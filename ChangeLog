@@ -1,5 +1,10 @@
 2008-06-30	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* src/core/song.cpp:
+	- send posted events after creating a new project - makes project not
+	  being marked as modified right after it's been created
+	- create empty sample-track and automation-track in new projects
+
 	* src/core/engine.cpp:
 	clear whole project before deleting everything - fixes segfault when
 	quitting with controllers added

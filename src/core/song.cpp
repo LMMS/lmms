@@ -779,12 +779,13 @@ void song::createNewProject( void )
 	t = track::create( track::InstrumentTrack, this );
 	dynamic_cast< instrumentTrack * >( t )->loadInstrument(
 					"tripleoscillator" );
-//	track::create( track::SampleTrack, this );
 	t = track::create( track::InstrumentTrack,
 						engine::getBBTrackContainer() );
 	dynamic_cast< instrumentTrack * >( t )->loadInstrument(
 						"tripleoscillator" );
+	track::create( track::SampleTrack, this );
 	track::create( track::BBTrack, this );
+	track::create( track::AutomationTrack, this );
 
 	m_tempoModel.setInitValue( DefaultTempo );
 	m_timeSigModel.reset();
@@ -798,6 +799,8 @@ void song::createNewProject( void )
 	engine::getBBTrackContainer()->updateAfterTrackAdd();
 
 	engine::getProjectJournal()->setJournalling( TRUE );
+
+	QCoreApplication::sendPostedEvents();
 
 	m_modified = FALSE;
 
