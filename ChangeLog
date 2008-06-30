@@ -1,5 +1,8 @@
 2008-06-30	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* src/core/fx_mixer.cpp:
+	reset mute-model in fxMixer::clear()
+
 	* include/track.h:
 	* src/core/track.cpp:
 	- removed obsolete static members
