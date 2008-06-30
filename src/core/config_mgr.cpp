@@ -75,20 +75,6 @@ configManager::~configManager()
 
 
 
-/*void configManager::openWorkingDir( void )
-{
-	QString new_dir = QFileDialog::getExistingDirectory( this,
-					tr( "Choose LMMS working directory" ),
-								m_workingDir );
-	if( new_dir != QString::null )
-	{
-		m_wdLineEdit->setText( new_dir );
-	}
-}*/
-
-
-
-
 void configManager::setWorkingDir( const QString & _wd )
 {
 	m_workingDir = _wd;
@@ -136,43 +122,6 @@ void configManager::setSTKDir( const QString & _fd )
 #endif
 }
 
-
-
-/*
-void configManager::accept( void )
-{
-	if( m_workingDir.right( 1 ) != "/" )
-	{
-		m_workingDir += '/';
-	}
-	if( !QDir( m_workingDir ).exists() )
-	{
-		if( QMessageBox::question
-				( 0, tr( "Directory not existing" ),
-						tr( "The directory you "
-							"specified does not "
-							"exist. Create it?" ),
-					QMessageBox::Yes, QMessageBox::No )
-			== QMessageBox::Yes )
-		{
-			QDir().mkpath( m_workingDir );
-		}
-		else
-		{
-			switchPage( m_pageWorkingDir );
-			return;
-		}
-	}
-
-	QDir().mkpath( userProjectsDir() );
-	QDir().mkpath( userSamplesDir() );
-	QDir().mkpath( userPresetsDir() );
-
-	saveConfigFile();
-
-	QDialog::accept();
-}
-*/
 
 
 
@@ -334,14 +283,33 @@ bool configManager::loadConfigFile( void )
 
 #ifdef LMMS_LMMS_HAVE_STK_H
 	if( m_stkDir == "" )
-{
-	m_stkDir = "/usr/share/stk/rawwaves/";
-}
+	{
+		m_stkDir = "/usr/share/stk/rawwaves/";
+	}
 #endif
 
 	QDir::setSearchPaths( "resources", QStringList() << artworkDir()
 						<< defaultArtworkDir() );
 
+	if( !QDir( m_workingDir ).exists() )
+	{
+		if( QMessageBox::question( 0,
+			mainWindow::tr( "Working directory" ),
+			mainWindow::tr( "The LMMS working directory %1 does not "
+				"exist. Create it now? You can change the directory "
+				"later via Edit -> Settings." ).arg( m_workingDir ),
+					QMessageBox::Yes, QMessageBox::No ) ==
+								QMessageBox::Yes )
+		{
+			QDir().mkpath( m_workingDir );
+		}
+	}
+	if( QDir( m_workingDir ).exists() )
+	{
+		QDir().mkpath( userProjectsDir() );
+		QDir().mkpath( userSamplesDir() );
+		QDir().mkpath( userPresetsDir() );
+	}
 	return( TRUE );
 }
 
