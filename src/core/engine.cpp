@@ -131,7 +131,7 @@ void engine::destroy( void )
 	presetPreviewPlayHandle::cleanup();
 	instrumentTrackView::cleanupWindowPool();
 
-	s_song->clearAllTracks();
+	s_song->clearProject();
 	delete s_bbTrackContainer;
 	s_bbTrackContainer = NULL;
 	delete s_dummyTC;
