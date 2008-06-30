@@ -1174,7 +1174,7 @@ void trackContentWidget::paintEvent( QPaintEvent * _pe )
 		
 		// draw vertical lines
 		//pmp.setPen( QPen( QBrush( QColor( 80, 84, 96, 192 ) ), 1 ) );
-		pmp.setPen( QPen( QBrush( QColor( 0,0,0, 112 ) ), 1 ) );
+		pmp.setPen( QPen( QColor( 0,0,0, 112 ), 1 ) );
 		for( float x = 0.5; x < w * 2; x += ppt )
 		{
 			pmp.drawLine( QLineF( x, 1.0, x, h-2.0 ) );
@@ -1182,7 +1182,7 @@ void trackContentWidget::paintEvent( QPaintEvent * _pe )
 		//pmp.setPen( QPen( QColor( 255,0,0, 128 ), 1 ) );
 		pmp.drawLine( 0, 1, w*2, 1 );
 
-		pmp.setPen( QPen( QBrush( QColor( 255,255,255, 32 ) ), 1 ) );
+		pmp.setPen( QPen( QColor( 255,255,255, 32 ), 1 ) );
 		for( float x = 1.5; x < w * 2; x += ppt )
 		{
 			pmp.drawLine( QLineF( x, 1.0, x, h-2.0 ) );
@@ -1336,10 +1336,6 @@ midiTime trackContentWidget::endPosition( const midiTime & _pos_start )
 
 
 QPixmap * trackOperationsWidget::s_grip = NULL;     /*!< grip pixmap */
-QPixmap * trackOperationsWidget::s_muteOffDisabled; /*!< Mute off and disabled pixmap */
-QPixmap * trackOperationsWidget::s_muteOffEnabled;  /*!< Mute off but enabled pixmap */
-QPixmap * trackOperationsWidget::s_muteOnDisabled;  /*!< Mute on but disabled pixmap */
-QPixmap * trackOperationsWidget::s_muteOnEnabled;   /*!< Mute on and enabled pixmap */
 
 
 /*! \brief Create a new trackOperationsWidget
@@ -1356,14 +1352,6 @@ trackOperationsWidget::trackOperationsWidget( trackView * _parent ) :
 	{
 		s_grip = new QPixmap( embed::getIconPixmap(
 							"track_op_grip" ) );
-/*		s_muteOffDisabled = new QPixmap( embed::getIconPixmap(
-							"mute_off_disabled" ) );
-		s_muteOffEnabled = new QPixmap( embed::getIconPixmap(
-							"mute_off" ) );
-		s_muteOnDisabled = new QPixmap( embed::getIconPixmap(
-							"mute_on_disabled" ) );
-		s_muteOnEnabled = new QPixmap( embed::getIconPixmap(
-							"mute_on" ) );*/
 	}
 
 	toolTip::add( this, tr( "Press <Ctrl> while clicking on move-grip "

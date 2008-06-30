@@ -1,5 +1,53 @@
 2008-06-30	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* include/track.h:
+	* src/core/track.cpp:
+	- removed obsolete static members
+	- more simple QPen-initialization for not making Qt leak
+
+	* include/combobox_model.h:
+	pass _default_constructed-parameter to base-class
+
+	* src/gui/lfo_controller_dialog.cpp:
+	renamed constants so one-unit-compiling is possible
+
+	* src/gui/widgets/envelope_and_lfo_view.cpp:
+	* src/core/envelope_and_lfo_parameters.cpp:
+	do not duplicate constants
+
+	* src/gui/widgets/group_box.cpp:
+	make sure LED's default-model is being deleted when changing model
+
+	* src/core/plugin.cpp:
+	made initialization of dummy-plugin pixmap-loder static
+
+	* src/core/mixer.cpp:
+	properly terminate worker-threads at mixer-destruction
+
+	* src/core/main.cpp:
+	fixed various leaks
+
+	* src/core/mmp.cpp:
+	replaced compat-code by proper code in multimediaProject::upgrade()
+
+	* src/core/effect.cpp:
+	added missing initialization of m_processors member variable
+
+	* src/core/instrument_functions.cpp:
+	removed obsolete constants
+
+	* src/core/sample_buffer.cpp:
+	fixed broken logic when updating sample-data
+
+	* src/core/automation_pattern.cpp:
+	in automationPattern::valueAt() check whether the time-map is empty
+
+	* src/core/fx_mixer.cpp:
+	save/load mute-settings for FX-lines
+
+	* src/core/peak_controller.cpp:
+	return default-value if there's no peak-effect
+
 	* configure.in:
 	* Makefile.am:
 	* include/sample_buffer.h:
