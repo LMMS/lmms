@@ -90,6 +90,21 @@
 	* plugins/spectrum_analyzer/log_y_axis.png:
 	Update plugin artwork
 
+	* plugins/live_tool/live_tool.cpp:
+	* src/gui/plugin_browser.cpp:
+	* src/gui/main_window.cpp:
+	* src/gui/automation_editor.cpp:
+	* src/gui/bb_editor.cpp:
+	* src/tracks/bb_track.cpp:
+	* src/core/mmp.cpp:
+	* data/locale/nl.ts:
+	* data/locale/it.ts:
+	* data/locale/ca.ts:
+	* data/locale/ru.ts:
+	* data/locale/de.ts:
+	* data/locale/sv.ts:
+	Rename Baseline to Bassline
+
 2008-06-28	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* plugins/Makefile.am:

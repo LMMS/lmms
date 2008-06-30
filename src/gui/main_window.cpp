@@ -361,17 +361,17 @@ void mainWindow::finalize( void )
 
 	toolButton * bb_editor_window = new toolButton(
 					embed::getIconPixmap( "bb_track" ),
-					tr( "Show/hide Beat+Baseline Editor" ) +
+					tr( "Show/hide Beat+Bassline Editor" ) +
 									" (F6)",
 					this, SLOT( toggleBBEditorWin() ),
 								m_toolBar );
 	bb_editor_window->setShortcut( Qt::Key_F6 );
 	bb_editor_window->setWhatsThis(
 		tr( "By pressing this button, you can show or hide the "
-			"Beat+Baseline Editor. The Beat+Baseline Editor is "
+			"Beat+Bassline Editor. The Beat+Bassline Editor is "
 			"needed for creating beats, opening, adding and "
 			"removing channels, cutting, copying and pasting "
-			"beat- and baseline-patterns and other things like "
+			"beat- and bassline-patterns and other things like "
 			"that." ) );
 
 

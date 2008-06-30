@@ -1533,8 +1533,8 @@ http://lmms.sourceforge.net</translation>
     </message>
     <message>
         <location filename="../../src/gui/bb_editor.cpp" line="65"/>
-        <source>Beat+Baseline Editor</source>
-        <translation>Beat+Baseline Editor</translation>
+        <source>Beat+Bassline Editor</source>
+        <translation>Beat+Bassline Editor</translation>
     </message>
     <message>
         <location filename="../../src/gui/bb_editor.cpp" line="81"/>
@@ -1561,16 +1561,16 @@ http://lmms.sourceforge.net</translation>
     </message>
     <message>
         <location filename="../../src/tracks/bb_track.cpp" line="80"/>
-        <source>Open in Beat+Baseline-Editor</source>
-        <translation type="obsolete">Im Beat+Baseline-Editor öffnen</translation>
+        <source>Open in Beat+Bassline-Editor</source>
+        <translation type="obsolete">Im Beat+Bassline-Editor öffnen</translation>
     </message>
 </context>
 <context>
     <name>bbTCOView</name>
     <message>
         <location filename="../../src/tracks/bb_track.cpp" line="154"/>
-        <source>Open in Beat+Baseline-Editor</source>
-        <translation>Im Beat+Baseline-Editor öffnen</translation>
+        <source>Open in Beat+Bassline-Editor</source>
+        <translation>Im Beat+Bassline-Editor öffnen</translation>
     </message>
     <message>
         <location filename="../../src/tracks/bb_track.cpp" line="161"/>
@@ -1592,8 +1592,8 @@ http://lmms.sourceforge.net</translation>
     <name>bbTrack</name>
     <message>
         <location filename="../../src/tracks/bb_track.cpp" line="317"/>
-        <source>Beat/Baseline %1</source>
-        <translation>Beat/Baseline %1</translation>
+        <source>Beat/Bassline %1</source>
+        <translation>Beat/Bassline %1</translation>
     </message>
 </context>
 <context>
@@ -5537,7 +5537,7 @@ Double clicking any of the plugins will bring up information on the ports.</sour
         <source>This tool is intended to be used in live performances, though you can use it for music production as well.
 The following keys will work only if this window is active.
 The spacebar toggles play and pause in the Song Editor.
-F1-F10 keys mute the first 10 instruments in the Beat+Baseline Editor.</source>
+F1-F10 keys mute the first 10 instruments in the Beat+Bassline Editor.</source>
         <translation type="obsolete">Dieses Werkzeug ist für die Verwendung in Live-Auftritten gedacht, allerdings können Sie es natürlich auch für die Musikproduktion verwenden.
 Die folgenden Tasten funktionieren nur, wenn dieses Fenster im Vordergrund ist.
 Leertaste wechselt zwischen Abspielen und Pause im Song-Editor.
@@ -5551,7 +5551,7 @@ F1-F10 schalten die ersten 10 Instrumente im Beat+Bassline-Editor stumm bzw. wie
         <source>This tool is intended to be used in live performances, though you can use it for music production as well.
 The following keys will work only if this window is active.
 The spacebar toggles play and pause in the Song Editor.
-F1-F10 keys mute the first 10 instruments in the Beat+Baseline Editor.</source>
+F1-F10 keys mute the first 10 instruments in the Beat+Bassline Editor.</source>
         <translation>Dieses Werkzeug ist für die Verwendung in Live-Auftritten gedacht, allerdings können Sie es natürlich auch für die Musikproduktion verwenden.
 Die folgenden Tasten funktionieren nur, wenn dieses Fenster im Vordergrund ist.
 Leertaste wechselt zwischen Abspielen und Pause im Song-Editor.
@@ -5769,13 +5769,13 @@ Bitte besuchen Sie http://wiki.mindrules.net für Dokumentationen über LMMS.</t
     </message>
     <message>
         <location filename="../../src/gui/main_window.cpp" line="262"/>
-        <source>Show/hide Beat+Baseline Editor</source>
-        <translation>Zeige/verstecke Beat+Baseline Editor</translation>
+        <source>Show/hide Beat+Bassline Editor</source>
+        <translation>Zeige/verstecke Beat+Bassline Editor</translation>
     </message>
     <message>
         <location filename="../../src/gui/main_window.cpp" line="272"/>
-        <source>By pressing this button, you can show or hide the Beat+Baseline Editor. The Beat+Baseline Editor is needed for creating beats, opening, adding and removing channels, cutting, copying and pasting beat- and baseline-patterns and other things like that.</source>
-        <translation>Durch das Drücken dieses Knopfes wird der Beat+Baseline Editor ein- oder ausgeblendet. Der Beat+Baseline Editor ist nötig, um Beats zu erstellen, Kanale zu öffnen, hinzuzufügen und zu entfernen sowie um Baseline-Patterns auszuschneiden, zu kopieren und einzufügen usw.</translation>
+        <source>By pressing this button, you can show or hide the Beat+Bassline Editor. The Beat+Bassline Editor is needed for creating beats, opening, adding and removing channels, cutting, copying and pasting beat- and bassline-patterns and other things like that.</source>
+        <translation>Durch das Drücken dieses Knopfes wird der Beat+Bassline Editor ein- oder ausgeblendet. Der Beat+Bassline Editor ist nötig, um Beats zu erstellen, Kanale zu öffnen, hinzuzufügen und zu entfernen sowie um Bassline-Patterns auszuschneiden, zu kopieren und einzufügen usw.</translation>
     </message>
     <message>
         <location filename="../../src/gui/main_window.cpp" line="404"/>
@@ -7383,8 +7383,8 @@ Lautstärke eines Steps kann mit Mausrad geändert werden</translation>
     </message>
     <message>
         <location filename="../../src/gui/plugin_browser.cpp" line="62"/>
-        <source>You can drag an instrument-plugin into either the Song-Editor, the Beat+Baseline Editor or just into a channel-window or on the corresponding channel-button.</source>
-        <translation>Sie können ein Instrument-Plugin entweder in den Song-Editor, den Beat+Baseline-Editor oder einfach in ein Kanal-Fenster oder auf den zugehörigen Kanal-Button ziehen.</translation>
+        <source>You can drag an instrument-plugin into either the Song-Editor, the Beat+Bassline Editor or just into a channel-window or on the corresponding channel-button.</source>
+        <translation>Sie können ein Instrument-Plugin entweder in den Song-Editor, den Beat+Bassline-Editor oder einfach in ein Kanal-Fenster oder auf den zugehörigen Kanal-Button ziehen.</translation>
     </message>
     <message>
         <location filename="../../plugins/organic/organic.cpp" line="54"/>

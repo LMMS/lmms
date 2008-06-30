@@ -892,7 +892,7 @@ http://lmms.sourceforge.net</translation>
     </message>
     <message>
         <location filename="../../src/gui/bb_editor.cpp" line="60"/>
-        <source>Beat+Baseline Editor</source>
+        <source>Beat+Bassline Editor</source>
         <translation>Editor de Ritme Base</translation>
     </message>
     <message>
@@ -905,7 +905,7 @@ http://lmms.sourceforge.net</translation>
     <name>bbTCOView</name>
     <message>
         <location filename="../../src/tracks/bb_track.cpp" line="150"/>
-        <source>Open in Beat+Baseline-Editor</source>
+        <source>Open in Beat+Bassline-Editor</source>
         <translation>Obre a l&apos;Editor de Ritme Base</translation>
     </message>
     <message>
@@ -928,7 +928,7 @@ http://lmms.sourceforge.net</translation>
     <name>bbTrack</name>
     <message>
         <location filename="../../src/tracks/bb_track.cpp" line="316"/>
-        <source>Beat/Baseline %1</source>
+        <source>Beat/Bassline %1</source>
         <translation>Ritme base %1</translation>
     </message>
 </context>
@@ -3173,7 +3173,7 @@ Fent doble clic a qualsevol connector mostrarà informació sobre els ports.</tr
         <source>This tool is intended to be used in live performances, though you can use it for music production as well.
 The following keys will work only if this window is active.
 The spacebar toggles play and pause in the Song Editor.
-F1-F10 keys mute the first 10 instruments in the Beat+Baseline Editor.</source>
+F1-F10 keys mute the first 10 instruments in the Beat+Bassline Editor.</source>
         <translation>Aquesta eina està pensada per a ser usada en actuacions en directe, encara que també pots usar-la per a producció musical.
 Les tecles següents només funcionaran si aquesta finestra està activa.
 La barra d&apos;espai canvia entre reproducció i pausa a l&apos;Editor de Cançó.
@@ -3304,12 +3304,12 @@ Les tecles F1-F10 apaguen els 10 primers instruments a l&apos;Editor de Ritme Ba
     </message>
     <message>
         <location filename="../../src/gui/main_window.cpp" line="365"/>
-        <source>Show/hide Beat+Baseline Editor</source>
+        <source>Show/hide Beat+Bassline Editor</source>
         <translation>Mostra/amaga Editor de Ritme Base</translation>
     </message>
     <message>
         <location filename="../../src/gui/main_window.cpp" line="375"/>
-        <source>By pressing this button, you can show or hide the Beat+Baseline Editor. The Beat+Baseline Editor is needed for creating beats, opening, adding and removing channels, cutting, copying and pasting beat- and baseline-patterns and other things like that.</source>
+        <source>By pressing this button, you can show or hide the Beat+Bassline Editor. The Beat+Bassline Editor is needed for creating beats, opening, adding and removing channels, cutting, copying and pasting beat- and bassline-patterns and other things like that.</source>
         <translation>Pitjant aquest botó pots mostrar o amagar l&apos;Editor de Ritme Base. L&apos;Editor de Ritme Base és necessari per a crear ritmes; obrir, afegir i eliminar canals; tallar, copiar i enganxar patrons de ritme; i altres funcions similars.</translation>
     </message>
     <message>
@@ -4412,7 +4412,7 @@ usa la roda del ratolí per a ajustar el volum d&apos;un pas</translation>
     </message>
     <message>
         <location filename="../../src/gui/plugin_browser.cpp" line="62"/>
-        <source>You can drag an instrument-plugin into either the Song-Editor, the Beat+Baseline Editor or just into a channel-window or on the corresponding channel-button.</source>
+        <source>You can drag an instrument-plugin into either the Song-Editor, the Beat+Bassline Editor or just into a channel-window or on the corresponding channel-button.</source>
         <translation>Pots arrossegar un connector d&apos;instrument a l&apos;Editor de Cançó, a l&apos;Editor de Ritme Base o simplement a una finestra de canal o al botó de canal corresponent.</translation>
     </message>
     <message>

@@ -147,7 +147,7 @@ bbTCOView::~bbTCOView()
 void bbTCOView::constructContextMenu( QMenu * _cm )
 {
 	QAction * a = new QAction( embed::getIconPixmap( "bb_track" ),
-					tr( "Open in Beat+Baseline-Editor" ),
+					tr( "Open in Beat+Bassline-Editor" ),
 					_cm );
 	_cm->insertAction( _cm->actions()[0], a );
 	connect( a, SIGNAL( triggered( bool ) ),
@@ -313,7 +313,7 @@ bbTrack::bbTrack( trackContainer * _tc ) :
 	int bbNum = s_infoMap.size();
 	s_infoMap[this] = bbNum;
 
-	setName( tr( "Beat/Baseline %1" ).arg( bbNum ) );
+	setName( tr( "Beat/Bassline %1" ).arg( bbNum ) );
 	engine::getBBTrackContainer()->setCurrentBB( bbNum );
 	engine::getBBTrackContainer()->updateComboBox();
 }

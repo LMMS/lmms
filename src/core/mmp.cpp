@@ -649,6 +649,15 @@ void multimediaProject::upgrade( void )
 			QDomElement el = list.item( i ).toElement();
 			el.setTagName( "automationpattern" );
 		}
+
+		list = elementsByTagName( "bbtrack" );
+		for( int i = 0; !list.item( i ).isNull(); ++i )
+		{
+			QDomElement el = list.item( i ).toElement();
+			QString s = el.attribute( "name" );
+			s.replace( QRegExp("^Beat/Baseline "), "Beat/Bassline " );
+			el.setAttribute( "name", s );
+		}
 	}
 
 

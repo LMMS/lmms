@@ -810,8 +810,8 @@ http://lmms.sourceforge.net</translation>
         <translation>Klik hier, wanneer je het afspelen van de huidige beat/bassline wilt stoppen. </translation>
     </message>
     <message>
-        <source>Beat+Baseline Editor</source>
-        <translation>Beat+Baseline Editor</translation>
+        <source>Beat+Bassline Editor</source>
+        <translation>Beat+Bassline Editor</translation>
     </message>
     <message>
         <source>Add beat/bassline</source>
@@ -833,15 +833,15 @@ http://lmms.sourceforge.net</translation>
         <translation>Kleur veranderen</translation>
     </message>
     <message>
-        <source>Open in Beat+Baseline-Editor</source>
-        <translation>In Beat+Baseline-Editor openen</translation>
+        <source>Open in Beat+Bassline-Editor</source>
+        <translation>In Beat+Bassline-Editor openen</translation>
     </message>
 </context>
 <context>
     <name>bbTrack</name>
     <message>
-        <source>Beat/Baseline %1</source>
-        <translation>Beat/Baseline %1</translation>
+        <source>Beat/Bassline %1</source>
+        <translation>Beat/Bassline %1</translation>
     </message>
 </context>
 <context>
@@ -1991,11 +1991,11 @@ Bezoek http://wiki.mindrules.net voor documentatie over LMMS.</translation>
         <translation>Hoofdscherm en werkplek instellen...</translation>
     </message>
     <message>
-        <source>Show/hide Beat+Baseline Editor</source>
+        <source>Show/hide Beat+Bassline Editor</source>
         <translation>Toon/Verberg Beat+Bassline Bewerker</translation>
     </message>
     <message>
-        <source>By pressing this button, you can show or hide the Beat+Baseline Editor. The Beat+Baseline Editor is needed for creating beats, opening, adding and removing channels, cutting, copying and pasting beat- and baseline-patterns and other things like that.</source>
+        <source>By pressing this button, you can show or hide the Beat+Bassline Editor. The Beat+Bassline Editor is needed for creating beats, opening, adding and removing channels, cutting, copying and pasting beat- and bassline-patterns and other things like that.</source>
         <translation>Met deze knop kun je de Beat+Bassline-Bewerker tonen/verbergen. De Beat+Bassline bewerker is nodig voor beats, het openen, toevoegen en verwijderen van kanalen, het knippen, plakken en kopieren van beat- en bassline-patterns en meer van dat soort dingen.</translation>
     </message>
     <message>
@@ -2460,8 +2460,8 @@ volume van de steps is met het muiswiel te veranderen</translation>
         <translation>Ruige &amp; Smerige Wavetable Synthesizer.</translation>
     </message>
     <message>
-        <source>You can drag an instrument-plugin into either the Song-Editor, the Beat+Baseline Editor or just into a channel-window or on the corresponding channel-button.</source>
-        <translation>Je kunt een instrument-plugin slepen naar zowel de Song-Bewerker, de Beat+Baseline-Bewerker of gewoon in een kanaal-venster of naar de corresponderende kanal-knop.</translation>
+        <source>You can drag an instrument-plugin into either the Song-Editor, the Beat+Bassline Editor or just into a channel-window or on the corresponding channel-button.</source>
+        <translation>Je kunt een instrument-plugin slepen naar zowel de Song-Bewerker, de Beat+Bassline-Bewerker of gewoon in een kanaal-venster of naar de corresponderende kanal-knop.</translation>
     </message>
     <message>
         <source>Additive Synthesizer for organ-like sounds</source>

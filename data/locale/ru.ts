@@ -837,7 +837,7 @@ http://lmms.sourceforge.net</translation>
         <translation>Нажмите чтобы остановить воспроизведение.</translation>
     </message>
     <message>
-        <source>Beat+Baseline Editor</source>
+        <source>Beat+Bassline Editor</source>
         <translation>Редактор ритма/лейтмотива</translation>
     </message>
     <message>
@@ -860,14 +860,14 @@ http://lmms.sourceforge.net</translation>
         <translation>Изменить цвет</translation>
     </message>
     <message>
-        <source>Open in Beat+Baseline-Editor</source>
+        <source>Open in Beat+Bassline-Editor</source>
         <translation>Открыть в редакторе ритма/лейтмотива</translation>
     </message>
 </context>
 <context>
     <name>bbTrack</name>
     <message>
-        <source>Beat/Baseline %1</source>
+        <source>Beat/Bassline %1</source>
         <translation>Лейтмотив %1</translation>
     </message>
 </context>
@@ -2443,11 +2443,11 @@ Please visit http://wiki.mindrules.net for documentation on LMMS.</source>
         <translation>Создаю рабочее пространство...</translation>
     </message>
     <message>
-        <source>Show/hide Beat+Baseline Editor</source>
+        <source>Show/hide Beat+Bassline Editor</source>
         <translation>Показать/скрыть редактор ритма/лейтмотива</translation>
     </message>
     <message>
-        <source>By pressing this button, you can show or hide the Beat+Baseline Editor. The Beat+Baseline Editor is needed for creating beats, opening, adding and removing channels, cutting, copying and pasting beat- and baseline-patterns and other things like that.</source>
+        <source>By pressing this button, you can show or hide the Beat+Bassline Editor. The Beat+Bassline Editor is needed for creating beats, opening, adding and removing channels, cutting, copying and pasting beat- and bassline-patterns and other things like that.</source>
         <translation>По нажатию этой кнопки запускается редактор ритма/лейтмотива произведения. Он необходим для установки ритма, добавления и удаления каналов, вырезания, копирования и вставки шаблонов и т. п.</translation>
     </message>
     <message>
@@ -3138,7 +3138,7 @@ use mouse wheel to set volume of a step</source>
         <translation>Тяп-ляп синтезатор сигнала.</translation>
     </message>
     <message>
-        <source>You can drag an instrument-plugin into either the Song-Editor, the Beat+Baseline Editor or just into a channel-window or on the corresponding channel-button.</source>
+        <source>You can drag an instrument-plugin into either the Song-Editor, the Beat+Bassline Editor or just into a channel-window or on the corresponding channel-button.</source>
         <translation>Вы можете переносить нужные вам инструменты из этой панели в редактор мелодии или в редактор лейтмотива. Отпускайте кнопку мыши прямо в окне, чтобы создать новый канал, или на кнопке нужного канала для замены типа канала на выбранный инструмент.</translation>
     </message>
     <message>

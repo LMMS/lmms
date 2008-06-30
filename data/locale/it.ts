@@ -778,10 +778,6 @@ http://lmms.sourceforge.net</translation>
 <context>
     <name>bbEditor</name>
     <message>
-        <source>Beat+Bassline Editor</source>
-        <translation type="obsolete">Beat+Bassline Editor</translation>
-    </message>
-    <message>
         <source>Play/pause current beat/bassline (Space)</source>
         <translation>Riproduci/pausa il beat/bassline corrente (Spazio)</translation>
     </message>
@@ -798,8 +794,8 @@ http://lmms.sourceforge.net</translation>
         <translation>Clicca qui per fermare la riproduzione del beat/bassline corrente.</translation>
     </message>
     <message>
-        <source>Beat+Baseline Editor</source>
-        <translation>Beat+Baseline Editor</translation>
+        <source>Beat+Bassline Editor</source>
+        <translation>Beat+Bassline Editor</translation>
     </message>
     <message>
         <source>Add beat/bassline</source>
@@ -808,10 +804,6 @@ http://lmms.sourceforge.net</translation>
 </context>
 <context>
     <name>bbTCO</name>
-    <message>
-        <source>Open in Beat+Bassline-Editor</source>
-        <translation type="obsolete">Apri nel Beat+Bassline-Editor</translation>
-    </message>
     <message>
         <source>Reset name</source>
         <translation>Reimposta nome</translation>
@@ -825,19 +817,15 @@ http://lmms.sourceforge.net</translation>
         <translation>Cambia colore</translation>
     </message>
     <message>
-        <source>Open in Beat+Baseline-Editor</source>
-        <translation>Apri nel Beat+Baseline Editor</translation>
+        <source>Open in Beat+Bassline-Editor</source>
+        <translation>Apri nel Beat+Bassline Editor</translation>
     </message>
 </context>
 <context>
     <name>bbTrack</name>
     <message>
         <source>Beat/Bassline %1</source>
-        <translation type="obsolete">Beat/Bassline %1</translation>
-    </message>
-    <message>
-        <source>Beat/Baseline %1</source>
-        <translation>Beat/Baseline %1</translation>
+        <translation>Beat/Bassline %1</translation>
     </message>
 </context>
 <context>
@@ -2057,12 +2045,12 @@ Si prega di visitare http://wiki.mindrules.net per la documentazione su LMMS.</t
         <translation>Esporta il progetto corrente</translation>
     </message>
     <message>
-        <source>Show/hide Beat+Baseline Editor</source>
-        <translation>Mostra/nascondi il Beat+Baseline Editor</translation>
+        <source>Show/hide Beat+Bassline Editor</source>
+        <translation>Mostra/nascondi il Beat+Bassline Editor</translation>
     </message>
     <message>
-        <source>By pressing this button, you can show or hide the Beat+Baseline Editor. The Beat+Baseline Editor is needed for creating beats, opening, adding and removing channels, cutting, copying and pasting beat- and baseline-patterns and other things like that.</source>
-        <translation>Premendo questo pulsante puoi mostrare o nascondere il Beat+Baseline Editor. Il Beat+Baseline Editor serve per creare beats, aprire, aggiungere e togliere canale, tagliare, copiare e incollare beat- e baseline- pattern.</translation>
+        <source>By pressing this button, you can show or hide the Beat+Bassline Editor. The Beat+Bassline Editor is needed for creating beats, opening, adding and removing channels, cutting, copying and pasting beat- and bassline-patterns and other things like that.</source>
+        <translation>Premendo questo pulsante puoi mostrare o nascondere il Beat+Bassline Editor. Il Beat+Bassline Editor serve per creare beats, aprire, aggiungere e togliere canale, tagliare, copiare e incollare beat- e bassline- pattern.</translation>
     </message>
     <message>
         <source>Show/hide Piano-Roll</source>
@@ -2624,8 +2612,8 @@ usa la rotellina del mouse per impostare il volume di una nota</translation>
         <translation>Host VST per usare i plugin VST con LMMS</translation>
     </message>
     <message>
-        <source>You can drag an instrument-plugin into either the Song-Editor, the Beat+Baseline Editor or just into a channel-window or on the corresponding channel-button.</source>
-        <translation>Puoi trascinare uno strumento plugin nel Song-Editor, nel Beat+Baseline Editor o direttamente in un canale o sul pulsante di canale corrispondente.</translation>
+        <source>You can drag an instrument-plugin into either the Song-Editor, the Beat+Bassline Editor or just into a channel-window or on the corresponding channel-button.</source>
+        <translation>Puoi trascinare uno strumento plugin nel Song-Editor, nel Beat+Bassline Editor o direttamente in un canale o sul pulsante di canale corrispondente.</translation>
     </message>
     <message>
         <source>Rough &amp; Dirty Wavetable Synthesizer.</source>

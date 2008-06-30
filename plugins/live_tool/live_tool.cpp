@@ -114,7 +114,7 @@ liveToolView::liveToolView( tool * _tool ) :
 		"The following keys will work only if this window is active.\n"
 		"The spacebar toggles play and pause in the Song Editor.\n"
 		"F1-F10 keys mute the first 10 instruments in the "
-		"Beat+Baseline Editor." ) );
+		"Beat+Bassline Editor." ) );
 
 	parentWidget()->hide();
 	parentWidget()->layout()->setSizeConstraint( QLayout::SetFixedSize );

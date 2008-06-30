@@ -57,7 +57,7 @@ bbEditor::bbEditor( bbTrackContainer * _tc ) :
 
 
 	setWindowIcon( embed::getIconPixmap( "bb_track" ) );
-	setWindowTitle( tr( "Beat+Baseline Editor" ) );
+	setWindowTitle( tr( "Beat+Bassline Editor" ) );
 	// TODO: Use style sheet
 	setMinimumWidth( TRACK_OP_WIDTH + DEFAULT_SETTINGS_WIDGET_WIDTH
 						+ 2 * TCO_BORDER_WIDTH + 192 );

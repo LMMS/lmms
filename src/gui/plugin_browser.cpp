@@ -57,7 +57,7 @@ pluginBrowser::pluginBrowser( QWidget * _parent ) :
 
 	QLabel * hint = new QLabel( tr( "You can drag an instrument-plugin "
 					"into either the Song-Editor, the "
-					"Beat+Baseline Editor or just into a "
+					"Beat+Bassline Editor or just into a "
 					"channel-window or on the "
 					"corresponding channel-button." ),
 								m_view );
