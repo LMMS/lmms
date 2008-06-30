@@ -30,7 +30,7 @@
 #include "effect.h"
 #include "engine.h"
 #include "debug.h"
-
+#include "dummy_effect.h"
 
 
 
@@ -88,16 +88,22 @@ void effectChain::loadSettings( const QDomElement & _this )
 			// base64-data inside :-)
 			effectKey key( cn.attribute( "key" ) );
 			effect * e = effect::instantiate( name, this, &key );
-			m_effects.push_back( e );
-			// TODO: somehow detect if effect is sub-plugin-capable
-			// but couldn't load sub-plugin with requested key
-			if( node.isElement() )
+			if( e->isOkay() )
 			{
-				if( e->nodeName() == node.nodeName() )
+				if( node.isElement() )
 				{
-					e->restoreState( node.toElement() );
+					if( e->nodeName() == node.nodeName() )
+					{
+						e->restoreState( node.toElement() );
+					}
 				}
 			}
+			else
+			{
+				delete e;
+				e = new dummyEffect( parentModel() );
+			}
+			m_effects.push_back( e );
 			++fx_loaded;
 		}
 		node = node.nextSibling();
