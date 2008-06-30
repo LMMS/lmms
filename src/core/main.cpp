@@ -59,7 +59,7 @@ static inline QString baseName( const QString & _file )
 inline void loadTranslation( const QString & _tname,
 	const QString & _dir = configManager::inst()->localeDir() )
 {
-	QTranslator * t = new QTranslator( 0 );
+	QTranslator * t = new QTranslator( QCoreApplication::instance() );
 	QString name = _tname + ".qm";
 
 	t->load( name, _dir );
@@ -397,7 +397,9 @@ int main( int argc, char * * argv )
 		r->startProcessing();
 	}
 
-	return( app->exec() );
+	const int ret = app->exec();
+	delete app;
+	return( ret );
 }
 
 
