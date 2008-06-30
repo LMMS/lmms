@@ -223,6 +223,8 @@ void fxMixer::saveSettings( QDomDocument & _doc, QDomElement & _this )
 		m_fxChannels[i]->m_fxChain.saveState( _doc, fxch );
 		m_fxChannels[i]->m_volumeModel.saveSettings( _doc, fxch,
 								"volume" );
+		m_fxChannels[i]->m_muteModel.saveSettings( _doc, fxch,
+								"muted" );
 		fxch.setAttribute( "num", i );
 		fxch.setAttribute( "name", m_fxChannels[i]->m_name );
 	}
@@ -243,6 +245,7 @@ void fxMixer::loadSettings( const QDomElement & _this )
 			fxch.firstChildElement(
 				m_fxChannels[num]->m_fxChain.nodeName() ) );
 		m_fxChannels[num]->m_volumeModel.loadSettings( fxch, "volume" );
+		m_fxChannels[num]->m_muteModel.loadSettings( fxch, "muted" );
 		m_fxChannels[num]->m_name = fxch.attribute( "name" );
 		node = node.nextSibling();
 	}
