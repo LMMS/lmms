@@ -218,11 +218,11 @@ songEditor::songEditor( song * _song, songEditor * & _engine_ptr ) :
 	// fill own tool-bar
 	m_playButton = new toolButton( embed::getIconPixmap( "play", 24, 24 ),
 					tr( "Play song (Space)" ),
-					m_s, SLOT( play() ), m_toolBar );
+					this, SLOT( play() ), m_toolBar );
 
 	m_stopButton = new toolButton( embed::getIconPixmap( "stop", 24, 24 ),
 					tr( "Stop song (Space)" ),
-					m_s, SLOT( stop() ), m_toolBar );
+					this, SLOT( stop() ), m_toolBar );
 
 	m_addBBTrackButton = new toolButton( embed::getIconPixmap(
 						"add_bb_track" ),
@@ -368,6 +368,31 @@ void songEditor::scrolled( int _new_pos )
 
 
 
+void songEditor::play( void )
+{
+	m_s->play();
+	if( m_s->playMode() == song::Mode_PlaySong )
+	{
+		m_playButton->setIcon( embed::getIconPixmap( "pause" ) );
+	}
+	else
+	{
+		m_playButton->setIcon( embed::getIconPixmap( "play" ) );
+	}
+}
+
+
+
+
+void songEditor::stop( void )
+{
+	m_s->stop();
+	m_playButton->setIcon( embed::getIconPixmap( "play" ) );
+}
+
+
+
+
 void songEditor::keyPressEvent( QKeyEvent * _ke )
 {
 	if( /*_ke->modifiers() & Qt::ShiftModifier*/
@@ -402,11 +427,11 @@ void songEditor::keyPressEvent( QKeyEvent * _ke )
 	{
 		if( m_s->isPlaying() )
 		{
-			m_s->stop();
+			stop();
 		}
 		else
 		{
-			m_s->play();
+			play();
 		}
 	}
 	else if( _ke->key() == Qt::Key_Home )

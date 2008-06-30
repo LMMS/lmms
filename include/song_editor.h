@@ -61,6 +61,9 @@ private slots:
 	void setHighQuality( bool );
 	void scrolled( int _new_pos );
 
+	void play( void );
+	void stop( void );
+
 	void masterVolumeChanged( int _new_val );
 	void masterVolumePressed( void );
 	void masterVolumeMoved( int _new_val );
