@@ -117,8 +117,8 @@ QToolButton:checked {
 	padding: 3px 0px 0px 3px;
 }
 
-fxMixerView QPushButton {
-	font-size: 9px;
+fxMixerView QPushButton, effectRackView QPushButton, controllerRackView QPushButton {
+	font-size: 10px;
 }
 
 /* Plugins */
