@@ -59,6 +59,7 @@ automationPattern::automationPattern( automationTrack * _auto_track ) :
 	m_dynamic( FALSE )
 {
 	changeLength( midiTime( 1, 0 ) );
+	m_timeMap[0] = 0;
 }
 
 
@@ -83,6 +84,11 @@ automationPattern::automationPattern( const automationPattern & _pat_to_copy ) :
 
 automationPattern::~automationPattern()
 {
+	if( engine::getAutomationEditor() &&
+		engine::getAutomationEditor()->currentPattern() == this )
+	{
+		engine::getAutomationEditor()->setCurrentPattern( NULL );
+	}
 }
 
 
@@ -94,7 +100,7 @@ const automatableModel * automationPattern::firstObject( void )
 	{
 		return( m_objects.first() );
 	}
-	static floatModel _fm;
+	static floatModel _fm( 0, 0, 1, 0.001 );
 	return( &_fm );
 }
 
@@ -108,8 +114,7 @@ midiTime automationPattern::length( void ) const
 	tick max_length = 0;
 
 	for( timeMap::const_iterator it = m_timeMap.begin();
-							it != m_timeMap.end();
-									++it )
+						it != m_timeMap.end(); ++it )
 	{
 		max_length = tMax<tick>( max_length, it.key() );
 	}
@@ -232,7 +237,7 @@ float automationPattern::valueAt( const midiTime & _time )
 void automationPattern::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
 	_this.setAttribute( "pos", startPosition() );
-	
+
 	for( timeMap::const_iterator it = m_timeMap.begin();
 						it != m_timeMap.end(); ++it )
 	{
@@ -241,6 +246,7 @@ void automationPattern::saveSettings( QDomDocument & _doc, QDomElement & _this )
 		element.setAttribute( "value", it.value() );
 		_this.appendChild( element );
 	}
+
 	for( objectVector::const_iterator it = m_objects.begin();
 						it != m_objects.end(); ++it )
 	{
@@ -296,7 +302,7 @@ const QString automationPattern::name( void ) const
 	{
 		return( m_objects.first()->fullDisplayName() );
 	}
-	return( tr( "No control assigned" ) );
+	return( tr( "Drag a control while pressing <Ctrl>" ) );
 }
 
 
@@ -459,15 +465,8 @@ automationPatternView::automationPatternView( automationPattern * _pattern,
 
 
 
-
-
 automationPatternView::~automationPatternView()
 {
-	if( engine::getAutomationEditor()
-		&& engine::getAutomationEditor()->currentPattern() == m_pat )
-	{
-		engine::getAutomationEditor()->setCurrentPattern( NULL );
-	}
 }
 
 
@@ -477,7 +476,10 @@ automationPatternView::~automationPatternView()
 void automationPatternView::update( void )
 {
 	m_needsUpdate = TRUE;
-//	m_pat->changeLength( m_pat->length() );
+	if( fixedTCOs() )
+	{
+		m_pat->changeLength( m_pat->length() );
+	}
 	trackContentObjectView::update();
 }
 
@@ -644,7 +646,7 @@ void automationPatternView::paintEvent( QPaintEvent * )
 	lin2grad.setColorAt( 0, cd );
 
 	for( automationPattern::timeMap::const_iterator it =
-				m_pat->getTimeMap().begin();
+						m_pat->getTimeMap().begin();
 					it != m_pat->getTimeMap().end(); ++it )
 	{
 		const float x1 = 2 * x_base + it.key() * ppt /
@@ -710,7 +712,7 @@ void automationPatternView::dropEvent( QDropEvent * _de )
 					getJournallingObject( val.toInt() ) );
 		if( mod != NULL )
 		{
-			m_pat->m_objects += mod;
+			m_pat->addObject( mod );
 		}
 	}
 
