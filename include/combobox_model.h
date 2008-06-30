@@ -42,7 +42,8 @@ public:
 	comboBoxModel( ::model * _parent = NULL,
 			const QString & _display_name = QString::null,
 				bool _default_constructed = FALSE ) :
-		intModel( 0, 0, 0, _parent, _display_name )
+		intModel( 0, 0, 0, _parent, _display_name,
+							_default_constructed )
 	{
 	}
 
