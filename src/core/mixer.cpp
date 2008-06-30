@@ -171,6 +171,10 @@ public:
 		m_jobQueue = _q;
 	}
 
+	virtual void quit( void )
+	{
+		m_quit = TRUE;
+	}
 
 private:
 	virtual void run( void )
@@ -178,7 +182,7 @@ private:
 		sampleFrame * working_buf = (sampleFrame *) aligned_malloc(
 						m_mixer->framesPerPeriod() *
 							sizeof( sampleFrame ) );
-		while( 1 )
+		while( m_quit == FALSE )
 		{
 			m_queueReadySem->acquire();
 			for( jobQueueItems::iterator it =
@@ -231,12 +235,38 @@ private:
 		aligned_free( working_buf );
 	}
 
+	volatile bool m_quit;
 	mixer * m_mixer;
 	QSemaphore * m_queueReadySem;
 	QSemaphore * m_workersDoneSem;
 	jobQueue * m_jobQueue;
 
 } ;
+
+
+
+#define FILL_JOB_QUEUE(_jq,_vec_type,_vec,_job_type,_condition)		\
+	for( _vec_type::iterator it = _vec.begin();			\
+				it != _vec.end(); ++it )		\
+	{								\
+		if( _condition )					\
+		{							\
+			_jq.items.push_back(				\
+			mixerWorkerThread::jobQueueItem( _job_type,	\
+							(void *)*it ) );\
+		}							\
+	}
+
+#define DISTRIBUTE_JOB_QUEUE(_jq)					\
+	for( int i = 0; i < m_numWorkers; ++i )				\
+	{								\
+		m_workers[i]->setJobQueue( &_jq );			\
+	}								\
+	m_queueReadySem.release( m_numWorkers );			\
+
+#define WAIT_FOR_JOBS()							\
+	m_workersDoneSem.acquire( m_numWorkers );
+
 
 
 
@@ -315,6 +345,19 @@ mixer::mixer( void ) :
 
 mixer::~mixer()
 {
+	if( m_multiThreaded )
+	{
+		// distribute an empty job-queue so that worker-threads
+		// get out of their processing-loop
+		mixerWorkerThread::jobQueue jq;
+		for( int w = 0; w < m_numWorkers; ++w )
+		{
+			m_workers[w]->quit();
+			DISTRIBUTE_JOB_QUEUE(jq);
+			m_workers[w]->wait();
+		}
+	}
+
 	while( m_fifo->available() )
 	{
 		delete[] m_fifo->read();
@@ -419,30 +462,6 @@ bool mixer::criticalXRuns( void ) const
 				engine::getSong()->realTimeTask() == TRUE ) );
 }
 
-
-
-
-#define FILL_JOB_QUEUE(_jq,_vec_type,_vec,_job_type,_condition)		\
-	for( _vec_type::iterator it = _vec.begin();			\
-				it != _vec.end(); ++it )		\
-	{								\
-		if( _condition )					\
-		{							\
-			_jq.items.push_back(				\
-			mixerWorkerThread::jobQueueItem( _job_type,	\
-							(void *)*it ) );\
-		}							\
-	}
-
-#define DISTRIBUTE_JOB_QUEUE(_jq)					\
-	for( int i = 0; i < m_numWorkers; ++i )				\
-	{								\
-		m_workers[i]->setJobQueue( &_jq );			\
-	}								\
-	m_queueReadySem.release( m_numWorkers );			\
-
-#define WAIT_FOR_JOBS()							\
-	m_workersDoneSem.acquire( m_numWorkers );
 
 
 
