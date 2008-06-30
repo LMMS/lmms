@@ -48,20 +48,20 @@
 #include "tempo_sync_knob.h"
 #include "pixmap_button.h"
 
-const int ENV_KNOBS_LBL_Y = 20;
-const int KNOB_X_SPACING = 32;
+const int CD_ENV_KNOBS_LBL_Y = 20;
+const int CD_KNOB_X_SPACING = 32;
 
-const int LFO_SHAPES_X = 6;
-const int LFO_SHAPES_Y = 36;
+const int CD_LFO_SHAPES_X = 6;
+const int CD_LFO_SHAPES_Y = 36;
 
-const int LFO_GRAPH_X = 6;
-const int LFO_GRAPH_Y = ENV_KNOBS_LBL_Y+15;
-const int LFO_KNOB_Y = LFO_GRAPH_Y-2;
-const int LFO_BASE_KNOB_X = LFO_SHAPES_X + 64;
-const int LFO_SPEED_KNOB_X = LFO_BASE_KNOB_X+KNOB_X_SPACING;
-const int LFO_AMOUNT_KNOB_X = LFO_SPEED_KNOB_X+KNOB_X_SPACING;
-const int LFO_PHASE_KNOB_X = LFO_AMOUNT_KNOB_X+KNOB_X_SPACING;
-const int LFO_MULTIPLIER_X = LFO_PHASE_KNOB_X+KNOB_X_SPACING;
+const int CD_LFO_GRAPH_X = 6;
+const int CD_LFO_GRAPH_Y = CD_ENV_KNOBS_LBL_Y+15;
+const int CD_LFO_CD_KNOB_Y = CD_LFO_GRAPH_Y-2;
+const int CD_LFO_BASE_CD_KNOB_X = CD_LFO_SHAPES_X + 64;
+const int CD_LFO_SPEED_CD_KNOB_X = CD_LFO_BASE_CD_KNOB_X+CD_KNOB_X_SPACING;
+const int CD_LFO_AMOUNT_CD_KNOB_X = CD_LFO_SPEED_CD_KNOB_X+CD_KNOB_X_SPACING;
+const int CD_LFO_PHASE_CD_KNOB_X = CD_LFO_AMOUNT_CD_KNOB_X+CD_KNOB_X_SPACING;
+const int CD_LFO_MULTIPLIER_X = CD_LFO_PHASE_CD_KNOB_X+CD_KNOB_X_SPACING;
 
 lfoControllerDialog::lfoControllerDialog( controller * _model, QWidget * _parent ) :
 	controllerDialog( _model, _parent )
@@ -78,14 +78,14 @@ lfoControllerDialog::lfoControllerDialog( controller * _model, QWidget * _parent
 
 	m_baseKnob = new knob( knobBright_26, this );
 	m_baseKnob->setLabel( tr( "BASE" ) );
-	m_baseKnob->move( LFO_BASE_KNOB_X, LFO_KNOB_Y );
+	m_baseKnob->move( CD_LFO_BASE_CD_KNOB_X, CD_LFO_CD_KNOB_Y );
 	m_baseKnob->setHintText( tr( "Base amount:" ) + " ", "" );
 	m_baseKnob->setWhatsThis( tr("todo") );
 
 
 	m_speedKnob = new tempoSyncKnob( knobBright_26, this );
 	m_speedKnob->setLabel( tr( "SPD" ) );
-	m_speedKnob->move( LFO_SPEED_KNOB_X, LFO_KNOB_Y );
+	m_speedKnob->move( CD_LFO_SPEED_CD_KNOB_X, CD_LFO_CD_KNOB_Y );
 	m_speedKnob->setHintText( tr( "LFO-speed:" ) + " ", "" );
 	m_speedKnob->setWhatsThis(
 		tr( "Use this knob for setting speed of the LFO. The "
@@ -95,7 +95,7 @@ lfoControllerDialog::lfoControllerDialog( controller * _model, QWidget * _parent
 
 	m_amountKnob = new knob( knobBright_26, this );
 	m_amountKnob->setLabel( tr( "AMT" ) );
-	m_amountKnob->move( LFO_AMOUNT_KNOB_X, LFO_KNOB_Y );
+	m_amountKnob->move( CD_LFO_AMOUNT_CD_KNOB_X, CD_LFO_CD_KNOB_Y );
 	m_amountKnob->setHintText( tr( "Modulation amount:" ) + " ", "" );
 	m_amountKnob->setWhatsThis(
 		tr( "Use this knob for setting modulation amount of the "
@@ -105,7 +105,7 @@ lfoControllerDialog::lfoControllerDialog( controller * _model, QWidget * _parent
 
 	m_phaseKnob = new knob( knobBright_26, this );
 	m_phaseKnob->setLabel( tr( "PHS" ) );
-	m_phaseKnob->move( LFO_PHASE_KNOB_X, LFO_KNOB_Y );
+	m_phaseKnob->move( CD_LFO_PHASE_CD_KNOB_X, CD_LFO_CD_KNOB_Y );
 	m_phaseKnob->setHintText( tr( "Phase offset:" ) + " ", "" + tr( "degrees" ) );
 	m_phaseKnob->setWhatsThis(
 			tr( "With this knob you can set the phase-offset of "
@@ -118,7 +118,7 @@ lfoControllerDialog::lfoControllerDialog( controller * _model, QWidget * _parent
 				) );
 
 	pixmapButton * sin_wave_btn = new pixmapButton( this, NULL );
-	sin_wave_btn->move( LFO_SHAPES_X, LFO_SHAPES_Y );
+	sin_wave_btn->move( CD_LFO_SHAPES_X, CD_LFO_SHAPES_Y );
 	sin_wave_btn->setActiveGraphic( embed::getIconPixmap(
 						"sin_wave_active" ) );
 	sin_wave_btn->setInactiveGraphic( embed::getIconPixmap(
@@ -129,7 +129,7 @@ lfoControllerDialog::lfoControllerDialog( controller * _model, QWidget * _parent
 
 	pixmapButton * triangle_wave_btn =
 					new pixmapButton( this, NULL );
-	triangle_wave_btn->move( LFO_SHAPES_X + 15, LFO_SHAPES_Y );
+	triangle_wave_btn->move( CD_LFO_SHAPES_X + 15, CD_LFO_SHAPES_Y );
 	triangle_wave_btn->setActiveGraphic(
 		embed::getIconPixmap( "triangle_wave_active" ) );
 	triangle_wave_btn->setInactiveGraphic(
@@ -139,7 +139,7 @@ lfoControllerDialog::lfoControllerDialog( controller * _model, QWidget * _parent
 					"for current oscillator." ) );
 
 	pixmapButton * saw_wave_btn = new pixmapButton( this, NULL );
-	saw_wave_btn->move( LFO_SHAPES_X + 30, LFO_SHAPES_Y );
+	saw_wave_btn->move( CD_LFO_SHAPES_X + 30, CD_LFO_SHAPES_Y );
 	saw_wave_btn->setActiveGraphic( embed::getIconPixmap(
 						"saw_wave_active" ) );
 	saw_wave_btn->setInactiveGraphic( embed::getIconPixmap(
@@ -149,7 +149,7 @@ lfoControllerDialog::lfoControllerDialog( controller * _model, QWidget * _parent
 					"current oscillator." ) );
 
 	pixmapButton * sqr_wave_btn = new pixmapButton( this, NULL );
-	sqr_wave_btn->move( LFO_SHAPES_X + 45, LFO_SHAPES_Y );
+	sqr_wave_btn->move( CD_LFO_SHAPES_X + 45, CD_LFO_SHAPES_Y );
 	sqr_wave_btn->setActiveGraphic( embed::getIconPixmap(
 					"square_wave_active" ) );
 	sqr_wave_btn->setInactiveGraphic( embed::getIconPixmap(
@@ -160,7 +160,7 @@ lfoControllerDialog::lfoControllerDialog( controller * _model, QWidget * _parent
 
 	pixmapButton * moog_saw_wave_btn =
 					new pixmapButton( this, NULL );
-	moog_saw_wave_btn->move( LFO_SHAPES_X, LFO_SHAPES_Y + 15 );
+	moog_saw_wave_btn->move( CD_LFO_SHAPES_X, CD_LFO_SHAPES_Y + 15 );
 	moog_saw_wave_btn->setActiveGraphic(
 		embed::getIconPixmap( "moog_saw_wave_active" ) );
 	moog_saw_wave_btn->setInactiveGraphic(
@@ -170,7 +170,7 @@ lfoControllerDialog::lfoControllerDialog( controller * _model, QWidget * _parent
 					"for current oscillator." ) );
 
 	pixmapButton * exp_wave_btn = new pixmapButton( this, NULL );
-	exp_wave_btn->move( LFO_SHAPES_X + 15, LFO_SHAPES_Y + 15 );
+	exp_wave_btn->move( CD_LFO_SHAPES_X + 15, CD_LFO_SHAPES_Y + 15 );
 	exp_wave_btn->setActiveGraphic( embed::getIconPixmap(
 						"exp_wave_active" ) );
 	exp_wave_btn->setInactiveGraphic( embed::getIconPixmap(
@@ -180,7 +180,7 @@ lfoControllerDialog::lfoControllerDialog( controller * _model, QWidget * _parent
 				"wave for current oscillator." ) );
 
 	pixmapButton * white_noise_btn = new pixmapButton( this, NULL );
-	white_noise_btn->move( LFO_SHAPES_X + 30, LFO_SHAPES_Y + 15 );
+	white_noise_btn->move( CD_LFO_SHAPES_X + 30, CD_LFO_SHAPES_Y + 15 );
 	white_noise_btn->setActiveGraphic(
 		embed::getIconPixmap( "white_noise_wave_active" ) );
 	white_noise_btn->setInactiveGraphic(
@@ -190,7 +190,7 @@ lfoControllerDialog::lfoControllerDialog( controller * _model, QWidget * _parent
 					"current oscillator." ) );
 
 	pixmapButton * uwb = new pixmapButton( this, NULL );
-	uwb->move( LFO_SHAPES_X + 45, LFO_SHAPES_Y + 15 );
+	uwb->move( CD_LFO_SHAPES_X + 45, CD_LFO_SHAPES_Y + 15 );
 	uwb->setActiveGraphic( embed::getIconPixmap(
 						"usr_wave_active" ) );
 	uwb->setInactiveGraphic( embed::getIconPixmap(
@@ -211,21 +211,21 @@ lfoControllerDialog::lfoControllerDialog( controller * _model, QWidget * _parent
 
 
 	pixmapButton * x1 = new pixmapButton( this, NULL );
-	x1->move( LFO_MULTIPLIER_X, LFO_SHAPES_Y );
+	x1->move( CD_LFO_MULTIPLIER_X, CD_LFO_SHAPES_Y );
 	x1->setActiveGraphic( embed::getIconPixmap(
 						"lfo_x1_active" ) );
 	x1->setInactiveGraphic( embed::getIconPixmap(
 						"lfo_x1_inactive" ) );
 
 	pixmapButton * x100 = new pixmapButton( this, NULL );
-	x100->move( LFO_MULTIPLIER_X, LFO_SHAPES_Y - 15 );
+	x100->move( CD_LFO_MULTIPLIER_X, CD_LFO_SHAPES_Y - 15 );
 	x100->setActiveGraphic( embed::getIconPixmap(
 						"lfo_x100_active" ) );
 	x100->setInactiveGraphic( embed::getIconPixmap(
 						"lfo_x100_inactive" ) );
 
 	pixmapButton * d100 = new pixmapButton( this, NULL );
-	d100->move( LFO_MULTIPLIER_X, LFO_SHAPES_Y + 15 );
+	d100->move( CD_LFO_MULTIPLIER_X, CD_LFO_SHAPES_Y + 15 );
 	d100->setActiveGraphic( embed::getIconPixmap(
 						"lfo_d100_active" ) );
 	d100->setInactiveGraphic( embed::getIconPixmap(
