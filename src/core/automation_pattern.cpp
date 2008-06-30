@@ -218,6 +218,10 @@ void automationPattern::openInAutomationEditor( void )
 
 float automationPattern::valueAt( const midiTime & _time )
 {
+	if( m_timeMap.isEmpty() )
+	{
+		return( 0 );
+	}
 	timeMap::const_iterator v = m_timeMap.lowerBound( _time );
 	return( ( v != m_timeMap.end() ) ? v.value() : (v-1).value() );
 }
