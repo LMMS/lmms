@@ -1,5 +1,14 @@
 2008-06-30	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* include/main_window.h:
+	* src/gui/bb_editor.cpp:
+	* src/gui/fx_mixer_view.cpp:
+	* src/gui/main_window.cpp:
+	* src/gui/song_editor.cpp:
+	* src/gui/widgets/controller_rack_view.cpp:
+	added toggle-button for controller-rack-view and improved default
+	positions of sub-windows in workspace
+
 	* src/core/song.cpp:
 	- send posted events after creating a new project - makes project not
 	  being marked as modified right after it's been created

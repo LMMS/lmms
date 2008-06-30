@@ -109,6 +109,7 @@ public slots:
 	void toggleProjectNotesWin( void );
 	void toggleFxMixerWin( void );
 	void togglePianoRollWin( void );
+	void toggleControllerRack( void );
 
 	void undo( void );
 	void redo( void );

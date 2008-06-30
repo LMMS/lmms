@@ -45,6 +45,7 @@
 #include "engine.h"
 #include "fx_mixer_view.h" 
 #include "about_dialog.h"
+#include "controller_rack_view.h"
 #include "file_browser.h"
 #include "plugin_browser.h"
 #include "side_bar.h"
@@ -434,13 +435,22 @@ void mainWindow::finalize( void )
 			"project notes window. In this window you can put "
 			"down your project notes.") );
 
+	toolButton * controllers_window = new toolButton(
+					embed::getIconPixmap( "controller" ),
+					tr( "Show/hide controller rack" ) +
+								" (F11)",
+					this, SLOT( toggleControllerRack() ),
+								m_toolBar );
+	controllers_window->setShortcut( Qt::Key_F11 );
+
 	m_toolBarLayout->addWidget( song_editor_window, 1, 1 );
 	m_toolBarLayout->addWidget( bb_editor_window, 1, 2 );
 	m_toolBarLayout->addWidget( piano_roll_window, 1, 3 );
 	m_toolBarLayout->addWidget( automation_editor_window, 1, 4 );
 	m_toolBarLayout->addWidget( fx_mixer_window, 1, 5 );
 	m_toolBarLayout->addWidget( project_notes_window, 1, 6 );
-
+	m_toolBarLayout->addWidget( controllers_window, 1, 7 );
+	m_toolBarLayout->addWidget( controllers_window, 1, 7 );
 	m_toolBarLayout->setColumnStretch( 100, 1 );
 
 
@@ -466,7 +476,7 @@ void mainWindow::finalize( void )
 
 int mainWindow::addWidgetToToolBar( QWidget * _w, int _row, int _col )
 {
-	int col = ( _col == -1 ) ? m_toolBarLayout->columnCount() + 6 : _col;
+	int col = ( _col == -1 ) ? m_toolBarLayout->columnCount() + 7 : _col;
 	if( _w->height() > 32 || _row == -1 )
 	{
 		m_toolBarLayout->addWidget( _w, 0, col, 2, 1 );
@@ -484,7 +494,7 @@ int mainWindow::addWidgetToToolBar( QWidget * _w, int _row, int _col )
 void mainWindow::addSpacingToToolBar( int _size )
 {
 	m_toolBarLayout->setColumnMinimumWidth( m_toolBarLayout->columnCount() +
-								6, _size );
+								7, _size );
 }
 
 
@@ -808,6 +818,14 @@ void mainWindow::toggleAutomationEditorWin( void )
 void mainWindow::toggleFxMixerWin( void )
 {
 	toggleWindow( engine::getFxMixerView() );
+}
+
+
+
+
+void mainWindow::toggleControllerRack( void )
+{
+	toggleWindow( engine::getControllerRackView() );
 }
 
 

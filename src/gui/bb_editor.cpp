@@ -116,7 +116,7 @@ bbEditor::bbEditor( bbTrackContainer * _tc ) :
 	parentWidget()->setAttribute( Qt::WA_DeleteOnClose, FALSE );
 	parentWidget()->layout()->setSizeConstraint( QLayout::SetMinimumSize );
 	parentWidget()->resize( minimumWidth(), 300 );
-	parentWidget()->move( 10, 340 );
+	parentWidget()->move( 610, 5 );
 	parentWidget()->show();
 
 

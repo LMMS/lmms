@@ -332,8 +332,8 @@ songEditor::songEditor( song * _song, songEditor * & _engine_ptr ) :
 
 	engine::getMainWindow()->workspace()->addSubWindow( this );
 	parentWidget()->setAttribute( Qt::WA_DeleteOnClose, FALSE );
-	parentWidget()->resize( 680, 300 );
-	parentWidget()->move( 10, 10 );
+	parentWidget()->resize( 600, 300 );
+	parentWidget()->move( 5, 5 );
 	parentWidget()->show();
 
 	m_updateTimer.start( 1000 / 20, this );	// 20 fps

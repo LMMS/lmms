@@ -79,9 +79,10 @@ controllerRackView::controllerRackView( ) :
 	flags &= ~Qt::WindowMaximizeButtonHint;
 	subWin->setWindowFlags( flags );
 	setWindowFlags( flags );
-	subWin->layout()->setSizeConstraint(QLayout::SetFixedSize);
+	subWin->layout()->setSizeConstraint( QLayout::SetFixedSize );
 
 	parentWidget()->setAttribute( Qt::WA_DeleteOnClose, FALSE );
+	parentWidget()->move( 880, 310 );
 }
 
 

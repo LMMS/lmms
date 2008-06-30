@@ -237,7 +237,7 @@ fxMixerView::fxMixerView() :
 	subWin->layout()->setSizeConstraint(QLayout::SetFixedSize);
 
 	parentWidget()->setAttribute( Qt::WA_DeleteOnClose, FALSE );
-	parentWidget()->move( 10, 200 );
+	parentWidget()->move( 5, 310 );
 
 	// we want to receive dataChanged-signals in order to update
 	setModel( m );
