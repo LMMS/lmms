@@ -1,5 +1,48 @@
 2008-06-30	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* src/core/engine.cpp:
+	clear whole project before deleting everything - fixes segfault when
+	quitting with controllers added
+
+	* src/core/effect_chain.cpp:
+	fixed crash when an effect failed to load because its sub-plugin is
+	missing (closes #2005910)
+
+	* src/core/automation_pattern.cpp:
+	- initialize first value in time-map
+	- better default-model
+	- change automation-pattern to NULL if opened in automation editor
+	  during destruction
+	- improved default-label
+	- when used in track-container with fixed TCOs, update length
+
+	* src/core/track.cpp:
+	* src/tracks/bb_track.cpp:
+	* src/tracks/instrument_track.cpp:
+	* src/tracks/sample_track.cpp:
+	save/restore name-property inside track-class
+
+	* src/tracks/automation_track.cpp:
+	set a proper name per default
+
+	* src/gui/automation_editor.cpp:
+	queued connections for models for not getting signaled at
+	destruction-time
+
+	* include/bb_editor.h:
+	* src/gui/bb_editor.cpp:
+	made it possible to add automation-tracks to BB-editor
+
+	* include/automation_pattern.h:
+	* include/inline_automation.h:
+	* include/note.h:
+	* src/core/inline_automation.cpp:
+	* src/core/note.cpp:
+	fixed inlineAutomation::hasAutomation()
+
+	* data/themes/default/style.css:
+	common font-size for various push-buttons
+
 	* src/core/config_mgr.cpp:
 	ask whether to create working-directory if it does not exist
 

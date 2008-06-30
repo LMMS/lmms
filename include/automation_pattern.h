@@ -63,9 +63,19 @@ public:
 
 	void removeValue( const midiTime & _time );
 
+	inline const timeMap & getTimeMap( void ) const
+	{
+		return( m_timeMap );
+	}
+
 	inline timeMap & getTimeMap( void )
 	{
 		return( m_timeMap );
+	}
+
+	inline bool hasAutomation( void ) const
+	{
+		return( m_dynamic || getTimeMap()[0] != 0 );
 	}
 
 	float valueAt( const midiTime & _time );

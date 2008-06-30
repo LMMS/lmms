@@ -258,15 +258,9 @@ void note::createDetuning( void )
 
 
 
-bool note::hasDetuningInfo( void )
+bool note::hasDetuningInfo( void ) const
 {
-	if( m_detuning->hasAutomationPattern() )
-	{
-		const automationPattern::timeMap & map =
-			m_detuning->getAutomationPattern()->getTimeMap();
-		return( map.size() > 1 || map[0] != 0 );
-	}
-	return( FALSE );
+	return( m_detuning && m_detuning->hasAutomation() );
 }
 
 

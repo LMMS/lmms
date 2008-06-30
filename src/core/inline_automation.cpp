@@ -31,7 +31,7 @@
 void inlineAutomation::saveSettings( QDomDocument & _doc,
 							QDomElement & _parent )
 {
-	if( hasAutomationPattern() )
+	if( hasAutomation() )
 	{
 		QDomElement ap = _doc.createElement(
 					automationPattern::classNodeName() );

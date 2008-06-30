@@ -153,7 +153,7 @@ public:
 
 	void editDetuningPattern( void );
 
-	bool hasDetuningInfo( void );
+	bool hasDetuningInfo( void ) const;
 
 
 protected:

@@ -45,9 +45,10 @@ public:
 		delete m_autoPattern;
 	}
 
-	inline bool hasAutomationPattern( void ) const
+	inline bool hasAutomation( void ) const
 	{
-		return( m_autoPattern != NULL );
+		return( m_autoPattern != NULL &&
+					m_autoPattern->hasAutomation() );
 	}
 
 	automationPattern * getAutomationPattern( void )
