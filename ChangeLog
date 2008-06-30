@@ -82,6 +82,14 @@
 	Remove author name from artwork.  No other artwork has author names.  The
 	name on the main GUI makes LMMS looks less professional.  AUTHORS.
 
+	* plugins/patman/logo.png:
+	* plugins/stereo_matrix/artwork.png:
+	* plugins/audio_file_processor/logo.png:
+	* plugins/vestige/logo.png:
+	* plugins/spectrum_analyzer/log_x_axis.png:
+	* plugins/spectrum_analyzer/log_y_axis.png:
+	Update plugin artwork
+
 2008-06-28	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* plugins/Makefile.am:
