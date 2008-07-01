@@ -864,6 +864,11 @@ void song::loadProject( const QString & _file_name )
 		m_playPos[Mode_PlaySong].m_timeLine->toggleLoopPoints( 0 );
 	}
 
+	if( !mmp.content().firstChildElement( "track" ).isNull() )
+	{
+		m_globalAutomationTrack->restoreState( mmp.content().
+						firstChildElement( "track" ) );
+	}
 	QDomNode node = mmp.content().firstChild();
 	while( !node.isNull() )
 	{
@@ -959,6 +964,7 @@ bool song::saveProject( void )
 
 	saveState( mmp, mmp.content() );
 
+	m_globalAutomationTrack->saveState( mmp, mmp.content() );
 	engine::getFxMixer()->saveState( mmp, mmp.content() );
 	engine::getPianoRoll()->saveState( mmp, mmp.content() );
 	engine::getAutomationEditor()->saveState( mmp, mmp.content() );

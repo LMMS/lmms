@@ -1704,7 +1704,7 @@ void track::loadSettings( const QDomElement & _this )
 	while( !m_trackContentObjects.empty() )
 	{
 		delete m_trackContentObjects.front();
-		m_trackContentObjects.erase( m_trackContentObjects.begin() );
+//		m_trackContentObjects.erase( m_trackContentObjects.begin() );
 	}
 
 	QDomNode node = _this.firstChild();

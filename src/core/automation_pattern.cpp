@@ -340,12 +340,14 @@ trackContentObjectView * automationPattern::createView( trackView * _tv )
 
 bool automationPattern::isAutomated( const automatableModel * _m )
 {
-	const trackContainer::trackList l = engine::getSong()->tracks() +
+	trackContainer::trackList l = engine::getSong()->tracks() +
 				engine::getBBTrackContainer()->tracks();
+	l += engine::getSong()->globalAutomationTrack();
 	for( trackContainer::trackList::const_iterator it = l.begin();
 							it != l.end(); ++it )
 	{
-		if( ( *it )->type() == track::AutomationTrack )
+		if( ( *it )->type() == track::AutomationTrack ||
+			( *it )->type() == track::HiddenAutomationTrack )
 		{
 			const track::tcoVector & v = ( *it )->getTCOs();
 			for( track::tcoVector::const_iterator j = v.begin();
@@ -409,6 +411,7 @@ void automationPattern::resolveAllIDs( void )
 {
 	trackContainer::trackList l = engine::getSong()->tracks() +
 				engine::getBBTrackContainer()->tracks();
+	l += engine::getSong()->globalAutomationTrack();
 	for( trackContainer::trackList::iterator it = l.begin();
 							it != l.end(); ++it )
 	{

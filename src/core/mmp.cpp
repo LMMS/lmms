@@ -168,8 +168,8 @@ multimediaProject::multimediaProject( const QString & _in_file_name,
 		node = node.nextSibling();
 	}
 
-	if( _upgrade && root.hasAttribute( "creatorversion" )
-			&& root.attribute( "creatorversion" ) != LMMS_VERSION )
+	if( _upgrade && root.hasAttribute( "creatorversion" ) &&
+			root.attribute( "creatorversion" ) != LMMS_VERSION )
 	{
 		upgrade();
 	}
