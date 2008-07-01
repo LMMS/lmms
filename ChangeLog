@@ -1,5 +1,21 @@
 2008-06-30	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* configure.in:
+	made 0.4.0-alpha release
+
+	* src/core/song.cpp:
+	* src/core/mmp.cpp:
+	* src/core/track.cpp:
+	* src/core/automation_pattern.cpp:
+	fixed broken load/save of song-global automation
+
+	* Makefile.am:
+	win32-pkg-fixes
+
+	* data/locale/de.qm:
+	* data/locale/de.ts:
+	updated German localization file
+
 	* include/song_editor.h:
 	* src/gui/song_editor.cpp:
 	made icon on play-button change according to current mode
