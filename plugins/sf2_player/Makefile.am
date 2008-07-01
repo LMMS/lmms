@@ -48,7 +48,7 @@ CLEANFILES = $(MOC_FILES) ${UIC_FILES} ./embedded_resources.h
 
 pkglib_LTLIBRARIES = libsf2player.la
 
-libsf2player_la_SOURCES = sf2_player.cpp sf2_player.h patches_dialog.cpp patches_dialog.h ui_patches_dialog.h
+libsf2player_la_SOURCES = sf2_player.cpp sf2_player.h patches_dialog.cpp patches_dialog.h
 libsf2player_la_LDFLAGS = -L@fluidsynth_lib@ -lfluidsynth
 
 $(libsf2player_la_SOURCES): ./embedded_resources.h
