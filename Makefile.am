@@ -31,7 +31,7 @@ win32-pkg: all
 	cp plugins/ladspa_effect/tap/tap*.dll tmp/lmms/plugins/ladspa/
 	PWD=`pwd`
 	cd data && make DESTDIR=$(PWD)/tmp/lmms/ install
-	mv tmp/lmms/usr/share/lmms/* tmp/lmms/data/ && rm -rf tmp/lmms/usr
+	mv tmp/lmms/opt/mingw/share/lmms/* tmp/lmms/data/ && rm -rf tmp/lmms/opt
 	cp /opt/mingw/bin/QtCore4.dll tmp/lmms
 	cp /opt/mingw/bin/QtGui4.dll tmp/lmms
 	cp /opt/mingw/bin/QtXml4.dll tmp/lmms
