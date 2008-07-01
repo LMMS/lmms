@@ -98,12 +98,12 @@ public:
 
 	inline model * getModel( void )
 	{
-		return( m_model.data() );
+		return( m_model );
 	}
 
 	inline const model * getModel( void ) const
 	{
-		return( m_model.data() );
+		return( m_model );
 	}
 
 	template<class T>
