@@ -1,5 +1,9 @@
 2008-07-01	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* src/core/mmp.cpp:
+	don't mess up projects when loading files being created using
+	0.4.0-alpha in a later version because "0.4.0-alpha" < "0.4.0-svn..."
+
 	* include/mv_base.h:
 	Qt 4.3 compatibility
 

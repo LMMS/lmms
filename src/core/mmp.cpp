@@ -337,10 +337,11 @@ void multimediaProject::cleanMetaNodes( QDomElement _de )
 
 void multimediaProject::upgrade( void )
 {
-	projectVersion version = documentElement().attribute(
-							"creatorversion" );
+	projectVersion version =
+		documentElement().attribute( "creatorversion" ).
+							replace( "svn", "" );
 
-	if( version < "0.2.1-svn20070501" )
+	if( version < "0.2.1-20070501" )
 	{
 		QDomNodeList list = elementsByTagName( "arpandchords" );
 		for( int i = 0; !list.item( i ).isNull(); ++i )
@@ -456,7 +457,7 @@ void multimediaProject::upgrade( void )
 		}
 	}
 
-	if( version < "0.2.1-svn20070508" )
+	if( version < "0.2.1-20070508" )
 	{
 		QDomNodeList list = elementsByTagName( "arpandchords" );
 		for( int i = 0; !list.item( i ).isNull(); ++i )
@@ -549,14 +550,15 @@ void multimediaProject::upgrade( void )
 			el.setTagName( "lb302" );
 		}
 
-		while( !( list = elementsByTagName( "channelsettings" ) ).isEmpty() )
+		while( !( list = elementsByTagName( "channelsettings" ) ).
+								isEmpty() )
 		{
 			QDomElement el = list.item( 0 ).toElement();
 			el.setTagName( "instrumenttracksettings" );
 		}
 	}
 
-	if( version < "0.4.0-svn20080104" )
+	if( version < "0.4.0-20080104" )
 	{
 		QDomNodeList list = elementsByTagName( "fx" );
 		for( int i = 0; !list.item( i ).isNull(); ++i )
@@ -570,7 +572,7 @@ void multimediaProject::upgrade( void )
 		}
 	}
 
-	if( version < "0.4.0-svn20080118" )
+	if( version < "0.4.0-20080118" )
 	{
 		QDomNodeList list;
 		while( !( list = elementsByTagName( "fx" ) ).isEmpty() )
@@ -590,7 +592,7 @@ void multimediaProject::upgrade( void )
 		}
 	}
 
-	if( version < "0.4.0-svn20080129" )
+	if( version < "0.4.0-20080129" )
 	{
 		QDomNodeList list;
 		while( !( list =
@@ -604,7 +606,7 @@ void multimediaProject::upgrade( void )
 		}
 	}
 
-	if( version < "0.4.0-svn20080409" )
+	if( version < "0.4.0-20080409" )
 	{
 		QStringList s;
 		s << "note" << "pattern" << "bbtco" << "sampletco" << "time";
@@ -632,7 +634,7 @@ void multimediaProject::upgrade( void )
 		
 	}
 
-	if( version < "0.4.0-svn20080607" )
+	if( version < "0.4.0-20080607" )
 	{
 		QDomNodeList list = elementsByTagName( "midi" );
 		for( int i = 0; !list.item( i ).isNull(); ++i )
@@ -642,7 +644,7 @@ void multimediaProject::upgrade( void )
 		}
 	}
 
-	if( version < "0.4.0-svn20080622" )
+	if( version < "0.4.0-20080622" )
 	{
 		QDomNodeList list = elementsByTagName( "automation-pattern" );
 		for( int i = 0; !list.item( i ).isNull(); ++i )
