@@ -1,5 +1,10 @@
 2008-07-02	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* src/core/main.cpp:
+	* src/core/song.cpp:
+	added new commandline option "--upgrade" for upgrading project-files
+	easily
+
 	* src/core/config_mgr.cpp:
 	fixed wrong macro-name - fixes unusable Mallets-plugin
 

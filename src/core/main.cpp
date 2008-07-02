@@ -39,14 +39,13 @@
 #include <sched.h>
 #endif
 
-
-#include "main_window.h"
+#include "config_mgr.h"
 #include "embed.h"
 #include "engine.h"
-#include "config_mgr.h"
+#include "lmms_style.h"
+#include "main_window.h"
 #include "project_renderer.h"
 #include "song.h"
-#include "lmms_style.h"
 
 #warning TODO: move somewhere else
 static inline QString baseName( const QString & _file )
@@ -99,7 +98,7 @@ int main( int argc, char * * argv )
 			new QCoreApplication( argc, argv ) :
 					new QApplication( argc, argv ) ;
 
-	QString file_to_load, render_out;
+	QString file_to_load, file_to_save, render_out;
 
 	mixer::qualitySettings qs( mixer::qualitySettings::Mode_HighQuality );
 	projectRenderer::outputSettings os( 44100, FALSE, 160,
@@ -149,10 +148,18 @@ int main( int argc, char * * argv )
 	"-x, --oversampling <value>	specify oversampling\n"
 	"				possible values: 1, 2, 4, 8\n"
 	"				default: 2\n"
+	"-u,--upgrade <in> <out>	upgrade file <in> and save as <out>\n"
 	"-v, --version			show version information and exit.\n"
 	"-h, --help			show this usage message and exit.\n\n",
 							LMMS_PACKAGE_VERSION );
 			return( EXIT_SUCCESS );
+		}
+		else if( argc > i+1 && ( QString( argv[i] ) == "--upgrade" ||
+						QString( argv[i] ) == "-u" ) )
+		{
+			file_to_load = argv[i + 1];
+			file_to_save = argv[i + 2];
+			i += 2;
 		}
 		else if( argc > i && ( QString( argv[i] ) == "--render" ||
 						QString( argv[i] ) == "-r" ) )
@@ -305,7 +312,7 @@ int main( int argc, char * * argv )
 		return( EXIT_FAILURE );
 	}
 
-	if( render_out == "" )
+	if( render_out.isEmpty() && file_to_save.isEmpty() )
 	{
 		QApplication::setStyle( new lmmsStyle() );
 
@@ -379,22 +386,31 @@ int main( int argc, char * * argv )
 		engine::init( FALSE );
 		engine::getSong()->loadProject( file_to_load );
 
-		// create renderer
-		projectRenderer * r = new projectRenderer( qs, os, eff,
-			render_out +
-				QString( ( eff == projectRenderer::WaveFile ) ?
+		if( !render_out.isEmpty() )
+		{
+			// create renderer
+			projectRenderer * r = new projectRenderer( qs, os, eff,
+				render_out +
+					QString( ( eff ==
+						projectRenderer::WaveFile ) ?
 							"wav" : "ogg" ) );
-		QCoreApplication::instance()->connect( r, SIGNAL( finished() ),
-							SLOT( quit() ) );
+			QCoreApplication::instance()->connect( r,
+					SIGNAL( finished() ), SLOT( quit() ) );
 
-		// timer for progress-updates
-		QTimer * t = new QTimer( r );
-		r->connect( t, SIGNAL( timeout() ),
-				SLOT( updateConsoleProgress() ) );
-		t->start( 50 );
+			// timer for progress-updates
+			QTimer * t = new QTimer( r );
+			r->connect( t, SIGNAL( timeout() ),
+					SLOT( updateConsoleProgress() ) );
+			t->start( 50 );
 
-		// start now!
-		r->startProcessing();
+			// start now!
+			r->startProcessing();
+		}
+		else
+		{
+			engine::getSong()->saveProjectAs( file_to_save );
+			return( 0 );
+		}
 	}
 
 	const int ret = app->exec();

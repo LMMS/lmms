@@ -966,16 +966,19 @@ bool song::saveProject( void )
 
 	m_globalAutomationTrack->saveState( mmp, mmp.content() );
 	engine::getFxMixer()->saveState( mmp, mmp.content() );
-	engine::getPianoRoll()->saveState( mmp, mmp.content() );
-	engine::getAutomationEditor()->saveState( mmp, mmp.content() );
-	( (journallingObject *)( engine::getProjectNotes() ) )->saveState( mmp,
+	if( engine::hasGUI() )
+	{
+		engine::getPianoRoll()->saveState( mmp, mmp.content() );
+		engine::getAutomationEditor()->saveState( mmp, mmp.content() );
+		( (journallingObject *)( engine::getProjectNotes() ) )->saveState( mmp,
 								mmp.content() );
-	m_playPos[Mode_PlaySong].m_timeLine->saveState( mmp, mmp.content() );
+		m_playPos[Mode_PlaySong].m_timeLine->saveState( mmp, mmp.content() );
+	}
 
 	saveControllerStates( mmp, mmp.content() );
 
 	m_fileName = mmp.nameWithExtension( m_fileName );
-	if( mmp.writeFile( m_fileName ) == TRUE )
+	if( mmp.writeFile( m_fileName ) == TRUE && engine::hasGUI() )
 	{
 		textFloat::displayMessage( tr( "Project saved" ),
 					tr( "The project %1 is now saved."
@@ -986,7 +989,7 @@ bool song::saveProject( void )
 		m_modified = FALSE;
 		engine::getMainWindow()->resetWindowTitle();
 	}
-	else
+	else if( engine::hasGUI() )
 	{
 		textFloat::displayMessage( tr( "Project NOT saved." ),
 				tr( "The project %1 was not saved!" ).arg(
