@@ -281,7 +281,7 @@ bool configManager::loadConfigFile( void )
 #endif
 	}
 
-#ifdef LMMS_LMMS_HAVE_STK_H
+#ifdef LMMS_HAVE_STK_H
 	if( m_stkDir == "" )
 	{
 		m_stkDir = "/usr/share/stk/rawwaves/";
