@@ -3,7 +3,7 @@
 /*
  * fade_button.cpp - implementation of fade-button
  *
- * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -30,6 +30,7 @@
 #include <QtGui/QPainter>
 #include <QtGui/QPixmap>
 
+#include "embed.h"
 #include "fade_button.h"
 #include "update_event.h"
 
@@ -41,6 +42,7 @@ fadeButton::fadeButton( const QColor & _normal_color,
 	m_normalColor( _normal_color ),
 	m_activatedColor( _activated_color )
 {
+	setCursor( QCursor( embed::getIconPixmap( "hand" ), 0, 0 ) );
 }
 
 

@@ -56,6 +56,7 @@ public:
 	{
 		setFixedSize( 32, 232 );
 		setAttribute( Qt::WA_OpaquePaintEvent, TRUE );
+		setCursor( QCursor( embed::getIconPixmap( "hand" ), 0, 0 ) );
 	}
 
 	virtual void paintEvent( QPaintEvent * )

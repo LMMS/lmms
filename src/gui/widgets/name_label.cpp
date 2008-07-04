@@ -32,6 +32,7 @@
 
 
 #include "name_label.h"
+#include "embed.h"
 #include "rename_dialog.h"
 #include "bb_track_container.h"
 #include "bb_track.h"
@@ -46,6 +47,7 @@ nameLabel::nameLabel( const QString & _initial_name, QWidget * _parent ) :
 	m_pixmap(),
 	m_pixmapFile( "" )
 {
+	setCursor( QCursor( embed::getIconPixmap( "hand" ), 0, 0 ) );
 }
 
 
@@ -201,7 +203,6 @@ void nameLabel::paintEvent( QPaintEvent * )
 	QPainter p( this );
 	p.fillRect( rect(),
 			parentWidget()->palette().color( backgroundRole() ) );
-	p.setFont( pointSize<9>( p.font() ) );
 
 	int x = 4;
 	if( m_pixmap.isNull() == FALSE )

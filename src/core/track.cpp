@@ -325,6 +325,7 @@ trackContentObjectView::trackContentObjectView( trackContentObject * _tco,
 
 	setAttribute( Qt::WA_DeleteOnClose );
 	setFocusPolicy( Qt::StrongFocus );
+	setCursor( QCursor( embed::getIconPixmap( "hand" ), 0, 0 ) );
 	move( 0, 1 );
 	show();
 
