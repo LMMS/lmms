@@ -47,11 +47,12 @@
 
 
 
-effectLabel::effectLabel( const QString & _initial_name, QWidget * _parent,
-							sampleTrack * _track ) :
+effectLabel::effectLabel( QWidget * _parent, sampleTrack * _track ) :
 	QWidget( _parent ),
 	m_track( _track )
 {
+	setCursor( QCursor( embed::getIconPixmap( "hand" ), 0, 0 ) );
+
 	m_effectBtn = new QPushButton( embed::getIconPixmap( "setup_audio" ),
 								"", this );
 	m_effectBtn->setGeometry( 6, 1, 28, 28 );
@@ -59,9 +60,7 @@ effectLabel::effectLabel( const QString & _initial_name, QWidget * _parent,
 					this, SLOT( showEffects() ) );
 
 	m_label = new QLabel( this );
-	m_label->setText( _initial_name );
-	QFont f = m_label->font();
-	m_label->setFont( pointSize<8>( f ) );
+	m_label->setText( m_track->name() );
 	m_label->setGeometry( 38, 1, 200, 28 );
 
 	m_effectRack = new effectRackView(
@@ -82,7 +81,7 @@ effectLabel::effectLabel( const QString & _initial_name, QWidget * _parent,
 		m_effWindow = m_effectRack;
 	}
 
- 	m_effWindow->setWindowTitle( _initial_name );
+ 	m_effWindow->setWindowTitle( m_track->name() );
 	m_effectRack->setFixedSize( 240, 242 );
 	m_effWindow->hide();
 }

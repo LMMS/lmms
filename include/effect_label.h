@@ -41,8 +41,7 @@ class effectLabel: public QWidget
 {
 	Q_OBJECT
 public:
-	effectLabel( const QString & _initial_name, QWidget * _parent,
-							sampleTrack * _track );
+	effectLabel( QWidget * _parent, sampleTrack * _track );
 	virtual ~effectLabel();
 
 	QString text( void ) const;
