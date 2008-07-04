@@ -306,8 +306,10 @@ void sampleTCOView::paintEvent( QPaintEvent * _pe )
 sampleTrack::sampleTrack( trackContainer * _tc ) :
 	track( SampleTrack, _tc ),
 	m_audioPort( tr( "Sample track" ) ),
-	m_volumeModel( DefaultVolume, MinVolume, MaxVolume, 1.0, this )
+	m_volumeModel( DefaultVolume, MinVolume, MaxVolume, 1.0, this,
+							tr( "Volume" ) )
 {
+	setName( tr( "Sample track" ) );
 }
 
 
@@ -420,8 +422,7 @@ sampleTrackView::sampleTrackView( sampleTrack * _t, trackContainerView * _tcv ) 
 {
 	setFixedHeight( 32 );
 
-	m_trackLabel = new effectLabel( tr( "Sample track" ),
-						getTrackSettingsWidget(), _t );
+	m_trackLabel = new effectLabel( getTrackSettingsWidget(), _t );
 #if 0
 	m_trackLabel = new nameLabel( tr( "Sample track" ),
 						getTrackSettingsWidget() );
