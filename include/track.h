@@ -85,6 +85,11 @@ public:
 		emit dataChanged();
 	}
 
+	virtual QString displayName( void ) const
+	{
+		return( name() );
+	}
+
 
 	inline const midiTime & startPosition( void ) const
 	{
@@ -411,6 +416,11 @@ public:
 	virtual const QString & name( void ) const
 	{
 		return( m_name );
+	}
+
+	virtual QString displayName( void ) const
+	{
+		return( name() );
 	}
 
 	inline const pixmapLoader * icon( void ) const
