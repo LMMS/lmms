@@ -1,3 +1,29 @@
+2008-07-04	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* include/track.h:
+	made trackContentObject and track implement displayName() in order to
+	return their name
+
+	* include/effect_label.h:
+	* src/gui/widgets/effect_label.cpp:
+	* src/tracks/sample_track.cpp:
+	do not take _initial_name as it can be retrieved from track
+
+	* src/tracks/sample_track.cpp:
+	added name to volumeModel
+
+	* data/themes/default/hand.png:
+	* src/gui/automatable_model_view.cpp:
+	* src/gui/fx_mixer_view.cpp:
+	* src/gui/widgets/fade_button.cpp:
+	* src/gui/widgets/effect_label.cpp:
+	* src/gui/widgets/name_label.cpp:
+	* src/core/track.cpp:
+	added hand-cursor for all controls
+
+	* data/themes/default/style.css:
+	common font-size for track-labels
+
 2008-07-02	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/core/main.cpp:
