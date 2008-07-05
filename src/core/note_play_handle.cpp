@@ -116,15 +116,17 @@ notePlayHandle::notePlayHandle( instrumentTrack * _it,
 
 notePlayHandle::~notePlayHandle()
 {
-	if( m_released == FALSE )
-	{
-		noteOff( 0 );
-	}
+	noteOff( 0 );
 
 	if( m_baseNote )
 	{
 		delete m_baseDetuning;
 		m_instrumentTrack->m_processHandles.removeAll( this );
+	}
+
+	if( m_instrumentTrack->m_notes[key()] == this )
+	{
+		m_instrumentTrack->m_notes[key()] = NULL;
 	}
 
 	if( m_pluginData != NULL )
@@ -287,6 +289,11 @@ bool notePlayHandle::isFromTrack( const track * _track ) const
 
 void notePlayHandle::noteOff( const f_cnt_t _s )
 {
+	if( m_released )
+	{
+		return;
+	}
+
 	// first note-off all sub-notes
 	for( notePlayHandleVector::iterator it = m_subNotes.begin();
 						it != m_subNotes.end(); ++it )
