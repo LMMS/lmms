@@ -85,8 +85,7 @@ public:
 		return( 0 );
 	}
 
-	// monophonic instruments can re-implement this indicate that they do
-	// not allow more then one note being played at the same time
+	// TO BE REMOVED
 	virtual bool isMonophonic( void ) const
 	{
 		return( FALSE );
