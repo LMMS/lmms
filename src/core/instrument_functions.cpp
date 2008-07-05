@@ -268,7 +268,7 @@ arpeggiator::arpeggiator( model * _parent ) :
 	m_arpEnabledModel( FALSE ),
 	m_arpModel( this, tr( "Arpeggio type" ) ),
 	m_arpRangeModel( 1.0f, 1.0f, 9.0f, 1.0f, this, tr( "Arpeggio range" ) ),
-	m_arpTimeModel( 100.0f, 25.0f, 2000.0f, 1.0f, 1.0, this,
+	m_arpTimeModel( 100.0f, 25.0f, 2000.0f, 1.0f, 2000, this,
 							tr( "Arpeggio time" ) ),
 	m_arpGateModel( 100.0f, 1.0f, 200.0f, 1.0f, this,
 							tr( "Arpeggio gate" ) ),
