@@ -42,7 +42,10 @@ public:
 
 	virtual ~inlineAutomation()
 	{
-		delete m_autoPattern;
+		if( m_autoPattern )
+		{
+			m_autoPattern->deleteLater();
+		}
 	}
 
 	inline bool hasAutomation( void ) const
