@@ -1,5 +1,8 @@
 2008-07-05	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* src/gui/widgets/effect_rack_view.cpp:
+	made removing effect-plugins thread-safe (closes #2010984)
+
 	* src/core/automation_pattern.cpp:
 	save and restore automationPattern's name (closes #2011011)
 

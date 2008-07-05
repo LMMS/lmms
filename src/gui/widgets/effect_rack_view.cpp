@@ -53,7 +53,7 @@ effectRackView::effectRackView( effectChain * _model, QWidget * _parent ) :
 	m_scrollArea->setPalette( QApplication::palette( m_scrollArea ) );
 	m_scrollArea->move( 6, 22 );
 
-	m_addButton = new QPushButton( m_effectsGroupBox/*, "Add Effect"*/ );
+	m_addButton = new QPushButton( m_effectsGroupBox );
 	m_addButton->setText( tr( "Add" ) );
 	m_addButton->move( 75, 210 );
 	connect( m_addButton, SIGNAL( clicked( void ) ), 
@@ -138,10 +138,8 @@ void effectRackView::deletePlugin( effectView * _view )
 	m_effectViews.erase( qFind( m_effectViews.begin(), m_effectViews.end(),
 								_view ) );
 	delete _view;
-	fxChain()->m_effects.erase( qFind( fxChain()->m_effects.begin(),
-						fxChain()->m_effects.end(),
-									e ) );
-	delete e;
+	fxChain()->removeEffect( e );
+	e->deleteLater();
 	update();
 }
 
@@ -175,7 +173,8 @@ void effectRackView::update( void )
 			connect( view, SIGNAL( moveDown( effectView * ) ),
 				this, SLOT( moveDown( effectView * ) ) );
 			connect( view, SIGNAL( deletePlugin( effectView * ) ),
-				this, SLOT( deletePlugin( effectView * ) ) );
+				this, SLOT( deletePlugin( effectView * ) ),
+							Qt::QueuedConnection );
 			view->show();
 			m_effectViews.append( view );
 			view_map[i] = TRUE;
