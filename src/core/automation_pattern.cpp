@@ -237,6 +237,7 @@ float automationPattern::valueAt( const midiTime & _time )
 void automationPattern::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
 	_this.setAttribute( "pos", startPosition() );
+	_this.setAttribute( "name", name() );
 
 	for( timeMap::const_iterator it = m_timeMap.begin();
 						it != m_timeMap.end(); ++it )
@@ -264,6 +265,7 @@ void automationPattern::loadSettings( const QDomElement & _this )
 	clear();
 
 	movePosition( _this.attribute( "pos" ).toInt() );
+	setName( _this.attribute( "name" ) );
 
 	for( QDomNode node = _this.firstChild(); !node.isNull();
 						node = node.nextSibling() )
