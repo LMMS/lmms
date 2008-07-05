@@ -1,5 +1,8 @@
 2008-07-05	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* src/tracks/bb_track.cpp:
+	made muting BB-tracks work (closes #2010764)
+
 	* src/gui/widgets/effect_rack_view.cpp:
 	made removing effect-plugins thread-safe (closes #2010984)
 

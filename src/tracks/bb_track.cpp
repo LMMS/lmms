@@ -350,6 +350,11 @@ bbTrack::~bbTrack()
 bool bbTrack::play( const midiTime & _start, const fpp_t _frames,
 				const f_cnt_t _offset, Sint16 _tco_num )
 {
+	if( isMuted() )
+	{
+		return( FALSE );
+	}
+
 	if( _tco_num >= 0 )
 	{
 		return( engine::getBBTrackContainer()->play( _start, _frames,
