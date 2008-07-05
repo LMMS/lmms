@@ -319,7 +319,7 @@ private:
 
 	// widgets on the top of an instrument-track-window
 	tabWidget * m_generalSettingsWidget;
-	QLineEdit * m_instrumentNameLE;
+	QLineEdit * m_nameLineEdit;
 	knob * m_volumeKnob;
 	knob * m_panningKnob;
 	knob * m_pitchKnob;

@@ -246,6 +246,10 @@ void instrumentTrack::processInEvent( const midiEvent & _me,
 
 		case MidiNoteOff:
 		{
+			if( _lock )	// TO BE REMOVED
+			{
+			engine::getMixer()->lock();
+			}
 			notePlayHandle * n = m_notes[_me.key()];
 			if( n != NULL )
 			{
@@ -255,23 +259,20 @@ void instrumentTrack::processInEvent( const midiEvent & _me,
 				// this is for example needed by piano-roll for
 				// recording notes into a pattern
 				note done_note(
-					midiTime( static_cast<f_cnt_t>(
-						n->totalFramesPlayed() /
-						engine::framesPerTick() ) ),
+				midiTime( static_cast<f_cnt_t>(
+					n->totalFramesPlayed() /
+					engine::framesPerTick() ) ),
 					0, n->key(),
 					n->getVolume(), n->getPanning() );
-				if( _lock )
-				{
-					// lock our play-handle while calling noteOff()
-					// for not modifying it's member variables
-					// asynchronously (while rendering!)
-					// which can result in segfaults
-					engine::getMixer()->lock();
-					n->noteOff();
-					engine::getMixer()->unlock();
-				}
+
+				n->noteOff();
 				m_notes[_me.key()] = NULL;
+
 				emit noteDone( done_note );
+			}
+			if( _lock )	// TO BE REMOVED
+			{
+				engine::getMixer()->unlock();
 			}
 			break;
 		}
@@ -359,6 +360,7 @@ void instrumentTrack::playNote( notePlayHandle * _n, bool _try_parallelizing,
 
 	if( _n->arpBaseNote() == FALSE && m_instrument != NULL )
 	{
+		// TO BE REMOVED
 		if( m_instrument->isMonophonic() )
 		{
 			constNotePlayHandleVector v =
@@ -383,7 +385,8 @@ void instrumentTrack::playNote( notePlayHandle * _n, bool _try_parallelizing,
 					!( *youngest_note )->arpBaseNote() &&
 					!_n->released() )
 				{
-					processInEvent( midiEvent( MidiNoteOff, 0,
+					processInEvent(midiEvent(
+								MidiNoteOff, 0,
 						_n->key(), 0 ), midiTime(),
 									FALSE );
 					if( ( *youngest_note )->offset() >
@@ -1104,11 +1107,11 @@ instrumentTrackWindow::instrumentTrackWindow( instrumentTrackView * _itv ) :
 	m_generalSettingsWidget->setFixedHeight( 90 );
 
 	// setup line-edit for changing channel-name
-	m_instrumentNameLE = new QLineEdit( m_generalSettingsWidget );
-	m_instrumentNameLE->setFont( pointSize<8>(
-						m_instrumentNameLE->font() ) );
-	m_instrumentNameLE->setGeometry( 10, 16, 230, 18 );
-	connect( m_instrumentNameLE, SIGNAL( textChanged( const QString & ) ),
+	m_nameLineEdit = new QLineEdit( m_generalSettingsWidget );
+	m_nameLineEdit->setFont( pointSize<8>(
+						m_nameLineEdit->font() ) );
+	m_nameLineEdit->setGeometry( 10, 16, 230, 18 );
+	connect( m_nameLineEdit, SIGNAL( textChanged( const QString & ) ),
 				this, SLOT( textChanged( const QString & ) ) );
 
 
@@ -1240,7 +1243,7 @@ void instrumentTrackWindow::modelChanged( void )
 {
 	m_track = castModel<instrumentTrack>();
 
-	m_instrumentNameLE->setText( m_track->name() );
+	m_nameLineEdit->setText( m_track->name() );
 
 	disconnect( m_track, SIGNAL( nameChanged() ) );
 	disconnect( m_track, SIGNAL( instrumentChanged() ) );
@@ -1308,9 +1311,9 @@ void instrumentTrackWindow::updateName( void )
 {
 	setWindowTitle( m_track->name() );
 
-	if( m_instrumentNameLE->text() != m_track->name() )
+	if( m_nameLineEdit->text() != m_track->name() )
 	{
-		m_instrumentNameLE->setText( m_track->name() );
+		m_nameLineEdit->setText( m_track->name() );
 	}
 }
 
@@ -1466,6 +1469,7 @@ instrumentTrackButton::instrumentTrackButton( instrumentTrackView * _itv ) :
 	m_instrumentTrackView( _itv )
 {
 	setAcceptDrops( TRUE );
+	setCursor( QCursor( embed::getIconPixmap( "hand" ), 0, 0 ) );
 }
 
 
