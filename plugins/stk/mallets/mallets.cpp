@@ -204,47 +204,51 @@ void malletsInstrument::playNote( notePlayHandle * _n, bool,
 	const float freq = _n->frequency();
 	if ( _n->totalFramesPlayed() == 0 || _n->m_pluginData == NULL )
 	{
-		float vel = static_cast<float>( _n->getVolume() ) / 100.0f;
-		
+		const float vel = _n->getVolume() / 100.0f;
+
+		// critical section as STK is not thread-safe
+		static QMutex m;
+		m.lock();
 		if( p < 9 )
 		{
 			_n->m_pluginData = new malletsSynth( freq,
-								vel,
-								m_vibratoGainModel.value(),
-								m_hardnessModel.value(),
-								m_positionModel.value(),
-								m_stickModel.value(),
-								m_vibratoFreqModel.value(),
-								p,
-								(Uint8) m_spreadModel.value(),
-								engine::getMixer()->processingSampleRate() );
+						vel,
+						m_vibratoGainModel.value(),
+						m_hardnessModel.value(),
+						m_positionModel.value(),
+						m_stickModel.value(),
+						m_vibratoFreqModel.value(),
+						p,
+						(Uint8) m_spreadModel.value(),
+				engine::getMixer()->processingSampleRate() );
 		}
 		else if( p == 9 )
 		{
 			_n->m_pluginData = new malletsSynth( freq,
-								vel,
-								p,
-								m_lfoDepthModel.value(),
-								m_modulatorModel.value(),
-								m_crossfadeModel.value(),
-								m_lfoSpeedModel.value(),
-								m_adsrModel.value(),
-								(Uint8) m_spreadModel.value(),
-								engine::getMixer()->processingSampleRate() );
+						vel,
+						p,
+						m_lfoDepthModel.value(),
+						m_modulatorModel.value(),
+						m_crossfadeModel.value(),
+						m_lfoSpeedModel.value(),
+						m_adsrModel.value(),
+						(Uint8) m_spreadModel.value(),
+				engine::getMixer()->processingSampleRate() );
 		}
 		else
 		{
 			_n->m_pluginData = new malletsSynth( freq,
-								vel,
-								m_pressureModel.value(),
-								m_motionModel.value(),
-								m_vibratoModel.value(),
-								p - 10,
-								m_strikeModel.value() * 128.0,
-								m_velocityModel.value(),
-								(Uint8) m_spreadModel.value(),
-								engine::getMixer()->processingSampleRate() );
+						vel,
+						m_pressureModel.value(),
+						m_motionModel.value(),
+						m_vibratoModel.value(),
+						p - 10,
+						m_strikeModel.value() * 128.0,
+						m_velocityModel.value(),
+						(Uint8) m_spreadModel.value(),
+				engine::getMixer()->processingSampleRate() );
 		}
+		m.unlock();
 	}
 
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();
