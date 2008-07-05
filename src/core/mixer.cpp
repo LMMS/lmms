@@ -554,40 +554,13 @@ const surroundSampleFrame * mixer::renderNextBuffer( void )
 					mixerWorkerThread::PlayHandle,
 					!( *it )->done() &&
 					!( *it )->supportsParallelizing() );
-// we have to process all note-play-handles of a monophonic instrument by the
-// same thread serially as monophonic instruments rely on processing note-play-
-// handles in correct order
-/*			QHash<instrumentTrack *, int> h;
-			for( mixerWorkerThread::jobQueueItems::iterator it =
-				jq.items.begin(); it != jq.items.end(); ++it )
-			{
-#define COND_NPH static_cast<playHandle *>( it->job )->type() == playHandle::NotePlayHandle
-#define COND_MONOPHONIC static_cast<notePlayHandle *>( it->job )->	\
-				getInstrumentTrack()->			\
-				getInstrument()->isMonophonic()
-if( COND_NPH )
-{
-	if( COND_MONOPHONIC )
-	{
-		notePlayHandle * n = static_cast<notePlayHandle *>( it->job );
-		if( h.contains( n->getInstrumentTrack() ) )
-		{
-			it->workerID = h[n->getInstrumentTrack()];
-		}
-		else
-		{
-			h[n->getInstrumentTrack()] = it->workerID;
-		}
-	}
-}
-			}*/
 			DISTRIBUTE_JOB_QUEUE(jq);
 			for( playHandleVector::iterator it = par_hndls.begin();
 						it != par_hndls.end(); ++it )
 			{
 				( *it )->waitForWorkerThread();
 			}
-			WAIT_FOR_JOBS();// h.size() > 0 && ( COND_NPH ? !COND_MONOPHONIC : TRUE ) );
+			WAIT_FOR_JOBS();
 		}
 		else
 		{
@@ -610,7 +583,7 @@ if( COND_NPH )
 			{
 				delete n;
 				m_playHandles.erase(
-					m_playHandles.begin() + idx );
+						m_playHandles.begin() + idx );
 			}
 			else
 			{
