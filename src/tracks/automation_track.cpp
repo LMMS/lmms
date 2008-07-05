@@ -55,6 +55,11 @@ automationTrack::~automationTrack()
 bool automationTrack::play( const midiTime & _start, const fpp_t _frames,
 				const f_cnt_t _frame_base, Sint16 _tco_num )
 {
+	if( isMuted() )
+	{
+		return( FALSE );
+	}
+
 	tcoVector tcos;
 	getTCOsInRange( tcos, _start, _start + static_cast<int>(
 					_frames / engine::framesPerTick() ) );
