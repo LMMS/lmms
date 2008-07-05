@@ -301,7 +301,7 @@ private:
 	f_cnt_t m_releaseFramesDone;	// number of frames done after
 					// release of note
 	notePlayHandleVector m_subNotes;// used for chords and arpeggios
-	bool m_released;		// indicates whether note is released
+	volatile bool m_released;	// indicates whether note is released
 	bool m_baseNote;		// indicates whether note is a
 					// base-note (i.e. no sub-note)
 	bool m_arpNote;			// indicates whether note is part of
