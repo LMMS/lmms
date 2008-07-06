@@ -25,6 +25,7 @@
 
 
 #include "drumsynth.h"
+#include "lmmsconfig.h"
 
 #include <fstream>
 #include <cstring>
@@ -33,6 +34,11 @@
 #include <math.h>     //sin(), exp(), etc.
 #include <stdio.h>    //sscanf(), sprintf()
 #include <stdlib.h>   //RAND_MAX
+
+#ifdef LMMS_BUILD_WIN32
+#define powf pow
+#endif
+
 
 using namespace std;
 
