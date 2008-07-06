@@ -201,7 +201,7 @@ void comboBox::paintEvent( QPaintEvent * _pe )
 	if( model()->size() > 0 )
 	{
 		p.setFont( font() );
-		p.setClipRect( QRect( 5, 2, width() - CB_ARROW_BTN_WIDTH - 8,
+		p.setClipRect( QRect( 4, 2, width() - CB_ARROW_BTN_WIDTH - 8,
 							height() - 2 ) );
 		QPixmap pm = model()->currentData() ?
 				model()->currentData()->pixmap() : QPixmap();
@@ -216,12 +216,11 @@ void comboBox::paintEvent( QPaintEvent * _pe )
 			p.drawPixmap( tx, 3, pm );
 			tx += pm.width() + 2;
 		}
+		const int y = ( height()+p.fontMetrics().height() ) /2;
 		p.setPen( QColor( 64, 64, 64 ) );
-		p.drawText( tx+1, p.fontMetrics().height()-2,
-						model()->currentText() );
+		p.drawText( tx+1, y-2, model()->currentText() );
 		p.setPen( QColor( 224, 224, 224 ) );
-		p.drawText( tx, p.fontMetrics().height()-3,
-						model()->currentText() );
+		p.drawText( tx, y-3, model()->currentText() );
 	}
 }
 

@@ -1,3 +1,15 @@
+2008-07-06	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* src/gui/widgets/combobox.cpp:
+	draw text at correct position in win32-version
+
+	* src/core/drumsynth.cpp:
+	when building for win32 define powf() as pow() due to symbol-conflicts
+	in win32-libm
+
+	* data/themes/default/style.css:
+	fixed font-color for what's-this-popups so that they're readable
+
 2008-07-05	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* plugins/stk/mallets/mallets.cpp:
