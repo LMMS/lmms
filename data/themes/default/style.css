@@ -1,5 +1,9 @@
 /* LMMS style sheet */
 
+QWhatsThat {
+	color: black;
+}
+
 QMdiArea {
 	background-image: url(resources:background_artwork.png);
 }
