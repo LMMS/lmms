@@ -2,7 +2,7 @@
 
 	* plugins/lb302/lb302.cpp:
 	* plugins/lb302/lb302.h:
-	First version (and probably last) of new IPH-based lb302
+	New version (and probably last) of new IPH-based lb302
 
 2008-07-06	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 

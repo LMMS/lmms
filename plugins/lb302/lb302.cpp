@@ -361,6 +361,8 @@ lb302Synth::lb302Synth( instrumentTrack * _instrumentTrack ) :
 	previous_freq = -1;
 	previous_vco_inc = 0;
 	previous_sample = 0;
+	previous_sample_hold = 0;
+	previous_sample_vca = 0;
 	delete_freq = -1;
 
 	
@@ -563,6 +565,11 @@ int lb302Synth::process(sampleFrame *outbuf, const Uint32 size)
 			}
 		}
 
+		if( sample_cnt <= 0 ) {
+			previous_sample_hold = previous_sample;
+			previous_sample_vca = 0.01f;
+		}
+
 		sample_cnt++;
 		vcf_envpos++;
 
@@ -640,12 +647,27 @@ int lb302Synth::process(sampleFrame *outbuf, const Uint32 size)
 		//samp = vcf->process(vco_k)*2.0*vca_a;
 		//samp = vcf->process(vco_k)*2.0;
 		samp = vcf->process(vco_k) * vca_a;
-		//printf("%f %d\n", vco_c, sample_cnt);
+		//printf("%f %d\n", vco_c, sample_cnt);	
+		
 
+		//samp = vco_k * vca_a;
+
+		if( sample_cnt <= 4 )
+		{
+	//			vca_a = 0;
+		}
+/*
+		if( previous_sample_vca <= 1.0f )
+			samp += (1.0f- previous_sample_vca) * previous_sample_hold;
+		previous_sample_vca *= 1.2f;
+*/
+
+
+		previous_sample = samp;
 		
 		//if( sample_cnt < 32 && previous_freq > 0.0f )
 		//{
-			previous_sample *= 0.96406088;
+			//previous_sample *= 0.96406088;
 			//float oldamt = (32.0f-(float)sample_cnt)*previous_sample/32.0f;
 			//printf("%d old %f\n", sample_cnt, oldamt);
 			//samp += previous_sample;
@@ -708,7 +730,7 @@ void lb302Synth::initNote( lb302Note *n)
 		sample_cnt = 0;
 		vca_mode = 0;
 		// LB303:
-		vca_a = 0;
+		//vca_a = 0;
 	}
 	else {
 		vca_mode = 2;
@@ -834,7 +856,7 @@ void lb302Synth::deleteNotePluginData( notePlayHandle * _n )
 	{
 		delete_freq = current_freq;
 		//previous_freq = current_freq;
-		previous_sample = vco_k * vca_a;
+		//previous_sample = vco_k * vca_a;
 	}
 }
 

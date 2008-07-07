@@ -242,6 +242,8 @@ private:
 	float previous_freq;
 	float previous_vco_inc;
 	float previous_sample;
+	float previous_sample_hold;
+	float previous_sample_vca;
 	float previous_count;
 	float delete_freq;
 
