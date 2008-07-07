@@ -52,38 +52,6 @@ class lb302FilterKnobState
 	float dist;
 };
 
-class lb302FilterIIR2State
-{
-	public:
-	float vcf_c0;
-	float vcf_a;
-	float vcf_b;
-	float vcf_c;
-	float vcf_d1;
-	float vcf_d2;
-};
-
-class lb302Filter3PoleState
-{
-	public:
-	float vcf_c0;
-	float kp,
-	      kp1h,
-	      kres,
-	      ay1,
-	      ay2,
-	      lastin,
-	      value;
-	float aout;
-};
-         
-typedef union 
-{
-	lb302FilterIIR2State iir;
-	lb302Filter3PoleState pole;
-} 
-lb302FilterState;
-
 
 class lb302Filter
 {
@@ -95,9 +63,6 @@ class lb302Filter
 	virtual void envRecalc();
 	virtual float process(const float& samp)=0;
 	virtual void playNote();
-
-	virtual void getState(lb302FilterState* fs)=0;
-	virtual void setState(const lb302FilterState* fs)=0;
 
 	protected:
 	lb302FilterKnobState *fs;  
@@ -118,9 +83,6 @@ class lb302FilterIIR2 : public lb302Filter
 	virtual void recalc();
 	virtual void envRecalc();
 	virtual float process(const float& samp);
-
-	virtual void getState(lb302FilterState* fs);
-	virtual void setState(const lb302FilterState* fs);
 
 	protected:
 	float vcf_d1,           //   d1 and d2 are added back into the sample with 
@@ -147,9 +109,6 @@ class lb302Filter3Pole : public lb302Filter
 	virtual void recalc();
 	virtual float process(const float& samp);
 
-	virtual void getState(lb302FilterState* fs);
-	virtual void setState(const lb302FilterState* fs);
-
 	protected:
 	float kfcn, 
 	      kp, 
@@ -164,17 +123,6 @@ class lb302Filter3Pole : public lb302Filter
 };
 
 
-
-class lb302State
-{
-public:
-	float vco_c;
-	float vca_a;
-	int vca_mode;
-	int sample_cnt;
-
-	lb302FilterState fs;
-};
 
 class lb302Note
 {
@@ -191,6 +139,8 @@ public:
 	lb302Synth( instrumentTrack * _channel_track );
 	virtual ~lb302Synth();
 
+	virtual void play( bool _try_parallelizing,
+						sampleFrame * _working_buffer );
 	virtual void playNote( notePlayHandle * _n, bool _try_parallelizing,
 						sampleFrame * _working_buffer );
 	virtual void deleteNotePluginData( notePlayHandle * _n );
@@ -201,13 +151,14 @@ public:
 
 	virtual QString nodeName( void ) const;
 
-	virtual bool isMonophonic(void) const {
-		return true;
+	virtual bool supportsParallelizing( void ) const
+	{
+		return( FALSE );
 	}
 
 	virtual f_cnt_t desiredReleaseFrames( void ) const
 	{
-		return 4048;
+		return 0; //4048;
 	}
 
 	virtual pluginView * instantiateView( QWidget * _parent );
@@ -238,7 +189,6 @@ private:
 public slots:
 	void filterChanged( void );
 	void detuneChanged( void );
-	void waveChanged( void );
 	void db24Toggled( void );
 
 private:
@@ -275,18 +225,26 @@ private:
 	      vca_a;            // Amplifier coefficient.
 
 	// Envelope State
-	int   vca_mode;         // 0: attack, 1: decay, 2: idle
+	int   vca_mode;         // 0: attack, 1: decay, 2: idle, 3: never played
 
 	// My hacks
 	int   sample_cnt;
 
 	int   last_offset;
 
-	lb302State *period_states;
 	int period_states_cnt;
 
 	int catch_frame;
 	int catch_decay;
+
+	float new_freq;
+	float current_freq;
+	float previous_freq;
+	float previous_vco_inc;
+	float previous_sample;
+	float previous_count;
+	float delete_freq;
+
 
 	void recalcFilter();
 

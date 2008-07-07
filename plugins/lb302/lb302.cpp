@@ -192,28 +192,6 @@ float lb302FilterIIR2::process(const float& samp)
 }
 
 
-void lb302FilterIIR2::getState(lb302FilterState* fs)
-{
-	fs->iir.vcf_c0 = vcf_c0;
-	fs->iir.vcf_a  = vcf_a;
-	fs->iir.vcf_b  = vcf_b;
-	fs->iir.vcf_c  = vcf_c;
-	fs->iir.vcf_d1 = vcf_d1;
-	fs->iir.vcf_d2 = vcf_d2;
-}
-
-
-void lb302FilterIIR2::setState(const lb302FilterState* fs)
-{
-	vcf_c0 = fs->iir.vcf_c0;
-	vcf_a  = fs->iir.vcf_a;
-	vcf_b  = fs->iir.vcf_b;
-	vcf_c  = fs->iir.vcf_c;
-	vcf_d1 = fs->iir.vcf_d1;
-	vcf_d2 = fs->iir.vcf_d2;
-}
-
-
 //
 // lb302Filter3Pole
 //
@@ -286,34 +264,6 @@ float lb302Filter3Pole::process(const float& samp)
 }
 
 
-void lb302Filter3Pole::getState(lb302FilterState* fs)
-{
-	fs->pole.aout = aout;
-	fs->pole.vcf_c0 = vcf_c0;
-	fs->pole.kp = kp;
-	fs->pole.kp1h = kp1h;
-	fs->pole.kres = kres;
-	fs->pole.ay1 = ay1;
-	fs->pole.ay2 = ay2;
-	fs->pole.lastin = lastin;
-	fs->pole.value = value;
-}
-
-
-void lb302Filter3Pole::setState(const lb302FilterState* fs)
-{
-	aout = fs->pole.aout;
-	vcf_c0 = fs->pole.vcf_c0;
-	kp = fs->pole.kp;
-	kp1h = fs->pole.kp1h;
-	kres = fs->pole.kres;
-	ay1 = fs->pole.ay1;
-	ay2 = fs->pole.ay2;
-	lastin = fs->pole.lastin;
-	value = fs->pole.value;
-}
-
-
 //
 // LBSynth
 //
@@ -358,9 +308,6 @@ lb302Synth::lb302Synth( instrumentTrack * _instrumentTrack ) :
 
 	connect( &dist_knob, SIGNAL( dataChanged( ) ),
 	         this, SLOT ( filterChanged( )));
-
-	connect( &wave_knob, SIGNAL( dataChanged( ) ),
-	         this, SLOT ( waveChanged( )));
 
 
 	// SYNTH
@@ -409,8 +356,19 @@ lb302Synth::lb302Synth( instrumentTrack * _instrumentTrack ) :
 	lastFramesPlayed = 1;	// because we subtract 1 later
 	last_offset = 0;
 
-	period_states = NULL;
+	new_freq = -1;
+	current_freq = -1;
+	previous_freq = -1;
+	previous_vco_inc = 0;
+	previous_sample = 0;
+	delete_freq = -1;
+
+	
+
 	period_states_cnt = 0;
+
+	instrumentPlayHandle * iph = new instrumentPlayHandle( this );
+	engine::getMixer()->addPlayHandle( iph );
 
 	filterChanged();
 	detuneChanged();
@@ -496,6 +454,7 @@ void lb302Synth::db24Toggled( void )
 
 void lb302Synth::detuneChanged( void )
 {
+	/* LB303
 	float freq = vco_inc*engine::getMixer()->processingSampleRate()/vco_detune;
 	float slidebase_freq=0;
 
@@ -514,23 +473,7 @@ void lb302Synth::detuneChanged( void )
 	// May need to rescale vco_slide as well
 	if(vco_slide) 
 		vco_slidebase = slidebase_freq*vco_detune/engine::getMixer()->processingSampleRate();
-}
-
-
-// TODO: Set vco_shape in here.
-//       setHintText is impossible from the synth now??
-void lb302Synth::waveChanged( void ) 
-{
-/*
-    switch(int(rint(wave_knob.value()))) {
-        case 0: wave_knob.setHintText(tr("Sawtooth "),""); break;
-        case 1: wave_knob.setHintText(tr("Inverted Sawtooth "),""); break;
-        case 2: wave_knob.setHintText(tr("Triangle "),""); break;
-        case 3: wave_knob.setHintText(tr("Square "),""); break;
-        case 4: wave_knob.setHintText(tr("Rounded Square "),""); break;
-        case 5: wave_knob.setHintText(tr("Moog "),""); break;
-    }
-*/
+		*/
 }
 
 
@@ -562,22 +505,49 @@ inline int MIN(int a, int b) {
 	return (a<b)?a:b;
 }
 
+inline float GET_INC(float freq) {
+	return freq/**vco_detune*//engine::getMixer()->processingSampleRate();  // TODO: Use actual sampling rate.
+}
+
 int lb302Synth::process(sampleFrame *outbuf, const Uint32 size)
 {
 	unsigned int i;
 	float w;
 	float samp;
 
+	if( delete_freq == current_freq ) {
+		// TODO: Crossfade
+		// previous_freq = delete_freq;
+		// previous_count = 0;
+		// previous_vco_inc = GET_INC( delete_freq );
+		
+		// Normal release
+		delete_freq = -1;
+		vca_mode = 1;
+	}
+
+	if( new_freq > 0.0f ) {
+		lb302Note note;
+		note.vco_inc = GET_INC( new_freq );
+		//printf("GET_INC %f %f %d\n", note.vco_inc, new_freq, vca_mode );
+		///**vco_detune*//engine::getMixer()->processingSampleRate();  // TODO: Use actual sampling rate.
+		//printf("VCO_INC = %f\n", note.vco_inc);
+		note.dead = deadToggle.value();
+		initNote(&note);
+		use_hold_note = false;
+		//printf("%f %f,  ", vco_inc, vco_c);
+		
+		current_freq = new_freq; 
+
+		new_freq = -1.0f;
+		//printf("GOT_INC %f %f %d\n\n", note.vco_inc, new_freq, vca_mode );
+	} 
+	
+
+	// TODO: NORMAL RELEASE
+	// vca_mode = 1;
+
 	for(i=0;i<size;i++) {
-		/* TODO: ONLY DO THIS IF WE ARE EDGE-TO-EDGE NON-DEAD */
-		/*
-		if (sample_cnt < desiredTransitionFrames()) {
-			for(int c=0; c<DEFAULT_CHANNELS; c++)
-			outbuf[i][c]=0;
-			sample_cnt++;
-			continue;
-		}
-		*/
 
 		// update vcf
 		if(vcf_envpos >= ENVINC) {
@@ -596,9 +566,6 @@ int lb302Synth::process(sampleFrame *outbuf, const Uint32 size)
 		sample_cnt++;
 		vcf_envpos++;
 
-		// unused variables
-		//float old_vco_k = vco_k;
-		//bool looking;
 		int  decay_frames = 128;
 
 		// update vco
@@ -607,6 +574,7 @@ int lb302Synth::process(sampleFrame *outbuf, const Uint32 size)
 		if(vco_c > 0.5)
 			vco_c -= 1.0;
 
+		/*LB303
 		if (catch_decay > 0) {
 			if (catch_decay < decay_frames) {
 				catch_decay++;
@@ -615,7 +583,7 @@ int lb302Synth::process(sampleFrame *outbuf, const Uint32 size)
 				use_hold_note = false;
 				initNote(&hold_note);
 			}
-		}
+		}*/
 
 		switch(int(rint(wave_knob.value()))) {
 			case 0: vco_shape = SAWTOOTH; break;
@@ -669,15 +637,28 @@ int lb302Synth::process(sampleFrame *outbuf, const Uint32 size)
 		//vca_a = 0.5;
 		// Write out samples.
 #ifdef LB_FILTERED
-		samp = vcf->process(vco_k)*2.0*vca_a;
+		//samp = vcf->process(vco_k)*2.0*vca_a;
+		//samp = vcf->process(vco_k)*2.0;
+		samp = vcf->process(vco_k) * vca_a;
+		//printf("%f %d\n", vco_c, sample_cnt);
+
+		
+		//if( sample_cnt < 32 && previous_freq > 0.0f )
+		//{
+			previous_sample *= 0.96406088;
+			//float oldamt = (32.0f-(float)sample_cnt)*previous_sample/32.0f;
+			//printf("%d old %f\n", sample_cnt, oldamt);
+			//samp += previous_sample;
+		//}
+		
 #else
-		samp = vco_k*vca_a;
+		//samp = vco_k*vca_a;
 #endif
 		/*
 		float releaseFrames = desiredReleaseFrames();
 		samp *= (releaseFrames - catch_decay)/releaseFrames;
 		*/
-		samp *= (float)(decay_frames - catch_decay)/(float)decay_frames;
+		//LB302 samp *= (float)(decay_frames - catch_decay)/(float)decay_frames;
 
 		for(int c=0; c<DEFAULT_CHANNELS; c++) {
 			outbuf[i][c]=samp;
@@ -704,13 +685,6 @@ int lb302Synth::process(sampleFrame *outbuf, const Uint32 size)
 			}
 		}
 
-		// Store state
-		period_states[i].vco_c = vco_c;
-		period_states[i].vca_a = vca_a;             // Doesn't change anything (currently)
-		period_states[i].vca_mode = vca_mode;       // Doesn't change anything (currently)
-		period_states[i].sample_cnt = sample_cnt;   // Doesn't change anything (currently)
-		vcf->getState(&period_states[i].fs);
-
 	}
 	return 1;
 }
@@ -727,11 +701,13 @@ void lb302Synth::initNote( lb302Note *n)
 
 	vco_inc = n->vco_inc;
     
-	// TODO: Try moving to the if() below
-	// Why vca_mode==3?
+	// Always reset vca on non-dead notes, and
+	// Only reset vca on decaying(decayed) and never-played
 	if(n->dead == 0 || (vca_mode==1 || vca_mode==3)) {
+		//printf("    good\n");
 		sample_cnt = 0;
 		vca_mode = 0;
+		// LB303:
 		vca_a = 0;
 	}
 	else {
@@ -741,6 +717,7 @@ void lb302Synth::initNote( lb302Note *n)
 	// Initiate Slide
 	// TODO: Break out into function, should be called again on detuneChanged
 	if (vco_slideinc) {
+		//printf("    sliding\n");
 		vco_slide = vco_inc-vco_slideinc;
 		vco_slidebase = vco_inc;
 		vco_slideinc = 0;
@@ -765,8 +742,8 @@ void lb302Synth::initNote( lb302Note *n)
 		vcf_envpos = ENVINC;
 
 		// Double Check 
-		vca_mode = 0;
-		vca_a = 0.0;
+		//vca_mode = 0;
+		//vca_a = 0.0;
 	}
 }
 
@@ -776,129 +753,27 @@ void lb302Synth::playNote( notePlayHandle * _n, bool,
 {
 	fpp_t framesPerPeriod = engine::getMixer()->framesPerPeriod();
 
-	// <WEIRD CODE FOR MONOPHONIC BEHAVIOUR - BEGIN>
-
 	if( _n->arpBaseNote() )
 	{
 		return;
 	}
-
-	// number of frames to play - only modified below if we have to play
-	// the rest of an old note
-	fpp_t frames = _n->framesLeftForCurrentPeriod();
-
-	// per default we resume at the last played frames - only in
-	// some special-cases (which we catch below) we have to resume
-	// somewhere else
-	f_cnt_t resume_pos = lastFramesPlayed-1;
-
-	bool decay_note = false;
-
-	// find out which situation we're in
-	constNotePlayHandleVector v =
-			notePlayHandle::nphsOfInstrumentTrack( getInstrumentTrack(), TRUE );
-	// more than one note running?
-	if( v.count() > 1 )
-	{
-		const notePlayHandle * on = v.first();	// oldest note
-		const notePlayHandle * yn = v.last();	// youngest note
-		// are we playing a released note and the new (youngest) note
-		// has taken over successfully (i.e. played more than the
-		// difference of the two offsets)?
-		if ( _n->released() &&
-				yn->totalFramesPlayed() >= yn->offset() - on->offset() )
-		{
-			// then we do not need to play something anymore
-			return;
-		}
-
-		// have to fill up the frames left to the new note so limit
-		// frames to play for not getting into trouble
-		if( _n != yn && !yn->arpBaseNote() )
-		{
-			frames = tMin<fpp_t>( frames, yn->offset() - on->offset() );
-#ifdef LB_DEBUG
-			// should be always true - why? I don't know... ;-)
-			assert( frames > 0 );
-#endif
-		}
-
-		// new note while other notes are running?
-		if( v.count() > 1 && yn == _n &&
-				_n->totalFramesPlayed() == 0 )
-		{
-			// if there had been a previous note whose
-			// offset > _n->offset() it played more frames than
-			// we actually need - therefore clear everything before
-			// the offset of the youngest note, otherwise we get
-			// frames with both waves overlapped
-			engine::getMixer()->clearAudioBuffer(
-				_n->getInstrumentTrack()->getAudioPort()->firstBuffer(),
-				framesPerPeriod - yn->offset(), 
-				yn->offset() );
-
-			resume_pos = yn->offset() - on->offset() - 1;
-			// make sure we have positive value, otherwise we're
-			// accessing states out of borders
-			while( resume_pos < 0 )
-			{
-				resume_pos += framesPerPeriod;
-			}
-
-			decay_note = true;
-		}
-	}
-
-#ifdef LB_DEBUG
-	if( _n->released() )
-	{
-	}
-	else
-	{
-	}
-
-#endif
-
-	//  </WEIRD CODE FOR MONOPHONIC BEHAVIOUR>
-
-	/// Malloc our period history buffer
-	if (period_states == NULL) {
-		period_states = new lb302State[framesPerPeriod];
-
-		for (int i=0; i < framesPerPeriod; i++) {
-			period_states[i].vco_c = vco_c;
-			period_states[i].vca_a = vca_a;             // Doesn't change anything (currently)
-			period_states[i].vca_mode = vca_mode;       // Doesn't change anything (currently)
-			period_states[i].sample_cnt = sample_cnt;   // Doesn't change anything (currently)
-			vcf->getState(&period_states[i].fs);
-		}
-	}
-
-
-	// now resume at the proper position and process as usual
-	lb302State *state = &period_states[resume_pos];
-
-	// Actually resume the state, now that we have the right state object.
-	vco_c = state->vco_c;
-	vca_a = state->vca_a;
-	vca_mode = state->vca_mode;
-	sample_cnt = state->sample_cnt;
-	vcf->setState(&state->fs);
-
 
 	// Currently have release/decay disabled
 	// Start the release decay if this is the first release period.
 	//if (_n->released() && catch_decay == 0)
 	//        catch_decay = 1;
 
+	bool decay_note = false;
 
 	release_frame = _n->framesLeft() - desiredReleaseFrames();
 
-	if ( _n->totalFramesPlayed() <= 0 ) {
+
+	//LB303 if ( _n->totalFramesPlayed() <= 0 ) {
 		// This code is obsolete, hence the "if false"
 
 		// Existing note. Allow it to decay. 
 		if(deadToggle.value() == 0 && decay_note) {
+/*
 #ifdef LB_DECAY
 			if (catch_decay < 1) {
 				// BEGIN NOT SURE OF...
@@ -914,35 +789,53 @@ void lb302Synth::playNote( notePlayHandle * _n, bool,
 				catch_decay = 1;
 			}
 #else
-			lb302Note note;
+*/
+	/*		lb302Note note;
 			note.vco_inc = _n->frequency()*vco_detune/engine::getMixer()->processingSampleRate();  // TODO: Use actual sampling rate.
 			note.dead = deadToggle.value();
 			initNote(&note);
-			vca_mode=0;
-			vca_a = state->vca_a;
+			vca_mode=0;*/
+			//LB303 vca_a = state->vca_a;
 
-#endif
+//#endif
 		}
 		/// Start a new note.
-		else {
-			lb302Note note;
-			note.vco_inc = _n->frequency()*vco_detune/engine::getMixer()->processingSampleRate();  // TODO: Use actual sampling rate.
-			note.dead = deadToggle.value();
-			initNote(&note);
-			use_hold_note = false;
+		else if( _n->totalFramesPlayed() == 0 ) {
+			new_freq = _n->frequency();
+			_n->m_pluginData = this;
 		}
 
-	}
+
+	//LB303 }
+
+
+	//LB303 lastFramesPlayed = frames; //_n->framesLeftForCurrentPeriod(); //_n->totalFramesPlayed();
+}
+
+
+
+void lb302Synth::play( bool _try_parallelizing,
+						sampleFrame * _working_buffer )
+{
+	//printf(".");
+	const fpp_t frames = engine::getMixer()->framesPerPeriod();
 
 	process( _working_buffer, frames); 
-	getInstrumentTrack()->processAudioBuffer( _working_buffer, frames, _n );
-
-	lastFramesPlayed = frames; //_n->framesLeftForCurrentPeriod(); //_n->totalFramesPlayed();
+	getInstrumentTrack()->processAudioBuffer( _working_buffer, frames,
+									NULL );
 }
+
 
 
 void lb302Synth::deleteNotePluginData( notePlayHandle * _n )
 {
+	//printf("GONE\n");
+	if( _n->frequency() == current_freq ) 
+	{
+		delete_freq = current_freq;
+		//previous_freq = current_freq;
+		previous_sample = vco_k * vca_a;
+	}
 }
 
 
