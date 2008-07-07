@@ -63,6 +63,12 @@ public:
 
 	void updateFrequency( void );
 
+	// returns frequency without pitch-wheel influence
+	float unpitchedFrequency( void ) const
+	{
+		return( m_unpitchedFrequency );
+	}
+
 	virtual void play( bool _try_parallelizing,
 						sampleFrame * _working_buffer );
 
@@ -318,6 +324,7 @@ private:
 	f_cnt_t m_orig_frames;		// original m_frames
 
 	float m_frequency;
+	float m_unpitchedFrequency;
 
 	baseDetuning * m_baseDetuning;
 

@@ -279,12 +279,10 @@ void instrumentTrack::processInEvent( const midiEvent & _me,
 			break;
 
 		case MidiPitchBend:
-			if( !m_instrument->handleMidiEvent( _me, _time ) )
-			{
-				m_pitchModel.setValue( m_pitchModel.minValue() +
+			m_instrument->handleMidiEvent( _me, _time );
+			m_pitchModel.setValue( m_pitchModel.minValue() +
 					_me.m_data.m_param[0] *
 						m_pitchModel.range() / 16384 );
-			}
 			break;
 
 		case MidiControlChange:
@@ -367,7 +365,7 @@ QString instrumentTrack::instrumentName( void ) const
 	{
 		return( m_instrument->publicName() );
 	}
-	return( "" );
+	return( QString::null );
 }
 
 

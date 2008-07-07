@@ -94,8 +94,15 @@ public:
 	// name-stuff
 	virtual void setName( const QString & _new_name );
 
+	// translate key of given notePlayHandle to absolute key (i.e.
+	// add global master-pitch and base-note in piano)
 	int masterKey( notePlayHandle * _n ) const;
 
+	// translate pitch to midi-pitch [0,16383]
+	inline int midiPitch( void ) const
+	{
+		return( (int)( ( m_pitchModel.value()+100 ) * 81.92 ) );
+	}
 
 	// play everything in given frame-range - creates note-play-handles
 	virtual bool play( const midiTime & _start, const fpp_t _frames,
