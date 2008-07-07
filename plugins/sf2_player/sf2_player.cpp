@@ -75,6 +75,7 @@ sf2Instrument::sf2Instrument( instrumentTrack * _instrument_track ) :
 	m_font( NULL ),
 	m_fontId( 0 ),
 	m_filename( "" ),
+	m_lastMidiPitch( 8192 ),
 	m_bankNum( -1, -1, 999, this, tr("Bank") ),
 	m_patchNum( -1, -1, 127, this, tr("Patch") ),
 	m_gain( 1.0f, 0.0f, 5.0f, 0.01f, this, tr( "Gain" ) ),
@@ -468,7 +469,8 @@ void sf2Instrument::playNote( notePlayHandle * _n, bool, sampleFrame * )
 
 	const f_cnt_t tfp = _n->totalFramesPlayed();
 
-	int midiNote = (int)floor( 12.0 * ( log2( _n->frequency() ) - LOG440 ) - 4.0 );
+	int midiNote = (int)floor( 12.0 * ( log2( _n->unpitchedFrequency() ) -
+							LOG440 ) - 4.0 );
 
 	// out of range?
 	if( midiNote <= 0 || midiNote >= 128 )
@@ -499,6 +501,11 @@ void sf2Instrument::play( bool _try_parallelizing,
 	const fpp_t frames = engine::getMixer()->framesPerPeriod();
 
 	m_synthMutex.lock();
+	if( m_lastMidiPitch != getInstrumentTrack()->midiPitch() )
+	{
+		m_lastMidiPitch = getInstrumentTrack()->midiPitch();
+		fluid_synth_pitch_bend( m_synth, 1, m_lastMidiPitch );
+	}
 
 	if( m_internalSampleRate < engine::getMixer()->processingSampleRate() &&
 							m_srcState != NULL )

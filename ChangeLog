@@ -1,5 +1,16 @@
 2008-07-07	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* plugins/sf2_player/sf2_player.cpp:
+	* plugins/sf2_player/sf2_player.h:
+	added support for pitch-bending
+
+	* include/instrument_track.h:
+	* include/note_play_handle.h:
+	* src/core/note_play_handle.cpp:
+	* src/tracks/instrument_track.cpp:
+	- additionally provide frequency without pitch-wheel
+	- added instrumentTrack::midiPitch()
+
 	* include/instrument.h:
 	* include/instrument_track.h:
 	* include/midi_controller.h:
