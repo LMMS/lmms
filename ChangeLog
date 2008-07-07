@@ -1,3 +1,11 @@
+2008-07-07	Paul Giblock <drfaygo/at/gmail/dot/com>
+
+	* src/gui/controller_connection_dialog.cpp:
+	Show name instead of type in connection dialog
+	
+	* src/gui/widgets/controller_view.cpp:
+	Remove bypass
+
 2008-07-06	Paul Giblock <drfaygo/at/gmail/dot/com>
 
 	* plugins/lb302/lb302.cpp:

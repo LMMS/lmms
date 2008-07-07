@@ -190,7 +190,7 @@ controllerConnectionDialog::controllerConnectionDialog( QWidget * _parent,
 	for( int i = 0; i < engine::getSong()->controllers().size(); ++i )
 	{
 		controller * c = engine::getSong()->controllers().at( i );
-		m_userController->model()->addItem( c->publicName() );
+		m_userController->model()->addItem( c->name() );
 	}
 	
 

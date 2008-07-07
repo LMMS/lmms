@@ -57,11 +57,6 @@ controllerView::controllerView( controller * _model, QWidget * _parent ) :
 
 	setAttribute( Qt::WA_OpaquePaintEvent, TRUE );
 
-	m_bypass = new ledCheckBox( "", this, tr( "Turn the controller off" ) );
-	m_bypass->move( 3, 2 );
-	m_bypass->setWhatsThis( tr( "Toggles the controller on or off." ) );
-	toolTip::add( m_bypass, tr( "On/Off" ) );
-	
 	QPushButton * ctls_btn = new QPushButton( tr( "Controls" ),
 	            this );
 	
@@ -150,13 +145,13 @@ void controllerView::paintEvent( QPaintEvent * )
 	controller * c = castModel<controller>();
 
 	p.setPen( QColor( 64, 64, 64 ) );
-	p.drawText( 21, 13, c->publicName() );
+	p.drawText( 7, 13, c->publicName() );
 	p.setPen( Qt::white );
-	p.drawText( 20, 12, c->publicName() );
+	p.drawText( 6, 12, c->publicName() );
 
     f.setBold( FALSE );
     p.setFont( f );
-	p.drawText( 6, 26, c->name() );
+	p.drawText( 8, 26, c->name() );
 }
 
 
