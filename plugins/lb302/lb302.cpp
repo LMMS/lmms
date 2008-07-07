@@ -529,8 +529,9 @@ int lb302Synth::process(sampleFrame *outbuf, const Uint32 size)
 	}
 
 	if( new_freq > 0.0f ) {
+		//printf("  playing new note..\n");
 		lb302Note note;
-		note.vco_inc = GET_INC( new_freq );
+		note.vco_inc = GET_INC( true_freq );
 		//printf("GET_INC %f %f %d\n", note.vco_inc, new_freq, vca_mode );
 		///**vco_detune*//engine::getMixer()->processingSampleRate();  // TODO: Use actual sampling rate.
 		//printf("VCO_INC = %f\n", note.vco_inc);
@@ -544,6 +545,7 @@ int lb302Synth::process(sampleFrame *outbuf, const Uint32 size)
 		new_freq = -1.0f;
 		//printf("GOT_INC %f %f %d\n\n", note.vco_inc, new_freq, vca_mode );
 	} 
+
 	
 
 	// TODO: NORMAL RELEASE
@@ -823,10 +825,15 @@ void lb302Synth::playNote( notePlayHandle * _n, bool,
 		}
 		/// Start a new note.
 		else if( _n->totalFramesPlayed() == 0 ) {
-			new_freq = _n->frequency();
+			new_freq = _n->unpitchedFrequency();
+			true_freq = _n->frequency();
 			_n->m_pluginData = this;
 		}
 
+		if( _n->unpitchedFrequency() == current_freq ) {
+			true_freq = _n->frequency();
+			vco_inc = GET_INC( true_freq );
+		}
 
 	//LB303 }
 
@@ -852,7 +859,7 @@ void lb302Synth::play( bool _try_parallelizing,
 void lb302Synth::deleteNotePluginData( notePlayHandle * _n )
 {
 	//printf("GONE\n");
-	if( _n->frequency() == current_freq ) 
+	if( _n->unpitchedFrequency() == current_freq ) 
 	{
 		delete_freq = current_freq;
 		//previous_freq = current_freq;

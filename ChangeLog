@@ -1,3 +1,16 @@
+2008-07-07	Paul Giblock <drfaygo/at/gmail/dot/com>
+
+	* src/gui/controller_connection_dialog.cpp:
+	Show name instead of type in connection dialog
+	
+	* src/gui/widgets/controller_view.cpp:
+	Remove bypass
+	
+	* plugins/lb302/lb302.cpp:
+	* plugins/lb302/lb302.h:
+	- Initial support for pitch-bend, doesn't work during slide.
+	- Next version will probably be the first lb303
+
 2008-07-07	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/core/mmp.cpp:
@@ -24,14 +37,6 @@
 	* src/core/midi/midi_controller.cpp:
 	* src/tracks/instrument_track.cpp:
 	removed buggy and obsolete support for monophonic instruments
-
-2008-07-07	Paul Giblock <drfaygo/at/gmail/dot/com>
-
-	* src/gui/controller_connection_dialog.cpp:
-	Show name instead of type in connection dialog
-	
-	* src/gui/widgets/controller_view.cpp:
-	Remove bypass
 
 2008-07-06	Paul Giblock <drfaygo/at/gmail/dot/com>
 

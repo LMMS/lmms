@@ -246,7 +246,7 @@ private:
 	float previous_sample_vca;
 	float previous_count;
 	float delete_freq;
-
+	float true_freq;
 
 	void recalcFilter();
 
