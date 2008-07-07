@@ -1,3 +1,15 @@
+2008-07-07	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* include/instrument.h:
+	* include/instrument_track.h:
+	* include/midi_controller.h:
+	* include/midi_event_processor.h:
+	* include/midi_port.h:
+	* src/core/note_play_handle.cpp:
+	* src/core/midi/midi_controller.cpp:
+	* src/tracks/instrument_track.cpp:
+	removed buggy and obsolete support for monophonic instruments
+
 2008-07-07	Paul Giblock <drfaygo/at/gmail/dot/com>
 
 	* src/gui/controller_connection_dialog.cpp:
