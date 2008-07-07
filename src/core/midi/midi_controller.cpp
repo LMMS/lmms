@@ -79,7 +79,7 @@ void midiController::updateName( void )
 
 
 void midiController::processInEvent( const midiEvent & _me,
-					const midiTime & _time, bool _lock )
+						const midiTime & _time )
 {
 	Uint8 controllerNum;
 	const Uint8 * bytes;

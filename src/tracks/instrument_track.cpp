@@ -207,7 +207,7 @@ void instrumentTrack::processAudioBuffer( sampleFrame * _buf,
 
 
 void instrumentTrack::processInEvent( const midiEvent & _me,
-					const midiTime & _time, bool _lock )
+							const midiTime & _time )
 {
 	switch( _me.m_type )
 	{
@@ -246,10 +246,6 @@ void instrumentTrack::processInEvent( const midiEvent & _me,
 
 		case MidiNoteOff:
 		{
-			if( _lock )	// TO BE REMOVED
-			{
-			engine::getMixer()->lock();
-			}
 			notePlayHandle * n = m_notes[_me.key()];
 			if( n != NULL )
 			{
@@ -269,10 +265,6 @@ void instrumentTrack::processInEvent( const midiEvent & _me,
 				m_notes[_me.key()] = NULL;
 
 				emit noteDone( done_note );
-			}
-			if( _lock )	// TO BE REMOVED
-			{
-				engine::getMixer()->unlock();
 			}
 			break;
 		}
@@ -360,60 +352,6 @@ void instrumentTrack::playNote( notePlayHandle * _n, bool _try_parallelizing,
 
 	if( _n->arpBaseNote() == FALSE && m_instrument != NULL )
 	{
-		// TO BE REMOVED
-		if( m_instrument->isMonophonic() )
-		{
-			constNotePlayHandleVector v =
-				notePlayHandle::nphsOfInstrumentTrack( this,
-									TRUE );
-			if( v.size() > 1 )
-			{
-				constNotePlayHandleVector::iterator
-						youngest_note = v.begin();
-				for( constNotePlayHandleVector::iterator it =
-						v.begin(); it != v.end(); ++it )
-				{
-					if( !( *it )->arpBaseNote() &&
-						( *it )->totalFramesPlayed() <=
-						( *youngest_note )->
-							totalFramesPlayed() )
-					{
-						youngest_note = it;
-					}
-				}
-				if( *youngest_note != _n &&
-					!( *youngest_note )->arpBaseNote() &&
-					!_n->released() )
-				{
-					processInEvent(midiEvent(
-								MidiNoteOff, 0,
-						_n->key(), 0 ), midiTime(),
-									FALSE );
-					if( ( *youngest_note )->offset() >
-								_n->offset() )
-					{
-						_n->noteOff( ( *youngest_note )->
-								offset() -
-								_n->offset() );
-					}
-					else
-					{
-						// for the case the youngest
-						// note has an offset smaller
-						// then the current note we
-						// already played everything
-						// in last period and have
-						// to clear parts of it
-						_n->noteOff();
-	engine::getMixer()->clearAudioBuffer( m_audioPort.firstBuffer(),
-				engine::getMixer()->framesPerPeriod() -
-					( *youngest_note )->offset(),
-					( *youngest_note )->offset() );
-						return;
-					}
-				}
-			}
-		}
 		// all is done, so now lets play the note!
 		m_instrument->playNote( _n, _try_parallelizing,
 							_working_buffer );

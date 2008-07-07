@@ -85,12 +85,6 @@ public:
 		return( 0 );
 	}
 
-	// TO BE REMOVED
-	virtual bool isMonophonic( void ) const
-	{
-		return( FALSE );
-	}
-
 	// instrument-play-handle-based instruments should return FALSE
 	inline virtual bool notePlayHandleBased( void ) const
 	{

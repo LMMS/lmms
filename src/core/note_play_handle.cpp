@@ -260,10 +260,6 @@ void notePlayHandle::play( bool _try_parallelizing,
 
 f_cnt_t notePlayHandle::framesLeft( void ) const
 {
-/*	const instrument * i = ( m_instrumentTrack != NULL ) ?
-				m_instrumentTrack->getInstrument() : NULL;
-	f_cnt_t rftd  = ( i != NULL && i->isMonophonic() ) ?
-						0 : actualReleaseFramesToDo();*/
 	if( m_released && actualReleaseFramesToDo() == 0 )
 	{
 		return( m_framesBeforeRelease );

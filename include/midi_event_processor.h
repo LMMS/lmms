@@ -44,8 +44,7 @@ public:
 
 	// to be implemented by inheriting classes
 	virtual void processInEvent( const midiEvent & _me,
-						const midiTime & _time,
-							bool _lock = TRUE ) = 0;
+						const midiTime & _time ) = 0;
 	virtual void processOutEvent( const midiEvent & _me,
 						const midiTime & _time ) = 0;
 

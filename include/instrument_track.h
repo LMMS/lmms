@@ -70,8 +70,7 @@ public:
 							notePlayHandle * _n );
 
 	virtual void processInEvent( const midiEvent & _me,
-					const midiTime & _time,
-							bool _lock = TRUE );
+					const midiTime & _time );
 	virtual void processOutEvent( const midiEvent & _me,
 						const midiTime & _time );
 
