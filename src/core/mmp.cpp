@@ -151,28 +151,16 @@ multimediaProject::multimediaProject( const QString & _in_file_name,
 
 	QDomElement root = documentElement();
 	m_type = type( root.attribute( "type" ) );
-	QDomNode node = root.firstChild();
-	while( !node.isNull() )
-	{
-		if( node.isElement() )
-		{
-			if( node.nodeName() == "head" )
-			{
-				m_head = node.toElement();
-			}
-			else if( node.nodeName() == typeName( m_type ) )
-			{
-				m_content = node.toElement();
-			}
-		}
-		node = node.nextSibling();
-	}
+	m_head = root.elementsByTagName( "head" ).item( 0 ).toElement();
 
 	if( _upgrade && root.hasAttribute( "creatorversion" ) &&
 			root.attribute( "creatorversion" ) != LMMS_VERSION )
 	{
 		upgrade();
 	}
+
+	m_content = root.elementsByTagName( typeName( m_type ) ).
+							item( 0 ).toElement();
 }
 
 
@@ -280,16 +268,15 @@ multimediaProject::ProjectTypes multimediaProject::type(
 {
 	for( int i = 0; i < NumProjectTypes; ++i )
 	{
-		if( s_types[i].m_name == _type_name || (
-			s_types[i].m_name.contains( "," ) && (
-			s_types[i].m_name.section( ',', 0, 0 ) == _type_name ||
-			s_types[i].m_name.section( ',', 1, 1 ) == _type_name ) )
-							)
-
+		if( s_types[i].m_name == _type_name )
 		{
 			return( static_cast<multimediaProject::ProjectTypes>(
 									i ) );
 		}
+	}
+	if( _type_name == "channelsettings" )
+	{
+		return( multimediaProject::InstrumentTrackSettings );
 	}
 	return( UnknownType );
 }
