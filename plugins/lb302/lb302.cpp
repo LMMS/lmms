@@ -274,7 +274,6 @@ lb302Synth::lb302Synth( instrumentTrack * _instrumentTrack ) :
 	vcf_res_knob( 0.75f, 0.0f, 1.25f, 0.005f, this, tr( "VCF Resonance" ) ),
 	vcf_mod_knob( 0.1f, 0.0f, 1.0f, 0.005f, this, tr( "VCF Envelope Mod" ) ),
 	vcf_dec_knob( 0.1f, 0.0f, 1.0f, 0.005f, this, tr( "VCF Envelope Decay" ) ),
-	vco_fine_detune_knob( 0.0f, -100.0f, 100.0f, 1.0f, this, tr( "VCO Fine Detuning:") ),
 	dist_knob( 0.0f, 0.0f, 1.0f, 0.01f, this, tr( "Distortion" ) ),
 	wave_knob( 0.0f, 0.0f, 5.0f, 1.0f, this, tr( "Waveform" ) ),
 	slide_dec_knob( 0.6f, 0.0f, 1.0f, 0.005f, this, tr( "Slide Decay" ) ),
@@ -300,9 +299,6 @@ lb302Synth::lb302Synth( instrumentTrack * _instrumentTrack ) :
 	connect( &vcf_dec_knob, SIGNAL( dataChanged( ) ),
 	         this, SLOT ( filterChanged( ) ) );
 
-	connect( &vco_fine_detune_knob, SIGNAL( dataChanged( ) ),
-	         this, SLOT ( filterChanged( ) ) );
-
 	connect( &db24Toggle, SIGNAL( dataChanged( ) ),
 	         this, SLOT ( db24Toggled( ) ) );
 
@@ -326,7 +322,6 @@ lb302Synth::lb302Synth( instrumentTrack * _instrumentTrack ) :
 	fs.dist = 0;
 
 	vcf_envpos = ENVINC;
-	vco_detune = 0;
 
 	// Start VCA on an attack.
 	vca_mode = 3;
@@ -345,7 +340,6 @@ lb302Synth::lb302Synth( instrumentTrack * _instrumentTrack ) :
 
 	vcf = new lb302FilterIIR2(&fs);
 
-	use_hold_note = false;
 	sample_cnt = 0;
 	release_frame = 1<<24;
 	catch_frame = 0;
@@ -353,27 +347,16 @@ lb302Synth::lb302Synth( instrumentTrack * _instrumentTrack ) :
 
 	recalcFilter();
 
-	lastFramesPlayed = 1;	// because we subtract 1 later
 	last_offset = 0;
 
 	new_freq = -1;
 	current_freq = -1;
-	previous_freq = -1;
-	previous_vco_inc = 0;
-	previous_sample = 0;
-	previous_sample_hold = 0;
-	previous_sample_vca = 0;
 	delete_freq = -1;
-
-	
-
-	period_states_cnt = 0;
 
 	instrumentPlayHandle * iph = new instrumentPlayHandle( this );
 	engine::getMixer()->addPlayHandle( iph );
 
 	filterChanged();
-	detuneChanged();
 }
 
 
@@ -391,7 +374,6 @@ void lb302Synth::saveSettings( QDomDocument & _doc,
 	vcf_mod_knob.saveSettings( _doc, _this, "vcf_mod" );
 	vcf_dec_knob.saveSettings( _doc, _this, "vcf_dec" );
 
-	vco_fine_detune_knob.saveSettings( _doc, _this, "vco_detune" );
 	wave_knob.saveSettings( _doc, _this, "shape");
 	dist_knob.saveSettings( _doc, _this, "dist");
 	slide_dec_knob.saveSettings( _doc, _this, "slide_dec");
@@ -409,7 +391,6 @@ void lb302Synth::loadSettings( const QDomElement & _this )
 	vcf_mod_knob.loadSettings( _this, "vcf_mod" );
 	vcf_dec_knob.loadSettings( _this, "vcf_dec" );
 
-	vco_fine_detune_knob.loadSettings( _this, "vco_detune" );
 	dist_knob.loadSettings( _this, "dist");
 	wave_knob.loadSettings( _this, "shape");
 	slide_dec_knob.loadSettings( _this, "slide_dec");
@@ -419,7 +400,6 @@ void lb302Synth::loadSettings( const QDomElement & _this )
 	db24Toggle.loadSettings( _this, "db24");
 
 	filterChanged();
-	detuneChanged();
 }
 
 // TODO: Split into one function per knob.  envdecay doesn't require
@@ -454,30 +434,6 @@ void lb302Synth::db24Toggled( void )
 }
 
 
-void lb302Synth::detuneChanged( void )
-{
-	/* LB303
-	float freq = vco_inc*engine::getMixer()->processingSampleRate()/vco_detune;
-	float slidebase_freq=0;
-
-	if(vco_slide) {
-		slidebase_freq = vco_slidebase*engine::getMixer()->processingSampleRate()/vco_detune;
-	}
-
-	vco_detune = powf(2.0f, (float)vco_fine_detune_knob.value()/1200.0f);
-	vco_inc = freq*vco_detune/engine::getMixer()->processingSampleRate();
-
-	// If a slide note is pending,
-	if(vco_slideinc)
-		vco_slideinc = vco_inc;
-
-	// If currently sliding,
-	// May need to rescale vco_slide as well
-	if(vco_slide) 
-		vco_slidebase = slidebase_freq*vco_detune/engine::getMixer()->processingSampleRate();
-		*/
-}
-
 
 QString lb302Synth::nodeName( void ) const
 {
@@ -508,7 +464,7 @@ inline int MIN(int a, int b) {
 }
 
 inline float GET_INC(float freq) {
-	return freq/**vco_detune*//engine::getMixer()->processingSampleRate();  // TODO: Use actual sampling rate.
+	return freq/engine::getMixer()->processingSampleRate();  // TODO: Use actual sampling rate.
 }
 
 int lb302Synth::process(sampleFrame *outbuf, const Uint32 size)
@@ -518,11 +474,6 @@ int lb302Synth::process(sampleFrame *outbuf, const Uint32 size)
 	float samp;
 
 	if( delete_freq == current_freq ) {
-		// TODO: Crossfade
-		// previous_freq = delete_freq;
-		// previous_count = 0;
-		// previous_vco_inc = GET_INC( delete_freq );
-		
 		// Normal release
 		delete_freq = -1;
 		vca_mode = 1;
@@ -537,7 +488,6 @@ int lb302Synth::process(sampleFrame *outbuf, const Uint32 size)
 		//printf("VCO_INC = %f\n", note.vco_inc);
 		note.dead = deadToggle.value();
 		initNote(&note);
-		use_hold_note = false;
 		//printf("%f %f,  ", vco_inc, vco_c);
 		
 		current_freq = new_freq; 
@@ -567,10 +517,6 @@ int lb302Synth::process(sampleFrame *outbuf, const Uint32 size)
 			}
 		}
 
-		if( sample_cnt <= 0 ) {
-			previous_sample_hold = previous_sample;
-			previous_sample_vca = 0.01f;
-		}
 
 		sample_cnt++;
 		vcf_envpos++;
@@ -587,10 +533,6 @@ int lb302Synth::process(sampleFrame *outbuf, const Uint32 size)
 		if (catch_decay > 0) {
 			if (catch_decay < decay_frames) {
 				catch_decay++;
-			}
-			else if (use_hold_note) {
-				use_hold_note = false;
-				initNote(&hold_note);
 			}
 		}*/
 
@@ -658,22 +600,6 @@ int lb302Synth::process(sampleFrame *outbuf, const Uint32 size)
 		{
 	//			vca_a = 0;
 		}
-/*
-		if( previous_sample_vca <= 1.0f )
-			samp += (1.0f- previous_sample_vca) * previous_sample_hold;
-		previous_sample_vca *= 1.2f;
-*/
-
-
-		previous_sample = samp;
-		
-		//if( sample_cnt < 32 && previous_freq > 0.0f )
-		//{
-			//previous_sample *= 0.96406088;
-			//float oldamt = (32.0f-(float)sample_cnt)*previous_sample/32.0f;
-			//printf("%d old %f\n", sample_cnt, oldamt);
-			//samp += previous_sample;
-		//}
 		
 #else
 		//samp = vco_k*vca_a;
@@ -689,9 +615,11 @@ int lb302Synth::process(sampleFrame *outbuf, const Uint32 size)
 		}
 
 
+		/*LB303
 		if((int)i>=release_frame) {
 			vca_mode=1;
 		}
+		*/
 
 		// Handle Envelope
 		if(vca_mode==0) {
@@ -751,7 +679,7 @@ void lb302Synth::initNote( lb302Note *n)
 	}
 	// End break-out
 
-	// Slide note, save inc for next note
+	// Slide-from note, save inc for next note
 	if (slideToggle.value()) {
 		vco_slideinc = vco_inc; // May need to equal vco_slidebase+vco_slide if last note slid
 	}
@@ -797,31 +725,14 @@ void lb302Synth::playNote( notePlayHandle * _n, bool,
 
 		// Existing note. Allow it to decay. 
 		if(deadToggle.value() == 0 && decay_note) {
-/*
-#ifdef LB_DECAY
-			if (catch_decay < 1) {
-				// BEGIN NOT SURE OF...
-				//lb302State *st = &period_states[period_states_cnt-1];
-				//vca_a = st->vca_a;
-				//sample_cnt = st->sample_cnt;
-				// END NOT SURE OF
 
-				// Reserve this note for retrigger in process()
-				hold_note.vco_inc = _n->frequency()*vco_detune/engine::getMixer()->processingSampleRate();  // TODO: Use actual sampling rate.
-				hold_note.dead = deadToggle->value();
-				use_hold_note = true;
-				catch_decay = 1;
-			}
-#else
-*/
 	/*		lb302Note note;
 			note.vco_inc = _n->frequency()*vco_detune/engine::getMixer()->processingSampleRate();  // TODO: Use actual sampling rate.
 			note.dead = deadToggle.value();
 			initNote(&note);
-			vca_mode=0;*/
-			//LB303 vca_a = state->vca_a;
+			vca_mode=0;
+	*/
 
-//#endif
 		}
 		/// Start a new note.
 		else if( _n->totalFramesPlayed() == 0 ) {
@@ -838,7 +749,6 @@ void lb302Synth::playNote( notePlayHandle * _n, bool,
 	//LB303 }
 
 
-	//LB303 lastFramesPlayed = frames; //_n->framesLeftForCurrentPeriod(); //_n->totalFramesPlayed();
 }
 
 
@@ -862,8 +772,6 @@ void lb302Synth::deleteNotePluginData( notePlayHandle * _n )
 	if( _n->unpitchedFrequency() == current_freq ) 
 	{
 		delete_freq = current_freq;
-		//previous_freq = current_freq;
-		//previous_sample = vco_k * vca_a;
 	}
 }
 
@@ -919,11 +827,6 @@ lb302SynthView::lb302SynthView( instrument * _instrument, QWidget * _parent ) :
 	m_slideDecKnob->setHintText( tr( "Slide Decay:" ) + " ", "" );
 	m_slideDecKnob->setLabel( tr( "SLIDE"));
 
-	m_vcoFineDetuneKnob = new knob( knobBright_26, this );
-	m_vcoFineDetuneKnob->move(165, 75);
-	m_vcoFineDetuneKnob->setHintText( tr( "VCO Fine Detuning:") + " ", "cents");
-	m_vcoFineDetuneKnob->setLabel( tr( "DETUNE"));
-
 	m_distKnob = new knob( knobBright_26, this );
 	m_distKnob->move( 210, 190 );
 	m_distKnob->setHintText( tr( "DIST:" ) + " ", "" );
@@ -958,8 +861,6 @@ void lb302SynthView::modelChanged( void )
 	m_vcfDecKnob->setModel( &syn->vcf_dec_knob );
 	m_vcfModKnob->setModel( &syn->vcf_mod_knob );
 	m_slideDecKnob->setModel( &syn->slide_dec_knob );
-
-	m_vcoFineDetuneKnob->setModel( &syn->vco_fine_detune_knob );
 
 	m_distKnob->setModel( &syn->dist_knob );
 	m_waveKnob->setModel( &syn->wave_knob );

@@ -209,10 +209,7 @@ private:
 	// User settings
 	lb302FilterKnobState fs;
 	lb302Filter *vcf;
-	lb302Note hold_note;
-	bool use_hold_note;
 
-	int lastFramesPlayed;
 	int release_frame;
 
 
@@ -232,19 +229,11 @@ private:
 
 	int   last_offset;
 
-	int period_states_cnt;
-
 	int catch_frame;
 	int catch_decay;
 
 	float new_freq;
 	float current_freq;
-	float previous_freq;
-	float previous_vco_inc;
-	float previous_sample;
-	float previous_sample_hold;
-	float previous_sample_vca;
-	float previous_count;
 	float delete_freq;
 	float true_freq;
 
