@@ -66,8 +66,9 @@ public:
 
 
 	virtual void processInEvent( const midiEvent & _me,
-					const midiTime & _time, bool _lock )
+					const midiTime & _time )
 	{
+		printf("ho hum\n");
 		if( _me.m_type == MidiControlChange &&
 			( m_midiPort.inputChannel() == _me.m_channel + 1 ||
 				m_midiPort.inputChannel() == 0 ) )

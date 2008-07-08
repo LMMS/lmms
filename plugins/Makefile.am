@@ -23,6 +23,7 @@ SUBDIRS =			\
 	ladspa_browser		\
 	ladspa_effect		\
 	lb302 			\
+	lb303 			\
 	live_tool		\
 	midi_import		\
 	organic			\

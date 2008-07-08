@@ -278,7 +278,7 @@ bool knob::updateAngle( void )
 
 void knob::drawKnob( QPainter * _p )
 {
-	if( updateAngle() == FALSE )
+	if( updateAngle() == FALSE && !m_cache.isNull() )
 	{
 		_p->drawImage( 0, 0, m_cache );
 		return;
