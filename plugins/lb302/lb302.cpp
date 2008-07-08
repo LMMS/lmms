@@ -670,9 +670,9 @@ void lb302Synth::initNote( lb302Note *n)
 	// TODO: Break out into function, should be called again on detuneChanged
 	if (vco_slideinc) {
 		//printf("    sliding\n");
-		vco_slide = vco_inc-vco_slideinc;
-		vco_slidebase = vco_inc;
-		vco_slideinc = 0;
+		vco_slide = vco_inc-vco_slideinc;	// Slide amount
+		vco_slidebase = vco_inc;			// The REAL frequency
+		vco_slideinc = 0;					// reset from-note
 	}
 	else {
 		vco_slide = 0;
@@ -741,9 +741,16 @@ void lb302Synth::playNote( notePlayHandle * _n, bool,
 			_n->m_pluginData = this;
 		}
 
+		// Check for slide
 		if( _n->unpitchedFrequency() == current_freq ) {
 			true_freq = _n->frequency();
-			vco_inc = GET_INC( true_freq );
+
+			if( slideToggle.value() ) {
+				vco_slidebase = GET_INC( true_freq );			// The REAL frequency
+			}
+			else {
+				vco_inc = GET_INC( true_freq );
+			}
 		}
 
 	//LB303 }
