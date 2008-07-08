@@ -3,6 +3,8 @@
 	* plugins/lb303:
 	* plugins/lb303/lb303.cpp:
 	* plugins/lb303/lb303.h:
+	* plugins/lb303/artwork.png:
+	* plugins/lb303/logo.png:
 	* plugins/lb303/Makefile.am:
 	* plugins/Makefile.am:
 	* configure.in:
