@@ -272,8 +272,7 @@ arpeggiator::arpeggiator( model * _parent ) :
 							tr( "Arpeggio time" ) ),
 	m_arpGateModel( 100.0f, 1.0f, 200.0f, 1.0f, this,
 							tr( "Arpeggio gate" ) ),
-	m_arpDirectionModel( 0, 0, NumArpDirections, this,
-						tr( "Arpeggio direction" ) ),
+	m_arpDirectionModel( this, tr( "Arpeggio direction" ) ),
 	m_arpModeModel( this, tr( "Arpeggio mode" ) )
 {
 	for( int i = 0; chordCreator::s_chordTable[i].interval[0] != -1; ++i )
@@ -283,6 +282,14 @@ arpeggiator::arpeggiator( model * _parent ) :
 						name.toAscii().constData() ) );
 	}
 
+	m_arpDirectionModel.addItem( tr( "Up" ),
+					new pixmapLoader( "arp_up" ) );
+	m_arpDirectionModel.addItem( tr( "Down" ),
+					new pixmapLoader( "arp_down" ) );
+	m_arpDirectionModel.addItem( tr( "Up and down" ),
+					new pixmapLoader( "arp_up_and_down" ) );
+	m_arpDirectionModel.addItem( tr( "Random" ),
+					new pixmapLoader( "arp_random" ) );
 	m_arpDirectionModel.setInitValue( ArpDirUp );
 
 	m_arpModeModel.addItem( tr( "Free" ), new pixmapLoader( "arp_free" ) );

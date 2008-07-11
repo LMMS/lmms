@@ -114,6 +114,7 @@ arpeggiatorView::arpeggiatorView( arpeggiator * _arp, QWidget * _parent ) :
 	m_arpRangeKnob( new knob( knobBright_26, m_arpGroupBox ) ),
 	m_arpTimeKnob( new tempoSyncKnob( knobBright_26, m_arpGroupBox ) ),
 	m_arpGateKnob( new knob( knobBright_26, m_arpGroupBox ) ),
+	m_arpDirectionComboBox( new comboBox( m_arpGroupBox ) ),
 	m_arpModeComboBox( new comboBox( m_arpGroupBox ) )
 {
 	move( ARP_GROUPBOX_X, ARP_GROUPBOX_Y );
@@ -168,55 +169,14 @@ arpeggiatorView::arpeggiatorView( arpeggiator * _arp, QWidget * _parent ) :
 	m_arpDirectionLbl->setGeometry( 10, 60, 64, 10 );
 	m_arpDirectionLbl->setFont( pointSize<7>( m_arpDirectionLbl->font() ) );
 
-
-
-	pixmapButton * arp_up_btn = new pixmapButton( m_arpGroupBox, NULL );
-	arp_up_btn->move( 10, 74 );
-	arp_up_btn->setActiveGraphic( embed::getIconPixmap( "arp_up_on" ) );
-	arp_up_btn->setInactiveGraphic( embed::getIconPixmap( "arp_up_off" ) );
-	toolTip::add( arp_up_btn, tr( "arpeggio direction = up" ) );
-
-
-	pixmapButton * arp_down_btn = new pixmapButton( m_arpGroupBox, NULL );
-	arp_down_btn->move( 30, 74 );
-	arp_down_btn->setActiveGraphic( embed::getIconPixmap( "arp_down_on" ) );
-	arp_down_btn->setInactiveGraphic( embed::getIconPixmap(
-							"arp_down_off" ) );
-	toolTip::add( arp_down_btn, tr( "arpeggio direction = down" ) );
-
-
-	pixmapButton * arp_up_and_down_btn = new pixmapButton( m_arpGroupBox,
-									NULL );
-	arp_up_and_down_btn->move( 50, 74 );
-	arp_up_and_down_btn->setActiveGraphic( embed::getIconPixmap(
-						"arp_up_and_down_on" ) );
-	arp_up_and_down_btn->setInactiveGraphic( embed::getIconPixmap(
-						"arp_up_and_down_off" ) );
-	toolTip::add( arp_up_and_down_btn,
-				tr( "arpeggio direction = up and down" ) );
-
-
-	pixmapButton * arp_random_btn = new pixmapButton( m_arpGroupBox, NULL );
-	arp_random_btn->move( 70, 74 );
-	arp_random_btn->setActiveGraphic( embed::getIconPixmap(
-							"arp_random_on" ) );
-	arp_random_btn->setInactiveGraphic( embed::getIconPixmap(
-							"arp_random_off" ) );
-	toolTip::add( arp_random_btn, tr( "arpeggio direction = random" ) );
-
-	m_arpDirectionBtnGrp = new automatableButtonGroup( this );
-	m_arpDirectionBtnGrp->addButton( arp_up_btn );
-	m_arpDirectionBtnGrp->addButton( arp_down_btn );
-	m_arpDirectionBtnGrp->addButton( arp_up_and_down_btn );
-	m_arpDirectionBtnGrp->addButton( arp_random_btn );
-
+	m_arpDirectionComboBox->setGeometry( 10, 74, 140, 22 );
 
 
 	QLabel * mode_lbl = new QLabel( tr( "Mode:" ), m_arpGroupBox );
-	mode_lbl->setGeometry( 10, 104, 64, 10 );
+	mode_lbl->setGeometry( 10, 110, 64, 10 );
 	mode_lbl->setFont( pointSize<7>( mode_lbl->font() ) );
 
-	m_arpModeComboBox->setGeometry( 10, 118, 128, 22 );
+	m_arpModeComboBox->setGeometry( 10, 124, 128, 22 );
 }
 
 
@@ -224,7 +184,6 @@ arpeggiatorView::arpeggiatorView( arpeggiator * _arp, QWidget * _parent ) :
 
 arpeggiatorView::~arpeggiatorView()
 {
-	delete m_arpDirectionBtnGrp;
 	delete m_arpGroupBox;
 }
 
@@ -239,7 +198,7 @@ void arpeggiatorView::modelChanged( void )
 	m_arpRangeKnob->setModel( &m_a->m_arpRangeModel );
 	m_arpTimeKnob->setModel( &m_a->m_arpTimeModel );
 	m_arpGateKnob->setModel( &m_a->m_arpGateModel );
-	m_arpDirectionBtnGrp->setModel( &m_a->m_arpDirectionModel );
+	m_arpDirectionComboBox->setModel( &m_a->m_arpDirectionModel );
 	m_arpModeComboBox->setModel( &m_a->m_arpModeModel );
 }
 

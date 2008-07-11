@@ -31,7 +31,6 @@
 #include <QtGui/QWidget>
 
 class QLabel;
-class automatableButtonGroup;
 class comboBox;
 class groupBox;
 class knob;
@@ -85,8 +84,7 @@ private:
 
 	QLabel * m_arpDirectionLbl;
 
-	automatableButtonGroup * m_arpDirectionBtnGrp;
-
+	comboBox * m_arpDirectionComboBox;
 	comboBox * m_arpModeComboBox;
 
 } ;

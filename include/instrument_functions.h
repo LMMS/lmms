@@ -131,7 +131,7 @@ private:
 	floatModel m_arpRangeModel;
 	tempoSyncKnobModel m_arpTimeModel;
 	floatModel m_arpGateModel;
-	intModel m_arpDirectionModel;
+	comboBoxModel m_arpDirectionModel;
 	comboBoxModel m_arpModeModel;
 
 
