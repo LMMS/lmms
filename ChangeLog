@@ -1,3 +1,29 @@
+2008-07-11	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* plugins/sf2_player/Makefile.am:
+	added missing SOURCES-entry for UI-file
+
+	* src/gui/widgets/combobox.cpp:
+	better position for text-drawing
+
+	* include/instrument_functions.h:
+	* include/instrument_function_views.h:
+	* src/core/instrument_functions.cpp:
+	* src/gui/widgets/instrument_function_views.cpp:
+	* data/themes/default/arp_down.png:
+	* data/themes/default/arp_down_off.png:
+	* data/themes/default/arp_down_on.png:
+	* data/themes/default/arp_random.png:
+	* data/themes/default/arp_random_off.png:
+	* data/themes/default/arp_random_on.png:
+	* data/themes/default/arp_up.png:
+	* data/themes/default/arp_up_off.png:
+	* data/themes/default/arp_up_on.png:
+	* data/themes/default/arp_up_and_down.png:
+	* data/themes/default/arp_up_and_down_off.png:
+	* data/themes/default/arp_up_and_down_on.png:
+	use combobox instead of button-group for selecting arpeggio-direction
+
 2008-07-08	Paul Giblock <drfaygo/at/gmail/dot/com>
 
 	* plugins/lb303:
@@ -32,6 +58,9 @@
 	- Fix pitch-bend while sliding
 
 2008-07-07	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* configure.in:
+	made 0.4.0-alpha2 release
 
 	* src/core/mmp.cpp:
 	added compat-code for loading old presets where content-node is named
