@@ -205,7 +205,7 @@ void comboBox::paintEvent( QPaintEvent * _pe )
 							height() - 2 ) );
 		QPixmap pm = model()->currentData() ?
 				model()->currentData()->pixmap() : QPixmap();
-		int tx = 4;
+		int tx = 5;
 		if( !pm.isNull() )
 		{
 			if( pm.height() > 16 )
@@ -214,13 +214,13 @@ void comboBox::paintEvent( QPaintEvent * _pe )
 						Qt::SmoothTransformation );
 			}
 			p.drawPixmap( tx, 3, pm );
-			tx += pm.width() + 2;
+			tx += pm.width() + 3;
 		}
 		const int y = ( height()+p.fontMetrics().height() ) /2;
 		p.setPen( QColor( 64, 64, 64 ) );
-		p.drawText( tx+1, y-2, model()->currentText() );
+		p.drawText( tx+1, y-3, model()->currentText() );
 		p.setPen( QColor( 224, 224, 224 ) );
-		p.drawText( tx, y-3, model()->currentText() );
+		p.drawText( tx, y-4, model()->currentText() );
 	}
 }
 
