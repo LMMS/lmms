@@ -1426,10 +1426,10 @@ void automationEditor::paintEvent( QPaintEvent * _pe )
 					- m_currentPosition ) * m_ppt /
 							DefaultTicksPerTact;
 				// skip this value if not in visible area at all
-				if( next_x > width() )
+/*				if( next_x > width() )
 				{
 					break;
-				}
+				}*/
 				rect_width = next_x - x;
 			}
 			else

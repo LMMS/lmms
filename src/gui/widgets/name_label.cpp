@@ -27,6 +27,7 @@
 
 
 #include <QtGui/QFileDialog>
+#include <QtGui/QHBoxLayout>
 #include <QtGui/QMouseEvent>
 #include <QtGui/QPainter>
 #include <QtGui/QToolButton>
@@ -40,7 +41,6 @@
 #include "gui_templates.h"
 #include "config_mgr.h"
 #include "engine.h"
-#include <QtGui/QHBoxLayout>
 
 
 

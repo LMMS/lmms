@@ -1,5 +1,14 @@
 2008-07-12	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* src/gui/automation_editor.cpp:
+	fixed drawing of bars which do not fit within current viewport
+
+	* data/themes/default/factory_files.png:
+	better icon
+
+	* data/projects/covers/J.S.Bach-Preludium_and_Fugue_A-Minor.mmpz:
+	upgraded + reverb in master-FX channel
+
 	* Makefile.am:
 	* include/effect_label.h:
 	* src/gui/widgets/effect_label.cpp:
