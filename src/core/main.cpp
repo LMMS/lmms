@@ -309,6 +309,7 @@ int main( int argc, char * * argv )
 
 	if( !configManager::inst()->loadConfigFile() )
 	{
+		printf( "could not load config file!\n" );
 		return( EXIT_FAILURE );
 	}
 

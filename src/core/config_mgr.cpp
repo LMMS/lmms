@@ -193,7 +193,7 @@ bool configManager::loadConfigFile( void )
 	{
 		if( !dom_tree.setContent( &cfg_file ) )
 		{
-			return( FALSE );
+		//	return( FALSE );
 		}
 		cfg_file.close();
 	}

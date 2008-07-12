@@ -1,5 +1,9 @@
 2008-07-12	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* src/core/config_mgr.cpp:
+	* src/core/main.cpp:
+	do not terminate silently if parsing of configuration file failed
+
 	* src/gui/automation_editor.cpp:
 	fixed drawing of bars which do not fit within current viewport
 
