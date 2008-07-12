@@ -116,13 +116,11 @@ automationTrackView::automationTrackView( automationTrack * _at,
 	trackView( _at, _tcv )
 {
 	setFixedHeight( 32 );
-	m_trackLabel = new nameLabel( _at->name(), getTrackSettingsWidget() );
-	m_trackLabel->setPixmap( embed::getIconPixmap( "automation" ) );
-	m_trackLabel->setGeometry( 1, 1, DEFAULT_SETTINGS_WIDGET_WIDTH - 2,
-									29 );
-	m_trackLabel->show();
-	connect( m_trackLabel, SIGNAL( nameChanged( const QString & ) ),
-			_at, SLOT( setName( const QString & ) ) );
+	trackLabelButton * tlb = new trackLabelButton( this,
+						getTrackSettingsWidget() );
+	tlb->setPixmap( embed::getIconPixmap( "automation_track" ) );
+	tlb->move( 3, 1 );
+	tlb->show();
 	setModel( _at );
 }
 

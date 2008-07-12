@@ -1501,9 +1501,8 @@ void trackOperationsWidget::removeTrack( void )
 
 /*! \brief Update the trackOperationsWidget context menu
  *
- *  If we're in the Beat+Bassline Editor, we can supply the enable or
- *  disable automation options.  For all track types, we have the Clone
- *  and Remove options as well.
+ *  For all track types, we have the Clone and Remove options.
+ *  For instrument-tracks we also offer the MIDI-control-menu
  */
 void trackOperationsWidget::updateMenu( void )
 {
@@ -1515,6 +1514,13 @@ void trackOperationsWidget::updateMenu( void )
 	to_menu->addAction( embed::getIconPixmap( "cancel", 16, 16 ),
 						tr( "Remove this track" ),
 						this, SLOT( removeTrack() ) );
+
+	if( dynamic_cast<instrumentTrackView *>( m_trackView ) )
+	{
+		to_menu->addSeparator();
+		to_menu->addMenu( dynamic_cast<instrumentTrackView *>(
+						m_trackView )->midiMenu() );
+	}
 }
 
 

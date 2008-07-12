@@ -31,9 +31,6 @@
 #include "track.h"
 
 
-class nameLabel;
-
-
 class automationTrack : public track
 {
 public:
@@ -72,14 +69,7 @@ public:
 	virtual void dragEnterEvent( QDragEnterEvent * _dee );
 	virtual void dropEvent( QDropEvent * _de );
 
-private:
-	bbTrack * m_bbTrack;
-	nameLabel * m_trackLabel;
-
 } ;
-
-
-
 
 
 #endif

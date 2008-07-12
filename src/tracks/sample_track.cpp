@@ -28,10 +28,12 @@
 
 #include <Qt/QtXml>
 #include <QtGui/QDropEvent>
+#include <QtGui/QLayout>
+#include <QtGui/QMdiArea>
 #include <QtGui/QPainter>
 #include <QtGui/QPushButton>
 
-#include "effect_label.h"
+#include "name_label.h"
 #include "sample_track.h"
 #include "song.h"
 #include "embed.h"
@@ -43,6 +45,8 @@
 #include "sample_play_handle.h"
 #include "string_pair_drag.h"
 #include "knob.h"
+#include "main_window.h"
+#include "effect_rack_view.h"
 
 
 
@@ -378,7 +382,7 @@ void sampleTrack::saveTrackSpecificSettings( QDomDocument & _doc,
 {
 	m_audioPort.getEffects()->saveState( _doc, _this );
 #if 0
-	_this.setAttribute( "icon", m_trackLabel->pixmapFile() );
+	_this.setAttribute( "icon", tlb->pixmapFile() );
 #endif
 	m_volumeModel.saveSettings( _doc, _this, "vol" );
 }
@@ -406,7 +410,7 @@ void sampleTrack::loadTrackSpecificSettings( const QDomElement & _this )
 #if 0
 	if( _this.attribute( "icon" ) != "" )
 	{
-		m_trackLabel->setPixmapFile( _this.attribute( "icon" ) );
+		tlb->setPixmapFile( _this.attribute( "icon" ) );
 	}
 #endif
 	m_volumeModel.loadSettings( _this, "vol" );
@@ -422,23 +426,32 @@ sampleTrackView::sampleTrackView( sampleTrack * _t, trackContainerView * _tcv ) 
 {
 	setFixedHeight( 32 );
 
-	m_trackLabel = new effectLabel( getTrackSettingsWidget(), _t );
-#if 0
-	m_trackLabel = new nameLabel( tr( "Sample track" ),
+	trackLabelButton * tlb = new trackLabelButton( this,
 						getTrackSettingsWidget() );
-	m_trackLabel->setPixmap( embed::getIconPixmap( "sample_track" ) );
-#endif
-	m_trackLabel->setGeometry( 26, 1, DEFAULT_SETTINGS_WIDGET_WIDTH-2, 29 );
-	m_trackLabel->show();
+	connect( tlb, SIGNAL( clicked( bool ) ),
+			this, SLOT( showEffects() ) );
+	tlb->setPixmap( embed::getIconPixmap( "sample_track" ) );
+	tlb->move( 3, 1 );
+	tlb->show();
 
 	m_volumeKnob = new knob( knobSmall_17, getTrackSettingsWidget(),
 						    tr( "Track volume" ) );
 	m_volumeKnob->setVolumeKnob( TRUE );
 	m_volumeKnob->setModel( &_t->m_volumeModel );
 	m_volumeKnob->setHintText( tr( "Channel volume:" ) + " ", "%" );
-	m_volumeKnob->move( 4, 4 );
+	m_volumeKnob->move( DEFAULT_SETTINGS_WIDGET_WIDTH-2*24, 4 );
 	m_volumeKnob->setLabel( tr( "VOL" ) );
 	m_volumeKnob->show();
+
+	m_effectRack = new effectRackView( _t->getAudioPort()->getEffects() );
+	m_effectRack->setFixedSize( 240, 242 );
+
+	engine::getMainWindow()->workspace()->addSubWindow( m_effectRack );
+	m_effWindow = m_effectRack->parentWidget();
+	m_effWindow->setAttribute( Qt::WA_DeleteOnClose, FALSE );
+	m_effWindow->layout()->setSizeConstraint( QLayout::SetFixedSize );
+ 	m_effWindow->setWindowTitle( _t->name() );
+	m_effWindow->hide();
 }
 
 
@@ -446,6 +459,23 @@ sampleTrackView::sampleTrackView( sampleTrack * _t, trackContainerView * _tcv ) 
 
 sampleTrackView::~sampleTrackView()
 {
+	m_effWindow->deleteLater();
+}
+
+
+
+
+void sampleTrackView::showEffects( void )
+{
+	if( m_effWindow->isHidden() )
+	{
+		m_effWindow->show();
+		m_effWindow->raise();
+	}
+	else
+	{
+		m_effWindow->hide();
+	}
 }
 
 

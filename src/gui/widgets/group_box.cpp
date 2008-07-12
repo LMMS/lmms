@@ -65,6 +65,7 @@ groupBox::groupBox( const QString & _caption, QWidget * _parent ) :
 
 	setModel( new boolModel( FALSE, NULL, _caption, TRUE ) );
 	setAutoFillBackground( TRUE );
+	unsetCursor();
 }
 
 

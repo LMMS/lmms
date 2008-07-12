@@ -43,7 +43,7 @@ class effectRackView : public QWidget, public modelView
 {
 	Q_OBJECT
 public:
-	effectRackView( effectChain * _model, QWidget * _parent );
+	effectRackView( effectChain * _model, QWidget * _parent = NULL );
 	virtual ~effectRackView();
 
 	void clear( void );

@@ -1,6 +1,5 @@
 /*
- * name_label.h - class nameLabel, a label which is renamable by
- *                double-clicking it
+ * name_label.h - class trackLabelButton
  *
  * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
@@ -27,16 +26,18 @@
 #ifndef _NAME_LABEL_H
 #define _NAME_LABEL_H
 
-#include <QtGui/QLabel>
-#include <QtGui/QPixmap>
+#include <QtGui/QToolButton>
 
 
-class nameLabel : public QLabel
+class trackView;
+
+
+class trackLabelButton : public QToolButton
 {
 	Q_OBJECT
 public:
-	nameLabel( const QString & _initial_name, QWidget * _parent );
-	virtual ~nameLabel();
+	trackLabelButton( trackView * _tv, QWidget * _parent );
+	virtual ~trackLabelButton();
 
 	const QPixmap & pixmap( void ) const
 	{
@@ -52,23 +53,25 @@ public:
 public slots:
 	void setPixmap( const QPixmap & _pixmap );
 	void setPixmapFile( const QString & _file );
-	void rename( void );
 	void selectPixmap( void );
+	void rename( void );
+	void updateName( void );
 
 
 signals:
-	void clicked( void );
-	void nameChanged( const QString & _new_name );
+	void nameChanged( void );
 	void pixmapChanged( void );
 
 
 protected:
+	virtual void dragEnterEvent( QDragEnterEvent * _dee );
+	virtual void dropEvent( QDropEvent * _de );
 	virtual void mousePressEvent( QMouseEvent * _me );
 	virtual void mouseDoubleClickEvent( QMouseEvent * _me );
-	virtual void paintEvent( QPaintEvent * _pe );
 
 
 private:
+	trackView * m_trackView;
 	QPixmap m_pixmap;
 	QString m_pixmapFile;
 

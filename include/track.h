@@ -553,6 +553,9 @@ private:
 	Actions m_action;
 
 
+	friend class trackLabelButton;
+
+
 private slots:
 	void createTCOView( trackContentObject * _tco );
 

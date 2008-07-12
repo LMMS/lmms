@@ -238,12 +238,7 @@ void bbTCOView::openInBBEditor( void )
 
 void bbTCOView::resetName( void )
 {
-	if( dynamic_cast<bbTrackView *>( getTrackView() ) != NULL )
-	{
-		m_bbTCO->setName(
-			dynamic_cast<bbTrackView *>( getTrackView() )->
-							trackLabel()->text() );
-	}
+	m_bbTCO->setName( m_bbTCO->getTrack()->name() );
 }
 
 
@@ -529,22 +524,16 @@ bbTrackView::bbTrackView( bbTrack * _bbt, trackContainerView * _tcv ) :
 	// too), so disable it
 	setAcceptDrops( FALSE );
 
-	m_trackLabel = new nameLabel( _bbt->name(),
-						getTrackSettingsWidget() );
+	m_trackLabel = new trackLabelButton( this, getTrackSettingsWidget() );
 	m_trackLabel->setPixmap( embed::getIconPixmap( "bb_track" ) );
-	m_trackLabel->setGeometry( 1, 1, DEFAULT_SETTINGS_WIDGET_WIDTH - 2,
-									29 );
+	m_trackLabel->move( 3, 1 );
 	m_trackLabel->show();
-	connect( m_trackLabel, SIGNAL( clicked() ),
+	connect( m_trackLabel, SIGNAL( clicked( bool ) ),
 			this, SLOT( clickedTrackLabel() ) );
-	connect( m_trackLabel, SIGNAL( nameChanged( const QString & ) ),
-			_bbt, SLOT( setName( const QString & ) ) );
-	connect( m_trackLabel, SIGNAL( nameChanged( const QString & ) ),
+	connect( m_trackLabel, SIGNAL( nameChanged() ),
 		engine::getBBTrackContainer(), SLOT( updateComboBox() ) );
 	connect( m_trackLabel, SIGNAL( pixmapChanged() ),
 		engine::getBBTrackContainer(), SLOT( updateComboBox() ) );
-	connect( _bbt, SIGNAL( dataChanged() ),
-			m_trackLabel, SLOT( update() ) );
 	setModel( _bbt );
 }
 
@@ -573,11 +562,11 @@ void bbTrackView::clickedTrackLabel( void )
 	engine::getBBTrackContainer()->setCurrentBB(
 					bbTrack::numOfBBTrack( m_bbTrack ) );
 	engine::getBBEditor()->show();
-	foreach( bbTrackView * tv,
+/*	foreach( bbTrackView * tv,
 			getTrackContainerView()->findChildren<bbTrackView *>() )
 	{
 		tv->m_trackLabel->update();
-	}
+	}*/
 	
 }
 

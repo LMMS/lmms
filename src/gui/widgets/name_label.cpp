@@ -1,7 +1,7 @@
 #ifndef SINGLE_SOURCE_COMPILE
 
 /*
- * name_label.cpp - implementation of class nameLabel, a label which
+ * name_label.cpp - implementation of class trackLabelButton, a label which
  *                  is renamable by double-clicking it
  *
  * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
@@ -29,6 +29,7 @@
 #include <QtGui/QFileDialog>
 #include <QtGui/QMouseEvent>
 #include <QtGui/QPainter>
+#include <QtGui/QToolButton>
 
 
 #include "name_label.h"
@@ -39,35 +40,46 @@
 #include "gui_templates.h"
 #include "config_mgr.h"
 #include "engine.h"
+#include <QtGui/QHBoxLayout>
 
 
 
-nameLabel::nameLabel( const QString & _initial_name, QWidget * _parent ) :
-	QLabel( _initial_name, _parent ),
+trackLabelButton::trackLabelButton( trackView * _tv, QWidget * _parent ) :
+	QToolButton( _parent ),
+	m_trackView( _tv ),
 	m_pixmap(),
 	m_pixmapFile( "" )
 {
+	setAcceptDrops( TRUE );
 	setCursor( QCursor( embed::getIconPixmap( "hand" ), 0, 0 ) );
+	setToolButtonStyle( Qt::ToolButtonTextBesideIcon );
+	setFixedSize( 160, 29 );
+	updateName();
+
+	connect( m_trackView->getTrack(), SIGNAL( dataChanged() ),
+					this, SLOT( updateName() ) );
 }
 
 
 
-nameLabel::~nameLabel()
+
+trackLabelButton::~trackLabelButton()
 {
 }
 
 
 
 
-void nameLabel::setPixmap( const QPixmap & _pixmap )
+void trackLabelButton::setPixmap( const QPixmap & _pixmap )
 {
 	m_pixmap = _pixmap;
+	setIcon( m_pixmap );
 }
 
 
 
 
-void nameLabel::setPixmapFile( const QString & _file )
+void trackLabelButton::setPixmapFile( const QString & _file )
 {
 	QPixmap new_pixmap;
 	if( QFileInfo( _file ).isRelative() )
@@ -83,7 +95,7 @@ void nameLabel::setPixmapFile( const QString & _file )
 	{
 		return;
 	}
-	m_pixmap = new_pixmap;
+	setPixmap( new_pixmap );
 	m_pixmapFile = _file;
 	emit( pixmapChanged() );
 	update();
@@ -92,7 +104,7 @@ void nameLabel::setPixmapFile( const QString & _file )
 
 
 
-void nameLabel::selectPixmap( void )
+void trackLabelButton::selectPixmap( void )
 {
 	QFileDialog ofd( NULL, tr( "Select icon" ) );
 
@@ -141,24 +153,31 @@ void nameLabel::selectPixmap( void )
 
 
 
-void nameLabel::rename( void )
+void trackLabelButton::rename( void )
 {
-	QString txt = text();
+	QString txt = m_trackView->getTrack()->name();
 	renameDialog rename_dlg( txt );
 	rename_dlg.exec();
 	if( txt != text() )
 	{
-		setText( txt );
-		emit nameChanged( txt );
+		m_trackView->getTrack()->setName( txt );
+		updateName();
 	}
 }
 
 
 
 
-void nameLabel::mousePressEvent( QMouseEvent * _me )
+void trackLabelButton::updateName( void )
 {
+	setText( m_trackView->getTrack()->name() );
+}
 
+
+
+
+void trackLabelButton::mousePressEvent( QMouseEvent * _me )
+{
 	if( _me->button() == Qt::RightButton )
 	{
 		QSize s( m_pixmap.width(), m_pixmap.height() );
@@ -174,14 +193,14 @@ void nameLabel::mousePressEvent( QMouseEvent * _me )
 	}
 	else
 	{
-		emit clicked();
+		QToolButton::mousePressEvent( _me );
 	}
 }
 
 
 
 
-void nameLabel::mouseDoubleClickEvent( QMouseEvent * _me )
+void trackLabelButton::mouseDoubleClickEvent( QMouseEvent * _me )
 {
 	QSize s( m_pixmap.width(), m_pixmap.height() );
 	s.scale( width(), height(), Qt::KeepAspectRatio );
@@ -198,42 +217,19 @@ void nameLabel::mouseDoubleClickEvent( QMouseEvent * _me )
 
 
 
-void nameLabel::paintEvent( QPaintEvent * )
+void trackLabelButton::dragEnterEvent( QDragEnterEvent * _dee )
 {
-	QPainter p( this );
-	p.fillRect( rect(),
-			parentWidget()->palette().color( backgroundRole() ) );
-
-	int x = 4;
-	if( m_pixmap.isNull() == FALSE )
-	{
-		QPixmap pm = m_pixmap;
-		if( pm.height() > height() )
-		{
-			pm = pm.scaledToHeight( height(),
-						Qt::SmoothTransformation );
-		}
-		p.drawPixmap( x, ( height() - pm.height() ) / 2, pm );
-		x += 4 + pm.width();
-	}
-
-	p.setPen( QColor( 160, 160, 160 ) );
-	bbTrack * bbt = bbTrack::findBBTrack(
-				engine::getBBTrackContainer()->currentBB() );
-	trackSettingsWidget * w = dynamic_cast<trackSettingsWidget *>( parentWidget() );
-	if( bbt != NULL && w != NULL )
-	{
-		bbTrackView * bbtv = dynamic_cast<bbTrackView *>( w->parentWidget() );
-		if( bbtv != NULL && bbtv->getBBTrack() == bbt )
-		{
-			p.setPen( QColor( 255, 255, 255 ) );
-		}
-	}
-	p.drawText( x, height() / 2 + p.fontMetrics().height() / 2 - 4,
-								text() );
-
+	m_trackView->dragEnterEvent( _dee );
 }
 
+
+
+
+void trackLabelButton::dropEvent( QDropEvent * _de )
+{
+	m_trackView->dropEvent( _de );
+	setChecked( TRUE );
+}
 
 
 

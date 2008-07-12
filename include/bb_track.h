@@ -32,7 +32,7 @@
 
 #include "track.h"
 
-class nameLabel;
+class trackLabelButton;
 class trackContainer;
 
 
@@ -165,11 +165,6 @@ public:
 	bbTrackView( bbTrack * _bbt, trackContainerView * _tcv );
 	virtual ~bbTrackView();
 
-	inline nameLabel * trackLabel( void )
-	{
-		return( m_trackLabel );
-	}
-
 	virtual bool close( void );
 
 	const bbTrack * getBBTrack( void ) const
@@ -184,7 +179,7 @@ public slots:
 
 private:
 	bbTrack * m_bbTrack;
-	nameLabel * m_trackLabel;
+	trackLabelButton * m_trackLabel;
 
 } ;
 

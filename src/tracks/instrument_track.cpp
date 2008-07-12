@@ -54,6 +54,7 @@
 #include "effect_rack_view.h"
 #include "embed.h"
 #include "engine.h"
+#include "fx_mixer.h"
 #include "fx_mixer_view.h"
 #include "instrument_sound_shaping.h"
 #include "instrument_sound_shaping_view.h"
@@ -66,7 +67,7 @@
 #include "main_window.h"
 #include "midi_client.h"
 #include "midi_port_menu.h"
-#include "fx_mixer.h"
+#include "name_label.h"
 #include "mmp.h"
 #include "note_play_handle.h"
 #include "pattern.h"
@@ -84,15 +85,6 @@ const char * volume_help = QT_TRANSLATE_NOOP( "instrumentTrack",
 						"With this knob you can set "
 						"the volume of the opened "
 						"channel.");
-const char * surroundarea_help = QT_TRANSLATE_NOOP( "instrumentTrack",
-						"Within this rectangle you can "
-						"set the position where the "
-						"channel should be audible. "
-						"You should have a soundcard "
-						"supporting at least surround "
-						"4.0 for enjoying this "
-						"feature." );
-
 
 const int INSTRUMENT_WIDTH	= 254;
 const int INSTRUMENT_HEIGHT	= INSTRUMENT_WIDTH;
@@ -772,34 +764,39 @@ instrumentTrackView::instrumentTrackView( instrumentTrack * _it,
 	setAcceptDrops( TRUE );
 	setFixedHeight( 32 );
 
+	m_tlb = new trackLabelButton( this, getTrackSettingsWidget() );
+	m_tlb->setCheckable( TRUE );
+	m_tlb->setPixmap( embed::getIconPixmap( "instrument_track" ) );
+	m_tlb->move( 3, 1 );
+	m_tlb->show();
+
+	connect( m_tlb, SIGNAL( toggled( bool ) ),
+			this, SLOT( toggleInstrumentWindow( bool ) ) );
+
+	connect( _it, SIGNAL( nameChanged() ),
+			m_tlb, SLOT( updateName() ) );
+
 	// creation of widgets for track-settings-widget
-	m_tswVolumeKnob = new knob( knobSmall_17, getTrackSettingsWidget(),
+	m_volumeKnob = new knob( knobSmall_17, getTrackSettingsWidget(),
 							tr( "Volume" ) );
-	m_tswVolumeKnob->setVolumeKnob( TRUE );
-	m_tswVolumeKnob->setModel( &_it->m_volumeModel );
-	m_tswVolumeKnob->setHintText( tr( "Volume:" ) + " ", "%" );
-	m_tswVolumeKnob->move( 4, 4 );
-	m_tswVolumeKnob->setLabel( tr( "VOL" ) );
-	m_tswVolumeKnob->show();
-	m_tswVolumeKnob->setWhatsThis( tr( volume_help ) );
+	m_volumeKnob->setVolumeKnob( TRUE );
+	m_volumeKnob->setModel( &_it->m_volumeModel );
+	m_volumeKnob->setHintText( tr( "Volume:" ) + " ", "%" );
+	m_volumeKnob->move( DEFAULT_SETTINGS_WIDGET_WIDTH-24*2, 4 );
+	m_volumeKnob->setLabel( tr( "VOL" ) );
+	m_volumeKnob->show();
+	m_volumeKnob->setWhatsThis( tr( volume_help ) );
 
-	m_tswPanningKnob = new knob( knobSmall_17, getTrackSettingsWidget(),
+	m_panningKnob = new knob( knobSmall_17, getTrackSettingsWidget(),
 							tr( "Panning" ) );
-	m_tswPanningKnob->setModel( &_it->m_panningModel );
-	m_tswPanningKnob->setHintText( tr( "Panning:" ) + " ", "%" );
-	m_tswPanningKnob->move( 24, 4 );
-	m_tswPanningKnob->setLabel( tr( "PAN" ) );
-	m_tswPanningKnob->show();
+	m_panningKnob->setModel( &_it->m_panningModel );
+	m_panningKnob->setHintText( tr( "Panning:" ) + " ", "%" );
+	m_panningKnob->move( DEFAULT_SETTINGS_WIDGET_WIDTH-24, 4 );
+	m_panningKnob->setLabel( tr( "PAN" ) );
+	m_panningKnob->show();
 
 
-	QPushButton * tsw_midi = new QPushButton(
-				embed::getIconPixmap( "piano" ), QString::null,
-						getTrackSettingsWidget() );
-	tsw_midi->setGeometry( 50, 2, 28, 28 );
-	tsw_midi->show();
-	toolTip::add( tsw_midi, tr( "MIDI input/output" ) );
-	m_tswMidiMenu = new QMenu( tsw_midi );
-	tsw_midi->setMenu( m_tswMidiMenu );
+	m_midiMenu = new QMenu( tr( "MIDI" ), this );
 
 	// sequenced MIDI?
 	if( !engine::getMixer()->getMIDIClient()->isRaw() )
@@ -812,15 +809,15 @@ instrumentTrackView::instrumentTrackView( instrumentTrack * _it,
 							&_it->m_midiPort );
 		_it->m_midiPort.m_writablePortsMenu->setModel(
 							&_it->m_midiPort );
-		m_midiInputAction = m_tswMidiMenu->addMenu(
+		m_midiInputAction = m_midiMenu->addMenu(
 					_it->m_midiPort.m_readablePortsMenu );
-		m_midiOutputAction = m_tswMidiMenu->addMenu(
+		m_midiOutputAction = m_midiMenu->addMenu(
 					_it->m_midiPort.m_writablePortsMenu );
 	}
 	else
 	{
-		m_midiInputAction = m_tswMidiMenu->addAction( "" );
-		m_midiOutputAction = m_tswMidiMenu->addAction( "" );
+		m_midiInputAction = m_midiMenu->addAction( "" );
+		m_midiOutputAction = m_midiMenu->addAction( "" );
 		m_midiInputAction->setCheckable( TRUE );
 		m_midiOutputAction->setCheckable( TRUE );
 		connect( m_midiInputAction, SIGNAL( changed() ), this,
@@ -831,34 +828,24 @@ instrumentTrackView::instrumentTrackView( instrumentTrack * _it,
 				this, SLOT( midiConfigChanged() ) );
 	}
 
-	m_midiInputAction->setText( tr( "MIDI input" ) );
-	m_midiOutputAction->setText( tr( "MIDI output" ) );
+	m_midiInputAction->setText( tr( "Input" ) );
+	m_midiOutputAction->setText( tr( "Output" ) );
 
-	m_tswActivityIndicator = new fadeButton( QColor( 56, 60, 72 ),
+	m_activityIndicator = new fadeButton( QColor( 56, 60, 72 ),
 						QColor( 64, 255, 16 ),
 						getTrackSettingsWidget() );
-	m_tswActivityIndicator->setGeometry( 212, 2, 8, 28 );
-	m_tswActivityIndicator->show();
-	connect( m_tswActivityIndicator, SIGNAL( pressed( void ) ),
+	m_activityIndicator->setGeometry(
+			DEFAULT_SETTINGS_WIDGET_WIDTH-2*24-11, 2, 8, 28 );
+	m_activityIndicator->show();
+	connect( m_activityIndicator, SIGNAL( pressed( void ) ),
 				this, SLOT( activityIndicatorPressed() ) );
-	connect( m_tswActivityIndicator, SIGNAL( released( void ) ),
+	connect( m_activityIndicator, SIGNAL( released( void ) ),
 				this, SLOT( activityIndicatorReleased() ) );
 	connect( _it, SIGNAL( newNote() ),
-				m_tswActivityIndicator, SLOT( activate() ) );
+				m_activityIndicator, SLOT( activate() ) );
 
-
-	m_tswInstrumentTrackButton = new instrumentTrackButton( this );
-	m_tswInstrumentTrackButton->setCheckable( TRUE );
-	m_tswInstrumentTrackButton->setGeometry( 82, 2, 126, 28 );
-	m_tswInstrumentTrackButton->show();
 
 	setModel( _it );
-
-	connect( m_tswInstrumentTrackButton, SIGNAL( toggled( bool ) ),
-			this, SLOT( toggledInstrumentTrackButton( bool ) ) );
-
-	connect( _it, SIGNAL( nameChanged() ),
-			m_tswInstrumentTrackButton, SLOT( update() ) );
 }
 
 
@@ -938,9 +925,27 @@ instrumentTrackWindow * instrumentTrackView::getInstrumentTrackWindow( void )
 
 
 
-void instrumentTrackView::toggledInstrumentTrackButton( bool _on )
+void instrumentTrackView::dragEnterEvent( QDragEnterEvent * _dee )
 {
-	getInstrumentTrackWindow()->toggledInstrumentTrackButton( _on );
+	getInstrumentTrackWindow()->dragEnterEvent( _dee );
+	trackView::dragEnterEvent( _dee );
+}
+
+
+
+
+void instrumentTrackView::dropEvent( QDropEvent * _de )
+{
+	getInstrumentTrackWindow()->dropEvent( _de );
+	trackView::dropEvent( _de );
+}
+
+
+
+
+void instrumentTrackView::toggleInstrumentWindow( bool _on )
+{
+	getInstrumentTrackWindow()->toggleVisibility( _on );
 	
 	if( !_on )
 	{
@@ -1069,7 +1074,6 @@ instrumentTrackWindow::instrumentTrackWindow( instrumentTrackView * _itv ) :
 					m_volumeKnob->width() + 16, 44 );
 	m_panningKnob->setHintText( tr( "Panning:" ) + " ", "" );
 	m_panningKnob->setLabel( tr( "PAN" ) );
-////	m_surroundArea->setWhatsThis( tr( surroundarea_help ) );
 
 
 	m_pitchKnob = new knob( knobBright_26, m_generalSettingsWidget,
@@ -1133,30 +1137,20 @@ instrumentTrackWindow::instrumentTrackWindow( instrumentTrackView * _itv ) :
 
 	setModel( _itv->model() );
 
-	// set window-icon
-	setWindowIcon( embed::getIconPixmap( "instrument_track" ) );
-
 	updateInstrumentView();
 
 	setFixedWidth( INSTRUMENT_WIDTH );
 	resize( sizeHint() );
 
-	if( engine::getMainWindow()->workspace() )
-	{
-		QMdiSubWindow * subWin = 
+	QMdiSubWindow * subWin = 
 			engine::getMainWindow()->workspace()->addSubWindow( this );
-		Qt::WindowFlags flags = subWin->windowFlags();
-		flags |= Qt::MSWindowsFixedSizeDialogHint;
-		flags &= ~Qt::WindowMaximizeButtonHint;
-		subWin->setWindowFlags( flags );
-		subWin->setFixedSize( subWin->size() );
-
-		parentWidget()->hide();
-	}
-	else
-	{
-		hide();
-	}
+	Qt::WindowFlags flags = subWin->windowFlags();
+	flags |= Qt::MSWindowsFixedSizeDialogHint;
+	flags &= ~Qt::WindowMaximizeButtonHint;
+	subWin->setWindowFlags( flags );
+	subWin->setWindowIcon( embed::getIconPixmap( "instrument_track" ) );
+	subWin->setFixedSize( subWin->size() );
+	subWin->hide();
 }
 
 
@@ -1267,8 +1261,6 @@ void instrumentTrackWindow::updateInstrumentView( void )
 		m_tabWidget->addTab( m_instrumentView, tr( "PLUGIN" ), 0 );
 		m_tabWidget->setActiveTab( 0 );
 	}
-
-//	m_tswInstrumentTrackButton->update();
 }
 
 
@@ -1283,33 +1275,18 @@ void instrumentTrackWindow::textChanged( const QString & _new_name )
 
 
 
-void instrumentTrackWindow::toggledInstrumentTrackButton( bool _on )
+void instrumentTrackWindow::toggleVisibility( bool _on )
 {
 
 	if( _on )
 	{
-		if( engine::getMainWindow()->workspace() )
-		{
-			show();
-			parentWidget()->show();
-			parentWidget()->raise();
-		}
-		else
-		{
-			show();
-			raise();
-		}
+		show();
+		parentWidget()->show();
+		parentWidget()->raise();
 	}
 	else
 	{
-		if( engine::getMainWindow()->workspace() )
-		{
-			parentWidget()->hide();
-		}
-		else
-		{
-			hide();
-		}
+		parentWidget()->hide();
 	}
 }
 
@@ -1327,7 +1304,7 @@ void instrumentTrackWindow::closeEvent( QCloseEvent * _ce )
 	{
 		hide();
 	}
-	m_itv->m_tswInstrumentTrackButton->setChecked( FALSE );
+	m_itv->m_tlb->setChecked( FALSE );
 }
 
 
@@ -1388,7 +1365,7 @@ void instrumentTrackWindow::loadSettings( const QDomElement & _this )
 	mainWindow::restoreWidgetState( this, _this );
 	if( isVisible() )
 	{
-		m_itv->m_tswInstrumentTrackButton->setChecked( TRUE );
+		m_itv->m_tlb->setChecked( TRUE );
 	}
 }
 
@@ -1397,28 +1374,7 @@ void instrumentTrackWindow::loadSettings( const QDomElement & _this )
 
 
 
-
-
-
-instrumentTrackButton::instrumentTrackButton( instrumentTrackView * _itv ) :
-	QPushButton( _itv->getTrackSettingsWidget() ),
-	m_instrumentTrackView( _itv )
-{
-	setAcceptDrops( TRUE );
-	setCursor( QCursor( embed::getIconPixmap( "hand" ), 0, 0 ) );
-}
-
-
-
-
-instrumentTrackButton::~instrumentTrackButton()
-{
-}
-
-
-
-
-void instrumentTrackButton::paintEvent( QPaintEvent * _pe )
+/*void instrumentTrackButton::paintEvent( QPaintEvent * _pe )
 {
 	QPushButton::paintEvent( _pe );
 	QPainter p( this );
@@ -1434,25 +1390,8 @@ void instrumentTrackButton::paintEvent( QPaintEvent * _pe )
 	p.drawText( ( width() - QFontMetrics( p.font() ).width( n ) ) /
 				2 + extra, height() / 2 - 2 +
 				QFontMetrics( p.font() ).height() + extra, n );
-}
+}*/
 
-
-
-
-void instrumentTrackButton::dragEnterEvent( QDragEnterEvent * _dee )
-{
-	m_instrumentTrackView->getInstrumentTrackWindow()->
-							dragEnterEvent( _dee );
-}
-
-
-
-
-void instrumentTrackButton::dropEvent( QDropEvent * _de )
-{
-	m_instrumentTrackView->getInstrumentTrackWindow()->dropEvent( _de );
-	setChecked( TRUE );
-}
 
 
 

@@ -46,7 +46,6 @@ class effectRackView;
 class instrumentSoundShapingView;
 class fadeButton;
 class instrument;
-class instrumentTrackButton;
 class instrumentTrackWindow;
 class instrumentMidiIOView;
 class lcdSpinBox;
@@ -55,6 +54,7 @@ class notePlayHandle;
 class pluginView;
 class presetPreviewPlayHandle;
 class tabWidget;
+class trackLabelButton;
 
 
 class EXPORT instrumentTrack : public track, public midiEventProcessor
@@ -225,13 +225,23 @@ public:
 	}
 
 
+	QMenu * midiMenu( void )
+	{
+		return( m_midiMenu );
+	}
+
 	void freeInstrumentTrackWindow( void );
 
 	static void cleanupWindowPool( void );
 
 
+protected:
+	virtual void dragEnterEvent( QDragEnterEvent * _dee );
+	virtual void dropEvent( QDropEvent * _de );
+
+
 private slots:
-	void toggledInstrumentTrackButton( bool _on );
+	void toggleInstrumentWindow( bool _on );
 	void activityIndicatorPressed( void );
 	void activityIndicatorReleased( void );
 
@@ -246,18 +256,17 @@ private:
 	static QQueue<instrumentTrackWindow *> s_windows;
 
 	// widgets in track-settings-widget
-	knob * m_tswVolumeKnob;
-	knob * m_tswPanningKnob;
-	fadeButton * m_tswActivityIndicator;
-	instrumentTrackButton * m_tswInstrumentTrackButton;
+	trackLabelButton * m_tlb;
+	knob * m_volumeKnob;
+	knob * m_panningKnob;
+	fadeButton * m_activityIndicator;
 
-	QMenu * m_tswMidiMenu;
+	QMenu * m_midiMenu;
 
 	QAction * m_midiInputAction;
 	QAction * m_midiOutputAction;
 
 
-	friend class instrumentTrackButton;
 	friend class instrumentTrackWindow;
 
 } ;
@@ -294,10 +303,13 @@ public:
 		m_itv = _tv;
 	}
 
+	virtual void dragEnterEvent( QDragEnterEvent * _dee );
+	virtual void dropEvent( QDropEvent * _de );
+
 
 public slots:
 	void textChanged( const QString & _new_name );
-	void toggledInstrumentTrackButton( bool _on );
+	void toggleVisibility( bool _on );
 	void updateName( void );
 	void updateInstrumentView( void );
 
@@ -305,8 +317,6 @@ public slots:
 protected:
 	// capture close-events for toggling instrument-track-button
 	virtual void closeEvent( QCloseEvent * _ce );
-	virtual void dragEnterEvent( QDragEnterEvent * _dee );
-	virtual void dropEvent( QDropEvent * _de );
 	virtual void focusInEvent( QFocusEvent * _fe );
 
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _this );
@@ -345,36 +355,10 @@ private:
 	// test-piano at the bottom of every instrument-settings-window
 	pianoView * m_pianoView;
 
-	friend class instrumentTrackButton;
 	friend class instrumentView;
 
 } ;
 
-
-
-
-class instrumentTrackButton : public QPushButton
-{
-public:
-	instrumentTrackButton( instrumentTrackView * _instrument_track_view );
-	virtual ~instrumentTrackButton();
-
-
-protected:
-	// since we want to draw a special label (instrument- and instrument-
-	// name) on our button, we have to re-implement this for doing so
-	virtual void paintEvent( QPaintEvent * _pe );
-
-	// allow drops on this button - we simply forward them to
-	// instrument-track
-	virtual void dragEnterEvent( QDragEnterEvent * _dee );
-	virtual void dropEvent( QDropEvent * _de );
-
-
-private:
-	instrumentTrackView * m_instrumentTrackView;
-
-} ;
 
 
 #endif

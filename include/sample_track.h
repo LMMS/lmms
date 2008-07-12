@@ -32,9 +32,9 @@
 #include "audio_port.h"
 #include "track.h"
 
-class effectLabel;
-class sampleBuffer;
+class effectRackView;
 class knob;
+class sampleBuffer;
 
 
 class sampleTCO : public trackContentObject
@@ -152,14 +152,19 @@ private:
 
 class sampleTrackView : public trackView
 {
+	Q_OBJECT
 public:
 	sampleTrackView( sampleTrack * _track, trackContainerView * _tcv );
 	virtual ~sampleTrackView();
 
 
-private:
-	effectLabel * m_trackLabel;
+public slots:
+	void showEffects( void );
 
+
+private:
+	effectRackView * m_effectRack;
+	QWidget * m_effWindow;
 	knob * m_volumeKnob;
 
 } ;
