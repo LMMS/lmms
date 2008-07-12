@@ -103,7 +103,6 @@ lmms_MOC =						\
 		./controller_view.moc			\
 		./cpuload_widget.moc			\
 		./effect_control_dialog.moc		\
-		./effect_label.moc			\
 		./effect_select_dialog.moc		\
 		./envelope_and_lfo_parameters.moc	\
 		./envelope_and_lfo_view.moc		\
@@ -299,7 +298,6 @@ lmms_SOURCES =									\
 		$(srcdir)/src/gui/widgets/controller_rack_view.cpp		\
 		$(srcdir)/src/gui/widgets/controller_view.cpp			\
 		$(srcdir)/src/gui/widgets/cpuload_widget.cpp			\
-		$(srcdir)/src/gui/widgets/effect_label.cpp			\
 		$(srcdir)/src/gui/widgets/effect_rack_view.cpp			\
 		$(srcdir)/src/gui/widgets/effect_view.cpp			\
 		$(srcdir)/src/gui/widgets/fade_button.cpp			\
@@ -479,7 +477,6 @@ lmms_SOURCES =									\
 		$(srcdir)/include/effect_chain.h				\
 		$(srcdir)/include/effect_controls.h				\
 		$(srcdir)/include/effect_control_dialog.h			\
-		$(srcdir)/include/effect_label.h				\
 		$(srcdir)/include/effect_rack_view.h				\
 		$(srcdir)/include/effect_select_dialog.h			\
 		$(srcdir)/include/effect_view.h					\

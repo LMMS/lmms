@@ -1,3 +1,35 @@
+2008-07-12	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* Makefile.am:
+	* include/effect_label.h:
+	* src/gui/widgets/effect_label.cpp:
+	removed obsolete files
+
+	* include/automation_track.h:
+	* include/bb_track.h:
+	* include/effect_rack_view.h:
+	* include/instrument_track.h:
+	* include/name_label.h:
+	* include/sample_track.h:
+	* include/track.h:
+	* src/core/track.cpp:
+	* src/gui/widgets/group_box.cpp:
+	* src/gui/widgets/name_label.cpp:
+	* src/tracks/automation_track.cpp:
+	* src/tracks/bb_track.cpp:
+	* src/tracks/instrument_track.cpp:
+	* src/tracks/sample_track.cpp:
+	* data/themes/default/style.css:
+	* data/themes/default/add_automation.png:
+	* data/themes/default/add_sample_track.png:
+	* data/themes/default/automation.png:
+	* data/themes/default/automation_track.png:
+	* data/themes/default/colorize.png:
+	* data/themes/default/instrument_track.png:
+	* data/themes/default/sample_track.png:
+	* data/themes/default/surround_area.png:
+	unified track-view appearence and behaviour
+
 2008-07-11	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* plugins/sf2_player/Makefile.am:
