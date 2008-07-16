@@ -232,20 +232,6 @@ void trackContentObject::redoStep( journalEntry & _je )
 
 
 
-/*! \brief Cut this trackContentObject from its track to the clipboard.
- *
- *  Perform the 'cut' action of the clipboard - copies the track content
- *  object to the clipboard and then removes it from the track.
- */
-void trackContentObject::cut( void )
-{
-	copy();
-	deleteLater();
-}
-
-
-
-
 /*! \brief Copy this trackContentObject to the clipboard.
  *
  *  Copies this track content object to the clipboard.
@@ -408,6 +394,20 @@ void trackContentObjectView::remove( void )
 	// delete ourself
 	close();
 	m_tco->deleteLater();
+}
+
+
+
+
+/*! \brief Cut this trackContentObjectView from its track to the clipboard.
+ *
+ *  Perform the 'cut' action of the clipboard - copies the track content
+ *  object to the clipboard and then removes it from the track.
+ */
+void trackContentObjectView::cut( void )
+{
+	m_tco->copy();
+	remove();
 }
 
 
@@ -807,7 +807,7 @@ void trackContentObjectView::contextMenuEvent( QContextMenuEvent * _cme )
 						this, SLOT( remove() ) );
 		contextMenu.addSeparator();
 		contextMenu.addAction( embed::getIconPixmap( "edit_cut" ),
-					tr( "Cut" ), m_tco, SLOT( cut() ) );
+					tr( "Cut" ), this, SLOT( cut() ) );
 	}
 	contextMenu.addAction( embed::getIconPixmap( "edit_copy" ),
 					tr( "Copy" ), m_tco, SLOT( copy() ) );

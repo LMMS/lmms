@@ -118,7 +118,6 @@ protected:
 
 
 protected slots:
-	void cut( void );
 	void copy( void );
 	void paste( void );
 	void toggleMute( void );
@@ -170,8 +169,8 @@ public:
 
 public slots:
 	virtual bool close( void );
+	void cut( void );
 	void remove( void );
-
 
 protected:
 	virtual void constructContextMenu( QMenu * )
