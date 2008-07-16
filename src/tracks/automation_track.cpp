@@ -61,8 +61,17 @@ bool automationTrack::play( const midiTime & _start, const fpp_t _frames,
 	}
 
 	tcoVector tcos;
-	getTCOsInRange( tcos, _start, _start + static_cast<int>(
-					_frames / engine::framesPerTick() ) );
+	if( _tco_num >= 0 )
+	{
+		trackContentObject * tco = getTCO( _tco_num );
+		tcos.push_back( tco );
+	}
+	else
+	{
+		getTCOsInRange( tcos, _start, _start + static_cast<int>(
+					_frames / engine::framesPerTick()) );
+	}
+
 	for( tcoVector::iterator it = tcos.begin(); it != tcos.end(); ++it )
 	{
 		automationPattern * p =
@@ -71,7 +80,12 @@ bool automationTrack::play( const midiTime & _start, const fpp_t _frames,
 		{
 			continue;
 		}
-		p->processMidiTime( _start - p->startPosition() );
+		midiTime cur_start = _start;
+		if( _tco_num < 0 )
+		{
+			cur_start -= p->startPosition();
+		}
+		p->processMidiTime( cur_start );
 	}
 	return( FALSE );
 }
