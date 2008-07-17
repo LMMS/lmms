@@ -439,6 +439,7 @@ void automationPattern::resolveAllIDs( void )
 		}
 	}
 	a->m_idsToResolve.clear();
+	a->dataChanged();
 				}
 			}
 		}
