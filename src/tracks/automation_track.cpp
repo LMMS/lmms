@@ -119,6 +119,11 @@ void automationTrack::saveTrackSpecificSettings( QDomDocument & _doc,
 
 void automationTrack::loadTrackSpecificSettings( const QDomElement & _this )
 {
+	// just in case something somehow wrent wrong...
+	if( type() == HiddenAutomationTrack )
+	{
+		setMuted( FALSE );
+	}
 }
 
 
