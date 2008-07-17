@@ -385,12 +385,6 @@ void automatableModel::linkModels( automatableModel * _model1,
 {
 	_model1->linkModel( _model2 );
 	_model2->linkModel( _model1 );
-
-/*	if( _model1->m_automationPattern != _model2->m_automationPattern )
-	{
-		delete _model2->m_automationPattern;
-		_model2->m_automationPattern = _model1->m_automationPattern;
-	}*/
 }
 
 
@@ -401,13 +395,6 @@ void automatableModel::unlinkModels( automatableModel * _model1,
 {
 	_model1->unlinkModel( _model2 );
 	_model2->unlinkModel( _model1 );
-/*
-	if( _model1->m_automationPattern && _model1->m_automationPattern
-					== _model2->m_automationPattern )
-	{
-		_model2->m_automationPattern = new automationPattern(
-				*_model1->m_automationPattern, _model2 );
-	}*/
 }
 
 
