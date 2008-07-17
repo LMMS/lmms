@@ -588,8 +588,8 @@ void mainWindow::restoreWidgetState( QWidget * _w, const QDomElement & _de )
 {
 	QRect r( tMax( 0, _de.attribute( "x" ).toInt() ),
 			tMax( 0, _de.attribute( "y" ).toInt() ),
-			_de.attribute( "width" ).toInt(),
-			_de.attribute( "height" ).toInt() );
+			tMax( 100, _de.attribute( "width" ).toInt() ),
+			tMax( 100, _de.attribute( "height" ).toInt() ) );
 	if( !r.isNull())
 	{
 		if ( _w->parentWidget() != NULL &&
