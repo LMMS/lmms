@@ -163,6 +163,21 @@ void bbTrackContainer::updateBBTrack( trackContentObject * _tco )
 
 
 
+void bbTrackContainer::fixIncorrectPositions( void )
+{
+	trackList tl = tracks();
+	for( trackList::iterator it = tl.begin(); it != tl.end(); ++it )
+	{
+		for( int i = 0; i < numOfBBs(); ++i )
+		{
+			( *it )->getTCO( i )->movePosition( midiTime( i, 0 ) );
+		}
+	}
+}
+
+
+
+
 void bbTrackContainer::play( void )
 {
 	if( engine::getSong()->isPlaying() )

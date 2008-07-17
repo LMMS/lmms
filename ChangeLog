@@ -1,5 +1,17 @@
 2008-07-16	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* src/gui/main_window.cpp:
+	added minimal width and height when restoring subwindow-states
+
+	* include/bb_track_container.h:
+	* src/core/bb_track_container.cpp:
+	* src/core/song.cpp:
+	added quirk for fixing projects with broken positions of TCOs inside
+	BB-tracks
+
+	* src/core/automation_pattern.cpp:
+	update views after resolving IDs for drawing bars with proper range
+
 	* src/tracks/automation_track.cpp:
 	fixed behaviour of automation-tracks in BB-editor (closes #2014486)
 

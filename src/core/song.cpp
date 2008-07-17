@@ -925,6 +925,10 @@ void song::loadProject( const QString & _file_name )
 		node = node.nextSibling();
 	}
 
+	// quirk for fixing projects with broken positions of TCOs inside
+	// BB-tracks
+	engine::getBBTrackContainer()->fixIncorrectPositions();
+
 	// Connect controller links to their controllers 
 	// now that everything is loaded
 	controllerConnection::finalizeConnections();

@@ -60,6 +60,7 @@ public:
 	void swapBB( int _bb1, int _bb2 );
 
 	void updateBBTrack( trackContentObject * _tco );
+	void fixIncorrectPositions( void );
 
 
 public slots:
