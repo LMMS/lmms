@@ -279,7 +279,7 @@ automationEditor::automationEditor( void ) :
 	m_zoomingXComboBox->setModel( &m_zoomingXModel );
 
 	connect( &m_zoomingXModel, SIGNAL( dataChanged() ),
-			this, SLOT( zoomingXChanged() ), Qt::QueuedConnection );
+			this, SLOT( zoomingXChanged() ) );
 
 
 	QLabel * zoom_y_lbl = new QLabel( m_toolBar );
@@ -298,7 +298,7 @@ automationEditor::automationEditor( void ) :
 	m_zoomingYComboBox->setModel( &m_zoomingYModel );
 
 	connect( &m_zoomingYModel, SIGNAL( dataChanged() ),
-			this, SLOT( zoomingYChanged() ), Qt::QueuedConnection );
+			this, SLOT( zoomingYChanged() ) );
 
 
 	// setup quantize-stuff

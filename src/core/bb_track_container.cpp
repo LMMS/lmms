@@ -37,13 +37,11 @@ bbTrackContainer::bbTrackContainer( void ) :
 	m_bbComboBoxModel( this )
 {
 	connect( &m_bbComboBoxModel, SIGNAL( dataChanged() ),
-			this, SLOT( currentBBChanged() ),
-			Qt::QueuedConnection );
+			this, SLOT( currentBBChanged() ) );
 	// we *always* want to receive updates even in case BB actually did
 	// not change upon setCurrentBB()-call
 	connect( &m_bbComboBoxModel, SIGNAL( dataUnchanged() ),
-			this, SLOT( currentBBChanged() ),
-			Qt::QueuedConnection );
+			this, SLOT( currentBBChanged() ) );
 }
 
 

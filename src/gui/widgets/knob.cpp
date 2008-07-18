@@ -633,11 +633,10 @@ void knob::doConnections( void )
 	if( model() != NULL )
 	{
 		QObject::connect( model(), SIGNAL( dataChanged() ),
-				this, SLOT( friendlyUpdate() ),
-				Qt::QueuedConnection );
+					this, SLOT( friendlyUpdate() ) );
 
 		QObject::connect( model(), SIGNAL( propertiesChanged() ),
-				this, SLOT( update() ), Qt::QueuedConnection );
+						this, SLOT( update() ) );
 	}
 }
 

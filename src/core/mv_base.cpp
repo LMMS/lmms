@@ -104,12 +104,10 @@ void modelView::doConnections( void )
 	if( m_model != NULL )
 	{
 		QObject::connect( m_model, SIGNAL( dataChanged() ),
-					widget(), SLOT( update() ),
-						Qt::QueuedConnection );
+					widget(), SLOT( update() ) );
 
 		QObject::connect( m_model, SIGNAL( propertiesChanged() ),
-					widget(), SLOT( update() ),
-						Qt::QueuedConnection );
+					widget(), SLOT( update() ) );
 	}
 }
 

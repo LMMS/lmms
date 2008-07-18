@@ -122,7 +122,7 @@ bbEditor::bbEditor( bbTrackContainer * _tc ) :
 
 	setModel( _tc );
 	connect( &_tc->m_bbComboBoxModel, SIGNAL( dataChanged() ),
-			this, SLOT( updatePosition() ), Qt::QueuedConnection );
+			this, SLOT( updatePosition() ) );
 }
 
 

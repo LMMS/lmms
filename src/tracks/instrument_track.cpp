@@ -1195,8 +1195,7 @@ void instrumentTrackWindow::modelChanged( void )
 	connect( m_track, SIGNAL( nameChanged() ),
 			this, SLOT( updateName() ) );
 	connect( m_track, SIGNAL( instrumentChanged() ),
-			this, SLOT( updateInstrumentView() ),
-			Qt::QueuedConnection );
+			this, SLOT( updateInstrumentView() ) );
 	
 	m_volumeKnob->setModel( &m_track->m_volumeModel );
 	m_panningKnob->setModel( &m_track->m_panningModel );
