@@ -5,7 +5,7 @@
  *                        for drag'n'drop of string-pairs and which is the base
  *                        for all drag'n'drop-actions within LMMS
  *
- * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -56,8 +56,10 @@ stringPairDrag::~stringPairDrag()
 {
 	// during a drag, we might have lost key-press-events, so reset
 	// modifiers of main-win
-	engine::getMainWindow()->clearKeyModifiers();
-	// TODO: do we have to delete anything???
+	if( engine::getMainWindow() )
+	{
+		engine::getMainWindow()->clearKeyModifiers();
+	}
 }
 
 
