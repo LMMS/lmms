@@ -1,5 +1,27 @@
 2008-07-18	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* include/automation_pattern.h:
+	* src/core/automation_pattern.cpp:
+	- removed obsolete variable
+	- fixed wrong behaviour of automationPattern::valueAt()
+	- in case there's only one initial value in time-map, set it for all
+	  objects when loading settings
+
+	* src/tracks/instrument_track.cpp:
+	save actual instrument-settings in separate sub-node for not mixing up
+	unknown nodes with instruments
+
+	* src/gui/widgets/group_box.cpp:
+	only toggle LED on left click
+
+	* include/detuning_helper.h:
+	* include/inline_automation.h:
+	fixed behaviour for inline-automations with only one value in time-map
+
+	* src/core/mmp.cpp:
+	- fixed and improved various tag-renaming-loops
+	- added upgrade path from LB302 to LB303
+
 	* plugins/bit_invader/bit_invader.cpp:
 	* plugins/sf2_player/sf2_player.cpp:
 	* plugins/spectrum_analyzer/spectrum_analyzer.cpp:
@@ -24,11 +46,16 @@
 	automationPattern::putValue()
 
 	* include/instrument_sound_shaping.h:
+	* src/core/effect_chain.cpp:
 	* src/core/instrument_functions.cpp:
 	* src/core/instrument_sound_shaping.cpp:
+	* src/core/meter_model.cpp:
+	* src/core/song.cpp:
+	* src/core/track.cpp:
 	* src/core/surround_area.cpp:
 	* src/gui/widgets/graph.cpp:
-	added values for displayName-property
+	* src/tracks/instrument_track.cpp:
+	added more values for displayName-property
 
 	* include/track_label_button.h:
 	* src/gui/widgets/track_label_button.cpp:

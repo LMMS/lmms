@@ -112,7 +112,7 @@ trackContentObject::trackContentObject( track * _track ) :
 	m_name( QString::null ),
 	m_startPosition(),
 	m_length(),
-	m_mutedModel( FALSE, this )
+	m_mutedModel( FALSE, this, tr( "Muted" ) )
 {
 	if( getTrack() )
 	{
@@ -1547,8 +1547,10 @@ track::track( TrackTypes _type, trackContainer * _tc ) :
 	m_type( _type ),                /*!< The track type */
 	m_name(),                       /*!< The track's name */
 	m_pixmapLoader( NULL ),         /*!< For loading the track's pixmaps */
-	m_mutedModel( FALSE, this ),    /*!< For controlling track muting */
-	m_soloModel( FALSE, this ),     /*!< For controlling track soloing */
+	m_mutedModel( FALSE, this, tr( "Muted" ) ),
+					 /*!< For controlling track muting */
+	m_soloModel( FALSE, this, tr( "Solo" ) ),
+					/*!< For controlling track soloing */
 	m_trackContentObjects()         /*!< The track content objects (segments) */
 {
 	m_trackContainer->addTrack( this );
