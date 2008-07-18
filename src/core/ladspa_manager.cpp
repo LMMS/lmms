@@ -41,8 +41,8 @@ ladspaManager::ladspaManager( void )
 								split( ':' );
 	ladspaDirectories += configManager::inst()->ladspaDir().split( ':' );
 
+	ladspaDirectories.push_back( configManager::inst()->pluginDir() + "ladspa" );
 #ifndef LMMS_BUILD_WIN32
-	ladspaDirectories.push_back( QString( LIBDIR ) + "/lmms/ladspa" );
 	ladspaDirectories.push_back( QString( LIBDIR ) + "/ladspa" );
 	ladspaDirectories.push_back( "/usr/lib/lmms/ladspa" );
 	ladspaDirectories.push_back( "/usr/local/lib/lmms/ladspa" );
@@ -61,15 +61,15 @@ ladspaManager::ladspaManager( void )
 			const QFileInfo & f = *file;
 			if( !f.isFile() ||
 #ifdef LMMS_BUILD_WIN32
-				 f.fileName().right(3) != "dll"
+				 f.fileName().right( 3 ).toLower() != "dll"
 #else
-				 f.fileName().right(2) != "so"
+				 f.fileName().right( 2 ).toLower() != "so"
 #endif
 								)
 			{
 				continue;
 			}
-			
+
 			QLibrary plugin_lib( f.absoluteFilePath() );
 			
 			if( plugin_lib.load() == TRUE )
