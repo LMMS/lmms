@@ -1,3 +1,45 @@
+2008-07-18	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* plugins/bit_invader/bit_invader.cpp:
+	* plugins/sf2_player/sf2_player.cpp:
+	* plugins/spectrum_analyzer/spectrum_analyzer.cpp:
+	fixed compiler warnings
+
+	* plugins/Makefile.am:
+	removed lb302 from list of plugins to build
+
+	* plugins/midi_import/midi_import.cpp:
+	improved tempo-automation import
+
+	* include/automatable_model.h:
+	* include/mv_base.h:
+	* src/core/automatable_model.cpp:
+	moved displayName-property from automatableModel to model base-class
+
+	* src/tracks/pattern.cpp:
+	fixed types
+
+	* src/core/automation_pattern.cpp:
+	improved behaviour in automationPattern::clear() and
+	automationPattern::putValue()
+
+	* include/instrument_sound_shaping.h:
+	* src/core/instrument_functions.cpp:
+	* src/core/instrument_sound_shaping.cpp:
+	* src/core/surround_area.cpp:
+	* src/gui/widgets/graph.cpp:
+	added values for displayName-property
+
+	* include/track_label_button.h:
+	* src/gui/widgets/track_label_button.cpp:
+	* src/tracks/automation_track.cpp:
+	* src/tracks/bb_track.cpp:
+	* src/tracks/instrument_track.cpp:
+	* src/tracks/sample_track.cpp:
+	* Makefile.am:
+	- moved name_label.* to track_label_button.*
+	- bigger icons for trackLabelButtons
+
 2008-07-17	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/tracks/automation_track.cpp:

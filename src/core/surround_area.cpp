@@ -186,7 +186,7 @@ void surroundArea::mouseReleaseEvent( QMouseEvent * )
 
 surroundAreaModel::surroundAreaModel( ::model * _parent,
 						bool _default_constructed ) :
-	model( _parent, _default_constructed ),
+	model( _parent, QString::null, _default_constructed ),
 	m_posX( 0, -SURROUND_AREA_SIZE, SURROUND_AREA_SIZE, _parent ),
 	m_posY( 0, -SURROUND_AREA_SIZE, SURROUND_AREA_SIZE, _parent )
 {

@@ -83,7 +83,7 @@ private:
 } ;
 
 
-extern const QString __targetNames[instrumentSoundShaping::NumTargets][2];
+extern const QString __targetNames[instrumentSoundShaping::NumTargets][3];
 
 
 #endif

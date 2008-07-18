@@ -344,7 +344,7 @@ void graph::updateGraph( void )
 
 graphModel::graphModel( float _min, float _max, int _length,
 			::model * _parent, bool _default_constructed ) :
-	model( _parent, _default_constructed ),
+	model( _parent, tr( "Graph" ), _default_constructed ),
 	m_samples( _length ),
 	m_minValue( _min ),
 	m_maxValue( _max )

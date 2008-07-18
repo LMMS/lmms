@@ -157,14 +157,14 @@ chordCreator::chord chordCreator::s_chordTable[] =
 
 
 chordCreator::chordCreator( model * _parent ) :
-	model( _parent ),
+	model( _parent, tr( "Chords" ) ),
 	m_chordsEnabledModel( FALSE, this ),
 	m_chordsModel( this, tr( "Chord type" ) ),
 	m_chordRangeModel( 1.0f, 1.0f, 9.0f, 1.0f, this, tr( "Chord range" ) )
 {
 	for( int i = 0; s_chordTable[i].interval[0] != -1; ++i )
 	{
-		m_chordsModel.addItem( tr( s_chordTable[i].name.toAscii().
+		m_chordsModel.addItem( tr( s_chordTable[i].name.toUtf8().
 								constData() ) );
 	}
 }
@@ -264,7 +264,7 @@ void chordCreator::loadSettings( const QDomElement & _this )
 
 
 arpeggiator::arpeggiator( model * _parent ) :
-	model( _parent ),
+	model( _parent, tr( "Arpeggio" ) ),
 	m_arpEnabledModel( FALSE ),
 	m_arpModel( this, tr( "Arpeggio type" ) ),
 	m_arpRangeModel( 1.0f, 1.0f, 9.0f, 1.0f, this, tr( "Arpeggio range" ) ),
@@ -279,7 +279,7 @@ arpeggiator::arpeggiator( model * _parent ) :
 	{
 		m_arpModel.addItem( chordCreator::tr(
 					chordCreator::s_chordTable[i].
-						name.toAscii().constData() ) );
+						name.toUtf8().constData() ) );
 	}
 
 	m_arpDirectionModel.addItem( tr( "Up" ),

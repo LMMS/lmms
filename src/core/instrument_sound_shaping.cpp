@@ -45,25 +45,28 @@ const float RES_PRECISION = 1000.0f;
 
 // names for env- and lfo-targets - first is name being displayed to user
 // and second one is used internally, e.g. for saving/restoring settings
-const QString __targetNames[instrumentSoundShaping::NumTargets][2] =
+const QString __targetNames[instrumentSoundShaping::NumTargets][3] =
 {
-	{ instrumentSoundShaping::tr( "VOLUME" ), "vol" },
+	{ instrumentSoundShaping::tr( "VOLUME" ), "vol",
+			instrumentSoundShaping::tr( "Volume" ) },
 /*	instrumentSoundShaping::tr( "Pan" ),
 	instrumentSoundShaping::tr( "Pitch" ),*/
-	{ instrumentSoundShaping::tr( "CUTOFF" ), "cut" },
-	{ instrumentSoundShaping::tr( "Q/RESO" ), "res" }
+	{ instrumentSoundShaping::tr( "CUTOFF" ), "cut",
+			instrumentSoundShaping::tr( "Cutoff frequency" ) },
+	{ instrumentSoundShaping::tr( "Q/RESO" ), "res",
+			instrumentSoundShaping::tr( "Q/Resonance" ) }
 } ;
  
 
 
 instrumentSoundShaping::instrumentSoundShaping(
 					instrumentTrack * _instrument_track ) :
-	model( _instrument_track ),
+	model( _instrument_track, tr( "Envelopes & LFOs" ) ),
 	m_instrumentTrack( _instrument_track ),
 	m_filterEnabledModel( FALSE, this ),
 	m_filterModel( this, tr( "Filter type" ) ),
 	m_filterCutModel( 14000.0, 1.0, 14000.0, 1.0, this,
-					tr( "cutoff-frequency" ) ),
+					tr( "Cutoff frequency" ) ),
 	m_filterResModel( 0.5, basicFilters<>::minQ(), 10.0, 0.01, this,
 					tr( "Q/Resonance" ) )
 {
@@ -77,6 +80,8 @@ instrumentSoundShaping::instrumentSoundShaping(
 		m_envLFOParameters[i] = new envelopeAndLFOParameters(
 							value_for_zero_amount, 
 							this );
+		m_envLFOParameters[i]->setDisplayName(
+			tr( __targetNames[i][2].toUtf8().constData() ) );
 	}
 
 	m_filterModel.addItem( tr( "LowPass" ),
