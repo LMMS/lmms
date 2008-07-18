@@ -127,6 +127,15 @@ void midiPort::processInEvent( const midiEvent & _me, const midiTime & _time )
 	if( ( mode() == Input || mode() == Duplex ) &&
 		( inputChannel()-1 == _me.m_channel || inputChannel() == 0 ) )
 	{
+		if( _me.m_type == MidiNoteOn ||
+			_me.m_type == MidiNoteOff ||
+			_me.m_type == MidiKeyPressure )
+		{
+			if( _me.key() < 0 || _me.key() >= NumKeys )
+			{
+				return;
+			}
+		}
 		midiEvent ev = _me;
 		if( m_defaultVelocityInEnabledModel.value() == TRUE &&
 							_me.velocity() > 0 )
