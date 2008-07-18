@@ -105,7 +105,8 @@ sf2Instrument::sf2Instrument( instrumentTrack * _instrument_track ) :
 
 	m_settings = new_fluid_settings();
 
-	fluid_settings_setint( m_settings, "audio.period-size", engine::getMixer()->framesPerPeriod() );
+	fluid_settings_setint( m_settings, (char *) "audio.period-size",
+					engine::getMixer()->framesPerPeriod() );
 
 	// This is just our starting instance of synth.  It is recreated
 	// everytime we load a new soundfont.
@@ -409,9 +410,10 @@ void sf2Instrument::updateSampleRate( void )
 	double tempRate;
 	
 	// Set & get, returns the true sample rate
-	fluid_settings_setnum( m_settings, "synth.sample-rate",
+	fluid_settings_setnum( m_settings, (char *) "synth.sample-rate",
 				engine::getMixer()->processingSampleRate() );
-	fluid_settings_getnum( m_settings, "synth.sample-rate", &tempRate );
+	fluid_settings_getnum( m_settings, (char *) "synth.sample-rate",
+								&tempRate );
 	m_internalSampleRate = static_cast<int>( tempRate );
 
 	if( m_font )

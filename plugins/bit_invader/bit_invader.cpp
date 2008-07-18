@@ -246,7 +246,7 @@ void bitInvader::normalize( void )
 	// analyze
 	float max = 0;
 	const float* samples = m_graph.samples();
-	for (unsigned int i=0; i < m_graph.length(); i++)
+	for(int i=0; i < m_graph.length(); i++)
 	{
 		if (fabsf(samples[i]) > max) { max = fabs(samples[i]); }
 	}

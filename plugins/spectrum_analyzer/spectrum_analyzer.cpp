@@ -282,16 +282,14 @@ static const int onethirdoctavecenterfr[] = {20, 25, 31, 40, 50, 63, 80, 100, 12
       returns power on success, else -1          */
 float signalpower(float *timesignal, int num_values)
 {
-	float power=0;
-	unsigned int i;
-	
 	if ( num_values<=0 )
 		return -1;
 
 	if( timesignal==NULL )
 		return -1;
 		
-	for ( i=0; i<num_values; i++ )	
+	float power=0;
+	for ( int i=0; i<num_values; i++ )	
 	{
 		power+=timesignal[i]*timesignal[i];
 	}
