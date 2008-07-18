@@ -38,8 +38,8 @@
 ladspaManager::ladspaManager( void )
 {
 	QStringList ladspaDirectories = QString( getenv( "LADSPA_PATH" ) ).
-								split( ':' );
-	ladspaDirectories += configManager::inst()->ladspaDir().split( ':' );
+								split( ',' );
+	ladspaDirectories += configManager::inst()->ladspaDir().split( ',' );
 
 	ladspaDirectories.push_back( configManager::inst()->pluginDir() + "ladspa" );
 #ifndef LMMS_BUILD_WIN32
@@ -71,7 +71,7 @@ ladspaManager::ladspaManager( void )
 			}
 
 			QLibrary plugin_lib( f.absoluteFilePath() );
-			
+
 			if( plugin_lib.load() == TRUE )
 			{
 				LADSPA_Descriptor_Function descriptorFunction =

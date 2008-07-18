@@ -1,5 +1,64 @@
 2008-07-18	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* plugins/ladspa_effect/tap/tap_deesser.c:
+	* plugins/ladspa_effect/tap/tap_sigmoid.c:
+	* plugins/ladspa_effect/tap/tap_doubler.c:
+	* plugins/ladspa_effect/tap/tap_eqbw.c:
+	* plugins/ladspa_effect/tap/tap_pinknoise.c:
+	* plugins/ladspa_effect/tap/tap_chorusflanger.c:
+	* plugins/ladspa_effect/tap/tap_eq.c:
+	* plugins/ladspa_effect/tap/tap_limiter.c:
+	* plugins/ladspa_effect/tap/tap_vibrato.c:
+	* plugins/ladspa_effect/tap/tap_pitch.c:
+	* plugins/ladspa_effect/tap/tap_autopan.c:
+	* plugins/ladspa_effect/tap/tap_dynamics_st.c:
+	* plugins/ladspa_effect/tap/tap_echo.c:
+	* plugins/ladspa_effect/tap/tap_tremolo.c:
+	* plugins/ladspa_effect/tap/tap_tubewarmth.c:
+	* plugins/ladspa_effect/tap/tap_dynamics_m.c:
+	* plugins/ladspa_effect/tap/tap_reflector.c:
+	* plugins/ladspa_effect/tap/tap_reverb.c:
+	* plugins/ladspa_effect/tap/tap_rotspeak.c:
+	* plugins/ladspa_effect/tap/Makefile.am:
+	added constructor/destructor-attribute to _init() and _finit()-methods
+	in order to make those LADSPA-plugins work properly in win32-version
+
+	* src/core/config_mgr.cpp:
+	* src/core/ladspa_manager.cpp:
+	* src/gui/setup_dialog.cpp:
+	separate LADSPA-paths with ',' instead of ':' as win32-paths usually
+	contain ':'-characters...
+
+	* src/core/ladspa_2_lmms.cpp:
+	also allow LADSPA-plugins which are not realtime capable - not all of
+	them work properly but most do and it's better to provide more of them
+
+	* src/gui/widgets/effect_view.cpp:
+	handled rename of up/down arrow graphics
+
+	* include/ladspa_2_lmms.h:
+	cleanups
+
+	* src/core/ladspa_manager.cpp:
+	fixed paths to LADSPA-plugins for win32
+
+	* src/gui/string_pair_drag.cpp:
+	at destruction check whether mainWindow is still alive
+
+	* src/core/midi/midi_port.cpp:
+	range-checking for keys of input-events
+
+	* src/core/song.cpp:
+	lock mixer while adding BB-track (finally closes #2014486)
+
+	* src/core/bb_track_container.cpp:
+	* src/core/mv_base.cpp:
+	* src/gui/automation_editor.cpp:
+	* src/gui/bb_editor.cpp:
+	* src/gui/widgets/knob.cpp:
+	* src/tracks/instrument_track.cpp:
+	do not create queued signal-slot-connections
+
 	* src/core/audio/audio_sdl.cpp:
 	changed number of frames per callback which seems to fix distorted sound
 

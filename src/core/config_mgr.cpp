@@ -277,7 +277,7 @@ bool configManager::loadConfigFile( void )
 #ifdef LMMS_BUILD_WIN32
 		m_ladDir = m_pluginDir + "ladspa" + QDir::separator();
 #else
-		m_ladDir = QString(LIBDIR) + "/ladspa/:/usr/lib/ladspa/:/usr/local/lib/ladspa/";
+		m_ladDir = QString(LIBDIR) + "/ladspa/";
 #endif
 	}
 

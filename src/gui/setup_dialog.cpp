@@ -902,7 +902,7 @@ void setupDialog::openLADSPADir( void )
 		}
 		else
 		{
-			m_ladLineEdit->setText( m_ladLineEdit->text() + ":" +
+			m_ladLineEdit->setText( m_ladLineEdit->text() + "," +
 								new_dir );
 		}
 	}
