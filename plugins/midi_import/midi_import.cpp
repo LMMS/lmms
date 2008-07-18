@@ -180,12 +180,8 @@ invalid_format:
 
 	// try to set default tempo
 	automationPattern * tap = _tc->tempoAutomationPattern();
-	if( tap != NULL )
-	{
-#warning BLAH
-//		tap->firstObject()->setValue( 120 );
-		tap->putValue( 0, 120 );
-	}
+	tap->clear();
+	tap->putValue( 0, 120 );
 
         // read tracks
 	for( int i = 0; i < num_tracks; ++i )
