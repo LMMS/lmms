@@ -221,10 +221,10 @@ void effectView::contextMenuEvent( QContextMenuEvent * )
 {
 	QPointer<captionMenu> contextMenu = new captionMenu(
 						getEffect()->displayName() );
-	contextMenu->addAction( embed::getIconPixmap( "arp_up_on" ),
+	contextMenu->addAction( embed::getIconPixmap( "arp_up" ),
 						tr( "Move &up" ),
 						this, SLOT( moveUp() ) );
-	contextMenu->addAction( embed::getIconPixmap( "arp_down_on" ),
+	contextMenu->addAction( embed::getIconPixmap( "arp_down" ),
 						tr( "Move &down" ),
 						this, SLOT( moveDown() ) );
 	contextMenu->addSeparator();
