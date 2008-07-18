@@ -106,7 +106,7 @@ instrumentTrack::instrumentTrack( trackContainer * _tc ) :
         m_panningModel( DefaultPanning, PanningLeft, PanningRight, 1.0f,
 							this, tr( "Panning" ) ),
 	m_pitchModel( 0, -100, 100, 1, this, tr( "Pitch" ) ),
-        m_effectChannelModel( 0, 0, NumFxChannels, this ),
+	m_effectChannelModel( 0, 0, NumFxChannels, this, tr( "FX channel" ) ),
 	m_instrument( NULL ),
 	m_soundShaping( this ),
 	m_arpeggiator( this ),
@@ -597,7 +597,10 @@ void instrumentTrack::saveTrackSpecificSettings( QDomDocument & _doc,
 
 	if( m_instrument != NULL )
 	{
-		m_instrument->saveState( _doc, _this );
+		QDomElement i = _doc.createElement( "instrument" );
+		i.setAttribute( "name", m_instrument->getDescriptor()->name );
+		m_instrument->saveState( _doc, i );
+		_this.appendChild( i );
 	}
 	m_soundShaping.saveState( _doc, _this );
 	m_chordCreator.saveState( _doc, _this );
@@ -681,13 +684,24 @@ void instrumentTrack::loadTrackSpecificSettings( const QDomElement & _this )
 				m_audioPort.getEffects()->restoreState(
 							node.toElement() );
 			}
+			else if( node.nodeName() == "instrument" )
+			{
+				delete m_instrument;
+				m_instrument = NULL;
+				m_instrument = instrument::instantiate(
+					node.toElement().attribute( "name" ),
+									this );
+				m_instrument->restoreState(
+						node.firstChildElement() );
+				emit instrumentChanged();
+			}
+			// compat code - if node-name doesn't match any known
+			// one, we assume that it is an instrument-plugin
+			// which we'll try to load
 			else if( automationPattern::classNodeName() !=
 							node.nodeName() &&
 					!node.toElement().hasAttribute( "id" ) )
 			{
-				// if node-name doesn't match any known one,
-				// we assume that it is an instrument-plugin
-				// which we'll try to load
 				delete m_instrument;
 				m_instrument = NULL;
 				m_instrument = instrument::instantiate(
