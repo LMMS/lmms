@@ -641,9 +641,11 @@ void song::removeBar( void )
 
 void song::addBBTrack( void )
 {
+	engine::getMixer()->lock();
 	track * t = track::create( track::BBTrack, this );
 	engine::getBBTrackContainer()->setCurrentBB(
 						bbTrack::numOfBBTrack( t ) );
+	engine::getMixer()->unlock();
 }
 
 
