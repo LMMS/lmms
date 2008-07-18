@@ -1,5 +1,8 @@
 2008-07-18	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* src/core/audio/audio_sdl.cpp:
+	changed number of frames per callback which seems to fix distorted sound
+
 	* plugins/lb303/lb303.h:
 	removed declaration of unimplemented slot - fixes win32-build
 
