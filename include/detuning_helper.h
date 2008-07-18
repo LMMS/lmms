@@ -42,6 +42,11 @@ public:
 	{
 	}
 
+	virtual float defaultValue( void ) const
+	{
+		return( 0 );
+	}
+
 	virtual QString displayName( void ) const
 	{
 		return( tr( "Note detuning" ) );

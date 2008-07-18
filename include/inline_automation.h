@@ -48,10 +48,12 @@ public:
 		}
 	}
 
+	virtual float defaultValue( void ) const = 0;
+
 	inline bool hasAutomation( void ) const
 	{
 		return( m_autoPattern != NULL &&
-					m_autoPattern->hasAutomation() );
+			m_autoPattern->getTimeMap()[0] != defaultValue() );
 	}
 
 	automationPattern * getAutomationPattern( void )
