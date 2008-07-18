@@ -15,24 +15,24 @@ SHARED_EXT=so
 LINKFLAGS=-nostartfiles
 endif
 
-PLUGINS	=	tap_autopan.$(SHARED_EXT) \
-		tap_chorusflanger.$(SHARED_EXT) \
-		tap_deesser.$(SHARED_EXT) \
-		tap_dynamics_m.$(SHARED_EXT) \
-		tap_dynamics_st.$(SHARED_EXT) \
-		tap_eq.$(SHARED_EXT) \
-		tap_eqbw.$(SHARED_EXT) \
-		tap_doubler.$(SHARED_EXT) \
-		tap_pinknoise.$(SHARED_EXT) \
-		tap_pitch.$(SHARED_EXT) \
-		tap_reflector.$(SHARED_EXT) \
-		tap_reverb.$(SHARED_EXT) \
-		tap_rotspeak.$(SHARED_EXT) \
-		tap_limiter.$(SHARED_EXT) \
-		tap_sigmoid.$(SHARED_EXT) \
-		tap_echo.$(SHARED_EXT) \
-		tap_tremolo.$(SHARED_EXT) \
-		tap_tubewarmth.$(SHARED_EXT) \
+PLUGINS	=	tap_autopan.$(SHARED_EXT)		\
+		tap_chorusflanger.$(SHARED_EXT)		\
+		tap_deesser.$(SHARED_EXT)		\
+		tap_dynamics_m.$(SHARED_EXT)		\
+		tap_dynamics_st.$(SHARED_EXT)		\
+		tap_eq.$(SHARED_EXT)			\
+		tap_eqbw.$(SHARED_EXT)			\
+		tap_doubler.$(SHARED_EXT)		\
+		tap_pinknoise.$(SHARED_EXT)		\
+		tap_pitch.$(SHARED_EXT)			\
+		tap_reflector.$(SHARED_EXT)		\
+		tap_reverb.$(SHARED_EXT)		\
+		tap_rotspeak.$(SHARED_EXT)		\
+		tap_limiter.$(SHARED_EXT)		\
+		tap_sigmoid.$(SHARED_EXT)		\
+		tap_echo.$(SHARED_EXT)			\
+		tap_tremolo.$(SHARED_EXT)		\
+		tap_tubewarmth.$(SHARED_EXT)		\
 		tap_vibrato.$(SHARED_EXT)
 
 

@@ -468,7 +468,7 @@ run_adding_eq(LADSPA_Handle instance, unsigned long sample_count) {
 
 
 void
-_init() {
+__attribute__((constructor)) _init() {
 
 	char **port_names;
 	LADSPA_PortDescriptor *port_descriptors;
@@ -739,7 +739,7 @@ _init() {
 
 
 void 
-_fini() {
+__attribute__((destructor)) _fini() {
 
 	if (eqDescriptor) {
 		free((LADSPA_PortDescriptor *)eqDescriptor->PortDescriptors);
