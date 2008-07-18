@@ -68,7 +68,6 @@ public:
 	virtual void processInEvent( const midiEvent & _me,
 					const midiTime & _time )
 	{
-		printf("ho hum\n");
 		if( _me.m_type == MidiControlChange &&
 			( m_midiPort.inputChannel() == _me.m_channel + 1 ||
 				m_midiPort.inputChannel() == 0 ) )
@@ -131,14 +130,9 @@ controllerConnectionDialog::controllerConnectionDialog( QWidget * _parent,
 	setWindowTitle( tr( "Connection Settings" ) );
 	setModal( TRUE );
 
-	QVBoxLayout * vlayout = new QVBoxLayout( this );
-	vlayout->setSpacing( 10 );
-	vlayout->setMargin( 10 );
-
-
 	// Midi stuff
 	m_midiGroupBox = new groupBox( tr( "MIDI CONTROLLER" ), this );
-	m_midiGroupBox->setGeometry( 8, 2, 240, 64 );
+	m_midiGroupBox->setGeometry( 8, 10, 240, 80 );
 	connect( m_midiGroupBox->model(), SIGNAL( dataChanged() ),
 			this, SLOT( midiToggled() ) );
 	
@@ -159,7 +153,7 @@ controllerConnectionDialog::controllerConnectionDialog( QWidget * _parent,
 			new ledCheckBox( tr("Auto Detect"),
 				m_midiGroupBox, tr("Auto Detect") );
 	m_midiAutoDetectCheckBox->setModel( &m_midiAutoDetect );
-	m_midiAutoDetectCheckBox->move( 132, 30 );
+	m_midiAutoDetectCheckBox->move( 8, 60 );
 	connect( &m_midiAutoDetect, SIGNAL( dataChanged() ),
 			this, SLOT( autoDetectToggled() ) );
 
@@ -173,7 +167,7 @@ controllerConnectionDialog::controllerConnectionDialog( QWidget * _parent,
 		rp_btn->setText( tr( "MIDI-devices to receive "
 						"MIDI-events from" ) );
 		rp_btn->setIcon( embed::getIconPixmap( "midi_in" ) );
-		rp_btn->setGeometry( 206, 30, 32, 32 );
+		rp_btn->setGeometry( 140, 24, 32, 32 );
 		rp_btn->setMenu( m_readablePorts );
 		rp_btn->setPopupMode( QToolButton::InstantPopup );
 	}
@@ -181,7 +175,7 @@ controllerConnectionDialog::controllerConnectionDialog( QWidget * _parent,
 
 	// User stuff
 	m_userGroupBox = new groupBox( tr( "USER CONTROLLER" ), this );
-	m_userGroupBox->setGeometry( 8, 70, 240, 64 );
+	m_userGroupBox->setGeometry( 8, 100, 240, 60 );
 	connect( m_userGroupBox->model(), SIGNAL( dataChanged() ),
 			this, SLOT( userToggled() ) );
 
@@ -197,7 +191,7 @@ controllerConnectionDialog::controllerConnectionDialog( QWidget * _parent,
 
 	// Mapping functions
 	m_mappingBox = new tabWidget( tr( "MAPPING FUNCTION" ), this );
-	m_mappingBox->setGeometry( 8, 138, 240, 64 );
+	m_mappingBox->setGeometry( 8, 170, 240, 64 );
 	m_mappingFunction = new QLineEdit( m_mappingBox );
 	m_mappingFunction->setGeometry( 10, 20, 170, 16 );
 	m_mappingFunction->setText( "input" );
@@ -206,7 +200,7 @@ controllerConnectionDialog::controllerConnectionDialog( QWidget * _parent,
 
 	// Buttons
 	QWidget * buttons = new QWidget( this );
-	buttons->setGeometry( 8, 210, 240, 32 );
+	buttons->setGeometry( 8, 240, 240, 32 );
 
 	QHBoxLayout * btn_layout = new QHBoxLayout( buttons );
 	btn_layout->setSpacing( 0 );
@@ -224,8 +218,6 @@ controllerConnectionDialog::controllerConnectionDialog( QWidget * _parent,
 	connect( cancel_btn, SIGNAL( clicked() ),
 				this, SLOT( reject() ) );
 
-	resize( 256, 246 );
-
 	btn_layout->addStretch();
 	btn_layout->addSpacing( 10 );
 	btn_layout->addWidget( select_btn );
@@ -233,6 +225,7 @@ controllerConnectionDialog::controllerConnectionDialog( QWidget * _parent,
 	btn_layout->addWidget( cancel_btn );
 	btn_layout->addSpacing( 10 );
 
+	setFixedSize( 256, 280 );
 
 	// Crazy MIDI View stuff
 	
