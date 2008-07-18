@@ -55,8 +55,7 @@ automationPattern::automationPattern( automationTrack * _auto_track ) :
 	trackContentObject( _auto_track ),
 	m_autoTrack( _auto_track ),
 	m_objects(),
-	m_updateFirst( TRUE ),
-	m_dynamic( FALSE )
+	m_hasAutomation( FALSE )
 {
 	changeLength( midiTime( 1, 0 ) );
 	m_timeMap[0] = 0;
@@ -69,8 +68,7 @@ automationPattern::automationPattern( const automationPattern & _pat_to_copy ) :
 	trackContentObject( _pat_to_copy.m_autoTrack ),
 	m_autoTrack( _pat_to_copy.m_autoTrack ),
 	m_objects( _pat_to_copy.m_objects ),
-	m_updateFirst( _pat_to_copy.m_updateFirst ),
-	m_dynamic( _pat_to_copy.m_dynamic )
+	m_hasAutomation( _pat_to_copy.m_hasAutomation )
 {
 	for( timeMap::const_iterator it = _pat_to_copy.m_timeMap.begin();
 				it != _pat_to_copy.m_timeMap.end(); ++it )
@@ -94,7 +92,7 @@ automationPattern::~automationPattern()
 
 
 
-const automatableModel * automationPattern::firstObject( void )
+const automatableModel * automationPattern::firstObject( void ) const
 {
 	if( !m_objects.isEmpty() )
 	{
@@ -141,13 +139,13 @@ midiTime automationPattern::putValue( const midiTime & _time,
 
 	m_timeMap[new_time] = _value;
 
-	if( !m_dynamic && new_time != 0 )
+	if( new_time != 0 )
 	{
-		m_dynamic = TRUE;
+		m_hasAutomation = TRUE;
 	}
 	else
 	{
-		m_dynamic = FALSE;
+		m_hasAutomation = FALSE;
 		for( objectVector::iterator it = m_objects.begin();
 						it != m_objects.end(); ++it )
 		{
@@ -177,9 +175,9 @@ void automationPattern::removeValue( const midiTime & _time )
 	{
 		m_timeMap.remove( _time );
 
-		if( m_timeMap.size() == 1 )
+		if( m_timeMap.size() <= 1 )
 		{
-			m_dynamic = FALSE;
+			m_hasAutomation = FALSE;
 			for( objectVector::iterator it = m_objects.begin();
 						it != m_objects.end(); ++it )
 			{
@@ -233,14 +231,16 @@ void automationPattern::openInAutomationEditor( void )
 
 
 
-float automationPattern::valueAt( const midiTime & _time )
+float automationPattern::valueAt( const midiTime & _time ) const
 {
 	if( m_timeMap.isEmpty() )
 	{
 		return( 0 );
 	}
 	timeMap::const_iterator v = m_timeMap.lowerBound( _time );
-	return( ( v != m_timeMap.end() ) ? v.value() : (v-1).value() );
+	// lowerBound returns next value with greater key, therefore we take
+	// the previous element to get the current value
+	return( ( v != m_timeMap.begin() ) ? (v-1).value() : v.value() );
 }
 
 
@@ -298,7 +298,18 @@ void automationPattern::loadSettings( const QDomElement & _this )
 		}
 	}
 
-	m_dynamic = m_timeMap.size() > 1;
+	m_hasAutomation = m_timeMap.size() > 1;
+	if( m_hasAutomation == FALSE )
+	{
+		for( objectVector::iterator it = m_objects.begin();
+						it != m_objects.end(); ++it )
+		{
+			if( *it )
+			{
+				( *it )->setValue( m_timeMap[0] );
+			}
+		}
+	}
 
 	changeLength( length() );
 }
@@ -324,7 +335,7 @@ const QString automationPattern::name( void ) const
 
 void automationPattern::processMidiTime( const midiTime & _time )
 {
-	if( _time >= 0 && m_dynamic )
+	if( _time >= 0 && m_hasAutomation )
 	{
 		const float val = valueAt( _time );
 		for( objectVector::iterator it = m_objects.begin();
@@ -370,7 +381,7 @@ bool automationPattern::isAutomated( const automatableModel * _m )
 				const automationPattern * a =
 					dynamic_cast<const
 						automationPattern *>( *j );
-				if( a && a->m_dynamic )
+				if( a && a->m_hasAutomation )
 				{
 	for( objectVector::const_iterator k = a->m_objects.begin();
 					k != a->m_objects.end(); ++k )

@@ -54,12 +54,12 @@ public:
 		m_objects += _obj;
 	}
 
-	const automatableModel * firstObject( void );
+	const automatableModel * firstObject( void ) const;
 
 	virtual midiTime length( void ) const;
 
 	midiTime putValue( const midiTime & _time, const float _value,
-					const bool _quant_pos = TRUE );
+						const bool _quant_pos = TRUE );
 
 	void removeValue( const midiTime & _time );
 
@@ -75,10 +75,10 @@ public:
 
 	inline bool hasAutomation( void ) const
 	{
-		return( m_dynamic || getTimeMap()[0] != 0 );
+		return( m_hasAutomation );
 	}
 
-	float valueAt( const midiTime & _time );
+	float valueAt( const midiTime & _time ) const;
 
 	const QString name( void ) const;
 
@@ -97,16 +97,6 @@ public:
 	}
 
 	void processMidiTime( const midiTime & _time );
-
-	inline bool updateFirst( void ) const
-	{
-		return( m_updateFirst );
-	}
-
-	inline void setUpdateFirst( bool _update )
-	{
-		m_updateFirst = _update;
-	}
 
 	virtual trackContentObjectView * createView( trackView * _tv );
 
@@ -127,8 +117,7 @@ private:
 	QVector<jo_id_t> m_idsToResolve;
 	objectVector m_objects;
 	timeMap m_timeMap;	// actual values
-	bool m_updateFirst;	// init-value set?
-	bool m_dynamic;		// more than 1 value?
+	bool m_hasAutomation;
 
 
 	friend class automationPatternView;
