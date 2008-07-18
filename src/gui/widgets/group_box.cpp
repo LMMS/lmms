@@ -89,7 +89,7 @@ void groupBox::modelChanged( void )
 
 void groupBox::mousePressEvent( QMouseEvent * _me )
 {
-	if( _me->y() > 1 && _me->y() < 13 )
+	if( _me->y() > 1 && _me->y() < 13 && _me->button() == Qt::LeftButton )
 	{
 		model()->setValue( !model()->value() );
 	}
