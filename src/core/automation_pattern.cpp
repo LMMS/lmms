@@ -145,6 +145,18 @@ midiTime automationPattern::putValue( const midiTime & _time,
 	{
 		m_dynamic = TRUE;
 	}
+	else
+	{
+		m_dynamic = FALSE;
+		for( objectVector::iterator it = m_objects.begin();
+						it != m_objects.end(); ++it )
+		{
+			if( *it )
+			{
+				( *it )->setValue( _value );
+			}
+		}
+	}
 
 	if( getTrack() && getTrack()->type() == track::HiddenAutomationTrack )
 	{
@@ -197,9 +209,9 @@ void automationPattern::removeValue( const midiTime & _time )
 
 void automationPattern::clear( void )
 {
+	const float val = firstObject()->value<float>();
 	m_timeMap.clear();
-	m_dynamic = FALSE;
-	m_timeMap[0] = firstObject()->value<float>();
+	putValue( 0, val );
 
 	if( engine::getAutomationEditor() &&
 		engine::getAutomationEditor()->currentPattern() == this )
