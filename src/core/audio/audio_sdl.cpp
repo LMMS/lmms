@@ -67,7 +67,7 @@ audioSDL::audioSDL( bool & _success_ful, mixer * _mixer ) :
 						// of system, so we don't have
 						// to convert the buffers
 	m_audioHandle.channels = channels();
-	m_audioHandle.samples = getMixer()->framesPerPeriod();
+	m_audioHandle.samples = qMax( 1024, getMixer()->framesPerPeriod()*2 );
 
 	m_audioHandle.callback = sdlAudioCallback;
 	m_audioHandle.userdata = this;
@@ -198,7 +198,7 @@ void audioSDL::sdlAudioCallback( Uint8 * _buf, int _len )
 						(int_sample_t *)m_convertedBuf,
 						m_convertEndian );
 		}
-		int min_len = tMin( _len, m_convertedBuf_size
+		const int min_len = tMin( _len, m_convertedBuf_size
 							- m_convertedBuf_pos );
 		memcpy( _buf, m_convertedBuf + m_convertedBuf_pos, min_len );
 		_buf += min_len;
