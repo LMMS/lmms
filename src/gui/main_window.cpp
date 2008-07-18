@@ -176,6 +176,7 @@ mainWindow::~mainWindow()
 
 
 
+
 void mainWindow::finalize( void )
 {
 	resetWindowTitle();

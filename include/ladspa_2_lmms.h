@@ -30,7 +30,7 @@
 #include "ladspa_manager.h"
 
 
-class EXPORT ladspa2LMMS: public ladspaManager
+class EXPORT ladspa2LMMS : public ladspaManager
 {
 public:
 	
@@ -64,8 +64,6 @@ public:
 private:
 	ladspa2LMMS( void );
 	~ladspa2LMMS();
-	
-//	ladspaManager * m_ladspa;
 
 	l_sortable_plugin_t m_instruments;
 	l_sortable_plugin_t m_validEffects;
@@ -75,6 +73,6 @@ private:
 	
 	friend class engine;
 
-};
+} ;
 
 #endif
