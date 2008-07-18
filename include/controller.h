@@ -55,7 +55,8 @@ public:
 		NumControllerTypes
 	} ;
 
-	controller( ControllerTypes _type, model * _parent );
+	controller( ControllerTypes _type, model * _parent,
+						const QString & _display_name );
 
 	virtual ~controller();
 
@@ -71,11 +72,6 @@ public:
 	void setSampleExact( bool _exact )
 	{
 		m_sampleExact = _exact;
-	}
-
-	virtual QString publicName() const
-	{
-		return "Dummy Controller";
 	}
 
 	ControllerTypes type( void ) const
@@ -109,6 +105,7 @@ public:
 	static void triggerFrameCounter( void );
 	static void resetFrameCounter( void );
 
+
 public slots:
 	virtual controllerDialog * createDialog( QWidget * _parent );
 
@@ -117,8 +114,8 @@ public slots:
 		m_name = _new_name;
 	}
 
-protected:
 
+protected:
 	// The internal per-controller get-value function
 	virtual float value( int _offset );
 
@@ -132,11 +129,6 @@ protected:
 
 	static unsigned int s_frames;
 
-	/*
-slots:
-	void trigger();
-
-	*/
 
 signals:
 	// The value changed while the mixer isn't running (i.e: MIDI CC)
@@ -146,7 +138,8 @@ signals:
 	void destroying( void );
 
 	friend class controllerDialog;
-};
+
+} ;
 
 #endif
 

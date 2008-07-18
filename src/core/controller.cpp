@@ -45,8 +45,9 @@ QVector<controller *> controller::s_controllers;
 
 
 
-controller::controller( ControllerTypes _type, model * _parent ) :
-	model( _parent ),
+controller::controller( ControllerTypes _type, model * _parent,
+					const QString & _display_name ) :
+	model( _parent, _display_name ),
 	journallingObject(),
 	m_type( _type )
 {
@@ -149,7 +150,8 @@ controller * controller::create( ControllerTypes _ct, model * _parent )
 			if( dummy )
 				c = dummy;
 			else
-				c = new controller( DummyController, NULL );
+				c = new controller( DummyController, NULL,
+								QString() );
 			break;
 
 		case LfoController: 

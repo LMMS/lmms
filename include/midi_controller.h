@@ -43,13 +43,6 @@ public:
 	midiController( model * _parent );
 	virtual ~midiController();
 
-	#warning TODO: use displayName-property!
-	virtual QString publicName() const
-	{
-		return "MIDI Controller";
-	}
-
-
 	virtual void processInEvent( const midiEvent & _me,
 					const midiTime & _time );
 

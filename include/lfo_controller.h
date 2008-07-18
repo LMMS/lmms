@@ -50,28 +50,18 @@ public:
 
 	virtual ~lfoController();
 
-	virtual QString publicName() const
-	{
-		return "LFO Controller";
-	}
-
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _this );
 	virtual void loadSettings( const QDomElement & _this );
 	virtual QString nodeName( void ) const;
 
+
 public slots:
 	virtual controllerDialog * createDialog( QWidget * _parent );
 
-protected:
 
+protected:
 	// The internal per-controller get-value function
 	virtual float value( int _offset );
-
-	/*
-slots:
-	void trigger();
-
-	*/
 
 	floatModel m_baseModel;
 	tempoSyncKnobModel m_speedModel;
@@ -86,11 +76,12 @@ slots:
 	
 	sample_t (*m_sampleFunction)( const float );
 
+
 protected slots:
 	void updateSampleFunction( void );
 
 	friend class lfoControllerDialog;
-};
+} ;
 
 
 
@@ -101,19 +92,9 @@ public:
 	lfoControllerDialog( controller * _controller, QWidget * _parent );
 	virtual ~lfoControllerDialog();
 
-public slots:
-	//void editControls( void );
-	//void deletePlugin( void );
-	//void displayHelp( void );
-	//void closeEffects( void );
-
-	
-signals:
-
 
 protected:
 	virtual void contextMenuEvent( QContextMenuEvent * _me );
-	//virtual void paintEvent( QPaintEvent * _pe );
 	virtual void modelChanged( void );
 
 	lfoController * m_lfo;

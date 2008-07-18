@@ -49,11 +49,6 @@ public:
 
 	virtual ~peakController();
 
-	virtual QString publicName() const
-	{
-		return "Peak Controller";
-	}
-
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _this );
 	virtual void loadSettings( const QDomElement & _this );
 	virtual QString nodeName( void ) const;
@@ -61,26 +56,19 @@ public:
 	static peakControllerEffectVector s_effects;
 	static int s_lastEffectId;
 
+
 public slots:
 	virtual controllerDialog * createDialog( QWidget * _parent );
 
-protected:
 
+protected:
 	// The internal per-controller get-value function
 	virtual float value( int _offset );
 
-	/*
-slots:
-	void trigger();
-
-	*/
-
 	peakControllerEffect * m_peakEffect;
 
-protected slots:
-
 	friend class peakControllerDialog;
-};
+} ;
 
 
 
@@ -90,16 +78,6 @@ class peakControllerDialog : public controllerDialog
 public:
 	peakControllerDialog( controller * _controller, QWidget * _parent );
 	virtual ~peakControllerDialog();
-
-public slots:
-	//void editControls( void );
-	//void deletePlugin( void );
-	//void displayHelp( void );
-	//void closeEffects( void );
-
-	
-signals:
-
 
 protected:
 	virtual void contextMenuEvent( QContextMenuEvent * _me );

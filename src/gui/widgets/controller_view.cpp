@@ -145,9 +145,9 @@ void controllerView::paintEvent( QPaintEvent * )
 	controller * c = castModel<controller>();
 
 	p.setPen( QColor( 64, 64, 64 ) );
-	p.drawText( 7, 13, c->publicName() );
+	p.drawText( 7, 13, c->displayName() );
 	p.setPen( Qt::white );
-	p.drawText( 6, 12, c->publicName() );
+	p.drawText( 6, 12, c->displayName() );
 
     f.setBold( FALSE );
     p.setFont( f );

@@ -254,7 +254,7 @@ void mainWindow::finalize( void )
 		if( it->type == plugin::Tool )
 		{
 			m_toolsMenu->addAction( it->logo->pixmap(),
-							it->publicName );
+							it->displayName );
 			m_tools.push_back( tool::instantiate( it->name,
 					/*this*/NULL )->createView( this ) );
 		}

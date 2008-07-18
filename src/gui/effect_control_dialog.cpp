@@ -39,7 +39,7 @@ effectControlDialog::effectControlDialog( effectControls * _controls ) :
 	modelView( _controls, this ),
 	m_effectControls( _controls )
 {
-	setWindowTitle( m_effectControls->getEffect()->publicName() );
+	setWindowTitle( m_effectControls->getEffect()->displayName() );
 
 }
 

@@ -77,7 +77,7 @@ toolView::toolView( tool * _tool ) :
 	engine::getMainWindow()->workspace()->addSubWindow( this );
 	parentWidget()->setAttribute( Qt::WA_DeleteOnClose, FALSE );
 
-	setWindowTitle( _tool->publicName() );
+	setWindowTitle( _tool->displayName() );
 	setWindowIcon( _tool->getDescriptor()->logo->pixmap() );
 }
 

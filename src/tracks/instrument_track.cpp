@@ -355,7 +355,7 @@ QString instrumentTrack::instrumentName( void ) const
 {
 	if( m_instrument != NULL )
 	{
-		return( m_instrument->publicName() );
+		return( m_instrument->displayName() );
 	}
 	return( QString::null );
 }

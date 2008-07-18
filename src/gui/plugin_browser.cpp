@@ -141,7 +141,8 @@ void pluginDescWidget::paintEvent( QPaintEvent * )
 	QFont f = pointSize<8>( p.font() );
 	f.setBold( TRUE );
 	p.setFont( f );
-	p.drawText( 10 + logo_size.width(), 15, m_pluginDescriptor.publicName );
+	p.drawText( 10 + logo_size.width(), 15,
+					m_pluginDescriptor.displayName );
 
 	if( height() > 24 || m_mouseOver )
 	{

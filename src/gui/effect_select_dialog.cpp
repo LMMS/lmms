@@ -175,7 +175,7 @@ effectListWidget::effectListWidget( QWidget * _parent ) :
 	for( effectKeyList::const_iterator it = m_effectKeys.begin();
 						it != m_effectKeys.end(); ++it )
 	{
-		plugin_names += QString( ( *it ).desc->publicName ) +
+		plugin_names += QString( ( *it ).desc->displayName ) +
 			( ( ( *it ).desc->sub_plugin_features != NULL ) ?
 							": " + ( *it ).name
 						:

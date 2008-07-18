@@ -77,7 +77,7 @@ ladspaEffect::ladspaEffect( model * _parent,
 		return;
 	}
 
-	setPublicName( manager->getShortName( m_key ) );
+	setDisplayName( manager->getShortName( m_key ) );
 
 	pluginInstantiation();
 
@@ -270,7 +270,7 @@ void ladspaEffect::setControl( int _control, LADSPA_Data _value )
 
 void ladspaEffect::pluginInstantiation( void )
 {
-	m_maxSampleRate = maxSamplerate( publicName() );
+	m_maxSampleRate = maxSamplerate( displayName() );
 
 	ladspa2LMMS * manager = engine::getLADSPAManager();
 

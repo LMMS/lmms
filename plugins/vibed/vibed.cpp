@@ -552,8 +552,6 @@ vibedView::vibedView( instrument * _instrument,
 			this, SLOT( showString( Uint8 ) ) );
 
 	showString( 0 );
-	// Get current graph-model
-	graphModel * gModel = m_graph->model();
 
 	m_sinWaveBtn = new pixmapButton( this, tr( "Sine wave" ) );
 	m_sinWaveBtn->move( 212, 24 );
@@ -762,7 +760,7 @@ void vibedView::normalizeClicked( void )
 void vibedView::contextMenuEvent( QContextMenuEvent * )
 {
 
-	captionMenu contextMenu( model()->publicName() );
+	captionMenu contextMenu( model()->displayName() );
 	contextMenu.addAction( embed::getIconPixmap( "help" ), tr( "&Help" ),
 					this, SLOT( displayHelp() ) );
 	contextMenu.exec( QCursor::pos() );

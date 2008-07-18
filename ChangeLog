@@ -1,5 +1,33 @@
 2008-07-18	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* plugins/lb303/lb303.h:
+	removed declaration of unimplemented slot - fixes win32-build
+
+	* plugins/ladspa_effect/ladspa_effect.cpp:
+	* plugins/vibed/vibed.cpp:
+	* include/controller.h:
+	* include/lfo_controller.h:
+	* include/midi_controller.h:
+	* include/peak_controller.h:
+	* include/plugin.h:
+	* src/core/controller.cpp:
+	* src/core/lfo_controller.cpp:
+	* src/core/peak_controller.cpp:
+	* src/core/tool.cpp:
+	* src/core/midi/midi_controller.cpp:
+	* src/gui/effect_control_dialog.cpp:
+	* src/gui/effect_select_dialog.cpp:
+	* src/gui/main_window.cpp:
+	* src/gui/plugin_browser.cpp:
+	* src/gui/widgets/controller_view.cpp:
+	* src/gui/widgets/effect_view.cpp:
+	* src/tracks/instrument_track.cpp:
+	removed publicName-properties in various classes and plugin-descriptor
+	and use model::displayName instead
+
+	* src/gui/controller_connection_dialog.cpp:
+	improved GUI-layout
+
 	* include/automation_pattern.h:
 	* src/core/automation_pattern.cpp:
 	- removed obsolete variable

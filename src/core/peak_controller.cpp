@@ -44,7 +44,7 @@ peakControllerEffectVector peakController::s_effects;
 
 peakController::peakController( model * _parent, 
 		peakControllerEffect * _peak_effect ) :
-	controller( PeakController, _parent ),
+	controller( PeakController, _parent, tr( "LFO Controller" ) ),
 	m_peakEffect( _peak_effect )
 {
 }
