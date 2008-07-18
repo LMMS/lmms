@@ -61,7 +61,7 @@ const QString __targetNames[instrumentSoundShaping::NumTargets][3] =
 
 instrumentSoundShaping::instrumentSoundShaping(
 					instrumentTrack * _instrument_track ) :
-	model( _instrument_track, tr( "Envelopes & LFOs" ) ),
+	model( _instrument_track, tr( "Envelopes/LFOs" ) ),
 	m_instrumentTrack( _instrument_track ),
 	m_filterEnabledModel( FALSE, this ),
 	m_filterModel( this, tr( "Filter type" ) ),
