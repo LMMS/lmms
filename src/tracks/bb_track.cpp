@@ -38,11 +38,11 @@
 #include "engine.h"
 #include "gui_templates.h"
 #include "mixer.h"
-#include "name_label.h"
 #include "rename_dialog.h"
 #include "song.h"
 #include "song_editor.h"
 #include "templates.h"
+#include "track_label_button.h"
 
 
 

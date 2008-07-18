@@ -132,7 +132,7 @@ lmms_MOC =						\
 		./midi_port_menu.moc			\
 		./mixer.moc				\
 		./mv_base.moc				\
-		./name_label.moc			\
+		./track_label_button.moc		\
 		./nstate_button.moc			\
 		./pattern.moc				\
 		./peak_controller.moc			\
@@ -315,7 +315,7 @@ lmms_SOURCES =									\
 		$(srcdir)/src/gui/widgets/led_checkbox.cpp			\
 		$(srcdir)/src/gui/widgets/meter_dialog.cpp			\
 		$(srcdir)/src/gui/widgets/midi_port_menu.cpp			\
-		$(srcdir)/src/gui/widgets/name_label.cpp			\
+		$(srcdir)/src/gui/widgets/track_label_button.cpp		\
 		$(srcdir)/src/gui/widgets/nstate_button.cpp			\
 		$(srcdir)/src/gui/widgets/pixmap_button.cpp			\
 		$(srcdir)/src/gui/widgets/project_notes.cpp			\
@@ -413,7 +413,7 @@ lmms_SOURCES =									\
 		$(srcdir)/include/caption_menu.h				\
 		$(srcdir)/include/sample_track.h				\
 		$(srcdir)/include/sample_buffer.h				\
-		$(srcdir)/include/name_label.h					\
+		$(srcdir)/include/track_label_button.h				\
 		$(srcdir)/include/play_handle.h					\
 		$(srcdir)/include/mmp.h						\
 		$(srcdir)/include/midi.h					\

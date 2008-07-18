@@ -30,10 +30,10 @@
 #include "automation_track.h"
 #include "automation_pattern.h"
 #include "embed.h"
-#include "name_label.h"
-#include "string_pair_drag.h"
 #include "project_journal.h"
+#include "string_pair_drag.h"
 #include "track_container_view.h"
+#include "track_label_button.h"
 
 
 automationTrack::automationTrack( trackContainer * _tc, bool _hidden ) :

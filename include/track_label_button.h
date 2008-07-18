@@ -1,5 +1,5 @@
 /*
- * name_label.h - class trackLabelButton
+ * track_label_button.h - class trackLabelButton
  *
  * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
@@ -23,8 +23,8 @@
  */
 
 
-#ifndef _NAME_LABEL_H
-#define _NAME_LABEL_H
+#ifndef _TRACK_LABEL_BUTTON_H
+#define _TRACK_LABEL_BUTTON_H
 
 #include <QtGui/QToolButton>
 

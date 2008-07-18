@@ -33,20 +33,18 @@
 #include <QtGui/QPainter>
 #include <QtGui/QPushButton>
 
-#include "name_label.h"
 #include "sample_track.h"
 #include "song.h"
 #include "embed.h"
 #include "engine.h"
-#include "templates.h"
 #include "tooltip.h"
 #include "audio_port.h"
-#include "automation_pattern.h"
 #include "sample_play_handle.h"
 #include "string_pair_drag.h"
 #include "knob.h"
 #include "main_window.h"
 #include "effect_rack_view.h"
+#include "track_label_button.h"
 
 
 

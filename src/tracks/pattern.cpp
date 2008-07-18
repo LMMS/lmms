@@ -1049,7 +1049,7 @@ void patternView::wheelEvent( QWheelEvent * _we )
 			return;
 		}
 		note * n = m_pat->m_notes[step];
-		Uint8 vol = n->getVolume();
+		int vol = n->getVolume();
 		
 		if( n->length() == 0 && _we->delta() > 0 )
 		{
@@ -1164,7 +1164,7 @@ void patternView::paintEvent( QPaintEvent * )
 			{
 				central_key = central_key / total_notes;
 
-				int central_y = height() / 2;
+				const int central_y = height() / 2;
 				int y_base = central_y + TCO_BORDER_WIDTH -1;
 
 				if( m_pat->getTrack()->isMuted() ||
@@ -1185,17 +1185,17 @@ void patternView::paintEvent( QPaintEvent * )
 							m_pat->m_notes.begin();
 					it != m_pat->m_notes.end(); ++it )
 				{
-					Sint8 y_pos = central_key -
+					const int y_pos = central_key -
 								( *it )->key();
 
 					if( ( *it )->length() > 0 &&
 							y_pos > -central_y &&
 							y_pos < central_y )
 					{
-						int x1 = 2 * x_base +
+						const int x1 = 2 * x_base +
 		static_cast<int>( ( *it )->pos() * ppt /
 						midiTime::ticksPerTact() );
-						int x2 =
+						const int x2 =
 			static_cast<int>( ( ( *it )->pos() + ( *it )->length() ) * ppt / midiTime::ticksPerTact() );
 						p.drawLine( x1, y_base + y_pos,
 							x2, y_base + y_pos );
@@ -1234,13 +1234,13 @@ void patternView::paintEvent( QPaintEvent * )
 		for( noteVector::iterator it = m_pat->m_notes.begin();
 					it != m_pat->m_notes.end(); ++it )
 		{
-			int no = ( *it )->pos() / DefaultBeatsPerTact;
-			int x = TCO_BORDER_WIDTH + static_cast<int>( no *
+			const int no = ( *it )->pos() / DefaultBeatsPerTact;
+			const int x = TCO_BORDER_WIDTH + static_cast<int>( no *
 								w / steps );
-			int y = height() - s_stepBtnOff->height() - 1;
-			
-			Uint8 vol = ( *it )->getVolume();
-			
+			const int y = height() - s_stepBtnOff->height() - 1;
+
+			const int vol = ( *it )->getVolume();
+
 			if( ( *it )->length() < 0 )
 			{
 				p.drawPixmap( x, y, stepoff );

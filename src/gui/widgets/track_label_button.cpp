@@ -1,8 +1,8 @@
 #ifndef SINGLE_SOURCE_COMPILE
 
 /*
- * name_label.cpp - implementation of class trackLabelButton, a label which
- *                  is renamable by double-clicking it
+ * track_label_button.cpp - implementation of class trackLabelButton, a label
+ *                          which is renamable by double-clicking it
  *
  * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
@@ -33,7 +33,7 @@
 #include <QtGui/QToolButton>
 
 
-#include "name_label.h"
+#include "track_label_button.h"
 #include "embed.h"
 #include "rename_dialog.h"
 #include "bb_track_container.h"
@@ -54,6 +54,7 @@ trackLabelButton::trackLabelButton( trackView * _tv, QWidget * _parent ) :
 	setCursor( QCursor( embed::getIconPixmap( "hand" ), 0, 0 ) );
 	setToolButtonStyle( Qt::ToolButtonTextBesideIcon );
 	setFixedSize( 160, 29 );
+	setIconSize( QSize( 32, 32 ) );
 	updateName();
 
 	connect( m_trackView->getTrack(), SIGNAL( dataChanged() ),
@@ -233,7 +234,7 @@ void trackLabelButton::dropEvent( QDropEvent * _de )
 
 
 
-#include "name_label.moc"
+#include "track_label_button.moc"
 
 
 #endif

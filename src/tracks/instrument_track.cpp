@@ -67,7 +67,6 @@
 #include "main_window.h"
 #include "midi_client.h"
 #include "midi_port_menu.h"
-#include "name_label.h"
 #include "mmp.h"
 #include "note_play_handle.h"
 #include "pattern.h"
@@ -78,6 +77,7 @@
 #include "surround_area.h"
 #include "tab_widget.h"
 #include "tooltip.h"
+#include "track_label_button.h"
 
 
 
