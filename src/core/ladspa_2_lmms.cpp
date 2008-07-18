@@ -2,7 +2,7 @@
  * ladspa_2_lmms.cpp - class that identifies and instantiates LADSPA effects
  *                     for use with LMMS
  *
- * Copyright (c) 2005-2007 Danny McRae <khjklujn@netscape.net>
+ * Copyright (c) 2005-2008 Danny McRae <khjklujn@netscape.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  * 
@@ -46,8 +46,8 @@ ladspa2LMMS::ladspa2LMMS( void )
 			( desc->inputChannels == desc->outputChannels &&
 			( desc->inputChannels == 1 ||
 			desc->inputChannels == 2 ||
-			desc->inputChannels == 4 ) &&
-			isRealTimeCapable( key ) ) )
+			desc->inputChannels == 4 )/* &&
+			isRealTimeCapable( key )*/ ) )
 		{
 			m_validEffects.append( qMakePair( getName( key ),
 								key ) );
