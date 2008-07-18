@@ -467,10 +467,9 @@ void multimediaProject::upgrade( void )
 			}
 		}
 
-		list = elementsByTagName( "channeltrack" );
-		for( int i = 0; !list.item( i ).isNull(); ++i )
+		while( !( list = elementsByTagName( "channeltrack" ) ).isEmpty() )
 		{
-			QDomElement el = list.item( i ).toElement();
+			QDomElement el = list.item( 0 ).toElement();
 			el.setTagName( "instrumenttrack" );
 		}
 
@@ -531,11 +530,11 @@ void multimediaProject::upgrade( void )
 			el.setAttribute( "active0", 1 );
 		}
 
-		while( !( list = elementsByTagName( "lb303" ) ).isEmpty() )
+/*		while( !( list = elementsByTagName( "lb303" ) ).isEmpty() )
 		{
 			QDomElement el = list.item( 0 ).toElement();
 			el.setTagName( "lb302" );
-		}
+		}*/
 
 		while( !( list = elementsByTagName( "channelsettings" ) ).
 								isEmpty() )
@@ -623,20 +622,20 @@ void multimediaProject::upgrade( void )
 
 	if( version < "0.4.0-20080607" )
 	{
-		QDomNodeList list = elementsByTagName( "midi" );
-		for( int i = 0; !list.item( i ).isNull(); ++i )
+		QDomNodeList list;
+		while( !( list = elementsByTagName( "midi" ) ).isEmpty() )
 		{
-			QDomElement el = list.item( i ).toElement();
+			QDomElement el = list.item( 0 ).toElement();
 			el.setTagName( "midiport" );
 		}
 	}
 
 	if( version < "0.4.0-20080622" )
 	{
-		QDomNodeList list = elementsByTagName( "automation-pattern" );
-		for( int i = 0; !list.item( i ).isNull(); ++i )
+		QDomNodeList list;
+		while( !( list = elementsByTagName( "automation-pattern" ) ).isEmpty() )
 		{
-			QDomElement el = list.item( i ).toElement();
+			QDomElement el = list.item( 0 ).toElement();
 			el.setTagName( "automationpattern" );
 		}
 
@@ -651,6 +650,15 @@ void multimediaProject::upgrade( void )
 		}
 	}
 
+	if( version < "0.4.0-beta" )
+	{
+		QDomNodeList list;
+		while( !( list = elementsByTagName( "lb302" ) ).isEmpty() )
+		{
+			QDomElement el = list.item( 0 ).toElement();
+			el.setTagName( "lb303" );
+		}
+	}
 
 	// Time-signature
 	if ( !m_head.hasAttribute( "timesig_numerator" ) )
