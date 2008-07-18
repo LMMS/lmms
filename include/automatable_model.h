@@ -210,18 +210,6 @@ public:
 	}
 
 
-	virtual QString displayName( void ) const
-	{
-		return m_displayName;
-	}
-
-	virtual void setDisplayName( const QString & _display_name )
-	{
-		m_displayName = _display_name;
-	}
-
-
-
 public slots:
 	virtual void reset( void );
 	virtual void copyValue( void );
@@ -248,9 +236,9 @@ private:
 	float m_step;
 	float m_range;
 
-	// most objects will need this temporarily (until sampleExact is standard)
+	// most objects will need this temporarily (until sampleExact is
+	// standard)
 	float m_oldValue;
-	QString m_displayName;
 	bool m_journalEntryReady;
 
 	autoModelVector m_linkedModels;
@@ -324,8 +312,7 @@ public:
 class boolModel : public automatableModel
 {
 public:
-	boolModel(  const bool _val = FALSE,
-				::model * _parent = NULL,
+	boolModel( const bool _val = FALSE, ::model * _parent = NULL,
 				const QString & _display_name  = QString::null,
 				bool _default_constructed = FALSE ) : 
 		automatableModel( Bool, _val, FALSE, TRUE, 1,

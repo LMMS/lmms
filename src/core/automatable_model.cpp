@@ -52,7 +52,7 @@ automatableModel::automatableModel( DataType _type,
 						::model * _parent,
 						const QString & _display_name,
 						bool _default_constructed ) :
-	model( _parent, _default_constructed ),
+	model( _parent, _display_name, _default_constructed ),
 	m_dataType( _type ),
 	m_value( _val ),
 	m_initValue( _val ),
@@ -60,7 +60,6 @@ automatableModel::automatableModel( DataType _type,
 	m_maxValue( _max ),
 	m_step( _step ),
 	m_range( _max - _min ),
-	m_displayName( _display_name ),
 	m_journalEntryReady( FALSE ),
 	m_controllerConnection( NULL )
 {
