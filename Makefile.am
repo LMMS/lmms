@@ -25,13 +25,12 @@ win32-pkg: all
 	mkdir -p tmp/lmms/plugins/ladspa/
 	cp lmms.exe tmp/lmms
 	find plugins/ -name "*.dll" -maxdepth 2 -exec cp '{}' tmp/lmms/plugins/ ';'
-	rm tmp/lmms/plugins/caps.dll
-	rm tmp/lmms/plugins/tap*.dll
+	rm -f tmp/lmms/plugins/caps.dll tmp/lmms/plugins/tap*.dll
 	cp plugins/ladspa_effect/caps/caps.dll tmp/lmms/plugins/ladspa/
 	cp plugins/ladspa_effect/tap/tap*.dll tmp/lmms/plugins/ladspa/
 	PWD=`pwd`
 	cd data && make DESTDIR=$(PWD)/tmp/lmms/ install
-	mv tmp/lmms/opt/mingw/share/lmms/* tmp/lmms/data/ && rm -rf tmp/lmms/opt
+	if [ -d tmp/lmms/opt/mingw ] ; then mv tmp/lmms/opt/mingw/share/lmms/* tmp/lmms/data/ && rm -rf tmp/lmms/opt ; else mv tmp/lmms/usr/share/lmms/* tmp/lmms/data/ && rm -rf tmp/lmms/usr ; fi
 	cp /opt/mingw/bin/QtCore4.dll tmp/lmms
 	cp /opt/mingw/bin/QtGui4.dll tmp/lmms
 	cp /opt/mingw/bin/QtXml4.dll tmp/lmms
