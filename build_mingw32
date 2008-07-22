@@ -1,4 +1,7 @@
 MINGW=/opt/mingw
 export PATH=$PATH:$MINGW/bin
-./configure --prefix=$MINGW --host=i586-mingw32 CC=$MINGW/bin/i586-mingw32-gcc CXX=$MINGW/bin/i586-mingw32-g++ DLLTOOL=$MINGW/bin/i586-mingw32-dlltool OBJDUMP=$MINGW/bin/i586-mingw32-objdump RANLIB=$MINGW/bin/i586-mingw32-ranlib AR=$MINGW/bin/i586-mingw32-ar AS=$MINGW/bin/i586-mingw32-as STRIP=$MINGW/bin/i586-mingw32-strip --with-qtdir=$MINGW --with-win32 CFLAGS="-mtune=generic -mmmx -fno-strict-aliasing" CXXFLAGS="-mtune=generic -mmmx -fno-strict-aliasing"
+#./configure --prefix=$MINGW --host=i586-mingw32 CC=$MINGW/bin/i586-mingw32-gcc CXX=$MINGW/bin/i586-mingw32-g++ DLLTOOL=$MINGW/bin/i586-mingw32-dlltool OBJDUMP=$MINGW/bin/i586-mingw32-objdump RANLIB=$MINGW/bin/i586-mingw32-ranlib AR=$MINGW/bin/i586-mingw32-ar AS=$MINGW/bin/i586-mingw32-as STRIP=$MINGW/bin/i586-mingw32-strip --with-qtdir=$MINGW --with-win32 CFLAGS="-mtune=generic -mmmx -fno-strict-aliasing" CXXFLAGS="-mtune=generic -mmmx -fno-strict-aliasing"
 #./configure --prefix=$MINGW --host=i586-mingw32 --build=i586-mingw32 CC=$MINGW/bin/i586-mingw32-gcc CXX=$MINGW/bin/i586-mingw32-g++ --with-qtdir=$MINGW --with-win32
+
+cmake . -DCMAKE_TOOLCHAIN_FILE=cmake/modules/Win32Toolchain.cmake
+

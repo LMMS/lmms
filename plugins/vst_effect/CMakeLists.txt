@@ -6,7 +6,8 @@ LINK_DIRECTORIES(../vst_base)
 LINK_LIBRARIES(vstbase)
 
 BUILD_PLUGIN(vsteffect vst_effect.cpp vst_effect_controls.cpp vst_effect_control_dialog.cpp vst_subplugin_features.cpp vst_effect.h vst_effect_controls.h vst_effect_control_dialog.h vst_subplugin_features.h MOCFILES vst_effect_controls.h EMBEDDED_RESOURCES *.png)
-ENDIF(LMMS_HAVE_VST)
 
-SET_TARGET_PROPERTIES(vsteffect PROPERTIES COMPILE_FLAGS "-D_FORTIFY_SOURCE=0")
+SET_TARGET_PROPERTIES(vsteffect PROPERTIES COMPILE_FLAGS "-Wno-attributes")
+
+ENDIF(LMMS_HAVE_VST)
 

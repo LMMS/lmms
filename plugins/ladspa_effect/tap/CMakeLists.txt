@@ -8,9 +8,8 @@ FOREACH(_item ${PLUGIN_SOURCES})
 	SET_TARGET_PROPERTIES(${_plugin} PROPERTIES COMPILE_FLAGS "-O3 -Wno-write-strings -Wall -fomit-frame-pointer -fno-strict-aliasing -fstrength-reduce -funroll-loops -ffast-math -c -fPIC -DPIC")
 	SET_TARGET_PROPERTIES(${_plugin} PROPERTIES LINK_FLAGS "${LINK_FLAGS} -shared -Wl,-no-undefined -Wl,-Bsymbolic -lm")
 	IF(LMMS_BUILD_LINUX)
-	SET_TARGET_PROPERTIES(${_plugin} PROPERTIES LINK_FLAGS "${LINK_FLAGS} -nostartfiles")
+		SET_TARGET_PROPERTIES(${_plugin} PROPERTIES LINK_FLAGS "${LINK_FLAGS} -nostartfiles")
+		INSTALL(TARGETS ${_plugin} LIBRARY DESTINATION ${PLUGIN_DIR}/ladspa)
 	ENDIF(LMMS_BUILD_LINUX)
-
-	INSTALL(TARGETS ${_plugin} LIBRARY DESTINATION ${PLUGIN_DIR}/ladspa)
 ENDFOREACH(_item ${PLUGIN_SOURCES})
 

@@ -30,8 +30,8 @@
 
 #ifdef LMMS_HAVE_SDL
 
-#include <SDL.h>
-#include <SDL_audio.h>
+#include <SDL/SDL.h>
+#include <SDL/SDL_audio.h>
 
 #include "audio_device.h"
 

@@ -414,7 +414,7 @@ void midiWinMM::setupWidget::saveSettings( void )
 }
 
 
-#include "midi_winmm.moc"
+#include "moc_midi_winmm.cxx"
 
 
 #endif

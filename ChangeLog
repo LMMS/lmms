@@ -1,5 +1,16 @@
 2008-07-22	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* cmake/modules/Win32Toolchain.cmake:
+	* cmake/modules/BuildPlugin.cmake:
+	* plugins/ladspa_effect/tap/CMakeLists.txt:
+	* plugins/ladspa_effect/caps/CMakeLists.txt:
+	* plugins/vst_effect/CMakeLists.txt:
+	* include/audio_sdl.h:
+	* src/core/midi/midi_winmm.cpp:
+	* build_mingw32:
+	* CMakeLists.txt:
+	initial support for mingw-cross-compiling
+
 	* include/midi_alsa_seq.h:
 	* include/midi_client.h:
 	* include/midi_port.h:
