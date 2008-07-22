@@ -1,5 +1,9 @@
 2008-07-22	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* CMakeLists.txt:
+	- initial support for CPack
+	- remove old include/lmmsconfig.h from the autotools-era
+
 	* cmake/modules/InstallHelpers.cmake:
 	fixed INSTALL_DATA_SUBDIRS-macro (use normal string-replace
 	instead of regex-replace)
