@@ -964,7 +964,7 @@ void mainWindow::browseHelp( void )
 
 
 
-#include "main_window.moc"
+#include "moc_main_window.cxx"
 
 
 #endif

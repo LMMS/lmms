@@ -245,7 +245,7 @@ controllerDialog * lfoController::createDialog( QWidget * _parent )
 }
 
 
-#include "lfo_controller.moc"
+#include "moc_lfo_controller.cxx"
 
 
 #endif

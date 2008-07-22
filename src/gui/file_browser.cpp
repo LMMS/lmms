@@ -893,5 +893,5 @@ QString fileItem::extension( const QString & _file )
 
 
 
-#include "file_browser.moc"
+#include "moc_file_browser.cxx"
 

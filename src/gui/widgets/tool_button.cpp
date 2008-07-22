@@ -104,7 +104,7 @@ void toolButton::toggledBool( bool _on )
 
 
 
-#include "tool_button.moc"
+#include "moc_tool_button.cxx"
 
 
 #endif

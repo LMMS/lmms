@@ -24,7 +24,7 @@
 #include <string.h>
 #include <math.h>
 
-#include "ladspa-local.h"
+#include <ladspa.h>
 #include "tap_utils.h"
 
 

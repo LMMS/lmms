@@ -36,7 +36,7 @@
 extern "C"
 {
 
-plugin::descriptor PLUGIN_EXPORT peakcontroller_effect_plugin_descriptor =
+plugin::descriptor PLUGIN_EXPORT peakcontrollereffect_plugin_descriptor =
 {
 	STRINGIFY_PLUGIN_NAME( PLUGIN_NAME ),
 	"Peak Controller",
@@ -60,7 +60,7 @@ plugin::descriptor PLUGIN_EXPORT peakcontroller_effect_plugin_descriptor =
 peakControllerEffect::peakControllerEffect(
 			model * _parent,
 			const descriptor::subPluginFeatures::key * _key ) :
-	effect( &peakcontroller_effect_plugin_descriptor, _parent, _key ),
+	effect( &peakcontrollereffect_plugin_descriptor, _parent, _key ),
 	m_effectId( ++peakController::s_lastEffectId ),
 	m_peakControls( this ),
 	m_autoController( NULL )

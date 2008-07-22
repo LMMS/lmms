@@ -223,7 +223,7 @@ void pluginDescWidget::updateHeight( void )
 
 
 
-#include "plugin_browser.moc"
+#include "moc_plugin_browser.cxx"
 
 
 #endif

@@ -57,7 +57,7 @@ configManager::configManager( void ) :
 	m_pluginDir( qApp->applicationDirPath()
 			+ QDir::separator() + "plugins" + QDir::separator() ),
 #else
-	m_pluginDir( QString( LIBDIR ) + "/lmms/" ),
+	m_pluginDir( QString( PLUGIN_DIR ) ),
 #endif
 	m_vstDir( QDir::home().absolutePath() ),
 	m_flDir( QDir::home().absolutePath() )
@@ -117,7 +117,7 @@ void configManager::setLADSPADir( const QString & _fd )
 
 void configManager::setSTKDir( const QString & _fd )
 {
-#ifdef LMMS_HAVE_STK_H
+#ifdef LMMS_HAVE_STK
 	m_stkDir = _fd;
 #endif
 }
@@ -258,7 +258,7 @@ bool configManager::loadConfigFile( void )
 	m_vstDir = value( "paths", "vstdir" );
 	m_flDir = value( "paths", "fldir" );
 	m_ladDir = value( "paths", "laddir" );
-#ifdef LMMS_HAVE_STK_H
+#ifdef LMMS_HAVE_STK
 	m_stkDir = value( "paths", "stkdir" );
 #endif
 
@@ -277,11 +277,11 @@ bool configManager::loadConfigFile( void )
 #ifdef LMMS_BUILD_WIN32
 		m_ladDir = m_pluginDir + "ladspa" + QDir::separator();
 #else
-		m_ladDir = QString(LIBDIR) + "/ladspa/";
+		m_ladDir = QString(LIB_DIR) + "/ladspa/";
 #endif
 	}
 
-#ifdef LMMS_HAVE_STK_H
+#ifdef LMMS_HAVE_STK
 	if( m_stkDir == "" )
 	{
 		m_stkDir = "/usr/share/stk/rawwaves/";
@@ -323,7 +323,7 @@ void configManager::saveConfigFile( void )
 	setValue( "paths", "vstdir", m_vstDir );
 	setValue( "paths", "fldir", m_flDir );
 	setValue( "paths", "laddir", m_ladDir );
-#ifdef LMMS_HAVE_STK_H
+#ifdef LMMS_HAVE_STK
 	setValue( "paths", "stkdir", m_stkDir );
 #endif
 

@@ -1,3 +1,4 @@
+#if 0
 /*
  * midi_mapper.h - MIDI-mapper for any midiDevice
  *
@@ -99,4 +100,5 @@ private:
 } ;
 
 
+#endif
 #endif

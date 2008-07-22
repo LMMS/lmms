@@ -450,5 +450,5 @@ void automatableModel::pasteValue( void )
 
 
 
-#include "automatable_model.moc"
+#include "moc_automatable_model.cxx"
 

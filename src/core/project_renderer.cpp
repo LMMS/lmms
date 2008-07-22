@@ -205,5 +205,5 @@ void projectRenderer::updateConsoleProgress( void )
 
 
 
-#include "project_renderer.moc"
+#include "moc_project_renderer.cxx"
 

@@ -1,0 +1,12 @@
+INCLUDE(BuildPlugin)
+
+BUILD_PLUGIN(ladspaeffect ladspa_effect.cpp ladspa_controls.cpp ladspa_control_dialog.cpp ladspa_subplugin_features.cpp ladspa_effect.h ladspa_controls.h ladspa_control_dialog.h ladspa_subplugin_features.h MOCFILES ladspa_effect.h ladspa_controls.h ladspa_control_dialog.h EMBEDDED_RESOURCES *.png)
+
+IF(WANT_CAPS)
+ADD_SUBDIRECTORY(caps)
+ENDIF(WANT_CAPS)
+
+IF(WANT_TAP)
+ADD_SUBDIRECTORY(tap)
+ENDIF(WANT_TAP)
+

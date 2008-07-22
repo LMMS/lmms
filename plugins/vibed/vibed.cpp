@@ -789,5 +789,5 @@ plugin * PLUGIN_EXPORT lmms_plugin_main( model *, void * _data )
 
 }
 
-#include "vibed.moc"
+#include "moc_vibed.cxx"
 

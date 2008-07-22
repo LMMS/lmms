@@ -236,4 +236,4 @@ void ladspaBrowserView::showPorts( const ladspa_key_t & _key )
 
 
 
-#include "ladspa_browser.moc"
+#include "moc_ladspa_browser.cxx"

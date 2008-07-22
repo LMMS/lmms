@@ -483,5 +483,5 @@ void trackContainerView::scrollArea::wheelEvent( QWheelEvent * _we )
 
 
 
-#include "track_container_view.moc"
+#include "moc_track_container_view.cxx"
 

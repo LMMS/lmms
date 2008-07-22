@@ -1167,7 +1167,7 @@ void song::removeController( controller * _controller )
 }
 
 
-#include "song.moc"
+#include "moc_song.cxx"
 
 
 #endif

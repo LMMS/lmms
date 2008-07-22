@@ -146,5 +146,5 @@ void instrumentSoundShapingView::modelChanged( void )
 
 
 
-#include "instrument_sound_shaping_view.moc"
+#include "moc_instrument_sound_shaping_view.cxx"
 

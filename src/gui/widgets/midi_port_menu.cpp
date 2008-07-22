@@ -101,5 +101,5 @@ void midiPortMenu::updatePorts( void )
 
 
 
-#include "midi_port_menu.moc"
+#include "moc_midi_port_menu.cxx"
 

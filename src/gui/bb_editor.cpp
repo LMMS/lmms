@@ -246,5 +246,5 @@ void bbEditor::keyPressEvent( QKeyEvent * _ke )
 
 
 
-#include "bb_editor.moc"
+#include "moc_bb_editor.cxx"
 

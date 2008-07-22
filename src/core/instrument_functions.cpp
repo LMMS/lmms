@@ -510,6 +510,6 @@ void arpeggiator::loadSettings( const QDomElement & _this )
 }
 
 
-#include "instrument_functions.moc"
+#include "moc_instrument_functions.cxx"
 
 #endif

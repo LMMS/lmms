@@ -640,5 +640,5 @@ Sint16 remoteVSTPlugin::processNextMessage( void )
 
 
 
-#include "lvsl_client.moc"
+#include "moc_lvsl_client.cxx"
 

@@ -409,6 +409,6 @@ void controllerConnectionDialog::midiValueChanged( void )
 
 
 
-#include "controller_connection_dialog.moc"
+#include "moc_controller_connection_dialog.cxx"
 
 #endif

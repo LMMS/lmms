@@ -652,7 +652,7 @@ void knob::displayHelp( void )
 
 
 
-#include "knob.moc"
+#include "moc_knob.cxx"
 
 
 #endif

@@ -559,5 +559,5 @@ plugin * PLUGIN_EXPORT lmms_plugin_main( model * _parent, void * _data )
 }
 
 
-#include "ladspa_effect.moc"
+#include "moc_ladspa_effect.cxx"
 

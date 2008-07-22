@@ -1,0 +1,16 @@
+INCLUDE_DIRECTORIES("${CMAKE_SOURCE_DIR}/include")
+SET(CMAKE_BUILD_TYPE release)
+FILE(GLOB PLUGIN_SOURCES *.c)
+FOREACH(_item ${PLUGIN_SOURCES})
+	GET_FILENAME_COMPONENT(_plugin "${_item}" NAME_WE)
+	ADD_LIBRARY(${_plugin} SHARED ${_item})
+	SET_TARGET_PROPERTIES(${_plugin} PROPERTIES PREFIX "")
+	SET_TARGET_PROPERTIES(${_plugin} PROPERTIES COMPILE_FLAGS "-O3 -Wno-write-strings -Wall -fomit-frame-pointer -fno-strict-aliasing -fstrength-reduce -funroll-loops -ffast-math -c -fPIC -DPIC")
+	SET_TARGET_PROPERTIES(${_plugin} PROPERTIES LINK_FLAGS "${LINK_FLAGS} -shared -Wl,-no-undefined -Wl,-Bsymbolic -lm")
+	IF(LMMS_BUILD_LINUX)
+	SET_TARGET_PROPERTIES(${_plugin} PROPERTIES LINK_FLAGS "${LINK_FLAGS} -nostartfiles")
+	ENDIF(LMMS_BUILD_LINUX)
+
+	INSTALL(TARGETS ${_plugin} LIBRARY DESTINATION ${PLUGIN_DIR}/ladspa)
+ENDFOREACH(_item ${PLUGIN_SOURCES})
+

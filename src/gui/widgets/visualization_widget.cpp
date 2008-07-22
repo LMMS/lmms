@@ -193,7 +193,7 @@ void visualizationWidget::mousePressEvent( QMouseEvent * _me )
 
 
 
-#include "visualization_widget.moc"
+#include "moc_visualization_widget.cxx"
 
 
 #endif

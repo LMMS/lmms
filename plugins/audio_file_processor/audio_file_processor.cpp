@@ -614,5 +614,5 @@ plugin * PLUGIN_EXPORT lmms_plugin_main( model *, void * _data )
 }
 
 
-#include "audio_file_processor.moc"
+#include "moc_audio_file_processor.cxx"
 

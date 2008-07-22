@@ -129,7 +129,7 @@ void aboutDialog::resizeEvent( QResizeEvent * _re )
 
 
 
-#include "about_dialog.moc"
+#include "moc_about_dialog.cxx"
 
 
 #endif

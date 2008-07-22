@@ -28,9 +28,7 @@
 
 #include "lmmsconfig.h"
 
-#ifdef LMMS_HAVE_JACK_JACK_H
-
-#define JACK_SUPPORT
+#ifdef LMMS_HAVE_JACK
 
 #include <jack/jack.h>
 

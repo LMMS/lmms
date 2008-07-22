@@ -282,7 +282,7 @@ automationPattern * surroundAreaModel::automationPatternY( void )
 */
 
 
-#include "surround_area.moc"
+#include "moc_surround_area.cxx"
 
 
 #endif

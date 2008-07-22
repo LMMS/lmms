@@ -32,8 +32,7 @@
 
 #include "audio_alsa.h"
 
-
-#ifdef ALSA_SUPPORT
+#ifdef LMMS_HAVE_ALSA
 
 #include "endian_handling.h"
 #include "config_mgr.h"

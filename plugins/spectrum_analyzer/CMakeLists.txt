@@ -1,0 +1,8 @@
+IF(LMMS_HAVE_FFTW3F)
+	INCLUDE(BuildPlugin)
+	INCLUDE_DIRECTORIES(${FFTW3F_INCLUDE_DIRS})
+	LINK_DIRECTORIES(${FFTW3F_LIBRARY_DIRS})
+	LINK_LIBRARIES(${FFTW3F_LIBRARIES})
+	BUILD_PLUGIN(spectrumanalyzer spectrum_analyzer.cpp spectrumanalyzer_controls.cpp spectrumanalyzer_control_dialog.cpp spectrum_analyzer.h spectrumanalyzer_controls.h spectrumanalyzer_control_dialog.h MOCFILES spectrumanalyzer_controls.h EMBEDDED_RESOURCES *.png)
+ENDIF(LMMS_HAVE_FFTW3F)
+

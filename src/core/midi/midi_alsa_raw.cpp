@@ -3,7 +3,7 @@
 /*
  * midi_alsa_raw.cpp - midi-client for RawMIDI via ALSA
  *
- * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -34,7 +34,7 @@
 #include "gui_templates.h"
 
 
-#ifdef ALSA_SUPPORT
+#ifdef LMMS_HAVE_ALSA
 
 
 midiALSARaw::midiALSARaw( void ) :
@@ -207,8 +207,7 @@ void midiALSARaw::setupWidget::saveSettings( void )
 }
 
 
+#endif
 
 #endif
 
-
-#endif

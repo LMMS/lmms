@@ -818,5 +818,5 @@ plugin * PLUGIN_EXPORT lmms_plugin_main( model *, void * _data )
 }
 
 
-#include "triple_oscillator.moc"
+#include "moc_triple_oscillator.cxx"
 

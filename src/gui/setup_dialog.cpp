@@ -101,7 +101,7 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 	m_artworkDir( configManager::inst()->artworkDir() ),
 	m_flDir( configManager::inst()->flDir() ),
 	m_ladDir( configManager::inst()->ladspaDir() ),
-#ifdef LMMS_HAVE_STK_H
+#ifdef LMMS_HAVE_STK
 	m_stkDir( configManager::inst()->stkDir() ),
 #endif
 	m_disableChActInd( configManager::inst()->value( "ui",
@@ -128,7 +128,7 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 	m_tabBar->setFixedWidth( 72 );
 
 	QWidget * ws = new QWidget( settings );
-#ifdef LMMS_HAVE_STK_H
+#ifdef LMMS_HAVE_STK
 	ws->setFixedSize( 360, 422 );
 #else
 	ws->setFixedSize( 360, 366 );
@@ -227,7 +227,7 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 
 
 	QWidget * directories = new QWidget( ws );
-#ifdef LMMS_HAVE_STK_H
+#ifdef LMMS_HAVE_STK
 	directories->setFixedSize( 360, 372 );
 #else
 	directories->setFixedSize( 360, 326 );
@@ -331,7 +331,7 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 	connect( laddir_select_btn, SIGNAL( clicked() ), this,
 				 		SLOT( openLADSPADir() ) );
 
-#ifdef LMMS_HAVE_STK_H
+#ifdef LMMS_HAVE_STK
 	// STK-dir
 	tabWidget * stk_tw = new tabWidget( tr(
 			"STK rawwave directory" ).toUpper(),
@@ -361,7 +361,7 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 	dir_layout->addWidget( fl_tw );
 	dir_layout->addSpacing( 10 );
 	dir_layout->addWidget( lad_tw );
-#ifdef LMMS_HAVE_STK_H
+#ifdef LMMS_HAVE_STK
 	dir_layout->addSpacing( 10 );
 	dir_layout->addWidget( stk_tw );
 #endif	
@@ -439,27 +439,27 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 	asw_layout->setMargin( 0 );
 	//asw_layout->setAutoAdd( TRUE );
 
-#ifdef JACK_SUPPORT
+#ifdef LMMS_HAVE_JACK
 	m_audioIfaceSetupWidgets[audioJACK::name()] =
 					new audioJACK::setupWidget( asw );
 #endif
 
-#ifdef ALSA_SUPPORT
+#ifdef LMMS_HAVE_ALSA
 	m_audioIfaceSetupWidgets[audioALSA::name()] =
 					new audioALSA::setupWidget( asw );
 #endif
 
-#ifdef PULSEAUDIO_SUPPORT
+#ifdef LMMS_HAVE_PULSEAUDIO
 	m_audioIfaceSetupWidgets[audioPulseAudio::name()] =
 					new audioPulseAudio::setupWidget( asw );
 #endif
 
-#ifdef SDL_AUDIO_SUPPORT
+#ifdef LMMS_HAVE_SDL
 	m_audioIfaceSetupWidgets[audioSDL::name()] =
 					new audioSDL::setupWidget( asw );
 #endif
 
-#ifdef OSS_SUPPORT
+#ifdef LMMS_HAVE_OSS
 	m_audioIfaceSetupWidgets[audioOSS::name()] =
 					new audioOSS::setupWidget( asw );
 #endif
@@ -526,14 +526,14 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 	msw_layout->setMargin( 0 );
 	//msw_layout->setAutoAdd( TRUE );
 
-#ifdef ALSA_SUPPORT
+#ifdef LMMS_HAVE_ALSA
 	m_midiIfaceSetupWidgets[midiALSASeq::name()] =
 					new midiALSASeq::setupWidget( msw );
 	m_midiIfaceSetupWidgets[midiALSARaw::name()] =
 					new midiALSARaw::setupWidget( msw );
 #endif
 
-#ifdef OSS_SUPPORT
+#ifdef LMMS_HAVE_OSS
 	m_midiIfaceSetupWidgets[midiOSS::name()] =
 					new midiOSS::setupWidget( msw );
 #endif
@@ -663,7 +663,7 @@ void setupDialog::accept( void )
 	configManager::inst()->setArtworkDir( m_artworkDir );
 	configManager::inst()->setFLDir( m_flDir );
 	configManager::inst()->setLADSPADir( m_ladDir );
-#ifdef LMMS_HAVE_STK_H
+#ifdef LMMS_HAVE_STK
 	configManager::inst()->setSTKDir( m_stkDir );
 #endif	
 
@@ -913,7 +913,7 @@ void setupDialog::openLADSPADir( void )
 
 void setupDialog::openSTKDir( void )
 {
-#ifdef LMMS_HAVE_STK_H
+#ifdef LMMS_HAVE_STK
 	QString new_dir = QFileDialog::getExistingDirectory( this,
 				tr( "Choose STK rawwave directory" ),
 							m_ladDir );
@@ -945,7 +945,7 @@ void setupDialog::setLADSPADir( const QString & _fd )
 
 void setupDialog::setSTKDir( const QString & _fd )
 {
-#ifdef LMMS_HAVE_STK_H
+#ifdef LMMS_HAVE_STK
 	m_stkDir = _fd;
 #endif
 }
@@ -1013,7 +1013,7 @@ void setupDialog::displayMIDIHelp( void )
 
 
 
-#include "setup_dialog.moc"
+#include "moc_setup_dialog.cxx"
 
 
 #endif

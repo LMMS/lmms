@@ -228,7 +228,7 @@ void tabWidget::wheelEvent( QWheelEvent * _we )
 
 
 
-#include "tab_widget.moc"
+#include "moc_tab_widget.cxx"
 
 
 #endif

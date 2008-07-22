@@ -225,7 +225,7 @@ controllerDialog * controller::createDialog( QWidget * _parent )
 }
 
 
-#include "controller.moc"
+#include "moc_controller.cxx"
 
 
 #endif

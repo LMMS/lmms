@@ -869,7 +869,7 @@ void pianoView::paintEvent( QPaintEvent * )
 
 
 
-#include "piano.moc"
+#include "moc_piano.cxx"
 
 
 #endif

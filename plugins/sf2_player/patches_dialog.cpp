@@ -361,4 +361,4 @@ void patchesDialog::progChanged (QTreeWidgetItem * _curr, QTreeWidgetItem * _pre
 }
 
 
-#include "patches_dialog.moc"
+#include "moc_patches_dialog.cxx"

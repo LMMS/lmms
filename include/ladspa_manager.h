@@ -28,14 +28,7 @@
 #ifndef _LADSPA_MANAGER_H
 #define _LADSPA_MANAGER_H
 
-#include "lmmsconfig.h"
-
-#ifdef LMMS_HAVE_LADSPA_H
 #include <ladspa.h>
-#else
-#include "ladspa-1.1.h"
-#endif
-
 
 #include <QtCore/QMap>
 #include <QtCore/QPair>

@@ -102,7 +102,7 @@ void nStateButton::mousePressEvent( QMouseEvent * _me )
 
 
 
-#include "nstate_button.moc"
+#include "moc_nstate_button.cxx"
 
 
 #endif

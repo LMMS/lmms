@@ -274,4 +274,4 @@ void nineButtonSelector::displayHelp( void )
 
 
 
-#include "nine_button_selector.moc"
+#include "moc_nine_button_selector.cxx"

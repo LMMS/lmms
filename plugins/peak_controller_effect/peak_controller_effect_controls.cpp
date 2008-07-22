@@ -74,5 +74,5 @@ void peakControllerEffectControls::saveSettings( QDomDocument & _doc,
 
 
 
-#include "peak_controller_effect_controls.moc"
+#include "moc_peak_controller_effect_controls.cxx"
 

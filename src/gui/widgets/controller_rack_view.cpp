@@ -280,6 +280,6 @@ void effectRackView::modelChanged( void )
 */
 
 
-#include "controller_rack_view.moc"
+#include "moc_controller_rack_view.cxx"
 
 #endif

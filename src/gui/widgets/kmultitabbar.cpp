@@ -912,7 +912,7 @@ QList<KMultiTabBarTab *>* KMultiTabBar::tabs() {return m_internal->tabs();}
 QList<KMultiTabBarButton *>* KMultiTabBar::buttons() {return &m_buttons;}
 
 
-#include "kmultitabbar.moc"
+#include "moc_kmultitabbar.cxx"
 
 
 

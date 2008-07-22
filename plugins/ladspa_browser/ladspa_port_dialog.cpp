@@ -180,4 +180,5 @@ ladspaPortDialog::~ladspaPortDialog()
 
 
 
-#include  "ladspa_port_dialog.moc"
+#include  "moc_ladspa_port_dialog.cxx"
+

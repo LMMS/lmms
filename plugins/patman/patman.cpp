@@ -675,4 +675,4 @@ const QStringList & patmanInstrument::subPluginFeatures::supported_extensions(
 
 
 
-#include "patman.moc"
+#include "moc_patman.cxx"

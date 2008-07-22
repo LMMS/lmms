@@ -573,7 +573,7 @@ void bbTrackView::clickedTrackLabel( void )
 
 
 
-#include "bb_track.moc"
+#include "moc_bb_track.cxx"
 
 
 #endif

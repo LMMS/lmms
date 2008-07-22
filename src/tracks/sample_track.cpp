@@ -479,7 +479,7 @@ void sampleTrackView::showEffects( void )
 
 
 
-#include "sample_track.moc"
+#include "moc_sample_track.cxx"
 
 
 #endif

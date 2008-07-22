@@ -760,7 +760,7 @@ void automationPatternView::dropEvent( QDropEvent * _de )
 
 
 
-#include "automation_pattern.moc"
+#include "moc_automation_pattern.cxx"
 
 
 #endif

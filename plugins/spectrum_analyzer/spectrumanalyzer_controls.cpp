@@ -58,5 +58,5 @@ void spectrumAnalyzerControls::saveSettings( QDomDocument & _doc,
 
 
 
-#include "spectrumanalyzer_controls.moc"
+#include "moc_spectrumanalyzer_controls.cxx"
 

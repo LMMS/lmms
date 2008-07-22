@@ -139,7 +139,7 @@ public:
 		return( m_ladDir );
 	}
 
-#ifdef LMMS_HAVE_STK_H
+#ifdef LMMS_HAVE_STK
 	const QString & stkDir( void ) const
 	{
 		return( m_stkDir );
@@ -186,7 +186,7 @@ private:
 	QString m_vstDir;
 	QString m_flDir;
 	QString m_ladDir;
-#ifdef LMMS_HAVE_STK_H
+#ifdef LMMS_HAVE_STK
 	QString m_stkDir;
 #endif
 	QStringList m_recentlyOpenedProjects;

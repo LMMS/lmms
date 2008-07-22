@@ -338,7 +338,7 @@ void lcdSpinBox::wheelEvent( QWheelEvent * _we )
 
 
 
-#include "lcd_spinbox.moc"
+#include "moc_lcd_spinbox.cxx"
 
 
 #endif

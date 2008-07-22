@@ -122,7 +122,7 @@ private:
 	QLineEdit * m_adLineEdit;
 	QLineEdit * m_fdLineEdit;
 	QLineEdit * m_ladLineEdit;
-#ifdef LMMS_HAVE_STK_H
+#ifdef LMMS_HAVE_STK
 	QLineEdit * m_stkLineEdit;
 #endif
 
@@ -131,7 +131,7 @@ private:
 	QString m_artworkDir;
 	QString m_flDir;
 	QString m_ladDir;
-#ifdef LMMS_HAVE_STK_H
+#ifdef LMMS_HAVE_STK
 	QString m_stkDir;
 #endif
 

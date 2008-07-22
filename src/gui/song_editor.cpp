@@ -640,7 +640,7 @@ bool songEditor::allowRubberband( void ) const
 
 
 
-#include "song_editor.moc"
+#include "moc_song_editor.cxx"
 
 
 #endif

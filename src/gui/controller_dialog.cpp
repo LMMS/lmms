@@ -53,6 +53,6 @@ void controllerDialog::closeEvent( QCloseEvent * _ce )
 }
 
 
-#include "controller_dialog.moc"
+#include "moc_controller_dialog.cxx"
 
 #endif

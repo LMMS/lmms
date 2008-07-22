@@ -167,7 +167,7 @@ void exportProjectDialog::updateTitleBar( int _prog )
 
 
 
-#include "export_project_dialog.moc"
+#include "moc_export_project_dialog.cxx"
 
 
 #endif

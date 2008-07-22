@@ -3,7 +3,7 @@
 /*
  * midi_oss.cpp - OSS-raw-midi-client
  *
- * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -27,14 +27,14 @@
 
 #include "midi_oss.h"
 
-#ifdef OSS_SUPPORT
+#ifdef LMMS_HAVE_OSS
 
 
 #include <QtGui/QLabel>
 #include <QtGui/QLineEdit>
 
 
-#ifdef HAVE_STDLIB_H
+#ifdef LMMS_HAVE_STDLIB_H
 #include <stdlib.h>
 #endif
 

@@ -35,19 +35,19 @@
  * 31 Oct 07, jasp00@users.sourceforge.net: replaced deprecated conversions
  *--------------------------------------------------------------------*/
 
-#ifdef HAVE_CONFIG_H
+#ifdef LMMS_HAVE_CONFIG_H
 #include <config.h>
 #endif
 
-#ifdef HAVE_STDIO_H
+#ifdef LMMS_HAVE_STDIO_H
 #include <stdio.h>
 #endif
 
-#ifdef HAVE_STRING_H
+#ifdef LMMS_HAVE_STRING_H
 #include <string.h>
 #endif
 
-#ifdef HAVE_STDLIB_H
+#ifdef LMMS_HAVE_STDLIB_H
 #include <stdlib.h>
 #endif
 
@@ -106,10 +106,10 @@ attr_express_begin (int attr, const char* param) {
 	switch(attr) 
 	{
 	case ATTR_BOLD: 
-		outstring+=QString().sprintf(op->bold_begin); 
+		outstring+=QString("%1").arg(op->bold_begin); 
 		break;
 	case ATTR_ITALIC: 
-		outstring+=QString().sprintf(op->italic_begin); 
+		outstring+=QString("%1").arg(op->italic_begin); 
 		break;
 
 	/* Various underlines, they all resolve to HTML's <u> */
@@ -121,11 +121,11 @@ attr_express_begin (int attr, const char* param) {
 	case ATTR_2DOT_DASH_UL:
 	case ATTR_WORD_UL: 
 	case ATTR_UNDERLINE: 
-		outstring+=QString().sprintf(op->underline_begin); 
+		outstring+=QString("%1").arg(op->underline_begin); 
 		break;
 
 	case ATTR_DOUBLE_UL: 
-		outstring+=QString().sprintf(op->dbl_underline_begin); 
+		outstring+=QString("%1").arg(op->dbl_underline_begin); 
 		break;
 
 	case ATTR_FONTSIZE: 
@@ -133,48 +133,48 @@ attr_express_begin (int attr, const char* param) {
 		break;
 
 	case ATTR_FONTFACE: 
-		outstring+=QString().sprintf(op->font_begin,param); 
+		outstring+=QString("%1").arg(op->font_begin,param); 
 		break;
 
 	case ATTR_FOREGROUND: 
-		outstring+=QString().sprintf(op->foreground_begin, param); 
+		outstring+=QString("%1").arg(op->foreground_begin, param); 
 		break;
 
 	case ATTR_BACKGROUND: 
 		if (!simple_mode)
-		  outstring+=QString().sprintf(op->foreground_begin,param); 
+		  outstring+=QString("%1").arg(op->foreground_begin,param); 
 		break;
 
 	case ATTR_SUPER: 
-		outstring+=QString().sprintf(op->superscript_begin); 
+		outstring+=QString("%1").arg(op->superscript_begin); 
 		break;
 	case ATTR_SUB: 
-		outstring+=QString().sprintf(op->subscript_begin); 
+		outstring+=QString("%1").arg(op->subscript_begin); 
 		break;
 
 	case ATTR_STRIKE: 
-		outstring+=QString().sprintf(op->strikethru_begin); 
+		outstring+=QString("%1").arg(op->strikethru_begin); 
 		break;
 
 	case ATTR_DBL_STRIKE: 
-		outstring+=QString().sprintf(op->dbl_strikethru_begin); 
+		outstring+=QString("%1").arg(op->dbl_strikethru_begin); 
 		break;
 
 	case ATTR_EXPAND: 
-		outstring+=QString().sprintf(op->expand_begin, param); 
+		outstring+=QString("%1").arg(op->expand_begin, param); 
 		break;
 
 	case ATTR_OUTLINE: 
-		outstring+=QString().sprintf(op->outline_begin); 
+		outstring+=QString("%1").arg(op->outline_begin); 
 		break;
 	case ATTR_SHADOW: 
-		outstring+=QString().sprintf(op->shadow_begin); 
+		outstring+=QString("%1").arg(op->shadow_begin); 
 		break;
 	case ATTR_EMBOSS: 
-		outstring+=QString().sprintf(op->emboss_begin); 
+		outstring+=QString("%1").arg(op->emboss_begin); 
 		break;
 	case ATTR_ENGRAVE: 
-		outstring+=QString().sprintf(op->engrave_begin); 
+		outstring+=QString("%1").arg(op->engrave_begin); 
 		break;
 
 	case ATTR_CAPS:
@@ -187,7 +187,7 @@ attr_express_begin (int attr, const char* param) {
 			simulate_smallcaps = TRUE;
 		else {
 			if (op->small_caps_begin)
-				outstring+=QString().sprintf(op->small_caps_begin); 
+				outstring+=QString("%1").arg(op->small_caps_begin); 
 		}
 		break;
 	}
@@ -207,10 +207,10 @@ attr_express_end (int attr, char *param)
 	switch(attr) 
 	{
 	case ATTR_BOLD: 
-		outstring+=QString().sprintf(op->bold_end); 
+		outstring+=QString("%1").arg(op->bold_end); 
 		break;
 	case ATTR_ITALIC: 
-		outstring+=QString().sprintf(op->italic_end); 
+		outstring+=QString("%1").arg(op->italic_end); 
 		break;
 
 	/* Various underlines, they all resolve to HTML's </u> */
@@ -222,11 +222,11 @@ attr_express_end (int attr, char *param)
 	case ATTR_2DOT_DASH_UL: 
 	case ATTR_WORD_UL: 
 	case ATTR_UNDERLINE: 
-		outstring+=QString().sprintf(op->underline_end); 
+		outstring+=QString("%1").arg(op->underline_end); 
 		break;
 
 	case ATTR_DOUBLE_UL: 
-		outstring+=QString().sprintf(op->dbl_underline_end); 
+		outstring+=QString("%1").arg(op->dbl_underline_end); 
 		break;
 
 	case ATTR_FONTSIZE: 
@@ -234,47 +234,47 @@ attr_express_end (int attr, char *param)
 		break;
 
 	case ATTR_FONTFACE: 
-		outstring+=QString().sprintf(op->font_end); 
+		outstring+=QString("%1").arg(op->font_end); 
 		break;
 
 	case ATTR_FOREGROUND: 
-		outstring+=QString().sprintf(op->foreground_end); 
+		outstring+=QString("%1").arg(op->foreground_end); 
 		break;
 	case ATTR_BACKGROUND: 
 		if (!simple_mode)
-		  outstring+=QString().sprintf(op->background_end);
+		  outstring+=QString("%1").arg(op->background_end);
 		break;
 
 	case ATTR_SUPER: 
-		outstring+=QString().sprintf(op->superscript_end); 
+		outstring+=QString("%1").arg(op->superscript_end); 
 		break;
 	case ATTR_SUB: 
-		outstring+=QString().sprintf(op->subscript_end); 
+		outstring+=QString("%1").arg(op->subscript_end); 
 		break;
 
 	case ATTR_STRIKE: 
-		outstring+=QString().sprintf(op->strikethru_end); 
+		outstring+=QString("%1").arg(op->strikethru_end); 
 		break;
 
 	case ATTR_DBL_STRIKE: 
-		outstring+=QString().sprintf(op->dbl_strikethru_end); 
+		outstring+=QString("%1").arg(op->dbl_strikethru_end); 
 		break;
 
 	case ATTR_OUTLINE: 
-		outstring+=QString().sprintf(op->outline_end); 
+		outstring+=QString("%1").arg(op->outline_end); 
 		break;
 	case ATTR_SHADOW: 
-		outstring+=QString().sprintf(op->shadow_end); 
+		outstring+=QString("%1").arg(op->shadow_end); 
 		break;
 	case ATTR_EMBOSS: 
-		outstring+=QString().sprintf(op->emboss_end); 
+		outstring+=QString("%1").arg(op->emboss_end); 
 		break;
 	case ATTR_ENGRAVE: 
-		outstring+=QString().sprintf(op->engrave_end); 
+		outstring+=QString("%1").arg(op->engrave_end); 
 		break;
 
 	case ATTR_EXPAND: 
-		outstring+=QString().sprintf(op->expand_end); 
+		outstring+=QString("%1").arg(op->expand_end); 
 		break;
 
 	case ATTR_CAPS:
@@ -287,7 +287,7 @@ attr_express_end (int attr, char *param)
 			simulate_smallcaps = FALSE;
 		else {
 			if (op->small_caps_end)
-				outstring+=QString().sprintf(op->small_caps_end); 
+				outstring+=QString("%1").arg(op->small_caps_end); 
 		}
 		break;
 	}

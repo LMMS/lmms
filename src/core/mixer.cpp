@@ -914,7 +914,7 @@ audioDevice * mixer::tryAudioDevices( void )
 		dev_name = "";
 	}
 
-#ifdef ALSA_SUPPORT
+#ifdef LMMS_HAVE_ALSA
 	if( dev_name == audioALSA::name() || dev_name == "" )
 	{
 		dev = new audioALSA( success_ful, this );
@@ -928,7 +928,7 @@ audioDevice * mixer::tryAudioDevices( void )
 #endif
 
 
-#ifdef PULSEAUDIO_SUPPORT
+#ifdef LMMS_HAVE_PULSEAUDIO
 	if( dev_name == audioPulseAudio::name() || dev_name == "" )
 	{
 		dev = new audioPulseAudio( success_ful, this );
@@ -942,7 +942,7 @@ audioDevice * mixer::tryAudioDevices( void )
 #endif
 
 
-#ifdef OSS_SUPPORT
+#ifdef LMMS_HAVE_OSS
 	if( dev_name == audioOSS::name() || dev_name == "" )
 	{
 		dev = new audioOSS( success_ful, this );
@@ -956,7 +956,7 @@ audioDevice * mixer::tryAudioDevices( void )
 #endif
 
 
-#ifdef JACK_SUPPORT
+#ifdef LMMS_HAVE_JACK
 	if( dev_name == audioJACK::name() || dev_name == "" )
 	{
 		dev = new audioJACK( success_ful, this );
@@ -970,7 +970,7 @@ audioDevice * mixer::tryAudioDevices( void )
 #endif
 
 
-#ifdef SDL_AUDIO_SUPPORT
+#ifdef LMMS_HAVE_SDL
 	if( dev_name == audioSDL::name() || dev_name == "" )
 	{
 		dev = new audioSDL( success_ful, this );
@@ -1008,7 +1008,7 @@ midiClient * mixer::tryMIDIClients( void )
 	QString client_name = configManager::inst()->value( "mixer",
 								"mididev" );
 
-#ifdef ALSA_SUPPORT
+#ifdef LMMS_HAVE_ALSA
 	if( client_name == midiALSASeq::name() || client_name == "" )
 	{
 		midiALSASeq * malsas = new midiALSASeq;
@@ -1032,7 +1032,7 @@ midiClient * mixer::tryMIDIClients( void )
 	}
 #endif
 
-#ifdef OSS_SUPPORT
+#ifdef LMMS_HAVE_OSS
 	if( client_name == midiOSS::name() || client_name == "" )
 	{
 		midiOSS * moss = new midiOSS;
@@ -1096,7 +1096,7 @@ void mixer::fifoWriter::run( void )
 
 
 
-#include "mixer.moc"
+#include "moc_mixer.cxx"
 
 
 #endif

@@ -26,13 +26,12 @@
 #ifndef _MIDI_OSS_H
 #define _MIDI_OSS_H
 
-#include "audio_oss.h"
+#include "lmmsconfig.h"
 
-#ifdef OSS_SUPPORT
+#ifdef LMMS_HAVE_OSS
 
-
-#include <qthread.h>
-#include <qfile.h>
+#include <QtCore/QThread>
+#include <QtCore/QFile>
 
 #include "midi_client.h"
 

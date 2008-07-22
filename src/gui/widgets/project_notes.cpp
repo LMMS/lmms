@@ -403,7 +403,7 @@ void projectNotes::loadSettings( const QDomElement & _this )
 }
 
 
-#include "project_notes.moc"
+#include "moc_project_notes.cxx"
 
 
 #endif

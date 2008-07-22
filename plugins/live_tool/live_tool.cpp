@@ -200,7 +200,3 @@ void liveToolView::toggleInstrument( int _n )
 }
 
 
-
-
-
-#include "live_tool.moc"

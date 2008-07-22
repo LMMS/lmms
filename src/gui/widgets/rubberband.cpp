@@ -104,7 +104,7 @@ QVector<selectableObject *> rubberBand::selectableObjects( void ) const
 
 
 
-#include "rubberband.moc"
+#include "moc_rubberband.cxx"
 
 
 #endif

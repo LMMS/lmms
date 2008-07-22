@@ -213,5 +213,5 @@ dummyTrackContainer::dummyTrackContainer( void ) :
 
 
 
-#include "track_container.moc"
+#include "moc_track_container.cxx"
 

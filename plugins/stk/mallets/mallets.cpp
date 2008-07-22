@@ -665,6 +665,6 @@ plugin * lmms_plugin_main( model *, void * _data )
 }
 
 
-#include "mallets.moc"
+#include "moc_mallets.cxx"
 
 

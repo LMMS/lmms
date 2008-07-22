@@ -268,6 +268,6 @@ void effectView::modelChanged( void )
 }
 
 
-#include "effect_view.moc"
+#include "moc_effect_view.cxx"
 
 #endif

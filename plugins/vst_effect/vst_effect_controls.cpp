@@ -65,5 +65,5 @@ void vstEffectControls::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 
 
-#include "vst_effect_controls.moc"
+#include "moc_vst_effect_controls.cxx"
 

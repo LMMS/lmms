@@ -112,5 +112,5 @@ void modelView::doConnections( void )
 }
 
 
-#include "mv_base.moc"
+#include "moc_mv_base.cxx"
 

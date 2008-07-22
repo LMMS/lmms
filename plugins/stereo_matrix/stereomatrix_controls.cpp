@@ -76,5 +76,5 @@ void stereoMatrixControls::saveSettings( QDomDocument & _doc,
 
 
 
-#include "stereomatrix_controls.moc"
+#include "moc_stereomatrix_controls.cxx"
 

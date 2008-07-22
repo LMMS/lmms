@@ -28,11 +28,7 @@
 
 #include "lmmsconfig.h"
 
-#ifdef LMMS_HAVE_PULSE_PULSEAUDIO_H
-
-#ifndef PULSEAUDIO_SUPPORT
-#define PULSEAUDIO_SUPPORT
-#endif
+#ifdef LMMS_HAVE_PULSEAUDIO
 
 #include <pulse/pulseaudio.h>
 

@@ -89,8 +89,8 @@ void sideBarWidget::resizeEvent( QResizeEvent * )
 
 
 
-#include "side_bar.moc"
-#include "side_bar_widget.moc"
+#include "moc_side_bar.cxx"
+#include "moc_side_bar_widget.cxx"
 
 
 #endif

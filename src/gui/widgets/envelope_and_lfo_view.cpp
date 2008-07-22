@@ -584,7 +584,7 @@ void envelopeAndLFOView::lfoUserWaveChanged( void )
 
 
 
-#include "envelope_and_lfo_view.moc"
+#include "moc_envelope_and_lfo_view.cxx"
 
 
 #endif

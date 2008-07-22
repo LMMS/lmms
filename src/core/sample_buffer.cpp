@@ -38,11 +38,9 @@
 
 #include <cstring>
 
-#ifdef LMMS_HAVE_SNDFILE_H
 #include <sndfile.h>
-#endif
 
-#ifdef LMMS_HAVE_VORBIS_VORBISFILE_H
+#ifdef LMMS_HAVE_OGGVORBIS
 #include <vorbis/vorbisfile.h>
 #endif
 
@@ -189,14 +187,12 @@ void sampleBuffer::update( bool _keep_settings )
 
 		m_frames = 0;
 
-#ifdef LMMS_HAVE_SNDFILE_H
 		if( m_frames == 0 )
 		{
 			m_frames = decodeSampleSF( f, buf, channels,
 								samplerate );
 		}
-#endif
-#ifdef LMMS_HAVE_VORBIS_VORBISFILE_H
+#ifdef LMMS_HAVE_OGGVORBIS
 		if( m_frames == 0 )
 		{
 			m_frames = decodeSampleOGGVorbis( f, buf, channels,
@@ -314,7 +310,6 @@ void sampleBuffer::normalizeSampleRate( const sample_rate_t _src_sr,
 
 
 
-#ifdef LMMS_HAVE_SNDFILE_H
 f_cnt_t sampleBuffer::decodeSampleSF( const char * _f,
 					int_sample_t * & _buf,
 					ch_cnt_t & _channels,
@@ -323,15 +318,9 @@ f_cnt_t sampleBuffer::decodeSampleSF( const char * _f,
 	SNDFILE * snd_file;
 	SF_INFO sf_info;
 	f_cnt_t frames = 0;
-#ifdef OLD_SNDFILE
-	if( ( snd_file = sf_open_read( _f, &sf_info ) ) != NULL )
-	{
-		frames = sf_info.samples;
-#else
 	if( ( snd_file = sf_open( _f, SFM_READ, &sf_info ) ) != NULL )
 	{
 		frames = sf_info.frames;
-#endif
 		_buf = new int_sample_t[sf_info.channels * frames];
 		if( sf_read_short( snd_file, _buf, sf_info.channels * frames )
 						< sf_info.channels * frames )
@@ -355,12 +344,11 @@ f_cnt_t sampleBuffer::decodeSampleSF( const char * _f,
 	}
 	return( frames );
 }
-#endif
 
 
 
 
-#ifdef LMMS_HAVE_VORBIS_VORBISFILE_H
+#ifdef LMMS_HAVE_OGGVORBIS
 
 // callback-functions for reading ogg-file
 
@@ -1213,7 +1201,7 @@ sampleBuffer::handleState::~handleState()
 
 
 
-#include "sample_buffer.moc"
+#include "moc_sample_buffer.cxx"
 
 
 #endif

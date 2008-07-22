@@ -75,5 +75,5 @@ void meterModel::loadSettings( const QDomElement & _this,
 
 
 
-#include "meter_model.moc"
+#include "moc_meter_model.cxx"
 

@@ -95,6 +95,6 @@ void ledCheckBox::paintEvent( QPaintEvent * )
 
 
 
-#include "led_checkbox.moc"
+#include "moc_led_checkbox.cxx"
 
 #endif

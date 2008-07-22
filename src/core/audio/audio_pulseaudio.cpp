@@ -32,8 +32,7 @@
 
 #include "audio_pulseaudio.h"
 
-
-#ifdef PULSEAUDIO_SUPPORT
+#ifdef LMMS_HAVE_PULSEAUDIO
 
 #include "endian_handling.h"
 #include "config_mgr.h"
@@ -307,5 +306,5 @@ void audioPulseAudio::setupWidget::saveSettings( void )
 
 #endif
 
-
 #endif
+

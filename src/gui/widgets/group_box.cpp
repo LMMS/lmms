@@ -152,7 +152,7 @@ void groupBox::updatePixmap( void )
 
 
 
-#include "group_box.moc"
+#include "moc_group_box.cxx"
 
 
 #endif

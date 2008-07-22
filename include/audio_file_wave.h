@@ -31,9 +31,7 @@
 #include "lmmsconfig.h"
 #include "audio_file_device.h"
 
-#ifdef LMMS_HAVE_SNDFILE_H
 #include <sndfile.h>
-#endif
 
 
 class audioFileWave : public audioFileDevice
@@ -79,29 +77,8 @@ private:
 	void finishEncoding( void );
 
 
-#if LMMS_HAVE_SNDFILE_H
 	SF_INFO m_si;
 	SNDFILE * m_sf;
-#else
-	int m_bytesWritten;
-
-	struct waveFileHeader
-	{
-		char riff_id[4];		// "RIFF"
-		Uint32 total_bytes;		// total filesize-8
-		char wave_fmt_str[8];		// "WAVEfmt"
-		Uint32 bitrate_1;		// bitrate, e.g. 16
-		Uint16 uncompressed;		// 1 if PCM
-		Uint16 channels;		// 1 = mono  2 = stereo
-		Uint32 sample_rate;		// sample-rate e.g. 44100
-		Uint32 bytes_per_second;	// sample-rate*channels*
-						// (bitrate/8)
-		Uint16 block_alignment;		// channels*(bitrate/8)
-		Uint16 bitrate_2;		// bitrate, e.g. 16
-		char data_chunk_id[4];		// "data"
-		Uint32 data_bytes;		// total size of sample-data
-	} m_waveFileHeader;
-#endif
 
 } ;
 

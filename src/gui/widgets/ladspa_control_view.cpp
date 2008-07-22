@@ -128,5 +128,5 @@ ladspaControlView::~ladspaControlView()
 
 
 
-#include "ladspa_control_view.moc"
+#include "moc_ladspa_control_view.cxx"
 

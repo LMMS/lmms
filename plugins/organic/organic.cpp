@@ -585,4 +585,4 @@ plugin * PLUGIN_EXPORT lmms_plugin_main( model *, void * _data )
 
 
 
-#include "organic.moc"
+#include "moc_organic.cxx"

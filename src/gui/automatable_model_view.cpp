@@ -239,4 +239,4 @@ void automatableModelViewSlots::editSongGlobalAutomation( void )
 
 
 
-#include "automatable_model_view.moc"
+#include "moc_automatable_model_view.cxx"

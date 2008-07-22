@@ -103,5 +103,5 @@ void bassBoosterControls::saveSettings( QDomDocument & _doc,
 
 
 
-#include "bassbooster_controls.moc"
+#include "moc_bassbooster_controls.cxx"
 

@@ -38,23 +38,23 @@
  * 29 Mar 05, daved@physiol.usyd.edu.au: changes requested by ZT Smith
  *--------------------------------------------------------------------*/
 
-#ifdef HAVE_CONFIG_H
+#ifdef LMMS_HAVE_CONFIG_H
 #include <config.h>
 #endif
 
-#ifdef HAVE_STDIO_H
+#ifdef LMMS_HAVE_STDIO_H
 #include <stdio.h>
 #endif
 
-#ifdef HAVE_STDLIB_H
+#ifdef LMMS_HAVE_STDLIB_H
 #include <stdlib.h>
 #endif
 
-#ifdef HAVE_CTYPE_H
+#ifdef LMMS_HAVE_CTYPE_H
 #include <ctype.h>
 #endif
 
-#ifdef HAVE_STRING_H
+#ifdef LMMS_HAVE_STRING_H
 #include <string.h>
 #endif
 

@@ -548,5 +548,5 @@ plugin * lmms_plugin_main( model *, void * _data )
 }
 
 
-#include "vestige.moc"
+#include "moc_vestige.cxx"
 

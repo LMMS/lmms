@@ -28,16 +28,10 @@
 
 #include "lmmsconfig.h"
 
-#ifdef LMMS_HAVE_SDL_SDL_AUDIO_H
+#ifdef LMMS_HAVE_SDL
 
-#ifndef SDL_AUDIO_SUPPORT
-#define SDL_AUDIO_SUPPORT
-#endif
-
-
-#include LMMS_SDL_SDL_H
-#include LMMS_SDL_SDL_AUDIO_H
-
+#include <SDL.h>
+#include <SDL_audio.h>
 
 #include "audio_device.h"
 

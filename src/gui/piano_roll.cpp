@@ -2760,7 +2760,7 @@ bool pianoRoll::x11Event( XEvent * _xe )
 
 
 
-#include "piano_roll.moc"
+#include "moc_piano_roll.cxx"
 
 
 #endif

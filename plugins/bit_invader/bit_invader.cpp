@@ -561,4 +561,4 @@ plugin * PLUGIN_EXPORT lmms_plugin_main( model *, void * _data )
 
 
 
-#include "bit_invader.moc"
+#include "moc_bit_invader.cxx"

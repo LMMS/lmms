@@ -178,6 +178,6 @@ void controllerView::modelChanged( void )
 }
 
 
-#include "controller_view.moc"
+#include "moc_controller_view.cxx"
 
 #endif

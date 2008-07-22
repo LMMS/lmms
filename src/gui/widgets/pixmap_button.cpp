@@ -135,7 +135,7 @@ void pixmapButton::setInactiveGraphic( const QPixmap & _pm, bool _update )
 
 
 
-#include "pixmap_button.moc"
+#include "moc_pixmap_button.cxx"
 
 
 #endif

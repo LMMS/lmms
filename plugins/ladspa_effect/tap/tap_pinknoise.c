@@ -25,7 +25,7 @@
 #include <math.h>
 #include <time.h>
 
-#include "ladspa-local.h"
+#include <ladspa.h>
 #include "tap_utils.h"
 
 /* The Unique ID of the plugin: */

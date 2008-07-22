@@ -234,7 +234,7 @@ void trackLabelButton::dropEvent( QDropEvent * _de )
 
 
 
-#include "track_label_button.moc"
+#include "moc_track_label_button.cxx"
 
 
 #endif

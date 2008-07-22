@@ -399,6 +399,6 @@ void instrumentSoundShaping::loadSettings( const QDomElement & _this )
 
 
 
-#include "instrument_sound_shaping.moc"
+#include "moc_instrument_sound_shaping.cxx"
 
 #endif

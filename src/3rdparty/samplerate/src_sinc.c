@@ -201,8 +201,8 @@ sinc_set_converter (SRC_PRIVATE *psrc, int src_enum)
 	** a better way. Need to look at prepare_data () at the same time.
 	*/
 
-	temp_filter.b_len = 1000 + 2 * lrint (0.5 + 2 * temp_filter.coeff_half_len / (temp_filter.index_inc * 1.0) * SRC_MAX_RATIO) ;
-	temp_filter.b_len = MIN (temp_filter.b_len, 4096) ;
+	temp_filter.b_len = 2 * lrint (1.0 + temp_filter.coeff_half_len / (temp_filter.index_inc * 1.0) * SRC_MAX_RATIO) ;
+	temp_filter.b_len = MAX (temp_filter.b_len, 4096) ;
 	temp_filter.b_len *= temp_filter.channels ;
 
 	if ((filter = calloc (1, sizeof (SINC_FILTER) + sizeof (filter->buffer [0]) * (temp_filter.b_len + temp_filter.channels))) == NULL)

@@ -391,7 +391,7 @@ void midiPort::subscribeWriteablePort( const QString & _port, bool _subscribe )
 
 
 
-#include "midi_port.moc"
+#include "moc_midi_port.cxx"
 
 
 #endif

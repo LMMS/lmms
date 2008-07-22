@@ -28,7 +28,7 @@
 #include "audio_oss.h"
 
 
-#ifdef OSS_SUPPORT
+#ifdef LMMS_HAVE_OSS
 
 #include <QtCore/QFileInfo>
 #include <QtGui/QLabel>

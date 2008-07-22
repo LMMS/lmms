@@ -53,7 +53,7 @@ public:
 		gettimeofday( &begin, NULL );
 	}
 
-	inline Uint32 elapsed( void ) const
+	inline int elapsed( void ) const
 	{
 		struct timeval now;
 		gettimeofday( &now, NULL );

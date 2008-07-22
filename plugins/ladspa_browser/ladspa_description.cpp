@@ -221,4 +221,4 @@ void ladspaDescription::onDoubleClicked( QListWidgetItem * _item )
 
 
 
-#include "ladspa_description.moc"
+#include "moc_ladspa_description.cxx"

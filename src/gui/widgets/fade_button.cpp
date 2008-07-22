@@ -125,7 +125,7 @@ void fadeButton::signalUpdate( void )
 
 
 
-#include "fade_button.moc"
+#include "moc_fade_button.cxx"
 
 
 #endif

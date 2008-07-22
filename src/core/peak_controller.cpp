@@ -112,7 +112,7 @@ controllerDialog * peakController::createDialog( QWidget * _parent )
 }
 
 
-#include "peak_controller.moc"
+#include "moc_peak_controller.cxx"
 
 
 #endif

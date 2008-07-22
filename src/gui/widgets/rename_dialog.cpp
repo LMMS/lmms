@@ -77,7 +77,7 @@ void renameDialog::textChanged( const QString & _new_string )
 
 
 
-#include "rename_dialog.moc"
+#include "moc_rename_dialog.cxx"
 
 
 #endif

@@ -110,8 +110,6 @@ public:
 
 		virtual void saveSettings( void ) = 0;
 
-
-	public slots:
 		virtual void show( void )
 		{
 			parentWidget()->show();

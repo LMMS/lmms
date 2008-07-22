@@ -146,6 +146,6 @@ void automatableSlider::updateSlider( void )
 
 
 
-#include "automatable_slider.moc"
+#include "moc_automatable_slider.cxx"
 
 #endif

@@ -28,15 +28,9 @@
 
 #include "lmmsconfig.h"
 
-#ifdef LMMS_HAVE_ALSA_ASOUNDLIB_H
-
-#ifndef ALSA_SUPPORT
-#define ALSA_SUPPORT
-#endif
+#ifdef LMMS_HAVE_ALSA
 
 #include <alsa/asoundlib.h>
-
-#endif
 
 #include <QtCore/QThread>
 #include <QtCore/QTimer>
@@ -132,7 +126,6 @@ private slots:
 
 private:
 	virtual void run( void );
-#ifdef ALSA_SUPPORT
 
 	snd_seq_t * m_seqHandle;
 	struct ports
@@ -146,7 +139,6 @@ private:
 	int m_queueID;
 
 	volatile bool m_quit;
-#endif
 
 	QTimer m_portListUpdateTimer;
 	QStringList m_readablePorts;
@@ -160,6 +152,8 @@ signals:
 	void writeablePortsChanged( void );
 
 } ;
+
+#endif
 
 #endif
 

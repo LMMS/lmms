@@ -1409,7 +1409,7 @@ void instrumentTrackWindow::loadSettings( const QDomElement & _this )
 
 
 
-#include "instrument_track.moc"
+#include "moc_instrument_track.cxx"
 
 
 #endif

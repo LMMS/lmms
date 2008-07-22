@@ -42,7 +42,7 @@
 
 #undef SINGLE_SOURCE_COMPILE
 #include "embed.cpp"
-#include "lb302.moc"
+#include "moc_lb302.cxx"
 
 
 // Envelope Recalculation period

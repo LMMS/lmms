@@ -26,14 +26,7 @@
 #ifndef _LADSPA_CONTROL_H
 #define _LADSPA_CONTROL_H
 
-#include "lmmsconfig.h"
-
-#ifdef LMMS_HAVE_LADSPA_H
 #include <ladspa.h>
-#else
-#include "ladspa-1.1.h"
-#endif
-
 
 #include "automatable_model.h"
 #include "knob.h"

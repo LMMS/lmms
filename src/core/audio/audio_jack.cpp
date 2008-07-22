@@ -28,7 +28,7 @@
 #include "audio_jack.h"
 
 
-#ifdef JACK_SUPPORT
+#ifdef LMMS_HAVE_JACK
 
 #include <QtGui/QLineEdit>
 #include <QtGui/QLabel>

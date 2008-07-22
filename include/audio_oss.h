@@ -28,13 +28,9 @@
 
 #include "lmmsconfig.h"
 
-#if defined LMMS_HAVE_SYS_SOUNDCARD_H || defined LMMS_HAVE_SOUNDCARD_H
-
-#define OSS_SUPPORT
-
+#ifdef LMMS_HAVE_OSS
 
 #include "audio_device.h"
-
 
 
 class lcdSpinBox;

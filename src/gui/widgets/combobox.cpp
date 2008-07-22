@@ -245,7 +245,7 @@ void comboBox::setItem( QAction * _item )
 
 
 
-#include "combobox.moc"
+#include "moc_combobox.cxx"
 
 
 #endif

@@ -38,7 +38,7 @@
 #include "note.h"
 
 
-#ifdef ALSA_SUPPORT
+#ifdef LMMS_HAVE_ALSA
 
 
 midiALSASeq::midiALSASeq( void ) :
@@ -651,10 +651,9 @@ void midiALSASeq::setupWidget::saveSettings( void )
 }
 
 
-#include "midi_alsa_seq.moc"
+#include "moc_midi_alsa_seq.cxx"
 
 
 #endif
-
 
 #endif

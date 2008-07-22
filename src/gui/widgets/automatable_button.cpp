@@ -261,6 +261,6 @@ void automatableButtonGroup::updateButtons( void )
 }
 
 
-#include "automatable_button.moc"
+#include "moc_automatable_button.cxx"
 
 #endif

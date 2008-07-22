@@ -41,15 +41,15 @@
  * 31 Oct 07, jasp00@users.sourceforge.net: replaced deprecated conversions
  *--------------------------------------------------------------------*/
 
-#ifdef HAVE_CONFIG_H
+#ifdef LMMS_HAVE_CONFIG_H
 #include <config.h>
 #endif
 
-#ifdef HAVE_STDIO_H
+#ifdef LMMS_HAVE_STDIO_H
 #include <stdio.h>
 #endif
 
-#ifdef HAVE_STRING_H
+#ifdef LMMS_HAVE_STRING_H
 #include <string.h>
 #endif
 

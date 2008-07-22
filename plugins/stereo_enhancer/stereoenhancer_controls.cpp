@@ -62,5 +62,5 @@ void stereoEnhancerControls::saveSettings( QDomDocument & _doc,
 
 
 
-#include "stereoenhancer_controls.moc"
+#include "moc_stereoenhancer_controls.cxx"
 

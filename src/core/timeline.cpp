@@ -372,7 +372,7 @@ void timeLine::mouseReleaseEvent( QMouseEvent * _me )
 
 
 
-#include "timeline.moc"
+#include "moc_timeline.cxx"
 
 
 #endif

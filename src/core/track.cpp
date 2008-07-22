@@ -2427,7 +2427,7 @@ void trackView::createTCOView( trackContentObject * _tco )
 
 
 
-#include "track.moc"
+#include "moc_track.cxx"
 
 
 #endif

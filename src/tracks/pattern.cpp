@@ -1302,7 +1302,7 @@ void patternView::paintEvent( QPaintEvent * )
 
 
 
-#include "pattern.moc"
+#include "moc_pattern.cxx"
 
 
 #endif

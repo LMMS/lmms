@@ -489,7 +489,7 @@ void envelopeAndLFOParameters::updateSampleVars( void )
 
 
 
-#include "envelope_and_lfo_parameters.moc"
+#include "moc_envelope_and_lfo_parameters.cxx"
 
 
 #endif

@@ -306,4 +306,4 @@ void ladspaControl::setLink( bool _state )
 
 
 
-#include "ladspa_control.moc"
+#include "moc_ladspa_control.cxx"

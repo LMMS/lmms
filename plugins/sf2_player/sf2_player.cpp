@@ -925,5 +925,5 @@ plugin * lmms_plugin_main( model *, void * _data )
 
 }
 
-#include "sf2_player.moc"
+#include "moc_sf2_player.cxx"
 

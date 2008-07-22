@@ -2160,7 +2160,7 @@ void automationEditor::update( void )
 
 
 
-#include "automation_editor.moc"
+#include "moc_automation_editor.cxx"
 
 
 #endif

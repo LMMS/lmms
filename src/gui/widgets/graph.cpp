@@ -522,4 +522,4 @@ void graphModel::normalize( void )
 
 
 
-#include "graph.moc"
+#include "moc_graph.cxx"

@@ -29,7 +29,7 @@
 
 #include <QtGui/QDialog>
 
-#include "ui_export_project.uic"
+#include "ui_export_project.h"
 
 class projectRenderer;
 

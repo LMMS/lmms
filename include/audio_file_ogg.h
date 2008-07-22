@@ -29,7 +29,7 @@
 
 #include "lmmsconfig.h"
 
-#ifdef LMMS_HAVE_VORBIS_CODEC_H
+#ifdef LMMS_HAVE_OGGVORBIS
 
 #include <vorbis/codec.h>
 

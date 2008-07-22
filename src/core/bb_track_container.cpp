@@ -272,5 +272,5 @@ void bbTrackContainer::createTCOsForBB( int _bb )
 
 
 
-#include "bb_track_container.moc"
+#include "moc_bb_track_container.cxx"
 

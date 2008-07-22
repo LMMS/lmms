@@ -251,6 +251,6 @@ void effectRackView::modelChanged( void )
 
 
 
-#include "effect_rack_view.moc"
+#include "moc_effect_rack_view.cxx"
 
 #endif

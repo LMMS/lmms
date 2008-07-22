@@ -485,7 +485,7 @@ void tempoSyncKnob::showCustom( void )
 
 
 
-#include "tempo_sync_knob.moc"
+#include "moc_tempo_sync_knob.cxx"
 
 
 #endif

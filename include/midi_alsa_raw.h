@@ -28,11 +28,7 @@
 
 #include "lmmsconfig.h"
 
-#ifdef LMMS_HAVE_ALSA_ASOUNDLIB_H
-
-#ifndef ALSA_SUPPORT
-#define ALSA_SUPPORT
-#endif
+#ifdef LMMS_HAVE_ALSA
 
 #include <alsa/asoundlib.h>
 

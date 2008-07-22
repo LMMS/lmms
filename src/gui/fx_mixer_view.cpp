@@ -324,6 +324,6 @@ void fxMixerView::updateFaders( void )
 
 
 
-#include "fx_mixer_view.moc"
+#include "moc_fx_mixer_view.cxx"
 
 #endif

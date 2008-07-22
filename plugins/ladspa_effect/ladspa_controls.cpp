@@ -189,5 +189,5 @@ void ladspaControls::updateChannelLinkState( void )
 }
 
 
-#include "ladspa_controls.moc"
+#include "moc_ladspa_controls.cxx"
 

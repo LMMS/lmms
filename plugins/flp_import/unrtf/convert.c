@@ -62,23 +62,23 @@
  * 31 Oct 07, jasp00@users.sourceforge.net: fixed several warnings
  *--------------------------------------------------------------------*/
 
-#ifdef HAVE_CONFIG_H
+#ifdef LMMS_HAVE_CONFIG_H
 #include <config.h>
 #endif
 
-#ifdef HAVE_STDIO_H
+#ifdef LMMS_HAVE_STDIO_H
 #include <stdio.h>
 #endif
 
-#ifdef HAVE_STDLIB_H
+#ifdef LMMS_HAVE_STDLIB_H
 #include <stdlib.h>
 #endif
 
-#ifdef HAVE_CTYPE_H
+#ifdef LMMS_HAVE_CTYPE_H
 #include <ctype.h>
 #endif
 
-#ifdef HAVE_STRING_H
+#ifdef LMMS_HAVE_STRING_H
 #include <string.h>
 #endif
 
@@ -195,8 +195,8 @@ starting_body ()
 {
 	if (!have_printed_body) {
 		if (!inline_mode) {
-			outstring+=QString().sprintf(op->header_end);
-			outstring+=QString().sprintf(op->body_begin);
+			outstring+=QString("%1").arg(op->header_end);
+			outstring+=QString("%1").arg(op->body_begin);
 		}
 		within_header = FALSE;
 		have_printed_body = TRUE;
@@ -365,20 +365,20 @@ process_font_table (Word *w)
 		w=w->next;
 	}
 
-	printf(op->comment_begin);
+	printf("%s",op->comment_begin);
 	printf("font table contains %d fonts total",total_fonts);
-	printf(op->comment_end);
+	printf("%s",op->comment_end);
 
 	if (debug_mode) {
 		int i;
 
-		printf(op->comment_begin);
+		printf("%s",op->comment_begin);
 		printf("font table dump: \n");
 		for (i=0; i<total_fonts; i++) {
 			printf(" font %d = %s\n", font_table[i].num, 
 				font_table[i].name);
 		}
-		printf(op->comment_end);
+		printf("%s",op->comment_end);
 	}
 }
 
@@ -402,9 +402,9 @@ process_index_entry (Word *w)
 			char *str = word_string (w2);
 
 			if (debug_mode && str) {
-				printf(op->comment_begin);
+				printf("%s",op->comment_begin);
 				printf("index entry word: %s ", str);
-				printf(op->comment_end);
+				printf("%s",op->comment_end);
 			}
 		}
 		w=w->next;
@@ -431,11 +431,11 @@ process_toc_entry (Word *w, int include_page_num)
 			char *str = word_string (w2);
 
 			if (debug_mode && str) {
-				printf(op->comment_begin);
+				printf("%s",op->comment_begin);
 				printf("toc %s entry word: %s ", 
 					include_page_num ? "page#":"no page#",
 					str);
-				printf(op->comment_end);
+				printf("%s",op->comment_end);
 			}
 		}
 		w=w->next;
@@ -471,7 +471,7 @@ process_info_group (Word *w)
 
 			if (!inline_mode) {
 				if (!strcmp("\\title", s)) {
-					outstring+=QString().sprintf(op->document_title_begin);
+					outstring+=QString("%1").arg(op->document_title_begin);
 					w2=child->next;
 					while (w2) {
 						char *s2 = word_string(w2);
@@ -482,7 +482,7 @@ process_info_group (Word *w)
 #if 1 /* daved 0.19.6 */
 							print_with_special_exprs (s2);
 #else
-							outstring+=QString().sprintf("%s", s2);
+							outstring+=QString("%1").arg("%s", s2);
 #endif
 #if 1 /* daved 0.20.0 */
 						}
@@ -496,18 +496,18 @@ process_info_group (Word *w)
 								s3 = op_translate_char (op, charset_type, ch, numchar_table);
 								if (!s3 || !*s3)
 								{
-									printf(op->comment_begin);
+									printf("%s",op->comment_begin);
 									printf("char 0x%02x",ch);
-									printf(op->comment_end);
+									printf("%s",op->comment_end);
 
 								}
 								else
 								{
 									if (op->word_begin)
-										outstring+=QString().sprintf(op->word_begin);
-									outstring+=QString().sprintf("%s", s3);
+										outstring+=QString("%1").arg(op->word_begin);
+									outstring+=QString("%1").arg("%s", s3);
 									if (op->word_end)
-										outstring+=QString().sprintf(op->word_end);
+										outstring+=QString("%1").arg(op->word_end);
 								}
 							}
 						}
@@ -515,32 +515,32 @@ process_info_group (Word *w)
 #endif
 						w2 = w2->next;
 					}
-					outstring+=QString().sprintf(op->document_title_end);
+					outstring+=QString("%1").arg(op->document_title_end);
 				}
 				else if (!strcmp("\\keywords", s)) {
-					outstring+=QString().sprintf(op->document_keywords_begin);
+					outstring+=QString("%1").arg(op->document_keywords_begin);
 					w2=child->next;
 					while (w2) {
 						char *s2 = word_string(w2);
 						if (s2[0] != '\\') 
-							outstring+=QString().sprintf("%s,", s2);
+							outstring+=QString("%1").arg("%s,", s2);
 						w2 = w2->next;
 					}
-					outstring+=QString().sprintf(op->document_keywords_end);
+					outstring+=QString("%1").arg(op->document_keywords_end);
 				}
 				else if (!strcmp("\\author", s)) {
-					outstring+=QString().sprintf(op->document_author_begin);
+					outstring+=QString("%1").arg(op->document_author_begin);
 					w2=child->next;
 					while (w2) {
 						char *s2 = word_string(w2);
 						if (s2[0] != '\\') 
-							outstring+=QString().sprintf("%s", s2);
+							outstring+=QString("%1").arg("%s", s2);
 						w2 = w2->next;
 					}
-					outstring+=QString().sprintf(op->document_author_end);
+					outstring+=QString("%1").arg(op->document_author_end);
 				}
 				else if (!strcmp("\\comment", s)) {
-					printf(op->comment_begin);
+					printf("%s",op->comment_begin);
 					printf("comments: ");
 					w2=child->next;
 					while (w2) {
@@ -549,46 +549,46 @@ process_info_group (Word *w)
 							printf("%s", s2);
 						w2 = w2->next;
 					}
-					printf(op->comment_end);
+					printf("%s",op->comment_end);
 				}
 				else if (!strncmp("\\nofpages", s, 9)) {
-					printf(op->comment_begin);
+					printf("%s",op->comment_begin);
 					printf("total pages: %s",&s[9]);
-					printf(op->comment_end);
+					printf("%s",op->comment_end);
 				}
 				else if (!strncmp("\\nofwords", s, 9)) {
-					printf(op->comment_begin);
+					printf("%s",op->comment_begin);
 					printf("total words: %s",&s[9]);
-					printf(op->comment_end);
+					printf("%s",op->comment_end);
 				}
 				else if (!strncmp("\\nofchars", s, 9) && isdigit(s[9])) {
-					printf(op->comment_begin);
+					printf("%s",op->comment_begin);
 					printf("total chars: %s",&s[9]);
-					printf(op->comment_end);
+					printf("%s",op->comment_end);
 				}
 				else if (!strcmp("\\creatim", s)) {
-					printf(op->comment_begin);
+					printf("%s",op->comment_begin);
 					printf("creation date: ");
 					if (child->next) word_dump_date (child->next);
-					printf(op->comment_end);
+					printf("%s",op->comment_end);
 				}
 				else if (!strcmp("\\printim", s)) {
-					printf(op->comment_begin);
+					printf("%s",op->comment_begin);
 					printf("last printed: ");
 					if (child->next) word_dump_date (child->next);
-					printf(op->comment_end);
+					printf("%s",op->comment_end);
 				}
 				else if (!strcmp("\\buptim", s)) {
-					printf(op->comment_begin);
+					printf("%s",op->comment_begin);
 					printf("last backup: ");
 					if (child->next) word_dump_date (child->next);
-					printf(op->comment_end);
+					printf("%s",op->comment_end);
 				}
 				else if (!strcmp("\\revtim", s)) {
-					printf(op->comment_begin);
+					printf("%s",op->comment_begin);
 					printf("revision date: ");
 					if (child->next) word_dump_date (child->next);
-					printf(op->comment_end);
+					printf("%s",op->comment_end);
 				}
 			}
 
@@ -598,7 +598,7 @@ process_info_group (Word *w)
 			if (!strcmp("\\hlinkbase", s)) {
 				char *linkstr = NULL;
 
-				printf(op->comment_begin);
+				printf("%s",op->comment_begin);
 				printf("hyperlink base: ");
 				if (child->next) {
 					Word *nextword = child->next;
@@ -611,7 +611,7 @@ process_info_group (Word *w)
 					printf("%s", linkstr);
 				else
 					printf("(none)");
-				printf(op->comment_end);
+				printf("%s",op->comment_end);
 
 				/* Store the pointer, it will remain good. */
 				hyperlink_base = linkstr; 
@@ -658,9 +658,9 @@ process_color_table (Word *w)
 		char *s = word_string (w);
 
 #if 0
-		printf(op->comment_begin);
+		printf("%s",op->comment_begin);
 		printf("found this color table word: %s", word_string(w));
-		printf(op->comment_end);
+		printf("%s",op->comment_end);
 #endif
 
 		if (!strncmp("\\red",s,4)) {
@@ -685,10 +685,10 @@ process_color_table (Word *w)
 			color_table[total_colors].g = g;
 			color_table[total_colors++].b = b;
 			if (debug_mode) {
-				printf(op->comment_begin);
+				printf("%s",op->comment_begin);
 				printf("storing color entry %d: %02x%02x%02x",
 					total_colors-1, r,g,b);
-				printf(op->comment_end);
+				printf("%s",op->comment_end);
 			}
 			r=g=b=0;
 		}
@@ -697,9 +697,9 @@ process_color_table (Word *w)
 	}
 
 	if (debug_mode) {
-		printf(op->comment_begin);
+		printf("%s",op->comment_begin);
 	  	printf("color table had %d entries -->\n", total_colors);
-		printf(op->comment_end);
+		printf("%s",op->comment_end);
 	}
 }
 
@@ -837,7 +837,7 @@ cmd_field (Word *w, int align, char has_param, int num) {
 					   {
 					   	const char * string;
 						if ((string = op->symbol_translation_table[char_num - op->symbol_first_char]) != 0)
-						outstring+=QString().sprintf("%s", string);
+						outstring+=QString("%1").arg("%s", string);
 					   }
 					}
 				    }
@@ -857,9 +857,9 @@ cmd_field (Word *w, int align, char has_param, int num) {
 							    w4=w4->next;
 						    if (w4) {
 							    s4=word_string(w4);
-							    outstring+=QString().sprintf(op->hyperlink_begin);
-							    outstring+=QString().sprintf("%s", s4);
-							    outstring+=QString().sprintf(op->hyperlink_end);
+							    outstring+=QString("%1").arg(op->hyperlink_begin);
+							    outstring+=QString("%1").arg("%s", s4);
+							    outstring+=QString("%1").arg(op->hyperlink_end);
 							    return TRUE;
 						    }
 					    	
@@ -900,9 +900,9 @@ cmd_f (Word *w, int align, char has_param, int num) {
 	numchar_table = FONTROMAN_TABLE;
 #endif
 	if (!name) {
-		printf(op->comment_begin);
+		printf("%s",op->comment_begin);
 		printf("invalid font number %d",num);
-		printf(op->comment_end);
+		printf("%s",op->comment_end);
 	} else {
 		attr_push(ATTR_FONTFACE,name);
 #if 1 /* daved - 0.19.6 */
@@ -962,10 +962,10 @@ cmd_tab (Word *w, int align, char has_param, int param)
 	int need= 8-(total_chars_this_line%8);
 	total_chars_this_line += need;
 	while(need>0) {
-		outstring+=QString().sprintf(op->forced_space);
+		outstring+=QString("%1").arg(op->forced_space);
 		need--;
 	}
-	outstring+=QString().sprintf("\n");
+	outstring+=QString("%1").arg("\n");
 	return FALSE;
 }
 
@@ -1182,7 +1182,7 @@ cmd_scaps (Word *w, int align, char has_param, int param) {
 static int 
 cmd_bullet (Word *w, int align, char has_param, int param) {
 	if (op->chars.bullet) {
-		outstring+=QString().sprintf(op->chars.bullet);
+		outstring+=QString("%1").arg(op->chars.bullet);
 		++total_chars_this_line; /* \tab */
 	}
 	return FALSE;
@@ -1197,7 +1197,7 @@ cmd_bullet (Word *w, int align, char has_param, int param) {
 static int 
 cmd_ldblquote (Word *w, int align, char has_param, int param) {
 	if (op->chars.left_dbl_quote) {
-		outstring+=QString().sprintf(op->chars.left_dbl_quote);
+		outstring+=QString("%1").arg(op->chars.left_dbl_quote);
 		++total_chars_this_line; /* \tab */
 	}
 	return FALSE;
@@ -1214,7 +1214,7 @@ cmd_ldblquote (Word *w, int align, char has_param, int param) {
 static int 
 cmd_rdblquote (Word *w, int align, char has_param, int param) {
 	if (op->chars.right_dbl_quote) {
-		outstring+=QString().sprintf(op->chars.right_dbl_quote);
+		outstring+=QString("%1").arg(op->chars.right_dbl_quote);
 		++total_chars_this_line; /* \tab */
 	}
 	return FALSE;
@@ -1230,7 +1230,7 @@ cmd_rdblquote (Word *w, int align, char has_param, int param) {
 static int 
 cmd_lquote (Word *w, int align, char has_param, int param) {
 	if (op->chars.left_quote) {
-		outstring+=QString().sprintf(op->chars.left_quote);
+		outstring+=QString("%1").arg(op->chars.left_quote);
 		++total_chars_this_line; /* \tab */
 	}
 	return FALSE;
@@ -1247,7 +1247,7 @@ cmd_lquote (Word *w, int align, char has_param, int param) {
 static int 
 cmd_nonbreaking_space (Word *w, int align, char has_param, int param) {
 	if (op->chars.nonbreaking_space) {
-		outstring+=QString().sprintf(op->chars.nonbreaking_space);
+		outstring+=QString("%1").arg(op->chars.nonbreaking_space);
 		++total_chars_this_line; /* \tab */
 	}
 	return FALSE;
@@ -1264,7 +1264,7 @@ cmd_nonbreaking_space (Word *w, int align, char has_param, int param) {
 static int 
 cmd_nonbreaking_hyphen (Word *w, int align, char has_param, int param) {
 	if (op->chars.nonbreaking_hyphen) {
-		outstring+=QString().sprintf(op->chars.nonbreaking_hyphen);
+		outstring+=QString("%1").arg(op->chars.nonbreaking_hyphen);
 		++total_chars_this_line; /* \tab */
 	}
 	return FALSE;
@@ -1281,7 +1281,7 @@ cmd_nonbreaking_hyphen (Word *w, int align, char has_param, int param) {
 static int 
 cmd_optional_hyphen (Word *w, int align, char has_param, int param) {
 	if (op->chars.optional_hyphen) {
-		outstring+=QString().sprintf(op->chars.optional_hyphen);
+		outstring+=QString("%1").arg(op->chars.optional_hyphen);
 		++total_chars_this_line; /* \tab */
 	}
 	return FALSE;
@@ -1297,7 +1297,7 @@ cmd_optional_hyphen (Word *w, int align, char has_param, int param) {
 static int 
 cmd_emdash (Word *w, int align, char has_param, int param) {
 	if (op->chars.emdash) {
-		outstring+=QString().sprintf(op->chars.emdash);
+		outstring+=QString("%1").arg(op->chars.emdash);
 		++total_chars_this_line; /* \tab */
 	}
 	return FALSE;
@@ -1314,7 +1314,7 @@ cmd_emdash (Word *w, int align, char has_param, int param) {
 static int 
 cmd_endash (Word *w, int align, char has_param, int param) {
 	if (op->chars.endash) {
-		outstring+=QString().sprintf(op->chars.endash);
+		outstring+=QString("%1").arg(op->chars.endash);
 		++total_chars_this_line; /* \tab */
 	}
 	return FALSE;
@@ -1331,7 +1331,7 @@ cmd_endash (Word *w, int align, char has_param, int param) {
 static int 
 cmd_rquote (Word *w, int align, char has_param, int param) {
 	if (op->chars.right_quote) {
-		outstring+=QString().sprintf(op->chars.right_quote);
+		outstring+=QString("%1").arg(op->chars.right_quote);
 		++total_chars_this_line; /* \tab */
 	}
 	return FALSE;
@@ -1347,7 +1347,7 @@ cmd_rquote (Word *w, int align, char has_param, int param) {
 static int 
 cmd_par (Word *w, int align, char has_param, int param) {
 	if (op->line_break) {
-		outstring+=QString().sprintf(op->line_break);
+		outstring+=QString("%1").arg(op->line_break);
 		total_chars_this_line = 0; /* \tab */
 	}
 	return FALSE;
@@ -1364,7 +1364,7 @@ cmd_par (Word *w, int align, char has_param, int param) {
 static int 
 cmd_line (Word *w, int align, char has_param, int param) {
 	if (op->line_break) {
-		outstring+=QString().sprintf(op->line_break);
+		outstring+=QString("%1").arg(op->line_break);
 		total_chars_this_line = 0; /* \tab */
 	}
 	return FALSE;
@@ -1380,7 +1380,7 @@ cmd_line (Word *w, int align, char has_param, int param) {
 
 static int cmd_page (Word *w, int align, char has_param, int param) {
 	if (op->page_break) {
-		outstring+=QString().sprintf(op->page_break);
+		outstring+=QString("%1").arg(op->page_break);
 		total_chars_this_line = 0; /* \tab */
 	}
 	return FALSE;
@@ -1683,9 +1683,9 @@ static int cmd_u (Word *w, int align, char has_param, int param) {
 	{
 		const char *string;
 		if ((string = op->unisymbol1_translation_table[param - op->unisymbol1_first_char]) != 0)
-			outstring+=QString().sprintf("%s", string);
+			outstring+=QString("%1").arg("%s", string);
 		else
-			outstring+=QString().sprintf("&#%u;", (unsigned int)param);
+			outstring+=QString("%1").arg("&#%u;", (unsigned int)param);
 		done++;
 	}
 	if
@@ -1697,9 +1697,9 @@ static int cmd_u (Word *w, int align, char has_param, int param) {
 	{
 		const char *string;
 		if ((string = op->unisymbol2_translation_table[param - op->unisymbol2_first_char]) != 0)
-			outstring+=QString().sprintf("%s", string);
+			outstring+=QString("%1").arg("%s", string);
 		else
-			outstring+=QString().sprintf("&#%u;", (unsigned int)param);
+			outstring+=QString("%1").arg("&#%u;", (unsigned int)param);
 		done++;
 	}
 	if
@@ -1711,9 +1711,9 @@ static int cmd_u (Word *w, int align, char has_param, int param) {
 	{
 		const char *string;
 		if ((string = op->unisymbol3_translation_table[param - op->unisymbol3_first_char]) != 0)
-			outstring+=QString().sprintf("%s", string);
+			outstring+=QString("%1").arg("%s", string);
 		else
-			outstring+=QString().sprintf("&#%u;", (unsigned int)param);
+			outstring+=QString("%1").arg("&#%u;", (unsigned int)param);
 		done++;
 	}
 #if 1 /* 0.19.5 more unicode support */
@@ -1726,9 +1726,9 @@ static int cmd_u (Word *w, int align, char has_param, int param) {
 	{
 		const char *string;
 		if ((string = op->unisymbol4_translation_table[param - op->unisymbol4_first_char]) != 0)
-			outstring+=QString().sprintf("%s", string);
+			outstring+=QString("%1").arg("%s", string);
 		else
-			outstring+=QString().sprintf("&#%u;", (unsigned int)param);
+			outstring+=QString("%1").arg("&#%u;", (unsigned int)param);
 		done++;
 	}
 #endif
@@ -1869,7 +1869,7 @@ static int cmd_s (Word *w, int align, char has_param, int param) {
 static int cmd_sect (Word *w, int align, char has_param, int param) {
 	/* XX kludge */
 	if (op->paragraph_begin) {
-		outstring+=QString().sprintf(op->paragraph_begin);
+		outstring+=QString("%1").arg(op->paragraph_begin);
 	}
 	return FALSE;
 }
@@ -1883,9 +1883,9 @@ static int cmd_sect (Word *w, int align, char has_param, int param) {
 
 static int cmd_shp (Word *w, int align, char has_param, int param) {
 	if (op->comment_begin) {
-		printf(op->comment_begin);
+		printf("%s",op->comment_begin);
 		printf("Drawn Shape (ignored--not implemented yet)");
-		printf(op->comment_begin);
+		printf("%s",op->comment_begin);
 	}
 
 	return FALSE;
@@ -1916,9 +1916,9 @@ static int cmd_outl (Word *w, int align, char has_param, int param) {
 static int cmd_ansi (Word *w, int align, char has_param, int param) {
 	charset_type = CHARSET_ANSI;
 	if (op->comment_begin) {
-		printf(op->comment_begin);
+		printf("%s",op->comment_begin);
 		printf("document uses ANSI character set");
-		printf(op->comment_end);
+		printf("%s",op->comment_end);
 	}
 	return FALSE;
 }
@@ -1933,9 +1933,9 @@ static int cmd_ansi (Word *w, int align, char has_param, int param) {
 static int cmd_pc (Word *w, int align, char has_param, int param) {
 	charset_type = CHARSET_CP437 ;
 	if (op->comment_begin) {
-		printf(op->comment_begin);
+		printf("%s",op->comment_begin);
 		printf("document uses PC codepage 437 character set");
-		printf(op->comment_end);
+		printf("%s",op->comment_end);
 	}
 	return FALSE;
 }
@@ -1950,9 +1950,9 @@ static int cmd_pc (Word *w, int align, char has_param, int param) {
 static int cmd_pca (Word *w, int align, char has_param, int param) {
 	charset_type = CHARSET_CP850;
 	if (op->comment_begin) {
-		printf(op->comment_begin);
+		printf("%s",op->comment_begin);
 		printf("document uses PC codepage 850 character set");
-		printf(op->comment_end);
+		printf("%s",op->comment_end);
 	}
 	return FALSE;
 }
@@ -1967,9 +1967,9 @@ static int cmd_pca (Word *w, int align, char has_param, int param) {
 static int cmd_mac (Word *w, int align, char has_param, int param) {
 	charset_type = CHARSET_MAC;
 	if (op->comment_begin) {
-		printf(op->comment_begin);
+		printf("%s",op->comment_begin);
 		printf("document uses Macintosh character set");
-		printf(op->comment_end);
+		printf("%s",op->comment_end);
 	}
 	return FALSE;
 }
@@ -2609,7 +2609,7 @@ enum { SMALL=0, BIG=1 };
 	if (simulate_smallcaps) {
 		if (*s >= 'a' && *s <= 'z') {
 			state=SMALL;
-			outstring+=QString().sprintf(op->smaller_begin);
+			outstring+=QString("%1").arg(op->smaller_begin);
 		}
 		else
 			state=BIG;
@@ -2630,7 +2630,7 @@ enum { SMALL=0, BIG=1 };
 #if 1 /* daved - 0.20.1 */
 			if(post_trans)
 #endif
-				outstring+=QString().sprintf("%s",post_trans);
+				outstring+=QString("%1").arg("%s",post_trans);
 		}
 
 		s++;
@@ -2639,13 +2639,13 @@ enum { SMALL=0, BIG=1 };
 			ch = *s;
 			if (ch >= 'a' && ch <= 'z') {
 				if (state==BIG)
-					outstring+=QString().sprintf(op->smaller_begin);
+					outstring+=QString("%1").arg(op->smaller_begin);
 				state=SMALL;
 			}
 			else
 			{
 				if (state==SMALL)
-					outstring+=QString().sprintf(op->smaller_end);
+					outstring+=QString("%1").arg(op->smaller_end);
 				state=BIG;
 			}
 		}
@@ -2671,7 +2671,7 @@ begin_table()
 	have_printed_cell_end = FALSE;
 	attrstack_push();
 	starting_body();
-	outstring+=QString().sprintf(op->table_begin);
+	outstring+=QString("%1").arg(op->table_begin);
 }
 
 
@@ -2689,12 +2689,12 @@ end_table ()
 	if (within_table) {
 		if (!have_printed_cell_end) {
 			attr_pop_dump();
-			outstring+=QString().sprintf(op->table_cell_end);
+			outstring+=QString("%1").arg(op->table_cell_end);
 		}
 		if (!have_printed_row_end) {
-			outstring+=QString().sprintf(op->table_row_end);
+			outstring+=QString("%1").arg(op->table_row_end);
 		}
-		outstring+=QString().sprintf(op->table_end);
+		outstring+=QString("%1").arg(op->table_end);
 		within_table=FALSE;
 		have_printed_row_begin = FALSE;
 		have_printed_cell_begin = FALSE;
@@ -2716,13 +2716,13 @@ void
 starting_text() {
 	if (within_table) {
 		if (!have_printed_row_begin) {
-			outstring+=QString().sprintf(op->table_row_begin);
+			outstring+=QString("%1").arg(op->table_row_begin);
 			have_printed_row_begin=TRUE;
 			have_printed_row_end=FALSE;
 			have_printed_cell_begin=FALSE;
 		}
 		if (!have_printed_cell_begin) {
-			outstring+=QString().sprintf(op->table_cell_begin);
+			outstring+=QString("%1").arg(op->table_cell_begin);
 			attrstack_express_all();
 			have_printed_cell_begin=TRUE;
 			have_printed_cell_end=FALSE;
@@ -2749,15 +2749,15 @@ starting_paragraph_align (int align)
 	switch (align) 
 	{
 	case ALIGN_CENTER:
-		outstring+=QString().sprintf(op->center_begin); 
+		outstring+=QString("%1").arg(op->center_begin); 
 		break;
 	case ALIGN_LEFT:
 		break;
 	case ALIGN_RIGHT:
-		outstring+=QString().sprintf(op->align_right_begin);
+		outstring+=QString("%1").arg(op->align_right_begin);
 		break;
 	case ALIGN_JUSTIFY:
-		outstring+=QString().sprintf(op->align_right_begin); /* This is WRONG! */
+		outstring+=QString("%1").arg(op->align_right_begin); /* This is WRONG! */
 		break;
 	}
 }
@@ -2776,16 +2776,16 @@ ending_paragraph_align (int align)
 {
 	switch (align) {
 	case ALIGN_CENTER:
-		outstring+=QString().sprintf(op->center_end);
+		outstring+=QString("%1").arg(op->center_end);
 		break;
 	case ALIGN_LEFT:
 	  /* printf(op->align_left_end); */
 		break;
 	case ALIGN_RIGHT:
-		outstring+=QString().sprintf(op->align_right_end);
+		outstring+=QString("%1").arg(op->align_right_end);
 		break;
 	case ALIGN_JUSTIFY:
-		outstring+=QString().sprintf(op->justify_end);
+		outstring+=QString("%1").arg(op->justify_end);
 		break;
 	}
 }
@@ -2861,7 +2861,7 @@ word_print_core (Word *w)
 
 					if (s[0]!=' ') {
 						char *s2;
-						printf(op->comment_begin);
+						printf("%s",op->comment_begin);
 						printf("picture data found, ");
 						if (picture_wmetafile_type_str) {
 							printf("WMF type is %s, ",
@@ -2869,7 +2869,7 @@ word_print_core (Word *w)
 						}
 						printf("picture dimensions are %d by %d, depth %d", 
 							picture_width, picture_height, picture_bits_per_pixel);
-						printf(op->comment_end);
+						printf("%s",op->comment_end);
 						if (picture_width && picture_height && picture_bits_per_pixel) {
 							s2=s;
 							while (*s2) {
@@ -2894,12 +2894,12 @@ word_print_core (Word *w)
 					total_chars_this_line += strlen(s);
 
 					if (op->word_begin)
-						outstring+=QString().sprintf(op->word_begin);
+						outstring+=QString("%1").arg(op->word_begin);
 
 					print_with_special_exprs (s);
 
 					if (op->word_end)
-						outstring+=QString().sprintf(op->word_end);
+						outstring+=QString("%1").arg(op->word_end);
 				}
 
 
@@ -2959,24 +2959,24 @@ word_print_core (Word *w)
 					is_cell_group=TRUE;
 					if (!have_printed_cell_begin) {
 						/* Need this with empty cells */
-						outstring+=QString().sprintf(op->table_cell_begin);
+						outstring+=QString("%1").arg(op->table_cell_begin);
 						attrstack_express_all();
 					}
 					attr_pop_dump();
-					outstring+=QString().sprintf(op->table_cell_end);
+					outstring+=QString("%1").arg(op->table_cell_end);
 					have_printed_cell_begin = FALSE;
 					have_printed_cell_end=TRUE;
 				}
 				else if (!strcmp (s, "row")) {
 					if (within_table) {
-						outstring+=QString().sprintf(op->table_row_end);
+						outstring+=QString("%1").arg(op->table_row_end);
 						have_printed_row_begin = FALSE;
 						have_printed_row_end=TRUE;
 					} else {
 						if (debug_mode) {
-							printf(op->comment_begin);
+							printf("%s",op->comment_begin);
 							printf("end of table row");
-							printf(op->comment_end);
+							printf("%s",op->comment_end);
 						}
 					}
 				}
@@ -2994,15 +2994,15 @@ word_print_core (Word *w)
 #endif
 
 					if (!s2 || !*s2) {
-						printf(op->comment_begin);
+						printf("%s",op->comment_begin);
 						printf("char 0x%02x",ch);
-						printf(op->comment_end);
+						printf("%s",op->comment_end);
 					} else {
 						if (op->word_begin)
-							outstring+=QString().sprintf(op->word_begin);
-						outstring+=QString().sprintf("%s", s2);
+							outstring+=QString("%1").arg(op->word_begin);
+						outstring+=QString("%1").arg("%s", s2);
 						if (op->word_end)
-							outstring+=QString().sprintf(op->word_end);
+							outstring+=QString("%1").arg(op->word_end);
 					}
 				}
 				else
@@ -3032,9 +3032,9 @@ word_print_core (Word *w)
 
 					if (!hip) {
 						if (debug_mode) {
-							printf(op->comment_begin);
+							printf("%s",op->comment_begin);
 							printf("Unfamiliar RTF command: %s (HashIndex not found)", s);
-							printf(op->comment_begin);
+							printf("%s",op->comment_begin);
 						}
 					}
 					else {
@@ -3068,9 +3068,9 @@ word_print_core (Word *w)
 								debug=hip[index].debug_print;
 
 								if (debug && debug_mode) {
-									printf(op->comment_begin);
+									printf("%s",op->comment_begin);
 									printf("%s", debug);
-									printf(op->comment_end);
+									printf("%s",op->comment_end);
 								}
 
 								done=TRUE;
@@ -3084,9 +3084,9 @@ word_print_core (Word *w)
 					}
 					if (!match) {
 						if (debug_mode) {
-							printf(op->comment_begin);
+							printf("%s",op->comment_begin);
 							printf("Unfamiliar RTF command: %s", s);
-							printf(op->comment_end);
+							printf("%s",op->comment_end);
 						}
 					}
 				}
@@ -3113,9 +3113,9 @@ word_print_core (Word *w)
 	if (within_picture) {
 		if(pictfile) { 
 			fclose(pictfile);
-			outstring+=QString().sprintf(op->imagelink_begin);
-			outstring+=QString().sprintf("%s", picture_path);
-			outstring+=QString().sprintf(op->imagelink_end);
+			outstring+=QString("%1").arg(op->imagelink_begin);
+			outstring+=QString("%1").arg("%s", picture_path);
+			outstring+=QString("%1").arg(op->imagelink_end);
 		}
 		within_picture=FALSE;
 	}
@@ -3153,8 +3153,8 @@ word_print (Word *w, QString & _s)
 
 	outstring = "";
 	if (!inline_mode) {
-		outstring+=QString().sprintf(op->document_begin);
-		outstring+=QString().sprintf(op->header_begin);
+		outstring+=QString("%1").arg(op->document_begin);
+		outstring+=QString("%1").arg(op->header_begin);
 	}
 
 	within_header=TRUE;
@@ -3165,8 +3165,8 @@ word_print (Word *w, QString & _s)
 	end_table();
 
 	if (!inline_mode) {
-		outstring+=QString().sprintf(op->body_end);
-		outstring+=QString().sprintf(op->document_end);
+		outstring+=QString("%1").arg(op->body_end);
+		outstring+=QString("%1").arg(op->document_end);
 	}
 	_s = outstring;
 }

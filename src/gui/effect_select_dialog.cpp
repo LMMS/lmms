@@ -314,6 +314,6 @@ void effectListWidget::updateSelection( void )
 }
 
 
-#include "effect_select_dialog.moc"
+#include "moc_effect_select_dialog.cxx"
 
 #endif

@@ -146,5 +146,5 @@ void ladspaControlDialog::updateEffectView( ladspaControls * _ctl )
 }
 
 
-#include "ladspa_control_dialog.moc"
+#include "moc_ladspa_control_dialog.cxx"
 

@@ -247,5 +247,5 @@ void fader::setMinPeak( float fMin )
 
 
 
-#include "fader.moc"
+#include "moc_fader.cxx"
 

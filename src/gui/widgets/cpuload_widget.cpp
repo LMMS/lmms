@@ -102,7 +102,7 @@ void cpuloadWidget::updateCpuLoad()
 
 
 
-#include "cpuload_widget.moc"
+#include "moc_cpuload_widget.cxx"
 
 
 #endif

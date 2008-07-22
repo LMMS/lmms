@@ -62,7 +62,7 @@ void effectControlDialog::closeEvent( QCloseEvent * _ce )
 
 
 
-#include "effect_control_dialog.moc"
+#include "moc_effect_control_dialog.cxx"
 
 #endif
 

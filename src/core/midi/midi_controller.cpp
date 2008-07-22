@@ -156,7 +156,7 @@ controllerDialog * midiController::createDialog( QWidget * _parent )
 }
 
 
-#include "midi_controller.moc"
+#include "moc_midi_controller.cxx"
 
 
 #endif

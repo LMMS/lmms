@@ -1,0 +1,359 @@
+CMAKE_MINIMUM_REQUIRED(VERSION 2.0)
+
+PROJECT(lmms)
+
+SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules)
+SET(CMAKE_BUILD_TYPE relwithdebinfo)
+
+CMAKE_POLICY(SET CMP0005 NEW)
+
+INCLUDE(AddFileDependencies)
+INCLUDE(CheckIncludeFiles)
+INCLUDE(FindPkgConfig)
+
+
+SET(VERSION_MAJOR "0")
+SET(VERSION_MINOR "4")
+SET(VERSION_PATCH "0")
+SET(VERSION_SUFFIX "beta")
+SET(VERSION ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH})
+IF(VERSION_SUFFIX)
+	SET (VERSION "${VERSION}-${VERSION_SUFFIX}")
+ENDIF(VERSION_SUFFIX)
+ADD_DEFINITIONS(-D'LMMS_VERSION="${VERSION}"')
+IF(WIN32)
+	SET(LMMS_BUILD_WIN32 1)
+ELSE(LINUX)
+	SET(LMMS_BUILD_LINUX 1)
+ENDIF(WIN32)
+
+
+OPTION(WANT_ALSA	"Include ALSA (Advanced Linux Sound Architecture) support" ON)
+OPTION(WANT_CAPS	"Include C* Audio Plugin Suite (LADSPA plugins)" ON)
+OPTION(WANT_FFTW3F	"Include SpectrumAnalyzer plugin" ON)
+OPTION(WANT_JACK	"Include JACK (Jack Audio Connection Kit) support" ON)
+OPTION(WANT_OGGVORBIS	"Include OGG/Vorbis support" ON)
+OPTION(WANT_PULSEAUDIO	"Include PulseAudio support" ON)
+OPTION(WANT_SDL		"Include SDL (Simple DirectMedia Layer) support" ON)
+OPTION(WANT_SF2		"Include SoundFont2 player plugin" ON)
+OPTION(WANT_STK		"Include Stk (Synthesis Toolkit) support" ON)
+OPTION(WANT_SYSTEM_SR	"Use system's libsamplerate" ON)
+OPTION(WANT_TAP		"Include Tom's Audio Processing (LADSPA plugins)" ON)
+OPTION(WANT_VST		"Include VST support" ON)
+OPTION(WANT_PCH		"Use precompiled headers" OFF)
+
+
+MESSAGE("PROCESSOR: ${CMAKE_SYSTEM_PROCESSOR}")
+EXEC_PROGRAM( uname ARGS "-m"OUTPUT_VARIABLE Machine )
+MESSAGE("Machine: ${Machine}")
+IF(${Machine} MATCHES "i686" OR ${Machine} MATCHES "i386" )
+	MESSAGE("-- This is an 32 bit machine")
+	SET(HOST_IS_64BIT FALSE)
+ELSE(${Machine} MATCHES "i686" OR ${Machine} MATCHES "i386" )
+	IF(${Machine} MATCHES "x86_64")
+		MESSAGE("-- This is an 64 bit machine")
+		SET(HOST_IS_64BIT TRUE)
+	ELSE(${Machine} MATCHES "x86_64")
+		MESSAGE("Can't identify this machine. Assuming 32 bit platform ")
+		SET(HOST_IS_64BIT FALSE)
+	ENDIF(${Machine} MATCHES "x86_64")
+ENDIF(${Machine} MATCHES "i686" OR ${Machine} MATCHES "i386" )
+
+
+IF(HOST_IS_64BIT)
+	SET(LIB_DIR lib64)
+ELSE(HOST_IS_64BIT)
+	SET(LIB_DIR lib)
+ENDIF(HOST_IS_64BIT)
+SET(PLUGIN_DIR ${LIB_DIR}/lmms)
+SET(DATA_DIR ${CMAKE_INSTALL_PREFIX}/share)
+SET(LMMS_DATA_DIR ${DATA_DIR}/lmms)
+
+
+CHECK_INCLUDE_FILES(stdint.h LMMS_HAVE_STDINT_H)
+CHECK_INCLUDE_FILES(pthread.h LMMS_HAVE_PTHREAD_H)
+CHECK_INCLUDE_FILES(unistd.h LMMS_HAVE_UNISTD_H)
+CHECK_INCLUDE_FILES(sys/types.h LMMS_HAVE_SYS_TYPES_H)
+CHECK_INCLUDE_FILES(sys/ipc.h LMMS_HAVE_SYS_IPC_H)
+CHECK_INCLUDE_FILES(sys/shm.h LMMS_HAVE_SYS_SHM_H)
+CHECK_INCLUDE_FILES(sys/time.h LMMS_HAVE_SYS_TIME_H)
+CHECK_INCLUDE_FILES(sys/wait.h LMMS_HAVE_SYS_WAIT_H)
+CHECK_INCLUDE_FILES(sys/select.h LMMS_HAVE_SYS_SELECT_H)
+CHECK_INCLUDE_FILES(stdarg.h LMMS_HAVE_STDARG_H)
+CHECK_INCLUDE_FILES(signal.h LMMS_HAVE_SIGNAL_H)
+CHECK_INCLUDE_FILES(sched.h LMMS_HAVE_SCHED_H)
+CHECK_INCLUDE_FILES(sys/soundcard.h LMMS_HAVE_SYS_SOUNDCARD_H)
+CHECK_INCLUDE_FILES(soundcard.h LMMS_HAVE_SOUNDCARD_H)
+CHECK_INCLUDE_FILES(fcntl.h LMMS_HAVE_FCNTL_H)
+CHECK_INCLUDE_FILES(sys/ioctl.h LMMS_HAVE_SYS_IOCTL_H)
+CHECK_INCLUDE_FILES(ctype.h LMMS_HAVE_CTYPE_H)
+CHECK_INCLUDE_FILES(string.h LMMS_HAVE_STRING_H)
+
+
+# check for Qt4
+FIND_PACKAGE(Qt4 REQUIRED)
+SET(QT_USE_QTXML 1)
+STRING(REGEX REPLACE "[^/]+$" "translations/" QT_TRANSLATIONS_DIR "${QT_MKSPECS_DIR}")
+IF(EXISTS "${QT_TRANSLATIONS_DIR}")
+	ADD_DEFINITIONS(-D'QT_TRANSLATIONS_DIR="${QT_TRANSLATIONS_DIR}"')
+ENDIF(EXISTS "${QT_TRANSLATIONS_DIR}")
+IF(NOT WIN32)
+	STRING(REGEX REPLACE "-DQT_DLL" "" QT_DEFINITIONS "${QT_DEFINITIONS}")
+ENDIF(NOT WIN32)
+INCLUDE(${QT_USE_FILE})
+
+# check for libsndfile
+PKG_CHECK_MODULES(SNDFILE REQUIRED sndfile>=1.0.11)
+
+
+IF(WANT_CAPS)
+SET(LMMS_HAVE_CAPS TRUE)
+ENDIF(WANT_CAPS)
+
+IF(WANT_TAP)
+SET(LMMS_HAVE_TAP TRUE)
+ENDIF(WANT_TAP)
+
+
+# check for SDL
+IF(WANT_SDL)
+	FIND_PACKAGE(SDL)
+	IF(SDL_FOUND)
+		SET(LMMS_HAVE_SDL TRUE)
+	ENDIF(SDL_FOUND)
+ENDIF(WANT_SDL)
+
+
+# check for Stk
+IF(WANT_STK)
+	FIND_PACKAGE(STK)
+	IF(STK_FOUND)
+		SET(LMMS_HAVE_STK TRUE)
+	ELSE(STK_FOUND)
+		SET(STK_INCLUDE_DIR "")
+	ENDIF(STK_FOUND)
+ENDIF(WANT_STK)
+
+
+# check for PulseAudio
+IF(WANT_PULSEAUDIO)
+	FIND_PACKAGE(PulseAudio)
+	IF(PULSEAUDIO_FOUND)
+		SET(LMMS_HAVE_PULSEAUDIO TRUE)
+	ELSE(PULSEAUDIO_FOUND)
+		SET(PULSEAUDIO_INCLUDE_DIR "")
+	ENDIF(PULSEAUDIO_FOUND)
+ENDIF(WANT_PULSEAUDIO)
+
+
+# check for OGG/Vorbis-libraries
+IF(WANT_OGGVORBIS)
+	FIND_PACKAGE(OggVorbis)
+	IF(OGGVORBIS_FOUND)
+		SET(LMMS_HAVE_OGGVORBIS TRUE)
+	ENDIF(OGGVORBIS_FOUND)
+ENDIF(WANT_OGGVORBIS)
+
+
+# check whether to enable OSS-support
+IF(LMMS_HAVE_SOUNDCARD_H OR LMMS_HAVE_SYS_SOUNDCARD_H)
+	SET(LMMS_HAVE_OSS TRUE)
+ENDIF(LMMS_HAVE_SOUNDCARD_H OR LMMS_HAVE_SYS_SOUNDCARD_H)
+
+
+# check for ALSA
+IF(WANT_ALSA)
+	INCLUDE(FindAlsa)
+	ALSA_CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/alsaconfig.h)
+	IF(ALSA_FOUND)
+		SET(LMMS_HAVE_ALSA TRUE)
+	ENDIF(ALSA_FOUND)
+ENDIF(WANT_ALSA)
+
+
+# check for JACK
+IF(WANT_JACK)
+	PKG_CHECK_MODULES(JACK jack>=0.77)
+	IF(JACK_FOUND)
+		SET(LMMS_HAVE_JACK TRUE)
+	ENDIF(JACK_FOUND)
+ENDIF(WANT_JACK)
+
+
+# check for FFTW3F-library
+IF(WANT_FFTW3F)
+	PKG_CHECK_MODULES(FFTW3F fftw3f>=3.0.0)
+	IF(FFTW3F_FOUND)
+		SET(LMMS_HAVE_FFTW3F TRUE)
+	ENDIF(FFTW3F_FOUND)
+ENDIF(WANT_FFTW3F)
+
+
+# check for Fluidsynth
+IF(WANT_SF2)
+	PKG_CHECK_MODULES(FLUIDSYNTH fluidsynth>=1.0.7)
+	IF(FLUIDSYNTH_FOUND)
+		SET(LMMS_HAVE_FLUIDSYNTH TRUE)
+	ENDIF(FLUIDSYNTH_FOUND)
+ENDIF(WANT_SF2)
+
+
+# check for WINE
+if(WANT_VST)
+	INCLUDE(CheckLibraryExists)
+	INCLUDE(CheckIncludeFileCXX)
+	SET(CMAKE_REQUIRED_FLAGS_ORIG ${CMAKE_REQUIRED_FLAGS})
+	SET(CMAKE_REQUIRED_INCLUDES_ORIG ${CMAKE_REQUIRED_INCLUDES})
+	SET(CMAKE_CXX_COMPILER_ORIG ${CMAKE_CXX_COMPILER})
+	IF(HOST_IS_64BIT)
+		SET(CMAKE_REQUIRED_FLAGS -m32 ${CMAKE_REQUIRED_FLAGS})
+	ENDIF(HOST_IS_64BIT)
+	CHECK_LIBRARY_EXISTS(wine wine_init "" HAVE_LIBWINE)
+	SET(CMAKE_CXX_COMPILER /usr/bin/wineg++)
+	SET(CMAKE_REQUIRED_INCLUDES ${CMAKE_REQUIRED_INCLUDES} ${CMAKE_INSTALL_PREFIX}/include/wine/windows /usr/include/wine/windows)
+	CHECK_INCLUDE_FILE_CXX(windows.h HAVE_WINDOWS_H)
+	SET(CMAKE_CXX_COMPILER ${CMAKE_CXX_COMPILER_ORIG})
+	SET(CMAKE_REQUIRED_FLAGS ${CMAKE_REQUIRED_FLAGS_ORIG})
+	SET(CMAKE_REQUIRED_INCLUDES ${CMAKE_REQUIRED_INCLUDES_ORIG})
+	IF(HAVE_LIBWINE AND HAVE_WINDOWS_H)
+		SET(LMMS_HAVE_VST TRUE)
+	ENDIF(HAVE_LIBWINE AND HAVE_WINDOWS_H)
+ENDIF(WANT_VST)
+
+
+# check for libsamplerate
+IF(WANT_SYSTEM_SR)
+	PKG_CHECK_MODULES(SAMPLERATE samplerate>=0.1.3)
+	IF(SAMPLERATE_FOUND)
+		SET(LMMS_HAVE_SAMPLERATE TRUE)
+	ELSE(SAMPLERATE_FOUND)
+		INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/src/3rdparty/samplerate)
+		INCLUDE(ChecksForLibSamplerate)
+		SET(LIBSAMPLERATE_SOURCES 
+			${CMAKE_CURRENT_SOURCE_DIR}/src/3rdparty/samplerate/samplerate.c
+			${CMAKE_CURRENT_SOURCE_DIR}/src/3rdparty/samplerate/samplerate.h
+			${CMAKE_CURRENT_SOURCE_DIR}/src/3rdparty/samplerate/src_sinc.c
+			${CMAKE_CURRENT_SOURCE_DIR}/src/3rdparty/samplerate/high_qual_coeffs.h
+			${CMAKE_CURRENT_SOURCE_DIR}/src/3rdparty/samplerate/mid_qual_coeffs.h
+			${CMAKE_CURRENT_SOURCE_DIR}/src/3rdparty/samplerate/fastest_coeffs.h
+			${CMAKE_CURRENT_SOURCE_DIR}/src/3rdparty/samplerate/common.h
+			${CMAKE_CURRENT_SOURCE_DIR}/src/3rdparty/samplerate/config.h
+			${CMAKE_CURRENT_SOURCE_DIR}/src/3rdparty/samplerate/float_cast.h
+			${CMAKE_CURRENT_SOURCE_DIR}/src/3rdparty/samplerate/src_zoh.c
+			${CMAKE_CURRENT_SOURCE_DIR}/src/3rdparty/samplerate/src_linear.c)
+	ENDIF(SAMPLERATE_FOUND)
+ENDIF(WANT_SYSTEM_SR)
+
+
+
+CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/lmmsconfig.h.in ${CMAKE_CURRENT_SOURCE_DIR}/lmmsconfig.h)
+
+
+FILE(GLOB lmms_INCLUDES include/*.h)
+FILE(GLOB lmms_UI src/gui/dialogs/*.ui)
+FILE(GLOB_RECURSE lmms_SOURCES src/*.cpp)
+
+SET(lmms_MOC ${lmms_INCLUDES})
+
+SET(lmms_EMBEDDED_RESOURCES AUTHORS COPYING)
+
+QT4_WRAP_CPP(lmms_MOC_out ${lmms_MOC} OPTIONS -nw -DLMMS_HAVE_ALSA)
+QT4_WRAP_UI(lmms_UI_out ${lmms_UI})
+
+
+# embedded resources stuff
+ADD_EXECUTABLE(bin2res buildtools/bin2res.cpp)
+GET_TARGET_PROPERTY(BIN2RES bin2res LOCATION)
+SET(ER_H embedded_resources.h)
+
+# we somehow have to make LMMS-binary depend on MOC-files
+ADD_FILE_DEPENDENCIES(${ER_H} ${lmms_MOC_out})
+
+ADD_CUSTOM_COMMAND(OUTPUT ${ER_H} COMMAND ${BIN2RES} ARGS ${lmms_EMBEDDED_RESOURCES} > ${ER_H} DEPENDS ${BIN2RES})
+
+
+# make sub-directories
+ADD_SUBDIRECTORY(plugins)
+ADD_SUBDIRECTORY(data)
+
+#
+# build LMMS-binary
+#
+ADD_DEFINITIONS(-D'LIB_DIR="${CMAKE_INSTALL_PREFIX}/${LIB_DIR}/"' -D'PLUGIN_DIR="${CMAKE_INSTALL_PREFIX}/${LIB_DIR}/lmms/"' ${PULSEAUDIO_DEFINITIONS})
+
+INCLUDE_DIRECTORIES( include . ${SDL_INCLUDE_DIR} ${PULSEAUDIO_INCLUDE_DIR} ${JACK_INCLUDE_DIRS} ${OGGVORBIS_INCLUDE_DIR} ${SAMPLERATE_INCLUDE_DIRS} ${SNDFILE_INCLUDE_DIRS})
+LINK_DIRECTORIES( ${ASOUND_LIBRARY_DIR} ${JACK_LIBRARY_DIRS} ${SAMPLERATE_LIBRARY_DIRS} ${SNDFILE_LIBRARY_DIRS} )
+LINK_LIBRARIES(${QT_LIBRARIES} ${ASOUND_LIBRARY} ${SDL_LIBRARY} ${PULSEAUDIO_LIBRARIES} ${JACK_LIBRARIES} ${OGGVORBIS_LIBRARIES} ${SAMPLERATE_LIBRARIES} ${SNDFILE_LIBRARIES})
+
+ADD_EXECUTABLE(lmms ${lmms_SOURCES} ${lmms_INCLUDES} ${LIBSAMPLERATE_SOURCES} ${ER_H} ${lmms_UI_out})
+SET_TARGET_PROPERTIES(lmms PROPERTIES COMPILE_FLAGS "-D_FORTIFY_SOURCE=0")
+IF(NOT WIN32)
+	SET_TARGET_PROPERTIES(lmms PROPERTIES COMPILE_FLAGS "-fPIC")
+ENDIF(NOT WIN32)
+INSTALL(TARGETS lmms RUNTIME DESTINATION bin)
+
+
+
+IF(WANT_PCH)
+    FIND_PACKAGE(PCHSupport)
+    IF(PCHSupport_FOUND)
+	SET(USE_PCH TRUE)
+        ADD_DEFINITIONS(-DUSE_PCH)
+        MESSAGE(STATUS "Enabling precompiled headers for GCC ${gcc_compiler_version}")
+	ADD_PRECOMPILED_HEADER(lmms pch include/pch.h)
+    ENDIF(PCHSupport_FOUND)
+ENDIF(WANT_PCH)
+
+SET(ADDITIONAL_MAKE_CLEAN_FILES ${ER_H} ${lmms_MOC_out} ${lmms_UI_out} lmmsconfig.h pch.h.gch/*)
+
+
+#
+# display configuration information
+#
+
+MESSAGE("\n"
+"Installation Summary\n"
+"--------------------\n"
+"* Install Directory           : ${CMAKE_INSTALL_PREFIX}\n"
+"* Build type                  : ${CMAKE_BUILD_TYPE}\n"
+"* Use precompiled headers     : ${USE_PCH}\n"
+"* Use system's libsamplerate  : ${LMMS_HAVE_SAMPLERATE}\n"
+)
+
+MESSAGE(
+"Supported audio interfaces\n"
+"--------------------------\n"
+"* ALSA                        : ${LMMS_HAVE_ALSA}\n"
+"* JACK                        : ${LMMS_HAVE_JACK}\n"
+"* OSS                         : ${LMMS_HAVE_OSS}\n"
+"* PulseAudio                  : ${LMMS_HAVE_PULSEAUDIO}\n"
+"* SDL                         : ${LMMS_HAVE_SDL}\n"
+)
+
+MESSAGE(
+"Supported MIDI interfaces\n"
+"-------------------------\n"
+"* ALSA                        : ${LMMS_HAVE_ALSA}\n"
+"* OSS                         : ${LMMS_HAVE_OSS}\n"
+"* WinMM                       : ${LMMS_BUILD_WIN32}\n"
+)
+
+MESSAGE(
+"Supported sample-file formats\n"
+"-----------------------------\n"
+"* WAVE                        : TRUE\n"
+"* OGG/VORBIS                  : ${LMMS_HAVE_OGGVORBIS}\n"
+)
+
+MESSAGE(
+"Optional plugins\n"
+"----------------\n"
+"* SoundFont2 player           : ${LMMS_HAVE_FLUIDSYNTH}\n"
+"* Stk Mallets                 : ${LMMS_HAVE_STK}\n"
+"* VST-instrument hoster       : ${LMMS_HAVE_VST}\n"
+"* VST-effect hoster           : ${LMMS_HAVE_VST}\n"
+"* SpectrumAnalyzer            : ${LMMS_HAVE_FFTW3F}\n"
+"* CAPS LADSPA plugins         : ${LMMS_HAVE_CAPS}\n"
+"* TAP LADSPA plugins          : ${LMMS_HAVE_TAP}\n"
+)
+

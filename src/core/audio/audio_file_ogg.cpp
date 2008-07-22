@@ -7,7 +7,7 @@
  * This file is based on encode.c from vorbis-tools-source, for more information
  * see below.
  *
- * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -30,11 +30,9 @@
 
 
 
-#include <qpair.h>
-
 #include "audio_file_ogg.h"
 
-#ifdef LMMS_HAVE_VORBIS_CODEC_H
+#ifdef LMMS_HAVE_OGGVORBIS
 
 
 #include <vorbis/vorbisenc.h>

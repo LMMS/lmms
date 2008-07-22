@@ -47,7 +47,7 @@ captionMenu::~captionMenu()
 
 
 
-#include "caption_menu.moc"
+#include "moc_caption_menu.cxx"
 
 
 #endif

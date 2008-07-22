@@ -266,5 +266,5 @@ plugin * PLUGIN_EXPORT lmms_plugin_main( model *, void * _data )
 }
 
 
-#include "kicker.moc"
+#include "moc_kicker.cxx"
 

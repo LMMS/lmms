@@ -28,7 +28,7 @@
 
 #include "audio_sdl.h"
 
-#ifdef SDL_AUDIO_SUPPORT
+#ifdef LMMS_HAVE_SDL
 
 #include <QtGui/QLabel>
 #include <QtGui/QLineEdit>

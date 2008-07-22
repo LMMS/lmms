@@ -1,3 +1,4 @@
+#if 0
 #ifndef SINGLE_SOURCE_COMPILE
 
 /*
@@ -214,4 +215,5 @@ void midiMapper::readChannelMap( QFile & _f )
 
 
 
+#endif
 #endif

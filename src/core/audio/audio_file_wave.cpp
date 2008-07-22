@@ -4,7 +4,7 @@
  * audio_file_wave.cpp - audio-device which encodes wave-stream and writes it
  *                       into a WAVE-file. This is used for song-export.
  *
- * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -62,7 +62,6 @@ audioFileWave::~audioFileWave()
 
 bool audioFileWave::startEncoding( void )
 {
-#if LMMS_HAVE_SNDFILE_H
 	m_si.samplerate = sampleRate();
 	m_si.channels = channels();
 	m_si.frames = getMixer()->framesPerPeriod();
@@ -76,31 +75,6 @@ bool audioFileWave::startEncoding( void )
 		default: m_si.format = SF_FORMAT_WAV | SF_FORMAT_PCM_16; break;
 	}
 	m_sf = sf_open( outputFile().toUtf8().constData(), SFM_WRITE, &m_si );
-#else
-	if( outputFileOpened() == FALSE )
-	{
-		return( FALSE );
-	}
-
-	m_bytesWritten = 0;
-
-	memcpy( m_waveFileHeader.riff_id, "RIFF", 4 );
-	m_waveFileHeader.total_bytes = 0;
-	memcpy( m_waveFileHeader.wave_fmt_str, "WAVEfmt ", 8 );
-	m_waveFileHeader.bitrate_1 = m_waveFileHeader.bitrate_2 =
-						BYTES_PER_INT_SAMPLE * 8;
-	m_waveFileHeader.uncompressed = swap16IfBE( 1 );
-	m_waveFileHeader.channels = swap16IfBE( channels() );
-	m_waveFileHeader.sample_rate = swap32IfBE( sampleRate() );
-	m_waveFileHeader.bytes_per_second = swap32IfBE( sampleRate() *
-					BYTES_PER_INT_SAMPLE * channels() );
-	m_waveFileHeader.block_alignment = swap16IfBE( BYTES_PER_INT_SAMPLE *
-								channels() );
-	memcpy ( m_waveFileHeader.data_chunk_id, "data", 4 );
-	m_waveFileHeader.data_bytes = 0;
-
-	writeData( &m_waveFileHeader, sizeof( m_waveFileHeader ) );
-#endif
 	return( TRUE );
 }
 
@@ -111,7 +85,6 @@ void audioFileWave::writeBuffer( const surroundSampleFrame * _ab,
 						const fpp_t _frames,
 						const float _master_gain )
 {
-#if LMMS_HAVE_SNDFILE_H
 	if( depth() == 32 )
 	{
 		float *  buf = new float[_frames*channels()];
@@ -135,16 +108,6 @@ void audioFileWave::writeBuffer( const surroundSampleFrame * _ab,
 		sf_writef_short( m_sf, buf, _frames );
 		delete[] buf;
 	}
-#else
-	int bytes = 0;
-	int_sample_t * outbuf = new int_sample_t[_frames * channels()];
-	Uint32 bytes = convertToS16( _ab, _frames, _master_gain, outbuf,
-							!isLittleEndian() );
-	writeData( outbuf, bytes );
-	delete[] outbuf;
-
-	m_bytesWritten += bytes;
-#endif
 }
 
 
@@ -152,18 +115,7 @@ void audioFileWave::writeBuffer( const surroundSampleFrame * _ab,
 
 void audioFileWave::finishEncoding( void )
 {
-#if LMMS_HAVE_SNDFILE_H
 	sf_close( m_sf );
-#else
-	seekToBegin();
-
-	m_waveFileHeader.total_bytes = swap32IfBE( m_bytesWritten+36 );
-	m_waveFileHeader.data_bytes = swap32IfBE( m_bytesWritten );
-
-	// write header again, because total-bytes-field and data-bytes-field
-	// have to be updated...
-	writeData( &m_waveFileHeader, sizeof( m_waveFileHeader ) );
-#endif
 }
 
 
