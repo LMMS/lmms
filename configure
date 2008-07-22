@@ -1,0 +1,10 @@
+#!/bin/sh
+
+echo ""
+echo "Usage of configure & Co is deprecated! Please use"
+echo ""
+echo "    cmake . -DCMAKE_INSTALL_PREFIX=/usr"
+echo ""
+echo "or similiar instead."
+echo ""
+
