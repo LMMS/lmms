@@ -1,5 +1,31 @@
 2008-07-22	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* cmake/modules/BuildPlugin.cmake:
+	* plugins/patman/CMakeLists.txt:
+	* plugins/ladspa_effect/CMakeLists.txt:
+	* plugins/organic/CMakeLists.txt:
+	* plugins/lb302/CMakeLists.txt:
+	* plugins/lb303/CMakeLists.txt:
+	* plugins/bass_booster/CMakeLists.txt:
+	* plugins/stereo_matrix/CMakeLists.txt:
+	* plugins/bit_invader/CMakeLists.txt:
+	* plugins/vst_effect/CMakeLists.txt:
+	* plugins/vibed/CMakeLists.txt:
+	* plugins/triple_oscillator/CMakeLists.txt:
+	* plugins/live_tool/CMakeLists.txt:
+	* plugins/peak_controller_effect/CMakeLists.txt:
+	* plugins/audio_file_processor/CMakeLists.txt:
+	* plugins/stk/mallets/CMakeLists.txt:
+	* plugins/stereo_enhancer/CMakeLists.txt:
+	* plugins/sf2_player/CMakeLists.txt:
+	* plugins/vestige/CMakeLists.txt:
+	* plugins/ladspa_browser/CMakeLists.txt:
+	* plugins/spectrum_analyzer/CMakeLists.txt:
+	* plugins/kicker/CMakeLists.txt:
+	* plugins/flp_import/CMakeLists.txt:
+	* CMakeLists.txt:
+	various fixes for allowing out-of-tree builds
+
 	* CMakeLists.txt:
 	- initial support for CPack
 	- remove old include/lmmsconfig.h from the autotools-era

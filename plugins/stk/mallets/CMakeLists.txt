@@ -1,4 +1,4 @@
 INCLUDE(BuildPlugin)
 INCLUDE_DIRECTORIES(${STK_INCLUDE_DIR})
 LINK_LIBRARIES(${STK_LIBRARY})
-BUILD_PLUGIN(malletsstk mallets.cpp mallets.h MOCFILES mallets.h EMBEDDED_RESOURCES *.png)
+BUILD_PLUGIN(malletsstk mallets.cpp mallets.h MOCFILES mallets.h EMBEDDED_RESOURCES ${CMAKE_CURRENT_SOURCE_DIR}/*.png)
