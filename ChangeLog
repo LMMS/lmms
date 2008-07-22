@@ -2,6 +2,12 @@
 
 	* cmake/modules/Win32Toolchain.cmake:
 	* cmake/modules/BuildPlugin.cmake:
+	* src/3rdparty/samplerate/config.h:
+	* CMakeLists.txt:
+	fixes for successfully cross-compiling
+
+	* cmake/modules/Win32Toolchain.cmake:
+	* cmake/modules/BuildPlugin.cmake:
 	* plugins/ladspa_effect/tap/CMakeLists.txt:
 	* plugins/ladspa_effect/caps/CMakeLists.txt:
 	* plugins/vst_effect/CMakeLists.txt:
