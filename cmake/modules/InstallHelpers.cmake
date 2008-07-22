@@ -27,7 +27,7 @@ MACRO(INSTALL_DATA_SUBDIRS _subdir _wildcards)
 
 		FOREACH(_item ${files})
 			GET_FILENAME_COMPONENT(_file "${_item}" PATH)
-			STRING(REGEX REPLACE "${CMAKE_CURRENT_SOURCE_DIR}/" "" _file "${_file}")
+			STRING(REPLACE "${CMAKE_CURRENT_SOURCE_DIR}/" "" _file "${_file}")
 			LIST_CONTAINS(contains _file ${SUBDIRS})
 			IF(NOT contains)
 				LIST(APPEND SUBDIRS "${_file}")
