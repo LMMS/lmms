@@ -42,7 +42,7 @@ fileEncodeDevice __fileEncodeDevices[] =
 	{ projectRenderer::OggFile,
 		QT_TRANSLATE_NOOP( "projectRenderer", "Compressed OGG-File (*.ogg)" ),
 					".ogg",
-#ifdef LMMS_HAVE_VORBIS_CODEC_H
+#ifdef LMMS_HAVE_OGGVORBIS
 					&audioFileOgg::getInst
 #else
 					NULL

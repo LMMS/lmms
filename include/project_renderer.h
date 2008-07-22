@@ -36,9 +36,7 @@ public:
 	enum ExportFileFormats
 	{
 		WaveFile,
-#ifdef LMMS_HAVE_OGGVORBIS
 		OggFile,
-#endif
 		NumFileFormats
 	} ;
 
