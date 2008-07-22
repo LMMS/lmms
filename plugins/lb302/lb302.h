@@ -188,7 +188,6 @@ private:
 
 public slots:
 	void filterChanged( void );
-	void detuneChanged( void );
 	void db24Toggled( void );
 
 private:

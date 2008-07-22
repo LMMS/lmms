@@ -1,5 +1,10 @@
 2008-07-22	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* src/core/mmp.cpp:
+	* plugins/lb302/lb302.h
+	* plugins/CMakeLists.txt:
+	switched back to LB302 as Paul wants LB303 for 0.4.1
+
 	* cmake/modules/FindAlsa.cmake:
 	* cmake/modules/FindOggVorbis.cmake:
 	* cmake/modules/FindSTK.cmake:

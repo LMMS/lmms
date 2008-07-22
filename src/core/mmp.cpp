@@ -530,11 +530,11 @@ void multimediaProject::upgrade( void )
 			el.setAttribute( "active0", 1 );
 		}
 
-/*		while( !( list = elementsByTagName( "lb303" ) ).isEmpty() )
+		while( !( list = elementsByTagName( "lb303" ) ).isEmpty() )
 		{
 			QDomElement el = list.item( 0 ).toElement();
 			el.setTagName( "lb302" );
-		}*/
+		}
 
 		while( !( list = elementsByTagName( "channelsettings" ) ).
 								isEmpty() )
@@ -650,7 +650,7 @@ void multimediaProject::upgrade( void )
 		}
 	}
 
-	if( version < "0.4.0-beta" )
+/*	if( version < "0.4.0-beta" )
 	{
 		QDomNodeList list;
 		while( !( list = elementsByTagName( "lb302" ) ).isEmpty() )
@@ -658,7 +658,7 @@ void multimediaProject::upgrade( void )
 			QDomElement el = list.item( 0 ).toElement();
 			el.setTagName( "lb303" );
 		}
-	}
+	}*/
 
 	// Time-signature
 	if ( !m_head.hasAttribute( "timesig_numerator" ) )
