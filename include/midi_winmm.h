@@ -1,7 +1,7 @@
 /*
- * midi_alsa_seq.h - ALSA-sequencer-client
+ * midi_winmm.h - WinMM MIDI client
  *
- * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -23,41 +23,38 @@
  */
 
 
-#ifndef _MIDI_ALSA_SEQ_H
-#define _MIDI_ALSA_SEQ_H
+#ifndef _MIDI_WINMM_H
+#define _MIDI_WINMM_H
 
 #include "lmmsconfig.h"
 
-#ifdef LMMS_HAVE_ALSA
+#ifdef LMMS_BUILD_WIN32
 
-#include <alsa/asoundlib.h>
+#include <windows.h>
+#include <mmsystem.h>
 
-#include <QtCore/QThread>
 #include <QtCore/QTimer>
 
-
 #include "midi_client.h"
+#include "midi_port.h"
 
 
-struct pollfd;
 class QLineEdit;
 
 
-class midiALSASeq : public QThread, public midiClient
+class midiWinMM : public QObject, public midiClient
 {
 	Q_OBJECT
 public:
-	midiALSASeq( void );
-	virtual ~midiALSASeq();
+	midiWinMM( void );
+	virtual ~midiWinMM();
 
 	static QString probeDevice( void );
 
 
 	inline static QString name( void )
 	{
-		return( QT_TRANSLATE_NOOP( "setupWidget",
-			"ALSA-Sequencer (Advanced Linux Sound "
-							"Architecture)" ) );
+		return( QT_TRANSLATE_NOOP( "setupWidget", "WinMM MIDI" ) );
 	}
 
 
@@ -67,20 +64,18 @@ public:
 						const midiPort * _port );
 
 	virtual void applyPortMode( midiPort * _port );
-	virtual void applyPortName( midiPort * _port );
-
 	virtual void removePort( midiPort * _port );
 
 
-	// list seq-ports from ALSA 
+	// list devices as ports
 	virtual QStringList readablePorts( void ) const
 	{
-		return( m_readablePorts );
+		return( m_inputDevices.values() );
 	}
 
 	virtual QStringList writeablePorts( void ) const
 	{
-		return( m_writeablePorts );
+		return( m_outputDevices.values() );
 	}
 
 	// (un)subscribe given midiPort to/from destination-port 
@@ -104,6 +99,11 @@ public:
 							_receiver, _member );
 	}
 
+	virtual bool isRaw( void ) const
+	{
+		return( FALSE );
+	}
+
 
 	class setupWidget : public midiClient::setupWidget
 	{
@@ -120,31 +120,26 @@ public:
 
 
 private slots:
-	void changeQueueTempo( bpm_t _bpm );
-	void updatePortList( void );
+	void updateDeviceList( void );
 
 
 private:
-	virtual void run( void );
+	void openDevices( void );
+	void closeDevices( void );
+	static void CALLBACK inputCallback( HMIDIIN _hm, UINT _msg,
+						DWORD_PTR _inst,
+						DWORD_PTR _param1,
+							DWORD_PTR _param2 );
+	void handleInputEvent( HMIDIIN _hm, DWORD _ev );
 
-	snd_seq_t * m_seqHandle;
-	struct ports
-	{
-		ports() { p[0] = -1; p[1] = -1; }
-		int & operator[]( const int _i ) { return( p[_i] ); }
-		private: int p[2];
-	} ;
-	QMap<midiPort *, ports> m_portIDs;
+	QTimer m_deviceListUpdateTimer;
+	QMap<HMIDIIN, QString> m_inputDevices;
+	QMap<HMIDIOUT, QString> m_outputDevices;
 
-	int m_queueID;
-
-	volatile bool m_quit;
-
-	QTimer m_portListUpdateTimer;
-	QStringList m_readablePorts;
-	QStringList m_writeablePorts;
-
-	int m_pipe[2];
+	// subscriptions
+	typedef QMap<QString, midiPortList> subMap;
+	subMap m_inputSubs;
+	subMap m_outputSubs;
 
 
 signals:

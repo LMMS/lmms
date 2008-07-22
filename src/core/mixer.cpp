@@ -62,6 +62,7 @@
 #include "midi_alsa_raw.h"
 #include "midi_alsa_seq.h"
 #include "midi_oss.h"
+#include "midi_winmm.h"
 #include "midi_dummy.h"
 
 
@@ -1045,6 +1046,18 @@ midiClient * mixer::tryMIDIClients( void )
 	}
 #endif
 
+#ifdef LMMS_BUILD_WIN32
+	if( client_name == midiWinMM::name() || client_name == "" )
+	{
+		midiWinMM * mwmm = new midiWinMM;
+//		if( moss->isRunning() )
+		{
+			m_midiClientName = midiWinMM::name();
+			return( mwmm );
+		}
+		delete mwmm;
+	}
+#endif
 	printf( "Couldn't create MIDI-client, neither with ALSA nor with "
 		"OSS. Will use dummy-MIDI-client.\n" );
 

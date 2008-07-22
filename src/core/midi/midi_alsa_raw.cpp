@@ -38,6 +38,7 @@
 
 
 midiALSARaw::midiALSARaw( void ) :
+	midiClientRaw(),
 	m_inputp( &m_input ),
 	m_outputp( &m_output ),
 	m_quit( FALSE )

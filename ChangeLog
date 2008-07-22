@@ -1,5 +1,18 @@
 2008-07-22	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* include/midi_alsa_seq.h:
+	* include/midi_client.h:
+	* include/midi_port.h:
+	* include/midi_winmm.h:
+	* src/core/mixer.cpp:
+	* src/core/midi/midi_alsa_raw.cpp:
+	* src/core/midi/midi_alsa_seq.cpp:
+	* src/core/midi/midi_client.cpp:
+	* src/core/midi/midi_oss.cpp:
+	* src/core/midi/midi_winmm.cpp:
+	* src/gui/setup_dialog.cpp:
+	added rudimentary WinMM MIDI support
+
 	* src/core/mmp.cpp:
 	* plugins/lb302/lb302.h
 	* plugins/CMakeLists.txt:

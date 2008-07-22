@@ -42,6 +42,7 @@
 
 
 midiALSASeq::midiALSASeq( void ) :
+	midiClient(),
 	m_seqHandle( NULL ),
 	m_queueID( -1 ),
 	m_quit( FALSE ),
@@ -326,9 +327,10 @@ void midiALSASeq::subscribeReadablePort( midiPort * _port,
 						bool _subscribe )
 {
 	if( m_portIDs.contains( _port ) == FALSE ||
-		( _port->mode() != midiPort::Input &&
-		  _port->mode() != midiPort::Duplex ) )
+				_port->inputEnabled() == FALSE )
 	{
+		printf( "port %s can't be (un)subscribed!\n",
+					_port->name().toAscii().constData() );
 		return;
 	}
 	snd_seq_addr_t sender;
@@ -366,9 +368,10 @@ void midiALSASeq::subscribeWriteablePort( midiPort * _port,
 						bool _subscribe )
 {
 	if( m_portIDs.contains( _port ) == FALSE ||
-		( _port->mode() != midiPort::Output &&
-		  _port->mode() != midiPort::Duplex ) )
+				_port->outputEnabled() == FALSE )
 	{
+		printf( "port %s can't be (un)subscribed!\n",
+					_port->name().toAscii().constData() );
 		return;
 	}
 	snd_seq_addr_t dest;

@@ -63,14 +63,20 @@ public:
 
 	// returns whether client works with raw-MIDI, only needs to be
 	// re-implemented by midiClientRaw for returning TRUE
-	inline virtual bool isRaw( void ) const
+	virtual bool isRaw( void ) const
 	{
 		return( FALSE );
 	}
 
 	// if not raw-client, return all readable/writeable ports
-	virtual const QStringList & readablePorts( void ) const;
-	virtual const QStringList & writeablePorts( void ) const;
+	virtual QStringList readablePorts( void ) const
+	{
+		return QStringList();
+	}
+	virtual QStringList writeablePorts( void ) const
+	{
+		return QStringList();
+	}
 
 	// (un)subscribe given midiPort to/from destination-port 
 	virtual void subscribeReadablePort( midiPort * _port,
@@ -100,7 +106,8 @@ public:
 	public:
 		setupWidget( const QString & _caption, QWidget * _parent ) :
 			tabWidget( tabWidget::tr( "Settings for %1" ).arg(
-					tr( _caption.toAscii() ) ).toUpper(), _parent )
+					tr( _caption.toAscii() ) ).toUpper(),
+								_parent )
 		{
 		}
 
@@ -137,7 +144,7 @@ public:
 	virtual ~midiClientRaw();
 
 	// we are raw-clients for sure!
-	inline virtual bool isRaw( void ) const
+	virtual bool isRaw( void ) const
 	{
 		return( TRUE );
 	}

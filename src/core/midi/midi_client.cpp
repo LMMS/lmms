@@ -86,24 +86,6 @@ void midiClient::removePort( midiPort * _port )
 
 
 
-const QStringList & midiClient::readablePorts( void ) const
-{
-	static QStringList sl;
-	return( sl );
-}
-
-
-
-
-const QStringList & midiClient::writeablePorts( void ) const
-{
-	static QStringList sl;
-	return( sl );
-}
-
-
-
-
 void midiClient::subscribeReadablePort( midiPort *, const QString & , bool )
 {
 }

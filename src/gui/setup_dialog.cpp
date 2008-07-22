@@ -63,6 +63,7 @@
 #include "midi_alsa_raw.h"
 #include "midi_alsa_seq.h"
 #include "midi_oss.h"
+#include "midi_winmm.h"
 #include "midi_dummy.h"
 
 
@@ -537,6 +538,12 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 	m_midiIfaceSetupWidgets[midiOSS::name()] =
 					new midiOSS::setupWidget( msw );
 #endif
+
+#ifdef LMMS_BUILD_WIN32
+	m_midiIfaceSetupWidgets[midiWinMM::name()] =
+					new midiWinMM::setupWidget( msw );
+#endif
+
 	m_midiIfaceSetupWidgets[midiDummy::name()] =
 					new midiDummy::setupWidget( msw );
 

@@ -87,6 +87,16 @@ public:
 
 	void setMode( Modes _mode );
 
+	inline bool inputEnabled( void ) const
+	{
+		return( mode() == Input || mode() == Duplex );
+	}
+
+	inline bool outputEnabled( void ) const
+	{
+		return( mode() == Output || mode() == Duplex );
+	}
+
 	inline void enableDefaultVelocityForInEvents( const bool _on )
 	{
 		m_defaultVelocityInEnabledModel.setValue( _on );
@@ -170,6 +180,8 @@ private:
 
 } ;
 
+
+typedef QList<midiPort *> midiPortList;
 
 
 #endif

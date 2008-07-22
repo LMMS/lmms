@@ -45,6 +45,7 @@
 
 
 midiOSS::midiOSS( void ) :
+	midiClientRaw(),
 	m_midiDev( probeDevice() ),
 	m_quit( FALSE )
 {
