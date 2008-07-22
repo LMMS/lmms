@@ -1,5 +1,9 @@
 2008-07-22	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* include/project_renderer.h:
+	* src/core/project_renderer.cpp:
+	also compile without OGG/Vorbis-support
+
 	* cmake/modules/Win32Toolchain.cmake:
 	* cmake/modules/BuildPlugin.cmake:
 	* src/3rdparty/samplerate/config.h:

@@ -13,6 +13,7 @@ ENDIF(COMMAND CMAKE_POLICY)
 INCLUDE(AddFileDependencies)
 INCLUDE(CheckIncludeFiles)
 INCLUDE(FindPkgConfig)
+INCLUDE(CPack)
 
 SET(VERSION_MAJOR "0")
 SET(VERSION_MINOR "4")
@@ -335,7 +336,7 @@ IF(WANT_PCH)
     ENDIF(PCHSupport_FOUND)
 ENDIF(WANT_PCH)
 
-SET(ADDITIONAL_MAKE_CLEAN_FILES ${ER_H} ${lmms_MOC_out} ${lmms_UI_out} lmmsconfig.h pch.h.gch/*)
+SET_DIRECTORY_PROPERTIES(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES "${ER_H} ${lmms_MOC_out} ${lmms_UI_out} lmmsconfig.h pch.h.gch/*")
 
 
 #
