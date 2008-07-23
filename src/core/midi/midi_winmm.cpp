@@ -202,7 +202,7 @@ void midiWinMM::subscribeReadablePort( midiPort * _port,
 						const QString & _dest,
 						bool _subscribe )
 {
-	if( _port->inputEnabled() == FALSE )
+	if( _subscribe && _port->inputEnabled() == FALSE )
 	{
 		printf( "port %s can't be (un)subscribed!\n",
 					_port->name().toAscii().constData() );
@@ -226,7 +226,7 @@ void midiWinMM::subscribeWriteablePort( midiPort * _port,
 						const QString & _dest,
 						bool _subscribe )
 {
-	if( _port->outputEnabled() == FALSE && _subscribe == FALSE )
+	if( _subscribe && _port->outputEnabled() == FALSE )
 	{
 		printf( "port %s can't be (un)subscribed!\n",
 					_port->name().toAscii().constData() );

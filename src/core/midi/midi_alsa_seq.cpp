@@ -326,8 +326,8 @@ void midiALSASeq::subscribeReadablePort( midiPort * _port,
 						const QString & _dest,
 						bool _subscribe )
 {
-	if( m_portIDs.contains( _port ) == FALSE ||
-				_port->inputEnabled() == FALSE )
+	if( _subscribe &&( m_portIDs.contains( _port ) == FALSE ||
+					_port->inputEnabled() == FALSE ) )
 	{
 		printf( "port %s can't be (un)subscribed!\n",
 					_port->name().toAscii().constData() );
@@ -367,8 +367,8 @@ void midiALSASeq::subscribeWriteablePort( midiPort * _port,
 						const QString & _dest,
 						bool _subscribe )
 {
-	if( m_portIDs.contains( _port ) == FALSE ||
-				_port->outputEnabled() == FALSE )
+	if( _subscribe && ( m_portIDs.contains( _port ) == FALSE ||
+					_port->outputEnabled() == FALSE ) )
 	{
 		printf( "port %s can't be (un)subscribed!\n",
 					_port->name().toAscii().constData() );
