@@ -29,9 +29,9 @@
 #include "lmmsconfig.h"
 
 #ifdef LMMS_BUILD_WIN32
-
 #include <windows.h>
 #include <mmsystem.h>
+#endif
 
 #include <QtCore/QTimer>
 
@@ -67,6 +67,7 @@ public:
 	virtual void removePort( midiPort * _port );
 
 
+#ifdef LMMS_BUILD_WIN32
 	// list devices as ports
 	virtual QStringList readablePorts( void ) const
 	{
@@ -77,6 +78,7 @@ public:
 	{
 		return( m_outputDevices.values() );
 	}
+#endif
 
 	// (un)subscribe given midiPort to/from destination-port 
 	virtual void subscribeReadablePort( midiPort * _port,
@@ -126,6 +128,8 @@ private slots:
 private:
 	void openDevices( void );
 	void closeDevices( void );
+
+#ifdef LMMS_BUILD_WIN32
 	static void CALLBACK inputCallback( HMIDIIN _hm, UINT _msg,
 						DWORD_PTR _inst,
 						DWORD_PTR _param1,
@@ -135,6 +139,7 @@ private:
 	QTimer m_deviceListUpdateTimer;
 	QMap<HMIDIIN, QString> m_inputDevices;
 	QMap<HMIDIOUT, QString> m_outputDevices;
+#endif
 
 	// subscriptions
 	typedef QMap<QString, midiPortList> subMap;
@@ -147,8 +152,6 @@ signals:
 	void writeablePortsChanged( void );
 
 } ;
-
-#endif
 
 #endif
 

@@ -1,5 +1,13 @@
 2008-07-23	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* data/locale/fr.qm:
+	* data/locale/fr.ts:
+	updated French localization-files by Stephane Thomas
+
+	* cmake/modules/FindPkgConfig.cmake:
+	* include/midi_winmm.h:
+	* include/midi_alsa_seq.h:
+	* CMakeLists.txt:
 	* cmake/modules/BuildPlugin.cmake:
 	support for cmake < 2.4.8
 

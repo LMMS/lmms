@@ -29,8 +29,8 @@
 #include "lmmsconfig.h"
 
 #ifdef LMMS_HAVE_ALSA
-
 #include <alsa/asoundlib.h>
+#endif
 
 #include <QtCore/QThread>
 #include <QtCore/QTimer>
@@ -127,6 +127,7 @@ private slots:
 private:
 	virtual void run( void );
 
+#ifdef LMMS_HAVE_ALSA
 	snd_seq_t * m_seqHandle;
 	struct ports
 	{
@@ -135,6 +136,7 @@ private:
 		private: int p[2];
 	} ;
 	QMap<midiPort *, ports> m_portIDs;
+#endif
 
 	int m_queueID;
 
@@ -152,8 +154,6 @@ signals:
 	void writeablePortsChanged( void );
 
 } ;
-
-#endif
 
 #endif
 
