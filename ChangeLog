@@ -1,5 +1,8 @@
 2008-07-23	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* cmake/modules/BuildPlugin.cmake:
+	support for cmake < 2.4.8
+
 	* plugins/ladspa_effect/caps/CMakeLists.txt:
 	do not compile with -O3 when using GCC 4.1.x as this version segfaults
 	while optimizing
