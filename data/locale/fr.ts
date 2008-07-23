@@ -1,4 +1,6 @@
-<!DOCTYPE TS><TS>
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS><TS version="1.1" language="fr_FR">
+<defaultcodec></defaultcodec>
 <context>
     <name>aboutDialog</name>
     <message>
@@ -7,7 +9,7 @@
     </message>
     <message>
         <source>Linux MultiMedia Studio</source>
-        <translation></translation>
+        <translation>Linux MultiMedia Studio</translation>
     </message>
     <message>
         <source>LMMS - A powerful synthesizer-studio
@@ -19,7 +21,7 @@ Copyright (c) 2004-2005 LMMS-Developers</source>
         <source>Current language not translated.
 
 If you&apos;re interested in translating LMMS in another language or want to improve existing translations, you&apos;re welcome to help us! Just contact the maintainer!</source>
-        <translation>Si vous êtes intérressé par la traduction de LMMS dans une autre langue ou que vous souhaitez améliorer les traductions existantes, votre aide est la bienvenue ! Contacter le mainteneur !</translation>
+        <translation>Si vous êtes intérressé par la traduction de LMMS dans une autre langue, ou que vous souhaitez améliorer les traductions existantes, votre aide est la bienvenue ! Contacter le mainteneur !</translation>
     </message>
     <message>
         <source>About</source>
@@ -470,7 +472,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>Use this knob for setting the arpeggio gate. The arpeggio gate specifies the percent of a whole arpeggio-tone that should be played. With this you can make cool staccato-arpeggios.</source>
-        <translation type="unfinished"></translation>
+        <translation>Utiliser ce bouton pour régler le paramètre &quot;gate&quot; de l&apos;arpège. &quot;gate&quot; spécifie la durée (en % de la note originale) de la note utilisée pour l&apos;arpège. Ceci permet les notes détachées pour un arpège (staccato).</translation>
     </message>
     <message>
         <source>Time</source>
@@ -584,7 +586,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>Click here, if you want to stop playing of current beat/bassline.</source>
-        <translation>Cliquez ici pour arrêter la lecture du rythme/ligne de basse courant (Espace).</translation>
+        <translation>Cliquez ici pour arrêter la lecture du &quot;rythme/ligne de basse&quot; courant.</translation>
     </message>
 </context>
 <context>
@@ -834,23 +836,23 @@ Assurez-vous d&apos;avoir les droits d&apos;accès en écriture sur ce fichier e
     <name>envelopeAndLFOWidget</name>
     <message>
         <source>Predelay-time</source>
-        <translation type="unfinished"></translation>
+        <translation>Durée du pré-délai</translation>
     </message>
     <message>
         <source>Predelay:</source>
-        <translation>Pré-délai : </translation>
+        <translation type="unfinished">Pré-délai: </translation>
     </message>
     <message>
         <source>Use this knob for setting predelay of the current envelope. The bigger this value the longer the time before start of actual envelope.</source>
-        <translation type="unfinished"></translation>
+        <translation>Utilisez ce bouton pour régler le pré-délai de l&apos;enveloppe courante. Plus la valeur est importante, plus le temps sera long avant le début de l&apos;enveloppe.</translation>
     </message>
     <message>
         <source>Attack-time</source>
-        <translation type="unfinished"></translation>
+        <translation>Durée d&apos;attaque</translation>
     </message>
     <message>
         <source>Attack:</source>
-        <translation>Attaque : </translation>
+        <translation type="unfinished">Attaque: </translation>
     </message>
     <message>
         <source>Use this knob for setting attack-time of the current envelope. The bigger this value the longer the envelope needs to increase to attack-level. Choose a small value for instruments like pianos and a big value for strings.</source>
@@ -962,35 +964,35 @@ Assurez-vous d&apos;avoir les droits d&apos;accès en écriture sur ce fichier e
     </message>
     <message>
         <source>Click here if you want a sine-wave for current oscillator.</source>
-        <translation type="unfinished"></translation>
+        <translation>Signal sinusoïdal</translation>
     </message>
     <message>
         <source>Click here if you want a triangle-wave for current oscillator.</source>
-        <translation type="unfinished"></translation>
+        <translation>Signal triangulaire</translation>
     </message>
     <message>
         <source>Click here if you want a saw-wave for current oscillator.</source>
-        <translation type="unfinished"></translation>
+        <translation>Signal en dent de scie</translation>
     </message>
     <message>
         <source>Click here if you want a square-wave for current oscillator.</source>
-        <translation type="unfinished"></translation>
+        <translation>Signal carré</translation>
     </message>
     <message>
         <source>Click here if the frequency of this LFO should be multiplied with 100.</source>
-        <translation type="unfinished"></translation>
+        <translation>Multiplier la fréquence de l&apos;oscillateur par 100.</translation>
     </message>
     <message>
         <source>multiply LFO-frequency with 100</source>
-        <translation>Multiplier la fréquence de l&apos;OBF par 100</translation>
+        <translation>Multiplier la fréquence de l&apos;OBF (LFO) par 100</translation>
     </message>
     <message>
         <source>Click here to make the envelope-amount controlled by this LFO.</source>
-        <translation>Cliquez ici pour que l&apos;OBF contrôle la quantité d&apos;enveloppe.</translation>
+        <translation>Cliquez ici pour que l&apos;OBF (LFO) contrôle la quantité d&apos;enveloppe.</translation>
     </message>
     <message>
         <source>control envelope-amount by this LFO</source>
-        <translation>Contrôler la quantité de l&apos;enveloppe avec cet OBF</translation>
+        <translation>Contrôler la quantité de l&apos;enveloppe avec cet OBF (LFO).</translation>
     </message>
     <message>
         <source>DELAY</source>
@@ -1026,7 +1028,7 @@ Assurez-vous d&apos;avoir les droits d&apos;accès en écriture sur ce fichier e
     </message>
     <message>
         <source>ms/LFO:</source>
-        <translation>ms/OBF : </translation>
+        <translation>ms/OBF: </translation>
     </message>
 </context>
 <context>
@@ -1045,27 +1047,27 @@ Assurez-vous d&apos;avoir les droits d&apos;accès en écriture sur ce fichier e
     </message>
     <message>
         <source>These tabs contain envelopes. They&apos;re very important for modifying a sound, for not saying that they&apos;re almost always neccessary for substractive synthesis. For example if you have a volume-envelope, you can set when the sound should have which volume-level. Maybe you want to create some soft strings. Then your sound has to fade in and out very softly. This can be done by setting a large attack- and release-time. It&apos;s the same for other envelope-targets like panning, cutoff-frequency of used filter and so on. Just monkey around with it! You can really make cool sounds out of a saw-wave with just some envelopes...!</source>
-        <translation type="unfinished"></translation>
+        <translation>Cet onglet conerne les enveloppes. Elles sont très importante pour modifier un son, pour ne pas dire qu&apos;elle sont toujours nécessaires pour la synthèse soustractive. Avec une enveloppe vous pouvez choisir quel volume le son aura à un moment donné. On peut aussi utiliser des enveloppes pour des paramètres tels que : la balance, la frequence de coupure des filtres utilisés, etc... Il est vraiment possible de faire des sons en utilisant simplement un signal triangulaire et quelques enveloppes !</translation>
     </message>
     <message>
         <source>Filter</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Filtre</translation>
     </message>
     <message>
         <source>LowPass</source>
-        <translation type="unfinished"></translation>
+        <translation>Passe-bas</translation>
     </message>
     <message>
         <source>HiPass</source>
-        <translation type="unfinished"></translation>
+        <translation>Passe-haut</translation>
     </message>
     <message>
         <source>BandPass csg</source>
-        <translation type="unfinished"></translation>
+        <translation>Passe-bande &quot;csg&quot;</translation>
     </message>
     <message>
         <source>BandPass czpg</source>
-        <translation type="unfinished"></translation>
+        <translation>Passe-bande &quot;czpg&quot;</translation>
     </message>
     <message>
         <source>Notch</source>
@@ -1081,19 +1083,19 @@ Assurez-vous d&apos;avoir les droits d&apos;accès en écriture sur ce fichier e
     </message>
     <message>
         <source>2x LowPass</source>
-        <translation type="unfinished"></translation>
+        <translation>Passe-bas x2</translation>
     </message>
     <message>
         <source>2x Moog</source>
-        <translation type="unfinished"></translation>
+        <translation>Moog x2</translation>
     </message>
     <message>
         <source>Here you can select the built-in filter you want to use in this channel. Filters are very important for changing the characteristics of a sound.</source>
-        <translation type="unfinished"></translation>
+        <translation>Selectionner le filtre intégré que vous voulez utiliser pour ce canal. Les filtres sont très importants pour changer les caractéristiques d&apos;un son.</translation>
     </message>
     <message>
         <source>cutoff-frequency</source>
-        <translation type="unfinished"></translation>
+        <translation>freq. de coupure</translation>
     </message>
     <message>
         <source>cutoff-frequency:</source>
@@ -1121,7 +1123,7 @@ Assurez-vous d&apos;avoir les droits d&apos;accès en écriture sur ce fichier e
     </message>
     <message>
         <source>Filter-state (on/off)</source>
-        <translation type="unfinished"></translation>
+        <translation>État du filtre (on/off)</translation>
     </message>
     <message>
         <source>Use this knob for setting the state of this filter. When setting to 0, the filter isn&apos;t used (improves performance). Otherwise it&apos;s used.</source>
@@ -1129,7 +1131,7 @@ Assurez-vous d&apos;avoir les droits d&apos;accès en écriture sur ce fichier e
     </message>
     <message>
         <source>State</source>
-        <translation type="unfinished"></translation>
+        <translation>État</translation>
     </message>
 </context>
 <context>
@@ -1294,43 +1296,43 @@ Assurez-vous d&apos;avoir les droits d&apos;accès en écriture sur le fichier/p
     </message>
     <message>
         <source>Show/Hide Beat+Bassline Editor</source>
-        <translation type="unfinished"></translation>
+        <translation>Afficher/Cacher l&apos;éditeur de rythme et ligne de basse</translation>
     </message>
     <message>
         <source>By pressing this button, you can show or hide the Beat+Bassline Editor. The Beat+Bassline Editor is needed for setting beats, opening, adding and removing channels, cutting, copying and pasting beat- and bassline-patterns and other things like that.</source>
-        <translation type="unfinished"></translation>
+        <translation>En utilisant ce bouton vous pouvez afficher ou cacher l&apos;&quot;Éditeur de rythme et ligne de bass&quot;. Cet outil (en anglais : Beat+Bassline Editor) et nécessaire pour créer des motifs, dont on pourra contrôler plusieurs canaux (instruments) que l&apos;on pourra copier/coller... [ndlt:c&apos;est un éditeur de motif, de &quot;pattern&quot;, généralement utilisé pour les rythmes (percussions) et la ligne de basse, qui se répètent souvent au cours d&apos;un morceau].</translation>
     </message>
     <message>
         <source>Show/Hide Piano-Roll</source>
-        <translation type="unfinished"></translation>
+        <translation>Montrer cacher le &quot;Piano-Roll&quot;</translation>
     </message>
     <message>
         <source>By pressing this button, you can show or hide the Piano-Roll. With the help of the Piano-Roll you can edit melody-patterns in an easy way.</source>
-        <translation type="unfinished"></translation>
+        <translation>En utilisant ce bouton vous pouvez cacher ou afficher le &quot;Piano-Roll&quot;. Avec le &quot;Piano-Roll&quot; vous pouvez éditer des motifs mélodiques facilement.</translation>
     </message>
     <message>
         <source>Show/Hide Project notes</source>
-        <translation type="unfinished"></translation>
+        <translation>Afficher/Cacher l&apos;éditeur de notes</translation>
     </message>
     <message>
         <source>By pressing this button, you can show or hide the project notes window. In this window you can put down your project notes.</source>
-        <translation type="unfinished"></translation>
+        <translation>En utilisant ce bouton vous pouvez cacher ou afficher les notes. Dans cette fenêtre vous pouvez noter tout ce qui concerne votre projet.</translation>
     </message>
     <message>
         <source>Show/Hide Song-Editor</source>
-        <translation type="unfinished"></translation>
+        <translation>Afficher/Cacher l&apos;éditeur de morceau</translation>
     </message>
     <message>
         <source>By pressing this button, you can show or hide the Song-Editor. With the Song-Editor you can edit the song and set when and which track should be played. You can also insert and move samples (e.g. rap-samples) directly in the playlist.</source>
-        <translation type="unfinished"></translation>
+        <translation>En utilisant ce bouton vous pouvez afficher ou cacher l&apos;éditeur de morceau. Avec l&apos;éditeur de morceau vous pouvez régler le moment auquel la piste doit être jouée. Vous pouvez également insérer et déplacer les échantillons directment dans la liste de lecture.</translation>
     </message>
     <message>
         <source>Show/Hide EffectBoard</source>
-        <translation type="unfinished"></translation>
+        <translation>Afficher/Cacher la table d&apos;effets</translation>
     </message>
     <message>
         <source>By pressing this button, you can show or hide the EffectBoard. The EffectBoard is a very powerful tool for managing effects for your song. You can insert effects into different effect-channels.</source>
-        <translation type="unfinished"></translation>
+        <translation>En utilisant ce bouton vous pouvez afficher ou cacher la table d&apos;effets. Cette table est un outil formidable pour gérer les effets de votre morceau. Vous pouvez ajouter différents effets dans chaque canal.</translation>
     </message>
     <message>
         <source>&amp;Project</source>
@@ -1589,119 +1591,119 @@ Assurez-vous d&apos;avoir les droits d&apos;accès en écriture sur le fichier/p
     <name>projectNotes</name>
     <message>
         <source>Project notes</source>
-        <translation type="unfinished"></translation>
+        <translation>Notes du projet</translation>
     </message>
     <message>
         <source>Put down your project notes here.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ici vous pouvez prendre des notes concernant votre projet.</translation>
     </message>
     <message>
         <source>Edit Actions</source>
-        <translation type="unfinished"></translation>
+        <translation>Édition</translation>
     </message>
     <message>
         <source>&amp;Undo</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Défaire</translation>
     </message>
     <message>
         <source>Ctrl+Z</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>&amp;Redo</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Refaire</translation>
     </message>
     <message>
         <source>Ctrl+Y</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>&amp;Copy</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Copier</translation>
     </message>
     <message>
         <source>Ctrl+C</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Cu&amp;t</source>
-        <translation type="unfinished"></translation>
+        <translation>Cou&amp;per</translation>
     </message>
     <message>
         <source>Ctrl+X</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>&amp;Paste</source>
-        <translation type="unfinished"></translation>
+        <translation>Co&amp;ller</translation>
     </message>
     <message>
         <source>Ctrl+V</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Format Actions</source>
-        <translation type="unfinished"></translation>
+        <translation>Format</translation>
     </message>
     <message>
         <source>&amp;Bold</source>
-        <translation type="unfinished"></translation>
+        <translation>Gr&amp;ad</translation>
     </message>
     <message>
         <source>Ctrl+B</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>&amp;Italic</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Italique</translation>
     </message>
     <message>
         <source>Ctrl+I</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>&amp;Underline</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Souligné</translation>
     </message>
     <message>
         <source>Ctrl+U</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>&amp;Left</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Gauche</translation>
     </message>
     <message>
         <source>Ctrl+L</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>C&amp;enter</source>
-        <translation type="unfinished"></translation>
+        <translation>C&amp;entrer</translation>
     </message>
     <message>
         <source>Ctrl+E</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>&amp;Right</source>
-        <translation type="unfinished"></translation>
+        <translation>D&amp;roite</translation>
     </message>
     <message>
         <source>Ctrl+R</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>&amp;Justify</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Justifier</translation>
     </message>
     <message>
         <source>Ctrl+J</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>&amp;Color...</source>
-        <translation type="unfinished"></translation>
+        <translation>C&amp;ouleurs...</translation>
     </message>
 </context>
 <context>
@@ -1800,7 +1802,7 @@ Assurez-vous d&apos;avoir les droits d&apos;accès en écriture sur le fichier/p
     </message>
     <message>
         <source>The tempo of a song is specified in beats per minute (BPM). If you want to change the tempo of your song, change this value. Every tact has four beats, so the tempo in BPM specifies, how many tacts / 4 should be played within a minute (or how many tacts should be played within four minutes).</source>
-        <translation type="unfinished"></translation>
+        <translation>Le tempo d&apos;un morceau est spécifié en &quot;beat&quot; par minutes (BPM). Vous pouvez changer le tempo de votre morceau en changeant cette valeur. Chaque mesure fait quatre &quot;beats&quot;, le tempo signifie donc combien de &quot;mesures/4&quot; seront joués dans une minute (soit combien de mesure seront joué en quatre minutes).</translation>
     </message>
     <message>
         <source>master output volume</source>
@@ -1828,19 +1830,19 @@ Assurez-vous d&apos;avoir les droits d&apos;accès en écriture sur le fichier/p
     </message>
     <message>
         <source>Insert bar at current tact (Shift+Insert)</source>
-        <translation type="unfinished"></translation>
+        <translation>Insérer à la mesure courante (Maj+Ins)</translation>
     </message>
     <message>
         <source>If you click here, a tact will be inserted at the current tact.</source>
-        <translation type="unfinished"></translation>
+        <translation>En cliquant ici, une mesure sera insérée à la mesure courante.</translation>
     </message>
     <message>
         <source>Remove bar at current tact (Shift+Delete)</source>
-        <translation type="unfinished"></translation>
+        <translation>Supprimer à la mesure courante (Maj+Supp)</translation>
     </message>
     <message>
         <source>If you click here, the tact at the current tact will be removed.</source>
-        <translation type="unfinished"></translation>
+        <translation>En cliquant ici, la mesure courante sera supprimée.</translation>
     </message>
     <message>
         <source>Stop playing song (Space)</source>
@@ -1848,11 +1850,11 @@ Assurez-vous d&apos;avoir les droits d&apos;accès en écriture sur le fichier/p
     </message>
     <message>
         <source>Insert tact at current tact (Shift+Insert)</source>
-        <translation type="unfinished"></translation>
+        <translation>Insérer une mesure à la mesure courante (Maj+Ins)</translation>
     </message>
     <message>
         <source>Remove tact at current tact (Shift+Delete)</source>
-        <translation type="unfinished"></translation>
+        <translation>Supprimer la mesure à la mesure courante (Maj+Supp)</translation>
     </message>
     <message>
         <source>Master output volume:</source>
