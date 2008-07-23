@@ -359,8 +359,8 @@ bool spectrumAnalyzer::processAudioBuffer( sampleFrame * _buf,
 	{
 		compressbands( m_absSpecBuf, m_bands, BUFFER_SIZE+1,
 			MAX_BANDS,
-			LOWEST_FREQ*(BUFFER_SIZE+1)/(float)(sr/2),
-			HIGHEST_FREQ*(BUFFER_SIZE+1)/(float)(sr/2) );
+			(int)(LOWEST_FREQ*(BUFFER_SIZE+1)/(float)(sr/2)),
+			(int)(HIGHEST_FREQ*(BUFFER_SIZE+1)/(float)(sr/2)));
 		m_energy = maximum( m_bands, MAX_BANDS ) / maximum( m_buffer, BUFFER_SIZE );
 	}
 	else

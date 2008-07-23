@@ -1,7 +1,7 @@
 /*
  * effect_lib.h - library with template-based inline-effects
  *
- * Copyright (c) 2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -448,7 +448,7 @@ namespace effectLib
 		// Lou's Hack
 		void setWideCoeff( const float _wideCoeff )
 		{
-			m_wideCoeff = static_cast<int>( _wideCoeff );
+			m_wideCoeff = _wideCoeff;
 		}
 		
 		int getWideCoeff()
@@ -478,7 +478,7 @@ namespace effectLib
 
 	private:
 		// Lou's Hack
-		int m_wideCoeff;
+		float m_wideCoeff;
 		//-----------
 	} ;
 
