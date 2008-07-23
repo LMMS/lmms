@@ -451,7 +451,7 @@ namespace effectLib
 			m_wideCoeff = _wideCoeff;
 		}
 		
-		int getWideCoeff()
+		float getWideCoeff()
 		{
 			return m_wideCoeff;
 		}
