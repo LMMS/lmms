@@ -1,3 +1,20 @@
+2008-07-23	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* plugins/ladspa_effect/caps/CMakeLists.txt:
+	do not compile with -O3 when using GCC 4.1.x as this version segfaults
+	while optimizing
+
+	* plugins/spectrum_analyzer/spectrum_analyzer.cpp:
+	* include/effect_lib.h:
+	fixed compiler-warnings
+
+	* src/core/midi/midi_winmm.cpp:
+	* src/core/midi/midi_alsa_seq.cpp:
+	fixed subscribe/unsubscribe-warnings
+
+	* CMakeLists.txt:
+	fixes for cmake 2.4
+
 2008-07-22	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* cmake/modules/BuildPlugin.cmake:
