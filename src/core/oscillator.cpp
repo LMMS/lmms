@@ -26,11 +26,14 @@
 
 
 #include "oscillator.h"
+#include "engine.h"
+#include "mixer.h"
+#include "automatable_model.h"
 
 
 
-oscillator::oscillator( const intModel & _wave_shape_model,
-				const intModel & _mod_algo_model,
+oscillator::oscillator( const intModel * _wave_shape_model,
+				const intModel * _mod_algo_model,
 				const float & _freq,
 				const float & _detuning,
 				const float & _phase_offset,
@@ -62,7 +65,7 @@ void oscillator::update( sampleFrame * _ab, const fpp_t _frames,
 	}
 	if( m_subOsc != NULL )
 	{
-		switch( m_modulationAlgoModel.value() )
+		switch( m_modulationAlgoModel->value() )
 		{
 			case PhaseModulation:
 				updatePM( _ab, _frames, _chnl );
@@ -92,7 +95,7 @@ void oscillator::update( sampleFrame * _ab, const fpp_t _frames,
 void oscillator::updateNoSub( sampleFrame * _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl )
 {
-	switch( m_waveShapeModel.value() )
+	switch( m_waveShapeModel->value() )
 	{
 		case SineWave:
 		default:
@@ -128,7 +131,7 @@ void oscillator::updateNoSub( sampleFrame * _ab, const fpp_t _frames,
 void oscillator::updatePM( sampleFrame * _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl )
 {
-	switch( m_waveShapeModel.value() )
+	switch( m_waveShapeModel->value() )
 	{
 		case SineWave:
 		default:
@@ -164,7 +167,7 @@ void oscillator::updatePM( sampleFrame * _ab, const fpp_t _frames,
 void oscillator::updateAM( sampleFrame * _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl )
 {
-	switch( m_waveShapeModel.value() )
+	switch( m_waveShapeModel->value() )
 	{
 		case SineWave:
 		default:
@@ -200,7 +203,7 @@ void oscillator::updateAM( sampleFrame * _ab, const fpp_t _frames,
 void oscillator::updateMix( sampleFrame * _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl )
 {
-	switch( m_waveShapeModel.value() )
+	switch( m_waveShapeModel->value() )
 	{
 		case SineWave:
 		default:
@@ -236,7 +239,7 @@ void oscillator::updateMix( sampleFrame * _ab, const fpp_t _frames,
 void oscillator::updateSync( sampleFrame * _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl )
 {
-	switch( m_waveShapeModel.value() )
+	switch( m_waveShapeModel->value() )
 	{
 		case SineWave:
 		default:
@@ -272,7 +275,7 @@ void oscillator::updateSync( sampleFrame * _ab, const fpp_t _frames,
 void oscillator::updateFM( sampleFrame * _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl )
 {
-	switch( m_waveShapeModel.value() )
+	switch( m_waveShapeModel->value() )
 	{
 		case SineWave:
 		default:

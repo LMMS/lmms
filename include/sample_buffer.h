@@ -29,7 +29,9 @@
 #include <QtCore/QObject>
 #include <QtCore/QRect>
 
-#include "mixer.h"
+#include <samplerate.h>
+
+#include "export.h"
 #include "interpolation.h"
 #include "types.h"
 #include "lmms_math.h"
@@ -72,7 +74,7 @@ public:
 
 	bool play( sampleFrame * _ab, handleState * _state,
 				const fpp_t _frames,
-				const float _freq = BaseFreq,
+				const float _freq,
 				const bool _looped = FALSE ) const;
 
 	void visualize( QPainter & _p, const QRect & _dr, const QRect & _clip );

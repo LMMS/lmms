@@ -1,3 +1,18 @@
+2008-07-25	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* plugins/organic/organic.cpp:
+	* plugins/triple_oscillator/triple_oscillator.cpp:
+	* include/mixer.h:
+	* include/sample_buffer.h:
+	* include/oscillator.h:
+	* include/types.h:
+	* src/core/sample_play_handle.cpp:
+	* src/core/sample_buffer.cpp:
+	* src/core/oscillator.cpp:
+	* lmmsconfig.h.in:
+	* CMakeLists.txt:
+	less header-dependencies and moved some type-definitions
+
 2008-07-23	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* data/locale/fr.qm:

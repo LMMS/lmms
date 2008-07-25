@@ -27,6 +27,7 @@
 #define _TYPES_H
 
 #include <limits>
+#include "lmmsconfig.h"
 
 typedef unsigned char	Uint8;
 typedef signed char	Sint8;
@@ -72,6 +73,21 @@ struct valueRanges
 		return( std::numeric_limits<T>::max() );
 	}
 } ;
+
+
+const ch_cnt_t DEFAULT_CHANNELS = 2;
+
+const ch_cnt_t SURROUND_CHANNELS =
+#ifndef LMMS_DISABLE_SURROUND
+				4;
+#else
+				2;
+#endif
+
+
+
+typedef sample_t sampleFrame[DEFAULT_CHANNELS];
+typedef sample_t surroundSampleFrame[SURROUND_CHANNELS];
 
 
 #endif

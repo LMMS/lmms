@@ -26,6 +26,7 @@
 
 
 #include "sample_buffer.h"
+#include "mixer.h"
 
 
 #include <QtCore/QBuffer>

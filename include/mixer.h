@@ -57,21 +57,6 @@ class audioPort;
 
 const fpp_t DEFAULT_BUFFER_SIZE = 256;
 
-const ch_cnt_t DEFAULT_CHANNELS = 2;
-
-const ch_cnt_t SURROUND_CHANNELS =
-#ifndef LMMS_DISABLE_SURROUND
-				4;
-#else
-				2;
-#endif
-
-
-
-typedef sample_t sampleFrame[DEFAULT_CHANNELS];
-typedef sample_t surroundSampleFrame[SURROUND_CHANNELS];
-
-
 const Uint8 BYTES_PER_SAMPLE = sizeof( sample_t );
 const Uint8 BYTES_PER_INT_SAMPLE = sizeof( int_sample_t );
 const Uint8 BYTES_PER_FRAME = sizeof( sampleFrame );

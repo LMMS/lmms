@@ -206,16 +206,16 @@ void organicInstrument::playNote( notePlayHandle * _n, bool,
 			{
 				// create left oscillator
 				oscs_l[i] = new oscillator(
-						m_osc[i]->m_waveShape,
-						m_modulationAlgo,
+						&m_osc[i]->m_waveShape,
+						&m_modulationAlgo,
 						_n->frequency(),
 						m_osc[i]->m_detuningLeft,
 						m_osc[i]->m_phaseOffsetLeft,
 						m_osc[i]->m_volumeLeft );
 				// create right oscillator
 				oscs_r[i] = new oscillator(
-						m_osc[i]->m_waveShape,
-						m_modulationAlgo,
+						&m_osc[i]->m_waveShape,
+						&m_modulationAlgo,
 						_n->frequency(),
 						m_osc[i]->m_detuningRight,
 						m_osc[i]->m_phaseOffsetRight,
@@ -225,8 +225,8 @@ void organicInstrument::playNote( notePlayHandle * _n, bool,
 			{
 				// create left oscillator
 				oscs_l[i] = new oscillator(
-						m_osc[i]->m_waveShape,
-						m_modulationAlgo,
+						&m_osc[i]->m_waveShape,
+						&m_modulationAlgo,
 						_n->frequency(),
 						m_osc[i]->m_detuningLeft,
 						m_osc[i]->m_phaseOffsetLeft,
@@ -234,8 +234,8 @@ void organicInstrument::playNote( notePlayHandle * _n, bool,
 						oscs_l[i + 1] );
 				// create right oscillator
 				oscs_r[i] = new oscillator(
-						m_osc[i]->m_waveShape,
-						m_modulationAlgo,
+						&m_osc[i]->m_waveShape,
+						&m_modulationAlgo,
 						_n->frequency(),
 						m_osc[i]->m_detuningRight,
 						m_osc[i]->m_phaseOffsetRight,

@@ -132,7 +132,8 @@ void samplePlayHandle::play( bool /* _try_parallelizing */,
 		stereoVolumeVector v =
 			{ { m_volumeModel->value() / DefaultVolume,
 				m_volumeModel->value() / DefaultVolume } };
-		m_sampleBuffer->play( _working_buffer, &m_state, frames );
+		m_sampleBuffer->play( _working_buffer, &m_state, frames,
+								BaseFreq );
 		engine::getMixer()->bufferToPort( _working_buffer, frames,
 						offset(), v, m_audioPort );
 	}

@@ -326,15 +326,15 @@ void tripleOscillator::playNote( notePlayHandle * _n, bool,
 			if( i == NUM_OF_OSCILLATORS - 1 )
 			{
 				oscs_l[i] = new oscillator(
-						m_osc[i]->m_waveShapeModel,
-						m_osc[i]->m_modulationAlgoModel,
+						&m_osc[i]->m_waveShapeModel,
+						&m_osc[i]->m_modulationAlgoModel,
 						_n->frequency(),
 						m_osc[i]->m_detuningLeft,
 						m_osc[i]->m_phaseOffsetLeft,
 						m_osc[i]->m_volumeLeft );
 				oscs_r[i] = new oscillator(
-						m_osc[i]->m_waveShapeModel,
-						m_osc[i]->m_modulationAlgoModel,
+						&m_osc[i]->m_waveShapeModel,
+						&m_osc[i]->m_modulationAlgoModel,
 						_n->frequency(),
 						m_osc[i]->m_detuningRight,
 						m_osc[i]->m_phaseOffsetRight,
@@ -343,16 +343,16 @@ void tripleOscillator::playNote( notePlayHandle * _n, bool,
 			else
 			{
 				oscs_l[i] = new oscillator(
-						m_osc[i]->m_waveShapeModel,
-						m_osc[i]->m_modulationAlgoModel,
+						&m_osc[i]->m_waveShapeModel,
+						&m_osc[i]->m_modulationAlgoModel,
 						_n->frequency(),
 						m_osc[i]->m_detuningLeft,
 						m_osc[i]->m_phaseOffsetLeft,
 						m_osc[i]->m_volumeLeft,
 						oscs_l[i + 1] );
 				oscs_r[i] = new oscillator(
-						m_osc[i]->m_waveShapeModel,
-						m_osc[i]->m_modulationAlgoModel,
+						&m_osc[i]->m_waveShapeModel,
+						&m_osc[i]->m_modulationAlgoModel,
 						_n->frequency(),
 						m_osc[i]->m_detuningRight,
 						m_osc[i]->m_phaseOffsetRight,

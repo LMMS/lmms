@@ -28,15 +28,18 @@
 
 #include "lmmsconfig.h"
 
+#include <math.h>
+
 #ifdef LMMS_HAVE_STDLIB_H
 #include <stdlib.h>
 #endif
 
-#include "mixer.h"
 #include "sample_buffer.h"
 #include "lmms_constants.h"
-#include "lmms_math.h"
-#include "automatable_model.h"
+
+
+class sampleBuffer;
+class intModel;
 
 
 class EXPORT oscillator
@@ -66,8 +69,8 @@ public:
 	} ;
 
 
-	oscillator( const intModel & _wave_shape_model,
-			const intModel & _mod_algo_model,
+	oscillator( const intModel * _wave_shape_model,
+			const intModel * _mod_algo_model,
 			const float & _freq,
 			const float & _detuning,
 			const float & _phase_offset,
@@ -154,8 +157,8 @@ public:
 
 
 private:
-	const intModel & m_waveShapeModel;
-	const intModel & m_modulationAlgoModel;
+	const intModel * m_waveShapeModel;
+	const intModel * m_modulationAlgoModel;
 	const float & m_freq;
 	const float & m_detuning;
 	const float & m_volume;
