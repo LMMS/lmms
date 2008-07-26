@@ -1,4 +1,6 @@
-<!DOCTYPE TS><TS>
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS><TS version="1.1" language="ru_RU">
+<defaultcodec></defaultcodec>
 <context>
     <name>QObject</name>
     <message>
@@ -807,15 +809,15 @@ http://lmms.sourceforge.net</translation>
     </message>
     <message>
         <source>Ratio</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Отношение</translation>
     </message>
     <message>
         <source>RATIO</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ОТН</translation>
     </message>
     <message>
         <source>Ratio:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Отношение:</translation>
     </message>
 </context>
 <context>
@@ -837,8 +839,8 @@ http://lmms.sourceforge.net</translation>
         <translation>Нажмите чтобы остановить воспроизведение.</translation>
     </message>
     <message>
-        <source>Beat+Bassline Editor</source>
-        <translation>Редактор ритма/лейтмотива</translation>
+        <source>Beat+Baseline Editor</source>
+        <translation>Пошаговый секвенсор</translation>
     </message>
     <message>
         <source>Add beat/bassline</source>
@@ -860,14 +862,14 @@ http://lmms.sourceforge.net</translation>
         <translation>Изменить цвет</translation>
     </message>
     <message>
-        <source>Open in Beat+Bassline-Editor</source>
-        <translation>Открыть в редакторе ритма/лейтмотива</translation>
+        <source>Open in Beat+Baseline-Editor</source>
+        <translation>Открыть в пошаговом секвенсоре</translation>
     </message>
 </context>
 <context>
     <name>bbTrack</name>
     <message>
-        <source>Beat/Bassline %1</source>
+        <source>Beat/Baseline %1</source>
         <translation>Лейтмотив %1</translation>
     </message>
 </context>
@@ -1627,11 +1629,11 @@ Make sure, you have write access to the selected file/device!</source>
     </message>
     <message>
         <source>Open in new instrument-track/Song-Editor</source>
-        <translation>В новую дорожку инструмента и открыть в редакторе композиции</translation>
+        <translation>В новую дорожку инструмента и открыть в финальном секвенсоре</translation>
     </message>
     <message>
         <source>Open in new instrument-track/B+B Editor</source>
-        <translation>В новую дорожку инструмента и открыть в редакторе лейтмотива</translation>
+        <translation>В новую дорожку инструмента и открыть в пошаговом секвенсоре</translation>
     </message>
 </context>
 <context>
@@ -2094,11 +2096,11 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
     <message>
         <source>In Place Broken: Yes</source>
-        <translation type="unfinished">In Place Broken: Да</translation>
+        <translation type="unfinished">Вход и выход не могут совпадать</translation>
     </message>
     <message>
         <source>In Place Broken: No</source>
-        <translation type="unfinished">In Place Broken: Нет</translation>
+        <translation type="unfinished">Вход и выход могут совпадать</translation>
     </message>
     <message>
         <source>Channels In: </source>
@@ -2113,7 +2115,7 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     <name>lb302Synth</name>
     <message>
         <source>VCF Cutoff Frequency</source>
-        <translation type="unfinished"></translation>
+        <translation>Частота среза VCF</translation>
     </message>
     <message>
         <source>Cutoff Freq:</source>
@@ -2121,7 +2123,7 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
     <message>
         <source>CUT</source>
-        <translation type="unfinished"></translation>
+        <translation>СРЕЗ</translation>
     </message>
     <message>
         <source>VCF Resonance</source>
@@ -2137,7 +2139,7 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
     <message>
         <source>VCF Envelope Mod</source>
-        <translation type="unfinished"></translation>
+        <translation>Глубина модуляции VCF</translation>
     </message>
     <message>
         <source>Env Mod:</source>
@@ -2189,11 +2191,11 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
     <message>
         <source>Fine detuning of the VCO. Ranged between -100 and 100 centes.</source>
-        <translation type="unfinished"></translation>
+        <translation>Точная расстройка VCO (от -100 до 100 центов).</translation>
     </message>
     <message>
         <source>VCO Fine Detuning:</source>
-        <translation type="unfinished"></translation>
+        <translation>Расстройка VCO(точно):</translation>
     </message>
     <message>
         <source>DETUNE</source>
@@ -2326,19 +2328,19 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
     <message>
         <source>Show/hide Piano-Roll</source>
-        <translation>Показать/скрыть синтезатор</translation>
+        <translation>Показать/скрыть нотный секвенсор</translation>
     </message>
     <message>
         <source>By pressing this button, you can show or hide the Piano-Roll. With the help of the Piano-Roll you can edit melody-patterns in an easy way.</source>
-        <translation>По нажатию этой кнопки запускается синтезатор LMMS. С его помощью вы можете легко редактировать шблоны мелодии.</translation>
+        <translation>По нажатию этой кнопки запускается секвенсор LMMS. С его помощью вы можете легко редактировать шблоны мелодии.</translation>
     </message>
     <message>
         <source>Show/hide Song-Editor</source>
-        <translation>Показать/скрыть редактор мелодии</translation>
+        <translation>Показать/скрыть финальный секвенсор</translation>
     </message>
     <message>
         <source>By pressing this button, you can show or hide the Song-Editor. With the help of the Song-Editor you can edit song-playlist and specify when which track should be played. You can also insert and move samples (e.g. rap-samples) directly into the playlist.</source>
-        <translation>По нажатию этой кнопки запускается редактор мелодии. С его помощью вы можеет редактировать композицию, устанавливать время воспроизведения для всех дорожек. Также вы можете вставлять и передвигать образцы непосредственно в списке воспроизведения.</translation>
+        <translation>По нажатию этой кнопки запускается финальный секвенсор. С его помощью вы можете редактировать композицию и устанавливать время воспроизведения для всех дорожек. Также вы можете вставлять и передвигать образцы непосредственно в списке воспроизведения.</translation>
     </message>
     <message>
         <source>Show/hide project notes</source>
@@ -2434,21 +2436,21 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
     <message>
         <source>Currently there&apos;s no help available in LMMS.
-Please visit http://wiki.mindrules.net for documentation on LMMS.</source>
+Please visit http://lmms.sourceforge.net/wiki/ for documentation on LMMS.</source>
         <translation>Пока что справка для LMMS не написана.
-Вероятно, Вы сможете найти нужные материалы на http://wiki.mindrules.net.</translation>
+Вероятно, Вы сможете найти нужные материалы на http://lmms.sourceforge.net/wiki/.</translation>
     </message>
     <message>
         <source>Setting up main-window and workspace...</source>
         <translation>Создаю рабочее пространство...</translation>
     </message>
     <message>
-        <source>Show/hide Beat+Bassline Editor</source>
-        <translation>Показать/скрыть редактор ритма/лейтмотива</translation>
+        <source>Show/hide Beat+Baseline Editor</source>
+        <translation>Показать/скрыть пошаговый секвенсор</translation>
     </message>
     <message>
-        <source>By pressing this button, you can show or hide the Beat+Bassline Editor. The Beat+Bassline Editor is needed for creating beats, opening, adding and removing channels, cutting, copying and pasting beat- and bassline-patterns and other things like that.</source>
-        <translation>По нажатию этой кнопки запускается редактор ритма/лейтмотива произведения. Он необходим для установки ритма, добавления и удаления каналов, вырезания, копирования и вставки шаблонов и т. п.</translation>
+        <source>By pressing this button, you can show or hide the Beat+Baseline Editor. The Beat+Baseline Editor is needed for creating beats, opening, adding and removing channels, cutting, copying and pasting beat- and baseline-patterns and other things like that.</source>
+        <translation>По нажатию этой кнопки запускается пошаговый секвенсор произведения. Он необходим для установки ритма, добавления и удаления каналов, вырезания, копирования и вставки шаблонов и т. п.</translation>
     </message>
     <message>
         <source>&amp;Edit</source>
@@ -2515,15 +2517,15 @@ Please visit http://wiki.mindrules.net for documentation on LMMS.</source>
     </message>
     <message>
         <source>Vibrato Gain</source>
-        <translation type="unfinished"></translation>
+        <translation>Усиление вибрато</translation>
     </message>
     <message>
         <source>Vib Gain</source>
-        <translation type="unfinished"></translation>
+        <translation>Усил. вибрато</translation>
     </message>
     <message>
         <source>Vib Gain:</source>
-        <translation type="unfinished"></translation>
+        <translation>Усил. вибрато:</translation>
     </message>
     <message>
         <source>Vibrato Freq</source>
@@ -2591,11 +2593,11 @@ Please visit http://wiki.mindrules.net for documentation on LMMS.</source>
     </message>
     <message>
         <source>Pressure</source>
-        <translation type="unfinished"></translation>
+        <translation>Давление</translation>
     </message>
     <message>
         <source>Pressure:</source>
-        <translation type="unfinished"></translation>
+        <translation>Давление:</translation>
     </message>
     <message>
         <source>Motion</source>
@@ -2607,11 +2609,11 @@ Please visit http://wiki.mindrules.net for documentation on LMMS.</source>
     </message>
     <message>
         <source>Speed</source>
-        <translation type="unfinished"></translation>
+        <translation>Скорость</translation>
     </message>
     <message>
         <source>Speed:</source>
-        <translation type="unfinished"></translation>
+        <translation>Скорость:</translation>
     </message>
     <message>
         <source>Vibrato</source>
@@ -2639,7 +2641,7 @@ Please visit http://wiki.mindrules.net for documentation on LMMS.</source>
     </message>
     <message>
         <source>Wood1</source>
-        <translation type="unfinished"></translation>
+        <translation>Дерево1</translation>
     </message>
     <message>
         <source>Reso</source>
@@ -2647,11 +2649,11 @@ Please visit http://wiki.mindrules.net for documentation on LMMS.</source>
     </message>
     <message>
         <source>Wood2</source>
-        <translation type="unfinished"></translation>
+        <translation>Дерево2</translation>
     </message>
     <message>
         <source>Beats</source>
-        <translation type="unfinished"></translation>
+        <translation>Удары</translation>
     </message>
     <message>
         <source>Two Fixed</source>
@@ -2874,7 +2876,7 @@ Please visit http://wiki.mindrules.net for documentation on LMMS.</source>
     </message>
     <message>
         <source>Open in piano-roll</source>
-        <translation>Открыть в синтезаторе</translation>
+        <translation>Открыть в секвенсоре</translation>
     </message>
     <message>
         <source>Refreeze</source>
@@ -2907,7 +2909,7 @@ Please visit http://wiki.mindrules.net for documentation on LMMS.</source>
     <message>
         <source>double-click to open this pattern in piano-roll
 use mouse wheel to set volume of a step</source>
-        <translation>Чтобы открыть этот шаблон в синтезаторе, дважды на нём щёлкните
+        <translation>Чтобы открыть этот шаблон в секвенсоре, дважды на нём щёлкните
 Используйте колёсико мыши для установки громкости отдельного шага</translation>
     </message>
     <message>
@@ -2990,11 +2992,11 @@ use mouse wheel to set volume of a step</source>
     </message>
     <message>
         <source>Piano-Roll - no pattern</source>
-        <translation>Синтезатор - без шаблона</translation>
+        <translation>Секвенсор - без шаблона</translation>
     </message>
     <message>
         <source>Piano-Roll - %1</source>
-        <translation>Синтезатор - %1</translation>
+        <translation>Секвенсор - %1</translation>
     </message>
     <message>
         <source>Please open a pattern by double-clicking on it!</source>
@@ -3006,7 +3008,7 @@ use mouse wheel to set volume of a step</source>
     </message>
     <message>
         <source>Click here, if you want to record notes from a MIDI-device or the virtual test-piano of the according channel-window to the current pattern. When recording all notes you play will be written to this pattern and you can play and edit them afterwards.</source>
-        <translation>Нажмите эту кнопку, если вы хотите записать ноты с устройства MIDI или виртуального синтезатора-пианино соответствующего канала. Позже вы сможете отредактировать записанный шаблон.</translation>
+        <translation>Нажмите эту кнопку, если вы хотите записать ноты с устройства MIDI или виртуального синтезатора соответствующего канала. Позже вы сможете отредактировать записанный шаблон.</translation>
     </message>
     <message>
         <source>Draw mode (D)</source>
@@ -3077,7 +3079,7 @@ use mouse wheel to set volume of a step</source>
     <name>pianoWidget</name>
     <message>
         <source>Base note</source>
-        <translation type="unfinished">Опорная нота</translation>
+        <translation>Опорная нота</translation>
     </message>
     <message>
         <source>&amp;Open in automation editor</source>
@@ -3138,8 +3140,8 @@ use mouse wheel to set volume of a step</source>
         <translation>Тяп-ляп синтезатор сигнала.</translation>
     </message>
     <message>
-        <source>You can drag an instrument-plugin into either the Song-Editor, the Beat+Bassline Editor or just into a channel-window or on the corresponding channel-button.</source>
-        <translation>Вы можете переносить нужные вам инструменты из этой панели в редактор мелодии или в редактор лейтмотива. Отпускайте кнопку мыши прямо в окне, чтобы создать новый канал, или на кнопке нужного канала для замены типа канала на выбранный инструмент.</translation>
+        <source>You can drag an instrument-plugin into either the Song-Editor, the Beat+Baseline Editor or just into a channel-window or on the corresponding channel-button.</source>
+        <translation>Вы можете переносить нужные вам инструменты из этой панели в финальный или пошаговый секвенсор. Отпускайте кнопку мыши прямо в окне, чтобы создать новый канал, или на кнопке нужного канала для замены типа канала на выбранный инструмент.</translation>
     </message>
     <message>
         <source>Additive Synthesizer for organ-like sounds</source>
@@ -3159,7 +3161,7 @@ use mouse wheel to set volume of a step</source>
     </message>
     <message>
         <source>Tuneful things to bang on</source>
-        <translation type="unfinished"></translation>
+        <translation>Мелодичные ударные</translation>
     </message>
     <message>
         <source>plugin for using arbitrary VST-effects inside LMMS.</source>
@@ -3183,7 +3185,7 @@ use mouse wheel to set volume of a step</source>
     </message>
     <message>
         <source>tool for live performance</source>
-        <translation type="unfinished"></translation>
+        <translation>Инструмент для живого воспроизвдения</translation>
     </message>
     <message>
         <source>versatile kick- &amp; bassdrum-synthesizer</source>
@@ -3776,7 +3778,7 @@ Please note that in some cases parallelizing won&apos;t work with small buffer-s
     </message>
     <message>
         <source>Song-Editor</source>
-        <translation>Редактор мелодии</translation>
+        <translation>Финальный секвенсор</translation>
     </message>
     <message>
         <source>Click here, if you want to play your whole song. Playing will be started at the song-position-marker (green). You can also move it while playing.</source>
