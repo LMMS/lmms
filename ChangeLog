@@ -1,5 +1,10 @@
 2008-07-26	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* CMakeLists.txt:
+	- added locale targets
+	- added "update-locales" target
+	- added "distclean" target
+
 	* plugins/organic/organic.cpp:
 	* plugins/triple_oscillator/triple_oscillator.cpp:
 	* include/mixer.h:

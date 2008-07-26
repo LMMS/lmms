@@ -325,6 +325,28 @@ LINK_LIBRARIES(${QT_LIBRARIES} ${ASOUND_LIBRARY} ${SDL_LIBRARY} ${PULSEAUDIO_LIB
 ADD_EXECUTABLE(lmms ${lmms_SOURCES} ${lmms_INCLUDES} ${LIBSAMPLERATE_SOURCES} ${ER_H} ${lmms_UI_out} lmmsconfig.h)
 INSTALL(TARGETS lmms RUNTIME DESTINATION bin)
 
+#
+# rules for building localizations
+#
+FILE(GLOB lmms_LOCALES data/locale/*.ts)
+SET(locale_targets "")
+FOREACH(_ts_file ${lmms_LOCALES})
+	STRING(REPLACE "${CMAKE_CURRENT_SOURCE_DIR}/data/locale/" "" _ts_target "${_ts_file}")
+	STRING(REPLACE ".ts" ".qm" _qm_file "${_ts_file}")
+	STRING(REPLACE ".ts" ".qm" _qm_target "${_ts_target}")
+	ADD_CUSTOM_TARGET(${_ts_target} COMMAND ${QT_LUPDATE_EXECUTABLE} ${lmms_SOURCES} `find plugins/ -type f -name '*.cpp'` -ts ${_ts_file})
+	ADD_CUSTOM_TARGET(${_qm_target} COMMAND ${QT_LRELEASE_EXECUTABLE} ${_ts_file} -qm ${_qm_file})
+	LIST(APPEND locale_targets "${_ts_target}")
+ENDFOREACH(_ts_file ${lmms_LOCALES})
+ADD_CUSTOM_TARGET(update-locales DEPENDS ${locale_targets})
+
+
+#
+# add distclean-target
+#
+ADD_CUSTOM_TARGET(distclean
+			COMMAND make clean
+			COMMAND rm -rf `find -name cmake_install.cmake` `find -name Makefile` `find -type d -name CMakeFiles` CMakeCache.txt)
 
 
 IF(WANT_PCH)
