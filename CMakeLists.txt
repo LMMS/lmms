@@ -359,7 +359,7 @@ IF(WANT_PCH)
     ENDIF(PCHSupport_FOUND)
 ENDIF(WANT_PCH)
 
-SET_DIRECTORY_PROPERTIES(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES "${ER_H} ${lmms_MOC_out} ${lmms_UI_out} lmmsconfig.h pch.h.gch/*")
+SET_DIRECTORY_PROPERTIES(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES "${ER_H} ${lmms_MOC_out} ${lmms_UI_out} lmmsconfig.h alsaconfig.h pch.h.gch/")
 
 
 #
