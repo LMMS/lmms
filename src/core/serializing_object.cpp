@@ -76,3 +76,17 @@ void serializingObject::setHook( serializingObjectHook * _hook )
 }
 
 
+
+
+void serializingObject::saveSettings( QDomDocument & _doc, QDomElement & _this )
+{
+}
+
+
+
+
+void serializingObject::loadSettings( const QDomElement & _this )
+{
+}
+
+

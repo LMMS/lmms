@@ -1,7 +1,7 @@
 /*
  * lmms_math.h - defines math functions
  *
- * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -27,7 +27,17 @@
 #define _LMMS_MATH_H
 
 
+#ifdef __INTEL_COMPILER
 
+#include <math.h>
+
+// Equivalent to _x - floorf( _x )
+static inline float fraction( const float _x )
+{
+	return( _x - ( _x >= 0.0f ? floorf( _x ) : floorf( _x ) - 1 ) );
+}
+
+#else
 
 // Equivalent to _x - floorf( _x )
 static inline float fraction( const float _x )
@@ -36,6 +46,7 @@ static inline float fraction( const float _x )
 						static_cast<int>( _x ) - 1 ) );
 }
 
+#endif
 
 
 

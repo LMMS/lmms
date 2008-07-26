@@ -62,13 +62,13 @@ public:
 
 protected:
 	// to be implemented by sub-objects
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _this )
-	{
-	}
+	virtual void saveSettings( QDomDocument & _doc, QDomElement & _this );
+//	{
+//	}
 
-	virtual void loadSettings( const QDomElement & _this )
-	{
-	}
+	virtual void loadSettings( const QDomElement & _this );
+//	{
+//	}
 
 
 private:
