@@ -346,7 +346,7 @@ ADD_CUSTOM_TARGET(update-locales DEPENDS ${locale_targets})
 #
 ADD_CUSTOM_TARGET(distclean
 			COMMAND make clean
-			COMMAND rm -rf `find -name cmake_install.cmake` `find -name Makefile` `find -type d -name CMakeFiles` CMakeCache.txt)
+			COMMAND rm -rf `find -name cmake_install.cmake` `find -name Makefile` `find -type d -name CMakeFiles` CMakeCache.txt lmmsconfig.h alsaconfig.h)
 
 #
 # add tarball-target
