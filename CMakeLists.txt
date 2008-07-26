@@ -338,7 +338,11 @@ FOREACH(_ts_file ${lmms_LOCALES})
 	ADD_CUSTOM_TARGET(${_qm_target} COMMAND ${QT_LRELEASE_EXECUTABLE} ${_ts_file} -qm ${_qm_file})
 	LIST(APPEND locale_targets "${_ts_target}")
 ENDFOREACH(_ts_file ${lmms_LOCALES})
-ADD_CUSTOM_TARGET(update-locales DEPENDS ${locale_targets})
+ADD_CUSTOM_TARGET(update-locales)# DEPENDS ${locale_targets}) # does not work
+FOREACH(_item ${locale_targets})
+	ADD_DEPENDENCIES(update-locales ${_item})
+ENDFOREACH(_item ${locale_targets})
+
 
 
 #
