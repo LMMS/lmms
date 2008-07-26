@@ -4,6 +4,7 @@
 	- added locale targets
 	- added "update-locales" target
 	- added "distclean" target
+	- added "tarball" target
 
 	* plugins/organic/organic.cpp:
 	* plugins/triple_oscillator/triple_oscillator.cpp:

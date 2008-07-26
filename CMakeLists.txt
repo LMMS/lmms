@@ -348,6 +348,20 @@ ADD_CUSTOM_TARGET(distclean
 			COMMAND make clean
 			COMMAND rm -rf `find -name cmake_install.cmake` `find -name Makefile` `find -type d -name CMakeFiles` CMakeCache.txt)
 
+#
+# add tarball-target
+#
+SET(TMP "lmms-${VERSION}")
+ADD_CUSTOM_TARGET(dist
+			COMMAND make clean
+			COMMAND rm -rf ${TMP}
+			COMMAND mkdir -p ${TMP}
+			COMMAND cp AUTHORS build_mingw32 ChangeLog CMakeLists.txt configure COPYING INSTALL lmms.1 lmms.rc.in lmms.spec.in README TODO ${TMP}
+			COMMAND cp -r buildtools cmake data include plugins src ${TMP}
+			COMMAND rm -rf `find ${TMP} -type d -name ".svn"`  `find ${TMP} -name cmake_install.cmake` `find ${TMP} -name Makefile` `find ${TMP} -type d -name CMakeFiles` ${TMP}/CMakeCache.txt
+			COMMAND tar cjf lmms-${VERSION}.tar.bz2 ${TMP}
+			COMMAND rm -rf ${TMP})
+
 
 IF(WANT_PCH)
     FIND_PACKAGE(PCHSupport)
