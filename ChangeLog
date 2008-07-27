@@ -1,3 +1,9 @@
+2008-07-27	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* README:
+	* INSTALL:
+	updated documentation on how to build LMMS with cmake
+
 2008-07-26	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* data/locale/en.ts:
