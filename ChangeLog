@@ -1,5 +1,15 @@
 2008-07-27	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* include/instrument_track.h:
+	* src/tracks/instrument_track.cpp:
+	reverted previous change of some models from floatModel to intModel as
+	it caused crashes in knob-class
+
+	* include/automation_pattern.h:
+	* src/core/automation_pattern.cpp:
+	when connecting object to automation-pattern which has no object
+	connected yet, set default-value (closes #2026102)
+
 	* plugins/vst_base/CMakeLists.txt:
 	added missing support for out-of-tree builds
 

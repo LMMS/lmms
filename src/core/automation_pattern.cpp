@@ -92,6 +92,20 @@ automationPattern::~automationPattern()
 
 
 
+void automationPattern::addObject( automatableModel * _obj )
+{
+	m_objects += _obj;
+	// been empty before?
+	if( m_objects.size() == 1 && !hasAutomation() )
+	{
+		// then initialize default-value
+		putValue( 0, _obj->value<float>(), FALSE );
+	}
+}
+
+
+
+
 const automatableModel * automationPattern::firstObject( void ) const
 {
 	if( !m_objects.isEmpty() )
