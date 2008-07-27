@@ -1,5 +1,9 @@
 2008-07-27	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* src/gui/automation_editor.cpp:
+	also allow drawing new dots when clicking inside already existing
+	value (closes #2026120)
+
 	* include/instrument_track.h:
 	* src/tracks/instrument_track.cpp:
 	reverted previous change of some models from floatModel to intModel as

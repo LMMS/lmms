@@ -686,7 +686,8 @@ void automationEditor::drawLine( int _x0, float _y0, int _x1, float _y1 )
 		m_pattern->removeValue( midiTime( x ) );
 		m_pattern->putValue( midiTime( x ), y );
 	}
-};
+}
+
 
 
 
@@ -730,6 +731,7 @@ void automationEditor::mousePressEvent( QMouseEvent * _me )
 					len > 0 &&
 					( it+1==time_map.end() ||
 						pos_ticks <= (it+1).key() ) &&
+		( pos_ticks<= it.key() + DefaultTicksPerTact *4 / m_ppt ) &&
 					level <= it.value() )
 				{
 					break;
@@ -742,9 +744,11 @@ void automationEditor::mousePressEvent( QMouseEvent * _me )
 							m_editMode == DRAW )
 			{
 				// Connect the dots
-				if( engine::getMainWindow()->isShiftPressed() == TRUE )
+				if( engine::getMainWindow()->isShiftPressed() )
 				{
-					drawLine( m_drawLastTick, m_drawLastLevel, pos_ticks, level );
+					drawLine( m_drawLastTick,
+							m_drawLastLevel,
+							pos_ticks, level );
 				}
 				m_drawLastTick = pos_ticks;
 				m_drawLastLevel = level;
@@ -811,7 +815,6 @@ void automationEditor::mousePressEvent( QMouseEvent * _me )
 			else if( _me->button() == Qt::LeftButton &&
 							m_editMode == MOVE )
 			{
-
 				// move selection (including selected values)
 
 				// save position where move-process began
@@ -870,17 +873,15 @@ void automationEditor::mouseMoveEvent( QMouseEvent * _me )
 			return;
 		}
 		x -= VALUES_WIDTH;
+		if( m_action == MOVE_VALUE )
+		{
+			x -= m_moveXOffset;
+		}
 
-			if( m_action == MOVE_VALUE )
-			{
-				x -= m_moveXOffset;
-			}
 		int pos_ticks = x * DefaultTicksPerTact / m_ppt +
 							m_currentPosition;
 		if( _me->buttons() & Qt::LeftButton && m_editMode == DRAW )
 		{
-/*			pos_ticks = x * DefaultTicksPerTact / m_ppt +
-							m_currentPosition;*/
 			if( m_action == MOVE_VALUE )
 			{
 				// moving value
@@ -889,7 +890,8 @@ void automationEditor::mouseMoveEvent( QMouseEvent * _me )
 					pos_ticks = 0;
 				}
 
-				drawLine( m_drawLastTick, m_drawLastLevel, pos_ticks, level );
+				drawLine( m_drawLastTick, m_drawLastLevel,
+							pos_ticks, level );
 				m_drawLastTick = pos_ticks;
 				m_drawLastLevel = level;
 
