@@ -180,9 +180,9 @@ private:
 	QList<notePlayHandle *> m_processHandles;
 
 
-	intModel m_volumeModel;
-	intModel m_panningModel;
-	intModel m_pitchModel;
+	floatModel m_volumeModel;
+	floatModel m_panningModel;
+	floatModel m_pitchModel;
 	intModel m_effectChannelModel;
 
 
