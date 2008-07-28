@@ -1,675 +1,919 @@
 <?xml version="1.0"?>
 <!DOCTYPE multimedia-project>
-<multimediaproject creator="Linux MultiMedia Studio (LMMS)" creatorversion="0.1.2-cvs20060115" type="song" version="1.0" >
-  <head>
-    <bpm value="160" />
-    <mastervol value="43" />
-    <masterpitch value="0" />
-  </head>
+<multimedia-project version="1.0" creator="Linux MultiMedia Studio (LMMS)" creatorversion="0.4.0-beta" type="song" >
+  <head timesig_numerator="4" mastervol="94" timesig_denominator="4" bpm="160" masterpitch="0" />
   <song>
-    <trackcontainer type="songeditor" >
-      <track muted="0" type="1" >
-        <bbtrack name="Main Lead Jupiter" >
-          <trackcontainer type="bbeditor" >
-            <track muted="0" type="0" >
-              <channeltrack surpos="134219776" fxch="0" baseoct="4" vol="27" name="Jupiter" basetone="9" tab="0" >
-                <tripleoscillator userwavefile1="" wavetype1="2" coarse1="0" userwavefile2="shapes/smooth_inv_saw.ogg" wavetype2="3" coarse2="12" vol0="100" vol1="100" finel0="0" vol2="63" finel1="-16" finel2="0" modalgo1="2" stphdetun0="121" pan0="0" modalgo2="0" stphdetun1="259" pan1="0" stphdetun2="92" pan2="0" phoffset0="0" phoffset1="266" phoffset2="80" finer0="0" finer1="13" finer2="0" userwavefile0="" wavetype0="2" coarse0="0" />
+    <trackcontainer type="song" >
+      <track muted="0" type="1" name="Main Lead Jupiter" >
+        <bbtrack>
+          <trackcontainer type="bbtrackcontainer" >
+            <track muted="0" type="0" name="Jupiter" >
+              <instrumenttrack pan="0" fxch="0" pitch="0" basenote="57" vol="16" >
+                <instrument name="tripleoscillator" >
+                  <tripleoscillator phoffset2="80" userwavefile0="" finer0="0" userwavefile1="" finer1="13" userwavefile2="shapes/smooth_inv_saw.ogg" finer2="0" coarse0="0" coarse1="0" coarse2="12" finel0="0" finel1="-16" modalgo1="2" modalgo2="0" finel2="0" pan0="0" modalgo3="0" pan1="0" stphdetun0="121" pan2="0" stphdetun1="259" wavetype0="2" stphdetun2="92" wavetype1="2" wavetype2="3" vol0="100" vol1="100" phoffset0="0" phoffset1="266" vol2="63" />
+                </instrument>
                 <eldata fres="1.26" ftype="7" fcut="1754" fwet="1" >
-                  <elvol lfosyncmode="0" lpdel="0" amt="1" rel="0.344" ctlenvamt="0" latt="0" sus="0" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.597" userwavefile="" x100="0" lshp="0" hold="0" />
-                  <elcut lfosyncmode="0" lpdel="0" amt="0.82" rel="0.016" ctlenvamt="0" latt="0" sus="0.998" lspd="0.2918" att="0" pdel="0" lamt="0.63" dec="0.136" userwavefile="" x100="0" lshp="1" hold="0" />
-                  <elres lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
+                  <elvol lspd_denominator="1" pdel="0" userwavefile="" dec="0.597" lamt="0" syncmode="0" latt="0" rel="0.344" sus="0" amt="1" x100="0" att="0" lpdel="0" hold="0" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="1" />
+                  <elcut lspd_denominator="1" pdel="0" userwavefile="" dec="0.136" lamt="0.63" syncmode="0" latt="0" rel="0.016" sus="0.998" amt="0.82" x100="0" att="0" lpdel="0" hold="0" lshp="1" lspd="0.2918" ctlenvamt="0" lspd_numerator="1" />
+                  <elres lspd_denominator="1" pdel="0" userwavefile="" dec="0.499" lamt="0" syncmode="0" latt="0" rel="0.1" sus="0.499" amt="0" x100="0" att="0" lpdel="0" hold="0.499" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="1" />
                 </eldata>
-                <arpandchords arpmode="0" chordrange="1" arprange="3" arpdisabled="1" chord="0" chorddisabled="0" arpgate="100" arp="0" arpsyncmode="0" arptime="72" arpdir="1" />
-                <midi inputchannel="0" outputchannel="1" receive="0" send="0" />
-              </channeltrack>
-              <pattern steps="16" type="1" name="Jupiter" pos="0" frozen="0" len="640" >
-                <note tone="9" pan="0" oct="3" vol="100" pos="0" len="4" />
-                <note tone="0" pan="0" oct="4" vol="100" pos="4" len="4" />
-                <note tone="4" pan="0" oct="4" vol="100" pos="8" len="4" />
-                <note tone="9" pan="0" oct="3" vol="100" pos="12" len="4" />
-                <note tone="0" pan="0" oct="4" vol="100" pos="16" len="4" />
-                <note tone="4" pan="0" oct="4" vol="100" pos="20" len="4" />
-                <note tone="9" pan="0" oct="3" vol="100" pos="24" len="4" />
-                <note tone="0" pan="0" oct="4" vol="100" pos="28" len="4" />
-                <note tone="4" pan="0" oct="4" vol="100" pos="32" len="4" />
-                <note tone="9" pan="0" oct="3" vol="100" pos="36" len="4" />
-                <note tone="0" pan="0" oct="4" vol="100" pos="40" len="4" />
-                <note tone="4" pan="0" oct="4" vol="100" pos="44" len="4" />
-                <note tone="7" pan="0" oct="3" vol="100" pos="48" len="4" />
-                <note tone="0" pan="0" oct="4" vol="100" pos="52" len="4" />
-                <note tone="4" pan="0" oct="4" vol="100" pos="56" len="4" />
-                <note tone="7" pan="0" oct="3" vol="100" pos="60" len="4" />
-                <note tone="0" pan="0" oct="4" vol="100" pos="64" len="4" />
-                <note tone="4" pan="0" oct="4" vol="100" pos="68" len="4" />
-                <note tone="7" pan="0" oct="3" vol="100" pos="72" len="4" />
-                <note tone="0" pan="0" oct="4" vol="100" pos="76" len="4" />
-                <note tone="4" pan="0" oct="4" vol="100" pos="80" len="4" />
-                <note tone="7" pan="0" oct="3" vol="100" pos="84" len="4" />
-                <note tone="0" pan="0" oct="4" vol="100" pos="88" len="4" />
-                <note tone="4" pan="0" oct="4" vol="100" pos="92" len="4" />
-                <note tone="7" pan="0" oct="3" vol="100" pos="96" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="100" len="4" />
-                <note tone="4" pan="0" oct="4" vol="100" pos="104" len="4" />
-                <note tone="7" pan="0" oct="3" vol="100" pos="108" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="112" len="4" />
-                <note tone="4" pan="0" oct="4" vol="100" pos="116" len="4" />
-                <note tone="7" pan="0" oct="3" vol="100" pos="120" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="124" len="4" />
-                <note tone="4" pan="0" oct="4" vol="100" pos="128" len="4" />
-                <note tone="7" pan="0" oct="3" vol="100" pos="132" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="136" len="4" />
-                <note tone="4" pan="0" oct="4" vol="100" pos="140" len="4" />
-                <note tone="6" pan="0" oct="3" vol="100" pos="144" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="148" len="4" />
-                <note tone="4" pan="0" oct="4" vol="100" pos="152" len="4" />
-                <note tone="6" pan="0" oct="3" vol="100" pos="156" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="160" len="4" />
-                <note tone="4" pan="0" oct="4" vol="100" pos="164" len="4" />
-                <note tone="6" pan="0" oct="3" vol="100" pos="168" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="172" len="4" />
-                <note tone="4" pan="0" oct="4" vol="100" pos="176" len="4" />
-                <note tone="6" pan="0" oct="3" vol="100" pos="180" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="184" len="4" />
-                <note tone="4" pan="0" oct="4" vol="100" pos="188" len="4" />
-                <note tone="6" pan="0" oct="3" vol="100" pos="192" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="196" len="4" />
-                <note tone="3" pan="0" oct="4" vol="100" pos="200" len="4" />
-                <note tone="6" pan="0" oct="3" vol="100" pos="204" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="208" len="4" />
-                <note tone="3" pan="0" oct="4" vol="100" pos="212" len="4" />
-                <note tone="6" pan="0" oct="3" vol="100" pos="216" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="220" len="4" />
-                <note tone="3" pan="0" oct="4" vol="100" pos="224" len="4" />
-                <note tone="6" pan="0" oct="3" vol="100" pos="228" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="232" len="4" />
-                <note tone="3" pan="0" oct="4" vol="100" pos="236" len="4" />
-                <note tone="6" pan="0" oct="3" vol="100" pos="240" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="244" len="4" />
-                <note tone="3" pan="0" oct="4" vol="100" pos="248" len="4" />
-                <note tone="6" pan="0" oct="3" vol="100" pos="252" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="256" len="4" />
-                <note tone="3" pan="0" oct="4" vol="100" pos="260" len="4" />
-                <note tone="6" pan="0" oct="3" vol="100" pos="264" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="268" len="4" />
-                <note tone="3" pan="0" oct="4" vol="100" pos="272" len="4" />
-                <note tone="6" pan="0" oct="3" vol="100" pos="276" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="280" len="4" />
-                <note tone="3" pan="0" oct="4" vol="100" pos="284" len="4" />
-                <note tone="7" pan="0" oct="3" vol="100" pos="288" len="4" />
-                <note tone="0" pan="0" oct="4" vol="100" pos="292" len="4" />
-                <note tone="4" pan="0" oct="4" vol="100" pos="296" len="4" />
-                <note tone="7" pan="0" oct="3" vol="100" pos="300" len="4" />
-                <note tone="0" pan="0" oct="4" vol="100" pos="304" len="4" />
-                <note tone="4" pan="0" oct="4" vol="100" pos="308" len="4" />
-                <note tone="9" pan="0" oct="3" vol="100" pos="312" len="4" />
-                <note tone="0" pan="0" oct="4" vol="100" pos="316" len="4" />
-                <note tone="4" pan="0" oct="4" vol="100" pos="320" len="4" />
-                <note tone="9" pan="0" oct="3" vol="100" pos="324" len="4" />
-                <note tone="0" pan="0" oct="4" vol="100" pos="328" len="4" />
-                <note tone="4" pan="0" oct="4" vol="100" pos="332" len="4" />
-                <note tone="7" pan="0" oct="3" vol="100" pos="336" len="4" />
-                <note tone="0" pan="0" oct="4" vol="100" pos="340" len="4" />
-                <note tone="4" pan="0" oct="4" vol="100" pos="344" len="4" />
-                <note tone="7" pan="0" oct="3" vol="100" pos="348" len="4" />
-                <note tone="0" pan="0" oct="4" vol="100" pos="352" len="4" />
-                <note tone="4" pan="0" oct="4" vol="100" pos="356" len="4" />
-                <note tone="7" pan="0" oct="3" vol="100" pos="360" len="4" />
-                <note tone="0" pan="0" oct="4" vol="100" pos="364" len="4" />
-                <note tone="4" pan="0" oct="4" vol="100" pos="368" len="4" />
-                <note tone="7" pan="0" oct="3" vol="100" pos="372" len="4" />
-                <note tone="0" pan="0" oct="4" vol="100" pos="376" len="4" />
-                <note tone="4" pan="0" oct="4" vol="100" pos="380" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="384" len="4" />
-                <note tone="3" pan="0" oct="4" vol="100" pos="388" len="4" />
-                <note tone="6" pan="0" oct="4" vol="100" pos="392" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="396" len="4" />
-                <note tone="3" pan="0" oct="4" vol="100" pos="400" len="4" />
-                <note tone="6" pan="0" oct="4" vol="100" pos="404" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="408" len="4" />
-                <note tone="3" pan="0" oct="4" vol="100" pos="412" len="4" />
-                <note tone="6" pan="0" oct="4" vol="100" pos="416" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="420" len="4" />
-                <note tone="3" pan="0" oct="4" vol="100" pos="424" len="4" />
-                <note tone="6" pan="0" oct="4" vol="100" pos="428" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="432" len="4" />
-                <note tone="4" pan="0" oct="4" vol="100" pos="436" len="4" />
-                <note tone="7" pan="0" oct="4" vol="100" pos="440" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="444" len="4" />
-                <note tone="4" pan="0" oct="4" vol="100" pos="448" len="4" />
-                <note tone="7" pan="0" oct="4" vol="100" pos="452" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="456" len="4" />
-                <note tone="4" pan="0" oct="4" vol="100" pos="460" len="4" />
-                <note tone="7" pan="0" oct="4" vol="100" pos="464" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="468" len="4" />
-                <note tone="4" pan="0" oct="4" vol="100" pos="472" len="4" />
-                <note tone="7" pan="0" oct="4" vol="100" pos="476" len="4" />
-                <note tone="9" pan="0" oct="3" vol="100" pos="480" len="4" />
-                <note tone="0" pan="0" oct="4" vol="100" pos="484" len="4" />
-                <note tone="4" pan="0" oct="4" vol="100" pos="488" len="4" />
-                <note tone="9" pan="0" oct="3" vol="100" pos="492" len="4" />
-                <note tone="0" pan="0" oct="4" vol="100" pos="496" len="4" />
-                <note tone="4" pan="0" oct="4" vol="100" pos="500" len="4" />
-                <note tone="9" pan="0" oct="3" vol="100" pos="504" len="4" />
-                <note tone="0" pan="0" oct="4" vol="100" pos="508" len="4" />
-                <note tone="4" pan="0" oct="4" vol="100" pos="512" len="4" />
-                <note tone="9" pan="0" oct="3" vol="100" pos="516" len="4" />
-                <note tone="0" pan="0" oct="4" vol="100" pos="520" len="4" />
-                <note tone="4" pan="0" oct="4" vol="100" pos="524" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="528" len="4" />
-                <note tone="3" pan="0" oct="4" vol="100" pos="532" len="4" />
-                <note tone="6" pan="0" oct="4" vol="100" pos="536" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="540" len="4" />
-                <note tone="3" pan="0" oct="4" vol="100" pos="544" len="4" />
-                <note tone="6" pan="0" oct="4" vol="100" pos="548" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="552" len="4" />
-                <note tone="3" pan="0" oct="4" vol="100" pos="556" len="4" />
-                <note tone="6" pan="0" oct="4" vol="100" pos="560" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="564" len="4" />
-                <note tone="3" pan="0" oct="4" vol="100" pos="568" len="4" />
-                <note tone="6" pan="0" oct="4" vol="100" pos="572" len="4" />
-                <note tone="6" pan="0" oct="3" vol="100" pos="576" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="580" len="4" />
-                <note tone="3" pan="0" oct="4" vol="100" pos="584" len="4" />
-                <note tone="6" pan="0" oct="3" vol="100" pos="588" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="592" len="4" />
-                <note tone="3" pan="0" oct="4" vol="100" pos="596" len="4" />
-                <note tone="6" pan="0" oct="3" vol="100" pos="600" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="604" len="4" />
-                <note tone="3" pan="0" oct="4" vol="100" pos="608" len="4" />
-                <note tone="6" pan="0" oct="3" vol="100" pos="612" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="616" len="4" />
-                <note tone="3" pan="0" oct="4" vol="100" pos="620" len="4" />
-                <note tone="6" pan="0" oct="3" vol="100" pos="624" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="628" len="4" />
-                <note tone="3" pan="0" oct="4" vol="100" pos="632" len="4" />
-                <note tone="6" pan="0" oct="3" vol="100" pos="636" len="4" />
+                <chordcreator chord="0" chordrange="1" chord-enabled="1" />
+                <arpeggiator arptime="72" arprange="3" arptime_denominator="1" syncmode="0" arpmode="0" arp-enabled="0" arp="0" arptime_numerator="1" arpdir="0" arpgate="100" />
+                <midiport inputcontroller="0" inputchannel="0" outputcontroller="0" writable="0" outputchannel="1" defvelout="0" readable="0" defvelin="0" />
+                <fxchain numofeffects="0" enabled="0" />
+              </instrumenttrack>
+              <pattern steps="16" muted="0" type="1" name="Jupiter" pos="0" len="1920" frozen="0" >
+                <note pan="0" key="45" vol="100" pos="0" len="12" />
+                <note pan="0" key="48" vol="100" pos="12" len="12" />
+                <note pan="0" key="52" vol="100" pos="24" len="12" />
+                <note pan="0" key="45" vol="100" pos="36" len="12" />
+                <note pan="0" key="48" vol="100" pos="48" len="12" />
+                <note pan="0" key="52" vol="100" pos="60" len="12" />
+                <note pan="0" key="45" vol="100" pos="72" len="12" />
+                <note pan="0" key="48" vol="100" pos="84" len="12" />
+                <note pan="0" key="52" vol="100" pos="96" len="12" />
+                <note pan="0" key="45" vol="100" pos="108" len="12" />
+                <note pan="0" key="48" vol="100" pos="120" len="12" />
+                <note pan="0" key="52" vol="100" pos="132" len="12" />
+                <note pan="0" key="43" vol="100" pos="144" len="12" />
+                <note pan="0" key="48" vol="100" pos="156" len="12" />
+                <note pan="0" key="52" vol="100" pos="168" len="12" />
+                <note pan="0" key="43" vol="100" pos="180" len="12" />
+                <note pan="0" key="48" vol="100" pos="192" len="12" />
+                <note pan="0" key="52" vol="100" pos="204" len="12" />
+                <note pan="0" key="43" vol="100" pos="216" len="12" />
+                <note pan="0" key="48" vol="100" pos="228" len="12" />
+                <note pan="0" key="52" vol="100" pos="240" len="12" />
+                <note pan="0" key="43" vol="100" pos="252" len="12" />
+                <note pan="0" key="48" vol="100" pos="264" len="12" />
+                <note pan="0" key="52" vol="100" pos="276" len="12" />
+                <note pan="0" key="43" vol="100" pos="288" len="12" />
+                <note pan="0" key="47" vol="100" pos="300" len="12" />
+                <note pan="0" key="52" vol="100" pos="312" len="12" />
+                <note pan="0" key="43" vol="100" pos="324" len="12" />
+                <note pan="0" key="47" vol="100" pos="336" len="12" />
+                <note pan="0" key="52" vol="100" pos="348" len="12" />
+                <note pan="0" key="43" vol="100" pos="360" len="12" />
+                <note pan="0" key="47" vol="100" pos="372" len="12" />
+                <note pan="0" key="52" vol="100" pos="384" len="12" />
+                <note pan="0" key="43" vol="100" pos="396" len="12" />
+                <note pan="0" key="47" vol="100" pos="408" len="12" />
+                <note pan="0" key="52" vol="100" pos="420" len="12" />
+                <note pan="0" key="42" vol="100" pos="432" len="12" />
+                <note pan="0" key="47" vol="100" pos="444" len="12" />
+                <note pan="0" key="52" vol="100" pos="456" len="12" />
+                <note pan="0" key="42" vol="100" pos="468" len="12" />
+                <note pan="0" key="47" vol="100" pos="480" len="12" />
+                <note pan="0" key="52" vol="100" pos="492" len="12" />
+                <note pan="0" key="42" vol="100" pos="504" len="12" />
+                <note pan="0" key="47" vol="100" pos="516" len="12" />
+                <note pan="0" key="52" vol="100" pos="528" len="12" />
+                <note pan="0" key="42" vol="100" pos="540" len="12" />
+                <note pan="0" key="47" vol="100" pos="552" len="12" />
+                <note pan="0" key="52" vol="100" pos="564" len="12" />
+                <note pan="0" key="42" vol="100" pos="576" len="12" />
+                <note pan="0" key="47" vol="100" pos="588" len="12" />
+                <note pan="0" key="51" vol="100" pos="600" len="12" />
+                <note pan="0" key="42" vol="100" pos="612" len="12" />
+                <note pan="0" key="47" vol="100" pos="624" len="12" />
+                <note pan="0" key="51" vol="100" pos="636" len="12" />
+                <note pan="0" key="42" vol="100" pos="648" len="12" />
+                <note pan="0" key="47" vol="100" pos="660" len="12" />
+                <note pan="0" key="51" vol="100" pos="672" len="12" />
+                <note pan="0" key="42" vol="100" pos="684" len="12" />
+                <note pan="0" key="47" vol="100" pos="696" len="12" />
+                <note pan="0" key="51" vol="100" pos="708" len="12" />
+                <note pan="0" key="42" vol="100" pos="720" len="12" />
+                <note pan="0" key="47" vol="100" pos="732" len="12" />
+                <note pan="0" key="51" vol="100" pos="744" len="12" />
+                <note pan="0" key="42" vol="100" pos="756" len="12" />
+                <note pan="0" key="47" vol="100" pos="768" len="12" />
+                <note pan="0" key="51" vol="100" pos="780" len="12" />
+                <note pan="0" key="42" vol="100" pos="792" len="12" />
+                <note pan="0" key="47" vol="100" pos="804" len="12" />
+                <note pan="0" key="51" vol="100" pos="816" len="12" />
+                <note pan="0" key="42" vol="100" pos="828" len="12" />
+                <note pan="0" key="47" vol="100" pos="840" len="12" />
+                <note pan="0" key="51" vol="100" pos="852" len="12" />
+                <note pan="0" key="43" vol="100" pos="864" len="12" />
+                <note pan="0" key="48" vol="100" pos="876" len="12" />
+                <note pan="0" key="52" vol="100" pos="888" len="12" />
+                <note pan="0" key="43" vol="100" pos="900" len="12" />
+                <note pan="0" key="48" vol="100" pos="912" len="12" />
+                <note pan="0" key="52" vol="100" pos="924" len="12" />
+                <note pan="0" key="45" vol="100" pos="936" len="12" />
+                <note pan="0" key="48" vol="100" pos="948" len="12" />
+                <note pan="0" key="52" vol="100" pos="960" len="12" />
+                <note pan="0" key="45" vol="100" pos="972" len="12" />
+                <note pan="0" key="48" vol="100" pos="984" len="12" />
+                <note pan="0" key="52" vol="100" pos="996" len="12" />
+                <note pan="0" key="43" vol="100" pos="1008" len="12" />
+                <note pan="0" key="48" vol="100" pos="1020" len="12" />
+                <note pan="0" key="52" vol="100" pos="1032" len="12" />
+                <note pan="0" key="43" vol="100" pos="1044" len="12" />
+                <note pan="0" key="48" vol="100" pos="1056" len="12" />
+                <note pan="0" key="52" vol="100" pos="1068" len="12" />
+                <note pan="0" key="43" vol="100" pos="1080" len="12" />
+                <note pan="0" key="48" vol="100" pos="1092" len="12" />
+                <note pan="0" key="52" vol="100" pos="1104" len="12" />
+                <note pan="0" key="43" vol="100" pos="1116" len="12" />
+                <note pan="0" key="48" vol="100" pos="1128" len="12" />
+                <note pan="0" key="52" vol="100" pos="1140" len="12" />
+                <note pan="0" key="47" vol="100" pos="1152" len="12" />
+                <note pan="0" key="51" vol="100" pos="1164" len="12" />
+                <note pan="0" key="54" vol="100" pos="1176" len="12" />
+                <note pan="0" key="47" vol="100" pos="1188" len="12" />
+                <note pan="0" key="51" vol="100" pos="1200" len="12" />
+                <note pan="0" key="54" vol="100" pos="1212" len="12" />
+                <note pan="0" key="47" vol="100" pos="1224" len="12" />
+                <note pan="0" key="51" vol="100" pos="1236" len="12" />
+                <note pan="0" key="54" vol="100" pos="1248" len="12" />
+                <note pan="0" key="47" vol="100" pos="1260" len="12" />
+                <note pan="0" key="51" vol="100" pos="1272" len="12" />
+                <note pan="0" key="54" vol="100" pos="1284" len="12" />
+                <note pan="0" key="47" vol="100" pos="1296" len="12" />
+                <note pan="0" key="52" vol="100" pos="1308" len="12" />
+                <note pan="0" key="55" vol="100" pos="1320" len="12" />
+                <note pan="0" key="47" vol="100" pos="1332" len="12" />
+                <note pan="0" key="52" vol="100" pos="1344" len="12" />
+                <note pan="0" key="55" vol="100" pos="1356" len="12" />
+                <note pan="0" key="47" vol="100" pos="1368" len="12" />
+                <note pan="0" key="52" vol="100" pos="1380" len="12" />
+                <note pan="0" key="55" vol="100" pos="1392" len="12" />
+                <note pan="0" key="47" vol="100" pos="1404" len="12" />
+                <note pan="0" key="52" vol="100" pos="1416" len="12" />
+                <note pan="0" key="55" vol="100" pos="1428" len="12" />
+                <note pan="0" key="45" vol="100" pos="1440" len="12" />
+                <note pan="0" key="48" vol="100" pos="1452" len="12" />
+                <note pan="0" key="52" vol="100" pos="1464" len="12" />
+                <note pan="0" key="45" vol="100" pos="1476" len="12" />
+                <note pan="0" key="48" vol="100" pos="1488" len="12" />
+                <note pan="0" key="52" vol="100" pos="1500" len="12" />
+                <note pan="0" key="45" vol="100" pos="1512" len="12" />
+                <note pan="0" key="48" vol="100" pos="1524" len="12" />
+                <note pan="0" key="52" vol="100" pos="1536" len="12" />
+                <note pan="0" key="45" vol="100" pos="1548" len="12" />
+                <note pan="0" key="48" vol="100" pos="1560" len="12" />
+                <note pan="0" key="52" vol="100" pos="1572" len="12" />
+                <note pan="0" key="47" vol="100" pos="1584" len="12" />
+                <note pan="0" key="51" vol="100" pos="1596" len="12" />
+                <note pan="0" key="54" vol="100" pos="1608" len="12" />
+                <note pan="0" key="47" vol="100" pos="1620" len="12" />
+                <note pan="0" key="51" vol="100" pos="1632" len="12" />
+                <note pan="0" key="54" vol="100" pos="1644" len="12" />
+                <note pan="0" key="47" vol="100" pos="1656" len="12" />
+                <note pan="0" key="51" vol="100" pos="1668" len="12" />
+                <note pan="0" key="54" vol="100" pos="1680" len="12" />
+                <note pan="0" key="47" vol="100" pos="1692" len="12" />
+                <note pan="0" key="51" vol="100" pos="1704" len="12" />
+                <note pan="0" key="54" vol="100" pos="1716" len="12" />
+                <note pan="0" key="42" vol="100" pos="1728" len="12" />
+                <note pan="0" key="47" vol="100" pos="1740" len="12" />
+                <note pan="0" key="51" vol="100" pos="1752" len="12" />
+                <note pan="0" key="42" vol="100" pos="1764" len="12" />
+                <note pan="0" key="47" vol="100" pos="1776" len="12" />
+                <note pan="0" key="51" vol="100" pos="1788" len="12" />
+                <note pan="0" key="42" vol="100" pos="1800" len="12" />
+                <note pan="0" key="47" vol="100" pos="1812" len="12" />
+                <note pan="0" key="51" vol="100" pos="1824" len="12" />
+                <note pan="0" key="42" vol="100" pos="1836" len="12" />
+                <note pan="0" key="47" vol="100" pos="1848" len="12" />
+                <note pan="0" key="51" vol="100" pos="1860" len="12" />
+                <note pan="0" key="42" vol="100" pos="1872" len="12" />
+                <note pan="0" key="47" vol="100" pos="1884" len="12" />
+                <note pan="0" key="51" vol="100" pos="1896" len="12" />
+                <note pan="0" key="42" vol="100" pos="1908" len="12" />
               </pattern>
-              <pattern steps="16" type="0" name="Jupiter" pos="64" frozen="0" len="64" />
-              <pattern steps="16" type="0" name="Jupiter" pos="128" frozen="0" len="64" />
-              <pattern steps="16" type="0" name="Jupiter" pos="192" frozen="0" len="64" />
-              <pattern steps="16" type="0" name="Jupiter" pos="256" frozen="0" len="64" />
-              <pattern steps="16" type="0" name="Jupiter" pos="320" frozen="0" len="64" />
+              <pattern steps="16" muted="0" type="0" name="Jupiter" pos="192" len="192" frozen="0" />
+              <pattern steps="16" muted="0" type="0" name="Jupiter" pos="384" len="192" frozen="0" />
+              <pattern steps="16" muted="0" type="0" name="Jupiter" pos="576" len="192" frozen="0" />
+              <pattern steps="16" muted="0" type="0" name="Jupiter" pos="768" len="192" frozen="0" />
+              <pattern steps="16" muted="0" type="0" name="Jupiter" pos="960" len="192" frozen="0" />
             </track>
-            <track muted="0" type="0" >
-              <channeltrack surpos="134219776" fxch="0" baseoct="4" vol="100" name="kick_hardcore01.ogg" basetone="9" tab="0" >
-                <audiofileprocessor reversed="0" looped="0" eframe="0.99957" sframe="0" amp="193" src="drums/kick_hardcore01.ogg" />
-                <eldata fres="0.5" ftype="0" fcut="16000" fwet="0" >
-                  <elvol lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
-                  <elcut lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
-                  <elres lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
+            <track muted="0" type="0" name="kick_hardcore01.ogg" >
+              <instrumenttrack pan="0" fxch="0" pitch="0" basenote="57" vol="59" >
+                <instrument name="audiofileprocessor" >
+                  <audiofileprocessor reversed="0" looped="0" eframe="0.99957" sframe="0" src="drums/kick_hardcore01.ogg" amp="193" />
+                </instrument>
+                <eldata fres="0.5" ftype="0" fcut="14000" fwet="0" >
+                  <elvol lspd_denominator="1" pdel="0" userwavefile="" dec="0.499" lamt="0" syncmode="0" latt="0" rel="0.1" sus="0.499" amt="0" x100="0" att="0" lpdel="0" hold="0.499" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="1" />
+                  <elcut lspd_denominator="1" pdel="0" userwavefile="" dec="0.499" lamt="0" syncmode="0" latt="0" rel="0.1" sus="0.499" amt="0" x100="0" att="0" lpdel="0" hold="0.499" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="1" />
+                  <elres lspd_denominator="1" pdel="0" userwavefile="" dec="0.499" lamt="0" syncmode="0" latt="0" rel="0.1" sus="0.499" amt="0" x100="0" att="0" lpdel="0" hold="0.499" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="1" />
                 </eldata>
-                <arpandchords arpmode="0" chordrange="1" arprange="1" arpdisabled="1" chord="0" chorddisabled="0" arpgate="100" arp="0" arpsyncmode="0" arptime="100" arpdir="1" />
-                <midi inputchannel="0" outputchannel="1" receive="0" send="0" />
-              </channeltrack>
-              <pattern steps="16" type="0" name="kick_hardcore01.ogg" pos="0" frozen="0" len="64" />
-              <pattern steps="16" type="0" name="kick_hardcore01.ogg" pos="64" frozen="0" len="64" />
-              <pattern steps="16" type="0" name="kick_hardcore01.ogg" pos="128" frozen="0" len="64" />
-              <pattern steps="16" type="0" name="kick_hardcore01.ogg" pos="192" frozen="0" len="64" />
-              <pattern steps="16" type="0" name="kick_hardcore01.ogg" pos="256" frozen="0" len="64" />
-              <pattern steps="16" type="0" name="kick_hardcore01.ogg" pos="320" frozen="0" len="64" >
-                <note tone="9" pan="0" oct="4" vol="100" pos="0" len="-64" />
-                <note tone="9" pan="0" oct="4" vol="100" pos="16" len="-64" />
-                <note tone="9" pan="0" oct="4" vol="100" pos="32" len="-64" />
-                <note tone="9" pan="0" oct="4" vol="100" pos="48" len="-64" />
-              </pattern>
-            </track>
-            <track muted="0" type="0" >
-              <channeltrack surpos="134219776" fxch="0" baseoct="4" vol="100" name="hihat_opened01.ogg" basetone="9" tab="0" >
-                <audiofileprocessor reversed="0" looped="0" eframe="0.999603" sframe="0" amp="100" src="drums/hihat_opened01.ogg" />
-                <eldata fres="0.5" ftype="0" fcut="16000" fwet="0" >
-                  <elvol lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
-                  <elcut lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
-                  <elres lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
-                </eldata>
-                <arpandchords arpmode="0" chordrange="1" arprange="1" arpdisabled="1" chord="0" chorddisabled="0" arpgate="100" arp="0" arpsyncmode="0" arptime="100" arpdir="1" />
-                <midi inputchannel="0" outputchannel="1" receive="0" send="0" />
-              </channeltrack>
-              <pattern steps="16" type="0" name="hihat_opened01.ogg" pos="0" frozen="0" len="64" />
-              <pattern steps="16" type="0" name="hihat_opened01.ogg" pos="64" frozen="0" len="64" />
-              <pattern steps="16" type="0" name="hihat_opened01.ogg" pos="128" frozen="0" len="64" />
-              <pattern steps="16" type="0" name="hihat_opened01.ogg" pos="192" frozen="0" len="64" />
-              <pattern steps="16" type="0" name="hihat_opened01.ogg" pos="256" frozen="0" len="64" />
-              <pattern steps="16" type="0" name="hihat_opened01.ogg" pos="320" frozen="0" len="64" >
-                <note tone="9" pan="0" oct="4" vol="100" pos="8" len="-64" />
-                <note tone="9" pan="0" oct="4" vol="100" pos="24" len="-64" />
-                <note tone="9" pan="0" oct="4" vol="100" pos="40" len="-64" />
-                <note tone="9" pan="0" oct="4" vol="100" pos="56" len="-64" />
+                <chordcreator chord="0" chordrange="1" chord-enabled="1" />
+                <arpeggiator arptime="100" arprange="1" arptime_denominator="1" syncmode="0" arpmode="0" arp-enabled="0" arp="0" arptime_numerator="1" arpdir="0" arpgate="100" />
+                <midiport inputcontroller="0" inputchannel="0" outputcontroller="0" writable="0" outputchannel="1" defvelout="0" readable="0" defvelin="0" />
+                <fxchain numofeffects="0" enabled="0" />
+              </instrumenttrack>
+              <pattern steps="16" muted="0" type="0" name="kick_hardcore01.ogg" pos="0" len="192" frozen="0" />
+              <pattern steps="16" muted="0" type="0" name="kick_hardcore01.ogg" pos="192" len="192" frozen="0" />
+              <pattern steps="16" muted="0" type="0" name="kick_hardcore01.ogg" pos="384" len="192" frozen="0" />
+              <pattern steps="16" muted="0" type="0" name="kick_hardcore01.ogg" pos="576" len="192" frozen="0" />
+              <pattern steps="16" muted="0" type="0" name="kick_hardcore01.ogg" pos="768" len="192" frozen="0" />
+              <pattern steps="16" muted="0" type="0" name="kick_hardcore01.ogg" pos="960" len="192" frozen="0" >
+                <note pan="0" key="57" vol="100" pos="0" len="-192" />
+                <note pan="0" key="57" vol="100" pos="48" len="-192" />
+                <note pan="0" key="57" vol="100" pos="96" len="-192" />
+                <note pan="0" key="57" vol="100" pos="144" len="-192" />
               </pattern>
             </track>
-            <track muted="0" type="0" >
-              <channeltrack surpos="134219776" fxch="0" baseoct="4" vol="33" name="RaveBass 2" basetone="9" tab="0" >
-                <tripleoscillator userwavefile1="empty.wav" wavetype1="3" coarse1="0" userwavefile2="empty.wav" wavetype2="2" coarse2="12" vol0="100" vol1="100" finel0="-10" vol2="115" finel1="10" finel2="-2" modalgo1="2" stphdetun0="232" pan0="9" modalgo2="2" stphdetun1="110" pan1="-20" stphdetun2="109" pan2="10" phoffset0="87" phoffset1="280" phoffset2="82" finer0="13" finer1="16" finer2="4" userwavefile0="empty.wav" wavetype0="2" coarse0="-12" />
+            <track muted="0" type="0" name="hihat_opened01.ogg" >
+              <instrumenttrack pan="0" fxch="0" pitch="0" basenote="57" vol="59" >
+                <instrument name="audiofileprocessor" >
+                  <audiofileprocessor reversed="0" looped="0" eframe="0.999603" sframe="0" src="drums/hihat_opened01.ogg" amp="100" />
+                </instrument>
+                <eldata fres="0.5" ftype="0" fcut="14000" fwet="0" >
+                  <elvol lspd_denominator="1" pdel="0" userwavefile="" dec="0.499" lamt="0" syncmode="0" latt="0" rel="0.1" sus="0.499" amt="0" x100="0" att="0" lpdel="0" hold="0.499" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="1" />
+                  <elcut lspd_denominator="1" pdel="0" userwavefile="" dec="0.499" lamt="0" syncmode="0" latt="0" rel="0.1" sus="0.499" amt="0" x100="0" att="0" lpdel="0" hold="0.499" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="1" />
+                  <elres lspd_denominator="1" pdel="0" userwavefile="" dec="0.499" lamt="0" syncmode="0" latt="0" rel="0.1" sus="0.499" amt="0" x100="0" att="0" lpdel="0" hold="0.499" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="1" />
+                </eldata>
+                <chordcreator chord="0" chordrange="1" chord-enabled="1" />
+                <arpeggiator arptime="100" arprange="1" arptime_denominator="1" syncmode="0" arpmode="0" arp-enabled="0" arp="0" arptime_numerator="1" arpdir="0" arpgate="100" />
+                <midiport inputcontroller="0" inputchannel="0" outputcontroller="0" writable="0" outputchannel="1" defvelout="0" readable="0" defvelin="0" />
+                <fxchain numofeffects="0" enabled="0" />
+              </instrumenttrack>
+              <pattern steps="16" muted="0" type="0" name="hihat_opened01.ogg" pos="0" len="192" frozen="0" />
+              <pattern steps="16" muted="0" type="0" name="hihat_opened01.ogg" pos="192" len="192" frozen="0" />
+              <pattern steps="16" muted="0" type="0" name="hihat_opened01.ogg" pos="384" len="192" frozen="0" />
+              <pattern steps="16" muted="0" type="0" name="hihat_opened01.ogg" pos="576" len="192" frozen="0" />
+              <pattern steps="16" muted="0" type="0" name="hihat_opened01.ogg" pos="768" len="192" frozen="0" />
+              <pattern steps="16" muted="0" type="0" name="hihat_opened01.ogg" pos="960" len="192" frozen="0" >
+                <note pan="0" key="57" vol="100" pos="24" len="-192" />
+                <note pan="0" key="57" vol="100" pos="72" len="-192" />
+                <note pan="0" key="57" vol="100" pos="120" len="-192" />
+                <note pan="0" key="57" vol="100" pos="168" len="-192" />
+              </pattern>
+            </track>
+            <track muted="0" type="0" name="RaveBass 2" >
+              <instrumenttrack pan="0" fxch="0" pitch="0" basenote="57" vol="19" >
+                <instrument name="tripleoscillator" >
+                  <tripleoscillator phoffset2="82" userwavefile0="empty.wav" finer0="13" userwavefile1="empty.wav" finer1="16" userwavefile2="empty.wav" finer2="4" coarse0="-12" coarse1="0" coarse2="12" finel0="-10" finel1="10" modalgo1="2" modalgo2="2" finel2="-2" pan0="9" modalgo3="0" pan1="-20" stphdetun0="232" pan2="10" stphdetun1="110" wavetype0="2" stphdetun2="109" wavetype1="3" wavetype2="2" vol0="100" vol1="100" phoffset0="87" phoffset1="280" vol2="115" />
+                </instrument>
                 <eldata fres="0.46" ftype="4" fcut="1250" fwet="1" >
-                  <elvol lfosyncmode="0" lpdel="0" amt="1" rel="0.238" ctlenvamt="0" latt="0" sus="0" lspd="0.1" att="0.048" pdel="0" lamt="0" dec="0.998" userwavefile="" x100="0" lshp="0" hold="0" />
-                  <elcut lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.6094" att="0.499" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="1" hold="0.499" />
-                  <elres lfosyncmode="0" lpdel="0" amt="0" rel="0" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0.499" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
+                  <elvol lspd_denominator="1" pdel="0" userwavefile="" dec="0.998" lamt="0" syncmode="0" latt="0" rel="0.238" sus="0" amt="1" x100="0" att="0.048" lpdel="0" hold="0" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="1" />
+                  <elcut lspd_denominator="1" pdel="0" userwavefile="" dec="0.499" lamt="0" syncmode="0" latt="0" rel="0.1" sus="0.499" amt="0" x100="0" att="0.499" lpdel="0" hold="0.499" lshp="1" lspd="0.6094" ctlenvamt="0" lspd_numerator="1" />
+                  <elres lspd_denominator="1" pdel="0" userwavefile="" dec="0.499" lamt="0" syncmode="0" latt="0" rel="0" sus="0.499" amt="0" x100="0" att="0.499" lpdel="0" hold="0.499" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="1" />
                 </eldata>
-                <arpandchords arpmode="0" chordrange="1" arprange="2" arpdisabled="0" chord="0" chorddisabled="0" arpgate="76" arp="0" arpsyncmode="0" arptime="100" arpdir="2" />
-                <midi inputchannel="0" outputchannel="1" receive="0" send="0" />
-              </channeltrack>
-              <pattern steps="16" type="0" name="RaveBass 2" pos="0" frozen="0" len="64" />
-              <pattern steps="16" type="0" name="RaveBass 2" pos="64" frozen="0" len="64" />
-              <pattern steps="16" type="0" name="RaveBass 2" pos="128" frozen="0" len="64" />
-              <pattern steps="16" type="0" name="RaveBass 2" pos="192" frozen="0" len="64" />
-              <pattern steps="16" type="1" name="RaveBass 2" pos="256" frozen="0" len="640" >
-                <note tone="9" pan="0" oct="3" vol="100" pos="0" len="47" />
-                <note tone="4" pan="0" oct="3" vol="100" pos="48" len="95" />
-                <note tone="6" pan="0" oct="3" vol="100" pos="144" len="48" />
-                <note tone="3" pan="0" oct="3" vol="100" pos="192" len="48" />
-                <note tone="11" pan="0" oct="2" vol="100" pos="240" len="48" />
-                <note tone="3" pan="0" oct="3" vol="100" pos="288" len="15" />
-                <note tone="6" pan="0" oct="3" vol="100" pos="304" len="15" />
-                <note tone="9" pan="0" oct="3" vol="100" pos="320" len="15" />
-                <note tone="0" pan="0" oct="4" vol="100" pos="336" len="47" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="384" len="95" />
-                <note tone="9" pan="0" oct="3" vol="100" pos="480" len="46" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="528" len="46" />
-                <note tone="3" pan="0" oct="4" vol="100" pos="576" len="57" />
+                <chordcreator chord="0" chordrange="1" chord-enabled="1" />
+                <arpeggiator arptime="100" arprange="2" arptime_denominator="1" syncmode="0" arpmode="0" arp-enabled="1" arp="0" arptime_numerator="1" arpdir="0" arpgate="76" />
+                <midiport inputcontroller="0" inputchannel="0" outputcontroller="0" writable="0" outputchannel="1" defvelout="0" readable="0" defvelin="0" />
+                <fxchain numofeffects="0" enabled="0" />
+              </instrumenttrack>
+              <pattern steps="16" muted="0" type="0" name="RaveBass 2" pos="0" len="192" frozen="0" />
+              <pattern steps="16" muted="0" type="0" name="RaveBass 2" pos="192" len="192" frozen="0" />
+              <pattern steps="16" muted="0" type="0" name="RaveBass 2" pos="384" len="192" frozen="0" />
+              <pattern steps="16" muted="0" type="0" name="RaveBass 2" pos="576" len="192" frozen="0" />
+              <pattern steps="16" muted="0" type="1" name="RaveBass 2" pos="768" len="1920" frozen="0" >
+                <note pan="0" key="45" vol="100" pos="0" len="141" />
+                <note pan="0" key="40" vol="100" pos="144" len="285" />
+                <note pan="0" key="42" vol="100" pos="432" len="144" />
+                <note pan="0" key="39" vol="100" pos="576" len="144" />
+                <note pan="0" key="35" vol="100" pos="720" len="144" />
+                <note pan="0" key="39" vol="100" pos="864" len="45" />
+                <note pan="0" key="42" vol="100" pos="912" len="45" />
+                <note pan="0" key="45" vol="100" pos="960" len="45" />
+                <note pan="0" key="48" vol="100" pos="1008" len="141" />
+                <note pan="0" key="47" vol="100" pos="1152" len="285" />
+                <note pan="0" key="45" vol="100" pos="1440" len="138" />
+                <note pan="0" key="47" vol="100" pos="1584" len="138" />
+                <note pan="0" key="51" vol="100" pos="1728" len="171" />
               </pattern>
-              <pattern steps="16" type="0" name="RaveBass 2" pos="320" frozen="0" len="64" />
+              <pattern steps="16" muted="0" type="0" name="RaveBass 2" pos="960" len="192" frozen="0" />
             </track>
-            <track muted="0" type="0" >
-              <channeltrack surpos="134219776" fxch="0" baseoct="3" vol="50" name="Soft Strings" basetone="9" tab="0" >
-                <tripleoscillator userwavefile1="" wavetype1="2" coarse1="0" userwavefile2="shapes/smooth_inv_saw.ogg" wavetype2="3" coarse2="12" vol0="100" vol1="100" finel0="0" vol2="42" finel1="-16" finel2="0" modalgo1="2" stphdetun0="121" pan0="0" modalgo2="0" stphdetun1="259" pan1="0" stphdetun2="92" pan2="0" phoffset0="0" phoffset1="266" phoffset2="80" finer0="0" finer1="13" finer2="0" userwavefile0="" wavetype0="2" coarse0="0" />
+            <track muted="0" type="0" name="Soft Strings" >
+              <instrumenttrack pan="0" fxch="0" pitch="0" basenote="45" vol="29" >
+                <instrument name="tripleoscillator" >
+                  <tripleoscillator phoffset2="80" userwavefile0="" finer0="0" userwavefile1="" finer1="13" userwavefile2="shapes/smooth_inv_saw.ogg" finer2="0" coarse0="0" coarse1="0" coarse2="12" finel0="0" finel1="-16" modalgo1="2" modalgo2="0" finel2="0" pan0="0" modalgo3="0" pan1="0" stphdetun0="121" pan2="0" stphdetun1="259" wavetype0="2" stphdetun2="92" wavetype1="2" wavetype2="3" vol0="100" vol1="100" phoffset0="0" phoffset1="266" vol2="42" />
+                </instrument>
                 <eldata fres="1.04" ftype="7" fcut="2524" fwet="1" >
-                  <elvol lfosyncmode="0" lpdel="0" amt="1" rel="0.328" ctlenvamt="0" latt="0" sus="0" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.597" userwavefile="" x100="0" lshp="0" hold="0" />
-                  <elcut lfosyncmode="0" lpdel="0" amt="1" rel="0.016" ctlenvamt="0" latt="0" sus="0.998" lspd="0.6268" att="0" pdel="0" lamt="0.63" dec="0.136" userwavefile="" x100="0" lshp="1" hold="0" />
-                  <elres lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.6717" att="0" pdel="0" lamt="0.43" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
+                  <elvol lspd_denominator="1" pdel="0" userwavefile="" dec="0.597" lamt="0" syncmode="0" latt="0" rel="0.328" sus="0" amt="1" x100="0" att="0" lpdel="0" hold="0" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="1" />
+                  <elcut lspd_denominator="1" pdel="0" userwavefile="" dec="0.136" lamt="0.63" syncmode="0" latt="0" rel="0.016" sus="0.998" amt="1" x100="0" att="0" lpdel="0" hold="0" lshp="1" lspd="0.6268" ctlenvamt="0" lspd_numerator="1" />
+                  <elres lspd_denominator="1" pdel="0" userwavefile="" dec="0.499" lamt="0.43" syncmode="0" latt="0" rel="0.1" sus="0.499" amt="0" x100="0" att="0" lpdel="0" hold="0.499" lshp="0" lspd="0.6717" ctlenvamt="0" lspd_numerator="1" />
                 </eldata>
-                <arpandchords arpmode="0" chordrange="1" arprange="2" arpdisabled="1" chord="0" chorddisabled="0" arpgate="100" arp="0" arpsyncmode="0" arptime="158" arpdir="1" />
-                <midi inputchannel="0" outputchannel="1" receive="0" send="0" />
-              </channeltrack>
-              <pattern steps="16" type="0" name="Soft Strings" pos="0" frozen="0" len="64" />
-              <pattern steps="16" type="1" name="Soft Strings" pos="64" frozen="0" len="640" >
-                <note tone="9" pan="0" oct="3" vol="100" pos="0" len="4" />
-                <note tone="0" pan="0" oct="4" vol="100" pos="4" len="4" />
-                <note tone="4" pan="0" oct="4" vol="100" pos="8" len="4" />
-                <note tone="9" pan="0" oct="3" vol="100" pos="12" len="4" />
-                <note tone="0" pan="0" oct="4" vol="100" pos="16" len="4" />
-                <note tone="4" pan="0" oct="4" vol="100" pos="20" len="4" />
-                <note tone="9" pan="0" oct="3" vol="100" pos="24" len="4" />
-                <note tone="0" pan="0" oct="4" vol="100" pos="28" len="4" />
-                <note tone="4" pan="0" oct="4" vol="100" pos="32" len="4" />
-                <note tone="9" pan="0" oct="3" vol="100" pos="36" len="4" />
-                <note tone="0" pan="0" oct="4" vol="100" pos="40" len="4" />
-                <note tone="4" pan="0" oct="4" vol="100" pos="44" len="4" />
-                <note tone="7" pan="0" oct="3" vol="100" pos="48" len="4" />
-                <note tone="0" pan="0" oct="4" vol="100" pos="52" len="4" />
-                <note tone="4" pan="0" oct="4" vol="100" pos="56" len="4" />
-                <note tone="7" pan="0" oct="3" vol="100" pos="60" len="4" />
-                <note tone="0" pan="0" oct="4" vol="100" pos="64" len="4" />
-                <note tone="4" pan="0" oct="4" vol="100" pos="68" len="4" />
-                <note tone="7" pan="0" oct="3" vol="100" pos="72" len="4" />
-                <note tone="0" pan="0" oct="4" vol="100" pos="76" len="4" />
-                <note tone="4" pan="0" oct="4" vol="100" pos="80" len="4" />
-                <note tone="7" pan="0" oct="3" vol="100" pos="84" len="4" />
-                <note tone="0" pan="0" oct="4" vol="100" pos="88" len="4" />
-                <note tone="4" pan="0" oct="4" vol="100" pos="92" len="4" />
-                <note tone="7" pan="0" oct="3" vol="100" pos="96" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="100" len="4" />
-                <note tone="4" pan="0" oct="4" vol="100" pos="104" len="4" />
-                <note tone="7" pan="0" oct="3" vol="100" pos="108" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="112" len="4" />
-                <note tone="4" pan="0" oct="4" vol="100" pos="116" len="4" />
-                <note tone="7" pan="0" oct="3" vol="100" pos="120" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="124" len="4" />
-                <note tone="4" pan="0" oct="4" vol="100" pos="128" len="4" />
-                <note tone="7" pan="0" oct="3" vol="100" pos="132" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="136" len="4" />
-                <note tone="4" pan="0" oct="4" vol="100" pos="140" len="4" />
-                <note tone="6" pan="0" oct="3" vol="100" pos="144" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="148" len="4" />
-                <note tone="4" pan="0" oct="4" vol="100" pos="152" len="4" />
-                <note tone="6" pan="0" oct="3" vol="100" pos="156" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="160" len="4" />
-                <note tone="4" pan="0" oct="4" vol="100" pos="164" len="4" />
-                <note tone="6" pan="0" oct="3" vol="100" pos="168" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="172" len="4" />
-                <note tone="4" pan="0" oct="4" vol="100" pos="176" len="4" />
-                <note tone="6" pan="0" oct="3" vol="100" pos="180" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="184" len="4" />
-                <note tone="4" pan="0" oct="4" vol="100" pos="188" len="4" />
-                <note tone="6" pan="0" oct="3" vol="100" pos="192" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="196" len="4" />
-                <note tone="3" pan="0" oct="4" vol="100" pos="200" len="4" />
-                <note tone="6" pan="0" oct="3" vol="100" pos="204" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="208" len="4" />
-                <note tone="3" pan="0" oct="4" vol="100" pos="212" len="4" />
-                <note tone="6" pan="0" oct="3" vol="100" pos="216" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="220" len="4" />
-                <note tone="3" pan="0" oct="4" vol="100" pos="224" len="4" />
-                <note tone="6" pan="0" oct="3" vol="100" pos="228" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="232" len="4" />
-                <note tone="3" pan="0" oct="4" vol="100" pos="236" len="4" />
-                <note tone="6" pan="0" oct="3" vol="100" pos="240" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="244" len="4" />
-                <note tone="3" pan="0" oct="4" vol="100" pos="248" len="4" />
-                <note tone="6" pan="0" oct="3" vol="100" pos="252" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="256" len="4" />
-                <note tone="3" pan="0" oct="4" vol="100" pos="260" len="4" />
-                <note tone="6" pan="0" oct="3" vol="100" pos="264" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="268" len="4" />
-                <note tone="3" pan="0" oct="4" vol="100" pos="272" len="4" />
-                <note tone="6" pan="0" oct="3" vol="100" pos="276" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="280" len="4" />
-                <note tone="3" pan="0" oct="4" vol="100" pos="284" len="4" />
-                <note tone="7" pan="0" oct="3" vol="100" pos="288" len="4" />
-                <note tone="0" pan="0" oct="4" vol="100" pos="292" len="4" />
-                <note tone="4" pan="0" oct="4" vol="100" pos="296" len="4" />
-                <note tone="7" pan="0" oct="3" vol="100" pos="300" len="4" />
-                <note tone="0" pan="0" oct="4" vol="100" pos="304" len="4" />
-                <note tone="4" pan="0" oct="4" vol="100" pos="308" len="4" />
-                <note tone="9" pan="0" oct="3" vol="100" pos="312" len="4" />
-                <note tone="0" pan="0" oct="4" vol="100" pos="316" len="4" />
-                <note tone="4" pan="0" oct="4" vol="100" pos="320" len="4" />
-                <note tone="9" pan="0" oct="3" vol="100" pos="324" len="4" />
-                <note tone="0" pan="0" oct="4" vol="100" pos="328" len="4" />
-                <note tone="4" pan="0" oct="4" vol="100" pos="332" len="4" />
-                <note tone="7" pan="0" oct="3" vol="100" pos="336" len="4" />
-                <note tone="0" pan="0" oct="4" vol="100" pos="340" len="4" />
-                <note tone="4" pan="0" oct="4" vol="100" pos="344" len="4" />
-                <note tone="7" pan="0" oct="3" vol="100" pos="348" len="4" />
-                <note tone="0" pan="0" oct="4" vol="100" pos="352" len="4" />
-                <note tone="4" pan="0" oct="4" vol="100" pos="356" len="4" />
-                <note tone="7" pan="0" oct="3" vol="100" pos="360" len="4" />
-                <note tone="0" pan="0" oct="4" vol="100" pos="364" len="4" />
-                <note tone="4" pan="0" oct="4" vol="100" pos="368" len="4" />
-                <note tone="7" pan="0" oct="3" vol="100" pos="372" len="4" />
-                <note tone="0" pan="0" oct="4" vol="100" pos="376" len="4" />
-                <note tone="4" pan="0" oct="4" vol="100" pos="380" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="384" len="4" />
-                <note tone="3" pan="0" oct="4" vol="100" pos="388" len="4" />
-                <note tone="6" pan="0" oct="4" vol="100" pos="392" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="396" len="4" />
-                <note tone="3" pan="0" oct="4" vol="100" pos="400" len="4" />
-                <note tone="6" pan="0" oct="4" vol="100" pos="404" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="408" len="4" />
-                <note tone="3" pan="0" oct="4" vol="100" pos="412" len="4" />
-                <note tone="6" pan="0" oct="4" vol="100" pos="416" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="420" len="4" />
-                <note tone="3" pan="0" oct="4" vol="100" pos="424" len="4" />
-                <note tone="6" pan="0" oct="4" vol="100" pos="428" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="432" len="4" />
-                <note tone="4" pan="0" oct="4" vol="100" pos="436" len="4" />
-                <note tone="7" pan="0" oct="4" vol="100" pos="440" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="444" len="4" />
-                <note tone="4" pan="0" oct="4" vol="100" pos="448" len="4" />
-                <note tone="7" pan="0" oct="4" vol="100" pos="452" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="456" len="4" />
-                <note tone="4" pan="0" oct="4" vol="100" pos="460" len="4" />
-                <note tone="7" pan="0" oct="4" vol="100" pos="464" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="468" len="4" />
-                <note tone="4" pan="0" oct="4" vol="100" pos="472" len="4" />
-                <note tone="7" pan="0" oct="4" vol="100" pos="476" len="4" />
-                <note tone="9" pan="0" oct="3" vol="100" pos="480" len="4" />
-                <note tone="0" pan="0" oct="4" vol="100" pos="484" len="4" />
-                <note tone="4" pan="0" oct="4" vol="100" pos="488" len="4" />
-                <note tone="9" pan="0" oct="3" vol="100" pos="492" len="4" />
-                <note tone="0" pan="0" oct="4" vol="100" pos="496" len="4" />
-                <note tone="4" pan="0" oct="4" vol="100" pos="500" len="4" />
-                <note tone="9" pan="0" oct="3" vol="100" pos="504" len="4" />
-                <note tone="0" pan="0" oct="4" vol="100" pos="508" len="4" />
-                <note tone="4" pan="0" oct="4" vol="100" pos="512" len="4" />
-                <note tone="9" pan="0" oct="3" vol="100" pos="516" len="4" />
-                <note tone="0" pan="0" oct="4" vol="100" pos="520" len="4" />
-                <note tone="4" pan="0" oct="4" vol="100" pos="524" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="528" len="4" />
-                <note tone="3" pan="0" oct="4" vol="100" pos="532" len="4" />
-                <note tone="6" pan="0" oct="4" vol="100" pos="536" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="540" len="4" />
-                <note tone="3" pan="0" oct="4" vol="100" pos="544" len="4" />
-                <note tone="6" pan="0" oct="4" vol="100" pos="548" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="552" len="4" />
-                <note tone="3" pan="0" oct="4" vol="100" pos="556" len="4" />
-                <note tone="6" pan="0" oct="4" vol="100" pos="560" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="564" len="4" />
-                <note tone="3" pan="0" oct="4" vol="100" pos="568" len="4" />
-                <note tone="6" pan="0" oct="4" vol="100" pos="572" len="4" />
-                <note tone="6" pan="0" oct="3" vol="100" pos="576" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="580" len="4" />
-                <note tone="3" pan="0" oct="4" vol="100" pos="584" len="4" />
-                <note tone="6" pan="0" oct="3" vol="100" pos="588" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="592" len="4" />
-                <note tone="3" pan="0" oct="4" vol="100" pos="596" len="4" />
-                <note tone="6" pan="0" oct="3" vol="100" pos="600" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="604" len="4" />
-                <note tone="3" pan="0" oct="4" vol="100" pos="608" len="4" />
-                <note tone="6" pan="0" oct="3" vol="100" pos="612" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="616" len="4" />
-                <note tone="3" pan="0" oct="4" vol="100" pos="620" len="4" />
-                <note tone="6" pan="0" oct="3" vol="100" pos="624" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="628" len="4" />
-                <note tone="3" pan="0" oct="4" vol="100" pos="632" len="4" />
-                <note tone="6" pan="0" oct="3" vol="100" pos="636" len="4" />
+                <chordcreator chord="0" chordrange="1" chord-enabled="1" />
+                <arpeggiator arptime="158" arprange="2" arptime_denominator="1" syncmode="0" arpmode="0" arp-enabled="0" arp="0" arptime_numerator="1" arpdir="0" arpgate="100" />
+                <midiport inputcontroller="0" inputchannel="0" outputcontroller="0" writable="0" outputchannel="1" defvelout="0" readable="0" defvelin="0" />
+                <fxchain numofeffects="0" enabled="0" />
+              </instrumenttrack>
+              <pattern steps="16" muted="0" type="0" name="Soft Strings" pos="0" len="192" frozen="0" />
+              <pattern steps="16" muted="0" type="1" name="Soft Strings" pos="192" len="1920" frozen="0" >
+                <note pan="0" key="45" vol="100" pos="0" len="12" />
+                <note pan="0" key="48" vol="100" pos="12" len="12" />
+                <note pan="0" key="52" vol="100" pos="24" len="12" />
+                <note pan="0" key="45" vol="100" pos="36" len="12" />
+                <note pan="0" key="48" vol="100" pos="48" len="12" />
+                <note pan="0" key="52" vol="100" pos="60" len="12" />
+                <note pan="0" key="45" vol="100" pos="72" len="12" />
+                <note pan="0" key="48" vol="100" pos="84" len="12" />
+                <note pan="0" key="52" vol="100" pos="96" len="12" />
+                <note pan="0" key="45" vol="100" pos="108" len="12" />
+                <note pan="0" key="48" vol="100" pos="120" len="12" />
+                <note pan="0" key="52" vol="100" pos="132" len="12" />
+                <note pan="0" key="43" vol="100" pos="144" len="12" />
+                <note pan="0" key="48" vol="100" pos="156" len="12" />
+                <note pan="0" key="52" vol="100" pos="168" len="12" />
+                <note pan="0" key="43" vol="100" pos="180" len="12" />
+                <note pan="0" key="48" vol="100" pos="192" len="12" />
+                <note pan="0" key="52" vol="100" pos="204" len="12" />
+                <note pan="0" key="43" vol="100" pos="216" len="12" />
+                <note pan="0" key="48" vol="100" pos="228" len="12" />
+                <note pan="0" key="52" vol="100" pos="240" len="12" />
+                <note pan="0" key="43" vol="100" pos="252" len="12" />
+                <note pan="0" key="48" vol="100" pos="264" len="12" />
+                <note pan="0" key="52" vol="100" pos="276" len="12" />
+                <note pan="0" key="43" vol="100" pos="288" len="12" />
+                <note pan="0" key="47" vol="100" pos="300" len="12" />
+                <note pan="0" key="52" vol="100" pos="312" len="12" />
+                <note pan="0" key="43" vol="100" pos="324" len="12" />
+                <note pan="0" key="47" vol="100" pos="336" len="12" />
+                <note pan="0" key="52" vol="100" pos="348" len="12" />
+                <note pan="0" key="43" vol="100" pos="360" len="12" />
+                <note pan="0" key="47" vol="100" pos="372" len="12" />
+                <note pan="0" key="52" vol="100" pos="384" len="12" />
+                <note pan="0" key="43" vol="100" pos="396" len="12" />
+                <note pan="0" key="47" vol="100" pos="408" len="12" />
+                <note pan="0" key="52" vol="100" pos="420" len="12" />
+                <note pan="0" key="42" vol="100" pos="432" len="12" />
+                <note pan="0" key="47" vol="100" pos="444" len="12" />
+                <note pan="0" key="52" vol="100" pos="456" len="12" />
+                <note pan="0" key="42" vol="100" pos="468" len="12" />
+                <note pan="0" key="47" vol="100" pos="480" len="12" />
+                <note pan="0" key="52" vol="100" pos="492" len="12" />
+                <note pan="0" key="42" vol="100" pos="504" len="12" />
+                <note pan="0" key="47" vol="100" pos="516" len="12" />
+                <note pan="0" key="52" vol="100" pos="528" len="12" />
+                <note pan="0" key="42" vol="100" pos="540" len="12" />
+                <note pan="0" key="47" vol="100" pos="552" len="12" />
+                <note pan="0" key="52" vol="100" pos="564" len="12" />
+                <note pan="0" key="42" vol="100" pos="576" len="12" />
+                <note pan="0" key="47" vol="100" pos="588" len="12" />
+                <note pan="0" key="51" vol="100" pos="600" len="12" />
+                <note pan="0" key="42" vol="100" pos="612" len="12" />
+                <note pan="0" key="47" vol="100" pos="624" len="12" />
+                <note pan="0" key="51" vol="100" pos="636" len="12" />
+                <note pan="0" key="42" vol="100" pos="648" len="12" />
+                <note pan="0" key="47" vol="100" pos="660" len="12" />
+                <note pan="0" key="51" vol="100" pos="672" len="12" />
+                <note pan="0" key="42" vol="100" pos="684" len="12" />
+                <note pan="0" key="47" vol="100" pos="696" len="12" />
+                <note pan="0" key="51" vol="100" pos="708" len="12" />
+                <note pan="0" key="42" vol="100" pos="720" len="12" />
+                <note pan="0" key="47" vol="100" pos="732" len="12" />
+                <note pan="0" key="51" vol="100" pos="744" len="12" />
+                <note pan="0" key="42" vol="100" pos="756" len="12" />
+                <note pan="0" key="47" vol="100" pos="768" len="12" />
+                <note pan="0" key="51" vol="100" pos="780" len="12" />
+                <note pan="0" key="42" vol="100" pos="792" len="12" />
+                <note pan="0" key="47" vol="100" pos="804" len="12" />
+                <note pan="0" key="51" vol="100" pos="816" len="12" />
+                <note pan="0" key="42" vol="100" pos="828" len="12" />
+                <note pan="0" key="47" vol="100" pos="840" len="12" />
+                <note pan="0" key="51" vol="100" pos="852" len="12" />
+                <note pan="0" key="43" vol="100" pos="864" len="12" />
+                <note pan="0" key="48" vol="100" pos="876" len="12" />
+                <note pan="0" key="52" vol="100" pos="888" len="12" />
+                <note pan="0" key="43" vol="100" pos="900" len="12" />
+                <note pan="0" key="48" vol="100" pos="912" len="12" />
+                <note pan="0" key="52" vol="100" pos="924" len="12" />
+                <note pan="0" key="45" vol="100" pos="936" len="12" />
+                <note pan="0" key="48" vol="100" pos="948" len="12" />
+                <note pan="0" key="52" vol="100" pos="960" len="12" />
+                <note pan="0" key="45" vol="100" pos="972" len="12" />
+                <note pan="0" key="48" vol="100" pos="984" len="12" />
+                <note pan="0" key="52" vol="100" pos="996" len="12" />
+                <note pan="0" key="43" vol="100" pos="1008" len="12" />
+                <note pan="0" key="48" vol="100" pos="1020" len="12" />
+                <note pan="0" key="52" vol="100" pos="1032" len="12" />
+                <note pan="0" key="43" vol="100" pos="1044" len="12" />
+                <note pan="0" key="48" vol="100" pos="1056" len="12" />
+                <note pan="0" key="52" vol="100" pos="1068" len="12" />
+                <note pan="0" key="43" vol="100" pos="1080" len="12" />
+                <note pan="0" key="48" vol="100" pos="1092" len="12" />
+                <note pan="0" key="52" vol="100" pos="1104" len="12" />
+                <note pan="0" key="43" vol="100" pos="1116" len="12" />
+                <note pan="0" key="48" vol="100" pos="1128" len="12" />
+                <note pan="0" key="52" vol="100" pos="1140" len="12" />
+                <note pan="0" key="47" vol="100" pos="1152" len="12" />
+                <note pan="0" key="51" vol="100" pos="1164" len="12" />
+                <note pan="0" key="54" vol="100" pos="1176" len="12" />
+                <note pan="0" key="47" vol="100" pos="1188" len="12" />
+                <note pan="0" key="51" vol="100" pos="1200" len="12" />
+                <note pan="0" key="54" vol="100" pos="1212" len="12" />
+                <note pan="0" key="47" vol="100" pos="1224" len="12" />
+                <note pan="0" key="51" vol="100" pos="1236" len="12" />
+                <note pan="0" key="54" vol="100" pos="1248" len="12" />
+                <note pan="0" key="47" vol="100" pos="1260" len="12" />
+                <note pan="0" key="51" vol="100" pos="1272" len="12" />
+                <note pan="0" key="54" vol="100" pos="1284" len="12" />
+                <note pan="0" key="47" vol="100" pos="1296" len="12" />
+                <note pan="0" key="52" vol="100" pos="1308" len="12" />
+                <note pan="0" key="55" vol="100" pos="1320" len="12" />
+                <note pan="0" key="47" vol="100" pos="1332" len="12" />
+                <note pan="0" key="52" vol="100" pos="1344" len="12" />
+                <note pan="0" key="55" vol="100" pos="1356" len="12" />
+                <note pan="0" key="47" vol="100" pos="1368" len="12" />
+                <note pan="0" key="52" vol="100" pos="1380" len="12" />
+                <note pan="0" key="55" vol="100" pos="1392" len="12" />
+                <note pan="0" key="47" vol="100" pos="1404" len="12" />
+                <note pan="0" key="52" vol="100" pos="1416" len="12" />
+                <note pan="0" key="55" vol="100" pos="1428" len="12" />
+                <note pan="0" key="45" vol="100" pos="1440" len="12" />
+                <note pan="0" key="48" vol="100" pos="1452" len="12" />
+                <note pan="0" key="52" vol="100" pos="1464" len="12" />
+                <note pan="0" key="45" vol="100" pos="1476" len="12" />
+                <note pan="0" key="48" vol="100" pos="1488" len="12" />
+                <note pan="0" key="52" vol="100" pos="1500" len="12" />
+                <note pan="0" key="45" vol="100" pos="1512" len="12" />
+                <note pan="0" key="48" vol="100" pos="1524" len="12" />
+                <note pan="0" key="52" vol="100" pos="1536" len="12" />
+                <note pan="0" key="45" vol="100" pos="1548" len="12" />
+                <note pan="0" key="48" vol="100" pos="1560" len="12" />
+                <note pan="0" key="52" vol="100" pos="1572" len="12" />
+                <note pan="0" key="47" vol="100" pos="1584" len="12" />
+                <note pan="0" key="51" vol="100" pos="1596" len="12" />
+                <note pan="0" key="54" vol="100" pos="1608" len="12" />
+                <note pan="0" key="47" vol="100" pos="1620" len="12" />
+                <note pan="0" key="51" vol="100" pos="1632" len="12" />
+                <note pan="0" key="54" vol="100" pos="1644" len="12" />
+                <note pan="0" key="47" vol="100" pos="1656" len="12" />
+                <note pan="0" key="51" vol="100" pos="1668" len="12" />
+                <note pan="0" key="54" vol="100" pos="1680" len="12" />
+                <note pan="0" key="47" vol="100" pos="1692" len="12" />
+                <note pan="0" key="51" vol="100" pos="1704" len="12" />
+                <note pan="0" key="54" vol="100" pos="1716" len="12" />
+                <note pan="0" key="42" vol="100" pos="1728" len="12" />
+                <note pan="0" key="47" vol="100" pos="1740" len="12" />
+                <note pan="0" key="51" vol="100" pos="1752" len="12" />
+                <note pan="0" key="42" vol="100" pos="1764" len="12" />
+                <note pan="0" key="47" vol="100" pos="1776" len="12" />
+                <note pan="0" key="51" vol="100" pos="1788" len="12" />
+                <note pan="0" key="42" vol="100" pos="1800" len="12" />
+                <note pan="0" key="47" vol="100" pos="1812" len="12" />
+                <note pan="0" key="51" vol="100" pos="1824" len="12" />
+                <note pan="0" key="42" vol="100" pos="1836" len="12" />
+                <note pan="0" key="47" vol="100" pos="1848" len="12" />
+                <note pan="0" key="51" vol="100" pos="1860" len="12" />
+                <note pan="0" key="42" vol="100" pos="1872" len="12" />
+                <note pan="0" key="47" vol="100" pos="1884" len="12" />
+                <note pan="0" key="51" vol="100" pos="1896" len="12" />
+                <note pan="0" key="42" vol="100" pos="1908" len="12" />
               </pattern>
-              <pattern steps="16" type="0" name="Soft Strings" pos="128" frozen="0" len="64" />
-              <pattern steps="16" type="0" name="Soft Strings" pos="192" frozen="0" len="64" />
-              <pattern steps="16" type="0" name="Soft Strings" pos="256" frozen="0" len="64" />
-              <pattern steps="16" type="0" name="Soft Strings" pos="320" frozen="0" len="64" />
+              <pattern steps="16" muted="0" type="0" name="Soft Strings" pos="384" len="192" frozen="0" />
+              <pattern steps="16" muted="0" type="0" name="Soft Strings" pos="576" len="192" frozen="0" />
+              <pattern steps="16" muted="0" type="0" name="Soft Strings" pos="768" len="192" frozen="0" />
+              <pattern steps="16" muted="0" type="0" name="Soft Strings" pos="960" len="192" frozen="0" />
             </track>
-            <track muted="0" type="0" >
-              <channeltrack surpos="134219776" fxch="0" baseoct="4" vol="100" name="Rough!" basetone="9" tab="0" >
-                <tripleoscillator userwavefile1="" wavetype1="2" coarse1="0" userwavefile2="" wavetype2="4" coarse2="-12" vol0="119" vol1="79" finel0="0" vol2="100" finel1="22" finel2="-30" modalgo1="1" stphdetun0="0" pan0="0" modalgo2="3" stphdetun1="142" pan1="0" stphdetun2="292" pan2="0" phoffset0="0" phoffset1="120" phoffset2="242" finer0="0" finer1="-32" finer2="16" userwavefile0="" wavetype0="3" coarse0="0" />
-                <eldata fres="10" ftype="0" fcut="16000" fwet="0" >
-                  <elvol lfosyncmode="0" lpdel="0" amt="1" rel="0.293" ctlenvamt="0" latt="0" sus="0" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0" />
-                  <elcut lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
-                  <elres lfosyncmode="0" lpdel="0" amt="0" rel="0.1" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
+            <track muted="0" type="0" name="Rough!" >
+              <instrumenttrack pan="0" fxch="0" pitch="0" basenote="57" vol="59" >
+                <instrument name="tripleoscillator" >
+                  <tripleoscillator phoffset2="242" userwavefile0="" finer0="0" userwavefile1="" finer1="-32" userwavefile2="" finer2="16" coarse0="0" coarse1="0" coarse2="-12" finel0="0" finel1="22" modalgo1="1" modalgo2="3" finel2="-30" pan0="0" modalgo3="0" pan1="0" stphdetun0="0" pan2="0" stphdetun1="142" wavetype0="3" stphdetun2="292" wavetype1="2" wavetype2="4" vol0="119" vol1="79" phoffset0="0" phoffset1="120" vol2="100" />
+                </instrument>
+                <eldata fres="10" ftype="0" fcut="14000" fwet="0" >
+                  <elvol lspd_denominator="1" pdel="0" userwavefile="" dec="0.499" lamt="0" syncmode="0" latt="0" rel="0.293" sus="0" amt="1" x100="0" att="0" lpdel="0" hold="0" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="1" />
+                  <elcut lspd_denominator="1" pdel="0" userwavefile="" dec="0.499" lamt="0" syncmode="0" latt="0" rel="0.1" sus="0.499" amt="0" x100="0" att="0" lpdel="0" hold="0.499" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="1" />
+                  <elres lspd_denominator="1" pdel="0" userwavefile="" dec="0.499" lamt="0" syncmode="0" latt="0" rel="0.1" sus="0.499" amt="0" x100="0" att="0" lpdel="0" hold="0.499" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="1" />
                 </eldata>
-                <arpandchords arpmode="0" chordrange="1" arprange="1" arpdisabled="1" chord="0" chorddisabled="0" arpgate="100" arp="0" arpsyncmode="0" arptime="100" arpdir="1" />
-                <midi inputchannel="0" outputchannel="1" receive="0" send="0" />
-              </channeltrack>
-              <pattern steps="16" type="0" name="Rough!" pos="0" frozen="0" len="64" />
-              <pattern steps="16" type="0" name="Rough!" pos="64" frozen="0" len="64" />
-              <pattern steps="16" type="1" name="Rough!" pos="128" frozen="0" len="640" >
-                <note tone="9" pan="0" oct="3" vol="100" pos="0" len="47" />
-                <note tone="4" pan="0" oct="3" vol="100" pos="48" len="95" />
-                <note tone="6" pan="0" oct="2" vol="100" pos="144" len="48" />
-                <note tone="11" pan="0" oct="2" vol="100" pos="192" len="48" />
-                <note tone="3" pan="0" oct="3" vol="100" pos="240" len="48" />
-                <note tone="3" pan="0" oct="3" vol="100" pos="288" len="15" />
-                <note tone="6" pan="0" oct="3" vol="100" pos="304" len="15" />
-                <note tone="9" pan="0" oct="3" vol="100" pos="320" len="15" />
-                <note tone="0" pan="0" oct="4" vol="100" pos="336" len="47" />
-                <note tone="6" pan="0" oct="3" vol="100" pos="384" len="41" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="424" len="56" />
-                <note tone="6" pan="0" oct="3" vol="100" pos="480" len="46" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="527" len="46" />
-                <note tone="3" pan="0" oct="4" vol="100" pos="576" len="57" />
+                <chordcreator chord="0" chordrange="1" chord-enabled="1" />
+                <arpeggiator arptime="100" arprange="1" arptime_denominator="1" syncmode="0" arpmode="0" arp-enabled="0" arp="0" arptime_numerator="1" arpdir="0" arpgate="100" />
+                <midiport inputcontroller="0" inputchannel="0" outputcontroller="0" writable="0" outputchannel="1" defvelout="0" readable="0" defvelin="0" />
+                <fxchain numofeffects="0" enabled="0" />
+              </instrumenttrack>
+              <pattern steps="16" muted="0" type="0" name="Rough!" pos="0" len="192" frozen="0" />
+              <pattern steps="16" muted="0" type="0" name="Rough!" pos="192" len="192" frozen="0" />
+              <pattern steps="16" muted="0" type="1" name="Rough!" pos="384" len="1920" frozen="0" >
+                <note pan="0" key="45" vol="100" pos="0" len="141" />
+                <note pan="0" key="40" vol="100" pos="144" len="285" />
+                <note pan="0" key="30" vol="100" pos="432" len="144" />
+                <note pan="0" key="35" vol="100" pos="576" len="144" />
+                <note pan="0" key="39" vol="100" pos="720" len="144" />
+                <note pan="0" key="39" vol="100" pos="864" len="45" />
+                <note pan="0" key="42" vol="100" pos="912" len="45" />
+                <note pan="0" key="45" vol="100" pos="960" len="45" />
+                <note pan="0" key="48" vol="100" pos="1008" len="141" />
+                <note pan="0" key="42" vol="100" pos="1152" len="123" />
+                <note pan="0" key="47" vol="100" pos="1272" len="168" />
+                <note pan="0" key="42" vol="100" pos="1440" len="138" />
+                <note pan="0" key="47" vol="100" pos="1581" len="138" />
+                <note pan="0" key="51" vol="100" pos="1728" len="171" />
               </pattern>
-              <pattern steps="16" type="1" name="Rough!" pos="192" frozen="0" len="640" >
-                <note tone="9" pan="0" oct="3" vol="100" pos="0" len="4" />
-                <note tone="0" pan="0" oct="4" vol="100" pos="4" len="4" />
-                <note tone="4" pan="0" oct="4" vol="100" pos="8" len="4" />
-                <note tone="9" pan="0" oct="3" vol="100" pos="12" len="4" />
-                <note tone="0" pan="0" oct="4" vol="100" pos="16" len="4" />
-                <note tone="4" pan="0" oct="4" vol="100" pos="20" len="4" />
-                <note tone="9" pan="0" oct="3" vol="100" pos="24" len="4" />
-                <note tone="0" pan="0" oct="4" vol="100" pos="28" len="4" />
-                <note tone="4" pan="0" oct="4" vol="100" pos="32" len="4" />
-                <note tone="9" pan="0" oct="3" vol="100" pos="36" len="4" />
-                <note tone="0" pan="0" oct="4" vol="100" pos="40" len="4" />
-                <note tone="4" pan="0" oct="4" vol="100" pos="44" len="4" />
-                <note tone="7" pan="0" oct="3" vol="100" pos="48" len="4" />
-                <note tone="0" pan="0" oct="4" vol="100" pos="52" len="4" />
-                <note tone="4" pan="0" oct="4" vol="100" pos="56" len="4" />
-                <note tone="7" pan="0" oct="3" vol="100" pos="60" len="4" />
-                <note tone="0" pan="0" oct="4" vol="100" pos="64" len="4" />
-                <note tone="4" pan="0" oct="4" vol="100" pos="68" len="4" />
-                <note tone="7" pan="0" oct="3" vol="100" pos="72" len="4" />
-                <note tone="0" pan="0" oct="4" vol="100" pos="76" len="4" />
-                <note tone="4" pan="0" oct="4" vol="100" pos="80" len="4" />
-                <note tone="7" pan="0" oct="3" vol="100" pos="84" len="4" />
-                <note tone="0" pan="0" oct="4" vol="100" pos="88" len="4" />
-                <note tone="4" pan="0" oct="4" vol="100" pos="92" len="4" />
-                <note tone="7" pan="0" oct="3" vol="100" pos="96" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="100" len="4" />
-                <note tone="4" pan="0" oct="4" vol="100" pos="104" len="4" />
-                <note tone="7" pan="0" oct="3" vol="100" pos="108" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="112" len="4" />
-                <note tone="4" pan="0" oct="4" vol="100" pos="116" len="4" />
-                <note tone="7" pan="0" oct="3" vol="100" pos="120" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="124" len="4" />
-                <note tone="4" pan="0" oct="4" vol="100" pos="128" len="4" />
-                <note tone="7" pan="0" oct="3" vol="100" pos="132" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="136" len="4" />
-                <note tone="4" pan="0" oct="4" vol="100" pos="140" len="4" />
-                <note tone="6" pan="0" oct="3" vol="100" pos="144" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="148" len="4" />
-                <note tone="4" pan="0" oct="4" vol="100" pos="152" len="4" />
-                <note tone="6" pan="0" oct="3" vol="100" pos="156" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="160" len="4" />
-                <note tone="4" pan="0" oct="4" vol="100" pos="164" len="4" />
-                <note tone="6" pan="0" oct="3" vol="100" pos="168" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="172" len="4" />
-                <note tone="4" pan="0" oct="4" vol="100" pos="176" len="4" />
-                <note tone="6" pan="0" oct="3" vol="100" pos="180" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="184" len="4" />
-                <note tone="4" pan="0" oct="4" vol="100" pos="188" len="4" />
-                <note tone="6" pan="0" oct="3" vol="100" pos="192" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="196" len="4" />
-                <note tone="3" pan="0" oct="4" vol="100" pos="200" len="4" />
-                <note tone="6" pan="0" oct="3" vol="100" pos="204" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="208" len="4" />
-                <note tone="3" pan="0" oct="4" vol="100" pos="212" len="4" />
-                <note tone="6" pan="0" oct="3" vol="100" pos="216" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="220" len="4" />
-                <note tone="3" pan="0" oct="4" vol="100" pos="224" len="4" />
-                <note tone="6" pan="0" oct="3" vol="100" pos="228" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="232" len="4" />
-                <note tone="3" pan="0" oct="4" vol="100" pos="236" len="4" />
-                <note tone="6" pan="0" oct="3" vol="100" pos="240" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="244" len="4" />
-                <note tone="3" pan="0" oct="4" vol="100" pos="248" len="4" />
-                <note tone="6" pan="0" oct="3" vol="100" pos="252" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="256" len="4" />
-                <note tone="3" pan="0" oct="4" vol="100" pos="260" len="4" />
-                <note tone="6" pan="0" oct="3" vol="100" pos="264" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="268" len="4" />
-                <note tone="3" pan="0" oct="4" vol="100" pos="272" len="4" />
-                <note tone="6" pan="0" oct="3" vol="100" pos="276" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="280" len="4" />
-                <note tone="3" pan="0" oct="4" vol="100" pos="284" len="4" />
-                <note tone="7" pan="0" oct="3" vol="100" pos="288" len="4" />
-                <note tone="0" pan="0" oct="4" vol="100" pos="292" len="4" />
-                <note tone="4" pan="0" oct="4" vol="100" pos="296" len="4" />
-                <note tone="7" pan="0" oct="3" vol="100" pos="300" len="4" />
-                <note tone="0" pan="0" oct="4" vol="100" pos="304" len="4" />
-                <note tone="4" pan="0" oct="4" vol="100" pos="308" len="4" />
-                <note tone="9" pan="0" oct="3" vol="100" pos="312" len="4" />
-                <note tone="0" pan="0" oct="4" vol="100" pos="316" len="4" />
-                <note tone="4" pan="0" oct="4" vol="100" pos="320" len="4" />
-                <note tone="9" pan="0" oct="3" vol="100" pos="324" len="4" />
-                <note tone="0" pan="0" oct="4" vol="100" pos="328" len="4" />
-                <note tone="4" pan="0" oct="4" vol="100" pos="332" len="4" />
-                <note tone="7" pan="0" oct="3" vol="100" pos="336" len="4" />
-                <note tone="0" pan="0" oct="4" vol="100" pos="340" len="4" />
-                <note tone="4" pan="0" oct="4" vol="100" pos="344" len="4" />
-                <note tone="7" pan="0" oct="3" vol="100" pos="348" len="4" />
-                <note tone="0" pan="0" oct="4" vol="100" pos="352" len="4" />
-                <note tone="4" pan="0" oct="4" vol="100" pos="356" len="4" />
-                <note tone="7" pan="0" oct="3" vol="100" pos="360" len="4" />
-                <note tone="0" pan="0" oct="4" vol="100" pos="364" len="4" />
-                <note tone="4" pan="0" oct="4" vol="100" pos="368" len="4" />
-                <note tone="7" pan="0" oct="3" vol="100" pos="372" len="4" />
-                <note tone="0" pan="0" oct="4" vol="100" pos="376" len="4" />
-                <note tone="4" pan="0" oct="4" vol="100" pos="380" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="384" len="4" />
-                <note tone="3" pan="0" oct="4" vol="100" pos="388" len="4" />
-                <note tone="6" pan="0" oct="4" vol="100" pos="392" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="396" len="4" />
-                <note tone="3" pan="0" oct="4" vol="100" pos="400" len="4" />
-                <note tone="6" pan="0" oct="4" vol="100" pos="404" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="408" len="4" />
-                <note tone="3" pan="0" oct="4" vol="100" pos="412" len="4" />
-                <note tone="6" pan="0" oct="4" vol="100" pos="416" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="420" len="4" />
-                <note tone="3" pan="0" oct="4" vol="100" pos="424" len="4" />
-                <note tone="6" pan="0" oct="4" vol="100" pos="428" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="432" len="4" />
-                <note tone="4" pan="0" oct="4" vol="100" pos="436" len="4" />
-                <note tone="7" pan="0" oct="4" vol="100" pos="440" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="444" len="4" />
-                <note tone="4" pan="0" oct="4" vol="100" pos="448" len="4" />
-                <note tone="7" pan="0" oct="4" vol="100" pos="452" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="456" len="4" />
-                <note tone="4" pan="0" oct="4" vol="100" pos="460" len="4" />
-                <note tone="7" pan="0" oct="4" vol="100" pos="464" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="468" len="4" />
-                <note tone="4" pan="0" oct="4" vol="100" pos="472" len="4" />
-                <note tone="7" pan="0" oct="4" vol="100" pos="476" len="4" />
-                <note tone="9" pan="0" oct="3" vol="100" pos="480" len="4" />
-                <note tone="0" pan="0" oct="4" vol="100" pos="484" len="4" />
-                <note tone="4" pan="0" oct="4" vol="100" pos="488" len="4" />
-                <note tone="9" pan="0" oct="3" vol="100" pos="492" len="4" />
-                <note tone="0" pan="0" oct="4" vol="100" pos="496" len="4" />
-                <note tone="4" pan="0" oct="4" vol="100" pos="500" len="4" />
-                <note tone="9" pan="0" oct="3" vol="100" pos="504" len="4" />
-                <note tone="0" pan="0" oct="4" vol="100" pos="508" len="4" />
-                <note tone="4" pan="0" oct="4" vol="100" pos="512" len="4" />
-                <note tone="9" pan="0" oct="3" vol="100" pos="516" len="4" />
-                <note tone="0" pan="0" oct="4" vol="100" pos="520" len="4" />
-                <note tone="4" pan="0" oct="4" vol="100" pos="524" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="528" len="4" />
-                <note tone="3" pan="0" oct="4" vol="100" pos="532" len="4" />
-                <note tone="6" pan="0" oct="4" vol="100" pos="536" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="540" len="4" />
-                <note tone="3" pan="0" oct="4" vol="100" pos="544" len="4" />
-                <note tone="6" pan="0" oct="4" vol="100" pos="548" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="552" len="4" />
-                <note tone="3" pan="0" oct="4" vol="100" pos="556" len="4" />
-                <note tone="6" pan="0" oct="4" vol="100" pos="560" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="564" len="4" />
-                <note tone="3" pan="0" oct="4" vol="100" pos="568" len="4" />
-                <note tone="6" pan="0" oct="4" vol="100" pos="572" len="4" />
-                <note tone="6" pan="0" oct="3" vol="100" pos="576" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="580" len="4" />
-                <note tone="3" pan="0" oct="4" vol="100" pos="584" len="4" />
-                <note tone="6" pan="0" oct="3" vol="100" pos="588" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="592" len="4" />
-                <note tone="3" pan="0" oct="4" vol="100" pos="596" len="4" />
-                <note tone="6" pan="0" oct="3" vol="100" pos="600" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="604" len="4" />
-                <note tone="3" pan="0" oct="4" vol="100" pos="608" len="4" />
-                <note tone="6" pan="0" oct="3" vol="100" pos="612" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="616" len="4" />
-                <note tone="3" pan="0" oct="4" vol="100" pos="620" len="4" />
-                <note tone="6" pan="0" oct="3" vol="100" pos="624" len="4" />
-                <note tone="11" pan="0" oct="3" vol="100" pos="628" len="4" />
-                <note tone="3" pan="0" oct="4" vol="100" pos="632" len="4" />
-                <note tone="6" pan="0" oct="3" vol="100" pos="636" len="4" />
+              <pattern steps="16" muted="0" type="1" name="Rough!" pos="576" len="1920" frozen="0" >
+                <note pan="0" key="45" vol="100" pos="0" len="12" />
+                <note pan="0" key="48" vol="100" pos="12" len="12" />
+                <note pan="0" key="52" vol="100" pos="24" len="12" />
+                <note pan="0" key="45" vol="100" pos="36" len="12" />
+                <note pan="0" key="48" vol="100" pos="48" len="12" />
+                <note pan="0" key="52" vol="100" pos="60" len="12" />
+                <note pan="0" key="45" vol="100" pos="72" len="12" />
+                <note pan="0" key="48" vol="100" pos="84" len="12" />
+                <note pan="0" key="52" vol="100" pos="96" len="12" />
+                <note pan="0" key="45" vol="100" pos="108" len="12" />
+                <note pan="0" key="48" vol="100" pos="120" len="12" />
+                <note pan="0" key="52" vol="100" pos="132" len="12" />
+                <note pan="0" key="43" vol="100" pos="144" len="12" />
+                <note pan="0" key="48" vol="100" pos="156" len="12" />
+                <note pan="0" key="52" vol="100" pos="168" len="12" />
+                <note pan="0" key="43" vol="100" pos="180" len="12" />
+                <note pan="0" key="48" vol="100" pos="192" len="12" />
+                <note pan="0" key="52" vol="100" pos="204" len="12" />
+                <note pan="0" key="43" vol="100" pos="216" len="12" />
+                <note pan="0" key="48" vol="100" pos="228" len="12" />
+                <note pan="0" key="52" vol="100" pos="240" len="12" />
+                <note pan="0" key="43" vol="100" pos="252" len="12" />
+                <note pan="0" key="48" vol="100" pos="264" len="12" />
+                <note pan="0" key="52" vol="100" pos="276" len="12" />
+                <note pan="0" key="43" vol="100" pos="288" len="12" />
+                <note pan="0" key="47" vol="100" pos="300" len="12" />
+                <note pan="0" key="52" vol="100" pos="312" len="12" />
+                <note pan="0" key="43" vol="100" pos="324" len="12" />
+                <note pan="0" key="47" vol="100" pos="336" len="12" />
+                <note pan="0" key="52" vol="100" pos="348" len="12" />
+                <note pan="0" key="43" vol="100" pos="360" len="12" />
+                <note pan="0" key="47" vol="100" pos="372" len="12" />
+                <note pan="0" key="52" vol="100" pos="384" len="12" />
+                <note pan="0" key="43" vol="100" pos="396" len="12" />
+                <note pan="0" key="47" vol="100" pos="408" len="12" />
+                <note pan="0" key="52" vol="100" pos="420" len="12" />
+                <note pan="0" key="42" vol="100" pos="432" len="12" />
+                <note pan="0" key="47" vol="100" pos="444" len="12" />
+                <note pan="0" key="52" vol="100" pos="456" len="12" />
+                <note pan="0" key="42" vol="100" pos="468" len="12" />
+                <note pan="0" key="47" vol="100" pos="480" len="12" />
+                <note pan="0" key="52" vol="100" pos="492" len="12" />
+                <note pan="0" key="42" vol="100" pos="504" len="12" />
+                <note pan="0" key="47" vol="100" pos="516" len="12" />
+                <note pan="0" key="52" vol="100" pos="528" len="12" />
+                <note pan="0" key="42" vol="100" pos="540" len="12" />
+                <note pan="0" key="47" vol="100" pos="552" len="12" />
+                <note pan="0" key="52" vol="100" pos="564" len="12" />
+                <note pan="0" key="42" vol="100" pos="576" len="12" />
+                <note pan="0" key="47" vol="100" pos="588" len="12" />
+                <note pan="0" key="51" vol="100" pos="600" len="12" />
+                <note pan="0" key="42" vol="100" pos="612" len="12" />
+                <note pan="0" key="47" vol="100" pos="624" len="12" />
+                <note pan="0" key="51" vol="100" pos="636" len="12" />
+                <note pan="0" key="42" vol="100" pos="648" len="12" />
+                <note pan="0" key="47" vol="100" pos="660" len="12" />
+                <note pan="0" key="51" vol="100" pos="672" len="12" />
+                <note pan="0" key="42" vol="100" pos="684" len="12" />
+                <note pan="0" key="47" vol="100" pos="696" len="12" />
+                <note pan="0" key="51" vol="100" pos="708" len="12" />
+                <note pan="0" key="42" vol="100" pos="720" len="12" />
+                <note pan="0" key="47" vol="100" pos="732" len="12" />
+                <note pan="0" key="51" vol="100" pos="744" len="12" />
+                <note pan="0" key="42" vol="100" pos="756" len="12" />
+                <note pan="0" key="47" vol="100" pos="768" len="12" />
+                <note pan="0" key="51" vol="100" pos="780" len="12" />
+                <note pan="0" key="42" vol="100" pos="792" len="12" />
+                <note pan="0" key="47" vol="100" pos="804" len="12" />
+                <note pan="0" key="51" vol="100" pos="816" len="12" />
+                <note pan="0" key="42" vol="100" pos="828" len="12" />
+                <note pan="0" key="47" vol="100" pos="840" len="12" />
+                <note pan="0" key="51" vol="100" pos="852" len="12" />
+                <note pan="0" key="43" vol="100" pos="864" len="12" />
+                <note pan="0" key="48" vol="100" pos="876" len="12" />
+                <note pan="0" key="52" vol="100" pos="888" len="12" />
+                <note pan="0" key="43" vol="100" pos="900" len="12" />
+                <note pan="0" key="48" vol="100" pos="912" len="12" />
+                <note pan="0" key="52" vol="100" pos="924" len="12" />
+                <note pan="0" key="45" vol="100" pos="936" len="12" />
+                <note pan="0" key="48" vol="100" pos="948" len="12" />
+                <note pan="0" key="52" vol="100" pos="960" len="12" />
+                <note pan="0" key="45" vol="100" pos="972" len="12" />
+                <note pan="0" key="48" vol="100" pos="984" len="12" />
+                <note pan="0" key="52" vol="100" pos="996" len="12" />
+                <note pan="0" key="43" vol="100" pos="1008" len="12" />
+                <note pan="0" key="48" vol="100" pos="1020" len="12" />
+                <note pan="0" key="52" vol="100" pos="1032" len="12" />
+                <note pan="0" key="43" vol="100" pos="1044" len="12" />
+                <note pan="0" key="48" vol="100" pos="1056" len="12" />
+                <note pan="0" key="52" vol="100" pos="1068" len="12" />
+                <note pan="0" key="43" vol="100" pos="1080" len="12" />
+                <note pan="0" key="48" vol="100" pos="1092" len="12" />
+                <note pan="0" key="52" vol="100" pos="1104" len="12" />
+                <note pan="0" key="43" vol="100" pos="1116" len="12" />
+                <note pan="0" key="48" vol="100" pos="1128" len="12" />
+                <note pan="0" key="52" vol="100" pos="1140" len="12" />
+                <note pan="0" key="47" vol="100" pos="1152" len="12" />
+                <note pan="0" key="51" vol="100" pos="1164" len="12" />
+                <note pan="0" key="54" vol="100" pos="1176" len="12" />
+                <note pan="0" key="47" vol="100" pos="1188" len="12" />
+                <note pan="0" key="51" vol="100" pos="1200" len="12" />
+                <note pan="0" key="54" vol="100" pos="1212" len="12" />
+                <note pan="0" key="47" vol="100" pos="1224" len="12" />
+                <note pan="0" key="51" vol="100" pos="1236" len="12" />
+                <note pan="0" key="54" vol="100" pos="1248" len="12" />
+                <note pan="0" key="47" vol="100" pos="1260" len="12" />
+                <note pan="0" key="51" vol="100" pos="1272" len="12" />
+                <note pan="0" key="54" vol="100" pos="1284" len="12" />
+                <note pan="0" key="47" vol="100" pos="1296" len="12" />
+                <note pan="0" key="52" vol="100" pos="1308" len="12" />
+                <note pan="0" key="55" vol="100" pos="1320" len="12" />
+                <note pan="0" key="47" vol="100" pos="1332" len="12" />
+                <note pan="0" key="52" vol="100" pos="1344" len="12" />
+                <note pan="0" key="55" vol="100" pos="1356" len="12" />
+                <note pan="0" key="47" vol="100" pos="1368" len="12" />
+                <note pan="0" key="52" vol="100" pos="1380" len="12" />
+                <note pan="0" key="55" vol="100" pos="1392" len="12" />
+                <note pan="0" key="47" vol="100" pos="1404" len="12" />
+                <note pan="0" key="52" vol="100" pos="1416" len="12" />
+                <note pan="0" key="55" vol="100" pos="1428" len="12" />
+                <note pan="0" key="45" vol="100" pos="1440" len="12" />
+                <note pan="0" key="48" vol="100" pos="1452" len="12" />
+                <note pan="0" key="52" vol="100" pos="1464" len="12" />
+                <note pan="0" key="45" vol="100" pos="1476" len="12" />
+                <note pan="0" key="48" vol="100" pos="1488" len="12" />
+                <note pan="0" key="52" vol="100" pos="1500" len="12" />
+                <note pan="0" key="45" vol="100" pos="1512" len="12" />
+                <note pan="0" key="48" vol="100" pos="1524" len="12" />
+                <note pan="0" key="52" vol="100" pos="1536" len="12" />
+                <note pan="0" key="45" vol="100" pos="1548" len="12" />
+                <note pan="0" key="48" vol="100" pos="1560" len="12" />
+                <note pan="0" key="52" vol="100" pos="1572" len="12" />
+                <note pan="0" key="47" vol="100" pos="1584" len="12" />
+                <note pan="0" key="51" vol="100" pos="1596" len="12" />
+                <note pan="0" key="54" vol="100" pos="1608" len="12" />
+                <note pan="0" key="47" vol="100" pos="1620" len="12" />
+                <note pan="0" key="51" vol="100" pos="1632" len="12" />
+                <note pan="0" key="54" vol="100" pos="1644" len="12" />
+                <note pan="0" key="47" vol="100" pos="1656" len="12" />
+                <note pan="0" key="51" vol="100" pos="1668" len="12" />
+                <note pan="0" key="54" vol="100" pos="1680" len="12" />
+                <note pan="0" key="47" vol="100" pos="1692" len="12" />
+                <note pan="0" key="51" vol="100" pos="1704" len="12" />
+                <note pan="0" key="54" vol="100" pos="1716" len="12" />
+                <note pan="0" key="42" vol="100" pos="1728" len="12" />
+                <note pan="0" key="47" vol="100" pos="1740" len="12" />
+                <note pan="0" key="51" vol="100" pos="1752" len="12" />
+                <note pan="0" key="42" vol="100" pos="1764" len="12" />
+                <note pan="0" key="47" vol="100" pos="1776" len="12" />
+                <note pan="0" key="51" vol="100" pos="1788" len="12" />
+                <note pan="0" key="42" vol="100" pos="1800" len="12" />
+                <note pan="0" key="47" vol="100" pos="1812" len="12" />
+                <note pan="0" key="51" vol="100" pos="1824" len="12" />
+                <note pan="0" key="42" vol="100" pos="1836" len="12" />
+                <note pan="0" key="47" vol="100" pos="1848" len="12" />
+                <note pan="0" key="51" vol="100" pos="1860" len="12" />
+                <note pan="0" key="42" vol="100" pos="1872" len="12" />
+                <note pan="0" key="47" vol="100" pos="1884" len="12" />
+                <note pan="0" key="51" vol="100" pos="1896" len="12" />
+                <note pan="0" key="42" vol="100" pos="1908" len="12" />
               </pattern>
-              <pattern steps="16" type="0" name="Rough!" pos="256" frozen="0" len="64" />
-              <pattern steps="16" type="0" name="Rough!" pos="320" frozen="0" len="64" />
+              <pattern steps="16" muted="0" type="0" name="Rough!" pos="768" len="192" frozen="0" />
+              <pattern steps="16" muted="0" type="0" name="Rough!" pos="960" len="192" frozen="0" />
             </track>
           </trackcontainer>
         </bbtrack>
-        <bbtco name="Main Lead Jupiter" color="4294945280" pos="0" len="3200" />
-        <bbtco name="Main Lead Jupiter" color="4294945280" pos="4480" len="1280" />
+        <bbtco muted="0" name="Main Lead Jupiter" pos="0" color="4294945280" len="9600" />
+        <bbtco muted="0" name="Main Lead Jupiter" pos="13440" color="4294945280" len="3840" />
       </track>
-      <track muted="0" type="1" >
-        <bbtrack name="Main Lead FM" />
-        <bbtco name="Main Lead FM" color="4294950912" pos="1280" len="1280" />
-        <bbtco name="Main Lead FM" color="4294950912" pos="3840" len="1280" />
+      <track muted="0" type="1" name="Main Lead FM" >
+        <bbtrack/>
+        <bbtco muted="0" name="Main Lead FM" pos="3840" color="4294950912" len="3840" />
+        <bbtco muted="0" name="Main Lead FM" pos="11520" color="4294950912" len="3840" />
       </track>
-      <track muted="0" type="1" >
-        <bbtrack name="Rough" />
-        <bbtco name="Rough" color="4294901760" pos="1920" len="640" />
-        <bbtco name="Rough" color="4294901760" pos="4480" len="640" />
+      <track muted="0" type="1" name="Rough" >
+        <bbtrack/>
+        <bbtco muted="0" name="Rough" pos="5760" color="4294901760" len="1920" />
+        <bbtco muted="0" name="Rough" pos="13440" color="4294901760" len="1920" />
       </track>
-      <track muted="0" type="1" >
-        <bbtrack name="Main Lead Rough" />
-        <bbtco name="Main Lead Rough" color="4294959104" pos="2560" len="2560" />
+      <track muted="0" type="1" name="Main Lead Rough" >
+        <bbtrack/>
+        <bbtco muted="0" name="Main Lead Rough" pos="7680" color="4294959104" len="7680" />
       </track>
-      <track muted="0" type="1" >
-        <bbtrack name="RaveBass" />
-        <bbtco name="Bass #1" color="4278223103" pos="640" len="4480" />
+      <track muted="0" type="1" name="RaveBass" >
+        <bbtrack/>
+        <bbtco muted="0" name="Bass #1" pos="1920" color="4278223103" len="13440" />
       </track>
-      <track muted="0" type="1" >
-        <bbtrack name="Beat" />
-        <bbtco name="Beat" color="4278255360" pos="640" len="2560" />
-        <bbtco name="Beat" color="4278255360" pos="4480" len="640" />
+      <track muted="0" type="1" name="Beat" >
+        <bbtrack/>
+        <bbtco muted="0" name="Beat" pos="1920" color="4278255360" len="7680" />
+        <bbtco muted="0" name="Beat" pos="13440" color="4278255360" len="1920" />
       </track>
     </trackcontainer>
-    <projectnotes><![CDATA[]]></projectnotes>
+    <track muted="0" type="6" name="Automation track" >
+      <automationtrack/>
+      <automationpattern name="Tempo" pos="0" >
+        <time value="140" pos="0" />
+        <object id="6797003" />
+      </automationpattern>
+      <automationpattern name="Master volume" pos="0" >
+        <time value="100" pos="0" />
+        <object id="12028285" />
+      </automationpattern>
+      <automationpattern name="Master pitch" pos="0" >
+        <time value="0" pos="0" />
+        <object id="12255046" />
+      </automationpattern>
+    </track>
+    <fxmixer>
+      <fxchannel num="0" muted="0" volume="0.95" name="Master" >
+        <fxchain numofeffects="1" enabled="1" >
+          <effect key="AAAACQAAAAACAAAACgAAAAAsAEYAYQBzAHQAIABMAG8AbwBrAGEAaABlAGEAZAAgAGwAaQBtAGkAdABlAHIAAAALAAAAAAIAAAAoAGYAYQBzAHQATABvAG8AawBhAGgAZQBhAGQATABpAG0AaQB0AGUAcgAAADwAZgBhAHMAdABfAGwAbwBvAGsAYQBoAGUAYQBkAF8AbABpAG0AaQB0AGUAcgBfADEAOQAxADMALgBzAG8=" autoquit="1" gate="0" name="ladspaeffect" wet="1" on="1" >
+            <ladspacontrols port00="-5.2" port01="0" port02="9.95" syncmode="0" port02_numerator="4" ports="3" port02_denominator="4" />
+          </effect>
+        </fxchain>
+      </fxchannel>
+      <fxchannel num="1" muted="0" volume="1" name="FX 1" >
+        <fxchain numofeffects="0" enabled="0" />
+      </fxchannel>
+      <fxchannel num="2" muted="0" volume="1" name="FX 2" >
+        <fxchain numofeffects="0" enabled="0" />
+      </fxchannel>
+      <fxchannel num="3" muted="0" volume="1" name="FX 3" >
+        <fxchain numofeffects="0" enabled="0" />
+      </fxchannel>
+      <fxchannel num="4" muted="0" volume="1" name="FX 4" >
+        <fxchain numofeffects="0" enabled="0" />
+      </fxchannel>
+      <fxchannel num="5" muted="0" volume="1" name="FX 5" >
+        <fxchain numofeffects="0" enabled="0" />
+      </fxchannel>
+      <fxchannel num="6" muted="0" volume="1" name="FX 6" >
+        <fxchain numofeffects="0" enabled="0" />
+      </fxchannel>
+      <fxchannel num="7" muted="0" volume="1" name="FX 7" >
+        <fxchain numofeffects="0" enabled="0" />
+      </fxchannel>
+      <fxchannel num="8" muted="0" volume="1" name="FX 8" >
+        <fxchain numofeffects="0" enabled="0" />
+      </fxchannel>
+      <fxchannel num="9" muted="0" volume="1" name="FX 9" >
+        <fxchain numofeffects="0" enabled="0" />
+      </fxchannel>
+      <fxchannel num="10" muted="0" volume="1" name="FX 10" >
+        <fxchain numofeffects="0" enabled="0" />
+      </fxchannel>
+      <fxchannel num="11" muted="0" volume="1" name="FX 11" >
+        <fxchain numofeffects="0" enabled="0" />
+      </fxchannel>
+      <fxchannel num="12" muted="0" volume="1" name="FX 12" >
+        <fxchain numofeffects="0" enabled="0" />
+      </fxchannel>
+      <fxchannel num="13" muted="0" volume="1" name="FX 13" >
+        <fxchain numofeffects="0" enabled="0" />
+      </fxchannel>
+      <fxchannel num="14" muted="0" volume="1" name="FX 14" >
+        <fxchain numofeffects="0" enabled="0" />
+      </fxchannel>
+      <fxchannel num="15" muted="0" volume="1" name="FX 15" >
+        <fxchain numofeffects="0" enabled="0" />
+      </fxchannel>
+      <fxchannel num="16" muted="0" volume="1" name="FX 16" >
+        <fxchain numofeffects="0" enabled="0" />
+      </fxchannel>
+      <fxchannel num="17" muted="0" volume="1" name="FX 17" >
+        <fxchain numofeffects="0" enabled="0" />
+      </fxchannel>
+      <fxchannel num="18" muted="0" volume="1" name="FX 18" >
+        <fxchain numofeffects="0" enabled="0" />
+      </fxchannel>
+      <fxchannel num="19" muted="0" volume="1" name="FX 19" >
+        <fxchain numofeffects="0" enabled="0" />
+      </fxchannel>
+      <fxchannel num="20" muted="0" volume="1" name="FX 20" >
+        <fxchain numofeffects="0" enabled="0" />
+      </fxchannel>
+      <fxchannel num="21" muted="0" volume="1" name="FX 21" >
+        <fxchain numofeffects="0" enabled="0" />
+      </fxchannel>
+      <fxchannel num="22" muted="0" volume="1" name="FX 22" >
+        <fxchain numofeffects="0" enabled="0" />
+      </fxchannel>
+      <fxchannel num="23" muted="0" volume="1" name="FX 23" >
+        <fxchain numofeffects="0" enabled="0" />
+      </fxchannel>
+      <fxchannel num="24" muted="0" volume="1" name="FX 24" >
+        <fxchain numofeffects="0" enabled="0" />
+      </fxchannel>
+      <fxchannel num="25" muted="0" volume="1" name="FX 25" >
+        <fxchain numofeffects="0" enabled="0" />
+      </fxchannel>
+      <fxchannel num="26" muted="0" volume="1" name="FX 26" >
+        <fxchain numofeffects="0" enabled="0" />
+      </fxchannel>
+      <fxchannel num="27" muted="0" volume="1" name="FX 27" >
+        <fxchain numofeffects="0" enabled="0" />
+      </fxchannel>
+      <fxchannel num="28" muted="0" volume="1" name="FX 28" >
+        <fxchain numofeffects="0" enabled="0" />
+      </fxchannel>
+      <fxchannel num="29" muted="0" volume="1" name="FX 29" >
+        <fxchain numofeffects="0" enabled="0" />
+      </fxchannel>
+      <fxchannel num="30" muted="0" volume="1" name="FX 30" >
+        <fxchain numofeffects="0" enabled="0" />
+      </fxchannel>
+      <fxchannel num="31" muted="0" volume="1" name="FX 31" >
+        <fxchain numofeffects="0" enabled="0" />
+      </fxchannel>
+      <fxchannel num="32" muted="0" volume="1" name="FX 32" >
+        <fxchain numofeffects="0" enabled="0" />
+      </fxchannel>
+      <fxchannel num="33" muted="0" volume="1" name="FX 33" >
+        <fxchain numofeffects="0" enabled="0" />
+      </fxchannel>
+      <fxchannel num="34" muted="0" volume="1" name="FX 34" >
+        <fxchain numofeffects="0" enabled="0" />
+      </fxchannel>
+      <fxchannel num="35" muted="0" volume="1" name="FX 35" >
+        <fxchain numofeffects="0" enabled="0" />
+      </fxchannel>
+      <fxchannel num="36" muted="0" volume="1" name="FX 36" >
+        <fxchain numofeffects="0" enabled="0" />
+      </fxchannel>
+      <fxchannel num="37" muted="0" volume="1" name="FX 37" >
+        <fxchain numofeffects="0" enabled="0" />
+      </fxchannel>
+      <fxchannel num="38" muted="0" volume="1" name="FX 38" >
+        <fxchain numofeffects="0" enabled="0" />
+      </fxchannel>
+      <fxchannel num="39" muted="0" volume="1" name="FX 39" >
+        <fxchain numofeffects="0" enabled="0" />
+      </fxchannel>
+      <fxchannel num="40" muted="0" volume="1" name="FX 40" >
+        <fxchain numofeffects="0" enabled="0" />
+      </fxchannel>
+      <fxchannel num="41" muted="0" volume="1" name="FX 41" >
+        <fxchain numofeffects="0" enabled="0" />
+      </fxchannel>
+      <fxchannel num="42" muted="0" volume="1" name="FX 42" >
+        <fxchain numofeffects="0" enabled="0" />
+      </fxchannel>
+      <fxchannel num="43" muted="0" volume="1" name="FX 43" >
+        <fxchain numofeffects="0" enabled="0" />
+      </fxchannel>
+      <fxchannel num="44" muted="0" volume="1" name="FX 44" >
+        <fxchain numofeffects="0" enabled="0" />
+      </fxchannel>
+      <fxchannel num="45" muted="0" volume="1" name="FX 45" >
+        <fxchain numofeffects="0" enabled="0" />
+      </fxchannel>
+      <fxchannel num="46" muted="0" volume="1" name="FX 46" >
+        <fxchain numofeffects="0" enabled="0" />
+      </fxchannel>
+      <fxchannel num="47" muted="0" volume="1" name="FX 47" >
+        <fxchain numofeffects="0" enabled="0" />
+      </fxchannel>
+      <fxchannel num="48" muted="0" volume="1" name="FX 48" >
+        <fxchain numofeffects="0" enabled="0" />
+      </fxchannel>
+      <fxchannel num="49" muted="0" volume="1" name="FX 49" >
+        <fxchain numofeffects="0" enabled="0" />
+      </fxchannel>
+      <fxchannel num="50" muted="0" volume="1" name="FX 50" >
+        <fxchain numofeffects="0" enabled="0" />
+      </fxchannel>
+      <fxchannel num="51" muted="0" volume="1" name="FX 51" >
+        <fxchain numofeffects="0" enabled="0" />
+      </fxchannel>
+      <fxchannel num="52" muted="0" volume="1" name="FX 52" >
+        <fxchain numofeffects="0" enabled="0" />
+      </fxchannel>
+      <fxchannel num="53" muted="0" volume="1" name="FX 53" >
+        <fxchain numofeffects="0" enabled="0" />
+      </fxchannel>
+      <fxchannel num="54" muted="0" volume="1" name="FX 54" >
+        <fxchain numofeffects="0" enabled="0" />
+      </fxchannel>
+      <fxchannel num="55" muted="0" volume="1" name="FX 55" >
+        <fxchain numofeffects="0" enabled="0" />
+      </fxchannel>
+      <fxchannel num="56" muted="0" volume="1" name="FX 56" >
+        <fxchain numofeffects="0" enabled="0" />
+      </fxchannel>
+      <fxchannel num="57" muted="0" volume="1" name="FX 57" >
+        <fxchain numofeffects="0" enabled="0" />
+      </fxchannel>
+      <fxchannel num="58" muted="0" volume="1" name="FX 58" >
+        <fxchain numofeffects="0" enabled="0" />
+      </fxchannel>
+      <fxchannel num="59" muted="0" volume="1" name="FX 59" >
+        <fxchain numofeffects="0" enabled="0" />
+      </fxchannel>
+      <fxchannel num="60" muted="0" volume="1" name="FX 60" >
+        <fxchain numofeffects="0" enabled="0" />
+      </fxchannel>
+      <fxchannel num="61" muted="0" volume="1" name="FX 61" >
+        <fxchain numofeffects="0" enabled="0" />
+      </fxchannel>
+      <fxchannel num="62" muted="0" volume="1" name="FX 62" >
+        <fxchain numofeffects="0" enabled="0" />
+      </fxchannel>
+      <fxchannel num="63" muted="0" volume="1" name="FX 63" >
+        <fxchain numofeffects="0" enabled="0" />
+      </fxchannel>
+      <fxchannel num="64" muted="0" volume="1" name="FX 64" >
+        <fxchain numofeffects="0" enabled="0" />
+      </fxchannel>
+    </fxmixer>
+    <pianoroll width="840" x="-11" y="0" height="480" visible="0" />
+    <automationeditor width="740" x="0" y="0" height="480" visible="0" />
+    <projectnotes width="316" x="0" y="0" height="235" visible="0" ><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+<html><head><meta name="qrichtext" content="1" /><style type="text/css">
+p, li { white-space: pre-wrap; }
+</style></head><body style=" font-family:'DejaVu Sans'; font-size:9pt; font-weight:400; font-style:normal;">
+<p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"></p></body></html>]]></projectnotes>
+    <timeline lp1pos="192" lp0pos="0" lpstate="0" />
+    <controllers/>
   </song>
-</multimediaproject>
+</multimedia-project>

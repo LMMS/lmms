@@ -1,5 +1,28 @@
 2008-07-28	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* data/projects/cool_songs/StrictProduction-DearJonDoe.mmp:
+	* data/projects/cool_songs/OrtalDj-FirstProyect.mmp:
+	* data/projects/cool_songs/TobyDox-Psycho.mmp:
+	* data/projects/cool_songs/TobyDox-Confused.mmp:
+	* data/projects/cool_songs/Djeezus-BeatRolls.mmp:
+	* data/projects/cool_songs/Lokori-Systematic_Chaos.mmp:
+	* data/projects/cool_songs/StrictProduction-Underline.mmp:
+	* data/projects/cool_songs/Djeezus-Oscilisous.mmp:
+	* data/projects/cool_songs/Chris-RaveRiff.mmpz:
+	* data/projects/cool_songs/TobyDox-TheFourthDimension.mmp:
+	* data/projects/cool_songs/Mart-Concave_flow.mmp:
+	* data/projects/cool_songs/MysthR-Living.mmpz:
+	* data/projects/cool_songs/Marfil-MarfilDrum01.mmp:
+	* data/projects/cool_songs/j1m-DingDong.mmp:
+	* data/projects/cool_songs/Malex-Horizon4.mmp:
+	* data/projects/cool_songs/Siegel-DreamWave.mmp:
+	* data/projects/cool_songs/BlueWolf-DreamTravel.mmp:
+	* data/projects/cool_songs/StrictProduction-Lamentelnes.mmp:
+	* data/projects/cool_songs/OrtalDj-FirstProyect.mmpz:
+	* data/projects/cool_songs/Silva-ElvesCall.mmp:
+	upgraded projects to match current file format
+	diffstat:  17 files changed, 12811 insertions(+), 37791 deletions(-)
+
 	* include/song_editor.h:
 	* src/core/song.cpp:
 	make sure all TCOs are shown after loading project (closes #2016741)
