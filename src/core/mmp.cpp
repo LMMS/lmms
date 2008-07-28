@@ -125,6 +125,8 @@ multimediaProject::multimediaProject( const QString & _in_file_name,
 		}
 		if( error )
 		{
+			printf( "at line %d column %d: %s\n", line, col,
+					error_msg.toAscii().constData() );
 			QMessageBox::critical( NULL, songEditor::tr( "Error in "
 							"multimedia-project" ),
 					songEditor::tr( "The multimedia-"
@@ -236,14 +238,14 @@ bool multimediaProject::writeFile( const QString & _fn )
 						).arg( fn ) );
 		return( FALSE );
 	}
-	QString xml = "<?xml version=\"1.0\"?>\n" + toString( 1 );
+	QString xml = "<?xml version=\"1.0\"?>\n" + toString( 2 );
 	if( fn.section( '.', -1 ) == "mmpz" )
 	{
 		outfile.write( qCompress( xml.toAscii() ) );
 	}
 	else
 	{
-		outfile.write( xml.toUtf8().constData(), xml.length() );
+		QTextStream( &outfile ) << xml;
 	}
 	outfile.close();
 
