@@ -1,5 +1,72 @@
 2008-07-28	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* plugins/ladspa_effect/ladspa_controls.cpp:
+	* plugins/lb302/lb302.cpp:
+	* plugins/lb303/lb303.cpp:
+	* plugins/stereo_matrix/stereomatrix_controls.cpp:
+	* plugins/bass_booster/bassbooster_controls.cpp:
+	* plugins/vst_effect/vst_effect_controls.cpp:
+	* plugins/vibed/vibed.cpp:
+	* plugins/triple_oscillator/triple_oscillator.cpp:
+	* plugins/peak_controller_effect/peak_controller_effect_controls.cpp:
+	* plugins/audio_file_processor/audio_file_processor.cpp:
+	* plugins/stereo_enhancer/stereoenhancer_controls.cpp:
+	* plugins/sf2_player/sf2_player.cpp:
+	* plugins/vst_base/lvsl_client.cpp:
+	* plugins/vst_base/lvsl_client.h:
+	* plugins/kicker/kicker.cpp:
+	* plugins/flp_import/flp_import.cpp:
+	* plugins/midi_import/midi_import.cpp:
+	* include/mmp.h:
+	* include/effect.h:
+	* include/meter_model.h:
+	* include/automatable_slider.h:
+	* include/song.h:
+	* include/pch.h:
+	* src/gui/main_window.cpp:
+	* src/gui/song_editor.cpp:
+	* src/gui/widgets/tempo_sync_knob.cpp:
+	* src/gui/widgets/meter_dialog.cpp:
+	* src/tracks/sample_track.cpp:
+	* src/tracks/bb_track.cpp:
+	* src/tracks/instrument_track.cpp:
+	* src/tracks/pattern.cpp:
+	* src/core/effect_chain.cpp:
+	* src/core/midi/midi_controller.cpp:
+	* src/core/midi/midi_port.cpp:
+	* src/core/track_container.cpp:
+	* src/core/serializing_object.cpp:
+	* src/core/journalling_object.cpp:
+	* src/core/config_mgr.cpp:
+	* src/core/automatable_model.cpp:
+	* src/core/instrument_sound_shaping.cpp:
+	* src/core/mmp.cpp:
+	* src/core/effect.cpp:
+	* src/core/instrument_functions.cpp:
+	* src/core/controller_connection.cpp:
+	* src/core/note.cpp:
+	* src/core/timeline.cpp:
+	* src/core/surround_area.cpp:
+	* src/core/automation_pattern.cpp:
+	* src/core/inline_automation.cpp:
+	* src/core/fx_mixer.cpp:
+	* src/core/controller.cpp:
+	* src/core/lfo_controller.cpp:
+	* src/core/peak_controller.cpp:
+	reduced header-dependencies
+
+	* src/core/plugin.cpp:
+	- don't show messagebox if no GUI is running
+	- if plugin failed to load also tell about the reason
+
+	* plugins/ladspa_effect/tap/CMakeLists.txt:
+	* plugins/ladspa_effect/caps/CMakeLists.txt:
+	* src/core/main.cpp:
+	* cmake/modules/BuildPlugin.cmake:
+	* lmmsconfig.h.in:
+	* CMakeLists.txt:
+	added support for building LMMS on OS X and generating a DMG-package
+
 	* src/core/main.cpp:
 	win32-compatibility
 

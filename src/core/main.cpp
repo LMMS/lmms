@@ -80,6 +80,7 @@ inline void loadTranslation( const QString & _tname,
 
 int main( int argc, char * * argv )
 {
+#ifdef LMMS_BUILD_LINUX
 #ifdef LMMS_HAVE_SCHED_H
 	struct sched_param sparam;
 	sparam.sched_priority = ( sched_get_priority_max( SCHED_FIFO ) +
@@ -88,6 +89,7 @@ int main( int argc, char * * argv )
 	{
 		printf( "could not set realtime priority.\n" );
 	}
+#endif
 #endif
 
 	bool core_only = FALSE;
