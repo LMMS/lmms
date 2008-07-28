@@ -277,9 +277,12 @@ void automationPattern::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	for( objectVector::const_iterator it = m_objects.begin();
 						it != m_objects.end(); ++it )
 	{
-		QDomElement element = _doc.createElement( "object" );
-		element.setAttribute( "id", ( *it )->id() );
-		_this.appendChild( element );
+		if( *it != NULL )
+		{
+			QDomElement element = _doc.createElement( "object" );
+			element.setAttribute( "id", ( *it )->id() );
+			_this.appendChild( element );
+		}
 	}
 }
 
@@ -337,7 +340,7 @@ const QString automationPattern::name( void ) const
 	{
 		return( trackContentObject::name() );
 	}
-	if( !m_objects.isEmpty() )
+	if( !m_objects.isEmpty() && m_objects.first() != NULL )
 	{
 		return( m_objects.first()->fullDisplayName() );
 	}
