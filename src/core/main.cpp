@@ -25,6 +25,8 @@
  */
 
 
+#include "lmmsconfig.h"
+
 #include <QtCore/QFileInfo>
 #include <QtCore/QLocale>
 #include <QtCore/QTimer>
@@ -37,6 +39,14 @@
 
 #ifdef LMMS_HAVE_SCHED_H
 #include <sched.h>
+#endif
+
+#ifdef LMMS_HAVE_SYS_TIME_H
+#include <sys/time.h>
+#endif
+
+#ifdef LMMS_HAVE_PROCESS_H
+#include <process.h>
 #endif
 
 #include "config_mgr.h"
@@ -309,7 +319,7 @@ int main( int argc, char * * argv )
 	loadTranslation( pos );
 
 
-	srandom( getpid() + time( 0 ) );
+	srand( getpid() + time( 0 ) );
 
 	if( !configManager::inst()->loadConfigFile() )
 	{
