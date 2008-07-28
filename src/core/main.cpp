@@ -308,8 +308,8 @@ int main( int argc, char * * argv )
 	// load actual translation for LMMS
 	loadTranslation( pos );
 
-//	app.setFont( pointSize<10>( app.font() ) );
 
+	srandom( getpid() + time( 0 ) );
 
 	if( !configManager::inst()->loadConfigFile() )
 	{
@@ -371,6 +371,9 @@ int main( int argc, char * * argv )
 		// init central engine which handles all components of LMMS
 		engine::init();
 
+		delete ss;
+		engine::getMainWindow()->showMaximized();
+
 		// we try to load given file
 		if( file_to_load != "" )
 		{
@@ -380,16 +383,14 @@ int main( int argc, char * * argv )
 		{
 			engine::getSong()->createNewProject();
 		}
-
-		engine::getMainWindow()->showMaximized();
-
-		delete ss;
 	}
 	else
 	{
 		// we're going to render our song
 		engine::init( FALSE );
+		printf( "loading project...\n" );
 		engine::getSong()->loadProject( file_to_load );
+		printf( "done\n" );
 
 		if( !render_out.isEmpty() )
 		{
