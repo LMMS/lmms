@@ -27,7 +27,7 @@
 
 #include "basics.h"
 
-#include "waves/waves_click.h"
+#include "waves/click.h"
 #include "waves/money.h"
 
 #include "Click.h"
