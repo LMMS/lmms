@@ -28,11 +28,11 @@
 #include <QtCore/QDir>
 #include <QtCore/QLibrary>
 #include <QtGui/QMessageBox>
-#include <QtGui/QPixmap>
 
 
 #include "plugin.h"
 #include "embed.h"
+#include "engine.h"
 #include "mixer.h"
 #include "config_mgr.h"
 #include "dummy_plugin.h"
@@ -98,24 +98,32 @@ plugin * plugin::instantiate( const QString & _plugin_name, model * _parent,
 								_plugin_name );
 	if( plugin_lib.load() == FALSE )
 	{
-		QMessageBox::information( NULL,
-					mixer::tr( "Plugin not found" ),
-					mixer::tr( "The %1-plugin wasn't found!"
-							).arg( _plugin_name ),
+		if( engine::hasGUI() )
+		{
+			QMessageBox::information( NULL,
+				tr( "Plugin not found" ),
+				tr( "The %1-plugin wasn't found"
+					"or could not be loaded!\n"
+					"Reason: \"%2\"" ).arg( _plugin_name ).
+						arg( plugin_lib.errorString() ),
 					QMessageBox::Ok |
 						QMessageBox::Default );
+		}
 		return( new dummyPlugin() );
 	}
 	instantiationHook inst_hook = ( instantiationHook ) plugin_lib.resolve(
 							"lmms_plugin_main" );
 	if( inst_hook == NULL )
 	{
-		QMessageBox::information( NULL,
-				mixer::tr( "Error while loading plugin" ),
-				mixer::tr( "Failed loading plugin \"%1\"!"
+		if( engine::hasGUI() )
+		{
+			QMessageBox::information( NULL,
+				tr( "Error while loading plugin" ),
+				tr( "Failed to load plugin \"%1\"!"
 							).arg( _plugin_name ),
 					QMessageBox::Ok |
 						QMessageBox::Default );
+		}
 		return( new dummyPlugin() );
 	}
 	plugin * inst = inst_hook( _parent, _data );
