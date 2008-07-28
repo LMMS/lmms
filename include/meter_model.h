@@ -25,7 +25,7 @@
 #ifndef _METER_MODEL_H
 #define _METER_MODEL_H
 
-#include "lcd_spinbox.h"
+#include "automatable_model.h"
 
 
 class meterModel : public model
@@ -46,8 +46,8 @@ public:
 
 
 private:
-	lcdSpinBoxModel m_numeratorModel;
-	lcdSpinBoxModel m_denominatorModel;
+	intModel m_numeratorModel;
+	intModel m_denominatorModel;
 
 
 	friend class meterDialog;

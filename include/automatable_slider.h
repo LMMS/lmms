@@ -27,7 +27,6 @@
 #define _AUTOMATABLE_SLIDER_H
 
 #include <QtGui/QSlider>
-#include <QtXml/QDomElement>
 
 #include "automatable_model_view.h"
 

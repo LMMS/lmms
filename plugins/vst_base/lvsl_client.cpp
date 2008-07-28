@@ -26,13 +26,16 @@
 #include "lvsl_client.h"
 #include "lmmsconfig.h"
 
+#include <QtCore/QCoreApplication>
+#include <QtCore/QDir>
+#include <QtCore/QEventLoop>
 #include <QtCore/QLocale>
 #include <QtCore/QTime>
-#include <QtCore/QDir>
 #include <QtGui/QMdiArea>
 #include <QtGui/QMdiSubWindow>
 #include <QtGui/QX11EmbedContainer>
 #include <QtGui/QX11Info>
+#include <QtXml/QDomDocument>
 
 #ifdef LMMS_HAVE_UNISTD_H
 #include <unistd.h>

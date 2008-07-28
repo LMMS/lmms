@@ -22,6 +22,9 @@
  *
  */
 
+
+#include <QtXml/QDomElement>
+
 #include "peak_controller.h"
 #include "peak_controller_effect_controls.h"
 #include "peak_controller_effect.h"

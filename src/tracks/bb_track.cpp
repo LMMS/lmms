@@ -25,7 +25,7 @@
  */
 
 
-#include <Qt/QtXml>
+#include <QtXml/QDomElement>
 #include <QtGui/QColorDialog>
 #include <QtGui/QMenu>
 #include <QtGui/QPainter>

@@ -26,6 +26,8 @@
  */
 
 
+#include <QtXml/QDomElement>
+
 #include "effect_chain.h"
 #include "effect.h"
 #include "engine.h"

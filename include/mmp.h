@@ -26,7 +26,7 @@
 #ifndef _MMP_H
 #define _MMP_H
 
-#include <Qt/QtXml>
+#include <QtXml/QDomDocument>
 
 #include "export.h"
 #include "types.h"

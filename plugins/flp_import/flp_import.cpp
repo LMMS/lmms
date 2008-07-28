@@ -23,7 +23,7 @@
  */
 
 
-#include <Qt/QtXml>
+#include <QtXml/QDomDocument>
 #include <QtGui/QApplication>
 #include <QtGui/QProgressDialog>
 #include <QtCore/QDir>

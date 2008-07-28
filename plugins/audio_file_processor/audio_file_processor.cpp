@@ -25,7 +25,7 @@
 
 #include <QtGui/QPainter>
 #include <QtGui/QBitmap>
-#include <Qt/QtXml>
+#include <QtXml/QDomDocument>
 #include <QtCore/QFileInfo>
 #include <QtGui/QDropEvent>
 

@@ -23,7 +23,7 @@
  */
  
 
-#include <Qt/QtXml>
+#include <QtXml/QDomDocument>
 #include <QtGui/QBitmap>
 #include <QtGui/QPainter>
 

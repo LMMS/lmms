@@ -27,8 +27,6 @@
 #ifndef _EFFECT_H
 #define _EFFECT_H
 
-#include <Qt/QtXml>
-
 #include "plugin.h"
 #include "engine.h"
 #include "mixer.h"

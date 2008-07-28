@@ -27,7 +27,7 @@
  */
 
 
-#include <Qt/QtXml>
+#include <QtXml/QDomElement>
 #include <QtGui/QMouseEvent>
 #include <QtGui/QPainter>
 

@@ -30,6 +30,7 @@
 
 #include <QtGui/QMouseEvent>
 #include <QtGui/QMdiArea>
+#include <QtXml/QDomElement>
 
 #include "engine.h"
 #include "caption_menu.h"

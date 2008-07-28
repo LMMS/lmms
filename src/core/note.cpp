@@ -25,7 +25,7 @@
  */
 
 
-#include <Qt/QtXml>
+#include <QtXml/QDomElement>
 
 #include <math.h>
 

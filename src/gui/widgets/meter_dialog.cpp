@@ -1,6 +1,7 @@
 /*
  * meter_dialog.cpp - dialog for entering meter settings
  *
+ * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2006-2008 Danny McRae <khjklujn/at/yahoo.com>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
@@ -22,6 +23,7 @@
  *
  */
 
+
 #include <QtGui/QLayout>
 #include <QtGui/QPushButton>
 #include <QtGui/QLabel>
@@ -30,6 +32,7 @@
 #include "meter_model.h"
 #include "embed.h"
 #include "gui_templates.h"
+#include "lcd_spinbox.h"
 
 
 meterDialog::meterDialog( QWidget * _parent, bool _simple ) :

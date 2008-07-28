@@ -23,6 +23,8 @@
  */
 
 
+#include <QtXml/QDomElement>
+
 #include "vst_effect_controls.h"
 #include "vst_effect.h"
 

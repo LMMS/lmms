@@ -25,7 +25,7 @@
  */
 
 
-#include <Qt/QtXml>
+#include <QtXml/QDomElement>
 
 #include "journalling_object.h"
 #include "project_journal.h"

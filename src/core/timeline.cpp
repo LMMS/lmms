@@ -25,7 +25,7 @@
  */
 
 
-#include <Qt/QtXml>
+#include <QtXml/QDomElement>
 #include <QtCore/QTimer>
 #include <QtGui/QApplication>
 #include <QtGui/QLayout>

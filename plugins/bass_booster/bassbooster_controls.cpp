@@ -23,6 +23,8 @@
  */
 
 
+#include <QtXml/QDomElement>
+
 #include "bassbooster_controls.h"
 #include "bass_booster.h"
 

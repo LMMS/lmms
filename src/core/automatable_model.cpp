@@ -23,7 +23,7 @@
  */
 
 
-#include <Qt/QtXml>
+#include <QtXml/QDomElement>
 
 
 #include "automatable_model.h"

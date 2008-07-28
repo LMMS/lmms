@@ -25,6 +25,8 @@
  */
 
 
+#include <QtXml/QDomElement>
+
 #include "fx_mixer.h"
 #include "effect.h"
 #include "song.h"

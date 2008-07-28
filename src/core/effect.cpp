@@ -26,6 +26,8 @@
  */
 
 
+#include <QtXml/QDomElement>
+
 #include "effect.h"
 #include "engine.h"
 #include "dummy_effect.h"

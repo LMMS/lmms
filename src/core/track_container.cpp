@@ -26,6 +26,7 @@
 
 #include <QtGui/QApplication>
 #include <QtGui/QProgressDialog>
+#include <QtXml/QDomElement>
 
 #include "track_container.h"
 #include "instrument_track.h"

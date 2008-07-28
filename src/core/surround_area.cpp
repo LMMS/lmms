@@ -32,7 +32,7 @@
 #include <QtGui/QApplication>
 #include <QtGui/QMouseEvent>
 #include <QtGui/QPainter>
-#include <Qt/QtXml>
+#include <QtXml/QDomElement>
 
 
 #include "caption_menu.h"

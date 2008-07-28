@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef _PCH_H_hsd
-#define _PCH_H_hsd
+#ifndef _PCH_H
+#define _PCH_H
 
 #include <Qt/QtCore>
 #include <Qt/QtGui>

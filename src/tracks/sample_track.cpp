@@ -26,7 +26,7 @@
  */
 
 
-#include <Qt/QtXml>
+#include <QtXml/QDomElement>
 #include <QtGui/QDropEvent>
 #include <QtGui/QLayout>
 #include <QtGui/QMdiArea>

@@ -29,7 +29,7 @@
  */
 
 
-#include <Qt/QtXml>
+#include <QtXml/QDomDocument>
 
 #include "lb303.h"
 #include "engine.h"

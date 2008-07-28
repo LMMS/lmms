@@ -23,7 +23,7 @@
  */
 
 
-#include <Qt/QtXml>
+#include <QtXml/QDomDocument>
 #include <QtCore/QMap>
 #include <QtGui/QWhatsThis>
 

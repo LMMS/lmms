@@ -23,7 +23,7 @@
  */
 
 
-#include <Qt/QtXml>
+#include <QtXml/QDomElement>
 
 #include "serializing_object.h"
 

@@ -25,7 +25,7 @@
  */
 
 
-#include <Qt/QtXml>
+#include <QtXml/QDomElement>
 #include <QtCore/QDir>
 #include <QtCore/QFile>
 #include <QtGui/QMessageBox>

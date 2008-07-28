@@ -23,6 +23,7 @@
  */
 
 
+#include <QtXml/QDomElement>
 
 #include "ladspa_effect.h"
 

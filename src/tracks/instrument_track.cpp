@@ -26,9 +26,6 @@
  */
 
 
-#include "instrument_track.h"
-
-
 #include <QtCore/QDir>
 #include <QtCore/QFile>
 #include <QtCore/QQueue>
@@ -44,7 +41,7 @@
 #include <QtGui/QMdiSubWindow>
 #include <QtGui/QPainter>
 
-
+#include "instrument_track.h"
 #include "audio_port.h"
 #include "automation_pattern.h"
 #include "bb_track.h"
@@ -63,6 +60,7 @@
 #include "instrument.h"
 #include "instrument_function_views.h"
 #include "instrument_midi_io_view.h"
+#include "lcd_spinbox.h"
 #include "led_checkbox.h"
 #include "main_window.h"
 #include "midi_client.h"

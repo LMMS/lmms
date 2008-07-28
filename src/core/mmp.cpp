@@ -30,6 +30,7 @@
 #include <math.h>
 
 #include <QtCore/QFile>
+#include <QtCore/QTextStream>
 #include <QtGui/QMessageBox>
 
 

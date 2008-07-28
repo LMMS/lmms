@@ -26,7 +26,7 @@
  */
 
 
-#include <Qt/QtXml>
+#include <QtXml/QDomElement>
 #include <QtCore/QTimer>
 #include <QtGui/QMenu>
 #include <QtGui/QMessageBox>

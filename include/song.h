@@ -30,8 +30,6 @@
 
 #include "track_container.h"
 #include "automatable_model.h"
-#include "automatable_slider.h"
-#include "lcd_spinbox.h"
 #include "controller.h"
 #include "meter_model.h"
 
@@ -259,11 +257,11 @@ private:
 
 	automationTrack * m_globalAutomationTrack;
 
-	lcdSpinBoxModel m_tempoModel;
+	intModel m_tempoModel;
 	meterModel m_timeSigModel;
 	int m_oldTicksPerTact;
-	sliderModel m_masterVolumeModel;
-	sliderModel m_masterPitchModel;
+	intModel m_masterVolumeModel;
+	intModel m_masterPitchModel;
 
 	controllerVector m_controllers;
 

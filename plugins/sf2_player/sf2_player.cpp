@@ -26,7 +26,7 @@
 #include <QtGui/QLayout>
 #include <QtGui/QLabel>
 #include <QtGui/QFileDialog>
-#include <Qt/QtXml>
+#include <QtXml/QDomDocument>
 
 #include "sf2_player.h"
 #include "engine.h"

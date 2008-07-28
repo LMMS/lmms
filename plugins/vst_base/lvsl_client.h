@@ -29,7 +29,6 @@
 #include <QtCore/QString>
 #include <QtCore/QMutex>
 #include <QtGui/QWidget>
-#include <Qt/QtXml>
 
 #include "mixer.h"
 #include "communication.h"

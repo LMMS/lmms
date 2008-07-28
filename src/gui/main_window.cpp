@@ -25,7 +25,8 @@
  */
 
 
-#include <Qt/QtXml>
+#include <QtXml/QDomElement>
+#include <QtCore/QUrl>
 #include <QtGui/QApplication>
 #include <QtGui/QCloseEvent>
 #include <QtGui/QDesktopServices>

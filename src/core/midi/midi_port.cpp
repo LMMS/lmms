@@ -26,7 +26,7 @@
  */
 
 
-#include <Qt/QtXml>
+#include <QtXml/QDomElement>
 
 #include "midi_port.h"
 #include "midi_client.h"

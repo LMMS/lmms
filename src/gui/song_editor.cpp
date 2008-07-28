@@ -36,9 +36,11 @@
 #include <math.h>
 
 #include "song_editor.h"
+#include "automatable_slider.h"
+#include "combobox.h"
 #include "cpuload_widget.h"
 #include "embed.h"
-#include "combobox.h"
+#include "lcd_spinbox.h"
 #include "main_window.h"
 #include "meter_dialog.h"
 #include "mmp.h"
