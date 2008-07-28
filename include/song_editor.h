@@ -57,9 +57,12 @@ signals:
 	void periodicUpdate( void );
 
 
+public slots:
+	void scrolled( int _new_pos );
+
+
 private slots:
 	void setHighQuality( bool );
-	void scrolled( int _new_pos );
 
 	void play( void );
 	void stop( void );

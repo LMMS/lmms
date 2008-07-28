@@ -1,5 +1,22 @@
 2008-07-28	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* include/song_editor.h:
+	* src/core/song.cpp:
+	make sure all TCOs are shown after loading project (closes #2016741)
+
+	* src/core/automatable_model.cpp:
+	when loading legacy automation with only one value in, eliminate
+	global automation pattern right after loading data
+
+	* src/core/main.cpp:
+	- initialize random-number generation - fixes problems with duplicate
+	  JO-IDs
+	- show main-window before loading project given on command-line or
+	  creating a new project (closes #2016741)
+
+	* src/core/automation_pattern.cpp:
+	fixed some segfaults in case of invalid objects in object-vector
+
 	* src/core/mmp.cpp:
 	- use QTextStream to save uncompressed XML-files
 	- when encountering problems while parsing XML-file, print line and

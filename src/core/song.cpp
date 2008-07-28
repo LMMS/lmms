@@ -952,6 +952,10 @@ void song::loadProject( const QString & _file_name )
 	{
 		engine::getMainWindow()->resetWindowTitle();
 	}
+	if( engine::getSongEditor() )
+	{
+		engine::getSongEditor()->scrolled( 0 );
+	}
 }
 
 
@@ -976,9 +980,10 @@ bool song::saveProject( void )
 	{
 		engine::getPianoRoll()->saveState( mmp, mmp.content() );
 		engine::getAutomationEditor()->saveState( mmp, mmp.content() );
-		( (journallingObject *)( engine::getProjectNotes() ) )->saveState( mmp,
-								mmp.content() );
-		m_playPos[Mode_PlaySong].m_timeLine->saveState( mmp, mmp.content() );
+		( (journallingObject *)( engine::getProjectNotes() ) )->
+						saveState( mmp, mmp.content() );
+		m_playPos[Mode_PlaySong].m_timeLine->saveState(
+							mmp, mmp.content() );
 	}
 
 	saveControllerStates( mmp, mmp.content() );
