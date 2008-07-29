@@ -26,14 +26,12 @@
 #ifndef _SPECTRUM_ANALYZER_H
 #define _SPECTRUM_ANALYZER_H
 
-#include <fftw3.h>
-
 #include "effect.h"
+#include "fft_helpers.h"
 #include "spectrumanalyzer_controls.h"
 
 
 const int MAX_BANDS = 249;
-const int BUFFER_SIZE = 2048;
 
 
 class spectrumAnalyzer : public effect
@@ -64,8 +62,8 @@ private:
 	fftwf_plan m_fftPlan;
 
 	fftwf_complex * m_specBuf;
-	float m_absSpecBuf[BUFFER_SIZE+1];
-	float m_buffer[BUFFER_SIZE*2];
+	float m_absSpecBuf[FFT_BUFFER_SIZE+1];
+	float m_buffer[FFT_BUFFER_SIZE*2];
 	int m_framesFilledUp;
 
 	float m_bands[MAX_BANDS];
