@@ -1,5 +1,9 @@
 2008-07-29	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* plugins/ladspa_effect/tap/CMakeLists.txt:
+	* plugins/ladspa_effect/caps/CMakeLists.txt:
+	fixed linker-flags
+
 	* plugins/spectrum_analyzer/spectrum_analyzer.cpp:
 	* plugins/spectrum_analyzer/spectrum_analyzer.h:
 	* include/fft_helpers.h:
