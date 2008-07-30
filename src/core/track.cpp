@@ -1551,6 +1551,7 @@ track::track( TrackTypes _type, trackContainer * _tc ) :
 					 /*!< For controlling track muting */
 	m_soloModel( FALSE, this, tr( "Solo" ) ),
 					/*!< For controlling track soloing */
+	m_simpleSerializingMode( FALSE ),
 	m_trackContentObjects()         /*!< The track content objects (segments) */
 {
 	m_trackContainer->addTrack( this );
@@ -1661,7 +1662,10 @@ void track::clone( void )
  */
 void track::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
-	_this.setTagName( "track" );
+	if( !m_simpleSerializingMode )
+	{
+		_this.setTagName( "track" );
+	}
 	_this.setAttribute( "type", type() );
 	_this.setAttribute( "name", name() );
 	_this.setAttribute( "muted", isMuted() );
@@ -1673,6 +1677,12 @@ void track::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	// its settings
 	_this.appendChild( ts_de );
 	saveTrackSpecificSettings( _doc, ts_de );
+
+	if( m_simpleSerializingMode )
+	{
+		m_simpleSerializingMode = FALSE;
+		return;
+	}
 
 	// now save settings of all TCO's
 	for( tcoVector::const_iterator it = m_trackContentObjects.begin();
@@ -1709,6 +1719,22 @@ void track::loadSettings( const QDomElement & _this )
 			_this.firstChild().toElement().attribute( "name" ) );
 
 	setMuted( _this.attribute( "muted" ).toInt() );
+
+	if( m_simpleSerializingMode )
+	{
+		QDomNode node = _this.firstChild();
+		while( !node.isNull() )
+		{
+			if( node.isElement() && node.nodeName() == nodeName() )
+			{
+				loadTrackSpecificSettings( node.toElement() );
+				break;
+			}
+			node = node.nextSibling();
+		}
+		m_simpleSerializingMode = FALSE;
+		return;
+	}
 
 	while( !m_trackContentObjects.empty() )
 	{

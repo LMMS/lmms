@@ -251,10 +251,8 @@ void listView::activateListItem( QTreeWidgetItem * _item, int _column )
 					engine::getBBTrackContainer() ) );
 		if( it != NULL )
 		{
-			it->loadTrackSpecificSettings( mmp.content().
-								firstChild().
-								toElement() );
-			//it->toggledInstrumentTrackButton( TRUE );
+			it->setSimpleSerializing();
+			it->loadSettings( mmp.content().toElement() );
 		}
 		engine::getMixer()->unlock();
 	}
@@ -312,9 +310,9 @@ void listView::sendToActiveInstrumentTrack( void )
 				multimediaProject mmp(
 						m_contextMenuItem->fullName() );
 				removeMidiPortNode( mmp );
-				itw->model()->loadTrackSpecificSettings(
-						mmp.content().firstChild().
-								toElement() );
+				itw->model()->setSimpleSerializing();
+				itw->model()->loadSettings(
+						mmp.content().toElement() );
 			}
 			engine::getMixer()->unlock();
 			break;
@@ -351,13 +349,11 @@ void listView::openInNewInstrumentTrack( trackContainer * _tc )
 		multimediaProject mmp( m_contextMenuItem->fullName() );
 		removeMidiPortNode( mmp );
 		track * t = track::create( track::InstrumentTrack, _tc );
-		instrumentTrack * ct = dynamic_cast<instrumentTrack *>( t );
-		if( ct != NULL )
+		instrumentTrack * it = dynamic_cast<instrumentTrack *>( t );
+		if( it != NULL )
 		{
-			ct->loadTrackSpecificSettings( mmp.content().
-							firstChild().
-							toElement() );
-			//ct->toggledInstrumentTrackButton( TRUE );
+			it->setSimpleSerializing();
+			it->loadSettings( mmp.content().toElement() );
 		}
 	}
 	engine::getMixer()->unlock();

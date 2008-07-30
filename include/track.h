@@ -381,6 +381,10 @@ public:
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _this );
 	virtual void loadSettings( const QDomElement & _this );
 
+	void setSimpleSerializing( void )
+	{
+		m_simpleSerializingMode = TRUE;
+	}
 
 	// -- for usage by trackContentObject only ---------------
 	trackContentObject * addTCO( trackContentObject * _tco );
@@ -449,6 +453,7 @@ private:
 	boolModel m_soloModel;
 	bool m_mutedBeforeSolo;
 
+	bool m_simpleSerializingMode;
 
 	tcoVector m_trackContentObjects;
 

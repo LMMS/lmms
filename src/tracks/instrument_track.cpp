@@ -1236,9 +1236,8 @@ void instrumentTrackWindow::saveSettingsBtnClicked( void )
 	{
 		multimediaProject mmp(
 				multimediaProject::InstrumentTrackSettings );
-		QDomElement _this = mmp.createElement( m_track->nodeName() );
-		m_track->saveTrackSpecificSettings( mmp, _this );
-		mmp.content().appendChild( _this );
+		m_track->setSimpleSerializing();
+		m_track->saveSettings( mmp, mmp.content() );
 		QString f = sfd.selectedFiles()[0];
 		mmp.writeFile( f );
 	}

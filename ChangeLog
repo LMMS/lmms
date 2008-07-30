@@ -1,5 +1,68 @@
 2008-07-30	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* include/track.h:
+	* src/core/track.cpp:
+	* src/gui/file_browser.cpp:
+	* src/tracks/instrument_track.cpp:
+	added simple-serializing mode which makes tracks not save their TCOs -
+	used for improved save and restore of presets (closes #2025902)
+
+	* src/gui/widgets/effect_view.cpp:
+	do not cast model to effect for only calling displayName()
+
+	* src/gui/widgets/effect_rack_view.cpp:
+	- initialize bool-map with correct size - fixes crashes under various
+	  circumstances
+	- do not cast model of effectView as the effect might not exist
+	  anymore
+
+	* data/presets/TripleOscillator/Steel.cs.xml:
+	* data/presets/TripleOscillator/SawLead.cs.xml:
+	* data/presets/TripleOscillator/Bass.cs.xml:
+	* data/presets/TripleOscillator/E-Organ.cs.xml:
+	* data/presets/TripleOscillator/FM-Wood-Arp.cs.xml:
+	* data/presets/TripleOscillator/Harmonium.cs.xml:
+	* data/presets/TripleOscillator/NostalgicFeelings.cs.xml:
+	* data/presets/TripleOscillator/Moog.cs.xml:
+	* data/presets/TripleOscillator/SawLead2.cs.xml:
+	* data/presets/TripleOscillator/HardClipping.cs.xml:
+	* data/presets/TripleOscillator/RaveBass.cs.xml:
+	* data/presets/TripleOscillator/EvilHardcore.cs.xml:
+	* data/presets/TripleOscillator/Distorted-FM-Bass_2.cs.xml:
+	* data/presets/TripleOscillator/ShortBass.cs.xml:
+	* data/presets/TripleOscillator/Crystallo.cs.xml:
+	* data/presets/TripleOscillator/Fear.cs.xml:
+	* data/presets/TripleOscillator/HorrorBass.cs.xml:
+	* data/presets/TripleOscillator/Default.cs.xml:
+	* data/presets/TripleOscillator/SoftStrings.cs.xml:
+	* data/presets/TripleOscillator/RaveBass_2.cs.xml:
+	* data/presets/TripleOscillator/Warmth.cs.xml:
+	* data/presets/TripleOscillator/Beam.cs.xml:
+	* data/presets/TripleOscillator/SquareLead2.cs.xml:
+	* data/presets/TripleOscillator/Weird.cs.xml:
+	* data/presets/TripleOscillator/LFO-party.cs.xml:
+	* data/presets/TripleOscillator/Nice.cs.xml:
+	* data/presets/TripleOscillator/ChurchOrgan_2.cs.xml:
+	* data/presets/TripleOscillator/SoftBass.cs.xml:
+	* data/presets/TripleOscillator/Stranger.cs.xml:
+	* data/presets/TripleOscillator/TB303-Arpeggio.cs.xml:
+	* data/presets/TripleOscillator/E-Piano.cs.xml:
+	* data/presets/TripleOscillator/PluckArpeggio.cs.xml:
+	* data/presets/TripleOscillator/WarmStack.cs.xml:
+	* data/presets/TripleOscillator/Square.cs.xml:
+	* data/presets/TripleOscillator/MyComputer.cs.xml:
+	* data/presets/TripleOscillator/Simple-Acid-Bass.cs.xml:
+	* data/presets/TripleOscillator/MoogArpeggio.cs.xml:
+	* data/presets/TripleOscillator/Jupiter.cs.xml:
+	* data/presets/TripleOscillator/AnalogTimes2.cs.xml:
+	* data/presets/TripleOscillator/SquareLead.cs.xml:
+	* data/presets/TripleOscillator/TB303.cs.xml:
+	* data/presets/TripleOscillator/Detuned-Synced-FM-Bass.cs.xml:
+	* data/presets/TripleOscillator/ChurchOrgan.cs.xml:
+	* data/presets/TripleOscillator/SquareArp.cs.xml:
+	* data/presets/TripleOscillator/OldComputerGames.cs.xml:
+	removed old raw presets, tuned others and added a few new ones
+
 	* plugins/stk/mallets/mallets.cpp:
 	detect incomplete Stk-installation in model rather than view for not
 	crashing when playing without opening the GUI before
