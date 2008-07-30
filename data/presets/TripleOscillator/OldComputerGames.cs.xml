@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<!DOCTYPE multimedia-project>
+<multimedia-project version="1.0" creator="Linux MultiMedia Studio (LMMS)" creatorversion="0.4.0-beta" type="instrumenttracksettings" >
+  <head/>
+  <instrumenttracksettings muted="0" type="0" name="Old Computer Games" >
+    <instrumenttrack pan="-7" fxch="0" pitch="0" basenote="57" vol="86" >
+      <instrument name="tripleoscillator" >
+        <tripleoscillator phoffset2="0" userwavefile0="" finer0="-4" userwavefile1="" finer1="2" userwavefile2="" finer2="-2" coarse0="0" coarse1="0" coarse2="0" finel0="4" finel1="-2" modalgo1="2" modalgo2="0" finel2="2" pan0="0" modalgo3="0" pan1="0" stphdetun0="0" pan2="0" stphdetun1="0" wavetype0="3" stphdetun2="0" wavetype1="3" wavetype2="2" vol0="33" vol1="30" phoffset0="0" phoffset1="0" vol2="33" />
+      </instrument>
+      <eldata fres="1.01" ftype="0" fcut="5320" fwet="1" >
+        <elvol lspd_denominator="4" pdel="0" userwavefile="" dec="0.4" lamt="0" syncmode="0" latt="0" rel="0.1" sus="0.5" amt="1" x100="0" att="0" lpdel="0" hold="0" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="4" />
+        <elcut lspd_denominator="4" pdel="0" userwavefile="" dec="0.48" lamt="0" syncmode="0" latt="0" rel="0" sus="1" amt="1" x100="0" att="0" lpdel="0" hold="0" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="4" />
+        <elres lspd_denominator="4" pdel="0" userwavefile="" dec="0.5" lamt="0" syncmode="0" latt="0" rel="0.1" sus="0.5" amt="0" x100="0" att="0" lpdel="0" hold="0.5" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="4" />
+      </eldata>
+      <chordcreator chord="0" chordrange="2" chord-enabled="1" />
+      <arpeggiator arptime="105" arprange="1" arptime_denominator="4" syncmode="0" arpmode="2" arp-enabled="1" arp="3" arptime_numerator="4" arpdir="0" arpgate="34" />
+      <midiport inputcontroller="0" inputchannel="0" outputcontroller="0" writable="0" outputchannel="1" defvelout="0" readable="0" defvelin="0" />
+      <fxchain numofeffects="4" enabled="1" >
+        <effect key="AAAACQAAAAACAAAACgAAAABGAEMAKgAgAFQAbwBuAGUAUwB0AGEAYwBrACAALQAgAFQAbwBuAGUAIABzAHQAYQBjAGsAIABlAG0AdQBsAGEAdABpAG8AbgAAAAsAAAAAAgAAABIAVABvAG4AZQBTAHQAYQBjAGsAAAAOAGMAYQBwAHMALgBzAG8=" autoquit="0" gate="0" name="ladspaeffect" wet="1" on="1" >
+          <ladspacontrols port11="0" port01="0" port12="0.14" port02="0.14" port13="0.5" port03="0.5" port14="0.5" port04="0.5" port04link="1" port02link="1" port03link="1" link="1" ports="8" port01link="1" />
+        </effect>
+        <effect key="AAAACQAAAAACAAAACgAAAAAeAFQAQQBQACAAUwB0AGUAcgBlAG8AIABFAGMAaABvAAAACwAAAAACAAAAHgB0AGEAcABfAHMAdABlAHIAZQBvAF8AZQBjAGgAbwAAABYAdABhAHAAXwBlAGMAaABvAC4AcwBv" autoquit="0" gate="0" name="ladspaeffect" wet="1" on="1" >
+          <ladspacontrols port00="640" port01="18" port02="640" port03="21" port04="-11.6" port05="-11.6" port06="2.4" port07="1" port08="0" port09="1" ports="10" />
+        </effect>
+        <effect key="AAAACQAAAAACAAAACgAAAAAcAFQAQQBQACAAQQB1AHQAbwBQAGEAbgBuAGUAcgAAAAsAAAAAAgAAABYAdABhAHAAXwBhAHUAdABvAHAAYQBuAAAAHAB0AGEAcABfAGEAdQB0AG8AcABhAG4ALgBzAG8=" autoquit="0" gate="0" name="ladspaeffect" wet="1" on="1" >
+          <ladspacontrols port00="0.2" port01="27" port02="10.125" ports="3" />
+        </effect>
+        <effect key="AAAACQAAAAACAAAACgAAAABmAEMAKgAgAFAAbABhAHQAZQAyAHgAMgAgAC0AIABWAGUAcgBzAGEAdABpAGwAZQAgAHAAbABhAHQAZQAgAHIAZQB2AGUAcgBiACwAIABzAHQAZQByAGUAbwAgAGkAbgBwAHUAdABzAAAACwAAAAACAAAAEABQAGwAYQB0AGUAMgB4ADIAAAAOAGMAYQBwAHMALgBzAG8=" autoquit="0" gate="0" name="ladspaeffect" wet="1" on="1" >
+          <ladspacontrols port02="0.27335" port03="0.749" port04="0" port05="0.4" ports="4" />
+        </effect>
+      </fxchain>
+    </instrumenttrack>
+  </instrumenttracksettings>
+</multimedia-project>
