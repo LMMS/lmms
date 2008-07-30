@@ -80,6 +80,9 @@ inline void loadTranslation( const QString & _tname,
 
 int main( int argc, char * * argv )
 {
+	// intialize RNG
+	srand( getpid() + time( 0 ) );
+
 	bool core_only = FALSE;
 
 	for( int i = 1; i < argc; ++i )
@@ -331,8 +334,6 @@ int main( int argc, char * * argv )
 	}
 #endif
 #endif
-
-	srand( getpid() + time( 0 ) );
 
 	if( !configManager::inst()->loadConfigFile() )
 	{

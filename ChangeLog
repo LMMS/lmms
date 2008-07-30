@@ -4,6 +4,7 @@
 	 - added --dump parameter for easily uncompressing mmpz-files
 	 - try to set realtime priority after command-line parsing as the
 	   resulting warning might be annoying at this place
+	- moved initialization of RNG to top of main()
 
 	* src/core/mmp.cpp:
 	quirks for loading drumsynth-samples whose directory-names have
