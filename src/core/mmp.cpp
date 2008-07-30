@@ -636,7 +636,8 @@ void multimediaProject::upgrade( void )
 	if( version < "0.4.0-20080622" )
 	{
 		QDomNodeList list;
-		while( !( list = elementsByTagName( "automation-pattern" ) ).isEmpty() )
+		while( !( list = elementsByTagName(
+					"automation-pattern" ) ).isEmpty() )
 		{
 			QDomElement el = list.item( 0 ).toElement();
 			el.setTagName( "automationpattern" );
@@ -653,6 +654,19 @@ void multimediaProject::upgrade( void )
 		}
 	}
 
+	if( version < "0.4.0-beta" )
+	{
+		QDomNodeList list;
+		list = elementsByTagName( "audiofileprocessor" );
+		for( int i = 0; !list.item( i ).isNull(); ++i )
+		{
+			QDomElement el = list.item( i ).toElement();
+			QString s = el.attribute( "src" );
+			s.replace( "drumsynth/misc ", "drumsynth/misc_" );
+			s.replace( "drumsynth/r&b", "drumsynth/r_b" );
+			el.setAttribute( "src", s );
+		}
+	}
 /*	if( version < "0.4.0-beta" )
 	{
 		QDomNodeList list;
