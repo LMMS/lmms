@@ -220,7 +220,7 @@ void effectView::closeEffects( void )
 void effectView::contextMenuEvent( QContextMenuEvent * )
 {
 	QPointer<captionMenu> contextMenu = new captionMenu(
-						getEffect()->displayName() );
+						getModel()->displayName() );
 	contextMenu->addAction( embed::getIconPixmap( "arp_up" ),
 						tr( "Move &up" ),
 						this, SLOT( moveUp() ) );
@@ -252,9 +252,9 @@ void effectView::paintEvent( QPaintEvent * )
 	p.setFont( f );
 
 	p.setPen( QColor( 64, 64, 64 ) );
-	p.drawText( 6, 55, getEffect()->displayName() );
+	p.drawText( 6, 55, getModel()->displayName() );
 	p.setPen( Qt::white );
-	p.drawText( 5, 54, getEffect()->displayName() );
+	p.drawText( 5, 54, getModel()->displayName() );
 }
 
 
