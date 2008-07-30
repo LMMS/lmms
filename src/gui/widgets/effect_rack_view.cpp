@@ -149,7 +149,8 @@ void effectRackView::deletePlugin( effectView * _view )
 void effectRackView::update( void )
 {
 	QWidget * w = m_scrollArea->widget();
-	QVector<bool> view_map( fxChain()->m_effects.size(), FALSE );
+	QVector<bool> view_map( qMax<int>( fxChain()->m_effects.size(),
+						m_effectViews.size() ), FALSE );
 
 	for( QVector<effect *>::iterator it = fxChain()->m_effects.begin();
 					it != fxChain()->m_effects.end(); ++it )
@@ -159,7 +160,7 @@ void effectRackView::update( void )
 							m_effectViews.begin();
 				vit != m_effectViews.end(); ++vit, ++i )
 		{
-			if( ( *vit )->getEffect() == *it )
+			if( ( *vit )->getModel() == *it )
 			{
 				view_map[i] = TRUE;
 				break;
