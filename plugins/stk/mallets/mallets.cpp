@@ -76,8 +76,20 @@ malletsInstrument::malletsInstrument( instrumentTrack * _instrument_track ):
 	m_strikeModel( FALSE, this, tr( "Bowed" ) ),
 	m_presetsModel(this),
 	m_spreadModel(0, 0, 255, 1, this, tr( "Spread" )),
-	m_filesMissing( FALSE )
+	m_filesMissing( !QDir( configManager::inst()->stkDir() ).exists() ||
+		!QFileInfo( configManager::inst()->stkDir() + QDir::separator()
+						+ "sinewave.raw" ).exists() )
 {
+	// try to inform user about missing Stk-installation
+	if( m_filesMissing && engine::hasGUI() )
+	{
+		QMessageBox::information( 0, tr( "Missing files" ),
+				tr( "Your Stk-installation seems to be "
+					"incomplete. Please make sure "
+					"the full Stk-package is installed!" ),
+				QMessageBox::Ok );
+	}
+
 	// ModalBar
 	m_presetsModel.addItem( tr( "Marimba" ) );
 	m_scalers.append( 4.0 );
@@ -293,21 +305,6 @@ malletsInstrumentView::malletsInstrumentView( malletsInstrument * _instrument,
 							QWidget * _parent ) :
 	instrumentView( _instrument, _parent )
 {
-	_instrument->m_filesMissing =
-		!QDir( configManager::inst()->stkDir() ).exists() ||
-		!QFileInfo( configManager::inst()->stkDir() + QDir::separator()
-			+ "sinewave.raw" ).exists();
-
-	// for some reason this crashes...???
-	if( _instrument->m_filesMissing )
-	{
-		QMessageBox::information( 0, tr( "Missing files" ),
-				tr( "Your Stk-installation seems to be "
-					"incomplete. Please make sure "
-					"the full Stk-package is installed!" ),
-				QMessageBox::Ok );
-	}
-
 	m_modalBarWidget = setupModalBarControls( this );
 	setWidgetBackground( m_modalBarWidget, "artwork" );
 	

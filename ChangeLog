@@ -1,5 +1,9 @@
 2008-07-30	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* plugins/stk/mallets/mallets.cpp:
+	detect incomplete Stk-installation in model rather than view for not
+	crashing when playing without opening the GUI before
+
 	* src/core/main.cpp:
 	 - added --dump parameter for easily uncompressing mmpz-files
 	 - try to set realtime priority after command-line parsing as the
@@ -903,7 +907,7 @@
 
 	* src/gui/controller_connection_dialog.cpp:
 	Fix MIDI AutoDetect  
-	
+
 	* src/gui/widgets/knob.cpp:
 	Fix occationally missing line after instantiation
 
@@ -911,10 +915,10 @@
 
 	* src/gui/controller_connection_dialog.cpp:
 	Show name instead of type in connection dialog
-	
+
 	* src/gui/widgets/controller_view.cpp:
 	Remove bypass
-	
+
 	* plugins/lb302/lb302.cpp:
 	* plugins/lb302/lb302.h:
 	- Initial support for pitch-bend, doesn't work during slide.
