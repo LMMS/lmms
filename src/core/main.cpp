@@ -80,18 +80,6 @@ inline void loadTranslation( const QString & _tname,
 
 int main( int argc, char * * argv )
 {
-#ifdef LMMS_BUILD_LINUX
-#ifdef LMMS_HAVE_SCHED_H
-	struct sched_param sparam;
-	sparam.sched_priority = ( sched_get_priority_max( SCHED_FIFO ) +
-				sched_get_priority_min( SCHED_FIFO ) ) / 2;
-	if( sched_setscheduler( 0, SCHED_FIFO, &sparam ) == -1 )
-	{
-		printf( "could not set realtime priority.\n" );
-	}
-#endif
-#endif
-
 	bool core_only = FALSE;
 
 	for( int i = 1; i < argc; ++i )
@@ -160,7 +148,8 @@ int main( int argc, char * * argv )
 	"-x, --oversampling <value>	specify oversampling\n"
 	"				possible values: 1, 2, 4, 8\n"
 	"				default: 2\n"
-	"-u,--upgrade <in> <out>	upgrade file <in> and save as <out>\n"
+	"-u, --upgrade <in> <out>	upgrade file <in> and save as <out>\n"
+	"-d, --dump <in>		dump XML of compressed file <in>\n"
 	"-v, --version			show version information and exit.\n"
 	"-h, --help			show this usage message and exit.\n\n",
 							LMMS_VERSION );
@@ -172,6 +161,15 @@ int main( int argc, char * * argv )
 			file_to_load = argv[i + 1];
 			file_to_save = argv[i + 2];
 			i += 2;
+		}
+		else if( argc > i && ( QString( argv[i] ) == "--dump" ||
+						QString( argv[i] ) == "-d" ) )
+		{
+			QFile f( argv[i + 1] );
+			f.open( QIODevice::ReadOnly );
+			QString d = qUncompress( f.readAll() );
+			printf( "%s\n", d.toAscii().constData() );
+			return( 0 );
 		}
 		else if( argc > i && ( QString( argv[i] ) == "--render" ||
 						QString( argv[i] ) == "-r" ) )
@@ -320,6 +318,19 @@ int main( int argc, char * * argv )
 	// load actual translation for LMMS
 	loadTranslation( pos );
 
+
+	// try to set realtime priority
+#ifdef LMMS_BUILD_LINUX
+#ifdef LMMS_HAVE_SCHED_H
+	struct sched_param sparam;
+	sparam.sched_priority = ( sched_get_priority_max( SCHED_FIFO ) +
+				sched_get_priority_min( SCHED_FIFO ) ) / 2;
+	if( sched_setscheduler( 0, SCHED_FIFO, &sparam ) == -1 )
+	{
+		printf( "could not set realtime priority.\n" );
+	}
+#endif
+#endif
 
 	srand( getpid() + time( 0 ) );
 
