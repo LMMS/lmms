@@ -83,72 +83,6 @@ void midiWinMM::processOutEvent( const midiEvent & _me,
 						const midiTime & _time,
 						const midiPort * _port )
 {
-/*	// HACK!!! - need a better solution which isn't that easy since we
-	// cannot store const-ptrs in our map because we need to call non-const
-	// methods of MIDI-port - it's a mess...
-	midiPort * p = const_cast<midiPort *>( _port );
-
-	snd_seq_event_t ev;
-	snd_seq_ev_clear( &ev );
-	snd_seq_ev_set_source( &ev, ( m_portIDs[p][1] != -1 ) ?
-					m_portIDs[p][1] : m_portIDs[p][0] );
-	snd_seq_ev_set_subs( &ev );
-	snd_seq_ev_schedule_tick( &ev, m_queueID, 1,
-						static_cast<Sint32>( _time ) );
-	ev.queue =  m_queueID;
-	switch( _me.m_type )
-	{
-		case MidiNoteOn:
-			snd_seq_ev_set_noteon( &ev,
-						_port->outputChannel(),
-						_me.key() + KeysPerOctave,
-						_me.velocity() );
-			break;
-
-		case MidiNoteOff:
-			snd_seq_ev_set_noteoff( &ev,
-						_port->outputChannel(),
-						_me.key() + KeysPerOctave,
-						_me.velocity() );
-			break;
-
-		case MidiKeyPressure:
-			snd_seq_ev_set_keypress( &ev,
-						_port->outputChannel(),
-						_me.key() + KeysPerOctave,
-						_me.velocity() );
-			break;
-
-		case MidiControlChange:
-			snd_seq_ev_set_controller( &ev,
-						_port->outputChannel(),
-						_me.m_data.m_param[0],
-						_me.m_data.m_param[1] );
-			break;
-
-		case MidiProgramChange:
-			snd_seq_ev_set_pgmchange( &ev,
-						_port->outputChannel(),
-						_me.m_data.m_param[0] );
-			break;
-
-		case MidiChannelPressure:
-			snd_seq_ev_set_chanpress( &ev,
-						_port->outputChannel(),
-						_me.m_data.m_param[0] );
-			break;
-
-		case MidiPitchBend:
-			snd_seq_ev_set_pitchbend( &ev,
-						_port->outputChannel(),
-						_me.m_data.m_param[0] - 8192 );
-			break;
-
-		default:
-			printf( "ALSA-sequencer: unhandled output event %d\n",
-							(int) _me.m_type );
-			return;
-	}*/
 }
 
 
@@ -249,7 +183,6 @@ void midiWinMM::subscribeWriteablePort( midiPort * _port,
 void CALLBACK midiWinMM::inputCallback( HMIDIIN _hm, UINT _msg, DWORD_PTR _inst,
 					DWORD_PTR _param1, DWORD_PTR _param2 )
 {
-printf("input callback %d\n", (int) _hm );
 	if( _msg == MIM_DATA )
 	{
 		( (midiWinMM *) _inst )->handleInputEvent( _hm, _param1 );
@@ -272,11 +205,9 @@ void midiWinMM::handleInputEvent( HMIDIIN _hm, DWORD _ev )
 				static_cast<MidiEventTypes>( cmd & 0xf0 );
 	const int chan = cmd & 0x0f;
 
-		printf("%d\n", cmd );
 	const QString d = m_inputDevices.value( _hm );
 	if( d.isEmpty() )
 	{
-printf("return\n");
 		return;
 	}
 
@@ -365,20 +296,16 @@ void midiWinMM::openDevices( void )
 	m_inputDevices.clear();
 	for( int i = 0; i < midiInGetNumDevs(); ++i )
 	{
-printf("opening %d\n", i );
 		HMIDIIN hm = 0;
 		MMRESULT res = midiInOpen( &hm, i, (DWORD) &inputCallback,
 						(DWORD_PTR) this,
 							CALLBACK_FUNCTION );
-printf("opened %d\n", (int) hm);
 		if( res == MMSYSERR_NOERROR )
 		{
 			midiInStart( hm );
-printf("started\n" );
 			MIDIINCAPS c;
 			midiInGetDevCaps( (UINT) hm, &c, sizeof( c ) );
 			m_inputDevices[hm] = c.szPname;
-printf("caps done %s\n", c.szPname );
 		}
 	}
 }
