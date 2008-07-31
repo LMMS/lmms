@@ -371,6 +371,39 @@ ADD_CUSTOM_TARGET(dist
 			COMMAND tar cjf lmms-${VERSION}.tar.bz2 ${TMP}
 			COMMAND rm -rf ${TMP})
 
+#
+# add win32-pkg-target
+#
+ADD_CUSTOM_TARGET(win32-pkg
+			COMMAND mkdir -p tmp/lmms/data
+			COMMAND mkdir -p tmp/lmms/plugins/ladspa/
+			COMMAND cp lmms.exe tmp/lmms
+			COMMAND find plugins/ -maxdepth 2 -name '*.dll'  -exec cp '{}' tmp/lmms/plugins/ "';'"
+			COMMAND rm tmp/lmms/plugins/caps.dll
+			COMMAND rm tmp/lmms/plugins/tap*.dll
+			COMMAND cp plugins/ladspa_effect/caps/caps.dll tmp/lmms/plugins/ladspa/
+			COMMAND cp plugins/ladspa_effect/tap/tap*.dll tmp/lmms/plugins/ladspa/
+			COMMAND cd data && make DESTDIR=${CMAKE_BINARY_DIR}/tmp/lmms/ install
+			COMMAND mv tmp/lmms/opt/mingw/share/lmms/* tmp/lmms/data/ && rm -rf tmp/lmms/opt
+			COMMAND cp /opt/mingw/bin/QtCore4.dll tmp/lmms
+			COMMAND cp /opt/mingw/bin/QtGui4.dll tmp/lmms
+			COMMAND cp /opt/mingw/bin/QtXml4.dll tmp/lmms
+			COMMAND cp /opt/mingw/bin/libz.dll tmp/lmms
+			COMMAND cp /opt/mingw/bin/libsndfile-1.dll tmp/lmms
+			COMMAND cp /opt/mingw/bin/libvorbis*.dll tmp/lmms
+			COMMAND cp /opt/mingw/bin/libogg-0.dll tmp/lmms
+			COMMAND cp /opt/mingw/bin/libfluidsynth-1.dll tmp/lmms
+			COMMAND cp /opt/mingw/bin/libfftw3f-3.dll tmp/lmms
+			COMMAND cp /opt/mingw/bin/SDL.dll tmp/lmms
+			COMMAND cp /opt/mingw/i586-mingw32/bin/mingwm10.dll tmp/lmms
+			COMMAND cp -L ${CMAKE_SOURCE_DIR}/COPYING tmp/lmms/LICENSE.TXT
+			COMMAND cp -L ${CMAKE_SOURCE_DIR}/README tmp/lmms/README.TXT
+			COMMAND /opt/mingw/bin/i586-mingw32-strip tmp/lmms/lmms.exe tmp/lmms/plugins/*.dll tmp/lmms/plugins/ladspa/*.dll
+			COMMAND mv tmp/lmms tmp/lmms-${VERSION}
+			COMMAND cd tmp && zip -r -9 ../lmms-${VERSION}-bin-win32.zip lmms-${VERSION}/*
+			COMMAND rm -rf tmp
+)
+
 
 IF(WANT_PCH)
     FIND_PACKAGE(PCHSupport)
