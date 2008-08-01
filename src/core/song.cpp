@@ -772,18 +772,13 @@ void song::createNewProject( void )
 
 	m_fileName = m_oldFileName = "";
 
-	if( engine::getMainWindow() )
-	{
-		engine::getMainWindow()->resetWindowTitle();
-	}
-
 	track * t;
 	t = track::create( track::InstrumentTrack, this );
-	dynamic_cast< instrumentTrack * >( t )->loadInstrument(
+	dynamic_cast<instrumentTrack * >( t )->loadInstrument(
 					"tripleoscillator" );
 	t = track::create( track::InstrumentTrack,
 						engine::getBBTrackContainer() );
-	dynamic_cast< instrumentTrack * >( t )->loadInstrument(
+	dynamic_cast<instrumentTrack * >( t )->loadInstrument(
 						"tripleoscillator" );
 	track::create( track::SampleTrack, this );
 	track::create( track::BBTrack, this );
