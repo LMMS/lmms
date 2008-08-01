@@ -396,16 +396,17 @@ int main( int argc, char * * argv )
 		engine::init();
 
 		delete ss;
-		engine::getMainWindow()->showMaximized();
 
 		// we try to load given file
 		if( file_to_load != "" )
 		{
+			engine::getMainWindow()->showMaximized();
 			engine::getSong()->loadProject( file_to_load );
 		}
 		else
 		{
 			engine::getSong()->createNewProject();
+			engine::getMainWindow()->showMaximized();
 		}
 	}
 	else
