@@ -180,9 +180,10 @@ void midiWinMM::subscribeWriteablePort( midiPort * _port,
 
 
 
-void CALLBACK midiWinMM::inputCallback( HMIDIIN _hm, UINT _msg, DWORD_PTR _inst,
+void midiWinMM::inputCallback( HMIDIIN _hm, UINT _msg, DWORD_PTR _inst,
 					DWORD_PTR _param1, DWORD_PTR _param2 )
 {
+	printf("callback: %d %d\n", _msg, _param1 );
 	if( _msg == MIM_DATA )
 	{
 		( (midiWinMM *) _inst )->handleInputEvent( _hm, _param1 );
