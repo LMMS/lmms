@@ -44,6 +44,7 @@ visualizationWidget::visualizationWidget( const QPixmap & _bg, QWidget * _p,
 						visualizationTypes _vtype ) :
 	QWidget( _p ),
 	s_background( _bg ),
+	m_points( new QPointF[engine::getMixer()->framesPerPeriod()] ),
 	m_active( FALSE )
 {
 	setFixedSize( s_background.width(), s_background.height() );
@@ -132,9 +133,9 @@ void visualizationWidget::paintEvent( QPaintEvent * )
 	{
 		float master_output = engine::getMixer()->masterGain();
 		int w = width()-4;
-		float half_h = -( height() - 6 ) / 3.0 * master_output - 1;
+		const float half_h = -( height() - 6 ) / 3.0 * master_output - 1;
 		int x_base = 2;
-		int y_base = height()/2 - 1;
+		const float y_base = height()/2 - 0.5f;
 
 //		p.setClipRect( 2, 2, w, height()-4 );
 
@@ -148,7 +149,7 @@ void visualizationWidget::paintEvent( QPaintEvent * )
 		// and set color according to that...
 		if( max_level * master_output < 0.9 )
 		{
-			p.setPen( QColor( 96, 255, 96 ) );
+			p.setPen( QColor( 128, 224, 128 ) );
 		}
 		else if( max_level * master_output < 1.0 )
 		{
@@ -159,22 +160,22 @@ void visualizationWidget::paintEvent( QPaintEvent * )
 			p.setPen( QColor( 255, 64, 64 ) );
 		}
 
-		const int xd = w / frames;
+		p.setPen( QPen( p.pen().color(), 0.7 ) );
+
+		const float xd = (float) w / frames;
+		p.setRenderHint( QPainter::Antialiasing );
 
 		// now draw all that stuff
 		for( ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch )
 		{
-			int old_y = y_base +
-				(int)( mixer::clip( m_buffer[0][ch] )*half_h );
-			for( fpp_t frame = 0; frame < frames; ++frame )
+			for( int frame = 0; frame < frames; ++frame )
 			{
-				int cur_y = y_base + (int)(
-					mixer::clip( m_buffer[frame][ch] ) *
-								half_h );
-				const int xp = x_base + frame * w / frames;
-				p.drawLine( xp, old_y, xp+xd, cur_y );
-				old_y = cur_y;
+				m_points[frame] = QPointF(
+					x_base + (float) frame * xd,
+					y_base + ( mixer::clip( m_buffer[frame][ch] ) *
+									half_h ) );
 			}
+			p.drawPolyline( m_points, frames );
 		}
 
 	}

@@ -1,5 +1,14 @@
 2008-08-01	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* include/visualization_widget.h:
+	* src/gui/widgets/visualization_widget.cpp:
+	improved anti-aliased visualization
+
+	* src/core/sample_buffer.cpp:
+	heavily improved performance by using QPainter::drawPolylines and
+	disabling anti-aliasing if more than 60000 samples have to be
+	drawn (closes #1938413)
+
 	* src/core/midi/midi_winmm.cpp:
 	added debug-code
 

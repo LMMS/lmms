@@ -59,6 +59,7 @@ protected slots:
 
 private:
 	QPixmap s_background;
+	QPointF * m_points;
 
 	sampleFrame * m_buffer;
 	bool m_active;
