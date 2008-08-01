@@ -76,8 +76,8 @@ sf2Instrument::sf2Instrument( instrumentTrack * _instrument_track ) :
 	m_fontId( 0 ),
 	m_filename( "" ),
 	m_lastMidiPitch( 8192 ),
-	m_bankNum( -1, -1, 999, this, tr("Bank") ),
-	m_patchNum( -1, -1, 127, this, tr("Patch") ),
+	m_bankNum( 0, 0, 999, this, tr("Bank") ),
+	m_patchNum( 0, 0, 127, this, tr("Patch") ),
 	m_gain( 1.0f, 0.0f, 5.0f, 0.01f, this, tr( "Gain" ) ),
 	m_reverbOn( 0, this, tr( "Reverb" ) ),
 	m_reverbRoomSize( FLUID_REVERB_DEFAULT_ROOMSIZE, 0, 1.0, 0.01f, 
@@ -362,6 +362,46 @@ void sf2Instrument::updatePatch( void )
 
 
 
+QString sf2Instrument::getCurrentPatchName( void )
+{
+	int iBankSelected = m_bankNum.value();
+	int iProgSelected = m_patchNum.value();
+
+	fluid_preset_t preset;
+	// For all soundfonts (in reversed stack order) fill the available programs...
+	int cSoundFonts = ::fluid_synth_sfcount( m_synth );
+	for( int i = 0; i < cSoundFonts; i++ )
+	{
+		fluid_sfont_t *pSoundFont = fluid_synth_get_sfont( m_synth, i );
+		if (pSoundFont) {
+#ifdef CONFIG_FLUID_BANK_OFFSET
+			int iBankOffset =
+				fluid_synth_get_bank_offset(
+						m_synth, pSoundFont->id );
+#endif
+			pSoundFont->iteration_start( pSoundFont );
+			while( pSoundFont->iteration_next( pSoundFont,
+								&preset ) )
+			{
+				int iBank = preset.get_banknum( &preset );
+#ifdef CONFIG_FLUID_BANK_OFFSET
+				iBank += iBankOffset;
+#endif
+				int iProg = preset.get_num( &preset );
+				if( iBank == iBankSelected && iProg ==
+								iProgSelected )
+				{
+					return preset.get_name( &preset );
+				}
+			}
+		}
+	}
+	return "";
+}
+
+
+
+
 void sf2Instrument::updateGain( void )
 {
 	fluid_synth_set_gain( m_synth, m_gain.value() );
@@ -613,6 +653,13 @@ sf2InstrumentView::sf2InstrumentView( instrument * _instrument,
 //	QVBoxLayout * vl = new QVBoxLayout( this );
 //	QHBoxLayout * hl = new QHBoxLayout();
 	
+	sf2Instrument * k = castModel<sf2Instrument>();
+	connect( &k->m_bankNum, SIGNAL( dataChanged() ),
+			this, SLOT( updatePatchName() ) );
+
+	connect( &k->m_patchNum, SIGNAL( dataChanged() ),
+			this, SLOT( updatePatchName() ) );
+	
 	// File Button
 	m_fileDialogButton = new pixmapButton( this );
 	m_fileDialogButton->setCursor( QCursor( Qt::PointingHandCursor ) );
@@ -646,12 +693,12 @@ sf2InstrumentView::sf2InstrumentView( instrument * _instrument,
 	// LCDs
 	m_bankNumLcd = new lcdSpinBox( 3, "21pink", this );
 	m_bankNumLcd->move(131, 62);
-	m_bankNumLcd->addTextForValue( -1, "---" );
+//	m_bankNumLcd->addTextForValue( -1, "---" );
 //	m_bankNumLcd->setEnabled( FALSE );
 
 	m_patchNumLcd = new lcdSpinBox( 3, "21pink", this );
 	m_patchNumLcd->move(190, 62);
-	m_patchNumLcd->addTextForValue( -1, "---" );
+//	m_patchNumLcd->addTextForValue( -1, "---" );
 //	m_patchNumLcd->setEnabled( FALSE );
 
 	/*hl->addWidget( m_fileDialogButton );
@@ -666,7 +713,9 @@ sf2InstrumentView::sf2InstrumentView( instrument * _instrument,
 	//hl = new QHBoxLayout();
 
 	m_filenameLabel = new QLabel( this );
-	m_filenameLabel->setGeometry( 56, 109, 156, 11 );
+	m_filenameLabel->setGeometry( 58, 109, 156, 11 );
+	m_patchLabel = new QLabel( this );
+	m_patchLabel->setGeometry( 58, 127, 156, 11 );
 
 	//hl->addWidget( m_filenameLabel );
 //	vl->addLayout( hl );
@@ -817,7 +866,7 @@ void sf2InstrumentView::modelChanged( void )
 void sf2InstrumentView::updateFilename( void )
 {
 	sf2Instrument * i = castModel<sf2Instrument>();
-	QFontMetrics fm( font() );
+	QFontMetrics fm( m_filenameLabel->font() );
 	QString file = i->m_filename.endsWith( ".sf2", Qt::CaseInsensitive ) ?
 			i->m_filename.left( i->m_filename.length() - 4 ) :
 			i->m_filename;
@@ -827,6 +876,24 @@ void sf2InstrumentView::updateFilename( void )
 			//		i->m_filename + "\nPatch: TODO" );
 
 	m_patchDialogButton->setEnabled( !i->m_filename.isEmpty() );
+
+	updatePatchName();
+
+	update();
+}
+
+
+
+
+void sf2InstrumentView::updatePatchName( void )
+{
+	sf2Instrument * i = castModel<sf2Instrument>();
+	QFontMetrics fm( font() );
+	QString patch = i->getCurrentPatchName();
+	m_patchLabel->setText(
+			fm.elidedText( patch, Qt::ElideLeft, 
+			m_patchLabel->width() ) );
+
 
 	update();
 }
@@ -844,7 +911,6 @@ void sf2InstrumentView::invalidateFile( void )
 
 void sf2InstrumentView::showFileDialog( void )
 {
-	printf("CLICKED\n");
 	sf2Instrument * k = castModel<sf2Instrument>();
 
 	QFileDialog ofd( NULL, tr( "Open SoundFont file" ) );
@@ -905,7 +971,7 @@ void sf2InstrumentView::showPatchDialog( void )
 	}
 
 	s_patchDialog->setup( k->m_synth, 1, k->getInstrumentTrack()->name(),
-		&k->m_bankNum, &k->m_patchNum );
+		&k->m_bankNum, &k->m_patchNum, m_patchLabel );
 
 	s_patchDialog->exec();
 }

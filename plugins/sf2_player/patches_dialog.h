@@ -31,6 +31,7 @@
 
 #include <fluidsynth.h>
 #include <QtGui/QWidget>
+#include <QtGui/QLabel>
 
 //----------------------------------------------------------------------------
 // qsynthPresetForm -- UI wrapper form.
@@ -49,7 +50,7 @@ public:
 
 
 	void setup(fluid_synth_t *pSynth, int iChan, const QString & _chanName,
-			lcdSpinBoxModel * _bankModel, lcdSpinBoxModel * _progModel );
+			lcdSpinBoxModel * _bankModel, lcdSpinBoxModel * _progModel, QLabel *_patchLabel );
 
 public slots:
 
@@ -86,6 +87,7 @@ private:
 
 	lcdSpinBoxModel * m_bankModel;
 	lcdSpinBoxModel * m_progModel;
+	QLabel *m_patchLabel;
 };
 
 

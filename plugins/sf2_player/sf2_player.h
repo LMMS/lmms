@@ -91,6 +91,8 @@ public:
 	}
 
 	virtual pluginView * instantiateView( QWidget * _parent );
+	
+	QString getCurrentPatchName();
 
 
 public slots:
@@ -197,6 +199,7 @@ private:
 	lcdSpinBox * m_patchNumLcd;
 
 	QLabel * m_filenameLabel;
+	QLabel * m_patchLabel;
 
 	knob	* m_gainKnob;
 
@@ -219,6 +222,7 @@ protected slots:
 	void showFileDialog( void );
 	void showPatchDialog( void );
 	void updateFilename( void );
+	void updatePatchName( void );
 } ;
 
 

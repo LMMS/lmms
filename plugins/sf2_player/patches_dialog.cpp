@@ -111,17 +111,21 @@ patchesDialog::~patchesDialog()
 
 
 // Dialog setup loader.
-void patchesDialog::setup ( fluid_synth_t *pSynth, int iChan, const QString & _chanName,
-			lcdSpinBoxModel * _bankModel, lcdSpinBoxModel * _progModel )
+void patchesDialog::setup ( fluid_synth_t * pSynth, int iChan,
+						const QString & _chanName,
+						lcdSpinBoxModel * _bankModel,
+						lcdSpinBoxModel * _progModel,
+							QLabel * _patchLabel )
 {
 
 	// We'll going to changes the whole thing...
 	m_dirty = 0;
 	m_bankModel = _bankModel;
 	m_progModel = _progModel;
+	m_patchLabel =  _patchLabel;
 
 	// Set the proper caption...
-	setWindowTitle( _chanName + " - Soundfont patches");
+	setWindowTitle( _chanName + " - Soundfont patches" );
 
 	// set m_pSynth to NULL so we don't trigger any progChanged events
 	m_pSynth = NULL;
@@ -232,8 +236,10 @@ void patchesDialog::accept()
 		setBankProg(iBank, iProg);
 		
 		if (m_dirty > 0) {
-			m_bankModel->setValue(iBank);
-			m_progModel->setValue(iProg);
+			m_bankModel->setValue( iBank );
+			m_progModel->setValue( iProg );
+			m_patchLabel->setText( m_progListView->
+						currentItem()->text( 1 ) );
 		}
 
 		// Do remember preview state...
