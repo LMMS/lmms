@@ -1,5 +1,25 @@
 2008-08-01	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* src/core/midi/midi_winmm.cpp:
+	added debug-code
+
+	* src/core/song.cpp:
+	do not reset window title twice when creating new project
+
+	* src/core/main.cpp:
+	when creating a new project, show main-window afterwards - fixes
+	behaviour when debugging win32-version via WINE
+
+	* cmake/modules/BuildPlugin.cmake:
+	* plugins/ladspa_effect/tap/CMakeLists.txt:
+	* plugins/ladspa_effect/caps/CMakeLists.txt:
+	* data/CMakeLists.txt:
+	* data/nsis_branding.bmp:
+	* CMakeLists.txt:
+	* lmms.rc.in:
+	- made cmake-files ready for NSIS-packaging
+	- added win-resource-object to LMMS-binary
+
 	* plugins/sf2_player/patches_dialog.cpp:
 	* plugins/sf2_player/sf2_player.cpp:
 	* plugins/sf2_player/patches_dialog.h:

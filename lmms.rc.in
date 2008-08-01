@@ -16,11 +16,11 @@ BEGIN
       VALUE "Comments",		"Linux MultiMedia Studio (http://lmms.sf.net)\0"
       VALUE "CompanyName",	"LMMS Developers\0"
       VALUE "FileDescription",	"Linux MultiMedia Studio\0"
-      VALUE "FileVersion",	"@PACKAGE_VERSION@\0"
+      VALUE "FileVersion",	"@VERSION@\0"
       VALUE "LegalCopyright",	"Copyright (c) 2004-2008 LMMS Developers\0"
       VALUE "OriginalFilename",	"lmms.exe\0"
       VALUE "ProductName",	"LMMS\0"
-      VALUE "ProductVersion",	"@PACKAGE_VERSION@\0"
+      VALUE "ProductVersion",	"@VERSION@\0"
     END
   END
 END
