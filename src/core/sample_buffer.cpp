@@ -689,35 +689,31 @@ void sampleBuffer::visualize( QPainter & _p, const QRect & _dr,
 //	_p.setClipRect( _clip );
 //	_p.setPen( QColor( 0x22, 0xFF, 0x44 ) );
 	//_p.setPen( QColor( 64, 224, 160 ) );
-#warning TODO: save and restore aa-settings
-	_p.setRenderHint( QPainter::Antialiasing );
 	const int w = _dr.width();
 	const int h = _dr.height();
 
-	const float y_base = h / 2 + _dr.y();
-	const float y_space = h / 2;
+	const int yb = h / 2 + _dr.y();
+	const float y_space = h*0.25f;
 
-	const QRect isect = _dr.intersect( _clip );
-
-	int old_y[DEFAULT_CHANNELS] = { y_base, y_base };
-
-	_p.setPen( QPen( _p.pen().color(), 0.5 ) );
-	const f_cnt_t fpp = tLimit<f_cnt_t>( m_frames / w, 1, 20 );
-	int old_x = _clip.x();
-	for( f_cnt_t frame = 0; frame < m_frames; frame += fpp )
+	if( m_frames < 60000 )
 	{
-		const float x = _dr.x() + ( frame /
-					(float) m_frames * _dr.width() );
-		for( ch_cnt_t chnl = 0; chnl < DEFAULT_CHANNELS; ++chnl )
-		{
-			const Uint16 y = y_base - (
-						m_data[frame][chnl] * y_space );
-			_p.drawLine( QLineF( old_x, old_y[chnl], x, y+0.5 ) );
-			old_y[chnl] = y;
-		}
-		old_x = x;
+		_p.setRenderHint( QPainter::Antialiasing );
+		QColor c = _p.pen().color();
+		_p.setPen( QPen( c, 0.7 ) );
 	}
-//	_p.setClipping( FALSE );
+	const int fpp = tLimit<int>( m_frames / w, 1, 20 );
+	QPoint * l = new QPoint[m_frames / fpp + 1];
+	int n = 0;
+	const int xb = _dr.x();
+	for( int frame = 0; frame < m_frames; frame += fpp )
+	{
+		l[n] = QPoint( xb + ( frame * w / m_frames ),
+				yb - ( ( m_data[frame][0]+m_data[frame][1] ) *
+								y_space ) );
+		++n;
+	}
+	_p.drawPolyline( l, m_frames / fpp );
+	delete[] l;
 }
 
 
