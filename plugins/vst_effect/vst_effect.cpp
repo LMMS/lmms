@@ -64,9 +64,9 @@ vstEffect::vstEffect( model * _parent,
 	m_key( *_key ),
 	m_vstControls( this )
 {
-	if( !m_key.user.toString().isEmpty() )
+	if( !m_key.attributes["file"].isEmpty() )
 	{
-		openPlugin( m_key.user.toString() );
+		openPlugin( m_key.attributes["file"] );
 	}
 }
 
@@ -152,6 +152,8 @@ void vstEffect::openPlugin( const QString & _plugin )
 	m_plugin->setTempo( engine::getSong()->getTempo() );
 	m_pluginMutex.unlock();
 	delete tf;
+
+	m_key.attributes["file"] = _plugin;
 }
 
 

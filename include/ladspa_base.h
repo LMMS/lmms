@@ -2,7 +2,7 @@
  * ladspa_base.h - basic declarations concerning LADSPA
  *
  * Copyright (c) 2006-2007 Danny McRae <khjklujn/at/users.sourceforge.net>
- * Copyright (c) 2006-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -74,8 +74,11 @@ inline plugin::descriptor::subPluginFeatures::key ladspaKeyToSubPluginKey(
 						const QString & _name,
 						const ladspa_key_t & _key )
 {
+	plugin::descriptor::subPluginFeatures::key::attributeMap m;
+	m["file"] = _key.first;
+	m["plugin"] = _key.second;
 	return( plugin::descriptor::subPluginFeatures::key( _desc, _name,
-		QVariant( QStringList() << _key.first << _key.second ) ) );
+									m ) );
 }
 
 

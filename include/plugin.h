@@ -30,6 +30,7 @@
 #include <QtCore/QString>
 #include <QtCore/QStringList>
 #include <QtCore/QVector>
+#include <QtXml/QDomDocument>
 
 #include "journalling_object.h"
 #include "mv_base.h"
@@ -76,42 +77,23 @@ public:
 		public:
 			struct key
 			{
+				typedef QMap<QString, QString> attributeMap;
+
 				inline key( plugin::descriptor * _desc = NULL,
 					const QString & _name = QString::null,
-					const QVariant & _user = QVariant() )
+					const attributeMap & _am =
+							attributeMap() )
 					:
 					desc( _desc ),
 					name( _name ),
-					user( _user )
+					attributes( _am )
 				{
 				}
 
-				inline key( const QString & _dump_data )	
-					:
-					desc( NULL )
-				{
-					const QList<QVariant> l =
-						base64::decode( _dump_data,
-							QVariant::List ).
-								toList();
-					if( l.empty() )
-					{
-						name = QString::null;
-						user = QVariant();
-					}
-					else
-					{
-						name = l[0].toString();
-						user = l[1];
-					}
-				}
+				key( const QDomElement & _key );
 
-				inline QString dumpBase64( void ) const
-				{
-					return( base64::encode(
-						QList<QVariant>()
-							<< name << user ) );
-				}
+				QDomElement saveXML( QDomDocument &
+								_doc ) const;
 
 				inline bool isValid( void ) const
 				{
@@ -121,8 +103,8 @@ public:
 
 				plugin::descriptor * desc;
 				QString name;
-				QVariant user;
-			};
+				attributeMap attributes;
+			} ;
 
 			typedef QList<key> keyList;
 
@@ -140,8 +122,9 @@ public:
 								const key * )
 			{
 			}
+
 			virtual void listSubPluginKeys( plugin::descriptor *,
-							keyList & )
+								keyList & )
 			{
 			}
 
@@ -154,8 +137,9 @@ public:
 
 		protected:
 			const plugin::PluginTypes m_type;
-		}
-			* sub_plugin_features;
+		} ;
+
+		subPluginFeatures * sub_plugin_features;
 
 	} ;
 

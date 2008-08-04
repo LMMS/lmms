@@ -1,3 +1,26 @@
+2008-08-04	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* plugins/ladspa_effect/ladspa_effect.cpp:
+	* plugins/ladspa_effect/ladspa_subplugin_features.cpp:
+	* plugins/vst_effect/vst_subplugin_features.cpp:
+	* plugins/vst_effect/vst_effect.cpp:
+	* plugins/vst_effect/vst_effect_controls.cpp:
+	* include/plugin.h:
+	* include/base64.h:
+	* include/ladspa_base.h:
+	* src/core/plugin.cpp:
+	* src/core/effect_chain.cpp:
+	* src/core/mmp.cpp:
+	* src/core/ladspa_manager.cpp:
+	* CMakeLists.txt:
+	use XML rather than binary blobs for saving plugin-/effect-key
+
+	* src/core/project_journal.cpp:
+	use random-number-generator correctly - fixes predictable random
+	numbers and avoids used Journalling-Object-IDs upon loading
+	project (closes #2036745) - anyways this still might happen under rare
+	circumstances and needs a further fix
+
 2008-08-03	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* include/lmms_math.h:

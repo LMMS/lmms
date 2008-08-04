@@ -37,6 +37,8 @@
 #include "config_mgr.h"
 #include "project_version.h"
 #include "song_editor.h"
+#include "effect.h"
+
 
 
 multimediaProject::typeDescStruct
@@ -665,6 +667,46 @@ void multimediaProject::upgrade( void )
 			s.replace( "drumsynth/misc ", "drumsynth/misc_" );
 			s.replace( "drumsynth/r&b", "drumsynth/r_b" );
 			el.setAttribute( "src", s );
+		}
+	}
+
+	if( version < "0.4.0-beta1" )
+	{
+		// convert binary effect-key-blobs to XML
+		QDomNodeList list;
+		list = elementsByTagName( "effect" );
+		for( int i = 0; !list.item( i ).isNull(); ++i )
+		{
+			QDomElement el = list.item( i ).toElement();
+			QString k = el.attribute( "key" );
+			if( !k.isEmpty() )
+			{
+				const QList<QVariant> l =
+					base64::decode( k, QVariant::List ).
+								toList();
+				if( !l.isEmpty() )
+				{
+					QString name = l[0].toString();
+					QVariant u = l[1];
+					effectKey::attributeMap m;
+					// VST-effect?
+					if( u.type() == QVariant::String )
+					{
+						m["file"] = u.toString();
+					}
+					// LADSPA-effect?
+					else if( u.type() ==
+							QVariant::StringList )
+					{
+						const QStringList sl =
+							u.toStringList();
+						m["plugin"] = sl.value( 0 );
+						m["file"] = sl.value( 1 );
+					}
+					effectKey key( NULL, name, m );
+					el.appendChild( key.saveXML( *this ) );
+				}
+			}
 		}
 	}
 /*	if( version < "0.4.0-beta" )

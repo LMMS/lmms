@@ -56,7 +56,7 @@ void vstEffectControls::loadSettings( const QDomElement & _this )
 
 void vstEffectControls::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
-	_this.setAttribute( "plugin", m_effect->m_key.user.toString() );
+	_this.setAttribute( "plugin", m_effect->m_key.attributes["file"] );
 	m_effect->m_pluginMutex.lock();
 	if( m_effect->m_plugin != NULL )
 	{

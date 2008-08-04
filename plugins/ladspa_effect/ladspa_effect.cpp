@@ -71,7 +71,7 @@ ladspaEffect::ladspaEffect( model * _parent,
 	if( manager->getDescription( m_key ) == NULL )
 	{
 		QMessageBox::warning( 0, "Effect", 
-			"Unknown LADSPA plugin requested: " + m_key.first, 
+			"Unknown LADSPA plugin requested: " + m_key.second, 
 			QMessageBox::Ok, QMessageBox::NoButton );
 		setOkay( FALSE );
 		return;
@@ -437,7 +437,7 @@ void ladspaEffect::pluginInstantiation( void )
 	if( m_descriptor == NULL )
 	{
 		QMessageBox::warning( 0, "Effect", 
-			"Can't get LADSPA descriptor function: " + m_key.first,
+			"Can't get LADSPA descriptor function: " + m_key.second,
 			QMessageBox::Ok, QMessageBox::NoButton );
 		setOkay( FALSE );
 		return;
@@ -445,7 +445,7 @@ void ladspaEffect::pluginInstantiation( void )
 	if( m_descriptor->run == NULL )
 	{
 		QMessageBox::warning( 0, "Effect",
-			"Plugin has no processor: " + m_key.first,
+			"Plugin has no processor: " + m_key.second,
 			QMessageBox::Ok, QMessageBox::NoButton );
 		setDontRun( TRUE );
 	}
@@ -456,7 +456,7 @@ void ladspaEffect::pluginInstantiation( void )
 		if( effect == NULL )
 		{
 			QMessageBox::warning( 0, "Effect",
-				"Can't get LADSPA instance: " + m_key.first,
+				"Can't get LADSPA instance: " + m_key.second,
 				QMessageBox::Ok, QMessageBox::NoButton );
 			setOkay( FALSE );
 			return;
@@ -475,7 +475,7 @@ void ladspaEffect::pluginInstantiation( void )
 						m_ports[proc][port]->buffer ) )
 			{
 				QMessageBox::warning( 0, "Effect", 
-				"Failed to connect port: " + m_key.first, 
+				"Failed to connect port: " + m_key.second, 
 				QMessageBox::Ok, QMessageBox::NoButton );
 				setDontRun( TRUE );
 				return;

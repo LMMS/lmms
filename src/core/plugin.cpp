@@ -205,5 +205,38 @@ pluginView * plugin::createView( QWidget * _parent )
 
 
 
+plugin::descriptor::subPluginFeatures::key::key(
+						const QDomElement & _key ) :
+	desc( NULL ),
+	name( _key.attribute( "key" ) ),
+	attributes()
+{
+	QDomNodeList l = _key.elementsByTagName( "attribute" );
+	for( int i = 0; !l.item( i ).isNull(); ++i )
+	{
+		QDomElement e = l.item( i ).toElement();
+		attributes[e.attribute( "name" )] = e.attribute( "value" );
+	}
+		
+}
+
+
+
+
+QDomElement plugin::descriptor::subPluginFeatures::key::saveXML(
+						QDomDocument & _doc ) const
+{
+	QDomElement e = _doc.createElement( "key" );
+	for( attributeMap::const_iterator it = attributes.begin();
+						it != attributes.end(); ++it )
+	{
+		QDomElement a = _doc.createElement( "attribute" );
+		a.setAttribute( "name", it.key() );
+		a.setAttribute( "value", it.value() );
+		e.appendChild( a );
+	}
+	return( e );
+}
+
 
 #endif

@@ -136,7 +136,7 @@ void ladspaManager::addPlugins(
 		( descriptor = _descriptor_func( pluginIndex ) ) != NULL;
 								++pluginIndex )
 	{
-		ladspa_key_t key( QString( descriptor->Label ), _file );
+		ladspa_key_t key( _file, QString( descriptor->Label ) );
 		if( m_ladspaManagerMap.contains( key ) )
 		{
 			continue;
@@ -167,7 +167,7 @@ void ladspaManager::addPlugins(
 		{
 			plugIn->type = OTHER;
 		}
-		
+
 		m_ladspaManagerMap[key] = plugIn;
 	}
 }

@@ -62,7 +62,7 @@ void effectChain::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	{
 		QDomElement ef = ( *it )->saveState( _doc, _this );
 		ef.setAttribute( "name", ( *it )->getDescriptor()->name );
-		ef.setAttribute( "key", ( *it )->getKey().dumpBase64() );
+		ef.appendChild( ( *it )->getKey().saveXML( _doc ) );
 	}
 }
 
@@ -85,10 +85,8 @@ void effectChain::loadSettings( const QDomElement & _this )
 		{
 			QDomElement cn = node.toElement();
 			const QString name = cn.attribute( "name" );
-			// we have this really convenient key-ctor
-			// which takes a QString and decodes the
-			// base64-data inside :-)
-			effectKey key( cn.attribute( "key" ) );
+			effectKey key( cn.elementsByTagName( "key" ).
+							item( 0 ).toElement() );
 			effect * e = effect::instantiate( name, this, &key );
 			if( e->isOkay() )
 			{
@@ -96,7 +94,7 @@ void effectChain::loadSettings( const QDomElement & _this )
 				{
 					if( e->nodeName() == node.nodeName() )
 					{
-						e->restoreState( node.toElement() );
+				e->restoreState( node.toElement() );
 					}
 				}
 			}

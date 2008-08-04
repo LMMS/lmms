@@ -45,7 +45,8 @@ void vstSubPluginFeatures::fillDescriptionWidget( QWidget * _parent,
 							const key * _key  )
 {
 	new QLabel( QWidget::tr( "Name: " ) + _key->name, _parent );
-	new QLabel( QWidget::tr( "File: " ) + _key->user.toString(), _parent );
+	new QLabel( QWidget::tr( "File: " ) + _key->attributes["file"],
+								_parent );
 }
 
 
@@ -61,8 +62,9 @@ void vstSubPluginFeatures::listSubPluginKeys( plugin::descriptor * _desc,
 	for( QStringList::const_iterator it = dlls.begin();
 							it != dlls.end(); ++it )
 	{
-			_kl.push_back( key( _desc, QFileInfo( *it ).baseName(),
-								*it ) );
+		effectKey::attributeMap am;
+		am["file"] = *it;
+		_kl.push_back( key( _desc, QFileInfo( *it ).baseName(), am ) );
 	}
 
 }

@@ -4,7 +4,7 @@
  *                                 hosting LADSPA-plugins
  *
  * Copyright (c) 2006-2007 Danny McRae <khjklujn/at/users.sourceforge.net>
- * Copyright (c) 2006-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -162,10 +162,7 @@ void ladspaSubPluginFeatures::listSubPluginKeys( plugin::descriptor * _desc,
 ladspa_key_t ladspaSubPluginFeatures::subPluginKeyToLadspaKey(
 							const key * _key )
 {
-	QStringList list = _key->user.toStringList();
-	if( list.empty() )
-	{
-		return( ladspa_key_t() );
-	}
-	return( ladspa_key_t( list.first(), list.last() ) );
+	return( ladspa_key_t( _key->attributes["file"],
+						_key->attributes["plugin"] ) );
 }
+
