@@ -87,33 +87,25 @@ void automatableButton::update( void )
 
 void automatableButton::contextMenuEvent( QContextMenuEvent * _me )
 {
-/*	if( model()->nullTrack() &&
-			( m_group == NULL || m_group->model()->nullTrack() ) )*/
-	if( m_group != NULL && !m_group->model()->isAutomated() )
-	{
-		QPushButton::contextMenuEvent( _me );
-		return;
-	}
-
 	// for the case, the user clicked right while pressing left mouse-
 	// button, the context-menu appears while mouse-cursor is still hidden
 	// and it isn't shown again until user does something which causes
 	// an QApplication::restoreOverrideCursor()-call...
 	mouseReleaseEvent( NULL );
 
-	QString targetName;
 	if ( m_group != NULL )
 	{
-		targetName = m_group->model()->displayName();
+		captionMenu contextMenu( m_group->model()->displayName() );
+		m_group->addDefaultActions( &contextMenu );
+		contextMenu.exec( QCursor::pos() );
 	}
 	else
 	{
-		targetName = model()->displayName();
+		captionMenu contextMenu( model()->displayName() );
+		addDefaultActions( &contextMenu );
+		contextMenu.exec( QCursor::pos() );
 	}
 
-	captionMenu contextMenu( targetName );
-	addDefaultActions( &contextMenu );
-	contextMenu.exec( QCursor::pos() );
 }
 
 
@@ -142,9 +134,10 @@ void automatableButton::mousePressEvent( QMouseEvent * _me )
 
 void automatableButton::mouseReleaseEvent( QMouseEvent * _me )
 {
-	// TODO: Fix this. for example: LeftDown, RightDown, Both Released causes two events
-	//   or - pressing down then releasing outside of the bbox causes click event.
-	emit clicked();
+	if( _me && _me->button() == Qt::LeftButton )
+	{
+		emit clicked();
+	}
 }
 
 
