@@ -1,3 +1,12 @@
+2008-08-05	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* plugins/sf2_player/sf2_player.cpp:
+	- query data from correct model when activating reverb (closes #2035134)
+	- convert from note-play-handle's volume to MIDI-velocity when calling
+	  fluid_synth_noteon()
+	- set fluidsynth's internal interpolation-method to high-quality when
+	  running LMMS in HQ-mode
+
 2008-08-04	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* plugins/ladspa_effect/ladspa_effect.cpp:

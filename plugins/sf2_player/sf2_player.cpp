@@ -79,7 +79,7 @@ sf2Instrument::sf2Instrument( instrumentTrack * _instrument_track ) :
 	m_bankNum( 0, 0, 999, this, tr("Bank") ),
 	m_patchNum( 0, 0, 127, this, tr("Patch") ),
 	m_gain( 1.0f, 0.0f, 5.0f, 0.01f, this, tr( "Gain" ) ),
-	m_reverbOn( 0, this, tr( "Reverb" ) ),
+	m_reverbOn( FALSE, this, tr( "Reverb" ) ),
 	m_reverbRoomSize( FLUID_REVERB_DEFAULT_ROOMSIZE, 0, 1.0, 0.01f, 
 			this, tr( "Reverb Roomsize" ) ),
 	m_reverbDamping( FLUID_REVERB_DEFAULT_DAMP, 0, 1.0, 0.01, 
@@ -88,7 +88,7 @@ sf2Instrument::sf2Instrument( instrumentTrack * _instrument_track ) :
 			this, tr( "Reverb Width" ) ),
 	m_reverbLevel( FLUID_REVERB_DEFAULT_LEVEL, 0, 1.0, 0.01f, 
 			this, tr( "Reverb Level" ) ),
-	m_chorusOn( 0, this, tr( "Chorus" ) ),
+	m_chorusOn( FALSE, this, tr( "Chorus" ) ),
 	m_chorusNum( FLUID_CHORUS_DEFAULT_N, 0, 10.0, 1.0, 
 			this, tr( "Chorus Lines" ) ),
 	m_chorusLevel( FLUID_CHORUS_DEFAULT_LEVEL, 0, 10.0, 0.01, 
@@ -412,7 +412,7 @@ void sf2Instrument::updateGain( void )
 
 void sf2Instrument::updateReverbOn( void )
 {
-	fluid_synth_set_reverb_on( m_synth, m_chorusOn.value() );
+	fluid_synth_set_reverb_on( m_synth, m_reverbOn.value() ? 1 : 0 );
 }
 
 
@@ -430,7 +430,7 @@ void sf2Instrument::updateReverb( void )
 
 void  sf2Instrument::updateChorusOn( void )
 {
-	fluid_synth_set_chorus_on( m_synth, m_chorusOn.value() );
+	fluid_synth_set_chorus_on( m_synth, m_chorusOn.value() ? 1 : 0 );
 }
 
 
@@ -462,12 +462,12 @@ void sf2Instrument::updateSampleRate( void )
 		m_synthMutex.lock();
 		fluid_synth_remove_sfont( m_synth, m_font->fluidFont ); 
 		delete_fluid_synth( m_synth );
-		
+
 		// New synth
 		m_synth = new_fluid_synth( m_settings );
 		m_fontId = fluid_synth_add_sfont( m_synth, m_font->fluidFont );		
 		m_synthMutex.unlock();
-		
+
 		// synth program change (set bank and patch)
 		updatePatch();
 		updateGain();
@@ -481,6 +481,19 @@ void sf2Instrument::updateSampleRate( void )
 		m_synthMutex.unlock();
 	}
 
+	m_synthMutex.lock();
+	if( engine::getMixer()->currentQualitySettings().interpolation >=
+			mixer::qualitySettings::Interpolation_SincFastest )
+	{
+		fluid_synth_set_interp_method( m_synth, -1,
+							FLUID_INTERP_7THORDER );
+	}
+	else
+	{
+		fluid_synth_set_interp_method( m_synth, -1,
+							FLUID_INTERP_DEFAULT );
+	}
+	m_synthMutex.unlock();
 	if( m_internalSampleRate < engine::getMixer()->processingSampleRate() )
 	{
 		m_synthMutex.lock();
@@ -525,7 +538,8 @@ void sf2Instrument::playNote( notePlayHandle * _n, bool, sampleFrame * )
 		_n->m_pluginData = new int( midiNote );
 
 		m_synthMutex.lock();
-		fluid_synth_noteon( m_synth, 1, midiNote, _n->getVolume() );
+		fluid_synth_noteon( m_synth, 1, midiNote, qMin<int>( 127,
+						_n->getVolume()*127/100 ) );
 		m_synthMutex.unlock();
 
 		m_notesRunningMutex.lock();
