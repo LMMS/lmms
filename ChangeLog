@@ -1,5 +1,64 @@
 2008-08-05	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* plugins/sid/wave8580__ST.cc:
+	* plugins/sid/spline.h:
+	* plugins/sid/3off.png:
+	* plugins/sid/8580red.png:
+	* plugins/sid/trianglered.png:
+	* plugins/sid/logo.png:
+	* plugins/sid/bp.png:
+	* plugins/sid/6581.png:
+	* plugins/sid/wave.cc:
+	* plugins/sid/8580.png:
+	* plugins/sid/pot.h:
+	* plugins/sid/syncred.png:
+	* plugins/sid/hp.png:
+	* plugins/sid/sid_instrument.h:
+	* plugins/sid/lp.png:
+	* plugins/sid/sync.png:
+	* plugins/sid/noise.png:
+	* plugins/sid/wave8580_PST.cc:
+	* plugins/sid/envelope.cc:
+	* plugins/sid/extfilt.cc:
+	* plugins/sid/envelope.h:
+	* plugins/sid/extfilt.h:
+	* plugins/sid/pulsered.png:
+	* plugins/sid/siddefs.h:
+	* plugins/sid/filter.png:
+	* plugins/sid/sawred.png:
+	* plugins/sid/wave6581_PS_.cc:
+	* plugins/sid/3offred.png:
+	* plugins/sid/pulse.png:
+	* plugins/sid/artwork.png:
+	* plugins/sid/saw.png:
+	* plugins/sid/CMakeLists.txt:
+	* plugins/sid/wave8580_P_T.cc:
+	* plugins/sid/wave6581__ST.cc:
+	* plugins/sid/bpred.png:
+	* plugins/sid/6581red.png:
+	* plugins/sid/ring.png:
+	* plugins/sid/hpred.png:
+	* plugins/sid/pot.cc:
+	* plugins/sid/sid_instrument.cpp:
+	* plugins/sid/triangle.png:
+	* plugins/sid/wave.h:
+	* plugins/sid/voice.cc:
+	* plugins/sid/lpred.png:
+	* plugins/sid/noisered.png:
+	* plugins/sid/voice.h:
+	* plugins/sid/wave6581_PST.cc:
+	* plugins/sid/sid.cc:
+	* plugins/sid/filterred.png:
+	* plugins/sid/sid.h:
+	* plugins/sid/version.cc:
+	* plugins/sid/filter.cc:
+	* plugins/sid/filter.h:
+	* plugins/sid/wave6581_P_T.cc:
+	* plugins/sid/wave8580_PS_.cc:
+	* plugins/sid/ringred.png:
+	* plugins/CMakeLists.txt:
+	added SID instrument plugin by Attila Herman and Csaba Hruska
+
 	* src/gui/widgets/automatable_button.cpp:
 	show context-menu of button-group if a button is part of it
 
