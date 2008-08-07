@@ -105,9 +105,9 @@ public:
 	virtual pluginView * instantiateView( QWidget * _parent );
 
 
-public slots:
+/*public slots:
 	void updateKnobHint( void );
-	void updateKnobToolTip( void );
+	void updateKnobToolTip( void );*/
 
 private:
 	// voices
