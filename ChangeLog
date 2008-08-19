@@ -1,5 +1,8 @@
 2008-08-19	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* plugins/sf2_player/sf2_player.cpp:
+	fixed reverb/chorus after change of samplerate
+
 	* src/core/main.cpp:
 	* lmms.1:
 	improved documentation of commandline options

@@ -513,6 +513,8 @@ void sf2Instrument::updateSampleRate( void )
 		}
 		m_synthMutex.unlock();
 	}
+	updateReverb();
+	updateChorus();
 }
 
 
