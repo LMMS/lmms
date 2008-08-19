@@ -190,6 +190,36 @@ controller * controller::create( const QDomElement & _this, model * _parent )
 
 
 
+bool controller::hasModel( const model * m )
+{
+	QObjectList chldren = children();
+	for( int i = 0; i < chldren.size(); ++i )
+	{
+		QObject * c = chldren.at(i);
+		automatableModel * am = qobject_cast<automatableModel*>(c);
+		if( am != NULL )
+		{
+			if( am == m )
+			{
+				return true;
+			}
+
+			controllerConnection * cc = am->getControllerConnection();
+			if( cc != NULL )
+			{
+				if( cc->getController()->hasModel( m ) )
+				{
+					return true;
+				}
+			}
+		}
+	}
+	
+	return false;
+}
+
+
+
 void controller::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
 	_this.setAttribute( "type", type() );

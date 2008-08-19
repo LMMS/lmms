@@ -25,7 +25,6 @@
 
 #include <QtGui/QMenu>
 #include <QtGui/QMouseEvent>
-
 #include "automatable_model_view.h"
 #include "automation_pattern.h"
 #include "controller_connection_dialog.h"
@@ -183,31 +182,32 @@ void automatableModelViewSlots::execConnectionDialog( void )
 	controllerConnectionDialog * d = new controllerConnectionDialog( 
 			(QWidget*)engine::getMainWindow(), m );
 
-	d->exec();
-
-	// Actually chose something
-	if (d->chosenController() != NULL )
+	if( d->exec() == 1) 
 	{
-		// Update
-		if( m->getControllerConnection() )
+		// Actually chose something
+		if (d->chosenController() != NULL )
 		{
-			m->getControllerConnection()->
-				setController( d->chosenController() );
+			// Update
+			if( m->getControllerConnection() )
+			{
+				m->getControllerConnection()->
+					setController( d->chosenController() );
+			}
+			// New
+			else
+			{
+				controllerConnection * cc =
+						new controllerConnection( d->chosenController() );
+				m->setControllerConnection( cc );
+				//cc->setTargetName( m->displayName() );
+				
+			}
 		}
-		// New
+		// no controller, so delete existing connection
 		else
 		{
-			controllerConnection * cc =
-					new controllerConnection( d->chosenController() );
-			m->setControllerConnection( cc );
-			//cc->setTargetName( m->displayName() );
-			
+			removeConnection();
 		}
-	}
-	// no controller, so delete existing connection
-	else
-	{
-		removeConnection();
 	}
 
 	delete d;

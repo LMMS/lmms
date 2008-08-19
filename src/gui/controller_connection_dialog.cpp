@@ -30,6 +30,7 @@
 #include <QtGui/QLineEdit>
 #include <QtGui/QPushButton>
 #include <QtGui/QScrollArea>
+#include <QMessageBox>
 
 #include "controller_connection_dialog.h"
 #include "controller_connection.h"
@@ -327,7 +328,15 @@ void controllerConnectionDialog::selectController( void )
 			m_controller = engine::getSong()->controllers().at( 
 					m_userController->model()->value() );
 		}
+
+		if( m_controller->hasModel( m_targetModel ) )
+		{
+			QMessageBox::warning(this, tr("LMMS"), tr("Cycle Detected."));
+			return;
+		}
+	
 	}
+
 	accept();
 }
 

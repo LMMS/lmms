@@ -114,6 +114,8 @@ public slots:
 		m_name = _new_name;
 	}
 
+	bool hasModel( const model * m );
+
 
 protected:
 	// The internal per-controller get-value function
