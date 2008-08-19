@@ -19,8 +19,13 @@
 lmms \- software for easy music-production
 .SH SYNOPSIS
 .B lmms
-.RB "[ \-\fBr\fP \fIfile\fP ]"
-.RB "[ \-\fBo\fP \fIformat\fP ]"
+.RB "[ \--\fBrender\fP \fIfile\fP ] [options]"
+.br
+.B lmms
+.RB "[ \--\fBupgrade\fP \fIin\fP \fIout\fP ]"
+.br
+.B lmms
+.RB "[ \--\fBdump\fP \fIin\fP ]"
 .br
 .B lmms
 .RI "[ file ]"
@@ -35,16 +40,32 @@ aims to be a free alternative to popular (but commercial and closed-source) prog
 LMMS combines the features of a sequencer-program (pattern-/channel-/sample-/song-/effect-management) and those of powerful instrument-plugins and plugin-hosters (such as LADSPA and VST) in a modern, user-friendly and easy to use graphical user-interface.
 
 .SH OPTIONS
-.IP "\fB\-r, --render\fP \fIfile\fP
-Render given file to either a wav\- or ogg\-file. See \fB\-o\fP for details
-.IP "\fB\-o, --output\fP \fIformat\fP
+.IP "\fB\-r, --render\fP \fIproject-file\fP
+Render given file to either a wav\- or ogg\-file. See \fB\-f\fP for details
+.IP "\fB\-o, --output\fP \fIfile\fP
+render into \fIfile\fP
+.IP "\fB\-f, --output-format\fP \fIformat\fP
 Specify format of render-output where \fIformat\fP is either 'wav' or 'ogg'
+.IP "\fB\-s, --samplerate\fP \fIsamplerate\fP
+Specify output samplerate in Hz - range is 44100 (default) to 192000
+.IP "\fB\-b, --bitrate\fP \fIbitrate\fP
+Specify output bitrate in kHz (for OGG encoding only), default is 160
+.IP "\fB\-i, --interpolation\fP \fImethod\fP
+Specify interpolation method - possible values are \fIlinear\fP, \fIsincfastest\fP (default), \fIsincmedium\fP, \fIsincbest\fP
+.IP "\fB\-i, --interpolation\fP \fImethod\fP
+Specify interpolation method - possible values are \fIlinear\fP, \fIsincfastest\fP (default), \fIsincmedium\fP, \fIsincbest\fP
+.IP "\fB\-x, --oversampling\fP \fIvalue\fP
+Specify oversampling, posible values: 1, 2 (default), 4, 8
+.IP "\fB\-u, --upgrade\fP \fIin\fP \fIout\fP
+Upgrade file \fIin\fP and save as \fIout\fP
+.IP "\fB\-d, --dump\fP \fIin\fP
+Dump XML of compressed file \fIin\fP (i.e. MMPZ-file)
+.IP "\fB\-v, --version
+Show version information and exit.
+.IP "\fB\-h, --help
+Show usage information and exit.
 .SH SEE ALSO
 .BR http://lmms.sf.net/
-
-.BR http://wiki.mindrules.net/
-.SH AUTHOR
-lmms was written by Tobias Doerffel and others. See AUTHORS for details.
-.PP
-This manual page was written by Florian Ragwitz <rafl@debian.org> and
-Tobias Doerffel <tobydox/at/users/dot/sf/dot/net>, for the Debian project (but may be used by others).
+.BR http://lmms.sf.net/wiki/
+.SH AUTHORS
+.BR Tobias Doerffel <tobydox/at/users.sourceforge.net>, Paul Giblock and others. See AUTHORS for details.
