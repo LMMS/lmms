@@ -186,21 +186,23 @@ void projectRenderer::updateConsoleProgress( void )
 {
 	const int cols = 50;
 	static int rot = 0;
+	char buf[80];
+	char prog[cols+1];
 
-	printf("\r|");
 	for( int i = 0; i < cols; ++i )
 	{
-		printf( "%c",( i*100/cols <= m_progress ? '-' : ' ' ));
+		prog[i] = ( i*100/cols <= m_progress ? '-' : ' ' );
 	}
-	printf( "|    %3d%%   ", m_progress );
-	switch( rot )
-	{
-		case 3: putchar( '|' ); break;
-		case 2: putchar( '/' ); break;
-		case 1: putchar( '-' ); break;
-		case 0: putchar( '\\' ); break;
-	}
-	rot = ++rot % 4;
+	prog[cols] = 0;
+
+	const char * activity = (const char *) "|/-\\";
+	memset( buf, 0, sizeof( buf ) );
+	sprintf( buf, "\r|%s|    %3d%%   %c  ", prog, m_progress,
+							activity[rot] );
+	rot = ( rot+1 ) % 4;
+
+	fprintf( stderr, "%s", buf );
+	fflush( stderr );
 }
 
 

@@ -432,7 +432,7 @@ int main( int argc, char * * argv )
 			QTimer * t = new QTimer( r );
 			r->connect( t, SIGNAL( timeout() ),
 					SLOT( updateConsoleProgress() ) );
-			t->start( 50 );
+			t->start( 200 );
 
 			// start now!
 			r->startProcessing();
