@@ -1,10 +1,13 @@
-2008-08-18	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+2008-08-18	Paul Giblock <drfaygo/at/gmail/dot/com>
 
 	* include/controller.h:
 	* src/core/controller.cpp:
 	* src/gui/automatable_model_view.cpp:
 	* src/gui/controller_connection_dialog.cpp:
 	Detect loops before allowing controller-connection
+
+	* src/core/peak_controller.cpp:
+	Changes displayName from LFO to Peak
 
 2008-08-07	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
