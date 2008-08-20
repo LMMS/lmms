@@ -102,7 +102,7 @@ plugin * plugin::instantiate( const QString & _plugin_name, model * _parent,
 		{
 			QMessageBox::information( NULL,
 				tr( "Plugin not found" ),
-				tr( "The %1-plugin wasn't found "
+				tr( "The plugin \"%1\" wasn't found "
 					"or could not be loaded!\n"
 					"Reason: \"%2\"" ).arg( _plugin_name ).
 						arg( plugin_lib.errorString() ),
