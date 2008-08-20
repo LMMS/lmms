@@ -266,7 +266,8 @@ void midiALSASeq::applyPortMode( midiPort * _port )
 		else if( m_portIDs[_port][i] != -1 )
 		{
 			// then remove this port
-			snd_seq_delete_simple_port( m_seqHandle, m_portIDs[_port][i] );
+			snd_seq_delete_simple_port( m_seqHandle,
+							m_portIDs[_port][i] );
 			m_portIDs[_port][i] = -1;
 		}
 	}
@@ -326,11 +327,8 @@ void midiALSASeq::subscribeReadablePort( midiPort * _port,
 						const QString & _dest,
 						bool _subscribe )
 {
-	if( _subscribe &&( m_portIDs.contains( _port ) == FALSE ||
-					_port->inputEnabled() == FALSE ) )
+	if( !m_portIDs.contains( _port ) || m_portIDs[_port][0] < 0 )
 	{
-		printf( "port %s can't be (un)subscribed!\n",
-					_port->name().toAscii().constData() );
 		return;
 	}
 	snd_seq_addr_t sender;
@@ -367,11 +365,8 @@ void midiALSASeq::subscribeWriteablePort( midiPort * _port,
 						const QString & _dest,
 						bool _subscribe )
 {
-	if( _subscribe && ( m_portIDs.contains( _port ) == FALSE ||
-					_port->outputEnabled() == FALSE ) )
+	if( !m_portIDs.contains( _port ) || m_portIDs[_port][1] < 0 )
 	{
-		printf( "port %s can't be (un)subscribed!\n",
-					_port->name().toAscii().constData() );
 		return;
 	}
 	snd_seq_addr_t dest;
@@ -383,10 +378,8 @@ void midiALSASeq::subscribeWriteablePort( midiPort * _port,
 	}
 	snd_seq_port_info_t * port_info;
 	snd_seq_port_info_malloc( &port_info );
-	snd_seq_get_port_info( m_seqHandle, ( m_portIDs[_port][1] == -1 ) ?
-						m_portIDs[_port][0] :
-						m_portIDs[_port][1],
-						port_info );
+	snd_seq_get_port_info( m_seqHandle, m_portIDs[_port][1] == -1,
+								port_info );
 	const snd_seq_addr_t * sender = snd_seq_port_info_get_addr( port_info );
 	snd_seq_port_subscribe_t * subs;
 	snd_seq_port_subscribe_malloc( &subs );
@@ -485,7 +478,8 @@ void midiALSASeq::run( void )
 				break;
 
 			case SND_SEQ_EVENT_CONTROLLER:
-				dest->processInEvent( midiEvent( MidiControlChange,
+				dest->processInEvent( midiEvent(
+							MidiControlChange,
 						ev->data.control.channel,
 						ev->data.control.param,
 						ev->data.control.value ),

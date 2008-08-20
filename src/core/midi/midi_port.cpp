@@ -124,7 +124,7 @@ void midiPort::setMode( Modes _mode )
 void midiPort::processInEvent( const midiEvent & _me, const midiTime & _time )
 {
 	// mask event
-	if( ( mode() == Input || mode() == Duplex ) &&
+	if( inputEnabled() &&
 		( inputChannel()-1 == _me.m_channel || inputChannel() == 0 ) )
 	{
 		if( _me.m_type == MidiNoteOn ||
@@ -152,7 +152,7 @@ void midiPort::processInEvent( const midiEvent & _me, const midiTime & _time )
 void midiPort::processOutEvent( const midiEvent & _me, const midiTime & _time )
 {
 	// mask event
-	if( ( mode() == Output || mode() == Duplex ) &&
+	if( outputEnabled() &&
 		( outputChannel()-1 == _me.m_channel && outputChannel() != 0 ) )
 	{
 		midiEvent ev = _me;
@@ -180,7 +180,7 @@ void midiPort::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	m_defaultVelocityOutEnabledModel.saveSettings( _doc, _this,
 								"defvelout" );
 
-	if( m_readableModel.value() == TRUE )
+	if( inputEnabled() )
 	{
 		QString rp;
 		for( midiPort::map::iterator it = m_readablePorts.begin();
@@ -199,7 +199,7 @@ void midiPort::saveSettings( QDomDocument & _doc, QDomElement & _this )
 		_this.setAttribute( "inports", rp );
 	}
 
-	if( m_writableModel.value() == TRUE )
+	if( outputEnabled() )
 	{
 		QString wp;
 		for( map::const_iterator it = m_writablePorts.begin();
@@ -235,7 +235,7 @@ void midiPort::loadSettings( const QDomElement & _this )
 
 	// restore connections
 
-	if( m_readableModel.value() == TRUE )
+	if( inputEnabled() )
 	{
 		QStringList rp = _this.attribute( "inports" ).split( ',' );
 		for( map::const_iterator it = m_readablePorts.begin();
@@ -248,7 +248,7 @@ void midiPort::loadSettings( const QDomElement & _this )
 		}
 	}
 
-	if( m_writableModel.value() == TRUE )
+	if( outputEnabled() )
 	{
 		QStringList wp = _this.attribute( "outports" ).split( ',' );
 		for( map::const_iterator it = m_writablePorts.begin();
@@ -276,24 +276,26 @@ void midiPort::updateMidiPortMode( void )
 	setMode( modeTable[m_readableModel.value()][m_writableModel.value()] );
 
 	// check whether we have to dis-check items in connection-menu
-	if( m_readableModel.value() == FALSE )
+	if( !inputEnabled() )
 	{
 		for( map::const_iterator it = m_readablePorts.begin();
 					it != m_readablePorts.end(); ++it )
 		{
-			if( it.value() == TRUE )
+			// subscribed?
+			if( it.value() )
 			{
 				subscribeReadablePort( it.key(), FALSE );
 			}
 		}
 	}
 
-	if( m_writableModel.value() == FALSE )
+	if( !outputEnabled() )
 	{
 		for( map::const_iterator it = m_writablePorts.begin();
 					it != m_writablePorts.end(); ++it )
 		{
-			if( it.value() == TRUE )
+			// subscribed?
+			if( it.value() )
 			{
 				subscribeWriteablePort( it.key(), FALSE );
 			}
@@ -368,7 +370,7 @@ void midiPort::subscribeReadablePort( const QString & _port, bool _subscribe )
 {
 	m_readablePorts[_port] = _subscribe;
 	// make sure, MIDI-port is configured for input
-	if( _subscribe == TRUE && mode() != Input && mode() != Duplex )
+	if( _subscribe == TRUE && !inputEnabled() )
 	{
 		m_readableModel.setValue( TRUE );
 	}
@@ -382,7 +384,7 @@ void midiPort::subscribeWriteablePort( const QString & _port, bool _subscribe )
 {
 	m_writablePorts[_port] = _subscribe;
 	// make sure, MIDI-port is configured for output
-	if( _subscribe == TRUE && mode() != Output && mode() != Duplex )
+	if( _subscribe == TRUE && !outputEnabled() )
 	{
 		m_writableModel.setValue( TRUE );
 	}
