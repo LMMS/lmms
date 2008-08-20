@@ -438,6 +438,7 @@ public slots:
 	virtual void setName( const QString & _new_name )
 	{
 		m_name = _new_name;
+		emit nameChanged();
 	}
 
 	void toggleSolo( void );
@@ -462,8 +463,9 @@ private:
 
 
 signals:
-	void trackContentObjectAdded( trackContentObject * );
 	void destroyed( void );
+	void nameChanged( void );
+	void trackContentObjectAdded( trackContentObject * );
 
 } ;
 

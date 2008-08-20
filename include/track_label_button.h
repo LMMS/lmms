@@ -59,7 +59,6 @@ public slots:
 
 
 signals:
-	void nameChanged( void );
 	void pixmapChanged( void );
 
 

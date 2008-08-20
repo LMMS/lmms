@@ -311,6 +311,9 @@ bbTrack::bbTrack( trackContainer * _tc ) :
 	setName( tr( "Beat/Bassline %1" ).arg( bbNum ) );
 	engine::getBBTrackContainer()->setCurrentBB( bbNum );
 	engine::getBBTrackContainer()->updateComboBox();
+
+	connect( this, SIGNAL( nameChanged() ),
+		engine::getBBTrackContainer(), SLOT( updateComboBox() ) );
 }
 
 
@@ -530,8 +533,6 @@ bbTrackView::bbTrackView( bbTrack * _bbt, trackContainerView * _tcv ) :
 	m_trackLabel->show();
 	connect( m_trackLabel, SIGNAL( clicked( bool ) ),
 			this, SLOT( clickedTrackLabel() ) );
-	connect( m_trackLabel, SIGNAL( nameChanged() ),
-		engine::getBBTrackContainer(), SLOT( updateComboBox() ) );
 	connect( m_trackLabel, SIGNAL( pixmapChanged() ),
 		engine::getBBTrackContainer(), SLOT( updateComboBox() ) );
 	setModel( _bbt );
