@@ -74,11 +74,24 @@ public:
 		m_sampleExact = _exact;
 	}
 
-	ControllerTypes type( void ) const
+	inline ControllerTypes type( void ) const
 	{
 		return( m_type );
 	}
 
+	// return whether this controller updates models frequently - used for
+	// determining when to update GUI
+	inline bool frequentUpdates( void ) const
+	{
+		switch( m_type )
+		{
+			case LfoController: return( TRUE );
+			case PeakController: return( TRUE );
+			default:
+				break;
+		}
+		return( FALSE );
+	}
 
 	virtual const QString & name( void ) const
 	{

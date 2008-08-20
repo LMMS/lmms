@@ -603,6 +603,8 @@ void knob::enterValue( void )
 void knob::friendlyUpdate( void )
 {
 	if( model()->getControllerConnection() == NULL ||
+		model()->getControllerConnection()->getController()->
+						frequentUpdates() == FALSE ||
 				controller::runningFrames() % (256*4) == 0 )
 	{
 		update();
