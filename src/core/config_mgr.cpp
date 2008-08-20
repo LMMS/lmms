@@ -36,6 +36,15 @@
 #include "main_window.h"
 
 
+static inline QString ensureTrailingSlash( const QString & _s )
+{
+	if( _s.right( 1 ) != QDir::separator() )
+	{
+		return( _s + QDir::separator() );
+	}
+	return( _s );
+}
+
 
 configManager * configManager::s_instanceOfMe = NULL;
 
@@ -44,7 +53,7 @@ configManager::configManager( void ) :
 	m_lmmsRcFile( QDir::home().absolutePath() + QDir::separator() +
 								".lmmsrc.xml" ),
 	m_workingDir( QDir::home().absolutePath() + QDir::separator() +
-								"lmms" ),
+						"lmms" + QDir::separator() ),
 	m_dataDir( qApp->applicationDirPath()
 #ifdef LMMS_BUILD_WIN32
 			+ QDir::separator() + "data" + QDir::separator()
@@ -77,7 +86,7 @@ configManager::~configManager()
 
 void configManager::setWorkingDir( const QString & _wd )
 {
-	m_workingDir = _wd;
+	m_workingDir = ensureTrailingSlash( _wd );
 }
 
 
@@ -85,7 +94,7 @@ void configManager::setWorkingDir( const QString & _wd )
 
 void configManager::setVSTDir( const QString & _vd )
 {
-	m_vstDir = _vd;
+	m_vstDir = ensureTrailingSlash( _vd );
 }
 
 
@@ -93,7 +102,7 @@ void configManager::setVSTDir( const QString & _vd )
 
 void configManager::setArtworkDir( const QString & _ad )
 {
-	m_artworkDir = _ad;
+	m_artworkDir = ensureTrailingSlash( _ad );
 }
 
 
@@ -101,7 +110,7 @@ void configManager::setArtworkDir( const QString & _ad )
 
 void configManager::setFLDir( const QString & _fd )
 {
-	m_flDir = _fd;
+	m_flDir = ensureTrailingSlash( _fd );
 }
 
 
@@ -118,7 +127,7 @@ void configManager::setLADSPADir( const QString & _fd )
 void configManager::setSTKDir( const QString & _fd )
 {
 #ifdef LMMS_HAVE_STK
-	m_stkDir = _fd;
+	m_stkDir = ensureTrailingSlash( _fd );
 #endif
 }
 
@@ -254,22 +263,22 @@ bool configManager::loadConfigFile( void )
 			m_artworkDir += QDir::separator();
 		}
 	}
-	m_workingDir = value( "paths", "workingdir" );
-	m_vstDir = value( "paths", "vstdir" );
-	m_flDir = value( "paths", "fldir" );
-	m_ladDir = value( "paths", "laddir" );
+	setWorkingDir( value( "paths", "workingdir" ) );
+	setVSTDir( value( "paths", "vstdir" ) );
+	setFLDir( value( "paths", "fldir" ) );
+	setLADSPADir( value( "paths", "laddir" ) );
 #ifdef LMMS_HAVE_STK
-	m_stkDir = value( "paths", "stkdir" );
+	setSTKDir( value( "paths", "stkdir" ) );
 #endif
 
 	if( m_vstDir == "" )
 	{
-		m_vstDir = QDir::home().absolutePath();
+		m_vstDir = ensureTrailingSlash( QDir::home().absolutePath() );
 	}
 
 	if( m_flDir == "" )
 	{
-		m_flDir = QDir::home().absolutePath();
+		m_flDir = ensureTrailingSlash( QDir::home().absolutePath() );
 	}
 
 	if( m_ladDir == "" )
