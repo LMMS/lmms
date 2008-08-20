@@ -131,6 +131,11 @@ public:
 		return( &m_audioPort );
 	}
 
+	inline midiPort * getMidiPort( void )
+	{
+		return( &m_midiPort );
+	}
+
 	intModel * baseNoteModel( void )
 	{
 		return( &m_baseNoteModel );

@@ -101,7 +101,7 @@ notePlayHandle::notePlayHandle( instrumentTrack * _it,
 	setFrames( _frames );
 	// send MIDI-note-on-event
 	m_instrumentTrack->processOutEvent( midiEvent( MidiNoteOn,
-				m_instrumentTrack->m_midiPort.outputChannel(),
+			m_instrumentTrack->getMidiPort()->outputChannel(),
 					key(),
 				tLimit<Uint16>(
 				(Uint16) ( ( getVolume() / 100.0f ) *
@@ -303,7 +303,7 @@ void notePlayHandle::noteOff( const f_cnt_t _s )
 			m_instrumentTrack->m_soundShaping.releaseFrames() );
 	// send MIDI-note-off-event
 	m_instrumentTrack->processOutEvent( midiEvent( MidiNoteOff,
-				m_instrumentTrack->m_midiPort.outputChannel(),
+			m_instrumentTrack->getMidiPort()->outputChannel(),
 								key(), 0 ),
 			midiTime::fromFrames( m_framesBeforeRelease,
 						engine::framesPerTick() ) );
