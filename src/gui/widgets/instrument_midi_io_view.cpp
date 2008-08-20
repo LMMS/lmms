@@ -47,7 +47,8 @@ instrumentMidiIOView::instrumentMidiIOView( QWidget * _parent ) :
 	m_rpBtn( NULL ),
 	m_wpBtn( NULL )
 {
-	m_setupTabWidget = new tabWidget( tr( "MIDI-SETUP FOR THIS CHANNEL" ),
+	m_setupTabWidget = new tabWidget(
+					tr( "MIDI SETUP FOR THIS INSTRUMENT" ),
 									this );
 	m_setupTabWidget->setGeometry( 4, 5, 238, 200 );
 
@@ -73,10 +74,9 @@ instrumentMidiIOView::instrumentMidiIOView( QWidget * _parent ) :
 			m_inputChannelSpinBox, SLOT( setEnabled( bool ) ) );
 
 
-	m_defaultVelocityInCheckBox = new ledCheckBox(
-			tr( "Default velocity for all input-events" ),
-			m_setupTabWidget );
-	m_defaultVelocityInCheckBox->move( 28, 84 );
+	m_defaultVelocityInCheckBox = new ledCheckBox( tr( "Equal velocity" ),
+							m_setupTabWidget );
+	m_defaultVelocityInCheckBox->move( 28, 86 );
 
 
 	m_sendCheckBox = new ledCheckBox( tr( "Send MIDI-events" ),
@@ -86,13 +86,12 @@ instrumentMidiIOView::instrumentMidiIOView( QWidget * _parent ) :
 			m_outputChannelSpinBox, SLOT( setEnabled( bool ) ) );
 
 
-	m_defaultVelocityOutCheckBox = new ledCheckBox(
-				tr( "Default velocity for all output-events" ),
-					m_setupTabWidget );
-	m_defaultVelocityOutCheckBox->move( 28, 164 );
+	m_defaultVelocityOutCheckBox = new ledCheckBox( tr( "Equal velocity" ),
+							m_setupTabWidget );
+	m_defaultVelocityOutCheckBox->move( 28, 166 );
 
 
-	if( !engine::getMixer()->getMIDIClient()->isRaw() )
+	if( !engine::getMixer()->getMidiClient()->isRaw() )
 	{
 		m_rpBtn = new QToolButton( m_setupTabWidget );
 		m_rpBtn->setText( tr( "MIDI-devices to receive "
