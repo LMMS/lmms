@@ -122,9 +122,9 @@ public:
 				castValue<T>( m_range * 
 					 m_controllerConnection->currentValue(
 							_frameOffset ) );
-			if( m_step != 0 )
+			if( m_step == 1 )
 			{
-				return( roundf( v / m_step ) * m_step );
+				return( roundf( v ) );
 			}
 			return( v );
 		}

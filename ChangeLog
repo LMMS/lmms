@@ -6,6 +6,10 @@
 
 2008-08-20	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* include/automatable_model.h:
+	restored old controller-behaviour for all models whose step-size is
+	not 1, i.e. only round for integer models
+
 	* plugins/sid/sid_instrument.h:
 	* plugins/sid/test.png:
 	* plugins/sid/sid_instrument.cpp:
