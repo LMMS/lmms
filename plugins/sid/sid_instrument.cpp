@@ -72,8 +72,8 @@ plugin::descriptor PLUGIN_EXPORT sid_plugin_descriptor =
 {
 	STRINGIFY_PLUGIN_NAME( PLUGIN_NAME ),
 	"SID",
-	QT_TRANSLATE_NOOP( "pluginBrowser", "Emulation of the MOS6581 SID.\n"\
-						"This chip was used in the Commodore 64 computer." ),
+	QT_TRANSLATE_NOOP( "pluginBrowser", "Emulation of the MOS6581 and MOS8580 "
+					"SID.\nThis chip was used in the Commodore 64 computer." ),
 
 	"Csaba Hruska <csaba.hruska/at/gmail.com>"
 	"Attila Herman <attila589/at/gmail.com>",
@@ -104,7 +104,8 @@ voiceObject::voiceObject( model * _parent, int _idx ) :
 
 	m_syncModel( false, this, tr( "Voice %1 sync" ).arg( _idx+1 ) ),
 	m_ringModModel( false, this, tr( "Voice %1 ring modulate" ).arg( _idx+1 ) ),
-	m_filteredModel( false, this, tr( "Voice %1 filtered" ).arg( _idx+1 ) )
+	m_filteredModel( false, this, tr( "Voice %1 filtered" ).arg( _idx+1 ) ),
+	m_testModel( false, this, tr( "Voice %1 test" ).arg( _idx+1 ) )
 {
 }
 
@@ -124,7 +125,7 @@ sidInstrument::sidInstrument( instrumentTrack * _instrument_track ) :
 	// misc
 	m_voice3OffModel( false, this, tr( "Voice 3 off" ) ),
 	m_volumeModel( 15.0f, 0.0f, 15.0f, 1.0f, this, tr( "Volume" ) ),
-	m_chipModel( sidMOS6581, 0, NumChipModels-1, this, tr( "Chip model" ) )
+	m_chipModel( sidMOS8580, 0, NumChipModels-1, this, tr( "Chip model" ) )
 {
 	for( int i = 0; i < 3; ++i )
 	{
@@ -164,6 +165,8 @@ void sidInstrument::saveSettings( QDomDocument & _doc,
 										_doc, _this, "ringmod" + is );
 		m_voice[i]->m_filteredModel.saveSettings(
 										_doc, _this,"filtered" + is );
+		m_voice[i]->m_testModel.saveSettings(
+										_doc, _this, "test" + is );
 	}
 
 	// filter	
@@ -196,6 +199,7 @@ void sidInstrument::loadSettings( const QDomElement & _this )
 		m_voice[i]->m_syncModel.loadSettings( _this, "sync" + is );
 		m_voice[i]->m_ringModModel.loadSettings( _this, "ringmod" + is );
 		m_voice[i]->m_filteredModel.loadSettings( _this, "filtered" + is );
+		m_voice[i]->m_testModel.loadSettings( _this, "test" + is );
 	}
 	
 	// filter	
@@ -303,7 +307,7 @@ void sidInstrument::playNote( notePlayHandle * _n, bool,
 	{
 		SID *sid = new SID();
 		sid->set_sampling_parameters( clockrate, SAMPLE_FAST, samplerate );
-		sid->set_chip_model( MOS6581 );
+		sid->set_chip_model( MOS8580 );
 		sid->enable_filter( true );
 		sid->reset();
 		_n->m_pluginData = sid;
@@ -355,6 +359,7 @@ void sidInstrument::playNote( notePlayHandle * _n, bool,
 		data8 = _n->released()?0:1;
 		data8 += m_voice[i]->m_syncModel.value()?2:0;
 		data8 += m_voice[i]->m_ringModModel.value()?4:0;
+		data8 += m_voice[i]->m_testModel.value()?8:0;
 		switch( m_voice[i]->m_waveFormModel.value() )
 		{	
 			default: break;
@@ -538,26 +543,42 @@ sidInstrumentView::sidInstrumentView( instrument * _instrument,
 		knob *ak = new sidKnob( this );
 		ak->setHintText( tr("Attack:") + " ", "" );
 		ak->move( 7, 110 + i*50 );
+		ak->setWhatsThis( tr ( "Attack rate determines how rapidly the output "
+				"of Voice %1 rises from zero to peak amplitude." ).arg( i+1 ) );
 
 		knob *dk = new sidKnob( this );
 		dk->setHintText( tr("Decay:") + " ", "" );
 		dk->move( 7 + 29, 110 + i*50 );
+		dk->setWhatsThis( tr ( "Decay rate determines how rapidly the output "
+				"falls from the peak amplitude to the selected Sustain level." )
+				.arg( i+1 ) );
 
 		knob *sk = new sidKnob( this );
 		sk->setHintText( tr("Sustain:") + " ", "" );
 		sk->move( 7 + 2*29, 110 + i*50 );
+		sk->setWhatsThis( tr ( "Output of Voice %1 will remain at the selected "
+				"Sustain amplitude as long as the note is held." ).arg( i+1 ) );
 
 		knob *rk = new sidKnob( this );
 		rk->setHintText( tr("Release:") + " ", "" );
 		rk->move( 7 + 3*29, 110 + i*50 );
+		rk->setWhatsThis( tr ( "The output of of Voice %1 will fall from "
+				"Sustain amplitude to zero amplitude at the selected Release "
+				"rate." ).arg( i+1 ) );
 
 		knob *pwk = new sidKnob( this );
 		pwk->setHintText( tr("Pulse Width:") + " ", "" );
 		pwk->move( 7 + 4*29, 110 + i*50 );
+		pwk->setWhatsThis( tr ( "The Pulse Width resolution allows the width "
+				"to be smoothly swept with no discernable stepping. The Pulse "
+				"waveform on Oscillator %1 must be selected to have any audible"
+				" effect." ).arg( i+1 ) );
 
 		knob *crsk = new sidKnob( this );
 		crsk->setHintText( tr("Coarse:") + " ", " semitones" );
 		crsk->move( 160, 110 + i*50 );
+		crsk->setWhatsThis( tr ( "The Coarse detuning allows to detune Voice "
+				"%1 one octave up or down." ).arg( i+1 ) );
 
 		pixmapButton * pulse_btn = new pixmapButton( this, NULL );
 		pulse_btn->move( 191, 103 + i*50 );
@@ -599,6 +620,8 @@ sidInstrumentView::sidInstrumentView( instrument * _instrument,
 		wfbg->addButton( saw_btn );
 		wfbg->addButton( noise_btn );
 
+		int syncRingWidth[] = { 3, 1, 2 };
+
 		pixmapButton * sync_btn = new pixmapButton( this, NULL );
 		sync_btn->setCheckable( TRUE );
 		sync_btn->move( 191, 117 + i*50 );
@@ -607,6 +630,10 @@ sidInstrumentView::sidInstrumentView( instrument * _instrument,
 		sync_btn->setInactiveGraphic(
 			PLUGIN_NAME::getIconPixmap( "sync" ) );
 		toolTip::add( sync_btn, tr( "Sync" ) );
+		sync_btn->setWhatsThis( tr ( "Sync synchronizes the fundamental "
+			"frequency of Oscillator %1 with the fundamental frequency of "
+			"Oscillator %2 producing \"Hard Sync\" effects." ).arg( i+1 )
+			.arg( syncRingWidth[i] ) );
 
 		pixmapButton * ringMod_btn = new pixmapButton( this, NULL );
 		ringMod_btn->setCheckable( TRUE );
@@ -616,43 +643,38 @@ sidInstrumentView::sidInstrumentView( instrument * _instrument,
 		ringMod_btn->setInactiveGraphic(
 			PLUGIN_NAME::getIconPixmap( "ring" ) );
 		toolTip::add( ringMod_btn, tr( "Ring-Mod" ) );
+		ringMod_btn->setWhatsThis( tr ( "Ring-mod replaces the Triangle "
+			"Waveform output of Oscillator %1 with a \"Ring Modulated\" "
+			"combination of Oscillators %1 and %2." ).arg( i+1 )
+			.arg( syncRingWidth[i] ) );
 
 		pixmapButton * filter_btn = new pixmapButton( this, NULL );
 		filter_btn->setCheckable( TRUE );
-		filter_btn->move( 204, 131 + i*50 );
+		filter_btn->move( 191, 131 + i*50 );
 		filter_btn->setActiveGraphic(
 			PLUGIN_NAME::getIconPixmap( "filterred" ) );
 		filter_btn->setInactiveGraphic(
 			PLUGIN_NAME::getIconPixmap( "filter" ) );
 		toolTip::add( filter_btn, tr( "Filtered" ) );
+		filter_btn->setWhatsThis( tr ( "When Filtered is on, Voice %1 will be "
+			"processed through the Filter. When Filtered is off, Voice %1 "
+			"appears directly at the output, and the Filter has no effect on "
+			"it." ).arg( i+1 ) );
+
+		pixmapButton * test_btn = new pixmapButton( this, NULL );
+		test_btn->setCheckable( TRUE );
+		test_btn->move( 191 +2*14, 131 + i*50 );
+		test_btn->setActiveGraphic(
+			PLUGIN_NAME::getIconPixmap( "testred" ) );
+		test_btn->setInactiveGraphic(
+			PLUGIN_NAME::getIconPixmap( "test" ) );
+		toolTip::add( test_btn, tr( "Test" ) );
+		test_btn->setWhatsThis( tr ( "Test, when set, resets and locks "
+			"Oscillator %1 at zero until Test is turned off." ).arg( i+1 ) );
 
 		m_voiceKnobs[i] = voiceKnobs( ak, dk, sk, rk, pwk, crsk, wfbg,
-										sync_btn, ringMod_btn, filter_btn );
+								sync_btn, ringMod_btn, filter_btn, test_btn );
 	}
-
-	for( int i = 0; i < 3; ++i )
-	{
-		connect( m_voiceKnobs[i].m_attKnob, SIGNAL( sliderMoved( float ) ),
-			this, SLOT( updateKnobHint() ) );
-		connect( m_voiceKnobs[i].m_decKnob, SIGNAL( sliderMoved( float ) ),
-			this, SLOT( updateKnobHint() ) );
-		connect( m_voiceKnobs[i].m_relKnob, SIGNAL( sliderMoved( float ) ),
-			this, SLOT( updateKnobHint() ) );
-		connect( m_voiceKnobs[i].m_pwKnob, SIGNAL( sliderMoved( float ) ),
-			this, SLOT( updateKnobHint() ) );
-		connect( m_voiceKnobs[i].m_sustKnob, SIGNAL( sliderMoved( float ) ),
-			this, SLOT( updateKnobToolTip() ) );
-		connect( m_voiceKnobs[i].m_crsKnob, SIGNAL( sliderMoved( float ) ),
-			this, SLOT( updateKnobToolTip() ) );
-	}
-	connect( m_volKnob, SIGNAL( sliderMoved( float ) ),
-		this, SLOT( updateKnobToolTip() ) );
-	connect( m_resKnob, SIGNAL( sliderMoved( float ) ),
-		this, SLOT( updateKnobToolTip() ) );
-	connect( m_cutKnob, SIGNAL( sliderMoved( float ) ),
-		this, SLOT( updateKnobHint() ) );
-	updateKnobHint();
-	updateKnobToolTip();
 }
 
 
@@ -754,7 +776,35 @@ void sidInstrumentView::modelChanged( void )
 					&k->m_voice[i]->m_ringModModel );
 		m_voiceKnobs[i].m_filterButton->setModel(
 					&k->m_voice[i]->m_filteredModel );
+		m_voiceKnobs[i].m_testButton->setModel(
+					&k->m_voice[i]->m_testModel );
 	}
+
+	for( int i = 0; i < 3; ++i )
+	{
+		connect( &k->m_voice[i]->m_attackModel, SIGNAL( dataChanged() ),
+			this, SLOT( updateKnobHint() ) );
+		connect( &k->m_voice[i]->m_decayModel, SIGNAL( dataChanged() ),
+			this, SLOT( updateKnobHint() ) );
+		connect( &k->m_voice[i]->m_releaseModel, SIGNAL( dataChanged() ),
+			this, SLOT( updateKnobHint() ) );
+		connect( &k->m_voice[i]->m_pulseWidthModel, SIGNAL( dataChanged() ),
+			this, SLOT( updateKnobHint() ) );
+		connect( &k->m_voice[i]->m_sustainModel, SIGNAL( dataChanged() ),
+			this, SLOT( updateKnobToolTip() ) );
+		connect( &k->m_voice[i]->m_coarseModel, SIGNAL( dataChanged() ),
+			this, SLOT( updateKnobToolTip() ) );
+	}
+	
+	connect( &k->m_volumeModel, SIGNAL( dataChanged() ),
+		this, SLOT( updateKnobToolTip() ) );
+	connect( &k->m_filterResonanceModel, SIGNAL( dataChanged() ),
+		this, SLOT( updateKnobToolTip() ) );
+	connect( &k->m_filterFCModel, SIGNAL( dataChanged() ),
+		this, SLOT( updateKnobHint() ) );
+
+	updateKnobHint();
+	updateKnobToolTip();
 }
 
 

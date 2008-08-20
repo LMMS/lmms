@@ -64,6 +64,7 @@ private:
 	boolModel m_syncModel;
 	boolModel m_ringModModel;
 	boolModel m_filteredModel;
+	boolModel m_testModel;
 
 	friend class sidInstrument;
 	friend class sidInstrumentView;
@@ -154,7 +155,8 @@ private:
 					automatableButtonGroup * wfbg,
 					pixmapButton * syncb,
 					pixmapButton * ringb,
-					pixmapButton * filterb ) :
+					pixmapButton * filterb,
+					pixmapButton * testb ) :
 			m_attKnob( a ),
 			m_decKnob( d ),
 			m_sustKnob( s ),
@@ -164,7 +166,8 @@ private:
 			m_waveFormBtnGrp( wfbg ),
 			m_syncButton( syncb ),
 			m_ringModButton( ringb ),
-			m_filterButton( filterb )
+			m_filterButton( filterb ),
+			m_testButton( testb )
 		{
 		}
 		voiceKnobs()
@@ -180,6 +183,7 @@ private:
 		pixmapButton * m_syncButton;
 		pixmapButton * m_ringModButton;
 		pixmapButton * m_filterButton;
+		pixmapButton * m_testButton;
 	} ;
 
 	voiceKnobs m_voiceKnobs[3];
