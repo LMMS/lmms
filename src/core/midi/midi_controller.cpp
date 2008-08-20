@@ -42,7 +42,7 @@ midiController::midiController( model * _parent ) :
 	controller( MidiController, _parent, tr( "MIDI Controller" ) ),
 	midiEventProcessor(),
 	m_midiPort( tr( "unnamed_midi_controller" ),
-			engine::getMixer()->getMIDIClient(), this, this,
+			engine::getMixer()->getMidiClient(), this, this,
 							midiPort::Input ),
 	m_lastValue( 0.0f )
 {

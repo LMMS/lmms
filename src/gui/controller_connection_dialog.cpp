@@ -160,7 +160,7 @@ controllerConnectionDialog::controllerConnectionDialog( QWidget * _parent,
 
 	// when using with non-raw-clients we can provide buttons showing
 	// our port-menus when being clicked
-	if( !engine::getMixer()->getMIDIClient()->isRaw() )
+	if( !engine::getMixer()->getMidiClient()->isRaw() )
 	{
 		m_readablePorts = new midiPortMenu( midiPort::Input );
 

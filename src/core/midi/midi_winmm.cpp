@@ -62,23 +62,6 @@ midiWinMM::~midiWinMM()
 
 
 
-QString midiWinMM::probeDevice( void )
-{
-	QString dev = configManager::inst()->value( "midiwinmm", "device" );
-	if( dev == "" )
-	{
-		if( getenv( "MIDIDEV" ) != NULL )
-		{
-			return( getenv( "MIDIDEV" ) );
-		}
-		return( "default" );
-	}
-	return( dev );
-}
-
-
-
-
 void midiWinMM::processOutEvent( const midiEvent & _me,
 						const midiTime & _time,
 						const midiPort * _port )
@@ -183,7 +166,7 @@ void midiWinMM::subscribeWriteablePort( midiPort * _port,
 void midiWinMM::inputCallback( HMIDIIN _hm, UINT _msg, DWORD_PTR _inst,
 					DWORD_PTR _param1, DWORD_PTR _param2 )
 {
-	printf("callback: %d %d\n", _msg, _param1 );
+	printf( "callback: %d %d\n", _msg, _param1 );
 	if( _msg == MIM_DATA )
 	{
 		( (midiWinMM *) _inst )->handleInputEvent( _hm, _param1 );
@@ -317,12 +300,6 @@ void midiWinMM::openDevices( void )
 midiWinMM::setupWidget::setupWidget( QWidget * _parent ) :
 	midiClient::setupWidget( midiWinMM::name(), _parent )
 {
-	m_device = new QLineEdit( midiWinMM::probeDevice(), this );
-	m_device->setGeometry( 10, 20, 160, 20 );
-
-	QLabel * dev_lbl = new QLabel( tr( "DEVICE" ), this );
-	dev_lbl->setFont( pointSize<6>( dev_lbl->font() ) );
-	dev_lbl->setGeometry( 10, 40, 160, 10 );
 }
 
 
@@ -333,13 +310,6 @@ midiWinMM::setupWidget::~setupWidget()
 }
 
 
-
-
-void midiWinMM::setupWidget::saveSettings( void )
-{
-	configManager::inst()->setValue( "midiwinmm", "device",
-							m_device->text() );
-}
 
 
 #include "moc_midi_winmm.cxx"

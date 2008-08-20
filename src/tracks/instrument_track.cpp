@@ -95,7 +95,7 @@ instrumentTrack::instrumentTrack( trackContainer * _tc ) :
 	track( InstrumentTrack, _tc ),
 	midiEventProcessor(),
 	m_audioPort( tr( "unnamed_track" ) ),
-	m_midiPort( tr( "unnamed_track" ), engine::getMixer()->getMIDIClient(),
+	m_midiPort( tr( "unnamed_track" ), engine::getMixer()->getMidiClient(),
 								this, this ),
 	m_notes(),
 	m_baseNoteModel( 0, 0, KeysPerOctave * NumOctaves - 1, this ),
@@ -811,7 +811,7 @@ instrumentTrackView::instrumentTrackView( instrumentTrack * _it,
 	m_midiMenu = new QMenu( tr( "MIDI" ), this );
 
 	// sequenced MIDI?
-	if( !engine::getMixer()->getMIDIClient()->isRaw() )
+	if( !engine::getMixer()->getMidiClient()->isRaw() )
 	{
 		_it->m_midiPort.m_readablePortsMenu = new midiPortMenu(
 							midiPort::Input );

@@ -386,7 +386,7 @@ mixer::~mixer()
 void mixer::initDevices( void )
 {
 	m_audioDev = tryAudioDevices();
-	m_midiClient = tryMIDIClients();
+	m_midiClient = tryMidiClients();
 }
 
 
@@ -1004,7 +1004,7 @@ audioDevice * mixer::tryAudioDevices( void )
 
 
 
-midiClient * mixer::tryMIDIClients( void )
+midiClient * mixer::tryMidiClients( void )
 {
 	QString client_name = configManager::inst()->value( "mixer",
 								"mididev" );

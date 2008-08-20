@@ -223,7 +223,7 @@ public:
 		return( m_midiClientName );
 	}
 
-	inline midiClient * getMIDIClient( void )
+	inline midiClient * getMidiClient( void )
 	{
 		return( m_midiClient );
 	}
@@ -417,7 +417,7 @@ private:
 
 
 	audioDevice * tryAudioDevices( void );
-	midiClient * tryMIDIClients( void );
+	midiClient * tryMidiClients( void );
 
 
 	const surroundSampleFrame * renderNextBuffer( void );

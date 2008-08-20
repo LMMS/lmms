@@ -1,5 +1,26 @@
 2008-08-20	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* include/controller.h:
+	* src/gui/widgets/knob.cpp:
+	only skip GUI-updates when connected to frequently changing controllers
+
+	* include/automatable_model.h:
+	when connected to controller and returning current value, respect
+	step-property of automatableModel
+
+	* src/gui/widgets/instrument_midi_io_view.cpp:
+	minor UI improvements
+
+	* include/midi_winmm.h:
+	* include/mixer.h:
+	* src/core/midi/midi_controller.cpp:
+	* src/core/midi/midi_port.cpp:
+	* src/core/midi/midi_winmm.cpp:
+	* src/core/mixer.cpp:
+	* src/gui/controller_connection_dialog.cpp:
+	* src/tracks/instrument_track.cpp:
+	cleanups and coding-style fixes
+
 	* src/core/midi/midi_alsa_seq.cpp:
 	* src/core/midi/midi_port.cpp:
 	- fixed crash when changing mode of midiPort
