@@ -118,10 +118,15 @@ public:
 	{
 		if( m_controllerConnection != NULL )
 		{
-			return minValue<T>() +
+			const float v = minValue<T>() +
 				castValue<T>( m_range * 
 					 m_controllerConnection->currentValue(
 							_frameOffset ) );
+			if( m_step != 0 )
+			{
+				return( roundf( v / m_step ) * m_step );
+			}
+			return( v );
 		}
 
 		return castValue<T>( m_value );
