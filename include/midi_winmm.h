@@ -113,6 +113,10 @@ public:
 		setupWidget( QWidget * _parent );
 		virtual ~setupWidget();
 
+		virtual void saveSettings( void )
+		{
+		}
+
 	} ;
 
 
