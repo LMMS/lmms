@@ -150,7 +150,7 @@ public:
 		return( 1.0f - fast_rand() * 2.0f / FAST_RAND_MAX );
 	}
 
-	inline sample_t userWaveSample( const float _sample )
+	inline sample_t userWaveSample( const float _sample ) const
 	{
 		return( m_userWave->userWaveSample( _sample ) );
 	}
