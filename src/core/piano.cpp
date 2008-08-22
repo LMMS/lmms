@@ -242,6 +242,45 @@ pianoView::~pianoView()
  */
 int pianoView::getKeyFromScancode( int _k )
 {
+#ifdef LMMS_BUILD_WIN32
+	switch( _k )
+	{
+		case 45: return( 0 ); // Y  = C
+		case 31: return( 1 ); // S  = C#
+		case 46: return( 2 ); // X  = D
+		case 32: return( 3 ); // D  = D#
+		case 47: return( 4 ); // C  = E
+		case 48: return( 5 ); // V  = F
+		case 34: return( 6 ); // G  = F#
+		case 49: return( 7 ); // B  = G
+		case 35: return( 8 ); // H  = G#
+		case 50: return( 9 ); // N  = A
+		case 36: return( 10 ); // J = A#
+		case 51: return( 11 ); // M = B
+		case 52: return( 12 ); // , = c
+		case 38: return( 13 ); // L = c#
+		case 53: return( 14 ); // . = d
+		case 39: return( 15 ); // ; = d#
+		case 86: return( 16 ); // / = e
+		case 16: return( 12 ); // Q = c
+		case 3: return( 13 ); // 2 = c#
+		case 17: return( 14 ); // W = d
+		case 4: return( 15 ); // 3 = d#
+		case 18: return( 16 ); // E = e
+		case 19: return( 17 ); // R = f
+		case 6: return( 18 ); // 5 = f#
+		case 20: return( 19 ); // T = g
+		case 7: return( 20 ); // 6 = g#
+		case 21: return( 21 ); // Z = a
+		case 8: return( 22 ); // 7 = a#
+		case 22: return( 23 ); // U = b
+		case 23: return( 24 ); // I = c'
+		case 10: return( 25 ); // 9 = c'#
+		case 24: return( 26 ); // O = d'
+		case 11: return( 27 ); // 0 = d'#
+		case 25: return( 28 ); // P = e'
+	}
+#else
 	switch( _k )
 	{
 		case 52: return( 0 ); // Y  = C
@@ -279,6 +318,7 @@ int pianoView::getKeyFromScancode( int _k )
 		case 19: return( 27 ); // 0 = d'#
 		case 33: return( 28 ); // P = e'
 	}
+#endif
 
 	return( -100 );
 }
