@@ -1843,14 +1843,11 @@ void automationEditor::selectAll( void )
 		return;
 	}
 
-	//TODO: Add constant
-	int len_ticks = 4;
-
 	timeMap & time_map = m_pattern->getTimeMap();
 
 	timeMap::iterator it = time_map.begin();
 	m_selectStartTick = 0;
-	m_selectedTick = it.key() + len_ticks;
+	m_selectedTick = m_pattern->length();
 	m_selectStartLevel = it.value();
 	m_selectedLevels = 1;
 
