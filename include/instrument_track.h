@@ -50,6 +50,7 @@ class instrumentTrackWindow;
 class instrumentMidiIOView;
 class lcdSpinBox;
 class midiPortMenu;
+class multimediaProject;
 class notePlayHandle;
 class pluginView;
 class presetPreviewPlayHandle;
@@ -152,6 +153,9 @@ public:
 	}
 
 	virtual QString displayName( void ) const;
+
+	// simple helper for removing midiport-XML-node when loading presets
+	static void removeMidiPortNode( multimediaProject & _mmp );
 
 
 signals:

@@ -442,6 +442,15 @@ QString instrumentTrack::displayName( void ) const
 
 
 
+void instrumentTrack::removeMidiPortNode( multimediaProject & _mmp )
+{
+	QDomNodeList n = _mmp.elementsByTagName( "midiport" );
+	n.item( 0 ).parentNode().removeChild( n.item( 0 ) );
+}
+
+
+
+
 bool instrumentTrack::play( const midiTime & _start,
 					const fpp_t _frames,
 					const f_cnt_t _offset,
@@ -1349,8 +1358,9 @@ void instrumentTrackWindow::dropEvent( QDropEvent * _de )
 	else if( type == "presetfile" )
 	{
 		multimediaProject mmp( value );
-		m_track->loadTrackSpecificSettings( mmp.content().firstChild().
-								toElement() );
+		instrumentTrack::removeMidiPortNode( mmp );
+		m_track->setSimpleSerializing();
+		m_track->loadSettings( mmp.content().toElement() );
 		engine::getSong()->setModified();
 		_de->accept();
 	}

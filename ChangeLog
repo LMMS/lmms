@@ -1,5 +1,11 @@
 2008-08-22	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* include/instrument_track.h:
+	* src/gui/file_browser.cpp:
+	* src/tracks/instrument_track.cpp:
+	fixed loading presets when dragging them onto existing
+	instrument-track-window (finally closes #2025902)
+
 	* src/gui/piano_roll.cpp:
 	fixed moving selected notes (closes #2039248, #2039254, #2043463)
 
