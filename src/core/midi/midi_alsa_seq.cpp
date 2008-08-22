@@ -428,6 +428,10 @@ void midiALSASeq::run( void )
 		{
 			break;
 		}
+
+		do	// while event queue is not empty
+		{
+
 		snd_seq_event_t * ev;
 		snd_seq_event_input( m_seqHandle, &ev );
 
@@ -520,6 +524,8 @@ void midiALSASeq::run( void )
 						"event %d\n", ev->type );
 				break;
 		}
+
+		} while( snd_seq_event_input_pending( m_seqHandle, 0 ) > 0 );
 
 	}
 
