@@ -377,7 +377,12 @@ int main( int argc, char * * argv )
 		// splash-image - otherwise we get nasty edges etc.
 		const QPixmap splash = embed::getIconPixmap( "splash" );
     		const QPoint pt = QApplication::desktop()->
-			availableGeometry().center() - splash.rect().center();
+#ifdef LMMS_BUILD_LINUX
+			availableGeometry().
+#else
+			screenGeometry().
+#endif
+					center() - splash.rect().center();
 		QPixmap pm = QPixmap::grabWindow(
 					QApplication::desktop()->winId(),
 					pt.x(), pt.y(),
