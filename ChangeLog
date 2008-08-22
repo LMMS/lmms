@@ -1,5 +1,9 @@
 2008-08-22	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* src/gui/piano_roll.cpp:
+	fixed notes appearing X times in pattern when recording from
+	MIDI-device (closes #2058971)
+
 	* src/gui/automation_editor.cpp:
 	fixed selection of all bars via Ctrl+A (closes #2048163)
 

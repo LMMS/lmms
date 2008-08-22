@@ -472,6 +472,11 @@ pianoRoll::~pianoRoll()
 
 void pianoRoll::setCurrentPattern( pattern * _new_pattern )
 {
+	if( validPattern() )
+	{
+		m_pattern->getInstrumentTrack()->disconnect( this );
+	}
+
 	m_pattern = _new_pattern;
 	m_currentPosition = 0;
 	m_currentNote = NULL;
@@ -516,9 +521,6 @@ void pianoRoll::setCurrentPattern( pattern * _new_pattern )
 	// resizeEvent() does the rest for us (scrolling, range-checking
 	// of start-notes and so on...)
 	resizeEvent( NULL );
-
-	// remove all connections to other instrument-tracks
-	disconnect( this, SLOT( recordNote( const note & ) ) );
 
 	// and now connect to noteDone()-signal of channel so that
 	// we receive note-off-events from it's midi-port for recording it
@@ -2269,11 +2271,6 @@ void pianoRoll::recordNote( const note & _n )
 		note n( _n.length(), engine::getSong()->getPlayPos(
 				engine::getSong()->playMode() ) - _n.length(),
 				_n.key(), _n.getVolume(), _n.getPanning() );
-		/*
-		note n( _n.length(), engine::getSong()->getPlayPos(
-				song::Mode_PlayPattern ) - _n.length(),
-				_n.key(), _n.getVolume(), _n.getPanning() );
-		*/
 		n.quantizeLength( quantization() );
 		m_pattern->addNote( n );
 		update();
