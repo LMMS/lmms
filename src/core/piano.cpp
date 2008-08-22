@@ -245,21 +245,21 @@ int pianoView::getKeyFromScancode( int _k )
 #ifdef LMMS_BUILD_WIN32
 	switch( _k )
 	{
-		case 45: return( 0 ); // Y  = C
+		case 44: return( 0 ); // Y  = C
 		case 31: return( 1 ); // S  = C#
-		case 46: return( 2 ); // X  = D
+		case 45: return( 2 ); // X  = D
 		case 32: return( 3 ); // D  = D#
-		case 47: return( 4 ); // C  = E
-		case 48: return( 5 ); // V  = F
+		case 46: return( 4 ); // C  = E
+		case 47: return( 5 ); // V  = F
 		case 34: return( 6 ); // G  = F#
-		case 49: return( 7 ); // B  = G
+		case 48: return( 7 ); // B  = G
 		case 35: return( 8 ); // H  = G#
-		case 50: return( 9 ); // N  = A
+		case 49: return( 9 ); // N  = A
 		case 36: return( 10 ); // J = A#
-		case 51: return( 11 ); // M = B
-		case 52: return( 12 ); // , = c
+		case 50: return( 11 ); // M = B
+		case 51: return( 12 ); // , = c
 		case 38: return( 13 ); // L = c#
-		case 53: return( 14 ); // . = d
+		case 52: return( 14 ); // . = d
 		case 39: return( 15 ); // ; = d#
 		case 86: return( 16 ); // / = e
 		case 16: return( 12 ); // Q = c
