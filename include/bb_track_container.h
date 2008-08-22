@@ -61,6 +61,7 @@ public:
 
 	void updateBBTrack( trackContentObject * _tco );
 	void fixIncorrectPositions( void );
+	void createTCOsForBB( int _bb );
 
 
 public slots:
@@ -71,8 +72,6 @@ public slots:
 
 
 private:
-	void createTCOsForBB( int _bb );
-
 	comboBoxModel m_bbComboBoxModel;
 
 

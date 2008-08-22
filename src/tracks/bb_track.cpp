@@ -437,6 +437,10 @@ void bbTrack::saveTrackSpecificSettings( QDomDocument & _doc,
 		( (journallingObject *)( engine::getBBTrackContainer() ) )->
 						saveState( _doc, _this );
 	}
+	if( _this.parentNode().parentNode().nodeName() == "clone" )
+	{
+		_this.setAttribute( "clonebbt", s_infoMap[this] );
+	}
 }
 
 
@@ -448,13 +452,30 @@ void bbTrack::loadTrackSpecificSettings( const QDomElement & _this )
 	{
 		m_trackLabel->setPixmapFile( _this.attribute( "icon" ) );
 	}*/
-//	engine::getBBTrackContainer()->updateComboBox();
 
-	QDomNode node = _this.namedItem( trackContainer::classNodeName() );
-	if( node.isElement() )
+	if( _this.hasAttribute( "clonebbt" ) )
 	{
-		( (journallingObject *)engine::getBBTrackContainer() )->
+		const int src = _this.attribute( "clonebb" ).toInt();
+		const int dst = s_infoMap[this];
+		engine::getBBTrackContainer()->createTCOsForBB( dst );
+		trackContainer::trackList tl =
+					engine::getBBTrackContainer()->tracks();
+		for( trackContainer::trackList::iterator it = tl.begin();
+							it != tl.end(); ++it )
+		{
+			( *it )->getTCO( src )->copy();
+			( *it )->getTCO( dst )->paste();
+		}
+	}
+	else
+	{
+		QDomNode node = _this.namedItem(
+					trackContainer::classNodeName() );
+		if( node.isElement() )
+		{
+			( (journallingObject *)engine::getBBTrackContainer() )->
 					restoreState( node.toElement() );
+		}
 	}
 /*	doesn't work yet because bbTrack-ctor also sets current bb so if
 	bb-tracks are created after this function is called, this doesn't

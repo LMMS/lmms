@@ -1613,7 +1613,7 @@ track * track::create( TrackTypes _tt, trackContainer * _tc )
 
 
 
-/*! \brief Create a track from track type in a QDomElement and a container object.
+/*! \brief Create a track inside trackContainer from track type in a QDomElement and restore state from XML
  *
  *  \param _this The QDomElement containing the type of track to create
  *  \param _tc The track container to attach to

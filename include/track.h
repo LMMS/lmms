@@ -112,15 +112,15 @@ public:
 	virtual trackContentObjectView * createView( trackView * _tv ) = 0;
 
 
-protected:
-	virtual void undoStep( journalEntry & _je );
-	virtual void redoStep( journalEntry & _je );
-
-
-protected slots:
+public slots:
 	void copy( void );
 	void paste( void );
 	void toggleMute( void );
+
+
+protected:
+	virtual void undoStep( journalEntry & _je );
+	virtual void redoStep( journalEntry & _je );
 
 
 signals:
