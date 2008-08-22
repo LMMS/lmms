@@ -1489,10 +1489,8 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 			int pos_ticks = x * midiTime::ticksPerTact() / m_ppt +
 							m_currentPosition;
 
-			m_selectedTick = pos_ticks -
-							m_selectStartTick;
-			if( (int) m_selectStartTick + m_selectedTick <
-									0 )
+			m_selectedTick = pos_ticks - m_selectStartTick;
+			if( (int) m_selectStartTick + m_selectedTick < 0 )
 			{
 				m_selectedTick = -static_cast<int>(
 							m_selectStartTick );
@@ -1512,12 +1510,10 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 			// do horizontal move-stuff
 			int pos_ticks = x * midiTime::ticksPerTact() / m_ppt +
 							m_currentPosition;
-			int ticks_diff = pos_ticks -
-							m_moveStartTick;
+			int ticks_diff = pos_ticks - m_moveStartTick;
 			if( m_selectedTick > 0 )
 			{
-				if( (int) m_selectStartTick +
-							ticks_diff < 0 )
+				if( (int) m_selectStartTick + ticks_diff < 0 )
 				{
 					ticks_diff = -m_selectStartTick;
 				}
@@ -1525,18 +1521,13 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 			else
 			{
 				if( (int) m_selectStartTick +
-					m_selectedTick + ticks_diff <
-									0 )
+					m_selectedTick + ticks_diff < 0 )
 				{
-					ticks_diff = -(
-							m_selectStartTick +
+					ticks_diff = -( m_selectStartTick +
 							m_selectedTick );
 				}
 			}
 			m_selectStartTick += ticks_diff;
-
-			int tact_diff = ticks_diff / midiTime::ticksPerTact();
-			ticks_diff = ticks_diff % midiTime::ticksPerTact();
 
 			// do vertical move-stuff
 			int key_diff = key_num - m_moveStartKey;
@@ -1573,32 +1564,11 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 			}
 			m_selectStartKey += key_diff;
 
-
 			for( noteVector::iterator it =
 						m_selNotesForMove.begin();
 				it != m_selNotesForMove.end(); ++it )
 			{
-				int note_tact = ( *it )->pos().getTact() +
-								tact_diff;
-				int note_ticks = ( *it )->pos().getTicks() +
-								ticks_diff;
-				
-                // ensure note_ticks range
-                if( note_ticks > midiTime::ticksPerTact() )
-                {
-                    note_tact += (note_ticks/midiTime::ticksPerTact() );
-                    note_ticks %= midiTime::ticksPerTact();
-                }
-                /* Old 1/64th code
-				if( note_ticks >> 6 )
-				{
-					note_tact += note_ticks >> 6;
-					note_ticks &= 63;
-				}
-                */
-				midiTime new_note_pos( note_tact,
-							note_ticks );
-				( *it )->setPos( new_note_pos );
+				( *it )->setPos( ( *it )->pos() + ticks_diff );
 				( *it )->setKey( ( *it )->key() + key_diff );
 				*it = m_pattern->rearrangeNote( *it, FALSE );
 			}
