@@ -1,5 +1,15 @@
 2008-08-22	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* plugins/audio_file_processor/audio_file_processor.cpp:
+	* plugins/audio_file_processor/audio_file_processor.h:
+	* include/sample_buffer.h:
+	* src/core/sample_buffer.cpp:
+	fixed crashes when automating start- and end-point in
+	AudioFileProcessor (closes #2048125)
+
+	* include/oscillator.h:
+	made oscillator::userWaveSample() const
+
 	* include/instrument_track.h:
 	* src/gui/file_browser.cpp:
 	* src/tracks/instrument_track.cpp:

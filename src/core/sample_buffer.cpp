@@ -74,8 +74,8 @@ sampleBuffer::sampleBuffer( const QString & _audio_file,
 	m_frames( 0 ),
 	m_startFrame( 0 ),
 	m_endFrame( 0 ),
-	m_loop_startFrame( 0 ),
-	m_loop_endFrame( 0 ),
+	m_loopStartFrame( 0 ),
+	m_loopEndFrame( 0 ),
 	m_amplification( 1.0f ),
 	m_reversed( FALSE ),
 	m_frequency( BaseFreq ),
@@ -99,8 +99,8 @@ sampleBuffer::sampleBuffer( const sampleFrame * _data, const f_cnt_t _frames ) :
 	m_frames( 0 ),
 	m_startFrame( 0 ),
 	m_endFrame( 0 ),
-	m_loop_startFrame( 0 ),
-	m_loop_endFrame( 0 ),
+	m_loopStartFrame( 0 ),
+	m_loopEndFrame( 0 ),
 	m_amplification( 1.0f ),
 	m_reversed( FALSE ),
 	m_frequency( BaseFreq ),
@@ -126,8 +126,8 @@ sampleBuffer::sampleBuffer( const f_cnt_t _frames ) :
 	m_frames( 0 ),
 	m_startFrame( 0 ),
 	m_endFrame( 0 ),
-	m_loop_startFrame( 0 ),
-	m_loop_endFrame( 0 ),
+	m_loopStartFrame( 0 ),
+	m_loopEndFrame( 0 ),
 	m_amplification( 1.0f ),
 	m_reversed( FALSE ),
 	m_frequency( BaseFreq ),
@@ -174,8 +174,8 @@ void sampleBuffer::update( bool _keep_settings )
 		if( _keep_settings == FALSE )
 		{
 			m_frames = m_origFrames;
-			m_loop_startFrame = m_startFrame = 0;
-			m_loop_endFrame = m_endFrame = m_frames;
+			m_loopStartFrame = m_startFrame = 0;
+			m_loopEndFrame = m_endFrame = m_frames;
 		}
 	}
 	else if( m_audioFile != "" )
@@ -258,8 +258,8 @@ m_data[frame][chnl] = buf[idx] * fac;
 			m_data = new sampleFrame[1];
 			memset( m_data, 0, sizeof( *m_data ) );
 			m_frames = 1;
-			m_loop_startFrame = m_startFrame = 0;
-			m_loop_endFrame = m_endFrame = 1;
+			m_loopStartFrame = m_startFrame = 0;
+			m_loopEndFrame = m_endFrame = 1;
 		}
 	}
 	else
@@ -269,8 +269,8 @@ m_data[frame][chnl] = buf[idx] * fac;
 		m_data = new sampleFrame[1];
 		memset( m_data, 0, sizeof( *m_data ) );
 		m_frames = 1;
-		m_loop_startFrame = m_startFrame = 0;
-		m_loop_endFrame = m_endFrame = 1;
+		m_loopStartFrame = m_startFrame = 0;
+		m_loopEndFrame = m_endFrame = 1;
 	}
 
 	if( lock )
@@ -303,8 +303,8 @@ void sampleBuffer::normalizeSampleRate( const sample_rate_t _src_sr,
 	if( _keep_settings == FALSE )
 	{
 		// update frame-variables
-		m_loop_startFrame = m_startFrame = 0;
-		m_loop_endFrame = m_endFrame = m_frames;
+		m_loopStartFrame = m_startFrame = 0;
+		m_loopEndFrame = m_endFrame = m_frames;
 	}
 }
 
@@ -506,8 +506,10 @@ f_cnt_t sampleBuffer::decodeSampleDS( const char * _f,
 bool sampleBuffer::play( sampleFrame * _ab, handleState * _state,
 					const fpp_t _frames,
 					const float _freq,
-					const bool _looped ) const
+					const bool _looped )
 {
+	QMutexLocker ml( &m_varLock );
+
 	engine::getMixer()->clearAudioBuffer( _ab, _frames );
 
 	if( m_endFrame == 0 || _frames == 0 )
@@ -540,7 +542,7 @@ bool sampleBuffer::play( sampleFrame * _ab, handleState * _state,
 	{
 		play_frame = getLoopedIndex( play_frame );
 		frames_for_loop = static_cast<f_cnt_t>(
-					( m_loop_endFrame - play_frame ) /
+					( m_loopEndFrame - play_frame ) /
 								freq_factor );
 	}
 	else
@@ -628,7 +630,7 @@ sampleFrame * sampleBuffer::getSampleFragment( f_cnt_t _start,
 {
 	if( _looped )
 	{
-		if( _start + _frames <= m_loop_endFrame )
+		if( _start + _frames <= m_loopEndFrame )
 		{
 			return( m_data + _start );
 		}
@@ -645,13 +647,13 @@ sampleFrame * sampleBuffer::getSampleFragment( f_cnt_t _start,
 
 	if( _looped )
 	{
-		f_cnt_t copied = m_loop_endFrame - _start;
+		f_cnt_t copied = m_loopEndFrame - _start;
 		memcpy( *_tmp, m_data + _start, copied * BYTES_PER_FRAME );
-		f_cnt_t loop_frames = m_loop_endFrame - m_loop_startFrame;
+		f_cnt_t loop_frames = m_loopEndFrame - m_loopStartFrame;
 		while( _frames - copied > 0 )
 		{
 			f_cnt_t todo = tMin( _frames - copied, loop_frames );
-			memcpy( *_tmp + copied, m_data + m_loop_startFrame,
+			memcpy( *_tmp + copied, m_data + m_loopStartFrame,
 						todo * BYTES_PER_FRAME );
 			copied += todo;
 		}
@@ -672,12 +674,12 @@ sampleFrame * sampleBuffer::getSampleFragment( f_cnt_t _start,
 
 f_cnt_t sampleBuffer::getLoopedIndex( f_cnt_t _index ) const
 {
-	if( _index < m_loop_endFrame )
+	if( _index < m_loopEndFrame )
 	{
 		return( _index );
 	}
-	return( m_loop_startFrame + ( _index - m_loop_startFrame )
-				% ( m_loop_endFrame - m_loop_startFrame ) );
+	return( m_loopStartFrame + ( _index - m_loopStartFrame )
+				% ( m_loopEndFrame - m_loopStartFrame ) );
 }
 
 
@@ -1095,7 +1097,9 @@ void sampleBuffer::loadFromBase64( const QString & _data )
 
 void sampleBuffer::setStartFrame( const f_cnt_t _s )
 {
-	m_loop_startFrame = m_startFrame = _s;
+	m_varLock.lock();
+	m_loopStartFrame = m_startFrame = _s;
+	m_varLock.unlock();
 }
 
 
@@ -1103,7 +1107,9 @@ void sampleBuffer::setStartFrame( const f_cnt_t _s )
 
 void sampleBuffer::setEndFrame( const f_cnt_t _e )
 {
-	m_loop_endFrame = m_endFrame = _e;
+	m_varLock.lock();
+	m_loopEndFrame = m_endFrame = _e;
+	m_varLock.unlock();
 }
 
 

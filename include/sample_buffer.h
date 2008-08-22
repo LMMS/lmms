@@ -26,6 +26,7 @@
 #ifndef _SAMPLE_BUFFER_H
 #define _SAMPLE_BUFFER_H
 
+#include <QtCore/QMutex>
 #include <QtCore/QObject>
 #include <QtCore/QRect>
 
@@ -75,7 +76,7 @@ public:
 	bool play( sampleFrame * _ab, handleState * _state,
 				const fpp_t _frames,
 				const float _freq,
-				const bool _looped = FALSE ) const;
+				const bool _looped = FALSE );
 
 	void visualize( QPainter & _p, const QRect & _dr, const QRect & _clip );
 	inline void visualize( QPainter & _p, const QRect & _dr )
@@ -100,12 +101,16 @@ public:
 
 	void setLoopStartFrame( f_cnt_t _start )
 	{
-		m_loop_startFrame = _start;
+		m_varLock.lock();
+		m_loopStartFrame = _start;
+		m_varLock.unlock();
 	}
 
 	void setLoopEndFrame( f_cnt_t _end )
 	{
-		m_loop_endFrame = _end;
+		m_varLock.lock();
+		m_loopEndFrame = _end;
+		m_varLock.unlock();
 	}
 
 	inline f_cnt_t frames( void ) const
@@ -130,12 +135,16 @@ public:
 
 	inline void setFrequency( float _freq )
 	{
+		m_varLock.lock();
 		m_frequency = _freq;
+		m_varLock.unlock();
 	}
 
 	inline void setSampleRate( sample_rate_t _rate )
 	{
+		m_varLock.lock();
 		m_sampleRate = _rate;
+		m_varLock.unlock();
 	}
 
 	inline const sampleFrame * data( void ) const
@@ -219,11 +228,12 @@ private:
 	sampleFrame * m_origData;
 	f_cnt_t m_origFrames;
 	sampleFrame * m_data;
+	QMutex m_varLock;
 	f_cnt_t m_frames;
 	f_cnt_t m_startFrame;
 	f_cnt_t m_endFrame;
-	f_cnt_t m_loop_startFrame;
-	f_cnt_t m_loop_endFrame;
+	f_cnt_t m_loopStartFrame;
+	f_cnt_t m_loopEndFrame;
 	float m_amplification;
 	bool m_reversed;
 	float m_frequency;

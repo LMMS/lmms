@@ -83,9 +83,9 @@ audioFileProcessor::audioFileProcessor( instrumentTrack * _instrument_track ) :
 	connect( &m_ampModel, SIGNAL( dataChanged() ),
 				this, SLOT( ampModelChanged() ) );
 	connect( &m_startPointModel, SIGNAL( dataChanged() ),
-				this, SLOT( startPointModelChanged() ) );
+				this, SLOT( loopPointChanged() ) );
 	connect( &m_endPointModel, SIGNAL( dataChanged() ),
-				this, SLOT( endPointModelChanged() ) );
+				this, SLOT( loopPointChanged() ) );
 }
 
 
@@ -166,8 +166,7 @@ void audioFileProcessor::loadSettings( const QDomElement & _this )
 	m_startPointModel.loadSettings( _this, "sframe" );
 	m_endPointModel.loadSettings( _this, "eframe" );
 
-	startPointModelChanged();
-	endPointModelChanged();
+	loopPointChanged();
 }
 
 
@@ -235,8 +234,7 @@ void audioFileProcessor::setAudioFile( const QString & _audio_file,
 	// else we don't touch the track-name, because the user named it self
 
 	m_sampleBuffer.setAudioFile( _audio_file );
-	startPointModelChanged();
-	endPointModelChanged();
+	loopPointChanged();
 }
 
 
@@ -258,43 +256,14 @@ void audioFileProcessor::ampModelChanged( void )
 
 
 
-void audioFileProcessor::startPointModelChanged( void )
+void audioFileProcessor::loopPointChanged( void )
 {
-	if( m_startPointModel.value() < m_endPointModel.value() )
-	{
-		m_sampleBuffer.setStartFrame( static_cast<Uint32>(
-					m_startPointModel.value() *
-						m_sampleBuffer.frames() ) );
-	}
-	else
-	{
-		m_startPointModel.setValue( m_endPointModel.value() - 0.01f );
-	}
-	emit dataChanged();
-}
-
-
-
-
-void audioFileProcessor::endPointModelChanged( void )
-{
-	if( m_endPointModel.value() > m_startPointModel.value() )
-	{
-		if( m_endPointModel.value() * m_sampleBuffer.frames() >= 1.0f )
-		{
-			m_sampleBuffer.setEndFrame( static_cast<Uint32>(
-					m_endPointModel.value() *
-						m_sampleBuffer.frames() ) - 1 );
-		}
-		else
-		{
-			m_sampleBuffer.setEndFrame( 0 );
-		}
-	}
-	else
-	{
-		m_endPointModel.setValue( m_startPointModel.value() + 0.01f );
-	}
+	const f_cnt_t f1 = static_cast<f_cnt_t>( m_startPointModel.value() *
+						( m_sampleBuffer.frames()-1 ) );
+	const f_cnt_t f2 = static_cast<f_cnt_t>( m_endPointModel.value() *
+						( m_sampleBuffer.frames()-1 ) );
+	m_sampleBuffer.setStartFrame( tMin<f_cnt_t>( f1, f2 ) );
+	m_sampleBuffer.setEndFrame( tMax<f_cnt_t>( f1, f2 ) );
 	emit dataChanged();
 }
 
@@ -507,7 +476,7 @@ void audioFileProcessorView::paintEvent( QPaintEvent * )
 	audioFileProcessor * a = castModel<audioFileProcessor>();
 
  	QString file_name = "";
-	Uint16 idx = a->m_sampleBuffer.audioFile().length();
+	int idx = a->m_sampleBuffer.audioFile().length();
 
 	p.setFont( pointSize<8>( font() ) );
 
@@ -536,10 +505,10 @@ void audioFileProcessorView::paintEvent( QPaintEvent * )
 	const QRect graph_rect( 4, 174, 241, 70 );
 	const f_cnt_t frames = tMax( a->m_sampleBuffer.frames(),
 						static_cast<f_cnt_t>( 1 ) );
-	const Uint16 start_frame_x = a->m_sampleBuffer.startFrame() *
+	const int start_frame_x = a->m_sampleBuffer.startFrame() *
 						graph_rect.width() / frames;
-	const Uint16 end_frame_x = a->m_sampleBuffer.endFrame() *
-					( graph_rect.width() - 1 ) / frames;
+	const int end_frame_x = a->m_sampleBuffer.endFrame() *
+						graph_rect.width() / frames;
 
 	p.drawLine( start_frame_x + graph_rect.x(), graph_rect.y(),
 					start_frame_x + graph_rect.x(),

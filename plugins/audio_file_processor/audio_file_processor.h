@@ -84,8 +84,7 @@ public slots:
 private slots:
 	void reverseModelChanged( void );
 	void ampModelChanged( void );
-	void startPointModelChanged( void );
-	void endPointModelChanged( void );
+	void loopPointChanged( void );
 
 
 private:
