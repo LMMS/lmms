@@ -1,5 +1,12 @@
 2008-08-22	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* src/core/main.cpp:
+	fixed splash-screen for win32
+
+	* src/core/sample_buffer.cpp:
+	fixed sampleBuffer::tryToMakeRelative() for win32 - paths to samples
+	are now saved relative in win32-version too (if possible)
+
 	* src/core/piano.cpp:
 	fixed keycodes for win32 version
 

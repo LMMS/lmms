@@ -1137,15 +1137,18 @@ QString sampleBuffer::tryToMakeRelative( const QString & _file )
 {
 	if( QFileInfo( _file ).isRelative() == FALSE )
 	{
+		QString f = QString( _file ).replace( QDir::separator(), '/' );
 		QString fsd = configManager::inst()->factorySamplesDir();
 		QString usd = configManager::inst()->userSamplesDir();
-		if( _file.startsWith( fsd ) )
+		fsd.replace( QDir::separator(), '/' );
+		usd.replace( QDir::separator(), '/' );
+		if( f.startsWith( fsd ) )
 		{
-			return( QString( _file ).mid( fsd.length() ) );
+			return( QString( f ).mid( fsd.length() ) );
 		}
-		else if( _file.startsWith( usd ) )
+		else if( f.startsWith( usd ) )
 		{
-			return( QString( _file ).mid( usd.length() ) );
+			return( QString( f ).mid( usd.length() ) );
 		}
 	}
 	return( _file );
