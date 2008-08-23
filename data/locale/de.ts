@@ -1,4 +1,5 @@
-<!DOCTYPE TS><TS>
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS><TS version="1.1" language="de_DE">
 <defaultcodec></defaultcodec>
 <context>
     <name>QWidget</name>
@@ -3570,7 +3571,7 @@ Grund: &quot;%2&quot;</translation>
     </message>
     <message>
         <source>Vibrating string modeler</source>
-        <translation>Modellierung einer schwingenden Saite</translation>
+        <translation>Modellierung schwingender Saiten</translation>
     </message>
     <message>
         <source>Filter for importing MIDI-files into LMMS</source>
