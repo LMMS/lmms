@@ -642,7 +642,7 @@ void automationEditor::leaveEvent( QEvent * _e )
 
 void automationEditor::drawLine( int _x0, float _y0, int _x1, float _y1 )
 {
-	int deltax = tAbs<float>( _x1 - _x0 );
+	int deltax = static_cast<int>( tAbs<float>( _x1 - _x0 ) );
 	float deltay = tAbs<float>( _y1 - _y0 );
 	int x = _x0;
 	float y = _y0;

@@ -90,25 +90,27 @@ float lfoController::value( int _offset )
 
 		// The new duration in frames 
 		// (Samples/Second) / (periods/second) = (Samples/cycle)
-		int newDuration = static_cast<int>(
-				(engine::getMixer()->processingSampleRate()) *
-				m_speedModel.value() );
+		float newDurationF =
+				engine::getMixer()->processingSampleRate() *
+				m_speedModel.value();
 
 		switch(m_multiplierModel.value() )
 		{
 			case 1:
-				newDuration /= 100.0;
+				newDurationF /= 100.0;
 				break;
 
 			case 2:
-				newDuration *= 100.0;
+				newDurationF *= 100.0;
 				break;
 
 			default:
 				break;
 		}
 		
-		m_phaseOffset = m_phaseModel.value() * newDuration / (360.0);
+		m_phaseOffset = static_cast<int>( 
+				m_phaseModel.value() * newDurationF / 360.0 );
+		int newDuration = static_cast<int>( newDurationF );
 
 		if (newDuration != m_duration) {
 			// frame offset

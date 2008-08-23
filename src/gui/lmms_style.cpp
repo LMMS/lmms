@@ -61,9 +61,9 @@ void lmmsStyle::drawPrimitive( PrimitiveElement element,
 		QColor highlight = option->palette.highlight().color();
 
 		int a100 = 165;
-		int a75 = a100 * .75;
-		int a50 = a100 * .6;
-		int a25 = a100 * .33;
+		int a75 = static_cast<int>( a100 * .75 );
+		int a50 = static_cast<int>( a100 * .6 );
+		int a25 = static_cast<int>( a100 * .33 );
 
 		QLine lines[4];
 		QPoint points[4];
