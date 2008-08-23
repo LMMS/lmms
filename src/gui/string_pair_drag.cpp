@@ -41,7 +41,17 @@ stringPairDrag::stringPairDrag( const QString & _key, const QString & _value,
 					const QPixmap & _icon, QWidget * _w ) :
 	QDrag( _w )
 {
-	setPixmap( _icon );
+	if( _icon.isNull() && _w )
+	{
+		setPixmap( QPixmap::grabWidget( _w ).scaled(
+						64, 64,
+						Qt::KeepAspectRatio,
+						Qt::SmoothTransformation ) );
+	}
+	else
+	{
+		setPixmap( _icon );
+	}
 	QString txt = _key + ":" + _value;
 	QMimeData * m = new QMimeData();
 	m->setData( mimeType(), txt.toAscii() );
