@@ -6,6 +6,10 @@
 	* src/core/lfo_controller.cpp:
 	Fix various casting warnings
 
+	* src/core/audio/audio_alsa.cpp:
+	Fix warning about obsolete snd_pcm_sw_params_set_xfer_align().  
+	ALSA >= 1.0.16 defaults to 1 now.
+
 2008-08-22	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/core/main.cpp:

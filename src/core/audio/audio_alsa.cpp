@@ -29,7 +29,6 @@
 #include <QtGui/QLineEdit>
 #include <QtGui/QLabel>
 
-
 #include "audio_alsa.h"
 
 #ifdef LMMS_HAVE_ALSA
@@ -455,6 +454,8 @@ int audioALSA::setSWParams( void )
 	}
 
 	// align all transfers to 1 sample
+	
+#if SND_LIB_VERSION < ((1<<16)|(0)|16)
 	if( ( err = snd_pcm_sw_params_set_xfer_align( m_handle,
 							m_swParams, 1 ) ) < 0 )
 	{
@@ -462,6 +463,7 @@ int audioALSA::setSWParams( void )
 							snd_strerror( err ) );
 		return( err );
 	}
+#endif
 
 	// write the parameters to the playback device
 	if( ( err = snd_pcm_sw_params( m_handle, m_swParams ) ) < 0 )
