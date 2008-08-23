@@ -53,6 +53,8 @@
 #include "gui_templates.h"
 #include "instrument_track.h"
 #include "knob.h"
+#include "string_pair_drag.h"
+#include "main_window.h"
 #include "midi.h"
 #include "templates.h"
 #include "update_event.h"
@@ -502,8 +504,20 @@ void pianoView::mousePressEvent( QMouseEvent * _me )
 		}
 		else
 		{
-			m_piano->m_instrumentTrack->baseNoteModel()->
+			if( engine::getMainWindow()->isCtrlPressed() )
+			{
+				new stringPairDrag( "automatable_model",
+					QString::number( m_piano->
+						m_instrumentTrack->
+							baseNoteModel()->id() ),
+					QPixmap(), this );
+				_me->accept();
+			}
+			else
+			{
+				m_piano->m_instrumentTrack->baseNoteModel()->
 							setInitValue( key_num );
+			}
 		}
 
 		// and let the user see that he pressed a key... :)
