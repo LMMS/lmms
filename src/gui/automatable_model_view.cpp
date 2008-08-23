@@ -93,19 +93,23 @@ void automatableModelView::addDefaultActions( QMenu * _menu )
 	QString controllerTxt;
 	if( _model->getControllerConnection() )
 	{
-		controller * cont = _model->getControllerConnection()->getController();
+		controller * cont = _model->getControllerConnection()->
+								getController();
 		if( cont )
 		{
-			controllerTxt = automatableModel::tr("Connected to %1").
-					arg( cont->name() );
+			controllerTxt =
+				automatableModel::tr( "Connected to %1" ).
+							arg( cont->name() );
 		}
 		else
 		{
-			controllerTxt = automatableModel::tr("Connected to controller");
+			controllerTxt = automatableModel::tr(
+						"Connected to controller" );
 		}
 
-		QMenu * contMenu = _menu->addMenu( embed::getIconPixmap( "controller" ),
-						controllerTxt );
+		QMenu * contMenu = _menu->addMenu(
+					embed::getIconPixmap( "controller" ),
+								controllerTxt );
 
 		contMenu->addAction( embed::getIconPixmap( "controller" ),
 				automatableModel::tr("Edit connection..."),
@@ -119,7 +123,7 @@ void automatableModelView::addDefaultActions( QMenu * _menu )
 	else
 	{
 		_menu->addAction( embed::getIconPixmap( "controller" ),
-				automatableModel::tr("Connect to controller..."),
+			automatableModel::tr("Connect to controller..."),
 				amvSlots,
 				SLOT( execConnectionDialog() ) );
 	}
