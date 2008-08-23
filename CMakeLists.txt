@@ -57,6 +57,10 @@ IF(LMMS_BUILD_WIN32)
 	SET(WANT_SYSTEM_SR OFF)
 	SET(WANT_WINMM ON)
 	SET(LMMS_HAVE_WINMM TRUE)
+	SET(STATUS_ALSA "<not supported on this platform>")
+	SET(STATUS_JACK "<not supported on this platform>")
+	SET(STATUS_PULSEAUDIO "<not supported on this platform>")
+	SET(STATUS_STK "<not supported on this platform>")
 	SET(STATUS_WINMM "OK")
 ELSE(LMMS_BUILD_WIN32)
 	SET(STATUS_WINMM "<not supported on this platform>")
@@ -217,7 +221,7 @@ IF(LMMS_HAVE_SOUNDCARD_H OR LMMS_HAVE_SYS_SOUNDCARD_H)
 	SET(LMMS_HAVE_OSS TRUE)
 	SET(STATUS_OSS "OK")
 ELSE(LMMS_HAVE_SOUNDCARD_H OR LMMS_HAVE_SYS_SOUNDCARD_H)
-	SET(STATUS_OSS "not found or not supported")
+	SET(STATUS_OSS "<not found or not supported on this platform>")
 ENDIF(LMMS_HAVE_SOUNDCARD_H OR LMMS_HAVE_SYS_SOUNDCARD_H)
 
 
@@ -533,11 +537,11 @@ MESSAGE(
 
 MESSAGE(
 "\n"
-"---------------------------------------------------------------------\n"
+"-----------------------------------------------------------------\n"
 "IMPORTANT:\n"
-"after installing missing packages, remove CMakeCache.txt before running\n"
-"cmake again!\n"
-"---------------------------------------------------------------------\n"
+"after installing missing packages, remove CMakeCache.txt before\n"
+"running cmake again!\n"
+"-----------------------------------------------------------------\n"
 "\n\n")
 
 INCLUDE(InstallRequiredSystemLibraries)
