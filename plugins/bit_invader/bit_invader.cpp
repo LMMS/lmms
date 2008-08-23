@@ -334,8 +334,8 @@ bitInvaderView::bitInvaderView( instrument * _instrument,
 	m_graph->move(53,118);	// 55,120 - 2px border
 	m_graph->setAutoFillBackground( TRUE );
 
-	toolTip::add( m_graph, tr ( "Draw your own waveform here"
-				"by dragging your mouse onto this graph"
+	toolTip::add( m_graph, tr ( "Draw your own waveform here "
+				"by dragging your mouse on this graph."
 	));
 
 
@@ -352,8 +352,7 @@ bitInvaderView::bitInvaderView( instrument * _instrument,
 	sinWaveBtn->setInactiveGraphic( embed::getIconPixmap(
 						"sin_wave_inactive" ) );
 	toolTip::add( sinWaveBtn,
-			tr( "Click here if you want a sine-wave for "
-					"current oscillator." ) );
+			tr( "Click for a sine-wave." ) );
 
 	triangleWaveBtn = new pixmapButton( this, tr( "Triangle wave" ) );
 	triangleWaveBtn->move( 188, 136 );
@@ -362,8 +361,7 @@ bitInvaderView::bitInvaderView( instrument * _instrument,
 	triangleWaveBtn->setInactiveGraphic(
 		embed::getIconPixmap( "triangle_wave_inactive" ) );
 	toolTip::add( triangleWaveBtn,
-			tr( "Click here if you want a triangle-wave "
-					"for current oscillator." ) );
+			tr( "Click here for a triangle-wave." ) );
 
 	sawWaveBtn = new pixmapButton( this, tr( "Saw wave" ) );
 	sawWaveBtn->move( 188, 152 );
@@ -372,8 +370,7 @@ bitInvaderView::bitInvaderView( instrument * _instrument,
 	sawWaveBtn->setInactiveGraphic( embed::getIconPixmap(
 						"saw_wave_inactive" ) );
 	toolTip::add( sawWaveBtn,
-			tr( "Click here if you want a saw-wave for "
-					"current oscillator." ) );
+			tr( "Click here for a saw-wave." ) );
 
 	sqrWaveBtn = new pixmapButton( this, tr( "Square wave" ) );
 	sqrWaveBtn->move( 188, 168 );
@@ -382,8 +379,7 @@ bitInvaderView::bitInvaderView( instrument * _instrument,
 	sqrWaveBtn->setInactiveGraphic( embed::getIconPixmap(
 					"square_wave_inactive" ) );
 	toolTip::add( sqrWaveBtn,
-			tr( "Click here if you want a square-wave for "
-					"current oscillator." ) );
+			tr( "Click here for a square-wave." ) );
 
 	whiteNoiseWaveBtn = new pixmapButton( this,
 					tr( "White noise wave" ) );
@@ -393,8 +389,7 @@ bitInvaderView::bitInvaderView( instrument * _instrument,
 	whiteNoiseWaveBtn->setInactiveGraphic(
 		embed::getIconPixmap( "white_noise_wave_inactive" ) );
 	toolTip::add( whiteNoiseWaveBtn,
-			tr( "Click here if you want a white-noise for "
-					"current oscillator." ) );
+			tr( "Click here for white-noise." ) );
 
 	usrWaveBtn = new pixmapButton( this, tr( "User defined wave" ) );
 	usrWaveBtn->move( 188, 200 );
@@ -403,8 +398,7 @@ bitInvaderView::bitInvaderView( instrument * _instrument,
 	usrWaveBtn->setInactiveGraphic( embed::getIconPixmap(
 						"usr_wave_inactive" ) );
 	toolTip::add( usrWaveBtn,
-			tr( "Click here if you want a user-defined "
-			"wave-shape for current oscillator." ) );
+			tr( "Click here for a user-defined shape." ) );
 
 	smoothBtn = new pixmapButton( this, tr( "Smooth" ) );
 	smoothBtn->move( 55, 225 );
@@ -414,8 +408,7 @@ bitInvaderView::bitInvaderView( instrument * _instrument,
 						"smooth" ) );
 	smoothBtn->setChecked( TRUE );
 	toolTip::add( smoothBtn,
-			tr( "Click here to "
-			"smooth waveform." ) );
+			tr( "Click here to smooth waveform." ) );
 
 
 	m_interpolationToggle = new ledCheckBox( "Interpolation", this,

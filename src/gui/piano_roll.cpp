@@ -232,25 +232,23 @@ pianoRoll::pianoRoll( void ) :
 					this, SLOT( stop() ), m_toolBar );
 
 	m_playButton->setWhatsThis(
-		tr( "Click here, if you want to play the current pattern. "
+		tr( "Click here to play the current pattern. "
 			"This is useful while editing it. The pattern is "
 			"automatically looped when its end is reached." ) );
 	m_recordButton->setWhatsThis(
-		tr( "Click here, if you want to record notes from a MIDI-"
+		tr( "Click here to record notes from a MIDI-"
 			"device or the virtual test-piano of the according "
 			"channel-window to the current pattern. When recording "
 			"all notes you play will be written to this pattern "
 			"and you can play and edit them afterwards." ) );
 	m_recordAccompanyButton->setWhatsThis(
-		tr( "Click here, if you want to record notes from a MIDI-"
+		tr( "Click here to record notes from a MIDI-"
 			"device or the virtual test-piano of the according "
 			"channel-window to the current pattern. When recording "
 			"all notes you play will be written to this pattern "
 			"and you will hear the song or BB track in the background." ) );
 	m_stopButton->setWhatsThis(
-		tr( "Click here, if you want to stop playing of current "
-			"pattern." ) );
-
+		tr( "Click here to stop playback of current pattern." ) );
 
 
 	removeSelection();
@@ -302,23 +300,23 @@ pianoRoll::pianoRoll( void ) :
 	tool_button_group->setExclusive( TRUE );
 
 	m_drawButton->setWhatsThis(
-		tr( "If you click here, draw-mode will be activated. In this "
+		tr( "Click here and draw mode will be activated. In this "
 			"mode you can add, resize and move single notes. This "
-			"is the default-mode which is used most of the time. "
+			"is the default mode which is used most of the time. "
 			"You can also press 'Shift+D' on your keyboard to "
 			"activate this mode." ) );
 	m_eraseButton->setWhatsThis(
-		tr( "If you click here, erase-mode will be activated. In this "
+		tr( "Click here and erase mode will be activated. In this "
 			"mode you can erase single notes. You can also press "
 			"'Shift+E' on your keyboard to activate this mode." ) );
 	m_selectButton->setWhatsThis(
-		tr( "If you click here, select-mode will be activated. "
+		tr( "Click here and select mode will be activated. "
 			"In this mode you can select notes. This is neccessary "
 			"if you want to cut, copy, paste, delete or move "
 			"notes. You can also press 'Shift+S' on your keyboard "
 			"to activate this mode." ) );
 	m_moveButton->setWhatsThis(
-		tr( "If you click here, move-mode will be activated. In this "
+		tr( "Click here and move-mode will be activated. In this "
 			"mode you can move the notes you selected in select-"
 			"mode. You can also press 'Shift+M' on your keyboard "
 			"to activate this mode." ) );
@@ -340,16 +338,16 @@ pianoRoll::pianoRoll( void ) :
 					m_toolBar );
 
 	m_cutButton->setWhatsThis(
-		tr( "If you click here, selected notes will be cut into the "
+		tr( "Click here and the selected notes will be cut into the "
 			"clipboard. You can paste them anywhere in any pattern "
-			"by clicking on the paste-button." ) );
+			"by clicking on the paste button." ) );
 	m_copyButton->setWhatsThis(
-		tr( "If you click here, selected notes will be copied into the "
+		tr( "Click here and the selected notes will be copied into the "
 			"clipboard. You can paste them anywhere in any pattern "
-			"by clicking on the paste-button." ) );
+			"by clicking on the paste button." ) );
 	m_pasteButton->setWhatsThis(
-		tr( "If you click here, the notes from the clipboard will be "
-			"pasted at the first visible tact." ) );
+		tr( "Click here and the notes from the clipboard will be "
+			"pasted at the first visible measure." ) );
 
 
 

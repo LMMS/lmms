@@ -560,7 +560,7 @@ vibedView::vibedView( instrument * _instrument,
 	m_sinWaveBtn->setInactiveGraphic( embed::getIconPixmap(
 				"sin_wave_inactive" ) );
 	toolTip::add( m_sinWaveBtn,
-				tr( "Click here if you want a sine-wave for "
+				tr( "Use a sine-wave for "
 				    "current oscillator." ) );
 	connect( m_sinWaveBtn, SIGNAL (clicked ( void ) ),
 			this, SLOT ( sinWaveClicked( void ) ) );
@@ -573,7 +573,7 @@ vibedView::vibedView( instrument * _instrument,
 	m_triangleWaveBtn->setInactiveGraphic(
 			embed::getIconPixmap( "triangle_wave_inactive" ) );
 	toolTip::add( m_triangleWaveBtn,
-			tr( "Click here if you want a triangle-wave "
+			tr( "Use a triangle-wave "
 			    "for current oscillator." ) );
 	connect( m_triangleWaveBtn, SIGNAL ( clicked ( void ) ),
 			this, SLOT ( triangleWaveClicked( ) ) );
@@ -586,7 +586,7 @@ vibedView::vibedView( instrument * _instrument,
 	m_sawWaveBtn->setInactiveGraphic( embed::getIconPixmap(
 				"saw_wave_inactive" ) );
 	toolTip::add( m_sawWaveBtn,
-				tr( "Click here if you want a saw-wave for "
+				tr( "Use a saw-wave for "
 				    "current oscillator." ) );
 	connect( m_sawWaveBtn, SIGNAL (clicked ( void ) ),
 			this, SLOT ( sawWaveClicked( void ) ) );
@@ -599,7 +599,7 @@ vibedView::vibedView( instrument * _instrument,
 	m_sqrWaveBtn->setInactiveGraphic( embed::getIconPixmap(
 				"square_wave_inactive" ) );
 	toolTip::add( m_sqrWaveBtn,
-			tr( "Click here if you want a square-wave for "
+			tr( "Use a square-wave for "
 			    "current oscillator." ) );
 	connect( m_sqrWaveBtn, SIGNAL ( clicked ( void ) ),
 			this, SLOT ( sqrWaveClicked( void ) ) );
@@ -612,7 +612,7 @@ vibedView::vibedView( instrument * _instrument,
 	m_whiteNoiseWaveBtn->setInactiveGraphic(
 			embed::getIconPixmap( "white_noise_wave_inactive" ) );
 	toolTip::add( m_whiteNoiseWaveBtn,
-			tr( "Click here if you want a white-noise for "
+			tr( "Use white-noise for "
 			    "current oscillator." ) );
 	connect( m_whiteNoiseWaveBtn, SIGNAL ( clicked ( void ) ),
 			this, SLOT ( noiseWaveClicked( void ) ) );
@@ -625,8 +625,8 @@ vibedView::vibedView( instrument * _instrument,
 	m_usrWaveBtn->setInactiveGraphic( embed::getIconPixmap(
 				"usr_wave_inactive" ) );
 	toolTip::add( m_usrWaveBtn,
-			tr( "Click here if you want a user-defined "
-			    "wave-shape for current oscillator." ) );
+			tr( "Use a user-defined "
+			    "waveform for current oscillator." ) );
 	connect( m_usrWaveBtn, SIGNAL ( clicked ( void ) ),
 			this, SLOT ( usrWaveClicked( void ) ) );
 

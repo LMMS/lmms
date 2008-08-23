@@ -1,3 +1,23 @@
+2008-08-23	Paul Giblock <drfaygo/at/gmail/dot/com>
+
+	* plugins/bit_invader/bit_invader.cpp:
+	* plugins/vibed/vibed.cpp:
+	* plugins/triple_oscillator/triple_oscillator.cpp:
+	* plugins/audio_file_processor/audio_file_processor.cpp:
+	* src/gui/piano_roll.cpp:
+	* src/gui/lfo_controller_dialog.cpp:
+	* src/gui/main_window.cpp:
+	* src/gui/song_editor.cpp:
+	* src/gui/widgets/instrument_sound_shaping_view.cpp:
+	* src/gui/widgets/envelope_and_lfo_view.cpp:
+	* src/gui/widgets/instrument_function_views.cpp:
+	* src/gui/widgets/effect_view.cpp:
+	* src/gui/automation_editor.cpp:
+	* src/gui/bb_editor.cpp:
+	* src/core/envelope_and_lfo_parameters.cpp:
+	* src/core/mmp.cpp:
+	Fix English grammer, punctuation, and hard to read strings
+
 2008-08-23	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/gui/automatable_model_view.cpp:

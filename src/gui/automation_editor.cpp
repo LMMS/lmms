@@ -154,12 +154,12 @@ automationEditor::automationEditor( void ) :
 					this, SLOT( stop() ), m_toolBar );
 
 	m_playButton->setWhatsThis(
-		tr( "Click here, if you want to play the current pattern. "
-			"This is useful while editing it. The pattern is "
-			"automatically looped when its end is reached." ) );
+		tr( "Click here if you want to play the current pattern. "
+			"This is useful while editing it.  The pattern is "
+			"automatically looped when the end is reached." ) );
 	m_stopButton->setWhatsThis(
-		tr( "Click here, if you want to stop playing of current "
-			"pattern." ) );
+		tr( "Click here if you want to stop playing of the "
+			"current pattern." ) );
 
 
 
@@ -212,19 +212,19 @@ automationEditor::automationEditor( void ) :
 	tool_button_group->setExclusive( TRUE );
 
 	m_drawButton->setWhatsThis(
-		tr( "If you click here, draw-mode will be activated. In this "
-			"mode you can add and move single values. This "
-			"is the default-mode which is used most of the time. "
+		tr( "Click here and draw-mode will be activated. In this "
+			"mode you can add and move single values.  This "
+			"is the default mode which is used most of the time.  "
 			"You can also press 'Shift+D' on your keyboard to "
 			"activate this mode." ) );
 	m_eraseButton->setWhatsThis(
-		tr( "If you click here, erase-mode will be activated. In this "
+		tr( "Click here and erase-mode will be activated. In this "
 			"mode you can erase single values. You can also press "
 			"'Shift+E' on your keyboard to activate this mode." ) );
 	m_selectButton->setWhatsThis(
-		tr( "If you click here, select-mode will be activated. In this "
+		tr( "Click here and select-mode will be activated. In this "
 			"mode you can select values. This is neccessary "
-			"if you want to cut, copy, paste, delete or move "
+			"if you want to cut, copy, paste, delete, or move "
 			"values. You can also press 'Shift+S' on your keyboard "
 			"to activate this mode." ) );
 	m_moveButton->setWhatsThis(
@@ -250,17 +250,16 @@ automationEditor::automationEditor( void ) :
 					m_toolBar );
 
 	m_cutButton->setWhatsThis(
-		tr( "If you click here, selected values will be cut into the "
-			"clipboard. You can paste them anywhere in any pattern "
-			"by clicking on the paste-button." ) );
+		tr( "Click here and selected values will be cut into the "
+			"clipboard.  You can paste them anywhere in any pattern "
+			"by clicking on the paste button." ) );
 	m_copyButton->setWhatsThis(
-		tr( "If you click here, selected values will be copied into "
-			"the clipboard. You can paste them anywhere in any "
-			"pattern by clicking on the paste-button." ) );
+		tr( "Click here and selected values will be copied into "
+			"the clipboard.  You can paste them anywhere in any "
+			"pattern by clicking on the paste button." ) );
 	m_pasteButton->setWhatsThis(
-		tr( "If you click here, the values from the clipboard will be "
-			"pasted at the first visible tact." ) );
-
+		tr( "Click here and the values from the clipboard will be "
+			"pasted at the first visible measure." ) );
 
 
 	// setup zooming-stuff

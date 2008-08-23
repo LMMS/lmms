@@ -68,8 +68,8 @@ effectView::effectView( effect * _model, QWidget * _parent ) :
 	m_wetDry->move( 27, 5 );
 	m_wetDry->setHintText( tr( "Wet Level:" ) + " ", "" );
 	m_wetDry->setWhatsThis( tr( "The Wet/Dry knob sets the ratio between "
-					"the input signal and the effect that "
-					"shows up in the output." ) );
+					"the input signal and the effect signal that "
+					"forms the output." ) );
 
 
 	m_autoQuit = new tempoSyncKnob( knobBright_26, this );
@@ -79,7 +79,7 @@ effectView::effectView( effect * _model, QWidget * _parent ) :
 	m_autoQuit->setWhatsThis( tr( 
 "The Decay knob controls how many buffers of silence must pass before the "
 "plugin stops processing.  Smaller values will reduce the CPU overhead but "
-"run the risk of clipping the tail on delay effects." ) );
+"run the risk of clipping the tail on delay and reverb effects." ) );
 
 
 	m_gate = new knob( knobBright_26, this );
@@ -125,12 +125,12 @@ effectView::effectView( effect * _model, QWidget * _parent ) :
 
 "The Wet/Dry knob controls the balance between the input signal and the "
 "effected signal that is the resulting output from the effect.  The input "
-"for one stage is the output from the previous stage, so the 'dry' signal "
+"for the stage is the output from the previous stage. So, the 'dry' signal "
 "for effects lower in the chain contains all of the previous effects.\n\n"
 
 "The Decay knob controls how long the signal will continue to be processed "
 "after the notes have been released.  The effect will stop processing signals "
-"when the signal has dropped below a given threshold for a given length of "
+"when the volume has dropped below a given threshold for a given length of "
 "time.  This knob sets the 'given length of time'.  Longer times will require "
 "more CPU, so this number should be set low for most effects.  It needs to be "
 "bumped up for effects that produce lengthy periods of silence, e.g. "

@@ -333,12 +333,11 @@ audioFileProcessorView::audioFileProcessorView( instrument * _instrument,
 	toolTip::add( m_openAudioFileButton, tr( "Open other sample" ) );
 
 	m_openAudioFileButton->setWhatsThis(
-		tr( "Click here, if you want to open another audio-file. After "
-			"clicking on this button, a file-open-dialog appears "
-			"and you can select your file. Settings like Looping-"
-			"Mode, start- and end-point, amplify-value and so on "
-			"are not reset, so please don't wonder if your sample "
-			"doesn't sound like the original one..." ) );
+		tr( "Click here, if you want to open another audio-file. "
+			"A dialog will appear where you can select your file. "
+			"Settings like looping-mode, start and end-points, " 
+			"amplify-value, and so on are not reset. So, it may not "
+			"sound like the original sample.") );
 
 	m_reverseButton = new pixmapButton( this );
 	m_reverseButton->setCheckable( TRUE );
@@ -363,10 +362,10 @@ audioFileProcessorView::audioFileProcessorView( instrument * _instrument,
 	toolTip::add( m_loopButton,
 				tr( "Loop sample at start- and end-point" ) );
 	m_loopButton->setWhatsThis(
-		tr( "Here you can set, whether Looping-Mode is enabled. If "
-			"enabled, AudioFileProcessor loops between start- and "
-			"end-point of a sample until the whole note is played. "
-			"This is useful for things like string- and choir-"
+		tr( "Here you can set, whether looping-mode is enabled. If "
+			"enabled, AudioFileProcessor loops between start and "
+			"end-points of a sample until the whole note is played. "
+			"This is useful for things like string and choir "
 			"samples." ) );
 
 	m_ampKnob = new knob( knobStyled, this );
@@ -375,7 +374,7 @@ audioFileProcessorView::audioFileProcessorView( instrument * _instrument,
 	m_ampKnob->setFixedSize( 37, 47 );
 	m_ampKnob->setHintText( tr( "Amplify:" )+" ", "%" );
 	m_ampKnob->setWhatsThis(
-		tr( "With this knob you can set the amplify-ratio. When you "
+		tr( "With this knob you can set the amplify ratio. When you "
 			"set a value of 100% your sample isn't changed. "
 			"Otherwise it will be amplified up or down (your "
 			"actual sample-file isn't touched!)" ) );
@@ -386,9 +385,9 @@ audioFileProcessorView::audioFileProcessorView( instrument * _instrument,
 	m_startKnob->setWhatsThis(
 		tr( "With this knob you can set the point where "
 			"AudioFileProcessor should begin playing your sample. "
-			"If you enable Looping-Mode, this is the point to "
+			"If you enable looping-mode, this is the point to "
 			"which AudioFileProcessor returns if a note is longer "
-			"than the sample between start- and end-point." ) );
+			"than the sample between the start and end-points." ) );
 
 	m_endKnob = new audioFileKnob( this );
 	m_endKnob->move( 119, 108 );
@@ -396,9 +395,9 @@ audioFileProcessorView::audioFileProcessorView( instrument * _instrument,
 	m_endKnob->setWhatsThis(
 		tr( "With this knob you can set the point where "
 			"AudioFileProcessor should stop playing your sample. "
-			"If you enable Looping-Mode, this is the point where "
+			"If you enable looping-mode, this is the point where "
 			"AudioFileProcessor returns if a note is longer than "
-			"the sample between start- and end-point." ) );
+			"the sample between the start and end-points." ) );
 
 	setAcceptDrops( TRUE );
 }

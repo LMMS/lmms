@@ -99,16 +99,16 @@ lfoControllerDialog::lfoControllerDialog( controller * _model, QWidget * _parent
 	m_amountKnob->setHintText( tr( "Modulation amount:" ) + " ", "" );
 	m_amountKnob->setWhatsThis(
 		tr( "Use this knob for setting modulation amount of the "
-			"current LFO. The bigger this value the more the "
-			"selected size (e.g. volume or cutoff-frequency) will "
-			"be influenced by this LFO." ) );
+			"LFO. The bigger this value, the more the connected "
+			"control (e.g. volume or cutoff-frequency) will "
+			"be influenced by the LFO." ) );
 
 	m_phaseKnob = new knob( knobBright_26, this );
 	m_phaseKnob->setLabel( tr( "PHS" ) );
 	m_phaseKnob->move( CD_LFO_PHASE_CD_KNOB_X, CD_LFO_CD_KNOB_Y );
 	m_phaseKnob->setHintText( tr( "Phase offset:" ) + " ", "" + tr( "degrees" ) );
 	m_phaseKnob->setWhatsThis(
-			tr( "With this knob you can set the phase-offset of "
+			tr( "With this knob you can set the phase offset of "
 				"the LFO. That means you can move the "
 				"point within an oscillation where the "
 				"oscillator begins to oscillate. For example "
@@ -124,8 +124,7 @@ lfoControllerDialog::lfoControllerDialog( controller * _model, QWidget * _parent
 	sin_wave_btn->setInactiveGraphic( embed::getIconPixmap(
 						"sin_wave_inactive" ) );
 	toolTip::add( sin_wave_btn,
-			tr( "Click here if you want a sine-wave for "
-					"current oscillator." ) );
+			tr( "Click here for a sine-wave for." ) );
 
 	pixmapButton * triangle_wave_btn =
 					new pixmapButton( this, NULL );
@@ -135,8 +134,7 @@ lfoControllerDialog::lfoControllerDialog( controller * _model, QWidget * _parent
 	triangle_wave_btn->setInactiveGraphic(
 		embed::getIconPixmap( "triangle_wave_inactive" ) );
 	toolTip::add( triangle_wave_btn,
-			tr( "Click here if you want a triangle-wave "
-					"for current oscillator." ) );
+			tr( "Click here for a triangle-wave." ) );
 
 	pixmapButton * saw_wave_btn = new pixmapButton( this, NULL );
 	saw_wave_btn->move( CD_LFO_SHAPES_X + 30, CD_LFO_SHAPES_Y );
@@ -145,8 +143,7 @@ lfoControllerDialog::lfoControllerDialog( controller * _model, QWidget * _parent
 	saw_wave_btn->setInactiveGraphic( embed::getIconPixmap(
 						"saw_wave_inactive" ) );
 	toolTip::add( saw_wave_btn,
-			tr( "Click here if you want a saw-wave for "
-					"current oscillator." ) );
+			tr( "Click here for a saw-wave." ) );
 
 	pixmapButton * sqr_wave_btn = new pixmapButton( this, NULL );
 	sqr_wave_btn->move( CD_LFO_SHAPES_X + 45, CD_LFO_SHAPES_Y );
@@ -155,8 +152,7 @@ lfoControllerDialog::lfoControllerDialog( controller * _model, QWidget * _parent
 	sqr_wave_btn->setInactiveGraphic( embed::getIconPixmap(
 					"square_wave_inactive" ) );
 	toolTip::add( sqr_wave_btn,
-			tr( "Click here if you want a square-wave for "
-					"current oscillator." ) );
+			tr( "Click here for a square-wave." ) );
 
 	pixmapButton * moog_saw_wave_btn =
 					new pixmapButton( this, NULL );
@@ -166,8 +162,7 @@ lfoControllerDialog::lfoControllerDialog( controller * _model, QWidget * _parent
 	moog_saw_wave_btn->setInactiveGraphic(
 		embed::getIconPixmap( "moog_saw_wave_inactive" ) );
 	toolTip::add( moog_saw_wave_btn,
-			tr( "Click here if you want a moog-saw-wave "
-					"for current oscillator." ) );
+			tr( "Click here for a a moog saw-wave." ) );
 
 	pixmapButton * exp_wave_btn = new pixmapButton( this, NULL );
 	exp_wave_btn->move( CD_LFO_SHAPES_X + 15, CD_LFO_SHAPES_Y + 15 );
@@ -176,8 +171,7 @@ lfoControllerDialog::lfoControllerDialog( controller * _model, QWidget * _parent
 	exp_wave_btn->setInactiveGraphic( embed::getIconPixmap(
 						"exp_wave_inactive" ) );
 	toolTip::add( exp_wave_btn,
-			tr( "Click here if you want an exponential "
-				"wave for current oscillator." ) );
+			tr( "Click here for an exponential wave." ) );
 
 	pixmapButton * white_noise_btn = new pixmapButton( this, NULL );
 	white_noise_btn->move( CD_LFO_SHAPES_X + 30, CD_LFO_SHAPES_Y + 15 );
@@ -186,8 +180,7 @@ lfoControllerDialog::lfoControllerDialog( controller * _model, QWidget * _parent
 	white_noise_btn->setInactiveGraphic(
 		embed::getIconPixmap( "white_noise_wave_inactive" ) );
 	toolTip::add( white_noise_btn,
-			tr( "Click here if you want a white-noise for "
-					"current oscillator." ) );
+			tr( "Click here for white-noise for." ) );
 
 	pixmapButton * uwb = new pixmapButton( this, NULL );
 	uwb->move( CD_LFO_SHAPES_X + 45, CD_LFO_SHAPES_Y + 15 );
@@ -196,8 +189,8 @@ lfoControllerDialog::lfoControllerDialog( controller * _model, QWidget * _parent
 	uwb->setInactiveGraphic( embed::getIconPixmap(
 						"usr_wave_inactive" ) );
 	uwb->setEnabled( false );
-	toolTip::add( uwb, tr( "Click here if you want a user-defined "
-			"wave-shape for current oscillator." ) );
+	toolTip::add( uwb, tr( "Click here for a user-defined "
+			"shape." ) );
 	
 	m_waveBtnGrp = new automatableButtonGroup( this );
 	m_waveBtnGrp->addButton( sin_wave_btn );

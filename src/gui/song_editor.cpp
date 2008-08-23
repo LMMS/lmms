@@ -92,9 +92,9 @@ songEditor::songEditor( song * _song, songEditor * & _engine_ptr ) :
 	m_tempoSpinBox->setWhatsThis(
 		tr( "The tempo of a song is specified in beats per minute "
 			"(BPM). If you want to change the tempo of your "
-			"song, change this value. Every tact has four beats, "
-			"so the tempo in BPM specifies, how many tacts / 4 "
-			"should be played within a minute (or how many tacts "
+			"song, change this value. Every measure has four beats, "
+			"so the tempo in BPM specifies, how many measures / 4 "
+			"should be played within a minute (or how many measures "
 			"should be played within four minutes)." ) );
 
 	int col = engine::getMainWindow()->addWidgetToToolBar( m_tempoSpinBox,

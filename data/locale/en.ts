@@ -164,7 +164,7 @@ http://lmms.sourceforge.net</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>An arpeggio is a type of playing (especially plucked) instruments, which makes the music much livelier. The strings of such instruments (e.g. harps) are plucked like chords, the only difference is, that this is done in a sequential order, so the notes are not played at the same time. Typical arpeggios are major or minor triads. But there&apos;re a lot of other possible chords, you can select.</source>
+        <source>An arpeggio is a type of playing (especially plucked) instruments, which makes the music much livelier. The strings of such instruments (e.g. harps) are plucked like chords, the only difference is, that this is done in a sequential order, so the notes are not played at the same time. Typical arpeggios are major or minor triads. But there are a lot of other possible chords to select.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

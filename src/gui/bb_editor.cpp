@@ -69,7 +69,7 @@ bbEditor::bbEditor( bbTrackContainer * _tc ) :
 					this, SLOT( play() ), m_toolBar );
 
 	m_stopButton = new toolButton( embed::getIconPixmap( "stop" ),
-			tr( "Stop playing of current beat/bassline (Space)" ),
+			tr( "Stop playback of current beat/bassline (Space)" ),
 					this, SLOT( stop() ), m_toolBar );
 
 	toolButton * add_bb_track = new toolButton(
@@ -86,11 +86,11 @@ bbEditor::bbEditor( bbTrackContainer * _tc ) :
 
 
 	m_playButton->setWhatsThis(
-		tr( "Click here, if you want to play the current "
-			"beat/bassline. The beat/bassline is automatically "
+		tr( "Click here to play the current "
+			"beat/bassline.  The beat/bassline is automatically "
 			"looped when its end is reached." ) );
 	m_stopButton->setWhatsThis(
-		tr( "Click here, if you want to stop playing of current "
+		tr( "Click here to stop playing of current "
 							"beat/bassline." ) );
 
 	QLabel * l = new QLabel( m_toolBar );

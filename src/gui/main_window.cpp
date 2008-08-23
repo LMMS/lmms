@@ -366,7 +366,7 @@ void mainWindow::finalize( void )
 			"edit song-playlist and specify when which track "
 			"should be played. "
 			"You can also insert and move samples (e.g. "
-			"rap-samples) directly into the playlist." ) );
+			"rap samples) directly into the playlist." ) );
 
 
 	toolButton * bb_editor_window = new toolButton(
@@ -379,9 +379,9 @@ void mainWindow::finalize( void )
 	bb_editor_window->setWhatsThis(
 		tr( "By pressing this button, you can show or hide the "
 			"Beat+Bassline Editor. The Beat+Bassline Editor is "
-			"needed for creating beats, opening, adding and "
-			"removing channels, cutting, copying and pasting "
-			"beat- and bassline-patterns and other things like "
+			"needed for creating beats, and for opening, adding, and "
+			"removing channels, and for cutting, copying and pasting "
+			"beat and bassline-patterns, and for other things like "
 			"that." ) );
 
 
@@ -393,9 +393,9 @@ void mainWindow::finalize( void )
 								m_toolBar );
 	piano_roll_window->setShortcut( Qt::Key_F7 );
 	piano_roll_window->setWhatsThis(
-			tr( "By pressing this button, you can show or hide the "
+			tr( "Click here to show or hide the "
 				"Piano-Roll. With the help of the Piano-Roll "
-				"you can edit melody-patterns in an easy way."
+				"you can edit melodies in an easy way."
 				) );
 
 	toolButton * automation_editor_window = new toolButton(
@@ -407,7 +407,7 @@ void mainWindow::finalize( void )
 					m_toolBar );
 	automation_editor_window->setShortcut( Qt::Key_F8 );
 	automation_editor_window->setWhatsThis(
-			tr( "By pressing this button, you can show or hide the "
+			tr( "Click here to show or hide the "
 				"Automation Editor. With the help of the "
 				"Automation Editor you can edit dynamic values "
 				"in an easy way."
@@ -420,7 +420,7 @@ void mainWindow::finalize( void )
 					m_toolBar );
 	fx_mixer_window->setShortcut( Qt::Key_F9 );
 	fx_mixer_window->setWhatsThis( 
-		tr( "By pressing this button, you can show or hide the "
+		tr( "Click here to show or hide the "
 			"FX Mixer. The FX Mixer is a very powerful tool "
 			"for managing effects for your song. You can insert "
 			"effects into different effect-channels." ) );
@@ -433,7 +433,7 @@ void mainWindow::finalize( void )
 								m_toolBar );
 	project_notes_window->setShortcut( Qt::Key_F10 );
 	project_notes_window->setWhatsThis(
-		tr( "By pressing this button, you can show or hide the "
+		tr( "Click here to show or hide the "
 			"project notes window. In this window you can put "
 			"down your project notes.") );
 

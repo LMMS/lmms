@@ -76,7 +76,7 @@ chordCreatorView::chordCreatorView( chordCreator * _cc, QWidget * _parent ) :
 	m_chordRangeKnob->setWhatsThis(
 		tr( "Use this knob for setting the chord range in octaves. "
 			"The selected chord will be played within specified "
-			"amount of octaves." ) );
+			"number of octaves." ) );
 
 }
 
@@ -123,13 +123,13 @@ arpeggiatorView::arpeggiatorView( arpeggiator * _arp, QWidget * _parent ) :
 							ARP_GROUPBOX_HEIGHT );
 
 	m_arpGroupBox->setWhatsThis(
-		tr( "An arpeggio is a type of playing (especially plucked) "
+		tr( "An arpeggio is a method playing (especially plucked) "
 			"instruments, which makes the music much livelier. "
 			"The strings of such instruments (e.g. harps) are "
-			"plucked like chords, the only difference is, that "
+			"plucked like chords. The only difference is that "
 			"this is done in a sequential order, so the notes are "
 			"not played at the same time. Typical arpeggios are "
-			"major or minor triads. But there're a lot of other "
+			"major or minor triads, but there are a lot of other "
 			"possible chords, you can select." ) );
 
 
@@ -143,7 +143,7 @@ arpeggiatorView::arpeggiatorView( arpeggiator * _arp, QWidget * _parent ) :
 	m_arpRangeKnob->setWhatsThis(
 		tr( "Use this knob for setting the arpeggio range in octaves. "
 			"The selected arpeggio will be played within specified "
-			"amount of octaves." ) );
+			"number of octaves." ) );
 
 
 	m_arpTimeKnob->setLabel( tr( "TIME" ) );
@@ -163,7 +163,7 @@ arpeggiatorView::arpeggiatorView( arpeggiator * _arp, QWidget * _parent ) :
 		tr( "Use this knob for setting the arpeggio gate. The "
 			"arpeggio gate specifies the percent of a whole "
 			"arpeggio-tone that should be played. With this you "
-			"can make cool staccato-arpeggios." ) );
+			"can make cool staccato arpeggios." ) );
 
 	m_arpDirectionLbl = new QLabel( tr( "Direction:" ), m_arpGroupBox );
 	m_arpDirectionLbl->setGeometry( 10, 60, 64, 10 );

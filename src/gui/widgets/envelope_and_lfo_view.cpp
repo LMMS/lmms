@@ -184,7 +184,7 @@ envelopeAndLFOView::envelopeAndLFOView( QWidget * _parent ) :
 	m_lfoPredelayKnob = new knob( knobBright_26, this );
 	m_lfoPredelayKnob->setLabel( tr( "DEL" ) );
 	m_lfoPredelayKnob->move( LFO_PREDELAY_KNOB_X, LFO_KNOB_Y );
-	m_lfoPredelayKnob->setHintText( tr( "LFO-predelay:" ) + " ", "" );
+	m_lfoPredelayKnob->setHintText( tr( "LFO predelay:" ) + " ", "" );
 	m_lfoPredelayKnob->setWhatsThis(
 		tr( "Use this knob for setting predelay-time of the current "
 			"LFO. The bigger this value the the time until the "
@@ -194,7 +194,7 @@ envelopeAndLFOView::envelopeAndLFOView( QWidget * _parent ) :
 	m_lfoAttackKnob = new knob( knobBright_26, this );
 	m_lfoAttackKnob->setLabel( tr( "ATT" ) );
 	m_lfoAttackKnob->move( LFO_ATTACK_KNOB_X, LFO_KNOB_Y );
-	m_lfoAttackKnob->setHintText( tr( "LFO-attack:" ) + " ", "" );
+	m_lfoAttackKnob->setHintText( tr( "LFO- attack:" ) + " ", "" );
 	m_lfoAttackKnob->setWhatsThis(
 		tr( "Use this knob for setting attack-time of the current LFO. "
 			"The bigger this value the longer the LFO needs to "
@@ -204,7 +204,7 @@ envelopeAndLFOView::envelopeAndLFOView( QWidget * _parent ) :
 	m_lfoSpeedKnob = new tempoSyncKnob( knobBright_26, this );
 	m_lfoSpeedKnob->setLabel( tr( "SPD" ) );
 	m_lfoSpeedKnob->move( LFO_SPEED_KNOB_X, LFO_KNOB_Y );
-	m_lfoSpeedKnob->setHintText( tr( "LFO-speed:" ) + " ", "" );
+	m_lfoSpeedKnob->setHintText( tr( "LFO speed:" ) + " ", "" );
 	m_lfoSpeedKnob->setWhatsThis(
 		tr( "Use this knob for setting speed of the current LFO. The "
 			"bigger this value the faster the LFO oscillates and "
@@ -229,8 +229,7 @@ envelopeAndLFOView::envelopeAndLFOView( QWidget * _parent ) :
 	sin_lfo_btn->setInactiveGraphic( embed::getIconPixmap(
 							"sin_wave_inactive" ) );
 	sin_lfo_btn->setWhatsThis(
-		tr( "Click here if you want a sine-wave for current "
-							"oscillator." ) );
+		tr( "Click here for a sine-wave." ) );
 
 	pixmapButton * triangle_lfo_btn = new pixmapButton( this, NULL );
 	triangle_lfo_btn->move( LFO_SHAPES_X+15, LFO_SHAPES_Y );
@@ -239,8 +238,7 @@ envelopeAndLFOView::envelopeAndLFOView( QWidget * _parent ) :
 	triangle_lfo_btn->setInactiveGraphic( embed::getIconPixmap(
 						"triangle_wave_inactive" ) );
 	triangle_lfo_btn->setWhatsThis(
-		tr( "Click here if you want a triangle-wave for current "
-							"oscillator." ) );
+		tr( "Click here for a triangle-wave." ) );
 
 	pixmapButton * saw_lfo_btn = new pixmapButton( this, NULL );
 	saw_lfo_btn->move( LFO_SHAPES_X+30, LFO_SHAPES_Y );
@@ -249,8 +247,7 @@ envelopeAndLFOView::envelopeAndLFOView( QWidget * _parent ) :
 	saw_lfo_btn->setInactiveGraphic( embed::getIconPixmap(
 							"saw_wave_inactive" ) );
 	saw_lfo_btn->setWhatsThis(
-		tr( "Click here if you want a saw-wave for current "
-							"oscillator." ) );
+		tr( "Click here for a saw-wave for current." ) );
 
 	pixmapButton * sqr_lfo_btn = new pixmapButton( this, NULL );
 	sqr_lfo_btn->move( LFO_SHAPES_X+45, LFO_SHAPES_Y );
@@ -259,8 +256,7 @@ envelopeAndLFOView::envelopeAndLFOView( QWidget * _parent ) :
 	sqr_lfo_btn->setInactiveGraphic( embed::getIconPixmap(
 						"square_wave_inactive" ) );
 	sqr_lfo_btn->setWhatsThis(
-		tr( "Click here if you want a square-wave for current "
-							"oscillator." ) );
+		tr( "Click here for a square-wave." ) );
 
 	m_userLfoBtn = new pixmapButton( this, NULL );
 	m_userLfoBtn->move( LFO_SHAPES_X+60, LFO_SHAPES_Y );
@@ -269,9 +265,9 @@ envelopeAndLFOView::envelopeAndLFOView( QWidget * _parent ) :
 	m_userLfoBtn->setInactiveGraphic( embed::getIconPixmap(
 							"usr_wave_inactive" ) );
 	m_userLfoBtn->setWhatsThis(
-		tr( "Click here if you want a user-defined wave for current "
-			"oscillator. Afterwards drag an according sample-"
-			"file into LFO-graph." ) );
+		tr( "Click here for a user-defined wave. "
+			"Afterwards, drag an according sample-"
+			"file onto the LFO graph." ) );
 
 	connect( m_userLfoBtn, SIGNAL( toggled( bool ) ),
 				this, SLOT( lfoUserWaveChanged() ) );
@@ -289,8 +285,8 @@ envelopeAndLFOView::envelopeAndLFOView( QWidget * _parent ) :
 	m_x100Cb->move( LFO_PREDELAY_KNOB_X, LFO_GRAPH_Y + 36 );
 	m_x100Cb->setWhatsThis(
 		tr( "Click here if the frequency of this LFO should be "
-						"multiplied with 100." ) );
-	toolTip::add( m_x100Cb, tr( "multiply LFO-frequency with 100" ) );
+						"multiplied by 100." ) );
+	toolTip::add( m_x100Cb, tr( "multiply LFO-frequency by 100" ) );
 
 
 	m_controlEnvAmountCb = new ledCheckBox( tr( "MODULATE ENV-AMOUNT" ),

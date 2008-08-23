@@ -133,12 +133,9 @@ multimediaProject::multimediaProject( const QString & _in_file_name,
 			QMessageBox::critical( NULL, songEditor::tr( "Error in "
 							"multimedia-project" ),
 					songEditor::tr( "The multimedia-"
-							"project %1 seems to "
-							"contain errors. LMMS "
-							"will try its best "
-							"to recover as much as "
-							"possible data from "
-							"this file."
+							"project %1 seems to contain errors. LMMS "
+							"will try its best to recover as much "
+							"data as possible data from this file."
 						).arg( _in_file_name ) );
 			return;
 		}
