@@ -57,6 +57,9 @@ IF(LMMS_BUILD_WIN32)
 	SET(WANT_SYSTEM_SR OFF)
 	SET(WANT_WINMM ON)
 	SET(LMMS_HAVE_WINMM TRUE)
+	SET(STATUS_WINMM "OK")
+ELSE(LMMS_BUILD_WIN32)
+	SET(STATUS_WINMM "<not supported on this platform>")
 ENDIF(LMMS_BUILD_WIN32)
 
 MESSAGE("PROCESSOR: ${CMAKE_SYSTEM_PROCESSOR}")
@@ -130,15 +133,21 @@ INCLUDE(${QT_USE_FILE})
 # check for libsndfile
 PKG_CHECK_MODULES(SNDFILE REQUIRED sndfile>=1.0.11)
 IF(NOT SNDFILE_FOUND)
-	MESSAGE(FATAL_ERROR "LMMS requires libsndfile >= 1.0.11 - please install and try again!")
+	MESSAGE(FATAL_ERROR "LMMS requires libsndfile1 and libsndfile1-dev >= 1.0.11 - please install and try again!")
 ENDIF(NOT SNDFILE_FOUND)
 
 IF(WANT_CAPS)
 SET(LMMS_HAVE_CAPS TRUE)
+SET(STATUS_CAPS "OK")
+ELSE(WANT_CAPS)
+SET(STATUS_CAPS "not built as requested")
 ENDIF(WANT_CAPS)
 
 IF(WANT_TAP)
 SET(LMMS_HAVE_TAP TRUE)
+SET(STATUS_TAP "OK")
+ELSE(WANT_TAP)
+SET(STATUS_TAP "not built as requested")
 ENDIF(WANT_TAP)
 
 
@@ -148,6 +157,9 @@ IF(WANT_SDL)
 	FIND_PACKAGE(SDL)
 	IF(SDL_FOUND)
 		SET(LMMS_HAVE_SDL TRUE)
+		SET(STATUS_SDL "OK")
+	ELSE(SDL_FOUND)
+		SET(STATUS_SDL "not found, please install libsdl1.2-dev (or similiar)")
 	ENDIF(SDL_FOUND)
 ENDIF(WANT_SDL)
 IF(NOT LMMS_HAVE_SDL)
@@ -164,8 +176,10 @@ IF(WANT_STK)
 	FIND_PACKAGE(STK)
 	IF(STK_FOUND)
 		SET(LMMS_HAVE_STK TRUE)
+		SET(STATUS_STK "OK")
 	ELSE(STK_FOUND)
 		SET(STK_INCLUDE_DIR "")
+		SET(STATUS_STK "not found, please install libstk0-dev (or similiar)")
 	ENDIF(STK_FOUND)
 ENDIF(WANT_STK)
 
@@ -175,6 +189,9 @@ IF(WANT_PULSEAUDIO)
 	FIND_PACKAGE(PulseAudio)
 	IF(PULSEAUDIO_FOUND)
 		SET(LMMS_HAVE_PULSEAUDIO TRUE)
+		SET(STATUS_PULSEAUDIO "OK")
+	ELSE(PULSEAUDIO_FOUND)
+		SET(STATUS_PULSEAUDIO "not found, please install libpulse-dev (or similiar)")
 	ENDIF(PULSEAUDIO_FOUND)
 ENDIF(WANT_PULSEAUDIO)
 IF(NOT LMMS_HAVE_PULSEAUDIO)
@@ -188,6 +205,9 @@ IF(WANT_OGGVORBIS)
 	FIND_PACKAGE(OggVorbis)
 	IF(OGGVORBIS_FOUND)
 		SET(LMMS_HAVE_OGGVORBIS TRUE)
+		SET(STATUS_OGGVORBIS "OK")
+	ELSE(OGGVORBIS_FOUND)
+		SET(STATUS_OGGVORBIS "not found, please install libogg-dev and libvorbis-dev (or similiar)")
 	ENDIF(OGGVORBIS_FOUND)
 ENDIF(WANT_OGGVORBIS)
 
@@ -195,6 +215,9 @@ ENDIF(WANT_OGGVORBIS)
 # check whether to enable OSS-support
 IF(LMMS_HAVE_SOUNDCARD_H OR LMMS_HAVE_SYS_SOUNDCARD_H)
 	SET(LMMS_HAVE_OSS TRUE)
+	SET(STATUS_OSS "OK")
+ELSE(LMMS_HAVE_SOUNDCARD_H OR LMMS_HAVE_SYS_SOUNDCARD_H)
+	SET(STATUS_OSS "not found or not supported")
 ENDIF(LMMS_HAVE_SOUNDCARD_H OR LMMS_HAVE_SYS_SOUNDCARD_H)
 
 
@@ -204,6 +227,9 @@ IF(WANT_ALSA)
 	ALSA_CONFIGURE_FILE(${CMAKE_BINARY_DIR}/alsaconfig.h)
 	IF(ALSA_FOUND)
 		SET(LMMS_HAVE_ALSA TRUE)
+		SET(STATUS_ALSA "OK")
+	ELSE(ALSA_FOUND)
+		SET(STATUS_ALSA "not found, please install libasound2-dev (or similiar)")
 	ENDIF(ALSA_FOUND)
 ENDIF(WANT_ALSA)
 IF(NOT LMMS_HAVE_ALSA)
@@ -216,6 +242,9 @@ IF(WANT_JACK)
 	PKG_CHECK_MODULES(JACK jack>=0.77)
 	IF(JACK_FOUND)
 		SET(LMMS_HAVE_JACK TRUE)
+		SET(STATUS_JACK "OK")
+	ELSE(JACK_FOUND)
+		SET(STATUS_JACK "not found, please install libjack0.100.0-dev (or similiar)")
 	ENDIF(JACK_FOUND)
 ENDIF(WANT_JACK)
 
@@ -225,6 +254,9 @@ IF(WANT_FFTW3F)
 	PKG_CHECK_MODULES(FFTW3F fftw3f>=3.0.0)
 	IF(FFTW3F_FOUND)
 		SET(LMMS_HAVE_FFTW3F TRUE)
+		SET(STATUS_FFTW3F "OK")
+	ELSE(FFTW3F_FOUND)
+		SET(STATUS_FFTW3F "not found, please install libfftw3-dev (or similiar)")
 	ENDIF(FFTW3F_FOUND)
 ENDIF(WANT_FFTW3F)
 
@@ -234,6 +266,9 @@ IF(WANT_SF2)
 	PKG_CHECK_MODULES(FLUIDSYNTH fluidsynth>=1.0.7)
 	IF(FLUIDSYNTH_FOUND)
 		SET(LMMS_HAVE_FLUIDSYNTH TRUE)
+		SET(STATUS_FLUIDSYNTH "OK")
+	ELSE(FLUIDSYNTH_FOUND)
+		SET(STATUS_FLUIDSYNTH "not found, please install libfluidsynth-dev (or similiar)")
 	ENDIF(FLUIDSYNTH_FOUND)
 ENDIF(WANT_SF2)
 
@@ -257,6 +292,9 @@ if(WANT_VST)
 	SET(CMAKE_REQUIRED_INCLUDES ${CMAKE_REQUIRED_INCLUDES_ORIG})
 	IF(HAVE_LIBWINE AND HAVE_WINDOWS_H)
 		SET(LMMS_HAVE_VST TRUE)
+		SET(STATUS_WINE "OK")
+	ELSE(HAVE_LIBWINE AND HAVE_WINDOWS_H)
+		SET(STATUS_WINE "not found, please install (lib)wine-dev (or similiar)")
 	ENDIF(HAVE_LIBWINE AND HAVE_WINDOWS_H)
 ENDIF(WANT_VST)
 
@@ -311,12 +349,12 @@ QT4_WRAP_UI(lmms_UI_out ${lmms_UI})
 # embedded resources stuff
 ADD_EXECUTABLE(bin2res buildtools/bin2res.cpp)
 GET_TARGET_PROPERTY(BIN2RES bin2res LOCATION)
-SET(ER_H embedded_resources.h)
+SET(LMMS_ER_H ${CMAKE_CURRENT_BINARY_DIR}/embedded_resources.h)
 
 # we somehow have to make LMMS-binary depend on MOC-files
 ADD_FILE_DEPENDENCIES(lmmsconfig.h ${lmms_MOC_out})
 
-ADD_CUSTOM_COMMAND(OUTPUT ${ER_H} COMMAND ${BIN2RES} ARGS ${lmms_EMBEDDED_RESOURCES} > ${ER_H} DEPENDS ${BIN2RES})
+ADD_CUSTOM_COMMAND(OUTPUT ${LMMS_ER_H} COMMAND ${BIN2RES} ARGS ${lmms_EMBEDDED_RESOURCES} > ${LMMS_ER_H} DEPENDS ${BIN2RES})
 
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-exceptions ${CXXFLAGS}")
 IF(WIN32)
@@ -345,7 +383,7 @@ INCLUDE_DIRECTORIES(${CMAKE_BINARY_DIR} ${CMAKE_BINARY_DIR}/include ${CMAKE_SOUR
 LINK_DIRECTORIES(${CMAKE_INSTALL_PREFIX}/lib ${ASOUND_LIBRARY_DIR} ${JACK_LIBRARY_DIRS} ${SAMPLERATE_LIBRARY_DIRS} ${SNDFILE_LIBRARY_DIRS})
 LINK_LIBRARIES(${QT_LIBRARIES} ${ASOUND_LIBRARY} ${SDL_LIBRARY} ${PULSEAUDIO_LIBRARIES} ${JACK_LIBRARIES} ${OGGVORBIS_LIBRARIES} ${SAMPLERATE_LIBRARIES} ${SNDFILE_LIBRARIES})
 
-ADD_EXECUTABLE(lmms ${lmms_SOURCES} ${lmms_INCLUDES} ${LIBSAMPLERATE_SOURCES} ${ER_H} ${lmms_UI_out} lmmsconfig.h ${WINRC})
+ADD_EXECUTABLE(lmms ${lmms_SOURCES} ${lmms_INCLUDES} ${LIBSAMPLERATE_SOURCES} ${LMMS_ER_H} ${lmms_UI_out} lmmsconfig.h ${WINRC})
 IF(LMMS_BUILD_WIN32)
 	SET_TARGET_PROPERTIES(lmms PROPERTIES LINK_FLAGS "${LINK_FLAGS} -mwindows")
 	ADD_CUSTOM_COMMAND(TARGET lmms POST_BUILD COMMAND /opt/mingw/bin/i586-mingw32-strip ${CMAKE_BINARY_DIR}/lmms.exe)
@@ -440,7 +478,7 @@ IF(WANT_PCH)
     ENDIF(PCHSupport_FOUND)
 ENDIF(WANT_PCH)
 
-SET_DIRECTORY_PROPERTIES(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES "${ER_H} ${lmms_MOC_out} ${lmms_UI_out} lmmsconfig.h alsaconfig.h pch.h.gch/")
+SET_DIRECTORY_PROPERTIES(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES "${LMMS_ER_H} ${lmms_MOC_out} ${lmms_UI_out} lmmsconfig.h alsaconfig.h pch.h.gch/")
 
 
 #
@@ -459,40 +497,48 @@ MESSAGE("\n"
 MESSAGE(
 "Supported audio interfaces\n"
 "--------------------------\n"
-"* ALSA                        : ${LMMS_HAVE_ALSA}\n"
-"* JACK                        : ${LMMS_HAVE_JACK}\n"
-"* OSS                         : ${LMMS_HAVE_OSS}\n"
-"* PulseAudio                  : ${LMMS_HAVE_PULSEAUDIO}\n"
-"* SDL                         : ${LMMS_HAVE_SDL}\n"
+"* ALSA                        : ${STATUS_ALSA}\n"
+"* JACK                        : ${STATUS_JACK}\n"
+"* OSS                         : ${STATUS_OSS}\n"
+"* PulseAudio                  : ${STATUS_PULSEAUDIO}\n"
+"* SDL                         : ${STATUS_SDL}\n"
 )
 
 MESSAGE(
 "Supported MIDI interfaces\n"
 "-------------------------\n"
-"* ALSA                        : ${LMMS_HAVE_ALSA}\n"
-"* OSS                         : ${LMMS_HAVE_OSS}\n"
-"* WinMM                       : ${LMMS_HAVE_WINMM}\n"
+"* ALSA                        : ${STATUS_ALSA}\n"
+"* OSS                         : ${STATUS_OSS}\n"
+"* WinMM                       : ${STATUS_WINMM}\n"
 )
 
 MESSAGE(
-"Supported sample-file formats\n"
-"-----------------------------\n"
-"* WAVE                        : TRUE\n"
-"* OGG/VORBIS                  : ${LMMS_HAVE_OGGVORBIS}\n"
+"Supported file formats for project export\n"
+"-----------------------------------------\n"
+"* WAVE                        : OK\n"
+"* OGG/VORBIS                  : ${STATUS_OGGVORBIS}\n"
 )
 
 MESSAGE(
 "Optional plugins\n"
 "----------------\n"
-"* SoundFont2 player           : ${LMMS_HAVE_FLUIDSYNTH}\n"
-"* Stk Mallets                 : ${LMMS_HAVE_STK}\n"
-"* VST-instrument hoster       : ${LMMS_HAVE_VST}\n"
-"* VST-effect hoster           : ${LMMS_HAVE_VST}\n"
-"* SpectrumAnalyzer            : ${LMMS_HAVE_FFTW3F}\n"
-"* CAPS LADSPA plugins         : ${LMMS_HAVE_CAPS}\n"
-"* TAP LADSPA plugins          : ${LMMS_HAVE_TAP}\n"
+"* SoundFont2 player           : ${STATUS_FLUIDSYNTH}\n"
+"* Stk Mallets                 : ${STATUS_STK}\n"
+"* VST-instrument hoster       : ${STATUS_WINE}\n"
+"* VST-effect hoster           : ${STATUS_WINE}\n"
+"* SpectrumAnalyzer            : ${STATUS_FFTW3F}\n"
+"* CAPS LADSPA plugins         : ${STATUS_CAPS}\n"
+"* TAP LADSPA plugins          : ${STATUS_TAP}\n"
 )
 
+MESSAGE(
+"\n"
+"---------------------------------------------------------------------\n"
+"IMPORTANT:\n"
+"after installing missing packages, remove CMakeCache.txt before running\n"
+"cmake again!\n"
+"---------------------------------------------------------------------\n"
+"\n\n")
 
 INCLUDE(InstallRequiredSystemLibraries)
 SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Linux MultiMedia Studio - easy music production for everyone!")
