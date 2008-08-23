@@ -173,7 +173,7 @@ http://lmms.sourceforge.net</translation>
     </message>
     <message>
         <source>An arpeggio is a type of playing (especially plucked) instruments, which makes the music much livelier. The strings of such instruments (e.g. harps) are plucked like chords, the only difference is, that this is done in a sequential order, so the notes are not played at the same time. Typical arpeggios are major or minor triads. But there&apos;re a lot of other possible chords, you can select.</source>
-        <translation>Ein Arpeggio ist eine Art, (vorallem gezupfte) Instrumente zu spielen, die die Musik viel lebendiger macht. Die Seiten von solchen Instrumenten (z.B. Harfen) werden wie Akkorde gezupft, der einzige Unterschied ist, dass das nacheinander in einer bestimmten Reihenfolge geschieht. Die Noten werden also nicht zur gleichen Zeit gespielt. Typische Arpeggios sind Dur- oder Moll-Dreiklänge. Aber es sind noch viele andere Akkorde möglich, die Sie auswählen können.</translation>
+        <translation type="obsolete">Ein Arpeggio ist eine Art, (vorallem gezupfte) Instrumente zu spielen, die die Musik viel lebendiger macht. Die Seiten von solchen Instrumenten (z.B. Harfen) werden wie Akkorde gezupft, der einzige Unterschied ist, dass das nacheinander in einer bestimmten Reihenfolge geschieht. Die Noten werden also nicht zur gleichen Zeit gespielt. Typische Arpeggios sind Dur- oder Moll-Dreiklänge. Aber es sind noch viele andere Akkorde möglich, die Sie auswählen können.</translation>
     </message>
     <message>
         <source>RANGE</source>
@@ -189,7 +189,7 @@ http://lmms.sourceforge.net</translation>
     </message>
     <message>
         <source>Use this knob for setting the arpeggio range in octaves. The selected arpeggio will be played within specified amount of octaves.</source>
-        <translation>Benutzen Sie diesen Knopf, um den Arpeggio-Bereich in Oktaven zu setzen. Das gewähle Arpeggio wird innerhalb der angegebenen Anzahl von Oktaven abgespielt.</translation>
+        <translation type="obsolete">Benutzen Sie diesen Knopf, um den Arpeggio-Bereich in Oktaven zu setzen. Das gewähle Arpeggio wird innerhalb der angegebenen Anzahl von Oktaven abgespielt.</translation>
     </message>
     <message>
         <source>TIME</source>
@@ -221,7 +221,7 @@ http://lmms.sourceforge.net</translation>
     </message>
     <message>
         <source>Use this knob for setting the arpeggio gate. The arpeggio gate specifies the percent of a whole arpeggio-tone that should be played. With this you can make cool staccato-arpeggios.</source>
-        <translation>Benutzen Sie diesen Knopf, um das Arpeggio-Gate zu setzen. Das Arpeggio-Gate gibt an, wie viel Prozent eines ganzen Arpeggio-Tons gespielt werden sollen. Damit können Sie coole Staccato-Arpeggios erstellen.</translation>
+        <translation type="obsolete">Benutzen Sie diesen Knopf, um das Arpeggio-Gate zu setzen. Das Arpeggio-Gate gibt an, wie viel Prozent eines ganzen Arpeggio-Tons gespielt werden sollen. Damit können Sie coole Staccato-Arpeggios erstellen.</translation>
     </message>
     <message>
         <source>Direction:</source>
@@ -230,6 +230,18 @@ http://lmms.sourceforge.net</translation>
     <message>
         <source>Mode:</source>
         <translation>Modus:</translation>
+    </message>
+    <message>
+        <source>An arpeggio is a method playing (especially plucked) instruments, which makes the music much livelier. The strings of such instruments (e.g. harps) are plucked like chords. The only difference is that this is done in a sequential order, so the notes are not played at the same time. Typical arpeggios are major or minor triads, but there are a lot of other possible chords, you can select.</source>
+        <translation>Ein Arpeggio ist eine Art, (vorallem gezupfte) Instrumente zu spielen, die die Musik viel lebendiger macht. Die Seiten von solchen Instrumenten (z.B. Harfen) werden wie Akkorde gezupft, der einzige Unterschied besteht darin, dass dies nacheinander geschieht. Die Noten werden also nicht zur gleichen Zeit gespielt. Typische Arpeggios sind Dur- oder Moll-Dreiklänge, aber es gibt noch viele andere Akkorde, die Sie auswählen können.</translation>
+    </message>
+    <message>
+        <source>Use this knob for setting the arpeggio range in octaves. The selected arpeggio will be played within specified number of octaves.</source>
+        <translation>Benutzen Sie diesen Knopf, um den Arpeggio-Bereich in Oktaven zu setzen. Das gewähle Arpeggio wird innerhalb der angegebenen Anzahl von Oktaven abgespielt.</translation>
+    </message>
+    <message>
+        <source>Use this knob for setting the arpeggio gate. The arpeggio gate specifies the percent of a whole arpeggio-tone that should be played. With this you can make cool staccato arpeggios.</source>
+        <translation>Benutzen Sie diesen Knopf, um das Arpeggio-Gate zu setzen. Das Arpeggio-Gate gibt an, wie viel Prozent eines ganzen Arpeggio-Tons gespielt werden sollen. Damit können Sie coole Staccato-Arpeggios erzeugen.</translation>
     </message>
 </context>
 <context>
@@ -278,7 +290,7 @@ http://lmms.sourceforge.net</translation>
     </message>
     <message>
         <source>Click here, if you want to open another audio-file. After clicking on this button, a file-open-dialog appears and you can select your file. Settings like Looping-Mode, start- and end-point, amplify-value and so on are not reset, so please don&apos;t wonder if your sample doesn&apos;t sound like the original one...</source>
-        <translation>Klicken Sie hier, wenn Sie eine andere Audio-Datei öffnen wollen. Nachdem Sie auf diesen Button geklickt haben, erscheint ein Datei-öffnen-Dialog, in dem Sie Ihre Datei wählen können. Einstellungen wie Looping-Modus, Start- und Endpunkt, Verstärkungs-Wert usw. werden nicht zurückgesetzt. Wundern Sie sich also bitte nicht, wenn das Sample auf einmal anders als das Original klingt...</translation>
+        <translation type="obsolete">Klicken Sie hier, wenn Sie eine andere Audio-Datei öffnen wollen. Nachdem Sie auf diesen Button geklickt haben, erscheint ein Datei-öffnen-Dialog, in dem Sie Ihre Datei wählen können. Einstellungen wie Looping-Modus, Start- und Endpunkt, Verstärkungs-Wert usw. werden nicht zurückgesetzt. Wundern Sie sich also bitte nicht, wenn das Sample auf einmal anders als das Original klingt...</translation>
     </message>
     <message>
         <source>Reverse sample</source>
@@ -294,7 +306,7 @@ http://lmms.sourceforge.net</translation>
     </message>
     <message>
         <source>Here you can set, whether Looping-Mode is enabled. If enabled, AudioFileProcessor loops between start- and end-point of a sample until the whole note is played. This is useful for things like string- and choir-samples.</source>
-        <translation>Hier können Sie festlegen, ob der Looping-Modus aktiviert sein soll. Wenn er aktiviert ist, wiederholt AudioFileProcessor das Sample zwischen Start- und Endpunkt solange, bis die gesamte Note gespielt ist. Das ist vorallem für String- und Chor-Samples nützlich.</translation>
+        <translation type="obsolete">Hier können Sie festlegen, ob der Looping-Modus aktiviert sein soll. Wenn er aktiviert ist, wiederholt AudioFileProcessor das Sample zwischen Start- und Endpunkt solange, bis die gesamte Note gespielt ist. Das ist vorallem für String- und Chor-Samples nützlich.</translation>
     </message>
     <message>
         <source>Amplify:</source>
@@ -302,7 +314,7 @@ http://lmms.sourceforge.net</translation>
     </message>
     <message>
         <source>With this knob you can set the amplify-ratio. When you set a value of 100% your sample isn&apos;t changed. Otherwise it will be amplified up or down (your actual sample-file isn&apos;t touched!)</source>
-        <translation>Mit diesem Knopf können Sie die Verstärkungsrate festlegen. Wenn Sie einen Wert von 100% setzen, wird das Sample nicht geändert. Ansonsten wird es hoch oder runter verstärkt (Ihre Audio-Datei wird dabei nicht verändert!)</translation>
+        <translation type="obsolete">Mit diesem Knopf können Sie die Verstärkungsrate festlegen. Wenn Sie einen Wert von 100% setzen, wird das Sample nicht geändert. Ansonsten wird es hoch oder runter verstärkt (Ihre Audio-Datei wird dabei nicht verändert!)</translation>
     </message>
     <message>
         <source>Startpoint:</source>
@@ -310,7 +322,7 @@ http://lmms.sourceforge.net</translation>
     </message>
     <message>
         <source>With this knob you can set the point where AudioFileProcessor should begin playing your sample. If you enable Looping-Mode, this is the point to which AudioFileProcessor returns if a note is longer than the sample between start- and end-point.</source>
-        <translation>Mit diesem Knopf können Sie festlegen, wo AudioFileProcessor anfangen soll, Ihr Sample zu spielen. Wenn Sie den Looping-Modus aktivieren, ist das der Punkt, wohin AudioFileProcessor zurückkehrt, wenn eine Note länger als das Sample zwischen Start- und Endpunkt ist.</translation>
+        <translation type="obsolete">Mit diesem Knopf können Sie festlegen, wo AudioFileProcessor anfangen soll, Ihr Sample zu spielen. Wenn Sie den Looping-Modus aktivieren, ist das der Punkt, wohin AudioFileProcessor zurückkehrt, wenn eine Note länger als das Sample zwischen Start- und Endpunkt ist.</translation>
     </message>
     <message>
         <source>Endpoint:</source>
@@ -318,7 +330,27 @@ http://lmms.sourceforge.net</translation>
     </message>
     <message>
         <source>With this knob you can set the point where AudioFileProcessor should stop playing your sample. If you enable Looping-Mode, this is the point where AudioFileProcessor returns if a note is longer than the sample between start- and end-point.</source>
-        <translation>Mit diesem Knopf können Sie festlegen, wo AudioFileProcessor aufhören soll, Ihr Sample zu spielen. Wenn Sie den Looping-Modus aktivieren, ist das der Punkt, an dem AudioFileProcessor zum Startpunkt zurückkehrt, wenn eine Note länger als das Sample zwischen Start- und Endpunkt ist.</translation>
+        <translation type="obsolete">Mit diesem Knopf können Sie festlegen, wo AudioFileProcessor aufhören soll, Ihr Sample zu spielen. Wenn Sie den Looping-Modus aktivieren, ist das der Punkt, an dem AudioFileProcessor zum Startpunkt zurückkehrt, wenn eine Note länger als das Sample zwischen Start- und Endpunkt ist.</translation>
+    </message>
+    <message>
+        <source>Click here, if you want to open another audio-file. A dialog will appear where you can select your file. Settings like looping-mode, start and end-points, amplify-value, and so on are not reset. So, it may not sound like the original sample.</source>
+        <translation>Klicken Sie hier, um eine andere Audio-Datei zu öffnen. Danach erscheint ein Dialog, in dem Sie Ihre Datei wählen können. Einstellungen wie Wiederhol-Modus, Start- und Endpunkt sowie Verstärkung werden nicht zurückgesetzt, weshalb die Datei möglicherweise nicht wie das Original klingt.</translation>
+    </message>
+    <message>
+        <source>Here you can set, whether looping-mode is enabled. If enabled, AudioFileProcessor loops between start and end-points of a sample until the whole note is played. This is useful for things like string and choir samples.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>With this knob you can set the amplify ratio. When you set a value of 100% your sample isn&apos;t changed. Otherwise it will be amplified up or down (your actual sample-file isn&apos;t touched!)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>With this knob you can set the point where AudioFileProcessor should begin playing your sample. If you enable looping-mode, this is the point to which AudioFileProcessor returns if a note is longer than the sample between the start and end-points.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>With this knob you can set the point where AudioFileProcessor should stop playing your sample. If you enable looping-mode, this is the point where AudioFileProcessor returns if a note is longer than the sample between the start and end-points.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -372,11 +404,11 @@ http://lmms.sourceforge.net</translation>
     </message>
     <message>
         <source>Click here, if you want to play the current pattern. This is useful while editing it. The pattern is automatically looped when its end is reached.</source>
-        <translation>Klicken Sie hier, wenn Sie den aktuellen Pattern spielen wollen. Das ist nützlich beim Bearbeiten. Der Pattern wird automatisch wiederholt, wenn sein Ende erreicht ist.</translation>
+        <translation type="obsolete">Klicken Sie hier, wenn Sie den aktuellen Pattern spielen wollen. Das ist nützlich beim Bearbeiten. Der Pattern wird automatisch wiederholt, wenn sein Ende erreicht ist.</translation>
     </message>
     <message>
         <source>Click here, if you want to stop playing of current pattern.</source>
-        <translation>Klicken Sie hier, wenn Sie das Abspielen des aktuellen Patterns stoppen wollen.</translation>
+        <translation type="obsolete">Klicken Sie hier, wenn Sie das Abspielen des aktuellen Patterns stoppen wollen.</translation>
     </message>
     <message>
         <source>Cut selected values (Ctrl+X)</source>
@@ -392,15 +424,15 @@ http://lmms.sourceforge.net</translation>
     </message>
     <message>
         <source>If you click here, selected values will be cut into the clipboard. You can paste them anywhere in any pattern by clicking on the paste-button.</source>
-        <translation>Wenn Sie hier klicken, werden die markierten Werte in die Zwischenablage ausgeschnitten. Sie können sie überall, auch in einem anderen Pattern, wieder einfügen, indem Sie auf den Einfügen-Button klicken.</translation>
+        <translation type="obsolete">Wenn Sie hier klicken, werden die markierten Werte in die Zwischenablage ausgeschnitten. Sie können sie überall, auch in einem anderen Pattern, wieder einfügen, indem Sie auf den Einfügen-Button klicken.</translation>
     </message>
     <message>
         <source>If you click here, selected values will be copied into the clipboard. You can paste them anywhere in any pattern by clicking on the paste-button.</source>
-        <translation>Wenn Sie hier klicken, werden die markierten Werte in die Zwischenablage kopiert. Sie können sie überall, auch in einem anderen Pattern, wieder einfügen, indem Sie auf den Einfügen-Button klicken.</translation>
+        <translation type="obsolete">Wenn Sie hier klicken, werden die markierten Werte in die Zwischenablage kopiert. Sie können sie überall, auch in einem anderen Pattern, wieder einfügen, indem Sie auf den Einfügen-Button klicken.</translation>
     </message>
     <message>
         <source>If you click here, the values from the clipboard will be pasted at the first visible tact.</source>
-        <translation>Wenn Sie hier klicken, werden die Werte in der Zwischenablage im ersten sichtbaren Takt eingefügt.</translation>
+        <translation type="obsolete">Wenn Sie hier klicken, werden die Werte in der Zwischenablage im ersten sichtbaren Takt eingefügt.</translation>
     </message>
     <message>
         <source>Automation Editor - no pattern</source>
@@ -440,19 +472,51 @@ http://lmms.sourceforge.net</translation>
     </message>
     <message>
         <source>If you click here, draw-mode will be activated. In this mode you can add and move single values. This is the default-mode which is used most of the time. You can also press &apos;Shift+D&apos; on your keyboard to activate this mode.</source>
-        <translation>Wenn Sie hier klicken, wird der Zeichnen-Modus aktiviert. In diesem Modus können Sie einzelne Werte hinzufügen und verschieben. Das ist der Standard-Modus, der meistens benutzt wird. Sie können auch &apos;Umschalt+D&apos; auf Ihrer Tastatur drücken, um in diesen Modus zu gelangen.</translation>
+        <translation type="obsolete">Wenn Sie hier klicken, wird der Zeichnen-Modus aktiviert. In diesem Modus können Sie einzelne Werte hinzufügen und verschieben. Das ist der Standard-Modus, der meistens benutzt wird. Sie können auch &apos;Umschalt+D&apos; auf Ihrer Tastatur drücken, um in diesen Modus zu gelangen.</translation>
     </message>
     <message>
         <source>If you click here, erase-mode will be activated. In this mode you can erase single values. You can also press &apos;Shift+E&apos; on your keyboard to activate this mode.</source>
-        <translation>Wenn Sie hier klicken, wird der Radier-Modus aktiviert. In diesem Modus können Sie einzelne Werte löschen. Sie können auch &apos;Umschalt+E&apos; auf Ihrer Tastatur drücken, um diesen Modus zu aktivieren.</translation>
+        <translation type="obsolete">Wenn Sie hier klicken, wird der Radier-Modus aktiviert. In diesem Modus können Sie einzelne Werte löschen. Sie können auch &apos;Umschalt+E&apos; auf Ihrer Tastatur drücken, um diesen Modus zu aktivieren.</translation>
     </message>
     <message>
         <source>If you click here, select-mode will be activated. In this mode you can select values. This is neccessary if you want to cut, copy, paste, delete or move values. You can also press &apos;Shift+S&apos; on your keyboard to activate this mode.</source>
-        <translation>Wenn Sie hier klicken, wird der Auswahl-Modus aktiviert. In diesem Modus können Sie Werte markieren. Das ist nötig, wenn Sie (mehrere) Werte ausschneiden, kopieren, einfügen, löschen oder verschieben wollen. Sie können auch &apos;Umschalt+S&apos; auf Ihrer Tastatur drücken, um diesen Modus zu aktivieren.</translation>
+        <translation type="obsolete">Wenn Sie hier klicken, wird der Auswahl-Modus aktiviert. In diesem Modus können Sie Werte markieren. Das ist nötig, wenn Sie (mehrere) Werte ausschneiden, kopieren, einfügen, löschen oder verschieben wollen. Sie können auch &apos;Umschalt+S&apos; auf Ihrer Tastatur drücken, um diesen Modus zu aktivieren.</translation>
     </message>
     <message>
         <source>If you click here, move-mode will be activated. In this mode you can move the values you selected in select-mode. You can also press &apos;Shift+M&apos; on your keyboard to activate this mode.</source>
         <translation>Wenn Sie hier klicken, wird der Auswahl-Verschieben-Modus aktiviert. In diesem Modus können Sie die markierten Werte verschieben. Sie können auch &apos;Umschalt+M&apos; auf Ihrer Tastatur drücken, um diesen Modus zu aktivieren.</translation>
+    </message>
+    <message>
+        <source>Click here if you want to play the current pattern. This is useful while editing it.  The pattern is automatically looped when the end is reached.</source>
+        <translation>Klicken Sie hier, wenn Sie den aktuellen Pattern spielen wollen. Das ist nützlich beim Bearbeiten. Der Pattern wird automatisch wiederholt, wenn das Ende erreicht ist.</translation>
+    </message>
+    <message>
+        <source>Click here if you want to stop playing of the current pattern.</source>
+        <translation>Klicken Sie hier, wenn Sie das Abspielen des aktuellen Patterns stoppen wollen.</translation>
+    </message>
+    <message>
+        <source>Click here and draw-mode will be activated. In this mode you can add and move single values.  This is the default mode which is used most of the time.  You can also press &apos;Shift+D&apos; on your keyboard to activate this mode.</source>
+        <translation>Klicken Sie hier, um den Zeichnen-Modus zu aktivieren. In diesem Modus können Sie einzelne Werte hinzufügen und verschieben. Das ist der Standard-Modus, der meistens benutzt wird. Sie können auch &apos;Umschalt+D&apos; auf Ihrer Tastatur drücken, um in diesen Modus zu gelangen.</translation>
+    </message>
+    <message>
+        <source>Click here and erase-mode will be activated. In this mode you can erase single values. You can also press &apos;Shift+E&apos; on your keyboard to activate this mode.</source>
+        <translation>Klicken Sie hier, um den Radier-Modus zu aktivieren. In diesem Modus können Sie einzelne Werte löschen. Sie können auch &apos;Umschalt+E&apos; auf Ihrer Tastatur drücken, um diesen Modus zu aktivieren.</translation>
+    </message>
+    <message>
+        <source>Click here and select-mode will be activated. In this mode you can select values. This is neccessary if you want to cut, copy, paste, delete, or move values. You can also press &apos;Shift+S&apos; on your keyboard to activate this mode.</source>
+        <translation>Klicken Sie hier, um den Auswahl-Modus zu aktivieren. In diesem Modus können Sie Werte markieren. Das ist nötig, wenn Sie (mehrere) Werte ausschneiden, kopieren, einfügen, löschen oder verschieben wollen. Sie können auch &apos;Umschalt+S&apos; auf Ihrer Tastatur drücken, um diesen Modus zu aktivieren.</translation>
+    </message>
+    <message>
+        <source>Click here and selected values will be cut into the clipboard.  You can paste them anywhere in any pattern by clicking on the paste button.</source>
+        <translation>Klicken Sie hier, um die markierten Werte auszuschneiden und in die Zwischenablage zu kopieren. Sie können diese dann überall, auch in einem anderen Pattern, wieder einfügen, indem Sie auf den Einfügen-Button klicken.</translation>
+    </message>
+    <message>
+        <source>Click here and selected values will be copied into the clipboard.  You can paste them anywhere in any pattern by clicking on the paste button.</source>
+        <translation>Klicken Sie hier, um die markierten Werte in die Zwischenablage zu kopieren. Sie können  diese dann überall, auch in einem anderen Pattern, wieder einfügen, indem Sie auf den Einfügen-Button klicken.</translation>
+    </message>
+    <message>
+        <source>Click here and the values from the clipboard will be pasted at the first visible measure.</source>
+        <translation>Klicken Sie hier, um die Werte in der Zwischenablage im ersten sichtbaren Takt einzufügen.</translation>
     </message>
 </context>
 <context>
@@ -550,15 +614,15 @@ http://lmms.sourceforge.net</translation>
     </message>
     <message>
         <source>Stop playing of current beat/bassline (Space)</source>
-        <translation>Abspielen des aktuellen Beats/Bassline stoppen (Leertaste)</translation>
+        <translation type="obsolete">Abspielen des aktuellen Beats/Bassline stoppen (Leertaste)</translation>
     </message>
     <message>
         <source>Click here, if you want to play the current beat/bassline. The beat/bassline is automatically looped when its end is reached.</source>
-        <translation>Klicken Sie hier, wenn Sie den aktuelle Beat/Bassline abspielen wollen. Der Beat/Bassline wird automatisch wiederholt, wenn sein Ende erreicht ist.</translation>
+        <translation type="obsolete">Klicken Sie hier, wenn Sie den aktuelle Beat/Bassline abspielen wollen. Der Beat/Bassline wird automatisch wiederholt, wenn sein Ende erreicht ist.</translation>
     </message>
     <message>
         <source>Click here, if you want to stop playing of current beat/bassline.</source>
-        <translation>Klicken Sie hier, wenn Sie das Abspielen des aktuellen Beats/Bassline stoppen wollen.</translation>
+        <translation type="obsolete">Klicken Sie hier, wenn Sie das Abspielen des aktuellen Beats/Bassline stoppen wollen.</translation>
     </message>
     <message>
         <source>Beat+Bassline Editor</source>
@@ -571,6 +635,18 @@ http://lmms.sourceforge.net</translation>
     <message>
         <source>Add automation-track</source>
         <translation>Automation-Spur hinzufügen</translation>
+    </message>
+    <message>
+        <source>Stop playback of current beat/bassline (Space)</source>
+        <translation>Abspielen des aktuellen Beats/Bassline stoppen (Leertaste)</translation>
+    </message>
+    <message>
+        <source>Click here to play the current beat/bassline.  The beat/bassline is automatically looped when its end is reached.</source>
+        <translation>Klicken Sie hier, um den aktuelle Beat/Bassline abzuspielen. Der Beat/Bassline wird am Ende automatisch wiederholt.</translation>
+    </message>
+    <message>
+        <source>Click here to stop playing of current beat/bassline.</source>
+        <translation>Klicken Sie hier, um das Abspielen des aktuellen Beats/Bassline zu stoppen (Leertaste)</translation>
     </message>
 </context>
 <context>
@@ -614,7 +690,7 @@ http://lmms.sourceforge.net</translation>
     </message>
     <message>
         <source>Draw your own waveform hereby dragging your mouse onto this graph</source>
-        <translation>Zeichnen Sie eigene Wellenformen, indem Sie die Maus über den Graph ziehen</translation>
+        <translation type="obsolete">Zeichnen Sie eigene Wellenformen, indem Sie die Maus über den Graph ziehen</translation>
     </message>
     <message>
         <source>Sine wave</source>
@@ -622,7 +698,7 @@ http://lmms.sourceforge.net</translation>
     </message>
     <message>
         <source>Click here if you want a sine-wave for current oscillator.</source>
-        <translation>Klicken Sie hier, wenn Sie eine Sinus-Schwingung für den aktuellen Oszillator haben wollen.</translation>
+        <translation type="obsolete">Klicken Sie hier, wenn Sie eine Sinus-Schwingung für den aktuellen Oszillator haben wollen.</translation>
     </message>
     <message>
         <source>Triangle wave</source>
@@ -630,7 +706,7 @@ http://lmms.sourceforge.net</translation>
     </message>
     <message>
         <source>Click here if you want a triangle-wave for current oscillator.</source>
-        <translation>Klicken Sie hier, wenn Sie eine Dreiecks-Schwingung für den aktuellen Oszillator haben wollen.</translation>
+        <translation type="obsolete">Klicken Sie hier, wenn Sie eine Dreiecks-Schwingung für den aktuellen Oszillator haben wollen.</translation>
     </message>
     <message>
         <source>Saw wave</source>
@@ -638,7 +714,7 @@ http://lmms.sourceforge.net</translation>
     </message>
     <message>
         <source>Click here if you want a saw-wave for current oscillator.</source>
-        <translation>Klicken Sie hier, wenn Sie eine Sägezahn-Schwingung für den aktuellen Oszillator haben wollen.</translation>
+        <translation type="obsolete">Klicken Sie hier, wenn Sie eine Sägezahn-Schwingung für den aktuellen Oszillator haben wollen.</translation>
     </message>
     <message>
         <source>Square wave</source>
@@ -646,7 +722,7 @@ http://lmms.sourceforge.net</translation>
     </message>
     <message>
         <source>Click here if you want a square-wave for current oscillator.</source>
-        <translation>Klicken Sie hier, wenn Sie eine Rechteck-Schwingung für den aktuellen Oszillator haben wollen.</translation>
+        <translation type="obsolete">Klicken Sie hier, wenn Sie eine Rechteck-Schwingung für den aktuellen Oszillator haben wollen.</translation>
     </message>
     <message>
         <source>White noise wave</source>
@@ -654,7 +730,7 @@ http://lmms.sourceforge.net</translation>
     </message>
     <message>
         <source>Click here if you want a white-noise for current oscillator.</source>
-        <translation>Klicken Sie hier, wenn Sie weißes Rauschen für den aktuellen Oszillator haben wollen.</translation>
+        <translation type="obsolete">Klicken Sie hier, wenn Sie weißes Rauschen für den aktuellen Oszillator haben wollen.</translation>
     </message>
     <message>
         <source>User defined wave</source>
@@ -662,7 +738,7 @@ http://lmms.sourceforge.net</translation>
     </message>
     <message>
         <source>Click here if you want a user-defined wave-shape for current oscillator.</source>
-        <translation>Klicken Sie hier, wenn Sie eine selbst definierte Wellenform für den aktuellen Oszillator haben wollen.</translation>
+        <translation type="obsolete">Klicken Sie hier, wenn Sie eine selbst definierte Wellenform für den aktuellen Oszillator haben wollen.</translation>
     </message>
     <message>
         <source>Smooth</source>
@@ -679,6 +755,34 @@ http://lmms.sourceforge.net</translation>
     <message>
         <source>Normalize</source>
         <translation>Normalisieren</translation>
+    </message>
+    <message>
+        <source>Draw your own waveform here by dragging your mouse on this graph.</source>
+        <translation>Zeichnen Sie eigene Wellenformen, indem Sie die Maus über den Graph ziehen.</translation>
+    </message>
+    <message>
+        <source>Click for a sine-wave.</source>
+        <translation>Klick für eine Sinuswelle.</translation>
+    </message>
+    <message>
+        <source>Click here for a triangle-wave.</source>
+        <translation>Klick für eine Dreieckswelle.</translation>
+    </message>
+    <message>
+        <source>Click here for a saw-wave.</source>
+        <translation>Klick für eine Sägezahnwelle.</translation>
+    </message>
+    <message>
+        <source>Click here for a square-wave.</source>
+        <translation>Klick für eine Rechteckswelle.</translation>
+    </message>
+    <message>
+        <source>Click here for white-noise.</source>
+        <translation>Klick für weißes Rauschen.</translation>
+    </message>
+    <message>
+        <source>Click here for a user-defined shape.</source>
+        <translation>Klick für eine benutzerdefinierte Wellenform.</translation>
     </message>
 </context>
 <context>
@@ -1045,7 +1149,7 @@ http://lmms.sourceforge.net</translation>
     </message>
     <message>
         <source>Chords</source>
-        <translation type="unfinished"></translation>
+        <translation>Akkorde</translation>
     </message>
 </context>
 <context>
@@ -1068,6 +1172,10 @@ http://lmms.sourceforge.net</translation>
     </message>
     <message>
         <source>Use this knob for setting the chord range in octaves. The selected chord will be played within specified amount of octaves.</source>
+        <translation type="obsolete">Benutzen Sie diesen Knopf, um den Akkord-Bereich in Oktaven zu setzen. Der gewähle Akkord wird innerhalb der angegebenen Anzahl von Oktaven abgespielt.</translation>
+    </message>
+    <message>
+        <source>Use this knob for setting the chord range in octaves. The selected chord will be played within specified number of octaves.</source>
         <translation>Benutzen Sie diesen Knopf, um den Akkord-Bereich in Oktaven zu setzen. Der gewähle Akkord wird innerhalb der angegebenen Anzahl von Oktaven abgespielt.</translation>
     </message>
 </context>
@@ -1242,7 +1350,7 @@ http://lmms.sourceforge.net</translation>
     </message>
     <message>
         <source>The Wet/Dry knob sets the ratio between the input signal and the effect that shows up in the output.</source>
-        <translation>Der Wet/Dry-Knopf legt das Verhältnis zwischen Eingangssignal und vom Effekt bearbeiteten Signal im Ausgang fest.</translation>
+        <translation type="obsolete">Der Wet/Dry-Knopf legt das Verhältnis zwischen Eingangssignal und vom Effekt bearbeiteten Signal im Ausgang fest.</translation>
     </message>
     <message>
         <source>Time:</source>
@@ -1250,7 +1358,7 @@ http://lmms.sourceforge.net</translation>
     </message>
     <message>
         <source>The Decay knob controls how many buffers of silence must pass before the plugin stops processing.  Smaller values will reduce the CPU overhead but run the risk of clipping the tail on delay effects.</source>
-        <translation>Der Abfallzeit-Knopf kontrolliert, wie viele Puffer mit Stille durchgelaufen sein müssen, bis das Plugin mit der Verarbeitung stoppt. Kleinere Werte reduzieren die CPU-Last, können jedoch unter Umständen das Ende von Delay-Effekten o.ä. abschneiden.</translation>
+        <translation type="obsolete">Der Abfallzeit-Knopf kontrolliert, wie viele Puffer mit Stille durchgelaufen sein müssen, bis das Plugin mit der Verarbeitung stoppt. Kleinere Werte reduzieren die CPU-Last, können jedoch unter Umständen das Ende von Delay-Effekten o.ä. abschneiden.</translation>
     </message>
     <message>
         <source>Gate:</source>
@@ -1263,22 +1371,6 @@ http://lmms.sourceforge.net</translation>
     <message>
         <source>Controls</source>
         <translation>Regler</translation>
-    </message>
-    <message>
-        <source>Effect plugins function as a chained series of effects where the signal will be processed from top to bottom.
-
-The On/Off switch allows you to bypass a given plugin at any point in time.
-
-The Wet/Dry knob controls the balance between the input signal and the effected signal that is the resulting output from the effect.  The input for one stage is the output from the previous stage, so the &apos;dry&apos; signal for effects lower in the chain contains all of the previous effects.
-
-The Decay knob controls how long the signal will continue to be processed after the notes have been released.  The effect will stop processing signals when the signal has dropped below a given threshold for a given length of time.  This knob sets the &apos;given length of time&apos;.  Longer times will require more CPU, so this number should be set low for most effects.  It needs to be bumped up for effects that produce lengthy periods of silence, e.g. delays.
-
-The Gate knob controls the &apos;given threshold&apos; for the effect&apos;s auto shutdown.  The clock for the &apos;given length of time&apos; will begin as soon as the processed signal level drops below the level specified with this knob.
-
-The Controls button opens a dialog for editing the effect&apos;s parameters.
-
-Right clicking will bring up a context menu where you can change the order in which the effects are processed or delete an effect altogether.</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Move &amp;up</source>
@@ -1304,56 +1396,80 @@ Right clicking will bring up a context menu where you can change the order in wh
         <source>GATE</source>
         <translation>GATE</translation>
     </message>
+    <message>
+        <source>The Wet/Dry knob sets the ratio between the input signal and the effect signal that forms the output.</source>
+        <translation>Der Wet/Dry-Knopf legt das Verhältnis zwischen Eingangssignal und vom Effekt bearbeiteten Signal im Ausgang fest.</translation>
+    </message>
+    <message>
+        <source>The Decay knob controls how many buffers of silence must pass before the plugin stops processing.  Smaller values will reduce the CPU overhead but run the risk of clipping the tail on delay and reverb effects.</source>
+        <translation>Der Abfallzeit-Knopf legt fest, wie viele Puffer mit Stille durchgelaufen sein müssen, bis der Effekt mit der Verarbeitung stoppt. Kleinere Werte reduzieren die CPU-Last, können jedoch unter Umständen das Ende von Delay-Effekten o.ä. abschneiden.</translation>
+    </message>
+    <message>
+        <source>Effect plugins function as a chained series of effects where the signal will be processed from top to bottom.
+
+The On/Off switch allows you to bypass a given plugin at any point in time.
+
+The Wet/Dry knob controls the balance between the input signal and the effected signal that is the resulting output from the effect.  The input for the stage is the output from the previous stage. So, the &apos;dry&apos; signal for effects lower in the chain contains all of the previous effects.
+
+The Decay knob controls how long the signal will continue to be processed after the notes have been released.  The effect will stop processing signals when the volume has dropped below a given threshold for a given length of time.  This knob sets the &apos;given length of time&apos;.  Longer times will require more CPU, so this number should be set low for most effects.  It needs to be bumped up for effects that produce lengthy periods of silence, e.g. delays.
+
+The Gate knob controls the &apos;given threshold&apos; for the effect&apos;s auto shutdown.  The clock for the &apos;given length of time&apos; will begin as soon as the processed signal level drops below the level specified with this knob.
+
+The Controls button opens a dialog for editing the effect&apos;s parameters.
+
+Right clicking will bring up a context menu where you can change the order in which the effects are processed or delete an effect altogether.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>envelopeAndLFOParameters</name>
     <message>
         <source>Predelay-time</source>
-        <translation>Vor-Verzögerung</translation>
+        <translation type="obsolete">Vor-Verzögerung</translation>
     </message>
     <message>
         <source>Attack-time</source>
-        <translation>Anschwellzeit</translation>
+        <translation type="obsolete">Anschwellzeit</translation>
     </message>
     <message>
         <source>Hold-time</source>
-        <translation>Haltezeit</translation>
+        <translation type="obsolete">Haltezeit</translation>
     </message>
     <message>
         <source>Decay-time</source>
-        <translation>Abfallzeit</translation>
+        <translation type="obsolete">Abfallzeit</translation>
     </message>
     <message>
         <source>Sustain-level</source>
-        <translation>Haltepegel</translation>
+        <translation type="obsolete">Haltepegel</translation>
     </message>
     <message>
         <source>Release-time</source>
-        <translation>Ausklingzeit</translation>
+        <translation type="obsolete">Ausklingzeit</translation>
     </message>
     <message>
         <source>Modulation amount</source>
-        <translation>Modulationsintensität</translation>
+        <translation type="obsolete">Modulationsintensität</translation>
     </message>
     <message>
         <source>LFO-predelay-time</source>
-        <translation>LFO-Verzögerung</translation>
+        <translation type="obsolete">LFO-Verzögerung</translation>
     </message>
     <message>
         <source>LFO-attack-time</source>
-        <translation>LFO-Anschwellzeit</translation>
+        <translation type="obsolete">LFO-Anschwellzeit</translation>
     </message>
     <message>
         <source>LFO-speed</source>
-        <translation>LFO-Geschwindigkeit</translation>
+        <translation type="obsolete">LFO-Geschwindigkeit</translation>
     </message>
     <message>
         <source>LFO-modulation-amount</source>
-        <translation>LFO-Modulationsintensität</translation>
+        <translation type="obsolete">LFO-Modulationsintensität</translation>
     </message>
     <message>
         <source>LFO wave shape</source>
-        <translation>LFO-Wellenform</translation>
+        <translation type="obsolete">LFO-Wellenform</translation>
     </message>
     <message>
         <source>Freq x 100</source>
@@ -1362,6 +1478,54 @@ Right clicking will bring up a context menu where you can change the order in wh
     <message>
         <source>Modulate Env-Amount</source>
         <translation>Hüllkurve modulieren</translation>
+    </message>
+    <message>
+        <source>Predelay</source>
+        <translation>Verzögerung (predelay)</translation>
+    </message>
+    <message>
+        <source>Attack</source>
+        <translation>Anschwellzeit (attack)</translation>
+    </message>
+    <message>
+        <source>Hold</source>
+        <translation>Haltezeit (hold)</translation>
+    </message>
+    <message>
+        <source>Decay</source>
+        <translation>Abfallzeit</translation>
+    </message>
+    <message>
+        <source>Sustain</source>
+        <translation>Haltepegel (sustain)</translation>
+    </message>
+    <message>
+        <source>Release</source>
+        <translation>Ausklingzeit (release)</translation>
+    </message>
+    <message>
+        <source>Modulation</source>
+        <translation>Modulation</translation>
+    </message>
+    <message>
+        <source>LFO Predelay</source>
+        <translation>LFO-Verzögerung</translation>
+    </message>
+    <message>
+        <source>LFO Attack</source>
+        <translation>LFO-Anschwellzeit (LFO-attack)</translation>
+    </message>
+    <message>
+        <source>LFO speed</source>
+        <translation>LFO-Geschwindigkeit</translation>
+    </message>
+    <message>
+        <source>LFO Modulation</source>
+        <translation>LFO Modulation</translation>
+    </message>
+    <message>
+        <source>LFO Wave Shape</source>
+        <translation>LFO-Wellenform</translation>
     </message>
 </context>
 <context>
@@ -1400,7 +1564,7 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>Use this knob for setting hold-time of the current envelope. The bigger this value the longer the envelope holds attack-level before it begins to decrease to sustain-level.</source>
-        <translation>Benutzen Sie diesen Knopf, um die Haltezeit (hold) der aktuellen Hüllkurve zu setzen. Je größer der Wert, desto länger hält die Hüllkurve den Anschwellpegel, bevor sie zum Dauerpegel (sustain-level) abfällt.</translation>
+        <translation>Benutzen Sie diesen Knopf, um die Haltezeit (hold) der aktuellen Hüllkurve zu setzen. Je größer der Wert, desto länger hält die Hüllkurve den Anschwellpegel, bevor sie zum Haltepegel (sustain-level) abfällt.</translation>
     </message>
     <message>
         <source>DEC</source>
@@ -1452,7 +1616,7 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>LFO-predelay:</source>
-        <translation>LFO-Verzögerung:</translation>
+        <translation type="obsolete">LFO-Verzögerung:</translation>
     </message>
     <message>
         <source>Use this knob for setting predelay-time of the current LFO. The bigger this value the the time until the LFO starts to oscillate.</source>
@@ -1460,7 +1624,7 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>LFO-attack:</source>
-        <translation>LFO-Anschwellzeit (LFO-attack):</translation>
+        <translation type="obsolete">LFO-Anschwellzeit (LFO-attack):</translation>
     </message>
     <message>
         <source>Use this knob for setting attack-time of the current LFO. The bigger this value the longer the LFO needs to increase its amplitude to maximum.</source>
@@ -1472,7 +1636,7 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>LFO-speed:</source>
-        <translation>LFO-Geschwindigkeit:</translation>
+        <translation type="obsolete">LFO-Geschwindigkeit:</translation>
     </message>
     <message>
         <source>Use this knob for setting speed of the current LFO. The bigger this value the faster the LFO oscillates and the faster will be your effect.</source>
@@ -1484,23 +1648,23 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>Click here if you want a sine-wave for current oscillator.</source>
-        <translation>Klicken Sie hier, wenn Sie eine Sinus-Schwingung für den aktuellen Oszillator haben wollen.</translation>
+        <translation type="obsolete">Klicken Sie hier, wenn Sie eine Sinus-Schwingung für den aktuellen Oszillator haben wollen.</translation>
     </message>
     <message>
         <source>Click here if you want a triangle-wave for current oscillator.</source>
-        <translation>Klicken Sie hier, wenn Sie eine Dreiecks-Schwingung für den aktuellen Oszillator haben wollen.</translation>
+        <translation type="obsolete">Klicken Sie hier, wenn Sie eine Dreiecks-Schwingung für den aktuellen Oszillator haben wollen.</translation>
     </message>
     <message>
         <source>Click here if you want a saw-wave for current oscillator.</source>
-        <translation>Klicken Sie hier, wenn Sie eine Sägezahn-Schwingung für den aktuellen Oszillator haben wollen.</translation>
+        <translation type="obsolete">Klicken Sie hier, wenn Sie eine Sägezahn-Schwingung für den aktuellen Oszillator haben wollen.</translation>
     </message>
     <message>
         <source>Click here if you want a square-wave for current oscillator.</source>
-        <translation>Klicken Sie hier, wenn Sie eine Rechteck-Schwingung für den aktuellen Oszillator haben wollen.</translation>
+        <translation type="obsolete">Klicken Sie hier, wenn Sie eine Rechteck-Schwingung für den aktuellen Oszillator haben wollen.</translation>
     </message>
     <message>
         <source>Click here if you want a user-defined wave for current oscillator. Afterwards drag an according sample-file into LFO-graph.</source>
-        <translation>Klicken Sie hier, wenn Sie eine benutzerdefinierte Wellenform für den aktuellen Oszillator wollen. Danach können Sie einfach entsprechende Sample-Dateien in den LFO-Graph ziehen.</translation>
+        <translation type="obsolete">Klicken Sie hier, wenn Sie eine benutzerdefinierte Wellenform für den aktuellen Oszillator wollen. Danach können Sie einfach entsprechende Sample-Dateien in den LFO-Graph ziehen.</translation>
     </message>
     <message>
         <source>FREQ x 100</source>
@@ -1508,11 +1672,11 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>Click here if the frequency of this LFO should be multiplied with 100.</source>
-        <translation>Klicken Sie hier, wenn die Frequenz von diesem LFO mit 100 multipliziert werden soll.</translation>
+        <translation type="obsolete">Klicken Sie hier, wenn die Frequenz von diesem LFO mit 100 multipliziert werden soll.</translation>
     </message>
     <message>
         <source>multiply LFO-frequency with 100</source>
-        <translation>LFO-Frequenz mit 100 multiplizieren</translation>
+        <translation type="obsolete">LFO-Frequenz mit 100 multiplizieren</translation>
     </message>
     <message>
         <source>MODULATE ENV-AMOUNT</source>
@@ -1537,6 +1701,46 @@ Right clicking will bring up a context menu where you can change the order in wh
     <message>
         <source>Drag a sample from somewhere and drop it in this window.</source>
         <translation>Ziehen Sie ein Sample von irgendwo und lassen es in diesem Fenster fallen.</translation>
+    </message>
+    <message>
+        <source>LFO predelay:</source>
+        <translation>LFO-Verzögerung:</translation>
+    </message>
+    <message>
+        <source>LFO- attack:</source>
+        <translation>LFO-Anschwellzeit (LFO-attack):</translation>
+    </message>
+    <message>
+        <source>LFO speed:</source>
+        <translation>LFO-Geschwindigkeit:</translation>
+    </message>
+    <message>
+        <source>Click here for a sine-wave.</source>
+        <translation>Klick für eine Sinuswelle.</translation>
+    </message>
+    <message>
+        <source>Click here for a triangle-wave.</source>
+        <translation>Klick für eine Dreieckswelle.</translation>
+    </message>
+    <message>
+        <source>Click here for a saw-wave for current.</source>
+        <translation>Klick für eine Sägezahnwelle.</translation>
+    </message>
+    <message>
+        <source>Click here for a square-wave.</source>
+        <translation>Klick für eine Rechteckswelle.</translation>
+    </message>
+    <message>
+        <source>Click here for a user-defined wave. Afterwards, drag an according sample-file onto the LFO graph.</source>
+        <translation>Hier klicken für eine benutzerdefinierte Wellenform. Danach eine entsprechende Sampledatei auf den LFO-Graphen ziehen.</translation>
+    </message>
+    <message>
+        <source>Click here if the frequency of this LFO should be multiplied by 100.</source>
+        <translation>Hier klicken, wenn die Frequenz des LFOs mit 100 multipliziert werden soll.</translation>
+    </message>
+    <message>
+        <source>multiply LFO-frequency by 100</source>
+        <translation>LFO-Frequenz mit 100 multiplizieren</translation>
     </message>
 </context>
 <context>
@@ -1722,7 +1926,7 @@ Bitte stellen Sie sicher, dass Sie Schreibrechte auf diese Datei und das Verzeic
     </message>
     <message>
         <source>These tabs contain envelopes. They&apos;re very important for modifying a sound, for not saying that they&apos;re almost always neccessary for substractive synthesis. For example if you have a volume-envelope, you can set when the sound should have which volume-level. Maybe you want to create some soft strings. Then your sound has to fade in and out very softly. This can be done by setting a large attack- and release-time. It&apos;s the same for other envelope-targets like panning, cutoff-frequency of used filter and so on. Just monkey around with it! You can really make cool sounds out of a saw-wave with just some envelopes...!</source>
-        <translation>Diese Tabs enthalten Hüllkurven. Sie sind sehr wichtig, um einen Sound zu verändern, um nicht zu sagen, dass sie für die substraktive Synthese fast immer nötig sind. Wenn Sie zum Beispiel eine Lautstärke-Hüllkurve haben, können Sie festlegen, wann der Sound welchen Lautstärke-Pegel haben soll. Vielleicht wollen Sie ein weiches Streichinstrument erstellen. Dann muss ihr Sound sehr sanft ein- und ausgeblendet werden. Das kann ganz einfach erreichen, indem man eine große Anschwell(attack)- und Ausklingzeit (release) einstellt. Mit anderen Hüllkurven, wie Balance, Kennfrequenz des benutzten Filters usw., ist es genau das Gleiche. Probieren Sie einfach ein bisschen herum! Mit ein paar Hüllkurven kann man aus einer Sägezahn-Welle wirklich coole Sounds machen...!</translation>
+        <translation type="obsolete">Diese Tabs enthalten Hüllkurven. Sie sind sehr wichtig, um einen Sound zu verändern, um nicht zu sagen, dass sie für die substraktive Synthese fast immer nötig sind. Wenn Sie zum Beispiel eine Lautstärke-Hüllkurve haben, können Sie festlegen, wann der Sound welchen Lautstärke-Pegel haben soll. Vielleicht wollen Sie ein weiches Streichinstrument erstellen. Dann muss ihr Sound sehr sanft ein- und ausgeblendet werden. Das kann ganz einfach erreichen, indem man eine große Anschwell(attack)- und Ausklingzeit (release) einstellt. Mit anderen Hüllkurven, wie Balance, Kennfrequenz des benutzten Filters usw., ist es genau das Gleiche. Probieren Sie einfach ein bisschen herum! Mit ein paar Hüllkurven kann man aus einer Sägezahn-Welle wirklich coole Sounds machen...!</translation>
     </message>
     <message>
         <source>FILTER</source>
@@ -1746,7 +1950,7 @@ Bitte stellen Sie sicher, dass Sie Schreibrechte auf diese Datei und das Verzeic
     </message>
     <message>
         <source>Use this knob for setting the cutoff-frequency for the selected filter. The cutoff-frequency specifies the frequency for cutting the signal by a filter. For example a lowpass-filter cuts all frequencies above the cutoff-frequency. A highpass-filter cuts all frequencies below cutoff-frequency and so on...</source>
-        <translation>Benutzen Sie diesen Knopf, um die Kennfrequenz (cutoff-frequency) für den gewählten Filter einzustellen. Die Kennfrequenz wird vom Filter zum Beschneiden des Signals verwendet. Zum Beispiel filtert ein Tiefpass-Filter alle Frequenzen oberhalb der Kennfrequenz heraus. Ein Hochpass-Filter filtert alle Frequenzen unterhalb der Kennfrequenz heraus usw...</translation>
+        <translation type="obsolete">Benutzen Sie diesen Knopf, um die Kennfrequenz (cutoff-frequency) für den gewählten Filter einzustellen. Die Kennfrequenz wird vom Filter zum Beschneiden des Signals verwendet. Zum Beispiel filtert ein Tiefpass-Filter alle Frequenzen oberhalb der Kennfrequenz heraus. Ein Hochpass-Filter filtert alle Frequenzen unterhalb der Kennfrequenz heraus usw...</translation>
     </message>
     <message>
         <source>Q/RESO</source>
@@ -1758,6 +1962,18 @@ Bitte stellen Sie sicher, dass Sie Schreibrechte auf diese Datei und das Verzeic
     </message>
     <message>
         <source>Use this knob for setting Q/Resonance for the selected filter. Q/Resonance tells the filter, how much it should amplify frequencies near Cutoff-frequency.</source>
+        <translation type="obsolete">Benutzen Sie diesen Knopf, um Q/die Resonanz für den gewählten Filter einzustellen. Q/Resonanz teilt dem Filter mit, wie stark er die Frequenzen in der Nähe der Cutoff-Frequenz verstärken soll.</translation>
+    </message>
+    <message>
+        <source>These tabs contain envelopes. They&apos;re very important for modifying a sound, in that they are almost always neccessary for substractive synthesis. For example if you have a volume envelope, you can set when the sound should have a specific volume. If you want to create some soft strings then your sound has to fade in and out very softly. This can be done by setting large attack and release times. It&apos;s the same for other envelope targets like panning, cutoff frequency for the used filter and so on. Just monkey around with it! You can really make cool sounds out of a saw-wave with just some envelopes...!</source>
+        <translation>Diese Tabs enthalten Hüllkurven. Diese sind sehr wichtig, um einen Klang zu verändern, insbesondere bei der substraktiven Synthese. Wenn Sie zum Beispiel eine Lautstärke-Hüllkurve haben, können Sie festlegen, wann der Klang welchen Lautstärke-Pegel haben soll. Vielleicht wollen Sie ein weiches Streichinstrument erstellen. Dann muss ihr Sound sehr sanft ein- und ausgeblendet werden. Das kann man ganz einfach erreichen, indem man eine große Anschwell(attack)- und Ausklingzeit (release) einstellt. Mit anderen Hüllkurven, wie Balance, Kennfrequenz des benutzten Filters usw., ist es genau das Gleiche. Probieren Sie einfach ein bisschen herum! Mit ein paar Hüllkurven kann man aus einer Sägezahn-Welle wirklich coole Klänge machen...!</translation>
+    </message>
+    <message>
+        <source>Use this knob for setting the cutoff frequency for the selected filter. The cutoff frequency specifies the frequency for cutting the signal by a filter. For example a lowpass-filter cuts all frequencies above the cutoff frequency. A highpass-filter cuts all frequencies below cutoff frequency, and so on...</source>
+        <translation>Benutzen Sie diesen Knopf, um die Kennfrequenz (cutoff-frequency) für den gewählten Filter einzustellen. Die Kennfrequenz wird vom Filter zum Beschneiden des Signals verwendet. Zum Beispiel filtert ein Tiefpass-Filter alle Frequenzen oberhalb der Kennfrequenz heraus. Ein Hochpass-Filter filtert alle Frequenzen unterhalb der Kennfrequenz heraus usw...</translation>
+    </message>
+    <message>
+        <source>Use this knob for setting Q/Resonance for the selected filter. Q/Resonance tells the filter how much it should amplify frequencies near Cutoff-frequency.</source>
         <translation>Benutzen Sie diesen Knopf, um Q/die Resonanz für den gewählten Filter einzustellen. Q/Resonanz teilt dem Filter mit, wie stark er die Frequenzen in der Nähe der Cutoff-Frequenz verstärken soll.</translation>
     </message>
 </context>
@@ -1794,6 +2010,10 @@ Bitte stellen Sie sicher, dass Sie Schreibrechte auf diese Datei und das Verzeic
     <message>
         <source>FX channel</source>
         <translation>FX-Kanal</translation>
+    </message>
+    <message>
+        <source>Base note</source>
+        <translation>Grundton</translation>
     </message>
 </context>
 <context>
@@ -2236,7 +2456,7 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
     <message>
         <source>DIST:</source>
-        <translation type="unfinished">DIST:</translation>
+        <translation>DIST:</translation>
     </message>
     <message>
         <source>DIST</source>
@@ -2436,7 +2656,7 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
     <message>
         <source>Use this knob for setting modulation amount of the current LFO. The bigger this value the more the selected size (e.g. volume or cutoff-frequency) will be influenced by this LFO.</source>
-        <translation>Benutzen Sie diesen Knopf, um die Modulationsintensität des aktuellen LFOs einzustellen. Je größer der Wert, desto mehr wird die gewählte Größe (z.B. Lautstärke oder Cuttoff-Frequenz) von diesem LFO beeinflusst.</translation>
+        <translation type="obsolete">Benutzen Sie diesen Knopf, um die Modulationsintensität des aktuellen LFOs einzustellen. Je größer der Wert, desto mehr wird die gewählte Größe (z.B. Lautstärke oder Cuttoff-Frequenz) von diesem LFO beeinflusst.</translation>
     </message>
     <message>
         <source>PHS</source>
@@ -2452,39 +2672,79 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
     <message>
         <source>With this knob you can set the phase-offset of the LFO. That means you can move the point within an oscillation where the oscillator begins to oscillate. For example if you have a sine-wave and have a phase-offset of 180 degrees the wave will first go down. It&apos;s the same with a square-wave.</source>
-        <translation>Mit diesem Knopf können Sie die Phasen-Verschiebung des LFOs setzen. Das heißt, Sie können den Punkt innerhalb einer Schwingung verschieben, an dem der Oszillator anfangen soll zu schwingen. Wenn Sie zum Beispiel eine Sinus-Welle haben und eine Phasen-Verschiebung von 180 Grad einstellen, wird die Welle zu erst runter gehen. Das gleiche trifft auch bei einer Rechteck-Welle zu.</translation>
+        <translation type="obsolete">Mit diesem Knopf können Sie die Phasen-Verschiebung des LFOs setzen. Das heißt, Sie können den Punkt innerhalb einer Schwingung verschieben, an dem der Oszillator anfangen soll zu schwingen. Wenn Sie zum Beispiel eine Sinus-Welle haben und eine Phasen-Verschiebung von 180 Grad einstellen, wird die Welle zu erst runter gehen. Das gleiche trifft auch bei einer Rechteck-Welle zu.</translation>
     </message>
     <message>
         <source>Click here if you want a sine-wave for current oscillator.</source>
-        <translation>Klicken Sie hier, wenn Sie eine Sinus-Schwingung für den aktuellen Oszillator haben wollen.</translation>
+        <translation type="obsolete">Klicken Sie hier, wenn Sie eine Sinus-Schwingung für den aktuellen Oszillator haben wollen.</translation>
     </message>
     <message>
         <source>Click here if you want a triangle-wave for current oscillator.</source>
-        <translation>Klicken Sie hier, wenn Sie eine Dreiecks-Schwingung für den aktuellen Oszillator haben wollen.</translation>
+        <translation type="obsolete">Klicken Sie hier, wenn Sie eine Dreiecks-Schwingung für den aktuellen Oszillator haben wollen.</translation>
     </message>
     <message>
         <source>Click here if you want a saw-wave for current oscillator.</source>
-        <translation>Klicken Sie hier, wenn Sie eine Sägezahn-Schwingung für den aktuellen Oszillator haben wollen.</translation>
+        <translation type="obsolete">Klicken Sie hier, wenn Sie eine Sägezahn-Schwingung für den aktuellen Oszillator haben wollen.</translation>
     </message>
     <message>
         <source>Click here if you want a square-wave for current oscillator.</source>
-        <translation>Klicken Sie hier, wenn Sie eine Rechteck-Schwingung für den aktuellen Oszillator haben wollen.</translation>
+        <translation type="obsolete">Klicken Sie hier, wenn Sie eine Rechteck-Schwingung für den aktuellen Oszillator haben wollen.</translation>
     </message>
     <message>
         <source>Click here if you want a moog-saw-wave for current oscillator.</source>
-        <translation>Klicken Sie hier, wenn Sie eine Moog-Sägezahn-Schwingung für den aktuellen Oszillator haben wollen.</translation>
+        <translation type="obsolete">Klicken Sie hier, wenn Sie eine Moog-Sägezahn-Schwingung für den aktuellen Oszillator haben wollen.</translation>
     </message>
     <message>
         <source>Click here if you want an exponential wave for current oscillator.</source>
-        <translation>Klicken Sie hier, wenn Sie eine Exponential-Schwingung für den aktuellen Oszillator haben wollen.</translation>
+        <translation type="obsolete">Klicken Sie hier, wenn Sie eine Exponential-Schwingung für den aktuellen Oszillator haben wollen.</translation>
     </message>
     <message>
         <source>Click here if you want a white-noise for current oscillator.</source>
-        <translation>Klicken Sie hier, wenn Sie weißes Rauschen für den aktuellen Oszillator haben wollen.</translation>
+        <translation type="obsolete">Klicken Sie hier, wenn Sie weißes Rauschen für den aktuellen Oszillator haben wollen.</translation>
     </message>
     <message>
         <source>Click here if you want a user-defined wave-shape for current oscillator.</source>
-        <translation>Klicken Sie hier, wenn Sie eine selbst definierte Wellenform für den aktuellen Oszillator haben wollen.</translation>
+        <translation type="obsolete">Klicken Sie hier, wenn Sie eine selbst definierte Wellenform für den aktuellen Oszillator haben wollen.</translation>
+    </message>
+    <message>
+        <source>Use this knob for setting modulation amount of the LFO. The bigger this value, the more the connected control (e.g. volume or cutoff-frequency) will be influenced by the LFO.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>With this knob you can set the phase offset of the LFO. That means you can move the point within an oscillation where the oscillator begins to oscillate. For example if you have a sine-wave and have a phase-offset of 180 degrees the wave will first go down. It&apos;s the same with a square-wave.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here for a sine-wave for.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here for a triangle-wave.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here for a saw-wave.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here for a square-wave.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here for a a moog saw-wave.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here for an exponential wave.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here for white-noise for.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here for a user-defined shape.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2575,7 +2835,7 @@ F1-F10 schalten die ersten 10 Instrumente im Beat+Bassline-Editor stumm bzw. wie
     </message>
     <message>
         <source>By pressing this button, you can show or hide the Piano-Roll. With the help of the Piano-Roll you can edit melody-patterns in an easy way.</source>
-        <translation>Durch das Drücken dieses Knopfes können Sie das Piano-Roll ein- oder ausblenden. Mit Hilfe des Piano-Rolls können Sie Melodie-Patterns auf eine bequeme Art bearbeiten.</translation>
+        <translation type="obsolete">Durch das Drücken dieses Knopfes können Sie das Piano-Roll ein- oder ausblenden. Mit Hilfe des Piano-Rolls können Sie Melodie-Patterns auf eine bequeme Art bearbeiten.</translation>
     </message>
     <message>
         <source>Show/hide Song-Editor</source>
@@ -2583,7 +2843,7 @@ F1-F10 schalten die ersten 10 Instrumente im Beat+Bassline-Editor stumm bzw. wie
     </message>
     <message>
         <source>By pressing this button, you can show or hide the Song-Editor. With the help of the Song-Editor you can edit song-playlist and specify when which track should be played. You can also insert and move samples (e.g. rap-samples) directly into the playlist.</source>
-        <translation>Durch das Drücken dieses Knopfes können Sie den Song-Editor ein- oder ausblenden. Mit Hilfe des Song-Editors können Sie den Song bearbeiten und einstellen, wann welche Spur gespielt werden soll. Sie können auch Samples (z.B. Rap-Samples) direkt in die Playliste einfügen und verschieben.</translation>
+        <translation type="obsolete">Durch das Drücken dieses Knopfes können Sie den Song-Editor ein- oder ausblenden. Mit Hilfe des Song-Editors können Sie den Song bearbeiten und einstellen, wann welche Spur gespielt werden soll. Sie können auch Samples (z.B. Rap-Samples) direkt in die Playliste einfügen und verschieben.</translation>
     </message>
     <message>
         <source>Show/hide project notes</source>
@@ -2591,7 +2851,7 @@ F1-F10 schalten die ersten 10 Instrumente im Beat+Bassline-Editor stumm bzw. wie
     </message>
     <message>
         <source>By pressing this button, you can show or hide the project notes window. In this window you can put down your project notes.</source>
-        <translation>Durch das Drücken dieses Knopfes können Sie das Projektnotizen-Fenster ein- oder ausblenden. In diesem Fenster können Sie Ihre Projektnotizen aufschreiben.</translation>
+        <translation type="obsolete">Durch das Drücken dieses Knopfes können Sie das Projektnotizen-Fenster ein- oder ausblenden. In diesem Fenster können Sie Ihre Projektnotizen aufschreiben.</translation>
     </message>
     <message>
         <source>&amp;Project</source>
@@ -2655,7 +2915,7 @@ F1-F10 schalten die ersten 10 Instrumente im Beat+Bassline-Editor stumm bzw. wie
     </message>
     <message>
         <source>By pressing this button, you can show or hide the Beat+Bassline Editor. The Beat+Bassline Editor is needed for creating beats, opening, adding and removing channels, cutting, copying and pasting beat- and bassline-patterns and other things like that.</source>
-        <translation>Durch das Drücken dieses Knopfes wird der Beat+Bassline Editor ein- oder ausgeblendet. Der Beat+Bassline Editor ist nötig, um Beats zu erstellen, Kanale zu öffnen, hinzuzufügen und zu entfernen sowie um Bassline-Patterns auszuschneiden, zu kopieren und einzufügen usw.</translation>
+        <translation type="obsolete">Durch das Drücken dieses Knopfes wird der Beat+Bassline Editor ein- oder ausgeblendet. Der Beat+Bassline Editor ist nötig, um Beats zu erstellen, Kanale zu öffnen, hinzuzufügen und zu entfernen sowie um Bassline-Patterns auszuschneiden, zu kopieren und einzufügen usw.</translation>
     </message>
     <message>
         <source>&amp;Edit</source>
@@ -2675,7 +2935,7 @@ F1-F10 schalten die ersten 10 Instrumente im Beat+Bassline-Editor stumm bzw. wie
     </message>
     <message>
         <source>By pressing this button, you can show or hide the Automation Editor. With the help of the Automation Editor you can edit dynamic values in an easy way.</source>
-        <translation>Durch das Drücken dieses Knopfes können Sie den Automation-Editor ein- oder ausblenden. Mit Hilfe des Automation-Editors können Sie dynamische Werte auf eine einfache Art und Weise bearbeiten.</translation>
+        <translation type="obsolete">Durch das Drücken dieses Knopfes können Sie den Automation-Editor ein- oder ausblenden. Mit Hilfe des Automation-Editors können Sie dynamische Werte auf eine einfache Art und Weise bearbeiten.</translation>
     </message>
     <message>
         <source>MultiMedia Project (*.mmp *.mmpz *.xml)</source>
@@ -2759,11 +3019,35 @@ Bitte überprüfen Sie Ihre Rechte und versuchen es erneut.</translation>
     </message>
     <message>
         <source>By pressing this button, you can show or hide the FX Mixer. The FX Mixer is a very powerful tool for managing effects for your song. You can insert effects into different effect-channels.</source>
-        <translation>Mit Hilfe dieses Knopfes können Sie den FX-Mixer anzeigen oder verstecken. Der FX-Mixer ist ein leistungsfähiges Werkzeug, um Effekte für Ihren Song zu verwalten. Sie können Effekte in verschiedene Effekt-Kanäle einfügen.</translation>
+        <translation type="obsolete">Mit Hilfe dieses Knopfes können Sie den FX-Mixer anzeigen oder verstecken. Der FX-Mixer ist ein leistungsfähiges Werkzeug, um Effekte für Ihren Song zu verwalten. Sie können Effekte in verschiedene Effekt-Kanäle einfügen.</translation>
     </message>
     <message>
         <source>Show/hide controller rack</source>
         <translation>Zeige/verstecke Controller-Rack</translation>
+    </message>
+    <message>
+        <source>By pressing this button, you can show or hide the Song-Editor. With the help of the Song-Editor you can edit song-playlist and specify when which track should be played. You can also insert and move samples (e.g. rap samples) directly into the playlist.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>By pressing this button, you can show or hide the Beat+Bassline Editor. The Beat+Bassline Editor is needed for creating beats, and for opening, adding, and removing channels, and for cutting, copying and pasting beat and bassline-patterns, and for other things like that.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here to show or hide the Piano-Roll. With the help of the Piano-Roll you can edit melodies in an easy way.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here to show or hide the Automation Editor. With the help of the Automation Editor you can edit dynamic values in an easy way.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here to show or hide the FX Mixer. The FX Mixer is a very powerful tool for managing effects for your song. You can insert effects into different effect-channels.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here to show or hide the project notes window. In this window you can put down your project notes.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3404,15 +3688,15 @@ Lautstärke eines Steps kann mit Mausrad geändert werden</translation>
     </message>
     <message>
         <source>If you click here, selected notes will be cut into the clipboard. You can paste them anywhere in any pattern by clicking on the paste-button.</source>
-        <translation>Wenn Sie hier klicken, werden die markierten Noten in die Zwischenablage ausgeschnitten. Sie können sie überall, auch in einem anderen Pattern, wieder einfügen, indem Sie auf den Einfügen-Button klicken.</translation>
+        <translation type="obsolete">Wenn Sie hier klicken, werden die markierten Noten in die Zwischenablage ausgeschnitten. Sie können sie überall, auch in einem anderen Pattern, wieder einfügen, indem Sie auf den Einfügen-Button klicken.</translation>
     </message>
     <message>
         <source>If you click here, selected notes will be copied into the clipboard. You can paste them anywhere in any pattern by clicking on the paste-button.</source>
-        <translation>Wenn Sie hier klicken, werden die markierten Noten in die Zwischenablage kopiert. Sie können sie überall, auch in einem anderen Pattern, wieder einfügen, indem Sie auf den Einfügen-Button klicken.</translation>
+        <translation type="obsolete">Wenn Sie hier klicken, werden die markierten Noten in die Zwischenablage kopiert. Sie können sie überall, auch in einem anderen Pattern, wieder einfügen, indem Sie auf den Einfügen-Button klicken.</translation>
     </message>
     <message>
         <source>If you click here, the notes from the clipboard will be pasted at the first visible tact.</source>
-        <translation>Wenn Sie hier klicken, werden Noten aus Zwischenablage im ersten sichtbaren Takt eingefügt.</translation>
+        <translation type="obsolete">Wenn Sie hier klicken, werden Noten aus Zwischenablage im ersten sichtbaren Takt eingefügt.</translation>
     </message>
     <message>
         <source>Paste notes from clipboard (Ctrl+V)</source>
@@ -3428,11 +3712,11 @@ Lautstärke eines Steps kann mit Mausrad geändert werden</translation>
     </message>
     <message>
         <source>Click here, if you want to play the current pattern. This is useful while editing it. The pattern is automatically looped when its end is reached.</source>
-        <translation>Klicken Sie hier, wenn Sie den aktuellen Pattern spielen wollen. Das ist nützlich beim Bearbeiten. Der Pattern wird automatisch wiederholt, wenn sein Ende erreicht ist.</translation>
+        <translation type="obsolete">Klicken Sie hier, wenn Sie den aktuellen Pattern spielen wollen. Das ist nützlich beim Bearbeiten. Der Pattern wird automatisch wiederholt, wenn sein Ende erreicht ist.</translation>
     </message>
     <message>
         <source>Click here, if you want to stop playing of current pattern.</source>
-        <translation>Klicken Sie hier, wenn Sie das Abspielen des aktuellen Patterns stoppen wollen.</translation>
+        <translation type="obsolete">Klicken Sie hier, wenn Sie das Abspielen des aktuellen Patterns stoppen wollen.</translation>
     </message>
     <message>
         <source>Piano-Roll - %1</source>
@@ -3452,7 +3736,7 @@ Lautstärke eines Steps kann mit Mausrad geändert werden</translation>
     </message>
     <message>
         <source>Click here, if you want to record notes from a MIDI-device or the virtual test-piano of the according channel-window to the current pattern. When recording all notes you play will be written to this pattern and you can play and edit them afterwards.</source>
-        <translation>Klicken Sie hier, wenn Sie Noten von einem MIDI-Gerät oder dem virtuellen Test-Klavier des zugehörigen Kanal-Fensters in den aktuellen Pattern aufnehmen wollen. Beim Aufnehmen werden alle Noten, die Sie spielen, in diesen Pattern geschrieben und hinterher können Sie diese abspielen und bearbeiten.</translation>
+        <translation type="obsolete">Klicken Sie hier, wenn Sie Noten von einem MIDI-Gerät oder dem virtuellen Test-Klavier des zugehörigen Kanal-Fensters in den aktuellen Pattern aufnehmen wollen. Beim Aufnehmen werden alle Noten, die Sie spielen, in diesen Pattern geschrieben und hinterher können Sie diese abspielen und bearbeiten.</translation>
     </message>
     <message>
         <source>Notes copied</source>
@@ -3484,26 +3768,66 @@ Lautstärke eines Steps kann mit Mausrad geändert werden</translation>
     </message>
     <message>
         <source>If you click here, draw-mode will be activated. In this mode you can add, resize and move single notes. This is the default-mode which is used most of the time. You can also press &apos;Shift+D&apos; on your keyboard to activate this mode.</source>
-        <translation>Wenn Sie hier klicken, wird der Zeichnen-Modus aktiviert. In diesem Modus können Sie einzelne Noten hinzufügen und verschieben. Das ist der Standard-Modus, der meistens benutzt wird. Sie können auch &apos;Umschalt+D&apos; auf Ihrer Tastatur drücken, um in diesen Modus zu gelangen.</translation>
+        <translation type="obsolete">Wenn Sie hier klicken, wird der Zeichnen-Modus aktiviert. In diesem Modus können Sie einzelne Noten hinzufügen und verschieben. Das ist der Standard-Modus, der meistens benutzt wird. Sie können auch &apos;Umschalt+D&apos; auf Ihrer Tastatur drücken, um in diesen Modus zu gelangen.</translation>
     </message>
     <message>
         <source>If you click here, erase-mode will be activated. In this mode you can erase single notes. You can also press &apos;Shift+E&apos; on your keyboard to activate this mode.</source>
-        <translation>Wenn Sie hier klicken, wird der Radier-Modus aktiviert. In diesem Modus können Sie einzelne Noten löschen. Sie können auch &apos;Umschalt+E&apos; auf Ihrer Tastatur drücken, um diesen Modus zu aktivieren.</translation>
+        <translation type="obsolete">Wenn Sie hier klicken, wird der Radier-Modus aktiviert. In diesem Modus können Sie einzelne Noten löschen. Sie können auch &apos;Umschalt+E&apos; auf Ihrer Tastatur drücken, um diesen Modus zu aktivieren.</translation>
     </message>
     <message>
         <source>If you click here, select-mode will be activated. In this mode you can select notes. This is neccessary if you want to cut, copy, paste, delete or move notes. You can also press &apos;Shift+S&apos; on your keyboard to activate this mode.</source>
-        <translation>Wenn Sie hier klicken, wird der Auswahl-Modus aktiviert. In diesem Modus können Sie Noten markieren. Das ist nötig, wenn Sie (mehrere) Noten ausschneiden, kopieren, einfügen, löschen oder verschieben wollen. Sie können auch &apos;Umschalt+S&apos; auf Ihrer Tastatur drücken, um diesen Modus zu aktivieren.</translation>
+        <translation type="obsolete">Wenn Sie hier klicken, wird der Auswahl-Modus aktiviert. In diesem Modus können Sie Noten markieren. Das ist nötig, wenn Sie (mehrere) Noten ausschneiden, kopieren, einfügen, löschen oder verschieben wollen. Sie können auch &apos;Umschalt+S&apos; auf Ihrer Tastatur drücken, um diesen Modus zu aktivieren.</translation>
     </message>
     <message>
         <source>If you click here, move-mode will be activated. In this mode you can move the notes you selected in select-mode. You can also press &apos;Shift+M&apos; on your keyboard to activate this mode.</source>
-        <translation>Wenn Sie hier klicken, wird der Auswahl-Verschieben-Modus aktiviert. In diesem Modus können Sie die markierten Noten verschieben. Sie können auch &apos;Umschalt+M&apos; auf Ihrer Tastatur drücken, um diesen Modus zu aktivieren.</translation>
+        <translation type="obsolete">Wenn Sie hier klicken, wird der Auswahl-Verschieben-Modus aktiviert. In diesem Modus können Sie die markierten Noten verschieben. Sie können auch &apos;Umschalt+M&apos; auf Ihrer Tastatur drücken, um diesen Modus zu aktivieren.</translation>
     </message>
     <message>
         <source>Record notes from MIDI-device/channel-piano while playing song or BB track</source>
         <translation>Noten vom MIDI-Gerät/Kanal-Klavier aufnehmen während der Song oder BB-Track abgespielt wird</translation>
     </message>
     <message>
-        <source>Click here, if you want to record notes from a MIDI-device or the virtual test-piano of the according channel-window to the current pattern. When recording all notes you play will be written to this pattern and you will hear the song or BB track in the background.</source>
+        <source>Click here to play the current pattern. This is useful while editing it. The pattern is automatically looped when its end is reached.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here to record notes from a MIDI-device or the virtual test-piano of the according channel-window to the current pattern. When recording all notes you play will be written to this pattern and you can play and edit them afterwards.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here to record notes from a MIDI-device or the virtual test-piano of the according channel-window to the current pattern. When recording all notes you play will be written to this pattern and you will hear the song or BB track in the background.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here to stop playback of current pattern.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here and draw mode will be activated. In this mode you can add, resize and move single notes. This is the default mode which is used most of the time. You can also press &apos;Shift+D&apos; on your keyboard to activate this mode.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here and erase mode will be activated. In this mode you can erase single notes. You can also press &apos;Shift+E&apos; on your keyboard to activate this mode.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here and select mode will be activated. In this mode you can select notes. This is neccessary if you want to cut, copy, paste, delete or move notes. You can also press &apos;Shift+S&apos; on your keyboard to activate this mode.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here and move-mode will be activated. In this mode you can move the notes you selected in select-mode. You can also press &apos;Shift+M&apos; on your keyboard to activate this mode.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here and the selected notes will be cut into the clipboard. You can paste them anywhere in any pattern by clicking on the paste button.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here and the selected notes will be copied into the clipboard. You can paste them anywhere in any pattern by clicking on the paste button.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here and the notes from the clipboard will be pasted at the first visible measure.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3640,7 +3964,13 @@ Grund: &quot;%2&quot;</translation>
     <message>
         <source>Emulation of the MOS6581 SID.
 This chip was used in the Commodore 64 computer.</source>
-        <translation>Emulation des MOS6581 SID Chips.
+        <translation type="obsolete">Emulation des MOS6581 SID Chips.
+Dieser Chip wurde in Commodore 64 Computern genutzt.</translation>
+    </message>
+    <message>
+        <source>Emulation of the MOS6581 and MOS8580 SID.
+This chip was used in the Commodore 64 computer.</source>
+        <translation>Emulation des MOS6581 und MOS8580 SID Chips.
 Dieser Chip wurde in Commodore 64 Computern genutzt.</translation>
     </message>
 </context>
@@ -4236,11 +4566,11 @@ Latenz: %2 ms</translation>
     </message>
     <message>
         <source>MOS6581 SID </source>
-        <translation type="unfinished"></translation>
+        <translation>MOS6581 SID </translation>
     </message>
     <message>
         <source>MOS8580 SID </source>
-        <translation type="unfinished"></translation>
+        <translation>MOS8580 SID </translation>
     </message>
     <message>
         <source>Attack:</source>
@@ -4284,15 +4614,59 @@ Latenz: %2 ms</translation>
     </message>
     <message>
         <source>Sync</source>
-        <translation type="unfinished">Synchron</translation>
+        <translation>Synchron</translation>
     </message>
     <message>
         <source>Ring-Mod</source>
-        <translation type="unfinished"></translation>
+        <translation>Ringmodulation</translation>
     </message>
     <message>
         <source>Filtered</source>
         <translation>Gefiltert</translation>
+    </message>
+    <message>
+        <source>Attack rate determines how rapidly the output of Voice %1 rises from zero to peak amplitude.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Decay rate determines how rapidly the output falls from the peak amplitude to the selected Sustain level.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Output of Voice %1 will remain at the selected Sustain amplitude as long as the note is held.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The output of of Voice %1 will fall from Sustain amplitude to zero amplitude at the selected Release rate.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The Pulse Width resolution allows the width to be smoothly swept with no discernable stepping. The Pulse waveform on Oscillator %1 must be selected to have any audible effect.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The Coarse detuning allows to detune Voice %1 one octave up or down.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sync synchronizes the fundamental frequency of Oscillator %1 with the fundamental frequency of Oscillator %2 producing &quot;Hard Sync&quot; effects.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ring-mod replaces the Triangle Waveform output of Oscillator %1 with a &quot;Ring Modulated&quot; combination of Oscillators %1 and %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>When Filtered is on, Voice %1 will be processed through the Filter. When Filtered is off, Voice %1 appears directly at the output, and the Filter has no effect on it.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Test</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Test, when set, resets and locks Oscillator %1 at zero until Test is turned off.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4354,7 +4728,7 @@ Latenz: %2 ms</translation>
     </message>
     <message>
         <source>The multimedia-project %1 seems to contain errors. LMMS will try its best to recover as much as possible data from this file.</source>
-        <translation>Das Multimedia-Projekt %1 scheint Fehler zu beinhalten. LMMS wird versuchen, so viel wie möglich Daten aus dieser Datei wiederherzustellen.</translation>
+        <translation type="obsolete">Das Multimedia-Projekt %1 scheint Fehler zu beinhalten. LMMS wird versuchen, so viel wie möglich Daten aus dieser Datei wiederherzustellen.</translation>
     </message>
     <message>
         <source>Could not write file</source>
@@ -4378,7 +4752,7 @@ Latenz: %2 ms</translation>
     </message>
     <message>
         <source>The tempo of a song is specified in beats per minute (BPM). If you want to change the tempo of your song, change this value. Every tact has four beats, so the tempo in BPM specifies, how many tacts / 4 should be played within a minute (or how many tacts should be played within four minutes).</source>
-        <translation>Das Tempo eines Liedes wird in Beats pro Minute (BPM) angegeben. Wenn Sie das Tempo Ihres Songs ändern wollen, ändern Sie diesen Wert. Jeder Takt hat vier Schläge (Beats), das Tempo sagt also, wie viele Takte / 4 innerhalb einer Minute gespielt werden sollen (bzw. wie viele Takte innerhalb von vier Minuten gespielt werden sollen).</translation>
+        <translation type="obsolete">Das Tempo eines Liedes wird in Beats pro Minute (BPM) angegeben. Wenn Sie das Tempo Ihres Songs ändern wollen, ändern Sie diesen Wert. Jeder Takt hat vier Schläge (Beats), das Tempo sagt also, wie viele Takte / 4 innerhalb einer Minute gespielt werden sollen (bzw. wie viele Takte innerhalb von vier Minuten gespielt werden sollen).</translation>
     </message>
     <message>
         <source>master pitch</source>
@@ -4451,6 +4825,14 @@ Bitte stellen Sie sicher, dass Sie Schreibrechte auf diese Datei besitzen und ve
     <message>
         <source>Add automation-track</source>
         <translation>Automation-Spur hinzufügen</translation>
+    </message>
+    <message>
+        <source>The multimedia-project %1 seems to contain errors. LMMS will try its best to recover as much data as possible data from this file.</source>
+        <translation>Das Multimedia-Projekt %1 scheint Fehler zu beinhalten. LMMS wird versuchen, so viel wie möglich Daten aus dieser Datei wiederherzustellen.</translation>
+    </message>
+    <message>
+        <source>The tempo of a song is specified in beats per minute (BPM). If you want to change the tempo of your song, change this value. Every measure has four beats, so the tempo in BPM specifies, how many measures / 4 should be played within a minute (or how many measures should be played within four minutes).</source>
+        <translation>Das Tempo eines Liedes wird in Beats pro Minute (BPM) angegeben. Wenn Sie das Tempo Ihres Songs ändern wollen, ändern Sie diesen Wert. Jeder Takt hat vier Schläge (Beats); das Tempo gibt also an, wie viele Takte / 4 innerhalb einer Minute gespielt werden sollen (bzw. wie viele Takte innerhalb von vier Minuten gespielt werden sollen).</translation>
     </message>
 </context>
 <context>
@@ -4799,43 +5181,43 @@ Sie sollten diese Datei mit Hilfe anderer Software in ein von LMMS unterstützes
     <name>tripleOscillatorView</name>
     <message>
         <source>use phase modulation for modulating oscillator 2 with oscillator 1</source>
-        <translation>Phasenmodulation benutzen, um Oszillator 2 mit Oszillator 1 zu modulieren</translation>
+        <translation type="obsolete">Phasenmodulation benutzen, um Oszillator 2 mit Oszillator 1 zu modulieren</translation>
     </message>
     <message>
         <source>use amplitude modulation for modulating oscillator 2 with oscillator 1</source>
-        <translation>Amplitudenmodulation benutzen, um Oszillator 2 mit Oszillator 1 zu modulieren</translation>
+        <translation type="obsolete">Amplitudenmodulation benutzen, um Oszillator 2 mit Oszillator 1 zu modulieren</translation>
     </message>
     <message>
         <source>mix output of oscillator 1 &amp; 2</source>
-        <translation>Mische Ausgang von Oszillator 1 &amp; 2</translation>
+        <translation type="obsolete">Mische Ausgang von Oszillator 1 &amp; 2</translation>
     </message>
     <message>
         <source>synchronize oscillator 1 with oscillator 2</source>
-        <translation>Synchronisiere Oszillator 1 mit Oszillator 2</translation>
+        <translation type="obsolete">Synchronisiere Oszillator 1 mit Oszillator 2</translation>
     </message>
     <message>
         <source>use frequency modulation for modulating oscillator 2 with oscillator 1</source>
-        <translation>Frequenzmodulation benutzen, um Oszillator 2 mit Oszillator 1 zu modulieren</translation>
+        <translation type="obsolete">Frequenzmodulation benutzen, um Oszillator 2 mit Oszillator 1 zu modulieren</translation>
     </message>
     <message>
         <source>use phase modulation for modulating oscillator 3 with oscillator 2</source>
-        <translation>Phasenmodulation benutzen, um Oszillator 3 mit Oszillator 2 zu modulieren</translation>
+        <translation type="obsolete">Phasenmodulation benutzen, um Oszillator 3 mit Oszillator 2 zu modulieren</translation>
     </message>
     <message>
         <source>use amplitude modulation for modulating oscillator 3 with oscillator 2</source>
-        <translation>Amplitudenmodulation benutzen, um Oszillator 3 mit Oszillator 2 zu modulieren</translation>
+        <translation type="obsolete">Amplitudenmodulation benutzen, um Oszillator 3 mit Oszillator 2 zu modulieren</translation>
     </message>
     <message>
         <source>mix output of oscillator 2 &amp; 3</source>
-        <translation>Mische Ausgang von Oszillator 2 &amp; 3</translation>
+        <translation type="obsolete">Mische Ausgang von Oszillator 2 &amp; 3</translation>
     </message>
     <message>
         <source>synchronize oscillator 2 with oscillator 3</source>
-        <translation>Synchronisiere Oszillator 2 mit Oszillator 3</translation>
+        <translation type="obsolete">Synchronisiere Oszillator 2 mit Oszillator 3</translation>
     </message>
     <message>
         <source>use frequency modulation for modulating oscillator 3 with oscillator 2</source>
-        <translation>Frequenzmodulation benutzen, um Oszillator 3 mit Oszillator 2 zu modulieren</translation>
+        <translation type="obsolete">Frequenzmodulation benutzen, um Oszillator 3 mit Oszillator 2 zu modulieren</translation>
     </message>
     <message>
         <source>Osc %1 volume:</source>
@@ -4903,39 +5285,115 @@ Sie sollten diese Datei mit Hilfe anderer Software in ein von LMMS unterstützes
     </message>
     <message>
         <source>With this knob you can set the stereo phase-detuning of oscillator %1. The stereo phase-detuning specifies the size of the difference between the phase-offset of left and right channel. This is very good for creating wide stereo-sounds.</source>
-        <translation>Mit diesem Knopf können Sie die Stereo Phasen-Verschiebung von Oszillator %1 setzen. Die Stereo Phasen-Verschiebung gibt die Größe der Differenz zwischen den Phasen-Verschiebungen zwischen dem linken und rechten Kanal an. Das ist sehr gut, um großräumig-klingende Stereo-Sounds zu erzeugen.</translation>
+        <translation type="obsolete">Mit diesem Knopf können Sie die Stereo Phasen-Verschiebung von Oszillator %1 setzen. Die Stereo Phasen-Verschiebung gibt die Größe der Differenz zwischen den Phasen-Verschiebungen zwischen dem linken und rechten Kanal an. Das ist sehr gut, um großräumig-klingende Stereo-Sounds zu erzeugen.</translation>
     </message>
     <message>
         <source>Click here if you want a sine-wave for current oscillator.</source>
-        <translation>Klicken Sie hier, wenn Sie eine Sinus-Schwingung für den aktuellen Oszillator haben wollen.</translation>
+        <translation type="obsolete">Klicken Sie hier, wenn Sie eine Sinus-Schwingung für den aktuellen Oszillator haben wollen.</translation>
     </message>
     <message>
         <source>Click here if you want a triangle-wave for current oscillator.</source>
-        <translation>Klicken Sie hier, wenn Sie eine Dreiecks-Schwingung für den aktuellen Oszillator haben wollen.</translation>
+        <translation type="obsolete">Klicken Sie hier, wenn Sie eine Dreiecks-Schwingung für den aktuellen Oszillator haben wollen.</translation>
     </message>
     <message>
         <source>Click here if you want a saw-wave for current oscillator.</source>
-        <translation>Klicken Sie hier, wenn Sie eine Sägezahn-Schwingung für den aktuellen Oszillator haben wollen.</translation>
+        <translation type="obsolete">Klicken Sie hier, wenn Sie eine Sägezahn-Schwingung für den aktuellen Oszillator haben wollen.</translation>
     </message>
     <message>
         <source>Click here if you want a square-wave for current oscillator.</source>
-        <translation>Klicken Sie hier, wenn Sie eine Rechteck-Schwingung für den aktuellen Oszillator haben wollen.</translation>
+        <translation type="obsolete">Klicken Sie hier, wenn Sie eine Rechteck-Schwingung für den aktuellen Oszillator haben wollen.</translation>
     </message>
     <message>
         <source>Click here if you want a moog-saw-wave for current oscillator.</source>
-        <translation>Klicken Sie hier, wenn Sie eine Moog-Sägezahn-Schwingung für den aktuellen Oszillator haben wollen.</translation>
+        <translation type="obsolete">Klicken Sie hier, wenn Sie eine Moog-Sägezahn-Schwingung für den aktuellen Oszillator haben wollen.</translation>
     </message>
     <message>
         <source>Click here if you want an exponential wave for current oscillator.</source>
-        <translation>Klicken Sie hier, wenn Sie eine Exponential-Schwingung für den aktuellen Oszillator haben wollen.</translation>
+        <translation type="obsolete">Klicken Sie hier, wenn Sie eine Exponential-Schwingung für den aktuellen Oszillator haben wollen.</translation>
     </message>
     <message>
         <source>Click here if you want a white-noise for current oscillator.</source>
-        <translation>Klicken Sie hier, wenn Sie weißes Rauschen für den aktuellen Oszillator haben wollen.</translation>
+        <translation type="obsolete">Klicken Sie hier, wenn Sie weißes Rauschen für den aktuellen Oszillator haben wollen.</translation>
     </message>
     <message>
         <source>Click here if you want a user-defined wave-shape for current oscillator.</source>
-        <translation>Klicken Sie hier, wenn Sie eine selbst definierte Wellenform für den aktuellen Oszillator haben wollen.</translation>
+        <translation type="obsolete">Klicken Sie hier, wenn Sie eine selbst definierte Wellenform für den aktuellen Oszillator haben wollen.</translation>
+    </message>
+    <message>
+        <source>Use phase modulation for modulating oscillator 2 with oscillator 1</source>
+        <translation>Phasenmodulation benutzen, um Oszillator 2 mit Oszillator 1 zu modulieren</translation>
+    </message>
+    <message>
+        <source>Use amplitude modulation for modulating oscillator 2 with oscillator 1</source>
+        <translation>Amplitudenmodulation benutzen, um Oszillator 2 mit Oszillator 1 zu modulieren</translation>
+    </message>
+    <message>
+        <source>Mix output of oscillator 1 &amp; 2</source>
+        <translation>Mische Ausgang von Oszillator 1 &amp; 2</translation>
+    </message>
+    <message>
+        <source>Synchronize oscillator 1 with oscillator 2</source>
+        <translation>Synchronisiere Oszillator 1 mit Oszillator 2</translation>
+    </message>
+    <message>
+        <source>Use frequency modulation for modulating oscillator 2 with oscillator 1</source>
+        <translation>Frequenzmodulation benutzen, um Oszillator 2 mit Oszillator 1 zu modulieren</translation>
+    </message>
+    <message>
+        <source>Use phase modulation for modulating oscillator 3 with oscillator 2</source>
+        <translation>Phasenmodulation benutzen, um Oszillator 3 mit Oszillator 2 zu modulieren</translation>
+    </message>
+    <message>
+        <source>Use amplitude modulation for modulating oscillator 3 with oscillator 2</source>
+        <translation>Amplitudenmodulation benutzen, um Oszillator 3 mit Oszillator 2 zu modulieren</translation>
+    </message>
+    <message>
+        <source>Mix output of oscillator 2 &amp; 3</source>
+        <translation>Mische Ausgang von Oszillator 2 &amp; 3</translation>
+    </message>
+    <message>
+        <source>Synchronize oscillator 2 with oscillator 3</source>
+        <translation>Synchronisiere Oszillator 2 mit Oszillator 3</translation>
+    </message>
+    <message>
+        <source>Use frequency modulation for modulating oscillator 3 with oscillator 2</source>
+        <translation>Frequenzmodulation benutzen, um Oszillator 3 mit Oszillator 2 zu modulieren</translation>
+    </message>
+    <message>
+        <source>With this knob you can set the stereo phase-detuning of oscillator %1. The stereo phase-detuning specifies the size of the difference between the phase-offset of left and right channel. This is very good for creating wide stereo sounds.</source>
+        <translation>Mit diesem Knopf können Sie die Stereo Phasen-Verschiebung von Oszillator %1 setzen. Die Stereo Phasen-Verschiebung gibt die Differenz zwischen den Phasen-Verschiebungen zwischen dem linken und rechten Kanal an. Dies eignet sich gut, um großräumig-klingende Stereo-Klänge zu erzeugen.</translation>
+    </message>
+    <message>
+        <source>Use a sine-wave for current oscillator.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use a triangle-wave for current oscillator.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use a saw-wave for current oscillator.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use a square-wave for current oscillator.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use a moog-like saw-wave for current oscillator.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use an exponential wave for current oscillator.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use white-noise for current oscillator.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use a user-defined waveform for current oscillator.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5026,15 +5484,15 @@ Wenn es mit anderer VST-software unter Linux funktioniert, kontaktieren Sie bitt
     </message>
     <message>
         <source>Detune %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Verstimmung %1</translation>
     </message>
     <message>
         <source>Fuzziness %1 </source>
-        <translation type="unfinished"></translation>
+        <translation>Unschärfe %1</translation>
     </message>
     <message>
         <source>Length %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Länge %1</translation>
     </message>
     <message>
         <source>Impulse %1</source>
@@ -5042,7 +5500,7 @@ Wenn es mit anderer VST-software unter Linux funktioniert, kontaktieren Sie bitt
     </message>
     <message>
         <source>Octave %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Oktave %1</translation>
     </message>
 </context>
 <context>
@@ -5193,7 +5651,7 @@ Die LED rechts unterhalb der Wellenform gibt an, ob die Saite aktiviert ist.</tr
     </message>
     <message>
         <source>Click here if you want a sine-wave for current oscillator.</source>
-        <translation>Klicken Sie hier, wenn Sie eine Sinus-Schwingung für den aktuellen Oszillator haben wollen.</translation>
+        <translation type="obsolete">Klicken Sie hier, wenn Sie eine Sinus-Schwingung für den aktuellen Oszillator haben wollen.</translation>
     </message>
     <message>
         <source>Triangle wave</source>
@@ -5201,7 +5659,7 @@ Die LED rechts unterhalb der Wellenform gibt an, ob die Saite aktiviert ist.</tr
     </message>
     <message>
         <source>Click here if you want a triangle-wave for current oscillator.</source>
-        <translation>Klicken Sie hier, wenn Sie eine Dreiecks-Schwingung für den aktuellen Oszillator haben wollen.</translation>
+        <translation type="obsolete">Klicken Sie hier, wenn Sie eine Dreiecks-Schwingung für den aktuellen Oszillator haben wollen.</translation>
     </message>
     <message>
         <source>Saw wave</source>
@@ -5209,7 +5667,7 @@ Die LED rechts unterhalb der Wellenform gibt an, ob die Saite aktiviert ist.</tr
     </message>
     <message>
         <source>Click here if you want a saw-wave for current oscillator.</source>
-        <translation>Klicken Sie hier, wenn Sie eine Sägezahn-Schwingung für den aktuellen Oszillator haben wollen.</translation>
+        <translation type="obsolete">Klicken Sie hier, wenn Sie eine Sägezahn-Schwingung für den aktuellen Oszillator haben wollen.</translation>
     </message>
     <message>
         <source>Square wave</source>
@@ -5217,7 +5675,7 @@ Die LED rechts unterhalb der Wellenform gibt an, ob die Saite aktiviert ist.</tr
     </message>
     <message>
         <source>Click here if you want a square-wave for current oscillator.</source>
-        <translation>Klicken Sie hier, wenn Sie eine Rechteck-Schwingung für den aktuellen Oszillator haben wollen.</translation>
+        <translation type="obsolete">Klicken Sie hier, wenn Sie eine Rechteck-Schwingung für den aktuellen Oszillator haben wollen.</translation>
     </message>
     <message>
         <source>White noise wave</source>
@@ -5225,7 +5683,7 @@ Die LED rechts unterhalb der Wellenform gibt an, ob die Saite aktiviert ist.</tr
     </message>
     <message>
         <source>Click here if you want a white-noise for current oscillator.</source>
-        <translation>Klicken Sie hier, wenn Sie weißes Rauschen für den aktuellen Oszillator haben wollen.</translation>
+        <translation type="obsolete">Klicken Sie hier, wenn Sie weißes Rauschen für den aktuellen Oszillator haben wollen.</translation>
     </message>
     <message>
         <source>User defined wave</source>
@@ -5233,7 +5691,7 @@ Die LED rechts unterhalb der Wellenform gibt an, ob die Saite aktiviert ist.</tr
     </message>
     <message>
         <source>Click here if you want a user-defined wave-shape for current oscillator.</source>
-        <translation>Klicken Sie hier, wenn Sie eine selbst definierte Wellenform für den aktuellen Oszillator haben wollen.</translation>
+        <translation type="obsolete">Klicken Sie hier, wenn Sie eine selbst definierte Wellenform für den aktuellen Oszillator haben wollen.</translation>
     </message>
     <message>
         <source>Smooth</source>
@@ -5254,6 +5712,30 @@ Die LED rechts unterhalb der Wellenform gibt an, ob die Saite aktiviert ist.</tr
     <message>
         <source>&amp;Help</source>
         <translation>&amp;Hilfe</translation>
+    </message>
+    <message>
+        <source>Use a sine-wave for current oscillator.</source>
+        <translation>Sinuswelle für aktuellen Oszillator nutzen.</translation>
+    </message>
+    <message>
+        <source>Use a triangle-wave for current oscillator.</source>
+        <translation>Dreieckswelle für aktuellen Oszillator nutzen.</translation>
+    </message>
+    <message>
+        <source>Use a saw-wave for current oscillator.</source>
+        <translation>Sägezahnwelle für aktuellen Oszillator nutzen.</translation>
+    </message>
+    <message>
+        <source>Use a square-wave for current oscillator.</source>
+        <translation>Rechteckswelle für aktuellen Oszillator nutzen.</translation>
+    </message>
+    <message>
+        <source>Use white-noise for current oscillator.</source>
+        <translation>Weißes Rauschen für aktuellen Oszillator nutzen.</translation>
+    </message>
+    <message>
+        <source>Use a user-defined waveform for current oscillator.</source>
+        <translation>Benutzerdefinierte Wellenform für aktuellen Oszillator nutzen.</translation>
     </message>
 </context>
 <context>
@@ -5304,6 +5786,10 @@ Die LED rechts unterhalb der Wellenform gibt an, ob die Saite aktiviert ist.</tr
     <message>
         <source>Voice %1 filtered</source>
         <translation>Stimme %1 gefiltert</translation>
+    </message>
+    <message>
+        <source>Voice %1 test</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>
