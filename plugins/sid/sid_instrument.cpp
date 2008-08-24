@@ -550,8 +550,7 @@ sidInstrumentView::sidInstrumentView( instrument * _instrument,
 		dk->setHintText( tr("Decay:") + " ", "" );
 		dk->move( 7 + 29, 110 + i*50 );
 		dk->setWhatsThis( tr ( "Decay rate determines how rapidly the output "
-				"falls from the peak amplitude to the selected Sustain level." )
-				.arg( i+1 ) );
+				"falls from the peak amplitude to the selected Sustain level." ) );
 
 		knob *sk = new sidKnob( this );
 		sk->setHintText( tr("Sustain:") + " ", "" );

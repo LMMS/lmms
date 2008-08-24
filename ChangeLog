@@ -1,3 +1,8 @@
+2008-08-24	Paul Giblock <drfaygo/at/gmail/dot/com>
+
+	* plugins/sid/sid_instrument.cpp:
+	Fix what's this text with extra arg value.
+
 2008-08-23	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* cmake/modules/BuildPlugin.cmake:
