@@ -1,3 +1,8 @@
+2008-08-24	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* CMakeLists.txt:
+	made 0.4.0-beta2 release
+
 2008-08-24	Paul Giblock <drfaygo/at/gmail/dot/com>
 
 	* plugins/sid/sid_instrument.cpp:
