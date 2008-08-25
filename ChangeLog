@@ -91,7 +91,7 @@
 	controlling intrument-tracks via MIDI (closes #2062907)
 
 	* src/gui/piano_roll.cpp:
-	fixed notes appearing X times in pattern when recording from
+	fixed notes appearing multiple times in pattern when recording from
 	MIDI-device (closes #2058971)
 
 	* src/gui/automation_editor.cpp:
