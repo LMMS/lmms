@@ -82,6 +82,9 @@ public:
 	virtual void loadSettings( const QDomElement & _this );
 	virtual QString nodeName( void ) const;
 
+public slots:
+	void deleteConnection( void );
+
 protected:
 	//virtual controllerDialog * createDialog( QWidget * _parent );
 	controller * m_controller;

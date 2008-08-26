@@ -219,7 +219,7 @@ public slots:
 	virtual void reset( void );
 	virtual void copyValue( void );
 	virtual void pasteValue( void );
-
+	void unlinkControllerConnection( void );
 
 protected:
 	virtual void redoStep( journalEntry & _je );

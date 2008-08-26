@@ -97,22 +97,29 @@ void controllerConnection::setController( controller * _controller )
 
 	if( !_controller )
 	{
-        m_controller = controller::create( controller::DummyController, NULL );
+		m_controller = controller::create( controller::DummyController, NULL );
 	}
 	else
 	{
 		m_controller = _controller;
 	}
-    m_controllerId = -1;
+	m_controllerId = -1;
 
-    if( _controller->type() != controller::DummyController )
+	if( _controller->type() != controller::DummyController )
 	{
-        QObject::connect( _controller, SIGNAL( valueChanged() ),
-                this, SIGNAL( valueChanged() ) );
-    }
+		QObject::connect( _controller, SIGNAL( valueChanged() ),
+				this, SIGNAL( valueChanged() ) );
+	}
 
 	m_ownsController = 
 			( _controller->type() == controller::MidiController );
+
+	// If we don't own the controller, allow deletion of controller
+	// to delete the connection
+	if( !m_ownsController ) {
+		QObject::connect( _controller, SIGNAL( destroyed() ),
+				this, SLOT( deleteConnection() ) );
+	}
 }
 
 
@@ -194,7 +201,10 @@ void controllerConnection::loadSettings( const QDomElement & _this )
 }
 
 
-
+void controllerConnection::deleteConnection( void )
+{
+	delete this;
+}
 
 QString controllerConnection::nodeName( void ) const
 {

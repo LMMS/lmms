@@ -74,7 +74,7 @@ controller::~controller()
 		engine::getSong()->removeController( this );
 	}
 
-	// TODO: Remove connections
+	// Remove connections by destroyed signal
 }
 
 

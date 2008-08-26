@@ -149,9 +149,6 @@ signals:
 	// The value changed while the mixer isn't running (i.e: MIDI CC)
 	void valueChanged( void );
 
-	// Allow all attached models to unlink
-	void destroying( void );
-
 	friend class controllerDialog;
 
 } ;

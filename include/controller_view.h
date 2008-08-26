@@ -59,15 +59,13 @@ public:
 
 public slots:
 	void editControls( void );
-	//void deletePlugin( void );
+	void deleteController( void );
 	//void displayHelp( void );
 	void closeControls( void );
 
 	
 signals:
-	//void moveUp( effectView * _plugin );
-	//void moveDown( effectView * _plugin );
-	//void deletePlugin( effectView * _plugin );
+	void deleteController( controllerView * _view );
 
 
 protected:

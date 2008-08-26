@@ -413,8 +413,24 @@ void automatableModel::setControllerConnection( controllerConnection * _c )
 		QObject::connect( m_controllerConnection,
 						SIGNAL( valueChanged() ),
 					this, SIGNAL( dataChanged() ) );
+		QObject::connect( m_controllerConnection,
+						SIGNAL( destroyed() ),
+					this, SLOT( unlinkControllerConnection() ) );
 		emit dataChanged();
 	}
+}
+
+
+
+
+void automatableModel::unlinkControllerConnection( void )
+{
+	if( m_controllerConnection )
+	{
+		m_controllerConnection->disconnect( this );
+	}
+
+	m_controllerConnection = NULL;
 }
 
 

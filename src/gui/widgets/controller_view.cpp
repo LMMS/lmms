@@ -124,12 +124,10 @@ void controllerView::closeControls( void )
 }
 
 
-
-
-void controllerView::contextMenuEvent( QContextMenuEvent * )
+void controllerView::deleteController()
 {
+	emit( deleteController( this ) );
 }
-
 
 
 
@@ -176,6 +174,33 @@ void controllerView::mouseDoubleClickEvent( QMouseEvent * event )
 void controllerView::modelChanged( void )
 {
 }
+
+
+
+void controllerView::contextMenuEvent( QContextMenuEvent * )
+{
+	QPointer<captionMenu> contextMenu = new captionMenu(
+						getModel()->displayName() );
+	/*
+	contextMenu->addAction( embed::getIconPixmap( "arp_up" ),
+						tr( "Move &up" ),
+						this, SLOT( moveUp() ) );
+	contextMenu->addAction( embed::getIconPixmap( "arp_down" ),
+						tr( "Move &down" ),
+						this, SLOT( moveDown() ) );
+	contextMenu->addSeparator();
+	*/
+	contextMenu->addAction( embed::getIconPixmap( "cancel" ),
+						tr( "&Remove this plugin" ),
+						this, SLOT( deleteController() ) );
+	contextMenu->addSeparator();
+	contextMenu->addAction( embed::getIconPixmap( "help" ),
+						tr( "&Help" ),
+						this, SLOT( displayHelp() ) );
+	contextMenu->exec( QCursor::pos() );
+	delete contextMenu;
+}
+
 
 
 #include "moc_controller_view.cxx"

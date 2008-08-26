@@ -149,23 +149,16 @@ void controllerRackView::moveDown( effectView * _view )
 }*/
 
 
-/*
-
-void controllerRackView::deletePlugin( effectView * _view )
+void controllerRackView::deleteController( controllerView * _view )
 {
 	
-	effect * e = _view->getEffect();
-	m_effectViews.erase( qFind( m_effectViews.begin(), m_effectViews.end(),
-								_view ) );
+	controller * c = _view->getController();
+	m_controllerViews.erase( qFind( m_controllerViews.begin(), 
+				m_controllerViews.end(), _view ) );
 	delete _view;
-	fxChain()->m_effects.erase( qFind( fxChain()->m_effects.begin(),
-						fxChain()->m_effects.end(),
-									e ) );
-	delete e;
+	delete c;
 	update();
-	
 }
-*/
 
 
 
@@ -188,6 +181,11 @@ void controllerRackView::update( void )
 	for( i = 0; i < s->m_controllers.size(); ++i )
 	{
 		controllerView * v = new controllerView( s->m_controllers[i], w );
+
+		connect( v, SIGNAL( deleteController( controllerView * ) ),
+			this, SLOT( deleteController( controllerView * ) ),
+						Qt::QueuedConnection );
+
 		m_controllerViews.append( v );
 		v->move( 0, i*32 );
 		v->show();

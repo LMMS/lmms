@@ -49,15 +49,12 @@ public:
 
 
 public slots:
-	//void moveUp( effectView * _view );
-	//void moveDown( effectView * _view );
-	//void deletePlugin( effectView * _view );
+	void deleteController( controllerView * _view );
 
 
 private slots:
 	virtual void update( void );
 	void addController( void );
-
 
 private:
 	/*virtual void modelChanged( void );
