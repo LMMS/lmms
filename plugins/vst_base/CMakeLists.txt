@@ -5,9 +5,9 @@ INCLUDE(BuildPlugin)
 BUILD_PLUGIN(vstbase vst_base.cpp lvsl_client.cpp lvsl_client.h communication.h MOCFILES lvsl_client.h)
 SET_TARGET_PROPERTIES(vstbase PROPERTIES COMPILE_FLAGS "-D_FORTIFY_SOURCE=0")
 
-IF(HOST_IS_64BIT)
+IF(LMMS_HOST_X86_64)
 	SET(EXTRA_FLAGS -m32 -Wb,--as-cmd='as --32',--ld-cmd='ld -melf_i386' -L/usr/lib32)
-ENDIF(HOST_IS_64BIT)
+ENDIF(LMMS_HOST_X86_64)
 ADD_CUSTOM_COMMAND(
 		SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/lvsl_server.cpp
 		COMMAND wineg++

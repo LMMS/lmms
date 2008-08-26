@@ -33,6 +33,8 @@ ELSE(WIN32)
 	ENDIF(APPLE)
 ENDIF(WIN32)
 
+INCLUDE(DetectMachine)
+
 
 OPTION(WANT_ALSA	"Include ALSA (Advanced Linux Sound Architecture) support" ON)
 OPTION(WANT_CAPS	"Include C* Audio Plugin Suite (LADSPA plugins)" ON)
@@ -66,28 +68,12 @@ ELSE(LMMS_BUILD_WIN32)
 	SET(STATUS_WINMM "<not supported on this platform>")
 ENDIF(LMMS_BUILD_WIN32)
 
-MESSAGE("PROCESSOR: ${CMAKE_SYSTEM_PROCESSOR}")
-EXEC_PROGRAM( uname ARGS "-m"OUTPUT_VARIABLE Machine )
-MESSAGE("Machine: ${Machine}")
-IF(${Machine} MATCHES "i686" OR ${Machine} MATCHES "i386" )
-	MESSAGE("-- This is an 32 bit machine")
-	SET(HOST_IS_64BIT FALSE)
-ELSE(${Machine} MATCHES "i686" OR ${Machine} MATCHES "i386" )
-	IF(${Machine} MATCHES "x86_64")
-		MESSAGE("-- This is an 64 bit machine")
-		SET(HOST_IS_64BIT TRUE)
-	ELSE(${Machine} MATCHES "x86_64")
-		MESSAGE("Can't identify this machine. Assuming 32 bit platform ")
-		SET(HOST_IS_64BIT FALSE)
-	ENDIF(${Machine} MATCHES "x86_64")
-ENDIF(${Machine} MATCHES "i686" OR ${Machine} MATCHES "i386" )
 
-
-IF(HOST_IS_64BIT)
+IF(LMMS_HOST_X86_64)
 	SET(LIB_DIR lib64)
-ELSE(HOST_IS_64BIT)
+ELSE(LMMS_HOST_X86_64)
 	SET(LIB_DIR lib)
-ENDIF(HOST_IS_64BIT)
+ENDIF(LMMS_HOST_X86_64)
 
 IF(LMMS_BUILD_WIN32)
 	SET(PLUGIN_DIR plugins)
@@ -284,9 +270,9 @@ if(WANT_VST)
 	SET(CMAKE_REQUIRED_FLAGS_ORIG ${CMAKE_REQUIRED_FLAGS})
 	SET(CMAKE_REQUIRED_INCLUDES_ORIG ${CMAKE_REQUIRED_INCLUDES})
 	SET(CMAKE_CXX_COMPILER_ORIG ${CMAKE_CXX_COMPILER})
-	IF(HOST_IS_64BIT)
+	IF(LMMS_HOST_X86_64)
 		SET(CMAKE_REQUIRED_FLAGS -m32 ${CMAKE_REQUIRED_FLAGS})
-	ENDIF(HOST_IS_64BIT)
+	ENDIF(LMMS_HOST_X86_64)
 	CHECK_LIBRARY_EXISTS(wine wine_init "" HAVE_LIBWINE)
 	SET(CMAKE_CXX_COMPILER /usr/bin/wineg++)
 	SET(CMAKE_REQUIRED_INCLUDES ${CMAKE_REQUIRED_INCLUDES} ${CMAKE_INSTALL_PREFIX}/include/wine/windows /usr/include/wine/windows)
@@ -416,6 +402,12 @@ FOREACH(_item ${locale_targets})
 ENDFOREACH(_item ${locale_targets})
 
 
+# install headers
+
+INSTALL(FILES ${lmms_INCLUDES} ${CMAKE_BINARY_DIR}/lmmsconfig.h ${CMAKE_SOURCE_DIR}/src/gui/embed.cpp DESTINATION ${CMAKE_INSTALL_PREFIX}/include/lmms/)
+IF(NOT LMMS_HAVE_SAMPLERATE)
+INSTALL(FILES ${CMAKE_SOURCE_DIR}/src/3rdparty/samplerate/samplerate.h DESTINATION ${CMAKE_INSTALL_PREFIX}/include/lmms/)
+ENDIF(NOT LMMS_HAVE_SAMPLERATE)
 
 #
 # add distclean-target

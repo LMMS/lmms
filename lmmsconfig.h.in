@@ -2,6 +2,9 @@
 #cmakedefine LMMS_BUILD_WIN32
 #cmakedefine LMMS_BUILD_APPLE
 
+#cmakedefine LMMS_HOST_X86
+#cmakedefine LMMS_HOST_X86_64
+
 #cmakedefine LMMS_HAVE_ALSA
 #cmakedefine LMMS_HAVE_FFTW3F
 #cmakedefine LMMS_HAVE_JACK

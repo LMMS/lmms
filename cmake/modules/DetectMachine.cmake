@@ -1,0 +1,18 @@
+MESSAGE("PROCESSOR: ${CMAKE_SYSTEM_PROCESSOR}")
+EXEC_PROGRAM( uname ARGS "-m" OUTPUT_VARIABLE Machine )
+MESSAGE("Machine: ${Machine}")
+SET(LMMS_HOST_X86 FALSE)
+SET(LMMS_HOST_X86_64 FALSE)
+
+IF(${Machine} MATCHES "i686" OR ${Machine} MATCHES "i386" )
+	MESSAGE("-- This is an 32 bit machine")
+	SET(LMMS_HOST_X86 TRUE)
+ELSE(${Machine} MATCHES "i686" OR ${Machine} MATCHES "i386" )
+	IF(${Machine} MATCHES "x86_64")
+		MESSAGE("-- This is an 64 bit machine")
+		SET(LMMS_HOST_X86_64 TRUE)
+	ELSE(${Machine} MATCHES "x86_64")
+		MESSAGE("Can't identify this machine. Assuming 32 bit platform ")
+	ENDIF(${Machine} MATCHES "x86_64")
+ENDIF(${Machine} MATCHES "i686" OR ${Machine} MATCHES "i386" )
+
