@@ -28,11 +28,13 @@
 
 #include <QtXml/QDomElement>
 #include <QtGui/QDropEvent>
+#include <QtGui/QMenu>
 #include <QtGui/QLayout>
 #include <QtGui/QMdiArea>
 #include <QtGui/QPainter>
 #include <QtGui/QPushButton>
 
+#include "gui_templates.h"
 #include "sample_track.h"
 #include "song.h"
 #include "embed.h"
@@ -40,6 +42,7 @@
 #include "tooltip.h"
 #include "audio_port.h"
 #include "sample_play_handle.h"
+#include "sample_record_handle.h"
 #include "string_pair_drag.h"
 #include "knob.h"
 #include "main_window.h"
@@ -89,6 +92,16 @@ const QString & sampleTCO::sampleFile( void ) const
 
 
 
+void sampleTCO::setSampleBuffer( sampleBuffer * _sb )
+{
+	sharedObject::unref( m_sampleBuffer );
+	m_sampleBuffer = _sb;
+	updateLength();
+
+	emit sampleChanged();
+}
+
+
 
 void sampleTCO::setSampleFile( const QString & _sf )
 {
@@ -96,6 +109,15 @@ void sampleTCO::setSampleFile( const QString & _sf )
 	updateLength();
 
 	emit sampleChanged();
+}
+
+
+
+
+void sampleTCO::toggleRecord( void )
+{
+	m_recordModel.setValue( !m_recordModel.value() );
+	emit dataChanged();
 }
 
 
@@ -204,6 +226,37 @@ void sampleTCOView::updateSample( void )
 
 
 
+void sampleTCOView::contextMenuEvent( QContextMenuEvent * _cme )
+{
+	QMenu contextMenu( this );
+	if( fixedTCOs() == FALSE )
+	{
+		contextMenu.addAction( embed::getIconPixmap( "cancel" ),
+					tr( "Delete (middle mousebutton)" ),
+						this, SLOT( remove() ) );
+		contextMenu.addSeparator();
+		contextMenu.addAction( embed::getIconPixmap( "edit_cut" ),
+					tr( "Cut" ), this, SLOT( cut() ) );
+	}
+	contextMenu.addAction( embed::getIconPixmap( "edit_copy" ),
+					tr( "Copy" ), m_tco, SLOT( copy() ) );
+	contextMenu.addAction( embed::getIconPixmap( "edit_paste" ),
+					tr( "Paste" ), m_tco, SLOT( paste() ) );
+	contextMenu.addSeparator();
+	contextMenu.addAction( embed::getIconPixmap( "muted" ),
+				tr( "Mute/unmute (<Ctrl> + middle click)" ),
+						m_tco, SLOT( toggleMute() ) );
+	contextMenu.addAction( embed::getIconPixmap( "record" ),
+				tr( "Set/clear record" ),
+						m_tco, SLOT( toggleRecord() ) );
+	constructContextMenu( &contextMenu );
+
+	contextMenu.exec( QCursor::pos() );
+}
+
+
+
+
 void sampleTCOView::dragEnterEvent( QDragEnterEvent * _dee )
 {
 	if( stringPairDrag::processDragEnterEvent( _dee,
@@ -235,6 +288,23 @@ void sampleTCOView::dropEvent( QDropEvent * _de )
 	else
 	{
 		trackContentObjectView::dropEvent( _de );
+	}
+}
+
+
+
+
+void sampleTCOView::mousePressEvent( QMouseEvent * _me )
+{
+	if( _me->button() == Qt::LeftButton &&
+		engine::getMainWindow()->isCtrlPressed() &&
+		engine::getMainWindow()->isShiftPressed() )
+	{
+		m_tco->toggleRecord();
+	}
+	else
+	{
+		trackContentObjectView::mousePressEvent( _me );
 	}
 }
 
@@ -298,6 +368,14 @@ void sampleTCOView::paintEvent( QPaintEvent * _pe )
 	{
 		p.drawPixmap( 3, 8, embed::getIconPixmap( "muted", 16, 16 ) );
 	}
+	if( m_tco->isRecord() )
+	{
+		p.setFont( pointSize<6>( p.font() ) );
+		p.setPen( QColor( 224, 0, 0 ) );
+		p.drawText( 9, p.fontMetrics().height() - 1, "Rec" );
+		p.setBrush( QBrush( QColor( 224, 0, 0 ) ) );
+		p.drawEllipse( 4, 5, 4, 4 );
+	}
 }
 
 
@@ -342,8 +420,18 @@ bool sampleTrack::play( const midiTime & _start, const fpp_t _frames,
 		sampleTCO * st = dynamic_cast<sampleTCO *>( tco );
 		if( !st->isMuted() )
 		{
-			samplePlayHandle * handle = new samplePlayHandle( st );
-			handle->setVolumeModel( &m_volumeModel );
+			playHandle * handle;
+			if( st->isRecord() )
+			{
+				sampleRecordHandle * smpHandle = new sampleRecordHandle( st );
+				handle = smpHandle;
+			}
+			else
+			{
+				samplePlayHandle * smpHandle = new samplePlayHandle( st );
+				smpHandle->setVolumeModel( &m_volumeModel );
+				handle = smpHandle;
+			}
 //TODO: check whether this works
 //			handle->setBBTrack( _tco_num );
 			handle->setOffset( _offset );

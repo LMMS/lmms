@@ -1,3 +1,26 @@
+2008-08-27	Csaba Hruska <csaba.hruska/at/gmail.com>
+
+	* cmake/modules/FindPortaudio.cmake:
+	* include/audio_portaudio.h:
+	* src/core/audio/audio_portaudio.cpp:
+	* src/gui/setup_dialog.cpp:
+	* lmmsconfig.h.in:
+	* CMakeLists.txt:
+	added support for PortAudio
+
+	* include/mixer.h:
+	* include/sample_record_handle.h:
+	* include/song_editor.h:
+	* include/sample_track.h:
+	* include/audio_device.h:
+	* src/gui/song_editor.cpp:
+	* src/tracks/sample_track.cpp:
+	* src/core/audio/audio_device.cpp:
+	* src/core/mixer.cpp:
+	* src/core/engine.cpp:
+	* src/core/sample_record_handle.cpp:
+	added basic support for recording sound into sample tracks
+
 2008-08-27	Paul Giblock <drfaygo/at/gmail/dot/com>
 	* include/controller_view.h:
 	* src/gui/widgets/controller_view.cpp:

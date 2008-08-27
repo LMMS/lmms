@@ -40,6 +40,7 @@ class sampleBuffer;
 class sampleTCO : public trackContentObject
 {
 	Q_OBJECT
+	mapPropertyFromModel(bool,isRecord,setRecord,m_recordModel);
 public:
 	sampleTCO( track * _track );
 	virtual ~sampleTCO();
@@ -65,12 +66,15 @@ public:
 
 
 public slots:
+	void setSampleBuffer( sampleBuffer * _sb );
 	void setSampleFile( const QString & _sf );
 	void updateLength( bpm_t = 0 );
+	void toggleRecord( void );
 
 
 private:
 	sampleBuffer * m_sampleBuffer;
+	boolModel m_recordModel;
 
 
 	friend class sampleTCOView;
@@ -96,6 +100,8 @@ public slots:
 
 
 protected:
+	virtual void contextMenuEvent( QContextMenuEvent * _cme );
+	virtual void mousePressEvent( QMouseEvent * _me );
 	virtual void dragEnterEvent( QDragEnterEvent * _dee );
 	virtual void dropEvent( QDropEvent * _de );
 	virtual void mouseDoubleClickEvent( QMouseEvent * );

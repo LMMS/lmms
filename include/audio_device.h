@@ -64,6 +64,11 @@ public:
 	virtual void renamePort( audioPort * _port );
 
 
+	inline bool supportsCapture( void ) const
+	{
+		return( m_supportsCapture );
+	}
+
 	inline sample_rate_t sampleRate( void ) const
 	{
 		return( m_sampleRate );
@@ -156,6 +161,8 @@ protected:
 
 	bool hqAudio( void ) const;
 
+protected:
+	bool m_supportsCapture;
 
 private:
 	sample_rate_t m_sampleRate;

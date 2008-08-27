@@ -65,6 +65,8 @@ private slots:
 	void setHighQuality( bool );
 
 	void play( void );
+	void record( void );
+	void recordAccompany( void );
 	void stop( void );
 
 	void masterVolumeChanged( int _new_val );
@@ -101,6 +103,8 @@ private:
 	QWidget * m_toolBar;
 
 	toolButton * m_playButton;
+	toolButton * m_recordButton;
+	toolButton * m_recordAccompanyButton;
 	toolButton * m_stopButton;
 	lcdSpinBox * m_tempoSpinBox;
 

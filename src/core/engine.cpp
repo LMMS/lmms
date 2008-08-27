@@ -79,6 +79,12 @@ void engine::init( const bool _has_gui )
 	s_fxMixer = new fxMixer;
 	s_bbTrackContainer = new bbTrackContainer;
 
+	s_ladspaManager = new ladspa2LMMS;
+
+	s_projectJournal->setJournalling( TRUE );
+
+	s_mixer->initDevices();
+
 	if( s_hasGUI )
 	{
 		s_mainWindow = new mainWindow;
@@ -89,15 +95,7 @@ void engine::init( const bool _has_gui )
 		s_bbEditor = new bbEditor( s_bbTrackContainer );
 		s_pianoRoll = new pianoRoll;
 		s_automationEditor = new automationEditor;
-	}
-	s_ladspaManager = new ladspa2LMMS;
 
-	s_projectJournal->setJournalling( TRUE );
-
-	s_mixer->initDevices();
-
-	if( s_hasGUI )
-	{
 		s_mainWindow->finalize();
 	}
 

@@ -288,6 +288,7 @@ public:
 
 	sample_rate_t baseSampleRate( void ) const;
 	sample_rate_t outputSampleRate( void ) const;
+	sample_rate_t inputSampleRate( void ) const;
 	sample_rate_t processingSampleRate( void ) const;
 
 
@@ -347,6 +348,16 @@ public:
 		m_playHandlesToRemoveMutex.unlock();
 	}
 
+	void lockInputFrames( void )
+	{
+		m_inputFramesMutex.lock();
+	}
+
+	void unlockInputFrames( void )
+	{
+		m_inputFramesMutex.unlock();
+	}
+
 	// audio-buffer-mgm
 	void bufferToPort( const sampleFrame * _buf,
 					const fpp_t _frames,
@@ -372,6 +383,18 @@ public:
 	inline bool hasFifoWriter( void ) const
 	{
 		return( m_fifoWriter != NULL );
+	}
+
+	void pushInputFrames( sampleFrame * _ab, const f_cnt_t _frames );
+	
+	inline const sampleFrame * inputBuffer( void )
+	{
+		return m_inputBuffer[ m_inputBufferRead ];
+	}
+
+	inline const f_cnt_t inputBufferFrames( void )
+	{
+		return m_inputBufferFrames[ m_inputBufferRead ];
 	}
 
 	inline const surroundSampleFrame * nextBuffer( void )
@@ -430,6 +453,12 @@ private:
 
 	sampleFrame * m_workingBuf;
 
+	sampleFrame * m_inputBuffer[2];
+	f_cnt_t m_inputBufferFrames[2];
+	f_cnt_t m_inputBufferSize[2];
+	int m_inputBufferRead;
+	int m_inputBufferWrite;
+	
 	surroundSampleFrame * m_readBuf;
 	surroundSampleFrame * m_writeBuf;
 	
@@ -472,6 +501,7 @@ private:
 	QMutex m_globalMutex;
 	QMutex m_playHandlesMutex;
 	QMutex m_playHandlesToRemoveMutex;
+	QMutex m_inputFramesMutex;
 
 
 	fifo * m_fifo;

@@ -49,6 +49,7 @@
 #include "tool_button.h"
 #include "tooltip.h"
 #include "visualization_widget.h"
+#include "audio_device.h"
 
 
 
@@ -222,6 +223,21 @@ songEditor::songEditor( song * _song, songEditor * & _engine_ptr ) :
 					tr( "Play song (Space)" ),
 					this, SLOT( play() ), m_toolBar );
 
+	m_recordButton = new toolButton( embed::getIconPixmap( "record" ),
+			tr( "Record samples from Audio-device" ),
+					this, SLOT( record() ), m_toolBar );
+	m_recordAccompanyButton = new toolButton( 
+			embed::getIconPixmap( "record_accompany" ),
+			tr( "Record samples from Audio-device while playing song or BB track" ),
+					this, SLOT( recordAccompany() ), m_toolBar );
+
+	// disable record buttons if capturing is not supported
+	if( !engine::getMixer()->audioDev()->supportsCapture() )
+	{
+		m_recordButton->setDisabled( true );
+		m_recordAccompanyButton->setDisabled( true );
+	}
+
 	m_stopButton = new toolButton( embed::getIconPixmap( "stop", 24, 24 ),
 					tr( "Stop song (Space)" ),
 					this, SLOT( stop() ), m_toolBar );
@@ -305,6 +321,8 @@ songEditor::songEditor( song * _song, songEditor * & _engine_ptr ) :
 
 	tb_layout->addSpacing( 5 );
 	tb_layout->addWidget( m_playButton );
+	tb_layout->addWidget( m_recordButton );
+	tb_layout->addWidget( m_recordAccompanyButton );
 	tb_layout->addWidget( m_stopButton );
 	tb_layout->addSpacing( 10 );
 	tb_layout->addWidget( m_addBBTrackButton );
@@ -381,6 +399,22 @@ void songEditor::play( void )
 	{
 		m_playButton->setIcon( embed::getIconPixmap( "play" ) );
 	}
+}
+
+
+
+
+void songEditor::record( void )
+{
+	play();
+}
+
+
+
+
+void songEditor::recordAccompany( void )
+{
+	play();
 }
 
 

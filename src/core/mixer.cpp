@@ -54,6 +54,7 @@
 #include "audio_alsa.h"
 #include "audio_jack.h"
 #include "audio_oss.h"
+#include "audio_portaudio.h"
 #include "audio_pulseaudio.h"
 #include "audio_sdl.h"
 #include "audio_dummy.h"
@@ -287,8 +288,18 @@ mixer::mixer( void ) :
 	m_masterGain( 1.0f ),
 	m_audioDev( NULL ),
 	m_oldAudioDev( NULL ),
-	m_globalMutex( QMutex::Recursive )
+	m_globalMutex( QMutex::Recursive ),
+	m_inputBufferRead( 0 ),
+	m_inputBufferWrite( 1 )
 {
+	for( int i = 0; i < 2; ++i )
+	{
+		m_inputBufferFrames[i] = 0;
+		m_inputBufferSize[i] = DEFAULT_BUFFER_SIZE * 100;
+		m_inputBuffer[i] = new sampleFrame[ DEFAULT_BUFFER_SIZE * 100 ];
+		clearAudioBuffer( m_inputBuffer[i], m_inputBufferSize[i] );
+	}
+	
 	if( configManager::inst()->value( "mixer", "framesperaudiobuffer"
 						).toInt() >= 32 )
 	{
@@ -453,6 +464,15 @@ sample_rate_t mixer::outputSampleRate( void ) const
 
 
 
+sample_rate_t mixer::inputSampleRate( void ) const
+{
+	return( m_audioDev != NULL ? m_audioDev->sampleRate() :
+							baseSampleRate() );
+}
+
+
+
+
 sample_rate_t mixer::processingSampleRate( void ) const
 {
 	return( outputSampleRate() * m_qualitySettings.sampleRateMultiplier() );
@@ -465,6 +485,36 @@ bool mixer::criticalXRuns( void ) const
 {
 	return( ( m_cpuLoad >= 99 &&
 				engine::getSong()->realTimeTask() == TRUE ) );
+}
+
+
+
+
+void mixer::pushInputFrames( sampleFrame * _ab, const f_cnt_t _frames )
+{
+	lockInputFrames();
+
+	f_cnt_t frames = m_inputBufferFrames[ m_inputBufferWrite ];
+	int size = m_inputBufferSize[ m_inputBufferWrite ];
+	sampleFrame * buf = m_inputBuffer[ m_inputBufferWrite ];
+	
+	if( frames + _frames > size )
+	{
+		size = tMax( size * 2, frames + _frames );
+		sampleFrame * ab = new sampleFrame[ size ];
+		memcpy( ab, buf, frames * sizeof( sampleFrame ) );
+		delete [] buf;
+
+		m_inputBufferSize[ m_inputBufferWrite ] = size;
+		m_inputBuffer[ m_inputBufferWrite ] = ab;
+
+		buf = ab;
+	}
+	
+	memcpy( &buf[ frames ], _ab, _frames * sizeof( sampleFrame ) );
+	m_inputBufferFrames[ m_inputBufferWrite ] += _frames;
+	
+	unlockInputFrames();
 }
 
 
@@ -486,6 +536,16 @@ const surroundSampleFrame * mixer::renderNextBuffer( void )
 		last_metro_pos = p;
 	}
 
+	lockInputFrames();
+	// swap buffer
+	m_inputBufferWrite++;
+	m_inputBufferWrite %= 2;
+	m_inputBufferRead++;
+	m_inputBufferRead %= 2;
+	// clear new write buffer
+	m_inputBufferFrames[ m_inputBufferWrite ] = 0;
+	unlockInputFrames();
+	
 	// now we have to make sure no other thread does anything bad
 	// while we're acting...
 	lock();
@@ -922,6 +982,20 @@ audioDevice * mixer::tryAudioDevices( void )
 		if( success_ful )
 		{
 			m_audioDevName = audioALSA::name();
+			return( dev );
+		}
+		delete dev;
+	}
+#endif
+
+
+#ifdef LMMS_HAVE_PORTAUDIO
+	if( dev_name == audioPortAudio::name() || dev_name == "" )
+	{
+		dev = new audioPortAudio( success_ful, this );
+		if( success_ful )
+		{
+			m_audioDevName = audioPortAudio::name();
 			return( dev );
 		}
 		delete dev;
