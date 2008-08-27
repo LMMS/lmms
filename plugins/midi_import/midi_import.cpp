@@ -40,7 +40,8 @@
 
 
 #define makeID(_c0, _c1, _c2, _c3) \
-	( ( _c0 ) | ( ( _c1 ) << 8 ) | ( ( _c2 ) << 16 ) | ( ( _c3 ) << 24 ) )
+		( 0 | \
+		( ( _c0 ) | ( ( _c1 ) << 8 ) | ( ( _c2 ) << 16 ) | ( ( _c3 ) << 24 ) ) )
 
 
 
@@ -90,9 +91,11 @@ bool midiImport::tryImport( trackContainer * _tc )
 	switch( readID() )
 	{
 		case makeID( 'M', 'T', 'h', 'd' ):
+			printf( "midiImport::tryImport(): found MThd\n");
 			return( readSMF( _tc ) );
 
 		case makeID( 'R', 'I', 'F', 'F' ):
+			printf( "midiImport::tryImport(): found RIFF\n");
 			return( readRIFF( _tc ) );
 
 		default:

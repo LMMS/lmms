@@ -104,6 +104,11 @@ const int NE_LINE_WIDTH = 3;
 // key where to start
 const int INITIAL_START_KEY = Key_C + Octave_3 * KeysPerOctave;
 
+// number of each not to provide in quantization and note lengths
+const int NUM_EVEN_LENGTHS = 6;
+const int NUM_TRIPLET_LENGTHS = 5;
+
+
 
 QPixmap * pianoRoll::s_whiteKeySmallPm = NULL;
 QPixmap * pianoRoll::s_whiteKeyBigPm = NULL;
@@ -366,14 +371,17 @@ pianoRoll::pianoRoll( void ) :
 	m_zoomingComboBox->setModel( &m_zoomingModel );
 	m_zoomingComboBox->setFixedSize( 80, 22 );
 
-
 	// setup quantize-stuff
 	QLabel * quantize_lbl = new QLabel( m_toolBar );
 	quantize_lbl->setPixmap( embed::getIconPixmap( "quantize" ) );
 
-	for( int i = 0; i < 7; ++i )
+	for( int i = 0; i <= NUM_EVEN_LENGTHS; ++i )
 	{
 		m_quantizeModel.addItem( "1/" + QString::number( 1 << i ) );
+	}
+	for( int i = 0; i < NUM_TRIPLET_LENGTHS; ++i )
+	{
+		m_quantizeModel.addItem( "1/" + QString::number( (1 << i) * 3 ) );
 	}
 	m_quantizeModel.addItem( "1/192" );
 	m_quantizeModel.setValue( m_quantizeModel.findText( "1/16" ) );
@@ -389,13 +397,20 @@ pianoRoll::pianoRoll( void ) :
 	m_noteLenModel.addItem( tr( "Last note" ),
 					new pixmapLoader( "edit_draw" ) );
 	const QString pixmaps[] = { "whole", "half", "quarter", "eighth",
-						"sixteenth", "thirtysecond" } ;
-	for( int i = 0; i < 6; ++i )
+						"sixteenth", "thirtysecond", "triplethalf", 
+						"tripletquarter", "tripleteighth", 
+						"tripletsixteenth", "tripletthirtysecond" } ;
+
+	for( int i = 0; i < NUM_EVEN_LENGTHS; ++i )
 	{
 		m_noteLenModel.addItem( "1/" + QString::number( 1 << i ),
 				new pixmapLoader( "note_" + pixmaps[i] ) );
 	}
-	m_noteLenModel.addItem( "1/192" );
+	for( int i = 0; i < NUM_TRIPLET_LENGTHS; ++i )
+	{
+		m_noteLenModel.addItem( "1/" + QString::number( (1 << i) * 3 ),
+				new pixmapLoader( "note_" + pixmaps[i+NUM_EVEN_LENGTHS] ) );
+	}
 	m_noteLenModel.setValue( 0 );
 	m_noteLenComboBox = new comboBox( m_toolBar );
 	m_noteLenComboBox->setModel( &m_noteLenModel );
@@ -1850,19 +1865,36 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 				height() - PR_TOP_MARGIN - PR_BOTTOM_MARGIN );
 
 	// draw vertical raster
-	int tact_16th = m_currentPosition / DefaultBeatsPerTact;
-	const int offset = ( m_currentPosition % DefaultBeatsPerTact ) *
-					m_ppt / midiTime::ticksPerTact();
+	bool triplets = m_quantizeModel.value() > NUM_EVEN_LENGTHS;
+	int tact_16th = m_currentPosition / (triplets?8:DefaultBeatsPerTact);                             
+
+	// TODO: FIX OFFSET
+	//int spt = 2 * midiTime::stepsPerTact(); 
+	int spt = midiTime::stepsPerTact(); 
+	
+	float pp16th = m_ppt / spt;
+
+	if ( triplets ) {
+		spt = static_cast<int>(1.5 * spt);
+		pp16th *= 2.0/3.0;
+	}
+
+	printf("%d %d\n", (m_currentPosition% DefaultBeatsPerTact ), DefaultBeatsPerTact);
+
+	const int offset = ( m_currentPosition % (triplets?8:DefaultBeatsPerTact) ) *                     
+                                       m_ppt * (triplets?3.0/3.0:1.0) / midiTime::ticksPerTact();  
+
+	bool show32nds = ( m_zoomingModel.value() > 3 );
 
 	// we need float here as odd time signatures might produce rounding
 	// errors else and thus an unusable grid
 	for( float x = WHITE_KEY_WIDTH - offset; x < width();
-		x += (float) m_ppt / midiTime::stepsPerTact(), ++tact_16th )
+		x += pp16th, ++tact_16th )
 	{
 		if( x >= WHITE_KEY_WIDTH )
 		{
 			// every tact-start needs to be a bright line
-			if( tact_16th % midiTime::stepsPerTact() == 0 )
+			if( tact_16th % spt == 0 )
 			{
 	 			p.setPen( QColor( 0x7F, 0x7F, 0x7F ) );
 			}
@@ -1876,8 +1908,18 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 			{
 				p.setPen( QColor( 0x3F, 0x3F, 0x3F ) );
 			}
+
 			p.drawLine( (int)x, PR_TOP_MARGIN, (int)x, height() -
 							PR_BOTTOM_MARGIN );
+
+			// extra 32nd's line
+			if( show32nds )
+			{
+				p.setPen( QColor( 0x22, 0x22, 0x22 ) );
+				p.drawLine( (int)(x + pp16th/2) , PR_TOP_MARGIN, 
+						(int)(x + pp16th/2), height() -
+						PR_BOTTOM_MARGIN );
+			}
 		}
 	}
 

@@ -2,7 +2,18 @@
 	* include/controller_view.h:
 	* src/gui/widgets/controller_view.cpp:
 	Add stub for controller help
-	
+
+	* src/gui/piano_roll.cpp:
+	* data/themes/default/note_triplethalf.png:
+	* data/themes/default/note_tripleteighth.png:
+	* data/themes/default/note_tripletthirtysecond.png:
+	* data/themes/default/note_tripletquarter.png:
+	* data/themes/default/note_tripletsixteenth.png:
+	- Add support for directly entering triplet notes
+	- Add support for triplet Quantization
+	- Switch grid layout for triplets
+	- Add additional 32nd note grid resolution when zooming
+
 2008-08-26	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* cmake/modules/DetectMachine.cmake:
