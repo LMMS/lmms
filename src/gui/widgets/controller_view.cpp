@@ -84,6 +84,8 @@ controllerView::controllerView( controller * _model, QWidget * _parent ) :
 
 	m_subWindow->hide();
 
+	setWhatsThis( tr( "Controllers are able to automate the value of a knob, "
+				"slider, and other controls."  ) );
 
 	setModel( _model );
 }
@@ -199,6 +201,14 @@ void controllerView::contextMenuEvent( QContextMenuEvent * )
 						this, SLOT( displayHelp() ) );
 	contextMenu->exec( QCursor::pos() );
 	delete contextMenu;
+}
+
+
+
+void controllerView::displayHelp( void )
+{
+	QWhatsThis::showText( mapToGlobal( rect().center() ),
+								whatsThis() );
 }
 
 

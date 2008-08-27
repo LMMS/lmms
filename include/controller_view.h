@@ -60,7 +60,7 @@ public:
 public slots:
 	void editControls( void );
 	void deleteController( void );
-	//void displayHelp( void );
+	void displayHelp( void );
 	void closeControls( void );
 
 	
