@@ -127,6 +127,7 @@ protected slots:
 	void updatePosition( const midiTime & _t );
 
 	void zoomingChanged( void );
+	void quantizeChanged( void );
 
 
 private:

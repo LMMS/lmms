@@ -388,6 +388,8 @@ pianoRoll::pianoRoll( void ) :
 	m_quantizeComboBox = new comboBox( m_toolBar );
 	m_quantizeComboBox->setModel( &m_quantizeModel );
 	m_quantizeComboBox->setFixedSize( 60, 22 );
+	connect( &m_quantizeModel, SIGNAL( dataChanged() ),
+					this, SLOT( quantizeChanged() ) );
 
 
 	// setup note-len-stuff
@@ -2667,6 +2669,14 @@ void pianoRoll::zoomingChanged( void )
 }
 
 
+
+
+void pianoRoll::quantizeChanged( void )
+{
+	static int oldQuantize = -1;
+	// Could be smarter
+	update();
+}
 
 
 int pianoRoll::quantization( void ) const
