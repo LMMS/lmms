@@ -308,7 +308,6 @@ int audioPortAudio::process_callback(
 			const fpp_t frames = getNextBuffer( m_outBuf );
 			if( !frames )
 			{
-				printf( "callback stopped and mutex released'\n" );
 				m_stopped = TRUE;
 				m_stop_semaphore.release();
 				memset( _outputBuffer, 0, _framesPerBuffer *
