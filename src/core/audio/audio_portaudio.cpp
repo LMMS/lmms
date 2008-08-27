@@ -53,8 +53,6 @@ void audioPortAudioSetupUtil::updateChannels( void )
 #include "lcd_spinbox.h"
 
 
-
-
 audioPortAudio::audioPortAudio( bool & _success_ful, mixer * _mixer ) :
 	audioDevice( tLimit<ch_cnt_t>(
 		configManager::inst()->value( "audioportaudio", "channels" ).toInt(),
@@ -93,8 +91,12 @@ audioPortAudio::audioPortAudio( bool & _success_ful, mixer * _mixer ) :
 	for( int i = 0; i < Pa_GetDeviceCount(); ++i )
 	{
 		di = Pa_GetDeviceInfo( i );
+#ifdef PORTAUDIO_V19
 		if( di->name == device &&
 			Pa_GetHostApiInfo( di->hostApi )->name == backend )
+#else
+		if( di->name == device )
+#endif
 		{
 			inDevIdx = i;
 			outDevIdx = i;
@@ -115,8 +117,10 @@ audioPortAudio::audioPortAudio( bool & _success_ful, mixer * _mixer ) :
 	double outLatency = (double)getMixer()->framesPerPeriod() / (double)sampleRate();
 
 	// FIXME: remove this
+#ifdef PORTAUDIO_V19
 	inLatency = Pa_GetDeviceInfo( inDevIdx )->defaultLowInputLatency;
 	outLatency = Pa_GetDeviceInfo( outDevIdx )->defaultLowOutputLatency;
+#endif
 	int samples = qMax( 1024, (int)getMixer()->framesPerPeriod() );
 	
 	// Configure output parameters.
@@ -134,6 +138,7 @@ audioPortAudio::audioPortAudio( bool & _success_ful, mixer * _mixer ) :
 	m_inputParameters.hostApiSpecificStreamInfo = NULL;
 	
 	// Open an audio I/O stream. 
+#ifdef PORTAUDIO_V19
 	err = Pa_OpenStream(
 			&m_paStream,
 			&m_inputParameters,	// The input parameter
@@ -143,6 +148,24 @@ audioPortAudio::audioPortAudio( bool & _success_ful, mixer * _mixer ) :
 			paNoFlag,		// Don't use any flags
 			_process_callback, 	// our callback function
 			this );
+#else
+	err = Pa_OpenStream(
+			&m_paStream,
+			m_inputParameters.device,
+			m_inputParameters.channelCount,
+			m_inputParameters.sampleFormat,
+			NULL,
+			m_outputParameters.device,
+			m_outputParameters.channelCount,
+			m_outputParameters.sampleFormat,
+			NULL,
+			sampleRate(),
+			samples,
+			0,
+			paNoFlag,		// Don't use any flags
+			_process_callback, 	// our callback function
+			this );
+#endif
 	
 	if( err != paNoError )
 	{
@@ -150,8 +173,14 @@ audioPortAudio::audioPortAudio( bool & _success_ful, mixer * _mixer ) :
 		return;
 	}
 
+	// FIXME: remove this debug info
+#ifdef PORTAUDIO_V19
 	printf( "Input device: '%s' backend: '%s'\n", Pa_GetDeviceInfo( inDevIdx )->name, Pa_GetHostApiInfo( Pa_GetDeviceInfo( inDevIdx )->hostApi )->name );
 	printf( "Output device: '%s' backend: '%s'\n", Pa_GetDeviceInfo( outDevIdx )->name, Pa_GetHostApiInfo( Pa_GetDeviceInfo( outDevIdx )->hostApi )->name );
+#else
+	printf( "Input device: '%s'\n", Pa_GetDeviceInfo( inDevIdx )->name );
+	printf( "Output device: '%s'\n", Pa_GetDeviceInfo( outDevIdx )->name );
+#endif
 
 	m_stop_semaphore.acquire();
 
@@ -220,15 +249,34 @@ void audioPortAudio::applyQualitySettings( void )
 		setSampleRate( engine::getMixer()->processingSampleRate() );
 		int samples = qMax( 1024, (int)getMixer()->framesPerPeriod() );
 
-		PaError err = Pa_OpenStream(
-				&m_paStream,
-				&m_inputParameters,	// The input parameter
-				&m_outputParameters,	// The outputparameter
-				sampleRate(),
-				samples,
-				paNoFlag,		// Don't use any flags
-				_process_callback, 	// our callback function
-				this );
+#ifdef PORTAUDIO_V19
+	PaError err = Pa_OpenStream(
+			&m_paStream,
+			&m_inputParameters,	// The input parameter
+			&m_outputParameters,	// The outputparameter
+			sampleRate(),
+			samples,
+			paNoFlag,		// Don't use any flags
+			_process_callback, 	// our callback function
+			this );
+#else
+	PaError err = Pa_OpenStream(
+			&m_paStream,
+			m_inputParameters.device,
+			m_inputParameters.channelCount,
+			m_inputParameters.sampleFormat,
+			NULL,
+			m_outputParameters.device,
+			m_outputParameters.channelCount,
+			m_outputParameters.sampleFormat,
+			NULL,
+			sampleRate(),
+			samples,
+			0,
+			paNoFlag,		// Don't use any flags
+			_process_callback, 	// our callback function
+			this );
+#endif
 	
 		if( err != paNoError )
 		{
@@ -295,6 +343,7 @@ int audioPortAudio::process_callback(
 
 
 
+#ifdef PORTAUDIO_V19
 int audioPortAudio::_process_callback(
 	const void *_inputBuffer,
 	void * _outputBuffer,
@@ -305,6 +354,11 @@ int audioPortAudio::_process_callback(
 {
 	Q_UNUSED(_timeInfo);
 	Q_UNUSED(_statusFlags);
+#else
+int audioPortAudio::_process_callback( void *_inputBuffer, void *_outputBuffer,
+	unsigned long _framesPerBuffer, PaTimestamp _outTime, void *_arg )
+{
+#endif
 	
 	audioPortAudio * _this  = static_cast<audioPortAudio *> (_arg);
 	_this->process_callback( (const float*)_inputBuffer,
@@ -315,7 +369,6 @@ int audioPortAudio::_process_callback(
 
 
 
-
 void audioPortAudioSetupUtil::updateDevices( void )
 {
 	PaError err = Pa_Initialize();
@@ -323,6 +376,7 @@ void audioPortAudioSetupUtil::updateDevices( void )
 		printf( "Couldn't initialize PortAudio: %s\n", Pa_GetErrorText( err ) );
 		return;
 	}
+#ifdef PORTAUDIO_V19
 	// get active backend 
 	const QString& backend = m_backendModel.currentText();
 	int hostApi = 0;
@@ -336,6 +390,7 @@ void audioPortAudioSetupUtil::updateDevices( void )
 			break;
 		}
 	}
+#endif
 
 	// get devices for selected backend
 	m_deviceModel.clear();
@@ -343,10 +398,14 @@ void audioPortAudioSetupUtil::updateDevices( void )
 	for( int i = 0; i < Pa_GetDeviceCount(); ++i )
 	{
 		di = Pa_GetDeviceInfo( i );
+#ifdef PORTAUDIO_V19
 		if( di->hostApi == hostApi )
 		{
 			m_deviceModel.addItem( di->name );
 		}
+#else
+		m_deviceModel.addItem( di->name );
+#endif
 	}
 	Pa_Terminate();
 }
@@ -377,7 +436,11 @@ audioPortAudio::setupWidget::setupWidget( QWidget * _parent ) :
 	QLabel * backend_lbl = new QLabel( tr( "BACKEND" ), this );
 	backend_lbl->setFont( pointSize<6>( backend_lbl->font() ) );
 	backend_lbl->move( 10, 17 );
-	
+#ifndef PORTAUDIO_V19
+	m_backend->hide();
+	backend_lbl->hide();
+#endif
+
 	m_device = new comboBox( this, "DEVICE" );
 	m_device->setGeometry( 52, 35, 250, 20 );
 
@@ -404,13 +467,14 @@ audioPortAudio::setupWidget::setupWidget( QWidget * _parent ) :
 	}
 	
 	// todo: setup backend model
+#ifdef PORTAUDIO_V19
 	const PaHostApiInfo * hi;
 	for( int i = 0; i < Pa_GetHostApiCount(); ++i )
 	{
 		hi = Pa_GetHostApiInfo( i );
 		m_setupUtil.m_backendModel.addItem( hi->name );
 	}
-
+#endif
 	Pa_Terminate();
 
 

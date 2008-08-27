@@ -50,6 +50,12 @@ public:
 
 #include "audio_device.h"
 
+#if defined paNeverDropInput || defined paNonInterleaved
+#	define PORTAUDIO_V19
+#else
+#	define PORTAUDIO_V18
+#endif
+
 
 class comboBox;
 class lcdSpinBox;
@@ -94,15 +100,42 @@ private:
 	virtual void stopProcessing( void );
 	virtual void applyQualitySettings( void );
 
-	static int _process_callback( const void *_inputBuffer, void *_outputBuffer,
+#ifdef PORTAUDIO_V19
+	static int _process_callback( const void *_inputBuffer, void * _outputBuffer,
 		unsigned long _framesPerBuffer,
-		const PaStreamCallbackTimeInfo* _timeInfo,
+		const PaStreamCallbackTimeInfo * _timeInfo,
 		PaStreamCallbackFlags _statusFlags,
 		void *arg );
+
+#else
+
+#define Pa_GetDeviceCount Pa_CountDevices
+#define Pa_GetDefaultInputDevice Pa_GetDefaultInputDeviceID
+#define Pa_GetDefaultOutputDevice Pa_GetDefaultOutputDeviceID
+#define Pa_IsStreamActive Pa_StreamActive
+
+	static int _process_callback( void * _inputBuffer, void * _outputBuffer,
+		unsigned long _framesPerBuffer, PaTimestamp _outTime, void * _arg );
+
+
+	typedef double PaTime;
+	typedef PaDeviceID PaDeviceIndex;
+	
+	typedef struct PaStreamParameters
+	{
+		PaDeviceIndex device;
+		int channelCount;
+		PaSampleFormat sampleFormat;
+		PaTime suggestedLatency;
+		void *hostApiSpecificStreamInfo;
+
+	} PaStreamParameters;
+#endif
 
 	PaStream * m_paStream;
 	PaStreamParameters m_outputParameters;
 	PaStreamParameters m_inputParameters;
+
 	bool m_wasPAInitError;
  
 	surroundSampleFrame * m_outBuf;
