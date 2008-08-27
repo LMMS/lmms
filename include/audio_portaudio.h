@@ -109,6 +109,8 @@ private:
 
 #else
 
+#define paContinue 0
+#define paComplete 1
 #define Pa_GetDeviceCount Pa_CountDevices
 #define Pa_GetDefaultInputDevice Pa_GetDefaultInputDeviceID
 #define Pa_GetDefaultOutputDevice Pa_GetDefaultOutputDeviceID

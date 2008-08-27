@@ -208,15 +208,14 @@ audioPortAudio::~audioPortAudio()
 
 void audioPortAudio::startProcessing( void )
 {
+	m_stopped = FALSE;
 	PaError err = Pa_StartStream( m_paStream );
 	
 	if( err != paNoError )
 	{
+		m_stopped = TRUE;
 		printf( "PortAudio error: %s\n", Pa_GetErrorText( err ) );
-		return;
 	}
-
-	m_stopped = FALSE;
 }
 
 
@@ -224,12 +223,11 @@ void audioPortAudio::startProcessing( void )
 
 void audioPortAudio::stopProcessing( void )
 {
-
 	if( Pa_IsStreamActive( m_paStream ) )
 	{
 		m_stop_semaphore.acquire();
 		
-		PaError err = Pa_CloseStream( m_paStream );
+		PaError err = Pa_StopStream( m_paStream );
 	
 		if( err != paNoError )
 		{
@@ -299,7 +297,7 @@ int audioPortAudio::process_callback(
 	{
 		memset( _outputBuffer, 0, _framesPerBuffer *
 			channels() * sizeof(float) );
-		return 0;
+		return paComplete;
 	}
 
 	while( _framesPerBuffer )
@@ -310,11 +308,12 @@ int audioPortAudio::process_callback(
 			const fpp_t frames = getNextBuffer( m_outBuf );
 			if( !frames )
 			{
+				printf( "callback stopped and mutex released'\n" );
 				m_stopped = TRUE;
 				m_stop_semaphore.release();
 				memset( _outputBuffer, 0, _framesPerBuffer *
 					channels() * sizeof(float) );
-				return 0;
+				return paComplete;
 			}
 			m_outBuf_size = frames;
 		}
@@ -339,6 +338,7 @@ int audioPortAudio::process_callback(
 		m_outBuf_pos %= m_outBuf_size;
 	}
 
+	return paContinue;
 }
 
 
@@ -361,10 +361,8 @@ int audioPortAudio::_process_callback( void *_inputBuffer, void *_outputBuffer,
 #endif
 	
 	audioPortAudio * _this  = static_cast<audioPortAudio *> (_arg);
-	_this->process_callback( (const float*)_inputBuffer,
+	return _this->process_callback( (const float*)_inputBuffer,
 		(float*)_outputBuffer, _framesPerBuffer );
-	
-	return 0;
 }
 
 
@@ -474,6 +472,8 @@ audioPortAudio::setupWidget::setupWidget( QWidget * _parent ) :
 		hi = Pa_GetHostApiInfo( i );
 		m_setupUtil.m_backendModel.addItem( hi->name );
 	}
+#else
+	m_setupUtil.m_backendModel.addItem( "" );
 #endif
 	Pa_Terminate();
 

@@ -1,3 +1,9 @@
+2008-08-28	Csaba Hruska <csaba.hruska/at/gmail.com>
+	* include/audio_portaudio.h:
+	* src/core/audio/audio_portaudio.cpp:
+	fixed segfault in PortAudio's setup widget
+	fixed hangon on PortAudio exit
+
 2008-08-27	Csaba Hruska <csaba.hruska/at/gmail.com>
 
 	* include/audio_portaudio.h:
