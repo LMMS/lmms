@@ -1866,23 +1866,20 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 
 	// draw vertical raster
 	bool triplets = m_quantizeModel.value() > NUM_EVEN_LENGTHS;
-	int tact_16th = m_currentPosition / (triplets?8:DefaultBeatsPerTact);                             
 
-	// TODO: FIX OFFSET
-	//int spt = 2 * midiTime::stepsPerTact(); 
 	int spt = midiTime::stepsPerTact(); 
-	
 	float pp16th = m_ppt / spt;
-
+	int bpt = DefaultBeatsPerTact;
 	if ( triplets ) {
 		spt = static_cast<int>(1.5 * spt);
+		bpt = static_cast<int>(bpt * 2.0/3.0);
 		pp16th *= 2.0/3.0;
 	}
 
-	printf("%d %d\n", (m_currentPosition% DefaultBeatsPerTact ), DefaultBeatsPerTact);
+	int tact_16th = m_currentPosition / bpt;
 
-	const int offset = ( m_currentPosition % (triplets?8:DefaultBeatsPerTact) ) *                     
-                                       m_ppt * (triplets?3.0/3.0:1.0) / midiTime::ticksPerTact();  
+	const int offset = ( m_currentPosition % bpt ) *
+			m_ppt / midiTime::ticksPerTact();
 
 	bool show32nds = ( m_zoomingModel.value() > 3 );
 
