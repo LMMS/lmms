@@ -1,5 +1,9 @@
 2008-08-27	Csaba Hruska <csaba.hruska/at/gmail.com>
 
+	* include/audio_portaudio.h:
+	* src/core/audio/audio_portaudio.cpp:
+	PortAudio V18 and V19 are supported now
+	
 	* cmake/modules/FindPortaudio.cmake:
 	* include/audio_portaudio.h:
 	* src/core/audio/audio_portaudio.cpp:
