@@ -55,6 +55,7 @@
 #include "audio_alsa.h"
 #include "audio_jack.h"
 #include "audio_oss.h"
+#include "audio_portaudio.h"
 #include "audio_pulseaudio.h"
 #include "audio_sdl.h"
 #include "audio_dummy.h"
@@ -453,6 +454,11 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 #ifdef LMMS_HAVE_PULSEAUDIO
 	m_audioIfaceSetupWidgets[audioPulseAudio::name()] =
 					new audioPulseAudio::setupWidget( asw );
+#endif
+
+#ifdef LMMS_HAVE_PORTAUDIO
+	m_audioIfaceSetupWidgets[audioPortAudio::name()] =
+					new audioPortAudio::setupWidget( asw );
 #endif
 
 #ifdef LMMS_HAVE_SDL
