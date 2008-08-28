@@ -1068,7 +1068,7 @@ DWORD WINAPI VSTPlugin::guiEventLoop( LPVOID _param )
 		pthread_cond_signal( &_this->m_windowStatusChange );
 		return( 1 );
 	}
-	
+
 	if( ( _this->m_window = CreateWindowExA(
 				0, "LVSL", _this->m_shortName.c_str(),
 			       ( WS_OVERLAPPEDWINDOW & ~WS_THICKFRAME &

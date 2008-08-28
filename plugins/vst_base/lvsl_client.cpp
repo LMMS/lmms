@@ -115,7 +115,7 @@ remoteVSTPlugin::remoteVSTPlugin( const QString & _plugin ) :
 		execlp( lvsl_server_exec.toAscii().constData(),
 					lvsl_server_exec.toAscii().constData(),
 									NULL );
-		return;
+		exit( 0 );
 	}
 	m_serverInFD = m_pipes[1][0];
 	m_serverOutFD = m_pipes[0][1];
