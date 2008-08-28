@@ -277,7 +277,7 @@ if(WANT_VST)
 		SET(LMMS_HAVE_VST TRUE)
 		SET(STATUS_WINE "OK")
 	ELSE(HAVE_LIBWINE AND HAVE_WINDOWS_H)
-		SET(STATUS_WINE "not found, please install (lib)wine-dev (or similiar) and gcc-multilib (only for 64 bit systems)")
+		SET(STATUS_WINE "not found, please install (lib)wine-dev (or similiar) - 64 bit systems additionally need gcc-multilib and g++-multilib")
 	ENDIF(HAVE_LIBWINE AND HAVE_WINDOWS_H)
 ENDIF(WANT_VST)
 
