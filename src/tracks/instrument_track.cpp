@@ -205,6 +205,7 @@ void instrumentTrack::processInEvent( const midiEvent & _me,
 		case MidiNoteOn: 
 			if( _me.velocity() > 0 )
 			{
+				m_instrument->handleMidiEvent( _me, _time );
 				if( m_notes[_me.key()] == NULL )
 				{
 					if( !configManager::inst()->value( "ui",
@@ -237,6 +238,7 @@ void instrumentTrack::processInEvent( const midiEvent & _me,
 
 		case MidiNoteOff:
 		{
+			m_instrument->handleMidiEvent( _me, _time );
 			notePlayHandle * n = m_notes[_me.key()];
 			if( n != NULL )
 			{
@@ -282,8 +284,11 @@ void instrumentTrack::processInEvent( const midiEvent & _me,
 			break;
 
 		default:
-			printf( "instrument-track: unhandled MIDI-event %d\n",
-								_me.m_type );
+			if( !m_instrument->handleMidiEvent( _me, _time ) )
+			{
+				printf( "instrument-track: unhandled "
+					"MIDI event %d\n", _me.m_type );
+			}
 			break;
 	}
 }
@@ -324,6 +329,7 @@ void instrumentTrack::processOutEvent( const midiEvent & _me,
 		default:
 			break;
 	}
+	m_instrument->handleMidiEvent( _me, _time );
 	// if appropriate, midi-port does futher routing
 	m_midiPort.processOutEvent( _me, _time );
 }
@@ -364,7 +370,7 @@ QString instrumentTrack::instrumentName( void ) const
 
 void instrumentTrack::deleteNotePluginData( notePlayHandle * _n )
 {
-	if( m_instrument != NULL && _n->m_pluginData != NULL )
+	if( m_instrument != NULL )
 	{
 		m_instrument->deleteNotePluginData( _n );
 	}
