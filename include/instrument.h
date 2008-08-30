@@ -62,7 +62,9 @@ public:
 	// to be implemented by actual plugin
 	virtual void playNote( notePlayHandle * _note_to_play,
 					bool _try_parallelizing,
-					sampleFrame * _working_buf ) = 0;
+					sampleFrame * _working_buf )
+	{
+	}
 
 	// needed for deleting plugin-specific-data of a note - plugin has to
 	// cast void-ptr so that the plugin-data is deleted properly

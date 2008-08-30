@@ -37,7 +37,8 @@ class previewTrackContainer;
 class presetPreviewPlayHandle : public playHandle
 {
 public:
-	presetPreviewPlayHandle( const QString & _preset_file );
+	presetPreviewPlayHandle( const QString & _preset_file,
+						bool _special_preset = false );
 	virtual ~presetPreviewPlayHandle();
 
 	virtual void play( bool _try_parallelizing,

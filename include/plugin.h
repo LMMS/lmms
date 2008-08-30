@@ -72,6 +72,12 @@ public:
 		int version;
 		PluginTypes type;
 		const pixmapLoader * logo;
+		const char * supportedFileTypes;
+		inline bool supportsFileType( const QString & _ext ) const
+		{
+			return( QString( supportedFileTypes ).
+						split( ',' ).contains( _ext ) );
+		}
 		class EXPORT subPluginFeatures
 		{
 		public:
@@ -126,12 +132,6 @@ public:
 			virtual void listSubPluginKeys( plugin::descriptor *,
 								keyList & )
 			{
-			}
-
-			virtual const QStringList & supportedExtensions( void )
-			{
-				static QStringList no_extensions;
-				return( no_extensions );
 			}
 
 

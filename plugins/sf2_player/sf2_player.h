@@ -48,14 +48,6 @@ class sf2Instrument : public instrument
 {
 	Q_OBJECT
 public:
-	class subPluginFeatures : public plugin::descriptor::subPluginFeatures
-	{
-	public:
-		subPluginFeatures( plugin::PluginTypes _type );
-
-		virtual const QStringList & supportedExtensions( void );
-	} ;
-
 	sf2Instrument( instrumentTrack * _instrument_track );
 	virtual ~sf2Instrument();
 
@@ -81,11 +73,6 @@ public:
 	}
 
 	virtual bool notePlayHandleBased( void ) const
-	{
-		return( FALSE );
-	}
-
-	virtual bool supportsParallelizing( void ) const
 	{
 		return( FALSE );
 	}

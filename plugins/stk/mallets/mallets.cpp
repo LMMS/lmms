@@ -52,6 +52,7 @@ plugin::descriptor malletsstk_plugin_descriptor =
 	0x0100,
 	plugin::Instrument,
 	new pluginPixmapLoader( "logo" ),
+	NULL,
 	NULL
 } ;
 

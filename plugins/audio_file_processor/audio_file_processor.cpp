@@ -61,7 +61,8 @@ plugin::descriptor PLUGIN_EXPORT audiofileprocessor_plugin_descriptor =
 	0x0100,
 	plugin::Instrument,
 	new pluginPixmapLoader( "logo" ),
-	new audioFileProcessor::subPluginFeatures( plugin::Instrument )
+	"wav,ogg,ds,spx,au,voc,aif,aiff,flac,raw",
+	NULL
 } ;
 
 }
@@ -269,28 +270,6 @@ void audioFileProcessor::loopPointChanged( void )
 
 
 
-
-
-
-
-
-audioFileProcessor::subPluginFeatures::subPluginFeatures(
-						plugin::PluginTypes _type ) :
-	plugin::descriptor::subPluginFeatures( _type )
-{
-}
-
-
-
-
-const QStringList & audioFileProcessor::subPluginFeatures::supportedExtensions(
-									void )
-{
-	static QStringList extensions = QStringList()
-				<< "wav" << "ogg" << "ds" << "spx" << "au"
-				<< "voc" << "aif" << "aiff" << "flac" << "raw";
-	return( extensions );
-}
 
 
 

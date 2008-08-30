@@ -43,6 +43,7 @@ plugin::descriptor PLUGIN_EXPORT bassbooster_plugin_descriptor =
 	0x0100,
 	plugin::Effect,
 	new pluginPixmapLoader( "logo" ),
+	NULL,
 	NULL
 } ;
 

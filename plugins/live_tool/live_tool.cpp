@@ -56,6 +56,7 @@ plugin::descriptor PLUGIN_EXPORT livetool_plugin_descriptor =
 	0x0100,
 	plugin::Tool,
 	new pluginPixmapLoader( "logo" ),
+	NULL,
 	NULL
 } ;
 

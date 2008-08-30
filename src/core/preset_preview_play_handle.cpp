@@ -26,7 +26,7 @@
  */
 
 
-#include <QtCore/QMutex>
+#include <QtCore/QFileInfo>
 #include <QtCore/QMutexLocker>
 
 #include "preset_preview_play_handle.h"
@@ -104,8 +104,8 @@ previewTrackContainer * presetPreviewPlayHandle::s_previewTC;
 
 
 
-presetPreviewPlayHandle::presetPreviewPlayHandle(
-						const QString & _preset_file ) :
+presetPreviewPlayHandle::presetPreviewPlayHandle( const QString & _preset_file,
+							bool _special_preset ) :
 	playHandle( PresetPreviewHandle ),
 	m_previewNote( NULL )
 {
@@ -120,9 +120,30 @@ presetPreviewPlayHandle::presetPreviewPlayHandle(
 	const bool j = engine::getProjectJournal()->isJournalling();
 	engine::getProjectJournal()->setJournalling( FALSE );
 
-	multimediaProject mmp( _preset_file );
-	s_previewTC->previewInstrumentTrack()->loadTrackSpecificSettings(
+	if( _special_preset )
+	{
+		instrument * i = s_previewTC->previewInstrumentTrack()->
+								getInstrument();
+		const QString ext = QFileInfo( _preset_file ).
+							suffix().toLower();
+		if( i == NULL || !i->getDescriptor()->supportsFileType( ext ) )
+		{
+			i = s_previewTC->previewInstrumentTrack()->
+				loadInstrument(
+					engine::sampleExtensions()[ext] );
+		}
+		if( i != NULL )
+		{
+			i->setParameter( "samplefile", _preset_file );
+		}
+	}
+	else
+	{
+		multimediaProject mmp( _preset_file );
+		s_previewTC->previewInstrumentTrack()->
+			loadTrackSpecificSettings(
 				mmp.content().firstChild().toElement() );
+	}
 
 	// make sure, our preset-preview-track does not appear in any MIDI-
 	// devices list, so just disable receiving/sending MIDI-events at all

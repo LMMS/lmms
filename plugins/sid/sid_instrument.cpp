@@ -80,6 +80,7 @@ plugin::descriptor PLUGIN_EXPORT sid_plugin_descriptor =
 	0x0100,
 	plugin::Instrument,
 	new pluginPixmapLoader( "logo" ),
+	NULL,
 	NULL
 } ;
 

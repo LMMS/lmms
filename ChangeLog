@@ -1,3 +1,49 @@
+2008-08-29	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* plugins/sid/sid_instrument.cpp:
+	* plugins/ladspa_effect/ladspa_effect.cpp:
+	* plugins/patman/patman.cpp:
+	* plugins/lb302/lb302.cpp:
+	* plugins/organic/organic.cpp:
+	* plugins/stereo_matrix/stereo_matrix.cpp:
+	* plugins/bass_booster/bass_booster.cpp:
+	* plugins/bit_invader/bit_invader.cpp:
+	* plugins/vst_effect/vst_effect.cpp:
+	* plugins/vibed/vibed.cpp:
+	* plugins/triple_oscillator/triple_oscillator.cpp:
+	* plugins/live_tool/live_tool.cpp:
+	* plugins/peak_controller_effect/peak_controller_effect.cpp:
+	* plugins/audio_file_processor/audio_file_processor.cpp:
+	* plugins/audio_file_processor/audio_file_processor.h:
+	* plugins/stk/mallets/mallets.cpp:
+	* plugins/stereo_enhancer/stereo_enhancer.cpp:
+	* plugins/sf2_player/sf2_player.cpp:
+	* plugins/sf2_player/sf2_player.h:
+	* plugins/vestige/vestige.cpp:
+	* plugins/ladspa_browser/ladspa_browser.cpp:
+	* plugins/spectrum_analyzer/spectrum_analyzer.cpp:
+	* plugins/kicker/kicker.cpp:
+	* plugins/flp_import/flp_import.cpp:
+	* plugins/midi_import/midi_import.cpp:
+	* include/plugin.h:
+	* include/instrument_track.h:
+	* include/instrument.h:
+	* include/file_browser.h:
+	* include/preset_preview_play_handle.h:
+	* src/core/engine.cpp:
+	* src/core/preset_preview_play_handle.cpp:
+	* src/gui/file_browser.cpp:
+	- improved concept for file types supported by certain plugins
+	- various small improvements for an even better ZynAddSubFX integration
+
+	* src/tracks/instrument_track.cpp:
+	pass all MIDI events to instrument
+
+	* include/remote_plugin.h:
+	* src/core/remote_plugin.cpp:
+	added remotePlugin-framework allowing to easily write plugins which
+	actually run as external process
+
 2008-08-28	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* plugins/vst_base/lvsl_client.cpp:

@@ -90,6 +90,11 @@ public:
 		return( m_instrument );
 	}
 
+	inline instrument * getInstrument( void )
+	{
+		return( m_instrument );
+	}
+
 	void deleteNotePluginData( notePlayHandle * _n );
 
 	// name-stuff

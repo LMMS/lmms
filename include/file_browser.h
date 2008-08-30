@@ -174,6 +174,7 @@ public:
 	{
 		ProjectFile,
 		PresetFile,
+		SpecialPresetFile,
 		SampleFile,
 		MidiFile,
 		FlpFile,

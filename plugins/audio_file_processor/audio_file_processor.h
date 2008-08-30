@@ -41,16 +41,6 @@ class audioFileProcessor : public instrument
 {
 	Q_OBJECT
 public:
-	class subPluginFeatures : public plugin::descriptor::subPluginFeatures
-	{
-	public:
-		subPluginFeatures( plugin::PluginTypes _type );
-
-		virtual const QStringList & supportedExtensions( void );
-
-	} ;
-
-
 	audioFileProcessor( instrumentTrack * _instrument_track );
 	virtual ~audioFileProcessor();
 

@@ -173,19 +173,14 @@ void engine::loadExtensions( void )
 						pluginDescriptors.begin();
 					it != pluginDescriptors.end(); ++it )
 	{
-		if( it->sub_plugin_features )
+		if( it->type == plugin::Instrument )
 		{
-			if( it->type == plugin::Instrument )
-			{
-				const QStringList & ext =
-						it->sub_plugin_features
-							->supportedExtensions();
-				for( QStringList::const_iterator itExt =
-								ext.begin();
+			const QStringList & ext =
+				QString( it->supportedFileTypes ).split( ',' );
+			for( QStringList::const_iterator itExt = ext.begin();
 						itExt != ext.end(); ++itExt )
-				{
-					s_sampleExtensions[*itExt] = it->name;
-				}
+			{
+				s_sampleExtensions[*itExt] = it->name;
 			}
 		}
 	}

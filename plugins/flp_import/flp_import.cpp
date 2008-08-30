@@ -75,6 +75,7 @@ plugin::descriptor PLUGIN_EXPORT flpimport_plugin_descriptor =
 	0x0100,
 	plugin::ImportFilter,
 	NULL,
+	NULL,
 	NULL
 } ;
 

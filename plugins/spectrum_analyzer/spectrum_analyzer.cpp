@@ -44,6 +44,7 @@ plugin::descriptor PLUGIN_EXPORT spectrumanalyzer_plugin_descriptor =
 	0x0100,
 	plugin::Effect,
 	new pluginPixmapLoader( "logo" ),
+	NULL,
 	NULL
 } ;
 

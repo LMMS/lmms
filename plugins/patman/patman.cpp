@@ -58,6 +58,7 @@ plugin::descriptor PLUGIN_EXPORT patman_plugin_descriptor =
 	0x0100,
 	plugin::Instrument,
 	new pluginPixmapLoader( "logo" ),
+	NULL,
 	new patmanInstrument::subPluginFeatures( plugin::Instrument )
 } ;
 

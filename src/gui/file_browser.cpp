@@ -211,7 +211,8 @@ void listView::activateListItem( QTreeWidgetItem * _item, int _column )
 		return;
 	}
 
-	if( f->type() == fileItem::SampleFile )
+	if( f->type() == fileItem::SampleFile ||
+				f->type() == fileItem::SpecialPresetFile )
 	{
 		// samples are per default opened in bb-editor because they're
 		// likely drum-samples etc.
@@ -283,17 +284,19 @@ void listView::sendToActiveInstrumentTrack( void )
 			// ok, it's an instrument-track, so we can apply the
 			// sample or the preset
 			engine::getMixer()->lock();
-			if( m_contextMenuItem->type() == fileItem::SampleFile )
+			if( m_contextMenuItem->type() == fileItem::SampleFile ||
+				m_contextMenuItem->type() ==
+						fileItem::SpecialPresetFile )
 			{
-				instrument * afp = itw->model()->loadInstrument(
-						engine::sampleExtensions()
-							[m_contextMenuItem
-							->extension()] );
-				if( afp != NULL )
+				QString e = m_contextMenuItem->extension();
+				instrument * i = itw->model()->getInstrument();
+				if( !i->getDescriptor()->supportsFileType( e ) )
 				{
-					afp->setParameter( "samplefile",
-						m_contextMenuItem->fullName() );
+					i = itw->model()->loadInstrument(
+						engine::sampleExtensions()[e] );
 				}
+				i->setParameter( "samplefile",
+						m_contextMenuItem->fullName() );
 			}
 			else if( m_contextMenuItem->type() ==
 							fileItem::PresetFile )
@@ -317,20 +320,21 @@ void listView::sendToActiveInstrumentTrack( void )
 void listView::openInNewInstrumentTrack( trackContainer * _tc )
 {
 	engine::getMixer()->lock();
-	if( m_contextMenuItem->type() == fileItem::SampleFile )
+	if( m_contextMenuItem->type() == fileItem::SampleFile ||
+		 m_contextMenuItem->type() == fileItem::SpecialPresetFile )
 	{
 		instrumentTrack * ct = dynamic_cast<instrumentTrack *>(
 			track::create( track::InstrumentTrack, _tc ) );
 #ifdef LMMS_DEBUG
 		assert( ct != NULL );
 #endif
-		instrument * afp = ct->loadInstrument(
+		instrument * i = ct->loadInstrument(
 					engine::sampleExtensions()
 						[m_contextMenuItem
 							->extension()] );
-		if( afp != NULL )
+		if( i != NULL )
 		{
-			afp->setParameter( "samplefile",
+			i->setParameter( "samplefile",
 						m_contextMenuItem->fullName() );
 		}
 		//ct->toggledInstrumentTrackButton( TRUE );
@@ -385,7 +389,8 @@ void listView::contextMenuEvent( QContextMenuEvent * _e )
 {
 	fileItem * f = dynamic_cast<fileItem *>( itemAt( _e->pos() ) );
 	if( f != NULL && ( f->type() == fileItem::SampleFile ||
-				f->type() == fileItem::PresetFile ) )
+				 f->type() == fileItem::SpecialPresetFile ||
+					f->type() == fileItem::PresetFile ) )
 	{
 		m_contextMenuItem = f;
 		QMenu contextMenu( this );
@@ -459,10 +464,13 @@ void listView::mousePressEvent( QMouseEvent * _me )
 			m_previewPlayHandle = s;
 			delete tf;
 		}
-		else if( f->type() == fileItem::PresetFile )
+		else if( f->type() == fileItem::PresetFile ||
+				f->type() == fileItem::SpecialPresetFile )
 		{
-			m_previewPlayHandle = new presetPreviewPlayHandle(
-								f->fullName() );
+			m_previewPlayHandle =
+				new presetPreviewPlayHandle( f->fullName(),
+					f->type() ==
+						fileItem::SpecialPresetFile );
 		}
 		if( m_previewPlayHandle != NULL )
 		{
@@ -794,6 +802,7 @@ void fileItem::initPixmapStuff( void )
 			setIcon( 0, *s_projectFilePixmap );
 			break;
 		case PresetFile:
+		case SpecialPresetFile:
 			setIcon( 0, *s_presetFilePixmap );
 			break;
 		case SampleFile:
@@ -842,6 +851,10 @@ void fileItem::determineFileType( void )
 	else if( ext == "csf" )
 	{
 		m_type = PresetFile;
+	}
+	else if( ext == "xiz" )
+	{
+		m_type = SpecialPresetFile;
 	}
 	else if( engine::sampleExtensions().contains( ext ) )
 	{

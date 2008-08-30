@@ -50,6 +50,7 @@ plugin::descriptor vsteffect_plugin_descriptor =
 	0x0200,
 	plugin::Effect,
 	new pluginPixmapLoader( "logo" ),
+	NULL,
 	new vstSubPluginFeatures( plugin::Effect )
 } ;
 
