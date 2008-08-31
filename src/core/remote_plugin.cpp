@@ -31,43 +31,20 @@
 #include "config_mgr.h"
 
 #include <QtCore/QDir>
-#include <QtCore/QTime>
 
 #ifdef LMMS_HAVE_UNISTD_H
 #include <unistd.h>
 #endif
 
-#ifdef LMMS_HAVE_SIGNAL_H
-#include <signal.h>
-#endif
-
-#include <cstdio>
-
-#ifdef LMMS_HAVE_SYS_SELECT_H
-#include <sys/select.h>
-#endif
-
-#ifdef LMMS_HAVE_SYS_TIME_H
-#include <sys/time.h>
-#endif
-
-#ifdef LMMS_HAVE_SYS_WAIT_H
-#include <sys/wait.h>
-#endif
-
-
-
-
 
 
 
 remotePlugin::remotePlugin( const QString & _plugin_executable ) :
-	remotePluginBase(),
+	remotePluginBase( new shmFifo(), new shmFifo() ),
 	m_initialized( false ),
 	m_failed( true ),
-	m_pluginPID( -1 ),
 	m_commMutex( QMutex::Recursive ),
-#ifdef USE_NATIVE_SHM_API
+#ifdef USE_NATIVE_SHMEM
 	m_shmID( 0 ),
 #else
 	m_shmObj(),
@@ -77,32 +54,18 @@ remotePlugin::remotePlugin( const QString & _plugin_executable ) :
 	m_inputCount( DEFAULT_CHANNELS ),
 	m_outputCount( DEFAULT_CHANNELS )
 {
-	QString fe = configManager::inst()->pluginDir() +
-					QDir::separator() + _plugin_executable;
-	if( pipe( m_pipes[0] ) || pipe( m_pipes[1] ) )
-	{
-		printf( "error while creating pipes!\n" );
-	}
-
-	if( ( m_pluginPID = fork() ) < 0 )
-	{
-		printf( "fork() failed!\n" );
-		return;
-	}
-	else if( m_pluginPID == 0 )
-	{
-		dup2( m_pipes[0][0], 0 );
-		dup2( m_pipes[1][1], 1 );
-		execlp( fe.toAscii().constData(), fe.toAscii().constData(),
-									NULL );
-		exit( 0 );
-	}
-	setInFD( m_pipes[1][0] );
-	setOutFD( m_pipes[0][1] );
-
-	resizeSharedMemory();
-
 	lock();
+	QString exec = configManager::inst()->pluginDir() +
+					QDir::separator() + _plugin_executable;
+	QStringList args;
+	// swap in and out for bidirectional communication
+	args << QString::number( out()->shmKey() );
+	args << QString::number( in()->shmKey() );
+	m_process.setProcessChannelMode( QProcess::MergedChannels );
+	m_process.start( exec, args );
+
+	resizeSharedProcessingMemory();
+
 	m_failed = waitForMessage( IdInitDone ).id != IdInitDone;
 	unlock();
 }
@@ -116,35 +79,14 @@ remotePlugin::~remotePlugin()
 	{
 		sendMessage( IdClosePlugin );
 
-		// wait for acknowledge
-		QTime t;
-		t.start();
-		while( t.elapsed() < 1000 )
+		m_process.waitForFinished( 1000 );
+		if( m_process.state() != QProcess::NotRunning )
 		{
-			if( messagesLeft() &&
-				receiveMessage().id == IdClosePlugin )
-			{
-				//m_pluginPID = 0;
-				break;
-			}
-			usleep( 10 );
+			m_process.terminate();
+			m_process.kill();
 		}
-		// timeout?
-/*		if( m_pluginPID != 0 )
-		{*/
-			kill( m_pluginPID, SIGTERM );
-			kill( m_pluginPID, SIGKILL );
-		//}
-		// remove process from PCB
-		waitpid( m_pluginPID, NULL, 0 );
 
-		// close all sides of our pipes
-		close( m_pipes[0][0] );
-		close( m_pipes[0][1] );
-		close( m_pipes[1][0] );
-		close( m_pipes[1][1] );
-
-#ifdef USE_NATIVE_SHM_API
+#ifdef USE_NATIVE_SHMEM
 		shmdt( m_shm );
 		shmctl( m_shmID, IPC_RMID, NULL );
 #endif
@@ -224,19 +166,24 @@ bool remotePlugin::waitForProcessingFinished( sampleFrame * _out_buf )
 	const fpp_t frames = engine::getMixer()->framesPerPeriod();
 	const ch_cnt_t outputs = tMax<ch_cnt_t>( m_outputCount,
 							DEFAULT_CHANNELS );
+	sampleFrame * o = (sampleFrame *) ( m_shm + m_inputCount*frames );
 	if( outputs != DEFAULT_CHANNELS )
 	{
 		// clear buffer, if plugin didn't fill up both channels
 		engine::getMixer()->clearAudioBuffer( _out_buf, frames );
-	}
 
-	sampleFrame * o = (sampleFrame *) ( m_shm + m_inputCount*frames );
-	for( ch_cnt_t ch = 0; ch < outputs; ++ch )
-	{
-		for( fpp_t frame = 0; frame < frames; ++frame )
+		for( ch_cnt_t ch = 0; ch <
+				qMin<int>( DEFAULT_CHANNELS, outputs ); ++ch )
 		{
-			_out_buf[frame][ch] = o[frame][ch];
+			for( fpp_t frame = 0; frame < frames; ++frame )
+			{
+				_out_buf[frame][ch] = o[frame][ch];
+			}
 		}
+	}
+	else
+	{
+		memcpy( _out_buf, o, frames * sizeof( sampleFrame ) );
 	}
 
 	return( TRUE );
@@ -262,14 +209,14 @@ void remotePlugin::processMidiEvent( const midiEvent & _e,
 
 
 
-void remotePlugin::resizeSharedMemory( void )
+void remotePlugin::resizeSharedProcessingMemory( void )
 {
 	const size_t s = ( m_inputCount+m_outputCount ) *
 				engine::getMixer()->framesPerPeriod() *
 							sizeof( float );
 	if( m_shm != NULL )
 	{
-#ifdef USE_NATIVE_SHM_API
+#ifdef USE_NATIVE_SHMEM
 		shmdt( m_shm );
 		shmctl( m_shmID, IPC_RMID, NULL );
 #else
@@ -278,7 +225,7 @@ void remotePlugin::resizeSharedMemory( void )
 	}
 
 	int shm_key = 0;
-#ifdef USE_NATIVE_SHM_API
+#ifdef USE_NATIVE_SHMEM
 	while( ( m_shmID = shmget( ++shm_key, s, IPC_CREAT | IPC_EXCL |
 								0600 ) ) == -1 )
 	{
@@ -317,11 +264,6 @@ bool remotePlugin::processMessage( const message & _m )
 		case IdGeneralFailure:
 			return( false );
 
-		case IdDebugMessage:
-			printf( "debug message from client: %s\n",
-						_m.data[0].c_str() );
-			break;
-
 		case IdInitDone:
 			reply = true;
 			break;
@@ -340,12 +282,12 @@ bool remotePlugin::processMessage( const message & _m )
 
 		case IdChangeInputCount:
 			m_inputCount = _m.getInt( 0 );
-			resizeSharedMemory();
+			resizeSharedProcessingMemory();
 			break;
 
 		case IdChangeOutputCount:
 			m_outputCount = _m.getInt( 0 );
-			resizeSharedMemory();
+			resizeSharedProcessingMemory();
 			break;
 
 		case IdProcessingDone:

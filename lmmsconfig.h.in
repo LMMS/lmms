@@ -22,6 +22,7 @@
 #cmakedefine LMMS_HAVE_UNISTD_H
 #cmakedefine LMMS_HAVE_SYS_TYPES_H
 #cmakedefine LMMS_HAVE_SYS_IPC_H
+#cmakedefine LMMS_HAVE_SEMAPHORE_H
 #cmakedefine LMMS_HAVE_SYS_SHM_H
 #cmakedefine LMMS_HAVE_SYS_TIME_H
 #cmakedefine LMMS_HAVE_SYS_WAIT_H
