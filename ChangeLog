@@ -1,3 +1,12 @@
+2008-09-02	Csaba Hruska <csaba.hruska/at/gmail.com>
+
+	* include/song.h:
+	* src/core/song.cpp:
+	* src/gui/song_editor.cpp:
+	* src/tracks/sample_track.cpp:
+	added implementation for recordAndPlay button
+	record button is disabled because it is not handled yet
+
 2008-08-31	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* include/remote_plugin.h:

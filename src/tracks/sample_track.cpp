@@ -423,6 +423,10 @@ bool sampleTrack::play( const midiTime & _start, const fpp_t _frames,
 			playHandle * handle;
 			if( st->isRecord() )
 			{
+				if( !engine::getSong()->isRecording() )
+				{
+					return( played_a_note );
+				}
 				sampleRecordHandle * smpHandle = new sampleRecordHandle( st );
 				handle = smpHandle;
 			}

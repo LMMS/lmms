@@ -231,6 +231,9 @@ songEditor::songEditor( song * _song, songEditor * & _engine_ptr ) :
 			tr( "Record samples from Audio-device while playing song or BB track" ),
 					this, SLOT( recordAccompany() ), m_toolBar );
 
+	// FIXME: disable record button while it is not implemented
+	m_recordButton->setDisabled( true );
+	
 	// disable record buttons if capturing is not supported
 	if( !engine::getMixer()->audioDev()->supportsCapture() )
 	{
@@ -406,7 +409,7 @@ void songEditor::play( void )
 
 void songEditor::record( void )
 {
-	play();
+	m_s->record();
 }
 
 
@@ -414,7 +417,7 @@ void songEditor::record( void )
 
 void songEditor::recordAccompany( void )
 {
-	play();
+	m_s->playAndRecord();
 }
 
 

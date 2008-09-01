@@ -110,6 +110,11 @@ public:
 		return( m_exporting );
 	}
 
+	inline bool isRecording( void ) const
+	{
+		return( m_recording );
+	}
+
 	bool realTimeTask( void ) const;
 
 	inline bool isExportDone( void ) const
@@ -190,6 +195,8 @@ public:
 
 public slots:
 	void play( void );
+	void record( void );
+	void playAndRecord( void );
 	void stop( void );
 	void playTrack( track * _trackToPlay );
 	void playBB( void );
@@ -270,6 +277,7 @@ private:
 	QString m_oldFileName;
 	bool m_modified;
 
+	volatile bool m_recording;
 	volatile bool m_exporting;
 	volatile bool m_playing;
 	volatile bool m_paused;

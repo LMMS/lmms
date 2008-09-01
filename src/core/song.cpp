@@ -81,6 +81,7 @@ song::song( void ) :
 	m_fileName(),
 	m_oldFileName(),
 	m_modified( FALSE ),
+	m_recording( FALSE ),
 	m_exporting( FALSE ),
 	m_playing( FALSE ),
 	m_paused( FALSE ),
@@ -177,6 +178,7 @@ void song::doActions( void )
 				timeLine * tl =
 					m_playPos[m_playMode].m_timeLine;
 				m_playing = FALSE;
+				m_recording = TRUE;
 				if( tl != NULL )
 				{
 
@@ -477,6 +479,7 @@ bool song::realTimeTask( void ) const
 
 void song::play( void )
 {
+	m_recording = FALSE;
 	if( m_playing == TRUE )
 	{
 		if( m_playMode != Mode_PlaySong )
@@ -492,6 +495,24 @@ void song::play( void )
 		}
 	}
 	m_actions.push_back( ActionPlaySong );
+}
+
+
+
+
+void song::record( void )
+{
+	m_recording = TRUE;
+	// TODO: Implement
+}
+
+
+
+
+void song::playAndRecord( void )
+{
+	play();
+	m_recording = TRUE;
 }
 
 
