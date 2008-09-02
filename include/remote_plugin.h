@@ -36,11 +36,18 @@
 
 #ifdef LMMS_BUILD_WIN32
 
+#ifdef LMMS_HAVE_PROCESS_H
+#include <process.h>
+#endif
+
 #if QT_VERSION >= 0x040400
 #include <QtCore/QSharedMemory>
+#include <QtCore/QSystemSemaphore>
 #else
 #error win32-build requires at least Qt 4.4.0
 #endif
+
+typedef int32_t key_t;
 
 #else
 
@@ -63,6 +70,8 @@
 
 
 #ifdef BUILD_REMOTE_PLUGIN_CLIENT
+#undef EXPORT
+#define EXPORT
 #define COMPILE_REMOTE_PLUGIN_BASE
 #else
 #include <QtCore/QProcess>
@@ -79,7 +88,10 @@ class shmFifo
 	// and 64 bit platforms
 	union sem32_t
 	{
+#ifdef LMMS_HAVE_SEMAPHORE_H
 		sem_t sem;
+#endif
+		int semKey;
 		char fill[32];
 	} ;
 	struct shmData
@@ -103,8 +115,13 @@ public:
 		m_shmObj(),
 #endif
 		m_data( NULL ),
+#ifdef LMMS_BUILD_WIN32
+		m_dataSem( QString::null ),
+		m_messageSem( QString::null ),
+#else
 		m_dataSem( NULL ),
 		m_messageSem( NULL ),
+#endif
 		m_lockDepth( 0 )
 	{
 #ifdef USE_NATIVE_SHMEM
@@ -123,9 +140,19 @@ public:
 		m_data = (shmData *) m_shmObj.data();
 #endif
 		assert( m_data != NULL );
+		m_data->startPtr = m_data->endPtr = 0;
+#ifdef LMMS_BUILD_WIN32
+		static int k = 0;
+		m_data->dataSem.semKey = ( getpid()<<10 ) + ++k;
+		m_data->messageSem.semKey = ( getpid()<<10 ) + ++k;
+		m_dataSem.setKey( QString::number( m_data->dataSem.semKey ),
+						1, QSystemSemaphore::Create );
+		m_messageSem.setKey( QString::number(
+						m_data->messageSem.semKey ),
+						0, QSystemSemaphore::Create );
+#else
 		m_dataSem = &m_data->dataSem.sem;
 		m_messageSem = &m_data->messageSem.sem;
-		m_data->startPtr = m_data->endPtr = 0;
 
 		if( sem_init( m_dataSem, 1, 1 ) )
 		{
@@ -135,7 +162,7 @@ public:
 		{
 			printf( "could not initialize m_messageSem\n" );
 		}
-
+#endif
 	}
 
 	// constructor for remote-/client-side - use _shm_key for making up
@@ -149,8 +176,13 @@ public:
 		m_shmObj( QString::number( _shm_key ) ),
 #endif
 		m_data( NULL ),
+#ifdef LMMS_BUILD_WIN32
+		m_dataSem( QString::null ),
+		m_messageSem( QString::null ),
+#else
 		m_dataSem( NULL ),
 		m_messageSem( NULL ),
+#endif
 		m_lockDepth( 0 )
 	{
 #ifdef USE_NATIVE_SHMEM
@@ -165,8 +197,14 @@ public:
 		}
 #endif
 		assert( m_data != NULL );
+#ifdef LMMS_BUILD_WIN32
+		m_dataSem.setKey( QString::number( m_data->dataSem.semKey ) );
+		m_messageSem.setKey( QString::number(
+						m_data->messageSem.semKey ) );
+#else
 		m_dataSem = &m_data->dataSem.sem;
 		m_messageSem = &m_data->messageSem.sem;
+#endif
 	}
 
 	~shmFifo()
@@ -180,8 +218,10 @@ public:
 #ifdef USE_NATIVE_SHMEM
 			shmctl( m_shmID, IPC_RMID, NULL );
 #endif
+#ifndef LMMS_BUILD_WIN32
 			sem_destroy( m_dataSem );
 			sem_destroy( m_messageSem );
+#endif
 		}
 	}
 
@@ -196,7 +236,11 @@ public:
 	{
 		if( ++m_lockDepth == 1 )
 		{
+#ifdef LMMS_BUILD_WIN32
+			m_dataSem.acquire();
+#else
 			sem_wait( m_dataSem );
+#endif
 		}
 	}
 
@@ -207,7 +251,11 @@ public:
 		{
 			if( --m_lockDepth == 0 )
 			{
+#ifdef LMMS_BUILD_WIN32
+				m_dataSem.release();
+#else
 				sem_post( m_dataSem );
+#endif
 			}
 		}
 	}
@@ -215,13 +263,21 @@ public:
 	// wait until message-semaphore is available
 	inline void waitForMessage( void )
 	{
+#ifdef LMMS_BUILD_WIN32
+		m_messageSem.acquire();
+#else
 		sem_wait( m_messageSem );
+#endif
 	}
 
 	// increase message-semaphore
 	inline void messageSent( void )
 	{
+#ifdef LMMS_BUILD_WIN32
+		m_messageSem.release();
+#else
 		sem_post( m_messageSem );
+#endif
 	}
 
 
@@ -263,9 +319,16 @@ public:
 
 	inline bool messagesLeft( void )
 	{
+#ifdef LMMS_BUILD_WIN32
+		lock();
+		const bool empty = ( m_data->startPtr == m_data->endPtr );
+		unlock();
+		return( !empty );
+#else
 		int v;
 		sem_getvalue( m_messageSem, &v );
 		return( v > 0 );
+#endif
 	}
 
 
@@ -339,17 +402,21 @@ private:
 	}
 
 	bool m_master;
-#ifdef USE_NATIVE_SHMEM
 	key_t m_shmKey;
+#ifdef USE_NATIVE_SHMEM
 	int m_shmID;
 #else
-	int m_shmKey;
 	QSharedMemory m_shmObj;
 #endif
 	size_t m_shmSize;
 	shmData * m_data;
+#ifdef LMMS_BUILD_WIN32
+	QSystemSemaphore m_dataSem;
+	QSystemSemaphore m_messageSem;
+#else
 	sem_t * m_dataSem;
 	sem_t * m_messageSem;
+#endif
 	int m_lockDepth;
 
 } ;
@@ -382,7 +449,7 @@ enum RemoteMessageIDs
 
 
 
-class remotePluginBase
+class EXPORT remotePluginBase
 {
 public:
 	struct message
@@ -482,7 +549,7 @@ private:
 
 #ifndef BUILD_REMOTE_PLUGIN_CLIENT
 
-class remotePlugin : public remotePluginBase
+class EXPORT remotePlugin : public remotePluginBase
 {
 public:
 	remotePlugin( const QString & _plugin_executable );
