@@ -4,9 +4,17 @@
 	* src/core/song.cpp:
 	* src/core/track_container.cpp:
 	* src/core/track.cpp:
-	Add locking to trackContainer::m_tracks.  This should fix most crashes
-	causes by moving/adding TCOs.  This also seems to fix the no-sound bug
-	that I hate so much.
+	Add locking to trackContainer::m_tracks and clean up some const-ness.
+	This should fix most crashes causes by moving/adding TCOs.  This also
+	seems to fix the no-sound bug that I hate so much.
+
+	* plugins/bit_invader/logo.png:
+	* plugins/bit_invader/artwork.png:
+	Improve BitInvader logo
+
+	* data/lmms.desktop:
+	* lmms.1:
+	A more consise description for English
 
 2008-09-02	Csaba Hruska <csaba.hruska/at/gmail.com>
 
