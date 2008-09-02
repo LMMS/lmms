@@ -27,6 +27,8 @@
 #ifndef _TRACK_CONTAINER_H
 #define _TRACK_CONTAINER_H
 
+#include <QReadWriteLock>
+
 #include "track.h"
 #include "journalling_object.h"
 
@@ -64,10 +66,12 @@ public:
 
 	void clearAllTracks( void );
 
+	/*
 	trackList & tracks( void )
 	{
 		return( m_tracks );
 	}
+	*/
 
 	const trackList & tracks( void ) const
 	{
@@ -83,6 +87,8 @@ public:
 signals:
 	void trackAdded( track * _track );
 
+protected:
+	mutable QReadWriteLock m_tracksMutex;
 
 private:
 	trackList m_tracks;

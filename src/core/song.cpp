@@ -564,6 +564,7 @@ void song::playPattern( pattern * _patternToPlay, bool _loop )
 void song::updateLength( void )
 {
 	m_length = 0;
+	m_tracksMutex.lockForRead();
 	for( trackList::const_iterator it = tracks().begin();
 						it != tracks().end(); ++it )
 	{
@@ -573,6 +574,7 @@ void song::updateLength( void )
 			m_length = cur;
 		}
 	}
+	m_tracksMutex.unlock();
 }
 
 
@@ -638,11 +640,13 @@ void song::stopExport( void )
 
 void song::insertBar( void )
 {
-	for( trackList::iterator it = tracks().begin();
+	m_tracksMutex.lockForRead();
+	for( trackList::const_iterator it = tracks().begin();
 					it != tracks().end(); ++it )
 	{
 		( *it )->insertTact( m_playPos[Mode_PlaySong] );
 	}
+	m_tracksMutex.unlock();
 }
 
 
@@ -650,11 +654,13 @@ void song::insertBar( void )
 
 void song::removeBar( void )
 {
-	for( trackList::iterator it = tracks().begin();
+	m_tracksMutex.lockForRead();
+	for( trackList::const_iterator it = tracks().begin();
 					it != tracks().end(); ++it )
 	{
 		( *it )->removeTact( m_playPos[Mode_PlaySong] );
 	}
+	m_tracksMutex.unlock();
 }
 
 
@@ -666,7 +672,6 @@ void song::addBBTrack( void )
 	track * t = track::create( track::BBTrack, this );
 	engine::getBBTrackContainer()->setCurrentBB(
 						bbTrack::numOfBBTrack( t ) );
-	engine::getMixer()->unlock();
 }
 
 

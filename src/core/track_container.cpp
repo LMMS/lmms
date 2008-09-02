@@ -37,7 +37,8 @@
 trackContainer::trackContainer( void ) :
 	model( NULL ),
 	journallingObject(),
-	m_tracks()
+	m_tracks(),
+	m_tracksMutex()
 {
 }
 
@@ -60,10 +61,12 @@ void trackContainer::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	//mainWindow::saveWidgetState( this, _this );
 
 	// save settings of each track
+	m_tracksMutex.lockForRead();
 	for( int i = 0; i < m_tracks.size(); ++i )
 	{
 		m_tracks[i]->saveState( _doc, _this );
 	}
+	m_tracksMutex.unlock();
 }
 
 
@@ -137,7 +140,9 @@ void trackContainer::addTrack( track * _track )
 {
 	if( _track->type() != track::HiddenAutomationTrack )
 	{
+		m_tracksMutex.lockForWrite();
 		m_tracks.push_back( _track );
+		m_tracksMutex.unlock();
 		emit trackAdded( _track );
 	}
 }
@@ -150,7 +155,9 @@ void trackContainer::removeTrack( track * _track )
 	int index = m_tracks.indexOf( _track );
 	if( index != -1 )
 	{
+		m_tracksMutex.lockForWrite();
 		m_tracks.remove( index );
+		m_tracksMutex.unlock();
 
 		if( engine::getSong() )
 		{
@@ -173,10 +180,12 @@ void trackContainer::updateAfterTrackAdd( void )
 
 void trackContainer::clearAllTracks( void )
 {
+	//m_tracksMutex.lockForWrite();
 	while( !m_tracks.isEmpty() )
 	{
 		delete m_tracks.first();
 	}
+	//m_tracksMutex.unlock();
 }
 
 
@@ -185,6 +194,7 @@ void trackContainer::clearAllTracks( void )
 int trackContainer::countTracks( track::TrackTypes _tt ) const
 {
 	int cnt = 0;
+	m_tracksMutex.lockForRead();
 	for( int i = 0; i < m_tracks.size(); ++i )
 	{
 		if( m_tracks[i]->type() == _tt || _tt == track::NumTrackTypes )
@@ -192,6 +202,7 @@ int trackContainer::countTracks( track::TrackTypes _tt ) const
 			++cnt;
 		}
 	}
+	m_tracksMutex.unlock();
 	return( cnt );
 }
 

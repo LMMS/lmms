@@ -2029,10 +2029,10 @@ tact track::length( void ) const
  */
 void track::toggleSolo( void )
 {
-	trackContainer::trackList & tl = m_trackContainer->tracks();
+	const trackContainer::trackList & tl = m_trackContainer->tracks();
 
 	bool solo_before = FALSE;
-	for( trackContainer::trackList::iterator it = tl.begin();
+	for( trackContainer::trackList::const_iterator it = tl.begin();
 							it != tl.end(); ++it )
 	{
 		if( *it != this )
@@ -2046,7 +2046,7 @@ void track::toggleSolo( void )
 	}
 
 	const bool solo = m_soloModel.value();
-	for( trackContainer::trackList::iterator it = tl.begin();
+	for( trackContainer::trackList::const_iterator it = tl.begin();
 							it != tl.end(); ++it )
 	{
 		if( solo )

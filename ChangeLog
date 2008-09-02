@@ -1,3 +1,13 @@
+2008-09-01	Paul Giblock <drfaygo/at/gmail/dot/com>
+
+	* include/track_container.h:
+	* src/core/song.cpp:
+	* src/core/track_container.cpp:
+	* src/core/track.cpp:
+	Add locking to trackContainer::m_tracks.  This should fix most crashes
+	causes by moving/adding TCOs.  This also seems to fix the no-sound bug
+	that I hate so much.
+
 2008-09-02	Csaba Hruska <csaba.hruska/at/gmail.com>
 
 	* include/song.h:
