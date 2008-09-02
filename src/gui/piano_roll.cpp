@@ -2584,7 +2584,7 @@ void pianoRoll::pasteNotes( void )
 		{
 			note cur_note;
 			cur_note.restoreState( list.item( i ).toElement() );
-			cur_note.setPos( cur_note.pos() + m_currentPosition );
+			cur_note.setPos( cur_note.pos() + m_timeLine->pos() );
 			m_pattern->addNote( cur_note );
 		}
 

@@ -1,3 +1,12 @@
+2008-09-02	Paul Giblock <drfaygo/at/gmail/dot/com>
+
+	* src/gui/widgets/graph.cpp:
+	Display crosshair cursor as a hint to the user
+
+	* src/gui/piano_roll.cpp:
+	Change Piano-Roll paste behavior. Instead of pasting at 0, paste at the
+	quantized location of the time-line's position-indicator.
+
 2008-09-01	Paul Giblock <drfaygo/at/gmail/dot/com>
 
 	* include/track_container.h:

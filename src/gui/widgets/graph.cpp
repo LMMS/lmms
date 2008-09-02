@@ -49,6 +49,7 @@ graph::graph( QWidget * _parent, graphStyle _style ) :
 
 	resize( 132, 104 );
 	setAcceptDrops( TRUE );
+	setCursor( Qt::CrossCursor );
 
 	graphModel * gModel = castModel<graphModel>();
 
@@ -205,7 +206,7 @@ void graph::mouseReleaseEvent( QMouseEvent * _me )
 	{
 		// toggle mouse state
 		m_mouseDown = false;
-		setCursor( Qt::ArrowCursor );
+		setCursor( Qt::CrossCursor );
 		update();
 	}
 }	
