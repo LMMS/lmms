@@ -1,3 +1,15 @@
+2008-09-02	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* cmake/modules/Win32Toolchain.cmake:
+	added include and library-directory of cross compiling environment
+
+	* include/remote_plugin.h:
+	use QSystemSemaphore in win32-version as libpthread-w32 does not
+	support process shared mutexes and semaphores
+
+	* src/core/mixer.cpp:
+	disabled WinMM MIDI for the time being
+
 2008-09-02	Paul Giblock <drfaygo/at/gmail/dot/com>
 
 	* src/gui/widgets/graph.cpp:
