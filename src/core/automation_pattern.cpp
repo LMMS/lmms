@@ -94,12 +94,28 @@ automationPattern::~automationPattern()
 
 void automationPattern::addObject( automatableModel * _obj )
 {
-	m_objects += _obj;
-	// been empty before?
-	if( m_objects.size() == 1 && !hasAutomation() )
+	bool addIt = true;
+
+	for( objectVector::iterator it = m_objects.begin();
+			it != m_objects.end(); ++it )
 	{
-		// then initialize default-value
-		putValue( 0, _obj->value<float>(), FALSE );
+		if( *it == _obj ) {
+			// Already exists
+			// TODO: Maybe let the user know in some non-annoying way
+			addIt = false;
+			break;
+		}
+	}
+
+	if( addIt )
+	{
+		m_objects += _obj;
+		// been empty before?
+		if( m_objects.size() == 1 && !hasAutomation() )
+		{
+			// then initialize default-value
+			putValue( 0, _obj->value<float>(), FALSE );
+		}
 	}
 }
 
@@ -591,7 +607,8 @@ void automationPatternView::constructContextMenu( QMenu * _cm )
 	if( !m_pat->m_objects.isEmpty() )
 	{
 		_cm->addSeparator();
-		QMenu * m = new QMenu( tr( "Connections" ), _cm );
+		QMenu * m = new QMenu( tr( "%1 Connections" ).
+				arg( m_pat->m_objects.count() ), _cm );
 		for( automationPattern::objectVector::iterator it =
 						m_pat->m_objects.begin();
 					it != m_pat->m_objects.end(); ++it )

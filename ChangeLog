@@ -19,6 +19,14 @@
 	Change Piano-Roll paste behavior. Instead of pasting at 0, paste at the
 	quantized location of the time-line's position-indicator.
 
+	* src/gui/main_window.cpp:
+	Display waiting cursor when loading project.  Really only helps when
+	loading a large song while another is loaded.  Provides feedback before
+	the loading dialog appears (I guess this is during project close)
+
+	* src/core/automation_pattern.cpp:
+	Don't connect to the same model more than once.
+
 2008-09-01	Paul Giblock <drfaygo/at/gmail/dot/com>
 
 	* include/track_container.h:

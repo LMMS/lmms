@@ -648,8 +648,10 @@ void mainWindow::openProject( void )
 		if( ofd.exec () == QDialog::Accepted &&
 						!ofd.selectedFiles().isEmpty() )
 		{
+			setCursor( Qt::WaitCursor );
 			engine::getSong()->loadProject(
 						ofd.selectedFiles()[0] );
+			setCursor( Qt::ArrowCursor );
 		}
 	}
 }
@@ -674,8 +676,10 @@ void mainWindow::updateRecentlyOpenedProjectsMenu( void )
 void mainWindow::openRecentlyOpenedProject( QAction * _action )
 {
 	const QString & f = _action->text();
+	setCursor( Qt::WaitCursor );
 	engine::getSong()->loadProject( f );
 	configManager::inst()->addRecentlyOpenedProject( f );
+	setCursor( Qt::ArrowCursor );
 }
 
 
