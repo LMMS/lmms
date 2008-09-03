@@ -26,11 +26,11 @@
 #ifndef _REMOTE_PLUGIN_H
 #define _REMOTE_PLUGIN_H
 
-#include "lmmsconfig.h"
-#include "mixer.h"
+#include "export.h"
 #include "midi.h"
 
 #include <vector>
+#include <cstring>
 #include <string>
 #include <cassert>
 
@@ -74,6 +74,7 @@ typedef int32_t key_t;
 #define EXPORT
 #define COMPILE_REMOTE_PLUGIN_BASE
 #else
+#include <QtCore/QMutex>
 #include <QtCore/QProcess>
 #endif
 
@@ -428,7 +429,7 @@ enum RemoteMessageIDs
 	IdUndefined,
 	IdGeneralFailure,
 	IdInitDone,
-	IdClosePlugin,
+	IdQuit,
 	IdSampleRateInformation,
 	IdBufferSizeInformation,
 	IdMidiEvent,
@@ -472,26 +473,64 @@ public:
 		{
 		}
 
-		void addInt( int _i )
+		inline message & addString( const std::string & _s )
+		{
+			data.push_back( _s );
+			return( *this );
+		}
+
+		message & addInt( int _i )
 		{
 			char buf[128];
 			buf[0] = 0;
 			sprintf( buf, "%d", _i );
 			data.push_back( std::string( buf ) );
+			return( *this );
 		}
 
-		int getInt( int _p ) const
+		message & addFloat( float _f )
+		{
+			char buf[128];
+			buf[0] = 0;
+			sprintf( buf, "%f", _f );
+			data.push_back( std::string( buf ) );
+			return( *this );
+		}
+
+		inline std::string getString( int _p = 0 ) const
+		{
+			return( data[_p] );
+		}
+
+#ifndef BUILD_REMOTE_PLUGIN_CLIENT
+		inline QString getQString( int _p = 0 ) const
+		{
+			return( QString::fromStdString( getString( _p ) ) );
+		}
+#endif
+
+		inline int getInt( int _p = 0 ) const
 		{
 			return( atoi( data[_p].c_str() ) );
 		}
 
-		bool operator==( const message & _m )
+		inline float getFloat( int _p ) const
+		{
+			return( atof( data[_p].c_str() ) );
+		}
+
+		inline bool operator==( const message & _m ) const
 		{
 			return( id == _m.id );
 		}
 
 		int id;
+
+	private:
 		std::vector<std::string> data;
+
+		friend class remotePluginBase;
+
 	} ;
 
 	remotePluginBase( shmFifo * _in, shmFifo * _out );
@@ -507,7 +546,7 @@ public:
 
 
 	message waitForMessage( const message & _m,
-						bool _busy_waiting = FALSE );
+						bool _busy_waiting = false );
 
 	inline message fetchAndProcessNextMessage( void )
 	{
@@ -552,8 +591,14 @@ private:
 class EXPORT remotePlugin : public remotePluginBase
 {
 public:
-	remotePlugin( const QString & _plugin_executable );
+	remotePlugin( const QString & _plugin_executable,
+					bool _wait_for_init_done = true );
 	virtual ~remotePlugin();
+
+	inline void waitForInitDone( void )
+	{
+		m_failed = waitForMessage( IdInitDone, TRUE ).id != IdInitDone;
+	}
 
 	virtual bool processMessage( const message & _m );
 
@@ -565,19 +610,28 @@ public:
 
 	void updateSampleRate( sample_rate_t _sr )
 	{
-		message m( IdSampleRateInformation );
-		m.addInt( _sr );
-		sendMessage( m );
+		lock();
+		sendMessage( message( IdSampleRateInformation ).addInt( _sr ) );
+		unlock();
 	}
 
 	void showUI( void )
 	{
+		lock();
 		sendMessage( IdShowUI );
+		unlock();
 	}
 
 	void hideUI( void )
 	{
+		lock();
 		sendMessage( IdHideUI );
+		unlock();
+	}
+
+	inline bool failed( void ) const
+	{
+		return( m_failed );
 	}
 
 
@@ -592,6 +646,11 @@ protected:
 		m_commMutex.unlock();
 	}
 
+	inline void setSplittedChannels( bool _on )
+	{
+		m_splitChannels = _on;
+	}
+
 
 private:
 	void resizeSharedProcessingMemory( void );
@@ -603,6 +662,7 @@ private:
 	QProcess m_process;
 
 	QMutex m_commMutex;
+	bool m_splitChannels;
 #ifdef USE_NATIVE_SHMEM
 	int m_shmID;
 #else
@@ -642,12 +702,17 @@ public:
 		return( m_shm );
 	}
 
-	virtual void updateSampleRate( sample_rate_t )
+	virtual void updateSampleRate( void )
 	{
 	}
 
-	virtual void updateBufferSize( fpp_t )
+	virtual void updateBufferSize( void )
 	{
+	}
+
+	inline sample_rate_t sampleRate( void ) const
+	{
+		return( m_sampleRate );
 	}
 
 	inline fpp_t bufferSize( void ) const
@@ -658,17 +723,23 @@ public:
 	void setInputCount( int _i )
 	{
 		m_inputCount = _i;
-		message m( IdChangeInputCount );
-		m.addInt( _i );
-		sendMessage( m );
+		sendMessage( message( IdChangeInputCount ).addInt( _i ) );
 	}
 
 	void setOutputCount( int _i )
 	{
 		m_outputCount = _i;
-		message m( IdChangeOutputCount );
-		m.addInt( _i );
-		sendMessage( m );
+		sendMessage( message( IdChangeOutputCount ).addInt( _i ) );
+	}
+
+	virtual int inputCount( void ) const
+	{
+		return( m_inputCount );
+	}
+
+	virtual int outputCount( void ) const
+	{
+		return( m_outputCount );
 	}
 
 
@@ -684,6 +755,7 @@ private:
 	int m_inputCount;
 	int m_outputCount;
 
+	sample_rate_t m_sampleRate;
 	fpp_t m_bufferSize;
 
 } ;
@@ -724,9 +796,11 @@ void remotePluginBase::sendMessage( const message & _m )
 	m_out->lock();
 	m_out->writeInt( _m.id );
 	m_out->writeInt( _m.data.size() );
+	int j = 0;
 	for( int i = 0; i < _m.data.size(); ++i )
 	{
 		m_out->writeString( _m.data[i] );
+		j += _m.data[i].size();
 	}
 	m_out->unlock();
 	m_out->messageSent();
@@ -797,9 +871,10 @@ remotePluginClient::remotePluginClient( key_t _shm_in, key_t _shm_out ) :
 	m_shmObj(),
 #endif
 	m_shm( NULL ),
-	m_inputCount( DEFAULT_CHANNELS ),
-	m_outputCount( DEFAULT_CHANNELS ),
-	m_bufferSize( DEFAULT_BUFFER_SIZE )
+	m_inputCount( 0 ),
+	m_outputCount( 0 ),
+	m_sampleRate( 44100 ),
+	m_bufferSize( 0 )
 {
 	sendMessage( IdSampleRateInformation );
 	sendMessage( IdBufferSizeInformation );
@@ -810,7 +885,7 @@ remotePluginClient::remotePluginClient( key_t _shm_in, key_t _shm_out ) :
 
 remotePluginClient::~remotePluginClient()
 {
-	sendMessage( IdClosePlugin );
+	sendMessage( IdQuit );
 
 #ifdef USE_NATIVE_SHMEM
 	shmdt( m_shm );
@@ -830,15 +905,16 @@ bool remotePluginClient::processMessage( const message & _m )
 			return( false );
 
 		case IdSampleRateInformation:
-			updateSampleRate( _m.getInt( 0 ) );
+			m_sampleRate = _m.getInt();
+			updateSampleRate();
 			break;
 
 		case IdBufferSizeInformation:
-			m_bufferSize = _m.getInt( 0 );
-			updateBufferSize( m_bufferSize );
+			m_bufferSize = _m.getInt();
+			updateBufferSize();
 			break;
 
-		case IdClosePlugin:
+		case IdQuit:
 			return( false );
 
 		case IdMidiEvent:
@@ -861,8 +937,13 @@ bool remotePluginClient::processMessage( const message & _m )
 			setShmKey( _m.getInt( 0 ), _m.getInt( 1 ) );
 			break;
 
+		case IdInitDone:
+			break;
+
 		case IdUndefined:
 		default:
+			fprintf( stderr, "undefined message: %d\n",
+							(int) _m.id );
 			break;
 	}
 	if( reply )

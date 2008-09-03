@@ -26,7 +26,7 @@
 #define COMPILE_REMOTE_PLUGIN_BASE
 
 #include "remote_plugin.h"
-#include "lmmsconfig.h"
+#include "mixer.h"
 #include "engine.h"
 #include "config_mgr.h"
 
@@ -39,11 +39,13 @@
 
 
 
-remotePlugin::remotePlugin( const QString & _plugin_executable ) :
+remotePlugin::remotePlugin( const QString & _plugin_executable,
+						bool _wait_for_init_done ) :
 	remotePluginBase( new shmFifo(), new shmFifo() ),
 	m_initialized( false ),
 	m_failed( true ),
 	m_commMutex( QMutex::Recursive ),
+	m_splitChannels( false ),
 #ifdef USE_NATIVE_SHMEM
 	m_shmID( 0 ),
 #else
@@ -66,7 +68,10 @@ remotePlugin::remotePlugin( const QString & _plugin_executable ) :
 
 	resizeSharedProcessingMemory();
 
-	m_failed = waitForMessage( IdInitDone ).id != IdInitDone;
+	if( _wait_for_init_done )
+	{
+		waitForInitDone();
+	}
 	unlock();
 }
 
@@ -77,7 +82,7 @@ remotePlugin::~remotePlugin()
 {
 	if( m_failed == false )
 	{
-		sendMessage( IdClosePlugin );
+		sendMessage( IdQuit );
 
 		m_process.waitForFinished( 1000 );
 		if( m_process.state() != QProcess::NotRunning )
@@ -124,28 +129,48 @@ bool remotePlugin::process( const sampleFrame * _in_buf,
 
 	memset( m_shm, 0, m_shmSize );
 
-	ch_cnt_t inputs = tMax<ch_cnt_t>( m_inputCount, DEFAULT_CHANNELS );
+	ch_cnt_t inputs = tMin<ch_cnt_t>( m_inputCount, DEFAULT_CHANNELS );
 
 	if( _in_buf != NULL && inputs > 0 )
 	{
-		for( ch_cnt_t ch = 0; ch < inputs; ++ch )
+		if( m_splitChannels )
 		{
-			for( fpp_t frame = 0; frame < frames; ++frame )
+			for( ch_cnt_t ch = 0; ch < inputs; ++ch )
 			{
-				m_shm[ch * frames + frame] = _in_buf[frame][ch];
+				for( fpp_t frame = 0; frame < frames; ++frame )
+				{
+					m_shm[ch * frames + frame] =
+							_in_buf[frame][ch];
+				}
+			}
+		}
+		else if( inputs == DEFAULT_CHANNELS )
+		{
+			memcpy( m_shm, _in_buf, frames * BYTES_PER_FRAME );
+		}
+		else
+		{
+			sampleFrame * o = (sampleFrame *) m_shm;
+			for( ch_cnt_t ch = 0; ch < inputs; ++ch )
+			{
+				for( fpp_t frame = 0; frame < frames; ++frame )
+				{
+					o[frame][ch] = _in_buf[frame][ch];
+				}
 			}
 		}
 	}
 
 	lock();
 	sendMessage( IdStartProcessing );
+	unlock();
 
 	m_initialized = TRUE;
 	if( _wait )
 	{
 		waitForProcessingFinished( _out_buf );
 	}
-	unlock();
+
 	return( TRUE );
 }
 
@@ -164,11 +189,28 @@ bool remotePlugin::waitForProcessingFinished( sampleFrame * _out_buf )
 	unlock();
 
 	const fpp_t frames = engine::getMixer()->framesPerPeriod();
-	const ch_cnt_t outputs = tMax<ch_cnt_t>( m_outputCount,
+	const ch_cnt_t outputs = tMin<ch_cnt_t>( m_outputCount,
 							DEFAULT_CHANNELS );
-	sampleFrame * o = (sampleFrame *) ( m_shm + m_inputCount*frames );
-	if( outputs != DEFAULT_CHANNELS )
+	if( m_splitChannels )
 	{
+		for( ch_cnt_t ch = 0; ch < outputs; ++ch )
+		{
+			for( fpp_t frame = 0; frame < frames; ++frame )
+			{
+				_out_buf[frame][ch] = m_shm[( m_inputCount+ch )*
+								frames + frame];
+			}
+		}
+	}
+	else if( outputs == DEFAULT_CHANNELS )
+	{
+		memcpy( _out_buf, m_shm + m_inputCount * frames,
+						frames * BYTES_PER_FRAME );
+	}
+	else
+	{
+		sampleFrame * o = (sampleFrame *) ( m_shm +
+							m_inputCount*frames );
 		// clear buffer, if plugin didn't fill up both channels
 		engine::getMixer()->clearAudioBuffer( _out_buf, frames );
 
@@ -180,10 +222,6 @@ bool remotePlugin::waitForProcessingFinished( sampleFrame * _out_buf )
 				_out_buf[frame][ch] = o[frame][ch];
 			}
 		}
-	}
-	else
-	{
-		memcpy( _out_buf, o, frames * sizeof( sampleFrame ) );
 	}
 
 	return( TRUE );
@@ -242,14 +280,9 @@ void remotePlugin::resizeSharedProcessingMemory( void )
 	m_shm = (float *) m_shmObj.data();
 #endif
 	m_shmSize = s;
-	message m( IdChangeSharedMemoryKey );
-	m.addInt( shm_key );
-	m.addInt( m_shmSize );
-	sendMessage( m );
+	sendMessage( message( IdChangeSharedMemoryKey ).
+				addInt( shm_key ).addInt( m_shmSize ) );
 }
-
-
-
 
 
 
@@ -291,7 +324,7 @@ bool remotePlugin::processMessage( const message & _m )
 			break;
 
 		case IdProcessingDone:
-		case IdClosePlugin:
+		case IdQuit:
 		case IdUndefined:
 		default:
 			break;
