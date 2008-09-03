@@ -30,28 +30,12 @@
 
 #include "lmmsconfig.h"
 
+#define BUILD_REMOTE_PLUGIN_CLIENT
+
+#include "remote_plugin.h"
+
 #ifdef LMMS_HAVE_PTHREAD_H
 #include <pthread.h>
-#endif
-
-#ifdef LMMS_HAVE_SYS_TYPES_H
-#include <sys/types.h>
-#endif
-
-#ifdef LMMS_HAVE_SYS_IPC_H
-#include <sys/ipc.h>
-#endif
-
-#ifdef LMMS_HAVE_SYS_SHM_H
-#include <sys/shm.h>
-#endif
-
-#ifdef LMMS_HAVE_STDARG_H
-#include <stdarg.h>
-#endif
-
-#ifdef LMMS_HAVE_SIGNAL_H
-#include <signal.h>
 #endif
 
 #ifdef LMMS_HAVE_SCHED_H
@@ -101,36 +85,23 @@ static pthread_key_t ejmpbuf_key;
 #endif
 
 
-static hostLanguages hlang = LanguageEnglish;
+static VstHostLanguages hlang = LanguageEnglish;
 
 
-class VSTPlugin;
+class remoteVstPlugin;
 
-VSTPlugin * plugin = NULL;
-
-
-
-void lvsMessage( const char * _fmt, ... )
-{
-	va_list ap;
-	char buffer[512];
-
-	va_start( ap, _fmt );
-	vsnprintf( buffer, sizeof( buffer ), _fmt, ap );
-	writeValue<Sint16>( VST_DEBUG_MSG, 1 );
-	writeString( buffer, 1 );
-	va_end( ap );
-}
+remoteVstPlugin * __plugin = NULL;
 
 
 
 
-class VSTPlugin
+class remoteVstPlugin : public remotePluginClient
 {
 public:
-	VSTPlugin( void );
+	remoteVstPlugin( key_t _shm_in, key_t _shm_out );
+	virtual ~remoteVstPlugin();
 
-	~VSTPlugin();
+	virtual bool processMessage( const message & _m );
 
 	void init( const std::string & _plugin_file );
 
@@ -143,23 +114,33 @@ public:
 		}
 	}
 
-	void process( void );
+	virtual bool process( const sampleFrame * _in, sampleFrame * _out );
 
-	// enqueue given MIDI-event to be processed the next time process() is
-	// called
-	void enqueueMidiEvent( const midiEvent & _event,
-						const f_cnt_t _frames_ahead );
+
+	virtual void processMidiEvent( const midiEvent & _event,
+							const f_cnt_t _offset );
 
 	// set given sample-rate for plugin
-	void setSampleRate( const sample_rate_t _rate )
+	void updateSampleRate( void )
 	{
-		m_plugin->dispatcher( m_plugin, effSetSampleRate, 0, 0, NULL, 
-							    (float) _rate );
-		m_sampleRate = _rate;
+		if( m_plugin )
+		{
+			m_plugin->dispatcher( m_plugin, effSetSampleRate, 0, 0,
+						NULL, (float) sampleRate() );
+		}
 	}
 
-	// set given block-size for plugin
-	void setBlockSize( const fpp_t _bsize );
+	// set given buffer-size for plugin
+	void updateBufferSize( void )
+	{
+		if( m_plugin )
+		{
+			m_plugin->dispatcher( m_plugin, effSetBlockSize, 0,
+						bufferSize(), NULL, 0.0f );
+		}
+	}
+
+
 
 	// set given tempo
 	void setBPM( const bpm_t _bpm )
@@ -168,7 +149,7 @@ public:
 	}
 
 	// determine VST-version the plugin uses
-	Sint32 pluginVersion( void ) const
+	int pluginVersion( void ) const
 	{
 		return( m_plugin->dispatcher( m_plugin,
 				effGetVendorVersion, 0, 0, NULL, 0.0f ) );
@@ -184,30 +165,28 @@ public:
 	const char * pluginProductString( void ) const;
 
 	// do a complete parameter-dump and post it
-	void getParameterDump( void ) const;
+	void getParameterDump( void );
 
 	// read parameter-dump and set it for plugin
-	void setParameterDump( void );
+	void setParameterDump( const message & _m );
 
 	// post properties of specified parameter
-	void getParameterProperties( const Sint32 _idx );
+	void getParameterProperties( const int _idx );
 
 	// number of inputs
-	ch_cnt_t inputCount( void ) const
+	virtual int inputCount( void ) const
 	{
 		return( m_plugin->numInputs );
 	}
 
 	// number of outputs
-	ch_cnt_t outputCount( void ) const
+	virtual int outputCount( void ) const
 	{
 		return( m_plugin->numOutputs );
 	}
 
-	// called once at initialization and everytime number of inputs/outputs
-	// or block-size changes and is responsible for resizing shared memory
-	// and inform client about changed shm-keys, input/output-count etc.
-	void resizeSharedMemory( void );
+	// has to be called as soon as input- or output-count changes
+	void updateInOutCount( void );
 
 
 private:
@@ -233,17 +212,14 @@ private:
 
 	AEffect * m_plugin;
 	HWND m_window;
-	Sint32 m_windowXID;
-	Sint16 m_windowWidth;
-	Sint16 m_windowHeight;
+	Sint32 m_windowID;
+	int m_windowWidth;
+	int m_windowHeight;
 
 	pthread_mutex_t m_lock;
 	pthread_cond_t m_windowStatusChange;
 	DWORD m_guiThreadID;
 
-
-	fpp_t m_blockSize;
-	float * m_shm;
 
 	float * * m_inputs;
 	float * * m_outputs;
@@ -251,7 +227,6 @@ private:
 	std::list<VstMidiEvent> m_midiEvents;
 
 	bpm_t m_bpm;
-	sample_rate_t m_sampleRate;
 	double m_currentSamplePos;
 
 } ;
@@ -259,98 +234,30 @@ private:
 
 
 
-VSTPlugin::VSTPlugin( void ) :
+remoteVstPlugin::remoteVstPlugin( key_t _shm_in, key_t _shm_out ) :
+	remotePluginClient( _shm_in, _shm_out ),
 	m_shortName( "" ),
 	m_libInst( NULL ),
 	m_plugin( NULL ),
 	m_window( NULL ),
-	m_windowXID( 0 ),
+	m_windowID( 0 ),
 	m_windowWidth( 0 ),
 	m_windowHeight( 0 ),
 	m_lock(),
 	m_windowStatusChange(),
 	m_guiThreadID( 0 ),
-	m_blockSize( 0 ),
-	m_shm( NULL ),
 	m_inputs( NULL ),
 	m_outputs( NULL ),
 	m_midiEvents(),
 	m_bpm( 0 ),
-	m_sampleRate( 44100 ),
 	m_currentSamplePos( 0 )
 {
 }
 
 
 
-
-void VSTPlugin::init( const std::string & _plugin_file )
+remoteVstPlugin::~remoteVstPlugin()
 {
-	if( load( _plugin_file ) == false )
-	{
-		writeValue<Sint16>( VST_FAILED_LOADING_PLUGIN );
-		return;
-	}
-
-	/* set program to zero */
-	/* i comment this out because it breaks dfx Geometer
-	 * looks like we cant set programs for it
-	 *
-	m_plugin->dispatcher( m_plugin, effSetProgram, 0, 0, NULL, 0.0f); */
-	// request rate and blocksize
-	writeValue<Sint16>( VST_GET_SAMPLE_RATE );
-	writeValue<Sint16>( VST_GET_BUFFER_SIZE );
-
-
-	m_plugin->dispatcher( m_plugin, effMainsChanged, 0, 1, NULL, 0.0f );
-
-
-	if( CreateThread( NULL, 0, guiEventLoop, this, 0, NULL ) == NULL )
-	{
-		lvsMessage( "could not create GUI-thread" );
-		return;
-	}
-	pthread_cond_wait( &m_windowStatusChange, &m_lock);
-
-
-	// now post some information about our plugin
-	writeValue<Sint16>( VST_PLUGIN_XID );
-	writeValue<Sint32>( m_windowXID );
-
-	if( m_windowXID != 0 )
-	{
-		writeValue<Sint16>( VST_PLUGIN_EDITOR_GEOMETRY );
-		writeValue<Sint16>( m_windowWidth );
-		writeValue<Sint16>( m_windowHeight );
-	}
-
-	writeValue<Sint16>( VST_PLUGIN_NAME );
-	writeString( pluginName() );
-
-	writeValue<Sint16>( VST_PLUGIN_VERSION );
-	writeValue<Sint32>( pluginVersion() );
-
-	writeValue<Sint16>( VST_PLUGIN_VENDOR_STRING );
-	writeString( pluginVendorString() );
-
-	writeValue<Sint16>( VST_PLUGIN_PRODUCT_STRING );
-	writeString( pluginProductString() );
-
-	writeValue<Sint16>( VST_PARAMETER_COUNT );
-	writeValue<Sint32>( (Sint32) m_plugin->numParams );
-
-	// tell client that we've done everything so far
-	writeValue<Sint16>( VST_INITIALIZATION_DONE );
-}
-
-
-
-
-VSTPlugin::~VSTPlugin()
-{
-	// acknowledge quit
-	writeValue<Sint16>( VST_QUIT_ACK );
-
 	if( m_window != NULL )
 	{
 		// notify GUI-thread
@@ -373,17 +280,105 @@ VSTPlugin::~VSTPlugin()
 
 	delete[] m_inputs;
 	delete[] m_outputs;
-
-	if( m_shm != NULL )
-	{
-		shmdt( m_shm );
-	}
 }
 
 
 
 
-bool VSTPlugin::load( const std::string & _plugin_file )
+bool remoteVstPlugin::processMessage( const message & _m )
+{
+	switch( _m.id )
+	{
+		case IdVstLoadPlugin:
+			init( _m.getString() );
+			break;
+
+		case IdShowUI:
+			showEditor();
+			break;
+
+		case IdVstSetTempo:
+			setBPM( _m.getInt() );
+			break;
+
+		case IdVstSetLanguage:
+			hlang = static_cast<VstHostLanguages>( _m.getInt() );
+			break;
+
+		case IdVstGetParameterDump:
+			getParameterDump();
+			break;
+
+		case IdVstSetParameterDump:
+			setParameterDump( _m );
+			break;
+
+		case IdVstGetParameterProperties:
+			getParameterProperties( _m.getInt() );
+			break;
+
+		default:
+			return remotePluginClient::processMessage( _m );
+	}
+	return true;
+}
+
+
+
+void remoteVstPlugin::init( const std::string & _plugin_file )
+{
+	if( load( _plugin_file ) == false )
+	{
+		sendMessage( IdVstFailedLoadingPlugin );
+		return;
+	}
+
+	updateInOutCount();
+
+	/* set program to zero */
+	/* i comment this out because it breaks dfx Geometer
+	 * looks like we cant set programs for it
+	 *
+	m_plugin->dispatcher( m_plugin, effSetProgram, 0, 0, NULL, 0.0f); */
+	// request rate and blocksize
+
+	m_plugin->dispatcher( m_plugin, effMainsChanged, 0, 1, NULL, 0.0f );
+
+
+	if( CreateThread( NULL, 0, guiEventLoop, this, 0, NULL ) == NULL )
+	{
+		fprintf( stderr, "could not create GUI-thread\n" );
+		return;
+	}
+	pthread_cond_wait( &m_windowStatusChange, &m_lock);
+
+
+	// now post some information about our plugin
+	sendMessage( message( IdVstPluginWindowID ).addInt( m_windowID ) );
+
+	if( m_windowID != 0 )
+	{
+		sendMessage( message( IdVstPluginEditorGeometry ).
+						addInt( m_windowWidth ).
+						addInt( m_windowHeight ) );
+	}
+
+	sendMessage( message( IdVstPluginName ).addString( pluginName() ) );
+	sendMessage( message( IdVstPluginVersion ).addInt( pluginVersion() ) );
+	sendMessage( message( IdVstPluginVendorString ).
+					addString( pluginVendorString() ) );
+	sendMessage( message( IdVstPluginProductString ).
+					addString( pluginProductString() ) );
+	sendMessage( message( IdVstParameterCount ).
+					addInt( m_plugin->numParams ) );
+
+	sendMessage( IdInitDone );
+}
+
+
+
+
+bool remoteVstPlugin::load( const std::string & _plugin_file )
 {
 	if( ( m_libInst = LoadLibraryA( _plugin_file.c_str() ) ) ==
 								NULL )
@@ -413,7 +408,8 @@ bool VSTPlugin::load( const std::string & _plugin_file )
 
 	if( m_plugin->magic != kEffectMagic )
 	{
-		lvsMessage( "%s is not a VST plugin\n", _plugin_file.c_str() );
+		fprintf( stderr, "%s is not a VST plugin\n",
+							_plugin_file.c_str() );
 	}
 
 	m_plugin->dispatcher( m_plugin, effOpen, 0, 0, 0, 0 );
@@ -423,7 +419,7 @@ bool VSTPlugin::load( const std::string & _plugin_file )
 
 
 
-void VSTPlugin::process( void )
+bool remoteVstPlugin::process( const sampleFrame * _in, sampleFrame * _out )
 {
 	// first we gonna post all MIDI-events we enqueued so far
 	if( m_midiEvents.size() )
@@ -440,7 +436,7 @@ void VSTPlugin::process( void )
 		VstEvents * events = (VstEvents *) event_buf;
 		events->reserved = 0;
 		events->numEvents = m_midiEvents.size();
-		Sint16 idx = 0;
+		int idx = 0;
 		for( std::list<VstMidiEvent>::iterator it =
 							m_midiEvents.begin();
 					it != m_midiEvents.end(); ++it, ++idx )
@@ -456,36 +452,33 @@ void VSTPlugin::process( void )
 
 	// now we're ready to fetch sound from VST-plugin
 
-	for( ch_cnt_t i = 0; i < inputCount(); ++i )
+	for( int i = 0; i < inputCount(); ++i )
 	{
-		m_inputs[i] = &m_shm[i * m_blockSize];
+		m_inputs[i] = &((float *) _in)[i * bufferSize()];
 	}
 
-	for( ch_cnt_t i = 0; i < outputCount(); ++i )
+	for( int i = 0; i < outputCount(); ++i )
 	{
-		m_outputs[i] = &m_shm[( i + inputCount() ) * m_blockSize];
-		memset( m_outputs[i], 0, m_blockSize * sizeof( float ) );
+		m_outputs[i] = &((float *) _out)[i * bufferSize()];
+		memset( m_outputs[i], 0, bufferSize() * sizeof( float ) );
 	}
 
 #ifdef OLD_VST_SDK
 	if( m_plugin->flags & effFlagsCanReplacing )
 	{
 #endif
-		m_plugin->processReplacing( m_plugin, m_inputs,
-							m_outputs,
-							m_blockSize );
+		m_plugin->processReplacing( m_plugin, m_inputs, m_outputs,
+								bufferSize() );
 #ifdef OLD_VST_SDK
 	}
 	else
 	{
 		m_plugin->process( m_plugin, m_inputs, m_outputs,
-							m_blockSize );
+								bufferSize() );
 	}
 #endif
 
-	m_currentSamplePos += m_blockSize;
-
-	writeValue<Sint16>( VST_PROCESS_DONE );
+	m_currentSamplePos += bufferSize();
 
 	// give plugin some idle-time for GUI-update and so on...
 	m_plugin->dispatcher( m_plugin, effEditIdle, 0, 0, NULL, 0 );
@@ -495,14 +488,14 @@ void VSTPlugin::process( void )
 
 
 
-void VSTPlugin::enqueueMidiEvent( const midiEvent & _event,
-						const f_cnt_t _frames_ahead )
+void remoteVstPlugin::processMidiEvent( const midiEvent & _event,
+							const f_cnt_t _offset )
 {
 	VstMidiEvent event;
 
 	event.type = kVstMidiType;
 	event.byteSize = 24;
-	event.deltaFrames = _frames_ahead;
+	event.deltaFrames = _offset;
 	event.flags = 0;
 	event.detune = 0;
 	event.noteLength = 0;
@@ -530,23 +523,7 @@ void VSTPlugin::enqueueMidiEvent( const midiEvent & _event,
 
 
 
-void VSTPlugin::setBlockSize( const fpp_t _bsize )
-{
-	if( _bsize == m_blockSize )
-	{
-		return;
-	}
-
-	m_blockSize = _bsize;
-	resizeSharedMemory();
-	m_plugin->dispatcher( m_plugin, effSetBlockSize, 0, _bsize, NULL,
-									0.0f );
-}
-
-
-
-
-const char * VSTPlugin::pluginName( void ) const
+const char * remoteVstPlugin::pluginName( void ) const
 {
 	static char buf[32];
 	buf[0] = 0;
@@ -558,7 +535,7 @@ const char * VSTPlugin::pluginName( void ) const
 
 
 
-const char * VSTPlugin::pluginVendorString( void ) const
+const char * remoteVstPlugin::pluginVendorString( void ) const
 {
 	static char buf[64];
 	buf[0] = 0;
@@ -570,7 +547,7 @@ const char * VSTPlugin::pluginVendorString( void ) const
 
 
 
-const char * VSTPlugin::pluginProductString( void ) const
+const char * remoteVstPlugin::pluginProductString( void ) const
 {
 	static char buf[64];
 	buf[0] = 0;
@@ -582,118 +559,100 @@ const char * VSTPlugin::pluginProductString( void ) const
 
 
 
-void VSTPlugin::getParameterDump( void ) const
+void remoteVstPlugin::getParameterDump( void )
 {
 	VstParameterProperties vst_props;
-	vstParameterDumpItem dump_item;
-	writeValue<Sint16>( VST_PARAMETER_DUMP );
-	writeValue<Sint32>( (Sint32) m_plugin->numParams );
-	for( Sint32 i = 0; i < m_plugin->numParams; ++i )
+	message m( IdVstParameterDump );
+	m.addInt( m_plugin->numParams );
+	for( int i = 0; i < m_plugin->numParams; ++i )
 	{
-		dump_item.index = i;
-		m_plugin->dispatcher( m_plugin, effGetParameterProperties, i, 0,
-							&vst_props, 0.0f );
-		memcpy( dump_item.shortLabel, vst_props.shortLabel,
-					sizeof( dump_item.shortLabel ) );
-		dump_item.value = m_plugin->getParameter( m_plugin, i );
-		writeValue<vstParameterDumpItem>( dump_item );
+		m_plugin->dispatcher( m_plugin, effGetParameterProperties, i,
+							0, &vst_props, 0.0f );
+		m.addInt( i );
+		m.addString( vst_props.shortLabel );
+		m.addFloat( m_plugin->getParameter( m_plugin, i ) );
+	}
+	sendMessage( m );
+}
+
+
+
+
+void remoteVstPlugin::setParameterDump( const message & _m )
+{
+	const int n = _m.getInt( 0 );
+	const int params = ( n > m_plugin->numParams ) ?
+					m_plugin->numParams : n;
+	int p = 0;
+	for( int i = 0; i < params; ++i )
+	{
+		vstParameterDumpItem item;
+		item.index = _m.getInt( ++p );
+		item.shortLabel = _m.getString( ++p );
+		item.value = _m.getFloat( ++p );
+		m_plugin->setParameter( m_plugin, item.index, item.value );
 	}
 }
 
 
 
 
-void VSTPlugin::setParameterDump( void )
+void remoteVstPlugin::getParameterProperties( const int _idx )
 {
-	const Sint32 sz = readValue<Sint32>();
-	const Sint32 params = ( sz > m_plugin->numParams ) ?
-					m_plugin->numParams : sz;
-	for( Sint32 i = 0; i < params; ++i )
-	{
-		vstParameterDumpItem dump_item =
-					readValue<vstParameterDumpItem>();
-		m_plugin->setParameter( m_plugin, dump_item.index,
-							dump_item.value );
-	}
-}
-
-
-
-
-void VSTPlugin::getParameterProperties( const Sint32 _idx )
-{
-	VstParameterProperties vst_props;
+	VstParameterProperties p;
 	m_plugin->dispatcher( m_plugin, effGetParameterProperties, _idx, 0,
-							&vst_props, 0.0f );
-	vstParamProperties props;
-	memcpy( props.label, vst_props.label, sizeof( props.label ) );
-	memcpy( props.shortLabel, vst_props.shortLabel,
-						sizeof( props.shortLabel) );
+								&p, 0.0f );
+	message m( IdVstParameterProperties );
+	m.addString( p.label );
+	m.addString( p.shortLabel );
+	m.addString(
 #if kVstVersion > 2
-	memcpy( props.categoryLabel, vst_props.categoryLabel,
-						sizeof( props.categoryLabel ) );
+			p.categoryLabel
+#else
+			""
 #endif
-	props.minValue = vst_props.minInteger;
-	props.maxValue = vst_props.maxInteger;
-	props.step = ( vst_props.flags & kVstParameterUsesFloatStep ) ?
-							vst_props.stepFloat :
-							vst_props.stepInteger;
+					);
+	m.addFloat( p.minInteger );
+	m.addFloat( p.maxInteger );
+	m.addFloat( ( p.flags & kVstParameterUsesFloatStep ) ?
+						p.stepFloat : p.stepInteger );
+	m.addInt(
 #if kVstVersion > 2
-	props.category = vst_props.category;
+			p.category
+#else
+			0
 #endif
-	writeValue<Sint16>( VST_PARAMETER_PROPERTIES );
-	writeValue<vstParamProperties>( props );
+				);
+	sendMessage( m );
 }
 
 
 
 
-void VSTPlugin::resizeSharedMemory( void )
+void remoteVstPlugin::updateInOutCount( void )
 {
 	delete[] m_inputs;
 	delete[] m_outputs;
 
-	size_t s = ( inputCount() + outputCount() ) * m_blockSize *
-								sizeof( float );
-	if( m_shm != NULL )
-	{
-		shmdt( m_shm );
-	}
-
-	int shm_id;
-	Uint16 shm_key = 0;
-	while( ( shm_id = shmget( ++shm_key, s, IPC_CREAT | IPC_EXCL |
-								0600 ) ) == -1 )
-	{
-	}
-
-	m_shm = (float *) shmat( shm_id, 0, 0 );
+	setInputCount( inputCount() );
+	setOutputCount( outputCount() );
 
 	if( inputCount() > 0 )
 	{
 		m_inputs = new float * [inputCount()];
 	}
+
 	if( outputCount() > 0 )
 	{
 		m_outputs = new float * [outputCount()];
 	}
-
-	writeValue<Sint16>( VST_INPUT_COUNT );
-	writeValue<ch_cnt_t>( inputCount() );
-
-	writeValue<Sint16>( VST_OUTPUT_COUNT );
-	writeValue<ch_cnt_t>( outputCount() );
-
-	writeValue<Sint16>( VST_SHM_KEY_AND_SIZE );
-	writeValue<Uint16>( shm_key );
-	writeValue<Uint32>( s );
 }
 
 
 
 #define DEBUG_CALLBACKS
 #ifdef DEBUG_CALLBACKS
-#define SHOW_CALLBACK lvsMessage 
+#define SHOW_CALLBACK printf
 #else
 #define SHOW_CALLBACK(...)
 #endif
@@ -706,7 +665,7 @@ void VSTPlugin::resizeSharedMemory( void )
  * - audioMasterGetDirectory: return either VST-plugin-dir or LMMS-workingdir
  * - audioMasterOpenFileSelector: show QFileDialog?
  */
-VstIntPtr VSTPlugin::hostCallback( AEffect * _effect, VstInt32 _opcode,
+VstIntPtr remoteVstPlugin::hostCallback( AEffect * _effect, VstInt32 _opcode,
 					VstInt32 _index, VstIntPtr _value,
 						void * _ptr, float _opt )
 {
@@ -756,10 +715,10 @@ VstIntPtr VSTPlugin::hostCallback( AEffect * _effect, VstInt32 _opcode,
 
 			memset( &_timeInfo, 0, sizeof( _timeInfo ) );
 
-			_timeInfo.samplePos = plugin->m_currentSamplePos;
-			_timeInfo.sampleRate = plugin->m_sampleRate;
+			_timeInfo.samplePos = __plugin->m_currentSamplePos;
+			_timeInfo.sampleRate = __plugin->sampleRate();
 			_timeInfo.flags = 0;
-			_timeInfo.tempo = plugin->m_bpm;
+			_timeInfo.tempo = __plugin->m_bpm;
 			_timeInfo.timeSigNumerator = 4;
 			_timeInfo.timeSigDenominator = 4;
 			_timeInfo.flags |= (/* kVstBarsValid|*/kVstTempoValid );
@@ -773,7 +732,7 @@ VstIntPtr VSTPlugin::hostCallback( AEffect * _effect, VstInt32 _opcode,
 			return( 0 );
 
 		case audioMasterIOChanged:
-			plugin->resizeSharedMemory();
+			__plugin->updateInOutCount();
 			//SHOW_CALLBACK( "amc: audioMasterIOChanged\n" );
 			// numInputs and/or numOutputs has changed
 			return( 0 );
@@ -792,7 +751,7 @@ VstIntPtr VSTPlugin::hostCallback( AEffect * _effect, VstInt32 _opcode,
 
 		case audioMasterTempoAt:
 			//SHOW_CALLBACK( "amc: audioMasterTempoAt\n" );
-			return( plugin->m_bpm * 10000 );
+			return( __plugin->m_bpm * 10000 );
 
 		case audioMasterGetNumAutomatableParameters:
 			SHOW_CALLBACK( "amc: audioMasterGetNumAutomatable"
@@ -864,36 +823,37 @@ VstIntPtr VSTPlugin::hostCallback( AEffect * _effect, VstInt32 _opcode,
 
 		case audioMasterSizeWindow:
 			//SHOW_CALLBACK( "amc: audioMasterSizeWindow\n" );
-			if( plugin->m_window == 0 )
+			if( __plugin->m_window == 0 )
 			{
 				return( 0 );
 			}
-			plugin->m_windowWidth = _index;
-			plugin->m_windowHeight = _value;
-			SetWindowPos( plugin->m_window, 0, 0, 0,
+			__plugin->m_windowWidth = _index;
+			__plugin->m_windowHeight = _value;
+			SetWindowPos( __plugin->m_window, 0, 0, 0,
 					_index + 8, _value + 26,
 					SWP_NOACTIVATE | SWP_NOMOVE |
 					SWP_NOOWNERZORDER | SWP_NOZORDER );
-			writeValue<Sint16>( VST_PLUGIN_EDITOR_GEOMETRY );
-			writeValue<Sint16>( plugin->m_windowWidth );
-			writeValue<Sint16>( plugin->m_windowHeight );
+			__plugin->sendMessage(
+				message( IdVstPluginEditorGeometry ).
+					addInt( __plugin->m_windowWidth ).
+					addInt( __plugin->m_windowHeight ) );
 			return( 1 );
 
 		case audioMasterGetSampleRate:
 			//SHOW_CALLBACK( "amc: audioMasterGetSampleRate\n" );
-			return( plugin->m_sampleRate );
+			return( __plugin->sampleRate() );
 
 		case audioMasterGetBlockSize:
 			//SHOW_CALLBACK( "amc: audioMasterGetBlockSize\n" );
-			return( plugin->m_blockSize );
+			return( __plugin->bufferSize() );
 
 		case audioMasterGetInputLatency:
 			//SHOW_CALLBACK( "amc: audioMasterGetInputLatency\n" );
-			return( plugin->m_blockSize );
+			return( __plugin->bufferSize() );
 
 		case audioMasterGetOutputLatency:
 			//SHOW_CALLBACK( "amc: audioMasterGetOutputLatency\n" );
-			return( plugin->m_blockSize );
+			return( __plugin->bufferSize() );
 
 		case audioMasterGetCurrentProcessLevel:
 			SHOW_CALLBACK( "amc: audioMasterGetCurrentProcess"
@@ -1019,16 +979,16 @@ VstIntPtr VSTPlugin::hostCallback( AEffect * _effect, VstInt32 _opcode,
 
 
 
-DWORD WINAPI VSTPlugin::guiEventLoop( LPVOID _param )
+DWORD WINAPI remoteVstPlugin::guiEventLoop( LPVOID _param )
 {
-	VSTPlugin * _this = static_cast<VSTPlugin *>( _param );
+	remoteVstPlugin * _this = static_cast<remoteVstPlugin *>( _param );
 	_this->m_guiThreadID = GetCurrentThreadId();
 
 	// "guard point" to trap errors that occur during plugin loading
 #ifdef LMMS_HAVE_TLS
 	if( sigsetjmp( ejmpbuf, 1 ) )
 	{
-		lvsMessage( "creating the editor for %s failed",
+		fprintf( stderr, "creating the editor for %s failed\n",
 						_this->m_shortName.c_str() );
 		pthread_cond_signal( &_this->m_windowStatusChange );
 		return( 1 );
@@ -1064,7 +1024,7 @@ DWORD WINAPI VSTPlugin::guiEventLoop( LPVOID _param )
 	HMODULE hInst = GetModuleHandleA( NULL );
 	if( hInst == NULL )
 	{
-		lvsMessage( "can't get module handle" );
+		fprintf( stderr, "can't get module handle\n" );
 		pthread_cond_signal( &_this->m_windowStatusChange );
 		return( 1 );
 	}
@@ -1075,14 +1035,14 @@ DWORD WINAPI VSTPlugin::guiEventLoop( LPVOID _param )
 					 		~WS_MAXIMIZEBOX ),
 			       0, 0, 1, 1, NULL, NULL, hInst, NULL ) ) == NULL )
 	{
-		lvsMessage( "cannot create editor window" );
+		fprintf( stderr, "cannot create editor window\n" );
 		pthread_cond_signal( &_this->m_windowStatusChange );
 		return( 1 );
 	}
 	ShowWindow( _this->m_window, SW_SHOWMINIMIZED );
 	ShowWindow( _this->m_window, SW_HIDE );
 
-	_this->m_windowXID = (Sint32) GetPropA( _this->m_window,
+	_this->m_windowID = (Sint32) GetPropA( _this->m_window,
 						"__wine_x11_whole_window" );
 
 
@@ -1148,13 +1108,25 @@ DWORD WINAPI VSTPlugin::guiEventLoop( LPVOID _param )
 
 
 
-int main( void ) 
+int main( int _argc, char * * _argv ) 
 {
+	if( _argc < 3 )
+	{
+		fprintf( stderr, "not enough arguments\n" );
+		return( -1 );
+	}
+
+#ifdef LMMS_BUILD_WIN32
+	// (non-portable) initialization of statically linked pthread library
+	pthread_win32_process_attach_np();
+	pthread_win32_thread_attach_np();
+#endif
+
 	// WINE-startup
 	HMODULE hInst = GetModuleHandleA( NULL );
 	if( hInst == NULL )
 	{
-		lvsMessage( "can't get module handle" );
+		fprintf( stderr, "can't get module handle\n" );
 		return( -1 );
 	}
 
@@ -1182,84 +1154,28 @@ int main( void )
 				sched_get_priority_min( SCHED_FIFO ) ) / 2;
 	if( sched_setscheduler( 0, SCHED_FIFO, &sparam ) == -1 )
 	{
-		lvsMessage( "could not set realtime priority for VST-server" );
+		fprintf( stderr, "could not set realtime priority for "
+							"remoteVstPlugin\n" );
 	}
 #endif
 
-	Sint16 cmd;
-	while( ( cmd = readValue<Sint16>() ) != VST_CLOSE_PLUGIN )
-	{
-		switch( cmd )
-		{
-			case VST_LOAD_PLUGIN:
-				plugin = new VSTPlugin();
-				plugin->init( readString() );
-				break;
+	__plugin = new remoteVstPlugin( atoi( _argv[1] ), atoi( _argv[2] ) );
 
-			case VST_SHOW_EDITOR:
-				plugin->showEditor();
-				break;
-
-			case VST_PROCESS:
-				plugin->process();
-				break;
-
-			case VST_ENQUEUE_MIDI_EVENT:
-			{
-				MidiEventTypes type =
-						readValue<MidiEventTypes>();
-				Sint8 channel = readValue<Sint8>();
-				Uint16 param1 = readValue<Uint16>();
-				Uint16 param2 = readValue<Uint16>();
-				const midiEvent ev = midiEvent( type, channel,
-							param1, param2 );
-
-				const f_cnt_t fr_ahead = readValue<f_cnt_t>();
-				plugin->enqueueMidiEvent( ev, fr_ahead );
-				break;
-			}
-
-			case VST_SAMPLE_RATE:
-				plugin->setSampleRate(
-						readValue<sample_rate_t>() );
-				break;
-
-
-			case VST_BUFFER_SIZE:
-				plugin->setBlockSize( readValue<fpp_t>() );
-				break;
-
-			case VST_BPM:
-				plugin->setBPM( readValue<bpm_t>() );
-				break;
-
-			case VST_LANGUAGE:
-				hlang = readValue<hostLanguages>();
-				break;
-
-			case VST_GET_PARAMETER_DUMP:
-				plugin->getParameterDump();
-				break;
-
-			case VST_SET_PARAMETER_DUMP:
-				plugin->setParameterDump();
-				break;
-
-			case VST_GET_PARAMETER_PROPERTIES:
-				plugin->getParameterProperties(
-							readValue<Sint32>() );
-				break;
-
-			default:
-				lvsMessage( "unhandled message: %d\n",
-								(int) cmd );
-				break;
-		}
+	remotePluginClient::message m;
+	while( ( m = __plugin->receiveMessage() ).id != IdQuit )
+        {
+		__plugin->processMessage( m );
 	}
 
-	delete plugin;
+	delete __plugin;
 
-	return( 0 );
+
+#ifdef LMMS_BUILD_WIN32
+	pthread_win32_thread_detach_np();
+	pthread_win32_process_detach_np();
+#endif
+
+	return 0;
 
 }
 

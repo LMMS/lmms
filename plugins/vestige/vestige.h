@@ -40,7 +40,7 @@ class QPixmap;
 class QPushButton;
 
 class pixmapButton;
-class remoteVSTPlugin;
+class vstPlugin;
 
 
 class vestigeInstrument : public instrument
@@ -90,7 +90,7 @@ private:
 	int m_runningNotes[NumKeys];
 
 
-	remoteVSTPlugin * m_plugin;
+	vstPlugin * m_plugin;
 	QMutex m_pluginMutex;
 
 	QString m_pluginDLL;

@@ -125,20 +125,20 @@ bool vstEffect::processAudioBuffer( sampleFrame * _buf, const fpp_t _frames )
 void vstEffect::openPlugin( const QString & _plugin )
 {
 	textFloat * tf = textFloat::displayMessage(
-		remoteVSTPlugin::tr( "Loading plugin" ),
-		remoteVSTPlugin::tr(
+		vstPlugin::tr( "Loading plugin" ),
+		vstPlugin::tr(
 				"Please wait while loading VST-plugin..." ),
 			PLUGIN_NAME::getIconPixmap( "logo", 24, 24 ), 0 );
 	m_pluginMutex.lock();
-	m_plugin = new remoteVSTPlugin( _plugin );
+	m_plugin = new vstPlugin( _plugin );
 	if( m_plugin->failed() )
 	{
 		m_pluginMutex.unlock();
 		closePlugin();
 		delete tf;
 		QMessageBox::information( NULL,
-			remoteVSTPlugin::tr( "Failed loading VST-plugin" ),
-			remoteVSTPlugin::tr( "The VST-plugin %1 could not "
+			vstPlugin::tr( "Failed loading VST-plugin" ),
+			vstPlugin::tr( "The VST-plugin %1 could not "
 					"be loaded for some reason.\n"
 					"If it runs with other VST-"
 					"software under Linux, please "
@@ -147,7 +147,7 @@ void vstEffect::openPlugin( const QString & _plugin )
 						QMessageBox::Ok );
 		return;
 	}
-	remoteVSTPlugin::connect( engine::getSong(),
+	vstPlugin::connect( engine::getSong(),
 				SIGNAL( tempoChanged( bpm_t ) ),
 			 m_plugin, SLOT( setTempo( bpm_t ) ) );
 	m_plugin->setTempo( engine::getSong()->getTempo() );

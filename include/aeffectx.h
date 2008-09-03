@@ -118,7 +118,7 @@ int kVstTempoValid = 1 << 10;
 int kVstTransportPlaying = 1 << 1;
 
 
-class VSTPlugin;
+class remoteVstPlugin;
 
 
 class VstMidiEvent
@@ -221,7 +221,7 @@ public:
 	// flags 24-27
 	int flags;
 	// Fill somewhere 28-2b
-	VSTPlugin * user;
+	remoteVstPlugin * user;
 	// Zeroes 2c-2f 30-33 34-37 38-3b
 	char empty3[4 + 4 + 4 + 4];
 	// 1.0f 3c-3f

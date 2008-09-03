@@ -1,5 +1,5 @@
 /*
- * lvsl_client.cpp - client for LVSL Server
+ * vst_plugin.cpp - implementation of vstPlugin class
  *
  * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
@@ -23,49 +23,16 @@
  */
 
 
-#include "lvsl_client.h"
-#include "lmmsconfig.h"
+#include "vst_plugin.h"
 
-#include <QtCore/QCoreApplication>
 #include <QtCore/QDir>
-#include <QtCore/QEventLoop>
+#include <QtCore/QFileInfo>
 #include <QtCore/QLocale>
-#include <QtCore/QTime>
 #include <QtGui/QMdiArea>
 #include <QtGui/QMdiSubWindow>
 #include <QtGui/QX11EmbedContainer>
 #include <QtGui/QX11Info>
 #include <QtXml/QDomDocument>
-
-#ifdef LMMS_HAVE_UNISTD_H
-#include <unistd.h>
-#endif
-
-#ifdef LMMS_HAVE_SIGNAL_H
-#include <signal.h>
-#endif
-
-#include <cstdio>
-
-#ifdef LMMS_HAVE_SYS_IPC_H
-#include <sys/ipc.h>
-#endif
-
-#ifdef LMMS_HAVE_SYS_SHM_H
-#include <sys/shm.h>
-#endif
-
-#ifdef LMMS_HAVE_SYS_SELECT_H
-#include <sys/select.h>
-#endif
-
-#ifdef LMMS_HAVE_SYS_TIME_H
-#include <sys/time.h>
-#endif
-
-#ifdef LMMS_HAVE_SYS_WAIT_H
-#include <sys/wait.h>
-#endif
 
 
 #include "config_mgr.h"
@@ -76,54 +43,23 @@
 
 
 
-remoteVSTPlugin::remoteVSTPlugin( const QString & _plugin ) :
+vstPlugin::vstPlugin( const QString & _plugin ) :
 	QObject(),
-	m_failed( TRUE ),
+	journallingObject(),
+	remotePlugin( "remote_vst_plugin", false ),
 	m_plugin( _plugin ),
 	m_pluginWidget( NULL ),
-	m_pluginXID( 0 ),
-	m_pluginPID( -1 ),
-	m_serverInFD( -1 ),
-	m_serverOutFD( -1 ),
-	m_serverMutex(),
+	m_pluginWindowID( 0 ),
 	m_name( "" ),
 	m_version( 0 ),
 	m_vendorString( "" ),
-	m_productString( "" ),
-	m_inputCount( 0 ),
-	m_outputCount( 0 ),
-	m_shmID( -1 ),
-	m_shm( NULL ),
-	m_shmSize( 0 ),
-	m_initialized( FALSE )
+	m_productString( "" )
 {
-	pipe( m_pipes[0] );
-	pipe( m_pipes[1] );
-
-	if( ( m_pluginPID = fork() ) < 0 )
-	{
-		printf( "fork() failed!\n" );
-		return;
-	}
-	else if( m_pluginPID == 0 )
-	{
-		dup2( m_pipes[0][0], 0 );
-		dup2( m_pipes[1][1], 1 );
-		QString lvsl_server_exec = configManager::inst()->pluginDir() +
-							QDir::separator() +
-								"lvsl_server";
-		execlp( lvsl_server_exec.toAscii().constData(),
-					lvsl_server_exec.toAscii().constData(),
-									NULL );
-		exit( 0 );
-	}
-	m_serverInFD = m_pipes[1][0];
-	m_serverOutFD = m_pipes[0][1];
+	setSplittedChannels( true );
 
 	lock();
 
-	writeValueS<Sint16>( VST_LANGUAGE );
-	hostLanguages hlang = LanguageEnglish;
+	VstHostLanguages hlang = LanguageEnglish;
 	switch( QLocale::system().language() )
 	{
 		case QLocale::German: hlang = LanguageGerman; break;
@@ -133,7 +69,8 @@ remoteVSTPlugin::remoteVSTPlugin( const QString & _plugin ) :
 		case QLocale::Japanese: hlang = LanguageJapanese; break;
 		default: break;
 	}
-	writeValueS<hostLanguages>( hlang );
+	sendMessage( message( IdVstSetLanguage ).addInt( hlang ) );
+
 
 	QString p = m_plugin;
 	if( QFileInfo( p ).dir().isRelative() )
@@ -141,81 +78,31 @@ remoteVSTPlugin::remoteVSTPlugin( const QString & _plugin ) :
 		p = configManager::inst()->vstDir() + QDir::separator() + p;
 	}
 
-	writeValueS<Sint16>( VST_LOAD_PLUGIN );
-	writeStringS( p.toAscii().constData() );
+	sendMessage( message( IdVstLoadPlugin ).addString( p.toStdString() ) );
+
+	waitForInitDone();
+
 	unlock();
-
-	while( 1 )
-	{
-		Sint16 cmd = VST_UNDEFINED_CMD;
-		if( messagesLeft() == TRUE )
-		{
-			cmd = processNextMessage();
-		}
-		if( cmd == VST_INITIALIZATION_DONE )
-		{
-			m_failed = FALSE;
-			break;
-		}
-		else if( cmd == VST_FAILED_LOADING_PLUGIN )
-		{
-			break;
-		}
-		QCoreApplication::processEvents( QEventLoop::AllEvents, 50 );
-	}
 }
 
 
 
 
-remoteVSTPlugin::~remoteVSTPlugin()
+vstPlugin::~vstPlugin()
 {
-	if( m_failed == FALSE )
+	if( m_pluginWidget != NULL &&
+		m_pluginWidget->parentWidget() != NULL &&
+		dynamic_cast<QMdiSubWindow *>(
+			m_pluginWidget->parentWidget() ) != NULL )
 	{
-		setShmKeyAndSize( 0, 0 );
-		// tell server to quit and wait for acknowledge
-		writeValueS<Sint16>( VST_CLOSE_PLUGIN );
-		QTime t;
-		t.start();
-		while( t.elapsed() < 1000 )
-		{
-			if( messagesLeft() == TRUE &&
-					processNextMessage() == VST_QUIT_ACK )
-			{
-				//m_pluginPID = 0;
-				break;
-			}
-		}
-		if( m_pluginWidget != NULL &&
-			m_pluginWidget->parentWidget() != NULL &&
-			dynamic_cast<QMdiSubWindow *>(
-				m_pluginWidget->parentWidget() ) != NULL )
-		{
-			delete m_pluginWidget->parentWidget();
-		}
-		// timeout?
-/*		if( m_pluginPID != 0 )
-		{*/
-			kill( m_pluginPID, SIGTERM );
-			kill( m_pluginPID, SIGKILL );
-		//}
-		// remove process from PCB
-		waitpid( m_pluginPID, NULL, 0 );
-
-		// close all sides of our pipes
-		close( m_pipes[0][0] );
-		close( m_pipes[0][1] );
-		close( m_pipes[1][0] );
-		close( m_pipes[1][1] );
-/*		close( m_serverInFD );
-		close( m_serverOutFD );*/
+		delete m_pluginWidget->parentWidget();
 	}
 }
 
 
 
 
-QWidget * remoteVSTPlugin::showEditor( QWidget * _parent )
+QWidget * vstPlugin::showEditor( QWidget * _parent )
 {
 	if( m_pluginWidget != NULL )
 	{
@@ -226,7 +113,7 @@ QWidget * remoteVSTPlugin::showEditor( QWidget * _parent )
 		return( m_pluginWidget );
 	}
 
-	if( m_pluginXID == 0 )
+	if( m_pluginWindowID == 0 )
 	{
 		return( NULL );
 	}
@@ -236,20 +123,22 @@ QWidget * remoteVSTPlugin::showEditor( QWidget * _parent )
 	m_pluginWidget->setWindowTitle( name() );
 	if( _parent == NULL )
 	{
-		engine::getMainWindow()->workspace()->addSubWindow( m_pluginWidget )
+		engine::getMainWindow()->workspace()->addSubWindow(
+							m_pluginWidget )
 				->setAttribute( Qt::WA_DeleteOnClose, FALSE );
 	}
 
+#ifdef LMMS_BUILD_LINUX
 	QX11EmbedContainer * xe = new QX11EmbedContainer( m_pluginWidget );
-	xe->embedClient( m_pluginXID );
+	xe->embedClient( m_pluginWindowID );
 	xe->setFixedSize( m_pluginGeometry );
 	//xe->setAutoDelete( FALSE );
 	xe->show();
+#endif
+
 	m_pluginWidget->show();
 
-	lock();
-	writeValueS<Sint16>( VST_SHOW_EDITOR );
-	unlock();
+	showUI();
 
 	return( m_pluginWidget );
 }
@@ -257,7 +146,7 @@ QWidget * remoteVSTPlugin::showEditor( QWidget * _parent )
 
 
 
-void remoteVSTPlugin::hideEditor( void )
+void vstPlugin::hideEditor( void )
 {
 	if( m_pluginWidget != NULL && m_pluginWidget->parentWidget() )
 	{
@@ -268,116 +157,7 @@ void remoteVSTPlugin::hideEditor( void )
 
 
 
-bool remoteVSTPlugin::process( const sampleFrame * _in_buf,
-					sampleFrame * _out_buf, bool _wait )
-{
-	const fpp_t frames = engine::getMixer()->framesPerPeriod();
-
-	if( m_shm == NULL )
-	{
-		// m_shm being zero means we didn't initialize everything so
-		// far so process one message each time (and hope we get
-		// information like SHM-key etc.) until we process messages
-		// in a later stage of this procedure
-		if( m_shmSize == 0 && messagesLeft() == TRUE )
-		{
-			(void) processNextMessage();
-		}
-		if( _out_buf != NULL )
-		{
-			engine::getMixer()->clearAudioBuffer( _out_buf,
-								frames );
-		}
-		return( FALSE );
-	}
-
-	memset( m_shm, 0, m_shmSize );
-
-	ch_cnt_t inputs = tMax<ch_cnt_t>( m_inputCount, DEFAULT_CHANNELS );
-
-	if( _in_buf != NULL && inputs > 0 )
-	{
-		for( ch_cnt_t ch = 0; ch < inputs; ++ch )
-		{
-			for( fpp_t frame = 0; frame < frames; ++frame )
-			{
-				m_shm[ch * frames + frame] = _in_buf[frame][ch];
-			}
-		}
-	}
-
-	lock();
-	writeValueS<Sint16>( VST_PROCESS );
-	unlock();
-
-	m_initialized = TRUE;
-	if( _wait )
-	{
-		waitForProcessingFinished( _out_buf );
-	}
-	return( TRUE );
-}
-
-
-
-
-bool remoteVSTPlugin::waitForProcessingFinished( sampleFrame * _out_buf )
-{
-	if( !m_initialized || _out_buf == NULL || m_outputCount == 0 )
-	{
-		return( FALSE );
-	}
-
-	// wait until server signals that process()ing is done
-	while( processNextMessage() != VST_PROCESS_DONE )
-	{
-		// hopefully scheduler gives process-time to plugin...
-		usleep( 10 );
-	}
-
-	const fpp_t frames = engine::getMixer()->framesPerPeriod();
-	const ch_cnt_t outputs = tMax<ch_cnt_t>( m_outputCount,
-							DEFAULT_CHANNELS );
-	if( outputs != DEFAULT_CHANNELS )
-	{
-		// clear buffer, if plugin didn't fill up both channels
-		engine::getMixer()->clearAudioBuffer( _out_buf, frames );
-	}
-
-	for( ch_cnt_t ch = 0; ch < outputs; ++ch )
-	{
-		for( fpp_t frame = 0; frame < frames; ++frame )
-		{
-			_out_buf[frame][ch] = m_shm[( m_inputCount + ch ) *
-								frames + frame];
-		}
-	}
-
-	return( TRUE );
-}
-
-
-
-
-void remoteVSTPlugin::enqueueMidiEvent( const midiEvent & _event,
-						const f_cnt_t _frames_ahead )
-{
-	lock();
-	writeValueS<Sint16>( VST_ENQUEUE_MIDI_EVENT );
-
-	writeValueS<MidiEventTypes>( _event.m_type );
-	writeValueS<Sint8>( _event.m_channel );
-	writeValueS<Uint16>( _event.m_data.m_param[0] );
-	writeValueS<Uint16>( _event.m_data.m_param[1] );
-
-	writeValueS<f_cnt_t>( _frames_ahead );
-	unlock();
-}
-
-
-
-
-void remoteVSTPlugin::loadSettings( const QDomElement & _this )
+void vstPlugin::loadSettings( const QDomElement & _this )
 {
 	if( pluginWidget() != NULL )
 	{
@@ -407,7 +187,7 @@ void remoteVSTPlugin::loadSettings( const QDomElement & _this )
 
 
 
-void remoteVSTPlugin::saveSettings( QDomDocument & _doc, QDomElement & _this )
+void vstPlugin::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
 	if( pluginWidget() != NULL )
 	{
@@ -425,36 +205,31 @@ void remoteVSTPlugin::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 
 
-void remoteVSTPlugin::setTempo( bpm_t _bpm )
+void vstPlugin::setTempo( bpm_t _bpm )
 {
 	lock();
-	writeValueS<Sint16>( VST_BPM );
-	writeValueS<bpm_t>( _bpm );
+	sendMessage( message( IdVstSetTempo ).addInt( _bpm ) );
 	unlock();
 }
 
 
 
 
-void remoteVSTPlugin::updateSampleRate( void )
+void vstPlugin::updateSampleRate( void )
 {
 	lock();
-	writeValueS<Sint16>( VST_SAMPLE_RATE );
-	writeValueS<sample_rate_t>(
-				engine::getMixer()->processingSampleRate() );
+	sendMessage( message( IdSampleRateInformation ).
+			addInt( engine::getMixer()->processingSampleRate() ) );
 	unlock();
 }
 
 
 
 
-const QMap<QString, QString> & remoteVSTPlugin::parameterDump( void )
+const QMap<QString, QString> & vstPlugin::parameterDump( void )
 {
-	writeValueS<Sint16>( VST_GET_PARAMETER_DUMP );
-
-	while( processNextMessage() != VST_PARAMETER_DUMP )
-	{
-	}
+	sendMessage( IdVstGetParameterDump );
+	waitForMessage( IdVstParameterDump );
 
 	return( m_parameterDump );
 }
@@ -462,127 +237,43 @@ const QMap<QString, QString> & remoteVSTPlugin::parameterDump( void )
 
 
 
-void remoteVSTPlugin::setParameterDump( const QMap<QString, QString> & _pdump )
+void vstPlugin::setParameterDump( const QMap<QString, QString> & _pdump )
 {
-	writeValueS<Sint16>( VST_SET_PARAMETER_DUMP );
-	writeValueS<Sint32>( _pdump.size() );
+	message m( IdVstSetParameterDump );
+	m.addInt( _pdump.size() );
 	for( QMap<QString, QString>::const_iterator it = _pdump.begin();
 						it != _pdump.end(); ++it )
 	{
-		const vstParameterDumpItem dump_item =
+		const vstParameterDumpItem item =
 		{
 			( *it ).section( ':', 0, 0 ).toInt(),
 			"",
 			( *it ).section( ':', 1, 1 ).toFloat()
 		} ;
-		writeValueS<vstParameterDumpItem>( dump_item );
+		m.addInt( item.index );
+		m.addString( item.shortLabel );
+		m.addFloat( item.value );
 	}
-}
-
-
-
-
-void remoteVSTPlugin::setShmKeyAndSize( Uint16 _key, size_t _size )
-{
-	if( m_shm != NULL && m_shmSize > 0 )
-	{
-		shmdt( m_shm );
-		m_shm = NULL;
-		m_shmSize = 0;
-	}
-
-	// only called for detaching SHM?
-	if( _size == 0 )
-	{
-		return;
-	}
-
-	int shm_id = shmget( _key, _size, 0 );
-	if( shm_id == -1 )
-	{
-		printf( "failed getting shared memory\n" );
-	}
-	else
-	{
-		m_shm = (float *) shmat( shm_id, 0, 0 );
-		// TODO: error-checking
-	}
-}
-
-
-
-
-bool remoteVSTPlugin::messagesLeft( void ) const
-{
-	fd_set rfds;
-	FD_ZERO( &rfds );
-	FD_SET( m_serverInFD, &rfds );
-	timeval tv;
-	tv.tv_sec = 0;
-	tv.tv_usec = 1;	// can we use 0 here?
-	return( select( m_serverInFD + 1, &rfds, NULL, NULL, &tv ) > 0 );
-}
-
-
-
-
-Sint16 remoteVSTPlugin::processNextMessage( void )
-{
-	fd_set rfds;
-	FD_ZERO( &rfds );
-	FD_SET( m_serverInFD, &rfds );
-	if( select( m_serverInFD + 1, &rfds, NULL, NULL, NULL ) <= 0 )
-	{
-		return( VST_UNDEFINED_CMD );
-	}
-
 	lock();
-	Sint16 cmd = readValueS<Sint16>();
-	switch( cmd )
+	sendMessage( m );
+	unlock();
+}
+
+
+
+
+bool vstPlugin::processMessage( const message & _m )
+{
+	switch( _m.id )
 	{
-		case VST_DEBUG_MSG:
-			printf( "debug message from server: %s\n",
-						readStringS().c_str() );
+		case IdVstPluginWindowID:
+			m_pluginWindowID = _m.getInt();
 			break;
 
-		case VST_GET_SAMPLE_RATE:
-			writeValueS<Sint16>( VST_SAMPLE_RATE );
-			// handle is the same
-			writeValueS<sample_rate_t>(
-				engine::getMixer()->processingSampleRate() );
-			break;
-
-		case VST_GET_BUFFER_SIZE:
-			writeValueS<Sint16>( VST_BUFFER_SIZE );
-			// handle is the same
-			writeValueS<fpp_t>(
-				engine::getMixer()->framesPerPeriod() );
-			break;
-
-		case VST_SHM_KEY_AND_SIZE:
+		case IdVstPluginEditorGeometry:
 		{
-			Uint16 shm_key = readValueS<Uint16>();
-			size_t shm_size = readValueS<Uint32>();
-			setShmKeyAndSize( shm_key, shm_size );
-			break;
-		}
-
-		case VST_INPUT_COUNT:
-			m_inputCount = readValueS<ch_cnt_t>();
-			break;
-
-		case VST_OUTPUT_COUNT:
-			m_outputCount = readValueS<ch_cnt_t>();
-			break;
-
-		case VST_PLUGIN_XID:
-			m_pluginXID = readValueS<Sint32>();
-			break;
-
-		case VST_PLUGIN_EDITOR_GEOMETRY:
-		{
-			const Sint16 w = readValueS<Sint16>();
-			const Sint16 h = readValueS<Sint16>();
+			const int w = _m.getInt( 0 );
+			const int h = _m.getInt( 1 );
 			m_pluginGeometry = QSize( w, h );
 			if( m_pluginWidget != NULL )
 			{
@@ -598,50 +289,48 @@ Sint16 remoteVSTPlugin::processNextMessage( void )
 			break;
 		}
 
-		case VST_PLUGIN_NAME:
-			m_name = readStringS().c_str();
+		case IdVstPluginName:
+			m_name = _m.getQString();
 			break;
 
-		case VST_PLUGIN_VERSION:
-			m_version = readValueS<Sint32>();
+		case IdVstPluginVersion:
+			m_version = _m.getInt();
 			break;
 
-		case VST_PLUGIN_VENDOR_STRING:
-			m_vendorString = readStringS().c_str();
+		case IdVstPluginVendorString:
+			m_vendorString = _m.getQString();
 			break;
 
-		case VST_PLUGIN_PRODUCT_STRING:
-			m_productString = readStringS().c_str();
+		case IdVstPluginProductString:
+			m_productString = _m.getQString();
 			break;
 
-		case VST_PARAMETER_DUMP:
+		case IdVstParameterDump:
 		{
 			m_parameterDump.clear();
-			const Sint32 num_params = readValueS<Sint32>();
-			for( Sint32 i = 0; i < num_params; ++i )
+			const int num_params = _m.getInt();
+			int p = 0;
+			for( int i = 0; i < num_params; ++i )
 			{
-				vstParameterDumpItem dump_item =
-					readValueS<vstParameterDumpItem>();
-	m_parameterDump["param" + QString::number( dump_item.index )] =
-				QString::number( dump_item.index ) + ":" +
-//					QString( dump_item.shortLabel ) + ":" +
-					QString::number( dump_item.value );
+				vstParameterDumpItem item;
+				item.index = _m.getInt( ++p );
+				item.shortLabel = _m.getString( ++p );
+				item.value = _m.getFloat( ++p );
+	m_parameterDump["param" + QString::number( item.index )] =
+				QString::number( item.index ) + ":" +
+//					QString( item.shortLabel ) + ":" +
+					QString::number( item.value );
 			}
 			break;
 		}
-
-		case VST_PROCESS_DONE:
-		case VST_QUIT_ACK:
-		case VST_UNDEFINED_CMD:
 		default:
-			break;
+			return remotePlugin::processMessage( _m );
 	}
-	unlock();
+	return true;
 
-	return( cmd );
 }
 
 
 
-#include "moc_lvsl_client.cxx"
+#include "moc_vst_plugin.cxx"
 

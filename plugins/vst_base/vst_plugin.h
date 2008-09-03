@@ -1,5 +1,5 @@
 /*
- * lvsl_client.h - client for LVSL Server
+ * vst_plugin.h - declaration of vstPlugin class
  *
  * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
@@ -23,26 +23,28 @@
  */
 
 
-#ifndef _LVSL_CLIENT_H
-#define _LVSL_CLIENT_H
+#ifndef _VST_PLUGIN_H
+#define _VST_PLUGIN_H
 
 #include <QtCore/QString>
 #include <QtCore/QMutex>
 #include <QtGui/QWidget>
 
 #include "mixer.h"
-#include "communication.h"
-#include "midi.h"
 #include "journalling_object.h"
+#include "communication.h"
+#include "remote_plugin.h"
 
 
 
-class remoteVSTPlugin : public QObject, public journallingObject
+class vstPlugin : public QObject, public journallingObject, public remotePlugin
 {
 	Q_OBJECT
 public:
-	remoteVSTPlugin( const QString & _plugin );
-	virtual ~remoteVSTPlugin();
+	vstPlugin( const QString & _plugin );
+	virtual ~vstPlugin();
+
+	virtual bool processMessage( const message & _m );
 
 	QWidget * showEditor( QWidget * _parent = NULL );
 	void hideEditor( void );
@@ -67,40 +69,14 @@ public:
 		return( m_productString );
 	}
 
-	// if _wait == TRUE, process() calls waitForProcessingFinished()
-	// immediately, otherwise, _out_buf can be zero and you've to call
-	// waitForProcessingFinished() on your own
-	bool process( const sampleFrame * _in_buf, sampleFrame * _out_buf,
-								bool _wait );
-	bool waitForProcessingFinished( sampleFrame * _out_buf );
-
-
-	void enqueueMidiEvent( const midiEvent & _event,
-						const f_cnt_t _frames_ahead );
-
 	const QMap<QString, QString> & parameterDump( void );
 	void setParameterDump( const QMap<QString, QString> & _pdump );
 
-
-	inline Uint8 inputCount( void ) const
-	{
-		return( m_inputCount );
-	}
-
-	inline Uint8 outputCount( void ) const
-	{
-		return( m_outputCount );
-	}
 
 	inline QWidget * pluginWidget( void )
 	{
 		return( m_pluginWidget != NULL ?
 					m_pluginWidget->parentWidget() : NULL );
-	}
-
-	inline bool failed( void ) const
-	{
-		return( m_failed );
 	}
 
 	virtual void loadSettings( const QDomElement & _this );
@@ -118,56 +94,10 @@ public slots:
 
 
 private:
-	template<typename T>
-	inline T readValueS( void ) const
-	{
-		return( ::readValue<T>( m_serverInFD ) );
-	}
-
-	template<typename T>
-	inline void writeValueS( const T & _i ) const
-	{
-		::writeValue<T>( _i, m_serverOutFD );
-	}
-
-	inline std::string readStringS( void ) const
-	{
-		return( ::readString( m_serverInFD ) );
-	}
-
-	inline void writeStringS( const char * _str ) const
-	{
-		::writeString( _str, m_serverOutFD );
-	}
-
-	inline void lock( void )
-	{
-		m_serverMutex.lock();
-	}
-
-	inline void unlock( void )
-	{
-		m_serverMutex.unlock();
-	}
-
-	bool messagesLeft( void ) const;
-	Sint16 processNextMessage( void );
-
-	void setShmKeyAndSize( const Uint16 _key, const size_t _size );
-
-
-	bool m_failed;
 	QString m_plugin;
 	QWidget * m_pluginWidget;
-	Sint32 m_pluginXID;
+	int m_pluginWindowID;
 	QSize m_pluginGeometry;
-
-	int m_pluginPID;
-	int m_pipes[2][2];
-	int m_serverInFD;
-	int m_serverOutFD;
-
-	QMutex m_serverMutex;
 
 	QString m_name;
 	Sint32 m_version;
@@ -175,15 +105,6 @@ private:
 	QString m_productString;
 
 	QMap<QString, QString> m_parameterDump;
-
-	Uint8 m_inputCount;
-	Uint8 m_outputCount;
-
-	int m_shmID;
-	float * m_shm;
-	size_t m_shmSize;
-
-	bool m_initialized;
 
 } ;
 

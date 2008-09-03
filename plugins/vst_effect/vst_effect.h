@@ -29,7 +29,7 @@
 #include <QtCore/QMutex>
 
 #include "effect.h"
-#include "lvsl_client.h"
+#include "vst_plugin.h"
 #include "vst_effect_control_dialog.h"
 #include "vst_effect_controls.h"
 
@@ -61,7 +61,7 @@ private:
 	void openPlugin( const QString & _plugin );
 	void closePlugin( void );
 
-	remoteVSTPlugin * m_plugin;
+	vstPlugin * m_plugin;
 	QMutex m_pluginMutex;
 	effectKey m_key;
 

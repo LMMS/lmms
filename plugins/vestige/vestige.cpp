@@ -35,7 +35,7 @@
 #include "gui_templates.h"
 #include "instrument_play_handle.h"
 #include "instrument_track.h"
-#include "lvsl_client.h"
+#include "vst_plugin.h"
 #include "note_play_handle.h"
 #include "pixmap_button.h"
 #include "song.h"
@@ -153,7 +153,7 @@ void vestigeInstrument::setParameter( const QString & _param,
 				PLUGIN_NAME::getIconPixmap( "logo", 24, 24 ),
 									0 );
 		m_pluginMutex.lock();
-		m_plugin = new remoteVSTPlugin( m_pluginDLL );
+		m_plugin = new vstPlugin( m_pluginDLL );
 		if( m_plugin->failed() )
 		{
 			m_pluginMutex.unlock();
@@ -263,11 +263,11 @@ void vestigeInstrument::playNote( notePlayHandle * _n, bool, sampleFrame * )
 		const int k = getInstrumentTrack()->masterKey( _n );
 		if( m_runningNotes[k] > 0 )
 		{
-			m_plugin->enqueueMidiEvent( midiEvent( MidiNoteOff, 0,
+			m_plugin->processMidiEvent( midiEvent( MidiNoteOff, 0,
 								k, 0 ), 0 );
 		}
 		++m_runningNotes[k];
-		m_plugin->enqueueMidiEvent( midiEvent( MidiNoteOn, 0, k,
+		m_plugin->processMidiEvent( midiEvent( MidiNoteOn, 0, k,
 					_n->getVolume() ), _n->offset() );
 		// notify when the handle stops, call to deleteNotePluginData
 		_n->m_pluginData = _n;
@@ -286,7 +286,7 @@ void vestigeInstrument::deleteNotePluginData( notePlayHandle * _n )
 		const int k = getInstrumentTrack()->masterKey( _n );
 		if( --m_runningNotes[k] <= 0 )
 		{
-			m_plugin->enqueueMidiEvent(
+			m_plugin->processMidiEvent(
 					midiEvent( MidiNoteOff, 0, k, 0 ), 0 );
 		}
 	}
@@ -302,7 +302,7 @@ bool vestigeInstrument::handleMidiEvent( const midiEvent & _me,
 	m_pluginMutex.lock();
 	if( m_plugin != NULL )
 	{
-		m_plugin->enqueueMidiEvent( _me, _time );
+		m_plugin->processMidiEvent( _me, _time );
 	}
 	m_pluginMutex.unlock();
 	return( TRUE );
@@ -489,7 +489,7 @@ void vestigeInstrumentView::noteOffAll( void )
 	{
 		for( int key = 0; key < NumKeys; ++key )
 		{
-			m_vi->m_plugin->enqueueMidiEvent(
+			m_vi->m_plugin->processMidiEvent(
 				midiEvent( MidiNoteOff, 0, key, 0 ), 0 );
 		}
 	}
