@@ -30,16 +30,24 @@
 #include <QtCore/QLocale>
 #include <QtGui/QMdiArea>
 #include <QtGui/QMdiSubWindow>
+#ifdef LMMS_BUILD_LINUX
 #include <QtGui/QX11EmbedContainer>
 #include <QtGui/QX11Info>
+#else
+#include <QtGui/QLayout>
+#endif
 #include <QtXml/QDomDocument>
+
+
+#ifdef LMMS_BUILD_WIN32
+#include <windows.h>
+#endif
 
 
 #include "config_mgr.h"
 #include "engine.h"
 #include "main_window.h"
 #include "templates.h"
-
 
 
 
@@ -58,6 +66,26 @@ vstPlugin::vstPlugin( const QString & _plugin ) :
 	setSplittedChannels( true );
 
 	lock();
+#ifdef LMMS_BUILD_WIN32
+	QWidget * helper = new QWidget;
+	QWidget * target = new QWidget( helper );
+	QHBoxLayout * l = new QHBoxLayout;
+	l->setMargin( 0 );
+	l->addWidget( target );
+	helper->setLayout( l );
+
+	static int k = 0;
+	const QString t = QString( "vst%1%2" ).arg( GetCurrentProcessId()<<10 ).
+								arg( ++k );
+	helper->setWindowTitle( t );
+
+	// we've to call that for making sure, Qt created the windows
+	(void) helper->winId();
+	(void) target->winId();
+
+	sendMessage( message( IdVstPluginWindowInformation ).
+					addString( t.toStdString() ) );
+#endif
 
 	VstHostLanguages hlang = LanguageEnglish;
 	switch( QLocale::system().language() )
@@ -83,6 +111,21 @@ vstPlugin::vstPlugin( const QString & _plugin ) :
 	waitForInitDone();
 
 	unlock();
+
+#ifdef LMMS_BUILD_WIN32
+	if( m_pluginWindowID )
+	{
+		target->setFixedSize( m_pluginGeometry );
+		engine::getMainWindow()->workspace()->addSubWindow( helper )
+				->setAttribute( Qt::WA_DeleteOnClose, FALSE );
+		helper->setWindowTitle( name() );
+		m_pluginWidget = helper;
+	}
+	else
+	{
+		delete helper;
+	}
+#endif
 }
 
 
@@ -112,7 +155,7 @@ QWidget * vstPlugin::showEditor( QWidget * _parent )
 		}
 		return( m_pluginWidget );
 	}
-
+#ifdef LMMS_BUILD_LINUX
 	if( m_pluginWindowID == 0 )
 	{
 		return( NULL );
@@ -128,7 +171,6 @@ QWidget * vstPlugin::showEditor( QWidget * _parent )
 				->setAttribute( Qt::WA_DeleteOnClose, FALSE );
 	}
 
-#ifdef LMMS_BUILD_LINUX
 	QX11EmbedContainer * xe = new QX11EmbedContainer( m_pluginWidget );
 	xe->embedClient( m_pluginWindowID );
 	xe->setFixedSize( m_pluginGeometry );
@@ -148,6 +190,9 @@ QWidget * vstPlugin::showEditor( QWidget * _parent )
 
 void vstPlugin::hideEditor( void )
 {
+	if( m_pluginWidget )
+		m_pluginWidget->hide();
+	return;
 	if( m_pluginWidget != NULL && m_pluginWidget->parentWidget() )
 	{
 		m_pluginWidget->parentWidget()->hide();
@@ -275,7 +320,7 @@ bool vstPlugin::processMessage( const message & _m )
 			const int w = _m.getInt( 0 );
 			const int h = _m.getInt( 1 );
 			m_pluginGeometry = QSize( w, h );
-			if( m_pluginWidget != NULL )
+/*			if( m_pluginWidget != NULL )
 			{
 				m_pluginWidget->setFixedSize(
 							m_pluginGeometry );
@@ -285,7 +330,7 @@ bool vstPlugin::processMessage( const message & _m )
 						)->setFixedSize(
 							m_pluginGeometry );
 				}
-			}
+			}*/
 			break;
 		}
 

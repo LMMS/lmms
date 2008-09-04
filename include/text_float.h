@@ -29,8 +29,10 @@
 #include <QtGui/QWidget>
 #include <QtGui/QPixmap>
 
+#include "export.h"
 
-class textFloat : public QWidget
+
+class EXPORT textFloat : public QWidget
 {
 public:
 	textFloat( void );

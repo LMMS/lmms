@@ -55,6 +55,7 @@ enum VstRemoteMessageIDs
 {
 	// vstPlugin -> remoteVstPlugin
 	IdVstLoadPlugin = IdUserBase,
+	IdVstPluginWindowInformation,
 	IdVstClosePlugin,
 	IdVstSetTempo,
 	IdVstSetLanguage,

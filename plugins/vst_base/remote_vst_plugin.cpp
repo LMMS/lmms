@@ -38,13 +38,22 @@
 #include <pthread.h>
 #endif
 
+#ifdef LMMS_BUILD_LINUX
+
 #ifdef LMMS_HAVE_SCHED_H
 #include <sched.h>
 #endif
 
+#include <wine/exception.h>
+
+#endif
 
 #include <windows.h>
-#include <wine/exception.h>
+
+#ifdef LMMS_BUILD_WIN32
+#include <libgen.h>
+
+#endif
 
 
 #include <list>
@@ -76,12 +85,14 @@ struct ERect
 #include "communication.h"
 
 
+#if 0
 #ifdef LMMS_HAVE_TLS
 static __thread int ejmpbuf_valid = false;
 static __thread jmp_buf ejmpbuf;
 #else
 static pthread_key_t ejmpbuf_valid_key;
 static pthread_key_t ejmpbuf_key;
+#endif
 #endif
 
 
@@ -104,15 +115,6 @@ public:
 	virtual bool processMessage( const message & _m );
 
 	void init( const std::string & _plugin_file );
-
-	void showEditor( void )
-	{
-		if( m_window != NULL )
-		{
-			PostThreadMessageA( m_guiThreadID, WM_USER, ShowEditor,
-									0 );
-		}
-	}
 
 	virtual bool process( const sampleFrame * _in, sampleFrame * _out );
 
@@ -190,9 +192,9 @@ public:
 
 
 private:
-	enum guiThreadMessages
+	enum GuiThreadMessages
 	{
-		None, ShowEditor, ClosePlugin
+		None, ClosePlugin
 	} ;
 
 	// callback used by plugin for being able to communicate with it's host
@@ -252,6 +254,8 @@ remoteVstPlugin::remoteVstPlugin( key_t _shm_in, key_t _shm_out ) :
 	m_bpm( 0 ),
 	m_currentSamplePos( 0 )
 {
+	pthread_mutex_init( &m_lock, NULL );
+	pthread_cond_init( &m_windowStatusChange, NULL );
 }
 
 
@@ -266,9 +270,12 @@ remoteVstPlugin::~remoteVstPlugin()
 		{
 			//lvsMessage( "could not post message to gui thread" );
 		}
+		pthread_mutex_lock( &m_lock );
 		pthread_cond_wait( &m_windowStatusChange, &m_lock );
 		m_plugin->dispatcher( m_plugin, effEditClose, 0, 0, NULL, 0.0 );
+#ifdef LMMS_BUILD_LINUX
 		CloseWindow( m_window );
+#endif
 		m_window = NULL;
 	}
 
@@ -280,6 +287,9 @@ remoteVstPlugin::~remoteVstPlugin()
 
 	delete[] m_inputs;
 	delete[] m_outputs;
+
+	pthread_mutex_destroy( &m_lock );
+	pthread_cond_destroy( &m_windowStatusChange );
 }
 
 
@@ -293,9 +303,15 @@ bool remoteVstPlugin::processMessage( const message & _m )
 			init( _m.getString() );
 			break;
 
-		case IdShowUI:
-			showEditor();
+#ifdef LMMS_BUILD_WIN32
+		case IdVstPluginWindowInformation:
+		{
+			HWND top = FindWindowEx( NULL, NULL, NULL,
+							_m.getString().c_str() );
+			m_window = FindWindowEx( top, NULL, NULL, NULL );
 			break;
+		}
+#endif
 
 		case IdVstSetTempo:
 			setBPM( _m.getInt() );
@@ -350,18 +366,16 @@ void remoteVstPlugin::init( const std::string & _plugin_file )
 		fprintf( stderr, "could not create GUI-thread\n" );
 		return;
 	}
-	pthread_cond_wait( &m_windowStatusChange, &m_lock);
+	pthread_mutex_lock( &m_lock );
+	pthread_cond_wait( &m_windowStatusChange, &m_lock );
 
 
 	// now post some information about our plugin
 	sendMessage( message( IdVstPluginWindowID ).addInt( m_windowID ) );
 
-	if( m_windowID != 0 )
-	{
-		sendMessage( message( IdVstPluginEditorGeometry ).
+	sendMessage( message( IdVstPluginEditorGeometry ).
 						addInt( m_windowWidth ).
 						addInt( m_windowHeight ) );
-	}
 
 	sendMessage( message( IdVstPluginName ).addString( pluginName() ) );
 	sendMessage( message( IdVstPluginVersion ).addInt( pluginVersion() ) );
@@ -479,9 +493,6 @@ bool remoteVstPlugin::process( const sampleFrame * _in, sampleFrame * _out )
 #endif
 
 	m_currentSamplePos += bufferSize();
-
-	// give plugin some idle-time for GUI-update and so on...
-	m_plugin->dispatcher( m_plugin, effEditIdle, 0, 0, NULL, 0 );
 
 }
 
@@ -984,6 +995,7 @@ DWORD WINAPI remoteVstPlugin::guiEventLoop( LPVOID _param )
 	remoteVstPlugin * _this = static_cast<remoteVstPlugin *>( _param );
 	_this->m_guiThreadID = GetCurrentThreadId();
 
+#if 0
 	// "guard point" to trap errors that occur during plugin loading
 #ifdef LMMS_HAVE_TLS
 	if( sigsetjmp( ejmpbuf, 1 ) )
@@ -1005,12 +1017,17 @@ DWORD WINAPI remoteVstPlugin::guiEventLoop( LPVOID _param )
 	pthread_key_create( &ejmpbuf_valid_key, NULL );
 	pthread_setspecific( ejmpbuf_valid_key, ejmpbuf_valid );
 
+#ifdef LMMS_BUILD_WIN32
+	if( setjmp( *ejmpbuf ) )
+#else
 	if( sigsetjmp( *ejmpbuf, 1 ) )
+#endif
 	{
 		exit( 1 );
 	}
 	
 	*ejmpbuf_valid = true;
+#endif
 #endif
 
 	// Note: m_lock is held while this function is called
@@ -1029,21 +1046,27 @@ DWORD WINAPI remoteVstPlugin::guiEventLoop( LPVOID _param )
 		return( 1 );
 	}
 
+#ifdef LMMS_BUILD_LINUX
 	if( ( _this->m_window = CreateWindowExA(
 				0, "LVSL", _this->m_shortName.c_str(),
-			       ( WS_OVERLAPPEDWINDOW & ~WS_THICKFRAME &
+			       ( WS_OVERLAPPEDWINDOW  | WS_THICKFRAME &
 					 		~WS_MAXIMIZEBOX ),
-			       0, 0, 1, 1, NULL, NULL, hInst, NULL ) ) == NULL )
+			       0, 0, 10, 10,
+				NULL, NULL, hInst, NULL ) ) == NULL )
 	{
 		fprintf( stderr, "cannot create editor window\n" );
 		pthread_cond_signal( &_this->m_windowStatusChange );
 		return( 1 );
 	}
-	ShowWindow( _this->m_window, SW_SHOWMINIMIZED );
-	ShowWindow( _this->m_window, SW_HIDE );
+
+	ShowWindow( _this->m_window, SW_SHOWNORMAL );
 
 	_this->m_windowID = (Sint32) GetPropA( _this->m_window,
 						"__wine_x11_whole_window" );
+#else
+	_this->m_windowID = 1;	// arbitrary value on win32 to signal
+				// vstPlugin-class that we have an editor
+#endif
 
 
 	_this->m_plugin->dispatcher( _this->m_plugin, effEditOpen, 0, 0,
@@ -1055,22 +1078,27 @@ DWORD WINAPI remoteVstPlugin::guiEventLoop( LPVOID _param )
 
 	_this->m_windowWidth = er->right - er->left;
 	_this->m_windowHeight = er->bottom - er->top;
-		
+
 	SetWindowPos( _this->m_window, 0, 0, 0, _this->m_windowWidth + 8,
-			_this->m_windowHeight + 26, 0
+			_this->m_windowHeight + 26, SWP_SHOWWINDOW );
+
+	UpdateWindow( _this->m_window );
+
 #if 0
-			SWP_NOACTIVATE /*| SWP_NOREDRAW*/ | SWP_NOMOVE |
-			SWP_NOOWNERZORDER | SWP_NOZORDER
-#endif
-			);
 #ifdef LMMS_HAVE_TLS
 	ejmpbuf_valid = false;
 #else
 	*ejmpbuf_valid = false;
 #endif
+#endif
 
 	pthread_cond_signal( &_this->m_windowStatusChange );
 
+
+	HWND timer_window = CreateWindowEx( 0, "LVSL", "dummy",
+					0, 0, 0, 0, 0, NULL, NULL, hInst, NULL );
+	// install GUI update timer
+	SetTimer( timer_window, 1000, 50, NULL );
 
 	MSG msg;
 
@@ -1080,16 +1108,17 @@ DWORD WINAPI remoteVstPlugin::guiEventLoop( LPVOID _param )
 		TranslateMessage( &msg );
 		DispatchMessageA( &msg );
 
-		if( msg.message == WM_USER )
+		if( msg.message == WM_TIMER )
+		{
+			// give plugin some idle-time for GUI-update
+			_this->m_plugin->dispatcher( _this->m_plugin,
+							effEditIdle, 0, 0,
+								NULL, 0 );
+		}
+		else if( msg.message == WM_USER )
 		{
 			switch( msg.wParam )
 			{
-				case ShowEditor:
-					ShowWindow( _this->m_window,
-								SW_SHOWNORMAL );
-					UpdateWindow( _this->m_window );
-					break;
-
 				case ClosePlugin:
 					quit = true;
 					break;
@@ -1108,7 +1137,7 @@ DWORD WINAPI remoteVstPlugin::guiEventLoop( LPVOID _param )
 
 
 
-int main( int _argc, char * * _argv ) 
+int main( int _argc, char * * _argv )
 {
 	if( _argc < 3 )
 	{
@@ -1147,6 +1176,7 @@ int main( int _argc, char * * _argv )
 		return( -1 );
 	}
 
+#ifdef LMMS_BUILD_LINUX
 #ifdef LMMS_HAVE_SCHED_H
 	// try to set realtime-priority
 	struct sched_param sparam;
@@ -1157,6 +1187,7 @@ int main( int _argc, char * * _argv )
 		fprintf( stderr, "could not set realtime priority for "
 							"remoteVstPlugin\n" );
 	}
+#endif
 #endif
 
 	__plugin = new remoteVstPlugin( atoi( _argv[1] ), atoi( _argv[2] ) );

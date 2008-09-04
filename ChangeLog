@@ -1,3 +1,15 @@
+2008-09-04	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* plugins/vst_base/vst_plugin.h:
+	* plugins/vst_base/remote_vst_plugin.cpp:
+	* plugins/vst_base/communication.h:
+	* plugins/vst_base/vst_plugin.cpp:
+	* plugins/vst_base/CMakeLists.txt:
+	* include/text_float.h:
+	* include/remote_plugin.h:
+	* CMakeLists.txt:
+	made VST support layer work on native win32
+
 2008-09-03	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* plugins/vst_base/communication.h:

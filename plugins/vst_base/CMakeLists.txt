@@ -4,6 +4,18 @@ INCLUDE(BuildPlugin)
 
 BUILD_PLUGIN(vstbase vst_base.cpp vst_plugin.cpp vst_plugin.h communication.h MOCFILES vst_plugin.h)
 
+
+IF(LMMS_BUILD_WIN32)
+
+ADD_DEFINITIONS(-DPTW32_STATIC_LIB)
+LINK_LIBRARIES(-lQtCore4 -lpthread -lgdi32 -lwsock32)
+ADD_EXECUTABLE(remote_vst_plugin ${CMAKE_CURRENT_SOURCE_DIR}/remote_vst_plugin.cpp)
+
+ENDIF(LMMS_BUILD_WIN32)
+
+
+IF(LMMS_BUILD_LINUX)
+
 IF(LMMS_HOST_X86_64)
 	SET(EXTRA_FLAGS -m32 -Wb,--as-cmd='as --32',--ld-cmd='ld -melf_i386' -L/usr/lib32)
 ENDIF(LMMS_HOST_X86_64)
@@ -18,5 +30,8 @@ ADD_CUSTOM_COMMAND(
 SET_DIRECTORY_PROPERTIES(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES remote_vst_plugin.exe.so)
 
 INSTALL(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/remote_vst_plugin ${CMAKE_CURRENT_BINARY_DIR}/remote_vst_plugin.exe.so DESTINATION ${PLUGIN_DIR})
+
+ENDIF(LMMS_BUILD_LINUX)
+
 
 ENDIF(LMMS_HAVE_VST)

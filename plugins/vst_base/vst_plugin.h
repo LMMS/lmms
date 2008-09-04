@@ -37,7 +37,8 @@
 
 
 
-class vstPlugin : public QObject, public journallingObject, public remotePlugin
+class PLUGIN_EXPORT vstPlugin : public QObject, public journallingObject,
+							public remotePlugin
 {
 	Q_OBJECT
 public:

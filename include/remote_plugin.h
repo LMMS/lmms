@@ -40,6 +40,8 @@
 #include <process.h>
 #endif
 
+#include <Qt/qglobal.h>
+
 #if QT_VERSION >= 0x040400
 #include <QtCore/QSharedMemory>
 #include <QtCore/QSystemSemaphore>

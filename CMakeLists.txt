@@ -258,7 +258,7 @@ ENDIF(WANT_SF2)
 
 
 # check for WINE
-if(WANT_VST)
+IF(WANT_VST)
 	INCLUDE(CheckLibraryExists)
 	INCLUDE(CheckIncludeFileCXX)
 	SET(CMAKE_REQUIRED_FLAGS_ORIG ${CMAKE_REQUIRED_FLAGS})
@@ -276,11 +276,15 @@ if(WANT_VST)
 	SET(CMAKE_REQUIRED_INCLUDES ${CMAKE_REQUIRED_INCLUDES_ORIG})
 	IF(HAVE_LIBWINE AND HAVE_WINDOWS_H)
 		SET(LMMS_HAVE_VST TRUE)
-		SET(STATUS_WINE "OK")
+		SET(STATUS_VST "OK")
 	ELSE(HAVE_LIBWINE AND HAVE_WINDOWS_H)
-		SET(STATUS_WINE "not found, please install (lib)wine-dev (or similiar) - 64 bit systems additionally need gcc-multilib and g++-multilib")
+		SET(STATUS_VST "not found, please install (lib)wine-dev (or similiar) - 64 bit systems additionally need gcc-multilib and g++-multilib")
 	ENDIF(HAVE_LIBWINE AND HAVE_WINDOWS_H)
 ENDIF(WANT_VST)
+IF(LMMS_BUILD_WIN32)
+	SET(LMMS_HAVE_VST TRUE)
+	SET(STATUS_VST "OK")
+ENDIF(LMMS_BUILD_WIN32)
 
 
 # check for libsamplerate
@@ -515,8 +519,8 @@ MESSAGE(
 "----------------\n"
 "* SoundFont2 player           : ${STATUS_FLUIDSYNTH}\n"
 "* Stk Mallets                 : ${STATUS_STK}\n"
-"* VST-instrument hoster       : ${STATUS_WINE}\n"
-"* VST-effect hoster           : ${STATUS_WINE}\n"
+"* VST-instrument hoster       : ${STATUS_VST}\n"
+"* VST-effect hoster           : ${STATUS_VST}\n"
 "* SpectrumAnalyzer            : ${STATUS_FFTW3F}\n"
 "* CAPS LADSPA plugins         : ${STATUS_CAPS}\n"
 "* TAP LADSPA plugins          : ${STATUS_TAP}\n"
