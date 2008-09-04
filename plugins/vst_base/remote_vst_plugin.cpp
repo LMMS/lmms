@@ -1,5 +1,5 @@
 /*
- * lvsl_server.cpp - LMMS VST Support Layer Server
+ * remote_vst_plugin.cpp - LMMS VST Support Layer (remotePlugin client)
  *
  * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
@@ -84,16 +84,6 @@ struct ERect
 #include "midi.h"
 #include "communication.h"
 
-
-#if 0
-#ifdef LMMS_HAVE_TLS
-static __thread int ejmpbuf_valid = false;
-static __thread jmp_buf ejmpbuf;
-#else
-static pthread_key_t ejmpbuf_valid_key;
-static pthread_key_t ejmpbuf_key;
-#endif
-#endif
 
 
 static VstHostLanguages hlang = LanguageEnglish;
@@ -995,42 +985,6 @@ DWORD WINAPI remoteVstPlugin::guiEventLoop( LPVOID _param )
 	remoteVstPlugin * _this = static_cast<remoteVstPlugin *>( _param );
 	_this->m_guiThreadID = GetCurrentThreadId();
 
-#if 0
-	// "guard point" to trap errors that occur during plugin loading
-#ifdef LMMS_HAVE_TLS
-	if( sigsetjmp( ejmpbuf, 1 ) )
-	{
-		fprintf( stderr, "creating the editor for %s failed\n",
-						_this->m_shortName.c_str() );
-		pthread_cond_signal( &_this->m_windowStatusChange );
-		return( 1 );
-	}
-
-	ejmpbuf_valid = true;
-#else
-	jmp_buf * ejmpbuf = new jmp_buf[1];
-	int * ejmpbuf_valid = new int;
-	*ejmpbuf_valid = false;
-
-	pthread_key_create( &ejmpbuf_key, NULL );
-	pthread_setspecific( ejmpbuf_key, ejmpbuf );
-	pthread_key_create( &ejmpbuf_valid_key, NULL );
-	pthread_setspecific( ejmpbuf_valid_key, ejmpbuf_valid );
-
-#ifdef LMMS_BUILD_WIN32
-	if( setjmp( *ejmpbuf ) )
-#else
-	if( sigsetjmp( *ejmpbuf, 1 ) )
-#endif
-	{
-		exit( 1 );
-	}
-	
-	*ejmpbuf_valid = true;
-#endif
-#endif
-
-	// Note: m_lock is held while this function is called
 	if( !( _this->m_plugin->flags & effFlagsHasEditor ) )
 	{
 		pthread_cond_signal( &_this->m_windowStatusChange );
@@ -1080,17 +1034,10 @@ DWORD WINAPI remoteVstPlugin::guiEventLoop( LPVOID _param )
 	_this->m_windowHeight = er->bottom - er->top;
 
 	SetWindowPos( _this->m_window, 0, 0, 0, _this->m_windowWidth + 8,
-			_this->m_windowHeight + 26, SWP_SHOWWINDOW );
+				_this->m_windowHeight + 26, SWP_SHOWWINDOW );
 
 	UpdateWindow( _this->m_window );
 
-#if 0
-#ifdef LMMS_HAVE_TLS
-	ejmpbuf_valid = false;
-#else
-	*ejmpbuf_valid = false;
-#endif
-#endif
 
 	pthread_cond_signal( &_this->m_windowStatusChange );
 
