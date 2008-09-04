@@ -273,8 +273,10 @@ void vstPlugin::updateSampleRate( void )
 
 const QMap<QString, QString> & vstPlugin::parameterDump( void )
 {
+	lock();
 	sendMessage( IdVstGetParameterDump );
 	waitForMessage( IdVstParameterDump );
+	unlock();
 
 	return( m_parameterDump );
 }

@@ -1,5 +1,15 @@
 2008-09-04	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* plugins/vst_base/vst_plugin.cpp:
+	hold lock while dumping parameters
+
+	* include/remote_plugin.h:
+	* lmmsconfig.h.in:
+	* CMakeLists.txt:
+	- set common numeric locale to make atof() work properly in Germany
+	- increased SHM_FIFO_SIZE from 4000 to 64000 for not getting stuck
+	  when exchanging bigger messages (e.g. parameter dumps)
+
 	* plugins/vst_base/vst_plugin.h:
 	* plugins/vst_base/remote_vst_plugin.cpp:
 	* plugins/vst_base/communication.h:
