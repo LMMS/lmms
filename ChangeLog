@@ -40,7 +40,7 @@
 
 	* src/gui/piano_roll.cpp:
 	Change Piano-Roll paste behavior. Instead of pasting at 0, paste at the
-	quantized location of the time-line's position-indicator.
+	quantized location of the time-line's position-indicator
 
 	* src/gui/main_window.cpp:
 	Display waiting cursor when loading project.  Really only helps when
