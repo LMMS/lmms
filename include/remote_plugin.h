@@ -70,6 +70,10 @@ typedef int32_t key_t;
 #include <semaphore.h>
 #endif
 
+#ifdef LMMS_HAVE_LOCALE_H
+#include <locale.h>
+#endif
+
 
 #ifdef BUILD_REMOTE_PLUGIN_CLIENT
 #undef EXPORT
@@ -80,9 +84,10 @@ typedef int32_t key_t;
 #include <QtCore/QProcess>
 #endif
 
+// sometimes we need to exchange bigger messages (e.g. for VST parameter dumps)
+// so set a usable value here
+const int SHM_FIFO_SIZE = 64000;
 
-// 4000 should be enough - this way we only need to allocate one page
-const int SHM_FIFO_SIZE = 4000;
 
 // implements a FIFO inside a shared memory segment
 class shmFifo
@@ -159,11 +164,12 @@ public:
 
 		if( sem_init( m_dataSem, 1, 1 ) )
 		{
-			printf( "could not initialize m_dataSem\n" );
+			fprintf( stderr, "could not initialize m_dataSem\n" );
 		}
 		if( sem_init( m_messageSem, 1, 0 ) )
 		{
-			printf( "could not initialize m_messageSem\n" );
+			fprintf( stderr, "could not initialize "
+							"m_messageSem\n" );
 		}
 #endif
 	}
@@ -779,6 +785,11 @@ remotePluginBase::remotePluginBase( shmFifo * _in, shmFifo * _out ) :
 	m_in( _in ),
 	m_out( _out )
 {
+#ifdef LMMS_HAVE_LOCALE_H
+	// make sure, we're using common ways to print/scan
+	// floats to/from strings (',' vs. '.' for decimal point etc.)
+	setlocale( LC_NUMERIC, "C" );
+#endif
 }
 
 
