@@ -48,7 +48,7 @@
 	the loading dialog appears (I guess this is during project close)
 
 	* src/core/automation_pattern.cpp:
-	Don't connect to the same model more than once.
+	Don't connect to the same model more than once
 
 2008-09-01	Paul Giblock <drfaygo/at/gmail/dot/com>
 
