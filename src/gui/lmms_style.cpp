@@ -28,7 +28,6 @@
 #include <QtGui/QApplication>
 #include <QtGui/QFrame>
 #include <QtGui/QPainter>
-#include <QtGui/QPlastiqueStyle>
 #include <QtGui/QStyleOption>
 
 #include "lmms_style.h"
@@ -41,6 +40,58 @@ lmmsStyle::lmmsStyle() :
 	QFile file( "resources:style.css" );
 	file.open( QIODevice::ReadOnly );
 	qApp->setStyleSheet( file.readAll() );
+
+	qApp->setPalette( standardPalette() );
+}
+
+
+
+
+QPalette lmmsStyle::standardPalette( void ) const
+{
+	QPalette pal = QPlastiqueStyle::standardPalette();
+	pal.setColor( QPalette::Background, QColor( 72, 76, 88 ) );
+	pal.setColor( QPalette::WindowText, QColor( 240, 240, 240 ) );
+	pal.setColor( QPalette::Base, QColor( 128, 128, 128 ) );
+	pal.setColor( QPalette::Text, QColor( 224, 224, 224 ) );
+	pal.setColor( QPalette::Button, QColor( 172, 176, 188 ) );
+	pal.setColor( QPalette::Shadow, QColor( 0, 0, 0 ) );
+	pal.setColor( QPalette::ButtonText, QColor( 255, 255, 255 ) );
+	pal.setColor( QPalette::BrightText, QColor( 0, 255, 0 ) );
+	pal.setColor( QPalette::Highlight, QColor( 224, 224, 224 ) );
+	pal.setColor( QPalette::HighlightedText, QColor( 0, 0, 0 ) );
+	return( pal );
+}
+
+
+
+
+void lmmsStyle::drawComplexControl( ComplexControl control,
+					const QStyleOptionComplex * option,
+					QPainter *painter,
+						const QWidget *widget ) const
+{
+	// fix broken titlebar styling on win32
+	if( control == CC_TitleBar )
+	{
+		const QStyleOptionTitleBar * titleBar =
+			qstyleoption_cast<const QStyleOptionTitleBar *>(option );
+		if( titleBar )
+		{
+			QStyleOptionTitleBar so( *titleBar );
+			so.palette = standardPalette();
+			so.palette.setColor( QPalette::HighlightedText,
+				( titleBar->titleBarState & State_Active ) ?
+					QColor( 255, 255, 255 ) :
+						QColor( 192, 192, 192 ) );
+			so.palette.setColor( QPalette::Text,
+							QColor( 64, 64, 64 ) );
+			QPlastiqueStyle::drawComplexControl( control, &so,
+							painter, widget );
+			return;
+		}
+	}
+	QPlastiqueStyle::drawComplexControl( control, option, painter, widget );
 }
 
 

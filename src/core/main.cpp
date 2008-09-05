@@ -343,32 +343,8 @@ int main( int argc, char * * argv )
 
 	if( render_out.isEmpty() && file_to_save.isEmpty() )
 	{
+		// init style and palette
 		QApplication::setStyle( new lmmsStyle() );
-
-		// set palette
-		QPalette pal = qApp->palette();
-		//pal.setColor( QPalette::Background, QColor( 72, 76 ,88 ) );
-		pal.setColor( QPalette::Background, QColor( 72, 76, 88 ) );
-		//pal.setColor( QPalette::Background, QColor( 127, 134 ,154 ) );
-		//pal.setColor( QPalette::Background, QColor( 105, 110, 120 ) );
-		//pal.setColor( QPalette::Background, QColor( 89, 99, 128 ) );
-		
-		pal.setColor( QPalette::Foreground, QColor( 240, 240, 240 ) );
-		
-		pal.setColor( QPalette::Base, QColor( 128, 128, 128 ) );
-		//pal.setColor( QPalette::Base, QColor( 115, 110 , 94 ) );
-		//pal.setColor( QPalette::Base, QColor( 128, 112 , 94 ) );
-		
-		pal.setColor( QPalette::Text, QColor( 224, 224, 224 ) );
-	
-		pal.setColor( QPalette::Button, QColor( 172, 176, 188 ) );
-		//pal.setColor( QPalette::Button, QColor( 172, 177, 191 ) );
-		
-		pal.setColor( QPalette::ButtonText, QColor( 255, 255, 255 ) );
-		pal.setColor( QPalette::Highlight, QColor( 224, 224, 224 ) );
-		pal.setColor( QPalette::HighlightedText, QColor( 0, 0, 0 ) );
-		qApp->setPalette( pal );
-
 
 		// init splash screen - this is a bit difficult as we have a
 		// semi-transparent splash-image therefore we first need to grab

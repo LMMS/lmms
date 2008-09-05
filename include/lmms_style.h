@@ -38,6 +38,13 @@ public:
 	{
 	}
 
+	virtual QPalette standardPalette( void ) const;
+
+	virtual void drawComplexControl(
+				ComplexControl control,
+				const QStyleOptionComplex * option,
+					QPainter *painter,
+						const QWidget *widget ) const;
 	virtual void drawPrimitive( PrimitiveElement element,
 					const QStyleOption *option,
 					QPainter *painter,

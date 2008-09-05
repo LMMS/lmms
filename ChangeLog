@@ -1,3 +1,12 @@
+2008-09-05	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* include/lmms_style.h:
+	* src/gui/lmms_style.cpp:
+	* src/core/main.cpp:
+	- moved palette initialization into lmmsStyle class
+	- added a hack for making titlebar text colors in QMdiSubWindows
+	  common on all platforms
+
 2008-09-04	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* plugins/vst_base/vst_plugin.cpp:
