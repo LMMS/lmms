@@ -246,7 +246,7 @@
 	* src/core/controller_connection.cpp:
 	* src/core/controller.cpp:
 	Add basic support for delete.  The controller dialogs probably leak, and
-	peakController isn't handled yet.
+	peakController isn't handled yet
 
 2008-08-24	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
