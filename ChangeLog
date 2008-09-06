@@ -89,7 +89,7 @@
 	* src/core/track.cpp:
 	Add locking to trackContainer::m_tracks and clean up some const-ness
 	This should fix most crashes causes by moving/adding TCOs.  This also
-	seems to fix the no-sound bug that I hate so much.
+	seems to fix the no-sound bug that I hate so much
 
 	* plugins/bit_invader/logo.png:
 	* plugins/bit_invader/artwork.png:
