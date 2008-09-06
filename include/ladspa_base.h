@@ -75,7 +75,9 @@ inline plugin::descriptor::subPluginFeatures::key ladspaKeyToSubPluginKey(
 						const ladspa_key_t & _key )
 {
 	plugin::descriptor::subPluginFeatures::key::attributeMap m;
-	m["file"] = _key.first;
+	QString file = _key.first;
+	m["file"] = file.remove( QRegExp( "\\.so$" ) ).
+				remove( QRegExp( "\\.dll$" ) );
 	m["plugin"] = _key.second;
 	return( plugin::descriptor::subPluginFeatures::key( _desc, _name,
 									m ) );
