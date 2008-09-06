@@ -1,3 +1,43 @@
+2008-09-06	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* plugins/ladspa_effect/ladspa_subplugin_features.cpp:
+	* include/ladspa_base.h:
+	save LADSPA effect filenames without extension and add correct
+	one (depending on platform built for) when loading settings - fixes
+	missing effects when loading songs in Windows which were made in Linux
+	and vice versa
+
+	* include/audio_pulseaudio.h:
+	added information about bad latency when using PulseAudio output
+
+	* plugins/vestige/vestige.cpp:
+	* plugins/vestige/vestige.h:
+	only use MIDI anymore for controlling VST instruments
+
+	* plugins/lb302/lb302.cpp:
+	* include/note.h:
+	* include/instrument_track.h:
+	* include/midi.h:
+	* include/note_play_handle.h:
+	* src/tracks/instrument_track.cpp:
+	* src/core/preset_preview_play_handle.cpp:
+	* src/core/note_play_handle.cpp:
+	* src/core/instrument_functions.cpp:
+	* src/core/piano.cpp:
+	- improved the way, MIDI-events are internally sent and handled
+	- fixed names of various member methods of notePlayHandle class
+	- full MIDI velocity when pressing key on test piano
+	- send volume changes of a notePlayHandle as MidiKeyPressure events
+	- send pitch changes of instrument track as MidiPitchBend events
+	- added detection for running MIDI notes
+	- correct calculation of MIDI key - makes remotePlugins respect
+	  base note settings
+
+	* src/core/midi/midi_port.cpp:
+	* src/core/midi/midi_alsa_seq.cpp:
+	fixed broken MIDI-output (when masking output events it didn't match
+	against correct output MIDI channel)
+
 2008-09-06	Csaba Hruska <csaba.hruska/at/gmail.com>
 
 	* plugins/sid/sid_instrument.cpp:

@@ -53,7 +53,7 @@ notePlayHandle::notePlayHandle( instrumentTrack * _it,
 						const f_cnt_t _frames,
 						const note & _n,
 						notePlayHandle * _parent,
-						const bool _arp_note ) :
+						const bool _part_of_arp ) :
 	playHandle( NotePlayHandle, _offset ),
 	note( _n.length(), _n.pos(), _n.key(),
 			_n.getVolume(), _n.getPanning(), _n.detuning() ),
@@ -67,13 +67,13 @@ notePlayHandle::notePlayHandle( instrumentTrack * _it,
 	m_releaseFramesDone( 0 ),
 	m_released( FALSE ),
 	m_baseNote( _parent == NULL  ),
-	m_arpNote( _arp_note ),
+	m_partOfArpeggio( _part_of_arp ),
 	m_muted( FALSE ),
 	m_bbTrack( NULL ),
 #if LMMS_SINGERBOT_SUPPORT
 	m_patternIndex( 0 ),
 #endif
-	m_orig_bpm( engine::getSong()->getTempo() )
+	m_origTempo( engine::getSong()->getTempo() )
 {
 	if( m_baseNote )
 	{
@@ -88,7 +88,8 @@ notePlayHandle::notePlayHandle( instrumentTrack * _it,
 		// if there was an arp-note added and parent is a base-note
 		// we set arp-note-flag for indicating that parent is an
 		// arpeggio-base-note
-		_parent->m_arpNote = arpNote() && _parent->baseNote();
+		_parent->m_partOfArpeggio = isPartOfArpeggio() &&
+							_parent->isBaseNote();
 
 		m_bbTrack = _parent->m_bbTrack;
 #if LMMS_SINGERBOT_SUPPORT
@@ -99,16 +100,17 @@ notePlayHandle::notePlayHandle( instrumentTrack * _it,
 	updateFrequency();
 
 	setFrames( _frames );
-	// send MIDI-note-on-event
-	m_instrumentTrack->processOutEvent( midiEvent( MidiNoteOn,
+
+
+	if( !isBaseNote() || !getInstrumentTrack()->arpeggiatorEnabled() )
+	{
+		// send MIDI-note-on-event
+		m_instrumentTrack->processOutEvent( midiEvent( MidiNoteOn,
 			m_instrumentTrack->getMidiPort()->outputChannel(),
-					key(),
-				tLimit<Uint16>(
-				(Uint16) ( ( getVolume() / 100.0f ) *
-				( m_instrumentTrack->getVolume() / 100.0f ) *
-							127 ), 0, 127 ) ),
-			midiTime::fromFrames( offset(),
+			key(), getMidiVelocity() ),
+				midiTime::fromFrames( offset(),
 						engine::framesPerTick() ) );
+	}
 }
 
 
@@ -147,6 +149,29 @@ notePlayHandle::~notePlayHandle()
 
 
 
+void notePlayHandle::setVolume( const volume _volume )
+{
+	note::setVolume( _volume );
+	m_instrumentTrack->processOutEvent( midiEvent( MidiKeyPressure,
+			m_instrumentTrack->getMidiPort()->outputChannel(),
+						key(), getMidiVelocity() ), 0 );
+	
+}
+
+
+
+
+int notePlayHandle::getMidiVelocity( void ) const
+{
+	return tLimit<Uint16>( (Uint16) ( ( getVolume() / 100.0f ) *
+			( m_instrumentTrack->getVolume() / 100.0f ) *
+							MidiMaxVelocity ),
+						0, MidiMaxVelocity );
+}
+
+
+
+
 void notePlayHandle::play( bool _try_parallelizing,
 						sampleFrame * _working_buffer )
 {
@@ -180,7 +205,7 @@ void notePlayHandle::play( bool _try_parallelizing,
 		// because we do not allow notePlayHandle::done() to be true
 		// until all sub-notes are completely played and no new ones
 		// are inserted by arpAndChordsTabWidget::processNote()
-		if( arpBaseNote() == TRUE )
+		if( isArpeggioBaseNote() )
 		{
 			m_releaseFramesToDo = m_releaseFramesDone + 2 *
 				engine::getMixer()->framesPerPeriod();
@@ -246,7 +271,7 @@ void notePlayHandle::play( bool _try_parallelizing,
 	// can set m_releaseFramesDone to m_releaseFramesToDo so that
 	// notePlayHandle::done() returns true and also this base-note is
 	// removed from mixer's active note vector
-	if( arpBaseNote() == TRUE && m_subNotes.size() == 0 )
+	if( isArpeggioBaseNote() && m_subNotes.size() == 0 )
 	{
 		m_releaseFramesDone = m_releaseFramesToDo;
 	}
@@ -301,12 +326,16 @@ void notePlayHandle::noteOff( const f_cnt_t _s )
 	m_framesBeforeRelease = _s;
 	m_releaseFramesToDo = tMax<f_cnt_t>( 0, // 10,
 			m_instrumentTrack->m_soundShaping.releaseFrames() );
-	// send MIDI-note-off-event
-	m_instrumentTrack->processOutEvent( midiEvent( MidiNoteOff,
+
+	if( !isBaseNote() || !getInstrumentTrack()->arpeggiatorEnabled() )
+	{
+		// send MIDI-note-off-event
+		m_instrumentTrack->processOutEvent( midiEvent( MidiNoteOff,
 			m_instrumentTrack->getMidiPort()->outputChannel(),
 								key(), 0 ),
 			midiTime::fromFrames( m_framesBeforeRelease,
 						engine::framesPerTick() ) );
+	}
 
 	m_released = TRUE;
 }
@@ -317,7 +346,7 @@ void notePlayHandle::noteOff( const f_cnt_t _s )
 f_cnt_t notePlayHandle::actualReleaseFramesToDo( void ) const
 {
 	return( m_instrumentTrack->m_soundShaping.releaseFrames(
-							arpBaseNote() ) );
+							isArpeggioBaseNote() ) );
 }
 
 
@@ -330,7 +359,7 @@ void notePlayHandle::setFrames( const f_cnt_t _frames )
 	{
 		m_frames = m_instrumentTrack->beatLen( this );
 	}
-	m_orig_frames = m_frames;
+	m_origFrames = m_frames;
 }
 
 
@@ -421,7 +450,7 @@ bool notePlayHandle::operator==( const notePlayHandle & _nph ) const
 			m_totalFramesPlayed == _nph.m_totalFramesPlayed &&
 			m_released == _nph.m_released &&
 			m_baseNote == _nph.m_baseNote &&
-			m_arpNote == _nph.m_arpNote &&
+			m_partOfArpeggio == _nph.m_partOfArpeggio &&
 			m_muted == _nph.m_muted );
 }
 
@@ -430,14 +459,9 @@ bool notePlayHandle::operator==( const notePlayHandle & _nph ) const
 
 void notePlayHandle::updateFrequency( void )
 {
-	const int base_tone = m_instrumentTrack->baseNoteModel()->value() %
-								KeysPerOctave;
-	const int base_octave = m_instrumentTrack->baseNoteModel()->value() /
-								KeysPerOctave;
-	const float pitch = ( key() % KeysPerOctave - base_tone +
-			engine::getSong()->masterPitch() ) / 12.0f +
-				( key() / KeysPerOctave - base_octave ) +
-					 m_baseDetuning->value() / 12.0f;
+	const float pitch =
+		( key() - m_instrumentTrack->baseNoteModel()->value() +
+				engine::getSong()->masterPitch() ) / 12.0f;
 	m_frequency = BaseFreq * powf( 2.0f, pitch +
 		m_instrumentTrack->m_pitchModel.value() / ( 100 * 12.0 ) );
 	m_unpitchedFrequency = BaseFreq * powf( 2.0f, pitch );
@@ -469,17 +493,17 @@ void notePlayHandle::processMidiTime( const midiTime & _time )
 
 
 
-void notePlayHandle::resize( const bpm_t _new_bpm )
+void notePlayHandle::resize( const bpm_t _new_tempo )
 {
-	double completed = m_totalFramesPlayed / (double)m_frames;
-	double new_frames = m_orig_frames * m_orig_bpm / (double)_new_bpm;
+	double completed = m_totalFramesPlayed / (double) m_frames;
+	double new_frames = m_origFrames * m_origTempo / (double) _new_tempo;
 	m_frames = (f_cnt_t)new_frames;
 	m_totalFramesPlayed = (f_cnt_t)( completed * new_frames );
 
 	for( notePlayHandleVector::iterator it = m_subNotes.begin();
 						it != m_subNotes.end(); ++it )
 	{
-		( *it )->resize( _new_bpm );
+		( *it )->resize( _new_tempo );
 	}
 }
 

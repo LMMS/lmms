@@ -187,9 +187,9 @@ void chordCreator::processNote( notePlayHandle * _n )
 	// at the same time we only add sub-notes if nothing of the note was
 	// played yet, because otherwise we would add chord-subnotes every
 	// time an audio-buffer is rendered...
-	if( ( ( _n->baseNote() &&
+	if( ( ( _n->isBaseNote() &&
 		_n->getInstrumentTrack()->arpeggiatorEnabled() == FALSE ) ||
-							_n->arpNote() ) &&
+						_n->isPartOfArpeggio() ) &&
 				_n->totalFramesPlayed() == 0 &&
 				m_chordsEnabledModel.value() == TRUE )
 	{
@@ -310,7 +310,7 @@ arpeggiator::~arpeggiator()
 void arpeggiator::processNote( notePlayHandle * _n )
 {
 	const int base_note_key = _n->key();
-	if( _n->baseNote() == FALSE ||
+	if( _n->isBaseNote() == FALSE ||
 			!m_arpEnabledModel.value() ||
 			( _n->released() && _n->releaseFramesDone() >=
 					_n->actualReleaseFramesToDo() ) )
@@ -467,7 +467,7 @@ void arpeggiator::processNote( notePlayHandle * _n )
 	// sub-note so far
 	if( m_arpModeModel.value() != FreeMode )
 	{
-		_n->setArpNote( TRUE );
+		_n->setPartOfArpeggio( true );
 	}
 }
 

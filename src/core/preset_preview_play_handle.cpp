@@ -170,7 +170,7 @@ presetPreviewPlayHandle::~presetPreviewPlayHandle()
 {
 	s_previewTC->lockData();
 	// not muted by other preset-preview-handle?
-	if( m_previewNote->muted() == FALSE )
+	if( !m_previewNote->isMuted() )
 	{
 		// then set according state
 		s_previewTC->setPreviewNote( NULL );
@@ -193,7 +193,7 @@ void presetPreviewPlayHandle::play( bool _try_parallelizing,
 
 bool presetPreviewPlayHandle::done( void ) const
 {
-	return( m_previewNote->muted() );
+	return( m_previewNote->isMuted() );
 }
 
 

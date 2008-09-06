@@ -52,9 +52,12 @@ public:
 					const f_cnt_t _offset,
 					const f_cnt_t _frames, const note & _n,
 					notePlayHandle * _parent = NULL,
-					const bool _arp_note = FALSE );
+					const bool _part_of_arp = false );
 	virtual ~notePlayHandle();
 
+	virtual void setVolume( const volume _volume = DefaultVolume );
+
+	int getMidiVelocity( void ) const;
 
 	const float & frequency( void ) const
 	{
@@ -85,7 +88,7 @@ public:
 		if( m_released == TRUE )
 		{
 			f_cnt_t todo = engine::getMixer()->framesPerPeriod();
-			if( arpBaseNote() == TRUE )
+			if( isArpeggioBaseNote() )
 			{
 				rftd = rfd + 2 *
 					engine::getMixer()->framesPerPeriod();
@@ -118,7 +121,7 @@ public:
 			}
 		}
 
-		if( arpBaseNote() == TRUE && m_subNotes.size() == 0 )
+		if( isArpeggioBaseNote() && m_subNotes.size() == 0 )
 		{
 			rfd = rftd;
 		}
@@ -184,29 +187,29 @@ public:
 
 	// returns whether note is a base-note, e.g. is not part of an arpeggio
 	// or a chord
-	inline bool baseNote( void ) const
+	inline bool isBaseNote( void ) const
 	{
 		return( m_baseNote );
 	}
 
-	// returns whether note is part of an arpeggio
-	inline bool arpNote( void ) const
+	inline bool isPartOfArpeggio( void ) const
 	{
-		return( m_arpNote );
+		return( m_partOfArpeggio );
 	}
 
-	inline void setArpNote( const bool _on )
+	inline void setPartOfArpeggio( const bool _on )
 	{
-		m_arpNote = _on;
+		m_partOfArpeggio = _on;
 	}
 
 	// returns whether note is base-note for arpeggio
-	inline bool arpBaseNote( void ) const
+	inline bool isArpeggioBaseNote( void ) const
 	{
-		return( baseNote() && arpNote() );
+		return( isBaseNote() && ( m_partOfArpeggio || 
+				m_instrumentTrack->arpeggiatorEnabled() ) );
 	}
 
-	inline bool muted( void ) const
+	inline bool isMuted( void ) const
 	{
 		return( m_muted );
 	}
@@ -214,7 +217,7 @@ public:
 	void mute( void );
 
 	// returns index of note-play-handle in vector of note-play-handles 
-	// belonging to this channel
+	// belonging to this instrument-track - used by arpeggiator
 	int index( void ) const;
 
 	// note-play-handles belonging to given channel, if _all_ph = TRUE,
@@ -255,7 +258,7 @@ public:
 	}
 
 	void processMidiTime( const midiTime & _time );
-	void resize( const bpm_t _new_bpm );
+	void resize( const bpm_t _new_tempo );
 
 #if LMMS_SINGERBOT_SUPPORT
 	int patternIndex( void )
@@ -310,7 +313,7 @@ private:
 	volatile bool m_released;	// indicates whether note is released
 	bool m_baseNote;		// indicates whether note is a
 					// base-note (i.e. no sub-note)
-	bool m_arpNote;			// indicates whether note is part of
+	bool m_partOfArpeggio;		// indicates whether note is part of
 					// an arpeggio (either base-note or
 					// sub-note)
 	bool m_muted;			// indicates whether note is muted
@@ -320,8 +323,8 @@ private:
 #endif
 
 	// tempo reaction
-	bpm_t m_orig_bpm;		// original bpm
-	f_cnt_t m_orig_frames;		// original m_frames
+	bpm_t m_origTempo;		// original tempo
+	f_cnt_t m_origFrames;		// original m_frames
 
 	float m_frequency;
 	float m_unpitchedFrequency;

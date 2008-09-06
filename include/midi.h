@@ -81,6 +81,7 @@ enum MidiMetaEvents
 
 const int MidiChannelCount = 16;
 const int MidiControllerCount = 128;
+const int MidiMaxVelocity = 127;
 
 
 struct midiEvent
@@ -105,6 +106,14 @@ struct midiEvent
 		m_data.m_sysExDataLen = _data_len;
 	}
 
+	midiEvent( const midiEvent & _copy ) :
+		m_type( _copy.m_type ),
+		m_channel( _copy.m_channel ),
+		m_data( _copy.m_data ),
+		m_sysExData( _copy.m_sysExData )
+	{
+	}
+
 	inline Uint16 key( void ) const
 	{
 		return( m_data.m_param[0] );
@@ -124,6 +133,12 @@ struct midiEvent
 	{
 		return( m_data.m_param[1] );
 	}
+
+	inline volume getVolume( void ) const
+	{
+		return( velocity() * 100 / MidiMaxVelocity );
+	}
+
 
 	MidiEventTypes m_type;		// MIDI event type
 	Sint8 m_channel;		// MIDI channel

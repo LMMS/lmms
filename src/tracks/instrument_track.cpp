@@ -116,12 +116,13 @@ instrumentTrack::instrumentTrack( trackContainer * _tc ) :
 	connect( &m_baseNoteModel, SIGNAL( dataChanged() ),
 			this, SLOT( updateBaseNote() ) );
 	connect( &m_pitchModel, SIGNAL( dataChanged() ),
-			this, SLOT( updateBaseNote() ) );
+			this, SLOT( updatePitch() ) );
 
 
 	for( int i = 0; i < NumKeys; ++i )
 	{
 		m_notes[i] = NULL;
+		m_runningMidiNotes[i] = 0;
 	}
 
 
@@ -137,24 +138,6 @@ instrumentTrack::~instrumentTrack()
 	engine::getMixer()->removePlayHandles( this );
 	delete m_instrument;
 }
-
-
-
-
-f_cnt_t instrumentTrack::beatLen( notePlayHandle * _n ) const
-{
-	if( m_instrument != NULL )
-	{
-		const f_cnt_t len = m_instrument->beatLen( _n );
-		if( len > 0 )
-		{
-			return( len );
-		}
-	}
-	return( m_soundShaping.envFrames() );
-}
-
-
 
 
 
@@ -197,15 +180,37 @@ void instrumentTrack::processAudioBuffer( sampleFrame * _buf,
 
 
 
+midiEvent instrumentTrack::applyMasterKey( const midiEvent & _me )
+{
+	midiEvent copy( _me );
+	switch( _me.m_type )
+	{
+		case MidiNoteOn:
+		case MidiNoteOff:
+		case MidiKeyPressure:
+			copy.key() = masterKey( _me.key() );
+			break;
+		default:
+			break;
+	}
+	return copy;
+}
+
+
+
+
 void instrumentTrack::processInEvent( const midiEvent & _me,
 							const midiTime & _time )
 {
+	engine::getMixer()->lock();
 	switch( _me.m_type )
 	{
+		// we don't send MidiNoteOn, MidiNoteOff and MidiKeyPressure
+		// events to instrument as notePlayHandle will send them on its
+		// own
 		case MidiNoteOn: 
 			if( _me.velocity() > 0 )
 			{
-				m_instrument->handleMidiEvent( _me, _time );
 				if( m_notes[_me.key()] == NULL )
 				{
 					if( !configManager::inst()->value( "ui",
@@ -217,8 +222,8 @@ void instrumentTrack::processInEvent( const midiEvent & _me,
 					// create temporary note
 					note n;
 					n.setKey( _me.key() );
-					n.setVolume( _me.velocity() * 100 /
-									127 );
+					n.setVolume( _me.getVolume() );
+
 					// create (timed) note-play-handle
 					notePlayHandle * nph = new
 						notePlayHandle( this,
@@ -231,14 +236,12 @@ void instrumentTrack::processInEvent( const midiEvent & _me,
 					{
 						m_notes[_me.key()] = nph;
 					}
-					return;
 				}
 				break;
 			}
 
 		case MidiNoteOff:
 		{
-			m_instrument->handleMidiEvent( _me, _time );
 			notePlayHandle * n = m_notes[_me.key()];
 			if( n != NULL )
 			{
@@ -248,11 +251,13 @@ void instrumentTrack::processInEvent( const midiEvent & _me,
 				// this is for example needed by piano-roll for
 				// recording notes into a pattern
 				note done_note(
-				midiTime( static_cast<f_cnt_t>(
-					n->totalFramesPlayed() /
-					engine::framesPerTick() ) ),
-					0, n->key(),
-					n->getVolume(), n->getPanning() );
+					midiTime( static_cast<f_cnt_t>(
+						n->totalFramesPlayed() /
+						engine::framesPerTick() ) ),
+							0,
+							n->key(),
+							n->getVolume(),
+							n->getPanning() );
 
 				n->noteOff();
 				m_notes[_me.key()] = NULL;
@@ -263,16 +268,16 @@ void instrumentTrack::processInEvent( const midiEvent & _me,
 		}
 
 		case MidiKeyPressure:
-			if( !m_instrument->handleMidiEvent( _me, _time ) &&
-						m_notes[_me.key()] != NULL )
+			if( m_notes[_me.key()] != NULL )
 			{
-				m_notes[_me.key()]->setVolume( _me.velocity() *
-								100 / 127 );
+				m_notes[_me.key()]->setVolume( _me.getVolume() );
 			}
 			break;
 
 		case MidiPitchBend:
-			m_instrument->handleMidiEvent( _me, _time );
+			// updatePitch() is connected to
+			// m_pitchModel::dataChanged() which will send out
+			// MidiPitchBend events
 			m_pitchModel.setValue( m_pitchModel.minValue() +
 					_me.m_data.m_param[0] *
 						m_pitchModel.range() / 16384 );
@@ -291,6 +296,7 @@ void instrumentTrack::processInEvent( const midiEvent & _me,
 			}
 			break;
 	}
+	engine::getMixer()->unlock();
 }
 
 
@@ -299,6 +305,8 @@ void instrumentTrack::processInEvent( const midiEvent & _me,
 void instrumentTrack::processOutEvent( const midiEvent & _me,
 							const midiTime & _time )
 {
+	int k;
+
 	switch( _me.m_type )
 	{
 		case MidiNoteOn:
@@ -310,11 +318,23 @@ void instrumentTrack::processOutEvent( const midiEvent & _me,
 			if( !configManager::inst()->value( "ui",
 				"disablechannelactivityindicators" ).toInt() )
 			{
-				if( m_notes[_me.key()] != NULL )
+				if( m_notes[_me.key()] == NULL )
 				{
-					return;
+					emit newNote();
 				}
-				emit newNote();
+			}
+			k = masterKey( _me.key() );
+			if( k >= 0 && k < NumKeys )
+			{
+				if( m_runningMidiNotes[k] > 0 )
+				{
+					m_instrument->handleMidiEvent(
+	midiEvent( MidiNoteOff, getMidiPort()->outputChannel(), k, 0 ), _time );
+				}
+				++m_runningMidiNotes[k];
+				m_instrument->handleMidiEvent(
+	midiEvent( MidiNoteOn, getMidiPort()->outputChannel(), k,
+						_me.velocity() ), _time );
 			}
 			break;
 
@@ -324,14 +344,43 @@ void instrumentTrack::processOutEvent( const midiEvent & _me,
 			{
 				m_piano.setKeyState( _me.key(), FALSE );
 			}
+			k = masterKey( _me.key() );
+			if( k >= 0 && k < NumKeys &&
+						--m_runningMidiNotes[k] <= 0 )
+			{
+				m_instrument->handleMidiEvent(
+	midiEvent( MidiNoteOff, getMidiPort()->outputChannel(), k, 0 ), _time );
+			}
 			break;
 
 		default:
+			if( m_instrument != NULL )
+			{
+				m_instrument->handleMidiEvent(
+							applyMasterKey( _me ),
+									_time );
+			}
 			break;
 	}
-	m_instrument->handleMidiEvent( _me, _time );
+
 	// if appropriate, midi-port does futher routing
 	m_midiPort.processOutEvent( _me, _time );
+}
+
+
+
+
+f_cnt_t instrumentTrack::beatLen( notePlayHandle * _n ) const
+{
+	if( m_instrument != NULL )
+	{
+		const f_cnt_t len = m_instrument->beatLen( _n );
+		if( len > 0 )
+		{
+			return( len );
+		}
+	}
+	return( m_soundShaping.envFrames() );
 }
 
 
@@ -345,7 +394,7 @@ void instrumentTrack::playNote( notePlayHandle * _n, bool _try_parallelizing,
 	m_chordCreator.processNote( _n );
 	m_arpeggiator.processNote( _n );
 
-	if( _n->arpBaseNote() == FALSE && m_instrument != NULL )
+	if( !_n->isArpeggioBaseNote() && m_instrument != NULL )
 	{
 		// all is done, so now lets play the note!
 		m_instrument->playNote( _n, _try_parallelizing,
@@ -431,11 +480,22 @@ void instrumentTrack::updateBaseNote( void )
 
 
 
-int instrumentTrack::masterKey( notePlayHandle * _n ) const
+void instrumentTrack::updatePitch( void )
+{
+	updateBaseNote();
+	processOutEvent( midiEvent( MidiPitchBend,
+					getMidiPort()->outputChannel(),
+					midiPitch() ), 0 );
+}
+
+
+
+
+int instrumentTrack::masterKey( int _midi_key ) const
 {
 	int key = m_baseNoteModel.value() + engine::getSong()->masterPitch();
-	return( tLimit<int>( _n->key() -
-		( key - Key_A - DefaultOctave * KeysPerOctave ), 0, NumKeys ) );
+	return( tLimit<int>( _midi_key -
+		( key - DefaultKey ), 0, NumKeys ) );
 }
 
 
@@ -986,7 +1046,8 @@ void instrumentTrackView::toggleInstrumentWindow( bool _on )
 
 void instrumentTrackView::activityIndicatorPressed( void )
 {
-	model()->processInEvent( midiEvent( MidiNoteOn, 0, DefaultKey, 127 ),
+	model()->processInEvent(
+			midiEvent( MidiNoteOn, 0, DefaultKey, MidiMaxVelocity ),
 								midiTime() );
 }
 

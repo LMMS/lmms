@@ -149,7 +149,7 @@ void piano::setKeyState( int _key, bool _on )
 void piano::handleKeyPress( int _key )
 {
 	m_instrumentTrack->processInEvent( midiEvent( MidiNoteOn, 0, _key,
-						DefaultVolume ), midiTime() );
+						MidiMaxVelocity ), midiTime() );
 	m_pressedKeys[_key] = TRUE;
 }
 
@@ -478,26 +478,26 @@ void pianoView::mousePressEvent( QMouseEvent * _me )
 		if( _me->pos().y() > PIANO_BASE )
 		{
 			int y_diff = _me->pos().y() - PIANO_BASE;
-			volume vol = (volume)( ( float ) y_diff /
+			int velocity = (int)( ( float ) y_diff /
 				( ( KEY_ORDER[key_num % KeysPerOctave] ==
 								WhiteKey ) ?
 				PW_WHITE_KEY_HEIGHT : PW_BLACK_KEY_HEIGHT ) *
-				(float) DefaultVolume );
+						(float) MidiMaxVelocity );
 			if( y_diff < 0 )
 			{
-				vol = 0;
+				velocity = 0;
 			}
 			else if( y_diff > ( ( KEY_ORDER[key_num %
 							KeysPerOctave] ==
 								WhiteKey ) ?
 				PW_WHITE_KEY_HEIGHT : PW_BLACK_KEY_HEIGHT ) )
 			{
-				vol = DefaultVolume;
+				velocity = MidiMaxVelocity;
 			}
 			// set note on
 			m_piano->m_instrumentTrack->processInEvent(
 					midiEvent( MidiNoteOn, 0, key_num,
-							vol * 127 / 100 ),
+							velocity ),
 								midiTime() );
 			m_piano->m_pressedKeys[key_num] = TRUE;
 			m_lastKey = key_num;
@@ -581,22 +581,22 @@ void pianoView::mouseMoveEvent( QMouseEvent * _me )
 
 	int key_num = getKeyFromMouse( _me->pos() );
 	int y_diff = _me->pos().y() - PIANO_BASE;
-	volume vol = (volume)( (float) y_diff /
+	int velocity = (int)( (float) y_diff /
 		( ( KEY_ORDER[key_num % KeysPerOctave] == WhiteKey ) ?
 			PW_WHITE_KEY_HEIGHT : PW_BLACK_KEY_HEIGHT ) *
-						(float)DefaultVolume );
+						(float) MidiMaxVelocity );
 	// maybe the user moved the mouse-cursor above or under the
 	// piano-widget while holding left button so check that and
 	// correct volume if necessary
 	if( y_diff < 0 )
 	{
-		vol = 0;
+		velocity = 0;
 	}
 	else if( y_diff >
 		( ( KEY_ORDER[key_num % KeysPerOctave] == WhiteKey ) ?
 				PW_WHITE_KEY_HEIGHT : PW_BLACK_KEY_HEIGHT ) )
 	{
-		vol = DefaultVolume;
+		velocity = MidiMaxVelocity;
 	}
 
 	// is the calculated key different from current key? (could be the
@@ -616,7 +616,8 @@ void pianoView::mouseMoveEvent( QMouseEvent * _me )
 			if( _me->pos().y() > PIANO_BASE )
 			{
 				m_piano->m_instrumentTrack->processInEvent(
-					midiEvent( MidiNoteOn, 0, key_num, vol ),
+					midiEvent( MidiNoteOn, 0, key_num,
+							velocity ),
 								midiTime() );
 				m_piano->m_pressedKeys[key_num] = TRUE;
 				m_lastKey = key_num;
@@ -633,7 +634,8 @@ void pianoView::mouseMoveEvent( QMouseEvent * _me )
 	else if( m_piano->m_pressedKeys[key_num] == TRUE )
 	{
 		m_piano->m_instrumentTrack->processInEvent(
-				midiEvent( MidiKeyPressure, 0, key_num, vol ),
+				midiEvent( MidiKeyPressure, 0, key_num,
+							velocity ),
 								midiTime() );
 	}
 

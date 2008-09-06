@@ -70,6 +70,8 @@ public:
 	void processAudioBuffer( sampleFrame * _buf, const fpp_t _frames,
 							notePlayHandle * _n );
 
+	midiEvent applyMasterKey( const midiEvent & _me );
+
 	virtual void processInEvent( const midiEvent & _me,
 					const midiTime & _time );
 	virtual void processOutEvent( const midiEvent & _me,
@@ -100,9 +102,9 @@ public:
 	// name-stuff
 	virtual void setName( const QString & _new_name );
 
-	// translate key of given notePlayHandle to absolute key (i.e.
-	// add global master-pitch and base-note in piano)
-	int masterKey( notePlayHandle * _n ) const;
+	// translate given key of a note-event to absolute key (i.e.
+	// add global master-pitch and base-note of this instrument track)
+	int masterKey( int _midi_key ) const;
 
 	// translate pitch to midi-pitch [0,16383]
 	inline int midiPitch( void ) const
@@ -181,6 +183,7 @@ protected:
 
 protected slots:
 	void updateBaseNote( void );
+	void updatePitch( void );
 
 
 private:
@@ -188,6 +191,7 @@ private:
 	midiPort m_midiPort;
 
 	notePlayHandle * m_notes[NumKeys];
+	int m_runningMidiNotes[NumKeys];
 
 	intModel m_baseNoteModel;
 

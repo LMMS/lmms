@@ -706,7 +706,7 @@ void lb302Synth::playNote( notePlayHandle * _n, bool,
 {
 	fpp_t framesPerPeriod = engine::getMixer()->framesPerPeriod();
 
-	if( _n->arpBaseNote() )
+	if( _n->isArpeggioBaseNote() )
 	{
 		return;
 	}
