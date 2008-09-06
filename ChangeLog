@@ -1,3 +1,9 @@
+2008-09-06	Csaba Hruska <csaba.hruska/at/gmail.com>
+
+	* plugins/sid/sid_instrument.cpp:
+	Fixed overlapping notes distorsion SID bug.
+	Some warnings are also had removed.
+	
 2008-09-05	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* include/lmms_style.h:

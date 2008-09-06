@@ -46,7 +46,6 @@
 #define SIDWRITEDELAY 9 // lda $xxxx,x 4 cycles, sta $d400,x 5 cycles
 #define SIDWAVEDELAY 4 // and $xxxx,x 4 cycles extra
 
-unsigned char sidreg[NUMSIDREGS];
 unsigned char sidorder[] =
   {0x15,0x16,0x18,0x17,
    0x05,0x06,0x02,0x03,0x00,0x01,0x04,
@@ -232,7 +231,7 @@ f_cnt_t sidInstrument::desiredReleaseFrames( void ) const
 	for( int i = 0 ; i < 3 ; ++i )
 	{
 		if( maxrel < m_voice[i]->m_releaseModel.value() )
-			maxrel = m_voice[i]->m_releaseModel.value();
+			maxrel = (int)m_voice[i]->m_releaseModel.value();
 	}
 
 	return f_cnt_t( float(relTime[maxrel])*samplerate/1000.0 );
@@ -241,7 +240,7 @@ f_cnt_t sidInstrument::desiredReleaseFrames( void ) const
 
 
 
-int sid_fillbuffer(SID *sid, int tdelta, short *ptr, int samples)
+static int sid_fillbuffer(unsigned char* sidreg, SID *sid, int tdelta, short *ptr, int samples)
 {
   int tdelta2;
   int result;
@@ -318,6 +317,7 @@ void sidInstrument::playNote( notePlayHandle * _n, bool,
 	SID *sid = static_cast<SID *>( _n->m_pluginData );
 	int delta_t = clockrate * frames / samplerate + 4;
 	short buf[frames];
+	unsigned char sidreg[NUMSIDREGS];
 
 	for (int c = 0; c < NUMSIDREGS; c++)
 	{
@@ -352,7 +352,7 @@ void sidInstrument::playNote( notePlayHandle * _n, bool,
 		sidreg[base+0] = data16&0x00FF;
 		sidreg[base+1] = (data16>>8)&0x00FF;
 		// pw
-		data16 = m_voice[i]->m_pulseWidthModel.value();
+		data16 = (int)m_voice[i]->m_pulseWidthModel.value();
 		
 		sidreg[base+2] = data16&0x00FF;
 		sidreg[base+3] = (data16>>8)&0x000F;
@@ -371,18 +371,18 @@ void sidInstrument::playNote( notePlayHandle * _n, bool,
 		}
 		sidreg[base+4] = data8&0x00FF;
 		// ad
-		data16 = m_voice[i]->m_attackModel.value();
+		data16 = (int)m_voice[i]->m_attackModel.value();
 
 		data8 = (data16&0x0F)<<4;
-		data16 = m_voice[i]->m_decayModel.value();
+		data16 = (int)m_voice[i]->m_decayModel.value();
 
 		data8 += (data16&0x0F);
 		sidreg[base+5] = data8&0x00FF;
 		// sr
-		data16 = m_voice[i]->m_sustainModel.value();
+		data16 = (int)m_voice[i]->m_sustainModel.value();
 
 		data8 = (data16&0x0F)<<4;
-		data16 = m_voice[i]->m_releaseModel.value();
+		data16 = (int)m_voice[i]->m_releaseModel.value();
 
 		data8 += (data16&0x0F);
 		sidreg[base+6] = data8&0x00FF;
@@ -390,12 +390,12 @@ void sidInstrument::playNote( notePlayHandle * _n, bool,
 	// filtered
 
 	// FC (FilterCutoff)
-	data16 = m_filterFCModel.value();
+	data16 = (int)m_filterFCModel.value();
 	sidreg[21] = data16&0x0007;
 	sidreg[22] = (data16>>3)&0x00FF;
 	
 	// res, filt ex,3,2,1
-	data16 = m_filterResonanceModel.value();
+	data16 = (int)m_filterResonanceModel.value();
 	data8 = (data16&0x000F)<<4;
 	data8 += m_voice[2]->m_filteredModel.value()?4:0;
 	data8 += m_voice[1]->m_filteredModel.value()?2:0;
@@ -403,7 +403,7 @@ void sidInstrument::playNote( notePlayHandle * _n, bool,
 	sidreg[23] = data8&0x00FF;
 
 	// mode vol
-	data16 = m_volumeModel.value();
+	data16 = (int)m_volumeModel.value();
 	data8 = data16&0x000F;
 	data8 += m_voice3OffModel.value()?128:0;
 
@@ -417,7 +417,7 @@ void sidInstrument::playNote( notePlayHandle * _n, bool,
 
 	sidreg[24] = data8&0x00FF;
 		
-	int num = sid_fillbuffer(sid,delta_t,buf, frames);
+	int num = sid_fillbuffer(sidreg, sid,delta_t,buf, frames);
 	if(num!=frames)
 		printf("!!!Not enough samples\n");
 
