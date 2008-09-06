@@ -1,5 +1,5 @@
 /*
- * vestige.cpp - instrument-plugin for hosting VST-plugins
+ * vestige.cpp - instrument-plugin for hosting VST-instruments
  *
  * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
@@ -36,7 +36,6 @@
 #include "instrument_play_handle.h"
 #include "instrument_track.h"
 #include "vst_plugin.h"
-#include "note_play_handle.h"
 #include "pixmap_button.h"
 #include "song.h"
 #include "text_float.h"
@@ -74,11 +73,6 @@ vestigeInstrument::vestigeInstrument( instrumentTrack * _instrument_track ) :
 	m_plugin( NULL ),
 	m_pluginMutex()
 {
-	for( int i = 0; i < NumKeys; ++i )
-	{
-		m_runningNotes[i] = 0;
-	}
-
 	// now we need a play-handle which cares for calling play()
 	instrumentPlayHandle * iph = new instrumentPlayHandle( this );
 	engine::getMixer()->addPlayHandle( iph );
@@ -253,49 +247,6 @@ void vestigeInstrument::play( bool _try_parallelizing, sampleFrame * )
 
 
 
-
-
-void vestigeInstrument::playNote( notePlayHandle * _n, bool, sampleFrame * )
-{
-	m_pluginMutex.lock();
-	if( _n->totalFramesPlayed() == 0 && m_plugin != NULL )
-	{
-		const int k = getInstrumentTrack()->masterKey( _n );
-		if( m_runningNotes[k] > 0 )
-		{
-			m_plugin->processMidiEvent( midiEvent( MidiNoteOff, 0,
-								k, 0 ), 0 );
-		}
-		++m_runningNotes[k];
-		m_plugin->processMidiEvent( midiEvent( MidiNoteOn, 0, k,
-					_n->getVolume() ), _n->offset() );
-		// notify when the handle stops, call to deleteNotePluginData
-		_n->m_pluginData = _n;
-	}
-	m_pluginMutex.unlock();
-}
-
-
-
-
-void vestigeInstrument::deleteNotePluginData( notePlayHandle * _n )
-{
-	m_pluginMutex.lock();
-	if( m_plugin != NULL )
-	{
-		const int k = getInstrumentTrack()->masterKey( _n );
-		if( --m_runningNotes[k] <= 0 )
-		{
-			m_plugin->processMidiEvent(
-					midiEvent( MidiNoteOff, 0, k, 0 ), 0 );
-		}
-	}
-	m_pluginMutex.unlock();
-}
-
-
-
-
 bool vestigeInstrument::handleMidiEvent( const midiEvent & _me,
 						const midiTime & _time )
 {
@@ -307,21 +258,6 @@ bool vestigeInstrument::handleMidiEvent( const midiEvent & _me,
 	m_pluginMutex.unlock();
 	return( TRUE );
 }
-
-
-
-
-/*
-void vestigeInstrument::changeTempo( bpm_t _new_tempo )
-{
-	m_pluginMutex.lock();
-	if( m_plugin != NULL )
-	{
-		m_plugin->setTempo( _new_tempo );
-	}
-	m_pluginMutex.unlock();
-}
-*/
 
 
 
