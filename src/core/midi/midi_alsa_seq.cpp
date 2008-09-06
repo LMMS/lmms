@@ -53,7 +53,8 @@ midiALSASeq::midiALSASeq( void ) :
 					probeDevice().toAscii().constData(),
 						SND_SEQ_OPEN_DUPLEX, 0 ) ) < 0 )
 	{
-		printf( "cannot open sequencer: %s\n", snd_strerror( err ) );
+		fprintf( stderr, "cannot open sequencer: %s\n",
+							snd_strerror( err ) );
 		return;
 	}
 	snd_seq_set_client_name( m_seqHandle, "LMMS" );
@@ -194,8 +195,8 @@ void midiALSASeq::processOutEvent( const midiEvent & _me,
 			break;
 
 		default:
-			printf( "ALSA-sequencer: unhandled output event %d\n",
-							(int) _me.m_type );
+			fprintf( stderr, "ALSA-sequencer: unhandled output "
+					"event %d\n", (int) _me.m_type );
 			return;
 	}
 
@@ -335,7 +336,7 @@ void midiALSASeq::subscribeReadablePort( midiPort * _port,
 	if( snd_seq_parse_address( m_seqHandle, &sender,
 			_dest.section( ' ', 0, 0 ).toAscii().constData() ) )
 	{
-		printf( "error parsing sender-address!!\n" );
+		fprintf( stderr, "error parsing sender-address!\n" );
 		return;
 	}
 	snd_seq_port_info_t * port_info;
@@ -373,7 +374,7 @@ void midiALSASeq::subscribeWriteablePort( midiPort * _port,
 	if( snd_seq_parse_address( m_seqHandle, &dest,
 			_dest.section( ' ', 0, 0 ).toAscii().constData() ) )
 	{
-		printf( "error parsing dest-address!!\n" );
+		fprintf( stderr, "error parsing dest-address!\n" );
 		return;
 	}
 	snd_seq_port_info_t * port_info;
@@ -520,7 +521,8 @@ void midiALSASeq::run( void )
 				break;
 
 			default:
-				printf( "ALSA-sequencer: unhandled input "
+				fprintf( stderr,
+					"ALSA-sequencer: unhandled input "
 						"event %d\n", ev->type );
 				break;
 		}

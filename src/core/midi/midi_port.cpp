@@ -153,10 +153,10 @@ void midiPort::processOutEvent( const midiEvent & _me, const midiTime & _time )
 {
 	// mask event
 	if( outputEnabled() &&
-		( outputChannel()-1 == _me.m_channel && outputChannel() != 0 ) )
+		( outputChannel() == _me.m_channel && outputChannel() != 0 ) )
 	{
 		midiEvent ev = _me;
-		if( m_defaultVelocityOutEnabledModel.value() == TRUE &&
+		if( m_defaultVelocityOutEnabledModel.value() == true &&
 							_me.velocity() > 0 )
 		{
 			ev.velocity() = DefaultVolume;
