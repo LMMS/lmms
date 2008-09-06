@@ -1,5 +1,8 @@
 2008-09-06	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* data/themes/default/background_artwork.png:
+	added more decent background artwork
+
 	* plugins/ladspa_effect/ladspa_subplugin_features.cpp:
 	* include/ladspa_base.h:
 	save LADSPA effect filenames without extension and add correct
