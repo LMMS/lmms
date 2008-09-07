@@ -72,7 +72,7 @@ trackContainerView::trackContainerView( trackContainer * _tc ) :
 	m_scrollLayout = new QVBoxLayout( scrollContent );
 	m_scrollLayout->setMargin( 0 );
 	m_scrollLayout->setSpacing( 0 );
-	m_scrollLayout->setSizeConstraint( QLayout::SetMinimumSize );
+	m_scrollLayout->setSizeConstraint( QLayout::SetMinAndMaxSize );
 
 	m_scrollArea->setWidget( scrollContent );
 

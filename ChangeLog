@@ -1,5 +1,9 @@
 2008-09-07	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* src/gui/track_container_view.cpp:
+	changed size constraint for scrollArea-widget layout - fixes messed up
+	Song Editor after loading various projects
+
 	* src/gui/main_window.cpp:
 	set QMdiArea::DontMaximizeSubWindowOnActivation option for not
 	crashing when loading project while a subwindow is maximized (this
@@ -44,6 +48,7 @@
 	* src/gui/song_editor.cpp:
 	* src/gui/fx_mixer_view.cpp:
 	* src/gui/widgets/visualization_widget.cpp:
+	* plugins/spectrum_analyzer/spectrumanalyzer_control_dialog.cpp:
 	moved peridic update-timer from songEditor to mainWindow
 
 	* data/projects/cool_songs/Chris-HorizonRemix.mmp:
