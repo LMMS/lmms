@@ -1,5 +1,10 @@
 2008-09-07	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* src/core/song.cpp:
+	- fixed freeze after adding BB-tracks (closes #2089337)
+	- replaced bad cast for calling projectNotes::save/restoreState by
+	  proper C++ construct
+
 	* include/controller_rack_view.h:
 	* include/fx_mixer_view.h:
 	* include/main_window.h:
@@ -15,7 +20,7 @@
 	* src/gui/widgets/controller_rack_view.cpp:
 	* src/tracks/instrument_track.cpp:
 	properly save and restore position, size, visibility and state of
-	MDI-subwindows
+	MDI-subwindows (closes #2072383)
 
 	* src/core/serializing_object.cpp:
 	fixed hook-mechanism

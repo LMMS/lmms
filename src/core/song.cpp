@@ -672,6 +672,7 @@ void song::addBBTrack( void )
 	track * t = track::create( track::BBTrack, this );
 	engine::getBBTrackContainer()->setCurrentBB(
 						bbTrack::numOfBBTrack( t ) );
+	engine::getMixer()->unlock();
 }
 
 
@@ -679,7 +680,9 @@ void song::addBBTrack( void )
 
 void song::addSampleTrack( void )
 {
+	engine::getMixer()->lock();
 	(void) track::create( track::SampleTrack, this );
+	engine::getMixer()->unlock();
 }
 
 
@@ -687,7 +690,9 @@ void song::addSampleTrack( void )
 
 void song::addAutomationTrack( void )
 {
+	engine::getMixer()->lock();
 	(void) track::create( track::AutomationTrack, this );
+	engine::getMixer()->unlock();
 }
 
 
@@ -937,9 +942,8 @@ void song::loadProject( const QString & _file_name )
 						engine::getProjectNotes()->
 								nodeName() )
 				{
-					( (journallingObject *)( engine::
-							getProjectNotes() ) )->
-						restoreState( node.toElement() );
+					 engine::getProjectNotes()->
+			serializingObject::restoreState( node.toElement() );
 				}
 				else if( node.nodeName() ==
 						m_playPos[Mode_PlaySong].
@@ -1008,8 +1012,8 @@ bool song::saveProject( void )
 		engine::getControllerRackView()->saveState( mmp, mmp.content() );
 		engine::getPianoRoll()->saveState( mmp, mmp.content() );
 		engine::getAutomationEditor()->saveState( mmp, mmp.content() );
-		( (journallingObject *)( engine::getProjectNotes() ) )->
-						saveState( mmp, mmp.content() );
+		engine::getProjectNotes()->
+			serializingObject::saveState( mmp, mmp.content() );
 		m_playPos[Mode_PlaySong].m_timeLine->saveState(
 							mmp, mmp.content() );
 	}
