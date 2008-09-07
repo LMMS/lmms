@@ -27,25 +27,31 @@
 
 #include <QtGui/QWidget>
 
+#include "serializing_object.h"
 #include "types.h"
 
-#include "mv_base.h"
 
 class QPushButton;
 class QScrollArea;
-class QVBoxLayout;
+//class QVBoxLayout;
 
 class controllerView;
 
 
-class controllerRackView : public QWidget, public modelView
+class controllerRackView : public QWidget, public serializingObject
 {
 	Q_OBJECT
 public:
 	controllerRackView();
 	virtual ~controllerRackView();
 
-	void clear( void );
+	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
+	virtual void loadSettings( const QDomElement & _this );
+
+	inline virtual QString nodeName( void ) const
+	{
+		return( "controllerrackview" );
+	}
 
 
 public slots:
@@ -56,24 +62,11 @@ private slots:
 	virtual void update( void );
 	void addController( void );
 
+
 private:
-	/*virtual void modelChanged( void );
-
-	inline effectChain * fxChain( void )
-	{
-		return( castModel<effectChain>() );
-	}
-
-	inline const effectChain * fxChain( void ) const
-	{
-		return( castModel<effectChain>() );
-	}
-*/
-
 	QVector<controllerView *> m_controllerViews;
 
 	QVBoxLayout * m_mainLayout;
-	//groupBox * m_effectsGroupBox;
 	QScrollArea * m_scrollArea;
 	QPushButton * m_addButton;
 	

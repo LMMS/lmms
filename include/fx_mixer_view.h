@@ -40,12 +40,16 @@ class pixmapButton;
 
 
 
-class fxMixerView : public QWidget, public modelView
+class fxMixerView : public QWidget, public modelView,
+					public serializingObjectHook
 {
 	Q_OBJECT
 public:
 	fxMixerView();
 	virtual ~fxMixerView();
+
+	virtual void saveSettings( QDomDocument & _doc, QDomElement & _this );
+	virtual void loadSettings( const QDomElement & _this );
 
 	fxLine * currentFxLine( void )
 	{

@@ -30,7 +30,7 @@
 #include <QtGui/QWidget>
 
 #include "combobox_model.h"
-#include "journalling_object.h"
+#include "serializing_object.h"
 #include "note.h"
 #include "types.h"
 
@@ -46,7 +46,7 @@ class timeLine;
 class toolButton;
 
 
-class pianoRoll : public QWidget, public journallingObject
+class pianoRoll : public QWidget, public serializingObject
 {
 	Q_OBJECT
 public:
@@ -72,6 +72,7 @@ public:
 
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
 	virtual void loadSettings( const QDomElement & _this );
+
 	inline virtual QString nodeName( void ) const
 	{
 		return( "pianoroll" );

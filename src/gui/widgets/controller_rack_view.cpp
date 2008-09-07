@@ -43,8 +43,7 @@
 
 
 controllerRackView::controllerRackView( ) :
-	QWidget(),
-	modelView( NULL, this )
+	QWidget()
 {
 	setFixedSize( 250, 250 );
 	setWindowIcon( embed::getIconPixmap( "controller" ) );
@@ -70,8 +69,6 @@ controllerRackView::controllerRackView( ) :
 
 	m_lastY = 0;
 
-	setModel( engine::getSong() );
-
 	QMdiSubWindow * subWin = 
 		engine::getMainWindow()->workspace()->addSubWindow( this );
 	Qt::WindowFlags flags = subWin->windowFlags();
@@ -90,63 +87,28 @@ controllerRackView::controllerRackView( ) :
 
 controllerRackView::~controllerRackView()
 {
-	clear();
+	// delete scroll-area with all children
+	delete m_scrollArea;
 }
 
 
 
 
-
-void controllerRackView::clear( void )
+void controllerRackView::saveSettings( QDomDocument & _doc,
+							QDomElement & _this )
 {
-/*	for( QVector<effectView *>::iterator it = m_controllerViews.begin();
-					it != m_controllerViews.end(); ++it )
-	{
-		delete *it;
-	}
-	m_controllerViews.clear();*/
+	mainWindow::saveWidgetState( this, _this );
 }
 
 
 
-/*
-void controllerRackView::moveUp( controllerView * _view )
+
+void controllerRackView::loadSettings( const QDomElement & _this )
 {
-	fxChain()->moveUp( _view->getEffect() );
-	if( _view != m_effectViews.first() )
-	{
-		int i = 0;
-		for( QVector<controllerView *>::iterator it = 
-						m_effectViews.begin(); 
-					it != m_effectViews.end(); it++, i++ )
-		{
-			if( *it == _view )
-			{
-				break;
-			}
-		}
-		
-		effectView * temp = m_effectViews[ i - 1 ];
-		
-		m_effectViews[i - 1] = _view;
-		m_effectViews[i] = temp;
-		
-		update();
-	}
-}*/
+	mainWindow::restoreWidgetState( this, _this );
+}
 
 
-
-/*
-void controllerRackView::moveDown( effectView * _view )
-{
-	if( _view != m_effectViews.last() )
-	{
-		// moving next effect up is the same
-		moveUp( *( qFind( m_effectViews.begin(), m_effectViews.end(),
-							_view ) + 1 ) );
-	}
-}*/
 
 
 void controllerRackView::deleteController( controllerView * _view )
@@ -162,6 +124,7 @@ void controllerRackView::deleteController( controllerView * _view )
 
 
 
+
 void controllerRackView::update( void )
 {
 	QWidget * w = m_scrollArea->widget();
@@ -173,7 +136,7 @@ void controllerRackView::update( void )
 	int i = 0;
 	for( i = 0; i < m_controllerViews.size(); ++i )
 	{
-		delete  m_controllerViews[i];
+		delete m_controllerViews[i];
 	}
 
 	m_controllerViews.clear();
@@ -193,57 +156,6 @@ void controllerRackView::update( void )
 
 	w->setFixedSize( 210, i*32 );
 
-	/*
-	for( QVector<effect *>::iterator it = fxChain()->m_effects.begin();
-					it != fxChain()->m_effects.end(); ++it )
-	{
-		int i = 0;
-		for( QVector<effectView *>::iterator vit =
-							m_effectViews.begin();
-				vit != m_effectViews.end(); ++vit, ++i )
-		{
-			if( ( *vit )->getEffect() == *it )
-			{
-				view_map[i] = TRUE;
-				break;
-			}
-		}
-		if( i >= m_effectViews.size() )
-		{
-			effectView * view = new effectView( *it, w );
-			connect( view, SIGNAL( moveUp( effectView * ) ), 
-					this, SLOT( moveUp( effectView * ) ) );
-			connect( view, SIGNAL( moveDown( effectView * ) ),
-				this, SLOT( moveDown( effectView * ) ) );
-			connect( view, SIGNAL( deletePlugin( effectView * ) ),
-				this, SLOT( deletePlugin( effectView * ) ) );
-			view->show();
-			m_effectViews.append( view );
-			view_map[i] = TRUE;
-
-		}
-	}
-
-	int i = m_lastY = 0;
-	for( QVector<effectView *>::iterator it = m_effectViews.begin(); 
-					it != m_effectViews.end(); )
-	{
-		if( i < view_map.size() && i < m_effectViews.size() &&
-							view_map[i] == FALSE )
-		{
-			delete m_effectViews[i];
-			m_effectViews.erase( it );
-		}
-		else
-		{
-			( *it )->move( 0, m_lastY );
-			m_lastY += ( *it )->height();
-			++it;
-			++i;
-		}
-	}
-	w->setFixedSize( 210, m_lastY );
-*/
 	setUpdatesEnabled( true );
 	QWidget::update();
 }
@@ -266,16 +178,6 @@ void controllerRackView::addController( void )
 	update();
 }
 
-
-/*
-
-void effectRackView::modelChanged( void )
-{
-	clear();
-	m_effectsGroupBox->setModel( &fxChain()->m_enabledModel );
-	update();
-}
-*/
 
 
 #include "moc_controller_rack_view.cxx"

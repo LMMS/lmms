@@ -155,7 +155,7 @@ mainWindow::mainWindow( void ) :
 	setCentralWidget( main_widget );
 
 
-
+	m_updateTimer.start( 1000 / 20, this );	// 20 fps
 }
 
 
@@ -578,6 +578,8 @@ void mainWindow::saveWidgetState( QWidget * _w, QDomElement & _de )
 	_de.setAttribute( "x", _w->x() );
 	_de.setAttribute( "y", _w->y() );
 	_de.setAttribute( "visible", _w->isVisible() );
+	_de.setAttribute( "minimized", _w->isMinimized() );
+	_de.setAttribute( "maximized", _w->isMaximized() );
 
 	_de.setAttribute( "width", _w->width() );
 	_de.setAttribute( "height", _w->height() );
@@ -592,7 +594,7 @@ void mainWindow::restoreWidgetState( QWidget * _w, const QDomElement & _de )
 			tMax( 0, _de.attribute( "y" ).toInt() ),
 			tMax( 100, _de.attribute( "width" ).toInt() ),
 			tMax( 100, _de.attribute( "height" ).toInt() ) );
-	if( !r.isNull())
+	if( !r.isNull() )
 	{
 		if ( _w->parentWidget() != NULL &&
 			_w->parentWidget()->inherits( "QMdiSubWindow" ) )
@@ -603,6 +605,12 @@ void mainWindow::restoreWidgetState( QWidget * _w, const QDomElement & _de )
 		_w->resize( r.size() );
 		_w->move( r.topLeft() );
 		_w->setVisible( _de.attribute( "visible" ).toInt() );
+		_w->setWindowState( _de.attribute( "minimized" ).toInt() ?
+				( _w->windowState() | Qt::WindowMinimized ) :
+				( _w->windowState() & ~Qt::WindowMinimized ) );
+		_w->setWindowState( _de.attribute( "maximized" ).toInt() ?
+				( _w->windowState() | Qt::WindowMaximized ) :
+				( _w->windowState() & ~Qt::WindowMaximized ) );
 	}
 }
 
@@ -904,6 +912,14 @@ void mainWindow::keyReleaseEvent( QKeyEvent * _ke )
 		default:
 			QMainWindow::keyReleaseEvent( _ke );
 	}
+}
+
+
+
+
+void mainWindow::timerEvent( QTimerEvent * )
+{
+	emit periodicUpdate();
 }
 
 

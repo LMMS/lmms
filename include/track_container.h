@@ -66,13 +66,6 @@ public:
 
 	void clearAllTracks( void );
 
-	/*
-	trackList & tracks( void )
-	{
-		return( m_tracks );
-	}
-	*/
-
 	const trackList & tracks( void ) const
 	{
 		return( m_tracks );

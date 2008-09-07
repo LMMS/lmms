@@ -26,6 +26,7 @@
 #ifndef _MAIN_WINDOW_H
 #define _MAIN_WINDOW_H
 
+#include <QtCore/QBasicTimer>
 #include <QtCore/QList>
 #include <QtGui/QMainWindow>
 #include <QtGui/QWhatsThis>
@@ -120,6 +121,7 @@ protected:
 	virtual void focusOutEvent( QFocusEvent * _fe );
 	virtual void keyPressEvent( QKeyEvent * _ke );
 	virtual void keyReleaseEvent( QKeyEvent * _ke );
+	virtual void timerEvent( QTimerEvent * _ev );
 
 
 private:
@@ -157,6 +159,8 @@ private:
 	QMenu * m_toolsMenu;
 	QList<pluginView *> m_tools;
 
+	QBasicTimer m_updateTimer;
+
 
 	friend class engine;
 
@@ -167,6 +171,10 @@ private slots:
 	void openRecentlyOpenedProject( QAction * _action );
 	void showTool( QAction * _idx );
 	void updateRecentlyOpenedProjectsMenu( void );
+
+
+signals:
+	void periodicUpdate( void );
 
 } ;
 

@@ -26,8 +26,8 @@
 #ifndef _TRACK_CONTAINER_VIEW_H
 #define _TRACK_CONTAINER_VIEW_H
 
-#include <QtGui/QScrollArea>
 #include <QtCore/QVector>
+#include <QtGui/QScrollArea>
 #include <QtGui/QWidget>
 
 
@@ -40,12 +40,16 @@ class trackContainer;
 
 
 class trackContainerView : public QWidget, public modelView,
-						public journallingObject
+						public journallingObject,
+						public serializingObjectHook
 {
 	Q_OBJECT
 public:
 	trackContainerView( trackContainer * _tc );
 	virtual ~trackContainerView();
+
+	virtual void saveSettings( QDomDocument & _doc, QDomElement & _this );
+	virtual void loadSettings( const QDomElement & _this );
 
 	QWidget * contentWidget( void )
 	{

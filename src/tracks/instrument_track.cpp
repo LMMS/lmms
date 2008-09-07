@@ -681,10 +681,6 @@ void instrumentTrack::saveTrackSpecificSettings( QDomDocument & _doc,
 	m_arpeggiator.saveState( _doc, _this );
 	m_midiPort.saveState( _doc, _this );
 	m_audioPort.getEffects()->saveState( _doc, _this );
-	if( getHook() )
-	{
-		getHook()->saveSettings( _doc, _this );
-	}
 }
 
 
@@ -792,11 +788,6 @@ void instrumentTrack::loadTrackSpecificSettings( const QDomElement & _this )
 		node = node.nextSibling();
         }
 	engine::getMixer()->unlock();
-
-	if( getHook() )
-	{
-		getHook()->loadSettings( _this );
-	}
 }
 
 
@@ -959,6 +950,7 @@ void instrumentTrackView::freeInstrumentTrackWindow( void )
 	{
 		if( s_windows.count() < INSTRUMENT_WINDOW_CACHE_SIZE )
 		{
+			model()->setHook( NULL );
 			m_window->parentWidget()->hide();
 			m_window->setModel(
 				engine::getDummyTrackContainer()->
@@ -1001,6 +993,7 @@ instrumentTrackWindow * instrumentTrackView::getInstrumentTrackWindow( void )
 		m_window->setInstrumentTrackView( this );
 		m_window->setModel( model() );
 		m_window->updateInstrumentView();
+		model()->setHook( m_window );
 	}
 	else
 	{

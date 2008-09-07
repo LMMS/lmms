@@ -915,6 +915,12 @@ void song::loadProject( const QString & _file_name )
 			else if( engine::hasGUI() )
 			{
 				if( node.nodeName() ==
+					engine::getControllerRackView()->nodeName() )
+				{
+					engine::getControllerRackView()->
+						restoreState( node.toElement() );
+				}
+				else if( node.nodeName() ==
 					engine::getPianoRoll()->nodeName() )
 				{
 					engine::getPianoRoll()->restoreState(
@@ -999,6 +1005,7 @@ bool song::saveProject( void )
 	engine::getFxMixer()->saveState( mmp, mmp.content() );
 	if( engine::hasGUI() )
 	{
+		engine::getControllerRackView()->saveState( mmp, mmp.content() );
 		engine::getPianoRoll()->saveState( mmp, mmp.content() );
 		engine::getAutomationEditor()->saveState( mmp, mmp.content() );
 		( (journallingObject *)( engine::getProjectNotes() ) )->

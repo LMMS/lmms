@@ -37,7 +37,7 @@ class QTextCharFormat;
 class QTextEdit;
 
 
-class EXPORT projectNotes : public QMainWindow, public journallingObject
+class EXPORT projectNotes : public QMainWindow, public serializingObject
 {
 	Q_OBJECT
 public:
@@ -49,6 +49,7 @@ public:
 
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
 	virtual void loadSettings( const QDomElement & _this );
+
 	inline virtual QString nodeName( void ) const
 	{
 		return( "projectnotes" );

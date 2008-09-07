@@ -57,8 +57,6 @@ void trackContainer::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
 	_this.setTagName( classNodeName() );
 	_this.setAttribute( "type", nodeName() );
-// ### TODO
-	//mainWindow::saveWidgetState( this, _this );
 
 	// save settings of each track
 	m_tracksMutex.lockForRead();
@@ -117,10 +115,6 @@ void trackContainer::loadSettings( const QDomElement & _this )
 		}
 		node = node.nextSibling();
 	}
-
-// ### TODO
-//	mainWindow::restoreWidgetState( this, _this );
-
 
 	if( pd != NULL )
 	{

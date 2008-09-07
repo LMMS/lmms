@@ -24,6 +24,7 @@
 
 
 #include <QtGui/QApplication>
+#include <QtGui/QLayout>
 #include <QtGui/QMdiArea>
 #include <QtGui/QProgressDialog>
 #include <QtGui/QScrollBar>
@@ -33,9 +34,8 @@
 #include "track_container_view.h"
 #include "track_container.h"
 #include "bb_track.h"
-#include "config_mgr.h"
+#include "main_window.h"
 #include "debug.h"
-#include "engine.h"
 #include "file_browser.h"
 #include "import_filter.h"
 #include "instrument.h"
@@ -51,6 +51,8 @@
 trackContainerView::trackContainerView( trackContainer * _tc ) :
 	QWidget(),
 	modelView( NULL, this ),
+	journallingObject(),
+	serializingObjectHook(),
 	m_currentPosition( 0, 0 ),
 	m_tc( _tc ),
 	m_trackViews(),
@@ -59,6 +61,8 @@ trackContainerView::trackContainerView( trackContainer * _tc ) :
 	m_rubberBand( new rubberBand( m_scrollArea ) ),
 	m_origin()
 {
+	m_tc->setHook( this );
+
 	QVBoxLayout * layout = new QVBoxLayout( this );
 	layout->setMargin( 0 );
 	layout->setSpacing( 0 );
@@ -95,6 +99,23 @@ trackContainerView::~trackContainerView()
 	}
 }
 
+
+
+
+
+void trackContainerView::saveSettings( QDomDocument & _doc,
+							QDomElement & _this )
+{
+	mainWindow::saveWidgetState( this, _this );
+}
+
+
+
+
+void trackContainerView::loadSettings( const QDomElement & _this )
+{
+	mainWindow::restoreWidgetState( this, _this );
+}
 
 
 
