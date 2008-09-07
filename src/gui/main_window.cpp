@@ -595,7 +595,7 @@ void mainWindow::restoreWidgetState( QWidget * _w, const QDomElement & _de )
 			tMax( 0, _de.attribute( "y" ).toInt() ),
 			tMax( 100, _de.attribute( "width" ).toInt() ),
 			tMax( 100, _de.attribute( "height" ).toInt() ) );
-	if( !r.isNull() )
+	if( _de.hasAttribute( "visible" ) && !r.isNull() )
 	{
 		if ( _w->parentWidget() != NULL &&
 			_w->parentWidget()->inherits( "QMdiSubWindow" ) )
