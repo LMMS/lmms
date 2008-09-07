@@ -132,6 +132,7 @@ mainWindow::mainWindow( void ) :
 
 	m_workspace = new QMdiArea( splitter );
 	m_workspace->setBackground( Qt::NoBrush );
+	m_workspace->setOption( QMdiArea::DontMaximizeSubWindowOnActivation );
 	m_workspace->setHorizontalScrollBarPolicy( Qt::ScrollBarAsNeeded );
 	m_workspace->setVerticalScrollBarPolicy( Qt::ScrollBarAsNeeded );
 

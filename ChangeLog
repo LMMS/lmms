@@ -1,5 +1,10 @@
 2008-09-07	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* src/gui/main_window.cpp:
+	set QMdiArea::DontMaximizeSubWindowOnActivation option for not
+	crashing when loading project while a subwindow is maximized (this
+	looks like a bug in Qt) (closes #2077774)
+
 	* src/gui/controller_connection_dialog.cpp:
 	fixed crash when closing controller select dialog and no controller
 	has been selected (closes #2078357)
