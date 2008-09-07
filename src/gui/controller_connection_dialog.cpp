@@ -329,7 +329,7 @@ void controllerConnectionDialog::selectController( void )
 					m_userController->model()->value() );
 		}
 
-		if( m_controller->hasModel( m_targetModel ) )
+		if( m_controller && m_controller->hasModel( m_targetModel ) )
 		{
 			QMessageBox::warning(this, tr("LMMS"), tr("Cycle Detected."));
 			return;
