@@ -58,8 +58,8 @@ plugin::descriptor PLUGIN_EXPORT patman_plugin_descriptor =
 	0x0100,
 	plugin::Instrument,
 	new pluginPixmapLoader( "logo" ),
-	NULL,
-	new patmanInstrument::subPluginFeatures( plugin::Instrument )
+	"pat",
+	NULL
 } ;
 
 
@@ -77,8 +77,8 @@ plugin * PLUGIN_EXPORT lmms_plugin_main( model *, void * _data )
 patmanInstrument::patmanInstrument( instrumentTrack * _instrument_track ) :
 	instrument( _instrument_track, &patman_plugin_descriptor ),
 	m_patchFile( QString::null ),
-	m_loopedModel( FALSE, this ),
-	m_tunedModel( TRUE, this )
+	m_loopedModel( true, this ),
+	m_tunedModel( true, this )
 {
 }
 
@@ -113,13 +113,9 @@ void patmanInstrument::loadSettings( const QDomElement & _this )
 
 
 
-void patmanInstrument::setParameter( const QString & _param,
-							const QString & _value )
+void patmanInstrument::loadFile( const QString & _file )
 {
-	if( _param == "samplefile" )
-	{
-		setFile( _value );
-	}
+	setFile( _file );
 }
 
 
@@ -155,6 +151,7 @@ void patmanInstrument::playNote( notePlayHandle * _n, bool,
 	if( hdata->sample->play( _working_buffer, hdata->state, frames,
 					play_freq, m_loopedModel.value() ) )
 	{
+		applyRelease( _working_buffer, _n );
 		getInstrumentTrack()->processAudioBuffer( _working_buffer,
 								frames, _n );
 	}
@@ -651,26 +648,6 @@ void patmanView::modelChanged( void )
 	m_tuneButton->setModel( &m_pi->m_tunedModel );
 	connect( m_pi, SIGNAL( fileChanged() ),
 			this, SLOT( updateFilename() ) );
-}
-
-
-
-
-
-patmanInstrument::subPluginFeatures::subPluginFeatures(
-						plugin::PluginTypes _type ) :
-	plugin::descriptor::subPluginFeatures( _type )
-{
-}
-
-
-
-
-const QStringList & patmanInstrument::subPluginFeatures::supported_extensions(
-									void )
-{
-	static QStringList extension( "pat" );
-	return( extension );
 }
 
 

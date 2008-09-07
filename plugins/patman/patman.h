@@ -50,21 +50,6 @@ class patmanInstrument : public instrument
 {
 	Q_OBJECT
 public:
-	class subPluginFeatures : public plugin::descriptor::subPluginFeatures
-	{
-	public:
-		subPluginFeatures( plugin::PluginTypes _type );
-
-		virtual const QStringList & supportedExtensions( void )
-		{
-			return( supported_extensions() );
-		}
-
-		static const QStringList & supported_extensions( void );
-
-	} ;
-
-
 	patmanInstrument( instrumentTrack * _track );
 	virtual ~patmanInstrument();
 
@@ -76,10 +61,14 @@ public:
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
 	virtual void loadSettings( const QDomElement & _this );
 
-	virtual void setParameter( const QString & _param,
-						const QString & _value );
+	virtual void loadFile( const QString & _file );
 
 	virtual QString nodeName( void ) const;
+
+	virtual f_cnt_t desiredReleaseFrames( void ) const
+	{
+		return( 128 );
+	}
 
 	virtual pluginView * instantiateView( QWidget * _parent );
 
