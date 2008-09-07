@@ -68,7 +68,7 @@ configManager::configManager( void ) :
 #else
 	m_pluginDir( QString( PLUGIN_DIR ) ),
 #endif
-	m_vstDir( QDir::home().absolutePath() ),
+	m_vstDir( m_workingDir + "vst" + QDir::separator() ),
 	m_flDir( QDir::home().absolutePath() )
 {
 }
