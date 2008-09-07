@@ -27,10 +27,7 @@
 #ifndef _SONG_EDITOR_H
 #define _SONG_EDITOR_H
 
-#include <QtCore/QBasicTimer>
-
 #include "track_container_view.h"
-
 
 class QLabel;
 class QScrollBar;
@@ -51,10 +48,6 @@ class songEditor : public trackContainerView
 public:
 	songEditor( song * _song, songEditor * & _engine_ptr );
 	virtual ~songEditor();
-
-
-signals:
-	void periodicUpdate( void );
 
 
 public slots:
@@ -86,17 +79,12 @@ private slots:
 private:
 	virtual void keyPressEvent( QKeyEvent * _ke );
 	virtual void paintEvent( QPaintEvent * _pe );
-	virtual void timerEvent( QTimerEvent * _ev );
 	virtual void wheelEvent( QWheelEvent * _we );
 
 	virtual bool allowRubberband( void ) const;
 
 
-
 	song * m_s;
-
-	QBasicTimer m_updateTimer;
-
 
 	QScrollBar * m_leftRightScroll;
 

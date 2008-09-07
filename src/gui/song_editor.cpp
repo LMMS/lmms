@@ -358,8 +358,6 @@ songEditor::songEditor( song * _song, songEditor * & _engine_ptr ) :
 	parentWidget()->resize( 600, 300 );
 	parentWidget()->move( 5, 5 );
 	parentWidget()->show();
-
-	m_updateTimer.start( 1000 / 20, this );	// 20 fps
 }
 
 
@@ -490,14 +488,6 @@ void songEditor::paintEvent( QPaintEvent * _pe )
 {
 	m_leftRightScroll->setMaximum( m_s->length() );
 	trackContainerView::paintEvent( _pe );
-}
-
-
-
-
-void songEditor::timerEvent( QTimerEvent * )
-{
-	emit periodicUpdate();
 }
 
 

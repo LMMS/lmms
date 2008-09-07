@@ -1,5 +1,3 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * fx_mixer_view.cpp - effect-mixer-view for LMMS
  *
@@ -42,9 +40,10 @@
 #include "main_window.h"
 #include "lcd_spinbox.h"
 #include "gui_templates.h"
-#include "song_editor.h"
 #include "tooltip.h"
 #include "pixmap_button.h"
+
+
 
 class fxLine : public QWidget
 {
@@ -108,9 +107,11 @@ private:
 
 fxMixerView::fxMixerView() :
 	QWidget(),
-	modelView( NULL, this )
+	modelView( NULL, this ),
+	serializingObjectHook()
 {
 	fxMixer * m = engine::getFxMixer();
+	m->setHook( this );
 
 	QPalette pal = palette();
 	pal.setColor( QPalette::Background, QColor( 72, 76, 88 ) );
@@ -224,8 +225,8 @@ fxMixerView::fxMixerView() :
 	setCurrentFxLine( m_fxChannelViews[0].m_fxLine );
 
 	// timer for updating faders
-	connect( engine::getSongEditor(), SIGNAL( periodicUpdate() ),
-				this, SLOT( updateFaders() ) );
+	connect( engine::getMainWindow(), SIGNAL( periodicUpdate() ),
+					this, SLOT( updateFaders() ) );
 
 
 	// add ourself to workspace
@@ -249,6 +250,22 @@ fxMixerView::fxMixerView() :
 
 fxMixerView::~fxMixerView()
 {
+}
+
+
+
+
+void fxMixerView::saveSettings( QDomDocument & _doc, QDomElement & _this )
+{
+	mainWindow::saveWidgetState( this, _this );
+}
+
+
+
+
+void fxMixerView::loadSettings( const QDomElement & _this )
+{
+	mainWindow::restoreWidgetState( this, _this );
 }
 
 
@@ -326,4 +343,3 @@ void fxMixerView::updateFaders( void )
 
 #include "moc_fx_mixer_view.cxx"
 
-#endif
