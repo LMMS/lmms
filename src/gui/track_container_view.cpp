@@ -380,16 +380,17 @@ void trackContainerView::dropEvent( QDropEvent * _de )
 		//it->toggledInstrumentTrackButton( TRUE );
 		_de->accept();
 	}
-	else if( type == "sampledata" || type == "samplefile" )
+	else if( /*type == "sampledata" || */type == "samplefile" )
 	{
 		instrumentTrack * it = dynamic_cast<instrumentTrack *>(
 				track::create( track::InstrumentTrack,
 								m_tc ) );
-		QString iname = type == "sampledata" ? "audiofileprocessor" :
-			engine::sampleExtensions()[fileItem::extension(
+		const QString iname = /*( type == "sampledata" ) ?
+			"audiofileprocessor" :*/
+			engine::pluginFileHandling()[fileItem::extension(
 								value )];
 		instrument * i = it->loadInstrument( iname );
-		i->setParameter( type, value );
+		i->loadFile( value );
 		//it->toggledInstrumentTrackButton( TRUE );
 		_de->accept();
 	}

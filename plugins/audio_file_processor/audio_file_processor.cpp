@@ -173,17 +173,9 @@ void audioFileProcessor::loadSettings( const QDomElement & _this )
 
 
 
-void audioFileProcessor::setParameter( const QString & _param,
-							const QString & _value )
+void audioFileProcessor::loadFile( const QString & _file )
 {
-	if( _param == "samplefile" )
-	{
-		setAudioFile( _value );
-	}
-	else if( _param == "sampledata" )
-	{
-		m_sampleBuffer.loadFromBase64( _value );
-	}
+	setAudioFile( _file );
 }
 
 

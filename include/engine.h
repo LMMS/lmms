@@ -143,9 +143,9 @@ public:
 	}
 	static void updateFramesPerTick( void );
 
-	static const QMap<QString, QString> & sampleExtensions( void )
+	static const QMap<QString, QString> & pluginFileHandling( void )
 	{
-		return( s_sampleExtensions );
+		return( s_pluginFileHandling );
 	}
 
 
@@ -172,9 +172,9 @@ private:
 	static projectNotes * s_projectNotes;
 	static ladspa2LMMS * s_ladspaManager;
 
-	static QMap<QString, QString> s_sampleExtensions;
+	static QMap<QString, QString> s_pluginFileHandling;
 
-	static void loadExtensions( void );
+	static void initPluginFileHandling( void );
 
 } ;
 

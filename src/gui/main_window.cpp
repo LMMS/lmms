@@ -91,14 +91,6 @@ mainWindow::mainWindow( void ) :
 	QSplitter * splitter = new QSplitter( Qt::Horizontal, w );
 	splitter->setChildrenCollapsible( FALSE );
 
-	QString sample_filter;
-	QList<QString> ext_keys = engine::sampleExtensions().keys();
-	for( QList<QString>::iterator it = ext_keys.begin();
-						it != ext_keys.end(); ++it )
-	{
-		sample_filter += " *." + *it;
-	}
-
 	int id = 0;
 	QString wdir = configManager::inst()->workingDir();
 	side_bar->appendTab( new pluginBrowser( splitter ), ++id );
@@ -112,8 +104,8 @@ mainWindow::mainWindow( void ) :
 	side_bar->appendTab( new fileBrowser(
 				configManager::inst()->userSamplesDir() + "*" +
 				configManager::inst()->factorySamplesDir(),
-					sample_filter, tr( "My samples" ),
-					embed::getIconPixmap( "sound_file" ),
+					"*", tr( "My samples" ),
+					embed::getIconPixmap( "sample_file" ),
 							splitter ), ++id );
 	side_bar->appendTab( new fileBrowser(
 				configManager::inst()->userPresetsDir() + "*" +

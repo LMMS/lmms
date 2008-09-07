@@ -76,7 +76,7 @@ plugin::~plugin()
 
 
 
-void plugin::setParameter( const QString &, const QString & )
+void plugin::loadFile( const QString & )
 {
 }
 

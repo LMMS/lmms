@@ -58,8 +58,7 @@ public:
 
 	virtual QString nodeName( void ) const;
 
-	virtual void setParameter( const QString & _param,
-						const QString & _value );
+	virtual void loadFile( const QString & _file );
 
 	virtual bool supportsParallelizing( void ) const
 	{

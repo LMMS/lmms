@@ -519,26 +519,26 @@ bool flpImport::tryImport( trackContainer * _tc )
 						"created so far\n" );
 					break;
 				}
-				QString dir = text;
-/*				if( dir.mid( 1, 11 ) == "Instruments" )
+				QString f = text;
+/*				if( f.mid( 1, 11 ) == "Instruments" )
 				{
-					dir = "\\Patches\\Packs" +
-								dir.mid( 12 );
+					f = "\\Patches\\Packs" +
+								f.mid( 12 );
 				}*/
-				dir.replace( '\\', QDir::separator() );
+				f.replace( '\\', QDir::separator() );
 				if( QFileInfo( configManager::inst()->flDir() +
 						"/Data/" ).exists() )
 				{
-					dir = configManager::inst()->flDir() +
-								"/Data/" + dir;
+					f = configManager::inst()->flDir() +
+								"/Data/" + f;
 				}
 				else
 				{
 					// FL 3 compat
-					dir = configManager::inst()->flDir() +
-							"/Samples/" + dir;
+					f = configManager::inst()->flDir() +
+							"/Samples/" + f;
 				}
-				it_inst->setParameter( "samplefile", dir );
+				it_inst->loadFile( f );
 				break;
 			}
 

@@ -167,10 +167,9 @@ public:
 		return( m_descriptor );
 	}
 
-	// plugins can overload this for making other classes able to change
-	// settings of the plugin without knowing the actual class
-	virtual void setParameter( const QString & _param,
-						const QString & _value );
+	// can be called if a file matching supportedFileTypes should be
+	// loaded/processed with the help of this plugin
+	virtual void loadFile( const QString & _file );
 
 	// plugins can overload this for making other classes able to query
 	// settings of the plugin without knowing the actual class

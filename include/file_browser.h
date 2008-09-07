@@ -1,7 +1,7 @@
 /*
  * file_browser.h - include file for fileBrowser
  *
- * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -38,6 +38,7 @@ class QColorGroup;
 class QPixmap;
 
 class fileItem;
+class instrumentTrack;
 class listView;
 class playHandle;
 class trackContainer;
@@ -90,6 +91,10 @@ protected:
 
 
 private:
+	void handleFile( fileItem * _fi, instrumentTrack * _it );
+	void openInNewInstrumentTrack( trackContainer * _tc );
+
+
 	bool m_mousePressed;
 	QPoint m_pressPos;
 
@@ -97,8 +102,6 @@ private:
 	QMutex m_pphMutex;
 
 	fileItem * m_contextMenuItem;
-
-	void openInNewInstrumentTrack( trackContainer * _tc );
 
 
 private slots:
@@ -159,6 +162,28 @@ private:
 class fileItem : public QTreeWidgetItem
 {
 public:
+	enum FileTypes
+	{
+		ProjectFile,
+		PresetFile,
+		SampleFile,
+		SoundFontFile,
+		PatchFile,
+		MidiFile,
+		FlpFile,
+		UnknownFile,
+		NumFileTypes
+	} ;
+
+	enum FileHandling
+	{
+		NotSupported,
+		LoadAsProject,
+		LoadAsPreset,
+		LoadByPlugin
+	} ;
+
+
 	fileItem( QTreeWidget * _parent, const QString & _name,
 							const QString & _path );
 	fileItem( QTreeWidgetItem * _parent, const QString & _name,
@@ -170,21 +195,14 @@ public:
 								text( 0 ) );
 	}
 
-	enum FileTypes
-	{
-		ProjectFile,
-		PresetFile,
-		SpecialPresetFile,
-		SampleFile,
-		MidiFile,
-		FlpFile,
-		UnknownFile,
-		NumFileTypes
-	} ;
-	
-	inline FileTypes type( void )
+	inline FileTypes type( void ) const
 	{
 		return( m_type );
+	}
+
+	inline FileHandling handling( void ) const
+	{
+		return( m_handling );
 	}
 
 	QString extension( void );
@@ -201,11 +219,12 @@ private:
 	static QPixmap * s_midiFilePixmap;
 	static QPixmap * s_flpFilePixmap;
 	static QPixmap * s_unknownFilePixmap;
-	
+
 	QString m_path;
 	FileTypes m_type;
-} ;
+	FileHandling m_handling;
 
+} ;
 
 
 #endif

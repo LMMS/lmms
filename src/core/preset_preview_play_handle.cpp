@@ -105,7 +105,7 @@ previewTrackContainer * presetPreviewPlayHandle::s_previewTC;
 
 
 presetPreviewPlayHandle::presetPreviewPlayHandle( const QString & _preset_file,
-							bool _special_preset ) :
+							bool _load_by_plugin ) :
 	playHandle( PresetPreviewHandle ),
 	m_previewNote( NULL )
 {
@@ -120,7 +120,7 @@ presetPreviewPlayHandle::presetPreviewPlayHandle( const QString & _preset_file,
 	const bool j = engine::getProjectJournal()->isJournalling();
 	engine::getProjectJournal()->setJournalling( FALSE );
 
-	if( _special_preset )
+	if( _load_by_plugin )
 	{
 		instrument * i = s_previewTC->previewInstrumentTrack()->
 								getInstrument();
@@ -130,11 +130,11 @@ presetPreviewPlayHandle::presetPreviewPlayHandle( const QString & _preset_file,
 		{
 			i = s_previewTC->previewInstrumentTrack()->
 				loadInstrument(
-					engine::sampleExtensions()[ext] );
+					engine::pluginFileHandling()[ext] );
 		}
 		if( i != NULL )
 		{
-			i->setParameter( "samplefile", _preset_file );
+			i->loadFile( _preset_file );
 		}
 	}
 	else

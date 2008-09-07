@@ -1,5 +1,41 @@
 2008-09-07	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* plugins/patman/patman.cpp:
+	* plugins/patman/patman.h:
+	- apply release of 128 frames
+	- enable loop mode per default
+
+	* plugins/patman/patman.cpp:
+	* plugins/patman/patman.h:
+	* plugins/triple_oscillator/triple_oscillator.h:
+	* plugins/triple_oscillator/triple_oscillator.cpp:
+	* plugins/audio_file_processor/audio_file_processor.cpp:
+	* plugins/audio_file_processor/audio_file_processor.h:
+	* plugins/sf2_player/sf2_player.cpp:
+	* plugins/sf2_player/sf2_player.h:
+	* plugins/vestige/vestige.cpp:
+	* plugins/vestige/vestige.h:
+	* plugins/flp_import/flp_import.cpp:
+	* plugins/midi_import/midi_import.cpp:
+	* include/engine.h:
+	* include/file_browser.h:
+	* include/preset_preview_play_handle.h:
+	* include/plugin.h:
+	* include/remote_plugin.h:
+	* include/sample_play_handle.h:
+	* src/core/engine.cpp:
+	* src/core/plugin.cpp:
+	* src/core/preset_preview_play_handle.cpp:
+	* src/gui/file_browser.cpp:
+	* src/gui/main_window.cpp:
+	* src/gui/track_container_view.cpp:
+	- rewrote the way plugins can handle certain filetypes
+	- rewrote various parts of file-browser to be less redundant and
+	  more stable (closes #2071891)
+
+	* data/themes/default/sample_file.png:
+	renamed from sound_file.png
+
 	* include/midi.h:
 	* src/core/midi/midi_client.cpp:
 	* src/core/midi/midi_port.cpp:

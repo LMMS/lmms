@@ -105,9 +105,6 @@ public:
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
 	virtual void loadSettings( const QDomElement & _this );
 
-	virtual void setParameter( const QString & _param,
-						const QString & _value );
-
 	virtual QString nodeName( void ) const;
 
 	virtual f_cnt_t desiredReleaseFrames( void ) const

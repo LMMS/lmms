@@ -52,8 +52,7 @@ public:
 						QDomElement & _parent );
 	virtual void loadSettings( const QDomElement & _this );
 
-	virtual void setParameter( const QString & _param,
-						const QString & _value );
+	virtual void loadFile( const QString & _file );
 
 	virtual QString nodeName( void ) const;
 

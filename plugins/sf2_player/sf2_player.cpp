@@ -238,13 +238,14 @@ void sf2Instrument::loadSettings( const QDomElement & _this )
 
 
 
-void sf2Instrument::setParameter( const QString & _param,
-							const QString & _value )
+void sf2Instrument::loadFile( const QString & _file )
 {
-	if( _param == "samplefile" )
-	{
-		openFile( _value );
-	}
+	openFile( _file );
+	updatePatch();
+
+	// for some reason we've to call that, otherwise preview of a
+	// soundfont for the first time fails
+	updateSampleRate();
 }
 
 

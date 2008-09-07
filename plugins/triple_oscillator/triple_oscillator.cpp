@@ -289,21 +289,6 @@ void tripleOscillator::loadSettings( const QDomElement & _this )
 
 
 
-void tripleOscillator::setParameter( const QString & _param,
-							const QString & _value )
-{
-	if( _param == "samplefile" )
-	{
-		for( int i = 0; i < NUM_OF_OSCILLATORS; ++i )
-		{
-			m_osc[i]->m_sampleBuffer->setAudioFile( _value );
-		}
-	}
-}
-
-
-
-
 QString tripleOscillator::nodeName( void ) const
 {
 	return( tripleoscillator_plugin_descriptor.name );

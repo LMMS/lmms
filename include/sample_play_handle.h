@@ -26,8 +26,6 @@
 #ifndef _SAMPLE_PLAY_HANDLE_H
 #define _SAMPLE_PLAY_HANDLE_H
 
-#include <qobject.h>
-
 #include "mixer.h"
 #include "sample_buffer.h"
 #include "automatable_model.h"

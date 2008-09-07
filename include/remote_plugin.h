@@ -850,7 +850,7 @@ remotePluginBase::message remotePluginBase::waitForMessage(
 		if( _busy_waiting && !messagesLeft() )
 		{
 			QCoreApplication::processEvents(
-						QEventLoop::AllEvents, 50 );
+				QEventLoop::ExcludeUserInputEvents, 50 );
 			continue;
 		}
 #endif

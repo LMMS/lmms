@@ -1,6 +1,6 @@
 /*
  * preset_preview_play_handle.h - play-handle for playing a short preview-sound
- *                                of a preset
+ *                                of a preset or a file processed by a plugin
  *
  * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
@@ -38,7 +38,7 @@ class presetPreviewPlayHandle : public playHandle
 {
 public:
 	presetPreviewPlayHandle( const QString & _preset_file,
-						bool _special_preset = false );
+						bool _load_by_plugin = false );
 	virtual ~presetPreviewPlayHandle();
 
 	virtual void play( bool _try_parallelizing,

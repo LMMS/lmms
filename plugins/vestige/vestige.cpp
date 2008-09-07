@@ -92,7 +92,7 @@ vestigeInstrument::~vestigeInstrument()
 
 void vestigeInstrument::loadSettings( const QDomElement & _this )
 {
-	setParameter( "plugin", _this.attribute( "plugin" ) );
+	loadFile( _this.attribute( "plugin" ) );
 	m_pluginMutex.lock();
 	if( m_plugin != NULL )
 	{
@@ -126,76 +126,58 @@ QString vestigeInstrument::nodeName( void ) const
 
 
 
-void vestigeInstrument::setParameter( const QString & _param,
-							const QString & _value )
+void vestigeInstrument::loadFile( const QString & _file )
 {
-	if( _param == "plugin" && _value != "" )
+	m_pluginMutex.lock();
+	const bool set_ch_name = ( m_plugin != NULL &&
+		getInstrumentTrack()->name() == m_plugin->name() ) ||
+			getInstrumentTrack()->name() ==
+				instrumentTrack::tr( "Default preset" );
+	m_pluginMutex.unlock();
+
+	closePlugin();
+
+	m_pluginDLL = _file;
+	textFloat * tf = textFloat::displayMessage(
+			tr( "Loading plugin" ),
+			tr( "Please wait while loading VST-plugin..." ),
+			PLUGIN_NAME::getIconPixmap( "logo", 24, 24 ), 0 );
+
+	m_pluginMutex.lock();
+	m_plugin = new vstPlugin( m_pluginDLL );
+	if( m_plugin->failed() )
 	{
-		m_pluginMutex.lock();
-		const bool set_ch_name = ( m_plugin != NULL &&
-			getInstrumentTrack()->name() == m_plugin->name() ) ||
-				getInstrumentTrack()->name() ==
-					instrumentTrack::tr( "Default" );
 		m_pluginMutex.unlock();
-
 		closePlugin();
-
-		m_pluginDLL = _value;
-		textFloat * tf = textFloat::displayMessage(
-				tr( "Loading plugin" ),
-				tr( "Please wait while loading VST-plugin..." ),
-				PLUGIN_NAME::getIconPixmap( "logo", 24, 24 ),
-									0 );
-		m_pluginMutex.lock();
-		m_plugin = new vstPlugin( m_pluginDLL );
-		if( m_plugin->failed() )
-		{
-			m_pluginMutex.unlock();
-			closePlugin();
-			delete tf;
-			QMessageBox::information( 0,
-					tr( "Failed loading VST-plugin" ),
-					tr( "The VST-plugin %1 could not "
-						"be loaded for some reason.\n"
-						"If it runs with other VST-"
-						"software under Linux, please "
-						"contact an LMMS-developer!"
-						).arg( m_pluginDLL ),
-							QMessageBox::Ok );
-			return;
-		}
-/*		if( m_plugin->vstVersion() < 2000 )
-		{
-			QMessageBox::information( this,
-					tr( "VST-plugin too old" ),
-					tr( "The version of VST-plugin %1 "
-						"is smaller than 2, which "
-						"isn't supported." ).arg(
-								m_pluginDLL ),
-							QMessageBox::Ok );
-			closePlugin();
-			return;
-		}*/
-		m_plugin->showEditor();
-		connect( engine::getSong(), SIGNAL( tempoChanged( bpm_t ) ),
-				m_plugin, SLOT( setTempo( bpm_t ) ) );
-		m_plugin->setTempo( engine::getSong()->getTempo() );
-		connect( engine::getMixer(), SIGNAL( sampleRateChanged() ),
-					m_plugin, SLOT( updateSampleRate() ) );
-		if( set_ch_name == TRUE )
-		{
-			getInstrumentTrack()->setName( m_plugin->name() );
-		}
-		if( m_plugin->pluginWidget() != NULL )
-		{
-/*			m_plugin->pluginWidget()->setWindowIcon(
-					getInstrumentTrack()->windowIcon() );*/
-		}
-		m_pluginMutex.unlock();
-//		update();
-		emit dataChanged();
 		delete tf;
+		QMessageBox::information( 0,
+				tr( "Failed loading VST-plugin" ),
+				tr( "The VST-plugin %1 could not "
+					"be loaded for some reason.\n"
+					"If it runs with other VST-"
+					"software under Linux, please "
+					"contact an LMMS-developer!"
+					).arg( m_pluginDLL ),
+						QMessageBox::Ok );
+		return;
 	}
+
+	m_plugin->showEditor();
+	connect( engine::getSong(), SIGNAL( tempoChanged( bpm_t ) ),
+			m_plugin, SLOT( setTempo( bpm_t ) ) );
+	m_plugin->setTempo( engine::getSong()->getTempo() );
+	connect( engine::getMixer(), SIGNAL( sampleRateChanged() ),
+				m_plugin, SLOT( updateSampleRate() ) );
+	if( set_ch_name )
+	{
+		getInstrumentTrack()->setName( m_plugin->name() );
+	}
+
+	m_pluginMutex.unlock();
+
+	emit dataChanged();
+
+	delete tf;
 }
 
 
@@ -385,7 +367,7 @@ void vestigeInstrumentView::openPlugin( void )
 			return;
 		}
 		engine::getMixer()->lock();
-		m_vi->setParameter( "plugin", ofd.selectedFiles()[0] );
+		m_vi->loadFile( ofd.selectedFiles()[0] );
 		engine::getMixer()->unlock();
 	}
 }

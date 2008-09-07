@@ -62,7 +62,7 @@ projectJournal * engine::s_projectJournal = NULL;
 ladspa2LMMS * engine::s_ladspaManager = NULL;
 dummyTrackContainer * engine::s_dummyTC = NULL;
 controllerRackView * engine::s_controllerRackView = NULL;
-QMap<QString, QString> engine::s_sampleExtensions;
+QMap<QString, QString> engine::s_pluginFileHandling;
 
 
 
@@ -71,7 +71,7 @@ void engine::init( const bool _has_gui )
 {
 	s_hasGUI = _has_gui;
 
-	loadExtensions();
+	initPluginFileHandling();
 
 	s_projectJournal = new projectJournal;
 	s_mixer = new mixer;
@@ -165,7 +165,7 @@ void engine::updateFramesPerTick( void )
 
 
 
-void engine::loadExtensions( void )
+void engine::initPluginFileHandling( void )
 {
 	QVector<plugin::descriptor> pluginDescriptors;
 	plugin::getDescriptorsOfAvailPlugins( pluginDescriptors );
@@ -180,7 +180,7 @@ void engine::loadExtensions( void )
 			for( QStringList::const_iterator itExt = ext.begin();
 						itExt != ext.end(); ++itExt )
 			{
-				s_sampleExtensions[*itExt] = it->name;
+				s_pluginFileHandling[*itExt] = it->name;
 			}
 		}
 	}

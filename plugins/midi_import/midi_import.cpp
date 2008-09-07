@@ -337,10 +337,9 @@ invalid_format:
 					const QStringList files = QDir( dir ).
 						entryList( QStringList(
 								filter ) );
-					if( !files.empty() && !sample_loaded )
+					if( it_inst && !files.empty() && !sample_loaded )
 					{
-						it_inst->setParameter( "samplefile",
-								dir+files.front() );
+						it_inst->loadFile( dir+files.front() );
 						sample_loaded = TRUE;
 					}
 					break;
