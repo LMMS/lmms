@@ -130,6 +130,24 @@ void trackContainer::loadSettings( const QDomElement & _this )
 
 
 
+int trackContainer::countTracks( track::TrackTypes _tt ) const
+{
+	int cnt = 0;
+	m_tracksMutex.lockForRead();
+	for( int i = 0; i < m_tracks.size(); ++i )
+	{
+		if( m_tracks[i]->type() == _tt || _tt == track::NumTrackTypes )
+		{
+			++cnt;
+		}
+	}
+	m_tracksMutex.unlock();
+	return( cnt );
+}
+
+
+
+
 void trackContainer::addTrack( track * _track )
 {
 	if( _track->type() != track::HiddenAutomationTrack )
@@ -163,11 +181,9 @@ void trackContainer::removeTrack( track * _track )
 
 
 
-
 void trackContainer::updateAfterTrackAdd( void )
 {
 }
-
 
 
 
@@ -185,19 +201,17 @@ void trackContainer::clearAllTracks( void )
 
 
 
-int trackContainer::countTracks( track::TrackTypes _tt ) const
+bool trackContainer::isEmpty( void ) const
 {
-	int cnt = 0;
-	m_tracksMutex.lockForRead();
-	for( int i = 0; i < m_tracks.size(); ++i )
+	for( trackList::const_iterator it = m_tracks.begin();
+						it != m_tracks.end(); ++it )
 	{
-		if( m_tracks[i]->type() == _tt || _tt == track::NumTrackTypes )
+		if( !( *it )->getTCOs().isEmpty() )
 		{
-			++cnt;
+			return false;
 		}
 	}
-	m_tracksMutex.unlock();
-	return( cnt );
+	return true;
 }
 
 

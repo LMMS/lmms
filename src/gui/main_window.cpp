@@ -531,7 +531,7 @@ bool mainWindow::mayChangeProject( void )
 		return( TRUE );
 	}
 
-	QMessageBox mb ( tr( "Project not saved" ),
+	QMessageBox mb( tr( "Project not saved" ),
 				tr( "The current project was modified since "
 					"last saving. Do you want to save it "
 								"now?" ),

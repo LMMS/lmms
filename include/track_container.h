@@ -60,9 +60,10 @@ public:
 	int countTracks( track::TrackTypes _tt = track::NumTrackTypes ) const;
 
 
-	virtual void updateAfterTrackAdd( void );
 	void addTrack( track * _track );
 	void removeTrack( track * _track );
+
+	virtual void updateAfterTrackAdd( void );
 
 	void clearAllTracks( void );
 
@@ -70,6 +71,8 @@ public:
 	{
 		return( m_tracks );
 	}
+
+	bool isEmpty( void ) const;
 
 	static const QString classNodeName( void )
 	{

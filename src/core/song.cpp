@@ -1110,6 +1110,16 @@ void song::restoreControllerStates( const QDomElement & _this )
 
 void song::exportProject( void )
 {
+	if( isEmpty() )
+	{
+		QMessageBox::information( engine::getMainWindow(),
+				tr( "Empty project" ),
+				tr( "This project is empty so exporting makes "
+					"no sense. Please put some items into "
+					"Song Editor first!" ) );
+		return;
+	}
+
 	QString base_filename;
 
 	if( m_fileName != "" )

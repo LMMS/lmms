@@ -1,5 +1,11 @@
 2008-09-07	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* include/track_container.h:
+	* src/core/song.cpp:
+	* src/core/track_container.cpp:
+	display message if project is empty and user tries to export
+	it (closes #2091056)
+
 	* src/core/song.cpp:
 	- fixed freeze after adding BB-tracks (closes #2089337)
 	- replaced bad cast for calling projectNotes::save/restoreState by
