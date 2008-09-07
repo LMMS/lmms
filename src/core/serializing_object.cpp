@@ -54,6 +54,10 @@ QDomElement serializingObject::saveState( QDomDocument & _doc,
 	QDomElement _this = _doc.createElement( nodeName() );
 	_parent.appendChild( _this );
 	saveSettings( _doc, _this );
+	if( getHook() )
+	{
+		getHook()->saveSettings( _doc, _this );
+	}
 	return( _this );
 }
 
@@ -62,8 +66,11 @@ QDomElement serializingObject::saveState( QDomDocument & _doc,
 
 void serializingObject::restoreState( const QDomElement & _this )
 {
-	// load actual settings
 	loadSettings( _this );
+	if( getHook() )
+	{
+		getHook()->loadSettings( _this );
+	}
 }
 
 
@@ -71,8 +78,15 @@ void serializingObject::restoreState( const QDomElement & _this )
 
 void serializingObject::setHook( serializingObjectHook * _hook )
 {
+	if( m_hook )
+	{
+		m_hook->m_hookedIn = NULL;
+	}
 	m_hook = _hook;
-	m_hook->m_hookedIn = this;
+	if( m_hook )
+	{
+		m_hook->m_hookedIn = this;
+	}
 }
 
 
