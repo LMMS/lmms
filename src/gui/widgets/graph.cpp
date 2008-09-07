@@ -46,6 +46,7 @@ graph::graph( QWidget * _parent, graphStyle _style ) :
 	m_graphStyle( _style )
 {
 	m_mouseDown = false;
+	m_graphColor = QColor( 0xFF, 0xAA, 0x00 );
 
 	resize( 132, 104 );
 	setAcceptDrops( TRUE );
@@ -72,7 +73,10 @@ void graph::setForeground( const QPixmap &_pixmap )
 	m_foreground = _pixmap;
 }
 
-
+void graph::setGraphColor( QColor _graphcol )
+{
+	m_graphColor = _graphcol;
+}
 
 /*
 void graph::loadSampleFromFile( const QString & _filename )
@@ -217,7 +221,7 @@ void graph::paintEvent( QPaintEvent * )
 {
 	QPainter p( this );
 
-	p.setPen( QPen(QColor( 0xFF, 0xAA, 0x00 ), 1) );
+	p.setPen( QPen( m_graphColor, 1 ) );
 
 	QVector<float> * samps = &(model()->m_samples);
 	int length = model()->length();
@@ -344,11 +348,12 @@ void graph::updateGraph( void )
 
 
 graphModel::graphModel( float _min, float _max, int _length,
-			::model * _parent, bool _default_constructed ) :
+			::model * _parent, bool _default_constructed,  float _step ) :
 	model( _parent, tr( "Graph" ), _default_constructed ),
 	m_samples( _length ),
 	m_minValue( _min ),
-	m_maxValue( _max )
+	m_maxValue( _max ),
+	m_step( _step )
 {
 }
 
@@ -395,6 +400,8 @@ void graphModel::setLength( int _length )
 
 void graphModel::setSampleAt( int _x, float _val )
 {
+	//snap to the grid
+	_val -= ( m_step != 0.0 ) ? fmod( _val, m_step ) * m_step : 0;
 	// boundary check
 	if ( _x >= 0 && _x < length() &&
 			_val >= minValue() && _val < maxValue() )

@@ -53,6 +53,8 @@ public:
 
 	void setForeground( const QPixmap & _pixmap );
 
+	void setGraphColor( const QColor );
+
 	inline graphModel * model( void )
 	{
 		return castModel<graphModel>();
@@ -89,6 +91,7 @@ private:
 
 
 	QPixmap m_foreground;
+	QColor m_graphColor;
 	
 	graphModel * m_graphModel;
 	graphStyle m_graphStyle;
@@ -107,7 +110,8 @@ public:
 			float _max,
 			int _size,
 			:: model * _parent,
-			bool _default_constructed = FALSE );
+			bool _default_constructed = FALSE,
+			float _step = 0.0 );
 
 	virtual ~graphModel();
 
@@ -161,6 +165,7 @@ private:
 	QVector<float> m_samples;
 	float m_minValue;
 	float m_maxValue;
+	float m_step;
 
 	friend class graph;
 

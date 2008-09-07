@@ -1,5 +1,13 @@
 2008-09-07	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* include/graph.h:
+	* src/gui/widgets/graph.cpp:
+	integrated patch by Attila Herman which adds support for colorized
+	graph and quantized values
+
+	* src/core/config_mgr.cpp:
+	made default VST path to be inside LMMS working directory
+
 	* src/gui/track_container_view.cpp:
 	changed size constraint for scrollArea-widget layout - fixes messed up
 	Song Editor after loading various projects
