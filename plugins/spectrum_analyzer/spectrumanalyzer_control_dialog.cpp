@@ -27,7 +27,7 @@
 #include <QtGui/QPainter>
 
 #include "spectrum_analyzer.h"
-#include "song_editor.h"
+#include "main_window.h"
 #include "led_checkbox.h"
 #include "embed.h"
 
@@ -61,7 +61,7 @@ public:
 		m_background( PLUGIN_NAME::getIconPixmap( "spectrum_background" ).toImage() )
 	{
 		setFixedSize( 249, 151 );
-		connect( engine::getSongEditor(), SIGNAL( periodicUpdate() ),
+		connect( engine::getMainWindow(), SIGNAL( periodicUpdate() ),
 				this, SLOT( update() ) );
 		setAttribute( Qt::WA_OpaquePaintEvent, TRUE );
 	}
