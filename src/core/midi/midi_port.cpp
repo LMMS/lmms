@@ -137,10 +137,10 @@ void midiPort::processInEvent( const midiEvent & _me, const midiTime & _time )
 			}
 		}
 		midiEvent ev = _me;
-		if( m_defaultVelocityInEnabledModel.value() == TRUE &&
+		if( m_defaultVelocityInEnabledModel.value() == true &&
 							_me.velocity() > 0 )
 		{
-			ev.velocity() = DefaultVolume;
+			ev.velocity() = MidiMaxVelocity;
 		}
 		m_midiEventProcessor->processInEvent( ev, _time );
 	}
@@ -156,10 +156,16 @@ void midiPort::processOutEvent( const midiEvent & _me, const midiTime & _time )
 		( outputChannel() == _me.m_channel && outputChannel() != 0 ) )
 	{
 		midiEvent ev = _me;
+		// we use/display MIDI channels 1...16 but we need 0...15 for
+		// the outside world
+		if( ev.m_channel > 0 )
+		{
+			--ev.m_channel;
+		}
 		if( m_defaultVelocityOutEnabledModel.value() == true &&
 							_me.velocity() > 0 )
 		{
-			ev.velocity() = DefaultVolume;
+			ev.velocity() = MidiMaxVelocity;
 		}
 		m_midiClient->processOutEvent( ev, _time, this );
 	}

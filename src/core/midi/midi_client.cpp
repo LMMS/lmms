@@ -278,26 +278,10 @@ void midiClientRaw::processOutEvent( const midiEvent & _me,
 		case MidiNoteOn:
 		case MidiNoteOff:
 		case MidiKeyPressure:
-			if( _port->outputChannel() >= 0 )
-			{
-				sendByte( _me.m_type | _port->outputChannel() );
-				sendByte( _me.m_data.m_param[0] +
-							KeysPerOctave );
-				sendByte( tLimit( (int) _me.m_data.m_param[1],
+			sendByte( _me.m_type | _me.channel() );
+			sendByte( _me.m_data.m_param[0] + KeysPerOctave );
+			sendByte( tLimit( (int) _me.m_data.m_param[1],
 								0, 127 ) );
-			}
-			else
-			{
-				for( Sint8 i = 0; i < MidiChannelCount; ++i )
-				{
-					sendByte( _me.m_type | i );
-					sendByte( _me.m_data.m_param[0] +
-							KeysPerOctave );
-					sendByte( tLimit( (int)
-						_me.m_data.m_param[1],
-								0, 127 ) );
-				}
-			}
 			break;
 
 		default:

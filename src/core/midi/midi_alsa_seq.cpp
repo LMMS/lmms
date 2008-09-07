@@ -150,47 +150,47 @@ void midiALSASeq::processOutEvent( const midiEvent & _me,
 	{
 		case MidiNoteOn:
 			snd_seq_ev_set_noteon( &ev,
-						_port->outputChannel(),
+						_me.channel(),
 						_me.key() + KeysPerOctave,
 						_me.velocity() );
 			break;
 
 		case MidiNoteOff:
 			snd_seq_ev_set_noteoff( &ev,
-						_port->outputChannel(),
+						_me.channel(),
 						_me.key() + KeysPerOctave,
 						_me.velocity() );
 			break;
 
 		case MidiKeyPressure:
 			snd_seq_ev_set_keypress( &ev,
-						_port->outputChannel(),
+						_me.channel(),
 						_me.key() + KeysPerOctave,
 						_me.velocity() );
 			break;
 
 		case MidiControlChange:
 			snd_seq_ev_set_controller( &ev,
-						_port->outputChannel(),
+						_me.channel(),
 						_me.m_data.m_param[0],
 						_me.m_data.m_param[1] );
 			break;
 
 		case MidiProgramChange:
 			snd_seq_ev_set_pgmchange( &ev,
-						_port->outputChannel(),
+						_me.channel(),
 						_me.m_data.m_param[0] );
 			break;
 
 		case MidiChannelPressure:
 			snd_seq_ev_set_chanpress( &ev,
-						_port->outputChannel(),
+						_me.channel(),
 						_me.m_data.m_param[0] );
 			break;
 
 		case MidiPitchBend:
 			snd_seq_ev_set_pitchbend( &ev,
-						_port->outputChannel(),
+						_me.channel(),
 						_me.m_data.m_param[0] - 8192 );
 			break;
 

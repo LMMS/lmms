@@ -114,6 +114,11 @@ struct midiEvent
 	{
 	}
 
+	inline int channel( void ) const
+	{
+		return m_channel;
+	}
+
 	inline Uint16 key( void ) const
 	{
 		return( m_data.m_param[0] );

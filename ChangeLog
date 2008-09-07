@@ -1,5 +1,11 @@
 2008-09-07	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* include/midi.h:
+	* src/core/midi/midi_client.cpp:
+	* src/core/midi/midi_port.cpp:
+	* src/core/midi/midi_alsa_seq.cpp:
+	fixed MIDI output channel issues (closes #2098722)
+
 	* include/graph.h:
 	* src/gui/widgets/graph.cpp:
 	integrated patch by Attila Herman which adds support for colorized
