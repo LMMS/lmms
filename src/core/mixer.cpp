@@ -1120,7 +1120,6 @@ midiClient * mixer::tryMidiClients( void )
 	}
 #endif
 
-#if 0
 #ifdef LMMS_BUILD_WIN32
 	if( client_name == midiWinMM::name() || client_name == "" )
 	{
@@ -1133,7 +1132,7 @@ midiClient * mixer::tryMidiClients( void )
 		delete mwmm;
 	}
 #endif
-#endif
+
 	printf( "Couldn't create MIDI-client, neither with ALSA nor with "
 		"OSS. Will use dummy-MIDI-client.\n" );
 

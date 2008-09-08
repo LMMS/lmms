@@ -1,3 +1,12 @@
+2008-09-08	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* src/core/mixer.cpp:
+	re-enabled WinMM MIDI
+
+	* include/midi_winmm.h:
+	* src/core/midi/midi_winmm.cpp:
+	create separate thread for WinMM MIDI
+
 2008-09-08	Paul Giblock <drfaygo/at/gmail/dot/com>
 
 	* plugins/sid/logo.png:
@@ -36,7 +45,7 @@
 	* plugins/papu/papu_instrument.cpp:
 	* plugins/CMakeLists.txt:
 	- Add Csaba and Attila's GameBoy emulator so it can be tested in RC1
-	- Update artwork to something not trademarked.  "Freeboy" is just for now.
+	- Update artwork to something not trademarked. "Freeboy" is just for now
 
 2008-09-07	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
