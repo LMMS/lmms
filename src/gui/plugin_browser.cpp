@@ -44,7 +44,7 @@ pluginBrowser::pluginBrowser( QWidget * _parent ) :
 	sideBarWidget( tr( "Instrument plugins" ),
 				embed::getIconPixmap( "plugins" ), _parent )
 {
-	setWindowTitle( tr( "Plugin browser" ) );
+	setWindowTitle( tr( "Instrument browser" ) );
 	m_view = new QWidget( contentParent() );
 	//m_view->setFrameShape( QFrame::NoFrame );
 
@@ -52,14 +52,13 @@ pluginBrowser::pluginBrowser( QWidget * _parent ) :
 
 	QVBoxLayout * view_layout = new QVBoxLayout( m_view );
 	view_layout->setMargin( 5 );
-	view_layout->setSpacing( 10 );
+	view_layout->setSpacing( 5 );
 
 
-	QLabel * hint = new QLabel( tr( "You can drag an instrument-plugin "
+	QLabel * hint = new QLabel( tr( "Drag an instrument "
 					"into either the Song-Editor, the "
-					"Beat+Bassline Editor or just into a "
-					"channel-window or on the "
-					"corresponding channel-button." ),
+					"Beat+Bassline Editor or into an "
+					"existing instrument track." ),
 								m_view );
 	hint->setFont( pointSize<8>( hint->font() ) );
 	hint->setWordWrap( TRUE );

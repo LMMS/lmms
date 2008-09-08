@@ -50,7 +50,7 @@ instrumentMidiIOView::instrumentMidiIOView( QWidget * _parent ) :
 	m_setupTabWidget = new tabWidget(
 					tr( "MIDI SETUP FOR THIS INSTRUMENT" ),
 									this );
-	m_setupTabWidget->setGeometry( 4, 5, 238, 200 );
+	m_setupTabWidget->setGeometry( 4, 5, 242, 200 );
 
 	m_inputChannelSpinBox = new lcdSpinBox( 3, m_setupTabWidget );
 	m_inputChannelSpinBox->addTextForValue( 0, "---" );

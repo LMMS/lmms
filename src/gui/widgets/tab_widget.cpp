@@ -3,7 +3,7 @@
 /*
  * tab_widget.cpp - tabwidget for LMMS
  *
- * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -46,7 +46,7 @@ tabWidget::tabWidget( const QString & _caption, QWidget * _parent ) :
 	setAutoFillBackground( TRUE );
 	QColor bg_color = QApplication::palette().color( QPalette::Active,
 							QPalette::Background ).
-								dark( 132 );
+								darker( 132 );
 	QPalette pal = palette();
 	pal.setColor( QPalette::Background, bg_color );
 	setPalette( pal );
@@ -151,23 +151,26 @@ void tabWidget::paintEvent( QPaintEvent * _pe )
 
 	QColor bg_color = QApplication::palette().color( QPalette::Active,
 							QPalette::Background );
-	p.fillRect( 0, 0, width() - 1, height() - 1, bg_color.dark( 132 ) );
+	QLinearGradient g( 0, 0, 0, 10 );
+	g.setColorAt( 0, bg_color.darker( 250 ) );
+	g.setColorAt( 0.1, bg_color.lighter( 120 ) );
+	g.setColorAt( 1, bg_color.darker( 250 ) );
+	p.fillRect( 0, 0, width() - 1, height() - 1, bg_color );
 
-	const int c = 0;
 	bool big_tab_captions = ( m_caption == "" );
 	int add = big_tab_captions ? 1 : 0;
 
-	p.setPen( bg_color.dark( 200 ) );
-	p.drawRect( 0, 0, width() - 1 + c, height() - 1 + c );
+	p.setPen( bg_color.darker( 150 ) );
+	p.drawRect( 0, 0, width() - 1, height() - 1 );
 
-	p.setPen( bg_color.light( 125 ) );
+	p.setPen( bg_color.light( 150 ) );
 	p.drawLine( width() - 1, 0, width() - 1, height() - 1 );
 	p.drawLine( 0, height() - 1, width() - 1, height() - 1 );
 
 	p.setPen( QColor( 0, 0, 0 ) );
-	p.drawRect( 1, 1, width() - 3 + c, height() - 3 + c );
+	p.drawRect( 1, 1, width() - 3, height() - 3 );
 
-	p.fillRect( 2, 2, width() - 4, 9 + add, bg_color.dark( 300 ) );
+	p.fillRect( 2, 2, width() - 4, 9 + add, g );
 	p.drawLine( 2, 11 + add, width() - 3, 11 + add );
 
 	if( !big_tab_captions )

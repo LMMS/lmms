@@ -294,8 +294,8 @@ vestigeInstrumentView::vestigeInstrumentView( instrument * _instrument,
 			"clicking on this button, a file-open-dialog appears "
 			"and you can select your file." ) );
 
-	m_toggleGUIButton = new QPushButton( tr( "Show/hide VST-GUI" ), this );
-	m_toggleGUIButton->setGeometry( 45, 150, 160, 24 );
+	m_toggleGUIButton = new QPushButton( tr( "Show/hide GUI" ), this );
+	m_toggleGUIButton->setGeometry( 20, 150, 200, 24 );
 	m_toggleGUIButton->setIcon( embed::getIconPixmap( "zoom" ) );
 	m_toggleGUIButton->setFont( pointSize<8>( m_toggleGUIButton->font() ) );
 	connect( m_toggleGUIButton, SIGNAL( clicked() ), this,
@@ -306,7 +306,7 @@ vestigeInstrumentView::vestigeInstrumentView( instrument * _instrument,
 
 	QPushButton * note_off_all_btn = new QPushButton( tr( "Turn off all "
 							"notes" ), this );
-	note_off_all_btn->setGeometry( 45, 180, 160, 24 );
+	note_off_all_btn->setGeometry( 20, 180, 200, 24 );
 	note_off_all_btn->setIcon( embed::getIconPixmap( "state_stop" ) );
 	note_off_all_btn->setFont( pointSize<8>( note_off_all_btn->font() ) );
 	connect( note_off_all_btn, SIGNAL( clicked() ), this,

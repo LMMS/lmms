@@ -51,9 +51,9 @@ extern "C"
 plugin::descriptor sf2player_plugin_descriptor =
 {
 	STRINGIFY_PLUGIN_NAME( PLUGIN_NAME ),
-	"Sf2Player",
+	"Sf2 Player",
 	QT_TRANSLATE_NOOP( "pluginBrowser",
-				"SoundFont synthesizer" ),
+			"Player for SoundFont files" ),
 	"Paul Giblock <drfaygo/at/gmail/dot/com>",
 	0x0100,
 	plugin::Instrument,

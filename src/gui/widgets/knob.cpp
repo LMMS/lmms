@@ -109,9 +109,9 @@ void knob::setLabel( const QString & _txt )
 	if( m_knobPixmap )
 	{
 		setFixedSize( tMax<int>( m_knobPixmap->width(),
-						QFontMetrics( pointSize<6>( font()
-								) ).width( m_label ) ),
-							m_knobPixmap->height() + 10 );
+					QFontMetrics( pointSizeF( font(), 6
+							) ).width( m_label ) ),
+						m_knobPixmap->height() + 10 );
 	}
 	update();
 }
@@ -516,7 +516,7 @@ void knob::paintEvent( QPaintEvent * _me )
 	drawKnob( &p );
 	if( !m_label.isEmpty() )
 	{
-		p.setFont( pointSize<6>( p.font() ) );
+		p.setFont( pointSizeF( p.font(), 6 ) );
 /*		p.setPen( QColor( 64, 64, 64 ) );
 		p.drawText( width() / 2 -
 			p.fontMetrics().width( m_label ) / 2 + 1,
@@ -619,11 +619,11 @@ QString knob::displayValue( void ) const
 	if( isVolumeKnob() &&
 		configManager::inst()->value( "app", "displaydbv" ).toInt() )
 	{
-		return( m_description + QString( " %1 dBV" ).arg(
-				20.0 * log10( model()->value() / 100.0 ),
-				3, 'f', 2 ) );
+		return( m_description.trimmed() + QString( " %1 dBV" ).
+				arg( 20.0 * log10( model()->value() / 100.0 ),
+								3, 'f', 2 ) );
 	}
-	return( m_description + QString( " %1" ).
+	return( m_description.trimmed() + QString( " %1" ).
 					arg( model()->value() ) + m_unit );
 }
 

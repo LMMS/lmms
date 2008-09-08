@@ -303,7 +303,7 @@ void fxMixerView::clear( void )
 {
 	for( int i = 0; i <= NumFxChannels; ++i )
 	{
-		m_fxChannelViews[i].m_rackView->clear();
+		m_fxChannelViews[i].m_rackView->clearViews();
 	}
 }
 

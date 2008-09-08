@@ -31,7 +31,6 @@
 #include "effect_chain.h"
 #include "types.h"
 
-class QPushButton;
 class QScrollArea;
 class QVBoxLayout;
 
@@ -46,7 +45,7 @@ public:
 	effectRackView( effectChain * _model, QWidget * _parent = NULL );
 	virtual ~effectRackView();
 
-	void clear( void );
+	void clearViews( void );
 
 
 public slots:
@@ -79,8 +78,7 @@ private:
 	QVBoxLayout * m_mainLayout;
 	groupBox * m_effectsGroupBox;
 	QScrollArea * m_scrollArea;
-	QPushButton * m_addButton;
-	
+
 	Uint32 m_lastY;
 
 } ;

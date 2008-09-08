@@ -41,25 +41,17 @@
 #include "gui_templates.h"
 
 
-QPixmap * groupBox::s_ledBg = NULL;
-
 
 groupBox::groupBox( const QString & _caption, QWidget * _parent ) :
 	QWidget( _parent ),
 	boolModelView( NULL, this ),
 	m_caption( _caption )
 {
-	if( s_ledBg == NULL )
-	{
-		s_ledBg = new QPixmap( embed::getIconPixmap(
-							"groupbox_led_bg" ) );
-	}
-
 	updatePixmap();
 
 	m_led = new pixmapButton( this, _caption );
 	m_led->setCheckable( TRUE );
-	m_led->move( 2, 3 );
+	m_led->move( 3, 3 );
 	m_led->setActiveGraphic( embed::getIconPixmap( "led_green" ) );
 	m_led->setInactiveGraphic( embed::getIconPixmap( "led_off" ) );
 
@@ -108,35 +100,35 @@ void groupBox::resizeEvent( QResizeEvent * _ev )
 
 void groupBox::updatePixmap( void )
 {
-	const int c = 0;
 	QColor bg_color = QApplication::palette().color( QPalette::Active,
 							QPalette::Background );
 	QPixmap pm( size() );
-	pm.fill( bg_color.dark( 132 ) );
+	pm.fill( bg_color/*.dark( 132 )*/ );
 
 	QPainter p( &pm );
 
 	// outer rect
-	p.setPen( bg_color.dark( 200 ) );
-	p.drawRect( 0, 0, width() - 1 + c, height() - 1 + c );
+	p.setPen( bg_color.dark( 150 ) );
+	p.drawRect( 0, 0, width() - 1, height() - 1 );
 
 	// brighter line at bottom/right
-	p.setPen( bg_color.light( 125 ) );
+	p.setPen( bg_color.light( 150 ) );
 	p.drawLine( width() - 1, 0, width() - 1, height() - 1 );
 	p.drawLine( 0, height() - 1, width() - 1, height() - 1 );
 
-	// draw our led-pixmap
-	p.drawPixmap( 2, 2, *s_ledBg );
-
 	// draw groupbox-titlebar
-	p.fillRect( 2, 2, width() - 4, 9, bg_color.dark( 300 ) );
+	QLinearGradient g( 0, 0, 0, 9 );
+	g.setColorAt( 0, bg_color.darker( 250 ) );
+	g.setColorAt( 0.1, bg_color.lighter( 120 ) );
+	g.setColorAt( 1, bg_color.darker( 250 ) );
+	p.fillRect( 2, 2, width() - 4, 9, g );
 
 	// draw line below titlebar
 	p.setPen( bg_color.dark( 400 ) );
-	p.drawLine( 2 + s_ledBg->width(), 11, width() - 3, 11 );
+	p.drawLine( 1, 11, width() - 3, 11 );
 
 	// black inner rect
-	p.drawRect( 1, 1, width() - 3 + c, height() - 3 + c );
+	p.drawRect( 1, 1, width() - 3, height() - 3 );
 
 
 	//p.setPen( QColor( 255, 255, 255 ) );

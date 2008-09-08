@@ -342,7 +342,7 @@ bitInvaderView::bitInvaderView( instrument * _instrument,
 
 	pal = QPalette();
 	pal.setBrush( backgroundRole(), 
-			PLUGIN_NAME::getIconPixmap("wavegraph3") );
+			PLUGIN_NAME::getIconPixmap("wavegraph") );
 	m_graph->setPalette( pal );
 
 

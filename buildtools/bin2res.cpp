@@ -1,7 +1,7 @@
 /*
  * bin2res.cpp - generate embedded resources from binary data (based on qembed)
  *
- * Copyright (c) 2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -97,7 +97,7 @@ int main( int argc, char * * argv )
 		e->cname = convertFileNameToCIdentifier( e->name );
 		embedded_data.push_back( e );
 		std::string s;
-		std::cout << "const unsigned char " << e->cname <<
+		std::cout << "static const unsigned char " << e->cname <<
 								"_data[] = {";
 		embedData( data, fsize, std::cout );
 		std::cout << std::endl << "};" << std::endl << std::endl;
@@ -106,7 +106,7 @@ int main( int argc, char * * argv )
 
 	if( embedded_data.size() > 0 )
 	{
-		std::cout << "const unsigned char dummy_data[] ="
+		std::cout << "static const unsigned char dummy_data[] ="
 					"{ 0x00 };" << std::endl << std::endl;
 		embed * dummy = new embed;
 		dummy->size = 1;
@@ -116,7 +116,7 @@ int main( int argc, char * * argv )
 
 		std::cout << "#include <string.h>" << std::endl << std::endl;
 		std::cout << "#include \"embed.h\"" << std::endl << std::endl;
-		std::cout << "embed::descriptor embed_vec[] = {" << std::endl;
+		std::cout << "static embed::descriptor embed_vec[] = {" << std::endl;
 /*				<< "{" << std::endl
 				<< "	int size;" << std::endl
 				<< "	const unsigned char * data;" <<

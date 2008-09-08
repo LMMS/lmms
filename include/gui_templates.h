@@ -1,7 +1,7 @@
 /*
  * gui_templates.h - GUI-specific templates
  *
- * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -26,6 +26,8 @@
 #ifndef _GUI_TEMPLATES_H
 #define _GUI_TEMPLATES_H
 
+#include "lmmsconfig.h"
+
 #include <QtGui/QApplication>
 #include <QtGui/QFont>
 #include <QtGui/QDesktopWidget>
@@ -37,7 +39,7 @@
 template<int SIZE>
 inline QFont pointSize( QFont _f )
 {
-	static const int DPI = 96;
+	static const float DPI = 96;
 	_f.setPointSizeF( (float) SIZE * DPI /
 			QApplication::desktop()->logicalDpiY() );
 	return( _f );
@@ -46,9 +48,14 @@ inline QFont pointSize( QFont _f )
 
 inline QFont pointSizeF( QFont _f, float SIZE )
 {
-	static const int DPI = 96;
+	static const float DPI = 96;
+#ifdef LMMS_BUILD_WIN32
+	_f.setPointSizeF( (SIZE+0.5f) * DPI /
+			QApplication::desktop()->logicalDpiY() );
+#else
 	_f.setPointSizeF( SIZE * DPI /
 			QApplication::desktop()->logicalDpiY() );
+#endif
 	return( _f );
 }
 

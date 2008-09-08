@@ -1,7 +1,7 @@
 /*
  * group_box.h - LMMS-groupbox
  *
- * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -52,8 +52,6 @@ protected:
 
 private:
 	void updatePixmap( void );
-
-	static QPixmap * s_ledBg;
 
 	pixmapButton * m_led;
 	QString m_caption;

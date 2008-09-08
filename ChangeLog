@@ -1,5 +1,77 @@
 2008-09-08	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* buildtools/bin2res.cpp:
+	* plugins/bit_invader/logo.png:
+	* plugins/bit_invader/bit_invader.cpp:
+	* plugins/bit_invader/wavegraph.png:
+	* plugins/bit_invader/wavegraph3.png:
+	* plugins/bit_invader/artwork.png:
+	* plugins/lb302/artwork.png:
+	* plugins/papu/artwork.png:
+	* plugins/sf2_player/chorus_off.png:
+	* plugins/sf2_player/chorus_on.png:
+	* plugins/sf2_player/logo.png:
+	* plugins/sf2_player/sf2_player.cpp:
+	* plugins/sf2_player/fileselect_off.png:
+	* plugins/sf2_player/fileselect_on.png:
+	* plugins/sf2_player/reverb_off.png:
+	* plugins/sf2_player/patches_off.png:
+	* plugins/sf2_player/patches_on.png:
+	* plugins/sf2_player/artwork.png:
+	* plugins/sid/3off.png:
+	* plugins/sid/8580red.png:
+	* plugins/sid/trianglered.png:
+	* plugins/sid/logo.png:
+	* plugins/sid/bp.png:
+	* plugins/sid/6581.png:
+	* plugins/sid/8580.png:
+	* plugins/sid/syncred.png:
+	* plugins/sid/hp.png:
+	* plugins/sid/lp.png:
+	* plugins/sid/sync.png:
+	* plugins/sid/noise.png:
+	* plugins/sid/test.png:
+	* plugins/sid/pulsered.png:
+	* plugins/sid/filter.png:
+	* plugins/sid/sawred.png:
+	* plugins/sid/3offred.png:
+	* plugins/sid/pulse.png:
+	* plugins/sid/artwork.png:
+	* plugins/sid/saw.png:
+	* plugins/sid/bpred.png:
+	* plugins/sid/6581red.png:
+	* plugins/sid/ring.png:
+	* plugins/sid/hpred.png:
+	* plugins/sid/triangle.png:
+	* plugins/sid/lpred.png:
+	* plugins/sid/noisered.png:
+	* plugins/sid/testred.png:
+	* plugins/sid/filterred.png:
+	* plugins/sid/ringred.png:
+	* plugins/spectrum_analyzer/log_x_axis.png:
+	* plugins/spectrum_analyzer/log_y_axis.png:
+	* plugins/spectrum_analyzer/background.png:
+	* plugins/spectrum_analyzer/spectrum_background.png:
+	* plugins/spectrum_analyzer/spectrum_background_plain.png:
+	* plugins/vestige/vestige.cpp:
+	* plugins/vst_base/remote_vst_plugin.cpp:
+	* data/themes/default/groupbox_led_bg.png:
+	* include/aeffectx.h:
+	* include/effect_rack_view.h:
+	* include/group_box.h:
+	* include/gui_templates.h:
+	* src/core/piano.cpp:
+	* src/gui/fx_mixer_view.cpp:
+	* src/gui/plugin_browser.cpp:
+	* src/gui/widgets/effect_rack_view.cpp:
+	* src/gui/widgets/group_box.cpp:
+	* src/gui/widgets/instrument_function_views.cpp:
+	* src/gui/widgets/instrument_midi_io_view.cpp:
+	* src/gui/widgets/instrument_sound_shaping_view.cpp:
+	* src/gui/widgets/knob.cpp:
+	* src/gui/widgets/tab_widget.cpp:
+	UI finetuning / recompression of some PNG-files
+
 	* src/core/remote_plugin.cpp:
 	improved destruction
 

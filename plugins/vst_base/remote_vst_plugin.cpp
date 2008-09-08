@@ -1013,10 +1013,6 @@ DWORD WINAPI remoteVstPlugin::guiEventLoop( LPVOID _param )
 		return( 1 );
 	}
 
-	ShowWindow( _this->m_window, SW_SHOWNORMAL );
-
-	_this->m_windowID = (Sint32) GetPropA( _this->m_window,
-						"__wine_x11_whole_window" );
 #else
 	_this->m_windowID = 1;	// arbitrary value on win32 to signal
 				// vstPlugin-class that we have an editor
@@ -1034,10 +1030,16 @@ DWORD WINAPI remoteVstPlugin::guiEventLoop( LPVOID _param )
 	_this->m_windowHeight = er->bottom - er->top;
 
 	SetWindowPos( _this->m_window, 0, 0, 0, _this->m_windowWidth + 8,
-				_this->m_windowHeight + 26, SWP_SHOWWINDOW );
+			_this->m_windowHeight + 26, SWP_NOMOVE | SWP_NOZORDER );
+	_this->m_plugin->dispatcher( _this->m_plugin, effEditTop, 0, 0,
+								NULL, 0 );
 
-	UpdateWindow( _this->m_window );
+	ShowWindow( _this->m_window, SW_SHOWNORMAL );
 
+#ifdef LMMS_BUILD_LINUX
+	_this->m_windowID = (Sint32) GetPropA( _this->m_window,
+						"__wine_x11_whole_window" );
+#endif
 
 	pthread_cond_signal( &_this->m_windowStatusChange );
 

@@ -45,7 +45,7 @@ effectRackView::effectRackView( effectChain * _model, QWidget * _parent ) :
 	setFixedSize( 250, 250 );
 
 	m_effectsGroupBox = new groupBox( tr( "EFFECTS CHAIN" ), this );
-	m_effectsGroupBox->setGeometry( 2, 2, 242, 244 );
+	m_effectsGroupBox->setGeometry( 4, 5, 242, 240 );
 
 	m_scrollArea = new QScrollArea( m_effectsGroupBox );
 	m_scrollArea->setFixedSize( 230, 184 );
@@ -53,11 +53,10 @@ effectRackView::effectRackView( effectChain * _model, QWidget * _parent ) :
 	m_scrollArea->setPalette( QApplication::palette( m_scrollArea ) );
 	m_scrollArea->move( 6, 22 );
 
-	m_addButton = new QPushButton( m_effectsGroupBox );
-	m_addButton->setText( tr( "Add" ) );
-	m_addButton->move( 75, 210 );
-	connect( m_addButton, SIGNAL( clicked( void ) ), 
-					this, SLOT( addEffect( void ) ) );
+	QPushButton * addButton = new QPushButton( m_effectsGroupBox );
+	addButton->setText( tr( "Add effect" ) );
+	addButton->move( 8, 210 );
+	connect( addButton, SIGNAL( clicked() ), this, SLOT( addEffect() ) );
 
 	QWidget * w = new QWidget;
 	m_scrollArea->setWidget( w );
@@ -71,14 +70,14 @@ effectRackView::effectRackView( effectChain * _model, QWidget * _parent ) :
 
 effectRackView::~effectRackView()
 {
-	clear();
+	clearViews();
 }
 
 
 
 
 
-void effectRackView::clear( void )
+void effectRackView::clearViews( void )
 {
 	for( QVector<effectView *>::iterator it = m_effectViews.begin();
 					it != m_effectViews.end(); ++it )
@@ -245,7 +244,7 @@ void effectRackView::addEffect( void )
 
 void effectRackView::modelChanged( void )
 {
-	clear();
+	clearViews();
 	m_effectsGroupBox->setModel( &fxChain()->m_enabledModel );
 	update();
 }
