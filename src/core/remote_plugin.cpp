@@ -82,13 +82,18 @@ remotePlugin::~remotePlugin()
 {
 	if( m_failed == false )
 	{
-		sendMessage( IdQuit );
-
-		m_process.waitForFinished( 1000 );
-		if( m_process.state() != QProcess::NotRunning )
+		if( m_process.state() == QProcess::Running )
 		{
-			m_process.terminate();
-			m_process.kill();
+			lock();
+			sendMessage( IdQuit );
+
+			m_process.waitForFinished( 1000 );
+			if( m_process.state() != QProcess::NotRunning )
+			{
+				m_process.terminate();
+				m_process.kill();
+			}
+			unlock();
 		}
 
 #ifdef USE_NATIVE_SHMEM
@@ -105,6 +110,10 @@ remotePlugin::~remotePlugin()
 bool remotePlugin::process( const sampleFrame * _in_buf,
 					sampleFrame * _out_buf, bool _wait )
 {
+	if( m_failed )
+	{
+		return false;
+	}
 	const fpp_t frames = engine::getMixer()->framesPerPeriod();
 
 	if( m_shm == NULL )
@@ -179,7 +188,8 @@ bool remotePlugin::process( const sampleFrame * _in_buf,
 
 bool remotePlugin::waitForProcessingFinished( sampleFrame * _out_buf )
 {
-	if( !m_initialized || _out_buf == NULL || m_outputCount == 0 )
+	if( m_failed || !m_initialized || _out_buf == NULL ||
+							m_outputCount == 0 )
 	{
 		return( false );
 	}
