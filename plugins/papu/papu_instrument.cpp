@@ -45,7 +45,7 @@ plugin::descriptor PLUGIN_EXPORT papu_plugin_descriptor =
 {
 	STRINGIFY_PLUGIN_NAME( PLUGIN_NAME ),
 	"PAPU",
-	QT_TRANSLATE_NOOP( "pluginBrowser", "Emulation of GameBoy APU" ),
+	QT_TRANSLATE_NOOP( "pluginBrowser", "Emulation of GameBoy (TM) APU" ),
 
 	"Attila Herman <attila589/at/gmail.com>"
 	"Csaba Hruska <csaba.hruska/at/gmail.com>",
