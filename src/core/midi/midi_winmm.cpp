@@ -40,15 +40,19 @@
 
 midiWinMM::midiWinMM( void ) :
 	midiClient(),
-	m_deviceListUpdateTimer( this )
+	m_threadHandle( 0 ),
+	m_threadId( 0 ),
+	m_isRunning( false ),
+	m_inputDevices(),
+	m_outputDevices(),
+	m_inputSubs(),
+	m_outputSubs()
 {
-	// initial list-update
-	updateDeviceList();
+	m_threadHandle = CreateThread( NULL, 0,
+					(LPTHREAD_START_ROUTINE) midiThreadProc,
+					this, 0, &m_threadId );
 
-	connect( &m_deviceListUpdateTimer, SIGNAL( timeout() ),
-					this, SLOT( updateDeviceList() ) );
-	// we check for port-changes every second
-//	m_deviceListUpdateTimer.start( 1000 );
+	m_isRunning = true;
 }
 
 
@@ -56,7 +60,9 @@ midiWinMM::midiWinMM( void ) :
 
 midiWinMM::~midiWinMM()
 {
-	closeDevices();
+	m_isRunning = false;
+	WaitForSingleObject( m_threadHandle, INFINITE );
+	CloseHandle( m_threadHandle );
 }
 
 
@@ -163,10 +169,30 @@ void midiWinMM::subscribeWriteablePort( midiPort * _port,
 
 
 
+DWORD WINAPI midiWinMM::midiThreadProc( midiWinMM * _midi )
+{
+	return _midi->threadProc();
+}
+
+
+
+
+DWORD midiWinMM::threadProc( void )
+{
+	openDevices();
+	while( m_isRunning )
+	{
+		Sleep( 100 );
+	}
+	closeDevices();
+}
+
+
+
+
 void midiWinMM::inputCallback( HMIDIIN _hm, UINT _msg, DWORD_PTR _inst,
 					DWORD_PTR _param1, DWORD_PTR _param2 )
 {
-	printf( "callback: %d %d\n", _msg, _param1 );
 	if( _msg == MIM_DATA )
 	{
 		( (midiWinMM *) _inst )->handleInputEvent( _hm, _param1 );
@@ -286,10 +312,10 @@ void midiWinMM::openDevices( void )
 							CALLBACK_FUNCTION );
 		if( res == MMSYSERR_NOERROR )
 		{
-			midiInStart( hm );
 			MIDIINCAPS c;
 			midiInGetDevCaps( (UINT) hm, &c, sizeof( c ) );
 			m_inputDevices[hm] = c.szPname;
+			midiInStart( hm );
 		}
 	}
 }
