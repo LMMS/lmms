@@ -118,7 +118,7 @@ public:
 	} ;
 
 
-private slots:
+private:// slots:
 	void updateDeviceList( void );
 
 
@@ -127,18 +127,11 @@ private:
 	void closeDevices( void );
 
 #ifdef LMMS_BUILD_WIN32
-	static DWORD WINAPI midiThreadProc( midiWinMM * _midi );
-	DWORD threadProc( void );
-
-	static void CALLBACK inputCallback( HMIDIIN _hm, UINT _msg,
+	static void WINAPI CALLBACK inputCallback( HMIDIIN _hm, UINT _msg,
 						DWORD_PTR _inst,
 						DWORD_PTR _param1,
 							DWORD_PTR _param2 );
 	void handleInputEvent( HMIDIIN _hm, DWORD _ev );
-
-	HANDLE m_threadHandle;
-	DWORD m_threadId;
-	volatile bool m_isRunning;
 
 	QMap<HMIDIIN, QString> m_inputDevices;
 	QMap<HMIDIOUT, QString> m_outputDevices;

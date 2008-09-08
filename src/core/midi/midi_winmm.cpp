@@ -40,19 +40,12 @@
 
 midiWinMM::midiWinMM( void ) :
 	midiClient(),
-	m_threadHandle( 0 ),
-	m_threadId( 0 ),
-	m_isRunning( false ),
 	m_inputDevices(),
 	m_outputDevices(),
 	m_inputSubs(),
 	m_outputSubs()
 {
-	m_threadHandle = CreateThread( NULL, 0,
-					(LPTHREAD_START_ROUTINE) midiThreadProc,
-					this, 0, &m_threadId );
-
-	m_isRunning = true;
+	openDevices();
 }
 
 
@@ -60,9 +53,7 @@ midiWinMM::midiWinMM( void ) :
 
 midiWinMM::~midiWinMM()
 {
-	m_isRunning = false;
-	WaitForSingleObject( m_threadHandle, INFINITE );
-	CloseHandle( m_threadHandle );
+	closeDevices();
 }
 
 
@@ -90,7 +81,7 @@ void midiWinMM::applyPortMode( midiPort * _port )
 		}
 	}
 
-	if( _port->outputEnabled() )
+	if( !_port->outputEnabled() )
 	{
 		for( subMap::iterator it = m_outputSubs.begin();
 						it != m_outputSubs.end(); ++it )
@@ -132,13 +123,10 @@ void midiWinMM::subscribeReadablePort( midiPort * _port,
 		return;
 	}
 
-	if( m_inputSubs.contains( _dest ) )
+	m_inputSubs[_dest].removeAll( _port );
+	if( _subscribe )
 	{
-		m_inputSubs[_dest].removeAll( _port );
-		if( _subscribe )
-		{
-			m_inputSubs[_dest].push_back( _port );
-		}
+		m_inputSubs[_dest].push_back( _port );
 	}
 }
 
@@ -169,28 +157,7 @@ void midiWinMM::subscribeWriteablePort( midiPort * _port,
 
 
 
-DWORD WINAPI midiWinMM::midiThreadProc( midiWinMM * _midi )
-{
-	return _midi->threadProc();
-}
-
-
-
-
-DWORD midiWinMM::threadProc( void )
-{
-	openDevices();
-	while( m_isRunning )
-	{
-		Sleep( 100 );
-	}
-	closeDevices();
-}
-
-
-
-
-void midiWinMM::inputCallback( HMIDIIN _hm, UINT _msg, DWORD_PTR _inst,
+void WINAPI CALLBACK midiWinMM::inputCallback( HMIDIIN _hm, UINT _msg, DWORD_PTR _inst,
 					DWORD_PTR _param1, DWORD_PTR _param2 )
 {
 	if( _msg == MIM_DATA )
@@ -216,7 +183,7 @@ void midiWinMM::handleInputEvent( HMIDIIN _hm, DWORD _ev )
 	const int chan = cmd & 0x0f;
 
 	const QString d = m_inputDevices.value( _hm );
-	if( d.isEmpty() )
+	if( d.isEmpty() || !m_inputSubs.contains( d ) )
 	{
 		return;
 	}
@@ -283,19 +250,30 @@ void midiWinMM::updateDeviceList( void )
 
 void midiWinMM::closeDevices( void )
 {
-	for( QList<HMIDIIN>::const_iterator it = m_inputDevices.keys().begin();
-				it != m_inputDevices.keys().end(); ++it )
+	m_inputSubs.clear();
+	m_outputSubs.clear();
+	QMapIterator<HMIDIIN, QString> i( m_inputDevices );
+	while( i.hasNext() )
 	{
-		midiInReset( *it );
-		midiInClose( *it );
+//		i.next();
+		midiInClose( i.next().key() );
 	}
+	QMapIterator<HMIDIOUT, QString> o( m_outputDevices );
+	while( o.hasNext() )
+	{
+//		o.next();
+		midiOutClose( o.next().key() );
+	}
+/*	}
 	for( QList<HMIDIOUT>::const_iterator it =
 					m_outputDevices.keys().begin();
 				it != m_outputDevices.keys().end(); ++it )
 	{
 		//midiOutStop( *it );
 		midiOutClose( *it );
-	}
+	}*/
+	m_inputDevices.clear();
+	m_outputDevices.clear();
 }
 
 
@@ -306,15 +284,15 @@ void midiWinMM::openDevices( void )
 	m_inputDevices.clear();
 	for( int i = 0; i < midiInGetNumDevs(); ++i )
 	{
+		MIDIINCAPS c;
+		midiInGetDevCaps( i, &c, sizeof( c ) );
 		HMIDIIN hm = 0;
 		MMRESULT res = midiInOpen( &hm, i, (DWORD) &inputCallback,
 						(DWORD_PTR) this,
 							CALLBACK_FUNCTION );
 		if( res == MMSYSERR_NOERROR )
 		{
-			MIDIINCAPS c;
-			midiInGetDevCaps( (UINT) hm, &c, sizeof( c ) );
-			m_inputDevices[hm] = c.szPname;
+			m_inputDevices[hm] = qstrdup( c.szPname );
 			midiInStart( hm );
 		}
 	}
