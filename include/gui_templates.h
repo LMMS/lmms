@@ -40,8 +40,13 @@ template<int SIZE>
 inline QFont pointSize( QFont _f )
 {
 	static const float DPI = 96;
+#ifdef LMMS_BUILD_WIN32
+	_f.setPointSizeF( ((float) SIZE+0.5f) * DPI /
+			QApplication::desktop()->logicalDpiY() );
+#else
 	_f.setPointSizeF( (float) SIZE * DPI /
 			QApplication::desktop()->logicalDpiY() );
+#endif
 	return( _f );
 }
 

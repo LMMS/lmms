@@ -53,8 +53,8 @@ const QString __targetNames[instrumentSoundShaping::NumTargets][3] =
 	instrumentSoundShaping::tr( "Pitch" ),*/
 	{ instrumentSoundShaping::tr( "CUTOFF" ), "cut",
 			instrumentSoundShaping::tr( "Cutoff frequency" ) },
-	{ instrumentSoundShaping::tr( "Q/RESO" ), "res",
-			instrumentSoundShaping::tr( "Q/Resonance" ) }
+	{ instrumentSoundShaping::tr( "RESO" ), "res",
+			instrumentSoundShaping::tr( "Resonance" ) }
 } ;
  
 

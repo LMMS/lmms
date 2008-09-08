@@ -116,7 +116,7 @@ void lcdSpinBox::paintEvent( QPaintEvent * _me )
 	int margin = 1;  // QStyle::PM_DefaultFrameWidth;
 	int lcdWidth = m_cellWidth * m_numDigits + (margin*m_marginWidth)*2;
 
-	p.translate( width() / 2 - lcdWidth / 2, 0 ); 
+//	p.translate( width() / 2 - lcdWidth / 2, 0 ); 
 	p.save();
 
 	p.translate( margin, margin );
@@ -180,12 +180,12 @@ void lcdSpinBox::paintEvent( QPaintEvent * _me )
 		p.setFont( pointSize<6>( p.font() ) );
 		p.setPen( QColor( 64, 64, 64 ) );
 		p.drawText( width() / 2 -
-			p.fontMetrics().width( m_label ) / 2 + 1,
-				height() - 1, m_label );
+				p.fontMetrics().width( m_label ) / 2 + 1,
+						height(), m_label );
 		p.setPen( QColor( 255, 255, 255 ) );
 		p.drawText( width() / 2 -
 				p.fontMetrics().width( m_label ) / 2,
-				height() - 2, m_label );
+						height() - 1, m_label );
 	}
 
 }

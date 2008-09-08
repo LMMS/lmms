@@ -111,9 +111,9 @@ instrumentSoundShapingView::instrumentSoundShapingView( QWidget * _parent ) :
 
 
 	m_filterResKnob = new knob( knobBright_26, m_filterGroupBox );
-	m_filterResKnob->setLabel( tr( "Q/RESO" ) );
-	m_filterResKnob->move( 190, 18 );
-	m_filterResKnob->setHintText( tr( "Q/Resonance:" ) + " ", "" );
+	m_filterResKnob->setLabel( tr( "RESO" ) );
+	m_filterResKnob->move( 196, 18 );
+	m_filterResKnob->setHintText( tr( "Resonance:" ) + " ", "" );
 	m_filterResKnob->setWhatsThis(
 		tr( "Use this knob for setting Q/Resonance for the selected "
 			"filter. Q/Resonance tells the filter how much it "

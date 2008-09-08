@@ -1,5 +1,13 @@
 2008-09-08	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* include/gui_templates.h:
+	* src/core/instrument_sound_shaping.cpp:
+	* src/gui/widgets/instrument_sound_shaping_view.cpp:
+	* src/gui/widgets/lcd_spinbox.cpp:
+	* data/locale/de.qm:
+	* data/locale/de.ts:
+	further UI finetuning
+
 	* include/midi_winmm.h:
 	* src/core/midi/midi_winmm.cpp:
 	finally made WinMM MIDI driver work properly by fixing internal data

@@ -2143,7 +2143,7 @@ Bitte stellen Sie sicher, dass Sie Schreibrechte auf diese Datei und das Verzeic
     </message>
     <message>
         <source>PITCH</source>
-        <translation>TONHÖHE</translation>
+        <translation>PITCH</translation>
     </message>
 </context>
 <context>
