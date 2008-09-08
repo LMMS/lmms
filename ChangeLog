@@ -1,3 +1,43 @@
+2008-09-08	Paul Giblock <drfaygo/at/gmail/dot/com>
+
+	* plugins/sid/logo.png:
+	Un-box the sid logo
+
+	* plugins/papu:
+	* plugins/papu/Basic_Gb_Apu.cpp:
+	* plugins/papu/btn_off.png:
+	* plugins/papu/btn_on.png:
+	* plugins/papu/papu_instrument.h:
+	* plugins/papu/logo.png:
+	* plugins/papu/Basic_Gb_Apu.h:
+	* plugins/papu/btn_up.png:
+	* plugins/papu/btn_15.png:
+	* plugins/papu/btn_7.png:
+	* plugins/papu/artwork.png:
+	* plugins/papu/gb_apu:
+	* plugins/papu/gb_apu/Blip_Buffer.cpp:
+	* plugins/papu/gb_apu/Gb_Oscs.cpp:
+	* plugins/papu/gb_apu/Blip_Synth.h:
+	* plugins/papu/gb_apu/Gb_Apu.h:
+	* plugins/papu/gb_apu/blargg_source.h:
+	* plugins/papu/gb_apu/Multi_Buffer.cpp:
+	* plugins/papu/gb_apu/Blip_Buffer.h:
+	* plugins/papu/gb_apu/Gb_Oscs.h:
+	* plugins/papu/gb_apu/boost:
+	* plugins/papu/gb_apu/boost/config.hpp:
+	* plugins/papu/gb_apu/boost/cstdint.hpp:
+	* plugins/papu/gb_apu/boost/static_assert.hpp:
+	* plugins/papu/gb_apu/Multi_Buffer.h:
+	* plugins/papu/gb_apu/LGPL.txt:
+	* plugins/papu/gb_apu/blargg_common.h:
+	* plugins/papu/gb_apu/Gb_Apu.cpp:
+	* plugins/papu/btn_down.png:
+	* plugins/papu/CMakeLists.txt:
+	* plugins/papu/papu_instrument.cpp:
+	* plugins/CMakeLists.txt:
+	- Add Csaba and Attila's GameBoy emulator so it can be tested in RC1
+	- Update artwork to something not trademarked.  "Freeboy" is just for now.
+
 2008-09-07	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* plugins/patman/patman.cpp:
