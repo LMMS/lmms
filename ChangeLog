@@ -3,6 +3,10 @@
 	* CMakeLists.txt:
 	made 0.4.0-rc1 release
 
+	* plugins/vst_base/CMakeLists.txt:
+	* CMakeLists.txt:
+	fixed win32-specific build issues
+
 	* include/gui_templates.h:
 	* src/core/instrument_sound_shaping.cpp:
 	* src/gui/widgets/instrument_sound_shaping_view.cpp:

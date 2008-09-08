@@ -403,10 +403,13 @@ ENDFOREACH(_item ${locale_targets})
 
 # install headers
 
+IF(LMMS_BUILD_LINUX)
 INSTALL(FILES ${lmms_INCLUDES} ${CMAKE_BINARY_DIR}/lmmsconfig.h ${CMAKE_SOURCE_DIR}/src/gui/embed.cpp DESTINATION ${CMAKE_INSTALL_PREFIX}/include/lmms/)
 IF(NOT LMMS_HAVE_SAMPLERATE)
 INSTALL(FILES ${CMAKE_SOURCE_DIR}/src/3rdparty/samplerate/samplerate.h DESTINATION ${CMAKE_INSTALL_PREFIX}/include/lmms/)
 ENDIF(NOT LMMS_HAVE_SAMPLERATE)
+ENDIF(LMMS_BUILD_LINUX)
+
 
 #
 # add distclean-target
