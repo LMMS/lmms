@@ -379,7 +379,7 @@ void papuInstrument::playNote( notePlayHandle * _n, bool,
 	int const buf_size = 2048;
 	int framesleft = frames;
 	int datalen = 0;
-	static blip_sample_t buf [buf_size*2];
+	blip_sample_t buf [buf_size*2];
 	while( framesleft > 0 )
 	{
 		int avail = papu->samples_avail();
