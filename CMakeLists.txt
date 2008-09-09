@@ -341,7 +341,7 @@ GET_TARGET_PROPERTY(BIN2RES bin2res LOCATION)
 SET(LMMS_ER_H ${CMAKE_CURRENT_BINARY_DIR}/embedded_resources.h)
 
 # we somehow have to make LMMS-binary depend on MOC-files
-ADD_FILE_DEPENDENCIES(lmmsconfig.h ${lmms_MOC_out})
+ADD_FILE_DEPENDENCIES(${CMAKE_BINARY_DIR}/lmmsconfig.h ${lmms_MOC_out})
 
 ADD_CUSTOM_COMMAND(OUTPUT ${LMMS_ER_H} COMMAND ${BIN2RES} ARGS ${lmms_EMBEDDED_RESOURCES} > ${LMMS_ER_H} DEPENDS ${BIN2RES})
 
@@ -380,6 +380,9 @@ IF(LMMS_BUILD_WIN32)
 	INSTALL(FILES /opt/mingw/bin/QtCore4.dll /opt/mingw/bin/QtGui4.dll /opt/mingw/bin/QtXml4.dll /opt/mingw/bin/libz.dll /opt/mingw/bin/libsndfile-1.dll /opt/mingw/bin/libvorbis-0.dll /opt/mingw/bin/libvorbisenc-2.dll /opt/mingw/bin/libvorbisfile-3.dll /opt/mingw/bin/libogg-0.dll /opt/mingw/bin/libfluidsynth-1.dll /opt/mingw/bin/libfftw3f-3.dll /opt/mingw/bin/SDL.dll /opt/mingw/i586-mingw32/bin/mingwm10.dll DESTINATION .)
 ELSE(LMMS_BUILD_WIN32)
 	INSTALL(TARGETS lmms RUNTIME DESTINATION bin)
+	ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_BINARY_DIR}/lmms.1.gz COMMAND gzip -c ${CMAKE_SOURCE_DIR}/lmms.1 > ${CMAKE_BINARY_DIR}/lmms.1.gz DEPENDS ${CMAKE_SOURCE_DIR}/lmms.1 COMMENT "Generating lmms.1.gz")
+	ADD_FILE_DEPENDENCIES(${CMAKE_BINARY_DIR}/lmmsconfig.h ${CMAKE_BINARY_DIR}/lmms.1.gz)
+	INSTALL(FILES ${CMAKE_BINARY_DIR}/lmms.1.gz DESTINATION ${CMAKE_INSTALL_PREFIX}/share/man/man1/ PERMISSIONS OWNER_READ GROUP_READ WORLD_READ)
 ENDIF(LMMS_BUILD_WIN32)
 
 #
@@ -416,7 +419,7 @@ ENDIF(LMMS_BUILD_LINUX)
 #
 ADD_CUSTOM_TARGET(distclean
 			COMMAND make clean
-			COMMAND rm -rf `find -name cmake_install.cmake` `find -name Makefile` `find -type d -name CMakeFiles` CMakeCache.txt lmmsconfig.h alsaconfig.h)
+			COMMAND rm -rf `find -name cmake_install.cmake` `find -name Makefile` `find -type d -name CMakeFiles` CMakeCache.txt lmmsconfig.h alsaconfig.h lmms.1.gz)
 
 #
 # add tarball-target
@@ -476,7 +479,7 @@ IF(WANT_PCH)
     ENDIF(PCHSupport_FOUND)
 ENDIF(WANT_PCH)
 
-SET_DIRECTORY_PROPERTIES(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES "${LMMS_ER_H} ${lmms_MOC_out} ${lmms_UI_out} lmmsconfig.h alsaconfig.h pch.h.gch/")
+SET_DIRECTORY_PROPERTIES(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES "${LMMS_ER_H} ${lmms_MOC_out} ${lmms_UI_out} lmmsconfig.h alsaconfig.h pch.h.gch/ lmms.1.gz")
 
 
 #

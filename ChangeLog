@@ -5,7 +5,8 @@
 
 	* plugins/vst_base/CMakeLists.txt:
 	* CMakeLists.txt:
-	fixed win32-specific build issues
+	- fixed win32-specific build issues
+	- on Linux install manpage
 
 	* include/gui_templates.h:
 	* src/core/instrument_sound_shaping.cpp:
