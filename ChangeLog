@@ -1,3 +1,8 @@
+2008-09-08	Paul Giblock <drfaygo/at/gmail/dot/com>
+    
+    * plugins/papu/gb_abu/Blip_Buffer.cpp:
+    Fix PAPU for 64bit machines
+
 2008-09-08	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* CMakeLists.txt:
