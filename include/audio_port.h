@@ -30,13 +30,14 @@
 #include <QtCore/QMutex>
 #include <QtCore/QMutexLocker>
 
-#include "effect_chain.h"
+#include "mixer.h"
 
+class effectChain;
 
 class audioPort
 {
 public:
-	audioPort( const QString & _name );
+	audioPort( const QString & _name, bool _has_effect_chain = true );
 	~audioPort();
 
 	inline sampleFrame * firstBuffer( void )
@@ -90,7 +91,7 @@ public:
 
 	inline effectChain * getEffects( void )
 	{
-		return( &m_effects );
+		return( m_effects );
 	}
 
 	void setNextFxChannel( const fx_ch_t _chnl )
@@ -131,7 +132,7 @@ private:
 
 	QString m_name;
 	
-	effectChain m_effects;
+	effectChain * m_effects;
 
 
 	friend class mixer;

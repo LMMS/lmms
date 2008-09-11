@@ -27,6 +27,7 @@
 #ifndef _PLAY_HANDLE_H
 #define _PLAY_HANDLE_H
 
+#include <QtCore/QThread>
 #include <QtCore/QVector>
 
 #include "types.h"
@@ -47,12 +48,23 @@ public:
 
 	playHandle( const types _type, f_cnt_t _offset = 0 ) :
 		m_type( _type ),
-		m_offset( _offset )
+		m_offset( _offset ),
+		m_affinity( QThread::currentThread() )
 	{
 	}
 
 	virtual inline ~playHandle()
 	{
+	}
+
+	virtual inline bool affinityMatters( void ) const
+	{
+		return false;
+	}
+
+	const QThread * affinity( void ) const
+	{
+		return( m_affinity );
 	}
 
 	inline types type( void ) const
@@ -92,6 +104,7 @@ public:
 private:
 	types m_type;
 	f_cnt_t m_offset;
+	QThread * m_affinity;
 
 } ;
 

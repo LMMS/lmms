@@ -46,6 +46,12 @@ public:
 	samplePlayHandle( pattern * _pattern );
 	virtual ~samplePlayHandle();
 
+	virtual inline bool affinityMatters( void ) const
+	{
+		return true;
+	}
+
+
 	virtual void play( bool _try_parallelizing,
 						sampleFrame * _working_buffer );
 	virtual bool done( void ) const;

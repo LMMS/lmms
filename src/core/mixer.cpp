@@ -567,7 +567,7 @@ const surroundSampleFrame * mixer::renderNextBuffer( void )
 			m_playHandles.erase( it );
 		}
 
-		m_playHandlesToRemove.erase( it_rem );
+		it_rem = m_playHandlesToRemove.erase( it_rem );
 	}
 	unlockPlayHandlesToRemove();
 	unlockPlayHandles();
@@ -636,22 +636,27 @@ const surroundSampleFrame * mixer::renderNextBuffer( void )
 				}
 			}
 		}
-		idx = 0;
-		while( idx < m_playHandles.size() )
+		for( playHandleVector::iterator it = m_playHandles.begin();
+					it != m_playHandles.end(); )
 		{
-			playHandle * n = m_playHandles[idx];
-			if( n->done() )
+			if( ( *it )->affinityMatters() &&
+				( *it )->affinity() != QThread::currentThread() )
 			{
-				delete n;
-				m_playHandles.erase(
-						m_playHandles.begin() + idx );
+				++it;
+				continue;
+			}
+			if( ( *it )->done() )
+			{
+				delete *it;
+				it = m_playHandles.erase( it );
 			}
 			else
 			{
-				++idx;
+				++it;
 			}
 		}
 		unlockPlayHandles();
+
 		if( m_multiThreaded )
 		{
 			mixerWorkerThread::jobQueue jq;
@@ -951,7 +956,7 @@ void mixer::removePlayHandles( track * _track )
 		if( ( *it )->isFromTrack( _track ) )
 		{
 			delete *it;
-			m_playHandles.erase( it );
+			it = m_playHandles.erase( it );
 		}
 		else
 		{

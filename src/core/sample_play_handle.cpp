@@ -39,10 +39,10 @@
 samplePlayHandle::samplePlayHandle( const QString & _sample_file ) :
 	playHandle( SamplePlayHandle ),
 	m_sampleBuffer( new sampleBuffer( _sample_file ) ),
-	m_doneMayReturnTrue( TRUE ),
+	m_doneMayReturnTrue( true ),
 	m_frame( 0 ),
-	m_audioPort( new audioPort( "samplePlayHandle" ) ),
-	m_ownAudioPort( TRUE ),
+	m_audioPort( new audioPort( "samplePlayHandle", false ) ),
+	m_ownAudioPort( true ),
 	m_defaultVolumeModel( DefaultVolume, MinVolume, MaxVolume, 1 ),
 	m_volumeModel( &m_defaultVolumeModel ),
 	m_track( NULL ),
@@ -56,10 +56,10 @@ samplePlayHandle::samplePlayHandle( const QString & _sample_file ) :
 samplePlayHandle::samplePlayHandle( sampleBuffer * _sample_buffer ) :
 	playHandle( SamplePlayHandle ),
 	m_sampleBuffer( sharedObject::ref( _sample_buffer ) ),
-	m_doneMayReturnTrue( TRUE ),
+	m_doneMayReturnTrue( true ),
 	m_frame( 0 ),
-	m_audioPort( new audioPort( "samplePlayHandle" ) ),
-	m_ownAudioPort( TRUE ),
+	m_audioPort( new audioPort( "samplePlayHandle", false ) ),
+	m_ownAudioPort( true ),
 	m_defaultVolumeModel( DefaultVolume, MinVolume, MaxVolume, 1 ),
 	m_volumeModel( &m_defaultVolumeModel ),
 	m_track( NULL ),
@@ -73,10 +73,10 @@ samplePlayHandle::samplePlayHandle( sampleBuffer * _sample_buffer ) :
 samplePlayHandle::samplePlayHandle( sampleTCO * _tco ) :
 	playHandle( SamplePlayHandle ),
 	m_sampleBuffer( sharedObject::ref( _tco->getSampleBuffer() ) ),
-	m_doneMayReturnTrue( TRUE ),
+	m_doneMayReturnTrue( true ),
 	m_frame( 0 ),
 	m_audioPort( ( (sampleTrack *)_tco->getTrack() )->getAudioPort() ),
-	m_ownAudioPort( FALSE ),
+	m_ownAudioPort( false ),
 	m_defaultVolumeModel( DefaultVolume, MinVolume, MaxVolume, 1 ),
 	m_volumeModel( &m_defaultVolumeModel ),
 	m_track( _tco->getTrack() ),
@@ -90,10 +90,10 @@ samplePlayHandle::samplePlayHandle( sampleTCO * _tco ) :
 samplePlayHandle::samplePlayHandle( pattern * _pattern ) :
 	playHandle( SamplePlayHandle ),
 	m_sampleBuffer( sharedObject::ref( _pattern->getFrozenPattern() ) ),
-	m_doneMayReturnTrue( TRUE ),
+	m_doneMayReturnTrue( true ),
 	m_frame( 0 ),
 	m_audioPort( _pattern->getInstrumentTrack()->getAudioPort() ),
-	m_ownAudioPort( FALSE ),
+	m_ownAudioPort( false ),
 	m_defaultVolumeModel( DefaultVolume, MinVolume, MaxVolume, 1 ),
 	m_volumeModel( &m_defaultVolumeModel ),
 	m_track( _pattern->getInstrumentTrack() ),
@@ -146,7 +146,7 @@ void samplePlayHandle::play( bool /* _try_parallelizing */,
 
 bool samplePlayHandle::done( void ) const
 {
-	return( framesDone() >= totalFrames() && m_doneMayReturnTrue == TRUE );
+	return( framesDone() >= totalFrames() && m_doneMayReturnTrue == true );
 }
 
 

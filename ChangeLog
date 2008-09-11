@@ -1,3 +1,23 @@
+2008-09-11	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* include/audio_port.h:
+	* include/midi.h:
+	* include/mixer.h:
+	* include/play_handle.h:
+	* include/sample_play_handle.h:
+	* include/track.h:
+	* src/core/audio/audio_port.cpp:
+	* src/core/effect_chain.cpp:
+	* src/core/mixer.cpp:
+	* src/core/sample_play_handle.cpp:
+	* src/core/track.cpp:
+	- ensure correct thread affinity when deleting play handles - fixes
+	  crash when previewing samples and LMMS was linked against Qt 4.3.x
+	- renamed destroyed()-signals for not conflicting with
+	  QObject::destroyed() in Qt 4.3
+	- made effectChain creation in audioPort optional
+	- fixed various compiler warnings
+
 2008-09-08	Paul Giblock <drfaygo/at/gmail/dot/com>
 
 	* plugins/papu/gb_abu/Blip_Buffer.cpp:

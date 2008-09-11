@@ -134,11 +134,7 @@ trackContentObject::trackContentObject( track * _track ) :
  */
 trackContentObject::~trackContentObject()
 {
-/*! \brief Start a drag event on this track View.
- *
- *  \param _dee the DragEnterEvent to start.
- */
-	emit destroyed();
+	emit destroyedTCO();
 
 	if( getTrack() )
 	{
@@ -323,7 +319,7 @@ trackContentObjectView::trackContentObjectView( trackContentObject * _tco,
 			this, SLOT( updateLength() ) );
 	connect( m_tco, SIGNAL( positionChanged() ),
 			this, SLOT( updatePosition() ) );
-	connect( m_tco, SIGNAL( destroyed() ), this, SLOT( close() ) );
+	connect( m_tco, SIGNAL( destroyedTCO() ), this, SLOT( close() ) );
 	setModel( m_tco );
 
 	m_trackView->getTrackContentWidget()->addTCOView( this );
@@ -1572,6 +1568,8 @@ track::track( TrackTypes _type, trackContainer * _tc ) :
  */
 track::~track()
 {
+	emit destroyedTrack();
+
 	while( !m_trackContentObjects.isEmpty() )
 	{
 		delete m_trackContentObjects.last();
@@ -2121,7 +2119,7 @@ trackView::trackView( track * _track, trackContainerView * _tcv ) :
 	setAttribute( Qt::WA_DeleteOnClose );
 
 
-	connect( m_track, SIGNAL( destroyed() ), this, SLOT( close() ) );
+	connect( m_track, SIGNAL( destroyedTrack() ), this, SLOT( close() ) );
 	connect( m_track,
 		SIGNAL( trackContentObjectAdded( trackContentObject * ) ),
 			this, SLOT( createTCOView( trackContentObject * ) ),
@@ -2206,7 +2204,7 @@ void trackView::modelChanged( void )
 {
 	m_track = castModel<track>();
 	assert( m_track != NULL );
-	connect( m_track, SIGNAL( destroyed() ), this, SLOT( close() ) );
+	connect( m_track, SIGNAL( destroyedTrack() ), this, SLOT( close() ) );
 	m_trackOperationsWidget.m_muteBtn->setModel( &m_track->m_mutedModel );
 	m_trackOperationsWidget.m_soloBtn->setModel( &m_track->m_soloModel );
 	modelView::modelChanged();

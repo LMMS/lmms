@@ -24,16 +24,13 @@
  *
  */
 
-#include "mixer.h"
-#include "audio_device.h"
-#include "config_mgr.h"
-
 #include "audio_port.h"
 #include "audio_device.h"
+#include "effect_chain.h"
 #include "engine.h"
 
 
-audioPort::audioPort( const QString & _name ) :
+audioPort::audioPort( const QString & _name, bool _has_effect_chain ) :
 	m_bufferUsage( NoUsage ),
 	m_firstBuffer( new sampleFrame[engine::getMixer()->framesPerPeriod()] ),
 	m_secondBuffer( new sampleFrame[
@@ -41,7 +38,7 @@ audioPort::audioPort( const QString & _name ) :
 	m_extOutputEnabled( FALSE ),
 	m_nextFxChannel( 0 ),
 	m_name( "unnamed port" ),
-	m_effects( NULL )
+	m_effects( _has_effect_chain ? new effectChain( NULL ) : NULL )
 {
 	engine::getMixer()->clearAudioBuffer( m_firstBuffer,
 				engine::getMixer()->framesPerPeriod() );
@@ -60,6 +57,7 @@ audioPort::~audioPort()
 	engine::getMixer()->removeAudioPort( this );
 	delete[] m_firstBuffer;
 	delete[] m_secondBuffer;
+	delete m_effects;
 }
 
 
@@ -113,11 +111,15 @@ void audioPort::setName( const QString & _name )
 
 bool audioPort::processEffects( void )
 {
-	lockFirstBuffer();
-	bool more = m_effects.processAudioBuffer( m_firstBuffer,
+	if( m_effects )
+	{
+		lockFirstBuffer();
+		bool more = m_effects->processAudioBuffer( m_firstBuffer,
 					engine::getMixer()->framesPerPeriod() );
-	unlockFirstBuffer();
-	return( more );
+		unlockFirstBuffer();
+		return( more );
+	}
+	return false;
 }
 
 

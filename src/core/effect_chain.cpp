@@ -38,7 +38,7 @@
 
 effectChain::effectChain( model * _parent ) :
 	model( _parent ),
-	m_enabledModel( FALSE, this, tr( "Effects enabled" ) )
+	m_enabledModel( FALSE, NULL, tr( "Effects enabled" ) )
 {
 }
 

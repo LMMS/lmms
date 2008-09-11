@@ -126,7 +126,7 @@ protected:
 signals:
 	void lengthChanged( void );
 	void positionChanged( void );
-	void destroyed( void );
+	void destroyedTCO( void );
 
 
 private:
@@ -463,7 +463,7 @@ private:
 
 
 signals:
-	void destroyed( void );
+	void destroyedTrack( void );
 	void nameChanged( void );
 	void trackContentObjectAdded( trackContentObject * );
 
