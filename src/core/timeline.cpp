@@ -350,6 +350,17 @@ void timeLine::mouseMoveEvent( QMouseEvent * _me )
 			{
 				m_loopPos[i] = t.toNearestTact();
 			}
+			// Catch begin == end
+			if( m_loopPos[0] == m_loopPos[1] )
+			{
+				// Note, swap 1 and 0 below and the behavior "skips" the other
+				// marking instead of pushing it.  However, I think pushing the
+				// other marker makes more sense it keeps the markers in order
+				if( m_action == MoveLoopBegin ) 
+					m_loopPos[1] += midiTime::ticksPerTact();
+				else
+					m_loopPos[0] -= midiTime::ticksPerTact();
+			}
 			update();
 			break;
 		}
