@@ -113,6 +113,11 @@ audioPortAudio::audioPortAudio( bool & _success_ful, mixer * _mixer ) :
 		outDevIdx = Pa_GetDefaultOutputDevice();
 	}
 
+	if( inDevIdx < 0 || outDevIdx < 0)
+	{
+		return;
+	}
+	
 	double inLatency = (double)getMixer()->framesPerPeriod() / (double)sampleRate();
 	double outLatency = (double)getMixer()->framesPerPeriod() / (double)sampleRate();
 

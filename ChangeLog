@@ -1,3 +1,8 @@
+2008-09-14	Csaba Hruska <csaba.hruska/at/gmail.com>
+	
+	* src/core/audio/audio_portaudio.cpp:
+	Bugfix: Fixed segfault when other app uses and blocks the audio device
+
 2008-09-08	Paul Giblock <drfaygo/at/gmail/dot/com>
 	
 	* src/core/timeline.cpp:
