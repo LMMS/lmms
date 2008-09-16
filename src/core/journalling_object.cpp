@@ -28,6 +28,7 @@
 #include <QtXml/QDomElement>
 
 #include "journalling_object.h"
+#include "automatable_model.h"
 #include "project_journal.h"
 #include "base64.h"
 #include "engine.h"
@@ -142,11 +143,20 @@ void journallingObject::changeID( jo_id_t _id )
 {
 	if( id() != _id )
 	{
-		if( engine::getProjectJournal()->getJournallingObject( _id )
-								!= NULL )
+		journallingObject * jo = engine::getProjectJournal()->
+						getJournallingObject( _id );
+		if( jo != NULL )
 		{
-			printf( "JO-ID %d already in use by another "
-							"object!\n", _id );
+			QString used_by = jo->nodeName();
+			if( used_by == "automatablemodel" &&
+				dynamic_cast<automatableModel *>( jo ) )
+			{
+				used_by += ":" +
+					dynamic_cast<automatableModel *>( jo )->
+								displayName();
+			}
+			printf( "JO-ID %d already in use by %s!\n", _id,
+						used_by.toAscii().constData() );
 			return;
 		}
 		engine::getProjectJournal()->forgetAboutID( id() );
