@@ -323,9 +323,9 @@ CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/lmms.rc.in ${CMAKE_BINARY_DIR}/lmms.rc)
 # people simply updating SVN will still have this and mess up build with it
 FILE(REMOVE include/lmmsconfig.h)
 
-FILE(GLOB lmms_INCLUDES include/*.h)
-FILE(GLOB lmms_UI src/gui/dialogs/*.ui)
-FILE(GLOB_RECURSE lmms_SOURCES src/*.cpp)
+FILE(GLOB lmms_INCLUDES ${CMAKE_SOURCE_DIR}/include/*.h)
+FILE(GLOB lmms_UI ${CMAKE_SOURCE_DIR}/src/gui/dialogs/*.ui)
+FILE(GLOB_RECURSE lmms_SOURCES ${CMAKE_SOURCE_DIR}/src/*.cpp)
 
 SET(lmms_MOC ${lmms_INCLUDES})
 
