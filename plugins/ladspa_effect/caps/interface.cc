@@ -54,14 +54,14 @@
 #define N 38 
 static DescriptorStub * descriptors [N];
 
-static inline void
+/*static inline void
 seed()
 {
 	static struct timeval tv;
   gettimeofday (&tv, 0);
 
 	srand (tv.tv_sec ^ tv.tv_usec);
-}
+}*/
 
 extern "C" {
 

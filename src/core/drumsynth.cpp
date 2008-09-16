@@ -344,7 +344,7 @@ int DrumSynth::GetDSFileSamples(const char *dsfile, int16_t *&wave, int channels
   { a = 1.f; b = -NT / 50.f; c = (float)fabs((float)NT) / 100.f; g = NL; }
   
   //if(GetPrivateProfileInt(sec,"FixedSeq",0,dsfile)!=0) 
-    srand(1); //fixed random sequence
+    //srand(1); //fixed random sequence
  
    //read tone parameters
   strcpy(sec, "Tone");

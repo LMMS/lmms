@@ -378,6 +378,10 @@ int main( int argc, char * * argv )
 
 		delete ss;
 
+		// re-intialize RNG - shared libraries might have srand() or
+		// srandom() calls in their init procedure
+		srand( getpid() + time( 0 ) );
+
 		// we try to load given file
 		if( file_to_load != "" )
 		{
