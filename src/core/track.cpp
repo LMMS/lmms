@@ -897,9 +897,9 @@ trackContentWidget::~trackContentWidget()
 void trackContentWidget::addTCOView( trackContentObjectView * _tcov )
 {
 	trackContentObject * tco = _tcov->getTrackContentObject();
-	QMap<QString, QVariant> map;
+/*	QMap<QString, QVariant> map;
 	map["id"] = tco->id();
-	addJournalEntry( journalEntry( AddTrackContentObject, map ) );
+	addJournalEntry( journalEntry( AddTrackContentObject, map ) );*/
 
 	m_tcoViews.push_back( _tcov );
 
@@ -925,13 +925,13 @@ void trackContentWidget::removeTCOView( trackContentObjectView * _tcov )
 						_tcov );
 	if( it != m_tcoViews.end() )
 	{
-		QMap<QString, QVariant> map;
+/*		QMap<QString, QVariant> map;
 		multimediaProject mmp( multimediaProject::JournalData );
 		_tcov->getTrackContentObject()->saveState( mmp, mmp.content() );
 		map["id"] = _tcov->getTrackContentObject()->id();
 		map["state"] = mmp.toString();
 		addJournalEntry( journalEntry( RemoveTrackContentObject,
-								map ) );
+								map ) );*/
 
 		m_tcoViews.erase( it );
 		engine::getSong()->setModified();

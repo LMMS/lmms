@@ -122,9 +122,9 @@ void trackContainerView::loadSettings( const QDomElement & _this )
 
 trackView * trackContainerView::addTrackView( trackView * _tv )
 {
-	QMap<QString, QVariant> map;
+/*	QMap<QString, QVariant> map;
 	map["id"] = _tv->getTrack()->id();
-	addJournalEntry( journalEntry( AddTrack, map ) );
+	addJournalEntry( journalEntry( AddTrack, map ) );*/
 
 	m_trackViews.push_back( _tv );
 	m_scrollLayout->addWidget( _tv );
@@ -143,12 +143,12 @@ void trackContainerView::removeTrackView( trackView * _tv )
 	int index = m_trackViews.indexOf( _tv );
 	if( index != -1 )
 	{
-		QMap<QString, QVariant> map;
+/*		QMap<QString, QVariant> map;
 		multimediaProject mmp( multimediaProject::JournalData );
 		_tv->getTrack()->saveState( mmp, mmp.content() );
 		map["id"] = _tv->getTrack()->id();
 		map["state"] = mmp.toString();
-		addJournalEntry( journalEntry( RemoveTrack, map ) );
+		addJournalEntry( journalEntry( RemoveTrack, map ) );*/
 
 		m_trackViews.removeAt( index );
 
@@ -302,6 +302,7 @@ void trackContainerView::clearAllTracks( void )
 
 void trackContainerView::undoStep( journalEntry & _je )
 {
+#if 0
 	saveJournallingState( FALSE );
 	switch( _je.actionID() )
 	{
@@ -331,6 +332,7 @@ void trackContainerView::undoStep( journalEntry & _je )
 		}
 	}
 	restoreJournallingState();
+#endif
 }
 
 
@@ -338,6 +340,7 @@ void trackContainerView::undoStep( journalEntry & _je )
 
 void trackContainerView::redoStep( journalEntry & _je )
 {
+#if 0
 	switch( _je.actionID() )
 	{
 		case AddTrack:
@@ -349,6 +352,7 @@ void trackContainerView::redoStep( journalEntry & _je )
 						RemoveTrack : AddTrack;
 			break;
 	}
+#endif
 }
 
 

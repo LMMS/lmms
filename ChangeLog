@@ -1,5 +1,10 @@
 2008-09-16	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* src/gui/track_container_view.cpp:
+	* src/core/track.cpp:
+	disabled undo/redo of track/TCO addition/removal as not mature yet and
+	causes unneccessary crashes (closes #2014439, #2100407)
+
 	* data/projects/cool_songs/Skiessi-TurningPoint.mmpz:
 	* data/projects/cool_songs/Skiessi-RandomProjectNumber14253.mmpz:
 	added two cool projects from Skiessi - more to come
