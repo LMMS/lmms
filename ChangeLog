@@ -1,5 +1,9 @@
 2008-09-16	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* data/projects/cool_songs/Skiessi-TurningPoint.mmpz:
+	* data/projects/cool_songs/Skiessi-RandomProjectNumber14253.mmpz:
+	added two cool projects from Skiessi - more to come
+
 	* src/core/track.cpp:
 	* src/core/automation_pattern.cpp:
 	- fixed cloning of automation-patterns (closes #2102218)
