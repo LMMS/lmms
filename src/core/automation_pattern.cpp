@@ -124,10 +124,12 @@ void automationPattern::addObject( automatableModel * _obj )
 
 const automatableModel * automationPattern::firstObject( void ) const
 {
-	if( !m_objects.isEmpty() )
+	automatableModel * m;
+	if( !m_objects.isEmpty() && ( m = m_objects.first() ) != NULL )
 	{
-		return( m_objects.first() );
+		return( m );
 	}
+
 	static floatModel _fm( 0, 0, 1, 0.001 );
 	return( &_fm );
 }
