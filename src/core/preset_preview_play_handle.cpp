@@ -120,6 +120,8 @@ presetPreviewPlayHandle::presetPreviewPlayHandle( const QString & _preset_file,
 	const bool j = engine::getProjectJournal()->isJournalling();
 	engine::getProjectJournal()->setJournalling( FALSE );
 
+	engine::setSuppressMessages( true );
+
 	if( _load_by_plugin )
 	{
 		instrument * i = s_previewTC->previewInstrumentTrack()->
@@ -144,6 +146,8 @@ presetPreviewPlayHandle::presetPreviewPlayHandle( const QString & _preset_file,
 			loadTrackSpecificSettings(
 				mmp.content().firstChild().toElement() );
 	}
+
+	engine::setSuppressMessages( false );
 
 	// make sure, our preset-preview-track does not appear in any MIDI-
 	// devices list, so just disable receiving/sending MIDI-events at all

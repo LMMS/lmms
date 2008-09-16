@@ -1,3 +1,20 @@
+2008-09-16	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* plugins/ladspa_effect/ladspa_effect.cpp:
+	* include/engine.h:
+	* include/effect_rack_view.h:
+	* include/effect_chain.h:
+	* src/core/effect_chain.cpp:
+	* src/core/preset_preview_play_handle.cpp:
+	* src/core/engine.cpp:
+	* src/gui/widgets/effect_rack_view.cpp:
+	- do not show messages about missing plugins when previewing
+	  presets (closes #2110203)
+	- clear effect view before loading settings in effectChain
+
+	* CMakeLists.txt:
+	improved out-of-tree builds
+
 2008-09-14	Csaba Hruska <csaba.hruska/at/gmail.com>
 	
 	* src/core/audio/audio_portaudio.cpp:

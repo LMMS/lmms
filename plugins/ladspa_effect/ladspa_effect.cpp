@@ -71,9 +71,13 @@ ladspaEffect::ladspaEffect( model * _parent,
 	ladspa2LMMS * manager = engine::getLADSPAManager();
 	if( manager->getDescription( m_key ) == NULL )
 	{
-		QMessageBox::warning( 0, "Effect", 
-			"Unknown LADSPA plugin requested: " + m_key.second, 
-			QMessageBox::Ok, QMessageBox::NoButton );
+		if( !engine::suppressMessages() )
+		{
+			QMessageBox::warning( 0, tr( "Effect" ), 
+				tr( "Unknown LADSPA plugin %1 requested." ).
+							arg( m_key.second ),
+				QMessageBox::Ok, QMessageBox::NoButton );
+		}
 		setOkay( FALSE );
 		return;
 	}

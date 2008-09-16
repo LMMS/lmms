@@ -45,7 +45,8 @@
 #include "song.h"
 
 
-bool engine::s_hasGUI = TRUE;
+bool engine::s_hasGUI = true;
+bool engine::s_suppressMessages = false;
 float engine::s_framesPerTick;
 mixer * engine::s_mixer = NULL;
 fxMixer * engine::s_fxMixer = NULL;

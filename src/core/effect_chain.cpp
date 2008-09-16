@@ -1,5 +1,3 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * effect_chain.cpp - class for processing and effects chain
  *
@@ -38,6 +36,7 @@
 
 effectChain::effectChain( model * _parent ) :
 	model( _parent ),
+	serializingObject(),
 	m_enabledModel( FALSE, NULL, tr( "Effects enabled" ) )
 {
 }
@@ -253,7 +252,9 @@ bool effectChain::isRunning( void )
 
 void effectChain::clear( void )
 {
-	m_enabledModel.setValue( FALSE );
+	emit aboutToClear();
+
+	m_enabledModel.setValue( false );
 	for( int i = 0; i < m_effects.count(); ++i )
 	{
 		delete m_effects[i];
@@ -262,4 +263,6 @@ void effectChain::clear( void )
 }
 
 
-#endif
+
+#include "moc_effect_chain.cxx"
+

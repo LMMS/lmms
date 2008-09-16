@@ -27,15 +27,16 @@
 #define _EFFECT_CHAIN_H
 
 #include "mv_base.h"
-#include "journalling_object.h"
+#include "serializing_object.h"
 #include "mixer.h"
 #include "automatable_model.h"
 
 class effect;
 
 
-class effectChain : public journallingObject, public model
+class effectChain : public model, public serializingObject
 {
+	Q_OBJECT
 public:
 	effectChain( model * _parent );
 	virtual ~effectChain();
@@ -67,6 +68,10 @@ private:
 
 
 	friend class effectRackView;
+
+
+signals:
+	void aboutToClear( void );
 
 } ;
 
