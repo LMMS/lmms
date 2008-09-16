@@ -105,9 +105,10 @@ void projectJournal::journalEntryAdded( const jo_id_t _id )
 
 jo_id_t projectJournal::allocID( journallingObject * _obj )
 {
-	const jo_id_t EO_ID_MAX = 1 << 24;
+	const jo_id_t EO_ID_MAX = (1 << 23)-1;
 	jo_id_t id;
-	while( m_joIDs.contains( id = static_cast<jo_id_t>( rand() % 
+	while( m_joIDs.contains( id =
+			static_cast<jo_id_t>( (jo_id_t)rand()*(jo_id_t)rand() % 
 								 EO_ID_MAX ) ) )
 	{
 	}

@@ -1,5 +1,20 @@
 2008-09-16	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* src/core/project_journal.cpp:
+	improved usage of random number generator (closes #2109211)
+
+	* plugins/ladspa_effect/tap/tap_pinknoise.c:
+	* plugins/ladspa_effect/caps/interface.cc:
+	* src/core/drumsynth.cpp:
+	* src/core/main.cpp:
+	don't mis-initialize random number generator with default value
+
+	* src/core/journalling_object.cpp:
+	print name of object which uses ID if another object requests it
+
+	* src/core/automation_pattern.cpp:
+	make sure we don't return NULL in automationPattern::firstObject()
+
 	* plugins/ladspa_effect/ladspa_effect.cpp:
 	* include/engine.h:
 	* include/effect_rack_view.h:
