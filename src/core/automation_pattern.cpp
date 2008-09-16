@@ -761,6 +761,10 @@ void automationPatternView::paintEvent( QPaintEvent * )
 void automationPatternView::dragEnterEvent( QDragEnterEvent * _dee )
 {
 	stringPairDrag::processDragEnterEvent( _dee, "automatable_model" );
+	if( !_dee->isAccepted() )
+	{
+		trackContentObjectView::dragEnterEvent( _dee );
+	}
 }
 
 
@@ -779,14 +783,19 @@ void automationPatternView::dropEvent( QDropEvent * _de )
 		{
 			m_pat->addObject( mod );
 		}
+		update();
+
+		if( engine::getAutomationEditor() &&
+			engine::getAutomationEditor()->currentPattern() ==
+									m_pat )
+		{
+			engine::getAutomationEditor()->setCurrentPattern(
+									m_pat );
+		}
 	}
-
-	update();
-
-	if( engine::getAutomationEditor() &&
-		engine::getAutomationEditor()->currentPattern() == m_pat )
+	else
 	{
-		engine::getAutomationEditor()->setCurrentPattern( m_pat );
+		trackContentObjectView::dropEvent( _de );
 	}
 }
 

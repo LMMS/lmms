@@ -492,6 +492,7 @@ void trackContentObjectView::dropEvent( QDropEvent * _de )
 		midiTime pos = m_tco->startPosition();
 		m_tco->restoreState( mmp.content().firstChild().toElement() );
 		m_tco->movePosition( pos );
+		automationPattern::resolveAllIDs();
 		_de->accept();
 	}
 }
@@ -1083,6 +1084,7 @@ void trackContentWidget::dropEvent( QDropEvent * _de )
 		tco->restoreState( mmp.content().firstChild().toElement() );
 		tco->movePosition( pos );
 
+		automationPattern::resolveAllIDs();
 
 		_de->accept();
 	}

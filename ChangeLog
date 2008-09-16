@@ -1,5 +1,10 @@
 2008-09-16	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* src/core/track.cpp:
+	* src/core/automation_pattern.cpp:
+	- fixed cloning of automation-patterns (closes #2102218)
+	- allow dropping automation patterns onto existing automation patterns
+
 	* src/core/project_journal.cpp:
 	improved usage of random number generator (closes #2109211)
 
