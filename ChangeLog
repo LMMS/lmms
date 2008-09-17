@@ -1,4 +1,15 @@
-2008-09-08	Paul Giblock <drfaygo/at/gmail/dot/com>
+2008-09-17	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* plugins/sf2_player/sf2_player.cpp:
+	try to use relative paths for s_fonts map too as otherwise
+	s_fonts.remove( m_filename ) won't do anything if a full path was
+	inserted and m_filename was made relative - fixes crash when
+	re-opening a soundfont which was shared before
+
+	* plugins/midi_import/portsmf/strparse.cpp:
+	fixed compilation issue
+
+2008-09-16	Paul Giblock <drfaygo/at/gmail/dot/com>
 
 	* plugins/sf2_player/sf2_player.cpp:
 	* plugins/sf2_player/sf2_player.h:

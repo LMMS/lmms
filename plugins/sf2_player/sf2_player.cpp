@@ -295,7 +295,7 @@ void sf2Instrument::freeFont( void )
 		{
 			cout << "Really deleting " << m_filename << endl;
 
-			sf2Instrument::s_fonts.remove( m_filename );
+			printf("%d\n", sf2Instrument::s_fonts.remove( m_filename ) );
 			fluid_synth_sfunload( m_synth, m_fontId, TRUE );
 
 			delete m_font;
@@ -352,7 +352,7 @@ void sf2Instrument::openFile( const QString & _sf2File )
 		{
 			// Grab this sf from the top of the stack and add to list
 			m_font = new sf2Font( fluid_synth_get_sfont( m_synth, 0 ) );
-			s_fonts.insert( _sf2File, m_font );
+			s_fonts.insert( sampleBuffer::tryToMakeRelative( _sf2File ), m_font );
 		}
 		else
 		{
