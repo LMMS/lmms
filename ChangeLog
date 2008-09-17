@@ -34,6 +34,10 @@
 	- Add default-sf2 to settings dialog, but currently only loads when
 	  importing a MIDI
 
+	* src/gui/piano_roll.cpp:
+	- Add new shortcuts for change Q and note length
+	- Add "Note lock" mode to keep Q equal to note length
+
 2008-09-16	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/gui/track_container_view.cpp:

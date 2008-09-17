@@ -375,6 +375,7 @@ pianoRoll::pianoRoll( void ) :
 	QLabel * quantize_lbl = new QLabel( m_toolBar );
 	quantize_lbl->setPixmap( embed::getIconPixmap( "quantize" ) );
 
+	m_quantizeModel.addItem( tr( "Note lock" ) );
 	for( int i = 0; i <= NUM_EVEN_LENGTHS; ++i )
 	{
 		m_quantizeModel.addItem( "1/" + QString::number( 1 << i ) );
@@ -387,7 +388,7 @@ pianoRoll::pianoRoll( void ) :
 	m_quantizeModel.setValue( m_quantizeModel.findText( "1/16" ) );
 	m_quantizeComboBox = new comboBox( m_toolBar );
 	m_quantizeComboBox->setModel( &m_quantizeModel );
-	m_quantizeComboBox->setFixedSize( 60, 22 );
+	m_quantizeComboBox->setFixedSize( 80, 22 );
 	connect( &m_quantizeModel, SIGNAL( dataChanged() ),
 					this, SLOT( quantizeChanged() ) );
 
@@ -416,7 +417,10 @@ pianoRoll::pianoRoll( void ) :
 	m_noteLenModel.setValue( 0 );
 	m_noteLenComboBox = new comboBox( m_toolBar );
 	m_noteLenComboBox->setModel( &m_noteLenModel );
-	m_noteLenComboBox->setFixedSize( 120, 22 );
+	m_noteLenComboBox->setFixedSize( 105, 22 );
+	// Note length change can cause a redraw if Q is set to lock
+	connect( &m_noteLenModel, SIGNAL( dataChanged() ),
+					this, SLOT( quantizeChanged() ) );
 
 
 	tb_layout->addSpacing( 5 );
@@ -822,6 +826,32 @@ void pianoRoll::keyPressEvent( QKeyEvent * _ke )
 			m_timeLine->pos().setTicks( 0 );
 			m_timeLine->updatePosition();
 			break;
+
+		case Qt::Key_0:
+		case Qt::Key_1:
+		case Qt::Key_2:
+		case Qt::Key_3:
+		case Qt::Key_4:
+		case Qt::Key_5:
+		case Qt::Key_6:
+		case Qt::Key_7:
+		case Qt::Key_8:
+		case Qt::Key_9:
+		{
+			int len = 1 + _ke->key() - Qt::Key_0;
+			if( len == 10 ) 
+				len = 0;
+			if( _ke->modifiers() & 
+					( Qt::ControlModifier | Qt::KeypadModifier ) )
+			{
+					m_noteLenModel.setValue( len );
+			}
+			else if( _ke->modifiers() & Qt::AltModifier )
+			{
+					m_quantizeModel.setValue( len );
+			}
+			break;
+		}
 
 		case Qt::Key_Control:
 			if( mouseOverNote() )
@@ -1867,7 +1897,9 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 				height() - PR_TOP_MARGIN - PR_BOTTOM_MARGIN );
 
 	// draw vertical raster
-	bool triplets = m_quantizeModel.value() > NUM_EVEN_LENGTHS;
+	
+	// triplet mode occurs if the note duration isn't a multiple of 3
+	bool triplets = ( quantization() % 3 != 0 ); 
 
 	int spt = midiTime::stepsPerTact(); 
 	float pp16th = m_ppt / spt;
@@ -2673,7 +2705,12 @@ void pianoRoll::zoomingChanged( void )
 
 void pianoRoll::quantizeChanged( void )
 {
-	static int oldQuantize = -1;
+	if( m_quantizeModel.value() == 0 && 
+			m_noteLenModel.value() == 0 ) 
+	{
+		m_quantizeModel.setValue( m_quantizeModel.findText( "1/16" ) );
+		return;
+	}
 	// Could be smarter
 	update();
 }
@@ -2681,6 +2718,10 @@ void pianoRoll::quantizeChanged( void )
 
 int pianoRoll::quantization( void ) const
 {
+	if( m_quantizeModel.value() == 0 )
+	{
+		return( newNoteLen() );
+	}
 	return( DefaultTicksPerTact / m_quantizeModel.currentText().right(
 				m_quantizeModel.currentText().length() -
 								2 ).toInt() );
