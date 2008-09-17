@@ -1,3 +1,4 @@
+#include <cstring>
 #include <string>
 // #include <iostream>  -- for debugging (cout)
 #include "ctype.h"
@@ -47,7 +48,7 @@ void String_parse::get_nonspace_quoted(string &field)
 }
 
 
-char *escape_chars[] = {"\\n", "\\t", "\\\\", "\\r", "\\\""};
+char *escape_chars[] = { (char *) "\\n", (char *)"\\t", (char *)"\\\\", (char *)"\\r", (char *) "\\\""};
 
 
 void string_escape(string &result, char *str, char *quote)
@@ -58,7 +59,7 @@ void string_escape(string &result, char *str, char *quote)
     }
     for (int i = 0; i < length; i++) {
         if (!isalnum((unsigned char) str[i])) {
-            char *chars = "\n\t\\\r\"";
+            char *chars = (char *)"\n\t\\\r\"";
             char *special = strchr(chars, str[i]);
             if (special) {
                 result.append(escape_chars[special - chars]);
