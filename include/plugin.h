@@ -42,6 +42,7 @@ class QWidget;
 
 class pixmapLoader;
 class pluginView;
+class automatableModel;
 
 
 class EXPORT plugin : public journallingObject, public model
@@ -171,10 +172,9 @@ public:
 	// loaded/processed with the help of this plugin
 	virtual void loadFile( const QString & _file );
 
-	// plugins can overload this for making other classes able to query
-	// settings of the plugin without knowing the actual class
-	virtual QString getParameter( const QString & _param );
-
+	// Called if external source needs to change something but we cannot
+	// reference the class header.  Should return null if not key not found.
+	virtual automatableModel * getChildModel( const QString & _modelName );
 
 	// returns an instance of a plugin whose name matches to given one
 	// if specified plugin couldn't be loaded, it creates a dummy-plugin

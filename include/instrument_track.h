@@ -164,6 +164,20 @@ public:
 	// simple helper for removing midiport-XML-node when loading presets
 	static void removeMidiPortNode( multimediaProject & _mmp );
 
+	floatModel & pitchModel() 
+	{
+		return m_pitchModel;
+	}
+
+	floatModel & volumeModel() 
+	{
+		return m_volumeModel;
+	}
+
+	floatModel & panningModel() 
+	{
+		return m_panningModel;
+	}
 
 signals:
 	void instrumentChanged( void );

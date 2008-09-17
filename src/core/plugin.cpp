@@ -83,9 +83,9 @@ void plugin::loadFile( const QString & )
 
 
 
-QString plugin::getParameter( const QString & )
+automatableModel * plugin::getChildModel( const QString & )
 {
-	return( "" );
+	return NULL;
 }
 
 

@@ -49,7 +49,7 @@ public:
 	enum ConfigTabs
 	{
 		GeneralSettings,
-		DirectorySettings,
+		PathSettings,
 		PerformanceSettings,
 		AudioSettings,
 		MidiSettings
@@ -69,13 +69,14 @@ private slots:
 	void resetBufSize( void );
 	void displayBufSizeHelp( void );
 
-	// directory settings widget
+	// path settings widget
 	void setWorkingDir( const QString & _wd );
 	void setVSTDir( const QString & _vd );
 	void setArtworkDir( const QString & _ad );
 	void setFLDir( const QString & _fd );
 	void setLADSPADir( const QString & _fd );
 	void setSTKDir( const QString & _fd );
+	void setDefaultSoundfont( const QString & _fd );
 	
 	// audio settings widget
 	void audioInterfaceChanged( const QString & _driver );
@@ -98,6 +99,7 @@ private slots:
 	void openFLDir( void );
 	void openLADSPADir( void );
 	void openSTKDir( void );
+	void openDefaultSoundfont( void );
 
 	void toggleDisableChActInd( bool _disabled );
 	void toggleManualChPiano( bool _enabled );
@@ -122,6 +124,9 @@ private:
 	QLineEdit * m_adLineEdit;
 	QLineEdit * m_fdLineEdit;
 	QLineEdit * m_ladLineEdit;
+#ifdef LMMS_HAVE_FLUIDSYNTH
+	QLineEdit * m_sfLineEdit;
+#endif
 #ifdef LMMS_HAVE_STK
 	QLineEdit * m_stkLineEdit;
 #endif
@@ -131,6 +136,9 @@ private:
 	QString m_artworkDir;
 	QString m_flDir;
 	QString m_ladDir;
+#ifdef LMMS_HAVE_FLUIDSYNTH
+	QString m_defaultSoundfont;
+#endif
 #ifdef LMMS_HAVE_STK
 	QString m_stkDir;
 #endif

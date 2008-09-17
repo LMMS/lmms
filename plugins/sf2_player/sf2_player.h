@@ -47,6 +47,9 @@ class QLabel;
 class sf2Instrument : public instrument
 {
 	Q_OBJECT
+	mapPropertyFromModel(int,getBank,setBank,m_bankNum);
+	mapPropertyFromModel(int,getPatch,setPatch,m_patchNum);
+
 public:
 	sf2Instrument( instrumentTrack * _instrument_track );
 	virtual ~sf2Instrument();
@@ -63,6 +66,8 @@ public:
 	virtual void loadSettings( const QDomElement & _this );
 
 	virtual void loadFile( const QString & _file );
+
+	virtual automatableModel * getChildModel( const QString & _modelName );
 
 	virtual QString nodeName( void ) const;
 
@@ -81,6 +86,8 @@ public:
 	QString getCurrentPatchName();
 
 
+	void setParameter( const QString & _param, const QString & _value );
+
 public slots:
 	void openFile( const QString & _sf2File );
 	void updatePatch( void );
@@ -96,6 +103,7 @@ public slots:
 
 
 private:
+	static QMutex s_fontsMutex;
 	static QMap<QString, sf2Font*> s_fonts;
 	static int (* s_origFree)( fluid_sfont_t * );
 

@@ -103,6 +103,9 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 	m_artworkDir( configManager::inst()->artworkDir() ),
 	m_flDir( configManager::inst()->flDir() ),
 	m_ladDir( configManager::inst()->ladspaDir() ),
+#ifdef LMMS_HAVE_FLUIDSYNTH
+	m_defaultSoundfont( configManager::inst()->defaultSoundfont() ),
+#endif
 #ifdef LMMS_HAVE_STK
 	m_stkDir( configManager::inst()->stkDir() ),
 #endif
@@ -130,11 +133,14 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 	m_tabBar->setFixedWidth( 72 );
 
 	QWidget * ws = new QWidget( settings );
+	int wsHeight = 336;
 #ifdef LMMS_HAVE_STK
-	ws->setFixedSize( 360, 422 );
-#else
-	ws->setFixedSize( 360, 366 );
+	wsHeight += 50;
 #endif
+#ifdef LMMS_HAVE_FLUIDSYNTH
+	wsHeight += 50;
+#endif
+	ws->setFixedSize( 360, wsHeight );
 	QWidget * general = new QWidget( ws );
 	general->setFixedSize( 360, 240 );
 	QVBoxLayout * gen_layout = new QVBoxLayout( general );
@@ -228,22 +234,25 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 
 
 
-	QWidget * directories = new QWidget( ws );
+	QWidget * paths = new QWidget( ws );
+	int pathsHeight = 296;
 #ifdef LMMS_HAVE_STK
-	directories->setFixedSize( 360, 372 );
-#else
-	directories->setFixedSize( 360, 326 );
+	pathsHeight += 50;
 #endif
-	QVBoxLayout * dir_layout = new QVBoxLayout( directories );
+#ifdef LMMS_HAVE_FLUIDSYNTH
+	pathsHeight += 50;
+#endif
+	paths->setFixedSize( 360, pathsHeight );
+	QVBoxLayout * dir_layout = new QVBoxLayout( paths );
 	dir_layout->setSpacing( 0 );
 	dir_layout->setMargin( 0 );
-	labelWidget( directories, tr( "Directories" ) );
+	labelWidget( paths, tr( "Paths" ) );
 
 	// working-dir
 	tabWidget * lmms_wd_tw = new tabWidget( tr(
 					"LMMS working directory" ).toUpper(),
-								directories );
-	lmms_wd_tw->setFixedHeight( 56 );
+								paths );
+	lmms_wd_tw->setFixedHeight( 48 );
 
 	m_wdLineEdit = new QLineEdit( m_workingDir, lmms_wd_tw );
 	m_wdLineEdit->setGeometry( 10, 20, 300, 16 );
@@ -254,15 +263,15 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 				embed::getIconPixmap( "project_open", 16, 16 ),
 							"", lmms_wd_tw );
 	workingdir_select_btn->setFixedSize( 24, 24 );
-	workingdir_select_btn->move( 320, 20 );
+	workingdir_select_btn->move( 320, 16 );
 	connect( workingdir_select_btn, SIGNAL( clicked() ), this,
 						SLOT( openWorkingDir() ) );
 
 	// vst-dir
 	tabWidget * vst_tw = new tabWidget( tr(
 					"VST-plugin directory" ).toUpper(),
-								directories );
-	vst_tw->setFixedHeight( 56 );
+								paths );
+	vst_tw->setFixedHeight( 48 );
 
 	m_vdLineEdit = new QLineEdit( m_vstDir, vst_tw );
 	m_vdLineEdit->setGeometry( 10, 20, 300, 16 );
@@ -273,15 +282,15 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 				embed::getIconPixmap( "project_open", 16, 16 ),
 								"", vst_tw );
 	vstdir_select_btn->setFixedSize( 24, 24 );
-	vstdir_select_btn->move( 320, 20 );
+	vstdir_select_btn->move( 320, 16 );
 	connect( vstdir_select_btn, SIGNAL( clicked() ), this,
 						SLOT( openVSTDir() ) );
 
 	// artwork-dir
 	tabWidget * artwork_tw = new tabWidget( tr(
 					"Artwork directory" ).toUpper(),
-								directories );
-	artwork_tw->setFixedHeight( 56 );
+								paths );
+	artwork_tw->setFixedHeight( 48 );
 
 	m_adLineEdit = new QLineEdit( m_artworkDir, artwork_tw );
 	m_adLineEdit->setGeometry( 10, 20, 300, 16 );
@@ -292,15 +301,18 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 				embed::getIconPixmap( "project_open", 16, 16 ),
 							"", artwork_tw );
 	artworkdir_select_btn->setFixedSize( 24, 24 );
-	artworkdir_select_btn->move( 320, 20 );
+	artworkdir_select_btn->move( 320, 16 );
 	connect( artworkdir_select_btn, SIGNAL( clicked() ), this,
 						SLOT( openArtworkDir() ) );
+
+
+
 
 	// FL Studio-dir
 	tabWidget * fl_tw = new tabWidget( tr(
 				"FL Studio installation directory" ).toUpper(),
-								directories );
-	fl_tw->setFixedHeight( 56 );
+								paths );
+	fl_tw->setFixedHeight( 48 );
 
 	m_fdLineEdit = new QLineEdit( m_flDir, fl_tw );
 	m_fdLineEdit->setGeometry( 10, 20, 300, 16 );
@@ -311,14 +323,14 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 				embed::getIconPixmap( "project_open", 16, 16 ),
 								"", fl_tw );
 	fldir_select_btn->setFixedSize( 24, 24 );
-	fldir_select_btn->move( 320, 20 );
+	fldir_select_btn->move( 320, 16 );
 	connect( fldir_select_btn, SIGNAL( clicked() ), this,
 						SLOT( openFLDir() ) );
 	// LADSPA-dir
 	tabWidget * lad_tw = new tabWidget( tr(
-			"LADSPA plugin directories" ).toUpper(),
-							directories );
-	lad_tw->setFixedHeight( 56 );
+			"LADSPA plugin paths" ).toUpper(),
+							paths );
+	lad_tw->setFixedHeight( 48 );
 
 	m_ladLineEdit = new QLineEdit( m_ladDir, lad_tw );
 	m_ladLineEdit->setGeometry( 10, 20, 300, 16 );
@@ -329,7 +341,7 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 				embed::getIconPixmap( "project_open", 16, 16 ),
 								"", lad_tw );
 	laddir_select_btn->setFixedSize( 24, 24 );
-	laddir_select_btn->move( 320, 20 );
+	laddir_select_btn->move( 320, 16 );
 	connect( laddir_select_btn, SIGNAL( clicked() ), this,
 				 		SLOT( openLADSPADir() ) );
 
@@ -337,8 +349,8 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 	// STK-dir
 	tabWidget * stk_tw = new tabWidget( tr(
 			"STK rawwave directory" ).toUpper(),
-							directories );
-	stk_tw->setFixedHeight( 56 );
+							paths );
+	stk_tw->setFixedHeight( 48 );
 
 	m_stkLineEdit = new QLineEdit( m_stkDir, stk_tw );
 	m_stkLineEdit->setGeometry( 10, 20, 300, 16 );
@@ -349,10 +361,31 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 			embed::getIconPixmap( "project_open", 16, 16 ),
 								"", stk_tw );
 	stkdir_select_btn->setFixedSize( 24, 24 );
-	stkdir_select_btn->move( 320, 20 );
+	stkdir_select_btn->move( 320, 16 );
 	connect( stkdir_select_btn, SIGNAL( clicked() ), this,
 		 SLOT( openSTKDir() ) );
 #endif
+
+#ifdef LMMS_HAVE_FLUIDSYNTH
+	// Soundfont
+	tabWidget * sf_tw = new tabWidget( tr(
+			"Default Soundfont File" ).toUpper(), paths );
+	sf_tw->setFixedHeight( 48 );
+
+	m_sfLineEdit = new QLineEdit( m_defaultSoundfont, sf_tw );
+	m_sfLineEdit->setGeometry( 10, 20, 300, 16 );
+	connect( m_sfLineEdit, SIGNAL( textChanged( const QString & ) ), this,
+		 		SLOT( setDefaultSoundfont( const QString & ) ) );
+
+	QPushButton * sf_select_btn = new QPushButton(
+				embed::getIconPixmap( "project_open", 16, 16 ),
+								"", sf_tw );
+	sf_select_btn->setFixedSize( 24, 24 );
+	sf_select_btn->move( 320, 16 );
+	connect( sf_select_btn, SIGNAL( clicked() ), this,
+				 		SLOT( openDefaultSoundfont() ) );
+#endif	
+
 
 	dir_layout->addWidget( lmms_wd_tw );
 	dir_layout->addSpacing( 10 );
@@ -367,8 +400,11 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 	dir_layout->addSpacing( 10 );
 	dir_layout->addWidget( stk_tw );
 #endif	
+#ifdef LMMS_HAVE_FLUIDSYNTH
+	dir_layout->addSpacing( 10 );
+	dir_layout->addWidget( sf_tw );
+#endif	
 	dir_layout->addStretch();
-
 
 
 
@@ -584,7 +620,7 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 
 	m_tabBar->addTab( general, tr( "General settings" ), 0, FALSE, TRUE 
 			)->setIcon( embed::getIconPixmap( "setup_general" ) );
-	m_tabBar->addTab( directories, tr( "Directories" ), 1, FALSE, TRUE 
+	m_tabBar->addTab( paths, tr( "Paths" ), 1, FALSE, TRUE 
 			)->setIcon( embed::getIconPixmap(
 							"setup_directories" ) );
 	m_tabBar->addTab( performance, tr( "Performance settings" ), 2, FALSE,
@@ -676,6 +712,9 @@ void setupDialog::accept( void )
 	configManager::inst()->setArtworkDir( m_artworkDir );
 	configManager::inst()->setFLDir( m_flDir );
 	configManager::inst()->setLADSPADir( m_ladDir );
+#ifdef LMMS_HAVE_FLUIDSYNTH
+	configManager::inst()->setDefaultSoundfont( m_defaultSoundfont );
+#endif
 #ifdef LMMS_HAVE_STK
 	configManager::inst()->setSTKDir( m_stkDir );
 #endif	
@@ -940,6 +979,23 @@ void setupDialog::openSTKDir( void )
 
 
 
+void setupDialog::openDefaultSoundfont( void )
+{
+#ifdef LMMS_HAVE_FLUIDSYNTH
+	QString new_file = QFileDialog::getOpenFileName( this,
+				tr( "Choose defeault SoundFont" ), m_defaultSoundfont, 
+				"SoundFont2 Files (*.sf2)" );
+	
+	if( new_file != QString::null )
+	{
+		m_sfLineEdit->setText( new_file );
+	}
+#endif
+}
+
+
+
+
 void setupDialog::setFLDir( const QString & _fd )
 {
 	m_flDir = _fd;
@@ -960,6 +1016,16 @@ void setupDialog::setSTKDir( const QString & _fd )
 {
 #ifdef LMMS_HAVE_STK
 	m_stkDir = _fd;
+#endif
+}
+
+
+
+
+void setupDialog::setDefaultSoundfont( const QString & _sf )
+{
+#ifdef LMMS_HAVE_FLUIDSYNTH
+	m_defaultSoundfont = _sf;
 #endif
 }
 

@@ -134,6 +134,16 @@ void configManager::setSTKDir( const QString & _fd )
 
 
 
+void configManager::setDefaultSoundfont( const QString & _sf )
+{
+#ifdef LMMS_HAVE_FLUIDSYNTH
+	m_defaultSoundfont = _sf;
+#endif
+}
+
+
+
+
 void configManager::addRecentlyOpenedProject( const QString & _file )
 {
 	m_recentlyOpenedProjects.removeAll( _file );
@@ -270,6 +280,9 @@ bool configManager::loadConfigFile( void )
 #ifdef LMMS_HAVE_STK
 	setSTKDir( value( "paths", "stkdir" ) );
 #endif
+#ifdef LMMS_HAVE_FLUIDSYNTH
+	setDefaultSoundfont( value( "paths", "defaultsf2" ) );
+#endif
 
 	if( m_vstDir == "" )
 	{
@@ -296,6 +309,7 @@ bool configManager::loadConfigFile( void )
 		m_stkDir = "/usr/share/stk/rawwaves/";
 	}
 #endif
+
 
 	QDir::setSearchPaths( "resources", QStringList() << artworkDir()
 						<< defaultArtworkDir() );
@@ -334,6 +348,9 @@ void configManager::saveConfigFile( void )
 	setValue( "paths", "laddir", m_ladDir );
 #ifdef LMMS_HAVE_STK
 	setValue( "paths", "stkdir", m_stkDir );
+#endif
+#ifdef LMMS_HAVE_FLUIDSYNTH
+	setValue( "paths", "defaultsf2", m_defaultSoundfont );
 #endif
 
 	QDomDocument doc( "lmms-config-file" );

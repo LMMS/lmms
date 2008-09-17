@@ -44,6 +44,18 @@ public:
 
 	void reset( void );
 
+	// Must have the sub-models exposed to programatically connect
+	// to automation or controllers
+	intModel & numeratorModel( void )
+	{
+		return m_numeratorModel;
+	}
+
+	intModel & denominatorModel( void )
+	{
+		return m_denominatorModel;
+	}
+
 
 private:
 	intModel m_numeratorModel;

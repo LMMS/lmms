@@ -67,6 +67,7 @@ plugin::descriptor sf2player_plugin_descriptor =
 
 // Static map of current sfonts
 QMap<QString, sf2Font*> sf2Instrument::s_fonts;
+QMutex sf2Instrument::s_fontsMutex;
 
 
 
@@ -115,6 +116,8 @@ sf2Instrument::sf2Instrument( instrumentTrack * _instrument_track ) :
 
 	instrumentPlayHandle * iph = new instrumentPlayHandle( this );
 	engine::getMixer()->addPlayHandle( iph );
+
+	//loadFile( configManager::inst()->defaultSoundfont() );
 
 	updateSampleRate();
 	updateReverbOn();
@@ -240,14 +243,31 @@ void sf2Instrument::loadSettings( const QDomElement & _this )
 
 void sf2Instrument::loadFile( const QString & _file )
 {
-	openFile( _file );
-	updatePatch();
+	if( !_file.isEmpty() )
+	{
+		openFile( _file );
+		updatePatch();
 
-	// for some reason we've to call that, otherwise preview of a
-	// soundfont for the first time fails
-	updateSampleRate();
+		// for some reason we've to call that, otherwise preview of a
+		// soundfont for the first time fails
+		updateSampleRate();
+	}
 }
 
+
+
+
+automatableModel * sf2Instrument::getChildModel( const QString & _modelName )
+{
+	if( _modelName == "bank" )
+	{
+		return &m_bankNum;
+	}
+	else if( _modelName == "patch" )
+	{
+		return &m_patchNum;
+	}
+}
 
 
 
@@ -267,6 +287,7 @@ void sf2Instrument::freeFont( void )
 	
 	if ( m_font != NULL )
 	{
+		s_fontsMutex.lock();
 		--(m_font->refCount);
 	
 		// No more references
@@ -286,6 +307,7 @@ void sf2Instrument::freeFont( void )
 
 			fluid_synth_remove_sfont( m_synth, m_font->fluidFont );
 		}
+		s_fontsMutex.unlock();
 
 		m_font = NULL;
 	}
@@ -298,12 +320,15 @@ void sf2Instrument::openFile( const QString & _sf2File )
 {
 	emit fileLoading();
 
-	char * sf2Ascii = qstrdup( qPrintable( _sf2File ) );
+	// Used for loading file
+	char * sf2Ascii = qstrdup( qPrintable(
+			sampleBuffer::tryToMakeAbsolute( _sf2File ) ) );
 
 	// free reference to soundfont if one is selected
 	freeFont();
 
 	m_synthMutex.lock();
+	s_fontsMutex.lock();
 
 	// Increment Reference
 	if( s_fonts.contains( _sf2File ) )
@@ -335,13 +360,16 @@ void sf2Instrument::openFile( const QString & _sf2File )
 		}
 	}
 
+	s_fontsMutex.unlock();
 	m_synthMutex.unlock();
 
 	if( m_fontId >= 0 )
 	{
-		m_patchNum.setValue( 0 );
-		m_bankNum.setValue( 0 );
-		m_filename = _sf2File;
+		// Don't reset patch/bank, so that it isn't cleared when
+		// someone resolves a missing file
+		//m_patchNum.setValue( 0 );
+		//m_bankNum.setValue( 0 );
+		m_filename = sampleBuffer::tryToMakeRelative( _sf2File );
 
 		emit fileChanged();
 	}
@@ -922,7 +950,7 @@ void sf2InstrumentView::showFileDialog( void )
 	ofd.setFileMode( QFileDialog::ExistingFiles );
 
 	QStringList types;
-	types << tr( "SoundFont2-Files (*.sf2)" );
+	types << tr( "SoundFont2 Files (*.sf2)" );
 	ofd.setFilters( types );
 
 	QString dir;

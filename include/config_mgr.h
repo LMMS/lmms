@@ -146,6 +146,13 @@ public:
 	}
 #endif
 
+#ifdef LMMS_HAVE_FLUIDSYNTH
+	const QString & defaultSoundfont( void ) const
+	{
+		return( m_defaultSoundfont );
+	}
+#endif
+
 	inline const QStringList & recentlyOpenedProjects( void ) const
 	{
 		return( m_recentlyOpenedProjects );
@@ -168,6 +175,7 @@ public:
 	void setFLDir( const QString & _fd );
 	void setLADSPADir( const QString & _fd );
 	void setSTKDir( const QString & _fd );
+	void setDefaultSoundfont( const QString & _sf );
 
 
 private:
@@ -188,6 +196,9 @@ private:
 	QString m_ladDir;
 #ifdef LMMS_HAVE_STK
 	QString m_stkDir;
+#endif
+#ifdef LMMS_HAVE_FLUIDSYNTH
+	QString m_defaultSoundfont;
 #endif
 	QStringList m_recentlyOpenedProjects;
 
