@@ -1276,8 +1276,8 @@ void instrumentTrackWindow::modelChanged( void )
 
 void instrumentTrackWindow::saveSettingsBtnClicked( void )
 {
-	QFileDialog sfd( this, tr( "Save channel-settings in file" ), "",
-				tr( "Channel-Settings-File (*.cs.xml)" ) );
+	QFileDialog sfd( this, tr( "Save preset" ), "",
+				tr( "XML preset file (*.xpf)" ) );
 
 	QString preset_root = configManager::inst()->userPresetsDir();
 	if( !QDir( preset_root ).exists() )

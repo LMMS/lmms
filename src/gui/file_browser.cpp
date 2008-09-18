@@ -792,7 +792,7 @@ void fileItem::determineFileType( void )
 		m_type = ProjectFile;
 		m_handling = LoadAsProject;
 	}
-	else if( ext == "xml" || ext == "xiz" )
+	else if( ext == "xpf" || ext == "xml" || ext == "xiz" )
 	{
 		m_type = PresetFile;
 		m_handling = LoadAsPreset;
