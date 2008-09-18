@@ -185,7 +185,7 @@ fxMixerView::fxMixerView() :
 					embed::getIconPixmap( "led_green" ) );
 		cv->m_muteBtn->setCheckable( TRUE );
 		cv->m_muteBtn->move( 9,  cv->m_fader->y()-16);
-		toolTip::add( cv->m_muteBtn, tr( "Mute this track" ) );
+		toolTip::add( cv->m_muteBtn, tr( "Mute this FX channel" ) );
 
 		cv->m_rackView = new effectRackView(
 				&m->m_fxChannels[i]->m_fxChain, this );
