@@ -102,6 +102,11 @@ public:
 	// name-stuff
 	virtual void setName( const QString & _new_name );
 
+	inline virtual QString displayName( void ) const
+	{
+		return instrumentName() + ":" + track::displayName();
+	}
+
 	// translate given key of a note-event to absolute key (i.e.
 	// add global master-pitch and base-note of this instrument track)
 	int masterKey( int _midi_key ) const;
@@ -158,8 +163,6 @@ public:
 	{
 		return( m_arpeggiator.m_arpEnabledModel.value() );
 	}
-
-	virtual QString displayName( void ) const;
 
 	// simple helper for removing midiport-XML-node when loading presets
 	static void removeMidiPortNode( multimediaProject & _mmp );

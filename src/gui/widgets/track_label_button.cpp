@@ -46,19 +46,17 @@
 
 trackLabelButton::trackLabelButton( trackView * _tv, QWidget * _parent ) :
 	QToolButton( _parent ),
-	m_trackView( _tv ),
-	m_pixmap(),
-	m_pixmapFile( "" )
+	m_trackView( _tv )
 {
 	setAcceptDrops( TRUE );
 	setCursor( QCursor( embed::getIconPixmap( "hand" ), 0, 0 ) );
 	setToolButtonStyle( Qt::ToolButtonTextBesideIcon );
 	setFixedSize( 160, 29 );
 	setIconSize( QSize( 32, 32 ) );
-	updateName();
+	setText( " " );
 
 	connect( m_trackView->getTrack(), SIGNAL( dataChanged() ),
-					this, SLOT( updateName() ) );
+					this, SLOT( update() ) );
 }
 
 
@@ -66,89 +64,6 @@ trackLabelButton::trackLabelButton( trackView * _tv, QWidget * _parent ) :
 
 trackLabelButton::~trackLabelButton()
 {
-}
-
-
-
-
-void trackLabelButton::setPixmap( const QPixmap & _pixmap )
-{
-	m_pixmap = _pixmap;
-	setIcon( m_pixmap );
-}
-
-
-
-
-void trackLabelButton::setPixmapFile( const QString & _file )
-{
-	QPixmap new_pixmap;
-	if( QFileInfo( _file ).isRelative() )
-	{
-		new_pixmap = QPixmap( configManager::inst()->trackIconsDir() +
-									_file );
-	}
-	else
-	{
-		new_pixmap = QPixmap( _file );
-	}
-	if( new_pixmap.isNull() )
-	{
-		return;
-	}
-	setPixmap( new_pixmap );
-	m_pixmapFile = _file;
-	emit( pixmapChanged() );
-	update();
-}
-
-
-
-
-void trackLabelButton::selectPixmap( void )
-{
-	QFileDialog ofd( NULL, tr( "Select icon" ) );
-
-	QString dir;
-	if( m_pixmapFile != "" )
-	{
-		QString f = m_pixmapFile;
-		if( QFileInfo( f ).isRelative() )
-		{
-			f = configManager::inst()->trackIconsDir() + f;
-		}
-		dir = QFileInfo( f ).absolutePath();
-	}
-	else
-	{
-		dir = configManager::inst()->trackIconsDir();
-	}
-	// change dir to position of previously opened file
-	ofd.setDirectory( dir );
-	// use default QFileDialog::ExistingFile
-
-	// set filters
-	QStringList types;
-	types << tr( "All images (*.png *.jpg *.jpeg *.gif *.bmp)" );
-	ofd.setFilters( types );
-	if( m_pixmapFile != "" )
-	{
-		// select previously opened file
-		ofd.selectFile( QFileInfo( m_pixmapFile ).fileName() );
-	}
-
-	if ( ofd.exec () == QDialog::Accepted
-		&& !ofd.selectedFiles().isEmpty()
-	)
-	{
-		QString pf = ofd.selectedFiles()[0];
-		if( !QFileInfo( pf ).isRelative() )
-		{
-			pf = pf.replace( configManager::inst()->trackIconsDir(),
-									"" );
-		}
-		setPixmapFile( pf );
-	}
 }
 
 
@@ -162,56 +77,6 @@ void trackLabelButton::rename( void )
 	if( txt != text() )
 	{
 		m_trackView->getTrack()->setName( txt );
-		updateName();
-	}
-}
-
-
-
-
-void trackLabelButton::updateName( void )
-{
-	setText( m_trackView->getTrack()->name() );
-}
-
-
-
-
-void trackLabelButton::mousePressEvent( QMouseEvent * _me )
-{
-	if( _me->button() == Qt::RightButton )
-	{
-		QSize s( m_pixmap.width(), m_pixmap.height() );
-		s.scale( width(), height(), Qt::KeepAspectRatio );
-		if( _me->x() > 4 + s.width() )
-		{
-			rename();
-		}
-		else
-		{
-			selectPixmap();
-		}
-	}
-	else
-	{
-		QToolButton::mousePressEvent( _me );
-	}
-}
-
-
-
-
-void trackLabelButton::mouseDoubleClickEvent( QMouseEvent * _me )
-{
-	QSize s( m_pixmap.width(), m_pixmap.height() );
-	s.scale( width(), height(), Qt::KeepAspectRatio );
-	if( _me->x() > 4 + s.width() )
-	{
-		rename();
-	}
-	else
-	{
-		selectPixmap();
 	}
 }
 
@@ -230,6 +95,58 @@ void trackLabelButton::dropEvent( QDropEvent * _de )
 {
 	m_trackView->dropEvent( _de );
 	setChecked( TRUE );
+}
+
+
+
+
+void trackLabelButton::mousePressEvent( QMouseEvent * _me )
+{
+	if( _me->button() == Qt::RightButton )
+	{
+		rename();
+	}
+	else
+	{
+		QToolButton::mousePressEvent( _me );
+	}
+}
+
+
+
+
+void trackLabelButton::mouseDoubleClickEvent( QMouseEvent * _me )
+{
+	rename();
+}
+
+
+
+
+void trackLabelButton::paintEvent( QPaintEvent * _pe )
+{
+	if( m_trackView->getTrack()->type() == track::InstrumentTrack )
+	{
+		QToolButton::paintEvent( _pe );
+		QPainter p( this );
+		const QString dn = m_trackView->getTrack()->displayName();
+		const QString in = dn.split( ':' )[0];
+		const QString tn = dn.split( ':' )[1];
+		const int extra = ( isDown() || isChecked() ) ? -2 : -3;
+		const int is = 40;
+		p.setPen( QApplication::palette().buttonText().color().
+								darker( 130 ) );
+		p.drawText( is + extra, height() / 2 + extra, in );
+		p.setPen( QApplication::palette().buttonText().color() );
+		p.drawText( is + extra, height() / 2 +
+				QFontMetrics( p.font() ).height() + extra - 2,
+								tn );
+	}
+	else
+	{
+		setText( m_trackView->getTrack()->displayName() );
+		QToolButton::paintEvent( _pe );
+	}
 }
 
 

@@ -1,3 +1,65 @@
+2008-09-18	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* include/instrument_track.h:
+	* include/track.h:
+	* include/track_label_button.h:
+	* src/core/bb_track_container.cpp:
+	* src/core/track.cpp:
+	* src/gui/widgets/track_label_button.cpp:
+	* src/tracks/automation_track.cpp:
+	* src/tracks/bb_track.cpp:
+	* src/tracks/instrument_track.cpp:
+	* src/tracks/sample_track.cpp:
+	- when used on instrumentTrack, also show instrument name on
+	  trackLabelButton
+	- removed obsolete support for choosing custom track icons
+
+	* src/core/mixer.cpp:
+	when just rendering at console, use DEFAULT_BUFFER_SIZE
+
+	* data/track_icons/harp02.png:
+	* data/track_icons/harp03.png:
+	* data/track_icons/cello01.png:
+	* data/track_icons/guitar_electric01.png:
+	* data/track_icons/piano01.png:
+	* data/track_icons/guitar_electric02.png:
+	* data/track_icons/maracas01.png:
+	* data/track_icons/guitar_electric03.png:
+	* data/track_icons/guitar_electric04.png:
+	* data/track_icons/connectors01.png:
+	* data/track_icons/drumset01_.png:
+	* data/track_icons/trombone01.png:
+	* data/track_icons/CMakeLists.txt:
+	* data/track_icons/african_drum01.png:
+	* data/track_icons/french_horn01.png:
+	* data/track_icons/african_drum02.png:
+	* data/track_icons/mouth01.png:
+	* data/track_icons/african_drum03.png:
+	* data/track_icons/african_drum04.png:
+	* data/track_icons/african_drum05.png:
+	* data/track_icons/gramophone01.png:
+	* data/track_icons/trumpet01.png:
+	* data/track_icons/violin01.png:
+	* data/track_icons/trumpet02.png:
+	* data/track_icons/violin02.png:
+	* data/track_icons/trumpet03.png:
+	* data/track_icons/microphone01.png:
+	* data/track_icons/guitar_bass01.png:
+	* data/track_icons/trumpet04.png:
+	* data/track_icons/microphone02.png:
+	* data/track_icons/microphone03.png:
+	* data/track_icons/microphone04.png:
+	* data/track_icons/flute01.png:
+	* data/track_icons/oboe01.png:
+	* data/track_icons/xylophone01.png:
+	* data/track_icons/guitar_accoustic01.png:
+	* data/track_icons/guitar_accoustic02.png:
+	* data/track_icons/speaker01.png:
+	* data/track_icons/harp01.png:
+	* data/track_icons/guitar_accoustic03.png:
+	* data/CMakeLists.txt:
+	finally removed obsolete track icons
+
 2008-09-17	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* plugins/sf2_player/sf2_player.cpp:

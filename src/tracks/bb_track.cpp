@@ -549,13 +549,11 @@ bbTrackView::bbTrackView( bbTrack * _bbt, trackContainerView * _tcv ) :
 	setAcceptDrops( FALSE );
 
 	m_trackLabel = new trackLabelButton( this, getTrackSettingsWidget() );
-	m_trackLabel->setPixmap( embed::getIconPixmap( "bb_track" ) );
+	m_trackLabel->setIcon( embed::getIconPixmap( "bb_track" ) );
 	m_trackLabel->move( 3, 1 );
 	m_trackLabel->show();
 	connect( m_trackLabel, SIGNAL( clicked( bool ) ),
 			this, SLOT( clickedTrackLabel() ) );
-	connect( m_trackLabel, SIGNAL( pixmapChanged() ),
-		engine::getBBTrackContainer(), SLOT( updateComboBox() ) );
 	setModel( _bbt );
 }
 

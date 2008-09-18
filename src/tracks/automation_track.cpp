@@ -137,7 +137,7 @@ automationTrackView::automationTrackView( automationTrack * _at,
 	setFixedHeight( 32 );
 	trackLabelButton * tlb = new trackLabelButton( this,
 						getTrackSettingsWidget() );
-	tlb->setPixmap( embed::getIconPixmap( "automation_track" ) );
+	tlb->setIcon( embed::getIconPixmap( "automation_track" ) );
 	tlb->move( 3, 1 );
 	tlb->show();
 	setModel( _at );

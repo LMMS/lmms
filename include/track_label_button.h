@@ -39,27 +39,9 @@ public:
 	trackLabelButton( trackView * _tv, QWidget * _parent );
 	virtual ~trackLabelButton();
 
-	const QPixmap & pixmap( void ) const
-	{
-		return( m_pixmap );
-	}
-
-	const QString & pixmapFile( void ) const
-	{
-		return( m_pixmapFile );
-	}
-
 
 public slots:
-	void setPixmap( const QPixmap & _pixmap );
-	void setPixmapFile( const QString & _file );
-	void selectPixmap( void );
 	void rename( void );
-	void updateName( void );
-
-
-signals:
-	void pixmapChanged( void );
 
 
 protected:
@@ -67,12 +49,11 @@ protected:
 	virtual void dropEvent( QDropEvent * _de );
 	virtual void mousePressEvent( QMouseEvent * _me );
 	virtual void mouseDoubleClickEvent( QMouseEvent * _me );
+	virtual void paintEvent( QPaintEvent * _pe );
 
 
 private:
 	trackView * m_trackView;
-	QPixmap m_pixmap;
-	QString m_pixmapFile;
 
 } ;
 

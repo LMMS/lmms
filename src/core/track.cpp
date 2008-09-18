@@ -1544,7 +1544,6 @@ track::track( TrackTypes _type, trackContainer * _tc ) :
 	m_trackContainer( _tc ),        /*!< The track container object */
 	m_type( _type ),                /*!< The track type */
 	m_name(),                       /*!< The track's name */
-	m_pixmapLoader( NULL ),         /*!< For loading the track's pixmaps */
 	m_mutedModel( FALSE, this, tr( "Muted" ) ),
 					 /*!< For controlling track muting */
 	m_soloModel( FALSE, this, tr( "Solo" ) ),

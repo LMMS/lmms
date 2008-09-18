@@ -497,12 +497,6 @@ void sampleTrack::loadTrackSpecificSettings( const QDomElement & _this )
 		}
 		node = node.nextSibling();
 	}
-#if 0
-	if( _this.attribute( "icon" ) != "" )
-	{
-		tlb->setPixmapFile( _this.attribute( "icon" ) );
-	}
-#endif
 	m_volumeModel.loadSettings( _this, "vol" );
 }
 
@@ -520,7 +514,7 @@ sampleTrackView::sampleTrackView( sampleTrack * _t, trackContainerView * _tcv ) 
 						getTrackSettingsWidget() );
 	connect( tlb, SIGNAL( clicked( bool ) ),
 			this, SLOT( showEffects() ) );
-	tlb->setPixmap( embed::getIconPixmap( "sample_track" ) );
+	tlb->setIcon( embed::getIconPixmap( "sample_track" ) );
 	tlb->move( 3, 1 );
 	tlb->show();
 

@@ -501,14 +501,6 @@ int instrumentTrack::masterKey( int _midi_key ) const
 
 
 
-QString instrumentTrack::displayName( void ) const
-{
-	return instrumentName() + ":" + name();
-}
-
-
-
-
 void instrumentTrack::removeMidiPortNode( multimediaProject & _mmp )
 {
 	QDomNodeList n = _mmp.elementsByTagName( "midiport" );
@@ -845,7 +837,7 @@ instrumentTrackView::instrumentTrackView( instrumentTrack * _it,
 
 	m_tlb = new trackLabelButton( this, getTrackSettingsWidget() );
 	m_tlb->setCheckable( TRUE );
-	m_tlb->setPixmap( embed::getIconPixmap( "instrument_track" ) );
+	m_tlb->setIcon( embed::getIconPixmap( "instrument_track" ) );
 	m_tlb->move( 3, 1 );
 	m_tlb->show();
 
@@ -853,7 +845,7 @@ instrumentTrackView::instrumentTrackView( instrumentTrack * _it,
 			this, SLOT( toggleInstrumentWindow( bool ) ) );
 
 	connect( _it, SIGNAL( nameChanged() ),
-			m_tlb, SLOT( updateName() ) );
+			m_tlb, SLOT( update() ) );
 
 	// creation of widgets for track-settings-widget
 	m_volumeKnob = new knob( knobSmall_17, getTrackSettingsWidget(),

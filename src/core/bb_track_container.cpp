@@ -221,8 +221,7 @@ void bbTrackContainer::updateComboBox( void )
 	for( int i = 0; i < numOfBBs(); ++i )
 	{
 		bbTrack * bbt = bbTrack::findBBTrack( i );
-		m_bbComboBoxModel.addItem( bbt->name(),
-					new pixmapLoader( bbt->icon() ) );
+		m_bbComboBoxModel.addItem( bbt->name() );
 	}
 	setCurrentBB( cur_bb );
 }
