@@ -299,8 +299,14 @@ mixer::mixer( void ) :
 		m_inputBuffer[i] = new sampleFrame[ DEFAULT_BUFFER_SIZE * 100 ];
 		clearAudioBuffer( m_inputBuffer[i], m_inputBufferSize[i] );
 	}
-	
-	if( configManager::inst()->value( "mixer", "framesperaudiobuffer"
+
+	// just rendering?
+	if( !engine::hasGUI() )
+	{
+		m_framesPerPeriod = DEFAULT_BUFFER_SIZE;
+		m_fifo = new fifo( 1 );
+	}
+	else if( configManager::inst()->value( "mixer", "framesperaudiobuffer"
 						).toInt() >= 32 )
 	{
 		m_framesPerPeriod = configManager::inst()->value( "mixer",
