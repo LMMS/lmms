@@ -165,7 +165,7 @@ public:
 	void setValue( const QString & _class, const QString & _attribute,
 						const QString & _value );
 
-	bool loadConfigFile( void );
+	void loadConfigFile( void );
 	void saveConfigFile( void );
 
 

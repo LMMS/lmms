@@ -335,11 +335,7 @@ int main( int argc, char * * argv )
 #endif
 #endif
 
-	if( !configManager::inst()->loadConfigFile() )
-	{
-		printf( "could not load config file!\n" );
-		return( EXIT_FAILURE );
-	}
+	configManager::inst()->loadConfigFile();
 
 	if( render_out.isEmpty() && file_to_save.isEmpty() )
 	{

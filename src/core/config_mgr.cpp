@@ -202,7 +202,7 @@ void configManager::setValue( const QString & _class,
 
 
 
-bool configManager::loadConfigFile( void )
+void configManager::loadConfigFile( void )
 {
 	// read the XML file and create DOM tree
 	QFile cfg_file( m_lmmsRcFile );
@@ -210,79 +210,78 @@ bool configManager::loadConfigFile( void )
 
 	if( cfg_file.open( QIODevice::ReadOnly ) )
 	{
-		if( !dom_tree.setContent( &cfg_file ) )
+		if( dom_tree.setContent( &cfg_file ) )
 		{
-		//	return( FALSE );
+			// get the head information from the DOM
+			QDomElement root = dom_tree.documentElement();
+
+			QDomNode node = root.firstChild();
+
+			// create the settings-map out of the DOM
+			while( !node.isNull() )
+			{
+				if( node.isElement() &&
+					node.toElement().hasAttributes () )
+				{
+					stringPairVector attr;
+					QDomNamedNodeMap node_attr =
+						node.toElement().attributes();
+					for( int i = 0; i < node_attr.count();
+									++i )
+					{
+		QDomNode n = node_attr.item( i );
+		if( n.isAttr() )
+		{
+			attr.push_back( qMakePair( n.toAttr().name(),
+							n.toAttr().value() ) );
+		}
+					}
+					m_settings[node.nodeName()] = attr;
+				}
+				else if( node.nodeName() == "recentfiles" )
+				{
+					m_recentlyOpenedProjects.clear();
+					QDomNode n = node.firstChild();
+					while( !n.isNull() )
+					{
+		if( n.isElement() && n.toElement().hasAttributes() )
+		{
+			m_recentlyOpenedProjects <<
+					n.toElement().attribute( "path" );
+		}
+		n = n.nextSibling();
+					}
+				}
+				node = node.nextSibling();
+			}
+
+			if( value( "paths", "artwork" ) != "" )
+			{
+				m_artworkDir = value( "paths", "artwork" );
+				if( !QDir( m_artworkDir ).exists() )
+				{
+					m_artworkDir = defaultArtworkDir();
+				}
+				if( m_artworkDir.right( 1 ) !=
+							QDir::separator() )
+				{
+					m_artworkDir += QDir::separator();
+				}
+			}
+			setWorkingDir( value( "paths", "workingdir" ) );
+			setVSTDir( value( "paths", "vstdir" ) );
+			setFLDir( value( "paths", "fldir" ) );
+			setLADSPADir( value( "paths", "laddir" ) );
+		#ifdef LMMS_HAVE_STK
+			setSTKDir( value( "paths", "stkdir" ) );
+		#endif
+		#ifdef LMMS_HAVE_FLUIDSYNTH
+			setDefaultSoundfont( value( "paths", "defaultsf2" ) );
+		#endif
 		}
 		cfg_file.close();
 	}
 
-	// get the head information from the DOM
-	QDomElement root = dom_tree.documentElement();
-
-	QDomNode node = root.firstChild();
-
-	// create the settings-map out of the DOM
-	while( !node.isNull() )
-	{
-		if( node.isElement() && node.toElement().hasAttributes () )
-		{
-			stringPairVector attr;
-			QDomNamedNodeMap node_attr =
-						node.toElement().attributes();
-			for( int i = 0; i < node_attr.count(); ++i )
-			{
-				QDomNode n = node_attr.item( i );
-				if( n.isAttr() )
-				{
-					attr.push_back( qMakePair(
-							n.toAttr().name(),
-							n.toAttr().value() ) );
-				}
-			}
-			m_settings[node.nodeName()] = attr;
-		}
-		else if( node.nodeName() == "recentfiles" )
-		{
-			m_recentlyOpenedProjects.clear();
-			QDomNode n = node.firstChild();
-			while( !n.isNull() )
-			{
-				if( n.isElement() &&
-					n.toElement().hasAttributes() )
-				{
-					m_recentlyOpenedProjects <<
-						n.toElement().
-							attribute( "path" );
-				}
-				n = n.nextSibling();
-			}
-		}
-		node = node.nextSibling();
-	}
-
-	if( value( "paths", "artwork" ) != "" )
-	{
-		m_artworkDir = value( "paths", "artwork" );
-		if( QDir( m_artworkDir ).exists() == FALSE )
-		{
-			m_artworkDir = defaultArtworkDir();
-		}
-		if( m_artworkDir.right( 1 ) != QDir::separator() )
-		{
-			m_artworkDir += QDir::separator();
-		}
-	}
-	setWorkingDir( value( "paths", "workingdir" ) );
-	setVSTDir( value( "paths", "vstdir" ) );
-	setFLDir( value( "paths", "fldir" ) );
-	setLADSPADir( value( "paths", "laddir" ) );
-#ifdef LMMS_HAVE_STK
-	setSTKDir( value( "paths", "stkdir" ) );
-#endif
-#ifdef LMMS_HAVE_FLUIDSYNTH
-	setDefaultSoundfont( value( "paths", "defaultsf2" ) );
-#endif
 
 	if( m_vstDir == "" )
 	{
@@ -333,7 +332,6 @@ bool configManager::loadConfigFile( void )
 		QDir().mkpath( userSamplesDir() );
 		QDir().mkpath( userPresetsDir() );
 	}
-	return( TRUE );
 }
 
 

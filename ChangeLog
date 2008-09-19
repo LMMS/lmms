@@ -1,3 +1,25 @@
+2008-09-19	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* include/config_mgr.h:
+	* src/core/config_mgr.cpp:
+	* src/core/main.cpp:
+	fixed paths when starting with no configuration file
+
+	* src/core/timeline.cpp:
+	* src/core/track.cpp:
+	* data/themes/default/playpos_marker.png:
+	* data/themes/default/loop_points_on.png:
+	* data/themes/default/style.css:
+	* data/themes/default/loop_point_disabled.png:
+	* data/themes/default/autoscroll_off.png:
+	* data/themes/default/loop_point.png:
+	* data/themes/default/autoscroll_on.png:
+	* data/themes/default/loop_points_off.png:
+	improved visual appearence of timeline
+
+	* CMakeLists.txt:
+	improved detection of Qt4 translation directory
+
 2008-09-18	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/gui/fx_mixer_view.cpp:
