@@ -132,6 +132,10 @@ fxMixerView QPushButton, effectRackView QPushButton, controllerRackView QPushBut
 	font-size: 10px;
 }
 
+timeLine {
+	font-size: 8px;
+}
+
 /* Plugins */
 
 tripleOscillatorView knob {

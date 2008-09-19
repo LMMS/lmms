@@ -1150,9 +1150,10 @@ void trackContentWidget::paintEvent( QPaintEvent * _pe )
 		backgrnd = QPixmap( w * 2, height() );
 		QPainter pmp( &backgrnd );
 		//pmp.setRenderHint( QPainter::Antialiasing );
-		
-		QLinearGradient grad( 0,1, 0,h-2 );
-		pmp.fillRect( 0, 0, w, h, QColor(128, 128, 128) );
+
+		QLinearGradient grad( 0, 1, 0, h-2 );
+		pmp.fillRect( 0, 0, 1, h, QColor( 96, 96, 96 ) );
+		pmp.fillRect( 1, 0, w+1, h, QColor( 128, 128, 128 ) );
 		grad.setColorAt( 0.0, QColor( 64, 64, 64 ) );
 		grad.setColorAt( 0.3, QColor( 128, 128, 128 ) );
 		grad.setColorAt( 0.5, QColor( 128, 128, 128 ) );
@@ -1162,7 +1163,7 @@ void trackContentWidget::paintEvent( QPaintEvent * _pe )
 		pmp.fillRect( 0, 1, w, h-2, grad );
 
 		QLinearGradient grad2( 0,1, 0, h-2 );
-		pmp.fillRect( w, 0, w , h, QColor(96, 96, 96) );
+		pmp.fillRect( w+1, 0, w , h, QColor( 96, 96, 96 ) );
 		grad2.setColorAt( 0.0, QColor( 48, 48, 48 ) );
 		grad2.setColorAt( 0.3, QColor( 96, 96, 96 ) );
 		grad2.setColorAt( 0.5, QColor( 96, 96, 96 ) );
@@ -1170,10 +1171,10 @@ void trackContentWidget::paintEvent( QPaintEvent * _pe )
 		//grad2.setColorAt( 1.0, QColor( 96, 96, 96 ) );
 		//grad2.setColorAt( 1.0, QColor( 48, 48, 48 ) );
 		pmp.fillRect( w, 1, w , h-2, grad2 );
-		
+
 		// draw vertical lines
 		//pmp.setPen( QPen( QBrush( QColor( 80, 84, 96, 192 ) ), 1 ) );
-		pmp.setPen( QPen( QColor( 0,0,0, 112 ), 1 ) );
+		pmp.setPen( QPen( QColor( 0, 0, 0, 112 ), 1 ) );
 		for( float x = 0.5; x < w * 2; x += ppt )
 		{
 			pmp.drawLine( QLineF( x, 1.0, x, h-2.0 ) );
@@ -1181,7 +1182,7 @@ void trackContentWidget::paintEvent( QPaintEvent * _pe )
 		//pmp.setPen( QPen( QColor( 255,0,0, 128 ), 1 ) );
 		pmp.drawLine( 0, 1, w*2, 1 );
 
-		pmp.setPen( QPen( QColor( 255,255,255, 32 ), 1 ) );
+		pmp.setPen( QPen( QColor( 255, 255, 255, 32 ), 1 ) );
 		for( float x = 1.5; x < w * 2; x += ppt )
 		{
 			pmp.drawLine( QLineF( x, 1.0, x, h-2.0 ) );
@@ -1193,7 +1194,7 @@ void trackContentWidget::paintEvent( QPaintEvent * _pe )
 
 		last_geometry = ppt*h;
 	}
-		
+
 	// Don't draw background on BB-Editor
 	if( m_trackView->getTrackContainerView() != engine::getBBEditor() )
 	{

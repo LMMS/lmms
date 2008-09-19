@@ -46,7 +46,6 @@
 QPixmap * timeLine::s_timeLinePixmap = NULL;
 QPixmap * timeLine::s_posMarkerPixmap = NULL;
 QPixmap * timeLine::s_loopPointPixmap = NULL;
-QPixmap * timeLine::s_loopPointDisabledPixmap = NULL;
 
 
 timeLine::timeLine( const int _xoff, const int _yoff, const float _ppt,
@@ -84,12 +83,6 @@ timeLine::timeLine( const int _xoff, const int _yoff, const float _ppt,
 	{
 		s_loopPointPixmap = new QPixmap( embed::getIconPixmap(
 							"loop_point" ) );
-	}
-
-	if( s_loopPointDisabledPixmap == NULL )
-	{
-		s_loopPointDisabledPixmap = new QPixmap( embed::getIconPixmap(
-						"loop_point_disabled" ) );
 	}
 
 	move( 0, _yoff );
@@ -231,18 +224,23 @@ void timeLine::paintEvent( QPaintEvent * )
 {
 	QPainter p( this );
 
-	for( int x = 0; x < width(); x += s_timeLinePixmap->width() )
-	{
-		p.drawPixmap( x, 0, *s_timeLinePixmap );
-	}
+	QColor bg_color = QApplication::palette().color( QPalette::Active,
+							QPalette::Background );
+	QLinearGradient g( 0, 0, 0, height() );
+//	g.setColorAt( 0, bg_color.darker( 250 ) );
+	g.setColorAt( 0, bg_color.lighter( 150 ) );
+	g.setColorAt( 1, bg_color.darker( 150 ) );
+	p.fillRect( 0, 0, width(), height(), g );
+
 	p.setClipRect( m_xOffset, 0, width() - m_xOffset, height() );
 	p.setPen( QColor( 0, 0, 0 ) );
 
-	const QPixmap & lpoint = loopPointsEnabled() ?
-						*s_loopPointPixmap :
-						*s_loopPointDisabledPixmap;
-	p.drawPixmap( markerX( loopBegin() ), 4, lpoint );
-	p.drawPixmap( markerX( loopEnd() ), 4, lpoint );
+	const QPixmap & lpoint = *s_loopPointPixmap;
+	
+	p.setOpacity( loopPointsEnabled() ? 0.9 : 0.2 );
+	p.drawPixmap( markerX( loopBegin() )+2, 2, lpoint );
+	p.drawPixmap( markerX( loopEnd() )+2, 2, lpoint );
+	p.setOpacity( 1.0 );
 
 
 	tact tact_num = m_begin.getTact();
@@ -251,24 +249,26 @@ void timeLine::paintEvent( QPaintEvent * )
 						midiTime::ticksPerTact() ) %
 						static_cast<int>( m_ppt ) );
 
+	p.setPen( QColor( 192, 192, 192 ) );
 	for( int i = 0; x + i * m_ppt < width(); ++i )
 	{
+		const int cx = x + qRound( i * m_ppt );
+		p.drawLine( cx, 5, cx, height() - 6 );
 		++tact_num;
 		if( ( tact_num - 1 ) %
-			tMax( 1, static_cast<int>(
-					(float) midiTime::ticksPerTact() /
+			tMax( 1, qRound( 1.0f / 3.0f * midiTime::ticksPerTact() /
 								m_ppt ) ) == 0 )
 		{
-			p.setPen( QColor( 224, 224, 224 ) );
-			p.drawText( x + static_cast<int>( i * m_ppt ) + 1, 15,
-						QString::number( tact_num ) );
-			p.setPen( QColor( 0, 0, 0 ) );
-			p.drawText( x + static_cast<int>( i * m_ppt ), 14,
-						QString::number( tact_num ) );
+			const QString s = QString::number( tact_num );
+			p.drawText( cx + qRound( ( m_ppt - p.fontMetrics().
+							width( s ) ) / 2 ),
+				height() - p.fontMetrics().height() / 2, s );
 		}
 	}
 
-	p.drawPixmap( m_posMarkerX, 4, *s_posMarkerPixmap );
+	p.setOpacity( 0.75 );
+	p.drawImage( m_posMarkerX, height() - s_posMarkerPixmap->height(),
+						s_posMarkerPixmap->toImage() );
 }
 
 
