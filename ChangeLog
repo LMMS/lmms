@@ -1,5 +1,32 @@
 2008-09-19	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* data/locale/pt_br.qm:
+	* data/locale/fr.qm:
+	* data/locale/es.qm:
+	* data/locale/nl.qm:
+	* data/locale/ir.qm:
+	* data/locale/en.ts:
+	* data/locale/it.qm:
+	* data/locale/pt_br.ts:
+	* data/locale/fr.ts:
+	* data/locale/es.ts:
+	* data/locale/nl.ts:
+	* data/locale/ir.ts:
+	* data/locale/ca.qm:
+	* data/locale/it.ts:
+	* data/locale/ru.qm:
+	* data/locale/de.qm:
+	* data/locale/sv.qm:
+	* data/locale/ca.ts:
+	* data/locale/ru.ts:
+	* data/locale/de.ts:
+	* data/locale/sv.ts:
+	* data/locale/en.qm:
+	refreshed localizations
+
+	* CMakeLists.txt:
+	added "finalize-locales" target
+
 	* include/config_mgr.h:
 	* src/core/config_mgr.cpp:
 	* src/core/main.cpp:
