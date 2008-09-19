@@ -399,19 +399,27 @@ ENDIF(LMMS_BUILD_WIN32)
 # rules for building localizations
 #
 FILE(GLOB lmms_LOCALES data/locale/*.ts)
-SET(locale_targets "")
+SET(ts_targets "")
+SET(qm_targets "")
 FOREACH(_ts_file ${lmms_LOCALES})
-	STRING(REPLACE "${CMAKE_CURRENT_SOURCE_DIR}/data/locale/" "" _ts_target "${_ts_file}")
+	STRING(REPLACE "${CMAKE_SOURCE_DIR}/data/locale/" "" _ts_target "${_ts_file}")
 	STRING(REPLACE ".ts" ".qm" _qm_file "${_ts_file}")
 	STRING(REPLACE ".ts" ".qm" _qm_target "${_ts_target}")
 	ADD_CUSTOM_TARGET(${_ts_target} COMMAND ${QT_LUPDATE_EXECUTABLE} ${lmms_SOURCES} `find plugins/ -type f -name '*.cpp'` -ts ${_ts_file})
 	ADD_CUSTOM_TARGET(${_qm_target} COMMAND ${QT_LRELEASE_EXECUTABLE} ${_ts_file} -qm ${_qm_file})
-	LIST(APPEND locale_targets "${_ts_target}")
+	LIST(APPEND ts_targets "${_ts_target}")
+	LIST(APPEND qm_targets "${_qm_target}")
 ENDFOREACH(_ts_file ${lmms_LOCALES})
-ADD_CUSTOM_TARGET(update-locales)# DEPENDS ${locale_targets}) # does not work
-FOREACH(_item ${locale_targets})
+
+ADD_CUSTOM_TARGET(update-locales)
+FOREACH(_item ${ts_targets})
 	ADD_DEPENDENCIES(update-locales ${_item})
-ENDFOREACH(_item ${locale_targets})
+ENDFOREACH(_item ${ts_targets})
+
+ADD_CUSTOM_TARGET(finalize-locales)
+FOREACH(_item ${qm_targets})
+	ADD_DEPENDENCIES(finalize-locales ${_item})
+ENDFOREACH(_item ${qm_targets})
 
 
 # install headers
