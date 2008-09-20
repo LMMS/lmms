@@ -28,13 +28,14 @@
 #define _MIDI_TIME_H
 
 #include "types.h"
+#include "export.h"
 
 const int DefaultTicksPerTact = 192;
 const int DefaultStepsPerTact = 16;
 const int DefaultBeatsPerTact = DefaultTicksPerTact / DefaultStepsPerTact;
 
 
-class midiTime
+class EXPORT midiTime
 {
 public:
 	inline midiTime( const tact _tact, const tick _ticks ) :
