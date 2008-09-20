@@ -1,5 +1,8 @@
 2008-09-20	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* src/core/config_mgr.cpp:
+	set default path if a path only contains of a dir-separator
+
 	* data/presets/CMakeLists.txt:
 	fixed extension of presets
 

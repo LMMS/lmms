@@ -283,17 +283,17 @@ void configManager::loadConfigFile( void )
 	}
 
 
-	if( m_vstDir == "" )
+	if( m_vstDir == "" || m_vstDir == QDir::separator() )
 	{
 		m_vstDir = ensureTrailingSlash( QDir::home().absolutePath() );
 	}
 
-	if( m_flDir == "" )
+	if( m_flDir == "" || m_flDir == QDir::separator() )
 	{
 		m_flDir = ensureTrailingSlash( QDir::home().absolutePath() );
 	}
 
-	if( m_ladDir == "" )
+	if( m_ladDir == "" || m_ladDir == QDir::separator() )
 	{
 #ifdef LMMS_BUILD_WIN32
 		m_ladDir = m_pluginDir + "ladspa" + QDir::separator();
