@@ -135,22 +135,22 @@ private:
 
 	enum editModes
 	{
-		DRAW,
-		ERASE,
-		SELECT,
-		MOVE,
-		OPEN
+		ModeDraw,
+		ModeErase,
+		ModeSelect,
+		ModeMove,
+		ModeOpen
 	} ;
 
 	enum actions
 	{
-		NONE,
-		MOVE_NOTE,
-		RESIZE_NOTE,
-		SELECT_NOTES,
-		MOVE_SELECTION,
-		CHANGE_NOTE_VOLUME,
-		CHANGE_NOTE_PANNING
+		ActionNone,
+		ActionMoveNote,
+		ActionResizeNote,
+		ActionSelectNotes,
+		ActionMoveSelection,
+		ActionChangeNoteVolume,
+		ActionChangeNotePanning
 	} ;
 
 	enum pianoRollKeyTypes

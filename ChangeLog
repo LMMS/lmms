@@ -1,5 +1,9 @@
 2008-09-20	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* include/piano_roll.h:
+	* src/gui/piano_roll.cpp:
+	fixed quantization when moving selected notes (closes #2118371)
+
 	* plugins/sid/envelope.h:
 	* plugins/sid/extfilt.h:
 	* plugins/sid/wave.h:
