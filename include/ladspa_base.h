@@ -46,7 +46,7 @@ typedef enum bufferData
 {
 	TOGGLED,
 	INTEGER,
-	FLOAT,
+	FLOATING,
 	TIME,
 	NONE
 } buffer_data_t;

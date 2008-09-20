@@ -374,7 +374,7 @@ void ladspaEffect::pluginInstantiation( void )
 			}
 			else
 			{
-				p->data_type = FLOAT;
+				p->data_type = FLOATING;
 			}
 
 			// Get the range and default values.

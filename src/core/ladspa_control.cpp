@@ -67,7 +67,7 @@ ladspaControl::ladspaControl( model * _parent, port_desc_t * _port,
 						 this, SLOT( knobChanged() ) );
 			break;
 
-		case FLOAT:
+		case FLOATING:
 			m_knobModel.setRange( m_port->min, m_port->max,
 				( m_port->max - m_port->min )
 				/ ( m_port->name.toUpper() == "GAIN"
@@ -113,7 +113,7 @@ LADSPA_Data ladspaControl::getValue( void )
 						m_toggledModel.value() );
 			break;
 		case INTEGER:
-		case FLOAT:
+		case FLOATING:
 			value = static_cast<LADSPA_Data>(
 							m_knobModel.value() );
 			break;		
@@ -142,7 +142,7 @@ void ladspaControl::setValue( LADSPA_Data _value )
 		case INTEGER:
 			m_knobModel.setValue( static_cast<int>( _value ) );
 			break;
-		case FLOAT:
+		case FLOATING:
 			m_knobModel.setValue( static_cast<float>( _value ) );
 			break;
 		case TIME:
@@ -172,7 +172,7 @@ void ladspaControl::saveSettings( QDomDocument & _doc,
 			m_toggledModel.saveSettings( _doc, _this, _name );
 			break;
 		case INTEGER:
-		case FLOAT:
+		case FLOATING:
 			m_knobModel.saveSettings( _doc, _this, _name );
 			break;
 		case TIME:
@@ -199,7 +199,7 @@ void ladspaControl::loadSettings( const QDomElement & _this,
 			m_toggledModel.loadSettings( _this, _name );
 			break;
 		case INTEGER:
-		case FLOAT:
+		case FLOATING:
 			m_knobModel.loadSettings( _this, _name );
 			break;
 		case TIME:
@@ -223,7 +223,7 @@ void ladspaControl::linkControls( ladspaControl * _control )
 						_control->getToggledModel() );
 			break;
 		case INTEGER:
-		case FLOAT:
+		case FLOATING:
 			knobModel::linkModels( &m_knobModel,
 						_control->getKnobModel() );
 			break;
@@ -275,7 +275,7 @@ void ladspaControl::unlinkControls( ladspaControl * _control )
 						_control->getToggledModel() );
 			break;
 		case INTEGER:
-		case FLOAT:
+		case FLOATING:
 			knobModel::unlinkModels( &m_knobModel,
 						_control->getKnobModel() );
 			break;

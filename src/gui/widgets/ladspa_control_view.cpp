@@ -79,7 +79,7 @@ ladspaControlView::ladspaControlView( QWidget * _parent,
 		}
 
 		case INTEGER:
-		case FLOAT:
+		case FLOATING:
 			knb = new knob( knobBright_26, this,
 						m_ctl->getPort()->name );
 			break;
