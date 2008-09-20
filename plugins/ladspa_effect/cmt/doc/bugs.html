@@ -1,0 +1,20 @@
+<H1>CMT Bugs</H1>
+
+<P>Please report bugs to <A HREF="mailto:richard@muse.demon.co.uk">
+richard@muse.demon.co.uk</A>.</P>
+
+<UL>
+
+<LI>I'm not sure I've got attack & decay the right way around in the
+expander plugins.</LI>
+
+<LI>Need to have a look at dynamic.cpp for handling of unusual
+arithmetic situation such as <CODE>isnan()</CODE>,
+<CODE>isinf()</CODE> etc.</LI>
+
+<LI>Memory management is a little haphazard at present. What happens
+when <CODE>new()</CODE> fails? The host can use
+<CODE>set_new_handler()</CODE>, but I suspect this needs further
+thought anyway.</LI>
+
+</UL>

@@ -1,5 +1,65 @@
 2008-09-20	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* plugins/ladspa_effect/cmt/doc/bugs.html:
+	* plugins/ladspa_effect/cmt/doc/plugins.html:
+	* plugins/ladspa_effect/cmt/doc/installation.html:
+	* plugins/ladspa_effect/cmt/doc/license.html:
+	* plugins/ladspa_effect/cmt/doc/tasks.html:
+	* plugins/ladspa_effect/cmt/doc/COPYING:
+	* plugins/ladspa_effect/cmt/doc/overview.html:
+	* plugins/ladspa_effect/cmt/doc/index.html:
+	* plugins/ladspa_effect/cmt/doc/adding_plugins.html:
+	* plugins/ladspa_effect/cmt/doc/changes.html:
+	* plugins/ladspa_effect/cmt/src/sine.cpp:
+	* plugins/ladspa_effect/cmt/src/delay.cpp:
+	* plugins/ladspa_effect/cmt/src/syndrum.cpp:
+	* plugins/ladspa_effect/cmt/src/vcf303.cpp:
+	* plugins/ladspa_effect/cmt/src/utils.h:
+	* plugins/ladspa_effect/cmt/src/wshape_sine.cpp:
+	* plugins/ladspa_effect/cmt/src/canyondelay.cpp:
+	* plugins/ladspa_effect/cmt/src/noise.cpp:
+	* plugins/ladspa_effect/cmt/src/amp.cpp:
+	* plugins/ladspa_effect/cmt/src/disintegrator.cpp:
+	* plugins/ladspa_effect/cmt/src/run_adding.h:
+	* plugins/ladspa_effect/cmt/src/hardgate.cpp:
+	* plugins/ladspa_effect/cmt/src/cmt.cpp:
+	* plugins/ladspa_effect/cmt/src/mixer.cpp:
+	* plugins/ladspa_effect/cmt/src/filter.cpp:
+	* plugins/ladspa_effect/cmt/src/lofi.cpp:
+	* plugins/ladspa_effect/cmt/src/am.cpp:
+	* plugins/ladspa_effect/cmt/src/phasemod.cpp:
+	* plugins/ladspa_effect/cmt/src/grain.cpp:
+	* plugins/ladspa_effect/cmt/src/pink.cpp:
+	* plugins/ladspa_effect/cmt/src/init.cpp:
+	* plugins/ladspa_effect/cmt/src/ambisonic.cpp:
+	* plugins/ladspa_effect/cmt/src/pinknoise.h:
+	* plugins/ladspa_effect/cmt/src/organ.cpp:
+	* plugins/ladspa_effect/cmt/src/null.cpp:
+	* plugins/ladspa_effect/cmt/src/logistic.cpp:
+	* plugins/ladspa_effect/cmt/src/descriptor.cpp:
+	* plugins/ladspa_effect/cmt/src/freeverb/freeverb.cpp:
+	* plugins/ladspa_effect/cmt/src/freeverb/Components/allpass.cpp:
+	* plugins/ladspa_effect/cmt/src/freeverb/Components/comb.cpp:
+	* plugins/ladspa_effect/cmt/src/freeverb/Components/revmodel.h:
+	* plugins/ladspa_effect/cmt/src/freeverb/Components/allpass.h:
+	* plugins/ladspa_effect/cmt/src/freeverb/Components/comb.h:
+	* plugins/ladspa_effect/cmt/src/freeverb/Components/tuning.h:
+	* plugins/ladspa_effect/cmt/src/freeverb/Components/denormals.h:
+	* plugins/ladspa_effect/cmt/src/freeverb/Components/revmodel.cpp:
+	* plugins/ladspa_effect/cmt/src/freeverb/readme.txt:
+	* plugins/ladspa_effect/cmt/src/peak.cpp:
+	* plugins/ladspa_effect/cmt/src/pink_full.cpp:
+	* plugins/ladspa_effect/cmt/src/dynamic.cpp:
+	* plugins/ladspa_effect/cmt/src/cmt.h:
+	* plugins/ladspa_effect/cmt/src/pink_sh.cpp:
+	* plugins/ladspa_effect/cmt/src/analogue.cpp:
+	* plugins/ladspa_effect/cmt/src/sledgehammer.cpp:
+	* plugins/ladspa_effect/cmt/src/ladspa_types.h:
+	* plugins/ladspa_effect/cmt/CMakeLists.txt:
+	* plugins/ladspa_effect/CMakeLists.txt:
+	* CMakeLists.txt:
+	added CMT LADSPA plugins - should be enough then :)
+
 	* plugins/ladspa_effect/swh/ladspa-util.h:
 	* plugins/ladspa_effect/swh/phasers_1217.c:
 	* plugins/ladspa_effect/swh/vynil_1905.c:

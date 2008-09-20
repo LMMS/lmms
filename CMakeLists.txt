@@ -30,6 +30,7 @@ INCLUDE(DetectMachine)
 
 OPTION(WANT_ALSA	"Include ALSA (Advanced Linux Sound Architecture) support" ON)
 OPTION(WANT_CAPS	"Include C* Audio Plugin Suite (LADSPA plugins)" ON)
+OPTION(WANT_CMT		"Include Computer Music Toolkit LADSPA plugins" ON)
 OPTION(WANT_FFTW3F	"Include SpectrumAnalyzer plugin" ON)
 OPTION(WANT_JACK	"Include JACK (Jack Audio Connection Kit) support" ON)
 OPTION(WANT_OGGVORBIS	"Include OGG/Vorbis support" ON)
@@ -113,6 +114,13 @@ SET(STATUS_CAPS "OK")
 ELSE(WANT_CAPS)
 SET(STATUS_CAPS "not built as requested")
 ENDIF(WANT_CAPS)
+
+IF(WANT_CMT)
+SET(LMMS_HAVE_CMT TRUE)
+SET(STATUS_CMT "OK")
+ELSE(WANT_CMT)
+SET(STATUS_CMT "not built as requested")
+ENDIF(WANT_CMT)
 
 IF(WANT_SWH)
 SET(LMMS_HAVE_SWH TRUE)
@@ -556,6 +564,7 @@ MESSAGE(
 "* VST-effect hoster           : ${STATUS_VST}\n"
 "* SpectrumAnalyzer            : ${STATUS_FFTW3F}\n"
 "* CAPS LADSPA plugins         : ${STATUS_CAPS}\n"
+"* CMT LADSPA plugins          : ${STATUS_CMT}\n"
 "* TAP LADSPA plugins          : ${STATUS_TAP}\n"
 "* SWH LADSPA plugins          : ${STATUS_SWH}\n"
 )
