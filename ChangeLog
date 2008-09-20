@@ -1,5 +1,22 @@
 2008-09-20	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* plugins/ladspa_effect/swh/phasers_1217.c:
+	* plugins/ladspa_effect/swh/vynil_1905.c:
+	* plugins/ladspa_effect/swh/mbeq_1197.c:
+	* plugins/ladspa_effect/swh/fast_lookahead_limiter_1913.c:
+	* plugins/ladspa_effect/swh/flanger_1191.c:
+	* plugins/ladspa_effect/swh/comb_1190.c:
+	* plugins/ladspa_effect/swh/dc_remove_1207.c:
+	* plugins/ladspa_effect/swh/dj_eq_1901.c:
+	* plugins/ladspa_effect/swh/util/biquad.h:
+	* plugins/ladspa_effect/swh/CMakeLists.txt:
+	* plugins/ladspa_effect/swh/AUTHORS:
+	* plugins/ladspa_effect/swh/COPYING:
+	* plugins/ladspa_effect/swh/README:
+	* plugins/ladspa_effect/CMakeLists.txt:
+	* CMakeLists.txt:
+	added a selection of nice SWH LADSPA plugins
+
 	* include/piano_roll.h:
 	* src/gui/piano_roll.cpp:
 	fixed quantization when moving selected notes (closes #2118371)

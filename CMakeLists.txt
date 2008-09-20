@@ -39,7 +39,8 @@ OPTION(WANT_SDL		"Include SDL (Simple DirectMedia Layer) support" ON)
 OPTION(WANT_SF2		"Include SoundFont2 player plugin" ON)
 OPTION(WANT_STK		"Include Stk (Synthesis Toolkit) support" ON)
 OPTION(WANT_SYSTEM_SR	"Use system's libsamplerate" ON)
-OPTION(WANT_TAP		"Include Tom's Audio Processing (LADSPA plugins)" ON)
+OPTION(WANT_SWH		"Include Steve Harris's LADSPA plugins" ON)
+OPTION(WANT_TAP		"Include Tom's Audio Processing LADSPA plugins" ON)
 OPTION(WANT_VST		"Include VST support" ON)
 OPTION(WANT_WINMM	"Include WinMM MIDI support" OFF)
 OPTION(WANT_PCH		"Use precompiled headers" OFF)
@@ -112,6 +113,13 @@ SET(STATUS_CAPS "OK")
 ELSE(WANT_CAPS)
 SET(STATUS_CAPS "not built as requested")
 ENDIF(WANT_CAPS)
+
+IF(WANT_SWH)
+SET(LMMS_HAVE_SWH TRUE)
+SET(STATUS_SWH "OK")
+ELSE(WANT_SWH)
+SET(STATUS_SWH "not built as requested")
+ENDIF(WANT_SWH)
 
 IF(WANT_TAP)
 SET(LMMS_HAVE_TAP TRUE)
@@ -549,6 +557,7 @@ MESSAGE(
 "* SpectrumAnalyzer            : ${STATUS_FFTW3F}\n"
 "* CAPS LADSPA plugins         : ${STATUS_CAPS}\n"
 "* TAP LADSPA plugins          : ${STATUS_TAP}\n"
+"* SWH LADSPA plugins          : ${STATUS_SWH}\n"
 )
 
 MESSAGE(
