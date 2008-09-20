@@ -438,7 +438,7 @@ void sidInstrument::playNote( notePlayHandle * _n, bool,
 
 void sidInstrument::deleteNotePluginData( notePlayHandle * _n )
 {
-	delete static_cast<SID *>( _n->m_pluginData );
+	delete static_cast<cSID *>( _n->m_pluginData );
 }
 
 
