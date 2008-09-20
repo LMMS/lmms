@@ -23,7 +23,7 @@
 // ----------------------------------------------------------------------------
 // Constructor.
 // ----------------------------------------------------------------------------
-SID::SID()
+cSID::cSID()
 {
   // Initialize pointers.
   sample = 0;
@@ -45,7 +45,7 @@ SID::SID()
 // ----------------------------------------------------------------------------
 // Destructor.
 // ----------------------------------------------------------------------------
-SID::~SID()
+cSID::~cSID()
 {
   delete[] sample;
   delete[] fir;
@@ -55,7 +55,7 @@ SID::~SID()
 // ----------------------------------------------------------------------------
 // Set chip model.
 // ----------------------------------------------------------------------------
-void SID::set_chip_model(chip_model model)
+void cSID::set_chip_model(chip_model model)
 {
   for (int i = 0; i < 3; i++) {
     voice[i].set_chip_model(model);
@@ -69,7 +69,7 @@ void SID::set_chip_model(chip_model model)
 // ----------------------------------------------------------------------------
 // SID reset.
 // ----------------------------------------------------------------------------
-void SID::reset()
+void cSID::reset()
 {
   for (int i = 0; i < 3; i++) {
     voice[i].reset();
@@ -88,7 +88,7 @@ void SID::reset()
 // Note that to mix in an external audio signal, the signal should be
 // resampled to 1MHz first to avoid sampling noise.
 // ----------------------------------------------------------------------------
-void SID::input(int sample)
+void cSID::input(int sample)
 {
   // Voice outputs are 20 bits. Scale up to match three voices in order
   // to facilitate simulation of the MOS8580 "digi boost" hardware hack.
@@ -99,7 +99,7 @@ void SID::input(int sample)
 // Read sample from audio output.
 // Both 16-bit and n-bit output is provided.
 // ----------------------------------------------------------------------------
-int SID::output()
+int cSID::output()
 {
   const int range = 1 << 16;
   const int half = range >> 1;
@@ -113,7 +113,7 @@ int SID::output()
   return sample;
 }
 
-int SID::output(int bits)
+int cSID::output(int bits)
 {
   const int range = 1 << bits;
   const int half = range >> 1;
@@ -145,7 +145,7 @@ int SID::output(int bits)
 // value instead). With this in mind we return the last value written to
 // any SID register for $2000 cycles without modeling the bit fading.
 // ----------------------------------------------------------------------------
-reg8 SID::read(reg8 offset)
+reg8 cSID::read(reg8 offset)
 {
   switch (offset) {
   case 0x19:
@@ -165,7 +165,7 @@ reg8 SID::read(reg8 offset)
 // ----------------------------------------------------------------------------
 // Write registers.
 // ----------------------------------------------------------------------------
-void SID::write(reg8 offset, reg8 value)
+void cSID::write(reg8 offset, reg8 value)
 {
   bus_value = value;
   bus_value_ttl = 0x2000;
@@ -255,7 +255,7 @@ void SID::write(reg8 offset, reg8 value)
 // ----------------------------------------------------------------------------
 // Constructor.
 // ----------------------------------------------------------------------------
-SID::State::State()
+cSID::State::State()
 {
   int i;
 
@@ -283,7 +283,7 @@ SID::State::State()
 // ----------------------------------------------------------------------------
 // Read state.
 // ----------------------------------------------------------------------------
-SID::State SID::read_state()
+cSID::State cSID::read_state()
 {
   State state;
   int i, j;
@@ -343,7 +343,7 @@ SID::State SID::read_state()
 // ----------------------------------------------------------------------------
 // Write state.
 // ----------------------------------------------------------------------------
-void SID::write_state(const State& state)
+void cSID::write_state(const State& state)
 {
   int i;
 
@@ -371,7 +371,7 @@ void SID::write_state(const State& state)
 // ----------------------------------------------------------------------------
 // Enable filter.
 // ----------------------------------------------------------------------------
-void SID::enable_filter(bool enable)
+void cSID::enable_filter(bool enable)
 {
   filter.enable_filter(enable);
 }
@@ -380,7 +380,7 @@ void SID::enable_filter(bool enable)
 // ----------------------------------------------------------------------------
 // Enable external filter.
 // ----------------------------------------------------------------------------
-void SID::enable_external_filter(bool enable)
+void cSID::enable_external_filter(bool enable)
 {
   extfilt.enable_filter(enable);
 }
@@ -390,7 +390,7 @@ void SID::enable_external_filter(bool enable)
 // I0() computes the 0th order modified Bessel function of the first kind.
 // This function is originally from resample-1.5/filterkit.c by J. O. Smith.
 // ----------------------------------------------------------------------------
-double SID::I0(double x)
+double cSID::I0(double x)
 {
   // Max error acceptable in I0.
   const double I0e = 1e-6;
@@ -433,7 +433,7 @@ double SID::I0(double x)
 // to slightly below 20kHz. This constraint ensures that the FIR table is
 // not overfilled.
 // ----------------------------------------------------------------------------
-bool SID::set_sampling_parameters(double clock_freq, sampling_method method,
+bool cSID::set_sampling_parameters(double clock_freq, sampling_method method,
 				  double sample_freq, double pass_freq,
 				  double filter_scale)
 {
@@ -571,7 +571,7 @@ bool SID::set_sampling_parameters(double clock_freq, sampling_method method,
 // that any adjustment of the sampling frequency will change the
 // characteristics of the resampling filter, since the filter is not rebuilt.
 // ----------------------------------------------------------------------------
-void SID::adjust_sampling_frequency(double sample_freq)
+void cSID::adjust_sampling_frequency(double sample_freq)
 {
   cycles_per_sample =
     cycle_count(clock_frequency/sample_freq*(1 << FIXP_SHIFT) + 0.5);
@@ -582,7 +582,7 @@ void SID::adjust_sampling_frequency(double sample_freq)
 // Return array of default spline interpolation points to map FC to
 // filter cutoff frequency.
 // ----------------------------------------------------------------------------
-void SID::fc_default(const fc_point*& points, int& count)
+void cSID::fc_default(const fc_point*& points, int& count)
 {
   filter.fc_default(points, count);
 }
@@ -591,7 +591,7 @@ void SID::fc_default(const fc_point*& points, int& count)
 // ----------------------------------------------------------------------------
 // Return FC spline plotter object.
 // ----------------------------------------------------------------------------
-PointPlotter<sound_sample> SID::fc_plotter()
+PointPlotter<sound_sample> cSID::fc_plotter()
 {
   return filter.fc_plotter();
 }
@@ -600,7 +600,7 @@ PointPlotter<sound_sample> SID::fc_plotter()
 // ----------------------------------------------------------------------------
 // SID clocking - 1 cycle.
 // ----------------------------------------------------------------------------
-void SID::clock()
+void cSID::clock()
 {
   int i;
 
@@ -636,7 +636,7 @@ void SID::clock()
 // ----------------------------------------------------------------------------
 // SID clocking - delta_t cycles.
 // ----------------------------------------------------------------------------
-void SID::clock(cycle_count delta_t)
+void cSID::clock(cycle_count delta_t)
 {
   int i;
 
@@ -727,7 +727,7 @@ void SID::clock(cycle_count delta_t)
 // }
 // 
 // ----------------------------------------------------------------------------
-int SID::clock(cycle_count& delta_t, short* buf, int n, int interleave)
+int cSID::clock(cycle_count& delta_t, short* buf, int n, int interleave)
 {
   switch (sampling) {
   default:
@@ -746,7 +746,7 @@ int SID::clock(cycle_count& delta_t, short* buf, int n, int interleave)
 // SID clocking with audio sampling - delta clocking picking nearest sample.
 // ----------------------------------------------------------------------------
 RESID_INLINE
-int SID::clock_fast(cycle_count& delta_t, short* buf, int n,
+int cSID::clock_fast(cycle_count& delta_t, short* buf, int n,
 		    int interleave)
 {
   int s = 0;
@@ -783,7 +783,7 @@ int SID::clock_fast(cycle_count& delta_t, short* buf, int n,
 // sampling noise.
 // ----------------------------------------------------------------------------
 RESID_INLINE
-int SID::clock_interpolate(cycle_count& delta_t, short* buf, int n,
+int cSID::clock_interpolate(cycle_count& delta_t, short* buf, int n,
 			   int interleave)
 {
   int s = 0;
@@ -865,7 +865,7 @@ int SID::clock_interpolate(cycle_count& delta_t, short* buf, int n,
 // implementation dependent in the C++ standard.
 // ----------------------------------------------------------------------------
 RESID_INLINE
-int SID::clock_resample_interpolate(cycle_count& delta_t, short* buf, int n,
+int cSID::clock_resample_interpolate(cycle_count& delta_t, short* buf, int n,
 				    int interleave)
 {
   int s = 0;
@@ -948,7 +948,7 @@ int SID::clock_resample_interpolate(cycle_count& delta_t, short* buf, int n,
 // SID clocking with audio sampling - cycle based with audio resampling.
 // ----------------------------------------------------------------------------
 RESID_INLINE
-int SID::clock_resample_fast(cycle_count& delta_t, short* buf, int n,
+int cSID::clock_resample_fast(cycle_count& delta_t, short* buf, int n,
 			     int interleave)
 {
   int s = 0;

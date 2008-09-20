@@ -66,7 +66,7 @@ protected:
   sound_sample w0lp;
   sound_sample w0hp;
 
-friend class SID;
+friend class cSID;
 };
 
 

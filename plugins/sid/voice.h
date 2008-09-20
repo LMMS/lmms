@@ -49,7 +49,7 @@ protected:
   // Multiplying D/A DC offset.
   sound_sample voice_DC;
 
-friend class SID;
+friend class cSID;
 };
 
 

@@ -26,11 +26,11 @@
 #include "extfilt.h"
 #include "pot.h"
 
-class SID
+class cSID
 {
 public:
-  SID();
-  ~SID();
+  cSID();
+  ~cSID();
 
   void set_chip_model(chip_model model);
   void enable_filter(bool enable);

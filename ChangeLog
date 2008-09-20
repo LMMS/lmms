@@ -1,3 +1,26 @@
+2008-09-20	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* plugins/sid/envelope.h:
+	* plugins/sid/extfilt.h:
+	* plugins/sid/wave.h:
+	* plugins/sid/voice.h:
+	* plugins/sid/sid.cc:
+	* plugins/sid/sid.h:
+	* plugins/sid/filter.h:
+	* plugins/sid/sid_instrument.cpp:
+	renamed class SID to cSID for not conflicting with data structure SID
+	in win32 headers
+
+	* include/ladspa_base.h:
+	* src/core/ladspa_control.cpp:
+	* src/gui/widgets/ladspa_control_view.cpp:
+	* plugins/ladspa_effect/ladspa_effect.cpp:
+	renamed FLOAT constant to FLOATING for not conflicting with FLOAT type
+	in win32 headers
+
+	* include/midi_time.h:
+	export MIDI class - DLL version of midiImport plugin needs it
+
 2008-09-19	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* data/locale/pt_br.qm:

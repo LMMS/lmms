@@ -196,7 +196,7 @@ protected:
   fc_point* f0_points;
   int f0_count;
 
-friend class SID;
+friend class cSID;
 };
 
 

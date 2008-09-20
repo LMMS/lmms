@@ -113,7 +113,7 @@ protected:
   reg8* wave_PST;
 
 friend class Voice;
-friend class SID;
+friend class cSID;
 };
 
 

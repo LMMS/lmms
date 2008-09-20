@@ -240,7 +240,7 @@ f_cnt_t sidInstrument::desiredReleaseFrames( void ) const
 
 
 
-static int sid_fillbuffer(unsigned char* sidreg, SID *sid, int tdelta, short *ptr, int samples)
+static int sid_fillbuffer(unsigned char* sidreg, cSID *sid, int tdelta, short *ptr, int samples)
 {
   int tdelta2;
   int result;
@@ -305,7 +305,7 @@ void sidInstrument::playNote( notePlayHandle * _n, bool,
 
 	if ( tfp == 0 )
 	{
-		SID *sid = new SID();
+		cSID *sid = new cSID();
 		sid->set_sampling_parameters( clockrate, SAMPLE_FAST, samplerate );
 		sid->set_chip_model( MOS8580 );
 		sid->enable_filter( true );
@@ -314,7 +314,7 @@ void sidInstrument::playNote( notePlayHandle * _n, bool,
 	}
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();
 
-	SID *sid = static_cast<SID *>( _n->m_pluginData );
+	cSID *sid = static_cast<cSID *>( _n->m_pluginData );
 	int delta_t = clockrate * frames / samplerate + 4;
 	short buf[frames];
 	unsigned char sidreg[NUMSIDREGS];
