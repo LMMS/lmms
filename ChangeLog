@@ -1,5 +1,6 @@
 2008-09-20	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* plugins/ladspa_effect/swh/ladspa-util.h:
 	* plugins/ladspa_effect/swh/phasers_1217.c:
 	* plugins/ladspa_effect/swh/vynil_1905.c:
 	* plugins/ladspa_effect/swh/mbeq_1197.c:
