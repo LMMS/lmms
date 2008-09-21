@@ -256,7 +256,7 @@ public:
     LADSPA_Data attack1, decay1, release1;
     LADSPA_Data attack2, decay2, release2;
     LADSPA_Data filt_attack, filt_decay, filt_release;
-    LADSPA_Data lfo_fadein, a, b, c;
+    LADSPA_Data lfo_fadein, a = 0, b = 0, c = 0;
     LADSPA_Data dco1_pwm, dco2_pwm;
     LADSPA_Data dco1_fm, dco2_fm;
     LADSPA_Data filt_lfo_mod;
