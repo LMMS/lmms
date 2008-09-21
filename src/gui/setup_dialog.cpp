@@ -995,7 +995,7 @@ void setupDialog::openSTKDir( void )
 #ifdef LMMS_HAVE_STK
 	QString new_dir = QFileDialog::getExistingDirectory( this,
 				tr( "Choose STK rawwave directory" ),
-							m_ladDir );
+							m_stkDir );
 	if( new_dir != QString::null )
 	{
 		m_stkLineEdit->setText( new_dir );

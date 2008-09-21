@@ -1,3 +1,4 @@
+ADD_SUBDIRECTORY(backgrounds)
 ADD_SUBDIRECTORY(locale)
 ADD_SUBDIRECTORY(presets)
 ADD_SUBDIRECTORY(projects)

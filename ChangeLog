@@ -81,7 +81,21 @@
 	Hide pitch bend one vibed instrument
 	
 	* src/gui/setup_dialog.cpp:
-	Minor layout fix
+	- Minor layout fix
+	- Fix incorrect starting directory for STK
+
+	* data/CMakeLists.txt:
+	* data/backgrounds:
+	* data/backgrounds/CMakeLists.txt:
+	* data/backgrounds/lmms_tile.png:
+	* data/backgrounds/vinnie.png:
+	- Move llama theme background to backgrounds/
+	- Resurrect the old background
+	- more to come..
+
+	* data/themes/llama:
+	* data/themes/llama/background_artwork.png:
+	- Remove llama theme
 
 2008-09-20	Paul Giblock <drfaygo/at/gmail/dot/com>
 
