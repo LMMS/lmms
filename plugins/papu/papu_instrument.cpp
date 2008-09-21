@@ -109,7 +109,7 @@ papuInstrument::papuInstrument( instrumentTrack * _instrument_track ) :
 	m_trebleModel( -20.0f, -100.0f, 200.0f, 1.0f, this, tr( "Treble" ) ),
 	m_bassModel( 461.0f, -1.0f, 600.0f, 1.0f, this, tr( "Bass" ) ),
 
-	m_graphModel( 0, 15, 32, this, FALSE, 1 )
+	m_graphModel( 0, 15, 32, this, false, 1 )
 {
 }
 
@@ -446,7 +446,7 @@ papuInstrumentView::papuInstrumentView( instrument * _instrument,
 	instrumentView( _instrument, _parent )
 {
 
-	setAutoFillBackground( TRUE );
+	setAutoFillBackground( true );
 	QPalette pal;
 	pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap( "artwork" ) );
 	setPalette( pal );
@@ -543,7 +543,7 @@ papuInstrumentView::papuInstrumentView( instrument * _instrument,
 	toolTip::add( m_bassKnob, tr( "Bass" ) );
 
 	m_ch1SweepDirButton = new pixmapButton( this, NULL );
-	m_ch1SweepDirButton->setCheckable( TRUE );
+	m_ch1SweepDirButton->setCheckable( true );
 	m_ch1SweepDirButton->move( 167, 108 );
 	m_ch1SweepDirButton->setActiveGraphic(
 							PLUGIN_NAME::getIconPixmap( "btn_down" ) );
@@ -552,7 +552,7 @@ papuInstrumentView::papuInstrumentView( instrument * _instrument,
 	toolTip::add( m_ch1SweepDirButton, tr( "Sweep Direction" ) );
 
 	m_ch1VolSweepDirButton = new pixmapButton( this, NULL );
-	m_ch1VolSweepDirButton->setCheckable( TRUE );
+	m_ch1VolSweepDirButton->setCheckable( true );
 	m_ch1VolSweepDirButton->move( 207, 108 );
 	m_ch1VolSweepDirButton->setActiveGraphic(
 								PLUGIN_NAME::getIconPixmap( "btn_up" ) );
@@ -564,7 +564,7 @@ papuInstrumentView::papuInstrumentView( instrument * _instrument,
 
 	m_ch2VolSweepDirButton = new pixmapButton( this,
 										tr( "Volume Sweep Direction" ) );
-	m_ch2VolSweepDirButton->setCheckable( TRUE );
+	m_ch2VolSweepDirButton->setCheckable( true );
 	m_ch2VolSweepDirButton->move( 102, 156 );
 	m_ch2VolSweepDirButton->setActiveGraphic(
 								PLUGIN_NAME::getIconPixmap( "btn_up" ) );
@@ -577,7 +577,7 @@ papuInstrumentView::papuInstrumentView( instrument * _instrument,
 
 	m_ch4VolSweepDirButton = new pixmapButton( this,
 										tr( "Volume Sweep Direction" ) );
-	m_ch4VolSweepDirButton->setCheckable( TRUE );
+	m_ch4VolSweepDirButton->setCheckable( true );
 	m_ch4VolSweepDirButton->move( 207, 157 );
 	m_ch4VolSweepDirButton->setActiveGraphic(
 								PLUGIN_NAME::getIconPixmap( "btn_up" ) );
@@ -586,7 +586,7 @@ papuInstrumentView::papuInstrumentView( instrument * _instrument,
 	toolTip::add( m_ch4VolSweepDirButton, tr( "Volume Sweep Direction" ) );
 
 	m_ch4ShiftRegWidthButton = new pixmapButton( this, NULL );
-	m_ch4ShiftRegWidthButton->setCheckable( TRUE );
+	m_ch4ShiftRegWidthButton->setCheckable( true );
 	m_ch4ShiftRegWidthButton->move( 207, 171 );
 	m_ch4ShiftRegWidthButton->setActiveGraphic(
 									PLUGIN_NAME::getIconPixmap( "btn_7" ) );
@@ -598,56 +598,58 @@ papuInstrumentView::papuInstrumentView( instrument * _instrument,
 
 
 	m_ch1So1Button = new pixmapButton( this, NULL );
-	m_ch1So1Button->setCheckable( TRUE );
+	m_ch1So1Button->setCheckable( true );
 	m_ch1So1Button->move( 208, 51 );
 	m_ch1So1Button->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "btn_on" ) );
 	m_ch1So1Button->setInactiveGraphic( PLUGIN_NAME::getIconPixmap("btn_off") );
 	toolTip::add( m_ch1So1Button, tr( "Channel1 to SO1 (Right)" ) );
 
 	m_ch2So1Button = new pixmapButton( this, NULL );
-	m_ch2So1Button->setCheckable( TRUE );
+	m_ch2So1Button->setCheckable( true );
 	m_ch2So1Button->move( 208, 51 + 12 );
 	m_ch2So1Button->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "btn_on" ) );
 	m_ch2So1Button->setInactiveGraphic( PLUGIN_NAME::getIconPixmap("btn_off") );
 	toolTip::add( m_ch2So1Button, tr( "Channel2 to SO1 (Right)" ) );
 
 	m_ch3So1Button = new pixmapButton( this, NULL );
-	m_ch3So1Button->setCheckable( TRUE );
+	m_ch3So1Button->setCheckable( true );
 	m_ch3So1Button->move( 208, 51 + 2*12 );
 	m_ch3So1Button->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "btn_on" ) );
 	m_ch3So1Button->setInactiveGraphic( PLUGIN_NAME::getIconPixmap("btn_off") );
 	toolTip::add( m_ch3So1Button, tr( "Channel3 to SO1 (Right)" ) );
 
 	m_ch4So1Button = new pixmapButton( this, NULL );
-	m_ch4So1Button->setCheckable( TRUE );
+	m_ch4So1Button->setCheckable( true );
+	m_ch4So1Button->setChecked( false );
 	m_ch4So1Button->move( 208, 51 + 3*12 );
 	m_ch4So1Button->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "btn_on" ) );
 	m_ch4So1Button->setInactiveGraphic( PLUGIN_NAME::getIconPixmap("btn_off") );
 	toolTip::add( m_ch4So1Button, tr( "Channel4 to SO1 (Right)" ) );
 
 	m_ch1So2Button = new pixmapButton( this, NULL );
-	m_ch1So2Button->setCheckable( TRUE );
+	m_ch1So2Button->setCheckable( true );
 	m_ch1So2Button->move( 148, 51 );
 	m_ch1So2Button->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "btn_on" ) );
 	m_ch1So2Button->setInactiveGraphic( PLUGIN_NAME::getIconPixmap("btn_off") );
 	toolTip::add( m_ch1So2Button, tr( "Channel1 to SO2 (Left)" ) );
 
 	m_ch2So2Button = new pixmapButton( this, NULL );
-	m_ch2So2Button->setCheckable( TRUE );
+	m_ch2So2Button->setCheckable( true );
 	m_ch2So2Button->move( 148, 51 + 12 );
 	m_ch2So2Button->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "btn_on" ) );
 	m_ch2So2Button->setInactiveGraphic( PLUGIN_NAME::getIconPixmap("btn_off") );
 	toolTip::add( m_ch2So2Button, tr( "Channel2 to SO2 (Left)" ) );
 
 	m_ch3So2Button = new pixmapButton( this, NULL );
-	m_ch3So2Button->setCheckable( TRUE );
+	m_ch3So2Button->setCheckable( true );
 	m_ch3So2Button->move( 148, 51 + 2*12 );
 	m_ch3So2Button->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "btn_on" ) );
 	m_ch3So2Button->setInactiveGraphic( PLUGIN_NAME::getIconPixmap("btn_off") );
 	toolTip::add( m_ch3So2Button, tr( "Channel3 to SO2 (Left)" ) );
 
 	m_ch4So2Button = new pixmapButton( this, NULL );
-	m_ch4So2Button->setCheckable( TRUE );
+	m_ch4So2Button->setCheckable( true );
+	m_ch4So2Button->setChecked( false );
 	m_ch4So2Button->move( 148, 51 + 3*12 );
 	m_ch4So2Button->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "btn_on" ) );
 	m_ch4So2Button->setInactiveGraphic( PLUGIN_NAME::getIconPixmap("btn_off") );

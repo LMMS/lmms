@@ -1,4 +1,4 @@
-2008-09-16	Paul Giblock <drfaygo/at/gmail/dot/com>
+2008-09-20	Paul Giblock <drfaygo/at/gmail/dot/com>
 
 	* plugins/sf2_player/sf2_player.cpp:
 	Fix bug introduced in the last edit.  Reference sharing was not working
@@ -10,6 +10,13 @@
 
 	* CMakeLists.txt:
 	Fix copy-and-paste error in a message
+
+	* plugins/papu/papu_instrument.cpp:
+	- Unselect the noise-channel (ch4) by default
+	- Coding style changes
+
+	* src/core/song.cpp:
+	Add hard-coded file-extension filters to the import file screen
 
 2008-09-20	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
