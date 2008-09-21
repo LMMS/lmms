@@ -48,7 +48,8 @@
 	- Replace r&b,r_b with r_n_b
 
 	* src/core/main.cpp:
-	Make "could not set realtime priority" sound less like an error
+	- Make "could not set realtime priority" sound less like an error
+	- Actually commit the file
 
 	* plugins/lb302/lb302.cpp:
 	* plugins/lb302/lb302.h:
@@ -58,6 +59,12 @@
 	- Remove useless inverted-saw waveform
 	- Add Sine, Noise, and Exponential waveforms
 	- Use buttons instead of a knob
+
+	* plugins/bit_invader/bit_invader.cpp:
+	* plugins/bit_invader/bit_invader.h:
+	- Add support for pitch bend
+	- Move smoothing button to a more noticable location
+	- Some coding style changes
 
 2008-09-20	Paul Giblock <drfaygo/at/gmail/dot/com>
 

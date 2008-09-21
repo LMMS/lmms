@@ -42,8 +42,9 @@ class bitInvaderView;
 class bSynth
 {
 public:
-	bSynth( float * sample, int length, float _pitch, bool _interpolation,
-			float factor, const sample_rate_t _sample_rate );
+	bSynth( float * sample, int length, notePlayHandle * _nph,
+			bool _interpolation, float factor, 
+			const sample_rate_t _sample_rate );
 	virtual ~bSynth();
 	
 	sample_t nextStringSample();
@@ -52,9 +53,10 @@ public:
 private:
 	int sample_index;
 	float sample_realindex;
-	int sample_length;
 	float* sample_shape;
-	float sample_step;	
+	notePlayHandle* nph;
+	const int sample_length;
+	const sample_rate_t sample_rate;
 
 	bool interpolation;
 	

@@ -68,30 +68,20 @@ plugin::descriptor PLUGIN_EXPORT bitinvader_plugin_descriptor =
 }
 
 
-bSynth::bSynth( float * shape, int length, float _pitch, bool _interpolation,
-				float factor, const sample_rate_t _sample_rate )
+bSynth::bSynth( float * _shape, int _length, notePlayHandle * _nph, bool _interpolation,
+				float _factor, const sample_rate_t _sample_rate ) :
+	sample_length( _length ),
+	nph( _nph ),
+	interpolation( _interpolation),
+	sample_rate( _sample_rate ),
+	sample_index( 0 ),
+	sample_realindex( 0 )
 {
-
-	interpolation = _interpolation;
-
-	// init variables
-
-	sample_length = length;
 	sample_shape = new float[sample_length];
-	for (int i=0; i < length; i++)
+	for (int i=0; i < _length; i++)
 	{
-		sample_shape[i] = shape[i] * factor;
+		sample_shape[i] = _shape[i] * _factor;
 	}
-
-
-	sample_index = 0;
-	sample_realindex = 0;
-	
-
-	sample_step = static_cast<float>( sample_length / ( _sample_rate /
-		 						_pitch ) );
-	
-
 }
 
 
@@ -102,6 +92,8 @@ bSynth::~bSynth()
 
 sample_t bSynth::nextStringSample( void )
 {
+	float sample_step = 
+		static_cast<float>( sample_length / ( sample_rate / nph->frequency() ) );
 
 	
 	// check overflow
@@ -281,7 +273,7 @@ void bitInvader::playNote( notePlayHandle * _n, bool,
 		_n->m_pluginData = new bSynth(
 					const_cast<float*>( m_graph.samples() ),
 					m_graph.length(),
-					_n->frequency(),
+					_n,
 					m_interpolation.value(), factor,
 				engine::getMixer()->processingSampleRate() );
 	}
@@ -402,7 +394,7 @@ bitInvaderView::bitInvaderView( instrument * _instrument,
 			tr( "Click here for a user-defined shape." ) );
 
 	smoothBtn = new pixmapButton( this, tr( "Smooth" ) );
-	smoothBtn->move( 55, 225 );
+	smoothBtn->move( 35, 200 );
 	smoothBtn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 						"smooth" ) );
 	smoothBtn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
