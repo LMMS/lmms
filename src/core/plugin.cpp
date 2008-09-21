@@ -36,6 +36,7 @@
 #include "mixer.h"
 #include "config_mgr.h"
 #include "dummy_plugin.h"
+#include "automatable_model.h"
 
 
 static pixmapLoader __dummy_loader;
@@ -85,7 +86,8 @@ void plugin::loadFile( const QString & )
 
 automatableModel * plugin::getChildModel( const QString & )
 {
-	return NULL;
+	static floatModel fm;
+	return &fm;
 }
 
 
