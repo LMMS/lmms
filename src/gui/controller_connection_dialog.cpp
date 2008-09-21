@@ -163,12 +163,13 @@ controllerConnectionDialog::controllerConnectionDialog( QWidget * _parent,
 	if( !engine::getMixer()->getMidiClient()->isRaw() )
 	{
 		m_readablePorts = new midiPortMenu( midiPort::Input );
-
+		connect( m_readablePorts, SIGNAL( triggered( QAction * ) ),
+				this, SLOT( enableAutoDetect( QAction * ) ) );
 		toolButton * rp_btn = new toolButton( m_midiGroupBox );
 		rp_btn->setText( tr( "MIDI-devices to receive "
 						"MIDI-events from" ) );
-		rp_btn->setIcon( embed::getIconPixmap( "midi_in" ) );
-		rp_btn->setGeometry( 140, 24, 32, 32 );
+		rp_btn->setIcon( embed::getIconPixmap( "piano" ) );
+		rp_btn->setGeometry( 160, 24, 32, 32 );
 		rp_btn->setMenu( m_readablePorts );
 		rp_btn->setPopupMode( QToolButton::InstantPopup );
 	}
@@ -415,6 +416,15 @@ void controllerConnectionDialog::midiValueChanged( void )
 	}
 }
 
+
+
+void controllerConnectionDialog::enableAutoDetect( QAction * _a )
+{
+	if( _a->isChecked() )
+	{
+		m_midiAutoDetectCheckBox->model()->setValue( true );
+	}
+}
 
 
 

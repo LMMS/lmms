@@ -67,6 +67,8 @@ public slots:
 	void midiToggled( void );
 	void userToggled( void );
 	void autoDetectToggled( void );
+	void enableAutoDetect( QAction * _a );
+
 
 protected slots:
 	void midiValueChanged( void );
