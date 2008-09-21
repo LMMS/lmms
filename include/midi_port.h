@@ -53,6 +53,12 @@ class midiPort : public model, public serializingObject
 						m_inputControllerModel);
 	mapPropertyFromModel(int,outputController,setOutputController,
 						m_outputControllerModel);
+	mapPropertyFromModel(int,fixedInputVelocity,setFixedInputVelocity,
+						m_fixedInputVelocityModel);
+	mapPropertyFromModel(int,fixedOutputVelocity,setFixedOutputVelocity,
+						m_fixedOutputVelocityModel);
+	mapPropertyFromModel(int,outputProgram,setOutputProgram,
+						m_outputProgramModel);
 	mapPropertyFromModel(bool,isReadable,setReadable,m_readableModel);
 	mapPropertyFromModel(bool,isWritable,setWritable,m_writableModel);
 public:
@@ -73,11 +79,6 @@ public:
 			Modes _mode = Disabled );
 	virtual ~midiPort();
 
-	inline const QString & name( void ) const
-	{
-		return( m_name );
-	}
-
 	void setName( const QString & _name );
 
 	inline Modes mode( void ) const
@@ -95,16 +96,6 @@ public:
 	inline bool outputEnabled( void ) const
 	{
 		return( mode() == Output || mode() == Duplex );
-	}
-
-	inline void enableDefaultVelocityForInEvents( const bool _on )
-	{
-		m_defaultVelocityInEnabledModel.setValue( _on );
-	}
-
-	inline void enableDefaultVelocityForOutEvents( const bool _on )
-	{
-		m_defaultVelocityOutEnabledModel.setValue( _on );
 	}
 
 
@@ -139,12 +130,6 @@ public:
 	midiPortMenu * m_writablePortsMenu;
 
 
-signals:
-	void readablePortsChanged( void );
-	void writeablePortsChanged( void );
-	void modeChanged( void );
-
-
 public slots:
 	void updateMidiPortMode( void );
 
@@ -152,13 +137,12 @@ public slots:
 private slots:
 	void updateReadablePorts( void );
 	void updateWriteablePorts( void );
+	void updateOutputProgram( void );
 
 
 private:
 	midiClient * m_midiClient;
 	midiEventProcessor * m_midiEventProcessor;
-
-	QString m_name;	// TODO: replace with model-name-property!
 
 	Modes m_mode;
 
@@ -166,10 +150,11 @@ private:
 	intModel m_outputChannelModel;
 	intModel m_inputControllerModel;
 	intModel m_outputControllerModel;
+	intModel m_fixedInputVelocityModel;
+	intModel m_fixedOutputVelocityModel;
+	intModel m_outputProgramModel;
 	boolModel m_readableModel;
 	boolModel m_writableModel;
-	boolModel m_defaultVelocityInEnabledModel;
-	boolModel m_defaultVelocityOutEnabledModel;
 
 	map m_readablePorts;
 	map m_writablePorts;
@@ -177,6 +162,13 @@ private:
 
 	friend class controllerConnectionDialog;
 	friend class instrumentMidiIOView;
+
+
+signals:
+	void readablePortsChanged( void );
+	void writeablePortsChanged( void );
+	void modeChanged( void );
+
 
 } ;
 

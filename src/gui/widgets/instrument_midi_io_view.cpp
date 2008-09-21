@@ -1,5 +1,3 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * instrument_midi_io_view.cpp - MIDI-IO-View
  *
@@ -32,11 +30,10 @@
 #include "instrument_midi_io_view.h"
 #include "midi_port_menu.h"
 #include "embed.h"
+#include "group_box.h"
 #include "gui_templates.h"
-#include "led_checkbox.h"
 #include "lcd_spinbox.h"
 #include "midi_client.h"
-#include "tab_widget.h"
 #include "tooltip.h"
 
 
@@ -47,64 +44,69 @@ instrumentMidiIOView::instrumentMidiIOView( QWidget * _parent ) :
 	m_rpBtn( NULL ),
 	m_wpBtn( NULL )
 {
-	m_setupTabWidget = new tabWidget(
-					tr( "MIDI SETUP FOR THIS INSTRUMENT" ),
-									this );
-	m_setupTabWidget->setGeometry( 4, 5, 242, 200 );
+	m_midiInputGroupBox = new groupBox( tr( "ENABLE MIDI INPUT" ), this );
+	m_midiInputGroupBox->setGeometry( 4, 5, 242, 80 );
 
-	m_inputChannelSpinBox = new lcdSpinBox( 3, m_setupTabWidget );
+	m_inputChannelSpinBox = new lcdSpinBox( 3, m_midiInputGroupBox );
 	m_inputChannelSpinBox->addTextForValue( 0, "---" );
 	m_inputChannelSpinBox->setLabel( tr( "CHANNEL" ) );
-	m_inputChannelSpinBox->move( 28, 52 );
-	m_inputChannelSpinBox->setEnabled( FALSE );
+	m_inputChannelSpinBox->move( 16, 32 );
+	m_inputChannelSpinBox->setEnabled( false );
 
+	m_fixedInputVelocitySpinBox = new lcdSpinBox( 3, m_midiInputGroupBox );
+	m_fixedInputVelocitySpinBox->addTextForValue( -1, "---" );
+	m_fixedInputVelocitySpinBox->setLabel( tr( "VELOCITY" ) );
+	m_fixedInputVelocitySpinBox->move( 64, 32 );
+	m_fixedInputVelocitySpinBox->setEnabled( false );
 
-
-	m_outputChannelSpinBox = new lcdSpinBox( 3, m_setupTabWidget );
-	m_outputChannelSpinBox->setLabel( tr( "CHANNEL" ) );
-	m_outputChannelSpinBox->move( 28, 132 );
-	m_outputChannelSpinBox->setEnabled( FALSE );
-
-
-	m_receiveCheckBox = new ledCheckBox( tr( "Receive MIDI-events" ),
-				m_setupTabWidget );
-	m_receiveCheckBox->move( 10, 34 );
-	// enabling/disabling widgets is UI-stuff thus we do not use model here
-	connect( m_receiveCheckBox, SIGNAL( toggled( bool ) ),
+	connect( m_midiInputGroupBox->ledButton(), SIGNAL( toggled( bool ) ),
 			m_inputChannelSpinBox, SLOT( setEnabled( bool ) ) );
+	connect( m_midiInputGroupBox->ledButton(), SIGNAL( toggled( bool ) ),
+		m_fixedInputVelocitySpinBox, SLOT( setEnabled( bool ) ) );
 
 
-	m_defaultVelocityInCheckBox = new ledCheckBox( tr( "Equal velocity" ),
-							m_setupTabWidget );
-	m_defaultVelocityInCheckBox->move( 28, 86 );
 
+	m_midiOutputGroupBox = new groupBox( tr( "ENABLE MIDI OUTPUT" ), this );
+	m_midiOutputGroupBox->setGeometry( 4, 90, 242, 80 );
 
-	m_sendCheckBox = new ledCheckBox( tr( "Send MIDI-events" ),
-						m_setupTabWidget );
-	m_sendCheckBox->move( 10, 114 );
-	connect( m_sendCheckBox, SIGNAL( toggled( bool ) ),
+	m_outputChannelSpinBox = new lcdSpinBox( 3, m_midiOutputGroupBox );
+	m_outputChannelSpinBox->setLabel( tr( "CHANNEL" ) );
+	m_outputChannelSpinBox->move( 16, 32 );
+	m_outputChannelSpinBox->setEnabled( false );
+
+	m_fixedOutputVelocitySpinBox = new lcdSpinBox( 3, m_midiOutputGroupBox );
+	m_fixedOutputVelocitySpinBox->addTextForValue( -1, "---" );
+	m_fixedOutputVelocitySpinBox->setLabel( tr( "VELOCITY" ) );
+	m_fixedOutputVelocitySpinBox->move( 64, 32 );
+	m_fixedOutputVelocitySpinBox->setEnabled( false );
+
+	m_outputProgramSpinBox = new lcdSpinBox( 3, m_midiOutputGroupBox );
+	m_outputProgramSpinBox->setLabel( tr( "PROGRAM" ) );
+	m_outputProgramSpinBox->move( 112, 32 );
+	m_outputProgramSpinBox->setEnabled( false );
+
+	connect( m_midiOutputGroupBox->ledButton(), SIGNAL( toggled( bool ) ),
 			m_outputChannelSpinBox, SLOT( setEnabled( bool ) ) );
-
-
-	m_defaultVelocityOutCheckBox = new ledCheckBox( tr( "Equal velocity" ),
-							m_setupTabWidget );
-	m_defaultVelocityOutCheckBox->move( 28, 166 );
+	connect( m_midiOutputGroupBox->ledButton(), SIGNAL( toggled( bool ) ),
+		m_fixedOutputVelocitySpinBox, SLOT( setEnabled( bool ) ) );
+	connect( m_midiOutputGroupBox->ledButton(), SIGNAL( toggled( bool ) ),
+			m_outputProgramSpinBox, SLOT( setEnabled( bool ) ) );
 
 
 	if( !engine::getMixer()->getMidiClient()->isRaw() )
 	{
-		m_rpBtn = new QToolButton( m_setupTabWidget );
+		m_rpBtn = new QToolButton( m_midiInputGroupBox );
 		m_rpBtn->setText( tr( "MIDI-devices to receive "
 						"MIDI-events from" ) );
-		m_rpBtn->setIcon( embed::getIconPixmap( "midi_in" ) );
-		m_rpBtn->setGeometry( 186, 34, 40, 40 );
+		m_rpBtn->setIcon( embed::getIconPixmap( "piano" ) );
+		m_rpBtn->setGeometry( 186, 24, 32, 32 );
 		m_rpBtn->setPopupMode( QToolButton::InstantPopup );
 
-		m_wpBtn = new QToolButton( m_setupTabWidget );
+		m_wpBtn = new QToolButton( m_midiOutputGroupBox );
 		m_wpBtn->setText( tr( "MIDI-devices to send MIDI-events "
 								"to" ) );
-		m_wpBtn->setIcon( embed::getIconPixmap( "midi_out" ) );
-		m_wpBtn->setGeometry( 186, 114, 40, 40 );
+		m_wpBtn->setIcon( embed::getIconPixmap( "piano" ) );
+		m_wpBtn->setGeometry( 186, 24, 32, 32 );
 		m_wpBtn->setPopupMode( QToolButton::InstantPopup );
 	}
 }
@@ -122,14 +124,17 @@ instrumentMidiIOView::~instrumentMidiIOView()
 void instrumentMidiIOView::modelChanged( void )
 {
 	midiPort * mp = castModel<midiPort>();
+
+	m_midiInputGroupBox->setModel( &mp->m_readableModel );
 	m_inputChannelSpinBox->setModel( &mp->m_inputChannelModel );
+	m_fixedInputVelocitySpinBox->setModel( &mp->m_fixedInputVelocityModel );
+
+	m_midiOutputGroupBox->setModel( &mp->m_writableModel );
 	m_outputChannelSpinBox->setModel( &mp->m_outputChannelModel );
-	m_receiveCheckBox->setModel( &mp->m_readableModel );
-	m_defaultVelocityInCheckBox->setModel(
-				&mp->m_defaultVelocityInEnabledModel );
-	m_sendCheckBox->setModel( &mp->m_writableModel );
-	m_defaultVelocityOutCheckBox->setModel(
-				&mp->m_defaultVelocityOutEnabledModel );
+	m_fixedOutputVelocitySpinBox->setModel(
+					&mp->m_fixedOutputVelocityModel );
+	m_outputProgramSpinBox->setModel( &mp->m_outputProgramModel );
+
 	if( m_rpBtn )
 	{
 		m_rpBtn->setMenu( mp->m_readablePortsMenu );
@@ -141,4 +146,3 @@ void instrumentMidiIOView::modelChanged( void )
 }
 
 
-#endif

@@ -32,8 +32,7 @@
 #include "mv_base.h"
 
 
-class tabWidget;
-class ledCheckBox;
+class groupBox;
 class lcdSpinBox;
 class midiPortMenu;
 class QToolButton;
@@ -49,14 +48,15 @@ public:
 private:
 	virtual void modelChanged( void );
 
-	tabWidget * m_setupTabWidget;
+	groupBox * m_midiInputGroupBox;
 	lcdSpinBox * m_inputChannelSpinBox;
-	lcdSpinBox * m_outputChannelSpinBox;
-	ledCheckBox * m_receiveCheckBox;
-	ledCheckBox * m_sendCheckBox;
-	ledCheckBox * m_defaultVelocityInCheckBox;
-	ledCheckBox * m_defaultVelocityOutCheckBox;
+	lcdSpinBox * m_fixedInputVelocitySpinBox;
 	QToolButton * m_rpBtn;
+
+	groupBox * m_midiOutputGroupBox;
+	lcdSpinBox * m_outputChannelSpinBox;
+	lcdSpinBox * m_fixedOutputVelocitySpinBox;
+	lcdSpinBox * m_outputProgramSpinBox;
 	QToolButton * m_wpBtn;
 
 } ;

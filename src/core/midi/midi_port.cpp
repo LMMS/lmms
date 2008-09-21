@@ -1,5 +1,3 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * midi_port.cpp - abstraction of MIDI-ports which are part of LMMS's MIDI-
  *                 sequencing system
@@ -42,7 +40,6 @@ midiPort::midiPort( const QString & _name, midiClient * _mc,
 	m_writablePortsMenu( NULL ),
 	m_midiClient( _mc ),
 	m_midiEventProcessor( _mep ),
-	m_name( _name ),
 	m_mode( _mode ),
 	m_inputChannelModel( 0, 0, MidiChannelCount, this,
 						tr( "Input channel" ) ),
@@ -52,12 +49,14 @@ midiPort::midiPort( const QString & _name, midiClient * _mc,
 						tr( "Input controller" )  ),
 	m_outputControllerModel( 0, 0, MidiControllerCount, this,
 						tr( "Output controller" )  ),
-	m_readableModel( FALSE, this, tr( "Receive MIDI-events" ) ),
-	m_writableModel( FALSE, this, tr( "Send MIDI-events" ) ),
-	m_defaultVelocityInEnabledModel( FALSE, this,
-					tr( "Default input velocity" ) ),
-	m_defaultVelocityOutEnabledModel( FALSE, this,
-					tr( "Default output velocity" ) )
+	m_fixedInputVelocityModel( -1, -1, MidiMaxVelocity, this,
+						tr( "Fixed input velocity" )  ),
+	m_fixedOutputVelocityModel( -1, -1, MidiMaxVelocity, this,
+						tr( "Fixed output velocity" )  ),
+	m_outputProgramModel( 1, 1, MidiProgramCount, this,
+						tr( "Output MIDI program" )  ),
+	m_readableModel( false, this, tr( "Receive MIDI-events" ) ),
+	m_writableModel( false, this, tr( "Send MIDI-events" ) )
 {
 	m_midiClient->addPort( this );
 
@@ -68,11 +67,13 @@ midiPort::midiPort( const QString & _name, midiClient * _mc,
 				this, SLOT( updateMidiPortMode() ) );
 	connect( &m_writableModel, SIGNAL( dataChanged() ),
 				this, SLOT( updateMidiPortMode() ) );
+	connect( &m_outputProgramModel, SIGNAL( dataChanged() ),
+				this, SLOT( updateOutputProgram() ) );
 
 
 	// when using with non-raw-clients we can provide buttons showing
 	// our port-menus when being clicked
-	if( m_midiClient->isRaw() == FALSE )
+	if( m_midiClient->isRaw() == false )
 	{
 		updateReadablePorts();
 		updateWriteablePorts();
@@ -93,8 +94,8 @@ midiPort::midiPort( const QString & _name, midiClient * _mc,
 midiPort::~midiPort()
 {
 	// unsubscribe ports
-	m_readableModel.setValue( FALSE );
-	m_writableModel.setValue( FALSE );
+	m_readableModel.setValue( false );
+	m_writableModel.setValue( false );
 
 	// and finally unregister ourself
 	m_midiClient->removePort( this );
@@ -105,7 +106,7 @@ midiPort::~midiPort()
 
 void midiPort::setName( const QString & _name )
 {
-	m_name = _name;
+	setDisplayName( _name );
 	m_midiClient->applyPortName( this );
 }
 
@@ -137,10 +138,9 @@ void midiPort::processInEvent( const midiEvent & _me, const midiTime & _time )
 			}
 		}
 		midiEvent ev = _me;
-		if( m_defaultVelocityInEnabledModel.value() == true &&
-							_me.velocity() > 0 )
+		if( fixedInputVelocity() >= 0 && _me.velocity() > 0 )
 		{
-			ev.velocity() = MidiMaxVelocity;
+			ev.velocity() = fixedInputVelocity();
 		}
 		m_midiEventProcessor->processInEvent( ev, _time );
 	}
@@ -152,8 +152,7 @@ void midiPort::processInEvent( const midiEvent & _me, const midiTime & _time )
 void midiPort::processOutEvent( const midiEvent & _me, const midiTime & _time )
 {
 	// mask event
-	if( outputEnabled() &&
-		( outputChannel() == _me.m_channel && outputChannel() != 0 ) )
+	if( outputEnabled() && outputChannel() == _me.m_channel )
 	{
 		midiEvent ev = _me;
 		// we use/display MIDI channels 1...16 but we need 0...15 for
@@ -162,10 +161,11 @@ void midiPort::processOutEvent( const midiEvent & _me, const midiTime & _time )
 		{
 			--ev.m_channel;
 		}
-		if( m_defaultVelocityOutEnabledModel.value() == true &&
-							_me.velocity() > 0 )
+		if( fixedOutputVelocity() >= 0 && _me.velocity() > 0 &&
+			( _me.m_type == MidiNoteOn ||
+					_me.m_type == MidiKeyPressure ) )
 		{
-			ev.velocity() = MidiMaxVelocity;
+			ev.velocity() = fixedOutputVelocity();
 		}
 		m_midiClient->processOutEvent( ev, _time, this );
 	}
@@ -180,11 +180,13 @@ void midiPort::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	m_outputChannelModel.saveSettings( _doc, _this, "outputchannel" );
 	m_inputControllerModel.saveSettings( _doc, _this, "inputcontroller" );
 	m_outputControllerModel.saveSettings( _doc, _this, "outputcontroller" );
+	m_fixedInputVelocityModel.saveSettings( _doc, _this,
+							"fixedinputvelocity" );
+	m_fixedOutputVelocityModel.saveSettings( _doc, _this,
+							"fixedoutputvelocity" );
+	m_outputProgramModel.saveSettings( _doc, _this, "outputprogram" );
 	m_readableModel.saveSettings( _doc, _this, "readable" );
 	m_writableModel.saveSettings( _doc, _this, "writable" );
-	m_defaultVelocityInEnabledModel.saveSettings( _doc, _this, "defvelin" );
-	m_defaultVelocityOutEnabledModel.saveSettings( _doc, _this,
-								"defvelout" );
 
 	if( inputEnabled() )
 	{
@@ -234,10 +236,11 @@ void midiPort::loadSettings( const QDomElement & _this )
 	m_outputChannelModel.loadSettings( _this, "outputchannel" );
 	m_inputControllerModel.loadSettings( _this, "inputcontroller" );
 	m_outputControllerModel.loadSettings( _this, "outputcontroller" );
+	m_fixedInputVelocityModel.loadSettings( _this, "fixedinputvelocity" );
+	m_fixedOutputVelocityModel.loadSettings( _this, "fixedoutputvelocity" );
+	m_outputProgramModel.loadSettings( _this, "outputprogram" );
 	m_readableModel.loadSettings( _this, "readable" );
 	m_writableModel.loadSettings( _this, "writable" );
-	m_defaultVelocityInEnabledModel.loadSettings( _this, "defvelin" );
-	m_defaultVelocityOutEnabledModel.loadSettings( _this, "defvelout" );
 
 	// restore connections
 
@@ -271,6 +274,34 @@ void midiPort::loadSettings( const QDomElement & _this )
 
 
 
+void midiPort::subscribeReadablePort( const QString & _port, bool _subscribe )
+{
+	m_readablePorts[_port] = _subscribe;
+	// make sure, MIDI-port is configured for input
+	if( _subscribe == true && !inputEnabled() )
+	{
+		m_readableModel.setValue( true );
+	}
+	m_midiClient->subscribeReadablePort( this, _port, _subscribe );
+}
+
+
+
+
+void midiPort::subscribeWriteablePort( const QString & _port, bool _subscribe )
+{
+	m_writablePorts[_port] = _subscribe;
+	// make sure, MIDI-port is configured for output
+	if( _subscribe == true && !outputEnabled() )
+	{
+		m_writableModel.setValue( true );
+	}
+	m_midiClient->subscribeWriteablePort( this, _port, _subscribe );
+}
+
+
+
+
 void midiPort::updateMidiPortMode( void )
 {
 	// this small lookup-table makes everything easier
@@ -290,7 +321,7 @@ void midiPort::updateMidiPortMode( void )
 			// subscribed?
 			if( it.value() )
 			{
-				subscribeReadablePort( it.key(), FALSE );
+				subscribeReadablePort( it.key(), false );
 			}
 		}
 	}
@@ -303,7 +334,7 @@ void midiPort::updateMidiPortMode( void )
 			// subscribed?
 			if( it.value() )
 			{
-				subscribeWriteablePort( it.key(), FALSE );
+				subscribeWriteablePort( it.key(), false );
 			}
 		}
 	}
@@ -325,7 +356,7 @@ void midiPort::updateReadablePorts( void )
 	for( midiPort::map::iterator it = m_readablePorts.begin();
 					it != m_readablePorts.end(); ++it )
 	{
-		if( it.value() == TRUE )
+		if( it.value() == true )
 		{
 			selected_ports.push_back( it.key() );
 		}
@@ -351,7 +382,7 @@ void midiPort::updateWriteablePorts( void )
 	for( midiPort::map::iterator it = m_writablePorts.begin();
 					it != m_writablePorts.end(); ++it )
 	{
-		if( it.value() == TRUE )
+		if( it.value() == true )
 		{
 			selected_ports.push_back( it.key() );
 		}
@@ -370,34 +401,14 @@ void midiPort::updateWriteablePorts( void )
 
 
 
-void midiPort::subscribeReadablePort( const QString & _port, bool _subscribe )
+void midiPort::updateOutputProgram( void )
 {
-	m_readablePorts[_port] = _subscribe;
-	// make sure, MIDI-port is configured for input
-	if( _subscribe == TRUE && !inputEnabled() )
-	{
-		m_readableModel.setValue( TRUE );
-	}
-	m_midiClient->subscribeReadablePort( this, _port, _subscribe );
-}
-
-
-
-
-void midiPort::subscribeWriteablePort( const QString & _port, bool _subscribe )
-{
-	m_writablePorts[_port] = _subscribe;
-	// make sure, MIDI-port is configured for output
-	if( _subscribe == TRUE && !outputEnabled() )
-	{
-		m_writableModel.setValue( TRUE );
-	}
-	m_midiClient->subscribeWriteablePort( this, _port, _subscribe );
+	processOutEvent( midiEvent( MidiProgramChange,
+					outputChannel(),
+					outputProgram()-1 ), midiTime( 0 ) );
 }
 
 
 
 #include "moc_midi_port.cxx"
 
-
-#endif

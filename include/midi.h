@@ -81,6 +81,7 @@ enum MidiMetaEvents
 
 const int MidiChannelCount = 16;
 const int MidiControllerCount = 128;
+const int MidiProgramCount = 128;
 const int MidiMaxVelocity = 127;
 
 

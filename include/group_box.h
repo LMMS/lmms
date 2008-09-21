@@ -44,6 +44,11 @@ public:
 
 	virtual void modelChanged( void );
 
+	pixmapButton * ledButton( void )
+	{
+		return m_led;
+	}
+
 
 protected:
 	virtual void mousePressEvent( QMouseEvent * _me );
