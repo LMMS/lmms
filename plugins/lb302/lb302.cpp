@@ -525,7 +525,7 @@ int lb302Synth::process(sampleFrame *outbuf, const Uint32 size)
 		sample_cnt++;
 		vcf_envpos++;
 
-		int  decay_frames = 128;
+		//int  decay_frames = 128;
 
 		// update vco
 		vco_c += vco_inc;
@@ -718,7 +718,7 @@ void lb302Synth::initNote( lb302Note *n)
 void lb302Synth::playNote( notePlayHandle * _n, bool,
 						sampleFrame * _working_buffer )
 {
-	fpp_t framesPerPeriod = engine::getMixer()->framesPerPeriod();
+	//fpp_t framesPerPeriod = engine::getMixer()->framesPerPeriod();
 
 	if( _n->isArpeggioBaseNote() )
 	{

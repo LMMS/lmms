@@ -229,13 +229,13 @@ inline long Blip_Buffer::sample_rate() const {
 
 inline void Blip_Buffer::end_frame( blip_time_t t ) {
 	offset_ += t * factor_;
-	assert(( "Blip_Buffer::end_frame(): Frame went past end of buffer",
-			samples_avail() <= (long) buffer_size_ ));
+/*	assert(( "Blip_Buffer::end_frame(): Frame went past end of buffer",
+			samples_avail() <= (long) buffer_size_ ));*/
 }
 
 inline void Blip_Buffer::remove_silence( long count ) {
-	assert(( "Blip_Buffer::remove_silence(): Tried to remove more samples than available",
-			count <= samples_avail() ));
+/*	assert(( "Blip_Buffer::remove_silence(): Tried to remove more samples than available",
+			count <= samples_avail() ));*/
 	offset_ -= blip_resampled_time_t (count) << BLIP_BUFFER_ACCURACY;
 }
 

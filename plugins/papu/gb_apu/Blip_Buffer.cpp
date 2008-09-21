@@ -119,7 +119,7 @@ long Blip_Buffer::count_samples( blip_time_t t ) const
 
 blip_time_t Blip_Buffer::count_clocks( long count ) const
 {
-	if ( count > buffer_size_ )
+	if ( count > (long) buffer_size_ )
 		count = buffer_size_;
 	
 	return ((count << BLIP_BUFFER_ACCURACY) - offset_ + (factor_ - 1)) / factor_;

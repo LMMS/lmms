@@ -314,7 +314,10 @@ void audioOSS::run( void )
 		int bytes = convertToS16( temp, frames,
 				getMixer()->masterGain(), outbuf,
 							m_convertEndian );
-		write( m_audioFD, outbuf, bytes );
+		if( write( m_audioFD, outbuf, bytes ) != bytes )
+		{
+			break;
+		}
 	}
 
 	delete[] temp;

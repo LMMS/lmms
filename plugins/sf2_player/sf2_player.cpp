@@ -22,6 +22,7 @@
  *
  */
 
+#include <QtCore/QDebug>
 #include <QtCore/QTextStream>
 #include <QtGui/QLayout>
 #include <QtGui/QLabel>
@@ -267,6 +268,8 @@ automatableModel * sf2Instrument::getChildModel( const QString & _modelName )
 	{
 		return &m_patchNum;
 	}
+	qCritical() << "requested unknown model " << _modelName;
+	return NULL;
 }
 
 

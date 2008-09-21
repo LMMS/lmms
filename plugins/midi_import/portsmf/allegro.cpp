@@ -29,7 +29,7 @@ using namespace std;
 // 4311 is type cast ponter to long warning
 // 4996 is warning against strcpy
 // 4267 is size_t to long warning
-#pragma warning(disable: 4311 4996 4267)
+//#pragma warning(disable: 4311 4996 4267)
 Alg_atoms symbol_table;
 Serial_buffer Alg_track::ser_buf; // declare the static variable
 
@@ -121,7 +121,7 @@ void Alg_parameter::show()
         printf("%s:%s", attr_name(), s);
         break;
     case 'i':
-        printf("%s:%d", attr_name(), i);
+        printf("%s:%d", attr_name(), (int) i);
         break;
     case 'l':
         printf("%s:%s", attr_name(), (l ? "t" : "f"));
@@ -601,7 +601,7 @@ void Alg_note::show()
 {
     printf("Alg_note: time %g, chan %d, dur %g, key %d, "
            "pitch %g, loud %g, attributes ",
-           time, chan, dur, key, pitch, loud);
+           time, (int) chan, dur, (int) key, pitch, loud);
     Alg_parameters_ptr parms = parameters;
     while (parms) {
         parms->parm.show();
@@ -668,8 +668,9 @@ Alg_event_ptr Alg_events::uninsert(long index)
 {
     assert(0 <= index && index < len);
     Alg_event_ptr event = events[index];
-    printf("memmove: %x from %x (%d)\n", events + index, events + index + 1,
-            sizeof(Alg_event_ptr) * (len - index - 1));
+    printf("memmove: %x from %x (%d)\n", (int) ( events + index ),
+			(int) ( events + index + 1 ),
+            (int)( sizeof(Alg_event_ptr) * (len - index - 1) ) );
     memmove(events + index, events + index + 1,
             sizeof(Alg_event_ptr) * (len - index - 1));
     len--;
@@ -1741,7 +1742,7 @@ void Alg_track::paste(double t, Alg_event_list *seq)
     assert(get_type() == 't');
     // seq can be an Alg_event_list, an Alg_track, or an Alg_seq
     // if it is an Alg_event_list, units_are_seconds must match
-    bool prev_units_are_seconds;
+    bool prev_units_are_seconds = false;
     if (seq->get_type() == 'e') {
         assert(seq->get_owner()->get_units_are_seconds() == units_are_seconds);
     } else { // make it match
@@ -2193,8 +2194,8 @@ void Alg_tracks::reset()
     // all track events are incorporated into the seq,
     // so all we need to delete are the arrays of pointers
     for (int i = 0; i < len; i++) {
-        printf("deleting track at %d (%x, this %x) = %x\n", i, &(tracks[i]), 
-               this, tracks[i]);
+        printf("deleting track at %d (%x, this %x) = %x\n", i, (int) &(tracks[i]), 
+               (int) this, (int) tracks[i]);
         delete tracks[i];
     }
     if (tracks) delete [] tracks;
@@ -2817,7 +2818,7 @@ Alg_event_ptr Alg_seq::iteration_next()
     long cur;           // a track index
     // find lowest next time of any track:
     double next = 1000000.0;
-    int i, track;
+    int i, track = 0;
     for (i = 0; i < track_list.length(); i++) {
         Alg_track &tr = track_list[i];
         cur = current[i];
@@ -2853,7 +2854,7 @@ void Alg_seq::merge_tracks()
     long notes_index = 0;
 
     Alg_event_ptr event;
-    while (event = iteration_next()) {
+    while (( event = iteration_next() )) {
         notes[notes_index++] = event;
     }
     track_list.reset(); // don't need them any more

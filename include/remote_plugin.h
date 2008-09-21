@@ -348,7 +348,7 @@ public:
 
 
 private:
-	static inline int fastMemCpy( void * _dest, const void * _src,
+	static inline void fastMemCpy( void * _dest, const void * _src,
 							const int _len )
 	{
 		// calling memcpy() for just an integer is obsolete overhead
@@ -563,7 +563,7 @@ public:
 		return m;
 	}
 
-	inline bool fetchAndProcessAllMessages( void )
+	inline void fetchAndProcessAllMessages( void )
 	{
 		while( messagesLeft() )
 		{
@@ -810,7 +810,7 @@ void remotePluginBase::sendMessage( const message & _m )
 	m_out->writeInt( _m.id );
 	m_out->writeInt( _m.data.size() );
 	int j = 0;
-	for( int i = 0; i < _m.data.size(); ++i )
+	for( unsigned int i = 0; i < _m.data.size(); ++i )
 	{
 		m_out->writeString( _m.data[i] );
 		j += _m.data[i].size();

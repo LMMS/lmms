@@ -70,12 +70,12 @@ plugin::descriptor PLUGIN_EXPORT bitinvader_plugin_descriptor =
 
 bSynth::bSynth( float * _shape, int _length, notePlayHandle * _nph, bool _interpolation,
 				float _factor, const sample_rate_t _sample_rate ) :
-	sample_length( _length ),
-	nph( _nph ),
-	interpolation( _interpolation),
-	sample_rate( _sample_rate ),
 	sample_index( 0 ),
-	sample_realindex( 0 )
+	sample_realindex( 0 ),
+	nph( _nph ),
+	sample_length( _length ),
+	sample_rate( _sample_rate ),
+	interpolation( _interpolation)
 {
 	sample_shape = new float[sample_length];
 	for (int i=0; i < _length; i++)

@@ -35,11 +35,11 @@
 
 
 audioDevice::audioDevice( const ch_cnt_t _channels, mixer * _mixer ) :
+	m_supportsCapture( false ),
 	m_sampleRate( _mixer->processingSampleRate() ),
 	m_channels( _channels ),
 	m_mixer( _mixer ),
-	m_buffer( new surroundSampleFrame[getMixer()->framesPerPeriod()] ),
-	m_supportsCapture( false )
+	m_buffer( new surroundSampleFrame[getMixer()->framesPerPeriod()] )
 {
 	int error;
 	if( ( m_srcState = src_new(

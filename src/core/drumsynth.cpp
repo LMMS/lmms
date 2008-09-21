@@ -121,7 +121,7 @@ void DrumSynth::GetEnv(int env, const char *sec, const char *key, const char *in
   char en[256], s[8];
   int i=0, o=0, ep=0;
   GetPrivateProfileString(sec, key, "0,0 100,0", en, sizeof(en), ini);
-  en[256]=0; //be safe!
+  en[255]=0; //be safe!
     
   while(en[i]!=0)
   {
@@ -261,17 +261,16 @@ int DrumSynth::GetDSFileSamples(const char *dsfile, int16_t *&wave, int channels
   char sec[32];
   char ver[32]; 
   char comment[256];
-  char percent[16];
   int commentLen=0;
 
   //generation
-  long  Length, pos=0, tpos=0, tplus, totmp, t, i, j;
+  long  Length, tpos=0, tplus, totmp, t, i, j;
   float x[3] = {0.f, 0.f, 0.f};
   float MasterTune, randmax, randmax2;
   int   MainFilter, HighPass;
   
   long  NON, NT, TON, DiON, TDroop=0, DStep;
-  float a, b=0.f, c=0.f, d=0.f, g, TT=0.f, TTT=0.f, TL, NL, F1, F2, Fsync;
+  float a, b=0.f, c=0.f, d=0.f, g, TT=0.f, TL, NL, F1, F2, Fsync;
   float TphiStart=0.f, Tphi, TDroopRate, ddF, DAtten, DGain;
   
   long  BON, BON2, BFStep, BFStep2, botmp;

@@ -276,6 +276,8 @@ private:
 mixer::mixer( void ) :
 	m_framesPerPeriod( DEFAULT_BUFFER_SIZE ),
 	m_workingBuf( NULL ),
+	m_inputBufferRead( 0 ),
+	m_inputBufferWrite( 1 ),
 	m_readBuf( NULL ),
 	m_writeBuf( NULL ),
 	m_cpuLoad( 0 ),
@@ -288,9 +290,7 @@ mixer::mixer( void ) :
 	m_masterGain( 1.0f ),
 	m_audioDev( NULL ),
 	m_oldAudioDev( NULL ),
-	m_globalMutex( QMutex::Recursive ),
-	m_inputBufferRead( 0 ),
-	m_inputBufferWrite( 1 )
+	m_globalMutex( QMutex::Recursive )
 {
 	for( int i = 0; i < 2; ++i )
 	{

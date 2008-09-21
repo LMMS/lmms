@@ -1,5 +1,61 @@
 2008-09-21	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* src/core/plugin.cpp:
+	always return a dummy model in plugin::getChildModel() for not
+	crashing if something goes wrong
+
+	* include/controller_connection_dialog.h:
+	* src/gui/controller_connection_dialog.cpp:
+	automatically enable auto-detect LED when selecting a MIDI device
+
+	* include/remote_plugin.h:
+	* src/core/audio/audio_device.cpp:
+	* src/core/audio/audio_oss.cpp:
+	* src/core/drumsynth.cpp:
+	* src/core/main.cpp:
+	* src/core/mixer.cpp:
+	* src/core/sample_record_handle.cpp:
+	* src/core/track_container.cpp:
+	* src/gui/widgets/lcd_spinbox.cpp:
+	* plugins/bit_invader/bit_invader.cpp:
+	* plugins/lb302/lb302.cpp:
+	* plugins/midi_import/portsmf/allegrosmfwr.cpp:
+	* plugins/midi_import/portsmf/allegro.cpp:
+	* plugins/midi_import/midi_import.cpp:
+	* plugins/papu/gb_apu/Blip_Buffer.cpp:
+	* plugins/papu/gb_apu/Blip_Synth.h:
+	* plugins/papu/gb_apu/blargg_source.h:
+	* plugins/papu/gb_apu/Blip_Buffer.h:
+	* plugins/sf2_player/sf2_player.cpp:
+	fixed compiler warnings
+
+	* src/core/midi/midi_alsa_seq.cpp:
+	fixed subscription of output ports
+
+	* include/group_box.h:
+	* include/midi.h:
+	* include/midi_port.h:
+	* include/instrument_midi_io_view.h:
+	* src/core/midi/midi_port.cpp:
+	* src/gui/widgets/instrument_midi_io_view.cpp:
+	* data/themes/default/midi_in.png:
+	* data/themes/default/midi_out.png:
+	refactored MIDI tab in instrumentTrackWindow which now also allows
+	setting arbitrary fixed velocity and defining a program for MIDI output
+
+	* include/midi_mapper.h:
+	* src/core/midi/midi_mapper.cpp:
+	* data/midi-maps/gm.map:
+	* data/midi-maps/YamahaPSS790.map:
+	* data/midi-maps/YamahaPSR400.map:
+	* data/midi-maps/YamahaPSR500.map:
+	* data/midi-maps/YamahaQY10.map:
+	* data/midi-maps/README:
+	removed obsolete/unused support for MIDI maps
+
+	* CMakeLists.txt:
+	enable all compiler warnings per default
+
 	* include/audio_file_ogg.h:
 	* include/audio_file_device.h:
 	* src/gui/export_project_dialog.cpp:

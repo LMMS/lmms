@@ -339,8 +339,9 @@ bool midiImport::readSMF( trackContainer * _tc )
 			if( evt->chan == -1 )
 			{
 				printf("MISSING GLOBAL THINGY\n");
-				printf("     %d %d %f %s\n", evt->chan, 
-					evt->get_type_code(), evt->time, evt->get_attribute() );
+				printf("     %d %d %f %s\n", (int) evt->chan, 
+					evt->get_type_code(), evt->time,
+							evt->get_attribute() );
 				// Global stuff
 			}
 			else if( evt->is_note() && evt->chan < 256 )
@@ -445,7 +446,7 @@ bool midiImport::readSMF( trackContainer * _tc )
 					}
 				}
 				else {
-					printf("Unhandled update: %d %d %f %s\n", evt->chan, 
+					printf("Unhandled update: %d %d %f %s\n", (int) evt->chan, 
 							evt->get_type_code(), evt->time, evt->get_attribute() );
 				}
 			}

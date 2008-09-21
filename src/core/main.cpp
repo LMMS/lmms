@@ -87,10 +87,10 @@ int main( int argc, char * * argv )
 
 	for( int i = 1; i < argc; ++i )
 	{
-		if( argc > i && ( QString( argv[i] ) == "--render" ||
+		if( argc > i && ( ( QString( argv[i] ) == "--render" ||
 					QString( argv[i] ) == "-r" ) ||
 				( QString( argv[i] ) == "--help" ||
-						QString( argv[i] ) == "-h" ) )
+						QString( argv[i] ) == "-h" ) ) )
 		{
 			core_only = TRUE;
 			break;

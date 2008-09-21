@@ -37,8 +37,8 @@
 trackContainer::trackContainer( void ) :
 	model( NULL ),
 	journallingObject(),
-	m_tracks(),
-	m_tracksMutex()
+	m_tracksMutex(),
+	m_tracks()
 {
 }
 

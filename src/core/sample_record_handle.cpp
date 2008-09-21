@@ -37,11 +37,11 @@
 
 sampleRecordHandle::sampleRecordHandle( sampleTCO * _tco ) :
 	playHandle( SamplePlayHandle ),
+	m_framesRecorded( 0 ),
+	m_minLength( _tco->length() ),
 	m_track( _tco->getTrack() ),
 	m_bbTrack( NULL ),
-	m_tco( _tco ),
-	m_framesRecorded( 0 ),
-	m_minLength( _tco->length() )
+	m_tco( _tco )
 {
 }
 
