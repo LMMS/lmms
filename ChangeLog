@@ -1,5 +1,13 @@
 2008-09-21	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* include/audio_file_ogg.h:
+	* include/audio_file_device.h:
+	* src/gui/export_project_dialog.cpp:
+	* src/core/audio/audio_file_device.cpp:
+	* src/core/audio/audio_file_ogg.cpp:
+	fixed crashes when exporting as OGG and output file can't be created
+	or OGG encoding settings are wrong
+
 	* src/core/automation_pattern.cpp:
 	fixed automationPattern::length() for cases where the key of the
 	last value was the first tick in a new tact
