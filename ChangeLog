@@ -6,6 +6,12 @@
 	* src/core/config_mgr.cpp:
 	Add support for user-configurable backgound artwork
 
+	* src/core/mmp.cpp:
+	* data/samples/drumsynth/r_b:
+	* data/samples/drumsynth/r_n_b:
+	- Fix incorrect replacement for drumsynth/misc
+	- Replace r&b,r_b with r_n_b
+
 2008-09-20	Paul Giblock <drfaygo/at/gmail/dot/com>
 
 	* plugins/sf2_player/sf2_player.cpp:

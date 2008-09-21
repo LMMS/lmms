@@ -653,20 +653,6 @@ void multimediaProject::upgrade( void )
 		}
 	}
 
-	if( version < "0.4.0-beta" )
-	{
-		QDomNodeList list;
-		list = elementsByTagName( "audiofileprocessor" );
-		for( int i = 0; !list.item( i ).isNull(); ++i )
-		{
-			QDomElement el = list.item( i ).toElement();
-			QString s = el.attribute( "src" );
-			s.replace( "drumsynth/misc ", "drumsynth/misc_" );
-			s.replace( "drumsynth/r&b", "drumsynth/r_b" );
-			el.setAttribute( "src", s );
-		}
-	}
-
 	if( version < "0.4.0-beta1" )
 	{
 		// convert binary effect-key-blobs to XML
@@ -706,15 +692,19 @@ void multimediaProject::upgrade( void )
 			}
 		}
 	}
-/*	if( version < "0.4.0-beta" )
+	if( version < "0.4.0-rc2" )
 	{
-		QDomNodeList list;
-		while( !( list = elementsByTagName( "lb302" ) ).isEmpty() )
+		QDomNodeList list = elementsByTagName( "audiofileprocessor" );
+		for( int i = 0; !list.item( i ).isNull(); ++i )
 		{
-			QDomElement el = list.item( 0 ).toElement();
-			el.setTagName( "lb303" );
+			QDomElement el = list.item( i ).toElement();
+			QString s = el.attribute( "src" );
+			s.replace( "drumsynth/misc ", "drumsynth/misc_" );
+			s.replace( "drumsynth/r&b", "drumsynth/r_n_b" );
+			s.replace( "drumsynth/r_b", "drumsynth/r_n_b" );
+			el.setAttribute( "src", s );
 		}
-	}*/
+	}
 
 	// Time-signature
 	if ( !m_head.hasAttribute( "timesig_numerator" ) )
