@@ -74,9 +74,10 @@ private slots:
 	void setVSTDir( const QString & _vd );
 	void setArtworkDir( const QString & _ad );
 	void setFLDir( const QString & _fd );
-	void setLADSPADir( const QString & _fd );
-	void setSTKDir( const QString & _fd );
-	void setDefaultSoundfont( const QString & _fd );
+	void setLADSPADir( const QString & _ld );
+	void setSTKDir( const QString & _sd );
+	void setDefaultSoundfont( const QString & _sf );
+	void setBackgroundArtwork( const QString & _ba );
 	
 	// audio settings widget
 	void audioInterfaceChanged( const QString & _driver );
@@ -100,6 +101,7 @@ private slots:
 	void openLADSPADir( void );
 	void openSTKDir( void );
 	void openDefaultSoundfont( void );
+	void openBackgroundArtwork( void );
 
 	void toggleDisableChActInd( bool _disabled );
 	void toggleManualChPiano( bool _enabled );
@@ -130,6 +132,7 @@ private:
 #ifdef LMMS_HAVE_STK
 	QLineEdit * m_stkLineEdit;
 #endif
+	QLineEdit * m_baLineEdit;
 
 	QString m_workingDir;
 	QString m_vstDir;
@@ -142,6 +145,7 @@ private:
 #ifdef LMMS_HAVE_STK
 	QString m_stkDir;
 #endif
+	QString m_backgroundArtwork;
 
 	bool m_disableChActInd;
 	bool m_manualChPiano;

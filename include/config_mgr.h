@@ -153,6 +153,11 @@ public:
 	}
 #endif
 
+	const QString & backgroundArtwork( void ) const
+	{
+		return( m_backgroundArtwork );
+	}
+
 	inline const QStringList & recentlyOpenedProjects( void ) const
 	{
 		return( m_recentlyOpenedProjects );
@@ -176,6 +181,7 @@ public:
 	void setLADSPADir( const QString & _fd );
 	void setSTKDir( const QString & _fd );
 	void setDefaultSoundfont( const QString & _sf );
+	void setBackgroundArtwork( const QString & _ba );
 
 
 private:
@@ -200,6 +206,7 @@ private:
 #ifdef LMMS_HAVE_FLUIDSYNTH
 	QString m_defaultSoundfont;
 #endif
+	QString m_backgroundArtwork;
 	QStringList m_recentlyOpenedProjects;
 
 

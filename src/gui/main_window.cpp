@@ -124,7 +124,23 @@ mainWindow::mainWindow( void ) :
 							splitter ), ++id );
 
 	m_workspace = new QMdiArea( splitter );
-	m_workspace->setBackground( Qt::NoBrush );
+
+	// Load background
+	QString bgArtwork = configManager::inst()->backgroundArtwork();
+	QImage bgImage; 
+	if( !bgArtwork.isEmpty() )
+	{
+		bgImage = QImage( bgArtwork );
+	}
+	if( !bgImage.isNull() )
+	{
+		m_workspace->setBackground( bgImage );
+	}
+	else
+	{
+		m_workspace->setBackground( Qt::NoBrush );
+	}
+
 	m_workspace->setOption( QMdiArea::DontMaximizeSubWindowOnActivation );
 	m_workspace->setHorizontalScrollBarPolicy( Qt::ScrollBarAsNeeded );
 	m_workspace->setVerticalScrollBarPolicy( Qt::ScrollBarAsNeeded );

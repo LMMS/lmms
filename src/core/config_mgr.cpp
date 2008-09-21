@@ -144,6 +144,16 @@ void configManager::setDefaultSoundfont( const QString & _sf )
 
 
 
+void configManager::setBackgroundArtwork( const QString & _ba )
+{
+#ifdef LMMS_HAVE_FLUIDSYNTH
+	m_backgroundArtwork = _ba;
+#endif
+}
+
+
+
+
 void configManager::addRecentlyOpenedProject( const QString & _file )
 {
 	m_recentlyOpenedProjects.removeAll( _file );
@@ -278,6 +288,7 @@ void configManager::loadConfigFile( void )
 		#ifdef LMMS_HAVE_FLUIDSYNTH
 			setDefaultSoundfont( value( "paths", "defaultsf2" ) );
 		#endif
+			setBackgroundArtwork( value( "paths", "backgroundartwork" ) );
 		}
 		cfg_file.close();
 	}
@@ -350,6 +361,7 @@ void configManager::saveConfigFile( void )
 #ifdef LMMS_HAVE_FLUIDSYNTH
 	setValue( "paths", "defaultsf2", m_defaultSoundfont );
 #endif
+	setValue( "paths", "backgroundartwork", m_backgroundArtwork );
 
 	QDomDocument doc( "lmms-config-file" );
 

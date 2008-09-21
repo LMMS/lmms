@@ -1,3 +1,11 @@
+2008-09-21	Paul Giblock <drfaygo/at/gmail/dot/com>
+	* include/config_mgr.h:
+	* include/setup_dialog.h:
+	* src/gui/main_window.cpp:
+	* src/gui/setup_dialog.cpp:
+	* src/core/config_mgr.cpp:
+	Add support for user-configurable backgound artwork
+
 2008-09-20	Paul Giblock <drfaygo/at/gmail/dot/com>
 
 	* plugins/sf2_player/sf2_player.cpp:

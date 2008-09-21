@@ -27,6 +27,7 @@
 
 #include <QtGui/QComboBox>
 #include <QtGui/QFileDialog>
+#include <QtGui/QImageReader>
 #include <QtGui/QLabel>
 #include <QtGui/QLayout>
 #include <QtGui/QLineEdit>
@@ -109,6 +110,7 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 #ifdef LMMS_HAVE_STK
 	m_stkDir( configManager::inst()->stkDir() ),
 #endif
+	m_backgroundArtwork( configManager::inst()->backgroundArtwork() ),
 	m_disableChActInd( configManager::inst()->value( "ui",
 				"disablechannelactivityindicators" ).toInt() ),
 	m_manualChPiano( configManager::inst()->value( "ui",
@@ -235,14 +237,14 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 
 
 	QWidget * paths = new QWidget( ws );
-	int pathsHeight = 296;
+	int pathsHeight = 346;
 #ifdef LMMS_HAVE_STK
 	pathsHeight += 50;
 #endif
 #ifdef LMMS_HAVE_FLUIDSYNTH
 	pathsHeight += 50;
 #endif
-	paths->setFixedSize( 360, pathsHeight );
+	paths->setFixedSize( 410, pathsHeight );
 	QVBoxLayout * dir_layout = new QVBoxLayout( paths );
 	dir_layout->setSpacing( 0 );
 	dir_layout->setMargin( 0 );
@@ -304,6 +306,28 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 	artworkdir_select_btn->move( 320, 16 );
 	connect( artworkdir_select_btn, SIGNAL( clicked() ), this,
 						SLOT( openArtworkDir() ) );
+
+
+
+	// background artwork file
+	tabWidget * backgroundArtwork_tw = new tabWidget( tr(
+			"Background artwork" ).toUpper(), paths );
+	backgroundArtwork_tw->setFixedHeight( 48 );
+
+	m_baLineEdit = new QLineEdit( m_backgroundArtwork, 
+			backgroundArtwork_tw );
+	m_baLineEdit->setGeometry( 10, 20, 300, 16 );
+	connect( m_baLineEdit, SIGNAL( textChanged( const QString & ) ), this,
+			SLOT( setBackgroundArtwork( const QString & ) ) );
+
+	QPushButton * backgroundartworkdir_select_btn = new QPushButton(
+			embed::getIconPixmap( "project_open", 16, 16 ),
+			"", backgroundArtwork_tw );
+	backgroundartworkdir_select_btn->setFixedSize( 24, 24 );
+	backgroundartworkdir_select_btn->move( 320, 16 );
+	connect( backgroundartworkdir_select_btn, SIGNAL( clicked() ), this,
+					SLOT( openBackgroundArtwork() ) );
+
 
 
 
@@ -392,6 +416,8 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 	dir_layout->addWidget( vst_tw );
 	dir_layout->addSpacing( 10 );
 	dir_layout->addWidget( artwork_tw );
+	dir_layout->addSpacing( 10 );
+	dir_layout->addWidget( backgroundArtwork_tw );
 	dir_layout->addSpacing( 10 );
 	dir_layout->addWidget( fl_tw );
 	dir_layout->addSpacing( 10 );
@@ -718,6 +744,7 @@ void setupDialog::accept( void )
 #ifdef LMMS_HAVE_STK
 	configManager::inst()->setSTKDir( m_stkDir );
 #endif	
+	configManager::inst()->setBackgroundArtwork( m_backgroundArtwork );
 
 	// tell all audio-settings-widget to save their settings
 	for( aswMap::iterator it = m_audioIfaceSetupWidgets.begin();
@@ -983,7 +1010,7 @@ void setupDialog::openDefaultSoundfont( void )
 {
 #ifdef LMMS_HAVE_FLUIDSYNTH
 	QString new_file = QFileDialog::getOpenFileName( this,
-				tr( "Choose defeault SoundFont" ), m_defaultSoundfont, 
+				tr( "Choose default SoundFont" ), m_defaultSoundfont, 
 				"SoundFont2 Files (*.sf2)" );
 	
 	if( new_file != QString::null )
@@ -991,6 +1018,38 @@ void setupDialog::openDefaultSoundfont( void )
 		m_sfLineEdit->setText( new_file );
 	}
 #endif
+}
+
+
+
+
+void setupDialog::openBackgroundArtwork( void )
+{
+	QList<QByteArray> fileTypesList = QImageReader::supportedImageFormats();
+	QString fileTypes;
+	for( int i = 0; i < fileTypesList.count(); i++ )
+	{
+		if( fileTypesList[i] != fileTypesList[i].toUpper() )
+		{
+			if( !fileTypes.isEmpty() )
+			{
+				fileTypes += " ";
+			}
+			fileTypes += "*." + QString( fileTypesList[i] );
+		}
+	}
+
+	QString dir = ( m_backgroundArtwork.isEmpty() ) ?
+		m_artworkDir :
+		m_backgroundArtwork;
+	QString new_file = QFileDialog::getOpenFileName( this,
+			tr( "Choose background artwork" ), dir, 
+			"Image Files (" + fileTypes + ")" );
+	
+	if( new_file != QString::null )
+	{
+		m_baLineEdit->setText( new_file );
+	}
 }
 
 
@@ -1026,6 +1085,16 @@ void setupDialog::setDefaultSoundfont( const QString & _sf )
 {
 #ifdef LMMS_HAVE_FLUIDSYNTH
 	m_defaultSoundfont = _sf;
+#endif
+}
+
+
+
+
+void setupDialog::setBackgroundArtwork( const QString & _ba )
+{
+#ifdef LMMS_HAVE_FLUIDSYNTH
+	m_backgroundArtwork = _ba;
 #endif
 }
 
