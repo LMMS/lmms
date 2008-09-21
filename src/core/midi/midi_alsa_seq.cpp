@@ -100,7 +100,8 @@ midiALSASeq::~midiALSASeq()
 	{
 		m_quit = TRUE;
 		// wake up input queue
-		write( m_pipe[1], "\n", 1 );
+		if( write( m_pipe[1], "\n", 1 ) )
+			/* fix warning */;
 		wait( 1000 );
 
 		snd_seq_stop_queue( m_seqHandle, m_queueID, NULL );
@@ -225,7 +226,7 @@ void midiALSASeq::applyPortMode( midiPort * _port )
 			break;
 
 		case midiPort::Output:
-			caps[0] |= SND_SEQ_PORT_CAP_READ |
+			caps[1] |= SND_SEQ_PORT_CAP_READ |
 						SND_SEQ_PORT_CAP_SUBS_READ;
 			break;
 
@@ -244,16 +245,12 @@ void midiALSASeq::applyPortMode( midiPort * _port )
 				m_portIDs[_port][i] =
 						snd_seq_create_simple_port(
 							m_seqHandle,
-					_port->name().toAscii().constData(),
+				_port->displayName().toAscii().constData(),
 							caps[i],
 						SND_SEQ_PORT_TYPE_MIDI_GENERIC |
 						SND_SEQ_PORT_TYPE_APPLICATION );
 				continue;
 			}
-			// this C-API sucks!! normally we at least could create
-			// a local snd_seq_port_info_t variable but the type-
-			// info for this is hidden and we have to mess with
-			// pointers...
 			snd_seq_port_info_t * port_info;
 			snd_seq_port_info_malloc( &port_info );
 			snd_seq_get_port_info( m_seqHandle, m_portIDs[_port][i],
@@ -286,25 +283,16 @@ void midiALSASeq::applyPortName( midiPort * _port )
 		{
 			continue;
 		}
-		// this C-API sucks!! normally we at least could create a local
-		// snd_seq_port_info_t variable but the type-info for this is
-		// hidden and we have to mess with pointers...
 		snd_seq_port_info_t * port_info;
 		snd_seq_port_info_malloc( &port_info );
 		snd_seq_get_port_info( m_seqHandle, m_portIDs[_port][i],
 							port_info );
 		snd_seq_port_info_set_name( port_info,
-					_port->name().toAscii().constData() );
+				_port->displayName().toAscii().constData() );
 		snd_seq_set_port_info( m_seqHandle, m_portIDs[_port][i],
 							port_info );
 		snd_seq_port_info_free( port_info );
 	}
-	// this small workaround would make qjackctl refresh it's MIDI-
-	// connection-window since it doesn't update it automatically if only
-	// the name of a client-port changes
-/*	snd_seq_delete_simple_port( m_seqHandle,
-			snd_seq_create_simple_port( m_seqHandle, "", 0,
-					SND_SEQ_PORT_TYPE_APPLICATION ) );*/
 }
 
 
@@ -366,10 +354,17 @@ void midiALSASeq::subscribeWriteablePort( midiPort * _port,
 						const QString & _dest,
 						bool _subscribe )
 {
-	if( !m_portIDs.contains( _port ) || m_portIDs[_port][1] < 0 )
+	if( !m_portIDs.contains( _port ) )
 	{
 		return;
 	}
+	const int pid = m_portIDs[_port][1] < 0 ? m_portIDs[_port][0] :
+							m_portIDs[_port][1];
+	if( pid < 0 )
+	{
+		return;
+	}
+
 	snd_seq_addr_t dest;
 	if( snd_seq_parse_address( m_seqHandle, &dest,
 			_dest.section( ' ', 0, 0 ).toAscii().constData() ) )
@@ -379,8 +374,7 @@ void midiALSASeq::subscribeWriteablePort( midiPort * _port,
 	}
 	snd_seq_port_info_t * port_info;
 	snd_seq_port_info_malloc( &port_info );
-	snd_seq_get_port_info( m_seqHandle, m_portIDs[_port][1] == -1,
-								port_info );
+	snd_seq_get_port_info( m_seqHandle, pid, port_info );
 	const snd_seq_addr_t * sender = snd_seq_port_info_get_addr( port_info );
 	snd_seq_port_subscribe_t * subs;
 	snd_seq_port_subscribe_malloc( &subs );
