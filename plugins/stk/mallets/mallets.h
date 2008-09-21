@@ -105,6 +105,14 @@ public:
 		return( s );
 	}
 
+	inline void setFrequency( const StkFloat _pitch )
+	{
+		if( m_voice )
+		{
+			m_voice->setFrequency( _pitch );
+		}
+	}
+
 
 protected:
 	Instrmnt * m_voice;

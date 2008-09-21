@@ -66,6 +66,10 @@
 	- Move smoothing button to a more noticable location
 	- Some coding style changes
 
+	* plugins/stk/mallets/mallets.cpp:
+	* plugins/stk/mallets/mallets.h:
+	Add support for pitch bend
+
 2008-09-20	Paul Giblock <drfaygo/at/gmail/dot/com>
 
 	* plugins/sf2_player/sf2_player.cpp:

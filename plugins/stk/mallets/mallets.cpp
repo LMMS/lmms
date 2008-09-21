@@ -267,6 +267,8 @@ void malletsInstrument::playNote( notePlayHandle * _n, bool,
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();
 
 	malletsSynth * ps = static_cast<malletsSynth *>( _n->m_pluginData );
+	ps->setFrequency( freq );
+
 	sample_t add_scale = 0.0f;
 	if( p == 10 )
 	{
