@@ -32,13 +32,17 @@
 #include <QtXml/QDomDocument>
 
 #include "lb302.h"
+#include "audio_port.h"
+#include "automatable_button.h"
 #include "engine.h"
 #include "instrument_play_handle.h"
 #include "instrument_track.h"
 #include "knob.h"
 #include "note_play_handle.h"
+#include "oscillator.h"
+#include "pixmap_button.h"
 #include "templates.h"
-#include "audio_port.h"
+#include "tooltip.h"
 
 #undef SINGLE_SOURCE_COMPILE
 #include "embed.cpp"
@@ -276,7 +280,7 @@ lb302Synth::lb302Synth( instrumentTrack * _instrumentTrack ) :
 	vcf_mod_knob( 0.1f, 0.0f, 1.0f, 0.005f, this, tr( "VCF Envelope Mod" ) ),
 	vcf_dec_knob( 0.1f, 0.0f, 1.0f, 0.005f, this, tr( "VCF Envelope Decay" ) ),
 	dist_knob( 0.0f, 0.0f, 1.0f, 0.01f, this, tr( "Distortion" ) ),
-	wave_knob( 0.0f, 0.0f, 5.0f, 1.0f, this, tr( "Waveform" ) ),
+	wave_shape( 0.0f, 0.0f, 6.0f, this, tr( "Waveform" ) ),
 	slide_dec_knob( 0.6f, 0.0f, 1.0f, 0.005f, this, tr( "Slide Decay" ) ),
 	slideToggle( FALSE, this, tr( "Slide" ) ),
 	accentToggle( FALSE, this, tr( "Accent" ) ),
@@ -375,7 +379,7 @@ void lb302Synth::saveSettings( QDomDocument & _doc,
 	vcf_mod_knob.saveSettings( _doc, _this, "vcf_mod" );
 	vcf_dec_knob.saveSettings( _doc, _this, "vcf_dec" );
 
-	wave_knob.saveSettings( _doc, _this, "shape");
+	wave_shape.saveSettings( _doc, _this, "shape");
 	dist_knob.saveSettings( _doc, _this, "dist");
 	slide_dec_knob.saveSettings( _doc, _this, "slide_dec");
 
@@ -393,9 +397,8 @@ void lb302Synth::loadSettings( const QDomElement & _this )
 	vcf_dec_knob.loadSettings( _this, "vcf_dec" );
 
 	dist_knob.loadSettings( _this, "dist");
-	wave_knob.loadSettings( _this, "shape");
 	slide_dec_knob.loadSettings( _this, "slide_dec");
-
+	wave_shape.loadSettings( _this, "shape");
 	slideToggle.loadSettings( _this, "slide");
 	deadToggle.loadSettings( _this, "dead");
 	db24Toggle.loadSettings( _this, "db24");
@@ -537,13 +540,15 @@ int lb302Synth::process(sampleFrame *outbuf, const Uint32 size)
 			}
 		}*/
 
-		switch(int(rint(wave_knob.value()))) {
+		switch(int(rint(wave_shape.value()))) {
 			case 0: vco_shape = SAWTOOTH; break;
-			case 1: vco_shape = INVERTED_SAWTOOTH; break;
-			case 2: vco_shape = TRIANGLE; break;
-			case 3: vco_shape = SQUARE; break;
-			case 4: vco_shape = ROUND_SQUARE; break;
-			case 5: vco_shape = MOOG; break;
+			case 1: vco_shape = TRIANGLE; break;
+			case 2: vco_shape = SQUARE; break;
+			case 3: vco_shape = ROUND_SQUARE; break;
+			case 4: vco_shape = MOOG; break;
+			case 5: vco_shape = SINE; break;
+			case 6: vco_shape = EXPONENTIAL; break;
+			case 7: vco_shape = WHITE_NOISE; break;
 			default:  vco_shape = SAWTOOTH; break;
 		}
 
@@ -552,10 +557,6 @@ int lb302Synth::process(sampleFrame *outbuf, const Uint32 size)
 		switch (vco_shape) {
 			case SAWTOOTH: // p0: curviness of line
 				vco_k = vco_c;  // Is this sawtooth backwards?
-				break;
-
-			case INVERTED_SAWTOOTH: // p0: curviness of line
-				vco_k = -vco_c;  // Is this sawtooth backwards?
 				break;
 
 			case TRIANGLE:  // p0: duty rev.saw<->triangle<->saw p1: curviness
@@ -583,6 +584,19 @@ int lb302Synth::process(sampleFrame *outbuf, const Uint32 size)
 					vco_k = 0.5 - sqrtf(1.0-(w*w));
 				}
 				vco_k *= 2.0;  // MOOG wave gets filtered away 
+				break;
+
+			case SINE:
+				// [-0.5, 0.5]  : [-pi, pi]
+				vco_k = 0.5f * oscillator::sinSample( vco_c );
+				break;
+
+			case EXPONENTIAL:
+				vco_k = 0.5 * oscillator::expSample( vco_c );
+				break;
+
+			case WHITE_NOISE:
+				vco_k = 0.5 * oscillator::noiseSample( vco_c );
 				break;
 		}
 
@@ -841,11 +855,97 @@ lb302SynthView::lb302SynthView( instrument * _instrument, QWidget * _parent ) :
 	m_distKnob->setLabel( tr( "DIST"));
 
 
-	m_waveKnob = new knob( knobBright_26, this );
-	m_waveKnob->move( 120, 75 );
-	m_waveKnob->setHintText( tr( "WAVE:" ) + " ", "" );
-	m_waveKnob->setLabel( tr( "WAVE"));
+	// Shapes
+	// move to 120,75
+	const int waveBtnX = 10;
+	const int waveBtnY = 96;
+	pixmapButton * sawWaveBtn = new pixmapButton( this, tr( "Saw wave" ) );
+	sawWaveBtn->move( waveBtnX, waveBtnY );
+	sawWaveBtn->setActiveGraphic( embed::getIconPixmap(
+						"saw_wave_active" ) );
+	sawWaveBtn->setInactiveGraphic( embed::getIconPixmap(
+						"saw_wave_inactive" ) );
+	toolTip::add( sawWaveBtn,
+			tr( "Click here for a saw-wave." ) );
 
+	pixmapButton * triangleWaveBtn =
+		new pixmapButton( this, tr( "Triangle wave" ) );
+	triangleWaveBtn->move( waveBtnX+(16*1), waveBtnY );
+	triangleWaveBtn->setActiveGraphic(
+		embed::getIconPixmap( "triangle_wave_active" ) );
+	triangleWaveBtn->setInactiveGraphic(
+		embed::getIconPixmap( "triangle_wave_inactive" ) );
+	toolTip::add( triangleWaveBtn,
+			tr( "Click here for a triangle-wave." ) );
+
+	pixmapButton * sqrWaveBtn = new pixmapButton( this, tr( "Square wave" ) );
+	sqrWaveBtn->move( waveBtnX+(16*2), waveBtnY );
+	sqrWaveBtn->setActiveGraphic( embed::getIconPixmap(
+					"square_wave_active" ) );
+	sqrWaveBtn->setInactiveGraphic( embed::getIconPixmap(
+					"square_wave_inactive" ) );
+	toolTip::add( sqrWaveBtn,
+			tr( "Click here for a square-wave." ) );
+
+	pixmapButton * roundSqrWaveBtn =
+		new pixmapButton( this, tr( "Rounded square wave" ) );
+	roundSqrWaveBtn->move( waveBtnX+(16*3), waveBtnY );
+	roundSqrWaveBtn->setActiveGraphic( embed::getIconPixmap(
+					"round_square_wave_active" ) );
+	roundSqrWaveBtn->setInactiveGraphic( embed::getIconPixmap(
+					"round_square_wave_inactive" ) );
+	toolTip::add( roundSqrWaveBtn,
+			tr( "Click here for a square-wave with a rounded end." ) );
+	
+	pixmapButton * moogWaveBtn =	
+		new pixmapButton( this, tr( "Moog wave" ) );
+	moogWaveBtn->move( waveBtnX+(16*4), waveBtnY );
+	moogWaveBtn->setActiveGraphic(
+		embed::getIconPixmap( "moog_saw_wave_active" ) );
+	moogWaveBtn->setInactiveGraphic(
+		embed::getIconPixmap( "moog_saw_wave_inactive" ) );
+	toolTip::add( moogWaveBtn,
+			tr( "Click here for a moog-like wave." ) );
+
+	pixmapButton * sinWaveBtn = new pixmapButton( this, tr( "Sine wave" ) );
+	sinWaveBtn->move( waveBtnX+(16*5), waveBtnY );
+	sinWaveBtn->setActiveGraphic( embed::getIconPixmap(
+						"sin_wave_active" ) );
+	sinWaveBtn->setInactiveGraphic( embed::getIconPixmap(
+						"sin_wave_inactive" ) );
+	toolTip::add( sinWaveBtn,
+			tr( "Click for a sine-wave." ) );
+
+	pixmapButton * exponentialWaveBtn =
+		new pixmapButton( this, tr( "White noise wave" ) );
+	exponentialWaveBtn->move( waveBtnX+(16*6), waveBtnY );
+	exponentialWaveBtn->setActiveGraphic(
+		embed::getIconPixmap( "exp_wave_active" ) );
+	exponentialWaveBtn->setInactiveGraphic(
+		embed::getIconPixmap( "exp_wave_inactive" ) );
+	toolTip::add( exponentialWaveBtn,
+			tr( "Click here for an exponential wave." ) );
+
+
+	pixmapButton * whiteNoiseWaveBtn =
+		new pixmapButton( this, tr( "White noise wave" ) );
+	whiteNoiseWaveBtn->move( waveBtnX+(16*7), waveBtnY );
+	whiteNoiseWaveBtn->setActiveGraphic(
+		embed::getIconPixmap( "white_noise_wave_active" ) );
+	whiteNoiseWaveBtn->setInactiveGraphic(
+		embed::getIconPixmap( "white_noise_wave_inactive" ) );
+	toolTip::add( whiteNoiseWaveBtn,
+			tr( "Click here for white-noise." ) );
+
+	m_waveBtnGrp = new automatableButtonGroup( this );
+	m_waveBtnGrp->addButton( sawWaveBtn );
+	m_waveBtnGrp->addButton( triangleWaveBtn );
+	m_waveBtnGrp->addButton( sqrWaveBtn );
+	m_waveBtnGrp->addButton( roundSqrWaveBtn );
+	m_waveBtnGrp->addButton( moogWaveBtn );
+	m_waveBtnGrp->addButton( sinWaveBtn );
+	m_waveBtnGrp->addButton( exponentialWaveBtn );
+	m_waveBtnGrp->addButton( whiteNoiseWaveBtn );
 
 	setAutoFillBackground( TRUE );
 	QPalette pal;
@@ -871,7 +971,7 @@ void lb302SynthView::modelChanged( void )
 	m_slideDecKnob->setModel( &syn->slide_dec_knob );
 
 	m_distKnob->setModel( &syn->dist_knob );
-	m_waveKnob->setModel( &syn->wave_knob );
+	m_waveBtnGrp->setModel( &syn->wave_shape );
     
 	m_slideToggle->setModel( &syn->slideToggle );
 	m_accentToggle->setModel( &syn->accentToggle );

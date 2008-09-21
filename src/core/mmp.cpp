@@ -704,6 +704,18 @@ void multimediaProject::upgrade( void )
 			s.replace( "drumsynth/r_b", "drumsynth/r_n_b" );
 			el.setAttribute( "src", s );
 		}
+		list = elementsByTagName( "lb302" );
+		for( int i = 0; !list.item( i ).isNull(); ++i )
+		{
+			QDomElement el = list.item( i ).toElement();
+			int s = el.attribute( "shape" ).toInt();
+			if( s >= 1 )
+			{
+				s--;
+			}
+			el.setAttribute( "shape", QString("%1").arg(s) );
+		}
+
 	}
 
 	// Time-signature

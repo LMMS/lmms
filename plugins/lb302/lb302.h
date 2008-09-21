@@ -177,7 +177,7 @@ private:
 	knobModel vco_fine_detune_knob;
 
 	knobModel dist_knob;
-	knobModel wave_knob;
+	intModel wave_shape;
 	knobModel slide_dec_knob;
     
 	boolModel slideToggle;
@@ -202,7 +202,7 @@ private:
 
 	float vco_detune;
 
-	enum  vco_shape_t { SAWTOOTH, INVERTED_SAWTOOTH, SQUARE, TRIANGLE, MOOG, ROUND_SQUARE };
+	enum  vco_shape_t { SAWTOOTH, SQUARE, TRIANGLE, MOOG, ROUND_SQUARE, SINE, EXPONENTIAL, WHITE_NOISE };
 	vco_shape_t vco_shape;
 
 	// User settings
@@ -263,8 +263,8 @@ private:
 	knob * m_vcoFineDetuneKnob;
 
 	knob * m_distKnob;
-	knob * m_waveKnob;
 	knob * m_slideDecKnob;
+	automatableButtonGroup * m_waveBtnGrp;
     
 	ledCheckBox * m_slideToggle;
 	ledCheckBox * m_accentToggle;
