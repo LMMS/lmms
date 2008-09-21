@@ -197,7 +197,7 @@ IF(WANT_PULSEAUDIO)
 		SET(STATUS_PULSEAUDIO "OK")
 	ELSE(PULSEAUDIO_FOUND)
 		SET(STATUS_PULSEAUDIO "not found, please install libpulse-dev (or similiar) "
-			"if your require Portaudio support")
+			"if your require PulseAudio support")
 	ENDIF(PULSEAUDIO_FOUND)
 ENDIF(WANT_PULSEAUDIO)
 IF(NOT LMMS_HAVE_PULSEAUDIO)

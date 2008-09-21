@@ -323,6 +323,7 @@ void sf2Instrument::openFile( const QString & _sf2File )
 	// Used for loading file
 	char * sf2Ascii = qstrdup( qPrintable(
 			sampleBuffer::tryToMakeAbsolute( _sf2File ) ) );
+	QString relativePath = sampleBuffer::tryToMakeRelative( _sf2File );
 
 	// free reference to soundfont if one is selected
 	freeFont();
@@ -331,12 +332,12 @@ void sf2Instrument::openFile( const QString & _sf2File )
 	s_fontsMutex.lock();
 
 	// Increment Reference
-	if( s_fonts.contains( _sf2File ) )
+	if( s_fonts.contains( relativePath ) )
 	{
 		QTextStream cout( stdout, QIODevice::WriteOnly );
-		cout << "Using existing reference to " << _sf2File << endl;
+		cout << "Using existing reference to " << relativePath << endl;
 
-		m_font = s_fonts[ _sf2File ];
+		m_font = s_fonts[ relativePath ];
 
 		m_font->refCount++;
 
@@ -352,7 +353,7 @@ void sf2Instrument::openFile( const QString & _sf2File )
 		{
 			// Grab this sf from the top of the stack and add to list
 			m_font = new sf2Font( fluid_synth_get_sfont( m_synth, 0 ) );
-			s_fonts.insert( sampleBuffer::tryToMakeRelative( _sf2File ), m_font );
+			s_fonts.insert( relativePath, m_font );
 		}
 		else
 		{
@@ -369,7 +370,7 @@ void sf2Instrument::openFile( const QString & _sf2File )
 		// someone resolves a missing file
 		//m_patchNum.setValue( 0 );
 		//m_bankNum.setValue( 0 );
-		m_filename = sampleBuffer::tryToMakeRelative( _sf2File );
+		m_filename = relativePath;
 
 		emit fileChanged();
 	}

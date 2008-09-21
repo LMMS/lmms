@@ -1,3 +1,16 @@
+2008-09-16	Paul Giblock <drfaygo/at/gmail/dot/com>
+
+	* plugins/sf2_player/sf2_player.cpp:
+	Fix bug introduced in the last edit.  Reference sharing was not working
+	at all because the check was performed with a different filename than
+	the insert
+	
+	* plugins/vibed/logo.png:
+	Add fabi's improved vibed logo
+
+	* CMakeLists.txt:
+	Fix copy-and-paste error in a message
+
 2008-09-20	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/core/config_mgr.cpp:
