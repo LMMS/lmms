@@ -38,10 +38,10 @@ inline float comb::process(float input)
 	float output;
 
 	output = buffer[bufidx];
-	undenormalise(output);
+	undenormalise(&output);
 
 	filterstore = (output*damp2) + (filterstore*damp1);
-	undenormalise(filterstore);
+	undenormalise(&filterstore);
 
 	buffer[bufidx] = input + (filterstore*feedback);
 
