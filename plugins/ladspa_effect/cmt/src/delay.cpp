@@ -83,7 +83,7 @@ public:
 
   DelayLine(const unsigned long lSampleRate,
 	    const LADSPA_Data fMaximumDelay) 
-    : CMT_PluginInstance(4),
+    : CMT_PluginInstance(5),
       m_fSampleRate(LADSPA_Data(lSampleRate)),
       m_fMaximumDelay(fMaximumDelay) {
     /* Buffer size is a power of two bigger than max delay time. */
