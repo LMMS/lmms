@@ -47,8 +47,6 @@
 #include <stdio.h>
 #include <stdint.h>
 
-#include "lmmsconfig.h"
-
 #include <ladspa.h> 	 
 
 #define BOUNDED (LADSPA_HINT_BOUNDED_BELOW | LADSPA_HINT_BOUNDED_ABOVE)

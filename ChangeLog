@@ -1,4 +1,27 @@
+2008-09-21	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* plugins/ladspa_effect/cmt/src/delay.cpp:
+	initialize CMT_PluginDescriptor with correct number of ports
+
+	* plugins/ladspa_effect/cmt/src/freeverb/Components/allpass.h:
+	* plugins/ladspa_effect/cmt/src/freeverb/Components/comb.h:
+	* plugins/ladspa_effect/cmt/src/freeverb/Components/denormals.h:
+	fixed strict aliasing violation
+
+	* plugins/ladspa_effect/cmt/src/analogue.cpp:
+	initialize members
+
+	* plugins/ladspa_effect/swh/CMakeLists.txt:
+	* plugins/ladspa_effect/cmt/CMakeLists.txt:
+	* plugins/ladspa_effect/tap/CMakeLists.txt:
+	* plugins/ladspa_effect/caps/basics.h:
+	* plugins/ladspa_effect/CMakeLists.txt:
+	- build LADSPA-effect plugin after subdirs have been processed,
+	  otherwise LADSPA plugins are linked against Qt4 and so on
+	- compile with -fno-strict-aliasing, fixes win32 builds of plugins
+
 2008-09-21	Paul Giblock <drfaygo/at/gmail/dot/com>
+
 	* include/config_mgr.h:
 	* include/setup_dialog.h:
 	* src/gui/main_window.cpp:
