@@ -80,7 +80,7 @@ private:
 	inline Sint32 writePage( void );
 
 
-
+	bool m_ok;
 	ch_cnt_t m_channels;
 	sample_rate_t m_rate;
 

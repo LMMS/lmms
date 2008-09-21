@@ -54,7 +54,6 @@ public:
 
 protected:
 	Sint32 writeData( const void * _data, Sint32 _len );
-	void seekToBegin( void );
 
 	inline bool useVBR( void ) const
 	{

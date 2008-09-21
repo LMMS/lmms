@@ -53,7 +53,7 @@ audioFileOgg::audioFileOgg( const sample_rate_t _sample_rate,
 				_nom_bitrate, _min_bitrate, _max_bitrate,
 								_depth, _mixer )
 {
-	_success_ful = startEncoding();
+	m_ok = _success_ful = startEncoding();
 }
 
 
@@ -105,6 +105,11 @@ bool audioFileOgg::startEncoding( void )
 	}
 
 	m_rate 		= sampleRate();		// default-samplerate
+	if( m_rate > 48000 )
+	{
+		m_rate = 48000;
+		setSampleRate( 48000 );
+	}
 	m_serialNo 	= 0;			// track-num?
 	m_comments 	= &vc;			// comments for ogg-file
 
@@ -247,15 +252,18 @@ void audioFileOgg::writeBuffer( const surroundSampleFrame * _ab,
 
 void audioFileOgg::finishEncoding( void )
 {
-	// just for flushing buffers...
-	writeBuffer( NULL, 0, 0.0f );
+	if( m_ok )
+	{
+		// just for flushing buffers...
+		writeBuffer( NULL, 0, 0.0f );
 
-	// clean up
-	ogg_stream_clear( &m_os );
+		// clean up
+		ogg_stream_clear( &m_os );
 
-	vorbis_block_clear( &m_vb );
-	vorbis_dsp_clear( &m_vd );
-	vorbis_info_clear( &m_vi );
+		vorbis_block_clear( &m_vb );
+		vorbis_dsp_clear( &m_vd );
+		vorbis_info_clear( &m_vi );
+	}
 }
 
 

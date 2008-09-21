@@ -144,16 +144,23 @@ void exportProjectDialog::startBtnClicked( void )
 						depthCB->currentIndex() ) );
 
 	m_renderer = new projectRenderer( qs, os, ft, m_fileName );
-	connect( m_renderer, SIGNAL( progressChanged( int ) ),
-			progressBar, SLOT( setValue( int ) ) );
-	connect( m_renderer, SIGNAL( progressChanged( int ) ),
-			this, SLOT( updateTitleBar( int ) ) );
-	connect( m_renderer, SIGNAL( finished() ),
-			this, SLOT( accept() ) );
-	connect( m_renderer, SIGNAL( finished() ),
+	if( m_renderer->isReady() )
+	{
+		connect( m_renderer, SIGNAL( progressChanged( int ) ),
+				progressBar, SLOT( setValue( int ) ) );
+		connect( m_renderer, SIGNAL( progressChanged( int ) ),
+				this, SLOT( updateTitleBar( int ) ) );
+		connect( m_renderer, SIGNAL( finished() ),
+				this, SLOT( accept() ) );
+		connect( m_renderer, SIGNAL( finished() ),
 			engine::getMainWindow(), SLOT( resetWindowTitle() ) );
 
-	m_renderer->startProcessing();
+		m_renderer->startProcessing();
+	}
+	else
+	{
+		accept();
+	}
 }
 
 

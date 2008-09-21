@@ -80,16 +80,14 @@ audioFileDevice::~audioFileDevice()
 
 Sint32 audioFileDevice::writeData( const void * _data, Sint32 _len )
 {
-	return( m_outputFile.write( (const char *) _data, _len ) );
+	if( m_outputFile.isOpen() )
+	{
+		return m_outputFile.write( (const char *) _data, _len );
+	}
+	return -1;
 }
 
 
-
-
-void audioFileDevice::seekToBegin( void )
-{
-	m_outputFile.seek( 0 );
-}
 
 
 #endif
