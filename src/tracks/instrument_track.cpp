@@ -1259,9 +1259,19 @@ void instrumentTrackWindow::modelChanged( void )
 	
 	m_volumeKnob->setModel( &m_track->m_volumeModel );
 	m_panningKnob->setModel( &m_track->m_panningModel );
-	m_pitchKnob->setModel( &m_track->m_pitchModel );
 	m_effectChannelNumber->setModel( &m_track->m_effectChannelModel );
 	m_pianoView->setModel( &m_track->m_piano );
+
+	if( m_track->getInstrument() && m_track->getInstrument()->bendable() )
+	{
+		m_pitchKnob->setModel( &m_track->m_pitchModel );
+		m_pitchKnob->show();
+	}
+	else
+	{
+		m_pitchKnob->hide();
+		m_pitchKnob->setModel( NULL );
+	}
 
 	m_ssView->setModel( &m_track->m_soundShaping );
 	m_chordView->setModel( &m_track->m_chordCreator );
@@ -1332,6 +1342,9 @@ void instrumentTrackWindow::updateInstrumentView( void )
 								m_tabWidget );
 		m_tabWidget->addTab( m_instrumentView, tr( "PLUGIN" ), 0 );
 		m_tabWidget->setActiveTab( 0 );
+
+		modelChanged(); 		// Get the instrument window to refresh
+		m_track->dataChanged(); // Get the text on the trackButton to change
 	}
 }
 

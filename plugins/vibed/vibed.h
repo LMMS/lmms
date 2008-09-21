@@ -53,8 +53,12 @@ public:
 
 	virtual QString nodeName( void ) const;
 
-	virtual pluginView * instantiateView( QWidget * _parent );
+	inline virtual bool bendable( void ) const
+    {
+    	return( false );
+    }
 
+	virtual pluginView * instantiateView( QWidget * _parent );
 
 private:
 	QList<knobModel*> m_pickKnobs;

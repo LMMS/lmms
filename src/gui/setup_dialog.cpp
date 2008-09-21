@@ -237,14 +237,14 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 
 
 	QWidget * paths = new QWidget( ws );
-	int pathsHeight = 346;
+	int pathsHeight = 356;
 #ifdef LMMS_HAVE_STK
-	pathsHeight += 50;
+	pathsHeight += 55;
 #endif
 #ifdef LMMS_HAVE_FLUIDSYNTH
-	pathsHeight += 50;
+	pathsHeight += 55;
 #endif
-	paths->setFixedSize( 410, pathsHeight );
+	paths->setFixedSize( 360, pathsHeight );
 	QVBoxLayout * dir_layout = new QVBoxLayout( paths );
 	dir_layout->setSpacing( 0 );
 	dir_layout->setMargin( 0 );

@@ -330,7 +330,7 @@ int main( int argc, char * * argv )
 				sched_get_priority_min( SCHED_FIFO ) ) / 2;
 	if( sched_setscheduler( 0, SCHED_FIFO, &sparam ) == -1 )
 	{
-		printf( "could not set realtime priority.\n" );
+		printf( "Notice: could not set realtime priority.\n" );
 	}
 #endif
 #endif

@@ -70,6 +70,19 @@
 	* plugins/stk/mallets/mallets.h:
 	Add support for pitch bend
 
+	* src/tracks/instrument_track.cpp:
+	* include/instrument_track.h: 
+	- Correctly update instrumentTrackView when changing the instrument plugin
+	- Add bendable property to hide pitchBend knob for Vibed
+
+	* plugins/vibed/vibed.h:
+	* include/instrument.h:
+	* src/tracks/instrument_track.cpp:
+	Hide pitch bend one vibed instrument
+	
+	* src/gui/setup_dialog.cpp:
+	Minor layout fix
+
 2008-09-20	Paul Giblock <drfaygo/at/gmail/dot/com>
 
 	* plugins/sf2_player/sf2_player.cpp:

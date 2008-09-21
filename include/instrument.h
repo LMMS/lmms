@@ -90,7 +90,12 @@ public:
 	// instrument-play-handle-based instruments should return FALSE
 	inline virtual bool notePlayHandleBased( void ) const
 	{
-		return( TRUE );
+		return( true );
+	}
+
+	inline virtual bool bendable( void ) const
+	{
+		return( true );
 	}
 
 	// sub-classes can re-implement this for receiving all incoming
@@ -98,7 +103,7 @@ public:
 	inline virtual bool handleMidiEvent( const midiEvent & _me,
 						const midiTime & _time )
 	{
-		return( FALSE );
+		return( false );
 	}
 
 	virtual QString fullDisplayName( void ) const;
