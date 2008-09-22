@@ -106,7 +106,7 @@ public:
 
 	void init( const std::string & _plugin_file );
 
-	virtual bool process( const sampleFrame * _in, sampleFrame * _out );
+	virtual void process( const sampleFrame * _in, sampleFrame * _out );
 
 
 	virtual void processMidiEvent( const midiEvent & _event,
@@ -423,7 +423,7 @@ bool remoteVstPlugin::load( const std::string & _plugin_file )
 
 
 
-bool remoteVstPlugin::process( const sampleFrame * _in, sampleFrame * _out )
+void remoteVstPlugin::process( const sampleFrame * _in, sampleFrame * _out )
 {
 	// first we gonna post all MIDI-events we enqueued so far
 	if( m_midiEvents.size() )

@@ -697,7 +697,7 @@ public:
 
 	virtual bool processMessage( const message & _m );
 
-	virtual bool process( const sampleFrame * _in_buf,
+	virtual void process( const sampleFrame * _in_buf,
 					sampleFrame * _out_buf ) = 0;
 
 	virtual void processMidiEvent( const midiEvent &,
