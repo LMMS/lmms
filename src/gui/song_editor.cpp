@@ -31,6 +31,7 @@
 #include <QtGui/QLabel>
 #include <QtGui/QLayout>
 #include <QtGui/QMdiArea>
+#include <QtGui/QPainter>
 #include <QtGui/QScrollBar>
 
 #include <math.h>
@@ -50,6 +51,24 @@
 #include "tooltip.h"
 #include "visualization_widget.h"
 #include "audio_device.h"
+
+
+
+positionLine::positionLine( QWidget * _parent ) :
+	QWidget( _parent )
+{
+	setFixedWidth( 3 );
+	setAttribute( Qt::WA_NoSystemBackground, true );
+}
+
+
+
+
+void positionLine::paintEvent( QPaintEvent * _pe )
+{
+	QPainter p( this );
+	p.fillRect( rect(), QColor( 0, 0, 0, 153 ) );
+}
 
 
 
@@ -78,6 +97,8 @@ songEditor::songEditor( song * _song, songEditor * & _engine_ptr ) :
 			SLOT( updatePosition( const midiTime & ) ) );
 	connect( tl, SIGNAL( positionChanged( const midiTime & ) ),
 			this, SLOT( updatePosition( const midiTime & ) ) );
+
+	m_positionLine = new positionLine( this );
 
 
 	// add some essential widgets to global tool-bar 
@@ -228,8 +249,9 @@ songEditor::songEditor( song * _song, songEditor * & _engine_ptr ) :
 					this, SLOT( record() ), m_toolBar );
 	m_recordAccompanyButton = new toolButton( 
 			embed::getIconPixmap( "record_accompany" ),
-			tr( "Record samples from Audio-device while playing song or BB track" ),
-					this, SLOT( recordAccompany() ), m_toolBar );
+			tr( "Record samples from Audio-device while playing "
+							"song or BB track" ),
+				this, SLOT( recordAccompany() ), m_toolBar );
 
 	// FIXME: disable record button while it is not implemented
 	m_recordButton->setDisabled( true );
@@ -643,6 +665,20 @@ void songEditor::updatePosition( const midiTime & _t )
 		}
 		m_scrollBack = FALSE;
 	}
+
+	const int x = m_s->m_playPos[song::Mode_PlaySong].m_timeLine->
+							markerX( _t ) + 7;
+	if( x >= TRACK_OP_WIDTH + DEFAULT_SETTINGS_WIDGET_WIDTH-1 )
+	{
+		m_positionLine->show();
+		m_positionLine->move( x, 50 );
+	}
+	else
+	{
+		m_positionLine->hide();
+	}
+
+	m_positionLine->setFixedHeight( height() );
 }
 
 

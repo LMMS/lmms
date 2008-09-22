@@ -227,7 +227,6 @@ void timeLine::paintEvent( QPaintEvent * )
 	QColor bg_color = QApplication::palette().color( QPalette::Active,
 							QPalette::Background );
 	QLinearGradient g( 0, 0, 0, height() );
-//	g.setColorAt( 0, bg_color.darker( 250 ) );
 	g.setColorAt( 0, bg_color.lighter( 150 ) );
 	g.setColorAt( 1, bg_color.darker( 150 ) );
 	p.fillRect( 0, 0, width(), height(), g );
@@ -235,11 +234,9 @@ void timeLine::paintEvent( QPaintEvent * )
 	p.setClipRect( m_xOffset, 0, width() - m_xOffset, height() );
 	p.setPen( QColor( 0, 0, 0 ) );
 
-	const QPixmap & lpoint = *s_loopPointPixmap;
-	
 	p.setOpacity( loopPointsEnabled() ? 0.9 : 0.2 );
-	p.drawPixmap( markerX( loopBegin() )+2, 2, lpoint );
-	p.drawPixmap( markerX( loopEnd() )+2, 2, lpoint );
+	p.drawPixmap( markerX( loopBegin() )+2, 2, *s_loopPointPixmap );
+	p.drawPixmap( markerX( loopEnd() )+2, 2, *s_loopPointPixmap );
 	p.setOpacity( 1.0 );
 
 
@@ -256,8 +253,8 @@ void timeLine::paintEvent( QPaintEvent * )
 		p.drawLine( cx, 5, cx, height() - 6 );
 		++tact_num;
 		if( ( tact_num - 1 ) %
-			tMax( 1, qRound( 1.0f / 3.0f * midiTime::ticksPerTact() /
-								m_ppt ) ) == 0 )
+			tMax( 1, qRound( 1.0f / 3.0f *
+				midiTime::ticksPerTact() / m_ppt ) ) == 0 )
 		{
 			const QString s = QString::number( tact_num );
 			p.drawText( cx + qRound( ( m_ppt - p.fontMetrics().
@@ -266,9 +263,9 @@ void timeLine::paintEvent( QPaintEvent * )
 		}
 	}
 
-	p.setOpacity( 0.75 );
-	p.drawImage( m_posMarkerX, height() - s_posMarkerPixmap->height(),
-						s_posMarkerPixmap->toImage() );
+	p.setOpacity( 0.6 );
+	p.drawPixmap( m_posMarkerX, height() - s_posMarkerPixmap->height(),
+							*s_posMarkerPixmap );
 }
 
 

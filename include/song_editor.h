@@ -38,8 +38,18 @@ class lcdSpinBox;
 class meterDialog;
 class song;
 class textFloat;
+class timeLine;
 class toolButton;
 
+class positionLine : public QWidget
+{
+public:
+	positionLine( QWidget * _parent );
+
+private:
+	virtual void paintEvent( QPaintEvent * _pe );
+
+} ;
 
 
 class songEditor : public trackContainerView
@@ -112,6 +122,7 @@ private:
 
 	comboBox * m_zoomingComboBox;
 
+	positionLine * m_positionLine;
 
 	bool m_scrollBack;
 

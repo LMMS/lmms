@@ -116,6 +116,12 @@ public:
 		return( "timeline" );
 	}
 
+	inline int markerX( const midiTime & _t ) const
+	{
+		return( m_xOffset + static_cast<int>( ( _t - m_begin ) *
+					m_ppt / midiTime::ticksPerTact() ) );
+	}
+
 
 public slots:
 	void updatePosition( const midiTime & );
@@ -136,13 +142,6 @@ protected:
 
 
 private:
-	inline int markerX( const midiTime & _t ) const
-	{
-		return( m_xOffset + static_cast<int>( ( _t - m_begin ) *
-					m_ppt / midiTime::ticksPerTact() ) );
-	}
-
-
 	static QPixmap * s_timeLinePixmap;
 	static QPixmap * s_posMarkerPixmap;
 	static QPixmap * s_loopPointPixmap;
