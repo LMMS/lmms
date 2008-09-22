@@ -276,26 +276,19 @@ void midiWinMM::closeDevices( void )
 {
 	m_inputSubs.clear();
 	m_outputSubs.clear();
+
 	QMapIterator<HMIDIIN, QString> i( m_inputDevices );
 	while( i.hasNext() )
 	{
-//		i.next();
 		midiInClose( i.next().key() );
 	}
+
 	QMapIterator<HMIDIOUT, QString> o( m_outputDevices );
 	while( o.hasNext() )
 	{
-//		o.next();
 		midiOutClose( o.next().key() );
 	}
-/*	}
-	for( QList<HMIDIOUT>::const_iterator it =
-					m_outputDevices.keys().begin();
-				it != m_outputDevices.keys().end(); ++it )
-	{
-		//midiOutStop( *it );
-		midiOutClose( *it );
-	}*/
+
 	m_inputDevices.clear();
 	m_outputDevices.clear();
 }
@@ -306,7 +299,7 @@ void midiWinMM::closeDevices( void )
 void midiWinMM::openDevices( void )
 {
 	m_inputDevices.clear();
-	for( int i = 0; i < midiInGetNumDevs(); ++i )
+	for( unsigned int i = 0; i < midiInGetNumDevs(); ++i )
 	{
 		MIDIINCAPS c;
 		midiInGetDevCaps( i, &c, sizeof( c ) );
@@ -322,7 +315,7 @@ void midiWinMM::openDevices( void )
 	}
 
 	m_outputDevices.clear();
-	for( int i = 0; i < midiOutGetNumDevs(); ++i )
+	for( unsigned int i = 0; i < midiOutGetNumDevs(); ++i )
 	{
 		MIDIOUTCAPS c;
 		midiOutGetDevCaps( i, &c, sizeof( c ) );
@@ -331,7 +324,6 @@ void midiWinMM::openDevices( void )
 		if( res == MMSYSERR_NOERROR )
 		{
 			m_outputDevices[hm] = qstrdup( c.szPname );
-//			midiOutStart( hm );
 		}
 	}
 }
