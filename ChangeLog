@@ -3,6 +3,9 @@
 	* plugins/midi_import/portsmf/allegro.cpp:
 	fixed broken SVN on 64bit systems. Who needs these printfs anyways?
 
+	* plugins/lb302/lb302.cpp:
+	max wave-shape model's max match the new total of wave-shapes.
+
 2008-09-21	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/core/plugin.cpp:

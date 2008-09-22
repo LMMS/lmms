@@ -280,7 +280,7 @@ lb302Synth::lb302Synth( instrumentTrack * _instrumentTrack ) :
 	vcf_mod_knob( 0.1f, 0.0f, 1.0f, 0.005f, this, tr( "VCF Envelope Mod" ) ),
 	vcf_dec_knob( 0.1f, 0.0f, 1.0f, 0.005f, this, tr( "VCF Envelope Decay" ) ),
 	dist_knob( 0.0f, 0.0f, 1.0f, 0.01f, this, tr( "Distortion" ) ),
-	wave_shape( 0.0f, 0.0f, 6.0f, this, tr( "Waveform" ) ),
+	wave_shape( 0.0f, 0.0f, 7.0f, this, tr( "Waveform" ) ),
 	slide_dec_knob( 0.6f, 0.0f, 1.0f, 0.005f, this, tr( "Slide Decay" ) ),
 	slideToggle( FALSE, this, tr( "Slide" ) ),
 	accentToggle( FALSE, this, tr( "Accent" ) ),
