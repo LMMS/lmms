@@ -1,5 +1,12 @@
 2008-09-22	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* CMakeLists.txt:
+	package ZynAddSubFX into win32 build
+
+	* plugins/vst_base/remote_vst_plugin.cpp:
+	* include/remote_plugin.h:
+	made remotePluginClient::process() have no return value
+
 	* src/core/main.cpp:
 	* data/locale/CMakeLists.txt:
 	install and load Qt translation files on win32

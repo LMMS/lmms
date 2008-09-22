@@ -389,6 +389,7 @@ ENDIF(WIN32)
 ADD_SUBDIRECTORY(plugins)
 ADD_SUBDIRECTORY(data)
 
+
 #
 # build LMMS-binary
 #
@@ -447,6 +448,14 @@ INSTALL(FILES ${CMAKE_SOURCE_DIR}/src/3rdparty/samplerate/samplerate.h DESTINATI
 ENDIF(NOT LMMS_HAVE_SAMPLERATE)
 ENDIF(LMMS_BUILD_LINUX)
 
+# package ZynAddSubFX into win32 build
+IF(LMMS_BUILD_WIN32)
+IF(EXISTS ${CMAKE_SOURCE_DIR}/extras)
+ADD_SUBDIRECTORY(${CMAKE_SOURCE_DIR}/extras/data/presets)
+FILE(GLOB ZASF_BINARIES ${CMAKE_SOURCE_DIR}/extras/plugins/zynaddsubfx/zynaddsubfx.dll ${CMAKE_SOURCE_DIR}/extras/plugins/zynaddsubfx/remote_zynaddsubfx.exe)
+INSTALL(FILES ${ZASF_BINARIES} DESTINATION ${PLUGIN_DIR})
+ENDIF(EXISTS ${CMAKE_SOURCE_DIR}/extras)
+ENDIF(LMMS_BUILD_WIN32)
 
 #
 # add distclean-target
