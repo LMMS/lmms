@@ -1121,19 +1121,6 @@ void song::exportProject( void )
 		return;
 	}
 
-	QString base_filename;
-
-	if( m_fileName != "" )
-	{
-		base_filename = QFileInfo( m_fileName ).absolutePath() + "/" +
-				QFileInfo( m_fileName ).completeBaseName();
-	}
-	else
-	{
-		base_filename = tr( "untitled" );
-	}
- 	base_filename += __fileEncodeDevices[0].m_extension;
-
 	QFileDialog efd( engine::getMainWindow() );
 	efd.setFileMode( QFileDialog::AnyFile );
 	efd.setAcceptMode( QFileDialog::AcceptSave );
@@ -1146,7 +1133,19 @@ void song::exportProject( void )
 		++idx;
 	}
 	efd.setFilters( types );
-	efd.selectFile( base_filename );
+
+	QString base_filename;
+	if( m_fileName != "" )
+	{
+		efd.setDirectory( QFileInfo( m_fileName ).absolutePath() );
+		base_filename = QFileInfo( m_fileName ).completeBaseName();
+	}
+	else
+	{
+		efd.setDirectory( configManager::inst()->userProjectsDir() );
+		base_filename = tr( "untitled" );
+	}
+	efd.selectFile( base_filename + __fileEncodeDevices[0].m_extension );
 	efd.setWindowTitle( tr( "Select file for project-export..." ) );
 
 	if( efd.exec() == QDialog::Accepted &&

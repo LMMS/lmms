@@ -1,5 +1,15 @@
 2008-09-22	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* src/core/song.cpp:
+	fixed file-dialog for choosing export filename
+
+	* src/core/project_renderer.cpp:
+	start render-thread with normal priority on win32 as otherwise the
+	whole GUI is almost frozen
+
+	* CMakeLists.txt:
+	removed -Wstrict-aliasing=2 warning
+
 	* src/core/midi/midi_winmm.cpp:
 	cleanups
 
