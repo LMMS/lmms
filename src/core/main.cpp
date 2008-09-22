@@ -364,6 +364,7 @@ int main( int argc, char * * argv )
 		p.end();
 
 		QSplashScreen * ss = new QSplashScreen( pm );
+		ss->setAttribute( Qt::WA_PaintOnScreen, true );
 		ss->setMask( splash.alphaChannel().createMaskFromColor(
 							QColor( 0, 0, 0 ) ) );
 		ss->show();
