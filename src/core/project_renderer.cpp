@@ -130,7 +130,11 @@ void projectRenderer::startProcessing( void )
 		engine::getMixer()->setAudioDevice( m_fileDev,
 						m_qualitySettings, FALSE );
 
-		start( QThread::HighestPriority );
+		start(
+#ifndef LMMS_BUILD_WIN32
+			QThread::HighPriority
+#endif
+						);
 	}
 }
 
