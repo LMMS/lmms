@@ -668,9 +668,6 @@ Alg_event_ptr Alg_events::uninsert(long index)
 {
     assert(0 <= index && index < len);
     Alg_event_ptr event = events[index];
-    printf("memmove: %x from %x (%d)\n", (int) ( events + index ),
-			(int) ( events + index + 1 ),
-            (int)( sizeof(Alg_event_ptr) * (len - index - 1) ) );
     memmove(events + index, events + index + 1,
             sizeof(Alg_event_ptr) * (len - index - 1));
     len--;
@@ -2194,8 +2191,6 @@ void Alg_tracks::reset()
     // all track events are incorporated into the seq,
     // so all we need to delete are the arrays of pointers
     for (int i = 0; i < len; i++) {
-        printf("deleting track at %d (%x, this %x) = %x\n", i, (int) &(tracks[i]), 
-               (int) this, (int) tracks[i]);
         delete tracks[i];
     }
     if (tracks) delete [] tracks;
