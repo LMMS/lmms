@@ -63,6 +63,33 @@ void midiWinMM::processOutEvent( const midiEvent & _me,
 						const midiTime & _time,
 						const midiPort * _port )
 {
+	const DWORD short_msg = ( _me.m_type + _me.channel() ) +
+				( ( _me.m_data.m_param[0] & 0xff ) << 8 ) +
+				( ( _me.m_data.m_param[1] & 0xff ) << 16 );
+
+	QStringList out_devs;
+	for( subMap::iterator it = m_outputSubs.begin();
+						it != m_outputSubs.end(); ++it )
+	{
+		for( midiPortList::iterator jt = it.value().begin();
+						jt != it.value().end(); ++jt )
+		{
+			if( *jt == _port )
+			{
+				out_devs += it.key();
+				break;
+			}
+		}
+	}
+
+	for( QMap<HMIDIOUT, QString>::iterator it = m_outputDevices.begin();
+					it != m_outputDevices.end(); ++it )
+	{
+		if( out_devs.contains( *it ) )
+		{
+			midiOutShortMsg( it.key(), short_msg );
+		}
+	}
 }
 
 
@@ -119,7 +146,7 @@ void midiWinMM::subscribeReadablePort( midiPort * _port,
 	if( _subscribe && _port->inputEnabled() == FALSE )
 	{
 		printf( "port %s can't be (un)subscribed!\n",
-					_port->name().toAscii().constData() );
+				_port->displayName().toAscii().constData() );
 		return;
 	}
 
@@ -140,17 +167,14 @@ void midiWinMM::subscribeWriteablePort( midiPort * _port,
 	if( _subscribe && _port->outputEnabled() == FALSE )
 	{
 		printf( "port %s can't be (un)subscribed!\n",
-					_port->name().toAscii().constData() );
+				_port->displayName().toAscii().constData() );
 		return;
 	}
 
-	if( m_outputSubs.contains( _dest ) )
+	m_outputSubs[_dest].removeAll( _port );
+	if( _subscribe )
 	{
-		m_outputSubs[_dest].removeAll( _port );
-		if( _subscribe )
-		{
-			m_outputSubs[_dest].push_back( _port );
-		}
+		m_outputSubs[_dest].push_back( _port );
 	}
 }
 
@@ -294,6 +318,20 @@ void midiWinMM::openDevices( void )
 		{
 			m_inputDevices[hm] = qstrdup( c.szPname );
 			midiInStart( hm );
+		}
+	}
+
+	m_outputDevices.clear();
+	for( int i = 0; i < midiOutGetNumDevs(); ++i )
+	{
+		MIDIOUTCAPS c;
+		midiOutGetDevCaps( i, &c, sizeof( c ) );
+		HMIDIOUT hm = 0;
+		MMRESULT res = midiOutOpen( &hm, i, NULL, NULL, CALLBACK_NULL );
+		if( res == MMSYSERR_NOERROR )
+		{
+			m_outputDevices[hm] = qstrdup( c.szPname );
+//			midiOutStart( hm );
 		}
 	}
 }

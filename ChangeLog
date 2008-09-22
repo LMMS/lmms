@@ -1,3 +1,8 @@
+2008-09-22	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* src/core/midi/midi_winmm.cpp:
+	added support for MIDI out in WinMM MIDI client
+
 2008-09-22	Paul Giblock <drfaygo/at/gmail/dot/com>
 
 	* plugins/midi_import/portsmf/allegro.cpp:
