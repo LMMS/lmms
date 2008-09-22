@@ -47,6 +47,8 @@ peakController::peakController( model * _parent,
 	controller( PeakController, _parent, tr( "Peak Controller" ) ),
 	m_peakEffect( _peak_effect )
 {
+	connect( m_peakEffect, SIGNAL( destroyed( ) ),
+			this, SLOT( handleDestroyedEffect( ) ) );
 }
 
 
@@ -68,6 +70,17 @@ float peakController::value( int _offset )
 	return( 0 );
 }
 
+
+
+void peakController::handleDestroyedEffect( )
+{
+	// possible race condition...
+	printf("disconnecting effect\n");
+	disconnect( m_peakEffect );
+	m_peakEffect = NULL;
+	//deleteLater();
+	delete this;
+}
 
 
 

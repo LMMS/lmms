@@ -6,6 +6,10 @@
 	* plugins/lb302/lb302.cpp:
 	max wave-shape model's max match the new total of wave-shapes.
 
+	* include/peak_controller.h:
+	* src/core/peak_controller.cpp:
+	delete controller when effect is destroyed, but not the other way around
+
 2008-09-21	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/core/plugin.cpp:

@@ -59,7 +59,7 @@ public:
 
 public slots:
 	virtual controllerDialog * createDialog( QWidget * _parent );
-
+	void handleDestroyedEffect( ); 
 
 protected:
 	// The internal per-controller get-value function
