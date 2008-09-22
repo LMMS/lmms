@@ -45,15 +45,15 @@
 audioSDL::audioSDL( bool & _success_ful, mixer * _mixer ) :
 	audioDevice( DEFAULT_CHANNELS, _mixer ),
 	m_outBuf( new surroundSampleFrame[getMixer()->framesPerPeriod()] ),
-	m_convertedBuf_pos( 0 ),
-	m_convertEndian( FALSE ),
-	m_stop_semaphore( 1 )
+	m_convertedBufPos( 0 ),
+	m_convertEndian( false ),
+	m_stopSemaphore( 1 )
 {
 	_success_ful = FALSE;
 
-	m_convertedBuf_size = getMixer()->framesPerPeriod() * channels()
+	m_convertedBufSize = getMixer()->framesPerPeriod() * channels()
 						* sizeof( int_sample_t );
-	m_convertedBuf = new Uint8[m_convertedBuf_size];
+	m_convertedBuf = new Uint8[m_convertedBufSize];
 
 
 	if( SDL_Init( SDL_INIT_AUDIO | SDL_INIT_NOPARACHUTE ) < 0 )
@@ -82,7 +82,7 @@ audioSDL::audioSDL( bool & _success_ful, mixer * _mixer ) :
 	}
 	m_convertEndian = ( m_audioHandle.format != actual.format );
 
-	m_stop_semaphore.acquire();
+	m_stopSemaphore.acquire();
 
 	_success_ful = TRUE;
 }
@@ -93,7 +93,7 @@ audioSDL::audioSDL( bool & _success_ful, mixer * _mixer ) :
 audioSDL::~audioSDL()
 {
 	stopProcessing();
-	m_stop_semaphore.release();
+	m_stopSemaphore.release();
 
 	SDL_CloseAudio();
 	SDL_Quit();
@@ -106,10 +106,9 @@ audioSDL::~audioSDL()
 
 void audioSDL::startProcessing( void )
 {
-	m_stopped = FALSE;
+	m_stopped = false;
 
 	SDL_PauseAudio( 0 );
-	SDL_UnlockAudio();
 }
 
 
@@ -119,10 +118,11 @@ void audioSDL::stopProcessing( void )
 {
 	if( SDL_GetAudioStatus() == SDL_AUDIO_PLAYING )
 	{
-		m_stop_semaphore.acquire();
+		m_stopSemaphore.acquire();
 
 		SDL_LockAudio();
 		SDL_PauseAudio( 1 );
+		SDL_UnlockAudio();
 	}
 }
 
@@ -131,7 +131,7 @@ void audioSDL::stopProcessing( void )
 
 void audioSDL::applyQualitySettings( void )
 {
-	if( hqAudio() )
+	if( 0 )//hqAudio() )
 	{
 		SDL_CloseAudio();
 
@@ -179,18 +179,18 @@ void audioSDL::sdlAudioCallback( Uint8 * _buf, int _len )
 
 	while( _len )
 	{
-		if( m_convertedBuf_pos == 0 )
+		if( m_convertedBufPos == 0 )
 		{
 			// frames depend on the sample rate
 			const fpp_t frames = getNextBuffer( m_outBuf );
 			if( !frames )
 			{
-				m_stopped = TRUE;
-				m_stop_semaphore.release();
+				m_stopped = true;
+				m_stopSemaphore.release();
 				memset( _buf, 0, _len );
 				return;
 			}
-			m_convertedBuf_size = frames * channels()
+			m_convertedBufSize = frames * channels()
 						* sizeof( int_sample_t );
 
 			convertToS16( m_outBuf, frames,
@@ -198,13 +198,13 @@ void audioSDL::sdlAudioCallback( Uint8 * _buf, int _len )
 						(int_sample_t *)m_convertedBuf,
 						m_convertEndian );
 		}
-		const int min_len = tMin( _len, m_convertedBuf_size
-							- m_convertedBuf_pos );
-		memcpy( _buf, m_convertedBuf + m_convertedBuf_pos, min_len );
+		const int min_len = tMin( _len, m_convertedBufSize
+							- m_convertedBufPos );
+		memcpy( _buf, m_convertedBuf + m_convertedBufPos, min_len );
 		_buf += min_len;
 		_len -= min_len;
-		m_convertedBuf_pos += min_len;
-		m_convertedBuf_pos %= m_convertedBuf_size;
+		m_convertedBufPos += min_len;
+		m_convertedBufPos %= m_convertedBufSize;
 	}
 }
 

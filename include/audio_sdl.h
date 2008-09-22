@@ -78,13 +78,13 @@ private:
 
 	surroundSampleFrame * m_outBuf;
 	Uint8 * m_convertedBuf;
-	int m_convertedBuf_pos;
-	int m_convertedBuf_size;
+	int m_convertedBufPos;
+	int m_convertedBufSize;
 
 	bool m_convertEndian;
 
-	bool m_stopped;
-	QSemaphore m_stop_semaphore;
+	volatile bool m_stopped;
+	QSemaphore m_stopSemaphore;
 
 } ;
 

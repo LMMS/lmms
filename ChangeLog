@@ -1,5 +1,16 @@
 2008-09-22	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* src/core/midi/midi_winmm.cpp:
+	cleanups
+
+	* include/audio_sdl.h:
+	* src/core/audio/audio_sdl.cpp:
+	fixed deadlocks after projectRenderer ran
+
+	* src/core/main.cpp:
+	set PaintOnScreen property for splash for not taking part of
+	compositing management
+
 	* include/song_editor.h:
 	* include/timeline.h:
 	* src/core/timeline.cpp:
