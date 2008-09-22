@@ -313,6 +313,12 @@ int main( int argc, char * * argv )
 
 
 	QString pos = QLocale::system().name().left( 2 );
+
+#ifdef LMMS_BUILD_WIN32
+#undef QT_TRANSLATIONS_DIR
+#define QT_TRANSLATIONS_DIR configManager::inst()->localeDir()
+#endif
+
 #ifdef QT_TRANSLATIONS_DIR
 	// load translation for Qt-widgets/-dialogs
 	loadTranslation( QString( "qt_" ) + pos,
