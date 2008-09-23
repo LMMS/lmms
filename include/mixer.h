@@ -243,31 +243,7 @@ public:
 		return( FALSE );
 	}
 
-	void removePlayHandle( playHandle * _ph )
-	{
-		// check thread affinity as we must not delete play-handles
-		// which were created in a thread different than mixer thread
-		if( _ph->affinityMatters() &&
-				_ph->affinity() == QThread::currentThread() )
-		{
-			lockPlayHandles();
-			playHandleVector::iterator it =
-				qFind( m_playHandles.begin(),
-						m_playHandles.end(), _ph );
-			if( it != m_playHandles.end() )
-			{
-				m_playHandles.erase( it );
-			}
-			unlockPlayHandles();
-			delete _ph;
-		}
-		else
-		{
-			lockPlayHandlesToRemove();
-			m_playHandlesToRemove.push_back( _ph );
-			unlockPlayHandlesToRemove();
-		}
-	}
+	void removePlayHandle( playHandle * _ph );
 
 	inline playHandleVector & playHandles( void )
 	{

@@ -735,6 +735,7 @@ const surroundSampleFrame * mixer::renderNextBuffer( void )
 void mixer::clear( void )
 {
 	// TODO: m_midiClient->noteOffAll();
+	lockPlayHandles();
 	lockPlayHandlesToRemove();
 	for( playHandleVector::iterator it = m_playHandles.begin();
 					it != m_playHandles.end(); ++it )
@@ -747,6 +748,7 @@ void mixer::clear( void )
 		}
 	}
 	unlockPlayHandlesToRemove();
+	unlockPlayHandles();
 }
 
 
@@ -950,6 +952,34 @@ void mixer::restoreAudioDevice( void )
 	}
 }
 
+
+
+
+void mixer::removePlayHandle( playHandle * _ph )
+{
+	// check thread affinity as we must not delete play-handles
+	// which were created in a thread different than mixer thread
+	if( _ph->affinityMatters() &&
+				_ph->affinity() == QThread::currentThread() )
+	{
+		lockPlayHandles();
+		playHandleVector::iterator it =
+				qFind( m_playHandles.begin(),
+						m_playHandles.end(), _ph );
+		if( it != m_playHandles.end() )
+		{
+			m_playHandles.erase( it );
+			delete _ph;
+		}
+		unlockPlayHandles();
+	}
+	else
+	{
+		lockPlayHandlesToRemove();
+		m_playHandlesToRemove.push_back( _ph );
+		unlockPlayHandlesToRemove();
+	}
+}
 
 
 
