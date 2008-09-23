@@ -1,3 +1,21 @@
+2008-09-23	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* src/gui/file_browser.cpp:
+	if adding play handle failed for some reason, set internal pointer to
+	it to NULL
+
+	* include/play_handle.h:
+	made QThread pointer const
+
+	* include/mixer.h:
+	* src/core/mixer.cpp:
+	- lock playHandle mutex in mixer::clear()
+	- moved implementation of mixer::removePlayHandle() from header to
+	  source-file
+	- only delete play-handle in mixer::removePlayHandle() if it was
+	  found in playHandle vector (fixes crash when previewing a preset
+	  under high load)
+
 2008-09-22	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* CMakeLists.txt:

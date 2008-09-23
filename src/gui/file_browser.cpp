@@ -292,8 +292,11 @@ void listView::mousePressEvent( QMouseEvent * _me )
 		}
 		if( m_previewPlayHandle != NULL )
 		{
-			engine::getMixer()->addPlayHandle(
-							m_previewPlayHandle );
+			if( !engine::getMixer()->addPlayHandle(
+							m_previewPlayHandle ) )
+			{
+				m_previewPlayHandle = NULL;
+			}
 		}
 		m_pphMutex.unlock();
 	}
