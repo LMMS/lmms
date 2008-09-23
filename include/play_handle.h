@@ -104,7 +104,7 @@ public:
 private:
 	types m_type;
 	f_cnt_t m_offset;
-	QThread * m_affinity;
+	const QThread * m_affinity;
 
 } ;
 
