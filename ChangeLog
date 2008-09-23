@@ -3,6 +3,10 @@
 	* CMakeLists.txt:
 	made 0.4.0-rc2 release
 
+	* src/gui/song_editor.cpp:
+	* data/themes/default/playpos_marker.png:
+	improved appearence of position line
+
 	* src/gui/file_browser.cpp:
 	if adding play handle failed for some reason, set internal pointer to
 	it to NULL

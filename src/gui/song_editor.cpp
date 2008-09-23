@@ -57,7 +57,7 @@
 positionLine::positionLine( QWidget * _parent ) :
 	QWidget( _parent )
 {
-	setFixedWidth( 3 );
+	setFixedWidth( 1 );
 	setAttribute( Qt::WA_NoSystemBackground, true );
 }
 
@@ -67,7 +67,7 @@ positionLine::positionLine( QWidget * _parent ) :
 void positionLine::paintEvent( QPaintEvent * _pe )
 {
 	QPainter p( this );
-	p.fillRect( rect(), QColor( 0, 0, 0, 153 ) );
+	p.fillRect( rect(), QColor( 255, 255, 255, 153 ) );
 }
 
 
@@ -667,7 +667,7 @@ void songEditor::updatePosition( const midiTime & _t )
 	}
 
 	const int x = m_s->m_playPos[song::Mode_PlaySong].m_timeLine->
-							markerX( _t ) + 7;
+							markerX( _t ) + 8;
 	if( x >= TRACK_OP_WIDTH + DEFAULT_SETTINGS_WIDGET_WIDTH-1 )
 	{
 		m_positionLine->show();
