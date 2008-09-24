@@ -2,7 +2,7 @@
 <!DOCTYPE multimedia-project>
 <multimedia-project version="1.0" creator="Linux MultiMedia Studio (LMMS)" creatorversion="0.4.0-beta" type="instrumenttracksettings" >
   <head/>
-  <instrumenttracksettings muted="0" type="0" name="Default" >
+  <instrumenttracksettings muted="0" type="0" name="SawLead" >
     <instrumenttrack pan="0" fxch="0" pitch="0" basenote="57" vol="68" >
       <instrument name="tripleoscillator" >
         <tripleoscillator phoffset2="39" userwavefile0="" finer0="2" userwavefile1="" finer1="-2" userwavefile2="" finer2="2" coarse0="0" coarse1="0" coarse2="0" finel0="6" finel1="-2" modalgo1="2" modalgo2="2" finel2="2" pan0="0" modalgo3="0" pan1="0" stphdetun0="0" pan2="0" stphdetun1="0" wavetype0="2" stphdetun2="196" wavetype1="2" wavetype2="2" vol0="33" vol1="33" phoffset0="0" phoffset1="47" vol2="33" />
