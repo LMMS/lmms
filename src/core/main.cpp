@@ -29,6 +29,7 @@
 
 #include <QtCore/QFileInfo>
 #include <QtCore/QLocale>
+#include <QtCore/QProcess>
 #include <QtCore/QTimer>
 #include <QtCore/QTranslator>
 #include <QtGui/QApplication>
@@ -373,7 +374,10 @@ int main( int argc, char * * argv )
 		ss->setAttribute( Qt::WA_PaintOnScreen, true );
 		ss->setMask( splash.alphaChannel().createMaskFromColor(
 							QColor( 0, 0, 0 ) ) );
-		//ss->show();
+		if( !QProcess::systemEnvironment().contains( "NOSPLASH=1" ) )
+		{
+			ss->show();
+		}
 		qApp->processEvents();
 
 		// init central engine which handles all components of LMMS

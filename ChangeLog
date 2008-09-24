@@ -1,5 +1,11 @@
 2008-09-24	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* src/core/main.cpp:
+	do not show splash if environment variable NOSPLASH is set
+
+	* include/audio_portaudio.h:
+	* src/core/audio/audio_portaudio.cpp:
+	* src/core/audio/audio_pulseaudio.cpp:
 	* src/core/sample_buffer.cpp:
 	* src/core/sample_record_handle.cpp:
 	* src/tracks/sample_track.cpp:
