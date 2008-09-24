@@ -76,7 +76,7 @@ void sampleRecordHandle::play( bool /* _try_parallelizing */,
 	writeBuffer( recbuf, frames );
 	m_framesRecorded += frames;
 
-	midiTime len = m_framesRecorded / engine::framesPerTick();
+	midiTime len = (tics)( m_framesRecorded / engine::framesPerTick() );
 	if( len > m_minLength )
 	{
 //		m_tco->changeLength( len );

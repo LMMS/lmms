@@ -710,8 +710,8 @@ void sampleBuffer::visualize( QPainter & _p, const QRect & _dr,
 	for( int frame = 0; frame < m_frames; frame += fpp )
 	{
 		l[n] = QPoint( xb + ( frame * w / m_frames ),
-				yb - ( ( m_data[frame][0]+m_data[frame][1] ) *
-								y_space ) );
+			(int)( yb - ( ( m_data[frame][0]+m_data[frame][1] ) *
+								y_space ) ) );
 		++n;
 	}
 	_p.drawPolyline( l, m_frames / fpp );

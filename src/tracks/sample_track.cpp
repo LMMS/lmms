@@ -133,7 +133,7 @@ void sampleTCO::updateLength( bpm_t )
 
 midiTime sampleTCO::sampleLength( void ) const
 {
-	return( m_sampleBuffer->frames() / engine::framesPerTick() );
+	return( (int)( m_sampleBuffer->frames() / engine::framesPerTick() ) );
 }
 
 

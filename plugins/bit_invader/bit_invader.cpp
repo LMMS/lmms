@@ -221,7 +221,7 @@ void bitInvader::loadSettings( const QDomElement & _this )
 
 void bitInvader::lengthChanged( void )
 {
-	m_graph.setLength( m_sampleLength.value() );
+	m_graph.setLength( (int) m_sampleLength.value() );
 
 	normalize();
 }
