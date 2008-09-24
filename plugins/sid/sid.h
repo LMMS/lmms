@@ -117,15 +117,15 @@ protected:
   // http://www-ccrma.stanford.edu/~jos/resample/Choice_Table_Size.html
   // For a resolution of 16 bits this yields L >= 285 and L >= 51473,
   // respectively.
-  static const int FIR_N = 125;
-  static const int FIR_RES_INTERPOLATE = 285;
-  static const int FIR_RES_FAST = 51473;
-  static const int FIR_SHIFT = 15;
-  static const int RINGSIZE = 16384;
+  static const int FIR_N;
+  static const int FIR_RES_INTERPOLATE;
+  static const int FIR_RES_FAST;
+  static const int FIR_SHIFT;
+  static const int RINGSIZE;
 
   // Fixpoint constants (16.16 bits).
-  static const int FIXP_SHIFT = 16;
-  static const int FIXP_MASK = 0xffff;
+  static const int FIXP_SHIFT;
+  static const int FIXP_MASK;
 
   // Sampling variables.
   sampling_method sampling;

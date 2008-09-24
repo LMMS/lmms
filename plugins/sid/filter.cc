@@ -220,13 +220,13 @@ void Filter::reset()
 // ----------------------------------------------------------------------------
 void Filter::writeFC_LO(reg8 fc_lo)
 {
-  fc = fc & 0x7f8 | fc_lo & 0x007;
+  fc = ( fc & 0x7f8 ) | ( fc_lo & 0x007 );
   set_w0();
 }
 
 void Filter::writeFC_HI(reg8 fc_hi)
 {
-  fc = (fc_hi << 3) & 0x7f8 | fc & 0x007;
+  fc = ( (fc_hi << 3) & 0x7f8 ) | ( fc & 0x007 );
   set_w0();
 }
 
