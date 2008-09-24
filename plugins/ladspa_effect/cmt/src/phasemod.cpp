@@ -24,7 +24,6 @@
 
 /*****************************************************************************/
 
-#include <malloc.h>
 #include <math.h>
 #include <stdlib.h>
 #include "cmt.h"

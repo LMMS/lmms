@@ -1,5 +1,15 @@
 2008-09-24	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* plugins/ladspa_effect/cmt/src/syndrum.cpp:
+	* plugins/ladspa_effect/cmt/src/vcf303.cpp:
+	* plugins/ladspa_effect/cmt/src/canyondelay.cpp:
+	* plugins/ladspa_effect/cmt/src/lofi.cpp:
+	* plugins/ladspa_effect/cmt/src/phasemod.cpp:
+	* plugins/ladspa_effect/cmt/src/analogue.cpp:
+	* plugins/ladspa_effect/swh/CMakeLists.txt:
+	* CMakeLists.txt:
+	properly build on OS X
+
 	* src/core/main.cpp:
 	do not show splash if environment variable NOSPLASH is set
 
@@ -10,6 +20,10 @@
 	* src/core/sample_record_handle.cpp:
 	* src/tracks/sample_track.cpp:
 	* plugins/bit_invader/bit_invader.cpp:
+	* plugins/sid/wave.cc:
+	* plugins/sid/sid.cc:
+	* plugins/sid/sid.h:
+	* plugins/sid/filter.cc:
 	fixed compiler warnings
 
 	* src/gui/controller_connection_dialog.cpp:
