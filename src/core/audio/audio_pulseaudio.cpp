@@ -232,9 +232,7 @@ void audioPulseAudio::streamWriteCallback(pa_stream *s, size_t length)
 	surroundSampleFrame * temp = new surroundSampleFrame[fpp];
 	Sint16 * pcmbuf = (Sint16*)pa_xmalloc( fpp * channels() * sizeof(Sint16) );
 
-	int error;
-
-	int fd = 0;
+	size_t fd = 0;
 	while( fd < length/4 )
 	{
 		const fpp_t frames = getNextBuffer( temp );

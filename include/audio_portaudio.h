@@ -141,11 +141,11 @@ private:
 	bool m_wasPAInitError;
  
 	surroundSampleFrame * m_outBuf;
-	int m_outBuf_pos;
-	int m_outBuf_size;
+	int m_outBufPos;
+	int m_outBufSize;
 
 	bool m_stopped;
-	QSemaphore m_stop_semaphore;
+	QSemaphore m_stopSemaphore;
 
 } ;
 

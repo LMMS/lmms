@@ -58,14 +58,14 @@ audioPortAudio::audioPortAudio( bool & _success_ful, mixer * _mixer ) :
 		configManager::inst()->value( "audioportaudio", "channels" ).toInt(),
 					DEFAULT_CHANNELS, SURROUND_CHANNELS ),
 								_mixer ),
+	m_wasPAInitError( false ),
 	m_outBuf( new surroundSampleFrame[getMixer()->framesPerPeriod()] ),
-	m_outBuf_pos( 0 ),
-	m_stop_semaphore( 1 ),
-	m_wasPAInitError( FALSE )
+	m_outBufPos( 0 ),
+	m_stopSemaphore( 1 )
 {
 	_success_ful = FALSE;
 
-	m_outBuf_size = getMixer()->framesPerPeriod();
+	m_outBufSize = getMixer()->framesPerPeriod();
 
 	PaError err = Pa_Initialize();
 	
@@ -187,7 +187,7 @@ audioPortAudio::audioPortAudio( bool & _success_ful, mixer * _mixer ) :
 	printf( "Output device: '%s'\n", Pa_GetDeviceInfo( outDevIdx )->name );
 #endif
 
-	m_stop_semaphore.acquire();
+	m_stopSemaphore.acquire();
 
 	m_supportsCapture = TRUE;
 	_success_ful = TRUE;
@@ -199,7 +199,7 @@ audioPortAudio::audioPortAudio( bool & _success_ful, mixer * _mixer ) :
 audioPortAudio::~audioPortAudio()
 {
 	stopProcessing();
-	m_stop_semaphore.release();
+	m_stopSemaphore.release();
 
 	if( !m_wasPAInitError )
 	{
@@ -230,7 +230,7 @@ void audioPortAudio::stopProcessing( void )
 {
 	if( Pa_IsStreamActive( m_paStream ) )
 	{
-		m_stop_semaphore.acquire();
+		m_stopSemaphore.acquire();
 		
 		PaError err = Pa_StopStream( m_paStream );
 	
@@ -307,22 +307,22 @@ int audioPortAudio::process_callback(
 
 	while( _framesPerBuffer )
 	{
-		if( m_outBuf_pos == 0 )
+		if( m_outBufPos == 0 )
 		{
 			// frames depend on the sample rate
 			const fpp_t frames = getNextBuffer( m_outBuf );
 			if( !frames )
 			{
 				m_stopped = TRUE;
-				m_stop_semaphore.release();
+				m_stopSemaphore.release();
 				memset( _outputBuffer, 0, _framesPerBuffer *
 					channels() * sizeof(float) );
 				return paComplete;
 			}
-			m_outBuf_size = frames;
+			m_outBufSize = frames;
 		}
 		const int min_len = tMin( (int)_framesPerBuffer,
-			m_outBuf_size - m_outBuf_pos );
+			m_outBufSize - m_outBufPos );
 
 		float master_gain = getMixer()->masterGain();
 
@@ -338,8 +338,8 @@ int audioPortAudio::process_callback(
 
 		_outputBuffer += min_len * channels();
 		_framesPerBuffer -= min_len;
-		m_outBuf_pos += min_len;
-		m_outBuf_pos %= m_outBuf_size;
+		m_outBufPos += min_len;
+		m_outBufPos %= m_outBufSize;
 	}
 
 	return paContinue;
