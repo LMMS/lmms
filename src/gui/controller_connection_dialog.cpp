@@ -361,7 +361,10 @@ void controllerConnectionDialog::midiToggled( void )
 					&m_midiController->m_midiPort.m_inputChannelModel );
 			m_midiControllerSpinBox->setModel( 
 					&m_midiController->m_midiPort.m_inputControllerModel );
-			m_readablePorts->setModel( &m_midiController->m_midiPort );
+			if( m_readablePorts )
+			{
+				m_readablePorts->setModel( &m_midiController->m_midiPort );
+			}
 
 
 			connect( m_midiController, SIGNAL( valueChanged() ), 
