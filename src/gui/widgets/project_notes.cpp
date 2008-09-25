@@ -54,6 +54,7 @@ projectNotes::projectNotes( void ) :
 	QPalette pal;
 	pal.setColor( m_edit->backgroundRole(), QColor( 64, 64, 64 ) );
 	m_edit->setPalette( pal );
+	m_edit->show();
 
 	clear();
 
@@ -71,19 +72,11 @@ projectNotes::projectNotes( void ) :
 	setWindowTitle( tr( "Project notes" ) );
 	setWindowIcon( embed::getIconPixmap( "project_notes" ) );
 
-	if( engine::getMainWindow()->workspace() )
-	{
-		engine::getMainWindow()->workspace()->addSubWindow( this );
-		parentWidget()->setAttribute( Qt::WA_DeleteOnClose, FALSE );
-		parentWidget()->move( 700, 10 );
-		parentWidget()->resize( 400, 300 );
-		parentWidget()->hide();
-	}
-	else
-	{
-		move( 800, 10 );
-		resize( 300, 200 );
-	}
+	engine::getMainWindow()->workspace()->addSubWindow( this );
+	parentWidget()->setAttribute( Qt::WA_DeleteOnClose, false );
+	parentWidget()->move( 700, 10 );
+	parentWidget()->resize( 400, 300 );
+	parentWidget()->hide();
 }
 
 
