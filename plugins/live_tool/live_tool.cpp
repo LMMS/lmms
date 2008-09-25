@@ -23,19 +23,13 @@
  */
 
 
-#include <QtGui/QKeyEvent>
-#include <QtGui/QLayout>
-
 #include "live_tool.h"
 #include "bb_track_container.h"
 #include "engine.h"
 #include "song.h"
 
-#ifdef Q_WS_X11
-
-#include <X11/Xlib.h>
-
-#endif
+#include <QtGui/QKeyEvent>
+#include <QtGui/QLayout>
 
 #undef SINGLE_SOURCE_COMPILE
 #include "embed.cpp"
@@ -119,6 +113,8 @@ liveToolView::liveToolView( tool * _tool ) :
 
 	parentWidget()->hide();
 	parentWidget()->layout()->setSizeConstraint( QLayout::SetFixedSize );
+
+	installEventFilter( this );
 }
 
 
@@ -151,11 +147,39 @@ void liveToolView::keyPressEvent( QKeyEvent * _ke )
 				engine::getSong()->play();
 			}
 			break;
-
+		case Qt::Key_F1:
+		case Qt::Key_F2:
+		case Qt::Key_F3:
+		case Qt::Key_F4:
+		case Qt::Key_F5:
+		case Qt::Key_F6:
+		case Qt::Key_F7:
+		case Qt::Key_F8:
+		case Qt::Key_F9:
+		case Qt::Key_F10:
+		case Qt::Key_F11:
+		case Qt::Key_F12:
+			toggleInstrument( _ke->key() - Qt::Key_F1 );
+			_ke->accept();
+			break;
 		default:
 			_ke->ignore();
 			break;
 	}
+}
+
+
+
+
+bool liveToolView::eventFilter ( QObject * watched, QEvent * event )
+{
+	if( event->type() == QEvent::KeyPress )
+	{
+		QKeyEvent * ke = static_cast<QKeyEvent *>( event );
+		keyPressEvent( ke );
+		return true;
+	}
+	return toolView::eventFilter( watched, event );
 }
 
 
@@ -166,27 +190,8 @@ void liveToolView::mousePressEvent( QMouseEvent * _me )
 	// MDI window gets focus otherwise
 	setFocus();
 	_me->accept();
+	// somehow need to grab keyboard for also grabbing global shortcuts
 }
-
-
-
-
-#ifdef Q_WS_X11
-bool liveToolView::x11Event( XEvent * _xe )
-{
-	if( _xe->type == KeyPress )
-	{
-		unsigned keycode = _xe->xkey.keycode;
-		// F1 to F10
-		if( 67 <= keycode && keycode <= 76 )
-		{
-			toggleInstrument( keycode - 67 );
-			return( TRUE );
-		}
-	}
-	return( FALSE );
-}
-#endif
 
 
 
