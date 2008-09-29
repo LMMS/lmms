@@ -1,3 +1,24 @@
+2008-09-29	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* plugins/sf2_player/sf2_player.cpp:
+	use notePlayHandle::getMidiVelocty() rather than
+	notePlayHandle::getVolume() for allowing less bright sounds by
+	decreasing instrument-track's volume (if soundfont supports it)
+
+	* plugins/sf2_player/sf2_player.h:
+	* plugins/vestige/vestige.h:
+	* plugins/vibed/vibed.h:
+	* include/instrument.h:
+	* include/note_play_handle.h:
+	* src/core/note_play_handle.cpp:
+	* src/tracks/instrument_track.cpp:
+	- replaced instrument::notePlayHandleBased() with
+	  instrument::isMidiBased()
+	- renamed bendable() to isBendable()
+	- if the instrument is MIDI based and instrument-track's volume
+	  is below 100, adjust velocity of MIDI events and scaling factor when
+	  mixing sound
+
 2008-09-25	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* plugins/CMakeLists.txt:

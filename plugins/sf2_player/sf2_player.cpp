@@ -574,8 +574,8 @@ void sf2Instrument::playNote( notePlayHandle * _n, bool, sampleFrame * )
 		_n->m_pluginData = new int( midiNote );
 
 		m_synthMutex.lock();
-		fluid_synth_noteon( m_synth, 1, midiNote, qMin<int>( 127,
-						_n->getVolume()*127/100 ) );
+		fluid_synth_noteon( m_synth, 1, midiNote,
+							_n->getMidiVelocity() );
 		m_synthMutex.unlock();
 
 		m_notesRunningMutex.lock();
