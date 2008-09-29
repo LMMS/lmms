@@ -151,11 +151,12 @@ void instrumentTrack::processAudioBuffer( sampleFrame * _buf,
 	{
 		return;
 	}
-	float v_scale = (float) getVolume() / DefaultVolume;
 
 	// if effects "went to sleep" because there was no input, wake them up
 	// now
 	m_audioPort.getEffects()->startRunning();
+
+	float v_scale = (float) getVolume() / DefaultVolume;
 
 	// instruments using instrument-play-handles will call this method
 	// without any knowledge about notes, so they pass NULL for _n, which
@@ -164,6 +165,13 @@ void instrumentTrack::processAudioBuffer( sampleFrame * _buf,
 	{
 		m_soundShaping.processAudioBuffer( _buf, _frames, _n );
 		v_scale *= ( (float) _n->getVolume() / DefaultVolume );
+	}
+	else
+	{
+		if( getVolume() < DefaultVolume )
+		{
+			v_scale = 1;
+		}
 	}
 
 	m_audioPort.setNextFxChannel( m_effectChannelModel.value() );
@@ -1262,7 +1270,7 @@ void instrumentTrackWindow::modelChanged( void )
 	m_effectChannelNumber->setModel( &m_track->m_effectChannelModel );
 	m_pianoView->setModel( &m_track->m_piano );
 
-	if( m_track->getInstrument() && m_track->getInstrument()->bendable() )
+	if( m_track->getInstrument() && m_track->getInstrument()->isBendable() )
 	{
 		m_pitchKnob->setModel( &m_track->m_pitchModel );
 		m_pitchKnob->show();

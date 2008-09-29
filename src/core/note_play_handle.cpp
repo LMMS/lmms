@@ -163,10 +163,12 @@ void notePlayHandle::setVolume( const volume _volume )
 
 int notePlayHandle::getMidiVelocity( void ) const
 {
-	return tLimit<Uint16>( (Uint16) ( ( getVolume() / 100.0f ) *
-			( m_instrumentTrack->getVolume() / 100.0f ) *
-							MidiMaxVelocity ),
-						0, MidiMaxVelocity );
+	int vel = getVolume();
+	if( m_instrumentTrack->getVolume() < DefaultVolume )
+	{
+		vel = ( vel * m_instrumentTrack->getVolume() ) / DefaultVolume;
+	}
+	return( qMin( MidiMaxVelocity, vel * MidiMaxVelocity / DefaultVolume ) );
 }
 
 

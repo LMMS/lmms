@@ -76,9 +76,9 @@ public:
 		return( 0 );
 	}
 
-	virtual bool notePlayHandleBased( void ) const
+	virtual bool isMidiBased( void ) const
 	{
-		return( FALSE );
+		return( true );
 	}
 
 	virtual pluginView * instantiateView( QWidget * _parent );

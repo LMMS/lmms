@@ -21,8 +21,8 @@
  * Boston, MA 02110-1301 USA.
  *
  */
-#ifndef _VIBED_STRINGS_H
-#define _VIBED_STRINGS_H
+#ifndef _VIBED_H
+#define _VIBED_H
 
 #include "instrument.h"
 #include "instrument_view.h"
@@ -53,12 +53,13 @@ public:
 
 	virtual QString nodeName( void ) const;
 
-	inline virtual bool bendable( void ) const
-    {
-    	return( false );
-    }
+	inline virtual bool isBendable( void ) const
+	{
+		return( false );
+	}
 
 	virtual pluginView * instantiateView( QWidget * _parent );
+
 
 private:
 	QList<knobModel*> m_pickKnobs;

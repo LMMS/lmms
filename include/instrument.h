@@ -87,19 +87,21 @@ public:
 		return( 0 );
 	}
 
-	// instrument-play-handle-based instruments should return FALSE
-	inline virtual bool notePlayHandleBased( void ) const
+	// return false if instrument is not bendable
+	inline virtual bool isBendable( void ) const
 	{
 		return( true );
 	}
 
-	inline virtual bool bendable( void ) const
+	// return true if instruments reacts to MIDI events passed to
+	// handleMidiEvent() rather than playNote() & Co
+	inline virtual bool isMidiBased( void ) const
 	{
-		return( true );
+		return( false );
 	}
 
 	// sub-classes can re-implement this for receiving all incoming
-	// MIDI-events except NoteOn and NoteOff
+	// MIDI-events
 	inline virtual bool handleMidiEvent( const midiEvent & _me,
 						const midiTime & _time )
 	{

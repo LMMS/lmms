@@ -245,11 +245,12 @@ public:
 				&&
 			// we must not parallelize note-play-handles, which
 			// belong to instruments that are instrument-play-
-			// handle-driven, because then waitForWorkerThread()
+			// handle-driven (i.e. react to MIDI events),
+			// because then waitForWorkerThread()
 			// would be additionally called for each
 			// note-play-handle which results in hangups
 			m_instrumentTrack->getInstrument()->
-						notePlayHandleBased() );
+						isMidiBased() );
 	}
 
 	virtual void waitForWorkerThread( void )

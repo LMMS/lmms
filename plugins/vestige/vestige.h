@@ -67,9 +67,9 @@ public:
 
 	virtual void waitForWorkerThread( void );
 
-	virtual bool notePlayHandleBased( void ) const
+	virtual bool isMidiBased( void ) const
 	{
-		return( FALSE );
+		return( true );
 	}
 
 	virtual bool handleMidiEvent( const midiEvent & _me,
