@@ -3,7 +3,6 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.4.5)
 PROJECT(lmms)
 
 SET(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules ${CMAKE_MODULE_PATH})
-SET(CMAKE_BUILD_TYPE relwithdebinfo)
 
 IF(COMMAND CMAKE_POLICY)
 	CMAKE_POLICY(SET CMP0005 NEW)
@@ -44,7 +43,6 @@ OPTION(WANT_SWH		"Include Steve Harris's LADSPA plugins" ON)
 OPTION(WANT_TAP		"Include Tom's Audio Processing LADSPA plugins" ON)
 OPTION(WANT_VST		"Include VST support" ON)
 OPTION(WANT_WINMM	"Include WinMM MIDI support" OFF)
-OPTION(WANT_PCH		"Use precompiled headers" OFF)
 
 IF(LMMS_BUILD_WIN32)
 	SET(WANT_ALSA OFF)
@@ -87,7 +85,6 @@ CHECK_INCLUDE_FILES(ctype.h LMMS_HAVE_CTYPE_H)
 CHECK_INCLUDE_FILES(string.h LMMS_HAVE_STRING_H)
 CHECK_INCLUDE_FILES(process.h LMMS_HAVE_PROCESS_H)
 CHECK_INCLUDE_FILES(locale.h LMMS_HAVE_LOCALE_H)
-
 
 # check for Qt4
 FIND_PACKAGE(Qt4 REQUIRED)
@@ -342,9 +339,16 @@ IF(NOT LMMS_HAVE_SAMPLERATE)
 ENDIF(NOT LMMS_HAVE_SAMPLERATE)
 
 
-
 CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/lmmsconfig.h.in ${CMAKE_BINARY_DIR}/lmmsconfig.h)
 CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/lmms.rc.in ${CMAKE_BINARY_DIR}/lmms.rc)
+
+# set compiler flags
+#SET(CMAKE_BUILD_TYPE relwithdebug)
+SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O2 -g -Wall")
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 -g -fno-exceptions -Wall")
+#SET(CMAKE_C_FLAGS_${CMAKE_BUILD_TYPE} "${CMAKE_C_FLAGS}")
+#SET(CMAKE_CXX_FLAGS_${CMAKE_BUILD_TYPE} "${CMAKE_CXX_FLAGS}")
+
 
 # people simply updating SVN will still have this and mess up build with it
 FILE(REMOVE include/lmmsconfig.h)
@@ -371,7 +375,6 @@ ADD_FILE_DEPENDENCIES(${CMAKE_BINARY_DIR}/lmmsconfig.h ${lmms_MOC_out})
 
 ADD_CUSTOM_COMMAND(OUTPUT ${LMMS_ER_H} COMMAND ${BIN2RES} ARGS ${lmms_EMBEDDED_RESOURCES} > ${LMMS_ER_H} DEPENDS ${BIN2RES})
 
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-exceptions -Wall ${CXXFLAGS}")
 IF(WIN32)
 	SET(WINRC "${CMAKE_BINARY_DIR}/lmmsrc.obj")
 	ADD_CUSTOM_COMMAND(OUTPUT ${WINRC}
@@ -382,8 +385,10 @@ IF(WIN32)
 				DEPENDS ${CMAKE_BINARY_DIR}/lmms.rc)
 	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-attributes")
 ELSE(WIN32)
-	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
+	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -DPIC")
 ENDIF(WIN32)
+
+
 
 # make sub-directories
 ADD_SUBDIRECTORY(plugins)
@@ -512,17 +517,7 @@ ADD_CUSTOM_TARGET(win32-pkg
 )
 
 
-IF(WANT_PCH)
-    FIND_PACKAGE(PCHSupport)
-    IF(PCHSupport_FOUND)
-	SET(USE_PCH TRUE)
-        ADD_DEFINITIONS(-DUSE_PCH)
-        MESSAGE(STATUS "Enabling precompiled headers for GCC ${gcc_compiler_version}")
-	ADD_PRECOMPILED_HEADER(lmms pch include/pch.h)
-    ENDIF(PCHSupport_FOUND)
-ENDIF(WANT_PCH)
-
-SET_DIRECTORY_PROPERTIES(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES "${LMMS_ER_H} ${lmms_MOC_out} ${lmms_UI_out} lmmsconfig.h alsaconfig.h pch.h.gch/ lmms.1.gz")
+SET_DIRECTORY_PROPERTIES(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES "${LMMS_ER_H} ${lmms_MOC_out} ${lmms_UI_out} lmmsconfig.h alsaconfig.h lmms.1.gz")
 
 
 #
@@ -533,8 +528,7 @@ MESSAGE("\n"
 "Installation Summary\n"
 "--------------------\n"
 "* Install Directory           : ${CMAKE_INSTALL_PREFIX}\n"
-"* Build type                  : ${CMAKE_BUILD_TYPE}\n"
-"* Use precompiled headers     : ${USE_PCH}\n"
+#"* Build type                  : ${CMAKE_BUILD_TYPE}\n"
 "* Use system's libsamplerate  : ${LMMS_HAVE_SAMPLERATE}\n"
 )
 
