@@ -52,8 +52,7 @@ public:
 	}
 
 
-	virtual void play( bool _try_parallelizing,
-						sampleFrame * _working_buffer );
+	virtual void play( sampleFrame * _working_buffer );
 	virtual bool done( void ) const;
 
 	virtual bool isFromTrack( const track * _track ) const;

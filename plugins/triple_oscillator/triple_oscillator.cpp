@@ -297,7 +297,7 @@ QString tripleOscillator::nodeName( void ) const
 
 
 
-void tripleOscillator::playNote( notePlayHandle * _n, bool,
+void tripleOscillator::playNote( notePlayHandle * _n,
 						sampleFrame * _working_buffer )
 {
 	if( _n->totalFramesPlayed() == 0 || _n->m_pluginData == NULL )

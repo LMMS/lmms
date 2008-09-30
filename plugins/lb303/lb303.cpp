@@ -666,7 +666,7 @@ void lb303Synth::initNote( lb303Note *n)
 }
 
 
-void lb303Synth::playNote( notePlayHandle * _n, bool,
+void lb303Synth::playNote( notePlayHandle * _n,
 						sampleFrame * _working_buffer )
 {
 	if( _n->arpBaseNote() )
@@ -708,8 +708,7 @@ void lb303Synth::playNote( notePlayHandle * _n, bool,
 
 
 
-void lb303Synth::play( bool _try_parallelizing,
-						sampleFrame * _working_buffer )
+void lb303Synth::play( sampleFrame * _working_buffer )
 {
 	//printf(".");
 	const fpp_t frames = engine::getMixer()->framesPerPeriod();

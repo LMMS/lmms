@@ -295,7 +295,7 @@ static int sid_fillbuffer(unsigned char* sidreg, cSID *sid, int tdelta, short *p
 
 
 
-void sidInstrument::playNote( notePlayHandle * _n, bool,
+void sidInstrument::playNote( notePlayHandle * _n,
 						sampleFrame * _working_buffer )
 {
 	const f_cnt_t tfp = _n->totalFramesPlayed();

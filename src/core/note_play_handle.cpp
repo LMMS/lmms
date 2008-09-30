@@ -2,7 +2,7 @@
 
 /*
  * note_play_handle.cpp - implementation of class notePlayHandle, part of
- *                        play-engine
+ *                        rendering engine
  *
  * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
@@ -174,10 +174,9 @@ int notePlayHandle::getMidiVelocity( void ) const
 
 
 
-void notePlayHandle::play( bool _try_parallelizing,
-						sampleFrame * _working_buffer )
+void notePlayHandle::play( sampleFrame * _working_buffer )
 {
-	if( m_muted == TRUE )
+	if( m_muted )
 	{
 		return;
 	}
@@ -195,11 +194,10 @@ void notePlayHandle::play( bool _try_parallelizing,
 	if( framesLeft() > 0 )
 	{
 		// play note!
-		m_instrumentTrack->playNote( this, _try_parallelizing,
-							_working_buffer );
+		m_instrumentTrack->playNote( this, _working_buffer );
 	}
 
-	if( m_released == TRUE )
+	if( m_released )
 	{
 		f_cnt_t todo = engine::getMixer()->framesPerPeriod();
 		// if this note is base-note for arpeggio, always set
@@ -257,7 +255,7 @@ void notePlayHandle::play( bool _try_parallelizing,
 	for( notePlayHandleVector::iterator it = m_subNotes.begin();
 						it != m_subNotes.end(); )
 	{
-		( *it )->play( _try_parallelizing, _working_buffer );
+		( *it )->play( _working_buffer );
 		if( ( *it )->done() )
 		{
 			delete *it;

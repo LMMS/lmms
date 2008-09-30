@@ -1,6 +1,5 @@
 /*
- * play_handle.h - base-class playHandle which is needed by
- *                 LMMS-Player-Engine
+ * play_handle.h - base-class playHandle - core of rendering engine
  *
  * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
@@ -64,23 +63,22 @@ public:
 
 	const QThread * affinity( void ) const
 	{
-		return( m_affinity );
+		return m_affinity;
 	}
 
 	inline types type( void ) const
 	{
-		return( m_type );
+		return m_type;
 	}
 
-	virtual void play( bool _try_parallelizing,
-					sampleFrame * _working_buffer ) = 0;
+	virtual void play( sampleFrame * _working_buffer ) = 0;
 	virtual bool done( void ) const = 0;
 
 	// returns how many frames this play-handle is aligned ahead, i.e.
 	// at which position it is inserted in the according buffer
 	inline f_cnt_t offset( void ) const
 	{
-		return ( m_offset );
+		return m_offset;
 	}
 
 	inline void setOffset( f_cnt_t _offset )
@@ -90,15 +88,6 @@ public:
 
 
 	virtual bool isFromTrack( const track * _track ) const = 0;
-
-	virtual bool supportsParallelizing( void ) const
-	{
-		return( FALSE );
-	}
-
-	virtual void waitForWorkerThread( void )
-	{
-	}
 
 
 private:

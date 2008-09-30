@@ -554,7 +554,7 @@ void sf2Instrument::updateSampleRate( void )
 
 
 
-void sf2Instrument::playNote( notePlayHandle * _n, bool, sampleFrame * )
+void sf2Instrument::playNote( notePlayHandle * _n, sampleFrame * )
 {
 	const double LOG440 = 2.643452676486187424842455584439449012279510498046875f;
 
@@ -587,8 +587,7 @@ void sf2Instrument::playNote( notePlayHandle * _n, bool, sampleFrame * )
 
 // Could we get iph-based instruments support sample-exact models by using a 
 // frame-length of 1 while rendering?
-void sf2Instrument::play( bool _try_parallelizing,
-						sampleFrame * _working_buffer )
+void sf2Instrument::play( sampleFrame * _working_buffer )
 {
 	const fpp_t frames = engine::getMixer()->framesPerPeriod();
 

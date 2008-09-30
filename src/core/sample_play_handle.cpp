@@ -116,8 +116,7 @@ samplePlayHandle::~samplePlayHandle()
 
 
 
-void samplePlayHandle::play( bool /* _try_parallelizing */,
-						sampleFrame * _working_buffer )
+void samplePlayHandle::play( sampleFrame * _working_buffer )
 {
 	//play( 0, _try_parallelizing );
 	if( framesDone() >= totalFrames() )

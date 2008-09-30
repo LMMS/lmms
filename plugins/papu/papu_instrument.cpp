@@ -230,7 +230,9 @@ f_cnt_t papuInstrument::desiredReleaseFrames( void ) const
 	return f_cnt_t( 1000 );
 }
 
-void papuInstrument::playNote( notePlayHandle * _n, bool,
+
+
+void papuInstrument::playNote( notePlayHandle * _n,
 						sampleFrame * _working_buffer )
 {
 	const f_cnt_t tfp = _n->totalFramesPlayed();

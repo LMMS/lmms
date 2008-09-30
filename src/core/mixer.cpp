@@ -118,13 +118,13 @@ public:
 		jobQueueItem() :
 			type( InvalidJob ),
 			job( NULL ),
-			done( FALSE )
+			done( false )
 		{
 		}
 		jobQueueItem( JobTypes _type, void * _job ) :
 			type( _type ),
 			job( _job ),
-			done( FALSE )
+			done( false )
 		{
 		}
 
@@ -156,7 +156,7 @@ public:
 
 	mixerWorkerThread( mixer * _mixer ) :
 		QThread( _mixer ),
-		m_quit( FALSE ),
+		m_quit( false ),
 		m_mixer( _mixer ),
 		m_queueReadySem( &m_mixer->m_queueReadySem ),
 		m_workersDoneSem( &m_mixer->m_workersDoneSem ),
@@ -176,7 +176,7 @@ public:
 
 	virtual void quit( void )
 	{
-		m_quit = TRUE;
+		m_quit = true;
 	}
 
 private:
@@ -185,7 +185,7 @@ private:
 		sampleFrame * working_buf = (sampleFrame *) aligned_malloc(
 						m_mixer->framesPerPeriod() *
 							sizeof( sampleFrame ) );
-		while( m_quit == FALSE )
+		while( m_quit == false )
 		{
 			m_queueReadySem->acquire();
 			for( jobQueueItems::iterator it =
@@ -199,13 +199,13 @@ private:
 				m_jobQueue->lock.lock();
 				if( !it->done )
 				{
-					it->done = TRUE;
+					it->done = true;
 					m_jobQueue->lock.unlock();
 #endif
 					switch( it->type )
 					{
 						case PlayHandle:
-		it->playHandleJob->play( FALSE, working_buf );
+		it->playHandleJob->play( working_buf );
 							break;
 						case AudioPortEffects:
 							{
@@ -490,7 +490,7 @@ sample_rate_t mixer::processingSampleRate( void ) const
 bool mixer::criticalXRuns( void ) const
 {
 	return( ( m_cpuLoad >= 99 &&
-				engine::getSong()->realTimeTask() == TRUE ) );
+				engine::getSong()->realTimeTask() == true ) );
 }
 
 
@@ -534,7 +534,7 @@ const surroundSampleFrame * mixer::renderNextBuffer( void )
 	song::playPos p = engine::getSong()->getPlayPos(
 						song::Mode_PlayPattern );
 	if( engine::getSong()->playMode() == song::Mode_PlayPattern &&
-		engine::getPianoRoll()->isRecording() == TRUE &&
+		engine::getPianoRoll()->isRecording() == true &&
 		p != last_metro_pos && p.getTicks() %
 					(DefaultTicksPerTact / 4 ) == 0 )
 	{
@@ -596,37 +596,19 @@ const surroundSampleFrame * mixer::renderNextBuffer( void )
 	// clear last audio-buffer
 	clearAudioBuffer( m_writeBuf, m_framesPerPeriod );
 //printf("---------------------------next period\n");
-//	if( criticalXRuns() == FALSE )
+//	if( criticalXRuns() == false )
 	{
 		engine::getFxMixer()->prepareMasterMix();
 		engine::getSong()->processNextBuffer();
 
 		lockPlayHandles();
-		int idx = 0;
 		if( m_multiThreaded )
 		{
-			playHandleVector par_hndls;
-			while( idx < m_playHandles.size() )
-			{
-				playHandle * n = m_playHandles[idx];
-				if( !n->done() && n->supportsParallelizing() )
-				{
-					n->play( TRUE, m_workingBuf );
-					par_hndls.push_back( n );
-				}
-				++idx;
-			}
 			mixerWorkerThread::jobQueue jq;
 			FILL_JOB_QUEUE(jq,playHandleVector,m_playHandles,
 					mixerWorkerThread::PlayHandle,
-					!( *it )->done() &&
-					!( *it )->supportsParallelizing() );
+					!( *it )->done());
 			DISTRIBUTE_JOB_QUEUE(jq);
-			for( playHandleVector::iterator it = par_hndls.begin();
-						it != par_hndls.end(); ++it )
-			{
-				( *it )->waitForWorkerThread();
-			}
 			WAIT_FOR_JOBS();
 		}
 		else
@@ -637,8 +619,10 @@ const surroundSampleFrame * mixer::renderNextBuffer( void )
 			{
 				if( !( *it )->done() )
 				{
-
-					( *it )->play( FALSE, m_workingBuf );
+					// play now and don't try to
+					// parallelize as we're on single-core
+					// system
+					( *it )->play( m_workingBuf );
 				}
 			}
 		}
@@ -684,7 +668,7 @@ const surroundSampleFrame * mixer::renderNextBuffer( void )
 		}
 		else
 		{
-			bool more_effects = FALSE;
+			bool more_effects = false;
 			for( QVector<audioPort *>::iterator it =
 							m_audioPorts.begin();
 						it != m_audioPorts.end(); ++it )
@@ -1007,7 +991,7 @@ void mixer::removePlayHandles( track * _track )
 
 audioDevice * mixer::tryAudioDevices( void )
 {
-	bool success_ful = FALSE;
+	bool success_ful = false;
 	audioDevice * dev = NULL;
 	QString dev_name = configManager::inst()->value( "mixer", "audiodev" );
 
@@ -1193,7 +1177,7 @@ midiClient * mixer::tryMidiClients( void )
 mixer::fifoWriter::fifoWriter( mixer * _mixer, fifo * _fifo ) :
 	m_mixer( _mixer ),
 	m_fifo( _fifo ),
-	m_writing( TRUE )
+	m_writing( true )
 {
 }
 
@@ -1202,7 +1186,7 @@ mixer::fifoWriter::fifoWriter( mixer * _mixer, fifo * _fifo ) :
 
 void mixer::fifoWriter::finish( void )
 {
-	m_writing = FALSE;
+	m_writing = false;
 }
 
 

@@ -99,7 +99,7 @@ audioFileProcessor::~audioFileProcessor()
 
 
 
-void audioFileProcessor::playNote( notePlayHandle * _n, bool,
+void audioFileProcessor::playNote( notePlayHandle * _n,
 						sampleFrame * _working_buffer )
 {
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();

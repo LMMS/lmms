@@ -69,7 +69,7 @@ public:
 	bitInvader(instrumentTrack * _channel_track );
 	virtual ~bitInvader();
 
-	virtual void playNote( notePlayHandle * _n, bool _try_parallelizing,
+	virtual void playNote( notePlayHandle * _n,
 						sampleFrame * _working_buffer );
 	virtual void deleteNotePluginData( notePlayHandle * _n );
 

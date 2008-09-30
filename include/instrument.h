@@ -56,12 +56,10 @@ public:
 	// if the plugin doesn't play each note, it can create an instrument-
 	// play-handle and re-implement this method, so that it mixes its
 	// output buffer only once per mixer-period
-	virtual void play( bool _try_parallelizing,
-						sampleFrame * _working_buffer );
+	virtual void play( sampleFrame * _working_buffer );
 
 	// to be implemented by actual plugin
 	virtual void playNote( notePlayHandle * _note_to_play,
-					bool _try_parallelizing,
 					sampleFrame * _working_buf )
 	{
 	}

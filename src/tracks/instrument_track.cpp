@@ -394,7 +394,7 @@ f_cnt_t instrumentTrack::beatLen( notePlayHandle * _n ) const
 
 
 
-void instrumentTrack::playNote( notePlayHandle * _n, bool _try_parallelizing,
+void instrumentTrack::playNote( notePlayHandle * _n, 
 						sampleFrame * _working_buffer )
 {
 	// arpeggio- and chord-widget has to do its work -> adding sub-notes
@@ -405,8 +405,7 @@ void instrumentTrack::playNote( notePlayHandle * _n, bool _try_parallelizing,
 	if( !_n->isArpeggioBaseNote() && m_instrument != NULL )
 	{
 		// all is done, so now lets play the note!
-		m_instrument->playNote( _n, _try_parallelizing,
-							_working_buffer );
+		m_instrument->playNote( _n, _working_buffer );
 	}
 }
 

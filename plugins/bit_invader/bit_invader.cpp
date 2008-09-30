@@ -23,15 +23,9 @@
  */
 
 
-#include "bit_invader.h"
-
-
 #include <QtXml/QDomElement>
 
-
-using namespace std;
-
-
+#include "bit_invader.h"
 #include "engine.h"
 #include "graph.h"
 #include "instrument_track.h"
@@ -56,7 +50,7 @@ plugin::descriptor PLUGIN_EXPORT bitinvader_plugin_descriptor =
 	STRINGIFY_PLUGIN_NAME( PLUGIN_NAME ),
 	"BitInvader",
 	QT_TRANSLATE_NOOP( "pluginBrowser",
-				"Rough & Dirty Wavetable Synthesizer." ),
+				"Customizable wavetable synthesizer" ),
 	"Andreas Brandmaier <andreas/at/brandmaier/dot/de>",
 	0x0100,
 	plugin::Instrument,
@@ -89,6 +83,7 @@ bSynth::~bSynth()
 {
 	delete[] sample_shape;
 }
+
 
 sample_t bSynth::nextStringSample( void )
 {
@@ -145,19 +140,20 @@ bitInvader::bitInvader( instrumentTrack * _channel_track ) :
 	m_sampleLength( 128, 8, 128, 1, this, tr( "Samplelength" ) ),
 	m_graph( -1.0f, 1.0f, 128, this ),
 	m_interpolation( FALSE, this ),
-	m_normalize( FALSE, this)
+	m_normalize( FALSE, this )
 {
 
 	m_graph.setWaveToSine();
 
 	connect( &m_sampleLength, SIGNAL( dataChanged( ) ),
-			this, SLOT( lengthChanged( ) )
-			);
+			this, SLOT( lengthChanged( ) ) );
 
 	connect( &m_graph, SIGNAL( samplesChanged( int, int ) ),
 			this, SLOT( samplesChanged( int, int ) ) );
 
 }
+
+
 
 
 bitInvader::~bitInvader()
@@ -214,9 +210,9 @@ void bitInvader::loadSettings( const QDomElement & _this )
 	// Load LED 
 	m_normalize.loadSettings( _this, "normalize" );
 
-//	songEditor::inst()->setModified();
-
 }
+
+
 
 
 void bitInvader::lengthChanged( void )
@@ -227,11 +223,15 @@ void bitInvader::lengthChanged( void )
 }
 
 
+
+
 void bitInvader::samplesChanged( int _begin, int _end )
 {
 	normalize();
 	//engine::getSongEditor()->setModified();
 }
+
+
 
 
 void bitInvader::normalize( void )
@@ -248,13 +248,16 @@ void bitInvader::normalize( void )
 
 
 
+
 QString bitInvader::nodeName( void ) const
 {
 	return( bitinvader_plugin_descriptor.name );
 }
 
 
-void bitInvader::playNote( notePlayHandle * _n, bool,
+
+
+void bitInvader::playNote( notePlayHandle * _n,
 						sampleFrame * _working_buffer )
 {
 	if ( _n->totalFramesPlayed() == 0 || _n->m_pluginData == NULL )
@@ -296,16 +299,25 @@ void bitInvader::playNote( notePlayHandle * _n, bool,
 }
 
 
+
+
 void bitInvader::deleteNotePluginData( notePlayHandle * _n )
 {
 	delete static_cast<bSynth *>( _n->m_pluginData );
 }
 
 
+
+
 pluginView * bitInvader::instantiateView( QWidget * _parent )
 {
 	return( new bitInvaderView( this, _parent ) );
 }
+
+
+
+
+
 
 
 bitInvaderView::bitInvaderView( instrument * _instrument,
@@ -438,6 +450,9 @@ bitInvaderView::bitInvaderView( instrument * _instrument,
 
 }
 
+
+
+
 void bitInvaderView::modelChanged( void )
 {
 	bitInvader * b = castModel<bitInvader>();
@@ -450,11 +465,16 @@ void bitInvaderView::modelChanged( void )
 }
 
 
+
+
 void bitInvaderView::sinWaveClicked( void )
 {
 	m_graph->model()->setWaveToSine();
 	engine::getSong()->setModified();
 }
+
+
+
 
 void bitInvaderView::triangleWaveClicked( void )
 {
@@ -463,11 +483,16 @@ void bitInvaderView::triangleWaveClicked( void )
 }
 
 
+
+
 void bitInvaderView::sawWaveClicked( void )
 {
 	m_graph->model()->setWaveToSaw();
 	engine::getSong()->setModified();
 }
+
+
+
 
 void bitInvaderView::sqrWaveClicked( void )
 {
@@ -475,11 +500,17 @@ void bitInvaderView::sqrWaveClicked( void )
 	engine::getSong()->setModified();
 }
 
+
+
+
 void bitInvaderView::noiseWaveClicked( void )
 {
 	m_graph->model()->setWaveToNoise();
 	engine::getSong()->setModified();
 }
+
+
+
 
 void bitInvaderView::usrWaveClicked( void )
 {
@@ -513,11 +544,15 @@ void bitInvaderView::usrWaveClicked( void )
 }
 
 
+
+
 void bitInvaderView::smoothClicked( void )
 {
 	m_graph->model()->smooth();
 	engine::getSong()->setModified();
 }
+
+
 
 
 void bitInvaderView::interpolationToggled( bool value )
@@ -527,10 +562,14 @@ void bitInvaderView::interpolationToggled( bool value )
 }
 
 
+
+
 void bitInvaderView::normalizeToggled( bool value )
 {
 	engine::getSong()->setModified();
 }
+
+
 
 
 extern "C"

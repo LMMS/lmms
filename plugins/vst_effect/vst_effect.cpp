@@ -100,7 +100,7 @@ bool vstEffect::processAudioBuffer( sampleFrame * _buf, const fpp_t _frames )
 			}
 		}
 		m_pluginMutex.lock();
-		m_plugin->process( buf, buf, TRUE );
+		m_plugin->process( buf, buf );
 		m_pluginMutex.unlock();
 
 		double out_sum = 0.0;

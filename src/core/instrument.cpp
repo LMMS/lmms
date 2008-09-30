@@ -50,7 +50,7 @@ instrument::~instrument()
 
 
 
-void instrument::play( bool, sampleFrame * )
+void instrument::play( sampleFrame * )
 {
 }
 

@@ -54,10 +54,9 @@ public:
 	sf2Instrument( instrumentTrack * _instrument_track );
 	virtual ~sf2Instrument();
 
-	virtual void play( bool _try_parallelizing,
-						sampleFrame * _working_buffer );
+	virtual void play( sampleFrame * _working_buffer );
 
-	virtual void playNote( notePlayHandle * _n, bool _try_parallelizing,
+	virtual void playNote( notePlayHandle * _n,
 						sampleFrame * _working_buffer );
 	virtual void deleteNotePluginData( notePlayHandle * _n );
 
@@ -87,6 +86,7 @@ public:
 
 
 	void setParameter( const QString & _param, const QString & _value );
+
 
 public slots:
 	void openFile( const QString & _sf2File );

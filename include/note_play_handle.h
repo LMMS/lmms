@@ -72,8 +72,7 @@ public:
 		return( m_unpitchedFrequency );
 	}
 
-	virtual void play( bool _try_parallelizing,
-						sampleFrame * _working_buffer );
+	virtual void play( sampleFrame * _working_buffer );
 
 	virtual inline bool done( void ) const
 	{
@@ -235,27 +234,6 @@ public:
 	void setBBTrack( track * _bb_track )
 	{
 		m_bbTrack = _bb_track;
-	}
-
-
-	virtual bool supportsParallelizing( void ) const
-	{
-		return( m_instrumentTrack->getInstrument()->
-						supportsParallelizing()
-				&&
-			// we must not parallelize note-play-handles, which
-			// belong to instruments that are instrument-play-
-			// handle-driven (i.e. react to MIDI events),
-			// because then waitForWorkerThread()
-			// would be additionally called for each
-			// note-play-handle which results in hangups
-			m_instrumentTrack->getInstrument()->
-						isMidiBased() );
-	}
-
-	virtual void waitForWorkerThread( void )
-	{
-		m_instrumentTrack->m_instrument->waitForWorkerThread();
 	}
 
 	void processMidiTime( const midiTime & _time );

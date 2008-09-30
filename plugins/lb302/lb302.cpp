@@ -715,8 +715,7 @@ void lb302Synth::initNote( lb302Note *n)
 }
 
 
-void lb302Synth::playNote( notePlayHandle * _n, bool,
-						sampleFrame * _working_buffer )
+void lb302Synth::playNote( notePlayHandle * _n, sampleFrame * _working_buffer )
 {
 	//fpp_t framesPerPeriod = engine::getMixer()->framesPerPeriod();
 
@@ -775,8 +774,7 @@ void lb302Synth::playNote( notePlayHandle * _n, bool,
 
 
 
-void lb302Synth::play( bool _try_parallelizing,
-						sampleFrame * _working_buffer )
+void lb302Synth::play( sampleFrame * _working_buffer )
 {
 	//printf(".");
 	const fpp_t frames = engine::getMixer()->framesPerPeriod();

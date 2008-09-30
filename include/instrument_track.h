@@ -83,8 +83,7 @@ public:
 
 	// for capturing note-play-events -> need that for arpeggio,
 	// filter and so on
-	void playNote( notePlayHandle * _n, bool _try_parallelizing,
-						sampleFrame * _working_buffer );
+	void playNote( notePlayHandle * _n, sampleFrame * _working_buffer );
 
 	QString instrumentName( void ) const;
 	inline const instrument * getInstrument( void ) const

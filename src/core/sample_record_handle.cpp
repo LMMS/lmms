@@ -68,8 +68,7 @@ sampleRecordHandle::~sampleRecordHandle()
 
 
 
-void sampleRecordHandle::play( bool /* _try_parallelizing */,
-						sampleFrame * _working_buffer )
+void sampleRecordHandle::play( sampleFrame * _working_buffer )
 {
 	const sampleFrame * recbuf = engine::getMixer()->inputBuffer();
 	const fpp_t frames = engine::getMixer()->inputBufferFrames();

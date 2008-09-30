@@ -610,9 +610,7 @@ public:
 
 	virtual bool processMessage( const message & _m );
 
-	bool process( const sampleFrame * _in_buf,
-					sampleFrame * _out_buf, bool _wait );
-	bool waitForProcessingFinished( sampleFrame * _out_buf );
+	bool process( const sampleFrame * _in_buf, sampleFrame * _out_buf );
 
 	void processMidiEvent( const midiEvent &, const f_cnt_t _offset );
 

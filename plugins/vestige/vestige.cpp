@@ -183,7 +183,7 @@ void vestigeInstrument::loadFile( const QString & _file )
 
 
 
-void vestigeInstrument::waitForWorkerThread( void )
+void vestigeInstrument::play( sampleFrame * _buf )
 {
 	m_pluginMutex.lock();
 	if( m_plugin == NULL )
@@ -191,39 +191,14 @@ void vestigeInstrument::waitForWorkerThread( void )
 		m_pluginMutex.unlock();
 		return;
 	}
+
+	m_plugin->process( NULL, _buf );
 
 	const fpp_t frames = engine::getMixer()->framesPerPeriod();
-	sampleFrame * buf = new sampleFrame[frames];
 
-	if( m_plugin->waitForProcessingFinished( buf ) )
-	{
-		getInstrumentTrack()->processAudioBuffer( buf, frames, NULL );
-	}
+	getInstrumentTrack()->processAudioBuffer( _buf, frames, NULL );
 
 	m_pluginMutex.unlock();
-
-	delete[] buf;
-}
-
-
-
-
-void vestigeInstrument::play( bool _try_parallelizing, sampleFrame * )
-{
-	m_pluginMutex.lock();
-	if( m_plugin == NULL )
-	{
-		m_pluginMutex.unlock();
-		return;
-	}
-
-	m_plugin->process( NULL, NULL, FALSE );
-	m_pluginMutex.unlock();
-
-	if( !_try_parallelizing )
-	{
-		waitForWorkerThread();
-	}
 }
 
 
@@ -238,7 +213,7 @@ bool vestigeInstrument::handleMidiEvent( const midiEvent & _me,
 		m_plugin->processMidiEvent( _me, _time );
 	}
 	m_pluginMutex.unlock();
-	return( TRUE );
+	return true;
 }
 
 

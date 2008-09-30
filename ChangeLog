@@ -1,3 +1,64 @@
+2008-09-30	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* plugins/sid/sid_instrument.h:
+	* plugins/sid/sid_instrument.cpp:
+	* plugins/ladspa_effect/tap/CMakeLists.txt:
+	* plugins/ladspa_effect/caps/CMakeLists.txt:
+	* plugins/patman/patman.cpp:
+	* plugins/patman/patman.h:
+	* plugins/lb302/lb302.cpp:
+	* plugins/lb302/lb302.h:
+	* plugins/organic/organic.cpp:
+	* plugins/organic/organic.h:
+	* plugins/lb303/lb303.cpp:
+	* plugins/lb303/lb303.h:
+	* plugins/bit_invader/bit_invader.cpp:
+	* plugins/bit_invader/bit_invader.h:
+	* plugins/vst_effect/vst_effect.cpp:
+	* plugins/vibed/vibed.h:
+	* plugins/vibed/vibed.cpp:
+	* plugins/triple_oscillator/triple_oscillator.h:
+	* plugins/triple_oscillator/triple_oscillator.cpp:
+	* plugins/audio_file_processor/audio_file_processor.cpp:
+	* plugins/audio_file_processor/audio_file_processor.h:
+	* plugins/stk/mallets/mallets.cpp:
+	* plugins/stk/mallets/mallets.h:
+	* plugins/papu/papu_instrument.h:
+	* plugins/papu/papu_instrument.cpp:
+	* plugins/sf2_player/sf2_player.cpp:
+	* plugins/sf2_player/sf2_player.h:
+	* plugins/vestige/vestige.cpp:
+	* plugins/vestige/vestige.h:
+	* plugins/kicker/kicker.cpp:
+	* plugins/kicker/kicker.h:
+	* include/instrument_play_handle.h:
+	* include/instrument_track.h:
+	* include/instrument.h:
+	* include/sample_record_handle.h:
+	* include/plugin.h:
+	* include/note_play_handle.h:
+	* include/sample_play_handle.h:
+	* include/remote_plugin.h:
+	* include/preset_preview_play_handle.h:
+	* include/play_handle.h:
+	* src/core/plugin.cpp:
+	* src/core/preset_preview_play_handle.cpp:
+	* src/core/note_play_handle.cpp:
+	* src/core/remote_plugin.cpp:
+	* src/core/sample_play_handle.cpp:
+	* src/core/mixer.cpp:
+	* src/core/instrument.cpp:
+	* src/core/sample_record_handle.cpp:
+	* src/tracks/instrument_track.cpp:
+	removed obsolete instrument-parallelization support as this is handled
+	much better by worker threads and adds unneccessary complexity
+
+	* cmake/modules/FindPCHSupport.cmake:
+	* INSTALL:
+	* CMakeLists.txt:
+	- removed (buggy) PCH support
+	- added support for CFLAGS and CXXFLAGS environment variables
+
 2008-09-29	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* plugins/sf2_player/sf2_player.cpp:

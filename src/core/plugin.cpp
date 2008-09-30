@@ -129,22 +129,7 @@ plugin * plugin::instantiate( const QString & _plugin_name, model * _parent,
 		return( new dummyPlugin() );
 	}
 	plugin * inst = inst_hook( _parent, _data );
-	return( inst );
-}
-
-
-
-
-bool plugin::supportsParallelizing( void ) const
-{
-	return( FALSE );
-}
-
-
-
-
-void plugin::waitForWorkerThread( void )
-{
+	return inst;
 }
 
 
@@ -202,7 +187,7 @@ pluginView * plugin::createView( QWidget * _parent )
 	{
 		pv->setModel( this );
 	}
-	return( pv );
+	return pv;
 }
 
 
@@ -237,7 +222,7 @@ QDomElement plugin::descriptor::subPluginFeatures::key::saveXML(
 		a.setAttribute( "value", it.value() );
 		e.appendChild( a );
 	}
-	return( e );
+	return e;
 }
 
 

@@ -186,10 +186,9 @@ presetPreviewPlayHandle::~presetPreviewPlayHandle()
 
 
 
-void presetPreviewPlayHandle::play( bool _try_parallelizing,
-						sampleFrame * _working_buffer )
+void presetPreviewPlayHandle::play( sampleFrame * _working_buffer )
 {
-	m_previewNote->play( _try_parallelizing, _working_buffer );
+	m_previewNote->play( _working_buffer );
 }
 
 

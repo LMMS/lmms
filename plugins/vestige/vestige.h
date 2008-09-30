@@ -50,8 +50,7 @@ public:
 	vestigeInstrument( instrumentTrack * _channel_track );
 	virtual ~vestigeInstrument();
 
-	virtual void play( bool _try_parallelizing,
-						sampleFrame * _working_buffer );
+	virtual void play( sampleFrame * _working_buffer );
 
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
 	virtual void loadSettings( const QDomElement & _this );
@@ -60,16 +59,9 @@ public:
 
 	virtual void loadFile( const QString & _file );
 
-	virtual bool supportsParallelizing( void ) const
-	{
-		return( TRUE );
-	}
-
-	virtual void waitForWorkerThread( void );
-
 	virtual bool isMidiBased( void ) const
 	{
-		return( true );
+		return true;
 	}
 
 	virtual bool handleMidiEvent( const midiEvent & _me,

@@ -114,7 +114,7 @@ typedef effectLib::distortion<> distFX;
 typedef sweepOscillator<effectLib::monoToStereoAdaptor<distFX> > sweepOsc;
 
 
-void kickerInstrument::playNote( notePlayHandle * _n, bool,
+void kickerInstrument::playNote( notePlayHandle * _n,
 						sampleFrame * _working_buffer )
 {
 	const float decfr = m_decayModel.value() *

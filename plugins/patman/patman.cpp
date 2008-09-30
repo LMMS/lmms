@@ -129,7 +129,7 @@ QString patmanInstrument::nodeName( void ) const
 
 
 
-void patmanInstrument::playNote( notePlayHandle * _n, bool,
+void patmanInstrument::playNote( notePlayHandle * _n,
 						sampleFrame * _working_buffer )
 {
 	if( m_patchFile == "" )

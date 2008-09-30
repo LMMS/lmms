@@ -42,7 +42,6 @@
 remotePlugin::remotePlugin( const QString & _plugin_executable,
 						bool _wait_for_init_done ) :
 	remotePluginBase( new shmFifo(), new shmFifo() ),
-	m_initialized( false ),
 	m_failed( true ),
 	m_commMutex( QMutex::Recursive ),
 	m_splitChannels( false ),
@@ -108,7 +107,7 @@ remotePlugin::~remotePlugin()
 
 
 bool remotePlugin::process( const sampleFrame * _in_buf,
-					sampleFrame * _out_buf, bool _wait )
+						sampleFrame * _out_buf )
 {
 	if( m_failed )
 	{
@@ -133,7 +132,7 @@ bool remotePlugin::process( const sampleFrame * _in_buf,
 			engine::getMixer()->clearAudioBuffer( _out_buf,
 								frames );
 		}
-		return( false );
+		return false;
 	}
 
 	memset( m_shm, 0, m_shmSize );
@@ -174,31 +173,15 @@ bool remotePlugin::process( const sampleFrame * _in_buf,
 	sendMessage( IdStartProcessing );
 	unlock();
 
-	m_initialized = TRUE;
-	if( _wait )
+	if( m_failed || _out_buf == NULL || m_outputCount == 0 )
 	{
-		waitForProcessingFinished( _out_buf );
-	}
-
-	return( TRUE );
-}
-
-
-
-
-bool remotePlugin::waitForProcessingFinished( sampleFrame * _out_buf )
-{
-	if( m_failed || !m_initialized || _out_buf == NULL ||
-							m_outputCount == 0 )
-	{
-		return( false );
+		return false;
 	}
 
 	lock();
 	waitForMessage( IdProcessingDone );
 	unlock();
 
-	const fpp_t frames = engine::getMixer()->framesPerPeriod();
 	const ch_cnt_t outputs = tMin<ch_cnt_t>( m_outputCount,
 							DEFAULT_CHANNELS );
 	if( m_splitChannels )
@@ -234,7 +217,7 @@ bool remotePlugin::waitForProcessingFinished( sampleFrame * _out_buf )
 		}
 	}
 
-	return( TRUE );
+	return true;
 }
 
 

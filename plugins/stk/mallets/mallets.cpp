@@ -204,7 +204,7 @@ QString malletsInstrument::nodeName( void ) const
 
 
 
-void malletsInstrument::playNote( notePlayHandle * _n, bool,
+void malletsInstrument::playNote( notePlayHandle * _n,
 						sampleFrame * _working_buffer )
 {
 	if( m_filesMissing )

@@ -139,9 +139,8 @@ public:
 	lb303Synth( instrumentTrack * _channel_track );
 	virtual ~lb303Synth();
 
-	virtual void play( bool _try_parallelizing,
-						sampleFrame * _working_buffer );
-	virtual void playNote( notePlayHandle * _n, bool _try_parallelizing,
+	virtual void play( sampleFrame * _working_buffer );
+	virtual void playNote( notePlayHandle * _n,
 						sampleFrame * _working_buffer );
 	virtual void deleteNotePluginData( notePlayHandle * _n );
 
