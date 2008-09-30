@@ -11,7 +11,7 @@ IF(NO_O3)
 	MESSAGE("Found GCC 4.1.x - compiling CAPS-plugins with -O2 instead of -O3")
 	SET_TARGET_PROPERTIES(caps PROPERTIES COMPILE_FLAGS "-Wno-write-strings")
 ELSE(NO_O3)
-	SET_TARGET_PROPERTIES(caps PROPERTIES COMPILE_FLAGS "-O3 -Wno-write-strings -msse -msse2 -msse3")
+	SET_TARGET_PROPERTIES(caps PROPERTIES COMPILE_FLAGS "-O3 -Wno-write-strings")
 ENDIF(NO_O3)
 
 IF(LMMS_BUILD_WIN32)
