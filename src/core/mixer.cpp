@@ -100,6 +100,8 @@ static void * aligned_malloc( int _bytes )
 }
 
 
+#undef QT_VERSION
+#define QT_VERSION 0x040300
 
 class mixerWorkerThread : public QThread
 {
@@ -193,11 +195,11 @@ private:
 								it->job != NULL )
 				{
 #else
-				m_jobQueue->lock.lock();
+				s_jobQueue.lock.lock();
 				if( !it->done && it->job != NULL )
 				{
 					it->done = true;
-					m_jobQueue->lock.unlock();
+					s_jobQueue.lock.unlock();
 #endif
 					switch( it->type )
 					{
@@ -226,7 +228,7 @@ private:
 #if QT_VERSION < 0x040400
 				else
 				{
-					m_jobQueue->lock.unlock();
+					s_jobQueue.lock.unlock();
 				}
 #endif
 			}
@@ -239,7 +241,6 @@ private:
 	mixer * m_mixer;
 	QSemaphore * m_queueReadySem;
 	QSemaphore * m_workersDoneSem;
-	volatile jobQueue * m_jobQueue;
 
 } ;
 
@@ -260,7 +261,7 @@ mixerWorkerThread::jobQueue mixerWorkerThread::s_jobQueue;
 		}							\
 	}
 
-#define START_JOBS()						\
+#define START_JOBS()							\
 	m_queueReadySem.release( m_numWorkers );			\
 
 #define WAIT_FOR_JOBS()							\
