@@ -1,5 +1,12 @@
 2008-10-02	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* plugins/ladspa_effect/ladspa_effect.cpp:
+	fetch pointer to LADSPA port descriptor once outside the inner loops -
+	improves performance of ladspaEffect::processAudioBuffer() by 400%
+
+	* include/types.h:
+	faster floating point comparison
+
 	* data/locale/ru.ts:
 	added updated Russian localization by Alexey Kouznetsov
 

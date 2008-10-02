@@ -150,44 +150,45 @@ bool ladspaEffect::processAudioBuffer( sampleFrame * _buf,
 	{
 		for( int port = 0; port < m_portCount; ++port )
 		{
-			switch( m_ports[proc][port]->rate )
+			port_desc_t * pp = m_ports.at( proc ).at( port );
+			switch( pp->rate )
 			{
 				case CHANNEL_IN:
 					for( fpp_t frame = 0; 
 						frame < frames; ++frame )
 					{
-						m_ports[proc][port]->buffer[frame] = 
+						pp->buffer[frame] = 
 							_buf[frame][channel];
 					}
 					++channel;
 					break;
 				case AUDIO_RATE_INPUT:
-					m_ports[proc][port]->value = 
+					pp->value = 
 						static_cast<LADSPA_Data>( 
-							m_ports[proc][port]->control->getValue() /
-								m_ports[proc][port]->scale );
+							pp->control->getValue() /
+								pp->scale );
 					// This only supports control rate ports, so the audio rates are
 					// treated as though they were control rate by setting the
 					// port buffer to all the same value.
 					for( fpp_t frame = 0; 
 						frame < frames; ++frame )
 					{
-						m_ports[proc][port]->buffer[frame] = 
-							m_ports[proc][port]->value;
+						pp->buffer[frame] = 
+							pp->value;
 					}
 					break;
 				case CONTROL_RATE_INPUT:
-					if( m_ports[proc][port]->control ==
+					if( pp->control ==
 									NULL )
 					{
 						break;
 					}
-					m_ports[proc][port]->value = 
+					pp->value = 
 						static_cast<LADSPA_Data>( 
-							m_ports[proc][port]->control->getValue() /
-								m_ports[proc][port]->scale );
-					m_ports[proc][port]->buffer[0] = 
-						m_ports[proc][port]->value;
+							pp->control->getValue() /
+								pp->scale );
+					pp->buffer[0] = 
+						pp->value;
 					break;
 				case CHANNEL_OUT:
 				case AUDIO_RATE_OUTPUT:
@@ -214,7 +215,8 @@ bool ladspaEffect::processAudioBuffer( sampleFrame * _buf,
 	{
 		for( int port = 0; port < m_portCount; ++port )
 		{
-			switch( m_ports[proc][port]->rate )
+			port_desc_t * pp = m_ports.at( proc ).at( port );
+			switch( pp->rate )
 			{
 				case CHANNEL_IN:
 				case AUDIO_RATE_INPUT:
@@ -228,7 +230,7 @@ bool ladspaEffect::processAudioBuffer( sampleFrame * _buf,
 							d * 
 							_buf[frame][channel] +
 							w *
-							m_ports[proc][port]->buffer[frame];
+							pp->buffer[frame];
 						out_sum += 
 							_buf[frame][channel] *
 							_buf[frame][channel];
@@ -474,10 +476,11 @@ void ladspaEffect::pluginInstantiation( void )
 	{
 		for( int port = 0; port < m_portCount; port++ )
 		{
+			port_desc_t * pp = m_ports.at( proc ).at( port );
 			if( !manager->connectPort( m_key,
 			     			m_handles[proc],
 						port,
-						m_ports[proc][port]->buffer ) )
+						pp->buffer ) )
 			{
 				QMessageBox::warning( 0, "Effect", 
 				"Failed to connect port: " + m_key.second, 
@@ -515,8 +518,9 @@ void ladspaEffect::pluginDestruction( void )
 		manager->cleanup( m_key, m_handles[proc] );
 		for( int port = 0; port < m_portCount; port++ )
 		{
-			delete[] m_ports[proc][port]->buffer;
-			delete m_ports[proc][port];
+			port_desc_t * pp = m_ports.at( proc ).at( port );
+			delete[] pp->buffer;
+			delete pp;
 		}
 		m_ports[proc].clear();
 	}
