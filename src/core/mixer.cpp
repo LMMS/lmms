@@ -25,7 +25,6 @@
  */
 
 
-#include <QtCore/QHash>
 #include <QtCore/QWaitCondition>
 
 #include <math.h>
@@ -67,12 +66,13 @@
 #include "midi_dummy.h"
 
 
+static QVector<fx_ch_t> __fx_channel_jobs( NumFxChannels );
 
 
 
 #define ALIGN_SIZE 64
 
-void aligned_free( void * _buf )
+static void aligned_free( void * _buf )
 {
 	if( _buf != NULL )
 	{
@@ -82,7 +82,7 @@ void aligned_free( void * _buf )
 	}
 }
 
-void * aligned_malloc( int _bytes )
+static void * aligned_malloc( int _bytes )
 {
 	char *ptr,*ptr2,*aligned_ptr;
 	int align_mask = ALIGN_SIZE- 1;
@@ -135,7 +135,7 @@ public:
 			playHandle * playHandleJob;
 			audioPort * audioPortJob;
 			int effectChannelJob;
-			void * job;
+			volatile void * job;
 		};
 
 #if QT_VERSION >= 0x040400
@@ -154,24 +154,20 @@ public:
 #endif
 	} ;
 
+	static jobQueue s_jobQueue;
+
 	mixerWorkerThread( mixer * _mixer ) :
 		QThread( _mixer ),
 		m_quit( false ),
 		m_mixer( _mixer ),
 		m_queueReadySem( &m_mixer->m_queueReadySem ),
-		m_workersDoneSem( &m_mixer->m_workersDoneSem ),
-		m_jobQueue( NULL )
+		m_workersDoneSem( &m_mixer->m_workersDoneSem )
 	{
 		start( QThread::TimeCriticalPriority );
 	}
 
 	virtual ~mixerWorkerThread()
 	{
-	}
-
-	void setJobQueue( jobQueue * _q )
-	{
-		m_jobQueue = _q;
 	}
 
 	virtual void quit( void )
@@ -189,15 +185,16 @@ private:
 		{
 			m_queueReadySem->acquire();
 			for( jobQueueItems::iterator it =
-						m_jobQueue->items.begin();
-					it != m_jobQueue->items.end(); ++it )
+						s_jobQueue.items.begin();
+					it != s_jobQueue.items.end(); ++it )
 			{
 #if QT_VERSION >= 0x040400
-				if( it->done.fetchAndStoreRelaxed( 1 ) == 0 )
+				if( it->done.fetchAndStoreRelaxed( 1 ) == 0 &&
+								it->job != NULL )
 				{
 #else
 				m_jobQueue->lock.lock();
-				if( !it->done )
+				if( !it->done && it->job != NULL )
 				{
 					it->done = true;
 					m_jobQueue->lock.unlock();
@@ -242,29 +239,28 @@ private:
 	mixer * m_mixer;
 	QSemaphore * m_queueReadySem;
 	QSemaphore * m_workersDoneSem;
-	jobQueue * m_jobQueue;
+	volatile jobQueue * m_jobQueue;
 
 } ;
 
+mixerWorkerThread::jobQueue mixerWorkerThread::s_jobQueue;
 
 
-#define FILL_JOB_QUEUE(_jq,_vec_type,_vec,_job_type,_condition)		\
+#define FILL_JOB_QUEUE(_vec_type,_vec,_job_type,_condition)		\
+	mixerWorkerThread::s_jobQueue.items.clear();			\
 	for( _vec_type::iterator it = _vec.begin();			\
 				it != _vec.end(); ++it )		\
 	{								\
 		if( _condition )					\
 		{							\
-			_jq.items.push_back(				\
+			mixerWorkerThread::s_jobQueue.items.		\
+					push_back(			\
 			mixerWorkerThread::jobQueueItem( _job_type,	\
 							(void *)*it ) );\
 		}							\
 	}
 
-#define DISTRIBUTE_JOB_QUEUE(_jq)					\
-	for( int i = 0; i < m_numWorkers; ++i )				\
-	{								\
-		m_workers[i]->setJobQueue( &_jq );			\
-	}								\
+#define START_JOBS()						\
 	m_queueReadySem.release( m_numWorkers );			\
 
 #define WAIT_FOR_JOBS()							\
@@ -300,6 +296,11 @@ mixer::mixer( void ) :
 		clearAudioBuffer( m_inputBuffer[i], m_inputBufferSize[i] );
 	}
 
+	for( int i = 1; i < NumFxChannels+1; ++i )
+	{
+		__fx_channel_jobs[i-1] = (fx_ch_t) i;
+	}
+
 	// just rendering?
 	if( !engine::hasGUI() )
 	{
@@ -309,7 +310,8 @@ mixer::mixer( void ) :
 	else if( configManager::inst()->value( "mixer", "framesperaudiobuffer"
 						).toInt() >= 32 )
 	{
-		m_framesPerPeriod = configManager::inst()->value( "mixer",
+		m_framesPerPeriod =
+			(fpp_t) configManager::inst()->value( "mixer",
 					"framesperaudiobuffer" ).toInt();
 
 		if( m_framesPerPeriod > DEFAULT_BUFFER_SIZE )
@@ -368,12 +370,12 @@ mixer::~mixer()
 	{
 		// distribute an empty job-queue so that worker-threads
 		// get out of their processing-loop
-		mixerWorkerThread::jobQueue jq;
+		mixerWorkerThread::s_jobQueue.items.clear();
 		for( int w = 0; w < m_numWorkers; ++w )
 		{
 			m_workers[w]->quit();
 		}
-		DISTRIBUTE_JOB_QUEUE(jq);
+		START_JOBS();
 		for( int w = 0; w < m_numWorkers; ++w )
 		{
 			m_workers[w]->wait( 500 );
@@ -506,7 +508,7 @@ void mixer::pushInputFrames( sampleFrame * _ab, const f_cnt_t _frames )
 	
 	if( frames + _frames > size )
 	{
-		size = tMax( size * 2, frames + _frames );
+		size = qMax( size * 2, frames + _frames );
 		sampleFrame * ab = new sampleFrame[ size ];
 		memcpy( ab, buf, frames * sizeof( sampleFrame ) );
 		delete [] buf;
@@ -604,11 +606,10 @@ const surroundSampleFrame * mixer::renderNextBuffer( void )
 		lockPlayHandles();
 		if( m_multiThreaded )
 		{
-			mixerWorkerThread::jobQueue jq;
-			FILL_JOB_QUEUE(jq,playHandleVector,m_playHandles,
+			FILL_JOB_QUEUE(playHandleVector,m_playHandles,
 					mixerWorkerThread::PlayHandle,
 					!( *it )->done());
-			DISTRIBUTE_JOB_QUEUE(jq);
+			START_JOBS();
 			WAIT_FOR_JOBS();
 		}
 		else
@@ -649,21 +650,14 @@ const surroundSampleFrame * mixer::renderNextBuffer( void )
 
 		if( m_multiThreaded )
 		{
-			mixerWorkerThread::jobQueue jq;
-			FILL_JOB_QUEUE(jq,QVector<audioPort*>,m_audioPorts,
+			FILL_JOB_QUEUE(QVector<audioPort*>,m_audioPorts,
 					mixerWorkerThread::AudioPortEffects,1);
-			DISTRIBUTE_JOB_QUEUE(jq);
+			START_JOBS();
 			WAIT_FOR_JOBS();
 
-			jq.items.clear();
-			QVector<fx_ch_t> fx_channels( NumFxChannels );
-			for( int i = 1; i < NumFxChannels+1; ++i )
-			{
-				fx_channels[i-1] = i;
-			}
-			FILL_JOB_QUEUE(jq,QVector<fx_ch_t>,fx_channels,
+			FILL_JOB_QUEUE(QVector<fx_ch_t>,__fx_channel_jobs,
 					mixerWorkerThread::EffectChannel,1);
-			DISTRIBUTE_JOB_QUEUE(jq);
+			START_JOBS();
 			WAIT_FOR_JOBS();
 		}
 		else
@@ -686,13 +680,11 @@ const surroundSampleFrame * mixer::renderNextBuffer( void )
 			}
 			for( int i = 1; i < NumFxChannels+1; ++i )
 			{
-				engine::getFxMixer()->processChannel( i );
+				engine::getFxMixer()->processChannel(
+								(fx_ch_t) i );
 			}
 		}
-		const surroundSampleFrame * buf =
-					engine::getFxMixer()->masterMix();
-		memcpy( m_writeBuf, buf, m_framesPerPeriod *
-						sizeof( surroundSampleFrame ) );
+		engine::getFxMixer()->masterMix( m_writeBuf );
 	}
 
 	unlock();
@@ -744,12 +736,12 @@ void mixer::bufferToPort( const sampleFrame * _buf,
 					stereoVolumeVector _vv,
 						audioPort * _port )
 {
-	const fpp_t start_frame = _offset % m_framesPerPeriod;
-	fpp_t end_frame = start_frame + _frames;
-	const fpp_t loop1_frame = tMin( end_frame, m_framesPerPeriod );
+	const int start_frame = _offset % m_framesPerPeriod;
+	int end_frame = start_frame + _frames;
+	const int loop1_frame = qMin<int>( end_frame, m_framesPerPeriod );
 
 	_port->lockFirstBuffer();
-	for( fpp_t frame = start_frame; frame < loop1_frame; ++frame )
+	for( int frame = start_frame; frame < loop1_frame; ++frame )
 	{
 		for( ch_cnt_t chnl = 0; chnl < DEFAULT_CHANNELS; ++chnl )
 		{
@@ -763,9 +755,9 @@ void mixer::bufferToPort( const sampleFrame * _buf,
 	_port->lockSecondBuffer();
 	if( end_frame > m_framesPerPeriod )
 	{
-		fpp_t frames_done = m_framesPerPeriod - start_frame;
-		end_frame = tMin( end_frame -= m_framesPerPeriod,
-						m_framesPerPeriod );
+		const int frames_done = m_framesPerPeriod - start_frame;
+		end_frame -= m_framesPerPeriod;
+		end_frame = qMin<int>( end_frame, m_framesPerPeriod );
 		for( fpp_t frame = 0; frame < end_frame; ++frame )
 		{
 			for( ch_cnt_t chnl = 0; chnl < DEFAULT_CHANNELS;
@@ -798,7 +790,7 @@ void mixer::clearAudioBuffer( sampleFrame * _ab, const f_cnt_t _frames,
 
 
 
-#ifndef DISABLE_SURROUND
+#ifndef LMMS_DISABLE_SURROUND
 void mixer::clearAudioBuffer( surroundSampleFrame * _ab, const f_cnt_t _frames,
 							const f_cnt_t _offset )
 {

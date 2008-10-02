@@ -34,12 +34,12 @@
 
 fxChannel::fxChannel( model * _parent ) :
 	m_fxChain( NULL ),
-	m_used( FALSE ),
-	m_stillRunning( FALSE ),
+	m_used( false ),
+	m_stillRunning( false ),
 	m_peakLeft( 0.0f ),
 	m_peakRight( 0.0f ),
 	m_buffer( new sampleFrame[engine::getMixer()->framesPerPeriod()] ),
-	m_muteModel( FALSE, _parent ),
+	m_muteModel( false, _parent ),
 	m_volumeModel( 1.0, 0.0, 2.0, 0.01, _parent ),
 	m_name(),
 	m_lock()
@@ -63,9 +63,7 @@ fxChannel::~fxChannel()
 
 fxMixer::fxMixer() :
 	journallingObject(),
-	model( NULL ),
-	m_out( new surroundSampleFrame[
-				engine::getMixer()->framesPerPeriod()] )
+	model( NULL )
 {
 	for( int i = 0; i < NumFxChannels+1; ++i )
 	{
@@ -80,7 +78,6 @@ fxMixer::fxMixer() :
 
 fxMixer::~fxMixer()
 {
-	delete[] m_out;
 	for( int i = 0; i < NumFxChannels+1; ++i )
 	{
 		delete m_fxChannels[i];
@@ -92,7 +89,7 @@ fxMixer::~fxMixer()
 
 void fxMixer::mixToChannel( const sampleFrame * _buf, fx_ch_t _ch )
 {
-	if( m_fxChannels[_ch]->m_muteModel.value() == FALSE )
+	if( m_fxChannels[_ch]->m_muteModel.value() == false )
 	{
 		m_fxChannels[_ch]->m_lock.lock();
 		sampleFrame * buf = m_fxChannels[_ch]->m_buffer;
@@ -102,7 +99,7 @@ void fxMixer::mixToChannel( const sampleFrame * _buf, fx_ch_t _ch )
 			buf[f][0] += _buf[f][0];
 			buf[f][1] += _buf[f][1];
 		}
-		m_fxChannels[_ch]->m_used = TRUE;
+		m_fxChannels[_ch]->m_used = true;
 		m_fxChannels[_ch]->m_lock.unlock();
 	}
 }
@@ -110,27 +107,29 @@ void fxMixer::mixToChannel( const sampleFrame * _buf, fx_ch_t _ch )
 
 
 
-void fxMixer::processChannel( fx_ch_t _ch )
+void fxMixer::processChannel( fx_ch_t _ch, sampleFrame * _buf )
 {
-	if( m_fxChannels[_ch]->m_muteModel.value() == FALSE &&
+	if( m_fxChannels[_ch]->m_muteModel.value() == false &&
 		( m_fxChannels[_ch]->m_used ||
 				m_fxChannels[_ch]->m_stillRunning ||
 								_ch == 0 ) )
 	{
+		if( _buf == NULL )
+		{
+			_buf = m_fxChannels[_ch]->m_buffer;
+		}
 		const fpp_t f = engine::getMixer()->framesPerPeriod();
 		m_fxChannels[_ch]->m_fxChain.startRunning();
 		m_fxChannels[_ch]->m_stillRunning =
 			m_fxChannels[_ch]->m_fxChain.processAudioBuffer(
-					m_fxChannels[_ch]->m_buffer, f );
+								_buf, f );
 		m_fxChannels[_ch]->m_peakLeft =
-			engine::getMixer()->peakValueLeft(
-					m_fxChannels[_ch]->m_buffer, f ) *
+			engine::getMixer()->peakValueLeft( _buf, f ) *
 				m_fxChannels[_ch]->m_volumeModel.value();
 		m_fxChannels[_ch]->m_peakRight =
-			engine::getMixer()->peakValueRight(
-					m_fxChannels[_ch]->m_buffer, f ) *
+			engine::getMixer()->peakValueRight( _buf, f ) *
 				m_fxChannels[_ch]->m_volumeModel.value();
-		m_fxChannels[_ch]->m_used = TRUE;
+		m_fxChannels[_ch]->m_used = true;
 	}
 	else
 	{
@@ -151,49 +150,46 @@ void fxMixer::prepareMasterMix( void )
 
 
 
-const surroundSampleFrame * fxMixer::masterMix( void )
+void fxMixer::masterMix( sampleFrame * _buf )
 {
-	sampleFrame * buf = m_fxChannels[0]->m_buffer;
+	const int fpp = engine::getMixer()->framesPerPeriod();
+	memcpy( _buf, m_fxChannels[0]->m_buffer, sizeof( sampleFrame ) * fpp );
+
 	for( int i = 1; i < NumFxChannels+1; ++i )
 	{
 		if( m_fxChannels[i]->m_used )
 		{
 			sampleFrame * ch_buf = m_fxChannels[i]->m_buffer;
 			const float v = m_fxChannels[i]->m_volumeModel.value();
-			for( f_cnt_t f = 0; f <
-				engine::getMixer()->framesPerPeriod(); ++f )
+			for( f_cnt_t f = 0; f < fpp; ++f )
 			{
-				buf[f][0] += ch_buf[f][0] * v;
-				buf[f][1] += ch_buf[f][1] * v;
+				_buf[f][0] += ch_buf[f][0] * v;
+				_buf[f][1] += ch_buf[f][1] * v;
 			}
 			engine::getMixer()->clearAudioBuffer( ch_buf,
 					engine::getMixer()->framesPerPeriod() );
-			m_fxChannels[i]->m_used = FALSE;
+			m_fxChannels[i]->m_used = false;
 		}
 	}
 
-	processChannel( 0 );
+	processChannel( 0, _buf );
 
 	if( m_fxChannels[0]->m_muteModel.value() )
 	{
-		engine::getMixer()->clearAudioBuffer( m_out,
+		engine::getMixer()->clearAudioBuffer( _buf,
 					engine::getMixer()->framesPerPeriod() );
-		return( m_out );
+		return;
 	}
 
 	const float v = m_fxChannels[0]->m_volumeModel.value();
 	for( f_cnt_t f = 0; f < engine::getMixer()->framesPerPeriod(); ++f )
 	{
-		for( ch_cnt_t ch = 0; ch < SURROUND_CHANNELS; ++ch )
-		{
-			m_out[f][ch] = buf[f][ch%DEFAULT_CHANNELS] * v;
-		}
+		_buf[f][0] *= v;
+		_buf[f][1] *= v;
 	}
 
 	m_fxChannels[0]->m_peakLeft *= engine::getMixer()->masterGain();
 	m_fxChannels[0]->m_peakRight *= engine::getMixer()->masterGain();
-
-	return( m_out );
 }
 
 
@@ -205,7 +201,7 @@ void fxMixer::clear()
 	{
 		m_fxChannels[i]->m_fxChain.clear();
 		m_fxChannels[i]->m_volumeModel.setValue( 1.0f );
-		m_fxChannels[i]->m_muteModel.setValue( FALSE );
+		m_fxChannels[i]->m_muteModel.setValue( false );
 		m_fxChannels[i]->m_name = ( i == 0 ) ?
 				tr( "Master" ) : tr( "FX %1" ).arg( i );
 		m_fxChannels[i]->m_volumeModel.setDisplayName( 

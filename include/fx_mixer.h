@@ -62,10 +62,10 @@ public:
 	virtual ~fxMixer();
 
 	void mixToChannel( const sampleFrame * _buf, fx_ch_t _ch );
-	void processChannel( fx_ch_t _ch );
+	void processChannel( fx_ch_t _ch, sampleFrame * _buf = NULL );
 
 	void prepareMasterMix( void );
-	const surroundSampleFrame * masterMix( void );
+	void masterMix( sampleFrame * _buf );
 
 
 	void clear( void );
@@ -81,7 +81,6 @@ public:
 
 private:
 	fxChannel * m_fxChannels[NumFxChannels+1];	// +1 = master
-	surroundSampleFrame * m_out;
 
 
 	friend class mixerWorkerThread;
