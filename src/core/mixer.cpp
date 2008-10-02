@@ -100,8 +100,6 @@ static void * aligned_malloc( int _bytes )
 }
 
 
-#undef QT_VERSION
-#define QT_VERSION 0x040300
 
 class mixerWorkerThread : public QThread
 {
