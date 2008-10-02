@@ -230,10 +230,11 @@ inline void envelopeAndLFOParameters::fillLFOLevel( float * _buf,
 {
 	if( m_lfoAmountIsZero || _frame <= m_lfoPredelayFrames )
 	{
-		for( fpp_t offset = 0; offset < _frames; ++offset )
+		memset( _buf, 0, _frames * sizeof( *_buf ) );
+/*		for( fpp_t offset = 0; offset < _frames; ++offset )
 		{
 			*_buf++ = 0.0f;
-		}
+		}*/
 		return;
 	}
 	_frame -= m_lfoPredelayFrames;
