@@ -35,14 +35,6 @@ float automatableModel::__copiedValue = 0;
 
 
 
-template<>
-inline float automatableModel::minEps<float>( void )
-{
-	return( 1.0e-10 );
-}
-
-
-
 
 automatableModel::automatableModel( DataType _type,
 						const float _val,
@@ -292,19 +284,20 @@ float automatableModel::fittedValue( float _value ) const
 	}
 
 	// correct rounding error at the border
-	if( tAbs<float>( _value - m_maxValue ) <
-				minEps<float>() * tAbs<float>( m_step ) )
+	if( qAbs<float>( _value - m_maxValue ) <
+			typeInfo<float>::minEps() * qAbs<float>( m_step ) )
 	{
 		_value = m_maxValue;
 	}
 
 	// correct rounding error if value = 0
-	if( tAbs<float>( _value ) < minEps<float>() * tAbs<float>( m_step ) )
+	if( qAbs<float>( _value ) < typeInfo<float>::minEps() *
+							qAbs<float>( m_step ) )
 	{
 		_value = 0;
 	}
 
-	return( _value );
+	return _value;
 }
 
 
@@ -314,7 +307,7 @@ float automatableModel::fittedValue( float _value ) const
 void automatableModel::redoStep( journalEntry & _je )
 {
 	bool journalling = testAndSetJournalling( FALSE );
-	setValue( value<float>() + _je.data().toDouble() );
+	setValue( value<float>() + (float) _je.data().toDouble() );
 	setJournalling( journalling );
 }
 

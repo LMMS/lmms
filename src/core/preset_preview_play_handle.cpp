@@ -157,7 +157,7 @@ presetPreviewPlayHandle::presetPreviewPlayHandle( const QString & _preset_file,
 	// create note-play-handle for it
 	m_previewNote = new notePlayHandle(
 			s_previewTC->previewInstrumentTrack(), 0,
-			valueRanges<f_cnt_t>::max() / 2,
+			typeInfo<f_cnt_t>::max() / 2,
 				note( 0, 0, DefaultKey, 100 ) );
 
 

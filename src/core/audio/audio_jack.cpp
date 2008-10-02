@@ -334,7 +334,7 @@ int audioJACK::processCallback( jack_nframes_t _nframes, void * _udata )
 	}
 
 #ifdef AUDIO_PORT_SUPPORT
-	const Uint32 frames = tMin<Uint32>( _nframes,
+	const Uint32 frames = qMin<Uint32>( _nframes,
 					_this->getMixer()->framesPerPeriod() );
 	for( jackPortMap::iterator it = _this->m_portMap.begin();
 					it != _this->m_portMap.end(); ++it )
@@ -360,7 +360,7 @@ int audioJACK::processCallback( jack_nframes_t _nframes, void * _udata )
 	jack_nframes_t done = 0;
 	while( done < _nframes && _this->m_stopped == FALSE )
 	{
-		jack_nframes_t todo = tMin<jack_nframes_t>(
+		jack_nframes_t todo = qMin<jack_nframes_t>(
 						_nframes,
 						_this->m_framesToDoInCurBuf -
 						_this->m_framesDoneInCurBuf );

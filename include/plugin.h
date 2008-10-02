@@ -77,7 +77,8 @@ public:
 		inline bool supportsFileType( const QString & _ext ) const
 		{
 			return( QString( supportedFileTypes ).
-						split( ',' ).contains( _ext ) );
+						split( QChar( ',' ) ).
+							contains( _ext ) );
 		}
 		class EXPORT subPluginFeatures
 		{
@@ -87,7 +88,7 @@ public:
 				typedef QMap<QString, QString> attributeMap;
 
 				inline key( plugin::descriptor * _desc = NULL,
-					const QString & _name = QString::null,
+					const QString & _name = QString(),
 					const attributeMap & _am =
 							attributeMap() )
 					:
@@ -151,9 +152,9 @@ public:
 	// returns display-name out of descriptor
 	virtual QString displayName( void ) const
 	{
-		return( model::displayName() != QString::null ?
-					model::displayName() :
-						m_descriptor->displayName );
+		return( model::displayName().isNull() ?
+					m_descriptor->displayName :
+						model::displayName() );
 	}
 
 	// return plugin-type

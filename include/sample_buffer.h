@@ -66,7 +66,7 @@ public:
 
 	// constructor which either loads sample _audio_file or decodes
 	// base64-data out of string
-	sampleBuffer( const QString & _audio_file = "",
+	sampleBuffer( const QString & _audio_file = QString(),
 						bool _is_base64_data = FALSE );
 	sampleBuffer( const sampleFrame * _data, const f_cnt_t _frames );
 	sampleBuffer( const f_cnt_t _frames );

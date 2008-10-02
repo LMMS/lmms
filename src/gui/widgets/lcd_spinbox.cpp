@@ -250,7 +250,7 @@ void lcdSpinBox::updateSize()
 				m_cellHeight + (2*margin) );
 	}
 	else {
-		setFixedSize( tMax<int>(
+		setFixedSize( qMax<int>(
 				m_cellWidth * m_numDigits + 2*(margin+m_marginWidth),
 				QFontMetrics( pointSize<6>( font() ) ).width( m_label ) ),
 				m_cellHeight + (2*margin) + 10 );

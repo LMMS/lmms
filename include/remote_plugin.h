@@ -237,7 +237,7 @@ public:
 	// do we act as master (i.e. not as remote-process?)
 	inline bool isMaster( void ) const
 	{
-		return( m_master );
+		return m_master;
 	}
 
 	// recursive lock
@@ -294,7 +294,7 @@ public:
 	{
 		int32_t i;
 		read( &i, sizeof( i ) );
-		return( i );
+		return i;
 	}
 
 	inline void writeInt( const int32_t & _i )
@@ -312,7 +312,7 @@ public:
 			sc[len] = 0;
 			std::string s( sc );
 			delete[] sc;
-			return( s );
+			return s;
 		}
 		return std::string();
 	}
@@ -332,18 +332,18 @@ public:
 		lock();
 		const bool empty = ( m_data->startPtr == m_data->endPtr );
 		unlock();
-		return( !empty );
+		return !empty;
 #else
 		int v;
 		sem_getvalue( m_messageSem, &v );
-		return( v > 0 );
+		return v > 0;
 #endif
 	}
 
 
 	inline int shmKey( void ) const
 	{
-		return( m_shmKey );
+		return m_shmKey;
 	}
 
 
@@ -484,7 +484,7 @@ public:
 		inline message & addString( const std::string & _s )
 		{
 			data.push_back( _s );
-			return( *this );
+			return *this;
 		}
 
 		message & addInt( int _i )
@@ -493,7 +493,7 @@ public:
 			buf[0] = 0;
 			sprintf( buf, "%d", _i );
 			data.push_back( std::string( buf ) );
-			return( *this );
+			return *this;
 		}
 
 		message & addFloat( float _f )
@@ -502,29 +502,29 @@ public:
 			buf[0] = 0;
 			sprintf( buf, "%f", _f );
 			data.push_back( std::string( buf ) );
-			return( *this );
+			return *this;
 		}
 
 		inline std::string getString( int _p = 0 ) const
 		{
-			return( data[_p] );
+			return data[_p];
 		}
 
 #ifndef BUILD_REMOTE_PLUGIN_CLIENT
 		inline QString getQString( int _p = 0 ) const
 		{
-			return( QString::fromStdString( getString( _p ) ) );
+			return QString::fromStdString( getString( _p ) );
 		}
 #endif
 
 		inline int getInt( int _p = 0 ) const
 		{
-			return( atoi( data[_p].c_str() ) );
+			return atoi( data[_p].c_str() );
 		}
 
 		inline float getFloat( int _p ) const
 		{
-			return( atof( data[_p].c_str() ) );
+			return (float) atof( data[_p].c_str() );
 		}
 
 		inline bool operator==( const message & _m ) const
@@ -549,7 +549,7 @@ public:
 
 	inline bool messagesLeft( void )
 	{
-		return( m_in->messagesLeft() );
+		return m_in->messagesLeft();
 	}
 
 
@@ -577,12 +577,12 @@ public:
 protected:
 	const shmFifo * in( void ) const
 	{
-		return( m_in );
+		return m_in;
 	}
 
 	const shmFifo * out( void ) const
 	{
-		return( m_out );
+		return m_out;
 	}
 
 
@@ -637,7 +637,7 @@ public:
 
 	inline bool failed( void ) const
 	{
-		return( m_failed );
+		return m_failed;
 	}
 
 
@@ -705,7 +705,7 @@ public:
 
 	inline float * sharedMemory( void )
 	{
-		return( m_shm );
+		return m_shm;
 	}
 
 	virtual void updateSampleRate( void )
@@ -718,12 +718,12 @@ public:
 
 	inline sample_rate_t sampleRate( void ) const
 	{
-		return( m_sampleRate );
+		return m_sampleRate;
 	}
 
 	inline fpp_t bufferSize( void ) const
 	{
-		return( m_bufferSize );
+		return m_bufferSize;
 	}
 
 	void setInputCount( int _i )
@@ -740,12 +740,12 @@ public:
 
 	virtual int inputCount( void ) const
 	{
-		return( m_inputCount );
+		return m_inputCount;
 	}
 
 	virtual int outputCount( void ) const
 	{
-		return( m_outputCount );
+		return m_outputCount;
 	}
 
 
@@ -832,7 +832,7 @@ remotePluginBase::message remotePluginBase::receiveMessage( void )
 		m.data.push_back( m_in->readString() );
 	}
 	m_in->unlock();
-	return( m );
+	return m;
 }
 
 
@@ -856,11 +856,11 @@ remotePluginBase::message remotePluginBase::waitForMessage(
 		processMessage( m );
 		if( m.id == _wm.id )
 		{
-			return( m );
+			return m;
 		}
 		else if( m.id == IdGeneralFailure )
 		{
-			return( m );
+			return m;
 		}
 	}
 }
@@ -913,7 +913,7 @@ bool remotePluginClient::processMessage( const message & _m )
 	switch( _m.id )
 	{
 		case IdGeneralFailure:
-			return( false );
+			return false;
 
 		case IdSampleRateInformation:
 			m_sampleRate = _m.getInt();
@@ -926,7 +926,7 @@ bool remotePluginClient::processMessage( const message & _m )
 			break;
 
 		case IdQuit:
-			return( false );
+			return false;
 
 		case IdMidiEvent:
 			processMidiEvent(
@@ -962,7 +962,7 @@ bool remotePluginClient::processMessage( const message & _m )
 		sendMessage( reply_message );
 	}
 
-	return( true );
+	return true;
 }
 
 

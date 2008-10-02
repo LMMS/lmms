@@ -63,7 +63,7 @@ public:
 
 private:
 	ladspa2LMMS( void );
-	~ladspa2LMMS();
+	virtual ~ladspa2LMMS();
 
 	l_sortable_plugin_t m_instruments;
 	l_sortable_plugin_t m_validEffects;

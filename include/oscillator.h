@@ -65,7 +65,7 @@ public:
 		SignalMix,
 		SynchronizedBySubOsc,
 		FrequencyModulation,
-		NumModulationAlgos,
+		NumModulationAlgos
 	} ;
 
 

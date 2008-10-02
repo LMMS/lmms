@@ -136,7 +136,7 @@ void song::masterVolumeChanged( void )
 
 void song::setTempo( void )
 {
-	const bpm_t tempo = m_tempoModel.value();
+	const bpm_t tempo = (bpm_t) m_tempoModel.value();
 	playHandleVector & phv = engine::getMixer()->playHandles();
 	for( playHandleVector::iterator it = phv.begin(); it != phv.end();
 									++it )
@@ -291,7 +291,7 @@ void song::processNextBuffer( void )
 	}
 
 	trackList track_list;
-	Sint16 tco_num = -1;
+	int tco_num = -1;
 
 	switch( m_playMode )
 	{
@@ -700,7 +700,7 @@ void song::addAutomationTrack( void )
 
 bpm_t song::getTempo( void )
 {
-	return( m_tempoModel.value() );
+	return (bpm_t) m_tempoModel.value();
 }
 
 

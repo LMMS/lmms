@@ -59,8 +59,8 @@ public:
 	virtual void play( sampleFrame * _working_buffer );
 
 	// to be implemented by actual plugin
-	virtual void playNote( notePlayHandle * _note_to_play,
-					sampleFrame * _working_buf )
+	virtual void playNote( notePlayHandle * /* _note_to_play */,
+					sampleFrame * /* _working_buf */ )
 	{
 	}
 
@@ -82,28 +82,28 @@ public:
 	// release
 	virtual f_cnt_t desiredReleaseFrames( void ) const
 	{
-		return( 0 );
+		return 0;
 	}
 
 	// return false if instrument is not bendable
 	inline virtual bool isBendable( void ) const
 	{
-		return( true );
+		return true;
 	}
 
 	// return true if instruments reacts to MIDI events passed to
 	// handleMidiEvent() rather than playNote() & Co
 	inline virtual bool isMidiBased( void ) const
 	{
-		return( false );
+		return false;
 	}
 
 	// sub-classes can re-implement this for receiving all incoming
 	// MIDI-events
-	inline virtual bool handleMidiEvent( const midiEvent & _me,
-						const midiTime & _time )
+	inline virtual bool handleMidiEvent( const midiEvent &,
+						const midiTime & )
 	{
-		return( false );
+		return false;
 	}
 
 	virtual QString fullDisplayName( void ) const;
@@ -123,13 +123,14 @@ public:
 protected:
 	inline instrumentTrack * getInstrumentTrack( void ) const
 	{
-		return( m_instrumentTrack );
+		return m_instrumentTrack;
 	}
 
 	// instruments may use this to apply a soft fade out at the end of
 	// notes - method does this only if really less or equal
 	// desiredReleaseFrames() frames are left
 	void applyRelease( sampleFrame * buf, const notePlayHandle * _n );
+
 
 private:
 	instrumentTrack * m_instrumentTrack;

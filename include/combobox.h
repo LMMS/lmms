@@ -38,7 +38,7 @@ class comboBox : public QWidget, public intModelView
 {
 	Q_OBJECT
 public:
-	comboBox( QWidget * _parent, const QString & _name = QString::null );
+	comboBox( QWidget * _parent, const QString & _name = QString() );
 	virtual ~comboBox();
 
 	comboBoxModel * model( void )

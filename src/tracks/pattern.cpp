@@ -146,7 +146,7 @@ midiTime pattern::length( void ) const
 	{
 		if( ( *it )->length() > 0 )
 		{
-			max_length = tMax<tick>( max_length,
+			max_length = qMax<tick>( max_length,
 							( *it )->endPos() );
 		}
 	}
@@ -166,7 +166,7 @@ midiTime pattern::beatPatternLength( void ) const
 	{
 		if( ( *it )->length() < 0 )
 		{
-			max_length = tMax<tick>( max_length, ( *it )->pos() +
+			max_length = qMax<tick>( max_length, ( *it )->pos() +
 					midiTime::ticksPerTact() /
 						midiTime::stepsPerTact() );
 		}

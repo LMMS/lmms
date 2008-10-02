@@ -183,8 +183,8 @@ void bbTCOView::paintEvent( QPaintEvent * )
 	}
 	if( isSelected() == TRUE )
 	{
-		col = QColor( tMax( col.red() - 128, 0 ),
-					tMax( col.green() - 128, 0 ), 255 );
+		col = QColor( qMax( col.red() - 128, 0 ),
+					qMax( col.green() - 128, 0 ), 255 );
 	}
 	QPainter p( this );
 

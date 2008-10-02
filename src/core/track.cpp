@@ -658,7 +658,7 @@ void trackContentObjectView::mouseMoveEvent( QMouseEvent * _me )
 	if( m_action == Move )
 	{
 		const int x = mapToParent( _me->pos() ).x() - m_initialMouseX;
-		midiTime t = tMax( 0, (int)
+		midiTime t = qMax( 0, (int)
 			m_trackView->getTrackContainerView()->currentPosition()+
 				static_cast<int>( x * midiTime::ticksPerTact() /
 									ppt ) );
@@ -696,7 +696,7 @@ void trackContentObjectView::mouseMoveEvent( QMouseEvent * _me )
 			}
 			trackContentObject * tco = tcov->m_tco;
 			tcos.push_back( tco );
-			smallest_pos = tMin<int>( smallest_pos,
+			smallest_pos = qMin<int>( smallest_pos,
 					(int)tco->startPosition() +
 				static_cast<int>( dx *
 					midiTime::ticksPerTact() / ppt ) );
@@ -712,7 +712,7 @@ void trackContentObjectView::mouseMoveEvent( QMouseEvent * _me )
 	}
 	else if( m_action == Resize )
 	{
-		midiTime t = tMax( midiTime::ticksPerTact(),
+		midiTime t = qMax( midiTime::ticksPerTact(),
 				static_cast<int>( _me->x() *
 					midiTime::ticksPerTact() / ppt ) );
 		if( engine::getMainWindow()->isCtrlPressed() ==
@@ -1987,7 +1987,7 @@ void track::removeTact( const midiTime & _pos )
 	{
 		if( ( *it )->startPosition() >= _pos )
 		{
-			( *it )->movePosition( tMax( ( *it )->startPosition() -
+			( *it )->movePosition( qMax( ( *it )->startPosition() -
 						midiTime::ticksPerTact(), 0 ) );
 		}
 	}
@@ -2235,7 +2235,7 @@ void trackView::undoStep( journalEntry & _je )
 			}
 			break;
 		case ResizeTrack:
-			setFixedHeight( tMax<int>( height() +
+			setFixedHeight( qMax<int>( height() +
 						_je.data().toInt(),
 						MINIMAL_TRACK_HEIGHT ) );
 			m_trackContainerView->realignTracks();
@@ -2397,7 +2397,7 @@ void trackView::mouseMoveEvent( QMouseEvent * _me )
 	}
 	else if( m_action == ResizeTrack )
 	{
-		setFixedHeight( tMax<int>( _me->y(), MINIMAL_TRACK_HEIGHT ) );
+		setFixedHeight( qMax<int>( _me->y(), MINIMAL_TRACK_HEIGHT ) );
 		m_trackContainerView->realignTracks();
 	}
 }

@@ -27,6 +27,7 @@
 #define _TYPES_H
 
 #include <limits>
+
 #include "lmmsconfig.h"
 
 typedef unsigned char	Uint8;
@@ -61,23 +62,53 @@ typedef Uint32 jo_id_t;			// (unique) ID of a journalling object
 
 
 template<typename T>
-struct valueRanges
+struct typeInfo
 {
 	static inline T min( void )
 	{
-		return( std::numeric_limits<T>::min() );
+		return std::numeric_limits<T>::min();
 	}
 
 	static inline T max( void )
 	{
-		return( std::numeric_limits<T>::max() );
+		return std::numeric_limits<T>::max();
+	}
+
+	static inline T minEps( void )
+	{
+		return 1;
+	}
+
+	static inline bool isEqual( T _x, T _y )
+	{
+		return _x == _y;
+	}
+
+	static inline T absVal( T t )
+	{
+		return t >= 0 ? t : -t;
 	}
 } ;
+
+
+template<>
+inline float typeInfo<float>::minEps( void )
+{
+	return 1.0e-10;
+}
+	
+template<>
+inline bool typeInfo<float>::isEqual( float _x, float _y )
+{
+	return absVal( _x - _y ) < minEps();
+}
+
 
 
 const ch_cnt_t DEFAULT_CHANNELS = 2;
 
 const ch_cnt_t SURROUND_CHANNELS =
+#define LMMS_DISABLE_SURROUND
 #ifndef LMMS_DISABLE_SURROUND
 				4;
 #else
@@ -89,5 +120,9 @@ const ch_cnt_t SURROUND_CHANNELS =
 typedef sample_t sampleFrame[DEFAULT_CHANNELS];
 typedef sample_t surroundSampleFrame[SURROUND_CHANNELS];
 
+
+// use for improved branch prediction
+#define likely(x)	__builtin_expect((x),1)
+#define unlikely(x)	__builtin_expect((x),0)
 
 #endif

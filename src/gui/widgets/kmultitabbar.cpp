@@ -394,7 +394,7 @@ QSize KMultiTabBarButton::sizeHint() const
         iw = 20;
         ih = 16;
         w += iw;
-        h = tMax( h, ih );
+        h = qMax( h, ih );
     }
     QStyleOptionButton sob;
     if ( menu() != 0 )

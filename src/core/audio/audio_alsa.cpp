@@ -264,7 +264,7 @@ void audioALSA::run( void )
 						outbuf,
 						m_convertEndian );
 			}
-			int min_len = tMin( len, outbuf_size - outbuf_pos );
+			int min_len = qMin( len, outbuf_size - outbuf_pos );
 			memcpy( ptr, outbuf + outbuf_pos,
 					min_len * sizeof( int_sample_t ) );
 			ptr += min_len;

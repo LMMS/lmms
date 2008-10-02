@@ -81,7 +81,7 @@ controllerConnection::~controllerConnection()
 
 
 
-void controllerConnection::setController( int _controllerId )
+void controllerConnection::setController( int /*_controllerId*/ )
 {
 }
 

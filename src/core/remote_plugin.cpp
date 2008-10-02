@@ -137,7 +137,7 @@ bool remotePlugin::process( const sampleFrame * _in_buf,
 
 	memset( m_shm, 0, m_shmSize );
 
-	ch_cnt_t inputs = tMin<ch_cnt_t>( m_inputCount, DEFAULT_CHANNELS );
+	ch_cnt_t inputs = qMin<ch_cnt_t>( m_inputCount, DEFAULT_CHANNELS );
 
 	if( _in_buf != NULL && inputs > 0 )
 	{
@@ -182,7 +182,7 @@ bool remotePlugin::process( const sampleFrame * _in_buf,
 	waitForMessage( IdProcessingDone );
 	unlock();
 
-	const ch_cnt_t outputs = tMin<ch_cnt_t>( m_outputCount,
+	const ch_cnt_t outputs = qMin<ch_cnt_t>( m_outputCount,
 							DEFAULT_CHANNELS );
 	if( m_splitChannels )
 	{

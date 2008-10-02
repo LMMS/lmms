@@ -521,7 +521,7 @@ void songEditor::wheelEvent( QWheelEvent * _we )
 	{
 		if( _we->delta() > 0 )
 		{
-			setPixelsPerTact( (int) tMin( pixelsPerTact() * 2,
+			setPixelsPerTact( (int) qMin( pixelsPerTact() * 2,
 								256.0f ) );
 		}
 		else if( pixelsPerTact() >= 8 )
@@ -657,7 +657,7 @@ void songEditor::updatePosition( const midiTime & _t )
 		}
 		else if( _t < m_currentPosition )
 		{
-			midiTime t = tMax(
+			midiTime t = qMax(
 				(int)( _t - w * midiTime::ticksPerTact() /
 							pixelsPerTact() ),
 									0 );

@@ -57,10 +57,10 @@ class audioPort;
 
 const fpp_t DEFAULT_BUFFER_SIZE = 256;
 
-const Uint8 BYTES_PER_SAMPLE = sizeof( sample_t );
-const Uint8 BYTES_PER_INT_SAMPLE = sizeof( int_sample_t );
-const Uint8 BYTES_PER_FRAME = sizeof( sampleFrame );
-const Uint8 BYTES_PER_SURROUND_FRAME = sizeof( surroundSampleFrame );
+const int BYTES_PER_SAMPLE = sizeof( sample_t );
+const int BYTES_PER_INT_SAMPLE = sizeof( int_sample_t );
+const int BYTES_PER_FRAME = sizeof( sampleFrame );
+const int BYTES_PER_SURROUND_FRAME = sizeof( surroundSampleFrame );
 
 const float OUTPUT_SAMPLE_MULTIPLIER = 32767.0f;
 
@@ -270,9 +270,9 @@ public:
 	}
 
 
-	inline Uint8 cpuLoad( void ) const
+	inline int cpuLoad( void ) const
 	{
-		return( m_cpuLoad );
+		return m_cpuLoad;
 	}
 
 	const qualitySettings & currentQualitySettings( void ) const
@@ -387,7 +387,7 @@ public:
 		return m_inputBuffer[ m_inputBufferRead ];
 	}
 
-	inline const f_cnt_t inputBufferFrames( void )
+	inline f_cnt_t inputBufferFrames( void ) const
 	{
 		return m_inputBufferFrames[ m_inputBufferRead ];
 	}
@@ -458,10 +458,10 @@ private:
 	surroundSampleFrame * m_writeBuf;
 	
 	QVector<surroundSampleFrame *> m_bufferPool;
-	Uint8 m_readBuffer;
-	Uint8 m_writeBuffer;
-	Uint8 m_analBuffer;
-	Uint8 m_poolDepth;
+	int m_readBuffer;
+	int m_writeBuffer;
+	int m_analBuffer;
+	int m_poolDepth;
 
 	surroundSampleFrame m_maxClip;
 	surroundSampleFrame m_previousSample;
@@ -469,7 +469,7 @@ private:
 	bool m_oldBuffer[SURROUND_CHANNELS];
 	bool m_newBuffer[SURROUND_CHANNELS];
 	
-	Uint8 m_cpuLoad;
+	int m_cpuLoad;
 	bool m_multiThreaded;
 	QVector<mixerWorkerThread *> m_workers;
 	int m_numWorkers;

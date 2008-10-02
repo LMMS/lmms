@@ -85,7 +85,7 @@ class EXPORT ladspaManager
 public:
 	
 	ladspaManager( void );
-	~ladspaManager();
+	virtual ~ladspaManager();
 
 	l_sortable_plugin_t getSortedPlugins();
 	ladspaManagerDescription * getDescription( const ladspa_key_t & 

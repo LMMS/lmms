@@ -82,8 +82,8 @@ const float MaxDetuning = 4 * 12.0f;
 class EXPORT note : public serializingObject
 {
 public:
-	note( const midiTime & _length = 0,
-		const midiTime & _pos = 0,
+	note( const midiTime & _length = midiTime( 0 ),
+		const midiTime & _pos = midiTime( 0 ),
 		int key = DefaultKey,
 		volume _volume = DefaultVolume,
 		panning _panning = DefaultPanning,
@@ -101,7 +101,8 @@ public:
 
 	inline midiTime endPos( void ) const
 	{
-		return( m_pos + m_length);
+		const int l = length();
+		return pos() + l;
 	}
 
 	inline const midiTime & length( void ) const
@@ -116,7 +117,8 @@ public:
 
 	inline midiTime pos( midiTime _base_pos ) const
 	{
-		return( m_pos - _base_pos );
+		const int bp = _base_pos;
+		return m_pos - bp;
 	}
 
 	inline int key( void ) const

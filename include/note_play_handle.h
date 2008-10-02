@@ -130,9 +130,9 @@ public:
 
 	f_cnt_t framesLeft( void ) const;
 
-	inline f_cnt_t framesLeftForCurrentPeriod( void ) const
+	inline fpp_t framesLeftForCurrentPeriod( void ) const
 	{
-		return( tMin<f_cnt_t>( framesLeft(),
+		return( (fpp_t) qMin<f_cnt_t>( framesLeft(),
 				engine::getMixer()->framesPerPeriod() ) );
 	}
 
@@ -239,7 +239,7 @@ public:
 	void processMidiTime( const midiTime & _time );
 	void resize( const bpm_t _new_tempo );
 
-#if LMMS_SINGERBOT_SUPPORT
+#ifdef LMMS_SINGERBOT_SUPPORT
 	int patternIndex( void )
 	{
 		return( m_patternIndex );
@@ -297,7 +297,7 @@ private:
 					// sub-note)
 	bool m_muted;			// indicates whether note is muted
 	track * m_bbTrack;		// related BB track
-#if LMMS_SINGERBOT_SUPPORT
+#ifdef LMMS_SINGERBOT_SUPPORT
 	int m_patternIndex;		// position among relevant notes
 #endif
 

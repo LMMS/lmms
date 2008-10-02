@@ -443,8 +443,7 @@ void arpeggiator::processNote( notePlayHandle * _n )
 		// create new arp-note
 		note new_note( midiTime( 0 ), midiTime( 0 ),
 				sub_note_key,
-				static_cast<volume>( _n->getVolume() *
-								vol_level ),
+				(volume) qRound( _n->getVolume() * vol_level ),
 				_n->getPanning(), _n->detuning() );
 
 		// create sub-note-play-handle, only ptr to note is different

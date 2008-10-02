@@ -60,7 +60,7 @@ class EXPORT knob : public QWidget, public floatModelView
 	Q_PROPERTY(QColor outerColor READ outerColor WRITE setOuterColor)
 	mapPropertyFromModel(bool,isVolumeKnob,setVolumeKnob,m_volumeKnob);
 public:
-	knob( int _knob_num, QWidget * _parent, const QString & _name = QString::null );
+	knob( int _knob_num, QWidget * _parent, const QString & _name = QString() );
 	virtual ~knob();
 
 	// TODO: remove
@@ -132,7 +132,7 @@ private:
 
 	inline float pageSize( void ) const
 	{
-		return( tMax<float>( ( model()->maxValue() -
+		return( qMax<float>( ( model()->maxValue() -
 					model()->minValue() ) / 100.0f,
 					modelUntyped()->step<float>() ) );
 	}

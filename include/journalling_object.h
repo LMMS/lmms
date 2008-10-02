@@ -157,10 +157,10 @@ protected:
 	void addJournalEntry( const journalEntry & _je );
 
 	// to be implemented by sub-objects
-	virtual void undoStep( journalEntry & _je )
+	virtual void undoStep( journalEntry & )
 	{
 	}
-	virtual void redoStep( journalEntry & _je )
+	virtual void redoStep( journalEntry & )
 	{
 	}
 

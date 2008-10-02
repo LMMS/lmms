@@ -321,7 +321,7 @@ int audioPortAudio::process_callback(
 			}
 			m_outBufSize = frames;
 		}
-		const int min_len = tMin( (int)_framesPerBuffer,
+		const int min_len = qMin( (int)_framesPerBuffer,
 			m_outBufSize - m_outBufPos );
 
 		float master_gain = getMixer()->masterGain();
@@ -487,12 +487,12 @@ audioPortAudio::setupWidget::setupWidget( QWidget * _parent ) :
 	const QString& device = configManager::inst()->value( "audioportaudio",
 		"device" );
 	
-	int i = tMax( 0, m_setupUtil.m_backendModel.findText( backend ) );
+	int i = qMax( 0, m_setupUtil.m_backendModel.findText( backend ) );
 	m_setupUtil.m_backendModel.setValue( i );
 	
 	m_setupUtil.updateDevices();
 	
-	i = tMax( 0, m_setupUtil.m_deviceModel.findText( device ) );
+	i = qMax( 0, m_setupUtil.m_deviceModel.findText( device ) );
 	m_setupUtil.m_deviceModel.setValue( i );
 
 	connect( &m_setupUtil.m_backendModel, SIGNAL( dataChanged() ),

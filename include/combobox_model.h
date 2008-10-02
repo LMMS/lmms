@@ -40,8 +40,8 @@ class comboBoxModel : public intModel
 	Q_OBJECT
 public:
 	comboBoxModel( ::model * _parent = NULL,
-			const QString & _display_name = QString::null,
-				bool _default_constructed = FALSE ) :
+			const QString & _display_name = QString(),
+				bool _default_constructed = false ) :
 		intModel( 0, 0, 0, _parent, _display_name,
 							_default_constructed )
 	{

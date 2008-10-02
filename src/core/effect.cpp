@@ -85,7 +85,7 @@ void effect::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 void effect::loadSettings( const QDomElement & _this )
 {
-	m_enabledModel.setValue( _this.attribute( "on" ).toInt() );
+	m_enabledModel.setValue( (float) _this.attribute( "on" ).toInt() );
 	m_wetDryModel.setValue( _this.attribute( "wet" ).toFloat() );
 	m_autoQuitModel.setValue( _this.attribute( "autoquit" ).toFloat() );
 	m_gateModel.setValue( _this.attribute( "gate" ).toFloat() );
@@ -183,7 +183,7 @@ void effect::reinitSRC( void )
 void effect::resample( int _i, const sampleFrame * _src_buf,
 							sample_rate_t _src_sr,
 				sampleFrame * _dst_buf, sample_rate_t _dst_sr,
-								fpp_t _frames )
+								f_cnt_t _frames )
 {
 	if( m_srcState[_i] == NULL )
 	{

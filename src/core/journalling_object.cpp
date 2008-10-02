@@ -155,7 +155,7 @@ void journallingObject::changeID( jo_id_t _id )
 					dynamic_cast<automatableModel *>( jo )->
 								displayName();
 			}
-			printf( "JO-ID %d already in use by %s!\n", _id,
+			printf( "JO-ID %d already in use by %s!\n", (int) _id,
 						used_by.toAscii().constData() );
 			return;
 		}

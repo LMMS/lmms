@@ -39,8 +39,9 @@ inline stereoVolumeVector panningToVolumeVector( panning _p,
 							float _scale = 1.0f )
 {
 	stereoVolumeVector v = { { _scale, _scale } };
-	v.vol[_p >= PanningCenter ? 0 : 1] *= 1.0f - tAbs<float>( _p / 100.0f );
-	return( v );
+	const float pf = _p / 100.0f;
+	v.vol[_p >= PanningCenter ? 0 : 1] *= 1.0f - qAbs<float>( pf );
+	return v;
 }
 
 #endif

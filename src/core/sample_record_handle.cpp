@@ -68,10 +68,10 @@ sampleRecordHandle::~sampleRecordHandle()
 
 
 
-void sampleRecordHandle::play( sampleFrame * _working_buffer )
+void sampleRecordHandle::play( sampleFrame * /*_working_buffer*/ )
 {
 	const sampleFrame * recbuf = engine::getMixer()->inputBuffer();
-	const fpp_t frames = engine::getMixer()->inputBufferFrames();
+	const f_cnt_t frames = engine::getMixer()->inputBufferFrames();
 	writeBuffer( recbuf, frames );
 	m_framesRecorded += frames;
 
@@ -88,7 +88,7 @@ void sampleRecordHandle::play( sampleFrame * _working_buffer )
 
 bool sampleRecordHandle::done( void ) const
 {
-	return( FALSE );
+	return false;
 }
 
 
@@ -139,10 +139,10 @@ void sampleRecordHandle::createSampleBuffer( sampleBuffer * * _sample_buf )
 
 
 void sampleRecordHandle::writeBuffer( const sampleFrame * _ab,
-					const fpp_t _frames )
+					const f_cnt_t _frames )
 {
 	sampleFrame * buf = new sampleFrame[_frames];
-	for( fpp_t frame = 0; frame < _frames; ++frame )
+	for( f_cnt_t frame = 0; frame < _frames; ++frame )
 	{
 		for( ch_cnt_t chnl = 0; chnl < DEFAULT_CHANNELS; ++chnl )
 		{

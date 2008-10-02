@@ -40,6 +40,10 @@ public:
 	{
 	}
 
+	virtual ~sharedObject()
+	{
+	}
+
 	template<class T>
 	static T * ref( T * _object )
 	{

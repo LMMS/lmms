@@ -97,7 +97,8 @@ public:
 
 	inline midiTime endPosition( void ) const
 	{
-		return( m_startPosition + m_length );
+		const int sp = m_startPosition;
+		return sp + m_length;
 	}
 
 	inline const midiTime & length( void ) const
@@ -247,7 +248,7 @@ public:
 
 public slots:
 	void update( void );
-	void changePosition( const midiTime & _new_pos = -1 );
+	void changePosition( const midiTime & _new_pos = midiTime( -1 ) );
 
 
 protected:

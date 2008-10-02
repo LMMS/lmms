@@ -121,9 +121,9 @@ public:
 protected:
 	// subclasses can re-implement this for being used in conjunction with
 	// processNextBuffer()
-	virtual void writeBuffer( const surroundSampleFrame * _ab,
-						const fpp_t _frames,
-						const float _master_gain )
+	virtual void writeBuffer( const surroundSampleFrame * /* _buf*/,
+						const fpp_t /*_frames*/,
+						const float /*_master_gain*/ )
 	{
 	}
 

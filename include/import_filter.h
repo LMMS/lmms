@@ -80,7 +80,7 @@ protected:
 		return( m_file.read( _data, _len ) );
 	}
 
-	inline void ungetChar( int _ch )
+	inline void ungetChar( char _ch )
 	{
 		m_file.ungetChar( _ch );
 	}

@@ -1,3 +1,94 @@
+2008-10-02	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* buildtools/bin2res.cpp:
+	* include/mmp.h:
+	* include/knob.h:
+	* include/effect.h:
+	* include/templates.h:
+	* include/track.h:
+	* include/note.h:
+	* include/automatable_model.h:
+	* include/import_filter.h:
+	* include/mixer.h:
+	* include/combobox_model.h:
+	* include/ladspa_manager.h:
+	* include/instrument.h:
+	* include/sample_buffer.h:
+	* include/midi.h:
+	* include/effect_lib.h:
+	* include/sample_record_handle.h:
+	* include/shared_object.h:
+	* include/plugin.h:
+	* include/note_play_handle.h:
+	* include/instrument_sound_shaping.h:
+	* include/oscillator.h:
+	* include/tempo_sync_knob.h:
+	* include/midi_time.h:
+	* include/remote_plugin.h:
+	* include/basic_filters.h:
+	* include/journalling_object.h:
+	* include/types.h:
+	* include/dummy_effect.h:
+	* include/automatable_model_view.h:
+	* include/inline_automation.h:
+	* include/audio_device.h:
+	* include/panning.h:
+	* include/combobox.h:
+	* include/ladspa_2_lmms.h:
+	* src/core/preset_preview_play_handle.cpp:
+	* src/core/note_play_handle.cpp:
+	* src/core/song.cpp:
+	* src/core/serializing_object.cpp:
+	* src/core/bb_track_container.cpp:
+	* src/core/remote_plugin.cpp:
+	* src/core/journalling_object.cpp:
+	* src/core/automatable_model.cpp:
+	* src/core/audio/audio_alsa.cpp:
+	* src/core/audio/audio_sdl.cpp:
+	* src/core/audio/audio_portaudio.cpp:
+	* src/core/audio/audio_jack.cpp:
+	* src/core/main.cpp:
+	* src/core/instrument_sound_shaping.cpp:
+	* src/core/effect.cpp:
+	* src/core/instrument_functions.cpp:
+	* src/core/controller_connection.cpp:
+	* src/core/track.cpp:
+	* src/core/engine.cpp:
+	* src/core/piano.cpp:
+	* src/core/timeline.cpp:
+	* src/core/instrument.cpp:
+	* src/core/surround_area.cpp:
+	* src/core/sample_buffer.cpp:
+	* src/core/oscillator.cpp:
+	* src/core/automation_pattern.cpp:
+	* src/core/lfo_controller.cpp:
+	* src/core/sample_record_handle.cpp:
+	* src/gui/piano_roll.cpp:
+	* src/gui/plugin_browser.cpp:
+	* src/gui/main_window.cpp:
+	* src/gui/song_editor.cpp:
+	* src/gui/widgets/kmultitabbar.cpp:
+	* src/gui/widgets/knob.cpp:
+	* src/gui/widgets/lcd_spinbox.cpp:
+	* src/gui/automation_editor.cpp:
+	* src/tracks/sample_track.cpp:
+	* src/tracks/bb_track.cpp:
+	* src/tracks/instrument_track.cpp:
+	* src/tracks/pattern.cpp:
+	* plugins/ladspa_effect/tap/CMakeLists.txt:
+	* plugins/audio_file_processor/audio_file_processor.cpp:
+	fixed a bunch warnings and remarks issued by Intel Compiler
+
+	* include/fx_mixer.h:
+	* src/core/fx_mixer.cpp:
+	* src/core/mixer.cpp:
+	- use one static jobqueue for not getting problems with cached pointers
+	- check for job being NULL
+	- improved performance of master mix
+
+	* CMakeLists.txt:
+	allow overriding compiler flags
+
 2008-09-30	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* plugins/sid/sid_instrument.h:

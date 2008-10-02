@@ -54,7 +54,7 @@ public:
 	} ;
 
 	f_cnt_t envFrames( const bool _only_vol = FALSE ) const;
-	f_cnt_t releaseFrames( const bool _only_vol = FALSE ) const;
+	f_cnt_t releaseFrames( void ) const;
 
 	float volumeLevel( notePlayHandle * _n, const f_cnt_t _frame );
 

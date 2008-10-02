@@ -253,7 +253,7 @@ void timeLine::paintEvent( QPaintEvent * )
 		p.drawLine( cx, 5, cx, height() - 6 );
 		++tact_num;
 		if( ( tact_num - 1 ) %
-			tMax( 1, qRound( 1.0f / 3.0f *
+			qMax( 1, qRound( 1.0f / 3.0f *
 				midiTime::ticksPerTact() / m_ppt ) ) == 0 )
 		{
 			const QString s = QString::number( tact_num );
@@ -321,7 +321,7 @@ void timeLine::mousePressEvent( QMouseEvent * _me )
 
 void timeLine::mouseMoveEvent( QMouseEvent * _me )
 {
-	const midiTime t = m_begin + static_cast<Sint32>( tMax( _me->x() -
+	const midiTime t = m_begin + static_cast<Sint32>( qMax( _me->x() -
 				    m_xOffset - m_moveXOff, 0 ) *
 					midiTime::ticksPerTact() / m_ppt );
 	switch( m_action )

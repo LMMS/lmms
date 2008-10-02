@@ -70,7 +70,7 @@ notePlayHandle::notePlayHandle( instrumentTrack * _it,
 	m_partOfArpeggio( _part_of_arp ),
 	m_muted( FALSE ),
 	m_bbTrack( NULL ),
-#if LMMS_SINGERBOT_SUPPORT
+#ifdef LMMS_SINGERBOT_SUPPORT
 	m_patternIndex( 0 ),
 #endif
 	m_origTempo( engine::getSong()->getTempo() )
@@ -92,7 +92,7 @@ notePlayHandle::notePlayHandle( instrumentTrack * _it,
 							_parent->isBaseNote();
 
 		m_bbTrack = _parent->m_bbTrack;
-#if LMMS_SINGERBOT_SUPPORT
+#ifdef LMMS_SINGERBOT_SUPPORT
 		m_patternIndex = _parent->m_patternIndex;
 #endif
 	}
@@ -324,7 +324,7 @@ void notePlayHandle::noteOff( const f_cnt_t _s )
 
 	// then set some variables indicating release-state
 	m_framesBeforeRelease = _s;
-	m_releaseFramesToDo = tMax<f_cnt_t>( 0, // 10,
+	m_releaseFramesToDo = qMax<f_cnt_t>( 0, // 10,
 			m_instrumentTrack->m_soundShaping.releaseFrames() );
 
 	if( !isBaseNote() || !getInstrumentTrack()->arpeggiatorEnabled() )
@@ -345,8 +345,8 @@ void notePlayHandle::noteOff( const f_cnt_t _s )
 
 f_cnt_t notePlayHandle::actualReleaseFramesToDo( void ) const
 {
-	return( m_instrumentTrack->m_soundShaping.releaseFrames(
-							isArpeggioBaseNote() ) );
+	return( m_instrumentTrack->m_soundShaping.releaseFrames(/*
+							isArpeggioBaseNote()*/ ) );
 }
 
 
@@ -463,7 +463,7 @@ void notePlayHandle::updateFrequency( void )
 		( key() - m_instrumentTrack->baseNoteModel()->value() +
 				engine::getSong()->masterPitch() ) / 12.0f;
 	m_frequency = BaseFreq * powf( 2.0f, pitch +
-		m_instrumentTrack->m_pitchModel.value() / ( 100 * 12.0 ) );
+		m_instrumentTrack->m_pitchModel.value() / ( 100 * 12.0f ) );
 	m_unpitchedFrequency = BaseFreq * powf( 2.0f, pitch );
 
 	for( notePlayHandleVector::iterator it = m_subNotes.begin();
@@ -480,9 +480,9 @@ void notePlayHandle::processMidiTime( const midiTime & _time )
 {
 	if( _time >= pos() )
 	{
-		float v = detuning()->getAutomationPattern()->valueAt( _time -
-									pos() );
-		if( v != m_baseDetuning->value() )
+		const float v = detuning()->getAutomationPattern()->
+						valueAt( _time - pos() );
+		if( !typeInfo<float>::isEqual( v, m_baseDetuning->value() ) )
 		{
 			m_baseDetuning->setValue( v );
 			updateFrequency();

@@ -1,7 +1,7 @@
 /*
  * templates.h - miscellanous templates and algorithms
  *
- * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -30,46 +30,9 @@
 
 
 template<class T>
-inline T tAbs( const T & x )
+inline T tLimit( const T x, const T x1, const T x2 )
 {
-	return( x < static_cast<T>( 0 ) ? -x : x );
-}
-
-
-
-
-template<class T>
-inline T tMin( const T & x1, const T & x2 )
-{
-	if( x1 < x2 )
-	{
-		return( x1 );
-	}
-	return( x2 );
-}
-
-
-
-
-template<class T>
-inline T tMax( const T & x1, const T & x2 )
-{
-	if( x1 > x2 )
-	{
-		return( x1 );
-	}
-	return( x2 );
-}
-
-
-
-
-template<class T>
-inline T tLimit( const T & x, const T & x1, const T & x2 )
-{
-	return( tMin<T>( tMax<T>( x, tMin<T>( x1, x2 ) ),
-							tMax<T>( x1, x2 ) ) );
-	
+	return qBound( x1, x, x2 );
 }
 
 

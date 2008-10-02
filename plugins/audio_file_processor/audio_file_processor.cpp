@@ -255,8 +255,8 @@ void audioFileProcessor::loopPointChanged( void )
 						( m_sampleBuffer.frames()-1 ) );
 	const f_cnt_t f2 = static_cast<f_cnt_t>( m_endPointModel.value() *
 						( m_sampleBuffer.frames()-1 ) );
-	m_sampleBuffer.setStartFrame( tMin<f_cnt_t>( f1, f2 ) );
-	m_sampleBuffer.setEndFrame( tMax<f_cnt_t>( f1, f2 ) );
+	m_sampleBuffer.setStartFrame( qMin<f_cnt_t>( f1, f2 ) );
+	m_sampleBuffer.setEndFrame( qMax<f_cnt_t>( f1, f2 ) );
 	emit dataChanged();
 }
 
@@ -473,7 +473,7 @@ void audioFileProcessorView::paintEvent( QPaintEvent * )
 
 	p.setPen( QColor( 0xFF, 0xAA, 0x00 ) );
 	const QRect graph_rect( 4, 174, 241, 70 );
-	const f_cnt_t frames = tMax( a->m_sampleBuffer.frames(),
+	const f_cnt_t frames = qMax( a->m_sampleBuffer.frames(),
 						static_cast<f_cnt_t>( 1 ) );
 	const int start_frame_x = a->m_sampleBuffer.startFrame() *
 						graph_rect.width() / frames;

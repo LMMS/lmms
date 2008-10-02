@@ -61,7 +61,7 @@ int main( int argc, char * * argv )
 	stringlist files;
 	for( int i = 1; i < argc; ++i )
 	{
-		files.push_back( argv[i] );
+		files.push_back( std::string( argv[i] ) );
 	}
 	for( stringlist::iterator it = files.begin(); it != files.end(); ++it )
 	{
@@ -111,7 +111,8 @@ int main( int argc, char * * argv )
 		embed * dummy = new embed;
 		dummy->size = 1;
 		dummy->name = "dummy";
-		dummy->cname = convertFileNameToCIdentifier( "dummy" );
+		dummy->cname = convertFileNameToCIdentifier(
+						std::string( "dummy" ) );
 		embedded_data.push_back( dummy );
 
 		std::cout << "#include <string.h>" << std::endl << std::endl;
@@ -134,7 +135,7 @@ int main( int argc, char * * argv )
 		}
 		std::cout << "	{ 0, 0, 0 }" << std::endl << "};" << std::endl
 								<< std::endl
-				<< "const embed::descriptor & "
+				<< "static const embed::descriptor & "
 				   "findEmbeddedData( const char * _name )"
 				<< std::endl << "{" << std::endl
 				<< "	for( int i = 0; embed_vec[i].data; "

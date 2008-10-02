@@ -2060,7 +2060,7 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 			}
 			// draw volume-line of note
 			QColor color = QColor::fromHsv( 120, 221, 
-					tMin(255, 60 + ( *it )->getVolume() ) );
+					qMin(255, 60 + ( *it )->getVolume() ) );
 			p.setPen( QPen( color,
 							NE_LINE_WIDTH ) );
 			p.drawLine( x + WHITE_KEY_WIDTH,
@@ -2191,7 +2191,7 @@ void pianoRoll::wheelEvent( QWheelEvent * _we )
 	{
 		if( _we->delta() > 0 )
 		{
-			m_ppt = tMin( m_ppt * 2, KEY_LINE_HEIGHT *
+			m_ppt = qMin( m_ppt * 2, KEY_LINE_HEIGHT *
 						DefaultStepsPerTact * 8 );
 		}
 		else if( m_ppt >= 72 )
@@ -2682,7 +2682,7 @@ void pianoRoll::updatePosition( const midiTime & _t )
 		}
 		else if( _t < m_currentPosition )
 		{
-			midiTime t = tMax( _t - w * midiTime::ticksPerTact() *
+			midiTime t = qMax( _t - w * midiTime::ticksPerTact() *
 					midiTime::ticksPerTact() / m_ppt, 0 );
 			m_leftRightScroll->setValue( t.getTact() *
 						midiTime::ticksPerTact() );

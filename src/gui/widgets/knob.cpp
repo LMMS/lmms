@@ -108,7 +108,7 @@ void knob::setLabel( const QString & _txt )
 	m_label = _txt;
 	if( m_knobPixmap )
 	{
-		setFixedSize( tMax<int>( m_knobPixmap->width(),
+		setFixedSize( qMax<int>( m_knobPixmap->width(),
 					QFontMetrics( pointSizeF( font(), 6
 							) ).width( m_label ) ),
 						m_knobPixmap->height() + 10 );
@@ -265,7 +265,7 @@ bool knob::updateAngle( void )
 								m_totalAngle;
 		angle = static_cast<int>( a ) % 360;
 	}
-	if( tAbs( angle - m_angle ) > 3 )
+	if( qAbs( angle - m_angle ) > 3 )
 	{
 		m_angle = angle;
 		return( TRUE );
@@ -346,9 +346,9 @@ void knob::drawKnob( QPainter * _p )
 		}
 		case knobDark_28:
 		{
-			const float rb = tMax<float>( ( radius - 10 ) / 3.0,
+			const float rb = qMax<float>( ( radius - 10 ) / 3.0,
 									0.0 );
-			const float re = tMax<float>( ( radius - 4 ), 0.0 );
+			const float re = qMax<float>( ( radius - 4 ), 0.0 );
 			QLineF ln = calculateLine( mid, re, rb );
 			ln.translate( 1, 1 );
 			p.drawLine( ln );

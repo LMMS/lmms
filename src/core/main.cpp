@@ -278,8 +278,8 @@ int main( int argc, char * * argv )
 				( QString( argv[i] ) == "--oversampling" ||
 						QString( argv[i] ) == "-x" ) )
 		{
-			int os = QString( argv[i + 1] ).toUInt();
-			switch( os )
+			int o = QString( argv[i + 1] ).toUInt();
+			switch( o )
 			{
 				case 1:
 		qs.oversampling = mixer::qualitySettings::Oversampling_None;

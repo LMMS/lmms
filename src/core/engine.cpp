@@ -177,7 +177,8 @@ void engine::initPluginFileHandling( void )
 		if( it->type == plugin::Instrument )
 		{
 			const QStringList & ext =
-				QString( it->supportedFileTypes ).split( ',' );
+				QString( it->supportedFileTypes ).
+							split( QChar( ',' ) );
 			for( QStringList::const_iterator itExt = ext.begin();
 						itExt != ext.end(); ++itExt )
 			{

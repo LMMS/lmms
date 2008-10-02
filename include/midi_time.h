@@ -70,14 +70,14 @@ public:
 
 	inline midiTime & operator+=( const midiTime & _t )
 	{
-		return( *this = static_cast<int>( *this ) +
-						static_cast<int>( _t ) );
+		m_ticks += _t.m_ticks;
+		return *this;
 	}
 
 	inline midiTime & operator-=( const midiTime & _t )
 	{
-		return( *this = static_cast<int>( *this ) -
-						static_cast<int>( _t ) );
+		m_ticks -= _t.m_ticks;
+		return *this;
 	}
 
 	inline tact getTact( void ) const

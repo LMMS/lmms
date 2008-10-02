@@ -38,7 +38,7 @@
 		public:							\
 			inline type getfunc( void ) const		\
 			{						\
-				return( (type) modelname->value() );	\
+				return (type) modelname->value();	\
 			}						\
 		public slots:						\
 			inline void setfunc( const type _val )		\
@@ -50,12 +50,12 @@
 		public:							\
 			inline type getfunc( void ) const		\
 			{						\
-				return( (type) modelname.value() );	\
+				return (type) modelname.value();	\
 			}						\
 		public slots:						\
 			inline void setfunc( const type _val )		\
 			{						\
-				modelname.setValue( _val );		\
+				modelname.setValue( (float) _val );	\
 			}
 
 
@@ -79,7 +79,7 @@ public:
 				const float _max = 0,
 				const float _step = 0,
 				::model * _parent = NULL,
-				const QString & _display_name = QString::null,
+				const QString & _display_name = QString(),
 				bool _default_constructed = FALSE );
 
 	virtual ~automatableModel();
@@ -87,7 +87,7 @@ public:
 
 	static inline float copiedValue( void )
 	{
-		return( __copiedValue );
+		return __copiedValue;
 	}
 
 	bool isAutomated( void ) const;
@@ -102,31 +102,32 @@ public:
 
 
 	template<class T>
-	static inline T minEps( void )
-	{
-		return( 1 );
-	}
-
-	template<class T>
 	static inline T castValue( const float _v )
 	{
-		return( static_cast<T>( _v ) );
+		return (T)( _v );
 	}
+
+	template<bool>
+	static inline bool castValue( const float _v )
+	{
+		return ( qRound( _v ) != 0 );
+	}
+
 
 	template<class T>
 	inline T value( int _frameOffset = 0 ) const
 	{
-		if( m_controllerConnection != NULL )
+		if( unlikely( m_controllerConnection != NULL ) )
 		{
 			const T v = minValue<T>() +
 				castValue<T>( m_range * 
 					 m_controllerConnection->currentValue(
 							_frameOffset ) );
-			if( m_step == 1 )
+			if( typeInfo<float>::isEqual( m_step, 1 ) )
 			{
-				return( castValue<T>( roundf( v ) ) );
+				return castValue<T>( roundf( (float) v ) );
 			}
-			return( v );
+			return v;
 		}
 
 		return castValue<T>( m_value );
@@ -170,7 +171,7 @@ public:
 
 	inline float range( void ) const
 	{
-		return( m_range );
+		return m_range;
 	}
 
 	void setRange( const float _min, const float _max,
@@ -185,14 +186,14 @@ public:
 
 	virtual void saveSettings( QDomDocument & _doc,
 					QDomElement & _this,
-					const QString & _name = "value" );
+				const QString & _name = QString( "value" ) );
 
 	virtual void loadSettings( const QDomElement & _this,
-					const QString & _name = "value" );
+				const QString & _name = QString( "value" ) );
 
 	virtual QString nodeName( void ) const
 	{
-		return( "automatablemodel" );
+		return "automatablemodel";
 	}
 
 	void prepareJournalEntryFromOldVal( void );
@@ -204,14 +205,14 @@ public:
 	{
 		switch( m_dataType )
 		{
-			case Float: return( QString::number(
-					castValue<float>( _val ) ) );
-			case Integer: return( QString::number(
-					castValue<int>( _val ) ) );
-			case Bool: return( QString::number(
-					castValue<bool>( _val ) ) );
+			case Float: return QString::number(
+						castValue<float>( _val ) );
+			case Integer: return QString::number(
+						castValue<int>( _val ) );
+			case Bool: return QString::number(
+						castValue<bool>( _val ) );
 		}
-		return( "0" );
+		return "0";
 	}
 
 
@@ -220,6 +221,7 @@ public slots:
 	virtual void copyValue( void );
 	virtual void pasteValue( void );
 	void unlinkControllerConnection( void );
+
 
 protected:
 	virtual void redoStep( journalEntry & _je );
@@ -261,20 +263,23 @@ signals:
 } ;
 
 
+
+
+
 #define defaultTypedMethods(type)					\
 	inline type value( int _frameOffset = 0 ) const			\
 	{								\
-		return( automatableModel::value<type>( _frameOffset ) );\
+		return automatableModel::value<type>( _frameOffset );	\
 	}								\
 									\
 	inline type minValue( void ) const				\
 	{								\
-		return( automatableModel::minValue<type>() );		\
+		return automatableModel::minValue<type>();		\
 	}								\
 									\
 	inline type maxValue( void ) const				\
 	{								\
-		return( automatableModel::maxValue<type>() );		\
+		return automatableModel::maxValue<type>();		\
 	}								\
 
 
@@ -285,7 +290,7 @@ class floatModel : public automatableModel
 public:
 	floatModel( float _val = 0, float _min = 0, float _max = 0,
 			float _step = 0, ::model * _parent = NULL,
-			const QString & _display_name  = QString::null,
+			const QString & _display_name  = QString(),
 			bool _default_constructed = FALSE ) :
 		automatableModel( Float, _val, _min, _max, _step,
 				_parent, _display_name, _default_constructed )
@@ -302,7 +307,7 @@ class intModel : public automatableModel
 public:
 	intModel( int _val = 0, int _min = 0, int _max = 0,
 			::model * _parent = NULL,
-			const QString & _display_name  = QString::null,
+			const QString & _display_name  = QString(),
 			bool _default_constructed = FALSE ) :
 		automatableModel( Integer, _val, _min, _max, 1,
 				_parent, _display_name, _default_constructed )
@@ -318,7 +323,7 @@ class boolModel : public automatableModel
 {
 public:
 	boolModel( const bool _val = FALSE, ::model * _parent = NULL,
-				const QString & _display_name  = QString::null,
+				const QString & _display_name  = QString(),
 				bool _default_constructed = FALSE ) : 
 		automatableModel( Bool, _val, FALSE, TRUE, 1,
 				_parent, _display_name, _default_constructed )

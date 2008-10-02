@@ -122,27 +122,27 @@ struct midiEvent
 
 	inline Sint16 key( void ) const
 	{
-		return( m_data.m_param[0] );
+		return m_data.m_param[0];
 	}
 
 	inline Sint16 & key( void )
 	{
-		return( m_data.m_param[0] );
+		return m_data.m_param[0];
 	}
 
 	inline Sint16 velocity( void ) const
 	{
-		return( m_data.m_param[1] );
+		return m_data.m_param[1];
 	}
 
 	inline Sint16 & velocity( void )
 	{
-		return( m_data.m_param[1] );
+		return m_data.m_param[1];
 	}
 
 	inline volume getVolume( void ) const
 	{
-		return( velocity() * 100 / MidiMaxVelocity );
+		return (volume)( velocity() * 100 / MidiMaxVelocity );
 	}
 
 

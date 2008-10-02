@@ -37,7 +37,7 @@
 #include "lfo_controller.h"
 #include "controller_dialog.h"
 
-const float TWO_PI = 6.28318531f;
+//const float TWO_PI = 6.28318531f;
 
 lfoController::lfoController( model * _parent ) :
 	controller( LfoController, _parent, tr( "LFO Controller" ) ),
@@ -108,14 +108,14 @@ float lfoController::value( int _offset )
 				break;
 		}
 		
-		m_phaseOffset = static_cast<int>( 
+		m_phaseOffset = qRound(
 				m_phaseModel.value() * newDurationF / 360.0 );
 		int newDuration = static_cast<int>( newDurationF );
 
 		if (newDuration != m_duration) {
 			// frame offset
 			// (Samples - Samples) = Samples
-			float oldFramePhase = (frame % m_duration);
+			float oldFramePhase = float(frame % m_duration);
 
 			// Phase between 0 and 1
 			// (Samples/Samples) = factor

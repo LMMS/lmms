@@ -215,7 +215,7 @@ namespace effectLib
 	template<typename SAMPLE>
 	inline SAMPLE saturate( const SAMPLE _x )
 	{
-		return( tMin<SAMPLE>( tMax<SAMPLE>( -1.0f, _x ), 1.0f ) );
+		return( qMin<SAMPLE>( qMax<SAMPLE>( -1.0f, _x ), 1.0f ) );
 	}
 
 
@@ -228,7 +228,7 @@ namespace effectLib
 				const SAMPLE _ratio,
 				const fastBassBoost<SAMPLE> & _orig =
 						fastBassBoost<SAMPLE>() ) :
-			m_frequency( tMax<SAMPLE>( _frequency, 10.0 ) ),
+			m_frequency( qMax<SAMPLE>( _frequency, 10.0 ) ),
 			m_gain1( 1.0 / ( m_frequency + 1.0 ) ),
 			m_gain2( _gain ),
 			m_ratio( _ratio ),

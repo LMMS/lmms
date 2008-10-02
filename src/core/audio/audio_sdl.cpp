@@ -198,7 +198,7 @@ void audioSDL::sdlAudioCallback( Uint8 * _buf, int _len )
 						(int_sample_t *)m_convertedBuf,
 						m_convertEndian );
 		}
-		const int min_len = tMin( _len, m_convertedBufSize
+		const int min_len = qMin( _len, m_convertedBufSize
 							- m_convertedBufPos );
 		memcpy( _buf, m_convertedBuf + m_convertedBufPos, min_len );
 		_buf += min_len;

@@ -65,8 +65,8 @@ public:
 
 	inline void setFilterType( const int _idx )
 	{
-		m_double_filter = _idx >= SIMPLE_FLT_CNT;
-		if( !m_double_filter )
+		m_doubleFilter = _idx >= SIMPLE_FLT_CNT;
+		if( !m_doubleFilter )
 		{
 			m_type = static_cast<filterTypes>( _idx );
 			return;
@@ -88,8 +88,8 @@ public:
 		m_b2a0( 0.0f ),
 		m_a1a0( 0.0f ),
 		m_a2a0( 0.0f ),
-		m_double_filter( FALSE ),
-		m_sampleRate( _sample_rate ),
+		m_doubleFilter( false ),
+		m_sampleRate( (float) _sample_rate ),
 		m_subFilter( NULL )
 	{
 		clearHistory();
@@ -151,70 +151,6 @@ public:
 						m_y4[_chnl] * ( 1.0f / 6.0f );
 				break;
 			}
-/*			case MOOG2:
-			case DOUBLE_MOOG2:
-			{
-				const float x1 = ( _in0 - m_r *
-						m_oldx[_chnl] ) / MOOG_VOLTAGE;
-				const float tanh1 = tanhf( x1 );
-				const float x2 = m_oldy1[_chnl] / MOOG_VOLTAGE;
-				const float tanh2 = tanhf( x2 );
-				m_y1[_chnl] = m_oldy1[_chnl] + m_p *
-							( tanh1 - tanh2 );
-				m_oldy1[_chnl] = m_y1[_chnl];
-				m_y2[_chnl] = m_oldy2[_chnl] + m_p *
-						( tanhf( m_y1[_chnl] /
-							MOOG_VOLTAGE ) -
-						tanhf( m_oldy2[_chnl] /
-							MOOG_VOLTAGE ) );
-				m_oldy2[_chnl] = m_y2[_chnl];
-				m_y3[_chnl] = m_oldy3[_chnl] + m_p *
-						( tanhf( m_y2[_chnl] /
-							MOOG_VOLTAGE ) -
-						tanhf( m_oldy3[_chnl] /
-							MOOG_VOLTAGE ) );
-				m_oldy3[_chnl] = m_y3[_chnl];
-				m_y4[_chnl] = m_ou1[_chnl] + m_p *
-						( tanhf( m_y3[_chnl] /
-							MOOG_VOLTAGE ) -
-						tanhf( m_ou1[_chnl] /
-							MOOG_VOLTAGE ) );
-				m_ou1[_chnl] = m_y4[_chnl];
-
-				m_oldx[_chnl] = ( m_y4[_chnl] +
-							m_ou2[_chnl] ) * 0.5f;
-				m_ou2[_chnl] = m_y4[_chnl];
-
-				// the same code again...
-				m_y1[_chnl] = m_oldy1[_chnl] + m_p *
-							( tanh1 - tanh2 );
-				m_oldy1[_chnl] = m_y1[_chnl];
-				m_y2[_chnl] = m_oldy2[_chnl] + m_p *
-						( tanhf( m_y1[_chnl] /
-							MOOG_VOLTAGE ) -
-						tanhf( m_oldy2[_chnl] /
-							MOOG_VOLTAGE ) );
-				m_oldy2[_chnl] = m_y2[_chnl];
-				m_y3[_chnl] = m_oldy3[_chnl] + m_p *
-						( tanhf( m_y2[_chnl] /
-							MOOG_VOLTAGE ) -
-						tanhf( m_oldy3[_chnl] /
-							MOOG_VOLTAGE ) );
-				m_oldy3[_chnl] = m_y3[_chnl];
-				m_y4[_chnl] = m_ou1[_chnl] + m_p *
-						( tanhf( m_y3[_chnl] /
-							MOOG_VOLTAGE ) -
-						tanhf( m_ou1[_chnl] /
-							MOOG_VOLTAGE ) );
-				m_ou1[_chnl] = m_y4[_chnl];
-
-				m_oldx[_chnl] = ( m_y4[_chnl] +
-							m_ou2[_chnl] ) * 0.5f;
-				m_ou2[_chnl] = m_y4[_chnl];
-
-				out = m_oldx[_chnl];
-				break;
-			}*/
 
 			default:
 				// filter
@@ -233,7 +169,7 @@ public:
 				break;
 		}
 
-		if( m_double_filter )
+		if( m_doubleFilter )
 		{
 			return( m_subFilter->update( out, _chnl ) );
 		}
@@ -244,12 +180,12 @@ public:
 
 
 	inline void calcFilterCoeffs( float _freq, float _q
-				/*, const bool _q_is_bandwidth = FALSE*/ )
+				/*, const bool _q_is_bandwidth = false*/ )
 	{
 		// temp coef vars
-		_freq = tMax( _freq, 0.01f );// limit freq and q for not getting
+		_freq = qMax( _freq, 0.01f );// limit freq and q for not getting
 					      // bad noise out of the filter...
-		_q = tMax( _q, minQ() );
+		_q = qMax( _q, minQ() );
 
 		if( m_type == MOOG )
 		{
@@ -260,7 +196,7 @@ public:
 			m_k = 2.0f * m_p - 1;
 			m_r = _q * powf( M_E, ( 1 - m_p ) * 1.386249f );
 
-			if( m_double_filter )
+			if( m_doubleFilter )
 			{
 				m_subFilter->m_r = m_r;
 				m_subFilter->m_p = m_p;
@@ -349,7 +285,7 @@ public:
 				break;
 		}
 
-		if( m_double_filter )
+		if( m_doubleFilter )
 		{
 			m_subFilter->m_b0a0 = m_b0a0;
 			m_subFilter->m_b1a0 = m_b1a0;
@@ -376,7 +312,7 @@ private:
 	frame m_y1, m_y2, m_y3, m_y4, m_oldx, m_oldy1, m_oldy2, m_oldy3;
 
 	filterTypes m_type;
-	bool m_double_filter;
+	bool m_doubleFilter;
 
 	float m_sampleRate;
 	basicFilters<CHANNELS> * m_subFilter;

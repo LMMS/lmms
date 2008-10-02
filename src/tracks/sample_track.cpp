@@ -78,7 +78,7 @@ sampleTCO::~sampleTCO()
 
 void sampleTCO::changeLength( const midiTime & _length )
 {
-	trackContentObject::changeLength( tMax( static_cast<Sint32>( _length ),
+	trackContentObject::changeLength( qMax( static_cast<Sint32>( _length ),
 							DefaultTicksPerTact ) );
 }
 
@@ -352,7 +352,7 @@ void sampleTCOView::paintEvent( QPaintEvent * _pe )
 		p.setPen( QColor( 64, 224, 160 ) );
 	}
 	QRect r = QRect( 1, 1,
-			tMax( static_cast<int>( m_tco->sampleLength() *
+			qMax( static_cast<int>( m_tco->sampleLength() *
 				pixelsPerTact() / DefaultTicksPerTact ), 1 ),
 								height() - 4 );
 	p.setClipRect( QRect( 1, 1, width() - 2, height() - 2 ) );

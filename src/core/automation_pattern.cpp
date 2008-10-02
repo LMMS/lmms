@@ -146,9 +146,9 @@ midiTime automationPattern::length( void ) const
 	for( timeMap::const_iterator it = m_timeMap.begin();
 						it != m_timeMap.end(); ++it )
 	{
-		max_length = tMax<tick>( max_length, it.key() );
+		max_length = qMax<tick>( max_length, it.key() );
 	}
-	return( midiTime( tMax( midiTime( max_length ).getTact() + 1, 1 ),
+	return( midiTime( qMax( midiTime( max_length ).getTact() + 1, 1 ),
 									0 ) );
 }
 
@@ -718,7 +718,7 @@ void automationPatternView::paintEvent( QPaintEvent * )
 		}
 		else
 		{
-			x2 = width() - TCO_BORDER_WIDTH;
+			x2 = (float)( width() - TCO_BORDER_WIDTH );
 		}
 		p.fillRect( QRectF( x1, 0.0f, x2-x1, it.value() ),
 							lin2grad );

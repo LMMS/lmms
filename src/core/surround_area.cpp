@@ -202,7 +202,7 @@ surroundAreaModel::surroundAreaModel( ::model * _parent,
 surroundVolumeVector surroundAreaModel::getVolumeVector( float _v_scale ) const
 {
 	surroundVolumeVector v = { { _v_scale, _v_scale
-#ifndef DISABLE_SURROUND
+#ifndef LMMS_DISABLE_SURROUND
 					, _v_scale, _v_scale
 #endif
 			} } ;
@@ -210,14 +210,14 @@ surroundVolumeVector surroundAreaModel::getVolumeVector( float _v_scale ) const
 	if( x() >= 0 )
 	{
 		v.vol[0] *= 1.0f - x() / (float)SURROUND_AREA_SIZE;
-#ifndef DISABLE_SURROUND
+#ifndef LMMS_DISABLE_SURROUND
 		v.vol[2] *= 1.0f - x() / (float)SURROUND_AREA_SIZE;
 #endif
 	}
 	else
 	{
 		v.vol[1] *= 1.0f + x() / (float)SURROUND_AREA_SIZE;
-#ifndef DISABLE_SURROUND
+#ifndef LMMS_DISABLE_SURROUND
 		v.vol[3] *= 1.0f + x() / (float)SURROUND_AREA_SIZE;
 #endif
 	}
@@ -227,7 +227,7 @@ surroundVolumeVector surroundAreaModel::getVolumeVector( float _v_scale ) const
 		v.vol[0] *= 1.0f - y() / (float)SURROUND_AREA_SIZE;
 		v.vol[1] *= 1.0f - y() / (float)SURROUND_AREA_SIZE;
 	}
-#ifndef DISABLE_SURROUND
+#ifndef LMMS_DISABLE_SURROUND
 	else
 	{
 		v.vol[2] *= 1.0f + y() / (float)SURROUND_AREA_SIZE;
@@ -257,8 +257,8 @@ void surroundAreaModel::loadSettings( const QDomElement & _this,
 	if( _this.hasAttribute( _name ) )
 	{
 		const int i = _this.attribute( _name ).toInt();
-		m_posX.setValue( ( i & 0xFFFF ) - 2 * SURROUND_AREA_SIZE );
-		m_posY.setValue( ( i >> 16 ) - 2 * SURROUND_AREA_SIZE );
+		m_posX.setValue( (float)( ( i & 0xFFFF ) - 2 * SURROUND_AREA_SIZE ) );
+		m_posY.setValue( (float)( ( i >> 16 ) - 2 * SURROUND_AREA_SIZE ) );
 	}
 	else
 	{

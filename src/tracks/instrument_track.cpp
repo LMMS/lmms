@@ -176,7 +176,7 @@ void instrumentTrack::processAudioBuffer( sampleFrame * _buf,
 
 	m_audioPort.setNextFxChannel( m_effectChannelModel.value() );
 	engine::getMixer()->bufferToPort( _buf,
-		( _n != NULL ) ? tMin<f_cnt_t>(
+		( _n != NULL ) ? qMin<f_cnt_t>(
 				_n->framesLeftForCurrentPeriod(), _frames ) :
 								_frames,
 			( _n != NULL ) ? _n->offset() : 0,
@@ -237,7 +237,7 @@ void instrumentTrack::processInEvent( const midiEvent & _me,
 						notePlayHandle( this,
 							_time.frames(
 						engine::framesPerTick() ),
-						valueRanges<f_cnt_t>::max() / 2,
+						typeInfo<f_cnt_t>::max() / 2,
 									n );
 					if( engine::getMixer()->addPlayHandle(
 									nph ) )

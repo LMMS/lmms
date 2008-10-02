@@ -63,7 +63,7 @@ instrumentSoundShaping::instrumentSoundShaping(
 					instrumentTrack * _instrument_track ) :
 	model( _instrument_track, tr( "Envelopes/LFOs" ) ),
 	m_instrumentTrack( _instrument_track ),
-	m_filterEnabledModel( FALSE, this ),
+	m_filterEnabledModel( false, this ),
 	m_filterModel( this, tr( "Filter type" ) ),
 	m_filterCutModel( 14000.0, 1.0, 14000.0, 1.0, this,
 					tr( "Cutoff frequency" ) ),
@@ -118,7 +118,7 @@ float instrumentSoundShaping::volumeLevel( notePlayHandle * _n,
 	f_cnt_t release_begin = _frame - _n->releaseFramesDone() +
 						_n->framesBeforeRelease();
 
-	if( _n->released() == FALSE )
+	if( _n->released() == false )
 	{
 		release_begin += engine::getMixer()->framesPerPeriod();
 	}
@@ -141,7 +141,7 @@ void instrumentSoundShaping::processAudioBuffer( sampleFrame * _ab,
 	f_cnt_t release_begin = total_frames - _n->releaseFramesDone() +
 						_n->framesBeforeRelease();
 
-	if( _n->released() == FALSE )
+	if( _n->released() == false )
 	{
 		release_begin += engine::getMixer()->framesPerPeriod();
 	}
@@ -282,7 +282,7 @@ void instrumentSoundShaping::processAudioBuffer( sampleFrame * _ab,
 		delete[] vol_buf;
 	}
 
-/*	else if( m_envLFOParameters[Volume]->used() == FALSE && m_envLFOParameters[PANNING]->used() )
+/*	else if( m_envLFOParameters[Volume]->used() == false && m_envLFOParameters[PANNING]->used() )
 	{
 		// only use panning-envelope...
 		for( fpp_t frame = 0; frame < _frames; ++frame )
@@ -304,7 +304,7 @@ f_cnt_t instrumentSoundShaping::envFrames( const bool _only_vol ) const
 {
 	f_cnt_t ret_val = m_envLFOParameters[Volume]->PAHD_Frames();
 
-	if( _only_vol == FALSE )
+	if( _only_vol == false )
 	{
 		for( int i = Volume+1; i < NumTargets; ++i )
 		{
@@ -321,7 +321,7 @@ f_cnt_t instrumentSoundShaping::envFrames( const bool _only_vol ) const
 
 
 
-f_cnt_t instrumentSoundShaping::releaseFrames( const bool _only_vol ) const
+f_cnt_t instrumentSoundShaping::releaseFrames(void ) const
 {
 	f_cnt_t ret_val = m_envLFOParameters[Volume]->used() ?
 				m_envLFOParameters[Volume]->releaseFrames() : 0;
@@ -332,7 +332,7 @@ f_cnt_t instrumentSoundShaping::releaseFrames( const bool _only_vol ) const
 							desiredReleaseFrames();
 	}
 
-	if( m_envLFOParameters[Volume]->used() == FALSE )
+	if( m_envLFOParameters[Volume]->used() == false )
 	{
 		for( int i = Volume+1; i < NumTargets; ++i )
 		{

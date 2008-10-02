@@ -641,8 +641,8 @@ void automationEditor::leaveEvent( QEvent * _e )
 
 void automationEditor::drawLine( int _x0, float _y0, int _x1, float _y1 )
 {
-	int deltax = static_cast<int>( tAbs<float>( _x1 - _x0 ) );
-	float deltay = tAbs<float>( _y1 - _y0 );
+	int deltax = qRound( qAbs<float>( _x1 - _x0 ) );
+	float deltay = qAbs<float>( _y1 - _y0 );
 	int x = _x0;
 	float y = _y0;
 	int xstep;
@@ -1006,8 +1006,7 @@ void automationEditor::mouseMoveEvent( QMouseEvent * _me )
 			m_selectedTick = pos_ticks - m_selectStartTick;
 			if( (int) m_selectStartTick + m_selectedTick < 0 )
 			{
-				m_selectedTick = -static_cast<int>(
-							m_selectStartTick );
+				m_selectedTick = -qRound( m_selectStartTick );
 			}
 			m_selectedLevels = level - m_selectStartLevel;
 			if( level <= m_selectStartLevel )
@@ -1169,8 +1168,7 @@ void automationEditor::mouseMoveEvent( QMouseEvent * _me )
 			if( (int) m_selectStartTick + m_selectedTick <
 									0 )
 			{
-				m_selectedTick = -static_cast<int>(
-							m_selectStartTick );
+				m_selectedTick = -qRound( m_selectStartTick );
 			}
 
 			float level = getLevel( _me->y() );
@@ -1274,7 +1272,7 @@ void automationEditor::paintEvent( QPaintEvent * _pe )
 		{
 			int y = grid_bottom;
 			int level = (int) m_bottomLevel;
-			int printable = tMax( 1, 5 * DEFAULT_Y_DELTA
+			int printable = qMax( 1, 5 * DEFAULT_Y_DELTA
 								/ m_y_delta );
 			int module = level % printable;
 			if( module )
@@ -1614,7 +1612,7 @@ void automationEditor::wheelEvent( QWheelEvent * _we )
 	{
 		if( _we->delta() > 0 )
 		{
-			m_ppt = tMin( m_ppt * 2, m_y_delta *
+			m_ppt = qMin( m_ppt * 2, m_y_delta *
 						DEFAULT_STEPS_PER_TACT * 8 );
 		}
 		else if( m_ppt >= 72 )
@@ -1624,7 +1622,7 @@ void automationEditor::wheelEvent( QWheelEvent * _we )
 		// update combobox with zooming-factor
 		m_zoomingXComboBox->model()->setValue(
 			m_zoomingXComboBox->model()->findText( QString::number(
-					static_cast<int>( m_ppt * 100 /
+					qRound( m_ppt * 100 /
 						DEFAULT_PPT ) ) +"%" ) );
 		// update timeline
 		m_timeLine->setPixelsPerTact( m_ppt );
@@ -2043,7 +2041,7 @@ void automationEditor::updatePosition( const midiTime & _t )
 		}
 		else if( _t < m_currentPosition )
 		{
-			midiTime t = tMax( _t - w * DefaultTicksPerTact *
+			midiTime t = qMax( _t - w * DefaultTicksPerTact *
 					DefaultTicksPerTact / m_ppt, 0 );
 			m_leftRightScroll->setValue( t.getTact() *
 							DefaultTicksPerTact );

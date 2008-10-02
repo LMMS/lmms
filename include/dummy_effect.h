@@ -95,12 +95,12 @@ public:
 
 	inline virtual effectControls * getControls( void )
 	{
-		return( &m_controls );
+		return &m_controls;
 	}
 
-	bool processAudioBuffer( sampleFrame * _buf, const fpp_t _frames )
+	bool processAudioBuffer( sampleFrame *, const fpp_t )
 	{
-		return( FALSE );
+		return false;
 	}
 
 

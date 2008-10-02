@@ -56,7 +56,7 @@ public:
 						bool _is_filename = TRUE,
 						bool _upgrade = TRUE );
 	multimediaProject( ProjectTypes _project_type );
-	~multimediaProject();
+	virtual ~multimediaProject();
 
 	QString nameWithExtension( const QString & _fn ) const;
 

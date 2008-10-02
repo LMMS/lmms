@@ -652,7 +652,7 @@ sampleFrame * sampleBuffer::getSampleFragment( f_cnt_t _start,
 		f_cnt_t loop_frames = m_loopEndFrame - m_loopStartFrame;
 		while( _frames - copied > 0 )
 		{
-			f_cnt_t todo = tMin( _frames - copied, loop_frames );
+			f_cnt_t todo = qMin( _frames - copied, loop_frames );
 			memcpy( *_tmp + copied, m_data + m_loopStartFrame,
 						todo * BYTES_PER_FRAME );
 			copied += todo;
@@ -850,7 +850,7 @@ QString & sampleBuffer::toBase64( QString & _dst ) const
 	f_cnt_t frame_cnt = 0;
 	while( frame_cnt < m_frames )
 	{
-		f_cnt_t remaining = tMin<f_cnt_t>( FRAMES_PER_BUF,
+		f_cnt_t remaining = qMin<f_cnt_t>( FRAMES_PER_BUF,
 							m_frames - frame_cnt );
 		FLAC__int32 buf[FRAMES_PER_BUF * DEFAULT_CHANNELS];
 		for( f_cnt_t f = 0; f < remaining; ++f )
@@ -911,7 +911,6 @@ sampleBuffer * sampleBuffer::resample( sampleFrame * _data,
 		src_data.input_frames = _frames;
 		src_data.output_frames = dst_frames;
 		src_data.src_ratio = (double) _dst_sr / _src_sr;
-		int error;
 		if( ( error = src_process( state, &src_data ) ) )
 		{
 			printf( "sampleBuffer: error while resampling: %s\n",

@@ -84,7 +84,7 @@ bool bbTrackContainer::play( midiTime _start, fpp_t _frames,
 void bbTrackContainer::updateAfterTrackAdd( void )
 {
 	// make sure, new track(s) have TCOs for every beat/bassline
-	for( int i = 0; i < tMax<int>( 1, numOfBBs() ); ++i )
+	for( int i = 0; i < qMax<int>( 1, numOfBBs() ); ++i )
 	{
 		createTCOsForBB( i );
 	}
@@ -100,7 +100,7 @@ tact bbTrackContainer::lengthOfBB( int _bb )
 	const trackList & tl = tracks();
 	for( trackList::const_iterator it = tl.begin(); it != tl.end(); ++it )
 	{
-		max_length = tMax( max_length,
+		max_length = qMax( max_length,
 					( *it )->getTCO( _bb )->length() );
 	}
 
@@ -128,7 +128,7 @@ void bbTrackContainer::removeBB( int _bb )
 	}
 	if( _bb <= currentBB() )
 	{
-		setCurrentBB( tMax( currentBB() - 1, 0 ) );
+		setCurrentBB( qMax( currentBB() - 1, 0 ) );
 	}
 }
 

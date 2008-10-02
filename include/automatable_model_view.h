@@ -132,7 +132,7 @@ public:									\
 	{								\
 		return( castModel<type##Model>() );			\
 	}								\
-} ;
+}
 
 
 generateTypedModelView(float);

@@ -196,7 +196,7 @@ private:
 	void resample( int _i, const sampleFrame * _src_buf,
 						sample_rate_t _src_sr,
 			sampleFrame * _dst_buf, sample_rate_t _dst_sr,
-					const fpp_t _frames );
+					const f_cnt_t _frames );
 
 	descriptor::subPluginFeatures::key m_key;
 

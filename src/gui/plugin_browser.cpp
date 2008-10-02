@@ -154,7 +154,7 @@ void pluginDescWidget::paintEvent( QPaintEvent * )
 								&br );
 		if( m_mouseOver )
 		{
-			m_targetHeight = tMax( 60, 25 + br.height() );
+			m_targetHeight = qMax( 60, 25 + br.height() );
 		}
 	}
 

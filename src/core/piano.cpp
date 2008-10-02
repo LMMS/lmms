@@ -515,8 +515,9 @@ void pianoView::mousePressEvent( QMouseEvent * _me )
 			}
 			else
 			{
-				m_piano->m_instrumentTrack->baseNoteModel()->
-							setInitValue( key_num );
+				m_piano->m_instrumentTrack->
+					baseNoteModel()->
+						setInitValue( (float) key_num );
 			}
 		}
 
@@ -536,7 +537,7 @@ void pianoView::mousePressEvent( QMouseEvent * _me )
  *
  *  \param _me the mousePressEvent to handle.
  */
-void pianoView::mouseReleaseEvent( QMouseEvent * _me )
+void pianoView::mouseReleaseEvent( QMouseEvent * )
 {
 	if( m_lastKey != -1 )
 	{
@@ -624,8 +625,9 @@ void pianoView::mouseMoveEvent( QMouseEvent * _me )
 			}
 			else
 			{
-				m_piano->m_instrumentTrack->baseNoteModel()->
-							setInitValue( key_num );
+				m_piano->m_instrumentTrack->
+					baseNoteModel()->
+						setInitValue( (float) key_num );
 			}
 		}
 		// and let the user see that he pressed a key... :)
