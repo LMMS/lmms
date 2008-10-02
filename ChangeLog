@@ -1,5 +1,8 @@
 2008-10-02	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* data/locale/ru.ts:
+	added updated Russian localization by Alexey Kouznetsov
+
 	* buildtools/bin2res.cpp:
 	* include/mmp.h:
 	* include/knob.h:
