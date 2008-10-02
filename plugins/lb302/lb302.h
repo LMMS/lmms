@@ -150,11 +150,6 @@ public:
 
 	virtual QString nodeName( void ) const;
 
-	virtual bool supportsParallelizing( void ) const
-	{
-		return( FALSE );
-	}
-
 	virtual f_cnt_t desiredReleaseFrames( void ) const
 	{
 		return 0; //4048;

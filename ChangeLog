@@ -1,5 +1,15 @@
 2008-10-02	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* plugins/lb302/lb302.h:
+	* plugins/lb303/lb303.h:
+	removed obsolete supportsParallelizing() method
+
+	* src/tracks/instrument_track.cpp:
+	fixed volume-scaling for IPH-based but not MIDI-based instruments
+
+	* src/core/envelope_and_lfo_parameters.cpp:
+	use memset() rather than initializing the buffer in a loop with 0
+
 	* plugins/ladspa_effect/ladspa_effect.cpp:
 	fetch pointer to LADSPA port descriptor once outside the inner loops -
 	improves performance of ladspaEffect::processAudioBuffer() by 400%
