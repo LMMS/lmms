@@ -60,6 +60,10 @@ typedef Sint8 fx_ch_t;			// FX-channel (0 to MAX_EFFECT_CHANNEL)
 
 typedef Uint32 jo_id_t;			// (unique) ID of a journalling object
 
+// use for improved branch prediction
+#define likely(x)	__builtin_expect((x),1)
+#define unlikely(x)	__builtin_expect((x),0)
+
 
 template<typename T>
 struct typeInfo
@@ -100,6 +104,10 @@ inline float typeInfo<float>::minEps( void )
 template<>
 inline bool typeInfo<float>::isEqual( float _x, float _y )
 {
+	if( likely( _x == _y ) )
+	{
+		return true;
+	}
 	return absVal( _x - _y ) < minEps();
 }
 
@@ -120,9 +128,5 @@ const ch_cnt_t SURROUND_CHANNELS =
 typedef sample_t sampleFrame[DEFAULT_CHANNELS];
 typedef sample_t surroundSampleFrame[SURROUND_CHANNELS];
 
-
-// use for improved branch prediction
-#define likely(x)	__builtin_expect((x),1)
-#define unlikely(x)	__builtin_expect((x),0)
 
 #endif
