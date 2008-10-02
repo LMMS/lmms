@@ -168,7 +168,8 @@ void instrumentTrack::processAudioBuffer( sampleFrame * _buf,
 	}
 	else
 	{
-		if( getVolume() < DefaultVolume )
+		if( getVolume() < DefaultVolume &&
+					m_instrument->isMidiBased() )
 		{
 			v_scale = 1;
 		}
