@@ -907,7 +907,9 @@ void automationEditor::mouseMoveEvent( QMouseEvent * _me )
 
 		}
 		else if( ( _me->buttons() & Qt::RightButton &&
-				m_editMode == DRAW ) || m_editMode == ERASE )
+						m_editMode == DRAW ) ||
+				( _me->buttons() & Qt::LeftButton &&
+						m_editMode == ERASE ) )
 		{
 			m_pattern->removeValue( midiTime( pos_ticks ) );
 		}
