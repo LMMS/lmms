@@ -65,10 +65,10 @@ notePlayHandle::notePlayHandle( instrumentTrack * _it,
 	m_framesBeforeRelease( 0 ),
 	m_releaseFramesToDo( 0 ),
 	m_releaseFramesDone( 0 ),
-	m_released( FALSE ),
+	m_released( false ),
 	m_baseNote( _parent == NULL  ),
 	m_partOfArpeggio( _part_of_arp ),
-	m_muted( FALSE ),
+	m_muted( false ),
 	m_bbTrack( NULL ),
 #ifdef LMMS_SINGERBOT_SUPPORT
 	m_patternIndex( 0 ),
@@ -168,7 +168,7 @@ int notePlayHandle::getMidiVelocity( void ) const
 	{
 		vel = ( vel * m_instrumentTrack->getVolume() ) / DefaultVolume;
 	}
-	return( qMin( MidiMaxVelocity, vel * MidiMaxVelocity / DefaultVolume ) );
+	return qMin( MidiMaxVelocity, vel * MidiMaxVelocity / DefaultVolume );
 }
 
 
@@ -181,7 +181,7 @@ void notePlayHandle::play( sampleFrame * _working_buffer )
 		return;
 	}
 
-	if( m_released == FALSE &&
+	if( m_released == false &&
 		m_totalFramesPlayed + engine::getMixer()->framesPerPeriod()
 								>= m_frames )
 	{
@@ -287,14 +287,14 @@ f_cnt_t notePlayHandle::framesLeft( void ) const
 {
 	if( m_released && actualReleaseFramesToDo() == 0 )
 	{
-		return( m_framesBeforeRelease );
+		return m_framesBeforeRelease;
 	}
 	else if( m_released && actualReleaseFramesToDo() >= m_releaseFramesDone )
 	{
-		return( m_framesBeforeRelease + actualReleaseFramesToDo() -
-							m_releaseFramesDone );
+		return m_framesBeforeRelease + actualReleaseFramesToDo() -
+							m_releaseFramesDone;
 	}
-	return( m_frames+actualReleaseFramesToDo()-m_totalFramesPlayed );
+	return m_frames+actualReleaseFramesToDo()-m_totalFramesPlayed;
 }
 
 
@@ -302,7 +302,7 @@ f_cnt_t notePlayHandle::framesLeft( void ) const
 
 bool notePlayHandle::isFromTrack( const track * _track ) const
 {
-	return( m_instrumentTrack == _track || m_bbTrack == _track );
+	return m_instrumentTrack == _track || m_bbTrack == _track;
 }
 
 
@@ -337,7 +337,7 @@ void notePlayHandle::noteOff( const f_cnt_t _s )
 						engine::framesPerTick() ) );
 	}
 
-	m_released = TRUE;
+	m_released = true;
 }
 
 
@@ -345,8 +345,8 @@ void notePlayHandle::noteOff( const f_cnt_t _s )
 
 f_cnt_t notePlayHandle::actualReleaseFramesToDo( void ) const
 {
-	return( m_instrumentTrack->m_soundShaping.releaseFrames(/*
-							isArpeggioBaseNote()*/ ) );
+	return m_instrumentTrack->m_soundShaping.releaseFrames(/*
+							isArpeggioBaseNote()*/ );
 }
 
 
@@ -367,7 +367,7 @@ void notePlayHandle::setFrames( const f_cnt_t _frames )
 
 float notePlayHandle::volumeLevel( const f_cnt_t _frame )
 {
-	return( m_instrumentTrack->m_soundShaping.volumeLevel( this, _frame ) );
+	return m_instrumentTrack->m_soundShaping.volumeLevel( this, _frame );
 }
 
 
@@ -381,7 +381,7 @@ void notePlayHandle::mute( void )
 	{
 		( *it )->mute();
 	}
-	m_muted = TRUE;
+	m_muted = true;
 }
 
 
@@ -398,7 +398,7 @@ int notePlayHandle::index( void ) const
 				dynamic_cast<const notePlayHandle *>( *it );
 		if( nph == NULL ||
 			nph->m_instrumentTrack != m_instrumentTrack ||
-						nph->released() == TRUE )
+						nph->released() == true )
 		{
 			continue;
 		}
@@ -408,7 +408,7 @@ int notePlayHandle::index( void ) const
 		}
 		++idx;
 	}
-	return( idx );
+	return idx;
 }
 
 
@@ -426,12 +426,12 @@ constNotePlayHandleVector notePlayHandle::nphsOfInstrumentTrack(
 		const notePlayHandle * nph =
 				dynamic_cast<const notePlayHandle *>( *it );
 		if( nph != NULL && nph->m_instrumentTrack == _it &&
-			( nph->released() == FALSE || _all_ph == TRUE ) )
+			( nph->released() == false || _all_ph == true ) )
 		{
 			cnphv.push_back( nph );
 		}
 	}
-	return( cnphv );
+	return cnphv;
 }
 
 
@@ -439,7 +439,7 @@ constNotePlayHandleVector notePlayHandle::nphsOfInstrumentTrack(
 
 bool notePlayHandle::operator==( const notePlayHandle & _nph ) const
 {
-	return( length() == _nph.length() &&
+	return length() == _nph.length() &&
 			pos() == _nph.pos() &&
 			key() == _nph.key() &&
 			getVolume() == _nph.getVolume() &&
@@ -451,7 +451,7 @@ bool notePlayHandle::operator==( const notePlayHandle & _nph ) const
 			m_released == _nph.m_released &&
 			m_baseNote == _nph.m_baseNote &&
 			m_partOfArpeggio == _nph.m_partOfArpeggio &&
-			m_muted == _nph.m_muted );
+			m_muted == _nph.m_muted;
 }
 
 

@@ -1,5 +1,3 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * audio_port.cpp - base-class for objects providing sound at a port
  *
@@ -35,7 +33,7 @@ audioPort::audioPort( const QString & _name, bool _has_effect_chain ) :
 	m_firstBuffer( new sampleFrame[engine::getMixer()->framesPerPeriod()] ),
 	m_secondBuffer( new sampleFrame[
 				engine::getMixer()->framesPerPeriod()] ),
-	m_extOutputEnabled( FALSE ),
+	m_extOutputEnabled( false ),
 	m_nextFxChannel( 0 ),
 	m_name( "unnamed port" ),
 	m_effects( _has_effect_chain ? new effectChain( NULL ) : NULL )
@@ -45,7 +43,7 @@ audioPort::audioPort( const QString & _name, bool _has_effect_chain ) :
 	engine::getMixer()->clearAudioBuffer( m_secondBuffer,
 				engine::getMixer()->framesPerPeriod() );
 	engine::getMixer()->addAudioPort( this );
-	setExtOutputEnabled( TRUE );
+	setExtOutputEnabled( true );
 }
 
 
@@ -53,7 +51,7 @@ audioPort::audioPort( const QString & _name, bool _has_effect_chain ) :
 
 audioPort::~audioPort()
 {
-	setExtOutputEnabled( FALSE );
+	setExtOutputEnabled( false );
 	engine::getMixer()->removeAudioPort( this );
 	delete[] m_firstBuffer;
 	delete[] m_secondBuffer;
@@ -117,11 +115,9 @@ bool audioPort::processEffects( void )
 		bool more = m_effects->processAudioBuffer( m_firstBuffer,
 					engine::getMixer()->framesPerPeriod() );
 		unlockFirstBuffer();
-		return( more );
+		return more;
 	}
 	return false;
 }
 
 
-
-#endif

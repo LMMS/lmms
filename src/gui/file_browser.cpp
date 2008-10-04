@@ -101,7 +101,7 @@ void fileBrowser::addItems( const QString & _path )
 		QString cur_file = *it;
 		if( cur_file[0] != '.' )
 		{
-			bool orphan = TRUE;
+			bool orphan = true;
 			for( int i = 0; i < m_l->topLevelItemCount(); ++i )
 			{
 				directory * d = dynamic_cast<directory *>(
@@ -111,13 +111,13 @@ void fileBrowser::addItems( const QString & _path )
 					m_l->insertTopLevelItem( i,
 						new directory( cur_file, _path,
 								m_filter ) );
-					orphan = FALSE;
+					orphan = false;
 					break;
 				}
 				else if( cur_file == d->text( 0 ) )
 				{
 					d->addDirectory( _path );
-					orphan = FALSE;
+					orphan = false;
 					break;
 				}
 			}
@@ -173,7 +173,7 @@ void fileBrowser::keyPressEvent( QKeyEvent * _ke )
 
 listView::listView( QWidget * _parent ) :
 	QTreeWidget( _parent ),
-	m_mousePressed( FALSE ),
+	m_mousePressed( false ),
 	m_pressPos(),
 	m_previewPlayHandle( NULL ),
 	m_pphMutex( QMutex::Recursive ),
@@ -181,7 +181,7 @@ listView::listView( QWidget * _parent ) :
 {
 	setColumnCount( 1 );
 	setHeaderLabel( tr( "Files" ) );
-	setSortingEnabled( FALSE );
+	setSortingEnabled( false );
 
 	setFont( pointSizeF( font(), 7.5f ) );
 
@@ -249,7 +249,7 @@ void listView::mousePressEvent( QMouseEvent * _me )
 //						header()->mapToActual( 0 ) ) )
 //		{
 			m_pressPos = _me->pos();
-			m_mousePressed = TRUE;
+			m_mousePressed = true;
 //		}
 	}
 
@@ -278,7 +278,7 @@ void listView::mousePressEvent( QMouseEvent * _me )
 					QEventLoop::ExcludeUserInputEvents );
 			samplePlayHandle * s = new samplePlayHandle(
 								f->fullName() );
-			s->setDoneMayReturnTrue( FALSE );
+			s->setDoneMayReturnTrue( false );
 			m_previewPlayHandle = s;
 			delete tf;
 		}
@@ -307,7 +307,7 @@ void listView::mousePressEvent( QMouseEvent * _me )
 
 void listView::mouseMoveEvent( QMouseEvent * _me )
 {
-	if( m_mousePressed == TRUE &&
+	if( m_mousePressed == true &&
 		( m_pressPos - _me->pos() ).manhattanLength() >
 					QApplication::startDragDistance() )
 	{
@@ -355,7 +355,7 @@ void listView::mouseMoveEvent( QMouseEvent * _me )
 
 void listView::mouseReleaseEvent( QMouseEvent * _me )
 {
-	m_mousePressed = FALSE;
+	m_mousePressed = false;
 
 	m_pphMutex.lock();
 	if( m_previewPlayHandle != NULL )
@@ -371,7 +371,7 @@ void listView::mouseReleaseEvent( QMouseEvent * _me )
 				static_cast<f_cnt_t>( engine::getMixer()->
 						processingSampleRate() * 3 ) )
 			{
-				s->setDoneMayReturnTrue( TRUE );
+				s->setDoneMayReturnTrue( true );
 				m_previewPlayHandle = NULL;
 				m_pphMutex.unlock();
 				return;
@@ -504,7 +504,7 @@ void listView::sendToActiveInstrumentTrack( void )
 		instrumentTrackWindow * itw =
 			dynamic_cast<instrumentTrackWindow *>(
 						w.previous()->widget() );
-		if( itw != NULL && itw->isHidden() == FALSE )
+		if( itw != NULL && itw->isHidden() == false )
 		{
 			handleFile( m_contextMenuItem, itw->model() );
 			break;
@@ -619,12 +619,12 @@ bool directory::addItems( const QString & _path )
 	QDir thisDir( _path );
 	if( !thisDir.isReadable() )
 	{
-		return( FALSE );
+		return false;
 	}
 
-	treeWidget()->setUpdatesEnabled( FALSE );
+	treeWidget()->setUpdatesEnabled( false );
 
-	bool added_something = FALSE;
+	bool added_something = false;
 
 	QStringList files = thisDir.entryList( QDir::Dirs, QDir::Name );
 	for( QStringList::const_iterator it = files.constBegin();
@@ -633,7 +633,7 @@ bool directory::addItems( const QString & _path )
 		QString cur_file = *it;
 		if( cur_file[0] != '.' )
 		{
-			bool orphan = TRUE;
+			bool orphan = true;
 			for( int i = 0; i < childCount(); ++i )
 			{
 				directory * d = dynamic_cast<directory *>(
@@ -642,13 +642,13 @@ bool directory::addItems( const QString & _path )
 				{
 					insertChild( i, new directory( cur_file,
 							_path, m_filter ) );
-					orphan = FALSE;
+					orphan = false;
 					break;
 				}
 				else if( cur_file == d->text( 0 ) )
 				{
 					d->addDirectory( _path );
-					orphan = FALSE;
+					orphan = false;
 					break;
 				}
 			}
@@ -658,7 +658,7 @@ bool directory::addItems( const QString & _path )
 								m_filter ) );
 			}
 
-			added_something = TRUE;
+			added_something = true;
 		}
 	}
 
@@ -672,13 +672,13 @@ bool directory::addItems( const QString & _path )
 			/*QDir::match( FILE_FILTER, cur_file )*/ )
 		{
 			(void) new fileItem( this, cur_file, _path );
-			added_something = TRUE;
+			added_something = true;
 		}
 	}
 
-	treeWidget()->setUpdatesEnabled( TRUE );
+	treeWidget()->setUpdatesEnabled( true );
 
-	return( added_something );
+	return added_something;
 }
 
 
@@ -838,7 +838,7 @@ void fileItem::determineFileType( void )
 
 QString fileItem::extension( void )
 {
-	return( extension( fullName() ) );
+	return extension( fullName() );
 }
 
 
@@ -846,7 +846,7 @@ QString fileItem::extension( void )
 
 QString fileItem::extension( const QString & _file )
 {
-	return( QFileInfo( _file ).suffix().toLower() );
+	return QFileInfo( _file ).suffix().toLower();
 }
 
 
