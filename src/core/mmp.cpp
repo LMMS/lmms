@@ -199,9 +199,9 @@ QString multimediaProject::nameWithExtension( const QString & _fn ) const
 			}
 			break;
 		case InstrumentTrackSettings:
-			if( _fn.section( '.', -2, -1 ) != "cs.xml" )
+			if( _fn.section( '.', -1 ) != "xpf" )
 			{
-				return( _fn + ".cs.xml" );
+				return( _fn + ".xpf" );
 			}
 			break;
 		default: ;

@@ -1,5 +1,8 @@
 2008-10-04	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* src/core/mmp.cpp:
+	fixed extension for presets
+
 	* plugins/ladspa_effect/ladspa_effect.cpp:
 	* include/automatable_model.h:
 	* include/automation_pattern.h:
