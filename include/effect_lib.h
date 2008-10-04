@@ -36,60 +36,41 @@
 namespace effectLib
 {
 
-	template<typename SAMPLE> class monoBypass;
-	template<typename SAMPLE> class stereoBypass;
-
-
-	template<typename SAMPLE = sample_t>
+	template<typename T>
 	class monoBase
 	{
 	public:
-		typedef SAMPLE sampleType;
-		typedef monoBypass<SAMPLE> bypassType;
+		typedef class monoBypass bypassType;
 
-		virtual ~monoBase()
-		{
-		}
-		virtual SAMPLE nextSample( const SAMPLE _in ) const = 0;
-		virtual void process( SAMPLE * * _buf,
-						const f_cnt_t _frames ) const
+		static void process( sample_t * * _buf, const f_cnt_t _frames )
 		{
 			for( f_cnt_t f = 0; f < _frames; ++f )
 			{
-				_buf[f][0] = nextSample( _buf[f][0] );
+				_buf[f][0] = T::nextSample( _buf[f][0] );
 			}
 		}
 	} ;
 
-	template<typename SAMPLE = sample_t>
+	template<typename T>
 	class stereoBase
 	{
 	public:
-		typedef SAMPLE sampleType;
-		typedef stereoBypass<SAMPLE> bypassType;
+		typedef class stereoBypass bypassType;
 
-		virtual ~stereoBase()
-		{
-		}
-		virtual void nextSample( SAMPLE & _in_left,
-						SAMPLE & _in_right ) const = 0;
-		virtual void process( SAMPLE * * _buf,
-						const f_cnt_t _frames ) const
+		static void process( sample_t * * _buf, const f_cnt_t _frames )
 		{
 			for( f_cnt_t f = 0; f < _frames; ++f )
 			{
-				nextSample( _buf[f][0], _buf[f][1] );
+				T::nextSample( _buf[f][0], _buf[f][1] );
 			}
 		}
 	} ;
 
 
 	template<class FXL, class FXR = FXL>
-	class monoToStereoAdaptor : public stereoBase<typename FXL::sampleType>
+	class monoToStereoAdaptor : public stereoBase<monoToStereoAdaptor<FXL, FXR> >
 	{
 	public:
-		typedef typename FXL::sampleType sampleType;
-
 		monoToStereoAdaptor( const FXL & _mono_fx ) :
 			m_leftFX( _mono_fx ),
 			m_rightFX( _mono_fx )
@@ -103,8 +84,7 @@ namespace effectLib
 		{
 		}
 
-		virtual void nextSample( sampleType & _in_left,
-						sampleType & _in_right ) const
+		void nextSample( sample_t & _in_left, sample_t & _in_right )
 		{
 			_in_left = m_leftFX.nextSample( _in_left );
 			_in_right = m_rightFX.nextSample( _in_right );
@@ -127,19 +107,17 @@ namespace effectLib
 
 
 	template<class FX>
-	class stereoToMonoAdaptor : public monoBase<typename FX::sampleType>
+	class stereoToMonoAdaptor : public monoBase<stereoToMonoAdaptor<FX> >
 	{
 	public:
-		typedef typename FX::sampleType sampleType;
-
 		stereoToMonoAdaptor( const FX & _stereo_fx ) :
 			m_FX( _stereo_fx )
 		{
 		}
 
-		virtual sampleType nextSample( const sampleType _in ) const
+		sample_t nextSample( sample_t _in )
 		{
-			sampleType s[2] = { _in, _in };
+			sample_t s[2] = { _in, _in };
 			m_FX.nextSample( s[0], s[1] );
 			return( ( s[0] + s[1] ) / 2.0f );
 		}
@@ -149,22 +127,24 @@ namespace effectLib
 	} ;
 
 
-	template<typename SAMPLE = sample_t>
-	class monoBypass : public monoBase<SAMPLE>
+	class monoBypass : public monoBase<monoBypass>
 	{
 	public:
-		virtual SAMPLE nextSample( const SAMPLE _in ) const
+		monoBypass()
+		{
+		}
+
+		sample_t nextSample( sample_t _in )
 		{
 			return( _in );
 		}
 	} ;
 
 
-	template<typename SAMPLE = sample_t>
-	class stereoBypass : public stereoBase<SAMPLE>
+	class stereoBypass : public stereoBase<stereoBypass>
 	{
 	public:
-		virtual void nextSample( SAMPLE &, SAMPLE & ) const
+		void nextSample( sample_t &, sample_t & )
 		{
 		}
 	} ;
@@ -191,15 +171,14 @@ namespace effectLib
 	class chain : public FX0::bypassType
 	{
 	public:
-		typedef typename FX0::sampleType sampleType;
+		typedef typename FX0::sample_t sample_t;
 		chain( const FX0 & _fx0, const FX1 & _fx1 = FX1() ) :
 			m_FX0( _fx0 ),
 			m_FX1( _fx1 )
 		{
 		}
 
-		virtual void process( sampleType * * _buf,
-						const f_cnt_t _frames ) const
+		void process( sample_t * * _buf, const f_cnt_t _frames )
 		{
 			m_FX0.process( _buf, _frames );
 			m_FX1.process( _buf, _frames );
@@ -212,23 +191,22 @@ namespace effectLib
 
 
 
-	template<typename SAMPLE>
-	inline SAMPLE saturate( const SAMPLE _x )
+	template<typename sample_t>
+	inline sample_t saturate( sample_t _x )
 	{
-		return( qMin<SAMPLE>( qMax<SAMPLE>( -1.0f, _x ), 1.0f ) );
+		return( qMin<sample_t>( qMax<sample_t>( -1.0f, _x ), 1.0f ) );
 	}
 
 
-	template<typename SAMPLE = sample_t>
-	class fastBassBoost : public monoBase<SAMPLE>
+	class fastBassBoost : public monoBase<fastBassBoost>
 	{
 	public:
-		fastBassBoost( const SAMPLE _frequency,
-				const SAMPLE _gain,
-				const SAMPLE _ratio,
-				const fastBassBoost<SAMPLE> & _orig =
-						fastBassBoost<SAMPLE>() ) :
-			m_frequency( qMax<SAMPLE>( _frequency, 10.0 ) ),
+		fastBassBoost( const sample_t _frequency,
+				const sample_t _gain,
+				const sample_t _ratio,
+				const fastBassBoost & _orig =
+						fastBassBoost() ) :
+			m_frequency( qMax<sample_t>( _frequency, 10.0 ) ),
 			m_gain1( 1.0 / ( m_frequency + 1.0 ) ),
 			m_gain2( _gain ),
 			m_ratio( _ratio ),
@@ -236,30 +214,26 @@ namespace effectLib
 		{
 		}
 
-		virtual ~fastBassBoost()
-		{
-		}
-
-		virtual SAMPLE nextSample( const SAMPLE _in ) const
+		inline sample_t nextSample( sample_t _in )
 		{
 			// TODO: somehow remove these horrible aliases...
 			m_cap = ( _in + m_cap*m_frequency ) * m_gain1;
-			return( /*saturate<SAMPLE>(*/ ( _in + m_cap*m_ratio ) *
+			return( /*saturate<sample_t>(*/ ( _in + m_cap*m_ratio ) *
 								m_gain2/* )*/ );
 		}
 
-		void setFrequency( const SAMPLE _frequency )
+		void setFrequency( const sample_t _frequency )
 		{
 			m_frequency = _frequency;
 			m_gain1 = 1.0 / ( m_frequency + 1.0 );
 		}
 
-		void setGain( const SAMPLE _gain )
+		void setGain( const sample_t _gain )
 		{
 			m_gain2 = _gain;
 		}
 
-		void setRatio( const SAMPLE _ratio )
+		void setRatio( const sample_t _ratio )
 		{
 			m_ratio = _ratio;
 		}
@@ -270,17 +244,15 @@ namespace effectLib
 		{
 		}
 
-		SAMPLE m_frequency;
-		SAMPLE m_gain1;
-		SAMPLE m_gain2;
-		SAMPLE m_ratio;
-		mutable SAMPLE m_cap;
+		sample_t m_frequency;
+		sample_t m_gain1;
+		sample_t m_gain2;
+		sample_t m_ratio;
+		sample_t m_cap;
 	} ;
 
-
 	// for some reason this effect doesn't work... (in=out)
-	template<typename SAMPLE = sample_t>
-	class bassBoost : public monoBase<SAMPLE>
+	class bassBoost : public monoBase<bassBoost>
 	{
 	public:
 		bassBoost( const float _frequency,
@@ -297,11 +269,7 @@ namespace effectLib
 			setRatio( _ratio );
 		}
 
-		virtual ~bassBoost()
-		{
-		}
-
-		virtual SAMPLE nextSample( const SAMPLE _in ) const
+		sample_t nextSample( sample_t _in )
 		{
 			const float out = ( m_b0*_in + m_b1*xn1 + m_b2*xn2 -
 						m_a1*yn1 - m_a2*yn2 ) / m_a0;
@@ -309,7 +277,7 @@ namespace effectLib
 			xn1 = _in;
 			yn2 = yn1;
 			yn1 = out;
-			return( out*m_gain );
+			return out*m_gain;
 		}
 
 		void setFrequency( const float _frequency )
@@ -354,12 +322,11 @@ namespace effectLib
 		const float m_shape;
 		const float m_sampleRate;
 		float m_b0, m_b1, m_b2, m_a0, m_a1, m_a2;
-		mutable float xn1, xn2, yn1, yn2;
+		float xn1, xn2, yn1, yn2;
 	} ;
 
 
-	template<typename SAMPLE = sample_t>
-	class foldbackDistortion : public monoBase<SAMPLE>
+	class foldbackDistortion : public monoBase<foldbackDistortion>
 	{
 	public:
 		foldbackDistortion( const float _threshold,
@@ -369,18 +336,18 @@ namespace effectLib
 		{
 		}
 
-		virtual SAMPLE nextSample( const SAMPLE _in ) const
+		sample_t nextSample( sample_t _in )
 		{
 			if( _in >= m_threshold || _in < -m_threshold )
 			{
-				return( ( fabsf( fabsf(
+				return ( fabsf( fabsf(
 					fmodf( _in - m_threshold,
 							m_threshold*4 ) ) -
 							m_threshold*2 ) -
 							m_threshold ) *
-								m_gain );
+								m_gain;
 			}
-			return( _in * m_gain );
+			return _in * m_gain;
 		}
 
 		void setThreshold( const float _threshold )
@@ -401,17 +368,16 @@ namespace effectLib
 	} ;
 
 
-	template<typename SAMPLE = sample_t>
-	class distortion : public monoBase<SAMPLE>
+	class distortion : public monoBase<distortion>
 	{
 	public:
-		distortion( const float _threshold, const float _gain ) :
+		distortion( float _threshold, float _gain ) :
 			m_threshold( _threshold ),
 			m_gain( _gain )
 		{
 		}
 
-		virtual SAMPLE nextSample( const SAMPLE _in ) const
+		sample_t nextSample( sample_t _in )
 		{
 			return( m_gain * ( _in * ( fabsf( _in )+m_threshold ) /
 					( _in*_in +( m_threshold-1 )*
@@ -436,17 +402,16 @@ namespace effectLib
 	} ;
 
 
-	template<typename SAMPLE = sample_t>
-	class stereoEnhancer : public stereoBase<SAMPLE>
+	class stereoEnhancer : public stereoBase<stereoEnhancer>
 	{
 	public:
-		stereoEnhancer( const float _wide_coeff ) :
+		stereoEnhancer( float _wide_coeff ) :
 			m_wideCoeff( _wide_coeff )
 		{
 		}
 		
 		// Lou's Hack
-		void setWideCoeff( const float _wideCoeff )
+		void setWideCoeff( float _wideCoeff )
 		{
 			m_wideCoeff = _wideCoeff;
 		}
@@ -457,8 +422,7 @@ namespace effectLib
 		}
 		// -----------
 
-		virtual void nextSample( SAMPLE & _in_left,
-						SAMPLE & _in_right ) const
+		void nextSample( sample_t & _in_left, sample_t & _in_right )
 		{
 			/*
 			const float delta = ( _in_left -
