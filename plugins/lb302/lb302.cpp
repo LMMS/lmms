@@ -148,7 +148,7 @@ lb302FilterIIR2::lb302FilterIIR2(lb302FilterKnobState* p_fs) :
 	vcf_c(1)
 {
 
-	m_dist = new effectLib::distortion<>( 1.0, 1.0f);
+	m_dist = new effectLib::distortion( 1.0, 1.0f);
 	
 };
 

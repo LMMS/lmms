@@ -78,8 +78,8 @@ void visualizationWidget::updateAudioBuffer( void )
 		engine::getMixer()->lock();
 		const surroundSampleFrame * c = engine::getMixer()->
 							currentReadBuffer();
-		for( f_cnt_t f = 0; f < engine::getMixer()->framesPerPeriod();
-									++f )
+		const fpp_t fpp = engine::getMixer()->framesPerPeriod();
+		for( f_cnt_t f = 0; f < fpp; ++f )
 		{
 			m_buffer[f][0] = c[f][0];
 			m_buffer[f][1] = c[f][1];

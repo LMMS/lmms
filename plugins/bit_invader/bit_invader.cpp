@@ -72,7 +72,7 @@ bSynth::bSynth( float * _shape, int _length, notePlayHandle * _nph, bool _interp
 	interpolation( _interpolation)
 {
 	sample_shape = new float[sample_length];
-	for (int i=0; i < _length; i++)
+	for (int i=0; i < _length; ++i)
 	{
 		sample_shape[i] = _shape[i] * _factor;
 	}
@@ -241,7 +241,8 @@ void bitInvader::normalize( void )
 	const float* samples = m_graph.samples();
 	for(int i=0; i < m_graph.length(); i++)
 	{
-		if (fabsf(samples[i]) > max) { max = fabs(samples[i]); }
+		const float f = fabsf( samples[i] );
+		if (f > max) { max = f; }
 	}
 	normalizeFactor = 1.0 / max;
 }

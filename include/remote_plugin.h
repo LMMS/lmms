@@ -30,6 +30,7 @@
 #include "midi.h"
 
 #include <vector>
+#include <cstdio>
 #include <cstring>
 #include <string>
 #include <cassert>

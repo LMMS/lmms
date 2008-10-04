@@ -30,7 +30,7 @@
 #include "effect_lib.h"
 
 
-template<class FX = effectLib::stereoBypass<> >
+template<class FX = effectLib::stereoBypass>
 class sweepOscillator
 {
 public:
@@ -51,11 +51,9 @@ public:
 		const float df = _freq2 - _freq1;
 		for( fpp_t frame = 0; frame < _frames; ++frame )
 		{
-			sample_t s = oscillator::sinSample( m_phase );
-			for( ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch )
-			{
-				_ab[frame][ch] = s;
-			}
+			const sample_t s = oscillator::sinSample( m_phase );
+			_ab[frame][0] = s;
+			_ab[frame][1] = s;
 			m_FX.nextSample( _ab[frame][0], _ab[frame][1] );
 			m_phase += ( _freq1 + ( frame * df / _frames ) ) /
 								_sample_rate;

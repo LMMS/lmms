@@ -26,8 +26,9 @@
  */
 
 
+#include <cstdio>
+
 #include "midi_client.h"
-/*#include "midi_mapper.h"*/
 #include "templates.h"
 #include "midi_port.h"
 #include "note.h"
@@ -285,7 +286,7 @@ void midiClientRaw::processOutEvent( const midiEvent & _me,
 			break;
 
 		default:
-			printf( "midiClientRaw: unhandled MIDI-event %d\n",
+			fprintf( stderr, "midiClientRaw: unhandled MIDI-event %d\n",
 							(int) _me.m_type );
 			break;
 	}

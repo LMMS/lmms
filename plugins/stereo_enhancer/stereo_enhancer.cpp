@@ -55,7 +55,7 @@ stereoEnhancerEffect::stereoEnhancerEffect(
 			model * _parent,
 			const descriptor::subPluginFeatures::key * _key ) :
 	effect( &stereoenhancer_plugin_descriptor, _parent, _key ),
-	m_seFX( effectLib::stereoEnhancer<>( 0.0f ) ),
+	m_seFX( effectLib::stereoEnhancer( 0.0f ) ),
 	m_delayBuffer( new sampleFrame[DEFAULT_BUFFER_SIZE] ),
 	m_currFrame( 0 ),
 	m_bbControls( this )
@@ -107,13 +107,13 @@ bool stereoEnhancerEffect::processAudioBuffer( sampleFrame * _buf,
 		// copy samples into the delay buffer
 		m_delayBuffer[m_currFrame][0] = _buf[f][0];
 		m_delayBuffer[m_currFrame][1] = _buf[f][1];
-		
+
 		// Get the width knob value from the Stereo Enhancer effect
 		width = m_seFX.getWideCoeff();
-		
+
 		// Calculate the correct sample frame for processing
 		frameIndex = m_currFrame - width;
-		
+
 		if( frameIndex < 0 )
 		{
 			// e.g. difference = -10, frameIndex = DBS - 10
@@ -122,7 +122,7 @@ bool stereoEnhancerEffect::processAudioBuffer( sampleFrame * _buf,
 
 		//sample_t s[2] = { _buf[f][0], _buf[f][1] };	//Vanilla
 		sample_t s[2] = { _buf[f][0], m_delayBuffer[frameIndex][1] };	//Chocolate
-		
+
 		m_seFX.nextSample( s[0], s[1] );
 
 		_buf[f][0] = d * _buf[f][0] + w * s[0];
@@ -154,7 +154,7 @@ void stereoEnhancerEffect::clearMyBuffer()
 		m_delayBuffer[i][0] = 0.0f;
 		m_delayBuffer[i][1] = 0.0f;
 	}
-	
+
 	m_currFrame = 0;
 }
 

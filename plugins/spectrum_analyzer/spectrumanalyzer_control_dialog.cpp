@@ -32,20 +32,19 @@
 #include "embed.h"
 
 
-inline void darken( QImage & _i, int _x, int _y, int _w, int _h )
+static inline void darken( QImage & _i, int _x, int _y, int _w, int _h )
 {
-	uchar * d = _i.scanLine( _y ) + _x * sizeof( QRgb );
-	const int add = ( _i.width() - _w ) * sizeof( QRgb );
+	const int w = _i.width();
+	QRgb * base = ( (QRgb *) _i.bits() ) + _y*w + _x;
 	for( int y = 0; y < _h; ++y )
 	{
+		QRgb * d = base + y*w;
 		for( int x = 0; x < _w; ++x )
 		{
-			*d = *d >> 1; ++d;
-			*d = *d >> 1; ++d;
-			*d = *d >> 1; ++d;
-			++d;
+			// shift each color component by 1 bit and set alpha
+			// to 0xff
+			d[x] = ( ( d[x] >> 1 ) & 0x7f7f7f7f ) | 0xff000000;
 		}
-		d += add;
 	}
 }
 
@@ -87,59 +86,53 @@ public:
 		float * b = m_sa->m_bands;
 		const int LOWER_Y = -60;	// dB
 		int h;
+		const int fh = height();
 		if( m_sa->m_saControls.m_linearSpec.value() )
 		{
-			for( int x = 0; x < MAX_BANDS; ++x, ++b )
+			if( lin_y )
 			{
-				if( lin_y )
+				for( int x = 0; x < MAX_BANDS; ++x, ++b )
 				{
-					h = height() * 2.0 / 3.0 * (*b / e );
+					h = fh * 2.0 / 3.0 * (*b / e );
+					if( h < 0 ) h = 0; else if( h >= fh ) continue;
+					darken( i, x, 0, 1, fh-h );
 				}
-				else
+			}
+			else
+			{
+				for( int x = 0; x < MAX_BANDS; ++x, ++b )
 				{
-					h = (int)( height() * 2.0 / 3.0 * (20*(log10( *b / e ) ) - LOWER_Y ) / (-LOWER_Y ) );
+					h = (int)( fh * 2.0 / 3.0 * (20*(log10( *b / e ) ) - LOWER_Y ) / (-LOWER_Y ) );
+					if( h < 0 ) h = 0; else if( h >= fh ) continue;
+					darken( i, x, 0, 1, fh-h );
 				}
-				if( h < 0 )
-				{
-					h = 0;
-				}
-				else if( h > height() )
-				{
-					h = height();
-				}
-				darken( i, x, 0, 1, height()-h );
 			}
 		}
 		else
 		{
-			for( int x = 0; x < 31; ++x, ++b )
+			if( lin_y )
 			{
-				if( lin_y )
+				for( int x = 0; x < 31; ++x, ++b )
 				{
-					h = height() * 2.0 / 3.0 * ( 1.2 * *b / e );
+					h = fh * 2.0 / 3.0 * ( 1.2 * *b / e );
+					if( h < 0 ) h = 0; else if( h >= fh ) continue; else h = ( h / 3 ) * 3;
+					darken( i, x*8, 0, 8, fh-h );
 				}
-				else
-				{
-					h = (int)( height() * 2.0 / 3.0 * (20*(log10( *b / e ) ) - LOWER_Y ) / (-LOWER_Y ) );
-				}
-				if( h < 0 )
-				{
-					h = 0;
-				}
-				else if( h > height() )
-				{
-					h = height();
-				}
-				else
-				{
-					h = ( h / 3 ) * 3;
-				}
-				darken( i, x*8, 0, 8, height()-h );
 			}
-			darken( i, 31*8, 0, 1, height() );
+			else
+			{
+				for( int x = 0; x < 31; ++x, ++b )
+				{
+					h = (int)( fh * 2.0 / 3.0 * (20*(log10( *b / e ) ) - LOWER_Y ) / (-LOWER_Y ) );
+					if( h < 0 ) h = 0; else if( h >= fh ) continue; else h = ( h / 3 ) * 3;
+					darken( i, x*8, 0, 8, fh-h );
+				}
+			}
+			darken( i, 31*8, 0, 1, fh );
 		}
 		p.drawImage( 0, 0, i );
 	}
+
 
 private:
 	spectrumAnalyzer * m_sa;

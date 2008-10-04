@@ -51,7 +51,7 @@ envelopeAndLFOParameters::envelopeAndLFOParameters(
 					float _value_for_zero_amount,
 							model * _parent ) :
 	model( _parent ),
-	m_used( FALSE ),
+	m_used( false ),
 	m_predelayModel( 0.0, 0.0, 1.0, 0.001, this, tr( "Predelay" ) ),
 	m_attackModel( 0.0, 0.0, 1.0, 0.001, this, tr( "Attack" ) ),
 	m_holdModel( 0.5, 0.0, 1.0, 0.001, this, tr( "Hold" ) ),
@@ -72,10 +72,10 @@ envelopeAndLFOParameters::envelopeAndLFOParameters(
 			tr( "LFO Modulation" ) ),
 	m_lfoWaveModel( SineWave, 0, NumLfoShapes, this,
 			tr( "LFO Wave Shape" ) ),
-	m_x100Model( FALSE, this, tr( "Freq x 100" ) ),
-	m_controlEnvAmountModel( FALSE, this, tr( "Modulate Env-Amount" ) ),
+	m_x100Model( false, this, tr( "Freq x 100" ) ),
+	m_controlEnvAmountModel( false, this, tr( "Modulate Env-Amount" ) ),
 	m_lfoFrame( 0 ),
-	m_lfoAmountIsZero( FALSE ),
+	m_lfoAmountIsZero( false ),
 	m_lfoShapeData( NULL )
 {
 	s_EaLParametersInstances.push_back( this );
@@ -151,45 +151,39 @@ envelopeAndLFOParameters::~envelopeAndLFOParameters()
 
 
 
-inline sample_t envelopeAndLFOParameters::lfoShapeSample( fpp_t _frame_offset )
-{
-	f_cnt_t frame = ( m_lfoFrame + _frame_offset ) % m_lfoOscillationFrames;
-	const float phase = frame / static_cast<float>(
-						m_lfoOscillationFrames );
-	sample_t shape_sample;
-	switch( m_lfoWaveModel.value()  )
-	{
-		case TriangleWave:
-			shape_sample = oscillator::triangleSample( phase );
-			break;
-		case SquareWave:
-			shape_sample = oscillator::squareSample( phase );
-			break;
-		case SawWave:
-			shape_sample = oscillator::sawSample( phase );
-			break;
-		case UserDefinedWave:
-			shape_sample = m_userWave.userWaveSample( phase );
-			break;
-		case SineWave:
-		default:
-			shape_sample = oscillator::sinSample( phase );
-			break;
-	}
-	return( shape_sample * m_lfoAmount );
-}
-
-
-
-
 void envelopeAndLFOParameters::updateLFOShapeData( void )
 {
-	const fpp_t frames = engine::getMixer()->framesPerPeriod();
-	for( fpp_t offset = 0; offset < frames; ++offset )
+	const f_cnt_t end_frame = m_lfoFrame+engine::getMixer()->framesPerPeriod();
+	const float la = m_lfoAmount;
+	const int wave_model = m_lfoWaveModel.value();
+	const float lof = m_lfoOscillationFrames;
+
+	for( int f = m_lfoFrame; f < end_frame; ++f )
 	{
-		m_lfoShapeData[offset] = lfoShapeSample( offset );
+		const float phase = ( f % m_lfoOscillationFrames ) / lof;
+		sample_t shape_sample;
+		switch( wave_model )
+		{
+			case TriangleWave:
+				shape_sample = oscillator::triangleSample( phase );
+				break;
+			case SquareWave:
+				shape_sample = oscillator::squareSample( phase );
+				break;
+			case SawWave:
+				shape_sample = oscillator::sawSample( phase );
+				break;
+			case UserDefinedWave:
+				shape_sample = m_userWave.userWaveSample( phase );
+				break;
+			case SineWave:
+			default:
+				shape_sample = oscillator::sinSample( phase );
+				break;
+		}
+		m_lfoShapeData[f] = shape_sample * la;
 	}
-	m_bad_lfoShapeData = FALSE;
+	m_bad_lfoShapeData = false;
 }
 
 
@@ -203,7 +197,7 @@ void envelopeAndLFOParameters::triggerLFO( void )
 	{
 		( *it )->m_lfoFrame +=
 				engine::getMixer()->framesPerPeriod();
-		( *it )->m_bad_lfoShapeData = TRUE;
+		( *it )->m_bad_lfoShapeData = true;
 	}
 }
 
@@ -217,24 +211,20 @@ void envelopeAndLFOParameters::resetLFO( void )
 							it != v.end(); ++it )
 	{
 		( *it )->m_lfoFrame = 0;
-		( *it )->m_bad_lfoShapeData = TRUE;
+		( *it )->m_bad_lfoShapeData = true;
 	}
 }
 
 
 
 
-inline void envelopeAndLFOParameters::fillLFOLevel( float * _buf,
+void envelopeAndLFOParameters::fillLFOLevel( float * _buf,
 							f_cnt_t _frame,
 							const fpp_t _frames )
 {
 	if( m_lfoAmountIsZero || _frame <= m_lfoPredelayFrames )
 	{
 		memset( _buf, 0, _frames * sizeof( *_buf ) );
-/*		for( fpp_t offset = 0; offset < _frames; ++offset )
-		{
-			*_buf++ = 0.0f;
-		}*/
 		return;
 	}
 	_frame -= m_lfoPredelayFrames;
@@ -245,10 +235,15 @@ inline void envelopeAndLFOParameters::fillLFOLevel( float * _buf,
 	}
 
 	fpp_t offset = 0;
-	for( ; offset < _frames && _frame < m_lfoAttackFrames; ++offset,
-								++_frame )
+	const f_cnt_t laf = m_lfoAttackFrames;
+	float f = _frame;
+	for( ; offset < _frames; ++offset, ++f )
 	{
-		*_buf++ = m_lfoShapeData[offset] * _frame / m_lfoAttackFrames;
+		if( _frame >= laf )
+		{
+			break;
+		}
+		*_buf++ = m_lfoShapeData[offset] * _frame / laf;
 	}
 	for( ; offset < _frames; ++offset )
 	{
@@ -270,6 +265,7 @@ void envelopeAndLFOParameters::fillLevel( float * _buf, f_cnt_t _frame,
 
 	fillLFOLevel( _buf, _frame, _frames );
 
+	const bool control_env_am = m_controlEnvAmountModel.value();
 	for( fpp_t offset = 0; offset < _frames; ++offset, ++_buf, ++_frame )
 	{
 		float env_level;
@@ -296,9 +292,9 @@ void envelopeAndLFOParameters::fillLevel( float * _buf, f_cnt_t _frame,
 		}
 
 		// at this point, *_buf is LFO level
-		*_buf = m_controlEnvAmountModel.value() ?
-			env_level * ( 0.5f + *_buf ) :
-			env_level + *_buf;
+		*_buf = control_env_am ?
+				env_level * ( 0.5f + *_buf ) :
+				env_level + *_buf;
 	}
 }
 
@@ -411,39 +407,48 @@ void envelopeAndLFOParameters::updateSampleVars( void )
 	m_pahdEnv = new sample_t[m_pahdFrames];
 	m_rEnv = new sample_t[m_rFrames];
 
+	// strange auto-vectorizer wants local variables
+	const float aa = m_amountAdd;
+	const float am = m_amount;
+	const float sl = m_sustainLevel;
+	const float afma = attack_frames * am;
+	const float hold = m_amount + m_amountAdd;
+	const float rf = m_rFrames;
+
+	// fill predelay
 	for( f_cnt_t i = 0; i < predelay_frames; ++i )
 	{
-		m_pahdEnv[i] = m_amountAdd;
+		m_pahdEnv[i] = aa;
 	}
 
+	// fill attack
 	f_cnt_t add = predelay_frames;
-
 	for( f_cnt_t i = 0; i < attack_frames; ++i )
 	{
-		m_pahdEnv[add + i] = ( (float)i / attack_frames ) *
-							m_amount + m_amountAdd;
+		m_pahdEnv[add + i] = (float)i / afma + aa;
 	}
 
+	// fill hold
 	add += attack_frames;
 	for( f_cnt_t i = 0; i < hold_frames; ++i )
 	{
-		m_pahdEnv[add + i] = m_amount + m_amountAdd;
+		m_pahdEnv[add + i] = hold;
 	}
 
+	// fill decay
 	add += hold_frames;
 	for( f_cnt_t i = 0; i < decay_frames; ++i )
 	{
-		m_pahdEnv[add + i] = ( m_sustainLevel + ( 1.0f -
-						(float)i / decay_frames ) *
-						( 1.0f - m_sustainLevel ) ) *
-							m_amount + m_amountAdd;
+		m_pahdEnv[add + i] = ( sl + ( 1.0f - (float)i / decay_frames ) *
+						( 1.0f - sl ) ) * am + aa;
 	}
 
-	for( f_cnt_t i = 0; i < m_rFrames; ++i )
+	// fill release
+	const f_cnt_t rfr = m_rFrames;
+	const float rfmam = rf * am;
+	for( f_cnt_t i = 0; i < rfr; ++i )
 	{
-		m_rEnv[i] = ( (float)( m_rFrames - i ) / m_rFrames
-					// * m_sustainLevel
-					 		) * m_amount;
+		m_rEnv[i] = (float)( rf - i ) / rfmam;
 	}
 
 	// save this calculation in real-time-part
@@ -465,21 +470,21 @@ void envelopeAndLFOParameters::updateSampleVars( void )
 	}
 	m_lfoAmount = m_lfoAmountModel.value() * 0.5f;
 
-	m_used = TRUE;
+	m_used = true;
 	if( static_cast<int>( floorf( m_lfoAmount * 1000.0f ) ) == 0 )
 	{
-		m_lfoAmountIsZero = TRUE;
+		m_lfoAmountIsZero = true;
 		if( static_cast<int>( floorf( m_amount * 1000.0f ) ) == 0 )
 		{
-			m_used = FALSE;
+			m_used = false;
 		}
 	}
 	else
 	{
-		m_lfoAmountIsZero = FALSE;
+		m_lfoAmountIsZero = false;
 	}
 
-	m_bad_lfoShapeData = TRUE;
+	m_bad_lfoShapeData = true;
 
 	emit dataChanged();
 

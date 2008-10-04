@@ -28,6 +28,8 @@
 
 #include <QtXml/QDomElement>
 
+#include <cstdio>
+
 #include "effect.h"
 #include "engine.h"
 #include "dummy_effect.h"
@@ -172,7 +174,7 @@ void effect::reinitSRC( void )
 							libsrcInterpolation(),
 					DEFAULT_CHANNELS, &error ) ) == NULL )
 		{
-			printf( "Error: src_new() failed in effect.cpp!\n" );
+			fprintf( stderr, "Error: src_new() failed in effect.cpp!\n" );
 		}
 	}
 }
@@ -198,7 +200,7 @@ void effect::resample( int _i, const sampleFrame * _src_buf,
 	int error;
 	if( ( error = src_process( m_srcState[_i], &m_srcData[_i] ) ) )
 	{
-		printf( "effect::resample(): error while resampling: %s\n",
+		fprintf( stderr, "effect::resample(): error while resampling: %s\n",
 							src_strerror( error ) );
 	}
 }

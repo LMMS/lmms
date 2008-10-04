@@ -52,7 +52,7 @@ public:
 
 
 private:
-	effectLib::stereoEnhancer<> m_seFX;
+	effectLib::stereoEnhancer m_seFX;
 	
 	sampleFrame * m_delayBuffer;
 	int m_currFrame;

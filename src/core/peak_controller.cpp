@@ -26,6 +26,7 @@
  */
 
 #include <math.h>
+#include <cstdio>
 #include <QtXml/QDomElement>
 #include <QtCore/QObject>
 #include <QtCore/QVector>

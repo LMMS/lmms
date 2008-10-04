@@ -26,6 +26,8 @@
  */
 
 
+#include <cstdio>
+
 #include "tempo_sync_knob.h"
 
 #include <QtGui/QMouseEvent>

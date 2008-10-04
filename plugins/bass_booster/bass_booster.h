@@ -48,7 +48,7 @@ public:
 
 
 private:
-	effectLib::monoToStereoAdaptor<effectLib::fastBassBoost<> > m_bbFX;
+	effectLib::monoToStereoAdaptor<effectLib::fastBassBoost> m_bbFX;
 
 	bassBoosterControls m_bbControls;
 

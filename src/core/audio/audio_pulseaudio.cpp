@@ -29,6 +29,7 @@
 #include <QtGui/QLineEdit>
 #include <QtGui/QLabel>
 
+#include <cstdio>
 
 #include "audio_pulseaudio.h"
 

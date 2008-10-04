@@ -30,6 +30,10 @@
 
 #include "lmmsconfig.h"
 
+#ifdef LMMS_HAVE_STDINT_H
+#include <stdint.h>
+#endif
+
 typedef unsigned char	Uint8;
 typedef signed char	Sint8;
 typedef unsigned short	Uint16;
@@ -127,6 +131,8 @@ const ch_cnt_t SURROUND_CHANNELS =
 
 typedef sample_t sampleFrame[DEFAULT_CHANNELS];
 typedef sample_t surroundSampleFrame[SURROUND_CHANNELS];
-
+#if __GNUC__
+typedef sample_t sampleFrameA[DEFAULT_CHANNELS] __attribute__((__aligned__(16)));
+#endif
 
 #endif

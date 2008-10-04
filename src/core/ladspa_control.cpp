@@ -23,6 +23,7 @@
  *
  */
 
+#include <cstdio>
 
 #include "ladspa_control.h"
 #include "ladspa_base.h"

@@ -104,7 +104,12 @@ bool peakControllerEffect::processAudioBuffer( sampleFrame * _buf,
 	{
 		for( int i = 0; i < _frames; ++i )
 		{
+			// is this really RMS???
 			sum += (_buf[i][0]+_buf[i][0]) * (_buf[i][1]+_buf[i][1]);
+		}
+		// eases vectorization
+		for( int i = 0; i < _frames; ++i )
+		{
 			_buf[i][0] = _buf[i][1] = 0.0f;
 		}
 	}

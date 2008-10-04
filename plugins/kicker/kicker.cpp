@@ -110,7 +110,7 @@ QString kickerInstrument::nodeName( void ) const
 
 
 //typedef effectLib::foldbackDistortion<> distFX;
-typedef effectLib::distortion<> distFX;
+typedef effectLib::distortion distFX;
 typedef sweepOscillator<effectLib::monoToStereoAdaptor<distFX> > sweepOsc;
 
 

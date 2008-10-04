@@ -94,8 +94,7 @@ class lb302FilterIIR2 : public lb302Filter
 	      vcf_b,            //  
 	      vcf_c;
 
-	effectLib::monoToStereoAdaptor<effectLib::distortion<> > * m_dist_fx;
-	effectLib::distortion<> * m_dist;
+	effectLib::distortion * m_dist;
 };
 
 

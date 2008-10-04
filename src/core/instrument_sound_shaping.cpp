@@ -166,33 +166,44 @@ void instrumentSoundShaping::processAudioBuffer( sampleFrame * _ab,
 		}
 		_n->m_filter->setFilterType( m_filterModel.value() );
 
+#ifdef __GNUC__
+		float cut_buf[_frames];
+		float res_buf[_frames];
+#else
 		float * cut_buf = NULL;
 		float * res_buf = NULL;
+#endif
 
 		if( m_envLFOParameters[Cut]->used() )
 		{
+#ifndef __GNUC__
 			cut_buf = new float[_frames];
+#endif
 			m_envLFOParameters[Cut]->fillLevel( cut_buf, total_frames,
 						release_begin, _frames );
 		}
 		if( m_envLFOParameters[Resonance]->used() )
 		{
+#ifndef __GNUC__
 			res_buf = new float[_frames];
+#endif
 			m_envLFOParameters[Resonance]->fillLevel( res_buf,
 						total_frames, release_begin,
 								_frames );
 		}
+
+		const float fcv = m_filterCutModel.value();
+		const float frv = m_filterResModel.value();
 
 		if( m_envLFOParameters[Cut]->used() &&
 			m_envLFOParameters[Resonance]->used() )
 		{
 			for( fpp_t frame = 0; frame < _frames; ++frame )
 			{
-				float new_cut_val = envelopeAndLFOParameters::expKnobVal( cut_buf[frame] ) * CUT_FREQ_MULTIPLIER +
-						m_filterCutModel.value();
+				const float new_cut_val = envelopeAndLFOParameters::expKnobVal( cut_buf[frame] ) *
+								CUT_FREQ_MULTIPLIER + fcv;
 
-				float new_res_val = m_filterResModel.value() + RES_MULTIPLIER *
-							res_buf[frame];
+				const float new_res_val = frv + RES_MULTIPLIER * res_buf[frame];
 
 				if( static_cast<int>( new_cut_val ) != old_filter_cut ||
 					static_cast<int>( new_res_val*RES_PRECISION ) != old_filter_res )
@@ -202,70 +213,67 @@ void instrumentSoundShaping::processAudioBuffer( sampleFrame * _ab,
 					old_filter_res = static_cast<int>( new_res_val*RES_PRECISION );
 				}
 
-				for( ch_cnt_t chnl = 0; chnl < DEFAULT_CHANNELS; ++chnl )
-				{
-					_ab[frame][chnl] = _n->m_filter->update( _ab[frame][chnl], chnl );
-				}
+				_ab[frame][0] = _n->m_filter->update( _ab[frame][0], 0 );
+				_ab[frame][1] = _n->m_filter->update( _ab[frame][1], 1 );
 			}
 		}
 		else if( m_envLFOParameters[Cut]->used() )
 		{
 			for( fpp_t frame = 0; frame < _frames; ++frame )
 			{
-				float new_cut_val = envelopeAndLFOParameters::expKnobVal( cut_buf[frame] ) * CUT_FREQ_MULTIPLIER +
-						m_filterCutModel.value();
+				float new_cut_val = envelopeAndLFOParameters::expKnobVal( cut_buf[frame] ) *
+								CUT_FREQ_MULTIPLIER + fcv;
 
 				if( static_cast<int>( new_cut_val ) != old_filter_cut )
 				{
-					_n->m_filter->calcFilterCoeffs( new_cut_val, m_filterResModel.value() );
+					_n->m_filter->calcFilterCoeffs( new_cut_val, frv );
 					old_filter_cut = static_cast<int>( new_cut_val );
 				}
 
-				for( ch_cnt_t chnl = 0; chnl < DEFAULT_CHANNELS; ++chnl )
-				{
-					_ab[frame][chnl] = _n->m_filter->update( _ab[frame][chnl], chnl );
-				}
+				_ab[frame][0] = _n->m_filter->update( _ab[frame][0], 0 );
+				_ab[frame][1] = _n->m_filter->update( _ab[frame][1], 1 );
 			}
 		}
 		else if( m_envLFOParameters[Resonance]->used() )
 		{
 			for( fpp_t frame = 0; frame < _frames; ++frame )
 			{
-				float new_res_val = m_filterResModel.value() + RES_MULTIPLIER *
-							res_buf[frame];
+				float new_res_val = frv + RES_MULTIPLIER * res_buf[frame];
 
 				if( static_cast<int>( new_res_val*RES_PRECISION ) != old_filter_res )
 				{
-					_n->m_filter->calcFilterCoeffs( m_filterCutModel.value(), new_res_val );
+					_n->m_filter->calcFilterCoeffs( fcv, new_res_val );
 					old_filter_res = static_cast<int>( new_res_val*RES_PRECISION );
 				}
 
-				for( ch_cnt_t chnl = 0; chnl < DEFAULT_CHANNELS; ++chnl )
-				{
-					_ab[frame][chnl] = _n->m_filter->update( _ab[frame][chnl], chnl );
-				}
+				_ab[frame][0] = _n->m_filter->update( _ab[frame][0], 0 );
+				_ab[frame][1] = _n->m_filter->update( _ab[frame][1], 1 );
 			}
 		}
 		else
 		{
-			_n->m_filter->calcFilterCoeffs( m_filterCutModel.value(), m_filterResModel.value() );
+			_n->m_filter->calcFilterCoeffs( fcv, frv );
 
 			for( fpp_t frame = 0; frame < _frames; ++frame )
 			{
-				for( ch_cnt_t chnl = 0; chnl < DEFAULT_CHANNELS; ++chnl )
-				{
-					_ab[frame][chnl] = _n->m_filter->update( _ab[frame][chnl], chnl );
-				}
+				_ab[frame][0] = _n->m_filter->update( _ab[frame][0], 0 );
+				_ab[frame][1] = _n->m_filter->update( _ab[frame][1], 1 );
 			}
 		}
 
+#ifndef __GNUC__
 		delete[] cut_buf;
 		delete[] res_buf;
+#endif
 	}
 
 	if( m_envLFOParameters[Volume]->used() )
 	{
+#ifdef __GNUC__
+		float vol_buf[_frames];
+#else
 		float * vol_buf = new float[_frames];
+#endif
 		m_envLFOParameters[Volume]->fillLevel( vol_buf, total_frames,
 						release_begin, _frames );
 
@@ -273,13 +281,12 @@ void instrumentSoundShaping::processAudioBuffer( sampleFrame * _ab,
 		{
 			float vol_level = vol_buf[frame];
 			vol_level = vol_level * vol_level;
-			for( ch_cnt_t chnl = 0; chnl < DEFAULT_CHANNELS;
-									++chnl )
-			{
-				_ab[frame][chnl] = vol_level * _ab[frame][chnl];
-			}
+			_ab[frame][0] = vol_level * _ab[frame][0];
+			_ab[frame][1] = vol_level * _ab[frame][1];
 		}
+#ifndef __GNUC__
 		delete[] vol_buf;
+#endif
 	}
 
 /*	else if( m_envLFOParameters[Volume]->used() == false && m_envLFOParameters[PANNING]->used() )
@@ -315,13 +322,13 @@ f_cnt_t instrumentSoundShaping::envFrames( const bool _only_vol ) const
 			}
 		}
 	}
-	return( ret_val );
+	return ret_val;
 }
 
 
 
 
-f_cnt_t instrumentSoundShaping::releaseFrames(void ) const
+f_cnt_t instrumentSoundShaping::releaseFrames( void ) const
 {
 	f_cnt_t ret_val = m_envLFOParameters[Volume]->used() ?
 				m_envLFOParameters[Volume]->releaseFrames() : 0;
@@ -344,7 +351,7 @@ f_cnt_t instrumentSoundShaping::releaseFrames(void ) const
 			}
 		}
 	}
-	return( ret_val );
+	return ret_val;
 }
 
 

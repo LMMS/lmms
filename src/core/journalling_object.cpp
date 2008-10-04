@@ -27,6 +27,8 @@
 
 #include <QtXml/QDomElement>
 
+#include <cstdio>
+
 #include "journalling_object.h"
 #include "automatable_model.h"
 #include "project_journal.h"
@@ -155,8 +157,8 @@ void journallingObject::changeID( jo_id_t _id )
 					dynamic_cast<automatableModel *>( jo )->
 								displayName();
 			}
-			printf( "JO-ID %d already in use by %s!\n", (int) _id,
-						used_by.toAscii().constData() );
+			fprintf( stderr, "JO-ID %d already in use by %s!\n",
+				(int) _id, used_by.toAscii().constData() );
 			return;
 		}
 		engine::getProjectJournal()->forgetAboutID( id() );

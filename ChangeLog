@@ -1,3 +1,43 @@
+2008-10-04	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* plugins/lb302/lb302.cpp:
+	* plugins/lb302/lb302.h:
+	* plugins/bass_booster/bass_booster.cpp:
+	* plugins/bass_booster/bass_booster.h:
+	* plugins/bit_invader/bit_invader.cpp:
+	* plugins/vst_effect/vst_effect.cpp:
+	* plugins/peak_controller_effect/peak_controller_effect.cpp:
+	* plugins/stereo_enhancer/stereo_enhancer.cpp:
+	* plugins/stereo_enhancer/stereo_enhancer.h:
+	* plugins/spectrum_analyzer/spectrumanalyzer_control_dialog.cpp:
+	* plugins/kicker/kicker.cpp:
+	* include/sweep_oscillator.h:
+	* include/envelope_and_lfo_parameters.h:
+	* include/remote_plugin.h:
+	* include/types.h:
+	* src/core/midi/midi_client.cpp:
+	* src/core/journalling_object.cpp:
+	* src/core/audio/audio_pulseaudio.cpp:
+	* src/core/envelope_and_lfo_parameters.cpp:
+	* src/core/instrument_sound_shaping.cpp:
+	* src/core/effect.cpp:
+	* src/core/ladspa_control.cpp:
+	* src/core/peak_controller.cpp:
+	* src/gui/widgets/visualization_widget.cpp:
+	* src/gui/widgets/tempo_sync_knob.cpp:
+	- added missing includes to compile with GCC 4.4
+	- optimized various loops for getting tree-vectorized, especially with
+	  upcoming GCC 4.4
+
+	* CMakeLists.txt:
+	use -ftree-vectorize per default - everyone compiling LMMS (which
+	needs Qt >= 4.3.0) will at least have GCC 4.1, anyways only makes
+	sense when setting C(XX)FLAGS=-march=...
+
+	* include/effect_lib.h:
+	improved effectLib for not being based on virtual-functions rather than
+	direct function-inlining via template parameter
+
 2008-10-02	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* plugins/lb302/lb302.h:
