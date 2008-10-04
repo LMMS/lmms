@@ -1,5 +1,3 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * song.cpp - root of the model-tree
  *
@@ -80,17 +78,17 @@ song::song( void ) :
 	m_masterPitchModel( 0, -12, 12, this, tr( "Master pitch" ) ),
 	m_fileName(),
 	m_oldFileName(),
-	m_modified( FALSE ),
-	m_recording( FALSE ),
-	m_exporting( FALSE ),
-	m_playing( FALSE ),
-	m_paused( FALSE ),
-	m_loadingProject( FALSE ),
+	m_modified( false ),
+	m_recording( false ),
+	m_exporting( false ),
+	m_playing( false ),
+	m_paused( false ),
+	m_loadingProject( false ),
 	m_playMode( Mode_PlaySong ),
 	m_length( 0 ),
 	m_trackToPlay( NULL ),
 	m_patternToPlay( NULL ),
-	m_loopPattern( FALSE )
+	m_loopPattern( false )
 {
 	connect( &m_tempoModel, SIGNAL( dataChanged() ),
 						this, SLOT( setTempo() ) );
@@ -118,7 +116,7 @@ song::song( void ) :
 
 song::~song()
 {
-	m_playing = FALSE;
+	m_playing = false;
 	delete m_globalAutomationTrack;
 }
 
@@ -137,6 +135,7 @@ void song::masterVolumeChanged( void )
 void song::setTempo( void )
 {
 	const bpm_t tempo = (bpm_t) m_tempoModel.value();
+	engine::getMixer()->lock();
 	playHandleVector & phv = engine::getMixer()->playHandles();
 	for( playHandleVector::iterator it = phv.begin(); it != phv.end();
 									++it )
@@ -147,6 +146,7 @@ void song::setTempo( void )
 			nph->resize( tempo );
 		}
 	}
+	engine::getMixer()->unlock();
 
 	engine::updateFramesPerTick();
 
@@ -177,8 +177,8 @@ void song::doActions( void )
 			{
 				timeLine * tl =
 					m_playPos[m_playMode].m_timeLine;
-				m_playing = FALSE;
-				m_recording = TRUE;
+				m_playing = false;
+				m_recording = true;
 				if( tl != NULL )
 				{
 
@@ -218,33 +218,33 @@ void song::doActions( void )
 
 			case ActionPlaySong:
 				m_playMode = Mode_PlaySong;
-				m_playing = TRUE;
+				m_playing = true;
 				controller::resetFrameCounter();
 				break;
 
 			case ActionPlayTrack:
 				m_playMode = Mode_PlayTrack;
-				m_playing = TRUE;
+				m_playing = true;
 				break;
 
 			case ActionPlayBB:
 				m_playMode = Mode_PlayBB;
-				m_playing = TRUE;
+				m_playing = true;
 				break;
 
 			case ActionPlayPattern:
 				m_playMode = Mode_PlayPattern;
-				m_playing = TRUE;
+				m_playing = true;
 				break;
 
 			case ActionPause:
-				m_playing = FALSE;// just set the play-flag
-				m_paused = TRUE;
+				m_playing = false;// just set the play-flag
+				m_paused = true;
 				break;
 
 			case ActionResumeFromPause:
-				m_playing = TRUE;// just set the play-flag
-				m_paused = FALSE;
+				m_playing = true;// just set the play-flag
+				m_paused = false;
 				break;
 		}
 
@@ -285,7 +285,7 @@ void song::processNextBuffer( void )
 {
 	doActions();
 
-	if( m_playing == FALSE )
+	if( m_playing == false )
 	{
 		return;
 	}
@@ -333,17 +333,17 @@ void song::processNextBuffer( void )
 
 	}
 
-	if( track_list.empty() == TRUE )
+	if( track_list.empty() == true )
 	{
 		return;
 	}
 
 	// check for looping-mode and act if neccessary
 	timeLine * tl = m_playPos[m_playMode].m_timeLine;
-	bool check_loop = tl != NULL && m_exporting == FALSE &&
+	bool check_loop = tl != NULL && m_exporting == false &&
 				tl->loopPointsEnabled() &&
 				!( m_playMode == Mode_PlayPattern &&
-					m_patternToPlay->freezing() == TRUE );
+					m_patternToPlay->freezing() == true );
 	if( check_loop )
 	{
 		if( m_playPos[m_playMode] < tl->loopBegin() ||
@@ -386,9 +386,9 @@ void song::processNextBuffer( void )
 							->lengthOfCurrentBB();
 				}
 				else if( m_playMode == Mode_PlayPattern &&
-					m_loopPattern == TRUE &&
+					m_loopPattern == true &&
 					tl != NULL &&
-					tl->loopPointsEnabled() == FALSE )
+					tl->loopPointsEnabled() == false )
 				{
 					max_tact = m_patternToPlay->length()
 								.getTact();
@@ -469,9 +469,9 @@ void song::processNextBuffer( void )
 
 bool song::realTimeTask( void ) const
 {
-	return( !( m_exporting == TRUE || ( m_playMode == Mode_PlayPattern &&
+	return !( m_exporting == true || ( m_playMode == Mode_PlayPattern &&
 		  	m_patternToPlay != NULL &&
-			m_patternToPlay->freezing() == TRUE ) ) );
+			m_patternToPlay->freezing() == true ) );
 }
 
 
@@ -479,8 +479,8 @@ bool song::realTimeTask( void ) const
 
 void song::play( void )
 {
-	m_recording = FALSE;
-	if( m_playing == TRUE )
+	m_recording = false;
+	if( m_playing == true )
 	{
 		if( m_playMode != Mode_PlaySong )
 		{
@@ -502,7 +502,7 @@ void song::play( void )
 
 void song::record( void )
 {
-	m_recording = TRUE;
+	m_recording = true;
 	// TODO: Implement
 }
 
@@ -512,7 +512,7 @@ void song::record( void )
 void song::playAndRecord( void )
 {
 	play();
-	m_recording = TRUE;
+	m_recording = true;
 }
 
 
@@ -520,7 +520,7 @@ void song::playAndRecord( void )
 
 void song::playTrack( track * _trackToPlay )
 {
-	if( m_playing == TRUE )
+	if( m_playing == true )
 	{
 		stop();
 	}
@@ -534,7 +534,7 @@ void song::playTrack( track * _trackToPlay )
 
 void song::playBB( void )
 {
-	if( m_playing == TRUE )
+	if( m_playing == true )
 	{
 		stop();
 	}
@@ -546,7 +546,7 @@ void song::playBB( void )
 
 void song::playPattern( pattern * _patternToPlay, bool _loop )
 {
-	if( m_playing == TRUE )
+	if( m_playing == true )
 	{
 		stop();
 	}
@@ -623,7 +623,7 @@ void song::startExport( void )
 	play();
 	doActions();
 
-	m_exporting = TRUE;
+	m_exporting = true;
 }
 
 
@@ -632,7 +632,7 @@ void song::startExport( void )
 void song::stopExport( void )
 {
 	stop();
-	m_exporting = FALSE;
+	m_exporting = false;
 }
 
 
@@ -708,7 +708,7 @@ bpm_t song::getTempo( void )
 
 automationPattern * song::tempoAutomationPattern( void )
 {
-	return( automationPattern::globalAutomationPattern( &m_tempoModel ) );
+	return automationPattern::globalAutomationPattern( &m_tempoModel );
 }
 
 
@@ -716,7 +716,7 @@ automationPattern * song::tempoAutomationPattern( void )
 
 void song::clearProject( void )
 {
-	engine::getProjectJournal()->setJournalling( FALSE );
+	engine::getProjectJournal()->setJournalling( false );
 
 	if( m_playing )
 	{
@@ -769,7 +769,7 @@ void song::clearProject( void )
 
 	engine::getProjectJournal()->clearJournal();
 
-	engine::getProjectJournal()->setJournalling( TRUE );
+	engine::getProjectJournal()->setJournalling( true );
 }
 
 
@@ -795,11 +795,11 @@ void song::createNewProject( void )
 		return;
 	}
 
-	m_loadingProject = TRUE;
+	m_loadingProject = true;
 
 	clearProject();
 
-	engine::getProjectJournal()->setJournalling( FALSE );
+	engine::getProjectJournal()->setJournalling( false );
 
 	m_fileName = m_oldFileName = "";
 
@@ -822,15 +822,15 @@ void song::createNewProject( void )
 
 	QCoreApplication::instance()->processEvents();
 
-	m_loadingProject = FALSE;
+	m_loadingProject = false;
 
 	engine::getBBTrackContainer()->updateAfterTrackAdd();
 
-	engine::getProjectJournal()->setJournalling( TRUE );
+	engine::getProjectJournal()->setJournalling( true );
 
 	QCoreApplication::sendPostedEvents();
 
-	m_modified = FALSE;
+	m_modified = false;
 
 	if( engine::getMainWindow() )
 	{
@@ -855,11 +855,11 @@ void song::createNewProjectFromTemplate( const QString & _template )
 // load given song
 void song::loadProject( const QString & _file_name )
 {
-	m_loadingProject = TRUE;
+	m_loadingProject = true;
 
 	clearProject();
 
-	engine::getProjectJournal()->setJournalling( FALSE );
+	engine::getProjectJournal()->setJournalling( false );
 
 	m_fileName = _file_name;
 	m_oldFileName = _file_name;
@@ -974,10 +974,10 @@ void song::loadProject( const QString & _file_name )
 
 	configManager::inst()->addRecentlyOpenedProject( _file_name );
 
-	engine::getProjectJournal()->setJournalling( TRUE );
+	engine::getProjectJournal()->setJournalling( true );
 
-	m_loadingProject = FALSE;
-	m_modified = FALSE;
+	m_loadingProject = false;
+	m_modified = false;
 
 	if( engine::getMainWindow() )
 	{
@@ -1021,7 +1021,7 @@ bool song::saveProject( void )
 	saveControllerStates( mmp, mmp.content() );
 
 	m_fileName = mmp.nameWithExtension( m_fileName );
-	if( mmp.writeFile( m_fileName ) == TRUE && engine::hasGUI() )
+	if( mmp.writeFile( m_fileName ) == true && engine::hasGUI() )
 	{
 		textFloat::displayMessage( tr( "Project saved" ),
 					tr( "The project %1 is now saved."
@@ -1029,7 +1029,7 @@ bool song::saveProject( void )
 				embed::getIconPixmap( "project_save", 24, 24 ),
 									2000 );
 		configManager::inst()->addRecentlyOpenedProject( m_fileName );
-		m_modified = FALSE;
+		m_modified = false;
 		engine::getMainWindow()->resetWindowTitle();
 	}
 	else if( engine::hasGUI() )
@@ -1038,10 +1038,10 @@ bool song::saveProject( void )
 				tr( "The project %1 was not saved!" ).arg(
 							m_fileName ),
 				embed::getIconPixmap( "error" ), 4000 );
-		return( FALSE );
+		return false;
 	}
 
-	return( TRUE );
+	return true;
 }
 
 
@@ -1053,14 +1053,14 @@ bool song::saveProjectAs( const QString & _file_name )
 	QString o = m_oldFileName;
 	m_oldFileName = m_fileName;
 	m_fileName = _file_name;
-	if( saveProject() == FALSE )
+	if( saveProject() == false )
 	{
 		m_fileName = m_oldFileName;
 		m_oldFileName = o;
-		return( FALSE );
+		return false;
 	}
 	m_oldFileName = m_fileName;
-	return( TRUE );
+	return true;
 }
 
 
@@ -1173,7 +1173,7 @@ void song::setModified( void )
 {
 	if( !m_loadingProject )
 	{
-		m_modified = TRUE;
+		m_modified = true;
 		if( engine::getMainWindow() &&
 			QThread::currentThread() ==
 					engine::getMainWindow()->thread() )
@@ -1214,7 +1214,7 @@ void song::removeController( controller * _controller )
 }
 
 
+
 #include "moc_song.cxx"
 
 
-#endif
