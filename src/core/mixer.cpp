@@ -1,5 +1,3 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * mixer.cpp - audio-device-independent mixer for LMMS
  *
@@ -24,8 +22,6 @@
  *
  */
 
-
-#include <QtCore/QWaitCondition>
 
 #include <math.h>
 
@@ -69,8 +65,6 @@
 static QVector<fx_ch_t> __fx_channel_jobs( NumFxChannels );
 
 
-
-#define ALIGN_SIZE 64
 
 static void aligned_free( void * _buf )
 {
@@ -560,8 +554,6 @@ const surroundSampleFrame * mixer::renderNextBuffer( void )
 	// remove all play-handles that have to be deleted and delete
 	// them if they still exist...
 	// maybe this algorithm could be optimized...
-	lockPlayHandles();
-	lockPlayHandlesToRemove();
 	constPlayHandleVector::iterator it_rem = m_playHandlesToRemove.begin();
 	while( it_rem != m_playHandlesToRemove.end() )
 	{
@@ -576,8 +568,6 @@ const surroundSampleFrame * mixer::renderNextBuffer( void )
 
 		it_rem = m_playHandlesToRemove.erase( it_rem );
 	}
-	unlockPlayHandlesToRemove();
-	unlockPlayHandles();
 
 	// now swap the buffers... current buffer becomes next (last)
 	// buffer and the next buffer becomes current (first) buffer
@@ -602,7 +592,6 @@ const surroundSampleFrame * mixer::renderNextBuffer( void )
 		engine::getFxMixer()->prepareMasterMix();
 		engine::getSong()->processNextBuffer();
 
-		lockPlayHandles();
 		if( m_multiThreaded )
 		{
 			FILL_JOB_QUEUE(playHandleVector,m_playHandles,
@@ -645,7 +634,6 @@ const surroundSampleFrame * mixer::renderNextBuffer( void )
 				++it;
 			}
 		}
-		unlockPlayHandles();
 
 		if( m_multiThreaded )
 		{
@@ -710,8 +698,7 @@ const surroundSampleFrame * mixer::renderNextBuffer( void )
 void mixer::clear( void )
 {
 	// TODO: m_midiClient->noteOffAll();
-	lockPlayHandles();
-	lockPlayHandlesToRemove();
+	lock();
 	for( playHandleVector::iterator it = m_playHandles.begin();
 					it != m_playHandles.end(); ++it )
 	{
@@ -722,8 +709,7 @@ void mixer::clear( void )
 			m_playHandlesToRemove.push_back( *it );
 		}
 	}
-	unlockPlayHandlesToRemove();
-	unlockPlayHandles();
+	unlock();
 }
 
 
@@ -930,14 +916,30 @@ void mixer::restoreAudioDevice( void )
 
 
 
+void mixer::removeAudioPort( audioPort * _port )
+{
+	QVector<audioPort *>::iterator it = qFind( m_audioPorts.begin(),
+							m_audioPorts.end(),
+							_port );
+	if( it != m_audioPorts.end() )
+	{
+		lock();
+		m_audioPorts.erase( it );
+		unlock();
+	}
+}
+
+
+
+
 void mixer::removePlayHandle( playHandle * _ph )
 {
+	lock();
 	// check thread affinity as we must not delete play-handles
 	// which were created in a thread different than mixer thread
 	if( _ph->affinityMatters() &&
 				_ph->affinity() == QThread::currentThread() )
 	{
-		lockPlayHandles();
 		playHandleVector::iterator it =
 				qFind( m_playHandles.begin(),
 						m_playHandles.end(), _ph );
@@ -946,21 +948,20 @@ void mixer::removePlayHandle( playHandle * _ph )
 			m_playHandles.erase( it );
 			delete _ph;
 		}
-		unlockPlayHandles();
 	}
 	else
 	{
-		lockPlayHandlesToRemove();
 		m_playHandlesToRemove.push_back( _ph );
-		unlockPlayHandlesToRemove();
 	}
+	unlock();
 }
+
 
 
 
 void mixer::removePlayHandles( track * _track )
 {
-	lockPlayHandles();
+	lock();
 	playHandleVector::iterator it = m_playHandles.begin();
 	while( it != m_playHandles.end() )
 	{
@@ -974,7 +975,7 @@ void mixer::removePlayHandles( track * _track )
 			++it;
 		}
 	}
-	unlockPlayHandles();
+	unlock();
 }
 
 
@@ -1202,5 +1203,3 @@ void mixer::fifoWriter::run( void )
 
 #include "moc_mixer.cxx"
 
-
-#endif

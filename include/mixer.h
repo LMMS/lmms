@@ -117,21 +117,21 @@ public:
 				case Mode_Draft:
 					interpolation = Interpolation_Linear;
 					oversampling = Oversampling_None;
-					sampleExactControllers = FALSE;
-					aliasFreeOscillators = FALSE;
+					sampleExactControllers = false;
+					aliasFreeOscillators = false;
 					break;
 				case Mode_HighQuality:
 					interpolation =
 						Interpolation_SincFastest;
 					oversampling = Oversampling_2x;
-					sampleExactControllers = TRUE;
-					aliasFreeOscillators = FALSE;
+					sampleExactControllers = true;
+					aliasFreeOscillators = false;
 					break;
 				case Mode_FinalMix:
 					interpolation = Interpolation_SincBest;
 					oversampling = Oversampling_8x;
-					sampleExactControllers = TRUE;
-					aliasFreeOscillators = TRUE;
+					sampleExactControllers = true;
+					aliasFreeOscillators = true;
 					break;
 			}
 		}
@@ -154,7 +154,7 @@ public:
 				case Oversampling_4x: return 4;
 				case Oversampling_8x: return 8;
 			}
-			return( 1 );
+			return 1;
 		}
 
 		int libsrcInterpolation( void ) const
@@ -162,15 +162,15 @@ public:
 			switch( interpolation )
 			{
 				case Interpolation_Linear:
-					return( SRC_ZERO_ORDER_HOLD );
+					return SRC_ZERO_ORDER_HOLD;
 				case Interpolation_SincFastest:
-					return( SRC_SINC_FASTEST );
+					return SRC_SINC_FASTEST;
 				case Interpolation_SincMedium:
-					return( SRC_SINC_MEDIUM_QUALITY );
+					return SRC_SINC_MEDIUM_QUALITY;
 				case Interpolation_SincBest:
-					return( SRC_SINC_BEST_QUALITY );
+					return SRC_SINC_BEST_QUALITY;
 			}
-			return( SRC_LINEAR );
+			return SRC_LINEAR;
 		}
 	} ;
 
@@ -181,7 +181,7 @@ public:
 	// audio-device-stuff
 	inline const QString & audioDevName( void ) const
 	{
-		return( m_audioDevName );
+		return m_audioDevName;
 	}
 
 	void setAudioDevice( audioDevice * _dev );
@@ -191,7 +191,7 @@ public:
 	void restoreAudioDevice( void );
 	inline audioDevice * audioDev( void )
 	{
-		return( m_audioDev );
+		return m_audioDev;
 	}
 
 
@@ -203,70 +203,59 @@ public:
 		unlock();
 	}
 
-	inline void removeAudioPort( audioPort * _port )
-	{
-		lock();
-		QVector<audioPort *>::iterator it = qFind( m_audioPorts.begin(),
-							m_audioPorts.end(),
-							_port );
-		if( it != m_audioPorts.end() )
-		{
-			m_audioPorts.erase( it );
-		}
-		unlock();
-	}
+	void removeAudioPort( audioPort * _port );
 
 
 	// MIDI-client-stuff
 	inline const QString & midiClientName( void ) const
 	{
-		return( m_midiClientName );
+		return m_midiClientName;
 	}
 
 	inline midiClient * getMidiClient( void )
 	{
-		return( m_midiClient );
+		return m_midiClient;
 	}
 
 
 	// play-handle stuff
 	inline bool addPlayHandle( playHandle * _ph )
 	{
-		if( criticalXRuns() == FALSE )
+		if( criticalXRuns() == false )
 		{
-			lockPlayHandles();
+			lock();
 			m_playHandles.push_back( _ph );
-			unlockPlayHandles();
-			return( TRUE );
+			unlock();
+			return true;
 		}
 		delete _ph;
-		return( FALSE );
+		return false;
 	}
 
 	void removePlayHandle( playHandle * _ph );
 
 	inline playHandleVector & playHandles( void )
 	{
-		return( m_playHandles );
+		return m_playHandles;
 	}
 
 	void removePlayHandles( track * _track );
 
 	inline bool hasPlayHandles( void ) const
 	{
-		return( !m_playHandles.empty() );
+		return !m_playHandles.empty();
 	}
 
 
 	// methods providing information for other classes
 	inline fpp_t framesPerPeriod( void ) const
 	{
-		return( m_framesPerPeriod );
+		return m_framesPerPeriod;
 	}
 
 	inline const surroundSampleFrame * currentReadBuffer( void ) const
 	{
-		return( m_readBuf );
+		return m_readBuf;
 	}
 
 
@@ -277,7 +266,7 @@ public:
 
 	const qualitySettings & currentQualitySettings( void ) const
 	{
-		return( m_qualitySettings );
+		return m_qualitySettings;
 	}
 
 
@@ -289,7 +278,7 @@ public:
 
 	inline float masterGain( void ) const
 	{
-		return( m_masterGain );
+		return m_masterGain;
 	}
 
 	inline void setMasterGain( const float _mo )
@@ -302,13 +291,13 @@ public:
 	{
 		if( _s > 1.0f )
 		{
-			return( 1.0f );
+			return 1.0f;
 		}
 		else if( _s < -1.0f )
 		{
-			return( -1.0f );
+			return -1.0f;
 		}
-		return( _s );
+		return _s;
 	}
 
 
@@ -321,26 +310,6 @@ public:
 	void unlock( void )
 	{
 		m_globalMutex.unlock();
-	}
-
-	void lockPlayHandles( void )
-	{
-		m_playHandlesMutex.lock();
-	}
-
-	void unlockPlayHandles( void )
-	{
-		m_playHandlesMutex.unlock();
-	}
-
-	void lockPlayHandlesToRemove( void )
-	{
-		m_playHandlesToRemoveMutex.lock();
-	}
-
-	void unlockPlayHandlesToRemove( void )
-	{
-		m_playHandlesToRemoveMutex.unlock();
 	}
 
 	void lockInputFrames( void )
@@ -377,7 +346,7 @@ public:
 
 	inline bool hasFifoWriter( void ) const
 	{
-		return( m_fifoWriter != NULL );
+		return m_fifoWriter != NULL;
 	}
 
 	void pushInputFrames( sampleFrame * _ab, const f_cnt_t _frames );
@@ -394,7 +363,7 @@ public:
 
 	inline const surroundSampleFrame * nextBuffer( void )
 	{
-		return( hasFifoWriter() ? m_fifo->read() : renderNextBuffer() );
+		return hasFifoWriter() ? m_fifo->read() : renderNextBuffer();
 	}
 
 	void changeQuality( const struct qualitySettings & _qs );
@@ -430,7 +399,7 @@ private:
 	mixer( void );
 	virtual ~mixer();
 
-	void startProcessing( bool _needs_fifo = TRUE );
+	void startProcessing( bool _needs_fifo = true );
 	void stopProcessing( void );
 
 
@@ -494,8 +463,6 @@ private:
 
 
 	QMutex m_globalMutex;
-	QMutex m_playHandlesMutex;
-	QMutex m_playHandlesToRemoveMutex;
 	QMutex m_inputFramesMutex;
 
 
