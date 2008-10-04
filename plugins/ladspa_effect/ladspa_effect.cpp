@@ -34,6 +34,7 @@
 #include "ladspa_subplugin_features.h"
 #include "mixer.h"
 #include "effect_chain.h"
+#include "automation_pattern.h"
 
 
 #undef SINGLE_SOURCE_COMPILE
@@ -105,15 +106,23 @@ void ladspaEffect::changeSampleRate( void )
 {
 	multimediaProject mmp( multimediaProject::EffectSettings );
 	m_controls->saveState( mmp, mmp.content() );
+
 	ladspaControls * controls = m_controls;
 	m_controls = NULL;
+
 	m_pluginMutex.lock();
 	pluginDestruction();
 	pluginInstantiation();
 	m_pluginMutex.unlock();
-	m_controls->restoreState( mmp.content().firstChild().toElement() );
+
 	controls->effectModelChanged( m_controls );
 	delete controls;
+
+	m_controls->restoreState( mmp.content().firstChild().toElement() );
+
+	// the IDs of re-created controls have been saved and now need to be
+	// resolved again
+	automationPattern::resolveAllIDs();
 }
 
 

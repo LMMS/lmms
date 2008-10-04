@@ -259,6 +259,7 @@ private:
 
 signals:
 	void initValueChanged( float _val );
+	void destroyed( jo_id_t _id );
 
 } ;
 

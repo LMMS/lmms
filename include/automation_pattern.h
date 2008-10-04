@@ -49,30 +49,30 @@ public:
 	automationPattern( const automationPattern & _pat_to_copy );
 	virtual ~automationPattern();
 
-	void addObject( automatableModel * _obj );
+	void addObject( automatableModel * _obj, bool _search_dup = true );
 
 	const automatableModel * firstObject( void ) const;
 
 	virtual midiTime length( void ) const;
 
 	midiTime putValue( const midiTime & _time, const float _value,
-						const bool _quant_pos = TRUE );
+						const bool _quant_pos = true );
 
 	void removeValue( const midiTime & _time );
 
 	inline const timeMap & getTimeMap( void ) const
 	{
-		return( m_timeMap );
+		return m_timeMap;
 	}
 
 	inline timeMap & getTimeMap( void )
 	{
-		return( m_timeMap );
+		return m_timeMap;
 	}
 
 	inline bool hasAutomation( void ) const
 	{
-		return( m_hasAutomation );
+		return m_hasAutomation;
 	}
 
 	float valueAt( const midiTime & _time ) const;
@@ -85,12 +85,12 @@ public:
 
 	static inline const QString classNodeName( void )
 	{
-		return( "automationpattern" );
+		return "automationpattern";
 	}
 
 	inline virtual QString nodeName( void ) const
 	{
-		return( classNodeName() );
+		return classNodeName();
 	}
 
 	void processMidiTime( const midiTime & _time );
@@ -105,8 +105,9 @@ public:
 
 
 public slots:
-	void openInAutomationEditor( void );
 	void clear( void );
+	void openInAutomationEditor( void );
+	void objectDestroyed( jo_id_t );
 
 
 private:
@@ -147,7 +148,7 @@ protected:
 	virtual void paintEvent( QPaintEvent * _pe );
 	virtual void resizeEvent( QResizeEvent * _re )
 	{
-		m_needsUpdate = TRUE;
+		m_needsUpdate = true;
 		trackContentObjectView::resizeEvent( _re );
 	}
 	virtual void dragEnterEvent( QDragEnterEvent * _dee );
@@ -160,7 +161,6 @@ private:
 	bool m_needsUpdate;
 
 } ;
-
 
 
 #endif

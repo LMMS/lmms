@@ -1,5 +1,3 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * automation_pattern.cpp - implementation of class automationPattern which
  *                          holds dynamic values
@@ -31,7 +29,6 @@
 #include <QtGui/QMouseEvent>
 #include <QtGui/QPainter>
 
-
 #include "automation_pattern.h"
 #include "automation_track.h"
 #include "automation_editor.h"
@@ -50,12 +47,11 @@
 
 
 
-
 automationPattern::automationPattern( automationTrack * _auto_track ) :
 	trackContentObject( _auto_track ),
 	m_autoTrack( _auto_track ),
 	m_objects(),
-	m_hasAutomation( FALSE )
+	m_hasAutomation( false )
 {
 	changeLength( midiTime( 1, 0 ) );
 	m_timeMap[0] = 0;
@@ -92,18 +88,22 @@ automationPattern::~automationPattern()
 
 
 
-void automationPattern::addObject( automatableModel * _obj )
+void automationPattern::addObject( automatableModel * _obj, bool _search_dup )
 {
 	bool addIt = true;
 
-	for( objectVector::iterator it = m_objects.begin();
-			it != m_objects.end(); ++it )
+	if( _search_dup )
 	{
-		if( *it == _obj ) {
-			// Already exists
-			// TODO: Maybe let the user know in some non-annoying way
-			addIt = false;
-			break;
+		for( objectVector::iterator it = m_objects.begin();
+					it != m_objects.end(); ++it )
+		{
+			if( *it == _obj )
+			{
+				// Already exists
+				// TODO: Maybe let the user know in some non-annoying way
+				addIt = false;
+				break;
+			}
 		}
 	}
 
@@ -114,8 +114,11 @@ void automationPattern::addObject( automatableModel * _obj )
 		if( m_objects.size() == 1 && !hasAutomation() )
 		{
 			// then initialize default-value
-			putValue( 0, _obj->value<float>(), FALSE );
+			putValue( 0, _obj->value<float>(), false );
 		}
+		connect( _obj, SIGNAL( destroyed( jo_id_t ) ),
+				this, SLOT( objectDestroyed( jo_id_t ) ),
+							Qt::DirectConnection );
 	}
 }
 
@@ -127,11 +130,11 @@ const automatableModel * automationPattern::firstObject( void ) const
 	automatableModel * m;
 	if( !m_objects.isEmpty() && ( m = m_objects.first() ) != NULL )
 	{
-		return( m );
+		return m;
 	}
 
 	static floatModel _fm( 0, 0, 1, 0.001 );
-	return( &_fm );
+	return &_fm;
 }
 
 
@@ -148,8 +151,7 @@ midiTime automationPattern::length( void ) const
 	{
 		max_length = qMax<tick>( max_length, it.key() );
 	}
-	return( midiTime( qMax( midiTime( max_length ).getTact() + 1, 1 ),
-									0 ) );
+	return midiTime( qMax( midiTime( max_length ).getTact() + 1, 1 ), 0 );
 }
 
 
@@ -168,17 +170,22 @@ midiTime automationPattern::putValue( const midiTime & _time,
 
 	if( new_time != 0 )
 	{
-		m_hasAutomation = TRUE;
+		m_hasAutomation = true;
 	}
 	else
 	{
-		m_hasAutomation = FALSE;
+		m_hasAutomation = false;
 		for( objectVector::iterator it = m_objects.begin();
-						it != m_objects.end(); ++it )
+						it != m_objects.end(); )
 		{
 			if( *it )
 			{
 				( *it )->setValue( _value );
+				++it;
+			}
+			else
+			{
+				it = m_objects.erase( it );
 			}
 		}
 	}
@@ -190,7 +197,7 @@ midiTime automationPattern::putValue( const midiTime & _time,
 
 	emit dataChanged();
 
-	return( new_time );
+	return new_time;
 }
 
 
@@ -204,13 +211,14 @@ void automationPattern::removeValue( const midiTime & _time )
 
 		if( m_timeMap.size() <= 1 )
 		{
-			m_hasAutomation = FALSE;
+			m_hasAutomation = false;
 			for( objectVector::iterator it = m_objects.begin();
-						it != m_objects.end(); ++it )
+						it != m_objects.end(); )
 			{
 				if( *it )
 				{
 					( *it )->setValue( m_timeMap[0] );
+					++it;
 				}
 				else
 				{
@@ -232,42 +240,16 @@ void automationPattern::removeValue( const midiTime & _time )
 
 
 
-void automationPattern::clear( void )
-{
-	const float val = firstObject()->value<float>();
-	m_timeMap.clear();
-	putValue( 0, val );
-
-	if( engine::getAutomationEditor() &&
-		engine::getAutomationEditor()->currentPattern() == this )
-	{
-		engine::getAutomationEditor()->update();
-	}
-}
-
-
-
-
-void automationPattern::openInAutomationEditor( void )
-{
-	engine::getAutomationEditor()->setCurrentPattern( this );
-	engine::getAutomationEditor()->parentWidget()->show();
-	engine::getAutomationEditor()->setFocus();
-}
-
-
-
-
 float automationPattern::valueAt( const midiTime & _time ) const
 {
 	if( m_timeMap.isEmpty() )
 	{
-		return( 0 );
+		return 0;
 	}
 	timeMap::const_iterator v = m_timeMap.lowerBound( _time );
 	// lowerBound returns next value with greater key, therefore we take
 	// the previous element to get the current value
-	return( ( v != m_timeMap.begin() ) ? (v-1).value() : v.value() );
+	return ( v != m_timeMap.begin() ) ? (v-1).value() : v.value();
 }
 
 
@@ -329,7 +311,7 @@ void automationPattern::loadSettings( const QDomElement & _this )
 	}
 
 	m_hasAutomation = m_timeMap.size() > 1;
-	if( m_hasAutomation == FALSE )
+	if( m_hasAutomation == false )
 	{
 		for( objectVector::iterator it = m_objects.begin();
 						it != m_objects.end(); ++it )
@@ -351,13 +333,13 @@ const QString automationPattern::name( void ) const
 {
 	if( !trackContentObject::name().isEmpty() )
 	{
-		return( trackContentObject::name() );
+		return trackContentObject::name();
 	}
 	if( !m_objects.isEmpty() && m_objects.first() != NULL )
 	{
-		return( m_objects.first()->fullDisplayName() );
+		return m_objects.first()->fullDisplayName();
 	}
-	return( tr( "Drag a control while pressing <Ctrl>" ) );
+	return tr( "Drag a control while pressing <Ctrl>" );
 }
 
 
@@ -386,7 +368,7 @@ void automationPattern::processMidiTime( const midiTime & _time )
 
 trackContentObjectView * automationPattern::createView( trackView * _tv )
 {
-	return( new automationPatternView( this, _tv ) );
+	return new automationPatternView( this, _tv );
 }
 
 
@@ -418,14 +400,14 @@ bool automationPattern::isAutomated( const automatableModel * _m )
 	{
 		if( *k == _m )
 		{
-			return( TRUE );
+			return true;
 		}
 	}
 				}
 			}
 		}
 	}
-	return( FALSE );
+	return false;
 }
 
 
@@ -448,15 +430,15 @@ automationPattern * automationPattern::globalAutomationPattern(
 			{
 				if( *k == _m )
 				{
-					return( a );
+					return a;
 				}
 			}
 		}
 	}
 
 	automationPattern * a = new automationPattern( t );
-	a->m_objects += _m;
-	return( a );
+	a->addObject( _m, false );
+	return a;
 }
 
 
@@ -488,7 +470,7 @@ void automationPattern::resolveAllIDs( void )
 						getJournallingObject( *k );
 		if( o && dynamic_cast<automatableModel *>( o ) )
 		{
-			a->m_objects += dynamic_cast<automatableModel *>( o );
+			a->addObject( dynamic_cast<automatableModel *>( o ), false );
 		}
 	}
 	a->m_idsToResolve.clear();
@@ -502,6 +484,43 @@ void automationPattern::resolveAllIDs( void )
 
 
 
+void automationPattern::clear( void )
+{
+	const float val = firstObject()->value<float>();
+	m_timeMap.clear();
+	putValue( 0, val );
+
+	if( engine::getAutomationEditor() &&
+		engine::getAutomationEditor()->currentPattern() == this )
+	{
+		engine::getAutomationEditor()->update();
+	}
+}
+
+
+
+
+void automationPattern::openInAutomationEditor( void )
+{
+	engine::getAutomationEditor()->setCurrentPattern( this );
+	engine::getAutomationEditor()->parentWidget()->show();
+	engine::getAutomationEditor()->setFocus();
+}
+
+
+
+
+void automationPattern::objectDestroyed( jo_id_t _id )
+{
+	// TODO: distict between temporary removal (e.g. LADSPA controls
+	// when switching samplerate) and real deletions because in the latter
+	// case we had to remove ourselves if we're the global automation
+	// pattern of the destroyed object
+	m_idsToResolve += _id;
+}
+
+
+
 
 
 automationPatternView::automationPatternView( automationPattern * _pattern,
@@ -509,13 +528,13 @@ automationPatternView::automationPatternView( automationPattern * _pattern,
 	trackContentObjectView( _pattern, _parent ),
 	m_pat( _pattern ),
 	m_paintPixmap(),
-	m_needsUpdate( TRUE )
+	m_needsUpdate( true )
 {
 	connect( m_pat, SIGNAL( dataChanged() ),
 			this, SLOT( update() ) );
 
 	setFixedHeight( parentWidget()->height() - 2 );
-	setAutoResizeEnabled( FALSE );
+	setAutoResizeEnabled( false );
 
 	toolTip::add( this, tr( "double-click to open this pattern in "
 						"automation editor" ) );
@@ -534,7 +553,7 @@ automationPatternView::~automationPatternView()
 
 void automationPatternView::update( void )
 {
-	m_needsUpdate = TRUE;
+	m_needsUpdate = true;
 	if( fixedTCOs() )
 	{
 		m_pat->changeLength( m_pat->length() );
@@ -644,16 +663,16 @@ void automationPatternView::mouseDoubleClickEvent( QMouseEvent * _me )
 
 void automationPatternView::paintEvent( QPaintEvent * )
 {
-	if( m_needsUpdate == FALSE )
+	if( m_needsUpdate == false )
 	{
 		QPainter p( this );
 		p.drawPixmap( 0, 0, m_paintPixmap );
 		return;
 	}
 
-	m_needsUpdate = FALSE;
+	m_needsUpdate = false;
 
-	if( m_paintPixmap.isNull() == TRUE || m_paintPixmap.size() != size() )
+	if( m_paintPixmap.isNull() == true || m_paintPixmap.size() != size() )
 	{
 		m_paintPixmap = QPixmap( size() );
 	}
@@ -798,9 +817,5 @@ void automationPatternView::dropEvent( QDropEvent * _de )
 
 
 
-
-
 #include "moc_automation_pattern.cxx"
 
-
-#endif

@@ -187,6 +187,7 @@ void ladspaControl::saveSettings( QDomDocument & _doc,
 
 
 
+
 void ladspaControl::loadSettings( const QDomElement & _this, 
 					   const QString & _name )
 {

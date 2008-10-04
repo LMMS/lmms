@@ -1,5 +1,13 @@
 2008-10-04	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* plugins/ladspa_effect/ladspa_effect.cpp:
+	* include/automatable_model.h:
+	* include/automation_pattern.h:
+	* src/core/automatable_model.cpp:
+	* src/core/ladspa_control.cpp:
+	* src/core/automation_pattern.cpp:
+	fixed lost automation relations when switching samplerate
+
 	* plugins/lb302/lb302.cpp:
 	* plugins/lb302/lb302.h:
 	* plugins/bass_booster/bass_booster.cpp:

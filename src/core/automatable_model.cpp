@@ -72,6 +72,8 @@ automatableModel::~automatableModel()
 	{
 		delete m_controllerConnection;
 	}
+
+	emit destroyed( id() );
 }
 
 
