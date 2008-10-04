@@ -1090,7 +1090,7 @@ void pianoRoll::mousePressEvent( QMouseEvent * _me )
 
 				engine::getSong()->setModified();
 			}
-			else if( ( _me->button() == Qt::RightButton &&
+			else if( ( _me->buttons() == Qt::RightButton &&
 							m_editMode == ModeDraw ) ||
 					m_editMode == ModeErase )
 			{

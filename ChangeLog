@@ -7,7 +7,9 @@
 	set global alignment via a #define
 
 	* src/gui/piano_roll.cpp:
-	fixed typo
+	- fixed typo
+	- do not crash when pressing right mouse button while moving a note
+	  with left mouse button
 
 	* src/core/song.cpp:
 	lock mixer while adjusting lengths of notePlayHandles after tempo change
