@@ -1,5 +1,3 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * envelope_and_lfo_parameters.cpp - class envelopeAndLFOParameters
  *
@@ -153,11 +151,12 @@ envelopeAndLFOParameters::~envelopeAndLFOParameters()
 
 void envelopeAndLFOParameters::updateLFOShapeData( void )
 {
-	const f_cnt_t end_frame = m_lfoFrame+engine::getMixer()->framesPerPeriod();
+	const int end_frame = m_lfoFrame + engine::getMixer()->framesPerPeriod();
 	const float la = m_lfoAmount;
 	const int wave_model = m_lfoWaveModel.value();
 	const float lof = m_lfoOscillationFrames;
 
+	int idx = 0;
 	for( int f = m_lfoFrame; f < end_frame; ++f )
 	{
 		const float phase = ( f % m_lfoOscillationFrames ) / lof;
@@ -181,7 +180,8 @@ void envelopeAndLFOParameters::updateLFOShapeData( void )
 				shape_sample = oscillator::sinSample( phase );
 				break;
 		}
-		m_lfoShapeData[f] = shape_sample * la;
+		m_lfoShapeData[idx] = shape_sample * la;
+		++idx;
 	}
 	m_bad_lfoShapeData = false;
 }
@@ -498,4 +498,3 @@ void envelopeAndLFOParameters::updateSampleVars( void )
 #include "moc_envelope_and_lfo_parameters.cxx"
 
 
-#endif
