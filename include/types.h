@@ -131,8 +131,9 @@ const ch_cnt_t SURROUND_CHANNELS =
 
 typedef sample_t sampleFrame[DEFAULT_CHANNELS];
 typedef sample_t surroundSampleFrame[SURROUND_CHANNELS];
+#define ALIGN_SIZE 16
 #if __GNUC__
-typedef sample_t sampleFrameA[DEFAULT_CHANNELS] __attribute__((__aligned__(16)));
+typedef sample_t sampleFrameA[DEFAULT_CHANNELS] __attribute__((__aligned__(ALIGN_SIZE)));
 #endif
 
 #endif
