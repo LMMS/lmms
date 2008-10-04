@@ -1,5 +1,28 @@
 2008-10-04	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* plugins/kicker/kicker.cpp:
+	moved constants out of loop
+
+	* include/types.h:
+	set global alignment via a #define
+
+	* src/gui/piano_roll.cpp:
+	fixed typo
+
+	* src/core/song.cpp:
+	lock mixer while adjusting lengths of notePlayHandles after tempo change
+
+	* src/gui/file_browser.cpp:
+	* src/core/note_play_handle.cpp:
+	* src/core/audio/audio_port.cpp:
+	coding style fixes
+
+	* include/mixer.h:
+	* src/core/mixer.cpp:
+	removed fine-granular locking of various playHandle-vectors, just use
+	one global big lock for everything now - prevents various
+	deadlocks (e.g. when previewing samples in file browser)
+
 	* src/gui/automation_editor.cpp:
 	in erase-mode do not remove values without clicking
 

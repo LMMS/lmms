@@ -151,15 +151,13 @@ void kickerInstrument::playNote( notePlayHandle * _n,
 
 	if( _n->released() )
 	{
+		const float rfd = _n->releaseFramesDone();
+		const float drf = desiredReleaseFrames();
 		for( fpp_t f = 0; f < frames; ++f )
 		{
-			const float fac = 1.0f -
-				(float)( _n->releaseFramesDone()+f ) /
-							desiredReleaseFrames();
-			for( ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch )
-			{
-				_working_buffer[f][ch] *= fac;
-			}
+			const float fac = 1.0f - ( rfd+f ) / drf;
+			_working_buffer[f][0] *= fac;
+			_working_buffer[f][1] *= fac;
 		}
 	}
 
