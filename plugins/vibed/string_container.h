@@ -26,7 +26,6 @@
 
 #include <QtCore/QVector>
 
-#include "types.h"
 #include "vibrating_string.h"
 
 

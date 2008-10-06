@@ -30,7 +30,6 @@
 
 #include "instrument.h"
 #include "instrument_view.h"
-#include "types.h"
 #include "graph.h"
 #include "knob.h"
 #include "pixmap_button.h"

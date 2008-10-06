@@ -27,7 +27,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "types.h"
+#include "lmms_basics.h"
 
 class vibratingString
 {

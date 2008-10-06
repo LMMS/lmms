@@ -24,7 +24,6 @@
 #ifndef _NINE_BUTTON_SELECTOR_H
 #define _NINE_BUTTON_SELECTOR_H
 
-#include "types.h"
 #include "pixmap_button.h"
 
 

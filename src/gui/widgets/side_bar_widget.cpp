@@ -1,9 +1,7 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * side_bar_widget.cpp - implementation of base-widget for side-bar
  *
- * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -30,7 +28,6 @@
 #include <QtGui/QPainter>
 
 #include "side_bar_widget.h"
-#include "types.h"
 #include "gui_templates.h"
 
 
@@ -59,7 +56,7 @@ sideBarWidget::~sideBarWidget()
 
 void sideBarWidget::paintEvent( QPaintEvent * )
 {
-	const Uint16 TITLE_FONT_HEIGHT = 13;
+	const int TITLE_FONT_HEIGHT = 13;
 
 	QPainter p( this );
 	p.fillRect( 0, 0, width(), 27, palette().highlight().color() );
@@ -70,8 +67,8 @@ void sideBarWidget::paintEvent( QPaintEvent * )
 
 	p.setPen( palette().highlightedText().color() );
 
-	const Uint16 tx = m_icon.width()+4;
-	const Uint16 ty = 2+TITLE_FONT_HEIGHT;
+	const int tx = m_icon.width()+4;
+	const int ty = 2+TITLE_FONT_HEIGHT;
 	p.drawText( tx, ty, m_title );
 	p.drawLine( tx, ty+4, width()-4, ty+4 );
 
@@ -82,7 +79,7 @@ void sideBarWidget::paintEvent( QPaintEvent * )
 
 void sideBarWidget::resizeEvent( QResizeEvent * )
 {
-	const Uint16 MARGIN = 6;
+	const int MARGIN = 6;
 	m_contents->setGeometry( MARGIN, 40 + MARGIN, width() - MARGIN * 2,
 						height() - MARGIN * 2 - 40 );
 }
@@ -92,5 +89,3 @@ void sideBarWidget::resizeEvent( QResizeEvent * )
 #include "moc_side_bar.cxx"
 #include "moc_side_bar_widget.cxx"
 
-
-#endif

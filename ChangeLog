@@ -24,6 +24,13 @@
 	* include/panning.h:
 	* include/project_journal.h:
 	* include/play_handle.h:
+	* plugins/bit_invader/bit_invader.h:
+	* plugins/vibed/vibrating_string.h:
+	* plugins/vibed/nine_button_selector.h:
+	* plugins/vibed/string_container.h:
+	* plugins/vst_base/remote_vst_plugin.cpp:
+	* src/core/base64.cpp:
+	* src/gui/widgets/side_bar_widget.cpp:
 	renamed types.h to lmms_basics.h
 
 2008-10-06	Attila Herman <attila589/at/gmail/dot/com>

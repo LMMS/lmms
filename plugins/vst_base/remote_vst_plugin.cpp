@@ -80,7 +80,7 @@ struct ERect
 #endif
 
 
-#include "types.h"
+#include "lmms_basics.h"
 #include "midi.h"
 #include "communication.h"
 
