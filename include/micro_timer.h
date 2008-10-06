@@ -33,7 +33,7 @@
 #endif
 
 #include <cstdlib>
-#include "types.h"
+#include "lmms_basics.h"
 
 
 class microTimer

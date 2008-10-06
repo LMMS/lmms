@@ -29,7 +29,7 @@
 #include <QtXml/QDomDocument>
 
 #include "export.h"
-#include "types.h"
+#include "lmms_basics.h"
 
 
 class EXPORT multimediaProject : public QDomDocument

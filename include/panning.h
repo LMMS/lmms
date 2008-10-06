@@ -26,7 +26,7 @@
 #ifndef _PANNING_H
 #define _PANNING_H
 
-#include "types.h"
+#include "lmms_basics.h"
 #include "volume.h"
 #include "templates.h"
 

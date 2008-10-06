@@ -31,7 +31,7 @@
 #include <QtCore/QList>
 #include <QtGui/QWidget>
 
-#include "types.h"
+#include "lmms_basics.h"
 #include "midi_time.h"
 #include "rubberband.h"
 #include "journalling_object.h"

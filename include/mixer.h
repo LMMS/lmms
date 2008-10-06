@@ -45,7 +45,7 @@
 #include <QtCore/QVector>
 
 
-#include "types.h"
+#include "lmms_basics.h"
 #include "note.h"
 #include "fifo_buffer.h"
 

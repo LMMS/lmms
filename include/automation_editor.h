@@ -29,7 +29,7 @@
 
 #include <QtGui/QWidget>
 
-#include "types.h"
+#include "lmms_basics.h"
 #include "journalling_object.h"
 #include "midi_time.h"
 #include "automation_pattern.h"

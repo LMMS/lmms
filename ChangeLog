@@ -1,8 +1,36 @@
+2008-10-06	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* include/mmp.h:
+	* include/cpuload_widget.h:
+	* include/endian_handling.h:
+	* include/track.h:
+	* include/controller_rack_view.h:
+	* include/mixer.h:
+	* include/ladspa_manager.h:
+	* include/instrument_functions.h:
+	* include/sample_buffer.h:
+	* include/effect_lib.h:
+	* include/midi.h:
+	* include/effect_rack_view.h:
+	* include/graph.h:
+	* include/micro_timer.h:
+	* include/envelope_and_lfo_parameters.h:
+	* include/piano_roll.h:
+	* include/volume.h:
+	* include/midi_time.h:
+	* include/basic_filters.h:
+	* include/journalling_object.h:
+	* include/automation_editor.h:
+	* include/panning.h:
+	* include/project_journal.h:
+	* include/play_handle.h:
+	renamed types.h to lmms_basics.h
+
 2008-10-06	Attila Herman <attila589/at/gmail/dot/com>
 
 	* plugins/papu/papu_intrument.cpp:
-	renamed from PAPU to FreeBoy
-	help added to the knobs
+	- renamed from PAPU to FreeBoy
+	- help added to the knobs
 
 2008-10-04	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 

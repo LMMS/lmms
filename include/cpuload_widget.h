@@ -31,7 +31,7 @@
 #include <QtGui/QPixmap>
 #include <QtGui/QWidget>
 
-#include "types.h"
+#include "lmms_basics.h"
 
 
 class cpuloadWidget : public QWidget

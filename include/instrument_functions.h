@@ -27,7 +27,7 @@
 #define _INSTRUMENT_FUNCTIONS_H
 
 #include "journalling_object.h"
-#include "types.h"
+#include "lmms_basics.h"
 #include "automatable_model.h"
 #include "tempo_sync_knob.h"
 #include "combobox_model.h"

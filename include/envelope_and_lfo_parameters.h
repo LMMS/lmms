@@ -32,7 +32,7 @@
 #include "automatable_model.h"
 #include "sample_buffer.h"
 #include "tempo_sync_knob.h"
-#include "types.h"
+#include "lmms_basics.h"
 
 
 

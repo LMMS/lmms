@@ -30,7 +30,7 @@
 #include <QtCore/QVariant>
 #include <QtCore/QVector>
 
-#include "types.h"
+#include "lmms_basics.h"
 
 
 class journallingObject;

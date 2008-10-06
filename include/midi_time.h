@@ -27,7 +27,7 @@
 #ifndef _MIDI_TIME_H
 #define _MIDI_TIME_H
 
-#include "types.h"
+#include "lmms_basics.h"
 #include "export.h"
 
 const int DefaultTicksPerTact = 192;

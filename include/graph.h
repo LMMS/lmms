@@ -32,7 +32,7 @@
 #include <QtGui/QCursor>
 
 #include "mv_base.h"
-#include "types.h"
+#include "lmms_basics.h"
 
 class graphModel;
 

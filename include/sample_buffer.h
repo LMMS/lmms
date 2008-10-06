@@ -34,7 +34,7 @@
 
 #include "export.h"
 #include "interpolation.h"
-#include "types.h"
+#include "lmms_basics.h"
 #include "lmms_math.h"
 #include "shared_object.h"
 

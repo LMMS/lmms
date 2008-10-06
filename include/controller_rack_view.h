@@ -28,7 +28,7 @@
 #include <QtGui/QWidget>
 
 #include "serializing_object.h"
-#include "types.h"
+#include "lmms_basics.h"
 
 
 class QPushButton;

@@ -29,7 +29,7 @@
 #include <QtGui/QWidget>
 
 #include "effect_chain.h"
-#include "types.h"
+#include "lmms_basics.h"
 
 class QScrollArea;
 class QVBoxLayout;

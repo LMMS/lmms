@@ -26,7 +26,7 @@
 #ifndef _JOURNALLING_OBJECT_H
 #define _JOURNALLING_OBJECT_H
 
-#include "types.h"
+#include "lmms_basics.h"
 #include "export.h"
 #include "serializing_object.h"
 

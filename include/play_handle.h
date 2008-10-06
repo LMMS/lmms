@@ -29,7 +29,7 @@
 #include <QtCore/QThread>
 #include <QtCore/QVector>
 
-#include "types.h"
+#include "lmms_basics.h"
 
 class track;
 

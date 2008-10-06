@@ -30,7 +30,7 @@
 
 #include "templates.h"
 #include "lmms_constants.h"
-#include "types.h"
+#include "lmms_basics.h"
 
 
 namespace effectLib

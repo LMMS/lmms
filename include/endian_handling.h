@@ -28,7 +28,7 @@
 
 #include <QtCore/QSysInfo>
 
-#include "types.h"
+#include "lmms_basics.h"
 
 
 inline bool isLittleEndian( void )

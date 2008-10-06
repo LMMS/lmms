@@ -35,7 +35,7 @@
 
 #include <math.h>
 
-#include "types.h"
+#include "lmms_basics.h"
 #include "mixer.h"
 #include "templates.h"
 #include "lmms_constants.h"

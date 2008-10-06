@@ -37,7 +37,7 @@
 
 
 #include "export.h"
-#include "types.h"
+#include "lmms_basics.h"
 
 
 const float NOHINT = -99342.2243f;

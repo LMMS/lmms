@@ -32,7 +32,7 @@
 #include "combobox_model.h"
 #include "serializing_object.h"
 #include "note.h"
-#include "types.h"
+#include "lmms_basics.h"
 
 
 class QPainter;

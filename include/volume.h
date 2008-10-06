@@ -28,7 +28,7 @@
 
 #include "lmmsconfig.h"
 
-#include "types.h"
+#include "lmms_basics.h"
 
 const volume MinVolume = 0;
 const volume MaxVolume = 200;

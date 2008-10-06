@@ -27,7 +27,7 @@
 #define _MIDI_H
 
 
-#include "types.h"
+#include "lmms_basics.h"
 #include <cstdlib>
 
 
