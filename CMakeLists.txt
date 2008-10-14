@@ -404,7 +404,10 @@ INCLUDE_DIRECTORIES(${CMAKE_BINARY_DIR} ${CMAKE_BINARY_DIR}/include ${CMAKE_SOUR
 LINK_DIRECTORIES(${CMAKE_INSTALL_PREFIX}/lib ${ASOUND_LIBRARY_DIR} ${JACK_LIBRARY_DIRS} ${SAMPLERATE_LIBRARY_DIRS} ${SNDFILE_LIBRARY_DIRS})
 LINK_LIBRARIES(${QT_LIBRARIES} ${ASOUND_LIBRARY} ${SDL_LIBRARY} ${PORTAUDIO_LIBRARIES} ${PULSEAUDIO_LIBRARIES} ${JACK_LIBRARIES} ${OGGVORBIS_LIBRARIES} ${SAMPLERATE_LIBRARIES} ${SNDFILE_LIBRARIES})
 
-ADD_EXECUTABLE(lmms ${lmms_SOURCES} ${lmms_INCLUDES} ${LIBSAMPLERATE_SOURCES} ${LMMS_ER_H} ${lmms_UI_out} lmmsconfig.h ${WINRC})
+ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_BINARY_DIR}/lmms.1.gz COMMAND gzip -c ${CMAKE_SOURCE_DIR}/lmms.1 > ${CMAKE_BINARY_DIR}/lmms.1.gz DEPENDS ${CMAKE_SOURCE_DIR}/lmms.1 COMMENT "Generating lmms.1.gz")
+
+ADD_EXECUTABLE(lmms ${lmms_SOURCES} ${lmms_INCLUDES} ${LIBSAMPLERATE_SOURCES} ${LMMS_ER_H} ${lmms_UI_out} lmmsconfig.h ${WINRC} ${CMAKE_BINARY_DIR}/lmms.1.gz)
+
 IF(LMMS_BUILD_WIN32)
 	SET_TARGET_PROPERTIES(lmms PROPERTIES LINK_FLAGS "${LINK_FLAGS} -mwindows")
 	ADD_CUSTOM_COMMAND(TARGET lmms POST_BUILD COMMAND /opt/mingw/bin/i586-mingw32-strip ${CMAKE_BINARY_DIR}/lmms.exe)
@@ -412,8 +415,6 @@ IF(LMMS_BUILD_WIN32)
 	INSTALL(FILES /opt/mingw/bin/QtCore4.dll /opt/mingw/bin/QtGui4.dll /opt/mingw/bin/QtXml4.dll /opt/mingw/bin/libz.dll /opt/mingw/bin/libsndfile-1.dll /opt/mingw/bin/libvorbis-0.dll /opt/mingw/bin/libvorbisenc-2.dll /opt/mingw/bin/libvorbisfile-3.dll /opt/mingw/bin/libogg-0.dll /opt/mingw/bin/libfluidsynth-1.dll /opt/mingw/bin/libfftw3f-3.dll /opt/mingw/bin/SDL.dll /opt/mingw/i586-mingw32/bin/mingwm10.dll DESTINATION .)
 ELSE(LMMS_BUILD_WIN32)
 	INSTALL(TARGETS lmms RUNTIME DESTINATION bin)
-	ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_BINARY_DIR}/lmms.1.gz COMMAND gzip -c ${CMAKE_SOURCE_DIR}/lmms.1 > ${CMAKE_BINARY_DIR}/lmms.1.gz DEPENDS ${CMAKE_SOURCE_DIR}/lmms.1 COMMENT "Generating lmms.1.gz")
-	ADD_FILE_DEPENDENCIES(${CMAKE_BINARY_DIR}/lmmsconfig.h ${CMAKE_BINARY_DIR}/lmms.1.gz)
 	INSTALL(FILES ${CMAKE_BINARY_DIR}/lmms.1.gz DESTINATION ${CMAKE_INSTALL_PREFIX}/share/man/man1/ PERMISSIONS OWNER_READ GROUP_READ WORLD_READ)
 ENDIF(LMMS_BUILD_WIN32)
 
