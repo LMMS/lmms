@@ -183,7 +183,7 @@ private:
 					it != s_jobQueue.items.end(); ++it )
 			{
 #if QT_VERSION >= 0x040400
-				if( it->done.fetchAndStoreRelaxed( 1 ) == 0 &&
+				if( it->done.fetchAndStoreOrdered( 1 ) == 0 &&
 								it->job != NULL )
 				{
 #else
