@@ -178,17 +178,17 @@ private:
 		while( m_quit == false )
 		{
 			m_queueReadySem->acquire();
+			jobQueueItems::iterator end_it = s_jobQueue.items.end();
 			for( jobQueueItems::iterator it =
 						s_jobQueue.items.begin();
-					it != s_jobQueue.items.end(); ++it )
+							it != end_it; ++it )
 			{
 #if QT_VERSION >= 0x040400
-				if( it->done.fetchAndStoreOrdered( 1 ) == 0 &&
-								it->job != NULL )
+				if( it->done.fetchAndStoreOrdered( 1 ) == 0 )
 				{
 #else
 				s_jobQueue.lock.lock();
-				if( !it->done && it->job != NULL )
+				if( !it->done )
 				{
 					it->done = true;
 					s_jobQueue.lock.unlock();
@@ -213,7 +213,11 @@ private:
 						case EffectChannel:
 		engine::getFxMixer()->processChannel(
 				(fx_ch_t) it->effectChannelJob );
+							break;
 						default:
+fprintf( stderr, "invalid job item type %d at %d in jobqueue(%d:%d)\n",
+		(int) it->type, (int) it, (int) s_jobQueue.items.begin(),
+							(int) end_it );
 							break;
 					}
 				}
