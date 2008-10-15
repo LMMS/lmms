@@ -142,6 +142,7 @@ private:
 		NumLfoShapes
 	} ;
 
+	sample_t lfoShapeSample( fpp_t _frame_offset );
 	void updateLFOShapeData( void );
 
 

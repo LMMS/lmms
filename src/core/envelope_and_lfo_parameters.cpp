@@ -1,3 +1,5 @@
+#ifndef SINGLE_SOURCE_COMPILE
+
 /*
  * envelope_and_lfo_parameters.cpp - class envelopeAndLFOParameters
  *
@@ -149,39 +151,43 @@ envelopeAndLFOParameters::~envelopeAndLFOParameters()
 
 
 
+inline sample_t envelopeAndLFOParameters::lfoShapeSample( fpp_t _frame_offset )
+{
+	f_cnt_t frame = ( m_lfoFrame + _frame_offset ) % m_lfoOscillationFrames;
+	const float phase = frame / static_cast<float>(
+						m_lfoOscillationFrames );
+	sample_t shape_sample;
+	switch( m_lfoWaveModel.value()  )
+	{
+		case TriangleWave:
+			shape_sample = oscillator::triangleSample( phase );
+			break;
+		case SquareWave:
+			shape_sample = oscillator::squareSample( phase );
+			break;
+		case SawWave:
+			shape_sample = oscillator::sawSample( phase );
+			break;
+		case UserDefinedWave:
+			shape_sample = m_userWave.userWaveSample( phase );
+			break;
+		case SineWave:
+		default:
+			shape_sample = oscillator::sinSample( phase );
+			break;
+	}
+	return( shape_sample * m_lfoAmount );
+}
+
+
+
+
 void envelopeAndLFOParameters::updateLFOShapeData( void )
 {
-	const int end_frame = m_lfoFrame + engine::getMixer()->framesPerPeriod();
-	const float la = m_lfoAmount;
-	const int wave_model = m_lfoWaveModel.value();
-	const float lof = m_lfoOscillationFrames;
-
-	int idx = 0;
-	for( int f = m_lfoFrame; f < end_frame; ++f )
+	const fpp_t frames = engine::getMixer()->framesPerPeriod();
+	for( fpp_t offset = 0; offset < frames; ++offset )
 	{
-		const float phase = ( f % m_lfoOscillationFrames ) / lof;
-		sample_t shape_sample;
-		switch( wave_model )
-		{
-			case TriangleWave:
-				shape_sample = oscillator::triangleSample( phase );
-				break;
-			case SquareWave:
-				shape_sample = oscillator::squareSample( phase );
-				break;
-			case SawWave:
-				shape_sample = oscillator::sawSample( phase );
-				break;
-			case UserDefinedWave:
-				shape_sample = m_userWave.userWaveSample( phase );
-				break;
-			case SineWave:
-			default:
-				shape_sample = oscillator::sinSample( phase );
-				break;
-		}
-		m_lfoShapeData[idx] = shape_sample * la;
-		++idx;
+		m_lfoShapeData[offset] = lfoShapeSample( offset );
 	}
 	m_bad_lfoShapeData = false;
 }
@@ -218,13 +224,16 @@ void envelopeAndLFOParameters::resetLFO( void )
 
 
 
-void envelopeAndLFOParameters::fillLFOLevel( float * _buf,
+inline void envelopeAndLFOParameters::fillLFOLevel( float * _buf,
 							f_cnt_t _frame,
 							const fpp_t _frames )
 {
 	if( m_lfoAmountIsZero || _frame <= m_lfoPredelayFrames )
 	{
-		memset( _buf, 0, _frames * sizeof( *_buf ) );
+		for( fpp_t offset = 0; offset < _frames; ++offset )
+		{
+			*_buf++ = 0.0f;
+		}
 		return;
 	}
 	_frame -= m_lfoPredelayFrames;
@@ -235,15 +244,10 @@ void envelopeAndLFOParameters::fillLFOLevel( float * _buf,
 	}
 
 	fpp_t offset = 0;
-	const f_cnt_t laf = m_lfoAttackFrames;
-	float f = _frame;
-	for( ; offset < _frames; ++offset, ++f )
+	for( ; offset < _frames && _frame < m_lfoAttackFrames; ++offset,
+								++_frame )
 	{
-		if( _frame >= laf )
-		{
-			break;
-		}
-		*_buf++ = m_lfoShapeData[offset] * _frame / laf;
+		*_buf++ = m_lfoShapeData[offset] * _frame / m_lfoAttackFrames;
 	}
 	for( ; offset < _frames; ++offset )
 	{
@@ -265,7 +269,6 @@ void envelopeAndLFOParameters::fillLevel( float * _buf, f_cnt_t _frame,
 
 	fillLFOLevel( _buf, _frame, _frames );
 
-	const bool control_env_am = m_controlEnvAmountModel.value();
 	for( fpp_t offset = 0; offset < _frames; ++offset, ++_buf, ++_frame )
 	{
 		float env_level;
@@ -292,9 +295,9 @@ void envelopeAndLFOParameters::fillLevel( float * _buf, f_cnt_t _frame,
 		}
 
 		// at this point, *_buf is LFO level
-		*_buf = control_env_am ?
-				env_level * ( 0.5f + *_buf ) :
-				env_level + *_buf;
+		*_buf = m_controlEnvAmountModel.value() ?
+			env_level * ( 0.5f + *_buf ) :
+			env_level + *_buf;
 	}
 }
 
@@ -407,48 +410,39 @@ void envelopeAndLFOParameters::updateSampleVars( void )
 	m_pahdEnv = new sample_t[m_pahdFrames];
 	m_rEnv = new sample_t[m_rFrames];
 
-	// strange auto-vectorizer wants local variables
-	const float aa = m_amountAdd;
-	const float am = m_amount;
-	const float sl = m_sustainLevel;
-	const float afma = attack_frames * am;
-	const float hold = m_amount + m_amountAdd;
-	const float rf = m_rFrames;
-
-	// fill predelay
 	for( f_cnt_t i = 0; i < predelay_frames; ++i )
 	{
-		m_pahdEnv[i] = aa;
+		m_pahdEnv[i] = m_amountAdd;
 	}
 
-	// fill attack
 	f_cnt_t add = predelay_frames;
+
 	for( f_cnt_t i = 0; i < attack_frames; ++i )
 	{
-		m_pahdEnv[add + i] = (float)i / afma + aa;
+		m_pahdEnv[add + i] = ( (float)i / attack_frames ) *
+							m_amount + m_amountAdd;
 	}
 
-	// fill hold
 	add += attack_frames;
 	for( f_cnt_t i = 0; i < hold_frames; ++i )
 	{
-		m_pahdEnv[add + i] = hold;
+		m_pahdEnv[add + i] = m_amount + m_amountAdd;
 	}
 
-	// fill decay
 	add += hold_frames;
 	for( f_cnt_t i = 0; i < decay_frames; ++i )
 	{
-		m_pahdEnv[add + i] = ( sl + ( 1.0f - (float)i / decay_frames ) *
-						( 1.0f - sl ) ) * am + aa;
+		m_pahdEnv[add + i] = ( m_sustainLevel + ( 1.0f -
+						(float)i / decay_frames ) *
+						( 1.0f - m_sustainLevel ) ) *
+							m_amount + m_amountAdd;
 	}
 
-	// fill release
-	const f_cnt_t rfr = m_rFrames;
-	const float rfmam = rf * am;
-	for( f_cnt_t i = 0; i < rfr; ++i )
+	for( f_cnt_t i = 0; i < m_rFrames; ++i )
 	{
-		m_rEnv[i] = (float)( rf - i ) / rfmam;
+		m_rEnv[i] = ( (float)( m_rFrames - i ) / m_rFrames
+					// * m_sustainLevel
+					 		) * m_amount;
 	}
 
 	// save this calculation in real-time-part
@@ -498,3 +492,4 @@ void envelopeAndLFOParameters::updateSampleVars( void )
 #include "moc_envelope_and_lfo_parameters.cxx"
 
 
+#endif
