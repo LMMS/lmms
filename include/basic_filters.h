@@ -4,7 +4,7 @@
  * original file by ??? 
  * modified and enhanced by Tobias Doerffel
  *
- * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -40,7 +40,6 @@
 #include "templates.h"
 #include "lmms_constants.h"
 
-//const int MOOG_VOLTAGE = 40000;
 
 template<ch_cnt_t CHANNELS/* = DEFAULT_CHANNELS*/>
 class basicFilters
@@ -48,15 +47,20 @@ class basicFilters
 public:
 	enum filterTypes
 	{
-		LOWPASS,
-		HIPASS,
-		BANDPASS_CSG,
-		BANDPASS_CZPG,
-		NOTCH,
-		ALLPASS,
-		MOOG,
-		SIMPLE_FLT_CNT
+		LowPass,
+		HiPass,
+		BandPass_CSG,
+		BandPass_CZPG,
+		Notch,
+		AllPass,
+		Moog,
+		NumOfFilters
 	} ;
+
+	static inline float minFreq( void )
+	{
+		return( 0.01f );
+	}
 
 	static inline float minQ( void )
 	{
@@ -65,14 +69,14 @@ public:
 
 	inline void setFilterType( const int _idx )
 	{
-		m_doubleFilter = _idx >= SIMPLE_FLT_CNT;
+		m_doubleFilter = _idx >= NumOfFilters;
 		if( !m_doubleFilter )
 		{
 			m_type = static_cast<filterTypes>( _idx );
 			return;
 		}
-		m_type = static_cast<filterTypes>( LOWPASS + _idx -
-							SIMPLE_FLT_CNT );
+		m_type = static_cast<filterTypes>( LowPass + _idx -
+							NumOfFilters );
 		if( m_subFilter == NULL )
 		{
 			m_subFilter = new basicFilters<CHANNELS>(
@@ -120,7 +124,7 @@ public:
 		sample_t out;
 		switch( m_type )
 		{
-			case MOOG:
+			case Moog:
 			{
 				sample_t x = _in0 - m_r*m_y4[_chnl];
 
@@ -171,11 +175,11 @@ public:
 
 		if( m_doubleFilter )
 		{
-			return( m_subFilter->update( out, _chnl ) );
+			return m_subFilter->update( out, _chnl );
 		}
 
 		// Clipper band limited sigmoid
-		return( out );
+		return out;
 	}
 
 
@@ -183,11 +187,11 @@ public:
 				/*, const bool _q_is_bandwidth = false*/ )
 	{
 		// temp coef vars
-		_freq = qMax( _freq, 0.01f );// limit freq and q for not getting
+		_freq = qMax( _freq, minFreq() );// limit freq and q for not getting
 					      // bad noise out of the filter...
 		_q = qMax( _q, minQ() );
 
-		if( m_type == MOOG )
+		if( m_type == Moog )
 		{
 			// [ 0 - 0.5 ]
 			const float f = _freq / m_sampleRate;
@@ -204,32 +208,6 @@ public:
 			}
 			return;
 
-/*			case DOUBLE_MOOG2:
-			{
-				if( m_subFilter == NULL )
-				{
-					m_subFilter =
-						new basicFilters<CHANNELS>(
-							m_sampleRate );
-				}
-				m_subFilter->calcFilterCoeffs( MOOG2, _freq,
-									_q );
-			}
-
-			case MOOG2:
-			{
-				const float kfc = 2 * _freq / m_sampleRate;
-				const float kf = _freq / m_sampleRate;
-				const float kfcr = 1.8730 * ( kfc*kfc*kfc ) +
-							0.4955 * ( kfc*kfc ) +
-							0.6490 * kfc + 0.9988;
-				const float kacr = -3.9364 * ( kfc*kfc ) +
-							1.8409 * kfc + 0.9968;
-				m_p = MOOG_VOLTAGE * ( 1 - expf( F_2PI *
-								kfcr * kf ) );
-				m_r = 4 * _q * kacr;
-				break;
-			}*/
 		}
 
 		// other filters
@@ -251,32 +229,32 @@ public:
 
 		switch( m_type )
 		{
-			case LOWPASS:
+			case LowPass:
 				m_b1a0 = ( 1.0f - tcos ) * a0;
 				m_b0a0 = m_b1a0 * 0.5f;
 				m_b2a0 = m_b0a0;//((1.0f-tcos)/2.0f)*a0;
 				break;
-			case HIPASS:
+			case HiPass:
 				m_b1a0 = ( -1.0f - tcos ) * a0;
 				m_b0a0 = m_b1a0 * -0.5f;
 				m_b2a0 = m_b0a0;//((1.0f+tcos)/2.0f)*a0;
 				break;
-			case BANDPASS_CSG:
+			case BandPass_CSG:
 				m_b1a0 = 0.0f;
 				m_b0a0 = tsin * 0.5f * a0;
 				m_b2a0 = -m_b0a0;
 				break;
-			case BANDPASS_CZPG:
+			case BandPass_CZPG:
 				m_b1a0 = 0.0f;
 				m_b0a0 = alpha * a0;
 				m_b2a0 = -m_b0a0;
 				break;
-			case NOTCH:
+			case Notch:
 				m_b1a0 = m_a1a0;
 				m_b0a0 = a0;
 				m_b2a0 = a0;
 				break;
-			case ALLPASS:
+			case AllPass:
 				m_b1a0 = m_a1a0;
 				m_b0a0 = m_a2a0;
 				m_b2a0 = 1.0f;//(1.0f+alpha)*a0;

@@ -671,14 +671,14 @@ bool flpImport::tryImport( trackContainer * _tc )
 				const basicFilters<>::filterTypes
 								mappedFilter[] =
 				{
-					basicFilters<>::LOWPASS,// fast LP
-					basicFilters<>::LOWPASS,
-					basicFilters<>::BANDPASS_CSG,
-					basicFilters<>::HIPASS,
-					basicFilters<>::NOTCH,
-					basicFilters<>::SIMPLE_FLT_CNT,
-					basicFilters<>::LOWPASS,
-					basicFilters<>::SIMPLE_FLT_CNT
+					basicFilters<>::LowPass,// fast LP
+					basicFilters<>::LowPass,
+					basicFilters<>::BandPass_CSG,
+					basicFilters<>::HiPass,
+					basicFilters<>::Notch,
+					basicFilters<>::NumOfFilters,
+					basicFilters<>::LowPass,
+					basicFilters<>::NumOfFilters
 				} ;
 				Uint32 * p = (Uint32 *) text;
 				instrumentSoundShaping * iss = &it->m_soundShaping;
