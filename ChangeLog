@@ -1,3 +1,17 @@
+2008-10-15	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* src/core/timeline.cpp:
+	move position marker lines even if autoscrolling is disabled
+
+	* include/envelope_and_lfo_parameters.h:
+	* src/core/envelope_and_lfo_parameters.cpp:
+	reverted to rev. 1479 as the optimizations lately completely screwed
+	up things...
+
+	* plugins/flp_import/flp_import.cpp:
+	* include/basic_filters.h:
+	cleanups
+
 2008-10-14	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* tests/README:

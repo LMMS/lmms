@@ -184,10 +184,7 @@ void timeLine::updatePosition( const midiTime & )
 	{
 		m_posMarkerX = new_x;
 		m_changedPosition = TRUE;
-		if( m_autoScroll == AutoScrollEnabled )
-		{
-			emit positionChanged( m_pos );
-		}
+		emit positionChanged( m_pos );
 		update();
 	}
 }
