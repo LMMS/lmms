@@ -1,5 +1,9 @@
 2008-10-15	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* data/locale/cs.qm:
+	* data/locale/cs.ts:
+	added Czech localization by Ludek Cerny <erl/at/erlmedia/dot/cz>
+
 	* src/core/timeline.cpp:
 	move position marker lines even if autoscrolling is disabled
 
