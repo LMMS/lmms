@@ -1,5 +1,11 @@
 2008-10-16	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* src/core/piano.cpp:
+	reclaim keyboard focus if the current focus-widget lives in the same
+	instrument-track-window as the previously active test piano - this way
+	running notes are not stopped when modifying a control in the same
+	instrument-track-window (closes #2139806)
+
 	* include/file_browser.h:
 	* src/gui/file_browser.cpp:
 	heavily improved performance when adding items to file browser
