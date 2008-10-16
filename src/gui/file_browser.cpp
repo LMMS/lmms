@@ -47,6 +47,12 @@
 #include "string_pair_drag.h"
 #include "text_float.h"
 
+enum TreeWidgetItemTypes
+{
+	TypeFileItem = QTreeWidgetItem::UserType,
+	TypeDirectoryItem
+} ;
+
 
 fileBrowser::fileBrowser( const QString & _directories, const QString & _filter,
 			const QString & _title, const QPixmap & _pm,
@@ -536,12 +542,12 @@ QPixmap * directory::s_folderLockedPixmap = NULL;
 
 directory::directory( const QString & _name, const QString & _path,
 						const QString & _filter ) :
+	QTreeWidgetItem( QStringList( _name ), TypeDirectoryItem ),
 	m_directories( _path ),
 	m_filter( _filter )
 {
-	initPixmapStuff();
+	initPixmaps();
 
-	setText( 0, _name );
 	setChildIndicatorPolicy( QTreeWidgetItem::ShowIndicator );
 
 	if( !QDir( fullName() ).isReadable() )
@@ -557,7 +563,7 @@ directory::directory( const QString & _name, const QString & _path,
 
 
 
-void directory::initPixmapStuff( void )
+void directory::initPixmaps( void )
 {
 	if( s_folderPixmap == NULL )
 	{
@@ -662,19 +668,20 @@ bool directory::addItems( const QString & _path )
 		}
 	}
 
+	QList<QTreeWidgetItem*> items;
 	files = thisDir.entryList( QDir::Files, QDir::Name );
 	for( QStringList::const_iterator it = files.constBegin();
 						it != files.constEnd(); ++it )
 	{
 		QString cur_file = *it;
-		if( cur_file[0] != '.'
-				&& thisDir.match( m_filter, cur_file.toLower() )
-			/*QDir::match( FILE_FILTER, cur_file )*/ )
+		if( cur_file[0] != '.' &&
+				thisDir.match( m_filter, cur_file.toLower() ) )
 		{
-			(void) new fileItem( this, cur_file, _path );
+			items << new fileItem( cur_file, _path );
 			added_something = true;
 		}
 	}
+	addChildren( items );
 
 	treeWidget()->setUpdatesEnabled( true );
 
@@ -694,31 +701,28 @@ QPixmap * fileItem::s_unknownFilePixmap = NULL;
 
 fileItem::fileItem( QTreeWidget * _parent, const QString & _name,
 						const QString & _path ) :
-	QTreeWidgetItem( _parent ),
+	QTreeWidgetItem( _parent, QStringList( _name) , TypeFileItem ),
 	m_path( _path )
 {
-	setText( 0, _name );
 	determineFileType();
-	initPixmapStuff();
+	initPixmaps();
 }
 
 
 
 
-fileItem::fileItem( QTreeWidgetItem * _parent, const QString & _name,
-						const QString & _path ) :
-	QTreeWidgetItem( _parent ),
+fileItem::fileItem( const QString & _name, const QString & _path ) :
+	QTreeWidgetItem( QStringList( _name ), TypeFileItem ),
 	m_path( _path )
 {
-	setText( 0, _name );
 	determineFileType();
-	initPixmapStuff();
+	initPixmaps();
 }
 
 
 
 
-void fileItem::initPixmapStuff( void )
+void fileItem::initPixmaps( void )
 {
 	if( s_projectFilePixmap == NULL )
 	{

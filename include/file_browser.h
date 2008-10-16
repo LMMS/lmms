@@ -142,7 +142,7 @@ public:
 
 
 private:
-	void initPixmapStuff( void );
+	void initPixmaps( void );
 
 	bool addItems( const QString & _path );
 
@@ -186,8 +186,7 @@ public:
 
 	fileItem( QTreeWidget * _parent, const QString & _name,
 							const QString & _path );
-	fileItem( QTreeWidgetItem * _parent, const QString & _name,
-							const QString & _path );
+	fileItem( const QString & _name, const QString & _path );
 
 	inline QString fullName( void ) const
 	{
@@ -210,7 +209,7 @@ public:
 
 
 private:
-	void initPixmapStuff( void );
+	void initPixmaps( void );
 	void determineFileType( void );
 
 	static QPixmap * s_projectFilePixmap;
