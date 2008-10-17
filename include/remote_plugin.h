@@ -156,7 +156,6 @@ public:
 		static int k = 0;
 		m_data->dataSem.semKey = ( getpid()<<10 ) + ++k;
 		m_data->messageSem.semKey = ( getpid()<<10 ) + ++k;
-		m_invalid( false ),
 		m_dataSem.setKey( QString::number( m_data->dataSem.semKey ),
 						1, QSystemSemaphore::Create );
 		m_messageSem.setKey( QString::number(
