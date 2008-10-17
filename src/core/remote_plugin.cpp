@@ -38,11 +38,39 @@
 
 
 
+// simple helper thread monitoring our remotePlugin - if process terminates
+// unexpectedly invalidate plugin so LMMS doesn't lock up
+processWatcher::processWatcher( remotePlugin * _p ) :
+	QThread(),
+	m_plugin( _p ),
+	m_quit( false )
+{
+}
+
+
+void processWatcher::run( void )
+{
+	while( !m_quit && m_plugin->isRunning() )
+	{
+		msleep( 200 );
+	}
+	if( !m_quit )
+	{
+		fprintf( stderr,
+				"remote plugin died! invalidating now.\n" );
+		m_plugin->invalidate();
+	}
+}
+
+
+
+
 
 remotePlugin::remotePlugin( const QString & _plugin_executable,
 						bool _wait_for_init_done ) :
 	remotePluginBase( new shmFifo(), new shmFifo() ),
 	m_failed( true ),
+	m_watcher( this ),
 	m_commMutex( QMutex::Recursive ),
 	m_splitChannels( false ),
 #ifdef USE_NATIVE_SHMEM
@@ -65,6 +93,8 @@ remotePlugin::remotePlugin( const QString & _plugin_executable,
 	m_process.setProcessChannelMode( QProcess::MergedChannels );
 	m_process.start( exec, args );
 
+	m_watcher.start( QThread::LowestPriority );
+
 	resizeSharedProcessingMemory();
 
 	if( _wait_for_init_done )
@@ -79,9 +109,12 @@ remotePlugin::remotePlugin( const QString & _plugin_executable,
 
 remotePlugin::~remotePlugin()
 {
+	m_watcher.quit();
+	m_watcher.wait();
+
 	if( m_failed == false )
 	{
-		if( m_process.state() == QProcess::Running )
+		if( isRunning() )
 		{
 			lock();
 			sendMessage( IdQuit );
@@ -109,11 +142,17 @@ remotePlugin::~remotePlugin()
 bool remotePlugin::process( const sampleFrame * _in_buf,
 						sampleFrame * _out_buf )
 {
-	if( m_failed )
+	const fpp_t frames = engine::getMixer()->framesPerPeriod();
+
+	if( m_failed || !isRunning() )
 	{
+		if( _out_buf != NULL )
+		{
+			engine::getMixer()->clearAudioBuffer( _out_buf,
+								frames );
+		}
 		return false;
 	}
-	const fpp_t frames = engine::getMixer()->framesPerPeriod();
 
 	if( m_shm == NULL )
 	{
@@ -287,8 +326,8 @@ bool remotePlugin::processMessage( const message & _m )
 	bool reply = false;
 	switch( _m.id )
 	{
-		case IdGeneralFailure:
-			return( false );
+		case IdUndefined:
+			return false;
 
 		case IdInitDone:
 			reply = true;
@@ -318,7 +357,6 @@ bool remotePlugin::processMessage( const message & _m )
 
 		case IdProcessingDone:
 		case IdQuit:
-		case IdUndefined:
 		default:
 			break;
 	}
@@ -328,11 +366,11 @@ bool remotePlugin::processMessage( const message & _m )
 	}
 	unlock();
 
-	return( true );
+	return true;
 }
 
 
 
 
-
+#include "moc_remote_plugin.cxx"
 

@@ -83,6 +83,7 @@ typedef int32_t key_t;
 #else
 #include <QtCore/QMutex>
 #include <QtCore/QProcess>
+#include <QtCore/QThread>
 #endif
 
 // sometimes we need to exchange bigger messages (e.g. for VST parameter dumps)
@@ -116,6 +117,7 @@ class shmFifo
 public:
 	// constructor for master-side
 	shmFifo() :
+		m_invalid( false ),
 		m_master( true ),
 		m_shmKey( 0 ),
 #ifdef USE_NATIVE_SHMEM
@@ -154,6 +156,7 @@ public:
 		static int k = 0;
 		m_data->dataSem.semKey = ( getpid()<<10 ) + ++k;
 		m_data->messageSem.semKey = ( getpid()<<10 ) + ++k;
+		m_invalid( false ),
 		m_dataSem.setKey( QString::number( m_data->dataSem.semKey ),
 						1, QSystemSemaphore::Create );
 		m_messageSem.setKey( QString::number(
@@ -178,6 +181,7 @@ public:
 	// constructor for remote-/client-side - use _shm_key for making up
 	// the connection to master
 	shmFifo( key_t _shm_key ) :
+		m_invalid( false ),
 		m_master( false ),
 		m_shmKey( 0 ),
 #ifdef USE_NATIVE_SHMEM
@@ -235,6 +239,16 @@ public:
 		}
 	}
 
+	inline bool isInvalid( void ) const
+	{
+		return m_invalid;
+	}
+
+	void invalidate( void )
+	{
+		m_invalid = true;
+	}
+
 	// do we act as master (i.e. not as remote-process?)
 	inline bool isMaster( void ) const
 	{
@@ -244,7 +258,7 @@ public:
 	// recursive lock
 	inline void lock( void )
 	{
-		if( ++m_lockDepth == 1 )
+		if( !isInvalid() && ++m_lockDepth == 1 )
 		{
 #ifdef LMMS_BUILD_WIN32
 			m_dataSem.acquire();
@@ -273,11 +287,14 @@ public:
 	// wait until message-semaphore is available
 	inline void waitForMessage( void )
 	{
+		if( !isInvalid() )
+		{
 #ifdef LMMS_BUILD_WIN32
-		m_messageSem.acquire();
+			m_messageSem.acquire();
 #else
-		sem_wait( m_messageSem );
+			sem_wait( m_messageSem );
 #endif
+		}
 	}
 
 	// increase message-semaphore
@@ -329,6 +346,10 @@ public:
 
 	inline bool messagesLeft( void )
 	{
+		if( isInvalid() )
+		{
+			return false;
+		}
 #ifdef LMMS_BUILD_WIN32
 		lock();
 		const bool empty = ( m_data->startPtr == m_data->endPtr );
@@ -365,6 +386,11 @@ private:
 
 	void read( void * _buf, int _len )
 	{
+		if( isInvalid() )
+		{
+			memset( _buf, 0, _len );
+			return;
+		}
 		lock();
 		while( _len > m_data->endPtr - m_data->startPtr )
 		{
@@ -387,6 +413,10 @@ private:
 
 	void write( const void * _buf, int _len )
 	{
+		if( isInvalid() )
+		{
+			return;
+		}
 		lock();
 		while( _len > SHM_FIFO_SIZE - m_data->endPtr )
 		{
@@ -411,6 +441,7 @@ private:
 		unlock();
 	}
 
+	volatile bool m_invalid;
 	bool m_master;
 	key_t m_shmKey;
 #ifdef USE_NATIVE_SHMEM
@@ -436,7 +467,6 @@ private:
 enum RemoteMessageIDs
 {
 	IdUndefined,
-	IdGeneralFailure,
 	IdInitDone,
 	IdQuit,
 	IdSampleRateInformation,
@@ -576,14 +606,21 @@ public:
 
 
 protected:
-	const shmFifo * in( void ) const
+	inline const shmFifo * in( void ) const
 	{
 		return m_in;
 	}
 
-	const shmFifo * out( void ) const
+	inline const shmFifo * out( void ) const
 	{
 		return m_out;
+	}
+
+	inline void invalidate( void )
+	{
+		m_in->invalidate();
+		m_out->invalidate();
+		m_in->messageSent();
 	}
 
 
@@ -597,6 +634,32 @@ private:
 
 #ifndef BUILD_REMOTE_PLUGIN_CLIENT
 
+
+class remotePlugin;
+
+class processWatcher : public QThread
+{
+public:
+	processWatcher( remotePlugin * );
+	virtual ~processWatcher()
+	{
+	}
+
+
+	void quit( void )
+	{
+		m_quit = true;
+	}
+
+private:
+	virtual void run( void );
+
+	remotePlugin * m_plugin;
+	volatile bool m_quit;
+
+} ;
+
+
 class EXPORT remotePlugin : public remotePluginBase
 {
 public:
@@ -604,9 +667,14 @@ public:
 					bool _wait_for_init_done = true );
 	virtual ~remotePlugin();
 
+	inline bool isRunning( void )
+	{
+		return m_process.state() != QProcess::NotRunning;
+	}
+
 	inline void waitForInitDone( void )
 	{
-		m_failed = waitForMessage( IdInitDone, TRUE ).id != IdInitDone;
+		m_failed = waitForMessage( IdInitDone, true ).id != IdInitDone;
 	}
 
 	virtual bool processMessage( const message & _m );
@@ -667,6 +735,7 @@ private:
 	bool m_failed;
 
 	QProcess m_process;
+	processWatcher m_watcher;
 
 	QMutex m_commMutex;
 	bool m_splitChannels;
@@ -681,6 +750,7 @@ private:
 	int m_inputCount;
 	int m_outputCount;
 
+	friend class processWatcher;
 } ;
 
 #endif
@@ -859,7 +929,7 @@ remotePluginBase::message remotePluginBase::waitForMessage(
 		{
 			return m;
 		}
-		else if( m.id == IdGeneralFailure )
+		else if( m.id == IdUndefined )
 		{
 			return m;
 		}
@@ -913,7 +983,7 @@ bool remotePluginClient::processMessage( const message & _m )
 	bool reply = false;
 	switch( _m.id )
 	{
-		case IdGeneralFailure:
+		case IdUndefined:
 			return false;
 
 		case IdSampleRateInformation:
@@ -952,7 +1022,6 @@ bool remotePluginClient::processMessage( const message & _m )
 		case IdInitDone:
 			break;
 
-		case IdUndefined:
 		default:
 			fprintf( stderr, "undefined message: %d\n",
 							(int) _m.id );

@@ -1,3 +1,12 @@
+2008-10-17	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* include/remote_plugin.h:
+	* src/core/remote_plugin.cpp:
+	added helper thread processWatcher which monitors the remote plugin
+	process - if it terminates unexpectedly, invalidate remotePlugin so
+	LMMS doesn't lock up - fixes crashes and lockups when using VST
+	plugins or ZynAddSubFX plugin
+
 2008-10-16	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/core/piano.cpp:
