@@ -789,7 +789,7 @@ VstIntPtr remoteVstPlugin::hostCallback( AEffect * _effect, VstInt32 _opcode,
 			SHOW_CALLBACK( "amc: audioMasterWillReplaceOr"
 							"Accumulate\n" );
 			// returns: 0: not supported, 1: replace, 2: accumulate
-			return( 0 );
+			return( 1 );
 
 		case audioMasterGetSpeakerArrangement:
 			SHOW_CALLBACK( "amc: audioMasterGetSpeaker"
@@ -842,10 +842,15 @@ VstIntPtr remoteVstPlugin::hostCallback( AEffect * _effect, VstInt32 _opcode,
 
 		case audioMasterGetSampleRate:
 			//SHOW_CALLBACK( "amc: audioMasterGetSampleRate\n" );
+			_effect->dispatcher( _effect, effSetSampleRate,
+				0, 0, NULL, (float)__plugin->sampleRate() );
 			return( __plugin->sampleRate() );
 
 		case audioMasterGetBlockSize:
 			//SHOW_CALLBACK( "amc: audioMasterGetBlockSize\n" );
+			_effect->dispatcher( _effect, effSetBlockSize,
+					0, __plugin->bufferSize(), NULL, 0 );
+
 			return( __plugin->bufferSize() );
 
 		case audioMasterGetInputLatency:
@@ -905,7 +910,7 @@ VstIntPtr remoteVstPlugin::hostCallback( AEffect * _effect, VstInt32 _opcode,
 			//SHOW_CALLBACK( "amc: audioMasterGetVendorString\n" );
 			// fills <ptr> with a string identifying the vendor
 			// (max 64 char)
-			strcpy( (char *) _ptr, "Tobias Doerffel & others");
+			strcpy( (char *) _ptr, "Tobias Doerffel" );
 			return( 1 );
 
 		case audioMasterGetProductString:
@@ -931,7 +936,8 @@ VstIntPtr remoteVstPlugin::hostCallback( AEffect * _effect, VstInt32 _opcode,
 			return( !strcmp( (char *) _ptr, "sendVstEvents" ) ||
 				!strcmp( (char *) _ptr, "sendVstMidiEvent" ) ||
 				!strcmp( (char *) _ptr, "sendVstTimeInfo" ) ||
-				!strcmp( (char *) _ptr, "sizeWindow" ) );
+				!strcmp( (char *) _ptr, "sizeWindow" ) ||
+				!strcmp( (char *) _ptr, "supplyIdle" ) );
 
 		case audioMasterGetLanguage:
 			//SHOW_CALLBACK( "amc: audioMasterGetLanguage\n" );
@@ -1030,11 +1036,13 @@ DWORD WINAPI remoteVstPlugin::guiEventLoop( LPVOID _param )
 	_this->m_windowHeight = er->bottom - er->top;
 
 	SetWindowPos( _this->m_window, 0, 0, 0, _this->m_windowWidth + 8,
-			_this->m_windowHeight + 26, SWP_NOMOVE | SWP_NOZORDER );
+			_this->m_windowHeight + 26, SWP_NOACTIVATE |
+						SWP_NOMOVE | SWP_NOZORDER );
 	_this->m_plugin->dispatcher( _this->m_plugin, effEditTop, 0, 0,
 								NULL, 0 );
 
 	ShowWindow( _this->m_window, SW_SHOWNORMAL );
+	UpdateWindow( _this->m_window );
 
 #ifdef LMMS_BUILD_LINUX
 	_this->m_windowID = (Sint32) GetPropA( _this->m_window,

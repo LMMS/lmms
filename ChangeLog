@@ -1,5 +1,12 @@
 2008-10-18	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* plugins/vst_base/remote_vst_plugin.cpp:
+	various tweakings
+
+	* src/core/piano.cpp:
+	check for focusWidget() being NULL before checking inheritance - fixes
+	crash for example when loading VST plugins
+
 	* src/gui/main_window.cpp:
 	use "Root directory" rather than "My computer" in non-win32-version
 
