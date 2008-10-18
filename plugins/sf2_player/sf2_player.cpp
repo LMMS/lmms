@@ -298,7 +298,6 @@ void sf2Instrument::freeFont( void )
 		{
 			cout << "Really deleting " << m_filename << endl;
 
-			printf("%d\n", sf2Instrument::s_fonts.remove( m_filename ) );
 			fluid_synth_sfunload( m_synth, m_fontId, TRUE );
 
 			delete m_font;
@@ -994,22 +993,17 @@ void sf2InstrumentView::showFileDialog( void )
 
 
 
-// Single instance of the patch dialog
-patchesDialog * sf2InstrumentView::s_patchDialog = NULL;
 
 void sf2InstrumentView::showPatchDialog( void )
 {
 	sf2Instrument * k = castModel<sf2Instrument>();
 
-	if( s_patchDialog == NULL )
-	{
-		s_patchDialog = new patchesDialog( this );
-	}
+	patchesDialog pd( this );
 
-	s_patchDialog->setup( k->m_synth, 1, k->getInstrumentTrack()->name(),
+	pd.setup( k->m_synth, 1, k->getInstrumentTrack()->name(),
 		&k->m_bankNum, &k->m_patchNum, m_patchLabel );
 
-	s_patchDialog->exec();
+	pd.exec();
 }
 
 
