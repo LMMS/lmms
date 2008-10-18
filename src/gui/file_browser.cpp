@@ -56,10 +56,11 @@ enum TreeWidgetItemTypes
 
 fileBrowser::fileBrowser( const QString & _directories, const QString & _filter,
 			const QString & _title, const QPixmap & _pm,
-							QWidget * _parent ) :
+			QWidget * _parent, bool _dirs_as_items ) :
 	sideBarWidget( _title, _pm, _parent ),
 	m_directories( _directories ),
-	m_filter( _filter )
+	m_filter( _filter ),
+	m_dirsAsItems( _dirs_as_items )
 {
 	setWindowTitle( tr( "Browser" ) );
 	m_l = new listView( contentParent() );
@@ -99,6 +100,13 @@ void fileBrowser::reloadTree( void )
 
 void fileBrowser::addItems( const QString & _path )
 {
+	if( m_dirsAsItems )
+	{
+		m_l->addTopLevelItem( new directory( _path,
+						QString::null, m_filter ) );
+		return;
+	}
+
 	QDir cdir( _path );
 	QStringList files = cdir.entryList( QDir::Dirs, QDir::Name );
 	for( QStringList::const_iterator it = files.constBegin();

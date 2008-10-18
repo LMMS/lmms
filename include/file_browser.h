@@ -51,7 +51,7 @@ class fileBrowser : public sideBarWidget
 public:
 	fileBrowser( const QString & _directories, const QString & _filter,
 			const QString & _title, const QPixmap & _pm,
-							QWidget * _parent );
+			QWidget * _parent, bool _dirs_as_items = false );
 	virtual ~fileBrowser();
 
 
@@ -69,6 +69,7 @@ private:
 	QString m_directories;
 	QString m_filter;
 
+	bool m_dirsAsItems;
 
 } ;
 
@@ -130,8 +131,11 @@ public:
 		{
 			_path = m_directories[0];
 		}
-		return( QDir::cleanPath( _path + QDir::separator() +
-								text( 0 ) ) +
+		if( _path != QString::null )
+		{
+			_path += QDir::separator();
+		}
+		return( QDir::cleanPath( _path + text( 0 ) ) +
 							QDir::separator() );
 	}
 

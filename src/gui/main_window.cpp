@@ -118,10 +118,22 @@ mainWindow::mainWindow( void ) :
 							tr( "My home" ),
 					embed::getIconPixmap( "home" ),
 							splitter ), ++id );
-	side_bar->appendTab( new fileBrowser( QDir::rootPath(), "*",
-							tr( "Root directory" ),
-					embed::getIconPixmap( "root" ),
-							splitter ), ++id );
+	QFileInfoList drives = QDir::drives();
+	QStringList root_paths;
+	foreach( const QFileInfo & drive, drives )
+	{
+		root_paths += drive.absolutePath();
+	}
+	side_bar->appendTab( new fileBrowser( root_paths.join( "*" ), "*",
+							tr( "My computer" ),
+					embed::getIconPixmap( "computer" ),
+							splitter,
+#ifdef LMMS_BUILD_WIN32
+							true
+#else
+							false
+#endif
+								), ++id );
 
 	m_workspace = new QMdiArea( splitter );
 

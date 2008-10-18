@@ -1,5 +1,14 @@
 2008-10-18	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* include/file_browser.h:
+	* src/gui/main_window.cpp:
+	* src/gui/file_browser.cpp:
+	* data/themes/default/computer.png:
+	* data/themes/default/home.png:
+	- renamed tab "root" to "My computer"
+	- on win32 allow browsing drives in "My computer" tab
+	- improved icons for home and "My computer" browser
+
 	* include/embed.h:
 	* include/instrument_track.h:
 	* include/plugin.h:
