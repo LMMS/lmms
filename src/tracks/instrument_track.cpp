@@ -1009,7 +1009,10 @@ instrumentTrackWindow * instrumentTrackView::getInstrumentTrackWindow( void )
 void instrumentTrackView::dragEnterEvent( QDragEnterEvent * _dee )
 {
 	getInstrumentTrackWindow()->dragEnterEvent( _dee );
-	trackView::dragEnterEvent( _dee );
+	if( !_dee->isAccepted() )
+	{
+		trackView::dragEnterEvent( _dee );
+	}
 }
 
 
