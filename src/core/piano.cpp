@@ -719,6 +719,7 @@ void pianoView::focusOutEvent( QFocusEvent * )
 	// focus just switched to another control inside the instrument track
 	// window we live in?
 	if( parentWidget()->parentWidget()->focusWidget() != this &&
+		parentWidget()->parentWidget()->focusWidget() != NULL &&
 		!parentWidget()->parentWidget()->
 				focusWidget()->inherits( "QLineEdit" ) )
 	{
