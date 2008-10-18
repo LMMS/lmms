@@ -227,8 +227,7 @@ ENDIF(LMMS_HAVE_SOUNDCARD_H OR LMMS_HAVE_SYS_SOUNDCARD_H)
 
 # check for ALSA
 IF(WANT_ALSA)
-	INCLUDE(FindAlsa)
-	ALSA_CONFIGURE_FILE(${CMAKE_BINARY_DIR}/alsaconfig.h)
+	FIND_PACKAGE(Alsa)
 	IF(ALSA_FOUND)
 		SET(LMMS_HAVE_ALSA TRUE)
 		SET(STATUS_ALSA "OK")
@@ -468,7 +467,7 @@ ENDIF(LMMS_BUILD_WIN32)
 #
 ADD_CUSTOM_TARGET(distclean
 			COMMAND make clean
-			COMMAND rm -rf `find -name cmake_install.cmake` `find -name Makefile` `find -type d -name CMakeFiles` CMakeCache.txt lmmsconfig.h alsaconfig.h lmms.1.gz)
+			COMMAND rm -rf `find -name cmake_install.cmake` `find -name Makefile` `find -type d -name CMakeFiles` CMakeCache.txt lmmsconfig.h lmms.1.gz)
 
 #
 # add tarball-target
@@ -518,7 +517,7 @@ ADD_CUSTOM_TARGET(win32-pkg
 )
 
 
-SET_DIRECTORY_PROPERTIES(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES "${LMMS_ER_H} ${lmms_MOC_out} ${lmms_UI_out} lmmsconfig.h alsaconfig.h lmms.1.gz")
+SET_DIRECTORY_PROPERTIES(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES "${LMMS_ER_H} ${lmms_MOC_out} ${lmms_UI_out} lmmsconfig.h lmms.1.gz")
 
 
 #
