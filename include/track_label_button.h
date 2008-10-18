@@ -54,6 +54,7 @@ protected:
 
 private:
 	trackView * m_trackView;
+	QString m_iconName;
 
 } ;
 

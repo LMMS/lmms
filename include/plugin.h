@@ -76,9 +76,9 @@ public:
 		const char * supportedFileTypes;
 		inline bool supportsFileType( const QString & _ext ) const
 		{
-			return( QString( supportedFileTypes ).
+			return QString( supportedFileTypes ).
 						split( QChar( ',' ) ).
-							contains( _ext ) );
+							contains( _ext );
 		}
 		class EXPORT subPluginFeatures
 		{
@@ -105,8 +105,8 @@ public:
 
 				inline bool isValid( void ) const
 				{
-					return( desc != NULL &&
-							name != QString::null );
+					return desc != NULL &&
+							name != QString::null;
 				}
 
 				plugin::descriptor * desc;
@@ -152,21 +152,21 @@ public:
 	// returns display-name out of descriptor
 	virtual QString displayName( void ) const
 	{
-		return( model::displayName().isNull() ?
-					m_descriptor->displayName :
-						model::displayName() );
+		return model::displayName().isNull() ?
+						m_descriptor->displayName :
+							model::displayName();
 	}
 
 	// return plugin-type
 	inline PluginTypes type( void ) const
 	{
-		return( m_descriptor->type );
+		return m_descriptor->type;
 	}
 
 	// return plugin-descriptor for further information
 	inline const descriptor * getDescriptor( void ) const
 	{
-		return( m_descriptor );
+		return m_descriptor;
 	}
 
 	// can be called if a file matching supportedFileTypes should be

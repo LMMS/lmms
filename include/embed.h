@@ -93,6 +93,11 @@ public:
 	{
 	}
 
+	virtual QString pixmapName( void ) const
+	{
+		return m_name;
+	}
+
 protected:
 	QString m_name;
 } ;
@@ -116,6 +121,13 @@ public:
 		}
 		return( QPixmap() );
 	}
+
+	virtual QString pixmapName( void ) const
+	{
+		return QString( STRINGIFY_PLUGIN_NAME(PLUGIN_NAME) ) +
+								"::" + m_name;
+	}
+
 } ;
 #endif
 

@@ -1,5 +1,3 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * track_label_button.cpp - implementation of class trackLabelButton, a label
  *                          which is renamable by double-clicking it
@@ -26,19 +24,15 @@
  */
 
 
-#include <QtGui/QFileDialog>
-#include <QtGui/QHBoxLayout>
+#include <QtGui/QApplication>
 #include <QtGui/QMouseEvent>
-#include <QtGui/QPainter>
-#include <QtGui/QToolButton>
 
 
 #include "track_label_button.h"
 #include "embed.h"
 #include "rename_dialog.h"
-#include "bb_track_container.h"
-#include "bb_track.h"
-#include "gui_templates.h"
+#include "instrument_track.h"
+#include "instrument.h"
 #include "config_mgr.h"
 #include "engine.h"
 
@@ -46,9 +40,10 @@
 
 trackLabelButton::trackLabelButton( trackView * _tv, QWidget * _parent ) :
 	QToolButton( _parent ),
-	m_trackView( _tv )
+	m_trackView( _tv ),
+	m_iconName()
 {
-	setAcceptDrops( TRUE );
+	setAcceptDrops( true );
 	setCursor( QCursor( embed::getIconPixmap( "hand" ), 0, 0 ) );
 	setToolButtonStyle( Qt::ToolButtonTextBesideIcon );
 	setFixedSize( 160, 29 );
@@ -94,7 +89,7 @@ void trackLabelButton::dragEnterEvent( QDragEnterEvent * _dee )
 void trackLabelButton::dropEvent( QDropEvent * _de )
 {
 	m_trackView->dropEvent( _de );
-	setChecked( TRUE );
+	setChecked( true );
 }
 
 
@@ -127,31 +122,25 @@ void trackLabelButton::paintEvent( QPaintEvent * _pe )
 {
 	if( m_trackView->getTrack()->type() == track::InstrumentTrack )
 	{
-		QToolButton::paintEvent( _pe );
-		QPainter p( this );
-		const QString dn = m_trackView->getTrack()->displayName();
-		const QString in = dn.split( ':' )[0];
-		const QString tn = dn.split( ':' )[1];
-		const int extra = ( isDown() || isChecked() ) ? -2 : -3;
-		const int is = 40;
-		p.setPen( QApplication::palette().buttonText().color().
-								darker( 130 ) );
-		p.drawText( is + extra, height() / 2 + extra, in );
-		p.setPen( QApplication::palette().buttonText().color() );
-		p.drawText( is + extra, height() / 2 +
-				QFontMetrics( p.font() ).height() + extra - 2,
-								tn );
+		instrumentTrack * it =
+			dynamic_cast<instrumentTrack *>(
+						m_trackView->getTrack() );
+		const pixmapLoader * pl;
+		if( it && ( pl = it->getInstrument()->getDescriptor()->logo ) )
+		{
+			if( pl->pixmapName() != m_iconName )
+			{
+				m_iconName = pl->pixmapName();
+				setIcon( pl->pixmap() );
+			}
+		}
 	}
-	else
-	{
-		setText( m_trackView->getTrack()->displayName() );
-		QToolButton::paintEvent( _pe );
-	}
+
+	setText( m_trackView->getTrack()->displayName() );
+	QToolButton::paintEvent( _pe );
 }
 
 
 
 #include "moc_track_label_button.cxx"
 
-
-#endif

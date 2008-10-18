@@ -1,3 +1,21 @@
+2008-10-18	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* include/embed.h:
+	* include/instrument_track.h:
+	* include/plugin.h:
+	* include/track_label_button.h:
+	* src/gui/widgets/track_label_button.cpp:
+	in instrument tracks draw icon of instrument rather than displaying the
+	full name of the instrument on track label button
+
+	* src/tracks/instrument_track.cpp:
+	do not call trackView::dragEnterEvent() if instrument track window
+	already accepted drag event - fixes dragging of presets and
+	instruments onto track label button
+
+	* src/core/piano.cpp:
+	do not reclaim keyboard focus if new focus widget is a QLineEdit
+
 2008-10-17	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* include/remote_plugin.h:
