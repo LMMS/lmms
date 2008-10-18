@@ -1,5 +1,9 @@
 2008-10-18	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* src/gui/widgets/track_label_button.cpp:
+	more checks before accessing icon - fixes crash when using ZynAddSubFX
+	plugin
+
 	* plugins/vst_base/remote_vst_plugin.cpp:
 	various tweakings
 
