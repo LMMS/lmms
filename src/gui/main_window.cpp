@@ -125,7 +125,11 @@ mainWindow::mainWindow( void ) :
 		root_paths += drive.absolutePath();
 	}
 	side_bar->appendTab( new fileBrowser( root_paths.join( "*" ), "*",
+#ifdef LMMS_BUILD_WIN32
 							tr( "My computer" ),
+#else
+							tr( "Root directory" ),
+#endif
 					embed::getIconPixmap( "computer" ),
 							splitter,
 #ifdef LMMS_BUILD_WIN32
