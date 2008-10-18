@@ -34,8 +34,7 @@
 #include "side_bar_widget.h"
 
 
-class QColorGroup;
-class QPixmap;
+class QLineEdit;
 
 class fileItem;
 class instrumentTrack;
@@ -56,15 +55,19 @@ public:
 
 
 public slots:
+	void filterItems( const QString & _filter );
 	void reloadTree( void );
 
 
 private:
+	bool filterItems( QTreeWidgetItem * _item, const QString & _filter );
 	virtual void keyPressEvent( QKeyEvent * _ke );
 
 	void addItems( const QString & _path );
 
 	listView * m_l;
+
+	QLineEdit * m_filterEdit;
 
 	QString m_directories;
 	QString m_filter;

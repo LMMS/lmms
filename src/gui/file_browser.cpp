@@ -24,7 +24,9 @@
  */
 
 
+#include <QtGui/QHBoxLayout>
 #include <QtGui/QKeyEvent>
+#include <QtGui/QLineEdit>
 #include <QtGui/QMenu>
 #include <QtGui/QPushButton>
 #include <QtGui/QMdiArea>
@@ -47,11 +49,14 @@
 #include "string_pair_drag.h"
 #include "text_float.h"
 
+
+
 enum TreeWidgetItemTypes
 {
 	TypeFileItem = QTreeWidgetItem::UserType,
 	TypeDirectoryItem
 } ;
+
 
 
 fileBrowser::fileBrowser( const QString & _directories, const QString & _filter,
@@ -66,10 +71,27 @@ fileBrowser::fileBrowser( const QString & _directories, const QString & _filter,
 	m_l = new listView( contentParent() );
 	addContentWidget( m_l );
 
-	QPushButton * reload_btn = new QPushButton( embed::getIconPixmap(
-			"reload" ), tr( "Reload (F5)" ), contentParent() );
-	addContentWidget( reload_btn );
+	QWidget * ops = new QWidget( contentParent() );
+	ops->setFixedHeight( 24 );
+
+	QHBoxLayout * opl = new QHBoxLayout( ops );
+	opl->setMargin( 0 );
+	opl->setSpacing( 0 );
+
+	m_filterEdit = new QLineEdit( ops );
+	connect( m_filterEdit, SIGNAL( textEdited( const QString & ) ),
+			this, SLOT( filterItems( const QString & ) ) );
+
+	QPushButton * reload_btn = new QPushButton(
+				embed::getIconPixmap( "reload" ),
+						QString::null, ops );
 	connect( reload_btn, SIGNAL( clicked() ), this, SLOT( reloadTree() ) );
+
+	opl->addWidget( m_filterEdit );
+	opl->addSpacing( 5 );
+	opl->addWidget( reload_btn );
+
+	addContentWidget( ops );
 
 	reloadTree();
 	show();
@@ -85,8 +107,124 @@ fileBrowser::~fileBrowser()
 
 
 
+void fileBrowser::filterItems( const QString & _filter )
+{
+	const bool show_all = _filter.isEmpty();
+
+	for( int i = 0; i < m_l->topLevelItemCount(); ++i )
+	{
+		QTreeWidgetItem * it = m_l->topLevelItem( i );
+		// show all items if filter is empty
+		if( show_all )
+		{
+			it->setHidden( false );
+			if( it->childCount() )
+			{
+				filterItems( it, _filter );
+			}
+		}
+		// is directory?
+		else if( it->childCount() )
+		{
+			// matches filter?
+			if( it->text( 0 ).
+				contains( _filter, Qt::CaseInsensitive ) )
+			{
+				// yes, then show everything below
+				it->setHidden( false );
+				filterItems( it, QString::null );
+			}
+			else
+			{
+				// only show if item below matches filter
+				it->setHidden( !filterItems( it, _filter ) );
+			}
+		}
+		// a standard item (i.e. no file or directory item?)
+		else if( it->type() == QTreeWidgetItem::Type )
+		{
+			// hide in every case when filtering
+			it->setHidden( true );
+		}
+		else
+		{
+			// file matches filter?
+			it->setHidden( !it->text( 0 ).
+				contains( _filter, Qt::CaseInsensitive ) );
+		}
+	
+	}
+}
+
+
+
+
+bool fileBrowser::filterItems( QTreeWidgetItem * _item, const QString & _filter )
+{
+	const bool show_all = _filter.isEmpty();
+	bool matched = false;
+
+	for( int i = 0; i < _item->childCount(); ++i )
+	{
+		QTreeWidgetItem * it = _item->child( i );
+		bool cm = false;	// whether current item matched
+		// show all items if filter is empty
+		if( show_all )
+		{
+			it->setHidden( false );
+			if( it->childCount() )
+			{
+				filterItems( it, _filter );
+			}
+		}
+		// is directory?
+		else if( it->childCount() )
+		{
+			// matches filter?
+			if( it->text( 0 ).
+				contains( _filter, Qt::CaseInsensitive ) )
+			{
+				// yes, then show everything below
+				it->setHidden( false );
+				filterItems( it, QString::null );
+				cm = true;
+			}
+			else
+			{
+				// only show if item below matches filter
+				cm = filterItems( it, _filter );
+				it->setHidden( !cm );
+			}
+		}
+		// a standard item (i.e. no file or directory item?)
+		else if( it->type() == QTreeWidgetItem::Type )
+		{
+			// hide in every case when filtering
+			it->setHidden( true );
+		}
+		else
+		{
+			// file matches filter?
+			cm = it->text( 0 ).
+				contains( _filter, Qt::CaseInsensitive );
+			it->setHidden( !cm );
+		}
+	
+		if( cm )
+		{
+			matched = true;
+		}
+	}
+
+	return matched;
+}
+
+
+
+
 void fileBrowser::reloadTree( void )
 {
+	m_filterEdit->clear();
 	m_l->clear();
 	QStringList paths = m_directories.split( '*' );
 	for( QStringList::iterator it = paths.begin(); it != paths.end(); ++it )
@@ -194,7 +332,7 @@ listView::listView( QWidget * _parent ) :
 	m_contextMenuItem( NULL )
 {
 	setColumnCount( 1 );
-	setHeaderLabel( tr( "Files" ) );
+	headerItem()->setHidden( true );
 	setSortingEnabled( false );
 
 	setFont( pointSizeF( font(), 7.5f ) );

@@ -1,6 +1,10 @@
 2008-10-18	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* include/file_browser.h:
+	* src/gui/file_browser.cpp:
+	added filter feature allowing quick file access
+
+	* include/file_browser.h:
 	* src/gui/main_window.cpp:
 	* src/gui/file_browser.cpp:
 	* data/themes/default/computer.png:
