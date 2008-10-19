@@ -1,9 +1,7 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * rename_dialog.cpp - implementation of dialog for renaming something
  *
- * Copyright (c) 2004-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -41,6 +39,7 @@ renameDialog::renameDialog( QString & _string ) :
 	m_stringLE = new QLineEdit( this );
 	m_stringLE->setText( _string );
 	m_stringLE->setGeometry ( 10, 5, 220, 20 );
+	m_stringLE->selectAll();
 	connect( m_stringLE, SIGNAL( textChanged( const QString & ) ), this,
 				SLOT( textChanged( const QString & ) ) );
 	connect( m_stringLE, SIGNAL( returnPressed() ), this,
@@ -79,5 +78,3 @@ void renameDialog::textChanged( const QString & _new_string )
 
 #include "moc_rename_dialog.cxx"
 
-
-#endif
