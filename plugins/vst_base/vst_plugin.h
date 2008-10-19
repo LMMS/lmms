@@ -47,27 +47,27 @@ public:
 
 	virtual bool processMessage( const message & _m );
 
-	QWidget * showEditor( QWidget * _parent = NULL );
+	void showEditor( QWidget * _parent = NULL );
 	void hideEditor( void );
 
 	inline const QString & name( void ) const
 	{
-		return( m_name );
+		return m_name;
 	}
 
 	inline Sint32 version( void ) const
 	{
-		return( m_version );
+		return m_version;
 	}
 	
 	inline const QString & vendorString( void ) const
 	{
-		return( m_vendorString );
+		return m_vendorString;
 	}
 
 	inline const QString & productString( void ) const
 	{
-		return( m_productString );
+		return m_productString;
 	}
 
 	const QMap<QString, QString> & parameterDump( void );
@@ -76,8 +76,14 @@ public:
 
 	inline QWidget * pluginWidget( void )
 	{
-		return( m_pluginWidget != NULL ?
-					m_pluginWidget->parentWidget() : NULL );
+		if( m_pluginWidget )
+		{
+			if( m_pluginWidget->parentWidget() )
+			{
+				return m_pluginWidget->parentWidget();
+			}
+		}
+		return m_pluginWidget;
 	}
 
 	virtual void loadSettings( const QDomElement & _this );
@@ -85,7 +91,7 @@ public:
 
 	inline virtual QString nodeName( void ) const
 	{
-		return( "vstplugin" );
+		return "vstplugin";
 	}
 
 

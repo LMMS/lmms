@@ -35,10 +35,10 @@ vstEffectControlDialog::vstEffectControlDialog( vstEffectControls * _ctl ) :
 	effectControlDialog( _ctl )
 {
 	QVBoxLayout * l = new QVBoxLayout( this );
-	QWidget * w = _ctl->m_effect->m_plugin->showEditor( this );
+	_ctl->m_effect->m_plugin->showEditor( this );
+	QWidget * w = _ctl->m_effect->m_plugin->pluginWidget();
 	if( w )
 	{
-		w->show();
 		l->addWidget( w );
 	}
 }

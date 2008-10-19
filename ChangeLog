@@ -1,3 +1,14 @@
+2008-10-19	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* plugins/vst_base/vst_plugin.h:
+	* plugins/vst_base/vst_plugin.cpp:
+	* plugins/vst_effect/vst_effect_control_dialog.cpp:
+	improved VST GUI embedding (closes #2167745)
+
+	* src/gui/track_container_view.cpp:
+	do not call method on deleted trackView but fetch pointer to track
+	before deleting trackView (fixes crash when removing a track)
+
 2008-10-18	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/gui/widgets/track_label_button.cpp:

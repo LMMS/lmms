@@ -28,6 +28,7 @@
 #include <QtCore/QDir>
 #include <QtCore/QFileInfo>
 #include <QtCore/QLocale>
+#include <QtGui/QCloseEvent>
 #include <QtGui/QMdiArea>
 #include <QtGui/QMdiSubWindow>
 #ifdef LMMS_BUILD_LINUX
@@ -48,6 +49,30 @@
 #include "engine.h"
 #include "main_window.h"
 #include "templates.h"
+
+
+class vstSubWin : public QMdiSubWindow
+{
+public:
+	vstSubWin( QWidget * _parent ) :
+		QMdiSubWindow( _parent )
+	{
+		setAttribute( Qt::WA_DeleteOnClose, false );
+	}
+
+	virtual ~vstSubWin()
+	{
+	}
+
+	virtual void closeEvent( QCloseEvent * e )
+	{
+		// ignore close-events - for some reason otherwise the VST GUI
+		// remains hidden when re-opening
+		hide();
+		e->ignore();
+	}
+} ;
+
 
 
 
@@ -116,8 +141,9 @@ vstPlugin::vstPlugin( const QString & _plugin ) :
 	if( m_pluginWindowID )
 	{
 		target->setFixedSize( m_pluginGeometry );
-		engine::getMainWindow()->workspace()->addSubWindow( helper )
-				->setAttribute( Qt::WA_DeleteOnClose, FALSE );
+		vstSubWin * sw = new vstSubWin(
+					engine::getMainWindow()->workspace() );
+		sw->setWidget( helper );
 		helper->setWindowTitle( name() );
 		m_pluginWidget = helper;
 	}
@@ -133,32 +159,25 @@ vstPlugin::vstPlugin( const QString & _plugin ) :
 
 vstPlugin::~vstPlugin()
 {
-	if( m_pluginWidget != NULL &&
-		m_pluginWidget->parentWidget() != NULL &&
-		dynamic_cast<QMdiSubWindow *>(
-			m_pluginWidget->parentWidget() ) != NULL )
-	{
-		delete m_pluginWidget->parentWidget();
-	}
+	delete pluginWidget();
 }
 
 
 
 
-QWidget * vstPlugin::showEditor( QWidget * _parent )
+void vstPlugin::showEditor( QWidget * _parent )
 {
-	if( m_pluginWidget != NULL )
+	QWidget * w = pluginWidget();
+	if( w )
 	{
-		if( m_pluginWidget->parentWidget() )
-		{
-			m_pluginWidget->parentWidget()->show();
-		}
-		return( m_pluginWidget );
+		w->show();
+		return;
 	}
+
 #ifdef LMMS_BUILD_LINUX
 	if( m_pluginWindowID == 0 )
 	{
-		return( NULL );
+		return;
 	}
 
 	m_pluginWidget = new QWidget( _parent );
@@ -166,23 +185,18 @@ QWidget * vstPlugin::showEditor( QWidget * _parent )
 	m_pluginWidget->setWindowTitle( name() );
 	if( _parent == NULL )
 	{
-		engine::getMainWindow()->workspace()->addSubWindow(
-							m_pluginWidget )
-				->setAttribute( Qt::WA_DeleteOnClose, FALSE );
+		vstSubWin * sw = new vstSubWin(
+					engine::getMainWindow()->workspace() );
+		sw->setWidget( m_pluginWidget );
 	}
 
 	QX11EmbedContainer * xe = new QX11EmbedContainer( m_pluginWidget );
 	xe->embedClient( m_pluginWindowID );
 	xe->setFixedSize( m_pluginGeometry );
-	//xe->setAutoDelete( FALSE );
 	xe->show();
 #endif
 
 	m_pluginWidget->show();
-
-	showUI();
-
-	return( m_pluginWidget );
 }
 
 
@@ -190,12 +204,10 @@ QWidget * vstPlugin::showEditor( QWidget * _parent )
 
 void vstPlugin::hideEditor( void )
 {
-	if( m_pluginWidget )
-		m_pluginWidget->hide();
-	return;
-	if( m_pluginWidget != NULL && m_pluginWidget->parentWidget() )
+	QWidget * w = pluginWidget();
+	if( w )
 	{
-		m_pluginWidget->parentWidget()->hide();
+		w->hide();
 	}
 }
 
@@ -208,18 +220,19 @@ void vstPlugin::loadSettings( const QDomElement & _this )
 	{
 		if( _this.attribute( "guivisible" ).toInt() )
 		{
-			pluginWidget()->show();
+			showEditor();
 		}
 		else
 		{
-			pluginWidget()->hide();
+			hideEditor();
 		}
 	}
-	const Sint32 num_params = _this.attribute( "numparams" ).toInt();
+
+	const int num_params = _this.attribute( "numparams" ).toInt();
 	if( num_params > 0 )
 	{
 		QMap<QString, QString> dump;
-		for( Sint32 i = 0; i < num_params; ++i )
+		for( int i = 0; i < num_params; ++i )
 		{
 			const QString key = "param" +
 						QString::number( i );
@@ -278,7 +291,7 @@ const QMap<QString, QString> & vstPlugin::parameterDump( void )
 	waitForMessage( IdVstParameterDump );
 	unlock();
 
-	return( m_parameterDump );
+	return m_parameterDump;
 }
 
 
