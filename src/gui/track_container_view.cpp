@@ -239,11 +239,12 @@ void trackContainerView::createTrackView( track * _t )
 
 void trackContainerView::deleteTrackView( trackView * _tv )
 {
+	track * t = _tv->getTrack();
 	removeTrackView( _tv );
 	delete _tv;
 
 	engine::getMixer()->lock();
-	delete _tv->getTrack();
+	delete t;
 	engine::getMixer()->unlock();
 }
 
