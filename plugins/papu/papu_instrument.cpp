@@ -43,7 +43,7 @@ extern "C"
 {
 plugin::descriptor PLUGIN_EXPORT papu_plugin_descriptor =
 {
-	STRINGIFY_PLUGIN_NAME( PLUGIN_NAME ),
+	STRINGIFY( PLUGIN_NAME ),
 	"FreeBoy",
 	QT_TRANSLATE_NOOP( "pluginBrowser", "Emulation of GameBoy (TM) APU" ),
 

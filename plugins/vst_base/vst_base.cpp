@@ -33,7 +33,7 @@ extern "C"
 
 plugin::descriptor vstbase_plugin_descriptor =
 {
-	STRINGIFY_PLUGIN_NAME( PLUGIN_NAME ),
+	STRINGIFY( PLUGIN_NAME ),
 	"VST Base",
 	"library for all LMMS-plugins dealing with VST-plugins",
 	"Tobias Doerffel <tobydox/at/users/dot/sf/dot/net>",

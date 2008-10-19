@@ -152,8 +152,7 @@ public:
 	// returns display-name out of descriptor
 	virtual QString displayName( void ) const
 	{
-		return model::displayName().isNull() ?
-						m_descriptor->displayName :
+		return m_descriptor ? m_descriptor->displayName :
 							model::displayName();
 	}
 

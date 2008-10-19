@@ -83,7 +83,7 @@ extern "C"
 
 plugin::descriptor PLUGIN_EXPORT lb302_plugin_descriptor =
 {
-	STRINGIFY_PLUGIN_NAME( PLUGIN_NAME ),
+	STRINGIFY( PLUGIN_NAME ),
 	"LB302",
 	QT_TRANSLATE_NOOP( "pluginBrowser",
 			"Incomplete monophonic immitation tb303" ),

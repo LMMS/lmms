@@ -48,7 +48,7 @@ extern "C"
 
 plugin::descriptor PLUGIN_EXPORT organic_plugin_descriptor =
 {
-	STRINGIFY_PLUGIN_NAME( PLUGIN_NAME ),
+	STRINGIFY( PLUGIN_NAME ),
 	"Organic",
 	QT_TRANSLATE_NOOP( "pluginBrowser",
 				"Additive Synthesizer for organ-like sounds" ),

@@ -50,7 +50,7 @@ extern "C"
 
 plugin::descriptor PLUGIN_EXPORT patman_plugin_descriptor =
 {
-	STRINGIFY_PLUGIN_NAME( PLUGIN_NAME ),
+	STRINGIFY( PLUGIN_NAME ),
 	"PatMan",
 	QT_TRANSLATE_NOOP( "pluginBrowser",
 				"GUS-compatible patch instrument" ),

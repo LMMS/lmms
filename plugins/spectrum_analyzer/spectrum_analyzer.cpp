@@ -35,7 +35,7 @@ extern "C"
 
 plugin::descriptor PLUGIN_EXPORT spectrumanalyzer_plugin_descriptor =
 {
-	STRINGIFY_PLUGIN_NAME( PLUGIN_NAME ),
+	STRINGIFY( PLUGIN_NAME ),
 	"Spectrum Analyzer",
 	QT_TRANSLATE_NOOP( "pluginBrowser",
 				"plugin for using arbitrary VST-effects "

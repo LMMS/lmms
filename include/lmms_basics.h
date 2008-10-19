@@ -136,4 +136,9 @@ typedef sample_t surroundSampleFrame[SURROUND_CHANNELS];
 typedef sample_t sampleFrameA[DEFAULT_CHANNELS] __attribute__((__aligned__(ALIGN_SIZE)));
 #endif
 
+
+#define STRINGIFY(s) STR(s)
+#define STR(PN)	#PN
+
+
 #endif

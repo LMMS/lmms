@@ -54,7 +54,7 @@ extern "C"
 
 plugin::descriptor PLUGIN_EXPORT midiimport_plugin_descriptor =
 {
-	STRINGIFY_PLUGIN_NAME( PLUGIN_NAME ),
+	STRINGIFY( PLUGIN_NAME ),
 	"MIDI Import",
 	QT_TRANSLATE_NOOP( "pluginBrowser",
 				"Filter for importing MIDI-files into LMMS" ),

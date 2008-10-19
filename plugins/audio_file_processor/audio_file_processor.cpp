@@ -51,7 +51,7 @@ extern "C"
 
 plugin::descriptor PLUGIN_EXPORT audiofileprocessor_plugin_descriptor =
 {
-	STRINGIFY_PLUGIN_NAME( PLUGIN_NAME ),
+	STRINGIFY( PLUGIN_NAME ),
 	"AudioFileProcessor",
 	QT_TRANSLATE_NOOP( "pluginBrowser",
 				"simple sampler with various settings for "

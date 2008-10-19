@@ -38,7 +38,7 @@ extern "C"
 
 plugin::descriptor PLUGIN_EXPORT peakcontrollereffect_plugin_descriptor =
 {
-	STRINGIFY_PLUGIN_NAME( PLUGIN_NAME ),
+	STRINGIFY( PLUGIN_NAME ),
 	"Peak Controller",
 	QT_TRANSLATE_NOOP( "pluginBrowser",
 				"Plugin for controlling knobs with sound peaks" ),

@@ -47,7 +47,7 @@ extern "C"
 
 plugin::descriptor PLUGIN_EXPORT bitinvader_plugin_descriptor =
 {
-	STRINGIFY_PLUGIN_NAME( PLUGIN_NAME ),
+	STRINGIFY( PLUGIN_NAME ),
 	"BitInvader",
 	QT_TRANSLATE_NOOP( "pluginBrowser",
 				"Customizable wavetable synthesizer" ),

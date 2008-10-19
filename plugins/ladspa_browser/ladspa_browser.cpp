@@ -49,7 +49,7 @@ extern "C"
 
 plugin::descriptor PLUGIN_EXPORT ladspabrowser_plugin_descriptor =
 {
-	STRINGIFY_PLUGIN_NAME( PLUGIN_NAME ),
+	STRINGIFY( PLUGIN_NAME ),
 	"LADSPA Plugin Browser",
 	QT_TRANSLATE_NOOP( "pluginBrowser",
 				"List installed LADSPA plugins" ),

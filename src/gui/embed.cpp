@@ -51,7 +51,7 @@ QPixmap getIconPixmap( const char * _name, int _w, int _h )
 
 #ifdef PLUGIN_NAME
 		QPixmap p( configManager::inst()->artworkDir() + "plugins/" +
-			STRINGIFY_PLUGIN_NAME( PLUGIN_NAME ) + "_" + name );
+					STRINGIFY( PLUGIN_NAME ) + "_" + name );
 		if( p.isNull() )
 		{
 			p = QPixmap( configManager::inst()->artworkDir() +

@@ -35,7 +35,7 @@ extern "C"
 
 plugin::descriptor PLUGIN_EXPORT bassbooster_plugin_descriptor =
 {
-	STRINGIFY_PLUGIN_NAME( PLUGIN_NAME ),
+	STRINGIFY( PLUGIN_NAME ),
 	"BassBooster Effect",
 	QT_TRANSLATE_NOOP( "pluginBrowser",
 				"plugin for boosting bass" ),

@@ -41,7 +41,7 @@ extern "C"
 
 plugin::descriptor vsteffect_plugin_descriptor =
 {
-	STRINGIFY_PLUGIN_NAME( PLUGIN_NAME ),
+	STRINGIFY( PLUGIN_NAME ),
 	"VST Effect",
 	QT_TRANSLATE_NOOP( "pluginBrowser",
 				"plugin for using arbitrary VST-effects "

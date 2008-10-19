@@ -49,7 +49,7 @@ extern "C"
 
 plugin::descriptor PLUGIN_EXPORT vibedstrings_plugin_descriptor =
 {
-	STRINGIFY_PLUGIN_NAME( PLUGIN_NAME ),
+	STRINGIFY( PLUGIN_NAME ),
 	"Vibed",
 	QT_TRANSLATE_NOOP( "pluginBrowser",
 					"Vibrating string modeler" ),

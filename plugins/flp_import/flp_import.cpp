@@ -67,7 +67,7 @@ extern "C"
 
 plugin::descriptor PLUGIN_EXPORT flpimport_plugin_descriptor =
 {
-	STRINGIFY_PLUGIN_NAME( PLUGIN_NAME ),
+	STRINGIFY( PLUGIN_NAME ),
 	"FLP Import",
 	QT_TRANSLATE_NOOP( "pluginBrowser",
 			"Filter for importing FL Studio projects into LMMS" ),

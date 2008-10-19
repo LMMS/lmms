@@ -31,10 +31,7 @@
 
 
 #include "export.h"
-
-
-#define STRINGIFY_PLUGIN_NAME(s) STR(s)
-#define STR(PN)	#PN
+#include "lmms_basics.h"
 
 
 namespace embed
@@ -124,8 +121,7 @@ public:
 
 	virtual QString pixmapName( void ) const
 	{
-		return QString( STRINGIFY_PLUGIN_NAME(PLUGIN_NAME) ) +
-								"::" + m_name;
+		return QString( STRINGIFY(PLUGIN_NAME) ) + "::" + m_name;
 	}
 
 } ;

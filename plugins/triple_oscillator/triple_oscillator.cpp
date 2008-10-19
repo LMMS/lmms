@@ -49,7 +49,7 @@ extern "C"
 
 plugin::descriptor PLUGIN_EXPORT tripleoscillator_plugin_descriptor =
 {
-	STRINGIFY_PLUGIN_NAME( PLUGIN_NAME ),
+	STRINGIFY( PLUGIN_NAME ),
 	"TripleOscillator",
 	QT_TRANSLATE_NOOP( "pluginBrowser",
 				"three powerful oscillators you can modulate "

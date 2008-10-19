@@ -50,7 +50,7 @@ extern "C"
 
 plugin::descriptor vestige_plugin_descriptor =
 {
-	STRINGIFY_PLUGIN_NAME( PLUGIN_NAME ),
+	STRINGIFY( PLUGIN_NAME ),
 	"VeSTige",
 	QT_TRANSLATE_NOOP( "pluginBrowser",
 			"VST-host for using VST(i)-plugins within LMMS" ),

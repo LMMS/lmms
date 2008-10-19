@@ -35,7 +35,7 @@ extern "C"
 
 plugin::descriptor PLUGIN_EXPORT stereomatrix_plugin_descriptor =
 {
-	STRINGIFY_PLUGIN_NAME( PLUGIN_NAME ),
+	STRINGIFY( PLUGIN_NAME ),
 	"Stereophonic Matrix",
 	QT_TRANSLATE_NOOP( "pluginBrowser",
 				"Plugin for freely manipulating stereo output" ),

@@ -1,5 +1,48 @@
 2008-10-19	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* plugins/sid/sid_instrument.cpp:
+	* plugins/ladspa_effect/ladspa_effect.cpp:
+	* plugins/patman/patman.cpp:
+	* plugins/lb302/lb302.cpp:
+	* plugins/organic/organic.cpp:
+	* plugins/lb303/lb303.cpp:
+	* plugins/stereo_matrix/stereo_matrix.cpp:
+	* plugins/bass_booster/bass_booster.cpp:
+	* plugins/bit_invader/bit_invader.cpp:
+	* plugins/vst_effect/vst_effect.cpp:
+	* plugins/vibed/vibed.cpp:
+	* plugins/triple_oscillator/triple_oscillator.cpp:
+	* plugins/peak_controller_effect/peak_controller_effect.cpp:
+	* plugins/audio_file_processor/audio_file_processor.cpp:
+	* plugins/stk/mallets/mallets.cpp:
+	* plugins/stereo_enhancer/stereo_enhancer.cpp:
+	* plugins/papu/papu_instrument.cpp:
+	* plugins/sf2_player/sf2_player.cpp:
+	* plugins/vestige/vestige.cpp:
+	* plugins/vst_base/vst_base.cpp:
+	* plugins/ladspa_browser/ladspa_browser.cpp:
+	* plugins/spectrum_analyzer/spectrum_analyzer.cpp:
+	* plugins/kicker/kicker.cpp:
+	* plugins/flp_import/flp_import.cpp:
+	* plugins/midi_import/midi_import.cpp:
+	* include/embed.h:
+	* include/lmms_basics.h:
+	* include/plugin.h:
+	* src/gui/embed.cpp:
+	made STRINGIFY_PLUGIN_NAME from embed.h a generic macro STRINGIFY in
+	lmms_basics.h
+
+	* include/about_dialog.h:
+	* src/gui/about_dialog.cpp:
+	* src/gui/dialogs/about_dialog.ui:
+	designed-based about dialog
+
+	* src/gui/widgets/rename_dialog.cpp:
+	initially select whole string so it can be overwritten easily
+
+	* AUTHORS:
+	moved an item to lmms-extras/AUTHORS
+
 	* plugins/vst_base/vst_plugin.h:
 	* plugins/vst_base/vst_plugin.cpp:
 	* plugins/vst_effect/vst_effect_control_dialog.cpp:
