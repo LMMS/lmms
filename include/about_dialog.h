@@ -1,7 +1,7 @@
 /*
  * about_dialog.h - declaration of class aboutDialog
  *
- * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -28,29 +28,13 @@
 
 #include <QtGui/QDialog>
 
-class QPushButton;
-class QLabel;
-class QTabWidget;
+#include "ui_about_dialog.h"
 
 
-class aboutDialog : public QDialog
+class aboutDialog : public QDialog, public Ui::AboutDialog
 {
-	Q_OBJECT
 public:
 	aboutDialog( void );
-	~aboutDialog();
-
-
-protected:
-	virtual void keyPressEvent( QKeyEvent * _ke );
-	virtual void resizeEvent( QResizeEvent * _re );
-
-
-private:
-	QPushButton * m_okBtn;
-	QLabel * m_iconLbl;
-	QLabel * m_appNameLbl;
-	QTabWidget * m_aboutTabs;
 
 } ;
 
