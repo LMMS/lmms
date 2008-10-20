@@ -38,17 +38,25 @@
 
 #ifdef LMMS_HOST_X86
 #define MACHINE "i386"
-#elif LMMS_HOST_X86_64
+#endif
+
+#ifdef LMMS_HOST_X86_64
 #define MACHINE "x86_64"
-#else
+#endif
+
+#ifndef MACHINE
 #define MACHINE "unknown processor"
 #endif
 
 #ifdef LMMS_BUILD_LINUX
 #define PLATFORM "Linux"
-#elif LMMS_BUILD_APPLE
+#endif
+
+#ifdef LMMS_BUILD_APPLE
 #define PLATFORM "OS X"
-#elif LMMS_BUILD_WIN32
+#endif
+
+#ifdef LMMS_BUILD_WIN32
 #define PLATFORM "win32"
 #endif
 
