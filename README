@@ -23,18 +23,20 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 What is LMMS?
 --------------
 
-LMMS aims to be a free alternative to popular (but commercial and closed-
-source) programs like FruityLoops, Cubase and Logic giving you the ability of
-producing music with your computer by creating/synthesizing sounds, arranging
-samples, using effects, playing live with keyboard and much more...
+LMMS is a free cross-platform alternative to commercial programs like FL Studio (R), which allow you to produce music with your computer. This includes the creation of melodies and beats, the synthesis and mixing of sounds, and arranging of samples. You can have fun with your MIDI-keyboard and much more; all in a user-friendly and modern interface.
 
-LMMS combines the features of a sequencer-program (pattern-/channel-/
-sample-/song-/effect-management) and those of powerful synthesizers and
-samplers in a modern, user-friendly and easy to use graphical user-interface.
 
-LMMS is still in heavy development, so with this version please don't expect a
-complete, ready and bugfree program!!
+Features
+---------
 
+    * Song-Editor for composing songs
+    * A Beat+Bassline-Editor for creating beats and basslines
+    * An easy-to-use Piano-Roll for editing patterns and melodies
+    * An FX mixer with 64 FX channels and arbitrary number of effects allow unlimited mixing possibilities
+    * Many powerful instrument and effect-plugins out of the box
+    * Full user-defined track-based automation and computer-controlled automation sources
+    * Compatible with many standards such as SoundFont2, VST(i), LADSPA, GUS Patches, and full MIDI support
+    * Import of MIDI and FLP (Fruityloops(R) Project) files
 
 
 Requirements
@@ -47,7 +49,7 @@ least 500 MHz, but for really enjoying LMMS less than 1 GHz makes no sense...
 
 Required libraries:
 
-- Qt >= 4.3.0 with devel-files
+- Qt >= 4.3.0 with devel-files (4.4.x recommended)
 
 Optional, but strongly recommended:
 - JACK with devel-files
@@ -58,6 +60,7 @@ Optional, but strongly recommended:
 - libsndfile with devel-files
 - WINE + WINE-devel-files
 - stk, libstk + libstk-dev
+- libfluidsynth with devel files
 
 For compiling you should have an up to date GCC with g++.
 
@@ -68,7 +71,7 @@ below)!
 
 
 Building
---------
+---------
 
 See INSTALL for information on how to build LMMS.
 
