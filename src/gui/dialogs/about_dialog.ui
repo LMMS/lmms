@@ -179,7 +179,7 @@
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_4" >
        <item>
-        <widget class="QPlainTextEdit" name="authorLabel" >
+        <widget class="QTextEdit" name="authorLabel" >
          <property name="readOnly" >
           <bool>true</bool>
          </property>
@@ -193,7 +193,7 @@
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_5" >
        <item>
-        <widget class="QPlainTextEdit" name="translationLabel" >
+        <widget class="QTextEdit" name="translationLabel" >
          <property name="readOnly" >
           <bool>true</bool>
          </property>
@@ -212,7 +212,7 @@ If you're interested in translating LMMS in another language or want to improve 
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_6" >
        <item>
-        <widget class="QPlainTextEdit" name="licenseLabel" >
+        <widget class="QTextEdit" name="licenseLabel" >
          <property name="readOnly" >
           <bool>true</bool>
          </property>
