@@ -1,5 +1,8 @@
 2008-10-20	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* CMakeLists.txt:
+	made 0.4.0-rc3 release
+
 	* README:
 	various fixes
 
