@@ -77,7 +77,8 @@ knob::knob( int _knob_num, QWidget * _parent, const QString & _name ) :
 
 	setAccessibleName( _name );
 	
-	if( m_knobNum != knobStyled ) {
+	if( m_knobNum != knobStyled )
+	{
 		m_knobPixmap = new QPixmap( embed::getIconPixmap( QString( "knob0" +
 			QString::number( m_knobNum + 1 ) ).toAscii().constData() ) );
 
@@ -86,6 +87,7 @@ knob::knob( int _knob_num, QWidget * _parent, const QString & _name ) :
 	setTotalAngle( 270.0f );
 	setInnerRadius( 1.0f );
 	setOuterRadius( 10.0f );
+	setFocusPolicy( Qt::ClickFocus );
 	doConnections();
 }
 
@@ -496,6 +498,16 @@ void knob::mouseReleaseEvent( QMouseEvent * /* _me*/ )
 	QApplication::restoreOverrideCursor();
 
 	s_textFloat->hide();
+}
+
+
+
+
+void knob::focusOutEvent( QFocusEvent * _fe )
+{
+	// make sure we don't loose mouse release event
+	mouseReleaseEvent( NULL );
+	QWidget::focusOutEvent( _fe );
 }
 
 
