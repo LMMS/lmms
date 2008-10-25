@@ -68,7 +68,7 @@ fileBrowser::fileBrowser( const QString & _directories, const QString & _filter,
 	m_dirsAsItems( _dirs_as_items )
 {
 	setWindowTitle( tr( "Browser" ) );
-	m_l = new listView( contentParent() );
+	m_l = new fileBrowserTreeWidget( contentParent() );
 	addContentWidget( m_l );
 
 	QWidget * ops = new QWidget( contentParent() );
@@ -323,7 +323,7 @@ void fileBrowser::keyPressEvent( QKeyEvent * _ke )
 
 
 
-listView::listView( QWidget * _parent ) :
+fileBrowserTreeWidget::fileBrowserTreeWidget( QWidget * _parent ) :
 	QTreeWidget( _parent ),
 	m_mousePressed( false ),
 	m_pressPos(),
@@ -348,14 +348,14 @@ listView::listView( QWidget * _parent ) :
 
 
 
-listView::~listView()
+fileBrowserTreeWidget::~fileBrowserTreeWidget()
 {
 }
 
 
 
 
-void listView::contextMenuEvent( QContextMenuEvent * _e )
+void fileBrowserTreeWidget::contextMenuEvent( QContextMenuEvent * _e )
 {
 	fileItem * f = dynamic_cast<fileItem *>( itemAt( _e->pos() ) );
 	if( f != NULL && ( f->handling() == fileItem::LoadAsPreset ||
@@ -382,7 +382,7 @@ void listView::contextMenuEvent( QContextMenuEvent * _e )
 
 
 
-void listView::mousePressEvent( QMouseEvent * _me )
+void fileBrowserTreeWidget::mousePressEvent( QMouseEvent * _me )
 {
 	QTreeWidget::mousePressEvent( _me );
 	if( _me->button() != Qt::LeftButton )
@@ -457,7 +457,7 @@ void listView::mousePressEvent( QMouseEvent * _me )
 
 
 
-void listView::mouseMoveEvent( QMouseEvent * _me )
+void fileBrowserTreeWidget::mouseMoveEvent( QMouseEvent * _me )
 {
 	if( m_mousePressed == true &&
 		( m_pressPos - _me->pos() ).manhattanLength() >
@@ -505,7 +505,7 @@ void listView::mouseMoveEvent( QMouseEvent * _me )
 
 
 
-void listView::mouseReleaseEvent( QMouseEvent * _me )
+void fileBrowserTreeWidget::mouseReleaseEvent( QMouseEvent * _me )
 {
 	m_mousePressed = false;
 
@@ -539,7 +539,7 @@ void listView::mouseReleaseEvent( QMouseEvent * _me )
 
 
 
-void listView::handleFile( fileItem * f, instrumentTrack * _it )
+void fileBrowserTreeWidget::handleFile( fileItem * f, instrumentTrack * _it )
 {
 	engine::getMixer()->lock();
 	switch( f->handling() )
@@ -583,7 +583,8 @@ void listView::handleFile( fileItem * f, instrumentTrack * _it )
 
 
 
-void listView::activateListItem( QTreeWidgetItem * _item, int _column )
+void fileBrowserTreeWidget::activateListItem( QTreeWidgetItem * _item,
+								int _column )
 {
 	fileItem * f = dynamic_cast<fileItem *>( _item );
 	if( f == NULL )
@@ -609,7 +610,7 @@ void listView::activateListItem( QTreeWidgetItem * _item, int _column )
 
 
 
-void listView::openInNewInstrumentTrack( trackContainer * _tc )
+void fileBrowserTreeWidget::openInNewInstrumentTrack( trackContainer * _tc )
 {
 	if( m_contextMenuItem->handling() == fileItem::LoadAsPreset ||
 		m_contextMenuItem->handling() == fileItem::LoadByPlugin )
@@ -625,7 +626,7 @@ void listView::openInNewInstrumentTrack( trackContainer * _tc )
 
 
 
-void listView::openInNewInstrumentTrackBBE( void )
+void fileBrowserTreeWidget::openInNewInstrumentTrackBBE( void )
 {
 	openInNewInstrumentTrack( engine::getBBTrackContainer() );
 }
@@ -633,7 +634,7 @@ void listView::openInNewInstrumentTrackBBE( void )
 
 
 
-void listView::openInNewInstrumentTrackSE( void )
+void fileBrowserTreeWidget::openInNewInstrumentTrackSE( void )
 {
 	openInNewInstrumentTrack( engine::getSong() );
 }
@@ -641,7 +642,7 @@ void listView::openInNewInstrumentTrackSE( void )
 
 
 
-void listView::sendToActiveInstrumentTrack( void )
+void fileBrowserTreeWidget::sendToActiveInstrumentTrack( void )
 {
 	// get all windows opened in the workspace
 	QList<QMdiSubWindow*> pl =
@@ -667,7 +668,7 @@ void listView::sendToActiveInstrumentTrack( void )
 
 
 
-void listView::updateDirectory( QTreeWidgetItem * _item )
+void fileBrowserTreeWidget::updateDirectory( QTreeWidgetItem * _item )
 {
 	directory * dir = dynamic_cast<directory *>( _item );
 	if( dir != NULL )
@@ -753,7 +754,8 @@ void directory::update( void )
 					configManager::inst()->dataDir() ) )
 			{
 				QTreeWidgetItem * sep = new QTreeWidgetItem;
-				sep->setText( 0, listView::tr(
+				sep->setText( 0,
+					fileBrowserTreeWidget::tr(
 						"--- Factory files ---" ) );
 				sep->setIcon( 0, embed::getIconPixmap(
 							"factory_files" ) );

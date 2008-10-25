@@ -38,7 +38,7 @@ class QLineEdit;
 
 class fileItem;
 class instrumentTrack;
-class listView;
+class fileBrowserTreeWidget;
 class playHandle;
 class trackContainer;
 
@@ -65,7 +65,7 @@ private:
 
 	void addItems( const QString & _path );
 
-	listView * m_l;
+	fileBrowserTreeWidget * m_l;
 
 	QLineEdit * m_filterEdit;
 
@@ -79,12 +79,12 @@ private:
 
 
 
-class listView : public QTreeWidget
+class fileBrowserTreeWidget : public QTreeWidget
 {
 	Q_OBJECT
 public:
-	listView( QWidget * _parent );
-	virtual ~listView();
+	fileBrowserTreeWidget( QWidget * _parent );
+	virtual ~fileBrowserTreeWidget();
 
 
 protected:
