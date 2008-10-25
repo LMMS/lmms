@@ -187,8 +187,7 @@ bool ladspaEffect::processAudioBuffer( sampleFrame * _buf,
 					}
 					break;
 				case CONTROL_RATE_INPUT:
-					if( pp->control ==
-									NULL )
+					if( pp->control == NULL )
 					{
 						break;
 					}
