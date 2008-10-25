@@ -124,7 +124,7 @@ lfoControllerDialog::lfoControllerDialog( controller * _model, QWidget * _parent
 	sin_wave_btn->setInactiveGraphic( embed::getIconPixmap(
 						"sin_wave_inactive" ) );
 	toolTip::add( sin_wave_btn,
-			tr( "Click here for a sine-wave for." ) );
+			tr( "Click here for a sine-wave." ) );
 
 	pixmapButton * triangle_wave_btn =
 					new pixmapButton( this, NULL );
@@ -180,7 +180,7 @@ lfoControllerDialog::lfoControllerDialog( controller * _model, QWidget * _parent
 	white_noise_btn->setInactiveGraphic(
 		embed::getIconPixmap( "white_noise_wave_inactive" ) );
 	toolTip::add( white_noise_btn,
-			tr( "Click here for white-noise for." ) );
+				tr( "Click here for white-noise." ) );
 
 	pixmapButton * uwb = new pixmapButton( this, NULL );
 	uwb->move( CD_LFO_SHAPES_X + 45, CD_LFO_SHAPES_Y + 15 );
