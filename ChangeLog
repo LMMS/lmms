@@ -1,3 +1,12 @@
+2008-10-25	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* plugins/vst_effect/CMakeLists.txt:
+	* plugins/vestige/CMakeLists.txt:
+	* plugins/vst_base/CMakeLists.txt:
+	* CMakeLists.txt:
+	made building the WINE-part of VST Support Layer optional to allow
+	packaging it in separate package (e.g. on 64 bit platforms)
+
 2008-10-25	dieEasy <dieeasy/at/cheapnet/dot/it>
 
 	* data/locale/it.qm:

@@ -1,4 +1,4 @@
-IF(LMMS_HAVE_VST)
+IF(LMMS_SUPPORT_VST)
 INCLUDE(BuildPlugin)
 
 INCLUDE_DIRECTORIES(../vst_base)
@@ -9,5 +9,5 @@ BUILD_PLUGIN(vsteffect vst_effect.cpp vst_effect_controls.cpp vst_effect_control
 
 SET_TARGET_PROPERTIES(vsteffect PROPERTIES COMPILE_FLAGS "-Wno-attributes")
 
-ENDIF(LMMS_HAVE_VST)
+ENDIF(LMMS_SUPPORT_VST)
 
