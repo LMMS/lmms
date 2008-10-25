@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS><TS version="1.1" language="de_DE">
-<defaultcodec></defaultcodec>
 <context>
     <name>ExportProjectDialog</name>
     <message>
+        <location filename="" line="0"/>
         <source>Output</source>
         <translation type="obsolete">Výstup</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Cancel</source>
         <translation type="obsolete">Zrušit</translation>
     </message>
@@ -83,12 +84,12 @@
     <message>
         <location filename="../../src/gui/about_dialog.cpp" line="45"/>
         <source>About LMMS...</source>
-        <translation>O LMMS...</translation>
+        <translation type="obsolete">O LMMS...</translation>
     </message>
     <message>
         <location filename="../../src/gui/about_dialog.cpp" line="52"/>
         <source>Linux MultiMedia Studio %1</source>
-        <translation>Linux MultiMedia Studio %1</translation>
+        <translation type="obsolete">Linux MultiMedia Studio %1</translation>
     </message>
     <message>
         <location filename="../../src/gui/about_dialog.cpp" line="62"/>
@@ -97,7 +98,7 @@
 Copyright (c) 2004-2008 LMMS-Developers
 
 http://lmms.sourceforge.net</source>
-        <translation>LMMS - Výkonné syntezátorové studio
+        <translation type="obsolete">LMMS - Výkonné syntezátorové studio
 
 Copyright (c) 2004-2008 LMMS Vývojáři
 
@@ -108,7 +109,7 @@ http://lmms.sourceforge.net</translation>
         <source>Current language not translated.
 
 If you&apos;re interested in translating LMMS in another language or want to improve existing translations, you&apos;re welcome to help us! Just contact the maintainer!</source>
-        <translation>Český překlad: Luděk Černý
+        <translation type="obsolete">Český překlad: Luděk Černý
 &lt;erl/at/erlmedia/dot/cz&gt;
 http://erlmedia.cz
 
@@ -117,200 +118,243 @@ Návrhy na vylepšení a opravy jsou vítány!</translation>
     <message>
         <location filename="../../src/gui/about_dialog.cpp" line="89"/>
         <source>About</source>
-        <translation>O LMMS</translation>
+        <translation type="obsolete">O LMMS</translation>
     </message>
     <message>
         <location filename="../../src/gui/about_dialog.cpp" line="90"/>
         <source>Authors</source>
-        <translation>Autoři</translation>
+        <translation type="obsolete">Autoři</translation>
     </message>
     <message>
         <location filename="../../src/gui/about_dialog.cpp" line="91"/>
         <source>Translation</source>
-        <translation>Překlad</translation>
+        <translation type="obsolete">Překlad</translation>
     </message>
     <message>
         <location filename="../../src/gui/about_dialog.cpp" line="92"/>
         <source>License</source>
-        <translation>Licence</translation>
+        <translation type="obsolete">Licence</translation>
     </message>
     <message>
         <location filename="../../src/gui/about_dialog.cpp" line="94"/>
         <source>Close</source>
-        <translation>Zavřít</translation>
+        <translation type="obsolete">Zavřít</translation>
     </message>
 </context>
 <context>
     <name>arpAndChordsTabWidget</name>
     <message>
+        <location filename="" line="0"/>
         <source>octave</source>
         <translation type="obsolete">oktáva</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Harmonic minor</source>
         <translation type="obsolete">Harmonický moll</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Melodic minor</source>
         <translation type="obsolete">Melodický moll</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Whole tone</source>
         <translation type="obsolete">Celá nota</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Diminished</source>
         <translation type="obsolete">Snížený</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Major pentatonic</source>
         <translation type="obsolete">Durová pentatonika</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Minor pentatonic</source>
         <translation type="obsolete">Mollová pentatonika</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Major bebop</source>
         <translation type="obsolete">Durový bebop</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Blues</source>
         <translation type="obsolete">Blues</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>CHORDS</source>
         <translation type="obsolete">AKORDY</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Chord type</source>
         <translation type="obsolete">Typ akordu</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Chord range</source>
         <translation type="obsolete">Rozsah akordu</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>RANGE</source>
         <translation type="obsolete">ROZSAH</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Chord range:</source>
         <translation type="obsolete">Rozsah akordu:</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>octave(s)</source>
         <translation type="obsolete">oktáva(y)</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Use this knob for setting the chord range in octaves. The selected chord will be played within specified amount of octaves.</source>
         <translation type="obsolete">Tento ovladač užívejte pro nastavení rozsahu akordů v oktávách. Vybraný akord bude zahrán ve zvoleném počtu oktáv.</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>ARPEGGIO</source>
         <translation type="obsolete">ARPEGGIO</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>An arpeggio is a type of playing (especially plucked) instruments, which makes the music much livelier. The strings of such instruments (e.g. harps) are plucked like chords, the only difference is, that this is done in a sequential order, so the notes are not played at the same time. Typical arpeggios are major or minor triads. But there&apos;re a lot of other possible chords, you can select.</source>
         <translation type="obsolete">Arpeggio je způsob hraní (zejména na drnkací nástroje), které činí hudbu živější. Struny nástroje (např. harfy) jsou rozechvěny v akordu nikoliv současně, ale v rychlém sledu (sekvenčně).Typickým arpeggiem jsou durové a mollové trojzvuky. Možností je zde však mnoho, račte si vybrat.</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Arpeggio type</source>
         <translation type="obsolete">Typ arpeggia</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Arpeggio range</source>
         <translation type="obsolete">Rozsah arpeggia</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Arpeggio range:</source>
         <translation type="obsolete">Rozsah arpeggia:</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Use this knob for setting the arpeggio range in octaves. The selected arpeggio will be played within specified amount of octaves.</source>
         <translation type="obsolete">Tento ovladač užívejte pro nastavení rozsahu arpeggia v oktávách. Vybrané arpeggio bude zahráno ve zvoleném počtu oktáv.</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Arpeggio time</source>
         <translation type="obsolete">Čas arpeggia</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>TIME</source>
         <translation type="obsolete">ČAS</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Arpeggio time:</source>
         <translation type="obsolete">Čas arpeggia:</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>ms</source>
         <translation type="obsolete">ms</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Use this knob for setting the arpeggio time in milliseconds. The arpeggio time specifies how long each arpeggio-tone should be played.</source>
         <translation type="obsolete">Tento ovladač užívejte pro nastavení času arpeggia v milisekundách. Čas arpeggia určuje jak dlouze bude každý tón arpeggia hraný.</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Arpeggio gate</source>
         <translation type="obsolete">Brána arpeggia</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>GATE</source>
         <translation type="obsolete">BRÁNA</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Arpeggio gate:</source>
         <translation type="obsolete">Brána arpeggia:</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>%</source>
         <translation type="obsolete">%</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Use this knob for setting the arpeggio gate. The arpeggio gate specifies the percent of a whole arpeggio-tone that should be played. With this you can make cool staccato-arpeggios.</source>
         <translation type="obsolete">Tento ovladač užívejte pro nastavení brány arpeggia. Brána arpeggia určuje procento celého arpeggio-tónu, který bude zahrán. Pomocí brány arpeggia můžete udělat bezva arpeggio staccato.</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Direction:</source>
         <translation type="obsolete">Směr:</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>arpeggio direction = up</source>
         <translation type="obsolete">arpeggio směr = nahoru</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>arpeggio direction = down</source>
         <translation type="obsolete">arpeggio směr = dolu</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>arpeggio direction = up and down</source>
         <translation type="obsolete">arpeggio směr = nahoru a dolu</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>arpeggio direction = random</source>
         <translation type="obsolete">arpeggio směr = náhodně</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Arpeggio direction</source>
         <translation type="obsolete">Arpeggio směr</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Mode:</source>
         <translation type="obsolete">Režim:</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Arpeggio mode</source>
         <translation type="obsolete">Režim arpeggia</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Free</source>
         <translation type="obsolete">Volný</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Sort</source>
         <translation type="obsolete">Tříděný</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Sync</source>
         <translation type="obsolete">Synchronizovaný</translation>
     </message>
@@ -396,6 +440,7 @@ Návrhy na vylepšení a opravy jsou vítány!</translation>
         <translation>ARPEGGIO</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>An arpeggio is a type of playing (especially plucked) instruments, which makes the music much livelier. The strings of such instruments (e.g. harps) are plucked like chords, the only difference is, that this is done in a sequential order, so the notes are not played at the same time. Typical arpeggios are major or minor triads. But there&apos;re a lot of other possible chords, you can select.</source>
         <translation type="obsolete">Arpeggio je způsob hraní (zejména na drnkací nástroje), které činí hudbu živější. Struny nástroje (např. harfy) jsou rozechvěny v akordu nikoliv současně, ale v rychlém sledu (sekvenčně).Typickým arpeggiem jsou durové a mollové trojzvuky. Možností je zde však mnoho, račte si vybrat.</translation>
     </message>
@@ -415,6 +460,7 @@ Návrhy na vylepšení a opravy jsou vítány!</translation>
         <translation>oktáva(y)</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Use this knob for setting the arpeggio range in octaves. The selected arpeggio will be played within specified amount of octaves.</source>
         <translation type="obsolete">Tento ovladač užívejte pro nastavení rozsahu arpeggia v oktávách. Vybrané arpeggio bude zahráno ve zvoleném počtu oktáv.</translation>
     </message>
@@ -454,6 +500,7 @@ Návrhy na vylepšení a opravy jsou vítány!</translation>
         <translation>%</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Use this knob for setting the arpeggio gate. The arpeggio gate specifies the percent of a whole arpeggio-tone that should be played. With this you can make cool staccato-arpeggios.</source>
         <translation type="obsolete">Tento ovladač užívejte pro nastavení brány arpeggia. Brána arpeggia určuje procento celého arpeggio-tónu, který bude zahrán. Pomocí brány arpeggia můžete udělat bezva arpeggio staccato.</translation>
     </message>
@@ -499,14 +546,17 @@ Návrhy na vylepšení a opravy jsou vítány!</translation>
 <context>
     <name>audioDevice</name>
     <message>
+        <location filename="" line="0"/>
         <source>DEVICE</source>
         <translation type="obsolete">ZAŘÍZENÍ</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>CHANNELS</source>
         <translation type="obsolete">KANÁLY</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>CLIENT-NAME</source>
         <translation type="obsolete">JMÉNO-KLIENTA</translation>
     </message>
@@ -514,10 +564,12 @@ Návrhy na vylepšení a opravy jsou vítány!</translation>
 <context>
     <name>audioFileProcessor</name>
     <message>
+        <location filename="" line="0"/>
         <source>Open other sample</source>
         <translation type="obsolete">Otevřít jiný sampl</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Click here, if you want to open another audio-file. After clicking on this button, a file-open-dialog appears and you can select your file. Settings like Looping-Mode, start- and end-point, amplify-value and so on are not reset, so please don&apos;t wonder if your sample doesn&apos;t sound like the original one...</source>
         <translation type="obsolete">Klikněte zde, pokud chcete otevřít jiný audio soubor. Po kliknutí na toto tlačítko se objeví dialog který umožní Váš soubor vyhledat. Nastavení jako režim opakování, počáteční a koncový bod, zesílení a další nejsou vymazána proto nebuďte překvapeni, pokud Váš sampl zní jinak než originál...</translation>
     </message>
@@ -527,6 +579,7 @@ Návrhy na vylepšení a opravy jsou vítány!</translation>
         <translation>Přehrávat pozpátku</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>If you enable this button, the whole sample is reversed. This is useful for cool effects, e.g. a reversed crash.</source>
         <translation type="obsolete">Zapnete-li toto tlačítko, celý sampl bude přehráván pozpátku. Tato volba je užitečná pro zajímavé efekty např. pozpátku přehraná srážka.</translation>
     </message>
@@ -536,10 +589,12 @@ Návrhy na vylepšení a opravy jsou vítány!</translation>
         <translation>Smyčka</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Loop sample at start- and end-point</source>
         <translation type="obsolete">Smyčka od počátečního ke koncovému bodu</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Here you can set, whether Looping-Mode is enabled. If enabled, AudioFileProcessor loops between start- and end-point of a sample until the whole note is played. This is useful for things like string- and choir-samples.</source>
         <translation type="obsolete">Zde můžete aktivovat přehrávání samplu ve smyčce. Jestliže je tato volba aktivní, AudioFileProcessor přehrává sampl ve smyčce od počátečního ke koncovému bodu dokud není zahrán celý tón. Hodí se to zejména u samplů strunných nástrojů a sborového zpěvu.</translation>
     </message>
@@ -549,10 +604,12 @@ Návrhy na vylepšení a opravy jsou vítány!</translation>
         <translation>Zesílení</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Amplify:</source>
         <translation type="obsolete">Zesílení:</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>With this knob you can set the amplify-ratio. When you set a value of 100% your sample isn&apos;t changed. Otherwise it will be amplified up or down (your actual sample-file isn&apos;t touched!)</source>
         <translation type="obsolete">Tento ovladač můžete použít pro nastavení poměru zesílení. Výchozí hodnotou je 100%, pokud nastavíte jiné procento Váš sampl bude zesílen nebo zeslaben. (Zdrojový soubor není tímto nastavením dotčen!)</translation>
     </message>
@@ -562,10 +619,12 @@ Návrhy na vylepšení a opravy jsou vítány!</translation>
         <translation>Začátek samplu</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Startpoint:</source>
         <translation type="obsolete">Počáteční bod:</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>With this knob you can set the point where AudioFileProcessor should begin playing your sample. If you enable Looping-Mode, this is the point to which AudioFileProcessor returns if a note is longer than the sample between start- and end-point.</source>
         <translation type="obsolete">Tento ovladač můžete použít pro nastavení pozice kde by měl AudioFileProcessor začít přehrávat Váš sampl. Pokud zapnete režim smyčky, toto je pozice od které AudioFileProcessor vrací jestliže nota je delší než sampl mezi počátečním a koncovým bodem.</translation>
     </message>
@@ -575,10 +634,12 @@ Návrhy na vylepšení a opravy jsou vítány!</translation>
         <translation>Konec samplu</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Endpoint:</source>
         <translation type="obsolete">Koncový bod:</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>With this knob you can set the point where AudioFileProcessor should stop playing your sample. If you enable Looping-Mode, this is the point where AudioFileProcessor returns if a note is longer than the sample between start- and end-point.</source>
         <translation type="obsolete">Tento ovladač můžete použít pro nastavení pozice kde by měl AudioFileProcessor skončit přehrávat Váš sampl. Pokud zapnete režim smyčky, toto je pozice do které AudioFileProcessor vrací jestliže nota je delší než sampl mezi počátečním a koncovým bodem.</translation>
     </message>
@@ -591,6 +652,7 @@ Návrhy na vylepšení a opravy jsou vítány!</translation>
         <translation>Otevřít jiný sampl</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Click here, if you want to open another audio-file. After clicking on this button, a file-open-dialog appears and you can select your file. Settings like Looping-Mode, start- and end-point, amplify-value and so on are not reset, so please don&apos;t wonder if your sample doesn&apos;t sound like the original one...</source>
         <translation type="obsolete">Klikněte zde, pokud chcete otevřít jiný audio soubor. Po kliknutí na toto tlačítko se objeví dialog který umožní Váš soubor vyhledat. Nastavení jako režim opakování, počáteční a koncový bod, zesílení a další nejsou vymazána proto nebuďte překvapeni, pokud Váš sampl zní jinak než originál...</translation>
     </message>
@@ -610,6 +672,7 @@ Návrhy na vylepšení a opravy jsou vítány!</translation>
         <translation>Smyčka od počátečního ke koncovému bodu</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Here you can set, whether Looping-Mode is enabled. If enabled, AudioFileProcessor loops between start- and end-point of a sample until the whole note is played. This is useful for things like string- and choir-samples.</source>
         <translation type="obsolete">Zde můžete aktivovat přehrávání samplu ve smyčce. Jestliže je tato volba aktivní, AudioFileProcessor přehrává sampl ve smyčce od počátečního ke koncovému bodu dokud není zahrán celý tón. Hodí se to zejména u samplů strunných nástrojů a sborového zpěvu.</translation>
     </message>
@@ -619,6 +682,7 @@ Návrhy na vylepšení a opravy jsou vítány!</translation>
         <translation>Zesílení:</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>With this knob you can set the amplify-ratio. When you set a value of 100% your sample isn&apos;t changed. Otherwise it will be amplified up or down (your actual sample-file isn&apos;t touched!)</source>
         <translation type="obsolete">Tento ovladač můžete použít pro nastavení poměru zesílení. Výchozí hodnotou je 100%, pokud nastavíte jiné procento Váš sampl bude zesílen nebo zeslaben. (Zdrojový soubor není tímto nastavením dotčen!)</translation>
     </message>
@@ -628,6 +692,7 @@ Návrhy na vylepšení a opravy jsou vítány!</translation>
         <translation>Počáteční bod:</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>With this knob you can set the point where AudioFileProcessor should begin playing your sample. If you enable Looping-Mode, this is the point to which AudioFileProcessor returns if a note is longer than the sample between start- and end-point.</source>
         <translation type="obsolete">Tento ovladač můžete použít pro nastavení pozice kde by měl AudioFileProcessor začít přehrávat Váš sampl. Pokud zapnete režim smyčky, toto je pozice od které AudioFileProcessor vrací jestliže nota je delší než sampl mezi počátečním a koncovým bodem.</translation>
     </message>
@@ -637,6 +702,7 @@ Návrhy na vylepšení a opravy jsou vítány!</translation>
         <translation>Koncový bod:</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>With this knob you can set the point where AudioFileProcessor should stop playing your sample. If you enable Looping-Mode, this is the point where AudioFileProcessor returns if a note is longer than the sample between start- and end-point.</source>
         <translation type="obsolete">Tento ovladač můžete použít pro nastavení pozice kde by měl AudioFileProcessor skončit přehrávat Váš sampl. Pokud zapnete režim smyčky, toto je pozice do které AudioFileProcessor vrací jestliže nota je delší než sampl mezi počátečním a koncovým bodem.</translation>
     </message>
@@ -734,6 +800,7 @@ Návrhy na vylepšení a opravy jsou vítány!</translation>
 <context>
     <name>automatableButton</name>
     <message>
+        <location filename="" line="0"/>
         <source>&amp;Open in automation editor</source>
         <translation type="obsolete">&amp;Otevřít v automatizačním editoru</translation>
     </message>
@@ -789,6 +856,7 @@ Návrhy na vylepšení a opravy jsou vítány!</translation>
 <context>
     <name>automatableSlider</name>
     <message>
+        <location filename="" line="0"/>
         <source>&amp;Open in automation editor</source>
         <translation type="obsolete">&amp;Otevřít v automatizačním editoru</translation>
     </message>
@@ -806,10 +874,12 @@ Návrhy na vylepšení a opravy jsou vítány!</translation>
         <translation>Zastavit přehrávání aktuálního patternu (mezerník)</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Click here, if you want to play the current pattern. This is useful while editing it. The pattern is automatically looped when its end is reached.</source>
         <translation type="obsolete">Klikněte zde, pokud chcete přehrát aktuální pattern. To je šikovné při editaci neboť pattern je automaticky přehrávám ve smyčce.</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Click here, if you want to stop playing of current pattern.</source>
         <translation type="obsolete">Klikněte zde, pokud chcete zastavit přehrávání aktuálního patternu.</translation>
     </message>
@@ -834,14 +904,17 @@ Návrhy na vylepšení a opravy jsou vítány!</translation>
         <translation>Režim přesunu výběrů (Shift+M)</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>If you click here, draw-mode will be activated. In this mode you can add and move single values. This is the default-mode which is used most of the time. You can also press &apos;Shift+D&apos; on your keyboard to activate this mode.</source>
         <translation type="obsolete">Klikněte zde pokud chcete aktivovat režim kreslení. V tomto výchozím a nejčastěji užívaném režimu lze přidávat a přesunovat jednotlivé hodnoty. Pro aktivaci můžete využít též klávesové zkratky &apos;Shift+D&apos;.</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>If you click here, erase-mode will be activated. In this mode you can erase single values. You can also press &apos;Shift+E&apos; on your keyboard to activate this mode.</source>
         <translation type="obsolete">Klikněte zde pokud chcete aktivovat režim mazání. V tomto režimu lze mazat jednotlivé hodnoty. Pro aktivaci můžete využít též klávesové zkratky &apos;Shift+E&apos;.</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>If you click here, select-mode will be activated. In this mode you can select values. This is neccessary if you want to cut, copy, paste, delete or move values. You can also press &apos;Shift+S&apos; on your keyboard to activate this mode.</source>
         <translation type="obsolete">Klikněte zde pokud chcete aktivovat režim výběru. Tento režimu umožňuje hodnoty vybírat a je nezbytný jestliže hodnoty chcete vyjmout, kopírovat, vložit, smazat nebo přesunout. Pro aktivaci můžete využít též klávesové zkratky &apos;Shift+S&apos;.</translation>
     </message>
@@ -866,14 +939,17 @@ Návrhy na vylepšení a opravy jsou vítány!</translation>
         <translation>Vložit hodnoty ze schránky (Ctrl+V)</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>If you click here, selected values will be cut into the clipboard. You can paste them anywhere in any pattern by clicking on the paste-button.</source>
         <translation type="obsolete">Klikněte zde pokud chcete označené hodnoty vyjmout do schránky. Vložit je pak můžete kdekoliv v libovolného patternu pomocí tlačítka Vložit.</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>If you click here, selected values will be copied into the clipboard. You can paste them anywhere in any pattern by clicking on the paste-button.</source>
         <translation type="obsolete">Klikněte zde pokud chcete označené hodnoty zkopírovat do schránky. Vložit je pak můžete kdekoliv v libovolného patternu pomocí tlačítka Vložit.</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>If you click here, the values from the clipboard will be pasted at the first visible tact.</source>
         <translation type="obsolete">Kliknete-li zde, budou hodnoty ze schránky vloženy do prvního viditelného taktu.</translation>
     </message>
@@ -903,6 +979,7 @@ Návrhy na vylepšení a opravy jsou vítány!</translation>
         <translation>Všechny označené hodnoty byly zkopírovány do schránky.</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Note detuning</source>
         <translation type="obsolete">Rozladění tónu</translation>
     </message>
@@ -1004,6 +1081,7 @@ Návrhy na vylepšení a opravy jsou vítány!</translation>
 <context>
     <name>bassBoosterControlDialog</name>
     <message>
+        <location filename="" line="0"/>
         <source>Frequency</source>
         <translation type="obsolete">Frekvence</translation>
     </message>
@@ -1013,6 +1091,7 @@ Návrhy na vylepšení a opravy jsou vítány!</translation>
         <translation>Frekvence:</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Gain</source>
         <translation type="obsolete">Zisk</translation>
     </message>
@@ -1022,6 +1101,7 @@ Návrhy na vylepšení a opravy jsou vítány!</translation>
         <translation>Zisk:</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Ratio</source>
         <translation type="obsolete">Poměr</translation>
     </message>
@@ -1067,6 +1147,7 @@ Návrhy na vylepšení a opravy jsou vítány!</translation>
 <context>
     <name>bbEditor</name>
     <message>
+        <location filename="" line="0"/>
         <source>Beat+Baseline Editor</source>
         <translation type="obsolete">Beat+Baseline Editor</translation>
     </message>
@@ -1076,6 +1157,7 @@ Návrhy na vylepšení a opravy jsou vítány!</translation>
         <translation>Přehrát nebo pozastavit přehrávání (mezerník)</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Stop playing of current beat/bassline (Space)</source>
         <translation type="obsolete">Zastavit přehrávání (mezerník)</translation>
     </message>
@@ -1085,10 +1167,12 @@ Návrhy na vylepšení a opravy jsou vítány!</translation>
         <translation>Přidat beat/basovou linku</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Click here, if you want to play the current beat/bassline. The beat/bassline is automatically looped when its end is reached.</source>
         <translation type="obsolete">Klikněte zde pokud chcete přehrát aktuální beat/basovou linku. Beat/basová linka je automaticky přehrávána ve smyčce.</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Click here, if you want to stop playing of current beat/bassline.</source>
         <translation type="obsolete">Klikněte zde, pokud chcete zastavit přehrávání aktuální beat/basové linky.</translation>
     </message>
@@ -1121,18 +1205,22 @@ Návrhy na vylepšení a opravy jsou vítány!</translation>
 <context>
     <name>bbTCO</name>
     <message>
+        <location filename="" line="0"/>
         <source>Open in Beat+Baseline-Editor</source>
         <translation type="obsolete">Otevřít v Beat+Baseline Editoru</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Reset name</source>
         <translation type="obsolete">Resetovat jméno</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Change name</source>
         <translation type="obsolete">Změnit jméno</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Change color</source>
         <translation type="obsolete">Změnit barvu</translation>
     </message>
@@ -1163,6 +1251,7 @@ Návrhy na vylepšení a opravy jsou vítány!</translation>
 <context>
     <name>bbTrack</name>
     <message>
+        <location filename="" line="0"/>
         <source>Beat/Baseline %1</source>
         <translation type="obsolete">Beat/Baseline %1</translation>
     </message>
@@ -1180,74 +1269,92 @@ Návrhy na vylepšení a opravy jsou vítány!</translation>
         <translation>Délka samplu</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Sample Length</source>
         <translation type="obsolete">Délka samplu</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Interpolation</source>
         <translation type="obsolete">Interpolovat</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Normalize</source>
         <translation type="obsolete">Normalizovat</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Draw your own waveform hereby dragging your mouse onto this graph</source>
         <translation type="obsolete">Vlastní vlnovku nakreslíte pomocí tažení myši na tomto grafu</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Sine wave</source>
         <translation type="obsolete">Sinusová vlna</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Click here if you want a sine-wave for current oscillator.</source>
         <translation type="obsolete">Klikněte zde, pokud chcete v aktuální oscilaci sinusovou vlnu.</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Triangle wave</source>
         <translation type="obsolete">Trianglová vlna</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Click here if you want a triangle-wave for current oscillator.</source>
         <translation type="obsolete">Klikněte zde, pokud chcete v aktuální oscilaci trianglovou vlnu.</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Saw wave</source>
         <translation type="obsolete">Pilovitá vlna</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Click here if you want a saw-wave for current oscillator.</source>
         <translation type="obsolete">Klikněte zde, pokud chcete v aktuální oscilaci pilovitou vlnu.</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Square wave</source>
         <translation type="obsolete">Pravoúhlá (square) vlna</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Click here if you want a square-wave for current oscillator.</source>
         <translation type="obsolete">Klikněte zde, pokud chcete v aktuální oscilaci pravoúhlou vlnu.</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>White noise wave</source>
         <translation type="obsolete">Bílý šum</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Click here if you want a white-noise for current oscillator.</source>
         <translation type="obsolete">Klikněte zde, pokud chcete v aktuální oscilaci bílý šum.</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>User defined wave</source>
         <translation type="obsolete">Vlna definovaná uživatelem</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Click here if you want a user-defined wave-shape for current oscillator.</source>
         <translation type="obsolete">Klikněte zde, pokud chcete užít v aktuální oscilaci vlnu definovanou uživatelem.</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Smooth</source>
         <translation type="obsolete">Uhladit</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Click here to smooth waveform.</source>
         <translation type="obsolete">Pro uhlazení vlny klikněte zde.</translation>
     </message>
@@ -1260,6 +1367,7 @@ Návrhy na vylepšení a opravy jsou vítány!</translation>
         <translation>Délka samplu</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Draw your own waveform hereby dragging your mouse onto this graph</source>
         <translation type="obsolete">Vlastní vlnovku nakreslíte pomocí tažení myši na tomto grafu</translation>
     </message>
@@ -1269,6 +1377,7 @@ Návrhy na vylepšení a opravy jsou vítány!</translation>
         <translation>Sinusová vlna</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Click here if you want a sine-wave for current oscillator.</source>
         <translation type="obsolete">Klikněte zde, pokud chcete v aktuální oscilaci sinusovou vlnu.</translation>
     </message>
@@ -1278,6 +1387,7 @@ Návrhy na vylepšení a opravy jsou vítány!</translation>
         <translation>Trianglová vlna</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Click here if you want a triangle-wave for current oscillator.</source>
         <translation type="obsolete">Klikněte zde, pokud chcete v aktuální oscilaci trianglovou vlnu.</translation>
     </message>
@@ -1287,6 +1397,7 @@ Návrhy na vylepšení a opravy jsou vítány!</translation>
         <translation>Pilovitá vlna</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Click here if you want a saw-wave for current oscillator.</source>
         <translation type="obsolete">Klikněte zde, pokud chcete v aktuální oscilaci pilovitou vlnu.</translation>
     </message>
@@ -1296,6 +1407,7 @@ Návrhy na vylepšení a opravy jsou vítány!</translation>
         <translation>Pravoúhlá (square) vlna</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Click here if you want a square-wave for current oscillator.</source>
         <translation type="obsolete">Klikněte zde, pokud chcete v aktuální oscilaci pravoúhlou vlnu.</translation>
     </message>
@@ -1305,6 +1417,7 @@ Návrhy na vylepšení a opravy jsou vítány!</translation>
         <translation>Bílý šum</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Click here if you want a white-noise for current oscillator.</source>
         <translation type="obsolete">Klikněte zde, pokud chcete v aktuální oscilaci bílý šum.</translation>
     </message>
@@ -1314,6 +1427,7 @@ Návrhy na vylepšení a opravy jsou vítány!</translation>
         <translation>Vlna definovaná uživatelem</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Click here if you want a user-defined wave-shape for current oscillator.</source>
         <translation type="obsolete">Klikněte zde, pokud chcete užít v aktuální oscilaci vlnu definovanou uživatelem.</translation>
     </message>
@@ -1854,6 +1968,7 @@ Návrhy na vylepšení a opravy jsou vítány!</translation>
         <translation>oktáva(y)</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Use this knob for setting the chord range in octaves. The selected chord will be played within specified amount of octaves.</source>
         <translation type="obsolete">Tento ovladač užívejte pro nastavení rozsahu akordů v oktávách. Vybraný akord bude zahrán ve zvoleném počtu oktáv.</translation>
     </message>
@@ -1866,6 +1981,7 @@ Návrhy na vylepšení a opravy jsou vítány!</translation>
 <context>
     <name>comboBox</name>
     <message>
+        <location filename="" line="0"/>
         <source>&amp;Open in automation editor</source>
         <translation type="obsolete">&amp;Otevřít v automatizačním editoru</translation>
     </message>
@@ -1873,26 +1989,32 @@ Návrhy na vylepšení a opravy jsou vítány!</translation>
 <context>
     <name>configManager</name>
     <message>
+        <location filename="" line="0"/>
         <source>&amp;Cancel</source>
         <translation type="obsolete">&amp;Zrušit</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>&lt; &amp;Back</source>
         <translation type="obsolete">&lt; &amp;Zpět</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>&amp;Next &gt;</source>
         <translation type="obsolete">&amp;Vpřed &gt;</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>&amp;Finish</source>
         <translation type="obsolete">&amp;Dokončit</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Setup LMMS</source>
         <translation type="obsolete">Nastavit LMMS</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>LMMS needs to be setup in order to run properly. This wizard will help you to setup your personal LMMS-installation.
 
 If you&apos;re unsure what to do at a step, just click on &apos;Next&apos;. LMMS will automatically select the best options for you.
@@ -1907,6 +2029,7 @@ Jestliže si nebudete jisti co v některém z následujících kroků udělat, m
 Pokračujte kliknutím na &apos;Vpřed&apos;.</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>When working with LMMS there needs to be a working-directory.
 This directory is used for storing your projects, presets, samples etc.
 
@@ -1919,40 +2042,49 @@ Adresář bude užívám pro ukládání projektu, předvoleb, samplů atd.
 Vyberte prosím adresář:</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Welcome to LMMS</source>
         <translation type="obsolete">Vítejte v LMMS</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Select working directory</source>
         <translation type="obsolete">Vyberte pracovní adresář</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Choose LMMS working directory</source>
         <translation type="obsolete">Vyberte pro LMMS pracovní adresář</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Directory not existing</source>
         <translation type="obsolete">Adresář neexistuje</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>The directory you specified does not exist. Create it?</source>
         <translation type="obsolete">Vámi vybraný adresář neexistuje. Chcete jej vytvořit?</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Error in configuration-file</source>
         <translation type="obsolete">Chyba v konfiguračním souboru</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Error while parsing configuration-file %1.
 The setup-wizard will be shown for reconfiguring LMMS.</source>
         <translation type="obsolete">Chyba při parsování konfiguračního souboru %.
 Pro rekonfiguraci LMMS bude spuštěn průvodce nastavením.</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Version mismatches</source>
         <translation type="obsolete">Neodpovídající verze</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Accordingly to the information in your LMMS-configuration-file you seem to have run a different (probably older) version of LMMS before.
 It is recommended to run the setup-wizard again to ensure that the latest samples, presets, demo-projects etc. are installed in your LMMS-working-directory.
 Run the setup-wizard now?</source>
@@ -1963,10 +2095,12 @@ Spustit průvodce nyní?
 </translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Could not save config-file</source>
         <translation type="obsolete">Nemohu uložit konfigurační soubor</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Could not save configuration file %1. You probably are not permitted to write to this file.
 Please make sure you have write-access to the file and try again.</source>
         <translation type="obsolete">Nemohu uložit konfigurační soubor %1. Pravděpodobně nejste oprávnění do tohoto souboru zapisovat.
@@ -2103,6 +2237,7 @@ Přesvědčte se prosím, že máte právo zápisu do tohoto souboru a zkuste to
 <context>
     <name>detuningHelper</name>
     <message>
+        <location filename="" line="0"/>
         <source>Note detuning</source>
         <translation type="obsolete">Rozladění tónu</translation>
     </message>
@@ -2141,6 +2276,7 @@ Přesvědčte se prosím, že máte právo zápisu do tohoto souboru a zkuste to
 <context>
     <name>effectList</name>
     <message>
+        <location filename="" line="0"/>
         <source>Description</source>
         <translation type="obsolete">Popis</translation>
     </message>
@@ -2161,6 +2297,7 @@ Přesvědčte se prosím, že máte právo zápisu do tohoto souboru a zkuste to
         <translation>ŘETĚZ EFEKTŮ</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Add</source>
         <translation type="obsolete">Přidat</translation>
     </message>
@@ -2191,10 +2328,12 @@ Přesvědčte se prosím, že máte právo zápisu do tohoto souboru a zkuste to
 <context>
     <name>effectTabWidget</name>
     <message>
+        <location filename="" line="0"/>
         <source>EFFECTS CHAIN</source>
         <translation type="obsolete">ŘETĚZ EFEKTŮ</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Add</source>
         <translation type="obsolete">Přidat</translation>
     </message>
@@ -2222,6 +2361,7 @@ Přesvědčte se prosím, že máte právo zápisu do tohoto souboru a zkuste to
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>The Wet/Dry knob sets the ratio between the input signal and the effect that shows up in the output.</source>
         <translation type="obsolete">Tlačítko Wet/Dry nastavuje poměr mezi vstupním signálem a efektem slyšitelným ve výstupu.</translation>
     </message>
@@ -2236,6 +2376,7 @@ Přesvědčte se prosím, že máte právo zápisu do tohoto souboru a zkuste to
         <translation>Čas:</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>The Decay knob controls how many buffers of silence must pass before the plugin stops processing.  Smaller values will reduce the CPU overhead but run the risk of clipping the tail on delay effects.</source>
         <translation type="obsolete">Tlačítko Decay určuje kolik bufferů ticha musí proběhnout než plugin zastaví zpracování. Nízké hodnoty redukují přehřátí CPU, ale přinášejí riziko ustřižení konce delay efektů.</translation>
     </message>
@@ -2260,6 +2401,7 @@ Přesvědčte se prosím, že máte právo zápisu do tohoto souboru a zkuste to
         <translation>Ovladače</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Effect plugins function as a chained series of effects where the signal will be processed from top to bottom.
 
 The On/Off switch allows you to bypass a given plugin at any point in time.
@@ -2338,26 +2480,32 @@ Right clicking will bring up a context menu where you can change the order in wh
 <context>
     <name>envelopeAndLFOParameters</name>
     <message>
+        <location filename="" line="0"/>
         <source>Predelay-time</source>
         <translation type="obsolete">Predelay čas</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Attack-time</source>
         <translation type="obsolete">Attack čas</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Sustain-level</source>
         <translation type="obsolete">Sustain úroveň</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Release-time</source>
         <translation type="obsolete">Čas uvolnění (release)</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Modulation amount</source>
         <translation type="obsolete">Stupeň (amount) modulace</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>LFO-predelay-time</source>
         <translation type="obsolete">LFO predelay čas</translation>
     </message>
@@ -2540,6 +2688,7 @@ Right clicking will bring up a context menu where you can change the order in wh
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>LFO-predelay:</source>
         <translation type="obsolete">LFO predelay:</translation>
     </message>
@@ -2569,22 +2718,27 @@ Right clicking will bring up a context menu where you can change the order in wh
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Click here if you want a sine-wave for current oscillator.</source>
         <translation type="obsolete">Klikněte zde, pokud chcete v aktuální oscilaci sinusovou vlnu.</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Click here if you want a triangle-wave for current oscillator.</source>
         <translation type="obsolete">Klikněte zde, pokud chcete v aktuální oscilaci trianglovou vlnu.</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Click here if you want a saw-wave for current oscillator.</source>
         <translation type="obsolete">Klikněte zde, pokud chcete v aktuální oscilaci pilovitou vlnu.</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Click here if you want a square-wave for current oscillator.</source>
         <translation type="obsolete">Klikněte zde, pokud chcete v aktuální oscilaci pravoúhlou vlnu.</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Click here if you want a user-defined wave for current oscillator. Afterwards drag an according sample-file into LFO-graph.</source>
         <translation type="obsolete">Klikněte zde, pokud chcete v aktuální oscilaci vlnu definovanou uživatelem. Poté přetáhněte odpovídající soubor se samplem do LFO-grafu.</translation>
     </message>
@@ -2594,10 +2748,12 @@ Right clicking will bring up a context menu where you can change the order in wh
         <translation>FREK x 100</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Click here if the frequency of this LFO should be multiplied with 100.</source>
         <translation type="obsolete">Klikněte zde pokud se frekvence tohoto LFO má násobit stem.</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>multiply LFO-frequency with 100</source>
         <translation type="obsolete">znásob 100x LFO frekvenci</translation>
     </message>
@@ -2685,78 +2841,97 @@ Right clicking will bring up a context menu where you can change the order in wh
 <context>
     <name>envelopeAndLFOWidget</name>
     <message>
+        <location filename="" line="0"/>
         <source>Predelay-time</source>
         <translation type="obsolete">Predelay čas</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Attack-time</source>
         <translation type="obsolete">Attack čas</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Sustain-level</source>
         <translation type="obsolete">Sustain úroveň</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>SUST</source>
         <translation type="obsolete">SUST</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Sustain:</source>
         <translation type="obsolete">Sustain:</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Release-time</source>
         <translation type="obsolete">Čas uvolnění (release)</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Modulation amount</source>
         <translation type="obsolete">Stupeň (amount) modulace</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Modulation amount:</source>
         <translation type="obsolete">Stupeň (amount) modulace:</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>LFO-predelay-time</source>
         <translation type="obsolete">LFO predelay čas</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>LFO-predelay:</source>
         <translation type="obsolete">LFO predelay:</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Click here if you want a sine-wave for current oscillator.</source>
         <translation type="obsolete">Klikněte zde, pokud chcete v aktuální oscilaci sinusovou vlnu.</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Click here if you want a triangle-wave for current oscillator.</source>
         <translation type="obsolete">Klikněte zde, pokud chcete v aktuální oscilaci trianglovou vlnu.</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Click here if you want a saw-wave for current oscillator.</source>
         <translation type="obsolete">Klikněte zde, pokud chcete v aktuální oscilaci pilovitou vlnu.</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Click here if you want a square-wave for current oscillator.</source>
         <translation type="obsolete">Klikněte zde, pokud chcete v aktuální oscilaci pravoúhlou vlnu.</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Click here if you want a user-defined wave for current oscillator. Afterwards drag an according sample-file into LFO-graph.</source>
         <translation type="obsolete">Klikněte zde, pokud chcete v aktuální oscilaci vlnu definovanou uživatelem. Poté přetáhněte odpovídající soubor se samplem do LFO-grafu.</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Click here if the frequency of this LFO should be multiplied with 100.</source>
         <translation type="obsolete">Klikněte zde pokud se frekvence tohoto LFO má násobit stem.</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>multiply LFO-frequency with 100</source>
         <translation type="obsolete">znásob 100x LFO frekvenci</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Hint</source>
         <translation type="obsolete">Rada</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Drag a sample from somewhere and drop it in this window.</source>
         <translation type="obsolete">Sampl odněkud přetáhněte a pusťte jej v tomto okně.</translation>
     </message>
@@ -2764,18 +2939,22 @@ Right clicking will bring up a context menu where you can change the order in wh
 <context>
     <name>envelopeTabWidget</name>
     <message>
+        <location filename="" line="0"/>
         <source>VOLUME</source>
         <translation type="obsolete">HLASITOST</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>FILTER</source>
         <translation type="obsolete">FILTR</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Filter type</source>
         <translation type="obsolete">Typ filtru</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Here you can select the built-in filter you want to use for this instrument-track. Filters are very important for changing the characteristics of a sound.</source>
         <translation type="obsolete">Zde si můžete vybrat z vestavěných filtrů, které chcete použít pro tuto stopu nástroje. Filtry jsou velmi důležité pro změnu charakteristiky zvuku.</translation>
     </message>
@@ -2795,56 +2974,69 @@ Please make sure you have write-permission to the file and the directory contain
 Přesvědčte se prosím, že máte právo zápisu do tohoto souboru a příslušného adresáře a zkuste to znovu!</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Uncompressed Wave-File (*.wav)</source>
         <translation type="obsolete">Nekomprimovaný soubor Wav (*.wav)</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Compressed OGG-File (*.ogg)</source>
         <translation type="obsolete">Komprimovaný soubor OGG (*.ogg)</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Export project to %1</source>
         <translation type="obsolete">Exportovat projekt do %1</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Type:</source>
         <translation type="obsolete">Typ:</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>kbps:</source>
         <translation type="obsolete">kbps:</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>variable bitrate</source>
         <translation type="obsolete">proměnný datový tok</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>use high-quality-mode (recommened)</source>
         <translation type="obsolete">použít režim vysoké kvality (doporučeno)</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Export</source>
         <translation type="obsolete">Export</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Cancel</source>
         <translation type="obsolete">Zrušit</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Export failed</source>
         <translation type="obsolete">Export se nezdařil</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>The project-export failed, because the output-file/-device could not be opened.
 Make sure, you have write access to the selected file/device!</source>
         <translation type="obsolete">Export projektu se nezdařil neboť výstupní soubor/zařízení nelze otevřít.
 Přesvědčte se, že ke zvolenému souboru/zařízení máte právo zápisu!</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Exporting project to %1</source>
         <translation type="obsolete">Exportuji projekt do %1</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Rendering:</source>
         <translation type="obsolete">Renderování:</translation>
     </message>
@@ -2867,14 +3059,52 @@ Přesvědčte se, že ke zvolenému souboru/zařízení máte právo zápisu!</t
 <context>
     <name>fileBrowser</name>
     <message>
-        <location filename="../../src/gui/file_browser.cpp" line="58"/>
+        <location filename="../../src/gui/file_browser.cpp" line="70"/>
         <source>Browser</source>
         <translation>Prohlížeč</translation>
     </message>
     <message>
         <location filename="../../src/gui/file_browser.cpp" line="63"/>
         <source>Reload (F5)</source>
-        <translation>Obnovit (F5)</translation>
+        <translation type="obsolete">Obnovit (F5)</translation>
+    </message>
+</context>
+<context>
+    <name>fileBrowserTreeWidget</name>
+    <message>
+        <location filename="../../src/gui/file_browser.cpp" line="183"/>
+        <source>Files</source>
+        <translation type="obsolete">Soubory</translation>
+    </message>
+    <message>
+        <location filename="../../src/gui/file_browser.cpp" line="366"/>
+        <source>Send to active instrument-track</source>
+        <translation>Odeslat k aktivaci nástrojové stopy</translation>
+    </message>
+    <message>
+        <location filename="../../src/gui/file_browser.cpp" line="370"/>
+        <source>Open in new instrument-track/Song-Editor</source>
+        <translation>Otevřít v nové nástrojové stopě/Editoru skladby</translation>
+    </message>
+    <message>
+        <location filename="../../src/gui/file_browser.cpp" line="374"/>
+        <source>Open in new instrument-track/B+B Editor</source>
+        <translation>Otevřít v nové nástrojové stopě/B+B editoru</translation>
+    </message>
+    <message>
+        <location filename="../../src/gui/file_browser.cpp" line="424"/>
+        <source>Loading sample</source>
+        <translation>Načítám sampl</translation>
+    </message>
+    <message>
+        <location filename="../../src/gui/file_browser.cpp" line="426"/>
+        <source>Please wait, loading sample for preview...</source>
+        <translation>Prosím čekejte, načítám sampl k náslechu...</translation>
+    </message>
+    <message>
+        <location filename="../../src/gui/file_browser.cpp" line="759"/>
+        <source>--- Factory files ---</source>
+        <translation>--- Tovární soubory ---</translation>
     </message>
 </context>
 <context>
@@ -2929,82 +3159,102 @@ Přesvědčte se, že ke zvolenému souboru/zařízení máte právo zápisu!</t
 <context>
     <name>impulseEditor</name>
     <message>
+        <location filename="" line="0"/>
         <source>Draw your own waveform here by dragging your mouse onto this graph</source>
         <translation type="obsolete">Vlastní vlnovku nakreslíte pomocí tažení myši na tomto grafu</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Sine wave</source>
         <translation type="obsolete">Sinusová vlna</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Click here if you want a sine-wave for current oscillator.</source>
         <translation type="obsolete">Klikněte zde, pokud chcete v aktuální oscilaci sinusovou vlnu.</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Triangle wave</source>
         <translation type="obsolete">Trianglová vlna</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Click here if you want a triangle-wave for current oscillator.</source>
         <translation type="obsolete">Klikněte zde, pokud chcete v aktuální oscilaci trianglovou vlnu.</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Saw wave</source>
         <translation type="obsolete">Pilovitá vlna</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Click here if you want a saw-wave for current oscillator.</source>
         <translation type="obsolete">Klikněte zde, pokud chcete v aktuální oscilaci pilovitou vlnu.</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Square wave</source>
         <translation type="obsolete">Pravoúhlá (square) vlna</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Click here if you want a square-wave for current oscillator.</source>
         <translation type="obsolete">Klikněte zde, pokud chcete v aktuální oscilaci pravoúhlou vlnu.</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>White noise wave</source>
         <translation type="obsolete">Bílý šum</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Click here if you want a white-noise for current oscillator.</source>
         <translation type="obsolete">Klikněte zde, pokud chcete v aktuální oscilaci bílý šum.</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>User defined wave</source>
         <translation type="obsolete">Vlna definovaná uživatelem</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Click here if you want a user-defined wave-shape for current oscillator.</source>
         <translation type="obsolete">Klikněte zde, pokud chcete užít v aktuální oscilaci vlnu definovanou uživatelem.</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Smooth</source>
         <translation type="obsolete">Uhladit</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Click here to smooth waveform.</source>
         <translation type="obsolete">Pro uhlazení vlny klikněte zde.</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Normalize</source>
         <translation type="obsolete">Normalizovat</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Click here to normalize waveform.</source>
         <translation type="obsolete">Pro normalizaci vlny klikněte zde.</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Enable waveform</source>
         <translation type="obsolete">Zapnout vlnu</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Click here to enable/disable waveform.</source>
         <translation type="obsolete">Pro zapnutí/vypnutí vlny klikněte zde.</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>&amp;Help</source>
         <translation type="obsolete">Nápověd&amp;a</translation>
     </message>
@@ -3012,6 +3262,7 @@ Přesvědčte se, že ke zvolenému souboru/zařízení máte právo zápisu!</t
 <context>
     <name>instrumentMidiIOView</name>
     <message>
+        <location filename="" line="0"/>
         <source>MIDI-SETUP FOR THIS CHANNEL</source>
         <translation type="obsolete">MIDI NASTAVENÍ PRO TENTO KANÁL</translation>
     </message>
@@ -3021,18 +3272,22 @@ Přesvědčte se, že ke zvolenému souboru/zařízení máte právo zápisu!</t
         <translation>KANÁL</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Receive MIDI-events</source>
         <translation type="obsolete">Přijímat MIDI-události</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Default velocity for all input-events</source>
         <translation type="obsolete">Výchozí rychlost pro všechny vstupní události</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Send MIDI-events</source>
         <translation type="obsolete">Posílat MIDI-události</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Default velocity for all output-events</source>
         <translation type="obsolete">Výchozí rychlost pro všechny výstupní události</translation>
     </message>
@@ -3221,38 +3476,47 @@ Přesvědčte se, že ke zvolenému souboru/zařízení máte právo zápisu!</t
         <translation>Tímto ovladačem můžete nastavit hlasitost otevřeného kanálu.</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Within this rectangle you can set the position where the channel should be audible. You should have a soundcard supporting at least surround 4.0 for enjoying this feature.</source>
         <translation type="obsolete">Pomocí tohoto čtverečku můžete nastavit pozici ve které bude kanál slyšitelný. Měli byste mít zvukovou kartu podporují alespoň surround 4.0 abyste si tuto vlastnost vychutnali.</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>unnamed_channel</source>
         <translation type="obsolete">nepojmenovaný_kanál</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Channel volume</source>
         <translation type="obsolete">Hlasitost kanálu</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Channel volume:</source>
         <translation type="obsolete">Hlasitost kanálu:</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>VOL</source>
         <translation type="obsolete">VOL</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>MIDI input/output</source>
         <translation type="obsolete">MIDI vstup/výstup</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>GENERAL SETTINGS</source>
         <translation type="obsolete">HLAVNÍ NASTAVENÍ</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>VOLUME</source>
         <translation type="obsolete">HLASITOST</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Surround area</source>
         <translation type="obsolete">Surround oblast</translation>
     </message>
@@ -3262,34 +3526,42 @@ Přesvědčte se, že ke zvolenému souboru/zařízení máte právo zápisu!</t
         <translation>FX kanál</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>FX CHNL</source>
         <translation type="obsolete">FX CHNL</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Save current channel settings in a preset-file</source>
         <translation type="obsolete">Uložit aktuální nastavení kanálu do souboru jako předvolbu</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Click here, if you want to save current channel settings in a preset-file. Later you can load this preset by double-clicking it in the preset-browser.</source>
         <translation type="obsolete">Klikněte zde pokud chcete uložit aktuální nastavení kanálu jako předvolbu. Později můžete předvolbu použít dvojitým kliknutím v prohlížeči předvoleb.</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Default</source>
         <translation type="obsolete">Výchozí</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>MIDI input</source>
         <translation type="obsolete">MIDI vstup</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>MIDI output</source>
         <translation type="obsolete">MIDI výstup</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Save channel-settings in file</source>
         <translation type="obsolete">Uložit nastavení kanálu do souboru</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Channel-Settings-File (*.cs.xml)</source>
         <translation type="obsolete">Soubor s nastavením kanálu (*.cs.xml)</translation>
     </message>
@@ -3375,120 +3647,122 @@ Přesvědčte se, že ke zvolenému souboru/zařízení máte právo zápisu!</t
 <context>
     <name>instrumentTrackWindow</name>
     <message>
-        <location filename="../../src/tracks/instrument_track.cpp" line="1128"/>
+        <location filename="../../src/tracks/instrument_track.cpp" line="1131"/>
         <source>GENERAL SETTINGS</source>
         <translation>HLAVNÍ NASTAVENÍ</translation>
     </message>
     <message>
-        <location filename="../../src/tracks/instrument_track.cpp" line="1143"/>
+        <location filename="../../src/tracks/instrument_track.cpp" line="1146"/>
         <source>Instrument volume</source>
         <translation>Hlasitost nástroje</translation>
     </message>
     <message>
-        <location filename="../../src/tracks/instrument_track.cpp" line="1146"/>
+        <location filename="../../src/tracks/instrument_track.cpp" line="1149"/>
         <source>Volume:</source>
         <translation>Hlasitost:</translation>
     </message>
     <message>
-        <location filename="../../src/tracks/instrument_track.cpp" line="1147"/>
+        <location filename="../../src/tracks/instrument_track.cpp" line="1150"/>
         <source>VOL</source>
         <translation>VOL</translation>
     </message>
     <message>
-        <location filename="../../src/tracks/instrument_track.cpp" line="1154"/>
+        <location filename="../../src/tracks/instrument_track.cpp" line="1157"/>
         <source>Panning</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/tracks/instrument_track.cpp" line="1157"/>
+        <location filename="../../src/tracks/instrument_track.cpp" line="1160"/>
         <source>Panning:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/tracks/instrument_track.cpp" line="1158"/>
+        <location filename="../../src/tracks/instrument_track.cpp" line="1161"/>
         <source>PAN</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/tracks/instrument_track.cpp" line="1162"/>
+        <location filename="../../src/tracks/instrument_track.cpp" line="1165"/>
         <source>Pitch</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/tracks/instrument_track.cpp" line="1165"/>
+        <location filename="../../src/tracks/instrument_track.cpp" line="1168"/>
         <source>Pitch:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/tracks/instrument_track.cpp" line="1165"/>
+        <location filename="../../src/tracks/instrument_track.cpp" line="1168"/>
         <source>cents</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/tracks/instrument_track.cpp" line="1166"/>
+        <location filename="../../src/tracks/instrument_track.cpp" line="1169"/>
         <source>PITCH</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/tracks/instrument_track.cpp" line="1171"/>
+        <location filename="../../src/tracks/instrument_track.cpp" line="1174"/>
         <source>FX channel</source>
         <translation>FX kanál</translation>
     </message>
     <message>
-        <location filename="../../src/tracks/instrument_track.cpp" line="1172"/>
+        <location filename="../../src/tracks/instrument_track.cpp" line="1175"/>
         <source>FX CHNL</source>
         <translation>FX CHNL</translation>
     </message>
     <message>
-        <location filename="../../src/tracks/instrument_track.cpp" line="1185"/>
+        <location filename="../../src/tracks/instrument_track.cpp" line="1188"/>
         <source>Save current channel settings in a preset-file</source>
         <translation>Uložit aktuální nastavení kanálu do souboru předvoleb</translation>
     </message>
     <message>
-        <location filename="../../src/tracks/instrument_track.cpp" line="1189"/>
+        <location filename="../../src/tracks/instrument_track.cpp" line="1192"/>
         <source>Click here, if you want to save current channel settings in a preset-file. Later you can load this preset by double-clicking it in the preset-browser.</source>
         <translation>Klikněte zde pokud chcete uložit aktuální nastavení kanálu do souboru předvoleb. Později můžete předvolbu použít dvojitým kliknutím v prohlížeči předvoleb.</translation>
     </message>
     <message>
-        <location filename="../../src/tracks/instrument_track.cpp" line="1206"/>
+        <location filename="../../src/tracks/instrument_track.cpp" line="1209"/>
         <source>ENV/LFO</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/tracks/instrument_track.cpp" line="1207"/>
+        <location filename="../../src/tracks/instrument_track.cpp" line="1210"/>
         <source>FUNC</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/tracks/instrument_track.cpp" line="1208"/>
+        <location filename="../../src/tracks/instrument_track.cpp" line="1211"/>
         <source>FX</source>
         <translation>FX</translation>
     </message>
     <message>
-        <location filename="../../src/tracks/instrument_track.cpp" line="1209"/>
+        <location filename="../../src/tracks/instrument_track.cpp" line="1212"/>
         <source>MIDI</source>
         <translation>MIDI</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Save channel-settings in file</source>
         <translation type="obsolete">Uložit nastavení kanálu do souboru</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Channel-Settings-File (*.cs.xml)</source>
         <translation type="obsolete">Soubor s nastavením kanálu (*.cs.xml)</translation>
     </message>
     <message>
-        <location filename="../../src/tracks/instrument_track.cpp" line="1351"/>
+        <location filename="../../src/tracks/instrument_track.cpp" line="1354"/>
         <source>PLUGIN</source>
         <translation>PLUGIN</translation>
     </message>
     <message>
-        <location filename="../../src/tracks/instrument_track.cpp" line="1297"/>
+        <location filename="../../src/tracks/instrument_track.cpp" line="1300"/>
         <source>Save preset</source>
         <translation>Uložit předvolbu</translation>
     </message>
     <message>
-        <location filename="../../src/tracks/instrument_track.cpp" line="1298"/>
+        <location filename="../../src/tracks/instrument_track.cpp" line="1301"/>
         <source>XML preset file (*.xpf)</source>
         <translation>XML soubor předvoleb (*.xpf)</translation>
     </message>
@@ -3501,6 +3775,7 @@ Přesvědčte se, že ke zvolenému souboru/zařízení máte právo zápisu!</t
         <translation type="unfinished">Počáteční frekvence</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Start frequency:</source>
         <translation type="obsolete">Počáteční frekvence:</translation>
     </message>
@@ -3510,6 +3785,7 @@ Přesvědčte se, že ke zvolenému souboru/zařízení máte právo zápisu!</t
         <translation type="unfinished">Konečná frekvence</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>End frequency:</source>
         <translation type="obsolete">Konečná frekvence:</translation>
     </message>
@@ -3519,6 +3795,7 @@ Přesvědčte se, že ke zvolenému souboru/zařízení máte právo zápisu!</t
         <translation type="unfinished">Zkreslení</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Distortion:</source>
         <translation type="obsolete">Zkreslení:</translation>
     </message>
@@ -3528,6 +3805,7 @@ Přesvědčte se, že ke zvolenému souboru/zařízení máte právo zápisu!</t
         <translation type="unfinished">Zisk</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Gain:</source>
         <translation type="obsolete">Zisk:</translation>
     </message>
@@ -3568,37 +3846,42 @@ Přesvědčte se, že ke zvolenému souboru/zařízení máte právo zápisu!</t
 <context>
     <name>knob</name>
     <message>
+        <location filename="" line="0"/>
         <source>&amp;Reset (%1%2)</source>
         <translation type="obsolete">&amp;Resetovat (%1%2)</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>&amp;Copy value (%1%2)</source>
         <translation type="obsolete">&amp;Kopírovat hodnoty (%1%2)</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>&amp;Paste value (%1%2)</source>
         <translation type="obsolete">&amp;Vložit hodnoty (%1%2)</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>&amp;Open in automation editor</source>
         <translation type="obsolete">&amp;Otevřít v automatizačním editoru</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Connect to MIDI-device</source>
         <translation type="obsolete">Napojit na MIDI zařízení</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/knob.cpp" line="394"/>
+        <location filename="../../src/gui/widgets/knob.cpp" line="396"/>
         <source>&amp;Help</source>
         <translation>Nápověd&amp;a</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/knob.cpp" line="587"/>
+        <location filename="../../src/gui/widgets/knob.cpp" line="599"/>
         <source>Please enter a new value between %1 and %2:</source>
         <translation>Vložte prosím novou hodnotu mezi %1 a %2:</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/knob.cpp" line="569"/>
+        <location filename="../../src/gui/widgets/knob.cpp" line="581"/>
         <source>Please enter a new value between -96.0 dBV and 6.0 dBV:</source>
         <translation>Vložte prosím novou hodnotu mezi -96.0 dBV a 6.0 dBV:</translation>
     </message>
@@ -3606,26 +3889,32 @@ Přesvědčte se, že ke zvolenému souboru/zařízení máte právo zápisu!</t
 <context>
     <name>ladspaBrowser</name>
     <message>
+        <location filename="" line="0"/>
         <source>Available Effects</source>
         <translation type="obsolete">Dostupné efekty</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Unavailable Effects</source>
         <translation type="obsolete">Nedostupné efekty</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Instruments</source>
         <translation type="obsolete">Nástroje</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Analysis Tools</source>
         <translation type="obsolete">Analyzační nástroje</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Don&apos;t know</source>
         <translation type="obsolete">Neznámé</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>This dialog displays information on all of the LADSPA plugins LMMS was able to locate. The plugins are divided into five categories based upon an interpretation of the port types and names.
 
 Available Effects are those that can be used by LMMS. In order for LMMS to be able to use an effect, it must, first and foremost, be an effect, which is to say, it has to have both input channels and output channels. LMMS identifies an input channel as an audio rate port containing &apos;in&apos; in the name. Output channels are identified by the letters &apos;out&apos;. Furthermore, the effect must have the same number of inputs and outputs and be real time capable.
@@ -3654,6 +3943,7 @@ Neznámé jsou pluginy, pro které nebyly identifikovány žádné vstupní nebo
 Dvojitým kliknutím na kterýkoli z modulů se zobrazí informace o portech.</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Type:</source>
         <translation type="obsolete">Typ:</translation>
     </message>
@@ -3728,10 +4018,12 @@ Dvojitým kliknutím na kterýkoli z modulů se zobrazí informace o portech.</t
         <translation>Spojit kanály</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Value:</source>
         <translation type="obsolete">Hodnota:</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Sorry, no help available.</source>
         <translation type="obsolete">Promiňte, nápověda není k dispozici.</translation>
     </message>
@@ -3884,10 +4176,12 @@ Dvojitým kliknutím na kterýkoli z modulů se zobrazí informace o portech.</t
         <translation>VCF frekvence vypnutí</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Cutoff Freq:</source>
         <translation type="obsolete">Frek. vypnutí:</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>CUT</source>
         <translation type="obsolete">CUT</translation>
     </message>
@@ -3897,6 +4191,7 @@ Dvojitým kliknutím na kterýkoli z modulů se zobrazí informace o portech.</t
         <translation>VCF rezonance</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Resonance:</source>
         <translation type="obsolete">Rezonance:</translation>
     </message>
@@ -3911,14 +4206,17 @@ Dvojitým kliknutím na kterýkoli z modulů se zobrazí informace o portech.</t
         <translation>Důraz</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Fine detuning of the VCO. Ranged between -100 and 100 centes.</source>
         <translation type="obsolete">VCO jemné rozladění. Rozsah mezi -100 a 100 setinami.</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>VCO Fine Detuning:</source>
         <translation type="obsolete">VCO jemné rozladění:</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>DETUNE</source>
         <translation type="obsolete">ROZLADIT</translation>
     </message>
@@ -3933,22 +4231,27 @@ Dvojitým kliknutím na kterýkoli z modulů se zobrazí informace o portech.</t
         <translation>Vlna</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Sawtooth </source>
         <translation type="obsolete">Pilový zub</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Inverted Sawtooth </source>
         <translation type="obsolete">Převrácený pilový zub</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Triangle </source>
         <translation type="obsolete">Triangl</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Square </source>
         <translation type="obsolete">Pravoúhlý</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Rounded Square </source>
         <translation type="obsolete">Zaoblený pravoúhlý</translation>
     </message>
@@ -4260,6 +4563,7 @@ Dvojitým kliknutím na kterýkoli z modulů se zobrazí informace o portech.</t
 <context>
     <name>lcdSpinBox</name>
     <message>
+        <location filename="" line="0"/>
         <source>&amp;Open in automation editor</source>
         <translation type="obsolete">&amp;Otevřít v automatizačním editoru</translation>
     </message>
@@ -4370,26 +4674,32 @@ Dvojitým kliknutím na kterýkoli z modulů se zobrazí informace o portech.</t
         <translation>stupně</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Click here if you want a sine-wave for current oscillator.</source>
         <translation type="obsolete">Klikněte zde, pokud chcete v aktuální oscilaci sinusovou vlnu.</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Click here if you want a triangle-wave for current oscillator.</source>
         <translation type="obsolete">Klikněte zde, pokud chcete v aktuální oscilaci trianglovou vlnu.</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Click here if you want a saw-wave for current oscillator.</source>
         <translation type="obsolete">Klikněte zde, pokud chcete v aktuální oscilaci pilovitou vlnu.</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Click here if you want a square-wave for current oscillator.</source>
         <translation type="obsolete">Klikněte zde, pokud chcete v aktuální oscilaci pravoúhlou vlnu.</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Click here if you want a white-noise for current oscillator.</source>
         <translation type="obsolete">Klikněte zde, pokud chcete v aktuální oscilaci bílý šum.</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Click here if you want a user-defined wave-shape for current oscillator.</source>
         <translation type="obsolete">Klikněte zde, pokud chcete užít v aktuální oscilaci vlnu definovanou uživatelem.</translation>
     </message>
@@ -4406,7 +4716,7 @@ Dvojitým kliknutím na kterýkoli z modulů se zobrazí informace o portech.</t
     <message>
         <location filename="../../src/gui/lfo_controller_dialog.cpp" line="127"/>
         <source>Click here for a sine-wave for.</source>
-        <translation>Klikněte zde pro sinusovou vlnu.</translation>
+        <translation type="obsolete">Klikněte zde pro sinusovou vlnu.</translation>
     </message>
     <message>
         <location filename="../../src/gui/lfo_controller_dialog.cpp" line="137"/>
@@ -4436,55 +4746,28 @@ Dvojitým kliknutím na kterýkoli z modulů se zobrazí informace o portech.</t
     <message>
         <location filename="../../src/gui/lfo_controller_dialog.cpp" line="183"/>
         <source>Click here for white-noise for.</source>
-        <translation>Klikněte zde pro bílý šum.</translation>
+        <translation type="obsolete">Klikněte zde pro bílý šum.</translation>
     </message>
     <message>
         <location filename="../../src/gui/lfo_controller_dialog.cpp" line="193"/>
         <source>Click here for a user-defined shape.</source>
         <translation>Klikněte zde pro uživatelem definovaný tvar.</translation>
     </message>
-</context>
-<context>
-    <name>listView</name>
     <message>
-        <location filename="../../src/gui/file_browser.cpp" line="183"/>
-        <source>Files</source>
-        <translation>Soubory</translation>
+        <location filename="../../src/gui/lfo_controller_dialog.cpp" line="127"/>
+        <source>Click here for a sine-wave.</source>
+        <translation type="unfinished">Klikněte zde pro sinusovou vlnu.</translation>
     </message>
     <message>
-        <location filename="../../src/gui/file_browser.cpp" line="214"/>
-        <source>Send to active instrument-track</source>
-        <translation>Odeslat k aktivaci nástrojové stopy</translation>
-    </message>
-    <message>
-        <location filename="../../src/gui/file_browser.cpp" line="218"/>
-        <source>Open in new instrument-track/Song-Editor</source>
-        <translation>Otevřít v nové nástrojové stopě/Editoru skladby</translation>
-    </message>
-    <message>
-        <location filename="../../src/gui/file_browser.cpp" line="222"/>
-        <source>Open in new instrument-track/B+B Editor</source>
-        <translation>Otevřít v nové nástrojové stopě/B+B editoru</translation>
-    </message>
-    <message>
-        <location filename="../../src/gui/file_browser.cpp" line="272"/>
-        <source>Loading sample</source>
-        <translation>Načítám sampl</translation>
-    </message>
-    <message>
-        <location filename="../../src/gui/file_browser.cpp" line="274"/>
-        <source>Please wait, loading sample for preview...</source>
-        <translation>Prosím čekejte, načítám sampl k náslechu...</translation>
-    </message>
-    <message>
-        <location filename="../../src/gui/file_browser.cpp" line="605"/>
-        <source>--- Factory files ---</source>
-        <translation>--- Tovární soubory ---</translation>
+        <location filename="../../src/gui/lfo_controller_dialog.cpp" line="183"/>
+        <source>Click here for white-noise.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>liveTool</name>
     <message>
+        <location filename="" line="0"/>
         <source>This tool is intended to be used in live performances, though you can use it for music production as well.
 The following keys will work only if this window is active.
 The spacebar toggles play and pause in the Song Editor.
@@ -4518,241 +4801,254 @@ F1-F10 klávesy umlčují prvních 10 nástrojů v Beat+Baseline Editoru.</trans
         <translation>Domovský adresář</translation>
     </message>
     <message>
-        <location filename="../../src/gui/main_window.cpp" line="122"/>
+        <location filename="../../src/gui/main_window.cpp" line="131"/>
         <source>Root directory</source>
         <translation>Kořenový adresář</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Loading song...</source>
         <translation type="obsolete">Načítám skladbu...</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Creating new song...</source>
         <translation type="obsolete">Vytvářím novou skladbu...</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Creating GUI...</source>
         <translation type="obsolete">Sestavuji grafické rozhraní (GUI)...</translation>
     </message>
     <message>
-        <location filename="../../src/gui/main_window.cpp" line="309"/>
+        <location filename="../../src/gui/main_window.cpp" line="325"/>
         <source>Create new project</source>
         <translation>Vytvořit nový projekt</translation>
     </message>
     <message>
-        <location filename="../../src/gui/main_window.cpp" line="329"/>
+        <location filename="../../src/gui/main_window.cpp" line="345"/>
         <source>Open existing project</source>
         <translation>Otevřít existující projekt</translation>
     </message>
     <message>
-        <location filename="../../src/gui/main_window.cpp" line="343"/>
+        <location filename="../../src/gui/main_window.cpp" line="359"/>
         <source>Save current project</source>
         <translation>Uložit aktuální projekt</translation>
     </message>
     <message>
-        <location filename="../../src/gui/main_window.cpp" line="350"/>
+        <location filename="../../src/gui/main_window.cpp" line="366"/>
         <source>Export current project</source>
         <translation>Exportovat aktuální projekt</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Show/hide Beat+Baseline Editor</source>
         <translation type="obsolete">Ukaž/schovej Beat+Baseline Editor</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>By pressing this button, you can show or hide the Beat+Baseline Editor. The Beat+Baseline Editor is needed for creating beats, opening, adding and removing channels, cutting, copying and pasting beat- and baseline-patterns and other things like that.</source>
         <translation type="obsolete">Kliknutím na toto tlačítko můžete ukázat nebo schovat Beat+Baseline Editor. Beat+Baseline Editor je potřebný pro vytvoření nových beatů, otevření, přidání a odstranění kanálů, vyjmutí, kopírování a vložení beat a baseline patternů a další podobné věci.</translation>
     </message>
     <message>
-        <location filename="../../src/gui/main_window.cpp" line="401"/>
+        <location filename="../../src/gui/main_window.cpp" line="417"/>
         <source>Show/hide Piano-Roll</source>
         <translation>Ukaž/schovej Piano-Roll</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>By pressing this button, you can show or hide the Piano-Roll. With the help of the Piano-Roll you can edit melody-patterns in an easy way.</source>
         <translation type="obsolete">Kliknutím na toto tlačítko můžete ukázat nebo schovat Piano-Roll. S pomocí Piano-Roll můžete snadno editovat melodické patterny.</translation>
     </message>
     <message>
-        <location filename="../../src/gui/main_window.cpp" line="369"/>
+        <location filename="../../src/gui/main_window.cpp" line="385"/>
         <source>Show/hide Song-Editor</source>
         <translation>Ukaž/schovej Editor skladby</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>By pressing this button, you can show or hide the Song-Editor. With the help of the Song-Editor you can edit song-playlist and specify when which track should be played. You can also insert and move samples (e.g. rap-samples) directly into the playlist.</source>
         <translation type="obsolete">Kliknutím na toto tlačítko můžete ukázat nebo schovat Editor skladby. Pomocí Editoru skladby můžete editovat playlist skladby a specifikovat které stopy budou přehrány. Taktéž můžete vkládat a přesouvat samply (např. rapové) přímo do playlistu.</translation>
     </message>
     <message>
-        <location filename="../../src/gui/main_window.cpp" line="414"/>
+        <location filename="../../src/gui/main_window.cpp" line="430"/>
         <source>Show/hide Automation Editor</source>
         <translation>Ukaž/schovej Automatizační editor</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>By pressing this button, you can show or hide the Automation Editor. With the help of the Automation Editor you can edit dynamic values in an easy way.</source>
         <translation type="obsolete">Kliknutím na toto tlačítko můžete ukázat nebo schovat Automatizační editor. S pomocí Automatizačního editoru můžete snadno editovat dynamické hodnoty.</translation>
     </message>
     <message>
-        <location filename="../../src/gui/main_window.cpp" line="441"/>
+        <location filename="../../src/gui/main_window.cpp" line="457"/>
         <source>Show/hide project notes</source>
         <translation>Ukaž/schovej poznámky k projektu</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>By pressing this button, you can show or hide the project notes window. In this window you can put down your project notes.</source>
         <translation type="obsolete">Kliknutím na toto tlačítko můžete ukázat nebo schovat poznámky k projektu. Do tohoto okna můžete vkládat Vaše poznámky k projektu.</translation>
     </message>
     <message>
-        <location filename="../../src/gui/main_window.cpp" line="199"/>
+        <location filename="../../src/gui/main_window.cpp" line="215"/>
         <source>&amp;Project</source>
         <translation>&amp;Projekt</translation>
     </message>
     <message>
-        <location filename="../../src/gui/main_window.cpp" line="201"/>
+        <location filename="../../src/gui/main_window.cpp" line="217"/>
         <source>&amp;New</source>
         <translation>&amp;Nový</translation>
     </message>
     <message>
-        <location filename="../../src/gui/main_window.cpp" line="206"/>
+        <location filename="../../src/gui/main_window.cpp" line="222"/>
         <source>&amp;Open...</source>
         <translation>&amp;Otevřít...</translation>
     </message>
     <message>
-        <location filename="../../src/gui/main_window.cpp" line="212"/>
+        <location filename="../../src/gui/main_window.cpp" line="228"/>
         <source>Recently opened projects</source>
         <translation>Nedávno otevřené projekty</translation>
     </message>
     <message>
-        <location filename="../../src/gui/main_window.cpp" line="219"/>
+        <location filename="../../src/gui/main_window.cpp" line="235"/>
         <source>&amp;Save</source>
         <translation>&amp;Uložit</translation>
     </message>
     <message>
-        <location filename="../../src/gui/main_window.cpp" line="224"/>
+        <location filename="../../src/gui/main_window.cpp" line="240"/>
         <source>Save &amp;As...</source>
         <translation>Uložit &amp;jako...</translation>
     </message>
     <message>
-        <location filename="../../src/gui/main_window.cpp" line="229"/>
+        <location filename="../../src/gui/main_window.cpp" line="245"/>
         <source>Import...</source>
         <translation>Importovat...</translation>
     </message>
     <message>
-        <location filename="../../src/gui/main_window.cpp" line="233"/>
+        <location filename="../../src/gui/main_window.cpp" line="249"/>
         <source>E&amp;xport...</source>
         <translation>E&amp;xportovat...</translation>
     </message>
     <message>
-        <location filename="../../src/gui/main_window.cpp" line="238"/>
+        <location filename="../../src/gui/main_window.cpp" line="254"/>
         <source>&amp;Quit</source>
         <translation>&amp;Ukončit</translation>
     </message>
     <message>
-        <location filename="../../src/gui/main_window.cpp" line="244"/>
+        <location filename="../../src/gui/main_window.cpp" line="260"/>
         <source>&amp;Edit</source>
         <translation>Úp&amp;ravy</translation>
     </message>
     <message>
-        <location filename="../../src/gui/main_window.cpp" line="246"/>
+        <location filename="../../src/gui/main_window.cpp" line="262"/>
         <source>Undo</source>
         <translation>Zpět</translation>
     </message>
     <message>
-        <location filename="../../src/gui/main_window.cpp" line="250"/>
+        <location filename="../../src/gui/main_window.cpp" line="266"/>
         <source>Redo</source>
         <translation>Znovu</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>&amp;Settings</source>
         <translation type="obsolete">Na&amp;stavení</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Show settings dialog</source>
         <translation type="obsolete">Zobraz nastavení</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Show setup wizard</source>
         <translation type="obsolete">Zobraz průvodce nastavením</translation>
     </message>
     <message>
-        <location filename="../../src/gui/main_window.cpp" line="276"/>
+        <location filename="../../src/gui/main_window.cpp" line="292"/>
         <source>&amp;Tools</source>
         <translation>Nás&amp;troje</translation>
     </message>
     <message>
-        <location filename="../../src/gui/main_window.cpp" line="284"/>
+        <location filename="../../src/gui/main_window.cpp" line="300"/>
         <source>&amp;Help</source>
         <translation>Nápověd&amp;a</translation>
     </message>
     <message>
-        <location filename="../../src/gui/main_window.cpp" line="289"/>
+        <location filename="../../src/gui/main_window.cpp" line="305"/>
         <source>Online help</source>
         <translation>Nápověda online</translation>
     </message>
     <message>
-        <location filename="../../src/gui/main_window.cpp" line="295"/>
+        <location filename="../../src/gui/main_window.cpp" line="311"/>
         <source>Help</source>
         <translation>Nápověda</translation>
     </message>
     <message>
-        <location filename="../../src/gui/main_window.cpp" line="299"/>
+        <location filename="../../src/gui/main_window.cpp" line="315"/>
         <source>What&apos;s this?</source>
         <translation>Co je to?</translation>
     </message>
     <message>
-        <location filename="../../src/gui/main_window.cpp" line="303"/>
+        <location filename="../../src/gui/main_window.cpp" line="319"/>
         <source>About</source>
         <translation>O LMMS</translation>
     </message>
     <message>
-        <location filename="../../src/gui/main_window.cpp" line="525"/>
+        <location filename="../../src/gui/main_window.cpp" line="541"/>
         <source>Untitled</source>
         <translation>Nepojmenovaný</translation>
     </message>
     <message>
-        <location filename="../../src/gui/main_window.cpp" line="531"/>
+        <location filename="../../src/gui/main_window.cpp" line="547"/>
         <source>LMMS %1</source>
         <translation>LMMS %1</translation>
     </message>
     <message>
-        <location filename="../../src/gui/main_window.cpp" line="544"/>
+        <location filename="../../src/gui/main_window.cpp" line="560"/>
         <source>Project not saved</source>
         <translation>Projekt není uložen</translation>
     </message>
     <message>
-        <location filename="../../src/gui/main_window.cpp" line="547"/>
+        <location filename="../../src/gui/main_window.cpp" line="563"/>
         <source>The current project was modified since last saving. Do you want to save it now?</source>
         <translation>Aktuální projekt byl od posledního uložení změněn. Chcete jej nyní uložit?</translation>
     </message>
     <message>
-        <location filename="../../src/gui/main_window.cpp" line="662"/>
+        <location filename="../../src/gui/main_window.cpp" line="678"/>
         <source>Open project</source>
         <translation>Otevřít projekt</translation>
     </message>
     <message>
-        <location filename="../../src/gui/main_window.cpp" line="663"/>
+        <location filename="../../src/gui/main_window.cpp" line="679"/>
         <source>MultiMedia Project (*.mmp *.mmpz *.xml)</source>
         <translation>MultiMedia Projekt (*.mmp *.mmpz *.xml)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/main_window.cpp" line="724"/>
+        <location filename="../../src/gui/main_window.cpp" line="740"/>
         <source>Save project</source>
         <translation>Uložit projekt</translation>
     </message>
     <message>
-        <location filename="../../src/gui/main_window.cpp" line="726"/>
+        <location filename="../../src/gui/main_window.cpp" line="742"/>
         <source>MultiMedia Project (*.mmp *.mmpz);;MultiMedia Project Template (*.mpt)</source>
         <translation>MultiMedia Projekt (*.mmp *.mmpz);;MultiMedia Projekt Šablona (*.mpt)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/main_window.cpp" line="772"/>
+        <location filename="../../src/gui/main_window.cpp" line="788"/>
         <source>Help not available</source>
         <translation>Nápověda není dostupná</translation>
     </message>
     <message>
-        <location filename="../../src/gui/main_window.cpp" line="777"/>
+        <location filename="../../src/gui/main_window.cpp" line="793"/>
         <source>Currently there&apos;s no help available in LMMS.
 Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
         <translation>V současnosti není v LMMS nápověda dostupná.
 Navštivte prosím stránku s dokumentací k LMMS na adrese http://lmms.sf.net/wiki.</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Setting up main-window and workspace...</source>
         <translation type="obsolete">Sestavuji hlavní okno a pracovní plochu...</translation>
     </message>
@@ -4779,197 +5075,235 @@ Please make sure you have write-access to the file and try again.</source>
 Ujistěte se prosím, že máte k souboru právo zápisu a zkuste to znovu.</translation>
     </message>
     <message>
-        <location filename="../../src/gui/main_window.cpp" line="255"/>
+        <location filename="../../src/gui/main_window.cpp" line="271"/>
         <source>Settings</source>
         <translation>Nastavení</translation>
     </message>
     <message>
-        <location filename="../../src/gui/main_window.cpp" line="315"/>
+        <location filename="../../src/gui/main_window.cpp" line="331"/>
         <source>Create new project from template</source>
         <translation>Vytvořit nový projekt ze šablony</translation>
     </message>
     <message>
-        <location filename="../../src/gui/main_window.cpp" line="336"/>
+        <location filename="../../src/gui/main_window.cpp" line="352"/>
         <source>Recently opened project</source>
         <translation>Naposledy otevřené projekty</translation>
     </message>
     <message>
-        <location filename="../../src/gui/main_window.cpp" line="385"/>
+        <location filename="../../src/gui/main_window.cpp" line="401"/>
         <source>Show/hide Beat+Bassline Editor</source>
         <translation>Ukaž/schovej Beat+Bassline editor</translation>
     </message>
     <message>
-        <location filename="../../src/gui/main_window.cpp" line="428"/>
+        <location filename="../../src/gui/main_window.cpp" line="444"/>
         <source>Show/hide FX Mixer</source>
         <translation>Ukaž/schovej FX Mixer</translation>
     </message>
     <message>
-        <location filename="../../src/gui/main_window.cpp" line="453"/>
+        <location filename="../../src/gui/main_window.cpp" line="469"/>
         <source>Show/hide controller rack</source>
         <translation>Ukaž/schovej kontrolér rack</translation>
     </message>
     <message>
-        <location filename="../../src/gui/main_window.cpp" line="379"/>
+        <location filename="../../src/gui/main_window.cpp" line="395"/>
         <source>By pressing this button, you can show or hide the Song-Editor. With the help of the Song-Editor you can edit song-playlist and specify when which track should be played. You can also insert and move samples (e.g. rap samples) directly into the playlist.</source>
         <translation>Zmačknutím tohoto knoflíku zobrazíte nebo schováte Editor skladby. S jeho pomocí můžete editovat playlist skladby a specifikovat, kdy a která stopa má být přehrána. Můžete také vložit a přesunovat samply (např. rapové) přímo do playlistu.</translation>
     </message>
     <message>
-        <location filename="../../src/gui/main_window.cpp" line="395"/>
+        <location filename="../../src/gui/main_window.cpp" line="411"/>
         <source>By pressing this button, you can show or hide the Beat+Bassline Editor. The Beat+Bassline Editor is needed for creating beats, and for opening, adding, and removing channels, and for cutting, copying and pasting beat and bassline-patterns, and for other things like that.</source>
         <translation>Zmačknutím tohoto knoflíku zobrazíte nebo schováte Beat+Bassline editor. Beat+Bassline editor je nezbytný pro tvorbu beatů a pro otevírání, přidávání a odebírání kanálů. Dále pro vyjmutí, kopírování a vložení beatů, Beat+Bassline patternů a dalších podobných věcí.</translation>
     </message>
     <message>
-        <location filename="../../src/gui/main_window.cpp" line="409"/>
+        <location filename="../../src/gui/main_window.cpp" line="425"/>
         <source>Click here to show or hide the Piano-Roll. With the help of the Piano-Roll you can edit melodies in an easy way.</source>
         <translation>Klikněte zde, pokud chcete ukázat nebo schovat Piano-Roll. S pomocí Piano-Roll můžete jednoduchým způsobem editovat melodie.</translation>
     </message>
     <message>
-        <location filename="../../src/gui/main_window.cpp" line="424"/>
+        <location filename="../../src/gui/main_window.cpp" line="440"/>
         <source>Click here to show or hide the Automation Editor. With the help of the Automation Editor you can edit dynamic values in an easy way.</source>
         <translation>Klikněte zde, pokud chcete ukázat nebo schovat Automatizační editor. S pomocí Automatizačního editoru můžete jednoduchým způsobem editovat dynamické hodnoty.</translation>
     </message>
     <message>
-        <location filename="../../src/gui/main_window.cpp" line="436"/>
+        <location filename="../../src/gui/main_window.cpp" line="452"/>
         <source>Click here to show or hide the FX Mixer. The FX Mixer is a very powerful tool for managing effects for your song. You can insert effects into different effect-channels.</source>
         <translation>Klikněte zde, pokud chcete ukázat nebo schovat FX Mixer. FX Mixer je velmi mocný nástroj pro správu efektů ve vaší skladbě. Efekty můžete vkládat do různých efektových kanálů.</translation>
     </message>
     <message>
-        <location filename="../../src/gui/main_window.cpp" line="448"/>
+        <location filename="../../src/gui/main_window.cpp" line="464"/>
         <source>Click here to show or hide the project notes window. In this window you can put down your project notes.</source>
         <translation>Klikněte zde, pokud chcete ukázat nebo schovat okno pro poznámky. V tomto okně lze vkládat vaše poznámky k projektu.</translation>
+    </message>
+    <message>
+        <location filename="../../src/gui/main_window.cpp" line="129"/>
+        <source>My computer</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>mallets</name>
     <message>
+        <location filename="" line="0"/>
         <source>Missing files</source>
         <translation type="obsolete">Chybějící soubory</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Your Stk-installation seems to be incomplete. Please make sure the full Stk-package is installed!</source>
         <translation type="obsolete">Zda se, že Vaše Stk instalace není kompletní. Přesvědčte se, ze STK balíček je plně nainstalován!</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Spread</source>
         <translation type="obsolete">Rozsah</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Spread:</source>
         <translation type="obsolete">Rozsah:</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Hardness</source>
         <translation type="obsolete">Tvrdost</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Hardness:</source>
         <translation type="obsolete">Tvrdost:</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Position</source>
         <translation type="obsolete">Pozice</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Position:</source>
         <translation type="obsolete">Pozice:</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Vibrato Gain</source>
         <translation type="obsolete">Zisk vibráta</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Vib Gain</source>
         <translation type="obsolete">Vib zisk</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Vib Gain:</source>
         <translation type="obsolete">Vib zisk:</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Vibrato Freq</source>
         <translation type="obsolete">Frekvence vibráta</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Vib Freq</source>
         <translation type="obsolete">Vib frek</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Vib Freq:</source>
         <translation type="obsolete">Vib frek:</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Modulator</source>
         <translation type="obsolete">Modulátor</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Modulator:</source>
         <translation type="obsolete">Modulátor:</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Crossfade</source>
         <translation type="obsolete">Prolínání (crossfade)</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Crossfade:</source>
         <translation type="obsolete">Prolínání (crossfade):</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>LFO Speed</source>
         <translation type="obsolete">LFO Rychlost</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>LFO Speed:</source>
         <translation type="obsolete">LFO Rychlost:</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>LFO Depth</source>
         <translation type="obsolete">LFO Hloubka</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>LFO Depth:</source>
         <translation type="obsolete">LFO Hloubka:</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Pressure</source>
         <translation type="obsolete">Tlak</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Pressure:</source>
         <translation type="obsolete">Tlak:</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Motion</source>
         <translation type="obsolete">Pohyb</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Motion:</source>
         <translation type="obsolete">Pohyb:</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Speed</source>
         <translation type="obsolete">Rychlost</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Speed:</source>
         <translation type="obsolete">Rychlost:</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Vibrato</source>
         <translation type="obsolete">Vibráto</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Vibrato:</source>
         <translation type="obsolete">Vibráto:</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Instrument</source>
         <translation type="obsolete">Nástroj</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Marimba</source>
         <translation type="obsolete">Marimba</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Vibraphone</source>
         <translation type="obsolete">Vibrafon</translation>
     </message>
@@ -5135,10 +5469,12 @@ Ujistěte se prosím, že máte k souboru právo zápisu a zkuste to znovu.</tra
 <context>
     <name>malletsInstrumentView</name>
     <message>
+        <location filename="" line="0"/>
         <source>Missing files</source>
         <translation type="obsolete">Chybějící soubory</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Your Stk-installation seems to be incomplete. Please make sure the full Stk-package is installed!</source>
         <translation type="obsolete">Zda se, že Vaše Stk instalace není kompletní. Přesvědčte se, ze STK balíček je plně nainstalován!</translation>
     </message>
@@ -5353,6 +5689,7 @@ Ujistěte se prosím, že máte k souboru právo zápisu a zkuste to znovu.</tra
 <context>
     <name>midiClient</name>
     <message>
+        <location filename="" line="0"/>
         <source>DEVICE</source>
         <translation type="obsolete">ZAŘÍZENÍ</translation>
     </message>
@@ -5360,6 +5697,7 @@ Ujistěte se prosím, že máte k souboru právo zápisu a zkuste to znovu.</tra
 <context>
     <name>midiClientRaw</name>
     <message>
+        <location filename="" line="0"/>
         <source>DEVICE</source>
         <translation type="obsolete">ZAŘÍZENÍ</translation>
     </message>
@@ -5418,10 +5756,12 @@ Ujistěte se prosím, že máte k souboru právo zápisu a zkuste to znovu.</tra
         <translation>Posílat MIDI-události</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Default input velocity</source>
         <translation type="obsolete">Výchozí vstupní rychlost</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Default output velocity</source>
         <translation type="obsolete">Výchozí výstupní rychlost</translation>
     </message>
@@ -5444,50 +5784,62 @@ Ujistěte se prosím, že máte k souboru právo zápisu a zkuste to znovu.</tra
 <context>
     <name>midiTabWidget</name>
     <message>
+        <location filename="" line="0"/>
         <source>MIDI-SETUP FOR THIS CHANNEL</source>
         <translation type="obsolete">MIDI NASTAVENÍ PRO TENTO KANÁL</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Input channel</source>
         <translation type="obsolete">Vstupní kanál</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>CHANNEL</source>
         <translation type="obsolete">KANÁL</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Output channel</source>
         <translation type="obsolete">Výstupní kanál</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Receive MIDI-events</source>
         <translation type="obsolete">Přijímat MIDI-události</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Default velocity for all input-events</source>
         <translation type="obsolete">Výchozí rychlost pro všechny vstupní události</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Default input velocity</source>
         <translation type="obsolete">Výchozí vstupní rychlost</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Send MIDI-events</source>
         <translation type="obsolete">Posílat MIDI-události</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Default velocity for all output-events</source>
         <translation type="obsolete">Výchozí rychlost pro všechny výstupní události</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Default output velocity</source>
         <translation type="obsolete">Výchozí výstupní rychlost</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>MIDI-devices to receive MIDI-events from</source>
         <translation type="obsolete">MIDI-zařízení k přijmu MIDI-události</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>MIDI-devices to send MIDI-events to</source>
         <translation type="obsolete">MIDI-zařízení k odesílání MIDI-události</translation>
     </message>
@@ -5495,18 +5847,22 @@ Ujistěte se prosím, že máte k souboru právo zápisu a zkuste to znovu.</tra
 <context>
     <name>mixer</name>
     <message>
+        <location filename="" line="0"/>
         <source>Plugin not found</source>
         <translation type="obsolete">Plugin nenalezen</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>The %1-plugin wasn&apos;t found!</source>
         <translation type="obsolete">Plugin-%1 nebyl nalezen!</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Error while loading plugin</source>
         <translation type="obsolete">Při načítání pluginu došlo k chybě</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Failed loading plugin &quot;%1&quot;!</source>
         <translation type="obsolete">Chyba načítání pluginu &quot;%1&quot;!</translation>
     </message>
@@ -5514,10 +5870,12 @@ Ujistěte se prosím, že máte k souboru právo zápisu a zkuste to znovu.</tra
 <context>
     <name>nameLabel</name>
     <message>
+        <location filename="" line="0"/>
         <source>Select icon</source>
         <translation type="obsolete">Vyberte ikonu</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>All images (*.png *.jpg *.jpeg *.gif *.bmp)</source>
         <translation type="obsolete">Všechny obrázky (*.png *.jpg *.jpeg *.gif *.bmp)</translation>
     </message>
@@ -5533,38 +5891,47 @@ Ujistěte se prosím, že máte k souboru právo zápisu a zkuste to znovu.</tra
 <context>
     <name>organicInstrument</name>
     <message>
+        <location filename="" line="0"/>
         <source>Osc %1 waveform</source>
         <translation type="obsolete">Osc %1 vlna</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Osc %1 waveform:</source>
         <translation type="obsolete">Osc %1 vlna:</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Osc %1 volume</source>
         <translation type="obsolete">Osc %1 hlasitost</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Osc %1 volume:</source>
         <translation type="obsolete">Osc %1 hlasitost:</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Osc %1 panning</source>
         <translation type="obsolete">Osc %1 panorama</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Osc %1 panning:</source>
         <translation type="obsolete">Osc %1 panorama:</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Osc %1 fine detuning left</source>
         <translation type="obsolete">Osc %1 jemné rozladění vlevo</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Osc %1 fine detuning left:</source>
         <translation type="obsolete">Osc %1 jemné rozladění vlevo:</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Randomise</source>
         <translation type="obsolete">Nastavit náhodně</translation>
     </message>
@@ -6009,46 +6376,57 @@ Ujistěte se prosím, že máte k souboru právo zápisu a zkuste to znovu.</tra
 <context>
     <name>patmanSynth</name>
     <message>
+        <location filename="" line="0"/>
         <source>Open other patch</source>
         <translation type="obsolete">Otevřít jiný patch</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Click here to open another patch-file. Loop and Tune settings are not reset.</source>
         <translation type="obsolete">Klikněte zde, pokud chcete otevřít další patch-soubor. Nastavení smyčky a režimu ladění budou zachována.</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Loop</source>
         <translation type="obsolete">Smyčka</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Loop mode</source>
         <translation type="obsolete">Režim smyčky</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Here you can toggle the Loop mode. If enabled, PatMan will use the loop information available in the file.</source>
         <translation type="obsolete">Zde můžete zapnout režim smyčky, Jestliže je režim aktivní PatMan použije dostupné informace o smyčcem ze souboru.</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Tune</source>
         <translation type="obsolete">Ladit</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Tune mode</source>
         <translation type="obsolete">Režim ladění</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Here you can toggle the Tune mode. If enabled, PatMan will tune the sample to match the note&apos;s frequency.</source>
         <translation type="obsolete">Zde můžete zapnout režim smyčky, Jestliže je režim aktivní PatMan naladí sampl tak, aby frekvence odpovídala tónu.</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>No file selected</source>
         <translation type="obsolete">Žádný soubor není vybrán</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Open patch file</source>
         <translation type="obsolete">Otevřít patch soubor</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Patch-Files (*.pat)</source>
         <translation type="obsolete">Patch-Soubory (*.pat)</translation>
     </message>
@@ -6114,6 +6492,7 @@ Ujistěte se prosím, že máte k souboru právo zápisu a zkuste to znovu.</tra
 <context>
     <name>pattern</name>
     <message>
+        <location filename="" line="0"/>
         <source>double-click to open this pattern in piano-roll
 use mouse wheel to set volume of a step</source>
         <translation type="obsolete">dvojitým kliknutím otevřete tento pattern v piano-roll
@@ -6130,46 +6509,57 @@ k nastavení zesílení kroku použijte kolečko myši</translation>
         <translation>Pattern nemůže být nyní zmrazen, neboť jste v režimu přehrávání. Zastavte přehrávání a zkuste to znovu!</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Open in piano-roll</source>
         <translation type="obsolete">Otevřít v piano-roll</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Clear all notes</source>
         <translation type="obsolete">Vyčistit všechny noty</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Reset name</source>
         <translation type="obsolete">Resetovat jméno</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Change name</source>
         <translation type="obsolete">Změnit jméno</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Refreeze</source>
         <translation type="obsolete">Znovu zmrazit</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Freeze</source>
         <translation type="obsolete">Zmrazit</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Unfreeze</source>
         <translation type="obsolete">Rozmrazit</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Add steps</source>
         <translation type="obsolete">Přidat kroky</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Remove steps</source>
         <translation type="obsolete">Odstranit kroky</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>1 step</source>
         <translation type="obsolete">1 krok</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>%1 steps</source>
         <translation type="obsolete">%1 kroky/ů</translation>
     </message>
@@ -6347,15 +6737,18 @@ k nastavení zesílení kroku použijte kolečko myši</translation>
         <translation>Zastavit přehrávání aktuálního patternu (mezerník)</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Click here, if you want to play the current pattern. This is useful while editing it. The pattern is automatically looped when its end is reached.</source>
         <translation type="obsolete">Klikněte zde, pokud chcete přehrát aktuální pattern. To je šikovné při editaci neboť pattern je automaticky přehrávám ve smyčce.</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Click here, if you want to record notes from a MIDI-device or the virtual test-piano of the according channel-window to the current pattern. When recording all notes you play will be written to this pattern and you can play and edit them afterwards.</source>
         <translation type="obsolete"><byte value="x9"/>
 Klikněte zde, chcete-li do aktuálního patternu nahrát noty z MIDI zařízení nebo virtuálního testovacího klavíru z odpovídajícího okna kanálu. Při nahrávání budou do patternu uloženy všechny zahrané noty, následně si je můžete přehrát a upravit.</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Click here, if you want to stop playing of current pattern.</source>
         <translation type="obsolete">Klikněte zde, pokud chcete zastavit přehrávání aktuálního patternu.</translation>
     </message>
@@ -6380,18 +6773,22 @@ Klikněte zde, chcete-li do aktuálního patternu nahrát noty z MIDI zařízen�
         <translation>Režim přesunu výběrů (Shift+M)</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>If you click here, draw-mode will be activated. In this mode you can add, resize and move single notes. This is the default-mode which is used most of the time. You can also press &apos;Shift+D&apos; on your keyboard to activate this mode.</source>
         <translation type="obsolete">Klikněte zde pokud chcete aktivovat režim kreslení. V tomto výchozím a nejčastěji užívaném režimu lze přidávat a přesunovat jednotlivé noty. Pro aktivaci můžete využít též klávesové zkratky &apos;Shift+D&apos;.</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>If you click here, erase-mode will be activated. In this mode you can erase single notes. You can also press &apos;Shift+E&apos; on your keyboard to activate this mode.</source>
         <translation type="obsolete">Klikněte zde pokud chcete aktivovat režim mazání. V tomto režimu lze mazat jednotlivé noty. Pro aktivaci můžete využít též klávesové zkratky &apos;Shift+E&apos;.</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>If you click here, select-mode will be activated. In this mode you can select notes. This is neccessary if you want to cut, copy, paste, delete or move notes. You can also press &apos;Shift+S&apos; on your keyboard to activate this mode.</source>
         <translation type="obsolete">Klikněte zde pokud chcete aktivovat režim výběru. Tento režimu umožňuje vybírat noty a je nezbytný jestliže noty chcete vyjmout, kopírovat, vložit, smazat nebo přesunout. Pro aktivaci můžete využít též klávesové zkratky &apos;Shift+S&apos;.</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>If you click here, move-mode will be activated. In this mode you can move the notes you selected in select-mode. You can also press &apos;Shift+M&apos; on your keyboard to activate this mode.</source>
         <translation type="obsolete">Klikněte zde pokud chcete aktivovat režim přesunu výběrů. V tomto režimu lze přesouvat noty, které byly označeny v režimu výběru. Pro aktivaci můžete využít též klávesové zkratky &apos;Shift+M&apos;.</translation>
     </message>
@@ -6411,14 +6808,17 @@ Klikněte zde, chcete-li do aktuálního patternu nahrát noty z MIDI zařízen�
         <translation>Vložit noty ze schránky (Ctrl+V)</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>If you click here, selected notes will be cut into the clipboard. You can paste them anywhere in any pattern by clicking on the paste-button.</source>
         <translation type="obsolete">Klikněte zde pokud chcete označené noty vyjmout do schránky. Vložit je pak můžete kdekoliv v libovolného patternu pomocí tlačítka Vložit.</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>If you click here, selected notes will be copied into the clipboard. You can paste them anywhere in any pattern by clicking on the paste-button.</source>
         <translation type="obsolete">Klikněte zde pokud chcete označené noty zkopírovat do schránky. Vložit je pak můžete kdekoliv v libovolného patternu pomocí tlačítka Vložit.</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>If you click here, the notes from the clipboard will be pasted at the first visible tact.</source>
         <translation type="obsolete">Kliknete-li zde, budou noty ze schránky vloženy do prvního viditelného taktu.</translation>
     </message>
@@ -6529,10 +6929,12 @@ Klikněte zde, chcete-li do aktuálního patternu nahrát noty z MIDI zařízen�
 <context>
     <name>pianoWidget</name>
     <message>
+        <location filename="" line="0"/>
         <source>Base note</source>
         <translation type="obsolete">Základní nota</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>&amp;Open in automation editor</source>
         <translation type="obsolete">&amp;Otevřít v automatizačním editoru</translation>
     </message>
@@ -6540,18 +6942,22 @@ Klikněte zde, chcete-li do aktuálního patternu nahrát noty z MIDI zařízen�
 <context>
     <name>pluckedStringSynth</name>
     <message>
+        <location filename="" line="0"/>
         <source>Pick position</source>
         <translation type="obsolete">Pozice drnknutí</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Pick position:</source>
         <translation type="obsolete">Pozice drnknutí:</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Pickup position</source>
         <translation type="obsolete">Pozice snímače</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Pickup position:</source>
         <translation type="obsolete">Pozice snímače:</translation>
     </message>
@@ -6594,10 +7000,12 @@ Důvod: &quot;%2&quot;</translation>
         <translation>Pluginy nástrojů</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Plugin browser</source>
         <translation type="obsolete">Prohlížeč pluginů</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>You can drag an instrument-plugin into either the Song-Editor, the Beat+Baseline Editor or just into a channel-window or on the corresponding channel-button.</source>
         <translation type="obsolete">Plugin nástroje můžete přetáhnout buď do Editoru skladby, Beat+Baseline Editoru nebo prostě do okna kanálů nebo na příslušné tlačítko kanálu.</translation>
     </message>
@@ -6612,6 +7020,7 @@ Důvod: &quot;%2&quot;</translation>
         <translation>Filtr pro import MIDI souborů do LMMS</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Incomplete polyphonic immitation tb303</source>
         <translation type="obsolete">Nekompletní polyfonní imitace tb303</translation>
     </message>
@@ -6621,6 +7030,7 @@ Důvod: &quot;%2&quot;</translation>
         <translation>tři výkonné oscilátory které můžete modulovat rozličnými způsoby</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Rough &amp; Dirty Wavetable Synthesizer.</source>
         <translation type="obsolete">Hrubý &amp; špinavý wavetable syntezátor.</translation>
     </message>
@@ -6650,6 +7060,7 @@ Důvod: &quot;%2&quot;</translation>
         <translation>mnohostranný kick &amp; bassdrum syntezátor</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Singer bot to add some basic vocals</source>
         <translation type="obsolete">Robotický zpěvák pro přidání základních vokálů</translation>
     </message>
@@ -6664,6 +7075,7 @@ Důvod: &quot;%2&quot;</translation>
         <translation>Seznam instalovaných LADSPA pluginů</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>cheap synthesis of guitar/harp-like sounds</source>
         <translation type="obsolete">laciný syntezátor zvuků ve stylu kytary/harfy</translation>
     </message>
@@ -6688,6 +7100,7 @@ Důvod: &quot;%2&quot;</translation>
         <translation>Filtr určený k import projektů z FL Studia do LMMS</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Tool for live performance</source>
         <translation type="obsolete">Nástroj pro živá vystoupení</translation>
     </message>
@@ -6746,54 +7159,67 @@ This chip was used in the Commodore 64 computer.</source>
 <context>
     <name>polyb302Synth</name>
     <message>
+        <location filename="" line="0"/>
         <source>VCF Cutoff Frequency</source>
         <translation type="obsolete">VCF frekvence vypnutí</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Cutoff Freq:</source>
         <translation type="obsolete">Frek. vypnutí:</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>VCF Resonance</source>
         <translation type="obsolete">VCF rezonance</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Resonance:</source>
         <translation type="obsolete">Rezonance:</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>VCO fine detuning</source>
         <translation type="obsolete">VCO jemné rozladění</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>VCO Fine Detuning:</source>
         <translation type="obsolete">VCO jemné rozladění:</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Distortion</source>
         <translation type="obsolete">Zkreslení</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Waveform</source>
         <translation type="obsolete">Vlna</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Sawtooth </source>
         <translation type="obsolete">Pilový zub</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Inverted Sawtooth </source>
         <translation type="obsolete">Převrácený pilový zub</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Triangle </source>
         <translation type="obsolete">Triangl</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Square </source>
         <translation type="obsolete">Pravoúhlý</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Rounded Square </source>
         <translation type="obsolete">Zaoblený pravoúhlý</translation>
     </message>
@@ -6949,12 +7375,12 @@ This chip was used in the Commodore 64 computer.</source>
 <context>
     <name>projectRenderer</name>
     <message>
-        <location filename="../../src/core/project_renderer.cpp" line="40"/>
+        <location filename="../../src/core/project_renderer.cpp" line="44"/>
         <source>WAV-File (*.wav)</source>
         <translation>WAV soubor (*.wav)</translation>
     </message>
     <message>
-        <location filename="../../src/core/project_renderer.cpp" line="43"/>
+        <location filename="../../src/core/project_renderer.cpp" line="47"/>
         <source>Compressed OGG-File (*.ogg)</source>
         <translation>Komprimovaný soubor OGG (*.ogg)</translation>
     </message>
@@ -6962,46 +7388,57 @@ This chip was used in the Commodore 64 computer.</source>
 <context>
     <name>rackPlugin</name>
     <message>
+        <location filename="" line="0"/>
         <source>Turn the effect off</source>
         <translation type="obsolete">Vypnout efekty</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>On/Off</source>
         <translation type="obsolete">Zap/Vyp</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Toggles the effect on or off.</source>
         <translation type="obsolete">Zapnout nebo vypnout efekty.</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>The Wet/Dry knob sets the ratio between the input signal and the effect that shows up in the output.</source>
         <translation type="obsolete">Tlačítko Wet/Dry nastavuje poměr mezi vstupním signálem a efektem slyšitelným ve výstupu.</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Time:</source>
         <translation type="obsolete">Čas:</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>The Decay knob controls how many buffers of silence must pass before the plugin stops processing.  Smaller values will reduce the CPU overhead but run the risk of clipping the tail on delay effects.</source>
         <translation type="obsolete">Tlačítko Decay určuje kolik bufferů ticha musí proběhnout než plugin zastaví zpracování. Nízké hodnoty redukují přehřátí CPU, ale přinášejí riziko ustřižení konce delay efektů.</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Gate</source>
         <translation type="obsolete">Brána</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Gate:</source>
         <translation type="obsolete">Brána:</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>The Gate knob controls the signal level that is considered to be &apos;silence&apos; while deciding when to stop processing signals.</source>
         <translation type="obsolete">Tlačítko Brána určuje sílu signálu který je považován za ticho při rozhodování kdy skončit se zpracováním signálů.</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Controls</source>
         <translation type="obsolete">Ovladače</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Effect plugins function as a chained series of effects where the signal will be processed from top to bottom.
 
 The On/Off switch allows you to bypass a given plugin at any point in time.
@@ -7030,18 +7467,22 @@ Tlačítko Ovladače otevře dialogové okno pro editaci efektových parametrů.
 Pravý klik zobrazí kontextové menu ve kterém můžete měnit pořadí zpracování efektů nebo efekty úplně odstraňovat.</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Move &amp;up</source>
         <translation type="obsolete">Posunout &amp;nahoru</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Move &amp;down</source>
         <translation type="obsolete">Posunout &amp;dolu</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>&amp;Remove this plugin</source>
         <translation type="obsolete">&amp;Odstranit tento plugin</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>&amp;Help</source>
         <translation type="obsolete">&amp;Nápověda</translation>
     </message>
@@ -7049,18 +7490,22 @@ Pravý klik zobrazí kontextové menu ve kterém můžete měnit pořadí zpraco
 <context>
     <name>remoteVSTPlugin</name>
     <message>
+        <location filename="" line="0"/>
         <source>Loading plugin</source>
         <translation type="obsolete">Načítám plugin</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Please wait while loading VST-plugin...</source>
         <translation type="obsolete">Prosím čekejte dokud se nenačte VST plugin...</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Failed loading VST-plugin</source>
         <translation type="obsolete">Chyba načítání VST pluginu</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>The VST-plugin %1 could not be loaded for some reason.
 If it runs with other VST-software under Linux, please contact an LMMS-developer!</source>
         <translation type="obsolete">VST plugin %1 nemohl být z určitých důvodů načten.
@@ -7070,7 +7515,7 @@ Jestliže tento plugin funguje v Linuxu v jiném VST softwaru, kontaktujte pros�
 <context>
     <name>renameDialog</name>
     <message>
-        <location filename="../../src/gui/widgets/rename_dialog.cpp" line="40"/>
+        <location filename="../../src/gui/widgets/rename_dialog.cpp" line="38"/>
         <source>Rename...</source>
         <translation>Přejmenovat...</translation>
     </message>
@@ -7078,66 +7523,67 @@ Jestliže tento plugin funguje v Linuxu v jiném VST softwaru, kontaktujte pros�
 <context>
     <name>sampleBuffer</name>
     <message>
-        <location filename="../../src/core/sample_buffer.cpp" line="726"/>
+        <location filename="../../src/core/sample_buffer.cpp" line="721"/>
         <source>Open audio file</source>
         <translation>Otevřít audio soubor</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>All Audio-Files (*.wav *.ogg *.ds *.flac *.spx *.voc *.aif *.aiff *.au *.raw)</source>
         <translation type="obsolete">Všechny audio soubory (*.wav *.ogg *.ds *.flac *.spx *.voc *.aif *.aiff *.au *.raw)</translation>
     </message>
     <message>
-        <location filename="../../src/core/sample_buffer.cpp" line="756"/>
+        <location filename="../../src/core/sample_buffer.cpp" line="751"/>
         <source>Wave-Files (*.wav)</source>
         <translation>Wav soubory (*.wav)</translation>
     </message>
     <message>
-        <location filename="../../src/core/sample_buffer.cpp" line="757"/>
+        <location filename="../../src/core/sample_buffer.cpp" line="752"/>
         <source>OGG-Files (*.ogg)</source>
         <translation>OGG soubory (*.ogg)</translation>
     </message>
     <message>
-        <location filename="../../src/core/sample_buffer.cpp" line="758"/>
+        <location filename="../../src/core/sample_buffer.cpp" line="753"/>
         <source>DrumSynth-Files (*.ds)</source>
         <translation>DrumSynth soubory (*.ds)</translation>
     </message>
     <message>
-        <location filename="../../src/core/sample_buffer.cpp" line="759"/>
+        <location filename="../../src/core/sample_buffer.cpp" line="754"/>
         <source>FLAC-Files (*.flac)</source>
         <translation>FLAC soubory (*.flac)</translation>
     </message>
     <message>
-        <location filename="../../src/core/sample_buffer.cpp" line="760"/>
+        <location filename="../../src/core/sample_buffer.cpp" line="755"/>
         <source>SPEEX-Files (*.spx)</source>
         <translation>SPEEX soubory (*.spx)</translation>
     </message>
     <message>
-        <location filename="../../src/core/sample_buffer.cpp" line="763"/>
+        <location filename="../../src/core/sample_buffer.cpp" line="758"/>
         <source>VOC-Files (*.voc)</source>
         <translation>VOC soubory (*.voc)</translation>
     </message>
     <message>
-        <location filename="../../src/core/sample_buffer.cpp" line="764"/>
+        <location filename="../../src/core/sample_buffer.cpp" line="759"/>
         <source>AIFF-Files (*.aif *.aiff)</source>
         <translation>AIFF soubory (*.aif *.aiff)</translation>
     </message>
     <message>
-        <location filename="../../src/core/sample_buffer.cpp" line="765"/>
+        <location filename="../../src/core/sample_buffer.cpp" line="760"/>
         <source>AU-Files (*.au)</source>
         <translation>AU soubory (*.au)</translation>
     </message>
     <message>
-        <location filename="../../src/core/sample_buffer.cpp" line="767"/>
+        <location filename="../../src/core/sample_buffer.cpp" line="762"/>
         <source>RAW-Files (*.raw)</source>
         <translation>RAW soubory (*.raw)</translation>
     </message>
     <message>
-        <location filename="../../src/core/sample_buffer.cpp" line="755"/>
+        <location filename="../../src/core/sample_buffer.cpp" line="750"/>
         <source>All Audio-Files (*.wav *.ogg *.ds *.flac *.spx *.voc *.aif *.aiff *.au *.raw *.mp3)</source>
         <translation>Všechny audio soubory (*.wav *.ogg *.ds *.flac *.spx *.voc *.aif *.aiff *.au *.raw *.mp3)</translation>
     </message>
     <message>
-        <location filename="../../src/core/sample_buffer.cpp" line="762"/>
+        <location filename="../../src/core/sample_buffer.cpp" line="757"/>
         <source>MP3-Files (*.mp3)</source>
         <translation>MP3 soubory (*.mp3)</translation>
     </message>
@@ -7145,6 +7591,7 @@ Jestliže tento plugin funguje v Linuxu v jiném VST softwaru, kontaktujte pros�
 <context>
     <name>sampleTCO</name>
     <message>
+        <location filename="" line="0"/>
         <source>double-click to select sample</source>
         <translation type="obsolete">dvojitým kliknutím vyberte sampl</translation>
     </message>
@@ -7195,14 +7642,17 @@ Jestliže tento plugin funguje v Linuxu v jiném VST softwaru, kontaktujte pros�
         <translation>Stopa samplů</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Channel volume</source>
         <translation type="obsolete">Hlasitost kanálu</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Channel volume:</source>
         <translation type="obsolete">Hlasitost kanálu:</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>With this knob you can set the volume of the opened channel.</source>
         <translation type="obsolete">Tímto ovladačem můžete nastavit hlasitost otevřeného kanálu.</translation>
     </message>
@@ -7263,14 +7713,17 @@ Jestliže tento plugin funguje v Linuxu v jiném VST softwaru, kontaktujte pros�
         <translation>Aktivovat nástrojové tipy</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Classical knob usability (move cursor around knob to change value)</source>
         <translation type="obsolete">Klasické použití ovladače (pohyb kurzoru kolem ovladače mění hodnotu)</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Multiple Document Interface</source>
         <translation type="obsolete">Prostředí MDI</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Show wizard after up-/downgrade</source>
         <translation type="obsolete">Zobrazit průvodce nastavením při up-/downgradu</translation>
     </message>
@@ -7290,6 +7743,7 @@ Jestliže tento plugin funguje v Linuxu v jiném VST softwaru, kontaktujte pros�
         <translation>Komprimovat soubory s projekty</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Directories</source>
         <translation type="obsolete">Adresáře</translation>
     </message>
@@ -7314,6 +7768,7 @@ Jestliže tento plugin funguje v Linuxu v jiném VST softwaru, kontaktujte pros�
         <translation>Instalační adresář FL Studia</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>LADSPA plugin directories</source>
         <translation type="obsolete">Adresář pro LADSPA pluginy</translation>
     </message>
@@ -7343,14 +7798,17 @@ Jestliže tento plugin funguje v Linuxu v jiném VST softwaru, kontaktujte pros�
         <translation>Knoflíky v kanálu piána tisknout pouze manuálně</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>SMP support</source>
         <translation type="obsolete">SMP podpora</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Parallelizing level</source>
         <translation type="obsolete">Úroveň paralelizace</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>If you have a machine with more then one processor (e.g. dual-core systems) you should use a parallelizing-level above 1 which means that LMMS will try to split up sound-processing into several threads which should should be run on several cores by the underlaying operating-system.
 Please note that in some cases parallelizing won&apos;t work with small buffer-sizes. If you experience problems (i.e. lot of xruns), try to increase buffer-size.</source>
         <translation type="obsolete">Jestliže máte počítač s více než jedním procesorem (např. dvoujádrový systém) můžete použít úroveň paralelizace více než 1 což znamená, že LMMS zkusí rozdělit zpracování zvuku do různých vláken které mohou být spuštěný v různých jádrech prostřednictvím vrstvy operačního systému.
@@ -7487,38 +7945,47 @@ Zpoždění %2 ms</translation>
 <context>
     <name>setupWidget</name>
     <message>
+        <location filename="" line="0"/>
         <source>ALSA (Advanced Linux Sound Architecture)</source>
         <translation type="obsolete">ALSA (Advanced Linux Sound Architecture)</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Dummy (no sound output)</source>
         <translation type="obsolete">Dummy (žádný zvukový výstup)</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>JACK (JACK Audio Connection Kit)</source>
         <translation type="obsolete">JACK (JACK Audio Connection Kit)</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>OSS (Open Sound System)</source>
         <translation type="obsolete">OSS (Open Sound System)</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>SDL (Simple DirectMedia Layer)</source>
         <translation type="obsolete">SDL (Simple DirectMedia Layer)</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>ALSA Raw-MIDI (Advanced Linux Sound Architecture)</source>
         <translation type="obsolete">ALSA Raw-MIDI (Advanced Linux Sound Architecture)</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>OSS Raw-MIDI (Open Sound System)</source>
         <translation type="obsolete">OSS Raw-MIDI (Open Sound System)</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Dummy (no MIDI support)</source>
         <translation type="obsolete">Dummy (žádná podpora MIDI)</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>ALSA-Sequencer (Advanced Linux Sound Architecture)</source>
         <translation type="obsolete">ALSA-Sekvencer (Advanced Linux Sound Architecture)</translation>
     </message>
@@ -7594,92 +8061,92 @@ Zpoždění %2 ms</translation>
 <context>
     <name>sf2InstrumentView</name>
     <message>
-        <location filename="../../plugins/sf2_player/sf2_player.cpp" line="761"/>
+        <location filename="../../plugins/sf2_player/sf2_player.cpp" line="760"/>
         <source>Gain</source>
         <translation>Zisk</translation>
     </message>
     <message>
-        <location filename="../../plugins/sf2_player/sf2_player.cpp" line="709"/>
+        <location filename="../../plugins/sf2_player/sf2_player.cpp" line="708"/>
         <source>Open other SoundFont file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../plugins/sf2_player/sf2_player.cpp" line="712"/>
+        <location filename="../../plugins/sf2_player/sf2_player.cpp" line="711"/>
         <source>Click here to open another SF2 file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../plugins/sf2_player/sf2_player.cpp" line="726"/>
+        <location filename="../../plugins/sf2_player/sf2_player.cpp" line="725"/>
         <source>Choose the patch</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../plugins/sf2_player/sf2_player.cpp" line="776"/>
+        <location filename="../../plugins/sf2_player/sf2_player.cpp" line="775"/>
         <source>Apply reverb (if supported)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../plugins/sf2_player/sf2_player.cpp" line="780"/>
+        <location filename="../../plugins/sf2_player/sf2_player.cpp" line="779"/>
         <source>This button enables the reverb effect. This is useful for cool effects, but only works on files that support it.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../plugins/sf2_player/sf2_player.cpp" line="784"/>
+        <location filename="../../plugins/sf2_player/sf2_player.cpp" line="783"/>
         <source>Reverb Roomsize:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../plugins/sf2_player/sf2_player.cpp" line="788"/>
+        <location filename="../../plugins/sf2_player/sf2_player.cpp" line="787"/>
         <source>Reverb Damping:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../plugins/sf2_player/sf2_player.cpp" line="792"/>
+        <location filename="../../plugins/sf2_player/sf2_player.cpp" line="791"/>
         <source>Reverb Width:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../plugins/sf2_player/sf2_player.cpp" line="796"/>
+        <location filename="../../plugins/sf2_player/sf2_player.cpp" line="795"/>
         <source>Reverb Level:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../plugins/sf2_player/sf2_player.cpp" line="818"/>
+        <location filename="../../plugins/sf2_player/sf2_player.cpp" line="817"/>
         <source>Apply chorus (if supported)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../plugins/sf2_player/sf2_player.cpp" line="822"/>
+        <location filename="../../plugins/sf2_player/sf2_player.cpp" line="821"/>
         <source>This button enables the chorus effect. This is useful for cool echo effects, but only works on files that support it.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../plugins/sf2_player/sf2_player.cpp" line="825"/>
+        <location filename="../../plugins/sf2_player/sf2_player.cpp" line="824"/>
         <source>Chorus Lines:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../plugins/sf2_player/sf2_player.cpp" line="829"/>
+        <location filename="../../plugins/sf2_player/sf2_player.cpp" line="828"/>
         <source>Chorus Level:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../plugins/sf2_player/sf2_player.cpp" line="833"/>
+        <location filename="../../plugins/sf2_player/sf2_player.cpp" line="832"/>
         <source>Chorus Speed:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../plugins/sf2_player/sf2_player.cpp" line="837"/>
+        <location filename="../../plugins/sf2_player/sf2_player.cpp" line="836"/>
         <source>Chorus Depth:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../plugins/sf2_player/sf2_player.cpp" line="952"/>
+        <location filename="../../plugins/sf2_player/sf2_player.cpp" line="951"/>
         <source>Open SoundFont file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../plugins/sf2_player/sf2_player.cpp" line="956"/>
+        <location filename="../../plugins/sf2_player/sf2_player.cpp" line="955"/>
         <source>SoundFont2 Files (*.sf2)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7976,6 +8443,7 @@ Zpoždění %2 ms</translation>
         <translation>tempo skladby</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>The tempo of a song is specified in beats per minute (BPM). If you want to change the tempo of your song, change this value. Every tact has four beats, so the tempo in BPM specifies, how many tacts / 4 should be played within a minute (or how many tacts should be played within four minutes).</source>
         <translation type="obsolete">Tempo skladby je uvedeno v úderech za minutu (BPS). Chcete-li změnit tempo skladby, změňte tuto hodnotu. Každý takt má čtyři údery, takže tempo v BPS specifikuje kolik taktů / 4 bude za minutu přehráno (nebo kolik taktů bude přehráno ve čtyřech minutách).</translation>
     </message>
@@ -7985,6 +8453,7 @@ Zpoždění %2 ms</translation>
         <translation>Režim vysoké kvality</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Auto limiter</source>
         <translation type="obsolete">Auto limiter</translation>
     </message>
@@ -8059,38 +8528,47 @@ Zpoždění %2 ms</translation>
         <translation>Hodnota: %1 půltónů</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Project saved</source>
         <translation type="obsolete">Projekt uložen</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>The project %1 is now saved.</source>
         <translation type="obsolete">Projekt %1 je nyní uložen.</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Project NOT saved.</source>
         <translation type="obsolete">Projekt NENÍ uložen.</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>The project %1 was not saved!</source>
         <translation type="obsolete">Projekt %1 nebyl uložen!</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Import file</source>
         <translation type="obsolete">Importovat soubor</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>untitled</source>
         <translation type="obsolete">nepojmenovaný</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Select file for project-export...</source>
         <translation type="obsolete">Zvolte soubor pro export projektu...</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>File already exists</source>
         <translation type="obsolete">Soubor již existuje</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>The file &quot;%1&quot; already exists. Do you want to overwrite it?</source>
         <translation type="obsolete">Soubor &quot;%1&quot; již existuje. Chcete jej přepsat?</translation>
     </message>
@@ -8112,10 +8590,12 @@ Přesvědčte se prosím, že máte alespoň právo ke čtení tohoto souboru a 
         <translation>Chyba v multimediálním projektu</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>The multimedia-project %1 seems to contain errors. LMMS will try its best to recover as much as possible data from this file.</source>
         <translation type="obsolete">Zdá se, že multimediální projekt %1 obsahuje chyby. LMMS se pokusí udělat to nejlepší možné k obnovení dat z tohoto souboru.</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>The file %1 already exists.
 Do you want to overwrite it?</source>
         <translation type="obsolete">Soubor %1 již existuje. 
@@ -8193,6 +8673,7 @@ Přesvědčte se prosím, že máte právo zápisu do tohoto souboru a zkuste to
 <context>
     <name>stereoEnhancerControlDialog</name>
     <message>
+        <location filename="" line="0"/>
         <source>Width</source>
         <translation type="obsolete">Šířka</translation>
     </message>
@@ -8264,22 +8745,27 @@ Přesvědčte se prosím, že máte právo zápisu do tohoto souboru a zkuste to
 <context>
     <name>surroundArea</name>
     <message>
+        <location filename="" line="0"/>
         <source>Surround area X</source>
         <translation type="obsolete">Surround oblast X</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Surround area Y</source>
         <translation type="obsolete">Surround oblast Y</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>click to where this channel should be audible</source>
         <translation type="obsolete">klikněte kde má být tento kanál slyšitelný</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Open &amp;X in automation editor</source>
         <translation type="obsolete">Otevřít &amp;X v automatizačním editoru</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Open &amp;Y in automation editor</source>
         <translation type="obsolete">Otevřít &amp;Y v automatizačním editoru</translation>
     </message>
@@ -8287,6 +8773,7 @@ Přesvědčte se prosím, že máte právo zápisu do tohoto souboru a zkuste to
 <context>
     <name>tabWidget</name>
     <message>
+        <location filename="" line="0"/>
         <source>Settings for %1</source>
         <translation type="obsolete">Nastavení pro %1</translation>
     </message>
@@ -8299,14 +8786,17 @@ Přesvědčte se prosím, že máte právo zápisu do tohoto souboru a zkuste to
         <translation>Synchronizace tempa</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>&amp;Reset (%1%2)</source>
         <translation type="obsolete">&amp;Resetovat (%1%2)</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>&amp;Copy value (%1%2)</source>
         <translation type="obsolete">&amp;Kopírovat hodnoty (%1%2)</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>&amp;Paste value (%1%2)</source>
         <translation type="obsolete">&amp;Vložit hodnoty (%1%2)</translation>
     </message>
@@ -8356,10 +8846,12 @@ Přesvědčte se prosím, že máte právo zápisu do tohoto souboru a zkuste to
         <translation>Vlastní...</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>&amp;Open in automation editor</source>
         <translation type="obsolete">&amp;Otevřít v automatizačním editoru</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Connect to MIDI-device</source>
         <translation type="obsolete">Napojit na MIDI zařízení</translation>
     </message>
@@ -8515,46 +9007,57 @@ Přesvědčte se prosím, že máte právo ke čtení tohoto souboru a příslu�
 <context>
     <name>trackContentObject</name>
     <message>
+        <location filename="" line="0"/>
         <source>Current position</source>
         <translation type="obsolete">Aktuální pozice</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Hint</source>
         <translation type="obsolete">Rada</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Press &lt;Ctrl&gt; for free positioning.</source>
         <translation type="obsolete">Stiskněte &lt;Ctrl&gt; pro volné pozicování.</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Current length</source>
         <translation type="obsolete">Aktuální délka</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Press &lt;Ctrl&gt; for free resizing.</source>
         <translation type="obsolete">Stiskněte &lt;Ctrl&gt; pro volné měnění velikosti.</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>%1:%2 (%3:%4 to %5:%6)</source>
         <translation type="obsolete">%1:%2 (%3:%4 to %5:%6)</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Delete (middle mousebutton)</source>
         <translation type="obsolete">Smazat (prostřední tlačítko myši)</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Cut</source>
         <translation type="obsolete">Vyjmout</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Copy</source>
         <translation type="obsolete">Kopírovat</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Paste</source>
         <translation type="obsolete">Vložit</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Mute/unmute (&lt;Ctrl&gt; + middle click)</source>
         <translation type="obsolete">Ztlumit/neztlumit (&lt;Ctrl&gt; + prostřední klik)</translation>
     </message>
@@ -8625,10 +9128,12 @@ Přesvědčte se prosím, že máte právo ke čtení tohoto souboru a příslu�
 <context>
     <name>trackLabelButton</name>
     <message>
+        <location filename="" line="0"/>
         <source>Select icon</source>
         <translation type="obsolete">Vyberte ikonu</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>All images (*.png *.jpg *.jpeg *.gif *.bmp)</source>
         <translation type="obsolete">Všechny obrázky (*.png *.jpg *.jpeg *.gif *.bmp)</translation>
     </message>
@@ -8674,30 +9179,37 @@ Přesvědčte se prosím, že máte právo ke čtení tohoto souboru a příslu�
 <context>
     <name>tripleOscillator</name>
     <message>
+        <location filename="" line="0"/>
         <source>Click here if you want a sine-wave for current oscillator.</source>
         <translation type="obsolete">Klikněte zde, pokud chcete v aktuální oscilaci sinusovou vlnu.</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Click here if you want a triangle-wave for current oscillator.</source>
         <translation type="obsolete">Klikněte zde, pokud chcete v aktuální oscilaci trianglovou vlnu.</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Click here if you want a saw-wave for current oscillator.</source>
         <translation type="obsolete">Klikněte zde, pokud chcete v aktuální oscilaci pilovitou vlnu.</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Click here if you want a square-wave for current oscillator.</source>
         <translation type="obsolete">Klikněte zde, pokud chcete v aktuální oscilaci pravoúhlou vlnu.</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Click here if you want a white-noise for current oscillator.</source>
         <translation type="obsolete">Klikněte zde, pokud chcete v aktuální oscilaci bílý šum.</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Click here if you want a user-defined wave-shape for current oscillator.</source>
         <translation type="obsolete">Klikněte zde, pokud chcete užít v aktuální oscilaci vlnu definovanou uživatelem.</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Osc %1 wave shape</source>
         <translation type="obsolete">Osc %1 forma vlny</translation>
     </message>
@@ -8720,26 +9232,32 @@ Přesvědčte se prosím, že máte právo ke čtení tohoto souboru a příslu�
         <translation type="unfinished">Osc %1 jemné rozladění vlevo:</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Click here if you want a sine-wave for current oscillator.</source>
         <translation type="obsolete">Klikněte zde, pokud chcete v aktuální oscilaci sinusovou vlnu.</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Click here if you want a triangle-wave for current oscillator.</source>
         <translation type="obsolete">Klikněte zde, pokud chcete v aktuální oscilaci trianglovou vlnu.</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Click here if you want a saw-wave for current oscillator.</source>
         <translation type="obsolete">Klikněte zde, pokud chcete v aktuální oscilaci pilovitou vlnu.</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Click here if you want a square-wave for current oscillator.</source>
         <translation type="obsolete">Klikněte zde, pokud chcete v aktuální oscilaci pravoúhlou vlnu.</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Click here if you want a white-noise for current oscillator.</source>
         <translation type="obsolete">Klikněte zde, pokud chcete v aktuální oscilaci bílý šum.</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Click here if you want a user-defined wave-shape for current oscillator.</source>
         <translation type="obsolete">Klikněte zde, pokud chcete užít v aktuální oscilaci vlnu definovanou uživatelem.</translation>
     </message>
@@ -8907,18 +9425,22 @@ Přesvědčte se prosím, že máte právo ke čtení tohoto souboru a příslu�
 <context>
     <name>vestigeInstrument</name>
     <message>
+        <location filename="" line="0"/>
         <source>Open other VST-plugin</source>
         <translation type="obsolete">Otevřít ostatní VST pluginy</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Click here, if you want to open another VST-plugin. After clicking on this button, a file-open-dialog appears and you can select your file.</source>
         <translation type="obsolete">Klikněte zde, pokud chcete otevřít ostatní VST pluginy. Po kliknutí na toto tlačítko se objeví okno ve kterém můžete soubor vybrat.</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Show/hide VST-GUI</source>
         <translation type="obsolete">Ukaž/schovej VST-GUI</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Click here to show or hide the graphical user interface (GUI) of your VST-plugin.</source>
         <translation type="obsolete">Klikněte zde pro zobrazení nebo skrytí grafického rozhraní (GUI) pro vaše VST pluginy.</translation>
     </message>
@@ -8945,18 +9467,22 @@ If it runs with other VST-software under Linux, please contact an LMMS-developer
 Jestliže tento plugin funguje v Linuxu v jiném VST softwaru, kontaktujte prosím LMMS vývojáře!</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Open VST-plugin</source>
         <translation type="obsolete">Otevřít VST plugin</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>DLL-files (*.dll)</source>
         <translation type="obsolete">DLL soubory (*.dll)</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>EXE-files (*.exe)</source>
         <translation type="obsolete">EXE soubory (*.exe)</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>No VST-plugin loaded</source>
         <translation type="obsolete">Žádný VST plugin nebyl načten</translation>
     </message>
@@ -8974,6 +9500,7 @@ Jestliže tento plugin funguje v Linuxu v jiném VST softwaru, kontaktujte pros�
         <translation type="unfinished">Klikněte zde, pokud chcete otevřít ostatní VST pluginy. Po kliknutí na toto tlačítko se objeví okno ve kterém můžete soubor vybrat.</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Show/hide VST-GUI</source>
         <translation type="obsolete">Ukaž/schovej VST-GUI</translation>
     </message>
@@ -9021,86 +9548,107 @@ Jestliže tento plugin funguje v Linuxu v jiném VST softwaru, kontaktujte pros�
 <context>
     <name>vibed</name>
     <message>
+        <location filename="" line="0"/>
         <source>Volume</source>
         <translation type="obsolete">Hlasitost</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Volume:</source>
         <translation type="obsolete">Hlasitost:</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>The &apos;V&apos; knob sets the volume of the selected string.</source>
         <translation type="obsolete">Ovladač &apos;V&apos; nastavuje hlasitost vybrané struny.</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Pick position</source>
         <translation type="obsolete">Pozice drnknutí</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Pick position:</source>
         <translation type="obsolete">Pozice drnknutí:</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>The &apos;P&apos; knob sets the position where the selected string will be &apos;picked&apos;.  The lower the setting the closer the pick is to the bridge.</source>
         <translation type="obsolete">Ovladač &apos;P&apos; nastavuje pozici na které bude na vybranou strunu drnknuto. Nižší nastavení znamená úhoz blíže ke kobylce.</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Pickup position</source>
         <translation type="obsolete">Pozice snímače</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Pickup position:</source>
         <translation type="obsolete">Pozice snímače:</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>The &apos;PU&apos; knob sets the position where the vibrations will be monitored for the selected string.  The lower the setting, the closer the pickup is to the bridge.</source>
         <translation type="obsolete">Ovladač &apos;PU&apos; nastavuje pozici snímače pro vybranou strunu. Nižší nastavení znamená snímač blíže u kobylky.</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Pan:</source>
         <translation type="obsolete">Pan:</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>The Pan knob determines the location of the selected string in the stereo field.</source>
         <translation type="obsolete">Pan ovladač určuje pozici vybrané struny ve stereo prostoru. </translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Detune</source>
         <translation type="obsolete">Rozladit</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Detune:</source>
         <translation type="obsolete">Rozladit:</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>The Detune knob modifies the pitch of the selected string.  Settings less than zero will cause the string to sound flat.  Settings greater than zero will cause the string to sound sharp.</source>
         <translation type="obsolete">Ovladač Rozladění mění ladění vybrané struny. Hodnoty nižší než nula způsobí plochý zvuk, hodnoty vyšší než nula způsobí ostřejší zvuk.</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Length</source>
         <translation type="obsolete">Délka</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Length:</source>
         <translation type="obsolete">Délka:</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>The Length knob sets the length of the selected string.  Longer strings will both ring longer and sound brighter, however, they will also eat up more CPU cycles.</source>
         <translation type="obsolete">Ovladač Délka nastavuje délku vybrané struny. Delší struny budou znít déle a jasněji, také však spořádají více CPU cyklů.</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Octave</source>
         <translation type="obsolete">Oktáva</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>String</source>
         <translation type="obsolete">Struna</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>The String selector is used to choose which string the controls are editting.  A Vibed instrument can contain up to nine independently vibrating strings.  The LED in the lower right corner of the waveform editor indicates whether the selected string is active.</source>
         <translation type="obsolete">Volič strun se užívá k výběru struny, které bude upravována. Nástroj Vibed může obsahovat maximálně devět nezávisle vibrujících strun. LED v pravém dolním rohu editoru tvaru vlny indikuje zda je vybraná struna aktivní.</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>&amp;Help</source>
         <translation type="obsolete">&amp;Nápověda</translation>
     </message>
@@ -9248,6 +9796,7 @@ Jestliže tento plugin funguje v Linuxu v jiném VST softwaru, kontaktujte pros�
         <translation type="unfinished">Sinusová vlna</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Click here if you want a sine-wave for current oscillator.</source>
         <translation type="obsolete">Klikněte zde, pokud chcete v aktuální oscilaci sinusovou vlnu.</translation>
     </message>
@@ -9257,6 +9806,7 @@ Jestliže tento plugin funguje v Linuxu v jiném VST softwaru, kontaktujte pros�
         <translation type="unfinished">Trianglová vlna</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Click here if you want a triangle-wave for current oscillator.</source>
         <translation type="obsolete">Klikněte zde, pokud chcete v aktuální oscilaci trianglovou vlnu.</translation>
     </message>
@@ -9266,6 +9816,7 @@ Jestliže tento plugin funguje v Linuxu v jiném VST softwaru, kontaktujte pros�
         <translation type="unfinished">Pilovitá vlna</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Click here if you want a saw-wave for current oscillator.</source>
         <translation type="obsolete">Klikněte zde, pokud chcete v aktuální oscilaci pilovitou vlnu.</translation>
     </message>
@@ -9275,6 +9826,7 @@ Jestliže tento plugin funguje v Linuxu v jiném VST softwaru, kontaktujte pros�
         <translation type="unfinished">Pravoúhlá (square) vlna</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Click here if you want a square-wave for current oscillator.</source>
         <translation type="obsolete">Klikněte zde, pokud chcete v aktuální oscilaci pravoúhlou vlnu.</translation>
     </message>
@@ -9284,6 +9836,7 @@ Jestliže tento plugin funguje v Linuxu v jiném VST softwaru, kontaktujte pros�
         <translation type="unfinished">Bílý šum</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Click here if you want a white-noise for current oscillator.</source>
         <translation type="obsolete">Klikněte zde, pokud chcete v aktuální oscilaci bílý šum.</translation>
     </message>
@@ -9293,6 +9846,7 @@ Jestliže tento plugin funguje v Linuxu v jiném VST softwaru, kontaktujte pros�
         <translation type="unfinished">Vlna definovaná uživatelem</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Click here if you want a user-defined wave-shape for current oscillator.</source>
         <translation type="obsolete">Klikněte zde, pokud chcete užít v aktuální oscilaci vlnu definovanou uživatelem.</translation>
     </message>
@@ -9487,10 +10041,12 @@ The LED in the lower right corner of the waveform editor determines whether the 
 <context>
     <name>volumeKnob</name>
     <message>
+        <location filename="" line="0"/>
         <source>Please enter a new value between -96.0 dBV and 6.0 dBV:</source>
         <translation type="obsolete">Vložte prosím novou hodnotu mezi -96.0 dBV a 6.0 dBV:</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Please enter a new value between %1 and %2:</source>
         <translation type="obsolete">Vložte prosím novou hodnotu mezi %1 a %2:</translation>
     </message>
