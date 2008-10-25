@@ -429,7 +429,6 @@ private:
 	QVector<surroundSampleFrame *> m_bufferPool;
 	int m_readBuffer;
 	int m_writeBuffer;
-	int m_analBuffer;
 	int m_poolDepth;
 
 	surroundSampleFrame m_maxClip;
@@ -439,7 +438,6 @@ private:
 	bool m_newBuffer[SURROUND_CHANNELS];
 	
 	int m_cpuLoad;
-	bool m_multiThreaded;
 	QVector<mixerWorkerThread *> m_workers;
 	int m_numWorkers;
 	QSemaphore m_queueReadySem;

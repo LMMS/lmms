@@ -32,6 +32,10 @@
 #include "audio_file_wave.h"
 #include "audio_file_ogg.h"
 
+#ifdef LMMS_HAVE_SCHED_H
+#include <sched.h>
+#endif
+
 
 fileEncodeDevice __fileEncodeDevices[] =
 {
@@ -140,21 +144,32 @@ void projectRenderer::startProcessing( void )
 
 
 
-
 void projectRenderer::run( void )
 {
+#if 0
+#ifdef LMMS_BUILD_LINUX
+#ifdef LMMS_HAVE_SCHED_H
+	cpu_set_t mask;
+	CPU_ZERO( &mask );
+	CPU_SET( 0, &mask );
+	sched_setaffinity( 0, sizeof( mask ), &mask );
+#endif
+#endif
+#endif
+
 	engine::getSong()->startExport();
 
 	song::playPos & pp = engine::getSong()->getPlayPos(
 							song::Mode_PlaySong );
 	m_progress = 0;
+	const int sl = ( engine::getSong()->length() + 1 ) * 192;
+
 	while( engine::getSong()->isExportDone() == FALSE &&
 				engine::getSong()->isExporting() == TRUE
 							&& !m_abort )
 	{
 		m_fileDev->processNextBuffer();
-		const int nprog = pp * 100 /
-				( ( engine::getSong()->length() + 1 ) * 192 );
+		const int nprog = pp * 100 / sl;
 		if( m_progress != nprog )
 		{
 			m_progress = nprog;

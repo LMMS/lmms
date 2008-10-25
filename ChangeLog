@@ -1,5 +1,15 @@
 2008-10-25	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* include/mixer.h:
+	* src/core/mixer.cpp:
+	* src/core/project_renderer.cpp:
+	- initial (not yet enabled) support for binding mixer threads to CPUs to
+	  reduce scheduling overhead and cache misses (gives avg. 10% performance
+	  boost)
+	- merged mixer-thread with first worker-thread - no more duplicate
+	  code for single- and multicore processing and better scheduling
+	  on multicore systems
+
 	* include/automatable_model.h:
 	* src/core/automatable_model.cpp:
 	* src/core/audio/audio_alsa.cpp:
