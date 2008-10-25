@@ -29,6 +29,7 @@
 
 #include "automation_track.h"
 #include "automation_pattern.h"
+#include "engine.h"
 #include "embed.h"
 #include "project_journal.h"
 #include "string_pair_drag.h"

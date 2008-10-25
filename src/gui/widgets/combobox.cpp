@@ -37,6 +37,7 @@
 
 #include "automation_pattern.h"
 #include "caption_menu.h"
+#include "engine.h"
 #include "embed.h"
 #include "gui_templates.h"
 #include "main_window.h"

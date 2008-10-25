@@ -50,6 +50,7 @@
 #include "automation_pattern.h"
 #include "caption_menu.h"
 #include "embed.h"
+#include "engine.h"
 #include "gui_templates.h"
 #include "instrument_track.h"
 #include "knob.h"

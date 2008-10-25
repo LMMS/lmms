@@ -32,6 +32,7 @@
 
 #include "debug.h"
 #include "engine.h"
+#include "mixer.h"
 #include "mmp.h"
 #include "oscillator.h"
 

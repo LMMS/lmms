@@ -43,6 +43,7 @@
 
 #include "caption_menu.h"
 #include "config_mgr.h"
+#include "controller_connection.h"
 #include "embed.h"
 #include "engine.h"
 #include "gui_templates.h"

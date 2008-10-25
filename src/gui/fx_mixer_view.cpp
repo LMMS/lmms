@@ -36,6 +36,7 @@
 #include "fx_mixer_view.h"
 #include "fader.h"
 #include "effect_rack_view.h"
+#include "engine.h"
 #include "embed.h"
 #include "main_window.h"
 #include "lcd_spinbox.h"

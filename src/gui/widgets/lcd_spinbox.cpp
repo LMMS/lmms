@@ -36,6 +36,7 @@
 
 #include "lcd_spinbox.h"
 #include "caption_menu.h"
+#include "engine.h"
 #include "embed.h"
 #include "gui_templates.h"
 #include "templates.h"

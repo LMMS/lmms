@@ -51,6 +51,7 @@
 
 #include "fader.h"
 #include "embed.h"
+#include "engine.h"
 #include "caption_menu.h"
 #include "main_window.h"
 

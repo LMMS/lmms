@@ -36,6 +36,7 @@
 
 #include "endian_handling.h"
 #include "lcd_spinbox.h"
+#include "engine.h"
 #include "gui_templates.h"
 #include "templates.h"
 

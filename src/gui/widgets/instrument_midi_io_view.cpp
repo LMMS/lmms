@@ -29,11 +29,13 @@
 
 #include "instrument_midi_io_view.h"
 #include "midi_port_menu.h"
+#include "engine.h"
 #include "embed.h"
 #include "group_box.h"
 #include "gui_templates.h"
 #include "lcd_spinbox.h"
 #include "midi_client.h"
+#include "mixer.h"
 #include "tooltip.h"
 
 

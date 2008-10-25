@@ -34,6 +34,7 @@
 #include "engine.h"
 #include "mixer.h"
 #include "controller.h"
+#include "controller_connection.h"
 #include "controller_dialog.h"
 #include "lfo_controller.h"
 #include "midi_controller.h"

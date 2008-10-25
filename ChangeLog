@@ -1,5 +1,26 @@
 2008-10-25	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* include/automatable_model.h:
+	* src/core/automatable_model.cpp:
+	* src/core/audio/audio_alsa.cpp:
+	* src/core/audio/audio_oss.cpp:
+	* src/core/audio/audio_jack.cpp:
+	* src/core/envelope_and_lfo_parameters.cpp:
+	* src/core/piano.cpp:
+	* src/core/controller.cpp:
+	* src/gui/fx_mixer_view.cpp:
+	* src/gui/widgets/combobox.cpp:
+	* src/gui/widgets/envelope_and_lfo_view.cpp:
+	* src/gui/widgets/knob.cpp:
+	* src/gui/widgets/instrument_midi_io_view.cpp:
+	* src/gui/widgets/automatable_slider.cpp:
+	* src/gui/widgets/lcd_spinbox.cpp:
+	* src/gui/widgets/fader.cpp:
+	* src/gui/widgets/automatable_button.cpp:
+	* src/tracks/automation_track.cpp:
+	do not inline code for fetching value from controller and thus reduce
+	header dependencies
+
 	* plugins/vst_effect/CMakeLists.txt:
 	* plugins/vestige/CMakeLists.txt:
 	* plugins/vst_base/CMakeLists.txt:

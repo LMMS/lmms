@@ -417,6 +417,20 @@ void automatableModel::setControllerConnection( controllerConnection * _c )
 
 
 
+float automatableModel::controllerValue( int _frameOffset ) const
+{
+	const float v = m_minValue +
+			( m_range * m_controllerConnection->currentValue(
+							_frameOffset ) );
+	if( typeInfo<float>::isEqual( m_step, 1 ) )
+	{
+		return qRound( v );
+	}
+	return v;
+}
+
+
+
 
 void automatableModel::unlinkControllerConnection( void )
 {

@@ -30,7 +30,6 @@
 
 #include "journalling_object.h"
 #include "mv_base.h"
-#include "controller_connection.h"
 
 
 // simple way to map a property of a view to a model
@@ -58,6 +57,9 @@
 				modelname.setValue( (float) _val );	\
 			}
 
+
+
+class controllerConnection;
 
 
 class EXPORT automatableModel : public model, public journallingObject
@@ -119,19 +121,13 @@ public:
 	{
 		if( unlikely( m_controllerConnection != NULL ) )
 		{
-			const T v = minValue<T>() +
-				castValue<T>( m_range * 
-					 m_controllerConnection->currentValue(
-							_frameOffset ) );
-			if( typeInfo<float>::isEqual( m_step, 1 ) )
-			{
-				return castValue<T>( roundf( (float) v ) );
-			}
-			return v;
+			return castValue<T>( controllerValue( _frameOffset ) );
 		}
 
 		return castValue<T>( m_value );
 	}
+
+	float controllerValue( int _frameOffset ) const;
 
 
 	template<class T>

@@ -39,6 +39,7 @@
 #include "gui_templates.h"
 #include "knob.h"
 #include "led_checkbox.h"
+#include "mixer.h"
 #include "mmp.h"
 #include "oscillator.h"
 #include "pixmap_button.h"
