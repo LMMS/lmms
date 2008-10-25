@@ -215,35 +215,30 @@ void sampleBuffer::update( bool _keep_settings )
 			const float fac = m_amplification /
 						OUTPUT_SAMPLE_MULTIPLIER;
 			m_data = new sampleFrame[m_frames];
+			const int ch = ( channels > 1 ) ? 1 : 0;
 
 			// if reversing is on, we also reverse when
 			// scaling
 			if( m_reversed )
 			{
+				int idx = ( m_frames - 1 ) * channels;
 				for( f_cnt_t frame = 0; frame < m_frames;
 								++frame )
 				{
-					for( ch_cnt_t chnl = 0;
-							chnl < DEFAULT_CHANNELS;
-									++chnl )
-					{
-const f_cnt_t idx = ( m_frames - frame ) * channels + ( chnl % channels );
-m_data[frame][chnl] = buf[idx] * fac;
-					}
+					m_data[frame][0] = buf[idx+0] * fac;
+					m_data[frame][1] = buf[idx+ch] * fac;
+					idx -= channels;
 				}
 			}
 			else
 			{
+				int idx = 0;
 				for( f_cnt_t frame = 0; frame < m_frames;
 								++frame )
 				{
-					for( ch_cnt_t chnl = 0;
-							chnl < DEFAULT_CHANNELS;
-									++chnl )
-					{
-		const f_cnt_t idx = frame * channels + ( chnl % channels );
-		m_data[frame][chnl] = buf[idx] * fac;
-					}
+					m_data[frame][0] = buf[idx+0] * fac;
+					m_data[frame][1] = buf[idx+ch] * fac;
+					idx += channels;
 				}
 			}
 
