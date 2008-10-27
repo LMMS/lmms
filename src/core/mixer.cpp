@@ -212,10 +212,10 @@ public:
 				(fx_ch_t) it->effectChannelJob );
 						break;
 					default:
-fprintf( stderr, "invalid job item type %d at %ld in jobqueue(%ld:%ld)\n",
+/*fprintf( stderr, "invalid job item type %d at %ld in jobqueue(%ld:%ld)\n",
 		(int) it->type, (long int) it,
 					(long int) s_jobQueue.items.begin(),
-							(long int) end_it );
+							(long int) end_it );*/
 						break;
 				}
 			}

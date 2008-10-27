@@ -147,8 +147,12 @@ kaiser (d_sample * s, int n, double beta)
 	{
 		double k = besseli ((beta * sqrt (1 - pow ((2 * i / (n - 1)), 2)))) / bb;
 
+#if LMMS_BUILD_WIN64
+		if (!isfinite (k))
+#else
 		/* can you spell hack */
 		if (!finite (k))
+#endif
 			k = 0;
 
 		F (s[si], k);

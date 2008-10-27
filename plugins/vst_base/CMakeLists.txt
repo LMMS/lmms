@@ -7,9 +7,9 @@ BUILD_PLUGIN(vstbase vst_base.cpp vst_plugin.cpp vst_plugin.h communication.h MO
 
 IF(LMMS_BUILD_WIN32)
 	ADD_DEFINITIONS(-DPTW32_STATIC_LIB)
-	LINK_LIBRARIES(-lQtCore4 -lpthread -lgdi32 -lwsock32)
+	LINK_LIBRARIES(-lQtCore4 -lpthread -lgdi32 -lws2_32)
 	ADD_EXECUTABLE(remote_vst_plugin ${CMAKE_CURRENT_SOURCE_DIR}/remote_vst_plugin.cpp)
-	ADD_CUSTOM_COMMAND(TARGET remote_vst_plugin POST_BUILD COMMAND /opt/mingw/bin/i586-mingw32-strip ${CMAKE_CURRENT_BINARY_DIR}/remote_vst_plugin.exe)
+	ADD_CUSTOM_COMMAND(TARGET remote_vst_plugin POST_BUILD COMMAND ${STRIP} ${CMAKE_CURRENT_BINARY_DIR}/remote_vst_plugin.exe)
 	INSTALL(TARGETS remote_vst_plugin RUNTIME DESTINATION ${PLUGIN_DIR})
 ENDIF(LMMS_BUILD_WIN32)
 

@@ -304,7 +304,7 @@ void midiWinMM::openDevices( void )
 		MIDIINCAPS c;
 		midiInGetDevCaps( i, &c, sizeof( c ) );
 		HMIDIIN hm = 0;
-		MMRESULT res = midiInOpen( &hm, i, (DWORD) &inputCallback,
+		MMRESULT res = midiInOpen( &hm, i, (DWORD_PTR) &inputCallback,
 						(DWORD_PTR) this,
 							CALLBACK_FUNCTION );
 		if( res == MMSYSERR_NOERROR )

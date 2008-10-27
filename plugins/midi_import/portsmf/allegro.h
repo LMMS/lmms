@@ -50,6 +50,8 @@
 #define __ALLEGRO__
 #include <assert.h>
 
+#include "lmmsconfig.h"
+
 #define ALG_EPS 0.000001 // epsilon
 #define ALG_DEFAULT_BPM 100.0 // default tempo
 
@@ -511,13 +513,17 @@ public:
         char *fence = buffer + len;
         assert(ptr < fence);
         while ((*ptr++ = *s++)) assert(ptr < fence);
-        assert((char *)(((long) (ptr + 7)) & ~7) <= fence);
+       // assert((char *)(((long) (ptr + 7)) & ~7) <= fence);
         pad(); }
     void set_int32(long v) { *((long *) ptr) = v; ptr += 4; }
     void set_double(double v) { *((double *) ptr) = v; ptr += 8; }
     void set_float(float v) { *((float *) ptr) = v; ptr += 4; }
     void set_char(char v) { *ptr++ = v; }
+#ifdef LMMS_BUILD_WIN64
+    void pad() { while (((long long) ptr) & 7) set_char(0); }
+#else
     void pad() { while (((long) ptr) & 7) set_char(0); }
+#endif
     void *to_heap(long *len) {
         *len = get_posn();
         char *newbuf = new char[*len];
@@ -539,7 +545,11 @@ public:
                          while (*ptr++) assert(ptr < fence);
                          get_pad();
                          return s; }
+#ifdef LMMS_BUILD_WIN64
+    void get_pad() { while (((long long) ptr) & 7) ptr++; }
+#else
     void get_pad() { while (((long) ptr) & 7) ptr++; }
+#endif
     void check_input_buffer(long needed) {
         assert(get_posn() + needed <= len); }
 } *Serial_buffer_ptr;

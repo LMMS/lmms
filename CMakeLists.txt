@@ -26,6 +26,11 @@ ADD_DEFINITIONS(-D'LMMS_VERSION="${VERSION}"')
 
 INCLUDE(DetectMachine)
 
+IF(LMMS_HOST_X86_64)
+	SET(STRIP /opt/mingw64/bin/x86_64-pc-mingw32-strip)
+ELSE(LMMS_HOST_X86_64)
+	SET(STRIP /opt/mingw/bin/i586-mingw32-strip)
+ENDIF(LMMS_HOST_X86_64)
 
 OPTION(WANT_ALSA	"Include ALSA (Advanced Linux Sound Architecture) support" ON)
 OPTION(WANT_CAPS	"Include C* Audio Plugin Suite (LADSPA plugins)" ON)
@@ -366,8 +371,16 @@ QT4_WRAP_UI(lmms_UI_out ${lmms_UI})
 
 
 # embedded resources stuff
-ADD_EXECUTABLE(bin2res buildtools/bin2res.cpp)
-GET_TARGET_PROPERTY(BIN2RES bin2res LOCATION)
+IF(WIN32 OR WIN64)
+	# compile buildtools native
+	SET(BIN2RES_CPP ${CMAKE_SOURCE_DIR}/buildtools/bin2res.cpp)
+	SET(BIN2RES ${CMAKE_BINARY_DIR}/bin2res)
+	ADD_CUSTOM_COMMAND(OUTPUT ${BIN2RES} COMMAND g++ ARGS ${BIN2RES_CPP} -o ${BIN2RES} DEPENDS ${BIN2RES_CPP})
+ELSE(WIN32 OR WIN64)
+	ADD_EXECUTABLE(bin2res buildtools/bin2res.cpp)
+	GET_TARGET_PROPERTY(BIN2RES bin2res LOCATION)
+ENDIF(WIN32 OR WIN64)
+
 SET(LMMS_ER_H ${CMAKE_CURRENT_BINARY_DIR}/embedded_resources.h)
 
 # we somehow have to make LMMS-binary depend on MOC-files
@@ -377,8 +390,13 @@ ADD_CUSTOM_COMMAND(OUTPUT ${LMMS_ER_H} COMMAND ${BIN2RES} ARGS ${lmms_EMBEDDED_R
 
 IF(WIN32)
 	SET(WINRC "${CMAKE_BINARY_DIR}/lmmsrc.obj")
+	IF(LMMS_HOST_X86_64)
+		SET(WINDRES /opt/mingw64/bin/x86_64-pc-mingw32-windres)
+	ELSE(LMMS_HOST_X86_64)
+		SET(WINDRES /opt/mingw/bin/i586-mingw32-windres)
+	ENDIF(LMMS_HOST_X86_64)
 	ADD_CUSTOM_COMMAND(OUTPUT ${WINRC}
-				COMMAND /opt/mingw/bin/i586-mingw32-windres
+				COMMAND ${WINDRES}
 					-I${CMAKE_SOURCE_DIR}
 					-o${CMAKE_BINARY_DIR}/lmmsrc.obj
 					-i${CMAKE_BINARY_DIR}/lmms.rc
@@ -410,9 +428,14 @@ ADD_EXECUTABLE(lmms ${lmms_SOURCES} ${lmms_INCLUDES} ${LIBSAMPLERATE_SOURCES} ${
 
 IF(LMMS_BUILD_WIN32)
 	SET_TARGET_PROPERTIES(lmms PROPERTIES LINK_FLAGS "${LINK_FLAGS} -mwindows")
-	ADD_CUSTOM_COMMAND(TARGET lmms POST_BUILD COMMAND /opt/mingw/bin/i586-mingw32-strip ${CMAKE_BINARY_DIR}/lmms.exe)
+	ADD_CUSTOM_COMMAND(TARGET lmms POST_BUILD COMMAND ${STRIP} ${CMAKE_BINARY_DIR}/lmms.exe)
+
 	INSTALL(TARGETS lmms RUNTIME DESTINATION .)
-	INSTALL(FILES /opt/mingw/bin/QtCore4.dll /opt/mingw/bin/QtGui4.dll /opt/mingw/bin/QtXml4.dll /opt/mingw/bin/libz.dll /opt/mingw/bin/libsndfile-1.dll /opt/mingw/bin/libvorbis-0.dll /opt/mingw/bin/libvorbisenc-2.dll /opt/mingw/bin/libvorbisfile-3.dll /opt/mingw/bin/libogg-0.dll /opt/mingw/bin/libfluidsynth-1.dll /opt/mingw/bin/libfftw3f-3.dll /opt/mingw/bin/SDL.dll /opt/mingw/i586-mingw32/bin/mingwm10.dll DESTINATION .)
+	IF(LMMS_BUILD_WIN64)
+		INSTALL(FILES /opt/mingw64/bin/QtCore4.dll /opt/mingw64/bin/QtGui4.dll /opt/mingw64/bin/QtXml4.dll /opt/mingw64/bin/libz.dll /opt/mingw64/bin/libsndfile-1.dll /opt/mingw64/bin/libfluidsynth-1.dll /opt/mingw64/bin/SDL.dll DESTINATION .)
+	ELSE(LMMS_BUILD_WIN64)
+		INSTALL(FILES /opt/mingw/bin/QtCore4.dll /opt/mingw/bin/QtGui4.dll /opt/mingw/bin/QtXml4.dll /opt/mingw/bin/libz.dll /opt/mingw/bin/libsndfile-1.dll /opt/mingw/bin/libvorbis-0.dll /opt/mingw/bin/libvorbisenc-2.dll /opt/mingw/bin/libvorbisfile-3.dll /opt/mingw/bin/libogg-0.dll /opt/mingw/bin/libfluidsynth-1.dll /opt/mingw/bin/libfftw3f-3.dll /opt/mingw/bin/SDL.dll /opt/mingw/i586-mingw32/bin/mingwm10.dll DESTINATION .)
+	ENDIF(LMMS_BUILD_WIN64)
 ELSE(LMMS_BUILD_WIN32)
 	INSTALL(TARGETS lmms RUNTIME DESTINATION bin)
 	INSTALL(FILES ${CMAKE_BINARY_DIR}/lmms.1.gz DESTINATION ${CMAKE_INSTALL_PREFIX}/share/man/man1/ PERMISSIONS OWNER_READ GROUP_READ WORLD_READ)

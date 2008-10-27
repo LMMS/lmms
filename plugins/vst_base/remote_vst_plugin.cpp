@@ -51,8 +51,11 @@
 #include <windows.h>
 
 #ifdef LMMS_BUILD_WIN32
+#ifdef LMMS_BUILD_WIN64
+#include "basename.c"
+#else
 #include <libgen.h>
-
+#endif
 #endif
 
 
@@ -724,8 +727,11 @@ VstIntPtr remoteVstPlugin::hostCallback( AEffect * _effect, VstInt32 _opcode,
 			_timeInfo.timeSigDenominator = 4;
 			_timeInfo.flags |= (/* kVstBarsValid|*/kVstTempoValid );
 			_timeInfo.flags |= kVstTransportPlaying;
-
+#ifdef LMMS_BUILD_WIN64
+			return( (long long) &_timeInfo );
+#else
 			return( (long) &_timeInfo );
+#endif
 
 		case audioMasterProcessEvents:
 			//SHOW_CALLBACK( "amc: audioMasterProcessEvents\n" );
