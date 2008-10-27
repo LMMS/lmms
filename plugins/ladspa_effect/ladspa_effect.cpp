@@ -551,6 +551,7 @@ sample_rate_t ladspaEffect::maxSamplerate( const QString & _name )
 		__buggy_plugins["C* AmpVTS"] = 88200;
 		__buggy_plugins["Chorus2"] = 44100;
 		__buggy_plugins["Notch Filter"] = 96000;
+		__buggy_plugins["Freeverb"] = 44100;
 	}
 	if( __buggy_plugins.contains( _name ) )
 	{
