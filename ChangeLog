@@ -3,6 +3,7 @@
 	* plugins/ladspa_effect/ladspa_effect.cpp:
 	added Freeverb to blacklist as it does not work samplerate independent
 
+	* cmake/modules/Win64Toolchain.cmake:
 	* cmake/modules/DetectMachine.cmake:
 	* cmake/modules/BuildPlugin.cmake:
 	* plugins/ladspa_effect/swh/CMakeLists.txt:
