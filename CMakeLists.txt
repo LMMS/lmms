@@ -39,7 +39,7 @@ OPTION(WANT_FFTW3F	"Include SpectrumAnalyzer plugin" ON)
 OPTION(WANT_JACK	"Include JACK (Jack Audio Connection Kit) support" ON)
 OPTION(WANT_OGGVORBIS	"Include OGG/Vorbis support" ON)
 OPTION(WANT_PULSEAUDIO	"Include PulseAudio support" ON)
-OPTION(WANT_PORTAUDIO	"Include PortAudio support" ON)
+#OPTION(WANT_PORTAUDIO	"Include PortAudio support" ON)	# TODO: fix PortAudio support
 OPTION(WANT_SDL		"Include SDL (Simple DirectMedia Layer) support" ON)
 OPTION(WANT_SF2		"Include SoundFont2 player plugin" ON)
 OPTION(WANT_STK		"Include Stk (Synthesis Toolkit) support" ON)
@@ -176,20 +176,20 @@ ENDIF(WANT_STK)
 
 
 # check for PortAudio
-IF(WANT_PORTAUDIO)
-	FIND_PACKAGE(Portaudio)
-	IF(PORTAUDIO_FOUND)
-		SET(LMMS_HAVE_PORTAUDIO TRUE)
-		SET(STATUS_PORTAUDIO "OK")
-	ELSE(PORTAUDIO_FOUND)
-		SET(STATUS_PORTAUDIO "not found, please install libportaudio-dev (or similiar, version >= 1.8) "
-			"if your require Portaudio support")
-	ENDIF(PORTAUDIO_FOUND)
-ENDIF(WANT_PORTAUDIO)
-IF(NOT LMMS_HAVE_PORTAUDIO)
-	SET(PORTAUDIO_INCLUDE_DIR "")
-	SET(PORTAUDIO_LIBRARIES "")
-ENDIF(NOT LMMS_HAVE_PORTAUDIO)
+#IF(WANT_PORTAUDIO)
+#	FIND_PACKAGE(Portaudio)
+#	IF(PORTAUDIO_FOUND)
+#		SET(LMMS_HAVE_PORTAUDIO TRUE)
+#		SET(STATUS_PORTAUDIO "OK")
+#	ELSE(PORTAUDIO_FOUND)
+#		SET(STATUS_PORTAUDIO "not found, please install libportaudio-dev (or similiar, version >= 1.8) "
+#			"if your require Portaudio support")
+#	ENDIF(PORTAUDIO_FOUND)
+#ENDIF(WANT_PORTAUDIO)
+#IF(NOT LMMS_HAVE_PORTAUDIO)
+#	SET(PORTAUDIO_INCLUDE_DIR "")
+#	SET(PORTAUDIO_LIBRARIES "")
+#ENDIF(NOT LMMS_HAVE_PORTAUDIO)
 
 
 # check for PulseAudio
@@ -562,7 +562,7 @@ MESSAGE(
 "* ALSA                        : ${STATUS_ALSA}\n"
 "* JACK                        : ${STATUS_JACK}\n"
 "* OSS                         : ${STATUS_OSS}\n"
-"* PortAudio                   : ${STATUS_PORTAUDIO}\n"
+#"* PortAudio                   : ${STATUS_PORTAUDIO}\n"
 "* PulseAudio                  : ${STATUS_PULSEAUDIO}\n"
 "* SDL                         : ${STATUS_SDL}\n"
 )
