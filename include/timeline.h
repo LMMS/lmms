@@ -69,26 +69,31 @@ public:
 		return( m_pos );
 	}
 
+	AutoScrollStates autoScroll( void ) const
+	{
+		return m_autoScroll;
+	}
+
 	BehaviourAtStopStates behaviourAtStop( void ) const
 	{
-		return( m_behaviourAtStop );
+		return m_behaviourAtStop;
 	}
 
 	bool loopPointsEnabled( void ) const
 	{
-		return( m_loopPoints == LoopPointsEnabled );
+		return m_loopPoints == LoopPointsEnabled;
 	}
 
 	inline const midiTime & loopBegin( void ) const
 	{
-		return( ( m_loopPos[0] < m_loopPos[1] ) ?
-						m_loopPos[0] : m_loopPos[1] );
+		return ( m_loopPos[0] < m_loopPos[1] ) ?
+						m_loopPos[0] : m_loopPos[1];
 	}
 
 	inline const midiTime & loopEnd( void ) const
 	{
-		return( ( m_loopPos[0] > m_loopPos[1] ) ?
-						m_loopPos[0] : m_loopPos[1] );
+		return ( m_loopPos[0] > m_loopPos[1] ) ?
+						m_loopPos[0] : m_loopPos[1];
 	}
 
 	inline void savePos( const midiTime & _pos )
@@ -97,7 +102,7 @@ public:
 	}
 	inline const midiTime & savedPos( void ) const
 	{
-		return( m_savedPos );
+		return m_savedPos;
 	}
 
 	inline void setPixelsPerTact( float _ppt )
@@ -113,13 +118,13 @@ public:
 	virtual void loadSettings( const QDomElement & _this );
 	inline virtual QString nodeName( void ) const
 	{
-		return( "timeline" );
+		return "timeline";
 	}
 
 	inline int markerX( const midiTime & _t ) const
 	{
-		return( m_xOffset + static_cast<int>( ( _t - m_begin ) *
-					m_ppt / midiTime::ticksPerTact() ) );
+		return m_xOffset + static_cast<int>( ( _t - m_begin ) *
+					m_ppt / midiTime::ticksPerTact() );
 	}
 
 

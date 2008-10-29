@@ -2670,7 +2670,8 @@ void pianoRoll::updatePosition( const midiTime & _t )
 {
 	if( ( engine::getSong()->isPlaying() &&
 			engine::getSong()->playMode() ==
-					song::Mode_PlayPattern ) ||
+					song::Mode_PlayPattern &&
+		m_timeLine->autoScroll() == timeLine::AutoScrollEnabled ) ||
 							m_scrollBack == true )
 	{
 		const int w = width() - WHITE_KEY_WIDTH;
