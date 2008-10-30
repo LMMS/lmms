@@ -1,5 +1,9 @@
 2008-10-30	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* CMakeLists.txt:
+	- include all neccessary DLLs in win64 build
+	- fix versioning for CPack if no VERSION_SUFFIX is set
+
 	* plugins/sid/sid_instrument.cpp:
 	* plugins/papu/papu_instrument.cpp:
 	* include/clipboard.h:
