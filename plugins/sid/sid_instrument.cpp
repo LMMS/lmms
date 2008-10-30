@@ -24,8 +24,8 @@
  */
 
 
-#include <Qt/QtXml>
 #include <QtGui/QPainter>
+#include <QtXml/QDomElement>
 #include "sid.h"
 
 #include "sid_instrument.h"

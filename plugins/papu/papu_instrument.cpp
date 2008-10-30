@@ -24,8 +24,8 @@
  */
 
 
-#include <Qt/QtXml>
 #include <QtGui/QPainter>
+#include <QtXml/QDomElement>
 #include "Basic_Gb_Apu.h"
 
 #include "papu_instrument.h"

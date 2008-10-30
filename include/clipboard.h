@@ -27,7 +27,7 @@
 #define _CLIPBOARD_H
 
 #include <QtCore/QMap>
-#include <Qt/QtXml>
+#include <QtXml/QDomElement>
 
 
 class journallingObject;
