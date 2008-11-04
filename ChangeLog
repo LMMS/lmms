@@ -1,5 +1,8 @@
 2008-11-04	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* plugins/sf2_player/sf2_player.cpp:
+	fixed broken reference sharing
+
 	* include/automatable_model.h:
 	* src/core/automatable_model.cpp:
 	fixed loops when adding a controller to a model which is linked to

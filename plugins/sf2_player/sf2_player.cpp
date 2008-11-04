@@ -299,7 +299,7 @@ void sf2Instrument::freeFont( void )
 			cout << "Really deleting " << m_filename << endl;
 
 			fluid_synth_sfunload( m_synth, m_fontId, TRUE );
-
+			s_fonts.remove( m_filename );
 			delete m_font;
 		}
 		// Just remove our reference
