@@ -1,3 +1,9 @@
+2008-11-04	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* src/core/effect.cpp:
+	call saveSettings()/loadSettings() on model rather than loading/saving
+	value directly - fixes lost automation on basic effect controls
+
 2008-10-30	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* CMakeLists.txt:

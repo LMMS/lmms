@@ -75,10 +75,10 @@ effect::~effect()
 
 void effect::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
-	_this.setAttribute( "on", m_enabledModel.value() );
-	_this.setAttribute( "wet", m_wetDryModel.value() );
-	_this.setAttribute( "autoquit", m_autoQuitModel.value() );
-	_this.setAttribute( "gate", m_gateModel.value() );
+	m_enabledModel.saveSettings( _doc, _this, "on" );
+	m_wetDryModel.saveSettings( _doc, _this, "wet" );
+	m_autoQuitModel.saveSettings( _doc, _this, "autoquit" );
+	m_gateModel.saveSettings( _doc, _this, "gate" );
 	getControls()->saveState( _doc, _this );
 }
 
@@ -87,10 +87,10 @@ void effect::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 void effect::loadSettings( const QDomElement & _this )
 {
-	m_enabledModel.setValue( (float) _this.attribute( "on" ).toInt() );
-	m_wetDryModel.setValue( _this.attribute( "wet" ).toFloat() );
-	m_autoQuitModel.setValue( _this.attribute( "autoquit" ).toFloat() );
-	m_gateModel.setValue( _this.attribute( "gate" ).toFloat() );
+	m_enabledModel.loadSettings( _this, "on" );
+	m_wetDryModel.loadSettings( _this, "wet" );
+	m_autoQuitModel.loadSettings( _this, "autoquit" );
+	m_gateModel.loadSettings( _this, "gate" );
 
 	QDomNode node = _this.firstChild();
 	while( !node.isNull() )
