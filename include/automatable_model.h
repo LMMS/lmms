@@ -119,7 +119,8 @@ public:
 	template<class T>
 	inline T value( int _frameOffset = 0 ) const
 	{
-		if( unlikely( m_controllerConnection != NULL ) )
+		if( unlikely( m_hasLinkedModels ||
+					m_controllerConnection != NULL ) )
 		{
 			return castValue<T>( controllerValue( _frameOffset ) );
 		}
@@ -243,8 +244,10 @@ private:
 	// standard)
 	float m_oldValue;
 	bool m_journalEntryReady;
+	int m_setValueDepth;
 
 	autoModelVector m_linkedModels;
+	bool m_hasLinkedModels;
 
 
 	controllerConnection * m_controllerConnection;
