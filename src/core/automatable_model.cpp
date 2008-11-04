@@ -52,7 +52,9 @@ automatableModel::automatableModel( DataType _type,
 	m_maxValue( _max ),
 	m_step( _step ),
 	m_range( _max - _min ),
-	m_journalEntryReady( FALSE ),
+	m_journalEntryReady( false ),
+	m_setValueDepth( 0 ),
+	m_hasLinkedModels( false ),
 	m_controllerConnection( NULL )
 {
 }
@@ -62,7 +64,7 @@ automatableModel::automatableModel( DataType _type,
 
 automatableModel::~automatableModel()
 {
-	while( m_linkedModels.empty() == FALSE )
+	while( m_linkedModels.empty() == false )
 	{
 		m_linkedModels.last()->unlinkModel( this );
 		m_linkedModels.erase( m_linkedModels.end() - 1 );
@@ -176,6 +178,7 @@ void automatableModel::loadSettings( const QDomElement & _this,
 
 void automatableModel::setValue( const float _value )
 {
+	++m_setValueDepth;
 	const float old_val = m_value;
 
 	m_value = fittedValue( _value );
@@ -189,13 +192,13 @@ void automatableModel::setValue( const float _value )
 		 			m_linkedModels.begin();
 				it != m_linkedModels.end(); ++it )
 		{
-			if( value<float>() != (*it)->value<float>() &&
-				(*it)->fittedValue( value<float>() )
-						!= (*it)->value<float>() )
+			if( (*it)->m_setValueDepth < 1 &&
+				!(*it)->fittedValue( m_value ) !=
+							 (*it)->m_value )
 			{
 				bool journalling = (*it)->testAndSetJournalling(
 							isJournalling() );
-				(*it)->setValue( value<float>() );
+				(*it)->setValue( m_value );
 				(*it)->setJournalling( journalling );
 			}
 		}
@@ -205,6 +208,7 @@ void automatableModel::setValue( const float _value )
 	{
 		emit dataUnchanged();
 	}
+	--m_setValueDepth;
 }
 
 
@@ -212,6 +216,7 @@ void automatableModel::setValue( const float _value )
 
 void automatableModel::setAutomatedValue( const float _value )
 {
+	++m_setValueDepth;
 	const float old_val = m_value;
 
 	m_value = fittedValue( _value );
@@ -222,15 +227,16 @@ void automatableModel::setAutomatedValue( const float _value )
 		 			m_linkedModels.begin();
 				it != m_linkedModels.end(); ++it )
 		{
-			if( value<float>() != (*it)->value<float>() &&
-				(*it)->fittedValue( value<float>() )
-						!= (*it)->value<float>() )
+			if( (*it)->m_setValueDepth < 1 &&
+				!(*it)->fittedValue( m_value ) !=
+							 (*it)->m_value )
 			{
-				(*it)->setAutomatedValue( value<float>() );
+				(*it)->setAutomatedValue( m_value );
 			}
 		}
 		emit dataChanged();
 	}
+	--m_setValueDepth;
 }
 
 
@@ -308,7 +314,7 @@ float automatableModel::fittedValue( float _value ) const
 
 void automatableModel::redoStep( journalEntry & _je )
 {
-	bool journalling = testAndSetJournalling( FALSE );
+	bool journalling = testAndSetJournalling( false );
 	setValue( value<float>() + (float) _je.data().toDouble() );
 	setJournalling( journalling );
 }
@@ -328,8 +334,8 @@ void automatableModel::undoStep( journalEntry & _je )
 void automatableModel::prepareJournalEntryFromOldVal( void )
 {
 	m_oldValue = value<float>();
-	saveJournallingState( FALSE );
-	m_journalEntryReady = TRUE;
+	saveJournallingState( false );
+	m_journalEntryReady = true;
 }
 
 
@@ -345,7 +351,7 @@ void automatableModel::addJournalEntryFromOldToCurVal( void )
 			addJournalEntry( journalEntry( 0, value<float>() -
 								m_oldValue ) );
 		}
-		m_journalEntryReady = FALSE;
+		m_journalEntryReady = false;
 	}
 }
 
@@ -354,10 +360,15 @@ void automatableModel::addJournalEntryFromOldToCurVal( void )
 
 void automatableModel::linkModel( automatableModel * _model )
 {
-	if( qFind( m_linkedModels.begin(), m_linkedModels.end(), _model )
-						== m_linkedModels.end() )
+	if( !m_linkedModels.contains( _model ) )
 	{
 		m_linkedModels.push_back( _model );
+		m_hasLinkedModels = true;
+		if( !_model->m_hasLinkedModels )
+		{
+			QObject::connect( this, SIGNAL( dataChanged() ),
+					_model, SIGNAL( dataChanged() ) );
+		}
 	}
 }
 
@@ -366,13 +377,13 @@ void automatableModel::linkModel( automatableModel * _model )
 
 void automatableModel::unlinkModel( automatableModel * _model )
 {
-	if( qFind( m_linkedModels.begin(), m_linkedModels.end(), _model )
-						!= m_linkedModels.end() )
+	autoModelVector::iterator it = qFind( m_linkedModels.begin(),
+						m_linkedModels.end(), _model );
+	if( it != m_linkedModels.end() )
 	{
-		m_linkedModels.erase( qFind( m_linkedModels.begin(),
-							m_linkedModels.end(),
-							_model ) );
+		m_linkedModels.erase( it );
 	}
+	m_hasLinkedModels = !m_linkedModels.isEmpty();
 }
 
 
@@ -410,7 +421,7 @@ void automatableModel::setControllerConnection( controllerConnection * _c )
 					this, SIGNAL( dataChanged() ) );
 		QObject::connect( m_controllerConnection,
 						SIGNAL( destroyed() ),
-					this, SLOT( unlinkControllerConnection() ) );
+				this, SLOT( unlinkControllerConnection() ) );
 		emit dataChanged();
 	}
 }
@@ -419,14 +430,23 @@ void automatableModel::setControllerConnection( controllerConnection * _c )
 
 float automatableModel::controllerValue( int _frameOffset ) const
 {
-	const float v = m_minValue +
+	if( m_controllerConnection )
+	{
+		const float v = m_minValue +
 			( m_range * m_controllerConnection->currentValue(
 							_frameOffset ) );
-	if( typeInfo<float>::isEqual( m_step, 1 ) )
-	{
-		return qRound( v );
+		if( typeInfo<float>::isEqual( m_step, 1 ) )
+		{
+			return qRound( v );
+		}
+		return v;
 	}
-	return v;
+	automatableModel * lm = m_linkedModels.first();
+	if( lm->m_controllerConnection )
+	{
+		return lm->controllerValue( _frameOffset );
+	}
+	return lm->m_value;
 }
 
 
@@ -448,7 +468,7 @@ void automatableModel::unlinkControllerConnection( void )
 void automatableModel::setInitValue( const float _value )
 {
 	m_initValue = _value;
-	bool journalling = testAndSetJournalling( FALSE );
+	bool journalling = testAndSetJournalling( false );
 	setValue( _value );
 	setJournalling( journalling );
 	emit initValueChanged( _value );
