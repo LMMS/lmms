@@ -28,7 +28,6 @@
 
 #include "piano_roll.h"
 
-
 #include <QtGui/QApplication>
 #include <QtGui/QButtonGroup>
 #include <QtGui/QClipboard>
@@ -854,6 +853,13 @@ void pianoRoll::keyPressEvent( QKeyEvent * _ke )
 		}
 
 		case Qt::Key_Control:
+			m_ctrlMode = m_editMode;
+			m_editMode = ModeSelect;
+			QApplication::changeOverrideCursor(
+											   QCursor( Qt::ArrowCursor ) );
+			update();
+			break;
+		case Qt::Key_Shift:
 			if( mouseOverNote() )
 			{
 				m_editMode = ModeOpen;
@@ -861,7 +867,7 @@ void pianoRoll::keyPressEvent( QKeyEvent * _ke )
 						QCursor( Qt::ArrowCursor ) );
 				update();
 			}
-
+			break;
 		default:
 			_ke->ignore();
 			break;
@@ -888,11 +894,16 @@ void pianoRoll::keyReleaseEvent( QKeyEvent * _ke )
 	switch( _ke->key() )
 	{
 		case Qt::Key_Control:
+			m_editMode = m_ctrlMode;
+			update();
+			break;
+		case Qt::Key_Shift:
 			if( m_editMode == ModeOpen )
 			{
 				m_editMode = ModeDraw;
 				update();
 			}
+			break;
 	}
 	_ke->ignore();
 }
@@ -1630,9 +1641,70 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 			m_moveStartKey = key_num;
 		}
 		else if( m_editMode == ModeOpen && !( mouseOverNote()
-				&& _me->modifiers() & Qt::ControlModifier ) )
+				&& _me->modifiers() & Qt::ShiftModifier ) )
 		{
 			m_editMode = ModeDraw;
+		}
+		else if( m_editMode == ModeDraw && _me->buttons() & Qt::RightButton )
+		{
+			// holding down right-click to delete notes
+			
+			// get tick in which the user clicked
+			int pos_ticks = x * midiTime::ticksPerTact() / m_ppt +
+							m_currentPosition;
+
+
+			// get note-vector of current pattern
+			const noteVector & notes = m_pattern->notes();
+
+			// will be our iterator in the following loop
+			noteVector::const_iterator it = notes.begin();
+
+			// loop through whole note-vector...
+			while( it != notes.end() )
+			{
+				midiTime len = ( *it )->length();
+				if( len < 0 )
+				{
+					len = 4;
+				}
+				// and check whether the user clicked on an
+				// existing note or an edit-line
+				if( pos_ticks >= ( *it )->pos() &&
+						len > 0 &&
+					(
+					( edit_note == false &&
+					pos_ticks <= ( *it )->pos() + len &&
+					( *it )->key() == key_num )
+					||
+					( edit_note == true &&
+					pos_ticks <= ( *it )->pos() +
+							NE_LINE_WIDTH *
+						midiTime::ticksPerTact() /
+								m_ppt )
+					)
+					)
+				{
+					// delete this note
+					if( it != notes.end() )
+					{
+						if( ( *it )->length() > 0 )
+						{
+							m_pattern->removeNote( *it );
+						}
+						else
+						{
+							( *it )->setLength( 0 );
+							m_pattern->dataChanged();
+						}
+						engine::getSong()->setModified();
+					}
+				} 
+				else
+				{
+					++it;
+				}
+			}
 		}
 	}
 	else

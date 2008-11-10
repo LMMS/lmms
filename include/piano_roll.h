@@ -238,6 +238,7 @@ private:
 
 
 	editModes m_editMode;
+	editModes m_ctrlMode; // mode they were in before they hit ctrl
 
 
 	timeLine * m_timeLine;

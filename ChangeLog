@@ -1,3 +1,10 @@
+2008-11-10	Andrew Kelley	<superjoe30/at/gmail/dot/com>
+	* src/gui/piano_roll.h:
+	* src/gui/piano_roll.cpp:
+	-made it so you can hold right click and drag around to delete notes
+	-changed ctrl+click from opening automation window to shift+click
+	-hold ctrl to temporarily select the select tool
+
 2008-11-10	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* include/audio_portaudio.h:
