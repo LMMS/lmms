@@ -1,5 +1,5 @@
 /*
- * types.h - typedefs for common types that are used in the whole app
+ * lmms_basics.h - common basics for the whole App
  *
  * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
@@ -23,10 +23,8 @@
  */
 
 
-#ifndef _TYPES_H
-#define _TYPES_H
-
-#include <limits>
+#ifndef _LMMS_BASICS_H
+#define _LMMS_BASICS_H
 
 #include "lmmsconfig.h"
 
@@ -68,6 +66,9 @@ typedef Uint32 jo_id_t;			// (unique) ID of a journalling object
 #define likely(x)	__builtin_expect((x),1)
 #define unlikely(x)	__builtin_expect((x),0)
 
+#ifdef __cplusplus
+
+#include <limits>
 
 template<typename T>
 struct typeInfo
@@ -115,25 +116,50 @@ inline bool typeInfo<float>::isEqual( float _x, float _y )
 	return absVal( _x - _y ) < minEps();
 }
 
+#endif
 
 
-const ch_cnt_t DEFAULT_CHANNELS = 2;
-
-const ch_cnt_t SURROUND_CHANNELS =
+#define DEFAULT_CHANNELS 2
 #define LMMS_DISABLE_SURROUND
-#ifndef LMMS_DISABLE_SURROUND
-				4;
+#ifdef LMMS_DISABLE_SURROUND
+#define SURROUND_CHANNELS 2
 #else
-				2;
+#define SURROUND_CHANNELS 4
 #endif
 
 
 
 typedef sample_t sampleFrame[DEFAULT_CHANNELS];
 typedef sample_t surroundSampleFrame[SURROUND_CHANNELS];
+
 #define ALIGN_SIZE 16
+
 #if __GNUC__
+
 typedef sample_t sampleFrameA[DEFAULT_CHANNELS] __attribute__((__aligned__(ALIGN_SIZE)));
+typedef int_sample_t intSampleFrameA[DEFAULT_CHANNELS] __attribute__((__aligned__(ALIGN_SIZE)));
+#define RP __restrict__
+
+#else
+
+#define RP
+
+#endif
+
+
+#ifdef __cplusplus
+const int BYTES_PER_SAMPLE = sizeof( sample_t );
+const int BYTES_PER_INT_SAMPLE = sizeof( int_sample_t );
+const int BYTES_PER_FRAME = sizeof( sampleFrame );
+const int BYTES_PER_SURROUND_FRAME = sizeof( surroundSampleFrame );
+
+const float OUTPUT_SAMPLE_MULTIPLIER = 32767.0f;
+#else
+#define BYTES_PER_SAMPLE sizeof( sample_t )
+#define BYTES_PER_INT_SAMPLE sizeof( int_sample_t )
+#define BYTES_PER_FRAME sizeof( sampleFrame )
+#define BYTES_PER_SURROUND_FRAME sizeof( surroundSampleFrame )
+#define OUTPUT_SAMPLE_MULTIPLIER 32767.0f
 #endif
 
 

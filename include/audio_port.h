@@ -40,14 +40,14 @@ public:
 	audioPort( const QString & _name, bool _has_effect_chain = true );
 	~audioPort();
 
-	inline sampleFrame * firstBuffer( void )
+	inline sampleFrameA * firstBuffer( void )
 	{
-		return( m_firstBuffer );
+		return m_firstBuffer;
 	}
 
-	inline sampleFrame * secondBuffer( void )
+	inline sampleFrameA * secondBuffer( void )
 	{
-		return( m_secondBuffer );
+		return m_secondBuffer;
 	}
 
 	inline void lockFirstBuffer( void )
@@ -76,7 +76,7 @@ public:
 	// indicate whether JACK & Co should provide output-buffer at ext. port
 	inline bool extOutputEnabled( void ) const
 	{
-		return( m_extOutputEnabled );
+		return m_extOutputEnabled;
 	}
 
 	void setExtOutputEnabled( bool _enabled );
@@ -86,12 +86,12 @@ public:
 	// (-1 = none  0 = master)
 	inline fx_ch_t nextFxChannel( void ) const
 	{
-		return( m_nextFxChannel );
+		return m_nextFxChannel;
 	}
 
 	inline effectChain * getEffects( void )
 	{
-		return( m_effects );
+		return m_effects;
 	}
 
 	void setNextFxChannel( const fx_ch_t _chnl )
@@ -102,7 +102,7 @@ public:
 
 	const QString & name( void ) const
 	{
-		return( m_name );
+		return m_name;
 	}
 
 	void setName( const QString & _new_name );
@@ -122,8 +122,8 @@ public:
 private:
 	volatile bufferUsages m_bufferUsage;
 
-	sampleFrame * m_firstBuffer;
-	sampleFrame * m_secondBuffer;
+	sampleFrameA * m_firstBuffer;
+	sampleFrameA * m_secondBuffer;
 	QMutex m_firstBufferLock;
 	QMutex m_secondBufferLock;
 

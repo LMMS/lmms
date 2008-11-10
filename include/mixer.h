@@ -57,13 +57,6 @@ class audioPort;
 
 const fpp_t DEFAULT_BUFFER_SIZE = 256;
 
-const int BYTES_PER_SAMPLE = sizeof( sample_t );
-const int BYTES_PER_INT_SAMPLE = sizeof( int_sample_t );
-const int BYTES_PER_FRAME = sizeof( sampleFrame );
-const int BYTES_PER_SURROUND_FRAME = sizeof( surroundSampleFrame );
-
-const float OUTPUT_SAMPLE_MULTIPLIER = 32767.0f;
-
 
 const float BaseFreq = 440.0f;
 const Keys BaseKey = Key_A;
@@ -361,7 +354,7 @@ public:
 		return m_inputBufferFrames[ m_inputBufferRead ];
 	}
 
-	inline const surroundSampleFrame * nextBuffer( void )
+	inline surroundSampleFrame * nextBuffer( void )
 	{
 		return hasFifoWriter() ? m_fifo->read() : renderNextBuffer();
 	}
@@ -407,7 +400,7 @@ private:
 	midiClient * tryMidiClients( void );
 
 
-	const surroundSampleFrame * renderNextBuffer( void );
+	surroundSampleFrame * renderNextBuffer( void );
 
 
 

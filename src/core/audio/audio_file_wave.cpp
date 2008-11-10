@@ -29,6 +29,7 @@
 
 #include "audio_file_wave.h"
 #include "endian_handling.h"
+#include "basic_ops.h"
 
 #include <cstring>
 
@@ -101,12 +102,14 @@ void audioFileWave::writeBuffer( const surroundSampleFrame * _ab,
 	}
 	else
 	{
-		int_sample_t * buf = new int_sample_t[_frames * channels()];
-		convertToS16( _ab, _frames, _master_gain, buf,
+		intSampleFrameA * buf = (intSampleFrameA *)
+				alignedMalloc(
+					sizeof( intSampleFrameA ) * _frames );
+		alignedConvertToS16( _ab, buf, _frames, _master_gain,
 							!isLittleEndian() );
 
-		sf_writef_short( m_sf, buf, _frames );
-		delete[] buf;
+		sf_writef_short( m_sf, (int_sample_t *) buf, _frames );
+		alignedFree( buf );
 	}
 }
 

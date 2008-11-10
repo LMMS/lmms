@@ -55,11 +55,12 @@ void audioPortAudioSetupUtil::updateChannels( void )
 
 audioPortAudio::audioPortAudio( bool & _success_ful, mixer * _mixer ) :
 	audioDevice( tLimit<ch_cnt_t>(
-		configManager::inst()->value( "audioportaudio", "channels" ).toInt(),
+		configManager::inst()->value( "audioportaudio",
+							"channels" ).toInt(),
 					DEFAULT_CHANNELS, SURROUND_CHANNELS ),
 								_mixer ),
 	m_wasPAInitError( false ),
-	m_outBuf( new surroundSampleFrame[getMixer()->framesPerPeriod()] ),
+	m_outBuf( alignedAllocFrames( getMixer()->framesPerPeriod() ) ),
 	m_outBufPos( 0 ),
 	m_stopSemaphore( 1 )
 {
@@ -205,7 +206,7 @@ audioPortAudio::~audioPortAudio()
 	{
 		Pa_Terminate();
 	}
-	delete[] m_outBuf;
+	alignedFreeFrames( m_outBuf );
 }
 
 

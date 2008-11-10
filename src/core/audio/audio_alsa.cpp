@@ -39,6 +39,7 @@
 #include "lcd_spinbox.h"
 #include "gui_templates.h"
 #include "templates.h"
+#include "basic_ops.h"
 
 
 
@@ -229,12 +230,14 @@ void audioALSA::applyQualitySettings( void )
 
 void audioALSA::run( void )
 {
-	surroundSampleFrame * temp =
-		new surroundSampleFrame[getMixer()->framesPerPeriod()];
-	int_sample_t * outbuf =
-			new int_sample_t[getMixer()->framesPerPeriod() *
-								channels()];
+	sampleFrameA * temp = alignedAllocFrames(
+					getMixer()->framesPerPeriod() );
+	intSampleFrameA * outbuf = (intSampleFrameA *)
+		alignedMalloc( sizeof( intSampleFrameA ) * channels() /
+			DEFAULT_CHANNELS * getMixer()->framesPerPeriod() );
+
 	int_sample_t * pcmbuf = new int_sample_t[m_periodSize * channels()];
+
 
 	int outbuf_size = getMixer()->framesPerPeriod() * channels();
 	int outbuf_pos = 0;
@@ -254,16 +257,15 @@ void audioALSA::run( void )
 				if( !frames )
 				{
 					quit = TRUE;
-					memset( ptr, 0, len
+					alignedMemClear( ptr, len
 						* sizeof( int_sample_t ) );
 					break;
 				}
 				outbuf_size = frames * channels();
 
-				convertToS16( temp, frames,
+				alignedConvertToS16( temp, outbuf, frames,
 						getMixer()->masterGain(),
-						outbuf,
-						m_convertEndian );
+							m_convertEndian );
 			}
 			int min_len = qMin( len, outbuf_size - outbuf_pos );
 			memcpy( ptr, outbuf + outbuf_pos,
@@ -300,8 +302,8 @@ void audioALSA::run( void )
 		}
 	}
 
-	delete[] temp;
-	delete[] outbuf;
+	alignedFreeFrames( temp );
+	alignedFree( outbuf );
 	delete[] pcmbuf;
 }
 

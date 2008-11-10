@@ -45,6 +45,7 @@
 #include "config_mgr.h"
 #include "lcd_spinbox.h"
 #include "audio_port.h"
+#include "basic_ops.h"
 
 
 
@@ -57,7 +58,7 @@ audioJACK::audioJACK( bool & _success_ful, mixer * _mixer ) :
 	m_client( NULL ),
 	m_active( FALSE ),
 	m_stop_semaphore( 1 ),
-	m_outBuf( new surroundSampleFrame[getMixer()->framesPerPeriod()] ),
+	m_outBuf( alignedAllocFrames( getMixer()->framesPerPeriod() ) ),
 	m_framesDoneInCurBuf( 0 ),
 	m_framesToDoInCurBuf( 0 )
 {
@@ -159,7 +160,7 @@ audioJACK::~audioJACK()
 		jack_client_close( m_client );
 	}
 
-	delete[] m_outBuf;
+	alignedFreeFrames( m_outBuf );
 
 }
 
@@ -367,14 +368,14 @@ int audioJACK::processCallback( jack_nframes_t _nframes, void * _udata )
 						_this->m_framesDoneInCurBuf );
 		if( ts == JackTransportRolling )
 		{
+			const float gain = _this->getMixer()->masterGain();
 			for( Uint8 chnl = 0; chnl < _this->channels(); ++chnl )
 			{
 				for( jack_nframes_t frame = 0; frame < todo;
 								++frame )
 				{
 					outbufs[chnl][done+frame] = 
-		_this->m_outBuf[_this->m_framesDoneInCurBuf+frame][chnl] *
-						_this->getMixer()->masterGain();
+		_this->m_outBuf[_this->m_framesDoneInCurBuf+frame][chnl] * gain;
 				}
 			}
 		}

@@ -38,22 +38,22 @@
 #include "config_mgr.h"
 #include "gui_templates.h"
 #include "templates.h"
-
+#include "basic_ops.h"
 
 
 
 audioSDL::audioSDL( bool & _success_ful, mixer * _mixer ) :
 	audioDevice( DEFAULT_CHANNELS, _mixer ),
-	m_outBuf( new surroundSampleFrame[getMixer()->framesPerPeriod()] ),
+	m_outBuf( alignedAllocFrames( getMixer()->framesPerPeriod() ) ),
 	m_convertedBufPos( 0 ),
 	m_convertEndian( false ),
 	m_stopSemaphore( 1 )
 {
 	_success_ful = FALSE;
 
-	m_convertedBufSize = getMixer()->framesPerPeriod() * channels()
-						* sizeof( int_sample_t );
-	m_convertedBuf = new Uint8[m_convertedBufSize];
+	m_convertedBufSize = getMixer()->framesPerPeriod() *
+						sizeof( intSampleFrameA );
+	m_convertedBuf = (intSampleFrameA *) alignedMalloc( m_convertedBufSize );
 
 
 	if( SDL_Init( SDL_INIT_AUDIO | SDL_INIT_NOPARACHUTE ) < 0 )
@@ -97,8 +97,8 @@ audioSDL::~audioSDL()
 
 	SDL_CloseAudio();
 	SDL_Quit();
-	delete[] m_convertedBuf;
-	delete[] m_outBuf;
+	alignedFree( m_convertedBuf );
+	alignedFreeFrames( m_outBuf );
 }
 
 
@@ -190,12 +190,12 @@ void audioSDL::sdlAudioCallback( Uint8 * _buf, int _len )
 				memset( _buf, 0, _len );
 				return;
 			}
-			m_convertedBufSize = frames * channels()
-						* sizeof( int_sample_t );
+			m_convertedBufSize = frames * sizeof( intSampleFrameA );
 
-			convertToS16( m_outBuf, frames,
+			alignedConvertToS16( m_outBuf,
+						m_convertedBuf,
+						frames,
 						getMixer()->masterGain(),
-						(int_sample_t *)m_convertedBuf,
 						m_convertEndian );
 		}
 		const int min_len = qMin( _len, m_convertedBufSize

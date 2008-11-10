@@ -39,6 +39,7 @@
 #include "engine.h"
 #include "gui_templates.h"
 #include "templates.h"
+#include "basic_ops.h"
 
 #ifdef LMMS_HAVE_UNISTD_H
 #include <unistd.h>
@@ -298,13 +299,13 @@ void audioOSS::applyQualitySettings( void )
 
 void audioOSS::run( void )
 {
-	surroundSampleFrame * temp =
-		new surroundSampleFrame[getMixer()->framesPerPeriod()];
-	int_sample_t * outbuf =
-			new int_sample_t[getMixer()->framesPerPeriod() *
-								channels()];
+	sampleFrameA * temp = alignedAllocFrames(
+						getMixer()->framesPerPeriod() );
+	intSampleFrameA * outbuf = (intSampleFrameA *)
+			alignedMalloc( sizeof( intSampleFrameA ) *
+						getMixer()->framesPerPeriod() );
 
-	while( TRUE )
+	while( 1 )
 	{
 		const fpp_t frames = getNextBuffer( temp );
 		if( !frames )
@@ -312,8 +313,8 @@ void audioOSS::run( void )
 			break;
 		}
 
-		int bytes = convertToS16( temp, frames,
-				getMixer()->masterGain(), outbuf,
+		int bytes = alignedConvertToS16( temp, outbuf, frames,
+						getMixer()->masterGain(),
 							m_convertEndian );
 		if( write( m_audioFD, outbuf, bytes ) != bytes )
 		{
@@ -321,8 +322,8 @@ void audioOSS::run( void )
 		}
 	}
 
-	delete[] temp;
-	delete[] outbuf;
+	alignedFreeFrames( temp );
+	alignedFree( outbuf );
 }
 
 

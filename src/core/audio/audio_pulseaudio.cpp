@@ -40,6 +40,7 @@
 #include "lcd_spinbox.h"
 #include "gui_templates.h"
 #include "templates.h"
+#include "basic_ops.h"
 
 
 static void stream_write_callback(pa_stream *s, size_t length, void *userdata)
@@ -230,8 +231,9 @@ void audioPulseAudio::run( void )
 void audioPulseAudio::streamWriteCallback(pa_stream *s, size_t length)
 {
 	const fpp_t fpp = getMixer()->framesPerPeriod();
-	surroundSampleFrame * temp = new surroundSampleFrame[fpp];
-	Sint16 * pcmbuf = (Sint16*)pa_xmalloc( fpp * channels() * sizeof(Sint16) );
+	sampleFrameA * temp = alignedAllocFrames( fpp );
+	Sint16 * pcmbuf = (Sint16*)pa_xmalloc( fpp * channels() *
+							sizeof(Sint16) );
 
 	size_t fd = 0;
 	while( fd < length/4 )
@@ -241,9 +243,10 @@ void audioPulseAudio::streamWriteCallback(pa_stream *s, size_t length)
 		{
 			return;
 		}
-		int bytes = convertToS16( temp, frames,
+		int bytes = alignedConvertToS16( temp,
+						(intSampleFrameA *) pcmbuf,
+						frames,
 						getMixer()->masterGain(),
-						pcmbuf,
 						m_convertEndian );
 		if( bytes > 0 )
 		{
@@ -254,7 +257,7 @@ void audioPulseAudio::streamWriteCallback(pa_stream *s, size_t length)
 	}
 
 	pa_xfree( pcmbuf );
-	delete[] temp;
+	alignedFreeFrames( temp );
 }
 
 

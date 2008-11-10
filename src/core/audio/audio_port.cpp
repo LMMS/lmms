@@ -26,13 +26,15 @@
 #include "audio_device.h"
 #include "effect_chain.h"
 #include "engine.h"
+#include "basic_ops.h"
 
 
 audioPort::audioPort( const QString & _name, bool _has_effect_chain ) :
 	m_bufferUsage( NoUsage ),
-	m_firstBuffer( new sampleFrame[engine::getMixer()->framesPerPeriod()] ),
-	m_secondBuffer( new sampleFrame[
-				engine::getMixer()->framesPerPeriod()] ),
+	m_firstBuffer( alignedAllocFrames( 
+				engine::getMixer()->framesPerPeriod() ) ),
+	m_secondBuffer( alignedAllocFrames(
+				engine::getMixer()->framesPerPeriod() ) ),
 	m_extOutputEnabled( false ),
 	m_nextFxChannel( 0 ),
 	m_name( "unnamed port" ),
@@ -53,8 +55,8 @@ audioPort::~audioPort()
 {
 	setExtOutputEnabled( false );
 	engine::getMixer()->removeAudioPort( this );
-	delete[] m_firstBuffer;
-	delete[] m_secondBuffer;
+	alignedFreeFrames( m_firstBuffer );
+	alignedFreeFrames( m_secondBuffer );
 	delete m_effects;
 }
 

@@ -76,8 +76,8 @@ private:
 
 	SDL_AudioSpec m_audioHandle;
 
-	surroundSampleFrame * m_outBuf;
-	Uint8 * m_convertedBuf;
+	sampleFrameA * m_outBuf;
+	intSampleFrameA * m_convertedBuf;
 	int m_convertedBufPos;
 	int m_convertedBufSize;
 

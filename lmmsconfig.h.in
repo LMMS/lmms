@@ -19,6 +19,7 @@
 #cmakedefine LMMS_HAVE_VST
 
 #cmakedefine LMMS_HAVE_STDINT_H
+#cmakedefine LMMS_HAVE_STDBOOL_H
 #cmakedefine LMMS_HAVE_STDLIB_H
 #cmakedefine LMMS_HAVE_PTHREAD_H
 #cmakedefine LMMS_HAVE_UNISTD_H

@@ -41,6 +41,7 @@
 #include "sample_play_handle.h"
 #include "piano_roll.h"
 #include "micro_timer.h"
+#include "basic_ops.h"
 
 #include "audio_device.h"
 #include "midi_client.h"
@@ -61,37 +62,12 @@
 #include "midi_winmm.h"
 #include "midi_dummy.h"
 
+#ifdef LMMS_HAVE_PTHREAD_H
+#include <pthread.h>
+#endif
+
 
 static QVector<fx_ch_t> __fx_channel_jobs( NumFxChannels );
-
-
-
-static void aligned_free( void * _buf )
-{
-	if( _buf != NULL )
-	{
-		int *ptr2=(int *)_buf - 1;
-		_buf = (char *)_buf- *ptr2;
-		free(_buf);
-	}
-}
-
-static void * aligned_malloc( int _bytes )
-{
-	char *ptr,*ptr2,*aligned_ptr;
-	int align_mask = ALIGN_SIZE- 1;
-	ptr=(char *)malloc(_bytes +ALIGN_SIZE+ sizeof(int));
-	if(ptr==NULL) return(NULL);
-
-	ptr2 = ptr + sizeof(int);
-	aligned_ptr = ptr2 + (ALIGN_SIZE- ((size_t)ptr2 & align_mask));
-
-
-	ptr2 = aligned_ptr - sizeof(int);
-	*((int *)ptr2)=(int)(aligned_ptr - ptr);
-
-	return(aligned_ptr);
-}
 
 
 
@@ -152,9 +128,7 @@ public:
 
 	mixerWorkerThread( int _worker_num, mixer * _mixer ) :
 		QThread( _mixer ),
-		m_workingBuf( (sampleFrame *) aligned_malloc(
-					_mixer->framesPerPeriod() *
-						sizeof( sampleFrame ) ) ),
+		m_workingBuf( alignedAllocFrames( _mixer->framesPerPeriod() ) ),
 		m_workerNum( _worker_num ),
 		m_quit( false ),
 		m_mixer( _mixer ),
@@ -165,7 +139,7 @@ public:
 
 	virtual ~mixerWorkerThread()
 	{
-		aligned_free( m_workingBuf );
+		alignedFreeFrames( m_workingBuf );
 	}
 
 	virtual void quit( void )
@@ -234,11 +208,11 @@ private:
 	{
 #if 0
 #ifdef LMMS_BUILD_LINUX
-#ifdef LMMS_HAVE_SCHED_H
+#ifdef LMMS_HAVE_PTHREAD_H
 		cpu_set_t mask;
 		CPU_ZERO( &mask );
 		CPU_SET( m_workerNum, &mask );
-		sched_setaffinity( 0, sizeof( mask ), &mask );
+		pthread_setaffinity_np( pthread_self(), sizeof( mask ), &mask );
 #endif
 #endif
 #endif
@@ -310,7 +284,8 @@ mixer::mixer( void ) :
 	{
 		m_inputBufferFrames[i] = 0;
 		m_inputBufferSize[i] = DEFAULT_BUFFER_SIZE * 100;
-		m_inputBuffer[i] = new sampleFrame[ DEFAULT_BUFFER_SIZE * 100 ];
+		m_inputBuffer[i] = alignedAllocFrames( 
+						DEFAULT_BUFFER_SIZE * 100 );
 		clearAudioBuffer( m_inputBuffer[i], m_inputBufferSize[i] );
 	}
 
@@ -351,14 +326,10 @@ mixer::mixer( void ) :
 		m_fifo = new fifo( 1 );
 	}
 
-	m_workingBuf = (sampleFrame*) aligned_malloc( m_framesPerPeriod *
-							sizeof( sampleFrame ) );
+	m_workingBuf = alignedAllocFrames( m_framesPerPeriod );
 	for( Uint8 i = 0; i < 3; i++ )
 	{
-		m_readBuf = (surroundSampleFrame*)
-			aligned_malloc( m_framesPerPeriod *
-						sizeof( surroundSampleFrame ) );
-
+		m_readBuf = alignedAllocFrames( m_framesPerPeriod );
 		clearAudioBuffer( m_readBuf, m_framesPerPeriod );
 		m_bufferPool.push_back( m_readBuf );
 	}
@@ -409,10 +380,10 @@ mixer::~mixer()
 
 	for( Uint8 i = 0; i < 3; i++ )
 	{
-		aligned_free( m_bufferPool[i] );
+		alignedFreeFrames( m_bufferPool[i] );
 	}
 
-	aligned_free( m_workingBuf );
+	alignedFreeFrames( m_workingBuf );
 }
 
 
@@ -524,9 +495,9 @@ void mixer::pushInputFrames( sampleFrame * _ab, const f_cnt_t _frames )
 	if( frames + _frames > size )
 	{
 		size = qMax( size * 2, frames + _frames );
-		sampleFrame * ab = new sampleFrame[ size ];
-		memcpy( ab, buf, frames * sizeof( sampleFrame ) );
-		delete [] buf;
+		sampleFrame * ab = alignedAllocFrames( size );
+		alignedMemCpy( ab, buf, frames * sizeof( sampleFrame ) );
+		alignedFreeFrames( buf );
 
 		m_inputBufferSize[ m_inputBufferWrite ] = size;
 		m_inputBuffer[ m_inputBufferWrite ] = ab;
@@ -534,7 +505,7 @@ void mixer::pushInputFrames( sampleFrame * _ab, const f_cnt_t _frames )
 		buf = ab;
 	}
 	
-	memcpy( &buf[ frames ], _ab, _frames * sizeof( sampleFrame ) );
+	alignedMemCpy( &buf[ frames ], _ab, _frames * sizeof( sampleFrame ) );
 	m_inputBufferFrames[ m_inputBufferWrite ] += _frames;
 	
 	unlockInputFrames();
@@ -543,7 +514,7 @@ void mixer::pushInputFrames( sampleFrame * _ab, const f_cnt_t _frames )
 
 
 
-const surroundSampleFrame * mixer::renderNextBuffer( void )
+sampleFrameA * mixer::renderNextBuffer( void )
 {
 	microTimer timer;
 	static song::playPos last_metro_pos = -1;
@@ -709,12 +680,9 @@ void mixer::bufferToPort( const sampleFrame * _buf,
 	const int loop1_frame = qMin<int>( end_frame, m_framesPerPeriod );
 
 	_port->lockFirstBuffer();
-	sampleFrame * obuf = _port->firstBuffer()+start_frame;
-	for( int frame = 0; frame < loop1_frame-start_frame; ++frame )
-	{
-		obuf[frame][0] += _buf[frame][0] * _vv.vol[0];
-		obuf[frame][1] += _buf[frame][1] * _vv.vol[1];
-	}
+	unalignedBufMixLRCoeff( _port->firstBuffer() + start_frame,
+					_buf, _vv.vol[0], _vv.vol[1],
+						loop1_frame - start_frame );
 	_port->unlockFirstBuffer();
 
 	_port->lockSecondBuffer();
@@ -723,14 +691,10 @@ void mixer::bufferToPort( const sampleFrame * _buf,
 		const int frames_done = m_framesPerPeriod - start_frame;
 		end_frame -= m_framesPerPeriod;
 		end_frame = qMin<int>( end_frame, m_framesPerPeriod );
-		sampleFrame * obuf = _port->secondBuffer();
-		for( fpp_t frame = 0; frame < end_frame; ++frame )
-		{
-			obuf[frame][0] += _buf[frames_done + frame][0] *
-								_vv.vol[0];
-			obuf[frame][1] += _buf[frames_done + frame][1] *
-								_vv.vol[1];
-		}
+		unalignedBufMixLRCoeff( _port->secondBuffer(),
+						_buf+frames_done,
+						_vv.vol[0], _vv.vol[1],
+						end_frame );
 		// we used both buffers so set flags
 		_port->m_bufferUsage = audioPort::BothBuffers;
 	}
@@ -748,7 +712,14 @@ void mixer::bufferToPort( const sampleFrame * _buf,
 void mixer::clearAudioBuffer( sampleFrame * _ab, const f_cnt_t _frames,
 							const f_cnt_t _offset )
 {
-	memset( _ab+_offset, 0, sizeof( *_ab ) * _frames );
+	if( likely( (int)( _ab+_offset ) % 16 == 0 && _frames % 8 == 0 ) )
+	{
+		alignedMemClear( _ab+_offset, sizeof( *_ab ) * _frames );
+	}
+	else
+	{
+		memset( _ab+_offset, 0, sizeof( *_ab ) * _frames );
+	}
 }
 
 
@@ -1166,11 +1137,11 @@ void mixer::fifoWriter::run( void )
 {
 #if 0
 #ifdef LMMS_BUILD_LINUX
-#ifdef LMMS_HAVE_SCHED_H
+#ifdef LMMS_HAVE_PTHREAD_H
 	cpu_set_t mask;
 	CPU_ZERO( &mask );
 	CPU_SET( 0, &mask );
-	sched_setaffinity( 0, sizeof( mask ), &mask );
+	pthread_setaffinity_np( pthread_self(), sizeof( mask ), &mask );
 #endif
 #endif
 #endif
@@ -1178,9 +1149,9 @@ void mixer::fifoWriter::run( void )
 	const fpp_t frames = m_mixer->framesPerPeriod();
 	while( m_writing )
 	{
-		surroundSampleFrame * buffer = new surroundSampleFrame[frames];
-		const surroundSampleFrame * b = m_mixer->renderNextBuffer();
-		memcpy( buffer, b, frames * sizeof( surroundSampleFrame ) );
+		sampleFrameA * buffer = alignedAllocFrames( frames );
+		const sampleFrameA * b = m_mixer->renderNextBuffer();
+		alignedMemCpy( buffer, b, frames * sizeof( sampleFrameA ) );
 		m_fifo->write( buffer );
 	}
 

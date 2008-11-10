@@ -2,6 +2,7 @@
  * fifo_buffer.h - FIFO fixed-size buffer
  *
  * Copyright (c) 2007 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
+ * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -33,50 +34,50 @@ class fifoBuffer
 {
 public:
 	fifoBuffer( int _size ) :
-		m_reader_sem( _size ),
-		m_writer_sem( _size ),
-		m_reader_index( 0 ),
-		m_writer_index( 0 ),
+		m_readerSem( _size ),
+		m_writerSem( _size ),
+		m_readerIndex( 0 ),
+		m_writerIndex( 0 ),
 		m_size( _size )
 	{
 		m_buffer = new T[_size];
-		m_reader_sem.acquire( _size );
+		m_readerSem.acquire( _size );
 	}
 
 	~fifoBuffer()
 	{
 		delete[] m_buffer;
-		m_reader_sem.release( m_size );
+		m_readerSem.release( m_size );
 	}
 
 	void write( T _element )
 	{
-		m_writer_sem.acquire();
-		m_buffer[m_writer_index++] = _element;
-		m_writer_index %= m_size;
-		m_reader_sem.release();
+		m_writerSem.acquire();
+		m_buffer[m_writerIndex++] = _element;
+		m_writerIndex %= m_size;
+		m_readerSem.release();
 	}
 
 	T read( void )
 	{
-		m_reader_sem.acquire();
-		T element = m_buffer[m_reader_index++];
-		m_reader_index %= m_size;
-		m_writer_sem.release();
-		return( element );
+		m_readerSem.acquire();
+		T element = m_buffer[m_readerIndex++];
+		m_readerIndex %= m_size;
+		m_writerSem.release();
+		return element;
 	}
 
 	bool available( void )
 	{
-		return( m_reader_sem.available() );
+		return m_readerSem.available();
 	}
 
 
 private:
-	QSemaphore m_reader_sem;
-	QSemaphore m_writer_sem;
-	int m_reader_index;
-	int m_writer_index;
+	QSemaphore m_readerSem;
+	QSemaphore m_writerSem;
+	int m_readerIndex;
+	int m_writerIndex;
 	int m_size;
 	T * m_buffer;
 

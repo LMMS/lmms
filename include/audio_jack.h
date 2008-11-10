@@ -94,7 +94,7 @@ private:
 	QSemaphore m_stop_semaphore;
 
 	QVector<jack_port_t *> m_outputPorts;
-	surroundSampleFrame * m_outBuf;
+	sampleFrameA * m_outBuf;
 
 
 	f_cnt_t m_framesDoneInCurBuf;

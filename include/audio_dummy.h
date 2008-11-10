@@ -27,6 +27,7 @@
 #define _AUDIO_DUMMY_H
 
 #include "audio_device.h"
+#include "basic_ops.h"
 #include "micro_timer.h"
 
 
@@ -94,16 +95,16 @@ private:
 	virtual void run( void )
 	{
 		microTimer timer;
-		while( TRUE )
+		while( true )
 		{
 			timer.reset();
-			const surroundSampleFrame * b =
+			surroundSampleFrame * b =
 						getMixer()->nextBuffer();
 			if( !b )
 			{
 				break;
 			}
-			delete[] b;
+			alignedFreeFrames( b );
 
 			const Sint32 microseconds = static_cast<Sint32>(
 					getMixer()->framesPerPeriod() *

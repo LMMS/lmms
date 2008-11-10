@@ -34,6 +34,7 @@
 #include "ladspa_subplugin_features.h"
 #include "mixer.h"
 #include "effect_chain.h"
+#include "basic_ops.h"
 #include "automation_pattern.h"
 
 
@@ -144,7 +145,7 @@ bool ladspaEffect::processAudioBuffer( sampleFrame * _buf,
 	if( m_maxSampleRate < engine::getMixer()->processingSampleRate() )
 	{
 		o_buf = _buf;
-		_buf = new sampleFrame[_frames];
+		_buf = alignedAllocFrames( _frames );
 		sampleDown( o_buf, _buf, m_maxSampleRate );
 		frames = _frames * m_maxSampleRate /
 				engine::getMixer()->processingSampleRate();
@@ -217,8 +218,8 @@ bool ladspaEffect::processAudioBuffer( sampleFrame * _buf,
 	// Copy the LADSPA output buffers to the LMMS buffer.
 	double out_sum = 0.0;
 	channel = 0;
-	const float d = getDryLevel();
-	const float w = getWetLevel();
+	float * buffers[2];
+
 	for( ch_cnt_t proc = 0; proc < getProcessorCount(); ++proc )
 	{
 		for( int port = 0; port < m_portCount; ++port )
@@ -231,17 +232,9 @@ bool ladspaEffect::processAudioBuffer( sampleFrame * _buf,
 				case CONTROL_RATE_INPUT:
 					break;
 				case CHANNEL_OUT:
-					for( fpp_t frame = 0; 
-						frame < frames; ++frame )
+					if( channel < DEFAULT_CHANNELS )
 					{
-						_buf[frame][channel] = 
-							d * 
-							_buf[frame][channel] +
-							w *
-							pp->buffer[frame];
-						out_sum += 
-							_buf[frame][channel] *
-							_buf[frame][channel];
+						buffers[channel] = pp->buffer;
 					}
 					++channel;
 					break;
@@ -254,10 +247,27 @@ bool ladspaEffect::processAudioBuffer( sampleFrame * _buf,
 		}
 	}
 
+	if( channel == 1 )
+	{
+		buffers[1] = buffers[0];
+	}
+	if( channel >= 1 && channel <= DEFAULT_CHANNELS )
+	{
+		alignedBufWetDryMixSplitted( _buf, buffers[0], buffers[1],
+					getWetLevel(), getDryLevel(), frames );
+	}
+
+	for( int i = 0; i < frames; ++i )
+	{
+		out_sum += _buf[i][0]*_buf[i][0];
+		out_sum += _buf[i][1]*_buf[i][1];
+
+	}
+
 	if( o_buf != NULL )
 	{
 		sampleBack( _buf, o_buf, m_maxSampleRate );
-		delete[] _buf;
+		alignedFreeFrames( _buf );
 	}
 
 	checkGate( out_sum / frames );

@@ -57,6 +57,7 @@
 #include "main_window.h"
 #include "project_renderer.h"
 #include "song.h"
+#include "basic_ops.h"
 
 #warning TODO: move somewhere else
 static inline QString baseName( const QString & _file )
@@ -78,12 +79,29 @@ inline void loadTranslation( const QString & _tname,
 }
 
 
+Uint32 convertToS16( const sampleFrameA * RP _ab,
+						const fpp_t _frames,
+						const float _master_gain,
+						intSampleFrameA * RP _output_buffer,
+						const bool _convert_endian );
 
 int main( int argc, char * * argv )
 {
 	// intialize RNG
 	srand( getpid() + time( 0 ) );
 
+	// init CPU specific optimized basic ops
+	initBasicOps();
+
+#if 0
+	sampleFrameA * buf = (sampleFrameA *) alignedMalloc( sizeof( sampleFrameA ) * 256 );
+	intSampleFrameA * obuf = (intSampleFrameA*)alignedMalloc( sizeof( intSampleFrameA ) * 256 );
+	for( int i = 0; i< 1000000; ++i )
+	{
+		convertToS16( buf, 256, 0.7, obuf, false );
+	}
+return 0;
+#endif
 	bool core_only = FALSE;
 
 	for( int i = 1; i < argc; ++i )

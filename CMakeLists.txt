@@ -70,6 +70,7 @@ ENDIF(LMMS_BUILD_WIN32)
 
 
 CHECK_INCLUDE_FILES(stdint.h LMMS_HAVE_STDINT_H)
+CHECK_INCLUDE_FILES(stdbool.h LMMS_HAVE_STDBOOL_H)
 CHECK_INCLUDE_FILES(stdlib.h LMMS_HAVE_STDLIB_H)
 CHECK_INCLUDE_FILES(pthread.h LMMS_HAVE_PTHREAD_H)
 CHECK_INCLUDE_FILES(semaphore.h LMMS_HAVE_SEMAPHORE_H)
@@ -387,6 +388,43 @@ SET(LMMS_ER_H ${CMAKE_CURRENT_BINARY_DIR}/embedded_resources.h)
 ADD_FILE_DEPENDENCIES(${CMAKE_BINARY_DIR}/lmmsconfig.h ${lmms_MOC_out})
 
 ADD_CUSTOM_COMMAND(OUTPUT ${LMMS_ER_H} COMMAND ${BIN2RES} ARGS ${lmms_EMBEDDED_RESOURCES} > ${LMMS_ER_H} DEPENDS ${BIN2RES})
+SET(BASIC_OPS_X86_C "${CMAKE_SOURCE_DIR}/src/core/basic_ops_x86.c")
+
+IF(LMMS_HOST_X86 OR LMMS_HOST_X86_64)
+
+ADD_CUSTOM_TARGET(regen-basic-ops)
+
+IF(LMMS_HOST_X86)
+SET(opt_targets mmx sse sse2)
+SET(host_arch x86)
+ELSE(LMMS_HOST_X86)
+SET(opt_targets sse sse2)
+SET(host_arch x86_64)
+ENDIF(LMMS_HOST_X86)
+
+FOREACH(opt_target ${opt_targets})
+
+	STRING(TOUPPER ${opt_target} OPT_TARGET)
+
+	SET(BASIC_OPS_X86_TARGET_S "${CMAKE_SOURCE_DIR}/src/core/basic_ops_${host_arch}_${opt_target}.s")
+	SET(BASIC_OPS_X86_TARGET_O "${CMAKE_BINARY_DIR}/basic_ops_${host_arch}_${opt_target}.o")
+	IF(NOT "${OPT_TARGET}" STREQUAL "MMX")
+		SET(FPMATH_FLAGS "-mfpmath=sse")
+	ENDIF(NOT "${OPT_TARGET}" STREQUAL "MMX")
+	IF(EXISTS "$ENV{SVN_C_COMPILER}")
+		SET(C_COMPILER $ENV{SVN_C_COMPILER})
+	ELSE(EXISTS "$ENV{SVN_C_COMPILER}")
+		SET(C_COMPILER ${CMAKE_C_COMPILER})
+	ENDIF(EXISTS "$ENV{SVN_C_COMPILER}")
+	ADD_CUSTOM_TARGET(regen-basic-ops-${opt_target} COMMAND ${C_COMPILER} -O2 -ftree-vectorize -ftree-vectorizer-verbose=2 -fomit-frame-pointer -c -S -I${CMAKE_SOURCE_DIR}/include -I${CMAKE_BINARY_DIR} -g0 -DBUILD_${OPT_TARGET} -m${opt_target} ${FPMATH_FLAGS} -o ${BASIC_OPS_X86_TARGET_S} ${BASIC_OPS_X86_C} DEPENDS ${BASIC_OPS_X86_C})
+	ADD_CUSTOM_COMMAND(OUTPUT ${BASIC_OPS_X86_TARGET_O} COMMAND ${CMAKE_C_COMPILER} ARGS ${BASIC_OPS_X86_TARGET_S} -c -o ${BASIC_OPS_X86_TARGET_O} DEPENDS ${BASIC_OPS_X86_TARGET_S})
+	ADD_DEPENDENCIES(regen-basic-ops regen-basic-ops-${opt_target})
+	SET(opt_target_objects ${opt_target_objects} ${BASIC_OPS_X86_TARGET_O})
+
+ENDFOREACH(opt_target ${opt_targets})
+SET(lmms_SOURCES ${lmms_SOURCES} ${opt_target_objects})
+# to be used by maintainer with special ultra-optimizing super duper GCC
+ENDIF(LMMS_HOST_X86 OR LMMS_HOST_X86_64)
 
 IF(WIN32)
 	SET(WINRC "${CMAKE_BINARY_DIR}/lmmsrc.obj")

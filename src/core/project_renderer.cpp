@@ -32,9 +32,10 @@
 #include "audio_file_wave.h"
 #include "audio_file_ogg.h"
 
-#ifdef LMMS_HAVE_SCHED_H
-#include <sched.h>
+#ifdef LMMS_HAVE_PTHREAD_H
+#include <pthread.h>
 #endif
+
 
 
 fileEncodeDevice __fileEncodeDevices[] =
@@ -148,11 +149,11 @@ void projectRenderer::run( void )
 {
 #if 0
 #ifdef LMMS_BUILD_LINUX
-#ifdef LMMS_HAVE_SCHED_H
+#ifdef LMMS_HAVE_PTHREAD_H
 	cpu_set_t mask;
 	CPU_ZERO( &mask );
 	CPU_SET( 0, &mask );
-	sched_setaffinity( 0, sizeof( mask ), &mask );
+	pthread_setaffinity_np( pthread_self(), sizeof( mask ), &mask );
 #endif
 #endif
 #endif

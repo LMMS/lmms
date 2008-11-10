@@ -31,6 +31,7 @@
 #include "audio_device.h"
 #include "config_mgr.h"
 #include "debug.h"
+#include "basic_ops.h"
 
 
 
@@ -39,7 +40,7 @@ audioDevice::audioDevice( const ch_cnt_t _channels, mixer * _mixer ) :
 	m_sampleRate( _mixer->processingSampleRate() ),
 	m_channels( _channels ),
 	m_mixer( _mixer ),
-	m_buffer( new surroundSampleFrame[getMixer()->framesPerPeriod()] )
+	m_buffer( alignedAllocFrames( getMixer()->framesPerPeriod() ) )
 {
 	int error;
 	if( ( m_srcState = src_new(
@@ -56,7 +57,7 @@ audioDevice::audioDevice( const ch_cnt_t _channels, mixer * _mixer ) :
 audioDevice::~audioDevice()
 {
 	src_delete( m_srcState );
-	delete[] m_buffer;
+	alignedFreeFrames( m_buffer );
 
 	m_devMutex.tryLock();
 	unlock();
@@ -81,10 +82,10 @@ void audioDevice::processNextBuffer( void )
 
 
 
-fpp_t audioDevice::getNextBuffer( surroundSampleFrame * _ab )
+fpp_t audioDevice::getNextBuffer( sampleFrameA * _ab )
 {
 	fpp_t frames = getMixer()->framesPerPeriod();
-	const surroundSampleFrame * b = getMixer()->nextBuffer();
+	sampleFrameA * b = getMixer()->nextBuffer();
 	if( !b )
 	{
 		return( 0 );
@@ -103,7 +104,7 @@ fpp_t audioDevice::getNextBuffer( surroundSampleFrame * _ab )
 	}
 	else
 	{
-		memcpy( _ab, b, frames * sizeof( surroundSampleFrame ) );
+		alignedMemCpy( _ab, b, frames * sizeof( surroundSampleFrame ) );
 	}
 
 	// release lock
@@ -111,10 +112,10 @@ fpp_t audioDevice::getNextBuffer( surroundSampleFrame * _ab )
 
 	if( getMixer()->hasFifoWriter() )
 	{
-		delete[] b;
+		alignedFreeFrames( b );
 	}
 
-	return( frames );
+	return frames;
 }
 
 
@@ -171,11 +172,10 @@ void audioDevice::renamePort( audioPort * )
 
 
 
-void audioDevice::resample( const surroundSampleFrame * _src,
-						const fpp_t _frames,
-						surroundSampleFrame * _dst,
-						const sample_rate_t _src_sr,
-						const sample_rate_t _dst_sr )
+void audioDevice::resample( const sampleFrame * _src, const fpp_t _frames,
+					sampleFrame * _dst,
+					const sample_rate_t _src_sr,
+					const sample_rate_t _dst_sr )
 {
 	if( m_srcState == NULL )
 	{
@@ -197,57 +197,11 @@ void audioDevice::resample( const surroundSampleFrame * _src,
 
 
 
-Uint32 audioDevice::convertToS16( const surroundSampleFrame * _ab,
-						const fpp_t _frames,
-						const float _master_gain,
-						int_sample_t * _output_buffer,
-						const bool _convert_endian )
+
+void audioDevice::clearS16Buffer( intSampleFrameA * _outbuf, const fpp_t _frames )
 {
-	if( _convert_endian )
-	{
-		Uint16 temp;
-		for( fpp_t frame = 0; frame < _frames; ++frame )
-		{
-			for( ch_cnt_t chnl = 0; chnl < channels(); ++chnl )
-			{
-				temp = static_cast<int_sample_t>(
-						mixer::clip( _ab[frame][chnl] *
-						_master_gain ) *
-						OUTPUT_SAMPLE_MULTIPLIER );
-				
-				( _output_buffer + frame * channels() )[chnl] =
-						( temp & 0x00ff ) << 8 |
-						( temp & 0xff00 ) >> 8;
-			}
-		}
-	}
-	else
-	{
-		for( fpp_t frame = 0; frame < _frames; ++frame )
-		{
-			for( ch_cnt_t chnl = 0; chnl < channels(); ++chnl )
-			{
-				( _output_buffer + frame * channels() )[chnl] =
-						static_cast<int_sample_t>(
-						mixer::clip( _ab[frame][chnl] *
-						_master_gain ) *
-						OUTPUT_SAMPLE_MULTIPLIER );
-			}
-		}
-	}
-
-	return( _frames * channels() * BYTES_PER_INT_SAMPLE );
-}
-
-
-
-
-void audioDevice::clearS16Buffer( int_sample_t * _outbuf, const fpp_t _frames )
-{
-#ifdef LMMS_DEBUG
-	assert( _outbuf != NULL );
-#endif
-	memset( _outbuf, 0,  _frames * channels() * BYTES_PER_INT_SAMPLE );
+	alignedMemClear( _outbuf, _frames * sizeof( *_outbuf ) );
+//	memset( _outbuf, 0,  _frames * channels() * BYTES_PER_INT_SAMPLE );
 }
 
 
