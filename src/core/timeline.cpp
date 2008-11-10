@@ -85,6 +85,7 @@ timeLine::timeLine( const int _xoff, const int _yoff, const float _ppt,
 							"loop_point" ) );
 	}
 
+	setAttribute( Qt::WA_OpaquePaintEvent, true );
 	move( 0, _yoff );
 	setFixedHeight( s_timeLinePixmap->height() );
 

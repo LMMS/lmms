@@ -47,12 +47,13 @@
 lcdSpinBox::lcdSpinBox( int _num_digits, QWidget * _parent,
 			const QString & _name ) :
 	QWidget( _parent ),
-	intModelView( new intModel( 0, 0, 0, NULL, _name, TRUE ), this ),
+	intModelView( new intModel( 0, 0, 0, NULL, _name, true ), this ),
 	m_label(),
 	m_numDigits( _num_digits ),
 	m_origMousePos()
 {
-	setEnabled( TRUE );
+	setAttribute( Qt::WA_OpaquePaintEvent, true );
+	setEnabled( true );
 
 	setAccessibleName( _name );
 
@@ -72,12 +73,12 @@ lcdSpinBox::lcdSpinBox( int _num_digits, QWidget * _parent,
 lcdSpinBox::lcdSpinBox( int _num_digits, const QString & _lcd_style,
 			QWidget * _parent, const QString & _name ) :
 	QWidget( _parent ),
-	intModelView( new intModel( 0, 0, 0, NULL, _name, TRUE ), this ),
+	intModelView( new intModel( 0, 0, 0, NULL, _name, true ), this ),
 	m_label(),
 	m_numDigits( _num_digits ),
 	m_origMousePos()
 {
-	setEnabled( TRUE );
+	setEnabled( true );
 
 	setAccessibleName( _name );
 
@@ -284,7 +285,7 @@ void lcdSpinBox::contextMenuEvent( QContextMenuEvent * _me )
 void lcdSpinBox::mousePressEvent( QMouseEvent * _me )
 {
 	if( _me->button() == Qt::LeftButton &&
-		engine::getMainWindow()->isCtrlPressed() == FALSE &&
+		engine::getMainWindow()->isCtrlPressed() == false &&
 						_me->y() < m_cellHeight + 2  )
 	{
 		m_origMousePos = _me->globalPos();

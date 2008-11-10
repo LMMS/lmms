@@ -436,6 +436,7 @@ KMultiTabBarTab::KMultiTabBarTab(const QPixmap& pic, const QString& text,
 	setIcon(pic);
 	m_expandedSize=24;
 	setCheckable(true);
+	setAttribute( Qt::WA_OpaquePaintEvent, true );
 }
 
 KMultiTabBarTab::~KMultiTabBarTab() {

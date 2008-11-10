@@ -47,6 +47,7 @@ groupBox::groupBox( const QString & _caption, QWidget * _parent ) :
 	boolModelView( NULL, this ),
 	m_caption( _caption )
 {
+	setAttribute( Qt::WA_OpaquePaintEvent, true );
 	updatePixmap();
 
 	m_led = new pixmapButton( this, _caption );

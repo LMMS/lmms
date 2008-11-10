@@ -1,3 +1,28 @@
+2008-11-10	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* src/core/track.cpp:
+	* src/core/timeline.cpp:
+	* src/core/piano.cpp:
+	* src/core/automation_pattern.cpp:
+	* src/gui/piano_roll.cpp:
+	* src/gui/fx_mixer_view.cpp:
+	* src/gui/widgets/track_label_button.cpp:
+	* src/gui/widgets/visualization_widget.cpp:
+	* src/gui/widgets/combobox.cpp:
+	* src/gui/widgets/tab_widget.cpp:
+	* src/gui/widgets/kmultitabbar.cpp:
+	* src/gui/widgets/envelope_and_lfo_view.cpp:
+	* src/gui/widgets/cpuload_widget.cpp:
+	* src/gui/widgets/fade_button.cpp:
+	* src/gui/widgets/lcd_spinbox.cpp:
+	* src/gui/widgets/group_box.cpp:
+	* src/gui/widgets/fader.cpp:
+	* src/gui/widgets/effect_rack_view.cpp:
+	* src/gui/widgets/effect_view.cpp:
+	* src/gui/automation_editor.cpp:
+	set OpaquePaintEvent attribute for all widgets where suitable - makes
+	whole GUI less sluggish :)
+
 2008-11-10	Andrew Kelley	<superjoe30/at/gmail/dot/com>
 
 	* src/gui/piano_roll.h:

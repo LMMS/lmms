@@ -103,6 +103,8 @@ envelopeAndLFOView::envelopeAndLFOView( QWidget * _parent ) :
 		s_lfoGraph = new QPixmap( embed::getIconPixmap( "lfo_graph" ) );
 	}
 
+	setAttribute( Qt::WA_OpaquePaintEvent, true );
+
 	m_predelayKnob = new knob( knobBright_26, this );
 	m_predelayKnob->setLabel( tr( "DEL" ) );
 	m_predelayKnob->move( PREDELAY_KNOB_X, ENV_KNOBS_Y );

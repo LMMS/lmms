@@ -69,7 +69,7 @@ fader::fader( floatModel * _model, QWidget * _parent ) :
 	m_leds( embed::getIconPixmap( "fader_leds" ) ),
 	m_knob( embed::getIconPixmap( "fader_knob" ) )
 {
-	setAttribute( Qt::WA_NoBackground );
+	setAttribute( Qt::WA_OpaquePaintEvent, true );
 	setMinimumSize( 23, 116 );
 	setMaximumSize( 23, 116);
 	resize( 23, 116 );

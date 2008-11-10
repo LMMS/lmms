@@ -45,7 +45,7 @@ visualizationWidget::visualizationWidget( const QPixmap & _bg, QWidget * _p,
 	m_active( FALSE )
 {
 	setFixedSize( s_background.width(), s_background.height() );
-
+	setAttribute( Qt::WA_OpaquePaintEvent, true );
 
 	const fpp_t frames = engine::getMixer()->framesPerPeriod();
 	m_buffer = new sampleFrame[frames];

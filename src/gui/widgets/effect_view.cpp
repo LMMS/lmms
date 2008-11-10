@@ -51,11 +51,11 @@
 effectView::effectView( effect * _model, QWidget * _parent ) :
 	pluginView( _model, _parent ),
 	m_bg( embed::getIconPixmap( "effect_plugin" ) ),
-	m_show( TRUE )
+	m_show( true )
 {
 	setFixedSize( 210, 60 );
 
-	setAttribute( Qt::WA_OpaquePaintEvent, TRUE );
+	setAttribute( Qt::WA_OpaquePaintEvent, true );
 
 	m_bypass = new ledCheckBox( "", this );
 	m_bypass->move( 3, 3 );
@@ -165,12 +165,12 @@ void effectView::editControls( void )
 	{
 		m_subWindow->show();
 		m_subWindow->raise();
-		m_show = FALSE;
+		m_show = false;
 	}
 	else
 	{
 		m_subWindow->hide();
-		m_show = TRUE;
+		m_show = true;
 	}
 }
 
@@ -212,7 +212,7 @@ void effectView::displayHelp( void )
 void effectView::closeEffects( void )
 {
 	m_subWindow->hide();
-	m_show = TRUE;
+	m_show = true;
 }
 
 
@@ -248,7 +248,7 @@ void effectView::paintEvent( QPaintEvent * )
 	p.drawPixmap( 0, 0, m_bg );
 
 	QFont f = pointSizeF( font(), 7.5f );
-	f.setBold( TRUE );
+	f.setBold( true );
 	p.setFont( f );
 
 	p.setPen( QColor( 64, 64, 64 ) );

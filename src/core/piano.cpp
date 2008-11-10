@@ -208,6 +208,7 @@ pianoView::pianoView( QWidget * _parent ) :
 							"black_key_pressed" ) );
 	}
 
+	setAttribute( Qt::WA_OpaquePaintEvent, true );
 	setFocusPolicy( Qt::StrongFocus );
 
 	m_pianoScroll = new QScrollBar( Qt::Horizontal, this );
