@@ -533,6 +533,7 @@ automationPatternView::automationPatternView( automationPattern * _pattern,
 	connect( m_pat, SIGNAL( dataChanged() ),
 			this, SLOT( update() ) );
 
+	setAttribute( Qt::WA_OpaquePaintEvent, true );
 	setFixedHeight( parentWidget()->height() - 2 );
 	setAutoResizeEnabled( false );
 

@@ -55,7 +55,7 @@ public:
 		m_name( _name )
 	{
 		setFixedSize( 32, 232 );
-		setAttribute( Qt::WA_OpaquePaintEvent, TRUE );
+		setAttribute( Qt::WA_OpaquePaintEvent, true );
 		setCursor( QCursor( embed::getIconPixmap( "hand" ), 0, 0 ) );
 	}
 
@@ -117,7 +117,7 @@ fxMixerView::fxMixerView() :
 	QPalette pal = palette();
 	pal.setColor( QPalette::Background, QColor( 72, 76, 88 ) );
 	setPalette( pal );
-	setAutoFillBackground( TRUE );
+	setAutoFillBackground( true );
 	setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Minimum );
 
 	setWindowTitle( tr( "FX-Mixer" ) );
@@ -184,7 +184,7 @@ fxMixerView::fxMixerView() :
 					embed::getIconPixmap( "led_off" ) );
 		cv->m_muteBtn->setInactiveGraphic(
 					embed::getIconPixmap( "led_green" ) );
-		cv->m_muteBtn->setCheckable( TRUE );
+		cv->m_muteBtn->setCheckable( true );
 		cv->m_muteBtn->move( 9,  cv->m_fader->y()-16);
 		toolTip::add( cv->m_muteBtn, tr( "Mute this FX channel" ) );
 
@@ -197,12 +197,12 @@ fxMixerView::fxMixerView() :
 			l->addSpacing( 10 );
 			QButtonGroup * g = new QButtonGroup( this );
 			m_bankButtons = g;
-			g->setExclusive( TRUE );
+			g->setExclusive( true );
 			for( int j = 0; j < 4; ++j )
 			{
 				QToolButton * btn = new QToolButton;
 				btn->setText( QString( 'A'+j ) );
-				btn->setCheckable( TRUE );
+				btn->setCheckable( true );
 				btn->setSizePolicy( QSizePolicy::Preferred,
 						QSizePolicy::Expanding );
 				l->addWidget( btn );
@@ -239,7 +239,7 @@ fxMixerView::fxMixerView() :
 	subWin->setWindowFlags( flags );
 	subWin->layout()->setSizeConstraint(QLayout::SetFixedSize);
 
-	parentWidget()->setAttribute( Qt::WA_DeleteOnClose, FALSE );
+	parentWidget()->setAttribute( Qt::WA_DeleteOnClose, false );
 	parentWidget()->move( 5, 310 );
 
 	// we want to receive dataChanged-signals in order to update

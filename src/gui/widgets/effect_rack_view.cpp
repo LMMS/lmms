@@ -42,6 +42,7 @@ effectRackView::effectRackView( effectChain * _model, QWidget * _parent ) :
 	QWidget( _parent ),
 	modelView( NULL, this )
 {
+	setAttribute( Qt::WA_OpaquePaintEvent, true );
 	setFixedSize( 250, 250 );
 
 	m_effectsGroupBox = new groupBox( tr( "EFFECTS CHAIN" ), this );

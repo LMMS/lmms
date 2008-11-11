@@ -43,6 +43,7 @@ trackLabelButton::trackLabelButton( trackView * _tv, QWidget * _parent ) :
 	m_trackView( _tv ),
 	m_iconName()
 {
+	setAttribute( Qt::WA_OpaquePaintEvent, true );
 	setAcceptDrops( true );
 	setCursor( QCursor( embed::getIconPixmap( "hand" ), 0, 0 ) );
 	setToolButtonStyle( Qt::ToolButtonTextBesideIcon );

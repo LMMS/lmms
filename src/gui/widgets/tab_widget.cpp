@@ -43,13 +43,15 @@ tabWidget::tabWidget( const QString & _caption, QWidget * _parent ) :
 {
 	setFont( pointSize<7>( font() ) );
 
-	setAutoFillBackground( TRUE );
+	setAutoFillBackground( true );
 	QColor bg_color = QApplication::palette().color( QPalette::Active,
 							QPalette::Background ).
 								darker( 132 );
 	QPalette pal = palette();
 	pal.setColor( QPalette::Background, bg_color );
 	setPalette( pal );
+
+	setAttribute( Qt::WA_OpaquePaintEvent, true );
 }
 
 
@@ -66,9 +68,9 @@ void tabWidget::addTab( QWidget * _w, const QString & _name, int _idx )
 {
 	setFont( pointSize<7>( font() ) );
 	widgetDesc d = { _w, _name, fontMetrics().width( _name ) + 10 } ;
-	if( _idx < 0/* || m_widgets.contains( _idx ) == TRUE*/ )
+	if( _idx < 0/* || m_widgets.contains( _idx ) == true*/ )
 	{
-		while( m_widgets.contains( ++_idx ) == TRUE )
+		while( m_widgets.contains( ++_idx ) == true )
 		{
 		}
 	}

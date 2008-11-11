@@ -118,6 +118,8 @@ automationEditor::automationEditor( void ) :
 							"edit_move" ) );
 	}
 
+	setAttribute( Qt::WA_OpaquePaintEvent, true );
+
 	// add time-line
 	m_timeLine = new timeLine( VALUES_WIDTH, 32, m_ppt,
 				engine::getSong()->getPlayPos(

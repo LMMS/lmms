@@ -112,16 +112,16 @@ trackContentObject::trackContentObject( track * _track ) :
 	m_name( QString::null ),
 	m_startPosition(),
 	m_length(),
-	m_mutedModel( FALSE, this, tr( "Muted" ) )
+	m_mutedModel( false, this, tr( "Muted" ) )
 {
 	if( getTrack() )
 	{
 		getTrack()->addTCO( this );
 	}
-	setJournalling( FALSE );
+	setJournalling( false );
 	movePosition( 0 );
 	changeLength( 0 );
-	setJournalling( TRUE );
+	setJournalling( true );
 }
 
 
@@ -197,7 +197,7 @@ void trackContentObject::changeLength( const midiTime & _length )
  */
 void trackContentObject::undoStep( journalEntry & _je )
 {
-	saveJournallingState( FALSE );
+	saveJournallingState( false );
 	switch( _je.actionID() )
 	{
 		case Move:
@@ -295,7 +295,7 @@ trackContentObjectView::trackContentObjectView( trackContentObject * _tco,
 	m_tco( _tco ),
 	m_trackView( _tv ),
 	m_action( NoAction ),
-	m_autoResize( FALSE ),
+	m_autoResize( false ),
 	m_initialMouseX( 0 ),
 	m_hint( NULL )
 {
@@ -305,15 +305,16 @@ trackContentObjectView::trackContentObjectView( trackContentObject * _tco,
 		s_textFloat->setPixmap( embed::getIconPixmap( "clock" ) );
 	}
 
-	setAttribute( Qt::WA_DeleteOnClose );
+	setAttribute( Qt::WA_OpaquePaintEvent, true );
+	setAttribute( Qt::WA_DeleteOnClose, true );
 	setFocusPolicy( Qt::StrongFocus );
 	setCursor( QCursor( embed::getIconPixmap( "hand" ), 0, 0 ) );
 	move( 0, 1 );
 	show();
 
 	setFixedHeight( _tv->getTrackContentWidget()->height() - 2 );
-	setAcceptDrops( TRUE );
-	setMouseTracking( TRUE );
+	setAcceptDrops( true );
+	setMouseTracking( true );
 
 	connect( m_tco, SIGNAL( lengthChanged() ),
 			this, SLOT( updateLength() ) );
@@ -486,7 +487,7 @@ void trackContentObjectView::dropEvent( QDropEvent * _de )
 	{
 		// value contains our XML-data so simply create a
 		// multimediaProject which does the rest for us...
-		multimediaProject mmp( value, FALSE );
+		multimediaProject mmp( value, false );
 		// at least save position before getting to moved to somewhere
 		// the user doesn't expect...
 		midiTime pos = m_tco->startPosition();
@@ -536,17 +537,17 @@ void trackContentObjectView::leaveEvent( QEvent * _e )
  */
 void trackContentObjectView::mousePressEvent( QMouseEvent * _me )
 {
-	if( m_trackView->getTrackContainerView()->allowRubberband() == TRUE &&
+	if( m_trackView->getTrackContainerView()->allowRubberband() == true &&
 					_me->button() == Qt::LeftButton )
 	{
 		// if rubberband is active, we can be selected
 		if( !m_trackView->getTrackContainerView()->rubberBandActive() )
 		{
-			if( engine::getMainWindow()->isCtrlPressed() == TRUE )
+			if( engine::getMainWindow()->isCtrlPressed() == true )
 			{
 				setSelected( !isSelected() );
 			}
-			else if( isSelected() == TRUE )
+			else if( isSelected() == true )
 			{
 				m_action = MoveSelection;
 				m_initialMouseX = _me->x();
@@ -558,13 +559,13 @@ void trackContentObjectView::mousePressEvent( QMouseEvent * _me )
 		}
 		return;
 	}
-	else if( engine::getMainWindow()->isShiftPressed() == TRUE )
+	else if( engine::getMainWindow()->isShiftPressed() == true )
 	{
 		// add/remove object to/from selection
 		selectableObject::mousePressEvent( _me );
 	}
 	else if( _me->button() == Qt::LeftButton &&
-			engine::getMainWindow()->isCtrlPressed() == TRUE )
+			engine::getMainWindow()->isCtrlPressed() == true )
 	{
 		// start drag-action
 		multimediaProject mmp( multimediaProject::DragNDropData );
@@ -578,11 +579,11 @@ void trackContentObjectView::mousePressEvent( QMouseEvent * _me )
 					mmp.toString(), thumbnail, this );
 	}
 	else if( _me->button() == Qt::LeftButton &&
-		/*	engine::getMainWindow()->isShiftPressed() == FALSE &&*/
-							fixedTCOs() == FALSE )
+		/*	engine::getMainWindow()->isShiftPressed() == false &&*/
+							fixedTCOs() == false )
 	{
 		// move or resize
-		m_tco->setJournalling( FALSE );
+		m_tco->setJournalling( false );
 
 		m_initialMouseX = _me->x();
 
@@ -599,7 +600,7 @@ void trackContentObjectView::mousePressEvent( QMouseEvent * _me )
 							"a copy." ),
 					embed::getIconPixmap( "hint" ), 0 );
 		}
-		else if( m_autoResize == FALSE )
+		else if( m_autoResize == false )
 		{
 			m_action = Resize;
 			m_oldTime = m_tco->length();
@@ -623,7 +624,7 @@ void trackContentObjectView::mousePressEvent( QMouseEvent * _me )
 		{
 			m_tco->toggleMute();
 		}
-		else if( fixedTCOs() == FALSE )
+		else if( fixedTCOs() == false )
 		{
 			remove();
 		}
@@ -648,7 +649,7 @@ void trackContentObjectView::mousePressEvent( QMouseEvent * _me )
  */
 void trackContentObjectView::mouseMoveEvent( QMouseEvent * _me )
 {
-	if( engine::getMainWindow()->isCtrlPressed() == TRUE )
+	if( engine::getMainWindow()->isCtrlPressed() == true )
 	{
 		delete m_hint;
 		m_hint = NULL;
@@ -663,7 +664,7 @@ void trackContentObjectView::mouseMoveEvent( QMouseEvent * _me )
 				static_cast<int>( x * midiTime::ticksPerTact() /
 									ppt ) );
 		if( engine::getMainWindow()->isCtrlPressed() ==
-					FALSE && _me->button() == Qt::NoButton )
+					false && _me->button() == Qt::NoButton )
 		{
 			t = t.toNearestTact();
 		}
@@ -716,7 +717,7 @@ void trackContentObjectView::mouseMoveEvent( QMouseEvent * _me )
 				static_cast<int>( _me->x() *
 					midiTime::ticksPerTact() / ppt ) );
 		if( engine::getMainWindow()->isCtrlPressed() ==
-					FALSE && _me->button() == Qt::NoButton )
+					false && _me->button() == Qt::NoButton )
 		{
 			t = t.toNearestTact();
 		}
@@ -771,7 +772,7 @@ void trackContentObjectView::mouseReleaseEvent( QMouseEvent * _me )
 {
 	if( m_action == Move || m_action == Resize )
 	{
-		m_tco->setJournalling( TRUE );
+		m_tco->setJournalling( true );
 		m_tco->addJournalEntry( journalEntry( m_action, m_oldTime -
 			( ( m_action == Move ) ?
 				m_tco->startPosition() : m_tco->length() ) ) );
@@ -797,7 +798,7 @@ void trackContentObjectView::mouseReleaseEvent( QMouseEvent * _me )
 void trackContentObjectView::contextMenuEvent( QContextMenuEvent * _cme )
 {
 	QMenu contextMenu( this );
-	if( fixedTCOs() == FALSE )
+	if( fixedTCOs() == false )
 	{
 		contextMenu.addAction( embed::getIconPixmap( "cancel" ),
 					tr( "Delete (middle mousebutton)" ),
@@ -863,14 +864,14 @@ trackContentWidget::trackContentWidget( trackView * _parent ) :
 	QWidget( _parent ),
 	m_trackView( _parent )
 {
-	setAcceptDrops( TRUE );
+	setAcceptDrops( true );
 
 	connect( _parent->getTrackContainerView(),
 			SIGNAL( positionChanged( const midiTime & ) ),
 			this, SLOT( changePosition( const midiTime & ) ) );
 
 	setAutoFillBackground( false );
-	setAttribute( Qt::WA_OpaquePaintEvent );
+	setAttribute( Qt::WA_OpaquePaintEvent, true );
 }
 
 
@@ -903,7 +904,7 @@ void trackContentWidget::addTCOView( trackContentObjectView * _tcov )
 
 	m_tcoViews.push_back( _tcov );
 
-	tco->saveJournallingState( FALSE );
+	tco->saveJournallingState( false );
 	changePosition();
 	tco->restoreJournallingState();
 
@@ -1070,7 +1071,7 @@ void trackContentWidget::dropEvent( QDropEvent * _de )
 	QString type = stringPairDrag::decodeKey( _de );
 	QString value = stringPairDrag::decodeValue( _de );
 	if( type == ( "tco_" + QString::number( getTrack()->type() ) ) &&
-		m_trackView->getTrackContainerView()->fixedTCOs() == FALSE )
+		m_trackView->getTrackContainerView()->fixedTCOs() == false )
 	{
 		const midiTime pos = getPosition( _de->pos().x()
 							).toNearestTact();
@@ -1078,7 +1079,7 @@ void trackContentWidget::dropEvent( QDropEvent * _de )
 
 		// value contains our XML-data so simply create a
 		// multimediaProject which does the rest for us...
-		multimediaProject mmp( value, FALSE );
+		multimediaProject mmp( value, false );
 		// at least save position before getting moved to somewhere
 		// the user doesn't expect...
 		tco->restoreState( mmp.content().firstChild().toElement() );
@@ -1101,11 +1102,11 @@ void trackContentWidget::dropEvent( QDropEvent * _de )
  */
 void trackContentWidget::mousePressEvent( QMouseEvent * _me )
 {
-	if( m_trackView->getTrackContainerView()->allowRubberband() == TRUE )
+	if( m_trackView->getTrackContainerView()->allowRubberband() == true )
 	{
 		QWidget::mousePressEvent( _me );
 	}
-	else if( engine::getMainWindow()->isShiftPressed() == TRUE )
+	else if( engine::getMainWindow()->isShiftPressed() == true )
 	{
 		QWidget::mousePressEvent( _me );
 	}
@@ -1116,7 +1117,7 @@ void trackContentWidget::mousePressEvent( QMouseEvent * _me )
 						midiTime::ticksPerTact();
 		trackContentObject * tco = getTrack()->createTCO( pos );
 
-		tco->saveJournallingState( FALSE );
+		tco->saveJournallingState( false );
 		tco->movePosition( pos );
 		tco->restoreJournallingState();
 
@@ -1225,7 +1226,7 @@ void trackContentWidget::resizeEvent( QResizeEvent * _re )
  */
 void trackContentWidget::undoStep( journalEntry & _je )
 {
-	saveJournallingState( FALSE );
+	saveJournallingState( false );
 	switch( _je.actionID() )
 	{
 		case AddTrackContentObject:
@@ -1249,7 +1250,7 @@ void trackContentWidget::undoStep( journalEntry & _je )
 			trackContentObject * tco = getTrack()->createTCO(
 								midiTime( 0 ) );
 			multimediaProject mmp(
-				_je.data().toMap()["state"].toString(), FALSE );
+				_je.data().toMap()["state"].toString(), false );
 			tco->restoreState(
 				mmp.content().firstChild().toElement() );
 			break;
@@ -1374,7 +1375,7 @@ trackOperationsWidget::trackOperationsWidget( trackView * _parent ) :
 	m_muteBtn = new pixmapButton( this, tr( "Mute" ) );
 	m_muteBtn->setActiveGraphic( embed::getIconPixmap( "led_off" ) );
 	m_muteBtn->setInactiveGraphic( embed::getIconPixmap( "led_green" ) );
-	m_muteBtn->setCheckable( TRUE );
+	m_muteBtn->setCheckable( true );
 	m_muteBtn->move( 46, 8 );
 	m_muteBtn->show();
 	toolTip::add( m_muteBtn, tr( "Mute this track" ) );
@@ -1382,7 +1383,7 @@ trackOperationsWidget::trackOperationsWidget( trackView * _parent ) :
 	m_soloBtn = new pixmapButton( this, tr( "Solo" ) );
 	m_soloBtn->setActiveGraphic( embed::getIconPixmap( "led_red" ) );
 	m_soloBtn->setInactiveGraphic( embed::getIconPixmap( "led_off" ) );
-	m_soloBtn->setCheckable( TRUE );
+	m_soloBtn->setCheckable( true );
 	m_soloBtn->move( 62, 8 );
 	toolTip::add( m_soloBtn, tr( "Solo" ) );
 
@@ -1391,6 +1392,7 @@ trackOperationsWidget::trackOperationsWidget( trackView * _parent ) :
 				SLOT( deleteTrackView( trackView * ) ),
 							Qt::QueuedConnection );
 			
+	setAttribute( Qt::WA_OpaquePaintEvent, true );
 }
 
 
@@ -1419,7 +1421,7 @@ trackOperationsWidget::~trackOperationsWidget()
 void trackOperationsWidget::mousePressEvent( QMouseEvent * _me )
 {
 	if( _me->button() == Qt::LeftButton &&
-		engine::getMainWindow()->isCtrlPressed() == TRUE &&
+		engine::getMainWindow()->isCtrlPressed() == true &&
 			m_trackView->getTrack()->type() != track::BBTrack )
 	{
 		multimediaProject mmp( multimediaProject::DragNDropData );
@@ -1457,7 +1459,7 @@ void trackOperationsWidget::paintEvent( QPaintEvent * _pe )
 	QPainter p( this );
 	p.fillRect( rect(), QColor( 56, 60, 72 ) );
 
-	if( m_trackView->isMovingTrack() == FALSE )
+	if( m_trackView->isMovingTrack() == false )
 	{
 		p.drawPixmap( 2, 2, *s_grip );
 		m_trackOps->show();
@@ -1545,11 +1547,11 @@ track::track( TrackTypes _type, trackContainer * _tc ) :
 	m_trackContainer( _tc ),        /*!< The track container object */
 	m_type( _type ),                /*!< The track type */
 	m_name(),                       /*!< The track's name */
-	m_mutedModel( FALSE, this, tr( "Muted" ) ),
+	m_mutedModel( false, this, tr( "Muted" ) ),
 					 /*!< For controlling track muting */
-	m_soloModel( FALSE, this, tr( "Solo" ) ),
+	m_soloModel( false, this, tr( "Solo" ) ),
 					/*!< For controlling track soloing */
-	m_simpleSerializingMode( FALSE ),
+	m_simpleSerializingMode( false ),
 	m_trackContentObjects()         /*!< The track content objects (segments) */
 {
 	m_trackContainer->addTrack( this );
@@ -1601,7 +1603,7 @@ track * track::create( TrackTypes _tt, trackContainer * _tc )
 //		case VIDEO_TRACK:
 		case AutomationTrack: t = new automationTrack( _tc ); break;
 		case HiddenAutomationTrack:
-				t = new automationTrack( _tc, TRUE ); break;
+				t = new automationTrack( _tc, true ); break;
 		default: break;
 	}
 
@@ -1680,7 +1682,7 @@ void track::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 	if( m_simpleSerializingMode )
 	{
-		m_simpleSerializingMode = FALSE;
+		m_simpleSerializingMode = false;
 		return;
 	}
 
@@ -1732,7 +1734,7 @@ void track::loadSettings( const QDomElement & _this )
 			}
 			node = node.nextSibling();
 		}
-		m_simpleSerializingMode = FALSE;
+		m_simpleSerializingMode = false;
 		return;
 	}
 
@@ -1757,7 +1759,7 @@ void track::loadSettings( const QDomElement & _this )
 				trackContentObject * tco = createTCO(
 								midiTime( 0 ) );
 				tco->restoreState( node.toElement() );
-				saveJournallingState( FALSE );
+				saveJournallingState( false );
 				restoreJournallingState();
 			}
 		}
@@ -1903,18 +1905,18 @@ void track::getTCOsInRange( tcoVector & _tco_v, const midiTime & _start,
 			// ok, TCO is posated within given range
 			// now let's search according position for TCO in list
 			// 	-> list is ordered by TCO's position afterwards
-			bool inserted = FALSE;
+			bool inserted = false;
 			for( tcoVector::iterator it = _tco_v.begin();
 						it != _tco_v.end(); ++it )
 			{
 				if( ( *it )->startPosition() >= s )
 				{
 					_tco_v.insert( it, tco );
-					inserted = TRUE;
+					inserted = true;
 					break;
 				}
 			}
-			if( inserted == FALSE )
+			if( inserted == false )
 			{
 				// no TCOs found posated behind current TCO...
 				_tco_v.push_back( tco );
@@ -2031,7 +2033,7 @@ void track::toggleSolo( void )
 {
 	const trackContainer::trackList & tl = m_trackContainer->tracks();
 
-	bool solo_before = FALSE;
+	bool solo_before = false;
 	for( trackContainer::trackList::const_iterator it = tl.begin();
 							it != tl.end(); ++it )
 	{
@@ -2039,7 +2041,7 @@ void track::toggleSolo( void )
 		{
 			if( ( *it )->m_soloModel.value() )
 			{
-				solo_before = TRUE;
+				solo_before = true;
 				break;
 			}
 		}
@@ -2056,10 +2058,10 @@ void track::toggleSolo( void )
 			{
 				( *it )->m_mutedBeforeSolo = ( *it )->isMuted();
 			}
-			( *it )->setMuted( *it == this ? FALSE : TRUE );
+			( *it )->setMuted( *it == this ? false : true );
 			if( *it != this )
 			{
-				( *it )->m_soloModel.setValue( FALSE );
+				( *it )->m_soloModel.setValue( false );
 			}
 		}
 		else if( !solo_before )
@@ -2097,13 +2099,13 @@ trackView::trackView( track * _track, trackContainerView * _tcv ) :
 	m_trackContentWidget( this ),       /*!< Our trackContentWidget */
 	m_action( NoAction )                /*!< The action we're currently performing */
 {
-	setAutoFillBackground( TRUE );
+	setAutoFillBackground( true );
 	QPalette pal;
 	pal.setColor( backgroundRole(), QColor( 32, 36, 40 ) );
 	setPalette( pal );
 
 
-	m_trackSettingsWidget.setAutoFillBackground( TRUE );
+	m_trackSettingsWidget.setAutoFillBackground( true );
 	pal.setColor( m_trackSettingsWidget.backgroundRole(),
 							QColor( 56, 60, 72 ) );
 	m_trackSettingsWidget.setPalette( pal );
@@ -2117,8 +2119,9 @@ trackView::trackView( track * _track, trackContainerView * _tcv ) :
 
 	resizeEvent( NULL );
 
-	setAcceptDrops( TRUE );
-	setAttribute( Qt::WA_DeleteOnClose );
+	setAcceptDrops( true );
+	setAttribute( Qt::WA_DeleteOnClose, true );
+	setAttribute( Qt::WA_OpaquePaintEvent, true );
 
 
 	connect( m_track, SIGNAL( destroyedTrack() ), this, SLOT( close() ) );
@@ -2221,7 +2224,7 @@ void trackView::modelChanged( void )
  */
 void trackView::undoStep( journalEntry & _je )
 {
-	saveJournallingState( FALSE );
+	saveJournallingState( false );
 	switch( _je.actionID() )
 	{
 		case MoveTrack:
@@ -2289,7 +2292,7 @@ void trackView::dropEvent( QDropEvent * _de )
 	{
 		// value contains our XML-data so simply create a
 		// multimediaProject which does the rest for us...
-		multimediaProject mmp( value, FALSE );
+		multimediaProject mmp( value, false );
 		engine::getMixer()->lock();
 		m_track->restoreState( mmp.content().firstChild().toElement() );
 		engine::getMixer()->unlock();
@@ -2315,13 +2318,13 @@ void trackView::dropEvent( QDropEvent * _de )
  */
 void trackView::mousePressEvent( QMouseEvent * _me )
 {
-	if( m_trackContainerView->allowRubberband() == TRUE )
+	if( m_trackContainerView->allowRubberband() == true )
 	{
 		QWidget::mousePressEvent( _me );
 	}
 	else if( _me->button() == Qt::LeftButton )
 	{
-		if( engine::getMainWindow()->isShiftPressed() == TRUE )
+		if( engine::getMainWindow()->isShiftPressed() == true )
 		{
 			m_action = ResizeTrack;
 			QCursor::setPos( mapToGlobal( QPoint( _me->x(),
@@ -2369,7 +2372,7 @@ void trackView::mousePressEvent( QMouseEvent * _me )
  */
 void trackView::mouseMoveEvent( QMouseEvent * _me )
 {
-	if( m_trackContainerView->allowRubberband() == TRUE )
+	if( m_trackContainerView->allowRubberband() == true )
 	{
 		QWidget::mouseMoveEvent( _me );
 	}

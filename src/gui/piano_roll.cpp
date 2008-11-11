@@ -192,6 +192,7 @@ pianoRoll::pianoRoll( void ) :
 							"automation" ) );
 	}
 
+	setAttribute( Qt::WA_OpaquePaintEvent, true );
 
 	// add time-line
 	m_timeLine = new timeLine( WHITE_KEY_WIDTH, 32, m_ppt,

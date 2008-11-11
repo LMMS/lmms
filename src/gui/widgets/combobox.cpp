@@ -80,6 +80,7 @@ comboBox::comboBox( QWidget * _parent, const QString & _name ) :
 	connect( &m_menu, SIGNAL( triggered( QAction * ) ),
 				this, SLOT( setItem( QAction * ) ) );
 
+	setAttribute( Qt::WA_OpaquePaintEvent, true );
 	setAccessibleName( _name );
 	doConnections();
 }
