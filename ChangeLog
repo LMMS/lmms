@@ -1,3 +1,26 @@
+2008-11-13	Andrew Kelley	<superjoe30/at/gmail/dot/com>
+	* include/piano_roll.h
+	* src/gui/piano_roll.cpp
+	- changed the way selection works
+	- you can select any combination of notes
+	- delete any combination of notes
+	- move multiple notes at once
+	- resize multiple notes at once
+	- etc
+	- hold alt to disable quantization
+
+	* include/note.h
+	* src/core/note.cpp 
+	- added m_selected so we know if the note is selected or not
+	- added operator< so we can sort notes vector by start time
+
+	* include/pattern.h
+	* src/tracks/pattern.cpp
+	added rearrangeAllNotes for when we move multiple notes in the piano roll 
+
+	* AUTHORS
+	hope you don't mind :-)
+
 2008-11-10	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/core/track.cpp:
@@ -25,7 +48,7 @@
 
 2008-11-10	Andrew Kelley	<superjoe30/at/gmail/dot/com>
 
-	* src/gui/piano_roll.h:
+	* include/piano_roll.h:
 	* src/gui/piano_roll.cpp:
 	- made it so you can hold right click and drag around to delete notes
 	- changed ctrl+click from opening automation window to shift+click

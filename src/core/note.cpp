@@ -48,7 +48,7 @@ note::note( const midiTime & _length, const midiTime & _pos,
 {
 	//saveJournallingState( FALSE );
 //	setJournalling( FALSE );
-
+	setSelected( false );
 	if( _detuning )
 	{
 		m_detuning = sharedObject::ref( _detuning );
@@ -71,6 +71,7 @@ note::note( const note & _note ) :
 	m_length( _note.m_length ),
 	m_pos( _note.m_pos )
 {
+	setSelected( false );
 	m_detuning = sharedObject::ref( _note.m_detuning );
 }
 
@@ -82,7 +83,10 @@ note::~note()
 	sharedObject::unref( m_detuning );
 }
 
-
+void note::setSelected( const bool selected )
+{
+	m_selected = selected;
+}
 
 
 void note::setLength( const midiTime & _length )

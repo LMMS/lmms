@@ -90,7 +90,8 @@ public:
 		detuningHelper * _detuning = NULL );
 	note( const note & _note );
 	virtual ~note();
-
+	
+	void setSelected( const bool selected );
 	void setLength( const midiTime & _length );
 	void setPos( const midiTime & _pos );
 	void setKey( const int _key );
@@ -98,6 +99,16 @@ public:
 	void setPanning( const panning _panning = DefaultPanning );
 	void quantizeLength( const int _q_grid );
 	void quantizePos( const int _q_grid );
+
+	inline bool operator<(const note & rhs)
+	{
+		return m_pos < rhs.pos();
+	}
+
+	inline bool getSelected( void ) const
+	{
+		return m_selected;
+	}
 
 	inline midiTime endPos( void ) const
 	{
@@ -177,7 +188,7 @@ private:
 		ChangePosition
 	} ;*/
 
-
+	bool m_selected; // for piano roll editing
 	int m_key;
 	volume m_volume;
 	panning m_panning;

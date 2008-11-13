@@ -269,7 +269,12 @@ note * pattern::rearrangeNote( const note * _note_to_proc,
 	return( addNote( copy_of_note, _quant_pos ) );
 }
 
-
+void pattern::rearrangeAllNotes( void )
+{
+	// sort notes by start time	
+	qSort(m_notes.begin(), m_notes.end());
+	
+}
 
 
 void pattern::clearNotes( void )

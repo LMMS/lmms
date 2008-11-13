@@ -250,8 +250,10 @@ private:
 	bool mouseOverNote( void );
 	note * noteUnderMouse( void );
 	noteVector::const_iterator noteIteratorUnderMouse( void );
-
-
+	
+	// turn a selection rectangle into selected notes
+	void computeSelectedNotes( bool shift ); 
+	void clearSelectedNotes( void );
 
 	friend class engine;
 

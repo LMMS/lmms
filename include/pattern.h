@@ -74,7 +74,7 @@ public:
 
 	note * rearrangeNote( const note * _note_to_proc,
 						const bool _quant_pos = TRUE );
-
+	void rearrangeAllNotes( void );
 	void clearNotes( void );
 
 	inline const noteVector & notes( void )
