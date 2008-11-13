@@ -1,6 +1,12 @@
+2008-11-13	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* ChangeLog:
+	again fixed syntax - please note the colons after filenames
+
 2008-11-13	Andrew Kelley	<superjoe30/at/gmail/dot/com>
-	* include/piano_roll.h
-	* src/gui/piano_roll.cpp
+
+	* include/piano_roll.h:
+	* src/gui/piano_roll.cpp:
 	- changed the way selection works
 	- you can select any combination of notes
 	- delete any combination of notes
@@ -9,16 +15,16 @@
 	- etc
 	- hold alt to disable quantization
 
-	* include/note.h
-	* src/core/note.cpp 
+	* include/note.h:
+	* src/core/note.cpp:
 	- added m_selected so we know if the note is selected or not
 	- added operator< so we can sort notes vector by start time
 
-	* include/pattern.h
-	* src/tracks/pattern.cpp
+	* include/pattern.h:
+	* src/tracks/pattern.cpp:
 	added rearrangeAllNotes for when we move multiple notes in the piano roll 
 
-	* AUTHORS
+	* AUTHORS:
 	hope you don't mind :-)
 
 2008-11-10	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
