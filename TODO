@@ -50,3 +50,21 @@
 - classical note-edit-window -> also ability of printing and maybe later scanning & recognition of notes
 - add FLAC as export-format?
 
+Andrew Kelley's todo:
+- piano roll, copy and paste notes 
+- remove the move tool, it's irrelevant now
+- holding control and shift shouldn't bring up the automation window
+- shift+drag to copy one or more notes
+- when dragging right click around to delete notes, show the eraser icon
+- moving a group of notes shouldn't crunch them together if brought to boundary conditions
+- moving a group with an unquantized note will quantize that note when you move the selection (this is bad)
+- undo/redo for piano roll
+- doing actions on the piano roll when LMMS doesn't have focus is glitchy
+
+- make knobs easier to tune (less sensitive)
+
+- make it so you can see the notes when putting a pattern in the playlist
+- make the menu for a channel happen when you right click, instead of renaming, and make the midi input a top-level menu item
+- segfault on quit
+- recording automation
+- dragging a note below the automation level messes up dragging it's weird and glitchy fix it

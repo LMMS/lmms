@@ -1542,15 +1542,15 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 						{
 							pos_ticks = 0;
 						}
-						// TODO: upper/lower bound checks on key_num
-						/*if( key_num < lower bound )
+						// upper/lower bound checks on key_num
+						if( key_num < 0 )
 						{
-							key_num = lower bound
+							key_num = 0;
 						}
-						else if( key_num > upper bound )
+						else if( key_num > NumKeys )
 						{
-							key_num = upper bound
-						} */
+							key_num = NumKeys;
+						}
 					
 						( *it )->setPos( midiTime(
 									pos_ticks ) );
@@ -2285,32 +2285,6 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 			// is the note in visible area?
 			if( key > 0 && key <= visible_keys )
 			{
-				/* changing the way selection works
-				 
-				 bool is_selected = false;
-				// if we're in move-mode, we may only draw notes
-				// in selected area, that have originally been
-				// selected and not notes that are now in
-				// selection because the user moved it...
-				if( m_editMode == ModeMove )
-				{
-					if( qFind( m_selNotesForMove.begin(),
-							m_selNotesForMove.end(),
-							*it ) !=
-						m_selNotesForMove.end() )
-					{
-						is_selected = true;
-					}
-				}
-				else if( key > sel_key_start &&
-					key <= sel_key_end &&
-					pos_ticks >= sel_pos_start &&
-					pos_ticks + len_ticks <=
-								sel_pos_end )
-				{
-					is_selected = true;
-				}
-				 */
 
 				// we've done and checked all, let's draw the
 				// note
@@ -2930,19 +2904,6 @@ void pianoRoll::deleteSelectedNotes( void )
 			++it;
 		}
 	}
-	
-	
-	/*
-	noteVector selected_notes;
-	getSelectedNotes( selected_notes );
-
-	const bool update_after_delete = !selected_notes.empty();
-
-	while( selected_notes.empty() == false )
-	{
-		m_pattern->removeNote( selected_notes.front() );
-		selected_notes.erase( selected_notes.begin() );
-	} */
 
 	if( update_after_delete == true )
 	{
