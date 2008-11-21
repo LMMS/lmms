@@ -4,7 +4,7 @@
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2 of the License, or
+   the Free Software Foundation; either version 3 of the License, or
    (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -46,6 +46,7 @@
  * 22 Sep 01, tuorfa@yahoo.com: added function-level comment blocks 
  * 29 Mar 05, daved@physiol.usyd.edu.au: changes requested by ZT Smith
  * 11 Jan 07, jasp00@users.sourceforge.net: optimized unsafe loop
+ * 16 Dec 07, daved@physiol.usyd.edu.au: updated to GPL v3
  *--------------------------------------------------------------------*/
 
 #ifdef LMMS_HAVE_CONFIG_H

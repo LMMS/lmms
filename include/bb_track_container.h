@@ -52,7 +52,7 @@ public:
 	tact lengthOfBB( int _bb );
 	inline tact lengthOfCurrentBB( void )
 	{
-		return( lengthOfBB( currentBB() ) );
+		return lengthOfBB( currentBB() );
 	}
 	int numOfBBs( void ) const;
 	void removeBB( int _bb );

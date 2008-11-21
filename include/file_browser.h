@@ -187,7 +187,8 @@ public:
 		NotSupported,
 		LoadAsProject,
 		LoadAsPreset,
-		LoadByPlugin
+		LoadByPlugin,
+		ImportAsProject
 	} ;
 
 

@@ -54,7 +54,7 @@ public:
 
 	virtual automationPattern * tempoAutomationPattern( void )
 	{
-		return( NULL );
+		return NULL;
 	}
 
 	int countTracks( track::TrackTypes _tt = track::NumTrackTypes ) const;
@@ -69,14 +69,14 @@ public:
 
 	const trackList & tracks( void ) const
 	{
-		return( m_tracks );
+		return m_tracks;
 	}
 
 	bool isEmpty( void ) const;
 
 	static const QString classNodeName( void )
 	{
-		return( "trackcontainer" );
+		return "trackcontainer";
 	}
 
 
@@ -107,12 +107,12 @@ public:
 
 	virtual QString nodeName( void ) const
 	{
-		return( "dummytrackcontainer" );
+		return "dummytrackcontainer";
 	}
 
 	instrumentTrack * dummyInstrumentTrack( void )
 	{
-		return( m_dummyInstrumentTrack );
+		return m_dummyInstrumentTrack;
 	}
 
 

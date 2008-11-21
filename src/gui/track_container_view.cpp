@@ -79,7 +79,7 @@ trackContainerView::trackContainerView( trackContainer * _tc ) :
 	m_scrollArea->show();
 	m_rubberBand->hide();
 
-	setAcceptDrops( TRUE );
+	setAcceptDrops( true );
 
 	connect( engine::getSong(), SIGNAL( timeSignatureChanged( int, int ) ),
 						this, SLOT( realignTracks() ) );
@@ -273,7 +273,7 @@ const trackView * trackContainerView::trackViewAt( const int _y ) const
 
 bool trackContainerView::allowRubberband( void ) const
 {
-	return( FALSE );
+	return( false );
 }
 
 
@@ -304,7 +304,7 @@ void trackContainerView::clearAllTracks( void )
 void trackContainerView::undoStep( journalEntry & _je )
 {
 #if 0
-	saveJournallingState( FALSE );
+	saveJournallingState( false );
 	switch( _je.actionID() )
 	{
 		case AddTrack:
@@ -326,7 +326,7 @@ void trackContainerView::undoStep( journalEntry & _je )
 		case RemoveTrack:
 		{
 			multimediaProject mmp(
-				_je.data().toMap()["state"].toString(), FALSE );
+				_je.data().toMap()["state"].toString(), false );
 			track::create( mmp.content().firstChild().toElement(),
 									m_tc );
 			break;
@@ -362,8 +362,8 @@ void trackContainerView::redoStep( journalEntry & _je )
 void trackContainerView::dragEnterEvent( QDragEnterEvent * _dee )
 {
 	stringPairDrag::processDragEnterEvent( _dee,
-		QString( "presetfile,sampledata,samplefile,instrument,midifile,"
-					"track_%1,track_%2" ).
+		QString( "presetfile,sampledata,samplefile,instrument,"
+				"importedproject,track_%1,track_%2" ).
 						arg( track::InstrumentTrack ).
 						arg( track::SampleTrack ) );
 }
@@ -382,7 +382,7 @@ void trackContainerView::dropEvent( QDropEvent * _de )
 				track::create( track::InstrumentTrack,
 								m_tc ) );
 		it->loadInstrument( value );
-		//it->toggledInstrumentTrackButton( TRUE );
+		//it->toggledInstrumentTrackButton( true );
 		_de->accept();
 	}
 	else if( /*type == "sampledata" || */type == "samplefile" )
@@ -396,7 +396,7 @@ void trackContainerView::dropEvent( QDropEvent * _de )
 								value )];
 		instrument * i = it->loadInstrument( iname );
 		i->loadFile( value );
-		//it->toggledInstrumentTrackButton( TRUE );
+		//it->toggledInstrumentTrackButton( true );
 		_de->accept();
 	}
 	else if( type == "presetfile" )
@@ -407,17 +407,17 @@ void trackContainerView::dropEvent( QDropEvent * _de )
 								m_tc ) );
 		it->loadTrackSpecificSettings( mmp.content().firstChild().
 								toElement() );
-		//it->toggledInstrumentTrackButton( TRUE );
+		//it->toggledInstrumentTrackButton( true );
 		_de->accept();
 	}
-	else if( type == "midifile" )
+	else if( type == "importedproject" )
 	{
 		importFilter::import( value, m_tc );
 		_de->accept();
 	}
 	else if( type.left( 6 ) == "track_" )
 	{
-		multimediaProject mmp( value, FALSE );
+		multimediaProject mmp( value, false );
 		track::create( mmp.content().firstChild().toElement(), m_tc );
 		_de->accept();
 	}
@@ -429,7 +429,7 @@ void trackContainerView::dropEvent( QDropEvent * _de )
 
 void trackContainerView::mousePressEvent( QMouseEvent * _me )
 {
-	if( allowRubberband() == TRUE )
+	if( allowRubberband() == true )
 	{
 		m_origin = m_scrollArea->mapFromParent( _me->pos() );
 		m_rubberBand->setGeometry( QRect( m_origin, QSize() ) );
@@ -443,7 +443,7 @@ void trackContainerView::mousePressEvent( QMouseEvent * _me )
 
 void trackContainerView::mouseMoveEvent( QMouseEvent * _me )
 {
-	if( rubberBandActive() == TRUE )
+	if( rubberBandActive() == true )
 	{
 		m_rubberBand->setGeometry( QRect( m_origin,
 				m_scrollArea->mapFromParent( _me->pos() ) ).

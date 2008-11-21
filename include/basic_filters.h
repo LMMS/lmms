@@ -45,7 +45,7 @@ template<ch_cnt_t CHANNELS/* = DEFAULT_CHANNELS*/>
 class basicFilters
 {
 public:
-	enum filterTypes
+	enum FilterTypes
 	{
 		LowPass,
 		HiPass,
@@ -54,7 +54,7 @@ public:
 		Notch,
 		AllPass,
 		Moog,
-		NumOfFilters
+		NumFilters
 	} ;
 
 	static inline float minFreq( void )
@@ -69,14 +69,14 @@ public:
 
 	inline void setFilterType( const int _idx )
 	{
-		m_doubleFilter = _idx >= NumOfFilters;
+		m_doubleFilter = _idx >= NumFilters;
 		if( !m_doubleFilter )
 		{
-			m_type = static_cast<filterTypes>( _idx );
+			m_type = static_cast<FilterTypes>( _idx );
 			return;
 		}
-		m_type = static_cast<filterTypes>( LowPass + _idx -
-							NumOfFilters );
+		m_type = static_cast<FilterTypes>( LowPass + _idx -
+							NumFilters );
 		if( m_subFilter == NULL )
 		{
 			m_subFilter = new basicFilters<CHANNELS>(
@@ -289,7 +289,7 @@ private:
 	// in/out history for moog-filter
 	frame m_y1, m_y2, m_y3, m_y4, m_oldx, m_oldy1, m_oldy2, m_oldy3;
 
-	filterTypes m_type;
+	FilterTypes m_type;
 	bool m_doubleFilter;
 
 	float m_sampleRate;

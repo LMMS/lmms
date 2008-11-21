@@ -53,6 +53,7 @@
 #include "config_mgr.h"
 #include "embed.h"
 #include "engine.h"
+#include "import_filter.h"
 #include "lmms_style.h"
 #include "main_window.h"
 #include "project_renderer.h"
@@ -84,7 +85,9 @@ int main( int argc, char * * argv )
 	// intialize RNG
 	srand( getpid() + time( 0 ) );
 
-	bool core_only = FALSE;
+	bool core_only = false;
+	bool exit_after_import = false;
+	QString file_to_load, file_to_save, file_to_import, render_out;
 
 	for( int i = 1; i < argc; ++i )
 	{
@@ -93,7 +96,7 @@ int main( int argc, char * * argv )
 				( QString( argv[i] ) == "--help" ||
 						QString( argv[i] ) == "-h" ) ) )
 		{
-			core_only = TRUE;
+			core_only = true;
 			break;
 		}
 	}
@@ -102,10 +105,9 @@ int main( int argc, char * * argv )
 			new QCoreApplication( argc, argv ) :
 					new QApplication( argc, argv ) ;
 
-	QString file_to_load, file_to_save, render_out;
 
 	mixer::qualitySettings qs( mixer::qualitySettings::Mode_HighQuality );
-	projectRenderer::outputSettings os( 44100, FALSE, 160,
+	projectRenderer::outputSettings os( 44100, false, 160,
 						projectRenderer::Depth_16Bit );
 	projectRenderer::ExportFileFormats eff = projectRenderer::WaveFile;
 
@@ -300,6 +302,17 @@ int main( int argc, char * * argv )
 			}
 			++i;
 		}
+		else if( argc > i &&
+				( QString( argv[i] ) == "--import" ) )
+		{
+			file_to_import = argv[i+1];
+			++i;
+			// exit after import? (only for debugging)
+			if( argc > i && QString( argv[i+1] ) == "-e" )
+			{
+				exit_after_import = true;
+			}
+		}
 		else
 		{
 			if( argv[i][0] == '-' )
@@ -390,10 +403,20 @@ int main( int argc, char * * argv )
 		srand( getpid() + time( 0 ) );
 
 		// we try to load given file
-		if( file_to_load != "" )
+		if( !file_to_load.isEmpty() )
 		{
 			engine::getMainWindow()->showMaximized();
 			engine::getSong()->loadProject( file_to_load );
+		}
+		else if( !file_to_import.isEmpty() )
+		{
+			importFilter::import( file_to_import,
+							engine::getSong() );
+			if( exit_after_import )
+			{
+				return 0;
+			}
+			engine::getMainWindow()->showMaximized();
 		}
 		else
 		{
@@ -404,7 +427,7 @@ int main( int argc, char * * argv )
 	else
 	{
 		// we're going to render our song
-		engine::init( FALSE );
+		engine::init( false );
 		printf( "loading project...\n" );
 		engine::getSong()->loadProject( file_to_load );
 		printf( "done\n" );

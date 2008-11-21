@@ -4,7 +4,7 @@
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2 of the License, or
+   the Free Software Foundation; either version 3 of the License, or
    (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -39,6 +39,8 @@
  * 19 Aug 05, ax2groin@arbornet.org: added more chars and changes to ANSI
  * 05 Jan 06, marcossamaral@terra.com.br: fixed bugs #14982 and #14983
  * 31 Oct 07, jasp00@users.sourceforge.net: replaced deprecated conversions
+ * 13 Dec 07, daved@physiol.usyd.edu.au: fixed some missing entity ';'
+ * 16 Dec 07, daved@physiol.usyd.edu.au: updated to GPL v3
  *--------------------------------------------------------------------*/
 
 #ifdef LMMS_HAVE_CONFIG_H
@@ -644,8 +646,8 @@ static const char* cp437 [] = {
 /* 0x9b */ "&cent;",
 /* 0x9c */ "&pound;",
 /* 0x9d */ "&yen;",
-/* 0x9e */ "&#8359", /* peseta */
-/* 0x9f */ "&#402", /* small f with hook */
+/* 0x9e */ "&#8359;", /* peseta */
+/* 0x9f */ "&#402;", /* small f with hook */
 /* 0xa0 */ "&aacute;",
 /* 0xa1 */ "&iacute;",
 /* 0xa2 */ "&oacute;",
@@ -655,7 +657,7 @@ static const char* cp437 [] = {
 /* 0xa6 */ "&ordf;",
 /* 0xa7 */ "&frac14;",
 /* 0xa8 */ "&iquest;",
-/* 0xa9 */ "&#8976", /* reversed not */
+/* 0xa9 */ "&#8976;", /* reversed not */
 /* 0xaa */ "&not;",
 /* 0xab */ "&frac12;",
 /* 0xac */ "&raquo;",
@@ -874,6 +876,159 @@ static const char* cp850 [] = {
 /* 0xfe */  "&#9632;", /* black square */
 /* 0xff */  "&nbsp;",
 };
+#if 1 /* daved - 0.20.3 */
+static char * Greek[] =
+{
+/* 0x80 */  "&ccedil;",
+/* 0x81 */  "&uuml;",
+/* 0x82 */  "&eacute;",
+/* 0x83 */  "&acirc;",
+/* 0x84 */  "&auml;",
+/* 0x85 */  "&agrave;",
+/* 0x86 */  "&aring;",
+/* 0x87 */  "&ccedil;",
+/* 0x88 */  "&ecirc;",
+/* 0x89 */  "&euml;",
+/* 0x8a */  "&egrave;",
+/* 0x8b */  "&iuml;",
+/* 0x8c */  "&icirc;",
+/* 0x8d */  "&igrave;",
+/* 0x8e */  "&auml;",
+/* 0x8f */  "&aring;",
+/* 0x90 */  "&eacute;",
+/* 0x91 */  "&aelig;",
+/* 0x92 */  "&aelig;",
+/* 0x93 */  "&ocirc;",
+/* 0x94 */  "&ouml;",
+/* 0x95 */  "&ograve;",
+/* 0x96 */  "&ucirc;",
+/* 0x97 */  "&ugrave;",
+/* 0x98 */  "&yuml;",
+/* 0x99 */  "&ouml;",
+/* 0x9a */  "&uuml;",
+/* 0x9b */  "&oslash;",
+/* 0x9c */  "&pound;",
+/* 0x9d */  "&oslash;",
+/* 0x9e */  "&times;",
+/* 0x9f */  "&#402;", /* small f with hook */
+/* 0xa0 */  "&aacute;",
+/* 0xa1 */  "&iacute;",
+/* 0xa2 */  "&oacute;",
+/* 0xa3 */  "&uacute;",
+/* 0xa4 */  "&ntilde;",
+/* 0xa5 */  "&ntilde;",
+/* 0xa6 */  "&ordf;",
+/* 0xa7 */  "&frac14;",
+/* 0xa8 */  "&iquest;",
+/* 0xa9 */  "&reg;",
+/* 0xaa */  "&not;",
+/* 0xab */  "&frac12;",
+/* 0xac */  "&raquo;",
+/* 0xad */  "&iexcl;",
+/* 0xae */  "&laquo;",
+/* 0xaf */  "&ordm;",
+/* 0xb0 */  "&#9617;", /* light shade */
+/* 0xb1 */  "&#9618;", /* med. shade */
+/* 0xb2 */  "&#9619;", /* dark shade */
+/* 0xb3 */  "&#9474;", /* box-draw light vert. */
+/* 0xb4 */  "&#9508;", /* box-draw light vert. + lt. */
+/* 0xb5 */  "&aacute;",
+/* 0xb6 */  "&acirc;",
+/* 0xb7 */  "&agrave;",
+/* 0xb8 */  "&copy;",
+/* 0xb9 */  "&#9571;", /* box-draw dbl. vert. + lt. */
+/* 0xba */  "&#9553;", /* box-draw dbl. vert. */
+/* 0xbb */  "&#9559;", /* box-draw dbl. dn. + lt. */
+/* 0xbc */  "&#9565;", /* box-draw dbl. up + lt. */
+/* 0xbd */  "&cent;",
+/* 0xbe */  "&yen;",
+/* 0xbf */  "&#9488;", /* box-draw light dn. + lt. */
+/* 0xc0 */  "&#9492;", /* box-draw light up + rt. */
+/* 0xc1 */  "&#9524;", /* box-draw light up + horiz. */
+/* 0xc2 */  "&#9516;", /* box-draw light dn. + horiz. */
+/* 0xc3 */  "&#9500;", /* box-draw light vert. + rt. */
+/* 0xc4 */  "&#9472;", /* box-draw light horiz. */
+/* 0xc5 */  "&#9532;", /* box-draw light vert. + horiz. */
+/* 0xc6 */  "&atilde;",
+/* 0xc7 */  "&atilde;",
+/* 0xc8 */  "&#9562;", /* box-draw dbl. up + rt. */
+/* 0xc9 */  "&#9556;", /* box-draw dbl. dn. + rt. */
+/* 0xca */  "&#9577;", /* box-draw dbl. up + horiz. */
+/* 0xcb */  "&#9574;", /* box-draw dbl. dn. + horiz. */
+/* 0xcc */  "&#9568;", /* box-draw dbl. vert. + rt. */
+/* 0xcd */  "&#9552;", /* box-draw dbl. horiz. */
+/* 0xce */  "&#9580;", /* box-draw dbl. vert. + horiz. */
+/* 0xcf */  "&curren;",
+/* 0xd0 */  "&eth;",
+/* 0xd1 */  "&eth;",
+/* 0xd2 */  "&ecirc;",
+/* 0xd3 */  "&euml;",
+/* 0xd4 */  "&egrave;",
+/* 0xd5 */  "&#305;", /* small dotless i */
+/* 0xd6 */  "&iacute;",
+/* 0xd7 */  "&icirc;",
+/* 0xd8 */  "&iuml;",
+/* 0xd9 */  "&#9496;", /* box-draw light up + lt. */
+/* 0xda */  "&#9484;", /* box-draw light dn. + rt. */
+/* 0xdb */  "&#9608;", /* full-block */
+/* 0xdc */  "&#9604;", /* lower 1/2 block */
+/* 0xdd */  "&brvbar;",
+/* 0xde */  "&igrave;",
+/* 0xdf */  "&#9600;", /* upper 1/2 block */
+/* 0xe0 */  "&oacute;",
+/* above here not done */
+/* 0xe1 */  "&alpha;",
+/* 0xe2 */  "&beta;",
+/* 0xe3 */  "&gamma;",
+/* 0xe4 */  "&delta;",
+/* 0xe5 */  "&epsilon;",
+/* 0xe6 */  "&zeta;",
+/* 0xe7 */  "&eta;",
+/* 0xe8 */  "&theta;",
+/* 0xe9 */  "&iota;",
+/* 0xea */  "&kappa;",
+/* 0xeb */  "&lambda;",
+/* 0xec */  "&mu;",
+/* 0xed */  "&nu;",
+/* 0xee */  "&xi;",
+/* 0xef */  "&omicron;",
+/* 0xf0 */  "&pi;",
+/* 0xf1 */  "&rho;",
+/* 0xf2 */  "&sigmaf;",
+/* 0xf3 */  "&sigma;",
+/* 0xf4 */  "&tau;",
+/* 0xf5 */  "&upsilon;",
+/* 0xf6 */  "&phi;",
+/* 0xf7 */  "&chi;",
+/* 0xf8 */  "&psi;",
+/* 0xf9 */  "&omiga;",
+/* 0xfa */  "&iotauml;",
+/* 0xfb */  "&nuuml;",
+/* 0xfc */  "&omicronacute;",
+/* 0xfd */  "&nuacute;",
+/* 0xfe */  "&omegaacute;", /* black square */
+/* 0xff */  "&nbsp;",
+};
+#endif
+
+
+
+
+
+/*========================================================================
+ * Name:	html_unisymbol_print
+ * Purpose:	Outputs arbitrary unicode symbol
+ * Args:	Unsigned Short.
+ * Returns:	String representing symbol.
+ *=======================================================================*/
+
+char *
+html_unisymbol_print (unsigned short c)
+{
+	char r[12];
+	snprintf(r, 9, "&#%04d;", c);
+	return my_strdup(r);
+}
 
 
 
@@ -1098,6 +1253,13 @@ html_init (void)
     op->symbol_last_char = 254;
 	op->symbol_translation_table = symbol;
 #endif
+#if 1 /* daved - 0.20.3 - GREEK font support */
+	op->greek_first_char = 0x80;
+    op->greek_last_char = 0xff;
+	op->greek_translation_table = Greek;
+#endif
+
+	op->unisymbol_print = html_unisymbol_print;
 
 	return op;
 }

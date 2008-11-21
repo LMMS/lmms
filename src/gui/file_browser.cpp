@@ -39,6 +39,7 @@
 #include "embed.h"
 #include "engine.h"
 #include "gui_templates.h"
+#include "import_filter.h"
 #include "instrument.h"
 #include "instrument_track.h"
 #include "main_window.h"
@@ -488,7 +489,10 @@ void fileBrowserTreeWidget::mouseMoveEvent( QMouseEvent * _me )
 					break;
 
 				case fileItem::MidiFile:
-					new stringPairDrag( "midifile",
+// don't allow dragging FLP-files as FLP import filter clears project
+// without asking
+//				case fileItem::FlpFile:
+					new stringPairDrag( "importedproject",
 								f->fullName(),
 							embed::getIconPixmap(
 								"midi_file" ),
@@ -571,11 +575,23 @@ void fileBrowserTreeWidget::handleFile( fileItem * f, instrumentTrack * _it )
 			instrumentTrack::removeMidiPortNode( mmp );
 			_it->setSimpleSerializing();
 			_it->loadSettings( mmp.content().toElement() );
+			break;
 		}
+
+		case fileItem::ImportAsProject:
+			if( f->type() == fileItem::FlpFile &&
+				!engine::getMainWindow()->mayChangeProject() )
+			{
+				break;
+			}
+			importFilter::import( f->fullName(),
+							engine::getSong() );
+			break;
 
 		case fileItem::NotSupported:
 		default:
 			break;
+
 	}
 	engine::getMixer()->unlock();
 }
@@ -592,7 +608,8 @@ void fileBrowserTreeWidget::activateListItem( QTreeWidgetItem * _item,
 		return;
 	}
 
-	if( f->handling() == fileItem::LoadAsProject )
+	if( f->handling() == fileItem::LoadAsProject ||
+		f->handling() == fileItem::ImportAsProject )
 	{
 		handleFile( f, NULL );
 	}
@@ -963,17 +980,20 @@ void fileItem::determineFileType( void )
 	else if( ext == "mid" )
 	{
 		m_type = MidiFile;
+		m_handling = ImportAsProject;
 	}
 	else if( ext == "flp" )
 	{
 		m_type = FlpFile;
+		m_handling = ImportAsProject;
 	}
 	else
 	{
 		m_type = UnknownFile;
 	}
 
-	if( !ext.isEmpty() && engine::pluginFileHandling().contains( ext ) )
+	if( m_handling == NotSupported &&
+		!ext.isEmpty() && engine::pluginFileHandling().contains( ext ) )
 	{
 		m_handling = LoadByPlugin;
 		// classify as sample if not classified by anything yet but can

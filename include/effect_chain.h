@@ -46,7 +46,7 @@ public:
 
 	inline virtual QString nodeName( void ) const
 	{
-		return( "fxchain" );
+		return "fxchain";
 	}
 
 	void appendEffect( effect * _effect );
@@ -58,6 +58,11 @@ public:
 	bool isRunning( void );
 
 	void clear( void );
+
+	void setEnabled( bool _on )
+	{
+		m_enabledModel.setValue( _on );
+	}
 
 
 private:

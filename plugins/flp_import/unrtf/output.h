@@ -4,7 +4,7 @@
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2 of the License, or
+   the Free Software Foundation; either version 3 of the License, or
    (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -28,11 +28,17 @@
  *----------------------------------------------------------------------
  * Changes:
  * 29 Mar 05, daved@physiol.usyd.edu.au: changes requested by ZT Smith
+ * 16 Dec 07, daved@physiol.usyd.edu.au: updated to GPL v3
  * 31 Oct 07, jasp00@users.sourceforge.net: replaced deprecated conversions
  *--------------------------------------------------------------------*/
 
 
 #ifndef _OUTPUT
+
+typedef struct {
+	int cp;
+	unsigned short chars[128];
+} CodepageInfo;
 
 
 typedef struct {
@@ -276,6 +282,13 @@ typedef struct {
 	short symbol_last_char;
 	const char **symbol_translation_table;
 #endif
+#if 1 /* daved 0.20.3 GREEK font support */
+	short greek_first_char;
+	short greek_last_char;
+	char **greek_translation_table;
+#endif
+
+	char *(*unisymbol_print) (unsigned short);
 
 	void (*write_set_foreground) (int,int,int);
 }
@@ -285,9 +298,9 @@ OutputPersonality;
 extern OutputPersonality* op_create(void);
 extern void op_free (OutputPersonality*);
 #if 1 /* daved - 0.19.6 */
-extern const char* op_translate_char (OutputPersonality*,int,int, int);
+extern const char* op_translate_char (OutputPersonality*,int,CodepageInfo*,int, int);
 #else
-extern char* op_translate_char (OutputPersonality*,int,int);
+extern char* op_translate_char (OutputPersonality*,int,CodepageInfo*,int);
 #endif
 
 extern void op_begin_std_fontsize (OutputPersonality*, int);
