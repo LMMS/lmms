@@ -1721,8 +1721,9 @@ p->putValue( jt->pos, value, false );
 		{
 			continue;
 		}
-		effectChain * ec = engine::getFxMixer()->getEffectChain(
-								it->fxChannel );
+		effectChain * ec = &engine::getFxMixer()->
+                                        getEffectChannel( it->fxChannel )->
+                                                                m_fxChain;
 		printf("adding %s to %d\n", effName.toAscii().constData(),
 								it->fxChannel );
 		for( effectKeyList::iterator jt = effKeys.begin();
