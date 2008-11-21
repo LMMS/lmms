@@ -75,7 +75,16 @@ public:
 
 	virtual QString nodeName( void ) const
 	{
-		return( "fxmixer" );
+		return "fxmixer";
+	}
+
+	fxChannel * getEffectChannel( int _ch )
+	{
+		if( _ch >= 0 && _ch <= NumFxChannels )
+		{
+			return m_fxChannels[_ch];
+		}
+		return NULL;
 	}
 
 

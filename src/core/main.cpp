@@ -53,11 +53,13 @@
 #include "config_mgr.h"
 #include "embed.h"
 #include "engine.h"
+#include "import_filter.h"
 #include "lmms_style.h"
 #include "main_window.h"
 #include "project_renderer.h"
 #include "song.h"
 #include "basic_ops.h"
+
 
 #warning TODO: move somewhere else
 static inline QString baseName( const QString & _file )
@@ -79,11 +81,7 @@ inline void loadTranslation( const QString & _tname,
 }
 
 
-Uint32 convertToS16( const sampleFrameA * RP _ab,
-						const fpp_t _frames,
-						const float _master_gain,
-						intSampleFrameA * RP _output_buffer,
-						const bool _convert_endian );
+
 
 int main( int argc, char * * argv )
 {
@@ -93,16 +91,9 @@ int main( int argc, char * * argv )
 	// init CPU specific optimized basic ops
 	initBasicOps();
 
-#if 0
-	sampleFrameA * buf = (sampleFrameA *) alignedMalloc( sizeof( sampleFrameA ) * 256 );
-	intSampleFrameA * obuf = (intSampleFrameA*)alignedMalloc( sizeof( intSampleFrameA ) * 256 );
-	for( int i = 0; i< 1000000; ++i )
-	{
-		convertToS16( buf, 256, 0.7, obuf, false );
-	}
-return 0;
-#endif
-	bool core_only = FALSE;
+	bool core_only = false;
+	bool exit_after_import = false;
+	QString file_to_load, file_to_save, file_to_import, render_out;
 
 	for( int i = 1; i < argc; ++i )
 	{
@@ -111,7 +102,7 @@ return 0;
 				( QString( argv[i] ) == "--help" ||
 						QString( argv[i] ) == "-h" ) ) )
 		{
-			core_only = TRUE;
+			core_only = true;
 			break;
 		}
 	}
@@ -120,10 +111,9 @@ return 0;
 			new QCoreApplication( argc, argv ) :
 					new QApplication( argc, argv ) ;
 
-	QString file_to_load, file_to_save, render_out;
 
 	mixer::qualitySettings qs( mixer::qualitySettings::Mode_HighQuality );
-	projectRenderer::outputSettings os( 44100, FALSE, 160,
+	projectRenderer::outputSettings os( 44100, false, 160,
 						projectRenderer::Depth_16Bit );
 	projectRenderer::ExportFileFormats eff = projectRenderer::WaveFile;
 
@@ -318,6 +308,17 @@ return 0;
 			}
 			++i;
 		}
+		else if( argc > i &&
+				( QString( argv[i] ) == "--import" ) )
+		{
+			file_to_import = argv[i+1];
+			++i;
+			// exit after import? (only for debugging)
+			if( argc > i && QString( argv[i+1] ) == "-e" )
+			{
+				exit_after_import = true;
+			}
+		}
 		else
 		{
 			if( argv[i][0] == '-' )
@@ -408,10 +409,20 @@ return 0;
 		srand( getpid() + time( 0 ) );
 
 		// we try to load given file
-		if( file_to_load != "" )
+		if( !file_to_load.isEmpty() )
 		{
 			engine::getMainWindow()->showMaximized();
 			engine::getSong()->loadProject( file_to_load );
+		}
+		else if( !file_to_import.isEmpty() )
+		{
+			importFilter::import( file_to_import,
+							engine::getSong() );
+			if( exit_after_import )
+			{
+				return 0;
+			}
+			engine::getMainWindow()->showMaximized();
 		}
 		else
 		{
@@ -422,7 +433,7 @@ return 0;
 	else
 	{
 		// we're going to render our song
-		engine::init( FALSE );
+		engine::init( false );
 		printf( "loading project...\n" );
 		engine::getSong()->loadProject( file_to_load );
 		printf( "done\n" );

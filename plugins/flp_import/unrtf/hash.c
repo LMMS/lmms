@@ -4,7 +4,7 @@
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2 of the License, or
+   the Free Software Foundation; either version 3 of the License, or
    (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -38,6 +38,7 @@
  * 08 Oct 03, daved@physiol.usyd.edu.au: some type fixes
  * 29 Mar 05, daved@physiol.usyd.edu.au: changes requsted by ZT Smith
  * 06 Jan 06, marcossamaral@terra.com.br: changes hash_stats function
+ * 16 Dec 07, daved@physiol.usyd.edu.au: updated to GPL v3
  *--------------------------------------------------------------------*/
 
 #ifdef LMMS_HAVE_CONFIG_H

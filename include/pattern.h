@@ -68,24 +68,27 @@ public:
 	virtual midiTime length( void ) const;
 	midiTime beatPatternLength( void ) const;
 
-	note * addNote( const note & _new_note, const bool _quant_pos = TRUE );
+	// note management
+	note * addNote( const note & _new_note, const bool _quant_pos = true );
 
 	void removeNote( const note * _note_to_del );
 
 	note * rearrangeNote( const note * _note_to_proc,
-						const bool _quant_pos = TRUE );
+						const bool _quant_pos = true );
 	void rearrangeAllNotes( void );
 	void clearNotes( void );
 
 	inline const noteVector & notes( void )
 	{
-		return( m_notes );
+		return m_notes;
 	}
+
+	void setStep( int _step, bool _enabled );
 
 	// pattern-type stuff
 	inline PatternTypes type( void ) const
 	{
-		return( m_patternType );
+		return m_patternType;
 	}
 	void setType( PatternTypes _new_pattern_type );
 	void checkType( void );
@@ -94,17 +97,17 @@ public:
 	// functions which are part of freezing-feature
 	inline bool freezing( void ) const
 	{
-		return( m_freezing );
+		return m_freezing;
 	}
 
 	inline bool frozen( void ) const
 	{
-		return( m_frozenPattern != NULL );
+		return m_frozenPattern != NULL;
 	}
 
 	sampleBuffer * getFrozenPattern( void )
 	{
-		return( m_frozenPattern );
+		return m_frozenPattern;
 	}
 
 	// settings-management
@@ -112,12 +115,12 @@ public:
 	virtual void loadSettings( const QDomElement & _this );
 	inline virtual QString nodeName( void ) const
 	{
-		return( "pattern" );
+		return "pattern";
 	}
 
 	inline instrumentTrack * getInstrumentTrack( void )
 	{
-		return( m_instrumentTrack );
+		return m_instrumentTrack;
 	}
 
 	bool empty( void );
@@ -197,7 +200,7 @@ protected:
 	virtual void paintEvent( QPaintEvent * _pe );
 	virtual void resizeEvent( QResizeEvent * _re )
 	{
-		m_needsUpdate = TRUE;
+		m_needsUpdate = true;
 		trackContentObjectView::resizeEvent( _re );
 	}
 	virtual void wheelEvent( QWheelEvent * _we );

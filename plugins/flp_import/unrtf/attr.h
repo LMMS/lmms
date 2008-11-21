@@ -4,7 +4,7 @@
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2 of the License, or
+   the Free Software Foundation; either version 3 of the License, or
    (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -32,10 +32,12 @@
  * 18 Sep 01, tuorfa@yahoo.com: updates for AttrStack paradigm
  * 29 Mar 05, daved@physiol.usyd.edu.au: changes requested by ZT Smith
  * 31 Oct 07, jasp00@users.sourceforge.net: replaced deprecated conversions
+ * 16 Dec 07, daved@physiol.usyd.edu.au: updated to GPL v3
  *--------------------------------------------------------------------*/
 
 #ifndef _ATTR
 #define _ATTR
+
 
 enum {
 	ATTR_NONE=0,
@@ -89,6 +91,13 @@ extern void attr_drop_all ();
 extern void attr_pop_all();
 
 extern void attr_pop_dump();
+
+#if 1 /* daved 0.20.2 */
+
+char * attr_get_param(int attr);
+
+#endif
+
 
 
 

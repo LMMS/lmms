@@ -292,20 +292,23 @@ bool midiImport::readSMF( trackContainer * _tc )
 
 	// Tempo stuff
 	automationPattern * tap = _tc->tempoAutomationPattern();
-	tap->clear();
-	Alg_time_map * timeMap = seq->get_time_map();
-	Alg_beats & beats = timeMap->beats;
-	for( int i = 0; i < beats.len - 1; i++ )
+	if( tap )
 	{
-		Alg_beat_ptr b = &(beats[i]);
-		double tempo = ( beats[i + 1].beat - b->beat ) /
-					   ( beats[i + 1].time - beats[i].time );
-		tap->putValue( b->beat * ticksPerBeat, tempo * 60.0 );
-	}
-	if( timeMap->last_tempo_flag )
-	{
-		Alg_beat_ptr b = &( beats[beats.len - 1] );
-		tap->putValue( b->beat * ticksPerBeat, timeMap->last_tempo * 60.0 );
+		tap->clear();
+		Alg_time_map * timeMap = seq->get_time_map();
+		Alg_beats & beats = timeMap->beats;
+		for( int i = 0; i < beats.len - 1; i++ )
+		{
+			Alg_beat_ptr b = &(beats[i]);
+			double tempo = ( beats[i + 1].beat - b->beat ) /
+						   ( beats[i + 1].time - beats[i].time );
+			tap->putValue( b->beat * ticksPerBeat, tempo * 60.0 );
+		}
+		if( timeMap->last_tempo_flag )
+		{
+			Alg_beat_ptr b = &( beats[beats.len - 1] );
+			tap->putValue( b->beat * ticksPerBeat, timeMap->last_tempo * 60.0 );
+		}
 	}
 
 	// Song events
@@ -416,17 +419,17 @@ bool midiImport::readSMF( trackContainer * _tc )
 								break;
 
 							case 7:
-								objModel = &ch->it->volumeModel();
+								objModel = ch->it->volumeModel();
 								cc *= 100.0f;
 								break;
 
 							case 10:
-								objModel = &ch->it->panningModel();
+								objModel = ch->it->panningModel();
 								cc = cc * 200.f - 100.0f;
 								break;
 
 							case 128:
-								objModel = &ch->it->pitchModel();
+								objModel = ch->it->pitchModel();
 								cc = cc * 100.0f;
 								break;
 						}

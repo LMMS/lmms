@@ -68,8 +68,8 @@ pattern::pattern( instrumentTrack * _instrument_track ) :
 	m_patternType( BeatPattern ),
 	m_steps( midiTime::stepsPerTact() ),
 	m_frozenPattern( NULL ),
-	m_freezing( FALSE ),
-	m_freezeAborted( FALSE )
+	m_freezing( false ),
+	m_freezeAborted( false )
 {
 	setName( _instrument_track->name() );
 	init();
@@ -84,7 +84,7 @@ pattern::pattern( const pattern & _pat_to_copy ) :
 	m_patternType( _pat_to_copy.m_patternType ),
 	m_steps( _pat_to_copy.m_steps ),
 	m_frozenPattern( NULL ),
-	m_freezeAborted( FALSE )
+	m_freezeAborted( false )
 {
 	for( noteVector::const_iterator it = _pat_to_copy.m_notes.begin();
 					it != _pat_to_copy.m_notes.end(); ++it )
@@ -121,7 +121,7 @@ void pattern::init( void )
 {
 	connect( engine::getSong(), SIGNAL( timeSignatureChanged( int, int ) ),
 				this, SLOT( changeTimeSignature() ) );
-	saveJournallingState( FALSE );
+	saveJournallingState( false );
 
 	ensureBeatNotes();
 
@@ -136,7 +136,7 @@ midiTime pattern::length( void ) const
 {
 	if( m_patternType == BeatPattern )
 	{
-		return( beatPatternLength() );
+		return beatPatternLength();
 	}
 
 	tick max_length = midiTime::ticksPerTact();
@@ -150,8 +150,8 @@ midiTime pattern::length( void ) const
 							( *it )->endPos() );
 		}
 	}
-	return( midiTime( max_length ).nextFullTact() *
-						midiTime::ticksPerTact() );
+	return midiTime( max_length ).nextFullTact() *
+						midiTime::ticksPerTact();
 }
 
 
@@ -178,8 +178,7 @@ midiTime pattern::beatPatternLength( void ) const
 						midiTime::stepsPerTact() ;
 	}
 
-	return( midiTime( max_length ).nextFullTact() *
-						midiTime::ticksPerTact() );
+	return midiTime( max_length ).nextFullTact() * midiTime::ticksPerTact();
 }
 
 
@@ -225,7 +224,7 @@ note * pattern::addNote( const note & _new_note, const bool _quant_pos )
 
 	updateBBTrack();
 
-	return( new_note );
+	return new_note;
 }
 
 
@@ -266,8 +265,11 @@ note * pattern::rearrangeNote( const note * _note_to_proc,
 	note copy_of_note( *_note_to_proc );
 	removeNote( _note_to_proc );
 
-	return( addNote( copy_of_note, _quant_pos ) );
+	return addNote( copy_of_note, _quant_pos );
 }
+
+
+
 
 void pattern::rearrangeAllNotes( void )
 {
@@ -275,6 +277,8 @@ void pattern::rearrangeAllNotes( void )
 	qSort(m_notes.begin(), m_notes.end());
 	
 }
+
+
 
 
 void pattern::clearNotes( void )
@@ -290,6 +294,23 @@ void pattern::clearNotes( void )
 
 	checkType();
 	emit dataChanged();
+}
+
+
+
+
+void pattern::setStep( int _step, bool _enabled )
+{
+	for( noteVector::iterator it = m_notes.begin(); it != m_notes.end();
+									++it )
+	{
+		if( ( *it )->pos() == _step*DefaultTicksPerTact/16 &&
+						( *it )->length() <= 0 )
+		{
+			( *it )->setLength( _enabled ?
+						-DefaultTicksPerTact : 0 );
+		}
+	}
 }
 
 
@@ -465,7 +486,7 @@ void pattern::unfreeze( void )
 
 void pattern::abortFreeze( void )
 {
-	m_freezeAborted = TRUE;
+	m_freezeAborted = true;
 }
 
 
@@ -510,7 +531,7 @@ void pattern::removeSteps( int _n )
 
 trackContentObjectView * pattern::createView( trackView * _tv )
 {
-	return( new patternView( this, _tv ) );
+	return new patternView( this, _tv );
 }
 
 
@@ -522,7 +543,7 @@ void pattern::ensureBeatNotes( void )
 	// make sure, that all step-note exist
 	for( int i = 0; i < m_steps; ++i )
 	{
-		bool found = FALSE;
+		bool found = false;
 		for( noteVector::iterator it = m_notes.begin();
 						it != m_notes.end(); ++it )
 		{
@@ -531,15 +552,15 @@ void pattern::ensureBeatNotes( void )
 					midiTime::stepsPerTact() &&
 							( *it )->length() <= 0 )
 			{
-				found = TRUE;
+				found = true;
 				break;
 			}
 		}
-		if( found == FALSE )
+		if( found == false )
 		{
 			addNote( note( midiTime( 0 ), midiTime( i *
 				midiTime::ticksPerTact() /
-					midiTime::stepsPerTact() ) ), FALSE );
+					midiTime::stepsPerTact() ) ), false );
 		}
 	}
 }
@@ -565,10 +586,10 @@ bool pattern::empty( void )
 	{
 		if( ( *it )->length() != 0 )
 		{
-			return( FALSE );
+			return false;
 		}
 	}
-	return( TRUE );
+	return true;
 }
 
 
@@ -614,12 +635,12 @@ patternFreezeStatusDialog::patternFreezeStatusDialog( QThread * _thread ) :
 	m_progress( 0 )
 {
 	setWindowTitle( tr( "Freezing pattern..." ) );
-	setModal( TRUE );
+	setModal( true );
 
 	m_progressBar = new QProgressBar( this );
 	m_progressBar->setGeometry( 10, 10, 200, 24 );
 	m_progressBar->setMaximum( 100 );
-	m_progressBar->setTextVisible( FALSE );
+	m_progressBar->setTextVisible( false );
 	m_progressBar->show();
 	m_cancelBtn = new QPushButton( embed::getIconPixmap( "cancel" ),
 							tr( "Cancel" ), this );
@@ -634,7 +655,7 @@ patternFreezeStatusDialog::patternFreezeStatusDialog( QThread * _thread ) :
 					this, SLOT( updateProgress() ) );
 	update_timer->start( 100 );
 
-	setAttribute( Qt::WA_DeleteOnClose, TRUE );
+	setAttribute( Qt::WA_DeleteOnClose, true );
 	connect( this, SIGNAL( aborted() ), this, SLOT( reject() ) );
 
 }
@@ -731,20 +752,20 @@ void patternFreezeThread::run( void )
 	engine::getMixer()->setAudioDevice( freeze_recorder );
 
 	// prepare stuff for playing correct things later
-	engine::getSong()->playPattern( m_pattern, FALSE );
+	engine::getSong()->playPattern( m_pattern, false );
 	song::playPos & ppp = engine::getSong()->getPlayPos(
 						song::Mode_PlayPattern );
 	ppp.setTicks( 0 );
 	ppp.setCurrentFrame( 0 );
-	ppp.m_timeLineUpdate = FALSE;
+	ppp.m_timeLineUpdate = false;
 
-	m_pattern->m_freezeAborted = FALSE;
-	m_pattern->m_freezing = TRUE;
+	m_pattern->m_freezeAborted = false;
+	m_pattern->m_freezing = true;
 
 
 	// now render everything
 	while( ppp < m_pattern->length() &&
-					m_pattern->m_freezeAborted == FALSE )
+					m_pattern->m_freezeAborted == false )
 	{
 		freeze_recorder->processNextBuffer();
 		m_statusDlg->setProgress( ppp * 100 / m_pattern->length() );
@@ -752,20 +773,20 @@ void patternFreezeThread::run( void )
 	m_statusDlg->setProgress( 100 );
 	// render tails
 	while( engine::getMixer()->hasPlayHandles() &&
-					m_pattern->m_freezeAborted == FALSE )
+					m_pattern->m_freezeAborted == false )
 	{
 		freeze_recorder->processNextBuffer();
 	}
 
 
-	m_pattern->m_freezing = FALSE;
+	m_pattern->m_freezing = false;
 
 	// reset song-editor settings
 	engine::getSong()->stop();
-	ppp.m_timeLineUpdate = TRUE;
+	ppp.m_timeLineUpdate = true;
 
 	// create final sample-buffer if freezing was successful
-	if( m_pattern->m_freezeAborted == FALSE )
+	if( m_pattern->m_freezeAborted == false )
 	{
 		freeze_recorder->createSampleBuffer(
 						&m_pattern->m_frozenPattern );
@@ -786,7 +807,7 @@ patternView::patternView( pattern * _pattern, trackView * _parent ) :
 	trackContentObjectView( _pattern, _parent ),
 	m_pat( _pattern ),
 	m_paintPixmap(),
-	m_needsUpdate( TRUE )
+	m_needsUpdate( true )
 {
 	if( s_stepBtnOn == NULL )
 	{
@@ -818,7 +839,7 @@ patternView::patternView( pattern * _pattern, trackView * _parent ) :
 	}
 
 	setFixedHeight( parentWidget()->height() - 2 );
-	setAutoResizeEnabled( FALSE );
+	setAutoResizeEnabled( false );
 
 	toolTip::add( this,
 		tr( "double-click to open this pattern in piano-roll\n"
@@ -852,7 +873,7 @@ patternView::~patternView()
 
 void patternView::update( void )
 {
-	m_needsUpdate = TRUE;
+	m_needsUpdate = true;
 	m_pat->changeLength( m_pat->length() );
 	trackContentObjectView::update();
 }
@@ -928,20 +949,20 @@ void patternView::constructContextMenu( QMenu * _cm )
 						this, SLOT( changeName() ) );
 	_cm->addSeparator();
 
-	bool freeze_separator = FALSE;
+	bool freeze_separator = false;
 	if( !( m_pat->m_instrumentTrack->isMuted() || m_pat->isMuted() ) )
 	{
 		_cm->addAction( embed::getIconPixmap( "freeze" ),
 			m_pat->m_frozenPattern ? tr( "Refreeze" ) :
 								tr( "Freeze" ),
 						m_pat, SLOT( freeze() ) );
-		freeze_separator = TRUE;
+		freeze_separator = true;
 	}
 	if( m_pat->m_frozenPattern )
 	{
 		_cm->addAction( embed::getIconPixmap( "unfreeze" ),
 				tr( "Unfreeze" ), m_pat, SLOT( unfreeze() ) );
-		freeze_separator = TRUE;
+		freeze_separator = true;
 	}
 	if( freeze_separator )
 	{
@@ -1023,7 +1044,7 @@ void patternView::mousePressEvent( QMouseEvent * _me )
 	}
 	else if( m_pat->m_frozenPattern != NULL &&
 					_me->button() == Qt::LeftButton &&
-			engine::getMainWindow()->isShiftPressed() == TRUE )
+			engine::getMainWindow()->isShiftPressed() == true )
 	{
 		QString s;
 		new stringPairDrag( "sampledata",
@@ -1098,7 +1119,7 @@ void patternView::wheelEvent( QWheelEvent * _we )
 
 void patternView::paintEvent( QPaintEvent * )
 {
-	if( m_needsUpdate == FALSE )
+	if( m_needsUpdate == false )
 	{
 		QPainter p( this );
 		p.drawPixmap( 0, 0, m_paintPixmap );
@@ -1107,9 +1128,9 @@ void patternView::paintEvent( QPaintEvent * )
 
 	m_pat->changeLength( m_pat->length() );
 
-	m_needsUpdate = FALSE;
+	m_needsUpdate = false;
 
-	if( m_paintPixmap.isNull() == TRUE || m_paintPixmap.size() != size() )
+	if( m_paintPixmap.isNull() == true || m_paintPixmap.size() != size() )
 	{
 		m_paintPixmap = QPixmap( size() );
 	}

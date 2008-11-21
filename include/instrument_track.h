@@ -88,12 +88,12 @@ public:
 	QString instrumentName( void ) const;
 	inline const instrument * getInstrument( void ) const
 	{
-		return( m_instrument );
+		return m_instrument;
 	}
 
 	inline instrument * getInstrument( void )
 	{
-		return( m_instrument );
+		return m_instrument;
 	}
 
 	void deleteNotePluginData( notePlayHandle * _n );
@@ -108,7 +108,7 @@ public:
 	// translate pitch to midi-pitch [0,16383]
 	inline int midiPitch( void ) const
 	{
-		return( (int)( ( m_pitchModel.value()+100 ) * 81.92 ) );
+		return (int)( ( m_pitchModel.value()+100 ) * 81.92 );
 	}
 
 	// play everything in given frame-range - creates note-play-handles
@@ -135,46 +135,52 @@ public:
 
 	inline audioPort * getAudioPort( void )
 	{
-		return( &m_audioPort );
+		return &m_audioPort;
 	}
 
 	inline midiPort * getMidiPort( void )
 	{
-		return( &m_midiPort );
+		return &m_midiPort;
 	}
 
 	intModel * baseNoteModel( void )
 	{
-		return( &m_baseNoteModel );
+		return &m_baseNoteModel;
 	}
 
 	piano * getPiano( void )
 	{
-		return( &m_piano );
+		return &m_piano;
 	}
 
 	bool arpeggiatorEnabled( void ) const
 	{
-		return( m_arpeggiator.m_arpEnabledModel.value() );
+		return m_arpeggiator.m_arpEnabledModel.value();
 	}
 
 	// simple helper for removing midiport-XML-node when loading presets
 	static void removeMidiPortNode( multimediaProject & _mmp );
 
-	floatModel & pitchModel() 
+	floatModel * pitchModel( void )
 	{
-		return m_pitchModel;
+		return &m_pitchModel;
 	}
 
-	floatModel & volumeModel() 
+	floatModel * volumeModel( void )
 	{
-		return m_volumeModel;
+		return &m_volumeModel;
 	}
 
-	floatModel & panningModel() 
+	floatModel * panningModel( void )
 	{
-		return m_panningModel;
+		return &m_panningModel;
 	}
+
+	intModel * effectChannelModel( void )
+	{
+		return &m_effectChannelModel;
+	}
+
 
 signals:
 	void instrumentChanged( void );
@@ -186,7 +192,7 @@ signals:
 protected:
 	virtual QString nodeName( void ) const
 	{
-		return( "instrumenttrack" );
+		return "instrumenttrack";
 	}
 	// invalidates all note-play-handles linked to this instrument
 	void invalidateAllMyNPH( void );
@@ -245,18 +251,18 @@ public:
 
 	instrumentTrack * model( void )
 	{
-		return( castModel<instrumentTrack>() );
+		return castModel<instrumentTrack>();
 	}
 
 	const instrumentTrack * model( void ) const
 	{
-		return( castModel<instrumentTrack>() );
+		return castModel<instrumentTrack>();
 	}
 
 
 	QMenu * midiMenu( void )
 	{
-		return( m_midiMenu );
+		return m_midiMenu;
 	}
 
 	void freeInstrumentTrackWindow( void );
@@ -314,17 +320,17 @@ public:
 	// parent for all internal tab-widgets
 	tabWidget * tabWidgetParent( void )
 	{
-		return( m_tabWidget );
+		return m_tabWidget;
 	}
 
 	instrumentTrack * model( void )
 	{
-		return( castModel<instrumentTrack>() );
+		return castModel<instrumentTrack>();
 	}
 
 	const instrumentTrack * model( void ) const
 	{
-		return( castModel<instrumentTrack>() );
+		return castModel<instrumentTrack>();
 	}
 
 	void setInstrumentTrackView( instrumentTrackView * _tv )

@@ -1,3 +1,92 @@
+2008-11-21	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* plugins/flp_import/flp_import.h:
+	* plugins/flp_import/flp_import.cpp:
+	completely rewrote FLP import filter since it didn't work at all
+	anymore - it now doesn't create or change any things in LMMS while
+	importing and instead builds up a complete data structure first
+	which represents the FL Studio project and then creates an LMMS
+	project based upon this data structure
+	- now supports projects from FL Studio 3 to 8
+	- more verbose debug output
+	- import volume, panning, pitch and FX channel for instrument tracks
+	- import amplification, loop-mode and reverse-mode settings for
+	  AudioFileProcessor
+	- import FX mixer settings and effects
+	- import automation data
+	- import channel- and pattern names
+	- import volume and panning settings of individual notes
+	- add notes of instrument layer master to each layer children for at
+	  least having a complete sound - need to replace with real layering
+	  support later
+	- map more instruments to various LMMS instruments
+	- fixed calculations of length and position of notes
+	- fixed importing steps/dots
+	- fixed scaling factor of various controls (arpeggio time,
+	  envelope sustain and amount, filter cut/res, TripleOsc volumes etc.)
+	- if three user defined samples were found for TripleOscillator set
+	  first oscillator to oscillator::SawWave
+
+	* plugins/flp_import/unrtf.cpp:
+	* plugins/flp_import/CMakeLists.txt:
+	* plugins/flp_import/unrtf/error.h:
+	* plugins/flp_import/unrtf/output.c:
+	* plugins/flp_import/unrtf/html.c:
+	* plugins/flp_import/unrtf/output.h:
+	* plugins/flp_import/unrtf/malloc.c:
+	* plugins/flp_import/unrtf/html.h:
+	* plugins/flp_import/unrtf/attr.c:
+	* plugins/flp_import/unrtf/parse.c:
+	* plugins/flp_import/unrtf/word.c:
+	* plugins/flp_import/unrtf/malloc.h:
+	* plugins/flp_import/unrtf/util.c:
+	* plugins/flp_import/unrtf/attr.h:
+	* plugins/flp_import/unrtf/parse.h:
+	* plugins/flp_import/unrtf/convert.c:
+	* plugins/flp_import/unrtf/word.h:
+	* plugins/flp_import/unrtf/util.h:
+	* plugins/flp_import/unrtf/hash.c:
+	* plugins/flp_import/unrtf/convert.h:
+	* plugins/flp_import/unrtf/defs.h:
+	* plugins/flp_import/unrtf/hash.h:
+	* plugins/flp_import/unrtf/main.h:
+	* plugins/flp_import/unrtf/error.c:
+	updated to latest version of unrtf and improved string operations
+
+	* src/core/main.cpp:
+	added support for importing file from commandline
+
+	* include/effect_chain.h:
+	added method for enabling/disabling FX chain
+
+	* include/file_browser.h:
+	* src/gui/file_browser.cpp:
+	enhanced support for importing various file types directly from browser
+
+	* include/pattern.h:
+	* src/tracks/pattern.cpp:
+	added method for toggling steps
+
+	* include/fx_mixer.h:
+	added method for accessing FX channels
+
+	* plugins/midi_import/midi_import.cpp:
+	check for tempoAutomationPattern being NULL for not crashing when
+	importing to BB-Editor
+
+	* include/instrument_track.h:
+	return pointers instead of references to various internal models
+
+	* include/basic_filters.h:
+	* include/bb_track_container.h:
+	* include/instrument_track.h:
+	* include/pattern.h:
+	* include/track_container.h:
+	* src/core/instrument_functions.cpp:
+	* src/tracks/pattern.cpp:
+	* src/gui/track_container_view.cpp:
+	coding style fixes
+
 2008-11-13	Andrew Kelley	<superjoe30/at/gmail/dot/com>
 	
 	* src/gui/piano_roll.cpp:

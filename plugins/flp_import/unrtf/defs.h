@@ -5,7 +5,7 @@
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2 of the License, or
+   the Free Software Foundation; either version 3 of the License, or
    (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -35,6 +35,9 @@
  * 09 Oct 03, daved@physiol.usyd.edu.au: changed to GNU website
  * 17 Feb 04, marcossamaral@terra.com.br: changed some information
  * 29 Mar 05, daved@physiol.usyd.edu.au: changes requested by ZT Smith
+ * 16 Dec 07, daved@physiol.usyd.edu.au: updated to GPL v3
+ * 17 Dec 07, daved@physiol.usyd.edu.au: added --noremap to usage - from
+ *		David Santinoli
  *--------------------------------------------------------------------*/
 
 
@@ -61,7 +64,7 @@
 #endif
 
 
-#define USAGE "unrtf [--version] [--verbose] [--help] [--nopict|-n] [--html] [--text] [--vt] [--latex] [-t html|text|vt|latex] <filename>"
+#define USAGE "unrtf [--version] [--verbose] [--help] [--nopict|-n] [--noremap] [--html] [--text] [--vt] [--latex] [-t html|text|vt|latex] <filename>"
 
 
 /* Default names for RTF's default fonts */

@@ -5,7 +5,7 @@
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2 of the License, or
+   the Free Software Foundation; either version 3 of the License, or
    (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -28,7 +28,8 @@
  * Purpose:        Definitions for the conversion module
  *----------------------------------------------------------------------
  * Changes:
- * 31 March 2005 by daved@physiol.usyd.edu.au: changes requested by ZT Smith
+ * 31 Mar 05, by daved@physiol.usyd.edu.au: changes requested by ZT Smith
+ * 16 Dec 07, daved@physiol.usyd.edu.au: updated to GPL v3
  *--------------------------------------------------------------------*/
 
 
@@ -38,7 +39,7 @@ enum {
 	CHARSET_ANSI=1,
 	CHARSET_MAC,
 	CHARSET_CP437,
-	CHARSET_CP850
+	CHARSET_CP850,
 };
 
 #ifndef _WORD
@@ -48,9 +49,10 @@ enum {
 extern void word_print (Word*, QString & _s);
 
 #if 1 /* daved 0.19.6 - support for multiple char number->output tables */
-	short numchar_table;
+	extern short numchar_table;
 #define FONTROMAN_TABLE 0
 #define FONTSYMBOL_TABLE 1
+#define FONTGREEK_TABLE 2
 #endif
 
 #define _CONVERT

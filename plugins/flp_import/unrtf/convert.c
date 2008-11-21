@@ -5,7 +5,7 @@
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2 of the License, or
+   the Free Software Foundation; either version 3 of the License, or
    (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -58,8 +58,13 @@
  * 03 Mar 06, daved@physiol.usyd.edu.au: fixed creation date spelling
 		and added support for accented characters in titles from
 		Laurent Monin
- # 09 Mar 06, daved@physiol.usyd.edu.au: don't print null post_trans
+ * 09 Mar 06, daved@physiol.usyd.edu.au: don't print null post_trans
+ * 18 Jun 06, daved@physiol.usyd.edu.au: fixed some incorrect comment_end
+ * 18 Jun 06, frolovs@internet2.ru: codepage support
  * 31 Oct 07, jasp00@users.sourceforge.net: fixed several warnings
+ * 16 Dec 07, daved@physiol.usyd.edu.au: updated to GPL v3
+ * 17 Dec 07, daved@physiol.usyd.edu.au: Italian month name spelling corrections
+ #		from David Santinoli
  *--------------------------------------------------------------------*/
 
 #ifdef LMMS_HAVE_CONFIG_H
@@ -94,16 +99,466 @@
 #include "attr.h"
 
 
+static CodepageInfo codepages[14] =
+{
+/*-- cp850 --*/
+{
+  850,
+  {
+  /* 0x80 */
+  0x00c7, 0x00fc, 0x00e9, 0x00e2, 0x00e4, 0x00e0, 0x00e5, 0x00e7,
+  0x00ea, 0x00eb, 0x00e8, 0x00ef, 0x00ee, 0x00ec, 0x00c4, 0x00c5,
+  /* 0x90 */
+  0x00c9, 0x00e6, 0x00c6, 0x00f4, 0x00f6, 0x00f2, 0x00fb, 0x00f9,
+  0x00ff, 0x00d6, 0x00dc, 0x00f8, 0x00a3, 0x00d8, 0x00d7, 0x0192,
+  /* 0xa0 */
+  0x00e1, 0x00ed, 0x00f3, 0x00fa, 0x00f1, 0x00d1, 0x00aa, 0x00ba,
+  0x00bf, 0x00ae, 0x00ac, 0x00bd, 0x00bc, 0x00a1, 0x00ab, 0x00bb,
+  /* 0xb0 */
+  0x2591, 0x2592, 0x2593, 0x2502, 0x2524, 0x00c1, 0x00c2, 0x00c0,
+  0x00a9, 0x2563, 0x2551, 0x2557, 0x255d, 0x00a2, 0x00a5, 0x2510,
+  /* 0xc0 */
+  0x2514, 0x2534, 0x252c, 0x251c, 0x2500, 0x253c, 0x00e3, 0x00c3,
+  0x255a, 0x2554, 0x2569, 0x2566, 0x2560, 0x2550, 0x256c, 0x00a4,
+  /* 0xd0 */
+  0x00f0, 0x00d0, 0x00ca, 0x00cb, 0x00c8, 0x0131, 0x00cd, 0x00ce,
+  0x00cf, 0x2518, 0x250c, 0x2588, 0x2584, 0x00a6, 0x00cc, 0x2580,
+  /* 0xe0 */
+  0x00d3, 0x00df, 0x00d4, 0x00d2, 0x00f5, 0x00d5, 0x00b5, 0x00fe,
+  0x00de, 0x00da, 0x00db, 0x00d9, 0x00fd, 0x00dd, 0x00af, 0x00b4,
+  /* 0xf0 */
+  0x00ad, 0x00b1, 0x2017, 0x00be, 0x00b6, 0x00a7, 0x00f7, 0x00b8,
+  0x00b0, 0x00a8, 0x00b7, 0x00b9, 0x00b3, 0x00b2, 0x25a0, 0x00a0,
+  }
+},
+/*-- cp866 --*/
+{
+  866,
+  {
+  /* 0x80 */
+  0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0,
+  /* 0x90 */
+  0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0,
+  /* 0xa0 */
+  0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0,
+  /* 0xb0 */
+  0x2591, 0x2592, 0x2593, 0x2502, 0x2524, 0x2561, 0x2562, 0x2556,
+  0x2555, 0x2563, 0x2551, 0x2557, 0x255d, 0x255c, 0x255b, 0x2510,
+  /* 0xc0 */
+  0x2514, 0x2534, 0x252c, 0x251c, 0x2500, 0x253c, 0x255e, 0x255f,
+  0x255a, 0x2554, 0x2569, 0x2566, 0x2560, 0x2550, 0x256c, 0x2567,
+  /* 0xd0 */
+  0x2568, 0x2564, 0x2565, 0x2559, 0x2558, 0x2552, 0x2553, 0x256b,
+  0x256a, 0x2518, 0x250c, 0x2588, 0x2584, 0x258c, 0x2590, 0x2580,
+  /* 0xe0 */
+  0x0440, 0x0441, 0x0442, 0x0443, 0x0444, 0x0445, 0x0446, 0x0447,
+  0x0448, 0x0449, 0x044a, 0x044b, 0x044c, 0x044d, 0x044e, 0x044f,
+  /* 0xf0 */
+  0x0401, 0x0451, 0x0404, 0x0454, 0x0407, 0x0457, 0x040e, 0x045e,
+  0x00b0, 0x2219, 0x00b7, 0x221a, 0x2116, 0x00a4, 0x25a0, 0x00a0,
+  }
+},
+/*-- cp874 --*/
+{
+  874,
+  {
+  /* 0x80 */
+  0x20ac, 0xfffd, 0xfffd, 0xfffd, 0xfffd, 0x2026, 0xfffd, 0xfffd,
+  0xfffd, 0xfffd, 0xfffd, 0xfffd, 0xfffd, 0xfffd, 0xfffd, 0xfffd,
+  /* 0x90 */
+  0xfffd, 0x2018, 0x2019, 0x201c, 0x201d, 0x2022, 0x2013, 0x2014,
+  0xfffd, 0xfffd, 0xfffd, 0xfffd, 0xfffd, 0xfffd, 0xfffd, 0xfffd,
+  /* 0xa0 */
+  0x00a0, 0x0e01, 0x0e02, 0x0e03, 0x0e04, 0x0e05, 0x0e06, 0x0e07,
+  0x0e08, 0x0e09, 0x0e0a, 0x0e0b, 0x0e0c, 0x0e0d, 0x0e0e, 0x0e0f,
+  /* 0xb0 */
+  0x0e10, 0x0e11, 0x0e12, 0x0e13, 0x0e14, 0x0e15, 0x0e16, 0x0e17,
+  0x0e18, 0x0e19, 0x0e1a, 0x0e1b, 0x0e1c, 0x0e1d, 0x0e1e, 0x0e1f,
+  /* 0xc0 */
+  0x0e20, 0x0e21, 0x0e22, 0x0e23, 0x0e24, 0x0e25, 0x0e26, 0x0e27,
+  0x0e28, 0x0e29, 0x0e2a, 0x0e2b, 0x0e2c, 0x0e2d, 0x0e2e, 0x0e2f,
+  /* 0xd0 */
+  0x0e30, 0x0e31, 0x0e32, 0x0e33, 0x0e34, 0x0e35, 0x0e36, 0x0e37,
+  0x0e38, 0x0e39, 0x0e3a, 0xfffd, 0xfffd, 0xfffd, 0xfffd, 0x0e3f,
+  /* 0xe0 */
+  0x0e40, 0x0e41, 0x0e42, 0x0e43, 0x0e44, 0x0e45, 0x0e46, 0x0e47,
+  0x0e48, 0x0e49, 0x0e4a, 0x0e4b, 0x0e4c, 0x0e4d, 0x0e4e, 0x0e4f,
+  /* 0xf0 */
+  0x0e50, 0x0e51, 0x0e52, 0x0e53, 0x0e54, 0x0e55, 0x0e56, 0x0e57,
+  0x0e58, 0x0e59, 0x0e5a, 0x0e5b, 0xfffd, 0xfffd, 0xfffd, 0xfffd,
+  }
+},
+/*-- cp1133 --*/
+{
+  1133,
+  {
+  /* 0x80 */
+  0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0,
+  /* 0x90 */
+  0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0,
+  /* 0xa0 */
+  0x00a0, 0x0e81, 0x0e82, 0x0e84, 0x0e87, 0x0e88, 0x0eaa, 0x0e8a,
+  0x0e8d, 0x0e94, 0x0e95, 0x0e96, 0x0e97, 0x0e99, 0x0e9a, 0x0e9b,
+  /* 0xb0 */
+  0x0e9c, 0x0e9d, 0x0e9e, 0x0e9f, 0x0ea1, 0x0ea2, 0x0ea3, 0x0ea5,
+  0x0ea7, 0x0eab, 0x0ead, 0x0eae, 0xfffd, 0xfffd, 0xfffd, 0x0eaf,
+  /* 0xc0 */
+  0x0eb0, 0x0eb2, 0x0eb3, 0x0eb4, 0x0eb5, 0x0eb6, 0x0eb7, 0x0eb8,
+  0x0eb9, 0x0ebc, 0x0eb1, 0x0ebb, 0x0ebd, 0xfffd, 0xfffd, 0xfffd,
+  /* 0xd0 */
+  0x0ec0, 0x0ec1, 0x0ec2, 0x0ec3, 0x0ec4, 0x0ec8, 0x0ec9, 0x0eca,
+  0x0ecb, 0x0ecc, 0x0ecd, 0x0ec6, 0xfffd, 0x0edc, 0x0edd, 0x20ad,
+  /* 0xe0 */
+  0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0,
+  /* 0xf0 */
+  0x0ed0, 0x0ed1, 0x0ed2, 0x0ed3, 0x0ed4, 0x0ed5, 0x0ed6, 0x0ed7,
+  0x0ed8, 0x0ed9, 0xfffd, 0xfffd, 0x00a2, 0x00ac, 0x00a6, 0xfffd,
+  }
+},
+/*-- cp1250 --*/
+{
+  1250,
+  {
+  /* 0x80 */
+  0x20ac, 0xfffd, 0x201a, 0xfffd, 0x201e, 0x2026, 0x2020, 0x2021,
+  0xfffd, 0x2030, 0x0160, 0x2039, 0x015a, 0x0164, 0x017d, 0x0179,
+  /* 0x90 */
+  0xfffd, 0x2018, 0x2019, 0x201c, 0x201d, 0x2022, 0x2013, 0x2014,
+  0xfffd, 0x2122, 0x0161, 0x203a, 0x015b, 0x0165, 0x017e, 0x017a,
+  /* 0xa0 */
+  0x00a0, 0x02c7, 0x02d8, 0x0141, 0x00a4, 0x0104, 0x00a6, 0x00a7,
+  0x00a8, 0x00a9, 0x015e, 0x00ab, 0x00ac, 0x00ad, 0x00ae, 0x017b,
+  /* 0xb0 */
+  0x00b0, 0x00b1, 0x02db, 0x0142, 0x00b4, 0x00b5, 0x00b6, 0x00b7,
+  0x00b8, 0x0105, 0x015f, 0x00bb, 0x013d, 0x02dd, 0x013e, 0x017c,
+  /* 0xc0 */
+  0x0154, 0x00c1, 0x00c2, 0x0102, 0x00c4, 0x0139, 0x0106, 0x00c7,
+  0x010c, 0x00c9, 0x0118, 0x00cb, 0x011a, 0x00cd, 0x00ce, 0x010e,
+  /* 0xd0 */
+  0x0110, 0x0143, 0x0147, 0x00d3, 0x00d4, 0x0150, 0x00d6, 0x00d7,
+  0x0158, 0x016e, 0x00da, 0x0170, 0x00dc, 0x00dd, 0x0162, 0x00df,
+  /* 0xe0 */
+  0x0155, 0x00e1, 0x00e2, 0x0103, 0x00e4, 0x013a, 0x0107, 0x00e7,
+  0x010d, 0x00e9, 0x0119, 0x00eb, 0x011b, 0x00ed, 0x00ee, 0x010f,
+  /* 0xf0 */
+  0x0111, 0x0144, 0x0148, 0x00f3, 0x00f4, 0x0151, 0x00f6, 0x00f7,
+  0x0159, 0x016f, 0x00fa, 0x0171, 0x00fc, 0x00fd, 0x0163, 0x02d9,
+  }
+},
+/*-- cp1251 --*/
+{
+  1251,
+  {
+  /* 0x80 */
+  0x0402, 0x0403, 0x201a, 0x0453, 0x201e, 0x2026, 0x2020, 0x2021,
+  0x20ac, 0x2030, 0x0409, 0x2039, 0x040a, 0x040c, 0x040b, 0x040f,
+  /* 0x90 */
+  0x0452, 0x2018, 0x2019, 0x201c, 0x201d, 0x2022, 0x2013, 0x2014,
+  0xfffd, 0x2122, 0x0459, 0x203a, 0x045a, 0x045c, 0x045b, 0x045f,
+  /* 0xa0 */
+  0x00a0, 0x040e, 0x045e, 0x0408, 0x00a4, 0x0490, 0x00a6, 0x00a7,
+  0x0401, 0x00a9, 0x0404, 0x00ab, 0x00ac, 0x00ad, 0x00ae, 0x0407,
+  /* 0xb0 */
+  0x00b0, 0x00b1, 0x0406, 0x0456, 0x0491, 0x00b5, 0x00b6, 0x00b7,
+  0x0451, 0x2116, 0x0454, 0x00bb, 0x0458, 0x0405, 0x0455, 0x0457,
+  /* 0xc0 */
+  0x0410, 0x0411, 0x0412, 0x0413, 0x0414, 0x0415, 0x0416, 0x0417,
+  0x0418, 0x0419, 0x041a, 0x041b, 0x041c, 0x041d, 0x041e, 0x041f,
+  /* 0xd0 */
+  0x0420, 0x0421, 0x0422, 0x0423, 0x0424, 0x0425, 0x0426, 0x0427,
+  0x0428, 0x0429, 0x042a, 0x042b, 0x042c, 0x042d, 0x042e, 0x042f,
+  /* 0xe0 */
+  0x0430, 0x0431, 0x0432, 0x0433, 0x0434, 0x0435, 0x0436, 0x0437,
+  0x0438, 0x0439, 0x043a, 0x043b, 0x043c, 0x043d, 0x043e, 0x043f,
+  /* 0xf0 */
+  0x0440, 0x0441, 0x0442, 0x0443, 0x0444, 0x0445, 0x0446, 0x0447,
+  0x0448, 0x0449, 0x044a, 0x044b, 0x044c, 0x044d, 0x044e, 0x044f,
+  }
+},
+/*-- cp1252 --*/
+{
+  1252,
+  {
+  /* 0x80 */
+  0x20ac, 0xfffd, 0x201a, 0x0192, 0x201e, 0x2026, 0x2020, 0x2021,
+  0x02c6, 0x2030, 0x0160, 0x2039, 0x0152, 0xfffd, 0x017d, 0xfffd,
+  /* 0x90 */
+#if 1
+/* daved - don't process 93 & 94 as we want entities */
+  0xfffd, 0x2018, 0x2019, 0, 0, 0x2022, 0x2013, 0x2014,
+#else
+  0xfffd, 0x2018, 0x2019, 0x201c, 0x201d, 0x2022, 0x2013, 0x2014,
+#endif
+  0x02dc, 0x2122, 0x0161, 0x203a, 0x0153, 0xfffd, 0x017e, 0x0178,
+#if 1
+  /* 0xa0 */
+  0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0,
+  /* 0xb0 */
+  0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0,
+  /* 0xc0 */
+  0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0,
+  /* 0xd0 */
+  0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0,
+  /* 0xe0 */
+  0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0,
+  /* 0xf0 */
+  0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0,
+#else /* daved experimenting */
+  /* 0xa0 */
+  160, 161, 162, 163, 164, 165, 166, 167,
+  168, 169, 170, 171, 172, 173, 174, 175,
+  /* 0xb0 */
+  176, 177, 178, 179, 180, 181, 182, 183,
+  184, 185, 186, 187, 188, 189, 190, 191,
+  /* 0xc0 */
+  192, 193, 194, 195, 196, 197, 198, 199,
+  200, 201, 202, 203, 204, 205, 206, 207,
+  /* 0xd0 */
+  208, 209, 210, 211, 212, 213, 214, 215,
+  216, 217, 218, 219, 220, 221, 222, 223,
+  /* 0xe0 */
+  224, 225, 226, 227, 228, 229, 230, 231,
+  232, 233, 234, 235, 236, 237, 238, 239,
+  /* 0xf0 */
+  240, 241, 242, 243, 244, 245, 246, 247,
+  248, 249, 250, 251, 252, 253, 254, 255,
+#endif
+  }
+},
+/*-- cp1253 --*/
+{
+  1253,
+  {
+  /* 0x80 */
+  0x20ac, 0xfffd, 0x201a, 0x0192, 0x201e, 0x2026, 0x2020, 0x2021,
+  0xfffd, 0x2030, 0xfffd, 0x2039, 0xfffd, 0xfffd, 0xfffd, 0xfffd,
+  /* 0x90 */
+  0xfffd, 0x2018, 0x2019, 0x201c, 0x201d, 0x2022, 0x2013, 0x2014,
+  0xfffd, 0x2122, 0xfffd, 0x203a, 0xfffd, 0xfffd, 0xfffd, 0xfffd,
+  /* 0xa0 */
+  0x00a0, 0x0385, 0x0386, 0x00a3, 0x00a4, 0x00a5, 0x00a6, 0x00a7,
+  0x00a8, 0x00a9, 0xfffd, 0x00ab, 0x00ac, 0x00ad, 0x00ae, 0x2015,
+  /* 0xb0 */
+  0x00b0, 0x00b1, 0x00b2, 0x00b3, 0x0384, 0x00b5, 0x00b6, 0x00b7,
+  0x0388, 0x0389, 0x038a, 0x00bb, 0x038c, 0x00bd, 0x038e, 0x038f,
+  /* 0xc0 */
+  0x0390, 0x0391, 0x0392, 0x0393, 0x0394, 0x0395, 0x0396, 0x0397,
+  0x0398, 0x0399, 0x039a, 0x039b, 0x039c, 0x039d, 0x039e, 0x039f,
+  /* 0xd0 */
+  0x03a0, 0x03a1, 0xfffd, 0x03a3, 0x03a4, 0x03a5, 0x03a6, 0x03a7,
+  0x03a8, 0x03a9, 0x03aa, 0x03ab, 0x03ac, 0x03ad, 0x03ae, 0x03af,
+  /* 0xe0 */
+  0x03b0, 0x03b1, 0x03b2, 0x03b3, 0x03b4, 0x03b5, 0x03b6, 0x03b7,
+  0x03b8, 0x03b9, 0x03ba, 0x03bb, 0x03bc, 0x03bd, 0x03be, 0x03bf,
+  /* 0xf0 */
+  0x03c0, 0x03c1, 0x03c2, 0x03c3, 0x03c4, 0x03c5, 0x03c6, 0x03c7,
+  0x03c8, 0x03c9, 0x03ca, 0x03cb, 0x03cc, 0x03cd, 0x03ce, 0xfffd,
+  }
+},
+/*-- 1254 --*/
+{
+  1254,
+  {
+  /* 0x80 */
+  0x20ac, 0xfffd, 0x201a, 0x0192, 0x201e, 0x2026, 0x2020, 0x2021,
+  0x02c6, 0x2030, 0x0160, 0x2039, 0x0152, 0xfffd, 0xfffd, 0xfffd,
+  /* 0x90 */
+  0xfffd, 0x2018, 0x2019, 0x201c, 0x201d, 0x2022, 0x2013, 0x2014,
+  0x02dc, 0x2122, 0x0161, 0x203a, 0x0153, 0xfffd, 0xfffd, 0x0178,
+  /* 0xa0 */
+  0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0,
+  /* 0xb0 */
+  0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0,
+  /* 0xc0 */
+  0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0,
+  /* 0xd0 */
+  0x011e, 0x00d1, 0x00d2, 0x00d3, 0x00d4, 0x00d5, 0x00d6, 0x00d7,
+  0x00d8, 0x00d9, 0x00da, 0x00db, 0x00dc, 0x0130, 0x015e, 0x00df,
+  /* 0xe0 */
+  0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0,
+  /* 0xf0 */
+  0x011f, 0x00f1, 0x00f2, 0x00f3, 0x00f4, 0x00f5, 0x00f6, 0x00f7,
+  0x00f8, 0x00f9, 0x00fa, 0x00fb, 0x00fc, 0x0131, 0x015f, 0x00ff,
+  }
+},
+/*-- cp1255 --*/
+{
+  1255,
+  {
+  /* 0x80 */
+  0x20ac, 0xfffd, 0x201a, 0x0192, 0x201e, 0x2026, 0x2020, 0x2021,
+  0x02c6, 0x2030, 0xfffd, 0x2039, 0xfffd, 0xfffd, 0xfffd, 0xfffd,
+  /* 0x90 */
+  0xfffd, 0x2018, 0x2019, 0x201c, 0x201d, 0x2022, 0x2013, 0x2014,
+  0x02dc, 0x2122, 0xfffd, 0x203a, 0xfffd, 0xfffd, 0xfffd, 0xfffd,
+  /* 0xa0 */
+  0x00a0, 0x00a1, 0x00a2, 0x00a3, 0x20aa, 0x00a5, 0x00a6, 0x00a7,
+  0x00a8, 0x00a9, 0x00d7, 0x00ab, 0x00ac, 0x00ad, 0x00ae, 0x00af,
+  /* 0xb0 */
+  0x00b0, 0x00b1, 0x00b2, 0x00b3, 0x00b4, 0x00b5, 0x00b6, 0x00b7,
+  0x00b8, 0x00b9, 0x00f7, 0x00bb, 0x00bc, 0x00bd, 0x00be, 0x00bf,
+  /* 0xc0 */
+  0x05b0, 0x05b1, 0x05b2, 0x05b3, 0x05b4, 0x05b5, 0x05b6, 0x05b7,
+  0x05b8, 0x05b9, 0xfffd, 0x05bb, 0x05bc, 0x05bd, 0x05be, 0x05bf,
+  /* 0xd0 */
+  0x05c0, 0x05c1, 0x05c2, 0x05c3, 0x05f0, 0x05f1, 0x05f2, 0x05f3,
+  0x05f4, 0xfffd, 0xfffd, 0xfffd, 0xfffd, 0xfffd, 0xfffd, 0xfffd,
+  /* 0xe0 */
+  0x05d0, 0x05d1, 0x05d2, 0x05d3, 0x05d4, 0x05d5, 0x05d6, 0x05d7,
+  0x05d8, 0x05d9, 0x05da, 0x05db, 0x05dc, 0x05dd, 0x05de, 0x05df,
+  /* 0xf0 */
+  0x05e0, 0x05e1, 0x05e2, 0x05e3, 0x05e4, 0x05e5, 0x05e6, 0x05e7,
+  0x05e8, 0x05e9, 0x05ea, 0xfffd, 0xfffd, 0x200e, 0x200f, 0xfffd,
+  }
+},
+/*-- cp1256 --*/
+{
+  1256,
+  {
+  /* 0x80 */
+  0x20ac, 0x067e, 0x201a, 0x0192, 0x201e, 0x2026, 0x2020, 0x2021,
+  0x02c6, 0x2030, 0x0679, 0x2039, 0x0152, 0x0686, 0x0698, 0x0688,
+  /* 0x90 */
+  0x06af, 0x2018, 0x2019, 0x201c, 0x201d, 0x2022, 0x2013, 0x2014,
+  0x06a9, 0x2122, 0x0691, 0x203a, 0x0153, 0x200c, 0x200d, 0x06ba,
+  /* 0xa0 */
+  0x00a0, 0x060c, 0x00a2, 0x00a3, 0x00a4, 0x00a5, 0x00a6, 0x00a7,
+  0x00a8, 0x00a9, 0x06be, 0x00ab, 0x00ac, 0x00ad, 0x00ae, 0x00af,
+  /* 0xb0 */
+  0x00b0, 0x00b1, 0x00b2, 0x00b3, 0x00b4, 0x00b5, 0x00b6, 0x00b7,
+  0x00b8, 0x00b9, 0x061b, 0x00bb, 0x00bc, 0x00bd, 0x00be, 0x061f,
+  /* 0xc0 */
+  0x06c1, 0x0621, 0x0622, 0x0623, 0x0624, 0x0625, 0x0626, 0x0627,
+  0x0628, 0x0629, 0x062a, 0x062b, 0x062c, 0x062d, 0x062e, 0x062f,
+  /* 0xd0 */
+  0x0630, 0x0631, 0x0632, 0x0633, 0x0634, 0x0635, 0x0636, 0x00d7,
+  0x0637, 0x0638, 0x0639, 0x063a, 0x0640, 0x0641, 0x0642, 0x0643,
+  /* 0xe0 */
+  0x00e0, 0x0644, 0x00e2, 0x0645, 0x0646, 0x0647, 0x0648, 0x00e7,
+  0x00e8, 0x00e9, 0x00ea, 0x00eb, 0x0649, 0x064a, 0x00ee, 0x00ef,
+  /* 0xf0 */
+  0x064b, 0x064c, 0x064d, 0x064e, 0x00f4, 0x064f, 0x0650, 0x00f7,
+  0x0651, 0x00f9, 0x0652, 0x00fb, 0x00fc, 0x200e, 0x200f, 0x06d2,
+  }
+},
+{
+  1257,
+  {
+  /* 0x80 */
+  0x20ac, 0xfffd, 0x201a, 0xfffd, 0x201e, 0x2026, 0x2020, 0x2021,
+  0xfffd, 0x2030, 0xfffd, 0x2039, 0xfffd, 0x00a8, 0x02c7, 0x00b8,
+  /* 0x90 */
+  0xfffd, 0x2018, 0x2019, 0x201c, 0x201d, 0x2022, 0x2013, 0x2014,
+  0xfffd, 0x2122, 0xfffd, 0x203a, 0xfffd, 0x00af, 0x02db, 0xfffd,
+  /* 0xa0 */
+  0x00a0, 0xfffd, 0x00a2, 0x00a3, 0x00a4, 0xfffd, 0x00a6, 0x00a7,
+  0x00d8, 0x00a9, 0x0156, 0x00ab, 0x00ac, 0x00ad, 0x00ae, 0x00c6,
+  /* 0xb0 */
+  0x00b0, 0x00b1, 0x00b2, 0x00b3, 0x00b4, 0x00b5, 0x00b6, 0x00b7,
+  0x00f8, 0x00b9, 0x0157, 0x00bb, 0x00bc, 0x00bd, 0x00be, 0x00e6,
+  /* 0xc0 */
+  0x0104, 0x012e, 0x0100, 0x0106, 0x00c4, 0x00c5, 0x0118, 0x0112,
+  0x010c, 0x00c9, 0x0179, 0x0116, 0x0122, 0x0136, 0x012a, 0x013b,
+  /* 0xd0 */
+  0x0160, 0x0143, 0x0145, 0x00d3, 0x014c, 0x00d5, 0x00d6, 0x00d7,
+  0x0172, 0x0141, 0x015a, 0x016a, 0x00dc, 0x017b, 0x017d, 0x00df,
+  /* 0xe0 */
+  0x0105, 0x012f, 0x0101, 0x0107, 0x00e4, 0x00e5, 0x0119, 0x0113,
+  0x010d, 0x00e9, 0x017a, 0x0117, 0x0123, 0x0137, 0x012b, 0x013c,
+  /* 0xf0 */
+  0x0161, 0x0144, 0x0146, 0x00f3, 0x014d, 0x00f5, 0x00f6, 0x00f7,
+  0x0173, 0x0142, 0x015b, 0x016b, 0x00fc, 0x017c, 0x017e, 0x02d9,
+  }
+},
+{
+  1258,
+  {
+  /* 0x80 */
+  0x20ac, 0xfffd, 0x201a, 0x0192, 0x201e, 0x2026, 0x2020, 0x2021,
+  0x02c6, 0x2030, 0xfffd, 0x2039, 0x0152, 0xfffd, 0xfffd, 0xfffd,
+  /* 0x90 */
+  0xfffd, 0x2018, 0x2019, 0x201c, 0x201d, 0x2022, 0x2013, 0x2014,
+  0x02dc, 0x2122, 0xfffd, 0x203a, 0x0153, 0xfffd, 0xfffd, 0x0178,
+  /* 0xa0 */
+  0x00a0, 0x00a1, 0x00a2, 0x00a3, 0x00a4, 0x00a5, 0x00a6, 0x00a7,
+  0x00a8, 0x00a9, 0x00aa, 0x00ab, 0x00ac, 0x00ad, 0x00ae, 0x00af,
+  /* 0xb0 */
+  0x00b0, 0x00b1, 0x00b2, 0x00b3, 0x00b4, 0x00b5, 0x00b6, 0x00b7,
+  0x00b8, 0x00b9, 0x00ba, 0x00bb, 0x00bc, 0x00bd, 0x00be, 0x00bf,
+  /* 0xc0 */
+  0x00c0, 0x00c1, 0x00c2, 0x0102, 0x00c4, 0x00c5, 0x00c6, 0x00c7,
+  0x00c8, 0x00c9, 0x00ca, 0x00cb, 0x0300, 0x00cd, 0x00ce, 0x00cf,
+  /* 0xd0 */
+  0x0110, 0x00d1, 0x0309, 0x00d3, 0x00d4, 0x01a0, 0x00d6, 0x00d7,
+  0x00d8, 0x00d9, 0x00da, 0x00db, 0x00dc, 0x01af, 0x0303, 0x00df,
+  /* 0xe0 */
+  0x00e0, 0x00e1, 0x00e2, 0x0103, 0x00e4, 0x00e5, 0x00e6, 0x00e7,
+  0x00e8, 0x00e9, 0x00ea, 0x00eb, 0x0301, 0x00ed, 0x00ee, 0x00ef,
+  /* 0xf0 */
+  0x0111, 0x00f1, 0x0323, 0x00f3, 0x00f4, 0x01a1, 0x00f6, 0x00f7,
+  0x00f8, 0x00f9, 0x00fa, 0x00fb, 0x00fc, 0x01b0, 0x20ab, 0x00ff,
+  }
+},
+/*-- null --*/
+{
+  0,
+  {
+  /* 0x80 */
+  0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0,
+  /* 0x90 */
+  0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0,
+  /* 0xa0 */
+  0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0,
+  /* 0xb0 */
+  0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0,
+  /* 0xc0 */
+  0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0,
+  /* 0xd0 */
+  0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0,
+  /* 0xe0 */
+  0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0,
+  /* 0xf0 */
+  0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0,
+  }
+},
+};
+
+
 //extern int nopict_mode;
 
 /*
 #define BINARY_ATTRS
 */
 
-QString outstring;
+extern QString outstring;
 
 
 static int charset_type=CHARSET_ANSI;
+static CodepageInfo * charset_codepage;
 
 
 /* Nested tables aren't supported.
@@ -195,8 +650,8 @@ starting_body ()
 {
 	if (!have_printed_body) {
 		if (!inline_mode) {
-			outstring+=QString("%1").arg(op->header_end);
-			outstring+=QString("%1").arg(op->body_begin);
+			outstring+=QString().sprintf(op->header_end);
+			outstring+=QString().sprintf(op->body_begin);
 		}
 		within_header = FALSE;
 		have_printed_body = TRUE;
@@ -219,8 +674,8 @@ static const char *month_strings[12]= {
   "Octobre","Novembre","Decembre"
 #endif
 #ifdef ITALIANO
-  "Ianuario","Febbraio","Marzo","Aprile","Maggio","Iuno",
-  "Luglio","Agusto","Settembre","Ottobre","Novembre","Dicembre"
+  "Gennaio","Febbraio","Marzo","Aprile","Maggio","Giugno",
+  "Luglio","Agosto","Settembre","Ottobre","Novembre","Dicembre"
 #endif
 #ifdef ESPANOL /* amaral - 0.19.2 */
   "Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto",
@@ -344,7 +799,7 @@ process_font_table (Word *w)
 					tmp = word_string (w2);
 					if (tmp && tmp[0] != '\\') {
 						if (strlen(tmp) + strlen(name) > BUFSIZ - 1) {
-							printf("Invalid font table entry\n");
+							outstring+=QString().sprintf("Invalid font table entry\n");
 							name[0] = 0;
 						}
 						else
@@ -365,20 +820,20 @@ process_font_table (Word *w)
 		w=w->next;
 	}
 
-	printf("%s",op->comment_begin);
-	printf("font table contains %d fonts total",total_fonts);
-	printf("%s",op->comment_end);
+	outstring+=QString().sprintf("%s",op->comment_begin);
+	outstring+=QString().sprintf("font table contains %d fonts total",total_fonts);
+	outstring+=QString().sprintf("%s",op->comment_end);
 
 	if (debug_mode) {
 		int i;
 
-		printf("%s",op->comment_begin);
-		printf("font table dump: \n");
+		outstring+=QString().sprintf("%s",op->comment_begin);
+		outstring+=QString().sprintf("font table dump: \n");
 		for (i=0; i<total_fonts; i++) {
 			printf(" font %d = %s\n", font_table[i].num, 
 				font_table[i].name);
 		}
-		printf("%s",op->comment_end);
+		outstring+=QString().sprintf("%s",op->comment_end);
 	}
 }
 
@@ -402,9 +857,9 @@ process_index_entry (Word *w)
 			char *str = word_string (w2);
 
 			if (debug_mode && str) {
-				printf("%s",op->comment_begin);
-				printf("index entry word: %s ", str);
-				printf("%s",op->comment_end);
+				outstring+=QString().sprintf("%s",op->comment_begin);
+				outstring+=QString().sprintf("index entry word: %s ", str);
+				outstring+=QString().sprintf("%s",op->comment_end);
 			}
 		}
 		w=w->next;
@@ -431,11 +886,11 @@ process_toc_entry (Word *w, int include_page_num)
 			char *str = word_string (w2);
 
 			if (debug_mode && str) {
-				printf("%s",op->comment_begin);
+				outstring+=QString().sprintf("%s",op->comment_begin);
 				printf("toc %s entry word: %s ", 
 					include_page_num ? "page#":"no page#",
 					str);
-				printf("%s",op->comment_end);
+				outstring+=QString().sprintf("%s",op->comment_end);
 			}
 		}
 		w=w->next;
@@ -457,7 +912,7 @@ process_info_group (Word *w)
 
 #if 1 /* amaral - 0.19.2 */
 	/* CHECK_PARAM_NOT_NULL(w); */
-	if (!w) printf("AUTHOR'S COMMENT: \\info command is null!\n"); 
+	if (!w) outstring+=QString().sprintf("AUTHOR'S COMMENT: \\info command is null!\n"); 
 #endif
 	
 
@@ -471,7 +926,7 @@ process_info_group (Word *w)
 
 			if (!inline_mode) {
 				if (!strcmp("\\title", s)) {
-					outstring+=QString("%1").arg(op->document_title_begin);
+					outstring+=QString().sprintf(op->document_title_begin);
 					w2=child->next;
 					while (w2) {
 						char *s2 = word_string(w2);
@@ -482,7 +937,7 @@ process_info_group (Word *w)
 #if 1 /* daved 0.19.6 */
 							print_with_special_exprs (s2);
 #else
-							outstring+=QString("%1").arg("%s", s2);
+							outstring+=QString().sprintf("%s", s2);
 #endif
 #if 1 /* daved 0.20.0 */
 						}
@@ -493,21 +948,21 @@ process_info_group (Word *w)
 								int ch = h2toi (&s2[2]);
 
 								const char *s3;
-								s3 = op_translate_char (op, charset_type, ch, numchar_table);
+								s3 = op_translate_char (op, charset_type, charset_codepage, ch, numchar_table);
 								if (!s3 || !*s3)
 								{
-									printf("%s",op->comment_begin);
-									printf("char 0x%02x",ch);
-									printf("%s",op->comment_end);
+									outstring+=QString().sprintf(op->comment_begin);
+									outstring+=QString().sprintf("char 0x%02x",ch);
+									outstring+=QString().sprintf(op->comment_end);
 
 								}
 								else
 								{
 									if (op->word_begin)
-										outstring+=QString("%1").arg(op->word_begin);
-									outstring+=QString("%1").arg("%s", s3);
+										outstring+=QString().sprintf(op->word_begin);
+									outstring+=QString().sprintf("%s", s3);
 									if (op->word_end)
-										outstring+=QString("%1").arg(op->word_end);
+										outstring+=QString().sprintf(op->word_end);
 								}
 							}
 						}
@@ -515,80 +970,80 @@ process_info_group (Word *w)
 #endif
 						w2 = w2->next;
 					}
-					outstring+=QString("%1").arg(op->document_title_end);
+					outstring+=QString().sprintf(op->document_title_end);
 				}
 				else if (!strcmp("\\keywords", s)) {
-					outstring+=QString("%1").arg(op->document_keywords_begin);
+					outstring+=QString().sprintf(op->document_keywords_begin);
 					w2=child->next;
 					while (w2) {
 						char *s2 = word_string(w2);
 						if (s2[0] != '\\') 
-							outstring+=QString("%1").arg("%s,", s2);
+							outstring+=QString().sprintf("%s,", s2);
 						w2 = w2->next;
 					}
-					outstring+=QString("%1").arg(op->document_keywords_end);
+					outstring+=QString().sprintf(op->document_keywords_end);
 				}
 				else if (!strcmp("\\author", s)) {
-					outstring+=QString("%1").arg(op->document_author_begin);
+					outstring+=QString().sprintf(op->document_author_begin);
 					w2=child->next;
 					while (w2) {
 						char *s2 = word_string(w2);
 						if (s2[0] != '\\') 
-							outstring+=QString("%1").arg("%s", s2);
+							outstring+=QString().sprintf("%s", s2);
 						w2 = w2->next;
 					}
-					outstring+=QString("%1").arg(op->document_author_end);
+					outstring+=QString().sprintf(op->document_author_end);
 				}
 				else if (!strcmp("\\comment", s)) {
-					printf("%s",op->comment_begin);
-					printf("comments: ");
+					outstring+=QString().sprintf("%s",op->comment_begin);
+					outstring+=QString().sprintf("comments: ");
 					w2=child->next;
 					while (w2) {
 						char *s2 = word_string(w2);
 						if (s2[0] != '\\') 
-							printf("%s", s2);
+							outstring+=QString().sprintf("%s", s2);
 						w2 = w2->next;
 					}
-					printf("%s",op->comment_end);
+					outstring+=QString().sprintf("%s",op->comment_end);
 				}
 				else if (!strncmp("\\nofpages", s, 9)) {
-					printf("%s",op->comment_begin);
-					printf("total pages: %s",&s[9]);
-					printf("%s",op->comment_end);
+					outstring+=QString().sprintf("%s",op->comment_begin);
+					outstring+=QString().sprintf("total pages: %s",&s[9]);
+					outstring+=QString().sprintf("%s",op->comment_end);
 				}
 				else if (!strncmp("\\nofwords", s, 9)) {
-					printf("%s",op->comment_begin);
-					printf("total words: %s",&s[9]);
-					printf("%s",op->comment_end);
+					outstring+=QString().sprintf("%s",op->comment_begin);
+					outstring+=QString().sprintf("total words: %s",&s[9]);
+					outstring+=QString().sprintf("%s",op->comment_end);
 				}
 				else if (!strncmp("\\nofchars", s, 9) && isdigit(s[9])) {
-					printf("%s",op->comment_begin);
-					printf("total chars: %s",&s[9]);
-					printf("%s",op->comment_end);
+					outstring+=QString().sprintf("%s",op->comment_begin);
+					outstring+=QString().sprintf("total chars: %s",&s[9]);
+					outstring+=QString().sprintf("%s",op->comment_end);
 				}
 				else if (!strcmp("\\creatim", s)) {
-					printf("%s",op->comment_begin);
-					printf("creation date: ");
+					outstring+=QString().sprintf("%s",op->comment_begin);
+					outstring+=QString().sprintf("creation date: ");
 					if (child->next) word_dump_date (child->next);
-					printf("%s",op->comment_end);
+					outstring+=QString().sprintf("%s",op->comment_end);
 				}
 				else if (!strcmp("\\printim", s)) {
-					printf("%s",op->comment_begin);
-					printf("last printed: ");
+					outstring+=QString().sprintf("%s",op->comment_begin);
+					outstring+=QString().sprintf("last printed: ");
 					if (child->next) word_dump_date (child->next);
-					printf("%s",op->comment_end);
+					outstring+=QString().sprintf("%s",op->comment_end);
 				}
 				else if (!strcmp("\\buptim", s)) {
-					printf("%s",op->comment_begin);
-					printf("last backup: ");
+					outstring+=QString().sprintf("%s",op->comment_begin);
+					outstring+=QString().sprintf("last backup: ");
 					if (child->next) word_dump_date (child->next);
-					printf("%s",op->comment_end);
+					outstring+=QString().sprintf("%s",op->comment_end);
 				}
 				else if (!strcmp("\\revtim", s)) {
-					printf("%s",op->comment_begin);
-					printf("revision date: ");
+					outstring+=QString().sprintf("%s",op->comment_begin);
+					outstring+=QString().sprintf("revision date: ");
 					if (child->next) word_dump_date (child->next);
-					printf("%s",op->comment_end);
+					outstring+=QString().sprintf("%s",op->comment_end);
 				}
 			}
 
@@ -598,8 +1053,8 @@ process_info_group (Word *w)
 			if (!strcmp("\\hlinkbase", s)) {
 				char *linkstr = NULL;
 
-				printf("%s",op->comment_begin);
-				printf("hyperlink base: ");
+				outstring+=QString().sprintf("%s",op->comment_begin);
+				outstring+=QString().sprintf("hyperlink base: ");
 				if (child->next) {
 					Word *nextword = child->next;
 
@@ -608,10 +1063,10 @@ process_info_group (Word *w)
 				}
 
 				if (linkstr)
-					printf("%s", linkstr);
+					outstring+=QString().sprintf("%s", linkstr);
 				else
-					printf("(none)");
-				printf("%s",op->comment_end);
+					outstring+=QString().sprintf("(none)");
+				outstring+=QString().sprintf("%s",op->comment_end);
 
 				/* Store the pointer, it will remain good. */
 				hyperlink_base = linkstr; 
@@ -658,9 +1113,9 @@ process_color_table (Word *w)
 		char *s = word_string (w);
 
 #if 0
-		printf("%s",op->comment_begin);
-		printf("found this color table word: %s", word_string(w));
-		printf("%s",op->comment_end);
+		outstring+=QString().sprintf("%s",op->comment_begin);
+		outstring+=QString().sprintf("found this color table word: %s", word_string(w));
+		outstring+=QString().sprintf("%s",op->comment_end);
 #endif
 
 		if (!strncmp("\\red",s,4)) {
@@ -685,10 +1140,10 @@ process_color_table (Word *w)
 			color_table[total_colors].g = g;
 			color_table[total_colors++].b = b;
 			if (debug_mode) {
-				printf("%s",op->comment_begin);
+				outstring+=QString().sprintf("%s",op->comment_begin);
 				printf("storing color entry %d: %02x%02x%02x",
 					total_colors-1, r,g,b);
-				printf("%s",op->comment_end);
+				outstring+=QString().sprintf("%s",op->comment_end);
 			}
 			r=g=b=0;
 		}
@@ -697,9 +1152,9 @@ process_color_table (Word *w)
 	}
 
 	if (debug_mode) {
-		printf("%s",op->comment_begin);
-	  	printf("color table had %d entries -->\n", total_colors);
-		printf("%s",op->comment_end);
+		outstring+=QString().sprintf("%s",op->comment_begin);
+	  	outstring+=QString().sprintf("color table had %d entries -->\n", total_colors);
+		outstring+=QString().sprintf("%s",op->comment_end);
 	}
 }
 
@@ -837,7 +1292,7 @@ cmd_field (Word *w, int align, char has_param, int num) {
 					   {
 					   	const char * string;
 						if ((string = op->symbol_translation_table[char_num - op->symbol_first_char]) != 0)
-						outstring+=QString("%1").arg("%s", string);
+						outstring+=QString().sprintf("%s", string);
 					   }
 					}
 				    }
@@ -857,9 +1312,9 @@ cmd_field (Word *w, int align, char has_param, int num) {
 							    w4=w4->next;
 						    if (w4) {
 							    s4=word_string(w4);
-							    outstring+=QString("%1").arg(op->hyperlink_begin);
-							    outstring+=QString("%1").arg("%s", s4);
-							    outstring+=QString("%1").arg(op->hyperlink_end);
+							    outstring+=QString().sprintf(op->hyperlink_begin);
+							    outstring+=QString().sprintf("%s", s4);
+							    outstring+=QString().sprintf(op->hyperlink_end);
 							    return TRUE;
 						    }
 					    	
@@ -900,15 +1355,21 @@ cmd_f (Word *w, int align, char has_param, int num) {
 	numchar_table = FONTROMAN_TABLE;
 #endif
 	if (!name) {
-		printf("%s",op->comment_begin);
-		printf("invalid font number %d",num);
-		printf("%s",op->comment_end);
+		outstring+=QString().sprintf("%s",op->comment_begin);
+		outstring+=QString().sprintf("invalid font number %d",num);
+		outstring+=QString().sprintf("%s",op->comment_end);
 	} else {
 		attr_push(ATTR_FONTFACE,name);
 #if 1 /* daved - 0.19.6 */
 		if (strstr(name,"Symbol") != NULL)
 			numchar_table=FONTSYMBOL_TABLE;
 #endif
+#if 1 /* daved - 0.20.3 */
+		else if (strstr(name,"Greek") != NULL)
+			numchar_table=FONTGREEK_TABLE;
+#endif
+		if(0)
+		outstring+=QString().sprintf("<numchar_table set to %d>", numchar_table);
 	}
 
 	return FALSE;
@@ -962,10 +1423,10 @@ cmd_tab (Word *w, int align, char has_param, int param)
 	int need= 8-(total_chars_this_line%8);
 	total_chars_this_line += need;
 	while(need>0) {
-		outstring+=QString("%1").arg(op->forced_space);
+		outstring+=QString().sprintf(op->forced_space);
 		need--;
 	}
-	outstring+=QString("%1").arg("\n");
+	outstring+=QString().sprintf("\n");
 	return FALSE;
 }
 
@@ -1182,7 +1643,7 @@ cmd_scaps (Word *w, int align, char has_param, int param) {
 static int 
 cmd_bullet (Word *w, int align, char has_param, int param) {
 	if (op->chars.bullet) {
-		outstring+=QString("%1").arg(op->chars.bullet);
+		outstring+=QString().sprintf(op->chars.bullet);
 		++total_chars_this_line; /* \tab */
 	}
 	return FALSE;
@@ -1197,7 +1658,7 @@ cmd_bullet (Word *w, int align, char has_param, int param) {
 static int 
 cmd_ldblquote (Word *w, int align, char has_param, int param) {
 	if (op->chars.left_dbl_quote) {
-		outstring+=QString("%1").arg(op->chars.left_dbl_quote);
+		outstring+=QString().sprintf(op->chars.left_dbl_quote);
 		++total_chars_this_line; /* \tab */
 	}
 	return FALSE;
@@ -1214,7 +1675,7 @@ cmd_ldblquote (Word *w, int align, char has_param, int param) {
 static int 
 cmd_rdblquote (Word *w, int align, char has_param, int param) {
 	if (op->chars.right_dbl_quote) {
-		outstring+=QString("%1").arg(op->chars.right_dbl_quote);
+		outstring+=QString().sprintf(op->chars.right_dbl_quote);
 		++total_chars_this_line; /* \tab */
 	}
 	return FALSE;
@@ -1230,7 +1691,7 @@ cmd_rdblquote (Word *w, int align, char has_param, int param) {
 static int 
 cmd_lquote (Word *w, int align, char has_param, int param) {
 	if (op->chars.left_quote) {
-		outstring+=QString("%1").arg(op->chars.left_quote);
+		outstring+=QString().sprintf(op->chars.left_quote);
 		++total_chars_this_line; /* \tab */
 	}
 	return FALSE;
@@ -1247,7 +1708,7 @@ cmd_lquote (Word *w, int align, char has_param, int param) {
 static int 
 cmd_nonbreaking_space (Word *w, int align, char has_param, int param) {
 	if (op->chars.nonbreaking_space) {
-		outstring+=QString("%1").arg(op->chars.nonbreaking_space);
+		outstring+=QString().sprintf(op->chars.nonbreaking_space);
 		++total_chars_this_line; /* \tab */
 	}
 	return FALSE;
@@ -1264,7 +1725,7 @@ cmd_nonbreaking_space (Word *w, int align, char has_param, int param) {
 static int 
 cmd_nonbreaking_hyphen (Word *w, int align, char has_param, int param) {
 	if (op->chars.nonbreaking_hyphen) {
-		outstring+=QString("%1").arg(op->chars.nonbreaking_hyphen);
+		outstring+=QString().sprintf(op->chars.nonbreaking_hyphen);
 		++total_chars_this_line; /* \tab */
 	}
 	return FALSE;
@@ -1281,7 +1742,7 @@ cmd_nonbreaking_hyphen (Word *w, int align, char has_param, int param) {
 static int 
 cmd_optional_hyphen (Word *w, int align, char has_param, int param) {
 	if (op->chars.optional_hyphen) {
-		outstring+=QString("%1").arg(op->chars.optional_hyphen);
+		outstring+=QString().sprintf(op->chars.optional_hyphen);
 		++total_chars_this_line; /* \tab */
 	}
 	return FALSE;
@@ -1297,7 +1758,7 @@ cmd_optional_hyphen (Word *w, int align, char has_param, int param) {
 static int 
 cmd_emdash (Word *w, int align, char has_param, int param) {
 	if (op->chars.emdash) {
-		outstring+=QString("%1").arg(op->chars.emdash);
+		outstring+=QString().sprintf(op->chars.emdash);
 		++total_chars_this_line; /* \tab */
 	}
 	return FALSE;
@@ -1314,7 +1775,7 @@ cmd_emdash (Word *w, int align, char has_param, int param) {
 static int 
 cmd_endash (Word *w, int align, char has_param, int param) {
 	if (op->chars.endash) {
-		outstring+=QString("%1").arg(op->chars.endash);
+		outstring+=QString().sprintf(op->chars.endash);
 		++total_chars_this_line; /* \tab */
 	}
 	return FALSE;
@@ -1331,7 +1792,7 @@ cmd_endash (Word *w, int align, char has_param, int param) {
 static int 
 cmd_rquote (Word *w, int align, char has_param, int param) {
 	if (op->chars.right_quote) {
-		outstring+=QString("%1").arg(op->chars.right_quote);
+		outstring+=QString().sprintf(op->chars.right_quote);
 		++total_chars_this_line; /* \tab */
 	}
 	return FALSE;
@@ -1347,7 +1808,7 @@ cmd_rquote (Word *w, int align, char has_param, int param) {
 static int 
 cmd_par (Word *w, int align, char has_param, int param) {
 	if (op->line_break) {
-		outstring+=QString("%1").arg(op->line_break);
+		outstring+=QString().sprintf(op->line_break);
 		total_chars_this_line = 0; /* \tab */
 	}
 	return FALSE;
@@ -1364,7 +1825,7 @@ cmd_par (Word *w, int align, char has_param, int param) {
 static int 
 cmd_line (Word *w, int align, char has_param, int param) {
 	if (op->line_break) {
-		outstring+=QString("%1").arg(op->line_break);
+		outstring+=QString().sprintf(op->line_break);
 		total_chars_this_line = 0; /* \tab */
 	}
 	return FALSE;
@@ -1380,7 +1841,7 @@ cmd_line (Word *w, int align, char has_param, int param) {
 
 static int cmd_page (Word *w, int align, char has_param, int param) {
 	if (op->page_break) {
-		outstring+=QString("%1").arg(op->page_break);
+		outstring+=QString().sprintf(op->page_break);
 		total_chars_this_line = 0; /* \tab */
 	}
 	return FALSE;
@@ -1665,8 +2126,8 @@ static int cmd_u (Word *w, int align, char has_param, int param) {
 	char	*str;
 	if (has_param == TRUE)
 	{
-		fprintf(stderr,"param is %d (%x)\n", param,
-			param);
+		fprintf(stderr,"param is %d (x%x) (0%o)\n", param,
+			param, param);
 	}
 	if (w->hash_index)
 	{
@@ -1683,9 +2144,9 @@ static int cmd_u (Word *w, int align, char has_param, int param) {
 	{
 		const char *string;
 		if ((string = op->unisymbol1_translation_table[param - op->unisymbol1_first_char]) != 0)
-			outstring+=QString("%1").arg("%s", string);
+			outstring+=QString().sprintf("%s", string);
 		else
-			outstring+=QString("%1").arg("&#%u;", (unsigned int)param);
+			outstring+=QString().sprintf("&#%u;", (unsigned int)param);
 		done++;
 	}
 	if
@@ -1697,9 +2158,9 @@ static int cmd_u (Word *w, int align, char has_param, int param) {
 	{
 		const char *string;
 		if ((string = op->unisymbol2_translation_table[param - op->unisymbol2_first_char]) != 0)
-			outstring+=QString("%1").arg("%s", string);
+			outstring+=QString().sprintf("%s", string);
 		else
-			outstring+=QString("%1").arg("&#%u;", (unsigned int)param);
+			outstring+=QString().sprintf("&#%u;", (unsigned int)param);
 		done++;
 	}
 	if
@@ -1711,9 +2172,9 @@ static int cmd_u (Word *w, int align, char has_param, int param) {
 	{
 		const char *string;
 		if ((string = op->unisymbol3_translation_table[param - op->unisymbol3_first_char]) != 0)
-			outstring+=QString("%1").arg("%s", string);
+			outstring+=QString().sprintf("%s", string);
 		else
-			outstring+=QString("%1").arg("&#%u;", (unsigned int)param);
+			outstring+=QString().sprintf("&#%u;", (unsigned int)param);
 		done++;
 	}
 #if 1 /* 0.19.5 more unicode support */
@@ -1726,9 +2187,16 @@ static int cmd_u (Word *w, int align, char has_param, int param) {
 	{
 		const char *string;
 		if ((string = op->unisymbol4_translation_table[param - op->unisymbol4_first_char]) != 0)
-			outstring+=QString("%1").arg("%s", string);
+			outstring+=QString().sprintf("%s", string);
 		else
-			outstring+=QString("%1").arg("&#%u;", (unsigned int)param);
+			outstring+=QString().sprintf("&#%u;", (unsigned int)param);
+		done++;
+	}
+#endif
+#if 1	/* 0.20.3 - daved added missing function call for unprocessed chars */
+	if(!done && op->unisymbol_print)
+	{
+		outstring+=QString().sprintf("%s", op->unisymbol_print(param));
 		done++;
 	}
 #endif
@@ -1869,7 +2337,7 @@ static int cmd_s (Word *w, int align, char has_param, int param) {
 static int cmd_sect (Word *w, int align, char has_param, int param) {
 	/* XX kludge */
 	if (op->paragraph_begin) {
-		outstring+=QString("%1").arg(op->paragraph_begin);
+		outstring+=QString().sprintf(op->paragraph_begin);
 	}
 	return FALSE;
 }
@@ -1883,9 +2351,9 @@ static int cmd_sect (Word *w, int align, char has_param, int param) {
 
 static int cmd_shp (Word *w, int align, char has_param, int param) {
 	if (op->comment_begin) {
-		printf("%s",op->comment_begin);
-		printf("Drawn Shape (ignored--not implemented yet)");
-		printf("%s",op->comment_begin);
+		outstring+=QString().sprintf(op->comment_begin);
+		outstring+=QString().sprintf("Drawn Shape (ignored--not implemented yet)");
+		outstring+=QString().sprintf(op->comment_end);	/* daved 0.20.2 */
 	}
 
 	return FALSE;
@@ -1916,9 +2384,37 @@ static int cmd_outl (Word *w, int align, char has_param, int param) {
 static int cmd_ansi (Word *w, int align, char has_param, int param) {
 	charset_type = CHARSET_ANSI;
 	if (op->comment_begin) {
-		printf("%s",op->comment_begin);
-		printf("document uses ANSI character set");
-		printf("%s",op->comment_end);
+		outstring+=QString().sprintf("%s",op->comment_begin);
+		outstring+=QString().sprintf("document uses ANSI character set");
+		outstring+=QString().sprintf("%s",op->comment_end);
+	}
+	return FALSE;
+}
+
+/*========================================================================
+ * Name:	cmd_ansicpg
+ * Purpose:	Executes the \ansicpg command.
+ * Args:	Word, paragraph align info, and numeric param if any.
+ * Returns:	Flag, true only if rest of Words on line should be ignored.
+ *=======================================================================*/
+
+static int cmd_ansicpg (Word *w, int align, char has_param, int param) {
+	int i;
+	for (i = 0; i < sizeof(codepages) / sizeof(CodepageInfo); i ++) {
+		charset_codepage = &codepages[i];
+		if (charset_codepage->cp == param) {
+			if (op->comment_begin) {
+				outstring+=QString().sprintf(op->comment_begin);
+				outstring+=QString().sprintf("document uses ANSI codepage %d character set", param);
+				outstring+=QString().sprintf(op->comment_end);
+			}
+			break;
+		}
+	}
+	if ((charset_codepage == NULL || charset_codepage->cp == 0) && op->comment_begin) {
+		outstring+=QString().sprintf(op->comment_begin);
+		outstring+=QString().sprintf("document uses default ANSI codepage character set");
+		outstring+=QString().sprintf(op->comment_end);
 	}
 	return FALSE;
 }
@@ -1933,9 +2429,9 @@ static int cmd_ansi (Word *w, int align, char has_param, int param) {
 static int cmd_pc (Word *w, int align, char has_param, int param) {
 	charset_type = CHARSET_CP437 ;
 	if (op->comment_begin) {
-		printf("%s",op->comment_begin);
-		printf("document uses PC codepage 437 character set");
-		printf("%s",op->comment_end);
+		outstring+=QString().sprintf("%s",op->comment_begin);
+		outstring+=QString().sprintf("document uses PC codepage 437 character set");
+		outstring+=QString().sprintf("%s",op->comment_end);
 	}
 	return FALSE;
 }
@@ -1950,9 +2446,9 @@ static int cmd_pc (Word *w, int align, char has_param, int param) {
 static int cmd_pca (Word *w, int align, char has_param, int param) {
 	charset_type = CHARSET_CP850;
 	if (op->comment_begin) {
-		printf("%s",op->comment_begin);
-		printf("document uses PC codepage 850 character set");
-		printf("%s",op->comment_end);
+		outstring+=QString().sprintf("%s",op->comment_begin);
+		outstring+=QString().sprintf("document uses PC codepage 850 character set");
+		outstring+=QString().sprintf("%s",op->comment_end);
 	}
 	return FALSE;
 }
@@ -1967,9 +2463,9 @@ static int cmd_pca (Word *w, int align, char has_param, int param) {
 static int cmd_mac (Word *w, int align, char has_param, int param) {
 	charset_type = CHARSET_MAC;
 	if (op->comment_begin) {
-		printf("%s",op->comment_begin);
-		printf("document uses Macintosh character set");
-		printf("%s",op->comment_end);
+		outstring+=QString().sprintf("%s",op->comment_begin);
+		outstring+=QString().sprintf("document uses Macintosh character set");
+		outstring+=QString().sprintf("%s",op->comment_end);
 	}
 	return FALSE;
 }
@@ -2307,6 +2803,7 @@ static HashItem hashArray_other [] = {
 };
 static HashItem hashArray_a [] = {
 	{ "ansi", &cmd_ansi , NULL },
+	{ "ansicpg", &cmd_ansicpg , NULL },
 	{ NULL, NULL, NULL}
 };
 static HashItem hashArray_b [] = {
@@ -2609,7 +3106,7 @@ enum { SMALL=0, BIG=1 };
 	if (simulate_smallcaps) {
 		if (*s >= 'a' && *s <= 'z') {
 			state=SMALL;
-			outstring+=QString("%1").arg(op->smaller_begin);
+			outstring+=QString().sprintf(op->smaller_begin);
 		}
 		else
 			state=BIG;
@@ -2623,14 +3120,14 @@ enum { SMALL=0, BIG=1 };
 
 		if (ch >= 0x20 && ch < 0x80) {
 #if 1 /* daved - 0.19.6 */
-			post_trans = op_translate_char (op, charset_type, ch, numchar_table);
+			post_trans = op_translate_char (op, charset_type, charset_codepage, ch, numchar_table);
 #else
-			post_trans = op_translate_char (op, charset_type, ch);
+			post_trans = op_translate_char (op, charset_type, charset_codepage, ch);
 #endif
 #if 1 /* daved - 0.20.1 */
 			if(post_trans)
 #endif
-				outstring+=QString("%1").arg("%s",post_trans);
+				outstring+=QString().sprintf("%s",post_trans);
 		}
 
 		s++;
@@ -2639,13 +3136,13 @@ enum { SMALL=0, BIG=1 };
 			ch = *s;
 			if (ch >= 'a' && ch <= 'z') {
 				if (state==BIG)
-					outstring+=QString("%1").arg(op->smaller_begin);
+					outstring+=QString().sprintf(op->smaller_begin);
 				state=SMALL;
 			}
 			else
 			{
 				if (state==SMALL)
-					outstring+=QString("%1").arg(op->smaller_end);
+					outstring+=QString().sprintf(op->smaller_end);
 				state=BIG;
 			}
 		}
@@ -2671,7 +3168,7 @@ begin_table()
 	have_printed_cell_end = FALSE;
 	attrstack_push();
 	starting_body();
-	outstring+=QString("%1").arg(op->table_begin);
+	outstring+=QString().sprintf(op->table_begin);
 }
 
 
@@ -2689,12 +3186,12 @@ end_table ()
 	if (within_table) {
 		if (!have_printed_cell_end) {
 			attr_pop_dump();
-			outstring+=QString("%1").arg(op->table_cell_end);
+			outstring+=QString().sprintf(op->table_cell_end);
 		}
 		if (!have_printed_row_end) {
-			outstring+=QString("%1").arg(op->table_row_end);
+			outstring+=QString().sprintf(op->table_row_end);
 		}
-		outstring+=QString("%1").arg(op->table_end);
+		outstring+=QString().sprintf(op->table_end);
 		within_table=FALSE;
 		have_printed_row_begin = FALSE;
 		have_printed_cell_begin = FALSE;
@@ -2716,13 +3213,13 @@ void
 starting_text() {
 	if (within_table) {
 		if (!have_printed_row_begin) {
-			outstring+=QString("%1").arg(op->table_row_begin);
+			outstring+=QString().sprintf(op->table_row_begin);
 			have_printed_row_begin=TRUE;
 			have_printed_row_end=FALSE;
 			have_printed_cell_begin=FALSE;
 		}
 		if (!have_printed_cell_begin) {
-			outstring+=QString("%1").arg(op->table_cell_begin);
+			outstring+=QString().sprintf(op->table_cell_begin);
 			attrstack_express_all();
 			have_printed_cell_begin=TRUE;
 			have_printed_cell_end=FALSE;
@@ -2749,15 +3246,15 @@ starting_paragraph_align (int align)
 	switch (align) 
 	{
 	case ALIGN_CENTER:
-		outstring+=QString("%1").arg(op->center_begin); 
+		outstring+=QString().sprintf(op->center_begin); 
 		break;
 	case ALIGN_LEFT:
 		break;
 	case ALIGN_RIGHT:
-		outstring+=QString("%1").arg(op->align_right_begin);
+		outstring+=QString().sprintf(op->align_right_begin);
 		break;
 	case ALIGN_JUSTIFY:
-		outstring+=QString("%1").arg(op->align_right_begin); /* This is WRONG! */
+		outstring+=QString().sprintf(op->align_right_begin); /* This is WRONG! */
 		break;
 	}
 }
@@ -2776,16 +3273,16 @@ ending_paragraph_align (int align)
 {
 	switch (align) {
 	case ALIGN_CENTER:
-		outstring+=QString("%1").arg(op->center_end);
+		outstring+=QString().sprintf(op->center_end);
 		break;
 	case ALIGN_LEFT:
-	  /* printf(op->align_left_end); */
+	  /* outstring+=QString().sprintf(op->align_left_end); */
 		break;
 	case ALIGN_RIGHT:
-		outstring+=QString("%1").arg(op->align_right_end);
+		outstring+=QString().sprintf(op->align_right_end);
 		break;
 	case ALIGN_JUSTIFY:
-		outstring+=QString("%1").arg(op->justify_end);
+		outstring+=QString().sprintf(op->justify_end);
 		break;
 	}
 }
@@ -2861,15 +3358,15 @@ word_print_core (Word *w)
 
 					if (s[0]!=' ') {
 						char *s2;
-						printf("%s",op->comment_begin);
-						printf("picture data found, ");
+						outstring+=QString().sprintf("%s",op->comment_begin);
+						outstring+=QString().sprintf("picture data found, ");
 						if (picture_wmetafile_type_str) {
 							printf("WMF type is %s, ",
 								picture_wmetafile_type_str);
 						}
 						printf("picture dimensions are %d by %d, depth %d", 
 							picture_width, picture_height, picture_bits_per_pixel);
-						printf("%s",op->comment_end);
+						outstring+=QString().sprintf("%s",op->comment_end);
 						if (picture_width && picture_height && picture_bits_per_pixel) {
 							s2=s;
 							while (*s2) {
@@ -2894,12 +3391,12 @@ word_print_core (Word *w)
 					total_chars_this_line += strlen(s);
 
 					if (op->word_begin)
-						outstring+=QString("%1").arg(op->word_begin);
+						outstring+=QString().sprintf(op->word_begin);
 
 					print_with_special_exprs (s);
 
 					if (op->word_end)
-						outstring+=QString("%1").arg(op->word_end);
+						outstring+=QString().sprintf(op->word_end);
 				}
 
 
@@ -2959,24 +3456,24 @@ word_print_core (Word *w)
 					is_cell_group=TRUE;
 					if (!have_printed_cell_begin) {
 						/* Need this with empty cells */
-						outstring+=QString("%1").arg(op->table_cell_begin);
+						outstring+=QString().sprintf(op->table_cell_begin);
 						attrstack_express_all();
 					}
 					attr_pop_dump();
-					outstring+=QString("%1").arg(op->table_cell_end);
+					outstring+=QString().sprintf(op->table_cell_end);
 					have_printed_cell_begin = FALSE;
 					have_printed_cell_end=TRUE;
 				}
 				else if (!strcmp (s, "row")) {
 					if (within_table) {
-						outstring+=QString("%1").arg(op->table_row_end);
+						outstring+=QString().sprintf(op->table_row_end);
 						have_printed_row_begin = FALSE;
 						have_printed_row_end=TRUE;
 					} else {
 						if (debug_mode) {
-							printf("%s",op->comment_begin);
-							printf("end of table row");
-							printf("%s",op->comment_end);
+							outstring+=QString().sprintf("%s",op->comment_begin);
+							outstring+=QString().sprintf("end of table row");
+							outstring+=QString().sprintf("%s",op->comment_end);
 						}
 					}
 				}
@@ -2988,21 +3485,21 @@ word_print_core (Word *w)
 					const char *s2;
 
 #if 1 /* daved - 0.19.6 */
-					s2 = op_translate_char (op, charset_type, ch, numchar_table);
+					s2 = op_translate_char (op, charset_type, charset_codepage, ch, numchar_table);
 #else
-					s2 = op_translate_char (op, charset_type, ch);
+					s2 = op_translate_char (op, charset_type, charset_codepage, ch);
 #endif
 
 					if (!s2 || !*s2) {
-						printf("%s",op->comment_begin);
-						printf("char 0x%02x",ch);
-						printf("%s",op->comment_end);
+						outstring+=QString().sprintf("%s",op->comment_begin);
+						outstring+=QString().sprintf("char 0x%02x",ch);
+						outstring+=QString().sprintf("%s",op->comment_end);
 					} else {
 						if (op->word_begin)
-							outstring+=QString("%1").arg(op->word_begin);
-						outstring+=QString("%1").arg("%s", s2);
+							outstring+=QString().sprintf(op->word_begin);
+						outstring+=QString().sprintf("%s", s2);
 						if (op->word_end)
-							outstring+=QString("%1").arg(op->word_end);
+							outstring+=QString().sprintf(op->word_end);
 					}
 				}
 				else
@@ -3032,9 +3529,9 @@ word_print_core (Word *w)
 
 					if (!hip) {
 						if (debug_mode) {
-							printf("%s",op->comment_begin);
-							printf("Unfamiliar RTF command: %s (HashIndex not found)", s);
-							printf("%s",op->comment_begin);
+							outstring+=QString().sprintf(op->comment_begin);
+							outstring+=QString().sprintf("Unfamiliar RTF command: %s (HashIndex not found)", s);
+							outstring+=QString().sprintf(op->comment_end); /* daved 0.20.2 */
 						}
 					}
 					else {
@@ -3068,9 +3565,9 @@ word_print_core (Word *w)
 								debug=hip[index].debug_print;
 
 								if (debug && debug_mode) {
-									printf("%s",op->comment_begin);
-									printf("%s", debug);
-									printf("%s",op->comment_end);
+									outstring+=QString().sprintf("%s",op->comment_begin);
+									outstring+=QString().sprintf("%s", debug);
+									outstring+=QString().sprintf("%s",op->comment_end);
 								}
 
 								done=TRUE;
@@ -3084,9 +3581,9 @@ word_print_core (Word *w)
 					}
 					if (!match) {
 						if (debug_mode) {
-							printf("%s",op->comment_begin);
-							printf("Unfamiliar RTF command: %s", s);
-							printf("%s",op->comment_end);
+							outstring+=QString().sprintf("%s",op->comment_begin);
+							outstring+=QString().sprintf("Unfamiliar RTF command: %s", s);
+							outstring+=QString().sprintf("%s",op->comment_end);
 						}
 					}
 				}
@@ -3113,9 +3610,9 @@ word_print_core (Word *w)
 	if (within_picture) {
 		if(pictfile) { 
 			fclose(pictfile);
-			outstring+=QString("%1").arg(op->imagelink_begin);
-			outstring+=QString("%1").arg("%s", picture_path);
-			outstring+=QString("%1").arg(op->imagelink_end);
+			outstring+=QString().sprintf(op->imagelink_begin);
+			outstring+=QString().sprintf("%s", picture_path);
+			outstring+=QString().sprintf(op->imagelink_end);
 		}
 		within_picture=FALSE;
 	}
@@ -3134,6 +3631,21 @@ word_print_core (Word *w)
 		ending_paragraph_align (paragraph_align);
 
 	attrstack_drop();
+
+#if 1 /* daved - 0.20.3 */
+	if(0)
+		outstring+=QString().sprintf("<numchar_table was %d>", numchar_table);
+	if((s = attr_get_param(ATTR_FONTFACE)) != NULL &&
+		strstr(s,"Symbol") != NULL)
+		numchar_table=FONTSYMBOL_TABLE;
+	else if((s = attr_get_param(ATTR_FONTFACE)) != NULL &&
+		strstr(s,"Greek") != NULL)
+		numchar_table=FONTGREEK_TABLE;
+	else
+		numchar_table = FONTROMAN_TABLE;
+	if(0)
+		outstring+=QString().sprintf("<numchar_table = %d>", numchar_table);
+#endif
 }
 
 
@@ -3153,8 +3665,8 @@ word_print (Word *w, QString & _s)
 
 	outstring = "";
 	if (!inline_mode) {
-		outstring+=QString("%1").arg(op->document_begin);
-		outstring+=QString("%1").arg(op->header_begin);
+		outstring+=QString().sprintf(op->document_begin);
+		outstring+=QString().sprintf(op->header_begin);
 	}
 
 	within_header=TRUE;
@@ -3165,8 +3677,8 @@ word_print (Word *w, QString & _s)
 	end_table();
 
 	if (!inline_mode) {
-		outstring+=QString("%1").arg(op->body_end);
-		outstring+=QString("%1").arg(op->document_end);
+		outstring+=QString().sprintf(op->body_end);
+		outstring+=QString().sprintf(op->document_end);
 	}
 	_s = outstring;
 }

@@ -31,13 +31,16 @@
 
 #include "flp_import.h"
 #include "note_play_handle.h"
+#include "automation_pattern.h"
 #include "basic_filters.h"
 #include "bb_track.h"
 #include "bb_track_container.h"
 #include "combobox.h"
 #include "config_mgr.h"
 #include "debug.h"
+#include "effect.h"
 #include "engine.h"
+#include "fx_mixer.h"
 #include "group_box.h"
 #include "instrument.h"
 #include "instrument_track.h"
@@ -80,7 +83,6 @@ plugin::descriptor PLUGIN_EXPORT flpimport_plugin_descriptor =
 } ;
 
 
-
 // unrtf-stuff
 #include "defs.h"
 #include "main.h"
@@ -90,18 +92,12 @@ plugin::descriptor PLUGIN_EXPORT flpimport_plugin_descriptor =
 #include "convert.h"
 #include "attr.h"
 
-
-OutputPersonality * op = NULL;
-int lineno = 0;
-#define inline_mode 0
-#define debug_mode 0
-#define nopict_mode 1
-#define verbose_mode 0
-#define simple_mode 0
-
+extern OutputPersonality * op;
+extern int lineno;
 extern QString outstring;
 
 }
+
 
 
 static void dump_mem( const void * buffer, uint n_bytes )
@@ -113,6 +109,466 @@ static void dump_mem( const void * buffer, uint n_bytes )
 	}
 	printf( "\n" );
 }
+
+
+enum FLP_Events
+{
+	// BYTE EVENTS
+	FLP_Byte		= 0,
+	FLP_Enabled		= 0,
+	FLP_NoteOn		= 1,	//+pos (byte)
+	FLP_Vol			= 2,
+	FLP_Pan			= 3,
+	FLP_MIDIChan		= 4,
+	FLP_MIDINote		= 5,
+	FLP_MIDIPatch		= 6,
+	FLP_MIDIBank		= 7,
+	FLP_LoopActive		= 9,
+	FLP_ShowInfo		= 10,
+	FLP_Shuffle		= 11,
+	FLP_MainVol		= 12,
+	FLP_Stretch		= 13,	// old byte version
+	FLP_Pitchable		= 14,
+	FLP_Zipped		= 15,
+	FLP_Delay_Flags		= 16,
+	FLP_PatLength		= 17,
+	FLP_BlockLength		= 18,
+	FLP_UseLoopPoints	= 19,
+	FLP_LoopType		= 20,
+	FLP_ChanType		= 21,
+	FLP_MixSliceNum		= 22,
+	FLP_EffectChannelMuted	= 27,
+
+	// WORD EVENTS
+	FLP_Word		= 64,
+	FLP_NewChan		= FLP_Word,
+	FLP_NewPat		= FLP_Word + 1,		//+PatNum (word)
+	FLP_Tempo		= FLP_Word + 2,
+	FLP_CurrentPatNum	= FLP_Word + 3,
+	FLP_PatData		= FLP_Word + 4,
+	FLP_FX			= FLP_Word + 5,
+	FLP_Fade_Stereo		= FLP_Word + 6,
+	FLP_CutOff		= FLP_Word + 7,
+	FLP_DotVol		= FLP_Word + 8,
+	FLP_DotPan		= FLP_Word + 9,
+	FLP_PreAmp		= FLP_Word + 10,
+	FLP_Decay		= FLP_Word + 11,
+	FLP_Attack		= FLP_Word + 12,
+	FLP_DotNote		= FLP_Word + 13,
+	FLP_DotPitch		= FLP_Word + 14,
+	FLP_DotMix		= FLP_Word + 15,
+	FLP_MainPitch		= FLP_Word + 16,
+	FLP_RandChan		= FLP_Word + 17,
+	FLP_MixChan		= FLP_Word + 18,
+	FLP_Resonance		= FLP_Word + 19,
+	FLP_LoopBar		= FLP_Word + 20,
+	FLP_StDel		= FLP_Word + 21,
+	FLP_FX3			= FLP_Word + 22,
+	FLP_DotReso		= FLP_Word + 23,
+	FLP_DotCutOff		= FLP_Word + 24,
+	FLP_ShiftDelay		= FLP_Word + 25,
+	FLP_LoopEndBar		= FLP_Word + 26,
+	FLP_Dot			= FLP_Word + 27,
+	FLP_DotShift		= FLP_Word + 28,
+	FLP_LayerChans		= FLP_Word + 30,
+
+	// DWORD EVENTS
+	FLP_Int			= 128,
+	FLP_Color		= FLP_Int,
+	FLP_PlayListItem	= FLP_Int + 1,	//+Pos (word) +PatNum (word)
+	FLP_Echo		= FLP_Int + 2,
+	FLP_FXSine		= FLP_Int + 3,
+	FLP_CutCutBy		= FLP_Int + 4,
+	FLP_WindowH		= FLP_Int + 5,
+	FLP_MiddleNote		= FLP_Int + 7,
+	FLP_Reserved		= FLP_Int + 8,	// may contain an invalid
+						// version info
+	FLP_MainResoCutOff	= FLP_Int + 9,
+	FLP_DelayReso		= FLP_Int + 10,
+	FLP_Reverb		= FLP_Int + 11,
+	FLP_IntStretch		= FLP_Int + 12,
+	FLP_SSNote		= FLP_Int + 13,
+	FLP_FineTune		= FLP_Int + 14,
+
+	// TEXT EVENTS
+	FLP_Undef		= 192,		//+Size (var length)
+	FLP_Text		= FLP_Undef,	//+Size (var length)+Text
+						//	(Null Term. String)
+	FLP_Text_ChanName	= FLP_Text,	// name for the current channel
+	FLP_Text_PatName	= FLP_Text + 1,	// name for the current pattern
+	FLP_Text_Title		= FLP_Text + 2,	// title of the loop
+	FLP_Text_Comment	= FLP_Text + 3,	// old comments in text format.
+						// Not used anymore
+	FLP_Text_SampleFileName	= FLP_Text + 4,	// filename for the sample in
+						// the current channel, stored
+						// as relative path
+	FLP_Text_URL		= FLP_Text + 5,
+	FLP_Text_CommentRTF	= FLP_Text + 6,	// new comments in Rich Text
+						// format
+	FLP_Text_Version	= FLP_Text + 7,
+	FLP_Text_PluginName	= FLP_Text + 9,	// plugin file name
+						// (without path)
+
+	FLP_Text_EffectChanName	= FLP_Text + 12,
+	FLP_Text_MIDICtrls	= FLP_Text + 16,
+	FLP_Text_Delay		= FLP_Text + 17,
+	FLP_Text_TS404Params	= FLP_Text + 18,
+	FLP_Text_DelayLine	= FLP_Text + 19,
+	FLP_Text_NewPlugin	= FLP_Text + 20,
+	FLP_Text_PluginParams	= FLP_Text + 21,
+	FLP_Text_ChanParams	= FLP_Text + 23,// block of various channel
+						// params (can grow)
+	FLP_Text_EnvLfoParams	= FLP_Text + 26,
+	FLP_Text_BasicChanParams= FLP_Text + 27,
+	FLP_Text_OldFilterParams= FLP_Text + 28,
+	FLP_Text_AutomationData	= FLP_Text + 31,
+	FLP_Text_PatternNotes	= FLP_Text + 32,
+	FLP_Text_ChanGroupName	= FLP_Text + 39,
+	FLP_Text_PlayListItems	= FLP_Text + 41,
+
+	FLP_CmdCount
+
+} ;
+
+
+struct FL_Automation
+{
+	FL_Automation() :
+		pos( 0 ),
+		value( 0 ),
+		channel( 0 ),
+		control( 0 )
+	{
+	}
+
+	enum Controls
+	{
+		ControlVolume			= 0,
+		ControlPanning			= 1,
+		ControlFilterCut		= 2,
+		ControlFilterRes		= 3,
+		ControlPitch			= 4,
+		ControlFilterType		= 5,
+		ControlFXChannel		= 8,
+
+		ControlVolPredelay		= 4354,
+		ControlVolAttack,
+		ControlVolHold,
+		ControlVolDecay,
+		ControlVolSustain,
+		ControlVolRelease,
+		ControlVolLfoPredelay		= ControlVolPredelay+7,
+		ControlVolLfoAttack,
+		ControlVolLfoAmount,
+		ControlVolLfoSpeed,
+		ControlVolAttackTension		= ControlVolPredelay+12,
+		ControlVolDecayTension,
+		ControlVolReleaseTension,
+		ControlCutPredelay		= 4610,
+		ControlCutAttack,
+		ControlCutHold,
+		ControlCutDecay,
+		ControlCutSustain,
+		ControlCutRelease,
+		ControlCutAmount,
+		ControlCutLfoPredelay		= ControlCutPredelay+7,
+		ControlCutLfoAttack,
+		ControlCutLfoAmount,
+		ControlCutLfoSpeed,
+		ControlCutAttackTension		= ControlCutPredelay+12,
+		ControlCutDecayTension,
+		ControlCutReleaseTension,
+
+		ControlResPredelay		= 4866,
+		ControlResAttack,
+		ControlResHold,
+		ControlResDecay,
+		ControlResSustain,
+		ControlResRelease,
+		ControlResAmount,
+		ControlResLfoPredelay		= ControlResPredelay+7,
+		ControlResLfoAttack,
+		ControlResLfoAmount,
+		ControlResLfoSpeed,
+		ControlResAttackTension		= ControlResPredelay+12,
+		ControlResDecayTension,
+		ControlResReleaseTension
+	} ;
+
+	int pos;
+	int value;
+	int channel;
+	int control;
+
+} ;
+
+
+
+struct FL_Channel_Envelope
+{
+	instrumentSoundShaping::Targets target;
+	float predelay;
+	float attack;
+	float hold;
+	float decay;
+	float sustain;
+	float release;
+	float amount;
+} ;
+
+
+struct FL_Plugin
+{
+	enum PluginTypes
+	{
+		UnknownPlugin,
+
+		InstrumentPlugin,
+		Sampler,
+		TS404,
+		Fruity_3x_Osc,
+		Layer,
+		BeepMap,
+		BuzzGeneratorAdapter,
+		FruitKick,
+		FruityDrumSynthLive,
+		FruityDX10,
+		FruityGranulizer,
+		FruitySlicer,
+		FruitySoundfontPlayer,
+		FruityVibrator,
+		MidiOut,
+		Plucked,
+		SimSynth,
+		Sytrus,
+		WASP,
+
+		EffectPlugin,
+		Fruity7BandEq,
+		FruityBalance,
+		FruityBassBoost,
+		FruityBigClock,
+		FruityBloodOverdrive,
+		FruityCenter,
+		FruityChorus,
+		FruityCompressor,
+		FruityDbMeter,
+		FruityDelay,
+		FruityDelay2,
+		FruityFastDist,
+		FruityFastLP,
+		FruityFilter,
+		FruityFlanger,
+		FruityFormulaController,
+		FruityFreeFilter,
+		FruityHTMLNotebook,
+		FruityLSD,
+		FruityMute2,
+		FruityNotebook,
+		FruityPanOMatic,
+		FruityParametricEQ,
+		FruityPeakController,
+		FruityPhaseInverter,
+		FruityPhaser,
+		FruityReeverb,
+		FruityScratcher,
+		FruitySend,
+		FruitySoftClipper,
+		FruitySpectroman,
+		FruityStereoEnhancer,
+		FruityXYController
+	} ;
+
+	FL_Plugin( PluginTypes _pt = UnknownPlugin ) :
+		pluginType( _pt ),
+		name(),
+		pluginSettings( NULL ),
+		pluginSettingsLength( 0 )
+	{
+	}
+
+	~FL_Plugin()
+	{
+		delete[] pluginSettings;
+	}
+
+	PluginTypes pluginType;
+	QString name;
+
+	char * pluginSettings;
+	int pluginSettingsLength;
+
+} ;
+
+
+struct FL_Channel : public FL_Plugin
+{
+	QList<FL_Automation> automationData;
+
+	int volume;
+	int panning;
+	int baseNote;
+	int fxChannel;
+	int layerParent;
+
+	typedef QList<QPair<int, note> > noteVector;
+	noteVector notes;
+
+	QList<int> dots;
+
+
+	QString sampleFileName;
+	int sampleAmp;
+	bool sampleReversed;
+	bool sampleReverseStereo;
+	bool sampleUseLoopPoints;
+
+	instrument * instrumentPlugin;
+
+	QList<FL_Channel_Envelope> envelopes;
+
+	int filterType;
+	float filterCut;
+	float filterRes;
+	bool filterEnabled;
+
+	int arpDir;
+	int arpRange;
+	int selectedArp;
+	float arpTime;
+	float arpGate;
+	bool arpEnabled;
+
+	QRgb color;
+
+
+	FL_Channel( PluginTypes _pt = UnknownPlugin ) :
+		FL_Plugin( _pt ),
+		automationData(),
+		volume( DefaultVolume ),
+		panning( DefaultPanning ),
+		baseNote( DefaultKey ),
+		fxChannel( 0 ),
+		layerParent( -1 ),
+		notes(),
+		dots(),
+		sampleFileName(),
+		sampleAmp( 100 ),
+		sampleReversed( false ),
+		sampleReverseStereo( false ),
+		sampleUseLoopPoints( false ),
+		instrumentPlugin( NULL ),
+		envelopes(),
+		filterType( basicFilters<>::LowPass ),
+		filterCut( 10000 ),
+		filterRes( 0.1 ),
+		filterEnabled( false ),
+		arpDir( arpeggiator::ArpDirUp ),
+		arpRange( 0 ),
+		selectedArp( 0 ),
+		arpTime( 100 ),
+		arpGate( 100 ),
+		arpEnabled( false ),
+		color( qRgb( 64, 128, 255 ) )
+	{
+	}
+
+} ;
+
+
+struct FL_Effect : public FL_Plugin
+{
+	FL_Effect( PluginTypes _pt = UnknownPlugin ) :
+		FL_Plugin( _pt ),
+		fxChannel( 0 ),
+		fxPos( 0 )
+	{
+	}
+
+	int fxChannel;
+	int fxPos;
+
+} ;
+
+
+struct FL_PlayListItem
+{
+	FL_PlayListItem() :
+		position( 0 ),
+		length( 1 ),
+		pattern( 0 )
+	{
+	}
+	int position;
+	int length;
+	int pattern;
+} ;
+
+
+struct FL_EffectChannel
+{
+	FL_EffectChannel() :
+		name(),
+		volume( DefaultVolume )
+	{
+	}
+
+	QString name;
+	int volume;
+	bool isMuted;
+} ;
+
+
+struct FL_Project
+{
+	int mainVolume;
+	int mainPitch;
+	bpm_t tempo;
+	int numChannels;
+
+	QList<FL_Channel> channels;
+	QList<FL_Effect> effects;
+	QList<FL_PlayListItem> playListItems;
+
+	QMap<int, QString> patternNames;
+	int maxPatterns;
+	int currentPattern;
+	int activeEditPattern;
+
+	FL_EffectChannel effectChannels[NumFxChannels+1];
+	int currentEffectChannel;
+
+	QString projectNotes;
+	QString projectTitle;
+
+	QString versionString;
+	int version;
+	int versionSpecificFactor;
+
+	FL_Project() :
+		mainVolume( DefaultVolume ),
+		mainPitch( 0 ),
+		tempo( DefaultTempo ),
+		numChannels( 0 ),
+		channels(),
+		effects(),
+		playListItems(),
+		patternNames(),
+		maxPatterns( 0 ),
+		currentPattern( 0 ),
+		activeEditPattern( 0 ),
+		effectChannels(),
+		currentEffectChannel( -1 ),
+		projectNotes(),
+		projectTitle(),
+		versionString(),
+		version( 0x100 ),
+		versionSpecificFactor( 1 )
+	{
+	}
+
+} ;
+
 
 
 
@@ -129,26 +585,105 @@ flpImport::~flpImport()
 }
 
 
-
-
 bool flpImport::tryImport( trackContainer * _tc )
 {
-	if( openFile() == FALSE )
+	const int mappedFilter[] =
 	{
-		return( FALSE );
+		basicFilters<>::LowPass,// fast LP
+		basicFilters<>::LowPass,
+		basicFilters<>::BandPass_CSG,
+		basicFilters<>::HiPass,
+		basicFilters<>::Notch,
+		basicFilters<>::NumFilters+basicFilters<>::LowPass,
+		basicFilters<>::LowPass,
+		basicFilters<>::NumFilters+basicFilters<>::LowPass
+	} ;
+
+	const arpeggiator::ArpDirections mappedArpDir[] =
+	{
+		arpeggiator::ArpDirUp,
+		arpeggiator::ArpDirUp,
+		arpeggiator::ArpDirDown,
+		arpeggiator::ArpDirUpAndDown,
+		arpeggiator::ArpDirUpAndDown,
+		arpeggiator::ArpDirRandom
+	} ;
+
+	QMap<QString, int> mappedPluginTypes;
+
+	// instruments
+	mappedPluginTypes["sampler"] = FL_Plugin::Sampler;
+	mappedPluginTypes["ts404"] = FL_Plugin::TS404;
+	mappedPluginTypes["3x osc"] = FL_Plugin::Fruity_3x_Osc;
+	mappedPluginTypes["beepmap"] = FL_Plugin::BeepMap;
+	mappedPluginTypes["buzz generator adapter"] = FL_Plugin::BuzzGeneratorAdapter;
+	mappedPluginTypes["fruit kick"] = FL_Plugin::FruitKick;
+	mappedPluginTypes["fruity drumsynth live"] = FL_Plugin::FruityDrumSynthLive;
+	mappedPluginTypes["fruity dx10"] = FL_Plugin::FruityDX10;
+	mappedPluginTypes["fruity granulizer"] = FL_Plugin::FruityGranulizer;
+	mappedPluginTypes["fruity slicer"] = FL_Plugin::FruitySlicer;
+	mappedPluginTypes["fruity soundfont player"] = FL_Plugin::FruitySoundfontPlayer;
+	mappedPluginTypes["fruity vibrator"] = FL_Plugin::FruityVibrator;
+	mappedPluginTypes["midi out"] = FL_Plugin::MidiOut;
+	mappedPluginTypes["plucked!"] = FL_Plugin::Plucked;
+	mappedPluginTypes["simsynth"] = FL_Plugin::SimSynth;
+	mappedPluginTypes["sytrus"] = FL_Plugin::Sytrus;
+	mappedPluginTypes["wasp"] = FL_Plugin::WASP;
+
+	// effects
+	mappedPluginTypes["fruity 7 band EQ"] = FL_Plugin::Fruity7BandEq;
+	mappedPluginTypes["fruity balance"] = FL_Plugin::FruityBalance;
+	mappedPluginTypes["fruity bass boost"] = FL_Plugin::FruityBassBoost;
+	mappedPluginTypes["fruity big clock"] = FL_Plugin::FruityBigClock;
+	mappedPluginTypes["fruity blood overdrive"] = FL_Plugin::FruityBloodOverdrive;
+	mappedPluginTypes["fruity center"] = FL_Plugin::FruityCenter;
+	mappedPluginTypes["fruity chorus"] = FL_Plugin::FruityChorus;
+	mappedPluginTypes["fruity compressor"] = FL_Plugin::FruityCompressor;
+	mappedPluginTypes["fruity db meter"] = FL_Plugin::FruityDbMeter;
+	mappedPluginTypes["fruity delay"] = FL_Plugin::FruityDelay;
+	mappedPluginTypes["fruity delay 2"] = FL_Plugin::FruityDelay2;
+	mappedPluginTypes["fruity fast dist"] = FL_Plugin::FruityFastDist;
+	mappedPluginTypes["fruity fast lp"] = FL_Plugin::FruityFastLP;
+	mappedPluginTypes["fruity filter"] = FL_Plugin::FruityFilter;
+	mappedPluginTypes["fruity flanger"] = FL_Plugin::FruityFlanger;
+	mappedPluginTypes["fruity formula controller"] = FL_Plugin::FruityFormulaController;
+	mappedPluginTypes["fruity free filter"] = FL_Plugin::FruityFreeFilter;
+	mappedPluginTypes["fruity html notebook"] = FL_Plugin::FruityHTMLNotebook;
+	mappedPluginTypes["fruity lsd"] = FL_Plugin::FruityLSD;
+	mappedPluginTypes["fruity mute 2"] = FL_Plugin::FruityMute2;
+	mappedPluginTypes["fruity notebook"] = FL_Plugin::FruityNotebook;
+	mappedPluginTypes["fruity panomatic"] = FL_Plugin::FruityPanOMatic;
+	mappedPluginTypes["fruity parametric eq"] = FL_Plugin::FruityParametricEQ;
+	mappedPluginTypes["fruity peak controller"] = FL_Plugin::FruityPeakController;
+	mappedPluginTypes["fruity phase inverter"] = FL_Plugin::FruityPhaseInverter;
+	mappedPluginTypes["fruity phaser"] = FL_Plugin::FruityPhaser;
+	mappedPluginTypes["fruity reeverb"] = FL_Plugin::FruityReeverb;
+	mappedPluginTypes["fruity scratcher"] = FL_Plugin::FruityScratcher;
+	mappedPluginTypes["fruity send"] = FL_Plugin::FruitySend;
+	mappedPluginTypes["fruity soft clipper"] = FL_Plugin::FruitySoftClipper;
+	mappedPluginTypes["fruity spectroman"] = FL_Plugin::FruitySpectroman;
+	mappedPluginTypes["fruity stereo enhancer"] = FL_Plugin::FruityStereoEnhancer;
+	mappedPluginTypes["fruity x-y controller"] = FL_Plugin::FruityXYController;
+
+
+	FL_Project p;
+
+	if( openFile() == false )
+	{
+		return false;
 	}
 
 	if( readID() != makeID( 'F', 'L', 'h', 'd' ) )
 	{
 		printf( "flpImport::tryImport(): not a valid FL project\n" );
-		return( FALSE );
+		return false;
 	}
 
 	const int header_len = read32LE();
 	if( header_len != 6 )
 	{
 		printf( "flpImport::tryImport(): invalid file format\n" );
-		return( FALSE );
+		return false;
 	}
 
 	const int type = read16LE();
@@ -156,30 +691,31 @@ bool flpImport::tryImport( trackContainer * _tc )
 	{
 		printf( "flpImport::tryImport(): type %d format is not "
 							"supported\n", type );
-		return( FALSE );
+		return false;
 	}
 
-	const int num_channels = read16LE();
-	if( num_channels < 1 || num_channels > 1000 )
+	p.numChannels = read16LE();
+	if( p.numChannels < 1 || p.numChannels > 1000 )
 	{
 		printf( "flpImport::tryImport(): invalid number of channels "
-						"(%d)\n", num_channels );
-		return( FALSE );
+						"(%d)\n", p.numChannels );
+		return false;
 	}
 
 	const int ppq = read16LE();
 	if( ppq < 0 )
 	{
 		printf( "flpImport::tryImport(): invalid ppq\n" );
-		return( FALSE );
+		return false;
 	}
 
-	QProgressDialog pd( trackContainer::tr( "Importing FLP-file..." ),
-			trackContainer::tr( "Cancel" ), 0, num_channels );
-	pd.setWindowTitle( trackContainer::tr( "Please wait..." ) );
-	pd.show();
+	QProgressDialog progressDialog(
+			trackContainer::tr( "Importing FLP-file..." ),
+			trackContainer::tr( "Cancel" ), 0, p.numChannels );
+	progressDialog.setWindowTitle( trackContainer::tr( "Please wait..." ) );
+	progressDialog.show();
 
-	bool valid = FALSE;
+	bool valid = false;
 
 	// search for FLdt chunk
 	while( 1 )
@@ -190,66 +726,48 @@ bool flpImport::tryImport( trackContainer * _tc )
 		{
 			printf( "flpImport::tryImport(): unexpected "
 					"end of file\n" );
-			return( FALSE );
+			return false;
 		}
 		if( len < 0 || len >= 0x10000000 )
 		{
 			printf( "flpImport::tryImport(): invalid "
 					"chunk length %d\n", len );
-			return( FALSE );
+			return false;
 		}
 		if( id == makeID( 'F', 'L', 'd', 't' ) )
 		{
-			valid = TRUE;
+			valid = true;
 			break;
 		}
 		skip( len );
 	}
 
-	if( valid == FALSE )
+	if( valid == false )
 	{
-		return( FALSE );
+		return false;
 	}
 
-	printf( "channels: %d\n", num_channels );
-
-	instrumentTrack * it = NULL;
-	instrument * it_inst = NULL;
-	flPlugins cur_plugin = FL_Plugin_Undef;
-
-	int current_pattern = 0;
-	char * text = NULL;
-	Uint32 text_len = 0;
-	QList<instrumentTrack *> i_tracks;
-	int project_cur_pat = 0;
-
-	int step_pattern = 0;
-	int last_step_pos = 0;
-	
-	int env_lfo_target = 0;
-
-	int ev_cnt = 0;
-
-	engine::getSong()->clearProject();
-	const bool is_journ = engine::getProjectJournal()->isJournalling();
-	engine::getProjectJournal()->setJournalling( FALSE );
-
-
-	while( file().atEnd() == FALSE )
+	for( int i = 0; i < p.numChannels; ++i )
 	{
-		if( ++ev_cnt > 100 )
-		{
-			ev_cnt = 0;
-			qApp->processEvents( QEventLoop::AllEvents, 100 );
-			pd.setValue( i_tracks.size() );
+		p.channels += FL_Channel();
+	}
 
-			if( pd.wasCanceled() )
-			{
-				return( FALSE );
-			}
-		}
+	printf( "channels: %d\n", p.numChannels );
 
-		flpEvents ev = static_cast<flpEvents>( readByte() );
+
+	char * text = NULL;
+	int text_len = 0;
+	FL_Plugin::PluginTypes last_plugin_type = FL_Plugin::UnknownPlugin;
+	
+	int cur_channel = -1;
+
+	const bool is_journ = engine::getProjectJournal()->isJournalling();
+	engine::getProjectJournal()->setJournalling( false );
+
+
+	while( file().atEnd() == false )
+	{
+		FLP_Events ev = static_cast<FLP_Events>( readByte() );
 		Uint32 data = readByte();
 
 		if( ev >= FLP_Word && ev < FLP_Text )
@@ -285,6 +803,12 @@ bool flpImport::tryImport( trackContainer * _tc )
 
 			text[text_len] = 0;
 		}
+		const unsigned char * puc = (const unsigned char*) text;
+		const int * pi = (const int *) text;
+
+
+		FL_Channel * cc = cur_channel >= 0 ?
+					&p.channels[cur_channel] : NULL;
 
 		switch( ev )
 		{
@@ -296,6 +820,14 @@ bool flpImport::tryImport( trackContainer * _tc )
 			case FLP_NoteOn:
 				printf( "note on: %d\n", data );
 				// data = pos   how to handle?
+				break;
+
+			case FLP_Vol:
+				printf( "vol %d\n", data );
+				break;
+
+			case FLP_Pan:
+				printf( "pan %d\n", data );
 				break;
 
 			case FLP_LoopActive:
@@ -311,18 +843,19 @@ bool flpImport::tryImport( trackContainer * _tc )
 				break;
 
 			case FLP_MainVol:
-				printf( "main-volume: %d\n", data );
-				engine::getSong()->setMasterVolume(
-					static_cast<volume>( data * 100 /
-									128 ) );
+				p.mainVolume = data * 100 / 128;
 				break;
 
 			case FLP_PatLength:
-				printf( "pattern-length: %d\n", data );
+				printf( "pattern length: %d\n", data );
 				break;
 
 			case FLP_BlockLength:
 				printf( "block length: %d\n", data );
+				break;
+
+			case FLP_UseLoopPoints:
+				cc->sampleUseLoopPoints = true;
 				break;
 
 			case FLP_LoopType:
@@ -331,51 +864,68 @@ bool flpImport::tryImport( trackContainer * _tc )
 
 			case FLP_ChanType:
 				printf( "channel type: %d\n", data );
+				if( cc )
+				{
+		switch( data )
+		{
+			case 0: cc->pluginType = FL_Plugin::Sampler; break;
+			case 1: cc->pluginType = FL_Plugin::TS404; break;
+//			case 2: cc->pluginType = FL_Plugin::Fruity_3x_Osc; break;
+			case 3: cc->pluginType = FL_Plugin::Layer; break;
+			default:
+				break;
+		}
+				}
 				break;
 
 			case FLP_MixSliceNum:
-				printf( "mix slice num: %d\n", data );
+				cc->fxChannel = data+1;
+				break;
+
+			case FLP_EffectChannelMuted:
+if( p.currentEffectChannel <= NumFxChannels )
+{
+	p.effectChannels[p.currentEffectChannel].isMuted =
+					( data & 0x08 ) > 0 ? false : true;
+}
 				break;
 
 
 			// WORD EVENTS
 			case FLP_NewChan:
-				printf( "new channel\n" );
-
-				it = dynamic_cast<instrumentTrack *>(
-	track::create( track::InstrumentTrack, engine::getBBTrackContainer() ) );
-				assert( it != NULL );
-				i_tracks.push_back( it );
-				it_inst = it->loadInstrument(
-							"audiofileprocessor" );
-//				it->toggledInstrumentTrackButton( FALSE );
-
-				// reset some values
-				step_pattern = 0;
-				last_step_pos = 0;
-				env_lfo_target = 0;
-
+				cur_channel = data;
+				printf( "new channel: %d\n", data );
 				break;
 
 			case FLP_NewPat:
-				current_pattern = data - 1;
+				p.currentPattern = data - 1;
+				if( p.currentPattern > p.maxPatterns )
+				{
+					p.maxPatterns = p.currentPattern;
+				}
 				break;
 
 			case FLP_Tempo:
-				printf( "tempo: %d\n", data );
-				engine::getSong()->setTempo( data );
+				p.tempo = data;
 				break;
 
 			case FLP_CurrentPatNum:
-				project_cur_pat = data;
+				p.activeEditPattern = data;
 				break;
 
 			case FLP_FX:
-				printf( "FX-channel for cur channel: %d\n",
-									data );
+				printf( "FX: %d\n", data );
 				break;
 
 			case FLP_Fade_Stereo:
+				if( data & 0x02 )
+				{
+					cc->sampleReversed = true;
+				}
+				else if( data & 0x100 )
+				{
+					cc->sampleReverseStereo = true;
+				}
 				printf( "fade stereo: %d\n", data );
 				break;
 
@@ -384,7 +934,7 @@ bool flpImport::tryImport( trackContainer * _tc )
 				break;
 
 			case FLP_PreAmp:
-				printf( "pre-amp (sample): %d\n", data );
+				cc->sampleAmp = 100 + data * 100 / 256;
 				break;
 
 			case FLP_Decay:
@@ -396,7 +946,7 @@ bool flpImport::tryImport( trackContainer * _tc )
 				break;
 
 			case FLP_MainPitch:
-				engine::getSong()->setMasterPitch( data );
+				p.mainPitch = data;
 				break;
 
 			case FLP_Resonance:
@@ -420,31 +970,30 @@ bool flpImport::tryImport( trackContainer * _tc )
 				break;
 
 			case FLP_Dot:
-			{
-				printf( "dot/step at: %d\n", data );
-				const int pos = data & 0xff;
-				if( last_step_pos > pos )
-				{
-					++step_pattern;
-				}
-				last_step_pos = pos;
-				m_steps.push_back(
-					( ( i_tracks.size() - 1 ) << 16 ) |
-					( pos + 16 * step_pattern ) );
+				cc->dots.push_back( ( data & 0xff ) +
+						( p.currentPattern << 8 ) );
 				break;
-			}
+
+			case FLP_LayerChans:
+				p.channels[data].layerParent = cur_channel;
 
 			// DWORD EVENTS
 			case FLP_Color:
-				printf( "color  r:%d  g:%d  b:%d\n",
-						qRed( data ),
-						qGreen( data ),
-						qBlue( data ) );
+				cc->color = data;
 				break;
 
 			case FLP_PlayListItem:
 			{
-				m_plItems.push_back( data );
+				FL_PlayListItem i;
+				i.position = ( data & 0xffff ) *
+							DefaultTicksPerTact;
+				i.length = DefaultTicksPerTact;
+				i.pattern = ( data >> 16 ) - 1;
+				p.playListItems.push_back( i );
+				if( i.pattern > p.maxPatterns )
+				{
+					p.maxPatterns = i.pattern;
+				}
 				break;
 			}
 
@@ -457,8 +1006,7 @@ bool flpImport::tryImport( trackContainer * _tc )
 				break;
 
 			case FLP_MiddleNote:
-				data += 8;
-				it->baseNoteModel()->setValue( data );
+				cc->baseNote = data+9;
 				break;
 
 			case FLP_DelayReso:
@@ -475,14 +1023,11 @@ bool flpImport::tryImport( trackContainer * _tc )
 
 			// TEXT EVENTS
 			case FLP_Text_ChanName:
-				if( it == NULL )
-				{
-					printf( "!! tried to set channel name "
-						"but no channel was created so "
-						"far\n" );
-					break;
-				}
-				it->setName( text );
+				cc->name = text;
+				break;
+
+			case FLP_Text_PatName:
+				p.patternNames[p.currentPattern] = text;
 				break;
 
 			case FLP_Text_CommentRTF:
@@ -500,25 +1045,17 @@ bool flpImport::tryImport( trackContainer * _tc )
 				word_free( word );
 				op_free( op );
 
-				engine::getProjectNotes()->setText( out );
+				p.projectNotes = out;
 				outstring = "";
 				break;
 			}
 
 			case FLP_Text_Title:
-				printf( "project title: %s\n", text );
+				p.projectTitle = text;
 				break;
 
 			case FLP_Text_SampleFileName:
 			{
-				if( it_inst == NULL )
-				{
-					printf( "!! tried to set sample for "
-						"instrument but no channel or "
-						"instrument was "
-						"created so far\n" );
-					break;
-				}
 				QString f = text;
 /*				if( f.mid( 1, 11 ) == "Instruments" )
 				{
@@ -538,223 +1075,313 @@ bool flpImport::tryImport( trackContainer * _tc )
 					f = configManager::inst()->flDir() +
 							"/Samples/" + f;
 				}
-				it_inst->loadFile( f );
+				cc->sampleFileName = f;
 				break;
 			}
 
-			case FLP_Version:
-				printf( "FL Version: %s\n", text );
+			case FLP_Text_Version:
+			{
+				printf( "FLP version: %s\n", text );
+				p.versionString = text;
+				QStringList l = p.versionString.split( '.' );
+				p.version = ( l[0].toInt() << 8 ) +
+						( l[1].toInt() << 4 ) +
+						( l[2].toInt() << 0 );
+				if( p.version >= 0x600 )
+				{
+					p.versionSpecificFactor = 100;
+				}
 				break;
+			}
 
 			case FLP_Text_PluginName:
-			{
-				instrument * new_inst = NULL;
-				if( QString( text ) == "3x Osc" )
+				if( mappedPluginTypes.
+					contains( QString( text ).toLower() ) )
 				{
-					printf( "loading TripleOscillator for "
-								"3x Osc\n" );
-					new_inst = it->loadInstrument(
-							"tripleoscillator" );
-					cur_plugin = FL_Plugin_3x_Osc;
-				}
-				else if( QString( text ) == "Plucked!" )
-				{
-					printf( "loading Vibed for Plucked!\n"
-									);
-					new_inst = it->loadInstrument(
-							"vibedstrings" );
-					cur_plugin = FL_Plugin_Plucked;
+	const FL_Plugin::PluginTypes t = static_cast<FL_Plugin::PluginTypes>(
+				mappedPluginTypes[QString( text ).toLower()] );
+					if( t > FL_Plugin::EffectPlugin )
+					{
+						printf( "recognized new "
+							"effect %s\n", text );
+						p.effects.push_back(
+							FL_Effect( t ) );
+					}
+					else if( cc )
+					{
+						printf( "recognized new "
+							"plugin %s\n", text );
+						cc->pluginType = t;
+					}
+					last_plugin_type = t;
 				}
 				else
 				{
 					printf( "unsupported plugin: %s!\n",
 									text );
 				}
-				if( new_inst != NULL )
-				{
-					it_inst = new_inst;
-				}
 				break;
-			}
 
-			case FLP_Delay:
-				printf( "delay-data:\n" );
+			case FLP_Text_EffectChanName:
+++p.currentEffectChannel;
+if( p.currentEffectChannel <= NumFxChannels )
+{
+	p.effectChannels[p.currentEffectChannel].name = text;
+}
+				break;
+
+			case FLP_Text_Delay:
+				printf( "delay data: " );
+				// pi[1] seems to be volume or similiar and
+				// needs to be divided
+				// by p.versionSpecificFactor
 				dump_mem( text, text_len );
 				break;
 
-			case FLP_NewPlugin:
-				printf( "new plugin: %s\n", text );
-				break;
-
-			case FLP_PluginParams:
-				if( it_inst != NULL &&
-						cur_plugin != FL_Plugin_Undef )
+			case FLP_Text_TS404Params:
+				if( cc && cc->pluginType ==
+					FL_Plugin::UnknownPlugin &&
+						cc->pluginSettings == NULL )
 				{
-					processPluginParams( cur_plugin,
-							(const char *) text,
-							text_len, it_inst );
-					cur_plugin = FL_Plugin_Undef;
+					cc->pluginSettings = new char[text_len];
+					memcpy( cc->pluginSettings, text,
+								text_len );
+					cc->pluginSettingsLength = text_len;
+					cc->pluginType =
+						FL_Plugin::TS404;
 				}
 				break;
 
-			case FLP_ChanParams:
-			{
-				const arpeggiator::ArpDirections
-					mappedArpDir[] =
+			case FLP_Text_NewPlugin:
+				if( last_plugin_type > FL_Plugin::EffectPlugin )
 				{
-					arpeggiator::ArpDirUp,
-					arpeggiator::ArpDirUp,
-					arpeggiator::ArpDirDown,
-					arpeggiator::ArpDirUpAndDown,
-					arpeggiator::ArpDirUpAndDown,
-					arpeggiator::ArpDirRandom
-				} ;
-				const Uint32 * p = (const Uint32 *) text;
-				arpeggiator * arp = &it->m_arpeggiator;
-				arp->m_arpDirectionModel.setValue(
-							mappedArpDir[p[10]] );
-				arp->m_arpRangeModel.setValue( p[11] );
-				arp->m_arpModel.setValue( p[12] );
-				arp->m_arpTimeModel.setValue( p[13] / 8.0f );
-							////	100.0f );
-				arp->m_arpGateModel.setValue( p[14] * 100.0f /
-									48.0f );
-				arp->m_arpEnabledModel.setValue( p[10] > 0 );
+		FL_Effect * e = &p.effects.last();
+		e->fxChannel = puc[0];
+		e->fxPos = puc[4];
+					printf( "new effect: " );
+				}
+				else
+				{
+					printf( "new plugin: " );
+				}
+				dump_mem( text, text_len );
+				break;
+
+			case FLP_Text_PluginParams:
+				if( cc && cc->pluginSettings == NULL )
+				{
+					cc->pluginSettings = new char[text_len];
+					memcpy( cc->pluginSettings, text,
+								text_len );
+					cc->pluginSettingsLength = text_len;
+				}
+				printf( "plugin params: " );
+				dump_mem( text, text_len );
+				break;
+
+			case FLP_Text_ChanParams:
+				cc->arpDir = mappedArpDir[pi[10]];
+				cc->arpRange = pi[11];
+				cc->selectedArp = pi[12];
+	if( cc->selectedArp < 8 )
+	{
+		const int mappedArps[] = { 0, 1, 5, 6, 2, 3, 4 } ;
+		cc->selectedArp = mappedArps[cc->selectedArp];
+	}
+				cc->arpTime = ( ( pi[13]+1 ) * p.tempo ) /
+								( 4*16 ) + 1;
+				cc->arpGate = ( pi[14] * 100.0f ) / 48.0f;
+				cc->arpEnabled = pi[10] > 0;
+
 				printf( "channel params: " );
 				dump_mem( text, text_len );
-				//printf( "channel params: arpdir: %d  range: %d  time: %d  gate: %d\n", p[10], p[11], p[13], p[14] );
 				break;
-			}
 
-			case FLP_EnvLfoParams:
+			case FLP_Text_EnvLfoParams:
 			{
-				const Uint32 * p = (const Uint32 *) text;
-				printf( "envelope and lfo params: " );
+				const float scaling = 1.0 / 65536.0f;
+				FL_Channel_Envelope e;
+
+		switch( cc->envelopes.size() )
+		{
+			case 1:
+				e.target = instrumentSoundShaping::Volume;
+				break;
+			case 2:
+				e.target = instrumentSoundShaping::Cut;
+				break;
+			case 3:
+				e.target = instrumentSoundShaping::Resonance;
+				break;
+			default:
+				e.target = instrumentSoundShaping::NumTargets;
+				break;
+		}
+				e.predelay = pi[2] * scaling;
+				e.attack = pi[3] * scaling;
+				e.hold = pi[4] * scaling;
+				e.decay = pi[5] * scaling;
+				e.sustain = 1-pi[6] / 128.0f;
+				e.release = pi[7] * scaling;
+				if( e.target == instrumentSoundShaping::Volume )
+				{
+					e.amount = pi[1] ? 1 : 0;
+				}
+				else
+				{
+					e.amount = pi[8] / 128.0f;
+				}
+//				e.lfoAmount = pi[11] / 128.0f;
+				cc->envelopes.push_back( e );
+
+				printf( "envelope and lfo params:\n" );
 				dump_mem( text, text_len );
-				instrumentSoundShaping * iss = &it->m_soundShaping;
-				envelopeAndLFOParameters * elp = NULL;
-				switch( env_lfo_target )
-				{
-					case 1:
-		elp = iss->m_envLFOParameters[instrumentSoundShaping::Volume];
-		break;
-					case 2:
-		elp = iss->m_envLFOParameters[instrumentSoundShaping::Cut];
-		break;
-					case 3:
-		elp = iss->m_envLFOParameters[instrumentSoundShaping::Resonance];
-		break;
-					default:
-						break;
-				}
-				++env_lfo_target;
-				if( elp == NULL )
-				{
-					break;
-				}
-				const float scaling = 0.8f / 65536.0f;
-				elp->m_predelayModel.setValue( p[2] * scaling );
-				elp->m_attackModel.setValue( p[3] * scaling );
-				elp->m_holdModel.setValue( p[4] * scaling );
-				elp->m_decayModel.setValue( p[5] * scaling );
-				elp->m_sustainModel.setValue( p[6] * scaling );
-				elp->m_releaseModel.setValue( p[7] * scaling );
-				elp->m_amountModel.setValue( p[1] ? 1 : 0 );
-				elp->updateSampleVars();
+
 				break;
 			}
 
-			case FLP_FilterParams:
+			case FLP_Text_BasicChanParams:
+		cc->volume = ( pi[1] / p.versionSpecificFactor ) * 100 / 128;
+		cc->panning = ( pi[0] / p.versionSpecificFactor ) * 200 / 128 -
+								PanningRight;
+				if( text_len > 12 )
+				{
+			cc->filterType = mappedFilter[puc[20]];
+			cc->filterCut = puc[12] / ( 255.0f * 2.5f );
+			cc->filterRes = 0.01f + puc[16] / ( 256.0f * 2 );
+			cc->filterEnabled = ( puc[13] == 0 );
+			if( puc[20] >= 6 )
 			{
-				// TODO: Dirty hack!
-				// SIMPLE_FLT_CNT equals to old DOUBLE_LOWPASS
-				const basicFilters<>::filterTypes
-								mappedFilter[] =
-				{
-					basicFilters<>::LowPass,// fast LP
-					basicFilters<>::LowPass,
-					basicFilters<>::BandPass_CSG,
-					basicFilters<>::HiPass,
-					basicFilters<>::Notch,
-					basicFilters<>::NumOfFilters,
-					basicFilters<>::LowPass,
-					basicFilters<>::NumOfFilters
-				} ;
-				Uint32 * p = (Uint32 *) text;
-				instrumentSoundShaping * iss = &it->m_soundShaping;
-/*				printf( "filter values: " );
-				for( int i = 0; i < 6; ++i )
-				{
-					printf( "%d  ", ((Sint32*)text)[i] );
+				cc->filterCut *= 0.5f;
+			}
 				}
-				printf( "\n" );*/
-				iss->m_filterModel.setValue(
-							mappedFilter[p[5]] );
-				iss->m_filterCutModel.setValue( p[3] / 255.0f *
-					( iss->m_filterCutModel.maxValue() -
-					iss->m_filterCutModel.minValue() ) +
-					iss->m_filterCutModel.minValue() );
-				iss->m_filterResModel.setValue( p[4] / 1024.0f *
-					( iss->m_filterResModel.maxValue() -
-					iss->m_filterResModel.minValue() ) +
-					iss->m_filterResModel.minValue() );
-				iss->m_filterEnabledModel.setValue( p[3] < 256 );
+				printf( "basic chan params: " );
+				dump_mem( text, text_len );
+				break;
+
+			case FLP_Text_OldFilterParams:
+				cc->filterType = mappedFilter[puc[8]];
+				cc->filterCut = puc[0] / ( 255.0f * 2.5 );
+				cc->filterRes = 0.1f + puc[4] / ( 256.0f * 2 );
+				cc->filterEnabled = ( puc[1] == 0 );
+				if( puc[8] >= 6 )
+				{
+					cc->filterCut *= 0.5;
+				}
+				printf( "old filter params: " );
+				dump_mem( text, text_len );
+				break;
+
+			case FLP_Text_AutomationData:
+			{
+				const int bpae = 12;
+				const int imax = text_len / bpae;
+				printf( "automation data (%d items)\n", imax );
+				for( int i = 0; i < imax; ++i )
+				{
+					FL_Automation a;
+					a.pos = pi[3*i+0] /
+						( 4*ppq / DefaultTicksPerTact );
+					a.value = pi[3*i+2];
+					a.channel = pi[3*i+1] >> 16;
+					a.control = pi[3*i+1] & 0xffff;
+					if( a.channel >= 0 &&
+						a.channel < p.numChannels )
+					{
+printf("add channel %d at %d  val %d  control:%d\n", a.channel, a.pos, a.value, a.control );
+				p.channels[a.channel].automationData += a;
+					}
+//					dump_mem( text+i*bpae, bpae );
+				}
 				break;
 			}
 
-			case FLP_PatternNotes:
+			case FLP_Text_PatternNotes:
 			{
 				//dump_mem( text, text_len );
 				const int bpn = 20;
-				Uint32 imax = ( text_len + bpn - 1 ) / bpn;
-				for( Uint32 i = 0; i < imax; ++i )
+				const int imax = ( text_len + bpn - 1 ) / bpn;
+				for( int i = 0; i < imax; ++i )
 				{
-					int ch = *( text + i*bpn + 6 );
-					int pos = *( (int *)( text + i*bpn ) );
-					int key = *( text + i*bpn + 12 );
-					int len = *( (int*)( text + i*bpn +
+					int ch = *( puc + i*bpn + 6 );
+					int pan = *( puc + i*bpn + 16 );
+					int vol = *( puc + i*bpn + 17 );
+					int pos = *( (int *)( puc + i*bpn ) );
+					int key = *( puc + i*bpn + 12 );
+					int len = *( (int*)( puc + i*bpn +
 									8 ) );
-					pos /= 384 / DefaultTicksPerTact;
-					len /= 384 / DefaultTicksPerTact;
-					note n( len, pos );
-					n.setKey( key );
-					m_notes.push_back( qMakePair(
-				num_channels * current_pattern + ch, n ) );
-				
-					//printf( "note on channel %d at pos %d with key %d and length %d   ", (int)*((text+i*bpn+6)), *((int*)(text+i*bpc)), (int) *(text+i*bpc+12), (int) *((int*)(text+i*bpc+8)));
-					//printf( "note on channel %d at pos %d with key %d and length %d\n", ch, pos, key, len );
-					
-					//dump_mem( text+i*bpn+4, bpc-4 );
+					pos /= (4*ppq) / DefaultTicksPerTact;
+					len /= (4*ppq) / DefaultTicksPerTact;
+					note n( len, pos, key, vol * 100 / 128,
+							pan*200 / 128 - 100 );
+	p.channels[ch].notes.push_back( qMakePair( p.currentPattern, n ) );
+					printf( "note: " );
+					dump_mem( text+i*bpn, bpn );
 				}
 				break;
 			}
 
-			case FLP_StepData:
+			case FLP_Text_ChanGroupName:
+				printf( "channel group name: %s\n", text );
+				break;
+
+			// case 216: pi[2] /= p.versionSpecificFactor
+			// case 229: pi[1] /= p.versionSpecificFactor
+
+			case 225:
 			{
-				printf( "step data:\n" );
-				dump_mem( text, text_len );
-#if 0
-				const int bpn = 20;
-				for( int i = 0; i*bpn < text_len; ++i )
+				enum FLP_EffectParams
 				{
-					int ch = *( text + i*bpn + 6 );
-					int pos = *( (int *)( text + i*bpn ) );
-					int key = *( text + i*bpn + 12 );
-					int len = *( (int*)( text + i*bpn +
-									8 ) );
-					pos /= 512 / DefaultTicksPerTact;
-					len /= 512 / DefaultTicksPerTact;
-					/*note n( NULL, len, pos );
-					n.setKey( key );
-					m_notes.push_back( qMakePair(
-				num_channels * current_pattern + ch, n ) );*/
-				
-					//printf( "note on channel %d at pos %d with key %d and length %d   ", (int)*((text+i*bpn+6)), *((int*)(text+i*bpc)), (int) *(text+i*bpc+12), (int) *((int*)(text+i*bpc+8)));
-					//printf( "step-note (?) on channel %d at pos %d with key %d and length %d\n", ch, pos, key, len );
-					
-					dump_mem( text+i*bpn, bpn );
+					EffectParamVolume = 0x1fc0
+				} ;
+
+				const int bpi = 12;
+				const int imax = text_len / bpi;
+				for( int i = 0; i < imax; ++i )
+				{
+					const int param = pi[i*3+1] & 0xffff;
+					const int ch = ( pi[i*3+1] >> 22 )
+									& 0x7f;
+					if( ch < 0 || ch > NumFxChannels )
+					{
+						continue;
+					}
+					const int val = pi[i*3+2];
+					if( param == EffectParamVolume )
+					{
+p.effectChannels[ch].volume = ( val / p.versionSpecificFactor ) * 100 / 128;
+					}
+					else
+					{
+printf("FX-ch: %d  param: %x  value:%x\n", ch, param, val );
+					}
 				}
-#endif
+				break;
+			}
+
+			case 233:	// playlist items
+			{
+				const int bpi = 28;
+				const int imax = text_len / bpi;
+				for( int i = 0; i < imax; ++i )
+				{
+const int pos = pi[i*bpi/sizeof(int)+0] / ( (4*ppq) / DefaultTicksPerTact );
+const int len = pi[i*bpi/sizeof(int)+2] / ( (4*ppq) / DefaultTicksPerTact );
+const int pat = pi[i*bpi/sizeof(int)+3] & 0xfff;
+if( pat > 2146 && pat <= 2278 )	// whatever these magic numbers are for...
+{
+	FL_PlayListItem i;
+	i.position = pos;
+	i.length = len;
+	i.pattern = 2278 - pat;
+	p.playListItems += i;
+}
+else
+{
+	printf( "playlist item: " );
+	dump_mem( text+i*bpi, bpi );
+}
+				}
 				break;
 			}
 
@@ -762,7 +1389,7 @@ bool flpImport::tryImport( trackContainer * _tc )
 				if( ev >= FLP_Text )
 				{
 					printf( "!! unhandled text (ev: %d, "
-							"len: %d):\n",
+							"len: %d): ",
 							ev, text_len );
 					dump_mem( text, text_len );
 				}
@@ -774,96 +1401,415 @@ bool flpImport::tryImport( trackContainer * _tc )
 				}
 				break;
 		}
+/*		if( ev >= FLP_Text )
+		{
+			printf( "dump (ev: %d, len: %d): ", ev, text_len );
+			dump_mem( text, text_len );
+		}*/
         }
 
-	// process all steps
-	for( stepVector::const_iterator it = m_steps.begin();
-						it != m_steps.end(); ++it )
+
+	// now create a project from FL_Project data structure
+
+	engine::getSong()->clearProject();
+
+	// set global parameters
+	engine::getSong()->setMasterVolume( p.mainVolume );
+	engine::getSong()->setMasterPitch( p.mainPitch );
+	engine::getSong()->setTempo( p.tempo );
+
+	// set project notes
+	engine::getProjectNotes()->setText( p.projectNotes );
+
+
+	progressDialog.setMaximum( p.maxPatterns + p.channels.size() +
+							p.effects.size() );
+	int cur_progress = 0;
+
+	// create BB tracks
+	QList<bbTrack *> bb_tracks;
+	QList<instrumentTrack *> i_tracks;
+
+	while( engine::getBBTrackContainer()->numOfBBs() <= p.maxPatterns )
 	{
-		const int ch = ( *it ) >> 16;
-		const int pat = ( ( *it ) & 0xffff ) / 16;
-		const int pos = ( ( ( *it ) & 0xffff ) % 16 ) *
-						(DefaultTicksPerTact/16);
-		while( engine::getBBTrackContainer()->numOfBBs() <= pat )
+		const int cur_pat = bb_tracks.size();
+		bbTrack * bbt = dynamic_cast<bbTrack *>(
+			track::create( track::BBTrack, engine::getSong() ) );
+		if( p.patternNames.contains( cur_pat ) )
 		{
-			track::create( track::BBTrack, engine::getSong() );
+			bbt->setName( p.patternNames[cur_pat] );
 		}
-		pattern * p = dynamic_cast<pattern *>(
-						i_tracks[ch]->getTCO( pat ) );
-		if( p == NULL )
-		{
-			continue;
-		}
-		p->addNote( note( -DefaultTicksPerTact, pos ), FALSE );
+		bb_tracks += bbt;
+		progressDialog.setValue( ++cur_progress );
+		qApp->processEvents();
 	}
 
-	// now process all notes
-	for( patternNoteVector::const_iterator it = m_notes.begin();
-						it != m_notes.end(); ++it )
+	// create instrument-track for each channel
+	for( QList<FL_Channel>::iterator it = p.channels.begin();
+						it != p.channels.end(); ++it )
 	{
-		const int where = ( *it ).first;
-		const int ch = where % num_channels;
-		const int pat = where / num_channels;
-		if( pat > 100 )
+		instrumentTrack * t = dynamic_cast<instrumentTrack *>(
+			track::create( track::InstrumentTrack,
+					engine::getBBTrackContainer() ) );
+		engine::getBBTrackContainer()->updateAfterTrackAdd();
+		i_tracks.push_back( t );
+		switch( it->pluginType )
+		{
+			case FL_Plugin::Fruity_3x_Osc:
+				it->instrumentPlugin =
+					t->loadInstrument( "tripleoscillator" );
+				break;
+			case FL_Plugin::Plucked:
+				it->instrumentPlugin =
+					t->loadInstrument( "vibedstrings" );
+				break;
+			case FL_Plugin::FruitKick:
+				it->instrumentPlugin =
+					t->loadInstrument( "kicker" );
+				break;
+			case FL_Plugin::TS404:
+				it->instrumentPlugin =
+					t->loadInstrument( "lb302" );
+				break;
+			case FL_Plugin::FruitySoundfontPlayer:
+				it->instrumentPlugin =
+					t->loadInstrument( "sf2player" );
+				break;
+			case FL_Plugin::Sampler:
+			case FL_Plugin::UnknownPlugin:
+			default:
+				it->instrumentPlugin =
+					t->loadInstrument(
+							"audiofileprocessor" );
+				break;
+		}
+		processPluginParams( &( *it ) );
+
+		t->setName( it->name );
+		t->volumeModel()->setValue( it->volume );
+		t->panningModel()->setValue( it->panning );
+		t->baseNoteModel()->setValue( it->baseNote );
+		t->effectChannelModel()->setValue( it->fxChannel );
+
+		instrumentSoundShaping * iss = &t->m_soundShaping;
+		iss->m_filterModel.setValue( it->filterType );
+		iss->m_filterCutModel.setValue( it->filterCut *
+			( iss->m_filterCutModel.maxValue() -
+				iss->m_filterCutModel.minValue() ) +
+					iss->m_filterCutModel.minValue() );
+		iss->m_filterResModel.setValue( it->filterRes *
+			( iss->m_filterResModel.maxValue() -
+				iss->m_filterResModel.minValue() ) +
+					iss->m_filterResModel.minValue() );
+		iss->m_filterEnabledModel.setValue( it->filterEnabled );
+
+		for( QList<FL_Channel_Envelope>::iterator jt =
+							it->envelopes.begin();
+					jt != it->envelopes.end(); ++jt )
+		{
+			if( jt->target != instrumentSoundShaping::NumTargets )
+			{
+				envelopeAndLFOParameters * elp =
+					iss->m_envLFOParameters[jt->target];
+
+				elp->m_predelayModel.setValue( jt->predelay );
+				elp->m_attackModel.setValue( jt->attack );
+				elp->m_holdModel.setValue( jt->hold );
+				elp->m_decayModel.setValue( jt->decay );
+				elp->m_sustainModel.setValue( jt->sustain );
+				elp->m_releaseModel.setValue( jt->release );
+				elp->m_amountModel.setValue( jt->amount );
+				elp->updateSampleVars();
+			}
+		}
+
+		arpeggiator * arp = &t->m_arpeggiator;
+		arp->m_arpDirectionModel.setValue( it->arpDir );
+		arp->m_arpRangeModel.setValue( it->arpRange );
+		arp->m_arpModel.setValue( it->selectedArp );
+		arp->m_arpTimeModel.setValue( it->arpTime );
+		arp->m_arpGateModel.setValue( it->arpGate );
+		arp->m_arpEnabledModel.setValue( it->arpEnabled );
+
+		// process all dots
+		for( QList<int>::const_iterator jt = it->dots.begin();
+						jt != it->dots.end(); ++jt )
+		{
+			const int pat = *jt / 256;
+			const int pos = *jt % 256;
+			pattern * p =
+				dynamic_cast<pattern *>( t->getTCO( pat ) );
+			if( p == NULL )
+			{
+				continue;
+			}
+			p->setStep( pos, true );
+		}
+
+		// TODO: use future layering feature
+		if( it->layerParent >= 0 )
+		{
+			it->notes += p.channels[it->layerParent].notes;
+		}
+
+		// process all notes
+		for( FL_Channel::noteVector::const_iterator jt =
+							it->notes.begin();
+						jt != it->notes.end(); ++jt )
+		{
+			const int pat = jt->first;
+
+			if( pat > 100 )
+			{
+				continue;
+			}
+			pattern * p = dynamic_cast<pattern *>(
+							t->getTCO( pat ) );
+			if( p != NULL )
+			{
+				p->addNote( jt->second, false );
+			}
+		}
+
+		// process automation data
+		for( QList<FL_Automation>::const_iterator jt =
+						it->automationData.begin();
+					jt != it->automationData.end(); ++jt )
+		{
+			automatableModel * m = NULL;
+			float value = jt->value;
+			bool scale = false;
+			switch( jt->control )
+			{
+				case FL_Automation::ControlVolume:
+					m = t->volumeModel();
+					value *= ( 100.0f / 128.0f ) /
+							p.versionSpecificFactor;
+					break;
+				case FL_Automation::ControlPanning:
+					m = t->panningModel();
+	value = ( value / p.versionSpecificFactor ) *200/128 - PanningRight;
+					break;
+				case FL_Automation::ControlPitch:
+					m = t->pitchModel();
+					break;
+				case FL_Automation::ControlFXChannel:
+					m = t->effectChannelModel();
+					value = value*200/128 - PanningRight;
+					break;
+				case FL_Automation::ControlFilterCut:
+					scale = true;
+					m = &t->m_soundShaping.m_filterCutModel;
+					value /= ( 255 * 2.5f );
+					break;
+				case FL_Automation::ControlFilterRes:
+					scale = true;
+					m = &t->m_soundShaping.m_filterResModel;
+					value = 0.1f + value / ( 256.0f * 2 );
+					break;
+				case FL_Automation::ControlFilterType:
+					m = &t->m_soundShaping.m_filterModel;
+					value = mappedFilter[jt->value];
+					break;
+				default:
+					printf( "handling automation data of "
+						"control %d not implemented "
+						"yet\n", jt->control );
+					break;
+			}
+			if( m )
+			{
+if( scale )
+{
+	value = m->minValue<float>() + value *
+				( m->maxValue<float>() - m->minValue<float>() );
+}
+automationPattern * p = automationPattern::globalAutomationPattern( m );
+p->putValue( jt->pos, value, false );
+			}
+		}
+
+		progressDialog.setValue( ++cur_progress );
+		qApp->processEvents();
+	}
+
+	// process all effects
+	effectKeyList effKeys;
+        QVector<plugin::descriptor> pluginDescs;
+	plugin::getDescriptorsOfAvailPlugins( pluginDescs );
+	for( QVector<plugin::descriptor>::iterator it = pluginDescs.begin();
+					it != pluginDescs.end(); ++it )
+	{
+		if( it->type != plugin::Effect )
 		{
 			continue;
 		}
-		while( engine::getBBTrackContainer()->numOfBBs() <= pat )
+		if( it->sub_plugin_features )
 		{
-			track::create( track::BBTrack, engine::getSong() );
-			qApp->processEvents( QEventLoop::AllEvents, 100 );
+			it->sub_plugin_features->listSubPluginKeys(
+							&( *it ), effKeys );
 		}
-		pattern * p = dynamic_cast<pattern *>(
-						i_tracks[ch]->getTCO( pat ) );
-		if( p != NULL )
+		else
 		{
-			p->addNote( ( *it ).second, FALSE );
+			effKeys << effectKey( &( *it ), it->name );
+
 		}
 	}
+
+	for( int fx_ch = 0; fx_ch <= NumFxChannels ; ++fx_ch )
+	{
+		fxChannel * ch = engine::getFxMixer()->getEffectChannel(
+									fx_ch );
+		if( !ch )
+		{
+			continue;
+		}
+		FL_EffectChannel * flch = &p.effectChannels[fx_ch];
+		if( !flch->name.isEmpty() )
+		{
+			ch->m_name = flch->name;
+		}
+		ch->m_volumeModel.setValue( flch->volume / 100.0f );
+		ch->m_muteModel.setValue( flch->isMuted );
+	}
+
+	for( QList<FL_Effect>::const_iterator it = p.effects.begin();
+						it != p.effects.end(); ++it )
+	{
+		QString effName;
+		switch( it->pluginType )
+		{
+			case FL_Plugin::Fruity7BandEq:
+				effName = "C* Eq2x2";
+				break;
+			case FL_Plugin::FruityBassBoost:
+				effName = "BassBooster";
+				break;
+			case FL_Plugin::FruityChorus:
+				effName = "TAP Chorus";
+				break;
+			case FL_Plugin::FruityCompressor:
+				//effName = "C* Compress";
+				effName = "Fast Lookahead limiter";
+				break;
+			case FL_Plugin::FruityDelay:
+			case FL_Plugin::FruityDelay2:
+//				effName = "Feedback Delay Line (Maximum Delay 5s)";
+				break;
+			case FL_Plugin::FruityBloodOverdrive:
+			case FL_Plugin::FruityFastDist:
+			case FL_Plugin::FruitySoftClipper:
+				effName = "C* Clip";
+				break;
+			case FL_Plugin::FruityFastLP:
+				effName = "Low Pass Filter";
+				break;
+			case FL_Plugin::FruityPhaser:
+				effName = "C* PhaserI";
+				break;
+			case FL_Plugin::FruityReeverb:
+				effName = "C* Plate2x2";
+				break;
+			case FL_Plugin::FruitySpectroman:
+				effName = "Spectrum Analyzer";
+				break;
+			default:
+				break;
+		}
+		if( effName.isEmpty() || it->fxChannel < 0 ||
+							it->fxChannel > 64 )
+		{
+			continue;
+		}
+		effectChain * ec = engine::getFxMixer()->getEffectChain(
+								it->fxChannel );
+		printf("adding %s to %d\n", effName.toAscii().constData(),
+								it->fxChannel );
+		for( effectKeyList::iterator jt = effKeys.begin();
+						jt != effKeys.end(); ++jt )
+		{
+			if( QString( jt->desc->displayName ).
+							contains( effName ) ||
+				( jt->desc->sub_plugin_features != NULL &&
+					jt->name.contains( effName ) ) )
+			{
+				printf("instantiate %s\n", jt->desc->name );
+				effect * e = effect::instantiate(
+						jt->desc->name, ec, &( *jt ) );
+				ec->appendEffect( e );
+				ec->setEnabled( true );
+				break;
+			}
+		}
+
+		progressDialog.setValue( ++cur_progress );
+		qApp->processEvents();
+	}
+
+
 
 	// process all playlist-items
-	for( playListItems::const_iterator it = m_plItems.begin();
-						it != m_plItems.end(); ++it )
+	for( QList<FL_PlayListItem>::const_iterator it =
+							p.playListItems.begin();
+					it != p.playListItems.end(); ++it )
 	{
-		int pat_num = ( ( *it ) >> 16 ) - 1;
-		if( pat_num > 100 )
+		if( it->pattern > p.maxPatterns )
 		{
 			continue;
 		}
-		while( engine::getBBTrackContainer()->numOfBBs() <= pat_num )
+		trackContentObject * tco =
+			bb_tracks[it->pattern]->createTCO( midiTime() );
+		tco->movePosition( it->position );
+		if( it->length != DefaultTicksPerTact )
 		{
-			track::create( track::BBTrack, engine::getSong() );
-			qApp->processEvents( QEventLoop::AllEvents, 100 );
+			tco->changeLength( it->length );
 		}
-		
-		bbTrack * bbt = bbTrack::findBBTrack( pat_num );
-		trackContentObject * tco = bbt->addTCO( bbt->createTCO( 0 ) );
-		tco->movePosition( midiTime( ( ( *it ) & 0xffff ) *
-							DefaultTicksPerTact ) );
 	}
 
-	if( project_cur_pat < engine::getBBTrackContainer()->numOfBBs() )
+
+
+	// set current pattern
+	if( p.activeEditPattern < engine::getBBTrackContainer()->numOfBBs() )
 	{
-		engine::getBBTrackContainer()->setCurrentBB( project_cur_pat );
+		engine::getBBTrackContainer()->setCurrentBB(
+							p.activeEditPattern );
 	}
 
+	// restore journalling settings
 	engine::getProjectJournal()->setJournalling( is_journ );
-        return( TRUE );
+
+        return true;
 }
 
 
 
 
-bool flpImport::processPluginParams( const flPlugins _plugin,
-					const char * _data,
-					const int _data_len, instrument * _i )
+void flpImport::processPluginParams( FL_Channel * _ch )
 {
-	printf( "plugin params for plugin %d (%d bytes): ", _plugin,
-								_data_len );
-	dump_mem( _data, _data_len );
-	switch( _plugin )
+	printf( "plugin params for plugin %d (%d bytes): ", _ch->pluginType,
+						_ch->pluginSettingsLength );
+	dump_mem( _ch->pluginSettings, _ch->pluginSettingsLength );
+	switch( _ch->pluginType )
 	{
-		case FL_Plugin_3x_Osc:
+		case FL_Plugin::Sampler:	// AudioFileProcessor loaded
+		{
+			QDomDocument dd;
+			QDomElement de = dd.createElement(
+					_ch->instrumentPlugin->nodeName() );
+			de.setAttribute( "reversed", _ch->sampleReversed );
+			de.setAttribute( "amp", _ch->sampleAmp );
+			de.setAttribute( "looped", _ch->sampleUseLoopPoints );
+			de.setAttribute( "sframe", 0 );
+			de.setAttribute( "eframe", 1 );
+			de.setAttribute( "src", _ch->sampleFileName );
+			_ch->instrumentPlugin->restoreState( de );
+			break;
+		}
+
+		case FL_Plugin::TS404:		// LB302 loaded
+			break;
+
+		case FL_Plugin::Fruity_3x_Osc:	// TripleOscillator loaded
 		{
 			const oscillator::WaveShapes mapped_3xOsc_Shapes[] =
 			{
@@ -877,16 +1823,19 @@ bool flpImport::processPluginParams( const flPlugins _plugin,
 			} ;
 
 			QDomDocument dd;
-			QDomElement de = dd.createElement( _i->nodeName() );
+			QDomElement de = dd.createElement(
+					_ch->instrumentPlugin->nodeName() );
 			de.setAttribute( "modalgo1", oscillator::SignalMix );
 			de.setAttribute( "modalgo2", oscillator::SignalMix );
-			for( Uint8 i = 0; i < 3; ++i )
+			int ws = oscillator::UserDefinedWave;
+			for( int i = 0; i < 3; ++i )
 			{
-				const Sint32 * d = (const Sint32 *)( _data +
-								i * 28 );
+				const Sint32 * d = (const Sint32 *)
+					( _ch->pluginSettings + i * 28 );
 				QString is = QString::number( i );
 				de.setAttribute( "vol" + is,
-					QString::number( d[0] * 100 / 128 ) );
+					QString::number( d[0] * 100 /
+								( 3 * 128 ) ) );
 				de.setAttribute( "pan" + is,
 						QString::number( d[1] ) );
 				de.setAttribute( "coarse" + is,
@@ -897,28 +1846,39 @@ bool flpImport::processPluginParams( const flPlugins _plugin,
 					QString::number( d[4] + d[6] / 2 ) );
 				de.setAttribute( "stphdetun" + is,
 						QString::number( d[5] ) );
+				const int s = mapped_3xOsc_Shapes[d[2]];
 				de.setAttribute( "wavetype" + is,
-					QString::number(
-						mapped_3xOsc_Shapes[d[2]] ) );
+					QString::number( s ) );
+				if( s != oscillator::UserDefinedWave )
+				{
+					ws = s;
+				}
 			}
-			de.setAttribute( "vol0", QString::number( 100 ) );
+			if( ws == oscillator::UserDefinedWave )
+			{
+				de.setAttribute( "wavetype0",
+							oscillator::SawWave );
+			}
+			de.setAttribute( "vol0", QString::number( 100/2 ) );
 			// now apply the prepared plugin-state
-			_i->restoreState( de );
+			_ch->instrumentPlugin->restoreState( de );
 			break;
 		}
 
-		case FL_Plugin_Plucked:
-		{
+		case FL_Plugin::Layer:
+			// nothing to do
+			break;
+
+		case FL_Plugin::Plucked:	// Vibed loaded
 			// TODO: setup vibed-instrument
 			break;
-		}
 
+		case FL_Plugin::UnknownPlugin:
 		default:
 			printf( "handling of plugin params not implemented "
 					"for current plugin\n" );
 			break;
 	}
-	return( TRUE );
 }
 
 
@@ -930,23 +1890,8 @@ extern "C"
 // neccessary for getting instance out of shared lib
 plugin * PLUGIN_EXPORT lmms_plugin_main( model *, void * _data )
 {
-	return( new flpImport( static_cast<const char *>( _data ) ) );
+	return new flpImport( static_cast<const char *>( _data ) );
 }
-
-
-// include unrtf-source
-#include "attr.c"
-#include "convert.c"
-#include "error.c"
-#include "hash.c"
-#include "html.c"
-#include "malloc.c"
-#include "output.c"
-#include "parse.c"
-#include "util.c"
-#include "word.c"
 
 }
 
-
-#undef setValue
