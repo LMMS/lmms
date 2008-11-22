@@ -712,7 +712,7 @@ void mixer::bufferToPort( const sampleFrame * _buf,
 void mixer::clearAudioBuffer( sampleFrame * _ab, const f_cnt_t _frames,
 							const f_cnt_t _offset )
 {
-	if( likely( (int)( _ab+_offset ) % 16 == 0 && _frames % 8 == 0 ) )
+	if( likely( (size_t)( _ab+_offset ) % 16 == 0 && _frames % 8 == 0 ) )
 	{
 		alignedMemClear( _ab+_offset, sizeof( *_ab ) * _frames );
 	}
