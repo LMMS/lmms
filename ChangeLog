@@ -1,5 +1,9 @@
 2008-11-22	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* src/core/automatable_model.cpp:
+	fixed wrong logic in automatableModel::setValue() which led to bugs when
+	changing linked controls to 0
+
 	* src/gui/file_browser.cpp:
 	do not allow to import unhandled file types, e.g. ZynAddSubFX presets if
 	plugin is not available (closes #2326384)

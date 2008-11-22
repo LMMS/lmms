@@ -83,7 +83,7 @@ automatableModel::~automatableModel()
 
 bool automatableModel::isAutomated( void ) const
 {
-	return( automationPattern::isAutomated( this ) );
+	return automationPattern::isAutomated( this );
 }
 
 
@@ -193,12 +193,12 @@ void automatableModel::setValue( const float _value )
 				it != m_linkedModels.end(); ++it )
 		{
 			if( (*it)->m_setValueDepth < 1 &&
-				!(*it)->fittedValue( m_value ) !=
+				(*it)->fittedValue( _value ) !=
 							 (*it)->m_value )
 			{
 				bool journalling = (*it)->testAndSetJournalling(
 							isJournalling() );
-				(*it)->setValue( m_value );
+				(*it)->setValue( _value );
 				(*it)->setJournalling( journalling );
 			}
 		}
