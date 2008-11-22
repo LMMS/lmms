@@ -613,7 +613,7 @@ void fileBrowserTreeWidget::activateListItem( QTreeWidgetItem * _item,
 	{
 		handleFile( f, NULL );
 	}
-	else
+	else if( f->handling() != fileItem::NotSupported )
 	{
 		engine::getMixer()->lock();
 		instrumentTrack * it = dynamic_cast<instrumentTrack *>(
@@ -964,10 +964,15 @@ void fileItem::determineFileType( void )
 		m_type = ProjectFile;
 		m_handling = LoadAsProject;
 	}
-	else if( ext == "xpf" || ext == "xml" || ext == "xiz" )
+	else if( ext == "xpf" || ext == "xml" )
 	{
 		m_type = PresetFile;
 		m_handling = LoadAsPreset;
+	}
+	else if( ext == "xiz" && engine::pluginFileHandling().contains( ext ) )
+	{
+		m_type = PresetFile;
+		m_handling = LoadByPlugin;
 	}
 	else if( ext == "sf2" )
 	{
