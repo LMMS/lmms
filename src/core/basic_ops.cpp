@@ -333,7 +333,7 @@ void alignedBufMixLRCoeffSSE( sampleFrameA * RP _dst, const sampleFrameA * RP _s
 void unalignedBufMixLRCoeffSSE( sampleFrame * RP _dst, const sampleFrame * RP _src, const float _left, const float _right, int _frames );
 void alignedBufWetDryMixSSE( sampleFrameA * RP _dst, const sampleFrameA * RP _src, float _wet, float _dry, int _frames );
 void alignedBufWetDryMixSplittedSSE( sampleFrameA * RP _dst, const float * RP _left, const float * RP _right, float _wet, float _dry, int _frames );
-#ifdef LMMS_HOST_X86
+#ifdef X86_OPTIMIZATIONS
 void alignedMemCpySSE2( void * RP _dst, const void * RP _src, int _size );
 void alignedMemClearSSE2( void * RP _dst, int _size );
 int alignedConvertToS16SSE2( const sampleFrameA * RP _src, intSampleFrameA * RP _dst, const fpp_t _frames, const float _master_gain, const bool _convert_endian );
