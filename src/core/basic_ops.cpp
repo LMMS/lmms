@@ -350,6 +350,11 @@ void initBasicOps( void )
 	if( extensions_checked == false )
 	{
 		int features = 0;
+#if defined(__x86_64__) || defined(Q_OS_WIN64)
+		features = MMX | SSE | SSE2 | CMOV;
+#elif defined(__ia64__)
+		features = MMX | SSE | SSE2;
+#else
 		unsigned int result = 0;
 		unsigned int extended_result = 0;
 		asm(	"push %%ebx\n"
@@ -418,6 +423,7 @@ void initBasicOps( void )
 			features |= SSE;
 		if( result & (1u << 26) )
 			features |= SSE2;
+#endif
 
 #ifdef LMMS_HOST_X86
 		if( features & MMX )
