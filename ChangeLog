@@ -1,3 +1,12 @@
+2008-11-24	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* src/core/basic_ops.cpp:
+	fixed alignedMemCpyNoOpt
+
+	* src/core/audio/audio_alsa.cpp:
+	fixed pointer additions leading to horrible noises under certain
+	circumstances
+
 2008-11-23	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/core/basic_ops.cpp:

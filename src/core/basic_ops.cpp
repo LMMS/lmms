@@ -83,7 +83,7 @@ void alignedFreeFrames( sampleFrame * _buf )
 // slow fallback
 void alignedMemCpyNoOpt( void * RP _dst, const void * RP _src, int _size )
 {
-	const int s = _size / ( sizeof( int ) * 16 );
+	const int s = _size / sizeof( int );
 	const int * RP src = (const int *) _src;
 	int * RP dst = (int *) _dst;
 	for( int i = 0; i < s; )
