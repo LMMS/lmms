@@ -1,3 +1,11 @@
+2008-11-24	Andrew Kelley	<superjoe30/at/gmail/dot/com>
+
+	* src/core/basic_ops.cpp:
+	* include/note.h:
+	* include/pattern.h:
+	* src/tracks/pattern.cpp:
+	fixed piano roll not playing notes glitch
+
 2008-11-24	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/core/basic_ops.cpp:

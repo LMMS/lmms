@@ -100,11 +100,13 @@ public:
 	void quantizeLength( const int _q_grid );
 	void quantizePos( const int _q_grid );
 
-	inline bool operator<(const note & rhs)
+	static inline bool lessThan(note * &lhs, note * &rhs)
 	{
-		return m_pos < rhs.pos();
+		// function to compare two notes - must be called explictly when
+		// using qSort
+		return (bool) ((int) ( *lhs ).pos() < (int) ( *rhs ).pos());
 	}
-
+		
 	inline bool getSelected( void ) const
 	{
 		return m_selected;

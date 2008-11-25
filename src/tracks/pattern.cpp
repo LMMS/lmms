@@ -34,6 +34,8 @@
 #include <QtGui/QPainter>
 #include <QtGui/QProgressBar>
 #include <QtGui/QPushButton>
+#include <QtAlgorithms>
+
 
 
 #include "pattern.h"
@@ -94,8 +96,6 @@ pattern::pattern( const pattern & _pat_to_copy ) :
 
 	init();
 }
-
-
 
 
 pattern::~pattern()
@@ -181,6 +181,17 @@ midiTime pattern::beatPatternLength( void ) const
 	return midiTime( max_length ).nextFullTact() * midiTime::ticksPerTact();
 }
 
+
+
+void pattern::printNotes( void )
+{
+	for( noteVector::iterator it = m_notes.begin(); it != m_notes.end();
+									++it )
+	{
+		printf("note (pos = %i)\n", (int) ( *it )->pos() );
+	}
+	printf("\n");
+}
 
 
 
@@ -270,14 +281,11 @@ note * pattern::rearrangeNote( const note * _note_to_proc,
 
 
 
-
 void pattern::rearrangeAllNotes( void )
 {
 	// sort notes by start time	
-	qSort(m_notes.begin(), m_notes.end());
-	
+	qSort(m_notes.begin(), m_notes.end(), note::lessThan );
 }
-
 
 
 
