@@ -45,6 +45,7 @@ public:
 		ClipboardData,
 		JournalData,
 		EffectSettings,
+		ResourcesDatabase,
 		VideoProject,		// might come later...
 		BurnProject,		// might come later...
 		Playlist,		// might come later...
@@ -64,16 +65,16 @@ public:
 
 	inline QDomElement & content( void )
 	{
-		return( m_content );
+		return m_content;
 	}
 	inline QDomElement & head( void )
 	{
-		return( m_head );
+		return m_head;
 	}
 
 	inline ProjectTypes type( void ) const
 	{
-		return( m_type );
+		return m_type;
 	}
 
 	static ProjectTypes typeOfFile( const QString & _fn );

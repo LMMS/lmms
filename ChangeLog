@@ -1,5 +1,10 @@
 2008-11-28	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* include/mmp.h:
+	* src/core/mmp.cpp:
+	- added new file typ "ResourcesDatabase"
+	- impoved code style
+
 	* CMakeLists.txt:
 	bumped version to 0.9.0 development series
 

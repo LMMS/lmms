@@ -53,6 +53,7 @@ multimediaProject::typeDescStruct
 	{ multimediaProject::ClipboardData, "clipboard-data" },
 	{ multimediaProject::JournalData, "journaldata" },
 	{ multimediaProject::EffectSettings, "effectsettings" },
+	{ multimediaProject::ResourcesDatabase, "resourcesdatabase" },
 	{ multimediaProject::VideoProject, "videoproject" },
 	{ multimediaProject::BurnProject, "burnproject" },
 	{ multimediaProject::Playlist, "playlist" }
@@ -92,7 +93,7 @@ multimediaProject::multimediaProject( const QString & _in_file_name,
 	m_head()
 {
 	QFile in_file( _in_file_name );
-	if( _is_filename == TRUE )
+	if( _is_filename == true )
 	{
 		if( !in_file.open( QIODevice::ReadOnly ) )
 		{
@@ -113,9 +114,9 @@ multimediaProject::multimediaProject( const QString & _in_file_name,
 	QString error_msg;
 	int line;
 	int col;
-	if( _is_filename == TRUE )
+	if( _is_filename == true )
 	{
-		bool error = FALSE;
+		bool error = false;
 		if( _in_file_name.section( '.', -1 ) == "mmpz" )
 		{
 			QString data = qUncompress( in_file.readAll() );
@@ -187,26 +188,26 @@ QString multimediaProject::nameWithExtension( const QString & _fn ) const
 				if( configManager::inst()->value( "app",
 						"nommpz" ).toInt() == 0 )
 				{
-					return( _fn + ".mmpz" );
+					return _fn + ".mmpz";
 				}
-				return( _fn + ".mmp" );
+				return _fn + ".mmp";
 			}
 			break;
 		case SongProjectTemplate:
 			if( _fn.section( '.',-1 ) != "mpt" )
 			{
-				return( _fn + ".mpt" );
+				return _fn + ".mpt";
 			}
 			break;
 		case InstrumentTrackSettings:
 			if( _fn.section( '.', -1 ) != "xpf" )
 			{
-				return( _fn + ".xpf" );
+				return _fn + ".xpf";
 			}
 			break;
 		default: ;
 	}
-	return( _fn );
+	return _fn;
 }
 
 
@@ -236,7 +237,7 @@ bool multimediaProject::writeFile( const QString & _fn )
 							"the file and try "
 							"again."
 						).arg( fn ) );
-		return( FALSE );
+		return false;
 	}
 	QString xml = "<?xml version=\"1.0\"?>\n" + toString( 2 );
 	if( fn.section( '.', -1 ) == "mmpz" )
@@ -249,7 +250,7 @@ bool multimediaProject::writeFile( const QString & _fn )
 	}
 	outfile.close();
 
-	return( TRUE );
+	return true;
 }
 
 
@@ -258,8 +259,8 @@ bool multimediaProject::writeFile( const QString & _fn )
 multimediaProject::ProjectTypes multimediaProject::typeOfFile(
 							const QString & _fn )
 {
-	multimediaProject m( _fn, TRUE, FALSE );
-	return( m.type() );
+	multimediaProject m( _fn, true, false );
+	return m.type();
 }
 
 
@@ -272,15 +273,14 @@ multimediaProject::ProjectTypes multimediaProject::type(
 	{
 		if( s_types[i].m_name == _type_name )
 		{
-			return( static_cast<multimediaProject::ProjectTypes>(
-									i ) );
+			return static_cast<multimediaProject::ProjectTypes>( i );
 		}
 	}
 	if( _type_name == "channelsettings" )
 	{
-		return( multimediaProject::InstrumentTrackSettings );
+		return multimediaProject::InstrumentTrackSettings;
 	}
-	return( UnknownType );
+	return UnknownType;
 }
 
 
@@ -290,9 +290,9 @@ QString multimediaProject::typeName( ProjectTypes _project_type )
 {
 	if( _project_type >= UnknownType && _project_type < NumProjectTypes )
 	{
-		return( s_types[_project_type].m_name );
+		return s_types[_project_type].m_name;
 	}
-	return( s_types[UnknownType].m_name );
+	return s_types[UnknownType].m_name;
 }
 
 
@@ -463,7 +463,7 @@ void multimediaProject::upgrade( void )
 			}
 			else if( !el.hasAttribute( "chord-enabled" ) )
 			{
-				el.setAttribute( "chord-enabled", TRUE );
+				el.setAttribute( "chord-enabled", true );
 				el.setAttribute( "arp-enabled",
 					el.attribute( "arpdir" ).toInt() != 0 );
 			}
