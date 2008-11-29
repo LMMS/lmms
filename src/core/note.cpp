@@ -69,9 +69,9 @@ note::note( const note & _note ) :
 	m_volume( _note.m_volume ),
 	m_panning( _note.m_panning ),
 	m_length( _note.m_length ),
-	m_pos( _note.m_pos )
+	m_pos( _note.m_pos ),
+	m_selected( _note.m_selected )	
 {
-	setSelected( false );
 	m_detuning = sharedObject::ref( _note.m_detuning );
 }
 

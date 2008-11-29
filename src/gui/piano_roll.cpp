@@ -2722,39 +2722,14 @@ void pianoRoll::getSelectedNotes( noteVector & _selected_notes )
 		return;
 	}
 
-	int sel_pos_start = m_selectStartTick;
-	int sel_pos_end = sel_pos_start + m_selectedTick;
-	if( sel_pos_start > sel_pos_end )
-	{
-		qSwap<int>( sel_pos_start, sel_pos_end );
-	}
-
-	int sel_key_start = m_selectStartKey;
-	int sel_key_end = sel_key_start + m_selectedKeys;
-	if( sel_key_start > sel_key_end )
-	{
-		qSwap<int>( sel_key_start, sel_key_end );
-	}
-
 	const noteVector & notes = m_pattern->notes();
 
 	for( noteVector::const_iterator it = notes.begin(); it != notes.end();
 									++it )
 	{
-		Sint32 len_ticks = ( *it )->length();
-
-		if( len_ticks > 0 )
+		if( ( *it )->getSelected() )
 		{
-			int key = ( *it )->key();
-			Sint32 pos_ticks = ( *it )->pos();
-
-			if( key > sel_key_start &&
-				key <= sel_key_end &&
-				pos_ticks >= sel_pos_start &&
-				pos_ticks+len_ticks <= sel_pos_end )
-			{
-				_selected_notes.push_back( *it );
-			}
+			_selected_notes.push_back( *it );
 		}
 	}
 }
@@ -2794,11 +2769,6 @@ void pianoRoll::copySelectedNotes( void )
 	if( selected_notes.empty() == false )
 	{
 		copy_to_clipboard( selected_notes );
-
-		textFloat::displayMessage( tr( "Notes copied" ),
-				tr( "All selected notes were copied to the "
-								"clipboard." ),
-				embed::getIconPixmap( "edit_copy" ), 2000 );
 	}
 }
 
@@ -2854,11 +2824,21 @@ void pianoRoll::pasteNotes( void )
 
 		QDomNodeList list = mmp.elementsByTagName(
 							note::classNodeName() );
+		
+		// remove selection and select the newly pasted notes
+		clearSelectedNotes();
+		
 		for( int i = 0; !list.item( i ).isNull(); ++i )
 		{
+			// create the note
 			note cur_note;
 			cur_note.restoreState( list.item( i ).toElement() );
 			cur_note.setPos( cur_note.pos() + m_timeLine->pos() );
+			
+			// select it
+			cur_note.setSelected( true );
+			
+			// add to pattern
 			m_pattern->addNote( cur_note );
 		}
 
