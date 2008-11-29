@@ -43,6 +43,7 @@ class mainWindow;
 class mixer;
 class pianoRoll;
 class projectNotes;
+class ResourcesDB;
 class song;
 class songEditor;
 class ladspa2LMMS;
@@ -94,6 +95,11 @@ public:
 	static projectJournal * getProjectJournal( void )
 	{
 		return( s_projectJournal );
+	}
+
+	static ResourcesDB * getResourcesDB( void )
+	{
+		return( s_resourcesDB );
 	}
 
 	// GUI
@@ -168,6 +174,7 @@ private:
 	static mixer * s_mixer;
 	static fxMixer * s_fxMixer;
 	static song * s_song;
+	static ResourcesDB * s_resourcesDB;
 	static bbTrackContainer * s_bbTrackContainer;
 	static projectJournal * s_projectJournal;
 	static dummyTrackContainer * s_dummyTC;

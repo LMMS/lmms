@@ -24,6 +24,7 @@
  *
  */
 
+#include <QtCore/QDir>
 
 #include "engine.h"
 #include "automation_editor.h"
@@ -41,6 +42,7 @@
 #include "preset_preview_play_handle.h"
 #include "project_journal.h"
 #include "project_notes.h"
+#include "resources_db.h"
 #include "song_editor.h"
 #include "song.h"
 
@@ -54,6 +56,7 @@ fxMixerView * engine::s_fxMixerView = NULL;
 mainWindow * engine::s_mainWindow = NULL;
 bbTrackContainer * engine::s_bbTrackContainer = NULL;
 song * engine::s_song = NULL;
+ResourcesDB * engine::s_resourcesDB = NULL;
 songEditor * engine::s_songEditor = NULL;
 automationEditor * engine::s_automationEditor = NULL;
 bbEditor * engine::s_bbEditor = NULL;
@@ -77,6 +80,9 @@ void engine::init( const bool _has_gui )
 	s_projectJournal = new projectJournal;
 	s_mixer = new mixer;
 	s_song = new song;
+	s_resourcesDB = new ResourcesDB( configManager::inst()->workingDir() +
+						QDir::separator() +
+							".resourcesdb.xml" );
 	s_fxMixer = new fxMixer;
 	s_bbTrackContainer = new bbTrackContainer;
 
@@ -150,6 +156,9 @@ void engine::destroy( void )
 
 	delete s_song;
 	s_song = NULL;
+
+	delete s_resourcesDB;
+	s_resourcesDB = NULL;
 
 	delete configManager::inst();
 }
