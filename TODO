@@ -41,6 +41,7 @@
 	- Swedish
 	- Norwegian
 	- Greece
+	- Elvish
 	- ...
 
 
@@ -51,12 +52,11 @@
 - add FLAC as export-format?
 
 Andrew Kelley's todo:
-- when you draw a note, if there's a selection it should clear it
-- piano roll, copy and paste notes 
-- remove the move tool, it's irrelevant now
+- don't play notes when you click on one if the song is already playing
+- humanizing tool for piano roll (add a tools menu to piano roll and put some of the tools with keyboard shortcuts on there)
+- dragging a note below the automation level messes up dragging it's weird and glitchy fix it
 - holding control and shift shouldn't bring up the automation window
 - shift+drag to copy one or more notes
-- when dragging right click around to delete notes, show the eraser icon
 - moving a group of notes shouldn't crunch them together if brought to boundary conditions
 - moving a group with an unquantized note will quantize that note when you move the selection (this is bad)
 - undo/redo for piano roll
@@ -69,6 +69,6 @@ Andrew Kelley's todo:
 - make the menu for a channel happen when you right click, instead of renaming, and make the midi input a top-level menu item
 - segfault on quit
 - recording automation
-- dragging a note below the automation level messes up dragging it's weird and glitchy fix it
 - adding/removing steps to the beat+bassline editor is awkward
 - the 'add beat+bassline' button in the beat+bassline editor is misleading - I say we remove it and rely on the song editor to add beat+basslines
+- make it so that 3xosc notes don't max out

@@ -147,6 +147,8 @@ pianoRoll::pianoRoll( void ) :
 	m_startKey( INITIAL_START_KEY ),
 	m_lastKey( 0 ),
 	m_editMode( ModeDraw ),
+	m_mouseDownLeft( false ),
+	m_mouseDownRight( false ),
 	m_scrollBack( false )
 {
 	// init pixmaps
@@ -291,17 +293,11 @@ pianoRoll::pianoRoll( void ) :
 					m_toolBar );
 	m_selectButton->setCheckable( true );
 
-	m_moveButton = new toolButton( embed::getIconPixmap( "edit_move" ),
-					tr( "Move selection mode (Shift+M)" ),
-					this, SLOT( moveButtonToggled() ),
-					m_toolBar );
-	m_moveButton->setCheckable( true );
 
 	QButtonGroup * tool_button_group = new QButtonGroup( this );
 	tool_button_group->addButton( m_drawButton );
 	tool_button_group->addButton( m_eraseButton );
 	tool_button_group->addButton( m_selectButton );
-	tool_button_group->addButton( m_moveButton );
 	tool_button_group->setExclusive( true );
 
 	m_drawButton->setWhatsThis(
@@ -319,11 +315,6 @@ pianoRoll::pianoRoll( void ) :
 			"In this mode you can select notes. This is neccessary "
 			"if you want to cut, copy, paste, delete or move "
 			"notes. You can also press 'Shift+S' on your keyboard "
-			"to activate this mode." ) );
-	m_moveButton->setWhatsThis(
-		tr( "Click here and move-mode will be activated. In this "
-			"mode you can move the notes you selected in select-"
-			"mode. You can also press 'Shift+M' on your keyboard "
 			"to activate this mode." ) );
 
 	m_cutButton = new toolButton( embed::getIconPixmap( "edit_cut" ),
@@ -432,7 +423,6 @@ pianoRoll::pianoRoll( void ) :
 	tb_layout->addWidget( m_drawButton );
 	tb_layout->addWidget( m_eraseButton );
 	tb_layout->addWidget( m_selectButton );
-	tb_layout->addWidget( m_moveButton );
 	tb_layout->addSpacing( 10 );
 	tb_layout->addWidget( m_cutButton );
 	tb_layout->addWidget( m_copyButton );
@@ -691,8 +681,58 @@ void pianoRoll::closeEvent( QCloseEvent * _ce )
 	_ce->ignore();
 }
 
+void pianoRoll::shiftSemiTone(int amount) // shift notes by amount semitones
+{
+	bool useAllNotes = ! isSelection();
+	const noteVector & notes = m_pattern->notes();
+	for( noteVector::const_iterator it = notes.begin(); it != notes.end(); ++it)
+	{
+		// if none are selected, move all notes, otherwise
+		// only move selected notes
+		if( useAllNotes || ( *it )->getSelected() )
+		{
+			( *it )->setKey( ( *it )->key() + amount );
+		}
+	}
+	
+	// we modified the song
+	update();
+	engine::getSongEditor()->update();
+	
+}
 
+void pianoRoll::shiftPos(int amount) //shift notes pos by amount
+{
+	bool useAllNotes = ! isSelection();
+	const noteVector & notes = m_pattern->notes();
+	for( noteVector::const_iterator it = notes.begin(); it != notes.end(); ++it)
+	{
+		// if none are selected, move all notes, otherwise
+		// only move selected notes
+		if( useAllNotes || ( *it )->getSelected() )
+		{
+			( *it )->setPos( ( *it )->pos() + amount );
+		}
+	}
+	
+	// we modified the song
+	update();
+	engine::getSongEditor()->update();
+}
 
+bool pianoRoll::isSelection() const // are any notes selected?
+{
+	const noteVector & notes = m_pattern->notes();
+	for( noteVector::const_iterator it = notes.begin(); it != notes.end(); ++it)
+	{
+		if( ( *it )->getSelected() )
+		{
+			return true;
+		}
+	}
+	
+	return false;
+}
 
 void pianoRoll::keyPressEvent( QKeyEvent * _ke )
 {
@@ -711,28 +751,84 @@ void pianoRoll::keyPressEvent( QKeyEvent * _ke )
 	switch( _ke->key() )
 	{
 		case Qt::Key_Up:
-			m_topBottomScroll->setValue(
-					m_topBottomScroll->value() - 1 );
+			if( _ke->modifiers() & Qt::ControlModifier )
+			{
+				// shift selection up an octave
+				// if nothing selected, shift _everything_
+				shiftSemiTone( +12 );
+			}
+			else
+			{
+				// scroll
+				m_topBottomScroll->setValue(
+						m_topBottomScroll->value() - cm_scrollAmtVert );
+			}
 			break;
-
 		case Qt::Key_Down:
-			m_topBottomScroll->setValue(
-					m_topBottomScroll->value() + 1 );
+			if( _ke->modifiers() & Qt::ControlModifier )
+			{
+				// shift selection down an octave
+				// if nothing selected, shift _everything_
+				shiftSemiTone( -12 );
+			}
+			else
+			{
+				// scroll
+				m_topBottomScroll->setValue(
+						m_topBottomScroll->value() + cm_scrollAmtVert );
+				
+			}
 			break;
 
 		case Qt::Key_Left:
 		{
-			if( ( m_timeLine->pos() -= 16 ) < 0 )
+			if( _ke->modifiers() & Qt::ControlModifier )
 			{
-				m_timeLine->pos().setTicks( 0 );
+				// move time ticker
+				if( ( m_timeLine->pos() -= 16 ) < 0 )
+				{
+					m_timeLine->pos().setTicks( 0 );
+				}
+				m_timeLine->updatePosition();
 			}
-			m_timeLine->updatePosition();
+			else if( _ke->modifiers() & Qt::ShiftModifier )
+			{
+				// move notes
+				bool quantized = ! (_ke->modifiers() & Qt::AltModifier);
+				int amt = quantized ? quantization() : 1;
+				shiftPos( -amt );
+			}
+			else
+			{
+				// scroll
+				m_leftRightScroll->setValue(
+						m_leftRightScroll->value() - cm_scrollAmtHoriz );
+			}
 			break;
 		}
 		case Qt::Key_Right:
 		{
-			m_timeLine->pos() += 16;
-			m_timeLine->updatePosition();
+			if( _ke->modifiers() & Qt::ControlModifier )
+			{
+				// move time ticker
+				m_timeLine->pos() += 16;
+				m_timeLine->updatePosition();
+			}
+			else if( _ke->modifiers() & Qt::ShiftModifier )
+			{
+				// move notes
+				bool quantized = ! (_ke->modifiers() & Qt::AltModifier);
+				int amt = quantized ? quantization() : 1;
+				shiftPos( +amt );
+			}
+			else
+			{
+				// scroll
+				m_leftRightScroll->setValue(
+						m_leftRightScroll->value() + cm_scrollAmtHoriz );
+			}
+			
+			
 			break;
 		}
 
@@ -808,17 +904,6 @@ void pianoRoll::keyPressEvent( QKeyEvent * _ke )
 			if( _ke->modifiers() & Qt::ShiftModifier )
 			{
 				m_selectButton->setChecked( true );
-			}
-			else
-			{
-				_ke->ignore();
-			}
-			break;
-
-		case Qt::Key_M:
-			if( _ke->modifiers() & Qt::ShiftModifier )
-			{
-				m_moveButton->setChecked( true );
 			}
 			else
 			{
@@ -1065,6 +1150,10 @@ void pianoRoll::mousePressEvent( QMouseEvent * _me )
 						pattern::MelodyPattern );
 
 					// then set new note
+					
+					// clear selection and select this new note
+					clearSelectedNotes();
+					
 					// +32 to quanitize the note correctly when placing notes with
 					// the mouse.  We do this here instead of in note.quantized
 					// because live notes should still be quantized at the half.
@@ -1072,7 +1161,7 @@ void pianoRoll::mousePressEvent( QMouseEvent * _me )
 					midiTime note_len( newNoteLen() );
 		
 					note new_note( note_len, note_pos, key_num );
-
+					new_note.setSelected( true );
 					note * created_new_note =
 						m_pattern->addNote( new_note );
 
@@ -1137,7 +1226,7 @@ void pianoRoll::mousePressEvent( QMouseEvent * _me )
 					m_editMode == ModeErase )
 			{
 				// erase single note
-
+				m_mouseDownRight = true;
 				play_note = false;
 				if( it != notes.end() )
 				{
@@ -1170,15 +1259,6 @@ void pianoRoll::mousePressEvent( QMouseEvent * _me )
 				// appears in wrong spot on mousedown
 				mouseMoveEvent( _me );
 			}
-			else if( _me->button() == Qt::RightButton &&
-							m_editMode == ModeSelect )
-			{
-				// when clicking right in select-move, we
-				// switch to move-mode
-				m_moveButton->setChecked( true );
-				play_note = false;
-
-			}
 			else if( _me->button() == Qt::LeftButton &&
 							m_editMode == ModeMove )
 			{
@@ -1189,6 +1269,7 @@ void pianoRoll::mousePressEvent( QMouseEvent * _me )
 				m_moveStartKey = key_num;
 
 				m_action = ActionMoveSelection;
+				m_mouseDownLeft = true;
 
 				play_note = false;
 				engine::getSong()->setModified();
@@ -1312,6 +1393,19 @@ void pianoRoll::computeSelectedNotes(bool shift)
 
 void pianoRoll::mouseReleaseEvent( QMouseEvent * _me )
 {
+	bool mustRepaint = false;
+	
+	if( _me->button() & Qt::LeftButton )
+	{
+		m_mouseDownLeft = false;
+		mustRepaint = true;
+	}
+	if( _me->button() & Qt::RightButton )
+	{
+		m_mouseDownRight = false;
+		mustRepaint = true;
+	}
+	
 	if( _me->button() & Qt::LeftButton &&
 					m_editMode == ModeSelect &&
 					m_action == ActionSelectNotes )
@@ -1355,6 +1449,11 @@ void pianoRoll::mouseReleaseEvent( QMouseEvent * _me )
 	if( m_editMode == ModeDraw )
 	{
 		QApplication::restoreOverrideCursor();
+	}
+	
+	if( mustRepaint )
+	{
+		repaint();
 	}
 }
 
@@ -2373,7 +2472,21 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 	// draw current edit-mode-icon below the cursor
 	switch( m_editMode )
 	{
-		case ModeDraw: cursor = s_toolDraw; break;
+		case ModeDraw:
+			if( m_mouseDownRight )
+			{
+				cursor = s_toolErase;
+			}
+			else if( m_action == ActionMoveSelection || 
+				   m_action == ActionMoveNote )
+			{
+				cursor = s_toolMove;
+			}
+			else
+			{
+				cursor = s_toolDraw;
+			}
+			break;
 		case ModeErase: cursor = s_toolErase; break;
 		case ModeSelect: cursor = s_toolSelect; break;
 		case ModeMove: cursor = s_toolMove; break;

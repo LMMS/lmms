@@ -166,8 +166,14 @@ private:
 	virtual ~pianoRoll();
 
 	midiTime newNoteLen( void ) const;
-
-
+	
+	void shiftPos(int amount);
+	void shiftSemiTone(int amount);
+	bool isSelection() const;
+		
+	static const int cm_scrollAmtHoriz = 10;
+	static const int cm_scrollAmtVert = 1;
+			
 	static QPixmap * s_whiteKeyBigPm;
 	static QPixmap * s_whiteKeySmallPm;
 	static QPixmap * s_blackKeyPm;
@@ -190,7 +196,6 @@ private:
 	toolButton * m_drawButton;
 	toolButton * m_eraseButton;
 	toolButton * m_selectButton;
-	toolButton * m_moveButton;
 
 	toolButton * m_cutButton;
 	toolButton * m_copyButton;
@@ -239,7 +244,9 @@ private:
 
 	editModes m_editMode;
 	editModes m_ctrlMode; // mode they were in before they hit ctrl
-
+		
+	bool m_mouseDownLeft; //true if left click is being held down
+	bool m_mouseDownRight; //true if right click is being held down
 
 	timeLine * m_timeLine;
 	bool m_scrollBack;
