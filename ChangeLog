@@ -1,3 +1,8 @@
+2008-12-01	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* plugins/triple_oscillator/triple_oscillator.cpp:
+	per default play sub-octaves of first oscillator in osc 2 and 3
+
 2008-11-22	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/core/automatable_model.cpp:
