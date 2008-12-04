@@ -230,25 +230,25 @@ alignedBufWetDryMixSplittedSSE:
 	pushl	%edi
 	pushl	%esi
 	pushl	%ebx
-	subl	$140, %esp
-	movl	180(%esp), %eax
-	movl	160(%esp), %edx
-	movl	164(%esp), %esi
-	movl	168(%esp), %ecx
+	subl	$124, %esp
+	movl	164(%esp), %eax
+	movl	144(%esp), %edx
+	movl	148(%esp), %esi
+	movl	152(%esp), %ecx
 	testl	%eax, %eax
-	movss	172(%esp), %xmm4
-	movss	176(%esp), %xmm5
+	movss	156(%esp), %xmm4
+	movss	160(%esp), %xmm5
 	jle	.L39
-	movl	180(%esp), %eax
+	movl	164(%esp), %eax
 	subl	$1, %eax
 	shrl	%eax
 	addl	$1, %eax
 	movl	%eax, %ebp
-	movl	%eax, 112(%esp)
+	movl	%eax, 96(%esp)
 	shrl	$2, %ebp
-	cmpl	$3, 112(%esp)
+	cmpl	$3, 96(%esp)
 	leal	0(,%ebp,4), %eax
-	movl	%eax, 116(%esp)
+	movl	%eax, 100(%esp)
 	jbe	.L40
 	testl	%eax, %eax
 	jne	.L34
@@ -264,11 +264,11 @@ alignedBufWetDryMixSplittedSSE:
 	movaps	%xmm5, %xmm1
 	movl	%esi, %ebx
 	shufps	$0, %xmm1, %xmm1
-	movaps	%xmm2, 32(%esp)
+	movaps	%xmm2, (%esp)
 	xorl	%eax, %eax
 	xorl	%edi, %edi
-	movss	%xmm5, 124(%esp)
-	movss	%xmm4, 120(%esp)
+	movss	%xmm5, 108(%esp)
+	movss	%xmm4, 104(%esp)
 	movaps	%xmm1, %xmm4
 	.p2align 4,,7
 	.p2align 3
@@ -276,87 +276,84 @@ alignedBufWetDryMixSplittedSSE:
 	movaps	16(%edx,%eax,2), %xmm3
 	addl	$1, %edi
 	movaps	(%edx,%eax,2), %xmm2
-	movaps	48(%edx,%eax,2), %xmm0
-	movaps	%xmm2, %xmm5
-	shufps	$221, %xmm3, %xmm2
 	movaps	32(%edx,%eax,2), %xmm1
-	shufps	$136, %xmm3, %xmm5
-	movaps	%xmm2, 96(%esp)
-	movaps	%xmm1, %xmm7
+	movaps	%xmm2, %xmm7
+	shufps	$221, %xmm3, %xmm2
+	movaps	48(%edx,%eax,2), %xmm0
+	shufps	$136, %xmm3, %xmm7
+	movaps	%xmm2, 64(%esp)
+	movaps	%xmm1, %xmm2
 	shufps	$221, %xmm0, %xmm1
-	shufps	$136, %xmm0, %xmm7
-	movaps	%xmm1, 64(%esp)
+	shufps	$136, %xmm0, %xmm2
 	movaps	%xmm6, %xmm3
-	movaps	%xmm5, (%esp)
-	shufps	$136, %xmm7, %xmm5
+	movaps	%xmm2, 48(%esp)
 	movlps	(%ebx), %xmm3
-	movaps	%xmm6, %xmm2
 	movhps	8(%ebx), %xmm3
-	movaps	%xmm7, 80(%esp)
-	movlps	16(%ebx), %xmm2
-	movhps	24(%ebx), %xmm2
-	movaps	96(%esp), %xmm7
-	addl	$32, %ebx
+	movaps	%xmm7, %xmm5
 	movaps	%xmm3, %xmm0
-	shufps	$221, %xmm2, %xmm3
+	movaps	%xmm6, %xmm2
+	movlps	16(%ebx), %xmm2
+	shufps	$136, 48(%esp), %xmm5
+	movhps	24(%ebx), %xmm2
 	shufps	$136, %xmm2, %xmm0
-	shufps	$136, 64(%esp), %xmm7
-	mulps	32(%esp), %xmm0
+	addl	$32, %ebx
+	mulps	%xmm4, %xmm5
+	shufps	$221, %xmm2, %xmm3
+	movaps	%xmm1, 32(%esp)
+	mulps	(%esp), %xmm0
 	movaps	%xmm6, %xmm1
+	shufps	$221, 48(%esp), %xmm7
 	movlps	(%ecx,%eax), %xmm1
 	movhps	8(%ecx,%eax), %xmm1
-	movaps	96(%esp), %xmm2
+	movaps	64(%esp), %xmm2
 	mulps	%xmm4, %xmm7
-	shufps	$221, 64(%esp), %xmm2
-	mulps	%xmm4, %xmm5
-	mulps	32(%esp), %xmm3
-	movaps	%xmm7, 16(%esp)
-	movaps	%xmm1, %xmm7
 	addps	%xmm0, %xmm5
 	movaps	%xmm6, %xmm0
 	movlps	16(%ecx,%eax), %xmm0
 	movhps	24(%ecx,%eax), %xmm0
-	shufps	$136, %xmm0, %xmm7
-	shufps	$221, %xmm0, %xmm1
-	mulps	32(%esp), %xmm7
-	mulps	32(%esp), %xmm1
+	shufps	$221, 32(%esp), %xmm2
+	movaps	%xmm5, 16(%esp)
+	movaps	64(%esp), %xmm5
 	mulps	%xmm4, %xmm2
-	movaps	%xmm7, 48(%esp)
-	movaps	16(%esp), %xmm7
-	addps	48(%esp), %xmm7
-	addps	%xmm1, %xmm2
-	movaps	%xmm7, 16(%esp)
-	movaps	(%esp), %xmm7
-	shufps	$221, 80(%esp), %xmm7
-	movaps	16(%esp), %xmm1
-	mulps	%xmm4, %xmm7
-	movaps	16(%esp), %xmm0
-	unpckhps	%xmm2, %xmm1
-	unpcklps	%xmm2, %xmm0
-	movaps	%xmm1, %xmm2
+	shufps	$136, 32(%esp), %xmm5
+	mulps	(%esp), %xmm3
+	mulps	%xmm4, %xmm5
 	addps	%xmm3, %xmm7
-	movaps	%xmm5, %xmm3
+	movaps	16(%esp), %xmm3
+	movaps	%xmm5, 80(%esp)
+	movaps	%xmm1, %xmm5
+	shufps	$221, %xmm0, %xmm1
+	shufps	$136, %xmm0, %xmm5
+	mulps	(%esp), %xmm1
 	unpcklps	%xmm7, %xmm3
-	unpckhps	%xmm7, %xmm5
+	mulps	(%esp), %xmm5
+	movaps	16(%esp), %xmm0
+	addps	%xmm1, %xmm2
 	movaps	%xmm3, %xmm1
-	unpckhps	%xmm0, %xmm3
-	unpcklps	%xmm0, %xmm1
+	addps	80(%esp), %xmm5
+	unpckhps	%xmm7, %xmm0
+	movaps	%xmm0, %xmm7
 	movaps	%xmm5, %xmm0
-	unpckhps	%xmm2, %xmm5
 	unpcklps	%xmm2, %xmm0
+	unpckhps	%xmm2, %xmm5
+	unpcklps	%xmm0, %xmm1
+	unpckhps	%xmm0, %xmm3
+	movaps	%xmm7, %xmm0
+	unpckhps	%xmm5, %xmm7
+	unpcklps	%xmm5, %xmm0
 	movaps	%xmm1, (%edx,%eax,2)
 	movaps	%xmm3, 16(%edx,%eax,2)
 	movaps	%xmm0, 32(%edx,%eax,2)
-	movaps	%xmm5, 48(%edx,%eax,2)
+	movaps	%xmm7, 48(%edx,%eax,2)
 	addl	$32, %eax
 	cmpl	%edi, %ebp
 	ja	.L37
-	movl	116(%esp), %edi
-	movl	112(%esp), %eax
-	movss	120(%esp), %xmm4
-	movss	124(%esp), %xmm5
+	movl	100(%esp), %edi
+	movl	96(%esp), %eax
+	movss	104(%esp), %xmm4
+	movss	108(%esp), %xmm5
 	addl	%edi, %edi
-	cmpl	%eax, 116(%esp)
+	cmpl	%eax, 100(%esp)
 	je	.L39
 .L36:
 	leal	(%edx,%edi,8), %ebx
@@ -394,10 +391,10 @@ alignedBufWetDryMixSplittedSSE:
 	addss	%xmm1, %xmm0
 	movss	%xmm0, 4(%edx)
 	addl	$16, %edx
-	cmpl	%eax, 180(%esp)
+	cmpl	%eax, 164(%esp)
 	jg	.L38
 .L39:
-	addl	$140, %esp
+	addl	$124, %esp
 	popl	%ebx
 	popl	%esi
 	popl	%edi
@@ -501,5 +498,5 @@ unalignedBufMixLRCoeffSSE:
 	addl	$8, %eax
 	jmp	.L44
 	.size	unalignedBufMixLRCoeffSSE, .-unalignedBufMixLRCoeffSSE
-	.ident	"GCC: (GNU) 4.4.0 20081110 (experimental)"
+	.ident	"GCC: (GNU) 4.4.0 20081204 (experimental)"
 	.section	.note.GNU-stack,"",@progbits

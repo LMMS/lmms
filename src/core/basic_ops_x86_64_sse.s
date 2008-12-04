@@ -9,11 +9,9 @@ alignedMemCpySSE:
 	shrq	$6, %rdx
 	testl	%edx, %edx
 	jle	.L4
-	leal	-1(%rdx), %r9d
+	subl	$1, %edx
 	xorl	%eax, %eax
-	mov	%r9d, %r8d
-	leaq	1(%r8), %rcx
-	movq	%rcx, %rdx
+	addq	$1, %rdx
 	salq	$6, %rdx
 	.align 16
 .L3:
@@ -560,4 +558,4 @@ unalignedBufMixLRCoeffSSE:
 	.byte	0x0
 	.align 8
 .LEFDE15:
-	.ident	"GCC: (GNU) 4.4.0 20081110 (experimental)"
+	.ident	"GCC: (GNU) 4.4.0 20081204 (experimental)"

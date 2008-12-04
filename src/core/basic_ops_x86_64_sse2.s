@@ -9,11 +9,9 @@ alignedMemCpySSE2:
 	shrq	$6, %rdx
 	testl	%edx, %edx
 	jle	.L4
-	leal	-1(%rdx), %r9d
+	subl	$1, %edx
 	xorl	%eax, %eax
-	mov	%r9d, %r8d
-	leaq	1(%r8), %rcx
-	movq	%rcx, %rdx
+	addq	$1, %rdx
 	salq	$6, %rdx
 	.align 16
 .L3:
@@ -149,7 +147,8 @@ alignedConvertToS16SSE2:
 	cmovg	%esi, %ebx
 	movzbl	%bh, %ebp
 	sall	$8, %ebx
-	orl	%ebp, %ebx
+	movl	%ebp, %r9d
+	orl	%r9d, %ebx
 	movw	%bx, (%rdx)
 	cvttss2si	%xmm1, %ebx
 	cmpl	$-32768, %ebx
@@ -160,7 +159,8 @@ alignedConvertToS16SSE2:
 	addq	$8, %rcx
 	movzbl	%bh, %ebp
 	sall	$8, %ebx
-	orl	%ebp, %ebx
+	movl	%ebp, %r9d
+	orl	%r9d, %ebx
 	movw	%bx, 2(%rdx)
 	addq	$4, %rdx
 	cmpw	%r8w, %ax
@@ -392,4 +392,4 @@ alignedConvertToS16SSE2:
 	.byte	0x2
 	.align 8
 .LEFDE5:
-	.ident	"GCC: (GNU) 4.4.0 20081110 (experimental)"
+	.ident	"GCC: (GNU) 4.4.0 20081204 (experimental)"

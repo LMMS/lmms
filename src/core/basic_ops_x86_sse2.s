@@ -345,5 +345,5 @@ alignedConvertToS16SSE2:
 	.long	65280
 	.long	65280
 	.long	65280
-	.ident	"GCC: (GNU) 4.4.0 20081110 (experimental)"
+	.ident	"GCC: (GNU) 4.4.0 20081204 (experimental)"
 	.section	.note.GNU-stack,"",@progbits
