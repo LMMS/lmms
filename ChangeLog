@@ -1,5 +1,9 @@
 2008-12-04	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* CMakeLists.txt:
+	automatically include SVN revision into version number if
+	VERSION_SUFFIX is not set
+
 	* src/core/basic_ops_x86_mmx.s:
 	* src/core/basic_ops_x86_sse.s:
 	* src/core/basic_ops_x86_sse2.s:
