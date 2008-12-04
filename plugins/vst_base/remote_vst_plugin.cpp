@@ -116,7 +116,7 @@ public:
 							const f_cnt_t _offset );
 
 	// set given sample-rate for plugin
-	void updateSampleRate( void )
+	virtual void updateSampleRate( void )
 	{
 		if( m_plugin )
 		{
@@ -126,7 +126,7 @@ public:
 	}
 
 	// set given buffer-size for plugin
-	void updateBufferSize( void )
+	virtual void updateBufferSize( void )
 	{
 		if( m_plugin )
 		{
