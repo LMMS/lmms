@@ -1612,7 +1612,7 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 			&& m_editMode == ModeDraw
 			&& (m_action == ActionMoveNote || m_action == ActionResizeNote ) )
 		{
-			dragNotes(_me->x(), _me->y(), _me->modifiers() && Qt::AltModifier);
+			dragNotes(_me->x(), _me->y(), _me->modifiers() & Qt::AltModifier);
 		}
 		else if( ( edit_note == true || m_action == ActionChangeNoteVolume ) &&
 				_me->buttons() & Qt::LeftButton )
@@ -2026,16 +2026,17 @@ void pianoRoll::dragNotes( int x, int y, bool alt )
 	int off_ticks = off_x * midiTime::ticksPerTact() / m_ppt;
 	int off_key = getKey( y ) - getKey( m_moveStartY );
 	
+	// handle scroll changes while dragging
+	off_ticks -= m_mouseDownTick - m_currentPosition;
+	off_key -= m_mouseDownKey - m_startKey;
+	
+	
 	// if they're not holding alt, quantize the offset
 	if( ! alt )
 	{
 		off_ticks = floor( off_ticks / quantization() )
 						* quantization();
 	}
-	
-	// handle scroll changes while dragging
-	off_ticks -= m_mouseDownTick - m_currentPosition;
-	off_key -= m_mouseDownKey - m_startKey;
 	
 	// make sure notes won't go outside boundary conditions
 	if( m_action == ActionMoveNote )
