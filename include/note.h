@@ -91,7 +91,11 @@ public:
 	note( const note & _note );
 	virtual ~note();
 	
-	void setSelected( const bool selected );
+	void setSelected( const bool _selected );
+	void setOldKey( const int _oldKey );
+	void setOldPos( const midiTime & _oldPos );
+	void setOldLength( const midiTime & _oldLength );
+	
 	void setLength( const midiTime & _length );
 	void setPos( const midiTime & _pos );
 	void setKey( const int _key );
@@ -107,9 +111,24 @@ public:
 		return (bool) ((int) ( *lhs ).pos() < (int) ( *rhs ).pos());
 	}
 		
-	inline bool getSelected( void ) const
+	inline bool selected( void ) const
 	{
 		return m_selected;
+	}
+	
+	inline int oldKey( void ) const
+	{
+		return m_oldKey;
+	}
+	
+	inline midiTime oldPos( void ) const
+	{
+		return m_oldPos;
+	}
+	
+	inline midiTime oldLength( void ) const
+	{
+		return m_oldLength;
 	}
 
 	inline midiTime endPos( void ) const
@@ -190,7 +209,12 @@ private:
 		ChangePosition
 	} ;*/
 
-	bool m_selected; // for piano roll editing
+	// for piano roll editing
+	bool m_selected; 
+	int m_oldKey;
+	midiTime m_oldPos;
+	midiTime m_oldLength;
+	
 	int m_key;
 	volume m_volume;
 	panning m_panning;

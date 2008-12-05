@@ -118,7 +118,6 @@ protected slots:
 	void drawButtonToggled( void );
 	void eraseButtonToggled( void );
 	void selectButtonToggled( void );
-	void moveButtonToggled( void );
 
 	void copySelectedNotes( void );
 	void cutSelectedNotes( void );
@@ -170,6 +169,8 @@ private:
 	void shiftPos(int amount);
 	void shiftSemiTone(int amount);
 	bool isSelection() const;
+	
+	void dragNotes( int x, int y, bool alt );
 		
 	static const int cm_scrollAmtHoriz = 10;
 	static const int cm_scrollAmtVert = 1;
@@ -225,10 +226,25 @@ private:
 	int m_selectedTick;
 	int m_selectStartKey;
 	int m_selectedKeys;
-
-	int m_moveStartKey;
-	int m_moveStartTick;
-	int m_moveXOffset;
+	
+	// boundary box around all selected notes when dragging
+	int m_moveBoundaryLeft;
+	int m_moveBoundaryTop;
+	int m_moveBoundaryRight;
+	int m_moveBoundaryBottom;
+	
+	// remember where the scrolling started when dragging so that
+	// we can handle dragging while scrolling with arrow keys
+	int m_mouseDownKey;
+	int m_mouseDownTick;
+	
+	// remember the last x and y of a mouse movement
+	int m_lastMouseX;
+	int m_lastMouseY;
+	
+	// x,y of when the user starts a drag
+	int m_moveStartX;
+	int m_moveStartY;
 
 	int m_notesEditHeight;
 	int m_ppt;
@@ -238,9 +254,6 @@ private:
 
 	int m_startKey;			// first key when drawing
 	int m_lastKey;
-
-	noteVector m_selNotesForMove;
-
 
 	editModes m_editMode;
 	editModes m_ctrlMode; // mode they were in before they hit ctrl
