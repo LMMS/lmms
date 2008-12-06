@@ -92,38 +92,6 @@ note::~note()
 
 
 
-void note::setSelected( const bool _selected )
-{
-	m_selected = _selected;
-}
-
-
-
-
-void note::setOldKey( const int _oldKey )
-{
-	m_oldKey = _oldKey;
-}
-
-
-
-
-void note::setOldPos( const midiTime & _oldPos )
-{
-	m_oldPos = _oldPos;
-}
-
-
-
-
-void note::setOldLength( const midiTime & _oldLength )
-{
-	m_oldLength = _oldLength;
-}
-
-
-
-
 void note::setLength( const midiTime & _length )
 {
 //	addJournalEntry( journalEntry( ChangeLength, m_length - _length ) );

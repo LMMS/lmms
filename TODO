@@ -63,6 +63,7 @@ Andrew Kelley's todo:
 - add note panning ability to piano roll
 - make piano roll grid change based on quantization
 
+- "paintbrush" tool for the song editor, to easily "paint" beat+basslines
 - when you clone a track in the song editor, rename the track so that it doesn't have the same name (increment the number if necessary)
 - somehow enable easy pattern copy pasting in the beat+bassline editor
 - make knobs easier to tune (less sensitive)
@@ -74,3 +75,5 @@ Andrew Kelley's todo:
 - make it so that 3xosc notes don't max out
 - implement note detuning (used to be ctrl+click to access note detuning) (need some other intuitive way to access note detuning as ctrl, shift, and alt are all being used)
 - make the horizontal scroll bar do the same thing as shift+vertical scroll bar
+- add a "Set exact value" to a right clicked automation menu
+- enable "auto detect" by default when you bring up the "connect to controller" window

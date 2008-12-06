@@ -34,11 +34,18 @@
 class QAction;
 class QDomElement;
 class QGridLayout;
+class QHBoxLayout;
 class QMdiArea;
+
+class lcdSpinBox;
+class meterDialog;
+class automatableSlider;
+class textFloat;
 
 class configManager;
 class pluginView;
 class toolButton;
+
 
 
 class mainWindow : public QMainWindow
@@ -55,8 +62,8 @@ public:
 		return( m_toolBar );
 	}
 
-	int addWidgetToToolBar( QWidget * _w, int _row = -1, int _col = -1 );
-	void addSpacingToToolBar( int _size );
+	//int addWidgetToToolBar( QWidget * _w, int _row = -1, int _col = -1 );
+	//void addSpacingToToolBar( int _size );
 
 
 	// every function that replaces current file (e.g. creates new file,
@@ -137,8 +144,18 @@ private:
 	QMdiArea * m_workspace;
 
 	QWidget * m_toolBar;
-	QGridLayout * m_toolBarLayout;
-
+	QHBoxLayout * m_toolBarLayout;
+	
+	
+	lcdSpinBox * m_tempoSpinBox;
+	meterDialog * m_timeSigDisplay;
+		
+	automatableSlider * m_masterVolumeSlider;
+	automatableSlider * m_masterPitchSlider;
+		
+	textFloat * m_mvsStatus;
+	textFloat * m_mpsStatus;
+		
 	QMenu * m_templatesMenu;
 	QMenu * m_recentlyOpenedProjectsMenu;
 	int m_custom_templates_count;
@@ -166,6 +183,17 @@ private:
 
 
 private slots:
+	void setHighQuality( bool );
+	
+	void masterVolumeChanged( int _new_val );
+	void masterVolumePressed( void );
+	void masterVolumeMoved( int _new_val );
+	void masterVolumeReleased( void );
+	void masterPitchChanged( int _new_val );
+	void masterPitchPressed( void );
+	void masterPitchMoved( int _new_val );
+	void masterPitchReleased( void );
+		
 	void browseHelp( void );
 	void fillTemplatesMenu( void );
 	void openRecentlyOpenedProject( QAction * _action );

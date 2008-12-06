@@ -36,6 +36,8 @@
 #include <QtGui/QMenuBar>
 #include <QtGui/QMessageBox>
 #include <QtGui/QSplitter>
+#include <QtGui/QCheckBox>
+
 
 #include "main_window.h"
 #include "bb_editor.h"
@@ -61,7 +63,13 @@
 #include "project_journal.h"
 #include "automation_editor.h"
 #include "templates.h"
-
+#include "lcd_spinbox.h"
+#include "tooltip.h"
+#include "meter_dialog.h"
+#include "automatable_slider.h"
+#include "text_float.h"
+#include "cpuload_widget.h"
+#include "visualization_widget.h"
 
 
 
@@ -168,11 +176,12 @@ mainWindow::mainWindow( void ) :
 	// create global-toolbar at the top of our window
 	m_toolBar = new QWidget( main_widget );
 	m_toolBar->setObjectName( "mainToolbar" );
+	m_toolBar->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 	m_toolBar->setFixedHeight( 64 );
 	m_toolBar->move( 0, 0 );
 
 	// add layout for organizing quite complex toolbar-layouting
-	m_toolBarLayout = new QGridLayout( m_toolBar/*, 2, 1*/ );
+	m_toolBarLayout = new QHBoxLayout( m_toolBar );
 	m_toolBarLayout->setMargin( 0 );
 	m_toolBarLayout->setSpacing( 0 );
 
@@ -319,18 +328,23 @@ void mainWindow::finalize( void )
 	help_menu->addAction( embed::getIconPixmap( "icon" ), tr( "About" ),
 			      this, SLOT( aboutLMMS() ) );
 
+	// create the grid layout for the first buttons area
+	QWidget * gridButtons_w = new QWidget( m_toolBar );
+	QGridLayout * gridButtons_layout = new QGridLayout( gridButtons_w/*, 2, 1*/ );
+
+	
 	// create tool-buttons
 	toolButton * project_new = new toolButton(
 					embed::getIconPixmap( "project_new" ),
 					tr( "Create new project" ),
 					this, SLOT( createNewProject() ),
-							m_toolBar );
+							gridButtons_w );
 
 	toolButton * project_new_from_template = new toolButton(
 			embed::getIconPixmap( "project_new_from_template" ),
 				tr( "Create new project from template" ),
 					this, SLOT( emptySlot() ),
-							m_toolBar );
+							gridButtons_w );
 
 	m_templatesMenu = new QMenu( project_new_from_template );
 	connect( m_templatesMenu, SIGNAL( aboutToShow() ),
@@ -344,13 +358,13 @@ void mainWindow::finalize( void )
 					embed::getIconPixmap( "project_open" ),
 					tr( "Open existing project" ),
 					this, SLOT( openProject() ),
-								m_toolBar );
+								gridButtons_w );
 
 
 	toolButton * project_open_recent = new toolButton( 
 				embed::getIconPixmap( "project_open_recent" ),
 					tr( "Recently opened project" ),
-					this, SLOT( emptySlot() ), m_toolBar );
+					this, SLOT( emptySlot() ), gridButtons_w );
 	project_open_recent->setMenu( m_recentlyOpenedProjectsMenu );
 	project_open_recent->setPopupMode( toolButton::InstantPopup );
 
@@ -358,7 +372,7 @@ void mainWindow::finalize( void )
 					embed::getIconPixmap( "project_save" ),
 					tr( "Save current project" ),
 					this, SLOT( saveProject() ),
-								m_toolBar );
+								gridButtons_w );
 
 
 	toolButton * project_export = new toolButton( 
@@ -366,16 +380,17 @@ void mainWindow::finalize( void )
 					tr( "Export current project" ),
 					engine::getSong(),
 							SLOT( exportProject() ),
-								m_toolBar );
+								gridButtons_w );
 
-
-	m_toolBarLayout->setColumnMinimumWidth( 0, 5 );
-	m_toolBarLayout->addWidget( project_new, 0, 1 );
-	m_toolBarLayout->addWidget( project_new_from_template, 0, 2 );
-	m_toolBarLayout->addWidget( project_open, 0, 3 );
-	m_toolBarLayout->addWidget( project_open_recent, 0, 4 );
-	m_toolBarLayout->addWidget( project_save, 0, 5 );
-	m_toolBarLayout->addWidget( project_export, 0, 6 );
+	gridButtons_layout->setMargin( 0 );
+	gridButtons_layout->setSpacing( 0 );
+	gridButtons_layout->setColumnMinimumWidth( 0, 5 );
+	gridButtons_layout->addWidget( project_new, 0, 1 );
+	gridButtons_layout->addWidget( project_new_from_template, 0, 2 );
+	gridButtons_layout->addWidget( project_open, 0, 3 );
+	gridButtons_layout->addWidget( project_open_recent, 0, 4 );
+	gridButtons_layout->addWidget( project_save, 0, 5 );
+	gridButtons_layout->addWidget( project_export, 0, 6 );
 
 
 
@@ -384,7 +399,7 @@ void mainWindow::finalize( void )
 					embed::getIconPixmap( "songeditor" ),
 					tr( "Show/hide Song-Editor" ) + " (F5)",
 					this, SLOT( toggleSongEditorWin() ),
-								m_toolBar );
+								gridButtons_w );
 	song_editor_window->setShortcut( Qt::Key_F5 );
 	song_editor_window->setWhatsThis(
 		tr( "By pressing this button, you can show or hide the "
@@ -400,7 +415,7 @@ void mainWindow::finalize( void )
 					tr( "Show/hide Beat+Bassline Editor" ) +
 									" (F6)",
 					this, SLOT( toggleBBEditorWin() ),
-								m_toolBar );
+								gridButtons_w );
 	bb_editor_window->setShortcut( Qt::Key_F6 );
 	bb_editor_window->setWhatsThis(
 		tr( "By pressing this button, you can show or hide the "
@@ -416,7 +431,7 @@ void mainWindow::finalize( void )
 						tr( "Show/hide Piano-Roll" ) +
 									" (F7)",
 					this, SLOT( togglePianoRollWin() ),
-								m_toolBar );
+								gridButtons_w );
 	piano_roll_window->setShortcut( Qt::Key_F7 );
 	piano_roll_window->setWhatsThis(
 			tr( "Click here to show or hide the "
@@ -430,7 +445,7 @@ void mainWindow::finalize( void )
 									" (F8)",
 					this,
 					SLOT( toggleAutomationEditorWin() ),
-					m_toolBar );
+					gridButtons_w );
 	automation_editor_window->setShortcut( Qt::Key_F8 );
 	automation_editor_window->setWhatsThis(
 			tr( "Click here to show or hide the "
@@ -443,7 +458,7 @@ void mainWindow::finalize( void )
 					embed::getIconPixmap( "fx_mixer" ),
 					tr( "Show/hide FX Mixer" ) + " (F9)",
 					this, SLOT( toggleFxMixerWin() ),
-					m_toolBar );
+					gridButtons_w );
 	fx_mixer_window->setShortcut( Qt::Key_F9 );
 	fx_mixer_window->setWhatsThis( 
 		tr( "Click here to show or hide the "
@@ -456,7 +471,7 @@ void mainWindow::finalize( void )
 					tr( "Show/hide project notes" ) +
 								" (F10)",
 					this, SLOT( toggleProjectNotesWin() ),
-								m_toolBar );
+								gridButtons_w );
 	project_notes_window->setShortcut( Qt::Key_F10 );
 	project_notes_window->setWhatsThis(
 		tr( "Click here to show or hide the "
@@ -468,19 +483,217 @@ void mainWindow::finalize( void )
 					tr( "Show/hide controller rack" ) +
 								" (F11)",
 					this, SLOT( toggleControllerRack() ),
-								m_toolBar );
+								gridButtons_w );
 	controllers_window->setShortcut( Qt::Key_F11 );
 
-	m_toolBarLayout->addWidget( song_editor_window, 1, 1 );
-	m_toolBarLayout->addWidget( bb_editor_window, 1, 2 );
-	m_toolBarLayout->addWidget( piano_roll_window, 1, 3 );
-	m_toolBarLayout->addWidget( automation_editor_window, 1, 4 );
-	m_toolBarLayout->addWidget( fx_mixer_window, 1, 5 );
-	m_toolBarLayout->addWidget( project_notes_window, 1, 6 );
-	m_toolBarLayout->addWidget( controllers_window, 1, 7 );
-	m_toolBarLayout->addWidget( controllers_window, 1, 7 );
-	m_toolBarLayout->setColumnStretch( 100, 1 );
+	gridButtons_layout->addWidget( song_editor_window, 1, 1 );
+	gridButtons_layout->addWidget( bb_editor_window, 1, 2 );
+	gridButtons_layout->addWidget( piano_roll_window, 1, 3 );
+	gridButtons_layout->addWidget( automation_editor_window, 1, 4 );
+	gridButtons_layout->addWidget( fx_mixer_window, 1, 5 );
+	gridButtons_layout->addWidget( project_notes_window, 1, 6 );
+	gridButtons_layout->addWidget( controllers_window, 1, 7 );
+	gridButtons_layout->addWidget( controllers_window, 1, 7 );
+	gridButtons_layout->setColumnStretch( 100, 1 );
 
+	
+	m_toolBarLayout->addWidget( gridButtons_w, 0, Qt::AlignLeft );
+	
+	m_toolBarLayout->insertSpacing( -1, 10 );
+	
+	// container for tempo/bpm and high quality
+	QWidget * tempo_hq_w = new QWidget( m_toolBar );
+	QVBoxLayout * tempo_hq_layout = new QVBoxLayout( tempo_hq_w );
+	tempo_hq_layout->setMargin( 0 );
+	tempo_hq_layout->setSpacing( 0 );
+	
+	// tempo spin box
+	m_tempoSpinBox = new lcdSpinBox( 3, tempo_hq_w, tr( "Tempo" ) );
+	m_tempoSpinBox->setModel( &( engine::getSong()->m_tempoModel) );
+	m_tempoSpinBox->setLabel( tr( "TEMPO/BPM" ) );
+	toolTip::add( m_tempoSpinBox, tr( "tempo of song" ) );
+
+	m_tempoSpinBox->setWhatsThis(
+		tr( "The tempo of a song is specified in beats per minute "
+			"(BPM). If you want to change the tempo of your "
+			"song, change this value. Every measure has four beats, "
+			"so the tempo in BPM specifies, how many measures / 4 "
+			"should be played within a minute (or how many measures "
+			"should be played within four minutes)." ) );
+
+	tempo_hq_layout->addWidget( m_tempoSpinBox );
+
+	// high quality button
+	toolButton * hq_btn = new toolButton( embed::getIconPixmap( "hq_mode" ),
+						tr( "High quality mode" ),
+						NULL, NULL, tempo_hq_w );
+	hq_btn->setCheckable( TRUE );
+	connect( hq_btn, SIGNAL( toggled( bool ) ),
+			this, SLOT( setHighQuality( bool ) ) );
+	hq_btn->setFixedWidth( 42 );
+	
+	tempo_hq_layout->addWidget( hq_btn );
+
+	// add container to main toolbar
+	m_toolBarLayout->addWidget( tempo_hq_w );
+
+	
+	m_toolBarLayout->insertSpacing( -1, 10 );
+
+	// time signature spin boxes
+	m_timeSigDisplay = new meterDialog( this, TRUE );
+	m_timeSigDisplay->setModel( &( engine::getSong()->m_timeSigModel ) );
+	
+	m_toolBarLayout->addWidget( m_timeSigDisplay, 0, Qt::AlignLeft );
+
+	m_toolBarLayout->insertSpacing( -1, 10 );
+	
+	// master volume slider
+	QLabel * master_vol_lbl = new QLabel( m_toolBar );
+	master_vol_lbl->setPixmap( embed::getIconPixmap( "master_volume" ) );
+
+	m_masterVolumeSlider = new automatableSlider( m_toolBar,
+							tr( "Master volume" ) );
+	m_masterVolumeSlider->setModel( &( engine::getSong()->m_masterVolumeModel ) );
+	m_masterVolumeSlider->setOrientation( Qt::Vertical );
+	m_masterVolumeSlider->setPageStep( 1 );
+	m_masterVolumeSlider->setTickPosition( QSlider::TicksLeft );
+	m_masterVolumeSlider->setFixedSize( 26, 60 );
+	m_masterVolumeSlider->setTickInterval( 50 );
+	toolTip::add( m_masterVolumeSlider, tr( "master volume" ) );
+
+	connect( m_masterVolumeSlider, SIGNAL( logicValueChanged( int ) ), this,
+			SLOT( masterVolumeChanged( int ) ) );
+	connect( m_masterVolumeSlider, SIGNAL( sliderPressed() ), this,
+			SLOT( masterVolumePressed() ) );
+	connect( m_masterVolumeSlider, SIGNAL( logicSliderMoved( int ) ), this,
+			SLOT( masterVolumeMoved( int ) ) );
+	connect( m_masterVolumeSlider, SIGNAL( sliderReleased() ), this,
+			SLOT( masterVolumeReleased() ) );
+
+	m_mvsStatus = new textFloat;
+	m_mvsStatus->setTitle( tr( "Master volume" ) );
+	m_mvsStatus->setPixmap( embed::getIconPixmap( "master_volume" ) );
+
+	m_toolBarLayout->addWidget( master_vol_lbl, 0, Qt::AlignLeft );
+	m_toolBarLayout->addWidget( m_masterVolumeSlider, 0, Qt::AlignLeft );
+
+	m_toolBarLayout->insertSpacing( -1, 10 );
+
+	// master pitch slider
+	QLabel * master_pitch_lbl = new QLabel( m_toolBar );
+	master_pitch_lbl->setPixmap( embed::getIconPixmap( "master_pitch" ) );
+	master_pitch_lbl->setFixedHeight( 64 );
+
+	m_masterPitchSlider = new automatableSlider( m_toolBar, tr( "Master pitch" ) );
+	m_masterPitchSlider->setModel( &( engine::getSong()->m_masterPitchModel ) );
+	m_masterPitchSlider->setOrientation( Qt::Vertical );
+	m_masterPitchSlider->setPageStep( 1 );
+	m_masterPitchSlider->setTickPosition( QSlider::TicksLeft );
+	m_masterPitchSlider->setFixedSize( 26, 60 );
+	m_masterPitchSlider->setTickInterval( 12 );
+	toolTip::add( m_masterPitchSlider, tr( "master pitch" ) );
+	connect( m_masterPitchSlider, SIGNAL( logicValueChanged( int ) ), this,
+			SLOT( masterPitchChanged( int ) ) );
+	connect( m_masterPitchSlider, SIGNAL( sliderPressed() ), this,
+			SLOT( masterPitchPressed() ) );
+	connect( m_masterPitchSlider, SIGNAL( logicSliderMoved( int ) ), this,
+			SLOT( masterPitchMoved( int ) ) );
+	connect( m_masterPitchSlider, SIGNAL( sliderReleased() ), this,
+			SLOT( masterPitchReleased() ) );
+
+	m_mpsStatus = new textFloat;
+	m_mpsStatus->setTitle( tr( "Master pitch" ) );
+	m_mpsStatus->setPixmap( embed::getIconPixmap( "master_pitch" ) );
+
+	m_toolBarLayout->addWidget( master_pitch_lbl, 0, Qt::AlignLeft );
+	m_toolBarLayout->addWidget( m_masterPitchSlider, 0, Qt::AlignLeft );
+
+	m_toolBarLayout->insertSpacing( -1, 10 );
+
+	// box to hold all new controls we're adding to main toolbar
+	//QWidget * add_w = new QWidget( tb );
+	//QHBoxLayout * add_layout = new QHBoxLayout( add_w );
+	
+	// create widget for visualization- and cpu-load-widget
+	QWidget * vc_w = new QWidget( m_toolBar );
+	QVBoxLayout * vcw_layout = new QVBoxLayout( vc_w );
+	vcw_layout->setMargin( 0 );
+	vcw_layout->setSpacing( 0 );
+
+	//vcw_layout->addStretch();
+	vcw_layout->addWidget( new visualizationWidget(
+			embed::getIconPixmap( "output_graph" ), vc_w ) );
+
+	vcw_layout->addWidget( new cpuloadWidget( vc_w ) );
+	vcw_layout->addStretch();
+	
+	m_toolBarLayout->addWidget( vc_w, 0, Qt::AlignLeft );
+	m_toolBarLayout->insertSpacing( -1, 10 );
+	
+	/*// global playback and record controls
+	// main box
+	QWidget * gpbr_w = new QWidget( m_toolBar );
+	QHBoxLayout * gpbrw_layout = new QHBoxLayout( gpbr_w );
+	
+	// playback half
+	QWidget * gpb_w = new QWidget( gpbr_w );
+	QVBoxLayout * gpbw_layout = new QVBoxLayout( gpb_w );
+	gpbw_layout->setMargin( 0 );
+	gpbw_layout->setSpacing( 0 );
+	gpbw_layout->addWidget( new QLabel( tr( "PLAYBACK" ), gpb_w ) );
+	
+	QWidget * btns = new QWidget( gpb_w );
+	QHBoxLayout * btns_layout = new QHBoxLayout( btns );
+	
+	QToolButton * m_playButton = new QToolButton( btns );
+	m_playButton->setIcon( embed::getIconPixmap( "play" ) );
+	m_playButton->setToolTip( tr( "Play/pause the current window (Space)" ) );
+
+	QToolButton * m_recordButton = new QToolButton( btns );
+	m_recordButton->setIcon( embed::getIconPixmap( "record" ) );
+	m_recordButton->setToolTip( tr( "Record from the checked items to the right" ) );
+
+	QToolButton * m_recordAccompanyButton = new QToolButton( btns );
+	m_recordAccompanyButton->setIcon( embed::getIconPixmap( "record_accompany" ) );
+	m_recordAccompanyButton->setToolTip( tr( "Record from the checked items to the right while playing" ) );
+	
+	QToolButton * m_stopButton = new QToolButton( btns );
+	m_stopButton->setIcon( embed::getIconPixmap( "stop" ) );
+	m_stopButton->setToolTip( tr( "Stop playing whatever is playing" ) );
+
+	btns_layout->setMargin(0);
+	btns_layout->setSpacing(0);
+	btns_layout->addWidget( m_playButton );
+	btns_layout->addWidget( m_recordButton );
+	btns_layout->addWidget( m_recordAccompanyButton );
+	btns_layout->addWidget( m_stopButton );
+	
+	gpbw_layout->addWidget( btns );
+	
+	gpbw_layout->addStretch();
+	
+	QWidget * gr_w = new QWidget( gpbr_w );
+	QVBoxLayout * grw_layout = new QVBoxLayout( gr_w );
+	grw_layout->setMargin( 0 );
+	grw_layout->setSpacing( 0 );
+	grw_layout->addWidget( new QLabel( tr( "RECORD" ), gr_w ) );
+	
+	grw_layout->addWidget( new QCheckBox( tr( "Audio-device" ), gr_w ) );
+	grw_layout->addWidget( new QCheckBox( tr( "Automation" ), gr_w ) );
+	grw_layout->addWidget( new QCheckBox( tr( "MIDI" ), gr_w ) ); 
+	
+	
+	gpbrw_layout->setMargin( 0 );
+	gpbrw_layout->setSpacing( 0 );
+	gpbrw_layout->addWidget( gpb_w );
+	gpbrw_layout->addSpacing( 20 );
+	gpbrw_layout->addWidget( gr_w );
+	gpbrw_layout->addStretch();
+	
+	
+	addWidgetToToolBar( gpbr_w );*/
+	
 
 	// setup-dialog opened before?
 	if( !configManager::inst()->value( "app", "configured" ).toInt() )
@@ -501,7 +714,7 @@ void mainWindow::finalize( void )
 
 
 
-
+/*
 int mainWindow::addWidgetToToolBar( QWidget * _w, int _row, int _col )
 {
 	int col = ( _col == -1 ) ? m_toolBarLayout->columnCount() + 7 : _col;
@@ -524,7 +737,7 @@ void mainWindow::addSpacingToToolBar( int _size )
 	m_toolBarLayout->setColumnMinimumWidth( m_toolBarLayout->columnCount() +
 								7, _size );
 }
-
+*/
 
 
 
@@ -1009,6 +1222,99 @@ void mainWindow::browseHelp( void )
 }
 
 
+
+
+void mainWindow::setHighQuality( bool _hq )
+{
+	engine::getMixer()->changeQuality( mixer::qualitySettings(
+			_hq ? mixer::qualitySettings::Mode_HighQuality :
+				mixer::qualitySettings::Mode_Draft ) );
+}
+
+
+
+void mainWindow::masterVolumeChanged( int _new_val )
+{
+	masterVolumeMoved( _new_val );
+	if( m_mvsStatus->isVisible() == FALSE && engine::getSong()->m_loadingProject == FALSE
+					&& m_masterVolumeSlider->showStatus() )
+	{
+		m_mvsStatus->moveGlobal( m_masterVolumeSlider,
+			QPoint( m_masterVolumeSlider->width() + 2, -2 ) );
+		m_mvsStatus->setVisibilityTimeOut( 1000 );
+	}
+	engine::getMixer()->setMasterGain( _new_val / 100.0f );
+}
+
+
+
+
+void mainWindow::masterVolumePressed( void )
+{
+	m_mvsStatus->moveGlobal( m_masterVolumeSlider,
+			QPoint( m_masterVolumeSlider->width() + 2, -2 ) );
+	m_mvsStatus->show();
+	masterVolumeMoved( engine::getSong()->m_masterVolumeModel.value() );
+}
+
+
+
+
+void mainWindow::masterVolumeMoved( int _new_val )
+{
+	m_mvsStatus->setText( tr( "Value: %1%" ).arg( _new_val ) );
+}
+
+
+
+
+void mainWindow::masterVolumeReleased( void )
+{
+	m_mvsStatus->hide();
+}
+
+
+
+
+void mainWindow::masterPitchChanged( int _new_val )
+{
+	masterPitchMoved( _new_val );
+	if( m_mpsStatus->isVisible() == FALSE && engine::getSong()->m_loadingProject == FALSE
+					&& m_masterPitchSlider->showStatus() )
+	{
+		m_mpsStatus->moveGlobal( m_masterPitchSlider,
+			QPoint( m_masterPitchSlider->width() + 2, -2 ) );
+		m_mpsStatus->setVisibilityTimeOut( 1000 );
+	}
+}
+
+
+
+
+void mainWindow::masterPitchPressed( void )
+{
+	m_mpsStatus->moveGlobal( m_masterPitchSlider,
+			QPoint( m_masterPitchSlider->width() + 2, -2 ) );
+	m_mpsStatus->show();
+	masterPitchMoved( engine::getSong()->m_masterPitchModel.value() );
+}
+
+
+
+
+void mainWindow::masterPitchMoved( int _new_val )
+{
+	m_mpsStatus->setText( tr( "Value: %1 semitones").arg( _new_val ) );
+
+}
+
+
+
+
+void mainWindow::masterPitchReleased( void )
+{
+	m_mpsStatus->hide();
+}
 
 
 #include "moc_main_window.cxx"

@@ -2,8 +2,6 @@
 	
 	* include/piano_roll.h:
 	* src/core/piano_roll.cpp:
-	* include/note.h:
-	* src/core/note.cpp:
 	- don't play notes when you click on one if the song is already playing
 	- now you can move and resize unquantized notes in quantized amounts
 	- shift+drag to copy one or more notes (we need to figure out some other
@@ -11,6 +9,17 @@
 	- removed stagnant note movement code 
 	- dragging a group of notes to boundary conditions is handled correctly
 	- ability to scroll using arrow keys while dragging notes
+	
+	* include/note.h:
+	* src/core/note.cpp:
+	refactored code (inline setXXX, etc)
+	
+	* include/song.h
+	* include/song_editor.h
+	* src/gui/song_editor.cpp
+	* include/main_window.h
+	* src/gui/main_window.cpp
+	moved main window toolbar code from songEditor to mainWindow
 
 2008-12-04	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 

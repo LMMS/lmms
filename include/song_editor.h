@@ -32,12 +32,8 @@
 class QLabel;
 class QScrollBar;
 
-class automatableSlider;
 class comboBox;
-class lcdSpinBox;
-class meterDialog;
 class song;
-class textFloat;
 class timeLine;
 class toolButton;
 
@@ -65,21 +61,11 @@ public slots:
 
 
 private slots:
-	void setHighQuality( bool );
 
 	void play( void );
 	void record( void );
 	void recordAccompany( void );
 	void stop( void );
-
-	void masterVolumeChanged( int _new_val );
-	void masterVolumePressed( void );
-	void masterVolumeMoved( int _new_val );
-	void masterVolumeReleased( void );
-	void masterPitchChanged( int _new_val );
-	void masterPitchPressed( void );
-	void masterPitchMoved( int _new_val );
-	void masterPitchReleased( void );
 
 	void updatePosition( const midiTime & _t );
 
@@ -104,14 +90,6 @@ private:
 	toolButton * m_recordButton;
 	toolButton * m_recordAccompanyButton;
 	toolButton * m_stopButton;
-	lcdSpinBox * m_tempoSpinBox;
-
-	meterDialog * m_timeSigDisplay;
-	automatableSlider * m_masterVolumeSlider;
-	automatableSlider * m_masterPitchSlider;
-
-	textFloat * m_mvsStatus;
-	textFloat * m_mpsStatus;
 
 	toolButton * m_addBBTrackButton;
 	toolButton * m_addSampleTrackButton;
