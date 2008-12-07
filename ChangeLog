@@ -1,3 +1,8 @@
+2008-12-07	Andrew Kelley	<superjoe30/at/gmail/dot/com>
+	
+	* src/gui/piano_roll.cpp:
+	(hopefully) fixed bug where shift+drag wasn't copying notes
+
 2008-12-05	Andrew Kelley	<superjoe30/at/gmail/dot/com>
 	
 	* include/piano_roll.h:

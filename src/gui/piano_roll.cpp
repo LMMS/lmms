@@ -1290,10 +1290,9 @@ void pianoRoll::mousePressEvent( QMouseEvent * _me )
 					QApplication::setOverrideCursor( c );
 					
 					// if they're holding shift, copy all selected notes 
-					if( *it != created_new_note &&
+					if( //*it != created_new_note &&
 					   _me->modifiers() & Qt::ShiftModifier )
 					{
-						
 						// vector to hold new notes until we're through the loop
 						QVector<note> newNotes;
 						it = notes.begin();
