@@ -52,7 +52,7 @@ timeLine::timeLine( const int _xoff, const int _yoff, const float _ppt,
 			song::playPos & _pos, const midiTime & _begin,
 							QWidget * _parent ) :
 	QWidget( _parent ),
-	m_autoScroll( AutoScrollEnabled ),
+	m_autoScroll( AutoScrollDisabled ),
 	m_loopPoints( LoopPointsDisabled ),
 	m_behaviourAtStop( BackToZero ),
 	m_changedPosition( TRUE ),
@@ -122,6 +122,8 @@ void timeLine::addToolButtons( QWidget * _tool_bar )
 	autoScroll->addState( embed::getIconPixmap( "autoscroll_off" ) );
 	connect( autoScroll, SIGNAL( changedState( int ) ), this,
 					SLOT( toggleAutoScroll( int ) ) );
+	// default to autoscroll off
+	autoScroll->changeState( AutoScrollDisabled );
 
 	nStateButton * loopPoints = new nStateButton( _tool_bar );
 	loopPoints->setGeneralToolTip( tr( "Enable/disable loop-points" ) );

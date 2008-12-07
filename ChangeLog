@@ -2,6 +2,13 @@
 	
 	* src/gui/piano_roll.cpp:
 	(hopefully) fixed bug where shift+drag wasn't copying notes
+	
+	* src/core/timeline.cpp:
+	* include/song_editor.h:
+	* src/gui/song_editor.cpp:
+	auto-scroll default to disabled
+	fixed glitch where it would auto-scroll even if it was off in song-editor
+	
 
 2008-12-05	Andrew Kelley	<superjoe30/at/gmail/dot/com>
 	

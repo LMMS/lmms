@@ -90,6 +90,8 @@ private:
 	toolButton * m_recordButton;
 	toolButton * m_recordAccompanyButton;
 	toolButton * m_stopButton;
+	
+	timeLine * m_timeLine;
 
 	toolButton * m_addBBTrackButton;
 	toolButton * m_addSampleTrackButton;
