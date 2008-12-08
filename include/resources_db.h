@@ -32,9 +32,11 @@
 #include <QtXml/QDomDocument>
 
 #define foreachTreeItem(list)	\
-		for(TreeItemList::Iterator it=list.begin();it!=list.end();++it)
-#define foreachConstTreeItem(list)	\
-		for(TreeItemList::ConstIterator it=list.begin();	\
+		for(ResourcesDB::TreeItemList::Iterator it=list.begin();\
+					it!=list.end();++it)
+
+#define foreachConstTreeItem(list)					\
+		for(ResourcesDB::TreeItemList::ConstIterator it=list.begin(); \
 						it!=list.end();++it)
 
 class ResourcesDB : public QObject
@@ -66,6 +68,7 @@ public:
 			TypeSoundFont,
 			TypePreset,
 			TypeProject,
+			TypeMidiFile,
 			TypeForeignProject,
 			TypePlugin,
 			TypeImage,

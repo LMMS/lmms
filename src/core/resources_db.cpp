@@ -127,7 +127,8 @@ ResourcesDB::Item::Types ResourcesDB::Item::guessType( void ) const
 		typeMap["mmp"] = TypeProject;
 		typeMap["mmpz"] = TypeProject;
 
-		typeMap["mid"] = TypeForeignProject;
+		typeMap["mid"] = TypeMidiFile;
+
 		typeMap["flp"] = TypeForeignProject;
 
 		typeMap["dll"] = TypePlugin;
@@ -193,7 +194,6 @@ void ResourcesDB::Item::init( void )
 		}
 		if( m_hash.isEmpty() )
 		{
-printf("rehash %s\n", fullName().toAscii().constData());
 			QCryptographicHash h( QCryptographicHash::Sha1 );
 
 			QFile f( fullName() );
@@ -477,7 +477,7 @@ void ResourcesDB::readDir( const QString & _dir, TreeItem * _parent,
 	TreeItem * curParent = _parent->findChild( d.dirName() +
 							QDir::separator(),
 							_base_dir );
-printf("read dir: %s (%d)\n", d.canonicalPath().toAscii().constData(), curParent );
+printf("read dir: %s\n", d.canonicalPath().toAscii().constData() );
 	if( curParent )
 	{
 		parentItem = curParent->item();
