@@ -87,7 +87,7 @@ songEditor::songEditor( song * _song, songEditor * & _engine_ptr ) :
 	setFocus();
 
 	// create time-line
-	timeLine * tl = new timeLine( TRACK_OP_WIDTH +
+	m_timeLine = new timeLine( TRACK_OP_WIDTH +
 					DEFAULT_SETTINGS_WIDGET_WIDTH, 32,
 					pixelsPerTact(),
 					m_s->m_playPos[song::Mode_PlaySong],
@@ -95,7 +95,7 @@ songEditor::songEditor( song * _song, songEditor * & _engine_ptr ) :
 	connect( this, SIGNAL( positionChanged( const midiTime & ) ),
 				m_s->m_playPos[song::Mode_PlaySong].m_timeLine,
 			SLOT( updatePosition( const midiTime & ) ) );
-	connect( tl, SIGNAL( positionChanged( const midiTime & ) ),
+	connect( m_timeLine, SIGNAL( positionChanged( const midiTime & ) ),
 			this, SLOT( updatePosition( const midiTime & ) ) );
 
 	m_positionLine = new positionLine( this );
@@ -232,7 +232,7 @@ songEditor::songEditor( song * _song, songEditor * & _engine_ptr ) :
 	m_toolBar->setPalette( pal );
 
 	static_cast<QVBoxLayout *>( layout() )->insertWidget( 0, m_toolBar );
-	static_cast<QVBoxLayout *>( layout() )->insertWidget( 1, tl );
+	static_cast<QVBoxLayout *>( layout() )->insertWidget( 1, m_timeLine );
 
 	QHBoxLayout * tb_layout = new QHBoxLayout( m_toolBar );
 	tb_layout->setMargin( 0 );
@@ -357,7 +357,7 @@ songEditor::songEditor( song * _song, songEditor * & _engine_ptr ) :
 	tb_layout->addWidget( m_drawModeButton );
 	tb_layout->addWidget( m_editModeButton );
 	tb_layout->addSpacing( 10 );
-	tl->addToolButtons( m_toolBar );
+	m_timeLine->addToolButtons( m_toolBar );
 	tb_layout->addSpacing( 15 );
 	tb_layout->addWidget( zoom_lbl );
 	tb_layout->addSpacing( 5 );

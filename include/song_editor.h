@@ -106,6 +106,8 @@ private:
 	toolButton * m_stopButton;
 	lcdSpinBox * m_tempoSpinBox;
 
+	timeLine * m_timeLine;
+
 	meterDialog * m_timeSigDisplay;
 	automatableSlider * m_masterVolumeSlider;
 	automatableSlider * m_masterPitchSlider;
