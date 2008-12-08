@@ -1,3 +1,8 @@
+2008-12-08	Andrew Kelley	<superjoe30/at/gmail/dot/com>
+	
+	* src/gui/piano_roll.cpp:
+	ability to scroll left and right while using ctrl to select notes
+
 2008-12-08	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/core/resources_tree_model.cpp:

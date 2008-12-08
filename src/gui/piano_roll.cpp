@@ -751,7 +751,8 @@ void pianoRoll::keyPressEvent( QKeyEvent * _ke )
 	switch( _ke->key() )
 	{
 		case Qt::Key_Up:
-			if( _ke->modifiers() & Qt::ControlModifier )
+			if( (_ke->modifiers() & Qt::ControlModifier) 
+				&& m_action == ActionNone )
 			{
 				// shift selection up an octave
 				// if nothing selected, shift _everything_
@@ -772,7 +773,8 @@ void pianoRoll::keyPressEvent( QKeyEvent * _ke )
 			}
 			break;
 		case Qt::Key_Down:
-			if( _ke->modifiers() & Qt::ControlModifier )
+			if( _ke->modifiers() & Qt::ControlModifier 
+			   && m_action == ActionNone )
 			{
 				// shift selection down an octave
 				// if nothing selected, shift _everything_
@@ -795,7 +797,8 @@ void pianoRoll::keyPressEvent( QKeyEvent * _ke )
 
 		case Qt::Key_Left:
 		{
-			if( _ke->modifiers() & Qt::ControlModifier )
+			if( _ke->modifiers() & Qt::ControlModifier 
+			   && m_action == ActionNone)
 			{
 				// move time ticker
 				if( ( m_timeLine->pos() -= 16 ) < 0 )
@@ -804,7 +807,8 @@ void pianoRoll::keyPressEvent( QKeyEvent * _ke )
 				}
 				m_timeLine->updatePosition();
 			}
-			else if( _ke->modifiers() & Qt::ShiftModifier )
+			else if( _ke->modifiers() & Qt::ShiftModifier 
+					&& m_action == ActionNone)
 			{
 				// move notes
 				bool quantized = ! (_ke->modifiers() & Qt::AltModifier);
@@ -829,13 +833,15 @@ void pianoRoll::keyPressEvent( QKeyEvent * _ke )
 		}
 		case Qt::Key_Right:
 		{
-			if( _ke->modifiers() & Qt::ControlModifier )
+			if( _ke->modifiers() & Qt::ControlModifier 
+			   && m_action == ActionNone)
 			{
 				// move time ticker
 				m_timeLine->pos() += 16;
 				m_timeLine->updatePosition();
 			}
-			else if( _ke->modifiers() & Qt::ShiftModifier )
+			else if( _ke->modifiers() & Qt::ShiftModifier 
+					&& m_action == ActionNone)
 			{
 				// move notes
 				bool quantized = ! (_ke->modifiers() & Qt::AltModifier);
