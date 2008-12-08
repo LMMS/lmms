@@ -77,4 +77,4 @@ Andrew Kelley's todo:
 - make it so that 3xosc notes don't max out
 - implement note detuning (used to be ctrl+click to access note detuning) (need some other intuitive way to access note detuning as ctrl, shift, and alt are all being used)
 - make the horizontal mouse wheel do the same thing as shift+vertical mouse wheel
-
+- copy-pasted automation patterns have to be manually linked back to their knob for some reason

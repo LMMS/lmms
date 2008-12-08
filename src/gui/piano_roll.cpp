@@ -1433,10 +1433,6 @@ void pianoRoll::computeSelectedNotes(bool shift)
 	{
 		const noteVector & notes = m_pattern->notes();
 
-		const int visible_keys = ( height() - PR_TOP_MARGIN -
-					PR_BOTTOM_MARGIN - m_notesEditHeight ) /
-							KEY_LINE_HEIGHT + 2;
-
 		QPolygon volumeHandles;
 
 		for( noteVector::const_iterator it = notes.begin();
@@ -1467,25 +1463,14 @@ void pianoRoll::computeSelectedNotes(bool shift)
 						midiTime::ticksPerTact();
 			const int x = ( pos_ticks - m_currentPosition ) *
 					m_ppt / midiTime::ticksPerTact();
-			// skip this note if not in visible area at all
-			if( !( x + note_width >= 0 &&
-					x <= width() - WHITE_KEY_WIDTH ) )
-			{
-				continue;
-			}
 
-			// is the note in visible area?
-			if( key > 0 && key <= visible_keys )
-			{	
-				// if the selection even barely overlaps the note
-				if( key > sel_key_start &&
-					key <= sel_key_end &&
-					pos_ticks + len_ticks > sel_pos_start &&
-					pos_ticks < sel_pos_end )
-				{
-					( *it )->setSelected( true );
-				}
-			
+			// if the selection even barely overlaps the note
+			if( key > sel_key_start &&
+				key <= sel_key_end &&
+				pos_ticks + len_ticks > sel_pos_start &&
+				pos_ticks < sel_pos_end )
+			{
+				( *it )->setSelected( true );
 			}
 		}
 	}
@@ -1572,7 +1557,7 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 		return;
 	}
 	
-	if( _me->y() > PR_TOP_MARGIN )
+	if( _me->y() > PR_TOP_MARGIN || m_action != ActionNone )
 	{
 		bool edit_note = ( _me->y() > 
 						   height() - PR_BOTTOM_MARGIN - m_notesEditHeight )
@@ -1580,6 +1565,7 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 			
 
 		int key_num = getKey( _me->y() );
+		printf("keynum = %i\n", key_num);
 		int x = _me->x();
 
 		// is the calculated key different from current key?
@@ -1607,7 +1593,7 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 								midiTime() );
 			}
 		}
-		if( x < WHITE_KEY_WIDTH )
+		if( x < WHITE_KEY_WIDTH && m_action == ActionNone )
 		{
 			update();
 			return;
@@ -1827,7 +1813,7 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 
 			// change size of selection
 
-			if( x < 0 && m_currentPosition > 0 )
+			/*if( x < 0 && m_currentPosition > 0 )
 			{
 				x = 0;
 				QCursor::setPos( mapToGlobal( QPoint(
@@ -1850,7 +1836,7 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 								_me->y() ) ) );
 				m_leftRightScroll->setValue( m_currentPosition +
 									4 );
-			}
+			}*/
 
 			// get tick in which the cursor is posated
 			int pos_ticks = x * midiTime::ticksPerTact() / m_ppt +
