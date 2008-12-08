@@ -1,27 +1,45 @@
+2008-12-08	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* include/fluiq/collapsible_widget.h:
+	* include/fluiq/splitter.h:
+	* include/fluiq/widget.h:
+	* include/fluiq/widget_container.h:
+	* include/fluiq/workspace.h:
+	* src/gui/fluiq/collapsible_widget.cpp:
+	* src/gui/fluiq/splitter.cpp:
+	* src/gui/fluiq/widget.cpp:
+	* src/gui/fluiq/widget_container.cpp:
+	* src/gui/fluiq/workspace.cpp:
+	* data/themes/default/fluiq/arrow-down.png:
+	* data/themes/default/fluiq/arrow-right.png:
+	* CMakeLists.txt:
+	added initial draft of FLUIQ (Flexible User-Interface with Qt)
+	framework (integration patches will follow later)
+
 2008-12-07	Andrew Kelley	<superjoe30/at/gmail/dot/com>
-	
+
 	* src/gui/piano_roll.cpp:
 	(hopefully) fixed bug where shift+drag wasn't copying notes
-	
+
 	* src/core/timeline.cpp:
 	* include/song_editor.h:
 	* src/gui/song_editor.cpp:
-	auto-scroll default to disabled
-	fixed glitch where it would auto-scroll even if it was off in song-editor
+	- auto-scroll default to disabled
+	- fixed glitch where it would auto-scroll even if it was off in
+	  song-editor
 	
 	* src/gui/main_window.cpp:
 	worked on global playback/record options in the toolbar. This code
 	is still commented out though.
-	
 
 2008-12-05	Andrew Kelley	<superjoe30/at/gmail/dot/com>
-	
+
 	* include/piano_roll.h:
 	* src/core/piano_roll.cpp:
 	- don't play notes when you click on one if the song is already playing
 	- now you can move and resize unquantized notes in quantized amounts
 	- shift+drag to copy one or more notes (we need to figure out some other
-	way to implement note detuning)
+	  way to implement note detuning)
 	- removed stagnant note movement code 
 	- dragging a group of notes to boundary conditions is handled correctly
 	- ability to scroll using arrow keys while dragging notes
@@ -71,7 +89,7 @@
 	per default play sub-octaves of first oscillator in osc 2 and 3
 
 2008-11-29	Andrew Kelley	<superjoe30/at/gmail/dot/com>
-	
+
 	* include/piano_roll.h:
 	* src/gui/piano_roll.cpp:
 	- when you draw a note it clears the selection and selects the new note
@@ -1283,7 +1301,7 @@
 	Add support for pitch bend
 
 	* src/tracks/instrument_track.cpp:
-	* include/instrument_track.h: 
+	* include/instrument_track.h:
 	- Correctly update instrumentTrackView when changing the instrument plugin
 	- Add bendable property to hide pitchBend knob for Vibed
 
@@ -3167,7 +3185,7 @@
 	added rudimentary WinMM MIDI support
 
 	* src/core/mmp.cpp:
-	* plugins/lb302/lb302.h
+	* plugins/lb302/lb302.h:
 	* plugins/CMakeLists.txt:
 	switched back to LB302 as Paul wants LB303 for 0.4.1
 
@@ -8439,6 +8457,7 @@
 	made MIDI- and FLP-import-filter work
 
 2008-02-15	Paul Giblock <drfaygo/at/gmail/dot/net>
+
 	* plugins/plucked_string_synth/plucked_string_synth.cpp:
 	* plugins/plucked_string_synth/plucked_string_synth.h:
 	* plugins/organic/organic.cpp:
@@ -9614,8 +9633,8 @@
 
 	* plugins/ladspa_effect/ladspa_effect.h:
 	* plugins/bass_booster/bass_booster.h:
-	* plugins/stereo_enhancer/stereoenhancer_control_dialog.cpp
-	* plugins/stereo_enhancer/stereoenhancer_control_dialog.h
+	* plugins/stereo_enhancer/stereoenhancer_control_dialog.cpp:
+	* plugins/stereo_enhancer/stereoenhancer_control_dialog.h:
 	* include/main_window.h:
 	* include/instrument_track.h:
 	* include/track_container.h:
@@ -10346,7 +10365,7 @@
 	* data/samples/drums/rim01.ogg:
 	* data/samples/drums/ride02.ogg:
 	* data/samples/drums/nasty_rim01.ogg:
-	* data/samples/drums/hihat_opened03.ogg
+	* data/samples/drums/hihat_opened03.ogg:
 	* data/samples/misc/applause01.ogg:
 	added samples
 
@@ -11113,7 +11132,7 @@
 	- display label text
 
 	* include/audio_device.h:
-	* include/audio_dummy.h
+	* include/audio_dummy.h:
 	* include/midi_client.h:
 	* include/midi_dummy.h:
 	hide empty settings box
@@ -11407,7 +11426,7 @@
 	* plugins/audio_file_processor/audio_file_processor.cpp:
 	* plugins/bass_booster/bass_booster.cpp:
 	* plugins/bass_booster/bass_booster.h:
-	* plugins/bass_booster/bassbooster_control_dialog.cpp
+	* plugins/bass_booster/bassbooster_control_dialog.cpp:
 	* plugins/bit_invader/bit_invader.cpp:
 	* plugins/bit_invader/graph.cpp:
 	* plugins/bit_invader/graph.h:
@@ -11751,7 +11770,7 @@
 	* include/audio_oss.h:
 	* include/audio_sdl.h:
 	* include/midi_alsa_raw.h:
-	* include/midi_alsa_seq.h
+	* include/midi_alsa_seq.h:
 	* include/midi_client.h:
 	* include/midi_dummy.h:
 	* include/midi_oss.h:
@@ -12651,6 +12670,7 @@
 	fixed single source compilation
 
 2006-09-08	Danny McRae <khjklujn/at/users/dot/sourceforge/dot/net>
+
 	* configure.in:
 	fixed check for STK headers and library
 	
@@ -12730,6 +12750,7 @@
 	Qt4-compat fixes
 
 2006-08-30	Danny McRae <khjklujn/at/users/dot/sourceforge/dot/net>
+
 	* src/widgets/ladspa_control.cpp:
 	added a lock to prevent segfaults when changing the values
 	while playing
@@ -12908,6 +12929,7 @@
 	updated Dutch translation
 
 2006-08-16	Danny McRae <khjklujn/at/users/dot/sourceforge/dot/net>
+
 	* src/widgets/tempo_sync_knob.cpp:
 	changed context menu to only display possible note length
 	options based on the knob's max value
@@ -12964,6 +12986,7 @@
 	connetions are not saved!)
 
 2006-08-15	Danny McRae <khjklujn/at/users/dot/sourceforge/dot/net>
+
 	* src/widgets/ladspa_control.cpp:
 	doubled the number of steps in the knobs
 	
@@ -13006,6 +13029,7 @@
 	removed
 
 2006-08-14	Danny McRae <khjklujn/at/users/dot/sourceforge/dot/net>
+
 	* Makefile.am:
 	* include/ladspa_effect.h:
 	* src/core/ladspa_effect.cpp:
@@ -13039,7 +13063,7 @@
 	- getAudioPort() is required
 	- removed slots, moved playing to samplePlayHandle
 
-	* include/sample_play_handle.h.
+	* include/sample_play_handle.h:
 	* src/core/sample_play_handle.cpp:
 	- became a QObject
 	- create handle from sampleTCO
@@ -13075,6 +13099,7 @@
 	added minQ "constant"
 
 2006-08-10	Danny McRae <khjklujn/at/users/dot/sourceforge/dot/net>
+
 	* src/widgets/ladspa_control.cpp:
 	unfixed my misunderstood fix of the setting of sample rate
 	dependent ports
@@ -13126,6 +13151,7 @@
 	added disabled track artwork
 
 2006-08-10	Danny McRae <khjklujn/at/users/dot/sourceforge/dot/net>
+
 	* include/effect.h:
 	* include/effect_chain.h:
 	* include/effect_label.h:
@@ -13164,6 +13190,7 @@
 	do about it--just thought it should be noted somewhere.
 
 2006-08-09	Danny McRae <khjklujn/at/users/dot/sourceforge/dot/net>
+
 	* Makefile.am:
 	* include/effect_label.h:
 	* include/effect_tab_widget.h:
@@ -13192,6 +13219,7 @@
 	 something I forgot to #ifdef LADSPA_SUPPORT out.
 
 2006-08-08	Danny McRae <khjklujn/at/users/dot/sourceforge/dot/net>
+
 	* include/effect.h:
 	* include/effect_chain.h:
 	* include/effect_tab_widget.h:
@@ -13217,6 +13245,7 @@
 	 sound like with effects
 
 2006-08-07	Danny McRae <khjklujn/at/users/dot/sourceforge/dot/net>
+
 	* include/oscillator.h:
 	* plugins/vibed/vibrating_string.h:
 	* plugins/vibed/vibrating_string.cpp:
@@ -14007,7 +14036,7 @@
 	fixed integer-overflow
 
 	* include/oscillator.h:
-	* include/sample_buffer.h: 
+	* include/sample_buffer.h:
 	* plugins/organic/organic.cpp:
 	* plugins/triple_oscillator/triple_oscillator.cpp:
 	* src/core/envelope_and_lfo_widget.cpp:
@@ -14091,13 +14120,14 @@
 	some small optimizations in vibed::playNote( ... )
 
 2006-04-16	Danny McRae	<khjklujn/at/users/dot/sourceforge/dot/net>
+
 	* Makefile.am:
 	* src/lmms_single_source.cpp:
 	* include/knob.h:
 	* include/instrument_track.h:
 	* src/tracks/instrument_track.cpp:
-	*+src/include/volume_knob.h:
-	*+src/widgets/volume_knob.cpp:
+	* src/include/volume_knob.h:
+	* src/widgets/volume_knob.cpp:
 	* include/setup_dialog.h:
 	* src/core/setup_dialog.cpp:
 	* include/sample_track.h:
@@ -14125,11 +14155,12 @@
 	the maximum number of channels that could be defined.
 	
 2006-04-15	Danny McRae	<khjklujn/at/users/dot/sourceforge/dot/net>
+
 	* include/mixer.h:
 	* src/core/mixer.cpp:
 	* src/core/song_editor.cpp:
-	*+data/themes/default/auto_limit.png:
-	*+data/themes/blue_scene/auto_limit.png:
+	* data/themes/default/auto_limit.png:
+	* data/themes/blue_scene/auto_limit.png:
 	Added auto limiter option.  Main window now has a button next to
 	the high-quality button to toggle the auto limiter on and off
 	The limiter scales the whole section between zero crossings where
@@ -14918,7 +14949,7 @@
 	do not lock mutex in processOutEvent() as it causes a deadlock when
 	having channel-activity-indicators enabled
 
-	* include/midi_mapper.h
+	* include/midi_mapper.h:
 	* include/project_notes.h:
 	* src/lib/sample_buffer.cpp:
 	* src/midi/midi_file.cpp:
@@ -16068,14 +16099,14 @@
 	* include/audio_dummy.h:
 	* include/audio_file_device.h:
 	* include/audio_file_ogg.h:
-	* include/audio_file_wave.h
+	* include/audio_file_wave.h:
 	* include/audio_jack.h:
 	* include/audio_oss.h:
 	* include/audio_sdl.h:
 	* include/export.h:
 	* include/export_project_dialog.h:
 	* include/mixer.h:
-	* include/pattern.h
+	* include/pattern.h:
 	* include/song_editor.h:
 	* src/audio/audio_alsa.cpp:
 	* src/audio/audio_device.cpp:
@@ -16122,7 +16153,7 @@
 	* plugins/vestige/communication.h:
 	added new VST-framework (client-server-architecture) based on XFST
 
-	* include/qxembed.h
+	* include/qxembed.h:
 	* src/widgets/qxembed.cpp:
 	added QXEmbed-widget which is neccessary for embedding VST-plugin
 
@@ -16451,8 +16482,8 @@
 
 2005-10-13	Danny McRae	<khjklujn/at/yahoo/dot/com>
 
-	* include/ladspa_manager.h
-	* include/ladspa_sine_1063.h
+	* include/ladspa_manager.h:
+	* include/ladspa_sine_1063.h:
 	* src/lib/ladspa_manager.cpp:
 	* src/soundgenerators/ladspa_sine_1063.cpp:
 	added LADSPA-support and a simple soundgenerator for testing-purposes
@@ -17719,7 +17750,7 @@
 2005-06-30	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* include/channel_track.h:
-	* include/midi_device.h
+	* include/midi_device.h:
 	* include/mixer.h:
 	* include/pattern.h:
 	* src/core/piano_roll.cpp:
@@ -17728,7 +17759,7 @@
 	added support for recording notes from MIDI-device (e.g. MIDI-keyboard
 	or virtual channel-piano) in a pattern using the piano-roll
 
-	* include/pattern.h
+	* include/pattern.h:
 	* src/core/song_editor.cpp:
 	fixed bug which led to crash: when pattern was played in non-looping
 	mode song-editor always called pattern::finishFreeze() even if there
