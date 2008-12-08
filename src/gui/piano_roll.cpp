@@ -1574,8 +1574,10 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 	
 	if( _me->y() > PR_TOP_MARGIN )
 	{
-		bool edit_note = ( _me->y() > height() -
-					PR_BOTTOM_MARGIN - m_notesEditHeight );
+		bool edit_note = ( _me->y() > 
+						   height() - PR_BOTTOM_MARGIN - m_notesEditHeight )
+						&& m_action != ActionSelectNotes;
+			
 
 		int key_num = getKey( _me->y() );
 		int x = _me->x();
@@ -1612,16 +1614,18 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 		}
 		x -= WHITE_KEY_WIDTH;
 
-		// Volume Bars
 		if( _me->buttons() & Qt::LeftButton 
 			&& m_editMode == ModeDraw
 			&& (m_action == ActionMoveNote || m_action == ActionResizeNote ) )
 		{
+			// handle moving notes and resizing them
 			dragNotes(_me->x(), _me->y(), _me->modifiers() & Qt::AltModifier);
 		}
 		else if( ( edit_note == true || m_action == ActionChangeNoteVolume ) &&
 				_me->buttons() & Qt::LeftButton )
 		{
+			// Volume Bars
+			
 			// Use nearest-note when changing volume so the bars can
 			// be "scribbled"
 			int pos_ticks = ( x * midiTime::ticksPerTact() ) /

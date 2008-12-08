@@ -10,6 +10,7 @@
 	
 	* src/gui/piano_roll.cpp:
 	ability to scroll left and right while using ctrl to select notes
+	disabled volume bar changes while dragging a selection
 
 2008-12-08	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
