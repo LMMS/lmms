@@ -372,10 +372,7 @@ SET(CMAKE_CXX_FLAGS "-O2 -g -fno-exceptions -Wall -ftree-vectorize ${CMAKE_CXX_F
 #SET(CMAKE_CXX_FLAGS_${CMAKE_BUILD_TYPE} "${CMAKE_CXX_FLAGS}")
 
 
-# people simply updating SVN will still have this and mess up build with it
-FILE(REMOVE include/lmmsconfig.h)
-
-FILE(GLOB lmms_INCLUDES ${CMAKE_SOURCE_DIR}/include/*.h)
+FILE(GLOB_RECURSE lmms_INCLUDES ${CMAKE_SOURCE_DIR}/include/*.h)
 FILE(GLOB lmms_UI ${CMAKE_SOURCE_DIR}/src/gui/dialogs/*.ui)
 FILE(GLOB_RECURSE lmms_SOURCES ${CMAKE_SOURCE_DIR}/src/*.cpp)
 
