@@ -196,7 +196,10 @@ void vstPlugin::showEditor( QWidget * _parent )
 	xe->show();
 #endif
 
-	m_pluginWidget->show();
+	if( m_pluginWidget )
+	{
+		m_pluginWidget->show();
+	}
 }
 
 
