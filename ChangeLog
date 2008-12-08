@@ -1,5 +1,20 @@
 2008-12-08	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* src/core/resources_tree_model.cpp:
+	return appropriate icon for Qt::DecorationRole
+
+	* data/themes/default/mimetypes/plugin.png:
+	* data/themes/default/mimetypes/unknown.png:
+	* data/themes/default/mimetypes/folder-datadir.png:
+	* data/themes/default/mimetypes/sample.png:
+	* data/themes/default/mimetypes/image.png:
+	* data/themes/default/mimetypes/midi.png:
+	* data/themes/default/mimetypes/preset.png:
+	* data/themes/default/mimetypes/folder-lsp.png:
+	* data/themes/default/mimetypes/folder-workingdir.png:
+	* data/themes/default/mimetypes/folder.png:
+	added new icons for various MIME types
+
 	* include/resources_db.h:
 	* src/core/resources_db.cpp:
 	added ResourcesDB::Item::TypeMidiFile

@@ -24,6 +24,7 @@
 
 
 #include "resources_tree_model.h"
+#include "embed.h"
 
 
 ResourcesTreeModel::ResourcesTreeModel( ResourcesDB * _db, QObject * _parent ) :
@@ -32,8 +33,6 @@ ResourcesTreeModel::ResourcesTreeModel( ResourcesDB * _db, QObject * _parent ) :
 {
 	connect( m_db, SIGNAL( itemsChanged() ),
 			this, SIGNAL( itemsChanged() ) );
-/*	connect( m_db, SIGNAL( itemsChanged() ),
-			this, SIGNAL( layoutChanged() ) );*/
 }
 
 
@@ -41,12 +40,61 @@ ResourcesTreeModel::ResourcesTreeModel( ResourcesDB * _db, QObject * _parent ) :
 
 QVariant ResourcesTreeModel::data( const QModelIndex & _idx, int _role ) const
 {
-	if( _idx.isValid() && _role == Qt::DisplayRole )
+	if( _idx.isValid() )
 	{
 		ResourcesDB::TreeItem * item =
 				static_cast<ResourcesDB::TreeItem *>(
 						_idx.internalPointer() );
-		return item->item()->name();
+		if( _role == Qt::DisplayRole )
+		{
+			if( item->parent() == m_db->topLevelNode() )
+			{
+				switch( item->item()->baseDir() )
+				{
+					case ResourcesDB::Item::BaseWorkingDir:
+			return tr( "My LMMS files" );
+					case ResourcesDB::Item::BaseDataDir:
+			return tr( "Shipped LMMS files" );
+					default:
+						break;
+				}
+			}
+			return item->item()->name();
+		}
+		else if( _role == Qt::DecorationRole )
+		{
+			if( item->parent() == m_db->topLevelNode() )
+			{
+				switch( item->item()->baseDir() )
+				{
+					case ResourcesDB::Item::BaseWorkingDir:
+	return embed::getIconPixmap( "mimetypes/folder-workingdir", 24, 24 );
+					case ResourcesDB::Item::BaseDataDir:
+	return embed::getIconPixmap( "mimetypes/folder-datadir", 24, 24 );
+					default:
+						break;
+				}
+			}
+			switch( item->item()->type() )
+			{
+case ResourcesDB::Item::TypeDirectory:
+	return embed::getIconPixmap( "mimetypes/folder", 24, 24 );
+case ResourcesDB::Item::TypeSample:
+	return embed::getIconPixmap( "mimetypes/sample", 24, 24 );
+case ResourcesDB::Item::TypePreset:
+	return embed::getIconPixmap( "mimetypes/preset", 24, 24 );
+case ResourcesDB::Item::TypeProject:
+	return embed::getIconPixmap( "project_file", 24, 24 );
+case ResourcesDB::Item::TypeMidiFile:
+	return embed::getIconPixmap( "mimetypes/midi", 24, 24 );
+case ResourcesDB::Item::TypeImage:
+	return embed::getIconPixmap( "mimetypes/image", 24, 24 );
+case ResourcesDB::Item::TypePlugin:
+	return embed::getIconPixmap( "mimetypes/plugin", 24, 24 );
+default:
+	return embed::getIconPixmap( "mimetypes/unknown", 24, 24 );
+			}
+		}
 	}
 	return QVariant();
 }
