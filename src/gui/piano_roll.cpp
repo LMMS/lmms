@@ -1813,31 +1813,6 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 
 			// change size of selection
 
-			/*if( x < 0 && m_currentPosition > 0 )
-			{
-				x = 0;
-				QCursor::setPos( mapToGlobal( QPoint(
-								WHITE_KEY_WIDTH,
-								_me->y() ) ) );
-				if( m_currentPosition >= 4 )
-				{
-					m_leftRightScroll->setValue(
-							m_currentPosition - 4 );
-				}
-				else
-				{
-					m_leftRightScroll->setValue( 0 );
-				}
-			}
-			else if( x > width() - WHITE_KEY_WIDTH )
-			{
-				x = width() - WHITE_KEY_WIDTH;
-				QCursor::setPos( mapToGlobal( QPoint( width(),
-								_me->y() ) ) );
-				m_leftRightScroll->setValue( m_currentPosition +
-									4 );
-			}*/
-
 			// get tick in which the cursor is posated
 			int pos_ticks = x * midiTime::ticksPerTact() / m_ppt +
 							m_currentPosition;
