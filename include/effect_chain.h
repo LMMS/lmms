@@ -34,7 +34,7 @@
 class effect;
 
 
-class effectChain : public model, public serializingObject
+class EXPORT effectChain : public model, public serializingObject
 {
 	Q_OBJECT
 public:
