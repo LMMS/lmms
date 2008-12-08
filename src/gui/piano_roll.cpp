@@ -1459,11 +1459,6 @@ void pianoRoll::computeSelectedNotes(bool shift)
 
 			Sint32 pos_ticks = ( *it )->pos();
 
-			int note_width = len_ticks * m_ppt /
-						midiTime::ticksPerTact();
-			const int x = ( pos_ticks - m_currentPosition ) *
-					m_ppt / midiTime::ticksPerTact();
-
 			// if the selection even barely overlaps the note
 			if( key > sel_key_start &&
 				key <= sel_key_end &&
