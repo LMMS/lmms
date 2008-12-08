@@ -645,7 +645,8 @@ void songEditor::masterPitchReleased( void )
 
 void songEditor::updatePosition( const midiTime & _t )
 {
-	if( ( m_s->isPlaying() && m_s->m_playMode == song::Mode_PlaySong ) ||
+	if( ( m_s->isPlaying() && m_s->m_playMode == song::Mode_PlaySong 
+		  && m_timeLine->autoScroll() == timeLine::AutoScrollEnabled) ||
 							m_scrollBack == TRUE )
 	{
 		const int w = width() - DEFAULT_SETTINGS_WIDGET_WIDTH
