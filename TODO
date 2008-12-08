@@ -52,6 +52,12 @@
 - add FLAC as export-format?
 
 Andrew Kelley's todo:
+- recording automation
+- make knobs easier to tune (less sensitive)
+- make the menu for a channel happen when you right click, instead of renaming, and make the midi input a top-level menu item
+- add a "Set exact value" to a right clicked automation menu
+- enable "auto detect" by default when you bring up the "connect to controller" window
+
 - add a tools menu to piano roll
   * put some of the tools on there that already have keyboard shortcuts (ctrl+up/down, shift+left/right)
   * humanizing tool
@@ -61,19 +67,14 @@ Andrew Kelley's todo:
 - make copy/paste work beyond inside piano roll - it didn't work when I copied notes from one pattern and then opened another pattern and pasted.
 - piano roll: make the note volume section have adjustable height
 - add note panning ability to piano roll
-- make piano roll grid change based on quantization
 
 - "paintbrush" tool for the song editor, to easily "paint" beat+basslines
 - when you clone a track in the song editor, rename the track so that it doesn't have the same name (increment the number if necessary)
 - somehow enable easy pattern copy pasting in the beat+bassline editor
-- make knobs easier to tune (less sensitive)
 - make it so you can see the notes when putting a pattern in the playlist
-- make the menu for a channel happen when you right click, instead of renaming, and make the midi input a top-level menu item
-- recording automation
 - adding/removing steps to the beat+bassline editor is awkward
 - the 'add beat+bassline' button in the beat+bassline editor is misleading - I say we remove it and rely on the song editor to add beat+basslines
 - make it so that 3xosc notes don't max out
 - implement note detuning (used to be ctrl+click to access note detuning) (need some other intuitive way to access note detuning as ctrl, shift, and alt are all being used)
-- make the horizontal scroll bar do the same thing as shift+vertical scroll bar
-- add a "Set exact value" to a right clicked automation menu
-- enable "auto detect" by default when you bring up the "connect to controller" window
+- make the horizontal mouse wheel do the same thing as shift+vertical mouse wheel
+

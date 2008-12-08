@@ -631,7 +631,8 @@ void mainWindow::finalize( void )
 	m_toolBarLayout->addWidget( vc_w, 0, Qt::AlignLeft );
 	m_toolBarLayout->insertSpacing( -1, 10 );
 	
-	/*// global playback and record controls
+	/*
+	// global playback and record controls
 	// main box
 	QWidget * gpbr_w = new QWidget( m_toolBar );
 	QHBoxLayout * gpbrw_layout = new QHBoxLayout( gpbr_w );
@@ -646,21 +647,40 @@ void mainWindow::finalize( void )
 	QWidget * btns = new QWidget( gpb_w );
 	QHBoxLayout * btns_layout = new QHBoxLayout( btns );
 	
-	QToolButton * m_playButton = new QToolButton( btns );
-	m_playButton->setIcon( embed::getIconPixmap( "play" ) );
-	m_playButton->setToolTip( tr( "Play/pause the current window (Space)" ) );
-
-	QToolButton * m_recordButton = new QToolButton( btns );
-	m_recordButton->setIcon( embed::getIconPixmap( "record" ) );
-	m_recordButton->setToolTip( tr( "Record from the checked items to the right" ) );
-
-	QToolButton * m_recordAccompanyButton = new QToolButton( btns );
-	m_recordAccompanyButton->setIcon( embed::getIconPixmap( "record_accompany" ) );
-	m_recordAccompanyButton->setToolTip( tr( "Record from the checked items to the right while playing" ) );
 	
-	QToolButton * m_stopButton = new QToolButton( btns );
-	m_stopButton->setIcon( embed::getIconPixmap( "stop" ) );
-	m_stopButton->setToolTip( tr( "Stop playing whatever is playing" ) );
+	
+	toolButton * m_playButton =
+		new toolButton(
+					   embed::getIconPixmap( "play" ),
+					   tr( "Play/pause the current window (Space)" ),
+					   engine::getSong(),
+					   SLOT( play() ),
+					   btns );
+
+	toolButton * m_recordButton =
+		new toolButton( 
+						embed::getIconPixmap( "record" ),
+						tr( "Record from the checked items to the right" ), 
+						engine::getSong(),
+						SLOT( record() ),
+						btns );
+
+	toolButton * m_recordAccompanyButton = 
+		new toolButton(
+					   embed::getIconPixmap( "record_accompany" ),
+					   tr( "Record from the checked items to "
+						   "the right while playing" ),
+					   engine::getSong(),
+					   SLOT( playAndRecord() ),
+					   btns );
+	
+	toolButton * m_stopButton =
+		new toolButton(
+					   embed::getIconPixmap( "stop" ),
+					   tr( "Stop playing whatever is playing" ),
+					   engine::getSong(),
+					   SLOT( stop() ),
+					   btns );
 
 	btns_layout->setMargin(0);
 	btns_layout->setSpacing(0);
@@ -677,11 +697,15 @@ void mainWindow::finalize( void )
 	QVBoxLayout * grw_layout = new QVBoxLayout( gr_w );
 	grw_layout->setMargin( 0 );
 	grw_layout->setSpacing( 0 );
-	grw_layout->addWidget( new QLabel( tr( "RECORD" ), gr_w ) );
 	
-	grw_layout->addWidget( new QCheckBox( tr( "Audio-device" ), gr_w ) );
-	grw_layout->addWidget( new QCheckBox( tr( "Automation" ), gr_w ) );
-	grw_layout->addWidget( new QCheckBox( tr( "MIDI" ), gr_w ) ); 
+	m_chkrAudio = new QCheckBox( tr( "Audio-device" ), gr_w );
+	m_chkrAutomation = new QCheckBox( tr( "Automation" ), gr_w );
+	m_chkrMidi = new QCheckBox( tr( "MIDI" ), gr_w );
+	
+	grw_layout->addWidget( new QLabel( tr( "RECORD" ), gr_w ) );
+	grw_layout->addWidget( m_chkrAudio );
+	grw_layout->addWidget( m_chkrAutomation );
+	grw_layout->addWidget( m_chkrMidi ); 
 	
 	
 	gpbrw_layout->setMargin( 0 );
@@ -692,7 +716,7 @@ void mainWindow::finalize( void )
 	gpbrw_layout->addStretch();
 	
 	
-	addWidgetToToolBar( gpbr_w );*/
+	m_toolBarLayout->addWidget( gpbr_w );*/
 	
 
 	// setup-dialog opened before?

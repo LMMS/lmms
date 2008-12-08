@@ -9,6 +9,10 @@
 	auto-scroll default to disabled
 	fixed glitch where it would auto-scroll even if it was off in song-editor
 	
+	* src/gui/main_window.cpp:
+	worked on global playback/record options in the toolbar. This code
+	is still commented out though.
+	
 
 2008-12-05	Andrew Kelley	<superjoe30/at/gmail/dot/com>
 	
