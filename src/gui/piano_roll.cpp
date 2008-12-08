@@ -1560,7 +1560,6 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 			
 
 		int key_num = getKey( _me->y() );
-		printf("keynum = %i\n", key_num);
 		int x = _me->x();
 
 		// is the calculated key different from current key?
