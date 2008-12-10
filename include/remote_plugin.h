@@ -483,6 +483,7 @@ enum RemoteMessageIDs
 	IdLoadSettingsFromString,
 	IdLoadSettingsFromFile,
 	IdLoadPresetFromFile,
+	IdDebugMessage,
 	IdUserBase = 64
 } ;
 
@@ -816,6 +817,11 @@ public:
 	virtual int outputCount( void ) const
 	{
 		return m_outputCount;
+	}
+
+	void debugMessage( const std::string & _s )
+	{
+		sendMessage( message( IdDebugMessage ).addString( _s ) );
 	}
 
 

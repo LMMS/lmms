@@ -355,6 +355,11 @@ bool remotePlugin::processMessage( const message & _m )
 			resizeSharedProcessingMemory();
 			break;
 
+		case IdDebugMessage:
+			fprintf( stderr, "RemotePlugin::DebugMessage: %s",
+						_m.getString( 0 ).c_str() );
+			break;
+
 		case IdProcessingDone:
 		case IdQuit:
 		default:
