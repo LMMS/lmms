@@ -93,11 +93,11 @@ vstPlugin::vstPlugin( const QString & _plugin ) :
 	lock();
 #ifdef LMMS_BUILD_WIN32
 	QWidget * helper = new QWidget;
+	QHBoxLayout * l = new QHBoxLayout( helper );
 	QWidget * target = new QWidget( helper );
-	QHBoxLayout * l = new QHBoxLayout;
+	l->setSpacing( 0 );
 	l->setMargin( 0 );
 	l->addWidget( target );
-	helper->setLayout( l );
 
 	static int k = 0;
 	const QString t = QString( "vst%1%2" ).arg( GetCurrentProcessId()<<10 ).
@@ -334,23 +334,9 @@ bool vstPlugin::processMessage( const message & _m )
 			break;
 
 		case IdVstPluginEditorGeometry:
-		{
-			const int w = _m.getInt( 0 );
-			const int h = _m.getInt( 1 );
-			m_pluginGeometry = QSize( w, h );
-/*			if( m_pluginWidget != NULL )
-			{
-				m_pluginWidget->setFixedSize(
-							m_pluginGeometry );
-				if( m_pluginWidget->childAt( 0, 0 ) != NULL )
-				{
-					m_pluginWidget->childAt( 0, 0
-						)->setFixedSize(
-							m_pluginGeometry );
-				}
-			}*/
+			m_pluginGeometry = QSize( _m.getInt( 0 ),
+							_m.getInt( 1 ) );
 			break;
-		}
 
 		case IdVstPluginName:
 			m_name = _m.getQString();
@@ -366,6 +352,11 @@ bool vstPlugin::processMessage( const message & _m )
 
 		case IdVstPluginProductString:
 			m_productString = _m.getQString();
+			break;
+
+		case IdVstPluginUniqueID:
+			// TODO: display graphically in case of failure
+			printf("unique ID: %s\n", _m.getString().c_str() );
 			break;
 
 		case IdVstParameterDump:
