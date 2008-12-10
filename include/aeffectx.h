@@ -26,6 +26,10 @@
 #ifndef _AEFFECTX_H
 #define _AEFFECTX_H
 
+#define CCONST(a, b, c, d)( ( ( (int) a ) << 24 ) |		\
+				( ( (int) b ) << 16 ) |		\
+				( ( (int) c ) << 8 ) |		\
+				( ( (int) d ) << 0 ) )
 
 const int audioMasterAutomate = 0;
 const int audioMasterVersion = 1;
@@ -79,44 +83,39 @@ const int audioMasterEditFile = 47; // currently unused
 const int audioMasterGetChunkFile = 48; // currently unused
 const int audioMasterGetInputSpeakerArrangement = 49; // currently unused
 
-int effFlagsHasEditor = 1;
-int effFlagsCanReplacing = 1 << 4; // very likely
-int effFlagsIsSynth = 1 << 8; // currently unused
+const int effFlagsHasEditor = 1;
+const int effFlagsCanReplacing = 1 << 4; // very likely
+const int effFlagsIsSynth = 1 << 8; // currently unused
 
-int effOpen = 0;
-int effClose = 1; // currently unused
-int effSetProgram = 2; // currently unused
-int effGetProgram = 3; // currently unused
-int effGetProgramName = 5; // currently unused
-int effGetParamName = 8; // currently unused
-int effSetSampleRate = 10;
-int effSetBlockSize = 11;
-int effMainsChanged = 12;
-int effEditGetRect = 13;
-int effEditOpen = 14;
-int effEditClose = 15;
-int effEditIdle = 19;
-int effEditTop = 20;
-int effProcessEvents = 25;
-int effGetEffectName = 45;
-int effGetParameterProperties = 47; // missing
-int effGetVendorString = 47;
-int effGetProductString = 48;
-int effGetVendorVersion = 49;
-int effCanDo = 51; // currently unused
-int effGetVstVersion = 58; // currently unused
+const int effOpen = 0;
+const int effClose = 1; // currently unused
+const int effSetProgram = 2; // currently unused
+const int effGetProgram = 3; // currently unused
+const int effGetProgramName = 5; // currently unused
+const int effGetParamName = 8; // currently unused
+const int effSetSampleRate = 10;
+const int effSetBlockSize = 11;
+const int effMainsChanged = 12;
+const int effEditGetRect = 13;
+const int effEditOpen = 14;
+const int effEditClose = 15;
+const int effEditIdle = 19;
+const int effEditTop = 20;
+const int effProcessEvents = 25;
+const int effGetEffectName = 45;
+const int effGetParameterProperties = 47; // missing
+const int effGetVendorString = 47;
+const int effGetProductString = 48;
+const int effGetVendorVersion = 49;
+const int effCanDo = 51; // currently unused
+const int effGetVstVersion = 58; // currently unused
 
-int kEffectMagic =
-#ifdef WORDS_BIGENDIAN
-	0x50747356; // "VstP"
-#else
-	0x56737450; // "PtsV"
-#endif
-int kVstLangEnglish = 1;
-int kVstMidiType = 1;
-int kVstParameterUsesFloatStep = 1 << 2;
-int kVstTempoValid = 1 << 10;
-int kVstTransportPlaying = 1 << 1;
+const int kEffectMagic = CCONST( 'V', 's', 't', 'P' );
+const int kVstLangEnglish = 1;
+const int kVstMidiType = 1;
+const int kVstParameterUsesFloatStep = 1 << 2;
+const int kVstTempoValid = 1 << 10;
+const int kVstTransportPlaying = 1 << 1;
 
 
 class remoteVstPlugin;
@@ -232,7 +231,7 @@ public:
 	// Zeroes 44-47
 	char empty5[4];
 	// Id 48-4b
-	char unused_id[4];
+	int32_t uniqueID;
 	// Don't know 4c-4f
 	char unknown1[4];
 	// processReplacing 50-53
