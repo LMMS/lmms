@@ -1209,7 +1209,6 @@ DWORD WINAPI remoteVstPlugin::guiEventLoop( LPVOID _param )
 
 	if( __threadingModel == TraditionalThreading )
 	{
-_this->debugMessage( "trad\n");
 		_this->initEditor();
 		pthread_cond_signal( &_this->m_windowStatusChange );
 	}
@@ -1220,7 +1219,6 @@ _this->debugMessage( "trad\n");
 								hInst, NULL );
 	// install GUI update timer
 	SetTimer( timerWindow, 1000, 50, NULL );
-_this->debugMessage( "timer done\n");
 
 	MSG msg;
 
