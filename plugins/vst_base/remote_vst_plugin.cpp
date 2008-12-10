@@ -91,11 +91,21 @@ struct ERect
 
 static VstHostLanguages hlang = LanguageEnglish;
 
+enum VstThreadingModel
+{
+	TraditionalThreading,	// all GUI related code in separate thread
+	SplittedThreading,	// sound processing in separate thread
+	
+} ;
+
 
 class remoteVstPlugin;
 
 remoteVstPlugin * __plugin = NULL;
 
+DWORD __threadID = NULL;
+
+VstThreadingModel __threadingModel = TraditionalThreading;
 
 
 
@@ -108,6 +118,7 @@ public:
 	virtual bool processMessage( const message & _m );
 
 	void init( const std::string & _plugin_file );
+	void initEditor( void );
 
 	virtual void process( const sampleFrame * _in, sampleFrame * _out );
 
@@ -136,6 +147,11 @@ public:
 	}
 
 
+	inline bool isInitialized( void ) const
+	{
+		return m_initialized;
+	}
+
 
 	// set given tempo
 	void setBPM( const bpm_t _bpm )
@@ -146,8 +162,8 @@ public:
 	// determine VST-version the plugin uses
 	int pluginVersion( void ) const
 	{
-		return( m_plugin->dispatcher( m_plugin,
-				effGetVendorVersion, 0, 0, NULL, 0.0f ) );
+		return m_plugin->dispatcher( m_plugin,
+				effGetVendorVersion, 0, 0, NULL, 0.0f );
 	}
 
 	// determine name of plugin
@@ -171,31 +187,34 @@ public:
 	// number of inputs
 	virtual int inputCount( void ) const
 	{
-		return( m_plugin->numInputs );
+		return m_plugin->numInputs;
 	}
 
 	// number of outputs
 	virtual int outputCount( void ) const
 	{
-		return( m_plugin->numOutputs );
+		return m_plugin->numOutputs;
 	}
 
 	// has to be called as soon as input- or output-count changes
 	void updateInOutCount( void );
 
+	static DWORD WINAPI processingThread( LPVOID _param );
+	static DWORD WINAPI guiEventLoop( LPVOID _param );
+
 
 private:
 	enum GuiThreadMessages
 	{
-		None, ClosePlugin
+		None,
+		ProcessPluginMessage,
+		ClosePlugin
 	} ;
 
 	// callback used by plugin for being able to communicate with it's host
 	static VstIntPtr hostCallback( AEffect * _effect, VstInt32 _opcode,
 					VstInt32 _index, VstIntPtr _value,
 					void * _ptr, float _opt );
-
-	static DWORD WINAPI guiEventLoop( LPVOID _param );
 
 
 	bool load( const std::string & _plugin_file );
@@ -211,9 +230,10 @@ private:
 	int m_windowWidth;
 	int m_windowHeight;
 
+	bool m_initialized;
+
 	pthread_mutex_t m_lock;
 	pthread_cond_t m_windowStatusChange;
-	DWORD m_guiThreadID;
 
 
 	float * * m_inputs;
@@ -238,9 +258,9 @@ remoteVstPlugin::remoteVstPlugin( key_t _shm_in, key_t _shm_out ) :
 	m_windowID( 0 ),
 	m_windowWidth( 0 ),
 	m_windowHeight( 0 ),
+	m_initialized( false ),
 	m_lock(),
 	m_windowStatusChange(),
-	m_guiThreadID( 0 ),
 	m_inputs( NULL ),
 	m_outputs( NULL ),
 	m_midiEvents(),
@@ -253,18 +273,22 @@ remoteVstPlugin::remoteVstPlugin( key_t _shm_in, key_t _shm_out ) :
 
 
 
+
 remoteVstPlugin::~remoteVstPlugin()
 {
 	if( m_window != NULL )
 	{
-		// notify GUI-thread
-		if( !PostThreadMessageA( m_guiThreadID, WM_USER,
-							ClosePlugin, 0 ) )
+		if( __threadingModel == TraditionalThreading )
 		{
-			//lvsMessage( "could not post message to gui thread" );
+			// notify GUI-thread
+			if( !PostThreadMessage( __threadID, WM_USER,
+							ClosePlugin, 0 ) )
+			{
+				//lvsMessage( "could not post message to gui thread" );
+			}
+			pthread_mutex_lock( &m_lock );
+			pthread_cond_wait( &m_windowStatusChange, &m_lock );
 		}
-		pthread_mutex_lock( &m_lock );
-		pthread_cond_wait( &m_windowStatusChange, &m_lock );
 		m_plugin->dispatcher( m_plugin, effEditClose, 0, 0, NULL, 0.0 );
 #ifdef LMMS_BUILD_LINUX
 		CloseWindow( m_window );
@@ -300,7 +324,7 @@ bool remoteVstPlugin::processMessage( const message & _m )
 		case IdVstPluginWindowInformation:
 		{
 			HWND top = FindWindowEx( NULL, NULL, NULL,
-							_m.getString().c_str() );
+						_m.getString().c_str() );
 			m_window = FindWindowEx( top, NULL, NULL, NULL );
 			break;
 		}
@@ -334,6 +358,7 @@ bool remoteVstPlugin::processMessage( const message & _m )
 
 
 
+
 void remoteVstPlugin::init( const std::string & _plugin_file )
 {
 	if( load( _plugin_file ) == false )
@@ -353,14 +378,23 @@ void remoteVstPlugin::init( const std::string & _plugin_file )
 
 	m_plugin->dispatcher( m_plugin, effMainsChanged, 0, 1, NULL, 0.0f );
 
-
-	if( CreateThread( NULL, 0, guiEventLoop, this, 0, NULL ) == NULL )
+	debugMessage( "creating editor\n" );
+	if( __threadingModel == TraditionalThreading )
 	{
-		fprintf( stderr, "could not create GUI-thread\n" );
-		return;
+		debugMessage( "creating GUI thread\n" );
+		if( !CreateThread( NULL, 0, guiEventLoop, this, 0, NULL ) )
+		{
+			debugMessage( "init(): could not create GUI thread\n" );
+			return;
+		}
+		pthread_mutex_lock( &m_lock );
+		pthread_cond_wait( &m_windowStatusChange, &m_lock );
 	}
-	pthread_mutex_lock( &m_lock );
-	pthread_cond_wait( &m_windowStatusChange, &m_lock );
+	else
+	{
+		initEditor();
+	}
+	debugMessage( "editor successfully created\n" );
 
 
 	// now post some information about our plugin
@@ -380,6 +414,87 @@ void remoteVstPlugin::init( const std::string & _plugin_file )
 					addInt( m_plugin->numParams ) );
 
 	sendMessage( IdInitDone );
+
+	m_initialized = true;
+}
+
+
+
+
+void remoteVstPlugin::initEditor( void )
+{
+	if( !( m_plugin->flags & effFlagsHasEditor ) )
+	{
+		return;
+	}
+
+
+	HMODULE hInst = GetModuleHandle( NULL );
+	if( hInst == NULL )
+	{
+		debugMessage( "initEditor(): can't get module handle\n" );
+		return;
+	}
+
+
+	WNDCLASS wc;
+	wc.style = CS_HREDRAW | CS_VREDRAW;
+	wc.lpfnWndProc = DefWindowProc;
+	wc.cbClsExtra = 0;
+	wc.cbWndExtra = 0;
+	wc.hInstance = hInst;
+	wc.hIcon = LoadIcon( NULL, IDI_APPLICATION );
+	wc.hCursor = LoadCursor( NULL, IDC_ARROW );
+	wc.hbrBackground = (HBRUSH) GetStockObject( BLACK_BRUSH );
+	wc.lpszMenuName = NULL;
+	wc.lpszClassName = "LVSL";
+
+	if( !RegisterClass( &wc ) )
+	{
+		return;
+	}
+
+
+#ifdef LMMS_BUILD_LINUX
+	m_window = CreateWindowEx( 0, "LVSL", m_shortName.c_str(),
+			       ( WS_OVERLAPPEDWINDOW | WS_THICKFRAME ) &
+					 		~WS_MAXIMIZEBOX,
+			       0, 0, 10, 10, NULL, NULL, hInst, NULL );
+
+#else
+	m_windowID = 1;	// arbitrary value on win32 to signal
+			// vstPlugin-class that we have an editor
+
+	m_window = CreateWindowEx( 0, "LVSL", m_shortName.c_str(),
+					WS_CHILD, 0, 0, 10, 10,
+					m_window, NULL, hInst, NULL );
+#endif
+	if( m_window == NULL )
+	{
+		debugMessage( "initEditor(): cannot create editor window\n" );
+		return;
+	}
+
+
+	m_plugin->dispatcher( m_plugin, effEditOpen, 0, 0, m_window, 0 );
+
+	ERect * er;
+	m_plugin->dispatcher( m_plugin, effEditGetRect, 0, 0, &er, 0 );
+
+	m_windowWidth = er->right - er->left;
+	m_windowHeight = er->bottom - er->top;
+
+	SetWindowPos( m_window, 0, 0, 0, m_windowWidth + 8,
+			m_windowHeight + 26, SWP_NOACTIVATE |
+						SWP_NOMOVE | SWP_NOZORDER );
+	m_plugin->dispatcher( m_plugin, effEditTop, 0, 0, NULL, 0 );
+
+	ShowWindow( m_window, SW_SHOWNORMAL );
+	UpdateWindow( m_window );
+
+#ifdef LMMS_BUILD_LINUX
+	m_windowID = (Sint32) GetProp( m_window, "__wine_x11_whole_window" );
+#endif
 }
 
 
@@ -387,42 +502,85 @@ void remoteVstPlugin::init( const std::string & _plugin_file )
 
 bool remoteVstPlugin::load( const std::string & _plugin_file )
 {
-	if( ( m_libInst = LoadLibraryA( _plugin_file.c_str() ) ) ==
+	if( ( m_libInst = LoadLibrary( _plugin_file.c_str() ) ) ==
 								NULL )
 	{
-		return( false );
+		return false;
 	}
 
 	char * tmp = strdup( _plugin_file.c_str() );
 	m_shortName = basename( tmp );
 	free( tmp );
 
-	typedef AEffect * ( __stdcall * mainEntry )( audioMasterCallback );
-	mainEntry main_entry = (mainEntry) GetProcAddress( m_libInst,
-								"main" );
-	if( main_entry == NULL )
+	typedef AEffect * ( __stdcall * mainEntryPointer )
+						( audioMasterCallback );
+	mainEntryPointer mainEntry = (mainEntryPointer)
+				GetProcAddress( m_libInst, "VSTPluginMain" );
+	if( mainEntry == NULL )
 	{
-		return( false );
+		mainEntry = (mainEntryPointer)
+				GetProcAddress( m_libInst, "VstPluginMain" );
+	}
+	if( mainEntry == NULL )
+	{
+		mainEntry = (mainEntryPointer)
+				GetProcAddress( m_libInst, "main" );
+	}
+	if( mainEntry == NULL )
+	{
+		debugMessage( "could not find entry point\n" );
+		return false;
 	}
 
-	m_plugin = main_entry( hostCallback );
+	m_plugin = mainEntry( hostCallback );
 	if( m_plugin == NULL )
 	{
-		return( false );
+		debugMessage( "mainEntry prodecure returned NULL\n" );
+		return false;
 	}
 
 	m_plugin->user = this;
 
 	if( m_plugin->magic != kEffectMagic )
 	{
-		fprintf( stderr, "%s is not a VST plugin\n",
+		char buf[256];
+		sprintf( buf, "%s is not a VST plugin\n",
 							_plugin_file.c_str() );
+		debugMessage( buf );
+		return false;
 	}
+
+
+	char id[8];
+	sprintf( id, "%c%c%c%c\n", ((char *)&m_plugin->uniqueID)[3],
+					 ((char *)&m_plugin->uniqueID)[2],
+					 ((char *)&m_plugin->uniqueID)[1],
+					 ((char *)&m_plugin->uniqueID)[0] );
+	sendMessage( message( IdVstPluginUniqueID ).addString( id ) );
+
+	// switch to appropriate threading model
+	switch( m_plugin->uniqueID )
+	{
+		// some plugins require processing to happen from within
+		// another thread
+		case CCONST( 'z', '3', 't', 'a' ):	// z3ta+
+		case CCONST( 'T', 'C', '_', 'S' ):	// Cygnus
+		case CCONST( 'S', 'y', 't', 'r' ):	// Sytrus
+			debugMessage( "switching to splitted threading "
+								"model\n" );
+			__threadingModel = SplittedThreading;
+			break;
+
+		default:
+			break;
+	}
+
 
 	m_plugin->dispatcher( m_plugin, effOpen, 0, 0, 0, 0 );
 
-	return( true );
+	return true;
 }
+
 
 
 
@@ -533,7 +691,7 @@ const char * remoteVstPlugin::pluginName( void ) const
 	buf[0] = 0;
 	m_plugin->dispatcher( m_plugin, effGetEffectName, 0, 0, buf, 0.0f );
 	buf[31] = 0;
-	return( buf );
+	return buf;
 }
 
 
@@ -545,7 +703,7 @@ const char * remoteVstPlugin::pluginVendorString( void ) const
 	buf[0] = 0;
 	m_plugin->dispatcher( m_plugin, effGetVendorString, 0, 0, buf, 0.0f );
 	buf[63] = 0;
-	return( buf );
+	return buf;
 }
 
 
@@ -557,7 +715,7 @@ const char * remoteVstPlugin::pluginProductString( void ) const
 	buf[0] = 0;
 	m_plugin->dispatcher( m_plugin, effGetProductString, 0, 0, buf, 0.0f );
 	buf[63] = 0;
-	return( buf );
+	return buf;
 }
 
 
@@ -654,9 +812,9 @@ void remoteVstPlugin::updateInOutCount( void )
 
 
 
-#define DEBUG_CALLBACKS
+//#define DEBUG_CALLBACKS
 #ifdef DEBUG_CALLBACKS
-#define SHOW_CALLBACK printf
+#define SHOW_CALLBACK __plugin->debugMessage
 #else
 #define SHOW_CALLBACK(...)
 #endif
@@ -674,44 +832,49 @@ VstIntPtr remoteVstPlugin::hostCallback( AEffect * _effect, VstInt32 _opcode,
 						void * _ptr, float _opt )
 {
 	static VstTimeInfo _timeInfo;
-	//SHOW_CALLBACK( "host-callback, opcode = %d\n", (int) _opcode );
+#ifdef DEBUG_CALLBACKS
+	char buf[64];
+	sprintf( buf, "host-callback, opcode = %d\n", (int) _opcode );
+	SHOW_CALLBACK( buf );
+#endif
+
 	switch( _opcode )
 	{
 		case audioMasterAutomate:
-			//SHOW_CALLBACK( "amc: audioMasterAutomate\n" );
+			SHOW_CALLBACK( "amc: audioMasterAutomate\n" );
 			// index, value, returns 0
 			_effect->setParameter( _effect, _index, _opt );
-			return( 0 );
+			return 0;
 
 		case audioMasterVersion:
-			//SHOW_CALLBACK( "amc: audioMasterVersion\n" );
-			return( 2300 );
+			SHOW_CALLBACK( "amc: audioMasterVersion\n" );
+			return 2300;
 
 		case audioMasterCurrentId:	
 			SHOW_CALLBACK( "amc: audioMasterCurrentId\n" );
 			// returns the unique id of a plug that's currently
 			// loading
-			return( 0 );
+			return 0;
 		
 		case audioMasterIdle:
-			//SHOW_CALLBACK ("amc: audioMasterIdle\n" );
+			SHOW_CALLBACK ("amc: audioMasterIdle\n" );
 			// call application idle routine (this will
 			// call effEditIdle for all open editors too) 
 			_effect->dispatcher( _effect, effEditIdle, 0, 0, NULL,
 									0.0f );
-			return( 0 );
+			return 0;
 
 		case audioMasterPinConnected:		
-			//SHOW_CALLBACK( "amc: audioMasterPinConnected\n" );
+			SHOW_CALLBACK( "amc: audioMasterPinConnected\n" );
 			// inquire if an input or output is beeing connected;
 			// index enumerates input or output counting from zero:
 			// value is 0 for input and != 0 otherwise. note: the
 			// return value is 0 for <true> such that older versions
 			// will always return true.
-			return( 1 );
+			return 1;
 
 		case audioMasterGetTime:
-			//SHOW_CALLBACK( "amc: audioMasterGetTime\n" );
+			SHOW_CALLBACK( "amc: audioMasterGetTime\n" );
 			// returns const VstTimeInfo* (or 0 if not supported)
 			// <value> should contain a mask indicating which
 			// fields are required (see valid masks above), as some
@@ -728,42 +891,42 @@ VstIntPtr remoteVstPlugin::hostCallback( AEffect * _effect, VstInt32 _opcode,
 			_timeInfo.flags |= (/* kVstBarsValid|*/kVstTempoValid );
 			_timeInfo.flags |= kVstTransportPlaying;
 #ifdef LMMS_BUILD_WIN64
-			return( (long long) &_timeInfo );
+			return (long long) &_timeInfo;
 #else
-			return( (long) &_timeInfo );
+			return (long) &_timeInfo;
 #endif
 
 		case audioMasterProcessEvents:
-			//SHOW_CALLBACK( "amc: audioMasterProcessEvents\n" );
+			SHOW_CALLBACK( "amc: audioMasterProcessEvents\n" );
 			// VstEvents* in <ptr>
-			return( 0 );
+			return 0;
 
 		case audioMasterIOChanged:
 			__plugin->updateInOutCount();
-			//SHOW_CALLBACK( "amc: audioMasterIOChanged\n" );
+			SHOW_CALLBACK( "amc: audioMasterIOChanged\n" );
 			// numInputs and/or numOutputs has changed
-			return( 0 );
+			return 0;
 
 #ifdef OLD_VST_SDK
 		case audioMasterWantMidi:
-			//SHOW_CALLBACK( "amc: audioMasterWantMidi\n" );
+			SHOW_CALLBACK( "amc: audioMasterWantMidi\n" );
 			// <value> is a filter which is currently ignored
-			return( 1 );
+			return 1;
 
 		case audioMasterSetTime:
 			SHOW_CALLBACK( "amc: audioMasterSetTime\n" );
 			// VstTimenfo* in <ptr>, filter in <value>, not
 			// supported
-			return( 0 );
+			return 0;
 
 		case audioMasterTempoAt:
-			//SHOW_CALLBACK( "amc: audioMasterTempoAt\n" );
-			return( __plugin->m_bpm * 10000 );
+			SHOW_CALLBACK( "amc: audioMasterTempoAt\n" );
+			return __plugin->m_bpm * 10000;
 
 		case audioMasterGetNumAutomatableParameters:
 			SHOW_CALLBACK( "amc: audioMasterGetNumAutomatable"
 							"Parameters\n" );
-			return( 5000 );
+			return 5000;
 
 		case audioMasterGetParameterQuantization:	
 			SHOW_CALLBACK( "amc: audioMasterGetParameter\n"
@@ -772,67 +935,67 @@ VstIntPtr remoteVstPlugin::hostCallback( AEffect * _effect, VstInt32 _opcode,
 			// or 1 if full single float precision is maintained
 			// in automation. parameter index in <value> (-1: all,
 			// any)
-			return( 1 );
+			return 1;
 
 		case audioMasterNeedIdle:
-			//SHOW_CALLBACK( "amc: audioMasterNeedIdle\n" );
+			SHOW_CALLBACK( "amc: audioMasterNeedIdle\n" );
 			// plug needs idle calls (outside its editor window)
-			return( 1 );
+			return 1;
 
 		case audioMasterGetPreviousPlug:
 			SHOW_CALLBACK( "amc: audioMasterGetPreviousPlug\n" );
 			// input pin in <value> (-1: first to come), returns
 			// cEffect*
-			return( 0 );
+			return 0;
 
 		case audioMasterGetNextPlug:
 			SHOW_CALLBACK( "amc: audioMasterGetNextPlug\n" );
 			// output pin in <value> (-1: first to come), returns
 			// cEffect*
-			return( 0 );
+			return 0;
 
 		case audioMasterWillReplaceOrAccumulate:
 			SHOW_CALLBACK( "amc: audioMasterWillReplaceOr"
 							"Accumulate\n" );
 			// returns: 0: not supported, 1: replace, 2: accumulate
-			return( 1 );
+			return 1;
 
 		case audioMasterGetSpeakerArrangement:
 			SHOW_CALLBACK( "amc: audioMasterGetSpeaker"
 							"Arrangement\n" );
 			// (long)input in <value>, output in <ptr>
-			return( 0 );
+			return 0;
 
 		case audioMasterSetOutputSampleRate:
 			SHOW_CALLBACK( "amc: audioMasterSetOutputSample"
 								"Rate\n" );
 			// for variable i/o, sample rate in <opt>
-			return( 0 );
+			return 0;
 
 		case audioMasterSetIcon:
 			SHOW_CALLBACK( "amc: audioMasterSetIcon\n" );
 			// TODO
 			// void* in <ptr>, format not defined yet
-			return( 0 );
+			return 0;
 
 		case audioMasterOpenWindow:
 			SHOW_CALLBACK( "amc: audioMasterOpenWindow\n" );
 			// TODO
 			// returns platform specific ptr
-			return( 0 );
+			return 0;
 		
 		case audioMasterCloseWindow:
 			SHOW_CALLBACK( "amc: audioMasterCloseWindow\n" );
 			// TODO
 			// close window, platform specific handle in <ptr>
-			return( 0 );
+			return 0;
 #endif
 
 		case audioMasterSizeWindow:
-			//SHOW_CALLBACK( "amc: audioMasterSizeWindow\n" );
+			SHOW_CALLBACK( "amc: audioMasterSizeWindow\n" );
 			if( __plugin->m_window == 0 )
 			{
-				return( 0 );
+				return 0;
 			}
 			__plugin->m_windowWidth = _index;
 			__plugin->m_windowHeight = _value;
@@ -844,28 +1007,28 @@ VstIntPtr remoteVstPlugin::hostCallback( AEffect * _effect, VstInt32 _opcode,
 				message( IdVstPluginEditorGeometry ).
 					addInt( __plugin->m_windowWidth ).
 					addInt( __plugin->m_windowHeight ) );
-			return( 1 );
+			return 1;
 
 		case audioMasterGetSampleRate:
-			//SHOW_CALLBACK( "amc: audioMasterGetSampleRate\n" );
+			SHOW_CALLBACK( "amc: audioMasterGetSampleRate\n" );
 			_effect->dispatcher( _effect, effSetSampleRate,
 				0, 0, NULL, (float)__plugin->sampleRate() );
-			return( __plugin->sampleRate() );
+			return __plugin->sampleRate();
 
 		case audioMasterGetBlockSize:
-			//SHOW_CALLBACK( "amc: audioMasterGetBlockSize\n" );
+			SHOW_CALLBACK( "amc: audioMasterGetBlockSize\n" );
 			_effect->dispatcher( _effect, effSetBlockSize,
 					0, __plugin->bufferSize(), NULL, 0 );
 
-			return( __plugin->bufferSize() );
+			return __plugin->bufferSize();
 
 		case audioMasterGetInputLatency:
-			//SHOW_CALLBACK( "amc: audioMasterGetInputLatency\n" );
-			return( __plugin->bufferSize() );
+			SHOW_CALLBACK( "amc: audioMasterGetInputLatency\n" );
+			return __plugin->bufferSize();
 
 		case audioMasterGetOutputLatency:
-			//SHOW_CALLBACK( "amc: audioMasterGetOutputLatency\n" );
-			return( __plugin->bufferSize() );
+			SHOW_CALLBACK( "amc: audioMasterGetOutputLatency\n" );
+			return __plugin->bufferSize();
 
 		case audioMasterGetCurrentProcessLevel:
 			SHOW_CALLBACK( "amc: audioMasterGetCurrentProcess"
@@ -879,114 +1042,153 @@ VstIntPtr remoteVstPlugin::hostCallback( AEffect * _effect, VstInt32 _opcode,
 			//    thread
 			// other: not defined, but probably pre-empting user
 			//        thread.
-			return( 0 );
+			return 0;
 
 		case audioMasterGetAutomationState:
 			SHOW_CALLBACK( "amc: audioMasterGetAutomationState\n" );
 			// returns 0: not supported, 1: off, 2:read, 3:write,
 			// 4:read/write offline
-			return( 0 );
+			return 0;
 
 		case audioMasterOfflineStart:
 			SHOW_CALLBACK( "amc: audioMasterOfflineStart\n" );
-			return( 0 );
+			return 0;
 
 		case audioMasterOfflineRead:
 			SHOW_CALLBACK( "amc: audioMasterOfflineRead\n" );
 			// ptr points to offline structure, see below.
 			// return 0: error, 1 ok
-			return( 0 );
+			return 0;
 
 		case audioMasterOfflineWrite:
 			SHOW_CALLBACK( "amc: audioMasterOfflineWrite\n" );
 			// same as read
-			return( 0 );
+			return 0;
 
 		case audioMasterOfflineGetCurrentPass:
 			SHOW_CALLBACK( "amc: audioMasterOfflineGetCurrent"
 								"Pass\n" );
-			return( 0 );
+			return 0;
 
 		case audioMasterOfflineGetCurrentMetaPass:
 			SHOW_CALLBACK( "amc: audioMasterOfflineGetCurrentMeta"
 								"Pass\n");
-			return( 0 );
+			return 0;
 
 		case audioMasterGetVendorString:
-			//SHOW_CALLBACK( "amc: audioMasterGetVendorString\n" );
+			SHOW_CALLBACK( "amc: audioMasterGetVendorString\n" );
 			// fills <ptr> with a string identifying the vendor
 			// (max 64 char)
 			strcpy( (char *) _ptr, "Tobias Doerffel" );
-			return( 1 );
+			return 1;
 
 		case audioMasterGetProductString:
-			//SHOW_CALLBACK( "amc: audioMasterGetProductString\n" );
+			SHOW_CALLBACK( "amc: audioMasterGetProductString\n" );
 			// fills <ptr> with a string with product name
 			// (max 64 char)
 			strcpy( (char *) _ptr,
 					"LMMS VST Support Layer (LVSL)" );
-			return( 1 );
+			return 1;
 
 		case audioMasterGetVendorVersion:
 			SHOW_CALLBACK( "amc: audioMasterGetVendorVersion\n" );
 			// returns vendor-specific version
-			return( 1000 );
+			return 1000;
 
 		case audioMasterVendorSpecific:
 			SHOW_CALLBACK( "amc: audioMasterVendorSpecific\n" );
 			// no definition, vendor specific handling
-			return( 0 );
+			return 0;
 		
 		case audioMasterCanDo:
-			//SHOW_CALLBACK( "amc: audioMasterCanDo\n" );
-			return( !strcmp( (char *) _ptr, "sendVstEvents" ) ||
+			SHOW_CALLBACK( "amc: audioMasterCanDo\n" );
+			return !strcmp( (char *) _ptr, "sendVstEvents" ) ||
 				!strcmp( (char *) _ptr, "sendVstMidiEvent" ) ||
 				!strcmp( (char *) _ptr, "sendVstTimeInfo" ) ||
 				!strcmp( (char *) _ptr, "sizeWindow" ) ||
-				!strcmp( (char *) _ptr, "supplyIdle" ) );
+				!strcmp( (char *) _ptr, "supplyIdle" );
 
 		case audioMasterGetLanguage:
-			//SHOW_CALLBACK( "amc: audioMasterGetLanguage\n" );
-			return( hlang );
+			SHOW_CALLBACK( "amc: audioMasterGetLanguage\n" );
+			return hlang;
 
 		case audioMasterGetDirectory:
 			SHOW_CALLBACK( "amc: audioMasterGetDirectory\n" );
 			// get plug directory, FSSpec on MAC, else char*
-			return( 0 );
+			return 0;
 		
 		case audioMasterUpdateDisplay:
-			//SHOW_CALLBACK( "amc: audioMasterUpdateDisplay\n" );
+			SHOW_CALLBACK( "amc: audioMasterUpdateDisplay\n" );
 			// something has changed, update 'multi-fx' display
 			_effect->dispatcher( _effect, effEditIdle, 0, 0, NULL,
 									0.0f );
-			return( 0 );
+			return 0;
 
 #if kVstVersion > 2
 		case audioMasterBeginEdit:
 			SHOW_CALLBACK( "amc: audioMasterBeginEdit\n" );
 			// begin of automation session (when mouse down),	
 			// parameter index in <index>
-			return( 0 );
+			return 0;
 
 		case audioMasterEndEdit:
 			SHOW_CALLBACK( "amc: audioMasterEndEdit\n" );
 			// end of automation session (when mouse up),
 			// parameter index in <index>
-			return( 0 );
+			return 0;
 
 		case audioMasterOpenFileSelector:
 			SHOW_CALLBACK( "amc: audioMasterOpenFileSelector\n" );
 			// open a fileselector window with VstFileSelect*
 			// in <ptr>
-			return( 0 );
+			return 0;
 #endif
 		default:
-			SHOW_CALLBACK( "VST master dispatcher: undefined: "
-						"%d\n", (int) _opcode );
+			SHOW_CALLBACK( "amd: not handled" );
 			break;
 	}
 
-	return( 0 );
+	return 0;
+}
+
+
+
+
+DWORD WINAPI remoteVstPlugin::processingThread( LPVOID _param )
+{
+	remoteVstPlugin * _this = static_cast<remoteVstPlugin *>( _param );
+
+	remotePluginClient::message m;
+	while( ( m = _this->receiveMessage() ).id != IdQuit )
+        {
+		VstThreadingModel oldModel = __threadingModel;
+#ifndef LMMS_BUILD_LINUX
+		if( __threadingModel == TraditionalThreading ||
+					m.id == IdStartProcessing )
+#endif
+		{
+			_this->processMessage( m );
+		}
+#ifndef LMMS_BUILD_LINUX
+		else
+		{
+			PostThreadMessage( __threadID,
+					WM_USER,
+					ProcessPluginMessage,
+					(LPARAM) new message( m ) );
+		}
+#endif
+
+		// did we load plugin and recognized a plugin which requires
+		// a different threading model?
+		if( m.id == IdVstLoadPlugin || __threadingModel != oldModel )
+		{
+			// then get out of here
+			return 0;
+		}
+	}
+
+	return 0;
 }
 
 
@@ -995,83 +1197,40 @@ VstIntPtr remoteVstPlugin::hostCallback( AEffect * _effect, VstInt32 _opcode,
 DWORD WINAPI remoteVstPlugin::guiEventLoop( LPVOID _param )
 {
 	remoteVstPlugin * _this = static_cast<remoteVstPlugin *>( _param );
-	_this->m_guiThreadID = GetCurrentThreadId();
+	__threadID = GetCurrentThreadId();
 
-	if( !( _this->m_plugin->flags & effFlagsHasEditor ) )
-	{
-		pthread_cond_signal( &_this->m_windowStatusChange );
-		return( 1 );
-	}
-
-
-	HMODULE hInst = GetModuleHandleA( NULL );
+	HMODULE hInst = GetModuleHandle( NULL );
 	if( hInst == NULL )
 	{
-		fprintf( stderr, "can't get module handle\n" );
-		pthread_cond_signal( &_this->m_windowStatusChange );
-		return( 1 );
+		_this->debugMessage( "guiEventLoop(): can't get "
+							"module handle\n" );
+		return -1;
 	}
 
-#ifdef LMMS_BUILD_LINUX
-	if( ( _this->m_window = CreateWindowExA(
-				0, "LVSL", _this->m_shortName.c_str(),
-			       ( WS_OVERLAPPEDWINDOW  | WS_THICKFRAME &
-					 		~WS_MAXIMIZEBOX ),
-			       0, 0, 10, 10,
-				NULL, NULL, hInst, NULL ) ) == NULL )
+	if( __threadingModel == TraditionalThreading )
 	{
-		fprintf( stderr, "cannot create editor window\n" );
+_this->debugMessage( "trad\n");
+		_this->initEditor();
 		pthread_cond_signal( &_this->m_windowStatusChange );
-		return( 1 );
 	}
 
-#else
-	_this->m_windowID = 1;	// arbitrary value on win32 to signal
-				// vstPlugin-class that we have an editor
-#endif
 
-
-	_this->m_plugin->dispatcher( _this->m_plugin, effEditOpen, 0, 0,
-							_this->m_window, 0 );
-
-	ERect * er;
-	_this->m_plugin->dispatcher( _this->m_plugin, effEditGetRect, 0, 0,
-								&er, 0 );
-
-	_this->m_windowWidth = er->right - er->left;
-	_this->m_windowHeight = er->bottom - er->top;
-
-	SetWindowPos( _this->m_window, 0, 0, 0, _this->m_windowWidth + 8,
-			_this->m_windowHeight + 26, SWP_NOACTIVATE |
-						SWP_NOMOVE | SWP_NOZORDER );
-	_this->m_plugin->dispatcher( _this->m_plugin, effEditTop, 0, 0,
-								NULL, 0 );
-
-	ShowWindow( _this->m_window, SW_SHOWNORMAL );
-	UpdateWindow( _this->m_window );
-
-#ifdef LMMS_BUILD_LINUX
-	_this->m_windowID = (Sint32) GetPropA( _this->m_window,
-						"__wine_x11_whole_window" );
-#endif
-
-	pthread_cond_signal( &_this->m_windowStatusChange );
-
-
-	HWND timer_window = CreateWindowEx( 0, "LVSL", "dummy",
-					0, 0, 0, 0, 0, NULL, NULL, hInst, NULL );
+	HWND timerWindow = CreateWindowEx( 0, "LVSL", "dummy",
+						0, 0, 0, 0, 0, NULL, NULL,
+								hInst, NULL );
 	// install GUI update timer
-	SetTimer( timer_window, 1000, 50, NULL );
+	SetTimer( timerWindow, 1000, 50, NULL );
+_this->debugMessage( "timer done\n");
 
 	MSG msg;
 
 	bool quit = false;
-	while( quit == false && GetMessageA( &msg, NULL, 0, 0 ) )
+	while( quit == false && GetMessage( &msg, NULL, 0, 0 ) )
 	{
 		TranslateMessage( &msg );
-		DispatchMessageA( &msg );
+		DispatchMessage( &msg );
 
-		if( msg.message == WM_TIMER )
+		if( msg.message == WM_TIMER && _this->isInitialized() )
 		{
 			// give plugin some idle-time for GUI-update
 			_this->m_plugin->dispatcher( _this->m_plugin,
@@ -1082,6 +1241,14 @@ DWORD WINAPI remoteVstPlugin::guiEventLoop( LPVOID _param )
 		{
 			switch( msg.wParam )
 			{
+				case ProcessPluginMessage:
+				{
+					message * m = (message *) msg.lParam;
+					_this->processMessage( *m );
+					delete m;
+					break;
+				}
+
 				case ClosePlugin:
 					quit = true;
 					break;
@@ -1092,9 +1259,12 @@ DWORD WINAPI remoteVstPlugin::guiEventLoop( LPVOID _param )
 		}
 	}
 
-	pthread_cond_signal( &_this->m_windowStatusChange );
+	if( __threadingModel == TraditionalThreading )
+	{
+		pthread_cond_signal( &_this->m_windowStatusChange );
+	}
 
-	return( 0 );
+	return 0;
 }
 
 
@@ -1105,7 +1275,7 @@ int main( int _argc, char * * _argv )
 	if( _argc < 3 )
 	{
 		fprintf( stderr, "not enough arguments\n" );
-		return( -1 );
+		return -1;
 	}
 
 #ifdef LMMS_BUILD_WIN32
@@ -1113,31 +1283,6 @@ int main( int _argc, char * * _argv )
 	pthread_win32_process_attach_np();
 	pthread_win32_thread_attach_np();
 #endif
-
-	// WINE-startup
-	HMODULE hInst = GetModuleHandleA( NULL );
-	if( hInst == NULL )
-	{
-		fprintf( stderr, "can't get module handle\n" );
-		return( -1 );
-	}
-
-	WNDCLASSA wc;
-	wc.style = 0;
-	wc.lpfnWndProc = DefWindowProcA;
-	wc.cbClsExtra = 0;
-	wc.cbWndExtra = 0;
-	wc.hInstance = hInst;
-	wc.hIcon = LoadIconA( hInst, "LVSL" );
-	wc.hCursor = LoadCursorA( NULL, IDI_APPLICATION );
-	wc.hbrBackground = (HBRUSH) GetStockObject( BLACK_BRUSH );
-	wc.lpszMenuName = "MENU_LVSL";
-	wc.lpszClassName = "LVSL";
-
-	if( !RegisterClassA( &wc ) )
-	{
-		return( -1 );
-	}
 
 #ifdef LMMS_BUILD_LINUX
 #ifdef LMMS_HAVE_SCHED_H
@@ -1155,11 +1300,31 @@ int main( int _argc, char * * _argv )
 
 	__plugin = new remoteVstPlugin( atoi( _argv[1] ), atoi( _argv[2] ) );
 
-	remotePluginClient::message m;
-	while( ( m = __plugin->receiveMessage() ).id != IdQuit )
-        {
-		__plugin->processMessage( m );
+	// process until we have loaded the plugin
+	remoteVstPlugin::processingThread( __plugin );
+
+	if( __plugin->isInitialized() )
+	{
+		if( __threadingModel == TraditionalThreading )
+		{
+			remoteVstPlugin::processingThread( __plugin );
+		}
+		else
+		{
+			__threadID = GetCurrentThreadId();
+
+			if( CreateThread( NULL, 0,
+					remoteVstPlugin::processingThread,
+						__plugin, 0, NULL ) == NULL )
+			{
+				__plugin->debugMessage( "could not create "
+							"processingThread\n" );
+				return -1;
+			}
+			remoteVstPlugin::guiEventLoop( __plugin );
+		}
 	}
+
 
 	delete __plugin;
 

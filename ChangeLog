@@ -1,3 +1,23 @@
+2008-12-10	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* plugins/vst_base/communication.h:
+	* plugins/vst_base/vst_plugin.cpp:
+	* plugins/vst_base/remote_vst_plugin.cpp:
+	rewrote wide parts of LVSL backend:
+	- now supports two threading models which makes LMMS support plugins
+	  like Sytrus, z3ta+ etc.
+	- on win32 create native widget as parent for plugin's GUI, fixes
+	  warning message when loading KarmaSynth (closes #2276787)
+	- try more symbol names for entry procedure
+
+	* include/aeffectx.h:
+	- made "int"s to "const int"s
+	- added CCONST macro
+
+	* include/remote_plugin.h:
+	* src/core/remote_plugin.cpp:
+	added support for debug messages from remote plugin
+
 2008-12-08	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* plugins/vst_base/vst_plugin.cpp:
