@@ -123,44 +123,4 @@ private:
 } ;
 
 
-
-class automationPatternView : public trackContentObjectView
-{
-	Q_OBJECT
-public:
-	automationPatternView( automationPattern * _pat, trackView * _parent );
-	virtual ~automationPatternView();
-
-
-public slots:
-	virtual void update( void );
-
-
-protected slots:
-	void resetName( void );
-	void changeName( void );
-	void disconnectObject( QAction * _a );
-
-
-protected:
-	virtual void constructContextMenu( QMenu * );
-	virtual void mouseDoubleClickEvent( QMouseEvent * _me );
-	virtual void paintEvent( QPaintEvent * _pe );
-	virtual void resizeEvent( QResizeEvent * _re )
-	{
-		m_needsUpdate = true;
-		trackContentObjectView::resizeEvent( _re );
-	}
-	virtual void dragEnterEvent( QDragEnterEvent * _dee );
-	virtual void dropEvent( QDropEvent * _de );
-
-
-private:
-	automationPattern * m_pat;
-	QPixmap m_paintPixmap;
-	bool m_needsUpdate;
-
-} ;
-
-
 #endif

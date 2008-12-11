@@ -1,3 +1,14 @@
+2008-12-11	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* include/automation_pattern.h:
+	* src/core/automation_pattern.cpp:
+	do not disable automation when just editing first point of an
+	automation pattern (closes #2146230)
+
+	* include/automation_pattern_view.h:
+	* src/gui/automation_pattern_view.cpp:
+	splitted view component out of automation_pattern.*
+
 2008-12-10	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* plugins/vst_base/communication.h:
