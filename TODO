@@ -63,6 +63,7 @@ Andrew Kelley's todo:
   * humanizing tool
   * quick slice
   * look through FL Studio's tools and implement some of them
+- if you press both controls at the same time, the piano roll gets stuck in selection mode
 
 - recording automation
 - make knobs easier to tune (less sensitive)

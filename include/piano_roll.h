@@ -171,6 +171,13 @@ private:
 	bool isSelection() const;
 	void testPlayNote( note * n );
 	
+	inline int noteEditTop() const;
+	inline int keyAreaBottom() const;
+	inline int noteEditBottom() const;
+	inline int keyAreaTop() const;
+	inline int noteEditRight() const;
+	inline int noteEditLeft() const;
+	
 	void dragNotes( int x, int y, bool alt );
 		
 	static const int cm_scrollAmtHoriz = 10;

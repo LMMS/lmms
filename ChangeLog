@@ -11,6 +11,9 @@
 	  none selected)
 	- when "scribbling" note volumes, if there is a chord, it will play all
 	  3 notes, rather than just the first one
+	- if you click towards the end of the key in the piano roll, it plays
+	  the note louder than if you play it towards the base
+	
 
 2008-12-11	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 

@@ -91,8 +91,11 @@ const int C_KEY_LABEL_X = WHITE_KEY_WIDTH - 19;
 const int KEY_LINE_HEIGHT = 12;
 const int OCTAVE_HEIGHT = KEY_LINE_HEIGHT * KeysPerOctave;	// = 12 * 12;
 
+const int NOTE_EDIT_RESIZE_BAR = 6;
 const int PR_BOTTOM_MARGIN = SCROLLBAR_SIZE;
 const int PR_TOP_MARGIN = 48;
+const int PR_RIGHT_MARGIN = SCROLLBAR_SIZE;
+
 
 // width of area used for resizing (the grip at the end of a note)
 const int RESIZE_AREA_WIDTH = 4;
@@ -1065,6 +1068,48 @@ void pianoRoll::leaveEvent( QEvent * _e )
 
 
 
+inline int pianoRoll::noteEditTop() const
+{
+	return height() - PR_BOTTOM_MARGIN - 
+		m_notesEditHeight + NOTE_EDIT_RESIZE_BAR;
+}
+
+
+
+inline int pianoRoll::noteEditBottom() const
+{
+	return height() - PR_BOTTOM_MARGIN;
+}
+
+
+
+inline int pianoRoll::noteEditRight() const
+{
+	return width() - PR_RIGHT_MARGIN;
+}
+
+
+
+inline int pianoRoll::noteEditLeft() const
+{
+	return WHITE_KEY_WIDTH;
+}
+
+
+
+inline int pianoRoll::keyAreaTop() const
+{
+	return PR_TOP_MARGIN;
+}
+
+
+
+inline int pianoRoll::keyAreaBottom() const
+{
+	return height() - PR_BOTTOM_MARGIN - m_notesEditHeight;
+}
+
+
 
 void pianoRoll::mousePressEvent( QMouseEvent * _me )
 {
@@ -1083,8 +1128,7 @@ void pianoRoll::mousePressEvent( QMouseEvent * _me )
 	{
 		volume vol = DefaultVolume;
 
-		bool edit_note = ( _me->y() > height() -
-					PR_BOTTOM_MARGIN - m_notesEditHeight );
+		bool edit_note = ( _me->y() > noteEditTop() );
 
 		int key_num = getKey( _me->y() );
 
@@ -1375,6 +1419,18 @@ void pianoRoll::mousePressEvent( QMouseEvent * _me )
 
 			update();
 		}
+		else
+		{
+			// clicked on keyboard on the left - play note
+			m_lastKey = key_num;
+			if( ! m_recording && ! engine::getSong()->isPlaying() )
+			{
+				int v = ( (float) x ) / ( (float) WHITE_KEY_WIDTH ) * 127;
+				m_pattern->getInstrumentTrack()->processInEvent(
+							midiEvent( MidiNoteOn, 0, key_num, v ),
+							midiTime() );
+			}
+		}
 	}
 }
 
@@ -1422,7 +1478,7 @@ void pianoRoll::computeSelectedNotes(bool shift)
 		qSwap<int>( sel_key_start, sel_key_end );
 	}
 
-	//int y_base = height() - PR_BOTTOM_MARGIN - m_notesEditHeight - 1;
+	//int y_base = noteEditTop() - 1;
 	if( validPattern() == true )
 	{
 		const noteVector & notes = m_pattern->notes();
@@ -1522,6 +1578,11 @@ void pianoRoll::mouseReleaseEvent( QMouseEvent * _me )
 			
 			++it;
 		}
+		
+		// stop playing keys that we let go of
+		m_pattern->getInstrumentTrack()->processInEvent(
+					midiEvent( MidiNoteOff, 0, m_lastKey, 0 ), midiTime() );
+				
 	}
 
 	m_currentNote = NULL;
@@ -1552,8 +1613,7 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 	
 	if( _me->y() > PR_TOP_MARGIN || m_action != ActionNone )
 	{
-		bool edit_note = ( _me->y() > 
-						   height() - PR_BOTTOM_MARGIN - m_notesEditHeight )
+		bool edit_note = ( _me->y() > noteEditTop() )
 						&& m_action != ActionSelectNotes;
 			
 
@@ -1564,24 +1624,26 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 		// (could be the user just moved the cursor one pixel up/down
 		// but is still on the same key)
 		if( key_num != m_lastKey &&
-			( m_action == ActionMoveNote || m_action == ActionMoveSelection ) &&
+			(   (m_action == ActionMoveNote || m_action == ActionMoveSelection )
+			 || ( x < WHITE_KEY_WIDTH && m_action == ActionNone ) ) &&
 			edit_note == false &&
 			_me->buttons() & Qt::LeftButton )
 		{
 			m_pattern->getInstrumentTrack()->processInEvent(
 				midiEvent( MidiNoteOff, 0, m_lastKey, 0 ),
 								midiTime() );
-			if( _me->buttons() & Qt::LeftButton &&
-				m_action != ActionResizeNote &&
-				m_action != ActionSelectNotes &&
-				m_action != ActionMoveSelection &&
-				m_recording == false )
+			if( _me->buttons() & Qt::LeftButton )
 			{
 				m_lastKey = key_num;
+				
+				int v = DefaultVolume * 127 / 100;
+				if( x < WHITE_KEY_WIDTH )
+				{
+					v = ( (float) x ) / ( (float) WHITE_KEY_WIDTH ) * 127;
+				}
+				
 				m_pattern->getInstrumentTrack()->processInEvent(
-					midiEvent( MidiNoteOn, 0, key_num,
-						DefaultVolume * 127 / 100 ),
-								midiTime() );
+					midiEvent( MidiNoteOn, 0, key_num, v ), midiTime() );
 			}
 		}
 		if( x < WHITE_KEY_WIDTH && m_action == ActionNone )
@@ -1914,9 +1976,7 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 			if( key_num <= s_key )
 			{
 				QCursor::setPos( mapToGlobal( QPoint( _me->x(),
-							height() -
-							PR_BOTTOM_MARGIN -
-							m_notesEditHeight ) ) );
+							keyAreaBottom() ) ) );
 				m_topBottomScroll->setValue(
 					m_topBottomScroll->value() + 1 );
 				key_num = s_key;
@@ -2071,7 +2131,7 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 	}
 
 	// start drawing at the bottom
-	int key_line_y = height() - PR_BOTTOM_MARGIN - m_notesEditHeight - 1;
+	int key_line_y = keyAreaBottom() - 1;
 	// used for aligning black-keys later
 	int first_white_key_height = WHITE_KEY_SMALL_HEIGHT;
 	// key-counter - only needed for finding out whether the processed 
@@ -2155,7 +2215,7 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 	int white_cnt = 0;
 
 	// and go!
-	for( int y = height() - PR_BOTTOM_MARGIN - m_notesEditHeight + y_offset;
+	for( int y = keyAreaBottom() + y_offset;
 					y > PR_TOP_MARGIN; ++keys_processed )
 	{
 		// check for black key that is only half visible on the bottom
@@ -2211,8 +2271,8 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 
 	// erase the area below the piano, because there might be keys that 
 	// should be only half-visible
-	p.fillRect( QRect( 0, height() - PR_BOTTOM_MARGIN - m_notesEditHeight,
-			WHITE_KEY_WIDTH, m_notesEditHeight ),
+	p.fillRect( QRect( 0, keyAreaBottom(),
+			WHITE_KEY_WIDTH, noteEditBottom()-keyAreaBottom() ),
 			QColor( 0, 0, 0 ) );
 
 
@@ -2299,7 +2359,7 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 		qSwap<int>( sel_key_start, sel_key_end );
 	}
 
-	int y_base = height() - PR_BOTTOM_MARGIN - m_notesEditHeight - 1;
+	int y_base = keyAreaBottom() - 1;
 	if( validPattern() == true )
 	{
 		p.setClipRect( WHITE_KEY_WIDTH, PR_TOP_MARGIN,
@@ -2308,8 +2368,7 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 
 		const noteVector & notes = m_pattern->notes();
 
-		const int visible_keys = ( height() - PR_TOP_MARGIN -
-					PR_BOTTOM_MARGIN - m_notesEditHeight ) /
+		const int visible_keys = ( keyAreaBottom()-keyAreaTop() ) /
 							KEY_LINE_HEIGHT + 2;
 	
 		QPolygon volumeHandles;
@@ -2423,12 +2482,14 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 	if( validPattern() == true )
 	{
 		int key_num = getKey( mapFromGlobal( QCursor::pos() ).y() );
-		p.fillRect( 10, height() + 3 - PR_BOTTOM_MARGIN -
-				m_notesEditHeight - KEY_LINE_HEIGHT *
+		p.fillRect( 10, keyAreaBottom() + 3 - KEY_LINE_HEIGHT *
 					( key_num - m_startKey + 1 ),
 				width() - 10, KEY_LINE_HEIGHT - 7,
 							QColor( 64, 64, 64 ) );
 	}
+	
+	// bar to resize note edit area
+	p.fillRect( 0, keyAreaBottom(), noteEditRight()-noteEditLeft(), NOTE_EDIT_RESIZE_BAR, QColor( 255, 255, 255 ) );
 
 	const QPixmap * cursor = NULL;
 	// draw current edit-mode-icon below the cursor
@@ -2535,7 +2596,7 @@ void pianoRoll::wheelEvent( QWheelEvent * _we )
 
 int pianoRoll::getKey( int _y ) const
 {
-	int key_line_y = height() - PR_BOTTOM_MARGIN - m_notesEditHeight - 1;
+	int key_line_y = keyAreaBottom() - 1;
 	// pressed key on piano
 	int key_num = ( key_line_y - _y ) / KEY_LINE_HEIGHT;
 	key_num += m_startKey;
@@ -3071,7 +3132,7 @@ noteVector::const_iterator pianoRoll::noteIteratorUnderMouse( void )
 
 	if( pos.x() <= WHITE_KEY_WIDTH || pos.x() > width() - SCROLLBAR_SIZE
 		|| pos.y() < PR_TOP_MARGIN
-		|| pos.y() > height() - PR_BOTTOM_MARGIN - m_notesEditHeight )
+		|| pos.y() > keyAreaBottom() )
 	{
 		return( notes.end() );
 	}
