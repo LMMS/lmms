@@ -1081,7 +1081,6 @@ void pianoRoll::mousePressEvent( QMouseEvent * _me )
 
 	if( _me->y() > PR_TOP_MARGIN )
 	{
-		bool play_note = ! engine::getSong()->isPlaying();
 		volume vol = DefaultVolume;
 
 		bool edit_note = ( _me->y() > height() -
@@ -1169,10 +1168,9 @@ void pianoRoll::mousePressEvent( QMouseEvent * _me )
 					m_currentNote = *it;
 					m_action = ActionChangeNoteVolume;
 					key_num = ( *it )->key();
-				}
-				else
-				{
-					play_note = false;
+					
+					testPlayNote( *it );
+					
 				}
 			}
 			// left button??
@@ -1280,16 +1278,11 @@ void pianoRoll::mousePressEvent( QMouseEvent * _me )
 					// set resize-cursor
 					QCursor c( Qt::SizeHorCursor );
 					QApplication::setOverrideCursor( c );
-					play_note = false;
 				}
 				else
 				{
 					// otherwise move it
 					m_action = ActionMoveNote;
-					
-
-				
-					
 					
 					// set move-cursor
 					QCursor c( Qt::SizeAllCursor );
@@ -1328,6 +1321,9 @@ void pianoRoll::mousePressEvent( QMouseEvent * _me )
 							engine::getSongEditor()->update();
 						}
 					}
+					
+					// play the note
+					testPlayNote( m_currentNote );
 				}
 				
 				
@@ -1346,7 +1342,6 @@ void pianoRoll::mousePressEvent( QMouseEvent * _me )
 			{
 				// erase single note
 				m_mouseDownRight = true;
-				play_note = false;
 				if( it != notes.end() )
 				{
 					if( ( *it )->length() > 0 )
@@ -1372,35 +1367,34 @@ void pianoRoll::mousePressEvent( QMouseEvent * _me )
 				m_selectedKeys = 1;
 				m_action = ActionSelectNotes;
 
-				play_note = false;
 				
 				// call mousemove to fix glitch where selection
 				// appears in wrong spot on mousedown
 				mouseMoveEvent( _me );
 			}
-			else if( _me->button() == Qt::RightButton &&
-							m_editMode == ModeMove )
-			{
-				// when clicking right in select-move, we
-				// switch to draw-mode
-				m_drawButton->setChecked( true );
-				play_note = false;
-			}
 
 			update();
 		}
-
-		// was there an action where should be played the note?
-		if( play_note == true && m_recording == false )
-		{
-			m_lastKey = key_num;
-			m_pattern->getInstrumentTrack()->processInEvent(
-					midiEvent( MidiNoteOn, 0, key_num,
-							vol * 127 / 100 ),
-								midiTime() );
-		}
 	}
 }
+
+
+
+void pianoRoll::testPlayNote( note * n )
+{
+	m_lastKey = n->key();
+	
+	if(! n->isPlaying() && ! m_recording && ! engine::getSong()->isPlaying() )
+	{
+		n->setIsPlaying( true );
+		m_pattern->getInstrumentTrack()->processInEvent(
+						midiEvent( MidiNoteOn, 0, n->key(), 
+								  n->getVolume() * 127 / 100 ), midiTime() );
+																  
+	}
+}
+
+
 
 void pianoRoll::computeSelectedNotes(bool shift)
 {
@@ -1512,17 +1506,21 @@ void pianoRoll::mouseReleaseEvent( QMouseEvent * _me )
 	
 	if( validPattern() == true )
 	{
-		if( m_action == ActionChangeNoteVolume && m_currentNote != NULL )
+		// turn off all notes that are playing
+		const noteVector & notes = m_pattern->notes();
+
+		noteVector::const_iterator it = notes.begin();
+		while( it != notes.end() )
 		{
-			m_pattern->getInstrumentTrack()->processInEvent(
-				midiEvent( MidiNoteOff, 0,
-					m_currentNote->key(), 0 ), midiTime() );
-		}
-		else
-		{
-			m_pattern->getInstrumentTrack()->processInEvent(
-				midiEvent( MidiNoteOff, 0, m_lastKey, 0 ),
-								midiTime() );
+			if( ( *it )->isPlaying() )
+			{
+				m_pattern->getInstrumentTrack()->processInEvent(
+					midiEvent( MidiNoteOff, 0, ( *it )->key(), 0 ), 
+																midiTime() );
+				( *it )->setIsPlaying( false );
+			}
+			
+			++it;
 		}
 	}
 
@@ -1566,8 +1564,7 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 		// (could be the user just moved the cursor one pixel up/down
 		// but is still on the same key)
 		if( key_num != m_lastKey &&
-			m_action != ActionChangeNoteVolume &&
-			m_action != ActionMoveSelection &&
+			( m_action == ActionMoveNote || m_action == ActionMoveSelection ) &&
 			edit_note == false &&
 			_me->buttons() & Qt::LeftButton )
 		{
@@ -1606,96 +1603,66 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 		{
 			// Volume Bars
 			
-			// Use nearest-note when changing volume so the bars can
-			// be "scribbled"
-			int pos_ticks = ( x * midiTime::ticksPerTact() ) /
-						m_ppt + m_currentPosition;
+			// Change notes within a certain pixel range of where
+			// the mouse cursor is
+			int pixel_range = 20;
+			
+			// convert to ticks so that we can check which notes
+			// are in the range
+			int ticks_start = (x-pixel_range/2) * 
+					midiTime::ticksPerTact() / m_ppt + m_currentPosition;
+			int ticks_end = (x+pixel_range/2) * 
+					midiTime::ticksPerTact() / m_ppt + m_currentPosition;
 
 			// get note-vector of current pattern
 			const noteVector & notes = m_pattern->notes();
 
-			note * shortNote = NULL;
-
-			// Max "snap length" 1/8 note on either side
-			int shortDistance = DefaultTicksPerTact/8;
-
-			// loop through vector to find nearest note
-			noteVector::const_iterator it = notes.begin();
-			while( it != notes.end() )
-			{
-				int tmp = abs( pos_ticks - (int)( (*it)->pos() ) );
-			
-				if( tmp <= shortDistance && (*it)->length().getTicks() > 0 )
-				{
-					shortDistance = tmp;
-					shortNote = *it ;
-
-				}
-				++it;
-
-			}
-
+			// determine what volume to set note to
 			volume vol = tLimit<int>( 2 * ( -_me->y() +
 							height() -
 						PR_BOTTOM_MARGIN ),
 							MinVolume,
 							MaxVolume );
-
-			if( shortNote ) 
+			
+			// loop through vector
+			bool use_selection = isSelection();
+			noteVector::const_iterator it = notes.begin();
+			while( it != notes.end() )
 			{
-				// have short length - now check for volume difference and currentNote
-				it = notes.begin();
-
-				int shortNotePos = shortNote->pos();
-				int shortVolumeDiff = MaxVolume-MinVolume;
-
-				while( it != notes.end() )
+				if( ( *it )->pos().getTicks() >= ticks_start 
+					&& ( *it )->pos().getTicks() <= ticks_end
+					&& ( *it )->length().getTicks() > 0
+					&& ( ( *it )->selected() || ! use_selection ) )
 				{
-					if( (*it)->pos() == shortNotePos && (*it)->length().getTicks() > 0 )
-					{
-						if( *it == m_currentNote ) 
-						{
-							shortNote = m_currentNote;
-							break;
-						}
-
-						int volDiff = abs( vol - (*it)->getVolume() );
-						if( volDiff <= shortVolumeDiff )
-						{
-							shortVolumeDiff = volDiff;
-							shortNote = *it;
-						}
-					}
-					++it;
-				}	
-			}
-
-			if( shortNote != m_currentNote && 
-					engine::getSong()->isPlaying() == false )
-			{
-				if( m_currentNote != NULL ) {
+					( *it )->setVolume( vol );
+					m_pattern->dataChanged();
+					
+					// play the note so that the user can tell how loud it is
+					testPlayNote( *it );
+					
 					m_pattern->getInstrumentTrack()->processInEvent(
-						midiEvent( MidiNoteOff, 0,
-						m_currentNote->key(), 0 ), midiTime() );
+								midiEvent( 
+										  MidiKeyPressure, 
+										  0, 
+										  ( *it )->key(),
+										  vol * 127 / 100 ),
+								midiTime() );
+				}
+				else
+				{
+					if( ( *it )->isPlaying() )
+					{
+						// mouse not over this note, stop playing it.
+						m_pattern->getInstrumentTrack()->processInEvent(
+							midiEvent( MidiNoteOff, 0,
+							( *it )->key(), 0 ), midiTime() );
+						
+						( *it )->setIsPlaying( false );
+					}
 				}
 				
-				if( shortNote != NULL ) {
-					m_lastKey = shortNote->key();
+				++it;
 
-					m_pattern->getInstrumentTrack()->processInEvent(
-					midiEvent( MidiNoteOn, 0,
-					shortNote->key(), shortNote->getVolume() ), midiTime() );
-				}
-			}
-			m_currentNote = shortNote;
-
-			if( m_currentNote != NULL ) {
-				m_currentNote->setVolume( vol );
-				m_pattern->dataChanged();
-				m_pattern->getInstrumentTrack()->processInEvent(
-					midiEvent( MidiKeyPressure, 0, m_lastKey,
-							vol * 127 / 100 ),
-								midiTime() );
 			}
 		}
 		else if( _me->buttons() == Qt::NoButton && m_editMode == ModeDraw )

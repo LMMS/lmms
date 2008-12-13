@@ -91,6 +91,7 @@ public:
 	note( const note & _note );
 	virtual ~note();
 	
+	// used by GUI
 	inline void setSelected( const bool _selected ){ m_selected = _selected; }
 	inline void setOldKey( const int _oldKey ){ m_oldKey = _oldKey; }
 	inline void setOldPos( const midiTime & _oldPos ){ m_oldPos = _oldPos; }
@@ -98,6 +99,11 @@ public:
 	{
 		m_oldLength = _oldLength;
 	}
+	inline void setIsPlaying( const bool _isPlaying )
+	{
+		m_isPlaying = _isPlaying;
+	}
+	
 	
 	void setLength( const midiTime & _length );
 	void setPos( const midiTime & _pos );
@@ -132,6 +138,11 @@ public:
 	inline midiTime oldLength( void ) const
 	{
 		return m_oldLength;
+	}
+		
+	inline bool isPlaying( void ) const
+	{
+		return m_isPlaying;
 	}
 
 	inline midiTime endPos( void ) const
@@ -212,11 +223,13 @@ private:
 		ChangePosition
 	} ;*/
 
+	
 	// for piano roll editing
 	bool m_selected; 
 	int m_oldKey;
 	midiTime m_oldPos;
 	midiTime m_oldLength;
+	bool m_isPlaying;
 	
 	int m_key;
 	volume m_volume;

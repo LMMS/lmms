@@ -169,6 +169,7 @@ private:
 	void shiftPos(int amount);
 	void shiftSemiTone(int amount);
 	bool isSelection() const;
+	void testPlayNote( note * n );
 	
 	void dragNotes( int x, int y, bool alt );
 		
