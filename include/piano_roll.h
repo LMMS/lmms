@@ -149,7 +149,8 @@ private:
 		ActionSelectNotes,
 		ActionMoveSelection,
 		ActionChangeNoteVolume,
-		ActionChangeNotePanning
+		ActionChangeNotePanning,
+		ActionResizeNoteEditArea,
 	} ;
 
 	enum pianoRollKeyTypes
@@ -254,6 +255,7 @@ private:
 	int m_moveStartX;
 	int m_moveStartY;
 
+	int m_oldNotesEditHeight;
 	int m_notesEditHeight;
 	int m_ppt;
 	int m_totalKeysToScroll;

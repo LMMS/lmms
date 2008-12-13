@@ -52,7 +52,6 @@
 - add FLAC as export-format?
 
 Andrew Kelley's todo:
-- piano roll: make the note volume section have adjustable height
 - add note panning ability to piano roll
 - paint piano roll notes with a darker color based on how high volume the note is
 - paint note volume blue if selected

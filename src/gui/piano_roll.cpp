@@ -92,6 +92,8 @@ const int KEY_LINE_HEIGHT = 12;
 const int OCTAVE_HEIGHT = KEY_LINE_HEIGHT * KeysPerOctave;	// = 12 * 12;
 
 const int NOTE_EDIT_RESIZE_BAR = 6;
+const int NOTE_EDIT_MIN_HEIGHT = 50;
+const int KEY_AREA_MIN_HEIGHT = 100;
 const int PR_BOTTOM_MARGIN = SCROLLBAR_SIZE;
 const int PR_TOP_MARGIN = 48;
 const int PR_RIGHT_MARGIN = SCROLLBAR_SIZE;
@@ -144,6 +146,7 @@ pianoRoll::pianoRoll( void ) :
 	m_action( ActionNone ),
 	m_lastMouseX( 0 ),
 	m_lastMouseY( 0 ),
+	m_oldNotesEditHeight( 100 ),
 	m_notesEditHeight( 100 ),
 	m_ppt( DEFAULT_PR_PPT ),
 	m_lenOfNewNotes( midiTime( 0, DefaultTicksPerTact/4 ) ),
@@ -1124,6 +1127,21 @@ void pianoRoll::mousePressEvent( QMouseEvent * _me )
 		return;
 	}
 
+	// keep track of the point where the user clicked down
+	if( _me->button() == Qt::LeftButton )
+	{
+		m_moveStartX = _me->x();
+		m_moveStartY = _me->y();
+	}
+
+	if( _me->y() > keyAreaBottom() && _me->y() < noteEditTop() )
+	{	
+		// resizing the note edit area
+		m_action = ActionResizeNoteEditArea;
+		m_oldNotesEditHeight = m_notesEditHeight;
+		return;
+	}	
+
 	if( _me->y() > PR_TOP_MARGIN )
 	{
 		volume vol = DefaultVolume;
@@ -1259,10 +1277,7 @@ void pianoRoll::mousePressEvent( QMouseEvent * _me )
 
 				m_currentNote = *it;
 				
-		
-				// keep track of the point where the user clicked down
-				m_moveStartX = _me->x();
-				m_moveStartY = _me->y();		
+				// remember which key and tick we started with		
 				m_mouseDownKey = m_startKey;
 				m_mouseDownTick = m_currentPosition;
 				
@@ -1611,11 +1626,35 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 		return;
 	}
 	
+	if( m_action == ActionNone && _me->buttons() == 0 )
+	{
+		if( _me->y() > keyAreaBottom() && _me->y() < noteEditTop() )
+		{
+			QApplication::setOverrideCursor( QCursor( Qt::SizeVerCursor ) );
+			return;
+		}
+		else
+		{
+			QApplication::setOverrideCursor( QCursor( Qt::ArrowCursor ) );
+		}
+	}
+	else if( m_action == ActionResizeNoteEditArea )
+	{
+		// change m_notesEditHeight and then repaint
+		m_notesEditHeight = tLimit<int>( 
+					m_oldNotesEditHeight - ( _me->y() - m_moveStartY ),
+					NOTE_EDIT_MIN_HEIGHT,
+					height() - PR_TOP_MARGIN - NOTE_EDIT_RESIZE_BAR - 
+									PR_BOTTOM_MARGIN - KEY_AREA_MIN_HEIGHT );
+		repaint();
+		return;
+	}
+	
 	if( _me->y() > PR_TOP_MARGIN || m_action != ActionNone )
 	{
 		bool edit_note = ( _me->y() > noteEditTop() )
 						&& m_action != ActionSelectNotes;
-			
+		
 
 		int key_num = getKey( _me->y() );
 		int x = _me->x();
@@ -1680,11 +1719,11 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 			const noteVector & notes = m_pattern->notes();
 
 			// determine what volume to set note to
-			volume vol = tLimit<int>( 2 * ( -_me->y() +
-							height() -
-						PR_BOTTOM_MARGIN ),
-							MinVolume,
-							MaxVolume );
+			volume vol = tLimit<int>( 
+							( ( (float)noteEditBottom() ) - ( (float)_me->y() ) ) / 
+							( (float)( noteEditBottom() - noteEditTop() ) ) * 
+							( MaxVolume - MinVolume ),
+										MinVolume, MaxVolume );
 			
 			// loop through vector
 			bool use_selection = isSelection();
@@ -2419,16 +2458,17 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 					qMin(255, 60 + ( *it )->getVolume() ) );
 			p.setPen( QPen( color,
 							NE_LINE_WIDTH ) );
-			p.drawLine( x + WHITE_KEY_WIDTH,
-					height() - PR_BOTTOM_MARGIN -
-						( *it )->getVolume() / 2,
-					x + WHITE_KEY_WIDTH,
-					height() - PR_BOTTOM_MARGIN );
+			
+			int volumeHandleTop = noteEditBottom() - 
+				( (float)( ( *it )->getVolume() - MinVolume ) ) / 
+				( (float)( MaxVolume - MinVolume ) ) * 
+				( (float)( noteEditBottom() - noteEditTop() ) );
+			p.drawLine( noteEditLeft() + x, volumeHandleTop, 
+					    noteEditLeft() + x, noteEditBottom() );
 
 
-			volumeHandles << QPoint( x + WHITE_KEY_WIDTH + 1,
-					height() - PR_BOTTOM_MARGIN -
-						( *it )->getVolume() / 2+1 );
+			volumeHandles << QPoint( x + noteEditLeft() + 1,
+					volumeHandleTop+1 );
 
 			if( ( *it )->hasDetuningInfo() )
 			{
@@ -2489,7 +2529,10 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 	}
 	
 	// bar to resize note edit area
-	p.fillRect( 0, keyAreaBottom(), noteEditRight()-noteEditLeft(), NOTE_EDIT_RESIZE_BAR, QColor( 255, 255, 255 ) );
+	p.setClipRect( 0, 0, width(), height() );
+	p.fillRect( QRect( 0, keyAreaBottom(), 
+					width()-PR_RIGHT_MARGIN, NOTE_EDIT_RESIZE_BAR ),
+			   QColor( 64, 64, 64 ) );
 
 	const QPixmap * cursor = NULL;
 	// draw current edit-mode-icon below the cursor
