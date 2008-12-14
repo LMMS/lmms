@@ -38,6 +38,8 @@
 #include <QtGui/QPainter>
 #include <QtGui/QStyleOption>
 #include <QtGui/QWheelEvent>
+#include <QString>
+#include <QSignalMapper>
 
 
 #ifndef __USE_XOPEN
@@ -136,6 +138,9 @@ const int DEFAULT_PR_PPT = KEY_LINE_HEIGHT * DefaultStepsPerTact;
 
 
 pianoRoll::pianoRoll( void ) :
+	m_nemStr( QVector<QString>() ),
+	m_noteEditMenu( NULL ),
+	m_signalMapper( NULL ),
 	m_zoomingModel(),
 	m_quantizeModel(),
 	m_noteLenModel(),
@@ -158,6 +163,23 @@ pianoRoll::pianoRoll( void ) :
 	m_mouseDownRight( false ),
 	m_scrollBack( false )
 {
+	// gui names of edit modes
+	m_nemStr.push_back( tr( "Note Volume" ) );
+	m_nemStr.push_back( tr( "Note Panning" ) );
+	
+	m_signalMapper = new QSignalMapper( this );
+	m_noteEditMenu = new QMenu( this );
+	m_noteEditMenu->clear();
+	for( int i=0; i<m_nemStr.size(); ++i )
+	{
+		QAction * act = new QAction( m_nemStr.at(i), this );
+		connect( act, SIGNAL(triggered()), m_signalMapper, SLOT(map()) );
+		m_signalMapper->setMapping( act, i );
+		m_noteEditMenu->addAction( act );
+	}
+	connect( m_signalMapper, SIGNAL(mapped(int)), 
+			this, SLOT(changeNoteEditMode(int)) );
+	
 	// init pixmaps
 	if( s_whiteKeySmallPm == NULL )
 	{
@@ -479,6 +501,11 @@ pianoRoll::pianoRoll( void ) :
 }
 
 
+void pianoRoll::changeNoteEditMode( int i )
+{
+	m_noteEditMode = (noteEditMode) i;
+	repaint();
+}
 
 
 pianoRoll::~pianoRoll()
@@ -569,8 +596,7 @@ void pianoRoll::loadSettings( const QDomElement & _this )
 
 
 inline void pianoRoll::drawNoteRect( QPainter & _p, int _x, int _y,
-					int _width, const bool _is_selected,
-						const bool _is_step_note )
+					int _width, note * _n )
 {
 	++_x;
 	++_y;
@@ -580,27 +606,65 @@ inline void pianoRoll::drawNoteRect( QPainter & _p, int _x, int _y,
 	{
 		_width = 2;
 	}
+	
+	int volVal = qMin( 255, (int) (
+				( (float)( _n->getVolume() - MinVolume ) ) / 
+				( (float)( MaxVolume - MinVolume ) ) * 255.0f) );
+	float rightPercent = qMin<float>( 1.0f, 
+						( (float)( _n->getPanning() - PanningLeft ) ) / 
+						( (float)( PanningRight - PanningLeft ) ) * 2.0f );
+	
+	float leftPercent = qMin<float>( 1.0f, 
+						( (float)( PanningRight - _n->getPanning() ) ) / 
+						( (float)( PanningRight - PanningLeft ) ) * 2.0f );
 
-	QColor current_color( 0xFF, 0xB0, 0x00 );
-	if( _is_step_note == true )
+	QColor col;
+	
+	col = QColor( 0xFF, 0xB0, 0x00 );
+	if( _n->length() < 0 )
 	{
-		current_color.setRgb( 0, 255, 0 );
+		//step note
+		col.setRgb( 0, 255, 0 );
+		_p.fillRect( _x, _y, _width, KEY_LINE_HEIGHT - 2, col );
 	}
-	else if( _is_selected == true )
+	else if( _n->selected() )
 	{
-		current_color.setRgb( 0x00, 0x40, 0xC0 );
+		col.setRgb( 0x00, 0x40, 0xC0 );
+		_p.fillRect( _x, _y, _width, KEY_LINE_HEIGHT - 2, col );
 	}
-	_p.fillRect( _x, _y, _width, KEY_LINE_HEIGHT - 2, current_color );
-
-	_p.setPen( QColor( 0xFF, 0xDF, 0x20 ) );
+	else
+	{
+		// adjust note to make it a bit faded if it has a lower volume
+		// in stereo using gradients
+		QColor lcol = QColor::fromHsv( col.hue(), col.saturation(), volVal * leftPercent );
+		QColor rcol = QColor::fromHsv( col.hue(), col.saturation(), volVal * rightPercent );
+		col = QColor::fromHsv( col.hue(), col.saturation(), volVal );
+		
+		QLinearGradient gradient( _x, _y, _x+_width, _y+KEY_LINE_HEIGHT );
+		gradient.setColorAt( 0, lcol );
+		gradient.setColorAt( 1, rcol );
+		_p.setBrush( gradient );
+		_p.setPen( Qt::NoPen );
+		_p.drawRect( _x, _y, _width, KEY_LINE_HEIGHT );
+	}
+	
+	// hilighting lines around the note
+	_p.setPen( Qt::SolidLine );
+	_p.setBrush( Qt::NoBrush );
+	
+	col = QColor( 0xFF, 0xDF, 0x20 );
+	_p.setPen( QColor::fromHsv( col.hue(), col.saturation(), volVal ) );
 	_p.drawLine( _x, _y, _x + _width, _y );
 	_p.drawLine( _x, _y, _x, _y + KEY_LINE_HEIGHT - 2 );
-
-	_p.setPen( QColor( 0xFF, 0x9F, 0x00 ) );
+	
+	col = QColor( 0xFF, 0x9F, 0x00 );
+	_p.setPen( QColor::fromHsv( col.hue(), col.saturation(), volVal ) );
 	_p.drawLine( _x + _width, _y, _x + _width, _y + KEY_LINE_HEIGHT - 2 );
 	_p.drawLine( _x, _y + KEY_LINE_HEIGHT - 2, _x + _width,
 						_y + KEY_LINE_HEIGHT - 2 );
-
+	
+	// that little tab thing on the end hinting at the user
+	// to resize the note
 	_p.setPen( QColor( 0xFF, 0xFF, 0x40 ) );
 	if( _width > 2 )
 	{
@@ -1420,13 +1484,21 @@ void pianoRoll::mousePressEvent( QMouseEvent * _me )
 		}
 		else
 		{
-			// clicked in the box below the keys to the left of note edit area
-			m_noteEditMode = (noteEditMode)(((int)m_noteEditMode)+1);
-			if( m_noteEditMode > 1 )
+			if( _me->buttons() == Qt::LeftButton )
 			{
-				m_noteEditMode = (noteEditMode)0;
+				// clicked in the box below the keys to the left of note edit area
+				m_noteEditMode = (noteEditMode)(((int)m_noteEditMode)+1);
+				if( m_noteEditMode == NoteEditCount )
+				{
+					m_noteEditMode = (noteEditMode)0;
+				}
+				repaint();
 			}
-			repaint();
+			else if( _me->buttons() == Qt::RightButton )
+			{
+				// pop menu asking which one they want to edit
+				m_noteEditMenu->popup( mapToGlobal( QPoint( _me->x(), _me->y() ) ) );
+			}
 		}
 	}
 }
@@ -2315,7 +2387,16 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 	p.fillRect( QRect( 0, keyAreaBottom(),
 			WHITE_KEY_WIDTH, noteEditBottom()-keyAreaBottom() ),
 			QColor( 0, 0, 0 ) );
-
+	
+	// display note editing info
+	QFont f = p.font();
+	f.setBold( false );
+	p.setFont( pointSize<10>( f ) );
+	p.setPen( QColor( 255, 255, 0 ) );
+	p.drawText( QRect( 0, keyAreaBottom(), 
+					  WHITE_KEY_WIDTH, noteEditBottom() - keyAreaBottom() ),
+			   Qt::AlignCenter | Qt::TextWordWrap,
+			   m_nemStr.at( m_noteEditMode ) + ":" );
 
 	// set clipping area, because we are not allowed to paint over
 	// keyboard...
@@ -2452,9 +2533,7 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 				// note
 				drawNoteRect( p, x + WHITE_KEY_WIDTH,
 						y_base - key * KEY_LINE_HEIGHT,
-								note_width,
-								( *it )->selected(),
-							( *it )->length() < 0 );
+								note_width, *it );
 			}
 			
 			// draw note editing stuff

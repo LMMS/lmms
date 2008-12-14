@@ -52,8 +52,12 @@
 - add FLAC as export-format?
 
 Andrew Kelley's todo:
-- paint piano roll notes with a darker color based on how high volume the note is
 - paint note volume blue if selected
+- make the tip of a panning bar blue too so the user knows it's selected
+- when you click on a note in the piano roll, it plays the note, but not the correct panning
+- fix ctrl+mousewheel zooming in
+- if you press both controls at the same time, the piano roll gets stuck in selection mode
+- change my modifier code to use mainwindows modifier info
 - multiview button - show notes from every instrument in the current beat+bassline with different colors
 - undo/redo for piano roll
 - add a tools menu to piano roll
@@ -61,11 +65,8 @@ Andrew Kelley's todo:
   * humanizing tool
   * quick slice
   * look through FL Studio's tools and implement some of them
-- if you press both controls at the same time, the piano roll gets stuck in selection mode
-- you can still move volumes for notes if you click down right on it, even if the
-  note is not selected.
-- change my modifier code to use mainwindows modifier info
-- fix ctrl+mousewheel zooming in
+- when looking at a piano roll, if the song is playing that pattern, move the position ticker to where it should be
+- double-click in note edit area to clear selection (assuming the intent of editing all notes)
 
 - recording automation
 - make knobs easier to tune (less sensitive)

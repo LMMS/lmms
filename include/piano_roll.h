@@ -38,6 +38,9 @@
 class QPainter;
 class QPixmap;
 class QScrollBar;
+class QString;
+class QMenu;
+class QSignalMapper;
 
 class comboBox;
 class notePlayHandle;
@@ -96,9 +99,7 @@ protected:
 
 	int getKey( int _y ) const;
 	static inline void drawNoteRect( QPainter & _p, int _x, int _y,
-					int  _width,
-					const bool _is_selected,
-					const bool _is_step_note );
+					int  _width, note * _n );
 	void removeSelection( void );
 	void selectAll( void );
 	void getSelectedNotes( noteVector & _selected_notes );
@@ -128,6 +129,8 @@ protected slots:
 
 	void zoomingChanged( void );
 	void quantizeChanged( void );
+		
+	void changeNoteEditMode( int i );
 
 
 private:
@@ -155,7 +158,7 @@ private:
 	{
 		NoteEditVolume,
 		NoteEditPanning,
-		NoteEditCount
+		NoteEditCount // make sure this one is always last
 	};
 
 	enum pianoRollKeyTypes
@@ -165,6 +168,9 @@ private:
 		PR_BLACK_KEY
 	};
 
+	QVector<QString> m_nemStr; // gui names of each edit mode
+	QMenu * m_noteEditMenu; // when you right click below the key area
+	QSignalMapper * m_signalMapper; // to keep track of edit mode events
 
 	pianoRoll( void );
 	pianoRoll( const pianoRoll & );
