@@ -1,5 +1,8 @@
 2008-12-14	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* include/group_box.h:
+	added NULL as default argument for parent
+
 	* include/effect_rack_view.h:
 	* src/gui/widgets/effect_rack_view.cpp:
 	manage effectRackView with a QVBoxLayout

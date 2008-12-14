@@ -1,5 +1,5 @@
 /*
- * group_box.h - LMMS-groupbox
+ * group_box.h - LMMS groupbox
  *
  * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
@@ -39,7 +39,7 @@ class groupBox : public QWidget, public boolModelView
 {
 	Q_OBJECT
 public:
-	groupBox( const QString & _caption, QWidget * _parent );
+	groupBox( const QString & _caption, QWidget * _parent = NULL );
 	virtual ~groupBox();
 
 	virtual void modelChanged( void );
