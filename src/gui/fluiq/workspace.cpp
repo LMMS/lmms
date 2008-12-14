@@ -52,19 +52,10 @@ FLUIQ::Workspace::~Workspace()
 
 void FLUIQ::Workspace::addWidget( QWidget * _w )
 {
-	m_currentSplitter = new Splitter( Qt::Horizontal, this );
-	m_masterLayout->addWidget( m_currentSplitter );
-
 	m_currentSplitter->addWidget( _w );
 }
 
 
-
-
-void FLUIQ::Workspace::addWidgetToExistingRow( QWidget * _w )
-{
-	m_currentSplitter->addWidget( _w );
-}
 
 
 

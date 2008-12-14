@@ -28,13 +28,12 @@
 #include <QtGui/QPainter> 
 
 #include "fluiq/collapsible_widget.h"
+#include "fluiq/splitter.h"
 
 #include "embed.h"
 
 
 // implementation of FLUIQ::CollapsibleWidgetHeader
-
-const int HEADER_MIN_HEIGHT = 20;
 
 FLUIQ::CollapsibleWidgetHeader::CollapsibleWidgetHeader(
 						CollapsibleWidget * _parent ) :
@@ -55,11 +54,11 @@ FLUIQ::CollapsibleWidgetHeader::CollapsibleWidgetHeader(
 
 	if( m_parent->orientation() == Qt::Horizontal )
 	{
-		setFixedWidth( HEADER_MIN_HEIGHT );
+		setFixedWidth( MinimalHeight );
 	}
 	else
 	{
-		setFixedHeight( HEADER_MIN_HEIGHT );
+		setFixedHeight( MinimalHeight );
 	}
 }
 
@@ -89,12 +88,14 @@ QSize FLUIQ::CollapsibleWidgetHeader::sizeHint( void ) const
 {
 	if( m_parent->orientation() == Qt::Horizontal )
 	{
-		return QSize( HEADER_MIN_HEIGHT,
-				HEADER_MIN_HEIGHT +
-					fontMetrics().width( windowTitle() ) );
+		return QSize( MinimalHeight,
+				MinimalHeight +
+					fontMetrics().width(
+						m_parent->windowTitle() ) );
 	}
-	return QSize( HEADER_MIN_HEIGHT + fontMetrics().width( windowTitle() ),
-							HEADER_MIN_HEIGHT );
+	return QSize( MinimalHeight +
+			fontMetrics().width( m_parent->windowTitle() ),
+							MinimalHeight );
 }
 
 
@@ -131,7 +132,7 @@ void FLUIQ::CollapsibleWidgetHeader::mousePressEvent( QMouseEvent * _ev )
 					Qt::SizeVerCursor : Qt::SizeHorCursor );
 		m_pressed = true;
 		m_moved = false;
-		m_origMousePos = _ev->pos();
+		m_origMousePos = _ev->globalPos();
 		update();
 		_ev->accept();
 	}
@@ -150,20 +151,72 @@ void FLUIQ::CollapsibleWidgetHeader::mouseMoveEvent( QMouseEvent * _event )
 	{
 		m_moved = true;
 
-		QSize ms = m_parent->minimumSize();
+		QPoint pos = _event->globalPos();
 
-		if( m_parent->orientation() == Qt::Vertical )
+		Splitter * s = NULL;
+		if( m_parent->parentWidget() &&
+			( s = qobject_cast<Splitter *>
+					( m_parent->parentWidget() ) ) )
 		{
-			const int dy = _event->y() - m_origMousePos.y();
-			ms.setHeight( qMax( 0, ms.height() + dy ) );
+			int idx = s->indexOf( m_parent );
+			QWidget * sibling = NULL;
+			CollapsibleWidget * collapsibleSibling;
+
+			// look whether we have expanded left-hand siblings
+			while( idx > 0 && sibling == NULL )
+			{
+				--idx;
+				sibling = s->widget( idx );
+				collapsibleSibling =
+					qobject_cast<CollapsibleWidget *>(
+								sibling );
+				if( collapsibleSibling &&
+					collapsibleSibling->isCollapsed() )
+				{
+					sibling = NULL;
+				}
+			}
+
+			// found one?
+			if( sibling )
+			{
+				QSize minSizeHint = sibling->minimumSizeHint();
+				QSize sizeHint = sibling->sizeHint();
+				QSize minSize = sibling->size();
+				QSize maxSize = sibling->maximumSize();
+				// then increase size according to orientation
+				if( m_parent->orientation() == Qt::Vertical )
+				{
+const int dy = pos.y() - m_origMousePos.y();
+minSize.setHeight( qMax( minSizeHint.height(), minSize.height() + dy ) );
+// implement snapping when reaching size hint
+if( dy < 0 && ( ( minSize.height() < sizeHint.height() &&
+				sizeHint.height() - minSize.height() < 20 )
+		 || ( sibling->size().height() == minSize.height() ) ) )
+{
+	return;
+}
+maxSize.setHeight( minSize.height() );
+				}
+				else
+				{
+const int dx = pos.x() - m_origMousePos.x();
+minSize.setWidth( qMax( minSizeHint.width(), minSize.width() + dx ) );
+// implement snapping when reaching size hint
+if( dx < 0 && ( ( minSize.width() < sizeHint.width() &&
+				sizeHint.width() - minSize.width() < 20 )
+		 || ( sibling->size().width() == minSize.width()  ) ) )
+{
+	return;
+}
+maxSize.setWidth( minSize.width() );
+				}
+				sibling->setMinimumSize( minSize );
+				sibling->setMaximumSize( maxSize );
+				s->updateGeometry();
+			}
+			m_origMousePos = pos;
 		}
-		else
-		{
-			const int dx = _event->x() - m_origMousePos.x();
-			ms.setWidth( qMax( 0, ms.width() + dx ) );
-		}
-		m_parent->setMinimumSize( ms );
-		m_origMousePos = _event->pos();
 	}
 }
 
@@ -226,7 +279,8 @@ void FLUIQ::CollapsibleWidgetHeader::paintEvent( QPaintEvent * _ev )
 
 	p.setPen( palette().color( QPalette::Text ) );
 	p.drawPixmap( 8, 5, m_collapsed ? m_arrowCollapsed : m_arrowExpanded );
-	p.drawText( 20, 10+r.height()-p.fontMetrics().height(), windowTitle() );
+	p.drawText( 20, 10+r.height()-p.fontMetrics().height(),
+						m_parent->windowTitle() );
 }
 
 
@@ -241,6 +295,8 @@ FLUIQ::CollapsibleWidget::CollapsibleWidget( Qt::Orientation _or,
 							Widget * _parent ) :
 	Widget( _parent ),
 	m_orientation( _or ),
+	m_origMinSize(),
+	m_origMaxSize(),
 	m_masterLayout( NULL )
 {
 	if( m_orientation == Qt::Horizontal )
@@ -253,10 +309,12 @@ FLUIQ::CollapsibleWidget::CollapsibleWidget( Qt::Orientation _or,
 	}
 	m_masterLayout->setMargin( 0 );
 	m_masterLayout->setSpacing( 0 );
-
+	setSizePolicy( QSizePolicy::Expanding,
+					QSizePolicy::Expanding );
 	m_header = new CollapsibleWidgetHeader( this );
 
 	m_masterLayout->addWidget( m_header );
+	m_masterLayout->insertStretch( 100, 0 );
 
 	connect( m_header, SIGNAL( expanded() ),
 			this, SLOT( expand() ) );
@@ -276,7 +334,7 @@ FLUIQ::CollapsibleWidget::~CollapsibleWidget()
 
 void FLUIQ::CollapsibleWidget::addWidget( QWidget * _w )
 {
-	m_masterLayout->addWidget( _w );
+	m_masterLayout->insertWidget( m_masterLayout->count()-1, _w, 1 );
 }
 
 
@@ -284,7 +342,7 @@ void FLUIQ::CollapsibleWidget::addWidget( QWidget * _w )
 
 void FLUIQ::CollapsibleWidget::insertWidget( int _idx, QWidget * _w )
 {
-	m_masterLayout->insertWidget( _idx, _w );
+	m_masterLayout->insertWidget( _idx, _w, 1 );
 }
 
 
@@ -295,7 +353,7 @@ void FLUIQ::CollapsibleWidget::expand( void )
 	m_header->setCollapsed( false );
 
 	// set size properties
-	setMaximumSize( QSize( 1 << 16, 1 << 16 ) );
+	setMaximumSize( m_origMaxSize );
 
 	// show all children
 	foreach( QWidget * w, findChildren<QWidget *>() )
@@ -305,14 +363,36 @@ void FLUIQ::CollapsibleWidget::expand( void )
 			w->show();
 		}
 	}
-	setMinimumSize( sizeHint() );
+
+	// parent has gotten smaller while we were collapsed?
+	if( m_orientation == Qt::Horizontal )
+	{
+		// then re-adjust height
+		if( m_origMinSize.height() > sizeHint().height() )
+		{
+			m_origMinSize.setHeight( sizeHint().height() );
+		}
+	}
+	else
+	{
+		// then re-adjust width
+		if( m_origMinSize.width() > sizeHint().width() )
+		{
+			m_origMinSize.setWidth( sizeHint().width() );
+		}
+	}
+	setMinimumSize( m_origMinSize );
 }
+
 
 
 
 void FLUIQ::CollapsibleWidget::collapse( void )
 {
 	m_header->setCollapsed( true );
+
+	m_origMinSize = minimumSize();
+	m_origMaxSize = maximumSize();
 
 	// hide all children
 	foreach( QWidget * w, findChildren<QWidget *>() )
@@ -324,6 +404,7 @@ void FLUIQ::CollapsibleWidget::collapse( void )
 	}
 
 	// set size properties
+	const QSize origSize = size();
 	const QSize headerSize = m_header->sizeHint();
 	if( m_orientation == Qt::Vertical )
 	{
@@ -334,6 +415,49 @@ void FLUIQ::CollapsibleWidget::collapse( void )
 		setMaximumSize( QSize( headerSize.width(), 1 << 16 ) );
 	}
 	setMinimumSize( headerSize );
+
+
+/*	// now try to redistribute freed space amongst sibling widgets
+	Splitter * s = NULL;
+	if( parentWidget() &&
+			( s = qobject_cast<Splitter *>( parentWidget() ) ) )
+	{
+		int numExpanded = 0;
+		for( int i = 0; i < s->count(); ++i )
+		{
+			CollapsibleWidget * cw =
+				qobject_cast<CollapsibleWidget *>(
+							s->widget( i ) );
+			if( cw && cw->isCollapsed() == false )
+			{
+				++numExpanded;
+			}
+		}
+		if( numExpanded == 0 )
+		{
+			return;
+		}
+		QSize addSizePerSibling = ( origSize - size() ) / numExpanded;
+		if( m_orientation == Qt::Vertical )
+		{
+			addSizePerSibling.setWidth( 0 );
+		}
+		else
+		{
+			addSizePerSibling.setHeight( 0 );
+		}
+		for( int i = 0; i < s->count(); ++i )
+		{
+			CollapsibleWidget * cw =
+				qobject_cast<CollapsibleWidget *>(
+							s->widget( i ) );
+			if( cw && cw->isCollapsed() == false )
+			{
+				cw->setMaximumSize( cw->maximumSize() +
+							addSizePerSibling );
+			}
+		}
+	}*/
 }
 
 

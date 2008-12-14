@@ -25,36 +25,42 @@
 #ifndef _FLUIQ_SPLITTER_H
 #define _FLUIQ_SPLITTER_H
 
-#include <QtGui/QSplitter>
+#include <QtGui/QWidget>
+
+class QBoxLayout;
 
 
 namespace FLUIQ
 {
 
 
-class Splitter : public QSplitter
+class Splitter : public QWidget
 {
 	Q_OBJECT
 public:
 	Splitter( Qt::Orientation _o, QWidget * _parent = NULL );
 	virtual ~Splitter();
 
+	void addWidget( QWidget * _widget );
 
-protected:
-	QSplitterHandle * createHandle( void );
+	int indexOf( QWidget * _widget ) const;
+	QWidget * widget( int _idx );
 
-} ;
+	int count( void ) const
+	{
+		return m_children.count();
+	}
+
+	Qt::Orientation orientation( void ) const
+	{
+		return m_orientation;
+	}
 
 
-class SplitterHandle : public QSplitterHandle
-{
-public:
-	SplitterHandle(	Qt::Orientation _o, QSplitter * _parent );
-	virtual ~SplitterHandle();
-
-
-protected:
-	void paintEvent( QPaintEvent * _event );
+private:
+	Qt::Orientation m_orientation;
+	QList<QWidget *> m_children;
+	QBoxLayout * m_mainLayout;
 
 } ;
 

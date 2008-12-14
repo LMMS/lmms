@@ -1,10 +1,20 @@
 2008-12-14	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
-	* src/core/main.cpp:
+	* include/fluiq/collapsible_widget.h:
+	* include/fluiq/splitter.h:
+	* include/fluiq/workspace.h:
+	* src/gui/fluiq/collapsible_widget.cpp:
+	* src/gui/fluiq/splitter.cpp:
+	* src/gui/fluiq/widget_container.cpp:
+	* src/gui/fluiq/workspace.cpp:
+	some work on a better widget layouting and more usable splitters in
+	combination with CollapsibleWidgets
+
 	* src/core/config_mgr.cpp:
+	* src/core/main.cpp:
 	* src/core/mmp.cpp:
-	* src/gui/main_window.cpp:
 	* src/gui/about_dialog.cpp:
+	* src/gui/main_window.cpp:
 	* lmmsversion.h.in:
 	* CMakeLists.txt:
 	moved version information into separate header file to avoid

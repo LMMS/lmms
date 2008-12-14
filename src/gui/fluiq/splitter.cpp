@@ -23,6 +23,7 @@
  */
 
 
+#include <QtGui/QLayout> 
 #include <QtGui/QPainter> 
 #include <QtGui/QPaintEvent> 
 
@@ -30,11 +31,20 @@
 
 
 FLUIQ::Splitter::Splitter( Qt::Orientation _o, QWidget * _parent ) :
-	QSplitter( _o, _parent )
+	QWidget( _parent ),
+	m_orientation( _o )
 {
-	setChildrenCollapsible( false );
-	setSizePolicy( QSizePolicy::MinimumExpanding,
-					QSizePolicy::MinimumExpanding );
+	if( m_orientation == Qt::Horizontal )
+	{
+		m_mainLayout = new QHBoxLayout( this );
+	}
+	else
+	{
+		m_mainLayout = new QVBoxLayout( this );
+	}
+	m_mainLayout->setMargin( 0 );
+	m_mainLayout->setSpacing( 0 );
+	m_mainLayout->insertStretch( 100, 0 );
 }
 
 
@@ -47,51 +57,37 @@ FLUIQ::Splitter::~Splitter()
 
 
 
-QSplitterHandle * FLUIQ::Splitter::createHandle( void )
+void FLUIQ::Splitter::addWidget( QWidget * _w )
 {
-	return new FLUIQ::SplitterHandle( orientation(), this );
+	m_mainLayout->insertWidget( m_children.size(), _w, 1 );
+	m_children << _w;
 }
 
 
 
 
-
-FLUIQ::SplitterHandle::SplitterHandle( Qt::Orientation _o,
-							QSplitter * _parent ) :
-	QSplitterHandle( _o, _parent )
+int FLUIQ::Splitter::indexOf( QWidget * _widget ) const
 {
-}
-
-
-
-
-FLUIQ::SplitterHandle::~SplitterHandle()
-{
-}
-
-
-
-
-void FLUIQ::SplitterHandle::paintEvent( QPaintEvent * _event )
-{
-	QPainter painter( this );
-
-	QLinearGradient gradient;
-	gradient.setColorAt( 0, QColor( 128, 128, 128 ) );
-	gradient.setColorAt( 1, QColor( 32, 32, 32 ) );
-	if( orientation() == Qt::Horizontal )
+	int i = 0;
+	foreach( QWidget * w , m_children )
 	{
-		gradient.setStart( rect().left(), rect().height()/2 );
-		gradient.setFinalStop( rect().right(), rect().height()/2 );
+		if( w == _widget )
+		{
+			return i;
+		}
+		++i;
 	}
-	else
-	{
-		gradient.setStart( rect().width()/2, rect().top() );
-		gradient.setFinalStop( rect().width()/2, rect().bottom() );
-	}
-	painter.fillRect( _event->rect(), QBrush( gradient ) );
+
+	return -1;
 }
 
+
+
+
+QWidget * FLUIQ::Splitter::widget( int _idx )
+{
+	return m_children[_idx];
+}
 
 
 #include "fluiq/moc_splitter.cxx"

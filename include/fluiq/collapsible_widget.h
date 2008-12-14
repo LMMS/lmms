@@ -52,6 +52,7 @@ public:
 
 	virtual QSize sizeHint( void ) const;
 
+	static const int MinimalHeight = 20;
 
 protected:
 	virtual void enterEvent( QEvent * _ev );
@@ -92,19 +93,14 @@ public:
 	void addWidget( QWidget * _w );
 	void insertWidget( int _idx, QWidget * _w );
 
-	inline QString labelText( void ) const
-	{
-		return m_header->windowTitle();
-	}
-
-	inline void setLabelText( const QString & _text )
-	{
-		m_header->setWindowTitle( _text );
-	}
-
 	inline Qt::Orientation orientation( void ) const
 	{
 		return m_orientation;
+	}
+
+	inline bool isCollapsed( void ) const
+	{
+		return m_header->isCollapsed();
 	}
 
 
@@ -115,6 +111,8 @@ public slots:
 
 private:
 	Qt::Orientation m_orientation;
+	QSize m_origMinSize;
+	QSize m_origMaxSize;
 
 	QBoxLayout * m_masterLayout;
 	CollapsibleWidgetHeader * m_header;

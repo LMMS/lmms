@@ -46,6 +46,16 @@ FLUIQ::WidgetContainer::WidgetContainer( Qt::Orientation _o,
 	m_scrollArea->setWidgetResizable( true );
 	m_scrollArea->setFrameStyle( QFrame::NoFrame );
 
+/*	if( _o == Qt::Horizontal )
+	{
+		m_scrollArea->setVerticalScrollBarPolicy(
+						Qt::ScrollBarAlwaysOff );
+	}
+	else
+	{
+		m_scrollArea->setHorizontalScrollBarPolicy(
+						Qt::ScrollBarAlwaysOff );
+	}*/
 	myLayout->addWidget( m_scrollArea );
 
 	m_splitter = new Splitter( m_orientation );

@@ -43,7 +43,6 @@ public:
 	virtual ~Workspace();
 
 	void addWidget( QWidget * _w );
-	void addWidgetToExistingRow( QWidget * _w );
 
 
 private:
