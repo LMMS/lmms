@@ -1,7 +1,7 @@
 /*
  * main.cpp - just main.cpp which is starting up app...
  *
- * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -22,8 +22,8 @@
  *
  */
 
-
 #include "lmmsconfig.h"
+#include "lmmsversion.h"
 
 #include <QtCore/QFileInfo>
 #include <QtCore/QLocale>

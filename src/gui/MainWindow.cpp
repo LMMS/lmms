@@ -37,6 +37,7 @@
 #include <QtGui/QMessageBox>
 #include <QtGui/QSplitter>
 
+#include "lmmsversion.h"
 #include "MainWindow.h"
 #include "bb_editor.h"
 #include "song_editor.h"

@@ -37,6 +37,7 @@
 #include "project_version.h"
 #include "song_editor.h"
 #include "Effect.h"
+#include "lmmsversion.h"
 
 
 

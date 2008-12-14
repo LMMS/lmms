@@ -31,7 +31,7 @@
 #include <QtGui/QMessageBox>
 #include <QtGui/QApplication>
 
-
+#include "lmmsversion.h"
 #include "config_mgr.h"
 #include "MainWindow.h"
 
