@@ -2542,6 +2542,10 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 			{
 				QColor color = QColor::fromHsv( 120, 221, 
 						qMin(255, 60 + ( *it )->getVolume() ) );
+				if( ( *it )->selected() )
+				{
+					color.setRgb( 0x00, 0x40, 0xC0 );
+				}
 				p.setPen( QPen( color,
 								NE_LINE_WIDTH ) );
 			
@@ -2583,7 +2587,7 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 					y_base - key * KEY_LINE_HEIGHT );
 			}
 		}
-
+		
 		p.setPen( QPen( QColor( 0xEA, 0xA1, 0x00 ),
 				NE_LINE_WIDTH*2 ) );
 		p.drawPoints( editHandles );

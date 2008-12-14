@@ -7,6 +7,7 @@
 	  and panning
 	- switching between note edit modes is more clear with label text and
 	  a right click menu
+	- note volume bars are painted blue if selected
 
 2008-12-14	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 

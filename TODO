@@ -52,8 +52,6 @@
 - add FLAC as export-format?
 
 Andrew Kelley's todo:
-- paint note volume blue if selected
-- make the tip of a panning bar blue too so the user knows it's selected
 - when you click on a note in the piano roll, it plays the note, but not the correct panning
 - fix ctrl+mousewheel zooming in
 - if you press both controls at the same time, the piano roll gets stuck in selection mode
@@ -83,3 +81,4 @@ Andrew Kelley's todo:
 - make it so that 3xosc notes don't max out
 - implement note detuning (used to be ctrl+click to access note detuning) (need some other intuitive way to access note detuning as ctrl, shift, and alt are all being used)
 - copy-pasted automation patterns have to be manually linked back to their knob for some reason
+- fix memory leaks
