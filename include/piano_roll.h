@@ -139,7 +139,7 @@ private:
 		ModeSelect,
 		ModeMove,
 		ModeOpen
-	} ;
+	};
 
 	enum actions
 	{
@@ -147,18 +147,23 @@ private:
 		ActionMoveNote,
 		ActionResizeNote,
 		ActionSelectNotes,
-		ActionMoveSelection,
-		ActionChangeNoteVolume,
-		ActionChangeNotePanning,
-		ActionResizeNoteEditArea,
-	} ;
+		ActionChangeNoteProperty,
+		ActionResizeNoteEditArea
+	};
+	
+	enum noteEditMode
+	{
+		NoteEditVolume,
+		NoteEditPanning,
+		NoteEditCount
+	};
 
 	enum pianoRollKeyTypes
 	{
 		PR_WHITE_KEY_SMALL,
 		PR_WHITE_KEY_BIG,
 		PR_BLACK_KEY
-	} ;
+	};
 
 
 	pianoRoll( void );
@@ -230,6 +235,7 @@ private:
 
 	note * m_currentNote;
 	actions m_action;
+	noteEditMode m_noteEditMode;
 
 	Uint32 m_selectStartTick;
 	int m_selectedTick;

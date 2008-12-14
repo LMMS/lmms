@@ -26,8 +26,8 @@
 #ifndef _MIDI_H
 #define _MIDI_H
 
-
 #include "lmms_basics.h"
+#include "panning_constants.h"
 #include <cstdlib>
 
 
@@ -87,6 +87,9 @@ const int MidiControllerCount = 128;
 const int MidiProgramCount = 128;
 const int MidiMaxVelocity = 127;
 
+const int MidiMaxPanning = 127;
+const int MidiMinPanning = -128;
+
 
 struct midiEvent
 {
@@ -145,10 +148,23 @@ struct midiEvent
 	{
 		return m_data.m_param[1];
 	}
+		
+	inline Sint16 midiPanning( void ) const
+	{
+		return m_data.m_param[1];
+	}
 
 	inline volume getVolume( void ) const
 	{
 		return (volume)( velocity() * 100 / MidiMaxVelocity );
+	}
+	
+	inline panning getPanning( void ) const
+	{
+		return (panning) ( PanningLeft +
+			( (float)( midiPanning() - MidiMinPanning ) ) / 
+			( (float)( MidiMaxPanning - MidiMinPanning ) ) *
+			( (float)( PanningRight - PanningLeft ) ) );
 	}
 
 

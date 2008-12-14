@@ -176,13 +176,12 @@ void instrumentTrack::processAudioBuffer( sampleFrame * _buf,
 	}
 
 	m_audioPort.setNextFxChannel( m_effectChannelModel.value() );
-	engine::getMixer()->bufferToPort( _buf,
-		( _n != NULL ) ? qMin<f_cnt_t>(
-				_n->framesLeftForCurrentPeriod(), _frames ) :
+	engine::getMixer()->bufferToPort( _buf, ( _n != NULL ) ? qMin<f_cnt_t>(_n->framesLeftForCurrentPeriod(), _frames ) :
 								_frames,
 			( _n != NULL ) ? _n->offset() : 0,
-			panningToVolumeVector( (int) m_panningModel.value(),
-								v_scale ),
+			panningToVolumeVector( 
+						(int) m_panningModel.value() + _n->getPanning(),
+						v_scale ),
 							 &m_audioPort );
 }
 
@@ -296,7 +295,24 @@ void instrumentTrack::processInEvent( const midiEvent & _me,
 		case MidiProgramChange:
 			m_instrument->handleMidiEvent( _me, _time );
 			break;
-
+		
+		case MidiMetaEvent:
+			// handle special cases such as note panning
+			switch( _me.m_metaEvent )
+			{
+				case MidiNotePanning:
+					if( m_notes[_me.key()] != NULL )
+					{
+						m_notes[_me.key()]->setPanning( _me.getPanning() );
+					}
+					break;
+				default:
+					printf( "instrument-track: unhandled "
+						    "MIDI meta event: %i\n", _me.m_metaEvent );
+					break;
+			}
+			break;
+			
 		default:
 			if( !m_instrument->handleMidiEvent( _me, _time ) )
 			{

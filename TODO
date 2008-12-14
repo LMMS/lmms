@@ -52,7 +52,6 @@
 - add FLAC as export-format?
 
 Andrew Kelley's todo:
-- add note panning ability to piano roll
 - paint piano roll notes with a darker color based on how high volume the note is
 - paint note volume blue if selected
 - multiview button - show notes from every instrument in the current beat+bassline with different colors
@@ -63,6 +62,10 @@ Andrew Kelley's todo:
   * quick slice
   * look through FL Studio's tools and implement some of them
 - if you press both controls at the same time, the piano roll gets stuck in selection mode
+- you can still move volumes for notes if you click down right on it, even if the
+  note is not selected.
+- change my modifier code to use mainwindows modifier info
+- fix ctrl+mousewheel zooming in
 
 - recording automation
 - make knobs easier to tune (less sensitive)
@@ -78,5 +81,4 @@ Andrew Kelley's todo:
 - the 'add beat+bassline' button in the beat+bassline editor is misleading - I say we remove it and rely on the song editor to add beat+basslines
 - make it so that 3xosc notes don't max out
 - implement note detuning (used to be ctrl+click to access note detuning) (need some other intuitive way to access note detuning as ctrl, shift, and alt are all being used)
-- make the horizontal mouse wheel do the same thing as shift+vertical mouse wheel
 - copy-pasted automation patterns have to be manually linked back to their knob for some reason

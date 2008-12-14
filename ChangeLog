@@ -31,6 +31,24 @@
 	- added support for MidiMetaEvents to midiEvent
 	- added MidiMetaPanning event
 
+2008-12-13	Andrew Kelley	<superjoe30/at/gmail/dot/com>
+
+	* include/piano_roll.h:
+	* src/gui/piano_roll.cpp:
+	* src/tracks/instrument_track.cpp:
+	* TODO:
+	- first draft of panning editing. (for now, click the area below 
+	  the piano to switch editing modes.)
+	- supports horizontal mouse wheel
+	 
+	* include/panning_constants.h:
+	* include/midi.h:
+	* include/panning.h:
+	- separated panning constants from panningToVolumeVector so that midi.h
+	  could have access to PanningLeft, PanningRight, etc
+	- added MidiNotePanning meta midi instruction to allow on the fly
+	  panning changes to instrument notes 
+
 2008-12-12	Andrew Kelley	<superjoe30/at/gmail/dot/com>
 
 	* include/note.h:
@@ -42,6 +60,9 @@
 	  is implemented more cleanly
 	- editing note volume only affects selected notes (or all notes if
 	  none selected)
+	- clicking a note volume no longer affects the nearest volume handle.
+	  Instead, select the note(s) whose volumes you want to change and then
+	  scribble their volumes.
 	- when "scribbling" note volumes, if there is a chord, it will play all
 	  3 notes, rather than just the first one
 	- if you click towards the end of the key in the piano roll, it plays
