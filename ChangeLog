@@ -1,3 +1,9 @@
+2008-12-14	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* include/midi.h:
+	- added support for MidiMetaEvents to midiEvent
+	- added MidiMetaPanning event
+
 2008-12-12	Andrew Kelley	<superjoe30/at/gmail/dot/com>
 
 	* include/note.h:

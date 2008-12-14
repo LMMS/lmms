@@ -63,6 +63,7 @@ enum MidiEventTypes
 
 enum MidiMetaEvents
 {
+	MidiMetaInvalid = 0x00,
 	MidiCopyright = 0x02,
 	MidiTrackName = 0x03,
 	MidiInstName = 0x04,
@@ -75,7 +76,9 @@ enum MidiMetaEvents
 	MidiSMPTEOffset = 0x54,
 	MidiTimeSignature = 0x58,
 	MidiKeySignature = 0x59,
-	MidiSequencerEvent = 0x7f
+	MidiSequencerEvent = 0x7f,
+	MidiMetaCustom = 0x80,
+	MidiNotePanning
 } ;
 
 
@@ -92,6 +95,7 @@ struct midiEvent
 			Sint16 _param1 = 0,
 			Sint16 _param2 = 0 ) :
 		m_type( _type ),
+		m_metaEvent( MidiMetaInvalid ),
 		m_channel( _channel ),
 		m_sysExData( NULL )
 	{
@@ -101,6 +105,7 @@ struct midiEvent
 	midiEvent( MidiEventTypes _type, const char * _sysex_data,
 							int _data_len ) :
 		m_type( _type ),
+		m_metaEvent( MidiMetaInvalid ),
 		m_channel( 0 ),
 		m_sysExData( _sysex_data )
 	{
@@ -109,6 +114,7 @@ struct midiEvent
 
 	midiEvent( const midiEvent & _copy ) :
 		m_type( _copy.m_type ),
+		m_metaEvent( _copy.m_metaEvent ),
 		m_channel( _copy.m_channel ),
 		m_data( _copy.m_data ),
 		m_sysExData( _copy.m_sysExData )
@@ -147,6 +153,7 @@ struct midiEvent
 
 
 	MidiEventTypes m_type;		// MIDI event type
+	MidiMetaEvents m_metaEvent;	// Meta event (mostly unused)
 	Sint8 m_channel;		// MIDI channel
 	union
 	{
