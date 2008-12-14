@@ -2761,7 +2761,7 @@ void pianoRoll::resizeEvent( QResizeEvent * )
 void pianoRoll::wheelEvent( QWheelEvent * _we )
 {
 	_we->accept();
-	if( engine::getMainWindow()->isCtrlPressed() == true )
+	if( _we->modifiers() & Qt::ControlModifier )
 	{
 		if( _we->delta() > 0 )
 		{
