@@ -3,6 +3,7 @@
  *                can set and edit notes in an easy way
  *
  * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008 Andrew Kelley <superjoe30/at/gmail/dot/com>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -57,17 +58,17 @@ public:
 
 	inline bool isRecording( void ) const
 	{
-		return( m_recording );
+		return m_recording;
 	}
 
 	inline const pattern * currentPattern( void ) const
 	{
-		return( m_pattern );
+		return m_pattern;
 	}
 
 	inline bool validPattern( void ) const
 	{
-		return( m_pattern != NULL );
+		return m_pattern != NULL;
 	}
 
 	int quantization( void ) const;
@@ -78,7 +79,7 @@ public:
 
 	inline virtual QString nodeName( void ) const
 	{
-		return( "pianoroll" );
+		return "pianoroll";
 	}
 
 
@@ -93,9 +94,6 @@ protected:
 	virtual void paintEvent( QPaintEvent * _pe );
 	virtual void resizeEvent( QResizeEvent * _re );
 	virtual void wheelEvent( QWheelEvent * _we );
-#ifdef LMMS_BUILD_LINUX
-	virtual bool x11Event( XEvent * _xe );
-#endif
 
 	int getKey( int _y ) const;
 	static inline void drawNoteRect( QPainter & _p, int _x, int _y,

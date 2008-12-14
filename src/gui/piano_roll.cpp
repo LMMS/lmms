@@ -1,10 +1,9 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * piano_roll.cpp - implementation of piano-roll which is used for actual
  *                  writing of melodies
  *
  * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008 Andrew Kelley <superjoe30/at/gmail/dot/com>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -2881,7 +2880,7 @@ int pianoRoll::getKey( int _y ) const
 		key_num = KeysPerOctave * NumOctaves - 1;
 	}
 
-	return( key_num );
+	return key_num;
 }
 
 
@@ -3351,11 +3350,11 @@ int pianoRoll::quantization( void ) const
 {
 	if( m_quantizeModel.value() == 0 )
 	{
-		return( newNoteLen() );
+		return newNoteLen();
 	}
-	return( DefaultTicksPerTact / m_quantizeModel.currentText().right(
+	return DefaultTicksPerTact / m_quantizeModel.currentText().right(
 				m_quantizeModel.currentText().length() -
-								2 ).toInt() );
+								2 ).toInt();
 }
 
 
@@ -3365,11 +3364,11 @@ midiTime pianoRoll::newNoteLen( void ) const
 {
 	if( m_noteLenModel.value() == 0 )
 	{
-		return( m_lenOfNewNotes );
+		return m_lenOfNewNotes;
 	}
-	return( midiTime::ticksPerTact() / m_noteLenModel.currentText().right(
+	return midiTime::ticksPerTact() / m_noteLenModel.currentText().right(
 				m_noteLenModel.currentText().length() -
-								2 ).toInt() );
+								2 ).toInt();
 }
 
 
@@ -3377,8 +3376,8 @@ midiTime pianoRoll::newNoteLen( void ) const
 
 bool pianoRoll::mouseOverNote( void )
 {
-	return( validPattern()
-		&& noteIteratorUnderMouse() != m_pattern->notes().end() );
+	return validPattern() &&
+			noteIteratorUnderMouse() != m_pattern->notes().end();
 }
 
 
@@ -3386,7 +3385,7 @@ bool pianoRoll::mouseOverNote( void )
 
 note * pianoRoll::noteUnderMouse( void )
 {
-	return( *noteIteratorUnderMouse() );
+	return *noteIteratorUnderMouse();
 }
 
 
@@ -3403,7 +3402,7 @@ noteVector::const_iterator pianoRoll::noteIteratorUnderMouse( void )
 		|| pos.y() < PR_TOP_MARGIN
 		|| pos.y() > keyAreaBottom() )
 	{
-		return( notes.end() );
+		return notes.end();
 	}
 
 	int key_num = getKey( pos.y() );
@@ -3427,26 +3426,11 @@ noteVector::const_iterator pianoRoll::noteIteratorUnderMouse( void )
 		++it;
 	}
 
-	return( it );
+	return it;
 }
-
-
-
-#ifdef LMMS_BUILD_LINUX
-bool pianoRoll::x11Event( XEvent * _xe )
-{
-	if( validPattern() )
-	{
-/*		return( m_pattern->getInstrumentTrack()->getPianoWidget()
-							->x11Event( _xe ) );*/
-	}
-	return( false );
-}
-#endif
 
 
 
 #include "moc_piano_roll.cxx"
 
 
-#endif
