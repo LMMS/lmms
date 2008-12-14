@@ -45,6 +45,11 @@ public:
 	effectRackView( effectChain * _model, QWidget * _parent = NULL );
 	virtual ~effectRackView();
 
+	QVBoxLayout * mainLayout( void )
+	{
+		return m_mainLayout;
+	}
+
 
 public slots:
 	void clearViews( void );
