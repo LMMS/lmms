@@ -25,8 +25,6 @@
  */
 
 
-#include "lmmsconfig.h"
-
 #include <QtCore/QFileInfo>
 #include <QtCore/QLocale>
 #include <QtCore/QProcess>
@@ -37,6 +35,8 @@
 #include <QtGui/QDesktopWidget>
 #include <QtGui/QPainter>
 #include <QtGui/QSplashScreen>
+
+#include "lmmsconfig.h"
 
 #ifdef LMMS_HAVE_SCHED_H
 #include <sched.h>
@@ -50,6 +50,7 @@
 #include <process.h>
 #endif
 
+#include "lmmsversion.h"
 #include "config_mgr.h"
 #include "embed.h"
 #include "engine.h"
