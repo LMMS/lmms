@@ -23,7 +23,7 @@
  */
 
 
-#include "lmmsconfig.h"
+#include "lmmsversion.h"
 #include "about_dialog.h"
 #include "embed.h"
 #include "engine.h"

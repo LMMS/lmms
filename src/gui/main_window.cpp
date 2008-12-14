@@ -39,6 +39,7 @@
 #include <QtGui/QCheckBox>
 
 
+#include "lmmsversion.h"
 #include "main_window.h"
 #include "bb_editor.h"
 #include "song_editor.h"

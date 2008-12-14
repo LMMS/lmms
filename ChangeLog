@@ -1,5 +1,14 @@
 2008-12-14	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* src/core/config_mgr.cpp:
+	* src/core/mmp.cpp:
+	* src/gui/main_window.cpp:
+	* src/gui/about_dialog.cpp:
+	* lmmsversion.h.in:
+	* CMakeLists.txt:
+	moved version information into separate header file to avoid
+	the necessity of a complete recompile each time SVN revision changes
+
 	* include/midi.h:
 	- added support for MidiMetaEvents to midiEvent
 	- added MidiMetaPanning event
