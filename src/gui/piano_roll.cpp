@@ -1515,8 +1515,65 @@ void pianoRoll::testPlayNote( note * n )
 		m_pattern->getInstrumentTrack()->processInEvent(
 						midiEvent( MidiNoteOn, 0, n->key(), 
 								  n->getVolume() * 127 / 100 ), midiTime() );
-																  
+		
+		midiEvent evt( MidiMetaEvent, 0, n->key(), 
+									panningToMidi( n->getPanning() ) );
+		
+						evt.m_metaEvent = MidiNotePanning;
+						m_pattern->getInstrumentTrack()->processInEvent(
+									evt, midiTime() );		
+		m_pattern->getInstrumentTrack()->processInEvent(evt, midiTime() );
+													   
 	}
+}
+
+
+void pianoRoll::pauseTestNotes( bool _pause )
+{
+	const noteVector & notes = m_pattern->notes();
+	noteVector::const_iterator it = notes.begin();
+	while( it != notes.end() )
+	{
+		if( ( *it )->isPlaying() )
+		{
+			if( _pause )
+			{
+				// stop note
+				m_pattern->getInstrumentTrack()->processInEvent(
+							midiEvent( MidiNoteOff, 0, 
+									  ( *it )->key(), 0 ), midiTime() );
+			}
+			else
+			{
+				// start note
+				( *it )->setIsPlaying( false );
+				testPlayNote( *it );
+			}
+		}
+		
+		++it;
+	}
+}
+
+
+void pianoRoll::testPlayKey( int _key, int _vol, int _pan )
+{
+	// turn off old key
+	m_pattern->getInstrumentTrack()->processInEvent(
+				midiEvent( MidiNoteOff, 0, m_lastKey, 0 ), midiTime() );
+	
+	// remember which one we're playing
+	m_lastKey = _key;
+	
+	// play new key
+	m_pattern->getInstrumentTrack()->processInEvent(
+				midiEvent( MidiNoteOn, 0, _key, _vol ), midiTime() );
+	
+	// set panning of newly played key
+	midiEvent evt( MidiMetaEvent, 0, _key, _pan );
+	evt.m_metaEvent = MidiNotePanning;
+	m_pattern->getInstrumentTrack()->processInEvent( evt, midiTime() );		
+	
 }
 
 
@@ -1713,36 +1770,19 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 		int key_num = getKey( _me->y() );
 		int x = _me->x();
 
-		// is the calculated key different from current key?
-		// (could be the user just moved the cursor one pixel up/down
-		// but is still on the same key)
-		if( key_num != m_lastKey &&	edit_note == false && 
-		   _me->buttons() & Qt::LeftButton &&
-		   ( m_action == ActionMoveNote || 
-			( x < WHITE_KEY_WIDTH && m_action == ActionNone ) ) )
+		// see if they clicked on the keyboard on the left
+		if( x < WHITE_KEY_WIDTH && m_action == ActionNone
+		    && ! edit_note && key_num != m_lastKey
+		    && _me->buttons() & Qt::LeftButton )
 		{
-			m_pattern->getInstrumentTrack()->processInEvent(
-				midiEvent( MidiNoteOff, 0, m_lastKey, 0 ),
-								midiTime() );
-			if( _me->buttons() & Qt::LeftButton )
-			{
-				m_lastKey = key_num;
-				
-				int v = DefaultVolume * 127 / 100;
-				if( x < WHITE_KEY_WIDTH )
-				{
-					v = ( (float) x ) / ( (float) WHITE_KEY_WIDTH ) * 127;
-				}
-				
-				m_pattern->getInstrumentTrack()->processInEvent(
-					midiEvent( MidiNoteOn, 0, key_num, v ), midiTime() );
-			}
-		}
-		if( x < WHITE_KEY_WIDTH && m_action == ActionNone )
-		{
+			// clicked on a key, play the note
+			testPlayKey( key_num, 
+						( (float) x ) / ( (float) WHITE_KEY_WIDTH ) * 127,
+						0 );
 			update();
 			return;
 		}
+		
 		x -= WHITE_KEY_WIDTH;
 
 		if( _me->buttons() & Qt::LeftButton 
@@ -1750,7 +1790,20 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 			&& (m_action == ActionMoveNote || m_action == ActionResizeNote ) )
 		{
 			// handle moving notes and resizing them
+			bool replay_note = key_num != m_lastKey 
+							&& m_action == ActionMoveNote;
+			
+			if( replay_note )
+			{
+				pauseTestNotes();
+			}
+			
 			dragNotes(_me->x(), _me->y(), _me->modifiers() & Qt::AltModifier);
+			
+			if( replay_note && m_action == ActionMoveNote )
+			{
+				pauseTestNotes( false );
+			}
 		}
 		else if( ( edit_note == true || m_action == ActionChangeNoteProperty ) &&
 				_me->buttons() & Qt::LeftButton )
@@ -1759,7 +1812,7 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 			
 			// Change notes within a certain pixel range of where
 			// the mouse cursor is
-			int pixel_range = 20;
+			int pixel_range = 14;
 			
 			// convert to ticks so that we can check which notes
 			// are in the range
@@ -1813,11 +1866,8 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 					else if( m_noteEditMode == NoteEditPanning )
 					{
 						( *it )->setPanning( pan );
-						midiEvent evt( MidiMetaEvent, 0, ( *it )->key(),
-							  MidiMinPanning + 
-							  ( (float)( pan - PanningLeft ) ) / 
-							  ( (float)( PanningRight - PanningLeft ) ) *
-							  ( (float)( MidiMaxPanning - MidiMinPanning ) ) );
+						midiEvent evt( MidiMetaEvent, 0, 
+									  ( *it )->key(), panningToMidi( pan ) );
 						evt.m_metaEvent = MidiNotePanning;
 						m_pattern->getInstrumentTrack()->processInEvent(
 									evt, midiTime() );

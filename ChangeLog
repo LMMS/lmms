@@ -8,6 +8,11 @@
 	- switching between note edit modes is more clear with label text and
 	  a right click menu
 	- note volume bars are painted blue if selected
+	- dragging around a note in the piano roll makes the correct volume
+	  and panning noises
+	
+	* include/panning.h:
+	added panningToMidi function to easily convert panning to a midi value
 
 2008-12-14	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 

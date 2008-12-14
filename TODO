@@ -52,7 +52,6 @@
 - add FLAC as export-format?
 
 Andrew Kelley's todo:
-- when you click on a note in the piano roll, it plays the note, but not the correct panning
 - fix ctrl+mousewheel zooming in
 - if you press both controls at the same time, the piano roll gets stuck in selection mode
 - change my modifier code to use mainwindows modifier info
@@ -65,6 +64,7 @@ Andrew Kelley's todo:
   * look through FL Studio's tools and implement some of them
 - when looking at a piano roll, if the song is playing that pattern, move the position ticker to where it should be
 - double-click in note edit area to clear selection (assuming the intent of editing all notes)
+- when setting a new note, set panning and volume to that of last note
 
 - recording automation
 - make knobs easier to tune (less sensitive)

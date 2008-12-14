@@ -182,6 +182,8 @@ private:
 	void shiftSemiTone(int amount);
 	bool isSelection() const;
 	void testPlayNote( note * n );
+	void testPlayKey( int _key, int _vol, int _pan );
+	void pauseTestNotes( bool _pause = true );
 	
 	inline int noteEditTop() const;
 	inline int keyAreaBottom() const;
