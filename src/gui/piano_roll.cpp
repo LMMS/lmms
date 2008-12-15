@@ -1556,6 +1556,24 @@ void pianoRoll::mousePressEvent( QMouseEvent * _me )
 
 
 
+void pianoRoll::mouseDoubleClickEvent( QMouseEvent * _me )
+{
+	if( validPattern() == false )
+	{
+		return;
+	}	
+	
+	// if they clicked in the note edit area, clear selection
+	if( _me->x() > noteEditLeft() && _me->x() < noteEditRight()
+	    && _me->y() > noteEditTop() && _me->y() < noteEditBottom() )
+	{
+		clearSelectedNotes();
+	}
+}
+
+
+
+
 void pianoRoll::testPlayNote( note * n )
 {
 	m_lastKey = n->key();

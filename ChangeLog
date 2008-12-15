@@ -1,3 +1,10 @@
+2008-12-14	Andrew Kelley	<superjoe30/at/gmail/dot/com>
+
+	* include/piano_roll.h:
+	* src/gui/piano_roll.cpp:
+	double click in the note edit area to clear selected notes (allowing you
+	to edit note velocities/panning for all notes)
+
 2008-12-14	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* CMakeLists.txt:
