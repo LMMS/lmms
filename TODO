@@ -60,6 +60,7 @@ Andrew Kelley's todo:
   * quick slice
   * look through FL Studio's tools and implement some of them
 - when looking at a piano roll, if the song is playing that pattern, move the position ticker to where it should be
+- slice tool for piano roll
 
 - recording automation
 - make knobs easier to tune (less sensitive)

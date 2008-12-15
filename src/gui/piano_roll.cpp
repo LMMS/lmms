@@ -1435,6 +1435,14 @@ void pianoRoll::mousePressEvent( QMouseEvent * _me )
 					
 					++it;
 				}
+				
+				// if clicked on an unselected note, remove selection
+				// and select that new note
+				if( ! m_currentNote->selected() )
+				{
+					clearSelectedNotes();
+					m_currentNote->setSelected( true );
+				}
 
 				
 				// clicked at the "tail" of the note?
@@ -1500,12 +1508,7 @@ void pianoRoll::mousePressEvent( QMouseEvent * _me )
 				}
 				
 				
-				// if clicked on an unselected note, remove selection
-				if( ! m_currentNote->selected() )
-				{
-					clearSelectedNotes();
-					m_currentNote->setSelected( true );
-				}
+				
 				
 				engine::getSong()->setModified();
 			}

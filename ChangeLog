@@ -6,6 +6,7 @@
 	  note editing
 	- if you pressed both controls at the same time, the piano roll would 
 	  get stuck in selection mode (FIXED)
+	- shift drag on an unselected note didn't work (FIXED)
 
 2008-12-14	Andrew Kelley	<superjoe30/at/gmail/dot/com>
 
