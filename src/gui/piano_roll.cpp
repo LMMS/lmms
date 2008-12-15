@@ -1126,11 +1126,14 @@ void pianoRoll::keyPressEvent( QKeyEvent * _ke )
 		}
 
 		case Qt::Key_Control:
-			m_ctrlMode = m_editMode;
-			m_editMode = ModeSelect;
-			QApplication::changeOverrideCursor(
-											   QCursor( Qt::ArrowCursor ) );
-			update();
+			if( m_editMode != ModeSelect )
+			{
+				m_ctrlMode = m_editMode;
+				m_editMode = ModeSelect;
+				QApplication::changeOverrideCursor(
+												   QCursor( Qt::ArrowCursor ) );
+				update();
+			}
 			break;
 		case Qt::Key_Shift:
 			/* TODO: implement note detuning some other way.
