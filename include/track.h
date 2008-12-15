@@ -284,6 +284,8 @@ private:
 
 	int m_pixelsPerTact;
 
+	QPixmap m_background;
+
 } ;
 
 

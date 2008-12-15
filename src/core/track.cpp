@@ -1133,76 +1133,16 @@ void trackContentWidget::mousePressEvent( QMouseEvent * _me )
  */
 void trackContentWidget::paintEvent( QPaintEvent * _pe )
 {
-	static QPixmap backgrnd;
-	static int last_geometry = 0;
-
-	QPainter p( this );
-	const int tactsPerBar = 4;
-	const trackContainerView * tcv = m_trackView->getTrackContainerView();
-
 	// Assume even-pixels-per-tact. Makes sense, should be like this anyways
+	const trackContainerView * tcv = m_trackView->getTrackContainerView();
 	int ppt = static_cast<int>( tcv->pixelsPerTact() );
-
-	// Update background if needed
-	if( ppt*height() != last_geometry )
-	{
-		int w = ppt * tactsPerBar;
-		int h = height();
-		backgrnd = QPixmap( w * 2, height() );
-		QPainter pmp( &backgrnd );
-		//pmp.setRenderHint( QPainter::Antialiasing );
-
-		QLinearGradient grad( 0, 1, 0, h-2 );
-		pmp.fillRect( 0, 0, 1, h, QColor( 96, 96, 96 ) );
-		pmp.fillRect( 1, 0, w+1, h, QColor( 128, 128, 128 ) );
-		grad.setColorAt( 0.0, QColor( 64, 64, 64 ) );
-		grad.setColorAt( 0.3, QColor( 128, 128, 128 ) );
-		grad.setColorAt( 0.5, QColor( 128, 128, 128 ) );
-		grad.setColorAt( 0.95, QColor( 160, 160, 160 ) );
-		//grad.setColorAt( 1.0, QColor( 128, 128, 128 ) );
-		//grad.setColorAt( 1.0, QColor( 64, 64, 64) );
-		pmp.fillRect( 0, 1, w, h-2, grad );
-
-		QLinearGradient grad2( 0,1, 0, h-2 );
-		pmp.fillRect( w+1, 0, w , h, QColor( 96, 96, 96 ) );
-		grad2.setColorAt( 0.0, QColor( 48, 48, 48 ) );
-		grad2.setColorAt( 0.3, QColor( 96, 96, 96 ) );
-		grad2.setColorAt( 0.5, QColor( 96, 96, 96 ) );
-		grad2.setColorAt( 0.95, QColor( 120, 120, 120 ) );
-		//grad2.setColorAt( 1.0, QColor( 96, 96, 96 ) );
-		//grad2.setColorAt( 1.0, QColor( 48, 48, 48 ) );
-		pmp.fillRect( w, 1, w , h-2, grad2 );
-
-		// draw vertical lines
-		//pmp.setPen( QPen( QBrush( QColor( 80, 84, 96, 192 ) ), 1 ) );
-		pmp.setPen( QPen( QColor( 0, 0, 0, 112 ), 1 ) );
-		for( float x = 0.5; x < w * 2; x += ppt )
-		{
-			pmp.drawLine( QLineF( x, 1.0, x, h-2.0 ) );
-		}
-		//pmp.setPen( QPen( QColor( 255,0,0, 128 ), 1 ) );
-		pmp.drawLine( 0, 1, w*2, 1 );
-
-		pmp.setPen( QPen( QColor( 255, 255, 255, 32 ), 1 ) );
-		for( float x = 1.5; x < w * 2; x += ppt )
-		{
-			pmp.drawLine( QLineF( x, 1.0, x, h-2.0 ) );
-		}
-		//pmp.setPen( QPen( QColor( 0,255,0, 128 ), 1 ) );
-		pmp.drawLine( 0, h-2, w*2, h-2 );
-
-		pmp.end();
-
-		last_geometry = ppt*h;
-	}
-
+	QPainter p( this );
 	// Don't draw background on BB-Editor
 	if( m_trackView->getTrackContainerView() != engine::getBBEditor() )
 	{
-		p.drawTiledPixmap( rect(), backgrnd, QPoint( 
+		p.drawTiledPixmap( rect(), m_background, QPoint( 
 				tcv->currentPosition().getTact() * ppt, 0 ) );
 	}
-
 }
 
 
@@ -1214,6 +1154,53 @@ void trackContentWidget::paintEvent( QPaintEvent * _pe )
  */
 void trackContentWidget::resizeEvent( QResizeEvent * _re )
 {
+    // Update backgroud
+	const int tactsPerBar = 4;
+	const trackContainerView * tcv = m_trackView->getTrackContainerView();
+
+	// Assume even-pixels-per-tact. Makes sense, should be like this anyways
+	int ppt = static_cast<int>( tcv->pixelsPerTact() );
+
+    int w = ppt * tactsPerBar;
+    int h = height();
+    m_background = QPixmap( w * 2, height() );
+    QPainter pmp( &m_background );
+
+    QLinearGradient grad( 0, 1, 0, h-2 );
+    pmp.fillRect( 0, 0, 1, h, QColor( 96, 96, 96 ) );
+    pmp.fillRect( 1, 0, w+1, h, QColor( 128, 128, 128 ) );
+    grad.setColorAt( 0.0, QColor( 64, 64, 64 ) );
+    grad.setColorAt( 0.3, QColor( 128, 128, 128 ) );
+    grad.setColorAt( 0.5, QColor( 128, 128, 128 ) );
+    grad.setColorAt( 0.95, QColor( 160, 160, 160 ) );
+    pmp.fillRect( 0, 1, w, h-2, grad );
+
+    QLinearGradient grad2( 0,1, 0, h-2 );
+    pmp.fillRect( w+1, 0, w , h, QColor( 96, 96, 96 ) );
+    grad2.setColorAt( 0.0, QColor( 48, 48, 48 ) );
+    grad2.setColorAt( 0.3, QColor( 96, 96, 96 ) );
+    grad2.setColorAt( 0.5, QColor( 96, 96, 96 ) );
+    grad2.setColorAt( 0.95, QColor( 120, 120, 120 ) );
+    pmp.fillRect( w, 1, w , h-2, grad2 );
+
+    // draw vertical lines
+    pmp.setPen( QPen( QColor( 0, 0, 0, 112 ), 1 ) );
+    for( float x = 0.5; x < w * 2; x += ppt )
+    {
+        pmp.drawLine( QLineF( x, 1.0, x, h-2.0 ) );
+    }
+    pmp.drawLine( 0, 1, w*2, 1 );
+
+    pmp.setPen( QPen( QColor( 255, 255, 255, 32 ), 1 ) );
+    for( float x = 1.5; x < w * 2; x += ppt )
+    {
+        pmp.drawLine( QLineF( x, 1.0, x, h-2.0 ) );
+    }
+    pmp.drawLine( 0, h-2, w*2, h-2 );
+
+    pmp.end();
+
+    // Force redraw
 	update();
 }
 
@@ -1457,7 +1444,7 @@ void trackOperationsWidget::mousePressEvent( QMouseEvent * _me )
 void trackOperationsWidget::paintEvent( QPaintEvent * _pe )
 {
 	QPainter p( this );
-	p.fillRect( rect(), QColor( 56, 60, 72 ) );
+	p.fillRect( rect(), palette().brush(QPalette::Background) );
 
 	if( m_trackView->isMovingTrack() == false )
 	{
@@ -2104,11 +2091,7 @@ trackView::trackView( track * _track, trackContainerView * _tcv ) :
 	pal.setColor( backgroundRole(), QColor( 32, 36, 40 ) );
 	setPalette( pal );
 
-
 	m_trackSettingsWidget.setAutoFillBackground( true );
-	pal.setColor( m_trackSettingsWidget.backgroundRole(),
-							QColor( 56, 60, 72 ) );
-	m_trackSettingsWidget.setPalette( pal );
 
 	QHBoxLayout * layout = new QHBoxLayout( this );
 	layout->setMargin( 0 );
