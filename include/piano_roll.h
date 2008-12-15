@@ -180,6 +180,7 @@ private:
 	void shiftPos(int amount);
 	void shiftSemiTone(int amount);
 	bool isSelection() const;
+	int selectionCount() const;
 	void testPlayNote( note * n );
 	void testPlayKey( int _key, int _vol, int _pan );
 	void pauseTestNotes( bool _pause = true );

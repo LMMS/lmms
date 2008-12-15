@@ -829,6 +829,24 @@ bool pianoRoll::isSelection( void ) const // are any notes selected?
 
 
 
+int pianoRoll::selectionCount( void ) const // how many notes are selected?
+{
+	int sum = 0;
+	
+	const noteVector & notes = m_pattern->notes();
+	for( noteVector::const_iterator it = notes.begin(); it != notes.end();
+									++it )
+	{
+		if( ( *it )->selected() )
+		{
+			++sum;
+		}
+	}
+	
+	return sum;
+}
+
+
 
 void pianoRoll::keyPressEvent( QKeyEvent * _ke )
 {
@@ -1770,6 +1788,13 @@ void pianoRoll::mouseReleaseEvent( QMouseEvent * _me )
 		// time in the note-array of pattern
 
 		m_pattern->rearrangeAllNotes();	
+		
+		// if we only moved one note, deselect it so we can
+		// edit the notes in the note edit area
+		if( selectionCount() == 1 )
+		{
+			clearSelectedNotes();
+		}
 	}
 	
 	if( validPattern() == true )

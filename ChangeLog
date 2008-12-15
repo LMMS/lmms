@@ -1,3 +1,10 @@
+2008-12-15	Andrew Kelley	<superjoe30/at/gmail/dot/com>
+
+	* include/piano_roll.h:
+	* src/gui/piano_roll.cpp:
+	if you move a single note, it is deselected after the move to allow
+	note editing
+
 2008-12-14	Andrew Kelley	<superjoe30/at/gmail/dot/com>
 
 	* include/piano_roll.h:
