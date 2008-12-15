@@ -247,6 +247,12 @@
 	* src/tracks/pattern.cpp:
 	backport: added support for panning editing of notes
 
+2008-12-15	Paul Giblock <drfaygo/at/gmail/dot/com>
+	
+	* src/core/track.cpp:
+	* include/track.h:
+	Cache background per-object instead of per-class.
+
 2008-12-14	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* CMakeLists.txt:
