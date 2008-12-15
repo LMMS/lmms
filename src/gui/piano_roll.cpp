@@ -155,6 +155,8 @@ pianoRoll::pianoRoll( void ) :
 	m_notesEditHeight( 100 ),
 	m_ppt( DEFAULT_PR_PPT ),
 	m_lenOfNewNotes( midiTime( 0, DefaultTicksPerTact/4 ) ),
+	m_lastNoteVolume( DefaultVolume ),
+	m_lastNotePanning( DefaultPanning ),
 	m_startKey( INITIAL_START_KEY ),
 	m_lastKey( 0 ),
 	m_editMode( ModeDraw ),
@@ -1346,6 +1348,8 @@ void pianoRoll::mousePressEvent( QMouseEvent * _me )
 		
 					note new_note( note_len, note_pos, key_num );
 					new_note.setSelected( true );
+					new_note.setPanning( m_lastNotePanning );
+					new_note.setVolume( m_lastNoteVolume );
 					created_new_note = m_pattern->addNote( new_note );
 
 					// reset it so that it can be used for
@@ -1362,6 +1366,9 @@ void pianoRoll::mousePressEvent( QMouseEvent * _me )
 				}
 
 				m_currentNote = *it;
+				m_lastNotePanning = ( *it )->getPanning();
+				m_lastNoteVolume = ( *it )->getVolume();
+				m_lenOfNewNotes = ( *it )->length();
 				
 				// remember which key and tick we started with		
 				m_mouseDownKey = m_startKey;
@@ -1919,6 +1926,17 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 							( (float)( noteEditBottom() - noteEditTop() ) ) * 
 							( (float)( PanningRight - PanningLeft ) ),
 									  PanningLeft, PanningRight);
+			
+			if( m_noteEditMode == NoteEditVolume )
+			{
+				m_lastNoteVolume = vol;
+			}
+			else if( m_noteEditMode == NoteEditPanning )
+			{
+				m_lastNotePanning = pan;
+			}
+			
+			
 			
 			// loop through vector
 			bool use_selection = isSelection();

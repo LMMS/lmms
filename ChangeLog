@@ -2,8 +2,10 @@
 
 	* include/piano_roll.h:
 	* src/gui/piano_roll.cpp:
-	double click in the note edit area to clear selected notes (allowing you
-	to edit note velocities/panning for all notes)
+	- double click in the note edit area to clear selected notes (allowing you
+	  to edit note velocities/panning for all notes)
+	- when setting a new note, set panning and volume to that of last
+	  clicked on note
 
 2008-12-14	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 

@@ -273,7 +273,11 @@ private:
 	int m_ppt;
 	int m_totalKeysToScroll;
 
+	// remember these values to use them 
+	// for the next note that is set
 	midiTime m_lenOfNewNotes;
+	volume m_lastNoteVolume;
+	panning m_lastNotePanning;
 
 	int m_startKey;			// first key when drawing
 	int m_lastKey;

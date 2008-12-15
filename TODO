@@ -52,9 +52,7 @@
 - add FLAC as export-format?
 
 Andrew Kelley's todo:
-- when setting a new note, set panning and volume to that of last note
 - figure out a way to not make editing note volume awkward. AKA don't select notes just by clicking on them, and don't select newly created notes
-
 
 - if you press both controls at the same time, the piano roll gets stuck in selection mode
 - multiview button - show notes from every instrument in the current beat+bassline with different colors
