@@ -1795,6 +1795,10 @@ void pianoRoll::mouseReleaseEvent( QMouseEvent * _me )
 
 		m_pattern->rearrangeAllNotes();	
 		
+	}
+	if( _me->button() & Qt::LeftButton &&
+	   ( m_action == ActionMoveNote || m_action == ActionResizeNote ) )
+	{
 		// if we only moved one note, deselect it so we can
 		// edit the notes in the note edit area
 		if( selectionCount() == 1 )
@@ -1802,6 +1806,7 @@ void pianoRoll::mouseReleaseEvent( QMouseEvent * _me )
 			clearSelectedNotes();
 		}
 	}
+	  
 	
 	if( validPattern() == true )
 	{

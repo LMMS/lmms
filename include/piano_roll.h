@@ -219,7 +219,8 @@ private:
 	toolButton * m_drawButton;
 	toolButton * m_eraseButton;
 	toolButton * m_selectButton;
-
+	toolButton * m_detuneButton;
+		
 	toolButton * m_cutButton;
 	toolButton * m_copyButton;
 	toolButton * m_pasteButton;

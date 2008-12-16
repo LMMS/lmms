@@ -8,8 +8,8 @@
 
 	* include/piano_roll.h:
 	* src/gui/piano_roll.cpp:
-	- if you move a single note, it is deselected after the move to allow
-	  note editing
+	- if you move or resize a single note, it is deselected after the move 
+	  to allow note editing
 	- if you pressed both controls at the same time, the piano roll would 
 	  get stuck in selection mode (FIXED)
 	- shift drag on an unselected note didn't work (FIXED)
