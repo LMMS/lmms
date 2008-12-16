@@ -1271,6 +1271,16 @@ void pianoRoll::mousePressEvent( QMouseEvent * _me )
 		noteUnderMouse()->editDetuningPattern();
 		return;
 	}
+	
+	// if holding control, go to selection mode
+	if( _me->modifiers() & Qt::ControlModifier && m_editMode != ModeSelect )
+	{
+		m_ctrlMode = m_editMode;
+		m_editMode = ModeSelect;
+		QApplication::changeOverrideCursor(
+										   QCursor( Qt::ArrowCursor ) );
+		update();
+	}	
 
 	// keep track of the point where the user clicked down
 	if( _me->button() == Qt::LeftButton )

@@ -52,7 +52,6 @@
 - add FLAC as export-format?
 
 Andrew Kelley's todo:
-- if a different window is selected and you hold control and then click in the piano roll, it doesn't do selection like it should
 - when looking at a piano roll, if the song is playing that pattern, move the position ticker to where it should be
 - multiview button - show notes from every instrument in the current beat+bassline with different colors
 - undo/redo for piano roll

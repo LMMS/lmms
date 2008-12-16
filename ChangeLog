@@ -16,6 +16,8 @@
 	- added a note detuning tool
 	- fixed mouse cursor glitch when mousing over notes
 	- shift+drag didn't update beat+bassline (FIXED)
+	- if a different window was selected and you hold control and then
+	  click in the piano roll, it didn't do selection like it should (FIXED)
 	
 	* src/tracks/instrument_track.cpp:
 	fixed crash in processAudioBuffer when notePlayHandle was NULL
