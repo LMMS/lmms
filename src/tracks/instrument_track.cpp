@@ -176,14 +176,16 @@ void instrumentTrack::processAudioBuffer( sampleFrame * _buf,
 	}
 
 	m_audioPort.setNextFxChannel( m_effectChannelModel.value() );
+	
+	int panning = m_panningModel.value();
+	if( _n != NULL )
+	{
+		panning += _n->getPanning();
+	}
 	engine::getMixer()->bufferToPort( _buf, ( _n != NULL ) ? qMin<f_cnt_t>(_n->framesLeftForCurrentPeriod(), _frames ) :
 								_frames,
 			( _n != NULL ) ? _n->offset() : 0,
-			panningToVolumeVector( 
-						(int) m_panningModel.value() +
-								  ( _n != NULL ) ? _n->getPanning() : 0,
-						v_scale ),
-							 &m_audioPort );
+			panningToVolumeVector( panning,	v_scale ), &m_audioPort );
 }
 
 
