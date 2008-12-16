@@ -322,30 +322,42 @@ pianoRoll::pianoRoll( void ) :
 					this, SLOT( selectButtonToggled() ),
 					m_toolBar );
 	m_selectButton->setCheckable( true );
-
+	
+	m_detuneButton = new toolButton( embed::getIconPixmap( "automation"),
+					tr( "Detune mode (Shift+T)" ),
+					this, SLOT( detuneButtonToggled() ),
+					m_toolBar );
+	m_detuneButton->setCheckable( true );
 
 	QButtonGroup * tool_button_group = new QButtonGroup( this );
 	tool_button_group->addButton( m_drawButton );
 	tool_button_group->addButton( m_eraseButton );
 	tool_button_group->addButton( m_selectButton );
+	tool_button_group->addButton( m_detuneButton );
 	tool_button_group->setExclusive( true );
 
 	m_drawButton->setWhatsThis(
 		tr( "Click here and draw mode will be activated. In this "
-			"mode you can add, resize and move single notes. This "
+			"mode you can add, resize and move notes. This "
 			"is the default mode which is used most of the time. "
 			"You can also press 'Shift+D' on your keyboard to "
-			"activate this mode." ) );
+			"activate this mode. In this mode, hold Ctrl to "
+		    "temporarily go into select mode." ) );
 	m_eraseButton->setWhatsThis(
 		tr( "Click here and erase mode will be activated. In this "
-			"mode you can erase single notes. You can also press "
+			"mode you can erase notes. You can also press "
 			"'Shift+E' on your keyboard to activate this mode." ) );
 	m_selectButton->setWhatsThis(
 		tr( "Click here and select mode will be activated. "
-			"In this mode you can select notes. This is neccessary "
-			"if you want to cut, copy, paste, delete or move "
-			"notes. You can also press 'Shift+S' on your keyboard "
-			"to activate this mode." ) );
+			"In this mode you can select notes. Alternatively, "
+		    "you can hold Ctrl in draw mode to temporarily use "
+		    "select mode." ) );
+	m_detuneButton->setWhatsThis(
+		tr( "Click here and detune mode will be activated. "
+			"In this mode you can click a note to open its "
+		    "automation detuning. You can utilize this to slide "
+		    "notes from one to another. You can also press "
+		    "'Shift+T' on your keyboard to activate this mode." ) );
 
 	m_cutButton = new toolButton( embed::getIconPixmap( "edit_cut" ),
 					tr( "Cut selected notes (Ctrl+X)" ),
@@ -453,6 +465,7 @@ pianoRoll::pianoRoll( void ) :
 	tb_layout->addWidget( m_drawButton );
 	tb_layout->addWidget( m_eraseButton );
 	tb_layout->addWidget( m_selectButton );
+	tb_layout->addWidget( m_detuneButton );
 	tb_layout->addSpacing( 10 );
 	tb_layout->addWidget( m_cutButton );
 	tb_layout->addWidget( m_copyButton );
@@ -1078,7 +1091,18 @@ void pianoRoll::keyPressEvent( QKeyEvent * _ke )
 				_ke->ignore();
 			}
 			break;
-
+			
+		case Qt::Key_T:
+			if( _ke->modifiers() & Qt::ShiftModifier )
+			{
+				m_detuneButton->setChecked( true );
+			}
+			else
+			{
+				_ke->ignore();
+			}
+			break;
+			
 		case Qt::Key_Delete:
 			deleteSelectedNotes();
 			break;
@@ -1135,16 +1159,6 @@ void pianoRoll::keyPressEvent( QKeyEvent * _ke )
 				update();
 			}
 			break;
-		case Qt::Key_Shift:
-			/* TODO: implement note detuning some other way.
-			if( mouseOverNote() )
-			{
-				m_editMode = ModeOpen;
-				QApplication::changeOverrideCursor(
-						QCursor( Qt::ArrowCursor ) );
-				update();
-			} */
-			break;
 		default:
 			_ke->ignore();
 			break;
@@ -1175,13 +1189,6 @@ void pianoRoll::keyReleaseEvent( QKeyEvent * _ke )
 							Qt::ShiftModifier);
 			m_editMode = m_ctrlMode;
 			update();
-			break;
-		case Qt::Key_Shift:
-			if( m_editMode == ModeOpen )
-			{
-				m_editMode = ModeDraw;
-				update();
-			}
 			break;
 	}
 	_ke->ignore();
@@ -1870,11 +1877,6 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 					QCursor( Qt::SizeVerCursor ) );
 			return;
 		}
-		else
-		{
-			QApplication::setOverrideCursor(
-					QCursor( Qt::ArrowCursor ) );
-		}
 	}
 	else if( m_action == ActionResizeNoteEditArea )
 	{
@@ -2062,14 +2064,8 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 			// no note??
 			if( it != notes.end() )
 			{
-				if( _me->modifiers() & Qt::ControlModifier )
-				{
-					m_editMode = ModeOpen;
-					QApplication::changeOverrideCursor(
-						QCursor( Qt::ArrowCursor ) );
-				}
 				// cursor at the "tail" of the note?
-				else if( ( *it )->length() > 0 &&
+				if( ( *it )->length() > 0 &&
 					pos_ticks*m_ppt /
 						midiTime::ticksPerTact() >
 						( ( *it )->pos() +
@@ -2152,11 +2148,6 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 			{
 				--m_selectedKeys;
 			}
-		}
-		else if( m_editMode == ModeOpen && !( mouseOverNote()
-				&& _me->modifiers() & Qt::ShiftModifier ) )
-		{
-			m_editMode = ModeDraw;
 		}
 		else if( m_editMode == ModeDraw && _me->buttons() & Qt::RightButton )
 		{
@@ -2851,7 +2842,7 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 			break;
 		case ModeErase: cursor = s_toolErase; break;
 		case ModeSelect: cursor = s_toolSelect; break;
-		case ModeMove: cursor = s_toolMove; break;
+		//case ModeMove: cursor = s_toolMove; break;
 		case ModeOpen: cursor = s_toolOpen; break;
 	}
 	p.drawPixmap( mapFromGlobal( QCursor::pos() ) + QPoint( 8, 8 ),
@@ -3094,7 +3085,6 @@ void pianoRoll::verScrolled( int _new_pos )
 void pianoRoll::drawButtonToggled( void )
 {
 	m_editMode = ModeDraw;
-	removeSelection();
 	update();
 }
 
@@ -3104,7 +3094,6 @@ void pianoRoll::drawButtonToggled( void )
 void pianoRoll::eraseButtonToggled( void )
 {
 	m_editMode = ModeErase;
-	removeSelection();
 	update();
 }
 
@@ -3114,7 +3103,14 @@ void pianoRoll::eraseButtonToggled( void )
 void pianoRoll::selectButtonToggled( void )
 {
 	m_editMode = ModeSelect;
-	removeSelection();
+	update();
+}
+
+
+
+void pianoRoll::detuneButtonToggled( void )
+{
+	m_editMode = ModeOpen;
 	update();
 }
 

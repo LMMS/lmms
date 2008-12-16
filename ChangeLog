@@ -13,6 +13,8 @@
 	- if you pressed both controls at the same time, the piano roll would 
 	  get stuck in selection mode (FIXED)
 	- shift drag on an unselected note didn't work (FIXED)
+	- added a note detuning tool
+	- fixed mouse cursor glitch when mousing over notes
 
 2008-12-14	Andrew Kelley	<superjoe30/at/gmail/dot/com>
 

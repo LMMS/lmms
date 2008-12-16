@@ -118,6 +118,7 @@ protected slots:
 	void drawButtonToggled( void );
 	void eraseButtonToggled( void );
 	void selectButtonToggled( void );
+	void detuneButtonToggled( void );
 
 	void copySelectedNotes( void );
 	void cutSelectedNotes( void );
@@ -139,7 +140,6 @@ private:
 		ModeDraw,
 		ModeErase,
 		ModeSelect,
-		ModeMove,
 		ModeOpen
 	};
 
