@@ -62,6 +62,8 @@ Andrew Kelley's todo:
   * look through FL Studio's tools and implement some of them
 - slice tool for piano roll
 - when a note is played, show the note as being depressed in the piano roll
+- don't end mouse selection when control is released
+- mouse cursor isn't updated correctly in selection mode (from resizing note edit area)
 
 - recording automation
 - make knobs easier to tune (less sensitive)

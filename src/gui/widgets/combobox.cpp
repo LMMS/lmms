@@ -114,7 +114,7 @@ void comboBox::contextMenuEvent( QContextMenuEvent * _me )
 void comboBox::mousePressEvent( QMouseEvent * _me )
 {
 	if( _me->button() == Qt::LeftButton &&
-			_me->modifiers() & Qt::ControlModifier )
+			! ( _me->modifiers() & Qt::ControlModifier ) )
 	{
 		if( _me->x() > width() - CB_ARROW_BTN_WIDTH )
 		{

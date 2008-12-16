@@ -663,7 +663,7 @@ void trackContentObjectView::mouseMoveEvent( QMouseEvent * _me )
 			m_trackView->getTrackContainerView()->currentPosition()+
 				static_cast<int>( x * midiTime::ticksPerTact() /
 									ppt ) );
-		if( _me->modifiers() & Qt::ControlModifier
+		if( ! ( _me->modifiers() & Qt::ControlModifier )
 		   && _me->button() == Qt::NoButton )
 		{
 			t = t.toNearestTact();
@@ -716,7 +716,7 @@ void trackContentObjectView::mouseMoveEvent( QMouseEvent * _me )
 		midiTime t = qMax( midiTime::ticksPerTact(),
 				static_cast<int>( _me->x() *
 					midiTime::ticksPerTact() / ppt ) );
-		if( _me->modifiers() & Qt::ControlModifier 
+		if( ! ( _me->modifiers() & Qt::ControlModifier )
 		   && _me->button() == Qt::NoButton )
 		{
 			t = t.toNearestTact();

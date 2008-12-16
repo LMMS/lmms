@@ -112,7 +112,7 @@ void fader::mouseMoveEvent( QMouseEvent *ev )
 void fader::mousePressEvent( QMouseEvent * _me )
 {
 	if( _me->button() == Qt::LeftButton &&
-			_me->modifiers() & Qt::ControlModifier )
+			! ( _me->modifiers() & Qt::ControlModifier ) )
 	{
 		mouseMoveEvent( _me );
 		_me->accept();
