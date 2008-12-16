@@ -338,6 +338,8 @@ public:
 		m_itv = _tv;
 	}
 
+	static void dragEnterEventGeneric( QDragEnterEvent * _dee );
+
 	virtual void dragEnterEvent( QDragEnterEvent * _dee );
 	virtual void dropEvent( QDropEvent * _de );
 
