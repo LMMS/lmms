@@ -18,6 +18,16 @@
 	changed modifier detection from mainWindow::isCtrlPressed etc to
 	Qt framework detection. Fixes a bunch of little glitches and
 	enables horizontal scroll wheels.
+	
+	* plugins/sf2_player/sf2_player.cpp:
+	* plugins/sf2_player/sf2_player.h:
+	* include/note_play_handle.h:
+	* src/core/note_play_handle.cpp:
+	* include/instrument.h:
+	* src/tracks/instrument_track.cpp:
+	experimental support for note panning in SF2 player (I'm not sure
+	what m_maxChannels should be or how to find it out. I just picked
+	what worked for my setup.)
 
 2008-12-15	Paul Giblock <drfaygo/at/gmail/dot/com>
 	

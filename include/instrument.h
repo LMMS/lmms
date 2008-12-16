@@ -63,6 +63,11 @@ public:
 					sampleFrame * /* _working_buf */ )
 	{
 	}
+		
+	// event called when a note's panning changes
+	virtual void updatePanning( notePlayHandle * )
+	{	
+	}
 
 	// needed for deleting plugin-specific-data of a note - plugin has to
 	// cast void-ptr so that the plugin-data is deleted properly

@@ -307,6 +307,7 @@ void instrumentTrack::processInEvent( const midiEvent & _me,
 					if( m_notes[_me.key()] != NULL )
 					{
 						m_notes[_me.key()]->setPanning( _me.getPanning() );
+						m_instrument->updatePanning( m_notes[_me.key()] );
 					}
 					break;
 				default:

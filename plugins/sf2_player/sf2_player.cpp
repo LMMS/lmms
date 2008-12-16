@@ -600,6 +600,17 @@ void sf2Instrument::playNote( notePlayHandle * _n, sampleFrame * )
 }
 
 
+void sf2Instrument::updatePanning( notePlayHandle * _n )
+{
+	short ctrl = 0x0A; // PAN_MSB
+	int pan = 0 + 
+			  ( (float)( _n->getPanning() - PanningLeft ) ) / 
+			  ( (float)( PanningRight - PanningLeft ) ) *
+			  ( (float)( 127 - 0 ) );
+	fluid_synth_cc( m_synth, _n->channel(), ctrl, pan );
+}
+
+
 // Could we get iph-based instruments support sample-exact models by using a 
 // frame-length of 1 while rendering?
 void sf2Instrument::play( sampleFrame * _working_buffer )
