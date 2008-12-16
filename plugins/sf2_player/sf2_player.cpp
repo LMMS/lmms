@@ -46,6 +46,7 @@
 #undef SINGLE_SOURCE_COMPILE
 #include "embed.cpp"
 
+#define SF2_PANNING_SUPPORT
 
 extern "C"
 {
@@ -65,6 +66,14 @@ plugin::descriptor sf2player_plugin_descriptor =
 } ;
 
 }
+
+
+struct SF2PluginData
+{
+	int midiNote;
+	int midiChannel;
+	int lastPanning;
+} ;
 
 
 // Static map of current sfonts
@@ -409,7 +418,8 @@ QString sf2Instrument::getCurrentPatchName( void )
 	for( int i = 0; i < cSoundFonts; i++ )
 	{
 		fluid_sfont_t *pSoundFont = fluid_synth_get_sfont( m_synth, i );
-		if (pSoundFont) {
+		if ( pSoundFont )
+		{
 #ifdef CONFIG_FLUID_BANK_OFFSET
 			int iBankOffset =
 				fluid_synth_get_bank_offset(
@@ -573,42 +583,50 @@ void sf2Instrument::playNote( notePlayHandle * _n, sampleFrame * )
 
 	if( tfp == 0 )
 	{
-		_n->m_pluginData = new int( midiNote );
+		SF2PluginData * pluginData = new SF2PluginData;
+		pluginData->midiNote = midiNote;
+		pluginData->midiChannel = m_channel;
+		pluginData->lastPanning = -1;
+
+		_n->m_pluginData = pluginData;
 
 		m_synthMutex.lock();
-		
-		short ctrl = 0x0A; // PAN_MSB
-		int pan = 0 + 
-			  ( (float)( _n->getPanning() - PanningLeft ) ) / 
-			  ( (float)( PanningRight - PanningLeft ) ) *
-			  ( (float)( 127 - 0 ) );
-		fluid_synth_cc( m_synth, m_channel, ctrl, pan );
-		fluid_synth_noteon( m_synth, m_channel, midiNote,
+
+		fluid_synth_noteon( m_synth, pluginData->midiChannel, midiNote,
 							_n->getMidiVelocity() );
-		_n->setChannel( m_channel );
+
+#ifdef SF2_PANNING_SUPPORT
+		updatePatch();
+
 		if( ++m_channel > m_maxChannels )
 		{
 			m_channel = 1;
 		}
-		
+#endif
+
 		m_synthMutex.unlock();
 
 		m_notesRunningMutex.lock();
 		++m_notesRunning[midiNote];
 		m_notesRunningMutex.unlock();
 	}
-}
 
-
-void sf2Instrument::updatePanning( notePlayHandle * _n )
-{
-	short ctrl = 0x0A; // PAN_MSB
-	int pan = 0 + 
+#ifdef SF2_PANNING_SUPPORT
+	SF2PluginData * pluginData = static_cast<SF2PluginData *>(
+							_n->m_pluginData );
+	if( pluginData->lastPanning != _n->getPanning() )
+	{
+		int pan = 0 + 
 			  ( (float)( _n->getPanning() - PanningLeft ) ) / 
 			  ( (float)( PanningRight - PanningLeft ) ) *
 			  ( (float)( 127 - 0 ) );
-	fluid_synth_cc( m_synth, _n->channel(), ctrl, pan );
+		fluid_synth_cc( m_synth, pluginData->midiChannel, 0x0A, pan );
+		pluginData->lastPanning = _n->getPanning();
+	}
+#endif
 }
+
+
 
 
 // Could we get iph-based instruments support sample-exact models by using a 
@@ -668,18 +686,21 @@ void sf2Instrument::play( sampleFrame * _working_buffer )
 
 void sf2Instrument::deleteNotePluginData( notePlayHandle * _n )
 {
-	int * midiNote = static_cast<int *>( _n->m_pluginData );
+	SF2PluginData * pluginData = static_cast<SF2PluginData *>(
+							_n->m_pluginData );
 	m_notesRunningMutex.lock();
-	const int n = --m_notesRunning[*midiNote];
+	const int n = --m_notesRunning[pluginData->midiNote];
 	m_notesRunningMutex.unlock();
+
 	if( n <= 0 )
 	{
 		m_synthMutex.lock();
-		fluid_synth_noteoff( m_synth, _n->channel(), *midiNote );
+		fluid_synth_noteoff( m_synth, pluginData->midiChannel,
+						pluginData->midiNote );
 		m_synthMutex.unlock();
 	}
 
-	delete midiNote;
+	delete pluginData;
 }
 
 
@@ -687,7 +708,7 @@ void sf2Instrument::deleteNotePluginData( notePlayHandle * _n )
 
 pluginView * sf2Instrument::instantiateView( QWidget * _parent )
 {
-	return( new sf2InstrumentView( this, _parent ) );
+	return new sf2InstrumentView( this, _parent );
 }
 
 

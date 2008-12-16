@@ -1,5 +1,24 @@
+2008-12-16	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* plugins/sf2_player/sf2_player.cpp:
+	* plugins/sf2_player/sf2_player.h:
+	fixed broken panning support
+
+	* include/instrument.h:
+	* include/note_play_handle.h:
+	* src/core/note_play_handle.cpp:
+	* src/tracks/instrument_track.cpp:
+	reverted previous API changes as they can be implemented in a
+	generic manner
+
+	* src/tracks/instrument_track.cpp:
+	* include/instrument_track.h:
+	- do not create a instrument track window just for calling
+	  dragEnterEvent() - use a static method instead
+	- limit panning in processAudioBuffer()
+
 2008-12-16	Andrew Kelley	<superjoe30/at/gmail/dot/com>
-	
+
 	* src/gui/piano_roll.cpp:
 	* src/gui/automatable_model_view.cpp:
 	* src/gui/song_editor.cpp:
@@ -18,7 +37,7 @@
 	changed modifier detection from mainWindow::isCtrlPressed etc to
 	Qt framework detection. Fixes a bunch of little glitches and
 	enables horizontal scroll wheels.
-	
+
 	* plugins/sf2_player/sf2_player.cpp:
 	* plugins/sf2_player/sf2_player.h:
 	* include/note_play_handle.h:
@@ -30,7 +49,7 @@
 	what worked for my setup.)
 
 2008-12-15	Paul Giblock <drfaygo/at/gmail/dot/com>
-	
+
 	* src/core/track.cpp:
 	* include/track.h:
 	Cache background per-object instead of per-class.
@@ -58,8 +77,8 @@
 
 	* include/piano_roll.h:
 	* src/gui/piano_roll.cpp:
-	- double click in the note edit area to clear selected notes (allowing you
-	  to edit note velocities/panning for all notes)
+	- double click in the note edit area to clear selected notes(allowing
+	  you to edit note velocities/panning for all notes)
 	- when setting a new note, set panning and volume to that of last
 	  clicked on note
 
