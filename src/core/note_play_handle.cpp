@@ -73,7 +73,6 @@ notePlayHandle::notePlayHandle( instrumentTrack * _it,
 #ifdef LMMS_SINGERBOT_SUPPORT
 	m_patternIndex( 0 ),
 #endif
-	m_channel( 1 ),
 	m_origTempo( engine::getSong()->getTempo() )
 {
 	if( m_baseNote )

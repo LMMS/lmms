@@ -61,7 +61,7 @@ public:
 
 	const float & frequency( void ) const
 	{
-		return( m_frequency );
+		return m_frequency;
 	}
 
 	void updateFrequency( void );
@@ -69,14 +69,14 @@ public:
 	// returns frequency without pitch-wheel influence
 	float unpitchedFrequency( void ) const
 	{
-		return( m_unpitchedFrequency );
+		return m_unpitchedFrequency;
 	}
 
 	virtual void play( sampleFrame * _working_buffer );
 
 	virtual inline bool done( void ) const
 	{
-		return( m_released && framesLeft() <= 0 );
+		return m_released && framesLeft() <= 0;
 	}
 
 	bool willFinishThisPeriod( void ) const
@@ -125,15 +125,15 @@ public:
 			rfd = rftd;
 		}
 
-		return( ( m_released && fbr == 0 && rfd >= rftd ) );
+		return ( m_released && fbr == 0 && rfd >= rftd );
 	}
 
 	f_cnt_t framesLeft( void ) const;
 
 	inline fpp_t framesLeftForCurrentPeriod( void ) const
 	{
-		return( (fpp_t) qMin<f_cnt_t>( framesLeft(),
-				engine::getMixer()->framesPerPeriod() ) );
+		return (fpp_t) qMin<f_cnt_t>( framesLeft(),
+				engine::getMixer()->framesPerPeriod() );
 	}
 
 
@@ -144,12 +144,12 @@ public:
 
 	inline f_cnt_t framesBeforeRelease( void ) const
 	{
-		return( m_framesBeforeRelease );
+		return m_framesBeforeRelease;
 	}
 
 	inline f_cnt_t releaseFramesDone( void ) const
 	{
-		return( m_releaseFramesDone );
+		return m_releaseFramesDone;
 	}
 
 	f_cnt_t actualReleaseFramesToDo( void ) const;
@@ -158,7 +158,7 @@ public:
 	// returns total numbers of frames to play
 	inline f_cnt_t frames( void ) const
 	{
-		return( m_frames );
+		return m_frames;
 	}
 
 	void setFrames( const f_cnt_t _frames );
@@ -166,13 +166,13 @@ public:
 	// returns whether note was released
 	inline bool released( void ) const
 	{
-		return( m_released );
+		return m_released;
 	}
 
 	// returns total numbers of played frames
 	inline f_cnt_t totalFramesPlayed( void ) const
 	{
-		return( m_totalFramesPlayed );
+		return m_totalFramesPlayed;
 	}
 
 	// returns volume-level at frame _frame (envelope/LFO)
@@ -181,19 +181,19 @@ public:
 	// returns instrument-track this note-play-handle plays
 	inline instrumentTrack * getInstrumentTrack( void )
 	{
-		return( m_instrumentTrack );
+		return m_instrumentTrack;
 	}
 
 	// returns whether note is a base-note, e.g. is not part of an arpeggio
 	// or a chord
 	inline bool isBaseNote( void ) const
 	{
-		return( m_baseNote );
+		return m_baseNote;
 	}
 
 	inline bool isPartOfArpeggio( void ) const
 	{
-		return( m_partOfArpeggio );
+		return m_partOfArpeggio;
 	}
 
 	inline void setPartOfArpeggio( const bool _on )
@@ -204,13 +204,13 @@ public:
 	// returns whether note is base-note for arpeggio
 	inline bool isArpeggioBaseNote( void ) const
 	{
-		return( isBaseNote() && ( m_partOfArpeggio || 
-				m_instrumentTrack->arpeggiatorEnabled() ) );
+		return isBaseNote() && ( m_partOfArpeggio || 
+				m_instrumentTrack->arpeggiatorEnabled() );
 	}
 
 	inline bool isMuted( void ) const
 	{
-		return( m_muted );
+		return m_muted;
 	}
 
 	void mute( void );
@@ -229,7 +229,7 @@ public:
 
 	bool bbTrackMuted( void )
 	{
-		return( m_bbTrack && m_bbTrack->isMuted() );
+		return m_bbTrack && m_bbTrack->isMuted();
 	}
 	void setBBTrack( track * _bb_track )
 	{
@@ -242,7 +242,7 @@ public:
 #ifdef LMMS_SINGERBOT_SUPPORT
 	int patternIndex( void )
 	{
-		return( m_patternIndex );
+		return m_patternIndex;
 	}
 
 	void setPatternIndex( int _i )
@@ -250,15 +250,6 @@ public:
 		m_patternIndex = _i;
 	}
 #endif
-	inline int channel( void ) const
-	{
-		return m_channel;
-	}
-	inline void setChannel( int _channel )
-	{
-		m_channel = _channel;
-	}
-
 
 
 private:
@@ -274,7 +265,7 @@ private:
 
 		float value( void ) const
 		{
-			return( m_value );
+			return m_value;
 		}
 
 
@@ -309,9 +300,6 @@ private:
 #ifdef LMMS_SINGERBOT_SUPPORT
 	int m_patternIndex;		// position among relevant notes
 #endif
-	// which channel this note was played on
-	// needed for some plugins like SF2
-	int m_channel;
 
 	// tempo reaction
 	bpm_t m_origTempo;		// original tempo
