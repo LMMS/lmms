@@ -2384,12 +2384,12 @@ void pianoRoll::dragNotes( int x, int y, bool alt )
 				( *it )->setLength( midiTime( ticks_new ) );
 				
 				m_lenOfNewNotes = ( *it )->length();
-				m_pattern->dataChanged();
 			}
 		}
 		++it;
 	}
 	
+	m_pattern->dataChanged();
 	engine::getSong()->setModified();
 }
 

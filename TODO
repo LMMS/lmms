@@ -52,6 +52,7 @@
 - add FLAC as export-format?
 
 Andrew Kelley's todo:
+- if a different window is selected and you hold control and then click in the piano roll, it doesn't do selection like it should
 - when looking at a piano roll, if the song is playing that pattern, move the position ticker to where it should be
 - multiview button - show notes from every instrument in the current beat+bassline with different colors
 - undo/redo for piano roll
@@ -61,6 +62,7 @@ Andrew Kelley's todo:
   * quick slice
   * look through FL Studio's tools and implement some of them
 - slice tool for piano roll
+- when a note is played, show the note as being depressed in the piano roll
 
 - recording automation
 - make knobs easier to tune (less sensitive)
@@ -75,6 +77,5 @@ Andrew Kelley's todo:
 - adding/removing steps to the beat+bassline editor is awkward
 - the 'add beat+bassline' button in the beat+bassline editor is misleading - I say we remove it and rely on the song editor to add beat+basslines
 - make it so that 3xosc notes don't max out
-- implement note detuning (used to be ctrl+click to access note detuning) (need some other intuitive way to access note detuning as ctrl, shift, and alt are all being used)
 - copy-pasted automation patterns have to be manually linked back to their knob for some reason
 - fix memory leaks
