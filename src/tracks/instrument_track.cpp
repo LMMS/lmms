@@ -180,7 +180,8 @@ void instrumentTrack::processAudioBuffer( sampleFrame * _buf,
 								_frames,
 			( _n != NULL ) ? _n->offset() : 0,
 			panningToVolumeVector( 
-						(int) m_panningModel.value() + _n->getPanning(),
+						(int) m_panningModel.value() +
+								  ( _n != NULL ) ? _n->getPanning() : 0,
 						v_scale ),
 							 &m_audioPort );
 }

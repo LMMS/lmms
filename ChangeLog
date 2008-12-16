@@ -15,6 +15,10 @@
 	- shift drag on an unselected note didn't work (FIXED)
 	- added a note detuning tool
 	- fixed mouse cursor glitch when mousing over notes
+	
+	* src/tracks/instrument_track.cpp:
+	fixed crash in processAudioBuffer when notePlayHandle was NULL
+	(crashed certain instruments like sf2)
 
 2008-12-14	Andrew Kelley	<superjoe30/at/gmail/dot/com>
 
