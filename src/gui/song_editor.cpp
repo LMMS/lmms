@@ -318,14 +318,12 @@ void songEditor::stop( void )
 
 void songEditor::keyPressEvent( QKeyEvent * _ke )
 {
-	if( /*_ke->modifiers() & Qt::ShiftModifier*/
-		engine::getMainWindow()->isShiftPressed() == TRUE &&
+	if( _ke->modifiers() & Qt::ShiftModifier &&
 						_ke->key() == Qt::Key_Insert )
 	{
 		m_s->insertBar();
 	}
-	else if(/* _ke->modifiers() & Qt::ShiftModifier &&*/
-			engine::getMainWindow()->isShiftPressed() == TRUE &&
+	else if( _ke->modifiers() & Qt::ShiftModifier &&
 						_ke->key() == Qt::Key_Delete )
 	{
 		m_s->removeBar();
@@ -381,7 +379,7 @@ void songEditor::paintEvent( QPaintEvent * _pe )
 
 void songEditor::wheelEvent( QWheelEvent * _we )
 {
-	if( engine::getMainWindow()->isCtrlPressed() == TRUE )
+	if( _we->modifiers() & Qt::ControlModifier )
 	{
 		if( _we->delta() > 0 )
 		{
@@ -405,7 +403,7 @@ void songEditor::wheelEvent( QWheelEvent * _we )
 		// and make sure, all TCO's are resized and relocated
 		realignTracks();
 	} 
-	else if( engine::getMainWindow()->isShiftPressed() == TRUE )
+	else if( _we->modifiers() & Qt::ShiftModifier )
 	{
 		m_leftRightScroll->setValue( m_leftRightScroll->value() -
 							_we->delta() / 30 );

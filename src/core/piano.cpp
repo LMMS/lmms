@@ -506,7 +506,7 @@ void pianoView::mousePressEvent( QMouseEvent * _me )
 		}
 		else
 		{
-			if( engine::getMainWindow()->isCtrlPressed() )
+			if( _me->modifiers() & Qt::ControlModifier )
 			{
 				new stringPairDrag( "automatable_model",
 					QString::number( m_piano->

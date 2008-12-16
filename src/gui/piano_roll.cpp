@@ -2919,7 +2919,7 @@ void pianoRoll::wheelEvent( QWheelEvent * _we )
 		m_timeLine->setPixelsPerTact( m_ppt );
 		update();
 	}
-	else if( engine::getMainWindow()->isShiftPressed()
+	else if( _we->modifiers() & Qt::ShiftModifier
 			 || _we->orientation() == Qt::Horizontal )
 	{
 		m_leftRightScroll->setValue( m_leftRightScroll->value() -

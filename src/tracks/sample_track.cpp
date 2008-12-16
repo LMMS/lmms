@@ -297,8 +297,8 @@ void sampleTCOView::dropEvent( QDropEvent * _de )
 void sampleTCOView::mousePressEvent( QMouseEvent * _me )
 {
 	if( _me->button() == Qt::LeftButton &&
-		engine::getMainWindow()->isCtrlPressed() &&
-		engine::getMainWindow()->isShiftPressed() )
+		_me->modifiers() & Qt::ControlModifier &&
+		_me->modifiers() & Qt::ShiftModifier )
 	{
 		m_tco->toggleRecord();
 	}

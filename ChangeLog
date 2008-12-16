@@ -1,3 +1,24 @@
+2008-12-16	Andrew Kelley	<superjoe30/at/gmail/dot/com>
+	
+	* src/gui/piano_roll.cpp:
+	* src/gui/automatable_model_view.cpp:
+	* src/gui/song_editor.cpp:
+	* src/gui/widgets/combobox.cpp:
+	* src/gui/widgets/knob.cpp:
+	* src/gui/widgets/automatable_slider.cpp:
+	* src/gui/widgets/lcd_spinbox.cpp:
+	* src/gui/widgets/fader.cpp:
+	* src/gui/widgets/automatable_button.cpp:
+	* src/gui/automation_editor.cpp:
+	* src/tracks/sample_track.cpp:
+	* src/tracks/pattern.cpp:
+	* src/core/timeline.cpp:
+	* src/core/track.cpp:
+	* src/core/piano.cpp:
+	changed modifier detection from mainWindow::isCtrlPressed etc to
+	Qt framework detection. Fixes a bunch of little glitches and
+	enables horizontal scroll wheels.
+
 2008-12-15	Paul Giblock <drfaygo/at/gmail/dot/com>
 	
 	* src/core/track.cpp:

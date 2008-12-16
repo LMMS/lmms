@@ -336,7 +336,7 @@ void timeLine::mouseMoveEvent( QMouseEvent * _me )
 		case MoveLoopEnd:
 		{
 			const Uint8 i = m_action - MoveLoopBegin;
-			if( engine::getMainWindow()->isCtrlPressed() == TRUE )
+			if( _me->modifiers() & Qt::ControlModifier )
 			{
 				// no ctrl-press-hint when having ctrl pressed
 				delete m_hint;

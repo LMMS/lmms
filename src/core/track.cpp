@@ -543,7 +543,7 @@ void trackContentObjectView::mousePressEvent( QMouseEvent * _me )
 		// if rubberband is active, we can be selected
 		if( !m_trackView->getTrackContainerView()->rubberBandActive() )
 		{
-			if( engine::getMainWindow()->isCtrlPressed() == true )
+			if( _me->modifiers() & Qt::ControlModifier )
 			{
 				setSelected( !isSelected() );
 			}
@@ -559,13 +559,13 @@ void trackContentObjectView::mousePressEvent( QMouseEvent * _me )
 		}
 		return;
 	}
-	else if( engine::getMainWindow()->isShiftPressed() == true )
+	else if( _me->modifiers() & Qt::ShiftModifier )
 	{
 		// add/remove object to/from selection
 		selectableObject::mousePressEvent( _me );
 	}
 	else if( _me->button() == Qt::LeftButton &&
-			engine::getMainWindow()->isCtrlPressed() == true )
+			_me->modifiers() & Qt::ControlModifier )
 	{
 		// start drag-action
 		multimediaProject mmp( multimediaProject::DragNDropData );
@@ -620,7 +620,7 @@ void trackContentObjectView::mousePressEvent( QMouseEvent * _me )
 	}
 	else if( _me->button() == Qt::MidButton )
 	{
-		if( engine::getMainWindow()->isCtrlPressed() )
+		if( _me->modifiers() & Qt::ControlModifier )
 		{
 			m_tco->toggleMute();
 		}
@@ -649,7 +649,7 @@ void trackContentObjectView::mousePressEvent( QMouseEvent * _me )
  */
 void trackContentObjectView::mouseMoveEvent( QMouseEvent * _me )
 {
-	if( engine::getMainWindow()->isCtrlPressed() == true )
+	if( _me->modifiers() & Qt::ControlModifier )
 	{
 		delete m_hint;
 		m_hint = NULL;
@@ -663,8 +663,8 @@ void trackContentObjectView::mouseMoveEvent( QMouseEvent * _me )
 			m_trackView->getTrackContainerView()->currentPosition()+
 				static_cast<int>( x * midiTime::ticksPerTact() /
 									ppt ) );
-		if( engine::getMainWindow()->isCtrlPressed() ==
-					false && _me->button() == Qt::NoButton )
+		if( _me->modifiers() & Qt::ControlModifier
+		   && _me->button() == Qt::NoButton )
 		{
 			t = t.toNearestTact();
 		}
@@ -716,8 +716,8 @@ void trackContentObjectView::mouseMoveEvent( QMouseEvent * _me )
 		midiTime t = qMax( midiTime::ticksPerTact(),
 				static_cast<int>( _me->x() *
 					midiTime::ticksPerTact() / ppt ) );
-		if( engine::getMainWindow()->isCtrlPressed() ==
-					false && _me->button() == Qt::NoButton )
+		if( _me->modifiers() & Qt::ControlModifier 
+		   && _me->button() == Qt::NoButton )
 		{
 			t = t.toNearestTact();
 		}
@@ -1106,7 +1106,7 @@ void trackContentWidget::mousePressEvent( QMouseEvent * _me )
 	{
 		QWidget::mousePressEvent( _me );
 	}
-	else if( engine::getMainWindow()->isShiftPressed() == true )
+	else if( _me->modifiers() & Qt::ShiftModifier )
 	{
 		QWidget::mousePressEvent( _me );
 	}
@@ -1408,7 +1408,7 @@ trackOperationsWidget::~trackOperationsWidget()
 void trackOperationsWidget::mousePressEvent( QMouseEvent * _me )
 {
 	if( _me->button() == Qt::LeftButton &&
-		engine::getMainWindow()->isCtrlPressed() == true &&
+		_me->modifiers() & Qt::ControlModifier &&
 			m_trackView->getTrack()->type() != track::BBTrack )
 	{
 		multimediaProject mmp( multimediaProject::DragNDropData );
@@ -2307,7 +2307,7 @@ void trackView::mousePressEvent( QMouseEvent * _me )
 	}
 	else if( _me->button() == Qt::LeftButton )
 	{
-		if( engine::getMainWindow()->isShiftPressed() == true )
+		if( _me->modifiers() & Qt::ShiftModifier )
 		{
 			m_action = ResizeTrack;
 			QCursor::setPos( mapToGlobal( QPoint( _me->x(),

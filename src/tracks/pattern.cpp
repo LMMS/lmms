@@ -1052,7 +1052,7 @@ void patternView::mousePressEvent( QMouseEvent * _me )
 	}
 	else if( m_pat->m_frozenPattern != NULL &&
 					_me->button() == Qt::LeftButton &&
-			engine::getMainWindow()->isShiftPressed() == true )
+					_me->modifiers() & Qt::ShiftModifier )
 	{
 		QString s;
 		new stringPairDrag( "sampledata",

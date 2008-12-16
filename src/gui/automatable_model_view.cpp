@@ -144,7 +144,7 @@ void automatableModelView::setModel( model * _model, bool _old_model_valid )
 void automatableModelView::mousePressEvent( QMouseEvent * _me )
 {
 	if( _me->button() == Qt::LeftButton &&
-			engine::getMainWindow()->isCtrlPressed() == TRUE )
+			_me->modifiers() & Qt::ControlModifier )
 	{
 		new stringPairDrag( "automatable_model",
 					QString::number( modelUntyped()->id() ),
