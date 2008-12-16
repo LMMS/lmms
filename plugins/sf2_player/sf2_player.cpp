@@ -41,6 +41,7 @@
 #include "patches_dialog.h"
 #include "tooltip.h"
 #include "lcd_spinbox.h"
+#include "panning.h"
 
 #undef SINGLE_SOURCE_COMPILE
 #include "embed.cpp"
@@ -79,6 +80,8 @@ sf2Instrument::sf2Instrument( instrumentTrack * _instrument_track ) :
 	m_fontId( 0 ),
 	m_filename( "" ),
 	m_lastMidiPitch( 8192 ),
+	m_channel( 1 ),
+	m_maxChannels( 5 ),
 	m_bankNum( 0, 0, 999, this, tr("Bank") ),
 	m_patchNum( 0, 0, 127, this, tr("Patch") ),
 	m_gain( 1.0f, 0.0f, 5.0f, 0.01f, this, tr( "Gain" ) ),
@@ -387,7 +390,7 @@ void sf2Instrument::updatePatch( void )
 {
 	if( m_bankNum.value() >= 0 && m_patchNum.value() >= 0 )
 	{
-		fluid_synth_program_select( m_synth, 1, m_fontId,
+		fluid_synth_program_select( m_synth, m_channel, m_fontId,
 				m_bankNum.value(), m_patchNum.value() );
 	}
 }
@@ -573,8 +576,21 @@ void sf2Instrument::playNote( notePlayHandle * _n, sampleFrame * )
 		_n->m_pluginData = new int( midiNote );
 
 		m_synthMutex.lock();
-		fluid_synth_noteon( m_synth, 1, midiNote,
+		
+		short ctrl = 0x0A; // PAN_MSB
+		int pan = 0 + 
+			  ( (float)( _n->getPanning() - PanningLeft ) ) / 
+			  ( (float)( PanningRight - PanningLeft ) ) *
+			  ( (float)( 127 - 0 ) );
+		fluid_synth_cc( m_synth, m_channel, ctrl, pan );
+		fluid_synth_noteon( m_synth, m_channel, midiNote,
 							_n->getMidiVelocity() );
+		_n->setChannel( m_channel );
+		if( ++m_channel > m_maxChannels )
+		{
+			m_channel = 1;
+		}
+		
 		m_synthMutex.unlock();
 
 		m_notesRunningMutex.lock();
@@ -594,7 +610,7 @@ void sf2Instrument::play( sampleFrame * _working_buffer )
 	if( m_lastMidiPitch != getInstrumentTrack()->midiPitch() )
 	{
 		m_lastMidiPitch = getInstrumentTrack()->midiPitch();
-		fluid_synth_pitch_bend( m_synth, 1, m_lastMidiPitch );
+		fluid_synth_pitch_bend( m_synth, m_channel, m_lastMidiPitch );
 	}
 
 	if( m_internalSampleRate < engine::getMixer()->processingSampleRate() &&
@@ -648,7 +664,7 @@ void sf2Instrument::deleteNotePluginData( notePlayHandle * _n )
 	if( n <= 0 )
 	{
 		m_synthMutex.lock();
-		fluid_synth_noteoff( m_synth, 1, *midiNote );
+		fluid_synth_noteoff( m_synth, _n->channel(), *midiNote );
 		m_synthMutex.unlock();
 	}
 

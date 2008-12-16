@@ -56,7 +56,7 @@ public:
 	virtual ~notePlayHandle();
 
 	virtual void setVolume( const volume _volume = DefaultVolume );
-
+	
 	int getMidiVelocity( void ) const;
 
 	const float & frequency( void ) const
@@ -250,6 +250,15 @@ public:
 		m_patternIndex = _i;
 	}
 #endif
+	inline int channel( void ) const
+	{
+		return m_channel;
+	}
+	inline void setChannel( int _channel )
+	{
+		m_channel = _channel;
+	}
+
 
 
 private:
@@ -274,7 +283,7 @@ private:
 		float m_value;
 
 	} ;
-
+	
 
 	instrumentTrack * m_instrumentTrack;	// needed for calling
 					// instrumentTrack::playNote
@@ -300,6 +309,9 @@ private:
 #ifdef LMMS_SINGERBOT_SUPPORT
 	int m_patternIndex;		// position among relevant notes
 #endif
+	// which channel this note was played on
+	// needed for some plugins like SF2
+	int m_channel;
 
 	// tempo reaction
 	bpm_t m_origTempo;		// original tempo
