@@ -745,7 +745,7 @@ void automationEditor::mousePressEvent( QMouseEvent * _me )
 							m_editMode == DRAW )
 			{
 				// Connect the dots
-				if( engine::getMainWindow()->isShiftPressed() )
+				if( _me->modifiers() & Qt::ShiftModifier )
 				{
 					drawLine( m_drawLastTick,
 							m_drawLastLevel,
@@ -1612,7 +1612,7 @@ void automationEditor::resizeEvent( QResizeEvent * )
 void automationEditor::wheelEvent( QWheelEvent * _we )
 {
 	_we->accept();
-	if( engine::getMainWindow()->isCtrlPressed() == TRUE )
+	if( _we->modifiers() & Qt::ControlModifier )
 	{
 		if( _we->delta() > 0 )
 		{
@@ -1632,7 +1632,8 @@ void automationEditor::wheelEvent( QWheelEvent * _we )
 		m_timeLine->setPixelsPerTact( m_ppt );
 		update();
 	}
-	else if( engine::getMainWindow()->isShiftPressed() )
+	else if( _we->modifiers() & Qt::ShiftModifier 
+			|| _we->orientation() == Qt::Horizontal )
 	{
 		m_leftRightScroll->setValue( m_leftRightScroll->value() -
 							_we->delta() * 2 / 15 );

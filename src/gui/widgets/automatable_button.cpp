@@ -115,7 +115,7 @@ void automatableButton::contextMenuEvent( QContextMenuEvent * _me )
 void automatableButton::mousePressEvent( QMouseEvent * _me )
 {
 	if( _me->button() == Qt::LeftButton &&
-			engine::getMainWindow()->isCtrlPressed() == FALSE )
+			! ( _me->modifiers() & Qt::ControlModifier ) )
 	{
 		if( isCheckable() )
 		{

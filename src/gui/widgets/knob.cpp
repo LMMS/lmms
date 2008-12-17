@@ -439,8 +439,8 @@ void knob::dropEvent( QDropEvent * _de )
 void knob::mousePressEvent( QMouseEvent * _me )
 {
 	if( _me->button() == Qt::LeftButton &&
-			engine::getMainWindow()->isCtrlPressed() == FALSE &&
-			engine::getMainWindow()->isShiftPressed() == FALSE )
+			! ( _me->modifiers() & Qt::ControlModifier ) &&
+			! ( _me->modifiers() & Qt::ShiftModifier ) )
 	{
 		model()->prepareJournalEntryFromOldVal();
 
