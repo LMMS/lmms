@@ -35,7 +35,7 @@
 class pixmapLoader;
 
 
-class comboBoxModel : public intModel
+class EXPORT comboBoxModel : public intModel
 {
 	Q_OBJECT
 public:

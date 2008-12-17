@@ -1,5 +1,13 @@
 2008-12-17	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* cmake/modules/FindSTK.cmake:
+	* include/combobox_model.h:
+	* include/combobox.h:
+	* src/core/config_mgr.cpp:
+	* data/CMakeLists.txt:
+	* CMakeLists.txt:
+	added STK support to win32 version of LMMS
+
 	* data/locale/ja.ts:
 	* data/locale/ja.qm:
 	added Japanese localization files by

@@ -34,7 +34,7 @@
 
 
 
-class comboBox : public QWidget, public intModelView
+class EXPORT comboBox : public QWidget, public intModelView
 {
 	Q_OBJECT
 public:
