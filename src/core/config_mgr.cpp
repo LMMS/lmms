@@ -314,9 +314,13 @@ void configManager::loadConfigFile( void )
 	}
 
 #ifdef LMMS_HAVE_STK
-	if( m_stkDir == "" )
+	if( m_stkDir == "" || m_stkDir == QDir::separator() )
 	{
+#ifdef LMMS_BUILD_WIN32
+		m_stkDir = m_dataDir + "stk/rawwaves/";
+#else
 		m_stkDir = "/usr/share/stk/rawwaves/";
+#endif
 	}
 #endif
 

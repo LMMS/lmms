@@ -1,3 +1,13 @@
+2008-12-17	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* cmake/modules/FindSTK.cmake:
+	* include/combobox_model.h:
+	* include/combobox.h:
+	* src/core/config_mgr.cpp:
+	* data/CMakeLists.txt:
+	* CMakeLists.txt:
+	added STK support to win32 version of LMMS
+
 2008-12-16	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* plugins/sf2_player/sf2_player.cpp:
