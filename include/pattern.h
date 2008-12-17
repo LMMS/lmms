@@ -68,13 +68,14 @@ public:
 	virtual midiTime length( void ) const;
 	midiTime beatPatternLength( void ) const;
 
+	// note management
 	note * addNote( const note & _new_note, const bool _quant_pos = true );
 
 	void removeNote( const note * _note_to_del );
 
 	note * rearrangeNote( const note * _note_to_proc,
 						const bool _quant_pos = true );
-
+	void rearrangeAllNotes( void );
 	void clearNotes( void );
 
 	inline const noteVector & notes( void )
@@ -132,6 +133,10 @@ public:
 
 
 	using model::dataChanged;
+		
+		
+	void printNotes( void ); // for debugging purposes
+	
 
 
 protected:

@@ -40,6 +40,11 @@
 note::note( const midiTime & _length, const midiTime & _pos,
 		int _key, volume _volume, panning _panning,
 						detuningHelper * _detuning ) :
+	m_selected( false ),
+	m_oldKey( tLimit( _key, 0, NumKeys ) ),
+	m_oldPos( _pos ),
+	m_oldLength( _length ),
+	m_isPlaying( false ),
 	m_key( tLimit( _key, 0, NumKeys ) ),
 	m_volume( tLimit( _volume, MinVolume, MaxVolume ) ),
 	m_panning( tLimit( _panning, PanningLeft, PanningRight ) ),
@@ -48,7 +53,6 @@ note::note( const midiTime & _length, const midiTime & _pos,
 {
 	//saveJournallingState( FALSE );
 //	setJournalling( FALSE );
-
 	if( _detuning )
 	{
 		m_detuning = sharedObject::ref( _detuning );
@@ -65,6 +69,11 @@ note::note( const midiTime & _length, const midiTime & _pos,
 
 note::note( const note & _note ) :
 	serializingObject( _note ),
+	m_selected( _note.m_selected ),
+	m_oldKey( _note.m_oldKey ),
+	m_oldPos( _note.m_oldPos ),
+	m_oldLength( _note.m_oldLength ),	
+	m_isPlaying( _note.m_isPlaying ),
 	m_key( _note.m_key),
 	m_volume( _note.m_volume ),
 	m_panning( _note.m_panning ),

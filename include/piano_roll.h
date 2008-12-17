@@ -3,6 +3,7 @@
  *                can set and edit notes in an easy way
  *
  * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008 Andrew Kelley <superjoe30/at/gmail/dot/com>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -38,6 +39,9 @@
 class QPainter;
 class QPixmap;
 class QScrollBar;
+class QString;
+class QMenu;
+class QSignalMapper;
 
 class comboBox;
 class notePlayHandle;
@@ -54,17 +58,17 @@ public:
 
 	inline bool isRecording( void ) const
 	{
-		return( m_recording );
+		return m_recording;
 	}
 
 	inline const pattern * currentPattern( void ) const
 	{
-		return( m_pattern );
+		return m_pattern;
 	}
 
 	inline bool validPattern( void ) const
 	{
-		return( m_pattern != NULL );
+		return m_pattern != NULL;
 	}
 
 	int quantization( void ) const;
@@ -75,7 +79,7 @@ public:
 
 	inline virtual QString nodeName( void ) const
 	{
-		return( "pianoroll" );
+		return "pianoroll";
 	}
 
 
@@ -85,20 +89,16 @@ protected:
 	virtual void keyReleaseEvent( QKeyEvent * _ke );
 	virtual void leaveEvent( QEvent * _e );
 	virtual void mousePressEvent( QMouseEvent * _me );
+	virtual void mouseDoubleClickEvent( QMouseEvent * _me );
 	virtual void mouseReleaseEvent( QMouseEvent * _me );
 	virtual void mouseMoveEvent( QMouseEvent * _me );
 	virtual void paintEvent( QPaintEvent * _pe );
 	virtual void resizeEvent( QResizeEvent * _re );
 	virtual void wheelEvent( QWheelEvent * _we );
-#ifdef LMMS_BUILD_LINUX
-	virtual bool x11Event( XEvent * _xe );
-#endif
 
 	int getKey( int _y ) const;
 	static inline void drawNoteRect( QPainter & _p, int _x, int _y,
-					int  _width,
-					const bool _is_selected,
-					const bool _is_step_note );
+					int  _width, note * _n );
 	void removeSelection( void );
 	void selectAll( void );
 	void getSelectedNotes( noteVector & _selected_notes );
@@ -118,7 +118,7 @@ protected slots:
 	void drawButtonToggled( void );
 	void eraseButtonToggled( void );
 	void selectButtonToggled( void );
-	void moveButtonToggled( void );
+	void detuneButtonToggled( void );
 
 	void copySelectedNotes( void );
 	void cutSelectedNotes( void );
@@ -129,6 +129,8 @@ protected slots:
 
 	void zoomingChanged( void );
 	void quantizeChanged( void );
+		
+	void changeNoteEditMode( int i );
 
 
 private:
@@ -138,9 +140,8 @@ private:
 		ModeDraw,
 		ModeErase,
 		ModeSelect,
-		ModeMove,
 		ModeOpen
-	} ;
+	};
 
 	enum actions
 	{
@@ -148,26 +149,54 @@ private:
 		ActionMoveNote,
 		ActionResizeNote,
 		ActionSelectNotes,
-		ActionMoveSelection,
-		ActionChangeNoteVolume,
-		ActionChangeNotePanning
-	} ;
+		ActionChangeNoteProperty,
+		ActionResizeNoteEditArea
+	};
+	
+	enum noteEditMode
+	{
+		NoteEditVolume,
+		NoteEditPanning,
+		NoteEditCount // make sure this one is always last
+	};
 
 	enum pianoRollKeyTypes
 	{
 		PR_WHITE_KEY_SMALL,
 		PR_WHITE_KEY_BIG,
 		PR_BLACK_KEY
-	} ;
+	};
 
+	QVector<QString> m_nemStr; // gui names of each edit mode
+	QMenu * m_noteEditMenu; // when you right click below the key area
+	QSignalMapper * m_signalMapper; // to keep track of edit mode events
 
 	pianoRoll( void );
 	pianoRoll( const pianoRoll & );
 	virtual ~pianoRoll();
 
 	midiTime newNoteLen( void ) const;
-
-
+	
+	void shiftPos(int amount);
+	void shiftSemiTone(int amount);
+	bool isSelection() const;
+	int selectionCount() const;
+	void testPlayNote( note * n );
+	void testPlayKey( int _key, int _vol, int _pan );
+	void pauseTestNotes( bool _pause = true );
+	
+	inline int noteEditTop() const;
+	inline int keyAreaBottom() const;
+	inline int noteEditBottom() const;
+	inline int keyAreaTop() const;
+	inline int noteEditRight() const;
+	inline int noteEditLeft() const;
+	
+	void dragNotes( int x, int y, bool alt );
+		
+	static const int cm_scrollAmtHoriz = 10;
+	static const int cm_scrollAmtVert = 1;
+			
 	static QPixmap * s_whiteKeyBigPm;
 	static QPixmap * s_whiteKeySmallPm;
 	static QPixmap * s_blackKeyPm;
@@ -190,8 +219,8 @@ private:
 	toolButton * m_drawButton;
 	toolButton * m_eraseButton;
 	toolButton * m_selectButton;
-	toolButton * m_moveButton;
-
+	toolButton * m_detuneButton;
+		
 	toolButton * m_cutButton;
 	toolButton * m_copyButton;
 	toolButton * m_pasteButton;
@@ -215,30 +244,51 @@ private:
 
 	note * m_currentNote;
 	actions m_action;
+	noteEditMode m_noteEditMode;
 
 	Uint32 m_selectStartTick;
 	int m_selectedTick;
 	int m_selectStartKey;
 	int m_selectedKeys;
+	
+	// boundary box around all selected notes when dragging
+	int m_moveBoundaryLeft;
+	int m_moveBoundaryTop;
+	int m_moveBoundaryRight;
+	int m_moveBoundaryBottom;
+	
+	// remember where the scrolling started when dragging so that
+	// we can handle dragging while scrolling with arrow keys
+	int m_mouseDownKey;
+	int m_mouseDownTick;
+	
+	// remember the last x and y of a mouse movement
+	int m_lastMouseX;
+	int m_lastMouseY;
+	
+	// x,y of when the user starts a drag
+	int m_moveStartX;
+	int m_moveStartY;
 
-	int m_moveStartKey;
-	int m_moveStartTick;
-	int m_moveXOffset;
-
+	int m_oldNotesEditHeight;
 	int m_notesEditHeight;
 	int m_ppt;
 	int m_totalKeysToScroll;
 
+	// remember these values to use them 
+	// for the next note that is set
 	midiTime m_lenOfNewNotes;
+	volume m_lastNoteVolume;
+	panning m_lastNotePanning;
 
 	int m_startKey;			// first key when drawing
 	int m_lastKey;
 
-	noteVector m_selNotesForMove;
-
-
 	editModes m_editMode;
-
+	editModes m_ctrlMode; // mode they were in before they hit ctrl
+		
+	bool m_mouseDownLeft; //true if left click is being held down
+	bool m_mouseDownRight; //true if right click is being held down
 
 	timeLine * m_timeLine;
 	bool m_scrollBack;
@@ -249,8 +299,10 @@ private:
 	bool mouseOverNote( void );
 	note * noteUnderMouse( void );
 	noteVector::const_iterator noteIteratorUnderMouse( void );
-
-
+	
+	// turn a selection rectangle into selected notes
+	void computeSelectedNotes( bool shift ); 
+	void clearSelectedNotes( void );
 
 	friend class engine;
 

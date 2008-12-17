@@ -1,5 +1,5 @@
 /*
- * panning.h - declaration of some types, concerning the
+ * panning_constants.h - declaration of some constants, concerning the
  *             panning of a note
  *
  * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
@@ -23,30 +23,12 @@
  *
  */
 
-#ifndef _PANNING_H
-#define _PANNING_H
+#ifndef _PANNING_CONSTANTS_H
+#define _PANNING_CONSTANTS_H
 
-#include "lmms_basics.h"
-#include "volume.h"
-#include "templates.h"
-#include "panning_constants.h"
-#include "midi.h"
-
-inline stereoVolumeVector panningToVolumeVector( panning _p,
-							float _scale = 1.0f )
-{
-	stereoVolumeVector v = { { _scale, _scale } };
-	const float pf = _p / 100.0f;
-	v.vol[_p >= PanningCenter ? 0 : 1] *= 1.0f - qAbs<float>( pf );
-	return v;
-}
-
-inline Sint16 panningToMidi( panning _p )
-{
-	return MidiMinPanning + 
-			  ( (float)( _p - PanningLeft ) ) / 
-			  ( (float)( PanningRight - PanningLeft ) ) *
-			  ( (float)( MidiMaxPanning - MidiMinPanning ) );
-}
+const panning PanningRight = ( 0 + 100 );
+const panning PanningLeft = - PanningRight;
+const panning PanningCenter = 0;
+const panning DefaultPanning = PanningCenter;
 
 #endif

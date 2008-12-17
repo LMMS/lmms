@@ -90,7 +90,21 @@ public:
 		detuningHelper * _detuning = NULL );
 	note( const note & _note );
 	virtual ~note();
-
+	
+	// used by GUI
+	inline void setSelected( const bool _selected ){ m_selected = _selected; }
+	inline void setOldKey( const int _oldKey ){ m_oldKey = _oldKey; }
+	inline void setOldPos( const midiTime & _oldPos ){ m_oldPos = _oldPos; }
+	inline void setOldLength( const midiTime & _oldLength )
+	{
+		m_oldLength = _oldLength;
+	}
+	inline void setIsPlaying( const bool _isPlaying )
+	{
+		m_isPlaying = _isPlaying;
+	}
+	
+	
 	void setLength( const midiTime & _length );
 	void setPos( const midiTime & _pos );
 	void setKey( const int _key );
@@ -98,6 +112,38 @@ public:
 	void setPanning( const panning _panning = DefaultPanning );
 	void quantizeLength( const int _q_grid );
 	void quantizePos( const int _q_grid );
+
+	static inline bool lessThan(note * &lhs, note * &rhs)
+	{
+		// function to compare two notes - must be called explictly when
+		// using qSort
+		return (bool) ((int) ( *lhs ).pos() < (int) ( *rhs ).pos());
+	}
+		
+	inline bool selected( void ) const
+	{
+		return m_selected;
+	}
+	
+	inline int oldKey( void ) const
+	{
+		return m_oldKey;
+	}
+	
+	inline midiTime oldPos( void ) const
+	{
+		return m_oldPos;
+	}
+	
+	inline midiTime oldLength( void ) const
+	{
+		return m_oldLength;
+	}
+		
+	inline bool isPlaying( void ) const
+	{
+		return m_isPlaying;
+	}
 
 	inline midiTime endPos( void ) const
 	{
@@ -177,7 +223,14 @@ private:
 		ChangePosition
 	} ;*/
 
-
+	
+	// for piano roll editing
+	bool m_selected; 
+	int m_oldKey;
+	midiTime m_oldPos;
+	midiTime m_oldLength;
+	bool m_isPlaying;
+	
 	int m_key;
 	volume m_volume;
 	panning m_panning;
