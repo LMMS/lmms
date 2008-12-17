@@ -1,5 +1,9 @@
 2008-12-17	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* CMakeLists.txt:
+	* README:
+	made 0.4.1 release
+
 	* cmake/modules/FindSTK.cmake:
 	* include/combobox_model.h:
 	* include/combobox.h:
