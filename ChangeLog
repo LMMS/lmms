@@ -5,6 +5,48 @@
 	added Japanese localization files by
 	Keishi Suenaga <skeishi/at/yahoo/dot/co/dot/jp>
 
+	* include/instrument_track.h:
+	* src/tracks/instrument_track.cpp:
+	backport: do not create a instrument track window just for calling
+	dragEnterEvent() - use a static method instead
+
+2008-12-17	Paul Giblock <drfaygo/at/gmail/dot/com>
+
+	* include/track.h:
+	* src/core/track.cpp:
+	backport: cache background per-object instead of per-class
+
+2008-12-17	Andrew Kelley	<superjoe30/at/gmail/dot/com>
+
+	* AUTHORS:
+	backport: added Andrew Kelley as author
+
+	* src/core/timeline.cpp:
+	* src/gui/automatable_model_view.cpp:
+	* src/gui/automation_editor.cpp:
+	* src/gui/piano_roll.cpp:
+	* src/gui/widgets/automatable_button.cpp:
+	* src/gui/widgets/automatable_slider.cpp:
+	* src/gui/widgets/combobox.cpp:
+	* src/gui/widgets/fader.cpp:
+	* src/gui/widgets/knob.cpp:
+	* src/gui/widgets/lcd_spinbox.cpp:
+	* src/tracks/sample_track.cpp:
+	backport: changed modifier detection from mainWindow::isCtrlPressed
+	etc to Qt framework detection. Fixes a bunch of little glitches and
+	enables horizontal scroll wheels.
+
+	* include/midi.h:
+	* include/note.h:
+	* include/panning.h:
+	* include/panning_constants.h:
+	* include/pattern.h:
+	* include/piano_roll.h:
+	* src/core/note.cpp:
+	* src/core/piano.cpp:
+	* src/tracks/pattern.cpp:
+	backport: added support for panning editing of notes
+
 2008-12-14	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* CMakeLists.txt:
