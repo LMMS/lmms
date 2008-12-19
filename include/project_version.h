@@ -47,7 +47,7 @@ public:
 
 inline bool operator<( const projectVersion & _v1, const char * _str )
 {
-	return( projectVersion::compare( _v1, projectVersion( _str ) ) < 0 );
+	return projectVersion::compare( _v1, projectVersion( _str ) ) < 0;
 }
 
 
