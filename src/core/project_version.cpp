@@ -42,7 +42,7 @@ int projectVersion::compare( const projectVersion & _v1,
 	n2 = _v2.section( '.', 0, 0 ).toInt();
 	if( n1 != n2 )
 	{
-		return( n1 - n2 );
+		return n1 - n2;
 	}
 
 	// Minor
@@ -50,7 +50,7 @@ int projectVersion::compare( const projectVersion & _v1,
 	n2 = _v2.section( '.', 1, 1 ).toInt();
 	if( n1 != n2 )
 	{
-		return( n1 - n2 );
+		return n1 - n2;
 	}
 
 	// Release
@@ -58,12 +58,24 @@ int projectVersion::compare( const projectVersion & _v1,
 	n2 = _v2.section( '.', 2 ).section( '-', 0, 0 ).toInt();
 	if( n1 != n2 )
 	{
-		return( n1 - n2 );
+		return n1 - n2;
 	}
 
 	// Build
-	return( QString::compare( _v1.section( '.', 2 ).section( '-', 1 ),
-				_v2.section( '.', 2 ).section( '-', 1 ) ) );
+	const QString b1 = _v1.section( '.', 2 ).section( '-', 1 );
+	const QString b2 = _v2.section( '.', 2 ).section( '-', 1 );
+
+	// make sure 0.x.y > 0.x.y-patch
+	if( b1.isEmpty() )
+	{
+		return 1;
+	}
+	if( b2.isEmpty() )
+	{
+		return -1;
+	}
+
+	return QString::compare( b1, b2 );
 }
 
 
