@@ -159,7 +159,6 @@ vstPlugin::vstPlugin( const QString & _plugin ) :
 
 vstPlugin::~vstPlugin()
 {
-	delete pluginWidget();
 }
 
 

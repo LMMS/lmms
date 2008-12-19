@@ -1,3 +1,18 @@
+2008-12-19	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* plugins/vst_base/vst_plugin.h:
+	* plugins/vst_base/vst_plugin.cpp:
+	* plugins/vst_effect/vst_effect_control_dialog.cpp:
+	* plugins/vst_effect/vst_effect.cpp:
+	* plugins/vestige/vestige.cpp:
+	fixed crash when adding VST effects
+
+	* include/project_version.h:
+	* src/core/project_version.cpp:
+	fixed broken version comparing which indicated 0.x.y to be less than
+	0.x.y-patch - fixes messed up projects when loading files created
+	with LMMS 0.4.0
+
 2008-12-17	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* cmake/modules/FindSTK.cmake:

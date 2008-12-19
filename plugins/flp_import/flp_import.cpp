@@ -1717,12 +1717,12 @@ p->putValue( jt->pos, value, false );
 				break;
 		}
 		if( effName.isEmpty() || it->fxChannel < 0 ||
-							it->fxChannel > 64 )
+						it->fxChannel > NumFxChannels )
 		{
 			continue;
 		}
 		effectChain * ec = &engine::getFxMixer()->
-                                        getEffectChannel( it->fxChannel )->
+					getEffectChannel( it->fxChannel )->
                                                                 m_fxChain;
 		printf("adding %s to %d\n", effName.toAscii().constData(),
 								it->fxChannel );
