@@ -86,7 +86,7 @@ bool vstEffect::processAudioBuffer( sampleFrame * _buf, const fpp_t _frames )
 {
 	if( !isEnabled() || !isRunning () )
 	{
-		return( FALSE );
+		return false;
 	}
 
 	if( m_plugin )
@@ -180,9 +180,9 @@ extern "C"
 // neccessary for getting instance out of shared lib
 plugin * lmms_plugin_main( model * _parent, void * _data )
 {
-	return( new vstEffect( _parent,
+	return new vstEffect( _parent,
 		static_cast<const plugin::descriptor::subPluginFeatures::key *>(
-								_data ) ) );
+								_data ) );
 }
 
 }

@@ -74,9 +74,9 @@ public:
 	void setParameterDump( const QMap<QString, QString> & _pdump );
 
 
-	inline QWidget * pluginWidget( void )
+	inline QWidget * pluginWidget( bool _top_widget = true )
 	{
-		if( m_pluginWidget )
+		if( _top_widget && m_pluginWidget )
 		{
 			if( m_pluginWidget->parentWidget() )
 			{

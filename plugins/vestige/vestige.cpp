@@ -222,6 +222,10 @@ bool vestigeInstrument::handleMidiEvent( const midiEvent & _me,
 void vestigeInstrument::closePlugin( void )
 {
 	m_pluginMutex.lock();
+	if( m_plugin )
+	{
+		delete m_plugin->pluginWidget();
+	}
 	delete m_plugin;
 	m_plugin = NULL;
 	m_pluginMutex.unlock();
