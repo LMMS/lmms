@@ -1,5 +1,9 @@
 2008-12-19	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* CMakeLists.txt:
+	* README:
+	made 0.4.2 release
+
 	* plugins/vst_base/vst_plugin.h:
 	* plugins/vst_base/vst_plugin.cpp:
 	* plugins/vst_effect/vst_effect_control_dialog.cpp:
