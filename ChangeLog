@@ -1,3 +1,9 @@
+2008-12-22	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* plugins/flp_import/flp_import.cpp:
+	in FL_EffectChannel initialize isMuted member - fixes muted FX channels
+	when importing older FLP files
+
 2008-12-19	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* plugins/vst_base/vst_plugin.h:
