@@ -509,7 +509,8 @@ struct FL_EffectChannel
 {
 	FL_EffectChannel() :
 		name(),
-		volume( DefaultVolume )
+		volume( DefaultVolume ),
+		isMuted( false )
 	{
 	}
 
