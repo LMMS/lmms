@@ -35,6 +35,7 @@
 #include "engine.h"
 #include "embed.h"
 #include "main_window.h"
+#include "string_pair_drag.h"
 
 
 
@@ -117,6 +118,7 @@ void automatableButton::mousePressEvent( QMouseEvent * _me )
 	if( _me->button() == Qt::LeftButton &&
 			! ( _me->modifiers() & Qt::ControlModifier ) )
 	{
+        // User simply clicked, toggle if needed
 		if( isCheckable() )
 		{
 			toggle();
@@ -125,8 +127,23 @@ void automatableButton::mousePressEvent( QMouseEvent * _me )
 	}
 	else
 	{
-		automatableModelView::mousePressEvent( _me );
-		QPushButton::mousePressEvent( _me );
+        // Ctrl-clicked, need to prepare drag-drop
+        if( m_group )
+        {
+            // A group, we must get process it instead
+            automatableModelView* groupView = (automatableModelView*)m_group;
+            new stringPairDrag( "automatable_model",
+                        QString::number( groupView->modelUntyped()->id() ),
+                                QPixmap(), widget() );
+            // TODO: ^^ Maybe use a predefined icon instead of the button they happened to select
+            _me->accept();
+        }
+        else
+        {
+            // Otherwise, drag the standalone button
+            automatableModelView::mousePressEvent( _me );
+            QPushButton::mousePressEvent( _me );
+        }
 	}
 }
 
