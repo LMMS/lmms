@@ -1,3 +1,8 @@
+2009-01-25	Paul Giblock <drfaygo/at/gmail/dot/com>
+
+	* src/gui/widgets/knob.cpp:
+	Fix infinite recursion on Mac OSX
+
 2009-01-03	Paul Giblock <drfaygo/at/gmail/dot/com>
 
 	* src/gui/widgets/automatable_button.cpp:

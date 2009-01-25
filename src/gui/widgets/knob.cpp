@@ -474,7 +474,7 @@ void knob::mousePressEvent( QMouseEvent * _me )
 
 void knob::mouseMoveEvent( QMouseEvent * _me )
 {
-	if( m_buttonPressed == TRUE )
+	if( m_buttonPressed == TRUE && _me->pos() != m_origMousePos )
 	{
 		setPosition( _me->pos() );
 		emit sliderMoved( model()->value() );
