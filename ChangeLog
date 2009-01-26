@@ -1,5 +1,10 @@
 2009-01-25	Paul Giblock <drfaygo/at/gmail/dot/com>
 
+	* src/tracks/bb_track.cpp:
+	Integrate broken BB-clone bug from pitanga
+
+2009-01-25	Paul Giblock <drfaygo/at/gmail/dot/com>
+
 	* src/gui/widgets/knob.cpp:
 	Fix infinite recursion on Mac OSX
 
