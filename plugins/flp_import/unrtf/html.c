@@ -877,7 +877,7 @@ static const char* cp850 [] = {
 /* 0xff */  "&nbsp;",
 };
 #if 1 /* daved - 0.20.3 */
-static char * Greek[] =
+static const char * Greek[] =
 {
 /* 0x80 */  "&ccedil;",
 /* 0x81 */  "&uuml;",

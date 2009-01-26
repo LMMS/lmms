@@ -3,6 +3,11 @@
 	* src/gui/widgets/knob.cpp:
 	Fix infinite recursion on Mac OSX
 
+	* plugins/flp_import/unrtf/html.c:
+	* plugins/flp_import/unrtf/output.h:
+	* plugins/flp_import/unrtf/convert.c:
+	Avoid compile warnings
+
 2009-01-03	Paul Giblock <drfaygo/at/gmail/dot/com>
 
 	* src/gui/widgets/automatable_button.cpp:

@@ -2399,7 +2399,7 @@ static int cmd_ansi (Word *w, int align, char has_param, int param) {
  *=======================================================================*/
 
 static int cmd_ansicpg (Word *w, int align, char has_param, int param) {
-	int i;
+	unsigned int i;
 	for (i = 0; i < sizeof(codepages) / sizeof(CodepageInfo); i ++) {
 		charset_codepage = &codepages[i];
 		if (charset_codepage->cp == param) {

@@ -285,7 +285,7 @@ typedef struct {
 #if 1 /* daved 0.20.3 GREEK font support */
 	short greek_first_char;
 	short greek_last_char;
-	char **greek_translation_table;
+	const char **greek_translation_table;
 #endif
 
 	char *(*unisymbol_print) (unsigned short);
