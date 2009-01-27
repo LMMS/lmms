@@ -455,7 +455,7 @@ void bbTrack::loadTrackSpecificSettings( const QDomElement & _this )
 
 	if( _this.hasAttribute( "clonebbt" ) )
 	{
-		const int src = _this.attribute( "clonebb" ).toInt();
+		const int src = _this.attribute( "clonebbt" ).toInt();
 		const int dst = s_infoMap[this];
 		engine::getBBTrackContainer()->createTCOsForBB( dst );
 		trackContainer::trackList tl =

@@ -1,3 +1,18 @@
+2009-01-25	Paul Giblock <drfaygo/at/gmail/dot/com>
+
+	* src/tracks/bb_track.cpp:
+	Integrate broken BB-clone bug from pitanga
+
+2009-01-25	Paul Giblock <drfaygo/at/gmail/dot/com>
+
+	* src/gui/widgets/knob.cpp:
+	Fix infinite recursion on Mac OSX
+
+	* plugins/flp_import/unrtf/html.c:
+	* plugins/flp_import/unrtf/output.h:
+	* plugins/flp_import/unrtf/convert.c:
+	Avoid compile warnings
+
 2008-12-22	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* CMakeLists.txt:
