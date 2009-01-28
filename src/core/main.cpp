@@ -4,7 +4,7 @@
  * main.cpp - just main.cpp which is starting up app...
  *
  * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -55,12 +55,14 @@
 #include "embed.h"
 #include "engine.h"
 #include "import_filter.h"
-#include "lmms_style.h"
 #include "main_window.h"
 #include "project_renderer.h"
 #include "song.h"
 #include "basic_ops.h"
 
+// FIXME Make a factory class for this (or hide it behind engine)
+#include "lmms_style.h"
+#include "classic_style.h"
 
 #warning TODO: move somewhere else
 static inline QString baseName( const QString & _file )
@@ -367,7 +369,10 @@ int main( int argc, char * * argv )
 	if( render_out.isEmpty() && file_to_save.isEmpty() )
 	{
 		// init style and palette
-		QApplication::setStyle( new lmmsStyle() );
+        // TODO, select based on theme.xml!
+        ClassicStyle * style = new ClassicStyle();
+        QApplication::setStyle( style );
+        engine::setLmmsStyle( style );
 
 		// init splash screen - this is a bit difficult as we have a
 		// semi-transparent splash-image therefore we first need to grab

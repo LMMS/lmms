@@ -3,6 +3,16 @@
 	* src/gui/embed.cpp:
 	Cache pixmaps instead of loading new ones each time
 
+	* include/engine.h:
+	* include/lmms_style.h:
+	* include/classic_style.h:
+	* src/gui/classic_style.cpp:
+	* src/gui/lmms_style.cpp:
+	* src/core/engine.cpp:
+	* src/core/main.cpp:
+	- Add LmmsStyle class for centralizing palette and drawing.  It isn't
+	  perfect, but at least most interesting stylables are in one place now.
+
 2009-01-26	Paul Giblock <drfaygo/at/gmail/dot/com>
 
 	* src/tracks/bb_track.cpp:

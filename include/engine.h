@@ -31,6 +31,7 @@
 #include <QtCore/QMap>
 
 #include "export.h"
+#include "lmms_style.h"
 
 class automationEditor;
 class bbEditor;
@@ -164,6 +165,13 @@ public:
 		return( s_pluginFileHandling );
 	}
 
+    static void setLmmsStyle( LmmsStyle * _style ) {
+        s_lmmsStyle = _style;
+    }
+
+    static LmmsStyle * getLmmsStyle( void ) {
+        return s_lmmsStyle;
+    }
 
 private:
 	static bool s_hasGUI;
@@ -189,6 +197,8 @@ private:
 	static pianoRoll * s_pianoRoll;
 	static projectNotes * s_projectNotes;
 	static ladspa2LMMS * s_ladspaManager;
+
+    static LmmsStyle * s_lmmsStyle;
 
 	static QMap<QString, QString> s_pluginFileHandling;
 

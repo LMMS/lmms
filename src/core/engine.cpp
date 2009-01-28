@@ -67,6 +67,7 @@ ladspa2LMMS * engine::s_ladspaManager = NULL;
 dummyTrackContainer * engine::s_dummyTC = NULL;
 controllerRackView * engine::s_controllerRackView = NULL;
 QMap<QString, QString> engine::s_pluginFileHandling;
+LmmsStyle * engine::s_lmmsStyle = NULL;
 
 
 
