@@ -2,7 +2,7 @@
  * graph.h - a QT widget for displaying and manipulating waveforms
  *
  * Copyright (c) 2006-2007 Andreas Brandmaier <andy/at/brandmaier/dot/de>
- *               2008 Paul Giblock <drfaygo/at/gmail/dot/com>
+ * Copyright (c) 2008-2009 Paul Giblock <pgib/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *

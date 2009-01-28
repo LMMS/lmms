@@ -223,6 +223,7 @@ void trackContainerView::realignTracks( void )
 	{
 		( *it )->show();
 		( *it )->update();
+        ( *it )->getTrackContentWidget()->updateBackground();
 	}
 }
 

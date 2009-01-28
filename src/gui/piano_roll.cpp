@@ -632,19 +632,19 @@ inline void pianoRoll::drawNoteRect( QPainter & _p, int _x, int _y,
 			( (float)( PanningRight - _n->getPanning() ) ) / 
 			( (float)( PanningRight - PanningLeft ) ) * 2.0f );
 
-	const QColor defaultNoteColor( 0x00, 0xAA, 0x00 );
+	const QColor defaultNoteColor =
+			engine::getLmmsStyle()->color( LmmsStyle::PianoRollDefaultNote );
 	QColor col = defaultNoteColor;
 	
-	col = QColor( 0x00, 0xAA, 0x00 );
 	if( _n->length() < 0 )
 	{
 		//step note
-		col.setRgb( 0, 255, 0 );
+		col = engine::getLmmsStyle()->color( LmmsStyle::PianoRollStepNote );
 		_p.fillRect( _x, _y, _width, KEY_LINE_HEIGHT - 2, col );
 	}
 	else if( _n->selected() )
 	{
-		col.setRgb( 0x00, 0x40, 0xC0 );
+		col = engine::getLmmsStyle()->color( LmmsStyle::PianoRollSelectedNote );
 		_p.fillRect( _x, _y, _width, KEY_LINE_HEIGHT - 2, col );
 	}
 	else
@@ -2683,6 +2683,13 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 		const int visible_keys = ( keyAreaBottom()-keyAreaTop() ) /
 							KEY_LINE_HEIGHT + 2;
 	
+        // horizontal line for the key under the cursor
+		int key_num = getKey( mapFromGlobal( QCursor::pos() ).y() );
+		p.fillRect( 10, keyAreaBottom() + 3 - KEY_LINE_HEIGHT *
+					( key_num - m_startKey + 1 ),
+				width() - 10, KEY_LINE_HEIGHT - 7,
+							QColor( 64, 64, 64 ) );
+	
 		QPolygon editHandles;
 
 		for( noteVector::const_iterator it = notes.begin();
@@ -2729,13 +2736,12 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 			int editHandleTop = 0;
 			if( m_noteEditMode == NoteEditVolume )
 			{
-				QColor color = QColor::fromHsv( 120, 221, 
-						qMin(255, 60 + ( *it )->getVolume() ) );
-				if( ( *it )->selected() )
-				{
-					color.setRgb( 0x00, 0x40, 0xC0 );
-				}
-				p.setPen( QPen( color, NE_LINE_WIDTH ) );
+				QColor color = engine::getLmmsStyle()->color(
+						( *it )->selected() ?
+						LmmsStyle::PianoRollSelectedLevel : 
+						LmmsStyle::PianoRollVolumeLevel );
+				p.setPen( QPen( color.lighter( 
+						(*it)->getVolume() / 2.0f ), NE_LINE_WIDTH ) );
 
 				editHandleTop = noteEditBottom() - 
 					( (float)( ( *it )->getVolume() - MinVolume ) ) / 
@@ -2748,11 +2754,10 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 			}
 			else if( m_noteEditMode == NoteEditPanning )
 			{
-				QColor color( 0xFF, 0xB0, 0x00 );
-				if( ( *it )->selected() )
-				{
-					color.setRgb( 0x00, 0x40, 0xC0 );
-				}
+				QColor color = engine::getLmmsStyle()->color(
+						( *it )->selected() ?
+						LmmsStyle::PianoRollSelectedLevel : 
+						LmmsStyle::PianoRollPanningLevel );
 				
 				p.setPen( QPen( color, NE_LINE_WIDTH ) );
 				
@@ -2776,7 +2781,7 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 			}
 		}
 		
-		p.setPen( QPen( QColor( 0xEA, 0xA1, 0x00 ),
+		p.setPen( QPen(engine::getLmmsStyle()->color( LmmsStyle::PianoRollEditHandle ),
 				NE_LINE_WIDTH+2 ) );
 		p.drawPoints( editHandles );
 		
@@ -2816,16 +2821,6 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 		m_leftRightScroll->setPageStep( l );
 	}
 
-	// horizontal line for the key under the cursor
-	if( validPattern() == true )
-	{
-		int key_num = getKey( mapFromGlobal( QCursor::pos() ).y() );
-		p.fillRect( 10, keyAreaBottom() + 3 - KEY_LINE_HEIGHT *
-					( key_num - m_startKey + 1 ),
-				width() - 10, KEY_LINE_HEIGHT - 7,
-							QColor( 64, 64, 64 ) );
-	}
-	
 	// bar to resize note edit area
 	p.setClipRect( 0, 0, width(), height() );
 	p.fillRect( QRect( 0, keyAreaBottom(), 

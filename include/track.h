@@ -245,6 +245,7 @@ public:
 
 	midiTime endPosition( const midiTime & _pos_start );
 
+    void updateBackground( void );
 
 public slots:
 	void update( void );

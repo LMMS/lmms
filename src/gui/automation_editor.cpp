@@ -6,7 +6,7 @@
  *
  * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2006-2008 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
- * 
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -309,15 +309,13 @@ automationEditor::automationEditor( void ) :
 	m_quantizeComboBox = new comboBox( m_toolBar );
 	m_quantizeComboBox->setFixedSize( 60, 22 );
 
-	// TODO: leak
-	comboBoxModel * quantize_model = new comboBoxModel( /* this */ );
 	for( int i = 0; i < 7; ++i )
 	{
-		quantize_model->addItem( "1/" + QString::number( 1 << i ) );
+		m_quantizeModel.addItem( "1/" + QString::number( 1 << i ) );
 	}
-	quantize_model->setValue( quantize_model->findText( "1/16" ) );
+	m_quantizeModel.setValue( m_quantizeModel.findText( "1/16" ) );
 
-	m_quantizeComboBox->setModel( quantize_model );
+	m_quantizeComboBox->setModel( &m_quantizeModel );
 
 
 	tb_layout->addSpacing( 5 );
@@ -435,19 +433,15 @@ inline void automationEditor::drawValueRect( QPainter & _p,
 						int _width, int _height,
 						const bool _is_selected )
 {
-	QColor current_color( 0xFF, 0xB0, 0x00 );
-	if( _is_selected == TRUE )
-	{
-		current_color.setRgb( 0x00, 0x40, 0xC0 );
-	}
-	_p.fillRect( _x, _y, _width, _height, current_color );
+    _p.fillRect( _x, _y, _width, _height, engine::getLmmsStyle()->color(
+            _is_selected ?
+            LmmsStyle::AutomationSelectedBarFill :
+            LmmsStyle::AutomationBarFill ) );
 
-	_p.setPen( QColor( 0xFF, 0xDF, 0x20 ) );
+	_p.setPen( engine::getLmmsStyle()->color(
+            LmmsStyle::AutomationBarValue ) );
 	_p.drawLine( _x - 1, _y, _x + 1, _y );
 	_p.drawLine( _x, _y - 1, _x, _y + 1 );
-//	_p.setPen( QColor( 0xFF, 0x9F, 0x00 ) );
-
-//	_p.setPen( QColor( 0xFF, 0xFF, 0x40 ) );
 }
 
 
@@ -659,20 +653,20 @@ void automationEditor::drawLine( int _x0, float _y0, int _x1, float _y1 )
 
 	float yscale = deltay / ( deltax );
 
-	if( _x0 < _x1) 
+	if( _x0 < _x1)
 	{
 		xstep = quantization();
 	}
-	else 
+	else
 	{
 		xstep = -( quantization() );
 	}
 
 	if( _y0 < _y1 )
 	{
-		ystep = 1; 
+		ystep = 1;
 	}
-	else 
+	else
 	{
 		ystep = -1;
 	}
@@ -760,7 +754,7 @@ void automationEditor::mousePressEvent( QMouseEvent * _me )
 				{
 					// then set new value
 					midiTime value_pos( pos_ticks );
-		
+
 					midiTime new_time =
 						m_pattern->putValue( value_pos,
 									level );
@@ -1220,7 +1214,7 @@ inline void automationEditor::drawCross( QPainter & _p )
 				/ (float)( m_maxLevel - m_minLevel ) ) :
 		grid_bottom - ( level - m_bottomLevel ) * m_y_delta;
 
-	_p.setPen( QColor( 0xFF, 0x33, 0x33 ) );
+	_p.setPen( engine::getLmmsStyle()->color( LmmsStyle::AutomationCrosshair ) );
 	_p.drawLine( VALUES_WIDTH, (int) cross_y, width(), (int) cross_y );
 	_p.drawLine( mouse_pos.x(), TOP_MARGIN, mouse_pos.x(),
 						height() - SCROLLBAR_SIZE );
@@ -1632,7 +1626,7 @@ void automationEditor::wheelEvent( QWheelEvent * _we )
 		m_timeLine->setPixelsPerTact( m_ppt );
 		update();
 	}
-	else if( _we->modifiers() & Qt::ShiftModifier 
+	else if( _we->modifiers() & Qt::ShiftModifier
 			|| _we->orientation() == Qt::Horizontal )
 	{
 		m_leftRightScroll->setValue( m_leftRightScroll->value() -
@@ -1858,7 +1852,7 @@ void automationEditor::selectAll( void )
 		const float level = it.value();
 		if( level < m_selectStartLevel )
 		{
-			// if we move start-level down, we have to add 
+			// if we move start-level down, we have to add
 			// the difference between old and new start-level
 			// to m_selectedLevels, otherwise the selection
 			// is just moved down...

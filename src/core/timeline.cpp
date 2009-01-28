@@ -4,7 +4,7 @@
  * timeline.cpp - class timeLine, representing a time-line with position marker
  *
  * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -32,16 +32,14 @@
 #include <QtGui/QMouseEvent>
 #include <QtGui/QPainter>
 
-
-#include "timeline.h"
 #include "embed.h"
 #include "engine.h"
-#include "templates.h"
-#include "nstate_button.h"
+#include "lmms_style.h"
 #include "main_window.h"
+#include "nstate_button.h"
+#include "templates.h"
 #include "text_float.h"
-
-
+#include "timeline.h"
 
 QPixmap * timeLine::s_timeLinePixmap = NULL;
 QPixmap * timeLine::s_posMarkerPixmap = NULL;
@@ -246,7 +244,8 @@ void timeLine::paintEvent( QPaintEvent * )
 						midiTime::ticksPerTact() ) %
 						static_cast<int>( m_ppt ) );
 
-	p.setPen( QColor( 192, 192, 192 ) );
+	QColor adas = engine::getLmmsStyle()->color(LmmsStyle::TimelineForecolor);
+	p.setPen(adas);
 	for( int i = 0; x + i * m_ppt < width(); ++i )
 	{
 		const int cx = x + qRound( i * m_ppt );
@@ -352,7 +351,7 @@ void timeLine::mouseMoveEvent( QMouseEvent * _me )
 			{
 				// Note, swap 1 and 0 below and the behavior "skips" the other
 				// marking instead of pushing it.
-				if( m_action == MoveLoopBegin ) 
+				if( m_action == MoveLoopBegin )
 					m_loopPos[0] -= midiTime::ticksPerTact();
 				else
 					m_loopPos[1] += midiTime::ticksPerTact();
