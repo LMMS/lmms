@@ -429,7 +429,7 @@ void envelopeAndLFOView::paintEvent( QPaintEvent * )
 
 	LmmsStyle * style = engine::getLmmsStyle();
 	QColor lineColor = style->color(LmmsStyle::StandardGraphLine);
-	const float gray_amount = 1.0f - fabsf( m_amountKnob->value<float>() );
+	const float gray_amount = fabsf( m_amountKnob->value<float>() );
 
 	p.setPen( QPen( QColor::fromHsvF(
 			lineColor.hueF(),
@@ -494,7 +494,7 @@ void envelopeAndLFOView::paintEvent( QPaintEvent * )
 	const float framesForGraph = SECS_PER_LFO_OSCILLATION *
 				engine::getMixer()->baseSampleRate() / 10;
 
-	const float lfoGrayAmount = 1.0f - fabsf( m_lfoAmountKnob->value<float>() );
+	const float lfoGrayAmount = fabsf( m_lfoAmountKnob->value<float>() );
 	p.setPen( QPen( QColor::fromHsvF(
 			lineColor.hueF(),
 			lineColor.saturationF() * lfoGrayAmount,

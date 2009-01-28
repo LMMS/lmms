@@ -45,6 +45,9 @@
 	- Begin themeing widgets with the new LmmsStyle interface
 	- Minor tweaks and code style improvements
 
+	* src/gui/widgets/envelope_and_lfo_view.cpp:
+	Fix backwards Color-to-gray in env and LFO graphs
+
 2009-01-26	Paul Giblock <drfaygo/at/gmail/dot/com>
 
 	* src/tracks/bb_track.cpp:
