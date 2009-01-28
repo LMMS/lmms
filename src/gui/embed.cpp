@@ -4,7 +4,7 @@
  * embed.cpp - misc stuff for using embedded resources (linked into binary)
  *
  * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -26,6 +26,7 @@
 
 
 #include <QtGui/QImage>
+#include <QHash>
 
 #include "embed.h"
 #include "config_mgr.h"
@@ -39,6 +40,10 @@ namespace PLUGIN_NAME
 #endif
 {
 
+namespace
+{
+	static QHash<QString, QPixmap> s_pixmapCache;
+}
 
 #include "embedded_resources.h"
 
@@ -47,15 +52,22 @@ QPixmap getIconPixmap( const char * _name, int _w, int _h )
 {
 	if( _w == -1 || _h == -1 )
 	{
+		// Return cached pixmap
+		QPixmap cached = s_pixmapCache.value( _name );
+		if( !cached.isNull() )
+		{
+			return cached;
+		}
+
+		// Or try to load it
 		QString name = QString( _name ) + ".png";
 
 #ifdef PLUGIN_NAME
 		QPixmap p( configManager::inst()->artworkDir() + "plugins/" +
-					STRINGIFY( PLUGIN_NAME ) + "_" + name );
+		           STRINGIFY( PLUGIN_NAME ) + "_" + name );
 		if( p.isNull() )
 		{
-			p = QPixmap( configManager::inst()->artworkDir() +
-									name );
+			p = QPixmap( configManager::inst()->artworkDir() + name );
 		}
 #else
 		// look whether icon is in artwork-dir
@@ -64,13 +76,12 @@ QPixmap getIconPixmap( const char * _name, int _w, int _h )
 		if( p.isNull() )
 		{
 			// nothing found, so look in default-artwork-dir
-			p =
-		QPixmap( configManager::inst()->defaultArtworkDir() + name );
+			p = QPixmap( configManager::inst()->defaultArtworkDir() + name );
 		}
-		if( p.isNull() )
-		{
+        if( p.isNull() )
+        {
 			const embed::descriptor & e = findEmbeddedData(
-						name.toAscii().constData() );
+			name.toAscii().constData() );
 			// found?
 			if( QString( e.name ) == name )
 			{
@@ -81,13 +92,15 @@ QPixmap getIconPixmap( const char * _name, int _w, int _h )
 				p = QPixmap( 1, 1 );
 			}
 		}
+
+		// Save to cache and return
+		s_pixmapCache.insert( _name, p );
 		return( p );
 	}
+
 	return( getIconPixmap( _name ).scaled( _w, _h, Qt::IgnoreAspectRatio,
-						Qt::SmoothTransformation ) );
+	        Qt::SmoothTransformation ) );
 }
-
-
 
 
 QString getText( const char * _name )

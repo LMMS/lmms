@@ -1,4 +1,9 @@
-2009-01-25	Paul Giblock <drfaygo/at/gmail/dot/com>
+2009-01-28	Paul Giblock <drfaygo/at/gmail/dot/com>
+
+	* src/gui/embed.cpp:
+	Cache pixmaps instead of loading new ones each time
+
+2009-01-26	Paul Giblock <drfaygo/at/gmail/dot/com>
 
 	* src/tracks/bb_track.cpp:
 	Integrate broken BB-clone bug from pitanga
