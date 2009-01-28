@@ -61,8 +61,11 @@ public:
 
 	virtual void paintEvent( QPaintEvent * )
 	{
-		engine::getLmmsStyle()->drawFxLine( &QPainter(this),
+        QPainter painter;
+        painter.begin(this);
+		engine::getLmmsStyle()->drawFxLine( &painter,
 				this, m_name, m_mv->currentFxLine() == this );
+        painter.end();
 	}
 
 	virtual void mousePressEvent( QMouseEvent * )

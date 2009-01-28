@@ -40,6 +40,7 @@
 	* src/gui/widgets/controller_view.cpp:
 	* src/gui/widgets/effect_view.cpp:
 	* src/gui/widgets/project_notes.cpp:
+	* src/core/track.cpp:
 	* src/gui/piano_roll.cpp:
 	* src/core/timeline.cpp:
 	- Begin themeing widgets with the new LmmsStyle interface
@@ -47,6 +48,10 @@
 
 	* src/gui/widgets/envelope_and_lfo_view.cpp:
 	Fix backwards Color-to-gray in env and LFO graphs
+
+	* src/core/track.cpp:
+	* src/gui/fx_mixer_view.cpp:
+	Attempt to fix Skiessi's gfx bugs
 
 2009-01-26	Paul Giblock <drfaygo/at/gmail/dot/com>
 

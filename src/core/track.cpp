@@ -1173,10 +1173,13 @@ void trackContentWidget::updateBackground( void )
     int width = ppt * tactsPerBar;
 
     m_background = QPixmap( width * 2, height() );
-    QPainter pmp( &m_background );
+    QPainter pmp;
+    pmp.begin( &m_background );
 
     engine::getLmmsStyle()->drawTrackContentBackground( &pmp, 
             QSize( width, height() ), ppt );
+
+    pmp.end();
 }
 
 
