@@ -5,7 +5,7 @@
  *                               tab of channel-window
  *
  * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -59,26 +59,25 @@ const int ENV_GRAPH_X = 6;
 const int ENV_GRAPH_Y = 6;
 
 const int ENV_KNOBS_Y = 43;
-const int ENV_KNOBS_LBL_Y = ENV_KNOBS_Y+35;
+const int ENV_KNOBS_LBL_Y = ENV_KNOBS_Y + 35;
 const int KNOB_X_SPACING = 32;
 const int PREDELAY_KNOB_X = 6;
-const int ATTACK_KNOB_X = PREDELAY_KNOB_X+KNOB_X_SPACING;
-const int HOLD_KNOB_X = ATTACK_KNOB_X+KNOB_X_SPACING;
-const int DECAY_KNOB_X = HOLD_KNOB_X+KNOB_X_SPACING;
-const int SUSTAIN_KNOB_X = DECAY_KNOB_X+KNOB_X_SPACING;
-const int RELEASE_KNOB_X = SUSTAIN_KNOB_X+KNOB_X_SPACING;
-const int AMOUNT_KNOB_X = RELEASE_KNOB_X+KNOB_X_SPACING;
+const int ATTACK_KNOB_X = PREDELAY_KNOB_X + KNOB_X_SPACING;
+const int HOLD_KNOB_X = ATTACK_KNOB_X + KNOB_X_SPACING;
+const int DECAY_KNOB_X = HOLD_KNOB_X + KNOB_X_SPACING;
+const int SUSTAIN_KNOB_X = DECAY_KNOB_X + KNOB_X_SPACING;
+const int RELEASE_KNOB_X = SUSTAIN_KNOB_X + KNOB_X_SPACING;
+const int AMOUNT_KNOB_X = RELEASE_KNOB_X + KNOB_X_SPACING;
 
 const float TIME_UNIT_WIDTH = 36.0;
 
-
 const int LFO_GRAPH_X = 6;
-const int LFO_GRAPH_Y = ENV_KNOBS_LBL_Y+14;
-const int LFO_KNOB_Y = LFO_GRAPH_Y-2;
+const int LFO_GRAPH_Y = ENV_KNOBS_LBL_Y + 14;
+const int LFO_KNOB_Y = LFO_GRAPH_Y - 2;
 const int LFO_PREDELAY_KNOB_X = LFO_GRAPH_X + 100;
-const int LFO_ATTACK_KNOB_X = LFO_PREDELAY_KNOB_X+KNOB_X_SPACING;
-const int LFO_SPEED_KNOB_X = LFO_ATTACK_KNOB_X+KNOB_X_SPACING;
-const int LFO_AMOUNT_KNOB_X = LFO_SPEED_KNOB_X+KNOB_X_SPACING;
+const int LFO_ATTACK_KNOB_X = LFO_PREDELAY_KNOB_X + KNOB_X_SPACING;
+const int LFO_SPEED_KNOB_X = LFO_ATTACK_KNOB_X + KNOB_X_SPACING;
+const int LFO_AMOUNT_KNOB_X = LFO_SPEED_KNOB_X + KNOB_X_SPACING;
 const int LFO_SHAPES_X = LFO_GRAPH_X;//PREDELAY_KNOB_X;
 const int LFO_SHAPES_Y = LFO_GRAPH_Y + 50;
 
@@ -428,97 +427,98 @@ void envelopeAndLFOView::paintEvent( QPaintEvent * )
 
 	p.setFont( pointSize<8>( p.font() ) );
 
+	LmmsStyle * style = engine::getLmmsStyle();
+	QColor lineColor = style->color(LmmsStyle::StandardGraphLine);
 	const float gray_amount = 1.0f - fabsf( m_amountKnob->value<float>() );
 
-	p.setPen( QPen( QColor( static_cast<int>( 96 * gray_amount ),
-				static_cast<int>( 255 - 159 * gray_amount ),
-				static_cast<int>( 128 - 32 * gray_amount ) ),
-									2 ) );
+	p.setPen( QPen( QColor::fromHsvF(
+			lineColor.hueF(),
+			lineColor.saturationF() * gray_amount,
+			lineColor.valueF() * (0.5+gray_amount*0.5) ), 2 ) );
 
-	const QColor end_points_color( 0xFF, 0xBF, 0x22 );
-	const QColor end_points_bg_color( 0, 0, 2 );
+	const QColor endPointsColor = style->color( LmmsStyle::StandardGraphHandle );
+	const QColor endPointsBorderColor = style->color(LmmsStyle::StandardGraphHandleBorder );
 
-	const int y_base = ENV_GRAPH_Y + s_envGraph->height() - 3;
-	const int avail_height = s_envGraph->height() - 6;
-	
+	const int yBase = ENV_GRAPH_Y + s_envGraph->height() - 3;
+	const int availHeight = s_envGraph->height() - 6;
+
 	int x1 = ENV_GRAPH_X + 2 + static_cast<int>( m_predelayKnob->value<float>() *
 							TIME_UNIT_WIDTH );
 	int x2 = x1 + static_cast<int>( m_attackKnob->value<float>() *
 							TIME_UNIT_WIDTH );
 
-	p.drawLine( x1, y_base, x2, y_base - avail_height );
-	p.fillRect( x1 - 1, y_base - 2, 4, 4, end_points_bg_color );
-	p.fillRect( x1, y_base - 1, 2, 2, end_points_color );
+	p.drawLine( x1, yBase, x2, yBase - availHeight );
+	p.fillRect( x1 - 1, yBase - 2, 4, 4, endPointsBorderColor );
+	p.fillRect( x1, yBase - 1, 2, 2, endPointsColor );
 	x1 = x2;
 	x2 = x1 + static_cast<int>( m_holdKnob->value<float>() * TIME_UNIT_WIDTH );
 
-	p.drawLine( x1, y_base - avail_height, x2, y_base - avail_height );
-	p.fillRect( x1 - 1, y_base - 2 - avail_height, 4, 4,
-							end_points_bg_color );
-	p.fillRect( x1, y_base-1-avail_height, 2, 2, end_points_color );
+	p.drawLine( x1, yBase - availHeight, x2, yBase - availHeight );
+	p.fillRect( x1 - 1, yBase - 2 - availHeight, 4, 4,
+							endPointsBorderColor );
+	p.fillRect( x1, yBase-1-availHeight, 2, 2, endPointsColor );
 	x1 = x2;
 	x2 = x1 + static_cast<int>( ( m_decayKnob->value<float>() *
 						m_sustainKnob->value<float>() ) *
 							TIME_UNIT_WIDTH );
 
-	p.drawLine( x1, y_base-avail_height, x2, static_cast<int>( y_base -
-								avail_height +
-				m_sustainKnob->value<float>() * avail_height ) );
-	p.fillRect( x1 - 1, y_base - 2 - avail_height, 4, 4,
-							end_points_bg_color );
-	p.fillRect( x1, y_base - 1 - avail_height, 2, 2, end_points_color );
+	p.drawLine( x1, yBase-availHeight, x2, static_cast<int>( yBase -
+								availHeight +
+				m_sustainKnob->value<float>() * availHeight ) );
+	p.fillRect( x1 - 1, yBase - 2 - availHeight, 4, 4,
+							endPointsBorderColor );
+	p.fillRect( x1, yBase - 1 - availHeight, 2, 2, endPointsColor );
 	x1 = x2;
 	x2 = x1 + static_cast<int>( m_releaseKnob->value<float>() * TIME_UNIT_WIDTH );
 
-	p.drawLine( x1, static_cast<int>( y_base - avail_height +
+	p.drawLine( x1, static_cast<int>( yBase - availHeight +
 						m_sustainKnob->value<float>() *
-						avail_height ), x2, y_base );
-	p.fillRect( x1-1, static_cast<int>( y_base - avail_height +
+						availHeight ), x2, yBase );
+	p.fillRect( x1-1, static_cast<int>( yBase - availHeight +
 						m_sustainKnob->value<float>() *
-						avail_height ) - 2, 4, 4,
-							end_points_bg_color );
-	p.fillRect( x1, static_cast<int>( y_base - avail_height +
+						availHeight ) - 2, 4, 4,
+							endPointsBorderColor );
+	p.fillRect( x1, static_cast<int>( yBase - availHeight +
 						m_sustainKnob->value<float>() *
-						avail_height ) - 1, 2, 2,
-							end_points_color );
-	p.fillRect( x2 - 1, y_base - 2, 4, 4, end_points_bg_color );
-	p.fillRect( x2, y_base - 1, 2, 2, end_points_color );
+						availHeight ) - 1, 2, 2,
+							endPointsColor );
+	p.fillRect( x2 - 1, yBase - 2, 4, 4, endPointsBorderColor );
+	p.fillRect( x2, yBase - 1, 2, 2, endPointsColor );
 
 
-	int LFO_GRAPH_W = s_lfoGraph->width() - 6;	// substract border
-	int LFO_GRAPH_H = s_lfoGraph->height() - 6;	// substract border
-	int graph_x_base = LFO_GRAPH_X + 3;
-	int graph_y_base = LFO_GRAPH_Y + 3 + LFO_GRAPH_H / 2;
+	int lfoGraphWidth = s_lfoGraph->width() - 6;	// substract border
+	int lfoGraphHeight = s_lfoGraph->height() - 6;	// substract border
+	int graphXBase = LFO_GRAPH_X + 3;
+	int graphYBase = LFO_GRAPH_Y + 3 + lfoGraphHeight / 2;
 
-	const float frames_for_graph = SECS_PER_LFO_OSCILLATION *
+	const float framesForGraph = SECS_PER_LFO_OSCILLATION *
 				engine::getMixer()->baseSampleRate() / 10;
 
-	const float lfo_gray_amount = 1.0f - fabsf( m_lfoAmountKnob->value<float>() );
-	p.setPen( QPen( QColor( static_cast<int>( 96 * lfo_gray_amount ),
-				static_cast<int>( 255 - 159 * lfo_gray_amount ),
-				static_cast<int>( 128 - 32 *
-							lfo_gray_amount ) ),
-									1.5 ) );
+	const float lfoGrayAmount = 1.0f - fabsf( m_lfoAmountKnob->value<float>() );
+	p.setPen( QPen( QColor::fromHsvF(
+			lineColor.hueF(),
+			lineColor.saturationF() * lfoGrayAmount,
+			lineColor.valueF() * (0.5+lfoGrayAmount*0.5) ), 1.5 ) );
 
 
-	float osc_frames = m_params->m_lfoOscillationFrames;
+	float oscFrames = m_params->m_lfoOscillationFrames;
 
 	if( m_params->m_x100Model.value() )
 	{
-		osc_frames *= 100.0f;
+		oscFrames *= 100.0f;
 	}
 
-	float old_y = 0;
-	for( int x = 0; x <= LFO_GRAPH_W; ++x )
+	float oldY = 0;
+	for( int x = 0; x <= lfoGraphWidth; ++x )
 	{
 		float val = 0.0;
-		float cur_sample = x * frames_for_graph / LFO_GRAPH_W;
-		if( static_cast<f_cnt_t>( cur_sample ) >
+		float curSample = x * framesForGraph / lfoGraphWidth;
+		if( static_cast<f_cnt_t>( curSample ) >
 						m_params->m_lfoPredelayFrames )
 		{
-			float phase = ( cur_sample -=
+			float phase = ( curSample -=
 					m_params->m_lfoPredelayFrames ) /
-								osc_frames;
+								oscFrames;
 			switch( m_params->m_lfoWaveModel.value() )
 			{
 				case envelopeAndLFOParameters::SineWave:
@@ -538,27 +538,27 @@ void envelopeAndLFOView::paintEvent( QPaintEvent * )
 					val = m_params->m_userWave.
 							userWaveSample( phase );
 			}
-			if( static_cast<f_cnt_t>( cur_sample ) <=
+			if( static_cast<f_cnt_t>( curSample ) <=
 						m_params->m_lfoAttackFrames )
 			{
-				val *= cur_sample / m_params->m_lfoAttackFrames;
+				val *= curSample / m_params->m_lfoAttackFrames;
 			}
 		}
-		float cur_y = -LFO_GRAPH_H / 2.0f * val;
-		p.drawLine( QLineF( graph_x_base + x - 1, graph_y_base + old_y,
-						graph_x_base + x,
-						graph_y_base + cur_y ) );
-		old_y = cur_y;
+		float curY = -lfoGraphHeight / 2.0f * val;
+		p.drawLine( QLineF( graphXBase + x - 1, graphYBase + oldY,
+						graphXBase + x,
+						graphYBase + curY ) );
+		oldY = curY;
 	}
 
-	p.setPen( QColor( 255, 192, 0 ) );
-	int ms_per_osc = static_cast<int>( SECS_PER_LFO_OSCILLATION *
+	p.setPen( endPointsColor );
+	int msPerOsc = static_cast<int>( SECS_PER_LFO_OSCILLATION *
 						m_lfoSpeedKnob->value<float>() *
 								1000.0f );
 	p.drawText( LFO_GRAPH_X + 4, LFO_GRAPH_Y + s_lfoGraph->height() - 6,
 							tr( "ms/LFO:" ) );
 	p.drawText( LFO_GRAPH_X + 52, LFO_GRAPH_Y + s_lfoGraph->height() - 6,
-						QString::number( ms_per_osc ) );
+						QString::number( msPerOsc ) );
 
 }
 

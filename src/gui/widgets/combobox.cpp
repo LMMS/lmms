@@ -4,7 +4,8 @@
  * combobox.cpp - implementation of LMMS-combobox
  *
  * Copyright (c) 2006-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ * Copyright (c) 2008-2009 Paul Giblock <pgib/at/users.sourceforge.net>
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -23,7 +24,7 @@
  * Boston, MA 02110-1301 USA.
  *
  */
- 
+
 
 #include "combobox.h"
 
@@ -172,9 +173,10 @@ void comboBox::paintEvent( QPaintEvent * _pe )
 	QPainter p( this );
 
 	p.fillRect( 2, 2, width()-2, height()-4, *s_background );
-	
+
 	QColor shadow = palette().shadow().color();
 	QColor highlight = palette().highlight().color();
+	QColor text = palette().text().color();
 
 	shadow.setAlpha( 124 );
 	highlight.setAlpha( 124 );
@@ -196,7 +198,7 @@ void comboBox::paintEvent( QPaintEvent * _pe )
 	style()->drawPrimitive( QStyle::PE_Frame, &opt, &p, this );
 
 	QPixmap * arrow = m_pressed ? s_arrowSelected : s_arrow;
-	
+
 	p.drawPixmap( width() - CB_ARROW_BTN_WIDTH + 5, 4,
 						*arrow );
 
@@ -221,7 +223,7 @@ void comboBox::paintEvent( QPaintEvent * _pe )
 		const int y = ( height()+p.fontMetrics().height() ) /2;
 		p.setPen( QColor( 64, 64, 64 ) );
 		p.drawText( tx+1, y-3, model()->currentText() );
-		p.setPen( QColor( 224, 224, 224 ) );
+		p.setPen( text );
 		p.drawText( tx, y-4, model()->currentText() );
 	}
 }

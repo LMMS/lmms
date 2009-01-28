@@ -4,7 +4,7 @@
  * led_checkbox.cpp - class ledCheckBox, an improved QCheckBox
  *
  * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -89,7 +89,7 @@ void ledCheckBox::paintEvent( QPaintEvent * )
 
 	p.setPen( QColor( 64, 64, 64 ) );
 	p.drawText( m_ledOffPixmap->width() + 3, 10, text() );
-	p.setPen( QColor( 255, 255, 255 ) );
+	p.setPen( palette().text().color() );
 	p.drawText( m_ledOffPixmap->width() + 2, 9, text() );
 }
 

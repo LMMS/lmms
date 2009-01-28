@@ -5,7 +5,7 @@
  *
  * Copyright (c) 2006-2007 Danny McRae <khjklujn/at/users.sourceforge.net>
  * Copyright (c) 2007-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -76,7 +76,7 @@ effectView::effectView( effect * _model, QWidget * _parent ) :
 	m_autoQuit->setLabel( tr( "DECAY" ) );
 	m_autoQuit->move( 60, 5 );
 	m_autoQuit->setHintText( tr( "Time:" ) + " ", "ms" );
-	m_autoQuit->setWhatsThis( tr( 
+	m_autoQuit->setWhatsThis( tr(
 "The Decay knob controls how many buffers of silence must pass before the "
 "plugin stops processing.  Smaller values will reduce the CPU overhead but "
 "run the risk of clipping the tail on delay and reverb effects." ) );
@@ -86,7 +86,7 @@ effectView::effectView( effect * _model, QWidget * _parent ) :
 	m_gate->setLabel( tr( "GATE" ) );
 	m_gate->move( 93, 5 );
 	m_gate->setHintText( tr( "Gate:" ) + " ", "" );
-	m_gate->setWhatsThis( tr( 
+	m_gate->setWhatsThis( tr(
 "The Gate knob controls the signal level that is considered to be 'silence' "
 "while deciding when to stop processing signals." ) );
 
@@ -98,7 +98,7 @@ effectView::effectView( effect * _model, QWidget * _parent ) :
 		QFont f = ctls_btn->font();
 		ctls_btn->setFont( pointSize<7>( f ) );
 		ctls_btn->setGeometry( 140, 14, 50, 20 );
-		connect( ctls_btn, SIGNAL( clicked() ), 
+		connect( ctls_btn, SIGNAL( clicked() ),
 					this, SLOT( editControls() ) );
 	}
 
@@ -116,7 +116,7 @@ effectView::effectView( effect * _model, QWidget * _parent ) :
 	m_subWindow->hide();
 
 
-	setWhatsThis( tr( 
+	setWhatsThis( tr(
 "Effect plugins function as a chained series of effects where the signal will "
 "be processed from top to bottom.\n\n"
 
@@ -253,7 +253,7 @@ void effectView::paintEvent( QPaintEvent * )
 
 	p.setPen( QColor( 64, 64, 64 ) );
 	p.drawText( 6, 55, getModel()->displayName() );
-	p.setPen( Qt::white );
+	p.setPen( palette().text().color() );
 	p.drawText( 5, 54, getModel()->displayName() );
 }
 

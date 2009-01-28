@@ -4,8 +4,8 @@
  * lcd_spinbox.cpp - class lcdSpinBox, an improved QLCDNumber
  *
  * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * Copyright (c) 2008 Paul Giblock <pgllama/at/gmail.com>
- * 
+ * Copyright (c) 2008-2009 Paul Giblock <pgib/at/users.sourceforge.net>
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -118,32 +118,32 @@ void lcdSpinBox::paintEvent( QPaintEvent * _me )
 	int margin = 1;  // QStyle::PM_DefaultFrameWidth;
 	//int lcdWidth = m_cellWidth * m_numDigits + (margin*m_marginWidth)*2;
 
-//	p.translate( width() / 2 - lcdWidth / 2, 0 ); 
+//	p.translate( width() / 2 - lcdWidth / 2, 0 );
 	p.save();
 
 	p.translate( margin, margin );
 
 	// Left Margin
-	p.drawPixmap( cellRect, *m_lcdPixmap, 
-			QRect( QPoint( charsPerPixmap*m_cellWidth, 
-				isEnabled()?0:m_cellHeight ), 
+	p.drawPixmap( cellRect, *m_lcdPixmap,
+			QRect( QPoint( charsPerPixmap*m_cellWidth,
+				isEnabled()?0:m_cellHeight ),
 			cellSize ) );
 
 	p.translate( m_marginWidth, 0 );
 
 	// Padding
-	for( int i=0; i < m_numDigits - m_display.length(); i++ ) 
+	for( int i=0; i < m_numDigits - m_display.length(); i++ )
 	{
-		p.drawPixmap( cellRect, *m_lcdPixmap, 
+		p.drawPixmap( cellRect, *m_lcdPixmap,
 			QRect( QPoint( 10 * m_cellWidth, isEnabled()?0:m_cellHeight) , cellSize ) );
 		p.translate( m_cellWidth, 0 );
 	}
 
 	// Digits
-	for( int i=0; i < m_display.length(); i++ ) 
+	for( int i=0; i < m_display.length(); i++ )
 	{
 		int val = m_display[i].digitValue();
-		if( val < 0 ) 
+		if( val < 0 )
 		{
 			if( m_display[i] == '-' )
 				val = 11;
@@ -151,14 +151,14 @@ void lcdSpinBox::paintEvent( QPaintEvent * _me )
 				val = 10;
 		}
 		p.drawPixmap( cellRect, *m_lcdPixmap,
-				QRect( QPoint( val*m_cellWidth, 
+				QRect( QPoint( val*m_cellWidth,
 					isEnabled()?0:m_cellHeight ),
 				cellSize ) );
 		p.translate( m_cellWidth, 0 );
 	}
 
 	// Right Margin
-	p.drawPixmap( QRect( 0, 0, m_marginWidth-1, m_cellHeight ), *m_lcdPixmap, 
+	p.drawPixmap( QRect( 0, 0, m_marginWidth-1, m_cellHeight ), *m_lcdPixmap,
 			QRect( charsPerPixmap*m_cellWidth, isEnabled()?0:m_cellHeight,
 				m_cellWidth / 2, m_cellHeight ) );
 
@@ -184,7 +184,7 @@ void lcdSpinBox::paintEvent( QPaintEvent * _me )
 		p.drawText( width() / 2 -
 				p.fontMetrics().width( m_label ) / 2 + 1,
 						height(), m_label );
-		p.setPen( QColor( 255, 255, 255 ) );
+		p.setPen( palette().text().color() );
 		p.drawText( width() / 2 -
 				p.fontMetrics().width( m_label ) / 2,
 						height() - 1, m_label );

@@ -61,20 +61,8 @@ public:
 
 	virtual void paintEvent( QPaintEvent * )
 	{
-		QPainter p( this );
-		p.fillRect( rect(), QColor( 72, 76, 88 ) );
-		p.setPen( QColor( 40, 42, 48 ) );
-		p.drawRect( 0, 0, width()-2, height()-2 );
-		p.setPen( QColor( 108, 114, 132 ) );
-		p.drawRect( 1, 1, width()-2, height()-2 );
-		p.setPen( QColor( 20, 24, 32 ) );
-		p.drawRect( 0, 0, width()-1, height()-1 );
-		
-		p.rotate( -90 );
-		p.setPen( m_mv->currentFxLine() == this ?
-					QColor( 0, 255, 0 ) : Qt::white );
-		p.setFont( pointSizeF( font(), 7.5f ) );
-		p.drawText( -90, 20, m_name );
+		engine::getLmmsStyle()->drawFxLine( &QPainter(this),
+				this, m_name, m_mv->currentFxLine() == this );
 	}
 
 	virtual void mousePressEvent( QMouseEvent * )
@@ -115,8 +103,8 @@ fxMixerView::fxMixerView() :
 	m->setHook( this );
 
 	QPalette pal = palette();
-	pal.setColor( QPalette::Background, QColor( 72, 76, 88 ) );
-	setPalette( pal );
+	//pal.setColor( QPalette::Background, QColor( 72, 76, 88 ) );
+	//setPalette( pal );
 	setAutoFillBackground( true );
 	setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Minimum );
 

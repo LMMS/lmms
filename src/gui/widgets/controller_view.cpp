@@ -4,7 +4,7 @@
  * controller_view.cpp - view-component for an controller
  *
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail.com>
- * 
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -57,20 +57,17 @@ controllerView::controllerView( controller * _model, QWidget * _parent ) :
 
 	setAttribute( Qt::WA_OpaquePaintEvent, TRUE );
 
-	QPushButton * ctls_btn = new QPushButton( tr( "Controls" ),
-	            this );
-	
+	QPushButton * ctls_btn = new QPushButton( tr( "Controls" ), this );
+
 	QFont f = ctls_btn->font();
 	ctls_btn->setFont( pointSize<7>( f ) );
 	ctls_btn->setGeometry( 140, 2, 50, 14 );
-	connect( ctls_btn, SIGNAL( clicked() ), 
-				this, SLOT( editControls() ) );
+	connect( ctls_btn, SIGNAL( clicked() ), this, SLOT( editControls() ) );
 
 	m_controllerDlg = getController()->createDialog( engine::getMainWindow()->workspace() );
 
-	m_subWindow = engine::getMainWindow()->workspace()->addSubWindow( 
-                m_controllerDlg );
-	
+	m_subWindow = engine::getMainWindow()->workspace()->addSubWindow( m_controllerDlg );
+
 	Qt::WindowFlags flags = m_subWindow->windowFlags();
 	flags |= Qt::MSWindowsFixedSizeDialogHint;
 	flags &= ~Qt::WindowMaximizeButtonHint;
@@ -79,13 +76,13 @@ controllerView::controllerView( controller * _model, QWidget * _parent ) :
 
 	m_subWindow->setWindowIcon( m_controllerDlg->windowIcon() );
 
-    connect( m_controllerDlg, SIGNAL( closed() ),
-                this, SLOT( closeControls() ) );
+	connect( m_controllerDlg, SIGNAL( closed() ),
+			this, SLOT( closeControls() ) );
 
 	m_subWindow->hide();
 
 	setWhatsThis( tr( "Controllers are able to automate the value of a knob, "
-				"slider, and other controls."  ) );
+			"slider, and other controls."  ) );
 
 	setModel( _model );
 }
@@ -146,11 +143,11 @@ void controllerView::paintEvent( QPaintEvent * )
 
 	p.setPen( QColor( 64, 64, 64 ) );
 	p.drawText( 7, 13, c->displayName() );
-	p.setPen( Qt::white );
+	p.setPen( palette().text().color() );
 	p.drawText( 6, 12, c->displayName() );
 
-    f.setBold( FALSE );
-    p.setFont( f );
+	f.setBold( FALSE );
+	p.setFont( f );
 	p.drawText( 8, 26, c->name() );
 }
 

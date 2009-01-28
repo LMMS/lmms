@@ -4,7 +4,7 @@
  * project_notes.cpp - implementation of project-notes-editor
  *
  * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -51,9 +51,9 @@ projectNotes::projectNotes( void ) :
 {
 	m_edit = new QTextEdit( this );
 	m_edit->setAutoFillBackground( TRUE );
-	QPalette pal;
-	pal.setColor( m_edit->backgroundRole(), QColor( 64, 64, 64 ) );
-	m_edit->setPalette( pal );
+	//QPalette pal;
+	//pal.setColor( m_edit->backgroundRole(), QColor( 64, 64, 64 ) );
+	//m_edit->setPalette( pal );
 	m_edit->show();
 
 	clear();

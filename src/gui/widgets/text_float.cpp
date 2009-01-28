@@ -4,7 +4,7 @@
  * text_float.cpp - class textFloat, a floating text-label
  *
  * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -130,15 +130,14 @@ void textFloat::paintEvent( QPaintEvent * _pe )
 {
 	QPainter p( this );
 
-	p.setPen( QColor( 0, 0, 0 ) );
+	LmmsStyle * style = engine::getLmmsStyle();
 
-	p.setBrush( QColor( 224, 224, 224 ) );
-
+	p.setPen( style->color( LmmsStyle::TextFloatForecolor ) );
+	p.setBrush( style->color( LmmsStyle::TextFloatFill ) );
 	p.setFont( pointSize<8>( p.font() ) );
 
 	p.drawRect( 0, 0, rect().right(), rect().bottom() );
 
-//	p.setPen( Qt::black );
 	// small message?
 	if( m_title == "" )
 	{

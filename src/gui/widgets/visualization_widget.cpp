@@ -4,7 +4,7 @@
  * visualization_widget.cpp - widget for visualization of sound-data
  *
  * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -66,6 +66,7 @@ visualizationWidget::visualizationWidget( const QPixmap & _bg, QWidget * _p,
 visualizationWidget::~visualizationWidget()
 {
 	delete[] m_buffer;
+	delete[] m_points;
 }
 
 
@@ -144,20 +145,23 @@ void visualizationWidget::paintEvent( QPaintEvent * )
 				mixer::peakValueRight( m_buffer, frames ) );
 
 		// and set color according to that...
+		LmmsStyle::ColorRole levelColor;
 		if( max_level * master_output < 0.9 )
 		{
-			p.setPen( QColor( 128, 224, 128 ) );
+			levelColor = LmmsStyle::VisualizationLevelLow;
 		}
 		else if( max_level * master_output < 1.0 )
 		{
-			p.setPen( QColor( 255, 192, 64 ) );
+			levelColor = LmmsStyle::VisualizationLevelMid;
 		}
 		else
 		{
-			p.setPen( QColor( 255, 64, 64 ) );
+			levelColor = LmmsStyle::VisualizationLevelPeak;
 		}
 
-		p.setPen( QPen( p.pen().color(), 0.7 ) );
+		p.setPen( QPen(
+				engine::getLmmsStyle()->color( levelColor ),
+				0.7 ) );
 
 		const float xd = (float) w / frames;
 		p.setRenderHint( QPainter::Antialiasing );

@@ -25,6 +25,23 @@
 	* src/gui/widgets/effect_rack_view.cpp:
 	Prevent Horizontal scroll bars from appearing in some cases
 
+	* src/gui/piano_roll.cpp:
+	* src/gui/widgets/visualization_widget.cpp:
+	Plug memory leaks
+
+	* src/gui/fx_mixer_view.cpp:
+	* src/gui/widgets/combobox.cpp:
+	* srg/gui/widgets/graph.cpp:
+	* src/gui/widgets/visualization_widget.cpp:
+	* src/gui/widgets/led_checkbox.cpp:
+	* src/gui/widgets/envelope_and_lfo_view.cpp:
+	* src/gui/widgets/lcd_spinbox.cpp:
+	* src/gui/widgets/text_float.cpp:
+	* src/gui/widgets/controller_view.cpp:
+	* src/gui/widgets/effect_view.cpp:
+	* src/gui/widgets/project_notes.cpp:
+	Begin themeing widgets with the new LmmsStyle interface
+
 2009-01-26	Paul Giblock <drfaygo/at/gmail/dot/com>
 
 	* src/tracks/bb_track.cpp:

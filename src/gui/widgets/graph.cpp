@@ -2,7 +2,7 @@
  * graph.cpp - a QT widget for displaying and manipulating waveforms
  *
  * Copyright (c) 2006-2007 Andreas Brandmaier <andy/at/brandmaier/dot/de>
- *               2008 Paul Giblock            <drfaygo/at/gmail/dot/com>
+ * Copyright (c) 2008-2009 Paul Giblock <pgib/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -32,6 +32,7 @@
 #include "string_pair_drag.h"
 #include "sample_buffer.h"
 #include "oscillator.h"
+#include "engine.h"
 //#include <cstdlib>
 //#include <math.h>
 
@@ -41,12 +42,12 @@ using namespace std;
 
 graph::graph( QWidget * _parent, graphStyle _style ) :
 	QWidget( _parent ),
-	/* TODO: size, background? */ 
+	/* TODO: size, background? */
 	modelView( new graphModel( -1.0, 1.0, 128, NULL, TRUE ), this ),
 	m_graphStyle( _style )
 {
 	m_mouseDown = false;
-	m_graphColor = QColor( 0xFF, 0xAA, 0x00 );
+	m_graphColor = engine::getLmmsStyle()->color(LmmsStyle::StandardGraphLine);
 
 	resize( 132, 104 );
 	setAcceptDrops( TRUE );
@@ -81,7 +82,7 @@ void graph::setGraphColor( QColor _graphcol )
 /*
 void graph::loadSampleFromFile( const QString & _filename )
 {
-	
+
 	int i;
 
 	// zero sample_shape
@@ -89,7 +90,7 @@ void graph::loadSampleFromFile( const QString & _filename )
 	{
 		samplePointer[i] = 0;
 	}
-	
+
 	// load user shape
 	sampleBuffer buffer( _filename );
 
@@ -213,7 +214,7 @@ void graph::mouseReleaseEvent( QMouseEvent * _me )
 		setCursor( Qt::CrossCursor );
 		update();
 	}
-}	
+}
 
 
 
@@ -242,15 +243,15 @@ void graph::paintEvent( QPaintEvent * )
 			for( int i=0; i < length; i++ )
 			{
 				// Needs to be rewritten
-				p.drawLine(2+static_cast<int>(i*xscale), 
+				p.drawLine(2+static_cast<int>(i*xscale),
 					2+static_cast<int>( ( (*samps)[i] - maxVal ) * yscale ),
-					2+static_cast<int>((i+1)*xscale), 
+					2+static_cast<int>((i+1)*xscale),
 					2+static_cast<int>( ( (*samps)[i+1] - maxVal ) * yscale )
 					);
 			}
 
 			// Draw last segment wrapped around
-			p.drawLine(2+static_cast<int>(length*xscale), 
+			p.drawLine(2+static_cast<int>(length*xscale),
 				2+static_cast<int>( ( (*samps)[length] - maxVal ) * yscale ),
 				width()-2,
 				2+static_cast<int>( ( (*samps)[0] - maxVal ) * yscale ) );
@@ -262,19 +263,19 @@ void graph::paintEvent( QPaintEvent * )
 		case graph::NearestStyle:
 			for( int i=0; i < length; i++ )
 			{
-				p.drawLine(2+static_cast<int>(i*xscale), 
+				p.drawLine(2+static_cast<int>(i*xscale),
 					2+static_cast<int>( ( (*samps)[i] - maxVal ) * yscale ),
-					2+static_cast<int>((i+1)*xscale), 
+					2+static_cast<int>((i+1)*xscale),
 					2+static_cast<int>( ( (*samps)[i] - maxVal ) * yscale )
 					);
-				p.drawLine(2+static_cast<int>((i+1)*xscale), 
+				p.drawLine(2+static_cast<int>((i+1)*xscale),
 					2+static_cast<int>( ( (*samps)[i] - maxVal ) * yscale ),
-					2+static_cast<int>((i+1)*xscale), 
+					2+static_cast<int>((i+1)*xscale),
 					2+static_cast<int>( ( (*samps)[i+1] - maxVal ) * yscale )
 					);
 			}
 
-			p.drawLine(2+static_cast<int>(length*xscale), 
+			p.drawLine(2+static_cast<int>(length*xscale),
 				2+static_cast<int>( ( (*samps)[length] - maxVal ) * yscale ),
 				width()-2,
 				2+static_cast<int>( ( (*samps)[length] - maxVal ) * yscale ) );
@@ -286,10 +287,10 @@ void graph::paintEvent( QPaintEvent * )
 
 
 	// draw Pointer
-	if( m_mouseDown ) 
+	if( m_mouseDown )
 	{
 		QPoint cursor = mapFromGlobal( QCursor::pos() );
-		p.setPen( QColor( 0xAA, 0xFF, 0x00, 0x70 ) );
+		p.setPen( engine::getLmmsStyle()->color(LmmsStyle::StandardGraphCrosshair) );
 		p.drawLine( 2, cursor.y(), width()-2, cursor.y() );
 		p.drawLine( cursor.x(), 2, cursor.x(), height()-2 );
 	}
@@ -374,7 +375,7 @@ void graphModel::setRange( float _min, float _max )
 
 		if( !m_samples.isEmpty() )
 		{
-			// Trim existing values 
+			// Trim existing values
 			for( int i=0; i < length(); i++ )
 			{
 				m_samples[i] = fmaxf( _min, fminf( m_samples[i], _max ) );
@@ -498,7 +499,7 @@ void graphModel::smooth( void )
 	m_samples[0] = ( temp[0] + temp[length()-1] ) * 0.5f;
 	for ( int i=1; i < length(); i++ )
 	{
-		m_samples[i] = ( temp[i-1] + temp[i] ) * 0.5f; 	
+		m_samples[i] = ( temp[i-1] + temp[i] ) * 0.5f;
 	}
 
 	emit samplesChanged(0, length()-1);
@@ -525,7 +526,7 @@ void graphModel::normalize( void )
 	if( max != 1.0f ) {
 		emit samplesChanged( 0, length()-1 );
 	}
-}	
+}
 
 
 
