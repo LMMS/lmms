@@ -40,7 +40,10 @@
 	* src/gui/widgets/controller_view.cpp:
 	* src/gui/widgets/effect_view.cpp:
 	* src/gui/widgets/project_notes.cpp:
-	Begin themeing widgets with the new LmmsStyle interface
+	* src/gui/piano_roll.cpp:
+	* src/core/timeline.cpp:
+	- Begin themeing widgets with the new LmmsStyle interface
+	- Minor tweaks and code style improvements
 
 2009-01-26	Paul Giblock <drfaygo/at/gmail/dot/com>
 
