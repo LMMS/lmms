@@ -51,6 +51,7 @@
 
 	* src/core/track.cpp:
 	* src/gui/fx_mixer_view.cpp:
+	* src/gui/classic_style.cpp:
 	Attempt to fix Skiessi's gfx bugs
 
 2009-01-26	Paul Giblock <drfaygo/at/gmail/dot/com>

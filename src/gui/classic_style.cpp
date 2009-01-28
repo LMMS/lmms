@@ -328,5 +328,4 @@ void ClassicStyle::drawTrackContentBackground(QPainter * _painter,
         _painter->drawLine( QLineF( x, 1.0, x, h-2.0 ) );
     }
     _painter->drawLine( 0, h-2, w*2, h-2 );
-    _painter->end();
 }
