@@ -216,15 +216,15 @@ void fader::paintEvent( QPaintEvent * ev)
 	painter.drawPixmap( QRect( 11, peak_R, 11, 116 - peak_R ), m_leds, QRect( 11, peak_R, 11, 116 - peak_R ) );
 
 	// knob
-	static const uint knob_height = 29;
-	static const uint knob_width = 15;
+	const uint knob_height = m_knob.height();
+	const uint knob_width = m_knob.width();
 
 	float fRange = m_model->maxValue() - m_model->minValue();
 
 	float realVal = m_model->value() - m_model->minValue();
 
 //		uint knob_y = (uint)( 116.0 - ( 86.0 * ( m_model->value() / fRange ) ) );
-	uint knob_y = (uint)( 116.0 - ( 86.0 * ( realVal / fRange ) ) );
+	uint knob_y = (uint)( 116.0 - ( (116.0-knob_height) * ( realVal / fRange ) ) );
 
 
 	painter.drawPixmap( QRect( 4, knob_y - knob_height, knob_width, knob_height), m_knob, QRect( 0, 0, knob_width, knob_height ) );

@@ -55,6 +55,7 @@ effectRackView::effectRackView( effectChain * _model, QWidget * _parent ) :
 	m_scrollArea = new QScrollArea( m_effectsGroupBox );
 	m_scrollArea->setFixedSize( 230, 184 );
 	m_scrollArea->setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOn );
+	m_scrollArea->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
 	m_scrollArea->setPalette( QApplication::palette( m_scrollArea ) );
 	m_scrollArea->setWidget( new QWidget );
 	m_scrollArea->move( 6, 22 );

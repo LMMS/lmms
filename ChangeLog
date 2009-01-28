@@ -13,6 +13,37 @@
 	- Add LmmsStyle class for centralizing palette and drawing.  It isn't
 	  perfect, but at least most interesting stylables are in one place now.
 
+	* include/track.h:
+	* src/core/track.cpp:
+	* src/gui/track_container_view.cpp:
+	Properly update track backgrounds when realigning tracks
+
+	* src/gui/piano_roll.cpp:
+	* src/gui/widgets/visualization_widget.cpp:
+	Plug memory leaks
+
+	* src/gui/widgets/fader.cpp:
+	Make fader size flexible
+
+	
+	* src/gui/widgets/controller_rack_view.cpp:
+	* src/gui/widgets/effect_rack_view.cpp:
+	Prevent Horizontal bars from appearing in some cases
+
+	src/gui/fx_mixer_view.cpp
+	srg/gui/widgets/graph.cpp
+	src/gui/widgets/visualization_widget.cpp
+	src/gui/widgets/led_checkbox.cpp
+	src/gui/widgets/envelope_and_lfo_view.cpp
+	src/gui/widgets/lcd_spinbox.cpp
+	src/gui/widgets/text_float.cpp
+	src/gui/widgets/controller_view.cpp
+
+
+
+
+
+
 2009-01-26	Paul Giblock <drfaygo/at/gmail/dot/com>
 
 	* src/tracks/bb_track.cpp:
