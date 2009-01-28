@@ -56,20 +56,20 @@ public:
 					const QStyleOption * option = 0,
 					const QWidget * widget = 0 ) const;
 
-    // LMMS Stuff
+// LMMS Stuff
 
-    virtual void drawFxLine(QPainter * _painter, const QWidget *_fxLine,
-            const QString & _name, bool _active);
+	virtual void drawFxLine(QPainter * _painter, const QWidget *_fxLine,
+			const QString & _name, bool _active);
 
-    virtual void drawTrackContentBackground(QPainter * _painter,
-            const QSize & _size, const int _pixelsPerTact);
+	virtual void drawTrackContentBackground(QPainter * _painter,
+			const QSize & _size, const int _pixelsPerTact);
 
-    virtual QColor color(LmmsStyle::ColorRole _role) const;
+	virtual QColor color(LmmsStyle::ColorRole _role) const;
 
-private:
-    QImage colorizeXpm( const char * const * xpm, const QBrush & fill ) const;
+	private:
+	QImage colorizeXpm( const char * const * xpm, const QBrush & fill ) const;
 
-    QColor colors[LmmsStyle::NumColorRoles];
+	QColor colors[LmmsStyle::NumColorRoles];
 
 };
 

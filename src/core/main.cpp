@@ -369,10 +369,10 @@ int main( int argc, char * * argv )
 	if( render_out.isEmpty() && file_to_save.isEmpty() )
 	{
 		// init style and palette
-        // TODO, select based on theme.xml!
-        ClassicStyle * style = new ClassicStyle();
-        QApplication::setStyle( style );
-        engine::setLmmsStyle( style );
+		// TODO, select based on theme.xml!
+		ClassicStyle * style = new ClassicStyle();
+		QApplication::setStyle( style );
+		engine::setLmmsStyle( style );
 
 		// init splash screen - this is a bit difficult as we have a
 		// semi-transparent splash-image therefore we first need to grab
@@ -380,7 +380,7 @@ int main( int argc, char * * argv )
 		// which covers all pixels which are not fully transparent in
 		// splash-image - otherwise we get nasty edges etc.
 		const QPixmap splash = embed::getIconPixmap( "splash" );
-    		const QPoint pt = QApplication::desktop()->
+		const QPoint pt = QApplication::desktop()->
 #ifdef LMMS_BUILD_LINUX
 			availableGeometry().
 #else

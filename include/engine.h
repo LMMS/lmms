@@ -165,13 +165,15 @@ public:
 		return( s_pluginFileHandling );
 	}
 
-    static void setLmmsStyle( LmmsStyle * _style ) {
-        s_lmmsStyle = _style;
-    }
+	static void setLmmsStyle( LmmsStyle * _style )
+	{
+		s_lmmsStyle = _style;
+	}
 
-    static LmmsStyle * getLmmsStyle( void ) {
-        return s_lmmsStyle;
-    }
+	static LmmsStyle * getLmmsStyle( void )
+	{
+		return s_lmmsStyle;
+	}
 
 private:
 	static bool s_hasGUI;

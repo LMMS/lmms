@@ -44,38 +44,38 @@ ClassicStyle::ClassicStyle() :
 
 	qApp->setPalette( standardPalette() );
 
-    colors[AutomationBarFill] = QColor( 0xFF, 0xB0, 0x00 );
-    colors[AutomationBarValue] = QColor( 0xFF, 0xDF, 0x20 );
-    colors[AutomationSelectedBarFill] = QColor( 0x00, 0x40, 0xC0 );
-    colors[AutomationCrosshair] = QColor( 0xFF, 0x33, 0x33 );
-    colors[PianoRollDefaultNote] = QColor( 0x00, 0xAA, 0x00 );
-    colors[PianoRollStepNote] = QColor( 0x00, 0xFF, 0x00 );
-    colors[PianoRollSelectedNote] = QColor( 0x00, 0x40, 0xC0 );
-    colors[PianoRollEditHandle] = QColor( 0xEA, 0xA1, 0x00 );
-    colors[PianoRollSelectedLevel] = QColor( 0x00, 0x40, 0xC0 );
-    colors[PianoRollVolumeLevel] = QColor( 0x00, 0xFF, 0x00 );
-    colors[PianoRollPanningLevel] = QColor( 0xFF, 0xB0, 0x00 );
+	colors[AutomationBarFill] = QColor( 0xFF, 0xB0, 0x00 );
+	colors[AutomationBarValue] = QColor( 0xFF, 0xDF, 0x20 );
+	colors[AutomationSelectedBarFill] = QColor( 0x00, 0x40, 0xC0 );
+	colors[AutomationCrosshair] = QColor( 0xFF, 0x33, 0x33 );
+	colors[PianoRollDefaultNote] = QColor( 0x00, 0xAA, 0x00 );
+	colors[PianoRollStepNote] = QColor( 0x00, 0xFF, 0x00 );
+	colors[PianoRollSelectedNote] = QColor( 0x00, 0x40, 0xC0 );
+	colors[PianoRollEditHandle] = QColor( 0xEA, 0xA1, 0x00 );
+	colors[PianoRollSelectedLevel] = QColor( 0x00, 0x40, 0xC0 );
+	colors[PianoRollVolumeLevel] = QColor( 0x00, 0xFF, 0x00 );
+	colors[PianoRollPanningLevel] = QColor( 0xFF, 0xB0, 0x00 );
 
-  	colors[TimelineForecolor] = QColor( 192, 192, 192 );
+	colors[TimelineForecolor] = QColor( 192, 192, 192 );
 
-  	colors[StandardGraphLine] = QColor( 96, 255, 128 );
-  	colors[StandardGraphHandle] = QColor( 0xFF, 0xBF, 0x22 );
-  	colors[StandardGraphHandleBorder] = QColor( 0x00, 0x00, 0x02 );
-  	colors[StandardGraphCrosshair] = QColor( 0xAA, 0xFF, 0x00, 0x70 );
+	colors[StandardGraphLine] = QColor( 96, 255, 128 );
+	colors[StandardGraphHandle] = QColor( 0xFF, 0xBF, 0x22 );
+	colors[StandardGraphHandleBorder] = QColor( 0x00, 0x00, 0x02 );
+	colors[StandardGraphCrosshair] = QColor( 0xAA, 0xFF, 0x00, 0x70 );
 
-  	colors[TextFloatForecolor] = QColor( 0, 0, 0 );
-  	colors[TextFloatFill] = QColor( 224, 224, 224 );
+	colors[TextFloatForecolor] = QColor( 0, 0, 0 );
+	colors[TextFloatFill] = QColor( 224, 224, 224 );
 
-  	colors[VisualizationLevelLow] = QColor( 128, 224, 128 );
-  	colors[VisualizationLevelMid] = QColor( 255, 192, 64 );
-  	colors[VisualizationLevelPeak] = QColor( 255, 64, 64 );
+	colors[VisualizationLevelLow] = QColor( 128, 224, 128 );
+	colors[VisualizationLevelMid] = QColor( 255, 192, 64 );
+	colors[VisualizationLevelPeak] = QColor( 255, 64, 64 );
 }
 
 
 
 QColor ClassicStyle::color( LmmsStyle::ColorRole _role ) const
 {
-    return colors[_role];
+	return colors[_role];
 }
 
 
@@ -100,9 +100,9 @@ QPalette ClassicStyle::standardPalette( void ) const
 
 
 void ClassicStyle::drawComplexControl( ComplexControl control,
-					const QStyleOptionComplex * option,
-					QPainter *painter,
-						const QWidget *widget ) const
+				const QStyleOptionComplex * option,
+				QPainter *painter,
+				const QWidget *widget ) const
 {
 	// fix broken titlebar styling on win32
 	if( control == CC_TitleBar )
@@ -131,8 +131,9 @@ void ClassicStyle::drawComplexControl( ComplexControl control,
 
 
 void ClassicStyle::drawPrimitive( PrimitiveElement element,
-		const QStyleOption *option, QPainter *painter,
-		const QWidget *widget) const
+				const QStyleOption *option,
+				QPainter *painter,
+				const QWidget *widget ) const
 {
 	if( element == QStyle::PE_Frame ||
 			element == QStyle::PE_FrameLineEdit ||
@@ -154,96 +155,96 @@ void ClassicStyle::drawPrimitive( PrimitiveElement element,
 
 		// black inside lines
 		// 50%
-		black.setAlpha(a100);
-		painter->setPen(QPen(black, 0));
-		lines[0] = QLine(rect.left() + 2, rect.top() + 1,
-					rect.right() - 2, rect.top() + 1);
-		lines[1] = QLine(rect.left() + 2, rect.bottom() - 1,
-					rect.right() - 2, rect.bottom() - 1);
-		lines[2] = QLine(rect.left() + 1, rect.top() + 2,
-					rect.left() + 1, rect.bottom() - 2);
-		lines[3] = QLine(rect.right() - 1, rect.top() + 2,
-					rect.right() - 1, rect.bottom() - 2);
-		painter->drawLines(lines, 4);
+		black.setAlpha( a100 );
+		painter->setPen( QPen( black, 0 ) );
+		lines[0] = QLine( rect.left() + 2, rect.top() + 1,
+					rect.right() - 2, rect.top() + 1 );
+		lines[1] = QLine( rect.left() + 2, rect.bottom() - 1,
+					rect.right() - 2, rect.bottom() - 1 );
+		lines[2] = QLine( rect.left() + 1, rect.top() + 2,
+					rect.left() + 1, rect.bottom() - 2 );
+		lines[3] = QLine( rect.right() - 1, rect.top() + 2,
+					rect.right() - 1, rect.bottom() - 2 );
+		painter->drawLines( lines, 4 );
 
 		// black inside dots
-		black.setAlpha(a50);
-		painter->setPen(QPen(black, 0));
-		points[0] = QPoint(rect.left() + 2, rect.top() + 2);
-		points[1] = QPoint(rect.left() + 2, rect.bottom() - 2);
-		points[2] = QPoint(rect.right() - 2, rect.top() + 2);
-		points[3] = QPoint(rect.right() - 2, rect.bottom() - 2);
-		painter->drawPoints(points, 4);
+		black.setAlpha( a50 );
+		painter->setPen( QPen( black, 0 ) );
+		points[0] = QPoint( rect.left() + 2, rect.top() + 2 );
+		points[1] = QPoint( rect.left() + 2, rect.bottom() - 2 );
+		points[2] = QPoint( rect.right() - 2, rect.top() + 2 );
+		points[3] = QPoint( rect.right() - 2, rect.bottom() - 2 );
+		painter->drawPoints( points, 4 );
 
 
 		// outside lines - shadow
 		// 100%
-		shadow.setAlpha(a75);
-		painter->setPen(QPen(shadow, 0));
-		lines[0] = QLine(rect.left() + 2, rect.top(),
-						rect.right() - 2, rect.top());
-		lines[1] = QLine(rect.left(), rect.top() + 2,
-						rect.left(), rect.bottom() - 2);
-		painter->drawLines(lines, 2);
+		shadow.setAlpha( a75 );
+		painter->setPen( QPen( shadow, 0 ) );
+		lines[0] = QLine( rect.left() + 2, rect.top(),
+						rect.right() - 2, rect.top() );
+		lines[1] = QLine( rect.left(), rect.top() + 2,
+						rect.left(), rect.bottom() - 2 );
+		painter->drawLines( lines, 2 );
 
 		// outside corner dots - shadow
 		// 75%
-		shadow.setAlpha(a50);
-		painter->setPen(QPen(shadow, 0));
-		points[0] = QPoint(rect.left() + 1, rect.top() + 1);
-		points[1] = QPoint(rect.right() - 1, rect.top() + 1);
-		painter->drawPoints(points, 2);
+		shadow.setAlpha( a50 );
+		painter->setPen( QPen( shadow, 0 ) );
+		points[0] = QPoint( rect.left() + 1, rect.top() + 1 );
+		points[1] = QPoint( rect.right() - 1, rect.top() + 1 );
+		painter->drawPoints( points, 2 );
 
 		// outside end dots - shadow
 		// 50%
-		shadow.setAlpha(a25);
-		painter->setPen(QPen(shadow, 0));
-		points[0] = QPoint(rect.left() + 1, rect.top());
-		points[1] = QPoint(rect.left(), rect.top() + 1);
-		points[2] = QPoint(rect.right() - 1, rect.top());
-		points[3] = QPoint(rect.left(), rect.bottom() - 1);
-		painter->drawPoints(points, 4);
+		shadow.setAlpha( a25 );
+		painter->setPen( QPen( shadow, 0 ) );
+		points[0] = QPoint( rect.left() + 1, rect.top() );
+		points[1] = QPoint( rect.left(), rect.top() + 1 );
+		points[2] = QPoint( rect.right() - 1, rect.top() );
+		points[3] = QPoint( rect.left(), rect.bottom() - 1 );
+		painter->drawPoints( points, 4 );
 
 
 		// outside lines - highlight
 		// 100%
-		highlight.setAlpha(a75);
-		painter->setPen(QPen(highlight, 0));
-		lines[0] = QLine(rect.left() + 2, rect.bottom(),
-					rect.right() - 2, rect.bottom());
-		lines[1] = QLine(rect.right(), rect.top() + 2,
-					rect.right(), rect.bottom() - 2);
-		painter->drawLines(lines, 2);
+		highlight.setAlpha( a75 );
+		painter->setPen( QPen( highlight, 0 ) );
+		lines[0] = QLine( rect.left() + 2, rect.bottom(),
+					rect.right() - 2, rect.bottom() );
+		lines[1] = QLine( rect.right(), rect.top() + 2,
+					rect.right(), rect.bottom() - 2 );
+		painter->drawLines( lines, 2 );
 
 		// outside corner dots - highlight
 		// 75%
-		highlight.setAlpha(a50);
-		painter->setPen(QPen(highlight, 0));
-		points[0] = QPoint(rect.left() + 1, rect.bottom() - 1);
-		points[1] = QPoint(rect.right() - 1, rect.bottom() - 1);
-		painter->drawPoints(points, 2);
+		highlight.setAlpha( a50 );
+		painter->setPen( QPen(highlight, 0 ) );
+		points[0] = QPoint( rect.left() + 1, rect.bottom() - 1 );
+		points[1] = QPoint( rect.right() - 1, rect.bottom() - 1 );
+		painter->drawPoints( points, 2 );
 
 		// outside end dots - highlight
 		// 50%
-		highlight.setAlpha(a25);
-		painter->setPen(QPen(highlight, 0));
-		points[0] = QPoint(rect.right() - 1, rect.bottom());
-		points[1] = QPoint(rect.right(), rect.bottom() - 1);
-		points[2] = QPoint(rect.left() + 1, rect.bottom());
-		points[3] = QPoint(rect.right(), rect.top() + 1);
-		painter->drawPoints(points, 4);
+		highlight.setAlpha( a25 );
+		painter->setPen( QPen(highlight, 0 ) );
+		points[0] = QPoint( rect.right() - 1, rect.bottom() );
+		points[1] = QPoint( rect.right(), rect.bottom() - 1 );
+		points[2] = QPoint( rect.left() + 1, rect.bottom() );
+		points[3] = QPoint( rect.right(), rect.top() + 1 );
+		painter->drawPoints( points, 4 );
 	}
 	else
 	{
-		QPlastiqueStyle::drawPrimitive( element, option, painter,
-								widget );
+		QPlastiqueStyle::drawPrimitive( element, option, painter, widget );
 	}
 
 }
 
 
-int ClassicStyle::pixelMetric( PixelMetric _metric, const QStyleOption * _option,
-						const QWidget * _widget ) const
+int ClassicStyle::pixelMetric( PixelMetric _metric,
+				const QStyleOption * _option,
+				const QWidget * _widget ) const
 {
 	switch( _metric )
 	{
@@ -263,31 +264,31 @@ int ClassicStyle::pixelMetric( PixelMetric _metric, const QStyleOption * _option
 			return 24;
 
 		default:
-			return QPlastiqueStyle::pixelMetric( _metric, _option,
-								_widget );
+			return QPlastiqueStyle::pixelMetric(
+					_metric, _option, _widget );
 	}
 }
 
 
-void ClassicStyle::drawFxLine(QPainter * _painter, const QWidget *_fxLine,
-        const QString & _name, bool _active)
+void ClassicStyle::drawFxLine( QPainter * _painter, const QWidget *_fxLine,
+				const QString & _name, bool _active )
 {
-    int width = _fxLine->rect().width();
-    int height = _fxLine->rect().height();
+	int width = _fxLine->rect().width();
+	int height = _fxLine->rect().height();
 
-    QPainter * p = _painter;
-    p->fillRect( _fxLine->rect(), QColor( 72, 76, 88 ) );
-    p->setPen( QColor( 40, 42, 48 ) );
-    p->drawRect( 0, 0, width-2, height-2 );
-    p->setPen( QColor( 108, 114, 132 ) );
-    p->drawRect( 1, 1, width-2, height-2 );
-    p->setPen( QColor( 20, 24, 32 ) );
-    p->drawRect( 0, 0, width-1, height-1 );
+	QPainter * p = _painter;
+	p->fillRect( _fxLine->rect(), QColor( 72, 76, 88 ) );
+	p->setPen( QColor( 40, 42, 48 ) );
+	p->drawRect( 0, 0, width-2, height-2 );
+	p->setPen( QColor( 108, 114, 132 ) );
+	p->drawRect( 1, 1, width-2, height-2 );
+	p->setPen( QColor( 20, 24, 32 ) );
+	p->drawRect( 0, 0, width-1, height-1 );
 
-    p->rotate( -90 );
-    p->setPen( _active ? QColor( 0, 255, 0 ) : Qt::white );
-    p->setFont( pointSizeF( _fxLine->font(), 7.5f ) );
-    p->drawText( -90, 20, _name );
+	p->rotate( -90 );
+	p->setPen( _active ? QColor( 0, 255, 0 ) : Qt::white );
+	p->setFont( pointSizeF( _fxLine->font(), 7.5f ) );
+	p->drawText( -90, 20, _name );
 }
 
 void ClassicStyle::drawTrackContentBackground(QPainter * _painter,
