@@ -1,0 +1,12 @@
+<lmmsTheme>
+	<title>Cusis Theme</title>
+	<authors>
+		<author>Paul Giblock</author>
+	</authors>
+	<description>Based on the mockup by Cusis</description>
+	<lmmsStyle class="CusisStyle"> <!-- can be ClassicStyle or CusisStyle -->
+		<!-- style-specific settings go here -->
+	</lmmsStyle>
+	<qStyle class="CusisStyle"/>  <!-- can be QPlastiqueStyle, ClassicStyle, CusisStyle QMotifStyle, etc.. -->
+	<defaultBackground url="..."/>
+</lmmsTheme>

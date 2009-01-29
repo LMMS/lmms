@@ -1,0 +1,220 @@
+/* Cusis Style sheet */
+
+QScrollBar::groove:horizontal {
+    background: red;
+}
+
+QScrollArea, QListView, QTreeView {
+	background: rgb(0, 0, 0);
+}
+
+QToolButton, toolButton {
+	padding: 3px 2px 2px 3px;
+    margin: 1px;
+	border-radius: 2px;
+	background: rgba(0,0,0,64);
+	font-size:10px;
+	color: white;
+}
+
+QToolButton:hover {
+	background: rgba(255,255,255,96);
+	border-radius: 3px;
+	border: 1px solid rgba(0,0,0,255);
+	color: black;
+}
+
+QToolButton:pressed {
+	background: rgba(192,192,192,96);
+	padding: 3px 0px 0px 3px;
+	border-radius: 3px;
+	border: 1px solid rgba(255,255,255,64);
+}
+
+QToolButton:checked {
+	background: rgba(233,239,255,96);
+	border-radius: 3px;
+	border: 1px solid black;
+	padding: 3px 0px 0px 3px;
+}
+
+/* LMMS style sheet */
+
+QWhatsThat {
+	color: black;
+}
+
+QMdiArea {
+	background-image: url(resources:background_artwork.png);
+}
+
+automationEditor {
+	background-color: rgb(0, 0, 0);
+}
+
+QMenu {
+	border:1px solid black;
+	background-color: rgb( 192, 192, 192 );
+	font-size:11px;
+}
+
+QMenu::separator {
+	height: 1px;
+	background: rgb(128,128,128);
+	margin-left: 5px;
+	margin-right: 5px;
+}
+
+QMenu::item {
+	color: black;
+	padding: 2px 32px 2px 20px;
+	margin:3px;
+}
+
+QMenu::item:selected {
+	color: white;
+	font-weight:bold;
+	background-color: rgb(54,57,66);
+	margin:3px;
+}
+
+QMenu::item:disabled {
+	color: white;
+	margin:0px;
+	background-color: rgba(0,0,0,192);
+	font-size:12px;
+	font-weight:bold;
+	padding: 4px 32px 4px 20px;
+}
+
+QMenu::indicator {
+	width: 16;
+	height: 16;
+	opacity: 0;
+	background-color: rgb( 192, 192, 192 );
+}
+
+QMenu::indicator:checked {
+	image: url("resources:apply.png");
+}
+
+QMenu::indicator:selected {
+	background-color: rgb(54,57,66);
+}
+
+pianoRoll {
+	background-color: rgb(0, 0, 0);
+}
+
+trackOperationsWidget > QPushButton {
+	max-height: 26px;
+	max-width: 26px;
+	min-height: 26px;
+	min-width: 26px;
+}
+
+trackOperationsWidget#automationDisabled > QPushButton::menu-indicator {
+	image: url(resources:track_op_menu_disabled.png);
+}
+
+trackOperationsWidget#automationEnabled > QPushButton::menu-indicator {
+	image: url(resources:track_op_menu.png);
+}
+
+trackWidget {
+/*	border-bottom: 1px solid rgb(0, 0, 0);*/
+	background-color: rgb(0, 0, 0);
+}
+nameLabel, effectLabel, sf2InstrumentView > QLabel {
+	font-size:10px;
+}
+
+
+QWidget#mainToolbar {
+	background-image: url(resources:main_toolbar_bg.png);
+}
+
+QToolBar {
+	background: url(resources:toolbar_bg.png);
+}
+
+
+fxMixerView QPushButton, effectRackView QPushButton, controllerRackView QPushButton {
+	font-size: 10px;
+}
+
+timeLine {
+	font-size: 8px;
+}
+
+/* Plugins */
+
+tripleOscillatorView knob {
+	color: rgb(1, 114, 216);
+	qproperty-outerColor: rgb(0, 0, 0);
+	qproperty-innerRadius: 1;
+	qproperty-outerRadius: 6.5;
+	qproperty-centerPointX: 13.5;
+	qproperty-centerPointY: 13.5;
+	qproperty-lineWidth: 2;
+}
+
+
+kickerInstrumentView knob {
+	color: rgb(240, 147, 14);
+	qproperty-outerColor: rgb(30, 35, 37);
+	qproperty-innerRadius: 4;
+	qproperty-outerRadius: 11.2;
+	qproperty-centerPointX: 18.5;
+	qproperty-centerPointY: 13.5;
+	qproperty-lineWidth: 3;
+}
+
+
+audioFileProcessorView knob {
+	color: rgb(240, 147, 14);
+	qproperty-outerColor: rgb(30, 35, 37);
+	qproperty-innerRadius: 4;
+	qproperty-outerRadius: 11.2;
+	qproperty-centerPointX: 18.5;
+	qproperty-centerPointY: 16.5;
+	qproperty-lineWidth: 3;
+}
+
+organicInstrumentView knob {
+	color: rgb(205, 16, 216);
+	qproperty-outerColor: rgb(23, 9, 24);
+	/*qproperty-outerColor: rgb(64, 21, 67);*/
+	qproperty-innerRadius: 2;
+	qproperty-outerRadius: 8.7;
+	qproperty-centerPointX: 10.5;
+	qproperty-centerPointY: 10.5;
+	qproperty-lineWidth: 2;
+}
+
+
+organicInstrumentView knob#fx1Knob,
+organicInstrumentView knob#volKnob {
+	qproperty-innerRadius: 4;
+	qproperty-outerRadius: 11.2;
+	qproperty-centerPointX: 18.5;
+	qproperty-centerPointY: 13.8;
+	qproperty-lineWidth: 3;
+}
+
+sf2InstrumentView knob {
+	color: #ff0066;
+	qproperty-outerColor: rgb(30, 35, 37);
+	qproperty-innerRadius: 2;
+	qproperty-outerRadius: 9.2;
+	qproperty-centerPointX: 15.5;
+	qproperty-centerPointY: 15.42;
+	qproperty-lineWidth: 2;
+}
+
+/* Notes: 
+ 
+lcd-spinbox colors: (12, 250, 150), (37, 57, 42)
+
+
+*/

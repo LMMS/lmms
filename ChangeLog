@@ -58,6 +58,23 @@
 	* src/gui/cusis_style.cpp:
 	Pull Cusis-style class into SVN
 
+	* data/themes/cusis:
+	* data/themes/cusis/led_off.png:
+	* data/themes/cusis/scrollarea_corner.png:
+	* data/themes/cusis/style.css:
+	* data/themes/cusis/toolbar_bg.png:
+	* data/themes/cusis/effect_plugin.png:
+	* data/themes/cusis/main_toolbar_bg.png:
+	* data/themes/cusis/fader_background.png:
+	* data/themes/cusis/combobox_bg.png:
+	* data/themes/cusis/combobox_arrow.png:
+	* data/themes/cusis/led_green.png:
+	* data/themes/cusis/fader_leds.png:
+	* data/themes/cusis/fader_knob.png:
+	* data/themes/cusis/combobox_arrow_selected.png:
+	* data/themes/cusis/controller_bg.png:
+	Add Cusis-theme artwork
+
 2009-01-26	Paul Giblock <drfaygo/at/gmail/dot/com>
 
 	* src/tracks/bb_track.cpp:
