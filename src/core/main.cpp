@@ -60,8 +60,9 @@
 #include "song.h"
 #include "basic_ops.h"
 
-// FIXME Make a factory class for this (or hide it behind engine)
+// TODO Make a factory class for this (or hide it behind engine)
 #include "lmms_style.h"
+#include "cusis_style.h"
 #include "classic_style.h"
 
 #warning TODO: move somewhere else
@@ -370,9 +371,21 @@ int main( int argc, char * * argv )
 	{
 		// init style and palette
 		// TODO, select based on theme.xml!
-		ClassicStyle * style = new ClassicStyle();
-		QApplication::setStyle( style );
-		engine::setLmmsStyle( style );
+		bool useCusis = configManager::inst()->artworkDir().contains(
+				"cusis", Qt::CaseInsensitive );
+
+		if( useCusis ) {
+			CusisStyle * style = new CusisStyle();
+			QApplication::setStyle( style );
+			engine::setLmmsStyle( style );
+		}
+		else {
+			ClassicStyle * style = new ClassicStyle();
+			QApplication::setStyle( style );
+			engine::setLmmsStyle( style );
+		}
+
+		// END TODO
 
 		// init splash screen - this is a bit difficult as we have a
 		// semi-transparent splash-image therefore we first need to grab

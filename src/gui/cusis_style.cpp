@@ -786,7 +786,6 @@ void CusisStyle::drawTrackContentBackground( QPainter * _painter, const QSize & 
 		_painter->drawLine( QLine( x, 0, x, h ) );
 	}
 	_painter->drawLine( 0, h - 1, w * 2, h - 1 );
-	_painter->end();
 }
 
 

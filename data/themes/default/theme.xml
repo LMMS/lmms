@@ -1,0 +1,13 @@
+<lmmsTheme>
+	<title>Classic 0.4 Theme</title>
+	<authors>
+		<author>Tobias Doerffel</author>
+		<author>Paul Giblock</author>
+	</authors>
+	<description>The LMMS-0.4 look and feel</description>
+	<lmmsStyle class="ClassicStyle"> <!-- can be ClassicStyle or CusisStyle -->
+		<!-- style-specific settings go here -->
+	</lmmsStyle>
+	<qStyle class="ClassicStyle"/>  <!-- can be QPlastiqueStyle, ClassicStyle, CusisStyle QMotifStyle, etc.. -->
+	<defaultBackground url="..."/>
+</lmmsTheme>
