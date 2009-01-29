@@ -54,6 +54,10 @@
 	* src/gui/classic_style.cpp:
 	Attempt to fix Skiessi's gfx bugs
 
+	* include/cusis_style.h:
+	* src/gui/cusis_style.cpp:
+	Pull Cusis-style class into SVN
+
 2009-01-26	Paul Giblock <drfaygo/at/gmail/dot/com>
 
 	* src/tracks/bb_track.cpp:
