@@ -48,7 +48,9 @@ ClassicStyle::ClassicStyle() :
 	colors[AutomationBarValue] = QColor( 0xFF, 0xDF, 0x20 );
 	colors[AutomationSelectedBarFill] = QColor( 0x00, 0x40, 0xC0 );
 	colors[AutomationCrosshair] = QColor( 0xFF, 0x33, 0x33 );
-	colors[PianoRollDefaultNote] = QColor( 0x00, 0xAA, 0x00 );
+	colors[PianoRollDefaultNote] = QColor( 0x00, 0xAA, 0x00 ); // 0.3.x: QColor( 0x99, 0xff, 0x00 )
+	colors[PianoRollFrozenNote] = QColor( 0x00, 0xE0, 0xFF );
+	colors[PianoRollMutedNote] = QColor( 160, 160, 160 );
 	colors[PianoRollStepNote] = QColor( 0x00, 0xFF, 0x00 );
 	colors[PianoRollSelectedNote] = QColor( 0x00, 0x40, 0xC0 );
 	colors[PianoRollEditHandle] = QColor( 0xEA, 0xA1, 0x00 );

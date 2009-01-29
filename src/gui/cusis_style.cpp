@@ -144,7 +144,10 @@ CusisStyle::CusisStyle() :
 	m_colors[AutomationBarValue] = QColor( 0xFF, 0xF7, 0x33 );
 	m_colors[AutomationSelectedBarFill] = QColor( 0x00, 0x99, 0xFF );
 	m_colors[AutomationCrosshair] = QColor( 0xFF, 0x33, 0x33 );
+
 	m_colors[PianoRollDefaultNote] = QColor( 0x99, 0xff, 0x00 ); // or 00 ff 99
+	m_colors[PianoRollFrozenNote] = QColor( 0x00, 0xE0, 0xFF );
+	m_colors[PianoRollMutedNote] = QColor( 160, 160, 160 );
 	m_colors[PianoRollStepNote] = QColor( 0xff, 0x99, 0x00 );
 	m_colors[PianoRollSelectedNote] = QColor( 0x00, 0x99, 0xff );
 	m_colors[PianoRollEditHandle] = QColor( 0xff, 0x99, 0x33 );

@@ -44,6 +44,8 @@ public:
 		PianoRollStepNote,
 		PianoRollSelectedNote,
 		PianoRollDefaultNote,
+		PianoRollFrozenNote,
+		PianoRollMutedNote,
 		PianoRollEditHandle,
 		PianoRollVolumeLevel,
 		PianoRollPanningLevel,

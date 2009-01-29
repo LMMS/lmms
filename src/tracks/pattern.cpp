@@ -5,7 +5,7 @@
  *
  * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2005-2007 Danny McRae <khjklujn/at/yahoo.com>
- * 
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -210,9 +210,9 @@ note * pattern::addNote( const note & _new_note, const bool _quant_pos )
 	}
 	else
 	{
-		// simple algorithm for inserting the note between two 
+		// simple algorithm for inserting the note between two
 		// notes with smaller and greater position
-		// maybe it could be optimized by starting in the middle and 
+		// maybe it could be optimized by starting in the middle and
 		// going forward or backward but note-inserting isn't that
 		// time-critical since it is usually not done while playing...
 		long new_note_abs_time = new_note->pos();
@@ -271,7 +271,7 @@ void pattern::removeNote( const note * _note_to_del )
 note * pattern::rearrangeNote( const note * _note_to_proc,
 							const bool _quant_pos )
 {
-	// just rearrange the position of the note by removing it and adding 
+	// just rearrange the position of the note by removing it and adding
 	// a copy of it -> addNote inserts it at the correct position
 	note copy_of_note( *_note_to_proc );
 	removeNote( _note_to_proc );
@@ -283,7 +283,7 @@ note * pattern::rearrangeNote( const note * _note_to_proc,
 
 void pattern::rearrangeAllNotes( void )
 {
-	// sort notes by start time	
+	// sort notes by start time
 	qSort(m_notes.begin(), m_notes.end(), note::lessThan );
 }
 
@@ -1084,7 +1084,7 @@ void patternView::wheelEvent( QWheelEvent * _we )
 		}
 		note * n = m_pat->m_notes[step];
 		int vol = n->getVolume();
-		
+
 		if( n->length() == 0 && _we->delta() > 0 )
 		{
 			n->setLength( -DefaultTicksPerTact );
@@ -1181,7 +1181,7 @@ void patternView::paintEvent( QPaintEvent * )
 		int central_key = 0;
 		if( m_pat->m_notes.size() > 0 )
 		{
-			// first determine the central tone so that we can 
+			// first determine the central tone so that we can
 			// display the area where most of the m_notes are
 			int total_notes = 0;
 			for( noteVector::iterator it = m_pat->m_notes.begin();
@@ -1201,18 +1201,19 @@ void patternView::paintEvent( QPaintEvent * )
 				const int central_y = height() / 2;
 				int y_base = central_y + TCO_BORDER_WIDTH -1;
 
+				LmmsStyle * lStyle = engine::getLmmsStyle();
 				if( m_pat->getTrack()->isMuted() ||
 							m_pat->isMuted() )
 				{
-					p.setPen( QColor( 160, 160, 160 ) );
+					p.setPen( lStyle->color(LmmsStyle::PianoRollMutedNote) );
 				}
 				else if( m_pat->m_frozenPattern != NULL )
 				{
-					p.setPen( QColor( 0x00, 0xE0, 0xFF ) );
+					p.setPen( lStyle->color(LmmsStyle::PianoRollFrozenNote) );
 				}
 				else
 				{
-					p.setPen( QColor( 0xFF, 0xB0, 0x00 ) );
+					p.setPen( lStyle->color(LmmsStyle::PianoRollDefaultNote) );
 				}
 
 				for( noteVector::iterator it =

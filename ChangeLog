@@ -75,6 +75,15 @@
 	* data/themes/cusis/controller_bg.png:
 	Add Cusis-theme artwork
 
+	* data/themes/cusis/theme.xml:
+	* data/themes/default/theme.xml:
+	* src/core/main.cpp:
+	- Add xml files for specifying styles and optional parameters
+	- However, we pick the class based on artworkDir path for now...
+
+	* src/tracks/pattern.cpp:
+	More widgets customized
+
 2009-01-26	Paul Giblock <drfaygo/at/gmail/dot/com>
 
 	* src/tracks/bb_track.cpp:
