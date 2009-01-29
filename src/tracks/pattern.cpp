@@ -1205,15 +1205,15 @@ void patternView::paintEvent( QPaintEvent * )
 				if( m_pat->getTrack()->isMuted() ||
 							m_pat->isMuted() )
 				{
-					p.setPen( lStyle->color(LmmsStyle::PianoRollMutedNote) );
+					p.setPen( lStyle->color( LmmsStyle::PianoRollMutedNote ) );
 				}
 				else if( m_pat->m_frozenPattern != NULL )
 				{
-					p.setPen( lStyle->color(LmmsStyle::PianoRollFrozenNote) );
+					p.setPen( lStyle->color( LmmsStyle::PianoRollFrozenNote ) );
 				}
 				else
 				{
-					p.setPen( lStyle->color(LmmsStyle::PianoRollDefaultNote) );
+					p.setPen( lStyle->color( LmmsStyle::PianoRollDefaultNote ) );
 				}
 
 				for( noteVector::iterator it =

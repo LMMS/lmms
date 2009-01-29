@@ -72,6 +72,8 @@ public:
 
 private:
 	QImage colorizeXpm( const char * const * _xpm, const QBrush & _fill ) const;
+	void hoverColors( bool sunken, bool hover, bool active,
+		QColor & color, QColor & blend ) const;
 	QColor m_colors[ LmmsStyle::NumColorRoles ];
 
 };

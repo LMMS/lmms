@@ -147,7 +147,7 @@ CusisStyle::CusisStyle() :
 
 	m_colors[PianoRollDefaultNote] = QColor( 0x99, 0xff, 0x00 ); // or 00 ff 99
 	m_colors[PianoRollFrozenNote] = QColor( 0x00, 0xE0, 0xFF );
-	m_colors[PianoRollMutedNote] = QColor( 160, 160, 160 );
+	m_colors[PianoRollMutedNote] = QColor( 0x99, 0x99, 0x99 );
 	m_colors[PianoRollStepNote] = QColor( 0xff, 0x99, 0x00 );
 	m_colors[PianoRollSelectedNote] = QColor( 0x00, 0x99, 0xff );
 	m_colors[PianoRollEditHandle] = QColor( 0xff, 0x99, 0x33 );
@@ -190,6 +190,36 @@ QPalette CusisStyle::standardPalette( void ) const
 	pal.setColor( QPalette::Button, QColor( 66, 66, 66 ) );
 
 	return ( pal );
+}
+
+
+
+void CusisStyle::hoverColors( bool sunken, bool hover, bool active,
+		QColor & color, QColor & blend ) const
+{
+	if( active )
+	{
+		if( sunken )
+		{
+			color = QColor( 75, 75, 75 );
+			blend = QColor( 65, 65, 65 );
+		}
+		else if( hover )
+		{
+			color = QColor( 100, 100, 100 );
+			blend = QColor( 75, 75, 75 );
+		}
+		else
+		{
+			color = QColor( 21, 21, 21 );
+			blend = QColor( 33, 33, 33 );
+		}
+	}
+	else
+	{
+		color = QColor( 21, 21, 21 );
+		blend = QColor( 33, 33, 33 );
+	}
 }
 
 
@@ -438,21 +468,12 @@ void CusisStyle::drawControl( ControlElement _element, const QStyleOption * _opt
 				cache = QPixmap( _option->rect.size() );
 				QPainter cachePainter( &cache );
 
-				cache.fill( QColor( 48, 48, 48 ) ); 				// TODO: Fill with CSS background
-				QColor sliderColor = QColor( 21, 21, 21 ); 	// TODO: option->palette.background()
-				if( ( scrollBar->activeSubControls & SC_ScrollBarAddLine ) )
-				{
-					if( sunken )
-					{
-					sliderColor = QColor( 75, 75, 75 );
-					}
-					else if( hover )
-					{
-						sliderColor = QColor( 100, 100, 100 );
-					}
-				}
-
-				QColor blurColor = QColor( 33, 33, 33 ); 		// TODO: Mix colors
+				cache.fill( QColor( 48, 48, 48 ) );
+				QColor sliderColor;
+				QColor blurColor;
+				hoverColors(sunken, hover, 
+						scrollBar->activeSubControls & SC_ScrollBarAddLine && isEnabled,
+						sliderColor, blurColor);
 
 				int scrollBarExtent = pixelMetric( PM_ScrollBarExtent, _option, _widget );
 				cachePainter.setPen( QPen( sliderColor, 0 ) );
@@ -526,19 +547,11 @@ void CusisStyle::drawControl( ControlElement _element, const QStyleOption * _opt
 				QPainter cachePainter( &cache );
 
 				cache.fill( QColor( 48, 48, 48 ) ); // TODO: Fill with CSS background
-				QColor sliderColor = QColor( 21, 21, 21 ); 	// TODO: option->palette.background()
-				if ((scrollBar->activeSubControls & SC_ScrollBarSubLine))
-				{
-					if( sunken )
-					{
-						sliderColor = QColor( 75, 75, 75 );
-					}
-					else if( hover )
-					{
-						sliderColor = QColor( 100, 100, 100 );
-					}
-				}
-				QColor blurColor = QColor( 33, 33, 33 ); // TODO: Mix colors
+				QColor sliderColor;
+				QColor blurColor;
+				hoverColors(sunken, hover,
+						scrollBar->activeSubControls & SC_ScrollBarSubLine && isEnabled,
+						sliderColor, blurColor);
 
 				int scrollBarExtent = pixelMetric( PM_ScrollBarExtent, _option, _widget );
 				cachePainter.setPen( QPen( sliderColor, 0 ) );
@@ -605,18 +618,10 @@ void CusisStyle::drawControl( ControlElement _element, const QStyleOption * _opt
 			bool sunken = scrollBar->state & State_Sunken;
 			bool hover = scrollBar->state & State_MouseOver;
 
-			QColor sliderColor = QColor( 21, 21, 21 ); 	// TODO: option->palette.background()
-			if ((scrollBar->activeSubControls & SC_ScrollBarSlider))
-			{
-				if( sunken )
-				{
-					sliderColor = QColor( 75, 75, 75 );
-				}
-				else if( hover )
-				{
-					sliderColor = QColor( 100, 100, 100 );
-				}
-			}
+			QColor sliderColor, blendColor;
+			hoverColors(sunken, hover,
+					(scrollBar->activeSubControls & SC_ScrollBarSlider) & isEnabled,
+					sliderColor, blendColor);
 
 			QColor background = QColor( 48, 48, 48 );
 			QRect rc = scrollBar->rect;

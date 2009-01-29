@@ -1,5 +1,14 @@
 2009-01-28	Paul Giblock <drfaygo/at/gmail/dot/com>
 
+	* src/tracks/pattern.cpp:
+	Code style
+
+	* src/gui/cusis_style.cpp:
+	* include/cusis_style.h:
+	Fix blending aronund scrollbar buttons
+
+2009-01-28	Paul Giblock <drfaygo/at/gmail/dot/com>
+
 	* src/gui/embed.cpp:
 	Cache pixmaps instead of loading new ones each time
 
