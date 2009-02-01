@@ -1,4 +1,9 @@
-2009-01-28	Paul Giblock <drfaygo/at/gmail/dot/com>
+2009-01-31	Paul Giblock <drfaygo/at/gmail/dot/com>
+	
+	* src/gui/cusis_style.cpp:
+	Scrollbar slider now highlights properly on hover
+
+2009-01-29	Paul Giblock <drfaygo/at/gmail/dot/com>
 
 	* src/tracks/pattern.cpp:
 	Code style

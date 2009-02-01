@@ -620,7 +620,7 @@ void CusisStyle::drawControl( ControlElement _element, const QStyleOption * _opt
 
 			QColor sliderColor, blendColor;
 			hoverColors(sunken, hover,
-					(scrollBar->activeSubControls & SC_ScrollBarSlider) & isEnabled,
+					(scrollBar->activeSubControls & SC_ScrollBarSlider) && isEnabled,
 					sliderColor, blendColor);
 
 			QColor background = QColor( 48, 48, 48 );
