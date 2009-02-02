@@ -1,5 +1,11 @@
 2009-02-01	Andrew Kelley	<superjoe30/at/gmail/dot/com>
 
+	* src/core/track.cpp:
+	integrated pitanga's patch to fix unquantized BB dragging in 
+	song editor. Changed ctrl modifier to alt to be consistent.
+
+2009-02-01	Andrew Kelley	<superjoe30/at/gmail/dot/com>
+
 	* plugins/flp_import/flp_import.cpp:
 	* plugins/flp_import/flp_import.h:
 	* src/core/song.cpp:
