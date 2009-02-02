@@ -277,6 +277,8 @@ void songEditor::scrolled( int _new_pos )
 
 void songEditor::play( void )
 {
+	engine::getMainWindow()->setPlaybackMode( PPM_Song );
+	
 	m_s->play();
 	if( m_s->playMode() == song::Mode_PlaySong )
 	{
@@ -293,6 +295,8 @@ void songEditor::play( void )
 
 void songEditor::record( void )
 {
+	engine::getMainWindow()->setPlaybackMode( PPM_Song );
+	
 	m_s->record();
 }
 
@@ -301,6 +305,8 @@ void songEditor::record( void )
 
 void songEditor::recordAccompany( void )
 {
+	engine::getMainWindow()->setPlaybackMode( PPM_Song );
+	
 	m_s->playAndRecord();
 }
 

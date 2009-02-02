@@ -37,6 +37,8 @@
 #include <QtGui/QMessageBox>
 #include <QtGui/QSplitter>
 #include <QtGui/QCheckBox>
+#include <QtGui/QRadioButton>
+#include <QShortcut>
 
 
 #include "lmmsversion.h"
@@ -632,7 +634,7 @@ void mainWindow::finalize( void )
 	m_toolBarLayout->addWidget( vc_w, 0, Qt::AlignLeft );
 	m_toolBarLayout->insertSpacing( -1, 10 );
 	
-	/*
+	
 	// global playback and record controls
 	// main box
 	QWidget * gpbr_w = new QWidget( m_toolBar );
@@ -647,23 +649,24 @@ void mainWindow::finalize( void )
 	
 	QWidget * btns = new QWidget( gpb_w );
 	QHBoxLayout * btns_layout = new QHBoxLayout( btns );
-	
-	
-	
+	btns_layout->setMargin(0);
+	btns_layout->setSpacing(0);
+
+		
 	toolButton * m_playButton =
 		new toolButton(
 					   embed::getIconPixmap( "play" ),
-					   tr( "Play/pause the current window (Space)" ),
-					   engine::getSong(),
-					   SLOT( play() ),
+					   tr( "Play/pause the project (Space)" ),
+					   this,
+					   SLOT(play()),
 					   btns );
 
 	toolButton * m_recordButton =
 		new toolButton( 
 						embed::getIconPixmap( "record" ),
 						tr( "Record from the checked items to the right" ), 
-						engine::getSong(),
-						SLOT( record() ),
+						this,
+						SLOT(record()),
 						btns );
 
 	toolButton * m_recordAccompanyButton = 
@@ -671,8 +674,8 @@ void mainWindow::finalize( void )
 					   embed::getIconPixmap( "record_accompany" ),
 					   tr( "Record from the checked items to "
 						   "the right while playing" ),
-					   engine::getSong(),
-					   SLOT( playAndRecord() ),
+					   this,
+					   SLOT(playAndRecord()),
 					   btns );
 	
 	toolButton * m_stopButton =
@@ -683,8 +686,6 @@ void mainWindow::finalize( void )
 					   SLOT( stop() ),
 					   btns );
 
-	btns_layout->setMargin(0);
-	btns_layout->setSpacing(0);
 	btns_layout->addWidget( m_playButton );
 	btns_layout->addWidget( m_recordButton );
 	btns_layout->addWidget( m_recordAccompanyButton );
@@ -692,13 +693,39 @@ void mainWindow::finalize( void )
 	
 	gpbw_layout->addWidget( btns );
 	
+	// choose between song or BB to playback	
+	QWidget * pbopt_w = new QWidget( gpb_w );
+	QHBoxLayout * pbopt_layout = new QHBoxLayout( pbopt_w );
+	pbopt_layout->setSpacing(0);
+	pbopt_layout->setMargin(0);
+
+	m_radpSong = new QRadioButton( tr( "Song" ), pbopt_w );
+	m_radpSong->setToolTip( tr("Playback: song mode") );
+	connect(m_radpSong, SIGNAL(clicked(bool)), SLOT(playbackSongClicked(bool)));
+	m_radpBB = new QRadioButton( tr( "B+B" ), pbopt_w );	
+	m_radpBB->setToolTip( tr("Playback: beat+bassline mode") );	
+	connect(m_radpBB, SIGNAL(clicked(bool)), SLOT(playbackBBClicked(bool)));
+	m_radpPianoRoll = new QRadioButton( tr( "Piano Roll" ), pbopt_w );	
+	m_radpPianoRoll->setToolTip( tr("Playback: piano roll mode") );	
+	connect(m_radpPianoRoll, SIGNAL(clicked(bool)), SLOT(playbackPianoRollClicked(bool)));
+	
+	
+	pbopt_layout->setMargin(0);
+	pbopt_layout->setSpacing(0);
+	pbopt_layout->addWidget( m_radpSong );
+	pbopt_layout->addWidget( m_radpBB );
+	pbopt_layout->addWidget( m_radpPianoRoll );
+
+	gpbw_layout->addWidget( pbopt_w );
+	
 	gpbw_layout->addStretch();
 	
 	QWidget * gr_w = new QWidget( gpbr_w );
 	QVBoxLayout * grw_layout = new QVBoxLayout( gr_w );
 	grw_layout->setMargin( 0 );
 	grw_layout->setSpacing( 0 );
-	
+
+		
 	m_chkrAudio = new QCheckBox( tr( "Audio-device" ), gr_w );
 	m_chkrAutomation = new QCheckBox( tr( "Automation" ), gr_w );
 	m_chkrMidi = new QCheckBox( tr( "MIDI" ), gr_w );
@@ -717,8 +744,16 @@ void mainWindow::finalize( void )
 	gpbrw_layout->addStretch();
 	
 	
-	m_toolBarLayout->addWidget( gpbr_w );*/
+	m_toolBarLayout->addWidget( gpbr_w );
 	
+	// initial toolbar settings
+	m_chkrAutomation->click();
+	m_chkrMidi->click();
+	m_radpSong->click();
+
+	// global keyboard shortcuts
+	QShortcut * space = new QShortcut(QKeySequence(Qt::Key_Space), this);
+	connect(space, SIGNAL(activated()), SLOT(spacePressed()));
 
 	// setup-dialog opened before?
 	if( !configManager::inst()->value( "app", "configured" ).toInt() )
@@ -942,7 +977,21 @@ void mainWindow::updateRecentlyOpenedProjectsMenu( void )
 	}
 }
 
+void mainWindow::playbackSongClicked( bool checked )
+{
+	m_playbackMode = PPM_Song;
+}
 
+
+void mainWindow::playbackBBClicked( bool checked )
+{
+	m_playbackMode = PPM_BB;
+}
+
+void mainWindow::playbackPianoRollClicked( bool checked )
+{
+	m_playbackMode = PPM_PianoRoll;
+}
 
 
 void mainWindow::openRecentlyOpenedProject( QAction * _action )
@@ -1163,6 +1212,78 @@ void mainWindow::keyPressEvent( QKeyEvent * _ke )
 	}
 }
 
+void mainWindow::spacePressed( void )
+{
+	play();
+}	
+
+void mainWindow::play( void )
+{
+	if( m_playbackMode == PPM_BB )
+	{
+		engine::getBBEditor()->play();
+	}
+	else if( m_playbackMode == PPM_PianoRoll )
+	{
+		engine::getPianoRoll()->play();
+	}
+	else
+	{
+		engine::getSongEditor()->play();
+	}
+}	
+
+void mainWindow::record( void )
+{
+	if( m_playbackMode == PPM_BB )
+	{
+		printf("beat+bassline does not support recording\n");
+	}
+	else if( m_playbackMode == PPM_PianoRoll )
+	{
+		engine::getPianoRoll()->record();
+	}
+	else
+	{
+		engine::getSongEditor()->record();
+	}
+
+}	
+
+void mainWindow::playAndRecord( void )
+{
+	if( m_playbackMode == PPM_BB )
+	{
+		printf("bb editor does not support record accompany\n");	
+	}
+	else if( m_playbackMode == PPM_PianoRoll )
+	{
+		engine::getPianoRoll()->recordAccompany();
+	}
+	else
+	{
+		engine::getSongEditor()->recordAccompany();
+	}
+
+}	
+
+
+
+void mainWindow::setPlaybackMode( ProjectPlaybackMode _playbackMode )
+{
+	if( _playbackMode == PPM_BB )
+	{
+		m_radpBB->click();
+	}
+	else if( _playbackMode == PPM_Song )
+	{
+		m_radpSong->click();
+	}
+	else
+	{
+		m_radpPianoRoll->click();
+	}
+}
 
 
 

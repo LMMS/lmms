@@ -149,6 +149,8 @@ void bbEditor::removeBBView( int _bb )
 
 void bbEditor::play( void )
 {
+	engine::getMainWindow()->setPlaybackMode( PPM_BB );
+	
 	if( engine::getSong()->isPlaying() )
 	{
 		if( engine::getSong()->playMode() != song::Mode_PlayBB )

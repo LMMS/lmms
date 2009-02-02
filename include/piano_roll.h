@@ -81,6 +81,11 @@ public:
 	{
 		return "pianoroll";
 	}
+public slots:
+	void play( void );
+	void record( void );
+	void recordAccompany( void );
+	void stop( void );
 
 
 protected:
@@ -105,11 +110,7 @@ protected:
 
 
 protected slots:
-	void play( void );
-	void record( void );
-	void recordAccompany( void );
-	void stop( void );
-
+	
 	void recordNote( const note & _n );
 
 	void horScrolled( int _new_pos );

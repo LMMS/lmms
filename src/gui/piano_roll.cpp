@@ -2956,6 +2956,8 @@ int pianoRoll::getKey( int _y ) const
 
 void pianoRoll::play( void )
 {
+	engine::getMainWindow()->setPlaybackMode( PPM_PianoRoll );
+
 	if( validPattern() == false )
 	{
 		return;
@@ -2993,6 +2995,8 @@ void pianoRoll::play( void )
 
 void pianoRoll::record( void )
 {
+	engine::getMainWindow()->setPlaybackMode( PPM_PianoRoll );
+	
 	if( engine::getSong()->isPlaying() )
 	{
 		stop();
@@ -3012,6 +3016,8 @@ void pianoRoll::record( void )
 
 void pianoRoll::recordAccompany( void )
 {
+	engine::getMainWindow()->setPlaybackMode( PPM_PianoRoll );
+	
 	if( engine::getSong()->isPlaying() )
 	{
 		stop();

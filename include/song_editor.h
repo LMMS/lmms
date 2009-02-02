@@ -58,16 +58,16 @@ public:
 
 public slots:
 	void scrolled( int _new_pos );
-
-
-private slots:
-
 	void play( void );
 	void record( void );
 	void recordAccompany( void );
 	void stop( void );
 
-	void updatePosition( const midiTime & _t );
+
+
+private slots:
+
+		void updatePosition( const midiTime & _t );
 
 	void zoomingChanged( void );
 

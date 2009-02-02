@@ -36,6 +36,8 @@ class QDomElement;
 class QGridLayout;
 class QHBoxLayout;
 class QMdiArea;
+class QCheckBox;
+class QRadioButton;
 
 class lcdSpinBox;
 class meterDialog;
@@ -46,7 +48,12 @@ class configManager;
 class pluginView;
 class toolButton;
 
-
+enum ProjectPlaybackMode
+{
+	PPM_Song = 0,
+	PPM_BB = 1,
+	PPM_PianoRoll
+};
 
 class mainWindow : public QMainWindow
 {
@@ -91,6 +98,13 @@ public:
 
 	static void saveWidgetState( QWidget * _w, QDomElement & _de );
 	static void restoreWidgetState( QWidget * _w, const QDomElement & _de );
+
+	inline ProjectPlaybackMode playbackMode() const
+	{
+		return m_playbackMode;	
+	}
+
+	void setPlaybackMode( ProjectPlaybackMode _playbackMode );
 
 
 public slots:
@@ -145,7 +159,14 @@ private:
 
 	QWidget * m_toolBar;
 	QHBoxLayout * m_toolBarLayout;
-	
+	QCheckBox * m_chkrAudio;
+	QCheckBox * m_chkrAutomation;
+	QCheckBox * m_chkrMidi;
+	QRadioButton * m_radpSong;
+	QRadioButton * m_radpBB;
+	QRadioButton * m_radpPianoRoll;
+
+	ProjectPlaybackMode m_playbackMode;
 	
 	lcdSpinBox * m_tempoSpinBox;
 	meterDialog * m_timeSigDisplay;
@@ -200,6 +221,14 @@ private slots:
 	void showTool( QAction * _idx );
 	void updateRecentlyOpenedProjectsMenu( void );
 
+	void playbackSongClicked( bool );
+	void playbackBBClicked( bool );
+	void playbackPianoRollClicked( bool );
+	void spacePressed( void );
+
+	void play( void );
+	void record( void );
+	void playAndRecord( void );
 
 signals:
 	void periodicUpdate( void );
