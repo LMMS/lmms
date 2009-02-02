@@ -52,6 +52,15 @@
 - add FLAC as export-format?
 
 Andrew Kelley's todo:
+- add a Modulator class and a Humanizer tool to the piano roll
+- global playback buttons, like in FL Studio
+- when you add VSTi, have it automatically pop the find VST plugin dialog
+- bug: you can use shift+left to move notes past the beginning
+- make pitch bend range adjustable
+- monophonic mode on 3xosc
+- integrate pitanga's patch
+- add dithering
+
 - when looking at a piano roll, if the song is playing that pattern, move the position ticker to where it should be
 - multiview button - show notes from every instrument in the current beat+bassline with different colors
 - undo/redo for piano roll
@@ -80,3 +89,4 @@ Andrew Kelley's todo:
 - make it so that 3xosc notes don't max out
 - copy-pasted automation patterns have to be manually linked back to their knob for some reason
 - fix memory leaks
+- cloning a pattern in the song editor should copy automation tracks along with notes

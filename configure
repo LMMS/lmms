@@ -7,4 +7,5 @@ echo "    cmake . -DCMAKE_INSTALL_PREFIX=/usr"
 echo ""
 echo "or similiar instead."
 echo ""
-
+echo "LMMS recommends an out of tree build. See INSTALL file for details."
+echo ""

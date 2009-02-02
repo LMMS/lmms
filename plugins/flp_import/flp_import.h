@@ -51,7 +51,13 @@ public:
 
 
 private:
+	QString m_fileBase;
+	
 	virtual bool tryImport( trackContainer * _tc );
+	bool tryFLPImport( trackContainer * _tc );
+#ifdef LMMS_HAVE_ZIP
+	bool tryZIPImport( trackContainer * _tc );
+#endif
 
 	void processPluginParams( FL_Channel * _ch );
 
@@ -99,7 +105,7 @@ private:
 		}
 	}
 
-
+	friend class zipImport;
 } ;
 
 

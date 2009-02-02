@@ -1,3 +1,25 @@
+2009-02-01	Andrew Kelley	<superjoe30/at/gmail/dot/com>
+
+	* plugins/flp_import/flp_import.cpp:
+	* plugins/flp_import/flp_import.h:
+	* src/core/song.cpp:
+	* include/import_filter.h:
+	- flp import filter will look in the same directory as the
+	  .flp file for samples if it cannot find them elsewhere
+	- added a zip import filter, which imports FLP zipped packages
+	- I tried not to change the import filter API but I needed
+	  to be able to set which file was being imported. it is a
+	  small addition to the API and I think it is acceptable.
+	
+	* cmake/modules/FindZIP.cmake:
+	* lmmsconfig.h.in:
+	* CMakeLists.txt:
+	added an optional dependency on libzip for importing
+	the above mentioned .zip loop files
+
+	* configure:
+	added helpful tip
+
 2009-01-31	Paul Giblock <drfaygo/at/gmail/dot/com>
 	
 	* src/gui/cusis_style.cpp:
@@ -118,6 +140,7 @@
 	* src/gui/widgets/automatable_button.cpp:
 	fix drag support for button groups
 
+>>>>>>> .r1984
 2008-12-22	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* CMakeLists.txt:

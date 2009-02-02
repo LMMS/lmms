@@ -1070,7 +1070,13 @@ void song::importProject( void )
 {
 	QFileDialog ofd( NULL, tr( "Import file" ),
 			configManager::inst()->userProjectsDir(),
-			tr("MIDI sequences (*.mid *.rif);;FL Studio projects (*.flp)") );
+			tr("MIDI sequences (*.mid *.rif);;FL Studio projects (*.flp"
+#ifdef LMMS_HAVE_ZIP	
+			 " *.zip)") );
+#else 
+			 ")") );
+#endif
+
 	ofd.setFileMode( QFileDialog::ExistingFiles );
 	if( ofd.exec () == QDialog::Accepted && !ofd.selectedFiles().isEmpty() )
 	{

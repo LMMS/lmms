@@ -57,6 +57,14 @@
 #include "embed.h"
 #include "lmmsconfig.h"
 
+#ifdef LMMS_HAVE_ZIP
+#include <QDir>
+#include <QTemporaryFile>
+#include <unistd.h>
+#include <zip.h>
+#endif 
+
+
 #ifdef LMMS_HAVE_CTYPE_H
 #include <ctype.h>
 #endif
@@ -576,6 +584,7 @@ struct FL_Project
 flpImport::flpImport( const QString & _file ) :
 	importFilter( _file, &flpimport_plugin_descriptor )
 {
+	m_fileBase = QFileInfo( _file ).path();
 }
 
 
@@ -585,8 +594,138 @@ flpImport::~flpImport()
 {
 }
 
-
 bool flpImport::tryImport( trackContainer * _tc )
+{
+#ifdef LMMS_HAVE_ZIP
+	return tryFLPImport( _tc ) || tryZIPImport( _tc );
+#else
+	return tryFLPImport( _tc );
+#endif
+}
+
+#ifdef LMMS_HAVE_ZIP
+bool flpImport::tryZIPImport( trackContainer * _tc )
+{
+	// see if the file is a zip file
+	closeFile();
+	const QFile &thefile = file();
+
+	int err = 0;
+	struct zip *zfile = zip_open(qPrintable(thefile.fileName()), 0, &err);
+
+	if( zfile == NULL )
+	{
+		if( err == ZIP_ER_NOZIP ) {
+			printf("flp import (zip): not a valid zip file\n");
+		}
+		else if( err == ZIP_ER_OPEN )
+		{
+			printf("flp import (zip): error opening file\n");
+		}
+		else if( err == ZIP_ER_READ || err == ZIP_ER_SEEK )
+		{
+			printf("flp import (zip): error reading file\n");
+		}
+		else
+		{
+			printf("flp import (zip): unknown error opening zip file\n");
+		}
+		return false;
+	}
+	// valid zip file
+	// get temporary directory
+	QString tmpName;
+	
+	{
+		QTemporaryFile qtmp;
+		if( qtmp.open() )
+		{
+			tmpName = qtmp.fileName();
+		}
+		else
+		{
+			zip_close(zfile);
+			printf("flp import (zip): error getting temporary folder\n");
+			return false;
+		}
+	}
+	QDir tmpDir = QDir::temp();
+	tmpDir.mkdir(tmpName);
+	tmpDir.cd(tmpName);
+	
+	// unzip everything to the temp folder
+	int buf_size = getpagesize();
+	char buf[buf_size];
+	int numFiles = zip_get_num_files(zfile);
+	int i;
+	bool foundFLP = false;
+	QString flpFile = "";
+	for( i=0; i<numFiles; ++i )
+	{
+		const char* fileName = zip_get_name(zfile, i, 0);
+		if( fileName != NULL )
+		{
+			struct zip_file *unzipFile = zip_fopen_index(zfile, i, 0); 
+			if( unzipFile != NULL )
+			{
+				// we have a handle to read, now get a handle to the outfile
+				QFile out(tmpDir.absolutePath() + QDir::separator() + 
+					fileName);
+				out.open(QIODevice::WriteOnly);
+				// ok we have handles on both, now do buffered writing
+				bool readErr = false;
+				while(true)
+				{
+					// read into buffer
+					int numRead = zip_fread(unzipFile, buf, buf_size);
+					if( numRead == -1 )
+					{
+						readErr = true;
+						printf("flp import (zip): error while reading %s "
+							"from zip file\n", fileName);
+						break;
+					}
+					out.write( buf, numRead );
+					if( numRead < buf_size ) break;
+				}
+				// we successfully read this file, check if it is 
+				// the .flp file
+				QString qFileName(fileName);
+				if( qFileName.endsWith(".flp") )
+				{
+					foundFLP = true;
+					flpFile = out.fileName();
+				}
+
+				// clean up
+				out.close();
+				zip_fclose(unzipFile);
+			}
+			else
+			{
+				printf("flp import (zip): unable to get %s out of %s\n",
+					fileName, qPrintable(thefile.fileName()) );
+			}
+		}
+	}
+	zip_close(zfile);
+
+	// make sure there was a .flp file in the archive	
+	if( ! foundFLP )
+	{
+		printf("flp import (zip): no .flp file found in archive\n");
+		return false;
+	}
+
+	// use the flp_import plugin to load the .flp file
+	// which was extracted to the temp dir
+	setFile(flpFile);
+	m_fileBase = QFileInfo( flpFile ).path();
+	return tryFLPImport( _tc );
+}
+#endif
+
+bool flpImport::tryFLPImport( trackContainer * _tc )
 {
 	const int mappedFilter[] =
 	{
@@ -1057,26 +1196,41 @@ if( p.currentEffectChannel <= NumFxChannels )
 
 			case FLP_Text_SampleFileName:
 			{
-				QString f = text;
+				QString f = "";
+				QString f_name = text;
+				
 /*				if( f.mid( 1, 11 ) == "Instruments" )
 				{
 					f = "\\Patches\\Packs" +
 								f.mid( 12 );
 				}*/
-				f.replace( '\\', QDir::separator() );
+				bool foundFile = false;
+				
+				f_name.replace( '\\', QDir::separator() );
 				if( QFileInfo( configManager::inst()->flDir() +
 						"/Data/" ).exists() )
 				{
 					f = configManager::inst()->flDir() +
-								"/Data/" + f;
+								"/Data/" + f_name;
+					foundFile = QFileInfo( f ).exists();
 				}
 				else
 				{
 					// FL 3 compat
 					f = configManager::inst()->flDir() +
-							"/Samples/" + f;
+							"/Samples/" + f_name;
+					foundFile = QFileInfo( f ).exists();
+				}
+				if( ! foundFile )
+				{
+					// look in same directory as .flp file
+					
+					f = m_fileBase + "/" + QFileInfo( f_name ).fileName();
+					printf("looking in %s for samples\n", qPrintable(f));
+					foundFile = QFileInfo( f ).exists();
 				}
 				cc->sampleFileName = f;
+				
 				break;
 			}
 

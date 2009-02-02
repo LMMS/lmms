@@ -52,6 +52,11 @@ public:
 
 protected:
 	virtual bool tryImport( trackContainer * _tc ) = 0;
+	
+	inline void setFile( QString &_file )
+	{
+		m_file.setFileName( _file );
+	}
 
 	const QFile & file( void ) const
 	{
