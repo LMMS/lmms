@@ -682,7 +682,7 @@ void mainWindow::finalize( void )
 		new toolButton(
 					   embed::getIconPixmap( "stop" ),
 					   tr( "Stop playing whatever is playing" ),
-					   engine::getSong(),
+					   this,
 					   SLOT( stop() ),
 					   btns );
 
@@ -752,8 +752,11 @@ void mainWindow::finalize( void )
 	m_radpSong->click();
 
 	// global keyboard shortcuts
-	QShortcut * space = new QShortcut(QKeySequence(Qt::Key_Space), this);
-	connect(space, SIGNAL(activated()), SLOT(spacePressed()));
+	QShortcut * qs_space = new QShortcut(QKeySequence(Qt::Key_Space), this);
+	connect(qs_space, SIGNAL(activated()), SLOT(shortcutSpacePressed()));
+	QShortcut * qs_L = new QShortcut(QKeySequence(Qt::Key_L), this);
+	connect(qs_L, SIGNAL(activated()), SLOT(shortcutLPressed()));
+
 
 	// setup-dialog opened before?
 	if( !configManager::inst()->value( "app", "configured" ).toInt() )
@@ -1212,10 +1215,27 @@ void mainWindow::keyPressEvent( QKeyEvent * _ke )
 	}
 }
 
-void mainWindow::spacePressed( void )
+void mainWindow::shortcutSpacePressed( void )
 {
 	play();
 }	
+
+void mainWindow::shortcutLPressed( void )
+{
+	// cycle through global playback mode
+	if( m_playbackMode == PPM_BB )
+	{
+		m_radpPianoRoll->click();
+	}
+	else if( m_playbackMode == PPM_PianoRoll )
+	{
+		m_radpSong->click();
+	}
+	else
+	{
+		m_radpBB->click();
+	}	
+}
 
 void mainWindow::play( void )
 {
@@ -1232,6 +1252,23 @@ void mainWindow::play( void )
 		engine::getSongEditor()->play();
 	}
 }	
+
+void mainWindow::stop( void )
+{
+	if( m_playbackMode == PPM_BB )
+	{
+		engine::getBBEditor()->stop();
+	}
+	else if( m_playbackMode == PPM_PianoRoll )
+	{
+		engine::getPianoRoll()->stop();
+	}
+	else
+	{
+		engine::getSongEditor()->stop();
+	}
+}	
+
 
 void mainWindow::record( void )
 {

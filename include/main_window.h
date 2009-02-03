@@ -224,11 +224,14 @@ private slots:
 	void playbackSongClicked( bool );
 	void playbackBBClicked( bool );
 	void playbackPianoRollClicked( bool );
-	void spacePressed( void );
+	
+	void shortcutSpacePressed( void );
+	void shortcutLPressed( void );
 
 	void play( void );
 	void record( void );
 	void playAndRecord( void );
+	void stop( void );
 
 signals:
 	void periodicUpdate( void );

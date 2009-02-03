@@ -1,3 +1,12 @@
+2009-02-02	Andrew Kelley	<superjoe30/at/gmail/dot/com>
+
+	* include/main_window.h:
+	* src/gui/main_window.cpp:
+	- fixed bug: piano roll was still recording when not in record
+	  mode
+	- use the key L to cycle through playback modes. (this is
+	  consistent with FL Studio)
+
 2009-02-01	Andrew Kelley	<superjoe30/at/gmail/dot/com>
 
 	* include/piano_roll.h:
