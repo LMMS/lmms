@@ -806,13 +806,25 @@ void pianoRoll::shiftPos( int amount ) //shift notes pos by amount
 {
 	bool useAllNotes = ! isSelection();
 	const noteVector & notes = m_pattern->notes();
+	
+	bool first = true;
 	for( noteVector::const_iterator it = notes.begin(); it != notes.end();
 									++it )
 	{
 		// if none are selected, move all notes, otherwise
 		// only move selected notes
-		if( useAllNotes || ( *it )->selected() )
+		if( ( *it )->selected() || (useAllNotes && ( *it )->length() > 0) )
 		{
+			// don't let notes go to out of bounds
+			if( first )
+			{
+				m_moveBoundaryLeft = ( *it )->pos();
+				if( m_moveBoundaryLeft + amount < 0 )
+				{
+					amount += 0 - (amount + m_moveBoundaryLeft);
+				}	
+				first = false;
+			}
 			( *it )->setPos( ( *it )->pos() + amount );
 		}
 	}

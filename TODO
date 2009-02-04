@@ -53,7 +53,6 @@
 
 Andrew Kelley's todo:
 - pencil tool icon doesn't set right. selection arrow cursor doesn't set right
-- bug: you can use shift+left to move notes past the beginning
 - add a Modulator class and a Humanizer tool to the piano roll
 - global playback buttons, like in FL Studio
 - when you add VSTi, have it automatically pop the find VST plugin dialog
