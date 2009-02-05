@@ -1,3 +1,28 @@
+2009-02-05	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* plugins/ladspa_effect/caps/dsp/Eq.h:
+	better workaround for optimizer bug in GCC >= 4.3
+
+	* plugins/sid/sid_instrument.cpp:
+	* plugins/flp_import/unrtf.cpp:
+	* src/core/track.cpp:
+	added missing header for compilation with GCC 4.4
+
+	* include/pattern.h:
+	* src/tracks/pattern.cpp:
+	cleanups
+
+	* src/core/envelope_and_lfo_parameters.cpp:
+	- simplified formulas for calculating envelope array resulting in about
+	  3x performance with traditional FPU code
+	- loops now can be vectorized by GCC 4.4
+
+	* include/mixer.h:
+	* include/audio_port.h:
+	* src/core/mixer.cpp:
+	reworked mixer-threads (synchronization, realization of jobqueue etc.)
+	which results in a much better performance and stability
+
 2009-02-04	Andrew Kelley	<superjoe30/at/gmail/dot/com>
 
 	* src/gui/piano_roll.cpp:
@@ -174,7 +199,6 @@
 	* src/gui/widgets/automatable_button.cpp:
 	fix drag support for button groups
 
->>>>>>> .r1984
 2008-12-22	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* CMakeLists.txt:
