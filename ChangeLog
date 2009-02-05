@@ -33,8 +33,7 @@
 
 	* include/main_window.h:
 	* src/gui/main_window.cpp:
-	- fixed bug: piano roll was still recording when not in record
-	  mode
+	- fixed bug: piano roll was still recording when not in record mode
 	- use the key L to cycle through playback modes. (this is
 	  consistent with FL Studio)
 
