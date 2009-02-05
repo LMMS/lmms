@@ -26,6 +26,9 @@
 
 #include <QtGui/QPainter>
 #include <QtXml/QDomElement>
+
+#include <cstdio>
+
 #include "sid.h"
 
 #include "sid_instrument.h"
