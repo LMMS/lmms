@@ -28,6 +28,8 @@
 #include <QtCore/QString>
 #include <QtCore/QBuffer>
 
+#include <cstdio>
+
 extern "C"
 {
 

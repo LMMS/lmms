@@ -40,6 +40,7 @@
 #include "track.h"
 
 #include <assert.h>
+#include <cstdio>
 
 #include <QtGui/QLayout>
 #include <QtGui/QMenu>
