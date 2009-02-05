@@ -133,10 +133,6 @@ public:
 
 
 	using model::dataChanged;
-		
-		
-	void printNotes( void ); // for debugging purposes
-	
 
 
 protected:
