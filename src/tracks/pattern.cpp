@@ -183,17 +183,6 @@ midiTime pattern::beatPatternLength( void ) const
 
 
 
-void pattern::printNotes( void )
-{
-	for( noteVector::iterator it = m_notes.begin(); it != m_notes.end();
-									++it )
-	{
-		printf("note (pos = %i)\n", (int) ( *it )->pos() );
-	}
-	printf("\n");
-}
-
-
 
 note * pattern::addNote( const note & _new_note, const bool _quant_pos )
 {
