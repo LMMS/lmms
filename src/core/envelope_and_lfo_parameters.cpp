@@ -245,10 +245,11 @@ inline void envelopeAndLFOParameters::fillLFOLevel( float * _buf,
 	}
 
 	fpp_t offset = 0;
+	const float lafI = 1.0f / m_lfoAttackFrames;
 	for( ; offset < _frames && _frame < m_lfoAttackFrames; ++offset,
 								++_frame )
 	{
-		*_buf++ = m_lfoShapeData[offset] * _frame / m_lfoAttackFrames;
+		*_buf++ = m_lfoShapeData[offset] * _frame * lafI;
 	}
 	for( ; offset < _frames; ++offset )
 	{
@@ -411,39 +412,44 @@ void envelopeAndLFOParameters::updateSampleVars( void )
 	m_pahdEnv = new sample_t[m_pahdFrames];
 	m_rEnv = new sample_t[m_rFrames];
 
+	const float aa = m_amountAdd;
 	for( f_cnt_t i = 0; i < predelay_frames; ++i )
 	{
-		m_pahdEnv[i] = m_amountAdd;
+		m_pahdEnv[i] = aa;
 	}
 
 	f_cnt_t add = predelay_frames;
 
+	const float afI = ( 1.0f / attack_frames ) * m_amount;
 	for( f_cnt_t i = 0; i < attack_frames; ++i )
 	{
-		m_pahdEnv[add + i] = ( (float)i / attack_frames ) *
-							m_amount + m_amountAdd;
+		m_pahdEnv[add+i] = i * afI + aa;
 	}
 
 	add += attack_frames;
+	const float amsum = m_amount + m_amountAdd;
 	for( f_cnt_t i = 0; i < hold_frames; ++i )
 	{
-		m_pahdEnv[add + i] = m_amount + m_amountAdd;
+		m_pahdEnv[add + i] = amsum;
 	}
 
 	add += hold_frames;
+	const float dfI = (1.0 / decay_frames)*(m_sustainLevel-1)*m_amount;
 	for( f_cnt_t i = 0; i < decay_frames; ++i )
 	{
+/*
 		m_pahdEnv[add + i] = ( m_sustainLevel + ( 1.0f -
 						(float)i / decay_frames ) *
 						( 1.0f - m_sustainLevel ) ) *
 							m_amount + m_amountAdd;
+*/
+		m_pahdEnv[add + i] = amsum + i*dfI;
 	}
 
+	const float rfI = ( 1.0f / m_rFrames ) * m_amount;
 	for( f_cnt_t i = 0; i < m_rFrames; ++i )
 	{
-		m_rEnv[i] = ( (float)( m_rFrames - i ) / m_rFrames
-					// * m_sustainLevel
-					 		) * m_amount;
+		m_rEnv[i] = (float)( m_rFrames - i ) * rfI;
 	}
 
 	// save this calculation in real-time-part
