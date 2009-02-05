@@ -1,4 +1,4 @@
-2009-02-04	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+2009-02-05	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* include/atomic_int.h:
 	* include/audio_port.h:
@@ -6,6 +6,11 @@
 	* src/core/mixer.cpp:
 	reworked mixer-threads (synchronization, realization of jobqueue etc.)
 	which results in a much better performance and stability
+
+2009-02-04	Andrew Kelley	<superjoe30/at/gmail/dot/com>
+
+	* src/gui/piano_roll.cpp:
+	fixed bug: you can use shift+left to move notes past the beginning
 
 2009-01-25	Paul Giblock <drfaygo/at/gmail/dot/com>
 
