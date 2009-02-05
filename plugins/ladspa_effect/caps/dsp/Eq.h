@@ -84,14 +84,9 @@ class Eq
 			{
 				for (int z = 0; z < 2; ++z)
 				{
-					// work-around for buggy optimizer in GCC 4.3
-					for (int i = 0; i < Bands-1; ++i)
-						y[z][i] = 0;
-					y[z][Bands-1] = 0;
+					memset( y[z], 0, Bands*sizeof( eq_sample ) );
+					x[z] = 0;
 				}
-
-				for (int i = 0; i < 2; ++i)
-					x[i] = 0;
 			}
 
 		void init (double fs, double Q)

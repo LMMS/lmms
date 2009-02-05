@@ -1,5 +1,22 @@
 2009-02-05	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* plugins/ladspa_effect/caps/dsp/Eq.h:
+	better workaround for optimizer bug in GCC >= 4.3
+
+	* plugins/sid/sid_instrument.cpp:
+	* plugins/flp_import/unrtf.cpp:
+	* src/core/track.cpp:
+	added missing header for compilation with GCC 4.4
+
+	* include/pattern.h:
+	* src/tracks/pattern.cpp:
+	cleanups
+
+	* src/core/envelope_and_lfo_parameters.cpp:
+	- simplified formulas for calculating envelope array resulting in about
+	  3x performance with traditional FPU code
+	- loops now can be vectorized by GCC 4.4
+
 	* include/atomic_int.h:
 	* include/audio_port.h:
 	* include/mixer.h:
