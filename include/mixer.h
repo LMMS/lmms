@@ -1,7 +1,7 @@
 /*
  * mixer.h - audio-device-independent mixer for LMMS
  *
- * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -40,9 +40,9 @@
 
 
 #include <QtCore/QMutex>
-#include <QtCore/QSemaphore>
 #include <QtCore/QThread>
 #include <QtCore/QVector>
+#include <QtCore/QWaitCondition>
 
 
 #include "lmms_basics.h"
@@ -73,7 +73,7 @@ const Octaves BaseOctave = DefaultOctave;
 #include "play_handle.h"
 
 
-class mixerWorkerThread;
+class MixerWorkerThread;
 
 
 class EXPORT mixer : public QObject
@@ -438,10 +438,9 @@ private:
 	bool m_newBuffer[SURROUND_CHANNELS];
 	
 	int m_cpuLoad;
-	QVector<mixerWorkerThread *> m_workers;
+	QVector<MixerWorkerThread *> m_workers;
 	int m_numWorkers;
-	QSemaphore m_queueReadySem;
-	QSemaphore m_workersDoneSem;
+	QWaitCondition m_queueReadyWaitCond;
 
 
 	playHandleVector m_playHandles;
@@ -469,7 +468,7 @@ private:
 
 
 	friend class engine;
-	friend class mixerWorkerThread;
+	friend class MixerWorkerThread;
 
 } ;
 
