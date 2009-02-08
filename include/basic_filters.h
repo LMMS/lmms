@@ -4,7 +4,7 @@
  * original file by ??? 
  * modified and enhanced by Tobias Doerffel
  *
- * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -40,6 +40,8 @@
 #include "templates.h"
 #include "lmms_constants.h"
 
+//#include <iostream>
+//#include <cstdlib>
 
 template<ch_cnt_t CHANNELS/* = DEFAULT_CHANNELS*/>
 class basicFilters
@@ -54,6 +56,9 @@ public:
 		Notch,
 		AllPass,
 		Moog,
+		Lowpass_RC,
+		Bandpass_RC,
+		Highpass_RC,
 		NumFilters
 	} ;
 
@@ -92,6 +97,9 @@ public:
 		m_b2a0( 0.0f ),
 		m_a1a0( 0.0f ),
 		m_a2a0( 0.0f ),
+		m_rca( 0.0f ),
+		m_rcb( 1.0f ),
+		m_rcc( 0.0f ),
 		m_doubleFilter( false ),
 		m_sampleRate( (float) _sample_rate ),
 		m_subFilter( NULL )
@@ -112,10 +120,14 @@ public:
 			// reset in/out history for simple filters
 			m_ou1[_chnl] = m_ou2[_chnl] = m_in1[_chnl] =
 					m_in2[_chnl] = 0.0f;
+					
 			// reset in/out historey for moog-filter
 			m_y1[_chnl] = m_y2[_chnl] = m_y3[_chnl] = m_y4[_chnl] =
 					m_oldx[_chnl] = m_oldy1[_chnl] =
 					m_oldy2[_chnl] = m_oldy3[_chnl] = 0.0f;
+					
+			// reset in/out historey for RC-filter
+			m_rclp[_chnl] = m_rchp[_chnl] = m_rcbp[_chnl] = m_rclast[_chnl] = 0.0f;
 		}
 	}
 
@@ -156,6 +168,58 @@ public:
 				break;
 			}
 
+
+			// 4-times oversampled simulation of an active RC-Bandpass,-Lowpass,-Highpass-
+			// Filter-Network as it was used in nearly all modern analog synthesizers. This
+			// can be driven up to self-oscillation (BTW: do not remove the limits!!!).
+			// (C) 1998 ... 2009 S.Fendt. Released under the GPL v2.0  or any later version.
+
+			case Lowpass_RC:
+			case Bandpass_RC:
+			case Highpass_RC:
+			{
+				sample_t lp, hp, bp;
+
+				sample_t in;
+
+				// 4-times oversampled... (even the moog would benefit from this)
+				for( int n = 4; n != 0; --n )
+				{
+					in = _in0 + m_rcbp[_chnl] * m_rcq;
+					in = (in > +1.f) ? +1.f : in;
+					in = (in < -1.f) ? -1.f : in;
+
+					lp = in * m_rcb + m_rclp[_chnl] * m_rca;
+					lp = (lp > +1.f) ? +1.f : lp;
+					lp = (lp < -1.f) ? -1.f : lp;
+
+					hp = m_rcc * ( m_rchp[_chnl] + in - m_rclast[_chnl] );
+					hp = (hp > +1.f) ? +1.f : hp;
+					hp = (hp < -1.f) ? -1.f : hp;
+
+					bp = hp * m_rcb + m_rcbp[_chnl] * m_rca;
+					bp = (bp > +1.f) ? +1.f : bp;
+					bp = (bp < -1.f) ? -1.f : bp;
+
+					m_rclast[_chnl] = in;
+					m_rclp[_chnl] = lp;
+					m_rchp[_chnl] = hp;
+					m_rcbp[_chnl] = bp;
+
+				}
+
+				if( m_type == Lowpass_RC )
+					out = lp;
+				else if( m_type == Bandpass_RC )
+					out = bp;
+				else
+					out = hp;
+				
+				return( out );
+				break;
+			}
+
+
 			default:
 				// filter
 				out = m_b0a0*_in0 +
@@ -163,7 +227,7 @@ public:
 						m_b2a0*m_in2[_chnl] -
 						m_a1a0*m_ou1[_chnl] -
 						m_a2a0*m_ou2[_chnl];
-   
+
 				// push in/out buffers
 				m_in2[_chnl] = m_in1[_chnl];
 				m_in1[_chnl] = _in0;
@@ -191,6 +255,23 @@ public:
 					      // bad noise out of the filter...
 		_q = qMax( _q, minQ() );
 
+		if( m_type == Lowpass_RC  ||
+				m_type == Bandpass_RC ||
+				m_type == Highpass_RC )
+		{
+			if( _freq < 50.f )
+			{
+				_freq = 50.f;
+			}
+		
+			m_rca = 1.0f - (1.0f/(m_sampleRate*4)) / ( (1.0f/(_freq*2.0f*M_PI)) + (1.0f/(m_sampleRate*4)) );
+			m_rcb = 1.0f - m_rca;
+			m_rcc = (1.0f/(_freq*2.0f*M_PI)) / ( (1.0f/(_freq*2.0f*M_PI)) + (1.0f/(m_sampleRate*4)) );
+			
+			// Stretch Q/resonance, as self-oscillation reliably starts at a q of ~2.5 - ~2.6
+			m_rcq = _q/4.f;
+		}
+		
 		if( m_type == Moog )
 		{
 			// [ 0 - 0.5 ]
@@ -207,7 +288,6 @@ public:
 				m_subFilter->m_k = m_k;
 			}
 			return;
-
 		}
 
 		// other filters
@@ -281,6 +361,9 @@ private:
 	// coeffs for moog-filter
 	float m_r, m_p, m_k;
 
+	// coeffs for RC-type-filters
+	float m_rca, m_rcb, m_rcc, m_rcq;
+
 	typedef sample_t frame[CHANNELS];
 
 	// in/out history
@@ -288,6 +371,9 @@ private:
 
 	// in/out history for moog-filter
 	frame m_y1, m_y2, m_y3, m_y4, m_oldx, m_oldy1, m_oldy2, m_oldy3;
+	
+	// in/out history for RC-type-filters
+	frame m_rclp, m_rchp, m_rcbp, m_rclast;
 
 	FilterTypes m_type;
 	bool m_doubleFilter;

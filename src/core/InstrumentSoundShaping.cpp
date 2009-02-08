@@ -87,6 +87,9 @@ InstrumentSoundShaping::InstrumentSoundShaping(
 	m_filterModel.addItem( tr( "Allpass" ), new PixmapLoader( "filter_ap" ) );
 	m_filterModel.addItem( tr( "Moog" ), new PixmapLoader( "filter_lp" ) );
 	m_filterModel.addItem( tr( "2x LowPass" ), new PixmapLoader( "filter_2lp" ) );
+	m_filterModel.addItem( tr( "RC LowPass" ), new PixmapLoader( "filter_lp" ) );
+	m_filterModel.addItem( tr( "RC BandPass" ), new PixmapLoader( "filter_bp" ) );
+	m_filterModel.addItem( tr( "RC HighPass" ), new PixmapLoader( "filter_hp" ) );
 }
 
 
