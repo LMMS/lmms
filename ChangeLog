@@ -1,3 +1,10 @@
+2009-02-08	Paul Giblock <drfaygo/at/gmail/dot/com>
+
+	* src/core/instrument_sound_shaping.cpp:
+	* include/basic_filters.h:
+	- patch in Stefan Fendt's RC filters, updated for HEAD
+	- fix code style on new source
+
 2009-02-05	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* plugins/ladspa_effect/caps/dsp/Eq.h:

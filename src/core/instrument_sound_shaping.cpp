@@ -100,6 +100,12 @@ instrumentSoundShaping::instrumentSoundShaping(
 					new pixmapLoader( "filter_lp" ) );
 	m_filterModel.addItem( tr( "2x LowPass" ),
 					new pixmapLoader( "filter_2lp" ) );
+	m_filterModel.addItem( tr( "RC LowPass" ),
+					new pixmapLoader( "filter_lp" ) );
+	m_filterModel.addItem( tr( "RC BandPass" ),
+					new pixmapLoader( "filter_bp" ) );
+	m_filterModel.addItem( tr( "RC HighPass" ),
+					new pixmapLoader( "filter_hp" ) );
 }
 
 
