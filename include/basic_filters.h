@@ -56,6 +56,7 @@ public:
 		Notch,
 		AllPass,
 		Moog,
+		DoubleLowPass,
 		Lowpass_RC,
 		Bandpass_RC,
 		Highpass_RC,
@@ -74,14 +75,16 @@ public:
 
 	inline void setFilterType( const int _idx )
 	{
-		m_doubleFilter = _idx >= NumFilters;
+		m_doubleFilter = _idx == DoubleLowPass;
 		if( !m_doubleFilter )
 		{
 			m_type = static_cast<FilterTypes>( _idx );
 			return;
 		}
-		m_type = static_cast<FilterTypes>( LowPass + _idx -
-							NumFilters );
+
+		// Double lowpass mode, backwards-compat for the goofy
+		// Add-NumFilters to signify doubleFilter stuff
+		m_type = static_cast<FilterTypes>( LowPass );
 		if( m_subFilter == NULL )
 		{
 			m_subFilter = new basicFilters<CHANNELS>(
@@ -127,7 +130,7 @@ public:
 					m_oldy2[_chnl] = m_oldy3[_chnl] = 0.0f;
 					
 			// reset in/out historey for RC-filter
-			m_rclp[_chnl] = m_rchp[_chnl] = m_rcbp[_chnl] = m_rclast[_chnl] = 0.0f;
+			m_rclp[_chnl] = m_rcbp[_chnl] = m_rchp[_chnl] = m_rclast[_chnl] = 0.0f;
 		}
 	}
 
@@ -373,7 +376,7 @@ private:
 	frame m_y1, m_y2, m_y3, m_y4, m_oldx, m_oldy1, m_oldy2, m_oldy3;
 	
 	// in/out history for RC-type-filters
-	frame m_rclp, m_rchp, m_rcbp, m_rclast;
+	frame m_rcbp, m_rclp, m_rchp, m_rclast;
 
 	FilterTypes m_type;
 	bool m_doubleFilter;
