@@ -1,3 +1,8 @@
+2009-02-09	Paul Giblock <drfaygo/at/gmail/dot/com>
+
+	* include/basic_filters.h:
+	Fix off-by-one enumeration problem with new RC filters
+
 2009-02-08	Paul Giblock <drfaygo/at/gmail/dot/com>
 
 	* src/core/instrument_sound_shaping.cpp:
