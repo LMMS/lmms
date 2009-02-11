@@ -59,6 +59,7 @@ protected:
 
 	TrackItem * m_trackItem;
 	trackContentObject * m_tco;
+    bool m_hover;
 };
 
 #endif

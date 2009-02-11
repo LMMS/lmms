@@ -10,6 +10,8 @@
 #include "gui/tracks/track_item.h"
 #include "track.h"
 
+// Just some stuff while playing with theming ideas, 
+// will be moved to lmmsStyle
 namespace BBTcoStuff {
 QLinearGradient getGradient( const QColor & _col, const QRectF & _rect )
 {
@@ -42,7 +44,7 @@ QLinearGradient darken( const QLinearGradient & _gradient )
     QGradientStops stops = _gradient.stops();
     for (int i = 0; i < stops.size(); ++i) {
         QColor color = stops.at(i).second;
-        stops[i].second = color.darker(160);
+        stops[i].second = color.lighter(150);
     }
 
     QLinearGradient g = _gradient;
@@ -85,7 +87,7 @@ void drawPath( QPainter *p, const QPainterPath &path,
 
     // highlight
     if (dark)
-        p->strokePath(path, QPen(col.lighter(160).darker(160), 2));
+        p->strokePath(path, QPen(col.lighter(160).lighter(160), 2));
     else
         p->strokePath(path, QPen(col.lighter(160), 2));
 
@@ -121,7 +123,7 @@ void BbTrackContentObjectItem::paint( QPainter * _painter,
 
     QPainterPath path;
     path.addRoundedRect(2, 2, rc.width()-4, rc.height()-4, 4, 4);
-    drawPath( _painter, path, col, "hah", false );
+    drawPath( _painter, path, col, "hah", m_hover );
 
     const float cellW = TrackContainerScene::DEFAULT_CELL_WIDTH;
     _painter->setOpacity(0.2);

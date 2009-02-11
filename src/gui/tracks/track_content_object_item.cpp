@@ -15,10 +15,12 @@ TrackContentObjectItem::TrackContentObjectItem( TrackItem * _track, trackContent
 		QGraphicsItem(),
 		m_trackItem( _track ),
 		m_tco( _object ),
-        m_snapBackAnimation( NULL )
+        m_snapBackAnimation( NULL ),
+        m_hover( false )
 {
     //m_object =  _object;
 	setFlags( QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemIsSelectable );
+    setAcceptHoverEvents( true );
     setCursor( Qt::OpenHandCursor );
 
     midiTime startPos = _object->startPosition();
@@ -205,7 +207,9 @@ void TrackContentObjectItem::mouseReleaseEvent( QGraphicsSceneMouseEvent * event
 
 void TrackContentObjectItem::hoverEnterEvent( QGraphicsSceneHoverEvent * event )
 {
+    m_hover = true;
     QGraphicsItem::hoverEnterEvent( event );
+    update();
 }
 
 
@@ -213,6 +217,8 @@ void TrackContentObjectItem::hoverEnterEvent( QGraphicsSceneHoverEvent * event )
 void TrackContentObjectItem::hoverLeaveEvent( QGraphicsSceneHoverEvent * event )
 {
     QGraphicsItem::hoverLeaveEvent( event );
+    m_hover = false;
+    update();
 }
 
 

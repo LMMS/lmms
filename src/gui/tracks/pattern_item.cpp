@@ -10,6 +10,8 @@
 #include "gui/tracks/track_item.h"
 #include "track.h"
 
+// Just some stuff while playing with theming ideas, 
+// will be moved to lmmsStyle
 namespace PatternItemStuff {
 QLinearGradient getGradient( const QColor & _col, const QRectF & _rect )
 {
@@ -42,7 +44,7 @@ QLinearGradient darken( const QLinearGradient & _gradient )
     QGradientStops stops = _gradient.stops();
     for (int i = 0; i < stops.size(); ++i) {
         QColor color = stops.at(i).second;
-        stops[i].second = color.darker(160);
+        stops[i].second = color.lighter(150);
     }
 
     QLinearGradient g = _gradient;
@@ -86,7 +88,7 @@ void drawPath( QPainter *p, const QPainterPath &path,
 
     // highlight
     if (dark)
-        p->strokePath(path, QPen(borderCol.darker(160), 2));
+        p->strokePath(path, QPen(borderCol.lighter(150), 2));
     else
         p->strokePath(path, QPen(borderCol, 2));
 
@@ -126,7 +128,7 @@ void PatternItem::paint( QPainter * _painter,
 
     QPainterPath path;
     path.addRoundedRect(2, 2, rc.width()-4, rc.height()-4, 4, 4);
-    drawPath( _painter, path, col0, colBorder, false );
+    drawPath( _painter, path, col0, colBorder, m_hover );
 
     _painter->restore();
 
