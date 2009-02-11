@@ -23,8 +23,12 @@
 	* src/gui/tracks/pattern_item.cpp:
 	* include/gui/tracks/pattern_item.h:
 	* include/gui/tracks/bb_tco_item.h:
+	* src/gui/main_window.cpp:
 	- Add BB and Pattern subclasses
 	- Play with some styling, about to move style code into lmmsStyle
+	- Add Caching support, but will soon expand with manual-QPixmapCache usage
+	  to share common-TCO pixmaps between TCOs.
+	- Fix tickmarks on BB-TCOs
 
 2009-02-09	Paul Giblock <drfaygo/at/gmail/dot/com>
 

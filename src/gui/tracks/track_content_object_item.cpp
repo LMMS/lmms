@@ -23,6 +23,10 @@ TrackContentObjectItem::TrackContentObjectItem( TrackItem * _track, trackContent
     setAcceptHoverEvents( true );
     setCursor( Qt::OpenHandCursor );
 
+    // TODO: We will do our own caching to allow common-TCOs to share pixmaps
+    // But this works for now
+    setCacheMode( QGraphicsItem::DeviceCoordinateCache );
+
     midiTime startPos = _object->startPosition();
     float x = TrackContainerScene::DEFAULT_CELL_WIDTH *
             startPos.getTicks() / midiTime::ticksPerTact();
@@ -154,6 +158,7 @@ QVariant TrackContentObjectItem::itemChange( GraphicsItemChange _change, const Q
         {
             setCursor( Qt::OpenHandCursor );
         }
+        update();
     }
 
 	return QGraphicsItem::itemChange( _change, _value );

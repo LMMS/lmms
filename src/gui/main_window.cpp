@@ -41,6 +41,7 @@
 #include <QShortcut>
 
 #include <QGraphicsView>
+#include <QPixmapCache>
 
 
 #include "lmmsversion.h"
@@ -207,6 +208,7 @@ mainWindow::mainWindow( void ) :
 			QSize( 16*4, 32 ),
             16 );
 
+    QPixmapCache::setCacheLimit( 10240 );
 	QGraphicsView *view = new QGraphicsView( scene );
 	view->setRenderHints( QPainter::Antialiasing | QPainter::SmoothPixmapTransform );
     view->setDragMode( QGraphicsView::RubberBandDrag );

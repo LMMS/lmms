@@ -8,7 +8,10 @@
 #include "gui/tracks/track_content_object_item.h"
 #include "gui/tracks/track_container_scene.h"
 #include "gui/tracks/track_item.h"
+#include "bb_track.h"
+#include "bb_track_container.h"
 #include "track.h"
+#include "engine.h"
 
 // Just some stuff while playing with theming ideas, 
 // will be moved to lmmsStyle
@@ -126,52 +129,35 @@ void BbTrackContentObjectItem::paint( QPainter * _painter,
     drawPath( _painter, path, col, "hah", m_hover );
 
     const float cellW = TrackContainerScene::DEFAULT_CELL_WIDTH;
-    _painter->setOpacity(0.2);
-    _painter->setRenderHint( QPainter::Antialiasing, false );
-    _painter->setPen( QColor(0, 0, 0) );
-    for( int i = 0; i < m_tco->length().getTact(); ++i )
-    {
-        float x = cellW * i;
-        _painter->drawLine(x, 2, x, rc.height()-4);
+
+    bbTCO * bbTco  = (bbTCO*)m_tco;
+	tact t = engine::getBBTrackContainer()->lengthOfBB(
+				bbTrack::numOfBBTrack( bbTco->getTrack() ) );
+
+	if( bbTco->length() > midiTime::ticksPerTact() && t > 0 )
+	{
+        _painter->setOpacity(0.2);
+        _painter->setRenderHint( QPainter::Antialiasing, false );
+        _painter->setPen( QColor(0, 0, 0) );
+
+		for( float x = t * cellW; x < rc.width()-2; x += t * cellW )
+		{
+            _painter->drawLine(x, 3, x, rc.height()-5);
+        }
+
+        _painter->translate( 1, 0 );
+        _painter->setPen( col.lighter(160) );
+		for( float x = t * cellW; x < rc.width()-2; x += t * cellW )
+		{
+            _painter->drawLine(x, 2, x, rc.height()-5);
+        }
+
+        _painter->setRenderHint( QPainter::Antialiasing, true );
     }
 
-    _painter->translate( 1, 0 );
-    _painter->setPen( col.lighter(160) );
-    for( int i = 0; i < m_tco->length().getTact(); ++i )
-    {
-        float x = cellW * i;
-        _painter->drawLine(x, 2, x, rc.height()-4);
-    }
-
-    _painter->setRenderHint( QPainter::Antialiasing, true );
     _painter->restore();
 
     return;
-
-
-	QColor col0 = col.light( 130 );
-	QColor col1 = col.light( 70 );
-	QColor col2 = col.light( 40 );
-	
-    QLinearGradient lingrad( 0, 0, 0, rc.height() );
-	lingrad.setColorAt( 0, col0 );
-	lingrad.setColorAt( 1, col1 );
-
-    QLinearGradient bordergrad( 0, 0, 0, rc.height() );
-	bordergrad.setColorAt( 1, col2 );
-	bordergrad.setColorAt( 0, col1 );
-
-    
-    rc.adjust( 0, 0, -1, -1 );
-
-
-    _painter->setRenderHint( QPainter::Antialiasing, true );
-	_painter->setBrush( lingrad );
-	_painter->setPen( QPen( bordergrad, 1.5 ) ); // QColor( 6, 6, 6 ) );
-	_painter->drawRoundedRect( rc, 4, 4 );
-    _painter->setRenderHint( QPainter::Antialiasing, false );
-
-	_painter->restore();
 }
 
 QVariant BbTrackContentObjectItem::itemChange( GraphicsItemChange _change, const QVariant & _value )
