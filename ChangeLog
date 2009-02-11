@@ -17,6 +17,15 @@
 	- Commit initial version of QGraphicsScene-based Song Editor
 	- Please save bugreports for another week or so, this is immature code
 
+	* src/gui/tracks/track_content_object_item.cpp:
+	* src/gui/tracks/track_item.cpp:
+	* src/gui/tracks/bb_tco_item.cpp:
+	* src/gui/tracks/pattern_item.cpp:
+	* include/gui/tracks/pattern_item.h:
+	* include/gui/tracks/bb_tco_item.h:
+	- Add BB and Pattern subclasses
+	- Play with some styling, about to move style code into lmmsStyle
+
 2009-02-09	Paul Giblock <drfaygo/at/gmail/dot/com>
 
 	* include/basic_filters.h:

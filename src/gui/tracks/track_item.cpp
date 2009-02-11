@@ -4,6 +4,12 @@
 #include "gui/tracks/track_content_object_item.h"
 #include "gui/tracks/track_container_scene.h"
 
+#include "gui/tracks/bb_tco_item.h"
+#include "gui/tracks/pattern_item.h"
+
+#include "bb_track.h"
+#include "pattern.h"
+
 TrackItem::TrackItem( TrackContainerScene * _scene, track * _track )
 {
 	m_scene = _scene;
@@ -43,7 +49,22 @@ TrackItem::~TrackItem()
 
 void TrackItem::addTCO( trackContentObject * _tco )
 {
-    TrackContentObjectItem * tcoItem = new TrackContentObjectItem( this, _tco );
+    // TODO move into a factory?
+    TrackContentObjectItem * tcoItem;
+
+    if( bbTCO * bbTco = dynamic_cast<bbTCO *>( _tco ) )
+    {
+        tcoItem = new BbTrackContentObjectItem( this, (trackContentObject*)bbTco );
+    }
+    else if( pattern * pat = dynamic_cast<pattern *>( _tco ) )
+    {
+        tcoItem = new PatternItem( this, (trackContentObject*)pat );
+    }
+    else
+    {
+        // Whoa.
+        return;
+    }
     
     // TODO refactor to private updateTCOGeometry
     tcoItem->setPos( tcoItem->x(), y() );

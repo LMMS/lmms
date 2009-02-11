@@ -9,9 +9,6 @@
 #include "gui/tracks/track_item.h"
 #include "track.h"
 
-//QTimeLine TrackContentObjectItem::s_timeLine;
-//QGraphicsItemAnimation TrackContentObjectItem::s_animation;
-QTimeLine TrackContentObjectItem::s_snapBackTimeLine;
 
 TrackContentObjectItem::TrackContentObjectItem( TrackItem * _track, trackContentObject * _object ) :
         QObject(),
