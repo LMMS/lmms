@@ -1,3 +1,22 @@
+2009-02-10	Paul Giblock <drfaygo/at/gmail/dot/com>
+	
+	* include/gui:
+	* include/gui/tracks:
+	* include/gui/tracks/track_content_object_item.h:
+	* include/gui/tracks/track_item.h:
+	* include/gui/tracks/track_container_scene.h:
+	* include/track_container.h:
+	* include/track.h:
+	* src/gui/tracks:
+	* src/gui/tracks/track_content_object_item.cpp:
+	* src/gui/tracks/track_item.cpp:
+	* src/gui/tracks/track_container_scene.cpp:
+	* src/gui/main_window.cpp:
+	* src/core/track_container.cpp:
+	* src/core/track.cpp:
+	- Commit initial version of QGraphicsScene-based Song Editor
+	- Please save bugreports for another week or so, this is immature code
+
 2009-02-09	Paul Giblock <drfaygo/at/gmail/dot/com>
 
 	* include/basic_filters.h:

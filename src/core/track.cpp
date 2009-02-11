@@ -493,7 +493,7 @@ void trackContentObjectView::dropEvent( QDropEvent * _de )
 		// the user doesn't expect...
 		midiTime pos = m_tco->startPosition();
 		m_tco->restoreState( mmp.content().firstChild().toElement() );
-		m_tco->movePosition( pos );
+ 		m_tco->movePosition( pos );
 		automationPattern::resolveAllIDs();
 		_de->accept();
 	}
@@ -1776,6 +1776,7 @@ void track::removeTCO( trackContentObject * _tco )
 	if( it != m_trackContentObjects.end() )
 	{
 		m_trackContentObjects.erase( it );
+		emit trackContentObjectRemoved( _tco );
 		engine::getSong()->setModified();
 	}
 }

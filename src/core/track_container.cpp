@@ -170,6 +170,7 @@ void trackContainer::removeTrack( track * _track )
 		m_tracksMutex.lockForWrite();
 		m_tracks.remove( index );
 		m_tracksMutex.unlock();
+		emit trackRemoved( _track );
 
 		if( engine::getSong() )
 		{
@@ -193,6 +194,7 @@ void trackContainer::clearAllTracks( void )
 	//m_tracksMutex.lockForWrite();
 	while( !m_tracks.isEmpty() )
 	{
+		emit trackRemoved( m_tracks.first() );
 		delete m_tracks.first();
 	}
 	//m_tracksMutex.unlock();

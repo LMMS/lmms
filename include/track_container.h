@@ -82,6 +82,7 @@ public:
 
 signals:
 	void trackAdded( track * _track );
+	void trackRemoved( track * _track );
 
 protected:
 	mutable QReadWriteLock m_tracksMutex;

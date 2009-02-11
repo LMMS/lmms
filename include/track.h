@@ -63,7 +63,7 @@ const int TCO_BORDER_WIDTH = 1;
 class trackContentObject : public model, public journallingObject
 {
 	Q_OBJECT
-	mapPropertyFromModel(bool,isMuted,setMuted,m_mutedModel);
+	mapPropertyFromModel( bool, isMuted, setMuted, m_mutedModel);
 public:
 	trackContentObject( track * _track );
 	virtual ~trackContentObject();
@@ -463,6 +463,7 @@ signals:
 	void destroyedTrack( void );
 	void nameChanged( void );
 	void trackContentObjectAdded( trackContentObject * );
+	void trackContentObjectRemoved( trackContentObject * );
 
 } ;
 
