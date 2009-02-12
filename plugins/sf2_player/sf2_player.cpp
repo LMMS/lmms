@@ -248,6 +248,7 @@ void sf2Instrument::loadSettings( const QDomElement & _this )
 	m_chorusSpeed.loadSettings( _this, "chorusSpeed" );
 	m_chorusDepth.loadSettings( _this, "chorusDepth" );
 
+	updatePatch();
 	updateGain();
 }
 
