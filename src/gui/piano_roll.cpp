@@ -2,7 +2,7 @@
  * piano_roll.cpp - implementation of piano-roll which is used for actual
  *                  writing of melodies
  *
- * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2008 Andrew Kelley <superjoe30/at/gmail/dot/com>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
@@ -2864,11 +2864,13 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 			break;
 		case ModeErase: cursor = s_toolErase; break;
 		case ModeSelect: cursor = s_toolSelect; break;
-		//case ModeMove: cursor = s_toolMove; break;
 		case ModeOpen: cursor = s_toolOpen; break;
 	}
-	p.drawPixmap( mapFromGlobal( QCursor::pos() ) + QPoint( 8, 8 ),
+	if( cursor != NULL )
+	{
+		p.drawPixmap( mapFromGlobal( QCursor::pos() ) + QPoint( 8, 8 ),
 								*cursor );
+	}
 }
 
 
