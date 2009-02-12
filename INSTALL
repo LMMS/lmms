@@ -23,3 +23,6 @@ that are going to be built into LMMS or built as plugins. Install the
 according libraries and development files if a certain feature is not enabled.
 Then remove CMakeCache.txt and run cmake again.
 
+If you're on linux and want to build for win32, the command is 
+
+cmake . -DCMAKE_TOOLCHAIN_FILE=cmake/modules/Win32Toolchain.cmake
