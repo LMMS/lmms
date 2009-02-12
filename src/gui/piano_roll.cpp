@@ -2,7 +2,7 @@
  * piano_roll.cpp - implementation of piano-roll which is used for actual
  *                  writing of melodies
  *
- * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2008 Andrew Kelley <superjoe30/at/gmail/dot/com>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
@@ -77,42 +77,43 @@ extern Keys whiteKeys[];	// defined in piano_widget.cpp
 
 
 // some constants...
-const int INITIAL_PIANOROLL_WIDTH = 840;
-const int INITIAL_PIANOROLL_HEIGHT = 480;
+static const int InitialPianoRollWidth = 840;
+static const int InitialPianoRollHeight = 480;
 
-const int SCROLLBAR_SIZE = 16;
-const int PIANO_X = 0;
+static const int ScrollBarSize = 16;
+static const int PianoX = 0;
 
-const int WHITE_KEY_WIDTH = 64;
-const int BLACK_KEY_WIDTH = 41;
-const int WHITE_KEY_SMALL_HEIGHT = 18;
-const int WHITE_KEY_BIG_HEIGHT = 24;
-const int BLACK_KEY_HEIGHT = 16;
-const int C_KEY_LABEL_X = WHITE_KEY_WIDTH - 19;
-const int KEY_LINE_HEIGHT = 12;
-const int OCTAVE_HEIGHT = KEY_LINE_HEIGHT * KeysPerOctave;	// = 12 * 12;
+static const int WhiteKeyWidth = 64;
+static const int BlackKeyWidth = 41;
+static const int WhiteKeySmallHeight = 18;
+static const int WhiteKeyBigHeight = 24;
+static const int BlackKeyHeightHeight = 16;
+static const int CKeyLabelX = WhiteKeyWidth - 19;
+static const int KeyLineHeight = 12;
+static const int OctaveHeight = KeyLineHeight * KeysPerOctave;	// = 12 * 12;
 
-const int NOTE_EDIT_RESIZE_BAR = 6;
-const int NOTE_EDIT_MIN_HEIGHT = 50;
-const int KEY_AREA_MIN_HEIGHT = 100;
-const int PR_BOTTOM_MARGIN = SCROLLBAR_SIZE;
-const int PR_TOP_MARGIN = 48;
-const int PR_RIGHT_MARGIN = SCROLLBAR_SIZE;
+static const int NoteEditResizeBar = 6;
+static const int NoteEditMinHeight = 50;
+static const int KeyAreaMinHeight = 100;
+static const int BottomMargin = ScrollBarSize;
+static const int TopMargin = 32 + FLUIQ::CollapsibleWidgetHeader::MinimalHeight;
+static const int RightMargin = ScrollBarSize;
 
 
 // width of area used for resizing (the grip at the end of a note)
-const int RESIZE_AREA_WIDTH = 4;
+static const int NoteResizeAreaWidth = 4;
 
 // width of line for setting volume/panning of note
-const int NE_LINE_WIDTH = 3;
+static const int NoteEditLineWidth = 3;
 
 // key where to start
-const int INITIAL_START_KEY = Key_C + Octave_3 * KeysPerOctave;
+static const int InitialStartKey = Key_C + Octave_3 * KeysPerOctave;
 
 // number of each note to provide in quantization and note lengths
-const int NUM_EVEN_LENGTHS = 6;
-const int NUM_TRIPLET_LENGTHS = 5;
+static const int NumEvenLengths = 6;
+static const int NumTripletLengths = 5;
 
+static const int DefaultPixelsPerTact = KeyLineHeight * DefaultStepsPerTact;
 
 
 QPixmap * pianoRoll::s_whiteKeySmallPm = NULL;
@@ -125,18 +126,18 @@ QPixmap * pianoRoll::s_toolMove = NULL;
 QPixmap * pianoRoll::s_toolOpen = NULL;
 
 // used for drawing of piano
-pianoRoll::pianoRollKeyTypes pianoRoll::prKeyOrder[] =
+pianoRoll::KeyTypes pianoRoll::s_keyOrder[] =
 {
-	PR_WHITE_KEY_SMALL, PR_BLACK_KEY, PR_WHITE_KEY_BIG, PR_BLACK_KEY,
-	PR_WHITE_KEY_SMALL, PR_WHITE_KEY_SMALL, PR_BLACK_KEY, PR_WHITE_KEY_BIG,
-	PR_BLACK_KEY, PR_WHITE_KEY_BIG, PR_BLACK_KEY, PR_WHITE_KEY_SMALL
+	WhiteKeySmall, BlackKey, WhiteKeyBig, BlackKey,
+	WhiteKeySmall, WhiteKeySmall, BlackKey, WhiteKeyBig,
+	BlackKey, WhiteKeyBig, BlackKey, WhiteKeySmall
 } ;
 
 
-const int DEFAULT_PR_PPT = KEY_LINE_HEIGHT * DefaultStepsPerTact;
 
 
 pianoRoll::pianoRoll( void ) :
+	FLUIQ::CollapsibleWidget( Qt::Vertical ),
 	m_nemStr( QVector<QString>() ),
 	m_noteEditMenu( NULL ),
 	m_signalMapper( NULL ),
@@ -153,11 +154,11 @@ pianoRoll::pianoRoll( void ) :
 	m_lastMouseY( 0 ),
 	m_oldNotesEditHeight( 100 ),
 	m_notesEditHeight( 100 ),
-	m_ppt( DEFAULT_PR_PPT ),
+	m_ppt( DefaultPixelsPerTact ),
 	m_lenOfNewNotes( midiTime( 0, DefaultTicksPerTact/4 ) ),
 	m_lastNoteVolume( DefaultVolume ),
 	m_lastNotePanning( DefaultPanning ),
-	m_startKey( INITIAL_START_KEY ),
+	m_startKey( InitialStartKey ),
 	m_lastKey( 0 ),
 	m_editMode( ModeDraw ),
 	m_mouseDownLeft( false ),
@@ -173,13 +174,14 @@ pianoRoll::pianoRoll( void ) :
 	m_noteEditMenu->clear();
 	for( int i=0; i<m_nemStr.size(); ++i )
 	{
-		QAction * act = new QAction( m_nemStr.at(i), this );
-		connect( act, SIGNAL(triggered()), m_signalMapper, SLOT(map()) );
+		QAction * act = new QAction( m_nemStr.at( i ), this );
+		connect( act, SIGNAL( triggered() ),
+				m_signalMapper, SLOT( map() ) );
 		m_signalMapper->setMapping( act, i );
 		m_noteEditMenu->addAction( act );
 	}
-	connect( m_signalMapper, SIGNAL(mapped(int)), 
-			this, SLOT(changeNoteEditMode(int)) );
+	connect( m_signalMapper, SIGNAL( mapped( int ) ), 
+			this, SLOT( changeNoteEditMode( int ) ) );
 	
 	// init pixmaps
 	if( s_whiteKeySmallPm == NULL )
@@ -226,7 +228,7 @@ pianoRoll::pianoRoll( void ) :
 	setAttribute( Qt::WA_OpaquePaintEvent, true );
 
 	// add time-line
-	m_timeLine = new timeLine( WHITE_KEY_WIDTH, 32, m_ppt,
+	m_timeLine = new timeLine( WhiteKeyWidth, 32, m_ppt,
 					engine::getSong()->getPlayPos(
 						song::Mode_PlayPattern ),
 						m_currentPosition, this );
@@ -409,11 +411,11 @@ pianoRoll::pianoRoll( void ) :
 	quantize_lbl->setPixmap( embed::getIconPixmap( "quantize" ) );
 
 	m_quantizeModel.addItem( tr( "Note lock" ) );
-	for( int i = 0; i <= NUM_EVEN_LENGTHS; ++i )
+	for( int i = 0; i <= NumEvenLengths; ++i )
 	{
 		m_quantizeModel.addItem( "1/" + QString::number( 1 << i ) );
 	}
-	for( int i = 0; i < NUM_TRIPLET_LENGTHS; ++i )
+	for( int i = 0; i < NumTripletLengths; ++i )
 	{
 		m_quantizeModel.addItem( "1/" + QString::number( (1 << i) * 3 ) );
 	}
@@ -437,15 +439,15 @@ pianoRoll::pianoRoll( void ) :
 						"tripletquarter", "tripleteighth", 
 						"tripletsixteenth", "tripletthirtysecond" } ;
 
-	for( int i = 0; i < NUM_EVEN_LENGTHS; ++i )
+	for( int i = 0; i < NumEvenLengths; ++i )
 	{
 		m_noteLenModel.addItem( "1/" + QString::number( 1 << i ),
 				new pixmapLoader( "note_" + pixmaps[i] ) );
 	}
-	for( int i = 0; i < NUM_TRIPLET_LENGTHS; ++i )
+	for( int i = 0; i < NumTripletLengths; ++i )
 	{
 		m_noteLenModel.addItem( "1/" + QString::number( (1 << i) * 3 ),
-				new pixmapLoader( "note_" + pixmaps[i+NUM_EVEN_LENGTHS] ) );
+				new pixmapLoader( "note_" + pixmaps[i+NumEvenLengths] ) );
 	}
 	m_noteLenModel.setValue( 0 );
 	m_noteLenComboBox = new comboBox( m_toolBar );
@@ -500,13 +502,13 @@ pianoRoll::pianoRoll( void ) :
 	if( engine::getMainWindow()->workspace() )
 	{
 		engine::getMainWindow()->workspace()->addSubWindow( this );
-		parentWidget()->resize( INITIAL_PIANOROLL_WIDTH,
-						INITIAL_PIANOROLL_HEIGHT );
+		parentWidget()->resize( InitialPianoRollWidth,
+						InitialPianoRollHeight );
 		parentWidget()->hide();
 	}
 	else
 	{
-		resize( INITIAL_PIANOROLL_WIDTH, INITIAL_PIANOROLL_HEIGHT );
+		resize( InitialPianoRollWidth, InitialPianoRollHeight );
 		hide();
 	}
 
@@ -515,16 +517,22 @@ pianoRoll::pianoRoll( void ) :
 }
 
 
-void pianoRoll::changeNoteEditMode( int i )
-{
-	m_noteEditMode = (noteEditMode) i;
-	repaint();
-}
 
 
 pianoRoll::~pianoRoll()
 {
 }
+
+
+
+
+void pianoRoll::changeNoteEditMode( int i )
+{
+	m_noteEditMode = (NoteEditMode) i;
+	repaint();
+}
+
+
 
 
 void pianoRoll::setCurrentPattern( pattern * _new_pattern )
@@ -537,7 +545,7 @@ void pianoRoll::setCurrentPattern( pattern * _new_pattern )
 	m_pattern = _new_pattern;
 	m_currentPosition = 0;
 	m_currentNote = NULL;
-	m_startKey = INITIAL_START_KEY;
+	m_startKey = InitialStartKey;
 
 	if( validPattern() == false )
 	{
@@ -640,12 +648,12 @@ inline void pianoRoll::drawNoteRect( QPainter & _p, int _x, int _y,
 	{
 		//step note
 		col = engine::getLmmsStyle()->color( LmmsStyle::PianoRollStepNote );
-		_p.fillRect( _x, _y, _width, KEY_LINE_HEIGHT - 2, col );
+		_p.fillRect( _x, _y, _width, KeyLineHeight - 2, col );
 	}
 	else if( _n->selected() )
 	{
 		col = engine::getLmmsStyle()->color( LmmsStyle::PianoRollSelectedNote );
-		_p.fillRect( _x, _y, _width, KEY_LINE_HEIGHT - 2, col );
+		_p.fillRect( _x, _y, _width, KeyLineHeight - 2, col );
 	}
 	else
 	{
@@ -658,12 +666,12 @@ inline void pianoRoll::drawNoteRect( QPainter & _p, int _x, int _y,
 		col = QColor::fromHsv( col.hue(), col.saturation(), volVal );
 		
 		QLinearGradient gradient( _x, _y, _x+_width,
-							_y+KEY_LINE_HEIGHT );
+							_y+KeyLineHeight );
 		gradient.setColorAt( 0, lcol );
 		gradient.setColorAt( 1, rcol );
 		_p.setBrush( gradient );
 		_p.setPen( Qt::NoPen );
-		_p.drawRect( _x, _y, _width, KEY_LINE_HEIGHT-1 );
+		_p.drawRect( _x, _y, _width, KeyLineHeight-1 );
 	}
 	
 	// hilighting lines around the note
@@ -674,13 +682,13 @@ inline void pianoRoll::drawNoteRect( QPainter & _p, int _x, int _y,
 	_p.setPen( QColor::fromHsv( col.hue(), col.saturation(),
 					qMin<float>( 255, volVal*1.7f ) ) );
 	_p.drawLine( _x, _y, _x + _width, _y );
-	_p.drawLine( _x, _y, _x, _y + KEY_LINE_HEIGHT - 2 );
+	_p.drawLine( _x, _y, _x, _y + KeyLineHeight - 2 );
 	
 	col = defaultNoteColor;
 	_p.setPen( QColor::fromHsv( col.hue(), col.saturation(), volVal/1.7 ) );
-	_p.drawLine( _x + _width, _y, _x + _width, _y + KEY_LINE_HEIGHT - 2 );
-	_p.drawLine( _x, _y + KEY_LINE_HEIGHT - 2, _x + _width,
-						_y + KEY_LINE_HEIGHT - 2 );
+	_p.drawLine( _x + _width, _y, _x + _width, _y + KeyLineHeight - 2 );
+	_p.drawLine( _x, _y + KeyLineHeight - 2, _x + _width,
+						_y + KeyLineHeight - 2 );
 	
 	// that little tab thing on the end hinting at the user
 	// to resize the note
@@ -688,12 +696,12 @@ inline void pianoRoll::drawNoteRect( QPainter & _p, int _x, int _y,
 	if( _width > 2 )
 	{
 		_p.drawLine( _x + _width - 3, _y + 2, _x + _width - 3,
-						_y + KEY_LINE_HEIGHT - 4 );
+						_y + KeyLineHeight - 4 );
 	}
 	_p.drawLine( _x + _width - 1, _y + 2, _x + _width - 1,
-						_y + KEY_LINE_HEIGHT - 4 );
+						_y + KeyLineHeight - 4 );
 	_p.drawLine( _x + _width - 2, _y + 2, _x + _width - 2,
-						_y + KEY_LINE_HEIGHT - 4 );
+						_y + KeyLineHeight - 4 );
 }
 
 
@@ -702,7 +710,7 @@ inline void pianoRoll::drawNoteRect( QPainter & _p, int _x, int _y,
 inline void pianoRoll::drawDetuningInfo( QPainter & _p, note * _n, int _x,
 								int _y )
 {
-	int middle_y = _y + KEY_LINE_HEIGHT / 2;
+	int middle_y = _y + KeyLineHeight / 2;
 	_p.setPen( QColor( 0xFF, 0xDF, 0x20 ) );
 
 	timeMap & map = _n->detuning()->getAutomationPattern()->getTimeMap();
@@ -717,7 +725,7 @@ inline void pianoRoll::drawDetuningInfo( QPainter & _p, note * _n, int _x,
 
 		const float level = it.value();
 
-		int pos_y = (int)( middle_y - level * KEY_LINE_HEIGHT / 10 );
+		int pos_y = (int)( middle_y - level * KeyLineHeight / 10 );
 
 		_p.drawLine( pos_x - 1, pos_y, pos_x + 1, pos_y );
 		_p.drawLine( pos_x, pos_y - 1, pos_x, pos_y + 1 );
@@ -1224,8 +1232,8 @@ void pianoRoll::leaveEvent( QEvent * _e )
 
 inline int pianoRoll::noteEditTop() const
 {
-	return height() - PR_BOTTOM_MARGIN - 
-		m_notesEditHeight + NOTE_EDIT_RESIZE_BAR;
+	return height() - BottomMargin - 
+		m_notesEditHeight + NoteEditResizeBar;
 }
 
 
@@ -1233,7 +1241,7 @@ inline int pianoRoll::noteEditTop() const
 
 inline int pianoRoll::noteEditBottom() const
 {
-	return height() - PR_BOTTOM_MARGIN;
+	return height() - BottomMargin;
 }
 
 
@@ -1241,7 +1249,7 @@ inline int pianoRoll::noteEditBottom() const
 
 inline int pianoRoll::noteEditRight() const
 {
-	return width() - PR_RIGHT_MARGIN;
+	return width() - RightMargin;
 }
 
 
@@ -1249,7 +1257,7 @@ inline int pianoRoll::noteEditRight() const
 
 inline int pianoRoll::noteEditLeft() const
 {
-	return WHITE_KEY_WIDTH;
+	return WhiteKeyWidth;
 }
 
 
@@ -1257,7 +1265,7 @@ inline int pianoRoll::noteEditLeft() const
 
 inline int pianoRoll::keyAreaTop() const
 {
-	return PR_TOP_MARGIN;
+	return TopMargin;
 }
 
 
@@ -1265,7 +1273,7 @@ inline int pianoRoll::keyAreaTop() const
 
 inline int pianoRoll::keyAreaBottom() const
 {
-	return height() - PR_BOTTOM_MARGIN - m_notesEditHeight;
+	return height() - BottomMargin - m_notesEditHeight;
 }
 
 
@@ -1283,16 +1291,16 @@ void pianoRoll::mousePressEvent( QMouseEvent * _me )
 		noteUnderMouse()->editDetuningPattern();
 		return;
 	}
-	
+
 	// if holding control, go to selection mode
 	if( _me->modifiers() & Qt::ControlModifier && m_editMode != ModeSelect )
 	{
 		m_ctrlMode = m_editMode;
 		m_editMode = ModeSelect;
 		QApplication::changeOverrideCursor(
-										   QCursor( Qt::ArrowCursor ) );
+						QCursor( Qt::ArrowCursor ) );
 		update();
-	}	
+	}
 
 	// keep track of the point where the user clicked down
 	if( _me->button() == Qt::LeftButton )
@@ -1307,22 +1315,22 @@ void pianoRoll::mousePressEvent( QMouseEvent * _me )
 		m_action = ActionResizeNoteEditArea;
 		m_oldNotesEditHeight = m_notesEditHeight;
 		return;
-	}	
+	}
 
-	if( _me->y() > PR_TOP_MARGIN )
+	if( _me->y() > TopMargin )
 	{
 		bool edit_note = ( _me->y() > noteEditTop() );
 
 		int key_num = getKey( _me->y() );
 
 		int x = _me->x();
-		
 
-		if( x > WHITE_KEY_WIDTH )
+
+		if( x > WhiteKeyWidth )
 		{
 			// set, move or resize note
 
-			x -= WHITE_KEY_WIDTH;
+			x -= WhiteKeyWidth;
 
 			// get tick in which the user clicked
 			int pos_ticks = x * midiTime::ticksPerTact() / m_ppt +
@@ -1354,7 +1362,7 @@ void pianoRoll::mousePressEvent( QMouseEvent * _me )
 					||
 					( edit_note == true &&
 					pos_ticks <= ( *it )->pos() +
-							NE_LINE_WIDTH *
+							NoteEditLineWidth *
 						midiTime::ticksPerTact() /
 								m_ppt )
 					)
@@ -1479,7 +1487,7 @@ void pianoRoll::mousePressEvent( QMouseEvent * _me )
 					( m_currentNote->pos() +
 					m_currentNote->length() )*m_ppt/
 						midiTime::ticksPerTact() -
-							RESIZE_AREA_WIDTH &&
+							NoteResizeAreaWidth &&
 						m_currentNote->length() > 0 )
 				{
 					// then resize the note
@@ -1586,7 +1594,7 @@ void pianoRoll::mousePressEvent( QMouseEvent * _me )
 			m_lastKey = key_num;
 			if( ! m_recording && ! engine::getSong()->isPlaying() )
 			{
-				int v = ( (float) x ) / ( (float) WHITE_KEY_WIDTH ) * 127;
+				int v = ( (float) x ) / ( (float) WhiteKeyWidth ) * 127;
 				m_pattern->getInstrumentTrack()->processInEvent(
 							midiEvent( MidiNoteOn, 0, key_num, v ),
 							midiTime() );
@@ -1597,10 +1605,10 @@ void pianoRoll::mousePressEvent( QMouseEvent * _me )
 			if( _me->buttons() == Qt::LeftButton )
 			{
 				// clicked in the box below the keys to the left of note edit area
-				m_noteEditMode = (noteEditMode)(((int)m_noteEditMode)+1);
+				m_noteEditMode = (NoteEditMode)(((int)m_noteEditMode)+1);
 				if( m_noteEditMode == NoteEditCount )
 				{
-					m_noteEditMode = (noteEditMode)0;
+					m_noteEditMode = (NoteEditMode)0;
 				}
 				repaint();
 			}
@@ -1905,14 +1913,14 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 		// change m_notesEditHeight and then repaint
 		m_notesEditHeight = tLimit<int>( 
 					m_oldNotesEditHeight - ( _me->y() - m_moveStartY ),
-					NOTE_EDIT_MIN_HEIGHT,
-					height() - PR_TOP_MARGIN - NOTE_EDIT_RESIZE_BAR - 
-									PR_BOTTOM_MARGIN - KEY_AREA_MIN_HEIGHT );
+					NoteEditMinHeight,
+					height() - TopMargin - NoteEditResizeBar - 
+						BottomMargin - KeyAreaMinHeight );
 		repaint();
 		return;
 	}
 	
-	if( _me->y() > PR_TOP_MARGIN || m_action != ActionNone )
+	if( _me->y() > TopMargin || m_action != ActionNone )
 	{
 		bool edit_note = ( _me->y() > noteEditTop() )
 						&& m_action != ActionSelectNotes;
@@ -1922,19 +1930,19 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 		int x = _me->x();
 
 		// see if they clicked on the keyboard on the left
-		if( x < WHITE_KEY_WIDTH && m_action == ActionNone
+		if( x < WhiteKeyWidth && m_action == ActionNone
 		    && ! edit_note && key_num != m_lastKey
 		    && _me->buttons() & Qt::LeftButton )
 		{
 			// clicked on a key, play the note
 			testPlayKey( key_num, 
-						( (float) x ) / ( (float) WHITE_KEY_WIDTH ) * 127,
+						( (float) x ) / ( (float) WhiteKeyWidth ) * 127,
 						0 );
 			update();
 			return;
 		}
 		
-		x -= WHITE_KEY_WIDTH;
+		x -= WhiteKeyWidth;
 
 		if( _me->buttons() & Qt::LeftButton 
 			&& m_editMode == ModeDraw
@@ -2093,7 +2101,7 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 						( ( *it )->pos() +
 						( *it )->length() )*m_ppt/
 						midiTime::ticksPerTact()-
-							RESIZE_AREA_WIDTH )
+							NoteResizeAreaWidth )
 				{
 					if( QApplication::overrideCursor() )
 					{
@@ -2205,7 +2213,7 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 					||
 					( edit_note == true &&
 					pos_ticks <= ( *it )->pos() +
-							NE_LINE_WIDTH *
+							NoteEditLineWidth *
 						midiTime::ticksPerTact() /
 								m_ppt )
 					)
@@ -2240,12 +2248,12 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 					m_action == ActionSelectNotes )
 		{
 
-			int x = _me->x() - WHITE_KEY_WIDTH;
+			int x = _me->x() - WhiteKeyWidth;
 			if( x < 0 && m_currentPosition > 0 )
 			{
 				x = 0;
 				QCursor::setPos( mapToGlobal( QPoint(
-							WHITE_KEY_WIDTH,
+							WhiteKeyWidth,
 							_me->y() ) ) );
 				if( m_currentPosition >= 4 )
 				{
@@ -2257,9 +2265,9 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 					m_leftRightScroll->setValue( 0 );
 				}
 			}
-			else if( x > width() - WHITE_KEY_WIDTH )
+			else if( x > width() - WhiteKeyWidth )
 			{
-				x = width() - WHITE_KEY_WIDTH;
+				x = width() - WhiteKeyWidth;
 				QCursor::setPos( mapToGlobal( QPoint( width(),
 							_me->y() ) ) );
 				m_leftRightScroll->setValue( m_currentPosition +
@@ -2281,10 +2289,10 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 
 
 			int key_num = getKey( _me->y() );
-			int visible_keys = ( height() - PR_TOP_MARGIN -
-						PR_BOTTOM_MARGIN -
+			int visible_keys = ( height() - TopMargin -
+						BottomMargin -
 						m_notesEditHeight ) /
-							KEY_LINE_HEIGHT + 2;
+							KeyLineHeight + 2;
 			const int s_key = m_startKey - 1;
 
 			if( key_num <= s_key )
@@ -2298,7 +2306,7 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 			else if( key_num >= s_key + visible_keys )
 			{
 				QCursor::setPos( mapToGlobal( QPoint( _me->x(),
-							PR_TOP_MARGIN ) ) );
+							TopMargin ) ) );
 				m_topBottomScroll->setValue(
 					m_topBottomScroll->value() - 1 );
 				key_num = s_key + visible_keys;
@@ -2431,15 +2439,15 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 	int y_offset = 0;
 
 	// calculate y_offset according to first key
-	switch( prKeyOrder[m_startKey % KeysPerOctave] )
+	switch( s_keyOrder[m_startKey % KeysPerOctave] )
 	{
-		case PR_BLACK_KEY: y_offset = KEY_LINE_HEIGHT/4; break;
-		case PR_WHITE_KEY_BIG: y_offset = KEY_LINE_HEIGHT/2; break;
-		case PR_WHITE_KEY_SMALL:
-			if( prKeyOrder[( ( m_startKey + 1 ) %
-					KeysPerOctave)] != PR_BLACK_KEY )
+		case BlackKey: y_offset = KeyLineHeight/4; break;
+		case WhiteKeyBig: y_offset = KeyLineHeight/2; break;
+		case WhiteKeySmall:
+			if( s_keyOrder[( ( m_startKey + 1 ) %
+					KeysPerOctave)] != BlackKey )
 			{
-				y_offset = KEY_LINE_HEIGHT / 2;
+				y_offset = KeyLineHeight / 2;
 			}
 			break;
 	}
@@ -2447,7 +2455,7 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 	// start drawing at the bottom
 	int key_line_y = keyAreaBottom() - 1;
 	// used for aligning black-keys later
-	int first_white_key_height = WHITE_KEY_SMALL_HEIGHT;
+	int first_white_key_height = WhiteKeySmallHeight;
 	// key-counter - only needed for finding out whether the processed 
 	// key is the first one
 	int keys_processed = 0;
@@ -2455,61 +2463,61 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 	int key = m_startKey;
 
 	// draw all white keys...
-	for( int y = key_line_y + 1 + y_offset; y > PR_TOP_MARGIN;
-			key_line_y -= KEY_LINE_HEIGHT, ++keys_processed )
+	for( int y = key_line_y + 1 + y_offset; y > TopMargin;
+			key_line_y -= KeyLineHeight, ++keys_processed )
 	{
 		// check for white key that is only half visible on the 
 		// bottom of piano-roll
 		if( keys_processed == 0 &&
-			prKeyOrder[m_startKey % KeysPerOctave] ==
-								PR_BLACK_KEY )
+			s_keyOrder[m_startKey % KeysPerOctave] ==
+								BlackKey )
 		{
 			// draw it!
-			p.drawPixmap( PIANO_X, y - WHITE_KEY_SMALL_HEIGHT,
+			p.drawPixmap( PianoX, y - WhiteKeySmallHeight,
 							*s_whiteKeySmallPm );
 			// update y-pos
-			y -= WHITE_KEY_SMALL_HEIGHT / 2;
+			y -= WhiteKeySmallHeight / 2;
 			// move first black key down (we didn't draw whole 
 			// white key so black key needs to be lifted down)
 			// (default for first_white_key_height = 
-			// WHITE_KEY_SMALL_HEIGHT, so WHITE_KEY_SMALL_HEIGHT/2
+			// WhiteKeySmallHeight, so WhiteKeySmallHeight/2
 			// is smaller)
-			first_white_key_height = WHITE_KEY_SMALL_HEIGHT / 2;
+			first_white_key_height = WhiteKeySmallHeight / 2;
 		}
 		// check whether to draw a big or a small white key
-		if( prKeyOrder[key % KeysPerOctave] == PR_WHITE_KEY_SMALL )
+		if( s_keyOrder[key % KeysPerOctave] == WhiteKeySmall )
 		{
 			// draw a small one...
-			p.drawPixmap( PIANO_X, y - WHITE_KEY_SMALL_HEIGHT,
+			p.drawPixmap( PianoX, y - WhiteKeySmallHeight,
 							*s_whiteKeySmallPm );
 			// update y-pos
-			y -= WHITE_KEY_SMALL_HEIGHT;
+			y -= WhiteKeySmallHeight;
 
 		}
-		else if( prKeyOrder[key % KeysPerOctave] ==
-							PR_WHITE_KEY_BIG )
+		else if( s_keyOrder[key % KeysPerOctave] ==
+							WhiteKeyBig )
 		{
 			// draw a big one...
-			p.drawPixmap( PIANO_X, y-WHITE_KEY_BIG_HEIGHT,
+			p.drawPixmap( PianoX, y-WhiteKeyBigHeight,
 							*s_whiteKeyBigPm );
 			// if a big white key has been the first key,
 			// black keys needs to be lifted up
 			if( keys_processed == 0 )
 			{
-				first_white_key_height = WHITE_KEY_BIG_HEIGHT;
+				first_white_key_height = WhiteKeyBigHeight;
 			}
 			// update y-pos
-			y -= WHITE_KEY_BIG_HEIGHT;
+			y -= WhiteKeyBigHeight;
 		}
 		// label C-keys...
 		if( static_cast<Keys>( key % KeysPerOctave ) == Key_C )
 		{
 			p.setPen( QColor( 240, 240, 240 ) );
-			p.drawText( C_KEY_LABEL_X + 1, y+14, "C" +
+			p.drawText( CKeyLabelX + 1, y+14, "C" +
 					QString::number( static_cast<int>( key /
 							KeysPerOctave ) ) );
 			p.setPen( QColor( 0, 0, 0 ) );
-			p.drawText( C_KEY_LABEL_X, y + 13, "C" +
+			p.drawText( CKeyLabelX, y + 13, "C" +
 					QString::number( static_cast<int>( key /
 							KeysPerOctave ) ) );
 			p.setPen( QColor( 0x4F, 0x4F, 0x4F ) );
@@ -2519,7 +2527,7 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 			p.setPen( QColor( 0x3F, 0x3F, 0x3F ) );
 		}
 		// draw key-line
-		p.drawLine( WHITE_KEY_WIDTH, key_line_y, width(), key_line_y );
+		p.drawLine( WhiteKeyWidth, key_line_y, width(), key_line_y );
 		++key;
 	}
 
@@ -2530,41 +2538,41 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 
 	// and go!
 	for( int y = keyAreaBottom() + y_offset;
-					y > PR_TOP_MARGIN; ++keys_processed )
+					y > TopMargin; ++keys_processed )
 	{
 		// check for black key that is only half visible on the bottom
 		// of piano-roll
 		if( keys_processed == 0
 		    // current key may not be a black one
-		    && prKeyOrder[key % KeysPerOctave] != PR_BLACK_KEY
+		    && s_keyOrder[key % KeysPerOctave] != BlackKey
 		    // but the previous one must be black (we must check this
 		    // because there might be two white keys (E-F)
-		    && prKeyOrder[( key - 1 ) % KeysPerOctave] ==
-								PR_BLACK_KEY )
+		    && s_keyOrder[( key - 1 ) % KeysPerOctave] ==
+								BlackKey )
 		{
 			// draw the black key!
-			p.drawPixmap( PIANO_X, y - BLACK_KEY_HEIGHT / 2,
+			p.drawPixmap( PianoX, y - BlackKeyHeightHeight / 2,
 								*s_blackKeyPm );
 			// is the one after the start-note a black key??
-			if( prKeyOrder[( key + 1 ) % KeysPerOctave] !=
-								PR_BLACK_KEY )
+			if( s_keyOrder[( key + 1 ) % KeysPerOctave] !=
+								BlackKey )
 			{
 				// no, then move it up!
-				y -= KEY_LINE_HEIGHT / 2;
+				y -= KeyLineHeight / 2;
 			}
 		}
 		// current key black?
-		if( prKeyOrder[key % KeysPerOctave] == PR_BLACK_KEY )
+		if( s_keyOrder[key % KeysPerOctave] == BlackKey )
 		{
 			// then draw it (calculation of y very complicated,
 			// but that's the only working solution, sorry...)
-			p.drawPixmap( PIANO_X, y - ( first_white_key_height -
-					WHITE_KEY_SMALL_HEIGHT ) -
-					WHITE_KEY_SMALL_HEIGHT/2 - 1 -
-					BLACK_KEY_HEIGHT, *s_blackKeyPm );
+			p.drawPixmap( PianoX, y - ( first_white_key_height -
+					WhiteKeySmallHeight ) -
+					WhiteKeySmallHeight/2 - 1 -
+					BlackKeyHeightHeight, *s_blackKeyPm );
 
 			// update y-pos
-			y -= WHITE_KEY_BIG_HEIGHT;
+			y -= WhiteKeyBigHeight;
 			// reset white-counter
 			white_cnt = 0;
 		}
@@ -2575,7 +2583,7 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 			++white_cnt;
 			if( white_cnt > 1 )
 			{
-				y -= WHITE_KEY_BIG_HEIGHT/2;
+				y -= WhiteKeyBigHeight/2;
 			}
 		}
 
@@ -2586,7 +2594,7 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 	// erase the area below the piano, because there might be keys that 
 	// should be only half-visible
 	p.fillRect( QRect( 0, keyAreaBottom(),
-			WHITE_KEY_WIDTH, noteEditBottom()-keyAreaBottom() ),
+			WhiteKeyWidth, noteEditBottom()-keyAreaBottom() ),
 			QColor( 0, 0, 0 ) );
 	
 	// display note editing info
@@ -2595,15 +2603,15 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 	p.setFont( pointSize<10>( f ) );
 	p.setPen( QColor( 255, 255, 0 ) );
 	p.drawText( QRect( 0, keyAreaBottom(), 
-					  WHITE_KEY_WIDTH, noteEditBottom() - keyAreaBottom() ),
+					  WhiteKeyWidth, noteEditBottom() - keyAreaBottom() ),
 			   Qt::AlignCenter | Qt::TextWordWrap,
 			   m_nemStr.at( m_noteEditMode ) + ":" );
 
 	// set clipping area, because we are not allowed to paint over
 	// keyboard...
-	p.setClipRect( WHITE_KEY_WIDTH, PR_TOP_MARGIN,
-				width() - WHITE_KEY_WIDTH,
-				height() - PR_TOP_MARGIN - PR_BOTTOM_MARGIN );
+	p.setClipRect( WhiteKeyWidth, TopMargin,
+				width() - WhiteKeyWidth,
+				height() - TopMargin - BottomMargin );
 
 	// draw vertical raster
 	
@@ -2628,10 +2636,10 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 
 	// we need float here as odd time signatures might produce rounding
 	// errors else and thus an unusable grid
-	for( float x = WHITE_KEY_WIDTH - offset; x < width();
+	for( float x = WhiteKeyWidth - offset; x < width();
 						x += pp16th, ++tact_16th )
 	{
-		if( x >= WHITE_KEY_WIDTH )
+		if( x >= WhiteKeyWidth )
 		{
 			// every tact-start needs to be a bright line
 			if( tact_16th % spt == 0 )
@@ -2649,16 +2657,16 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 				p.setPen( QColor( 0x3F, 0x3F, 0x3F ) );
 			}
 
-			p.drawLine( (int)x, PR_TOP_MARGIN, (int)x, height() -
-							PR_BOTTOM_MARGIN );
+			p.drawLine( (int)x, TopMargin, (int)x, height() -
+							BottomMargin );
 
 			// extra 32nd's line
 			if( show32nds )
 			{
 				p.setPen( QColor( 0x22, 0x22, 0x22 ) );
-				p.drawLine( (int)(x + pp16th/2) , PR_TOP_MARGIN, 
+				p.drawLine( (int)(x + pp16th/2) , TopMargin, 
 						(int)(x + pp16th/2), height() -
-						PR_BOTTOM_MARGIN );
+						BottomMargin );
 			}
 		}
 	}
@@ -2686,20 +2694,20 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 	int y_base = keyAreaBottom() - 1;
 	if( validPattern() == true )
 	{
-		p.setClipRect( WHITE_KEY_WIDTH, PR_TOP_MARGIN,
-				width() - WHITE_KEY_WIDTH,
-				height() - PR_TOP_MARGIN );
+		p.setClipRect( WhiteKeyWidth, TopMargin,
+				width() - WhiteKeyWidth,
+				height() - TopMargin );
 
 		const noteVector & notes = m_pattern->notes();
 
 		const int visible_keys = ( keyAreaBottom()-keyAreaTop() ) /
-							KEY_LINE_HEIGHT + 2;
+							KeyLineHeight + 2;
 	
-        // horizontal line for the key under the cursor
+		// horizontal line for the key under the cursor
 		int key_num = getKey( mapFromGlobal( QCursor::pos() ).y() );
-		p.fillRect( 10, keyAreaBottom() + 3 - KEY_LINE_HEIGHT *
+		p.fillRect( 10, keyAreaBottom() + 3 - KeyLineHeight *
 					( key_num - m_startKey + 1 ),
-				width() - 10, KEY_LINE_HEIGHT - 7,
+				width() - 10, KeyLineHeight - 7,
 							QColor( 64, 64, 64 ) );
 	
 		QPolygon editHandles;
@@ -2728,7 +2736,7 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 					m_ppt / midiTime::ticksPerTact();
 			// skip this note if not in visible area at all
 			if( !( x + note_width >= 0 &&
-					x <= width() - WHITE_KEY_WIDTH ) )
+					x <= width() - WhiteKeyWidth ) )
 			{
 				continue;
 			}
@@ -2739,8 +2747,8 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 
 				// we've done and checked all, let's draw the
 				// note
-				drawNoteRect( p, x + WHITE_KEY_WIDTH,
-						y_base - key * KEY_LINE_HEIGHT,
+				drawNoteRect( p, x + WhiteKeyWidth,
+						y_base - key * KeyLineHeight,
 								note_width, *it );
 			}
 			
@@ -2753,7 +2761,8 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 						LmmsStyle::PianoRollSelectedLevel : 
 						LmmsStyle::PianoRollVolumeLevel );
 				p.setPen( QPen( color.lighter( 
-						(*it)->getVolume() / 2.0f ), NE_LINE_WIDTH ) );
+						(*it)->getVolume() / 2.0f ),
+							NoteEditLineWidth ) );
 
 				editHandleTop = noteEditBottom() - 
 					( (float)( ( *it )->getVolume() - MinVolume ) ) / 
@@ -2771,7 +2780,7 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 						LmmsStyle::PianoRollSelectedLevel : 
 						LmmsStyle::PianoRollPanningLevel );
 				
-				p.setPen( QPen( color, NE_LINE_WIDTH ) );
+				p.setPen( QPen( color, NoteEditLineWidth ) );
 				
 				editHandleTop = noteEditBottom() -
 					( (float)( ( *it )->getPanning() - PanningLeft ) ) / 
@@ -2788,13 +2797,13 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 			if( ( *it )->hasDetuningInfo() )
 			{
 				drawDetuningInfo( p, *it,
-					x + WHITE_KEY_WIDTH,
-					y_base - key * KEY_LINE_HEIGHT );
+					x + WhiteKeyWidth,
+					y_base - key * KeyLineHeight );
 			}
 		}
 		
 		p.setPen( QPen(engine::getLmmsStyle()->color( LmmsStyle::PianoRollEditHandle ),
-				NE_LINE_WIDTH+2 ) );
+				NoteEditLineWidth+2 ) );
 		p.drawPoints( editHandles );
 		
 	}
@@ -2804,24 +2813,24 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 		f.setBold( true );
 		p.setFont( pointSize<14>( f ) );
 		p.setPen( QColor( 0, 255, 0 ) );
-		p.drawText( WHITE_KEY_WIDTH + 20, PR_TOP_MARGIN + 40,
+		p.drawText( WhiteKeyWidth + 20, TopMargin + 40,
 				tr( "Please open a pattern by double-clicking "
 								"on it!" ) );
 	}
 
-	p.setClipRect( WHITE_KEY_WIDTH, PR_TOP_MARGIN, width() -
-				WHITE_KEY_WIDTH, height() - PR_TOP_MARGIN -
-					m_notesEditHeight - PR_BOTTOM_MARGIN );
+	p.setClipRect( WhiteKeyWidth, TopMargin, width() -
+				WhiteKeyWidth, height() - TopMargin -
+					m_notesEditHeight - BottomMargin );
 
 	// now draw selection-frame
 	int x = ( ( sel_pos_start - m_currentPosition ) * m_ppt ) /
 						midiTime::ticksPerTact();
 	int w = ( ( ( sel_pos_end - m_currentPosition ) * m_ppt ) /
 						midiTime::ticksPerTact() ) - x;
-	int y = (int) y_base - sel_key_start * KEY_LINE_HEIGHT;
-	int h = (int) y_base - sel_key_end * KEY_LINE_HEIGHT - y;
+	int y = (int) y_base - sel_key_start * KeyLineHeight;
+	int h = (int) y_base - sel_key_end * KeyLineHeight - y;
 	p.setPen( QColor( 0, 64, 192 ) );
-	p.drawRect( x + WHITE_KEY_WIDTH, y, w, h );
+	p.drawRect( x + WhiteKeyWidth, y, w, h );
 
 	// TODO: Get this out of paint event
 	int l = ( validPattern() == true )? (int) m_pattern->length() : 0;
@@ -2836,7 +2845,7 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 	// bar to resize note edit area
 	p.setClipRect( 0, 0, width(), height() );
 	p.fillRect( QRect( 0, keyAreaBottom(), 
-					width()-PR_RIGHT_MARGIN, NOTE_EDIT_RESIZE_BAR ),
+					width()-RightMargin, NoteEditResizeBar ),
 			   QColor( 64, 64, 64 ) );
 
 	const QPixmap * cursor = NULL;
@@ -2859,11 +2868,13 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 			break;
 		case ModeErase: cursor = s_toolErase; break;
 		case ModeSelect: cursor = s_toolSelect; break;
-		//case ModeMove: cursor = s_toolMove; break;
 		case ModeOpen: cursor = s_toolOpen; break;
 	}
-	p.drawPixmap( mapFromGlobal( QCursor::pos() ) + QPoint( 8, 8 ),
+	if( cursor != NULL )
+	{
+		p.drawPixmap( mapFromGlobal( QCursor::pos() ) + QPoint( 8, 8 ),
 								*cursor );
+	}
 }
 
 
@@ -2872,19 +2883,19 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 // responsible for moving/resizing scrollbars after window-resizing
 void pianoRoll::resizeEvent( QResizeEvent * )
 {
-	m_leftRightScroll->setGeometry( WHITE_KEY_WIDTH, height() -
-								SCROLLBAR_SIZE,
-					width()-WHITE_KEY_WIDTH,
-							SCROLLBAR_SIZE );
-	m_topBottomScroll->setGeometry( width() - SCROLLBAR_SIZE, PR_TOP_MARGIN,
-						SCROLLBAR_SIZE,
-						height() - PR_TOP_MARGIN -
-						SCROLLBAR_SIZE );
+	m_leftRightScroll->setGeometry( WhiteKeyWidth, height() -
+								ScrollBarSize,
+					width()-WhiteKeyWidth,
+							ScrollBarSize );
+	m_topBottomScroll->setGeometry( width() - ScrollBarSize, TopMargin,
+						ScrollBarSize,
+						height() - TopMargin -
+						ScrollBarSize );
 
-	int total_pixels = OCTAVE_HEIGHT * NumOctaves - ( height() -
-					PR_TOP_MARGIN - PR_BOTTOM_MARGIN -
+	int total_pixels = OctaveHeight * NumOctaves - ( height() -
+					TopMargin - BottomMargin -
 							m_notesEditHeight );
-	m_totalKeysToScroll = total_pixels * KeysPerOctave / OCTAVE_HEIGHT;
+	m_totalKeysToScroll = total_pixels * KeysPerOctave / OctaveHeight;
 
 	m_topBottomScroll->setRange( 0, m_totalKeysToScroll );
 
@@ -2910,7 +2921,7 @@ void pianoRoll::wheelEvent( QWheelEvent * _we )
 	{
 		if( _we->delta() > 0 )
 		{
-			m_ppt = qMin( m_ppt * 2, KEY_LINE_HEIGHT *
+			m_ppt = qMin( m_ppt * 2, KeyLineHeight *
 						DefaultStepsPerTact * 8 );
 		}
 		else if( m_ppt >= 72 )
@@ -2921,7 +2932,7 @@ void pianoRoll::wheelEvent( QWheelEvent * _we )
 		m_zoomingModel.setValue(
 				m_zoomingModel.findText( QString::number(
 					static_cast<int>( m_ppt * 100 /
-						DEFAULT_PR_PPT ) ) +"%" ) );
+						DefaultPixelsPerTact ) ) +"%" ) );
 		// update timeline
 		m_timeLine->setPixelsPerTact( m_ppt );
 		update();
@@ -2946,7 +2957,7 @@ int pianoRoll::getKey( int _y ) const
 {
 	int key_line_y = keyAreaBottom() - 1;
 	// pressed key on piano
-	int key_num = ( key_line_y - _y ) / KEY_LINE_HEIGHT;
+	int key_num = ( key_line_y - _y ) / KeyLineHeight;
 	key_num += m_startKey;
 
 	// some range-checking-stuff
@@ -3388,7 +3399,7 @@ void pianoRoll::updatePosition( const midiTime & _t )
 		m_timeLine->autoScroll() == timeLine::AutoScrollEnabled ) ||
 							m_scrollBack == true )
 	{
-		const int w = width() - WHITE_KEY_WIDTH;
+		const int w = width() - WhiteKeyWidth;
 		if( _t > m_currentPosition + w * midiTime::ticksPerTact() /
 									m_ppt )
 		{
@@ -3412,7 +3423,7 @@ void pianoRoll::updatePosition( const midiTime & _t )
 void pianoRoll::zoomingChanged( void )
 {
 	const QString & zfac = m_zoomingModel.currentText();
-	m_ppt = zfac.left( zfac.length() - 1 ).toInt() * DEFAULT_PR_PPT / 100;
+	m_ppt = zfac.left( zfac.length() - 1 ).toInt() * DefaultPixelsPerTact / 100;
 #ifdef LMMS_DEBUG
 	assert( m_ppt > 0 );
 #endif
@@ -3489,15 +3500,15 @@ noteVector::const_iterator pianoRoll::noteIteratorUnderMouse( void )
 	// get note-vector of current pattern
 	const noteVector & notes = m_pattern->notes();
 
-	if( pos.x() <= WHITE_KEY_WIDTH || pos.x() > width() - SCROLLBAR_SIZE
-		|| pos.y() < PR_TOP_MARGIN
+	if( pos.x() <= WhiteKeyWidth || pos.x() > width() - ScrollBarSize
+		|| pos.y() < TopMargin
 		|| pos.y() > keyAreaBottom() )
 	{
 		return notes.end();
 	}
 
 	int key_num = getKey( pos.y() );
-	int pos_ticks = ( pos.x() - WHITE_KEY_WIDTH ) *
+	int pos_ticks = ( pos.x() - WhiteKeyWidth ) *
 			midiTime::ticksPerTact() / m_ppt + m_currentPosition;
 
 	// will be our iterator in the following loop
