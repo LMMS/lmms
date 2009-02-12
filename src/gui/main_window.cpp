@@ -1245,7 +1245,32 @@ void mainWindow::keyPressEvent( QKeyEvent * _ke )
 
 void mainWindow::shortcutSpacePressed( void )
 {
-	play();
+	if( engine::getSong()->isPlaying() )
+	{
+		if( 
+			( engine::getSong()->playMode() == song::Mode_PlaySong &&
+				m_playbackMode == PPM_Song ) ||
+			( engine::getSong()->playMode() == song::Mode_PlayBB &&
+				m_playbackMode == PPM_BB ) ||
+			( engine::getSong()->playMode() == song::Mode_PlayPattern &&
+				m_playbackMode == PPM_PianoRoll ) )
+		{
+			// we should stop playback because the user did not
+			// change which mode to playback
+			stop();
+		}
+		else
+		{
+			// stop playback and then play it again with the
+			// current selected playback mode
+			stop();
+			play();
+		}
+	}
+	else
+	{
+		play();
+	}
 }	
 
 void mainWindow::shortcutLPressed( void )

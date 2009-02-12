@@ -1,3 +1,9 @@
+2009-02-11	Andrew Kelley	<superjoe30/at/gmail/dot/com>
+	
+	* src/gui/main_window.cpp:
+	* TODO:
+	global playback buttons have more user friendly behavior
+
 2009-02-10	Paul Giblock <drfaygo/at/gmail/dot/com>
 	
 	* include/gui:
