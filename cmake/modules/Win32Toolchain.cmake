@@ -4,16 +4,16 @@ SET(CMAKE_SYSTEM_NAME Windows)
 SET(CMAKE_SYSTEM_VERSION 1)
 
 SET(CMAKE_SYSTEM_PROCESSOR i686)
-SET(CMAKE_INSTALL_PREFIX /opt/mingw)
+SET(CMAKE_INSTALL_PREFIX /opt/mingw32)
 
-SET(CC_PREFIX /opt/mingw)
+SET(CC_PREFIX /opt/mingw32)
 
 # specify the cross compiler
-SET(CMAKE_C_COMPILER   ${CC_PREFIX}/bin/i586-mingw32-gcc)
-SET(CMAKE_CXX_COMPILER ${CC_PREFIX}/bin/i586-mingw32-g++)
+SET(CMAKE_C_COMPILER   ${CC_PREFIX}/bin/i586-pc-mingw32-gcc)
+SET(CMAKE_CXX_COMPILER ${CC_PREFIX}/bin/i586-pc-mingw32-g++)
 
 # where is the target environment 
-SET(CMAKE_FIND_ROOT_PATH  /opt/mingw)
+SET(CMAKE_FIND_ROOT_PATH  /opt/mingw32)
 
 SET(QT_BINARY_DIR   ${CC_PREFIX}/bin)
 SET(QT_LIBRARY_DIR  ${CC_PREFIX}/lib)
