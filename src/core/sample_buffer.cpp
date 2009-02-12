@@ -3,7 +3,7 @@
 /*
  * sample_buffer.cpp - container-class sampleBuffer
  *
- * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -67,7 +67,7 @@
 
 sampleBuffer::sampleBuffer( const QString & _audio_file,
 							bool _is_base64_data ) :
-	m_audioFile( ( _is_base64_data == TRUE ) ? "" : _audio_file ),
+	m_audioFile( ( _is_base64_data == true ) ? "" : _audio_file ),
 	m_origData( NULL ),
 	m_origFrames( 0 ),
 	m_data( NULL ),
@@ -77,11 +77,11 @@ sampleBuffer::sampleBuffer( const QString & _audio_file,
 	m_loopStartFrame( 0 ),
 	m_loopEndFrame( 0 ),
 	m_amplification( 1.0f ),
-	m_reversed( FALSE ),
+	m_reversed( false ),
 	m_frequency( BaseFreq ),
 	m_sampleRate( engine::getMixer()->baseSampleRate() )
 {
-	if( _is_base64_data == TRUE )
+	if( _is_base64_data == true )
 	{
 		loadFromBase64( _audio_file );
 	}
@@ -102,7 +102,7 @@ sampleBuffer::sampleBuffer( const sampleFrame * _data, const f_cnt_t _frames ) :
 	m_loopStartFrame( 0 ),
 	m_loopEndFrame( 0 ),
 	m_amplification( 1.0f ),
-	m_reversed( FALSE ),
+	m_reversed( false ),
 	m_frequency( BaseFreq ),
 	m_sampleRate( engine::getMixer()->baseSampleRate() )
 {
@@ -129,7 +129,7 @@ sampleBuffer::sampleBuffer( const f_cnt_t _frames ) :
 	m_loopStartFrame( 0 ),
 	m_loopEndFrame( 0 ),
 	m_amplification( 1.0f ),
-	m_reversed( FALSE ),
+	m_reversed( false ),
 	m_frequency( BaseFreq ),
 	m_sampleRate( engine::getMixer()->baseSampleRate() )
 {
@@ -171,7 +171,7 @@ void sampleBuffer::update( bool _keep_settings )
 		// by following code...
 		m_data = new sampleFrame[m_origFrames];
 		memcpy( m_data, m_origData, m_origFrames * BYTES_PER_FRAME );
-		if( _keep_settings == FALSE )
+		if( _keep_settings == false )
 		{
 			m_frames = m_origFrames;
 			m_loopStartFrame = m_startFrame = 0;
@@ -185,8 +185,15 @@ void sampleBuffer::update( bool _keep_settings )
 		int_sample_t * buf = NULL;
 		ch_cnt_t channels = DEFAULT_CHANNELS;
 		sample_rate_t samplerate = engine::getMixer()->baseSampleRate();
-
 		m_frames = 0;
+
+		if( QFileInfo( file ).size() > 100*1024*1024 )
+		{
+			qWarning( "refusing to load sample files bigger "
+								"than 100 MB" );
+		}
+		else
+		{
 
 		if( m_frames == 0 )
 		{
@@ -207,6 +214,7 @@ void sampleBuffer::update( bool _keep_settings )
 		}
 
 		delete[] f;
+		}
 
 		if( m_frames > 0 && buf != NULL )
 		{
@@ -295,7 +303,7 @@ void sampleBuffer::normalizeSampleRate( const sample_rate_t _src_sr,
 		delete resampled;
 	}
 
-	if( _keep_settings == FALSE )
+	if( _keep_settings == false )
 	{
 		// update frame-variables
 		m_loopStartFrame = m_startFrame = 0;
@@ -414,7 +422,7 @@ f_cnt_t sampleBuffer::decodeSampleOGGVorbis( const char * _f,
 	f_cnt_t frames = 0;
 
 	QFile * f = new QFile( _f );
-	if( f->open( QFile::ReadOnly ) == FALSE )
+	if( f->open( QFile::ReadOnly ) == false )
 	{
 		delete f;
 		return( 0 );
@@ -509,7 +517,7 @@ bool sampleBuffer::play( sampleFrame * _ab, handleState * _state,
 
 	if( m_endFrame == 0 || _frames == 0 )
 	{
-		return( FALSE );
+		return( false );
 	}
 
 	const double freq_factor = (double) _freq / (double) m_frequency *
@@ -521,7 +529,7 @@ bool sampleBuffer::play( sampleFrame * _ab, handleState * _state,
 								freq_factor );
 	if( total_frames_for_current_pitch == 0 )
 	{
-		return( FALSE );
+		return( false );
 	}
 
 	// this holds the number of the first frame to play
@@ -544,14 +552,14 @@ bool sampleBuffer::play( sampleFrame * _ab, handleState * _state,
 	{
 		if( play_frame >= m_endFrame )
 		{
-			return( FALSE );
+			return( false );
 		}
 		frames_for_loop = static_cast<f_cnt_t>(
 					( m_endFrame - play_frame ) /
 								freq_factor );
 		if( frames_for_loop == 0 )
 		{
-			return( FALSE );
+			return( false );
 		}
 	}
 
@@ -613,7 +621,7 @@ bool sampleBuffer::play( sampleFrame * _ab, handleState * _state,
 
 	_state->m_frameIndex = play_frame;
 
-	return( TRUE );
+	return( true );
 
 }
 
@@ -727,7 +735,7 @@ QString sampleBuffer::openAudioFile( void ) const
 		if( QFileInfo( f ).isRelative() )
 		{
 			f = configManager::inst()->userSamplesDir() + f;
-			if( QFileInfo( f ).exists() == FALSE )
+			if( QFileInfo( f ).exists() == false )
 			{
 				f = configManager::inst()->factorySamplesDir() +
 								m_audioFile;
@@ -826,8 +834,8 @@ QString & sampleBuffer::toBase64( QString & _dst ) const
 	FLAC__StreamEncoder * flac_enc = FLAC__stream_encoder_new();
 	FLAC__stream_encoder_set_channels( flac_enc, DEFAULT_CHANNELS );
 	FLAC__stream_encoder_set_blocksize( flac_enc, FRAMES_PER_BUF );
-/*	FLAC__stream_encoder_set_do_exhaustive_model_search( flac_enc, TRUE );
-	FLAC__stream_encoder_set_do_mid_side_stereo( flac_enc, TRUE );*/
+/*	FLAC__stream_encoder_set_do_exhaustive_model_search( flac_enc, true );
+	FLAC__stream_encoder_set_do_mid_side_stereo( flac_enc, true );*/
 	FLAC__stream_encoder_set_sample_rate( flac_enc,
 					engine::getMixer()->sampleRate() );
 	QBuffer ba_writer;
@@ -1112,7 +1120,7 @@ void sampleBuffer::setEndFrame( const f_cnt_t _e )
 void sampleBuffer::setAmplification( float _a )
 {
 	m_amplification = _a;
-	update( TRUE );
+	update( true );
 }
 
 
@@ -1121,7 +1129,7 @@ void sampleBuffer::setAmplification( float _a )
 void sampleBuffer::setReversed( bool _on )
 {
 	m_reversed = _on;
-	update( TRUE );
+	update( true );
 }
 
 
@@ -1129,7 +1137,7 @@ void sampleBuffer::setReversed( bool _on )
 
 QString sampleBuffer::tryToMakeRelative( const QString & _file )
 {
-	if( QFileInfo( _file ).isRelative() == FALSE )
+	if( QFileInfo( _file ).isRelative() == false )
 	{
 		QString f = QString( _file ).replace( QDir::separator(), '/' );
 		QString fsd = configManager::inst()->factorySamplesDir();
@@ -1181,7 +1189,7 @@ sampleBuffer::handleState::handleState( bool _varying_pitch ) :
 {
 	int error;
 	if( ( m_resamplingData = src_new(/*
-		( engine::getMixer()->highQuality() == TRUE ) ?
+		( engine::getMixer()->highQuality() == true ) ?
 					SRC_SINC_FASTEST :*/
 					SRC_LINEAR,
 					DEFAULT_CHANNELS, &error ) ) == NULL )
