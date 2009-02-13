@@ -165,7 +165,7 @@ void sampleBuffer::update( bool _keep_settings )
 		delete[] m_data;
 	}
 
-	if( m_audioFile == "" && m_origData != NULL && m_origFrames > 0 )
+	if( m_audioFile.isEmpty() && m_origData != NULL && m_origFrames > 0 )
 	{
 		// TODO: reverse- and amplification-property is not covered
 		// by following code...
@@ -346,7 +346,7 @@ f_cnt_t sampleBuffer::decodeSampleSF( const char * _f,
 				"sample %s: %s\n", _f, sf_strerror( NULL ) );
 #endif
 	}
-	return( frames );
+	return frames;
 }
 
 
@@ -358,8 +358,8 @@ f_cnt_t sampleBuffer::decodeSampleSF( const char * _f,
 
 size_t qfileReadCallback( void * _ptr, size_t _size, size_t _n, void * _udata )
 {
-	return( static_cast<QFile *>( _udata )->read( (char*) _ptr,
-								_size * _n ) );
+	return static_cast<QFile *>( _udata )->read( (char*) _ptr,
+								_size * _n );
 }
 
 
@@ -381,7 +381,7 @@ int qfileSeekCallback( void * _udata, ogg_int64_t _offset, int _whence )
 	{
 		f->seek( _offset );
 	}
-	return( 0 );
+	return 0;
 }
 
 
@@ -390,7 +390,7 @@ int qfileSeekCallback( void * _udata, ogg_int64_t _offset, int _whence )
 int qfileCloseCallback( void * _udata )
 {
 	delete static_cast<QFile *>( _udata );
-	return( 0 );
+	return 0;
 }
 
 
@@ -398,7 +398,7 @@ int qfileCloseCallback( void * _udata )
 
 long qfileTellCallback( void * _udata )
 {
-	return( static_cast<QFile *>( _udata )->pos() );
+	return static_cast<QFile *>( _udata )->pos();
 }
 
 
@@ -425,7 +425,7 @@ f_cnt_t sampleBuffer::decodeSampleOGGVorbis( const char * _f,
 	if( f->open( QFile::ReadOnly ) == false )
 	{
 		delete f;
-		return( 0 );
+		return 0;
 	}
 
 	int err = ov_open_callbacks( f, &vf, NULL, 0, callbacks );
@@ -456,7 +456,7 @@ f_cnt_t sampleBuffer::decodeSampleOGGVorbis( const char * _f,
 				break;
 		}
 		delete f;
-		return( 0 );
+		return 0;
 	}
 
 	ov_pcm_seek( &vf, 0 );
@@ -487,7 +487,7 @@ f_cnt_t sampleBuffer::decodeSampleOGGVorbis( const char * _f,
 
 	ov_clear( &vf );
 
-	return( frames );
+	return frames;
 }
 #endif
 
@@ -500,7 +500,7 @@ f_cnt_t sampleBuffer::decodeSampleDS( const char * _f,
 						sample_rate_t & _samplerate )
 {
 	DrumSynth ds;
-	return( ds.GetDSFileSamples( _f, _buf, _channels ) );
+	return ds.GetDSFileSamples( _f, _buf, _channels );
 }
 
 
@@ -517,7 +517,7 @@ bool sampleBuffer::play( sampleFrame * _ab, handleState * _state,
 
 	if( m_endFrame == 0 || _frames == 0 )
 	{
-		return( false );
+		return false;
 	}
 
 	const double freq_factor = (double) _freq / (double) m_frequency *
@@ -529,7 +529,7 @@ bool sampleBuffer::play( sampleFrame * _ab, handleState * _state,
 								freq_factor );
 	if( total_frames_for_current_pitch == 0 )
 	{
-		return( false );
+		return false;
 	}
 
 	// this holds the number of the first frame to play
@@ -552,14 +552,14 @@ bool sampleBuffer::play( sampleFrame * _ab, handleState * _state,
 	{
 		if( play_frame >= m_endFrame )
 		{
-			return( false );
+			return false;
 		}
 		frames_for_loop = static_cast<f_cnt_t>(
 					( m_endFrame - play_frame ) /
 								freq_factor );
 		if( frames_for_loop == 0 )
 		{
-			return( false );
+			return false;
 		}
 	}
 
@@ -579,7 +579,7 @@ bool sampleBuffer::play( sampleFrame * _ab, handleState * _state,
 		src_data.input_frames = fragment_size;
 		src_data.output_frames = _frames;
 		src_data.src_ratio = 1.0 / freq_factor;
-		src_data.end_of_input = _state->m_eof;
+		src_data.end_of_input = 0;
 		int error = src_process( _state->m_resamplingData,
 								&src_data );
 		if( error )
@@ -592,7 +592,6 @@ bool sampleBuffer::play( sampleFrame * _ab, handleState * _state,
 			printf( "sampleBuffer: not enough frames: %ld / %d\n",
 					src_data.output_frames_gen, _frames );
 		}
-		_state->m_eof = src_data.end_of_input;
 		// Advance
 		play_frame += src_data.input_frames_used;
 		if( _looped )
@@ -621,7 +620,7 @@ bool sampleBuffer::play( sampleFrame * _ab, handleState * _state,
 
 	_state->m_frameIndex = play_frame;
 
-	return( true );
+	return true;
 
 }
 
@@ -635,14 +634,14 @@ sampleFrame * sampleBuffer::getSampleFragment( f_cnt_t _start,
 	{
 		if( _start + _frames <= m_loopEndFrame )
 		{
-			return( m_data + _start );
+			return m_data + _start;
 		}
 	}
 	else
 	{
 		if( _start + _frames <= m_endFrame )
 		{
-			return( m_data + _start );
+			return m_data + _start;
 		}
 	}
 
@@ -669,7 +668,7 @@ sampleFrame * sampleBuffer::getSampleFragment( f_cnt_t _start,
 							BYTES_PER_FRAME );
 	}
 
-	return( *_tmp );
+	return *_tmp;
 }
 
 
@@ -679,10 +678,10 @@ f_cnt_t sampleBuffer::getLoopedIndex( f_cnt_t _index ) const
 {
 	if( _index < m_loopEndFrame )
 	{
-		return( _index );
+		return _index;
 	}
-	return( m_loopStartFrame + ( _index - m_loopStartFrame )
-				% ( m_loopEndFrame - m_loopStartFrame ) );
+	return m_loopStartFrame + ( _index - m_loopStartFrame )
+				% ( m_loopEndFrame - m_loopStartFrame );
 }
 
 
@@ -779,12 +778,12 @@ QString sampleBuffer::openAudioFile( void ) const
 	{
 		if( ofd.selectedFiles().isEmpty() )
 		{
-			return( "" );
+			return QString::null;
 		}
-		return( tryToMakeRelative( ofd.selectedFiles()[0] ) );
+		return tryToMakeRelative( ofd.selectedFiles()[0] );
 	}
 
-	return( "" );
+	return QString::null;
 }
 
 
@@ -803,13 +802,13 @@ FLAC__StreamEncoderWriteStatus flacStreamEncoderWriteCallback(
 {
 /*	if( _bytes == 0 )
 	{
-		return( FLAC__STREAM_ENCODER_WRITE_STATUS_OK );
+		return FLAC__STREAM_ENCODER_WRITE_STATUS_OK;
 	}*/
-	return( ( static_cast<QBuffer *>( _client_data )->write(
+	return ( static_cast<QBuffer *>( _client_data )->write(
 				(const char *) _buffer, _bytes ) ==
 								(int) _bytes ) ?
 				FLAC__STREAM_ENCODER_WRITE_STATUS_OK :
-				FLAC__STREAM_ENCODER_WRITE_STATUS_FATAL_ERROR );
+				FLAC__STREAM_ENCODER_WRITE_STATUS_FATAL_ERROR;
 }
 
 
@@ -885,7 +884,7 @@ QString & sampleBuffer::toBase64( QString & _dst ) const
 
 #endif	/* LMMS_HAVE_FLAC_STREAM_ENCODER_H */
 
-	return( _dst );
+	return _dst;
 }
 
 
@@ -908,7 +907,7 @@ sampleBuffer * sampleBuffer::resample( sampleFrame * _data,
 					DEFAULT_CHANNELS, &error ) ) != NULL )
 	{
 		SRC_DATA src_data;
-		src_data.end_of_input = 0;
+		src_data.end_of_input = 1;
 		src_data.data_in = _data[0];
 		src_data.data_out = dst_buf[0];
 		src_data.input_frames = _frames;
@@ -926,7 +925,7 @@ sampleBuffer * sampleBuffer::resample( sampleFrame * _data,
 		printf( "Error: src_new() failed in sample_buffer.cpp!\n" );
 	}
 	dst_sb->update();
-	return( dst_sb );
+	return dst_sb;
 }
 
 
@@ -964,11 +963,11 @@ FLAC__StreamDecoderReadStatus flacStreamDecoderReadCallback(
 	if( res > 0 )
 	{
 		*_bytes = res;
-		return( FLAC__STREAM_DECODER_READ_STATUS_CONTINUE );
+		return FLAC__STREAM_DECODER_READ_STATUS_CONTINUE;
 
 	}
 	*_bytes = 0;
-	return( FLAC__STREAM_DECODER_READ_STATUS_END_OF_STREAM );
+	return FLAC__STREAM_DECODER_READ_STATUS_END_OF_STREAM;
 }
 
 
@@ -985,14 +984,14 @@ FLAC__StreamDecoderWriteStatus flacStreamDecoderWriteCallback(
 	{
 		printf( "channels != 2 in "
 					"flacStreamDecoderWriteCallback()\n" );
-		return( FLAC__STREAM_DECODER_WRITE_STATUS_ABORT );
+		return FLAC__STREAM_DECODER_WRITE_STATUS_ABORT;
 	}
 
 	if( _frame->header.bits_per_sample != 16 )
 	{
 		printf( "bits_per_sample != 16 in "
 					"flacStreamDecoderWriteCallback()\n" );
-		return( FLAC__STREAM_DECODER_WRITE_STATUS_ABORT );
+		return FLAC__STREAM_DECODER_WRITE_STATUS_ABORT;
 	}
 
 	const f_cnt_t frames = _frame->header.blocksize;
@@ -1007,7 +1006,7 @@ FLAC__StreamDecoderWriteStatus flacStreamDecoderWriteCallback(
 					_client_data )->write_buffer->write(
 				(const char *) sframe, sizeof( sframe ) );
 	} 
-	return( FLAC__STREAM_DECODER_WRITE_STATUS_CONTINUE );
+	return FLAC__STREAM_DECODER_WRITE_STATUS_CONTINUE;
 }
 
 
@@ -1146,14 +1145,14 @@ QString sampleBuffer::tryToMakeRelative( const QString & _file )
 		usd.replace( QDir::separator(), '/' );
 		if( f.startsWith( fsd ) )
 		{
-			return( QString( f ).mid( fsd.length() ) );
+			return QString( f ).mid( fsd.length() );
 		}
 		else if( f.startsWith( usd ) )
 		{
-			return( QString( f ).mid( usd.length() ) );
+			return QString( f ).mid( usd.length() );
 		}
 	}
-	return( _file );
+	return _file;
 }
 
 
@@ -1163,16 +1162,16 @@ QString sampleBuffer::tryToMakeAbsolute( const QString & _file )
 {
 	if( QFileInfo( _file ).isAbsolute() )
 	{
-		return( _file );
+		return _file;
 	}
 
 	QString f = configManager::inst()->userSamplesDir() + _file;
 	if( QFileInfo( f ).exists() )
 	{
-		return( f );
+		return f;
 	}
 
-	return( configManager::inst()->factorySamplesDir() + _file );
+	return configManager::inst()->factorySamplesDir() + _file;
 }
 
 
@@ -1184,8 +1183,7 @@ QString sampleBuffer::tryToMakeAbsolute( const QString & _file )
 
 sampleBuffer::handleState::handleState( bool _varying_pitch ) :
 	m_frameIndex( 0 ),
-	m_varyingPitch( _varying_pitch ),
-	m_eof( 0 )
+	m_varyingPitch( _varying_pitch )
 {
 	int error;
 	if( ( m_resamplingData = src_new(/*

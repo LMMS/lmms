@@ -1,7 +1,7 @@
 /*
  * sample_buffer.h - container-class sampleBuffer
  *
- * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -57,7 +57,6 @@ public:
 		f_cnt_t m_frameIndex;
 		const bool m_varyingPitch;
 		SRC_STATE * m_resamplingData;
-		int m_eof;
 
 		friend class sampleBuffer;
 
@@ -86,17 +85,17 @@ public:
 
 	inline const QString & audioFile( void ) const
 	{
-		return( m_audioFile );
+		return m_audioFile;
 	}
 
 	inline f_cnt_t startFrame( void ) const
 	{
-		return( m_startFrame );
+		return m_startFrame;
 	}
 
 	inline f_cnt_t endFrame( void ) const
 	{
-		return( m_endFrame );
+		return m_endFrame;
 	}
 
 	void setLoopStartFrame( f_cnt_t _start )
@@ -115,22 +114,22 @@ public:
 
 	inline f_cnt_t frames( void ) const
 	{
-		return( m_frames );
+		return m_frames;
 	}
 
 	inline float amplification( void ) const
 	{
-		return( m_amplification );
+		return m_amplification;
 	}
 
 	inline bool reversed( void ) const
 	{
-		return( m_reversed );
+		return m_reversed;
 	}
 
 	inline float frequency( void ) const
 	{
-		return( m_frequency );
+		return m_frequency;
 	}
 
 	inline void setFrequency( float _freq )
@@ -149,7 +148,7 @@ public:
 
 	inline const sampleFrame * data( void ) const
 	{
-		return( m_data );
+		return m_data;
 	}
 
 	QString openAudioFile( void ) const;
@@ -166,8 +165,8 @@ public:
 						const sample_rate_t _src_sr,
 						const sample_rate_t _dst_sr )
 	{
-		return( resample( _buf->m_data, _buf->m_frames, _src_sr,
-								_dst_sr ) );
+		return resample( _buf->m_data, _buf->m_frames, _src_sr,
+								_dst_sr );
 	}
 
 	void normalizeSampleRate( const sample_rate_t _src_sr,
@@ -182,7 +181,7 @@ public:
 //		sample_t waveSample = linearInterpolate( m_data[f1][0],
 //						m_data[f2][0],
 //						fraction( frame ) );
-//		return( waveSample );
+//		return waveSample;
 
 		// Fast implementation
 		const float frame = _sample * m_frames;
@@ -191,7 +190,7 @@ public:
 		{
 			f1 += m_frames;
 		}
-		return( m_data[f1][0] );
+		return m_data[f1][0];
 	}
 
 	static QString tryToMakeRelative( const QString & _file );

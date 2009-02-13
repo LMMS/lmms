@@ -1,5 +1,14 @@
 2009-02-13	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* include/sample_buffer.h:
+	* src/core/sample_buffer.cpp:
+	- when resampling whole sampleBuffer, set end_of_input = 1 in
+	  libsamplerate data struct - fixes lots of zero samples at the end
+	  of output buffer (closes #2531452)
+	- coding style fixes
+	- removed obsolete save/restore of EOF-property in libsample rate
+	  data struct when resampling successively (always use 0)
+
 	* src/3rdparty/samplerate/src_linear.c:
 	* src/3rdparty/samplerate/samplerate.h:
 	* src/3rdparty/samplerate/src_sinc.c:
