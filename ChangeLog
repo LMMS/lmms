@@ -1,5 +1,12 @@
 2009-02-13	Tobias Doerffel <tobydox/at/users/dot/sourceforge/dot/net>
 
+	* include/pattern.h:
+	* src/tracks/pattern.cpp:
+	- added missing slot declaration for abortFreeze(), fixes lockup when
+	  freezing pattern (closes #2530320)
+	- update patternView after freezing
+	- fixed drawing of frozen pattern
+
 	* include/sample_buffer.h:
 	* src/core/sample_buffer.cpp:
 	- when resampling whole sampleBuffer, set end_of_input = 1 in
