@@ -1,3 +1,16 @@
+2009-02-13	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
+
+	* src/gui/widgets/combobox.cpp:
+	* src/gui/widgets/tab_widget.cpp:
+	* src/gui/widgets/envelope_and_lfo_view.cpp:
+	* src/gui/widgets/group_box.cpp:
+	* src/gui/widgets/lcd_spinbox.cpp:
+	* src/gui/widgets/controller_view.cpp:
+	* src/gui/widgets/effect_rack_view.cpp:
+	* src/core/track.cpp:
+	reverted some of the changes from 2008-11-10 which caused distorted
+	graphics when running LMMS with Qt 4.5
+
 2009-02-12	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/gui/fluiq/collapsible_widget.cpp:

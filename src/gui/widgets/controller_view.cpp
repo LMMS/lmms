@@ -55,8 +55,6 @@ controllerView::controllerView( controller * _model, QWidget * _parent ) :
 {
 	setFixedSize( 210, 32 );
 
-	setAttribute( Qt::WA_OpaquePaintEvent, TRUE );
-
 	QPushButton * ctls_btn = new QPushButton( tr( "Controls" ), this );
 
 	QFont f = ctls_btn->font();

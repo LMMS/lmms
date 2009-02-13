@@ -4,7 +4,7 @@
  * effect_rack_view.cpp - view for effectChain-model
  *
  * Copyright (c) 2006-2007 Danny McRae <khjklujn@netscape.net>
- * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -42,7 +42,6 @@ effectRackView::effectRackView( effectChain * _model, QWidget * _parent ) :
 	QWidget( _parent ),
 	modelView( NULL, this )
 {
-	setAttribute( Qt::WA_OpaquePaintEvent, true );
 	setFixedSize( 250, 250 );
 
 	m_mainLayout = new QVBoxLayout( this );

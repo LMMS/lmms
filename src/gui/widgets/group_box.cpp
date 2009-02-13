@@ -3,7 +3,7 @@
 /*
  * group_box.cpp - groupbox for LMMS
  *
- * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -47,7 +47,6 @@ groupBox::groupBox( const QString & _caption, QWidget * _parent ) :
 	boolModelView( NULL, this ),
 	m_caption( _caption )
 {
-	setAttribute( Qt::WA_OpaquePaintEvent, true );
 	updatePixmap();
 
 	m_led = new pixmapButton( this, _caption );
