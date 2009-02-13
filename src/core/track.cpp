@@ -4,7 +4,7 @@
  * track.cpp - implementation of classes concerning tracks -> neccessary for
  *             all track-like objects (beat/bassline, sample-track...)
  *
- * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -1384,8 +1384,6 @@ trackOperationsWidget::trackOperationsWidget( trackView * _parent ) :
 			m_trackView->getTrackContainerView(),
 				SLOT( deleteTrackView( trackView * ) ),
 							Qt::QueuedConnection );
-			
-	setAttribute( Qt::WA_OpaquePaintEvent, true );
 }
 
 

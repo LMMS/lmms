@@ -4,7 +4,7 @@
  * envelope_and_lfo_view.cpp - widget which is m_used by envelope/lfo/filter-
  *                               tab of channel-window
  *
- * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -102,8 +102,6 @@ envelopeAndLFOView::envelopeAndLFOView( QWidget * _parent ) :
 	{
 		s_lfoGraph = new QPixmap( embed::getIconPixmap( "lfo_graph" ) );
 	}
-
-	setAttribute( Qt::WA_OpaquePaintEvent, true );
 
 	m_predelayKnob = new knob( knobBright_26, this );
 	m_predelayKnob->setLabel( tr( "DEL" ) );

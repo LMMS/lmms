@@ -3,7 +3,7 @@
 /*
  * tab_widget.cpp - tabwidget for LMMS
  *
- * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -50,8 +50,6 @@ tabWidget::tabWidget( const QString & _caption, QWidget * _parent ) :
 	QPalette pal = palette();
 	pal.setColor( QPalette::Background, bg_color );
 	setPalette( pal );
-
-	setAttribute( Qt::WA_OpaquePaintEvent, true );
 }
 
 

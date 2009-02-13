@@ -3,7 +3,7 @@
 /*
  * lcd_spinbox.cpp - class lcdSpinBox, an improved QLCDNumber
  *
- * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2008 Paul Giblock <pgllama/at/gmail.com>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
@@ -52,7 +52,6 @@ lcdSpinBox::lcdSpinBox( int _num_digits, QWidget * _parent,
 	m_numDigits( _num_digits ),
 	m_origMousePos()
 {
-	setAttribute( Qt::WA_OpaquePaintEvent, true );
 	setEnabled( true );
 
 	setAccessibleName( _name );

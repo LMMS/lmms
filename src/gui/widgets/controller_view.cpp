@@ -57,8 +57,7 @@ controllerView::controllerView( controller * _model, QWidget * _parent ) :
 
 	setAttribute( Qt::WA_OpaquePaintEvent, TRUE );
 
-	QPushButton * ctls_btn = new QPushButton( tr( "Controls" ),
-	            this );
+	QPushButton * ctls_btn = new QPushButton( tr( "Controls" ), this );
 	
 	QFont f = ctls_btn->font();
 	ctls_btn->setFont( pointSize<7>( f ) );
@@ -79,8 +78,8 @@ controllerView::controllerView( controller * _model, QWidget * _parent ) :
 
 	m_subWindow->setWindowIcon( m_controllerDlg->windowIcon() );
 
-    connect( m_controllerDlg, SIGNAL( closed() ),
-                this, SLOT( closeControls() ) );
+	connect( m_controllerDlg, SIGNAL( closed() ),
+		this, SLOT( closeControls() ) );
 
 	m_subWindow->hide();
 
@@ -149,8 +148,8 @@ void controllerView::paintEvent( QPaintEvent * )
 	p.setPen( Qt::white );
 	p.drawText( 6, 12, c->displayName() );
 
-    f.setBold( FALSE );
-    p.setFont( f );
+	f.setBold( FALSE );
+	p.setFont( f );
 	p.drawText( 8, 26, c->name() );
 }
 
