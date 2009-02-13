@@ -52,41 +52,41 @@ typedef struct
 
 static int
 zoh_vari_process (SRC_PRIVATE *psrc, SRC_DATA *data)
-{	ZOH_DATA 	*zoh ;
+{	ZOH_DATA 	*priv ;
 	double		src_ratio, input_index, rem ;
 	int			ch ;
 
 	if (psrc->private_data == NULL)
 		return SRC_ERR_NO_PRIVATE ;
 
-	zoh = (ZOH_DATA*) psrc->private_data ;
+	priv = (ZOH_DATA*) psrc->private_data ;
 
-	if (zoh->reset)
+	if (priv->reset)
 	{	/* If we have just been reset, set the last_value data. */
-		for (ch = 0 ; ch < zoh->channels ; ch++)
-			zoh->last_value [ch] = data->data_in [ch] ;
-		zoh->reset = 0 ;
+		for (ch = 0 ; ch < priv->channels ; ch++)
+			priv->last_value [ch] = data->data_in [ch] ;
+		priv->reset = 0 ;
 		} ;
 
-	zoh->in_count = data->input_frames * zoh->channels ;
-	zoh->out_count = data->output_frames * zoh->channels ;
-	zoh->in_used = zoh->out_gen = 0 ;
+	priv->in_count = data->input_frames * priv->channels ;
+	priv->out_count = data->output_frames * priv->channels ;
+	priv->in_used = priv->out_gen = 0 ;
 
 	src_ratio = psrc->last_ratio ;
 	input_index = psrc->last_position ;
 
 	/* Calculate samples before first sample in input array. */
-	while (input_index < 1.0 && zoh->out_gen < zoh->out_count)
+	while (input_index < 1.0 && priv->out_gen < priv->out_count)
 	{
-		if (zoh->in_used + zoh->channels * input_index >= zoh->in_count)
+		if (priv->in_used + priv->channels * input_index >= priv->in_count)
 			break ;
 
-		if (zoh->out_count > 0 && fabs (psrc->last_ratio - data->src_ratio) > SRC_MIN_RATIO_DIFF)
-			src_ratio = psrc->last_ratio + zoh->out_gen * (data->src_ratio - psrc->last_ratio) / zoh->out_count ;
+		if (priv->out_count > 0 && fabs (psrc->last_ratio - data->src_ratio) > SRC_MIN_RATIO_DIFF)
+			src_ratio = psrc->last_ratio + priv->out_gen * (data->src_ratio - psrc->last_ratio) / priv->out_count ;
 
-		for (ch = 0 ; ch < zoh->channels ; ch++)
-		{	data->data_out [zoh->out_gen] = zoh->last_value [ch] ;
-			zoh->out_gen ++ ;
+		for (ch = 0 ; ch < priv->channels ; ch++)
+		{	data->data_out [priv->out_gen] = priv->last_value [ch] ;
+			priv->out_gen ++ ;
 			} ;
 
 		/* Figure out the next index. */
@@ -94,44 +94,44 @@ zoh_vari_process (SRC_PRIVATE *psrc, SRC_DATA *data)
 		} ;
 
 	rem = fmod_one (input_index) ;
-	zoh->in_used += zoh->channels * lrint (input_index - rem) ;
+	priv->in_used += priv->channels * lrint (input_index - rem) ;
 	input_index = rem ;
 
 	/* Main processing loop. */
-	while (zoh->out_gen < zoh->out_count && zoh->in_used + zoh->channels * input_index <= zoh->in_count)
+	while (priv->out_gen < priv->out_count && priv->in_used + priv->channels * input_index <= priv->in_count)
 	{
-		if (zoh->out_count > 0 && fabs (psrc->last_ratio - data->src_ratio) > SRC_MIN_RATIO_DIFF)
-			src_ratio = psrc->last_ratio + zoh->out_gen * (data->src_ratio - psrc->last_ratio) / zoh->out_count ;
+		if (priv->out_count > 0 && fabs (psrc->last_ratio - data->src_ratio) > SRC_MIN_RATIO_DIFF)
+			src_ratio = psrc->last_ratio + priv->out_gen * (data->src_ratio - psrc->last_ratio) / priv->out_count ;
 
-		for (ch = 0 ; ch < zoh->channels ; ch++)
-		{	data->data_out [zoh->out_gen] = data->data_in [zoh->in_used - zoh->channels + ch] ;
-			zoh->out_gen ++ ;
+		for (ch = 0 ; ch < priv->channels ; ch++)
+		{	data->data_out [priv->out_gen] = data->data_in [priv->in_used - priv->channels + ch] ;
+			priv->out_gen ++ ;
 			} ;
 
 		/* Figure out the next index. */
 		input_index += 1.0 / src_ratio ;
 		rem = fmod_one (input_index) ;
 
-		zoh->in_used += zoh->channels * lrint (input_index - rem) ;
+		priv->in_used += priv->channels * lrint (input_index - rem) ;
 		input_index = rem ;
 		} ;
 
-	if (zoh->in_used > zoh->in_count)
-	{	input_index += (zoh->in_used - zoh->in_count) / zoh->channels ;
-		zoh->in_used = zoh->in_count ;
+	if (priv->in_used > priv->in_count)
+	{	input_index += (priv->in_used - priv->in_count) / priv->channels ;
+		priv->in_used = priv->in_count ;
 		} ;
 
 	psrc->last_position = input_index ;
 
-	if (zoh->in_used > 0)
-		for (ch = 0 ; ch < zoh->channels ; ch++)
-			zoh->last_value [ch] = data->data_in [zoh->in_used - zoh->channels + ch] ;
+	if (priv->in_used > 0)
+		for (ch = 0 ; ch < priv->channels ; ch++)
+			priv->last_value [ch] = data->data_in [priv->in_used - priv->channels + ch] ;
 
 	/* Save current ratio rather then target ratio. */
 	psrc->last_ratio = src_ratio ;
 
-	data->input_frames_used = zoh->in_used / zoh->channels ;
-	data->output_frames_gen = zoh->out_gen / zoh->channels ;
+	data->input_frames_used = priv->in_used / priv->channels ;
+	data->output_frames_gen = priv->out_gen / priv->channels ;
 
 	return SRC_ERR_NO_ERROR ;
 } /* zoh_vari_process */
@@ -159,28 +159,25 @@ zoh_get_description (int src_enum)
 
 int
 zoh_set_converter (SRC_PRIVATE *psrc, int src_enum)
-{	ZOH_DATA *zoh = NULL ;
+{	ZOH_DATA *priv = NULL ;
 
 	if (src_enum != SRC_ZERO_ORDER_HOLD)
 		return SRC_ERR_BAD_CONVERTER ;
 
 	if (psrc->private_data != NULL)
-	{	zoh = (ZOH_DATA*) psrc->private_data ;
-		if (zoh->zoh_magic_marker != ZOH_MAGIC_MARKER)
-		{	free (psrc->private_data) ;
-			psrc->private_data = NULL ;
-			} ;
+	{	free (psrc->private_data) ;
+		psrc->private_data = NULL ;
 		} ;
 
 	if (psrc->private_data == NULL)
-	{	zoh = calloc (1, sizeof (*zoh) + psrc->channels * sizeof (float)) ;
-		if (zoh == NULL)
+	{	priv = calloc (1, sizeof (*priv) + psrc->channels * sizeof (float)) ;
+		if (priv == NULL)
 			return SRC_ERR_MALLOC_FAILED ;
-		psrc->private_data = zoh ;
+		psrc->private_data = priv ;
 		} ;
 
-	zoh->zoh_magic_marker = ZOH_MAGIC_MARKER ;
-	zoh->channels = psrc->channels ;
+	priv->zoh_magic_marker = ZOH_MAGIC_MARKER ;
+	priv->channels = psrc->channels ;
 
 	psrc->const_process = zoh_vari_process ;
 	psrc->vari_process = zoh_vari_process ;
@@ -196,15 +193,15 @@ zoh_set_converter (SRC_PRIVATE *psrc, int src_enum)
 
 static void
 zoh_reset (SRC_PRIVATE *psrc)
-{	ZOH_DATA *zoh ;
+{	ZOH_DATA *priv ;
 
-	zoh = (ZOH_DATA*) psrc->private_data ;
-	if (zoh == NULL)
+	priv = (ZOH_DATA*) psrc->private_data ;
+	if (priv == NULL)
 		return ;
 
-	zoh->channels = psrc->channels ;
-	zoh->reset = 1 ;
-	memset (zoh->last_value, 0, sizeof (zoh->last_value [0]) * zoh->channels) ;
+	priv->channels = psrc->channels ;
+	priv->reset = 1 ;
+	memset (priv->last_value, 0, sizeof (priv->last_value [0]) * priv->channels) ;
 
 	return ;
 } /* zoh_reset */
