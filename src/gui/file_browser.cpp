@@ -63,16 +63,19 @@ enum TreeWidgetItemTypes
 fileBrowser::fileBrowser( const QString & _directories, const QString & _filter,
 			const QString & _title, const QPixmap & _pm,
 			QWidget * _parent, bool _dirs_as_items ) :
-	sideBarWidget( _title, _pm, _parent ),
+	QWidget( _parent ),
 	m_directories( _directories ),
 	m_filter( _filter ),
 	m_dirsAsItems( _dirs_as_items )
 {
-	setWindowTitle( tr( "Browser" ) );
-	m_l = new fileBrowserTreeWidget( contentParent() );
-	addContentWidget( m_l );
+	QVBoxLayout * viewLayout = new QVBoxLayout( this );
+	viewLayout->setMargin( 5 );
+	viewLayout->setSpacing( 5 );
 
-	QWidget * ops = new QWidget( contentParent() );
+	m_l = new fileBrowserTreeWidget( this );
+	viewLayout->addWidget( m_l );
+
+	QWidget * ops = new QWidget( this );
 	ops->setFixedHeight( 24 );
 
 	QHBoxLayout * opl = new QHBoxLayout( ops );
@@ -92,10 +95,9 @@ fileBrowser::fileBrowser( const QString & _directories, const QString & _filter,
 	opl->addSpacing( 5 );
 	opl->addWidget( reload_btn );
 
-	addContentWidget( ops );
+	viewLayout->addWidget( ops );
 
 	reloadTree();
-	show();
 }
 
 

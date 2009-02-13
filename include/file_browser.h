@@ -30,10 +30,6 @@
 #include <QtCore/QMutex>
 #include <QtGui/QTreeWidget>
 
-
-#include "side_bar_widget.h"
-
-
 class QLineEdit;
 
 class fileItem;
@@ -44,7 +40,7 @@ class trackContainer;
 
 
 
-class fileBrowser : public sideBarWidget
+class fileBrowser : public QWidget
 {
 	Q_OBJECT
 public:
@@ -54,6 +50,10 @@ public:
 	virtual ~fileBrowser();
 
 
+protected:
+	virtual void keyPressEvent( QKeyEvent * _ke );
+
+
 public slots:
 	void filterItems( const QString & _filter );
 	void reloadTree( void );
@@ -61,7 +61,6 @@ public slots:
 
 private:
 	bool filterItems( QTreeWidgetItem * _item, const QString & _filter );
-	virtual void keyPressEvent( QKeyEvent * _ke );
 
 	void addItems( const QString & _path );
 

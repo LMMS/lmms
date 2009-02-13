@@ -1,7 +1,7 @@
 /*
  * plugin_browser.h - include file for pluginBrowser
  *
- * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -28,28 +28,26 @@
 
 #include <QtCore/QTimer>
 #include <QtCore/QVector>
+#include <QtGui/QWidget>
 #include <QtGui/QPixmap>
 
 
-#include "side_bar_widget.h"
 #include "plugin.h"
 
 
 class trackContainer;
 
 
-class pluginBrowser : public sideBarWidget
+class pluginBrowser : public QWidget
 {
 	Q_OBJECT
 public:
-	pluginBrowser( QWidget * _parent );
+	pluginBrowser( QWidget * _parent = NULL );
 	virtual ~pluginBrowser();
 
 
 private:
 	QVector<plugin::descriptor> m_pluginDescriptors;
-
-	QWidget * m_view;
 
 } ;
 

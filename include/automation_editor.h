@@ -35,6 +35,7 @@
 #include "midi_time.h"
 #include "automation_pattern.h"
 #include "combobox_model.h"
+#include "fluiq/collapsible_widget.h"
 
 
 class QPainter;
@@ -47,7 +48,8 @@ class timeLine;
 class toolButton;
 
 
-class automationEditor : public QWidget, public journallingObject
+class automationEditor : public FLUIQ::CollapsibleWidget,
+				public journallingObject
 {
 	Q_OBJECT
 public:
@@ -148,7 +150,8 @@ private:
 	static const int InitialHeight = 480;
 
 	static const int ScrollBarSize = 16;
-	static const int TopMargin = 48;
+	static const int TopMargin = 32 +
+				FLUIQ::CollapsibleWidgetHeader::MinimalHeight;
 
 	static const int DefaultYDelta = 6;
 	static const int DefaultStepsPerTact = 16;

@@ -47,6 +47,11 @@ class textFloat;
 class configManager;
 class pluginView;
 class toolButton;
+namespace FLUIQ
+{
+class WidgetContainer;
+class CollapsibleWidget;
+}
 
 enum ProjectPlaybackMode
 {
@@ -62,6 +67,11 @@ public:
 	inline QMdiArea * workspace( void )
 	{
 		return( m_workspace );
+	}
+
+	inline FLUIQ::WidgetContainer * centralWidgetContainer( void )
+	{
+		return m_centralWidgetContainer;
 	}
 
 	inline QWidget * toolBar( void )
@@ -152,10 +162,11 @@ private:
 
 	void finalize( void );
 
-	void toggleWindow( QWidget * _w );
+	void toggleWindow( FLUIQ::CollapsibleWidget * _w );
 
 
 	QMdiArea * m_workspace;
+	FLUIQ::WidgetContainer * m_centralWidgetContainer;
 
 	QWidget * m_toolBar;
 	QHBoxLayout * m_toolBarLayout;

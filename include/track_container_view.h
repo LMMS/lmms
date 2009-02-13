@@ -33,13 +33,15 @@
 
 #include "track.h"
 #include "journalling_object.h"
+#include "fluiq/collapsible_widget.h"
 
 
 class QVBoxLayout;
 class trackContainer;
 
 
-class trackContainerView : public QWidget, public modelView,
+class trackContainerView : public FLUIQ::CollapsibleWidget,
+						public modelView,
 						public journallingObject,
 						public serializingObjectHook
 {
@@ -53,22 +55,22 @@ public:
 
 	QWidget * contentWidget( void )
 	{
-		return( m_scrollArea );
+		return m_scrollArea;
 	}
 
 	inline const midiTime & currentPosition( void ) const
 	{
-		return( m_currentPosition );
+		return m_currentPosition;
 	}
 
 	virtual bool fixedTCOs( void ) const
 	{
-		return( FALSE );
+		return false;
 	}
 
 	inline float pixelsPerTact( void ) const
 	{
-		return( m_ppt );
+		return m_ppt;
 	}
 
 	void setPixelsPerTact( int _ppt );
@@ -79,27 +81,27 @@ public:
 
 	inline bool rubberBandActive( void ) const
 	{
-		return( m_rubberBand->isVisible() );
+		return m_rubberBand->isVisible();
 	}
 
 	inline QVector<selectableObject *> selectedObjects( void )
 	{
-		if( allowRubberband() == TRUE )
+		if( allowRubberband() == true )
 		{
-			return( m_rubberBand->selectedObjects() );
+			return m_rubberBand->selectedObjects();
 		}
-		return( QVector<selectableObject *>() );
+		return QVector<selectableObject *>();
 	}
 
 
 	trackContainer * model( void )
 	{
-		return( m_tc );
+		return m_tc;
 	}
 
 	const trackContainer * model( void ) const
 	{
-		return( m_tc );
+		return m_tc;
 	}
 
 	void moveTrackViewUp( trackView * _tv );
@@ -114,7 +116,7 @@ public:
 
 	virtual QString nodeName( void ) const
 	{
-		return( "trackcontainerview" );
+		return "trackcontainerview";
 	}
 
 
@@ -129,7 +131,7 @@ protected:
 
 	const QList<trackView *> & trackViews( void ) const
 	{
-		return( m_trackViews );
+		return m_trackViews;
 	}
 
 	virtual void dragEnterEvent( QDragEnterEvent * _dee );

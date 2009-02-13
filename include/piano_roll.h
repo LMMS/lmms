@@ -28,12 +28,11 @@
 #ifndef _PIANO_ROLL_H
 #define _PIANO_ROLL_H
 
-#include <QtGui/QWidget>
-
 #include "combobox_model.h"
 #include "serializing_object.h"
 #include "note.h"
 #include "lmms_basics.h"
+#include "fluiq/collapsible_widget.h"
 
 
 class QPainter;
@@ -50,7 +49,7 @@ class timeLine;
 class toolButton;
 
 
-class pianoRoll : public QWidget, public serializingObject
+class pianoRoll : public FLUIQ::CollapsibleWidget, public serializingObject
 {
 	Q_OBJECT
 public:

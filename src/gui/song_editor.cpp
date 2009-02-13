@@ -76,7 +76,7 @@ songEditor::songEditor( song * _song, songEditor * & _engine_ptr ) :
 {
 	_engine_ptr = this;
 
-	setWindowTitle( tr( "Song-Editor" ) );
+	setWindowTitle( tr( "SONG EDITOR" ) );
 	setWindowIcon( embed::getIconPixmap( "songeditor" ) );
 
 	setFocusPolicy( Qt::StrongFocus );
@@ -98,7 +98,7 @@ songEditor::songEditor( song * _song, songEditor * & _engine_ptr ) :
 
 
 	// create own toolbar
-	m_toolBar = new QWidget( this );
+	m_toolBar = new QWidget;//( this );
 	m_toolBar->setFixedHeight( 32 );
 	m_toolBar->setAutoFillBackground( TRUE );
 	QPalette pal;
@@ -106,8 +106,8 @@ songEditor::songEditor( song * _song, songEditor * & _engine_ptr ) :
 				embed::getIconPixmap( "toolbar_bg" ) );
 	m_toolBar->setPalette( pal );
 
-	static_cast<QVBoxLayout *>( layout() )->insertWidget( 0, m_toolBar );
-	static_cast<QVBoxLayout *>( layout() )->insertWidget( 1, m_timeLine );
+	insertWidget( 1, m_toolBar );
+	insertWidget( 2, m_timeLine );
 
 	QHBoxLayout * tb_layout = new QHBoxLayout( m_toolBar );
 	tb_layout->setMargin( 0 );
@@ -250,11 +250,11 @@ songEditor::songEditor( song * _song, songEditor * & _engine_ptr ) :
 					this, SLOT( scrolled( int ) ) );
 
 
-	engine::getMainWindow()->workspace()->addSubWindow( this );
+/*	engine::getMainWindow()->workspace()->addSubWindow( this );
 	parentWidget()->setAttribute( Qt::WA_DeleteOnClose, FALSE );
 	parentWidget()->resize( 600, 300 );
 	parentWidget()->move( 5, 5 );
-	parentWidget()->show();
+	parentWidget()->show();*/
 }
 
 

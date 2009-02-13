@@ -29,9 +29,10 @@
 #include <QtGui/QWidget>
 
 #include "fx_mixer.h"
+#include "fluiq/collapsible_widget.h"
 
 
-class QStackedLayout;
+class QStackedWidget;
 class QButtonGroup;
 class fader;
 class fxLine;
@@ -40,7 +41,7 @@ class pixmapButton;
 
 
 
-class fxMixerView : public QWidget, public modelView,
+class fxMixerView : public FLUIQ::CollapsibleWidget, public modelView,
 					public serializingObjectHook
 {
 	Q_OBJECT
@@ -53,7 +54,7 @@ public:
 
 	fxLine * currentFxLine( void )
 	{
-		return( m_currentFxLine );
+		return m_currentFxLine;
 	}
 	void setCurrentFxLine( fxLine * _line );
 	void setCurrentFxLine( int _line );
@@ -66,6 +67,8 @@ private slots:
 
 
 private:
+	void createFxLine( int _line, QWidget * _parent );
+
 	struct fxChannelView
 	{
 		fxLine * m_fxLine;
@@ -76,9 +79,7 @@ private:
 
 	fxChannelView m_fxChannelViews[NumFxChannels+1];
 
-	QStackedLayout * m_fxRacksLayout;
-	QStackedLayout * m_fxLineBanks;
-	QButtonGroup * m_bankButtons;
+	QStackedWidget * m_fxRacksView;
 	fxLine * m_currentFxLine;
 
 } ;

@@ -97,12 +97,12 @@ void engine::init( const bool _has_gui )
 	{
 		s_mainWindow = new mainWindow;
 		s_songEditor = new songEditor( s_song, s_songEditor );
-		s_fxMixerView = new fxMixerView;
-		s_controllerRackView = new controllerRackView;
-		s_projectNotes = new projectNotes;
 		s_bbEditor = new bbEditor( s_bbTrackContainer );
 		s_pianoRoll = new pianoRoll;
 		s_automationEditor = new automationEditor;
+		s_fxMixerView = new fxMixerView;
+		s_controllerRackView = new controllerRackView;
+		s_projectNotes = new projectNotes;
 
 		s_mainWindow->finalize();
 	}

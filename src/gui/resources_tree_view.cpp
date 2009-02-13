@@ -33,6 +33,7 @@ ResourcesTreeView::ResourcesTreeView( ResourcesTreeModel * _tm,
 	m_tm( _tm )
 {
 	setHeaderHidden( true );
+	setIconSize( QSize( 24, 24 ) );
 	setModel( m_tm );
 	connect( m_tm, SIGNAL( itemsChanged() ),
 			this, SLOT( updateFilter() ) );

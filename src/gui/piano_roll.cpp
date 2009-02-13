@@ -68,6 +68,7 @@
 #include "timeline.h"
 #include "tool_button.h"
 #include "tooltip.h"
+#include "fluiq/widget_container.h"
 
 
 typedef automationPattern::timeMap timeMap;
@@ -77,9 +78,6 @@ extern Keys whiteKeys[];	// defined in piano_widget.cpp
 
 
 // some constants...
-static const int InitialPianoRollWidth = 840;
-static const int InitialPianoRollHeight = 480;
-
 static const int ScrollBarSize = 16;
 static const int PianoX = 0;
 
@@ -240,8 +238,9 @@ pianoRoll::pianoRoll( void ) :
 
 	m_toolBar = new QWidget( this );
 	m_toolBar->setFixedHeight( 32 );
-	m_toolBar->move( 0, 0 );
 	m_toolBar->setAutoFillBackground( true );
+	addWidget( m_toolBar );
+
 	QPalette pal;
 	pal.setBrush( m_toolBar->backgroundRole(),
 					embed::getIconPixmap( "toolbar_bg" ) );
@@ -498,19 +497,7 @@ pianoRoll::pianoRoll( void ) :
 
 	setMinimumSize( tb_layout->minimumSize().width(), 160 );
 
-	// add us to workspace
-	if( engine::getMainWindow()->workspace() )
-	{
-		engine::getMainWindow()->workspace()->addSubWindow( this );
-		parentWidget()->resize( InitialPianoRollWidth,
-						InitialPianoRollHeight );
-		parentWidget()->hide();
-	}
-	else
-	{
-		resize( InitialPianoRollWidth, InitialPianoRollHeight );
-		hide();
-	}
+	engine::getMainWindow()->centralWidgetContainer()->addWidget( this );
 
 	connect( engine::getSong(), SIGNAL( timeSignatureChanged( int, int ) ),
 						this, SLOT( update() ) );

@@ -31,6 +31,7 @@
 #include <QtGui/QCloseEvent>
 #include <QtGui/QDesktopServices>
 #include <QtGui/QFileDialog>
+#include <QtGui/QLineEdit>
 #include <QtGui/QMdiArea>
 #include <QtGui/QMdiSubWindow>
 #include <QtGui/QMenuBar>
@@ -57,7 +58,6 @@
 #include "controller_rack_view.h"
 #include "file_browser.h"
 #include "plugin_browser.h"
-#include "side_bar.h"
 #include "config_mgr.h"
 #include "mixer.h"
 #include "plugin_view.h"
@@ -77,7 +77,16 @@
 #include "cpuload_widget.h"
 #include "visualization_widget.h"
 
+#include "resources_db.h"
+#include "resources_tree_model.h"
+#include "resources_tree_view.h"
+
 #include "gui/tracks/track_container_scene.h"
+
+#include "fluiq/workspace.h"
+#include "fluiq/widget_container.h"
+#include "fluiq/collapsible_widget.h"
+
 
 
 mainWindow::mainWindow( void ) :
@@ -88,13 +97,14 @@ mainWindow::mainWindow( void ) :
 {
 	setAttribute( Qt::WA_DeleteOnClose );
 
-	QWidget * main_widget = new QWidget( this );
-	QVBoxLayout * vbox = new QVBoxLayout( main_widget );
+	QWidget * mainWidget = new QWidget( this );
+	QVBoxLayout * vbox = new QVBoxLayout( mainWidget );
 	vbox->setSpacing( 0 );
 	vbox->setMargin( 0 );
 
 
-	QWidget * w = new QWidget( main_widget );
+#if 0
+	QWidget * w = new QWidget( mainWidget );
 	QHBoxLayout * hbox = new QHBoxLayout( w );
 	hbox->setSpacing( 0 );
 	hbox->setMargin( 0 );
@@ -155,6 +165,94 @@ mainWindow::mainWindow( void ) :
 								), ++id );
 
 	m_workspace = new QMdiArea( splitter );
+#endif
+	FLUIQ::Workspace * ws = new FLUIQ::Workspace( mainWidget );
+
+
+	FLUIQ::CollapsibleWidget * componentWidget =
+			new FLUIQ::CollapsibleWidget( Qt::Horizontal, ws );
+	componentWidget->setWindowTitle( tr( "COMPONENTS" ) );
+
+	FLUIQ::WidgetContainer * componentContainer =
+		new FLUIQ::WidgetContainer( Qt::Vertical, componentWidget );
+	componentWidget->addWidget( componentContainer );
+
+
+
+	FLUIQ::CollapsibleWidget * resourcesWidget =
+			new FLUIQ::CollapsibleWidget( Qt::Vertical,
+							componentContainer );
+	resourcesWidget->setWindowTitle( tr( "RESOURCES" ) );
+ 
+	ResourcesTreeModel * rtm = new ResourcesTreeModel(
+						engine::getResourcesDB() );
+
+	ResourcesTreeView * tv = new ResourcesTreeView( rtm, resourcesWidget );
+
+	QLineEdit * le = new QLineEdit;
+	resourcesWidget->addWidget( tv );
+	resourcesWidget->addWidget( le );
+
+	connect( le, SIGNAL( textChanged( const QString & ) ),
+	                tv, SLOT( setFilter( const QString & ) ) );
+
+
+	componentContainer->addWidget( resourcesWidget );
+
+
+
+	FLUIQ::CollapsibleWidget * pluginsWidget =
+			new FLUIQ::CollapsibleWidget( Qt::Vertical,
+							componentContainer );
+	pluginsWidget->setWindowTitle( tr( "INSTRUMENTS" ) );
+ 
+	pluginBrowser * pb = new pluginBrowser();
+	pluginsWidget->addWidget( pb );
+
+	componentContainer->addWidget( pluginsWidget );
+
+
+	FLUIQ::CollapsibleWidget * homeBrowserW =
+			new FLUIQ::CollapsibleWidget( Qt::Vertical,
+							componentContainer );
+	homeBrowserW->setWindowTitle( tr( "HOME DIRECTORY" ) );
+	fileBrowser * hb = new fileBrowser( QDir::homePath(), "*",
+							tr( "My home" ),
+					embed::getIconPixmap( "home" ),
+							NULL );
+	homeBrowserW->addWidget( hb );
+	componentContainer->addWidget( homeBrowserW );
+
+	componentWidget->setMaximumWidth( 300 );
+
+	ws->addWidget( componentWidget );
+
+
+
+
+	FLUIQ::CollapsibleWidget * editorsWidget =
+			new FLUIQ::CollapsibleWidget( Qt::Horizontal, ws );
+	editorsWidget->setWindowTitle( tr( "EDITORS" ) );
+
+
+	m_centralWidgetContainer = new FLUIQ::WidgetContainer( Qt::Vertical,
+							editorsWidget );
+	editorsWidget->addWidget( m_centralWidgetContainer );
+
+	FLUIQ::CollapsibleWidget * workspaceWidget =
+			new FLUIQ::CollapsibleWidget( Qt::Vertical,
+						m_centralWidgetContainer );
+	workspaceWidget->setWindowTitle( tr( "WORKSPACE" ) );
+ 
+	m_workspace = new QMdiArea;
+	workspaceWidget->addWidget( m_workspace );
+
+	m_centralWidgetContainer->addWidget( workspaceWidget );
+
+
+	ws->addWidget( editorsWidget );
+
+
 
 	// Load background
 	QString bgArtwork = configManager::inst()->backgroundArtwork();
@@ -176,12 +274,9 @@ mainWindow::mainWindow( void ) :
 	m_workspace->setHorizontalScrollBarPolicy( Qt::ScrollBarAsNeeded );
 	m_workspace->setVerticalScrollBarPolicy( Qt::ScrollBarAsNeeded );
 
-	hbox->addWidget( side_bar );
-	hbox->addWidget( splitter );
-
 
 	// create global-toolbar at the top of our window
-	m_toolBar = new QWidget( main_widget );
+	m_toolBar = new QWidget( mainWidget );
 	m_toolBar->setObjectName( "mainToolbar" );
 	m_toolBar->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 	m_toolBar->setFixedHeight( 64 );
@@ -193,8 +288,9 @@ mainWindow::mainWindow( void ) :
 	m_toolBarLayout->setSpacing( 0 );
 
 	vbox->addWidget( m_toolBar );
-	vbox->addWidget( w );
-	setCentralWidget( main_widget );
+	vbox->addWidget( ws );
+
+	setCentralWidget( mainWidget );
 
     /// HACK TO CREATE EXTRA SONG EDITOR FOR NOW ///
 	//Fun test
@@ -1115,18 +1211,15 @@ void mainWindow::help( void )
 
 
 
-void mainWindow::toggleWindow( QWidget * _w )
+void mainWindow::toggleWindow( FLUIQ::CollapsibleWidget * _w )
 {
-	if( m_workspace->activeSubWindow() != _w->parentWidget()
-				|| _w->parentWidget()->isHidden() )
+	if( _w->isCollapsed() )
 	{
-		_w->parentWidget()->show();
-		_w->show();
-		_w->setFocus();
+		_w->expand();
 	}
 	else
 	{
-		_w->parentWidget()->hide();
+		_w->collapse();
 	}
 }
 
@@ -1151,7 +1244,20 @@ void mainWindow::toggleSongEditorWin( void )
 
 void mainWindow::toggleProjectNotesWin( void )
 {
-	toggleWindow( engine::getProjectNotes() );
+	//toggleWindow( engine::getProjectNotes() );
+	// TODO
+	QWidget * _w = engine::getProjectNotes();
+	if( m_workspace->activeSubWindow() != _w->parentWidget()
+				|| _w->parentWidget()->isHidden() )
+	{
+		_w->parentWidget()->show();
+		_w->show();
+		_w->setFocus();
+	}
+	else
+	{
+		_w->parentWidget()->hide();
+	}
 }
 
 
@@ -1183,7 +1289,18 @@ void mainWindow::toggleFxMixerWin( void )
 
 void mainWindow::toggleControllerRack( void )
 {
-	toggleWindow( engine::getControllerRackView() );
+	QWidget * _w = engine::getControllerRackView();
+	if( m_workspace->activeSubWindow() != _w->parentWidget()
+				|| _w->parentWidget()->isHidden() )
+	{
+		_w->parentWidget()->show();
+		_w->show();
+		_w->setFocus();
+	}
+	else
+	{
+		_w->parentWidget()->hide();
+	}
 }
 
 

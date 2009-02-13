@@ -50,7 +50,8 @@ bbEditor::bbEditor( bbTrackContainer * _tc ) :
 	pal.setBrush( m_toolBar->backgroundRole(),
 					embed::getIconPixmap( "toolbar_bg" ) );
 	m_toolBar->setPalette( pal );
-	static_cast<QVBoxLayout *>( layout() )->insertWidget( 0, m_toolBar );
+	insertWidget( 1, m_toolBar );
+//	static_cast<QVBoxLayout *>( layout() )->insertWidget( 0, m_toolBar );
 
 	QHBoxLayout * tb_layout = new QHBoxLayout( m_toolBar );
 	tb_layout->setSpacing( 0 );
@@ -58,7 +59,8 @@ bbEditor::bbEditor( bbTrackContainer * _tc ) :
 
 
 	setWindowIcon( embed::getIconPixmap( "bb_track" ) );
-	setWindowTitle( tr( "Beat+Bassline Editor" ) );
+	setWindowTitle( tr( "PATTERN EDITOR" ) );
+
 	// TODO: Use style sheet
 	setMinimumWidth( TRACK_OP_WIDTH + DEFAULT_SETTINGS_WIDGET_WIDTH
 						+ 2 * TCO_BORDER_WIDTH + 192 );
@@ -112,12 +114,12 @@ bbEditor::bbEditor( bbTrackContainer * _tc ) :
 	tb_layout->addWidget( l );
 	tb_layout->addSpacing( 15 );
 
-	engine::getMainWindow()->workspace()->addSubWindow( this );
+/*	engine::getMainWindow()->workspace()->addSubWindow( this );
 	parentWidget()->setAttribute( Qt::WA_DeleteOnClose, FALSE );
 	parentWidget()->layout()->setSizeConstraint( QLayout::SetMinimumSize );
 	parentWidget()->resize( minimumWidth(), 300 );
 	parentWidget()->move( 610, 5 );
-	parentWidget()->show();
+	parentWidget()->show();*/
 
 
 	setModel( _tc );

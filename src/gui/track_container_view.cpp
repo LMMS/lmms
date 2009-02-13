@@ -47,9 +47,11 @@
 #include "string_pair_drag.h"
 #include "track.h"
 
+#include "fluiq/widget_container.h"
+
 
 trackContainerView::trackContainerView( trackContainer * _tc ) :
-	QWidget(),
+	FLUIQ::CollapsibleWidget( Qt::Vertical ),
 	modelView( NULL, this ),
 	journallingObject(),
 	serializingObjectHook(),
@@ -61,12 +63,11 @@ trackContainerView::trackContainerView( trackContainer * _tc ) :
 	m_rubberBand( new rubberBand( m_scrollArea ) ),
 	m_origin()
 {
+	engine::getMainWindow()->centralWidgetContainer()->addWidget( this );
+
 	m_tc->setHook( this );
 
-	QVBoxLayout * layout = new QVBoxLayout( this );
-	layout->setMargin( 0 );
-	layout->setSpacing( 0 );
-	layout->addWidget( m_scrollArea );
+	addWidget( m_scrollArea );
 
 	QWidget * scrollContent = new QWidget;
 	m_scrollLayout = new QVBoxLayout( scrollContent );
@@ -476,7 +477,7 @@ void trackContainerView::resizeEvent( QResizeEvent * _re )
 
 
 trackContainerView::scrollArea::scrollArea( trackContainerView * _parent ) :
-	QScrollArea( _parent ),
+	QScrollArea( NULL ),
 	m_trackContainerView( _parent )
 {
 	setFrameStyle( QFrame::NoFrame );
