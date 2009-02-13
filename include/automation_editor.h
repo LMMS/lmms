@@ -2,6 +2,7 @@
  * automation_editor.h - declaration of class automationEditor which is a window
  *                       where you can edit dynamic values in an easy way
  *
+ * Copyright (c) 2008-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2006-2008 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
@@ -54,12 +55,12 @@ public:
 
 	inline const automationPattern * currentPattern( void ) const
 	{
-		return( m_pattern );
+		return m_pattern;
 	}
 
 	inline bool validPattern( void ) const
 	{
-		return( m_pattern != NULL );
+		return m_pattern != NULL;
 	}
 
 	int quantization( void ) const;
@@ -69,7 +70,7 @@ public:
 	virtual void loadSettings( const QDomElement & _this );
 	inline virtual QString nodeName( void ) const
 	{
-		return( "automationeditor" );
+		return "automationeditor";
 	}
 
 
@@ -100,6 +101,7 @@ protected:
 
 	void drawLine( int x0, float y0, int x1, float y1 );
 
+
 protected slots:
 	void play( void );
 	void stop( void );
@@ -125,34 +127,35 @@ protected slots:
 
 private:
 
-	enum editModes
+	enum EditModes
 	{
-		DRAW,
-		ERASE,
-		SELECT,
-		MOVE
+		ModeDraw,
+		ModeErase,
+		ModeSelect,
+		ModeMove
 	} ;
 
-	enum actions
+	enum Actions
 	{
-		NONE,
-		MOVE_VALUE,
-		SELECT_VALUES,
-		MOVE_SELECTION
+		ActionNone,
+		ActionMoveValue,
+		ActionSelectValues,
+		ActionMoveSelection
 	} ;
 
 	// some constants...
-	static const int INITIAL_WIDTH = 740;
-	static const int INITIAL_HEIGHT = 480;
+	static const int InitialWidth = 740;
+	static const int InitialHeight = 480;
 
-	static const int SCROLLBAR_SIZE = 16;
-	static const int TOP_MARGIN = 48;
+	static const int ScrollBarSize = 16;
+	static const int TopMargin = 48;
 
-	static const int DEFAULT_Y_DELTA = 6;
-	static const int DEFAULT_STEPS_PER_TACT = 16;
-	static const int DEFAULT_PPT = 12 * DEFAULT_STEPS_PER_TACT;
+	static const int DefaultYDelta = 6;
+	static const int DefaultStepsPerTact = 16;
+	static const int DefaultPixelsPerTact = 12 * DefaultStepsPerTact;
 
-	static const int VALUES_WIDTH = 64;
+	static const int ValuesWidth = 64;
+
 
 	automationEditor( void );
 	automationEditor( const automationEditor & );
@@ -202,7 +205,7 @@ private:
 
 	midiTime m_currentPosition;
 
-	actions m_action;
+	Actions m_action;
 
 	tick m_selectStartTick;
 	tick m_selectedTick;
@@ -224,7 +227,7 @@ private:
 	timeMap m_selValuesForMove;
 
 
-	editModes m_editMode;
+	EditModes m_editMode;
 
 
 	timeLine * m_timeLine;

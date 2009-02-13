@@ -136,7 +136,7 @@ protected slots:
 
 private:
 
-	enum editModes
+	enum EditModes
 	{
 		ModeDraw,
 		ModeErase,
@@ -144,7 +144,7 @@ private:
 		ModeOpen
 	};
 
-	enum actions
+	enum Actions
 	{
 		ActionNone,
 		ActionMoveNote,
@@ -154,18 +154,18 @@ private:
 		ActionResizeNoteEditArea
 	};
 	
-	enum noteEditMode
+	enum NoteEditMode
 	{
 		NoteEditVolume,
 		NoteEditPanning,
 		NoteEditCount // make sure this one is always last
 	};
 
-	enum pianoRollKeyTypes
+	enum KeyTypes
 	{
-		PR_WHITE_KEY_SMALL,
-		PR_WHITE_KEY_BIG,
-		PR_BLACK_KEY
+		WhiteKeySmall,
+		WhiteKeyBig,
+		BlackKey
 	};
 
 	QVector<QString> m_nemStr; // gui names of each edit mode
@@ -207,7 +207,7 @@ private:
 	static QPixmap * s_toolMove;
 	static QPixmap * s_toolOpen;
 
-	static pianoRollKeyTypes prKeyOrder[];
+	static KeyTypes s_keyOrder[];
 
 
 	QWidget * m_toolBar;
@@ -244,8 +244,8 @@ private:
 	bool m_recording;
 
 	note * m_currentNote;
-	actions m_action;
-	noteEditMode m_noteEditMode;
+	Actions m_action;
+	NoteEditMode m_noteEditMode;
 
 	Uint32 m_selectStartTick;
 	int m_selectedTick;
@@ -285,8 +285,8 @@ private:
 	int m_startKey;			// first key when drawing
 	int m_lastKey;
 
-	editModes m_editMode;
-	editModes m_ctrlMode; // mode they were in before they hit ctrl
+	EditModes m_editMode;
+	EditModes m_ctrlMode; // mode they were in before they hit ctrl
 		
 	bool m_mouseDownLeft; //true if left click is being held down
 	bool m_mouseDownRight; //true if right click is being held down

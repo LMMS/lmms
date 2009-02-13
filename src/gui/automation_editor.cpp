@@ -4,7 +4,7 @@
  * automation_editor.cpp - implementation of automationEditor which is used for
  *                         actual setting of dynamic values
  *
- * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2006-2008 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
@@ -87,14 +87,14 @@ automationEditor::automationEditor( void ) :
 	m_bottomLevel( 0 ),
 	m_topLevel( 0 ),
 	m_currentPosition(),
-	m_action( NONE ),
+	m_action( ActionNone ),
 	m_moveStartLevel( 0 ),
 	m_moveStartTick( 0 ),
-	m_ppt( DEFAULT_PPT ),
-	m_y_delta( DEFAULT_Y_DELTA ),
-	m_y_auto( TRUE ),
-	m_editMode( DRAW ),
-	m_scrollBack( FALSE )
+	m_ppt( DefaultPixelsPerTact ),
+	m_y_delta( DefaultYDelta ),
+	m_y_auto( true ),
+	m_editMode( ModeDraw ),
+	m_scrollBack( false )
 {
 	// init pixmaps
 	if( s_toolDraw == NULL )
@@ -121,7 +121,7 @@ automationEditor::automationEditor( void ) :
 	setAttribute( Qt::WA_OpaquePaintEvent, true );
 
 	// add time-line
-	m_timeLine = new timeLine( VALUES_WIDTH, 32, m_ppt,
+	m_timeLine = new timeLine( ValuesWidth, 32, m_ppt,
 				engine::getSong()->getPlayPos(
 					song::Mode_PlayAutomationPattern ),
 						m_currentPosition, this );
@@ -134,7 +134,7 @@ automationEditor::automationEditor( void ) :
 	m_toolBar = new QWidget( this );
 	m_toolBar->setFixedHeight( 32 );
 	m_toolBar->move( 0, 0 );
-	m_toolBar->setAutoFillBackground( TRUE );
+	m_toolBar->setAutoFillBackground( true );
 	QPalette pal;
 	pal.setBrush( m_toolBar->backgroundRole(),
 					embed::getIconPixmap( "toolbar_bg" ) );
@@ -184,34 +184,34 @@ automationEditor::automationEditor( void ) :
 					tr( "Draw mode (Shift+D)" ),
 					this, SLOT( drawButtonToggled() ),
 					m_toolBar );
-	m_drawButton->setCheckable( TRUE );
-	m_drawButton->setChecked( TRUE );
+	m_drawButton->setCheckable( true );
+	m_drawButton->setChecked( true );
 
 	m_eraseButton = new toolButton( embed::getIconPixmap( "edit_erase" ),
 					tr( "Erase mode (Shift+E)" ),
 					this, SLOT( eraseButtonToggled() ),
 					m_toolBar );
-	m_eraseButton->setCheckable( TRUE );
+	m_eraseButton->setCheckable( true );
 
 	m_selectButton = new toolButton( embed::getIconPixmap(
 							"edit_select" ),
 					tr( "Select mode (Shift+S)" ),
 					this, SLOT( selectButtonToggled() ),
 					m_toolBar );
-	m_selectButton->setCheckable( TRUE );
+	m_selectButton->setCheckable( true );
 
 	m_moveButton = new toolButton( embed::getIconPixmap( "edit_move" ),
 					tr( "Move selection mode (Shift+M)" ),
 					this, SLOT( moveButtonToggled() ),
 					m_toolBar );
-	m_moveButton->setCheckable( TRUE );
+	m_moveButton->setCheckable( true );
 
 	QButtonGroup * tool_button_group = new QButtonGroup( this );
 	tool_button_group->addButton( m_drawButton );
 	tool_button_group->addButton( m_eraseButton );
 	tool_button_group->addButton( m_selectButton );
 	tool_button_group->addButton( m_moveButton );
-	tool_button_group->setExclusive( TRUE );
+	tool_button_group->setExclusive( true );
 
 	m_drawButton->setWhatsThis(
 		tr( "Click here and draw-mode will be activated. In this "
@@ -352,7 +352,7 @@ automationEditor::automationEditor( void ) :
 	setWindowIcon( embed::getIconPixmap( "automation" ) );
 	setCurrentPattern( NULL );
 
-	setMouseTracking( TRUE );
+	setMouseTracking( true );
 
 	setMinimumSize( tb_layout->minimumSize().width(), 128 );
 
@@ -360,12 +360,12 @@ automationEditor::automationEditor( void ) :
 	if( engine::getMainWindow()->workspace() )
 	{
 		engine::getMainWindow()->workspace()->addSubWindow( this );
-		parentWidget()->resize( INITIAL_WIDTH, INITIAL_HEIGHT );
+		parentWidget()->resize( InitialWidth, InitialHeight );
 		parentWidget()->hide();
 	}
 	else
 	{
-		resize( INITIAL_WIDTH, INITIAL_HEIGHT );
+		resize( InitialWidth, InitialHeight );
 		hide();
 	}
 }
@@ -385,9 +385,9 @@ void automationEditor::setCurrentPattern( automationPattern * _new_pattern )
 	m_pattern = _new_pattern;
 	m_currentPosition = 0;
 
-	if( validPattern() == FALSE )
+	if( validPattern() == false )
 	{
-		setWindowTitle( tr( "Automation Editor - no pattern" ) );
+		setWindowTitle( tr( "AUTOMATION EDITOR - no pattern" ) );
 		m_minLevel = m_maxLevel = m_scrollLevel = 0;
 		m_step = 1;
 		resizeEvent( NULL );
@@ -403,7 +403,7 @@ void automationEditor::setCurrentPattern( automationPattern * _new_pattern )
 	// of levels and so on...)
 	resizeEvent( NULL );
 
-	setWindowTitle( tr( "Automation Editor - %1" ).arg(
+	setWindowTitle( tr( "AUTOMATION EDITOR - %1" ).arg(
 							m_pattern->name() ) );
 
 	update();
@@ -433,13 +433,13 @@ inline void automationEditor::drawValueRect( QPainter & _p,
 						int _width, int _height,
 						const bool _is_selected )
 {
-    _p.fillRect( _x, _y, _width, _height, engine::getLmmsStyle()->color(
-            _is_selected ?
-            LmmsStyle::AutomationSelectedBarFill :
-            LmmsStyle::AutomationBarFill ) );
+	_p.fillRect( _x, _y, _width, _height, engine::getLmmsStyle()->color(
+			_is_selected ?
+				LmmsStyle::AutomationSelectedBarFill :
+				LmmsStyle::AutomationBarFill ) );
 
 	_p.setPen( engine::getLmmsStyle()->color(
-            LmmsStyle::AutomationBarValue ) );
+					LmmsStyle::AutomationBarValue ) );
 	_p.drawLine( _x - 1, _y, _x + 1, _y );
 	_p.drawLine( _x, _y - 1, _x, _y + 1 );
 }
@@ -541,7 +541,7 @@ void automationEditor::keyPressEvent( QKeyEvent * _ke )
 		case Qt::Key_A:
 			if( _ke->modifiers() & Qt::ControlModifier )
 			{
-				m_selectButton->setChecked( TRUE );
+				m_selectButton->setChecked( true );
 				selectAll();
 				update();
 			}
@@ -554,7 +554,7 @@ void automationEditor::keyPressEvent( QKeyEvent * _ke )
 		case Qt::Key_D:
 			if( _ke->modifiers() & Qt::ShiftModifier )
 			{
-				m_drawButton->setChecked( TRUE );
+				m_drawButton->setChecked( true );
 			}
 			else
 			{
@@ -565,7 +565,7 @@ void automationEditor::keyPressEvent( QKeyEvent * _ke )
 		case Qt::Key_E:
 			if( _ke->modifiers() & Qt::ShiftModifier )
 			{
-				m_eraseButton->setChecked( TRUE );
+				m_eraseButton->setChecked( true );
 			}
 			else
 			{
@@ -576,7 +576,7 @@ void automationEditor::keyPressEvent( QKeyEvent * _ke )
 		case Qt::Key_S:
 			if( _ke->modifiers() & Qt::ShiftModifier )
 			{
-				m_selectButton->setChecked( TRUE );
+				m_selectButton->setChecked( true );
 			}
 			else
 			{
@@ -587,7 +587,7 @@ void automationEditor::keyPressEvent( QKeyEvent * _ke )
 		case Qt::Key_M:
 			if( _ke->modifiers() & Qt::ShiftModifier )
 			{
-				m_moveButton->setChecked( TRUE );
+				m_moveButton->setChecked( true );
 			}
 			else
 			{
@@ -688,22 +688,22 @@ void automationEditor::drawLine( int _x0, float _y0, int _x1, float _y1 )
 
 void automationEditor::mousePressEvent( QMouseEvent * _me )
 {
-	if( validPattern() == FALSE )
+	if( validPattern() == false )
 	{
 		return;
 	}
 
-	if( _me->y() > TOP_MARGIN )
+	if( _me->y() > TopMargin )
 	{
 		float level = getLevel( _me->y() );
 
 		int x = _me->x();
 
-		if( x > VALUES_WIDTH )
+		if( x > ValuesWidth )
 		{
 			// set or move value
 
-			x -= VALUES_WIDTH;
+			x -= ValuesWidth;
 
 			// get tick in which the user clicked
 			int pos_ticks = x * DefaultTicksPerTact / m_ppt +
@@ -736,7 +736,7 @@ void automationEditor::mousePressEvent( QMouseEvent * _me )
 
 			// left button??
 			if( _me->button() == Qt::LeftButton &&
-							m_editMode == DRAW )
+							m_editMode == ModeDraw )
 			{
 				// Connect the dots
 				if( _me->modifiers() & Qt::ShiftModifier )
@@ -766,7 +766,7 @@ void automationEditor::mousePressEvent( QMouseEvent * _me )
 				}
 
 				// move it
-				m_action = MOVE_VALUE;
+				m_action = ActionMoveValue;
 				int aligned_x = (int)( (float)( (
 						it.key() -
 						m_currentPosition ) *
@@ -779,8 +779,8 @@ void automationEditor::mousePressEvent( QMouseEvent * _me )
 				engine::getSong()->setModified();
 			}
 			else if( ( _me->button() == Qt::RightButton &&
-							m_editMode == DRAW ) ||
-					m_editMode == ERASE )
+							m_editMode == ModeDraw ) ||
+					m_editMode == ModeErase )
 			{
 				// erase single value
 				if( it != time_map.end() )
@@ -790,7 +790,7 @@ void automationEditor::mousePressEvent( QMouseEvent * _me )
 				}
 			}
 			else if( _me->button() == Qt::LeftButton &&
-							m_editMode == SELECT )
+							m_editMode == ModeSelect )
 			{
 				// select an area of values
 
@@ -798,17 +798,17 @@ void automationEditor::mousePressEvent( QMouseEvent * _me )
 				m_selectedTick = 0;
 				m_selectStartLevel = level;
 				m_selectedLevels = 1;
-				m_action = SELECT_VALUES;
+				m_action = ActionSelectValues;
 			}
 			else if( _me->button() == Qt::RightButton &&
-							m_editMode == SELECT )
+							m_editMode == ModeSelect )
 			{
 				// when clicking right in select-move, we
 				// switch to move-mode
-				m_moveButton->setChecked( TRUE );
+				m_moveButton->setChecked( true );
 			}
 			else if( _me->button() == Qt::LeftButton &&
-							m_editMode == MOVE )
+							m_editMode == ModeMove )
 			{
 				// move selection (including selected values)
 
@@ -816,16 +816,16 @@ void automationEditor::mousePressEvent( QMouseEvent * _me )
 				m_moveStartTick = pos_ticks;
 				m_moveStartLevel = level;
 
-				m_action = MOVE_SELECTION;
+				m_action = ActionMoveSelection;
 
 				engine::getSong()->setModified();
 			}
 			else if( _me->button() == Qt::RightButton &&
-							m_editMode == MOVE )
+							m_editMode == ModeMove )
 			{
 				// when clicking right in select-move, we
 				// switch to draw-mode
-				m_drawButton->setChecked( TRUE );
+				m_drawButton->setChecked( true );
 			}
 
 			update();
@@ -838,9 +838,9 @@ void automationEditor::mousePressEvent( QMouseEvent * _me )
 
 void automationEditor::mouseReleaseEvent( QMouseEvent * _me )
 {
-	m_action = NONE;
+	m_action = ActionNone;
 
-	if( m_editMode == DRAW )
+	if( m_editMode == ModeDraw )
 	{
 		QApplication::restoreOverrideCursor();
 	}
@@ -851,33 +851,33 @@ void automationEditor::mouseReleaseEvent( QMouseEvent * _me )
 
 void automationEditor::mouseMoveEvent( QMouseEvent * _me )
 {
-	if( validPattern() == FALSE )
+	if( validPattern() == false )
 	{
 		update();
 		return;
 	}
 
-	if( _me->y() > TOP_MARGIN )
+	if( _me->y() > TopMargin )
 	{
 		float level = getLevel( _me->y() );
 		int x = _me->x();
 
-		if( _me->x() <= VALUES_WIDTH )
+		if( _me->x() <= ValuesWidth )
 		{
 			update();
 			return;
 		}
-		x -= VALUES_WIDTH;
-		if( m_action == MOVE_VALUE )
+		x -= ValuesWidth;
+		if( m_action == ActionMoveValue )
 		{
 			x -= m_moveXOffset;
 		}
 
 		int pos_ticks = x * DefaultTicksPerTact / m_ppt +
 							m_currentPosition;
-		if( _me->buttons() & Qt::LeftButton && m_editMode == DRAW )
+		if( _me->buttons() & Qt::LeftButton && m_editMode == ModeDraw )
 		{
-			if( m_action == MOVE_VALUE )
+			if( m_action == ActionMoveValue )
 			{
 				// moving value
 				if( pos_ticks < 0 )
@@ -903,13 +903,13 @@ void automationEditor::mouseMoveEvent( QMouseEvent * _me )
 
 		}
 		else if( ( _me->buttons() & Qt::RightButton &&
-						m_editMode == DRAW ) ||
+						m_editMode == ModeDraw ) ||
 				( _me->buttons() & Qt::LeftButton &&
-						m_editMode == ERASE ) )
+						m_editMode == ModeErase ) )
 		{
 			m_pattern->removeValue( midiTime( pos_ticks ) );
 		}
-		else if( _me->buttons() & Qt::NoButton && m_editMode == DRAW )
+		else if( _me->buttons() & Qt::NoButton && m_editMode == ModeDraw )
 		{
 			// set move- or resize-cursor
 
@@ -967,8 +967,8 @@ void automationEditor::mouseMoveEvent( QMouseEvent * _me )
 			}
 		}
 		else if( _me->buttons() & Qt::LeftButton &&
-						m_editMode == SELECT &&
-						m_action == SELECT_VALUES )
+						m_editMode == ModeSelect &&
+						m_action == ActionSelectValues )
 		{
 
 			// change size of selection
@@ -977,7 +977,7 @@ void automationEditor::mouseMoveEvent( QMouseEvent * _me )
 			{
 				x = 0;
 				QCursor::setPos( mapToGlobal( QPoint(
-						VALUES_WIDTH, _me->y() ) ) );
+						ValuesWidth, _me->y() ) ) );
 				if( m_currentPosition >= 4 )
 				{
 					m_leftRightScroll->setValue(
@@ -988,9 +988,9 @@ void automationEditor::mouseMoveEvent( QMouseEvent * _me )
 					m_leftRightScroll->setValue( 0 );
 				}
 			}
-			else if( x > width() - VALUES_WIDTH )
+			else if( x > width() - ValuesWidth )
 			{
-				x = width() - VALUES_WIDTH;
+				x = width() - ValuesWidth;
 				QCursor::setPos( mapToGlobal( QPoint( width(),
 								_me->y() ) ) );
 				m_leftRightScroll->setValue( m_currentPosition +
@@ -1013,8 +1013,8 @@ void automationEditor::mouseMoveEvent( QMouseEvent * _me )
 			}
 		}
 		else if( _me->buttons() & Qt::LeftButton &&
-					m_editMode == MOVE &&
-					m_action == MOVE_SELECTION )
+					m_editMode == ModeMove &&
+					m_action == ActionMoveSelection )
 		{
 			// move selection + selected values
 
@@ -1116,7 +1116,7 @@ void automationEditor::mouseMoveEvent( QMouseEvent * _me )
 				new_selValuesForMove[
 					m_pattern->putValue( new_value_pos,
 						it.value () + level_diff,
-									FALSE )]
+									false )]
 						= it.value() + level_diff;
 			}
 			m_selValuesForMove = new_selValuesForMove;
@@ -1128,15 +1128,15 @@ void automationEditor::mouseMoveEvent( QMouseEvent * _me )
 	else
 	{
 		if( _me->buttons() & Qt::LeftButton &&
-					m_editMode == SELECT &&
-					m_action == SELECT_VALUES )
+					m_editMode == ModeSelect &&
+					m_action == ActionSelectValues )
 		{
 
-			int x = _me->x() - VALUES_WIDTH;
+			int x = _me->x() - ValuesWidth;
 			if( x < 0 && m_currentPosition > 0 )
 			{
 				x = 0;
-				QCursor::setPos( mapToGlobal( QPoint( VALUES_WIDTH,
+				QCursor::setPos( mapToGlobal( QPoint( ValuesWidth,
 								_me->y() ) ) );
 				if( m_currentPosition >= 4 )
 				{
@@ -1148,9 +1148,9 @@ void automationEditor::mouseMoveEvent( QMouseEvent * _me )
 					m_leftRightScroll->setValue( 0 );
 				}
 			}
-			else if( x > width() - VALUES_WIDTH )
+			else if( x > width() - ValuesWidth )
 			{
-				x = width() - VALUES_WIDTH;
+				x = width() - ValuesWidth;
 				QCursor::setPos( mapToGlobal( QPoint( width(),
 							_me->y() ) ) );
 				m_leftRightScroll->setValue( m_currentPosition +
@@ -1175,7 +1175,7 @@ void automationEditor::mouseMoveEvent( QMouseEvent * _me )
 			{
 				QCursor::setPos( mapToGlobal( QPoint( _me->x(),
 							height() -
-							SCROLLBAR_SIZE ) ) );
+							ScrollBarSize ) ) );
 				m_topBottomScroll->setValue(
 					m_topBottomScroll->value() + 1 );
 				level = m_bottomLevel;
@@ -1183,7 +1183,7 @@ void automationEditor::mouseMoveEvent( QMouseEvent * _me )
 			else if( level >= m_topLevel )
 			{
 				QCursor::setPos( mapToGlobal( QPoint( _me->x(),
-							TOP_MARGIN ) ) );
+								TopMargin ) ) );
 				m_topBottomScroll->setValue(
 					m_topBottomScroll->value() - 1 );
 				level = m_topLevel;
@@ -1207,17 +1207,17 @@ inline void automationEditor::drawCross( QPainter & _p )
 {
 	QPoint mouse_pos = mapFromGlobal( QCursor::pos() );
 	float level = getLevel( mouse_pos.y() );
-	int grid_bottom = height() - SCROLLBAR_SIZE - 1;
+	int grid_bottom = height() - ScrollBarSize - 1;
 	float cross_y = m_y_auto ?
-		grid_bottom - ( ( grid_bottom - TOP_MARGIN )
+		grid_bottom - ( ( grid_bottom - TopMargin )
 				* ( level - m_minLevel )
 				/ (float)( m_maxLevel - m_minLevel ) ) :
 		grid_bottom - ( level - m_bottomLevel ) * m_y_delta;
 
 	_p.setPen( engine::getLmmsStyle()->color( LmmsStyle::AutomationCrosshair ) );
-	_p.drawLine( VALUES_WIDTH, (int) cross_y, width(), (int) cross_y );
-	_p.drawLine( mouse_pos.x(), TOP_MARGIN, mouse_pos.x(),
-						height() - SCROLLBAR_SIZE );
+	_p.drawLine( ValuesWidth, (int) cross_y, width(), (int) cross_y );
+	_p.drawLine( mouse_pos.x(), TopMargin, mouse_pos.x(),
+						height() - ScrollBarSize );
 }
 
 
@@ -1233,12 +1233,12 @@ void automationEditor::paintEvent( QPaintEvent * _pe )
 	// set font-size to 8
 	p.setFont( pointSize<8>( p.font() ) );
 
-	int grid_height = height() - TOP_MARGIN - SCROLLBAR_SIZE;
+	int grid_height = height() - TopMargin - ScrollBarSize;
 
 	// start drawing at the bottom
-	int grid_bottom = height() - SCROLLBAR_SIZE - 1;
+	int grid_bottom = height() - ScrollBarSize - 1;
 
-	p.fillRect( 0, TOP_MARGIN, VALUES_WIDTH, height() - TOP_MARGIN,
+	p.fillRect( 0, TopMargin, ValuesWidth, height() - TopMargin,
 						QColor( 0x33, 0x33, 0x33 ) );
 
 	// print value numbers
@@ -1250,7 +1250,7 @@ void automationEditor::paintEvent( QPaintEvent * _pe )
 	{
 		if( m_y_auto )
 		{
-			int y[] = { grid_bottom, TOP_MARGIN + font_height / 2 };
+			int y[] = { grid_bottom, TopMargin + font_height / 2 };
 			float level[] = { m_minLevel, m_maxLevel };
 			for( int i = 0; i < 2; ++i )
 			{
@@ -1258,11 +1258,11 @@ void automationEditor::paintEvent( QPaintEvent * _pe )
 						->displayValue( level[i] );
 				p.setPen( QColor( 240, 240, 240 ) );
 				p.drawText( 1, y[i] - font_height + 1,
-					VALUES_WIDTH - 10, 2 * font_height,
+					ValuesWidth - 10, 2 * font_height,
 					text_flags, label );
 				p.setPen( QColor( 0, 0, 0 ) );
 				p.drawText( 0, y[i] - font_height,
-					VALUES_WIDTH - 10, 2 * font_height,
+					ValuesWidth - 10, 2 * font_height,
 					text_flags, label );
 			}
 		}
@@ -1270,7 +1270,7 @@ void automationEditor::paintEvent( QPaintEvent * _pe )
 		{
 			int y = grid_bottom;
 			int level = (int) m_bottomLevel;
-			int printable = qMax( 1, 5 * DEFAULT_Y_DELTA
+			int printable = qMax( 1, 5 * DefaultYDelta
 								/ m_y_delta );
 			int module = level % printable;
 			if( module )
@@ -1280,18 +1280,18 @@ void automationEditor::paintEvent( QPaintEvent * _pe )
 				y -= inv_module * m_y_delta;
 				level += inv_module;
 			}
-			for( ; y >= TOP_MARGIN && level <= m_topLevel;
+			for( ; y >= TopMargin && level <= m_topLevel;
 				y -= printable * m_y_delta, level += printable )
 			{
 				const QString & label = m_pattern->firstObject()
 							->displayValue( level );
 				p.setPen( QColor( 240, 240, 240 ) );
 				p.drawText( 1, y - font_height + 1,
-					VALUES_WIDTH - 10, 2 * font_height,
+					ValuesWidth - 10, 2 * font_height,
 					text_flags, label );
 				p.setPen( QColor( 0, 0, 0 ) );
 				p.drawText( 0, y - font_height,
-					VALUES_WIDTH - 10, 2 * font_height,
+					ValuesWidth - 10, 2 * font_height,
 					text_flags, label );
 			}
 		}
@@ -1299,25 +1299,25 @@ void automationEditor::paintEvent( QPaintEvent * _pe )
 
 	// set clipping area, because we are not allowed to paint over
 	// keyboard...
-	p.setClipRect( VALUES_WIDTH, TOP_MARGIN, width() - VALUES_WIDTH,
+	p.setClipRect( ValuesWidth, TopMargin, width() - ValuesWidth,
 								grid_height  );
 
 	// draw vertical raster
 	int tact_16th = m_currentPosition / ( DefaultTicksPerTact / 16 );
 	const int offset = ( m_currentPosition % (DefaultTicksPerTact/16) ) *
-					m_ppt / DEFAULT_STEPS_PER_TACT / 8;
+					m_ppt / DefaultStepsPerTact / 8;
 
 	if( m_pattern )
 	{
 		int x_line_end = (int)( m_y_auto || m_topLevel < m_maxLevel ?
-			TOP_MARGIN :
+			TopMargin :
 			grid_bottom - ( m_topLevel - m_bottomLevel )
 								* m_y_delta );
 
-		for( int x = VALUES_WIDTH - offset; x < width();
-			x += m_ppt / DEFAULT_STEPS_PER_TACT, ++tact_16th )
+		for( int x = ValuesWidth - offset; x < width();
+			x += m_ppt / DefaultStepsPerTact, ++tact_16th )
 		{
-			if( x >= VALUES_WIDTH )
+			if( x >= ValuesWidth )
 			{
 				// every tact-start needs to be a bright line
 				if( tact_16th % 16 == 0 )
@@ -1343,21 +1343,21 @@ void automationEditor::paintEvent( QPaintEvent * _pe )
 		{
 			QPen pen( QColor( 0x4F, 0x4F, 0x4F ) );
 			p.setPen( pen );
-			p.drawLine( VALUES_WIDTH, grid_bottom, width(),
+			p.drawLine( ValuesWidth, grid_bottom, width(),
 								grid_bottom );
 			pen.setStyle( Qt::DotLine );
 			p.setPen( pen );
-			float y_delta = ( grid_bottom - TOP_MARGIN ) / 8.0f;
+			float y_delta = ( grid_bottom - TopMargin ) / 8.0f;
 			for( int i = 1; i < 8; ++i )
 			{
 				int y = (int)( grid_bottom - i * y_delta );
-				p.drawLine( VALUES_WIDTH, y, width(), y );
+				p.drawLine( ValuesWidth, y, width(), y );
 			}
 		}
 		else
 		{
 			for( float y = grid_bottom, level = m_bottomLevel;
-					y >= TOP_MARGIN && level <= m_topLevel;
+					y >= TopMargin && level <= m_topLevel;
 					y -= m_y_delta, ++level )
 			{
 				if( (int)level % 5 == 0 )
@@ -1370,7 +1370,7 @@ void automationEditor::paintEvent( QPaintEvent * _pe )
 				}
 
 				// draw level line
-				p.drawLine( VALUES_WIDTH, (int) y, width(),
+				p.drawLine( ValuesWidth, (int) y, width(),
 								(int) y );
 			}
 		}
@@ -1395,7 +1395,7 @@ void automationEditor::paintEvent( QPaintEvent * _pe )
 		qSwap<float>( selLevel_start, selLevel_end );
 	}
 
-	if( validPattern() == TRUE )
+	if( validPattern() == true )
 	{
 		timeMap & time_map = m_pattern->getTimeMap();
 		timeMap::iterator it = time_map.begin();
@@ -1409,7 +1409,7 @@ void automationEditor::paintEvent( QPaintEvent * _pe )
 
 			const int x = ( pos_ticks - m_currentPosition ) *
 						m_ppt / DefaultTicksPerTact;
-			if( x > width() - VALUES_WIDTH )
+			if( x > width() - ValuesWidth )
 			{
 				break;
 			}
@@ -1440,17 +1440,17 @@ void automationEditor::paintEvent( QPaintEvent * _pe )
 				|| ( level < m_bottomLevel
 						&& m_bottomLevel <= 0 ) )
 			{
-				bool is_selected = FALSE;
+				bool is_selected = false;
 				// if we're in move-mode, we may only draw
 				// values in selected area, that have originally
 				// been selected and not values that are now in
 				// selection because the user moved it...
-				if( m_editMode == MOVE )
+				if( m_editMode == ModeMove )
 				{
 					if( m_selValuesForMove.contains(
 								it.key() ) )
 					{
-						is_selected = TRUE;
+						is_selected = true;
 					}
 				}
 				else if( level >= selLevel_start &&
@@ -1459,7 +1459,7 @@ void automationEditor::paintEvent( QPaintEvent * _pe )
 					pos_ticks + len_ticks <=
 								sel_pos_end )
 				{
-					is_selected = TRUE;
+					is_selected = true;
 				}
 
 				// we've done and checked all, lets draw the
@@ -1469,11 +1469,11 @@ void automationEditor::paintEvent( QPaintEvent * _pe )
 				if( m_y_auto )
 				{
 					y_start = (int)( grid_bottom
-						- ( grid_bottom - TOP_MARGIN )
+						- ( grid_bottom - TopMargin )
 						* ( level - m_minLevel )
 						/ ( m_maxLevel - m_minLevel ) );
 					int y_end = (int)( grid_bottom
-						+ ( grid_bottom - TOP_MARGIN )
+						+ ( grid_bottom - TopMargin )
 						* m_minLevel
 						/ ( m_maxLevel - m_minLevel ) );
 					rect_height = y_end - y_start;
@@ -1485,7 +1485,7 @@ void automationEditor::paintEvent( QPaintEvent * _pe )
 							* m_y_delta );
 					rect_height = (int)( level * m_y_delta );
 				}
-				drawValueRect( p, x + VALUES_WIDTH, y_start,
+				drawValueRect( p, x + ValuesWidth, y_start,
 							rect_width, rect_height,
 							is_selected );
 			}
@@ -1496,11 +1496,11 @@ void automationEditor::paintEvent( QPaintEvent * _pe )
 	else
 	{
 		QFont f = p.font();
-		f.setBold( TRUE );
+		f.setBold( true );
 		p.setFont( pointSize<14>( f ) );
 		p.setPen( QColor( 0, 255, 0 ) );
-		p.drawText( VALUES_WIDTH + 20, TOP_MARGIN + 40,
-				width() - VALUES_WIDTH - 20 - SCROLLBAR_SIZE,
+		p.drawText( ValuesWidth + 20, TopMargin + 40,
+				width() - ValuesWidth - 20 - ScrollBarSize,
 				grid_height - 40, Qt::TextWordWrap,
 				tr( "Please open an automation pattern with "
 					"the context menu of a control!" ) );
@@ -1513,10 +1513,10 @@ void automationEditor::paintEvent( QPaintEvent * _pe )
 	int y, h;
 	if( m_y_auto )
 	{
-		y = (int)( grid_bottom - ( ( grid_bottom - TOP_MARGIN )
+		y = (int)( grid_bottom - ( ( grid_bottom - TopMargin )
 				* ( selLevel_start - m_minLevel )
 				/ (float)( m_maxLevel - m_minLevel ) ) );
-		h = (int)( grid_bottom - ( ( grid_bottom - TOP_MARGIN )
+		h = (int)( grid_bottom - ( ( grid_bottom - TopMargin )
 				* ( selLevel_end - m_minLevel )
 				/ (float)( m_maxLevel - m_minLevel ) ) - y );
 	}
@@ -1527,10 +1527,10 @@ void automationEditor::paintEvent( QPaintEvent * _pe )
 		h = (int)( ( selLevel_start - selLevel_end ) * m_y_delta );
 	}
 	p.setPen( QColor( 0, 64, 192 ) );
-	p.drawRect( x + VALUES_WIDTH, y, w, h );
+	p.drawRect( x + ValuesWidth, y, w, h );
 
 	// TODO: Get this out of paint event
-	int l = ( validPattern() == TRUE )? (int) m_pattern->length() : 0;
+	int l = ( validPattern() == true )? (int) m_pattern->length() : 0;
 
 	// reset scroll-range
 	if( m_leftRightScroll->maximum() != l )
@@ -1539,7 +1539,7 @@ void automationEditor::paintEvent( QPaintEvent * _pe )
 		m_leftRightScroll->setPageStep( l );
 	}
 
-	if( validPattern() == TRUE )
+	if( validPattern() == true )
 	{
 		drawCross( p );
 	}
@@ -1548,10 +1548,10 @@ void automationEditor::paintEvent( QPaintEvent * _pe )
 	// draw current edit-mode-icon below the cursor
 	switch( m_editMode )
 	{
-		case DRAW: cursor = s_toolDraw; break;
-		case ERASE: cursor = s_toolErase; break;
-		case SELECT: cursor = s_toolSelect; break;
-		case MOVE: cursor = s_toolMove; break;
+		case ModeDraw: cursor = s_toolDraw; break;
+		case ModeErase: cursor = s_toolErase; break;
+		case ModeSelect: cursor = s_toolSelect; break;
+		case ModeMove: cursor = s_toolMove; break;
 	}
 	p.drawPixmap( mapFromGlobal( QCursor::pos() ) + QPoint( 8, 8 ),
 								*cursor );
@@ -1563,13 +1563,13 @@ void automationEditor::paintEvent( QPaintEvent * _pe )
 // responsible for moving/resizing scrollbars after window-resizing
 void automationEditor::resizeEvent( QResizeEvent * )
 {
-	m_leftRightScroll->setGeometry( VALUES_WIDTH, height() - SCROLLBAR_SIZE,
-							width() - VALUES_WIDTH,
-							SCROLLBAR_SIZE );
+	m_leftRightScroll->setGeometry( ValuesWidth, height() - ScrollBarSize,
+							width() - ValuesWidth,
+							ScrollBarSize );
 
-	int grid_height = height() - TOP_MARGIN - SCROLLBAR_SIZE;
-	m_topBottomScroll->setGeometry( width() - SCROLLBAR_SIZE, TOP_MARGIN,
-						SCROLLBAR_SIZE, grid_height );
+	int grid_height = height() - TopMargin - ScrollBarSize;
+	m_topBottomScroll->setGeometry( width() - ScrollBarSize, TopMargin,
+						ScrollBarSize, grid_height );
 
 	int half_grid = grid_height / 2;
 	int total_pixels = (int)( ( m_maxLevel - m_minLevel ) * m_y_delta + 1 );
@@ -1611,7 +1611,7 @@ void automationEditor::wheelEvent( QWheelEvent * _we )
 		if( _we->delta() > 0 )
 		{
 			m_ppt = qMin( m_ppt * 2, m_y_delta *
-						DEFAULT_STEPS_PER_TACT * 8 );
+						DefaultStepsPerTact * 8 );
 		}
 		else if( m_ppt >= 72 )
 		{
@@ -1621,7 +1621,7 @@ void automationEditor::wheelEvent( QWheelEvent * _we )
 		m_zoomingXComboBox->model()->setValue(
 			m_zoomingXComboBox->model()->findText( QString::number(
 					qRound( m_ppt * 100 /
-						DEFAULT_PPT ) ) +"%" ) );
+						DefaultPixelsPerTact ) ) +"%" ) );
 		// update timeline
 		m_timeLine->setPixelsPerTact( m_ppt );
 		update();
@@ -1644,11 +1644,11 @@ void automationEditor::wheelEvent( QWheelEvent * _we )
 
 float automationEditor::getLevel( int _y )
 {
-	int level_line_y = height() - SCROLLBAR_SIZE - 1;
+	int level_line_y = height() - ScrollBarSize - 1;
 	// pressed level
 	float level = roundf( ( m_bottomLevel + ( m_y_auto ?
 			( m_maxLevel - m_minLevel ) * ( level_line_y - _y )
-					/ (float)( level_line_y - TOP_MARGIN ) :
+					/ (float)( level_line_y - TopMargin ) :
 			( level_line_y - _y ) / (float)m_y_delta ) ) / m_step ) * m_step;
 	// some range-checking-stuff
 	if( level < m_bottomLevel )
@@ -1677,7 +1677,7 @@ inline bool automationEditor::inBBEditor( void )
 
 void automationEditor::play( void )
 {
-	if( validPattern() == FALSE )
+	if( validPattern() == false )
 	{
 		return;
 	}
@@ -1765,7 +1765,7 @@ void automationEditor::stop( void )
 	}
 	m_playButton->setIcon( embed::getIconPixmap( "play" ) );
 	m_playButton->update();
-	m_scrollBack = TRUE;
+	m_scrollBack = true;
 }
 
 
@@ -1793,7 +1793,7 @@ void automationEditor::verScrolled( int _new_pos )
 
 void automationEditor::drawButtonToggled( void )
 {
-	m_editMode = DRAW;
+	m_editMode = ModeDraw;
 	removeSelection();
 	update();
 }
@@ -1803,7 +1803,7 @@ void automationEditor::drawButtonToggled( void )
 
 void automationEditor::eraseButtonToggled( void )
 {
-	m_editMode = ERASE;
+	m_editMode = ModeErase;
 	removeSelection();
 	update();
 }
@@ -1813,7 +1813,7 @@ void automationEditor::eraseButtonToggled( void )
 
 void automationEditor::selectButtonToggled( void )
 {
-	m_editMode = SELECT;
+	m_editMode = ModeSelect;
 	removeSelection();
 	update();
 }
@@ -1823,7 +1823,7 @@ void automationEditor::selectButtonToggled( void )
 
 void automationEditor::moveButtonToggled( void )
 {
-	m_editMode = MOVE;
+	m_editMode = ModeMove;
 	m_selValuesForMove.clear();
 	getSelectedValues( m_selValuesForMove );
 	update();
@@ -1834,7 +1834,7 @@ void automationEditor::moveButtonToggled( void )
 
 void automationEditor::selectAll( void )
 {
-	if( validPattern() == FALSE )
+	if( validPattern() == false )
 	{
 		return;
 	}
@@ -1872,7 +1872,7 @@ void automationEditor::selectAll( void )
 // returns vector with pointers to all selected values
 void automationEditor::getSelectedValues( timeMap & _selected_values )
 {
-	if( validPattern() == FALSE )
+	if( validPattern() == false )
 	{
 		return;
 	}
@@ -1940,7 +1940,7 @@ void automationEditor::copySelectedValues( void )
 
 void automationEditor::cutSelectedValues( void )
 {
-	if( validPattern() == FALSE )
+	if( validPattern() == false )
 	{
 		return;
 	}
@@ -1971,7 +1971,7 @@ void automationEditor::cutSelectedValues( void )
 
 void automationEditor::pasteValues( void )
 {
-	if( validPattern() == FALSE )
+	if( validPattern() == false )
 	{
 		return;
 	}
@@ -1998,7 +1998,7 @@ void automationEditor::pasteValues( void )
 
 void automationEditor::deleteSelectedValues( void )
 {
-	if( validPattern() == FALSE )
+	if( validPattern() == false )
 	{
 		return;
 	}
@@ -2014,7 +2014,7 @@ void automationEditor::deleteSelectedValues( void )
 		m_pattern->removeValue( it.key() );
 	}
 
-	if( update_after_delete == TRUE )
+	if( update_after_delete == true )
 	{
 		engine::getSong()->setModified();
 		update();
@@ -2030,9 +2030,9 @@ void automationEditor::updatePosition( const midiTime & _t )
 	if( ( engine::getSong()->isPlaying() &&
 			engine::getSong()->playMode() ==
 					song::Mode_PlayAutomationPattern ) ||
-							m_scrollBack == TRUE )
+							m_scrollBack == true )
 	{
-		const int w = width() - VALUES_WIDTH;
+		const int w = width() - ValuesWidth;
 		if( _t > m_currentPosition + w * DefaultTicksPerTact / m_ppt )
 		{
 			m_leftRightScroll->setValue( _t.getTact() *
@@ -2045,7 +2045,7 @@ void automationEditor::updatePosition( const midiTime & _t )
 			m_leftRightScroll->setValue( t.getTact() *
 							DefaultTicksPerTact );
 		}
-		m_scrollBack = FALSE;
+		m_scrollBack = false;
 	}
 }
 
@@ -2055,7 +2055,7 @@ void automationEditor::updatePosition( const midiTime & _t )
 void automationEditor::zoomingXChanged( void )
 {
 	const QString & zfac = m_zoomingXModel.currentText();
-	m_ppt = zfac.left( zfac.length() - 1 ).toInt() * DEFAULT_PPT / 100;
+	m_ppt = zfac.left( zfac.length() - 1 ).toInt() * DefaultPixelsPerTact / 100;
 #ifdef LMMS_DEBUG
 	assert( m_ppt > 0 );
 #endif
@@ -2073,7 +2073,7 @@ void automationEditor::zoomingYChanged( void )
 	if( !m_y_auto )
 	{
 		m_y_delta = zfac.left( zfac.length() - 1 ).toInt()
-							* DEFAULT_Y_DELTA / 100;
+							* DefaultYDelta / 100;
 	}
 #ifdef LMMS_DEBUG
 	assert( m_y_delta > 0 );
@@ -2105,7 +2105,7 @@ void automationEditor::updateTopBottomLevels( void )
 	}
 
 	int total_pixels = (int)( ( m_maxLevel - m_minLevel ) * m_y_delta + 1 );
-	int grid_height = height() - TOP_MARGIN - SCROLLBAR_SIZE;
+	int grid_height = height() - TopMargin - ScrollBarSize;
 	int half_grid = grid_height / 2;
 
 	if( total_pixels > grid_height )
