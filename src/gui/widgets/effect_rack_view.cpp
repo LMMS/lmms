@@ -45,13 +45,19 @@ effectRackView::effectRackView( effectChain * _model, QWidget * _parent ) :
 	setAttribute( Qt::WA_OpaquePaintEvent, true );
 	setFixedSize( 250, 250 );
 
-	m_effectsGroupBox = new groupBox( tr( "EFFECTS CHAIN" ), this );
-	m_effectsGroupBox->setGeometry( 4, 5, 242, 240 );
+	m_mainLayout = new QVBoxLayout( this );
+	m_mainLayout->setSpacing( 0 );
+	m_mainLayout->setMargin( 5 );
+
+	m_effectsGroupBox = new groupBox( tr( "EFFECTS CHAIN" ) );
+	m_mainLayout->addWidget( m_effectsGroupBox );
 
 	m_scrollArea = new QScrollArea( m_effectsGroupBox );
 	m_scrollArea->setFixedSize( 230, 184 );
 	m_scrollArea->setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOn );
+	m_scrollArea->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
 	m_scrollArea->setPalette( QApplication::palette( m_scrollArea ) );
+	m_scrollArea->setWidget( new QWidget );
 	m_scrollArea->move( 6, 22 );
 
 	QPushButton * addButton = new QPushButton( m_effectsGroupBox );
@@ -59,8 +65,6 @@ effectRackView::effectRackView( effectChain * _model, QWidget * _parent ) :
 	addButton->move( 8, 210 );
 	connect( addButton, SIGNAL( clicked() ), this, SLOT( addEffect() ) );
 
-	QWidget * w = new QWidget;
-	m_scrollArea->setWidget( w );
 
 	m_lastY = 0;
 

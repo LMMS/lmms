@@ -52,6 +52,7 @@ controllerRackView::controllerRackView( ) :
 	m_scrollArea = new QScrollArea( this );
 	m_scrollArea->setFixedSize( 230, 184 );
 	m_scrollArea->setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOn );
+	m_scrollArea->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
 	m_scrollArea->setPalette( QApplication::palette( m_scrollArea ) );
 	m_scrollArea->move( 6, 22 );
 

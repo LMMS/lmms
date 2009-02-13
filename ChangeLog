@@ -1,5 +1,16 @@
 2009-02-12      Tobias Doerffel <tobydox/at/users/dot/sourceforge/dot/net>
 
+	* include/group_box.h:
+	* src/gui/widgets/effect_rack_view.cpp:
+	backport: manage effectRackView with a QVBoxLayout
+
+	* src/gui/widgets/controller_rack_view.cpp:
+	* src/gui/widgets/effect_rack_view.cpp:
+	backport: prevent Horizontal bars from appearing in some cases
+
+	* cmake/modules/Win32Toolchain.cmake:
+	reflect recent changes to MinGW cross compiling environment
+
 	* plugins/sf2_player/sf2_player.cpp:
 	update patch after loading settings (closes #2486372)
 

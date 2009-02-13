@@ -39,7 +39,7 @@ class groupBox : public QWidget, public boolModelView
 {
 	Q_OBJECT
 public:
-	groupBox( const QString & _caption, QWidget * _parent );
+	groupBox( const QString & _caption, QWidget * _parent = NULL );
 	virtual ~groupBox();
 
 	virtual void modelChanged( void );
