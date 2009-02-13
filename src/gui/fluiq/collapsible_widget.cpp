@@ -24,6 +24,7 @@
 
 
 #include <QtGui/QApplication> 
+#include <QtGui/QMenu> 
 #include <QtGui/QMouseEvent> 
 #include <QtGui/QPainter> 
 
@@ -397,7 +398,8 @@ void FLUIQ::CollapsibleWidget::collapse( void )
 	// hide all children
 	foreach( QWidget * w, findChildren<QWidget *>() )
 	{
-		if( w != m_header && w->parentWidget() == this )
+		if( w != m_header && w->parentWidget() == this &&
+				qobject_cast<QMenu *>( w ) == NULL )
 		{
 			w->hide();
 		}

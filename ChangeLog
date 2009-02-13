@@ -1,5 +1,8 @@
 2009-02-12	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
+	* src/gui/fluiq/collapsible_widget.cpp:
+	do not hide menus when collapsing widget
+
 	* src/gui/automation_editor.cpp:
 	* include/automation_editor.h:
 	* include/piano_roll.h:
