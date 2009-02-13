@@ -3,7 +3,7 @@
 /*
  * pattern.cpp - implementation of class pattern which holds notes
  *
- * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2005-2007 Danny McRae <khjklujn/at/yahoo.com>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
@@ -731,6 +731,7 @@ patternFreezeThread::patternFreezeThread( pattern * _pattern ) :
 
 patternFreezeThread::~patternFreezeThread()
 {
+	m_pattern->dataChanged();
 }
 
 
@@ -1311,8 +1312,9 @@ void patternView::paintEvent( QPaintEvent * )
 	}
 	else if( m_pat->m_frozenPattern != NULL )
 	{
+		p.setBrush( QBrush() );
 		p.setPen( QColor( 0, 224, 255 ) );
-		p.drawRect( 0, 0, width(), height() - 1 );
+		p.drawRect( 0, 0, width()-1, height() - 1 );
 		p.drawPixmap( 3, height() - s_frozen->height() - 4, *s_frozen );
 	}
 

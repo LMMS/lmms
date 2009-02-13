@@ -2,7 +2,7 @@
  * pattern.h - declaration of class pattern, which contains all informations
  *             about a pattern
  *
- * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -139,13 +139,12 @@ protected:
 	void ensureBeatNotes( void );
 	void updateBBTrack( void );
 
-	void abortFreeze( void );
-
 
 protected slots:
 	void clear( void );
 	void freeze( void );
 	void unfreeze( void );
+	void abortFreeze( void );
 	void changeTimeSignature( void );
 
 
