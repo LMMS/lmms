@@ -3,7 +3,7 @@
 /*
  * visualization_widget.cpp - widget for visualization of sound-data
  *
- * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -29,6 +29,7 @@
 #include <QtGui/QPainter>
 
 #include "visualization_widget.h"
+#include "gui_templates.h"
 #include "main_window.h"
 #include "embed.h"
 #include "engine.h"
@@ -42,7 +43,7 @@ visualizationWidget::visualizationWidget( const QPixmap & _bg, QWidget * _p,
 	QWidget( _p ),
 	s_background( _bg ),
 	m_points( new QPointF[engine::getMixer()->framesPerPeriod()] ),
-	m_active( FALSE )
+	m_active( false )
 {
 	setFixedSize( s_background.width(), s_background.height() );
 	setAttribute( Qt::WA_OpaquePaintEvent, true );
@@ -55,9 +56,6 @@ visualizationWidget::visualizationWidget( const QPixmap & _bg, QWidget * _p,
 
 	toolTip::add( this, tr( "click to enable/disable visualization of "
 							"master-output" ) );
-
-	setActive( TRUE );
-
 }
 
 
@@ -80,11 +78,7 @@ void visualizationWidget::updateAudioBuffer( void )
 		const surroundSampleFrame * c = engine::getMixer()->
 							currentReadBuffer();
 		const fpp_t fpp = engine::getMixer()->framesPerPeriod();
-		for( f_cnt_t f = 0; f < fpp; ++f )
-		{
-			m_buffer[f][0] = c[f][0];
-			m_buffer[f][1] = c[f][1];
-		}
+		memcpy( m_buffer, c, sizeof( surroundSampleFrame ) * fpp );
 		engine::getMixer()->unlock();
 	}
 }
@@ -173,12 +167,18 @@ void visualizationWidget::paintEvent( QPaintEvent * )
 			{
 				m_points[frame] = QPointF(
 					x_base + (float) frame * xd,
-					y_base + ( mixer::clip( m_buffer[frame][ch] ) *
-									half_h ) );
+					y_base + ( mixer::clip(
+						m_buffer[frame][ch] ) *
+								half_h ) );
 			}
 			p.drawPolyline( m_points, frames );
 		}
-
+	}
+	else
+	{
+		p.setPen( QColor( 192, 192, 192 ) );
+		p.setFont( pointSize<7>( p.font() ) );
+		p.drawText( 6, height()-5, tr( "Click to enable" ) );
 	}
 }
 
