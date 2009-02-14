@@ -1,3 +1,8 @@
+2009-02-14	Tobias Doerffel <tobydox/at/users/dot/sourceforge/dot/net>
+
+	* src/3rdparty/samplerate/samplerate.h:
+	reverted rev 2037 as we have custom changes in this file
+
 2009-02-13	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* include/pattern.h:
