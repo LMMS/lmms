@@ -125,7 +125,7 @@
        <item>
         <widget class="QLabel" name="label_3" >
          <property name="text" >
-          <string>Copyright (c) 2004-2008, LMMS developers</string>
+          <string>Copyright (c) 2004-2009, LMMS developers</string>
          </property>
          <property name="wordWrap" >
           <bool>true</bool>
@@ -151,7 +151,9 @@
        <item>
         <widget class="QLabel" name="label_4" >
          <property name="text" >
-          <string>http://lmms.sourceforge.net</string>
+          <string>http://lmms.sourceforge.net
+
+Join us on Freenode (irc.freenode.net) in ##lmms!</string>
          </property>
          <property name="wordWrap" >
           <bool>true</bool>
