@@ -3,7 +3,7 @@
 /*
  * song_editor.cpp - basic window for song-editing
  *
- * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -51,6 +51,7 @@
 #include "tooltip.h"
 #include "visualization_widget.h"
 #include "audio_device.h"
+#include "piano_roll.h"
 
 
 
@@ -414,6 +415,7 @@ void songEditor::scrolled( int _new_pos )
 void songEditor::play( void )
 {
 	m_s->play();
+	engine::getPianoRoll()->stopRecording();
 	if( m_s->playMode() == song::Mode_PlaySong )
 	{
 		m_playButton->setIcon( embed::getIconPixmap( "pause" ) );
@@ -446,6 +448,7 @@ void songEditor::recordAccompany( void )
 void songEditor::stop( void )
 {
 	m_s->stop();
+	engine::getPianoRoll()->stopRecording();
 	m_playButton->setIcon( embed::getIconPixmap( "play" ) );
 }
 

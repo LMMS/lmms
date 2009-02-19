@@ -2,7 +2,7 @@
  * piano_roll.h - declaration of class pianoRoll which is a window where you
  *                can set and edit notes in an easy way
  *
- * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2008 Andrew Kelley <superjoe30/at/gmail/dot/com>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
@@ -34,6 +34,7 @@
 #include "serializing_object.h"
 #include "note.h"
 #include "lmms_basics.h"
+#include "song.h"
 
 
 class QPainter;
@@ -56,6 +57,11 @@ class pianoRoll : public QWidget, public serializingObject
 public:
 	void setCurrentPattern( pattern * _new_pattern );
 
+	inline void stopRecording( void )
+	{
+		m_recording = false;
+	}
+
 	inline bool isRecording( void ) const
 	{
 		return m_recording;
@@ -70,6 +76,8 @@ public:
 	{
 		return m_pattern != NULL;
 	}
+
+	song::PlayModes desiredPlayModeForAccompany( void ) const;
 
 	int quantization( void ) const;
 
@@ -110,7 +118,8 @@ protected slots:
 	void recordAccompany( void );
 	void stop( void );
 
-	void recordNote( const note & _n );
+	void startRecordNote( const note & _n );
+	void finishRecordNote( const note & _n );
 
 	void horScrolled( int _new_pos );
 	void verScrolled( int _new_pos );
@@ -241,6 +250,7 @@ private:
 
 	midiTime m_currentPosition;
 	bool m_recording;
+	QList<note> m_recordingNotes;
 
 	note * m_currentNote;
 	actions m_action;

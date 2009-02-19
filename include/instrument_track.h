@@ -2,7 +2,7 @@
  * instrument_track.h - declaration of class instrumentTrack, a track + window
  *                      which holds an instrument-plugin
  *
- * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -185,7 +185,8 @@ public:
 signals:
 	void instrumentChanged( void );
 	void newNote( void );
-	void noteDone( const note & _n );
+	void noteOn( const note & _n );
+	void noteOff( const note & _n );
 	void nameChanged( void );
 
 

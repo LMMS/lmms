@@ -1,3 +1,19 @@
+2009-02-19	Tobias Doerffel <tobydox/at/users/dot/sourceforge/dot/net>
+
+	* include/instrument_track.h:
+	* include/piano_roll.h:
+	* src/gui/piano_roll.cpp:
+	* src/gui/song_editor.cpp:
+	* src/tracks/instrument_track.cpp:
+	fixed various bugs regarding recording:
+	- once recording has been started, stop it as soon as playMode of song
+	  changes or similiar things happen (closes #2486341)
+	- fixed broken record-accompany in most use-cases other than using
+	  record-while-playing-song by also tracking NoteOn events and remember
+	  current play position to use the correct note postitions on NoteOff
+	  events (play position might have wrapped around in the meantime due
+	  to looppoints or end of BB track) (closes #2486299, #2486203)
+
 2009-02-14	Tobias Doerffel <tobydox/at/users/dot/sourceforge/dot/net>
 
 	* src/3rdparty/samplerate/samplerate.h:
