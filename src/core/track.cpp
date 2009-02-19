@@ -1361,6 +1361,7 @@ trackOperationsWidget::trackOperationsWidget( trackView * _parent ) :
 
 	m_trackOps = new QPushButton( this );
 	m_trackOps->move( 12, 1 );
+	m_trackOps->setFocusPolicy( Qt::NoFocus );
 	m_trackOps->setMenu( to_menu );
 	toolTip::add( m_trackOps, tr( "Actions for this track" ) );
 
