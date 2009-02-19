@@ -3089,10 +3089,18 @@ void pianoRoll::startRecordNote( const note & _n )
 				engine::getSong()->playMode() ==
 					song::Mode_PlayPattern ) )
 	{
+		midiTime sub;
+		if( engine::getSong()->playMode() == song::Mode_PlaySong )
+		{
+			sub = m_pattern->startPosition();
+		}
 		note n( 1, engine::getSong()->getPlayPos(
-					engine::getSong()->playMode() ),
+					engine::getSong()->playMode() ) - sub,
 				_n.key(), _n.getVolume(), _n.getPanning() );
-		m_recordingNotes << n;
+		if( n.pos() >= 0 )
+		{
+			m_recordingNotes << n;
+		}
 	}
 }
 
