@@ -2,7 +2,7 @@
  * note.h - declaration of class note which contains all informations about a
  *          note + definitions of several constants and enums
  *
- * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -119,27 +119,27 @@ public:
 		// using qSort
 		return (bool) ((int) ( *lhs ).pos() < (int) ( *rhs ).pos());
 	}
-		
+
 	inline bool selected( void ) const
 	{
 		return m_selected;
 	}
-	
+
 	inline int oldKey( void ) const
 	{
 		return m_oldKey;
 	}
-	
+
 	inline midiTime oldPos( void ) const
 	{
 		return m_oldPos;
 	}
-	
+
 	inline midiTime oldLength( void ) const
 	{
 		return m_oldLength;
 	}
-		
+
 	inline bool isPlaying( void ) const
 	{
 		return m_isPlaying;
@@ -153,12 +153,12 @@ public:
 
 	inline const midiTime & length( void ) const
 	{
-		return( m_length );
+		return m_length;
 	}
 
 	inline const midiTime & pos( void ) const
 	{
-		return( m_pos );
+		return m_pos;
 	}
 
 	inline midiTime pos( midiTime _base_pos ) const
@@ -169,34 +169,34 @@ public:
 
 	inline int key( void ) const
 	{
-		return( m_key );
+		return m_key;
 	}
 
 	inline volume getVolume( void ) const
 	{
-		return( m_volume );
+		return m_volume;
 	}
 
 	inline panning getPanning( void ) const
 	{
-		return( m_panning );
+		return m_panning;
 	}
 
 	static QString classNodeName( void )
 	{
-		return( "note" );
+		return "note";
 	}
 
 	inline virtual QString nodeName( void ) const
 	{
-		return( classNodeName() );
+		return classNodeName();
 	}
 
 	static midiTime quantized( const midiTime & _m, const int _q_grid );
 
 	detuningHelper * detuning( void ) const
 	{
-		return( m_detuning );
+		return m_detuning;
 	}
 
 	void editDetuningPattern( void );
