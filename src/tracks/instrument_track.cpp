@@ -2,7 +2,7 @@
  * instrument_track.cpp - implementation of instrument-track-class
  *                        (window + data-structures)
  *
- * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -248,6 +248,8 @@ void instrumentTrack::processInEvent( const midiEvent & _me,
 					{
 						m_notes[_me.key()] = nph;
 					}
+
+					emit noteOn( n );
 				}
 				break;
 			}
@@ -259,7 +261,7 @@ void instrumentTrack::processInEvent( const midiEvent & _me,
 			{
 				// create dummy-note which has the same length
 				// as the played note for sending it later
-				// to all slots connected to signal noteDone()
+				// to all slots connected to signal noteOff()
 				// this is for example needed by piano-roll for
 				// recording notes into a pattern
 				note done_note(
@@ -274,7 +276,7 @@ void instrumentTrack::processInEvent( const midiEvent & _me,
 				n->noteOff();
 				m_notes[_me.key()] = NULL;
 
-				emit noteDone( done_note );
+				emit noteOff( done_note );
 			}
 			break;
 		}
@@ -463,7 +465,7 @@ void instrumentTrack::deleteNotePluginData( notePlayHandle * _n )
 					_n->getVolume(), _n->getPanning() );
 		_n->noteOff();
 		m_notes[_n->key()] = NULL;
-		emit noteDone( done_note );
+		emit noteOff( done_note );
 	}
 }
 

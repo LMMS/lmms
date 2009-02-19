@@ -48,6 +48,7 @@
 #include <math.h>
 
 
+#include "bb_track_container.h"
 #include "clipboard.h"
 #include "combobox.h"
 #include "debug.h"
@@ -574,11 +575,12 @@ void pianoRoll::setCurrentPattern( pattern * _new_pattern )
 	// of start-notes and so on...)
 	resizeEvent( NULL );
 
-	// and now connect to noteDone()-signal of channel so that
-	// we receive note-off-events from it's midi-port for recording it
 	connect( m_pattern->getInstrumentTrack(),
-			SIGNAL( noteDone( const note & ) ),
-			this, SLOT( recordNote( const note & ) ) );
+			SIGNAL( noteOn( const note & ) ),
+			this, SLOT( startRecordNote( const note & ) ) );
+	connect( m_pattern->getInstrumentTrack(),
+			SIGNAL( noteOff( const note & ) ),
+			this, SLOT( finishRecordNote( const note & ) ) );
 
 	setWindowTitle( tr( "Piano-Roll - %1" ).arg( m_pattern->name() ) );
 
@@ -2964,6 +2966,19 @@ int pianoRoll::getKey( int _y ) const
 
 
 
+song::PlayModes pianoRoll::desiredPlayModeForAccompany( void ) const
+{
+	if( m_pattern->getTrack()->getTrackContainer() ==
+					engine::getBBTrackContainer() )
+	{
+		return song::Mode_PlayBB;
+	}
+	return song::Mode_PlaySong;
+}
+
+
+
+
 void pianoRoll::play( void )
 {
 	engine::getMainWindow()->setPlaybackMode( PPM_PianoRoll );
@@ -3038,7 +3053,7 @@ void pianoRoll::recordAccompany( void )
 	}
 
 	m_recording = true;
-	
+
 	if( m_pattern->getTrack()->getTrackContainer() == engine::getSong() )
 	{
 		engine::getSong()->play();
@@ -3065,17 +3080,49 @@ void pianoRoll::stop( void )
 
 
 
-void pianoRoll::recordNote( const note & _n )
+void pianoRoll::startRecordNote( const note & _n )
 {
-	if( m_recording == true && validPattern() == true )
+	if( m_recording == true && validPattern() == true &&
+		engine::getSong()->isPlaying() &&
+			( engine::getSong()->playMode() ==
+					desiredPlayModeForAccompany() ||
+				engine::getSong()->playMode() ==
+					song::Mode_PlayPattern ) )
 	{
-		note n( _n.length(), engine::getSong()->getPlayPos(
-				engine::getSong()->playMode() ) - _n.length(),
+		note n( 1, engine::getSong()->getPlayPos(
+					engine::getSong()->playMode() ),
 				_n.key(), _n.getVolume(), _n.getPanning() );
-		n.quantizeLength( quantization() );
-		m_pattern->addNote( n );
-		update();
-		engine::getSong()->setModified();
+		m_recordingNotes << n;
+	}
+}
+
+
+
+
+void pianoRoll::finishRecordNote( const note & _n )
+{
+	if( m_recording == true && validPattern() == true &&
+		engine::getSong()->isPlaying() &&
+			( engine::getSong()->playMode() ==
+					desiredPlayModeForAccompany() ||
+				engine::getSong()->playMode() ==
+					song::Mode_PlayPattern ) )
+	{
+		for( QList<note>::Iterator it = m_recordingNotes.begin();
+					it != m_recordingNotes.end(); ++it )
+		{
+			if( it->key() == _n.key() )
+			{
+				note n( _n.length(), it->pos(),
+						it->key(), it->getVolume(),
+						it->getPanning() );
+				n.quantizeLength( quantization() );
+				m_pattern->addNote( n );
+				update();
+				m_recordingNotes.erase( it );
+				break;
+			}
+		}
 	}
 }
 
