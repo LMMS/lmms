@@ -135,6 +135,7 @@ protected slots:
 	void deleteSelectedNotes( void );
 
 	void updatePosition( const midiTime & _t );
+	void updatePositionAccompany( const midiTime & _t );
 
 	void zoomingChanged( void );
 	void quantizeChanged( void );
@@ -183,6 +184,8 @@ private:
 	pianoRoll( void );
 	pianoRoll( const pianoRoll & );
 	virtual ~pianoRoll();
+
+	void autoScroll( const midiTime & _t );
 
 	midiTime newNoteLen( void ) const;
 	
