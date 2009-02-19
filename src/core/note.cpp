@@ -3,7 +3,7 @@
 /*
  * note.cpp - implementation of class note
  *
- * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -49,7 +49,8 @@ note::note( const midiTime & _length, const midiTime & _pos,
 	m_volume( tLimit( _volume, MinVolume, MaxVolume ) ),
 	m_panning( tLimit( _panning, PanningLeft, PanningRight ) ),
 	m_length( _length ),
-	m_pos( _pos )
+	m_pos( _pos ),
+	m_detuning( NULL )
 {
 	//saveJournallingState( FALSE );
 //	setJournalling( FALSE );
@@ -78,9 +79,17 @@ note::note( const note & _note ) :
 	m_volume( _note.m_volume ),
 	m_panning( _note.m_panning ),
 	m_length( _note.m_length ),
-	m_pos( _note.m_pos )
+	m_pos( _note.m_pos ),
+	m_detuning( NULL )
 {
-	m_detuning = sharedObject::ref( _note.m_detuning );
+	if( _note.m_detuning )
+	{
+		m_detuning = sharedObject::ref( _note.m_detuning );
+	}
+	else
+	{
+		createDetuning();
+	}
 }
 
 
@@ -88,7 +97,10 @@ note::note( const note & _note ) :
 
 note::~note()
 {
-	sharedObject::unref( m_detuning );
+	if( m_detuning )
+	{
+		sharedObject::unref( m_detuning );
+	}
 }
 
 
@@ -269,7 +281,7 @@ void note::createDetuning( void )
 
 bool note::hasDetuningInfo( void ) const
 {
-	return( m_detuning && m_detuning->hasAutomation() );
+	return m_detuning && m_detuning->hasAutomation();
 }
 
 
