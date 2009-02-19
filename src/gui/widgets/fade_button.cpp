@@ -3,7 +3,7 @@
 /*
  * fade_button.cpp - implementation of fade-button
  *
- * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -35,15 +35,19 @@
 #include "update_event.h"
 
 
+const float FadeDuration = 300;
+
+
 fadeButton::fadeButton( const QColor & _normal_color,
 			const QColor & _activated_color, QWidget * _parent ) :
 	QAbstractButton( _parent ),
-	m_state( 0.0f ),
+	m_stateTimer(),
 	m_normalColor( _normal_color ),
 	m_activatedColor( _activated_color )
 {
 	setAttribute( Qt::WA_OpaquePaintEvent, true );
 	setCursor( QCursor( embed::getIconPixmap( "hand" ), 0, 0 ) );
+	setFocusPolicy( Qt::NoFocus );
 }
 
 
@@ -58,18 +62,9 @@ fadeButton::~fadeButton()
 
 void fadeButton::activate( void )
 {
-	m_state = 1.00f;
+	m_stateTimer.restart();
 	signalUpdate();
 }
-
-
-
-void fadeButton::reset( void )
-{
-	m_state = 0.0f;
-	signalUpdate();
-}
-
 
 
 
@@ -85,20 +80,19 @@ void fadeButton::customEvent( QEvent * )
 void fadeButton::paintEvent( QPaintEvent * _pe )
 {
 	QColor col = m_normalColor;
-	if( m_state > 0.0f )
+	if( m_stateTimer.elapsed() < FadeDuration )
 	{
+		const float state = 1 - m_stateTimer.elapsed() / FadeDuration;
 		const int r = (int)( m_normalColor.red() *
-					( 1.0f - m_state ) +
-			m_activatedColor.red() * m_state );
+					( 1.0f - state ) +
+			m_activatedColor.red() * state );
 		const int g = (int)( m_normalColor.green() *
-					( 1.0f - m_state ) +
-			m_activatedColor.green() * m_state );
+					( 1.0f - state ) +
+			m_activatedColor.green() * state );
 		const int b = (int)( m_normalColor.blue() *
-					( 1.0f - m_state ) +
-			m_activatedColor.blue() * m_state );
+					( 1.0f - state ) +
+			m_activatedColor.blue() * state );
 		col.setRgb( r, g, b );
-
-		m_state -= 0.1f;
 		QTimer::singleShot( 20, this, SLOT( update() ) );
 	}
 

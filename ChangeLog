@@ -1,5 +1,16 @@
 2009-02-19	Tobias Doerffel <tobydox/at/users/dot/sourceforge/dot/net>
 
+	* include/fade_button.h:
+	* src/gui/widgets/fade_button.cpp:
+	rewrote timing of fading animation for not postponing updates of
+	hidden fadeButton until it becomes visible
+
+	* src/gui/widgets/automatable_button.cpp:
+	* src/core/track.cpp:
+	make sure all buttons in trackOperationsWidget have focus-policy
+	set to Qt::NoFocus in order to make space play song even if you clicked
+	e.g. a mute-button (closes #2486211)
+
 	* include/note.h:
 	* src/core/note.cpp:
 	- coding style fixes
