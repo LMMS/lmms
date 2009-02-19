@@ -1,7 +1,7 @@
 /*
  * fade_button.h - declaration of class fadeButton 
  *
- * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -26,6 +26,7 @@
 #ifndef _FADE_BUTTON_H
 #define _FADE_BUTTON_H 
 
+#include <QtCore/QTime>
 #include <QtGui/QAbstractButton>
 #include <QtGui/QColor>
 
@@ -42,7 +43,6 @@ public:
 
 public slots:
 	void activate( void );
-	void reset( void );
 
 
 protected:
@@ -51,7 +51,7 @@ protected:
 
 
 private:
-	float m_state;
+	QTime m_stateTimer;
 	QColor m_normalColor;
 	QColor m_activatedColor;
 
