@@ -236,6 +236,17 @@ pianoRoll::pianoRoll( void ) :
 	connect( m_timeLine, SIGNAL( positionChanged( const midiTime & ) ),
 			this, SLOT( updatePosition( const midiTime & ) ) );
 
+	// update timeline when in record-accompany mode
+	connect( engine::getSong()->getPlayPos( song::Mode_PlaySong ).m_timeLine,
+				SIGNAL( positionChanged( const midiTime & ) ),
+			this,
+			SLOT( updatePositionAccompany( const midiTime & ) ) );
+	// TODO
+/*	connect( engine::getSong()->getPlayPos( song::Mode_PlayBB ).m_timeLine,
+				SIGNAL( positionChanged( const midiTime & ) ),
+			this,
+			SLOT( updatePositionAccompany( const midiTime & ) ) );*/
+
 
 	m_toolBar = new QWidget( this );
 	m_toolBar->setFixedHeight( 32 );
@@ -3433,6 +3444,27 @@ void pianoRoll::deleteSelectedNotes( void )
 
 
 
+void pianoRoll::autoScroll( const midiTime & _t )
+{
+	const int w = width() - WhiteKeyWidth;
+	if( _t > m_currentPosition + w * midiTime::ticksPerTact() / m_ppt )
+	{
+		m_leftRightScroll->setValue( _t.getTact() *
+					midiTime::ticksPerTact() );
+	}
+	else if( _t < m_currentPosition )
+	{
+		midiTime t = qMax( _t - w * midiTime::ticksPerTact() *
+					midiTime::ticksPerTact() / m_ppt, 0 );
+		m_leftRightScroll->setValue( t.getTact() *
+						midiTime::ticksPerTact() );
+	}
+	m_scrollBack = false;
+}
+
+
+
+
 void pianoRoll::updatePosition( const midiTime & _t )
 {
 	if( ( engine::getSong()->isPlaying() &&
@@ -3441,21 +3473,30 @@ void pianoRoll::updatePosition( const midiTime & _t )
 		m_timeLine->autoScroll() == timeLine::AutoScrollEnabled ) ||
 							m_scrollBack == true )
 	{
-		const int w = width() - WhiteKeyWidth;
-		if( _t > m_currentPosition + w * midiTime::ticksPerTact() /
-									m_ppt )
+		autoScroll( _t );
+	}
+}
+
+
+
+
+void pianoRoll::updatePositionAccompany( const midiTime & _t )
+{
+	song * s = engine::getSong();
+
+	if( m_recording && validPattern() &&
+					s->playMode() != song::Mode_PlayPattern )
+	{
+		midiTime pos = _t;
+		if( s->playMode() != song::Mode_PlayBB )
 		{
-			m_leftRightScroll->setValue( _t.getTact() *
-						midiTime::ticksPerTact() );
+			pos -= m_pattern->startPosition();
 		}
-		else if( _t < m_currentPosition )
+		if( (int) pos > 0 )
 		{
-			midiTime t = qMax( _t - w * midiTime::ticksPerTact() *
-					midiTime::ticksPerTact() / m_ppt, 0 );
-			m_leftRightScroll->setValue( t.getTact() *
-						midiTime::ticksPerTact() );
+			s->getPlayPos( song::Mode_PlayPattern ).setTicks( pos );
+			autoScroll( pos );
 		}
-		m_scrollBack = false;
 	}
 }
 

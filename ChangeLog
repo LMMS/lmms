@@ -18,6 +18,8 @@
 	  current play position to use the correct note postitions on NoteOff
 	  events (play position might have wrapped around in the meantime due
 	  to looppoints or end of BB track) (closes #2486299, #2486203)
+	- move timeLine marker in Piano Roll and autoscroll when recording while
+	  playing song (closes #2486334)
 
 2009-02-14	Andrew Kelley	<superjoe30/at/gmail/dot/com>
 
