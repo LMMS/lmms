@@ -16,6 +16,14 @@
 	* src/gui/cusis_style.cpp:
 	Fix cache collision bug 
 
+	* src/gui/tracks/pattern_item.cpp:
+	Place marks once-per-tact
+
+	* src/gui/tracks/bb_tco_item.cpp:
+	* src/gui/tracks/track_content_object_item.cpp:
+	* src/gui/cusis_style.cpp:
+	Add per-TCO coloring and non-linear motion when dragging
+
 2009-02-19	Paul Giblock <drfaygo/at/gmail/dot/com>
 	
 	* include/track.h:

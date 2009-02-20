@@ -63,7 +63,7 @@ void PatternItem::paint(
 	options->rect = rc;
 	options->selected = isSelected();
 	options->hovered = m_hover;
-	options->duration = 0;
+	options->duration = 1;
 
 	engine::getLmmsStyle()->drawTrackContentObject( _painter, m_tco, options );
 

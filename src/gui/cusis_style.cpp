@@ -147,7 +147,7 @@ QLinearGradient darken( const QLinearGradient & _gradient )
 	QGradientStops stops = _gradient.stops();
 	for (int i = 0; i < stops.size(); ++i) {
 		QColor color = stops.at(i).second;
-		stops[i].second = color.lighter(150);
+		stops[i].second = color.lighter(133);
 	}
 
 	QLinearGradient g = _gradient;
@@ -195,7 +195,7 @@ void drawPath( QPainter *p, const QPainterPath &path,
 
 	// highlight (bb)
 	if (dark)
-		p->strokePath(path, QPen(borderCol.lighter(150), 2));
+		p->strokePath(path, QPen(borderCol.lighter(133), 2));
 	else
 		p->strokePath(path, QPen(borderCol, 2));
 }
@@ -919,22 +919,23 @@ void CusisStyle::drawTrackContentObject( QPainter * _painter,
 		cache.fill( Qt::transparent );
 		QPainter painter( &cache );
 
-		QColor col;
-		if( !_option->selected )
-		{
-			col = QColor( 0x00, 0x33, 0x99 );
-		}
-		else
-		{
-			col = QColor( 0x00, 0x99, 0x33 );
-		}
-
-		QColor colBorder = col.lighter(160);
+		QColor col = _option->userColor;
+		QColor colBorder;
 		QColor col0;
 		if( _option->type == LmmsStyleOptionTCO::BbTco )
-			col0 = col;
+		{
+			colBorder = col;
+			col0 = _option->selected ?
+				QColor( 0x33, 0x00, 0x99 ) :
+				col.darker(140);
+		}
 		else
-			col0 = col.darker(400);
+		{
+			colBorder = QColor( 0x00, 0x33, 0x99 );
+			col0 = _option->selected ?
+				QColor( 0x33, 0x00, 0x99 ).darker(180) :
+				colBorder.darker(420);
+		}
 
 		painter.setRenderHint( QPainter::Antialiasing, true );
 
@@ -957,7 +958,12 @@ void CusisStyle::drawTrackContentObject( QPainter * _painter,
 			}
 
 			painter.translate( 1, 0 );
-			painter.setPen( col.lighter(160) );
+			QColor faint = QColor::fromHsv( 
+					colBorder.hue(),
+					colBorder.saturation()/2,
+					colBorder.value() );
+
+			painter.setPen( faint );
 			for( float x = t * cellW; x < rc.width()-2; x += t * cellW )
 			{
 				painter.drawLine(x, 2, x, rc.height()-5);

@@ -62,14 +62,16 @@ void BbTrackContentObjectItem::paint(
 	_painter->scale( 1.0f/xscale, 1.0f );
 	rc.setWidth( rc.width() * xscale );
 
+	bbTCO * bbTco  = (bbTCO*)m_tco;
+
 	// TODO: Use a proxy class
 	LmmsStyleOptionTCO * options = new LmmsStyleOptionTCO();
 	options->type = LmmsStyleOptionTCO::BbTco;
 	options->rect = rc;
 	options->selected = isSelected();
 	options->hovered = m_hover;
+	options->userColor = bbTco->color();
 
-	bbTCO * bbTco  = (bbTCO*)m_tco;
 	int trackNum = bbTrack::numOfBBTrack( bbTco->getTrack() );
 	options->duration = engine::getBBTrackContainer()->lengthOfBB( trackNum );
 
