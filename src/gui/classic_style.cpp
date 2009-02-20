@@ -344,6 +344,8 @@ void ClassicStyle::drawTrackContentObject( QPainter * _painter,
 		const trackContentObject * _model, const LmmsStyleOptionTCO * _option )
 {
 	QRectF rc = _option->rect.adjusted( 0, 2, 0, -2 );
+	_painter->setRenderHint( QPainter::Antialiasing, false );
+
 	if( const bbTCO * bbTco = dynamic_cast<const bbTCO *>( _model ) )
 	{
 		QColor col( bbTco->color() );
@@ -359,7 +361,7 @@ void ClassicStyle::drawTrackContentObject( QPainter * _painter,
 		}
 		if( _option->hovered )
 		{
-			col = col.light(120);
+			col = col.light(130);
 		}
 
 		QLinearGradient lingrad( 0, 0, 0, rc.height() );
@@ -417,36 +419,21 @@ void ClassicStyle::drawTrackContentObject( QPainter * _painter,
 		//p.drawRect( 0, 0, width() - 1, height() - 1 );
 		p->drawRect( rc );
 
-		const float ppt = TrackContainerScene::DEFAULT_CELL_WIDTH;
 		const float TCO_BORDER_WIDTH = 1.0f;
+		float ppt = TrackContainerScene::DEFAULT_CELL_WIDTH;
 
 		if( const pattern * pat = dynamic_cast<const pattern *>( _model ) )
 		{
-			/*
-			const float ppt;
-			if( fixedTCOs() )
-			{
-				ppt = ( parentWidget()->width() - 2 * TCO_BORDER_WIDTH )
-						/ (float) m_pat->length().getTact();
-			}
-			else
-			{
-				pixelsPerTact();
-			}
-			*/
+			ppt = rc.width() / (float) pat->length().getTact();
 
-			const float x_base = TCO_BORDER_WIDTH + rc.top();
+			const float x_base = TCO_BORDER_WIDTH;
 			p->setPen( QColor( 0, 0, 0 ) );
 
 			for( tact t = 1; t < pat->length().getTact(); ++t )
 			{
-				p->drawLine( x_base + static_cast<int>( ppt * t ) - 1,
-						TCO_BORDER_WIDTH, x_base + static_cast<int>(
-								ppt * t ) - 1, 5 );
-				p->drawLine( x_base + static_cast<int>( ppt * t ) - 1,
-						rc.height() - ( 4 + 2 * TCO_BORDER_WIDTH ),
-						x_base + static_cast<int>( ppt * t ) - 1,
-						rc.height() - 2 * TCO_BORDER_WIDTH );
+				float x = x_base + static_cast<int>( ppt * t ) - 1;
+				p->drawLine( x, rc.top() + 0.5, x, rc.top() + 4 );
+				p->drawLine( x,	rc.bottom() - 4, x, rc.bottom() - 0.5 );
 			}
 
 			p->setClipRect( rc.adjusted( 1, 1, -1, -1 ) );
@@ -470,7 +457,6 @@ void ClassicStyle::drawTrackContentObject( QPainter * _painter,
 
 					if( total_notes > 0 )
 					{
-						p->setRenderHint( QPainter::Antialiasing, false );
 						central_key = central_key / total_notes;
 
 						const float central_y = rc.height() / 2.0f;
@@ -501,7 +487,7 @@ void ClassicStyle::drawTrackContentObject( QPainter * _painter,
 									y_pos > -central_y &&
 									y_pos < central_y )
 							{
-								const float x1 = 2 * x_base +
+								const float x1 =
 										( *it )->pos() * ppt / 
 										midiTime::ticksPerTact();
 								const float x2 =
@@ -509,11 +495,10 @@ void ClassicStyle::drawTrackContentObject( QPainter * _painter,
 										ppt / midiTime::ticksPerTact();
 
 								p->drawLine( x1, y_base + y_pos,	
-										x2, y_base + y_pos );
+										x2-1, y_base + y_pos );
 							}
 						}
 
-						p->setRenderHint( QPainter::Antialiasing, true );
 					}
 				}
 			}
@@ -615,5 +600,6 @@ void ClassicStyle::drawTrackContentObject( QPainter * _painter,
 			p->setClipping( false );
 		}
 	}
+	_painter->setRenderHint( QPainter::Antialiasing, true );
 }
 

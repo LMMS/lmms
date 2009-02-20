@@ -235,7 +235,7 @@ lfoControllerDialog::lfoControllerDialog( controller * _model, QWidget * _parent
 	setAutoFillBackground( TRUE );
 	QPalette pal;
 	pal.setBrush( backgroundRole(),
-				QColor( 255 ,0 ,0, 255 ) );
+			embed::getIconPixmap( "lfo_controller_artwork" ) );
 	setPalette( pal );
 
 }

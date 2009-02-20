@@ -123,17 +123,6 @@ void TrackContentObjectItem::paint( QPainter * _painter,
 
 
 
-float easeInOutQuad(float t, float b, float c, float d) 
-{
-    float t_adj = 2.0f * (float)t / (float)d;
-    if (t_adj < 1) {
-        return c/2*t_adj*t_adj + b;
-    } else {
-        --t_adj;
-        return -c/2 * ((t_adj)*(t_adj-2) - 1) + b;
-    }
-}
-
 // I think this was the best from Cubic thru Quint
 float easeInOutQuart(float t, float b, float c, float d) 
 {
