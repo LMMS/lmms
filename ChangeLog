@@ -24,6 +24,9 @@
 	* src/gui/cusis_style.cpp:
 	Add per-TCO coloring and non-linear motion when dragging
 
+	* src/gui/classic_style.cpp:
+	Fix text clipping
+
 2009-02-19	Paul Giblock <drfaygo/at/gmail/dot/com>
 	
 	* include/track.h:

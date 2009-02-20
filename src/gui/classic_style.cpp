@@ -449,10 +449,10 @@ void ClassicStyle::drawTrackContentObject( QPainter * _painter,
 						rc.height() - 2 * TCO_BORDER_WIDTH );
 			}
 
+			p->setClipRect( rc.adjusted( 1, 1, -1, -1 ) );
 			if( pat->type() == pattern::MelodyPattern )
 			{
 				int central_key = 0;
-				p->setClipRect( rc.adjusted( 1, 1, -1, -1 ) );
 				if( pat->notes().size() > 0 )
 				{
 					// first determine the central tone so that we can
@@ -516,7 +516,6 @@ void ClassicStyle::drawTrackContentObject( QPainter * _painter,
 						p->setRenderHint( QPainter::Antialiasing, true );
 					}
 				}
-				p->setClipping( false );
 			}
 			/*
 			else if( pat->type() == pattern::BeatPattern &&
@@ -613,6 +612,7 @@ void ClassicStyle::drawTrackContentObject( QPainter * _painter,
 				*/
 			}
 
+			p->setClipping( false );
 		}
 	}
 }
