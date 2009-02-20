@@ -68,6 +68,9 @@ public:
 	virtual void drawTrackContentBackground( QPainter * _painter,
 			const QSize & _size, const int _pixelsPerTact );
 
+	virtual void drawTrackContentObject( QPainter * _painter, const trackContentObject * _model,
+			const LmmsStyleOptionTCO * _options );
+
 	virtual QColor color( LmmsStyle::ColorRole _role ) const;
 
 private:

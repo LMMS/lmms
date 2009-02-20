@@ -19,17 +19,17 @@ class BbTrackContentObjectItem : public TrackContentObjectItem
 	Q_OBJECT
 
 public:
-    BbTrackContentObjectItem( TrackItem * _track, trackContentObject * _object );
+	BbTrackContentObjectItem( TrackItem * _track, trackContentObject * _object );
 
-	void paint( QPainter * _painter, const QStyleOptionGraphicsItem * _option,
-						QWidget * _widget );
-
-	QVariant itemChange( GraphicsItemChange _change, const QVariant & _value );
+	virtual void paint( QPainter * _painter, const QStyleOptionGraphicsItem * _option,
+			QWidget * _widget );
 
 
 protected:
-    virtual void mousePressEvent( QGraphicsSceneMouseEvent * event );
-    virtual void mouseReleaseEvent( QGraphicsSceneMouseEvent * event );
+	virtual QVariant itemChange( GraphicsItemChange _change, const QVariant & _value );
+
+	virtual void mousePressEvent( QGraphicsSceneMouseEvent * event );
+	virtual void mouseReleaseEvent( QGraphicsSceneMouseEvent * event );
 	
 };
 

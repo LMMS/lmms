@@ -78,7 +78,7 @@ public:
 	void rearrangeAllNotes( void );
 	void clearNotes( void );
 
-	inline const noteVector & notes( void )
+	inline const noteVector & notes( void ) const
 	{
 		return m_notes;
 	}
@@ -118,7 +118,7 @@ public:
 		return "pattern";
 	}
 
-	inline instrumentTrack * getInstrumentTrack( void )
+	inline instrumentTrack * getInstrumentTrack( void ) const
 	{
 		return m_instrumentTrack;
 	}

@@ -66,6 +66,9 @@ public:
 
 	virtual QColor color(LmmsStyle::ColorRole _role) const;
 
+	virtual void drawTrackContentObject( QPainter * _painter, const trackContentObject * _model,
+			const LmmsStyleOptionTCO * _options );
+
 	private:
 	QImage colorizeXpm( const char * const * xpm, const QBrush & fill ) const;
 

@@ -33,6 +33,13 @@
 #include "lmms_style.h"
 #include "classic_style.h"
 #include "gui_templates.h"
+#include "track.h"
+#include "gui/tracks/track_container_scene.h"
+#include "embed.h"
+#include "bb_track.h"
+#include "pattern.h"
+#include "instrument_track.h"
+
 
 
 ClassicStyle::ClassicStyle() :
@@ -331,3 +338,279 @@ void ClassicStyle::drawTrackContentBackground(QPainter * _painter,
     }
     _painter->drawLine( 0, h-2, w*2, h-2 );
 }
+
+
+
+void ClassicStyle::drawTrackContentObject( QPainter * _painter,
+		const trackContentObject * _model, const LmmsStyleOptionTCO * _option )
+{
+	QRectF rc = _option->rect.adjusted( 0, 2, 0, -2 );
+	if( const bbTCO * bbTco = dynamic_cast<const bbTCO *>( _model ) )
+	{
+		QColor col( bbTco->color() );
+
+		if( _model->getTrack()->isMuted() || _model->isMuted() )
+		{
+			col = QColor( 160, 160, 160 );
+		}
+		if( _option->selected )
+		{
+			col = QColor( qMax( col.red() - 128, 0 ),
+						qMax( col.green() - 128, 0 ), 255 );
+		}
+		if( _option->hovered )
+		{
+			col = col.light(120);
+		}
+
+		QLinearGradient lingrad( 0, 0, 0, rc.height() );
+		lingrad.setColorAt( 0, col.light( 130 ) );
+		lingrad.setColorAt( 1, col.light( 70 ) );
+		_painter->fillRect( rc, lingrad );
+
+		const float cellW = TrackContainerScene::DEFAULT_CELL_WIDTH;
+		const tick t = _option->duration;
+		if( _model->length() > midiTime::ticksPerTact() && t > 0 )
+		{
+			for( int x = t * cellW; x < rc.width()-2; x += t * cellW )
+			{
+				_painter->setPen( col.light( 80 ) );
+				_painter->drawLine( x, 3, x, 7 );
+				_painter->setPen( col.light( 120 ) );
+				_painter->drawLine( x, rc.height() - 4,
+						x, rc.height() - 0 );
+			}
+		}
+
+		_painter->setPen( col.dark() );
+		_painter->drawRect( rc );
+
+		_painter->setFont( pointSize<7>( _painter->font() ) );
+		_painter->setPen( QColor( 0, 0, 0 ) );
+		_painter->setClipRect( rc );
+		_painter->drawText( QPointF( rc.left(), _painter->fontMetrics().height() + rc.top() ), _model->name() );
+		_painter->setClipping( false );
+
+		if( _model->isMuted() )
+		{
+			_painter->drawPixmap( 3, _painter->fontMetrics().height() + 1,
+					embed::getIconPixmap( "muted", 16, 16 ) );
+		}
+	}
+	
+
+	else if( const pattern * pat = dynamic_cast<const pattern *>( _model ) )
+	{
+		QPainter * p = _painter;
+		QLinearGradient lingrad( 0, 0, 0, rc.height() );
+		QColor c = _option->selected ? 
+				QColor( 0, 0, 224 ) :
+				QColor( 96, 96, 96 );
+		if( _option->hovered )
+		{
+			c = c.light(120);
+		}
+		lingrad.setColorAt( 0, c );
+		lingrad.setColorAt( 0.5, Qt::black );
+		lingrad.setColorAt( 1, c );
+		p->setBrush( lingrad );
+		p->setPen( QColor( 0, 0, 0 ) );
+		//p.drawRect( 0, 0, width() - 1, height() - 1 );
+		p->drawRect( rc );
+
+		const float ppt = TrackContainerScene::DEFAULT_CELL_WIDTH;
+		const float TCO_BORDER_WIDTH = 1.0f;
+		/*
+		const float ppt;
+		if( fixedTCOs() )
+		{
+			ppt = ( parentWidget()->width() - 2 * TCO_BORDER_WIDTH )
+					/ (float) m_pat->length().getTact();
+		}
+		else
+		{
+			pixelsPerTact();
+		}
+		*/
+
+		const float x_base = TCO_BORDER_WIDTH + rc.top();
+		p->setPen( QColor( 0, 0, 0 ) );
+
+		for( tact t = 1; t < pat->length().getTact(); ++t )
+		{
+			p->drawLine( x_base + static_cast<int>( ppt * t ) - 1,
+					TCO_BORDER_WIDTH, x_base + static_cast<int>(
+							ppt * t ) - 1, 5 );
+			p->drawLine( x_base + static_cast<int>( ppt * t ) - 1,
+					rc.height() - ( 4 + 2 * TCO_BORDER_WIDTH ),
+					x_base + static_cast<int>( ppt * t ) - 1,
+					rc.height() - 2 * TCO_BORDER_WIDTH );
+		}
+
+		if( pat->type() == pattern::MelodyPattern )
+		{
+			int central_key = 0;
+			p->setClipRect( rc.adjusted( 1, 1, -1, -1 ) );
+			if( pat->notes().size() > 0 )
+			{
+				// first determine the central tone so that we can
+				// display the area where most of the notes are
+				int total_notes = 0;
+				for( noteVector::const_iterator it = pat->notes().begin();
+						it != pat->notes().end(); ++it )
+				{
+					if( ( *it )->length() > 0 )
+					{
+						central_key += ( *it )->key();
+						++total_notes;
+					}
+				}
+
+				if( total_notes > 0 )
+				{
+					p->setRenderHint( QPainter::Antialiasing, false );
+					central_key = central_key / total_notes;
+
+					const float central_y = rc.height() / 2.0f;
+					float y_base = central_y + TCO_BORDER_WIDTH - 1.0f;
+
+					if( pat->getTrack()->isMuted() ||
+								pat->isMuted() )
+					{
+						p->setPen( color( LmmsStyle::PianoRollMutedNote ) );
+					}
+					else if( pat->frozen() )
+					{
+						p->setPen( color( LmmsStyle::PianoRollFrozenNote ) );
+					}
+					else
+					{
+						p->setPen( color( LmmsStyle::PianoRollDefaultNote ) );
+					}
+
+					for( noteVector::const_iterator it =
+								pat->notes().begin();
+						it != pat->notes().end(); ++it )
+					{
+						const float y_pos = central_key -
+									( *it )->key();
+
+						if( ( *it )->length() > 0 &&
+								y_pos > -central_y &&
+								y_pos < central_y )
+						{
+							const float x1 = 2 * x_base +
+									( *it )->pos() * ppt / 
+									midiTime::ticksPerTact();
+							const float x2 =
+									( ( *it )->pos() + ( *it )->length() ) * 
+									ppt / midiTime::ticksPerTact();
+
+							p->drawLine( x1, y_base + y_pos,	
+									x2, y_base + y_pos );
+						}
+					}
+
+					p->setRenderHint( QPainter::Antialiasing, true );
+				}
+			}
+		}
+		/*
+		else if( pat->type() == pattern::BeatPattern &&
+				( fixedTCOs() || 
+				  ppt >= 96 || 
+				  pat->m_steps != midiTime::stepsPerTact() ) )
+		{
+			QPixmap stepon;
+			QPixmap stepoverlay;
+			QPixmap stepoff;
+			QPixmap stepoffl;
+			const int steps = m_pat->length() / DefaultBeatsPerTact;
+			const int w = width() - 2 * TCO_BORDER_WIDTH;
+			stepon = s_stepBtnOn->scaled( w / steps,
+					      	  s_stepBtnOn->height(),
+					      	  Qt::IgnoreAspectRatio,
+					      	  Qt::SmoothTransformation );
+			stepoverlay = s_stepBtnOverlay->scaled( w / steps,
+					      	  s_stepBtnOn->height(),
+					      	  Qt::IgnoreAspectRatio,
+					      	  Qt::SmoothTransformation );
+			stepoff = s_stepBtnOff->scaled( w / steps,
+							s_stepBtnOff->height(),
+							Qt::IgnoreAspectRatio,
+							Qt::SmoothTransformation );
+			stepoffl = s_stepBtnOffLight->scaled( w / steps,
+							s_stepBtnOffLight->height(),
+							Qt::IgnoreAspectRatio,
+							Qt::SmoothTransformation );
+			for( noteVector::iterator it = m_pat->m_notes.begin();
+						it != m_pat->m_notes.end(); ++it )
+			{
+				const int no = ( *it )->pos() / DefaultBeatsPerTact;
+				const int x = TCO_BORDER_WIDTH + static_cast<int>( no *
+									w / steps );
+				const int y = height() - s_stepBtnOff->height() - 1;
+
+				const int vol = ( *it )->getVolume();
+
+				if( ( *it )->length() < 0 )
+				{
+					p.drawPixmap( x, y, stepoff );
+					for( int i = 0; i < vol / 5 + 1; ++i )
+					{
+						p.drawPixmap( x, y, stepon );
+					}
+					for( int i = 0; i < ( 25 + ( vol - 75 ) ) / 5;
+										++i )
+					{
+						p.drawPixmap( x, y, stepoverlay );
+					}
+				}
+				else if( ( no / 4 ) % 2 )
+				{
+					p.drawPixmap( x, y, stepoff );
+				}
+				else
+				{
+					p.drawPixmap( x, y, stepoffl );
+				}
+			}
+		}
+		END BEAT TRACK */
+
+		p->setFont( pointSize<7>( p->font() ) );
+		if( pat->isMuted() || pat->getTrack()->isMuted() )
+		{
+			p->setPen( QColor( 192, 192, 192 ) );
+		}
+		else
+		{
+			p->setPen( QColor( 32, 240, 32 ) );
+		}
+
+		if( pat->name() != pat->getInstrumentTrack()->name() )
+		{
+			p->drawText( 2, p->fontMetrics().height() - 1, pat->name() );
+		}
+
+		if( pat->isMuted() )
+		{
+			p->drawPixmap( 3, p->fontMetrics().height() + 1,
+					embed::getIconPixmap( "muted", 16, 16 ) );
+		}
+		else if( pat->frozen() )
+		{
+			p->setBrush( QBrush() );
+			p->setPen( QColor( 0, 224, 255 ) );
+			p->drawRect( rc );
+			/* TODO:
+			p->drawPixmap( rc.left() + 3, 
+					rc.top() + height() - s_frozen->height() - 4, 
+					*s_frozen );
+			*/
+		}
+
+		p->setClipping( false );
+	}
+}
+

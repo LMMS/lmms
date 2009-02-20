@@ -36,6 +36,9 @@ const int BUTTON_LENGTH = 24;
 #include "cusis_style.h"
 #include "gui_templates.h"
 
+// For TrackContainerScene::DEFAULT_CELL_WIDTH;
+#include "gui/tracks/track_container_scene.h" 
+
 #include <iostream>
 #include <limits.h>
 
@@ -111,6 +114,94 @@ static const char * const s_scrollbarArrowLeftXpm[] = {
 
 
 
+QLinearGradient getGradient( const QColor & _col, const QRectF & _rect )
+{
+	QLinearGradient g( _rect.topLeft(), _rect.bottomLeft() );
+
+	qreal hue = _col.hueF();
+	qreal value = _col.valueF();
+	qreal saturation = _col.saturationF();
+
+	QColor c = _col;
+	c.setHsvF( hue, 0.42 * saturation, 0.98 * value ); // TODO: pattern: 1.08
+	g.setColorAt( 0, c );
+	c.setHsvF( hue, 0.58 * saturation, 0.95 * value ); // TODO: pattern: 1.05
+	g.setColorAt( 0.25, c );
+	c.setHsvF( hue, 0.70 * saturation, 0.93 * value ); // TODO: pattern: 1.03
+	g.setColorAt( 0.5, c );
+
+	c.setHsvF( hue, 0.95 * saturation, 0.9 * value );
+	g.setColorAt( 0.501, c );
+	c.setHsvF( hue * 0.95, 0.95 * saturation, 0.95 * value );
+	g.setColorAt( 0.75, c );
+	c.setHsvF( hue * 0.90, 0.95 * saturation, 1 * value );
+	g.setColorAt( 1.0, c );
+
+	return g;
+}
+
+
+
+QLinearGradient darken( const QLinearGradient & _gradient )
+{
+	QGradientStops stops = _gradient.stops();
+	for (int i = 0; i < stops.size(); ++i) {
+		QColor color = stops.at(i).second;
+		stops[i].second = color.lighter(150);
+	}
+
+	QLinearGradient g = _gradient;
+	g.setStops(stops);
+	return g;
+}
+
+
+
+void drawPath( QPainter *p, const QPainterPath &path,
+			   const QColor &col, const QColor &borderCol,
+			   bool dark = false )
+{
+	const QRectF pathRect = path.boundingRect();
+
+	const QLinearGradient baseGradient = getGradient(col, pathRect);
+	const QLinearGradient darkGradient = darken(baseGradient);
+
+	p->setOpacity(0.25);
+
+	// glow
+	if (dark)
+		p->strokePath(path, QPen(darkGradient, 4));
+	else
+		p->strokePath(path, QPen(baseGradient, 4));
+
+	p->setOpacity(1.0);
+
+	// fill
+	if (dark)
+		p->fillPath(path, darkGradient);
+	else
+		p->fillPath(path, baseGradient);
+
+	// TODO: Remove??
+	/*
+	QLinearGradient g(pathRect.topLeft(), pathRect.topRight());
+	g.setCoordinateMode(QGradient::ObjectBoundingMode);
+
+	p->setOpacity(0.2);
+	p->fillPath(path, g);*/
+	// END: Remove??
+
+	p->setOpacity(0.5);
+
+	// highlight (bb)
+	if (dark)
+		p->strokePath(path, QPen(borderCol.lighter(150), 2));
+	else
+		p->strokePath(path, QPen(borderCol, 2));
+}
+
+
+
 static QString getCacheKey( const QString & _key,
 		const QStyleOption * _option, const QSize & _size )
 {
@@ -128,6 +219,21 @@ static QString getCacheKey( const QString & _key,
 	return tmp;
 }
 
+
+static QString getTcoCacheKey( const QString & _key,
+		const LmmsStyleOptionTCO * _option )
+{
+	QString tmp;
+	tmp.sprintf( "%s,%d,%d,%d,%s,%.3fx%.3f",
+			_key.toLatin1().constData(),
+			_option->type,
+			_option->selected,
+			_option->hovered,
+			_option->userColor.name().constData(),
+			_option->rect.width(),
+			_option->rect.height() );
+	return tmp;
+}
 
 
 CusisStyle::CusisStyle() :
@@ -794,6 +900,74 @@ void CusisStyle::drawTrackContentBackground( QPainter * _painter, const QSize & 
 		_painter->drawLine( QLine( x, 0, x, h ) );
 	}
 	_painter->drawLine( 0, h - 1, w * 2, h - 1 );
+}
+
+
+
+void CusisStyle::drawTrackContentObject( QPainter * _painter,
+		const trackContentObject * _model, const LmmsStyleOptionTCO * _option )
+{
+	QString pixmapName = getTcoCacheKey( "tco", _option );
+	QPixmap cache;
+
+	if( !QPixmapCache::find( pixmapName, cache ) )
+	{
+		printf("Creating pixmap\n");
+		const QRectF & rc = _option->rect;
+
+		// TODO: Consider matrix m11 and m22 for scaling the pixmap
+		cache = QPixmap( rc.width(), rc.height() );
+		cache.fill( Qt::transparent );
+		QPainter painter( &cache );
+
+		QColor col;
+		if( !_option->selected )
+		{
+			col = QColor( 0x00, 0x33, 0x99 );
+		}
+		else
+		{
+			col = QColor( 0x00, 0x99, 0x33 );
+		}
+
+		QColor colBorder = col.lighter(160);
+		QColor col0;
+		if( _option->type == LmmsStyleOptionTCO::BbTco )
+			col0 = col;
+		else
+			col0 = col.darker(400);
+
+		painter.setRenderHint( QPainter::Antialiasing, true );
+
+		QPainterPath path;
+		path.addRoundedRect( 2, 2, rc.width()-4, rc.height()-4, 4, 4 );
+		drawPath( &painter, path, col0, colBorder, _option->hovered );
+
+		const float cellW = TrackContainerScene::DEFAULT_CELL_WIDTH;
+		const tick t = _option->duration;
+
+		if( _model->length() > midiTime::ticksPerTact() && t > 0 )
+		{
+			painter.setOpacity(0.2);
+			painter.setRenderHint( QPainter::Antialiasing, false );
+			painter.setPen( QColor(0, 0, 0) );
+
+			for( float x = t * cellW; x < rc.width()-2; x += t * cellW )
+			{
+				painter.drawLine(x, 3, x, rc.height()-5);
+			}
+
+			painter.translate( 1, 0 );
+			painter.setPen( col.lighter(160) );
+			for( float x = t * cellW; x < rc.width()-2; x += t * cellW )
+			{
+				painter.drawLine(x, 2, x, rc.height()-5);
+			}
+		}
+
+		QPixmapCache::insert( pixmapName, cache );
+	}
+	_painter->drawPixmap( 0, 0, cache );		
 }
 
 

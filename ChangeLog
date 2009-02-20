@@ -1,3 +1,44 @@
+2009-02-19	Paul Giblock <drfaygo/at/gmail/dot/com>
+	
+	* include/track.h:
+	* include/pattern.h:
+	Fixed constness
+
+	* include/lmms_style.h:
+	* include/classic_style.h:
+	* include/cusis_style.h:
+	* src/gui/tracks/track_content_object_item.cpp:
+	* src/gui/tracks/bb_tco_item.cpp:
+	* src/gui/tracks/pattern_item.cpp:
+	Move TCO drawing into LMMS style
+
+	* include/lcd_spinbox.h:
+	* include/combobox.h:
+	Update copyright
+
+	* include/gui/tracks/pattern_item.h:
+	* include/gui/tracks/track_content_object_item.h:
+	* include/gui/tracks/track_item.h:
+	* include/gui/tracks/track_container_scene.h:
+	* include/gui/tracks/bb_tco_item.h:
+	* src/gui/tracks/track_content_object_item.cpp:
+	* src/gui/tracks/track_item.cpp:
+	* src/gui/tracks/track_container_scene.cpp:
+	* src/gui/main_window.cpp:
+	Code style and cleanup
+
+	* src/gui/main_window.cpp:
+	Update for model move and resize
+
+	* src/gui/classic_style.cpp:
+	Add Classic TCO style back, unoptimized at the moment
+
+	* src/gui/cusis_style.cpp:
+	Move Shiny-TCO to Cusis and add pixmap caching
+
+
+
+
 2009-02-19	Tobias Doerffel <tobydox/at/users/dot/sourceforge/dot/net>
 
 	* include/fade_button.h:

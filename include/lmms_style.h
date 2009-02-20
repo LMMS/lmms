@@ -28,8 +28,17 @@
 #define _LMMS_STYLE_H
 
 
-// Defines for widgets
-#include "fx_mixer_view.h"
+#include <QColor>
+#include <QRect>
+#include "lmms_basics.h"
+
+class QPainter;
+class QSize;
+class QString;
+class QWidget;
+
+class LmmsStyleOptionTCO;
+class trackContentObject;
 
 
 class LmmsStyle
@@ -87,8 +96,32 @@ public:
 	virtual void drawTrackContentBackground(QPainter * _painter,
 			const QSize & _size, const int _pixelsPerTact) = 0;
 
+	virtual void drawTrackContentObject( QPainter * _painter, const trackContentObject * _model,
+			const LmmsStyleOptionTCO * _options ) = 0;
+
 	virtual QColor color(ColorRole _role) const = 0;
 
-} ;
+};
+
+
+
+class LmmsStyleOptionTCO
+{
+	public:
+		enum TcoTypes
+		{
+			BbTco,
+			Pattern,
+			NumTcoTypes
+		};
+		TcoTypes type;
+
+		QRectF rect;
+		bool selected;
+		bool hovered;
+		QColor userColor;
+		tick duration;
+};
+
 
 #endif

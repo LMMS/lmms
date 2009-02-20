@@ -23,6 +23,7 @@
  */
 
 
+
 #ifndef _TRACK_CONTAINER_SCENE_H
 #define _TRACK_CONTAINER_SCENE_H
 
@@ -103,12 +104,6 @@ protected:
     virtual void keyPressEvent( QKeyEvent * event );
 
 private:
-	/*
-	enum Actions
-	{
-		AddTrack,
-		RemoveTrack
-	} ;*/
 
 
 //signals:

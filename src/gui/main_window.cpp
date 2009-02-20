@@ -314,6 +314,7 @@ mainWindow::mainWindow( void ) :
 	//view->scale(2.0, 1.0);
 
 	QMdiSubWindow * subWin = workspace()->addSubWindow( view );
+    
     /// END HACK TO CREATE EXTRA SONG EDITOR FOR NOW ///
 
 

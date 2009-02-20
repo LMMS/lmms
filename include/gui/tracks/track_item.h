@@ -1,9 +1,4 @@
-/*
- * track_item.h
- *
- *  Created on: Jan 27, 2009
- *      Author: llama
- */
+
 
 #ifndef TRACK_ITEM_H_
 #define TRACK_ITEM_H_
@@ -44,4 +39,4 @@ private:
 };
 
 
-#endif /* TRACK_ITEM_H_ */
+#endif

@@ -68,7 +68,7 @@ public:
 	trackContentObject( track * _track );
 	virtual ~trackContentObject();
 
-	inline track * getTrack( void )
+	inline track * getTrack( void ) const
 	{
 		return( m_track );
 	}

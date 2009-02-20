@@ -10,27 +10,26 @@
 #include <math.h>
 
 #include "gui/tracks/track_content_object_item.h"
+#include "gui/tracks/track_item.h"
 
-class trackContentObject;
-class TrackItem;
 
 class PatternItem : public TrackContentObjectItem
 {
 	Q_OBJECT
 
 public:
-    PatternItem( TrackItem * _track, trackContentObject * _object );
+	PatternItem( TrackItem * _track, trackContentObject * _object );
 
-	void paint( QPainter * _painter, const QStyleOptionGraphicsItem * _option,
+	virtual void paint( QPainter * _painter, const QStyleOptionGraphicsItem * _option,
 						QWidget * _widget );
-
-	QVariant itemChange( GraphicsItemChange _change, const QVariant & _value );
 
 
 protected:
-    virtual void mousePressEvent( QGraphicsSceneMouseEvent * event );
-    virtual void mouseReleaseEvent( QGraphicsSceneMouseEvent * event );
-	
+	// virtual QVariant itemChange( GraphicsItemChange _change, const QVariant & _value );
+
+	virtual void mousePressEvent( QGraphicsSceneMouseEvent * event );
+	virtual void mouseReleaseEvent( QGraphicsSceneMouseEvent * event );
+
 };
 
 #endif
