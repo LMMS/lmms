@@ -224,14 +224,13 @@ static QString getTcoCacheKey( const QString & _key,
 		const LmmsStyleOptionTCO * _option )
 {
 	QString tmp;
-	tmp.sprintf( "%s,%d,%d,%d,%s,%.3fx%.3f",
+	tmp.sprintf( "%s,%d,%d,%s,%.2fx%.2f",
 			_key.toLatin1().constData(),
-			_option->type,
-			_option->selected,
-			_option->hovered,
+			_option->type | ( _option->selected << 4 ) | ( _option->hovered << 5 ),
+			_option->duration,
 			_option->userColor.name().constData(),
 			_option->rect.width(),
-			_option->rect.height() );
+			_option->rect.height());
 	return tmp;
 }
 

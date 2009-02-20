@@ -1,3 +1,21 @@
+2009-02-20	Paul Giblock <drfaygo/at/gmail/dot/com>
+
+	* include/gui/tracks/pattern_item.h:
+	* include/gui/tracks/track_content_object_item.h:
+	* include/gui/tracks/track_item.h:
+	* include/gui/tracks/track_container_scene.h:
+	* include/gui/tracks/bb_tco_item.h:
+	* src/gui/classic_style.cpp:
+	* src/gui/tracks/track_content_object_item.cpp:
+	* src/gui/tracks/track_item.cpp:
+	* src/gui/tracks/track_container_scene.cpp:
+	* src/gui/tracks/bb_tco_item.cpp:
+	* src/gui/tracks/pattern_item.cpp:
+	Fix File headers
+
+	* src/gui/cusis_style.cpp:
+	Fix cache collision bug 
+
 2009-02-19	Paul Giblock <drfaygo/at/gmail/dot/com>
 	
 	* include/track.h:

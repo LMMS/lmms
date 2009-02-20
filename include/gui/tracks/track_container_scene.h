@@ -1,5 +1,6 @@
 /*
- * track_container_scene.h - view-component for trackContainer
+ * track_container_scene.cpp - A TrackContainer is represented in the
+ * SongEditor as the GraphicsScene.  This is it.
  *
  * Copyright (c) 2009 Paul Giblock <pgib/at/users.sourceforge.net>
  *
