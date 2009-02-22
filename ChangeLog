@@ -1,3 +1,9 @@
+2009-02-21	Paul Giblock <drfaygo/at/gmail/dot/com>
+
+	* include/cusis_style.h:
+	* src/gui/cusis_style.cpp:
+	Make ScrollBar-hover work again in Qt-4.5
+
 2009-02-20	Paul Giblock <drfaygo/at/gmail/dot/com>
 
 	* include/gui/tracks/pattern_item.h:
@@ -26,6 +32,10 @@
 
 	* src/gui/classic_style.cpp:
 	Fix text clipping
+
+	* gui/lfo_controller_dialog.cpp:
+	QT4.5 fixes our error where Controllers couldn't have backgrounds,
+	re-add artwork.
 
 2009-02-19	Paul Giblock <drfaygo/at/gmail/dot/com>
 	

@@ -62,6 +62,9 @@ public:
 	QRect subControlRect( ComplexControl control, const QStyleOptionComplex *option,
 			SubControl subControl, const QWidget *widget ) const;
 
+	virtual void polish( QWidget * widget );
+	virtual void unpolish( QWidget * widget );
+
 	virtual void drawFxLine( QPainter * _painter, const QWidget *_fxLine,
 			const QString & _name, bool _active );
 

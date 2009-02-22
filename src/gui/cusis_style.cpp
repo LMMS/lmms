@@ -33,6 +33,8 @@ const int BUTTON_LENGTH = 24;
 #include <QtGui/QStyleOption>
 #include <QtGui/QLinearGradient>
 
+#include <QScrollBar>
+
 #include "cusis_style.h"
 #include "gui_templates.h"
 
@@ -228,7 +230,7 @@ static QString getTcoCacheKey( const QString & _key,
 			_key.toLatin1().constData(),
 			_option->type | ( _option->selected << 4 ) | ( _option->hovered << 5 ),
 			_option->duration,
-			_option->userColor.name().constData(),
+			_option->userColor.name().toLatin1().data(),
 			_option->rect.width(),
 			_option->rect.height());
 	return tmp;
@@ -302,6 +304,7 @@ QPalette CusisStyle::standardPalette( void ) const
 void CusisStyle::hoverColors( bool sunken, bool hover, bool active,
 		QColor & color, QColor & blend ) const
 {
+	printf("SB: %d %d %d\n", sunken, hover, active );
 	if( active )
 	{
 		if( sunken )
@@ -826,6 +829,25 @@ void CusisStyle::drawPrimitive( PrimitiveElement _element,
 		QPlastiqueStyle::drawPrimitive( _element, _option, _painter, _widget );
 	}
 
+}
+
+
+void CusisStyle::polish( QWidget * widget )
+{
+	if( qobject_cast<QScrollBar *>(widget) )
+	{
+		widget->setAttribute(Qt::WA_Hover, true);
+	}
+}
+
+
+
+void CusisStyle::unpolish(QWidget *widget)
+{
+	if( qobject_cast<QScrollBar *>(widget) )
+	{
+		widget->setAttribute(Qt::WA_Hover, false);
+	}
 }
 
 
