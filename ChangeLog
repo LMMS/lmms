@@ -1,3 +1,9 @@
+2009-02-23	Tobias Doerffel <tobydox/at/users/dot/sourceforge/dot/net>
+
+	* cmake/modules/FindSTK.cmake:
+	* CMakeLists.txt:
+	reflect changes in MinGW crosscompiling environment, typo fixes
+
 2009-02-21	Paul Giblock <drfaygo/at/gmail/dot/com>
 
 	* include/cusis_style.h:
@@ -74,9 +80,6 @@
 
 	* src/gui/cusis_style.cpp:
 	Move Shiny-TCO to Cusis and add pixmap caching
-
-
-
 
 2009-02-19	Tobias Doerffel <tobydox/at/users/dot/sourceforge/dot/net>
 
