@@ -1,3 +1,9 @@
+2009-02-23	Tobias Doerffel <tobydox/at/users/dot/sourceforge/dot/net>
+
+	* cmake/modules/FindSTK.cmake:
+	* CMakeLists.txt:
+	reflect changes in MinGW crosscompiling environment
+
 2009-02-19	Tobias Doerffel <tobydox/at/users/dot/sourceforge/dot/net>
 
 	* include/fade_button.h:

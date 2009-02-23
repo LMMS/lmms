@@ -1,6 +1,6 @@
-FIND_PATH(STK_INCLUDE_DIR Stk.h /usr/include/stk /usr/local/include/stk ${CMAKE_INSTALL_PREFIX}/include/stk)
+FIND_PATH(STK_INCLUDE_DIR Stk.h /usr/include/stk /usr/local/include/stk ${CMAKE_INSTALL_PREFIX}/include/stk ${CMAKE_FIND_ROOT_PATH}/include/stk)
 
-FIND_LIBRARY(STK_LIBRARY NAMES stk PATH /usr/lib /usr/local/lib ${CMAKE_INSTALL_PREFIX}/lib) 
+FIND_LIBRARY(STK_LIBRARY NAMES stk PATH /usr/lib /usr/local/lib ${CMAKE_INSTALL_PREFIX}/lib ${CMAKE_FIND_ROOT_PATH}/lib) 
 
 IF (STK_INCLUDE_DIR AND STK_LIBRARY)
    SET(STK_FOUND TRUE)

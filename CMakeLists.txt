@@ -29,7 +29,7 @@ INCLUDE(DetectMachine)
 IF(LMMS_HOST_X86_64)
 	SET(STRIP /opt/mingw64/bin/x86_64-pc-mingw32-strip)
 ELSE(LMMS_HOST_X86_64)
-	SET(STRIP /opt/mingw/bin/i586-mingw32-strip)
+	SET(STRIP /opt/mingw32/bin/i586-pc-mingw32-strip)
 ENDIF(LMMS_HOST_X86_64)
 
 OPTION(WANT_ALSA	"Include ALSA (Advanced Linux Sound Architecture) support" ON)
@@ -95,6 +95,14 @@ SET(QT_MIN_VERSION "4.3.0")
 FIND_PACKAGE(Qt4 REQUIRED)
 SET(QT_USE_QTXML 1)
 EXEC_PROGRAM(${QT_QMAKE_EXECUTABLE} ARGS "-query QT_INSTALL_TRANSLATIONS" OUTPUT_VARIABLE QT_TRANSLATIONS_DIR)
+IF(LMMS_BUILD_WIN32)
+	SET(QT_TRANSLATIONS_DIR "/opt/mingw32/share/qt4/translations/")
+	# hack to allow making moc.exe a symlink to native moc-binary in compatible version
+	SET(QT_MOC_EXECUTABLE ${QT_BINARY_DIR}/moc.exe)
+ENDIF(LMMS_BUILD_WIN32)
+IF(LMMS_BUILD_WIN64)
+	SET(QT_TRANSLATIONS_DIR "/opt/mingw64/share/qt4/translations/")
+ENDIF(LMMS_BUILD_WIN64)
 IF(EXISTS "${QT_TRANSLATIONS_DIR}")
 	MESSAGE("-- Found Qt translations in ${QT_TRANSLATIONS_DIR}")
 	ADD_DEFINITIONS(-D'QT_TRANSLATIONS_DIR="${QT_TRANSLATIONS_DIR}"')
@@ -392,7 +400,7 @@ IF(WIN32)
 	IF(LMMS_HOST_X86_64)
 		SET(WINDRES /opt/mingw64/bin/x86_64-pc-mingw32-windres)
 	ELSE(LMMS_HOST_X86_64)
-		SET(WINDRES /opt/mingw/bin/i586-mingw32-windres)
+		SET(WINDRES /opt/mingw32/bin/i586-pc-mingw32-windres)
 	ENDIF(LMMS_HOST_X86_64)
 	ADD_CUSTOM_COMMAND(OUTPUT ${WINRC}
 				COMMAND ${WINDRES}
@@ -433,7 +441,7 @@ IF(LMMS_BUILD_WIN32)
 	IF(LMMS_BUILD_WIN64)
 		INSTALL(FILES /opt/mingw64/bin/QtCore4.dll /opt/mingw64/bin/QtGui4.dll /opt/mingw64/bin/QtXml4.dll /opt/mingw64/bin/libsndfile-1.dll /opt/mingw64/bin/libvorbis-0.dll /opt/mingw64/bin/libvorbisenc-2.dll /opt/mingw64/bin/libvorbisfile-3.dll /opt/mingw64/bin/libogg-0.dll /opt/mingw64/bin/libfluidsynth-1.dll /opt/mingw64/bin/libfftw3f-3.dll /opt/mingw64/bin/SDL.dll DESTINATION .)
 	ELSE(LMMS_BUILD_WIN64)
-		INSTALL(FILES /opt/mingw/bin/QtCore4.dll /opt/mingw/bin/QtGui4.dll /opt/mingw/bin/QtXml4.dll /opt/mingw/bin/libz.dll /opt/mingw/bin/libsndfile-1.dll /opt/mingw/bin/libvorbis-0.dll /opt/mingw/bin/libvorbisenc-2.dll /opt/mingw/bin/libvorbisfile-3.dll /opt/mingw/bin/libogg-0.dll /opt/mingw/bin/libfluidsynth-1.dll /opt/mingw/bin/libfftw3f-3.dll /opt/mingw/bin/SDL.dll /opt/mingw/i586-mingw32/bin/mingwm10.dll DESTINATION .)
+		INSTALL(FILES /opt/mingw32/bin/QtCore4.dll /opt/mingw32/bin/QtGui4.dll /opt/mingw32/bin/QtXml4.dll /opt/mingw32/bin/libz.dll /opt/mingw32/bin/libsndfile-1.dll /opt/mingw32/bin/libvorbis-0.dll /opt/mingw32/bin/libvorbisenc-2.dll /opt/mingw32/bin/libvorbisfile-3.dll /opt/mingw32/bin/libogg-0.dll /opt/mingw32/bin/libfluidsynth-1.dll /opt/mingw32/bin/libfftw3f-3.dll /opt/mingw32/bin/SDL.dll /opt/mingw32/i586-pc-mingw32/bin/mingwm10.dll DESTINATION .)
 	ENDIF(LMMS_BUILD_WIN64)
 ELSE(LMMS_BUILD_WIN32)
 	INSTALL(TARGETS lmms RUNTIME DESTINATION bin)
@@ -519,21 +527,21 @@ ADD_CUSTOM_TARGET(win32-pkg
 			COMMAND cp plugins/ladspa_effect/caps/caps.dll tmp/lmms/plugins/ladspa/
 			COMMAND cp plugins/ladspa_effect/tap/tap*.dll tmp/lmms/plugins/ladspa/
 			COMMAND cd data && make DESTDIR=${CMAKE_BINARY_DIR}/tmp/lmms/ install
-			COMMAND mv tmp/lmms/opt/mingw/share/lmms/* tmp/lmms/data/ && rm -rf tmp/lmms/opt
-			COMMAND cp /opt/mingw/bin/QtCore4.dll tmp/lmms
-			COMMAND cp /opt/mingw/bin/QtGui4.dll tmp/lmms
-			COMMAND cp /opt/mingw/bin/QtXml4.dll tmp/lmms
-			COMMAND cp /opt/mingw/bin/libz.dll tmp/lmms
-			COMMAND cp /opt/mingw/bin/libsndfile-1.dll tmp/lmms
-			COMMAND cp /opt/mingw/bin/libvorbis*.dll tmp/lmms
-			COMMAND cp /opt/mingw/bin/libogg-0.dll tmp/lmms
-			COMMAND cp /opt/mingw/bin/libfluidsynth-1.dll tmp/lmms
-			COMMAND cp /opt/mingw/bin/libfftw3f-3.dll tmp/lmms
-			COMMAND cp /opt/mingw/bin/SDL.dll tmp/lmms
-			COMMAND cp /opt/mingw/i586-mingw32/bin/mingwm10.dll tmp/lmms
+			COMMAND mv tmp/lmms/opt/mingw32/share/lmms/* tmp/lmms/data/ && rm -rf tmp/lmms/opt
+			COMMAND cp /opt/mingw32/bin/QtCore4.dll tmp/lmms
+			COMMAND cp /opt/mingw32/bin/QtGui4.dll tmp/lmms
+			COMMAND cp /opt/mingw32/bin/QtXml4.dll tmp/lmms
+			COMMAND cp /opt/mingw32/bin/libz.dll tmp/lmms
+			COMMAND cp /opt/mingw32/bin/libsndfile-1.dll tmp/lmms
+			COMMAND cp /opt/mingw32/bin/libvorbis*.dll tmp/lmms
+			COMMAND cp /opt/mingw32/bin/libogg-0.dll tmp/lmms
+			COMMAND cp /opt/mingw32/bin/libfluidsynth-1.dll tmp/lmms
+			COMMAND cp /opt/mingw32/bin/libfftw3f-3.dll tmp/lmms
+			COMMAND cp /opt/mingw32/bin/SDL.dll tmp/lmms
+			COMMAND cp /opt/mingw32/i586-mingw32/bin/mingwm10.dll tmp/lmms
 			COMMAND cp -L ${CMAKE_SOURCE_DIR}/COPYING tmp/lmms/LICENSE.TXT
 			COMMAND cp -L ${CMAKE_SOURCE_DIR}/README tmp/lmms/README.TXT
-			COMMAND /opt/mingw/bin/i586-mingw32-strip tmp/lmms/lmms.exe tmp/lmms/plugins/*.dll tmp/lmms/plugins/ladspa/*.dll
+			COMMAND /opt/mingw32/bin/i586-pc-mingw32-strip tmp/lmms/lmms.exe tmp/lmms/plugins/*.dll tmp/lmms/plugins/ladspa/*.dll
 			COMMAND mv tmp/lmms tmp/lmms-${VERSION}
 			COMMAND cd tmp && zip -r -9 ../lmms-${VERSION}-bin-win32.zip lmms-${VERSION}/*
 			COMMAND rm -rf tmp
