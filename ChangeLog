@@ -4,6 +4,11 @@
 	* CMakeLists.txt:
 	made 0.4.3 release
 
+	* include/atomic_int.h:
+	- fixed typo
+	- added copy constructor implementation for AtomicInt class - fixes
+	  build failure with Qt < 4.4.0
+
 	* CMakeLists.txt:
 	fixed typos
 

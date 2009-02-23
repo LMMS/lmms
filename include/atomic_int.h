@@ -27,7 +27,7 @@
 
 #include <QtCore/QMutex>
 
-#if QT_VERSION > 0x040400
+#if QT_VERSION >= 0x040400
 
 typedef QAtomicInt AtomicInt;
 
@@ -38,6 +38,12 @@ class AtomicInt
 public:
 	inline AtomicInt( int _value = 0 ) :
 		m_value( _value ),
+		m_lock()
+	{
+	}
+
+	inline AtomicInt( const AtomicInt & _copy ) :
+		m_value( _copy.m_value ),
 		m_lock()
 	{
 	}
