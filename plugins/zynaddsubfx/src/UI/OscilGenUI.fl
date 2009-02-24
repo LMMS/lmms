@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0106 
+version 1.0109 
 header_name {.h} 
 code_name {.cc}
 decl {//Copyright (c) 2002-2005 Nasca Octavian Paul} {} 
@@ -68,7 +68,7 @@ int n=lx/GX-1;
 if (n>OSCIL_SIZE/2) n=OSCIL_SIZE/2;
 
 REALTYPE x;
-REALTYPE spc[n];
+REALTYPE* spc=new REALTYPE[n];
 for (i=0;i<n;i++) spc[i]=0.0;
 
 pthread_mutex_lock(&master->mutex);
@@ -118,7 +118,9 @@ for (i=0;i<n;i++){
 
    int val=(int) ((ly-2)*x);
    if (val>0) fl_line(ox+tmp,oy+ly-2-val,ox+tmp,oy+ly-2);
-};} {}
+}
+delete [] spc;} {selected
+    }
   }
   decl {OscilGen *oscil;} {}
   decl {int oscbase;} {}
@@ -266,7 +268,7 @@ if (cbwidget!=NULL) {
 	applybutton->color(FL_RED);
 	applybutton->redraw();
 };}
-        xywh {0 15 15 115} type {Vert Knob} box FLAT_BOX selection_color 222 labelcolor 0 maximum 127 step 1 value 64
+        xywh {0 15 15 115} type {Vert Knob} box FLAT_BOX selection_color 222 maximum 127 step 1 value 64
         code0 {o->value(127-oscil->Phmag[n]);}
         code1 {if (oscil->Phmag[n]==64) o->selection_color(0);}
         class PSlider
@@ -363,7 +365,7 @@ if (cbapplywidget!=NULL) {
 	cbapplywidget->do_callback();
 	cbapplywidget->color(FL_GRAY);
 	cbapplywidget->redraw();
-};} selected
+};}
         xywh {300 280 60 20} box THIN_UP_BOX labelfont 1
         code0 {if (!oscil->ADvsPAD) o->hide();}
       }
@@ -401,15 +403,15 @@ oldosc->redraw();}
             callback {oscil->Pamprandtype=(int) o->value();}
             tooltip {Harmonic Amplitude Randomness} xywh {281 282 50 15} down_box BORDER_BOX labelsize 10 textsize 10
           } {
-            menuitem {} {
+            MenuItem {} {
               label None
               xywh {60 60 100 20} labelfont 1 labelsize 10
             }
-            menuitem {} {
+            MenuItem {} {
               label Pow
               xywh {70 70 100 20} labelfont 1 labelsize 10
             }
-            menuitem {} {
+            MenuItem {} {
               label Sin
               xywh {80 80 100 20} labelfont 1 labelsize 10
             }
@@ -453,59 +455,59 @@ if ((oscil->Pcurrentbasefunc==0)||(oscil->Pcurrentbasefunc==127)) basefuncmodula
       else basefuncmodulation->activate();}
           xywh {370 285 90 15} down_box BORDER_BOX labelsize 10 align 5 textsize 11
         } {
-          menuitem {} {
+          MenuItem {} {
             label Sine
             xywh {10 10 100 20} labelfont 1 labelsize 11
           }
-          menuitem {} {
+          MenuItem {} {
             label Triangle
             xywh {20 20 100 20} labelfont 1 labelsize 11
           }
-          menuitem {} {
+          MenuItem {} {
             label Pulse
             xywh {30 30 100 20} labelfont 1 labelsize 11
           }
-          menuitem {} {
+          MenuItem {} {
             label Saw
             xywh {40 40 100 20} labelfont 1 labelsize 11
           }
-          menuitem {} {
+          MenuItem {} {
             label Power
             xywh {50 50 100 20} labelfont 1 labelsize 11
           }
-          menuitem {} {
+          MenuItem {} {
             label Gauss
             xywh {50 50 100 20} labelfont 1 labelsize 11
           }
-          menuitem {} {
+          MenuItem {} {
             label Diode
             xywh {60 60 100 20} labelfont 1 labelsize 11
           }
-          menuitem {} {
+          MenuItem {} {
             label AbsSine
             xywh {70 70 100 20} labelfont 1 labelsize 11
           }
-          menuitem {} {
+          MenuItem {} {
             label PulseSine
             xywh {80 80 100 20} labelfont 1 labelsize 11
           }
-          menuitem {} {
+          MenuItem {} {
             label StrchSine
             xywh {90 90 100 20} labelfont 1 labelsize 11
           }
-          menuitem {} {
+          MenuItem {} {
             label Chirp
             xywh {100 100 100 20} labelfont 1 labelsize 11
           }
-          menuitem {} {
+          MenuItem {} {
             label AbsStrSine
             xywh {102 102 100 20} labelfont 1 labelsize 11
           }
-          menuitem {} {
+          MenuItem {} {
             label Chebyshev
             xywh {112 112 100 20} labelfont 1 labelsize 11
           }
-          menuitem {} {
+          MenuItem {} {
             label Sqr
             xywh {122 122 100 20} labelfont 1 labelsize 11
           }
@@ -534,19 +536,19 @@ basefuncdisplaygroup->redraw();
 redrawoscil();}
             tooltip {Base function modulation} xywh {599 281 50 15} down_box BORDER_BOX labelsize 10 textsize 10
           } {
-            menuitem {} {
+            MenuItem {} {
               label None
               xywh {50 50 100 20} labelfont 1 labelsize 10
             }
-            menuitem {} {
+            MenuItem {} {
               label Rev
               xywh {60 60 100 20} labelfont 1 labelsize 10
             }
-            menuitem {} {
+            MenuItem {} {
               label Sine
               xywh {70 70 100 20} labelfont 1 labelsize 10
             }
-            menuitem {} {
+            MenuItem {} {
               label Pow
               xywh {80 80 100 20} labelfont 1 labelsize 10
             }
@@ -582,23 +584,23 @@ basefuncdisplaygroup->redraw();
 redrawoscil();}
         xywh {70 280 65 20} down_box BORDER_BOX labelsize 11 textsize 11
       } {
-        menuitem {} {
+        MenuItem {} {
           label Linear
           xywh {0 0 100 20} labelfont 1 labelsize 11
         }
-        menuitem {} {
+        MenuItem {} {
           label {-40dB}
           xywh {10 10 100 20} labelfont 1 labelsize 11
         }
-        menuitem {} {
+        MenuItem {} {
           label {-60dB}
           xywh {20 20 100 20} labelfont 1 labelsize 11
         }
-        menuitem {} {
+        MenuItem {} {
           label {-80dB}
           xywh {30 30 100 20} labelfont 1 labelsize 11
         }
-        menuitem {} {
+        MenuItem {} {
           label {-100dB}
           xywh {40 40 100 20} labelfont 1 labelsize 11
         }
@@ -681,63 +683,63 @@ basefuncdisplaygroup->redraw();
 redrawoscil();} open
           tooltip {Waveshaping function} xywh {165 313 55 20} down_box BORDER_BOX labelsize 10 textsize 10
         } {
-          menuitem {} {
+          MenuItem {} {
             label None
             xywh {25 25 100 20} labelfont 1 labelsize 10
           }
-          menuitem {} {
+          MenuItem {} {
             label Atan
             xywh {35 35 100 20} labelfont 1 labelsize 10
           }
-          menuitem {} {
+          MenuItem {} {
             label Asym1
             xywh {45 45 100 20} labelfont 1 labelsize 10
           }
-          menuitem {} {
+          MenuItem {} {
             label Pow
             xywh {55 55 100 20} labelfont 1 labelsize 10
           }
-          menuitem {} {
+          MenuItem {} {
             label Sine
             xywh {65 65 100 20} labelfont 1 labelsize 10
           }
-          menuitem {} {
+          MenuItem {} {
             label Qnts
             xywh {75 75 100 20} labelfont 1 labelsize 10
           }
-          menuitem {} {
+          MenuItem {} {
             label Zigzg
             xywh {85 85 100 20} labelfont 1 labelsize 10
           }
-          menuitem {} {
+          MenuItem {} {
             label Lmt
             xywh {95 95 100 20} labelfont 1 labelsize 10
           }
-          menuitem {} {
+          MenuItem {} {
             label LmtU
             xywh {105 105 100 20} labelfont 1 labelsize 10
           }
-          menuitem {} {
+          MenuItem {} {
             label LmtL
             xywh {115 115 100 20} labelfont 1 labelsize 10
           }
-          menuitem {} {
+          MenuItem {} {
             label ILmt
             xywh {127 127 100 20} labelfont 1 labelsize 10
           }
-          menuitem {} {
+          MenuItem {} {
             label Clip
             xywh {137 137 100 20} labelfont 1 labelsize 10
           }
-          menuitem {} {
+          MenuItem {} {
             label Asym2
             xywh {85 85 100 20} labelfont 1 labelsize 10
           }
-          menuitem {} {
+          MenuItem {} {
             label Pow2
             xywh {95 95 100 20} labelfont 1 labelsize 10
           }
-          menuitem {} {
+          MenuItem {} {
             label Sgm
             xywh {90 90 100 20} labelfont 1 labelsize 10
           }
@@ -767,59 +769,59 @@ redrawoscil();}
 redrawoscil();}
           tooltip {Oscillator's filter type} xywh {315 313 50 20} down_box BORDER_BOX labelsize 10 textsize 10
         } {
-          menuitem {} {
+          MenuItem {} {
             label None
             xywh {35 35 100 20} labelfont 1 labelsize 10
           }
-          menuitem {} {
+          MenuItem {} {
             label LP1
             xywh {45 45 100 20} labelfont 1 labelsize 10
           }
-          menuitem {} {
+          MenuItem {} {
             label HP1a
             xywh {55 55 100 20} labelfont 1 labelsize 10
           }
-          menuitem {} {
+          MenuItem {} {
             label HP1b
             xywh {65 65 100 20} labelfont 1 labelsize 10
           }
-          menuitem {} {
+          MenuItem {} {
             label BP1
             xywh {75 75 100 20} labelfont 1 labelsize 10
           }
-          menuitem {} {
+          MenuItem {} {
             label BS1
             xywh {85 85 100 20} labelfont 1 labelsize 10
           }
-          menuitem {} {
+          MenuItem {} {
             label LP2
             xywh {55 55 100 20} labelfont 1 labelsize 10
           }
-          menuitem {} {
+          MenuItem {} {
             label HP2
             xywh {65 65 100 20} labelfont 1 labelsize 10
           }
-          menuitem {} {
+          MenuItem {} {
             label BP2
             xywh {65 65 100 20} labelfont 1 labelsize 10
           }
-          menuitem {} {
+          MenuItem {} {
             label BS2
             xywh {75 75 100 20} labelfont 1 labelsize 10
           }
-          menuitem {} {
+          MenuItem {} {
             label Cos
             xywh {75 75 100 20} labelfont 1 labelsize 10
           }
-          menuitem {} {
+          MenuItem {} {
             label Sin
             xywh {85 85 100 20} labelfont 1 labelsize 10
           }
-          menuitem {} {
+          MenuItem {} {
             label LSh
             xywh {95 95 100 20} labelfont 1 labelsize 10
           }
-          menuitem {} {
+          MenuItem {} {
             label S
             xywh {105 105 100 20} labelfont 1 labelsize 10
           }
@@ -855,19 +857,19 @@ redrawoscil();}
 redrawoscil();}
           tooltip {Oscillator's spectrum adjust} xywh {630 313 60 20} down_box BORDER_BOX labelsize 10 textsize 10
         } {
-          menuitem {} {
+          MenuItem {} {
             label None
             xywh {55 55 100 20} labelfont 1 labelsize 10
           }
-          menuitem {} {
+          MenuItem {} {
             label Pow
             xywh {65 65 100 20} labelfont 1 labelsize 10
           }
-          menuitem {} {
+          MenuItem {} {
             label ThrsD
             xywh {75 75 100 20} labelfont 1 labelsize 10
           }
-          menuitem {} {
+          MenuItem {} {
             label ThrsU
             xywh {85 85 100 20} labelfont 1 labelsize 10
           }
@@ -911,39 +913,39 @@ redrawoscil();}
 redrawoscil();}
           tooltip {The type of the addaptive harmonics} xywh {670 425 55 15} down_box BORDER_BOX labelsize 10 align 129 when 6 textsize 10
         } {
-          menuitem {} {
+          MenuItem {} {
             label OFF
             xywh {80 80 100 20} labelfont 1 labelsize 10
           }
-          menuitem {} {
+          MenuItem {} {
             label ON
             xywh {90 90 100 20} labelfont 1 labelsize 10
           }
-          menuitem {} {
+          MenuItem {} {
             label Square
             xywh {100 100 100 20} labelfont 1 labelsize 10
           }
-          menuitem {} {
+          MenuItem {} {
             label 2xSub
             xywh {110 110 100 20} labelfont 1 labelsize 10
           }
-          menuitem {} {
+          MenuItem {} {
             label 2xAdd
             xywh {120 120 100 20} labelfont 1 labelsize 10
           }
-          menuitem {} {
+          MenuItem {} {
             label 3xSub
             xywh {120 120 100 20} labelfont 1 labelsize 10
           }
-          menuitem {} {
+          MenuItem {} {
             label 3xAdd
             xywh {130 130 100 20} labelfont 1 labelsize 10
           }
-          menuitem {} {
+          MenuItem {} {
             label 4xSub
             xywh {130 130 100 20} labelfont 1 labelsize 10
           }
-          menuitem {} {
+          MenuItem {} {
             label 4xAdd
             xywh {140 140 100 20} labelfont 1 labelsize 10
           }
@@ -978,19 +980,19 @@ redrawoscil();}
 redrawoscil();}
           tooltip modulation xywh {470 315 50 15} down_box BORDER_BOX labelsize 10 textsize 10
         } {
-          menuitem {} {
+          MenuItem {} {
             label None
             xywh {60 60 100 20} labelfont 1 labelsize 10
           }
-          menuitem {} {
+          MenuItem {} {
             label Rev
             xywh {70 70 100 20} labelfont 1 labelsize 10
           }
-          menuitem {} {
+          MenuItem {} {
             label Sine
             xywh {80 80 100 20} labelfont 1 labelsize 10
           }
-          menuitem {} {
+          MenuItem {} {
             label Pow
             xywh {90 90 100 20} labelfont 1 labelsize 10
           }

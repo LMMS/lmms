@@ -1,5 +1,13 @@
 2009-02-24	Tobias Doerffel <tobydox/at/users/dot/sourceforge/dot/net>
 
+	* plugins/zynaddsubfx/src/Params/PresetsStore.C:
+	* plugins/zynaddsubfx/src/Synth/OscilGen.C:
+	* plugins/zynaddsubfx/src/UI/OscilGenUI.cc:
+	* plugins/zynaddsubfx/src/UI/OscilGenUI.fl:
+	follow recent changes in ZynAddSubFX CVS:
+	- Fix improper deallocation in PresetsStore
+	- Fixed errors with drawing of the Oscillator as reported with valgrind
+
 	* CMakeLists.txt:
 	* data/presets/CMakeLists.txt:
 	* plugins/CMakeLists.txt:

@@ -26,7 +26,7 @@ int n=lx/GX-1;
 if (n>OSCIL_SIZE/2) n=OSCIL_SIZE/2;
 
 REALTYPE x;
-REALTYPE spc[n];
+REALTYPE* spc=new REALTYPE[n];
 for (i=0;i<n;i++) spc[i]=0.0;
 
 pthread_mutex_lock(&master->mutex);
@@ -76,7 +76,8 @@ for (i=0;i<n;i++){
 
    int val=(int) ((ly-2)*x);
    if (val>0) fl_line(ox+tmp,oy+ly-2-val,ox+tmp,oy+ly-2);
-};
+}
+delete [] spc;
 }
 
 PSlider::PSlider(int x,int y, int w, int h, const char *label):Fl_Slider(x,y,w,h,label) {

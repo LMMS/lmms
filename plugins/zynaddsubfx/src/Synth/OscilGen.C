@@ -988,7 +988,7 @@ void OscilGen::getspectrum(int n, REALTYPE *spc,int what){
     };
     
     if (what==0) {
-        for (int i=0;i<n;i++) outoscilFFTfreqs.s[i]=outoscilFFTfreqs.c[i]=spc[i+1];
+        for (int i=0;i<(n-1);i++) outoscilFFTfreqs.s[i]=outoscilFFTfreqs.c[i]=spc[i+1];
 	for (int i=n;i<OSCIL_SIZE/2;i++) outoscilFFTfreqs.s[i]=outoscilFFTfreqs.c[i]=0.0;
 	adaptiveharmonic(outoscilFFTfreqs,0.0);
 	for (int i=1;i<n;i++) spc[i-1]=outoscilFFTfreqs.s[i];

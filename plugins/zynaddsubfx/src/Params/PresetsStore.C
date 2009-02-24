@@ -41,7 +41,7 @@ PresetsStore::PresetsStore(){
 };
 
 PresetsStore::~PresetsStore(){
-    if (clipboard.data!=NULL) delete (clipboard.data);
+    if (clipboard.data!=NULL) free (clipboard.data);
     clearpresets();
 };
 
@@ -49,7 +49,7 @@ PresetsStore::~PresetsStore(){
 
 void PresetsStore::copyclipboard(XMLwrapper *xml,char *type){
     strcpy(clipboard.type,type);
-    if (clipboard.data!=NULL) delete (clipboard.data);
+    if (clipboard.data!=NULL) free (clipboard.data);
     clipboard.data=xml->getXMLdata();
 };
 
