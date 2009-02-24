@@ -1,0 +1,3397 @@
+CHANGES IN FLTK 1.1.9
+
+	- Improved color contrast in secondary selection blocks
+	  of Fl_Text_Display (STR #1917)
+	- Fixed regression in callback handling (STR #1918)
+	- Fixed wrong relative path when absolute path has a 
+	  trailing slash in fl_filename_relative (STR #1920)
+	- Fixed multiple selction of files and directories in
+	  Fl_File_Chooser (STR #1913)
+	- Fixed MSWindows crash when selecting umlauts
+	  in Fl_Help_View (STR #1912)
+
+CHANGES IN FLTK 1.1.8
+
+	- Documentation fixes (STR #1454, STR #1455, STR #1456,
+	  STR #1457, STR #1458, STR #1460, STR #1481, STR #1578,
+	  STR #1639, STR #1645, STR #1644, STR #1792, STR #1793,
+	  STR #1742, STR #1777, STR #1794, STR #1827, STR #1843,
+	  STR #1796, STR #1815, STR #1726, STR #1753, STR #1855,
+	  STR #1862, STR #1867, STR #1874, STR #1888)
+	- Fixed library path in Makefile (STR #1885)
+	- Fixed image read for partial regions on X11 
+	  (STR #1716)
+	- Fixed KDE/Gnome icon paths (STR #1795)
+	- Fixed Tab key to wrap around menu bars (STR #1877)
+	- Fixed possible timer leak in Scrollbar (STR #1880)
+	- Added documentation about the potential limitations
+	  of Fl::grab on newer operating systems (STR #1747)
+	- Fixed lockout when mixing popups and alerts
+	  (STR # 1869)
+	- Fixed recursion crash in event handling (STR #1873)
+	- Fixed missing return code in 'fltk-config' (STR #1875)
+	- Fixed inconsistencies with CHANGED flags (STR #1719)
+	- Fixed message sent to hidden widgets (STR #1849)
+	- Fixed width calculation in Fl_Help_View (STR #1868)
+	- Fixed offset bug in OS X pixmap code (STR #1856)
+	- Fixed potential buffer overrun 
+	  in Fl_Preferences (STR #1853)
+	- Fixed method attributes in consecutive class
+	  declarations in FLUID (STR #1741)
+	- FLUID checks for seperately declared callbacks to 
+	  avoid a bogus "extern" declaration (STR #1776)
+	- Added "protected" class memebrs in FLUID
+	- Double-clicking a widget in a FLUID layout will show 
+	  the item in the widget browser
+	- Fixed color highlighting in Text_Display
+	- Fixed 16 bit PNM image support (STR #1847)
+	- Fixed exposure event on zero size windows (STR #1824)
+	- Fixed overlay offset for OS X Quartz (STR #1729)
+	- gl_font() support for Xft+X11 (STR #1809)
+	- Fl_Gl_Window::mode() needed to hide and show the window
+	  when toggling stereo mode (STR #1846)
+	- Fl_Gl_Window::show() did not work reliably on Mac OS X
+	  (STR #1707)
+	- Added Fl_Group::clip_children() methods to support
+	  automatic clipping of child widget drawing (STR #1844)
+	- Fl_Browser_ and friends now support FL_WHEN_ENTER_KEY
+	  for both Enter/Return and double-clicks (STR #1818)
+	- Fl_Help_View did not release the images it used (STR
+	  #1817)
+	- Shared libraries would not build on 64-bit Linux
+	  systems with an existing non-PIC FLTK installation
+	  (STR #1791)
+	- Fl_Browser::hide() and Fl_Browser::show() did not
+	  correctly update the scrollbar (STR #1724)
+	- The configure script now shows a summry of the
+	  configuration results (STR #1810)
+	- "fltk-config --use-* --libs" did not list all of the
+	  dependent libraries (STR #1799)
+	- Hiding a nested window on WIN32 caused 100% CPU (STR #1748)
+	- Changing the window size in FLUID would not mark the 
+	  project as modified (STR #1751)
+	- Fixed fl_filename_isdir for "/"-path (STR #1761)
+	- Fixed Fl_Chart drawing (STR #1756)
+	- Fixed mapping of subwindows with unmapped parent
+	  windows (STR #1706)
+	- Fixed rendering of grayscale images with alpha
+	  channel (STR #1703)
+	- Fixed occasional incomplete refresh (STR #1681)
+	- Improved fl_down, fl_frame, added fl_box (STR #1678)
+	- Fixed selection of submenu items in 
+	  input_choice (STR #1676)
+	- Fixed calculation of stride for image scaling and
+	  color manipulation (STR #1673)
+	- Made -O3 the default optimization on Cygwin/Mingw since
+	  -Os currently creates bad code (STR #1656)
+	- OSF/Tru64 now uses 'install-sh' instead of 'install' to
+	  accomodate for a missing '-d' option (STR #1632)
+	- New option in Fluid project settings to translate all
+	  shortcut modifiers from FL_META or FL_CTRL to FL_COMMAND
+	- Made icon size fixed (50x50) in fl_message etc. (STR #1626)
+	- Fixed selection of first word in Fl_Help_View
+	- Fixed endless loop in Fl_Text_Display (STR #1655)
+	- Allowing shortcuts in Tabs (STR #1652)
+	- Fixed Makefile "make clean" (STR #1642,
+	  STR #1643, STR #1641)
+	- The sample RPM spec file now enables large file support
+	  and threading support (STR #1603)
+	- Changed minimum contrast between background and text to 
+	  99 and added more weight to the blue component to improve
+	  readability for certain color combinations (STR #1625)
+	- Fixed VCNet OpenGL project file (STR #1617)
+	- Fixed scrolling of clipped areas in MSWindows (STR
+	  #1601)
+	- Fixed clipping in OS X Quartz offscreen buffers (STR
+	  #1595)
+	- Now flush file chooser preferences after every change to
+	  avoid data loss (STR #1609)
+	- The Fl_File_Chooser constructor now saves and restores the
+	  current group (STR #1611)
+	- Added Fl::awake(fn*,void*) to set a handler for thread
+	  messages (STR #1536)
+	- Added "mute sound" option to Sudoku game.
+	- Updated the bundled zlib to v1.2.3.
+	- Updated the bundled libpng to v1.2.16.
+	- "make install" now uses the install command (or the
+	  included install-sh script) to copy files to the
+	  install directories, to ensure that permissions are
+	  correct.
+	- Fixed DLL generation via MingW/Cygwin (STR #1546)
+	- FLUID incorrectly opened the display when generating
+	  source code for Fl_Help_View widgets (STR #1318)
+	- Fl_Double_Window did not always show the scheme
+	  background image.
+	- Fixed first window behavior in OS X (STR #1548)
+	- Fixed calculation of character widths for OS X
+	  Quartz rendering (no STR)
+	- Fixed OS X mouse click handling (STR #1504)
+	- Added missing GLUT functions so that FLTK can be used
+	  as a fairly complete C++ replacement for the original
+	  GLUT library (STR #1522)
+	- Fl::awake() could block on X11 and OSX (STR #1537)
+	- Updated recursive mutex code to run on platforms other
+	  than Linux and to do a run-time check to determine
+	  whether they are supported by the kernel (STR #1575)
+	- WIN32 did check callbacks after the event processing instead of
+	  before as documented (STR #1535)
+	- Fl_File_Chooser now hides the window before doing a callback
+	  when the user clicks on the OK button (STR #1565)
+	- Fixed indentation of nested HTML elements (STR #1549)
+	- Made layout of Fl_Help_Dialog consistent with other
+	  help windows and web browsers.
+	- Improved GTK+ schemed round box (STR #1531)
+	- Fluid avoids writing unsupported combinations of the 
+	  "when()" flags (STR #1501)
+	- Fl_Browser_ would allow keyboard callbacks even though
+	  "when()" was set to "never" (STR #1501)
+	- Added automated little helpers to Sudoku 
+	- Added example code for Wizard with the
+	  Tabs demo (STR #1564)
+	- Optimized Fl_Tabs drawing for speed (STR #1520)
+	- OS X resource fork now obsolete (STR #1453)
+	- Added chapter 10 about multithreading (STR #1532, 
+	  1533)
+	- OS X system menu bar top level attribute support 
+	  improved (STR #1505)
+	- Fixed Quartz image drawing bug (STR #1438)
+	- Fixed Quartz fl_read_image
+	- Overlay drawing is now avoiding XOR mode (STR #1438) 
+	- Fixed Scroll crash in Fluid Live Mode (STR #1524) 
+	- Fixed mousewheel event propagation (STR #1521) 
+	- Fixed drawing issues of a tile in a scroll (STR #1507) 
+	- Fixed dismissing buttons in menu bars (STR #1494) 
+	- Making a child group visible in a Fl_Tabs or Fl_Wizard
+	  group now shows that tab or pane.
+	- Added fl_open_uri() function as proposed on
+	  fltk.development.
+	- Added Fl::has_check() which previously was prototyped
+	  and documented, but not implemented (STR #1542)
+	- Enabled Fl::add_check() on OS X (STR #1534)
+	- Documented tooltip inheritance (STR #1467)
+	- Better event mouse handling fixing detached menus and
+	  sticky tooltips (STR #1463, STR #449)
+	- Added Fl::scrollbar_size() methods that are used by all
+	  of the scrollbar-using widgets (STR #1500)
+	- fl_read_image() was broken on Intel-based Macs (STR
+	  #1490)
+	- Fl_Progress was using the wrong width to calculate 
+	  progress (STR #1492)
+	- Fl::x(), Fl::y(), Fl::w(), and Fl::h() did not report
+	  the desktop work area on X11 (STR #1482)
+	- Shortcut events could be sent to the wrong window (STR
+	  #1451)
+	- Fl_Spinner did not handle the arrow keys properly (STR
+	  #1476)
+	- Fl_File_Browser did not calculate the width of
+	  directory items correctly (STR #1469, STR #1470)
+	- Fl_Pack incorrectly started widgets at an offset of 1/2
+	  the spacing value.
+	- FLUID did not generate correct window class code if
+	  the class name was not a standard FLTK window class.
+	- FLUID incorrectly included <FL/Fl_classname.H> for
+	  widget classes that were not subclassed from a standard
+	  FLTK widget class.
+	- The demo master test program now supports scheme
+	  selection and all demos use it (STR #1459)
+	- fl_arc() and fl_pie() did not draw properly on WIN32
+	  when the start and end points were identical (STR
+	  #1461)
+	- Fl_Input and Fl_Text_Editor now hide the mouse pointer
+	  when typing into them (STR #1466)
+	- Implemented alpha blending for Quartz, WIN32, and X11
+	- Check buttons did not redraw properly with box() set to
+	  FL_NO_BOX (STR #1440)
+	- Added the Bluecurve-inspired scheme "gtk+".
+	- Updated documentation (STR #1420, STR #1421)
+	- Fixed font caching issue (STR #1415)
+	- Fixed crash in fl_file_chooser (STR #1410)
+	- Fixed Fluid hotspot bug (STR #1416)
+	- Fixed image copy code (STR #1412)
+	- Fixed latin-to-roman text conversion (STR #1411)
+	- Fixed Cygwin timeout for "select" calls (STR #1151)
+	- Improved Mac OS X subwindow handling (STR #1402)
+	- Fixed more inconsistencies between fl_draw and
+	  fl_measure (STR #1408)
+	- Fixed fl_measure which mistook a trailing '@@' for a
+	  symbol (STR #1406)
+	- Fixed GLUT behavior on window creation (STR #1403)
+	- Fixed OS X bug that would hide tooltips before they
+	  were shown (STR #1392)
+	- Fixed Fl_Tabs tooltip reappearing (STR #1324)
+	- Added a new demo game called "Block Attack!"
+	- Updated the Sudoku game to show a notice about Hard and
+	  Impossible puzzles having multiple solutions which are
+	  not a bug or error (STR #1361)
+	- Fixed filechooser to behave as documented when file
+	  pattern changes (STR #1359)
+	- Completed the global function index and added an
+	  alphabetical list of all methods (STR #1319)
+	- Avoiding problems with some platforms that don't 
+	  implement hypot() (STR #1366)
+	- Fixed floating point value formatting for Fl_Spinner
+	  (STR #1331)
+	- Fixed Fl_Positioner callback when released (STR #1387)
+	- Fixed WIN32 zero size window issue (STR #1387)
+	- Fixed Sudoku window positioning (STR #1398)
+	- Fluid Code Declarations can now handle C++ style
+	  comments (STR #1383)
+	- Fixed uninitialized data in OS X and WIN32 timeout
+	  functions (STR #1374).
+	- Fixed speed issues when measuring text on OS X with
+	  Quartz (STR #1386).
+	- Fixed focus issues on OS X (STR #1377)
+	- Optional precision argument when storing floats or 
+	  doubles in a Preferences file (STR #1381)
+	- Fixed callback not called when using arrow keys in
+	  Fl_Slider (STR #1333)
+	- Changing the shortcut of a widget in fluid now marks the
+	  document as dirty (STR #1382)
+	- Fl_Text_Editor now correctly handles middle mouse
+	  clicks (STR #1384)
+	- Added some GLUT4 functions (STR #1370)
+	- Added "context_changed()" function for OpenGL windows
+	  which allows efficient texture loading (STR #1372)
+	- Added missing "const" to GLUT call (STR #1371)
+	- Fixed stray FL_RELEASE events after clicking system
+	  areas on OS X (STR #1376)
+	- FLUID now only writes definitions of "o" and "w"
+	  variables as needed, reducing the number of "variable
+	  is shadowed" warnings from GCC.
+	- Added access to Xft font pointer (STR #1328)
+	- Fixed endianness in OS X mouse cursor graphics (STR
+	  #1348)
+	- Fixed crash on mixed use of keyboard and mouse for
+	  Fl_Menu_Button (STR #1356)
+	- Fixed Fl_Window::visible() and shown() for OS X
+	  (STR #1341)
+	- Fixed Fl_Window::copy_label() losing copy (STR #1332)
+	- Documentation fixes (STR #1336, STR #1329, STR #1339,
+	  STR #1340)
+	- Added support for floating point Fl_Spinner in the
+	  API, documentation, and Fluid (STR #1331)
+	- Repeat button now cancels timeout if it should get 
+	  deactivated during a callback (STR #1330)
+	- Added support for assigning Fl_Menu_Items to array 
+	  variables in Fluid (STR #1280)
+	- Added --with-archflags configure option to allow
+	  passing of specific architecture-selection options to
+	  the compiler and linker.
+	- Fixed WIN32 window stacking bug (STR #1296)
+	- Fixed wrong code generated by FLUID for Scrollbars (STR
+	  #1287)
+	- Loading a file would not update the Widget Properties
+	  dialog in FLUID (STR #1326)
+	- Fixed key compose sequences for shifted keys (STR
+	  #1194)
+	- Added text selection and copy to Fl_Help_View.
+	- Fixed position of popup menu titles (STR #1322)
+	- Showing any window will disable the current tooltip
+	  so it won't pop over menus (STR #1321)
+	- Updated documentation to reflect limitation of 
+	  Fl::delete_widget() (STR #1306)
+	- Fixed line wrapping in Fl_Text_Display (STR #1227)
+	- New function Fl::event_original_key() returns key code
+	  before NumLock handling.
+	- Many OS X Quartz fixes (STR #1310, etc.)
+	- Fixed shortcut and default focus for message dialogs
+	  (STR #1298)
+	- Fixed focus issues (STR #1286, STR #1289, STR #1296)
+	- Fixed window resizing in OS X (STR #1297)
+	- In FLUID, declarations starting with the keyword
+	  'typedef', 'class', or 'struct' are now treated
+	  correctly if inside a class (STR #1283)
+	- Tabs now show the correct tooltip (STR #1282)
+	- Included fltk.spec in configure.in (STR #1274)
+	- Fixed insufficiently invalidated cache 
+	  in Fl_Browser (STR #1265)
+	- Attempt to fix multi monitor issues (STR #1153)
+	- Fixed warnings when compiling w/Cygwin (STR #1152)
+	- Fixed missing reset of flag in FLUID (STR #1187)
+	- Fixed maximizing in OS X (STR #1221)
+	- Fixed 'make distclean' to remove binaries inside
+	  MacOS app packages (STR #1169)
+	- FLUID Code Viewer is now truly a viewer, not a text
+	  editor because edited text can not be saved.
+	- Fl_Spinner is now fully supported by FLUID (STR #1158)
+	- Fixed usage of deleted object after menu pulldown
+	  (STR #1162)
+	- Calling fl_font(0, 0) under Xft would access a NULL
+	  pointer (STR #1205)
+	- Setting a new value in Fl_Input_ wil now actually move
+	  cursor to the end of the input field as documented
+	  (STR #1161)
+	- FLUID crashed on WIN32 with international characters
+	  (STR #1176)
+	- Fl_Check_Browser did not allow the user to toggle the
+	  check boxes (STR #1232)
+	- Fl_Help_View crashed on WIN32 with international
+	  characters (STR #1228)
+	- Fl::run() no longer clears resources on WIN32 (STR
+	  #1231)
+	- Fl::add_timeout() leaked resources on OSX (STR #1233)
+	- Accented characters could not be entered on OSX (STR
+	  #1195)
+	- The caret key lookup was missing for OS X
+	- FLUID didn't handle loading .fl files with
+	  international characters properly with all compilers
+	  (STR #1150)
+	- Fl_Spinner's minimum() and maximum() "get" methods were
+	  misspelled (STR #1146)
+	- The largefile support changes in 1.1.7 broke binary
+	  compability for fl_filename_list(); you must now use
+	  "--enable-largefile" when configuring to get large file
+	  support, and the large file support definitions are
+	  added to the output of "fltk-config --cflags" (STR
+	  #1159)
+
+
+CHANGES IN FLTK 1.1.7
+
+	- Documentation fixes (STR #571, STR #648, STR #692, STR
+	  #730, STR #744, STR #745, STR #931, STR #942, STR #960,
+	  STR #969)
+	- Various menu widget fixes (STR #1140, STR #1143, STR
+	  #1144)
+	- The threads demo would display negative prime numbers
+	  on MacOS X; this appears to be a MacOS X bug, but we
+	  added a workaround to "fix" this (STR #1138)
+	- Fl::dnd() now sets the content type of the drag to
+	  "text/uri-list" when it sees the dragged text is
+	  composed of URIs.
+	- Fixed keyboard shortcut handling in FLUID and shortcut
+	  labeling in FLTK (STR #1129)
+	- Fixed include path for CMake build (STR #1123)
+	- Fixed unnecessary delay in WIN32 event handling 
+	  (STR #1104)
+	- Fixed handling of Ctrl-C in Fl_Text_Display (STR #1122)
+	- OS X Quartz version now draw a nice resize control (STR
+	  #1099)
+	- FLTK now enables large file support when available (STR
+	  #1087)
+	- Fl_Clock_Output depended on a time value that was the
+	  same as an unsigned long, which is incorrect for WIN64
+	  and VC++ 2005 (STR #1079)
+	- Fl_Text_Display::wrap_mode() would crash if no buffer
+	  was associated with the widget (STR #1069)
+	- Updated the default label and text colors of all widgets
+	  to use FL_FOREGROUND_COLOR instead of FL_BLACK (STR
+	  #1052)
+	- Fl::set_fonts() now works with Xft (STR #1012)
+	- Fl_Value_Input now uses the screen-absolute position
+	  instead of the window-relative position when dragging
+	  the value; this avoids some jumping conditions (STR
+	  #1037)
+	- Menus now pop up fully inside the screen if possible
+	  (STR #973)
+	- Fixed illegal access in Preferences (STR #1025)
+	- Fixed x-offset problem in Help_Widget (STR #998)
+	- Clipboard will persist if owner window is hidden (STR
+	  #1019)
+	- Fixed handling of Win32 Device Contexts (STR #1007)
+	- Fixed C++ style comments in C files (STR #997)
+	- Fixed signedness of scanf() argument (STR #996)
+	- Fixed cross-compiling problem (STR #995).
+	- FLUID now knows if a static callback is already
+	  declared in a class and won't declare it 'extern' (STR
+	  #776)
+	- Some actions in FLUID would not set the  "changed" flag
+	  (STR #984, STR #999)
+	- fl_filename_list now always appends a forward slash to
+	  directory names (STR #874)
+	- Multiline Input will update right if a space character is
+	  inserted in word wrap mode (STR #981)
+	- FLUID group labels redraw correctly (STR #959)
+	- FLUID now updates color of Fl_Tabs children (STR #979)
+	- FLUID now supports 'size_range()' (STR #851)
+	- FLUID selection boxes now synchronised (STR #964)
+	- fl_filename_list() now recognizes pathnames without
+	  trailing  slash as directions (STR #854)
+	- Fl_Text_Display now auto-scrolls in all 
+	  directions (STR #915)
+	- Borderless windows will not show in the taskbar anymore
+	  on X11 (STR #933)
+	- Fixed event_text() field on FL_DND_* event on 
+	  OS X and WIN32 (STR #968)
+	- The fltk-config utility now supports "--cc" and "--cxx"
+	  options to get the C and C++ compilers that were used
+	  to compile FLTK (STR #868)
+	- Fl_Valuator-derived widgets could show more digits than
+	  were necessary (STR #971)
+	- Fl_GIF_Image did not handle images with an incorrect
+	  number of data bits (STR #914)
+	- Fixed some plastic drawing artifacts (STR #906)
+	- Fl_Help_View now draws the box outside the scrollbars,
+	  like the other scrollable widgets (STR #871)
+	- The fltk-config script now handles invocation via a
+	  symlink (STR #869)
+	- Updated WIN32 cut/paste code to consistently handle DOS
+	  text (STR #961)
+	- Added shared library support for Cygwin and MingW (STR
+	  #893)
+	- Fl_File_Chooser did not implement the user_data()
+	  methods (STR #970)
+	- Compilation could fail if a previous installation of
+	  FLTK was in the same (non-standard) directory as an
+	  image library (STR #926)
+	- Fixed OSX compilation problems with non-HFS filesystems
+	  (STR #972)
+	- Problems with CMake on MinGW have been solved, thanks
+	  to Mr. "fltk.x0", who submitted the patch. (STR #863)
+	- Fixed memory leak in Fl_Check_Browser reported by
+	  "miguel2i". (STR #967)
+	- Fl_File_Input could draw in the wrong window (STR #958)
+	- WIN32: Internal WM_PAINT message now ignored (STR #831)
+	- Added Windows support for Fl_Window::xclass() (STR #848)
+	- Floating point input field allows characters from
+	  current locale (STR #903)
+	- Fixed integration of Fl_Input_Choice into FLUID (STR
+	  #879)
+	- New windows touching the right screen border would be 
+	  positioned all the way to the left (STR #898)
+	- Made pie drawing size for WIN32 and OS X the same as
+	  X11 (STR #905)
+	- Fixed OS X issue with OpenGL windows inside of Tabs
+	  (STR #602)
+	- FLUID Code Editor would occasionally not draw the last
+	  character in the buffer (STR #798)
+	- FLUID Declaration private flag fixed (STR #799)
+	- FLUID overlay now shows a seperate bounding box of
+	  selected items with correct handles and a dotted
+	  boundig box for all  labels (STR #790)
+	- Fixed left overhang of large chracters in Fl_Input_
+	  (STR #941)
+	- Fixed button resizing in File Chooser (STR #884)
+	- Fixed FLUID redraw issue (STR #912)
+	- Added 32bit BMP Image file format support (STR #918)
+	- Value Sliders would not receive focus when clicked on
+	  (STR #911)
+	- Added redraw of some widgets to show focus change (STR
+	  #910)
+	- Fl::set_font would not clear 'pretty' name (STR #902)
+	- Fixed unescaped '@' in fonts demo (STR #867)
+	- FLUID should not open the Display connection anymore if
+	  creating code only (STR #904)
+	- Improved hidden copy / ctor implementation (STR #860)
+	- Increased matrix stack depth and added over/underflow
+	  error (STR #924)
+	- Reverted Mac Carbon Clipping simplification that broke
+	  subwindow clipping (STR #908, SVN r4386)
+	- Fixed bitmap scaling code
+	- Fixed tiny memory leak (STR #878)
+	- Fixed hang on corrupt jpeg (STR #915)
+	- Fixed static allocation of font buffer in demo (STR #909)
+	- Added symbols 'refresh', 'reload', 'undo', and 'redo'.
+	- Fixed focus loss on Fl_Window:resize()
+	- Fl::delete_widget would hang fl_wait after deleting the
+	  window (STR #679)
+	- Fl::paste would sometimes not recoginze external 
+	  changes of the clipboard (STR #722)
+	- Clipping fixes for OSX
+	- Removed attempt to find items via 
+	  Fl_Menu_::find_item() in linked submenus
+	- FLUID interactive window resizing fixes (STR #873, 791)
+	- FLUID panel resize and alignment fixes (STR #891)
+	- Fl_Window::show(argc, argv) now sets the scheme before
+	  showing the window; this should eliminate any
+	  flickering between the standard and plastic schemes on
+	  startup (STR #886)
+	- Selected tabs are now drawn slightly larger than
+	  unselected tabs so they stand out more (STR #882)
+	- Round Plastic boxes now draw round (STR #841)
+	- FL_PLASTIC_DOWN_BOX drew with artifacts (STR #852)
+	- Changed initializations on WIN32 (STR #862)
+	- Fl_Preferences::getUserdataPath() didn't work for
+	  sub-groups (STR #872)
+	- Fixed some redraw issues on Windows XP.
+	- FLUID didn't set the initial size of widgets properly
+	  (STR #850)
+	- Fl_Tabs would steal focus away from its children on a
+	  window focus change (STR #870)
+	- filename_relative() now converts the current directory
+	  to forward slashes as needed on WIN32 (STR #816)
+	- Fl_File_Chooser::value() and ::directory() now handle
+	  paths with backslashes on WIN32 (STR #811)
+	- Added the standard rgb.txt file from X11 to the test
+	  directory, allowing all platforms to try the colbrowser
+	  demo (STR #843)
+	- Resizing of OpenGL subwindows was broken on OSX (STR #804)
+	- The fltk-config script now supports running from a
+	  source directory (STR #840)
+	- Fl_Browser_ didn't update the position properly when an
+	  item was deleted (STR #839)
+	- fl_contrast() now compares the luminosity of each color
+	  (STR #837)
+	- Fl_Input_ crashed on some platforms when wrapping
+	  international text characters (STR #836)
+	- Fixed some BMP images loading bugs (STR #825)
+	- Fl_File_Chooser now returns directory names with a
+	  trailing slash to avoid problems with relative
+	  filenames (STR #819)
+	- Fl_Help_View now supports the FONT and U elements (STR
+	  #815)
+	- OpenGL windows that were completely off-screen caused
+	  problems with some graphics cards on WIN32 (STR #831)
+	- Multiple screen support didn't work on Windows NT and
+	  95 (STR #821)
+	- Fl_Scrollbar didn't compute the correct knob size when
+	  using the "nice" types (STR #845)
+	- fl_draw() would segfault on WIN32 if no font was set;
+	  it now uses the default font (STR #828)
+	- Fl_Browser_ was calling the callback multiple times for
+	  a single selection change with FL_WHEN_CHANGED (STR
+	  #834)
+	- Added "filenew", "fileopen", "filesave", "filesaveas",
+	  and "fileprint" symbols with standard toolbar
+	  symbology.
+	- Updated Fl_Tabs to check the contrast of the label
+	  color against the tab background, and to highlight the
+	  top 5 lines of the tab pane with the selection color so
+	  that selected tabs stand out more.
+	- The example programs can now compile separate from the
+	  FLTK source distribution (STR #809)
+	- The example programs are now installed with the
+	  documentation (STR #809)
+	- Fixed the drawing of the Fl_Browser_ selection box (STR
+	  #786)
+	- Dropped Codewarrier project files and support.
+	- The FLTK string functions are now compiled in on all
+	  systems (STR #774)
+	- Fixed symbol demo label bug (STR #777)
+	- Fixed position of menu titles (STR #795)
+	- Added missing Fl_Window::copy_label() method.
+	- Fixed wrong tooltip in FLUID (STR #784)
+	- Added zlib path to FLUID (STR #783)
+	- Menus and other pop-up windows now obey screen
+	  boundaries on multi-screen displays (STR #781)
+	- Fl_Chart would draw outside its bounding box (STR #780)
+	- Added Fl::screen_count() and Fl::screen_xywh() APIs to
+	  support multi-screen displays.
+	- FLUID now supports direct creation of widget classes.
+	- Fl_File_Chooser now correctly handles multiple
+	  selections that are a mix of files and directories.
+	- Fl_File_Chooser no longer resets the type() when
+	  choosing a single file, and it now works when selecting
+	  multiple directories (STR #747)
+	- Fl_File_Icon::load_system_icons() now only loads 16x16
+	  and 32x32 icon images to improve startup performance.
+	- Pressing Enter in the file chooser when selecting a
+	  directory will choose that directory if it is currently
+	  shown (STR #746)
+	- Added a fl_file_chooser_ok_label() function to set the
+	  "OK" button label for the fl_file_chooser() and
+	  fl_dir_chooser() functions.
+	- Added Fl_File_Chooser::ok_label() methods to set the
+	  "OK" button label.
+	- The fl_ask() function is now deprecated since it does
+	  not conform to the FLTK Human Interface Guidelines.
+	- The Fl_File_Chooser window now properly resizes its
+	  controls (STR #766)
+	- The Fl_Help_Dialog window now properly resizes its
+	  controls (STR #768)
+	- The Fl_File_Chooser favorites window is now resizable
+	  (STR #770)
+	- Now provide FL_PLASTIC_ROUND_UP/DOWN_BOX box types
+	  which are used by the plastic scheme.
+	- FLUID windows that are resized through the widget panel
+	  now remain resizable by the window manager.
+	- Increased the size of the background image used by
+	  the plastic scheme to reduce the CPU load of redraws
+	  (STR #769)
+	- Fixed a syntax highlighting bug in the editor demo.
+	- Fl_Progress now contrasts the label color with the bar
+	  color, so labels will be readable at all times.
+	- fl_read_image() didn't use the right red, green, and
+	  blue masks on XFree86.
+	- Fixed Quickdraw drawing of 3 and 4 sided polygons (STR
+	  #765)
+	- Fixed fl_message() code so that it does not get
+	  accidentaly addded to the current group (STR #253)
+	- FLUID now highlights code in the widget callback and
+	  code editors.
+	- FLUID now supports printing of windows.
+	- Fixed inactive drawing of border, embossed, and
+	  engraved box types.
+	- Added Fl_Spinner widget (another combination of
+	  existing widgets in a header file)
+	- FLUID now provides support for UI templates.
+	- fl_not_clipped() incorrectly used the current window
+	  dimensions for gross clipping, which interfered with
+	  off-screen rendering.
+	- Fl_Window::draw() and Fl_Window::iconlabel() could leak
+	  memory if copy_label() was used on the window.
+	- fl_shortcut_label() now shows letter shortcuts in
+	  uppercase, e.g. "Ctrl+N" instead of "Ctrl+n" to be
+	  consistent with other toolkits.
+	- FLUID now provides unlimited undo/redo support.
+	- FLUID now provides an option to choose which scheme
+	  (default, none, plastic) to display.
+	- Fixed scheme background issue with windows in FLUID.
+	- In FLUID, new widgets are now created with the ideal
+	  size by default, and menu bars are positioned to use
+	  the entire width of the window.
+	- Added Layout/Widget Size submenu to select default
+	  label and text size (Tiny, Small, and Normal).
+	- Added Edit/Duplicate command to FLUID to duplicate the
+	  current selection.
+	- FLUID now tracks the current state of the widget bin
+	  and overlays.
+	- Now fill the widget image paths with relative
+	  filenames.
+	- Fixed frame drawing of Fl_Text_Display (STR #762)
+	- Fl_Clock_Output::value() did not return the previously
+	  set value (STR #748)
+	- Added comment type to FLUID. This is useful for
+	  generating copyright notices in the source and header
+	  files.
+	- Fl_Valuator would not format text output with decimal 
+	  point when the step value was fractional, but above 1.
+	- fl_filename_relative() didn't compare drive letters in
+	  a case-insensitive way (STR #741)
+	- Fixed menu item width calculations with symbols (STR
+	  #740)
+	- The keyboard shortcut handling code did not handle
+	  8-bit characters properly (STR #731)
+	- Fl_JPEG_Image could still crash an app with a corrupt
+	  JPEG file (STR #739)
+	- Using the layout alignment controls on a menu widget
+	  would cause FLUID to crash (STR #742)
+	- Added QNX bug workaround for menu handling (STR #704)
+	- Added Greg Ercolano's simple Fl_Input_Choice widget
+	  which is a combination of the Fl_Input and
+	  Fl_Menu_Button widgets (STR #650)
+	- Fl_Multiline_Input now scrolls the full height of the
+	  widget instead of 5 lines when the user presses PageUp
+	  or PageDown (STR #727)
+	- CMake build fixes (STR #724)
+	- Fl_Browser::swap() didn't handle redraws properly when
+	  the swapped lines had different heights (STR #729)
+	- FL_MOUSEWHEEL events are now sent first to the widget
+	  under the mouse pointer and then to the first widget
+	  which accepts them. This is similar to the way
+	  shortcut events are handled and is consistent with the
+	  way the mouse wheel is handled by other toolkits.
+	- Fl::wait() could block on WIN32 if the window was
+	  deleted via Fl::delete_widget() (STR #679)
+	- Fl_Preferences::RootNode did not find the user's home
+	  directory on some non-US versions of Windows (STR
+	  #720)
+	- Fl_Window::hide() didn't delete the current clipping
+	  region on WIN32, causing a GDI resource leak in some
+	  situations (STR #723)
+	- Removed a few warnings when compiling on OS X
+	- Fl_Menu now draws the arrow more like other toolkits
+	  and 2.0 (STR #651)
+	- Fixed a VC++ compiler error in Fl_JPEG_Image.cxx (STR
+	  #676)
+	- FL_SHADOW_BOX/FRAME drew outside of the bounding box
+	  (STR #694)
+	- Fl_Widget::copy_label(NULL) didn't work (STR #707)
+	- Fl_Choice now allows click selection like
+	  Fl_Menu_Button and Fl_Menubar (STR #706)
+	- Updated cmake support (STR #645)
+	- Fl_Check_Browser didn't draw properly when inactive
+	  (STR #681)
+	- Removed some redundant code in Fl_Group::handle() (STR
+	  #669)
+	- The file chooser didn't always deactivate the OK
+	  button when necessary (STR #653)
+	- Image drawing on OSX changed the current drawing
+	  colors (STR #662)
+	- Fixed some compiler errors on WIN32 (STR #647, STR
+	  #726)
+	- FLUID didn't update the widget panel X/Y/W/H values
+	  when moving the selected window (STR #701)
+	- FLUID didn't use the label type constant names for
+	  menu items, causing them to be drawn using the normal
+	  label type (STR #668)
+	- Fl_File_Chooser was slow with large directories (STR
+	  #654)
+	- FLUID didn't add xclass() calls to windows (STR #718)
+	- The X11 DND code did not correctly select a text
+	  format for incoming data (STR #711)
+	- Fixes to Fl_JPEG_Image error handler.
+	- Fl_Menu::popup() and ::pulldown() would crash an
+	  application if a callback created widgets before they
+	  returned (STR #685)
+	- Fl_Double_Window would cause a full redraw, even if
+	  only small parts of the UI were changed on Mac OS X.
+	- Fl_JPEG_Image did not correctly handle errors reported
+	  by the JPEG library (STR #652)
+	- Fl_Menu now draws sub-menu arrows like other toolkits
+	  and FLTK 2.0 (STR #651)
+	- Fixed a compiler warning in Fl_Window.H (STR #641)
+	- Tooltips disabled shortcut processing (STR #643)
+	- Fl::event_number() didn't always match the value sent
+	  to the handle() method (STR #634)
+	- Fl_Shared_Image::reload() didn't set the image_
+	  pointer properly in all cases (STR #632)
+	- Fl_Help_View::topline() incorrectly set the changed()
+	  flag (STR #631)
+	- Fl_Choice::value() now supports NULL or -1 to deselect
+	  the current item (STR #637)
+	- More VC++ 6 project file fixes (STR #638)
+	- Added missing Watcom makefile in the test directory
+	  (STR #636)
+	- Fl_Text_Display::word_left would hang if the cursor
+	  was at position 0 (STR #635)
+
+
+CHANGES IN FLTK 1.1.6
+
+	- Documentation updates (STR #552, STR #608)
+	- Added the 2.0 Fl_Widget::copy_label() method to
+	  allow FLTK 1.x applications to have their label
+	  strings managed by FLTK (STR #630)
+	- Added Fl::delete_widget() method to safely delete
+	  widgets in callback methods (STR #629)
+	- Fl_Widget::damage(uchar,int,int,int,int) didn't clip
+	  the bounding box properly (STR #626)
+	- Windows could appear on the wrong screen on OSX (STR
+	  #628)
+	- Fl_Double_Window produced an error on resize with X11
+	- FLUID didn't display menu items using images properly
+	  (STR #564)
+	- Fl_Sys_Menu_Bar didn't compile on case-sensitive
+	  file-systems (STR #622)
+	- FLUID didn't handle default function parameters
+	  properly (STR #579)
+	- Moving or resizing widgets in FLUID didn't always
+	  update the widget panel (STR #600)
+	- FLTK windows could appear off-screen on X11 (STR #586)
+	- The configure script did not support
+	  --disable-localfoo to completely disable image file
+	  support (STR #582)
+	- The Visual C++ 6.0 project files still listed the old
+	  JPEG, PNG, and ZLIB library names (STR #577)
+	- Fixed the scandir() conditional code for HP-UX 11i
+	  (STR #585)
+	- Fl_Text_Display didn't support CTRL/CMD-A/C (STR #601)
+	- Watcom fixes (STR #581, STR #584, STR #594, STR #595,
+	  STR #623, STR #627)
+	- Fixed library include order when building DSOs on
+	  MacOS X (STR #596)
+	- fl_xid() could cause a WIN32 application to crash (STR
+	  #560, STR #576, STR #618)
+	- Fl_Browser::remove_() removed the item from the list
+	  before computing the item height, which caused
+	  problems with some programs (STR #613)
+
+
+CHANGES IN FLTK 1.1.5
+
+	- Documentation updates (STR #568, STR #570)
+	- Shortcuts were incorrectly underlined in multi-line
+	  labels (STR #566)
+	- More CMake updates (STR #499)
+	- The Watcom C++ compiler needed a small change (STR
+	  #567)
+	- Added DESTDIR support and now remove all man pages for
+	  the "uninstall" target (STR #545)
+	- Fix PNG drawing on buggy WIN32 graphics cards (STR
+	  #548)
+	- The configure script didn't propagate the CPPFLAGS
+	  environment variable (STR #549)
+	- The numpad keys didn't work properly on WIN32 (STR
+	  #502)
+	- fl_input() and friends now set the input focus to the
+	  text field when the dialog is shown (STR #553)
+	- Fixed background color mixup when drawing Fl_Choice
+	  menus (STR #544)
+	- Fixed MingW makefiles (STR #550)
+	- More VC++ project file tweaking (STR #559)
+	- Fl_PNG_Image didn't use the png_set_trns_to_alpha
+	  function when available (STR #547)
+	- The FL_UNFOCUS event wasn't always sent when switching
+	  tabs (STR #558)
+
+
+CHANGES IN FLTK 1.1.5rc3
+
+	- Documentation updates (STR #505, STR #513)
+	- Updated PNG library source to 1.2.7.
+	- Updated ZLIB library source to 1.2.1.
+	- Fixed VC++ project file problems (STR #476, STR #478,
+	  STR #520, STR #527, STR #537)
+	- Now look for 8 bits of alpha when the developer has
+	  requested FL_RGB8 (STR #541)
+	- The last line in an Fl_Help_View widget was not
+	  aligned properly (STR #536)
+	- The "search" symbol looked like a Q (STR #536)
+	- Changed Fl_Help_View::get_color() to use a lookup
+	  table to avoid serious Borland C++ 5.5 compiler bugs
+	  (STR #533)
+	- Fixed Watcom compiler warnings with FL/Fl_Widget.H
+	  (STR #540)
+	- The image class copy() methods did not always make a
+	  separate copy of the image data (STR #539)
+	- Fixed an edge case in fl_old_shortcut() that could
+	  cause it to read beyond then end of the shortcut
+	  string (used for XForms named shortcuts)
+	- Added (unsupported) CMake files (STR #499)
+	- Tooltips would not reappear on the same widget, and
+	  the initial tooltip delay was not used after a tooltip
+	  was shown (STR #465)
+	- Fixed a compile problem with the Linux 2.6 threading
+	  support (STR #483)
+	- Fixed problems with 2-byte Xpm files on 64-bit
+	  platforms (STR #525)
+	- FLTK didn't handle the ReparentNotify event on X11
+	  (STR #524)
+	- The old source file "fl_set_gray.cxx" is not needed
+	  (STR #516)
+	- Fl_Text_Display still called delete[] instead of
+	  free() in one place (STR #503)
+	- The symbol test program did not handle the @+ symbol
+	  properly (STR #490)
+	- Fl_File_Chooser didn't correctly call isprint() and
+	  isspace() when checking to see if the current file was
+	  text that can be previewed (STR #517)
+	- FLUID didn't compile with Borland C++ due to a
+	  compiler bug (STR #496)
+	- Fl_Positioner did not handle reversed min and max
+	  values (STR #510)
+	- fl_descent(), fl_height(), and fl_width() would crash
+	  a program if you didn't call fl_font() first; they now
+	  return -1 if no font is set (STR #500)
+	- Added test/unittests to verify pixel drawing and 
+	  alignment across platforms
+	- Fl_Menu_::find_item() didn't determine the menu path
+	  properly (STR #481)
+	- The build system now installs image library header
+	  files in FL/images/filename.h so that FLTK programs
+	  will use the same header files as the FLTK image
+	  libraries.
+	- The build system now creates image libraries named
+	  "libfltk_name.a" instead of "libname.a" to avoid
+	  clobbering an existing installed library (STR #480)
+
+
+CHANGES IN FLTK 1.1.5rc2
+
+	- Documentation updates (STR #365, STR #399, STR #407,
+	  STR #412, STR #414, STR #452, STR #462)
+	- Fl_Text_Display did not handle drawing of overlapping
+	  text (italic next to plain, etc.) properly (STR #381)
+	- All of the core widgets now consistently set changed()
+	  before calling the callback function for a change in
+	  value; this allows programs to check the changed()
+	  state in a callback to see why they are being called
+	  (STR #475)
+	- Fl_File_Chooser did not handle some cases for filename
+	  completion (STR #376)
+	- Fl_Help_View didn't properly compute the default
+	  maximum width of the page properly, resulting in
+	  non-wrapped text in table cells (STR #464)
+	- Fl_Text_Editor no longer tries to emulate the Emacs
+	  CTRL-A shortcut to move to the first column, since
+	  there is a key for that and the widget does not
+	  emulate any other Emacs keys (STR #421)
+	- Fl_File_Chooser always disabled the OK button when the
+	  user pressed DELETE or BACKSPACE (STR #397)
+	- Added Fl_Browser::swap() methods (STR #459)
+	- Fl_Counter didn't use a thin down box for the text
+	  field if the box type was set to FL_THIN_UP_BOX (STR
+	  #467)
+	- Fl_Help_View now resets the scrollbars if they go
+	  outside the current view (STR #464)
+	- fl_dir_chooser() did not show the previous selection
+	  as documented (STR #443)
+	- Fl_Text_Display used delete[] instead of free() in
+	  some places (STR #466)
+	- FLTK now includes copies of the PNG, JPEG, and ZLIB
+	  libraries for platforms that do not have them (STR
+	  #441)
+	- The fltk-config script did not include the
+	  "-mno-cygwin" option under CygWin (STR #434)
+	- Fl_Help_View::find() did not check for a NULL value
+	  (STR #442)
+	- Added search symbol to the search field of
+	  Fl_Help_Dialog (STR #417)
+	- Added two new symbols, @search and @FLTK, which can be
+	  used in labels.
+	- MacOS X: fixed NumLock mixup, added support for
+	  FL_Menu and FL_Delete keys on external (PC) keyboards
+	  (STR #445)
+	- Fl_File_Icon::draw() did not support drawing of complex
+	  polygons in icon descriptions (STR #474)
+	- The configure script now offers options for JPEG, PNG,
+	  and ZLIB libraries (STR #416)
+	- The first menu item in a list would not go invisible 
+	  (STR #406)
+	- Fl_Text_Buffer::replace() now range checks its input
+	  (STR #385)
+	- FLTK now builds with the current release of MinGW (STR
+	  #325, STR #401, STR #402)
+	- FLTK now honors the numlock key state (STR #369)
+	- The Fl_Text_Display widget did not redraw selections
+	  when focus changed (STR #390)
+	- The plastic background image is now less contrasty
+	  (STR #394)
+	- Fl_Scroll now uses a full redraw when the scheme is
+	  set to plastic and the box type is a frame (STR #205)
+	- Fl_Window::resize() did not work properly with KDE 3.2
+	  (STR #356)
+	- FLTK didn't delete font bitmaps when the last OpenGL
+	  window was deleted, preventing future text from
+	  displaying (STR #310)
+	- FLUID didn't include a full initialization record for
+	  the trailing NULL menu items (STR #375)
+	- Fl_Browser::item_width() did not properly handle
+	  format modifiers (STR #372)
+	- Fl_Browser::item_height() did not handle columns
+	  properly (STR #371)
+	- Fl_Gl_Window's on WIN32 now prefer accelerated pixel
+	  formats over generic formats (STR #382)
+	- Fl_Window::resize() did not work on some systems if
+	  the window was not shown (STR #373)
+	- FLUID did not write the user_data type if the
+	  user_data field was empty (STR #374)
+	- The value(const Fl_Menu_Item*) method was not
+	  implemented for Fl_Choice (STR #366)
+        - Fl_Pack didn't draw child widget labels the same way
+          as Fl_Group, causing display problems (STR #360)
+        - fl_read_image() didn't work when reading from an
+          offscreen buffer with some X11 servers (STR #364)
+
+
+CHANGES IN FLTK 1.1.5rc1
+
+	- Documentation updates (STR #186, STR #245, STR #250,
+	  STR #277, STR #281, STR #328, STR #338)
+	- fl_scroll() did not handle scrolling from off-screen on
+	  WIN32 (STR #315)
+	- Fl_File_Chooser did not allow manual entry of a drive
+	  letter (STR #339)
+	- Fl_Menu now uses the boxtype to redraw the menu
+	  background (STR #204)
+	- Fl_Scroll now shows the background image when a framed
+	  box type is used and the Fl_Scroll is a direct
+	  decendent of a window (STR #205)
+	- Added a new_directory_tooltip string pointer to allow
+	  localization of the file chooser's new directory
+	  button (STR #340)
+	- Added Fl_Menu_::find_item() method (STR #316)
+	- The Fl_Widget copy operator definitions were not
+	  conditionally compiled properly (STR #329)
+	- FLUID's Layout functionality did not move child
+	  widgets when laying out group widgets (STR #319)
+	- FLUID's Layout->Center In Group functionality did not
+	  properly handle widgets that were children of a
+	  Fl_Window widget (STR #318)
+	- The Fl_Text_Display destructor did not remove the
+	  predelete callback associated with the current buffer
+	  (STR #332)
+	- Fixed several bugs in the MacOS X Fl::add_fd()
+	  handling (STR #333, STR #337)
+	- The Fl_Text_Display widget did not display selections
+	  set by the application (STR #322)
+	- FLUID crashed if you did layout with a window widget
+	  (STR #317)
+	- Fl_Scroll::clear() didn't remove the child widget from
+	  the Fl_Scroll widget (STR #327)
+	- Fl_Value_Slider::draw_bg() didn't always apply the
+	  clipping rectangle (STR #235)
+	- fl_filename_relative() returned the wrong string if
+	  the absolute pathname was equal to the current working
+	  directory (STR #224)
+	- Fl_Help_Dialog didn't correctly restore the scroll
+	  position when going forward/back in the link history
+	  if the file changed (STR #218)
+	- glutGetModifiers() did not mask off extra state bits,
+	  confusing some GLUT-based applications (STR #213)
+	- Fixed mouse capture problems on MacOS X (STR #209, STR
+	  #229)
+	- Fl_Sys_Menu_Bar is now built into the library for
+	  MacOS X (STR #229)
+	- Fl_Menu_ now provides item_pathname() methods to get
+	  the "pathname" of a menu item, e.g. "File/Quit" (STR
+	  #283)
+	- Fl_Text_Display now provides cursor_color() methods to
+	  get and set the cursor color (STR #271)
+	- Fl_Scroll didn't honor FL_NO_BOX (STR #305)
+	- FLUID declaration blocks didn't support public/private
+	  definitions (STR #301)
+	- Fl_Preferences incorrectly created the preferences
+	  directory before necessary (STR #247)
+	- The WIN32 project files still defined the (obsolete)
+	  FL_STATIC constant (STR #279)
+	- Fl_Text_Display::buffer() did not support NULL values,
+	  making it impossible to clean up text buffers from a
+	  subclass (STR #295)
+	- Fl_Text_Display did not support a NULL
+	  unfinishedStyleCB function (STR #241)
+	- Fl::background2() incorrectly marked the foreground
+	  color as initialized (STR #255)
+	- Fixed the X11 CTRL + "-" detection code to properly
+	  track the state of the CTRL key (STR #264)
+	- Fl_File_Icon::load_system_icons() didn't support KDE
+	  3.x (STR #299)
+	- WIN32's scandir() emulation did not allocate enough
+	  memory for directory names (STR #263)
+	- Fl::compose() did not handle special keys like
+	  backspace properly (STR #293)
+	- Fl_Choice did not clip its text when drawing using the
+	  plastic scheme (STR #287)
+	- Fl_Group incorrectly mapped the emacs CTRL keys to
+	  keyboard navigation (STR #228)
+	- Fl_File_Browser::load() didn't handle a NULL directory
+	  name (STR #266)
+	- 64-bit library fixes (STR #261)
+	- The Fl_Valuator::format() function did not limit the
+	  size of the number buffer (STR #268)
+	- The keypad Enter key works as the normal Enter/Return
+	  key in common widgets (STR #191)
+	- Fixed some OS/2-specific build problems (STR #185, STR
+	  #197)
+	- Calling Fl_Text_Display::buffer() with the same buffer
+	  would cause an application to lockup (STR #196)
+	- Some of the widgets could crash an application if the
+	  cursor was changed after a window was deleted (STR
+	  #181)
+	- The Fl_Gl_Window WIN32 pixel format code did not
+	  choose the pixel format with the largest depth buffer
+	  (STR #175)
+	- The configure script didn't leave space between the
+	  CFLAGS/CXXFLAGS and X_CFLAGS variables (STR #174)
+	- The Fl_JPEG_Image and Fl_PNG_Image classes did not
+	  trap errors from the corresponding image libraries
+	  (STR #168)
+	- Added "--with-links" configure option to control
+	  whether symlinks are created for the FLTK header files
+	  (STR #164)
+	- Added new hoverdelay() to Fl_Tooltip to control how
+	  quickly recent tooltips appear (STR #126)
+	- FLUID now sets the size range when a window is shown.
+	  This seems to be necessary with some window managers
+	  (STR #166)
+
+
+CHANGES IN FLTK 1.1.4
+
+	- The fl_read_image() function was not implemented on
+	  OSX (STR #161)
+	- VC++ 7.1 didn't like how the copy operators were
+	  disabled for the Fl_Widget class; now include inline
+	  code which will never be used but makes VC++ happy
+	  (STR #156)
+	- Fixed an IRIX compile problem caused by a missing
+	  #include (STR #157)
+	- FLUID didn't write color/selection_color() calls using
+	  the symbolic names when possible, nor did it cast
+	  integer colors to Fl_Color (STR #146)
+	- Fl_File_Chooser was very close for multiple file
+	  selection in large directories (STR #140)
+	- Fl_Text_Display/Editor did not disable the current
+	  selection when focus was shifted to another widget
+	  (STR #131)
+	- Fl_Choice didn't use the normal focus box when the
+	  plastic scheme was in use (STR #129)
+	- Fl_Text_Editor didn't use selection_color()
+	  consistently (STR #130)
+	- The fltk_forms, fltk_gl, and fltk_images DSO's and
+	  HP-UX shared libraries are now linked against the fltk
+	  shared library to provide complete dependency
+	  resolution (STR #118)
+	- The configure.in file did not work with autoconf 2.57.
+	- FLUID didn't redraw widgets when changing the X, Y, W,
+	  or H values in the widget panel (STR #120)
+	- Fl_Window::show(argc, argv) wasn't calling
+	  Fl::get_system_colors() as documented (STR #119)
+	- DSO (shared library) building wasn't quite right for
+	  some platforms (STR #118)
+	- OSX: some changes to make ProjectBuilder compiles
+	  possible.
+	- OSX: FLTK would not know where a window was positioned
+	  by the OS. As a result, popup menus could open at 
+	  wrong positions.
+
+
+CHANGES IN FLTK 1.1.4rc2
+
+	- Fl_Window::show(argc,argv) incorrectly opened the
+	  display prior to parsing the arguments; this prevented
+	  the "-display foo" option from working (STR #111)
+	- Images were not clipped properly on MacOS X (STR #114)
+	- Fl::reload_scheme() and Fl::scheme("foo") incorrectly
+	  called Fl::get_system_colors().  This prevented an
+	  application from setting its own color preferences
+	  (STR #115)
+	- The 'Enter' key event on OS X would not set
+	  Fl::e_text.
+	- Changed behaviour of FLUID to always paste into
+	  a selected group (STR #88)
+	- Menuitem now changes font, even if fontsize
+	  is not set (STR #110)
+	- Swapped shortcut labels in OS X (STR #86)
+	- Non-square Fl_Dial would calculate angle from user
+	  input wrong (STR #101)
+	- Updated documentatiopn of fl_draw (STR #94)
+	  and Fl_Menu_::add() (STR #99)
+	- FLUID collapse triangle events were not offset by
+          horizontal scroll (STR #106)
+	- QuitAppleEvent now correctly returns from Fl::run()
+          instead of just exiting (STR #87)
+	- Hiding the first created OpenGL context was not
+	  possible. FLTK now manages a list of contexts (STR #77)
+	- FLUID didn't keep the double/single buffer type for
+	  windows.
+	- FLTK didn't work with Xft2.
+	- OSX window resizing didn't work (STR #64)
+	- Fixed MacOS X shared library generation (STR #51)
+	- Several widgets defined their own size() method but
+	  didn't provide an inline method that mapped to the
+	  Fl_Widget::size() method (STR #62)
+	- Fl_Scroll didn't provide its own clear() method, so
+	  calling clear() on a Fl_Scroll widget would also
+	  destroy the scrollbars (STR #75)
+	- Fl::event_text() was sometimes initialized to NULL
+	  instead of an empty string (STR #70)
+	- fl_draw() didn't properly handle a trailing escaped
+	  "@" character (STR #84)
+	- Added documentation for all forms of
+	  Fl_Widget::damage() (STR #61)
+	- Fl_Double_Window now has a type() value of
+	  FL_DOUBLE_WINDOW, to allow double-buffered windows to
+	  process redraws properly on WIN32 (STR #46)
+	- Added FL_DAMAGE_USER1 and FL_DAMAGE_USER2 damage bits
+	  for use by widget developers (STR #57)
+	- Fl_Help_View didn't support numeric character entities
+	  (STR #66)
+	- Menu shortcuts didn't use the Mac key names under
+	  MacOS X (STR #71)
+	- CodeWarrior Mac OS X updated to work with current
+	  CW8.3 (STR #34)
+	- Apple-C/X/V/Z didn't work in the Fl_Input widget due
+	  to a bad mapping to control keys (STR #79)
+	- Added the OSX-specific fl_open_callback() function to
+	  handle Open Documents messages from the Finder (STR
+	  #80)
+	- The configure script contained erroneous whitespace in
+	  various tests which caused errors on some platforms
+	  (STR #60)
+	- The fltk-config script still supported the deprecated
+	  --prefix and --exec-prefix options; dropped them since
+	  they serve no useful purpose and would never have
+	  worked for the intended purpose anyways... (STR #56)
+	- fl_filename_list returned 0 on Win32 if no directory
+	  existed (STR #54)
+	- Pressing 'home' after the last letter in a Text_Editor
+	  would move the cursor to pos 0 (STR #39)
+	- Fl::get_key(x) would mix up Ctrl and Meta on OS X (STR
+	  #55)
+	- The configure script used the wrong dynamic library
+	  linking command for OSX (STR #51)
+	- The Fl_Text_Editor widget did not set changed() nor
+	  did it call the widget's callback function for
+	  FL_WHEN_CHANGED when processing characters that
+	  Fl::compose() handles (STR #52)
+
+
+CHANGES IN FLTK 1.1.4rc1
+
+	- The file chooser did not reset the click count when
+	  changing directories; if you clicked on a file in the
+	  same position after changing directories with a
+	  double-click, the chooser treated it as a triple
+	  click (STR #27)
+	- Symbols with outlines did not get drawn inactive.
+	- The Fl_Help_View widget now provides a find() method
+	  to search for text within the page.
+	- The Fl_Help_Dialog widget now provides a search box
+	  for entering text to search for.
+	- The default font encoding on OSX did not match the
+	  default on WIN32 or X11.
+	- Menu items were not drawn using the font specified in
+	  the Fl_Menu_Item structure (STR #30)
+	- Long menus that were aligned such that the top of an
+	  item was exactly at the top of the screen would not
+	  scroll (STR #33)
+	- The OS issues appendix incorrectly stated that MacOS
+	  8.6 and 9 were supported; they are not (STR #28)
+	- Fixed handling of nested double-buffered windows (STR
+	  #1)
+	- Showing a subwindow inside a hidden window would crash
+	  the application (STR #23)
+	- OSX users couldn't enter some special chars when using
+	  some foreign key layouts (STR #32)
+	- Hiding subwindows on OSX would hide the parent window
+	  (STR #22)
+	- Added thin plastic box types.
+	- Fl_Pack ignored the box() setting and cleared any
+	  unused areas to the widget color; it now only does so
+	  if the box() is set to something other than FL_NO_BOX.
+	- Updated the Fl_Tabs widget to offset the first tab by
+	  the box dx value to avoid visual errors.
+	- Updated the plastic up box to draw only a single
+	  border frame instead of the old double one for
+	  improved appearance.
+	- Updated the default background color on OSX to provide
+	  better contrast.
+	- Fl_Text_Display and friends now look for the next
+	  non-punctuation/space character for word boundaries
+	  (STR #26)
+	- gl_font() didn't work properly for X11 when Xft was
+	  used (STR #12)
+	- Fl_File_Browser incorrectly included "." on WIN32 (STR
+	  #9)
+	- Include shellapi.h instead of ShellAPI.h in the WIN32
+	  drag-n-drop code in order to work with the MingW cross
+	  compiler (STR #6)
+	- The cursor was not properly restored when doing
+	  drag-n-drop on X11 (STR #4)
+	- Fl::remove_fd() didn't recalculate the highest file
+	  descriptor properly (STR #20)
+	- Fl_Preferences::deleteGroup() didn't work properly
+	  (STR #13)
+	- Fixed the fl_show_file_selector() function - it was
+	  copying using the wrong string size (STR #14)
+	- fl_font() and fl_size() were not implemented on MacOS
+	  X.
+	- Sorted the icon menu bar in FLUID.
+	- Fixed minor memory access complaints from Valgrind
+	- Compiling src/flstring.h on OS X with BSD header would
+	  fail.
+	- Fl_Text_Editor didn't scroll the buffer when the user
+	  pressed Ctrl+End or Ctrl+Home.
+	- Fl_Text_Editor didn't show its cursor when the mouse
+	  was moved inside the window.
+	- FLUID now uses an Fl_Text_Display widget for command
+	  output, which allows you to copy and paste text from
+	  command output into other windows.
+	- Fl_Gl_Window could cause a bus error on MacOS X if the
+	  parent window was not yet shown.
+	- FLUID could crash after displaying a syntax error
+	  dialog for the callback code.
+	- FLUID would reset the callback code if you opened the
+	  widget panel for multiple widgets.
+	- Added a NULL check to Fl_Text_Display (SF Bug #706921).
+	- The fltk-config script placed the LDFLAGS at the wrong
+	  place in the linker options.
+	- Fl_Text_Display didn't draw the outer box in the right
+	  dimensions, so it was invisible.
+	- Fl_Help_Dialog used the same color for links as for
+	  the background, causing links to be invisible on pages
+	  without a background color set.
+
+
+CHANGES IN FLTK 1.1.3
+
+	- Documentation updates.
+	- FLTK now ignores KeyRelease events when X11 sends them
+	  for repeating keys.
+	- FLUID now supports up to two additional qualifiers
+	  before a class name (FL_EXPORT, etc.) to aide in
+	  developing DLL interfaces for WIN32.
+	- Additional NULL checks in Fl_Button,
+	  fl_draw_boxtype(), Fl_File_Chooser, and
+	  Fl_Window::hotspot().
+	- The Fl_Preferences header file needed to FL_EXPORT all
+	  of the nested classes for WIN32.
+	- Fl_Double_Window couldn't be nested on WIN32. [SF Bug
+	  #658219]
+	- Fl_Slider didn't call the callback function when the
+	  user changed the value using the keyboard and the
+	  "when" condition was FL_WHEN_RELEASE. [SF Bug #647072]
+	- Lines with less than 2 unique vertices and polygons
+	  with less the 3 unique vertices were not drawn
+	  properly. [SF Bug #647067]
+	- The size_range() values were not honored under MacOS
+	  X. [SF Bug #647074]
+	- OpenGL windows didn't resize correctly on MacOS X.
+          [SF Bug #667855]
+	- The menus incorrectly used the overlay visual when one
+	  or more menu items contained an image. [SF Bug #653846]
+	- Changed some error messages to use Fl::error() instead
+	  of fprintf()...
+	- Fl_Text_Buffer and Fl_Text_Display used free to free
+	  memory that was allocated using the new operator.
+	- Tweeked the plastic scheme under MacOSX to better
+	  match the colors.
+	- The Fl_Image.H always included the x.H header file,
+	  which included many system headers that could
+	  interfere with normal GUI applications.  It now uses
+	  the corresponding based types for the image id and
+	  mask to avoid this.
+	- The FLUID widget panel wasn't sorted, so keyboard
+	  navigation was strange. [SF Bug #647069]
+	- Fl_Scroll didn't compute the location of labels to the
+	  right or below when determining the area to erase.
+	- Added backward-compatibility macro for
+	  filename_setext().
+	- Fl_Bitmap::copy(), Fl_Pixmap::copy(), and
+	  Fl_RGB_Image::copy() all could overflow the source
+	  image when scaling the image.
+	- Double/triple clicks in Fl_Input fields didn't copy
+	  the expanded selection to the clipboard.
+	- Fl_Glut_Window and Fl_Gl_Window didn't always initialize
+	  the OpenGL context on MacOS.
+
+
+CHANGES IN FLTK 1.1.2
+
+	- Fl_Menu_Bar now supports drawing vertical dividers
+	  between menu items and submenus in the menu bar.
+	- Fl_File_Chooser::value() didn't return NULL when the
+	  user clicked Cancel while selecting a directory.  This
+	  bug also affected fl_dir_chooser().
+	- Fl_Menu_::add(const char *) used too small a menu item
+	  label buffer and didn't do bounds checking.
+	- Eliminate some compiler warnings with CodeWarrier
+	  under WIN32 (Paul Chambers)
+	- Fl_Gl_Window widgets did not resize properly under
+	  MacOS X.
+	- The cursor could be set for the wrong window in the
+	  text widgets.
+	- Fl_Check_Browser didn't provide const char * add
+	  methods as documented.
+	- Fl_Check_Browser didn't draw the same style of check
+	  marks at the other widgets.
+	- Fl_Button, Fl_Choice, and Fl_Menu_Button incorrectly
+	  activated the button/menu when the spacebar was
+	  pressed in conjunction with shift, control, alt, or
+	  meta.
+	- FLTK should now compile with Xft 2.0.
+	- Some versions of Tru64 4.0 have snprintf and
+	  vnsprintf, but don't have the prototypes for those
+	  functions.
+	- FLTK had trouble doing character composition with some
+	  keyboard layouts under X11 (in particular, Belgian).
+	- Fl_Text_Editor would cause a segfault if the user
+	  pressed CTRL-V (paste) without having any data in the
+	  clipboard...
+	- The tab key moved backwards in menus instead of
+	  forwards.  Shift-tab still moves backwards.
+	- The redraw_label() method didn't damage the parent
+	  window when the label was outside the widget's
+	  bounding box.
+	- Added a "draw_children()" method to Fl_Group to make
+	  subclassing Fl_Group with a custom draw() function
+	  easier.
+	- Fl_Text_Editor now supports basic undo functionality.
+	- FLUID now uses Fl_Text_Editor widgets for all
+	  multi-line code fields.
+	- Added new widget bin and icons to FLUID.
+	- FLUID would try running multiple commands in parallel,
+	  even though it wasn't capable of handling it.
+	- FLUID didn't generate code for some attributes when
+	  using custom/named widget classes.
+	- Added a new FL_COMMAND state bit which maps to FL_CTRL
+	  on X11 and WIN32 and FL_META on MacOS.
+	- MacOS keyboard modifiers mapping corrections. Cmd and
+	  Control are no longer swapped, event_key and event_text
+	  return (mostly) the same values as on other platforms.
+	- The Fl_Tabs widget should no longer be a focus hog;
+	  previously it would take focus from child widgets.
+	- The file chooser now activates the OK button when
+	  opening a directory in directory selection mode.
+	- Fixed a bug in the file chooser when entering an
+	  absolute path.
+	- Back-ported some FLTK 2.0 tooltip changes to eliminate
+	  erroneous tooltip display.
+	- MacOS windows were resizable, even when size_range
+	  would not allow for resizing.
+	- Fl_Text_Editor now supports Shift+Delete, Ctrl+Insert,
+	  and Shift+Insert for cut, copy, and paste,
+	  respectively.
+	- Fl_Text_Display didn't restore the mouse pointer when
+	  hidden.
+	- Fl::arg() now ignores the MacOS X -psn_N_NNNNN option.
+	- Added another change to the WIN32 redraw handling for
+	  the MingW compilers.
+	- Fl_File_Chooser didn't handle WIN32 home directories
+	  that used backslashes instead of forward slashes.
+	- Fl_Text_Display didn't limit the resize height to 1
+	  line.
+	- Fl_Scrollbar widgets incorrectly took keyboard focus
+	  when clicked on. This caused widgets such as
+	  Fl_Text_Display to hide the cursor when you scrolled
+	  the text.
+
+
+CHANGES IN FLTK 1.1.1
+
+	- Fl_Text_Display didn't always show the cursor.
+	- Fl_Tabs now only redraws the tabs themselves when
+	  making focus changes.  This reduces flicker in tabbed
+	  interfaces.
+	- The WIN32 redraw handler now correctly merges the FLTK
+	  and Windows redraw regions.
+	- The Fl_Text_* widgets use the C++ bool type, which is
+	  not supported by older C++ compilers.  Added a
+	  configure check and workaround code for this.
+	- Fl_X::set_xid() didn't initialize the backbuffer_bad
+	  element that was used with XDBE.
+	- Fl_Shared_Image::uncache() was not implemented.
+	- Fl::set_font() didn't 0-initialize all font descriptor
+	  data.
+	- Some OpenGL implementations don't support single-
+	  buffered visuals. The Fl_Gl_Window class now emulates
+	  single-buffered windows using double-buffered
+	  windows.
+	- Added a workaround for a compiler bug in Borland C++
+	  that prevented Fl_Help_View.cxx from compiling.
+	- Checkmarks didn't scale properly; copied the 2.0 check
+	  mark code over.
+	- Replaced several memcpy's with memmove's for
+	  portability (memmove allows for overlapping copies,
+	  memcpy does not)
+	- Bug #621737: Fl_Bitmap::copy(), Fl_Pixmap::copy(), and
+	  Fl_RGB_Image::copy() now range-check the new width and
+	  height to make sure they are positive integers.
+	- Bug #621740: the WIN32 port needed to handle WM_MOUSELEAVE events
+	  in order to avoid problems with tooltips.
+	- Fl_PNM_Image didn't set the "alloc" flag for the data,
+	  which could lead to a memory leak.
+	- fl_filename_match() was inconsistently doing case-
+	  insensitive matching.
+	- Fl_Button redraw fix for bug #620979 (focus boxes and
+	  check buttons).
+	- Fl_Text_Display fix for bug #620633 (crash on
+	  redisplay).
+	- Fl_Output now calls its callback when the user clicks
+	  or drags in the widget.
+	- Shortcuts now cause buttons to take focus when visible
+	  focus is enabled.
+	- fl_filename_relative() didn't check that the path was
+	  absolute under WIN32.
+	- fl_filename_relative() didn't check that the path was
+	  on the current drive under WIN32.
+	- The Fl_BMP_Image class now handles 16-bit BMP files
+	  and BMP files with a transparency mask.
+	- The fltk-config script didn't add the required include
+	  path, if any, when compiling a program.
+	- Added a license clarification that the FLTK manual is
+	  covered by the same license as FLTK itself.
+	- Fl_Check_Browser wasn't documented.
+	- Fl_Preferences::Node::addChild(), deleteEntry(), and
+	  remove() didn't set the "dirty" flag.
+	- The "no change" button didn't work in the FLUID widget
+	  panel.
+	- Vertical scrollbars did not draw the arrows inactive
+	  when the scrollbar was inactive.
+
+
+CHANGES IN FLTK 1.1.0
+
+	- Documentation updates.
+	- Added a Fl_Widget::redraw_label() method which flags a
+	  redraw of the appropriate area.  This helps to
+	  eliminate flicker when updating the value of a widget.
+	- Fl_Wizard::value() now resets the mouse cursor to the
+	  window's default cursor.
+	- Fl_File_Chooser::type() didn't enable/disable the new
+	  directory button correctly.
+	- Fl_Preferences::entryExists() did not work properly.
+	- FLUID's image file chooser pattern was incorrect.
+	- Fl_File_Icon::load_system_icons() now detects KDE
+	  icons in /opt/kde, /usr/local, and /usr automatically,
+	  and supports the KDEDIR environment variable as well.
+	- Submenus now display to the left of the parent menu if
+	  they won't fit to the right.  Previously they would
+	  display right on top of the parent menu...
+	- Fl_Menu_:add() didn't handle a trailing "\" character
+	  gracefully.
+	- Clicking/dragging the middle mouse button in a
+	  scrollbar now moves directly to that scroll position,
+	  matching the behavior of other toolkits.
+	- Added some more range checking to the Fl_Text_Display
+	  widget.
+	- The editor demo did not correctly update the style
+	  (syntax highlighting) information.
+
+
+CHANGES IN FLTK 1.1.0rc7
+
+	- Updated the Fl_Text_Buffer and Fl_Text_Display classes
+	  to be based on NEdit 5.3 (patch from George Garvey).
+	- Fixed a problem with Fl::wait(0.0) on MacOS X 10.2;
+	  this affected the fractals demo and other OpenGL
+	  applications.
+	- Fl_Glut_Window now takes keyboard focus and handles
+	  shortcut events.
+	- The MacOS X implementation of fl_ready() now checks
+	  the event queue for events.
+	- Fl_PNM_Image now supports the XV/GIMP thumbnail format
+	  (P7).
+	- Fl_Preferences would not find groups inside the root 
+	  group.
+	- Small bug fixes for Fl_Chart, Fl_Scrollbar, Fl_Tabs,
+	  and FLUID from Matthew Morrise.
+	- Fl_Chart didn't have its own destructor, so data in
+	  the chart wasn't freed.
+	- Fl_Menu_Button no longer responds to focus or keyboard
+	  events when box() is FL_NO_BOX.
+	- FLTK convenience dialogs put the buttons in the wrong
+	  order.
+	- Fl_BMP_Image didn't load 4-bit BMP files properly.
+	- Minor tweeks to the WIN32 DLL support.
+	- Fl_Text_Display::resize() could go into an infinite
+	  loop if the buffer is emptied.
+	- Fl::handle() didn't pass FL_RELEASE events to the
+	  grab() widget if pushed() was set (for proper menu
+	  handling...)
+	- DND events were being sent to the target window
+	  instead of the target widget under WIN32.
+	- The newest Cygwin needs the same scandir() handling as
+	  HP-UX.
+	- FLUID didn't register the image formats in the
+	  fltk_images library, and had some other image
+	  management problems.
+	- Fixed one more redraw bug in Fl_Browser_ where we
+	  weren't using the box function to erase empty space in
+	  the list.
+	- Fl_Text_Display::buffer() now calls resize() to show
+	  the buffer.
+	- Fl_Help_View didn't support HTML comments.
+	- Fl_Help_View didn't include the extra cellpadding when
+	  handling colspan attributes in cells.
+	- Fl_Help_View didn't support table alignment.
+
+
+CHANGES IN FLTK 1.1.0rc6
+
+	- Documentation updates.
+	- Fl::handle() didn't apply the modal tests for
+	  FL_RELEASE events, which caused Fl_Tabs to allow users
+	  to change tabs even when a modal window was open.
+	- Fl_Browser_, Fl_Input_, Fl_Slider now use the box
+	  function to erase the background.  This fixes some
+	  long-standing redraw problems.
+	- More snprintf/strlcpy/strlcat changes where needed.
+	- Fl::get_font_name() would leak 128 bytes.
+	- Eliminated most of the "shadowed" variables to avoid
+	  potential problems with using the wrong copy of "foo"
+	  in a class method.
+	- Moved Fl_BMP_Image, Fl_GIF_Image, and Fl_PNM_Image to
+	  the fltk_images library, so the only image formats
+	  that are supported by the core library are XBM and XPM
+	  files.  This reduces the size of the FLTK core library
+	  by about 16k...
+	- The Fl_Text_Display::resize() method was incorrectly
+	  flagged as protected.
+	- Fixed some memory/initialization bugs in
+	  Fl_File_Chooser that valgrind caught.
+	- The PNG library png_read_destroy() is deprecated and
+	  does not free all of the memory allocated by
+	  png_create_read_struct(). This caused a memory leak in
+	  FLTK apps that loaded PNG images.
+	- Added uncache() method to Fl_Image and friends.
+	- Added image() methods to Fl_Menu_Item.
+	- Added default_cursor() method and data to Fl_Window.
+	- Fl_Group would send FL_ENTER events before FL_LEAVE
+	  events, causing problems with adjacent widgets.
+	- Fixed filename problems with Fl_File_Chooser -
+	  changing the filename field directly or choosing files
+	  from the root directory could yield interesting
+	  filenames.
+	- Fl_Input_ could crash if it received an empty paste
+	  event.
+	- The mouse pointer now changes to the I beam
+	  (FL_CURSOR_INSERT) when moved over an input field or
+	  text widget.
+	- "make install" didn't automatically (re)compile the
+	  FLUID executable.
+	- Added an Fl::get_boxtype() method to get the current
+	  drawing function for a specific box type.
+	- Fl_Output and Fl_Multiline_Output didn't prevent
+	  middle-mouse pastes.
+	- Fl_JPEG_Image didn't compile out-of-the-box with Cygwin
+	  due to a bug in the Cygwin JPEG library headers.
+	- Fl_BMP_Image still didn't work with some old BMP files.
+	- "make distclean" didn't really clean out everything.
+	- Tweeked the look of the check button with a patch from
+	  Albrecht Schlosser.
+
+
+CHANGES IN FLTK 1.1.0rc5
+
+	- Added "wrap" type bit to Fl_Input_, so you can now
+	  have a multiline text field that wraps text.
+	- Setting the value() of an output text field no longer
+	  selects the text in it.
+	- Output text fields now show a caret for the cursor
+	  instead of the vertical bar.
+	- The newButton and previewButton widgets are now public
+	  members of the Fl_File_Chooser class.  This allows
+	  developers to disable or hide the "new directory" and
+	  "preview" buttons as desired.
+	- Added new visible focus flag bit and methods to
+	  Fl_Widget, so it is now possible to do both global and
+	  per-widget keyboard focus control.
+	- Removed extra 3 pixel border around input fields.
+	- No longer quote characters from 0x80 to 0x9f in input
+	  fields.
+	- Improved speed of Fl_Browser_::display() method with
+	  large lists (patch from Stephen Davies.)
+	- Fl_Help_View didn't properly handle NULL from the link
+	  callback (the original filename/directory name were
+	  not preserved...)
+	- Fl_Help_View didn't use the boxtype border values when
+	  clipping the page that was displayed.
+	- Added first steps to CodeWarrior/OS_X support (see
+	  fltk-1.1.x/CodeWarrior/OS_X.sit)
+	- Cleaned up the WIN32 export definitions for some of
+	  the widget classes.
+	- Fixed a filename completion bug when changing
+	  directories.
+	- Fl_File_Chooser::value() would return directories with
+	  a trailing slash, but would not accept a directory
+	  without a trailing slash.
+	- When installing shared libraries, FLUID is now linked
+	  against the shared libraries.
+	- MacOS: missing compile rule for .dylib files.
+	- Fl_Group::current(), Fl_Group::begin(), and
+	  Fl_Group::end() are no longer inlined so that they are
+	  properly exported in DLLs under WIN32.  Similar
+	  changes for all static inline methods in other
+	  classes.
+	- MacOS: support for Mac system menu (Fl_Sys_Menu_Bar)
+	- MacOS: wait(0) would not handle all pending events
+	- Added new makeinclude file for MingW using GCC 3.1.x.
+	- Fl_Choice::value(n) didn't range check "n".
+	- The MingW and OS/2 makeinclude files didn't have the
+	  new fltk_images library definitions.
+	- Fl_Text_Editor didn't scroll the text in the widget
+	  when dragging text.
+	- Config header file changes for Borland C++.
+	- FLTK didn't provide a Fl::remove_handler() method.
+
+
+CHANGES IN FLTK 1.1.0rc4
+
+	- Added new filter_value() methods to Fl_File_Chooser to
+	  get and set the current file filters.
+	- Added support for custom filters to Fl_File_Chooser.
+	- Added Borland C++ Builder IDE project files from
+	  Alexey Parshin.
+	- Resource leak fixes under WIN32 from Ori Berger.
+	- Now register a WIN32 message for thread messages.
+	- Fl_Window didn't initialize the min and max window
+	  size fields.
+	- The JPEG and PNG image classes have been moved to the
+	  fltk_images library, a la FLTK 2.0.  You can register
+	  all image file formats provided in fltk_images using
+	  the new fl_register_images() function.
+	- Fl_XBM_Image didn't correctly load XBM files.
+	- MacOS: Added Greg Ercolano's file descriptor support.
+	- MacOS: Fixed text width bug.
+	- A change in fl_fix_focus() broken click-focus in FLWM.
+	- Cygwin with -mnocygwin didn't like the FL/math.h
+	  header file.
+	- Fl_Browser_ cleared the click count unnecessarily.
+	- MacOS: Pixmap draw fix, gl_font implemented
+	  FL_FOCUS fix, window type fix for modal and nonmodal
+	  windows, glut uninitialised 'display' proc fix
+	- Now support FLTK_1_0_COMPAT symbol to define
+	  compatibility macros for the old FLTK 1.0.x function
+	  names to the 1.1.x names.
+	- Now translate the window coordinates when a window is
+	  shown, moved, or resized.  This should fix the "menus
+	  showing up at the wrong position" bug under XFree86.
+	- Fixed some more problems with the Fl_BMP_Image file
+	  loader.
+	- BC++ fixes.
+	- The pixmap_browser demo didn't check for a NULL image
+	  pointer.
+	- Fl_File_Icon::find() now uses fl_filename_isdir()
+	  under WIN32 to check for directories.
+	- Fl_File_Chooser's preview code called refcount()
+	  on the deleted image's object.
+	- Fixed another problem with the Fl_BMP_Image loader.
+	- The fl_file_chooser() callback was being called with a
+	  NULL filename.
+	- Documented that fl_push_clip() is preferred over
+	  fl_clip(), with a corresponding source change.
+	- Minor changes to the MacOS X event handling code.
+	- Added syntax highlighting example code to the editor
+	  test program.
+	- Fl_Text_Display didn't range check style buffer
+	  values.
+	- Added "dark" color constants (FL_DARK_RED, etc.)
+	- The MacOS font code was missing definitions for
+	  fl_font_ and fl_size_.
+
+
+CHANGES IN FLTK 1.1.0rc3
+
+	- Documentation updates.
+	- New file chooser from design contest.
+	- Did some testing with Valgrind and fixed some memory
+	  problems in Fl_Help_View::Fl_HelpView,
+	  Fl_Menu_::remove(), Fl_Text_Display::draw_vline(), and
+	  resizeform() (convenience dialogs).
+	- Fixed some redraw() bugs, and now redraw portions of
+	  the parent widget when the label appears outside the
+	  widget.
+	- The boolean (char) value methods in Fl_Preferences
+	  have been removed since some C++ compilers can't
+	  handle char and int value methods with the same name.
+	- Added fl_read_image() function.
+	- Fixed Fl_Valuator::format() so that the correct format
+	  type is used when step == 1.0.
+	- Fl_Help_View didn't support the TT markup.
+	- Fl_Shared_Image used a double-pointer to the image
+	  handler functions, which was unnecessary and
+	  unintuitive.
+	- Fl_PNM_Image didn't load the height of the image
+	  properly.
+	- Fl_BMP_Image, Fl_JPEG_Image, Fl_PNG_Image, and
+	  Fl_Shared_Image didn't delete image data that was
+	  allocated.
+	- Enabled the OpenGL and threads demos when compiling
+	  for MingW.
+	- Fl_File_Input didn't update the directory buttons if a
+	  callback was registered with the widget.
+	- The file chooser would return the last selected
+	  file(s) when cancel was pressed.
+	- The file chooser limited the resizing of the chooser
+	  window unnecessarily.
+	- Fixed WM_PAINT handling under WIN32.
+	- Minor tweeks to MingW and OS/2 config headers.
+	- Fl_Value_Input now correctly determines if step()
+	  specifies an integer value.
+	- Fl_Help_View didn't add links inside PRE elements.
+	- OS/2 build fixes from Alexander Mai.
+	- Now use strlcat() instead of strncat() which could
+	  cause buffer overflows.
+	- Now use of strlcpy() instead of strncpy() to simplify
+	  the code.
+	- Drag-n-drop under WIN32 now shows a [+] cursor instead
+	  of the link cursor.
+	- Fixed widget width tooltip and default argument
+	  handling code in FLUID.
+	- Fixed colors used when drawing antialiased text using
+	  Xft.
+	- Fl_Preferences::makePath() now uses access() instead
+	  of stat() when checking to see if the destination
+	  directory already exists.
+	- Fl_BMP_Image now supports older BMP files with the 12
+	  byte header.
+	- Optimized the redrawing of tabs and radio/check
+	  buttons when the keyboard focus changes.
+	- More tooltip fixes.
+	- DND text operations would loop under X11.
+
+
+CHANGES IN FLTK 1.1.0rc2
+
+	- Portability fixes.
+	- Backported 2.0 tooltip changes.
+	- Several of the valuators did not support tooltips.
+	- The last menu item in a menu didn't pick up on font
+	  changes.
+	- FLUID now properly handles default argument parameters
+	  properly.
+	- Fixed WM_PAINT handling under WIN32 - didn't validate
+	  the correct region that was drawn.
+	- Fl_Multiline_Output would insert the enter key.
+	- Fl_File_Browser didn't clip items to the column width.
+	- Fl_Window::draw() cleared the window label but didn't
+	  restore it, so windows could lose their titles.
+	- Eliminated multiple definitions of dirent structure
+	  when compiling under WIN32.
+	- Adjusted the size of the circle that is drawn inside
+	  radio buttons to scale better for larger labels.
+	- FLUID was opening the display when it shouldn't have.
+	- Fl_File_Chooser.cxx defined the file chooser functions
+	  again; they should only be defined in the header file.
+	- Wide arcs would draw with "teeth".
+	- The preferences demo included Fl/Fl_Preferences.H
+	  instead of FL/Fl_Preferences.H.
+
+
+CHANGES IN FLTK 1.1.0rc1
+
+	- The fl_file_chooser() and fl_dir_chooser() functions
+	  now support an optional "relative" argument to get
+	  relative pathnames; the default is to return absolute
+	  pathnames.
+	- The backspace and delete keys now work as expected in
+	  the file chooser when doing filename completion.
+	- FLUID now supports running shell commands.
+	- New Fl_File_Input widget that shows directory
+	  separators with filename in input field.
+	- The Fl_File_Chooser dialog now shows the absolute path
+	  in the filename field using the Fl_File_Input widget.
+	- FLUID now keeps track of grid, tooltip, and other
+	  GUI options, along with the last 10 files opened.
+	- Tooltip windows would show up in the task bar under
+	  WIN32.
+	- Now append trailing slash to directory names in names
+	  in WIN32 version of scandir().  This takes care of a
+	  file chooser performance problem with large
+	  directories.
+	- Added Fl_Preferences class from Matthias Melcher,
+	  including binary data support.
+	- FLUID now recognizes the "using" keyword in
+	  declarations.
+	- fl_file_chooser() didn't highlight the requested file
+	  the second time the file chooser dialog was shown.
+	- Fixed rendering of Fl_Light_Button with the plastic
+	  scheme.
+	- Fixed a bug in the MacOS font enumeration code.
+	- Now show a "locked" icon next to static/private
+	  elements in FLUID, and "unlocked" icon next to
+	  global/public elements.
+	- Implemented Fl_Menu_Item image labels using older
+	  1.0.x labeltype method.
+	- Updated the PNG library check to support both png.h
+	  and libpng/png.h.
+	- Fixed a recursion bug in tooltips that was causing
+	  random crashes.
+	- fl_file_chooser() could cause a segfault when passed a
+	  NULL filename parameter in some situations.
+	- Added a "-g" option to fltk-config to support quick
+	  compiling with debugging enabled.
+	- Fixed redraw problem with Fl_Input and anti-aliased
+	  text.
+	- Added threading support for MacOS X and Darwin.
+	- The filesystem list in the file chooser now works under
+	  MacOS X and Darwin.
+	- The fl_msg structure now contains all data passed to
+	  the WndProc function under WIN32.
+	- Fixed some window focus/positioning problems under
+	  MacOS X.
+	- Added fl_create_alphamask() function to create an alpha
+	  mask from 8-bit data; currently this always generates a
+	  1-bit screen-door bitmask, however in the future it will
+	  allow us to generate N-bit masks as needed by various
+	  OS's.
+	- Fl_File_Browser::load() didn't properly show drives
+	  when compiled in Cygwin mode.
+	- Now pass correctly pass keyboard and mouse events to
+	  widget under tooltip as needed...
+	- Added new Fl::dnd_text_ops() methods to enable/disable
+	  drag-and-drop text operations.
+	- Fl_Input now supports clicking inside a selection to
+	  set the new text position when drag-and-drop is
+	  enabled.
+	- Added support of X resources for scheme, dnd_text_ops,
+	  tooltips, and visible_focus...
+	- Fixed some case problems in includes for the MacOS X
+	  code.
+	- Fl_Widget::handle() returned 1 for FL_ENTER and
+	  FL_LEAVE events, which caused some compatibility
+	  problems with 1.0 code.
+	- Fl_Box::handle() now returns 1 for FL_ENTER and
+	  FL_LEAVE events so that tooltips will work with Fl_Box
+	  widgets.
+	- Some source files still defined strcasecmp and
+	  strncasecmp under WIN32.
+	- Some source files still used the "false" and "true"
+	  C++ keywords, even though several of our "supported"
+	  C++ compilers don't support them.  Using 0 and 1 until
+	  FLTK 2.0 (which uses the bool type instead of int for
+	  any boolean values...)
+	- Minor Fl_Color revamping, so that color constants map
+	  to the color cube and FL_FOREGROUND_COLOR,
+	  FL_BACKGROUND_COLOR, FL_BACKGROUND2_COLOR,
+	  FL_INACTIVE_COLOR, and FL_SELECTION_COLOR map to the
+	  user-defined colors.
+
+
+CHANGES IN FLTK 1.1.0b13
+
+	- Fixed a bug in the Xft support in Fl_Window::hide()
+	  (the config header wasn't included, so the Xft code
+	  wasn't getting called)
+	- Xdbe support must now be enabled explicitly using
+	  --enable-xdbe due to inconsistent bugs in XFree86 and
+	  others.
+	- Windows resized by a program would revert to their
+	  original size when moved under WIN32.
+	- Cygwin can only compile the new WIN32 drag-n-drop code
+	  using GCC 3.x.
+	- Tooltips now appear for inactive and output widgets.
+	- Tooltips no longer steal keyboard events other than
+	  ESCape.
+	- Tooltips are no longer delayed when moving between
+	  adjacent widgets.
+	- fl_beep(FL_BEEP_DEFAULT) now uses the PC speaker under
+	  Windows (0xFFFFFFFF) rather than an event sound.
+	- The configure script didn't include the -mwindows or
+	  -DWIN32 compiler options in the output of fltk-config
+	  when using the Cygwin tools.
+	- Fl_Output didn't take input focus when needed, so it
+	  was unable to support CTRL-C for copying text in the
+	  field and did not unhighlight selections when the
+	  widget lost focus.
+	- The fl_filename_name() function didn't handle a NULL
+	  input string.
+	- The input field used by the fl_input() and
+	  fl_password() functions was resized too small in
+	  1.1.0b12.
+	- Added casts in fl_set_fonts_win32.cxx for VC++ 5.0.
+	- Fl_File_Icon::find() did not check the basename of a
+	  filename for a match; this caused matches for a
+	  specific filename (e.g. "fluid") to fail.
+	- The Fl_Shared_Image class now supports additional
+	  image handling functions - this allows you to support
+	  additional image file formats transparently.
+
+
+CHANGES IN FLTK 1.1.0b12
+
+	- Documentation updates.
+	- Fl_Choice didn't clip the current value properly - it
+	  wasn't accounting for the box border width.
+	- The forms compatibility functions are now placed in a
+	  "fltk_forms" library to match FLTK 2.0.
+	- Renamed down() and frame() to fl_down() and
+	  fl_frame(), filename_xyz() to fl_filename_xyz(), and
+	  all of the define_FL_FOO() functions for the custom
+	  boxtypes to fl_define_FL_FOO() to avoid namespace
+	  clashes.
+	- Stereo OpenGL support (patch from Stuart Levy)
+	- All of the convenience functions defined in fl_ask.H
+	  now resize the widgets and dialog window as needed for
+	  the labels and prompt.
+	- Backported FLTK 2.0 dual cut/paste buffer code.
+	- Added support for Xft library to provide anti-aliased
+	  text on X11.
+	- Fl_Help_View didn't keep track of the background color
+	  of cells properly.
+	- Fl_Browser::item_width() didn't compute the width of
+	  the item properly when column_widths() was set.
+	- Fl_Button didn't check to see if the widget could
+	  accept focus before taking input focus.
+	- Fl_Help_View didn't preserve target names (e.g.
+	  "filename.html#target") when following links.
+	- Drag-and-drop support for MacOS.
+	- Updated MacOS issues documentation.
+
+
+CHANGES IN FLTK 1.1.0b11
+
+	- Now conditionally use the WIN32 TrackMouseEvent API
+	  (default is no...)
+	- Fixed a table rendering bug in the Fl_Help_View
+	  widget.
+	- The fltk-config script now recognizes all common C++
+	  extensions.
+	- The menu code was using overlay visuals when the
+	  scheme was set to "plastic".
+	- Fixed some drawing problems with Fl_Light_Button and
+	  its subclasses.
+	- Fixed a minor event propagation bug in Fl_Group that
+	  caused mousewheel events to be passed to scrollbars
+	  that were not visible.
+	- The fl_file_chooser() function did not preserve the
+	  old file/directory like the old file chooser did.
+	- The prototypes for fl_input() and fl_password() did
+	  not default the "default value" to NULL.
+	- Fl_Tabs now draws tabs using the selection_color() of
+	  the child groups; this allows the tabs to be colored
+	  separately from the body.  Selected tabs are a mix of
+	  the Fl_Tabs selection_color() and the child group's
+	  selection_color().
+	- Fl_Tabs didn't include images in the measurement of
+	  the tabs if no label text was defined.
+	- The WIN32 code didn't return 0 from the window
+	  procedure after handling WM_PAINT messages.
+	- fl_draw() would incorrectly test the clipping of
+	  labels the lay outside the bounding box.
+	- filename_relative() didn't always return the correct
+	  relative path.
+	- Updated the test makefile to work with more versions
+	  of "make".
+	- Added new "--with-optim" configure option to set the
+	  optimization flags to use when compiling FLTK.
+	- The fltk-config script no longer reports the
+	  optimization flags that were used to compile FLTK.
+	- Initial port of FLTK 2.0 drag-and-drop support.
+
+
+CHANGES IN FLTK 1.1.0b10
+
+	- Fixed the new WIN32 TrackMouseEvent code.
+	- Fixed the VC++ project files to link against
+	  comctl32.lib.
+
+
+CHANGES IN FLTK 1.1.0b9
+
+	- Better FL_LEAVE event handling for WIN32.
+	- The alpha mask was bit-reversed.
+	- Fl::scheme() applied the scheme tile image to overlay
+	  and menu windows, which caused problems when the
+	  overlay planes were in use.
+	- Fixed Fl::event_button() value when hiding tooltip on
+	  some systems.
+	- Added Fl_BMP_Image class to support loading of Windows
+	  bitmap (BMP) files.
+	- The shiny demo didn't work on some systems (no
+	  single-buffered OpenGL visual), and the new box types
+	  were reset when show(argc, argv) was called.
+	- Fl::scheme() didn't update windows that were not
+	  shown.
+	- The fractals demo would get far ahead of the UI with
+	  some Linux OpenGL drivers.  Now use glFinish() instead
+	  of glFlush() so we are at most 1 frame ahead.
+	- The fractals demo Y axis controls were backwards for
+	  the "flying" mode.
+	- MacOS: cleaned up src/Fl_mac.cxx
+	- MacOS: fixed Fl::wait(0.0), fixed Cmd-Q handling
+	- Update CygWin support for Fl::add_fd().
+	- Update the plastic scheme to not override the default
+	  colors - move the color code to the MacOS-specific
+	  code.  Also updates the tile image colormap to match
+	  the current background color.
+	- Add fl_parse_color() to X11 as well, removing a bunch
+	  of conditional code and providing a common interface
+	  for looking up color values.
+	- Fixed the make problems in the test directory - some
+	  make programs had trouble handling the recursive
+	  dependencies on the FLUID files...
+	- Now use rint() to round floating-point coordinates.
+	- Demo cleanup - made sure they all worked with schemes.
+	- Fl_Tabs no longer clears the unused area of the tab
+	  bar.
+	- Added show(argc, argv) method to Fl_Help_Dialog.
+	- MacOS: implemented cut/copy/paste.
+	- MacOS: improved keyboard handling, fixed keyboard
+	  focus handling, fixed get_key, modified 'keyboard'
+	  demo to show second mouse wheel and additional keys
+	  'help' and FL_NK+'='
+
+
+CHANGES IN FLTK 1.1.0b8
+
+	- OS/2 build fixes.
+	- fl_draw() didn't ignore symbol escapes properly for
+	  the browsers...
+	- New Fl::scheme() methods from FLTK 2.0; currently only
+	  the standard ("") and plastic ("plastic") methods are
+	  supported.  Schemes can be set on the command-line
+	  ("-scheme plastic") or using the FLTK_SCHEME
+	  environment variable.
+	- MacOS: fixed iBook keyboard handling, moved 
+	  remaining message handling to Carbon, added mouse
+	  capture support, added timer support, added overlay
+	  support, fixed double-buffering side effects.
+	- The configure script wasn't using the -fpermissive or
+	  -fno-exceptions options with GCC.
+	- Fl_JPEG_Image and friends didn't set the depth if the
+	  image file couldn't be loaded; since Fl_RGB_Image
+	  didn't check for this, it could fail when displaying
+	  or copying these images.
+	- filename_absolute() did not always free its temporary
+	  buffer.
+	- filename_relative() did not do a case-insensitive
+	  comparison under MacOS, OS/2, and Windows.
+	- filename_isdir() didn't properly handle "D:L" under
+	  WIN32.
+	- Fl_Shared_Image::get() did not check to see if the
+	  image could not be loaded.
+	- Fl_Help_View didn't clear the line array in the
+	  Fl_Help_Block structure; this causes erratic
+	  formatting for some pages.
+	- The font and size members of Fl_Help_Block were never
+	  used.
+	- The threading functions (Fl::lock() and friends) were
+	  not exported under WIN32.
+	- The Fl_Text_Display destructor deleted the scrollbars
+	  twice...
+	- Fl_Help_View didn't reset the horizontal scroll
+	  position when showing a new page.
+	- Fl_Pack now allows any child widget to be the
+	  resizable() widget, not just the last one.
+	- MacOS: opaque window resizing, all events except 
+	  Mac menus are now handled using Carbon, window 
+	  activation fixed, GL_SWAP_TYPE default changed to 
+	  make gl_overlay work.
+	- Fl_Help_View::resize() didn't resize the horizontal
+	  scrollbar.
+	- MacOS: list all fonts, fixed clipping and mouse
+	  pointer bugs.
+	- The Fl_File_Chooser widget now uses hotspot() to
+	  position the dialog under the mouse pointer prior to
+	  showing it.
+	- Added a configure check for *BSD - use -pthread option
+	  instead of -lpthread.
+	- Fl_Text_Display could get in an infinite loop when
+	  redrawing a portion of the screen.  Added a check for
+	  the return value from fl_clip_box() so that the
+	  correct bounding box is used.
+	- Removed the Fl_Mutex and Fl_Signal_Mutex classes from
+	  the threads example, since they weren't being used
+	  and apparently are not very portable.
+	- Fl_Help_View now ignores links when the link callback
+	  returns NULL, and displays a sensible error message
+	  when an unhandled URI scheme is used (e.g. http:,
+	  ftp:)
+	- Fl_File_Icon::load_system_icons() no longer complains
+	  about missing icon files, just files that exist but
+	  can't be loaded.
+	- FLUID didn't list the plastic box and frame types.
+	- Now hide the tooltip window whenever a window is
+	  hidden.  Otherwise a tooltip window could keep an
+	  application running.
+	- Updated FLUID to only append a trailing semicolon to
+	  code lines in a callback (so "#include" and friends
+	  will work...)
+	- The Fl_Color_Chooser widget now supports keyboard
+	  navigation.
+	- Fixed button and valuator widgets to call Fl::focus()
+	  instead of take_focus().
+	- Tweeked the radio button drawing code for better
+	  circles with different boxtypes.
+	- The Fl_File_Chooser widget did not provide a shown()
+	  method, and fl_file_chooser() and fl_dir_chooser() did
+	  not wait on shown(); this would cause them to return
+	  prematurely if you switched desktops/workspaces.
+	- Cosmetic changes to plastic boxtypes.  Now look much
+	  better for large areas and the buttons now have a much
+	  greater "3D" feeling to them.
+	- Added new Fl::draw_box_active() method so that
+	  boxtypes can find out if the widget they are drawing
+	  for is active or not.
+	- Fl_Button and its subclasses did not redraw the parent
+	  when the boxtype was FL_NO_BOX and they lost keyboard
+	  focus (the parent redraw clears the focus box.)
+	- Fixed the example program makefile - wasn't building
+	  the mandelbrot and shiny demos right.
+	- Fl::set_font(Fl_Font, Fl_Font) was not implemented.
+	- Fixed the documentation Makefile commands; was not
+	  using the fltk.book file for some reason...
+
+
+CHANGES IN FLTK 1.1.0b7
+
+	- More documentation updates...
+	- Mac OS X support works 95%
+	- The Fl_Window::hotspot() off-screen avoidance code was
+	  commented out.
+	- Mac OS X uses mostly Carbon event handling to support
+	  Mousewheel, three buttons, all modifier keys, etc.
+	- Updated paragraph 4 of the FLTK license exceptions;
+	  there was some question about the requirement to show
+	  that a program uses FLTK, which is required by section
+	  6 of the LGPL. The new exemption specifies that
+	  inclusion of the FLTK license is not required, just a
+	  statement that the program uses FLTK.
+	- Fl_Button::handle() was calling take_focus() for both
+	  FL_PUSH and FL_DRAG.
+	- File and memory fixes for Fl_GIF_Image, Fl_PNG_Image,
+	  Fl_PNM_Image, Fl_Shared_Image, Fl_Tiled_Image, and
+	  Fl_XBM_Image.
+	- filename_match() didn't handle backslashes properly
+	  under WIN32, and didn't use a case-insensitive
+	  comparison under MacOS X.
+	- The Fl class was missing access methods for the
+	  FL_MOUSEWHEEL event values - Fl::event_dx() and
+	  Fl::event_dy().
+	- The default help string didn't include the -nokbd
+	  option.
+	- "make uninstall" didn't uninstall the static OpenGL
+	  widget library.
+	- Mac cursor shapes added...
+	- Fl_Text_Display would lockup when all text was
+	  deleted; for example, when running the editor
+	  demo, you couldn't load a second file.
+	- Added Fl::lock() and friends from FLTK 2.0 to
+	  support multi-threaded applications; see the
+	  "threads" demo for an example of this.
+	- Fl_Check_Button and Fl_Round_Button now use the
+	  FL_NO_BOX box type to show the background of the
+	  parent widget.
+	- Tweeked the plastic boxtype code to draw with the
+	  right shading for narrow, but horizontal buttons.
+	- Fl_Progress now shades the bounding box instead of
+	  drawing a polygon inside it.
+	- Fl::warning() under WIN32 defaults to no action. This
+	  avoids warning dialogs when an image file cannot be
+	  loaded.
+	- Some Win32 drivers would draw into wrong buffers
+	  after OpenGL mode change
+	- The file chooser would cause a segfault if you
+	  clicked in an empty area of the file list.
+	- Fl_File_Icon::labeltype() would cause a segfault
+	  if the value pointer was NULL.
+	- Fl_File_Icon::load_image() could cause segfaults
+	  (NULL data and incrementing the data pointer too
+	  often.)
+	- Fl_File_Icon::load_image() now handles 2-byte
+	  per color XPM files.
+	- Some Win32 drivers would draw into wrong buffers
+	  after OpenGL mode change.
+	- Message handling and Resources for MacOS port.
+	- Fl_Help_View could get in an infinitely loop when
+	  determining the maximum width of the page; this
+	  was due to a bug in the get_length() method with
+	  percentages (100% width would cause the bug.)
+	- Don't need -lgdi32 for CygWin, since -mwindows
+	  does this for us.
+	- The WIN32 event handler did not properly handle
+	  WM_SYNCPAINT messages.
+	- Fl_Tabs now uses the boxtype exclusively to draw
+	  both the tabs and surrounding box, so alternate
+	  box types actually work and the look is a little
+	  nicer.
+	- Fixed the drawing of large areas with the new
+	  plastic boxtypes.
+	- Updated the Visual C++ demo projects to use FLUID
+	  to generate the GUI files as needed.
+	- The demo program didn't load the right menu file
+	  when compiled for debugging under WIN32.
+	- Added plastic box types to forms demo.
+	- Added mousewheel to keyboard demo.
+	- The Fl_Text_Editor widget caused an infinite loop
+	  when it received keyboard focus.
+	- filename_isdir() didn't properly handle drive letters
+	  properly; WIN32 needs a trailing slash for drive
+	  letters by themselves, but cannot have a trailing
+	  slash for directory names, go figure...
+	- The Fl_Text_Buffer and Fl_Text_Display classes did not
+	  initialize all of their members.
+	- fl_normal_label() had a totally redundant set of
+	  if/else tests, which the new code handles all from
+	  fl_draw().
+	- The Fl_File_Chooser dialog contained two hotspots.
+	- The fl_draw_pixmap() function didn't free the 2-byte
+	  color lookup table properly (delete instead of
+	  delete[]).
+	- fl_draw() reset the text color under WIN32, causing
+	  bitmaps to draw incorrectly.
+	- Fl::get_font_sizes() is now implemented under WIN32.
+	- Fl_Text_Display now uses the same default colors for
+	  selection and text as Fl_Input_ and friends.
+	- Changed the default line scrolling in Fl_Text_Display
+	  to 3 lines for the mouse wheel and scrollbar arrows.
+
+
+CHANGES IN FLTK 1.1.0b6
+
+	- Documentation updates...
+	- The configure script now works within the CygWin
+	  environment.
+	- Tooltips are now enabled by default, but are not
+	  re-enabled when calling the Fl_Widget::tooltip()
+	  method.
+	- Added new Fl::version() method to get the current
+	  FLTK library version (for shared libraries/DLLs)
+	- Added new Fl::event() method to get the current
+	  event that is being processed.
+	- Added new fl_beep() function to do audible
+	  notifications of various types.
+	- Added new Fl_GIF_Image, Fl_JPEG_Image, Fl_PNG_Image,
+	  Fl_PNM_Image, Fl_XBM_Image, and Fl_XPM_Image classes.
+	- Added new Fl_Shared_Image class, a la FLTK 2.0.
+	- Added new Fl_Tiled_Image class for tiled backgrounds.
+	- Added new copy(), desaturate(), inactive(), and
+	  color_average() methods to the Fl_Image classes.
+	- Added a horizontal scrollbar to the Fl_Help_View
+	  widget.
+	- Added new FL_PLASTIC_{UP/DOWN}_{BOX/FRAME} boxtypes
+	  for a more "modern" look (sort of a cross between KDE
+	  2.2 and Aqua.)
+	- Fl_Float_Input and Fl_Int_Input no longer accept
+	  pasted text that is not a floating point or integer
+	  value.  Pasted numbers now replace text in these
+	  widgets.
+	- Implemented the Fl_File_Icon::load_png() method.
+	- The Fl_File_Icon::load_system_icons() method now
+	  supports KDE 2.x icons.
+	- Fixed PNG support in Fl_Help_View.
+	- Removed the "Microsoft" mode button from the menubar
+	  demo.
+	- The browser demo now makes sure that the input field
+	  contains a number.
+	- The Fl_Browser::make_visible() method now range checks
+	  the input.
+	- Updated the fl_draw() and fl_measure() methods to
+	  accept an optional draw_symbols argument, which
+	  controls whether symbols are drawn in the text.
+	- Added new Fl::visible_focus() methods to control
+	  whether the focus box is drawn.
+	- The focus box is now drawn using the contrast color.
+	- Fl_Repeat_Button didn't accept keyboard focus.
+	- Added new Fl::visible_focus() method and standard
+	  "-kbd" and "-nokbd" options in Fl::args() processing
+	  to control whether keyboard focus is shown and handled
+	  by non-text widgets.
+	- The wrong tooltip could be shown if the user moved the
+	  mouse over adjacent widgets with tooltips.
+	- The drop-down button on Fl_Choice widgets was not
+	  limited in width.
+	- Tooltips could appear off the screen.
+	- Mouse wheel events are now sent to the focus widget
+	  first, then to any other interested widget.
+	- The Fl_RGB_Image class now supports images with an
+	  alpha channel.  Images are currently drawn using
+	  "screen door" transparency...  See the "image" demo
+	  for an example.
+	- Added new fl_create_bitmask() and fl_delete_bitmask()
+	  functions that create bitmap objects for masking and
+	  bitmap drawing.
+	- Was sending FL_RELEASE events for buttons 4 and 5
+	  under X11, which are only for FL_MOUSEWHEEL.
+	- Fl_Help_View now supports the EM and STRONG elements.
+	- Didn't do callbacks when changing tabs via keyboard.
+	- FLUID didn't write tooltip strings to the message
+	  catalog file.
+	- Fl_File_Icon now uses Fl_Shared_Image to load icon
+	  images; the load_png() and load_xpm() methods have
+	  been replaced by a single load_image() method.
+	- Fl_File_Icon::load_system_icons() now does a better
+	  job of finding KDE icons.
+	- Now use Fl::warning() and Fl::error() in place of
+	  printf's in some of the newer widgets.
+	- The default behavior of Fl::error() is now to display
+	  an error but not to exit; Fl::fatal() still exits.
+	- FLUID now uses the Fl_Shared_Image class, so FLUID-
+	  generated GUIs can embed any of the supported image
+	  file formats.
+	- New filename_relative() function to convert an
+	  absolute filename to a relative one.
+	- Updated the filename_absolute(), filename_expand(),
+	  and filename_setext() functions to take the
+	  destination string size, with inline functions for the
+	  old FL_PATH_MAX size.
+	- fl_file_chooser() and fl_dir_chooser() now return a
+	  relative path.
+	- Fl_Help_View now supports all ampersand escapes.
+
+
+CHANGES IN FLTK 1.1.0b5
+
+	**** NOTE: DUE TO CHANGES IN THE WIDGET CLASSES,  ****
+	****       YOU MUST RECOMPILE ALL SOURCE FILES    ****
+	****       THAT USE FLTK!!!                       ****
+
+	- All FLTK color values are now 32-bits and support
+	  both the legacy 8-bit color values as well as 24-bit
+	  RGB values (0xRRGGBB00 for 24-bit RGB, 0x000000II
+	  for indexed color).
+	- Fl::set_boxtype() and fl_internal_boxtype() now keep
+	  track of when a boxtype is changed; this allows you to
+	  override the "special" boxtypes without references to
+	  those boxtypes causing them to be reset.
+	- Fl_Help_Func now takes a Fl_Widget pointer as well as
+	  a pathname.
+	- Added code to support FL_KEYUP events.
+	- Focus did not return to the Fl_Text_Display and Editor
+	  widgets when scrolling and then clicking inside the
+	  editor window.
+	- Now set the line size of the vertical scrollbar in the
+	  text editor to 1.
+	- The symbols demo didn't show the strings needed to
+	  show the corresponding symbol (the label string was
+	  not quoted...)
+	- FLTK should now compile with Cygwin cleanly.
+	- Shortcut changes were not being saved by FLUID.
+	- FLUID didn't write the deimage() static data.
+
+
+CHANGES IN FLTK 1.1.0b4
+
+	**** NOTE: DUE TO CHANGES IN THE FL_WIDGET CLASS, ****
+	****       YOU MUST RECOMPILE ALL SOURCE FILES    ****
+	****       THAT USE FLTK!!!                       ****
+
+	- Updated the flags_ member of Fl_Widget to be an
+	  integer instead of uchar, to support the new
+	  FL_OVERRIDE flag for Fl_Window.
+
+	- The parent() method of Fl_Widget now uses pointers to
+	  Fl_Group instead of Fl_Widget.
+
+	- Fl_Window now provides the FLTK 2.0 "override()" and
+	  "set_override()" methods for windows.
+
+	- Added a configure check (and warning) for GCC 3.0.x.
+
+	- Updated the configure script to check for the
+	  png_set_tRNS_to_alpha() function.
+
+	- Updated the config.h files for all platforms for the
+	  image and FLTK documentation defines.
+
+	- Updated the makeinclude files for all platforms to
+	  match the current makeinclude.in file.
+
+	- FLUID would crash if you cleared an image for a
+	  widget.
+
+	- Fl_Help_View::add_image() did not initialize the image
+	  member of the base (unscaled) image.
+
+	- Fl_Help_View didn't support A elements with both a
+	  NAME and HREF attribute - the HREF was ignored.
+
+	- Miscellaneous compile warning fixes.
+
+	- Tooltips were being reset by Fl::belowmouse(), which
+	  caused problems with the FLUID main window (flashing
+	  tooltip windows and serious problems with KDE 2.2)
+
+	- The editor demo had the save and discard button
+	  actions reversed.
+
+	- The Fl_Help_View widget now uses
+	  png_destroy_read_struct() if the older
+	  png_read_destroy() function is not available.
+
+	- The WIN32 DLL library now includes the OpenGL widgets.
+	  This is a simpler solution for the export/import
+	  dillemma under WIN32, as OpenGL and non-OpenGL symbols
+	  need to be exported at different times with the
+	  separate library scheme.  Since OpenGL is standard
+	  under Windows, this is less of a problem than under
+	  UNIX...
+
+
+CHANGES IN FLTK 1.1.0b3
+
+	- The top-level makefile did not include the makeinclude
+	  file, causing the fltk-config installation commands to
+	  fail.
+
+	- The fl_file_chooser.cxx source file conflicted with
+	  Fl_File_Chooser.cxx under Windows.  Similarly, the
+	  fl_file_chooser.H header file conflicts with the
+	  Fl_File_Chooser.H header file.
+
+	- Now save and restore the GDI pen object when
+	  responding to WIN32 paint messages.
+
+	- Documentation updates from A. Suatoni.
+
+
+CHANGES IN FLTK 1.1.0b2
+
+	- New fltk-config script.
+
+	- Fixed image/text label handling; in b1 the label
+	  needed a non-blank text string to display the image. 
+	  This bug also caused all sorts of crashes and display
+	  problems.
+
+	- Added new filetype() method to Fl_FileBrowser to allow
+	  for file or directory browsing.
+
+	- Fixed the drawing of the focus box around
+	  Fl_Return_Button.
+
+	- Fixed menu item measurement bug (wasn't initializing
+	  image pointers to 0...)
+
+	- Radio and checkbox menu items now draw with the new
+	  style (round radio buttons with dots and square check
+	  buttons with check marks.)
+
+	- Improved the appearance of Fl_Check_Button.
+
+	- Improved the Fl_HelpView table formatting code; now
+	  dynamically sizes the table columns, and supports
+	  COLSPAN.
+
+	- The FLUID keyboard shortcuts now work as expected
+	  (CTRL-C copies, SHIFT-CTRL-C writes code, etc.)
+
+	- The FLTK_DOCDIR environment variable can now be
+	  used to tell FLUID where to find the on-line
+	  documentation files.
+
+	- FLUID now supports image labels in addition to text
+	  labels + text over image alignment.
+
+	- FLUID now supports tooltips.
+
+	- The widget panel in FLUID is now tabbed, a la FLTK
+	  2.0.
+
+	- The FLUID pixmap destructor tried to free 1 too many
+	  lines of image data.
+
+	- FLUID now provides on-line help.
+
+	- Changed Fl_FileXYZ to Fl_File_XYZ.
+
+	- Changed Fl_HelpXYZ to Fl_Help_XYZ.
+
+	- Tooltip fixes for Fl_Browser_, Fl_Choice, and Fl_Input_.
+
+	- Added tooltips to FLUID, help dialog, and file chooser.
+
+	- Now load system icons in FLUID.
+
+
+CHANGES IN FLTK 1.1.0b1
+
+	- Added new image() and deimage() methods to support
+	  image + text labels more easily.
+
+	- Added new alignment bit FL_ALIGN_TEXT_OVER_IMAGE.
+
+	- Added tooltip support using Jacques Tremblay's tooltip
+	  patch.
+
+	- Added keyboard navigation to all widgets.
+
+	- Added support for mouse wheels using the new
+	  FL_MOUSEWHEEL event type.  Get the mouse wheel
+	  movement values from Fl::e_dx (horizontal) and
+	  Fl::e_dy (vertical).
+
+	- Added the Fl_Check_Browser, Fl_FileBrowser,
+	  Fl_FileChooser, Fl_FileIcon, Fl_HelpDialog,
+	  Fl_HelpView, Fl_Progress, and Fl_Wizard widgets from
+	  the bazaar.
+
+	- Added 2.0 Fl_Text_Display and Fl_Text_Editor widgets
+	  based on NEdit.
+
+	- The Fl_Choice widget now looks more line a combo box
+	  than a Motif option menu.
+
+	- Moved the OpenGL widgets into a separate library
+	  called fltkgl - this eliminates shared library
+	  dependencies on OpenGL when no OpenGL functionality is
+	  used/required.
+
+	- FLUID now supports the new Fl_CheckBrowser,
+	  Fl_FileBrowser, Fl_FileIcon, Fl_HelpView,
+	  Fl_Text_Display, Fl_Text_Editor, and Fl_Wizard
+	  widgets.
+
+	- Updated configure stuff to support shared libraries
+	  under AIX (link to -lfltk_s)
+
+	- Symbol labels can now contain regular text.
+
+	- FLUID now supports relative filenames for the source
+	  and header files you generate.
+
+	- Fl_Menu_Item::add() didn't use the flags that were
+	  passed in.
+
+	- Fixed a bug in Fl_Scrollbar - clicking in the "trough"
+	  of the scrollbar would move the scroller in the wrong
+	  direction.
+
+	- Made the Forms pixmap parameter const to match the
+	  Fl_Pixmap.H definitions.
+
+	- Changed the Fl_Pixmap constructor to use the explicit
+	  keyword which should work for all C++ compilers.
+
+	- Fl_Menu_add of a menu item with the same name as an
+	  existing submenu title would mess up by replacing that
+	  menu title, it now adds a new item.
+
+	- Fl_Menu::add() of text starting with '/' to a menu is
+	  assummed to be a filename. So "/foo/bar" creates a
+	  single menu item. You can also put filenames into
+	  submenus by doing "submenu//foo/bar", this will create
+	  a submenu called "submenu" with an item "/foo/bar".
+	  Menu items starting with "\_" will insert an item
+	  starting with '_' rather than a divider line. These
+	  changes make the menus compatable with fltk 2.0.
+
+	- Another little fix for the BoXX OpenGL overlays.
+
+	- Fl_Gl_Window no longer blanks the mouse pointer on
+	  WIN32 unless an OpenGL overlay is being used.  This
+	  should make non-overlay displays faster when a cursor
+	  is set.
+
+
+CHANGES SINCE FLTK 1.0.10
+
+	- CHANGED THE DEFAULT RUN-TIME LINKING TO "MULTITHREADED
+	  DLL". You'll need to change your project settings to
+	  use this as well or you'll get errors.
+
+	- Added new --disable-gl option to configure script.
+
+	- Added new const const pointer versions of pixmap
+	  functions to eliminate an annoying pointer warning
+	  message that was generated by the Sun and other C++
+	  compilers.
+
+	- Eliminated all "var hides class::var" warnings.
+
+	- Eliminated all "string literal converted to char *"
+	  warnings.
+
+	- OS/2 updates from Alexander Mai.
+
+	- Tidied up the HTML documentation to be more standards
+	  compliant.
+
+	- Compiling with -DBOXX_BUGS will work around some
+	  problems with the newest X drivers that BoXX delivers,
+	  the problems all affect use of Overlays for normal X
+	  drawing and OpenGL drawing. Normal compilation is
+	  unchanged.
+
+	- The file chooser buttons use user_data() rather than
+	  the label to decide what to do, allowing the label to
+	  be somewhat cleaner.
+
+	- Selection color on X changed to blue, to match what
+	  happens on Windows now.
+
+	- Added support for AIX (static library only).
+
+	- Added support for SunOS 4.x
+
+	- Now process WIN32 WM_ACTIVATEAPP message to reset the
+	  key and button states in Fl::e_state.
+
+	- Fl_has_idle only tested N-1 callbacks and missed one.
+
+	- Restored WM_SYNCPAINT handling under WIN32; this fixed
+	  a refresh bug under some versions of Windows.
+
+	- Check for OpenGL headers before checking to see if
+	  OpenGL is supported.  This should eliminate compile
+	  errors due to missing non-FLTK header files...
+
+	- Add -D_INCLUDE_POSIX_SOURCE option when compiling with
+	  the HP compilers.
+
+	- Replaced remaining _WIN32 symbols with WIN32
+
+	- Removed reference to unused GL/glu.h header file, which is missing on
+	  some Linux systems.
+
+	- Fl_Gl_Window has a new method to allow you to get and set the context:
+
+	      void Fl_Gl_Window::context(void*, int destroy = 0)
+	      void* Fl_Gl_Window::context() const;
+
+	  Return or set a pointer to the GLContext that this window is
+	  using. This is a system-dependent structure, but it is portable to
+	  copy the context from one window to another. You can also set it to
+	  NULL, which will force FLTK to recreate the context the next time
+	  make_current() is called, this is useful for getting around bugs in
+	  OpenGL implementations.
+
+	  If destroy_flag is true the context will be destroyed by fltk when
+	  the window is destroyed, or when the mode() is changed, or the next
+	  time context(x) is called.
+
+	- Some cleanup of Fl_Gl_Choice to move most of the system dependent
+	  #ifdefs into Fl_Gl_Choice.cxx.
+
+	- Fl_Gl_Window does not set drawbuffer(BACKBUFFER) for
+	  single-buffered windows.
+
+	- Fl_Input::replace(...) correctly updates the display
+	  if the replaced region does not include the mark,
+	  point, or selected region.
+
+	- Added Fl::add_check(...), Fl::remove_check, and
+	  Fl::has_check. These are similar to idle callbacks but
+	  are only called just before it waits for new events.
+	  They can be used to watch for changes in global state
+	  and respond to them.
+
+	- "accu-timer": some changes to repeat_timeout that seem
+	  to make it accurate on Unix and WIN32 at speeds up to
+	  500000 timeouts/second (and 700000 on Linux), and
+	  within about .001% as accurate as the system clock.
+
+	- Fix to Fl_Valuator::step() by Guillermo Andrade.
+
+	- Fixed the FLUID write-menu bug introduced in 1.0.10
+
+	- Fl::flush() now calls GdiFlush() under WIN32 to
+	  ensure that all graphics are drawn.
+
+	- fl_curve() now uses a much better algorithim to figure
+	  out how many pieces to cut the curve into.
+
+	- FLUID now uses GetTempPath() under WIN32 to determine
+	  where to store the clipboard.
+
+	- Right-ctrl does not delete selected text in Fl_Input,
+	  until you type a composed character.
+
+	- Added simple FLTK and FLUID manual pages.
+
+	- Fl_Gl_Window leaked memory under WIN32.
+
+	- The colbrowser demo was missing an include file when
+	  compiled under OS/2.
+
+
+CHANGES SINCE FLTK 1.0.9
+
+	- Added a strcasecmp() function to FLUID; AIX doesn't
+	  have it.
+
+	- Bug #115509: Fl_Scroll not repainting background.
+
+	- Updated the configure script and makeinclude.in file
+	  to work with the Sun PRO compilers.
+
+	- Disabled the WIN32 async socket select code by default:
+	  it doesn't seem to work anymore...
+
+	- Fl::below_mouse() was incorrectly clearing e_is_click;
+	  this prevented any double-clicks from getting
+	  through...
+
+	- No longer clear Fl::keysym on every event, this makes
+	  better back compatability and fixes Win2000
+
+	- FLUID now restores which tab in an Fl_Tabs was
+	  selected when loads .fl files.
+
+	- Hack to fix the annoying "raise another application
+	  when a modal window is closed" problem on WIN32.
+
+	- Fl_Tabs now draws the background behind the tabs.
+
+	- Fl::set_fonts() on WIN32 fixed to work before the
+	  first window is shown.
+
+	- CUA function keys, code submitted by George Yohng
+	  <yohng@drivex.dosware.8m.com>
+
+	- Another attempt to get glut.h to work on WIN32.
+
+	- Fl_Menu_::add() ignores '&' signs when comparing menu
+	  items, so you don't have to make the shortcuts the
+	  same all the time.
+
+	- Fixed bit-flipping patterns in WIN32 bitmap code.
+
+	- Fixed size of data written by gif images to .C files
+
+	- Menu titles and buttons in the menubar can be images
+	  (allows it to be used as a toolbar)
+
+	- Reads selectBackground from the xrdb database to set
+	  the selection color. Adding this to your .Xdefaults
+	  will make fltk and Motif programs look much more
+	  Windoze-like:
+
+	      *selectForeground: white
+	      *selectBackground: #000080
+
+	- FL_WHEN_RELEASE on Fl_Input will now do the callback
+	  when the input field is hidden, for instance when it
+	  is on a tab and the user switches to another tab.
+
+	- Fl_Gl_Window with an overlay on X always resized any
+	  child windows even if you turned resizable() off
+	  because it turned it back on to resize the overlay
+	  window. This patch avoids changing resizable().
+
+	- Fix so multiple Fl::add_idle() calls works
+
+	- The input focus got messed up if you called
+	  Fl_Tabs::value(x) and there was something that took
+	  focus on an earlier tab.
+
+	- Removed some (not all) of the warnings when compiled
+	  with -Wwrite-strings, this should also get similar
+	  warnings Solaris produces.
+
+	- Made Fl_Browser not hide the Fl_Widget::show() method
+
+	- Changes & additions for OS/2 from Alexander Mai
+
+	- Patch from Mike Lindner to make the turning on/off of
+	  scrollbars on Fl_Scroll smarter.
+
+	- Added missing FL_EXPORT for Fl_Valuator::format()
+
+	- Shortcuts for "buttons" in a Fl_Menu_Bar work again.
+
+	- Fix for cut/paste support and Xdnd.
+
+	- Shortcuts for submenu titles in a menubar pop up the
+	  submenu (rather than calling the callback)
+
+	- Added documentation for GL_SWAP_TYPE
+
+	- Buttons with box(FL_NO_BOX) did not draw.  Apparently
+	  they did in older versions of fltk, I restored this.
+	  (bug 108771)
+
+	- Removed 8-bit colormap drawing code that was not doing
+	  anything in fl_draw_image due to the colormap
+	  allocation changes.  I also made fl_color(r,g,b)
+	  actually allocate the requested color rather than the
+	  nearest fltk color-cube color (this is only done for
+	  the first color that maps to a given entry in the fltk
+	  color cube), the result is that pixmaps with a small
+	  number of colors are drawn much more accurately. The
+	  resulting code seems to produce better images and is a
+	  good deal smaller!
+
+	- Fixed makeinclude.in so CFLAGS are used for c source
+	  code instead of CXXFLAGS. (bug 108694)
+
+	- Better fix for gif files suggested by pauly (bug
+	  108770)
+
+	- Performance of Fl_Gl_Window may be improved on some
+	  types of OpenGL implementations, in particular MESA
+	  or other software emulators, by setting the
+	  GL_SWAP_TYPE environment variable.  This variable
+	  declares what is in the back buffer after you do a
+	  swapbuffers:
+
+	      setenv GL_SWAP_TYPE COPY
+
+	      This indicates that the back buffer is copied to
+	      the front buffer, and still contains it's old
+	      data. This is true of many hardware
+	      implementations.  Setting this will speed up
+	      emulation of overlays, and widgets that can do
+	      partial update can take advantage of this as
+	      damage() will not be cleared to -1.
+
+	      setenv GL_SWAP_TYPE NODAMAGE
+
+	      This indicates that nothing changes the back
+	      buffer except drawing into it.  This is true of
+	      MESA and Win32 software emulation and perhaps some
+	      hardware emulation on systems with lots of memory.
+
+	  All other values for GL_SWAP_TYPE, and not setting
+	  the variable, cause fltk to assumme that the back
+	  buffer must be completely redrawn after a swap.
+
+	  This is easily tested by running the gl_overlay demo
+	  program and seeing if the display is correct when
+	  you drag another window over it or if you drag the
+	  window off the screen and back on. You have to exit
+	  and run the program again for it to see any changes
+	  to the environment variable.
+
+	- Optimized colormap usage on 8-bit displays with
+	  images. New code only allocates colors as they are
+	  needed (still converts indexed images to full RGB and
+	  dithers, tho...)
+
+	- Fixed .gif files in FLUID, they were broken by the fix
+	  for large .xpm files in version 1.0.9.
+
+	- Fix for OpenGL hardware overlays with the transparent
+	  index != 0. Tested on the brand new HP Linux
+	  Workstations, this is the only bug encountered.  Both
+	  X and OpenGL hardware overlay works perfectly on
+	  these, though configue may not enable it by
+	  default...)
+
+	- Fl_Choice and all other Fl_Menu_ subclasses draw the
+	  items using textcolor() as the default color of the
+	  text.
+
+	- Fix suggested by Stuart Levy to fix scrolling when
+	  deleting items from the browser.
+
+	- Replaced the -$(MAKEFLAGS) with $(MFLAGS) as per the
+	  gmake documenation.  Apperntly this works with other
+	  make programs and MAKEFLAGS is passed invisibly by
+	  gmake, though the documenation is not too clear...
+
+
+CHANGES SINCE FLTK 1.0.8
+
+	- More documentation fixes.
+	- GLUT_STROKE_*_ROMAN in glut.h are defined as 0,1 on
+	  WIN32 to match the glut header files there.
+	- Added Fl::has_timeout() and Fl::has_idle() functions.
+	- Added new Fl::repeat_timeout() method that
+	  measures time from when the last timeout was called. 
+	  This has slightly less overhead and allows accurate
+	  spacing of timeouts.
+	- More Cygwin changes
+	- FLUID could crash with identifiers with trailing
+	  whitespace.
+	- Fixed the XPM loading code in FLUID to handle files
+	  longer than 2048 lines.
+	- Added a bunch of missing FL_EXTERN's to glut.h to
+	  eliminate GLUT linking errors under WIN32.
+	- Fix for sliders so that clicking on one with a small
+	  (or zero) slider_size will not move the slider.
+	- fl_shortcut.cxx didn't export fl_old_shortcut() in the
+	  WIN32 DLL.
+	- Fixed xpaint link in the documentation.
+	- Included Fl_Input word-wrap fixes from Alexander Rabi
+	  Beels. This will not affect things much because
+	  word-wrap is normally disabled.
+	- Patch from Stuart Levy so the *last* widget in an
+	  Fl_Pack may be resizable.  This should be compatable
+	  because resizable didn't do anything before so there
+	  was no reason to set it.
+	- Cleaned up the timeout and Fl::wait() code.  The new
+	  code calls the clock function less than half as much,
+	  which results in a noticable performance improvement
+	  in some apps.
+	- Fl::wait(time) with a time greater than the system can
+	  handle (24.855 days on NT, the same on some Unix
+	  systems) will now act as though the time is infinity. 
+	  Before it would do unpredictable things.
+	- "USE_POLL" now compiles and works, although it is
+	  disabled by default. poll() is an alternative to the
+	  UNIX select() call which is available on some version
+	  of UNIX and may be faster depending on the platform;
+	  try it by editing config.h.
+	- The WIN32 USE_ASYNC_SELECT code now does translation
+	  and dispatching of the select events; this makes
+	  Windows a lot happier.
+	- Added a check for an open display in Fl::wait() so
+	  that you don't need an open window under X to call it.
+
+	  [changes in snapshot 2]
+
+	- fl_old_shortcut() wasn't being exported in the WIN32 DLL
+	  project.
+	- Updated Cygwin and Mingw makefiles.
+	- Updated the BC++ project file.
+	- You can no longer insert control chars into Fl_Int/Float_Input.
+	- Fl_Multiline_Input now resets the horizontal position when
+	  focus is changed; this caused problems when multiple multiline
+	  widgets were used in an application.
+	- All handle() methods are now public, and all draw() methods are
+	  now protected in FLTK widgets.
+	- More fixes to the OpenGL overlay code on win32.  This now
+	  seems to work quite reliably on several different pieces of
+	  hardware. Apparently doing SetLayerPaletteEntries with a
+	  palette larger than the overlay size caused the drivers to
+	  screw up in unpredictable ways. Also SwapBuffers swapped both
+	  the overlay and main window, which is not what fltk's
+	  interface wanted, this was easy to fix however.
+	- Patch for full scrollbars so that clicking on them does not
+	  move anything.
+	- Documentation fixes.
+	- Better horizontal scrolling of Fl_Input when cursor is near
+	  the end of the line.
+	- Fl_Input::value(x) selects all text.
+	- Fl_Output and Fl_Multiline_Output would scroll to the end
+	  of the text.
+	- filename_isdir() now drops any trailing slash from the
+	  filename (needed for Windows)
+	- Added return type for main() function in line_style demo.
+	- Running FLUID with the "-cs" option writes the I18N message
+	  file.
+	- The WIN32 version of XParseGeometry() didn't initialize some
+	  variables.  This caused a compiler warning but did not affect
+	  the actual code.
+
+	  [changes in snapshot 1]
+
+	- EMail changes - fltk-bugs@easysw.com now officially
+	  fltk-bugs@fltk.org.
+	- The FLTK DLL project file didn't include fl_compose.cxx
+	- Dropped the GCC -fno-rtti option since it caused problems
+	  with existing programs.
+	- Moved the .fl rules back to the test directory.
+	- Fixed some makefile and spec file problems.
+	- Fixed hardware overlays.  The problem was the new
+	  fl_clipped() code, which tests against the current window
+	  size.  The hardware overlay code did not set the current
+	  window when drawing the overlay.  I needed hardware overlay
+	  for DD's code, I'm not sure if these fixes are good enough to
+	  enable this in our general release.  Hardware overlay still
+	  only works on SGI Irix.
+	- Some patches to turn off the MSVC++ -Oa (assumme no aliasing)
+	  optimization flag.  Suprisingly this only broke a few parts
+	  of fltk, or at least these are the only ones I found.
+	- Does not unmap child windows when the main window is
+	  iconized.  This reduces flashing when the window is
+	  deiconized.
+	- Fl::key() is set to zero by all events except key down/up. 
+	  This will allow you to reliably test if an event or callback
+	  was produced by a keystroke.  Fixes the bug posted about
+	  stopping Escape from closing the window.
+	- User defined cursors on OpenGL windows slowed down NT a
+	  *LOT*.  Some attempts to fix this by turning off the cursor
+	  while drawing the window.
+	- Filename completion in the file chooser works better on NT. 
+	  Typing TAB fixes the case of everything you typed to match
+	  the shortest name that can be completed.
+
+
+CHANGES SINCE FLTK 1.0.7
+
+	- Many documentation changes/fixes/improvements.
+	- FLUID didn't save Fl_Double_Window's as
+	  double-buffered windows.
+	- Fl_Menu_ text color is used if Fl_Menu_Item text color
+	  is not set.
+	- Added Fl::first_window(window) method to change the
+	  "top" window that is used when showing modal windows.
+	  By default it is the window the user last
+	  clicked/typed in.
+	- The Fl_Menu::global() handler now uses the current top
+	  window instead of the menu bar for modal stuff.
+	- Added fl_line_style() function to set the line style. 
+	  Note that user-defined line styles ONLY WORK UNDER X11
+	  and Windows NT/2000. Windows 95/98 do, however,
+	  support the "standard" line styles.
+	- Fl::wait() does not return immediately when no windows
+	- XForms keyboard shortcuts using hex keycode constants
+	  now work.
+	- Updated the configure script for *BSD and to turn off
+	  exceptions and RTTI in the FLTK library itself (does
+	  not affect applications which use these things)
+	- FLUID now supports I18N using the POSIX or GNU
+	  mechanisms.
+	- Fixed definition of glutBitmapWidth to match header
+	  file.
+	- Does not turn visible() on when a window is iconized()
+	  or if a modal window is shown and it's parent is
+	  iconized.  This allows the code "while (w->visible()
+	  && w->damage()) Fl::check();" to reliably wait for the
+	  window to be mapped and drawn the first time.
+	- Setting box(FL_NO_BOX) on a button makes it an
+	  invisible overlay
+	- FL_NORMAL_SIZE is now a global variable so you can
+	  change the default text size prior to creating your
+	  widgets.
+	- Menus now draw properly with a box type of
+	  FL_FLAT_BOX.
+	- Cygwin fixes to compile in POSIX mode.
+	- Fl_Value_Input callback can call value() or
+	  destructor.
+	- OpenGL overlays now work under Windows NT!
+	- Fl_Slider and Fl_Scrollbar could cause a divide by
+	  zero.
+	- Clicking in an Fl_Input field no longer selects the
+	  whole field, it just moves the text cursor.
+	- Tru64 UNIX fixes for filename_list()
+	- Fl_Browser now draws itself properly when deactivated.
+	- FLUID GUIs now use Courier font for all code input.
+	- The FLUID OK and Cancel buttons are now all shown in
+	  the same order in all windows.
+	- Fixes to compile under GCC 2.95.2
+	- Fixed the BC5 project files.
+	- FL_LEFT_MOUSE and friends are now in
+	  <FL/Enumerations.H>
+	- Fixes for fake OpenGL overlay code under WIN32.
+	- Message windows are now resizeable.
+	- On WIN32 non_modal (but not modal) windows have the
+	  close and size boxes.
+	- Fl_Button and friends didn't honor the
+	  FL_WHEN_NOT_CHANGED condition.
+	- Disabled XDBE on all platforms.
+	- XGetDefault patch from James Roth
+	- New fl_open_display(Display *) function to allow FLTK
+	  to share a display connection with another toolkit
+	  (like Xt, GTK, etc.)
+	- Shortcut labels for special keys should now display
+	  properly under WIN32.
+	- fl_set_fonts() did not reuse fonts.
+	- Fixed shortcut problem under WIN32 when the focus
+	  window changes.
+	- "dead" keys should now work under X11.
+	- Fixes to make FLTK compile with GCC 2.95.2
+	- FL_SHORTCUT fix for I18N.
+	- Fixed cut/paste problems under WIN32
+	- FLUID now produces correct code for nested class
+	  destructors.
+	- Nested windows should now redraw properly under WIN32.
+	- "table" is now static in fl_cursor.cxx
+	- Fl_Chart used the textcolor() and not the color() for
+	  horizontal bar charts.
+	- Now set the input hint for TWM and TWM-derived window
+	  managers.
+	- Now look for TrueColor visual if FLTK is compiled with
+	  USE_COLORMAP == 0.
+	- Fl_Scrollbar could generate a divide-by-0 error if the
+	  min and max values were the same.
+	- Fl_Menu_::remove() now removes whole submenus if
+	  needed.
+	- Scrollbar buttons now draw themselves pushed in as
+	  needed.
+	- Fixed the gl_overlay demo (and gl overlays in general)
+	  when they are faked with no hardware and the window is
+	  resized.
+	- Selections weren't shown in Fl_Browser widgets when an
+	  item used the @B (background) format.
+	- Windows can now be resized by the program under X11
+	  for more window managers.
+	- OS/2 makeinclude updates.
+	- Added Fl.H required by an inline function in
+	  Fl_Repeat_Button.H
+	- Fl_add_idle adds new functions to the end of the queue
+	  ring, rather than the start, so they are executed in
+	  the order added, and a callback that adds itself does
+	  not prevent others from being called.
+	- FLUID lets you type in code that starts with '#' for
+	  cpp directives.
+	- XBell() could be called before the X11 display was
+	  opened, causing a segfault.
+	- Fixed Fl_Gl_Window::ortho() - Borland C++ doesn't
+	  define GLint to "int", but instead to "long"...
+	- Fixed Fl_Browser scrollbars within an Fl_Scroll
+	  widget.
+	- Fl_Output (and non-focused Fl_Input) now scroll in
+	  response to position()
+	- Fl_Input now does not scroll horizontally if the
+	  entire string will fit in the widget.
+	- Fl_Scrollbar didn't push the right arrow buttons when
+	  you clicked outside the scroller.
+	- Now use WSAAsyncSelect() for better socket performance
+	  with Fl::add_fd()
+
+
+CHANGES SINCE FLTK 1.0.6
+
+	- Fixed Fl_Input_ bug under WIN32 - no longer stop accepting input
+	  when one of the "Windows" keys is pressed.
+	- Now call TranslateEvent for all events under WIN32.
+	- Fixes for OpenBSD and NetBSD
+	- The FL_CURSOR_HAND cursor now uses the IDC_HAND cursor instead of
+	  IDC_UPARROW under Windows 98 and 2000.
+	- Fl_Scrollbar now does a page-up/down when you click outside the
+	  scroller.
+	- Fl_Window::show(0, NULL) causes core dump
+	- Fixed a compile-time error in fl_call_main.c for Borland C++.
+	- "fluid -c filename.fl" would try to open an X display if the
+	  FLUID file contained an Fl_Browser widget.
+	- Fl_Browser now correctly measures items with @C or @B color
+	  formatting commands.
+	- Fixed a bitmap drawing bug for WIN32 (bit reversal table was wrong)
+	- fl_xyz() dialogs now set a title in the title bar.
+	- fl_alert() sounds the bell under X11.
+	- fl_xyz() dialogs now call MessageBeep() under WIN32.
+	- Fl_Browser_ didn't draw the selection box with the inactive color
+	  when the browser wasn't activated.
+	- Fl_Browser now responds to FL_KEYBOARD as well as FL_SHORTCUT.  If
+	  you subclass it to accept focus then keyboard navigation will work.
+	- Fl_Tile and Fl_Tabs do their callback when the user changes their
+	  display.
+	- Made some of the private methods of Fl_Browser protected.
+	- Now set win_gravity correctly, this helps some X
+	  window managers that use it position the window where
+	  FLTK wants it to be.
+	- 0-width browsers crashed.
+	- Minor change: if the X window manager does not do
+	  anything else with windows that don't have their
+	  position specified, the windows appear centered in the
+	  screen, rather than in the top-left corner.  This
+	  happened with modal windows under Irix 4Dwm.  This
+	  also causes windows to be centered when no window
+	  manager is running, which might be useful for
+	  installation gui programs?
+	- Clicking in an Fl_Input field the first time selects the entire
+	  field.
+	- Clicking the middle mouse button in an Fl_Input field now inserts
+	  the text at the indicated position instead of the cursor position.
+	- Drag-selecting text in an Fl_Input field now copies the text
+	  automatically.
+	- Fl::flush() no longer calls the draw() method for invisible windows.
+	- Calling deactivate() on an invisible widget could cause an
+	  infinite loop in some obscure cases.
+	- Added #pragma's for SGI C++ compilers - the 6.{23} X headers had
+	  errors in them.
+	- Fl_Gl_Window::ortho() changed so that text and images
+	  are not erased if the origin is off the left/bottom of the
+	  window.
+	- Small change to Fl_Input so that a click that gives it
+	  the focus also selects all the text.
+	- Fixed a slider drawing problem.
+	- You can now add/delete children of Fl_Tabs widgets whether or
+	  not they are visible.
+	- Now embed woff options for SGI C++ compilers (gets rid of X11
+	  header warnings)
+	- draw_pixmap used a cast that the Digital UNIX C++ compiler didn't
+	  like.
+	- The GLUT function key constants were off by one.
+	- The XPM reading code didn't handle RGB colors other than #rrggbb.
+
+
+CHANGES SINCE FLTK 1.0.5
+
+    - Fl_win32.cxx defined WM_MOUSE_LEAVE instead of WM_MOUSELEAVE.
+    - Fl_get_key_win32.cxx needed to include <ctype.h>
+    - gl_draw_pixmap.cxx needed a pointer cast for ANSI C++.
+    - Fl_Repeat_Button didn't always delete its timeout.
+    - Now keep track of the current OpenGL context; this provides
+      significant performance improvements for OpenGL applications
+      with a single context.
+
+
+CHANGES SINCE FLTK 1.0.4
+
+    - Fl_Roller didn't handle a width and height of 0.
+    - filename_list() fix for FreeBSD.
+    - Fixed RPM install docos - needed "--install" option...
+    - Fl_Browser_ wouldn't draw the vertical scrollbar right away if it
+      added a horizontal one which covered the last line.
+    - Fl_Tabs problems - single-character labels don't show up (problem in
+      measure_tabs() or measure_label() methods?), and doesn't clear top
+      tab area before drawing tabs.
+    - Fl_Browser needs a destructor.
+    - fl_draw_label() quoted characters between 0x80 and 0xa0, which
+      caused problems for some programs using the WinANSI character set.
+    - FLUID didn't handle declared class destructors.
+    - Fixed another WIN32 cut/paste bug.
+    - Fl_Tabs didn't work properly when there was only 1 tab.
+    - Fl_Menu::add() didn't delete the old array.
+    - Fl_Repeat_Button didn't delete its timeout when disabled.
+    - fl_draw() would crash if no font was set (now defaults to
+      a 14-pixel Helvetica font)
+    - Can't forward declare classes; need to check for "class ", "struct ",
+      "union ", etc.  See Bill's message
+    - Added #pragma around xlib.h for IRIX
+    - FL_KEYBOARD events have the correct x/y when sent to child X
+      windows. Note that if you worked around this bug by adjusting the
+      x/y yourself you will have to change your code. In addition all
+      events have the correct x/y when sent to the grab() widget.  And
+      the code to do all this was simplified a lot.
+    - The XPM code didn't handle named colors with spaces in the names.
+    - Pressing ESCape closed the window with pointer focus, even if there
+      was a modal window open (now closes the modal window).
+    - FLUID no longer produces trigraphs accidentally in the image data.
+    - FLUID uses string constant concatenation to produce shorter image
+      data.
+    - The Fl_Group deletion code crashed if there was exactly one child
+      widget.
+    - Simulated overlays in single-buffered Fl_Gl_Windows now draw
+      correctly (though very slowly as it requires the entire window to
+      be redrawn to erase the overlay).  This fix ported our Digital
+      Domain programs better to systems with no overlay hardware.
+    - Added support for extern "C" declarations in FLUID.
+    - Added Fl_Pack support to FLUID.
+    - Fixed the order of #include's in FLUID generated header files.
+    - Fixed detection of vsnprintf and snprintf under HP-UX 10.20 once
+      and for all.
+    - The checkers demo did not compile with GCC 2.95
+    - FLUID didn't output virtual destructors properly.
+    - Added inline "make_visible()" method to Fl_Browser.
+    - Fl::wait() now returns immediately if any timeouts are
+      called.
+    - 16-bit XPM files are now properly handled.
+    - Fl_Window::resize() was missing FL_EXPORT (caused problems
+      with Windows DLLs)
+    - FLUID was writing extern declarations twice.
+    - New FLUID arrow key functionality: arrows move by one pixel, shift+arrow
+      resizes, ctrl+arrow steps by grid
+
+
+CHANGES SINCE FLTK 1.0.3
+
+    - Documentation updates
+    - Fl_Browser::bottomline(size) didn't scroll to the bottom
+      if the second-to-last line was visible.
+    - fl_wait() didn't poll FDs properly for WIN32.
+    - Fixed DLL definitions for BC++.
+    - FLUID now handles nested classes properly.
+    - The "connect" demo now does a wait() for the PPP process
+      so that you aren't left with a lot of zombie processes.
+    - Fixed the FLTK colormap to use FF instead of F4 for full
+      intensity values.
+    - Minor change to scrollbar drawing code to match other
+      toolkits.
+    - New selections would cancel themselves out in WIN32.
+    - The header file links were broken in the IRIX
+      distributions.
+    - fl_elapsed() now always uses GetClockTick() for WIN32.
+    - fl_display is now initialized to GetModuleHandle(NULL) -
+      this fixes problems people had with Cygwin and MingW32.
+    - WinMain() is no longer compiled in with Cygwin and
+      MingW32; it wasn't being used for those compilers anyways.
+    - Added Solaris compiler options to configure script.
+    - Fl_Value_Input wouldn't update properly if you set the
+      value from a callback.
+    - Fl_Tile wouldn't resize if the resizeable widget was the
+      last child.
+    - Was missing #include <ctype.h> and #include <stdlib.h> in
+      several files, which caused problems on some platforms.
+    - Fixed another case where Fl_Browser_ could get in an
+      infinite resizing loop.
+    - Fl_win32.cxx now includes <FL/filename.H> to export missing
+      DLL symbols.
+    - FLUID didn't handle member functions that include the
+      scope operator.
+    - Fl_Chart was dividing by 0 if there were no data samples
+      or if they were all the same (min == max).
+
+
+CHANGES SINCE FLTK 1.0.2
+
+    - XDBE is now enabled for IRIX 6.[234] as well as 6.5.
+    - FLUID didn't write the when() condition properly.
+    - Tab/space/backtab/backspace can be used to navigate
+      through menus.
+    - Changed $(DSONAME) in the src/Makefile to "libfltk.so.1
+      libfltk.sl.1".
+    - Fl_Browser could read past the end of the string when
+      computing the item height.
+    - Fl_Browser could get in an infinite loop when checking to
+      see if scrollbars needed to be displayed.
+    - FLUID now honors the return type of the outermost widget. 
+      This was a problem when substituting Fl_Group in an
+      Fl_Window widget.
+    - Fl_Menu_::copy() wasn't allocating a power of 2 for the
+      array size.
+    - FLWM would crash if fl_xmousewin was deleted.
+    - The fast_slow demo now uses output widgets.
+    - Timers under WIN32 were unreliable.
+
+
+CHANGES SINCE FLTK 1.0.1
+
+    - Documentation updates
+    - The Visual C++ project files didn't include fl_add_idle.cxx.
+    - LIBRARY/DSO name inconsistencies in src/Makefile.
+    - src/Makefile didn't clean the DSO.
+    - The valuator demo now has only a single callback.
+    - The code looked for HAVE_SYS_SELECT_H, but the
+      config file uses HAVE_SYS_SELECT.
+    - Fl_Image redraw not quite right under X11 or WIN32
+    - Problems with timeouts & cube demo under WIN32
+    - FLUID problems with inline functions.
+    - Documentation fixes...
+    - Fl_Browser::item_height() didn't handle blank lines or
+      non-default fonts properly.
+    - FL/math.h didn't have #ifndef...#define...#endif guards
+      against multiple inclusion...
+    - Fl_Menu_::copy() fix - didn't allocate power of 2...
+    - Fl::damage() now remains true until all windows are actually
+      redrawn.
+    - Fl_Widget destructor, hide(), and deactivate() methods no longer
+      send FL_LEAVE, FL_RELEASE, or FL_UNFOCUS events to the widget
+      (which could cause applications to crash).
+    - FLUID now outputs symbolic names for align() and when().
+    - Fixed select() to use maxfd + 1 instead of maxfd.
+    - Added "Fl::remove_fd(fd, when)" function so you can remove the
+      read and write callbacks separately.
+    - The Fl::add_fd() and Fl::add_timeout() arrays are now dynamically
+      allocated.
+    - FLUID didn't always turn the FL_SUBMENU flag on for submenu titles.
+    - The "extra code" in FLUID now is placed before the "o->end()" call
+      for Fl_Group and its derived classes.
+    - You can now set a FL_Window widget's class in FLUID to Fl_Group to
+      generate a function or class that builds part of a GUI (i.e. no window).
+    - FLUID now displays "Save file before exiting?" with the standard yes,
+      no, and cancel buttons rather than "Discard changes?".
+    - Fl_Menu_::add() now works with any type of menu, even one set with
+      the menu() method.
+    - The keypad keys were not always decoded properly under X11.
+    - Some pointers were not being turned off when widgets were deleted,
+      which caused some applications (like FLWM) to crash.
+
+
+CHANGES SINCE FLTK 1.0
+
+    - Documentation fixes.
+    - Fl::check() didn't return the correct value, breaking a number
+      of applications.
+    - Fixed FLUID bug that caused styles patch to crash when you delete
+      a menu item.
+    - Updated valuators demo to put the values in the gui box.
+    - Fl_Browser_::item_height() didn't always compute the correct
+      value.
+    - Fixed the alignment of Fl_Choice text.
+    - Fixes for OS/2.
+    - Fl_Menu_Item::clear() didn't clear value.
+    - Added some changes to make FLTK work with Borland C++.
+    - ANSI C++ fixes.
+    - Plugged a memory leak in the fractal demo.
+    - Fl::add_timeout() didn't work under WIN32 with small values.
+    - The configure script and makefiles now define DSONAME and
+      use the static library for all example programs.    

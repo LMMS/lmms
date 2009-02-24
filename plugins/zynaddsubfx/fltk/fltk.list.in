@@ -1,0 +1,412 @@
+#
+# "$Id: fltk.list.in 6059 2008-02-28 16:50:07Z mike $"
+#
+# EPM product list file for the Fast Light Tool Kit (FLTK).
+#
+# (EPM can be found at http://www.epmhome.org/)
+#
+# Copyright 1998-2008 by Bill Spitzak and others.
+#
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Library General Public
+# License as published by the Free Software Foundation; either
+# version 2 of the License, or (at your option) any later version.
+#
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Library General Public License for more details.
+#
+# You should have received a copy of the GNU Library General Public
+# License along with this library; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
+# USA.
+#
+# Please report all bugs and problems on the following page:
+#
+#      http://www.fltk.org/str.php
+#
+
+%product Fast Light Tool Kit (FLTK)
+%copyright 1998-2008 by Bill Spitzak and others.
+%vendor FLTK Development Team
+%license COPYING
+%readme README
+%version @FL_MAJOR_VERSION@.@FL_MINOR_VERSION@.@FL_PATCH_VERSION@
+%description The Fast Light Tool Kit ("FLTK", pronounced "fulltick") is a
+%description cross-platform C++ GUI toolkit for UNIX(r)/Linux(r) (X11),
+%description Microsoft(r) Windows(r), and MacOS(r) X.  FLTK provides modern
+%description GUI functionality without the bloat and supports 3D graphics via
+%description OpenGL(r) and its built-in GLUT emulation.
+
+$prefix=@prefix@
+$exec_prefix=@exec_prefix@
+$bindir=@bindir@
+$datarootdir=@datarootdir@
+$datadir=@datadir@
+$includedir=@includedir@
+$libdir=@libdir@
+$mandir=@mandir@
+$docdir=${datadir}/doc/fltk
+
+$CAT1EXT=@CAT1EXT@
+$CAT3EXT=@CAT3EXT@
+$CAT6EXT=@CAT6EXT@
+
+$DSONAME=@DSONAME@
+$FLDSONAME=@FLDSONAME@
+$FLLIBNAME=@FLLIBNAME@
+$GLDSONAME=@GLDSONAME@
+$GLLIBNAME=@GLLIBNAME@
+$FLUID=@FLUID@
+$JPEG=@JPEG@
+$PNG=@PNG@
+$ZLIB=@ZLIB@
+
+%if DSONAME
+%system aix
+f 0555 root sys $libdir/libfltk_s.a src/libfltk_s.a nostrip()
+%system hpux
+f 0555 root sys $libdir/libfltk.sl.@FL_API_VERSION@ src/libfltk.sl.@FL_API_VERSION@ nostrip()
+%system darwin
+f 0555 root sys $libdir/libfltk.@FL_API_VERSION@.dylib src/libfltk.@FL_API_VERSION@.dylib nostrip()
+%system !aix !darwin !hpux
+f 0555 root sys $libdir/libfltk.so.@FL_API_VERSION@ src/libfltk.so.@FL_API_VERSION@ nostrip()
+%system all
+
+%system aix
+f 0555 root sys $libdir/libfltk_forms_s.a src/libfltk_forms_s.a nostrip()
+%system hpux
+f 0555 root sys $libdir/libfltk_forms.sl.@FL_API_VERSION@ src/libfltk_forms.sl.@FL_API_VERSION@ nostrip()
+%system darwin
+f 0555 root sys $libdir/libfltk_forms.@FL_API_VERSION@.dylib src/libfltk_forms.@FL_API_VERSION@.dylib nostrip()
+%system !aix !darwin !hpux
+f 0555 root sys $libdir/libfltk_forms.so.@FL_API_VERSION@ src/libfltk_forms.so.@FL_API_VERSION@ nostrip()
+%system all
+
+%system aix
+f 0555 root sys $libdir/libfltk_images_s.a src/libfltk_images_s.a nostrip()
+%system hpux
+f 0555 root sys $libdir/libfltk_images.sl.@FL_API_VERSION@ src/libfltk_images.sl.@FL_API_VERSION@ nostrip()
+%system darwin
+f 0555 root sys $libdir/libfltk_images.@FL_API_VERSION@.dylib src/libfltk_images.@FL_API_VERSION@.dylib nostrip()
+%system !aix !darwin !hpux
+f 0555 root sys $libdir/libfltk_images.so.@FL_API_VERSION@ src/libfltk_images.so.@FL_API_VERSION@ nostrip()
+%system all
+%endif
+
+%if GLDSONAME
+%system aix
+f 0555 root sys $libdir/libfltk_gl_s.a src/libfltk_gl_s.a nostrip()
+%system hpux
+f 0555 root sys $libdir/libfltk_gl.sl.@FL_API_VERSION@ src/libfltk_gl.sl.@FL_API_VERSION@ nostrip()
+%system darwin
+f 0555 root sys $libdir/libfltk_gl.@FL_API_VERSION@.dylib src/libfltk_gl.@FL_API_VERSION@.dylib nostrip()
+%system !aix !darwin !hpux
+f 0555 root sys $libdir/libfltk_gl.so.@FL_API_VERSION@ src/libfltk_gl.so.@FL_API_VERSION@ nostrip()
+%system all
+%endif
+
+
+%subpackage devel
+%description FLTK Development Environment
+%description Install fltk-devel if you need to develop FLTK applications. 
+%description You'll need to install the fltk package if you plan to run
+%description dynamically linked applications.
+
+%system darwin
+l 0444 root sys /usr/include/gcc/darwin/3.1/g++-v3/FL $includedir/FL
+
+d 0555 root sys /Applications/fluid.app -
+d 0555 root sys /Applications/fluid.app/Contents -
+f 0444 root sys /Applications/fluid.app/Contents/Info.plist fluid/fluid.app/Contents/Info.plist
+f 0444 root sys /Applications/fluid.app/Contents/PkgInfo fluid/fluid.app/Contents/PkgInfo
+d 0555 root sys /Applications/fluid.app/Contents/MacOS -
+l 0555 root sys /Applications/fluid.app/Contents/MacOS/fluid $bindir/fluid
+d 0555 root sys /Applications/fluid.app/Contents/Resources -
+f 0444 root sys /Applications/fluid.app/Contents/Resources/fluid.icns fluid/fluid.app/Contents/Resources/fluid.icns
+%postinstall $bindir/fltk-config --post $bindir/fluid
+%postremove /bin/rm -rf /Applications/fluid.app
+
+%system !darwin
+f 0444 root sys /usr/share/applications/fluid.desktop fluid/fluid.desktop
+f 0444 root sys /usr/share/icons/hicolor/16x16/apps/fluid.png fluid/icons/fluid-16.png
+f 0444 root sys /usr/share/icons/hicolor/32x32/apps/fluid.png fluid/icons/fluid-32.png
+f 0444 root sys /usr/share/icons/hicolor/48x48/apps/fluid.png fluid/icons/fluid-48.png
+f 0444 root sys /usr/share/icons/hicolor/64x64/apps/fluid.png fluid/icons/fluid-64.png
+f 0444 root sys /usr/share/icons/hicolor/128x128/apps/fluid.png fluid/icons/fluid-128.png
+f 0444 root sys /usr/share/mimelnk/application/x-fluid.desktop fluid/x-fluid.desktop
+
+%system all
+
+# FLUID
+f 0555 root sys $bindir/fluid fluid/$FLUID
+f 0555 root sys $bindir/fltk-config fltk-config
+
+# Man pages
+f 0444 root sys $mandir/cat1/fluid.$CAT1EXT documentation/fluid.$CAT1EXT
+f 0444 root sys $mandir/cat1/fltk-config.$CAT1EXT documentation/fltk-config.$CAT1EXT
+f 0444 root sys $mandir/cat3/fltk.$CAT3EXT documentation/fltk.$CAT3EXT
+f 0444 root sys $mandir/man1/fluid.1 documentation/fluid.man
+f 0444 root sys $mandir/man1/fltk-config.1 documentation/fltk-config.man
+f 0444 root sys $mandir/man3/fltk.3 documentation/fltk.man
+
+# Library files
+f 0444 root sys $libdir/libfltk.a lib/libfltk.a
+f 0444 root sys $libdir/libfltk_forms.a lib/libfltk_forms.a
+f 0444 root sys $libdir/libfltk_images.a lib/libfltk_images.a
+%if GLLIBNAME
+f 0444 root sys $libdir/libfltk_gl.a lib/libfltk_gl.a
+%endif
+
+%if JPEG
+f 0444 root sys $libdir/libfltk_jpeg.a lib/libfltk_jpeg.a
+%endif
+
+%if PNG
+f 0444 root sys $libdir/libfltk_png.a lib/libfltk_png.a
+%endif
+
+%if ZLIB
+f 0444 root sys $libdir/libfltk_z.a lib/libfltk_z.a
+%endif
+
+%if DSONAME
+%system hpux
+l 0000 root sys $libdir/libfltk.sl libfltk.sl.@FL_API_VERSION@
+%system darwin
+l 0000 root sys $libdir/libfltk.dylib libfltk.@FL_API_VERSION@.dylib
+%system !aix !darwin !hpux
+l 0000 root sys $libdir/libfltk.so libfltk.so.@FL_API_VERSION@
+%system all
+
+%system hpux
+l 0000 root sys $libdir/libfltk_forms.sl libfltk_forms.sl.@FL_API_VERSION@
+%system darwin
+l 0000 root sys $libdir/libfltk_forms.dylib libfltk_forms.@FL_API_VERSION@.dylib
+%system !aix !darwin !hpux
+l 0000 root sys $libdir/libfltk_forms.so libfltk_forms.so.@FL_API_VERSION@
+%system all
+
+%system hpux
+l 0000 root sys $libdir/libfltk_images.sl libfltk_images.sl.@FL_API_VERSION@
+%system darwin
+l 0000 root sys $libdir/libfltk_images.dylib libfltk_images.@FL_API_VERSION@.dylib
+%system !aix !darwin !hpux
+l 0000 root sys $libdir/libfltk_images.so libfltk_images.so.@FL_API_VERSION@
+%system all
+%endif
+
+%if GLDSONAME
+%system hpux
+l 0000 root sys $libdir/libfltk_gl.sl libfltk_gl.sl.@FL_API_VERSION@
+%system darwin
+l 0000 root sys $libdir/libfltk_gl.dylib libfltk_gl.@FL_API_VERSION@.dylib
+%system !aix !darwin !hpux
+l 0000 root sys $libdir/libfltk_gl.so libfltk_gl.so.@FL_API_VERSION@
+%system all
+%endif
+
+# Header files
+f 0444 root sys $includedir/FL/ FL/*.[hH]
+
+%if JPEG
+f 0444 root sys $includedir/FL/images/jconfig.h jpeg/jconfig.h
+f 0444 root sys $includedir/FL/images/jerror.h jpeg/jerror.h
+f 0444 root sys $includedir/FL/images/jmorecfg.h jpeg/jmorecfg.h
+f 0444 root sys $includedir/FL/images/jpeglib.h jpeg/jpeglib.h
+%endif
+
+%if PNG
+f 0444 root sys $includedir/FL/images/png.h png/png.h
+f 0444 root sys $includedir/FL/images/pngconf.h png/pngconf.h
+%endif
+
+%if ZLIB
+f 0444 root sys $includedir/FL/images/zconf.h zlib/zconf.h
+f 0444 root sys $includedir/FL/images/zlib.h zlib/zlib.h
+f 0444 root sys $includedir/FL/images/zutil.h zlib/zutil.h
+%endif
+
+%system !darwin
+# Symlinks to handle common case problems...
+l 0000 root sys $includedir/Fl FL
+l 0000 root sys $includedir/FL/Enumerations.h Enumerations.H
+l 0000 root sys $includedir/FL/Fl.h Fl.H
+l 0000 root sys $includedir/FL/Fl_Adjuster.h Fl_Adjuster.H
+l 0000 root sys $includedir/FL/Fl_Bitmap.h Fl_Bitmap.H
+l 0000 root sys $includedir/FL/Fl_Box.h Fl_Box.H
+l 0000 root sys $includedir/FL/Fl_Browser.h Fl_Browser.H
+l 0000 root sys $includedir/FL/Fl_Browser_.h Fl_Browser_.H
+l 0000 root sys $includedir/FL/Fl_Button.h Fl_Button.H
+l 0000 root sys $includedir/FL/Fl_Chart.h Fl_Chart.H
+l 0000 root sys $includedir/FL/Fl_Check_Browser.h Fl_Check_Browser.H
+l 0000 root sys $includedir/FL/Fl_Check_Button.h Fl_Check_Button.H
+l 0000 root sys $includedir/FL/Fl_Choice.h Fl_Choice.H
+l 0000 root sys $includedir/FL/Fl_Clock.h Fl_Clock.H
+l 0000 root sys $includedir/FL/Fl_Color_Chooser.h Fl_Color_Chooser.H
+l 0000 root sys $includedir/FL/Fl_Counter.h Fl_Counter.H
+l 0000 root sys $includedir/FL/Fl_Dial.h Fl_Dial.H
+l 0000 root sys $includedir/FL/Fl_Double_Window.h Fl_Double_Window.H
+l 0000 root sys $includedir/FL/Fl_File_Browser.h Fl_File_Browser.H
+l 0000 root sys $includedir/FL/Fl_File_Chooser.h Fl_File_Chooser.H
+l 0000 root sys $includedir/FL/Fl_File_Icon.h Fl_File_Icon.H
+l 0000 root sys $includedir/FL/Fl_Fill_Dial.h Fl_Fill_Dial.H
+l 0000 root sys $includedir/FL/Fl_Fill_Slider.h Fl_Fill_Slider.H
+l 0000 root sys $includedir/FL/Fl_Float_Input.h Fl_Float_Input.H
+l 0000 root sys $includedir/FL/Fl_FormsBitmap.h Fl_FormsBitmap.H
+l 0000 root sys $includedir/FL/Fl_FormsPixmap.h Fl_FormsPixmap.H
+l 0000 root sys $includedir/FL/Fl_Free.h Fl_Free.H
+l 0000 root sys $includedir/FL/Fl_Group.h Fl_Group.H
+l 0000 root sys $includedir/FL/Fl_Help_Dialog.h Fl_Help_Dialog.H
+l 0000 root sys $includedir/FL/Fl_Help_View.h Fl_Help_View.H
+l 0000 root sys $includedir/FL/Fl_Hold_Browser.h Fl_Hold_Browser.H
+l 0000 root sys $includedir/FL/Fl_Hor_Fill_Slider.h Fl_Hor_Fill_Slider.H
+l 0000 root sys $includedir/FL/Fl_Hor_Nice_Slider.h Fl_Hor_Nice_Slider.H
+l 0000 root sys $includedir/FL/Fl_Hor_Slider.h Fl_Hor_Slider.H
+l 0000 root sys $includedir/FL/Fl_Hor_Value_Slider.h Fl_Hor_Value_Slider.H
+l 0000 root sys $includedir/FL/Fl_Image.h Fl_Image.H
+l 0000 root sys $includedir/FL/Fl_Input.h Fl_Input.H
+l 0000 root sys $includedir/FL/Fl_Input_.h Fl_Input_.H
+l 0000 root sys $includedir/FL/Fl_Input_Choice.h Fl_Input_Choice.H
+l 0000 root sys $includedir/FL/Fl_Int_Input.h Fl_Int_Input.H
+l 0000 root sys $includedir/FL/Fl_Light_Button.h Fl_Light_Button.H
+l 0000 root sys $includedir/FL/Fl_Line_Dial.h Fl_Line_Dial.H
+l 0000 root sys $includedir/FL/Fl_Menu.h Fl_Menu.H
+l 0000 root sys $includedir/FL/Fl_Menu_.h Fl_Menu_.H
+l 0000 root sys $includedir/FL/Fl_Menu_Bar.h Fl_Menu_Bar.H
+l 0000 root sys $includedir/FL/Fl_Menu_Button.h Fl_Menu_Button.H
+l 0000 root sys $includedir/FL/Fl_Menu_Item.h Fl_Menu_Item.H
+l 0000 root sys $includedir/FL/Fl_Menu_Window.h Fl_Menu_Window.H
+l 0000 root sys $includedir/FL/Fl_Multi_Browser.h Fl_Multi_Browser.H
+l 0000 root sys $includedir/FL/Fl_Multi_Label.h Fl_Multi_Label.H
+l 0000 root sys $includedir/FL/Fl_Multiline_Input.h Fl_Multiline_Input.H
+l 0000 root sys $includedir/FL/Fl_Multiline_Output.h Fl_Multiline_Output.H
+l 0000 root sys $includedir/FL/Fl_Nice_Slider.h Fl_Nice_Slider.H
+l 0000 root sys $includedir/FL/Fl_Object.h Fl_Object.H
+l 0000 root sys $includedir/FL/Fl_Output.h Fl_Output.H
+l 0000 root sys $includedir/FL/Fl_Overlay_Window.h Fl_Overlay_Window.H
+l 0000 root sys $includedir/FL/Fl_Pack.h Fl_Pack.H
+l 0000 root sys $includedir/FL/Fl_Pixmap.h Fl_Pixmap.H
+l 0000 root sys $includedir/FL/Fl_Positioner.h Fl_Positioner.H
+l 0000 root sys $includedir/FL/Fl_Progress.h Fl_Progress.H
+l 0000 root sys $includedir/FL/Fl_Radio_Button.h Fl_Radio_Button.H
+l 0000 root sys $includedir/FL/Fl_Radio_Light_Button.h Fl_Radio_Light_Button.H
+l 0000 root sys $includedir/FL/Fl_Radio_Round_Button.h Fl_Radio_Round_Button.H
+l 0000 root sys $includedir/FL/Fl_Repeat_Button.h Fl_Repeat_Button.H
+l 0000 root sys $includedir/FL/Fl_Return_Button.h Fl_Return_Button.H
+l 0000 root sys $includedir/FL/Fl_Roller.h Fl_Roller.H
+l 0000 root sys $includedir/FL/Fl_Round_Button.h Fl_Round_Button.H
+l 0000 root sys $includedir/FL/Fl_Round_Clock.h Fl_Round_Clock.H
+l 0000 root sys $includedir/FL/Fl_Scroll.h Fl_Scroll.H
+l 0000 root sys $includedir/FL/Fl_Scrollbar.h Fl_Scrollbar.H
+l 0000 root sys $includedir/FL/Fl_Secret_Input.h Fl_Secret_Input.H
+l 0000 root sys $includedir/FL/Fl_Select_Browser.h Fl_Select_Browser.H
+l 0000 root sys $includedir/FL/Fl_Simple_Counter.h Fl_Simple_Counter.H
+l 0000 root sys $includedir/FL/Fl_Single_Window.h Fl_Single_Window.H
+l 0000 root sys $includedir/FL/Fl_Slider.h Fl_Slider.H
+l 0000 root sys $includedir/FL/Fl_Spinner.h Fl_Spinner.H
+l 0000 root sys $includedir/FL/Fl_Tabs.h Fl_Tabs.H
+l 0000 root sys $includedir/FL/Fl_Tile.h Fl_Tile.H
+l 0000 root sys $includedir/FL/Fl_Timer.h Fl_Timer.H
+l 0000 root sys $includedir/FL/Fl_Toggle_Button.h Fl_Toggle_Button.H
+l 0000 root sys $includedir/FL/Fl_Toggle_Light_Button.h Fl_Toggle_Light_Button.H
+l 0000 root sys $includedir/FL/Fl_Toggle_Round_Button.h Fl_Toggle_Round_Button.H
+l 0000 root sys $includedir/FL/Fl_Tooltip.h Fl_Tooltip.H
+l 0000 root sys $includedir/FL/Fl_Valuator.h Fl_Valuator.H
+l 0000 root sys $includedir/FL/Fl_Value_Input.h Fl_Value_Input.H
+l 0000 root sys $includedir/FL/Fl_Value_Output.h Fl_Value_Output.H
+l 0000 root sys $includedir/FL/Fl_Value_Slider.h Fl_Value_Slider.H
+l 0000 root sys $includedir/FL/Fl_Widget.h Fl_Widget.H
+l 0000 root sys $includedir/FL/Fl_Window.h Fl_Window.H
+l 0000 root sys $includedir/FL/Fl_XBM_Image.h Fl_XBM_Image.H
+l 0000 root sys $includedir/FL/Fl_XPM_Image.h Fl_XPM_Image.H
+l 0000 root sys $includedir/FL/filename.h filename.H
+l 0000 root sys $includedir/FL/fl_ask.h fl_ask.H
+l 0000 root sys $includedir/FL/fl_draw.h fl_draw.H
+l 0000 root sys $includedir/FL/fl_file_chooser.h Fl_File_Chooser.H
+l 0000 root sys $includedir/FL/fl_file_chooser.H Fl_File_Chooser.H
+l 0000 root sys $includedir/FL/fl_message.h fl_message.H
+l 0000 root sys $includedir/FL/fl_show_colormap.h fl_show_colormap.H
+l 0000 root sys $includedir/FL/fl_show_input.h fl_show_input.H
+l 0000 root sys $includedir/FL/win32.h win32.H
+l 0000 root sys $includedir/FL/x.h x.H
+%system all
+
+# Documentation
+d 0555 root sys $docdir -
+f 0444 root sys $docdir/ documentation/*.gif
+f 0444 root sys $docdir/ documentation/*.html
+f 0444 root sys $docdir/ documentation/*.jpg
+f 0444 root sys $docdir/COPYING COPYING
+f 0444 root sys $docdir/CHANGES CHANGES
+
+# Examples
+d 0555 root sys $docdir/examples
+f 0444 root sys $docdir/examples/config.h config.h
+f 0444 root sys $docdir/examples/ test/*.cxx
+f 0444 root sys $docdir/examples/ test/*.fl
+f 0444 root sys $docdir/examples/ test/*.h
+
+%subpackage games
+%description FLTK Games
+%description Install fltk-games to play Block Attack!, checkers, or Sudoku on your computer.
+
+%system darwin
+d 0555 root sys /Applications/blocks.app -
+d 0555 root sys /Applications/blocks.app/Contents -
+f 0444 root sys /Applications/blocks.app/Contents/Info.plist test/blocks.app/Contents/Info.plist
+f 0444 root sys /Applications/blocks.app/Contents/PkgInfo test/blocks.app/Contents/PkgInfo
+d 0555 root sys /Applications/blocks.app/Contents/MacOS -
+f 0555 root sys /Applications/blocks.app/Contents/MacOS/blocks test/blocks
+d 0555 root sys /Applications/blocks.app/Contents/Resources -
+f 0444 root sys /Applications/blocks.app/Contents/Resources/blocks.icns test/blocks.app/Contents/Resources/blocks.icns
+%postremove /bin/rm -rf /Applications/blocks.app
+
+d 0555 root sys /Applications/checkers.app -
+d 0555 root sys /Applications/checkers.app/Contents -
+f 0444 root sys /Applications/checkers.app/Contents/Info.plist test/checkers.app/Contents/Info.plist
+f 0444 root sys /Applications/checkers.app/Contents/PkgInfo test/checkers.app/Contents/PkgInfo
+d 0555 root sys /Applications/checkers.app/Contents/MacOS -
+f 0555 root sys /Applications/checkers.app/Contents/MacOS/checkers test/checkers
+d 0555 root sys /Applications/checkers.app/Contents/Resources -
+f 0444 root sys /Applications/checkers.app/Contents/Resources/checkers.icns test/checkers.app/Contents/Resources/checkers.icns
+%postremove /bin/rm -rf /Applications/checkers.app
+
+d 0555 root sys /Applications/sudoku.app -
+d 0555 root sys /Applications/sudoku.app/Contents -
+f 0444 root sys /Applications/sudoku.app/Contents/Info.plist test/sudoku.app/Contents/Info.plist
+f 0444 root sys /Applications/sudoku.app/Contents/PkgInfo test/sudoku.app/Contents/PkgInfo
+d 0555 root sys /Applications/sudoku.app/Contents/MacOS -
+f 0555 root sys /Applications/sudoku.app/Contents/MacOS/sudoku test/sudoku
+d 0555 root sys /Applications/sudoku.app/Contents/Resources -
+f 0444 root sys /Applications/sudoku.app/Contents/Resources/sudoku.icns test/sudoku.app/Contents/Resources/sudoku.icns
+%postremove /bin/rm -rf /Applications/sudoku.app
+
+%system !darwin
+f 0555 root sys $bindir/blocks test/blocks
+f 0444 root sys /usr/share/applications/blocks.desktop test/desktop/blocks.desktop
+f 0444 root sys /usr/share/icons/hicolor/32x32/apps/blocks.png test/desktop/blocks-32.png
+f 0444 root sys /usr/share/icons/hicolor/128x128/apps/blocks.png test/desktop/blocks-128.png
+
+f 0555 root sys $bindir/checkers test/checkers
+f 0444 root sys /usr/share/applications/checkers.desktop test/desktop/checkers.desktop
+f 0444 root sys /usr/share/icons/hicolor/32x32/apps/checkers.png test/desktop/checkers-32.png
+f 0444 root sys /usr/share/icons/hicolor/128x128/apps/checkers.png test/desktop/checkers-128.png
+
+f 0555 root sys $bindir/sudoku test/sudoku
+f 0444 root sys /usr/share/applications/sudoku.desktop test/desktop/sudoku.desktop
+f 0444 root sys /usr/share/icons/hicolor/32x32/apps/sudoku.png test/desktop/sudoku-32.png
+f 0444 root sys /usr/share/icons/hicolor/128x128/apps/sudoku.png test/desktop/sudoku-128.png
+
+%system all
+f 0444 root sys $mandir/cat6/blocks.$CAT6EXT documentation/blocks.$CAT6EXT
+f 0444 root sys $mandir/cat6/checkers.$CAT6EXT documentation/checkers.$CAT6EXT
+f 0444 root sys $mandir/cat6/sudoku.$CAT6EXT documentation/sudoku.$CAT6EXT
+f 0444 root sys $mandir/man6/blocks.6 documentation/blocks.man
+f 0444 root sys $mandir/man6/checkers.6 documentation/checkers.man
+f 0444 root sys $mandir/man6/sudoku.6 documentation/sudoku.man
+
+#
+# End of "$Id: fltk.list.in 6059 2008-02-28 16:50:07Z mike $".
+#

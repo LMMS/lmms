@@ -1,0 +1,265 @@
+/*
+ * "$Id: configh.cmake.in 6106 2008-04-21 21:10:47Z matt $"
+ *
+ * Configuration file for the Fast Light Tool Kit (FLTK).
+ * @configure_input@
+ *
+ * Copyright 1998-2008 by Bill Spitzak and others.
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
+ * USA.
+ *
+ * Please report all bugs and problems to "fltk-bugs@fltk.org".
+ */
+
+/*
+ * Where to find files...
+ */
+
+#define FLTK_DATADIR	"@FLTK_DATADIR@"
+#define FLTK_DOCDIR	"@FLTK_DOCDIR@"
+
+/*
+ * BORDER_WIDTH:
+ *
+ * Thickness of FL_UP_BOX and FL_DOWN_BOX.  Current 1,2, and 3 are
+ * supported.
+ *
+ * 3 is the historic FLTK look.
+ * 2 is the default and looks like Microsoft Windows, KDE, and Qt.
+ * 1 is a plausible future evolution...
+ *
+ * Note that this may be simulated at runtime by redefining the boxtypes
+ * using Fl::set_boxtype().
+ */
+
+#define BORDER_WIDTH 2
+
+/*
+ * HAVE_GL:
+ *
+ * Do you have OpenGL? Set this to 0 if you don't have or plan to use
+ * OpenGL, and FLTK will be smaller.
+ */
+
+#define HAVE_GL @HAVE_GL@
+
+/*
+ * HAVE_GL_GLU_H:
+ *
+ * Do you have the OpenGL Utility Library header file?
+ * (many broken Mesa RPMs do not...)
+ */
+
+#cmakedefine HAVE_GL_GLU_H @HAVE_GL_GLU_H@
+
+/*
+ * USE_COLORMAP:
+ *
+ * Setting this to zero will save a good deal of code (especially for
+ * fl_draw_image), but FLTK will only work on TrueColor visuals.
+ */
+
+#define USE_COLORMAP 1
+
+/*
+ * USE_XFT
+ *
+ * Use the new Xft library to draw anti-aliased text.
+ */
+
+#define USE_XFT 0
+
+/*
+ * HAVE_XDBE:
+ *
+ * Do we have the X double-buffer extension?
+ */
+
+#define HAVE_XDBE 0
+
+/*
+ * USE_XDBE:
+ *
+ * Actually try to use the double-buffer extension?
+ */
+
+#define USE_XDBE HAVE_XDBE
+
+/*
+ * USE_QUARTZ:
+ *
+ * Use Quartz instead of Quickdraw on Apple Mac OS X machines.
+ * FLTK was originally ported to Quickdraw which is no longer 
+ * supported by Apple. If USE_QUARTZ is defined, FLTK will be
+ * compiled using Quartz instead. This flag has no meaning on
+ * other operating systems.
+ */
+
+#cmakedefine FLTK_APPLE
+#ifdef FLTK_APPLE
+  #cmakedefine FLTK_QUARTZ
+  #ifdef FLTK_QUARTZ
+    #define USE_QUARTZ 1
+    #define __APPLE_QUARTZ__
+    #undef __APPLE_QD__
+  #else
+    #define USE_QUARTZ 0
+    #undef __APPLE_QUARTZ__
+    #define __APPLE_QD__
+  #endif
+#endif
+
+/*
+ * HAVE_OVERLAY:
+ *
+ * Use the X overlay extension?  FLTK will try to use an overlay
+ * visual for Fl_Overlay_Window, the Gl_Window overlay, and for the
+ * menus.  Setting this to zero will remove a substantial amount of
+ * code from FLTK.  Overlays have only been tested on SGI servers!
+ */
+
+#define HAVE_OVERLAY 0
+
+/*
+ * HAVE_GL_OVERLAY:
+ *
+ * It is possible your GL has an overlay even if X does not.  If so,
+ * set this to 1.
+ */
+
+#define HAVE_GL_OVERLAY HAVE_OVERLAY
+
+/*
+ * WORDS_BIGENDIAN:
+ *
+ * Byte order of your machine: 1 = big-endian, 0 = little-endian.
+ */
+
+#define WORDS_BIGENDIAN 0
+
+/*
+ * U16, U32, U64:
+ *
+ * Types used by fl_draw_image.  One of U32 or U64 must be defined.
+ * U16 is optional but FLTK will work better with it!
+ */
+
+#cmakedefine U16 @U16@
+#cmakedefine U32 @U32@
+#cmakedefine U64 @U64@
+
+/*
+ * HAVE_DIRENT_H, HAVE_SYS_NDIR_H, HAVE_SYS_DIR_H, HAVE_NDIR_H, HAVE_SCANDIR:
+ *
+ * Where is <dirent.h> (used only by fl_file_chooser and scandir).
+ */
+
+#cmakedefine HAVE_DIRENT_H @HAVE_DIRENT_H@
+#cmakedefine HAVE_SYS_NDIR_H @HAVE_SYS_NDIR_H@
+#cmakedefine HAVE_SYS_DIR_H @HAVE_SYS_DIR_H@
+#cmakedefine HAVE_NDIR_H @HAVE_NDIR_H@
+#cmakedefine HAVE_SCANDIR @HAVE_SCANDIR@
+
+/*
+ * Possibly missing sprintf-style functions:
+ */
+
+#cmakedefine HAVE_VSNPRINTF @HAVE_VSNPRINTF@
+#cmakedefine HAVE_SNPRINTF @HAVE_SNPRINTF@
+
+/*
+ * String functions and headers...
+ */
+
+#cmakedefine HAVE_STRINGS_H @HAVE_STRINGS_H@
+#cmakedefine HAVE_STRCASECMP @HAVE_STRCASECMP@
+#cmakedefine HAVE_STRLCAT @HAVE_STRLCAT@
+#cmakedefine HAVE_STRLCPY @HAVE_STRLCPY@
+
+/*
+ * 'locale' functions
+ */
+
+#cmakedefine HAVE_LOCALE_H @HAVE_LOCALE_H@
+#cmakedefine HAVE_LOCALECONV @HAVE_LOCALECONV@
+
+/*
+ * HAVE_SYS_SELECT_H:
+ *
+ * Whether or not select() call has its own header file.
+ */
+
+#cmakedefine HAVE_SYS_SELECT_H @HAVE_SYS_SELECT_H@
+
+/*
+ * HAVE_SYS_STDTYPES_H:
+ *
+ * Whether or not we have the <sys/stdtypes.h> header file.
+ */
+
+#cmakedefine HAVE_SYS_STDTYPES_H @HAVE_SYS_STDTYPES_H@
+
+/*
+ * USE_POLL:
+ *
+ * Use the poll() call provided on Linux and Irix instead of select()
+ */
+
+#define USE_POLL 0
+
+/*
+ * Do we have various image libraries?
+ */
+
+#cmakedefine HAVE_LIBPNG @HAVE_LIBPNG@
+#cmakedefine HAVE_LIBZ @HAVE_LIBZ@
+#cmakedefine HAVE_LIBJPEG @HAVE_LIBJPEG@
+
+/*
+ * Which header file do we include for libpng?
+ */
+
+#cmakedefine HAVE_PNG_H @HAVE_PNG_H@
+#cmakedefine HAVE_LIBPNG_PNG_H @HAVE_LIBPNG_PNG_H@
+
+/*
+ * Do we have the png_xyz() functions?
+ */
+
+#cmakedefine HAVE_PNG_GET_VALID @HAVE_PNG_GET_VALID@
+#cmakedefine HAVE_PNG_SET_TRNS_TO_ALPHA @HAVE_PNG_SET_TRNS_TO_ALPHA@
+
+/*
+ * Do we have POSIX threading?
+ */
+
+#cmakedefine CMAKE_USE_PTHREADS
+#ifdef CMAKE_USE_PTHREADS
+#define HAVE_PTHREAD 1
+#else
+#define HAVE_PTHREAD 0
+#endif
+
+#cmakedefine CMAKE_HAVE_PTHREAD_H
+#ifdef CMAKE_HAVE_PTHREAD_H
+#define HAVE_PTHREAD_H 1
+#else
+#define HAVE_PTHREAD_H 0
+#endif
+
+/*
+ * End of "$Id: configh.cmake.in 6106 2008-04-21 21:10:47Z matt $".
+ */

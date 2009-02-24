@@ -1,0 +1,305 @@
+CHANGES - 2008-01-28
+--------------------
+
+CHANGES IN Mini-XML 2.5
+
+	- The mxmldoc program now makes greater use of CSS and
+	  supports a --css option to embed an alternate stylesheet.
+	- The mxmldoc program now supports --header and --footer
+	  options to insert documentation content before and
+	  after the generated content.
+	- The mxmldoc program now supports a --framed option to
+	  generate framed HTML output.
+	- The mxmldoc program now creates a table of contents
+	  including any headings in the --intro file when
+	  generating HTML output.
+	- The man pages and man page output from mxmldoc did
+	  not use "\-" for dashes (STR #68)
+	- The debug version of the Mini-XML DLL could not be
+	  built (STR #65)
+	- Processing instructions and directives did not work
+	  when not at the top level of a document (STR #67)
+	- Spaces around the "=" in attributes were not supported
+	  (STR #67)
+
+
+CHANGES IN Mini-XML 2.4
+
+	- Fixed shared library build problems on HP-UX and Mac OS X.
+	- The mxmldoc program did not output argument descriptions
+	  for functions properly.
+	- All global settings (custom, error, and entity callbacks
+	  and the wrap margin) are now managed separately for each
+	  thread.
+	- Added mxmlElementDeleteAttr() function (STR #59)
+	- mxmlElementSetAttrf() did not work (STR #57)
+	- mxmlLoad*() incorrectly treated declarations as parent
+	  elements (STR #56)
+	- mxmlLoad*() incorrectly allowed attributes without values
+	  (STR #47)
+	- Fixed Visual C++ build problems (STR #49)
+	- mxmlLoad*() did not return NULL when an element contained
+	  an error (STR #46)
+	- Added support for the apos character entity (STR #54)
+	- Fixed whitespace detection with Unicode characters (STR
+	  #48)
+	- mxmlWalkNext() and mxmlWalkPrev() did not work correctly
+	  when called with a node with no children as the top node
+	  (STR #53)
+
+
+CHANGES IN Mini-XML 2.3
+
+	- Added two exceptions to the LGPL to support static
+	  linking of applications against Mini-XML
+	- The mxmldoc utility can now generate man pages, too.
+	- Added a mxmlNewXML() function
+	- Added a mxmlElementSetAttrf() function (STR #43)
+	- Added snprintf() emulation function for test program (STR
+	  #32)
+	- Added the _CRT_SECURE_NO_DEPRECATE definition when
+	  building on VC++ 2005 (STR #36)
+	- mxmlLoad*() did not detect missing > characters in
+	  elements (STR #41)
+	- mxmlLoad*() did not detect missing close tags at the end
+	  of an XML document (STR #45)
+	- Added user_data and ref_count members to mxml_node_t
+	  structure
+	- Added mxmlReleaseNode() and mxmlRetainNode() APIs for
+	  reference-counted nodes
+	- Added mxmlSetWrapMargin() to control the wrapping of XML
+	  output
+	- Added conditional check for EINTR error code for
+	  certain Windows compilers that do not define it (STR
+	  #33)
+	- The mxmldoc program now generates correct HTML 4.0
+	  output - previously it generated invalid XHTML
+	- The mxmldoc program now supports "@deprecated@,
+	  "@private@", and "@since version@" comments
+	- Fixed function and enumeration type bugs in mxmldoc.
+	- Fixed the XML schema for mxmldoc
+	- The mxmldoc program now supports --intro, --section,
+	  and --title options
+	- The mxmlLoad*() functions could leak a node on an error
+	  (STR #27)
+	- The mxml_vsnprintf() function could get in an infinite
+	  loop on a buffer overflow (STR #25)
+	- Added new mxmlNewCDATA() and mxmlSetCDATA() functions
+	  to create and set CDATA nodes, which are really just
+	  special element nodes
+	- Added new MXML_IGNORE type and MXML_IGNORE_CB callback
+	  to ignore non-element nodes, e.g. whitespace
+	- mxmlLoad*() crashed when reporting an error in some
+	  invalid XML (STR #23)
+
+
+CHANGES IN Mini-XML 2.2.2
+
+	- mxmlLoad*() did not treat custom data as opaque, so
+	  whitespace characters would be lost.
+
+
+CHANGES IN Mini-XML 2.2.1
+
+	- mxmlLoadFd(), mxmlLoadFile(), and mxmlLoadString() now
+	  correctly return NULL on error (STR #21)
+	- mxmlNewInteger(), mxmlNewOpaque(), mxmlNewReal(),
+	  mxmlNewText(), and mxmlNewTextf() incorrectly required
+	  a parent node (STR #22)
+	- Fixed an XML output bug in mxmldoc.
+	- The "make install" target now uses the install command
+	  to set the proper permissions on UNIX/Linux/OSX.
+	- Fixed a MingW/Cygwin compilation problem (STR #18)
+
+
+CHANGES IN Mini-XML 2.2
+
+	- Added shared library support (STR #17)
+	- mxmlLoad*() now returns an error when an XML stream
+	  contains illegal control characters (STR #10)
+	- mxmlLoad*() now returns an error when an element
+	  contains two attributes with the same name in
+	  conformance with the XML spec (STR #16)
+	- Added support for CDATA (STR #14, STR #15)
+	- Updated comment and processing instruction handling -
+	  no entity support per XML specification.
+	- Added checking for invalid comment termination ("--->"
+	  is not allowed)
+
+
+CHANGES IN Mini-XML 2.1
+
+	- Added support for custom data nodes (STR #6)
+	- Now treat UTF-8 sequences which are longer than
+	  necessary as an error (STR #4)
+	- Fixed entity number support (STR #8)
+	- Fixed mxmlLoadString() bug with UTF-8 (STR #7)
+	- Fixed entity lookup bug (STR #5)
+	- Added mxmlLoadFd() and mxmlSaveFd() functions.
+	- Fixed multi-word UTF-16 handling.
+
+
+CHANGES IN Mini-XML 2.0
+
+	- New programmers manual.
+	- Added Visual C++ project files for Microsoft Windows
+	  users.
+	- Added optimizations to mxmldoc, mxmlSaveFile(), and
+	  mxmlIndexNew() (STR #2)
+	- mxmlEntityAddCallback() now returns an integer status
+	  (STR #2)
+	- Added UTF-16 support (input only; all output is UTF-8)
+	- Added index functions to build a searchable index of
+	  XML nodes.
+	- Added character entity callback interface to support
+	  additional character entities beyond those defined in
+	  the XHTML specification.
+	- Added support for XHTML character entities.
+	- The mxmldoc utility now produces XML output which
+	  conforms to an updated XML schema, described in the file
+	  "doc/mxmldoc.xsd".
+	- Changed the whitespace callback interface to return
+	  strings instead of a single character, allowing for
+	  greater control over the formatting of XML files
+	  written using Mini-XML.  THIS CHANGE WILL REQUIRE
+	  CHANGES TO YOUR 1.x CODE IF YOU USE WHITESPACE
+	  CALLBACKS.
+	- The mxmldoc utility is now capable of documenting C++
+	  classes, functions, and structures, and correctly
+	  handles C++ comments.
+	- Added new modular tests for mxmldoc.
+	- Updated the mxmldoc output to be more compatible with
+	  embedding in manuals produced with HTMLDOC.
+	- The makefile incorrectly included a "/" separator
+	  between the destination path and install path.  This
+	  caused problems when building and installing with
+	  MingW.
+
+
+CHANGES IN Mini-XML 1.3
+
+	- Fixes for mxmldoc.
+	- Added support for reading standard HTML entity names.
+	- mxmlLoadString/File() did not decode character
+	  entities in element names, attribute names, or
+	  attribute values.
+	- mxmlLoadString/File() would crash when loading non-
+	  conformant XML data under an existing parent (top)
+	  node.
+	- Fixed several bugs in the mxmldoc utility.
+	- Added new error callback function to catch a variety
+	  of errors and log them to someplace other than stderr.
+	- The mxmlElementSetAttr() function now allows for NULL
+	  attribute values.
+	- The load and save functions now properly handle quoted
+	  element and attribute name strings properly, e.g. for
+	  !DOCTYPE declarations.
+
+
+CHANGES IN Mini-XML 1.2
+
+	- Added new "set" methods to set the value of a node.
+	- Added new formatted text methods mxmlNewTextf() and
+	  mxmlSetTextf() to create/set a text node value using
+	  printf-style formats.
+	- Added new standard callbacks for use with the mxmlLoad
+	  functions.
+	- Updated the HTML documentation to include examples of
+	  the walk and load function output.
+	- Added --with/without-ansi configure option to control
+	  the strdup() function check.
+	- Added --with/without-snprintf configure option to
+	  control the snprintf() and vsnprintf() function
+	  checks.
+
+
+CHANGES IN Mini-XML 1.1.2
+
+	- The mxml(3) man page wasn't updated for the string
+	  functions.
+	- mxmlSaveString() returned the wrong number of
+	  characters.
+	- mxml_add_char() updated the buffer pointer in the
+	  wrong place.
+
+
+CHANGES IN Mini-XML 1.1.1
+
+	- The private mxml_add_ch() function did not update the
+	  start-of-buffer pointer which could cause a crash when
+	  using mxmlSaveString().
+	- The private mxml_write_ws() function called putc()
+	  instead of using the proper callback which could cause
+	  a crash when using mxmlSaveString().
+	- Added a mxmlSaveAllocString() convenience function for
+	  saving an XML node tree to an allocated string.
+
+
+CHANGES IN Mini-XML 1.1
+
+	- The mxmlLoadFile() function now uses dynamically
+	  allocated string buffers for element names, attribute
+	  names, and attribute values.  Previously they were
+	  capped at 16383, 255, and 255 bytes, respectively.
+	- Added a new mxmlLoadString() function for loading an
+	  XML node tree from a string.
+	- Added a new mxmlSaveString() function for saving an
+	  XML node tree to a string.
+	- Add emulation of strdup() if the local platform does
+	  not provide the function.
+
+
+CHANGES IN Mini-XML 1.0
+
+	- The mxmldoc program now handles function arguments,
+	  structures, unions, enumerations, classes, and
+	  typedefs properly.
+	- Documentation provided via mxmldoc and more in-line
+	  comments in the code.
+	- Added man pages and packaging files.
+
+
+CHANGES IN Mini-XML 0.93
+
+	- New mxmldoc example program that is also used to
+	  create and update code documentation using XML and
+	  produce HTML reference pages.
+	- Added mxmlAdd() and mxmlRemove() functions to add and
+	  remove nodes from a tree.  This provides more
+	  flexibility over where the nodes are inserted and
+	  allows nodes to be moved within the tree as needed.
+	- mxmlLoadFile() now correctly handles comments.
+	- mxmlLoadFile() now supports the required "gt", "quot",
+	  and "nbsp" character entities.
+	- mxmlSaveFile() now uses newlines as whitespace
+	  when valid to do so.
+	- mxmlFindElement() now also takes attribute name and
+	  attribute value string arguments to limit the search
+	  to specific elements with attributes and/or values.
+	  NULL pointers can be used as "wildcards".
+	- Added uninstall target to makefile, and auto-reconfig
+	  if Makefile.in or configure.in are changed.
+	- mxmlFindElement(), mxmlWalkNext(), and mxmlWalkPrev()
+	  now all provide "descend" arguments to control whether
+	  they descend into child nodes in the tree.
+	- Fixed some whitespace issues in mxmlLoadFile().
+	- Fixed Unicode output and whitespace issues in
+	  mxmlSaveFile().
+	- mxmlSaveFile() now supports a whitespace callback to
+	  provide more human-readable XML output under program
+	  control.
+
+
+CHANGES IN Mini-XML 0.92
+
+	- mxmlSaveFile() didn't return a value on success.
+
+
+CHANGES IN Mini-XML 0.91
+
+	- mxmlWalkNext() would go into an infinite loop.
+
+
+CHANGES IN Mini-XML 0.9
+
+	- Initial public release.
