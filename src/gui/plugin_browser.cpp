@@ -29,7 +29,6 @@
 #include <QtGui/QPainter>
 #include <QtGui/QCursor>
 #include <QtGui/QMouseEvent>
-#include <QtGui/QVBoxLayout>
 
 
 #include "plugin_browser.h"
@@ -42,27 +41,28 @@
 
 
 pluginBrowser::pluginBrowser( QWidget * _parent ) :
-	QWidget( _parent )
+	sideBarWidget( tr( "Instrument plugins" ),
+				embed::getIconPixmap( "plugins" ), _parent )
 {
-/*	setWindowTitle( tr( "Instrument browser" ) );
+	setWindowTitle( tr( "Instrument browser" ) );
 	m_view = new QWidget( contentParent() );
 	//m_view->setFrameShape( QFrame::NoFrame );
 
-	addContentWidget( m_view );*/
+	addContentWidget( m_view );
 
-	QVBoxLayout * viewLayout = new QVBoxLayout( this );
-	viewLayout->setMargin( 5 );
-	viewLayout->setSpacing( 5 );
+	QVBoxLayout * view_layout = new QVBoxLayout( m_view );
+	view_layout->setMargin( 5 );
+	view_layout->setSpacing( 5 );
 
 
 	QLabel * hint = new QLabel( tr( "Drag an instrument "
 					"into either the Song-Editor, the "
 					"Beat+Bassline Editor or into an "
 					"existing instrument track." ),
-								this );
+								m_view );
 	hint->setFont( pointSize<8>( hint->font() ) );
-	hint->setWordWrap( true );
-	viewLayout->addWidget( hint );
+	hint->setWordWrap( TRUE );
+	view_layout->addWidget( hint );
 
 	plugin::getDescriptorsOfAvailPlugins( m_pluginDescriptors );
 
@@ -73,14 +73,13 @@ pluginBrowser::pluginBrowser( QWidget * _parent ) :
 		if( it->type == plugin::Instrument )
 		{
 			pluginDescWidget * p = new pluginDescWidget( *it,
-								this );
+								m_view );
 			p->show();
-			viewLayout->addWidget( p );
+			view_layout->addWidget( p );
 		}
 	}
-
-	viewLayout->addStretch();
-	viewLayout->setSizeConstraint( QLayout::SetMinimumSize );
+	view_layout->addStretch();
+	show();
 }
 
 
@@ -102,12 +101,12 @@ pluginDescWidget::pluginDescWidget( const plugin::descriptor & _pd,
 	m_updateTimer( this ),
 	m_pluginDescriptor( _pd ),
 	m_logo( _pd.logo->pixmap() ),
-	m_mouseOver( false ),
+	m_mouseOver( FALSE ),
 	m_targetHeight( 24 )
 {
 	connect( &m_updateTimer, SIGNAL( timeout() ), SLOT( updateHeight() ) );
 	setFixedHeight( m_targetHeight );
-	setMouseTracking( true );
+	setMouseTracking( TRUE );
 	setCursor( Qt::PointingHandCursor );
 }
 
@@ -139,14 +138,14 @@ void pluginDescWidget::paintEvent( QPaintEvent * )
 	p.drawPixmap( 4, 4, logo );
 
 	QFont f = pointSize<8>( p.font() );
-	f.setBold( true );
+	f.setBold( TRUE );
 	p.setFont( f );
 	p.drawText( 10 + logo_size.width(), 15,
 					m_pluginDescriptor.displayName );
 
 	if( height() > 24 || m_mouseOver )
 	{
-		f.setBold( false );
+		f.setBold( FALSE );
 		p.setFont( pointSize<7>( f ) );
 		QRect br;
 		p.drawText( 10 + logo_size.width(), 20, width() - 58 - 5, 999,
@@ -166,7 +165,7 @@ void pluginDescWidget::paintEvent( QPaintEvent * )
 
 void pluginDescWidget::enterEvent( QEvent * _e )
 {
-	m_mouseOver = true;
+	m_mouseOver = TRUE;
 	m_targetHeight = height() + 1;
 	updateHeight();
 	QWidget::enterEvent( _e );
@@ -177,7 +176,7 @@ void pluginDescWidget::enterEvent( QEvent * _e )
 
 void pluginDescWidget::leaveEvent( QEvent * _e )
 {
-	m_mouseOver = false;
+	m_mouseOver = FALSE;
 	m_targetHeight = 24;
 	updateHeight();
 	QWidget::leaveEvent( _e );

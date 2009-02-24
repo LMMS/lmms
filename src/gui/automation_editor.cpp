@@ -65,7 +65,6 @@
 #include "bb_track_container.h"
 #include "piano_roll.h"
 #include "debug.h"
-#include "fluiq/widget_container.h"
 
 
 
@@ -76,7 +75,7 @@ QPixmap * automationEditor::s_toolMove = NULL;
 
 
 automationEditor::automationEditor( void ) :
-	FLUIQ::CollapsibleWidget( Qt::Vertical ),
+	QWidget(),
 	m_zoomingXModel(),
 	m_zoomingYModel(),
 	m_quantizeModel(),
@@ -134,9 +133,8 @@ automationEditor::automationEditor( void ) :
 
 	m_toolBar = new QWidget( this );
 	m_toolBar->setFixedHeight( 32 );
+	m_toolBar->move( 0, 0 );
 	m_toolBar->setAutoFillBackground( true );
-	addWidget( m_toolBar );
-
 	QPalette pal;
 	pal.setBrush( m_toolBar->backgroundRole(),
 					embed::getIconPixmap( "toolbar_bg" ) );
@@ -358,7 +356,18 @@ automationEditor::automationEditor( void ) :
 
 	setMinimumSize( tb_layout->minimumSize().width(), 128 );
 
-	engine::getMainWindow()->centralWidgetContainer()->addWidget( this );
+	// add us to workspace
+	if( engine::getMainWindow()->workspace() )
+	{
+		engine::getMainWindow()->workspace()->addSubWindow( this );
+		parentWidget()->resize( InitialWidth, InitialHeight );
+		parentWidget()->hide();
+	}
+	else
+	{
+		resize( InitialWidth, InitialHeight );
+		hide();
+	}
 }
 
 
