@@ -50,7 +50,7 @@ ENDIF(LMMS_HOST_X86_64)
 OPTION(WANT_ALSA	"Include ALSA (Advanced Linux Sound Architecture) support" ON)
 OPTION(WANT_CAPS	"Include C* Audio Plugin Suite (LADSPA plugins)" ON)
 OPTION(WANT_CMT		"Include Computer Music Toolkit LADSPA plugins" ON)
-OPTION(WANT_FFTW3F	"Include SpectrumAnalyzer plugin" ON)
+OPTION(WANT_FFTW3F	"Include SpectrumAnalyzer and ZynAddSubFX plugin" ON)
 OPTION(WANT_JACK	"Include JACK (Jack Audio Connection Kit) support" ON)
 OPTION(WANT_OGGVORBIS	"Include OGG/Vorbis support" ON)
 OPTION(WANT_PULSEAUDIO	"Include PulseAudio support" ON)
@@ -657,6 +657,7 @@ MESSAGE(
 "* TAP LADSPA plugins          : ${STATUS_TAP}\n"
 "* SWH LADSPA plugins          : ${STATUS_SWH}\n"
 "* FL .zip import              : ${STATUS_ZIP}\n"
+"* ZynAddSubFX                 : ${STATUS_FFTW3F}\n"
 )
 
 MESSAGE(
