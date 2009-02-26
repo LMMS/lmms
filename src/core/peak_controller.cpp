@@ -48,8 +48,11 @@ peakController::peakController( model * _parent,
 	controller( PeakController, _parent, tr( "Peak Controller" ) ),
 	m_peakEffect( _peak_effect )
 {
-	connect( m_peakEffect, SIGNAL( destroyed( ) ),
+	if( m_peakEffect )
+	{
+		connect( m_peakEffect, SIGNAL( destroyed( ) ),
 			this, SLOT( handleDestroyedEffect( ) ) );
+	}
 }
 
 
@@ -87,9 +90,12 @@ void peakController::handleDestroyedEffect( )
 
 void peakController::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
-	controller::saveSettings( _doc, _this );
+	if( m_peakEffect )
+	{
+		controller::saveSettings( _doc, _this );
 
-	_this.setAttribute( "effectId", m_peakEffect->m_effectId );
+		_this.setAttribute( "effectId", m_peakEffect->m_effectId );
+	}
 }
 
 
