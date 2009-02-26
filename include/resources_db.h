@@ -59,6 +59,7 @@ public:
 			BaseHome,
 			NumBaseDirectories
 		} ;
+		typedef BaseDirectories BaseDirectory;
 
 		enum Types
 		{
@@ -74,6 +75,7 @@ public:
 			TypeImage,
 			NumTypes
 		} ;
+		typedef Types Type;
 
 		Item( const QString & _name,
 				Types _type,
