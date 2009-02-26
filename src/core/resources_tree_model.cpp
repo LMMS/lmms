@@ -1,7 +1,7 @@
 /*
  * resources_tree_model.cpp - implementation of ResourcesTreeModel
  *
- * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -225,12 +225,11 @@ bool ResourcesTreeModel::filterItems( ResourcesDB::TreeItem * _item,
 
 	int row = 0;
 	bool hide = true;
-	for( QList<ResourcesDB::TreeItem>::Iterator it =
-						_item->children().begin();
+	for( ResourcesDB::TreeItemList::Iterator it = _item->children().begin();
 					it != _item->children().end(); ++it )
 	{
-		QModelIndex idx = createIndex( row, 0, &( *it ) );
-		if( filterItems( &( *it ), idx , _keywords ) )
+		QModelIndex idx = createIndex( row, 0, *it );
+		if( filterItems( *it, idx , _keywords ) )
 		{
 			hide = false;
 		}
@@ -251,12 +250,11 @@ void ResourcesTreeModel::setHidden( ResourcesDB::TreeItem * _item,
 	if( _recursive )
 	{
 		int row = 0;
-		for( QList<ResourcesDB::TreeItem>::Iterator it =
+		for( ResourcesDB::TreeItemList::Iterator it =
 						_item->children().begin();
 					it != _item->children().end(); ++it )
 		{
-			setHidden( &( *it ), createIndex( row, 0, &( *it ) ),
-									_hide );
+			setHidden( *it, createIndex( row, 0, *it ), _hide );
 			++row;
 		}
 	}

@@ -1,7 +1,7 @@
 /*
  * resources_db.h - header file for ResourcesDB
  *
- * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -45,8 +45,8 @@ class ResourcesDB : public QObject
 public:
 	class Item;
 	class TreeItem;
-	typedef QHash<QString, Item> ItemList;
-	typedef QList<TreeItem> TreeItemList;
+	typedef QHash<QString, Item *> ItemList;
+	typedef QList<TreeItem *> TreeItemList;
 
 	class Item
 	{
@@ -167,7 +167,7 @@ public:
 
 		bool isValid( void ) const
 		{
-			return !m_name.isEmpty() && m_type != TypeUnknown;
+			return m_type != TypeUnknown && !m_name.isEmpty();
 		}
 
 		void setTreeItem( TreeItem * _ti )
@@ -227,6 +227,30 @@ public:
 			m_temporaryMarker( false ),
 			m_item( _item )
 		{
+			if( m_parent )
+			{
+				m_parent->addChild( this );
+			}
+			if( m_item )
+			{
+				m_item->setTreeItem( this );
+			}
+		}
+
+		~TreeItem()
+		{
+			foreachTreeItem( m_children )
+			{
+				delete *it;
+			}
+			if( m_item )
+			{
+				m_item->setTreeItem( NULL );
+			}
+			if( m_parent )
+			{
+				m_parent->removeChild( this );
+			}
 		}
 
 		inline void setHidden( bool _h )
@@ -244,7 +268,7 @@ public:
 			int rc = 0;
 			foreachConstTreeItem( m_children )
 			{
-				if( !it->isHidden() )
+				if( !(*it)->isHidden() )
 				{
 					++rc;
 				}
@@ -257,11 +281,11 @@ public:
 			int rc = 0;
 			foreachTreeItem( m_children )
 			{
-				if( !it->isHidden() )
+				if( !(*it)->isHidden() )
 				{
 					if( rc == _row )
 					{
-						return &( *it );
+						return *it;
 					}
 					++rc;
 				}
@@ -279,9 +303,9 @@ public:
 			int row = 0;
 			foreachConstTreeItem( m_parent->m_children )
 			{
-				if( !it->isHidden() )
+				if( !(*it)->isHidden() )
 				{
-					if( &( *it ) == this )
+					if( *it == this )
 					{
 						return row;
 					}
@@ -291,9 +315,14 @@ public:
 			return 0;
 		}
 
-		inline void addChild( const TreeItem & _it )
+		inline void addChild( TreeItem * _it )
 		{
 			m_children.push_back( _it );
+		}
+
+		inline void removeChild( TreeItem * _it )
+		{
+			m_children.removeAll( _it );
 		}
 
 		inline TreeItemList & children( void )
@@ -307,18 +336,7 @@ public:
 		}
 
 		TreeItem * findChild( const QString & _name,
-					Item::BaseDirectories _base_dir )
-		{
-			foreachTreeItem( m_children )
-			{
-				if( it->item() && it->item()->name() == _name &&
-					it->item()->baseDir() == _base_dir )
-				{
-					return &( *it );
-				}
-			}
-			return NULL;
-		}
+					Item::BaseDirectories _base_dir );
 
 		inline Item * item( void )
 		{
@@ -347,8 +365,11 @@ public:
 
 
 	private:
+		// hide copy-ctor
+		TreeItem( const TreeItem & ) { }
+
 		TreeItem * m_parent;
-		QList<TreeItem> m_children;
+		QList<TreeItem *> m_children;
 
 		bool m_hidden;
 		bool m_temporaryMarker;
@@ -374,7 +395,7 @@ public:
 		return &m_topLevelNode;
 	}
 
-	const Item & nearestMatch( const Item & _item );
+	const Item * nearestMatch( const Item & _item );
 
 
 private slots:
@@ -383,11 +404,13 @@ private slots:
 private:
 	void readDir( const QString & _dir, TreeItem * _parent,
 					Item::BaseDirectories _base_dir );
-	void recursiveRemoveItems( TreeItemList::Iterator _it );
+	void replaceItem( Item * newItem );
+	void recursiveRemoveItems( TreeItem * parent,
+					bool removeTopLevelParent = true );
 
-	void saveTreeItem( const TreeItem & _i, QDomDocument & _doc,
+	void saveTreeItem( const TreeItem * _i, QDomDocument & _doc,
 							QDomElement & _de );
-	void loadTreeItem( TreeItem & _i, QDomElement & _de );
+	void loadTreeItem( TreeItem * _i, QDomElement & _de );
 
 
 	typedef QList<QPair<Item::BaseDirectories, QString> > FolderList;

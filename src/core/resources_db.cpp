@@ -1,7 +1,7 @@
 /*
  * resources_db.cpp - implementation of ResourcesDB
  *
- * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -57,7 +57,8 @@ bool ResourcesDB::Item::operator==( const Item & _other ) const
 int ResourcesDB::Item::equalityLevel( const Item & _other ) const
 {
 	int l = 0;
-	if( m_path == _other.m_path && m_name == _other.m_name )
+	if( m_name == _other.m_name &&
+		m_path == _other.m_path )
 	{
 		l += 40;
 	}
@@ -153,7 +154,7 @@ ResourcesDB::Item::Types ResourcesDB::Item::guessType( void ) const
 
 void ResourcesDB::Item::init( void )
 {
-	if( name().isEmpty() )
+	if( m_name.isEmpty() )
 	{
 		return;
 	}
@@ -245,6 +246,32 @@ QString ResourcesDB::Item::getBaseDirectory( BaseDirectories _bd )
 
 
 
+ResourcesDB::TreeItem * ResourcesDB::TreeItem::findChild(
+					const QString & _name,
+					Item::BaseDirectories _base_dir )
+{
+	if( _name.isNull() || _name.isEmpty() )
+	{
+		return NULL;
+	}
+
+	const int hash = qHash( _name );
+
+	foreachTreeItem( m_children )
+	{
+		TreeItem * ti = *it;
+		if( ti->item() &&
+			ti->item()->name() == _name &&
+			ti->item()->baseDir() == _base_dir )
+		{
+			return ti;
+		}
+	}
+	return NULL;
+}
+
+
+
 
 
 
@@ -284,7 +311,7 @@ void ResourcesDB::load( void )
 
 	multimediaProject m( m_dbFile );
 
-	loadTreeItem( m_topLevelNode, m.content() );
+	loadTreeItem( &m_topLevelNode, m.content() );
 }
 
 
@@ -293,7 +320,7 @@ void ResourcesDB::load( void )
 void ResourcesDB::save( void )
 {
 	multimediaProject m( multimediaProject::ResourcesDatabase );
-	saveTreeItem( m_topLevelNode, m, m.content() );
+	saveTreeItem( &m_topLevelNode, m, m.content() );
 
 	m.writeFile( m_dbFile );
 }
@@ -301,17 +328,17 @@ void ResourcesDB::save( void )
 
 
 
-void ResourcesDB::saveTreeItem( const TreeItem & _i, QDomDocument & _doc,
+void ResourcesDB::saveTreeItem( const TreeItem * _i, QDomDocument & _doc,
 							QDomElement & _de )
 {
-	QDomElement e = _i.item() ? _doc.createElement( "item" ) : _de;
-	foreachConstTreeItem( _i.children() )
+	QDomElement e = _i->item() ? _doc.createElement( "item" ) : _de;
+	foreachConstTreeItem( _i->children() )
 	{
 		saveTreeItem( *it, _doc, e );
 	}
-	if( _i.item() )
+	if( _i->item() )
 	{
-		const Item * it = _i.item();
+		const Item * it = _i->item();
 		e.setAttribute( "name", it->name() );
 		e.setAttribute( "type", it->type() );
 		e.setAttribute( "basedir", it->baseDir() );
@@ -328,7 +355,7 @@ void ResourcesDB::saveTreeItem( const TreeItem & _i, QDomDocument & _doc,
 
 
 
-void ResourcesDB::loadTreeItem( TreeItem & _i, QDomElement & _de )
+void ResourcesDB::loadTreeItem( TreeItem * _i, QDomElement & _de )
 {
 	QDomNode node = _de.firstChild();
 	while( !node.isNull() )
@@ -339,7 +366,7 @@ void ResourcesDB::loadTreeItem( TreeItem & _i, QDomElement & _de )
 			const QString h = e.attribute( "hash" );
 			if( !h.isEmpty() )
 			{
-				m_items[h] = Item( e.attribute( "name" ),
+				Item * item = new Item( e.attribute( "name" ),
 	static_cast<Item::Types>( e.attribute( "type" ).toInt() ),
 	static_cast<Item::BaseDirectories>( e.attribute( "basedir" ).toInt() ),
 						e.attribute( "path" ),
@@ -347,16 +374,14 @@ void ResourcesDB::loadTreeItem( TreeItem & _i, QDomElement & _de )
 						e.attribute( "tags" ),
 						e.attribute( "size" ).toInt(),
 	QDateTime::fromString( e.attribute( "lastmod" ), Qt::ISODate ) );
-
-				_i.addChild( TreeItem( &_i, &m_items[h] ) );
-				m_items[h].setTreeItem( &_i.children().last() );
-				if( m_items[h].type() == Item::TypeDirectory &&
-			QFileInfo( m_items[h].fullPath() ).isDir() )
+				replaceItem( item );
+				TreeItem * treeItem = new TreeItem( _i, item );
+				if( item->type() == Item::TypeDirectory &&
+					QFileInfo( item->fullPath() ).isDir() )
 				{
-					m_watcher.addPath(
-							m_items[h].fullPath() );
+					m_watcher.addPath( item->fullPath() );
 				}
-				loadTreeItem( _i.children().last(), e );
+				loadTreeItem( treeItem, e );
 			}
 		}
 		node = node.nextSibling();
@@ -378,7 +403,7 @@ void ResourcesDB::scanResources( void )
 
 
 
-const ResourcesDB::Item & ResourcesDB::nearestMatch( const Item & _item )
+const ResourcesDB::Item * ResourcesDB::nearestMatch( const Item & _item )
 {
 	if( !_item.hash().isEmpty() )
 	{
@@ -392,18 +417,18 @@ const ResourcesDB::Item & ResourcesDB::nearestMatch( const Item & _item )
 	int max_level = -1;
 	const Item * max_item = NULL;
 
-	foreach( const Item & it, m_items )
+	foreach( const Item * it, m_items )
 	{
-		const int l = it.equalityLevel( _item );
+		const int l = it->equalityLevel( _item );
 		if( l > max_level )
 		{
-			max_item = &it;
+			max_item = it;
 		}
 	}
 
 	Q_ASSERT( max_item != NULL );
 
-	return *max_item;
+	return max_item;
 }
 
 
@@ -413,11 +438,12 @@ void ResourcesDB::reloadDirectory( const QString & _path )
 {
 	TreeItem * dirTreeItem = NULL;
 
-	foreach( Item it, m_items )
+	foreach( Item * it, m_items )
 	{
-		if( it.type() == Item::TypeDirectory && it.fullPath() == _path )
+		if( it->type() == Item::TypeDirectory &&
+			it->fullPath() == _path )
 		{
-			dirTreeItem = it.treeItem();
+			dirTreeItem = it->treeItem();
 		}
 	}
 
@@ -438,20 +464,57 @@ void ResourcesDB::reloadDirectory( const QString & _path )
 
 
 
-void ResourcesDB::recursiveRemoveItems( TreeItemList::Iterator _it )
+
+void ResourcesDB::replaceItem( Item * newItem )
 {
-	for( TreeItemList::Iterator ch_it = _it->children().begin();
-				ch_it != _it->children().end(); ++ch_it )
+	const QString hash = newItem->hash();
+	Item * oldItem = m_items[hash];
+	if( oldItem )
 	{
-		recursiveRemoveItems( ch_it );
-	}
-	if( _it->item() )
-	{
-		if( _it->item()->type() == Item::TypeDirectory )
+		TreeItem * oldTreeItem = oldItem->treeItem();
+		if( oldTreeItem )
 		{
-			m_watcher.removePath( _it->item()->fullPath() );
+			recursiveRemoveItems( oldTreeItem, false );
+			delete oldTreeItem;
 		}
-		m_items.remove( _it->item()->hash() );
+		if( oldItem->type() == Item::TypeDirectory )
+		{
+			m_watcher.removePath( oldItem->fullPath() );
+		}
+		m_items.remove( hash );
+		delete oldItem;
+	}
+	m_items[hash] = newItem;
+}
+
+
+
+
+void ResourcesDB::recursiveRemoveItems( TreeItem * parent,
+						bool removeTopLevelParent )
+{
+	if( !parent )
+	{
+		return;
+	}
+
+	while( !parent->children().isEmpty() )
+	{
+		recursiveRemoveItems( parent->children().front() );
+	}
+
+	if( removeTopLevelParent && parent->item() )
+	{
+		if( parent->item()->type() == Item::TypeDirectory )
+		{
+			m_watcher.removePath( parent->item()->fullPath() );
+		}
+		const QString & hash = parent->item()->hash();
+		if( !hash.isEmpty() )
+		{
+			m_items.remove( hash );
+		}
+		delete parent;
 	}
 }
 
@@ -483,26 +546,23 @@ printf("read dir: %s\n", d.canonicalPath().toAscii().constData() );
 		parentItem = curParent->item();
 		foreachTreeItem( curParent->children() )
 		{
-			it->setTemporaryMarker( false );
+			(*it)->setTemporaryMarker( false );
 		}
 	}
 	else
 	{
 		// create new item for current dir
-		Item parent( d.dirName(), Item::TypeDirectory,
+		parentItem = new Item( d.dirName(), Item::TypeDirectory,
 				_base_dir, _parent->item() ?
 					_parent->item()->path() + d.dirName() +
 							QDir::separator() :
 								QString::null );
-		parent.setLastMod( QFileInfo(
+		parentItem->setLastMod( QFileInfo(
 					d.canonicalPath() ).lastModified() );
-
-		parentItem = &( m_items[parent.hash()] = parent );
-		_parent->addChild( TreeItem( _parent, parentItem ) );
-		curParent = &_parent->children().last();
+		replaceItem( parentItem );
+		curParent = new TreeItem( _parent, parentItem );
 		curParent->setTemporaryMarker( true );
-		parentItem->setTreeItem( curParent );
-		m_watcher.addPath( parent.fullPath() );
+		m_watcher.addPath( parentItem->fullPath() );
 	}
 
 
@@ -528,7 +588,7 @@ printf("read dir: %s\n", d.canonicalPath().toAscii().constData() );
 			curChild->setTemporaryMarker( true );
 			if( f.lastModified() > curChild->item()->lastMod() )
 			{
-printf("reload: %s\n", fname.toAscii().constData());
+//printf("reload: %s\n", fname.toAscii().constData());
 				curChild->item()->setLastMod(
 							f.lastModified() );
 				if( curChild->item()->type() ==
@@ -554,13 +614,15 @@ printf("reload: %s\n", fname.toAscii().constData());
 			}
 			else if( f.isFile() )
 			{
-				Item i( f.fileName(), Item::TypeUnknown,
-						_base_dir, _dir );
-				i.setLastMod( f.lastModified() );
-				TreeItem ti( curParent,
-						&( m_items[i.hash()] = i ) );
-				ti.setTemporaryMarker( true );
-				curParent->addChild( ti );
+				Item * newItem =
+					new Item( f.fileName(),
+							Item::TypeUnknown,
+							_base_dir, _dir );
+				newItem->setLastMod( f.lastModified() );
+				replaceItem( newItem );
+				TreeItem * ti = new TreeItem( curParent,
+								newItem );
+				ti->setTemporaryMarker( true );
 			}
 		}
 	}
@@ -568,10 +630,10 @@ printf("reload: %s\n", fname.toAscii().constData());
 	for( TreeItemList::Iterator it = curParent->children().begin();
 					it != curParent->children().end(); )
 	{
-		if( it->temporaryMarker() == false )
+		if( (*it)->temporaryMarker() == false )
 		{
-	printf("removing %s\n", it->item()->name().toAscii().constData() );
-			recursiveRemoveItems( it );
+			//printf("removing %d %s\n", (*it)->item(), (*it)->item()->name().toAscii().constData() );
+			recursiveRemoveItems( *it );
 			it = curParent->children().erase( it );
 		}
 		else
