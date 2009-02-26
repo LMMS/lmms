@@ -69,6 +69,7 @@
 #include "timeline.h"
 #include "tool_button.h"
 #include "tooltip.h"
+#include "fluiq/collapsible_widget.h"
 
 
 typedef automationPattern::timeMap timeMap;
@@ -138,7 +139,6 @@ pianoRoll::KeyTypes pianoRoll::s_keyOrder[] =
 
 
 pianoRoll::pianoRoll( void ) :
-	FLUIQ::CollapsibleWidget( Qt::Vertical ),
 	m_nemStr( QVector<QString>() ),
 	m_noteEditMenu( NULL ),
 	m_signalMapper( NULL ),
