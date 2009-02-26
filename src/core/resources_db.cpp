@@ -43,7 +43,8 @@ void ResourcesDB::Item::reload( void )
 
 bool ResourcesDB::Item::operator==( const Item & _other ) const
 {
-	return m_name == _other.m_name &&
+	return m_nameHash == _other.m_nameHash &&
+		m_name == _other.m_name &&
 		m_type == _other.m_type &&
 		m_path == _other.m_path &&
 		m_hash == _other.m_hash &&
@@ -57,12 +58,13 @@ bool ResourcesDB::Item::operator==( const Item & _other ) const
 int ResourcesDB::Item::equalityLevel( const Item & _other ) const
 {
 	int l = 0;
-	if( m_name == _other.m_name &&
+	if( m_nameHash == _other.m_nameHash &&
+		m_name == _other.m_name &&
 		m_path == _other.m_path )
 	{
 		l += 40;
 	}
-	else if( m_name == _other.m_name )
+	else if( m_nameHash == _other.m_nameHash && m_name == _other.m_name )
 	{
 		l += 30;
 	}
@@ -210,6 +212,8 @@ void ResourcesDB::Item::init( void )
 			m_hash = h.result().toHex();
 		}
 	}
+
+	m_nameHash = qHash( m_name );
 }
 
 
@@ -261,6 +265,7 @@ ResourcesDB::TreeItem * ResourcesDB::TreeItem::findChild(
 	{
 		TreeItem * ti = *it;
 		if( ti->item() &&
+			ti->item()->nameHash() == hash &&
 			ti->item()->name() == _name &&
 			ti->item()->baseDir() == _base_dir )
 		{

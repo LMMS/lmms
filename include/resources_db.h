@@ -84,6 +84,7 @@ public:
 				int _size = -1,
 				const QDateTime & _last_mod = QDateTime() ) :
 			m_name( _name ),
+			m_nameHash( 0 ),
 			m_type( _type ),
 			m_baseDir( _base_dir ),
 			m_path( _path ),
@@ -98,6 +99,7 @@ public:
 
 		Item() :
 			m_name(),
+			m_nameHash( 0 ),
 			m_type( TypeUnknown ),
 			m_baseDir( BaseRoot ),
 			m_path(),
@@ -114,6 +116,11 @@ public:
 		const QString & name( void ) const
 		{
 			return m_name;
+		}
+
+		inline int nameHash( void ) const
+		{
+			return m_nameHash;
 		}
 
 		Types type( void ) const
@@ -206,6 +213,7 @@ public:
 		void init( void );
 
 		QString m_name;
+		int m_nameHash;
 		Types m_type;
 		BaseDirectories m_baseDir;
 		QString m_path;
