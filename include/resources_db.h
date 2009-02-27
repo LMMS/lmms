@@ -26,7 +26,6 @@
 #define _RESOURCES_DB_H
 
 #include <QtCore/QDateTime>
-#include <QtCore/QFileSystemWatcher>
 #include <QtCore/QHash>
 #include <QtCore/QStringList>
 #include <QtXml/QDomDocument>
@@ -41,12 +40,13 @@ public:
 	typedef QHash<QString, ResourcesItem *> ItemList;
 
 
-	ResourcesDB( const QString & _db_file );
+	ResourcesDB( ResourcesProvider * _provider );
 	~ResourcesDB();
 
-	void scanResources( void );
-	void load( void );
-	void save( void );
+	void init( void );
+
+	void load( const QString & _file );
+	void save( const QString & _file );
 
 	inline const ItemList & items( void ) const
 	{
@@ -60,37 +60,27 @@ public:
 
 	const ResourcesItem * nearestMatch( const ResourcesItem & _item );
 
+	void addItem( ResourcesItem * newItem );
 
-private slots:
-	void reloadDirectory( const QString & _path );
-
-
-private:
-	void readDir( const QString & _dir, ResourcesTreeItem * _parent,
-				ResourcesItem::BaseDirectory _base_dir );
-	void replaceItem( ResourcesItem * newItem );
 	void recursiveRemoveItems( ResourcesTreeItem * parent,
 					bool removeTopLevelParent = true );
 
+
+private:
 	void saveTreeItem( const ResourcesTreeItem * _i, QDomDocument & _doc,
 							QDomElement & _de );
 	void loadTreeItem( ResourcesTreeItem * _i, QDomElement & _de );
 
 
-	typedef QList<QPair<ResourcesItem::BaseDirectories, QString> >
-								FolderList;
-	FolderList m_folders;
-	QStringList m_scannedFolders;
-	QFileSystemWatcher m_watcher;
-
-	QString m_dbFile;
-
+	ResourcesProvider * m_provider;
 	ItemList m_items;
 	ResourcesTreeItem m_topLevelNode;
 
 
 signals:
 	void itemsChanged( void );
+	void directoryItemAdded( const QString & _path );
+	void directoryItemRemoved( const QString & _path );
 
 } ;
 

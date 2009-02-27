@@ -28,18 +28,26 @@
 #include <QtCore/QByteArray>
 
 #include "resources_provider.h"
+#include "resources_item.h"
 
 
 class WebResourcesProvider : public ResourcesProvider
 {
 public:
-	WebResourcesProvider( const QString & url );
+	WebResourcesProvider( const QString & _url );
 	virtual ~WebResourcesProvider()
 	{
 	}
 
 	virtual ResourcesDB * createResourcesDB( void );
-	virtual QByteArray fetchData( const ResourcesItem * item );
+	virtual int dataSize( const ResourcesItem * _item ) const
+	{
+		// asume that the size we have set before from the web
+		// catalogue is correct
+		return _item->size();
+	}
+	virtual QByteArray fetchData( const ResourcesItem * _item,
+					int _maxSize = -1 ) const;
 
 
 private:

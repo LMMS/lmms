@@ -25,10 +25,13 @@
 #ifndef _RESOURCES_ITEM_H
 #define _RESOURCES_ITEM_H
 
+#include <QtCore/QByteArray>
 #include <QtCore/QDateTime>
 
+#include "resources_provider.h"
 
 class ResourcesTreeItem;
+
 
 class ResourcesItem
 {
@@ -59,8 +62,8 @@ public:
 	} ;
 	typedef Types Type;
 
-	ResourcesItem();
-	ResourcesItem( const QString & _name,
+	ResourcesItem( ResourcesProvider * _provider,
+			const QString & _name,
 			Type _type,
 			BaseDirectory _base_dir = BaseWorkingDir,
 			const QString & _path = QString::null,
@@ -69,6 +72,11 @@ public:
 			int _size = -1,
 			const QDateTime & _last_mod = QDateTime() );
 
+
+	const ResourcesProvider * provider( void ) const
+	{
+		return m_provider;
+	}
 
 	const QString & name( void ) const
 	{
@@ -154,6 +162,16 @@ public:
 		m_lastMod = _date;
 	}
 
+	int realSize( void ) const
+	{
+		return m_provider->dataSize( this );
+	}
+
+	QByteArray fetchData( int _maxSize = -1 ) const
+	{
+		return m_provider->fetchData( this );
+	}
+
 	void reload( void );
 
 	bool operator==( const ResourcesItem & _other ) const;
@@ -169,6 +187,7 @@ public:
 private:
 	void init( void );
 
+	ResourcesProvider * m_provider;
 	QString m_name;
 	int m_nameHash;
 	Type m_type;

@@ -25,24 +25,50 @@
 #ifndef _LOCAL_RESOURCES_PROVIDER_H
 #define _LOCAL_RESOURCES_PROVIDER_H
 
+#include <QtCore/QFileSystemWatcher>
+#include <QtCore/QStringList>
+
 #include "resources_provider.h"
+#include "resources_item.h"
 
 
 class LocalResourcesProvider : public ResourcesProvider
 {
+	Q_OBJECT
 public:
-	LocalResourcesProvider( const QString & _url,
-				ResourcesItem::BaseDirectory _baseDir );
+	LocalResourcesProvider( ResourcesItem::BaseDirectory _baseDir,
+						const QString & _dir );
 	virtual ~LocalResourcesProvider()
 	{
 	}
 
-	virtual ResourcesDB * createResourcesDB( void );
-	virtual QByteArray fetchData( const ResourcesItem * _item );
+	virtual QString providerName( void ) const
+	{
+		return "LocalResourcesProvider";
+	}
+
+	virtual void updateDatabase( void );
+
+	virtual int dataSize( const ResourcesItem * _item ) const;
+	virtual QByteArray fetchData( const ResourcesItem * _item,
+						int _maxSize = -1 ) const;
+
+
+private slots:
+	void addDirectory( const QString & _path );
+	void removeDirectory( const QString & _path );
+	void reloadDirectory( const QString & _path );
 
 
 private:
+	void readDir( const QString & _dir, ResourcesTreeItem * _parent );
+
 	ResourcesItem::BaseDirectory m_baseDir;
+	const QString m_dir;
+
+	QStringList m_scannedFolders;
+
+	QFileSystemWatcher m_watcher;
 
 } ;
 

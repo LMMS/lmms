@@ -23,32 +23,20 @@
  */
 
 
-#include <QtCore/QDir>
+#include <QtCore/QFileInfo>
 
 #include "resources_db.h"
-#include "config_mgr.h"
-#include "lmms_basics.h"
+#include "resources_provider.h"
 #include "mmp.h"
 
 
 
-ResourcesDB::ResourcesDB( const QString & _db_file ) :
-	m_watcher( this ),
-	m_dbFile( _db_file )
+ResourcesDB::ResourcesDB( ResourcesProvider * _provider ) :
+	m_provider( _provider )
 {
-	m_folders += qMakePair( ResourcesItem::BaseDataDir, QString() );
-	m_folders += qMakePair( ResourcesItem::BaseWorkingDir, QString() );
+	connect( m_provider, SIGNAL( itemsChanged() ),
+			this, SIGNAL( itemsChanged() ) );
 
-	if( QFile::exists( m_dbFile ) )
-	{
-		load();
-	}
-	// (re-) scan directories
-	scanResources();
-	save();
-
-	connect( &m_watcher, SIGNAL( directoryChanged( const QString & ) ),
-			this, SLOT( reloadDirectory( const QString & ) ) );
 }
 
 
@@ -56,17 +44,32 @@ ResourcesDB::ResourcesDB( const QString & _db_file ) :
 
 ResourcesDB::~ResourcesDB()
 {
-	save();
+	save( m_provider->localCatalogueFile() );
 }
 
 
 
 
-void ResourcesDB::load( void )
+void ResourcesDB::init( void )
 {
-	m_items.clear();
+	if( QFileInfo( m_provider->localCatalogueFile() ).exists() )
+	{
+		load( m_provider->localCatalogueFile() );
+	}
 
-	multimediaProject m( m_dbFile );
+	m_provider->updateDatabase();
+
+	save( m_provider->localCatalogueFile() );
+}
+
+
+
+
+void ResourcesDB::load( const QString & _file )
+{
+	recursiveRemoveItems( topLevelNode(), false );
+
+	multimediaProject m( _file );
 
 	loadTreeItem( &m_topLevelNode, m.content() );
 }
@@ -74,12 +77,13 @@ void ResourcesDB::load( void )
 
 
 
-void ResourcesDB::save( void )
+void ResourcesDB::save( const QString & _file )
 {
 	multimediaProject m( multimediaProject::ResourcesDatabase );
+
 	saveTreeItem( &m_topLevelNode, m, m.content() );
 
-	m.writeFile( m_dbFile );
+	m.writeFile( _file );
 }
 
 
@@ -124,7 +128,8 @@ void ResourcesDB::loadTreeItem( ResourcesTreeItem * _i, QDomElement & _de )
 			const QString h = e.attribute( "hash" );
 			if( !h.isEmpty() )
 			{
-ResourcesItem * item = new ResourcesItem( e.attribute( "name" ),
+ResourcesItem * item = new ResourcesItem( m_provider,
+						e.attribute( "name" ),
 	static_cast<ResourcesItem::Type>( e.attribute( "type" ).toInt() ),
 	static_cast<ResourcesItem::BaseDirectory>(
 					e.attribute( "basedir" ).toInt() ),
@@ -133,29 +138,16 @@ ResourcesItem * item = new ResourcesItem( e.attribute( "name" ),
 						e.attribute( "tags" ),
 						e.attribute( "size" ).toInt(),
 	QDateTime::fromString( e.attribute( "lastmod" ), Qt::ISODate ) );
-replaceItem( item );
+addItem( item );
 ResourcesTreeItem * treeItem = new ResourcesTreeItem( _i, item );
-if( item->type() == ResourcesItem::TypeDirectory &&
-				QFileInfo( item->fullPath() ).isDir() )
+if( item->type() == ResourcesItem::TypeDirectory )
 {
-	m_watcher.addPath( item->fullPath() );
+	emit directoryItemAdded( item->fullPath() );
 }
 loadTreeItem( treeItem, e );
 			}
 		}
 		node = node.nextSibling();
-	}
-}
-
-
-
-
-void ResourcesDB::scanResources( void )
-{
-	for( FolderList::ConstIterator it = m_folders.begin();
-						it != m_folders.end(); ++it )
-	{
-		readDir( it->second, &m_topLevelNode, it->first );
 	}
 }
 
@@ -193,38 +185,7 @@ const ResourcesItem * ResourcesDB::nearestMatch( const ResourcesItem & _item )
 
 
 
-void ResourcesDB::reloadDirectory( const QString & _path )
-{
-	ResourcesTreeItem * dirTreeItem = NULL;
-
-	foreach( ResourcesItem * it, m_items )
-	{
-		if( it->type() == ResourcesItem::TypeDirectory &&
-						it->fullPath() == _path )
-		{
-			dirTreeItem = it->treeItem();
-		}
-	}
-
-	if( dirTreeItem )
-	{
-		ResourcesItem * dirItem = dirTreeItem->item();
-		if( dirItem )
-		{
-			m_scannedFolders.clear();
-			readDir( dirItem->path(), dirTreeItem->parent(),
-							dirItem->baseDir() );
-		}
-	}
-
-	emit itemsChanged();
-}
-
-
-
-
-
-void ResourcesDB::replaceItem( ResourcesItem * newItem )
+void ResourcesDB::addItem( ResourcesItem * newItem )
 {
 	const QString hash = newItem->hash();
 	ResourcesItem * oldItem = m_items[hash];
@@ -238,7 +199,7 @@ void ResourcesDB::replaceItem( ResourcesItem * newItem )
 		}
 		if( oldItem->type() == ResourcesItem::TypeDirectory )
 		{
-			m_watcher.removePath( oldItem->fullPath() );
+			emit directoryItemRemoved( oldItem->fullPath() );
 		}
 		m_items.remove( hash );
 		delete oldItem;
@@ -266,7 +227,7 @@ void ResourcesDB::recursiveRemoveItems( ResourcesTreeItem * parent,
 	{
 		if( parent->item()->type() == ResourcesItem::TypeDirectory )
 		{
-			m_watcher.removePath( parent->item()->fullPath() );
+			emit directoryItemRemoved( parent->item()->fullPath() );
 		}
 		const QString & hash = parent->item()->hash();
 		if( !hash.isEmpty() )
@@ -278,133 +239,6 @@ void ResourcesDB::recursiveRemoveItems( ResourcesTreeItem * parent,
 }
 
 
-
-
-void ResourcesDB::readDir( const QString & _dir, ResourcesTreeItem * _parent,
-					ResourcesItem::BaseDirectory _base_dir )
-{
-#ifdef LMMS_BUILD_LINUX
-	if( _dir.startsWith( "/dev" ) ||
-		_dir.startsWith( "/sys" ) ||
-		_dir.startsWith( "/proc" ) )
-	{
-        	return;
-	}
-#endif
-
-	QDir d( ResourcesItem::getBaseDirectory( _base_dir ) + _dir );
-	m_scannedFolders << d.canonicalPath();
-
-	ResourcesItem * parentItem;
-	ResourcesTreeItem * curParent = _parent->findChild( d.dirName() +
-							QDir::separator(),
-							_base_dir );
-printf("read dir: %s\n", d.canonicalPath().toAscii().constData() );
-	if( curParent )
-	{
-		parentItem = curParent->item();
-		foreachResourcesTreeItem( curParent->children() )
-		{
-			(*it)->setTemporaryMarker( false );
-		}
-	}
-	else
-	{
-		// create new item for current dir
-		parentItem = new ResourcesItem( d.dirName(),
-						ResourcesItem::TypeDirectory,
-						_base_dir,
-				_parent->item() ?
-					_parent->item()->path() + d.dirName() +
-							QDir::separator() :
-								QString::null );
-		parentItem->setLastMod( QFileInfo(
-					d.canonicalPath() ).lastModified() );
-		replaceItem( parentItem );
-		curParent = new ResourcesTreeItem( _parent, parentItem );
-		curParent->setTemporaryMarker( true );
-		m_watcher.addPath( parentItem->fullPath() );
-	}
-
-
-	QFileInfoList list = d.entryInfoList( QDir::NoDotAndDotDot |
-						QDir::Dirs | QDir::Files |
-						QDir::Readable,
-						QDir::Name | QDir::DirsFirst );
-	foreach( QFileInfo f, list )
-	{
-		if( f.isSymLink() )
-		{
-			f = QFileInfo( f.symLinkTarget() );
-		}
-
-		QString fname = f.fileName();
-		if( f.isDir() )
-		{
-			fname += QDir::separator();
-		}
-		ResourcesTreeItem * curChild =
-				curParent->findChild( fname, _base_dir );
-		if( curChild )
-		{
-			curChild->setTemporaryMarker( true );
-			if( f.lastModified() > curChild->item()->lastMod() )
-			{
-//printf("reload: %s\n", fname.toAscii().constData());
-				curChild->item()->setLastMod(
-							f.lastModified() );
-				if( curChild->item()->type() ==
-						ResourcesItem::TypeDirectory )
-				{
-					readDir( _dir + fname, curParent,
-								_base_dir );
-				}
-				else
-				{
-					curChild->item()->reload();
-				}
-			}
-		}
-		else
-		{
-			if( f.isDir() &&
-				!m_scannedFolders.contains(
-						f.canonicalFilePath() ) )
-
-			{
-				readDir( _dir + fname, curParent, _base_dir );
-			}
-			else if( f.isFile() )
-			{
-				ResourcesItem * newItem =
-					new ResourcesItem( f.fileName(),
-						ResourcesItem::TypeUnknown,
-							_base_dir, _dir );
-				newItem->setLastMod( f.lastModified() );
-				replaceItem( newItem );
-				ResourcesTreeItem * ti =
-					new ResourcesTreeItem( curParent,
-								newItem );
-				ti->setTemporaryMarker( true );
-			}
-		}
-	}
-
-	for( ResourcesTreeItemList::Iterator it = curParent->children().begin();
-					it != curParent->children().end(); )
-	{
-		if( (*it)->temporaryMarker() == false )
-		{
-			//printf("removing %d %s\n", (*it)->item(), (*it)->item()->name().toAscii().constData() );
-			recursiveRemoveItems( *it );
-			it = curParent->children().erase( it );
-		}
-		else
-		{
-			++it;
-		}
-	}
-}
 
 
 

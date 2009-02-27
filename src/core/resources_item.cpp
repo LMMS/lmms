@@ -28,29 +28,13 @@
 #include <QtCore/QDir>
 
 #include "resources_item.h"
+#include "resources_provider.h"
 #include "config_mgr.h"
 
 
 
-ResourcesItem::ResourcesItem() :
-	m_name(),
-	m_nameHash( 0 ),
-	m_type( TypeUnknown ),
-	m_baseDir( BaseRoot ),
-	m_path(),
-	m_hash(),
-	m_size( -1 ),
-	m_lastMod(),
-	m_tags(),
-	m_treeItem( NULL )
-{
-	init();
-}
-
-
-
-
-ResourcesItem::ResourcesItem( const QString & _name,
+ResourcesItem::ResourcesItem( ResourcesProvider * _provider,
+				const QString & _name,
 				Type _type,
 				BaseDirectory _base_dir,
 				const QString & _path,
@@ -58,6 +42,7 @@ ResourcesItem::ResourcesItem( const QString & _name,
 				const QString & _tags,
 				int _size,
 				const QDateTime & _last_mod ) :
+	m_provider( _provider ),
 	m_name( _name ),
 	m_nameHash( 0 ),
 	m_type( _type ),
@@ -238,21 +223,14 @@ void ResourcesItem::init( void )
 	{
 		if( m_size < 0 )
 		{
-			m_size = QFileInfo( fullName() ).size();
+			m_size = realSize();
 		}
 		if( m_hash.isEmpty() )
 		{
 			QCryptographicHash h( QCryptographicHash::Sha1 );
 
-			QFile f( fullName() );
-			f.open( QFile::ReadOnly );
-
-			const int chunkSize = 1024*1024;	// 1 MB
-			for( int i = 0; i < f.size() / chunkSize; ++i )
-			{
-				h.addData( f.read( chunkSize ) );
-			}
-			h.addData( f.readAll() );
+			// fetch at most 1 MB for creating hash
+			h.addData( fetchData( 1 * 1024 * 1024 ) );
 
 			m_hash = h.result().toHex();
 		}
@@ -272,12 +250,15 @@ QString ResourcesItem::getBaseDirectory( BaseDirectory _bd )
 		case BaseRoot:
 			d = QDir::rootPath();
 			break;
+
 		case BaseWorkingDir:
 			d = configManager::inst()->workingDir();
 			break;
+
 		case BaseDataDir:
 			d = configManager::inst()->dataDir();
 			break;
+
 		case BaseHome:
 		default:
 			d = QDir::homePath();

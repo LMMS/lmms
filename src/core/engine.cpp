@@ -35,6 +35,7 @@
 #include "fx_mixer.h"
 #include "fx_mixer_view.h"
 #include "ladspa_2_lmms.h"
+#include "local_resources_provider.h"
 #include "main_window.h"
 #include "mixer.h"
 #include "pattern.h"
@@ -81,9 +82,11 @@ void engine::init( const bool _has_gui )
 	s_projectJournal = new projectJournal;
 	s_mixer = new mixer;
 	s_song = new song;
-	s_resourcesDB = new ResourcesDB( configManager::inst()->workingDir() +
-						QDir::separator() +
-							".resourcesdb.xml" );
+
+	LocalResourcesProvider * resProv =
+			new LocalResourcesProvider( ResourcesItem::BaseWorkingDir, QString() );
+	s_resourcesDB = resProv->database();
+
 	s_fxMixer = new fxMixer;
 	s_bbTrackContainer = new bbTrackContainer;
 

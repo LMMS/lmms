@@ -1,5 +1,5 @@
 /*
- * resources_provider.h - header file for ResourcesProvider
+ * resources_provider.cpp - implementation of ResourcesProvider
  *
  * Copyright (c) 2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
@@ -22,52 +22,49 @@
  *
  */
 
-#ifndef _RESOURCES_PROVIDER_H
-#define _RESOURCES_PROVIDER_H
 
-#include <QtCore/QByteArray>
-#include <QtCore/QObject>
-#include <QtCore/QString>
+#include <QtCore/QCryptographicHash>
+#include <QtCore/QDir>
 
-class ResourcesDB;
-class ResourcesItem;
+#include "resources_provider.h"
+#include "resources_db.h"
+#include "config_mgr.h"
 
 
-class ResourcesProvider : public QObject
+ResourcesProvider::ResourcesProvider( const QString & _url ) :
+	m_database( new ResourcesDB( this ) ),
+	m_url( _url )
 {
-	Q_OBJECT
-public:
-	ResourcesProvider( const QString & _url );
-	virtual ~ResourcesProvider();
+}
 
-	virtual QString providerName( void ) const = 0;
-	virtual void updateDatabase( void ) = 0;
-	virtual int dataSize( const ResourcesItem * _item ) const = 0;
-	virtual QByteArray fetchData( const ResourcesItem * _item,
-					int _maxSize = -1 ) const = 0;
 
-	inline const QString & url( void ) const
+
+
+ResourcesProvider::~ResourcesProvider()
+{
+	delete m_database;
+}
+
+
+
+
+QString ResourcesProvider::localCatalogueFile( void ) const
+{
+	const QString dir = configManager::inst()->workingDir() +
+					"catalogs" + QDir::separator();
+	if( !QDir( dir ).exists() )
 	{
-		return m_url;
+		QDir().mkpath( dir );
 	}
 
-	QString localCatalogueFile( void ) const;
+	QCryptographicHash h( QCryptographicHash::Md5 );
 
-	ResourcesDB * database( void )
-	{
-		return m_database;
-	}
+	h.addData( QString( providerName() + url() ).toUtf8() );
 
-
-private:
-	ResourcesDB * m_database;
-	QString m_url;
+	return dir + h.result().toHex();
+}
 
 
-signals:
-	void itemsChanged( void );
 
-} ;
+#include "moc_resources_provider.cxx"
 
-
-#endif
