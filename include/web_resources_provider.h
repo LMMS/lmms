@@ -39,7 +39,7 @@ public:
 	}
 
 	virtual ResourcesDB * createResourcesDB( void );
-	virtual QByteArray fetchData( const ResourcesDB::Item * item );
+	virtual QByteArray fetchData( const ResourcesItem * item );
 
 
 private:

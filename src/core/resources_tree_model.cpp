@@ -42,8 +42,8 @@ QVariant ResourcesTreeModel::data( const QModelIndex & _idx, int _role ) const
 {
 	if( _idx.isValid() )
 	{
-		ResourcesDB::TreeItem * item =
-				static_cast<ResourcesDB::TreeItem *>(
+		ResourcesTreeItem * item =
+				static_cast<ResourcesTreeItem *>(
 						_idx.internalPointer() );
 		if( _role == Qt::DisplayRole )
 		{
@@ -51,9 +51,9 @@ QVariant ResourcesTreeModel::data( const QModelIndex & _idx, int _role ) const
 			{
 				switch( item->item()->baseDir() )
 				{
-					case ResourcesDB::Item::BaseWorkingDir:
+					case ResourcesItem::BaseWorkingDir:
 			return tr( "My LMMS files" );
-					case ResourcesDB::Item::BaseDataDir:
+					case ResourcesItem::BaseDataDir:
 			return tr( "Shipped LMMS files" );
 					default:
 						break;
@@ -67,9 +67,9 @@ QVariant ResourcesTreeModel::data( const QModelIndex & _idx, int _role ) const
 			{
 				switch( item->item()->baseDir() )
 				{
-					case ResourcesDB::Item::BaseWorkingDir:
+					case ResourcesItem::BaseWorkingDir:
 	return embed::getIconPixmap( "mimetypes/folder-workingdir", 24, 24 );
-					case ResourcesDB::Item::BaseDataDir:
+					case ResourcesItem::BaseDataDir:
 	return embed::getIconPixmap( "mimetypes/folder-datadir", 24, 24 );
 					default:
 						break;
@@ -77,19 +77,19 @@ QVariant ResourcesTreeModel::data( const QModelIndex & _idx, int _role ) const
 			}
 			switch( item->item()->type() )
 			{
-case ResourcesDB::Item::TypeDirectory:
+case ResourcesItem::TypeDirectory:
 	return embed::getIconPixmap( "mimetypes/folder", 24, 24 );
-case ResourcesDB::Item::TypeSample:
+case ResourcesItem::TypeSample:
 	return embed::getIconPixmap( "mimetypes/sample", 24, 24 );
-case ResourcesDB::Item::TypePreset:
+case ResourcesItem::TypePreset:
 	return embed::getIconPixmap( "mimetypes/preset", 24, 24 );
-case ResourcesDB::Item::TypeProject:
+case ResourcesItem::TypeProject:
 	return embed::getIconPixmap( "project_file", 24, 24 );
-case ResourcesDB::Item::TypeMidiFile:
+case ResourcesItem::TypeMidiFile:
 	return embed::getIconPixmap( "mimetypes/midi", 24, 24 );
-case ResourcesDB::Item::TypeImage:
+case ResourcesItem::TypeImage:
 	return embed::getIconPixmap( "mimetypes/image", 24, 24 );
-case ResourcesDB::Item::TypePlugin:
+case ResourcesItem::TypePlugin:
 	return embed::getIconPixmap( "mimetypes/plugin", 24, 24 );
 default:
 	return embed::getIconPixmap( "mimetypes/unknown", 24, 24 );
@@ -104,7 +104,7 @@ default:
 
 int ResourcesTreeModel::rowCount( const QModelIndex & _parent ) const
 {
-	ResourcesDB::TreeItem * parentItem;
+	ResourcesTreeItem * parentItem;
 
 	if( _parent.column() > 0 )
 	{
@@ -117,7 +117,7 @@ int ResourcesTreeModel::rowCount( const QModelIndex & _parent ) const
 	}
 	else
 	{
-		parentItem = static_cast<ResourcesDB::TreeItem *>(
+		parentItem = static_cast<ResourcesTreeItem *>(
 						_parent.internalPointer() );
 	}
 	return parentItem->rowCount();
@@ -134,7 +134,7 @@ QModelIndex ResourcesTreeModel::index( int _row, int _col,
 		return QModelIndex();
 	}
 
-	ResourcesDB::TreeItem * parentItem;
+	ResourcesTreeItem * parentItem;
 
 	if( !_parent.isValid() )
 	{
@@ -142,7 +142,7 @@ QModelIndex ResourcesTreeModel::index( int _row, int _col,
 	}
 	else
 	{
-		parentItem = static_cast<ResourcesDB::TreeItem *>(
+		parentItem = static_cast<ResourcesTreeItem *>(
 						_parent.internalPointer() );
 	}
 
@@ -163,10 +163,10 @@ QModelIndex ResourcesTreeModel::parent( const QModelIndex & _idx ) const
 		return QModelIndex();
 	}
 
-	ResourcesDB::TreeItem * childItem =
-			static_cast<ResourcesDB::TreeItem *>(
+	ResourcesTreeItem * childItem =
+			static_cast<ResourcesTreeItem *>(
 						_idx.internalPointer() );
-	ResourcesDB::TreeItem * parentItem = childItem->parent();
+	ResourcesTreeItem * parentItem = childItem->parent();
 	if( parentItem == m_db->topLevelNode() )
 	{
 		return QModelIndex();
@@ -197,13 +197,13 @@ void ResourcesTreeModel::setFilter( const QString & _s )
 
 
 
-bool ResourcesTreeModel::filterItems( ResourcesDB::TreeItem * _item,
+bool ResourcesTreeModel::filterItems( ResourcesTreeItem * _item,
 						const QModelIndex & _parent,
 						const QStringList & _keywords )
 {
 	if( _item->item() )
 	{
-		ResourcesDB::Item * i = _item->item();
+		ResourcesItem * i = _item->item();
 		bool accept = true;
 		for( QStringList::ConstIterator it = _keywords.begin();
 						it != _keywords.end(); ++it )
@@ -225,7 +225,7 @@ bool ResourcesTreeModel::filterItems( ResourcesDB::TreeItem * _item,
 
 	int row = 0;
 	bool hide = true;
-	for( ResourcesDB::TreeItemList::Iterator it = _item->children().begin();
+	for( ResourcesTreeItemList::Iterator it = _item->children().begin();
 					it != _item->children().end(); ++it )
 	{
 		QModelIndex idx = createIndex( row, 0, *it );
@@ -243,14 +243,14 @@ bool ResourcesTreeModel::filterItems( ResourcesDB::TreeItem * _item,
 
 
 
-void ResourcesTreeModel::setHidden( ResourcesDB::TreeItem * _item,
+void ResourcesTreeModel::setHidden( ResourcesTreeItem * _item,
 						const QModelIndex & _parent,
 						bool _hide, bool _recursive )
 {
 	if( _recursive )
 	{
 		int row = 0;
-		for( ResourcesDB::TreeItemList::Iterator it =
+		for( ResourcesTreeItemList::Iterator it =
 						_item->children().begin();
 					it != _item->children().end(); ++it )
 		{

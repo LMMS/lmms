@@ -27,21 +27,27 @@
 
 #include <QtCore/QByteArray>
 
-#include "resources_db.h"
+#include "resources_item.h"
+
+class ResourcesDB;
 
 
 class ResourcesProvider
 {
 public:
-	ResourcesProvider( const QString & url );
+	ResourcesProvider( const QString & url ) :
+		m_url( url )
+	{
+	}
 
 	virtual ResourcesDB * createResourcesDB( void ) = 0;
-	virtual QByteArray fetchData( const ResourcesDB::Item * item ) = 0;
+	virtual QByteArray fetchData( const ResourcesItem * item ) = 0;
 
 	inline const QString & url( void ) const
 	{
 		return m_url;
 	}
+
 
 private:
 	QString m_url;

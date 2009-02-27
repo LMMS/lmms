@@ -1,7 +1,7 @@
 /*
  * resources_tree_model.h - tree-model for ResourcesDB
  *
- * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -64,10 +64,10 @@ public:
 
 
 private:
-	bool filterItems( ResourcesDB::TreeItem * _item,
+	bool filterItems( ResourcesTreeItem * _item,
 					const QModelIndex & _parent,
 						const QStringList & _keywords );
-	void setHidden( ResourcesDB::TreeItem * _item,
+	void setHidden( ResourcesTreeItem * _item,
 				const QModelIndex & _parent,
 					bool _hidden,
 						bool _recursive = true );

@@ -23,7 +23,6 @@
  */
 
 
-#include <QtCore/QCryptographicHash>
 #include <QtCore/QDir>
 
 #include "resources_db.h"
@@ -33,259 +32,12 @@
 
 
 
-void ResourcesDB::Item::reload( void )
-{
-	m_hash.clear();
-	m_size = -1;
-	init();
-}
-
-
-bool ResourcesDB::Item::operator==( const Item & _other ) const
-{
-	return m_nameHash == _other.m_nameHash &&
-		m_name == _other.m_name &&
-		m_type == _other.m_type &&
-		m_path == _other.m_path &&
-		m_hash == _other.m_hash &&
-		m_size == _other.m_size &&
-		m_tags == _other.m_tags;
-}
-
-
-
-
-int ResourcesDB::Item::equalityLevel( const Item & _other ) const
-{
-	int l = 0;
-	if( m_nameHash == _other.m_nameHash &&
-		m_name == _other.m_name &&
-		m_path == _other.m_path )
-	{
-		l += 40;
-	}
-	else if( m_nameHash == _other.m_nameHash && m_name == _other.m_name )
-	{
-		l += 30;
-	}
-	else if( m_path == _other.m_path )
-	{
-		l += 10;
-	}
-
-	if( m_type == _other.m_type )
-	{
-		l += 5;
-	}
-
-	if( !m_tags.isEmpty() && !_other.m_tags.isEmpty() )
-	{
-		QStringList my_tags = m_tags.split( " " );
-		QStringList o_tags = _other.m_tags.split( " " );
-		foreach( const QString & tag, o_tags )
-		{
-			if( my_tags.contains( tag ) )
-			{
-				l += 10;
-			}
-		}
-	}
-
-	if( m_size == _other.m_size )
-	{
-		l += 20;
-	}
-
-	if( m_hash == _other.m_hash )
-	{
-		l += 100;
-	}
-	return l;
-}
-
-
-
-
-ResourcesDB::Item::Types ResourcesDB::Item::guessType( void ) const
-{
-	static QMap<QString, Types> typeMap;
-	if( typeMap.isEmpty() )
-	{
-		typeMap["wav"] = TypeSample;
-		typeMap["ogg"] = TypeSample;
-		typeMap["mp3"] = TypeSample;
-		typeMap["ds"] = TypeSample;
-		typeMap["flac"] = TypeSample;
-		typeMap["spx"] = TypeSample;
-		typeMap["voc"] = TypeSample;
-		typeMap["au"] = TypeSample;
-		typeMap["raw"] = TypeSample;
-		typeMap["aif"] = TypeSample;
-		typeMap["aiff"] = TypeSample;
-
-		typeMap["sf2"] = TypeSoundFont;
-
-		typeMap["xpf"] = TypePreset;
-
-		typeMap["mmp"] = TypeProject;
-		typeMap["mmpz"] = TypeProject;
-
-		typeMap["mid"] = TypeMidiFile;
-
-		typeMap["flp"] = TypeForeignProject;
-
-		typeMap["dll"] = TypePlugin;
-		typeMap["so"] = TypePlugin;
-
-		typeMap["png"] = TypeImage;
-		typeMap["jpg"] = TypeImage;
-		typeMap["jpeg"] = TypeImage;
-	}
-
-	const QString s = QFileInfo( fullName() ).suffix().toLower();
-	QMap<QString, Types>::ConstIterator it = typeMap.find( s );
-	if( it != typeMap.end() )
-	{
-		return it.value();
-	}
-	return TypeUnknown;
-}
-
-
-
-
-void ResourcesDB::Item::init( void )
-{
-	if( m_name.isEmpty() )
-	{
-		return;
-	}
-
-	// ensure trailing slash for path property
-	if( !m_path.isEmpty() && m_path.right( 1 ) != QDir::separator() )
-	{
-		m_path += QDir::separator();
-	}
-
-	if( m_type == TypeUnknown )
-	{
-		m_type = guessType();
-	}
-
-	// if item is a directory, ensure a trailing slash
-	if( m_type == TypeDirectory )
-	{
-		if( !m_name.isEmpty() &&
-				m_name.right( 1 ) != QDir::separator() )
-		{
-			m_name += QDir::separator();
-		}
-		if( m_hash.isEmpty() )
-		{
-			QCryptographicHash h( QCryptographicHash::Sha1 );
-			h.addData( fullName().toUtf8() );
-			m_hash = h.result().toHex();
-		}
-	}
-	// only stat file if we really need to
-	else if( ( m_hash.isEmpty() || m_size < 0 ) &&
-						QFile::exists( fullName() ) )
-	{
-		if( m_size < 0 )
-		{
-			m_size = QFileInfo( fullName() ).size();
-		}
-		if( m_hash.isEmpty() )
-		{
-			QCryptographicHash h( QCryptographicHash::Sha1 );
-
-			QFile f( fullName() );
-			f.open( QFile::ReadOnly );
-
-			const int chunkSize = 1024*1024;	// 1 MB
-			for( int i = 0; i < f.size() / chunkSize; ++i )
-			{
-				h.addData( f.read( chunkSize ) );
-			}
-			h.addData( f.readAll() );
-
-			m_hash = h.result().toHex();
-		}
-	}
-
-	m_nameHash = qHash( m_name );
-}
-
-
-
-
-QString ResourcesDB::Item::getBaseDirectory( BaseDirectories _bd )
-{
-	QString d;
-	switch( _bd )
-	{
-		case BaseRoot:
-			d = QDir::rootPath();
-			break;
-		case BaseWorkingDir:
-			d = configManager::inst()->workingDir();
-			break;
-		case BaseDataDir:
-			d = configManager::inst()->dataDir();
-			break;
-		case BaseHome:
-		default:
-			d = QDir::homePath();
-			break;
-	}
-	if( !d.isEmpty() && d.right( 1 ) != QDir::separator() )
-	{
-		d += QDir::separator();
-	}
-
-	return d;
-}
-
-
-
-
-
-ResourcesDB::TreeItem * ResourcesDB::TreeItem::findChild(
-					const QString & _name,
-					Item::BaseDirectories _base_dir )
-{
-	if( _name.isNull() || _name.isEmpty() )
-	{
-		return NULL;
-	}
-
-	const int hash = qHash( _name );
-
-	foreachTreeItem( m_children )
-	{
-		TreeItem * ti = *it;
-		if( ti->item() &&
-			ti->item()->nameHash() == hash &&
-			ti->item()->name() == _name &&
-			ti->item()->baseDir() == _base_dir )
-		{
-			return ti;
-		}
-	}
-	return NULL;
-}
-
-
-
-
-
-
 ResourcesDB::ResourcesDB( const QString & _db_file ) :
 	m_watcher( this ),
 	m_dbFile( _db_file )
 {
-	m_folders += qMakePair( Item::BaseDataDir, QString() );
-	m_folders += qMakePair( Item::BaseWorkingDir, QString() );
+	m_folders += qMakePair( ResourcesItem::BaseDataDir, QString() );
+	m_folders += qMakePair( ResourcesItem::BaseWorkingDir, QString() );
 
 	if( QFile::exists( m_dbFile ) )
 	{
@@ -333,17 +85,18 @@ void ResourcesDB::save( void )
 
 
 
-void ResourcesDB::saveTreeItem( const TreeItem * _i, QDomDocument & _doc,
+void ResourcesDB::saveTreeItem( const ResourcesTreeItem * _i,
+							QDomDocument & _doc,
 							QDomElement & _de )
 {
 	QDomElement e = _i->item() ? _doc.createElement( "item" ) : _de;
-	foreachConstTreeItem( _i->children() )
+	foreachConstResourcesTreeItem( _i->children() )
 	{
 		saveTreeItem( *it, _doc, e );
 	}
 	if( _i->item() )
 	{
-		const Item * it = _i->item();
+		const ResourcesItem * it = _i->item();
 		e.setAttribute( "name", it->name() );
 		e.setAttribute( "type", it->type() );
 		e.setAttribute( "basedir", it->baseDir() );
@@ -360,7 +113,7 @@ void ResourcesDB::saveTreeItem( const TreeItem * _i, QDomDocument & _doc,
 
 
 
-void ResourcesDB::loadTreeItem( TreeItem * _i, QDomElement & _de )
+void ResourcesDB::loadTreeItem( ResourcesTreeItem * _i, QDomElement & _de )
 {
 	QDomNode node = _de.firstChild();
 	while( !node.isNull() )
@@ -371,22 +124,23 @@ void ResourcesDB::loadTreeItem( TreeItem * _i, QDomElement & _de )
 			const QString h = e.attribute( "hash" );
 			if( !h.isEmpty() )
 			{
-				Item * item = new Item( e.attribute( "name" ),
-	static_cast<Item::Types>( e.attribute( "type" ).toInt() ),
-	static_cast<Item::BaseDirectories>( e.attribute( "basedir" ).toInt() ),
+ResourcesItem * item = new ResourcesItem( e.attribute( "name" ),
+	static_cast<ResourcesItem::Type>( e.attribute( "type" ).toInt() ),
+	static_cast<ResourcesItem::BaseDirectory>(
+					e.attribute( "basedir" ).toInt() ),
 						e.attribute( "path" ),
 						h,
 						e.attribute( "tags" ),
 						e.attribute( "size" ).toInt(),
 	QDateTime::fromString( e.attribute( "lastmod" ), Qt::ISODate ) );
-				replaceItem( item );
-				TreeItem * treeItem = new TreeItem( _i, item );
-				if( item->type() == Item::TypeDirectory &&
-					QFileInfo( item->fullPath() ).isDir() )
-				{
-					m_watcher.addPath( item->fullPath() );
-				}
-				loadTreeItem( treeItem, e );
+replaceItem( item );
+ResourcesTreeItem * treeItem = new ResourcesTreeItem( _i, item );
+if( item->type() == ResourcesItem::TypeDirectory &&
+				QFileInfo( item->fullPath() ).isDir() )
+{
+	m_watcher.addPath( item->fullPath() );
+}
+loadTreeItem( treeItem, e );
 			}
 		}
 		node = node.nextSibling();
@@ -408,7 +162,7 @@ void ResourcesDB::scanResources( void )
 
 
 
-const ResourcesDB::Item * ResourcesDB::nearestMatch( const Item & _item )
+const ResourcesItem * ResourcesDB::nearestMatch( const ResourcesItem & _item )
 {
 	if( !_item.hash().isEmpty() )
 	{
@@ -420,9 +174,9 @@ const ResourcesDB::Item * ResourcesDB::nearestMatch( const Item & _item )
 	}
 
 	int max_level = -1;
-	const Item * max_item = NULL;
+	const ResourcesItem * max_item = NULL;
 
-	foreach( const Item * it, m_items )
+	foreach( const ResourcesItem * it, m_items )
 	{
 		const int l = it->equalityLevel( _item );
 		if( l > max_level )
@@ -441,12 +195,12 @@ const ResourcesDB::Item * ResourcesDB::nearestMatch( const Item & _item )
 
 void ResourcesDB::reloadDirectory( const QString & _path )
 {
-	TreeItem * dirTreeItem = NULL;
+	ResourcesTreeItem * dirTreeItem = NULL;
 
-	foreach( Item * it, m_items )
+	foreach( ResourcesItem * it, m_items )
 	{
-		if( it->type() == Item::TypeDirectory &&
-			it->fullPath() == _path )
+		if( it->type() == ResourcesItem::TypeDirectory &&
+						it->fullPath() == _path )
 		{
 			dirTreeItem = it->treeItem();
 		}
@@ -454,7 +208,7 @@ void ResourcesDB::reloadDirectory( const QString & _path )
 
 	if( dirTreeItem )
 	{
-		Item * dirItem = dirTreeItem->item();
+		ResourcesItem * dirItem = dirTreeItem->item();
 		if( dirItem )
 		{
 			m_scannedFolders.clear();
@@ -470,19 +224,19 @@ void ResourcesDB::reloadDirectory( const QString & _path )
 
 
 
-void ResourcesDB::replaceItem( Item * newItem )
+void ResourcesDB::replaceItem( ResourcesItem * newItem )
 {
 	const QString hash = newItem->hash();
-	Item * oldItem = m_items[hash];
+	ResourcesItem * oldItem = m_items[hash];
 	if( oldItem )
 	{
-		TreeItem * oldTreeItem = oldItem->treeItem();
+		ResourcesTreeItem * oldTreeItem = oldItem->treeItem();
 		if( oldTreeItem )
 		{
 			recursiveRemoveItems( oldTreeItem, false );
 			delete oldTreeItem;
 		}
-		if( oldItem->type() == Item::TypeDirectory )
+		if( oldItem->type() == ResourcesItem::TypeDirectory )
 		{
 			m_watcher.removePath( oldItem->fullPath() );
 		}
@@ -495,7 +249,7 @@ void ResourcesDB::replaceItem( Item * newItem )
 
 
 
-void ResourcesDB::recursiveRemoveItems( TreeItem * parent,
+void ResourcesDB::recursiveRemoveItems( ResourcesTreeItem * parent,
 						bool removeTopLevelParent )
 {
 	if( !parent )
@@ -510,7 +264,7 @@ void ResourcesDB::recursiveRemoveItems( TreeItem * parent,
 
 	if( removeTopLevelParent && parent->item() )
 	{
-		if( parent->item()->type() == Item::TypeDirectory )
+		if( parent->item()->type() == ResourcesItem::TypeDirectory )
 		{
 			m_watcher.removePath( parent->item()->fullPath() );
 		}
@@ -526,8 +280,8 @@ void ResourcesDB::recursiveRemoveItems( TreeItem * parent,
 
 
 
-void ResourcesDB::readDir( const QString & _dir, TreeItem * _parent,
-					Item::BaseDirectories _base_dir )
+void ResourcesDB::readDir( const QString & _dir, ResourcesTreeItem * _parent,
+					ResourcesItem::BaseDirectory _base_dir )
 {
 #ifdef LMMS_BUILD_LINUX
 	if( _dir.startsWith( "/dev" ) ||
@@ -538,18 +292,18 @@ void ResourcesDB::readDir( const QString & _dir, TreeItem * _parent,
 	}
 #endif
 
-	QDir d( Item::getBaseDirectory( _base_dir ) + _dir );
+	QDir d( ResourcesItem::getBaseDirectory( _base_dir ) + _dir );
 	m_scannedFolders << d.canonicalPath();
 
-	Item * parentItem;
-	TreeItem * curParent = _parent->findChild( d.dirName() +
+	ResourcesItem * parentItem;
+	ResourcesTreeItem * curParent = _parent->findChild( d.dirName() +
 							QDir::separator(),
 							_base_dir );
 printf("read dir: %s\n", d.canonicalPath().toAscii().constData() );
 	if( curParent )
 	{
 		parentItem = curParent->item();
-		foreachTreeItem( curParent->children() )
+		foreachResourcesTreeItem( curParent->children() )
 		{
 			(*it)->setTemporaryMarker( false );
 		}
@@ -557,15 +311,17 @@ printf("read dir: %s\n", d.canonicalPath().toAscii().constData() );
 	else
 	{
 		// create new item for current dir
-		parentItem = new Item( d.dirName(), Item::TypeDirectory,
-				_base_dir, _parent->item() ?
+		parentItem = new ResourcesItem( d.dirName(),
+						ResourcesItem::TypeDirectory,
+						_base_dir,
+				_parent->item() ?
 					_parent->item()->path() + d.dirName() +
 							QDir::separator() :
 								QString::null );
 		parentItem->setLastMod( QFileInfo(
 					d.canonicalPath() ).lastModified() );
 		replaceItem( parentItem );
-		curParent = new TreeItem( _parent, parentItem );
+		curParent = new ResourcesTreeItem( _parent, parentItem );
 		curParent->setTemporaryMarker( true );
 		m_watcher.addPath( parentItem->fullPath() );
 	}
@@ -587,7 +343,8 @@ printf("read dir: %s\n", d.canonicalPath().toAscii().constData() );
 		{
 			fname += QDir::separator();
 		}
-		TreeItem * curChild = curParent->findChild( fname, _base_dir );
+		ResourcesTreeItem * curChild =
+				curParent->findChild( fname, _base_dir );
 		if( curChild )
 		{
 			curChild->setTemporaryMarker( true );
@@ -597,7 +354,7 @@ printf("read dir: %s\n", d.canonicalPath().toAscii().constData() );
 				curChild->item()->setLastMod(
 							f.lastModified() );
 				if( curChild->item()->type() ==
-							Item::TypeDirectory )
+						ResourcesItem::TypeDirectory )
 				{
 					readDir( _dir + fname, curParent,
 								_base_dir );
@@ -619,20 +376,21 @@ printf("read dir: %s\n", d.canonicalPath().toAscii().constData() );
 			}
 			else if( f.isFile() )
 			{
-				Item * newItem =
-					new Item( f.fileName(),
-							Item::TypeUnknown,
+				ResourcesItem * newItem =
+					new ResourcesItem( f.fileName(),
+						ResourcesItem::TypeUnknown,
 							_base_dir, _dir );
 				newItem->setLastMod( f.lastModified() );
 				replaceItem( newItem );
-				TreeItem * ti = new TreeItem( curParent,
+				ResourcesTreeItem * ti =
+					new ResourcesTreeItem( curParent,
 								newItem );
 				ti->setTemporaryMarker( true );
 			}
 		}
 	}
 
-	for( TreeItemList::Iterator it = curParent->children().begin();
+	for( ResourcesTreeItemList::Iterator it = curParent->children().begin();
 					it != curParent->children().end(); )
 	{
 		if( (*it)->temporaryMarker() == false )

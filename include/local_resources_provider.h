@@ -32,17 +32,17 @@ class LocalResourcesProvider : public ResourcesProvider
 {
 public:
 	LocalResourcesProvider( const QString & _url,
-				ResourcesDB::Item::BaseDirectory _baseDir );
+				ResourcesItem::BaseDirectory _baseDir );
 	virtual ~LocalResourcesProvider()
 	{
 	}
 
 	virtual ResourcesDB * createResourcesDB( void );
-	virtual QByteArray fetchData( const ResourcesDB::Item * _item );
+	virtual QByteArray fetchData( const ResourcesItem * _item );
 
 
 private:
-	ResourcesDB::Item::BaseDirectory m_baseDir;
+	ResourcesItem::BaseDirectory m_baseDir;
 
 } ;
 
