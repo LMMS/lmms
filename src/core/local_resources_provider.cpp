@@ -86,7 +86,7 @@ QByteArray LocalResourcesProvider::fetchData( const ResourcesItem * _item,
 
 void LocalResourcesProvider::addDirectory( const QString & _path )
 {
-	if( QDir( _path ).exists() )
+	if( QFileInfo( _path ).isDir() )
 	{
 		m_watcher.addPath( _path );
 	}
