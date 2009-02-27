@@ -126,14 +126,14 @@ notePlayHandle::~notePlayHandle()
 		m_instrumentTrack->m_processHandles.removeAll( this );
 	}
 
-	if( m_instrumentTrack->m_notes[key()] == this )
-	{
-		m_instrumentTrack->m_notes[key()] = NULL;
-	}
-
 	if( m_pluginData != NULL )
 	{
 		m_instrumentTrack->deleteNotePluginData( this );
+	}
+
+	if( m_instrumentTrack->m_notes[key()] == this )
+	{
+		m_instrumentTrack->m_notes[key()] = NULL;
 	}
 
 	for( notePlayHandleVector::iterator it = m_subNotes.begin();
