@@ -48,6 +48,11 @@ public:
 	void load( const QString & _file );
 	void save( const QString & _file );
 
+	ResourcesProvider * provider( void )
+	{
+		return m_provider;
+	}
+
 	inline const ItemList & items( void ) const
 	{
 		return m_items;

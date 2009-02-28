@@ -104,6 +104,11 @@ public:
 		return m_parent;
 	}
 
+	inline void setParent( ResourcesTreeItem * _parent )
+	{
+		m_parent = _parent;
+	}
+
 	inline bool temporaryMarker( void ) const
 	{
 		return m_temporaryMarker;
