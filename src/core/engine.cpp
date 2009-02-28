@@ -3,7 +3,7 @@
 /*
  * engine.cpp - implementation of LMMS' engine-system
  *
- * Copyright (c) 2006-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -35,7 +35,6 @@
 #include "fx_mixer.h"
 #include "fx_mixer_view.h"
 #include "ladspa_2_lmms.h"
-#include "local_resources_provider.h"
 #include "main_window.h"
 #include "mixer.h"
 #include "pattern.h"
@@ -43,9 +42,12 @@
 #include "preset_preview_play_handle.h"
 #include "project_journal.h"
 #include "project_notes.h"
-#include "resources_db.h"
 #include "song_editor.h"
 #include "song.h"
+
+#include "resources_db.h"
+#include "local_resources_provider.h"
+#include "unified_resources_provider.h"
 
 
 bool engine::s_hasGUI = true;
@@ -57,7 +59,7 @@ fxMixerView * engine::s_fxMixerView = NULL;
 mainWindow * engine::s_mainWindow = NULL;
 bbTrackContainer * engine::s_bbTrackContainer = NULL;
 song * engine::s_song = NULL;
-ResourcesDB * engine::s_resourcesDB = NULL;
+UnifiedResourcesProvider * engine::s_resourcesProvider = NULL;
 songEditor * engine::s_songEditor = NULL;
 automationEditor * engine::s_automationEditor = NULL;
 bbEditor * engine::s_bbEditor = NULL;
@@ -83,9 +85,21 @@ void engine::init( const bool _has_gui )
 	s_mixer = new mixer;
 	s_song = new song;
 
-	LocalResourcesProvider * resProv =
-			new LocalResourcesProvider( ResourcesItem::BaseWorkingDir, QString() );
-	s_resourcesDB = resProv->database();
+
+	// init resources framework
+	LocalResourcesProvider * workingDirResources =
+		new LocalResourcesProvider( ResourcesItem::BaseWorkingDir,
+								QString() );
+	LocalResourcesProvider * shippedResources =
+		new LocalResourcesProvider( ResourcesItem::BaseDataDir,
+								QString() );
+	UnifiedResourcesProvider * unifiedResources =
+						new UnifiedResourcesProvider;
+	unifiedResources->addDatabase( workingDirResources->database() );
+	unifiedResources->addDatabase( shippedResources->database() );
+
+	s_resourcesProvider = unifiedResources;
+
 
 	s_fxMixer = new fxMixer;
 	s_bbTrackContainer = new bbTrackContainer;
@@ -161,8 +175,8 @@ void engine::destroy( void )
 	delete s_song;
 	s_song = NULL;
 
-	delete s_resourcesDB;
-	s_resourcesDB = NULL;
+	delete s_resourcesProvider;
+	s_resourcesProvider = NULL;
 
 	delete configManager::inst();
 }

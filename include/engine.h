@@ -1,7 +1,7 @@
 /*
  * engine.h - engine-system of LMMS
  *
- * Copyright (c) 2006-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -44,7 +44,7 @@ class mainWindow;
 class mixer;
 class pianoRoll;
 class projectNotes;
-class ResourcesDB;
+class UnifiedResourcesProvider;
 class song;
 class songEditor;
 class ladspa2LMMS;
@@ -59,7 +59,7 @@ public:
 
 	static bool hasGUI( void )
 	{
-		return( s_hasGUI );
+		return s_hasGUI;
 	}
 
 	static void setSuppressMessages( bool _on )
@@ -75,94 +75,94 @@ public:
 	// core
 	static mixer * getMixer( void )
 	{
-		return( s_mixer );
+		return s_mixer;
 	}
 
 	static fxMixer * getFxMixer( void )
 	{
-		return( s_fxMixer );
+		return s_fxMixer;
 	}
 
 	static song * getSong( void )
 	{
-		return( s_song );
+		return s_song;
 	}
 
 	static bbTrackContainer * getBBTrackContainer( void )
 	{
-		return( s_bbTrackContainer );
+		return s_bbTrackContainer;
 	}
 
 	static projectJournal * getProjectJournal( void )
 	{
-		return( s_projectJournal );
+		return s_projectJournal;
 	}
 
-	static ResourcesDB * getResourcesDB( void )
+	static UnifiedResourcesProvider * getResourcesProvider( void )
 	{
-		return( s_resourcesDB );
+		return s_resourcesProvider;
 	}
 
 	// GUI
 	static mainWindow * getMainWindow( void )
 	{
-		return( s_mainWindow );
+		return s_mainWindow;
 	}
 
 	static fxMixerView * getFxMixerView( void )
 	{
-		return( s_fxMixerView );
+		return s_fxMixerView;
 	}
 
 	static songEditor * getSongEditor( void )
 	{
-		return( s_songEditor );
+		return s_songEditor;
 	}
 
 	static bbEditor * getBBEditor( void )
 	{
-		return( s_bbEditor );
+		return s_bbEditor;
 	}
 
 	static pianoRoll * getPianoRoll( void )
 	{
-		return( s_pianoRoll );
+		return s_pianoRoll;
 	}
 
 	static projectNotes * getProjectNotes( void )
 	{
-		return( s_projectNotes );
+		return s_projectNotes;
 	}
 
 	static automationEditor * getAutomationEditor( void )
 	{
-		return( s_automationEditor );
+		return s_automationEditor;
 	}
 
 	static ladspa2LMMS * getLADSPAManager( void )
 	{
-		return( s_ladspaManager );
+		return s_ladspaManager;
 	}
 
 	static dummyTrackContainer * getDummyTrackContainer( void )
 	{
-		return( s_dummyTC );
+		return s_dummyTC;
 	}
 
 	static controllerRackView * getControllerRackView( void )
 	{
-		return( s_controllerRackView );
+		return s_controllerRackView;
 	}
 
 	static float framesPerTick( void )
 	{
-		return( s_framesPerTick );
+		return s_framesPerTick;
 	}
 	static void updateFramesPerTick( void );
 
 	static const QMap<QString, QString> & pluginFileHandling( void )
 	{
-		return( s_pluginFileHandling );
+		return s_pluginFileHandling;
 	}
 
 	static void setLmmsStyle( LmmsStyle * _style )
@@ -184,7 +184,7 @@ private:
 	static mixer * s_mixer;
 	static fxMixer * s_fxMixer;
 	static song * s_song;
-	static ResourcesDB * s_resourcesDB;
+	static UnifiedResourcesProvider * s_resourcesProvider;
 	static bbTrackContainer * s_bbTrackContainer;
 	static projectJournal * s_projectJournal;
 	static dummyTrackContainer * s_dummyTC;
@@ -200,7 +200,7 @@ private:
 	static projectNotes * s_projectNotes;
 	static ladspa2LMMS * s_ladspaManager;
 
-    static LmmsStyle * s_lmmsStyle;
+	static LmmsStyle * s_lmmsStyle;
 
 	static QMap<QString, QString> s_pluginFileHandling;
 
