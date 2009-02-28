@@ -48,10 +48,10 @@ ResourcesProvider::~ResourcesProvider()
 
 
 
-QString ResourcesProvider::localCatalogueFile( void ) const
+QString ResourcesProvider::localCacheFile( void ) const
 {
 	const QString dir = configManager::inst()->workingDir() +
-					"catalogs" + QDir::separator();
+					".resources" + QDir::separator();
 	if( !QDir( dir ).exists() )
 	{
 		QDir().mkpath( dir );

@@ -44,7 +44,6 @@ ResourcesDB::ResourcesDB( ResourcesProvider * _provider ) :
 
 ResourcesDB::~ResourcesDB()
 {
-	save( m_provider->localCatalogueFile() );
 }
 
 
@@ -52,14 +51,17 @@ ResourcesDB::~ResourcesDB()
 
 void ResourcesDB::init( void )
 {
-	if( QFileInfo( m_provider->localCatalogueFile() ).exists() )
+	if( QFileInfo( m_provider->localCacheFile() ).exists() )
 	{
-		load( m_provider->localCatalogueFile() );
+		load( m_provider->localCacheFile() );
 	}
 
 	m_provider->updateDatabase();
 
-	save( m_provider->localCatalogueFile() );
+	if( m_provider->cacheDatabase() )
+	{
+		save( m_provider->localCacheFile() );
+	}
 }
 
 

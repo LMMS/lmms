@@ -45,13 +45,17 @@ public:
 	virtual int dataSize( const ResourcesItem * _item ) const = 0;
 	virtual QByteArray fetchData( const ResourcesItem * _item,
 					int _maxSize = -1 ) const = 0;
+	virtual bool cacheDatabase( void ) const
+	{
+		return true;
+	}
 
 	inline const QString & url( void ) const
 	{
 		return m_url;
 	}
 
-	QString localCatalogueFile( void ) const;
+	QString localCacheFile( void ) const;
 
 	ResourcesDB * database( void )
 	{
