@@ -34,9 +34,7 @@ class UnifiedResourcesProvider : public ResourcesProvider
 	Q_OBJECT
 public:
 	UnifiedResourcesProvider();
-	virtual ~UnifiedResourcesProvider()
-	{
-	}
+	virtual ~UnifiedResourcesProvider();
 
 	void addDatabase( ResourcesDB * _db );
 
@@ -46,6 +44,7 @@ public:
 	}
 
 	virtual void updateDatabase( void );
+
 	virtual int dataSize( const ResourcesItem * _item ) const
 	{
 		if( _item->provider() != this )
@@ -54,6 +53,7 @@ public:
 		}
 		return 0;
 	}
+
 	virtual QByteArray fetchData( const ResourcesItem * _item,
 					int _maxSize = -1 ) const
 	{
@@ -64,13 +64,18 @@ public:
 		return QByteArray();
 	}
 
+	virtual bool cacheDatabase( void ) const
+	{
+		return false;
+	}
+
+
+private slots:
+	void remergeItems( void );
+
 
 private:
 	QList<ResourcesDB *> m_mergedDatabases;
-
-
-signals:
-	void itemsChanged( void );
 
 } ;
 

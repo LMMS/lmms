@@ -23,8 +23,6 @@
  */
 
 
-#include <QtCore/QDir>
-
 #include "unified_resources_provider.h"
 #include "resources_db.h"
 
@@ -38,6 +36,19 @@ UnifiedResourcesProvider::UnifiedResourcesProvider() :
 
 
 
+UnifiedResourcesProvider::~UnifiedResourcesProvider()
+{
+	database()->items().clear();
+
+	foreach( ResourcesDB * db, m_mergedDatabases )
+	{
+		delete db->provider();
+	}
+}
+
+
+
+
 void UnifiedResourcesProvider::addDatabase( ResourcesDB * _db )
 {
 	ResourcesTreeItem * childRoot = _db->topLevelNode()->getChild( 0 );
@@ -45,7 +56,9 @@ void UnifiedResourcesProvider::addDatabase( ResourcesDB * _db )
 	{
 		m_mergedDatabases << _db;
 		connect( _db, SIGNAL( itemsChanged() ),
-				this, SIGNAL( itemsChanged() ) );
+				database(), SIGNAL( itemsChanged() ) );
+		connect( _db, SIGNAL( itemsChanged() ),
+				this, SLOT( remergeItems() ) );
 
 		childRoot->setParent( database()->topLevelNode() );
 		database()->topLevelNode()->addChild( childRoot );
@@ -60,6 +73,54 @@ void UnifiedResourcesProvider::updateDatabase( void )
 	foreach( ResourcesDB * db, m_mergedDatabases )
 	{
 		db->provider()->updateDatabase();
+	}
+}
+
+
+
+
+void UnifiedResourcesProvider::remergeItems( void )
+{
+	typedef QHash<const ResourcesItem *,
+			const ResourcesItem *> PointerHashMap;
+	PointerHashMap itemsSeen;
+
+	ResourcesDB::ItemList & items = database()->items();
+	for( ResourcesDB::ItemList::Iterator it = items.begin();
+						it != items.end(); ++it )
+	{
+		itemsSeen[*it] = *it;
+	}
+
+	foreach( ResourcesDB * db, m_mergedDatabases )
+	{
+		for( ResourcesDB::ItemList::ConstIterator it =
+							db->items().begin();
+						it != db->items().end(); ++it )
+		{
+			const QString & h = (*it)->hash();
+			if( !items.contains( h ) )
+			{
+				items[(*it)->hash()] = *it;
+			}
+			else
+			{
+				itemsSeen[*it] = NULL;
+			}
+		}
+	}
+
+	for( ResourcesDB::ItemList::Iterator it = items.begin();
+						it != items.end(); )
+	{
+		if( itemsSeen[*it] == *it )
+		{
+			it = items.erase( it );
+		}
+		else
+		{
+			++it;
+		}
 	}
 }
 
