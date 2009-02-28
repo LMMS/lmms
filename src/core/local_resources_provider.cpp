@@ -51,6 +51,14 @@ LocalResourcesProvider::LocalResourcesProvider(
 
 
 
+LocalResourcesProvider::~LocalResourcesProvider()
+{
+	database()->save( localCacheFile() );
+}
+
+
+
+
 void LocalResourcesProvider::updateDatabase( void )
 {
 	readDir( m_dir, database()->topLevelNode() );

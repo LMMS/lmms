@@ -38,9 +38,7 @@ class LocalResourcesProvider : public ResourcesProvider
 public:
 	LocalResourcesProvider( ResourcesItem::BaseDirectory _baseDir,
 						const QString & _dir );
-	virtual ~LocalResourcesProvider()
-	{
-	}
+	virtual ~LocalResourcesProvider();
 
 	virtual QString providerName( void ) const
 	{
