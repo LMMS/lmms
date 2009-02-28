@@ -114,8 +114,8 @@ public:
 			pthread_mutex_lock( &__gui_mutex );
 			__gui_messages.push( _m );
 			pthread_mutex_unlock( &__gui_mutex );
-			return true;
 		}
+		return true;
 	}
 
 	virtual ~remoteZynAddSubFX()
@@ -287,6 +287,8 @@ void * guiThread( void * )
 		pthread_mutex_unlock( &__gui_mutex );
 	}
 	Fl::flush();
+
+	return NULL;
 }
 
 
