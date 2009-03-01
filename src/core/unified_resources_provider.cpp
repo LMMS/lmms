@@ -86,6 +86,9 @@ void UnifiedResourcesProvider::remergeItems( void )
 	PointerHashMap itemsSeen;
 
 	ResourcesDB::ItemList & items = database()->items();
+
+	itemsSeen.reserve( items.size() );
+
 	for( ResourcesDB::ItemList::Iterator it = items.begin();
 						it != items.end(); ++it )
 	{
