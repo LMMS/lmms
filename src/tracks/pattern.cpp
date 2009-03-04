@@ -1086,6 +1086,10 @@ void patternView::wheelEvent( QWheelEvent * _we )
 			{
 				n->setVolume( vol + 5 );
 			}
+			else
+			{
+				n->setVolume( 100 );
+			}
 		}
 		else
 		{
