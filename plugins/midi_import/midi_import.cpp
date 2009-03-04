@@ -214,7 +214,7 @@ public:
 			{
 				isSF2 = true;
 				it_inst->loadFile( configManager::inst()->defaultSoundfont() );
-				it_inst->getChildModel( "bank" )->setValue( 128 );
+				it_inst->getChildModel( "bank" )->setValue( 0 );
 				it_inst->getChildModel( "patch" )->setValue( 0 );
 			}
 			else
