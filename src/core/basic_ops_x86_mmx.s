@@ -10,11 +10,11 @@ alignedMemCpyMMX:
 	movl	124(%esp), %eax
 	shrl	$6, %ebx
 #APP
-# 42 "/home/toby/development/svn/lmms-trunk/src/core/basic_ops_x86.c" 1
+# 42 "/home/toby/development/git/lmms/src/core/basic_ops_x86.c" 1
 	 fsave 4(%esp); fwait
 
 # 0 "" 2
-# 44 "/home/toby/development/svn/lmms-trunk/src/core/basic_ops_x86.c" 1
+# 44 "/home/toby/development/git/lmms/src/core/basic_ops_x86.c" 1
 	1: prefetchnta (%eax)
    prefetchnta 64(%eax)
    prefetchnta 128(%eax)
@@ -31,7 +31,7 @@ alignedMemCpyMMX:
 	.p2align 3
 .L3:
 #APP
-# 53 "/home/toby/development/svn/lmms-trunk/src/core/basic_ops_x86.c" 1
+# 53 "/home/toby/development/git/lmms/src/core/basic_ops_x86.c" 1
 	1: prefetchnta 320(%eax)
 2: movq (%eax), %mm0
    movq 8(%eax), %mm1
@@ -59,7 +59,7 @@ alignedMemCpyMMX:
 	jne	.L3
 .L2:
 #APP
-# 75 "/home/toby/development/svn/lmms-trunk/src/core/basic_ops_x86.c" 1
+# 75 "/home/toby/development/git/lmms/src/core/basic_ops_x86.c" 1
 	 fsave 4(%esp); fwait
 
 # 0 "" 2
@@ -83,7 +83,7 @@ alignedMemClearMMX:
 	.p2align 3
 .L9:
 #APP
-# 90 "/home/toby/development/svn/lmms-trunk/src/core/basic_ops_x86.c" 1
+# 90 "/home/toby/development/git/lmms/src/core/basic_ops_x86.c" 1
 	movq    %mm0, (%edx)
 movq    %mm0, 8(%edx)
 movq    %mm0, 16(%edx)
@@ -103,5 +103,5 @@ movq    %mm0, 56(%edx)
 	emms
 	ret
 	.size	alignedMemClearMMX, .-alignedMemClearMMX
-	.ident	"GCC: (GNU) 4.4.0 20081204 (experimental)"
+	.ident	"GCC: (GNU) 4.4.0 20090304 (experimental)"
 	.section	.note.GNU-stack,"",@progbits
