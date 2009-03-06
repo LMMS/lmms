@@ -1,7 +1,7 @@
 /*
  * midi_import.cpp - support for importing MIDI-files
  *
- * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  * 
@@ -26,6 +26,7 @@
 #include <QtXml/QDomDocument>
 #include <QtCore/QDir>
 #include <QtGui/QApplication>
+#include <QtGui/QMessageBox>
 #include <QtGui/QProgressDialog>
 
 #include "midi_import.h"
@@ -91,6 +92,18 @@ bool midiImport::tryImport( trackContainer * _tc )
 	if( openFile() == FALSE )
 	{
 		return( FALSE );
+	}
+	if( engine::hasGUI() &&
+		configManager::inst()->defaultSoundfont().isEmpty() )
+	{
+		QMessageBox::information( engine::getMainWindow(),
+			tr( "Setup incomplete" ),
+			tr( "You do not have set up a default soundfont in "
+				"the settings dialog (Edit->Settings). "
+				"Therefore no sound will be played back after "
+				"importing this MIDI file. You should download "
+				"a General MIDI soundfont, specify it in "
+				"settings dialog and try again." ) );
 	}
 
 	switch( readID() )
@@ -201,7 +214,7 @@ public:
 			{
 				isSF2 = true;
 				it_inst->loadFile( configManager::inst()->defaultSoundfont() );
-				it_inst->getChildModel( "bank" )->setValue( 128 );
+				it_inst->getChildModel( "bank" )->setValue( 0 );
 				it_inst->getChildModel( "patch" )->setValue( 0 );
 			}
 			else
@@ -471,51 +484,6 @@ bool midiImport::readSMF( trackContainer * _tc )
 	}
 
 	return true;
-
-
-	/*
-	// the curren position is immediately after the "MThd" id
-	int header_len = readInt( 4 );
-	if( header_len < 6 )
-	{
-invalid_format:
-		printf( "midiImport::readSMF(): invalid file format\n" );
-		return( FALSE );
-	}
-
-	int type = readInt( 2 );
-	if( type != 0 && type != 1 )
-	{
-		printf( "midiImport::readSMF(): type %d format is not "
-							"supported\n", type );
-		return( FALSE );
-	}
-
-	int num_tracks = readInt( 2 );
-	if( num_tracks < 1 || num_tracks > 1000 )
-	{
-		printf( "midiImport::readSMF(): invalid number of tracks (%d)\n",
-								num_tracks );
-		num_tracks = 0;
-		return( FALSE );
-	}
-
-#ifdef LMMS_DEBUG
-	printf( "tracks: %d\n", num_tracks );
-#endif
-
-	m_timingDivision = readInt( 2 );
-	if( m_timingDivision < 0 )
-	{
-		goto invalid_format;
-	}
-#ifdef LMMS_DEBUG
-	printf( "time-division: %d\n", m_timingDivision );
-#endif
-
-
-	*/
-
 }
 
 

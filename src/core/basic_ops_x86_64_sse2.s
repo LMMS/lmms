@@ -36,14 +36,14 @@ alignedMemCpySSE2:
 	.type	alignedMemClearSSE2, @function
 alignedMemClearSSE2:
 .LFB510:
-	movslq	%esi,%rax
-	shrq	$6, %rax
-	testl	%eax, %eax
+	movslq	%esi,%rsi
+	shrq	$6, %rsi
+	testl	%esi, %esi
 	jle	.L10
-	subl	$1, %eax
+	subl	$1, %esi
 	pxor	%xmm0, %xmm0
-	salq	$6, %rax
-	leaq	64(%rax,%rdi), %rax
+	salq	$6, %rsi
+	leaq	64(%rdi,%rsi), %rax
 	.align 16
 .L9:
 	movdqa	%xmm0, (%rdi)
@@ -89,11 +89,11 @@ alignedConvertToS16SSE2:
 	movl	$-32768, %edi
 	.align 16
 .L25:
-	movaps	%xmm0, %xmm1
-	mulss	(%rcx), %xmm1
+	movss	(%rcx), %xmm1
+	mulss	%xmm0, %xmm1
 	cvttss2si	%xmm1, %esi
-	movaps	%xmm0, %xmm1
-	mulss	4(%rcx), %xmm1
+	movss	4(%rcx), %xmm1
+	mulss	%xmm0, %xmm1
 	cmpl	$-32768, %esi
 	cmovl	%edi, %esi
 	cmpl	$32767, %esi
@@ -136,11 +136,11 @@ alignedConvertToS16SSE2:
 	movl	$32767, %esi
 	.align 16
 .L20:
-	movaps	%xmm0, %xmm1
-	mulss	(%rcx), %xmm1
+	movss	(%rcx), %xmm1
+	mulss	%xmm0, %xmm1
 	cvttss2si	%xmm1, %ebx
-	movaps	%xmm0, %xmm1
-	mulss	4(%rcx), %xmm1
+	movss	4(%rcx), %xmm1
+	mulss	%xmm0, %xmm1
 	cmpl	$-32768, %ebx
 	cmovl	%edi, %ebx
 	cmpl	$32767, %ebx
@@ -176,71 +176,71 @@ alignedConvertToS16SSE2:
 	je	.L27
 	movaps	%xmm0, %xmm1
 	movq	%rdi, %rcx
-	movdqa	.LC1(%rip), %xmm2
+	movdqa	.LC1(%rip), %xmm4
 	movq	%rsi, %r10
 	shufps	$0, %xmm1, %xmm1
 	xorl	%r9d, %r9d
-	movdqa	.LC3(%rip), %xmm8
+	movdqa	.LC2(%rip), %xmm3
 	movaps	%xmm1, %xmm9
-	movdqa	.LC2(%rip), %xmm1
+	movdqa	.LC3(%rip), %xmm8
 	.align 16
 .L19:
-	movaps	%xmm9, %xmm4
+	movaps	(%rcx), %xmm1
 	addl	$1, %r9d
-	movaps	%xmm9, %xmm3
-	mulps	(%rcx), %xmm4
-	movdqa	%xmm1, %xmm6
-	mulps	16(%rcx), %xmm3
+	movdqa	%xmm3, %xmm5
+	mulps	%xmm9, %xmm1
+	movaps	16(%rcx), %xmm6
+	movdqa	%xmm3, %xmm7
 	addq	$32, %rcx
-	cvttps2dq	%xmm4, %xmm4
-	movdqa	%xmm4, %xmm5
-	pcmpgtd	%xmm2, %xmm5
-	cvttps2dq	%xmm3, %xmm3
-	pand	%xmm5, %xmm4
-	pandn	%xmm2, %xmm5
-	por	%xmm5, %xmm4
-	movdqa	%xmm4, %xmm5
-	pcmpgtd	%xmm1, %xmm5
-	pand	%xmm5, %xmm6
-	pandn	%xmm4, %xmm5
-	movdqa	%xmm5, %xmm4
-	movdqa	%xmm3, %xmm5
-	por	%xmm6, %xmm4
-	movdqa	%xmm1, %xmm6
-	pcmpgtd	%xmm2, %xmm5
-	pand	%xmm5, %xmm3
-	pandn	%xmm2, %xmm5
-	movdqa	%xmm4, %xmm7
-	pslld	$8, %xmm4
-	pand	%xmm8, %xmm7
-	por	%xmm5, %xmm3
-	psrad	$8, %xmm7
-	movdqa	%xmm3, %xmm5
-	pcmpgtd	%xmm1, %xmm5
-	pand	%xmm5, %xmm6
-	pandn	%xmm3, %xmm5
-	movdqa	%xmm5, %xmm3
-	por	%xmm6, %xmm3
-	movdqa	%xmm7, %xmm6
-	movdqa	%xmm3, %xmm5
-	pslld	$8, %xmm3
+	mulps	%xmm9, %xmm6
+	cvttps2dq	%xmm1, %xmm1
+	movdqa	%xmm1, %xmm2
+	pcmpgtd	%xmm4, %xmm2
+	cvttps2dq	%xmm6, %xmm6
+	pand	%xmm2, %xmm1
+	pandn	%xmm4, %xmm2
+	por	%xmm1, %xmm2
+	movdqa	%xmm2, %xmm1
+	pcmpgtd	%xmm3, %xmm1
+	pand	%xmm1, %xmm5
+	pandn	%xmm2, %xmm1
+	movdqa	%xmm1, %xmm2
+	movdqa	%xmm6, %xmm1
+	por	%xmm5, %xmm2
+	pcmpgtd	%xmm4, %xmm1
+	pand	%xmm1, %xmm6
+	pandn	%xmm4, %xmm1
+	movdqa	%xmm2, %xmm5
+	pslld	$8, %xmm2
 	pand	%xmm8, %xmm5
+	por	%xmm6, %xmm1
 	psrad	$8, %xmm5
-	punpcklwd	%xmm5, %xmm7
-	punpckhwd	%xmm5, %xmm6
-	movdqa	%xmm4, %xmm5
-	punpcklwd	%xmm3, %xmm4
-	movdqa	%xmm7, %xmm10
-	punpckhwd	%xmm3, %xmm5
-	punpcklwd	%xmm6, %xmm7
-	punpckhwd	%xmm6, %xmm10
-	punpcklwd	%xmm10, %xmm7
-	movdqa	%xmm4, %xmm10
-	punpcklwd	%xmm5, %xmm4
-	punpckhwd	%xmm5, %xmm10
-	punpcklwd	%xmm10, %xmm4
-	por	%xmm7, %xmm4
-	movdqa	%xmm4, (%r10)
+	movdqa	%xmm1, %xmm6
+	pcmpgtd	%xmm3, %xmm6
+	pand	%xmm6, %xmm7
+	pandn	%xmm1, %xmm6
+	movdqa	%xmm6, %xmm1
+	por	%xmm7, %xmm1
+	movdqa	%xmm5, %xmm7
+	movdqa	%xmm1, %xmm6
+	pslld	$8, %xmm1
+	pand	%xmm8, %xmm6
+	psrad	$8, %xmm6
+	punpcklwd	%xmm6, %xmm5
+	punpckhwd	%xmm6, %xmm7
+	movdqa	%xmm5, %xmm6
+	punpcklwd	%xmm7, %xmm5
+	punpckhwd	%xmm7, %xmm6
+	punpcklwd	%xmm6, %xmm5
+	movdqa	%xmm2, %xmm6
+	punpcklwd	%xmm1, %xmm2
+	punpckhwd	%xmm1, %xmm6
+	movdqa	%xmm2, %xmm1
+	punpcklwd	%xmm6, %xmm2
+	punpckhwd	%xmm6, %xmm1
+	punpcklwd	%xmm1, %xmm2
+	por	%xmm2, %xmm5
+	movdqa	%xmm5, (%r10)
 	addq	$16, %r10
 	cmpw	%r9w, %bx
 	ja	.L19
@@ -253,54 +253,54 @@ alignedConvertToS16SSE2:
 	je	.L28
 	movaps	%xmm0, %xmm1
 	movq	%rdi, %rcx
-	movdqa	.LC1(%rip), %xmm2
+	movdqa	.LC1(%rip), %xmm4
 	movq	%rsi, %r10
 	shufps	$0, %xmm1, %xmm1
 	xorl	%r9d, %r9d
+	movdqa	.LC2(%rip), %xmm3
 	movaps	%xmm1, %xmm6
-	movdqa	.LC2(%rip), %xmm1
 	.align 16
 .L24:
-	movaps	%xmm6, %xmm4
+	movaps	(%rcx), %xmm1
 	addl	$1, %r9d
-	movaps	%xmm6, %xmm3
-	mulps	(%rcx), %xmm4
-	movdqa	%xmm1, %xmm7
-	mulps	16(%rcx), %xmm3
+	movdqa	%xmm3, %xmm7
+	mulps	%xmm6, %xmm1
+	movaps	16(%rcx), %xmm5
 	addq	$32, %rcx
-	cvttps2dq	%xmm4, %xmm4
-	movdqa	%xmm4, %xmm5
-	pcmpgtd	%xmm2, %xmm5
-	cvttps2dq	%xmm3, %xmm3
-	pand	%xmm5, %xmm4
-	pandn	%xmm2, %xmm5
-	por	%xmm5, %xmm4
-	movdqa	%xmm4, %xmm5
-	pcmpgtd	%xmm1, %xmm5
+	mulps	%xmm6, %xmm5
+	cvttps2dq	%xmm1, %xmm1
+	movdqa	%xmm1, %xmm2
+	pcmpgtd	%xmm4, %xmm2
+	cvttps2dq	%xmm5, %xmm5
+	pand	%xmm2, %xmm1
+	pandn	%xmm4, %xmm2
+	por	%xmm1, %xmm2
+	movdqa	%xmm2, %xmm1
+	pcmpgtd	%xmm3, %xmm1
+	pand	%xmm1, %xmm7
+	pandn	%xmm2, %xmm1
+	movdqa	%xmm1, %xmm2
+	movdqa	%xmm5, %xmm1
+	por	%xmm7, %xmm2
+	movdqa	%xmm3, %xmm7
+	pcmpgtd	%xmm4, %xmm1
+	pand	%xmm1, %xmm5
+	pandn	%xmm4, %xmm1
+	por	%xmm5, %xmm1
+	movdqa	%xmm1, %xmm5
+	pcmpgtd	%xmm3, %xmm5
 	pand	%xmm5, %xmm7
-	pandn	%xmm4, %xmm5
-	movdqa	%xmm5, %xmm4
-	movdqa	%xmm3, %xmm5
-	por	%xmm7, %xmm4
-	movdqa	%xmm1, %xmm7
-	pcmpgtd	%xmm2, %xmm5
-	pand	%xmm5, %xmm3
-	pandn	%xmm2, %xmm5
-	por	%xmm5, %xmm3
-	movdqa	%xmm3, %xmm5
-	pcmpgtd	%xmm1, %xmm5
-	pand	%xmm5, %xmm7
-	pandn	%xmm3, %xmm5
-	movdqa	%xmm5, %xmm3
-	movdqa	%xmm4, %xmm5
-	por	%xmm7, %xmm3
-	punpcklwd	%xmm3, %xmm4
-	punpckhwd	%xmm3, %xmm5
-	movdqa	%xmm4, %xmm7
-	punpcklwd	%xmm5, %xmm4
-	punpckhwd	%xmm5, %xmm7
-	punpcklwd	%xmm7, %xmm4
-	movdqa	%xmm4, (%r10)
+	pandn	%xmm1, %xmm5
+	movdqa	%xmm5, %xmm1
+	movdqa	%xmm2, %xmm5
+	por	%xmm7, %xmm1
+	punpcklwd	%xmm1, %xmm2
+	punpckhwd	%xmm1, %xmm5
+	movdqa	%xmm2, %xmm1
+	punpcklwd	%xmm5, %xmm2
+	punpckhwd	%xmm5, %xmm1
+	punpcklwd	%xmm1, %xmm2
+	movdqa	%xmm2, (%r10)
 	addq	$16, %r10
 	cmpw	%r9w, %bx
 	ja	.L24
@@ -392,4 +392,4 @@ alignedConvertToS16SSE2:
 	.byte	0x2
 	.align 8
 .LEFDE5:
-	.ident	"GCC: (GNU) 4.4.0 20081204 (experimental)"
+	.ident	"GCC: (GNU) 4.4.0 20090304 (experimental)"
