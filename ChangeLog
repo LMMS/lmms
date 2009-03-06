@@ -1,3 +1,12 @@
+2009-03-5	Andrew Kelley	<superjoe30/at/gmail/dot/com>
+
+	* plugins/triple_oscillator/artwork.png:
+	* plugins/triple_oscillator/triple_oscillator.cpp:
+	* plugins/triple_oscillator/triple_oscillator.h:
+	* plugins/triple_oscillator/artwork-dev/artwork.xcf:
+	- added Phase Randomness knob to tripleoscillator
+	- added artwork-dev folder so it's easier to edit artwork
+
 2009-02-24	Tobias Doerffel <tobydox/at/users/dot/sourceforge/dot/net>
 
 	* plugins/zynaddsubfx/src/Params/PresetsStore.C:

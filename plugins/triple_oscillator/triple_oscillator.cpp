@@ -22,6 +22,7 @@
  *
  */
  
+#include <cstdlib>
 
 #include <QtXml/QDomDocument>
 #include <QtGui/QBitmap>
@@ -79,10 +80,12 @@ oscillatorObject::oscillatorObject( model * _parent, int _idx ) :
 			tr( "Osc %1 fine detuning left" ).arg( _idx+1 ) ),
 	m_fineRightModel( 0.0f, -100.0f, 100.0f, 1.0f, this,
 			tr( "Osc %1 fine detuning right" ).arg( _idx + 1 ) ),
-	m_phaseOffsetModel( 0.0f, 0.0f, 360.0f, 1.0f, this,
+	m_phaseOffsetModel( 0.0f, -180.0f, 180.0f, 1.0f, this,
 			tr( "Osc %1 phase-offset" ).arg( _idx+1 ) ), 
-	m_stereoPhaseDetuningModel( 0.0f, 0.0f, 360.0f, 1.0f, this,
+	m_stereoPhaseDetuningModel( 0.0f, -180.0f, 180.0f, 1.0f, this,
 			tr( "Osc %1 stereo phase-detuning" ).arg( _idx+1 ) ),
+	m_phaseRandomnessModel( 0.0f, 0.0f, 360.0f, 1.0f, this,
+			tr( "Osc %1 phase randomness" ).arg( _idx+1 ) ),
 	m_waveShapeModel( oscillator::SineWave, 0, 
 			oscillator::NumWaveShapes-1, this,
 			tr( "Osc %1 wave shape" ).arg( _idx+1 ) ),
@@ -121,6 +124,8 @@ oscillatorObject::oscillatorObject( model * _parent, int _idx ) :
 	connect( &m_phaseOffsetModel, SIGNAL( dataChanged() ),
 			this, SLOT( updatePhaseOffsetRight() ) );
 	connect( &m_stereoPhaseDetuningModel, SIGNAL( dataChanged() ),
+			this, SLOT( updatePhaseOffsetLeft() ) );
+	connect( &m_phaseRandomnessModel, SIGNAL( dataChanged() ),
 			this, SLOT( updatePhaseOffsetLeft() ) );
 	updatePhaseOffsetLeft();
 	updatePhaseOffsetRight();
@@ -197,8 +202,21 @@ void oscillatorObject::updateDetuningRight( void )
 
 void oscillatorObject::updatePhaseOffsetLeft( void )
 {
-	m_phaseOffsetLeft = ( m_phaseOffsetModel.value() +
-				m_stereoPhaseDetuningModel.value() ) / 360.0f;
+	float phoff = m_phaseOffsetModel.value();
+	float sphdet = m_stereoPhaseDetuningModel.value();
+	float phr = m_phaseRandomnessModel.value();
+
+	// add phase randomness
+	float min = phoff - phr / 2.0f;
+	float max = phoff + phr / 2.0f;
+	// TODO replace this with a better random function
+	phoff = min + ( (float)rand() / (float)RAND_MAX ) * (max - min);
+	
+	// get rid of negative values
+	while( phoff < 0.0f ) phoff += 360.0f;
+	while( sphdet < 0.0f ) sphdet += 360.0f;
+
+	m_phaseOffsetLeft = ( phoff + sphdet ) / 360.0f;
 }
 
 
@@ -206,7 +224,11 @@ void oscillatorObject::updatePhaseOffsetLeft( void )
 
 void oscillatorObject::updatePhaseOffsetRight( void )
 {
-	m_phaseOffsetRight = m_phaseOffsetModel.value() / 360.0f;
+	float phoff = m_phaseOffsetModel.value();
+
+	// get rid of negative values
+	while( phoff < 0.0f ) phoff += 360.0f;
+	m_phaseOffsetRight = phoff / 360.0f;
 }
 
 
@@ -252,6 +274,8 @@ void tripleOscillator::saveSettings( QDomDocument & _doc, QDomElement & _this )
 							"phoffset" + is );
 		m_osc[i]->m_stereoPhaseDetuningModel.saveSettings( _doc, _this,
 							"stphdetun" + is );
+		m_osc[i]->m_phaseRandomnessModel.saveSettings( _doc, _this, 
+							"phrand" + is );
 		m_osc[i]->m_waveShapeModel.saveSettings( _doc, _this,
 							"wavetype" + is );
 		m_osc[i]->m_modulationAlgoModel.saveSettings( _doc, _this,
@@ -278,12 +302,28 @@ void tripleOscillator::loadSettings( const QDomElement & _this )
 							"phoffset" + is );
 		m_osc[i]->m_stereoPhaseDetuningModel.loadSettings( _this,
 							"stphdetun" + is );
+		m_osc[i]->m_phaseRandomnessModel.loadSettings( _this,
+							"phrand" + is );
 		m_osc[i]->m_waveShapeModel.loadSettings( _this, "wavetype" +
 									is );
 		m_osc[i]->m_modulationAlgoModel.loadSettings( _this,
 					"modalgo" + QString::number( i+1 ) );
 		m_osc[i]->m_sampleBuffer->setAudioFile( _this.attribute(
 							"userwavefile" + is ) );
+
+		// convert 0-360 for phase offset and SPD to -180 to 180
+		while( m_osc[i]->m_phaseOffsetModel.value() > 180.0f )
+		{
+			m_osc[i]->m_phaseOffsetModel.setValue(
+				m_osc[i]->m_phaseOffsetModel.value() - 360.0f);
+		}
+
+		while( m_osc[i]->m_stereoPhaseDetuningModel.value() > 180.0f )
+		{
+			m_osc[i]->m_stereoPhaseDetuningModel.setValue(
+				m_osc[i]->m_stereoPhaseDetuningModel.value() - 360.0f);
+		}
+
 	}
 }
 
@@ -308,6 +348,8 @@ void tripleOscillator::playNote( notePlayHandle * _n,
 
 		for( Sint8 i = NUM_OF_OSCILLATORS - 1; i >= 0; --i )
 		{
+			// prepare phase randomness for note
+			m_osc[i]->updatePhaseOffsetLeft();
 
 			// the last oscs needs no sub-oscs...
 			if( i == NUM_OF_OSCILLATORS - 1 )
@@ -557,7 +599,7 @@ tripleOscillatorView::tripleOscillatorView( instrument * _instrument,
 		knob * vk = new knob( knobStyled, this );
 		vk->setVolumeKnob( TRUE );
 		vk->setFixedSize( 28, 35 );
-		vk->move( 6, knob_y );
+		vk->move( 4, knob_y );
 		vk->setHintText( tr( "Osc %1 volume:" ).arg(
 							i+1 ) + " ", "%" );
 		vk->setWhatsThis(
@@ -569,7 +611,7 @@ tripleOscillatorView::tripleOscillatorView( instrument * _instrument,
 
 		// setup panning-knob
 		knob * pk = new tripleOscKnob( this );
-		pk->move( 35, knob_y );
+		pk->move( 30, knob_y );
 		pk->setHintText( tr("Osc %1 panning:").arg( i + 1 ) + " ", "" );
 		pk->setWhatsThis(
 			tr( "With this knob you can set the panning of the "
@@ -579,7 +621,7 @@ tripleOscillatorView::tripleOscillatorView( instrument * _instrument,
 
 		// setup coarse-knob
 		knob * ck = new tripleOscKnob( this );
-		ck->move( 82, knob_y );
+		ck->move( 72, knob_y );
 		ck->setHintText( tr( "Osc %1 coarse detuning:" ).arg( i + 1 ) +
 						" ", " " + tr( "semitones" ) );
 		ck->setWhatsThis(
@@ -592,7 +634,7 @@ tripleOscillatorView::tripleOscillatorView( instrument * _instrument,
 		
 		// setup knob for left fine-detuning
 		knob * flk = new tripleOscKnob( this );
-		flk->move( 111, knob_y );
+		flk->move( 97, knob_y );
 		flk->setHintText( tr( "Osc %1 fine detuning left:" ).
 						arg( i + 1 ) + " ",
 							" " + tr( "cents" ) );
@@ -605,7 +647,7 @@ tripleOscillatorView::tripleOscillatorView( instrument * _instrument,
 
 		// setup knob for right fine-detuning
 		knob * frk = new tripleOscKnob( this );
-		frk->move( 140, knob_y );
+		frk->move( 122, knob_y );
 		frk->setHintText( tr( "Osc %1 fine detuning right:" ).
 						arg( i + 1 ) + " ",
 							" " + tr( "cents" ) );
@@ -619,7 +661,7 @@ tripleOscillatorView::tripleOscillatorView( instrument * _instrument,
 
 		// setup phase-offset-knob
 		knob * pok = new tripleOscKnob( this );
-		pok->move( 188, knob_y );
+		pok->move( 166, knob_y );
 		pok->setHintText( tr( "Osc %1 phase-offset:" ).
 						arg( i + 1 ) + " ",
 							" " + tr( "degrees" ) );
@@ -635,7 +677,7 @@ tripleOscillatorView::tripleOscillatorView( instrument * _instrument,
 
 		// setup stereo-phase-detuning-knob
 		knob * spdk = new tripleOscKnob( this );
-		spdk->move( 217, knob_y );
+		spdk->move( 190, knob_y );
 		spdk->setHintText( tr("Osc %1 stereo phase-detuning:" ).
 					arg( i + 1 ) + " ",
 							" " + tr( "degrees" ) );
@@ -646,6 +688,17 @@ tripleOscillatorView::tripleOscillatorView( instrument * _instrument,
 				"between the phase-offset of left and right "
 				"channel. This is very good for creating wide "
 				"stereo sounds." ).arg( i+1 ) );
+
+		// set up phase randomness knob
+		knob * phrk = new tripleOscKnob( this );
+		// TODO edit the artwork to fit this knob and put it where it belongs
+		phrk->move( 215, knob_y );
+		phrk->setHintText( tr("Osc %1 phase randomness:" ).arg( i+1 ) + " ",
+							" " + tr( "degrees" ) );
+		phrk->setWhatsThis(
+			tr( "With this knob you can add random variation "
+				"to the phase offsets of oscillator %1. "
+				"This gives each note a unique sound." ).arg( i+1 ) );
 
 
 		int btn_y = 96 + i * osc_h;
@@ -744,7 +797,7 @@ tripleOscillatorView::tripleOscillatorView( instrument * _instrument,
 		wsbg->addButton( uwb );
 
 		m_oscKnobs[i] = oscillatorKnobs( vk, pk, ck, flk, frk, pok,
-							spdk, uwb, wsbg );
+							spdk, phrk, uwb, wsbg );
 
 	}
 }
@@ -781,6 +834,8 @@ void tripleOscillatorView::modelChanged( void )
 					&t->m_osc[i]->m_phaseOffsetModel );
 		m_oscKnobs[i].m_stereoPhaseDetuningKnob->setModel(
 				&t->m_osc[i]->m_stereoPhaseDetuningModel );
+		m_oscKnobs[i].m_phaseRandomnessKnob->setModel(
+				&t->m_osc[i]->m_phaseRandomnessModel );
 		m_oscKnobs[i].m_waveShapeBtnGrp->setModel(
 					&t->m_osc[i]->m_waveShapeModel );
 		connect( m_oscKnobs[i].m_userWaveButton,

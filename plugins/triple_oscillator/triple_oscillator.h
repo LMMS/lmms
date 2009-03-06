@@ -58,6 +58,7 @@ private:
 	floatModel m_fineRightModel;
 	floatModel m_phaseOffsetModel;
 	floatModel m_stereoPhaseDetuningModel;
+	floatModel m_phaseRandomnessModel;
 	intModel m_waveShapeModel;
 	intModel m_modulationAlgoModel;
 	sampleBuffer * m_sampleBuffer;
@@ -160,6 +161,7 @@ private:
 					knob * fr,
 					knob * po,
 					knob * spd,
+					knob * pr,
 					pixmapButton * uwb,
 					automatableButtonGroup * wsbg ) :
 			m_volKnob( v ),
@@ -169,6 +171,7 @@ private:
 			m_fineRightKnob( fr ),
 			m_phaseOffsetKnob( po ),
 			m_stereoPhaseDetuningKnob( spd ),
+			m_phaseRandomnessKnob( pr ),
 			m_userWaveButton( uwb ),
 			m_waveShapeBtnGrp( wsbg )
 		{
@@ -183,6 +186,7 @@ private:
 		knob * m_fineRightKnob;
 		knob * m_phaseOffsetKnob;
 		knob * m_stereoPhaseDetuningKnob;
+		knob * m_phaseRandomnessKnob;
 		pixmapButton * m_userWaveButton;
 		automatableButtonGroup * m_waveShapeBtnGrp;
 
