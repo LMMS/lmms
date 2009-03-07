@@ -199,8 +199,7 @@ void oscillatorObject::updateDetuningRight( void )
 
 
 
-
-void oscillatorObject::updatePhaseOffsetLeft( void )
+void oscillatorObject::applyPhaseRandomness( void )
 {
 	float phoff = m_phaseOffsetModel.value();
 	float sphdet = m_stereoPhaseDetuningModel.value();
@@ -211,12 +210,16 @@ void oscillatorObject::updatePhaseOffsetLeft( void )
 	float max = phoff + phr / 2.0f;
 	// TODO replace this with a better random function
 	phoff = min + ( (float)rand() / (float)RAND_MAX ) * (max - min);
-	
-	// get rid of negative values
-	while( phoff < 0.0f ) phoff += 360.0f;
-	while( sphdet < 0.0f ) sphdet += 360.0f;
 
 	m_phaseOffsetLeft = ( phoff + sphdet ) / 360.0f;
+}
+
+
+
+void oscillatorObject::updatePhaseOffsetLeft( void )
+{
+	m_phaseOffsetLeft = ( m_phaseOffsetModel.value() + 
+						m_stereoPhaseDetuningModel.value() );
 }
 
 
@@ -349,7 +352,7 @@ void tripleOscillator::playNote( notePlayHandle * _n,
 		for( Sint8 i = NUM_OF_OSCILLATORS - 1; i >= 0; --i )
 		{
 			// prepare phase randomness for note
-			m_osc[i]->updatePhaseOffsetLeft();
+			m_osc[i]->applyPhaseRandomness();
 
 			// the last oscs needs no sub-oscs...
 			if( i == NUM_OF_OSCILLATORS - 1 )
@@ -599,7 +602,7 @@ tripleOscillatorView::tripleOscillatorView( instrument * _instrument,
 		knob * vk = new knob( knobStyled, this );
 		vk->setVolumeKnob( TRUE );
 		vk->setFixedSize( 28, 35 );
-		vk->move( 4, knob_y );
+		vk->move( 2, knob_y );
 		vk->setHintText( tr( "Osc %1 volume:" ).arg(
 							i+1 ) + " ", "%" );
 		vk->setWhatsThis(
@@ -611,7 +614,7 @@ tripleOscillatorView::tripleOscillatorView( instrument * _instrument,
 
 		// setup panning-knob
 		knob * pk = new tripleOscKnob( this );
-		pk->move( 30, knob_y );
+		pk->move( 26, knob_y );
 		pk->setHintText( tr("Osc %1 panning:").arg( i + 1 ) + " ", "" );
 		pk->setWhatsThis(
 			tr( "With this knob you can set the panning of the "
@@ -621,7 +624,7 @@ tripleOscillatorView::tripleOscillatorView( instrument * _instrument,
 
 		// setup coarse-knob
 		knob * ck = new tripleOscKnob( this );
-		ck->move( 72, knob_y );
+		ck->move( 69, knob_y );
 		ck->setHintText( tr( "Osc %1 coarse detuning:" ).arg( i + 1 ) +
 						" ", " " + tr( "semitones" ) );
 		ck->setWhatsThis(
@@ -634,7 +637,7 @@ tripleOscillatorView::tripleOscillatorView( instrument * _instrument,
 		
 		// setup knob for left fine-detuning
 		knob * flk = new tripleOscKnob( this );
-		flk->move( 97, knob_y );
+		flk->move( 94, knob_y );
 		flk->setHintText( tr( "Osc %1 fine detuning left:" ).
 						arg( i + 1 ) + " ",
 							" " + tr( "cents" ) );
@@ -647,7 +650,7 @@ tripleOscillatorView::tripleOscillatorView( instrument * _instrument,
 
 		// setup knob for right fine-detuning
 		knob * frk = new tripleOscKnob( this );
-		frk->move( 122, knob_y );
+		frk->move( 119, knob_y );
 		frk->setHintText( tr( "Osc %1 fine detuning right:" ).
 						arg( i + 1 ) + " ",
 							" " + tr( "cents" ) );
@@ -661,7 +664,7 @@ tripleOscillatorView::tripleOscillatorView( instrument * _instrument,
 
 		// setup phase-offset-knob
 		knob * pok = new tripleOscKnob( this );
-		pok->move( 166, knob_y );
+		pok->move( 163, knob_y );
 		pok->setHintText( tr( "Osc %1 phase-offset:" ).
 						arg( i + 1 ) + " ",
 							" " + tr( "degrees" ) );
@@ -677,7 +680,7 @@ tripleOscillatorView::tripleOscillatorView( instrument * _instrument,
 
 		// setup stereo-phase-detuning-knob
 		knob * spdk = new tripleOscKnob( this );
-		spdk->move( 190, knob_y );
+		spdk->move( 188, knob_y );
 		spdk->setHintText( tr("Osc %1 stereo phase-detuning:" ).
 					arg( i + 1 ) + " ",
 							" " + tr( "degrees" ) );
@@ -692,7 +695,7 @@ tripleOscillatorView::tripleOscillatorView( instrument * _instrument,
 		// set up phase randomness knob
 		knob * phrk = new tripleOscKnob( this );
 		// TODO edit the artwork to fit this knob and put it where it belongs
-		phrk->move( 215, knob_y );
+		phrk->move( 213, knob_y );
 		phrk->setHintText( tr("Osc %1 phase randomness:" ).arg( i+1 ) + " ",
 							" " + tr( "degrees" ) );
 		phrk->setWhatsThis(

@@ -51,6 +51,8 @@ public:
 
 
 private:
+	void applyPhaseRandomness( void );
+
 	floatModel m_volumeModel;
 	floatModel m_panModel;
 	floatModel m_coarseModel;
@@ -72,6 +74,7 @@ private:
 	// normalized offset -> x/360
 	float m_phaseOffsetLeft;
 	float m_phaseOffsetRight;
+	
 
 	friend class tripleOscillator;
 	friend class tripleOscillatorView;
