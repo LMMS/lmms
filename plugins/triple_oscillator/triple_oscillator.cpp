@@ -210,8 +210,10 @@ void oscillatorObject::applyPhaseRandomness( void )
 	float max = phoff + phr / 2.0f;
 	// TODO replace this with a better random function
 	phoff = min + ( (float)rand() / (float)RAND_MAX ) * (max - min);
-
 	m_phaseOffsetLeft = ( phoff + sphdet ) / 360.0f;
+
+	phoff = min + ( (float)rand() / (float)RAND_MAX ) * (max - min);
+	m_phaseOffsetRight = phoff / 360.0f;
 }
 
 
@@ -227,11 +229,7 @@ void oscillatorObject::updatePhaseOffsetLeft( void )
 
 void oscillatorObject::updatePhaseOffsetRight( void )
 {
-	float phoff = m_phaseOffsetModel.value();
-
-	// get rid of negative values
-	while( phoff < 0.0f ) phoff += 360.0f;
-	m_phaseOffsetRight = phoff / 360.0f;
+	m_phaseOffsetRight = m_phaseOffsetModel.value() / 360.0f;
 }
 
 
