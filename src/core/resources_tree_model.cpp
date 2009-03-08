@@ -55,6 +55,8 @@ QVariant ResourcesTreeModel::data( const QModelIndex & _idx, int _role ) const
 			return tr( "My LMMS files" );
 					case ResourcesItem::BaseDataDir:
 			return tr( "Shipped LMMS files" );
+					case ResourcesItem::BaseURL:
+			return item->item()->provider()->url();
 					default:
 						break;
 				}
@@ -71,6 +73,8 @@ QVariant ResourcesTreeModel::data( const QModelIndex & _idx, int _role ) const
 	return embed::getIconPixmap( "mimetypes/folder-workingdir", 24, 24 );
 					case ResourcesItem::BaseDataDir:
 	return embed::getIconPixmap( "mimetypes/folder-datadir", 24, 24 );
+					case ResourcesItem::BaseURL:
+	return embed::getIconPixmap( "mimetypes/folder-web", 24, 24 );
 					default:
 						break;
 				}
