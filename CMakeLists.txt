@@ -111,6 +111,7 @@ CHECK_INCLUDE_FILES(locale.h LMMS_HAVE_LOCALE_H)
 SET(QT_MIN_VERSION "4.4.0")
 FIND_PACKAGE(Qt4 REQUIRED)
 SET(QT_USE_QTXML 1)
+SET(QT_USE_QTNETWORK 1)
 EXEC_PROGRAM(${QT_QMAKE_EXECUTABLE} ARGS "-query QT_INSTALL_TRANSLATIONS" OUTPUT_VARIABLE QT_TRANSLATIONS_DIR)
 IF(EXISTS "${QT_TRANSLATIONS_DIR}")
 	MESSAGE("-- Found Qt translations in ${QT_TRANSLATIONS_DIR}")
@@ -494,9 +495,9 @@ IF(LMMS_BUILD_WIN32)
 
 	INSTALL(TARGETS lmms RUNTIME DESTINATION .)
 	IF(LMMS_BUILD_WIN64)
-		INSTALL(FILES /opt/mingw64/bin/QtCore4.dll /opt/mingw64/bin/QtGui4.dll /opt/mingw64/bin/QtXml4.dll /opt/mingw64/bin/libsndfile-1.dll /opt/mingw64/bin/libvorbis-0.dll /opt/mingw64/bin/libvorbisenc-2.dll /opt/mingw64/bin/libvorbisfile-3.dll /opt/mingw64/bin/libogg-0.dll /opt/mingw64/bin/libfluidsynth-1.dll /opt/mingw64/bin/libfftw3f-3.dll /opt/mingw64/bin/SDL.dll DESTINATION .)
+		INSTALL(FILES /opt/mingw64/bin/QtCore4.dll /opt/mingw64/bin/QtGui4.dll /opt/mingw64/bin/QtXml4.dll /opt/mingw64/bin/QtNetwork4.dll /opt/mingw64/bin/libsndfile-1.dll /opt/mingw64/bin/libvorbis-0.dll /opt/mingw64/bin/libvorbisenc-2.dll /opt/mingw64/bin/libvorbisfile-3.dll /opt/mingw64/bin/libogg-0.dll /opt/mingw64/bin/libfluidsynth-1.dll /opt/mingw64/bin/libfftw3f-3.dll /opt/mingw64/bin/SDL.dll DESTINATION .)
 	ELSE(LMMS_BUILD_WIN64)
-		INSTALL(FILES /opt/mingw32/bin/QtCore4.dll /opt/mingw32/bin/QtGui4.dll /opt/mingw32/bin/QtXml4.dll /opt/mingw32/bin/libz.dll /opt/mingw32/bin/libsndfile-1.dll /opt/mingw32/bin/libvorbis-0.dll /opt/mingw32/bin/libvorbisenc-2.dll /opt/mingw32/bin/libvorbisfile-3.dll /opt/mingw32/bin/libogg-0.dll /opt/mingw32/bin/libfluidsynth-1.dll /opt/mingw32/bin/libfftw3f-3.dll /opt/mingw32/bin/SDL.dll /opt/mingw32/i586-mingw32/bin/mingwm10.dll DESTINATION .)
+		INSTALL(FILES /opt/mingw32/bin/QtCore4.dll /opt/mingw32/bin/QtGui4.dll /opt/mingw32/bin/QtXml4.dll /opt/mingw32/bin/QtNetwork4.dll /opt/mingw32/bin/libz.dll /opt/mingw32/bin/libsndfile-1.dll /opt/mingw32/bin/libvorbis-0.dll /opt/mingw32/bin/libvorbisenc-2.dll /opt/mingw32/bin/libvorbisfile-3.dll /opt/mingw32/bin/libogg-0.dll /opt/mingw32/bin/libfluidsynth-1.dll /opt/mingw32/bin/libfftw3f-3.dll /opt/mingw32/bin/SDL.dll /opt/mingw32/i586-mingw32/bin/mingwm10.dll DESTINATION .)
 	ENDIF(LMMS_BUILD_WIN64)
 ELSE(LMMS_BUILD_WIN32)
 	INSTALL(TARGETS lmms RUNTIME DESTINATION bin)
@@ -586,6 +587,7 @@ ADD_CUSTOM_TARGET(win32-pkg
 			COMMAND cp /opt/mingw32/bin/QtCore4.dll tmp/lmms
 			COMMAND cp /opt/mingw32/bin/QtGui4.dll tmp/lmms
 			COMMAND cp /opt/mingw32/bin/QtXml4.dll tmp/lmms
+			COMMAND cp /opt/mingw32/bin/QtNetwork4.dll tmp/lmms
 			COMMAND cp /opt/mingw32/bin/libz.dll tmp/lmms
 			COMMAND cp /opt/mingw32/bin/libsndfile-1.dll tmp/lmms
 			COMMAND cp /opt/mingw32/bin/libvorbis*.dll tmp/lmms
