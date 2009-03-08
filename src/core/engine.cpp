@@ -47,6 +47,7 @@
 
 #include "resources_db.h"
 #include "local_resources_provider.h"
+#include "web_resources_provider.h"
 #include "unified_resources_provider.h"
 
 
@@ -93,10 +94,14 @@ void engine::init( const bool _has_gui )
 	LocalResourcesProvider * shippedResources =
 		new LocalResourcesProvider( ResourcesItem::BaseDataDir,
 								QString() );
+	WebResourcesProvider * webResources =
+		new WebResourcesProvider( "http://lmms.sourceforge.net" );
+
 	UnifiedResourcesProvider * unifiedResources =
 						new UnifiedResourcesProvider;
 	unifiedResources->addDatabase( workingDirResources->database() );
 	unifiedResources->addDatabase( shippedResources->database() );
+	unifiedResources->addDatabase( webResources->database() );
 
 	s_resourcesProvider = unifiedResources;
 
