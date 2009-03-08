@@ -25,21 +25,30 @@
 #ifndef _WEB_RESOURCES_PROVIDER_H
 #define _WEB_RESOURCES_PROVIDER_H
 
-#include <QtCore/QByteArray>
+#include <QtCore/QBuffer>
+#include <QtXml/QDomNode>
 
 #include "resources_provider.h"
 #include "resources_item.h"
 
 
+class QHttp;
+
+
 class WebResourcesProvider : public ResourcesProvider
 {
+	Q_OBJECT
 public:
 	WebResourcesProvider( const QString & _url );
-	virtual ~WebResourcesProvider()
+	virtual ~WebResourcesProvider();
+
+	virtual QString providerName( void ) const
 	{
+		return "WebResourcesProvider";
 	}
 
-	virtual ResourcesDB * createResourcesDB( void );
+	virtual void updateDatabase( void );
+
 	virtual int dataSize( const ResourcesItem * _item ) const
 	{
 		// asume that the size we have set before from the web
@@ -50,7 +59,19 @@ public:
 					int _maxSize = -1 ) const;
 
 
+private slots:
+	void finishDownload( int _id, bool );
+
+
 private:
+	void importNodeIntoDB( const QDomNode & n,
+						ResourcesTreeItem * _parent );
+	void download( const QString & _path, QBuffer * _target,
+						bool _wait = false ) const;
+
+	QHttp * m_http;
+	QBuffer m_indexBuffer;
+	static QList<int> m_downloadIDs;
 
 } ;
 
