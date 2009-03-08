@@ -42,6 +42,7 @@ public:
 		BaseWorkingDir,
 		BaseDataDir,
 		BaseHome,
+		BaseURL,
 		NumBaseDirectories
 	} ;
 	typedef BaseDirectories BaseDirectory;
