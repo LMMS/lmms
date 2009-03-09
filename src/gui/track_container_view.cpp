@@ -405,8 +405,7 @@ void trackContainerView::dropEvent( QDropEvent * _de )
 		instrumentTrack * it = dynamic_cast<instrumentTrack *>(
 				track::create( track::InstrumentTrack,
 								m_tc ) );
-		it->loadTrackSpecificSettings( mmp.content().firstChild().
-								toElement() );
+		it->loadSettings( mmp.content().toElement() );
 		//it->toggledInstrumentTrackButton( true );
 		_de->accept();
 	}
