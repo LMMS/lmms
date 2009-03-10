@@ -175,16 +175,16 @@ printf("read dir: %s\n", d.canonicalPath().toAscii().constData() );
 					d.dirName(),
 					ResourcesItem::TypeDirectory,
 					m_baseDir,
-					_parent->item() ?
-					_parent->item()->path() + d.dirName() +
-							QDir::separator() :
+					_parent->item() && _parent->parent() &&
+					_parent->parent()->item() ?
+					_parent->item()->fullRelativeName() :
 								QString::null );
 		parentItem->setLastMod( QFileInfo(
 					d.canonicalPath() ).lastModified() );
 		database()->addItem( parentItem );
 		curParent = new ResourcesTreeItem( _parent, parentItem );
 		curParent->setTemporaryMarker( true );
-		m_watcher.addPath( parentItem->fullPath() );
+		m_watcher.addPath( parentItem->fullName() );
 	}
 
 

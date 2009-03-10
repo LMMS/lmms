@@ -144,7 +144,7 @@ addItem( item );
 ResourcesTreeItem * treeItem = new ResourcesTreeItem( _i, item );
 if( item->type() == ResourcesItem::TypeDirectory )
 {
-	emit directoryItemAdded( item->fullPath() );
+	emit directoryItemAdded( item->fullName() );
 }
 loadTreeItem( treeItem, e );
 			}
@@ -201,7 +201,7 @@ void ResourcesDB::addItem( ResourcesItem * newItem )
 		}
 		if( oldItem->type() == ResourcesItem::TypeDirectory )
 		{
-			emit directoryItemRemoved( oldItem->fullPath() );
+			emit directoryItemRemoved( oldItem->fullName() );
 		}
 		m_items.remove( hash );
 		delete oldItem;
@@ -229,7 +229,7 @@ void ResourcesDB::recursiveRemoveItems( ResourcesTreeItem * parent,
 	{
 		if( parent->item()->type() == ResourcesItem::TypeDirectory )
 		{
-			emit directoryItemRemoved( parent->item()->fullPath() );
+			emit directoryItemRemoved( parent->item()->fullName() );
 		}
 		const QString & hash = parent->item()->hash();
 		if( !hash.isEmpty() )

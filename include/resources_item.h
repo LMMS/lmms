@@ -111,11 +111,12 @@ public:
 
 	QString fullName( void ) const
 	{
-		if( m_type == TypeDirectory )
-		{
-			return fullPath();
-		}
-		return fullPath()+name();
+		return fullPath() + name();
+	}
+
+	QString fullRelativeName( void ) const
+	{
+		return path() + name();
 	}
 
 	const QString & hash( void ) const
