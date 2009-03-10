@@ -187,11 +187,6 @@ ResourcesItem::Type ResourcesItem::guessType( void ) const
 
 void ResourcesItem::init( void )
 {
-	if( m_name.isEmpty() )
-	{
-		return;
-	}
-
 	// ensure trailing slash for path property
 	if( !m_path.isEmpty() && m_path.right( 1 ) != QDir::separator() )
 	{
@@ -237,7 +232,10 @@ void ResourcesItem::init( void )
 		}
 	}
 
-	m_nameHash = qHash( m_name );
+	if( !m_name.isEmpty() )
+	{
+		m_nameHash = qHash( m_name );
+	}
 }
 
 
