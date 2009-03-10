@@ -106,7 +106,7 @@ public:
 
 	QString fullPath( void ) const
 	{
-		return getBaseDirectory( m_baseDir ) + m_path;
+		return getBaseDirectory( m_baseDir, this ) + m_path;
 	}
 
 	QString fullName( void ) const
@@ -183,7 +183,8 @@ public:
 
 	Type guessType( void ) const;
 
-	static QString getBaseDirectory( BaseDirectory _bd );
+	static QString getBaseDirectory( BaseDirectory _bd,
+					const ResourcesItem * _item = NULL );
 
 
 private:

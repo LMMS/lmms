@@ -243,7 +243,8 @@ void ResourcesItem::init( void )
 
 
 
-QString ResourcesItem::getBaseDirectory( BaseDirectory _bd )
+QString ResourcesItem::getBaseDirectory( BaseDirectory _bd,
+						const ResourcesItem * _item )
 {
 	QString d;
 	switch( _bd )
@@ -259,6 +260,13 @@ QString ResourcesItem::getBaseDirectory( BaseDirectory _bd )
 		case BaseDataDir:
 			d = configManager::inst()->dataDir();
 			break;
+
+		case BaseURL:
+			if( _item )
+			{
+				d = _item->provider()->url();
+				break;
+			}
 
 		case BaseHome:
 		default:
