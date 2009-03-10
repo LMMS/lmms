@@ -98,25 +98,92 @@ void WebResourcesProvider::finishDownload( int _id, bool a )
 
 
 
+// create a recursive tree from flat items and their path property
+ResourcesTreeItem * WebResourcesProvider::addTreeItem(
+						ResourcesTreeItem * _parent,
+						ResourcesItem * _item )
+{
+	if( _parent == database()->topLevelNode() ||
+						_item->path().isEmpty() )
+	{
+		return new ResourcesTreeItem( _parent, _item );
+	}
+
+	const QStringList itemPath = _item->path().split( '/' );
+
+	QString pathComponent = itemPath.first() + "/";
+	QString parentPath;
+
+	if( _parent->item() )
+	{
+		parentPath = _parent->item()->path() + _parent->item()->name();
+		const int parentPathSize = parentPath.count( '/' );
+		if( parentPathSize+1 >= itemPath.size() )
+		{
+			if( _item->path() == parentPath )
+			{
+				return new ResourcesTreeItem( _parent, _item );
+			}
+			else
+			{
+				// something went wrong
+				return new ResourcesTreeItem( _parent, _item );
+			}
+		}
+
+		pathComponent = itemPath[parentPathSize] + "/";
+	}
+
+	ResourcesTreeItem * subParent =
+		_parent->findChild( pathComponent,
+					ResourcesItem::BaseURL );
+	if( subParent == NULL )
+	{
+		ResourcesItem * dirItem =
+			new ResourcesItem( this,
+				pathComponent,
+				ResourcesItem::TypeDirectory,
+				ResourcesItem::BaseURL,
+				parentPath );
+		database()->addItem( dirItem );
+		subParent = new ResourcesTreeItem( _parent, dirItem );
+	}
+	return addTreeItem( subParent, _item );
+}
+
+
+
+
 void WebResourcesProvider::importNodeIntoDB( const QDomNode & _n,
 						ResourcesTreeItem * _parent )
 {
 	QDomNode n = _n;
 	while( !n.isNull() )
 	{
+		QString path = n.firstChildElement( "dir" ).text();
+		ResourcesItem::Type type = ResourcesItem::TypeUnknown;
+
+		if( !path.isEmpty() )
+		{
+			path += "/";
+		}
+		if( n.nodeName() == "webresources" )
+		{
+			type = ResourcesItem::TypeDirectory;
+		}
+
 		ResourcesItem * item =
 			new ResourcesItem( this,
 				n.firstChildElement( "name" ).text(),
-				ResourcesItem::TypeUnknown,
+				type,
 				ResourcesItem::BaseURL,
-				n.firstChildElement( "dir" ).text(),
+				path,
 				n.firstChildElement( "hash" ).text(),
 				n.firstChildElement( "tags" ).text(),
 				n.firstChildElement( "size" ).text().toInt() );
 		database()->addItem( item );
 
-		ResourcesTreeItem * treeItem =
-					new ResourcesTreeItem( _parent, item );
+		ResourcesTreeItem * treeItem = addTreeItem( _parent, item );
 		if( n.nodeName() != "file" )
 		{
 			importNodeIntoDB( n.firstChild(), treeItem );

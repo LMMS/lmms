@@ -64,6 +64,8 @@ private slots:
 
 
 private:
+	ResourcesTreeItem * addTreeItem( ResourcesTreeItem * _parent,
+						ResourcesItem * _item );
 	void importNodeIntoDB( const QDomNode & n,
 						ResourcesTreeItem * _parent );
 	void download( const QString & _path, QBuffer * _target,
