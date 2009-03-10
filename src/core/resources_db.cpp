@@ -83,7 +83,10 @@ void ResourcesDB::save( const QString & _file )
 {
 	multimediaProject m( multimediaProject::ResourcesDatabase );
 
-	saveTreeItem( &m_topLevelNode, m, m.content() );
+	if( m_topLevelNode.getChild( 0 ) )
+	{
+		saveTreeItem( m_topLevelNode.getChild( 0 ), m, m.content() );
+	}
 
 	m.writeFile( _file );
 }
