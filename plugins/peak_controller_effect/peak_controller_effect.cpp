@@ -99,29 +99,22 @@ bool peakControllerEffect::processAudioBuffer( sampleFrame * _buf,
 
 
 	// RMS:
-	float sum = 0;
+	double sum = 0;
+	for( int i = 0; i < _frames; ++i )
+	{
+		sum += _buf[i][0]*_buf[i][0] + _buf[i][1]*_buf[i][1];
+	}
+
 	if( c.m_muteModel.value() )
 	{
-		for( int i = 0; i < _frames; ++i )
-		{
-			// is this really RMS???
-			sum += (_buf[i][0]+_buf[i][0]) * (_buf[i][1]+_buf[i][1]);
-		}
-		// eases vectorization
 		for( int i = 0; i < _frames; ++i )
 		{
 			_buf[i][0] = _buf[i][1] = 0.0f;
 		}
 	}
-	else
-	{
-		for( int i = 0; i < _frames; ++i )
-		{
-			sum += (_buf[i][0]+_buf[i][0]) * (_buf[i][1]+_buf[i][1]);
-		}
-	}
 
-	m_lastSample = c.m_baseModel.value() + c.m_amountModel.value() * sqrtf( 0.5f * sum / _frames );
+	m_lastSample = c.m_baseModel.value() + c.m_amountModel.value() *
+							sqrtf( sum / _frames );
 
 	//checkGate( out_sum / _frames );
 
