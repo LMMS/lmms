@@ -2,7 +2,7 @@
  * midi_port.cpp - abstraction of MIDI-ports which are part of LMMS's MIDI-
  *                 sequencing system
  *
- * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -52,7 +52,7 @@ midiPort::midiPort( const QString & _name, midiClient * _mc,
 	m_fixedInputVelocityModel( -1, -1, MidiMaxVelocity, this,
 						tr( "Fixed input velocity" )  ),
 	m_fixedOutputVelocityModel( -1, -1, MidiMaxVelocity, this,
-						tr( "Fixed output velocity" )  ),
+						tr( "Fixed output velocity" ) ),
 	m_outputProgramModel( 1, 1, MidiProgramCount, this,
 						tr( "Output MIDI program" )  ),
 	m_readableModel( false, this, tr( "Receive MIDI-events" ) ),
@@ -255,6 +255,7 @@ void midiPort::loadSettings( const QDomElement & _this )
 				subscribeReadablePort( it.key() );
 			}
 		}
+		emit readablePortsChanged();
 	}
 
 	if( outputEnabled() )
@@ -268,6 +269,7 @@ void midiPort::loadSettings( const QDomElement & _this )
 				subscribeReadablePort( it.key() );
 			}
 		}
+		emit writeablePortsChanged();
 	}
 }
 
