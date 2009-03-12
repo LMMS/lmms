@@ -2,7 +2,7 @@
  * automation_pattern.cpp - implementation of class automationPattern which
  *                          holds dynamic values
  *
- * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2006-2008 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
@@ -273,6 +273,7 @@ float automationPattern::valueAt( const midiTime & _time ) const
 void automationPattern::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
 	_this.setAttribute( "pos", startPosition() );
+	_this.setAttribute( "len", trackContentObject::length() );
 	_this.setAttribute( "name", name() );
 
 	for( timeMap::const_iterator it = m_timeMap.begin();
@@ -337,8 +338,12 @@ void automationPattern::loadSettings( const QDomElement & _this )
 			}
 		}
 	}
-
-	changeLength( length() );
+	int len = _this.attribute( "len" ).toInt();
+	if( len <= 0 )
+	{
+		len = length();
+	}
+	changeLength( len );
 }
 
 
