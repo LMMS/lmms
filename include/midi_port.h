@@ -2,7 +2,7 @@
  * midi_port.h - abstraction of MIDI-ports which are part of LMMS's MIDI-
  *               sequencing system
  *
- * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -113,7 +113,7 @@ public:
 
 	void subscribeReadablePort( const QString & _port,
 						bool _subscribe = TRUE );
-	void subscribeWriteablePort( const QString & _port,
+	void subscribeWritablePort( const QString & _port,
 						bool _subscribe = TRUE );
 
 	const map & readablePorts( void ) const
@@ -136,7 +136,7 @@ public slots:
 
 private slots:
 	void updateReadablePorts( void );
-	void updateWriteablePorts( void );
+	void updateWritablePorts( void );
 	void updateOutputProgram( void );
 
 
@@ -166,7 +166,7 @@ private:
 
 signals:
 	void readablePortsChanged( void );
-	void writeablePortsChanged( void );
+	void writablePortsChanged( void );
 	void modeChanged( void );
 
 

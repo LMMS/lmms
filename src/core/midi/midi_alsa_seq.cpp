@@ -3,7 +3,7 @@
 /*
  * midi_alsa_seq.cpp - ALSA-sequencer-client
  *
- * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -350,7 +350,7 @@ void midiALSASeq::subscribeReadablePort( midiPort * _port,
 
 
 
-void midiALSASeq::subscribeWriteablePort( midiPort * _port,
+void midiALSASeq::subscribeWritablePort( midiPort * _port,
 						const QString & _dest,
 						bool _subscribe )
 {
@@ -544,7 +544,7 @@ void midiALSASeq::changeQueueTempo( bpm_t _bpm )
 void midiALSASeq::updatePortList( void )
 {
 	QStringList readable_ports;
-	QStringList writeable_ports;
+	QStringList writable_ports;
 
 	// get input- and output-ports
 	snd_seq_client_info_t * cinfo;
@@ -586,7 +586,7 @@ void midiALSASeq::updatePortList( void )
 					( SND_SEQ_PORT_CAP_WRITE |
 					  	SND_SEQ_PORT_CAP_SUBS_WRITE ) )
 			{
-				writeable_ports.push_back( 
+				writable_ports.push_back( 
 					QString( "%1:%2 %3:%4" ).
 					arg( snd_seq_port_info_get_client(
 								pinfo ) ).
@@ -606,13 +606,13 @@ void midiALSASeq::updatePortList( void )
 	if( m_readablePorts != readable_ports )
 	{
 		m_readablePorts = readable_ports;
-		emit( readablePortsChanged() );
+		emit readablePortsChanged();
 	}
 
-	if( m_writeablePorts != writeable_ports )
+	if( m_writablePorts != writable_ports )
 	{
-		m_writeablePorts = writeable_ports;
-		emit( writeablePortsChanged() );
+		m_writablePorts = writable_ports;
+		emit writablePortsChanged();
 	}
 }
 

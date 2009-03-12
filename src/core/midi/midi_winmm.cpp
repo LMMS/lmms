@@ -1,7 +1,7 @@
 /*
  * midi_winmm.cpp - WinMM MIDI client
  *
- * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -160,7 +160,7 @@ void midiWinMM::subscribeReadablePort( midiPort * _port,
 
 
 
-void midiWinMM::subscribeWriteablePort( midiPort * _port,
+void midiWinMM::subscribeWritablePort( midiPort * _port,
 						const QString & _dest,
 						bool _subscribe )
 {
@@ -260,13 +260,13 @@ void midiWinMM::updateDeviceList( void )
 //	if( m_readablePorts != readable_ports )
 	{
 //		m_readablePorts = readable_ports;
-		emit( readablePortsChanged() );
+		emit readablePortsChanged();
 	}
 
-//	if( m_writeablePorts != writeable_ports )
+//	if( m_writablePorts != writable_ports )
 	{
-//		m_writeablePorts = writeable_ports;
-		emit( writeablePortsChanged() );
+//		m_writablePorts = writable_ports;
+		emit writablePortsChanged();
 	}
 }
 

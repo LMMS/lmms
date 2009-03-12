@@ -76,13 +76,13 @@ midiPort::midiPort( const QString & _name, midiClient * _mc,
 	if( m_midiClient->isRaw() == false )
 	{
 		updateReadablePorts();
-		updateWriteablePorts();
+		updateWritablePorts();
 
 		// we want to get informed about port-changes!
 		m_midiClient->connectRPChanged( this,
 					SLOT( updateReadablePorts() ) );
 		m_midiClient->connectWPChanged( this,
-					SLOT( updateWriteablePorts() ) );
+					SLOT( updateWritablePorts() ) );
 	}
 
 	updateMidiPortMode();
@@ -269,7 +269,7 @@ void midiPort::loadSettings( const QDomElement & _this )
 				subscribeReadablePort( it.key() );
 			}
 		}
-		emit writeablePortsChanged();
+		emit writablePortsChanged();
 	}
 }
 
@@ -290,7 +290,7 @@ void midiPort::subscribeReadablePort( const QString & _port, bool _subscribe )
 
 
 
-void midiPort::subscribeWriteablePort( const QString & _port, bool _subscribe )
+void midiPort::subscribeWritablePort( const QString & _port, bool _subscribe )
 {
 	m_writablePorts[_port] = _subscribe;
 	// make sure, MIDI-port is configured for output
@@ -298,7 +298,7 @@ void midiPort::subscribeWriteablePort( const QString & _port, bool _subscribe )
 	{
 		m_writableModel.setValue( true );
 	}
-	m_midiClient->subscribeWriteablePort( this, _port, _subscribe );
+	m_midiClient->subscribeWritablePort( this, _port, _subscribe );
 }
 
 
@@ -336,13 +336,13 @@ void midiPort::updateMidiPortMode( void )
 			// subscribed?
 			if( it.value() )
 			{
-				subscribeWriteablePort( it.key(), false );
+				subscribeWritablePort( it.key(), false );
 			}
 		}
 	}
 
 	emit readablePortsChanged();
-	emit writeablePortsChanged();
+	emit writablePortsChanged();
 	emit modeChanged();
 
 	engine::getSong()->setModified();
@@ -377,7 +377,7 @@ void midiPort::updateReadablePorts( void )
 
 
 
-void midiPort::updateWriteablePorts( void )
+void midiPort::updateWritablePorts( void )
 {
 	// first save all selected ports
 	QStringList selected_ports;
@@ -391,13 +391,13 @@ void midiPort::updateWriteablePorts( void )
 	}
 
 	m_writablePorts.clear();
-	const QStringList & wp = m_midiClient->writeablePorts();
+	const QStringList & wp = m_midiClient->writablePorts();
 	// now insert new ports and restore selections
 	for( QStringList::const_iterator it = wp.begin(); it != wp.end(); ++it )
 	{
 		m_writablePorts[*it] = ( selected_ports.indexOf( *it ) != -1 );
 	}
-	emit writeablePortsChanged();
+	emit writablePortsChanged();
 }
 
 
