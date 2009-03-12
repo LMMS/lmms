@@ -50,6 +50,10 @@
 #include <process.h>
 #endif
 
+#ifdef LMMS_HAVE_UNISTD_H
+#include <unistd.h>
+#endif
+
 #include "config_mgr.h"
 #include "embed.h"
 #include "engine.h"
@@ -345,6 +349,7 @@ int main( int argc, char * * argv )
 	// try to set realtime priority
 #ifdef LMMS_BUILD_LINUX
 #ifdef LMMS_HAVE_SCHED_H
+#ifndef __OpenBSD__
 	struct sched_param sparam;
 	sparam.sched_priority = ( sched_get_priority_max( SCHED_FIFO ) +
 				sched_get_priority_min( SCHED_FIFO ) ) / 2;
@@ -352,6 +357,7 @@ int main( int argc, char * * argv )
 	{
 		printf( "Notice: could not set realtime priority.\n" );
 	}
+#endif
 #endif
 #endif
 

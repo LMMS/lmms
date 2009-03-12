@@ -1,7 +1,7 @@
 /*
  * remote_plugin.h - base class providing RPC like mechanisms
  *
- * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -62,6 +62,10 @@ typedef int32_t key_t;
 
 #ifdef LMMS_HAVE_SYS_SHM_H
 #include <sys/shm.h>
+#endif
+
+#ifdef LMMS_HAVE_UNISTD_H
+#include <unistd.h>
 #endif
 
 #endif
