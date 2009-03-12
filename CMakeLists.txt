@@ -490,6 +490,7 @@ ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_BINARY_DIR}/lmms.1.gz COMMAND gzip -c ${CMAKE_
 ADD_EXECUTABLE(lmms ${lmms_SOURCES} ${lmms_INCLUDES} ${LIBSAMPLERATE_SOURCES} ${LMMS_ER_H} ${lmms_UI_out} lmmsconfig.h lmmsversion.h ${WINRC} ${CMAKE_BINARY_DIR}/lmms.1.gz)
 
 IF(LMMS_BUILD_WIN32)
+
 	SET_TARGET_PROPERTIES(lmms PROPERTIES LINK_FLAGS "${LINK_FLAGS} -mwindows")
 	ADD_CUSTOM_COMMAND(TARGET lmms POST_BUILD COMMAND ${STRIP} ${CMAKE_BINARY_DIR}/lmms.exe)
 
@@ -499,9 +500,13 @@ IF(LMMS_BUILD_WIN32)
 	ELSE(LMMS_BUILD_WIN64)
 		INSTALL(FILES /opt/mingw32/bin/QtCore4.dll /opt/mingw32/bin/QtGui4.dll /opt/mingw32/bin/QtXml4.dll /opt/mingw32/bin/QtNetwork4.dll /opt/mingw32/bin/libz.dll /opt/mingw32/bin/libsndfile-1.dll /opt/mingw32/bin/libvorbis-0.dll /opt/mingw32/bin/libvorbisenc-2.dll /opt/mingw32/bin/libvorbisfile-3.dll /opt/mingw32/bin/libogg-0.dll /opt/mingw32/bin/libfluidsynth-1.dll /opt/mingw32/bin/libfftw3f-3.dll /opt/mingw32/bin/SDL.dll /opt/mingw32/i586-mingw32/bin/mingwm10.dll DESTINATION .)
 	ENDIF(LMMS_BUILD_WIN64)
+
 ELSE(LMMS_BUILD_WIN32)
+	SET_TARGET_PROPERTIES(lmms PROPERTIES LINK_FLAGS "${LINK_FLAGS} -Wl,-E")
+
 	INSTALL(TARGETS lmms RUNTIME DESTINATION bin)
 	INSTALL(FILES ${CMAKE_BINARY_DIR}/lmms.1.gz DESTINATION ${CMAKE_INSTALL_PREFIX}/share/man/man1/ PERMISSIONS OWNER_READ GROUP_READ WORLD_READ)
+
 ENDIF(LMMS_BUILD_WIN32)
 
 #

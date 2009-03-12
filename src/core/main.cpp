@@ -3,7 +3,7 @@
 /*
  * main.cpp - just main.cpp which is starting up app...
  *
- * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -48,6 +48,10 @@
 
 #ifdef LMMS_HAVE_PROCESS_H
 #include <process.h>
+#endif
+
+#ifdef LMMS_HAVE_UNISTD_H
+#include <unistd.h>
 #endif
 
 #include "lmmsversion.h"
@@ -355,6 +359,7 @@ int main( int argc, char * * argv )
 	// try to set realtime priority
 #ifdef LMMS_BUILD_LINUX
 #ifdef LMMS_HAVE_SCHED_H
+#ifndef __OpenBSD__
 	struct sched_param sparam;
 	sparam.sched_priority = ( sched_get_priority_max( SCHED_FIFO ) +
 				sched_get_priority_min( SCHED_FIFO ) ) / 2;
@@ -362,6 +367,7 @@ int main( int argc, char * * argv )
 	{
 		printf( "Notice: could not set realtime priority.\n" );
 	}
+#endif
 #endif
 #endif
 

@@ -3,7 +3,7 @@
 /*
  * audio_oss.cpp - device-class that implements OSS-PCM-output
  *
- * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -57,7 +57,7 @@
 #ifdef LMMS_HAVE_SYS_SOUNDCARD_H
 // This is recommended by OSS
 #include <sys/soundcard.h>
-#elif LMMS_HAVE_SOUNDCARD_H
+#elif defined(LMMS_HAVE_SOUNDCARD_H)
 // This is installed on some systems
 #include <soundcard.h>
 #endif
