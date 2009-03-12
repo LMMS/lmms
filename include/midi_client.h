@@ -1,7 +1,7 @@
 /*
  * midi_client.h - base-class for MIDI-clients like ALSA-sequencer-client
  *
- * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -68,12 +68,12 @@ public:
 		return( FALSE );
 	}
 
-	// if not raw-client, return all readable/writeable ports
+	// if not raw-client, return all readable/writable ports
 	virtual QStringList readablePorts( void ) const
 	{
 		return QStringList();
 	}
-	virtual QStringList writeablePorts( void ) const
+	virtual QStringList writablePorts( void ) const
 	{
 		return QStringList();
 	}
@@ -82,7 +82,7 @@ public:
 	virtual void subscribeReadablePort( midiPort * _port,
 						const QString & _dest,
 						bool _subscribe = TRUE );
-	virtual void subscribeWriteablePort( midiPort * _port,
+	virtual void subscribeWritablePort( midiPort * _port,
 						const QString & _dest,
 						bool _subscribe = TRUE );
 

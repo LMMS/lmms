@@ -1,7 +1,7 @@
 /*
  * midi_winmm.h - WinMM MIDI client
  *
- * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -72,7 +72,7 @@ public:
 		return( m_inputDevices.values() );
 	}
 
-	virtual QStringList writeablePorts( void ) const
+	virtual QStringList writeblePorts( void ) const
 	{
 		return( m_outputDevices.values() );
 	}
@@ -82,7 +82,7 @@ public:
 	virtual void subscribeReadablePort( midiPort * _port,
 						const QString & _dest,
 						bool _subscribe = TRUE );
-	virtual void subscribeWriteablePort( midiPort * _port,
+	virtual void subscribeWritablePort( midiPort * _port,
 						const QString & _dest,
 						bool _subscribe = TRUE );
 	virtual void connectRPChanged( QObject * _receiver,
@@ -95,7 +95,7 @@ public:
 	virtual void connectWPChanged( QObject * _receiver,
 							const char * _member )
 	{
-		connect( this, SIGNAL( writeablePortsChanged() ),
+		connect( this, SIGNAL( writablePortsChanged() ),
 							_receiver, _member );
 	}
 
@@ -145,7 +145,7 @@ private:
 
 signals:
 	void readablePortsChanged( void );
-	void writeablePortsChanged( void );
+	void writablePortsChanged( void );
 
 } ;
 

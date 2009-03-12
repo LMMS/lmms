@@ -2,7 +2,7 @@
  * midi_port_menu.cpp - a menu for subscribing a midiPort to several external
  *                      MIDI ports
  *
- * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -58,7 +58,7 @@ void midiPortMenu::modelChanged( void )
 	}
 	else if( m_mode == midiPort::Output )
 	{
-		connect( mp, SIGNAL( writeablePortsChanged() ),
+		connect( mp, SIGNAL( writablePortsChanged() ),
 			this, SLOT( updatePorts() ) );
 	}
 	updatePorts();
@@ -76,7 +76,7 @@ void midiPortMenu::activatedPort( QAction * _item )
 	}
 	else if( m_mode == midiPort::Output )
 	{
-		castModel<midiPort>()->subscribeWriteablePort( _item->text(),
+		castModel<midiPort>()->subscribeWritablePort( _item->text(),
 							_item->isChecked() );
 	}
 }

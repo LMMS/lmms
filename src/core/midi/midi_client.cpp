@@ -3,7 +3,7 @@
 /*
  * midi_client.cpp - base-class for MIDI-clients like ALSA-sequencer-client
  *
- * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * This file partly contains code from Fluidsynth, Peter Hanappe
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
@@ -94,7 +94,7 @@ void midiClient::subscribeReadablePort( midiPort *, const QString & , bool )
 
 
 
-void midiClient::subscribeWriteablePort( midiPort * , const QString & , bool)
+void midiClient::subscribeWritablePort( midiPort * , const QString & , bool )
 {
 }
 
