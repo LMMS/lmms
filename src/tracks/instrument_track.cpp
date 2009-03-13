@@ -790,7 +790,8 @@ void instrumentTrack::loadTrackSpecificSettings( const QDomElement & _this )
 			// compat code - if node-name doesn't match any known
 			// one, we assume that it is an instrument-plugin
 			// which we'll try to load
-			else if( automationPattern::classNodeName() !=
+			else if( node.nodeName() != "connection" &&
+					automationPattern::classNodeName() !=
 							node.nodeName() &&
 					!node.toElement().hasAttribute( "id" ) )
 			{
