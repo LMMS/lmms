@@ -75,10 +75,10 @@ public:
 	// list seq-ports from ALSA 
 	virtual QStringList readablePorts( void ) const
 	{
-		return( m_readablePorts );
+		return m_readablePorts;
 	}
 
-	virtual QStringList writeblePorts( void ) const
+	virtual QStringList writablePorts( void ) const
 	{
 		return m_writablePorts;
 	}
