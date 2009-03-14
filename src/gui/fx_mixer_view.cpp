@@ -1,7 +1,7 @@
 /*
  * fx_mixer_view.cpp - effect-mixer-view for LMMS
  *
- * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -97,6 +97,7 @@ public:
 		}
 	}
 
+
 private:
 	fxMixerView * m_mv;
 	QString & m_name;
@@ -173,6 +174,7 @@ fxMixerView::fxMixerView() :
 
 
 		cv->m_fader = new fader( &m->m_fxChannels[i]->m_volumeModel,
+						tr( "FX Fader %1" ).arg( i ),
 								cv->m_fxLine );
 		cv->m_fader->move( 15-cv->m_fader->width()/2,
 						cv->m_fxLine->height()-
