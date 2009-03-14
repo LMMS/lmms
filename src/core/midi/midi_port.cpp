@@ -266,7 +266,7 @@ void midiPort::loadSettings( const QDomElement & _this )
 		{
 			if( it.value() != ( wp.indexOf( it.key() ) != -1 ) )
 			{
-				subscribeReadablePort( it.key() );
+				subscribeWritablePort( it.key() );
 			}
 		}
 		emit writablePortsChanged();
