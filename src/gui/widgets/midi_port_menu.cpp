@@ -59,7 +59,7 @@ void midiPortMenu::modelChanged( void )
 	else if( m_mode == midiPort::Output )
 	{
 		connect( mp, SIGNAL( writablePortsChanged() ),
-			this, SLOT( updatePorts() ) );
+				this, SLOT( updatePorts() ) );
 	}
 	updatePorts();
 }
@@ -94,7 +94,7 @@ void midiPortMenu::updatePorts( void )
 							it != map.end(); ++it )
 	{
 		QAction * a = addAction( it.key() );
-		a->setCheckable( TRUE );
+		a->setCheckable( true );
 		a->setChecked( it.value() );
 	}
 }
