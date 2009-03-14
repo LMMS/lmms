@@ -1,7 +1,7 @@
 /*
  * fader.cpp - fader-widget used in mixer - partly taken from Hydrogen
  *
- * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -57,7 +57,7 @@
 
 
 
-fader::fader( floatModel * _model, QWidget * _parent ) :
+fader::fader( floatModel * _model, const QString & _name, QWidget * _parent ) :
 	QWidget( _parent ),
 	floatModelView( _model, this ),
 	m_model( _model ),
@@ -69,6 +69,7 @@ fader::fader( floatModel * _model, QWidget * _parent ) :
 	m_leds( embed::getIconPixmap( "fader_leds" ) ),
 	m_knob( embed::getIconPixmap( "fader_knob" ) )
 {
+	setAccessibleName( _name );
 	setAttribute( Qt::WA_OpaquePaintEvent, true );
 	setMinimumSize( 23, 116 );
 	setMaximumSize( 23, 116);

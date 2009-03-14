@@ -1,7 +1,7 @@
 /*
  * fader.h - fader-widget used in FX-mixer - partly taken from Hydrogen
  *
- * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -58,7 +58,7 @@ class fader : public QWidget, public floatModelView
 {
 	Q_OBJECT
 public:
-	fader( floatModel * _model, QWidget * _parent );
+	fader( floatModel * _model, const QString & _name, QWidget * _parent );
 	virtual ~fader();
 
 	void setMaxPeak( float _max );
