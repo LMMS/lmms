@@ -136,12 +136,12 @@ const automatableModel * automationPattern::firstObject( void ) const
 //TODO: Improve this
 midiTime automationPattern::length( void ) const
 {
-	tick max_length = 0;
+	tick_t max_length = 0;
 
 	for( timeMap::const_iterator it = m_timeMap.begin();
 						it != m_timeMap.end(); ++it )
 	{
-		max_length = qMax<tick>( max_length, it.key() );
+		max_length = qMax<tick_t>( max_length, it.key() );
 	}
 	return midiTime( qMax( midiTime( max_length ).getTact() + 1, 1 ), 0 );
 }

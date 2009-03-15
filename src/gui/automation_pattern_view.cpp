@@ -1,7 +1,7 @@
 /*
  * automation_pattern_view.cpp - implementation of view for automationPattern
  *
- * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -215,7 +215,7 @@ void automationPatternView::paintEvent( QPaintEvent * )
 	const int x_base = TCO_BORDER_WIDTH;
 	p.setPen( QColor( 0, 0, 0 ) );
 
-	for( tact t = 1; t < m_pat->length().getTact(); ++t )
+	for( tact_t t = 1; t < m_pat->length().getTact(); ++t )
 	{
 		p.drawLine( x_base + static_cast<int>( ppt * t ) - 1,
 				TCO_BORDER_WIDTH, x_base + static_cast<int>(

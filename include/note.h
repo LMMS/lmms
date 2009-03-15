@@ -85,8 +85,8 @@ public:
 	note( const midiTime & _length = midiTime( 0 ),
 		const midiTime & _pos = midiTime( 0 ),
 		int key = DefaultKey,
-		volume _volume = DefaultVolume,
-		panning _panning = DefaultPanning,
+		volume_t _volume = DefaultVolume,
+		panning_t _panning = DefaultPanning,
 		detuningHelper * _detuning = NULL );
 	note( const note & _note );
 	virtual ~note();
@@ -108,12 +108,12 @@ public:
 	void setLength( const midiTime & _length );
 	void setPos( const midiTime & _pos );
 	void setKey( const int _key );
-	virtual void setVolume( const volume _volume = DefaultVolume );
-	void setPanning( const panning _panning = DefaultPanning );
+	virtual void setVolume( const volume_t _volume = DefaultVolume );
+	void setPanning( const panning_t _panning = DefaultPanning );
 	void quantizeLength( const int _q_grid );
 	void quantizePos( const int _q_grid );
 
-	static inline bool lessThan(note * &lhs, note * &rhs)
+	static inline bool lessThan( note * &lhs, note * &rhs )
 	{
 		// function to compare two notes - must be called explictly when
 		// using qSort
@@ -172,12 +172,12 @@ public:
 		return m_key;
 	}
 
-	inline volume getVolume( void ) const
+	inline volume_t getVolume( void ) const
 	{
 		return m_volume;
 	}
 
-	inline panning getPanning( void ) const
+	inline panning_t getPanning( void ) const
 	{
 		return m_panning;
 	}
@@ -232,8 +232,8 @@ private:
 	bool m_isPlaying;
 	
 	int m_key;
-	volume m_volume;
-	panning m_panning;
+	volume_t m_volume;
+	panning_t m_panning;
 	midiTime m_length;
 	midiTime m_pos;
 	detuningHelper * m_detuning;

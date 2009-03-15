@@ -238,7 +238,7 @@ void timeLine::paintEvent( QPaintEvent * )
 	p.setOpacity( 1.0 );
 
 
-	tact tact_num = m_begin.getTact();
+	tact_t tact_num = m_begin.getTact();
 	int x = m_xOffset + s_posMarkerPixmap->width() / 2 -
 			( ( static_cast<Sint32>( m_begin * m_ppt ) /
 						midiTime::ticksPerTact() ) %

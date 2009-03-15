@@ -2,7 +2,7 @@
  * track.h - declaration of classes concerning tracks -> neccessary for all
  *           track-like objects (beat/bassline, sample-track...)
  *
- * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -409,7 +409,7 @@ public:
 	void insertTact( const midiTime & _pos );
 	void removeTact( const midiTime & _pos );
 
-	tact length( void ) const;
+	tact_t length( void ) const;
 
 
 	inline trackContainer * getTrackContainer( void ) const

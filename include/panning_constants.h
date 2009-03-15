@@ -2,7 +2,7 @@
  * panning_constants.h - declaration of some constants, concerning the
  *             panning of a note
  *
- * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -26,9 +26,9 @@
 #ifndef _PANNING_CONSTANTS_H
 #define _PANNING_CONSTANTS_H
 
-const panning PanningRight = ( 0 + 100 );
-const panning PanningLeft = - PanningRight;
-const panning PanningCenter = 0;
-const panning DefaultPanning = PanningCenter;
+const panning_t PanningRight = ( 0 + 100 );
+const panning_t PanningLeft = - PanningRight;
+const panning_t PanningCenter = 0;
+const panning_t DefaultPanning = PanningCenter;
 
 #endif

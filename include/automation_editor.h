@@ -204,17 +204,17 @@ private:
 
 	actions m_action;
 
-	tick m_selectStartTick;
-	tick m_selectedTick;
+	tick_t m_selectStartTick;
+	tick_t m_selectedTick;
 	float m_selectStartLevel;
 	float m_selectedLevels;
 
 	float m_moveStartLevel;
-	tick m_moveStartTick;
+	tick_t m_moveStartTick;
 	int m_moveXOffset;
 
 	float m_drawLastLevel;
-	tick m_drawLastTick;
+	tick_t m_drawLastTick;
 
 	int m_ppt;
 	int m_y_delta;

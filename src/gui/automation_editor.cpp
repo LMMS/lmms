@@ -1903,10 +1903,10 @@ void automationEditor::getSelectedValues( timeMap & _selected_values )
 									++it )
 	{
 		//TODO: Add constant
-		tick len_ticks = DefaultTicksPerTact / 16;
+		tick_t len_ticks = DefaultTicksPerTact / 16;
 
 		float level = it.value();
-		tick pos_ticks = it.key();
+		tick_t pos_ticks = it.key();
 
 		if( level >= selLevel_start && level <= selLevel_end &&
 				pos_ticks >= sel_pos_start &&

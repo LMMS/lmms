@@ -3,7 +3,7 @@
 /*
  * bb_track.cpp - implementation of class bbTrack and bbTCO
  *
- * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -53,7 +53,7 @@ bbTCO::bbTCO( track * _track, unsigned int _color ) :
 	trackContentObject( _track ),
 	m_color( _color > 0 ? _color : qRgb( 64, 128, 255 ) )
 {
-	tact t = engine::getBBTrackContainer()->lengthOfBB(
+	tact_t t = engine::getBBTrackContainer()->lengthOfBB(
 					bbTrack::numOfBBTrack( getTrack() ) );
 	if( t > 0 )
 	{
@@ -193,7 +193,7 @@ void bbTCOView::paintEvent( QPaintEvent * )
 	lingrad.setColorAt( 1, col.light( 70 ) );
 	p.fillRect( rect(), lingrad );
 
-	tact t = engine::getBBTrackContainer()->lengthOfBB(
+	tact_t t = engine::getBBTrackContainer()->lengthOfBB(
 				bbTrack::numOfBBTrack( m_bbTCO->getTrack() ) );
 	if( m_bbTCO->length() > midiTime::ticksPerTact() && t > 0 )
 	{

@@ -471,7 +471,7 @@ void songEditor::keyPressEvent( QKeyEvent * _ke )
 	}
 	else if( _ke->key() == Qt::Key_Left )
 	{
-		tick t = m_s->currentTick() - midiTime::ticksPerTact();
+		tick_t t = m_s->currentTick() - midiTime::ticksPerTact();
 		if( t >= 0 )
 		{
 			m_s->setPlayPos( t, song::Mode_PlaySong );
@@ -479,7 +479,7 @@ void songEditor::keyPressEvent( QKeyEvent * _ke )
 	}
 	else if( _ke->key() == Qt::Key_Right )
 	{
-		tick t = m_s->currentTick() + midiTime::ticksPerTact();
+		tick_t t = m_s->currentTick() + midiTime::ticksPerTact();
 		if( t < MaxSongLength )
 		{
 			m_s->setPlayPos( t, song::Mode_PlaySong );

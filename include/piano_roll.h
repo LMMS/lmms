@@ -291,8 +291,8 @@ private:
 	// remember these values to use them 
 	// for the next note that is set
 	midiTime m_lenOfNewNotes;
-	volume m_lastNoteVolume;
-	panning m_lastNotePanning;
+	volume_t m_lastNoteVolume;
+	panning_t m_lastNotePanning;
 
 	int m_startKey;			// first key when drawing
 	int m_lastKey;

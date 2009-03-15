@@ -1996,21 +1996,21 @@ void track::removeTact( const midiTime & _pos )
  *  keeping track of the latest time found in ticks.  Then we return
  *  that in bars by dividing by the number of ticks per bar.
  */
-tact track::length( void ) const
+tact_t track::length( void ) const
 {
 	// find last end-position
-	tick last = 0;
+	tick_t last = 0;
 	for( tcoVector::const_iterator it = m_trackContentObjects.begin();
 				it != m_trackContentObjects.end(); ++it )
 	{
-		const tick cur = ( *it )->endPosition();
+		const tick_t cur = ( *it )->endPosition();
 		if( cur > last )
 		{
 			last = cur;
 		}
 	}
 
-	return( last / midiTime::ticksPerTact() );
+	return last / midiTime::ticksPerTact();
 }
 
 

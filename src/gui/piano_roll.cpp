@@ -1989,12 +1989,12 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 			const noteVector & notes = m_pattern->notes();
 
 			// determine what volume/panning to set note to
-			volume vol = tLimit<int>( MinVolume +
+			volume_t vol = tLimit<int>( MinVolume +
 							( ( (float)noteEditBottom() ) - ( (float)_me->y() ) ) / 
 							( (float)( noteEditBottom() - noteEditTop() ) ) * 
 							( MaxVolume - MinVolume ),
 										MinVolume, MaxVolume );
-			panning pan = tLimit<int>( PanningLeft +
+			panning_t pan = tLimit<int>( PanningLeft +
 							( (float)( noteEditBottom() - _me->y() ) ) /
 							( (float)( noteEditBottom() - noteEditTop() ) ) * 
 							( (float)( PanningRight - PanningLeft ) ),

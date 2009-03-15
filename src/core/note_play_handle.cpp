@@ -4,7 +4,7 @@
  * note_play_handle.cpp - implementation of class notePlayHandle, part of
  *                        rendering engine
  *
- * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -149,7 +149,7 @@ notePlayHandle::~notePlayHandle()
 
 
 
-void notePlayHandle::setVolume( const volume _volume )
+void notePlayHandle::setVolume( const volume_t _volume )
 {
 	note::setVolume( _volume );
 	m_instrumentTrack->processOutEvent( midiEvent( MidiKeyPressure,

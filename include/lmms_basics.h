@@ -1,7 +1,7 @@
 /*
  * types.h - typedefs for common types that are used in the whole app
  *
- * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -42,12 +42,12 @@ typedef unsigned int	Uint32;
 typedef signed int	Sint32;
 
 
-typedef Uint32 minute;
-typedef Sint8 second;
-typedef Sint32 tact;
-typedef Sint32 tick;
-typedef Uint8 volume;
-typedef Sint8 panning;
+typedef Uint32 minute_t;
+typedef Sint8 second_t;
+typedef Sint32 tact_t;
+typedef Sint32 tick_t;
+typedef Uint8 volume_t;
+typedef Sint8 panning_t;
 
 
 typedef float sample_t;			// standard sample-type

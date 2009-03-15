@@ -55,7 +55,7 @@ public:
 					const bool _part_of_arp = false );
 	virtual ~notePlayHandle();
 
-	virtual void setVolume( const volume _volume = DefaultVolume );
+	virtual void setVolume( const volume_t _volume = DefaultVolume );
 
 	int getMidiVelocity( void ) const;
 
