@@ -2,7 +2,7 @@
  * midi_time.h - declaration of class midiTime which provides data-type for
  *               position- and length-variables
  *
- * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -38,12 +38,12 @@ const int DefaultBeatsPerTact = DefaultTicksPerTact / DefaultStepsPerTact;
 class EXPORT midiTime
 {
 public:
-	inline midiTime( const tact _tact, const tick _ticks ) :
+	inline midiTime( const tact_t _tact, const tick_t _ticks ) :
 		m_ticks( _tact * s_ticksPerTact + _ticks )
 	{
 	}
 
-	inline midiTime( const tick _ticks = 0 ) :
+	inline midiTime( const tick_t _ticks = 0 ) :
 		m_ticks( _ticks )
 	{
 	}
@@ -57,15 +57,15 @@ public:
 	{
 		if( m_ticks % s_ticksPerTact >= s_ticksPerTact/2 )
 		{
-			return( ( getTact() + 1 ) * s_ticksPerTact );
+			return ( getTact() + 1 ) * s_ticksPerTact;
 		}
-		return( getTact() * s_ticksPerTact );
+		return getTact() * s_ticksPerTact;
 	}
 
 	inline midiTime & operator=( const midiTime & _t )
 	{
 		m_ticks = _t.m_ticks;
-		return( *this );
+		return *this;
 	}
 
 	inline midiTime & operator+=( const midiTime & _t )
@@ -80,33 +80,33 @@ public:
 		return *this;
 	}
 
-	inline tact getTact( void ) const
+	inline tact_t getTact( void ) const
 	{
-		return( m_ticks / s_ticksPerTact );
+		return m_ticks / s_ticksPerTact;
 	}
 
-	inline tact nextFullTact( void ) const
+	inline tact_t nextFullTact( void ) const
 	{
 		if( m_ticks % s_ticksPerTact == 0 )
 		{
-			return( m_ticks / s_ticksPerTact );
+			return m_ticks / s_ticksPerTact;
 		}
-		return( m_ticks / s_ticksPerTact + 1 );
+		return m_ticks / s_ticksPerTact + 1;
 	}
 
-	inline void setTicks( tick _t )
+	inline void setTicks( tick_t _t )
 	{
 		m_ticks = _t;
 	}
 
-	inline tick getTicks( void ) const
+	inline tick_t getTicks( void ) const
 	{
-		return( m_ticks );
+		return m_ticks;
 	}
 
 	inline operator int( void ) const
 	{
-		return( m_ticks );
+		return m_ticks;
 	}
 
 	// calculate number of frame that are needed this time
@@ -114,39 +114,39 @@ public:
 	{
 		if( m_ticks >= 0 )
 		{
-			return( static_cast<f_cnt_t>( m_ticks *
-							_frames_per_tick ) );
+			return static_cast<f_cnt_t>( m_ticks *
+							_frames_per_tick );
 		}
-		return( 0 );
+		return 0;
 	}
 
 	static inline midiTime fromFrames( const f_cnt_t _frames,
 					const float _frames_per_tick )
 	{
-		return( midiTime( static_cast<int>( _frames /
-							_frames_per_tick ) ) );
+		return midiTime( static_cast<int>( _frames /
+							_frames_per_tick ) );
 	}
 
 
-	static tick ticksPerTact( void )
+	static tick_t ticksPerTact( void )
 	{
-		return( s_ticksPerTact );
+		return s_ticksPerTact;
 	}
 
 	static int stepsPerTact( void )
 	{
-		return( ticksPerTact() / DefaultBeatsPerTact );
+		return ticksPerTact() / DefaultBeatsPerTact;
 	}
 
-	static void setTicksPerTact( tick _tpt )
+	static void setTicksPerTact( tick_t _tpt )
 	{
 		s_ticksPerTact = _tpt;
 	}
 
 private:
-	tick m_ticks;
+	tick_t m_ticks;
 
-	static tick s_ticksPerTact;
+	static tick_t s_ticksPerTact;
 
 } ;
 

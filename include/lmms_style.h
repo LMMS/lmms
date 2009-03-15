@@ -120,7 +120,7 @@ class LmmsStyleOptionTCO
 		bool selected;
 		bool hovered;
 		QColor userColor;
-		tick duration;
+		tick_t duration;
 };
 
 

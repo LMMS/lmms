@@ -38,7 +38,7 @@
 
 
 note::note( const midiTime & _length, const midiTime & _pos,
-		int _key, volume _volume, panning _panning,
+		int _key, volume_t _volume, panning_t _panning,
 						detuningHelper * _detuning ) :
 	m_selected( false ),
 	m_oldKey( tLimit( _key, 0, NumKeys ) ),
@@ -134,9 +134,9 @@ void note::setKey( const int _key )
 
 
 
-void note::setVolume( const volume _volume )
+void note::setVolume( const volume_t _volume )
 {
-	const volume v = tLimit( _volume, MinVolume, MaxVolume );
+	const volume_t v = tLimit( _volume, MinVolume, MaxVolume );
 //	addJournalEntry( journalEntry( ChangeVolume, (int) m_volume - v ) );
 	m_volume = v;
 }
@@ -144,9 +144,9 @@ void note::setVolume( const volume _volume )
 
 
 
-void note::setPanning( const panning _panning )
+void note::setPanning( const panning_t _panning )
 {
-	const panning p = tLimit( _panning, PanningLeft, PanningRight );
+	const panning_t p = tLimit( _panning, PanningLeft, PanningRight );
 //	addJournalEntry( journalEntry( ChangePanning, (int) m_panning - p ) );
 	m_panning = p;
 }

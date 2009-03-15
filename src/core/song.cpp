@@ -1,7 +1,7 @@
 /*
  * song.cpp - root of the model-tree
  *
- * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -62,7 +62,7 @@
 #include "timeline.h"
 
 
-tick midiTime::s_ticksPerTact = DefaultTicksPerTact;
+tick_t midiTime::s_ticksPerTact = DefaultTicksPerTact;
 
 
 
@@ -568,7 +568,7 @@ void song::updateLength( void )
 	for( trackList::const_iterator it = tracks().begin();
 						it != tracks().end(); ++it )
 	{
-		const tact cur = ( *it )->length();
+		const tact_t cur = ( *it )->length();
 		if( cur > m_length )
 		{
 			m_length = cur;
@@ -580,7 +580,7 @@ void song::updateLength( void )
 
 
 
-void song::setPlayPos( tick _ticks, PlayModes _play_mode )
+void song::setPlayPos( tick_t _ticks, PlayModes _play_mode )
 {
 	m_playPos[_play_mode].setTicks( _ticks );
 	m_playPos[_play_mode].setCurrentFrame( 0.0f );

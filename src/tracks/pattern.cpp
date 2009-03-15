@@ -139,14 +139,14 @@ midiTime pattern::length( void ) const
 		return beatPatternLength();
 	}
 
-	tick max_length = midiTime::ticksPerTact();
+	tick_t max_length = midiTime::ticksPerTact();
 
 	for( noteVector::const_iterator it = m_notes.begin();
 						it != m_notes.end(); ++it )
 	{
 		if( ( *it )->length() > 0 )
 		{
-			max_length = qMax<tick>( max_length,
+			max_length = qMax<tick_t>( max_length,
 							( *it )->endPos() );
 		}
 	}
@@ -159,14 +159,15 @@ midiTime pattern::length( void ) const
 
 midiTime pattern::beatPatternLength( void ) const
 {
-	tick max_length = midiTime::ticksPerTact();
+	tick_t max_length = midiTime::ticksPerTact();
 
 	for( noteVector::const_iterator it = m_notes.begin();
 						it != m_notes.end(); ++it )
 	{
 		if( ( *it )->length() < 0 )
 		{
-			max_length = qMax<tick>( max_length, ( *it )->pos() +
+			max_length = qMax<tick_t>( max_length,
+				( *it )->pos() +
 					midiTime::ticksPerTact() /
 						midiTime::stepsPerTact() );
 		}
@@ -618,7 +619,8 @@ void pattern::changeTimeSignature( void )
 			++it;
 		}
 	}
-	m_steps = qMax<tick>( qMax<tick>( m_steps, midiTime::stepsPerTact() ),
+	m_steps = qMax<tick_t>(
+		qMax<tick_t>( m_steps, midiTime::stepsPerTact() ),
 				last_pos.getTact() * midiTime::stepsPerTact() );
 	ensureBeatNotes();
 }
@@ -1159,7 +1161,7 @@ void patternView::paintEvent( QPaintEvent * )
 	const int x_base = TCO_BORDER_WIDTH;
 	p.setPen( QColor( 0, 0, 0 ) );
 
-	for( tact t = 1; t < m_pat->length().getTact(); ++t )
+	for( tact_t t = 1; t < m_pat->length().getTact(); ++t )
 	{
 		p.drawLine( x_base + static_cast<int>( ppt * t ) - 1,
 				TCO_BORDER_WIDTH, x_base + static_cast<int>(

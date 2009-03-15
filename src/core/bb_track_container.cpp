@@ -1,7 +1,7 @@
 /*
  * bb_track_container.cpp - model-component of BB-Editor
  *
- * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -93,7 +93,7 @@ void bbTrackContainer::updateAfterTrackAdd( void )
 
 
 
-tact bbTrackContainer::lengthOfBB( int _bb )
+tact_t bbTrackContainer::lengthOfBB( int _bb )
 {
 	midiTime max_length = midiTime::ticksPerTact();
 

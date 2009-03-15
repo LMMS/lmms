@@ -1,7 +1,7 @@
 /*
  * song.h - class song - the root of the model-tree
  *
- * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -42,7 +42,7 @@ class timeLine;
 const bpm_t MinTempo = 10;
 const bpm_t DefaultTempo = 140;
 const bpm_t MaxTempo = 999;
-const tick MaxSongLength = 9999 * DefaultTicksPerTact;
+const tick_t MaxSongLength = 9999 * DefaultTicksPerTact;
 
 
 class EXPORT song : public trackContainer
@@ -70,7 +70,7 @@ public:
 		playPos( const int _abs = 0 ) :
 			midiTime( _abs ),
 			m_timeLine( NULL ),
-			m_timeLineUpdate( TRUE ),
+			m_timeLineUpdate( true ),
 			m_currentFrame( 0.0f )
 		{
 		}
@@ -80,7 +80,7 @@ public:
 		}
 		inline float currentFrame( void ) const
 		{
-			return( m_currentFrame );
+			return m_currentFrame;
 		}
 		timeLine * m_timeLine;
 		bool m_timeLineUpdate;
@@ -97,46 +97,46 @@ public:
 
 	inline bool isPaused( void ) const
 	{
-		return( m_paused );
+		return m_paused;
 	}
 
 	inline bool isPlaying( void ) const
 	{
-		return( m_playing && m_exporting == FALSE );
+		return m_playing && m_exporting == false;
 	}
 
 	inline bool isExporting( void ) const
 	{
-		return( m_exporting );
+		return m_exporting;
 	}
 
 	inline bool isRecording( void ) const
 	{
-		return( m_recording );
+		return m_recording;
 	}
 
 	bool realTimeTask( void ) const;
 
 	inline bool isExportDone( void ) const
 	{
-		return( m_exporting == TRUE &&
-			m_playPos[Mode_PlaySong].getTact() >= length() + 1 );
+		return m_exporting == true &&
+			m_playPos[Mode_PlaySong].getTact() >= length() + 1;
 	}
 
 	inline PlayModes playMode( void ) const
 	{
-		return( m_playMode );
+		return m_playMode;
 	}
 
 	inline playPos & getPlayPos( PlayModes _pm )
 	{
-		return( m_playPos[_pm] );
+		return m_playPos[_pm];
 	}
 
 	void updateLength( void );
-	tact length( void ) const
+	tact_t length( void ) const
 	{
-		return( m_length );
+		return m_length;
 	}
 
 
@@ -145,7 +145,7 @@ public:
 
 	automationTrack * globalAutomationTrack( void )
 	{
-		return( m_globalAutomationTrack );
+		return m_globalAutomationTrack;
 	}
 
 	// file management
@@ -156,25 +156,25 @@ public:
 	bool saveProjectAs( const QString & _file_name );
 	inline const QString & projectFileName( void ) const
 	{
-		return( m_fileName );
+		return m_fileName;
 	}
 	inline bool isLoadingProject( void ) const
 	{
-		return( m_loadingProject );
+		return m_loadingProject;
 	}
 	inline bool isModified( void ) const
 	{
-		return( m_modified );
+		return m_modified;
 	}
 
 	inline virtual QString nodeName( void ) const
 	{
-		return( "song" );
+		return "song";
 	}
 
 	virtual inline bool fixedTCOs( void ) const
 	{
-		return( FALSE );
+		return false;
 	}
 
 	void addController( controller * _c );
@@ -189,7 +189,7 @@ public:
 
 	meterModel & getTimeSigModel( void )
 	{
-		return( m_timeSigModel );
+		return m_timeSigModel;
 	}
 
 
@@ -200,7 +200,7 @@ public slots:
 	void stop( void );
 	void playTrack( track * _trackToPlay );
 	void playBB( void );
-	void playPattern( pattern * _patternToPlay, bool _loop = TRUE );
+	void playPattern( pattern * _patternToPlay, bool _loop = true );
 	void pause( void );
 	void resumeFromPause( void );
 
@@ -242,21 +242,21 @@ private:
 
 	inline int ticksPerTact( void ) const
 	{
-		return( DefaultTicksPerTact *
+		return DefaultTicksPerTact *
 				m_timeSigModel.getNumerator() /
-					 m_timeSigModel.getDenominator() );
+					 m_timeSigModel.getDenominator();
 	}
 
-	inline tact currentTact( void ) const
+	inline tact_t currentTact( void ) const
 	{
-		return( m_playPos[m_playMode].getTact() );
+		return m_playPos[m_playMode].getTact();
 	}
 
-	inline tick currentTick( void ) const
+	inline tick_t currentTick( void ) const
 	{
-		return( m_playPos[m_playMode].getTicks() );
+		return m_playPos[m_playMode].getTicks();
 	}
-	void setPlayPos( tick _ticks, PlayModes _play_mode );
+	void setPlayPos( tick_t _ticks, PlayModes _play_mode );
 
 	void saveControllerStates( QDomDocument & _doc, QDomElement & _this );
 	void restoreControllerStates( const QDomElement & _this );
@@ -286,7 +286,7 @@ private:
 
 	PlayModes m_playMode;
 	playPos m_playPos[Mode_Count];
-	tact m_length;
+	tact_t m_length;
 
 	track * m_trackToPlay;
 	pattern * m_patternToPlay;

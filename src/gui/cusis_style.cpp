@@ -966,7 +966,7 @@ void CusisStyle::drawTrackContentObject( QPainter * _painter,
 		drawPath( &painter, path, col0, colBorder, _option->hovered );
 
 		const float cellW = TrackContainerScene::DEFAULT_CELL_WIDTH;
-		const tick t = _option->duration;
+		const tick_t t = _option->duration;
 
 		if( _model->length() > midiTime::ticksPerTact() && t > 0 )
 		{

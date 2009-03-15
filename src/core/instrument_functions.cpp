@@ -3,7 +3,7 @@
 /*
  * instrument_functions.cpp - models for instrument-function-tab
  *
- * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -427,7 +427,8 @@ void arpeggiator::processNote( notePlayHandle * _n )
 		// create new arp-note
 		note new_note( midiTime( 0 ), midiTime( 0 ),
 				sub_note_key,
-				(volume) qRound( _n->getVolume() * vol_level ),
+				(volume_t)
+					qRound( _n->getVolume() * vol_level ),
 				_n->getPanning(), _n->detuning() );
 
 		// create sub-note-play-handle, only ptr to note is different

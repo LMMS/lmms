@@ -1,7 +1,7 @@
 /*
  * bb_track_container.h - model-component of BB-Editor
  *
- * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -46,11 +46,11 @@ public:
 
 	inline virtual QString nodeName( void ) const
 	{
-		return( "bbtrackcontainer" );
+		return "bbtrackcontainer";
 	}
 
-	tact lengthOfBB( int _bb );
-	inline tact lengthOfCurrentBB( void )
+	tact_t lengthOfBB( int _bb );
+	inline tact_t lengthOfCurrentBB( void )
 	{
 		return lengthOfBB( currentBB() );
 	}

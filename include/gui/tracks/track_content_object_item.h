@@ -85,7 +85,7 @@ protected slots:
 protected:
 	QPointF m_lastPos;
 	QPointF m_lastDest;
-	tact m_length;
+	tact_t m_length;
 	QGraphicsItemAnimation * m_snapBackAnimation;
 	static QTimeLine s_snapBackTimeLine;
 

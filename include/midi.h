@@ -1,7 +1,7 @@
 /*
  * midi.h - constants, structs etc. concerning MIDI
  *
- * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -154,14 +154,14 @@ struct midiEvent
 		return m_data.m_param[1];
 	}
 
-	inline volume getVolume( void ) const
+	inline volume_t getVolume( void ) const
 	{
-		return (volume)( velocity() * 100 / MidiMaxVelocity );
+		return (volume_t)( velocity() * 100 / MidiMaxVelocity );
 	}
 	
-	inline panning getPanning( void ) const
+	inline panning_t getPanning( void ) const
 	{
-		return (panning) ( PanningLeft +
+		return (panning_t) ( PanningLeft +
 			( (float)( midiPanning() - MidiMinPanning ) ) / 
 			( (float)( MidiMaxPanning - MidiMinPanning ) ) *
 			( (float)( PanningRight - PanningLeft ) ) );

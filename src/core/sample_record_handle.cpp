@@ -75,7 +75,7 @@ void sampleRecordHandle::play( sampleFrame * /*_working_buffer*/ )
 	writeBuffer( recbuf, frames );
 	m_framesRecorded += frames;
 
-	midiTime len = (tick)( m_framesRecorded / engine::framesPerTick() );
+	midiTime len = (tick_t)( m_framesRecorded / engine::framesPerTick() );
 	if( len > m_minLength )
 	{
 //		m_tco->changeLength( len );

@@ -3,7 +3,7 @@
 /*
  * timeline.cpp - class timeLine, representing a time-line with position marker
  *
- * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -238,14 +238,15 @@ void timeLine::paintEvent( QPaintEvent * )
 	p.setOpacity( 1.0 );
 
 
-	tact tact_num = m_begin.getTact();
+	tact_t tact_num = m_begin.getTact();
 	int x = m_xOffset + s_posMarkerPixmap->width() / 2 -
 			( ( static_cast<Sint32>( m_begin * m_ppt ) /
 						midiTime::ticksPerTact() ) %
 						static_cast<int>( m_ppt ) );
 
-	QColor adas = engine::getLmmsStyle()->color(LmmsStyle::TimelineForecolor);
-	p.setPen(adas);
+	QColor adas = engine::getLmmsStyle()->color(
+						LmmsStyle::TimelineForecolor );
+	p.setPen( adas );
 	for( int i = 0; x + i * m_ppt < width(); ++i )
 	{
 		const int cx = x + qRound( i * m_ppt );

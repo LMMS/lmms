@@ -370,7 +370,7 @@ void ClassicStyle::drawTrackContentObject( QPainter * _painter,
 		_painter->fillRect( rc, lingrad );
 
 		const float cellW = TrackContainerScene::DEFAULT_CELL_WIDTH;
-		const tick t = _option->duration;
+		const tick_t t = _option->duration;
 		if( _model->length() > midiTime::ticksPerTact() && t > 0 )
 		{
 			for( int x = t * cellW; x < rc.width()-2; x += t * cellW )
@@ -429,7 +429,7 @@ void ClassicStyle::drawTrackContentObject( QPainter * _painter,
 			const float x_base = TCO_BORDER_WIDTH;
 			p->setPen( QColor( 0, 0, 0 ) );
 
-			for( tact t = 1; t < pat->length().getTact(); ++t )
+			for( tact_t t = 1; t < pat->length().getTact(); ++t )
 			{
 				float x = x_base + static_cast<int>( ppt * t ) - 1;
 				p->drawLine( x, rc.top() + 0.5, x, rc.top() + 4 );
