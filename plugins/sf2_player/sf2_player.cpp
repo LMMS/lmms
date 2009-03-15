@@ -593,12 +593,14 @@ void sf2Instrument::playNote( notePlayHandle * _n, sampleFrame * )
 
 		m_synthMutex.lock();
 
+#ifdef SF2_PANNING_SUPPORT
+		updatePatch();
+#endif
+
 		fluid_synth_noteon( m_synth, pluginData->midiChannel, midiNote,
 							_n->getMidiVelocity() );
 
 #ifdef SF2_PANNING_SUPPORT
-		updatePatch();
-
 		if( ++m_channel > m_maxChannels )
 		{
 			m_channel = 1;
