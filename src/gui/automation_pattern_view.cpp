@@ -242,6 +242,11 @@ void automationPatternView::paintEvent( QPaintEvent * )
 	lin2grad.setColorAt( 1, cl );
 	lin2grad.setColorAt( 0, cd );
 
+	if( ppt <= 32 )
+	{
+		p.setRenderHint( QPainter::Antialiasing, true );
+	}
+
 	for( automationPattern::timeMap::const_iterator it =
 						m_pat->getTimeMap().begin();
 					it != m_pat->getTimeMap().end(); ++it )
