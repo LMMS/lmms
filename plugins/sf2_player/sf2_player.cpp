@@ -2,6 +2,7 @@
  * sf2_player.cpp - a soundfont2 player using fluidSynth
  *
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail/dot/com>
+ * Copyright (c) 2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -556,7 +557,7 @@ void sf2Instrument::updateSampleRate( void )
 
 void sf2Instrument::playNote( notePlayHandle * _n, sampleFrame * )
 {
-	const double LOG440 = 2.643452676486187424842455584439449012279510498046875f;
+	const float LOG440 = 2.643452676f;
 
 	const f_cnt_t tfp = _n->totalFramesPlayed();
 
