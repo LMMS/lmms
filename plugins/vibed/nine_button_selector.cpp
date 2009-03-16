@@ -60,6 +60,8 @@ nineButtonSelector::nineButtonSelector(	QPixmap _button0_on,
 	setFixedSize( 50, 50 );
 	move( _x, _y );
 
+	// TODO: use a generic approach using QSignalMapper
+
 	m_button = new pixmapButton( this, NULL );
 	m_button->move( 1, 1 );
 	m_button->setActiveGraphic( _button0_on );
@@ -146,7 +148,7 @@ nineButtonSelector::nineButtonSelector(	QPixmap _button0_on,
 }
 
 
-nineButtonSelector::~ nineButtonSelector()
+nineButtonSelector::~nineButtonSelector()
 {
 	for( Uint8 i = 0; i < 9; i++ )
 	{
@@ -163,14 +165,10 @@ void nineButtonSelector::button0Clicked( void )
 }
 
 
-
-
 void nineButtonSelector::button1Clicked( void )
 {
 	setSelected( 1 );
 }
-
-
 
 
 void nineButtonSelector::button2Clicked( void )
@@ -179,14 +177,10 @@ void nineButtonSelector::button2Clicked( void )
 }
 
 
-
-
 void nineButtonSelector::button3Clicked( void )
 {
 	setSelected( 3 );
 }
-
-
 
 
 void nineButtonSelector::button4Clicked( void )
@@ -195,14 +189,10 @@ void nineButtonSelector::button4Clicked( void )
 }
 
 
-
-
 void nineButtonSelector::button5Clicked( void )
 {
 	setSelected( 5 );
 }
-
-
 
 
 void nineButtonSelector::button6Clicked( void )
@@ -211,14 +201,10 @@ void nineButtonSelector::button6Clicked( void )
 }
 
 
-
-
 void nineButtonSelector::button7Clicked( void )
 {
 	setSelected( 7 );
 }
-
-
 
 
 void nineButtonSelector::button8Clicked( void )
@@ -226,16 +212,23 @@ void nineButtonSelector::button8Clicked( void )
 	setSelected( 8 );
 }
 
+
 void nineButtonSelector::modelChanged( void )
 {
 	updateButton( model()->value() );
 }
+
+
+
 
 void nineButtonSelector::setSelected( Uint8 _new_button )
 {
 	model()->setValue(_new_button);
 	updateButton( _new_button );
 }
+
+
+
 
 void nineButtonSelector::updateButton( Uint8 _new_button )
 {
@@ -248,6 +241,9 @@ void nineButtonSelector::updateButton( Uint8 _new_button )
 	
 	emit nineButtonSelection( _new_button );
 }
+
+
+
 
 void nineButtonSelector::contextMenuEvent( QContextMenuEvent * )
 {
