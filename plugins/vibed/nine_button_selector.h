@@ -2,6 +2,7 @@
  * nine_button_selector.h
  *
  * Copyright (c) 2006-2007 Danny McRae <khjklujn/at/yahoo/com>
+ * Copyright (c) 2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -85,11 +86,10 @@ private:
 	QList<pixmapButton *> m_buttons;
 	pixmapButton * m_button;
 	pixmapButton * m_lastBtn;
-	QPixmap m_base;
 
-	Uint8 m_selected;
-	
-};
+	int m_selected;
+
+} ;
 
 typedef intModel nineButtonSelectorModel;
 
