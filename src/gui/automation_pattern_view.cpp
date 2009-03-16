@@ -246,12 +246,13 @@ void automationPatternView::paintEvent( QPaintEvent * )
 						m_pat->getTimeMap().begin();
 					it != m_pat->getTimeMap().end(); ++it )
 	{
-		const float x1 = 2 * x_base + it.key() * ppt /
+		const float x1 = x_base + it.key() * ppt /
 						midiTime::ticksPerTact();
 		float x2;
 		if( it+1 != m_pat->getTimeMap().end() )
 		{
-		 	x2 = (it+1).key() * ppt / midiTime::ticksPerTact() + 2;
+		 	x2 = x_base + (it+1).key() * ppt /
+						midiTime::ticksPerTact() + 1;
 		}
 		else
 		{
