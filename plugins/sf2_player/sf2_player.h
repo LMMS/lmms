@@ -37,12 +37,16 @@
 #include "fluidsynth.h"
 #include "sample_buffer.h"
 
+
 class sf2InstrumentView;
 class sf2Font;
 class notePlayHandle;
 
 class patchesDialog;
 class QLabel;
+
+const int MaxFluidChannels = 5;
+
 
 class sf2Instrument : public instrument
 {
@@ -72,12 +76,12 @@ public:
 
 	virtual f_cnt_t desiredReleaseFrames( void ) const
 	{
-		return( 0 );
+		return 0;
 	}
 
 	virtual bool isMidiBased( void ) const
 	{
-		return( true );
+		return true;
 	}
 
 	virtual pluginView * instantiateView( QWidget * _parent );
@@ -124,11 +128,10 @@ private:
 	QMutex m_synthMutex;
 	QMutex m_loadMutex;
 
-	int m_notesRunning[128];
+	int m_notesRunning[128][MaxFluidChannels];
 	sample_rate_t m_internalSampleRate;
 	int m_lastMidiPitch;
 	int m_channel;
-	int m_maxChannels;
 
 	lcdSpinBoxModel m_bankNum;
 	lcdSpinBoxModel m_patchNum;

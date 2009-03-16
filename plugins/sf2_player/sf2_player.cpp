@@ -77,6 +77,7 @@ struct SF2PluginData
 } ;
 
 
+
 // Static map of current sfonts
 QMap<QString, sf2Font*> sf2Instrument::s_fonts;
 QMutex sf2Instrument::s_fontsMutex;
@@ -91,7 +92,6 @@ sf2Instrument::sf2Instrument( instrumentTrack * _instrument_track ) :
 	m_filename( "" ),
 	m_lastMidiPitch( 8192 ),
 	m_channel( 1 ),
-	m_maxChannels( 5 ),
 	m_bankNum( 0, 0, 999, this, tr("Bank") ),
 	m_patchNum( 0, 0, 127, this, tr("Patch") ),
 	m_gain( 1.0f, 0.0f, 5.0f, 0.01f, this, tr( "Gain" ) ),
@@ -116,7 +116,10 @@ sf2Instrument::sf2Instrument( instrumentTrack * _instrument_track ) :
 {
 	for( int i = 0; i < 128; ++i )
 	{
-		m_notesRunning[i] = 0;
+		for( int j = 0; j < MaxFluidChannels; ++j )
+		{
+			m_notesRunning[i][j] = 0;
+		}
 	}
 
 	m_settings = new_fluid_settings();
@@ -602,7 +605,7 @@ void sf2Instrument::playNote( notePlayHandle * _n, sampleFrame * )
 							_n->getMidiVelocity() );
 
 #ifdef SF2_PANNING_SUPPORT
-		if( ++m_channel > m_maxChannels )
+		if( ++m_channel > MaxFluidChannels )
 		{
 			m_channel = 1;
 		}
@@ -611,7 +614,7 @@ void sf2Instrument::playNote( notePlayHandle * _n, sampleFrame * )
 		m_synthMutex.unlock();
 
 		m_notesRunningMutex.lock();
-		++m_notesRunning[midiNote];
+		++m_notesRunning[midiNote][pluginData->midiChannel-1];
 		m_notesRunningMutex.unlock();
 	}
 
@@ -693,7 +696,8 @@ void sf2Instrument::deleteNotePluginData( notePlayHandle * _n )
 	SF2PluginData * pluginData = static_cast<SF2PluginData *>(
 							_n->m_pluginData );
 	m_notesRunningMutex.lock();
-	const int n = --m_notesRunning[pluginData->midiNote];
+	const int n = --m_notesRunning[pluginData->midiNote]
+					[pluginData->midiChannel-1];
 	m_notesRunningMutex.unlock();
 
 	if( n <= 0 )
