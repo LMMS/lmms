@@ -268,6 +268,10 @@ midiinputnamebox->label(config.winmididevices[config.cfg.WindowsMidiInId].name);
               label Dvorak
               xywh {25 25 100 20} labelfont 1 labelsize 11
             }
+            menuitem {} {
+              label QWERTZ
+              xywh {35 35 100 20} labelfont 1 labelsize 11
+            }
           }
         }
         Fl_Group {} {

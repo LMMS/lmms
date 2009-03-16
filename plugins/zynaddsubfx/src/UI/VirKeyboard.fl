@@ -29,13 +29,17 @@ decl {\#include "WidgetPDial.h"} {public
 
 decl {const int keyspos[12]={0,-1,1,-2,2,3,-4,4,-5,5,-6,6};} {} 
 
-decl {const int keysoct1qw[]={'q','2','w','3','e','r','5','t','6','y','7','u','i','9','o','0','p','[','=',']','\\\\',FL_Enter,0};} {} 
+decl {const int keysoct1qwerty[]={'q','2','w','3','e','r','5','t','6','y','7','u','i','9','o','0','p','[','=',']','\\\\',FL_Enter,0};} {} 
 
-decl {const int keysoct2qw[]={'z','s','x','d','c','v','g','b','h','n','j','m',',','l','.',';','/',0};} {} 
+decl {const int keysoct2qwerty[]={'z','s','x','d','c','v','g','b','h','n','j','m',',','l','.',';','/',0};} {} 
 
 decl {const int keysoct1dw[]={'\\'','2',',','3','.','p','5','y','6','f','7','g','c','9','r','0','l','/',']','=','\\\\',FL_Enter,0};} {} 
 
 decl {const int keysoct2dw[]={';','o','q','e','j','k','i','x','d','b','h','m','w','n','v','s','z',0};} {} 
+
+decl {const int keysoct1qwertz[]={'q','2','w','3','e','r','5','t','6','z','7','u','i','9','o','0','p',252,'\\\'','+','\\\\',FL_Enter,0};} {} 
+
+decl {const int keysoct2qwertz[]={'y','s','x','d','c','v','g','b','h','n','j','m',',','l','.',246,'-',0};} {} 
 
 class VirKeys {open : {public Fl_Box}
 } {
@@ -145,12 +149,15 @@ if ((event==FL_PUSH)||(event==FL_DRAG)||(event==FL_RELEASE)){
 };
 
 
-const int *keysoct1=keysoct1qw;
-const int *keysoct2=keysoct2qw;
+const int *keysoct1=keysoct1qwerty;
+const int *keysoct2=keysoct2qwerty;
 
 if (config.cfg.VirKeybLayout==2) {
 	keysoct1=keysoct1dw;
 	keysoct2=keysoct2dw;
+}else if (config.cfg.VirKeybLayout==3) {
+	keysoct1=keysoct1qwertz;
+	keysoct2=keysoct2qwertz;
 };
 
 if ((event==FL_KEYDOWN)||(event==FL_KEYUP)){

@@ -154,6 +154,7 @@ Fl_Menu_Item ConfigUI::menu_Virtual[] = {
  {" ", 0,  0, 0, 1, FL_NORMAL_LABEL, 1, 11, 0},
  {"QWERTY", 0,  0, 0, 0, FL_NORMAL_LABEL, 1, 11, 0},
  {"Dvorak", 0,  0, 0, 0, FL_NORMAL_LABEL, 1, 11, 0},
+ {"QWERTZ", 0,  0, 0, 0, FL_NORMAL_LABEL, 1, 11, 0},
  {0,0,0,0,0,0,0,0,0}
 };
 
