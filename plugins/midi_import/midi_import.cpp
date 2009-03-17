@@ -367,7 +367,7 @@ bool midiImport::readSMF( trackContainer * _tc )
 
 				note n( noteEvt->get_duration() * ticksPerBeat,
 						noteEvt->get_start_time() * ticksPerBeat,
-						noteEvt->get_identifier() - 3,
+						noteEvt->get_identifier() - 12,
 						noteEvt->get_loud());
 				ch->addNote( n );
 				
