@@ -3,7 +3,7 @@
 /*
  * audio_alsa.cpp - device-class which implements ALSA-PCM-output
  *
- * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -51,9 +51,9 @@ audioALSA::audioALSA( bool & _success_ful, mixer * _mixer ) :
 	m_handle( NULL ),
 	m_hwParams( NULL ),
 	m_swParams( NULL ),
-	m_convertEndian( FALSE )
+	m_convertEndian( false )
 {
-	_success_ful = FALSE;
+	_success_ful = false;
 
 	int err;
 
@@ -83,7 +83,7 @@ audioALSA::audioALSA( bool & _success_ful, mixer * _mixer ) :
 		return;
 	}
 
-	_success_ful = TRUE;
+	_success_ful = true;
 }
 
 
@@ -243,8 +243,8 @@ void audioALSA::run( void )
 	int outbuf_pos = 0;
 	int pcmbuf_size = m_periodSize * channels();
 
-	bool quit = FALSE;
-	while( quit == FALSE )
+	bool quit = false;
+	while( quit == false )
 	{
 		int_sample_t * ptr = pcmbuf;
 		int len = pcmbuf_size;
@@ -256,9 +256,7 @@ void audioALSA::run( void )
 				const fpp_t frames = getNextBuffer( temp );
 				if( !frames )
 				{
-					quit = TRUE;
-					alignedMemClear( ptr, len
-						* sizeof( int_sample_t ) );
+					quit = true;
 					break;
 				}
 				outbuf_size = frames * channels();
@@ -279,7 +277,7 @@ void audioALSA::run( void )
 		f_cnt_t frames = m_periodSize;
 		ptr = pcmbuf;
 
-		while( frames )
+		while( quit == false && frames )
 		{
 			int err = snd_pcm_writei( m_handle, ptr, frames );
 
