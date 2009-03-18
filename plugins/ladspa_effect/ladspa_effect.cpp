@@ -2,6 +2,7 @@
  * ladspa_effect.cpp - class for processing LADSPA effects
  *
  * Copyright (c) 2006-2008 Danny McRae <khjklujn/at/users.sourceforge.net>
+ * Copyright (c) 2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -35,6 +36,7 @@
 #include "mixer.h"
 #include "effect_chain.h"
 #include "automation_pattern.h"
+#include "controller_connection.h"
 
 
 #undef SINGLE_SOURCE_COMPILE
@@ -123,6 +125,9 @@ void ladspaEffect::changeSampleRate( void )
 	// the IDs of re-created controls have been saved and now need to be
 	// resolved again
 	automationPattern::resolveAllIDs();
+
+	// make sure, connections are ok
+        controllerConnection::finalizeConnections();
 }
 
 
