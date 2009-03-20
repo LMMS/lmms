@@ -34,6 +34,8 @@
 #include "remote_zynaddsubfx.h"
 
 
+std::string __presets_dir;
+
 #define main unused_main
 #ifdef LMMS_BUILD_LINUX
 #define ATOM(x) (x)
@@ -43,8 +45,6 @@
 #undef main
 
 #include <FL/x.H>
-
-std::string __presets_dir;
 
 static pthread_t __gui_thread_handle;
 static pthread_mutex_t __gui_mutex;
@@ -104,6 +104,20 @@ public:
 
 			case IdZasfPresetDirectory:
 				__presets_dir = _m.getString();
+	for( int i = 0; i < MAX_BANK_ROOT_DIRS; ++i )
+	{
+		if( config.cfg.bankRootDirList[i] == NULL )
+		{
+			config.cfg.bankRootDirList[i] = new char[MAX_STRING_SIZE];
+			strcpy(config.cfg.bankRootDirList[i], __presets_dir.c_str() );
+			break;
+		}
+		else if( strcmp( config.cfg.bankRootDirList[i],
+						__presets_dir.c_str() ) == 0 )
+		{
+			break;
+		}
+	}
 				break;
 
 			default:
