@@ -375,10 +375,13 @@ void oscillator::updatePM( sampleFrame * _ab, const fpp_t _frames,
 	m_subOsc->update( _ab, _frames, _chnl );
 	recalcPhase();
 	const float osc_coeff = m_freq * m_detuning;
+	const float sampleRateCorrection = 44100.0f /
+				engine::getMixer()->processingSampleRate();
 
 	for( fpp_t frame = 0; frame < _frames; ++frame )
 	{
-		_ab[frame][_chnl] = getSample<W>( m_phase + _ab[frame][_chnl] )
+		_ab[frame][_chnl] = getSample<W>( m_phase +
+					_ab[frame][_chnl]*sampleRateCorrection )
 							* m_volume;
 		m_phase += osc_coeff;
 	}
@@ -457,10 +460,12 @@ void oscillator::updateFM( sampleFrame * _ab, const fpp_t _frames,
 	m_subOsc->update( _ab, _frames, _chnl );
 	recalcPhase();
 	const float osc_coeff = m_freq * m_detuning;
+	const float sampleRateCorrection = 44100.0f /
+				engine::getMixer()->processingSampleRate();
 
 	for( fpp_t frame = 0; frame < _frames; ++frame )
 	{
-		m_phase += _ab[frame][_chnl];
+		m_phase += _ab[frame][_chnl] * sampleRateCorrection;
 		_ab[frame][_chnl] = getSample<W>( m_phase ) * m_volume;
 		m_phase += osc_coeff;
 	}
