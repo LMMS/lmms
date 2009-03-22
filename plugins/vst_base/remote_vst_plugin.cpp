@@ -566,8 +566,6 @@ bool remoteVstPlugin::load( const std::string & _plugin_file )
 		case CCONST( 'z', '3', 't', 'a' ):	// z3ta+
 		case CCONST( 'T', 'C', '_', 'S' ):	// Cygnus
 		case CCONST( 'S', 'y', 't', 'r' ):	// Sytrus
-			debugMessage( "switching to splitted threading "
-								"model\n" );
 			__threadingModel = SplittedThreading;
 			break;
 
@@ -575,6 +573,16 @@ bool remoteVstPlugin::load( const std::string & _plugin_file )
 			break;
 	}
 
+	// most of MDA plugins only work with SplittedThreading model
+	if( strncmp( id, "mda", 3 ) == 0 )
+	{
+		__threadingModel = SplittedThreading;
+	}
+
+	if( __threadingModel == SplittedThreading )
+	{
+		debugMessage( "switching to splitted threading model\n" );
+	}
 
 	m_plugin->dispatcher( m_plugin, effOpen, 0, 0, 0, 0 );
 
