@@ -69,6 +69,7 @@ vstEffect::vstEffect( model * _parent,
 	{
 		openPlugin( m_key.attributes["file"] );
 	}
+	setDisplayName( m_key.name );
 }
 
 
