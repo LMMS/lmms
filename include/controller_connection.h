@@ -40,7 +40,7 @@ class controllerConnection;
 typedef QVector<controllerConnection *> controllerConnectionVector;
 
 
-class controllerConnection : public QObject, public journallingObject
+class EXPORT controllerConnection : public QObject, public journallingObject
 {
 	Q_OBJECT
 public:
