@@ -1,7 +1,7 @@
 /*
  * vestige.cpp - instrument-plugin for hosting VST-instruments
  *
- * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -37,7 +37,6 @@
 #include "instrument_track.h"
 #include "vst_plugin.h"
 #include "pixmap_button.h"
-#include "song.h"
 #include "text_float.h"
 #include "tooltip.h"
 
@@ -163,11 +162,7 @@ void vestigeInstrument::loadFile( const QString & _file )
 	}
 
 	m_plugin->showEditor();
-	connect( engine::getSong(), SIGNAL( tempoChanged( bpm_t ) ),
-			m_plugin, SLOT( setTempo( bpm_t ) ) );
-	m_plugin->setTempo( engine::getSong()->getTempo() );
-	connect( engine::getMixer(), SIGNAL( sampleRateChanged() ),
-				m_plugin, SLOT( updateSampleRate() ) );
+
 	if( set_ch_name )
 	{
 		getInstrumentTrack()->setName( m_plugin->name() );

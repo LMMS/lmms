@@ -1,7 +1,7 @@
 /*
  * vst_plugin.cpp - implementation of vstPlugin class
  *
- * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -48,6 +48,7 @@
 #include "config_mgr.h"
 #include "engine.h"
 #include "main_window.h"
+#include "song.h"
 #include "templates.h"
 
 
@@ -152,6 +153,13 @@ vstPlugin::vstPlugin( const QString & _plugin ) :
 		delete helper;
 	}
 #endif
+
+	setTempo( engine::getSong()->getTempo() );
+
+	connect( engine::getSong(), SIGNAL( tempoChanged( bpm_t ) ),
+			this, SLOT( setTempo( bpm_t ) ) );
+	connect( engine::getMixer(), SIGNAL( sampleRateChanged() ),
+				this, SLOT( updateSampleRate() ) );
 }
 
 
