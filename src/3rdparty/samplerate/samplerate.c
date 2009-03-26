@@ -226,7 +226,7 @@ src_callback_read (SRC_STATE *state, double src_ratio, long frames, float *data)
 		**	returns without setting the ptr.
 		*/
 		float dummy [1] ;
-			
+
 		if (src_data.input_frames == 0)
 		{	float *ptr = dummy ;
 
@@ -392,8 +392,10 @@ src_strerror (int error)
 				return "SRC_DATA->data_out is NULL." ;
 		case SRC_ERR_NO_PRIVATE :
 				return "Internal error. No private data." ;
+
 		case SRC_ERR_BAD_SRC_RATIO :
-				return "SRC ratio outside [1/12, 12] range." ;
+				return "SRC ratio outside [1/" SRC_MAX_RATIO_STR ", " SRC_MAX_RATIO_STR "] range." ;
+
 		case SRC_ERR_BAD_SINC_STATE :
 				return "src_process() called without reset after end_of_input." ;
 		case SRC_ERR_BAD_PROC_PTR :
@@ -422,6 +424,8 @@ src_strerror (int error)
 				return "Callback function pointer is NULL in src_callback_read ()." ;
 		case SRC_ERR_NO_VARIABLE_RATIO :
 				return "This converter only allows constant conversion ratios." ;
+		case SRC_ERR_SINC_PREPARE_DATA_BAD_LEN :
+				return "Internal error : Bad length in prepare_data ()." ;
 
 		case SRC_ERR_MAX_ERROR :
 				return "Placeholder. No error defined for this error number." ;

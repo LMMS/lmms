@@ -34,6 +34,8 @@ typedef	long	int32_t ;
 #endif
 
 #define	SRC_MAX_RATIO			256
+#define	SRC_MAX_RATIO_STR		"256"
+
 #define	SRC_MIN_RATIO_DIFF		(1e-20)
 
 #define	MAX(a,b)	(((a) > (b)) ? (a) : (b))
@@ -43,6 +45,12 @@ typedef	long	int32_t ;
 #define OFFSETOF(type,member)	((int) (&((type*) 0)->member))
 
 #define	MAKE_MAGIC(a,b,c,d,e,f)	((a) + ((b) << 4) + ((c) << 8) + ((d) << 12) + ((e) << 16) + ((f) << 20))
+
+#ifdef __GNUC__
+#	define WARN_UNUSED	__attribute__ ((warn_unused_result))
+#else
+#	define WARN_UNUSED
+#endif
 
 
 #include "samplerate.h"
@@ -78,6 +86,7 @@ enum
 	SRC_ERR_BAD_MODE,
 	SRC_ERR_NULL_CALLBACK,
 	SRC_ERR_NO_VARIABLE_RATIO,
+	SRC_ERR_SINC_PREPARE_DATA_BAD_LEN,
 
 	/* This must be the last error number. */
 	SRC_ERR_MAX_ERROR
