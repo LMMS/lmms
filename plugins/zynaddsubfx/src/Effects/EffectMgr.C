@@ -39,19 +39,19 @@ EffectMgr::EffectMgr(int insertion_,pthread_mutex_t *mutex_){
     filterpars=NULL;
     dryonly=false;
     defaults();
-};
+}
 
 
 EffectMgr::~EffectMgr(){
     if (efx!=NULL) delete (efx);
     delete []efxoutl;
     delete []efxoutr;
-};
+}
 
 void EffectMgr::defaults(){
     changeeffect(0);
     setdryonly(false);
-};
+}
 
 /*
  * Change the effect
@@ -80,21 +80,21 @@ void EffectMgr::changeeffect(int nefx_){
     };
     
     if (efx!=NULL) filterpars=efx->filterpars;
-};
+}
 
 /*
  * Obtain the effect number
  */
 int EffectMgr::geteffect(){
     return (nefx);
-};
+}
 
 /*
  * Cleanup the current effect
  */
 void EffectMgr::cleanup(){
     if (efx!=NULL) efx->cleanup();
-};
+}
 
 
 /*
@@ -104,14 +104,14 @@ void EffectMgr::cleanup(){
 unsigned char EffectMgr::getpreset(){
     if (efx!=NULL) return(efx->Ppreset);
 	else return(0);
-};
+}
 
 /*
  * Change the preset of the current effect
  */
 void EffectMgr::changepreset_nolock(unsigned char npreset){
     if (efx!=NULL) efx->setpreset(npreset);
-};
+}
 
 /*
  * Change the preset of the current effect(with thread locking)
@@ -120,7 +120,7 @@ void EffectMgr::changepreset(unsigned char npreset){
     pthread_mutex_lock(mutex);
     changepreset_nolock(npreset);
     pthread_mutex_unlock(mutex);
-};
+}
 
 
 /*
@@ -129,7 +129,7 @@ void EffectMgr::changepreset(unsigned char npreset){
 void EffectMgr::seteffectpar_nolock(int npar,unsigned char value){
     if (efx==NULL) return;
     efx->changepar(npar,value);
-};
+}
 
 /*
  * Change a parameter of the current effect (with thread locking)
@@ -138,7 +138,7 @@ void EffectMgr::seteffectpar(int npar,unsigned char value){
     pthread_mutex_lock(mutex);
     seteffectpar_nolock(npar,value);
     pthread_mutex_unlock(mutex);
-};
+}
 
 /*
  * Get a parameter of the current effect
@@ -146,7 +146,7 @@ void EffectMgr::seteffectpar(int npar,unsigned char value){
 unsigned char EffectMgr::geteffectpar(int npar){
     if (efx==NULL) return(0);
     return(efx->getpar(npar));
-};
+}
 
 
 /*
@@ -214,7 +214,7 @@ void EffectMgr::out(REALTYPE *smpsl,REALTYPE *smpsr){
 	};
     };
     
-};
+}
 
 /*
  * Get the effect volume for the system effect
@@ -222,7 +222,7 @@ void EffectMgr::out(REALTYPE *smpsl,REALTYPE *smpsr){
 REALTYPE EffectMgr::sysefxgetvolume(){
     if (efx==NULL) return (1.0);
 	else return(efx->outvolume);    
-};
+}
 
 
 /*
@@ -231,12 +231,12 @@ REALTYPE EffectMgr::sysefxgetvolume(){
 REALTYPE EffectMgr::getEQfreqresponse(REALTYPE freq){
     if (nefx==7) return(efx->getfreqresponse(freq));
 	else return(0.0);
-};
+}
 
 
 void EffectMgr::setdryonly(bool value){
     dryonly=value;
-};
+}
 
 void EffectMgr::add2XML(XMLwrapper *xml){
     xml->addpar("type",geteffect());
@@ -258,7 +258,7 @@ void EffectMgr::add2XML(XMLwrapper *xml){
 	    xml->endbranch();
 	};
     xml->endbranch();
-};
+}
 
 void EffectMgr::getfromXML(XMLwrapper *xml){
     changeeffect(xml->getpar127("type",geteffect()));
@@ -285,7 +285,7 @@ void EffectMgr::getfromXML(XMLwrapper *xml){
 	xml->exitbranch();
     };
     cleanup();
-};
+}
 
 
 

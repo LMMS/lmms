@@ -27,21 +27,22 @@
 #include "../DSP/AnalogFilter.h"
 #include "Effect.h"
 
+/**EQ Effect*/
 class EQ:public Effect{
     public:
-	EQ(int insertion,REALTYPE *efxoutl_,REALTYPE *efxoutr_);
+	EQ(const int &insertion_,REALTYPE *efxoutl_,REALTYPE *efxoutr_);
 	~EQ();
 	void out(REALTYPE *smpsl,REALTYPE *smpr);
 	void setpreset(unsigned char npreset);
-	void changepar(int npar,unsigned char value);
-	unsigned char getpar(int npar);
+	void changepar(const int &npar,const unsigned char &value);
+	unsigned char getpar(const int &npar)const;
 	void cleanup();
 	REALTYPE getfreqresponse(REALTYPE freq);
     private:
-	//Parametrii
-	unsigned char Pvolume;//Volumul 
+	//Parameters
+	unsigned char Pvolume;/**<Volume*/
 	
-	void setvolume(unsigned char Pvolume);
+	void setvolume(const unsigned char &Pvolume);
 	
 	struct {
 	    //parameters

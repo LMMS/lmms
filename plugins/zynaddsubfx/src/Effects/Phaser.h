@@ -29,38 +29,38 @@
 #define MAX_PHASER_STAGES 12
 class Phaser:public Effect {
     public:
-	Phaser(int insetion_,REALTYPE *efxoutl_,REALTYPE *efxoutr_);
+	Phaser(const int &insetion_,REALTYPE *efxoutl_,REALTYPE *efxoutr_);
 	~Phaser();
 	void out(REALTYPE *smpsl,REALTYPE *smpsr);
         void setpreset(unsigned char npreset);
-	void changepar(int npar,unsigned char value);
-	unsigned char getpar(int npar);
+	void changepar(const int &npar,const unsigned char &value);
+	unsigned char getpar(const int &npar)const;
 	void cleanup();
 	void setdryonly();
 		
     private:
 	//Parametrii Phaser
-	EffectLFO lfo;//lfo-ul Phaser
+	EffectLFO lfo;/**<lfo-ul Phaser*/
 	unsigned char Pvolume;
 	unsigned char Ppanning;
-	unsigned char Pdepth;//the depth of the Phaser
-	unsigned char Pfb;//feedback
-	unsigned char Plrcross;//feedback
+	unsigned char Pdepth;/**<the depth of the Phaser*/
+	unsigned char Pfb;/**<feedback*/
+	unsigned char Plrcross;/**<feedback*/
 	unsigned char Pstages;
-	unsigned char Poutsub;//if I wish to substract the output instead of the adding it
+	unsigned char Poutsub;/**<if I wish to substract the output instead of the adding it*/
 	unsigned char Pphase;
 	
 	//Control Parametrii
-	void setvolume(unsigned char Pvolume);
-	void setpanning(unsigned char Ppanning);
-	void setdepth(unsigned char Pdepth);
-	void setfb(unsigned char Pfb);
-	void setlrcross(unsigned char Plrcross);
-	void setstages(unsigned char Pstages);
-	void setphase(unsigned char Pphase);
+	void setvolume(const unsigned char &Pvolume);
+	void setpanning(const unsigned char &Ppanning);
+	void setdepth(const unsigned char &Pdepth);
+	void setfb(const unsigned char &Pfb);
+	void setlrcross(const unsigned char &Plrcross);
+	void setstages(const unsigned char &Pstages);
+	void setphase(const unsigned char &Pphase);
 	
-	//Valorile interne
-	int insertion;
+	//Internal Values
+	//int insertion; //inherited from Effect
 	REALTYPE panning,fb,depth,lrcross,fbl,fbr,phase;
 	REALTYPE *oldl,*oldr;
 	REALTYPE oldlgain,oldrgain;

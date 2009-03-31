@@ -39,6 +39,7 @@
 #include "../Params/Presets.h"
 
 
+/**Effect manager, an interface betwen the program and effects*/
 class EffectMgr:public Presets{
     public:
 	EffectMgr(int insertion_,pthread_mutex_t *mutex_);
@@ -52,10 +53,10 @@ class EffectMgr:public Presets{
 
 	void setdryonly(bool value);
 	
-	//get the output(to speakers) volume of the systemeffect
+	/**get the output(to speakers) volume of the systemeffect*/
 	REALTYPE sysefxgetvolume();
 
-	void cleanup();//cleanup the effect
+	void cleanup();/**<cleanup the effect*/
 	
 	void changeeffect(int nefx_);
 	int geteffect();
@@ -63,9 +64,9 @@ class EffectMgr:public Presets{
         void changepreset_nolock(unsigned char npreset);
 	unsigned char getpreset();
 	void seteffectpar(int npar,unsigned char value);
-	void seteffectpar_nolock(int npar,unsigned char value);//sets the effect par without thread lock
+	void seteffectpar_nolock(int npar,unsigned char value);/**<sets the effect par without thread lock*/
 	unsigned char geteffectpar(int npar);
-        int insertion;//1 if the effect is connected as insertion effect
+        int insertion;/**<1 if the effect is connected as insertion effect*/
 	REALTYPE *efxoutl,*efxoutr;
 
 	//used by UI

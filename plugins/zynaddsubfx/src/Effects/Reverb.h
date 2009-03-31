@@ -31,83 +31,85 @@
 #define REV_COMBS 8
 #define REV_APS 4
 
+/**Creates Reverberation Effects*/
 class Reverb:public Effect {
     public:
-	Reverb(int insertion,REALTYPE *efxoutl_,REALTYPE *efxoutr_);
+	Reverb(const int &insertion_,REALTYPE *efxoutl_,REALTYPE *efxoutr_);
 	~Reverb();
 	void out(REALTYPE *smps_l,REALTYPE *smps_r);
 	void cleanup();
 
         void setpreset(unsigned char npreset);
-	void changepar(int npar,unsigned char value);
-	unsigned char getpar(int npar);
+	void changepar(const int &npar,const unsigned char &value);
+	unsigned char getpar(const int &npar)const;
 
     private:
 	//Parametrii
-	//Amount of the reverb,
+	/**Amount of the reverb*/
 	unsigned char Pvolume;
 
-	//LefT/Right Panning
+	/**Left/Right Panning*/
 	unsigned char Ppan;
 
-	//duration of reverb
+	/**duration of reverb*/
 	unsigned char Ptime;
 
-	//Initial delay 
+	/**Initial delay*/
 	unsigned char Pidelay;
 
-	//Initial delay feedback
+	/**Initial delay feedback*/
 	unsigned char Pidelayfb;
 
-	//delay between ER/Reverbs
+	/**delay between ER/Reverbs*/
 	unsigned char Prdelay;
 
-	//EarlyReflections/Reverb Balance
+	/**EarlyReflections/Reverb Balance*/
 	unsigned char Perbalance;
 
-	//HighPassFilter 
+	/**HighPassFilter*/
 	unsigned char Plpf;
 
-	//LowPassFilter
+	/**LowPassFilter*/
 	unsigned char Phpf;
 
-	//Low/HighFrequency Damping
-	unsigned char Plohidamp;// 0..63 lpf,64=off,65..127=hpf(TODO)
+	/**Low/HighFrequency Damping
+         * \todo 0..63 lpf,64=off,65..127=hpf(TODO)*/
+	unsigned char Plohidamp;
 
-	//Reverb type
+	/**Reverb type*/
 	unsigned char Ptype;
 
-	//Room Size
+	/**Room Size*/
 	unsigned char Proomsize;
 
 	//parameter control
-	void setvolume(unsigned char Pvolume);
-	void setpan(unsigned char Ppan);
-	void settime(unsigned char Ptime);
+	void setvolume(const unsigned char &Pvolume);
+	void setpan(const unsigned char &Ppan);
+	void settime(const unsigned char &Ptime);
 	void setlohidamp(unsigned char Plohidamp);
-	void setidelay(unsigned char Pidelay);
-	void setidelayfb(unsigned char Pidelayfb);
-	void sethpf(unsigned char Phpf);
-	void setlpf(unsigned char Plpf);
-	void settype(unsigned char Ptype);
-	void setroomsize(unsigned char Proomsize);
+	void setidelay(const unsigned char &Pidelay);
+	void setidelayfb(const unsigned char &Pidelayfb);
+	void sethpf(const unsigned char &Phpf);
+	void setlpf(const unsigned char &Plpf);
+	void settype( unsigned char Ptype);
+	void setroomsize(const unsigned char &Proomsize);
 	
 	REALTYPE pan,erbalance;
 	//Parametrii 2	
-	int lohidamptype;//0=disable,1=highdamp(lowpass),2=lowdamp(highpass)
+	int lohidamptype;/**<0=disable,1=highdamp(lowpass),2=lowdamp(highpass)*/
 	int idelaylen,rdelaylen;
 	int idelayk;
 	REALTYPE lohifb,idelayfb,roomsize,rs;//rs is used to "normalise" the volume according to the roomsize
 	int comblen[REV_COMBS*2];		
 	int aplen[REV_APS*2];
 	
-	//Valorile interne
+	//Internal Variables
 	
 	REALTYPE *comb[REV_COMBS*2];
 	
 	int combk[REV_COMBS*2];
-	REALTYPE combfb[REV_COMBS*2];//feedback-ul fiecarui filtru "comb"
-	REALTYPE lpcomb[REV_COMBS*2];//pentru Filtrul LowPass
+	REALTYPE combfb[REV_COMBS*2];/**<feedback-ul fiecarui filtru "comb"*/
+	REALTYPE lpcomb[REV_COMBS*2];/**<pentru Filtrul LowPass*/
 
 	REALTYPE *ap[REV_APS*2];
 	
@@ -119,9 +121,6 @@ class Reverb:public Effect {
 	
 	void processmono(int ch,REALTYPE *output);
 };
-
-
-
 
 #endif
 

@@ -840,7 +840,7 @@
 	      hovers over them
 	    - Created tooltips for the effects knobs
 	    - Standardized the code, so it could compile with pedantic without
-	      errors
+	      errors [it looks like some errors may have ben missed]
 
 22 Feb 2009 (Mark McCurry)
 	    - Fix improper deallocation in PresetsStore
@@ -851,3 +851,13 @@
 	    - Added start of DocBook documentation
 	    - Incorperated JACK output patch by Emmanuel Saracco
 	    - Incorperated QUERTZ layout by Achim Settelmeier
+
+29 Mar 2009 (Mark McCurry)
+	    - Started to use Doxygen within the Effects
+	    - Started to use const within Effects
+	    - Changing tabs->four spaces in hopes of generating a bit more
+	      consitancy
+	    - Began to use Initialization Lists
+	    - Almost all changes contained in Effects until further
+	      discussion on the style, so consistancy can be reached
+

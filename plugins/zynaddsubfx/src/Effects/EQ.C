@@ -25,11 +25,9 @@
 #include <math.h>
 #include "EQ.h"
 
-EQ::EQ(int insertion_,REALTYPE *efxoutl_,REALTYPE *efxoutr_){
-    efxoutl=efxoutl_;
-    efxoutr=efxoutr_;
-    insertion=insertion_;
-    filterpars=NULL;
+EQ::EQ(const int &insertion_,REALTYPE *efxoutl_,REALTYPE *efxoutr_)
+    :Effect(insertion_,efxoutl_,efxoutr_,NULL,0)
+{
     
     for (int i=0;i<MAX_EQ_BANDS;i++){
 	filter[i].Ptype=0;
@@ -41,7 +39,6 @@ EQ::EQ(int insertion_,REALTYPE *efxoutl_,REALTYPE *efxoutr_){
 	filter[i].r=new AnalogFilter(6,1000.0,1.0,0);
     };
     //default values
-    Ppreset=0;
     Pvolume=50;
     
     setpreset(Ppreset);    	   
@@ -84,7 +81,7 @@ void EQ::out(REALTYPE *smpsl,REALTYPE *smpsr){
 /*
  * Parameter control
  */
-void EQ::setvolume(unsigned char Pvolume){
+void EQ::setvolume(const unsigned char &Pvolume){
     this->Pvolume=Pvolume;
 
     outvolume=pow(0.005,(1.0-Pvolume/127.0))*10.0;
@@ -112,7 +109,7 @@ void EQ::setpreset(unsigned char npreset){
 };
 
 
-void EQ::changepar(int npar,unsigned char value){
+void EQ::changepar(const int &npar,const unsigned char &value){
     switch (npar){
 	case 0: setvolume(value);
 		break;
@@ -125,9 +122,9 @@ void EQ::changepar(int npar,unsigned char value){
     
     REALTYPE tmp;
     switch(bp){
-	case 0: if (value>9) value=0;//has to be changed if more filters will be added
-	        filter[nb].Ptype=value;
-		if (value!=0){
+	case 0: filter[nb].Ptype=value;
+                if (value>9) filter[nb].Ptype=0;//has to be changed if more filters will be added
+		if (filter[nb].Ptype!=0){
 		    filter[nb].l->settype(value-1);
 		    filter[nb].r->settype(value-1);
 		};
@@ -147,15 +144,15 @@ void EQ::changepar(int npar,unsigned char value){
 		filter[nb].l->setq(tmp);
 		filter[nb].r->setq(tmp);
 		break;
-	case 4: if (value>=MAX_FILTER_STAGES) value=MAX_FILTER_STAGES-1;
-		filter[nb].Pstages=value;
+	case 4: filter[nb].Pstages=value;
+                if (value>=MAX_FILTER_STAGES) filter[nb].Pstages=MAX_FILTER_STAGES-1;
 		filter[nb].l->setstages(value);
 		filter[nb].r->setstages(value);
 		break;
     };
 };
 
-unsigned char EQ::getpar(int npar){
+unsigned char EQ::getpar(const int &npar)const{
     switch (npar){
 	case 0: return(Pvolume);
 		break;

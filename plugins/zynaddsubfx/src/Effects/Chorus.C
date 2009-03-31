@@ -24,17 +24,14 @@
 #include "Chorus.h"
 #include <stdio.h>
 
-Chorus::Chorus(int insertion_,REALTYPE *efxoutl_,REALTYPE *efxoutr_){
-    efxoutl=efxoutl_;
-    efxoutr=efxoutr_;
+Chorus::Chorus(const int &insertion_,REALTYPE *const efxoutl_,REALTYPE *const efxoutr_)
+    :Effect(insertion_,efxoutl_,efxoutr_,NULL,0)
+{
     dlk=0;drk=0;
     maxdelay=(int)(MAX_CHORUS_DELAY/1000.0*SAMPLE_RATE);
     delayl=new REALTYPE[maxdelay];
     delayr=new REALTYPE[maxdelay];
-    insertion=insertion_;
 
-    filterpars=NULL;
-    Ppreset=0;
     setpreset(Ppreset);
 
     lfo.effectlfoout(&lfol,&lfor);
@@ -144,33 +141,33 @@ void Chorus::cleanup(){
 /*
  * Parameter control
  */
-void Chorus::setdepth(unsigned char Pdepth){
+void Chorus::setdepth(const unsigned char &Pdepth){
     this->Pdepth=Pdepth;
     depth=(pow(8.0,(Pdepth/127.0)*2.0)-1.0)/1000.0;//seconds
 };
 
-void Chorus::setdelay(unsigned char Pdelay){
+void Chorus::setdelay(const unsigned char &Pdelay){
     this->Pdelay=Pdelay;
     delay=(pow(10.0,(Pdelay/127.0)*2.0)-1.0)/1000.0;//seconds
 };
 
-void Chorus::setfb(unsigned char Pfb){
+void Chorus::setfb(const unsigned char &Pfb){
     this->Pfb=Pfb;
     fb=(Pfb-64.0)/64.1;
 };
-void Chorus::setvolume(unsigned char Pvolume){
+void Chorus::setvolume(const unsigned char &Pvolume){
     this->Pvolume=Pvolume;
     outvolume=Pvolume/127.0;
     if (insertion==0) volume=1.0;
 	else volume=outvolume;
 };
 
-void Chorus::setpanning(unsigned char Ppanning){
+void Chorus::setpanning(const unsigned char &Ppanning){
     this->Ppanning=Ppanning;
     panning=Ppanning/127.0;
 };
 
-void Chorus::setlrcross(unsigned char Plrcross){
+void Chorus::setlrcross(const unsigned char &Plrcross){
     this->Plrcross=Plrcross;
     lrcross=Plrcross/127.0;
 };
@@ -206,7 +203,7 @@ void Chorus::setpreset(unsigned char npreset){
 };
 
 
-void Chorus::changepar(int npar,unsigned char value){
+void Chorus::changepar(const int &npar,const unsigned char &value){
     switch(npar){
 	case 0:	setvolume(value);
 	        break;
@@ -232,16 +229,16 @@ void Chorus::changepar(int npar,unsigned char value){
 	        break;
 	case 9:	setlrcross(value);
 	        break;
-	case 10:if (value>1) value=1;
-		Pflangemode=value;
+	case 10:if (value>1) Pflangemode=1;
+                else Pflangemode=value;
 	        break;
-	case 11:if (value>1) value=1;
-	        Poutsub=value;
+	case 11:if (value>1) Poutsub=1;
+                else Poutsub=value;
 		break;
     };
 };
 
-unsigned char Chorus::getpar(int npar){
+unsigned char Chorus::getpar(const int &npar)const{
     switch (npar){
 	case 0:	return(Pvolume);
 		break;
@@ -271,7 +268,4 @@ unsigned char Chorus::getpar(int npar){
     };
     
 };
-
-
-
 

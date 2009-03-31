@@ -30,16 +30,16 @@
 
 class Chorus:public Effect {
     public:
-	Chorus(int insetion_,REALTYPE *efxoutl_,REALTYPE *efxoutr_);
+	Chorus(const int &insetion_,REALTYPE *efxoutl_,REALTYPE *efxoutr_);
 	~Chorus();
 	void out(REALTYPE *smpsl,REALTYPE *smpsr);
         void setpreset(unsigned char npreset);
-	void changepar(int npar,unsigned char value);
-	unsigned char getpar(int npar);
+	void changepar(const int &npar,const unsigned char &value);
+	unsigned char getpar(const int &npar)const;
 	void cleanup();
 		
     private:
-	//Parametrii Chorus
+	//Chorus Parameters
 	EffectLFO lfo;//lfo-ul chorus
 	unsigned char Pvolume;
 	unsigned char Ppanning;
@@ -52,17 +52,17 @@ class Chorus:public Effect {
 
 	
 	//Control Parametrii
-	void setvolume(unsigned char Pvolume);
-	void setpanning(unsigned char Ppanning);
-	void setdepth(unsigned char Pdepth);
-	void setdelay(unsigned char Pdelay);
-	void setfb(unsigned char Pfb);
-	void setlrcross(unsigned char Plrcross);
+	void setvolume(const unsigned char &Pvolume);
+	void setpanning(const unsigned char &Ppanning);
+	void setdepth(const unsigned char &Pdepth);
+	void setdelay(const unsigned char &Pdelay);
+	void setfb(const unsigned char &Pfb);
+	void setlrcross(const unsigned char &Plrcross);
 
-	//Valorile interne
+	//Internal Values
 	REALTYPE depth,delay,fb,lrcross,panning;
 	REALTYPE dl1,dl2,dr1,dr2,lfol,lfor;
-	int insertion,maxdelay;
+	int maxdelay;
 	REALTYPE *delayl,*delayr;
 	int dlk,drk,dlhi,dlhi2;
 	REALTYPE getdelay(REALTYPE xlfo);

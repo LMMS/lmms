@@ -24,16 +24,9 @@
 #include "Alienwah.h"
 #include <stdio.h>
 
-Alienwah::Alienwah(int insertion_,REALTYPE *efxoutl_,REALTYPE *efxoutr_){
-    efxoutl=efxoutl_;
-    efxoutr=efxoutr_;
-        
-    oldl=NULL;
-    oldr=NULL;
-    filterpars=NULL;
-    insertion=insertion_;
-
-    Ppreset=0;
+Alienwah::Alienwah(int insertion_,REALTYPE *efxoutl_,REALTYPE *efxoutr_)
+    :Effect(insertion_,efxoutl_,efxoutr_,NULL,0),oldl(NULL),oldr(NULL)
+{
     setpreset(Ppreset);
     cleanup();
     oldclfol.a=fb;oldclfol.b=0.0;
@@ -114,12 +107,12 @@ void Alienwah::cleanup(){
  * Parameter control
  */
 
-void Alienwah::setdepth(unsigned char Pdepth){
+void Alienwah::setdepth(const unsigned char &Pdepth){
     this->Pdepth=Pdepth;
     depth=(Pdepth/127.0);
 };
 
-void Alienwah::setfb(unsigned char Pfb){
+void Alienwah::setfb(const unsigned char &Pfb){
     this->Pfb=Pfb;
     fb=fabs((Pfb-64.0)/64.1);
     fb=sqrt(fb);
@@ -127,33 +120,33 @@ void Alienwah::setfb(unsigned char Pfb){
     if (Pfb<64) fb=-fb;
 };
 
-void Alienwah::setvolume(unsigned char Pvolume){
+void Alienwah::setvolume(const unsigned char &Pvolume){
     this->Pvolume=Pvolume;
     outvolume=Pvolume/127.0;
     if (insertion==0) volume=1.0;
 	else volume=outvolume;
 };
 
-void Alienwah::setpanning(unsigned char Ppanning){
+void Alienwah::setpanning(const unsigned char &Ppanning){
     this->Ppanning=Ppanning;
     panning=Ppanning/127.0;
 };
 
-void Alienwah::setlrcross(unsigned char Plrcross){
+void Alienwah::setlrcross(const unsigned char &Plrcross){
     this->Plrcross=Plrcross;
     lrcross=Plrcross/127.0;
 };
 
-void Alienwah::setphase(unsigned char Pphase){
+void Alienwah::setphase(const unsigned char &Pphase){
     this->Pphase=Pphase;
     phase=(Pphase-64.0)/64.0*PI;
 };
 
-void Alienwah::setdelay(unsigned char Pdelay){
+void Alienwah::setdelay(const unsigned char &Pdelay){
     if (oldl!=NULL) delete [] oldl;
     if (oldr!=NULL) delete [] oldr;
-    if (Pdelay>=MAX_ALIENWAH_DELAY) Pdelay=MAX_ALIENWAH_DELAY;
-    this->Pdelay=Pdelay;
+    if (Pdelay>=MAX_ALIENWAH_DELAY) this->Pdelay=MAX_ALIENWAH_DELAY;
+    else this->Pdelay=Pdelay;
     oldl=new COMPLEXTYPE[Pdelay];
     oldr=new COMPLEXTYPE[Pdelay];
     cleanup();
@@ -179,7 +172,7 @@ void Alienwah::setpreset(unsigned char npreset){
 };
 
 
-void Alienwah::changepar(int npar,unsigned char value){
+void Alienwah::changepar(const int &npar,const unsigned char &value){
     switch(npar){
 	case 0:	setvolume(value);
 	        break;
@@ -210,7 +203,7 @@ void Alienwah::changepar(int npar,unsigned char value){
     };
 };
 
-unsigned char Alienwah::getpar(int npar){
+unsigned char Alienwah::getpar(const int &npar)const{
     switch (npar){
 	case 0:	return(Pvolume);
 		break;

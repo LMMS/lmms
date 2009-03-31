@@ -33,44 +33,52 @@ struct COMPLEXTYPE {
     REALTYPE a,b;
 };
 
+/**"AlienWah" Effect*/
 class Alienwah:public Effect {
     public:
-	Alienwah(int insetion_,REALTYPE *efxoutl_,REALTYPE *efxoutr_);
-	~Alienwah();
-	void out(REALTYPE *smpsl,REALTYPE *smpsr);
+        /**
+         * Constructor
+         * @param insetion_ 1 for insertion Effect, 0 for others
+         * @param efxoutl_ Pointer to Alienwah's left channel output buffer
+         * @param efxoutr_ Pointer to Alienwah's left channel output buffer
+         * @return Initialized Alienwah
+         */
+        Alienwah(int insetion_,REALTYPE *const efxoutl_,REALTYPE *const efxoutr_);
+        ~Alienwah();
+        void out(REALTYPE *const smpsl,REALTYPE *const smpsr);
 
         void setpreset(unsigned char npreset);
-	void changepar(int npar,unsigned char value);
-	unsigned char getpar(int npar);
-	void cleanup();
-		
+        void changepar(const int &npar,const unsigned char &value);
+        unsigned char getpar(const int &npar)const;
+        void cleanup();
+        	
     private:
-	//Parametrii Alienwah
-	EffectLFO lfo;//lfo-ul Alienwah
-	unsigned char Pvolume;
-	unsigned char Ppanning;
-	unsigned char Pdepth;//the depth of the Alienwah
-	unsigned char Pfb;//feedback
-	unsigned char Plrcross;//feedback
-	unsigned char Pdelay;
-	unsigned char Pphase;
+        //Alienwah Parameters
+        EffectLFO lfo;//lfo-ul Alienwah
+        unsigned char Pvolume;
+        unsigned char Ppanning;
+        unsigned char Pdepth;//the depth of the Alienwah
+        unsigned char Pfb;//feedback
+        unsigned char Plrcross;//feedback
+        unsigned char Pdelay;
+        unsigned char Pphase;
 
-	
-	//Control Parametrii
-	void setvolume(unsigned char Pvolume);
-	void setpanning(unsigned char Ppanning);
-	void setdepth(unsigned char Pdepth);
-	void setfb(unsigned char Pfb);
-	void setlrcross(unsigned char Plrcross);
-	void setdelay(unsigned char Pdelay);
-	void setphase(unsigned char Pphase);
-	
-	//Valorile interne
-	int insertion;
-	REALTYPE panning,fb,depth,lrcross,phase;
-	COMPLEXTYPE *oldl,*oldr;
-	COMPLEXTYPE oldclfol,oldclfor;
-	int oldk;
+        
+        //Control Parameters
+        void setvolume(const unsigned char &Pvolume);
+        void setpanning(const unsigned char &Ppanning);
+        void setdepth(const unsigned char &Pdepth);
+        void setfb(const unsigned char &Pfb);
+        void setlrcross(const unsigned char &Plrcross);
+        void setdelay(const unsigned char &Pdelay);
+        void setphase(const unsigned char &Pphase);
+        
+        //Internal Values
+        //const int insertion; //value inherited
+        REALTYPE panning,fb,depth,lrcross,phase;
+        COMPLEXTYPE *oldl,*oldr;
+        COMPLEXTYPE oldclfol,oldclfor;
+        int oldk;
 };
 
 #endif

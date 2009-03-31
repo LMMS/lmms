@@ -26,17 +26,14 @@
 #include <stdlib.h>
 #include "Reverb.h"
 
-/*TODO: EarlyReflections,Prdelay,Perbalance */
+/**\todo: EarlyReflections,Prdelay,Perbalance */
 
-Reverb::Reverb(int insertion_,REALTYPE *efxoutl_,REALTYPE *efxoutr_){
-    efxoutl=efxoutl_;
-    efxoutr=efxoutr_;
+Reverb::Reverb(const int &insertion_,REALTYPE *efxoutl_,REALTYPE *efxoutr_)
+    :Effect(insertion_,efxoutl_,efxoutr_,NULL,0)
+{
     inputbuf=new REALTYPE[SOUND_BUFFER_SIZE];
-    filterpars=NULL;
 
-    insertion=insertion_;
     //defaults
-    Ppreset=0;
     Pvolume=48; 
     Ppan=64; 
     Ptime=64;
@@ -110,7 +107,7 @@ void Reverb::cleanup(){
 void Reverb::processmono(int ch,REALTYPE *output){
     int i,j;
     REALTYPE fbout,tmp;
-    //TODO: implement the high part from lohidamp
+    /**\todo: implement the high part from lohidamp*/
     
     for (j=REV_COMBS*ch;j<REV_COMBS*(ch+1);j++){
 
@@ -185,7 +182,7 @@ void Reverb::out(REALTYPE *smps_l, REALTYPE *smps_r){
 /*
  * Parameter control
  */
-void Reverb::setvolume(unsigned char Pvolume){
+void Reverb::setvolume(const unsigned char &Pvolume){
     this->Pvolume=Pvolume;
     if (insertion==0) {
 	outvolume=pow(0.01,(1.0-Pvolume/127.0))*4.0;
@@ -196,12 +193,12 @@ void Reverb::setvolume(unsigned char Pvolume){
     };
 };
 
-void Reverb::setpan(unsigned char Ppan){
+void Reverb::setpan(const unsigned char &Ppan){
     this->Ppan=Ppan;
     pan=(REALTYPE)Ppan/127.0;
 };
 
-void Reverb::settime(unsigned char Ptime){
+void Reverb::settime(const unsigned char &Ptime){
     int i;
     REALTYPE t;
     this->Ptime=Ptime;
@@ -230,7 +227,7 @@ void Reverb::setlohidamp(unsigned char Plohidamp){
 	};
 };
 
-void Reverb::setidelay(unsigned char Pidelay){
+void Reverb::setidelay(const unsigned char &Pidelay){
     REALTYPE delay;
     this->Pidelay=Pidelay;
     delay=pow(50*Pidelay/127.0,2)-1.0;
@@ -246,12 +243,12 @@ void Reverb::setidelay(unsigned char Pidelay){
     };
 };
 
-void Reverb::setidelayfb(unsigned char Pidelayfb){
+void Reverb::setidelayfb(const unsigned char &Pidelayfb){
     this->Pidelayfb=Pidelayfb;
     idelayfb=Pidelayfb/128.0;
 };
 
-void Reverb::sethpf(unsigned char Phpf){
+void Reverb::sethpf(const unsigned char &Phpf){
     this->Phpf=Phpf;
     if (Phpf==0) {//No HighPass
 	    if (hpf!=NULL) delete(hpf);
@@ -264,7 +261,7 @@ void Reverb::sethpf(unsigned char Phpf){
 	};
 };
 
-void Reverb::setlpf(unsigned char Plpf){
+void Reverb::setlpf(const unsigned char &Plpf){
     this->Plpf=Plpf;
     if (Plpf==127) {//No LowPass
 	    if (lpf!=NULL) delete(lpf);
@@ -327,10 +324,10 @@ void Reverb::settype(unsigned char Ptype){
     cleanup();
 };
 
-void Reverb::setroomsize(unsigned char Proomsize){
-    if (Proomsize==0) Proomsize=64;//this is because the older versions consider roomsize=0
+void Reverb::setroomsize(const unsigned char &Proomsize){
     this->Proomsize=Proomsize;
-    roomsize=(Proomsize-64.0)/64.0;
+    if (Proomsize==0) this->Proomsize=64;//this is because the older versions consider roomsize=0
+    roomsize=(this->Proomsize-64.0)/64.0;
     if (roomsize>0.0) roomsize*=2.0;
     roomsize=pow(10.0,roomsize);
     rs=sqrt(roomsize);
@@ -375,7 +372,7 @@ void Reverb::setpreset(unsigned char npreset){
 };
 
 
-void Reverb::changepar(int npar,unsigned char value){
+void Reverb::changepar(const int &npar,const unsigned char &value){
     switch (npar){
 	case 0: setvolume(value);
 		break;
@@ -404,7 +401,7 @@ void Reverb::changepar(int npar,unsigned char value){
     };
 };
 
-unsigned char Reverb::getpar(int npar){
+unsigned char Reverb::getpar(const int &npar)const{
     switch (npar){
 	case 0: return(Pvolume);
 		break;

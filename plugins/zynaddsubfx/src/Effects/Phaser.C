@@ -25,16 +25,9 @@
 #include <stdio.h>
 #define PHASER_LFO_SHAPE 2
 
-Phaser::Phaser(int insertion_,REALTYPE *efxoutl_,REALTYPE *efxoutr_){
-    efxoutl=efxoutl_;
-    efxoutr=efxoutr_;
-    filterpars=NULL;
-        
-    oldl=NULL;
-    oldr=NULL;
-    insertion=insertion_;
-
-    Ppreset=0;
+Phaser::Phaser(const int &insertion_,REALTYPE *efxoutl_,REALTYPE *efxoutr_)
+    :Effect(insertion_,efxoutl_,efxoutr_,NULL,0),oldl(NULL),oldr(NULL)
+{
     setpreset(Ppreset);
     cleanup();
 };
@@ -124,45 +117,45 @@ void Phaser::cleanup(){
 /*
  * Parameter control
  */
-void Phaser::setdepth(unsigned char Pdepth){
+void Phaser::setdepth(const unsigned char &Pdepth){
     this->Pdepth=Pdepth;
     depth=(Pdepth/127.0);
 };
 
 
-void Phaser::setfb(unsigned char Pfb){
+void Phaser::setfb(const unsigned char &Pfb){
     this->Pfb=Pfb;
     fb=(Pfb-64.0)/64.1;
 };
 
-void Phaser::setvolume(unsigned char Pvolume){
+void Phaser::setvolume(const unsigned char &Pvolume){
     this->Pvolume=Pvolume;
     outvolume=Pvolume/127.0;
     if (insertion==0) volume=1.0;
 	else volume=outvolume;
 };
 
-void Phaser::setpanning(unsigned char Ppanning){
+void Phaser::setpanning(const unsigned char &Ppanning){
     this->Ppanning=Ppanning;
     panning=Ppanning/127.0;
 };
 
-void Phaser::setlrcross(unsigned char Plrcross){
+void Phaser::setlrcross(const unsigned char &Plrcross){
     this->Plrcross=Plrcross;
     lrcross=Plrcross/127.0;
 };
 
-void Phaser::setstages(unsigned char Pstages){
+void Phaser::setstages(const unsigned char &Pstages){
     if (oldl!=NULL) delete [] oldl;
     if (oldr!=NULL) delete [] oldr;
-    if (Pstages>=MAX_PHASER_STAGES) Pstages=MAX_PHASER_STAGES-1;
-    this->Pstages=Pstages;
+    if (Pstages>=MAX_PHASER_STAGES) this->Pstages=MAX_PHASER_STAGES-1;
+    else this->Pstages=Pstages;
     oldl=new REALTYPE[Pstages*2];
     oldr=new REALTYPE[Pstages*2];
     cleanup();
 };
 
-void Phaser::setphase(unsigned char Pphase){
+void Phaser::setphase(const unsigned char &Pphase){
     this->Pphase=Pphase;
     phase=(Pphase/127.0);
 };
@@ -190,7 +183,7 @@ void Phaser::setpreset(unsigned char npreset){
 };
 
 
-void Phaser::changepar(int npar,unsigned char value){
+void Phaser::changepar(const int &npar,const unsigned char &value){
     switch(npar){
 	case 0:	setvolume(value);
 	        break;
@@ -216,15 +209,15 @@ void Phaser::changepar(int npar,unsigned char value){
 	        break;
 	case 9:	setlrcross(value);
 	        break;
-	case 10:if (value>1) value=1;
-		Poutsub=value;
+	case 10:if (value>1) Poutsub=1;
+                else Poutsub=value;
 		break;
 	case 11:setphase(value);
 	        break;
     };
 };
 
-unsigned char Phaser::getpar(int npar){
+unsigned char Phaser::getpar(const int &npar)const{
     switch (npar){
 	case 0:	return(Pvolume);
 		break;
@@ -254,7 +247,4 @@ unsigned char Phaser::getpar(int npar){
     };
     
 };
-
-
-
 

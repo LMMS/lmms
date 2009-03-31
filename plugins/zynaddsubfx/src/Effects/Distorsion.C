@@ -143,20 +143,17 @@ void waveshapesmps(int n,REALTYPE *smps,unsigned char type,unsigned char drive){
 };
 
 
-Distorsion::Distorsion(int insertion_,REALTYPE *efxoutl_,REALTYPE *efxoutr_){
-    efxoutl=efxoutl_;
-    efxoutr=efxoutr_;
+Distorsion::Distorsion(const int &insertion_,REALTYPE *efxoutl_,REALTYPE *efxoutr_)
+    :Effect(insertion_,efxoutl_,efxoutr_,NULL,0)
+{
 
     lpfl=new AnalogFilter(2,22000,1,0);
     lpfr=new AnalogFilter(2,22000,1,0);
     hpfl=new AnalogFilter(3,20,1,0);
     hpfr=new AnalogFilter(3,20,1,0);
     
-    filterpars=NULL;
 
-    insertion=insertion_;
     //default values
-    Ppreset=0;
     Pvolume=50;
     Plrcross=40; 
     Pdrive=90;
@@ -173,10 +170,10 @@ Distorsion::Distorsion(int insertion_,REALTYPE *efxoutl_,REALTYPE *efxoutr_){
 };
 
 Distorsion::~Distorsion(){
-    delete (lpfl);
-    delete (lpfr);
-    delete (hpfl);
-    delete (hpfr);
+    delete lpfl;
+    delete lpfr;
+    delete hpfl;
+    delete hpfr;
     
 };
 
@@ -256,7 +253,7 @@ void Distorsion::out(REALTYPE *smpsl,REALTYPE *smpsr){
 /*
  * Parameter control
  */
-void Distorsion::setvolume(unsigned char Pvolume){
+void Distorsion::setvolume(const unsigned char &Pvolume){
     this->Pvolume=Pvolume;
 
     if (insertion==0) {
@@ -269,25 +266,25 @@ void Distorsion::setvolume(unsigned char Pvolume){
 
 };
 
-void Distorsion::setpanning(unsigned char Ppanning){
+void Distorsion::setpanning(const unsigned char &Ppanning){
     this->Ppanning=Ppanning;
     panning=(Ppanning+0.5)/127.0;
 };
 
 
-void Distorsion::setlrcross(unsigned char Plrcross){
+void Distorsion::setlrcross(const unsigned char &Plrcross){
     this->Plrcross=Plrcross;
     lrcross=Plrcross/127.0*1.0;
 };
 
-void Distorsion::setlpf(unsigned char Plpf){
+void Distorsion::setlpf(const unsigned char &Plpf){
     this->Plpf=Plpf;
     REALTYPE fr=exp(pow(Plpf/127.0,0.5)*log(25000.0))+40;
     lpfl->setfreq(fr);
     lpfr->setfreq(fr);
 };
 
-void Distorsion::sethpf(unsigned char Phpf){
+void Distorsion::sethpf(const unsigned char &Phpf){
     this->Phpf=Phpf;
     REALTYPE fr=exp(pow(Phpf/127.0,0.5)*log(25000.0))+20.0;
     hpfl->setfreq(fr);
@@ -321,7 +318,7 @@ void Distorsion::setpreset(unsigned char npreset){
 };
 
 
-void Distorsion::changepar(int npar,unsigned char value){
+void Distorsion::changepar(const int &npar,const unsigned char &value){
     switch (npar){
 	case 0: setvolume(value);
 		break;
@@ -333,25 +330,25 @@ void Distorsion::changepar(int npar,unsigned char value){
 		break;
 	case 4: Plevel=value;
 		break;
-	case 5: if (value>13) value=13;//this must be increased if more distorsion types are added
-		Ptype=value;
+	case 5: if (value>13) Ptype=13;//this must be increased if more distorsion types are added
+                else Ptype=value;
 		break;
-	case 6: if (value>1) value=1;
-		Pnegate=value;
+	case 6: if (value>1) Pnegate=1;
+                else Pnegate=value;
 		break;
 	case 7: setlpf(value);
 		break;
 	case 8: sethpf(value);
 		break;
-	case 9: if (value>1) value=1;
-		Pstereo=value;
+	case 9: if (value>1) Pstereo=1;
+                else Pstereo=value;
 		break;
 	case 10:Pprefiltering=value;
 		break;
     };
 };
 
-unsigned char Distorsion::getpar(int npar){
+unsigned char Distorsion::getpar(const int &npar)const{
     switch (npar){
 	case 0: return(Pvolume);
 		break;
@@ -378,7 +375,4 @@ unsigned char Distorsion::getpar(int npar){
     };
     return(0);//in case of bogus parameter number
 };
-
-
-
 

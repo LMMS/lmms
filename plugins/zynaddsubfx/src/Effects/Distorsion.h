@@ -32,12 +32,12 @@ void waveshapesmps(int n,REALTYPE *smps,unsigned char type,unsigned char drive);
 
 class Distorsion:public Effect{
     public:
-	Distorsion(int insertion,REALTYPE *efxoutl_,REALTYPE *efxoutr_);
+	Distorsion(const int &insertion,REALTYPE *efxoutl_,REALTYPE *efxoutr_);
 	~Distorsion();
 	void out(REALTYPE *smpsl,REALTYPE *smpr);
 	void setpreset(unsigned char npreset);
-	void changepar(int npar,unsigned char value);
-	unsigned char getpar(int npar);
+	void changepar(const int &npar,const unsigned char &value);
+	unsigned char getpar(const int &npar)const;
 	void cleanup();
 	void applyfilters(REALTYPE *efxoutl,REALTYPE *efxoutr);
 
@@ -55,13 +55,13 @@ class Distorsion:public Effect{
 	unsigned char Pstereo; //0=mono,1=stereo
 	unsigned char Pprefiltering;//if you want to do the filtering before the distorsion
 	
-	void setvolume(unsigned char Pvolume);
-	void setpanning(unsigned char Ppanning);
-	void setlrcross(unsigned char Plrcross);
-	void setlpf(unsigned char Plpf);
-	void sethpf(unsigned char Phpf);
+	void setvolume(const unsigned char &Pvolume);
+	void setpanning(const unsigned char &Ppanning);
+	void setlrcross(const unsigned char &Plrcross);
+	void setlpf(const unsigned char &Plpf);
+	void sethpf(const unsigned char &Phpf);
 	
-	//Parametrii reali
+	//Real Parameters
 	REALTYPE panning,lrcross;
 	AnalogFilter *lpfl,*lpfr,*hpfl,*hpfr;
 
@@ -69,5 +69,4 @@ class Distorsion:public Effect{
 
 
 #endif
-
 

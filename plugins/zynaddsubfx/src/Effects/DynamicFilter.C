@@ -24,24 +24,19 @@
 #include "DynamicFilter.h"
 #include <stdio.h>
 
-DynamicFilter::DynamicFilter(int insertion_,REALTYPE *efxoutl_,REALTYPE *efxoutr_){
-    efxoutl=efxoutl_;
-    efxoutr=efxoutr_;
-        
-    insertion=insertion_;
-    
-    Ppreset=0;
-    filterl=NULL;
-    filterr=NULL;
-    filterpars=new FilterParams(0,64,64);
+DynamicFilter::DynamicFilter(int insertion_,REALTYPE *efxoutl_,REALTYPE *efxoutr_)
+    :Effect(insertion_,efxoutl_,efxoutr_,new FilterParams(0,64,64),0),
+     filterl(NULL),filterr(NULL)
+{
     setpreset(Ppreset);
     cleanup();
+    /**\todo fix intialization issues here*/
 };
 
 DynamicFilter::~DynamicFilter(){
-    delete(filterpars);
-    delete(filterl);
-    delete(filterr);
+    delete filterpars;
+    delete filterl;
+    delete filterr;
 };
 
 
@@ -110,26 +105,26 @@ void DynamicFilter::cleanup(){
  * Parameter control
  */
 
-void DynamicFilter::setdepth(unsigned char Pdepth){
+void DynamicFilter::setdepth(const unsigned char &Pdepth){
     this->Pdepth=Pdepth;
     depth=pow((Pdepth/127.0),2.0);
 };
 
 
-void DynamicFilter::setvolume(unsigned char Pvolume){
+void DynamicFilter::setvolume(const unsigned char &Pvolume){
     this->Pvolume=Pvolume;
     outvolume=Pvolume/127.0;
     if (insertion==0) volume=1.0;
 	else volume=outvolume;
 };
 
-void DynamicFilter::setpanning(unsigned char Ppanning){
+void DynamicFilter::setpanning(const unsigned char &Ppanning){
     this->Ppanning=Ppanning;
     panning=Ppanning/127.0;
 };
 
 
-void DynamicFilter::setampsns(unsigned char Pampsns){
+void DynamicFilter::setampsns(const unsigned char &Pampsns){
     ampsns=pow(Pampsns/127.0,2.5)*10.0;
     if (Pampsnsinv!=0) ampsns=-ampsns;    
     ampsmooth=exp(-Pampsmooth/127.0*10.0)*0.99;
@@ -255,7 +250,7 @@ void DynamicFilter::setpreset(unsigned char npreset){
 };
 
 
-void DynamicFilter::changepar(int npar,unsigned char value){
+void DynamicFilter::changepar(const int &npar,const unsigned char &value){
     switch(npar){
 	case 0:	setvolume(value);
 	        break;
@@ -286,7 +281,7 @@ void DynamicFilter::changepar(int npar,unsigned char value){
     };
 };
 
-unsigned char DynamicFilter::getpar(int npar){
+unsigned char DynamicFilter::getpar(const int &npar)const{
     switch (npar){
 	case 0:	return(Pvolume);
 		break;
@@ -312,7 +307,4 @@ unsigned char DynamicFilter::getpar(int npar){
     };
     
 };
-
-
-
 
