@@ -67,6 +67,11 @@ public:
 	// For TrackItem to call
 	void updateGeometry();
 
+	virtual bool resizable()
+	{
+		return false;
+	}
+
 protected:
 	virtual QVariant itemChange( GraphicsItemChange _change, const QVariant & _value );
 

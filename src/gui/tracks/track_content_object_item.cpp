@@ -149,10 +149,11 @@ QVariant TrackContentObjectItem::itemChange( GraphicsItemChange _change,
 		{
 			newPos.setX( 0 );
 		}
+		/* FUCK_GIT
 		if( newPos.y() < 0 )
 		{
 			newPos.setY( 0 );
-		}
+		} */
 
 		/* Let's just short-circuit the Y for now 
 		if( fmod( newPos.y(), 32 ) != 16 )
@@ -220,8 +221,53 @@ void TrackContentObjectItem::mouseReleaseEvent( QGraphicsSceneMouseEvent * event
 	setCursor( Qt::OpenHandCursor );
 
 	QTimeLine * timeLine = new QTimeLine();
-	prepareSnapBackAnimation( timeLine );
+	//prepareSnapBackAnimation( timeLine );
 
+	const float ppt = 16.0f;
+	const bool doSnap = true;
+
+	QList<QGraphicsItem*> selItems = scene()->selectedItems();
+
+	if( selItems.count() <= 1 )
+	{
+		midiTime t = qMax( 0, (int)( x() * midiTime::ticksPerTact() / ppt ) );
+		m_tco->movePosition( doSnap ? t.toNearestTact() : t );
+	}
+	else
+	{
+		// Find first item, TODO: Or maybe the item-under-mouse?
+		qreal earliestX = x();
+		midiTime earliestTime = m_tco->startPosition();
+
+		for( QList<QGraphicsItem *>::iterator it = selItems.begin();
+				it != selItems.end(); ++it )
+		{
+			
+			TrackContentObjectItem * tcoItem =
+				dynamic_cast<TrackContentObjectItem*>( *it );
+			if( tcoItem->x() < earliestX )
+			{
+				earliestX = qMin( earliestX, tcoItem->x() );
+				earliestTime = tcoItem->m_tco->startPosition();
+			}
+		}
+
+		midiTime t = qMax( 0, (int)( earliestX * midiTime::ticksPerTact() / ppt ) );
+		midiTime dt = ( doSnap ? t.toNearestTact() : t ) - earliestTime; 
+
+		for( QList<QGraphicsItem *>::iterator it = selItems.begin();
+				it != selItems.end(); ++it ) {
+			
+			trackContentObject * tco =
+				dynamic_cast<TrackContentObjectItem*>( *it )->m_tco;
+				
+			tco->movePosition( tco->startPosition() + dt );
+		}
+
+	}
+
+
+	/* FUCK_GIT
 	if( isSelected() ) {
 		QList<QGraphicsItem*> selItems = scene()->selectedItems();
 		for( QList<QGraphicsItem *>::iterator it = selItems.begin();
@@ -242,6 +288,7 @@ void TrackContentObjectItem::mouseReleaseEvent( QGraphicsSceneMouseEvent * event
 	timeLine->setCurveShape( QTimeLine::EaseInOutCurve );
 	connect( timeLine, SIGNAL(finished()), timeLine, SLOT(deleteLater()));
 	timeLine->start();
+	*/
 } 
  
 
