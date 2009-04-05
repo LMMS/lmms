@@ -913,7 +913,6 @@ void trackContentWidget::addTCOView( trackContentObjectView * _tcov )
 	tco->saveJournallingState( false );
 	changePosition();
 	tco->restoreJournallingState();
-
 }
 
 
@@ -1753,11 +1752,9 @@ trackContentObject * track::addTCO( trackContentObject * _tco )
 {
 	m_trackContentObjects.push_back( _tco );
 
-//	emit dataChanged();
 	emit trackContentObjectAdded( _tco );
 
-	//engine::getSongEditor()->setModified();
-	return( _tco );		// just for convenience
+	return _tco;		// just for convenience
 }
 
 
@@ -1776,6 +1773,7 @@ void track::removeTCO( trackContentObject * _tco )
 	{
 		m_trackContentObjects.erase( it );
 		emit trackContentObjectRemoved( _tco );
+		engine::getSong()->updateLength();
 		engine::getSong()->setModified();
 	}
 }

@@ -2,7 +2,7 @@
  * song_editor.h - declaration of class songEditor, a window where you can
  *                 setup your songs
  *
- * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -66,15 +66,13 @@ public slots:
 
 
 private slots:
-
-		void updatePosition( const midiTime & _t );
-
+	void updateScrollBar( int );
+	void updatePosition( const midiTime & _t );
 	void zoomingChanged( void );
 
 
 private:
 	virtual void keyPressEvent( QKeyEvent * _ke );
-	virtual void paintEvent( QPaintEvent * _pe );
 	virtual void wheelEvent( QWheelEvent * _we );
 
 	virtual bool allowRubberband( void ) const;

@@ -575,6 +575,8 @@ void song::updateLength( void )
 		}
 	}
 	m_tracksMutex.unlock();
+
+	emit lengthChanged( m_length );
 }
 
 
