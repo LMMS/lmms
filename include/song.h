@@ -311,6 +311,7 @@ private:
 	friend class controllerRackView;
 
 signals:
+	void lengthChanged( int _tacts );
 	void tempoChanged( bpm_t _new_bpm );
 	void timeSignatureChanged( int _old_ticks_per_tact,
 							int _ticks_per_tact );

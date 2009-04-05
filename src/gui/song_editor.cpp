@@ -374,6 +374,8 @@ songEditor::songEditor( song * _song, songEditor * & _engine_ptr ) :
 	static_cast<QVBoxLayout *>( layout() )->addWidget( m_leftRightScroll );
 	connect( m_leftRightScroll, SIGNAL( valueChanged( int ) ),
 					this, SLOT( scrolled( int ) ) );
+	connect( m_s, SIGNAL( lengthChanged( int ) ),
+			this, SLOT( updateScrollBar( int ) ) );
 
 
 	engine::getMainWindow()->workspace()->addSubWindow( this );
@@ -509,15 +511,6 @@ void songEditor::keyPressEvent( QKeyEvent * _ke )
 
 
 
-void songEditor::paintEvent( QPaintEvent * _pe )
-{
-	m_leftRightScroll->setMaximum( m_s->length() );
-	trackContainerView::paintEvent( _pe );
-}
-
-
-
-
 void songEditor::wheelEvent( QWheelEvent * _we )
 {
 	if( engine::getMainWindow()->isCtrlPressed() == TRUE )
@@ -641,6 +634,14 @@ void songEditor::masterPitchMoved( int _new_val )
 void songEditor::masterPitchReleased( void )
 {
 	m_mpsStatus->hide();
+}
+
+
+
+
+void songEditor::updateScrollBar( int _len )
+{
+	m_leftRightScroll->setMaximum( _len );
 }
 
 
