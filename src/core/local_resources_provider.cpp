@@ -114,11 +114,16 @@ void LocalResourcesProvider::removeDirectory( const QString & _path )
 void LocalResourcesProvider::reloadDirectory( const QString & _path )
 {
 	ResourcesTreeItem * dirTreeItem = NULL;
+	QString p = _path;
+	if( !p.endsWith( QDir::separator() ) )
+	{
+		p += QDir::separator();
+	}
 
 	foreach( ResourcesItem * it, database()->items() )
 	{
 		if( it->type() == ResourcesItem::TypeDirectory &&
-			it->fullPath() == _path )
+			it->fullName() == p )
 		{
 			dirTreeItem = it->treeItem();
 		}
@@ -130,7 +135,8 @@ void LocalResourcesProvider::reloadDirectory( const QString & _path )
 		if( dirItem )
 		{
 			m_scannedFolders.clear();
-			readDir( dirItem->path(), dirTreeItem->parent() );
+			readDir( dirItem->fullRelativeName(),
+					dirTreeItem->parent() );
 		}
 	}
 
