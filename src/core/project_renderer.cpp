@@ -1,7 +1,7 @@
 /*
  * project_renderer.cpp - projectRenderer-class for easily rendering projects
  *
- * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -84,7 +84,7 @@ projectRenderer::projectRenderer( const mixer::qualitySettings & _qs,
 				_os.samplerate, DEFAULT_CHANNELS, success_ful,
 				_out_file, _os.vbr,
 				_os.bitrate, _os.bitrate - 64, _os.bitrate + 64,
-				_os.depth == Depth_32Bit ? 32 : 16,
+				_os.depth == Depth_32Bit ? 32 : (Depth_24Bit ? 24 : 16),
 							engine::getMixer() );
 	if( success_ful == FALSE )
 	{

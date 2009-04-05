@@ -4,7 +4,7 @@
  * audio_file_wave.cpp - audio-device which encodes wave-stream and writes it
  *                       into a WAVE-file. This is used for song-export.
  *
- * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -72,6 +72,7 @@ bool audioFileWave::startEncoding( void )
 	switch( depth() )
 	{
 		case 32: m_si.format = SF_FORMAT_WAV | SF_FORMAT_FLOAT; break;
+		case 24: m_si.format = SF_FORMAT_WAV | SF_FORMAT_PCM_24; break;
 		case 16:
 		default: m_si.format = SF_FORMAT_WAV | SF_FORMAT_PCM_16; break;
 	}
@@ -86,7 +87,18 @@ void audioFileWave::writeBuffer( const surroundSampleFrame * _ab,
 						const fpp_t _frames,
 						const float _master_gain )
 {
-	if( depth() == 32 )
+	if( depth() == 16 )
+	{
+		intSampleFrameA * buf = (intSampleFrameA *)
+				alignedMalloc(
+					sizeof( intSampleFrameA ) * _frames );
+		alignedConvertToS16( _ab, buf, _frames, _master_gain,
+							!isLittleEndian() );
+
+		sf_writef_short( m_sf, (int_sample_t *) buf, _frames );
+		alignedFree( buf );
+	}
+	else
 	{
 		float *  buf = new float[_frames*channels()];
 		for( fpp_t frame = 0; frame < _frames; ++frame )
@@ -99,17 +111,6 @@ void audioFileWave::writeBuffer( const surroundSampleFrame * _ab,
 		}
 		sf_writef_float( m_sf, buf, _frames );
 		delete[] buf;
-	}
-	else
-	{
-		intSampleFrameA * buf = (intSampleFrameA *)
-				alignedMalloc(
-					sizeof( intSampleFrameA ) * _frames );
-		alignedConvertToS16( _ab, buf, _frames, _master_gain,
-							!isLittleEndian() );
-
-		sf_writef_short( m_sf, (int_sample_t *) buf, _frames );
-		alignedFree( buf );
 	}
 }
 
