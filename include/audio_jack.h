@@ -1,7 +1,7 @@
 /*
  * audio_jack.h - support for JACK-transport
  *
- * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -29,9 +29,8 @@
 #include "lmmsconfig.h"
 
 #ifdef LMMS_HAVE_JACK
-
 #include <jack/jack.h>
-
+#endif
 
 #include <QtCore/QVector>
 #include <QtCore/QList>
@@ -45,16 +44,17 @@ class QLineEdit;
 class lcdSpinBox;
 
 
-class audioJACK : public audioDevice
+class audioJACK : public QObject, public audioDevice
 {
+	Q_OBJECT
 public:
 	audioJACK( bool & _success_ful, mixer * _mixer );
 	virtual ~audioJACK();
 
 	inline static QString name( void )
 	{
-		return( QT_TRANSLATE_NOOP( "setupWidget",
-			"JACK (JACK Audio Connection Kit)" ) );
+		return QT_TRANSLATE_NOOP( "setupWidget",
+			"JACK (JACK Audio Connection Kit)" );
 	}
 
 
@@ -73,7 +73,14 @@ public:
 	} ;
 
 
+private slots:
+	void restartAfterZombified( void );
+
+
+#ifdef LMMS_HAVE_JACK
 private:
+	bool initJackClient( void );
+
 	virtual void startProcessing( void );
 	virtual void stopProcessing( void );
 	virtual void applyQualitySettings( void );
@@ -82,7 +89,10 @@ private:
 	virtual void unregisterPort( audioPort * _port );
 	virtual void renamePort( audioPort * _port );
 
-	static int processCallback( jack_nframes_t _nframes, void * _udata );
+	int processCallback( jack_nframes_t _nframes, void * _udata );
+
+	static int staticProcessCallback( jack_nframes_t _nframes,
+							void * _udata );
 	static void shutdownCallback( void * _udata );
 
 
@@ -91,7 +101,7 @@ private:
 	bool m_active;
 	bool m_stopped;
 
-	QSemaphore m_stop_semaphore;
+	QSemaphore m_stopSemaphore;
 
 	QVector<jack_port_t *> m_outputPorts;
 	sampleFrameA * m_outBuf;
@@ -108,9 +118,11 @@ private:
 
 	typedef QMap<audioPort *, stereoPort> jackPortMap;
 	jackPortMap m_portMap;
+#endif
+
+signals:
+	void zombified( void );
 
 } ;
-
-#endif
 
 #endif

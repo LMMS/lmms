@@ -1,9 +1,7 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * audio_jack.cpp - support for JACK-transport
  *
- * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -45,6 +43,7 @@
 #include "config_mgr.h"
 #include "lcd_spinbox.h"
 #include "audio_port.h"
+#include "main_window.h"
 #include "basic_ops.h"
 
 
@@ -56,87 +55,21 @@ audioJACK::audioJACK( bool & _success_ful, mixer * _mixer ) :
 					DEFAULT_CHANNELS, SURROUND_CHANNELS ),
 								_mixer ),
 	m_client( NULL ),
-	m_active( FALSE ),
-	m_stop_semaphore( 1 ),
+	m_active( false ),
+	m_stopSemaphore( 1 ),
 	m_outBuf( alignedAllocFrames( getMixer()->framesPerPeriod() ) ),
 	m_framesDoneInCurBuf( 0 ),
 	m_framesToDoInCurBuf( 0 )
 {
-	_success_ful = FALSE;
-
-	QString client_name = configManager::inst()->value( "audiojack",
-								"clientname" );
-	if( client_name == "" )
+	_success_ful = initJackClient();
+	if( _success_ful )
 	{
-		client_name = "lmms";
+		m_stopSemaphore.acquire();
+
+		connect( this, SIGNAL( zombified() ),
+				this, SLOT( restartAfterZombified() ),
+				Qt::QueuedConnection );
 	}
-
-#ifndef OLD_JACK
-	const char * server_name = NULL;
-	jack_status_t status;
-	m_client = jack_client_open( client_name.toAscii().constData(),
-						JackNullOption, &status,
-								server_name );
-	if( m_client == NULL )
-	{
-		printf( "jack_client_open() failed, status 0x%2.0x\n", status );
-		if( status & JackServerFailed )
-		{
-			printf( "Could not connect to JACK server.\n" );
-		}
-		return;
-	}
-	if( status & JackNameNotUnique )
-	{
-		printf( "there's already a client with name '%s', so unique "
-			"name '%s' was assigned\n", client_name.
-							toAscii().constData(),
-					jack_get_client_name( m_client ) );
-	}
-
-#else /* OLD_JACK */
-
-	m_client = jack_client_new( client_name.toAscii().constData() );
-	if( m_client == NULL )
-	{
-		printf( "jack_client_new() failed\n" );
-		return;
-	}
-
-#endif
-
-	// set process-callback
-	jack_set_process_callback( m_client, processCallback, this );
-
-	// set shutdown-callback
-	jack_on_shutdown( m_client, shutdownCallback, this );
-
-
-
-	if( jack_get_sample_rate( m_client ) != sampleRate() )
-	{
-		setSampleRate( jack_get_sample_rate( m_client ) );
-	}
-
-	for( Uint8 ch = 0; ch < channels(); ++ch )
-	{
-		QString name = QString( "master out " ) +
-				( ( ch % 2 ) ? "R" : "L" ) +
-				QString::number( ch / 2 + 1 );
-		m_outputPorts.push_back( jack_port_register( m_client,
-						name.toAscii().constData(),
-						JACK_DEFAULT_AUDIO_TYPE,
-						JackPortIsOutput, 0 ) );
-		if( m_outputPorts.back() == NULL )
-		{
-			printf( "no more JACK-ports available!\n" );
-			return;
-		}
-	}
-
-	m_stop_semaphore.acquire();
-
-	_success_ful = TRUE;
 }
 
 
@@ -144,7 +77,7 @@ audioJACK::audioJACK( bool & _success_ful, mixer * _mixer ) :
 
 audioJACK::~audioJACK()
 {
-	m_stop_semaphore.release();
+	m_stopSemaphore.release();
 
 	while( m_portMap.size() )
 	{
@@ -167,11 +100,106 @@ audioJACK::~audioJACK()
 
 
 
+void audioJACK::restartAfterZombified( void )
+{
+	if( initJackClient() )
+	{
+		m_active = false;
+		startProcessing();
+		QMessageBox::information( engine::getMainWindow(),
+			tr( "JACK client restarted" ),
+			tr( "LMMS was kicked by JACK for some reason. "
+				"Therefore the JACK backend of LMMS has been "
+				"restarted. You will have to make manual "
+				"connections again." ) );
+	}
+	else
+	{
+		QMessageBox::information( engine::getMainWindow(),
+			tr( "JACK server down" ),
+			tr( "The JACK server seems to have been shutdown "
+				"and starting a new instance failed. "
+				"Therefore LMMS is unable to proceed. "
+				"You should save your project and restart "
+						"JACK and LMMS." ) );
+	}
+}
+
+
+
+
+
+bool audioJACK::initJackClient( void )
+{
+	QString clientName = configManager::inst()->value( "audiojack",
+								"clientname" );
+	if( clientName.isEmpty() )
+	{
+		clientName = "lmms";
+	}
+
+	const char * serverName = NULL;
+	jack_status_t status;
+	m_client = jack_client_open( clientName.toAscii().constData(),
+						JackNullOption, &status,
+								serverName );
+	if( m_client == NULL )
+	{
+		printf( "jack_client_open() failed, status 0x%2.0x\n", status );
+		if( status & JackServerFailed )
+		{
+			printf( "Could not connect to JACK server.\n" );
+		}
+		return false;
+	}
+	if( status & JackNameNotUnique )
+	{
+		printf( "there's already a client with name '%s', so unique "
+			"name '%s' was assigned\n", clientName.
+							toAscii().constData(),
+					jack_get_client_name( m_client ) );
+	}
+
+	// set process-callback
+	jack_set_process_callback( m_client, staticProcessCallback, this );
+
+	// set shutdown-callback
+	jack_on_shutdown( m_client, shutdownCallback, this );
+
+
+
+	if( jack_get_sample_rate( m_client ) != sampleRate() )
+	{
+		setSampleRate( jack_get_sample_rate( m_client ) );
+	}
+
+	for( ch_cnt_t ch = 0; ch < channels(); ++ch )
+	{
+		QString name = QString( "master out " ) +
+				( ( ch % 2 ) ? "R" : "L" ) +
+				QString::number( ch / 2 + 1 );
+		m_outputPorts.push_back( jack_port_register( m_client,
+						name.toAscii().constData(),
+						JACK_DEFAULT_AUDIO_TYPE,
+						JackPortIsOutput, 0 ) );
+		if( m_outputPorts.back() == NULL )
+		{
+			printf( "no more JACK-ports available!\n" );
+			return false;
+		}
+	}
+
+	return true;
+}
+
+
+
+
 void audioJACK::startProcessing( void )
 {
-	m_stopped = FALSE;
+	m_stopped = false;
 
-	if( m_active )
+	if( m_active || m_client == NULL )
 	{
 		return;
 	}
@@ -182,7 +210,7 @@ void audioJACK::startProcessing( void )
 		return;
 	}
 
-	m_active = TRUE;
+	m_active = true;
 
 
 	// make sure, JACK transport is rolling
@@ -193,7 +221,7 @@ void audioJACK::startProcessing( void )
 
 
 	// try to sync JACK's and LMMS's buffer-size
-	jack_set_buffer_size( m_client, getMixer()->framesPerPeriod() );
+//	jack_set_buffer_size( m_client, getMixer()->framesPerPeriod() );
 
 
 
@@ -207,7 +235,7 @@ void audioJACK::startProcessing( void )
 	}
 	else
 	{
-		for( Uint8 ch = 0; ch < channels(); ++ch )
+		for( ch_cnt_t ch = 0; ch < channels(); ++ch )
 		{
 			if( jack_connect( m_client, jack_port_name(
 							m_outputPorts[ch] ),
@@ -228,7 +256,7 @@ void audioJACK::startProcessing( void )
 
 void audioJACK::stopProcessing( void )
 {
-	m_stop_semaphore.acquire();
+	m_stopSemaphore.acquire();
 }
 
 
@@ -260,7 +288,7 @@ void audioJACK::registerPort( audioPort * _port )
 	const QString name[2] = { _port->name() + " L",
 					_port->name() + " R" } ;
 
-	for( Uint8 ch = 0; ch < DEFAULT_CHANNELS; ++ch )
+	for( ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch )
 	{
 		m_portMap[_port].ports[ch] = jack_port_register( m_client,
 						name[ch].toAscii().constData(),
@@ -278,7 +306,7 @@ void audioJACK::unregisterPort( audioPort * _port )
 #ifdef AUDIO_PORT_SUPPORT
 	if( m_portMap.contains( _port ) )
 	{
-		for( Uint8 ch = 0; ch < DEFAULT_CHANNELS; ++ch )
+		for( ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch )
 		{
 			if( m_portMap[_port].ports[ch] != NULL )
 			{
@@ -301,7 +329,7 @@ void audioJACK::renamePort( audioPort * _port )
 	{
 		const QString name[2] = { _port->name() + " L",
 					_port->name() + " R" };
-		for( Uint8 ch = 0; ch < DEFAULT_CHANNELS; ++ch )
+		for( ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch )
 		{
 			jack_port_set_name( m_portMap[_port].ports[ch],
 					name[ch].toAscii().constData() );
@@ -315,33 +343,24 @@ void audioJACK::renamePort( audioPort * _port )
 
 int audioJACK::processCallback( jack_nframes_t _nframes, void * _udata )
 {
-	audioJACK * _this = static_cast<audioJACK *>( _udata );
+	jack_transport_state_t ts = jack_transport_query( m_client, NULL );
 
-/*	printf( "%f\n", jack_cpu_load( _this->m_client ) );*/
-
-#ifdef LMMS_DEBUG
-	assert( _this != NULL );
-#endif
-	jack_transport_state_t ts = jack_transport_query( _this->m_client,
-									NULL );
-
-	QVector<jack_default_audio_sample_t *> outbufs( _this->channels(),
-									NULL );
-	Uint8 chnl = 0;
+	QVector<jack_default_audio_sample_t *> outbufs( channels(), NULL );
+	ch_cnt_t chnl = 0;
 	for( QVector<jack_default_audio_sample_t *>::iterator it =
 			outbufs.begin(); it != outbufs.end(); ++it, ++chnl )
 	{
 		*it = (jack_default_audio_sample_t *) jack_port_get_buffer(
-					_this->m_outputPorts[chnl], _nframes );
+						m_outputPorts[chnl], _nframes );
 	}
 
 #ifdef AUDIO_PORT_SUPPORT
 	const Uint32 frames = qMin<Uint32>( _nframes,
-					_this->getMixer()->framesPerPeriod() );
-	for( jackPortMap::iterator it = _this->m_portMap.begin();
-					it != _this->m_portMap.end(); ++it )
+						getMixer()->framesPerPeriod() );
+	for( jackPortMap::iterator it = m_portMap.begin();
+						it != m_portMap.end(); ++it )
 	{
-		for( Uint8 ch = 0; ch < _this->channels(); ++ch )
+		for( ch_cnt_t ch = 0; ch < channels(); ++ch )
 		{
 			if( it.data().ports[ch] == NULL )
 			{
@@ -360,50 +379,60 @@ int audioJACK::processCallback( jack_nframes_t _nframes, void * _udata )
 #endif
 
 	jack_nframes_t done = 0;
-	while( done < _nframes && _this->m_stopped == FALSE )
+	while( done < _nframes && m_stopped == false )
 	{
 		jack_nframes_t todo = qMin<jack_nframes_t>(
 						_nframes,
-						_this->m_framesToDoInCurBuf -
-						_this->m_framesDoneInCurBuf );
+						m_framesToDoInCurBuf -
+							m_framesDoneInCurBuf );
 		if( ts == JackTransportRolling )
 		{
-			const float gain = _this->getMixer()->masterGain();
-			for( Uint8 chnl = 0; chnl < _this->channels(); ++chnl )
+			const float gain = getMixer()->masterGain();
+			for( ch_cnt_t chnl = 0; chnl < channels(); ++chnl )
 			{
+				jack_default_audio_sample_t * o = outbufs[chnl];
 				for( jack_nframes_t frame = 0; frame < todo;
 								++frame )
 				{
-					outbufs[chnl][done+frame] = 
-		_this->m_outBuf[_this->m_framesDoneInCurBuf+frame][chnl] * gain;
+					o[done+frame] = 
+						m_outBuf[m_framesDoneInCurBuf+
+							frame][chnl] * gain;
 				}
 			}
 		}
 		done += todo;
-		_this->m_framesDoneInCurBuf += todo;
-		if( _this->m_framesDoneInCurBuf == _this->m_framesToDoInCurBuf )
+		m_framesDoneInCurBuf += todo;
+		if( m_framesDoneInCurBuf == m_framesToDoInCurBuf )
 		{
-			_this->m_framesToDoInCurBuf = _this->getNextBuffer(
-							_this->m_outBuf );
-			if( !_this->m_framesToDoInCurBuf )
+			m_framesToDoInCurBuf = getNextBuffer( m_outBuf );
+			if( !m_framesToDoInCurBuf )
 			{
-				_this->m_stopped = TRUE;
-				_this->m_stop_semaphore.release();
+				m_stopped = true;
+				m_stopSemaphore.release();
 			}
-			_this->m_framesDoneInCurBuf = 0;
+			m_framesDoneInCurBuf = 0;
 		}
 	}
 
-	if( ts != JackTransportRolling || _this->m_stopped == TRUE )
+	if( ts != JackTransportRolling || m_stopped == true )
 	{
-		for( Uint8 ch = 0; ch < _this->channels(); ++ch )
+		for( ch_cnt_t ch = 0; ch < channels(); ++ch )
 		{
 			jack_default_audio_sample_t * b = outbufs[ch] + done;
 			memset( b, 0, sizeof( *b ) * ( _nframes - done ) );
 		}
 	}
 
-	return( 0 );
+	return 0;
+}
+
+
+
+
+int audioJACK::staticProcessCallback( jack_nframes_t _nframes, void * _udata )
+{
+	return static_cast<audioJACK *>( _udata )->
+					processCallback( _nframes, _udata );
 }
 
 
@@ -413,13 +442,7 @@ void audioJACK::shutdownCallback( void * _udata )
 {
 	audioJACK * _this = static_cast<audioJACK *>( _udata );
 	_this->m_client = NULL;
-/*	QMessageBox::information( 0, setupWidget::tr( "JACK-server down" ),
-					setupWidget::tr( "You seem to have "
-						"shutdown JACK-server, so "
-						"LMMS is unable to proceed. "
-						"You should save your project "
-						"and restart LMMS!" ),
-					QMessageBox::Ok );*/
+	_this->zombified();
 }
 
 
@@ -473,6 +496,8 @@ void audioJACK::setupWidget::saveSettings( void )
 }
 
 
-#endif
+
+#include "moc_audio_jack.cxx"
 
 #endif
+
