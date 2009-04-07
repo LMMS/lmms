@@ -59,7 +59,7 @@
 #endif
 
 
-#include <list>
+#include <vector>
 #include <string>
 
 
@@ -239,7 +239,7 @@ private:
 	float * * m_inputs;
 	float * * m_outputs;
 
-	std::list<VstMidiEvent> m_midiEvents;
+	std::vector<VstMidiEvent> m_midiEvents;
 
 	bpm_t m_bpm;
 	double m_currentSamplePos;
@@ -610,7 +610,7 @@ void remoteVstPlugin::process( const sampleFrame * _in, sampleFrame * _out )
 		events->reserved = 0;
 		events->numEvents = m_midiEvents.size();
 		int idx = 0;
-		for( std::list<VstMidiEvent>::iterator it =
+		for( std::vector<VstMidiEvent>::iterator it =
 							m_midiEvents.begin();
 					it != m_midiEvents.end(); ++it, ++idx )
 		{
