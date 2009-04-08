@@ -6637,7 +6637,7 @@ Wenn es mit anderer VST-software unter Linux funktioniert, kontaktieren Sie bitt
     <message>
         <location filename="../../plugins/vestige/vestige.cpp" line="311"/>
         <source>Open VST-plugin</source>
-        <translation>VST-Plugn öffnen</translation>
+        <translation>VST-Plugin öffnen</translation>
     </message>
     <message>
         <location filename="../../plugins/vestige/vestige.cpp" line="329"/>
