@@ -524,7 +524,7 @@ void instrumentTrack::updatePitch( void )
 
 int instrumentTrack::masterKey( int _midi_key ) const
 {
-	int key = m_baseNoteModel.value() + engine::getSong()->masterPitch();
+	int key = m_baseNoteModel.value() - engine::getSong()->masterPitch();
 	return tLimit<int>( _midi_key - ( key - DefaultKey ), 0, NumKeys );
 }
 
