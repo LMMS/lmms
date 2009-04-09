@@ -28,6 +28,7 @@
 #include <QtCore/QDir>
 #include <QtCore/QFileInfo>
 #include <QtCore/QLocale>
+#include <QtCore/QTemporaryFile>
 #include <QtGui/QCloseEvent>
 #include <QtGui/QMdiArea>
 #include <QtGui/QMdiSubWindow>
@@ -250,6 +251,12 @@ void vstPlugin::loadSettings( const QDomElement & _this )
 		}
 		setParameterDump( dump );
 	}
+
+	if( _this.hasAttribute( "chunk" ) )
+	{
+		loadChunk( QByteArray::fromBase64(
+				_this.attribute( "chunk" ).toAscii() ) );
+	}
 }
 
 
@@ -267,6 +274,11 @@ void vstPlugin::saveSettings( QDomDocument & _doc, QDomElement & _this )
 							it != dump.end(); ++it )
 	{
 		_this.setAttribute( it.key(), it.value() );
+	}
+	QByteArray chunk = saveChunk();
+	if( !chunk.isEmpty() )
+	{
+		_this.setAttribute( "chunk", QString( chunk.toBase64() ) );
 	}
 }
 
@@ -391,6 +403,45 @@ bool vstPlugin::processMessage( const message & _m )
 
 }
 
+
+
+
+void vstPlugin::loadChunk( const QByteArray & _chunk )
+{
+	QTemporaryFile tf;
+	if( tf.open() )
+	{
+		tf.write( _chunk );
+		lock();
+		sendMessage( message( IdLoadSettingsFromFile ).
+				addString( QDir::toNativeSeparators(
+					tf.fileName() ).toStdString() ).
+				addInt( _chunk.size() ) );
+		waitForMessage( IdLoadSettingsFromFile );
+		unlock();
+	}
+}
+
+
+
+
+QByteArray vstPlugin::saveChunk( void )
+{
+	QByteArray a;
+	QTemporaryFile tf;
+	if( tf.open() )
+	{
+		lock();
+		sendMessage( message( IdSaveSettingsToFile ).
+				addString( QDir::toNativeSeparators(
+					tf.fileName() ).toStdString() ) );
+		waitForMessage( IdSaveSettingsToFile );
+		unlock();
+		a = tf.readAll();
+	}
+
+	return a;
+}
 
 
 #include "moc_vst_plugin.cxx"
