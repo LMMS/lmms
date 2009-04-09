@@ -1296,11 +1296,7 @@ int main( int _argc, char * * _argv )
 	struct sched_param sparam;
 	sparam.sched_priority = ( sched_get_priority_max( SCHED_FIFO ) +
 				sched_get_priority_min( SCHED_FIFO ) ) / 2;
-	if( sched_setscheduler( 0, SCHED_FIFO, &sparam ) == -1 )
-	{
-		fprintf( stderr, "could not set realtime priority for "
-							"remoteVstPlugin\n" );
-	}
+	sched_setscheduler( 0, SCHED_FIFO, &sparam );
 #endif
 #endif
 
