@@ -522,8 +522,7 @@ void remoteVstPlugin::initEditor( void )
 
 bool remoteVstPlugin::load( const std::string & _plugin_file )
 {
-	if( ( m_libInst = LoadLibrary( _plugin_file.c_str() ) ) ==
-								NULL )
+	if( ( m_libInst = LoadLibrary( _plugin_file.c_str() ) ) == NULL )
 	{
 		return false;
 	}
@@ -571,11 +570,12 @@ bool remoteVstPlugin::load( const std::string & _plugin_file )
 	}
 
 
-	char id[8];
-	sprintf( id, "%c%c%c%c\n", ((char *)&m_plugin->uniqueID)[3],
+	char id[5];
+	sprintf( id, "%c%c%c%c", ((char *)&m_plugin->uniqueID)[3],
 					 ((char *)&m_plugin->uniqueID)[2],
 					 ((char *)&m_plugin->uniqueID)[1],
 					 ((char *)&m_plugin->uniqueID)[0] );
+	id[4] = 0;
 	sendMessage( message( IdVstPluginUniqueID ).addString( id ) );
 
 	// switch to appropriate threading model
