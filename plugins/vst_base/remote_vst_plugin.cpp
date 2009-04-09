@@ -38,6 +38,10 @@
 #include <pthread.h>
 #endif
 
+#ifdef LMMS_HAVE_FCNTL_H
+#include <fcntl.h>
+#endif
+
 #ifdef LMMS_BUILD_LINUX
 
 #ifdef LMMS_HAVE_SCHED_H
@@ -183,6 +187,12 @@ public:
 
 	// post properties of specified parameter
 	void getParameterProperties( const int _idx );
+
+	// save settings chunk of plugin into file
+	void saveChunkToFile( const std::string & _file );
+
+	// restore settings chunk of plugin from file
+	void loadChunkFromFile( const std::string & _file, int _len );
 
 	// number of inputs
 	virtual int inputCount( void ) const
@@ -348,6 +358,16 @@ bool remoteVstPlugin::processMessage( const message & _m )
 
 		case IdVstGetParameterProperties:
 			getParameterProperties( _m.getInt() );
+			break;
+
+		case IdSaveSettingsToFile:
+			saveChunkToFile( _m.getString() );
+			sendMessage( IdSaveSettingsToFile );
+			break;
+
+		case IdLoadSettingsFromFile:
+			loadChunkFromFile( _m.getString( 0 ), _m.getInt( 1 ) );
+			sendMessage( IdLoadSettingsFromFile );
 			break;
 
 		default:
@@ -795,6 +815,40 @@ void remoteVstPlugin::getParameterProperties( const int _idx )
 #endif
 				);
 	sendMessage( m );
+}
+
+
+
+
+void remoteVstPlugin::saveChunkToFile( const std::string & _file )
+{
+	if( m_plugin->flags & 32 )
+	{
+		void * chunk = NULL;
+		int len = m_plugin->dispatcher( m_plugin, 23, 0, 0, &chunk, 0 );
+		if( len > 0 )
+		{
+			int fd = open( _file.c_str(), O_WRONLY );
+			write( fd, chunk, len );
+			close( fd );
+		}
+	}
+}
+
+
+
+
+void remoteVstPlugin::loadChunkFromFile( const std::string & _file, int _len )
+{
+	char * buf = new char[_len];
+
+	const int fd = open( _file.c_str(), O_RDONLY );
+	read( fd, buf, _len );
+	close( fd );
+
+	// doesn't work for various plugins for some reason :-(
+	// m_plugin->dispatcher( m_plugin, 24, 0, _len, buf, 0 );
+	delete[] buf;
 }
 
 
