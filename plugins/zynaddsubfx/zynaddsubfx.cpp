@@ -138,7 +138,8 @@ void zynAddSubFx::loadSettings( const QDomElement & _this )
 		tf.write( a );
 		lock();
 		sendMessage( message( IdLoadSettingsFromFile ).
-				addString( tf.fileName().toStdString() ) );
+				addString( QDir::toNativeSeparators(
+					tf.fileName() ).toStdString() ) );
 		waitForMessage( IdLoadSettingsFromFile );
 		unlock();
 
