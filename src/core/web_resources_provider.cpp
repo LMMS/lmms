@@ -92,7 +92,7 @@ QByteArray WebResourcesProvider::fetchData( const ResourcesItem * _item,
 
 void WebResourcesProvider::finishDownload( int _id, bool a )
 {
-	m_downloadIDs.removeAll( _id );
+	m_downloadIDs << _id;
 }
 
 
@@ -200,14 +200,14 @@ void WebResourcesProvider::download( const QString & _path,
 					QBuffer * _target, bool _wait ) const
 {
 	const int id = m_http->get( _path, _target );
-	m_downloadIDs << id;
 
 	if( _wait )
 	{
-		while( m_downloadIDs.contains( id ) )
+		while( !m_downloadIDs.contains( id ) )
 		{
 			QCoreApplication::instance()->processEvents();
 		}
+		m_downloadIDs.removeAll( id );
 	}
 }
 
