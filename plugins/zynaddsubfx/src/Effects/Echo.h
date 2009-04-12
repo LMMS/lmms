@@ -49,6 +49,8 @@ class Echo:public Effect{
          * Outputs the echo to efxoutl and efxoutr
          * @param smpsl Sample from Left channel
          * @param smpsr Sample from Right channel
+         * \todo try to figure out if smpsl should be const *const
+         * or not
          */
         void out(REALTYPE *const smpsl,REALTYPE *const smpr);
         
@@ -99,14 +101,15 @@ class Echo:public Effect{
         /**\todo This function needs to be implemented or the  prototype should be removed*/
         void setdryonly();
     private:
+        /**\todo remove all of these once they have been depreciated*/
         //Parameters
-        unsigned char Pvolume;/**< Volume or Dry/Wetness*/
-        unsigned char Ppanning;/**< Panning*/
-        unsigned char Pdelay;/**< Delay of the Echo*/
-        unsigned char Plrdelay;/**< L/R delay difference*/
-        unsigned char Plrcross;/**< L/R Mixing*/
-        unsigned char Pfb;/**<Feedback*/
-        unsigned char Phidamp;/**<Dampening of the Echo*/
+        unsigned char Pvolume;/**<#1 Volume or Dry/Wetness*/
+        unsigned char Ppanning;/**<#2 Panning*/
+        unsigned char Pdelay;/**<#3 Delay of the Echo*/
+        unsigned char Plrdelay;/**<#4 L/R delay difference*/
+        unsigned char Plrcross;/**<#5 L/R Mixing*/
+        unsigned char Pfb;/**<#6Feedback*/
+        unsigned char Phidamp;/**<#7Dampening of the Echo*/
         
         void setvolume(const unsigned char & Pvolume);
         void setpanning(const unsigned char & Ppanning);

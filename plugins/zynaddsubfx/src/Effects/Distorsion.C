@@ -20,9 +20,7 @@
 
 */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
+#include <cmath>
 #include "Distorsion.h"
 
 
@@ -137,7 +135,7 @@ void waveshapesmps(int n,REALTYPE *smps,unsigned char type,unsigned char drive){
 		    smps[i]=tmp/tmpv;
 		};
 		break;
-	//update to Distorsion::changepar (Ptype max) if there is added more waveshapings functions
+	/**\todo update to Distorsion::changepar (Ptype max) if there is added more waveshapings functions*/
     };
 
 };

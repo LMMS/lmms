@@ -22,16 +22,14 @@
 
 #ifndef ALIENWAH_H
 #define ALIENWAH_H
+#include <complex>
 #include "../globals.h"
 #include "Effect.h"
 #include "EffectLFO.h"
 
+using namespace std;
 
 #define MAX_ALIENWAH_DELAY 100
-
-struct COMPLEXTYPE {
-    REALTYPE a,b;
-};
 
 /**"AlienWah" Effect*/
 class Alienwah:public Effect {
@@ -43,7 +41,7 @@ class Alienwah:public Effect {
          * @param efxoutr_ Pointer to Alienwah's left channel output buffer
          * @return Initialized Alienwah
          */
-        Alienwah(int insetion_,REALTYPE *const efxoutl_,REALTYPE *const efxoutr_);
+        Alienwah(const int &insetion_,REALTYPE *const efxoutl_,REALTYPE *const efxoutr_);
         ~Alienwah();
         void out(REALTYPE *const smpsl,REALTYPE *const smpsr);
 
@@ -74,10 +72,9 @@ class Alienwah:public Effect {
         void setphase(const unsigned char &Pphase);
         
         //Internal Values
-        //const int insertion; //value inherited
         REALTYPE panning,fb,depth,lrcross,phase;
-        COMPLEXTYPE *oldl,*oldr;
-        COMPLEXTYPE oldclfol,oldclfor;
+        complex<REALTYPE> *oldl,*oldr;
+        complex<REALTYPE> oldclfol,oldclfor;
         int oldk;
 };
 

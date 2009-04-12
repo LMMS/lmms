@@ -24,7 +24,7 @@
 #define EFFECT_LFO_H
 
 #include "../globals.h"
-
+/**LFO for some of the Effect objects*/
 class EffectLFO{
  public:
     EffectLFO();
@@ -40,11 +40,12 @@ class EffectLFO{
  
     REALTYPE xl,xr;
     REALTYPE incx;
-    REALTYPE ampl1,ampl2,ampr1,ampr2;//necesar pentru "randomness"
+    REALTYPE ampl1,ampl2,ampr1,ampr2;//necessary for "randomness"
     REALTYPE lfointensity;
     REALTYPE lfornd;
-    char lfotype;
+    char lfotype; /**\todo GET RID OF CHAR (use a subclass if types are needed)*/
 };
 
 
 #endif
+

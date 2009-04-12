@@ -20,9 +20,11 @@
 
 */
 
-#include <math.h>
+#include <cmath>
 #include "Chorus.h"
-#include <stdio.h>
+#include <iostream>
+
+using namespace std;
 
 Chorus::Chorus(const int &insertion_,REALTYPE *const efxoutl_,REALTYPE *const efxoutr_)
     :Effect(insertion_,efxoutl_,efxoutr_,NULL,0)
@@ -54,9 +56,10 @@ REALTYPE Chorus::getdelay(REALTYPE xlfo){
 	result=(delay+xlfo*depth)*SAMPLE_RATE;
     } else result=0;
     
-    //check if it is too big delay(caused bu errornous setdelay() and setdepth()    
+    //check if it is too big delay(caused bu errornous setdelay() and setdepth()
+    /**\todo fix setdelay() and setdepth(), so this error cannot occur*/
     if ((result+0.5)>=maxdelay) {
-	fprintf(stderr,"%s","WARNING: Chorus.C::getdelay(..) too big delay (see setdelay and setdepth funcs.)\n");
+	cerr << "WARNING: Chorus.C::getdelay(..) too big delay (see setdelay and setdepth funcs.)\n";
 	result=maxdelay-1.0;
     };
     return(result);
@@ -67,6 +70,7 @@ REALTYPE Chorus::getdelay(REALTYPE xlfo){
  */
 void Chorus::out(REALTYPE *smpsl,REALTYPE *smpsr){
     int i;
+    const REALTYPE one=1.0;
     dl1=dl2;dr1=dr2;
     lfo.effectlfoout(&lfol,&lfor);
     
@@ -93,7 +97,7 @@ void Chorus::out(REALTYPE *smpsl,REALTYPE *smpsr){
 	dlhi%=maxdelay;
 	
 	dlhi2=(dlhi-1+maxdelay)%maxdelay;
-	dllo=1.0-fmod(tmp,1.0);
+	dllo=1.0-fmod(tmp,one);
         efxoutl[i]=delayl[dlhi2]*dllo+delayl[dlhi]*(1.0-dllo);
 	delayl[dlk]=inl+efxoutl[i]*fb;
 
@@ -102,13 +106,13 @@ void Chorus::out(REALTYPE *smpsl,REALTYPE *smpsr){
 	//compute the delay in samples using linear interpolation between the lfo delays
 	mdel=(dr1*(SOUND_BUFFER_SIZE-i)+dr2*i)/SOUND_BUFFER_SIZE;
 	if (++drk>=maxdelay) drk=0;
-	tmp=drk-mdel+maxdelay*2.0;//where should I get the sample from
+	tmp=drk*1.0-mdel+maxdelay*2.0;//where should I get the sample from
 
 	F2I(tmp,dlhi);
 	dlhi%=maxdelay;	
 	
 	dlhi2=(dlhi-1+maxdelay)%maxdelay;
-	dllo=1.0-fmod(tmp,1.0);
+	dllo=1.0-fmod(tmp,one);
         efxoutr[i]=delayr[dlhi2]*dllo+delayr[dlhi]*(1.0-dllo);
 	delayr[dlk]=inr+efxoutr[i]*fb;
 

@@ -20,17 +20,16 @@
 
 */
 
-#include <math.h>
+#include <cmath>
 #include "Alienwah.h"
-#include <stdio.h>
 
-Alienwah::Alienwah(int insertion_,REALTYPE *efxoutl_,REALTYPE *efxoutr_)
+Alienwah::Alienwah(const int &insertion_,REALTYPE *const efxoutl_,REALTYPE *const efxoutr_)
     :Effect(insertion_,efxoutl_,efxoutr_,NULL,0),oldl(NULL),oldr(NULL)
 {
     setpreset(Ppreset);
     cleanup();
-    oldclfol.a=fb;oldclfol.b=0.0;
-    oldclfor.a=fb;oldclfor.b=0.0;
+    oldclfol=complex<REALTYPE>(fb,0.0);
+    oldclfor=complex<REALTYPE>(fb,0.0);
 };
 
 Alienwah::~Alienwah(){
@@ -43,39 +42,38 @@ Alienwah::~Alienwah(){
  * Apply the effect
  */
 void Alienwah::out(REALTYPE *smpsl,REALTYPE *smpsr){
-    int i;
-    REALTYPE lfol,lfor;
-    COMPLEXTYPE clfol,clfor,out,tmp;
-
+    REALTYPE lfol,lfor; //Left/Right LFOs
+    complex<REALTYPE> clfol,clfor,out,tmp;
+    /**\todo Rework, as optimization can be used when the new complex type is
+     * utilized.
+     * Before all calculations needed to be done with individual REALTYPE,
+     * but now they can be done together*/
     lfo.effectlfoout(&lfol,&lfor);
     lfol*=depth*PI*2.0;lfor*=depth*PI*2.0;
-    clfol.a=cos(lfol+phase)*fb;clfol.b=sin(lfol+phase)*fb;
-    clfor.a=cos(lfor+phase)*fb;clfor.b=sin(lfor+phase)*fb;
+    clfol=complex<REALTYPE>(cos(lfol+phase)*fb,sin(lfol+phase)*fb); //rework
+    clfor=complex<REALTYPE>(cos(lfor+phase)*fb,sin(lfor+phase)*fb); //rework
 
-    for (i=0;i<SOUND_BUFFER_SIZE;i++){	
+    for (int i=0;i<SOUND_BUFFER_SIZE;i++){/**\todo reduce significantly with
+                                            * valarray*/
 	REALTYPE x=((REALTYPE) i)/SOUND_BUFFER_SIZE;
 	REALTYPE x1=1.0-x;
-	//left	
-	tmp.a=clfol.a*x+oldclfol.a*x1;
-	tmp.b=clfol.b*x+oldclfol.b*x1;
-	
-	out.a=tmp.a*oldl[oldk].a-tmp.b*oldl[oldk].b
-	     +(1-fabs(fb))*smpsl[i]*panning;
-	out.b=tmp.a*oldl[oldk].b+tmp.b*oldl[oldk].a;
-	oldl[oldk].a=out.a;
-	oldl[oldk].b=out.b;
-	REALTYPE l=out.a*10.0*(fb+0.1);
+	//left
+        tmp=clfol*x+oldclfol*x1;
+
+        out=tmp*oldl[oldk];
+        out.real()+=(1-fabs(fb))*smpsr[i]*(1.0-panning);
+        
+        oldl[oldk]=out;
+	REALTYPE l=out.real()*10.0*(fb+0.1);
 	
 	//right
-	tmp.a=clfor.a*x+oldclfor.a*x1;
-	tmp.b=clfor.b*x+oldclfor.b*x1;
+        tmp=clfor*x+oldclfor*x1;
 	
-	out.a=tmp.a*oldr[oldk].a-tmp.b*oldr[oldk].b
-	     +(1-fabs(fb))*smpsr[i]*(1.0-panning);
-	out.b=tmp.a*oldr[oldk].b+tmp.b*oldr[oldk].a;
-	oldr[oldk].a=out.a;
-	oldr[oldk].b=out.b;
-	REALTYPE r=out.a*10.0*(fb+0.1);
+        out=tmp*oldr[oldk];
+        out.real()+=(1-fabs(fb))*smpsr[i]*(1.0-panning);
+	
+        oldr[oldk]=out;
+	REALTYPE r=out.real()*10.0*(fb+0.1);
 
 
 	if (++oldk>=Pdelay) oldk=0;
@@ -84,8 +82,8 @@ void Alienwah::out(REALTYPE *smpsl,REALTYPE *smpsr){
 	efxoutr[i]=r*(1.0-lrcross)+l*lrcross;
     };
 
-    oldclfol.a=clfol.a;oldclfol.b=clfol.b;
-    oldclfor.a=clfor.a;oldclfor.b=clfor.b;
+    oldclfol=clfol;
+    oldclfor=clfor;
 
 };
 
@@ -93,11 +91,9 @@ void Alienwah::out(REALTYPE *smpsl,REALTYPE *smpsr){
  * Cleanup the effect
  */
 void Alienwah::cleanup(){
-    for (int i=0;i<Pdelay;i++) {
-	oldl[i].a=0.0;
-	oldl[i].b=0.0;
-	oldr[i].a=0.0;
-	oldr[i].b=0.0;
+    for (int i=0;i<Pdelay;i++) { /**\todo reduce with valarray*/
+	oldl[i]=complex<REALTYPE>(0.0,0.0);
+	oldr[i]=complex<REALTYPE>(0.0,0.0);
     };
     oldk=0;
 };
@@ -147,8 +143,8 @@ void Alienwah::setdelay(const unsigned char &Pdelay){
     if (oldr!=NULL) delete [] oldr;
     if (Pdelay>=MAX_ALIENWAH_DELAY) this->Pdelay=MAX_ALIENWAH_DELAY;
     else this->Pdelay=Pdelay;
-    oldl=new COMPLEXTYPE[Pdelay];
-    oldr=new COMPLEXTYPE[Pdelay];
+    oldl=new complex<REALTYPE>[Pdelay];
+    oldr=new complex<REALTYPE>[Pdelay];
     cleanup();
 };
 
@@ -231,7 +227,4 @@ unsigned char Alienwah::getpar(const int &npar)const{
     };
     
 };
-
-
-
 

@@ -110,7 +110,7 @@ return(idbresp);
 
 REALTYPE EQGraph::getfreqx(REALTYPE x) {
   if (x>1.0) x=1.0;
-return(20.0*pow(1000.0,x));
+return(20.0*pow((REALTYPE)1000.0,x));
 }
 
 REALTYPE EQGraph::getfreqpos(REALTYPE freq) {

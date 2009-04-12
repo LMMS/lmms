@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0109 
+version 1.0107 
 header_name {.h} 
 code_name {.cc}
 decl {//Copyright (c) 2002-2005 Nasca Octavian Paul} {} 
@@ -36,7 +36,7 @@ decl {\#include "../Effects/EffectMgr.h"} {public
 decl {\#include "PresetsUI.h"} {public
 } 
 
-class EQGraph {: {public Fl_Box}
+class EQGraph {selected : {public Fl_Box}
 } {
   Function {EQGraph(int x,int y, int w, int h, const char *label=0):Fl_Box(x,y,w,h,label)} {} {
     code {eff=NULL;
@@ -141,7 +141,7 @@ return(idbresp);} {}
   Function {getfreqx(REALTYPE x)} {return_type REALTYPE
   } {
     code {if (x>1.0) x=1.0;
-return(20.0*pow(1000.0,x));} {}
+return(20.0*pow((REALTYPE)1000.0,x));} {}
   }
   Function {getfreqpos(REALTYPE freq)} {return_type REALTYPE
   } {
@@ -336,7 +336,7 @@ refresh(eff);}
         callback {int x=64;
 if (Fl::event_button1()) x=(int)o->value();
    else o->value(x);
-eff->seteffectpar(11,x);} selected
+eff->seteffectpar(11,x);}
         tooltip RoomSize xywh {190 10 25 25} box ROUND_UP_BOX labelfont 1 labelsize 8 align 8 minimum 1 maximum 127 step 1
         class WidgetPDial
       }

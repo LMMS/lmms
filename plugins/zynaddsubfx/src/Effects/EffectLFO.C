@@ -20,9 +20,8 @@
 
 */
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
+#include <cstdlib>
+#include <cmath>
 
 #include "EffectLFO.h"
 
@@ -75,7 +74,7 @@ REALTYPE EffectLFO::getlfoshape(REALTYPE x){
 		else if ((x>0.25)&&(x<0.75)) out=2-4*x;
 		     else out=4.0*x-4.0;
 		break;
-	//more to be added here; also ::updateparams() need to be updated (to allow more lfotypes)
+	/**\todo more to be added here; also ::updateparams() need to be updated (to allow more lfotypes)*/
 	default:out=cos(x*2*PI);//EffectLFO_SINE
     };
     return(out);

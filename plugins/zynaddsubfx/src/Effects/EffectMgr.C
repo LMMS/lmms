@@ -20,30 +20,34 @@
 
 */
 
-#include <stdlib.h>
-#include <stdio.h>
 #include "EffectMgr.h"
 
-EffectMgr::EffectMgr(int insertion_,pthread_mutex_t *mutex_){
-    setpresettype("Peffect");
-    efx=NULL;
-    nefx=0;
-    insertion=insertion_;
-    mutex=mutex_;
-    efxoutl=new REALTYPE[SOUND_BUFFER_SIZE];
-    efxoutr=new REALTYPE[SOUND_BUFFER_SIZE];;
+EffectMgr::EffectMgr(int insertion_,pthread_mutex_t *mutex_)
+    :insertion(insertion_),
+    efxoutl(new REALTYPE[SOUND_BUFFER_SIZE]),
+    efxoutr(new REALTYPE[SOUND_BUFFER_SIZE]),
+    filterpars(NULL),nefx(0),efx(NULL),mutex(mutex_),dryonly(false)
+{
+    setpresettype("Peffect"); /**\todo Figure out what this is doing
+                               * , as it might be another leaky abstraction.*/
+//    efx=NULL;
+//    nefx=0;
+//    insertion=insertion_;
+//    mutex=mutex_;
+//    efxoutl=new REALTYPE[SOUND_BUFFER_SIZE];
+//    efxoutr=new REALTYPE[SOUND_BUFFER_SIZE];
     for (int i=0;i<SOUND_BUFFER_SIZE;i++){
 	efxoutl[i]=0.0;
 	efxoutr[i]=0.0;
     };
-    filterpars=NULL;
-    dryonly=false;
+//    filterpars=NULL;
+//    dryonly=false;
     defaults();
 }
 
 
 EffectMgr::~EffectMgr(){
-    if (efx!=NULL) delete (efx);
+    if (efx!=NULL) delete efx;
     delete []efxoutl;
     delete []efxoutr;
 }
@@ -66,7 +70,7 @@ void EffectMgr::changeeffect(int nefx_){
     };
 
     if (efx!=NULL) delete efx;
-    switch (nefx){
+    switch (nefx){ /**\todo replace leaky abstraction*/
 	case 1:efx=new Reverb(insertion,efxoutl,efxoutr);break;
 	case 2:efx=new Echo(insertion,efxoutl,efxoutr);break;
 	case 3:efx=new Chorus(insertion,efxoutl,efxoutr);break;
@@ -173,6 +177,7 @@ void EffectMgr::out(REALTYPE *smpsl,REALTYPE *smpsr){
     REALTYPE volume=efx->volume;
     
     if (nefx==7){//this is need only for the EQ effect
+      /**\todo figure out why*/
 	for (i=0;i<SOUND_BUFFER_SIZE;i++){
 	    smpsl[i]=efxoutl[i];
 	    smpsr[i]=efxoutr[i];
@@ -245,7 +250,8 @@ void EffectMgr::add2XML(XMLwrapper *xml){
     xml->addpar("preset",efx->Ppreset);
 
     xml->beginbranch("EFFECT_PARAMETERS");
-	for (int n=0;n<128;n++){
+	for (int n=0;n<128;n++){ /**\todo evaluate who should oversee saving
+                                   * and loading of parameters*/
 	    int par=geteffectpar(n);
 	    if (par==0) continue;
 	    xml->beginbranch("par_no",n);
@@ -286,6 +292,4 @@ void EffectMgr::getfromXML(XMLwrapper *xml){
     };
     cleanup();
 }
-
-
 

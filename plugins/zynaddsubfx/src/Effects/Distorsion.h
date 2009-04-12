@@ -29,7 +29,7 @@
 
 //Waveshaping(called by Distorsion effect and waveshape from OscilGen)
 void waveshapesmps(int n,REALTYPE *smps,unsigned char type,unsigned char drive);
-
+/**Distortion Effect*/
 class Distorsion:public Effect{
     public:
 	Distorsion(const int &insertion,REALTYPE *efxoutl_,REALTYPE *efxoutr_);

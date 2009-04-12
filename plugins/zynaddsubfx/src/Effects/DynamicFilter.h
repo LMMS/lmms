@@ -27,7 +27,7 @@
 #include "EffectLFO.h"
 
 #include "../DSP/Filter.h"
-
+/**DynamicFilter Effect*/
 class DynamicFilter:public Effect {
     public:
 	DynamicFilter(int insetion_,REALTYPE *efxoutl_,REALTYPE *efxoutr_);

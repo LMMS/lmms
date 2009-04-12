@@ -20,9 +20,8 @@
 
 */
 
-#include <math.h>
+#include <cmath>
 #include "DynamicFilter.h"
-#include <stdio.h>
 
 DynamicFilter::DynamicFilter(int insertion_,REALTYPE *efxoutl_,REALTYPE *efxoutr_)
     :Effect(insertion_,efxoutl_,efxoutr_,new FilterParams(0,64,64),0),
@@ -127,7 +126,10 @@ void DynamicFilter::setpanning(const unsigned char &Ppanning){
 void DynamicFilter::setampsns(const unsigned char &Pampsns){
     ampsns=pow(Pampsns/127.0,2.5)*10.0;
     if (Pampsnsinv!=0) ampsns=-ampsns;    
-    ampsmooth=exp(-Pampsmooth/127.0*10.0)*0.99;
+    ampsmooth=exp(-Pampsmooth/127.0*10.0)*0.99;/**\todo currently Pampsmooth is
+                                                 * uninitialized when this is
+                                                 * called. Please fix.
+                                                 */
     this->Pampsns=Pampsns;
 };
 

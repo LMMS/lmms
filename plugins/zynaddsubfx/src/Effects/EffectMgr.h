@@ -17,7 +17,6 @@
   You should have received a copy of the GNU General Public License (version 2)
   along with this program; if not, write to the Free Software Foundation,
   Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
-
 */
 
 #ifndef EFFECTMGR_H
@@ -57,19 +56,41 @@ class EffectMgr:public Presets{
 	REALTYPE sysefxgetvolume();
 
 	void cleanup();/**<cleanup the effect*/
-	
+
+	/**change effect to the given int
+         * @param nefx_ the number of the effect*/
 	void changeeffect(int nefx_);
+        /**Get the number of the effect
+         * @return the number
+         * \todo try to fix abstraction failure*/
 	int geteffect();
+        /**
+         * Change the preset to the given one
+         * @param npreset number of the chosen preset
+         * \todo figure out why this is binary
+         */
         void changepreset(unsigned char npreset);
+        /**
+         * Change the preset to the given one without locking the thread
+         * @param npreset number of the chosen preset
+         * \todo figure out why this is binary
+         */
         void changepreset_nolock(unsigned char npreset);
+        /**
+         * Get the current preset
+         * @return the current preset*/
 	unsigned char getpreset();
+        /**sets the effect par*/
 	void seteffectpar(int npar,unsigned char value);
-	void seteffectpar_nolock(int npar,unsigned char value);/**<sets the effect par without thread lock*/
+        /**<sets the effect par without thread lock*/
+        void seteffectpar_nolock(int npar,unsigned char value);
 	unsigned char geteffectpar(int npar);
-        int insertion;/**<1 if the effect is connected as insertion effect*/
+        int insertion;/**<1 if the effect is connected as insertion effect
+                       * \todo figure out why this is not a bool*/
 	REALTYPE *efxoutl,*efxoutr;
 
-	//used by UI
+	/**used by UI
+         * \todo needs to be decoupled*/
 	REALTYPE getEQfreqresponse(REALTYPE freq);
 
 	FilterParams *filterpars;
@@ -82,6 +103,4 @@ class EffectMgr:public Presets{
 };
 
 #endif
-
-
 

@@ -150,6 +150,7 @@ void Echo::sethidamp(const unsigned char & Phidamp){
 }
 
 void Echo::setpreset(unsigned char npreset){
+    /**\todo see if the preset array can be replaced with a struct or a class*/
     const int PRESET_SIZE=7;
     const int NUM_PRESETS=9;
     unsigned char presets[NUM_PRESETS][PRESET_SIZE]={
@@ -175,12 +176,13 @@ void Echo::setpreset(unsigned char npreset){
 
     if (npreset>=NUM_PRESETS) npreset=NUM_PRESETS-1;
     for (int n=0;n<PRESET_SIZE;n++) changepar(n,presets[npreset][n]);
-    if (insertion!=0) changepar(0,presets[npreset][0]/2);//lower the volume if this is insertion effect
+    if (insertion!=0) setvolume(presets[npreset][0]/2);//lower the volume if this is insertion effect
     Ppreset=npreset;
 }
 
 
 void Echo::changepar(const int & npar,const unsigned char & value){
+  /**\todo get rid of this leaky abstraction*/
     switch (npar){
         case 0: setvolume(value);
                 break;
@@ -197,11 +199,10 @@ void Echo::changepar(const int & npar,const unsigned char & value){
         case 6: sethidamp(value);
                 break;
     };
-    /**\todo in case of bogus parameter number print error to find depreciated
-     *calls*/
 }
 
 unsigned char Echo::getpar(const int & npar)const{
+  /**\todo get rid of this leaky abstraction*/
     switch (npar){
         case 0: return(Pvolume);
                 break;

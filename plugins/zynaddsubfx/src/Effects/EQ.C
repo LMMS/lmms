@@ -20,9 +20,7 @@
 
 */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
+#include <cmath>
 #include "EQ.h"
 
 EQ::EQ(const int &insertion_,REALTYPE *efxoutl_,REALTYPE *efxoutr_)

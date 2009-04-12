@@ -28,13 +28,51 @@
 
 #define MAX_CHORUS_DELAY 250.0 //ms
 
+/**Chorus and Flange effects*/
 class Chorus:public Effect {
     public:
 	Chorus(const int &insetion_,REALTYPE *efxoutl_,REALTYPE *efxoutr_);
+        /**Destructor*/
 	~Chorus();
 	void out(REALTYPE *smpsl,REALTYPE *smpsr);
         void setpreset(unsigned char npreset);
+        /**
+         * Sets the value of the chosen variable
+         *
+         * The possible parameters are:
+         *   -# Volume
+         *   -# Panning
+         *   -# LFO Frequency
+         *   -# LFO Randomness
+         *   -# LFO Type
+         *   -# LFO stereo
+         *   -# Depth
+         *   -# Delay
+         *   -# Feedback
+         *   -# Flange Mode
+         *   -# Subtractive
+         * @param npar number of chosen parameter
+         * @param value the new value
+         */
 	void changepar(const int &npar,const unsigned char &value);
+        /**
+         * Gets the value of the chosen variable
+         *
+         * The possible parameters are:
+         *   -# Volume
+         *   -# Panning
+         *   -# LFO Frequency
+         *   -# LFO Randomness
+         *   -# LFO Type
+         *   -# LFO stereo
+         *   -# Depth
+         *   -# Delay
+         *   -# Feedback
+         *   -# Flange Mode
+         *   -# Subtractive
+         * @param npar number of chosen parameter
+         * @return the value of the parameter
+         */
 	unsigned char getpar(const int &npar)const;
 	void cleanup();
 		
@@ -51,7 +89,7 @@ class Chorus:public Effect {
 	unsigned char Poutsub;//if I wish to substract the output instead of the adding it
 
 	
-	//Control Parametrii
+	//Parameter Controls
 	void setvolume(const unsigned char &Pvolume);
 	void setpanning(const unsigned char &Ppanning);
 	void setdepth(const unsigned char &Pdepth);
