@@ -155,7 +155,7 @@ public:
   void callback(Fl_Callback1*c, long p=0) {callback_=(Fl_Callback*)c; user_data_=(void*)p;}
   void* user_data() const {return user_data_;}
   void user_data(void* v) {user_data_ = v;}
-  long argument() const {return (long long)user_data_;}
+  long argument() const {return (long)user_data_;}
   void argument(long v) {user_data_ = (void*)v;}
   Fl_When when() const {return (Fl_When)when_;}
   void when(uchar i) {when_ = i;}
