@@ -195,7 +195,9 @@ static Fl_FontSize* find(int fnum, int size) {
 
 int fl_font_ = 0;
 int fl_size_ = 0;
+#if USE_XFT != 1
 XFontStruct* fl_xfont = 0;
+#endif
 void *fl_xftfont = 0;
 static GC font_gc;
 

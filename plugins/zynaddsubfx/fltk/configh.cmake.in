@@ -80,8 +80,12 @@
  * Use the new Xft library to draw anti-aliased text.
  */
 
+#cmakedefine FOUND_XFT
+#ifdef FOUND_XFT
+#define USE_XFT 1
+#else
 #define USE_XFT 0
-
+#endif
 /*
  * HAVE_XDBE:
  *
