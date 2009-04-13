@@ -435,8 +435,9 @@ void fileBrowserTreeWidget::mousePressEvent( QMouseEvent * _me )
 			m_previewPlayHandle = s;
 			delete tf;
 		}
-		else if( f->handling() == fileItem::LoadAsPreset ||
-				f->handling() == fileItem::LoadByPlugin )
+		else if( f->type() != fileItem::VstPluginFile &&
+				( f->handling() == fileItem::LoadAsPreset ||
+				f->handling() == fileItem::LoadByPlugin ) )
 		{
 			m_previewPlayHandle =
 				new presetPreviewPlayHandle( f->fullName(),
@@ -496,6 +497,14 @@ void fileBrowserTreeWidget::mouseMoveEvent( QMouseEvent * _me )
 								f->fullName(),
 							embed::getIconPixmap(
 								"midi_file" ),
+									this );
+					break;
+
+				case fileItem::VstPluginFile:
+					new stringPairDrag( "vstplugin",
+								f->fullName(),
+							embed::getIconPixmap(
+								"sample_file" ),
 									this );
 					break;
 
@@ -991,6 +1000,11 @@ void fileItem::determineFileType( void )
 	{
 		m_type = FlpFile;
 		m_handling = ImportAsProject;
+	}
+	else if( ext == "dll" )
+	{
+		m_type = VstPluginFile;
+		m_handling = LoadByPlugin;
 	}
 	else
 	{
