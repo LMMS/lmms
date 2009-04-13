@@ -108,7 +108,7 @@ public:
 	// translate pitch to midi-pitch [0,16383]
 	inline int midiPitch( void ) const
 	{
-		return (int)( ( m_pitchModel.value()+100 ) * 81.92 );
+		return (int)( ( m_pitchModel.value()+100 ) * 16383 ) / 200;
 	}
 
 	// play everything in given frame-range - creates note-play-handles
