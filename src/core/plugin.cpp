@@ -3,7 +3,7 @@
 /*
  * plugin.cpp - implementation of plugin-class including plugin-loader
  *
- * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -145,10 +145,13 @@ void plugin::getDescriptorsOfAvailPlugins( QVector<descriptor> & _plugin_descs )
 	QFileInfoList list = directory.entryInfoList(
 						QStringList( "lib*.so" ) );
 #endif
-	for( QFileInfoList::iterator file = list.begin();
-						file != list.end(); ++file )
+	foreach( const QFileInfo & f, list )
 	{
-		const QFileInfo & f = *file;
+		QLibrary( f.absoluteFilePath() ).load();
+	}
+
+	foreach( const QFileInfo & f, list )
+	{
 		QLibrary plugin_lib( f.absoluteFilePath() );
 		if( plugin_lib.load() == FALSE ||
 			plugin_lib.resolve( "lmms_plugin_main" ) == NULL )
