@@ -25,6 +25,7 @@
 
 #include "vestige.h"
 
+#include <QtGui/QDropEvent>
 #include <QtGui/QFileDialog>
 #include <QtGui/QMessageBox>
 #include <QtGui/QPainter>
@@ -37,6 +38,7 @@
 #include "instrument_track.h"
 #include "vst_plugin.h"
 #include "pixmap_button.h"
+#include "string_pair_drag.h"
 #include "text_float.h"
 #include "tooltip.h"
 
@@ -57,7 +59,7 @@ plugin::descriptor vestige_plugin_descriptor =
 	0x0100,
 	plugin::Instrument,
 	new pluginPixmapLoader( "logo" ),
-	NULL,
+	"dll",
 	NULL
 } ;
 
@@ -252,7 +254,7 @@ vestigeInstrumentView::vestigeInstrumentView( instrument * _instrument,
 	}
 
 	m_openPluginButton = new pixmapButton( this, "" );
-	m_openPluginButton->setCheckable( FALSE );
+	m_openPluginButton->setCheckable( false );
 	m_openPluginButton->setCursor( Qt::PointingHandCursor );
 	m_openPluginButton->move( 218, 79 );
 	m_openPluginButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
@@ -285,6 +287,8 @@ vestigeInstrumentView::vestigeInstrumentView( instrument * _instrument,
 	note_off_all_btn->setFont( pointSize<8>( note_off_all_btn->font() ) );
 	connect( note_off_all_btn, SIGNAL( clicked() ), this,
 							SLOT( noteOffAll() ) );
+
+	setAcceptDrops( true );
 }
 
 
@@ -391,6 +395,46 @@ void vestigeInstrumentView::noteOffAll( void )
 
 
 
+void vestigeInstrumentView::dragEnterEvent( QDragEnterEvent * _dee )
+{
+	if( _dee->mimeData()->hasFormat( stringPairDrag::mimeType() ) )
+	{
+		QString txt = _dee->mimeData()->data(
+						stringPairDrag::mimeType() );
+		if( txt.section( ':', 0, 0 ) == "vstplugin" )
+		{
+			_dee->acceptProposedAction();
+		}
+		else
+		{
+			_dee->ignore();
+		}
+	}
+	else
+	{
+		_dee->ignore();
+	}
+}
+
+
+
+
+void vestigeInstrumentView::dropEvent( QDropEvent * _de )
+{
+	QString type = stringPairDrag::decodeKey( _de );
+	QString value = stringPairDrag::decodeValue( _de );
+	if( type == "vstplugin" )
+	{
+		m_vi->loadFile( value );
+		_de->accept();
+		return;
+	}
+	_de->ignore();
+}
+
+
+
+
 void vestigeInstrumentView::paintEvent( QPaintEvent * )
 {
 	QPainter p( this );
@@ -403,7 +447,7 @@ void vestigeInstrumentView::paintEvent( QPaintEvent * )
 					:
 				tr( "No VST-plugin loaded" );
 	QFont f = p.font();
-	f.setBold( TRUE );
+	f.setBold( true );
 	p.setFont( pointSize<10>( f ) );
 	p.setPen( QColor( 32, 160, 54 ) );
 
@@ -413,7 +457,7 @@ void vestigeInstrumentView::paintEvent( QPaintEvent * )
 	if( m_vi->m_plugin != NULL )
 	{
 		p.setPen( QColor( 251, 41, 8 ) );
-		f.setBold( FALSE );
+		f.setBold( false );
 		p.setFont( pointSize<8>( f ) );
 		p.drawText( 10, 114, tr( "by" ) + " " +
 					m_vi->m_plugin->vendorString() );
