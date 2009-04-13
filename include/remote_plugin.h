@@ -582,6 +582,11 @@ public:
 	void sendMessage( const message & _m );
 	message receiveMessage( void );
 
+	inline bool isInvalid( void ) const
+	{
+		return m_in->isInvalid() || m_out->isInvalid();
+	}
+
 	inline bool messagesLeft( void )
 	{
 		return m_in->messagesLeft();
@@ -717,12 +722,18 @@ public:
 protected:
 	inline void lock( void )
 	{
-		m_commMutex.lock();
+		if( !isInvalid() )
+		{
+			m_commMutex.lock();
+		}
 	}
 
 	inline void unlock( void )
 	{
-		m_commMutex.unlock();
+		if( !isInvalid() )
+		{
+			m_commMutex.unlock();
+		}
 	}
 
 	inline void setSplittedChannels( bool _on )
@@ -922,7 +933,7 @@ remotePluginBase::message remotePluginBase::waitForMessage(
 							const message & _wm,
 							bool _busy_waiting )
 {
-	while( 1 )
+	while( !isInvalid() )
 	{
 #ifndef BUILD_REMOTE_PLUGIN_CLIENT
 		if( _busy_waiting && !messagesLeft() )
@@ -943,6 +954,8 @@ remotePluginBase::message remotePluginBase::waitForMessage(
 			return m;
 		}
 	}
+
+	return message();
 }
 
 
