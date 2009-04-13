@@ -1,7 +1,7 @@
 /*
  * vestige.h - instrument VeSTige for hosting VST-plugins
  *
- * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -98,11 +98,13 @@ public:
 
 protected slots:
 	void openPlugin( void );
-	void noteOffAll( void );
 	void toggleGUI( void );
+	void noteOffAll( void );
 
 
 protected:
+	virtual void dragEnterEvent( QDragEnterEvent * _dee );
+	virtual void dropEvent( QDropEvent * _de );
 	virtual void paintEvent( QPaintEvent * _pe );
 
 
