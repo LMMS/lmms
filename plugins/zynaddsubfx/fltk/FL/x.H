@@ -65,34 +65,10 @@ extern FL_EXPORT int fl_screen;
 extern FL_EXPORT XVisualInfo *fl_visual;
 extern FL_EXPORT Colormap fl_colormap;
 
-#if USE_XFT
-// access to core fonts
-FL_EXPORT XFontStruct* fl_xxfont();
-class Fl_XFont_On_Demand
-{
-public:
-  Fl_XFont_On_Demand(XFontStruct* p = NULL) : ptr(p) { }
-  Fl_XFont_On_Demand& operator=(const Fl_XFont_On_Demand& x)
-    { ptr = x.ptr;  return *this; }
-  Fl_XFont_On_Demand& operator=(XFontStruct* p)
-    { ptr = p;  return *this; }
-  XFontStruct* value() { if (!ptr) { ptr = fl_xxfont(); }  return ptr; }
-  operator XFontStruct*() { return value(); }
-  XFontStruct& operator*() { return *value(); }
-  XFontStruct* operator->() { return value(); }
-  bool operator==(const Fl_XFont_On_Demand& x) { return ptr == x.ptr; }
-  bool operator!=(const Fl_XFont_On_Demand& x) { return ptr != x.ptr; }
-private:
-  XFontStruct* ptr;
-};
-extern FL_EXPORT Fl_XFont_On_Demand fl_xfont;
-#else
-extern FL_EXPORT XFontStruct* fl_xfont;
-#endif
-
 // drawing functions:
 extern FL_EXPORT GC fl_gc;
 extern FL_EXPORT Window fl_window;
+extern FL_EXPORT XFontStruct* fl_xfont;
 extern FL_EXPORT void *fl_xftfont;
 FL_EXPORT ulong fl_xpixel(Fl_Color i);
 FL_EXPORT ulong fl_xpixel(uchar r, uchar g, uchar b);

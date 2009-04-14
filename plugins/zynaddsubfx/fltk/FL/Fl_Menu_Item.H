@@ -88,7 +88,7 @@ struct FL_EXPORT Fl_Menu_Item {
   void callback(Fl_Callback1*c, long p=0) {callback_=(Fl_Callback*)c; user_data_=(void*)p;}
   void* user_data() const {return user_data_;}
   void user_data(void* v) {user_data_ = v;}
-  long argument() const {return (long)user_data_;}
+  long argument() const {return (long long)user_data_;}
   void argument(long v) {user_data_ = (void*)v;}
   int shortcut() const {return shortcut_;}
   void shortcut(int s) {shortcut_ = s;}
