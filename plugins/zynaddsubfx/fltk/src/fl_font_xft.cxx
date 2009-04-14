@@ -90,7 +90,11 @@ Fl_Fontdesc* fl_fonts = built_in_table;
 
 int fl_font_ = 0;
 int fl_size_ = 0;
+#ifdef USE_XFT
 Fl_XFont_On_Demand fl_xfont;
+else
+FL_EXPORT XFontStruct* fl_xfont;
+#endif
 void *fl_xftfont = 0;
 const char* fl_encoding_ = "iso8859-1";
 Fl_FontSize* fl_fontsize = 0;
