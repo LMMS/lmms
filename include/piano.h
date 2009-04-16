@@ -1,7 +1,7 @@
 /*
  * piano.h - piano and pianoView, an interactive piano/keyboard-widget
  *
- * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -77,7 +77,7 @@ public:
 	pianoView( QWidget * _parent );
 	virtual ~pianoView();
 
-	static int getKeyFromScancode( int _sc );
+	static int getKeyFromKeyEvent( QKeyEvent * _ke );
 
 
 protected:
