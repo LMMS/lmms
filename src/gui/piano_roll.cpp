@@ -151,6 +151,12 @@ pianoRoll::pianoRoll( void ) :
 	m_currentNote( NULL ),
 	m_action( ActionNone ),
 	m_noteEditMode( NoteEditVolume ),
+	m_moveBoundaryLeft( 0 ),
+	m_moveBoundaryTop( 0 ),
+	m_moveBoundaryRight( 0 ),
+	m_moveBoundaryBottom( 0 ),
+	m_mouseDownKey( 0 ),
+	m_mouseDownTick( 0 ),
 	m_lastMouseX( 0 ),
 	m_lastMouseY( 0 ),
 	m_oldNotesEditHeight( 100 ),
@@ -1490,6 +1496,10 @@ void pianoRoll::mousePressEvent( QMouseEvent * _me )
 				{
 					clearSelectedNotes();
 					m_currentNote->setSelected( true );
+					m_moveBoundaryLeft = m_currentNote->pos().getTicks();
+					m_moveBoundaryRight = m_currentNote->pos() + m_currentNote->length();
+					m_moveBoundaryBottom = m_currentNote->key();
+					m_moveBoundaryTop = m_currentNote->key();	
 				}
 
 				
