@@ -387,7 +387,7 @@ void automationEditor::setCurrentPattern( automationPattern * _new_pattern )
 
 	if( validPattern() == false )
 	{
-		setWindowTitle( tr( "AUTOMATION EDITOR - no pattern" ) );
+		setWindowTitle( tr( "Automation Editor - no pattern" ) );
 		m_minLevel = m_maxLevel = m_scrollLevel = 0;
 		m_step = 1;
 		resizeEvent( NULL );
@@ -403,7 +403,7 @@ void automationEditor::setCurrentPattern( automationPattern * _new_pattern )
 	// of levels and so on...)
 	resizeEvent( NULL );
 
-	setWindowTitle( tr( "AUTOMATION EDITOR - %1" ).arg(
+	setWindowTitle( tr( "Automation Editor - %1" ).arg(
 							m_pattern->name() ) );
 
 	update();
