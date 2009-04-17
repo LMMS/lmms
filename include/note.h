@@ -120,7 +120,7 @@ public:
 		return (bool) ((int) ( *lhs ).pos() < (int) ( *rhs ).pos());
 	}
 
-	inline bool selected( void ) const
+	inline bool isSelected( void ) const
 	{
 		return m_selected;
 	}

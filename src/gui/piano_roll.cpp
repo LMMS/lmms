@@ -669,7 +669,7 @@ inline void pianoRoll::drawNoteRect( QPainter & _p, int _x, int _y,
 		col = engine::getLmmsStyle()->color( LmmsStyle::PianoRollStepNote );
 		_p.fillRect( _x, _y, _width, KeyLineHeight - 2, col );
 	}
-	else if( _n->selected() )
+	else if( _n->isSelected() )
 	{
 		col = engine::getLmmsStyle()->color( LmmsStyle::PianoRollSelectedNote );
 		_p.fillRect( _x, _y, _width, KeyLineHeight - 2, col );
@@ -814,7 +814,7 @@ void pianoRoll::shiftSemiTone( int amount ) // shift notes by amount semitones
 	{
 		// if none are selected, move all notes, otherwise
 		// only move selected notes
-		if( useAllNotes || ( *it )->selected() )
+		if( useAllNotes || ( *it )->isSelected() )
 		{
 			( *it )->setKey( ( *it )->key() + amount );
 		}
@@ -840,7 +840,7 @@ void pianoRoll::shiftPos( int amount ) //shift notes pos by amount
 	{
 		// if none are selected, move all notes, otherwise
 		// only move selected notes
-		if( ( *it )->selected() || (useAllNotes && ( *it )->length() > 0) )
+		if( ( *it )->isSelected() || (useAllNotes && ( *it )->length() > 0) )
 		{
 			// don't let notes go to out of bounds
 			if( first )
@@ -870,7 +870,7 @@ bool pianoRoll::isSelection( void ) const // are any notes selected?
 	for( noteVector::const_iterator it = notes.begin(); it != notes.end();
 									++it )
 	{
-		if( ( *it )->selected() )
+		if( ( *it )->isSelected() )
 		{
 			return true;
 		}
@@ -889,7 +889,7 @@ int pianoRoll::selectionCount( void ) const // how many notes are selected?
 	for( noteVector::const_iterator it = notes.begin(); it != notes.end();
 									++it )
 	{
-		if( ( *it )->selected() )
+		if( ( *it )->isSelected() )
 		{
 			++sum;
 		}
@@ -1459,7 +1459,7 @@ void pianoRoll::mousePressEvent( QMouseEvent * _me )
 					( *it )->setOldPos( ( *it )->pos() );
 					( *it )->setOldLength( ( *it )->length() );
 					
-					if( ( *it )->selected() )
+					if( ( *it )->isSelected() )
 					{
 			
 						// figure out the bounding box of all the selected notes
@@ -1492,7 +1492,7 @@ void pianoRoll::mousePressEvent( QMouseEvent * _me )
 				
 				// if clicked on an unselected note, remove selection
 				// and select that new note
-				if( ! m_currentNote->selected() )
+				if( ! m_currentNote->isSelected() )
 				{
 					clearSelectedNotes();
 					m_currentNote->setSelected( true );
@@ -1536,7 +1536,7 @@ void pianoRoll::mousePressEvent( QMouseEvent * _me )
 						it = notes.begin();
 						while( it != notes.end() )
 						{
-							if( ( *it )->selected() )
+							if( ( *it )->isSelected() )
 							{
 								// copy this note
 								note noteCopy( (note) **it );
@@ -2035,7 +2035,7 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 				if( ( *it )->pos().getTicks() >= ticks_start 
 					&& ( *it )->pos().getTicks() <= ticks_end
 					&& ( *it )->length().getTicks() > 0
-					&& ( ( *it )->selected() || ! use_selection ) )
+					&& ( ( *it )->isSelected() || ! use_selection ) )
 				{
 					m_pattern->dataChanged();
 					
@@ -2396,7 +2396,7 @@ void pianoRoll::dragNotes( int x, int y, bool alt )
 	noteVector::const_iterator it = notes.begin();
 	while( it != notes.end() )
 	{
-		if( ( *it )->selected() )
+		if( ( *it )->isSelected() )
 		{
 			
 			if( m_action == ActionMoveNote )
@@ -2778,7 +2778,7 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 			if( m_noteEditMode == NoteEditVolume )
 			{
 				QColor color = engine::getLmmsStyle()->color(
-						( *it )->selected() ?
+						( *it )->isSelected() ?
 						LmmsStyle::PianoRollSelectedLevel : 
 						LmmsStyle::PianoRollVolumeLevel );
 				p.setPen( QPen( color.lighter( 
@@ -2797,7 +2797,7 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 			else if( m_noteEditMode == NoteEditPanning )
 			{
 				QColor color = engine::getLmmsStyle()->color(
-						( *it )->selected() ?
+						( *it )->isSelected() ?
 						LmmsStyle::PianoRollSelectedLevel : 
 						LmmsStyle::PianoRollPanningLevel );
 				
@@ -3295,7 +3295,7 @@ void pianoRoll::getSelectedNotes( noteVector & _selected_notes )
 	for( noteVector::const_iterator it = notes.begin(); it != notes.end();
 									++it )
 	{
-		if( ( *it )->selected() )
+		if( ( *it )->isSelected() )
 		{
 			_selected_notes.push_back( *it );
 		}
@@ -3438,7 +3438,7 @@ void pianoRoll::deleteSelectedNotes( void )
 	noteVector::const_iterator it = notes.begin();
 	while( it != notes.end() )
 	{
-		if( ( *it )->selected() )
+		if( ( *it )->isSelected() )
 		{
 			// delete this note
 			m_pattern->removeNote( ( *it ) );
