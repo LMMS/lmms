@@ -1,0 +1,265 @@
+# data file for the Fltk User Interface Designer (fluid)
+version 1.0108 
+header_name {../FL/Fl_Help_Dialog.H} 
+code_name {.cxx}
+comment {//
+// "$Id: Fl_Help_Dialog.fl 5643 2007-01-28 19:36:51Z mike $"
+//
+// Fl_Help_Dialog dialog for the Fast Light Tool Kit (FLTK).
+//
+// Copyright 1998-2005 by Bill Spitzak and others.
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Library General Public
+// License as published by the Free Software Foundation; either
+// version 2 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Library General Public License for more details.
+//
+// You should have received a copy of the GNU Library General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
+// USA.
+//
+// Please report all bugs and problems on the following page:
+//
+//     http://www.fltk.org/str.php
+//
+} {in_source in_header
+} 
+
+decl {\#include "flstring.h"} {} 
+
+decl {\#include <FL/fl_ask.H>} {} 
+
+class FL_EXPORT Fl_Help_Dialog {open
+} {
+  decl {int index_;} {}
+  decl {int max_;} {}
+  decl {int line_[100];} {}
+  decl {char file_[100][256];} {}
+  decl {int find_pos_;} {}
+  Function {Fl_Help_Dialog()} {open
+  } {
+    Fl_Window window_ {
+      label {Help Dialog} open
+      private xywh {398 64 530 385} type Double resizable size_range {260 150 0 0} visible
+    } {
+      Fl_Group {} {open selected
+        xywh {10 10 511 25}
+      } {
+        Fl_Button back_ {
+          label {@<-}
+          callback {if (index_ > 0)
+  index_ --;
+
+if (index_ == 0)
+  back_->deactivate();
+
+forward_->activate();
+
+int l = line_[index_];
+
+if (strcmp(view_->filename(), file_[index_]) != 0)
+  view_->load(file_[index_]);
+
+view_->topline(l);}
+          private tooltip {Show the previous help page.} xywh {10 10 25 25} shortcut 0xff51 labelcolor 2
+        }
+        Fl_Button forward_ {
+          label {@->}
+          callback {if (index_ < max_)
+  index_ ++;
+
+if (index_ >= max_)
+  forward_->deactivate();
+
+back_->activate();
+
+int l = view_->topline();
+
+if (strcmp(view_->filename(), file_[index_]) != 0)
+  view_->load(file_[index_]);
+
+view_->topline(l);}
+          private tooltip {Show the next help page.} xywh {45 10 25 25} shortcut 0xff53 labelcolor 2
+        }
+        Fl_Button smaller_ {
+          label F
+          callback {if (view_->textsize() > 8)
+  view_->textsize(view_->textsize() - 2);
+
+if (view_->textsize() <= 8)
+  smaller_->deactivate();
+larger_->activate();}
+          private tooltip {Make the help text smaller.} xywh {80 10 25 25} labelfont 1 labelsize 10
+        }
+        Fl_Button larger_ {
+          label F
+          callback {if (view_->textsize() < 18)
+  view_->textsize(view_->textsize() + 2);
+
+if (view_->textsize() >= 18)
+  larger_->deactivate();
+smaller_->activate();}
+          private tooltip {Make the help text larger.} xywh {115 10 25 25} labelfont 1 labelsize 16
+        }
+        Fl_Group {} {open
+          xywh {350 10 171 25} box DOWN_BOX color 7
+        } {
+          Fl_Input find_ {
+            label {@search}
+            callback {find_pos_ = view_->find(find_->value(), find_pos_);}
+            private tooltip {find text in document} xywh {375 12 143 21} box FLAT_BOX labelsize 13 when 10 textfont 4
+          }
+        }
+        Fl_Box {} {
+          xywh {150 10 190 25} resizable
+        }
+      }
+      Fl_Help_View view_ {
+        callback {if (view_->filename())
+{
+  if (view_->changed())
+  {
+    index_ ++;
+
+    if (index_ >= 100)
+    {
+      memmove(line_, line_ + 10, sizeof(line_[0]) * 90);
+      memmove(file_, file_ + 10, sizeof(file_[0]) * 90);
+      index_ -= 10;
+    }
+
+    max_ = index_;
+
+    strlcpy(file_[index_], view_->filename(),sizeof(file_[0]));
+    line_[index_] = view_->topline();
+
+    if (index_ > 0)
+      back_->activate();
+    else
+      back_->deactivate();
+
+    forward_->deactivate();
+    window_->label(view_->title());
+  }
+  else // if ! view_->changed()
+  {
+    strlcpy(file_[index_], view_->filename(), sizeof(file_[0]));
+    line_[index_] = view_->topline();
+  }
+} else { // if ! view_->filename()
+  index_ = 0; // hitting an internal page will disable the back/fwd buffer
+  file_[index_][0] = 0; // unnamed internal page
+  line_[index_] = view_->topline();
+  back_->deactivate();
+  forward_->deactivate();
+}}
+        private xywh {10 45 510 330} box DOWN_BOX resizable
+      }
+    }
+    code {back_->deactivate();
+forward_->deactivate();
+
+index_    = -1;
+max_      = 0;
+find_pos_ = 0;
+
+fl_register_images();} {}
+  }
+  Function {~Fl_Help_Dialog()} {} {
+    code {delete window_;} {}
+  }
+  Function {h()} {return_type int
+  } {
+    code {return (window_->h());} {}
+  }
+  Function {hide()} {return_type void
+  } {
+    code {window_->hide();} {}
+  }
+  Function {load(const char *f)} {return_type void
+  } {
+    code {view_->set_changed();
+view_->load(f);
+window_->label(view_->title());} {}
+  }
+  Function {position(int xx, int yy)} {return_type void
+  } {
+    code {window_->position(xx, yy);} {}
+  }
+  Function {resize(int xx, int yy, int ww, int hh)} {return_type void
+  } {
+    code {window_->resize(xx, yy, ww, hh);} {}
+  }
+  Function {show()} {return_type void
+  } {
+    code {window_->show();} {}
+  }
+  Function {show(int argc, char **argv)} {return_type void
+  } {
+    code {window_->show(argc, argv);} {}
+  }
+  Function {textsize(uchar s)} {return_type void
+  } {
+    code {view_->textsize(s);
+
+if (s <= 8)
+  smaller_->deactivate();
+else
+  smaller_->activate();
+
+if (s >= 18)
+  larger_->deactivate();
+else
+  larger_->activate();} {}
+  }
+  Function {textsize()} {return_type uchar
+  } {
+    code {return (view_->textsize());} {}
+  }
+  Function {topline(const char *n)} {return_type void
+  } {
+    code {view_->topline(n);} {}
+  }
+  Function {topline(int n)} {return_type void
+  } {
+    code {view_->topline(n);} {}
+  }
+  Function {value(const char *f)} {return_type void
+  } {
+    code {view_->set_changed();
+view_->value(f);
+window_->label(view_->title());} {}
+  }
+  Function {value() const} {return_type {const char *}
+  } {
+    code {return view_->value();} {}
+  }
+  Function {visible()} {return_type int
+  } {
+    code {return (window_->visible());} {}
+  }
+  Function {w()} {return_type int
+  } {
+    code {return (window_->w());} {}
+  }
+  Function {x()} {return_type int
+  } {
+    code {return (window_->x());} {}
+  }
+  Function {y()} {return_type int
+  } {
+    code {return (window_->y());} {}
+  }
+} 
+
+comment {
+//
+// End of "$Id: Fl_Help_Dialog.fl 5643 2007-01-28 19:36:51Z mike $".
+//} {in_source in_header
+} 

@@ -1,0 +1,37 @@
+#-----------------------------------------------------------------------------
+#
+# FLTKConfig.cmake - FLTK CMake configuration file for external projects.
+#
+# This file is configured by FLTK and used by the UseFLTK.cmake module
+# to load FLTK's settings for an external project.
+
+# The FLTK source tree.
+SET(FLTK_SOURCE_DIR "@FLTK_SOURCE_DIR@")
+
+# The FLTK include file directories.
+SET(FLUID_COMMAND "@FLTK_FLUID_COMMAND@")
+SET(FLTK_EXECUTABLE_DIRS "@FLTK_EXECUTABLE_DIRS@")
+SET(FLTK_LIBRARY_DIRS "@FLTK_LIBRARY_DIRS@")
+SET(FLTK_LIBRARIES "@FLTK_LIBRARIES@")
+SET(FLTK_INCLUDE_DIRS "@FLTK_INCLUDE_DIRS@")
+
+# The C and C++ flags added by FLTK to the cmake-configured flags.
+SET(FLTK_REQUIRED_C_FLAGS "@FLTK_REQUIRED_C_FLAGS@")
+SET(FLTK_REQUIRED_CXX_FLAGS "@FLTK_REQUIRED_CXX_FLAGS@")
+
+# The FLTK version number
+SET(FLTK_VERSION_MAJOR "@FLTK_VERSION_MAJOR@")
+SET(FLTK_VERSION_MINOR "@FLTK_VERSION_MINOR@")
+SET(FLTK_VERSION_PATCH "@FLTK_VERSION_PATCH@")
+
+# Is FLTK using shared libraries?
+SET(FLTK_BUILD_SHARED_LIBS "@BUILD_SHARED_LIBS@")
+SET(FLTK_BUILD_SETTINGS_FILE "@FLTK_BUILD_SETTINGS_FILE@")
+
+# The location of the UseFLTK.cmake file.
+SET(FLTK11_USE_FILE "@FLTK_USE_FILE@")
+
+# The ExodusII library dependencies.
+IF(NOT FLTK_NO_LIBRARY_DEPENDS)
+  INCLUDE("@FLTK_LIBRARY_DEPENDS_FILE@")
+ENDIF(NOT FLTK_NO_LIBRARY_DEPENDS)

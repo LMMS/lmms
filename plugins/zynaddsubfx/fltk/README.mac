@@ -1,0 +1,87 @@
+README.mac - 2007-02-06 - Building FLTK under MacOS X
+-----------------------------------------------------
+
+CONTENTS
+
+    - Introduction
+    - How to Build Using GCC (MacOS X)
+    - Scripts
+    - Known MacFLTK bugs
+    - Test suite status
+    - Other stuff
+    - FLTK 1.0.x for Mac
+
+
+INTRODUCTION
+
+    FLTK currently supports the following development
+    environments on the MacOS X platform:
+
+	- GCC
+	- Metrowerks CodeWarrior
+	- (Apple Project Builder - future releases)
+	- (MPW - future releases)
+
+
+HOW TO BUILD USING GCC (MacOS X)
+
+    Since the MacOS X command line build environment is based on
+    BSD UNIX, the normal UNIX build procedure as described in
+    'README' applies.
+
+
+KNOWN MacFLTK BUGS
+
+    The following FLTK things are not implemented or don't work
+    at present:
+
+	- Line styles are not fully implemented.
+	- Sub-sub-subwindow not tested.
+	- The 'shiny' demo needs work (flush/aglFlush).
+
+
+TEST SUITE STATUS
+
+    OS X:
+
+    CubeView(++), adjuster(++), arc(++), ask(++), bitmap(++), 
+    boxtype(++), browser(++), button(++), buttons(++),
+    checkers(++), clock(++), colbrowser(++), color_chooser(++),
+    cube(++), cursor(++), curve(++), demo(++), doublebuffer(++),
+    editor(++), fast_slow(++), file_chooser(++), fonts(++),
+    forms(++), fractals(++), fullscreen(++), gl_overlay(++),
+    glpuzzle(++), hello(++), help(++), iconize(++), image(+),
+    inactive(++), input(++), keyboard(++), label(++),
+    line_style(+), mandelbrot(++), menubar(++), message(++),
+    minimum(++), navigation(++), output(++), overlay(++),
+    pack(++), pixmap(++), pixmap_browser(++), radio(++),
+    resizebox(++), scroll(++), shape(++), shiny(-),
+    subwindow(++), symbols(++), tabs(++), tile(++),
+    tiled_image(++), valuators(++),  fluid(++)
+
+    (o)=minor bugs, (+)=usable, (++)=running perfectly,
+    (-)=major bugs, (--)=crashes  
+
+
+OTHER STUFF
+
+    The creator ID's 'FLTK', 'Fltk', 'FLID', and 'Flid' are
+    officially registered with Apple Computers, Inc. and can be
+    used for FLTK applications ('FLTK') and FLUID files
+    ('Flid').
+
+    Under MacOS X, all windows are double-buffered. Using
+    Fl_Window has the same effect as using Fl_Double_Window on
+    other operating systems. Fl_Overlay_Window however uses one 
+    additional buffer for the overlay plane.
+
+
+FLTK 1.0.X FOR MAC
+
+    FLTK 1.0.6 for MacOS 8.x and OS 9.x is in beta stage and can
+    be downloaded from http://www.matthiasm.com/flMac.html .
+    The archive contains build files for Metrowerks CodeWarrior
+    5 and 6.
+
+    FLTK 1.0.6 for Mac is not supported by the FLTK team and
+    will not be further developed by the author.

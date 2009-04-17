@@ -1,0 +1,197 @@
+README - Fast Light Tool Kit (FLTK) Version 1.1.9
+-------------------------------------------------
+
+WHAT IS FLTK?
+
+    The Fast Light Tool Kit ("FLTK", pronounced "fulltick") is a
+    a cross-platform C++ GUI toolkit for UNIX(r)/Linux(r) (X11),
+    Microsoft(r) Windows(r), and MacOS(r) X. FLTK provides
+    modern GUI functionality without the bloat and supports 3D
+    graphics via OpenGL(r) and its built-in GLUT emulation. It
+    was originally developed by Mr. Bill Spitzak and is
+    currently maintained by a small group of developers across
+    the world with a central repository in the US.
+
+
+LICENSING
+
+    FLTK comes with complete free source code. FLTK is available
+    under the terms of the GNU Library General Public License.
+    Contrary to popular belief, it can be used in commercial
+    software! (Even Bill Gates could use it.) 
+
+
+ON-LINE DOCUMENTATION
+
+    All of the documentation is in HTML in the subdirectory
+    "documentation". The "index.html" file should be your
+    starting point.  PostScript(tm) and PDF versions of this
+    documentation is also available from the FLTK web site at:
+
+        http://www.fltk.org/documentation.php
+
+
+BUILDING AND INSTALLING FLTK UNDER UNIX AND MacOS X
+
+    In most cases you can just type "make".  This will run
+    configure with the default (no) options and then compile
+    everything.
+
+    FLTK uses GNU autoconf to configure itself for your UNIX
+    platform. The main things that the configure script will
+    look for are the X11, OpenGL (or Mesa), and JPEG header and
+    library files.  Make sure that they are in the standard
+    include/library locations.  If they aren't you need to
+    define the CFLAGS, CXXFLAGS, and LDFLAGS environment
+    variables.
+
+    If you aren't using "gcc", "g++", "c++", or "CC" for your
+    C++ compiler, you'll also need to set the CXX environment
+    variable. Similarly, if you aren't using "gcc" or "cc" for
+    your C compiler you'll need to set the CC environment
+    variable.
+
+    You can run configure yourself to get the exact setup you
+    need. Type "./configure <options>".  Options include:
+
+	--enable-cygwin         - Enable the Cygwin libraries (WIN32)
+	--enable-debug          - Enable debugging code & symbols
+	--disable-gl            - Disable OpenGL support
+	--enable-shared         - Enable generation of shared libraries
+	--enable-threads        - Enable multithreading support
+	--enable-xdbe           - Enable the X double-buffer extension
+	--enable-xft            - Enable the Xft library (anti-aliased fonts)
+
+	--bindir=/path          - Set the location for executables
+                        	  [default = /usr/local/bin]
+	--libdir=/path          - Set the location for libraries
+                        	  [default = /usr/local/lib]
+	--includedir=/path      - Set the location for include files.
+                        	  [default = /usr/local/include]
+	--prefix=/dir           - Set the directory prefix for files
+                        	  [default = /usr/local]
+
+    When the configure script is done you can just run the
+    "make" command. This will build the library, FLUID tool, and
+    all of the test programs.
+
+    To install the library, become root and type "make
+    install".  This will copy the "fluid" executable to
+    "bindir", the header files to "includedir", and the library
+    files to "libdir".
+
+
+BUILDING FLTK UNDER MICROSOFT WINDOWS
+
+    There are two ways to build FLTK under Microsoft Windows. 
+    The first is to use the VC++ 6.0 project files under the
+    "visualc" directory.  Just open (or double-click on) the
+    "fltk.dsw" file to get the whole shebang.
+
+    The second method is to use a GNU-based development tool
+    with the files in the "makefiles" directory.  To build
+    with the CygWin tools, use the supplied configure script
+    as specified in the UNIX section above:
+
+        sh configure ...options...
+
+    To build using other tools simply copy the appropriate
+    makeinclude and config files to the main directory and do a
+    make:
+
+	copy makefiles\Makefile.<env> Makefile
+	make
+
+
+BUILDING FLTK UNDER OS/2
+
+    The current OS/2 build requires XFree86 for OS/2 to work.  A
+    native Presentation Manager version has not been implemented
+    yet (volunteers are welcome!).
+
+    To build the XFree86 version of FLTK for OS/2, copy the
+    appropriate makeinclude and config files to the main
+    directory and do a make:
+
+        copy makefiles\Makefile.os2x Makefile
+	make
+
+
+INTERNET RESOURCES
+
+    FLTK is available on the 'net in a bunch of locations:
+
+	- WWW:   http://www.fltk.org/
+	         http://www.fltk.org/str.php [for reporting bugs]
+	         http://www.fltk.org/software.php [source code]
+
+	- FTP:   http://ftp.easysw.com/pub/fltk
+	         ftp://ftp.easysw.com/pub/fltk
+	         ftp://ftp2.easysw.com/pub/fltk
+	         ftp://ftp.funet.fi/pub/mirrors/ftp.easysw.com/pub/fltk
+	         ftp://linux.mathematik.tu-darmstadt.de/pub/linux/mirrors/misc/fltk
+	         ftp://gd.tuwien.ac.at/hci/fltk
+
+	- EMail: fltk@fltk.org [see instructions below]
+
+    To send a message to the FLTK mailing list ("fltk@fltk.org")
+    you must first join the list.  Non-member submissions are
+    blocked to avoid problems with SPAM.
+
+    To join the FLTK mailing list, go the following web page:
+
+        http://lists.easysw.com/listinfo/fltk
+
+
+REPORTING BUGS
+
+    To report a bug in FLTK, use the form at:
+
+        http://www.fltk.org/str.php
+
+    For general support and questions, please use the FLTK
+    mailing list at "fltk@fltk.org".
+
+
+TRADEMARKS
+
+    Microsoft and Windows are registered trademarks of Microsoft
+    Corporation. UNIX is a registered trademark of the X/Open
+    Group, Inc.  OpenGL is a registered trademark of Silicon
+    Graphics, Inc.  MacOS is a registered trademark of Apple
+    Computers, Inc.
+
+
+COPYRIGHT
+
+    FLTK is copyright 1998-2008 by Bill Spitzak
+    (spitzak@users.sourceforge.net) and others, including:
+
+        Craig P. Earls
+	Curtis Edwards (trilex@users.sourceforge.net)
+	Gustavo Hime (hime@users.sourceforge.net)
+	Talbot Hughes
+	Robert Kesterson (robertk@users.sourceforge.net)
+	Matthias Melcher (matthiaswm@users.sourceforge.net)
+	James Dean Palmer (jamespalmer@users.sourceforge.net)
+	Vincent Penne (vincentp@users.sourceforge.net)
+        Michael Sweet (easysw@users.sourceforge.net)
+	Carl Thompson (clip@users.sourceforge.net)
+	Nafees Bin Zafar (nafees@users.sourceforge.net)
+
+    This library is free software; you can redistribute it
+    and/or modify it under the terms of the GNU Library General
+    Public License as published by the Free Software Foundation;
+    either version 2 of the License, or (at your option) any
+    later version.
+
+    This library is distributed in the hope that it will be
+    useful, but WITHOUT ANY WARRANTY; without even the implied
+    warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+    PURPOSE.  See the GNU Library General Public License for
+    more details.
+
+    You should have received a copy of the GNU Library General
+    Public License along with this library; if not, write to the
+    Free Software Foundation, Inc., 59 Temple Place, Suite 330,
+    Boston, MA 02111-1307 USA.
