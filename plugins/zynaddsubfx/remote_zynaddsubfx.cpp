@@ -281,11 +281,18 @@ void * guiThread( void * )
 					char * f = strdup( m.getString().
 								c_str() );
 					pthread_mutex_lock( &master->mutex );
-					master->part[0]->defaultsinstrument();
-					master->part[0]->loadXMLinstrument( f );
+					const int npart = ui ?
+						ui->npartcounter->value()-1 : 0;
+					master->part[npart]->defaultsinstrument();
+					master->part[npart]->loadXMLinstrument( f );
 					pthread_mutex_unlock( &master->mutex );
 					master->applyparameters();
-					if( ui ) ui->refresh_master_ui();
+					if( ui )
+					{
+						ui->npartcounter->do_callback();
+						ui->updatepanel();
+						ui->refresh_master_ui();
+					}
 					free( f );
 					pthread_mutex_lock( &master->mutex );
 					__remote_zasf->sendMessage(
