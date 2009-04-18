@@ -718,8 +718,6 @@ public:
 		return m_failed;
 	}
 
-
-protected:
 	inline void lock( void )
 	{
 		if( !isInvalid() )
@@ -736,6 +734,8 @@ protected:
 		}
 	}
 
+
+protected:
 	inline void setSplittedChannels( bool _on )
 	{
 		m_splitChannels = _on;
