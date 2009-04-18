@@ -96,6 +96,11 @@ public:
 	virtual ~zynAddSubFxView();
 
 
+protected:
+	virtual void dragEnterEvent( QDragEnterEvent * _dee );
+	virtual void dropEvent( QDropEvent * _de );
+
+
 private:
 	void modelChanged( void );
 
