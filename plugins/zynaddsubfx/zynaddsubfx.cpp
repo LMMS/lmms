@@ -27,6 +27,7 @@
 
 #include <Qt/QtXml>
 #include <QtCore/QTemporaryFile>
+#include <QtGui/QDropEvent>
 #include <QtGui/QPushButton>
 
 #include "zynaddsubfx.h"
@@ -35,6 +36,7 @@
 #include "instrument_play_handle.h"
 #include "instrument_track.h"
 #include "gui_templates.h"
+#include "string_pair_drag.h"
 #include "remote_zynaddsubfx.h"
 
 #undef SINGLE_SOURCE_COMPILE
@@ -269,6 +271,8 @@ zynAddSubFxView::zynAddSubFxView( instrument * _instrument, QWidget * _parent ) 
 	m_toggleUIButton->setWhatsThis(
 		tr( "Click here to show or hide the graphical user interface "
 			"(GUI) of ZynAddSubFX." ) );
+
+	setAcceptDrops( true );
 }
 
 
@@ -276,6 +280,46 @@ zynAddSubFxView::zynAddSubFxView( instrument * _instrument, QWidget * _parent ) 
 
 zynAddSubFxView::~zynAddSubFxView()
 {
+}
+
+
+
+
+void zynAddSubFxView::dragEnterEvent( QDragEnterEvent * _dee )
+{
+	if( _dee->mimeData()->hasFormat( stringPairDrag::mimeType() ) )
+	{
+		QString txt = _dee->mimeData()->data(
+						stringPairDrag::mimeType() );
+		if( txt.section( ':', 0, 0 ) == "presetfile" )
+		{
+			_dee->acceptProposedAction();
+		}
+		else
+		{
+			_dee->ignore();
+		}
+	}
+	else
+	{
+		_dee->ignore();
+	}
+}
+
+
+
+
+void zynAddSubFxView::dropEvent( QDropEvent * _de )
+{
+	const QString type = stringPairDrag::decodeKey( _de );
+	const QString value = stringPairDrag::decodeValue( _de );
+	if( type == "presetfile" )
+	{
+		castModel<zynAddSubFx>()->loadFile( value );
+		_de->accept();
+		return;
+	}
+	_de->ignore();
 }
 
 
