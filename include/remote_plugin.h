@@ -681,9 +681,10 @@ public:
 		return m_process.state() != QProcess::NotRunning;
 	}
 
-	inline void waitForInitDone( void )
+	inline void waitForInitDone( bool _busy_waiting = true )
 	{
-		m_failed = waitForMessage( IdInitDone, true ).id != IdInitDone;
+		m_failed = waitForMessage( IdInitDone,
+					_busy_waiting ).id != IdInitDone;
 	}
 
 	virtual bool processMessage( const message & _m );
