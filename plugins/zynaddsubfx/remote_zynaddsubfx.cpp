@@ -169,7 +169,7 @@ public:
 				}
 				break;
 			case MidiPitchBend:
-	    			master->SetController( _e.m_channel,
+				master->SetController( 0,
 					C_pitchwheel,
 					_e.m_data.m_param[0] +
 						_e.m_data.m_param[1]*128-8192 );
