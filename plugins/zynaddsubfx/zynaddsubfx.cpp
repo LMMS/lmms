@@ -222,7 +222,9 @@ void zynAddSubFx::updateSampleRate( void )
 void zynAddSubFx::initRemotePlugin( void )
 {
 	delete m_plugin;
-	m_plugin = new remotePlugin( "remote_zynaddsubfx" );
+	m_plugin = new remotePlugin( "remote_zynaddsubfx", false );
+	m_plugin->lock();
+	m_plugin->waitForInitDone( false );
 
 	m_plugin->sendMessage(
 		remotePlugin::message( IdZasfPresetDirectory ).
@@ -230,6 +232,7 @@ void zynAddSubFx::initRemotePlugin( void )
 		( configManager::inst()->factoryPresetsDir() +
 			QDir::separator() + "ZynAddSubFX" ).
 						toStdString() ) );
+	m_plugin->unlock();
 }
 
 
