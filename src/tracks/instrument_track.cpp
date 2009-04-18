@@ -861,7 +861,8 @@ QQueue<instrumentTrackWindow *> instrumentTrackView::s_windows;
 instrumentTrackView::instrumentTrackView( instrumentTrack * _it,
 						trackContainerView * _tcv ) :
 	trackView( _it, _tcv ),
-	m_window( NULL )
+	m_window( NULL ),
+	m_lastPos( -1, -1 )
 {
 	setAcceptDrops( true );
 	setFixedHeight( 32 );
@@ -971,6 +972,7 @@ void instrumentTrackView::freeInstrumentTrackWindow( void )
 {
 	if( m_window != NULL )
 	{
+		m_lastPos = m_window->parentWidget()->pos();
 		if( s_windows.count() < INSTRUMENT_WINDOW_CACHE_SIZE )
 		{
 			model()->setHook( NULL );
@@ -1017,6 +1019,11 @@ instrumentTrackWindow * instrumentTrackView::getInstrumentTrackWindow( void )
 		m_window->setModel( model() );
 		m_window->updateInstrumentView();
 		model()->setHook( m_window );
+
+		if( m_lastPos.x() > 0 || m_lastPos.y() > 0 )
+		{
+			m_window->parentWidget()->move( m_lastPos );
+		}
 	}
 	else
 	{
