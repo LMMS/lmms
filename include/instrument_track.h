@@ -288,7 +288,7 @@ private slots:
 
 private:
 	instrumentTrackWindow * m_window;
-	
+
 	static QQueue<instrumentTrackWindow *> s_windows;
 
 	// widgets in track-settings-widget
@@ -301,6 +301,8 @@ private:
 
 	QAction * m_midiInputAction;
 	QAction * m_midiOutputAction;
+
+	QPoint m_lastPos;
 
 
 	friend class instrumentTrackWindow;
