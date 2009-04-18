@@ -1,7 +1,7 @@
 /*
  * zynaddsubfx.h - ZynAddSubFX-embedding plugin
  *
- * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -40,7 +40,7 @@ class zynAddSubFxView;
 class notePlayHandle;
 
 
-class zynAddSubFx : public instrument, public remotePlugin
+class zynAddSubFx : public instrument
 {
 	Q_OBJECT
 public:
@@ -73,8 +73,10 @@ private slots:
 
 
 private:
-	QMutex m_pluginMutex;
+	void initRemotePlugin( void );
 
+	QMutex m_pluginMutex;
+	remotePlugin * m_plugin;
 
 	friend class zynAddSubFxView;
 
@@ -93,16 +95,14 @@ public:
 	zynAddSubFxView( instrument * _instrument, QWidget * _parent );
 	virtual ~zynAddSubFxView();
 
+
 private:
 	void modelChanged( void );
-
-	int m_exit;
 
 	QPushButton * m_toggleUIButton;
 
 
 private slots:
-	void updateUI( void );
 	void toggleUI( void );
 
 } ;

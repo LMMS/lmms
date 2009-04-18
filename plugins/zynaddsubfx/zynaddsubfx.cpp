@@ -31,6 +31,7 @@
 
 #include "zynaddsubfx.h"
 #include "engine.h"
+#include "mmp.h"
 #include "instrument_play_handle.h"
 #include "instrument_track.h"
 #include "gui_templates.h"
@@ -64,19 +65,16 @@ plugin::descriptor PLUGIN_EXPORT zynaddsubfx_plugin_descriptor =
 
 zynAddSubFx::zynAddSubFx( instrumentTrack * _instrumentTrack ) :
 	instrument( _instrumentTrack, &zynaddsubfx_plugin_descriptor ),
-	remotePlugin( "remote_zynaddsubfx" )
+	m_plugin( NULL )
 {
+	initRemotePlugin();
+
 	// now we need a play-handle which cares for calling play()
 	instrumentPlayHandle * iph = new instrumentPlayHandle( this );
 	engine::getMixer()->addPlayHandle( iph );
 
 	connect( engine::getMixer(), SIGNAL( sampleRateChanged() ),
 			this, SLOT( updateSampleRate() ) );
-	sendMessage( message( IdZasfPresetDirectory ).
-				addString(
-		( configManager::inst()->factoryPresetsDir() +
-			QDir::separator() + "ZynAddSubFX" ).
-						toStdString() ) );
 }
 
 
@@ -85,6 +83,10 @@ zynAddSubFx::zynAddSubFx( instrumentTrack * _instrumentTrack ) :
 zynAddSubFx::~zynAddSubFx()
 {
 	engine::getMixer()->removePlayHandles( getInstrumentTrack() );
+
+	m_pluginMutex.lock();
+	delete m_plugin;
+	m_pluginMutex.unlock();
 }
 
 
@@ -96,12 +98,13 @@ void zynAddSubFx::saveSettings( QDomDocument & _doc,
 	QTemporaryFile tf;
 	if( tf.open() )
 	{
-		lock();
-		sendMessage( message( IdSaveSettingsToFile ).
+		m_plugin->lock();
+		m_plugin->sendMessage(
+			remotePlugin::message( IdSaveSettingsToFile ).
 				addString( QDir::toNativeSeparators(
 					tf.fileName() ).toStdString() ) );
-		waitForMessage( IdSaveSettingsToFile );
-		unlock();
+		m_plugin->waitForMessage( IdSaveSettingsToFile );
+		m_plugin->unlock();
 		QByteArray a = tf.readAll();
 		// remove first blank line
 		a.remove( 0,
@@ -128,7 +131,7 @@ void zynAddSubFx::loadSettings( const QDomElement & _this )
 	}
 
 	QDomDocument doc;
-	doc.appendChild( doc.importNode( _this.firstChild(), TRUE ) );
+	doc.appendChild( doc.importNode( _this.firstChild(), true ) );
 	QTemporaryFile tf;
 	tf.setAutoRemove( false );
 	if( tf.open() )
@@ -136,12 +139,13 @@ void zynAddSubFx::loadSettings( const QDomElement & _this )
 		QByteArray a = doc.toString( 0 ).toUtf8();
 		a.prepend( "<?xml version=\"1.0\"?>\n" );
 		tf.write( a );
-		lock();
-		sendMessage( message( IdLoadSettingsFromFile ).
+		m_plugin->lock();
+		m_plugin->sendMessage(
+			remotePlugin::message( IdLoadSettingsFromFile ).
 				addString( QDir::toNativeSeparators(
 					tf.fileName() ).toStdString() ) );
-		waitForMessage( IdLoadSettingsFromFile );
-		unlock();
+		m_plugin->waitForMessage( IdLoadSettingsFromFile );
+		m_plugin->unlock();
 
 		emit settingsChanged();
 	}
@@ -152,11 +156,13 @@ void zynAddSubFx::loadSettings( const QDomElement & _this )
 
 void zynAddSubFx::loadFile( const QString & _file )
 {
-	lock();
-	sendMessage( message( IdLoadPresetFromFile ).
+	m_plugin->lock();
+	m_plugin->sendMessage(
+		remotePlugin::message( IdLoadPresetFromFile ).
 				addString( _file.toStdString() ) );
-	waitForMessage( IdLoadPresetFromFile );
-	unlock();
+	m_plugin->waitForMessage( IdLoadPresetFromFile );
+	m_plugin->unlock();
+
 	emit settingsChanged();
 }
 
@@ -165,7 +171,7 @@ void zynAddSubFx::loadFile( const QString & _file )
 
 QString zynAddSubFx::nodeName( void ) const
 {
-	return( zynaddsubfx_plugin_descriptor.name );
+	return zynaddsubfx_plugin_descriptor.name;
 }
 
 
@@ -173,7 +179,9 @@ QString zynAddSubFx::nodeName( void ) const
 
 void zynAddSubFx::play( sampleFrame * _buf )
 {
-	process( NULL, _buf );
+	m_pluginMutex.lock();
+	m_plugin->process( NULL, _buf );
+	m_pluginMutex.unlock();
 	getInstrumentTrack()->processAudioBuffer( _buf,
 				engine::getMixer()->framesPerPeriod(), NULL );
 }
@@ -184,7 +192,10 @@ void zynAddSubFx::play( sampleFrame * _buf )
 bool zynAddSubFx::handleMidiEvent( const midiEvent & _me,
                                                 const midiTime & _time )
 {
-	processMidiEvent( _me, 0 );
+	m_pluginMutex.lock();
+	m_plugin->processMidiEvent( _me, 0 );
+	m_pluginMutex.unlock();
+
 	return true;
 }
 
@@ -193,8 +204,32 @@ bool zynAddSubFx::handleMidiEvent( const midiEvent & _me,
 
 void zynAddSubFx::updateSampleRate( void )
 {
-	remotePlugin::updateSampleRate(
-				engine::getMixer()->processingSampleRate() );
+	m_pluginMutex.lock();
+
+	multimediaProject m( multimediaProject::InstrumentTrackSettings );
+	saveSettings( m, m.content() );
+
+	initRemotePlugin();
+
+	loadSettings( m.content() );
+
+	m_pluginMutex.unlock();
+}
+
+
+
+
+void zynAddSubFx::initRemotePlugin( void )
+{
+	delete m_plugin;
+	m_plugin = new remotePlugin( "remote_zynaddsubfx" );
+
+	m_plugin->sendMessage(
+		remotePlugin::message( IdZasfPresetDirectory ).
+				addString(
+		( configManager::inst()->factoryPresetsDir() +
+			QDir::separator() + "ZynAddSubFX" ).
+						toStdString() ) );
 }
 
 
@@ -202,7 +237,7 @@ void zynAddSubFx::updateSampleRate( void )
 
 pluginView * zynAddSubFx::instantiateView( QWidget * _parent )
 {
-	return( new zynAddSubFxView( this, _parent ) );
+	return new zynAddSubFxView( this, _parent );
 }
 
 
@@ -212,18 +247,17 @@ pluginView * zynAddSubFx::instantiateView( QWidget * _parent )
 
 
 zynAddSubFxView::zynAddSubFxView( instrument * _instrument, QWidget * _parent ) :
-	instrumentView( _instrument, _parent ),
-	m_exit( 0 )
+	instrumentView( _instrument, _parent )
 {
-	setAutoFillBackground( TRUE );
+	setAutoFillBackground( true );
 	QPalette pal;
 	pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap(
 								"artwork" ) );
 	setPalette( pal );
 
 	m_toggleUIButton = new QPushButton( tr( "Show GUI" ), this );
-	m_toggleUIButton->setCheckable( TRUE );
-	m_toggleUIButton->setChecked( FALSE );
+	m_toggleUIButton->setCheckable( true );
+	m_toggleUIButton->setChecked( false );
 	m_toggleUIButton->setGeometry( 45, 80, 160, 24 );
 	m_toggleUIButton->setIcon( embed::getIconPixmap( "zoom" ) );
 	m_toggleUIButton->setFont( pointSize<8>( m_toggleUIButton->font() ) );
@@ -246,20 +280,7 @@ zynAddSubFxView::~zynAddSubFxView()
 
 void zynAddSubFxView::modelChanged( void )
 {
-	zynAddSubFx * z = castModel<zynAddSubFx>();
-	connect( z, SIGNAL( settingsChanged() ),
-			this, SLOT( updateUI() ) );
 	toggleUI();
-}
-
-
-
-
-void zynAddSubFxView::updateUI( void )
-{
-/*	zynAddSubFxManager::instance()->m_uiMutex.lock();
-	m_ui->refresh_master_ui();
-	zynAddSubFxManager::instance()->m_uiMutex.unlock();*/
 }
 
 
@@ -269,11 +290,11 @@ void zynAddSubFxView::toggleUI( void )
 {
 	if( m_toggleUIButton->isChecked() )
 	{
-		castModel<zynAddSubFx>()->showUI();
+		castModel<zynAddSubFx>()->m_plugin->showUI();
 	}
 	else
 	{
-		castModel<zynAddSubFx>()->hideUI();
+		castModel<zynAddSubFx>()->m_plugin->hideUI();
 	}
 
 }
@@ -289,8 +310,7 @@ extern "C"
 plugin * PLUGIN_EXPORT lmms_plugin_main( model *, void * _data )
 {
 
-	return( new zynAddSubFx(
-	        static_cast<instrumentTrack *>( _data ) ) );
+	return new zynAddSubFx( static_cast<instrumentTrack *>( _data ) );
 }
 
 
