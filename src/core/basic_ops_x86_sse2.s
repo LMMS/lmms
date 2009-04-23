@@ -70,19 +70,19 @@ alignedConvertToS16SSE2:
 	pushl	%ebx
 	subl	$8, %esp
 	movl	36(%esp), %eax
+	movss	.LC0, %xmm6
 	cmpb	$0, 44(%esp)
-	flds	.LC0
 	movl	28(%esp), %edx
 	movl	32(%esp), %ebx
 	movl	%eax, %esi
-	fmuls	40(%esp)
+	mulss	40(%esp), %xmm6
 	jne	.L13
 	testw	%ax, %ax
-	jle	.L35
+	jle	.L15
 	movl	%eax, %edi
 	shrw	$2, %di
 	cmpw	$3, %ax
-	movw	%ax, 4(%esp)
+	movw	%ax, 2(%esp)
 	leal	0(,%edi,4), %ebp
 	ja	.L33
 .L28:
@@ -98,19 +98,17 @@ alignedConvertToS16SSE2:
 	.p2align 4,,7
 	.p2align 3
 .L25:
-	flds	(%edx)
-	fmul	%st(1), %st
-	fstps	4(%esp)
-	cvttss2si	4(%esp), %ecx
-	flds	4(%edx)
-	fmul	%st(1), %st
+	movss	(%edx), %xmm0
+	mulss	%xmm6, %xmm0
+	cvttss2si	%xmm0, %ecx
+	movss	4(%edx), %xmm0
 	cmpl	$-32768, %ecx
+	mulss	%xmm6, %xmm0
 	cmovl	%edi, %ecx
 	cmpl	$32767, %ecx
 	cmovg	%ebx, %ecx
-	fstps	4(%esp)
 	movw	%cx, (%eax)
-	cvttss2si	4(%esp), %ecx
+	cvttss2si	%xmm0, %ecx
 	cmpl	$-32768, %ecx
 	cmovl	%edi, %ecx
 	cmpl	$32767, %ecx
@@ -121,15 +119,6 @@ alignedConvertToS16SSE2:
 	addl	$4, %eax
 	cmpw	%bp, %si
 	jg	.L25
-	fstp	%st(0)
-	jmp	.L15
-.L35:
-	fstp	%st(0)
-	jmp	.L15
-.L36:
-	fstp	%st(0)
-	.p2align 4,,7
-	.p2align 3
 .L15:
 	movswl	%si,%esi
 	addl	$8, %esp
@@ -143,11 +132,11 @@ alignedConvertToS16SSE2:
 	.p2align 3
 .L13:
 	testw	%ax, %ax
-	jle	.L36
+	jle	.L15
 	movl	%eax, %ebp
 	shrw	$2, %bp
 	cmpw	$3, %si
-	movw	%ax, 4(%esp)
+	movw	%ax, 2(%esp)
 	leal	0(,%ebp,4), %eax
 	ja	.L34
 .L27:
@@ -162,24 +151,22 @@ alignedConvertToS16SSE2:
 	.p2align 4,,7
 	.p2align 3
 .L20:
-	flds	(%ecx)
+	movss	(%ecx), %xmm0
 	movl	$32767, %ebp
-	fmul	%st(1), %st
-	fstps	4(%esp)
-	cvttss2si	4(%esp), %ebx
-	flds	4(%ecx)
-	fmul	%st(1), %st
+	mulss	%xmm6, %xmm0
+	cvttss2si	%xmm0, %ebx
+	movss	4(%ecx), %xmm0
 	cmpl	$-32768, %ebx
 	cmovl	%edi, %ebx
 	cmpl	$32767, %ebx
+	mulss	%xmm6, %xmm0
 	cmovg	%ebp, %ebx
 	movzbl	%bh, %ebp
 	sall	$8, %ebx
 	orl	%ebp, %ebx
 	movl	$32767, %ebp
-	fstps	4(%esp)
 	movw	%bx, (%edx)
-	cvttss2si	4(%esp), %ebx
+	cvttss2si	%xmm0, %ebx
 	cmpl	$-32768, %ebx
 	cmovl	%edi, %ebx
 	cmpl	$32767, %ebx
@@ -193,107 +180,105 @@ alignedConvertToS16SSE2:
 	addl	$4, %edx
 	cmpw	%ax, %si
 	jg	.L20
-	fstp	%st(0)
 	jmp	.L15
 	.p2align 4,,7
 	.p2align 3
 .L34:
 	testw	%ax, %ax
 	je	.L27
-	fsts	(%esp)
+	movaps	%xmm6, %xmm0
 	xorl	%ecx, %ecx
 	movdqa	.LC1, %xmm3
-	movss	(%esp), %xmm0
-	xorl	%edi, %edi
-	movdqa	.LC2, %xmm2
 	shufps	$0, %xmm0, %xmm0
+	movdqa	.LC2, %xmm2
+	movss	%xmm6, 4(%esp)
+	xorl	%edi, %edi
 	movaps	%xmm0, %xmm7
 	.p2align 4,,7
 	.p2align 3
 .L19:
 	movaps	(%edx,%ecx,2), %xmm0
-	movdqa	%xmm2, %xmm4
+	movdqa	%xmm2, %xmm5
 	movdqa	%xmm2, %xmm6
 	addl	$1, %edi
-	movaps	16(%edx,%ecx,2), %xmm5
+	movaps	16(%edx,%ecx,2), %xmm4
 	mulps	%xmm7, %xmm0
-	mulps	%xmm7, %xmm5
+	mulps	%xmm7, %xmm4
 	cvttps2dq	%xmm0, %xmm0
 	movdqa	%xmm0, %xmm1
 	pcmpgtd	%xmm3, %xmm1
 	pand	%xmm1, %xmm0
 	pandn	%xmm3, %xmm1
 	por	%xmm0, %xmm1
-	cvttps2dq	%xmm5, %xmm5
+	cvttps2dq	%xmm4, %xmm4
 	movdqa	%xmm1, %xmm0
 	pcmpgtd	%xmm2, %xmm0
-	pand	%xmm0, %xmm4
+	pand	%xmm0, %xmm5
 	pandn	%xmm1, %xmm0
 	movdqa	%xmm0, %xmm1
-	movdqa	%xmm5, %xmm0
-	por	%xmm4, %xmm1
+	movdqa	%xmm4, %xmm0
+	por	%xmm5, %xmm1
 	pcmpgtd	%xmm3, %xmm0
-	movdqa	.LC3, %xmm4
-	pand	%xmm0, %xmm5
-	pand	%xmm1, %xmm4
-	pandn	%xmm3, %xmm0
-	psrad	$8, %xmm4
-	por	%xmm5, %xmm0
-	pslld	$8, %xmm1
-	movdqa	%xmm0, %xmm5
-	pcmpgtd	%xmm2, %xmm5
-	pand	%xmm5, %xmm6
-	pandn	%xmm0, %xmm5
-	movdqa	%xmm5, %xmm0
 	movdqa	.LC3, %xmm5
-	por	%xmm6, %xmm0
-	pand	%xmm0, %xmm5
-	pslld	$8, %xmm0
+	pand	%xmm0, %xmm4
+	pand	%xmm1, %xmm5
+	pandn	%xmm3, %xmm0
 	psrad	$8, %xmm5
-	movdqa	%xmm4, %xmm6
-	punpcklwd	%xmm5, %xmm4
-	punpckhwd	%xmm5, %xmm6
-	movdqa	%xmm4, %xmm5
-	punpcklwd	%xmm6, %xmm4
-	punpckhwd	%xmm6, %xmm5
-	punpcklwd	%xmm5, %xmm4
-	movdqa	%xmm1, %xmm5
+	por	%xmm4, %xmm0
+	pslld	$8, %xmm1
+	movdqa	%xmm0, %xmm4
+	pcmpgtd	%xmm2, %xmm4
+	pand	%xmm4, %xmm6
+	pandn	%xmm0, %xmm4
+	movdqa	%xmm4, %xmm0
+	movdqa	.LC3, %xmm4
+	por	%xmm6, %xmm0
+	pand	%xmm0, %xmm4
+	pslld	$8, %xmm0
+	psrad	$8, %xmm4
+	movdqa	%xmm5, %xmm6
+	punpcklwd	%xmm4, %xmm5
+	punpckhwd	%xmm4, %xmm6
+	movdqa	%xmm5, %xmm4
+	punpcklwd	%xmm6, %xmm5
+	punpckhwd	%xmm6, %xmm4
+	punpcklwd	%xmm4, %xmm5
+	movdqa	%xmm1, %xmm4
 	punpcklwd	%xmm0, %xmm1
-	punpckhwd	%xmm0, %xmm5
-	movdqa	%xmm1, %xmm0
-	punpcklwd	%xmm5, %xmm1
-	punpckhwd	%xmm5, %xmm0
-	punpcklwd	%xmm0, %xmm1
-	por	%xmm1, %xmm4
-	movdqa	%xmm4, (%ebx,%ecx)
+	punpckhwd	%xmm0, %xmm4
+	movdqa	%xmm1, %xmm6
+	punpcklwd	%xmm4, %xmm1
+	punpckhwd	%xmm4, %xmm6
+	punpcklwd	%xmm6, %xmm1
+	por	%xmm1, %xmm5
+	movdqa	%xmm5, (%ebx,%ecx)
 	addl	$16, %ecx
 	cmpw	%di, %bp
 	ja	.L19
-	cmpw	4(%esp), %ax
+	cmpw	2(%esp), %ax
+	movss	4(%esp), %xmm6
 	jne	.L18
-	fstp	%st(0)
 	jmp	.L15
 	.p2align 4,,7
 	.p2align 3
 .L33:
 	testw	%bp, %bp
-	.p2align 4,,4
+	.p2align 4,,3
 	.p2align 3
 	je	.L28
-	fsts	(%esp)
+	movaps	%xmm6, %xmm0
 	xorl	%eax, %eax
 	movdqa	.LC1, %xmm3
-	movss	(%esp), %xmm0
-	xorl	%ecx, %ecx
-	movdqa	.LC2, %xmm2
 	shufps	$0, %xmm0, %xmm0
+	movdqa	.LC2, %xmm2
+	xorl	%ecx, %ecx
 	movaps	%xmm0, %xmm5
 	.p2align 4,,7
 	.p2align 3
 .L24:
 	movaps	(%edx,%eax,2), %xmm0
 	addl	$1, %ecx
-	movdqa	%xmm2, %xmm6
+	movdqa	%xmm2, %xmm7
 	movaps	16(%edx,%eax,2), %xmm4
 	mulps	%xmm5, %xmm0
 	mulps	%xmm5, %xmm4
@@ -306,23 +291,23 @@ alignedConvertToS16SSE2:
 	cvttps2dq	%xmm4, %xmm4
 	movdqa	%xmm1, %xmm0
 	pcmpgtd	%xmm2, %xmm0
-	pand	%xmm0, %xmm6
+	pand	%xmm0, %xmm7
 	pandn	%xmm1, %xmm0
 	movdqa	%xmm0, %xmm1
 	movdqa	%xmm4, %xmm0
-	por	%xmm6, %xmm1
+	por	%xmm7, %xmm1
 	pcmpgtd	%xmm3, %xmm0
-	movdqa	%xmm2, %xmm6
+	movdqa	%xmm2, %xmm7
 	pand	%xmm0, %xmm4
 	pandn	%xmm3, %xmm0
 	por	%xmm4, %xmm0
 	movdqa	%xmm0, %xmm4
 	pcmpgtd	%xmm2, %xmm4
-	pand	%xmm4, %xmm6
+	pand	%xmm4, %xmm7
 	pandn	%xmm0, %xmm4
 	movdqa	%xmm4, %xmm0
 	movdqa	%xmm1, %xmm4
-	por	%xmm6, %xmm0
+	por	%xmm7, %xmm0
 	punpckhwd	%xmm0, %xmm4
 	punpcklwd	%xmm0, %xmm1
 	movdqa	%xmm1, %xmm0
@@ -333,9 +318,8 @@ alignedConvertToS16SSE2:
 	addl	$16, %eax
 	cmpw	%cx, %di
 	ja	.L24
-	cmpw	%bp, 4(%esp)
+	cmpw	%bp, 2(%esp)
 	jne	.L23
-	fstp	%st(0)
 	jmp	.L15
 	.size	alignedConvertToS16SSE2, .-alignedConvertToS16SSE2
 	.section	.rodata.cst4,"aM",@progbits,4
@@ -361,5 +345,5 @@ alignedConvertToS16SSE2:
 	.long	65280
 	.long	65280
 	.long	65280
-	.ident	"GCC: (GNU) 4.4.0 20090304 (experimental)"
+	.ident	"GCC: (Ubuntu 4.4.0-0ubuntu2) 4.4.0"
 	.section	.note.GNU-stack,"",@progbits

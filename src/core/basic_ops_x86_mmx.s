@@ -103,5 +103,5 @@ movq    %mm0, 56(%edx)
 	emms
 	ret
 	.size	alignedMemClearMMX, .-alignedMemClearMMX
-	.ident	"GCC: (GNU) 4.4.0 20090304 (experimental)"
+	.ident	"GCC: (Ubuntu 4.4.0-0ubuntu2) 4.4.0"
 	.section	.note.GNU-stack,"",@progbits
