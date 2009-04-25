@@ -1429,6 +1429,7 @@ void instrumentTrackWindow::closeEvent( QCloseEvent * _ce )
 	{
 		hide();
 	}
+	m_itv->m_tlb->setFocus();
 	m_itv->m_tlb->setChecked( false );
 }
 
