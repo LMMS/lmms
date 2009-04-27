@@ -34,6 +34,7 @@
 #include "lmms_style.h"
 
 class automationEditor;
+class AutomationRecorder;
 class bbEditor;
 class bbTrackContainer;
 class dummyTrackContainer;
@@ -139,6 +140,11 @@ public:
 		return s_automationEditor;
 	}
 
+	static AutomationRecorder * getAutomationRecorder( void )
+	{
+		return s_automationRecorder;
+	}
+
 	static ladspa2LMMS * getLADSPAManager( void )
 	{
 		return s_ladspaManager;
@@ -195,6 +201,7 @@ private:
 	static fxMixerView * s_fxMixerView;
 	static songEditor * s_songEditor;
 	static automationEditor * s_automationEditor;
+	static AutomationRecorder * s_automationRecorder;
 	static bbEditor * s_bbEditor;
 	static pianoRoll * s_pianoRoll;
 	static projectNotes * s_projectNotes;

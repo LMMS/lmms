@@ -48,6 +48,7 @@
 #include "main_window.h"
 #include "bb_editor.h"
 #include "song_editor.h"
+#include "automation_recorder.h"
 #include "song.h"
 #include "piano_roll.h"
 #include "embed.h"
@@ -759,6 +760,8 @@ void mainWindow::finalize( void )
 	m_chkrAutomation = new QCheckBox( tr( "Automation" ), gr_w );
 	m_chkrMidi = new QCheckBox( tr( "MIDI" ), gr_w );
 	
+	connect(m_chkrAutomation, SIGNAL(toggled(bool)), SLOT(toggleRecordAutomation(bool)));
+
 	grw_layout->addWidget( new QLabel( tr( "RECORD" ), gr_w ) );
 	grw_layout->addWidget( m_chkrAudio );
 	grw_layout->addWidget( m_chkrAutomation );
@@ -1551,6 +1554,13 @@ void mainWindow::masterPitchMoved( int _new_val )
 void mainWindow::masterPitchReleased( void )
 {
 	m_mpsStatus->hide();
+}
+
+
+
+void mainWindow::toggleRecordAutomation( bool _recording )
+{
+	engine::getAutomationRecorder()->setRecording( _recording );
 }
 
 

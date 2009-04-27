@@ -304,7 +304,6 @@ QPalette CusisStyle::standardPalette( void ) const
 void CusisStyle::hoverColors( bool sunken, bool hover, bool active,
 		QColor & color, QColor & blend ) const
 {
-	printf("SB: %d %d %d\n", sunken, hover, active );
 	if( active )
 	{
 		if( sunken )

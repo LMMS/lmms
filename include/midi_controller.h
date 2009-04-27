@@ -49,7 +49,7 @@ public:
 	virtual void processOutEvent( const midiEvent& _me,
 					const midiTime & _time)
 	{
-		// No output yet
+		// No output yet (TODO?)
 	}
 
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _this );

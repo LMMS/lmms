@@ -28,6 +28,7 @@
 
 #include "engine.h"
 #include "automation_editor.h"
+#include "automation_recorder.h"
 #include "bb_editor.h"
 #include "bb_track_container.h"
 #include "config_mgr.h"
@@ -63,6 +64,7 @@ song * engine::s_song = NULL;
 UnifiedResourcesProvider * engine::s_resourcesProvider = NULL;
 songEditor * engine::s_songEditor = NULL;
 automationEditor * engine::s_automationEditor = NULL;
+AutomationRecorder * engine::s_automationRecorder = NULL;
 bbEditor * engine::s_bbEditor = NULL;
 pianoRoll * engine::s_pianoRoll = NULL;
 projectNotes * engine::s_projectNotes = NULL;
@@ -125,6 +127,7 @@ void engine::init( const bool _has_gui )
 		s_bbEditor = new bbEditor( s_bbTrackContainer );
 		s_pianoRoll = new pianoRoll;
 		s_automationEditor = new automationEditor;
+		s_automationRecorder = new AutomationRecorder;
 
 		s_mainWindow->finalize();
 	}
@@ -152,6 +155,8 @@ void engine::destroy( void )
 	s_pianoRoll = NULL;
 	delete s_automationEditor;
 	s_automationEditor = NULL;
+	delete s_automationRecorder;
+	s_automationRecorder = NULL;
 
 	delete s_fxMixerView;
 	s_fxMixerView = NULL;

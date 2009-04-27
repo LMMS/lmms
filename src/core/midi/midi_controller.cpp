@@ -35,7 +35,7 @@
 #include "mixer.h"
 #include "midi_client.h"
 #include "midi_controller.h"
-
+#include "automation_recorder.h"
 
 
 midiController::midiController( model * _parent ) :
@@ -96,6 +96,10 @@ void midiController::processInEvent( const midiEvent & _me,
 				Uint8 val = _me.m_data.m_bytes[2] & 0x7F;
 				m_lastValue = (float)( val ) / 127.0f;
 				emit valueChanged();
+
+				// send this event to the automation recorder
+				engine::getAutomationRecorder()->controllerEvent( 
+					this, m_lastValue );
 			}
 			break;
 

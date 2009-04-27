@@ -136,6 +136,7 @@ public slots:
 	void undo( void );
 	void redo( void );
 
+	void toggleRecordAutomation( bool );
 
 protected:
 	virtual void closeEvent( QCloseEvent * _ce );

@@ -33,6 +33,7 @@
 #include "song.h"
 #include "automation_track.h"
 #include "automation_editor.h"
+#include "automation_recorder.h"
 #include "bb_editor.h"
 #include "bb_track.h"
 #include "bb_track_container.h"
@@ -594,6 +595,8 @@ void song::setPlayPos( tick_t _ticks, PlayModes _play_mode )
 void song::stop( void )
 {
 	m_actions.push_back( ActionStop );
+
+	engine::getAutomationRecorder()->initRecord();
 }
 
 
