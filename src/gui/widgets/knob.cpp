@@ -265,7 +265,7 @@ bool knob::updateAngle( void )
 	int angle = 0;
 	if( model() && model()->maxValue() != model()->minValue() )
 	{
-		float a = ( m_fineModelValue - 0.5 * ( model()->minValue() +
+		float a = ( model()->value() - 0.5 * ( model()->minValue() +
 						model()->maxValue() ) ) /
 				( model()->maxValue() - model()->minValue() ) *
 								m_totalAngle;
@@ -385,7 +385,6 @@ float knob::getValue( const QPoint & _p )
 	{
 		return (float)( _p.y() - m_origMousePos.y() ) / (float)(m_pixelHeight)
 				* (model()->maxValue() - model()->minValue()) ;
-				//+ model()->minValue();
 	}
 }
 
@@ -572,7 +571,10 @@ void knob::wheelEvent( QWheelEvent * _we )
 
 void knob::setPosition( const QPoint & _p )
 {
-	// this variable will be exactly where the knob is turned to
+	if( round(m_fineModelValue) != round(model()->value()) )
+	{
+		m_fineModelValue = model()->value();
+	}
 	m_fineModelValue -= getValue( _p );
 	if( m_fineModelValue < model()->minValue() )
 	{
