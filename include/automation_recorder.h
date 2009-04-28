@@ -4,7 +4,6 @@
  * 						controllers and creates automation TCOs if automation
  *						recording is on.
  *
- * Copyright (c) 2008-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2009-2009 Andrew Kelley <superjoe30/at/gmail.com>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net

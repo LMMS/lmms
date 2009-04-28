@@ -4,7 +4,6 @@
  * 						controller and records automation if automation
  *						recording is on.
  *
- * Copyright (c) 2008-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2009-2009 Andrew Kelley <superjoe30/at/gmail.com>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
@@ -90,7 +89,7 @@ void AutomationRecorder::controllerEvent(
 			data.pat->changeLength( song_pos - data.pat->startPosition() );
 			// now draw a line from the last one to this one
 			// TODO: make it smooth (draw line instead of insert value)
-			data.pat->putValue( song_pos, _val );
+			data.pat->putValue( song_pos - data.pat->startPosition(), _val, false );
 
 		}
 		else
@@ -120,7 +119,8 @@ void AutomationRecorder::controllerEvent(
 			}
 
 			// add first value TODO: make sure this is absolute
-			data.pat->putValue( song_pos, _val );
+			data.pat->putValue( 
+				song_pos - data.pat->startPosition(), _val, false );
 			
 			// insert into map
 			data.seen = true;
