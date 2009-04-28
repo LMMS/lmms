@@ -52,39 +52,38 @@
 - add FLAC as export-format?
 
 Andrew Kelley's todo:
-- add a Modulator class and a Humanizer tool to the piano roll
 - when a song goes past the end of the song, make it stop or loop
-- when looking at a piano roll, if the song is playing that pattern, move the position ticker to where it should be
+- don't end mouse selection when control is released
 - add a tools menu to piano roll
-  * put some of the tools on there that already have keyboard shortcuts (ctrl+up/down, shift+left/right)
-  * humanizing tool
-  * quick slice
-  * look through FL Studio's tools and implement some of them
-- slice tool for piano roll, "map audio files to piano roll keys"
+	* quantize tool in the piano roll
+	* put some of the tools on there that already have keyboard shortcuts (ctrl+up/down, shift+left/right)
+	* humanizing tool
+	* quick slice
+	* look through FL Studio's tools and implement some of them
+- adding/removing steps to the beat+bassline editor is awkward
+- the 'add beat+bassline' button in the beat+bassline editor is misleading - I say we remove it and rely on the song editor to add beat+basslines
+- "map audio files to piano roll keys" - GoldWave equivalent instrument
+	* allow importing goldwave presets
 - when a note is played, show the note as being depressed in the piano roll
-
+- when song is playing and you switch playback mode it should switch immediately
 - pencil tool icon doesn't set right. selection arrow cursor doesn't set right
 - when you add VSTi, have it automatically pop the find VST plugin dialog
 - make pitch bend range adjustable
+- when looking at a piano roll, if the song is playing that pattern, move the position ticker to where it should be
 - monophonic mode on 3xosc
 - add dithering
 - add global playback mode to .mmp file format
 - allow increasing the width of song editor things, it will make the BB repeat
 - multiview button - show notes from every instrument in the current beat+bassline with different colors
 - undo/redo for piano roll
-- don't end mouse selection when control is released
 - mouse cursor isn't updated correctly in selection mode (from resizing note edit area)
-
 - make the menu for a channel happen when you right click, instead of renaming, and make the midi input a top-level menu item
 - add a "Set exact value" to a right clicked automation menu
 - enable "auto detect" by default when you bring up the "connect to controller" window
-
 - "paintbrush" tool for the song editor, to easily "paint" beat+basslines
 - when you clone a track in the song editor, rename the track so that it doesn't have the same name (increment the number if necessary)
 - somehow enable easy pattern copy pasting in the beat+bassline editor
 - make it so you can see the notes when putting a pattern in the playlist
-- adding/removing steps to the beat+bassline editor is awkward
-- the 'add beat+bassline' button in the beat+bassline editor is misleading - I say we remove it and rely on the song editor to add beat+basslines
 - make it so that 3xosc notes don't max out
 - copy-pasted automation patterns have to be manually linked back to their knob for some reason
 - cloning a pattern in the song editor should copy automation tracks along with notes
