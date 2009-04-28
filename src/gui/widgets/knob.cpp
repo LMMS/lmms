@@ -85,6 +85,9 @@ knob::knob( int _knob_num, QWidget * _parent, const QString & _name ) :
 
 		setFixedSize( m_knobPixmap->width(), m_knobPixmap->height() );
 	}
+
+	m_fineModelValue = model()->value();
+
 	setTotalAngle( 270.0f );
 	setInnerRadius( 1.0f );
 	setOuterRadius( 10.0f );
@@ -262,7 +265,7 @@ bool knob::updateAngle( void )
 	int angle = 0;
 	if( model() && model()->maxValue() != model()->minValue() )
 	{
-		float a = ( model()->value() - 0.5 * ( model()->minValue() +
+		float a = ( m_fineModelValue - 0.5 * ( model()->minValue() +
 						model()->maxValue() ) ) /
 				( model()->maxValue() - model()->minValue() ) *
 								m_totalAngle;
@@ -375,9 +378,15 @@ float knob::getValue( const QPoint & _p )
 {
 	if( engine::getMainWindow()->isShiftPressed() )
 	{
-		return( ( _p.y() - m_origMousePos.y() ) * model()->step<float>() );
+		//return( ( _p.y() - m_origMousePos.y() ) * model()->step<float>() );
+		return( ( _p.y() - m_origMousePos.y() ) * pageSize() );
 	}
-	return( ( _p.y() - m_origMousePos.y() ) * pageSize() );
+	else
+	{
+		return (float)( _p.y() - m_origMousePos.y() ) / (float)(m_pixelHeight)
+				* (model()->maxValue() - model()->minValue()) ;
+				//+ model()->minValue();
+	}
 }
 
 
@@ -563,7 +572,19 @@ void knob::wheelEvent( QWheelEvent * _we )
 
 void knob::setPosition( const QPoint & _p )
 {
-	model()->setValue( model()->value() - getValue( _p ) );
+	// this variable will be exactly where the knob is turned to
+	m_fineModelValue -= getValue( _p );
+	if( m_fineModelValue < model()->minValue() )
+	{
+		m_fineModelValue = model()->minValue();
+	}
+	else if( m_fineModelValue > model()->maxValue() )
+	{
+		m_fineModelValue = model()->maxValue();
+	}
+
+	// this can round
+	model()->setValue( m_fineModelValue );
 }
 
 

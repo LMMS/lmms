@@ -141,6 +141,11 @@ private:
 
 	static textFloat * s_textFloat;
 
+	// how many pixels to get from one end of the knob to the other
+	static const int m_pixelHeight = 400;
+	// same as model()->value(), except it is a float
+	float m_fineModelValue;
+
 	int m_knobNum;
 	QString m_label;
 

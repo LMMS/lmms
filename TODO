@@ -52,7 +52,6 @@
 - add FLAC as export-format?
 
 Andrew Kelley's todo:
-- make knobs easier to tune (less sensitive)
 - add a Modulator class and a Humanizer tool to the piano roll
 - when a song goes past the end of the song, make it stop or loop
 - when looking at a piano roll, if the song is playing that pattern, move the position ticker to where it should be
