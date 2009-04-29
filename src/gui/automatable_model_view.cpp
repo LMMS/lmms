@@ -25,6 +25,7 @@
 
 #include <QtGui/QMenu>
 #include <QtGui/QMouseEvent>
+
 #include "automatable_model_view.h"
 #include "automation_pattern.h"
 #include "controller_connection_dialog.h"
@@ -126,6 +127,21 @@ void automatableModelView::addDefaultActions( QMenu * _menu )
 			automatableModel::tr("Connect to controller..."),
 				amvSlots,
 				SLOT( execConnectionDialog() ) );
+	}
+
+	if( _model->armed() )
+	{
+		_menu->addAction( //embed::getIconPixmap( "controller" ), 
+			automatableModel::tr( "de-arm" ),
+			amvSlots,
+			SLOT( deArm() ) );
+	}
+	else
+	{
+		_menu->addAction( //embed::getIconPixmap( "controller" ), 
+			automatableModel::tr( "Arm for recording" ),
+			amvSlots,
+			SLOT( arm() ) );
 	}
 }
 
@@ -241,6 +257,16 @@ void automatableModelViewSlots::editSongGlobalAutomation( void )
 }
 
 
+void automatableModelViewSlots::arm( void )
+{
+	amv->modelUntyped()->setArmed( true );
+}
+
+
+void automatableModelViewSlots::deArm( void )
+{
+	amv->modelUntyped()->setArmed( false );
+}
 
 
 #include "moc_automatable_model_view.cxx"

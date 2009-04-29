@@ -48,14 +48,14 @@ public:
 		automationTrack* auto_track;
 		// the tco that we're putting this automation in
 		automationPattern* pat;
-	} ControllerMetaData;
-	typedef QMap<const controller *, ControllerMetaData> ControllerMap;
+	} ClipData;
+	typedef QMap<const automatableModel *, ClipData> AutoClipMap;
 
 	AutomationRecorder();
 	~AutomationRecorder();
 	
-	// midi controllers call this
-	void controllerEvent( const controller * _controller, float _val );
+	// automatable models call this when their data changes
+	void modelDataEvent( automatableModel * _model );
 	
 	// must be called at some point between a recording ending and a new
 	// one beginning
@@ -67,7 +67,7 @@ public:
 private:
 	
 	bool m_recording; // while the song is playing, should we record automation?
-	ControllerMap m_controllers; // remember state during recording
+	AutoClipMap m_clips; // remember state during recording
 
 	friend class engine;
 } ;

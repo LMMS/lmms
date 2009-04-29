@@ -104,7 +104,8 @@ public slots:
 	void execConnectionDialog( void );
 	void removeConnection( void );
 	void editSongGlobalAutomation( void );
-
+	void arm( void );
+	void deArm( void );
 
 protected:
 	automatableModelView * amv;

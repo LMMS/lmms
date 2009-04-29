@@ -27,6 +27,7 @@
 
 
 #include "automatable_model.h"
+#include "automation_recorder.h"
 #include "automation_pattern.h"
 #include "controller_connection.h"
 
@@ -55,8 +56,13 @@ automatableModel::automatableModel( DataType _type,
 	m_journalEntryReady( false ),
 	m_setValueDepth( 0 ),
 	m_hasLinkedModels( false ),
-	m_controllerConnection( NULL )
+	m_controllerConnection( NULL ),
+	m_armed( false )
 {
+	// we need to handle our own dataChanged signal so we can
+	// alert AutomationRecorder and pass a pointer to this
+	QObject::connect( this, SIGNAL( dataChanged() ),
+					this, SLOT( handleDataChanged() ) );
 }
 
 
@@ -462,6 +468,13 @@ void automatableModel::unlinkControllerConnection( void )
 	m_controllerConnection = NULL;
 }
 
+
+
+void automatableModel::handleDataChanged( void )
+{
+	// report the data changed to AutomationRecorder
+	engine::getAutomationRecorder()->modelDataEvent( this );
+}
 
 
 

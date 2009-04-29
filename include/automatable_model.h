@@ -212,13 +212,16 @@ public:
 		return "0";
 	}
 
+	inline bool armed( void ){ return m_armed; }
+	inline void setArmed( bool _armed ){ m_armed = _armed; }
+
 
 public slots:
 	virtual void reset( void );
 	virtual void copyValue( void );
 	virtual void pasteValue( void );
 	void unlinkControllerConnection( void );
-
+	void handleDataChanged( void );
 
 protected:
 	virtual void redoStep( journalEntry & _je );
@@ -252,6 +255,7 @@ private:
 
 	controllerConnection * m_controllerConnection;
 
+	bool m_armed; // record this model during automation recording?
 
 	static float __copiedValue;
 

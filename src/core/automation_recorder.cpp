@@ -1,7 +1,7 @@
 /*
  * automation_recorder.cpp - declaration of class AutomationRecorder 
- *						which handles the valueChanged signal of every
- * 						controller and records automation if automation
+ *						which handles the dataChanged event of every
+ * 						automatableModel and records it if automation
  *						recording is on.
  *
  * Copyright (c) 2009-2009 Andrew Kelley <superjoe30/at/gmail.com>
@@ -32,7 +32,7 @@
 
 AutomationRecorder::AutomationRecorder() :
 	m_recording( false ),
-	m_controllers( ControllerMap() )
+	m_clips( AutoClipMap() )
 {
 }
 
@@ -40,17 +40,17 @@ AutomationRecorder::~AutomationRecorder()
 {
 } 
 
-void AutomationRecorder::controllerEvent( 
-	const controller * _controller, float _val )
+void AutomationRecorder::modelDataEvent( automatableModel * _model )
 {
-	if( engine::getSong()->isRecording() &&
+	if( _model->armed() &&
+		engine::getSong()->isRecording() &&
 		engine::getSong()->isPlaying()   &&
 		m_recording )
 	{
-		// record this controller position at the current tick
 		// determine the current tick
 		song * s = engine::getSong();
 		midiTime & song_pos = s->getPlayPos( song::Mode_PlaySong );
+
 		/*
 		// if the tick is within an existing automation TCO 
 		// for the automatable model that this controller controls 
@@ -79,23 +79,25 @@ void AutomationRecorder::controllerEvent(
 		}
 		*/
 
-		// check if we've seen this controller change yet
-		if( m_controllers.contains( _controller ) &&
-			m_controllers[_controller].seen )
+		// check if we've seen this model change yet
+		float val = _model->value<float>();
+		if( m_clips.contains( _model ) &&
+			m_clips[_model].seen )
 		{
-			ControllerMetaData data = m_controllers[_controller];
+			ClipData data = m_clips[_model];
 			// we've seen this controller, add automation to the TCO we added
 			// first make the TCO bigger
 			data.pat->changeLength( song_pos - data.pat->startPosition() );
 			// now draw a line from the last one to this one
 			// TODO: make it smooth (draw line instead of insert value)
-			data.pat->putValue( song_pos - data.pat->startPosition(), _val, false );
+			data.pat->putValue( 
+				song_pos - data.pat->startPosition(), val, false );
 
 		}
 		else
 		{
 			// new entry in controller map
-			ControllerMetaData data;
+			ClipData data;
 
 			// create a new automation track in the song
 			engine::getMixer()->lock();
@@ -109,22 +111,16 @@ void AutomationRecorder::controllerEvent(
 				data.auto_track->createTCO( song_pos ) );
 			data.pat->movePosition( song_pos );
 
-			// add each automatableModel that the controller controls
-			// to the automation pattern
-			QObjectList kids = _controller->children();
-			for( int i = 0; i < kids.size(); ++i )
-			{
-				data.pat->addObject(
-					qobject_cast<automatableModel*>( kids.at(i) ) );
-			}
+			// connect the model to the automation pattern
+			data.pat->addObject( _model );
 
 			// add first value TODO: make sure this is absolute
 			data.pat->putValue( 
-				song_pos - data.pat->startPosition(), _val, false );
+				song_pos - data.pat->startPosition(), val, false );
 			
 			// insert into map
 			data.seen = true;
-			m_controllers.insert(_controller, data);
+			m_clips.insert(_model, data);
 		}
 	}
 } 
@@ -132,7 +128,7 @@ void AutomationRecorder::controllerEvent(
 void AutomationRecorder::initRecord( void )
 {
 	// starting a new recording, clear map
-	m_controllers.clear();
+	m_clips.clear();
 }
 
 #include "moc_automation_recorder.cxx"

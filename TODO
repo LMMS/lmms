@@ -52,6 +52,10 @@
 - add FLAC as export-format?
 
 Andrew Kelley's todo:
+- automation recording:
+	* when you record and there is already an auto clip, it repeats it
+	* it freezes when you try to do it with the Volume or Panning slider
+	* crashes when you try to do it with a solo/mute button
 - when a song goes past the end of the song, make it stop or loop
 - don't end mouse selection when control is released
 - add a tools menu to piano roll
