@@ -1,8 +1,8 @@
 /*
  * lv2_port_dialog.cpp - dialog to test an LV2 plugin
  *
- * Copyright (c) 2009-2009 Martin Andrews <mdda/at/users.sourceforge.net>
- * 
+ * Copyright (c) 2009 Martin Andrews <mdda/at/users.sourceforge.net>
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -30,18 +30,16 @@
 
 #include "embed.h"
 #include "engine.h"
-// #include "ladspa_2_lmms.h"
 #include "mixer.h"
 
 
 lv2PortDialog::lv2PortDialog( const lv2_key_t & _key )
 {
-//	ladspa2LMMS * manager = engine::getLADSPAManager();
- lv2Manager * manager = static_lv2_manager; 
+	lv2Manager * manager = static_lv2_manager;
 
 	setWindowIcon( embed::getIconPixmap( "ports" ) );
 	setWindowTitle( tr( "Ports" ) );
-	setModal( TRUE );
+	setModal( true );
 
 	QVBoxLayout * vlayout = new QVBoxLayout( this );
 	vlayout->setSpacing( 0 );
@@ -59,7 +57,7 @@ lv2PortDialog::lv2PortDialog( const lv2_key_t & _key )
 //	ports.append( tr( "SR Dependent" ) );
 
 	QTableWidget * settings = new QTableWidget( pc, ports.size(), this );
- settings->setHorizontalHeaderLabels( ports );
+	settings->setHorizontalHeaderLabels( ports );
 
 	for( Uint16 row = 0; row < pc; row++ )
 	{
@@ -82,25 +80,25 @@ lv2PortDialog::lv2PortDialog( const lv2_key_t & _key )
 			manager->isPortInput( _key, row ) ?
 					tr( "Input" ) : tr( "Output" ) );
 
-  QStringList values;
-  if( manager->isInteger( _key, row ) )
-  {
-   values = manager->listEnumeration( _key, row );
-   settings->item( row, col )->setText( values.join("|") );
-  }
-  else 
-  {
-   settings->item( row, col )->setText( tr( "Float" ) );
-  }
-  col++;
-  
+		QStringList values;
+		if( manager->isInteger( _key, row ) )
+		{
+			values = manager->listEnumeration( _key, row );
+			settings->item( row, col )->setText( values.join("|") );
+		}
+		else
+		{
+			settings->item( row, col )->setText( tr( "Float" ) );
+		}
+		col++;
+
 /*
 		settings->item( row, col++ )->setText(
 			manager->isPortToggled( _key, row ) ? tr( "Toggled" ) :
 			manager->isInteger( _key, row ) ? tr( "Integer" ) :
 								tr( "Float" ) );
 */
-  
+
 		float min = manager->getLowerBound( _key, row );
 		float max = manager->getUpperBound( _key, row );
 		float def = manager->getDefaultSetting( _key, row );
@@ -126,7 +124,7 @@ lv2PortDialog::lv2PortDialog( const lv2_key_t & _key )
 		}
 		else if( values.size() >0 )
 		{
-   // Don't have a minimum
+			// Don't have a minimum
 //			range += QString::number( static_cast<int>( min ) ) + " < ";
 		}
 		else
@@ -163,7 +161,7 @@ lv2PortDialog::lv2PortDialog( const lv2_key_t & _key )
 		{
 			range += QString::number( max );
 		}
-  
+
 		settings->item( row, col++ )->setText( range );
 
 /*

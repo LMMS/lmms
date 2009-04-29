@@ -1,11 +1,11 @@
 /*
  * lv2_2_lmms.cpp - class that identifies and instantiates LV2 effects
- *                     for use with LMMS
+ *                  for use with LMMS
  *
- * Copyright (c) 2009-2009 Martin Andrews <mdda@sourceforge.net>
+ * Copyright (c) 2009 Martin Andrews <mdda@sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
  * License as published by the Free Software Foundation; either
@@ -30,16 +30,16 @@
 lv22LMMS::lv22LMMS( void )
 {
 	l_sortable_plugin_t plugins = getSortedPlugins();
-	
+
 	for( l_sortable_plugin_t::iterator it = plugins.begin();
 		    it != plugins.end(); it++ )
 	{
 		lv2_key_t key = (*it).second;
 		lv2ManagerDescription * desc = getDescription( key );
-		
+
 		if( desc->type == SOURCE )
 		{
-			m_instruments.append( qMakePair( getName( key ), 
+			m_instruments.append( qMakePair( getName( key ),
 								key ) );
 		}
 		else if( desc->type == TRANSFER &&
@@ -57,7 +57,7 @@ lv22LMMS::lv22LMMS( void )
 			desc->inputChannels != 2 &&
 			desc->inputChannels != 4 ) ) )
 		{
-			m_invalidEffects.append( qMakePair( getName( key ), 
+			m_invalidEffects.append( qMakePair( getName( key ),
 								key ) );
 		}
 		else if( desc->type == SINK )
@@ -67,25 +67,26 @@ lv22LMMS::lv22LMMS( void )
 		}
 		else if( desc->type == OTHER )
 		{
-			m_otherPlugins.append( qMakePair( getName( key ), 
+			m_otherPlugins.append( qMakePair( getName( key ),
 								key ) );
 		}
 	}
 }
- 
- 
- 
- 
+
+
+
+
 lv22LMMS::~lv22LMMS()
 {
 }
 
 
 
+
 QString lv22LMMS::getShortName( const lv2_key_t & _key )
 {
 	QString name = getName( _key );
-	
+
 	if( name.indexOf( "(" ) > 0 )
 	{
 		name = name.left( name.indexOf( "(" ) );
@@ -120,7 +121,7 @@ QString lv22LMMS::getShortName( const lv2_key_t & _key )
 	{
 		name = "LV2 Plugin";
 	}
-	
-	return( name );	
+
+	return name;
 }
 

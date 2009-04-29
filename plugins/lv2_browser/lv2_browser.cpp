@@ -1,9 +1,8 @@
 /*
- * lv2_browser.cpp - dialog to display information about installed LV2
- *                      plugins
+ * lv2_browser.cpp - dialog to display information about installed LV2 plugins
  *
- * Copyright (c) 2009-2009 Martin Andrews <mdda/at/users.sourceforge.net>
- * 
+ * Copyright (c) 2009 Martin Andrews <mdda/at/users.sourceforge.net>
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -66,7 +65,7 @@ plugin::descriptor PLUGIN_EXPORT lv2browser_plugin_descriptor =
 // neccessary for getting instance out of shared lib
 plugin * PLUGIN_EXPORT lmms_plugin_main( model * _parent, void * _data )
 {
-	return( new lv2Browser );
+	return  new lv2Browser;
 }
 
 }
@@ -77,10 +76,10 @@ plugin * PLUGIN_EXPORT lmms_plugin_main( model * _parent, void * _data )
 lv2Browser::lv2Browser( void ) :
 	tool( &lv2browser_plugin_descriptor, NULL )
 {
- if( static_lv2_manager == NULL ) 
- {
-  static_lv2_manager=new lv2Manager();
- }
+	if( static_lv2_manager == NULL )
+	{
+		static_lv2_manager = new lv2Manager();
+	}
 }
 
 
@@ -88,10 +87,10 @@ lv2Browser::lv2Browser( void ) :
 
 lv2Browser::~lv2Browser()
 {
- if( static_lv2_manager != NULL ) 
- {
-  delete static_lv2_manager;
- }
+	if( static_lv2_manager != NULL )
+	{
+		delete static_lv2_manager;
+	}
 }
 
 
@@ -99,7 +98,7 @@ lv2Browser::~lv2Browser()
 
 QString lv2Browser::nodeName( void ) const
 {
-	return( lv2browser_plugin_descriptor.name );
+	return lv2browser_plugin_descriptor.name;
 }
 
 
@@ -115,34 +114,34 @@ lv2BrowserView::lv2BrowserView( tool * _tool ) :
 	hlayout->setMargin( 0 );
 
 	m_tabBar = new tabBar( this, QBoxLayout::TopToBottom );
-	m_tabBar->setExclusive( TRUE );
+	m_tabBar->setExclusive( true );
 	m_tabBar->setFixedWidth( 72 );
 
 	QWidget * ws = new QWidget( this );
 	ws->setFixedSize( 500, 480 );
 
-	QWidget * available = createTab( ws, tr( "Available Effects" ), VALID ); 
+	QWidget * available = createTab( ws, tr( "Available Effects" ), VALID );
 	QWidget * unavailable = createTab( ws, tr( "Unavailable Effects" ), INVALID );
 	QWidget * instruments = createTab( ws, tr( "Instruments" ), SOURCE );
 	QWidget * analysis = createTab( ws, tr( "Analysis Tools" ), SINK );
 	QWidget * other = createTab( ws, tr( "Don't know" ), OTHER );
 
-	m_tabBar->addTab( available, tr( "Available Effects" ), 
-				0, FALSE, TRUE 
+	m_tabBar->addTab( available, tr( "Available Effects" ),
+				0, false, true
 			)->setIcon( embed::getIconPixmap( "setup_audio" ) );
-	m_tabBar->addTab( unavailable, tr( "Unavailable Effects" ), 
-				1, FALSE, TRUE 
+	m_tabBar->addTab( unavailable, tr( "Unavailable Effects" ),
+				1, false, true
 			)->setIcon( embed::getIconPixmap(
 						"unavailable_sound" ) );
-	m_tabBar->addTab( instruments, tr( "Instruments" ), 
-				2, FALSE, TRUE 
+	m_tabBar->addTab( instruments, tr( "Instruments" ),
+				2, false, true
 			)->setIcon( embed::getIconPixmap(
 							"setup_midi" ) );
-	m_tabBar->addTab( analysis, tr( "Analysis Tools" ), 
-				3, FALSE, TRUE
+	m_tabBar->addTab( analysis, tr( "Analysis Tools" ),
+				3, false, true
 			)->setIcon( embed::getIconPixmap( "analysis" ) );
-	m_tabBar->addTab( other, tr( "Don't know" ), 
-				4, TRUE, TRUE
+	m_tabBar->addTab( other, tr( "Don't know" ),
+				4, true, true
 			)->setIcon( embed::getIconPixmap( "uhoh" ) );
 
 	m_tabBar->setActiveTab( 0 );
@@ -186,7 +185,7 @@ lv2BrowserView::lv2BrowserView( tool * _tool ) :
 		parentWidget()->hide();
 		parentWidget()->layout()->setSizeConstraint(
 							QLayout::SetFixedSize );
-		
+
 		Qt::WindowFlags flags = parentWidget()->windowFlags();
 		flags |= Qt::MSWindowsFixedSizeDialogHint;
 		flags &= ~Qt::WindowMaximizeButtonHint;
@@ -216,7 +215,7 @@ QWidget * lv2BrowserView::createTab( QWidget * _parent, const QString & _txt,
 	const QString type = "<b>" + tr( "Type:" ) + "</b> ";
 	QLabel * title = new QLabel( type + _txt, tab );
 	QFont f = title->font();
-	f.setBold( TRUE );
+	f.setBold( true );
 	title->setFont( pointSize<12>( f ) );
 
 	layout->addSpacing( 5 );
@@ -225,14 +224,16 @@ QWidget * lv2BrowserView::createTab( QWidget * _parent, const QString & _txt,
 
 	lv2Description * description = new lv2Description( tab, _type );
 
- // Double-clicking on a row gives us a pop-up
+	// Double-clicking on a row gives us a pop-up
 	connect( description, SIGNAL( doubleClicked( const lv2_key_t & ) ),
 				SLOT( showPorts( const lv2_key_t & ) ) );
 
- layout->addWidget( description, 1 );
+	layout->addWidget( description, 1 );
 
-	return( tab );
+	return  tab;
 }
+
+
 
 
 void lv2BrowserView::showPorts( const lv2_key_t & _key )
@@ -243,3 +244,4 @@ void lv2BrowserView::showPorts( const lv2_key_t & _key )
 
 
 #include "moc_lv2_browser.cxx"
+

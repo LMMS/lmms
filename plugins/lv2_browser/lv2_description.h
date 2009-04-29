@@ -1,7 +1,7 @@
 /*
  * lv2_description.h - LV2 plugin description Pane of Information
  *
- * Copyright (c) 2009-2009 Martin Andrews <mdda/at/users.sourceforge.net>
+ * Copyright (c) 2009 Martin Andrews <mdda/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *

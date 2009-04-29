@@ -1,7 +1,7 @@
 /*
  * lv2_description.cpp - LV2 plugin description
  *
- * Copyright (c) 2007 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
+ * Copyright (c) 2009 Martin Andrews <mdda/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -35,7 +35,6 @@
 
 #include "audio_device.h"
 #include "engine.h"
-// #include "ladspa_2_lmms.h"
 #include "mixer.h"
 
 
@@ -45,9 +44,8 @@ lv2Description::lv2Description( QWidget * _parent,
 						lv2PluginType _type ) :
 	QWidget( _parent )
 {
-//	ladspa2LMMS * manager = engine::getLADSPAManager();
- lv2Manager * manager = static_lv2_manager; 
-/* 
+	lv2Manager * manager = static_lv2_manager;
+/*
 	switch( _type )
 	{
 		case SOURCE:
@@ -74,7 +72,7 @@ lv2Description::lv2Description( QWidget * _parent,
 */
  // Simpler : Get all the plugins, and select based on the type...
 	l_sortable_plugin_t plugins = manager->getSortedPlugins();
- 
+
 	QList<QString> pluginNames;
 	for( l_sortable_plugin_t::iterator it = plugins.begin();
 		    it != plugins.end(); it++ )
@@ -82,11 +80,11 @@ lv2Description::lv2Description( QWidget * _parent,
   lv2ManagerDescription * description=manager->getDescription( ( *it ).second );
 		if( description->type == _type  &&
      (
-      _type != VALID || 
-      description->inputChannels <= engine::getMixer()->audioDev()->channels() 
+      _type != VALID ||
+      description->inputChannels <= engine::getMixer()->audioDev()->channels()
      )
     )
-		{ 
+		{
 			pluginNames.push_back( ( *it ).first );
 			m_pluginKeys.push_back( ( *it ).second );
 		}
@@ -139,8 +137,7 @@ void lv2Description::update( const lv2_key_t & _key )
 	QVBoxLayout * layout = new QVBoxLayout( description );
 	layout->setSizeConstraint( QLayout::SetFixedSize );
 
-//	ladspa2LMMS * manager = engine::getLADSPAManager();
- lv2Manager * manager = static_lv2_manager; 
+	lv2Manager * manager = static_lv2_manager;
 
 	QLabel * name = new QLabel( description );
 	name->setText( QWidget::tr( "Name: " ) + manager->getName( _key ) );
@@ -157,7 +154,7 @@ void lv2Description::update( const lv2_key_t & _key )
 	maker_label->setAlignment( Qt::AlignTop );
 	QLabel * maker_content = new QLabel( maker );
 	maker_content->setText( manager->getMaker( _key ) );
-	maker_content->setWordWrap( TRUE );
+	maker_content->setWordWrap( true );
 	makerLayout->addWidget( maker_label );
 	makerLayout->addWidget( maker_content, 1 );
 
@@ -174,7 +171,7 @@ void lv2Description::update( const lv2_key_t & _key )
 
 	QLabel * copyright_content = new QLabel( copyright );
 	copyright_content->setText( manager->getCopyright( _key ) );
-	copyright_content->setWordWrap( TRUE );
+	copyright_content->setWordWrap( true );
 	copyrightLayout->addWidget( copyright_label );
 	copyrightLayout->addWidget( copyright_content, 1 );
 
@@ -225,7 +222,7 @@ void lv2Description::rowChanged( int _pluginIndex )
 
 void lv2Description::onDoubleClicked( QListWidgetItem * _item )
 {
-	emit( doubleClicked( m_currentSelection ) );
+	emit doubleClicked( m_currentSelection );
 }
 
 

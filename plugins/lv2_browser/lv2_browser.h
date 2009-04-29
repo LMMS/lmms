@@ -1,9 +1,8 @@
 /*
- * ladspa_browser.h - dialog to display information about installed LADSPA
- *                    plugins
+ * lv2_browser.h - dialog to display information about installed LV2 plugins
  *
- * Copyright (c) 2009-2009 Martin Andrews <mdda/at/users.sourceforge.net>
- * 
+ * Copyright (c) 2009 Martin Andrews <mdda/at/users.sourceforge.net>
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -64,7 +63,7 @@ public:
 
 	virtual pluginView * instantiateView( QWidget * )
 	{
-		return( new lv2BrowserView( this ) );
+		return new lv2BrowserView( this );
 	}
 
 	virtual QString nodeName( void ) const;

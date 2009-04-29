@@ -1,8 +1,8 @@
 /*
  * lv2_port_dialog.h - dialog to test an LV2 plugin
  *
- * Copyright (c) 2009-2009 Martin Andrews <mdda/at/users.sourceforge.net>
- * 
+ * Copyright (c) 2009 Martin Andrews <mdda/at/users.sourceforge.net>
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
