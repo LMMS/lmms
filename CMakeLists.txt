@@ -11,6 +11,7 @@ ENDIF(COMMAND CMAKE_POLICY)
 
 INCLUDE(AddFileDependencies)
 INCLUDE(CheckIncludeFiles)
+INCLUDE(CheckLibraryExists)
 INCLUDE(FindPkgConfig)
 
 SET(VERSION_MAJOR "0")
@@ -52,6 +53,7 @@ OPTION(WANT_CAPS	"Include C* Audio Plugin Suite (LADSPA plugins)" ON)
 OPTION(WANT_CMT		"Include Computer Music Toolkit LADSPA plugins" ON)
 OPTION(WANT_FFTW3F	"Include SpectrumAnalyzer and ZynAddSubFX plugin" ON)
 OPTION(WANT_JACK	"Include JACK (Jack Audio Connection Kit) support" ON)
+OPTION(WANT_LV2		"Include LV2 support" ON)
 OPTION(WANT_OGGVORBIS	"Include OGG/Vorbis support" ON)
 OPTION(WANT_PULSEAUDIO	"Include PulseAudio support" ON)
 #OPTION(WANT_PORTAUDIO	"Include PortAudio support" ON)	# TODO: fix PortAudio support
@@ -313,10 +315,46 @@ IF(WANT_SF2)
 	ENDIF(FLUIDSYNTH_FOUND)
 ENDIF(WANT_SF2)
 
+# check for LV2 (this has an implicit dependency on RDF as far as I can tell)
+IF(WANT_LV2)
+	CHECK_INCLUDE_FILES(lv2.h LMMS_HAVE_LV2CORE)
+
+	CHECK_LIBRARY_EXISTS(slv2 slv2_world_new "" LMMS_HAVE_SLV2)
+
+# MESSAGE("SLV2 Exists    : '${LMMS_HAVE_SLV2}'")
+# MESSAGE("SLV2 Library   : '${SLV2_LIBRARY}'")   #RIGHT
+# MESSAGE("SLV2 Libraries : '${SLV2_LIBRARIES}'") # WRONG
+
+	CHECK_LIBRARY_EXISTS(rdf librdf_new_world "" LMMS_HAVE_RDF)
+
+###  TODO : mdda : Install requires :
+# Fedora CCRMA : Want "lv2core"
+# Fedora CCRMA : Want "slv2"
+
+	SET(STATUS_LV2 "OK")
+
+	IF(NOT LMMS_HAVE_LV2CORE)
+		SET(STATUS_LV2 "LV2 devel packages not found : need lv2core(-devel)")
+	ENDIF(NOT LMMS_HAVE_LV2CORE)
+
+	IF(NOT LMMS_HAVE_SLV2)
+		SET(STATUS_LV2 "LV2 (Host) devel packages not found : need libslv2-dev, slv2-devel or similiar")
+	ENDIF(NOT LMMS_HAVE_SLV2)
+
+	IF(NOT LMMS_HAVE_RDF)
+		SET(STATUS_LV2 "LV2 (RDF) devel packages not found : need librdf0-dev, redland-devel or similiar")
+	ENDIF(NOT LMMS_HAVE_RDF)
+
+	IF("${STATUS_LV2}" STREQUAL "OK")
+		FIND_LIBRARY(SLV2_LIBRARY NAMES slv2 PATH /usr/lib /usr/local/lib)
+		FIND_LIBRARY(RDF_LIBRARY NAMES rdf PATH /usr/lib /usr/local/lib)
+		SET(LMMS_SUPPORT_LV2 TRUE)
+	 ENDIF("${STATUS_LV2}" STREQUAL "OK")
+ENDIF(WANT_LV2)
+
 
 # check for WINE
 IF(WANT_VST)
-	INCLUDE(CheckLibraryExists)
 	INCLUDE(CheckIncludeFileCXX)
 	SET(CMAKE_REQUIRED_FLAGS_ORIG ${CMAKE_REQUIRED_FLAGS})
 	SET(CMAKE_REQUIRED_INCLUDES_ORIG ${CMAKE_REQUIRED_INCLUDES})
@@ -658,6 +696,7 @@ MESSAGE(
 "* Stk Mallets                 : ${STATUS_STK}\n"
 "* VST-instrument hoster       : ${STATUS_VST}\n"
 "* VST-effect hoster           : ${STATUS_VST}\n"
+"* LV2 hoster                  : ${STATUS_LV2}\n"
 "* SpectrumAnalyzer            : ${STATUS_FFTW3F}\n"
 "* CAPS LADSPA plugins         : ${STATUS_CAPS}\n"
 "* CMT LADSPA plugins          : ${STATUS_CMT}\n"
