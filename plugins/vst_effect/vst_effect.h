@@ -1,7 +1,7 @@
 /*
  * vst_effect.h - class for handling VST effect plugins
  *
- * Copyright (c) 2006-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -47,13 +47,13 @@ public:
 
 	virtual effectControls * getControls( void )
 	{
-		return( &m_vstControls );
+		return &m_vstControls;
 	}
 
 
 	virtual inline QString publicName( void ) const
 	{
-		return( m_plugin->name() );
+		return m_plugin->name();
 	}
 
 

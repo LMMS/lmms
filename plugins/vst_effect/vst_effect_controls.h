@@ -1,7 +1,7 @@
 /*
  * vst_effect_controls.h - controls for VST effect plugins
  *
- * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -46,17 +46,14 @@ public:
 	virtual void loadSettings( const QDomElement & _this );
 	inline virtual QString nodeName( void ) const
 	{
-		return( "vsteffectcontrols" );
+		return "vsteffectcontrols";
 	}
 
-	virtual int getControlCount( void )
-	{
-		return( 1 );
-	}
+	virtual int getControlCount( void );
 
 	virtual effectControlDialog * createView( void )
 	{
-		return( new vstEffectControlDialog( this ) );
+		return new vstEffectControlDialog( this );
 	}
 
 
