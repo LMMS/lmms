@@ -1,7 +1,7 @@
 /*
  * ladspa_control.cpp - model for controlling a LADSPA port
  *
- * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2006-2008 Danny McRae <khjklujn/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
@@ -37,13 +37,12 @@ ladspaControl::ladspaControl( model * _parent, port_desc_t * _port,
         m_linkEnabledModel( _link, this, tr( "Link channels" ) ),
         m_toggledModel( FALSE, this, m_port->name ),
         m_knobModel( 0, 0, 0, 1, this, m_port->name ),
-	m_tempoSyncKnobModel( 0, 0, 0, 1, m_port->max, this )
+	m_tempoSyncKnobModel( 0, 0, 0, 1, m_port->max, this, m_port->name )
 {
 	if( m_link )
 	{
 		connect( &m_linkEnabledModel, SIGNAL( dataChanged() ),
 					 this, SLOT( linkStateChanged() ) );
-
 	}
 	
 	switch( m_port->data_type )
