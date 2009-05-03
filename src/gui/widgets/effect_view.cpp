@@ -1,5 +1,3 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * effect_view.cpp - view-component for an effect
  *
@@ -51,6 +49,8 @@
 effectView::effectView( effect * _model, QWidget * _parent ) :
 	pluginView( _model, _parent ),
 	m_bg( embed::getIconPixmap( "effect_plugin" ) ),
+	m_subWindow( NULL ),
+	m_controlView( NULL ),
 	m_show( true )
 {
 	setFixedSize( 210, 60 );
@@ -100,20 +100,22 @@ effectView::effectView( effect * _model, QWidget * _parent ) :
 		ctls_btn->setGeometry( 140, 14, 50, 20 );
 		connect( ctls_btn, SIGNAL( clicked() ),
 					this, SLOT( editControls() ) );
+		m_controlView = getEffect()->getControls()->createView();
+		if( m_controlView )
+		{
+			m_subWindow = engine::getMainWindow()->workspace()->addSubWindow(
+								m_controlView,
+				Qt::SubWindow | Qt::CustomizeWindowHint  |
+					Qt::WindowTitleHint | Qt::WindowSystemMenuHint );
+			m_subWindow->setSizePolicy( QSizePolicy::Fixed, QSizePolicy::Fixed );
+			m_subWindow->setFixedSize( m_subWindow->size() );
+
+			connect( m_controlView, SIGNAL( closed() ),
+					this, SLOT( closeEffects() ) );
+
+			m_subWindow->hide();
+		}
 	}
-
-	m_controlView = getEffect()->getControls()->createView();
-	m_subWindow = engine::getMainWindow()->workspace()->addSubWindow(
-							m_controlView,
-		Qt::SubWindow | Qt::CustomizeWindowHint  |
-			Qt::WindowTitleHint | Qt::WindowSystemMenuHint );
-	m_subWindow->setSizePolicy( QSizePolicy::Fixed, QSizePolicy::Fixed );
-	m_subWindow->setFixedSize( m_subWindow->size() );
-
-	connect( m_controlView, SIGNAL( closed() ),
-				this, SLOT( closeEffects() ) );
-
-	m_subWindow->hide();
 
 
 	setWhatsThis( tr(
@@ -161,16 +163,19 @@ effectView::~effectView()
 
 void effectView::editControls( void )
 {
-	if( m_show )
+	if( m_subWindow )
 	{
-		m_subWindow->show();
-		m_subWindow->raise();
-		m_show = false;
-	}
-	else
-	{
-		m_subWindow->hide();
-		m_show = true;
+		if( m_show )
+		{
+			m_subWindow->show();
+			m_subWindow->raise();
+			m_show = false;
+		}
+		else
+		{
+			m_subWindow->hide();
+			m_show = true;
+		}
 	}
 }
 
@@ -179,7 +184,7 @@ void effectView::editControls( void )
 
 void effectView::moveUp()
 {
-	emit( moveUp( this ) );
+	emit moveUp( this );
 }
 
 
@@ -187,14 +192,14 @@ void effectView::moveUp()
 
 void effectView::moveDown()
 {
-	emit( moveDown( this ) );
+	emit moveDown( this );
 }
 
 
 
 void effectView::deletePlugin()
 {
-	emit( deletePlugin( this ) );
+	emit deletePlugin( this );
 }
 
 
@@ -211,7 +216,10 @@ void effectView::displayHelp( void )
 
 void effectView::closeEffects( void )
 {
-	m_subWindow->hide();
+	if( m_subWindow )
+	{
+		m_subWindow->hide();
+	}
 	m_show = true;
 }
 
@@ -259,6 +267,7 @@ void effectView::paintEvent( QPaintEvent * )
 
 
 
+
 void effectView::modelChanged( void )
 {
 	m_bypass->setModel( &getEffect()->m_enabledModel );
@@ -268,6 +277,6 @@ void effectView::modelChanged( void )
 }
 
 
+
 #include "moc_effect_view.cxx"
 
-#endif
