@@ -2,7 +2,7 @@
  * file_browser.cpp - implementation of the project-, preset- and
  *                    sample-file-browser
  *
- * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -474,38 +474,28 @@ void fileBrowserTreeWidget::mouseMoveEvent( QMouseEvent * _me )
 			switch( f->type() )
 			{
 				case fileItem::PresetFile:
-					new stringPairDrag( "presetfile",
-								f->fullName(),
-							embed::getIconPixmap(
-								"preset_file" ),
-									this );
+	new stringPairDrag( f->handling() == fileItem::LoadAsPreset ?
+					"presetfile" : "pluginpresetfile",
+				f->fullName(),
+				embed::getIconPixmap( "preset_file" ), this );
 					break;
 
 				case fileItem::SampleFile:
-					new stringPairDrag( "samplefile",
-								f->fullName(),
-							embed::getIconPixmap(
-								"sample_file" ),
-									this );
+	new stringPairDrag( "samplefile", f->fullName(),
+				embed::getIconPixmap( "sample_file" ), this );
 					break;
 
 				case fileItem::MidiFile:
 // don't allow dragging FLP-files as FLP import filter clears project
 // without asking
 //				case fileItem::FlpFile:
-					new stringPairDrag( "importedproject",
-								f->fullName(),
-							embed::getIconPixmap(
-								"midi_file" ),
-									this );
+	new stringPairDrag( "importedproject", f->fullName(),
+				embed::getIconPixmap( "midi_file" ), this );
 					break;
 
 				case fileItem::VstPluginFile:
-					new stringPairDrag( "vstplugin",
-								f->fullName(),
-							embed::getIconPixmap(
-								"sample_file" ),
-									this );
+	new stringPairDrag( "vstplugin", f->fullName(),
+				embed::getIconPixmap( "sample_file" ), this );
 					break;
 
 				default:

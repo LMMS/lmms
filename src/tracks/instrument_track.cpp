@@ -49,6 +49,7 @@
 #include "effect_rack_view.h"
 #include "embed.h"
 #include "engine.h"
+#include "file_browser.h"
 #include "fx_mixer.h"
 #include "fx_mixer_view.h"
 #include "instrument_sound_shaping.h"
@@ -1447,7 +1448,8 @@ void instrumentTrackWindow::focusInEvent( QFocusEvent * )
 
 void instrumentTrackWindow::dragEnterEventGeneric( QDragEnterEvent * _dee )
 {
-	stringPairDrag::processDragEnterEvent( _dee, "instrument,presetfile" );
+	stringPairDrag::processDragEnterEvent( _dee, "instrument,presetfile,"
+							"pluginpresetfile" );
 }
 
 
@@ -1478,6 +1480,18 @@ void instrumentTrackWindow::dropEvent( QDropEvent * _de )
 		m_track->setSimpleSerializing();
 		m_track->loadSettings( mmp.content().toElement() );
 		engine::getSong()->setModified();
+		_de->accept();
+	}
+	else if( type == "pluginpresetfile" )
+	{
+		const QString ext = fileItem::extension( value );
+		instrument * i = m_track->getInstrument();
+		if( !i->getDescriptor()->supportsFileType( ext ) )
+		{
+			i = m_track->loadInstrument(
+					engine::pluginFileHandling()[ext] );
+		}
+		i->loadFile( value );
 		_de->accept();
 	}
 }
