@@ -47,6 +47,11 @@ public:
 
 	virtual bool processMessage( const message & _m );
 
+	inline bool hasEditor( void ) const
+	{
+		return m_pluginWindowID != 0;
+	}
+
 	void showEditor( QWidget * _parent = NULL );
 	void hideEditor( void );
 
