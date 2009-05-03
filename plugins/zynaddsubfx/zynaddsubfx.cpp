@@ -291,7 +291,7 @@ void zynAddSubFxView::dragEnterEvent( QDragEnterEvent * _dee )
 	{
 		QString txt = _dee->mimeData()->data(
 						stringPairDrag::mimeType() );
-		if( txt.section( ':', 0, 0 ) == "presetfile" )
+		if( txt.section( ':', 0, 0 ) == "pluginpresetfile" )
 		{
 			_dee->acceptProposedAction();
 		}
@@ -313,7 +313,7 @@ void zynAddSubFxView::dropEvent( QDropEvent * _de )
 {
 	const QString type = stringPairDrag::decodeKey( _de );
 	const QString value = stringPairDrag::decodeValue( _de );
-	if( type == "presetfile" )
+	if( type == "pluginpresetfile" )
 	{
 		castModel<zynAddSubFx>()->loadFile( value );
 		_de->accept();

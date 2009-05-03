@@ -1,7 +1,7 @@
 /*
  * track_container_view.cpp - view-component for trackContainer
  *
- * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -362,7 +362,7 @@ void trackContainerView::redoStep( journalEntry & _je )
 void trackContainerView::dragEnterEvent( QDragEnterEvent * _dee )
 {
 	stringPairDrag::processDragEnterEvent( _dee,
-		QString( "presetfile,sampledata,samplefile,instrument,"
+		QString( "presetfile,pluginpresetfile,samplefile,instrument,"
 				"importedproject,track_%1,track_%2" ).
 						arg( track::InstrumentTrack ).
 						arg( track::SampleTrack ) );
@@ -385,16 +385,14 @@ void trackContainerView::dropEvent( QDropEvent * _de )
 		//it->toggledInstrumentTrackButton( true );
 		_de->accept();
 	}
-	else if( /*type == "sampledata" || */type == "samplefile" )
+	else if( type == "samplefile" || type == "pluginpresetfile" )
 	{
 		instrumentTrack * it = dynamic_cast<instrumentTrack *>(
 				track::create( track::InstrumentTrack,
 								m_tc ) );
-		const QString iname = /*( type == "sampledata" ) ?
-			"audiofileprocessor" :*/
+		instrument * i = it->loadInstrument(
 			engine::pluginFileHandling()[fileItem::extension(
-								value )];
-		instrument * i = it->loadInstrument( iname );
+								value )]);
 		i->loadFile( value );
 		//it->toggledInstrumentTrackButton( true );
 		_de->accept();
