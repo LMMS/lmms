@@ -1,7 +1,7 @@
 /*
  * vst_effect_controls.cpp - controls for VST effect plugins
  *
- * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -63,6 +63,15 @@ void vstEffectControls::saveSettings( QDomDocument & _doc, QDomElement & _this )
 		m_effect->m_plugin->saveSettings( _doc, _this );
 	}
 	m_effect->m_pluginMutex.unlock();
+}
+
+
+
+
+int vstEffectControls::getControlCount( void )
+{
+	return m_effect->m_plugin != NULL &&
+		m_effect->m_plugin->hasEditor() ?  1 : 0;
 }
 
 
