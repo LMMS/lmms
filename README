@@ -56,11 +56,12 @@ Optional, but strongly recommended:
 - libvorbis & libogg with devel-files
 - libalsa with devel-files
 - SDL with devel-files
-- libsamplerate >= 0.1.3 with devel-files
+- libsamplerate >= 0.1.7 with devel-files
 - libsndfile with devel-files
 - WINE + WINE-devel-files
 - stk, libstk + libstk-dev
 - libfluidsynth with devel files
+- fftw3 with devel-files
 
 For compiling you should have an up to date GCC with g++.
 
