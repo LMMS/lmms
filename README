@@ -52,15 +52,16 @@ Required libraries:
 - Qt >= 4.3.0 with devel-files (4.4.x recommended)
 
 Optional, but strongly recommended:
-- libalsa with devel-files
+- JACK with devel-files
 - libvorbis & libogg with devel-files
-- libfluidsynth with devel files
+- libalsa with devel-files
 - SDL with devel-files
-- libsamplerate >= 0.1.3 with devel-files
+- libsamplerate >= 0.1.7 with devel-files
 - libsndfile with devel-files
 - WINE + WINE-devel-files
 - stk, libstk + libstk-dev
-- JACK with devel-files
+- libfluidsynth with devel files
+- fftw3 with devel-files
 
 For compiling you should have an up to date GCC with g++.
 
