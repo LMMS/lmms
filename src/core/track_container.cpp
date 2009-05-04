@@ -2,7 +2,7 @@
  * track_container.cpp - implementation of base-class for all track-containers
  *                       like Song-Editor, BB-Editor...
  *
- * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -31,6 +31,7 @@
 #include "track_container.h"
 #include "instrument_track.h"
 #include "engine.h"
+#include "main_window.h"
 #include "song.h"
 
 
@@ -81,7 +82,8 @@ void trackContainer::loadSettings( const QDomElement & _this )
 		{
 			pd = new QProgressDialog( tr( "Loading project..." ),
 						tr( "Cancel" ), 0,
-						_this.childNodes().count() );
+						_this.childNodes().count(),
+						engine::getMainWindow() );
 			pd->setWindowModality( Qt::ApplicationModal );
 			pd->setWindowTitle( tr( "Please wait..." ) );
 			pd->show();
