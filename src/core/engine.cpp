@@ -45,6 +45,7 @@
 #include "project_notes.h"
 #include "song_editor.h"
 #include "song.h"
+#include "midi_control_listener.h"
 
 #include "resources_db.h"
 #include "local_resources_provider.h"
@@ -72,6 +73,7 @@ projectJournal * engine::s_projectJournal = NULL;
 ladspa2LMMS * engine::s_ladspaManager = NULL;
 dummyTrackContainer * engine::s_dummyTC = NULL;
 controllerRackView * engine::s_controllerRackView = NULL;
+MidiControlListener * engine::s_midiControlListener = NULL;
 QMap<QString, QString> engine::s_pluginFileHandling;
 LmmsStyle * engine::s_lmmsStyle = NULL;
 
@@ -116,6 +118,8 @@ void engine::init( const bool _has_gui )
 	s_projectJournal->setJournalling( TRUE );
 
 	s_mixer->initDevices();
+
+	s_midiControlListener = new MidiControlListener();
 
 	if( s_hasGUI )
 	{

@@ -50,6 +50,7 @@ class song;
 class songEditor;
 class ladspa2LMMS;
 class controllerRackView;
+class MidiControlListener;
 
 
 class EXPORT engine
@@ -195,6 +196,7 @@ private:
 	static projectJournal * s_projectJournal;
 	static dummyTrackContainer * s_dummyTC;
 	static controllerRackView * s_controllerRackView;
+	static MidiControlListener * s_midiControlListener;
 
 	// GUI
 	static mainWindow * s_mainWindow;
