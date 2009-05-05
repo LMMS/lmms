@@ -100,6 +100,7 @@ int main( int argc, char * * argv )
 	initBasicOps();
 
 	bool core_only = false;
+	bool fullscreen = true;
 	bool exit_after_import = false;
 	QString file_to_load, file_to_save, file_to_import, render_out;
 
@@ -111,7 +112,14 @@ int main( int argc, char * * argv )
 						QString( argv[i] ) == "-h" ) ) )
 		{
 			core_only = true;
-			break;
+		}
+		else if( argc > i && QString( argv[i] ) == "-geometry" )
+		{
+			// option -geometry is filtered by Qt later,
+			// so we need to check its presence now to
+			// determine, if the application should run in
+			// fullscreen mode (default, no -geometry given).
+			fullscreen = false;
 		}
 	}
 
@@ -436,7 +444,11 @@ int main( int argc, char * * argv )
 		// we try to load given file
 		if( !file_to_load.isEmpty() )
 		{
-			engine::getMainWindow()->showMaximized();
+			engine::getMainWindow()->show();
+			if( fullscreen )
+			{
+				engine::getMainWindow()->showMaximized();
+			}
 			engine::getSong()->loadProject( file_to_load );
 		}
 		else if( !file_to_import.isEmpty() )
@@ -447,12 +459,24 @@ int main( int argc, char * * argv )
 			{
 				return 0;
 			}
-			engine::getMainWindow()->showMaximized();
+
+			engine::getMainWindow()->show();
+			if( fullscreen )
+			{
+				engine::getMainWindow()->showMaximized();
+			}
 		}
 		else
 		{
 			engine::getSong()->createNewProject();
-			engine::getMainWindow()->showMaximized();
+
+			// [Settel] workaround: showMaximized() doesn't work with
+			// FVWM2 unless the window is already visible -> show() first
+			engine::getMainWindow()->show();
+			if( fullscreen )
+			{
+				engine::getMainWindow()->showMaximized();
+			}
 		}
 	}
 	else
