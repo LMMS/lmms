@@ -93,6 +93,8 @@ bool midiImport::tryImport( trackContainer * _tc )
 	{
 		return( FALSE );
 	}
+
+#ifdef LMMS_HAVE_FLUIDSYNTH
 	if( engine::hasGUI() &&
 		configManager::inst()->defaultSoundfont().isEmpty() )
 	{
@@ -105,6 +107,18 @@ bool midiImport::tryImport( trackContainer * _tc )
 				"a General MIDI soundfont, specify it in "
 				"settings dialog and try again." ) );
 	}
+#else
+	if( engine::hasGUI() )
+	{
+		QMessageBox::information( engine::getMainWindow(),
+			tr( "Setup incomplete" ),
+			tr( "You did not compile LMMS with support for "
+				"SoundFont2 player, which is used to add default "
+				"sound to imported MIDI files. "
+				"Therefore no sound will be played back after "
+				"importing this MIDI file." ) );
+	}
+#endif
 
 	switch( readID() )
 	{
