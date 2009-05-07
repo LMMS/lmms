@@ -5,10 +5,9 @@ then run
 
 mkdir build
 cd build
-cmake ../ -DCMAKE_INSTALL_PREFIX=/usr
+cmake ../
 make
 sudo make install
-
 
 This way an out-of-tree build is performed. You can also run "cmake ." directly
 in the root of source-tree although this is not recommended. When performing an
@@ -23,6 +22,9 @@ that are going to be built into LMMS or built as plugins. Install the
 according libraries and development files if a certain feature is not enabled.
 Then remove CMakeCache.txt and run cmake again.
 
-If you're on linux and want to build for win32, the command is 
+If you want to supply an install prefix to cmake, add the flag:
 
-cmake . -DCMAKE_TOOLCHAIN_FILE=cmake/modules/Win32Toolchain.cmake
+-DCMAKE_INSTALL_PREFIX=<prefix>
+
+Where <prefix> can be /usr, /usr/local, /opt, etc. The default is /usr/local.
+
