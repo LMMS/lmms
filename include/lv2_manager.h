@@ -29,7 +29,6 @@
 #include <slv2/world.h>
 #include <slv2/plugin.h>
 #include <slv2/scalepoint.h>
-#include <slv2/scalepoints.h>
 
 #include <QtCore/QMap>
 #include <QtCore/QPair>
