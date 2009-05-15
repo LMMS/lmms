@@ -318,6 +318,8 @@ ENDIF(WANT_SF2)
 # check for LV2 (this has an implicit dependency on RDF as far as I can tell)
 IF(WANT_LV2)
 	CHECK_INCLUDE_FILES(lv2.h LMMS_HAVE_LV2CORE)
+	# compatibility for slv2 <= 0.6.2
+	CHECK_INCLUDE_FILES(slv2/scalepoints.h LMMS_HAVE_SLV2_SCALEPOINTS_H)
 
 	CHECK_LIBRARY_EXISTS(slv2 slv2_world_new "" LMMS_HAVE_SLV2)
 
@@ -349,6 +351,7 @@ IF(WANT_LV2)
 		FIND_LIBRARY(SLV2_LIBRARY NAMES slv2 PATH /usr/lib /usr/local/lib)
 		FIND_LIBRARY(RDF_LIBRARY NAMES rdf PATH /usr/lib /usr/local/lib)
 		SET(LMMS_SUPPORT_LV2 TRUE)
+		SET(LMMS_HAVE_LV2 TRUE)
 	 ENDIF("${STATUS_LV2}" STREQUAL "OK")
 ENDIF(WANT_LV2)
 

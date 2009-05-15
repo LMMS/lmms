@@ -26,6 +26,8 @@
 #ifndef _LV2_MANAGER_H
 #define _LV2_MANAGER_H
 
+#ifdef LMMS_HAVE_LV2
+
 #include <slv2/world.h>
 #include <slv2/plugin.h>
 #include <slv2/scalepoint.h>
@@ -376,5 +378,7 @@ private:
 // This is declared static in lv2_manager.cpp
 // TODO: integrate into LMMS engine
 extern lv2Manager * static_lv2_manager; // There is only one of these...
+
+#endif
 
 #endif

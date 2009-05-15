@@ -10,6 +10,7 @@
 #cmakedefine LMMS_HAVE_FFTW3F
 #cmakedefine LMMS_HAVE_FLUIDSYNTH
 #cmakedefine LMMS_HAVE_JACK
+#cmakedefine LMMS_HAVE_LV2
 #cmakedefine LMMS_HAVE_OGGVORBIS
 #cmakedefine LMMS_HAVE_OSS
 #cmakedefine LMMS_HAVE_PORTAUDIO
@@ -42,6 +43,7 @@
 #cmakedefine LMMS_HAVE_STRING_H
 #cmakedefine LMMS_HAVE_PROCESS_H
 #cmakedefine LMMS_HAVE_LOCALE_H
+#cmakedefine LMMS_HAVE_SLV2_SCALEPOINTS_H
 
 /* defines for libsamplerate */
 
