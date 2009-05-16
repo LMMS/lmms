@@ -1,7 +1,7 @@
 /*
  * triple_oscillator.cpp - powerful instrument with three oscillators
  *
- * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -244,8 +244,13 @@ tripleOscillator::tripleOscillator( instrumentTrack * _instrument_track ) :
 
 	}
 
+	updateAllPitchRange();
+
 	connect( engine::getMixer(), SIGNAL( sampleRateChanged() ),
 			this, SLOT( updateAllDetuning() ) );
+	connect( getInstrumentTrack()->pitchRangeModel(),
+			SIGNAL( dataChanged() ),
+			this, SLOT( updateAllPitchRange() ) );
 }
 
 
@@ -333,7 +338,7 @@ void tripleOscillator::loadSettings( const QDomElement & _this )
 
 QString tripleOscillator::nodeName( void ) const
 {
-	return( tripleoscillator_plugin_descriptor.name );
+	return tripleoscillator_plugin_descriptor.name;
 }
 
 
@@ -432,7 +437,7 @@ void tripleOscillator::deleteNotePluginData( notePlayHandle * _n )
 
 pluginView * tripleOscillator::instantiateView( QWidget * _parent )
 {
-	return( new tripleOscillatorView( this, _parent ) );
+	return new tripleOscillatorView( this, _parent );
 }
 
 
@@ -444,6 +449,18 @@ void tripleOscillator::updateAllDetuning( void )
 	{
 		m_osc[i]->updateDetuningLeft();
 		m_osc[i]->updateDetuningRight();
+	}
+}
+
+
+
+
+void tripleOscillator::updateAllPitchRange( void )
+{
+	const int range = getInstrumentTrack()->pitchRangeModel()->value();
+	for( int i = 0; i < NUM_OF_OSCILLATORS; ++i )
+	{
+		m_osc[i]->updatePitchRange( range );
 	}
 }
 
@@ -854,8 +871,7 @@ extern "C"
 // neccessary for getting instance out of shared lib
 plugin * PLUGIN_EXPORT lmms_plugin_main( model *, void * _data )
 {
-	return( new tripleOscillator(
-				static_cast<instrumentTrack *>( _data ) ) );
+	return new tripleOscillator( static_cast<instrumentTrack *>( _data ) );
 }
 
 }

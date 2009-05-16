@@ -104,6 +104,7 @@ instrumentTrack::instrumentTrack( trackContainer * _tc ) :
         m_panningModel( DefaultPanning, PanningLeft, PanningRight, 0.1f,
 							this, tr( "Panning" ) ),
 	m_pitchModel( 0, -100, 100, 1, this, tr( "Pitch" ) ),
+	m_pitchRangeModel( 1, 1, 24, this, tr( "Pitch range" ) ),
 	m_effectChannelModel( 0, 0, NumFxChannels, this, tr( "FX channel" ) ),
 	m_instrument( NULL ),
 	m_soundShaping( this ),
@@ -116,6 +117,8 @@ instrumentTrack::instrumentTrack( trackContainer * _tc ) :
 			this, SLOT( updateBaseNote() ) );
 	connect( &m_pitchModel, SIGNAL( dataChanged() ),
 			this, SLOT( updatePitch() ) );
+	connect( &m_pitchRangeModel, SIGNAL( dataChanged() ),
+			this, SLOT( updatePitchRange() ) );
 
 
 	for( int i = 0; i < NumKeys; ++i )
@@ -523,6 +526,15 @@ void instrumentTrack::updatePitch( void )
 
 
 
+void instrumentTrack::updatePitchRange( void )
+{
+	const int r = m_pitchRangeModel.value();
+	m_pitchModel.setRange( -100 * r, 100 * r );
+}
+
+
+
+
 int instrumentTrack::masterKey( int _midi_key ) const
 {
 	int key = m_baseNoteModel.value() - engine::getSong()->masterPitch();
@@ -688,6 +700,7 @@ void instrumentTrack::saveTrackSpecificSettings( QDomDocument & _doc,
 	m_volumeModel.saveSettings( _doc, _this, "vol" );
 	m_panningModel.saveSettings( _doc, _this, "pan" );
 	m_pitchModel.saveSettings( _doc, _this, "pitch" );
+	m_pitchRangeModel.saveSettings( _doc, _this, "pitchrange" );
 
 	m_effectChannelModel.saveSettings( _doc, _this, "fxch" );
 	m_baseNoteModel.saveSettings( _doc, _this, "basenote" );
@@ -731,6 +744,7 @@ void instrumentTrack::loadTrackSpecificSettings( const QDomElement & _this )
 		m_panningModel.loadSettings( _this, "pan" );
 	}
 
+	m_pitchRangeModel.loadSettings( _this, "pitchrange" );
 	m_pitchModel.loadSettings( _this, "pitch" );
 	m_effectChannelModel.loadSettings( _this, "fxch" );
 
@@ -1128,18 +1142,22 @@ void instrumentTrackView::midiConfigChanged( void )
 
 class fxLineLcdSpinBox : public lcdSpinBox 
 {
-	public:
-		fxLineLcdSpinBox( int _num_digits, QWidget * _parent, 
+public:
+	fxLineLcdSpinBox( int _num_digits, QWidget * _parent,
 				const QString & _name ) :
-			lcdSpinBox( _num_digits, _parent, _name ) {}
+		lcdSpinBox( _num_digits, _parent, _name )
+	{
+	}
 
-	protected:
-		virtual void mouseDoubleClickEvent ( QMouseEvent * _me )
-		{
-			engine::getFxMixerView()->setCurrentFxLine( model()->value() );
-			//engine::getFxMixerView()->raise();
-		}
-};
+
+protected:
+	virtual void mouseDoubleClickEvent ( QMouseEvent * _me )
+	{
+		engine::getFxMixerView()->setCurrentFxLine( model()->value() );
+		//engine::getFxMixerView()->raise();
+	}
+
+} ;
 
 
 
@@ -1167,16 +1185,29 @@ instrumentTrackWindow::instrumentTrackWindow( instrumentTrackView * _itv ) :
 	m_nameLineEdit = new QLineEdit( m_generalSettingsWidget );
 	m_nameLineEdit->setFont( pointSize<8>(
 						m_nameLineEdit->font() ) );
-	m_nameLineEdit->setGeometry( 10, 16, 230, 18 );
+	m_nameLineEdit->setGeometry( 10, 16, 196, 20 );
 	connect( m_nameLineEdit, SIGNAL( textChanged( const QString & ) ),
 				this, SLOT( textChanged( const QString & ) ) );
+
+	m_saveSettingsBtn = new QPushButton( embed::getIconPixmap(
+							"project_save" ), "",
+						m_generalSettingsWidget );
+	m_saveSettingsBtn->setGeometry( 216, 14, 24, 24 );
+	connect( m_saveSettingsBtn, SIGNAL( clicked() ), this,
+					SLOT( saveSettingsBtnClicked() ) );
+	toolTip::add( m_saveSettingsBtn,
+		tr( "Save instrument track settings in a preset file" ) );
+	m_saveSettingsBtn->setWhatsThis(
+		tr( "Click here, if you want to save current channel settings "
+			"in a preset-file. Later you can load this preset by "
+			"double-clicking it in the preset-browser." ) );
 
 
 	// setup volume-knob
 	m_volumeKnob = new knob( knobBright_26, m_generalSettingsWidget,
 						tr( "Instrument volume" ) );
 	m_volumeKnob->setVolumeKnob( true );
-	m_volumeKnob->move( 10, 44 );
+	m_volumeKnob->move( 8, 46 );
 	m_volumeKnob->setHintText( tr( "Volume:" ) + " ", "%" );
 	m_volumeKnob->setLabel( tr( "VOL" ) );
 
@@ -1187,7 +1218,7 @@ instrumentTrackWindow::instrumentTrackWindow( instrumentTrackView * _itv ) :
 	m_panningKnob = new knob( knobBright_26, m_generalSettingsWidget,
 							tr( "Panning" ) );
 	m_panningKnob->move( m_volumeKnob->x() +
-					m_volumeKnob->width() + 16, 44 );
+					m_volumeKnob->width() + 12, 46 );
 	m_panningKnob->setHintText( tr( "Panning:" ) + " ", "" );
 	m_panningKnob->setLabel( tr( "PAN" ) );
 
@@ -1195,32 +1226,23 @@ instrumentTrackWindow::instrumentTrackWindow( instrumentTrackView * _itv ) :
 	m_pitchKnob = new knob( knobBright_26, m_generalSettingsWidget,
 							tr( "Pitch" ) );
 	m_pitchKnob->move( m_panningKnob->x() +
-					m_panningKnob->width() + 16, 44 );
+					m_panningKnob->width() + 24, 46 );
 	m_pitchKnob->setHintText( tr( "Pitch:" ) + " ", " " + tr( "cents" ) );
 	m_pitchKnob->setLabel( tr( "PITCH" ) );
 
+
+	m_pitchRange = new lcdSpinBox( 2, m_generalSettingsWidget,
+						tr( "Pitch range (semitones)" ) );
+	m_pitchRange->setLabel( tr( "RANGE" ) );
+	m_pitchRange->move( m_pitchKnob->x() +
+					m_pitchKnob->width() + 8, 46 );
 
 	// setup spinbox for selecting FX-channel
 	m_effectChannelNumber = new fxLineLcdSpinBox( 2, m_generalSettingsWidget,
 						tr( "FX channel" ) );
 	m_effectChannelNumber->setLabel( tr( "FX CHNL" ) );
-	m_effectChannelNumber->move( m_pitchKnob->x() +
-					m_pitchKnob->width() + 16, 44 );
-
-	m_saveSettingsBtn = new QPushButton( embed::getIconPixmap(
-							"project_save" ), "",
-						m_generalSettingsWidget );
-	m_saveSettingsBtn->setGeometry( m_effectChannelNumber->x() +
-					m_effectChannelNumber->width() + 20, 44,
-					32, 32 );
-	connect( m_saveSettingsBtn, SIGNAL( clicked() ), this,
-					SLOT( saveSettingsBtnClicked() ) );
-	toolTip::add( m_saveSettingsBtn, 
-		tr( "Save current channel settings in a preset-file" ) );
-	m_saveSettingsBtn->setWhatsThis(
-		tr( "Click here, if you want to save current channel settings "
-			"in a preset-file. Later you can load this preset by "
-			"double-clicking it in the preset-browser." ) );
+	m_effectChannelNumber->move( m_pitchRange->x() +
+					m_pitchRange->width() + 24, 46 );
 
 
 	m_tabWidget = new tabWidget( "", this );
@@ -1307,6 +1329,7 @@ void instrumentTrackWindow::modelChanged( void )
 	if( m_track->getInstrument() && m_track->getInstrument()->isBendable() )
 	{
 		m_pitchKnob->setModel( &m_track->m_pitchModel );
+		m_pitchRange->setModel( &m_track->m_pitchRangeModel );
 		m_pitchKnob->show();
 	}
 	else

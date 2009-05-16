@@ -161,11 +161,6 @@ public:
 	// simple helper for removing midiport-XML-node when loading presets
 	static void removeMidiPortNode( multimediaProject & _mmp );
 
-	floatModel * pitchModel( void )
-	{
-		return &m_pitchModel;
-	}
-
 	floatModel * volumeModel( void )
 	{
 		return &m_volumeModel;
@@ -174,6 +169,16 @@ public:
 	floatModel * panningModel( void )
 	{
 		return &m_panningModel;
+	}
+
+	floatModel * pitchModel( void )
+	{
+		return &m_pitchModel;
+	}
+
+	intModel * pitchRangeModel( void )
+	{
+		return &m_pitchRangeModel;
 	}
 
 	intModel * effectChannelModel( void )
@@ -202,6 +207,7 @@ protected:
 protected slots:
 	void updateBaseNote( void );
 	void updatePitch( void );
+	void updatePitchRange( void );
 
 
 private:
@@ -219,6 +225,7 @@ private:
 	floatModel m_volumeModel;
 	floatModel m_panningModel;
 	floatModel m_pitchModel;
+	intModel m_pitchRangeModel;
 	intModel m_effectChannelModel;
 
 
@@ -379,6 +386,7 @@ private:
 	knob * m_volumeKnob;
 	knob * m_panningKnob;
 	knob * m_pitchKnob;
+	lcdSpinBox * m_pitchRange;
 	lcdSpinBox * m_effectChannelNumber;
 	QPushButton * m_saveSettingsBtn;
 
