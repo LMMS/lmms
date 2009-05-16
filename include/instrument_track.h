@@ -161,11 +161,6 @@ public:
 	// simple helper for removing midiport-XML-node when loading presets
 	static void removeMidiPortNode( multimediaProject & _mmp );
 
-	floatModel * pitchModel( void )
-	{
-		return &m_pitchModel;
-	}
-
 	floatModel * volumeModel( void )
 	{
 		return &m_volumeModel;
@@ -174,6 +169,16 @@ public:
 	floatModel * panningModel( void )
 	{
 		return &m_panningModel;
+	}
+
+	floatModel * pitchModel( void )
+	{
+		return &m_pitchModel;
+	}
+
+	intModel * pitchRangeModel( void )
+	{
+		return &m_pitchRangeModel;
 	}
 
 	intModel * effectChannelModel( void )
