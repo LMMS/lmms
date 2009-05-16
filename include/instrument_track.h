@@ -202,6 +202,7 @@ protected:
 protected slots:
 	void updateBaseNote( void );
 	void updatePitch( void );
+	void updatePitchRange( void );
 
 
 private:
@@ -219,6 +220,7 @@ private:
 	floatModel m_volumeModel;
 	floatModel m_panningModel;
 	floatModel m_pitchModel;
+	intModel m_pitchRangeModel;
 	intModel m_effectChannelModel;
 
 
@@ -379,6 +381,7 @@ private:
 	knob * m_volumeKnob;
 	knob * m_panningKnob;
 	knob * m_pitchKnob;
+	lcdSpinBox * m_pitchRange;
 	lcdSpinBox * m_effectChannelNumber;
 	QPushButton * m_saveSettingsBtn;
 
