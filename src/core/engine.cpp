@@ -121,6 +121,8 @@ void engine::init( const bool _has_gui )
 
 	s_midiControlListener = new MidiControlListener();
 
+	s_automationRecorder = new AutomationRecorder;
+
 	if( s_hasGUI )
 	{
 		s_mainWindow = new mainWindow;
@@ -131,7 +133,6 @@ void engine::init( const bool _has_gui )
 		s_bbEditor = new bbEditor( s_bbTrackContainer );
 		s_pianoRoll = new pianoRoll;
 		s_automationEditor = new automationEditor;
-		s_automationRecorder = new AutomationRecorder;
 
 		s_mainWindow->finalize();
 	}
