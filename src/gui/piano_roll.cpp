@@ -1767,8 +1767,6 @@ void pianoRoll::computeSelectedNotes(bool shift)
 	{
 		const noteVector & notes = m_pattern->notes();
 
-		QPolygon volumeHandles;
-
 		for( noteVector::const_iterator it = notes.begin();
 						it != notes.end(); ++it )
 		{
