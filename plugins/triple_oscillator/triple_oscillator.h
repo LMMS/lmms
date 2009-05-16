@@ -2,7 +2,7 @@
  * triple_oscillator.h - declaration of class tripleOscillator a powerful
  *                       instrument-plugin with 3 oscillators
  *
- * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -48,6 +48,12 @@ class oscillatorObject : public model
 public:
 	oscillatorObject( model * _parent, int _idx );
 	virtual ~oscillatorObject();
+
+	void updatePitchRange( int _range )
+	{
+		m_fineLeftModel.setRange( -100 * _range, 100 * _range );
+		m_fineRightModel.setRange( -100 * _range, 100 * _range );
+	}
 
 
 private:
@@ -113,7 +119,7 @@ public:
 
 	virtual f_cnt_t desiredReleaseFrames( void ) const
 	{
-		return( 128 );
+		return 128;
 	}
 
 	virtual pluginView * instantiateView( QWidget * _parent );
@@ -121,6 +127,7 @@ public:
 
 protected slots:
 	void updateAllDetuning( void );
+	void updateAllPitchRange( void );
 
 
 private:
