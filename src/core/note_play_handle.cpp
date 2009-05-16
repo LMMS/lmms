@@ -463,7 +463,7 @@ void notePlayHandle::updateFrequency( void )
 		( key() - m_instrumentTrack->baseNoteModel()->value() +
 				engine::getSong()->masterPitch() ) / 12.0f;
 	m_frequency = BaseFreq * powf( 2.0f, pitch +
-		m_instrumentTrack->m_pitchModel.value() / ( 100 * 12.0f ) );
+		m_instrumentTrack->pitchModel()->value() / ( 100 * 12.0f ) );
 	m_unpitchedFrequency = BaseFreq * powf( 2.0f, pitch );
 
 	for( notePlayHandleVector::iterator it = m_subNotes.begin();
