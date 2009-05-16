@@ -27,6 +27,8 @@
 #include "lv2_2_lmms.h"
 
 
+#ifdef LMMS_HAVE_LV2
+
 lv22LMMS::lv22LMMS( void )
 {
 	l_sortable_plugin_t plugins = getSortedPlugins();
@@ -124,4 +126,6 @@ QString lv22LMMS::getShortName( const lv2_key_t & _key )
 
 	return name;
 }
+
+#endif
 

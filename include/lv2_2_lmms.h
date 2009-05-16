@@ -29,6 +29,7 @@
 
 #include "lv2_manager.h"
 
+#ifdef LMMS_HAVE_LV2
 
 class EXPORT lv22LMMS : public lv2Manager
 {
@@ -74,5 +75,7 @@ private:
 	friend class engine;
 
 } ;
+
+#endif
 
 #endif
