@@ -51,6 +51,7 @@ class songEditor;
 class ladspa2LMMS;
 class controllerRackView;
 class MidiControlListener;
+class QDomDocument;
 
 
 class EXPORT engine
@@ -180,6 +181,15 @@ public:
 	static LmmsStyle * getLmmsStyle( void )
 	{
 		return s_lmmsStyle;
+	}
+	
+	static void saveConfiguration( QDomDocument & doc );
+
+	static void loadConfiguration( QDomDocument & doc );
+
+	static MidiControlListener * getMidiControlListener( void )
+	{
+		return s_midiControlListener;
 	}
 
 private:

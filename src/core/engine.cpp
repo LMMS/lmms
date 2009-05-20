@@ -25,6 +25,7 @@
  */
 
 #include <QtCore/QDir>
+#include <QDomDocument>
 
 #include "engine.h"
 #include "automation_editor.h"
@@ -229,6 +230,25 @@ void engine::initPluginFileHandling( void )
 			}
 		}
 	}
+}
+
+
+
+
+void engine::loadConfiguration( QDomDocument & doc )
+{
+	// must be a call to a static method as the engine
+	// is not yet created and initialized and 
+	// s_midiControlListener is still NULL.
+	MidiControlListener::rememberConfiguration( doc );
+}
+
+
+
+
+void engine::saveConfiguration( QDomDocument & doc )
+{
+	s_midiControlListener->saveConfiguration( doc );
 }
 
 

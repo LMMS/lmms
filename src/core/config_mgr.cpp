@@ -34,7 +34,7 @@
 #include "lmmsversion.h"
 #include "config_mgr.h"
 #include "main_window.h"
-
+#include "engine.h"
 
 static inline QString ensureTrailingSlash( const QString & _s )
 {
@@ -227,6 +227,8 @@ void configManager::loadConfigFile( void )
 
 			QDomNode node = root.firstChild();
 
+			engine::loadConfiguration( dom_tree );
+
 			// create the settings-map out of the DOM
 			while( !node.isNull() )
 			{
@@ -395,7 +397,9 @@ void configManager::saveConfigFile( void )
 		recent_files.appendChild( n );
 	}
 	lmms_config.appendChild( recent_files );
-
+	
+	engine::saveConfiguration( doc );
+	
 	QString xml = "<?xml version=\"1.0\"?>\n" + doc.toString( 2 );
 
 	QFile outfile( m_lmmsRcFile );
