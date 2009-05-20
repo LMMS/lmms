@@ -160,8 +160,6 @@ void engine::destroy( void )
 	s_pianoRoll = NULL;
 	delete s_automationEditor;
 	s_automationEditor = NULL;
-	delete s_automationRecorder;
-	s_automationRecorder = NULL;
 
 	delete s_fxMixerView;
 	s_fxMixerView = NULL;
@@ -189,6 +187,9 @@ void engine::destroy( void )
 
 	delete s_song;
 	s_song = NULL;
+
+	delete s_automationRecorder;
+	s_automationRecorder = NULL;
 
 	delete s_resourcesProvider;
 	s_resourcesProvider = NULL;
