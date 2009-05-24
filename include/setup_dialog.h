@@ -32,15 +32,18 @@
 #include "lmmsconfig.h"
 #include "audio_device.h"
 #include "midi_client.h"
+#include "midi_control_listener.h"
+
 
 
 class QComboBox;
 class QLabel;
 class QLineEdit;
 class QSlider;
-
+class QTableWidget;
 class tabBar;
-
+class groupBox;
+class setupDialogMCL;
 
 class setupDialog : public QDialog
 {
@@ -57,7 +60,11 @@ public:
 
 	setupDialog( ConfigTabs _tab_to_open = GeneralSettings );
 	virtual ~setupDialog();
-
+	
+	void mclAddKeyAction( int _key, 
+			     MidiControlListener::EventAction _action );
+	void mclAddControllerAction( int _controller, 
+			     MidiControlListener::EventAction _action );
 
 protected slots:
 	virtual void accept( void );
@@ -106,8 +113,16 @@ private slots:
 	void toggleDisableChActInd( bool _disabled );
 	void toggleManualChPiano( bool _enabled );
 
+	void toggleMCLEnabled( bool _enabled );
+	void toggleMCLControlKey( bool _enabled );
+	
+	void mclNewAction( void );
+	void mclDelAction( void );
 
 private:
+	groupBox * setupMidiControlListener( QWidget * midi );
+	void mclUpdateActionTable( void );
+	
 	tabBar * m_tabBar;
 
 	QSlider * m_bufSizeSlider;
@@ -162,7 +177,14 @@ private:
 	mswMap m_midiIfaceSetupWidgets;
 	trMap m_midiIfaceNames;
 
-
+	bool m_mclEnabled;
+	int m_mclChannel;
+	bool m_mclUseControlKey;
+	MidiControlListener::ActionMap m_mclActionMapKeys;
+	MidiControlListener::ActionMap m_mclActionMapControllers;
+	
+	QList< QPair <char, int> > m_mclActionTableMap;
+	QTableWidget * m_mclActionTable;
 } ;
 
 

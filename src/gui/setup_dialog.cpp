@@ -34,6 +34,9 @@
 #include <QtGui/QMessageBox>
 #include <QtGui/QSlider>
 #include <QtGui/QWhatsThis>
+#include <QtGui/QToolButton>
+#include <QtGui/QTableWidget>
+#include <QtGui/QHeaderView>
 
 
 #include "setup_dialog.h"
@@ -49,7 +52,10 @@
 #include "debug.h"
 #include "tooltip.h"
 #include "led_checkbox.h"
+#include "group_box.h"
 #include "lcd_spinbox.h"
+#include "midi_control_listener.h"
+#include "setup_dialog_mcl.h"
 
 
 // platform-specific audio-interface-classes
@@ -114,7 +120,12 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 	m_disableChActInd( configManager::inst()->value( "ui",
 				"disablechannelactivityindicators" ).toInt() ),
 	m_manualChPiano( configManager::inst()->value( "ui",
-					"manualchannelpiano" ).toInt() )
+					"manualchannelpiano" ).toInt() ),
+	m_mclEnabled( engine::getMidiControlListener()->getEnabled() ),
+	m_mclChannel( engine::getMidiControlListener()->getChannel() ),
+	m_mclUseControlKey( engine::getMidiControlListener()->getUseControlKey() ),
+	m_mclActionMapKeys( engine::getMidiControlListener()->getActionMapKeys() ),
+	m_mclActionMapControllers( engine::getMidiControlListener()->getActionMapControllers() )
 {
 	setWindowIcon( embed::getIconPixmap( "setup_general" ) );
 	setWindowTitle( tr( "Setup LMMS" ) );
@@ -637,12 +648,14 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 	connect( m_midiInterfaces, SIGNAL( activated( const QString & ) ),
 		this, SLOT( midiInterfaceChanged( const QString & ) ) );
 
-
+	groupBox * midicl_gb = setupMidiControlListener( midi );
+	
 	midi_layout->addWidget( midiiface_tw );
 	midi_layout->addSpacing( 20 );
 	midi_layout->addWidget( msw );
+	midi_layout->addSpacing( 20 );
+	midi_layout->addWidget( midicl_gb );
 	midi_layout->addStretch();
-
 
 	m_tabBar->addTab( general, tr( "General settings" ), 0, FALSE, TRUE 
 			)->setIcon( embed::getIconPixmap( "setup_general" ) );
@@ -709,6 +722,141 @@ setupDialog::~setupDialog()
 
 
 
+groupBox * setupDialog::setupMidiControlListener( QWidget * midi )
+{
+	// MIDI control listener
+	groupBox * gb = new groupBox( tr( "MIDI REMOTE CONTROL" ),
+									midi );
+	gb->setFixedHeight( 235 );
+	gb->ledButton()->setChecked( m_mclEnabled );
+	
+	connect( gb->ledButton(), SIGNAL( toggled( bool ) ),
+		this, SLOT( toggleMCLEnabled( bool ) ) );
+	
+	// channel
+	lcdSpinBoxModel * channelSbModel = new lcdSpinBoxModel( /* this */ );
+	channelSbModel->setRange( 0, 16 );
+	channelSbModel->setStep( 1 );
+	channelSbModel->setValue( m_mclChannel + 1 );
+	lcdSpinBox * channelSb = new lcdSpinBox( 3, gb );
+	channelSb->setModel( channelSbModel );
+	channelSb->addTextForValue( 0, "---" );
+	channelSb->setLabel( tr( "CHANNEL" ) );
+	channelSb->move( 20, 20 );
+	
+	// device
+	QToolButton * devicesBtn = new QToolButton( gb );
+	devicesBtn->setText( tr( "MIDI-device to receive "
+			     "remote control events from" ) );
+	devicesBtn->setIcon( embed::getIconPixmap( "piano" ) );
+	devicesBtn->setGeometry( 100, 20, 32, 32 );
+	devicesBtn->setPopupMode( QToolButton::InstantPopup );
+	
+	// use control key
+	ledCheckBox * controlKeyCb = new ledCheckBox(
+						   tr( "Use control key" ),
+						   gb );
+	controlKeyCb->move( 20, 60 );
+	controlKeyCb->setChecked( m_mclUseControlKey );
+	connect( controlKeyCb, SIGNAL( toggled( bool ) ),
+		this, SLOT( toggleMCLControlKey( bool ) ) );
+	
+	m_mclActionTable = new QTableWidget( gb );
+	mclUpdateActionTable();
+	
+	QWidget * buttons = new QWidget( gb );
+	QVBoxLayout * btn_layout = new QVBoxLayout( buttons );
+	btn_layout->setSpacing( 0 );
+	btn_layout->setMargin( 0 );
+	QPushButton * new_btn = new QPushButton( tr( "New" ), buttons );
+	connect( new_btn, SIGNAL( clicked() ), this, SLOT( mclNewAction() ) );
+	QPushButton * del_btn = new QPushButton( tr( "Del" ), buttons );
+	connect( del_btn, SIGNAL( clicked() ), this, SLOT( mclDelAction() ) );
+	
+	btn_layout->addWidget( new_btn );
+	btn_layout->addSpacing( 5 );
+	btn_layout->addWidget( del_btn );
+	btn_layout->addStretch();
+	buttons->move( 275, 80 );
+	
+	return gb;
+}
+
+
+
+
+void setupDialog::mclUpdateActionTable( void )
+{
+	m_mclActionTableMap.clear();
+	
+	QTableWidget * table = m_mclActionTable;
+	table->setColumnCount( 2 );
+	table->setRowCount( m_mclActionMapKeys.count() + 
+			   m_mclActionMapControllers.count() );
+	table->setGeometry(20, 80, 250, 145 );
+	QStringList headers;
+	headers << "Key/Ctrl" << "Action";
+	table->setHorizontalHeaderLabels( headers );
+	int row = 0;
+	QString key2NameMap[] =
+	{
+		"C", "C#", "D", "D#", "E", "F", 
+		"F#", "G", "G#", "A", "A#", "B"
+	};
+	for( MidiControlListener::ActionMap::const_iterator it = m_mclActionMapKeys.begin(); 
+	    it != m_mclActionMapKeys.end(); ++it, ++row )
+	{
+		int keyNr = it.key();
+		QString key = "Key "; 
+		key += key2NameMap[ keyNr % 12 ];
+		key += QString::number( int( keyNr / 12 ) );
+		QTableWidgetItem * item = new QTableWidgetItem( key );
+		item->setFlags( Qt::ItemIsSelectable | Qt::ItemIsEnabled );
+		table->setItem( row, 0, item );
+		
+		QString actionName = MidiControlListener::action2ActionNameMap( it.value() ).name;
+		item = new QTableWidgetItem( actionName );
+		item->setFlags( Qt::ItemIsSelectable | Qt::ItemIsEnabled );
+		table->setItem( row, 1, item );
+		
+		table->setRowHeight( row, 20 );
+		
+		m_mclActionTableMap.append( qMakePair( 'k', keyNr ) );
+	}
+	
+	for( MidiControlListener::ActionMap::const_iterator it = m_mclActionMapControllers.begin(); 
+	    it != m_mclActionMapControllers.end(); ++it, ++row )
+	{
+		QString controller = "Controller #"; 
+		controller += QString::number( it.key() );
+		QTableWidgetItem * item = new QTableWidgetItem( controller );
+		item->setFlags( Qt::ItemIsSelectable | Qt::ItemIsEnabled );
+		table->setItem( row, 0, item );
+		
+		QString actionName = MidiControlListener::action2ActionNameMap( it.value() ).name;
+		item = new QTableWidgetItem( actionName );
+		item->setFlags( Qt::ItemIsSelectable | Qt::ItemIsEnabled );
+		table->setItem( row, 1, item );
+		
+		table->setRowHeight( row, 20 );
+		
+		m_mclActionTableMap.append( qMakePair( 'c', it.key() ) );
+	}
+	
+	//table->setColumnWidth( 0, 135 );
+	//table->setColumnWidth( 1, 135 );
+	table->setEnabled( true );
+	table->setShowGrid( false );
+	table->setSortingEnabled( false );
+	table->setSelectionBehavior( QTableWidget::SelectRows );
+	table->verticalHeader()->hide();
+	table->setAlternatingRowColors( true );
+	
+}
+
+
+
+
 void setupDialog::accept( void )
 {
 	configManager::inst()->setValue( "mixer", "framesperaudiobuffer",
@@ -758,6 +906,14 @@ void setupDialog::accept( void )
 	{
 		it.value()->saveSettings();
 	}
+	
+	// MIDI control listener
+	MidiControlListener * listener = engine::getMidiControlListener();
+	listener->setEnabled( m_mclEnabled );
+	listener->setChannel( m_mclChannel );
+	listener->setUseControlKey( m_mclUseControlKey );
+	listener->setActionMapKeys( m_mclActionMapKeys );
+	listener->setActionMapControllers( m_mclActionMapControllers );
 
 	configManager::inst()->saveConfigFile();
 
@@ -1156,6 +1312,75 @@ void setupDialog::displayMIDIHelp( void )
 					"Below you see a box which offers "
 					"controls to setup the selected "
 					"MIDI-interface." ) );
+}
+
+
+
+
+void setupDialog::toggleMCLEnabled( bool _enabled )
+{
+	m_mclEnabled = _enabled;
+}
+
+
+
+
+void setupDialog::toggleMCLControlKey( bool _enabled )
+{
+	m_mclUseControlKey = _enabled;
+}
+
+
+
+
+void setupDialog::mclNewAction( void )
+{
+	setupDialogMCL sdMcl( this );
+	sdMcl.exec();
+}
+
+
+
+
+void setupDialog::mclDelAction( void )
+{
+	
+	int row = m_mclActionTable->currentRow();
+	if( row < 0 )
+	{
+		return; // sanity check: no row selected
+	}
+	QPair<char, int> entry = m_mclActionTableMap[ row ];
+	if( entry.first == 'k' )
+	{
+		m_mclActionMapKeys.remove( entry.second );
+	}
+	else if( entry.first == 'c' )
+	{
+		m_mclActionMapControllers.remove( entry.second );
+	}
+	
+	mclUpdateActionTable();
+}
+
+
+
+
+void setupDialog::mclAddKeyAction( int _key, 
+				  MidiControlListener::EventAction _action )
+{
+	m_mclActionMapKeys[ _key ] = _action;
+	mclUpdateActionTable();
+}
+
+
+
+
+void setupDialog::mclAddControllerAction( int _controller, 
+				  MidiControlListener::EventAction _action )
+{
+	m_mclActionMapControllers[ _controller ] = _action;
+	mclUpdateActionTable();
 }
 
 
