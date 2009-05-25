@@ -2085,7 +2085,6 @@ trackView::trackView( track * _track, trackContainerView * _tcv ) :
 
 	setAcceptDrops( true );
 	setAttribute( Qt::WA_DeleteOnClose, true );
-	setAttribute( Qt::WA_OpaquePaintEvent, true );
 
 
 	connect( m_track, SIGNAL( destroyedTrack() ), this, SLOT( close() ) );
