@@ -1175,16 +1175,16 @@ void trackContentWidget::updateBackground( void )
 
 	// Assume even-pixels-per-tact. Makes sense, should be like this anyways
 	int ppt = static_cast<int>( tcv->pixelsPerTact() );
-    int width = ppt * tactsPerBar;
+	int width = ppt * tactsPerBar;
 
-    m_background = QPixmap( width * 2, height() );
-    QPainter pmp;
-    pmp.begin( &m_background );
+	m_background = QPixmap( width * 2, height() );
+	QPainter pmp;
+	pmp.begin( &m_background );
 
-    engine::getLmmsStyle()->drawTrackContentBackground( &pmp, 
-            QSize( width, height() ), ppt );
+	engine::getLmmsStyle()->drawTrackContentBackground( &pmp,
+						QSize( width, height() ), ppt );
 
-    pmp.end();
+	pmp.end();
 }
 
 
@@ -1425,7 +1425,7 @@ void trackOperationsWidget::mousePressEvent( QMouseEvent * _me )
 void trackOperationsWidget::paintEvent( QPaintEvent * _pe )
 {
 	QPainter p( this );
-	p.fillRect( rect(), palette().brush(QPalette::Background) );
+	p.fillRect( rect(), palette().brush( QPalette::Background ) );
 
 	if( m_trackView->isMovingTrack() == false )
 	{
