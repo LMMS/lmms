@@ -35,15 +35,15 @@
 
 #include "setup_dialog.h"
 #include "setup_dialog_mcl.h"
-
+#include "piano.h"
 
 setupDialogMCL::setupDialogMCL( setupDialog * _parent ) :
 	m_parent( _parent ),
 	m_keysActive( true )
 {
-	
 	setWindowTitle( tr( "New action" ) );
 	setModal( true );
+	resize( 270, 330 );
 	
 	QWidget * buttons = new QWidget( this );
 	QHBoxLayout * btn_layout = new QHBoxLayout( buttons );
@@ -52,7 +52,7 @@ setupDialogMCL::setupDialogMCL( setupDialog * _parent ) :
 	QPushButton * ok_btn = new QPushButton( embed::getIconPixmap( "apply" ),
 						tr( "OK" ), buttons );
 	connect( ok_btn, SIGNAL( clicked() ), this, SLOT( accept() ) );
-
+	
 	QPushButton * cancel_btn = new QPushButton( embed::getIconPixmap(
 								"cancel" ),
 							tr( "Cancel" ),
@@ -67,7 +67,7 @@ setupDialogMCL::setupDialogMCL( setupDialog * _parent ) :
 	btn_layout->addSpacing( 10 );
 	
 	QWidget * settings = new QWidget( this );
-	settings->setGeometry( 10, 10, 180, 100 );
+	settings->setGeometry( 10, 10, 280, 100 );
 	
 	QVBoxLayout * vlayout = new QVBoxLayout( this );
 	vlayout->setSpacing( 0 );
@@ -81,7 +81,7 @@ setupDialogMCL::setupDialogMCL( setupDialog * _parent ) :
 	
 	m_actionKey_gb = new groupBox( tr( "MIDI KEYBOARD" ),
 						settings );
-	m_actionKey_gb->setFixedHeight( 60 );
+	m_actionKey_gb->setFixedHeight( 160 );
 	m_actionKey_gb->ledButton()->setChecked( m_keysActive );
 	connect( m_actionKey_gb->ledButton(), SIGNAL( clicked() ), 
 		this, SLOT( clickedKeyBox(  ) ) );
@@ -113,6 +113,12 @@ setupDialogMCL::setupDialogMCL( setupDialog * _parent ) :
 			m_actionsKey_box->addItem( action.name );
 		}
 	}
+	
+	QWidget * pianoWidget = new QWidget( m_actionKey_gb );
+	pianoWidget->move( 10, 60 );
+	PianoView * piano_view = new PianoView( pianoWidget );
+	piano_view->setFixedSize( 250, 84 );
+	
 	
 	m_actionsController_box = new QComboBox( m_actionController_gb );
 	m_actionsController_box->setGeometry( 10, 30, 150, 22 );
