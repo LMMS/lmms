@@ -30,12 +30,40 @@
 #include "mmp.h"
 
 
+QMap<ResourcesItem::Type, QString> ResourcesDB::s_typeNames;
+QMap<ResourcesItem::BaseDirectory, QString> ResourcesDB::s_baseDirNames;
+
+
 
 ResourcesDB::ResourcesDB( ResourcesProvider * _provider ) :
 	m_provider( _provider )
 {
 	connect( m_provider, SIGNAL( itemsChanged() ),
 			this, SIGNAL( itemsChanged() ) );
+
+	if( s_typeNames.isEmpty() )
+	{
+		s_typeNames[ResourcesItem::TypeUnknown] = "Unknown";
+		s_typeNames[ResourcesItem::TypeDirectory] = "Directory";
+		s_typeNames[ResourcesItem::TypeSample] = "Sample";
+		s_typeNames[ResourcesItem::TypeSoundFont] = "SoundFont";
+		s_typeNames[ResourcesItem::TypePreset] = "Preset";
+		s_typeNames[ResourcesItem::TypeProject] = "Project";
+		s_typeNames[ResourcesItem::TypeMidiFile] = "MidiFile";
+		s_typeNames[ResourcesItem::TypeForeignProject] = "ForeignProject";
+		s_typeNames[ResourcesItem::TypePlugin] = "Plugin";
+		s_typeNames[ResourcesItem::TypeImage] = "Image";
+	}
+
+	if( s_baseDirNames.isEmpty() )
+	{
+		s_baseDirNames[ResourcesItem::BaseRoot] = "Root";
+		s_baseDirNames[ResourcesItem::BaseWorkingDir] = "WorkingDir";
+		s_baseDirNames[ResourcesItem::BaseDataDir] = "DataDir";
+		s_baseDirNames[ResourcesItem::BaseHome] = "Home";
+		s_baseDirNames[ResourcesItem::BaseURL] = "URL";
+	}
+
 
 }
 
@@ -107,8 +135,8 @@ void ResourcesDB::saveTreeItem( const ResourcesTreeItem * _i,
 	{
 		const ResourcesItem * it = _i->item();
 		e.setAttribute( "name", it->name() );
-		e.setAttribute( "type", it->type() );
-		e.setAttribute( "basedir", it->baseDir() );
+		e.setAttribute( "type", typeName( it->type() ) );
+		e.setAttribute( "basedir", baseDirName( it->baseDir() ) );
 		e.setAttribute( "path", it->path() );
 		e.setAttribute( "hash", it->hash() );
 		e.setAttribute( "size", it->size() );
@@ -135,9 +163,8 @@ void ResourcesDB::loadTreeItem( ResourcesTreeItem * _i, QDomElement & _de )
 			{
 ResourcesItem * item = new ResourcesItem( m_provider,
 						e.attribute( "name" ),
-	static_cast<ResourcesItem::Type>( e.attribute( "type" ).toInt() ),
-	static_cast<ResourcesItem::BaseDirectory>(
-					e.attribute( "basedir" ).toInt() ),
+				typeFromName( e.attribute( "type" ) ),
+				baseDirFromName( e.attribute( "basedir" ) ),
 						e.attribute( "path" ),
 						h,
 						e.attribute( "tags" ),

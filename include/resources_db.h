@@ -27,6 +27,7 @@
 
 #include <QtCore/QDateTime>
 #include <QtCore/QHash>
+#include <QtCore/QMap>
 #include <QtCore/QStringList>
 #include <QtXml/QDomDocument>
 
@@ -81,6 +82,48 @@ private:
 							QDomElement & _de );
 	void loadTreeItem( ResourcesTreeItem * _i, QDomElement & _de );
 
+	static inline QString typeName( ResourcesItem::Type _t )
+	{
+		return s_typeNames[_t];
+	}
+
+	static inline QString baseDirName( ResourcesItem::BaseDirectory _bd )
+	{
+		return s_baseDirNames[_bd];
+	}
+
+	static inline ResourcesItem::Type typeFromName( const QString & _n )
+	{
+		for( TypeStringMap::ConstIterator it = s_typeNames.begin();
+						it != s_typeNames.end(); ++it )
+		{
+			if( it.value() == _n )
+			{
+				return it.key();
+			}
+		}
+		return ResourcesItem::TypeUnknown;
+	}
+
+	static inline ResourcesItem::BaseDirectory baseDirFromName(
+							const QString & _n )
+	{
+		for( BaseDirStringMap::ConstIterator it =
+							s_baseDirNames.begin();
+					it != s_baseDirNames.end(); ++it )
+		{
+			if( it.value() == _n )
+			{
+				return it.key();
+			}
+		}
+		return ResourcesItem::BaseRoot;
+	}
+
+	typedef QMap<ResourcesItem::Type, QString> TypeStringMap;
+	typedef QMap<ResourcesItem::BaseDirectory, QString> BaseDirStringMap;
+	static TypeStringMap s_typeNames;
+	static BaseDirStringMap s_baseDirNames;
 
 	ResourcesProvider * m_provider;
 	ItemList m_items;

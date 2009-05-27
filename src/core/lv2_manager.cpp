@@ -36,10 +36,6 @@
 
 #ifdef LMMS_HAVE_LV2
 
-#ifdef LMMS_HAVE_SLV2_SCALEPOINTS_H
-#include "slv2/scalepoints.h"
-#endif
-
 
 lv2Manager * static_lv2_manager=(lv2Manager *)NULL; // There is only one of these...
 

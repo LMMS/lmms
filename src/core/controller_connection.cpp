@@ -41,17 +41,18 @@ controllerConnectionVector controllerConnection::s_connections;
 
 
 controllerConnection::controllerConnection( controller * _controller ) :
-    m_controllerId( -1 ),
+	m_controllerId( -1 ),
 	m_ownsController( FALSE )
 {
-    if( _controller != NULL )
-    {
-        setController( _controller );
-    }
-    else
-    {
-        m_controller = controller::create( controller::DummyController, NULL );
-    }
+	if( _controller != NULL )
+	{
+		setController( _controller );
+	}
+	else
+	{
+		m_controller = controller::create( controller::DummyController,
+									NULL );
+	}
 	s_connections.append( this );
 }
 
@@ -60,7 +61,7 @@ controllerConnection::controllerConnection( controller * _controller ) :
 
 controllerConnection::controllerConnection( int _controllerId ) :
 	m_controller( controller::create( controller::DummyController, NULL ) ),
-    m_controllerId( _controllerId ),
+	m_controllerId( _controllerId ),
 	m_ownsController( FALSE )
 {
 	s_connections.append( this );
@@ -145,13 +146,15 @@ inline void controllerConnection::setTargetName( const QString & _name )
 void controllerConnection::finalizeConnections( void )
 {
 	for( int i = 0; i < s_connections.size(); ++i )
-    {
-        controllerConnection * c = s_connections[i];
-        if ( !c->isFinalized() )
-        {
-            c->setController( engine::getSong()->controllers().at( c->m_controllerId ) );
-        }
-    }
+	{
+		controllerConnection * c = s_connections[i];
+		if ( !c->isFinalized() && c->m_controllerId <
+				engine::getSong()->controllers().size() )
+		{
+			c->setController( engine::getSong()->
+					controllers().at( c->m_controllerId ) );
+		}
+	}
 }
 
 
@@ -159,7 +162,8 @@ void controllerConnection::finalizeConnections( void )
 
 void controllerConnection::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
-    if( engine::getSong() ) {
+	if( engine::getSong() )
+	{
 		if( m_ownsController )
 		{
 			m_controller->saveState( _doc, _this );
@@ -167,12 +171,12 @@ void controllerConnection::saveSettings( QDomDocument & _doc, QDomElement & _thi
 		else
 		{
 			int id = engine::getSong()->controllers().indexOf( m_controller );
-			if(id >= 0 )
+			if( id >= 0 )
 			{
 				_this.setAttribute( "id", id );
 			}
 		}
-    }
+	}
 }
 
 

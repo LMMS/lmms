@@ -26,11 +26,17 @@
 #ifndef _LV2_MANAGER_H
 #define _LV2_MANAGER_H
 
+#include "lmmsconfig.h"
+
 #ifdef LMMS_HAVE_LV2
 
 #include <slv2/world.h>
 #include <slv2/plugin.h>
 #include <slv2/scalepoint.h>
+
+#ifdef LMMS_HAVE_SLV2_SCALEPOINTS_H
+#include <slv2/scalepoints.h>
+#endif
 
 #include <QtCore/QMap>
 #include <QtCore/QPair>
