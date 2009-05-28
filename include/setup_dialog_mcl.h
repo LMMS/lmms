@@ -50,10 +50,10 @@ private:
 	
 	bool m_keysActive; // true: configure key, false: configure controller
 	
-	groupBox * m_actionKey_gb;
-	groupBox * m_actionController_gb;
-	QComboBox * m_actionsKey_box;
-	QComboBox * m_actionsController_box;
+	groupBox * m_actionKeyGroupBox;
+	groupBox * m_actionControllerGroupBox;
+	QComboBox * m_actionsKeyBox;
+	QComboBox * m_actionsControllerBox;
 	lcdSpinBoxModel * m_controllerSbModel;
 } ;
 

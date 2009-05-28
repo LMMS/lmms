@@ -24,11 +24,10 @@
  */
 
 
-#include <stdio.h>
-#include <QString>
-#include <QDomDocument>
-#include <QDomElement>
-#include <QDomNodeList>
+#include <QtCore/QString>
+#include <QtXml/QDomDocument>
+#include <QtXml/QDomElement>
+#include <QtXml/QDomNodeList>
 
 #include "midi_control_listener.h"
 #include "mixer.h"
@@ -39,7 +38,7 @@
 #include "song.h"
 #include "config_mgr.h"
 
-const QString MidiControlListener::configClass = "midicontrollistener";
+const QString MidiControlListener::configClass = "MidiControlListener";
 QDomElement MidiControlListener::s_configTree;
 
 const MidiControlListener::ActionNameMap MidiControlListener::actionNames[] = 
@@ -54,7 +53,7 @@ const MidiControlListener::ActionNameMap MidiControlListener::actionNames[] =
 
 
 MidiControlListener::MidiControlListener() :
-	m_port( "unnamed_midi_controller",
+	m_port( "UnnamedMidiController",
 	       engine::getMixer()->getMidiClient(), this, NULL,
 	       midiPort::Input ),
 	m_controlKeyCount( 0 ),
@@ -87,62 +86,64 @@ void MidiControlListener::processInEvent( const midiEvent & _me,
 	// pre-check whether this MIDI packet suits our configuration
 	switch( _me.m_type )
 	{
-	case MidiNoteOn:
-	case MidiNoteOff:
-	case MidiControlChange:
-		// ignore commands for other channels
-		if( m_channel != -1 && m_channel != _me.channel() )
+		case MidiNoteOn:
+		case MidiNoteOff:
+		case MidiControlChange:
+			// ignore commands for other channels
+			if( m_channel != -1 && m_channel != _me.channel() )
+			{
+				return;
+			}
+			break;
+			
+		default:
+			// ignore commands other than note on/off and control change
 			return;
-		break;
-		
-	default:
-		// ignore commands other than note on/off and control change
-		return;
 	}
 	
 	// check MIDI packet type and act upon
-	switch( _me.m_type ) 
+	switch( _me.m_type )
 	{
-	case MidiNoteOn:
-		if( m_actionMapKeys.contains( _me.key() ) )
-		{
-			if( m_actionMapKeys.value( _me.key(), ActionNone ) == ActionControl )
+		case MidiNoteOn:
+			if( m_actionMapKeys.contains( _me.key() ) )
 			{
-				if( _me.velocity() > 0 )
+				if( m_actionMapKeys.value( _me.key(), ActionNone ) == ActionControl )
 				{
-					m_controlKeyCount++;
-				}
-				else
-				{
-					m_controlKeyCount--;
-					if( m_controlKeyCount < 0 )
+					if( _me.velocity() > 0 )
 					{
-						m_controlKeyCount = 0;
+						m_controlKeyCount++;
+					}
+					else
+					{
+						m_controlKeyCount--;
+						if( m_controlKeyCount < 0 )
+						{
+							m_controlKeyCount = 0;
+						}
 					}
 				}
+				else if( _me.velocity() > 0 &&
+					( !m_useControlKey || m_controlKeyCount > 0) ) 
+				{
+					act( m_actionMapKeys.value( _me.key(), ActionNone ) );
+				}
 			}
-			else if( _me.velocity() > 0 &&
-				( !m_useControlKey || m_controlKeyCount > 0) ) 
+			break;
+			
+		case MidiNoteOff:
+			break;
+			
+		case MidiControlChange:
+			// controller changed to a value other than zero
+			if( _me.m_data.m_param[1] > 0 )
 			{
-				act( m_actionMapKeys.value( _me.key(), ActionNone ) );
+				act( m_actionMapControllers.value( _me.m_data.m_param[0], ActionNone ) );
 			}
-		}
-		break;
-		
-	case MidiNoteOff:
-		break;
-		
-	case MidiControlChange:
-		// controller changed to a value other than zero
-		if( _me.m_data.m_param[1] > 0 )
-		{
-			act( m_actionMapControllers.value( _me.m_data.m_param[0], ActionNone ) );
-		}
-		break;
-		
-	default:
-		// nop
-		break;
+			break;
+			
+		default:
+			// nop
+			break;
 	}
 }
 
@@ -153,15 +154,16 @@ void MidiControlListener::act( EventAction _action )
 {
 	switch( _action )
 	{
-	case ActionNone:
-	case ActionControl:
-		break;
-	case ActionPlay:
-		engine::getSong()->play();
-		break;
-	case ActionStop:
-		engine::getSong()->stop();
-		break;
+		case ActionNone:
+			break;
+		case ActionControl:
+			break;
+		case ActionPlay:
+			engine::getSong()->play();
+			break;
+		case ActionStop:
+			engine::getSong()->stop();
+			break;
 	}
 }
 
@@ -222,8 +224,8 @@ void MidiControlListener::saveConfiguration( QDomDocument & doc )
 		confRoot.appendChild( actionNode );
 	}
 	
-	QDomElement lmms_config = doc.documentElement();
-	lmms_config.appendChild( confRoot );
+	QDomElement lmmsConfig = doc.documentElement();
+	lmmsConfig.appendChild( confRoot );
 }
 
 

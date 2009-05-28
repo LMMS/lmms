@@ -30,9 +30,9 @@
 #include "midi_event_processor.h"
 #include "midi_port.h"
 #include "note.h"
-#include <QString>
-#include <QPair>
-#include <QDomElement>
+#include <QtCore/QString>
+#include <QtCore/QPair>
+#include <QtXml/QDomElement>
 
 class QDomDocument;
 

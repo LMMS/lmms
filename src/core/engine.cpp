@@ -25,7 +25,7 @@
  */
 
 #include <QtCore/QDir>
-#include <QDomDocument>
+#include <QtXml/QDomDocument>
 
 #include "engine.h"
 #include "automation_editor.h"
