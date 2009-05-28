@@ -36,7 +36,7 @@
 
 
 class midiClient;
-class midiEventProcessor;
+class MidiEventProcessor;
 class midiPortMenu;
 class midiTime;
 
@@ -74,7 +74,7 @@ public:
 
 	midiPort( const QString & _name,
 			midiClient * _mc,
-			midiEventProcessor * _mep,
+			MidiEventProcessor * _mep,
 			model * _parent = NULL,
 			Modes _mode = Disabled );
 	virtual ~midiPort();
@@ -142,7 +142,7 @@ private slots:
 
 private:
 	midiClient * m_midiClient;
-	midiEventProcessor * m_midiEventProcessor;
+	MidiEventProcessor * m_midiEventProcessor;
 
 	Modes m_mode;
 

@@ -58,7 +58,7 @@ class tabWidget;
 class trackLabelButton;
 
 
-class EXPORT instrumentTrack : public track, public midiEventProcessor
+class EXPORT instrumentTrack : public track, public MidiEventProcessor
 {
 	Q_OBJECT
 	mapPropertyFromModel(int,getVolume,setVolume,m_volumeModel);
@@ -143,12 +143,7 @@ public:
 		return &m_midiPort;
 	}
 
-	intModel * baseNoteModel( void )
-	{
-		return &m_baseNoteModel;
-	}
-
-	piano * getPiano( void )
+	Piano * getPiano( void )
 	{
 		return &m_piano;
 	}
@@ -217,8 +212,6 @@ private:
 	notePlayHandle * m_notes[NumKeys];
 	int m_runningMidiNotes[NumKeys];
 
-	intModel m_baseNoteModel;
-
 	QList<notePlayHandle *> m_processHandles;
 
 
@@ -234,7 +227,7 @@ private:
 	arpeggiator m_arpeggiator;
 	chordCreator m_chordCreator;
 
-	piano m_piano;
+	Piano m_piano;
 
 
 	friend class instrumentTrackView;
@@ -401,7 +394,7 @@ private:
 	effectRackView * m_effectView;
 
 	// test-piano at the bottom of every instrument-settings-window
-	pianoView * m_pianoView;
+	PianoView * m_pianoView;
 
 	friend class instrumentView;
 

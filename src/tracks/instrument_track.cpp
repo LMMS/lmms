@@ -92,13 +92,11 @@ const int INSTRUMENT_WINDOW_CACHE_SIZE = 8;
 // #### IT:
 instrumentTrack::instrumentTrack( trackContainer * _tc ) :
 	track( InstrumentTrack, _tc ),
-	midiEventProcessor(),
+	MidiEventProcessor(),
 	m_audioPort( tr( "unnamed_track" ) ),
 	m_midiPort( tr( "unnamed_track" ), engine::getMixer()->getMidiClient(),
 								this, this ),
 	m_notes(),
-	m_baseNoteModel( 0, 0, KeysPerOctave * NumOctaves - 1, this,
-							tr( "Base note" ) ),
         m_volumeModel( DefaultVolume, MinVolume, MaxVolume, 0.1f, this,
 							tr( "Volume" ) ),
         m_panningModel( DefaultPanning, PanningLeft, PanningRight, 0.1f,
@@ -112,8 +110,7 @@ instrumentTrack::instrumentTrack( trackContainer * _tc ) :
 	m_chordCreator( this ),
 	m_piano( this )
 {
-	m_baseNoteModel.setInitValue( DefaultKey );
-	connect( &m_baseNoteModel, SIGNAL( dataChanged() ),
+	connect( baseNoteModel(), SIGNAL( dataChanged() ),
 			this, SLOT( updateBaseNote() ) );
 	connect( &m_pitchModel, SIGNAL( dataChanged() ),
 			this, SLOT( updatePitch() ) );
@@ -537,7 +534,7 @@ void instrumentTrack::updatePitchRange( void )
 
 int instrumentTrack::masterKey( int _midi_key ) const
 {
-	int key = m_baseNoteModel.value() - engine::getSong()->masterPitch();
+	int key = baseNoteModel()->value() - engine::getSong()->masterPitch();
 	return tLimit<int>( _midi_key - ( key - DefaultKey ), 0, NumKeys );
 }
 
@@ -703,7 +700,7 @@ void instrumentTrack::saveTrackSpecificSettings( QDomDocument & _doc,
 	m_pitchRangeModel.saveSettings( _doc, _this, "pitchrange" );
 
 	m_effectChannelModel.saveSettings( _doc, _this, "fxch" );
-	m_baseNoteModel.saveSettings( _doc, _this, "basenote" );
+	baseNoteModel()->saveSettings( _doc, _this, "basenote" );
 
 	if( m_instrument != NULL )
 	{
@@ -751,14 +748,14 @@ void instrumentTrack::loadTrackSpecificSettings( const QDomElement & _this )
 	if( _this.hasAttribute( "baseoct" ) )
 	{
 		// TODO: move this compat code to mmp.cpp -> upgrade()
-		m_baseNoteModel.setInitValue( _this.
+		baseNoteModel()->setInitValue( _this.
 			attribute( "baseoct" ).toInt()
 				* KeysPerOctave
 				+ _this.attribute( "basetone" ).toInt() );
 	}
 	else
 	{
-		m_baseNoteModel.loadSettings( _this, "basenote" );
+		baseNoteModel()->loadSettings( _this, "basenote" );
 	}
 
 	// clear effect-chain just in case we load an old preset without FX-data
@@ -1265,7 +1262,7 @@ instrumentTrackWindow::instrumentTrackWindow( instrumentTrackView * _itv ) :
 	m_tabWidget->addTab( m_midiView, tr( "MIDI" ), 4 );
 
 	// setup piano-widget
-	m_pianoView= new pianoView( this );
+	m_pianoView= new PianoView( this );
 	m_pianoView->setFixedSize( INSTRUMENT_WIDTH, PIANO_HEIGHT );
 
 	vlayout->addWidget( m_generalSettingsWidget );

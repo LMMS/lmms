@@ -36,7 +36,7 @@
 class midiPort;
 
 
-class midiController : public controller, public midiEventProcessor
+class midiController : public controller, public MidiEventProcessor
 {
 	Q_OBJECT
 public:

@@ -31,7 +31,7 @@
 #include "midi_port.h"
 #include "note.h"
 
-class MidiControlListener : public midiEventProcessor
+class MidiControlListener : public MidiEventProcessor
 {
 public:
 	typedef enum

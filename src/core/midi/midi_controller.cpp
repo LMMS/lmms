@@ -1,5 +1,3 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * midi_controller.cpp - implementation of class midi-controller which handles
  *                      MIDI control change messages
@@ -40,7 +38,7 @@
 
 midiController::midiController( model * _parent ) :
 	controller( MidiController, _parent, tr( "MIDI Controller" ) ),
-	midiEventProcessor(),
+	MidiEventProcessor(),
 	m_midiPort( tr( "unnamed_midi_controller" ),
 			engine::getMixer()->getMidiClient(), this, this,
 							midiPort::Input ),
@@ -158,6 +156,4 @@ controllerDialog * midiController::createDialog( QWidget * _parent )
 
 #include "moc_midi_controller.cxx"
 
-
-#endif
 

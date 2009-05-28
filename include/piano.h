@@ -1,5 +1,5 @@
 /*
- * piano.h - piano and pianoView, an interactive piano/keyboard-widget
+ * piano.h - Piano and PianoView, an interactive piano/keyboard-widget
  *
  * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
@@ -26,32 +26,25 @@
 #ifndef _PIANO_H
 #define _PIANO_H
 
-#include <QtGui/QWidget>
 #include <QtGui/QPixmap>
 #include <QtGui/QScrollBar>
 
-
 #include "note.h"
-#include "automatable_model.h"
+#include "mv_base.h"
 
+class MidiEventProcessor;
 
-class instrumentTrack;
-class instrumentTrackView;
-class notePlayHandle;
-
-
-enum KeyTypes
-{
-	WhiteKey,
-	BlackKey
-} ;
-
-
-class piano : public model
+class Piano : public model
 {
 public:
-	piano( instrumentTrack * _it );
-	virtual ~piano();
+	enum KeyTypes
+	{
+		WhiteKey,
+		BlackKey
+	} ;
+
+	Piano( MidiEventProcessor * _mep );
+	virtual ~Piano();
 
 	void setKeyState( int _key, bool _on = FALSE );
 
@@ -60,22 +53,22 @@ public:
 
 
 private:
-	instrumentTrack * m_instrumentTrack;
+	MidiEventProcessor * m_midiEvProc;
 	bool m_pressedKeys[NumKeys];
 
 
-	friend class pianoView;
+	friend class PianoView;
 
 } ;
 
 
 
-class pianoView : public QWidget, public modelView
+class PianoView : public QWidget, public modelView
 {
 	Q_OBJECT
 public:
-	pianoView( QWidget * _parent );
-	virtual ~pianoView();
+	PianoView( QWidget * _parent );
+	virtual ~PianoView();
 
 	static int getKeyFromKeyEvent( QKeyEvent * _ke );
 
@@ -101,7 +94,7 @@ private:
 	static QPixmap * s_whiteKeyPressedPm;
 	static QPixmap * s_blackKeyPressedPm;
 
-	piano * m_piano;
+	Piano * m_piano;
 
 	QScrollBar * m_pianoScroll;
 	int m_startKey;			// first key when drawing

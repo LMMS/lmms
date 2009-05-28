@@ -1,7 +1,8 @@
 /*
- * midi_event_processor.h - base-class for midi-processing classes
+ * midi_event_processor.h - class MidiEventProcessor, a base class for all
+ *                          midi-processing classes
  *
- * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -26,27 +27,46 @@
 #ifndef _MIDI_EVENT_PROCESSOR_H
 #define _MIDI_EVENT_PROCESSOR_H
 
-class midiEvent;
-class midiTime;
+#include "piano.h"
+#include "automatable_model.h"
 
 
 // all classes being able to process MIDI-events should inherit from this
-class midiEventProcessor
+class MidiEventProcessor
 {
 public:
-	inline midiEventProcessor( void )
+	inline MidiEventProcessor() :
+		m_baseNoteModel( DefaultKey,
+					0,
+					KeysPerOctave * NumOctaves - 1,
+					NULL,
+					PianoView::tr( "Base note" ) )
 	{
 	}
 
-	virtual inline ~midiEventProcessor()
+	virtual inline ~MidiEventProcessor()
 	{
 	}
+
+	intModel * baseNoteModel( void )
+	{
+		return &m_baseNoteModel;
+	}
+
+	const intModel * baseNoteModel( void ) const
+	{
+		return &m_baseNoteModel;
+	}
+
 
 	// to be implemented by inheriting classes
 	virtual void processInEvent( const midiEvent & _me,
 						const midiTime & _time ) = 0;
 	virtual void processOutEvent( const midiEvent & _me,
 						const midiTime & _time ) = 0;
+
+private:
+	intModel m_baseNoteModel;
 
 } ;
 
