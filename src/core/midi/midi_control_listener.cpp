@@ -318,11 +318,11 @@ void MidiControlListener::readConfiguration()
 	}
 	
 	// now read action tags
-	QDomNodeList actionNodes = s_configTree.elementsByTagName( "action" );
-	for( uint i = 0; i < actionNodes.length(); ++i )
+	// use iterator instead of elementsByTagName(), which under unsetteled circumstances returns an empty list
+	for( QDomElement actionNode = s_configTree.firstChildElement( "action" );
+	    !actionNode.isNull();
+	     actionNode = actionNode.nextSiblingElement("action") )
 	{
-		QDomElement actionNode = actionNodes.at( i ).toElement();
-		
 		EventAction action = actionName2ActionNameMap( actionNode.attribute( "actionName" ) ).action;
 		
 		if( actionNode.attribute( "type" ) == "key" )
