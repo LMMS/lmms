@@ -306,10 +306,10 @@ void MidiControlListener::readConfiguration()
 			m_useControlKey = false;
 		}
 		
-		QDomNodeList deviceNodes = s_configTree.elementsByTagName( "device" );
-		for( uint i = 0; i < deviceNodes.length(); ++i )
+		for( QDomElement deviceNode = s_configTree.firstChildElement( "device" );
+		    !deviceNode.isNull();
+		     deviceNode = deviceNode.nextSiblingElement( "device" ) )
 		{
-			QDomElement deviceNode = deviceNodes.at( i ).toElement();
 			if( deviceNode.text() != "" )
 			{
 				m_port.subscribeReadablePort( deviceNode.text(), true );
@@ -321,7 +321,7 @@ void MidiControlListener::readConfiguration()
 	// use iterator instead of elementsByTagName(), which under unsetteled circumstances returns an empty list
 	for( QDomElement actionNode = s_configTree.firstChildElement( "action" );
 	    !actionNode.isNull();
-	     actionNode = actionNode.nextSiblingElement("action") )
+	     actionNode = actionNode.nextSiblingElement( "action" ) )
 	{
 		EventAction action = actionName2ActionNameMap( actionNode.attribute( "actionName" ) ).action;
 		
