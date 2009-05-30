@@ -28,6 +28,9 @@
 
 #include <QtGui/QDialog>
 
+#include "dummy_midi_event_processor.h"
+#include "piano.h"
+
 class setupDialog;
 
 class setupDialogMCL : public QDialog
@@ -55,6 +58,9 @@ private:
 	QComboBox * m_actionsKeyBox;
 	QComboBox * m_actionsControllerBox;
 	lcdSpinBoxModel * m_controllerSbModel;
+	
+	DummyMidiEventProcessor m_mep;
+	Piano m_pianoModel;
 } ;
 
 

@@ -39,12 +39,15 @@
 
 setupDialogMCL::setupDialogMCL( setupDialog * _parent ) :
 	m_parent( _parent ),
-	m_keysActive( true )
+	m_keysActive( true ),
+	m_mep(),
+	m_pianoModel( &m_mep )
 {
 	setWindowTitle( tr( "New action" ) );
 	setModal( true );
 	resize( 270, 330 );
 	
+	// ok/cancel buttons
 	QWidget * buttons = new QWidget( this );
 	QHBoxLayout * buttonLayout = new QHBoxLayout( buttons );
 	buttonLayout->setSpacing( 0 );
@@ -66,9 +69,11 @@ setupDialogMCL::setupDialogMCL( setupDialog * _parent ) :
 	buttonLayout->addWidget( cancelButton );
 	buttonLayout->addSpacing( 10 );
 	
+	// container for settings, right above buttons
 	QWidget * settings = new QWidget( this );
 	settings->setGeometry( 10, 10, 280, 100 );
 	
+	// put window together
 	QVBoxLayout * vlayout = new QVBoxLayout( this );
 	vlayout->setSpacing( 0 );
 	vlayout->setMargin( 0 );
@@ -78,7 +83,7 @@ setupDialogMCL::setupDialogMCL( setupDialog * _parent ) :
 	vlayout->addSpacing( 10 );
 	vlayout->addStretch();
 	
-	
+	// keyboard group
 	m_actionKeyGroupBox = new groupBox( tr( "MIDI KEYBOARD" ),
 						settings );
 	m_actionKeyGroupBox->setFixedHeight( 160 );
@@ -86,6 +91,7 @@ setupDialogMCL::setupDialogMCL( setupDialog * _parent ) :
 	connect( m_actionKeyGroupBox->ledButton(), SIGNAL( clicked() ), 
 		this, SLOT( clickedKeyBox(  ) ) );
 	
+	// controller group
 	m_actionControllerGroupBox = new groupBox( tr( "MIDI CONTROLLER" ),
 						settings );
 	m_actionControllerGroupBox->setFixedHeight( 100 );
@@ -93,7 +99,7 @@ setupDialogMCL::setupDialogMCL( setupDialog * _parent ) :
 	connect( m_actionControllerGroupBox->ledButton(), SIGNAL( clicked() ), 
 		this, SLOT( clickedControllerBox( ) ) );
 	
-	
+	// put settings box together
 	QVBoxLayout * settingsLayout = new QVBoxLayout( settings );
 	settingsLayout->setSpacing( 0 );
 	settingsLayout->setMargin( 0 );
@@ -103,6 +109,7 @@ setupDialogMCL::setupDialogMCL( setupDialog * _parent ) :
 	settingsLayout->addSpacing( 10 );
 	settingsLayout->addStretch();
 	
+	// populate keys box
 	m_actionsKeyBox = new QComboBox( m_actionKeyGroupBox );
 	m_actionsKeyBox->setGeometry( 10, 20, 150, 22 );
 	for( int i = 0; i < MidiControlListener::numActions; ++i )
@@ -116,10 +123,14 @@ setupDialogMCL::setupDialogMCL( setupDialog * _parent ) :
 	
 	QWidget * pianoWidget = new QWidget( m_actionKeyGroupBox );
 	pianoWidget->move( 10, 60 );
+	
 	PianoView * pianoViewWidget = new PianoView( pianoWidget );
 	pianoViewWidget->setFixedSize( 250, 84 );
+	pianoViewWidget->setModel( &m_pianoModel );
+	m_mep.baseNoteModel()->setValue( 60 );
+	m_mep.setUpdateBaseNote( true );
 	
-	
+	// populate controller box
 	m_actionsControllerBox = new QComboBox( m_actionControllerGroupBox );
 	m_actionsControllerBox->setGeometry( 10, 30, 150, 22 );
 	for( int i = 0; i < MidiControlListener::numActions; ++i )
@@ -135,12 +146,13 @@ setupDialogMCL::setupDialogMCL( setupDialog * _parent ) :
 	m_controllerSbModel = new lcdSpinBoxModel( /* this */ );
 	m_controllerSbModel->setRange( 0, 127 );
 	m_controllerSbModel->setStep( 1 );
-	m_controllerSbModel->setValue( 63 );
+	m_controllerSbModel->setValue( 23 );
 	lcdSpinBox * controllerSb = new lcdSpinBox( 3, m_actionControllerGroupBox );
 	controllerSb->setModel( m_controllerSbModel );
 	controllerSb->setLabel( tr( "CONTROLLER" ) );
 	controllerSb->move( 20, 60 );
 	
+	// widgets setup done
 	show();
 }
 
@@ -162,7 +174,8 @@ void setupDialogMCL::accept( void )
 			MidiControlListener::actionName2ActionNameMap(
 				m_actionsKeyBox->currentText() );
 		
-		m_parent->mclAddKeyAction( 40, action.action );
+		m_parent->mclAddKeyAction( m_mep.baseNoteModel()->value(), 
+					  action.action );
 	}
 	else
 	{
