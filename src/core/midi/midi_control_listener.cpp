@@ -187,18 +187,10 @@ void MidiControlListener::saveConfiguration( QDomDocument & doc )
 	conf.setAttribute( "useControlKey", m_useControlKey );
 	conf.setAttribute( "channel", m_channel + 1 );
 	
-	// get subscribed MIDI device
-	midiPort::map map = m_port.readablePorts();
-	for( midiPort::map::iterator it = map.begin();
-	    it != map.end(); ++it )
-	{
-		if( it.value() )
-		{
-			QDomElement device = doc.createElement( "device" );
-			device.appendChild( doc.createTextNode( it.key() ) );
-			conf.appendChild( device );
-		}
-	}
+	// save MIDI device settings
+	QDomElement devices = doc.createElement( "devices" );
+	confRoot.appendChild( devices );
+	m_port.saveSettings( doc, devices );
 	
 	// add key actions
 	for( ActionMap::const_iterator it = m_actionMapKeys.begin(); 
@@ -306,14 +298,10 @@ void MidiControlListener::readConfiguration()
 			m_useControlKey = false;
 		}
 		
-		for( QDomElement deviceNode = s_configTree.firstChildElement( "device" );
-		    !deviceNode.isNull();
-		     deviceNode = deviceNode.nextSiblingElement( "device" ) )
+		QDomElement devicesNode = s_configTree.firstChildElement( "devices" );
+		if( !devicesNode.isNull() )
 		{
-			if( deviceNode.text() != "" )
-			{
-				m_port.subscribeReadablePort( deviceNode.text(), true );
-			}
+			m_port.loadSettings( devicesNode );
 		}
 	}
 	

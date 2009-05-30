@@ -134,6 +134,11 @@ public:
 		m_controlKeyCount = 0;
 	}
 	
+	inline midiPort * getMidiPort( void )
+	{
+		return &m_port;
+	}
+	
 private:
 	static const QString configClass;
 	static QDomElement s_configTree;
