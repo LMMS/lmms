@@ -36,6 +36,7 @@
 #include "engine.h"
 #include "note.h"
 #include "song.h"
+#include "timeline.h"
 #include "config_mgr.h"
 
 const QString MidiControlListener::configClass = "MidiControlListener";
@@ -46,7 +47,10 @@ const MidiControlListener::ActionNameMap MidiControlListener::actionNames[] =
 	{ MidiControlListener::ActionNone, "", "" },
 	{ MidiControlListener::ActionControl, "Control key", "control" },
 	{ MidiControlListener::ActionPlay, "Play", "play" },
-	{ MidiControlListener::ActionStop, "Stop", "stop" }
+	{ MidiControlListener::ActionStop, "Stop", "stop" },
+	{ MidiControlListener::ActionToggleLoop, "Toggle loop", "toggleLoop" },
+	{ MidiControlListener::ActionJumpToLoopStart, "Jump to loop start", "jumpToLoopStart" },
+	{ MidiControlListener::ActionJumpToLoopEnd, "Jump to loop end", "jumpToLoopEnd" }
 };
 
 
@@ -152,6 +156,7 @@ void MidiControlListener::processInEvent( const midiEvent & _me,
 
 void MidiControlListener::act( EventAction _action )
 {
+	timeLine * tl = engine::getSong()->getPlayPos( song::Mode_PlaySong ).m_timeLine;
 	switch( _action )
 	{
 		case ActionNone:
@@ -163,6 +168,20 @@ void MidiControlListener::act( EventAction _action )
 			break;
 		case ActionStop:
 			engine::getSong()->stop();
+			break;
+		case ActionToggleLoop:
+			if( tl->loopPointsEnabled() )
+			{
+				engine::getSong()->toggleLoopPoints( timeLine::LoopPointsDisabled );
+			}
+			else
+			{
+				engine::getSong()->toggleLoopPoints( timeLine::LoopPointsEnabled );
+			}
+			break;
+		case ActionJumpToLoopStart:
+			break;
+		case ActionJumpToLoopEnd:
 			break;
 	}
 }

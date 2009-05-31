@@ -131,6 +131,10 @@ void timeLine::addToolButtons( QWidget * _tool_bar )
 					SLOT( toggleLoopPoints( int ) ) );
 	connect( this, SIGNAL( loopPointStateLoaded( int ) ), loopPoints,
 					SLOT( changeState( int ) ) );
+	connect( engine::getSong(), SIGNAL( loopPointsChanged( int ) ), this,
+					SLOT( toggleLoopPoints( int ) ) );
+	connect( engine::getSong(), SIGNAL( loopPointsChanged( int ) ), 
+					loopPoints, SLOT( changeState( int ) ) );
 
 	nStateButton * behaviourAtStop = new nStateButton( _tool_bar );
 	behaviourAtStop->addState( embed::getIconPixmap( "back_to_zero" ),

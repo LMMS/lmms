@@ -192,7 +192,11 @@ public:
 		return m_timeSigModel;
 	}
 
-
+	inline void toggleLoopPoints( int _mode )
+	{
+		emit loopPointsChanged( _mode );
+	}
+	
 public slots:
 	void play( void );
 	void record( void );
@@ -316,7 +320,7 @@ signals:
 	void tempoChanged( bpm_t _new_bpm );
 	void timeSignatureChanged( int _old_ticks_per_tact,
 							int _ticks_per_tact );
-
+	void loopPointsChanged( int _mode );
 } ;
 
 

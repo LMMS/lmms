@@ -44,9 +44,12 @@ public:
 		ActionNone = 0,
 		ActionControl,
 		ActionPlay,
-		ActionStop
+		ActionStop,
+		ActionToggleLoop,
+		ActionJumpToLoopStart,
+		ActionJumpToLoopEnd
 	} EventAction;
-	static const int numActions = 4;
+	static const int numActions = 7;
 	
 	typedef QMap<int, EventAction> ActionMap;
 	
