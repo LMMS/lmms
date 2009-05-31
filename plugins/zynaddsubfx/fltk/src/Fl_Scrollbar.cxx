@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Scrollbar.cxx 6042 2008-02-25 13:00:53Z matt $"
+// "$Id: Fl_Scrollbar.cxx 6683 2009-03-14 11:46:43Z engelsman $"
 //
 // Scroll bar widget for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2006 by Bill Spitzak and others.
+// Copyright 1998-2009 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -24,6 +24,7 @@
 //
 //     http://www.fltk.org/str.php
 //
+
 
 #include <FL/Fl.H>
 #include <FL/Fl_Scrollbar.H>
@@ -254,9 +255,12 @@ void Fl_Scrollbar::draw() {
   }
 }
 
+/**
+  Creates a new Fl_Scrollbar widget with given position, size, and label.
+  You need to do type(FL_HORIZONTAL) if you want a horizontal scrollbar.
+*/
 Fl_Scrollbar::Fl_Scrollbar(int X, int Y, int W, int H, const char* L)
-  : Fl_Slider(X, Y, W, H, L)
-{
+  : Fl_Slider(X, Y, W, H, L) {
   box(FL_FLAT_BOX);
   color(FL_DARK2);
   slider(FL_UP_BOX);
@@ -265,13 +269,13 @@ Fl_Scrollbar::Fl_Scrollbar(int X, int Y, int W, int H, const char* L)
   step(1);
 }
 
-Fl_Scrollbar::~Fl_Scrollbar()
-{
+/**  Destroys the Scrollbar. */
+Fl_Scrollbar::~Fl_Scrollbar() {
   if (pushed_)
     Fl::remove_timeout(timeout_cb, this);
 }
 
 
 //
-// End of "$Id: Fl_Scrollbar.cxx 6042 2008-02-25 13:00:53Z matt $".
+// End of "$Id: Fl_Scrollbar.cxx 6683 2009-03-14 11:46:43Z engelsman $".
 //

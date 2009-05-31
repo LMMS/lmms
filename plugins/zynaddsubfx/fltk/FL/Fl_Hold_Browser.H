@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Hold_Browser.H 4288 2005-04-16 00:13:17Z mike $"
+// "$Id: Fl_Hold_Browser.H 6614 2009-01-01 16:11:32Z matt $"
 //
 // Hold browser header file for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2005 by Bill Spitzak and others.
+// Copyright 1998-2009 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -25,19 +25,37 @@
 //     http://www.fltk.org/str.php
 //
 
+/* \file
+   Fl_Hold_Browser widget . */
+
 #ifndef Fl_Hold_Browser_H
 #define Fl_Hold_Browser_H
 
 #include "Fl_Browser.H"
 
+/**
+  The Fl_Hold_Browser is a subclass of Fl_Browser
+  which lets the user select a single item, or no items by clicking on
+  the empty space.  As long as the mouse button is held down the item
+  pointed to by it is highlighted, and this highlighting remains on when
+  the mouse button is released. Normally the callback is done when the
+  user releases the mouse, but you can change this with when().
+  <P>See Fl_Browser for methods to add and remove lines from the browser.
+*/
 class Fl_Hold_Browser : public Fl_Browser {
 public:
-    Fl_Hold_Browser(int X,int Y,int W,int H,const char *l=0)
+  /**
+    Creates a new Fl_Hold_Browser widget using the given
+    position, size, and label string. The default boxtype is FL_DOWN_BOX.
+    The constructor specializes Fl_Browser() by setting the type to FL_HOLD_BROWSER.
+    The destructor destroys the widget and frees all memory that has been allocated.
+ */
+  Fl_Hold_Browser(int X,int Y,int W,int H,const char *l=0)
 	: Fl_Browser(X,Y,W,H,l) {type(FL_HOLD_BROWSER);}
 };
 
 #endif
 
 //
-// End of "$Id: Fl_Hold_Browser.H 4288 2005-04-16 00:13:17Z mike $".
+// End of "$Id: Fl_Hold_Browser.H 6614 2009-01-01 16:11:32Z matt $".
 //

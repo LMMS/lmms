@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_File_Browser.cxx 5635 2007-01-23 15:02:00Z mike $"
+// "$Id: Fl_File_Browser.cxx 6616 2009-01-01 21:28:26Z matt $"
 //
 // Fl_File_Browser routines.
 //
-// Copyright 1999-2006 by Michael Sweet.
+// Copyright 1999-2009 by Michael Sweet.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -538,13 +538,13 @@ Fl_File_Browser::load(const char     *directory,// I - Directory to load
     // Open the file that contains a list of mounted filesystems...
     //
 
-    mtab = fopen("/etc/mnttab", "r");	// Fairly standard
+    mtab = fl_fopen("/etc/mnttab", "r");	// Fairly standard
     if (mtab == NULL)
-      mtab = fopen("/etc/mtab", "r");	// More standard
+      mtab = fl_fopen("/etc/mtab", "r");	// More standard
     if (mtab == NULL)
-      mtab = fopen("/etc/fstab", "r");	// Otherwise fallback to full list
+      mtab = fl_fopen("/etc/fstab", "r");	// Otherwise fallback to full list
     if (mtab == NULL)
-      mtab = fopen("/etc/vfstab", "r");	// Alternate full list file
+      mtab = fl_fopen("/etc/vfstab", "r");	// Alternate full list file
 
     if (mtab != NULL)
     {
@@ -635,5 +635,5 @@ Fl_File_Browser::filter(const char *pattern)	// I - Pattern string
 
 
 //
-// End of "$Id: Fl_File_Browser.cxx 5635 2007-01-23 15:02:00Z mike $".
+// End of "$Id: Fl_File_Browser.cxx 6616 2009-01-01 21:28:26Z matt $".
 //

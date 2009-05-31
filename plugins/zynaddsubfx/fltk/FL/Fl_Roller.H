@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Roller.H 4288 2005-04-16 00:13:17Z mike $"
+// "$Id: Fl_Roller.H 6614 2009-01-01 16:11:32Z matt $"
 //
 // Roller header file for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2005 by Bill Spitzak and others.
+// Copyright 1998-2009 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -25,6 +25,9 @@
 //     http://www.fltk.org/str.php
 //
 
+/* \file
+   Fl_Roller widget . */
+
 #ifndef Fl_Roller_H
 #define Fl_Roller_H
 
@@ -32,6 +35,12 @@
 #include "Fl_Valuator.H"
 #endif
 
+/**
+  The Fl_Roller widget is a "dolly" control commonly used to
+  move 3D objects.
+  <P ALIGN=CENTER>\image html Fl_Roller.gif 
+  \image latex Fl_Roller.eps "Fl_Roller" width=4cm
+*/
 class FL_EXPORT Fl_Roller : public Fl_Valuator {
 protected:
   void draw();
@@ -43,5 +52,5 @@ public:
 #endif
 
 //
-// End of "$Id: Fl_Roller.H 4288 2005-04-16 00:13:17Z mike $".
+// End of "$Id: Fl_Roller.H 6614 2009-01-01 16:11:32Z matt $".
 //

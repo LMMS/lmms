@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Tile.cxx 5606 2007-01-18 10:01:24Z matt $"
+// "$Id: Fl_Tile.cxx 6616 2009-01-01 21:28:26Z matt $"
 //
 // Tile widget for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2005 by Bill Spitzak and others.
+// Copyright 1998-2009 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -25,6 +25,7 @@
 //     http://www.fltk.org/str.php
 //
 
+
 // Group of 2 or 4 "tiles" that can be resized by dragging border
 // The size of the first child determines where the resize border is.
 // The resizebox is used to limit where the border can be dragged to.
@@ -36,10 +37,13 @@
 
 // Drag the edges that were initially at oldx,oldy to newx,newy:
 // pass zero as oldx or oldy to disable drag in that direction:
-
+/** 
+  Drag the intersection at from_x,from_y to to_x,to_y.
+  This redraws all the necessary children.
+*/
 void Fl_Tile::position(int oix, int oiy, int newx, int newy) {
   Fl_Widget*const* a = array();
-  short* p = sizes();
+  int *p = sizes();
   p += 8; // skip group & resizable's saved size
   for (int i=children(); i--; p += 4) {
     Fl_Widget* o = *a++;
@@ -73,7 +77,7 @@ void Fl_Tile::resize(int X,int Y,int W,int H) {
   int dy = Y-y();
   int dw = W-w();
   int dh = H-h();
-  short* p = sizes();
+  int *p = sizes();
   // resize this (skip the Fl_Group resize):
   Fl_Widget::resize(X,Y,W,H);
   // find bottom-right of resiable:
@@ -132,14 +136,17 @@ int Fl_Tile::handle(int event) {
 
   case FL_MOVE:
   case FL_ENTER:
-  case FL_PUSH: {
+  case FL_PUSH:
+    // don't potentially change the mouse cursor if inactive:
+    if (!active()) break; // will cascade inherited handle()
+    {
     int mindx = 100;
     int mindy = 100;
     int oldx = 0;
     int oldy = 0;
     Fl_Widget*const* a = array();
-    short* q = sizes();
-    short* p = q+8;
+    int *q = sizes();
+    int *p = q+8;
     for (int i=children(); i--; p += 4) {
       Fl_Widget* o = *a++;
       if (o == resizable()) continue;
@@ -203,5 +210,5 @@ int Fl_Tile::handle(int event) {
 }
 
 //
-// End of "$Id: Fl_Tile.cxx 5606 2007-01-18 10:01:24Z matt $".
+// End of "$Id: Fl_Tile.cxx 6616 2009-01-01 21:28:26Z matt $".
 //

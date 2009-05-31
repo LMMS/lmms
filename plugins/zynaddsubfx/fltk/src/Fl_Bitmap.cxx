@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Bitmap.cxx 5190 2006-06-09 16:16:34Z mike $"
+// "$Id: Fl_Bitmap.cxx 6616 2009-01-01 21:28:26Z matt $"
 //
 // Bitmap drawing routines for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2005 by Bill Spitzak and others.
+// Copyright 1998-2009 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -25,6 +25,12 @@
 //     http://www.fltk.org/str.php
 //
 
+/** \fn Fl_Bitmap::Fl_Bitmap(const char *array, int W, int H)
+  The constructors create a new bitmap from the specified bitmap data.*/
+
+/** \fn Fl_Bitmap::Fl_Bitmap(const unsigned char *array, int W, int H)
+  The constructors create a new bitmap from the specified bitmap data.*/
+
 #include <FL/Fl.H>
 #include <FL/x.H>
 #include <FL/fl_draw.H>
@@ -33,53 +39,7 @@
 #include <FL/Fl_Bitmap.H>
 #include "flstring.h"
 
-#ifdef __APPLE_QD__ // MacOS bitmask functions
-Fl_Bitmask fl_create_bitmask(int w, int h, const uchar *array) {
-  Rect srcRect;
-  srcRect.left = 0; srcRect.right = w;
-  srcRect.top = 0; srcRect.bottom = h;
-  GrafPtr savePort;
-
-  GetPort(&savePort); // remember the current port
-
-  Fl_Bitmask gw;
-  NewGWorld( &gw, 1, &srcRect, 0L, 0L, 0 );
-  PixMapHandle pm = GetGWorldPixMap( gw );
-  if ( pm ) 
-  {
-    LockPixels( pm );
-    if ( *pm ) 
-    {
-      uchar *base = (uchar*)GetPixBaseAddr( pm );
-      if ( base ) 
-      {
-        PixMapPtr pmp = *pm;
-        // verify the parameters for direct memory write
-        if ( pmp->pixelType == 0 || pmp->pixelSize == 1 || pmp->cmpCount == 1 || pmp->cmpSize == 1 ) 
-        {
-          static uchar reverse[16] =	/* Bit reversal lookup table */
-          { 0x00, 0x88, 0x44, 0xcc, 0x22, 0xaa, 0x66, 0xee, 0x11, 0x99, 0x55, 0xdd, 0x33, 0xbb, 0x77, 0xff };
-          uchar *dst = base;
-          const uchar *src = array;
-          int rowBytesSrc = (w+7)>>3 ;
-          int rowPatch = (pmp->rowBytes&0x3fff) - rowBytesSrc;
-          for ( int j=0; j<h; j++,dst+=rowPatch )
-            for ( int i=0; i<rowBytesSrc; i++,src++ )
-              *dst++ = (reverse[*src & 0x0f] & 0xf0) | (reverse[(*src >> 4) & 0x0f] & 0x0f);
-        }
-      }
-      UnlockPixels( pm );
-    }
-  }
-
-  SetPort(savePort);
-  return gw;               /* tell caller we succeeded! */
-}
-
-void fl_delete_bitmask(Fl_Bitmask id) {
-  if (id) DisposeGWorld(id);
-}
-#elif defined(__APPLE_QUARTZ__)
+#if defined(__APPLE_QUARTZ__)
 Fl_Bitmask fl_create_bitmask(int w, int h, const uchar *array) {
   static uchar reverse[16] =    /* Bit reversal lookup table */
     { 0x00, 0x88, 0x44, 0xcc, 0x22, 0xaa, 0x66, 0xee, 
@@ -230,54 +190,6 @@ void fl_delete_bitmask(Fl_Bitmask bm) {
 #endif // __APPLE__
 
 
-// MRS: Currently it appears that CopyDeepMask() does not work with an 8-bit alpha mask.
-//      If you want to test/fix this, uncomment the "#ifdef __APPLE__" and comment out
-//      the "#if 0" here.  Also see Fl_Image.cxx for a similar check...
-
-//#ifdef __APPLE_QD__
-#if 0
-// Create an 8-bit mask used for alpha blending
-Fl_Bitmask fl_create_alphamask(int w, int h, int d, int ld, const uchar *array) {
-  Rect srcRect;
-  srcRect.left = 0; srcRect.right = w;
-  srcRect.top = 0; srcRect.bottom = h;
-  GrafPtr savePort;
-
-  GetPort(&savePort); // remember the current port
-
-  Fl_Bitmask gw;
-  NewGWorld( &gw, 8, &srcRect, 0L, 0L, 0 );
-  PixMapHandle pm = GetGWorldPixMap( gw );
-  if ( pm ) 
-  {
-    LockPixels( pm );
-    if ( *pm ) 
-    {
-      uchar *base = (uchar*)GetPixBaseAddr( pm );
-      if ( base ) 
-      {
-        PixMapPtr pmp = *pm;
-        // verify the parameters for direct memory write
-        if ( pmp->pixelType == 0 || pmp->pixelSize == 8 || pmp->cmpCount == 1 || pmp->cmpSize == 8 ) 
-        {
-	  // Copy alpha values from the source array to the pixmap...
-	  array += d - 1;
-          int rowoffset = (pmp->rowBytes & 0x3fff) - w;
-	  for (int y = h; y > 0; y --, array += ld, base += rowoffset) {
-	    for (int x = w; x > 0; x --, array += d) {
-	      *base++ = 255 /*255 - *array*/;
-	    }
-	  }
-        }
-      }
-      UnlockPixels( pm );
-    }
-  }
-
-  SetPort(savePort);
-  return gw;               /* tell caller we succeeded! */
-}
-#else
 // Create a 1-bit mask used for alpha blending
 Fl_Bitmask fl_create_alphamask(int w, int h, int d, int ld, const uchar *array) {
   Fl_Bitmask mask;
@@ -350,7 +262,6 @@ Fl_Bitmask fl_create_alphamask(int w, int h, int d, int ld, const uchar *array) 
 
   return (mask);
 }
-#endif // __APPLE__
 
 void Fl_Bitmap::draw(int XP, int YP, int WP, int HP, int cx, int cy) {
   if (!array) {
@@ -368,7 +279,18 @@ void Fl_Bitmap::draw(int XP, int YP, int WP, int HP, int cx, int cy) {
   if (cy < 0) {H += cy; Y -= cy; cy = 0;}
   if ((cy+H) > h()) H = h()-cy;
   if (H <= 0) return;
-#ifdef WIN32
+
+#if defined(USE_X11)
+  if (!id) id = fl_create_bitmask(w(), h(), array);
+
+  XSetStipple(fl_display, fl_gc, id);
+  int ox = X-cx; if (ox < 0) ox += w();
+  int oy = Y-cy; if (oy < 0) oy += h();
+  XSetTSOrigin(fl_display, fl_gc, ox, oy);
+  XSetFillStyle(fl_display, fl_gc, FillStippled);
+  XFillRectangle(fl_display, fl_window, fl_gc, X, Y, W, H);
+  XSetFillStyle(fl_display, fl_gc, FillSolid);
+#elif defined(WIN32)
   if (!id) id = fl_create_bitmap(w(), h(), array);
 
   HDC tempdc = CreateCompatibleDC(fl_gc);
@@ -379,20 +301,6 @@ void Fl_Bitmap::draw(int XP, int YP, int WP, int HP, int cx, int cy) {
   BitBlt(fl_gc, X, Y, W, H, tempdc, cx, cy, 0xE20746L);
   RestoreDC(tempdc, save);
   DeleteDC(tempdc);
-#elif defined(__APPLE_QD__)
-  if (!id) id = fl_create_bitmask(w(), h(), array);
-  GrafPtr dstPort;
-  GetPort( &dstPort );
-  Rect src, dst;
-  GetPortBounds( (Fl_Offscreen)id, &src );
-  SetRect( &src, cx, cy, cx+W, cy+H );
-  SetRect( &dst, X, Y, X+W, Y+H );
-  CopyBits(GetPortBitMapForCopyBits((Fl_Offscreen)id),	// srcBits
-	   GetPortBitMapForCopyBits(dstPort),	// dstBits
-	   &src,		 		// src bounds
-	   &dst, 				// dst bounds
-	   srcOr, 				// mode
-	   0L);					// mask region
 #elif defined(__APPLE_QUARTZ__)
   if (!id) id = fl_create_bitmask(w(), h(), array);
   if (id && fl_gc) {
@@ -402,18 +310,14 @@ void Fl_Bitmap::draw(int XP, int YP, int WP, int HP, int cx, int cy) {
     Fl_X::q_end_image();
   }
 #else
-  if (!id) id = fl_create_bitmask(w(), h(), array);
-
-  XSetStipple(fl_display, fl_gc, id);
-  int ox = X-cx; if (ox < 0) ox += w();
-  int oy = Y-cy; if (oy < 0) oy += h();
-  XSetTSOrigin(fl_display, fl_gc, ox, oy);
-  XSetFillStyle(fl_display, fl_gc, FillStippled);
-  XFillRectangle(fl_display, fl_window, fl_gc, X, Y, W, H);
-  XSetFillStyle(fl_display, fl_gc, FillSolid);
+# error unsupported platform
 #endif
 }
 
+/**
+  The destructor free all memory and server resources that are used by
+  the bitmap.
+*/
 Fl_Bitmap::~Fl_Bitmap() {
   uncache();
   if (alloc_array) delete[] (uchar *)array;
@@ -514,5 +418,5 @@ Fl_Image *Fl_Bitmap::copy(int W, int H) {
 
 
 //
-// End of "$Id: Fl_Bitmap.cxx 5190 2006-06-09 16:16:34Z mike $".
+// End of "$Id: Fl_Bitmap.cxx 6616 2009-01-01 21:28:26Z matt $".
 //

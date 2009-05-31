@@ -1,9 +1,9 @@
 //
-// "$Id: filename_list.cxx 5190 2006-06-09 16:16:34Z mike $"
+// "$Id: filename_list.cxx 6641 2009-01-20 11:10:29Z fabien $"
 //
 // Filename list routines for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2005 by Bill Spitzak and others.
+// Copyright 1998-2009 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -50,6 +50,29 @@ int fl_casealphasort(struct dirent **a, struct dirent **b) {
 }
 
 
+/**
+   Portable and const-correct wrapper for the scandir() function. 
+   For each file in that directory a "dirent" structure is created. 
+   The only portable thing about a dirent is that dirent.d_name is the nul-terminated file name. 
+   An pointers array to these dirent's is created and a pointer to the array is returned in *list.
+   The number of entries is given as a return value. 
+   If there is an error reading the directory a number less than zero is returned, 
+   and errno has the reason; errno does not work under WIN32. 
+   \param[in] d the name of the directory to list.  It does not matter if it has a trailing slash.
+   \param[out] list table containing the resulting directory listing
+   \param[in] sort sorting functor:
+    - fl_alphasort: The files are sorted in ascending alphabetical order; 
+        upper and lowercase letters are compared according to their ASCII ordering  uppercase before lowercase.
+    - fl_casealphasort: The files are sorted in ascending alphabetical order; 
+        upper and lowercase letters are compared equally case is not significant.
+    - fl_casenumericsort: The files are sorted in ascending "alphanumeric" order, where an attempt is made 
+        to put unpadded numbers in consecutive order; upper and lowercase letters 
+        are compared equally case is not significant.
+    - fl_numericsort: The files are sorted in ascending "alphanumeric" order, where an attempt is made 
+        to put unpadded numbers in consecutive order; upper and lowercase letters are compared 
+        according to their ASCII ordering - uppercase before lowercase. 
+   \return the number of entries if no error, a negative value otherwise.
+*/
 int fl_filename_list(const char *d, dirent ***list,
                      Fl_File_Sort_F *sort) {
 #ifndef HAVE_SCANDIR
@@ -103,5 +126,5 @@ int fl_filename_list(const char *d, dirent ***list,
 }
 
 //
-// End of "$Id: filename_list.cxx 5190 2006-06-09 16:16:34Z mike $".
+// End of "$Id: filename_list.cxx 6641 2009-01-20 11:10:29Z fabien $".
 //

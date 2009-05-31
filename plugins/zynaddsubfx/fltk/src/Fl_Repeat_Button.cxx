@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Repeat_Button.cxx 5219 2006-06-21 06:52:10Z matt $"
+// "$Id: Fl_Repeat_Button.cxx 6616 2009-01-01 21:28:26Z matt $"
 //
 // Repeat button widget for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2005 by Bill Spitzak and others.
+// Copyright 1998-2009 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -66,5 +66,5 @@ int Fl_Repeat_Button::handle(int event) {
 }
 
 //
-// End of "$Id: Fl_Repeat_Button.cxx 5219 2006-06-21 06:52:10Z matt $".
+// End of "$Id: Fl_Repeat_Button.cxx 6616 2009-01-01 21:28:26Z matt $".
 //

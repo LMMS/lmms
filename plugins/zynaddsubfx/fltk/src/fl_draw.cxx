@@ -1,9 +1,9 @@
 //
-// "$Id: fl_draw.cxx 5565 2006-12-21 19:39:26Z mike $"
+// "$Id: fl_draw.cxx 6735 2009-04-01 22:11:57Z engelsman $"
 //
 // Label drawing code for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2005 by Bill Spitzak and others.
+// Copyright 1998-2009 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -33,6 +33,8 @@
 // Aligns them against the inside of the box.
 
 #define min(a,b) ((a)<(b)?(a):(b))
+#include <FL/fl_utf8.h>
+#include <FL/Fl.H>
 #include <FL/fl_draw.H>
 #include <FL/Fl_Image.H>
 
@@ -46,18 +48,73 @@ char fl_draw_shortcut;	// set by fl_labeltypes.cxx
 
 static char* underline_at;
 
-// Copy p to buf, replacing unprintable characters with ^X and \nnn
-// Stop at a newline or if MAXBUF characters written to buffer.
-// Also word-wrap if width exceeds maxw.
-// Returns a pointer to the start of the next line of caharcters.
-// Sets n to the number of characters put into the buffer.
-// Sets width to the width of the string in the current font.
+/** 
+    utf8 multibyte char seq. detection an pass-thru routine.
+    \retval false if no utf8 seq detected, no change made. true if utf8 and d copied with s seq.
+    note that for n bytes copied dest incremented of n, but s of n-1 for compatible loop use see below.
+*/
+#define C_IN(c,a,b) ((c)>=(a) && (c)<=(b)) 
+#define C_UTF8(c)   C_IN(c,0x80,0xBF)
 
-static const char*
-expand(const char* from, char* buf, double maxw, int& n, double &width,
-       int wrap, int draw_symbols) {
+static bool handle_utf8_seq(const char * &s,char * &d) {
+  register const unsigned char* p=(const unsigned char*)s;
+  if (p[0] < 0xc2 || p[0] > 0xf4)
+    return false; // not adressed in this function
+  else if ( C_IN(p[0], 0xc2, 0xdf) && C_UTF8(p[1]) ) {
+    d[0]=s[0]; d[1]=s[1];
+    d+=2; s++;
+    // non-overlong 2-byte
+  }
+  else if ( p[0]==0xe0 && C_IN(p[1], 0xa0, 0xbf) && C_UTF8(p[2]) ) {
+    d[0]=s[0]; d[1]=s[1];d[2]=s[2];
+    d+=3; s+=2;
+    //  excluding overlongs
+  }
+  else if (p[0]==0xed && C_IN(p[1], 0x80, 0x9f) && C_UTF8(p[2]) ) {
+    d[0]=s[0]; d[1]=s[1];d[2]=s[2];
+    d+=3; s+=2;
+    //  excluding surrogates
+  }
+  else if (p[0]!=0xed && C_IN(p[0], 0xe1, 0xef) && C_UTF8(p[1]) && C_UTF8(p[2]) ) {
+    d[0]=s[0]; d[1]=s[1];d[2]=s[2];
+    d+=3; s+=2;
+    // straight 3-byte
+  }
+  else if (p[0]==0xf0 && C_IN(p[1], 0x90, 0xbf)   && C_UTF8(p[2]) && C_UTF8(p[3]) ) {
+    d[0]=s[0]; d[1]=s[1]; d[2]=s[2]; d[3]=s[3];
+    d+=4; s+=3;
+    // planes 1-3
+  }
+  else if (C_IN(p[0], 0xf1, 0xf3) && C_UTF8(p[1]) && C_UTF8(p[2]) && C_UTF8(p[3]) ) {
+    d[0]=s[0]; d[1]=s[1]; d[2]=s[2]; d[3]=s[3];
+    d+=4; s+=3;
+    // planes 4-15
+  }
+  else if (p[0]==0xf4 && C_IN(p[1], 0x80, 0x8f)   && C_UTF8(p[2]) && C_UTF8(p[3]) ) {
+    d[0]=s[0]; d[1]=s[1]; d[2]=s[2]; d[3]=s[3];
+    d+=4; s+=3;
+    // planes 16
+  } else { // non utf8 compliant, maybe CP125x or broken utf8 string
+    // fprintf(stderr, "Not UTF8 char \n");
+    return false; 
+  }
+  return true; //  we did handled and copied the utf8 multibyte char seq.
+}
+
+/**
+ Copy \p from to \p buf, replacing unprintable characters with ^X and \\nnn.
+
+ Stop at a newline or if MAXBUF characters written to buffer.
+ Also word-wrap if width exceeds maxw.
+ Returns a pointer to the start of the next line of characters.
+ Sets n to the number of characters put into the buffer.
+ Sets width to the width of the string in the current font.
+*/
+const char*
+fl_expand_text(const char* from, char* buf, int maxbuf, double maxw, int& n, 
+	double &width, int wrap, int draw_symbols) {
   char* o = buf;
-  char* e = buf+(MAXBUF-4);
+  char* e = buf+(maxbuf-4);
   underline_at = 0;
   char* word_end = o;
   const char* word_start = from;
@@ -88,19 +145,22 @@ expand(const char* from, char* buf, double maxw, int& n, double &width,
     if (o > e) break; // don't overflow buffer
 
     if (c == '\t') {
-      for (c = (o-buf)%8; c<8 && o<e; c++) *o++ = ' ';
+      for (c = fl_utf_nb_char((uchar*)buf, o-buf)%8; c<8 && o<e; c++) 
+           *o++ = ' ';
     } else if (c == '&' && fl_draw_shortcut && *(p+1)) {
       if (*(p+1) == '&') {p++; *o++ = '&';}
       else if (fl_draw_shortcut != 2) underline_at = o;
     } else if (c < ' ' || c == 127) { // ^X
       *o++ = '^';
       *o++ = c ^ 0x40;
+    } else  if (handle_utf8_seq(p, o)) { // figure out if we have an utf8 valid sequence before we determine the nbsp test validity:
 #ifdef __APPLE__
     } else if (c == 0xCA) { // non-breaking space in MacRoman
 #else
     } else if (c == 0xA0) { // non-breaking space in ISO 8859
 #endif
       *o++ = ' ';
+       
     } else if (c == '@' && draw_symbols) { // Symbol???
       if (p[1] && p[1] != '@')  break;
       *o++ = c;
@@ -116,6 +176,11 @@ expand(const char* from, char* buf, double maxw, int& n, double &width,
   return p;
 }
 
+/**
+  The same as fl_draw(const char*,int,int,int,int,Fl_Align,Fl_Image*,int) with
+  the addition of the \p callthis parameter, which is a pointer to a text drawing
+  function such as fl_draw(const char*, int, int, int) to do the real work
+*/
 void fl_draw(
     const char* str,	// the (multi-line) string
     int x, int y, int w, int h,	// bounding box
@@ -158,13 +223,15 @@ void fl_draw(
 
   symtotal = symwidth[0] + symwidth[1];
 
+  if (str) {
   for (p = str, lines=0; p;) {
-    e = expand(p, buf, w - symtotal, buflen, width, align&FL_ALIGN_WRAP,
-               draw_symbols);
+      e = fl_expand_text(p, buf, MAXBUF, w - symtotal, buflen, width, 
+		align&FL_ALIGN_WRAP, draw_symbols);
     lines++;
     if (!*e || (*e == '@' && e[1] != '@' && draw_symbols)) break;
     p = e;
   }
+  } else lines = 0;
 
   if ((symwidth[0] || symwidth[1]) && lines) {
     if (symwidth[0]) symwidth[0] = lines * fl_height();
@@ -201,8 +268,8 @@ void fl_draw(
   if (str) {
     int desc = fl_descent();
     for (p=str; ; ypos += height) {
-      if (lines>1) e = expand(p, buf, w - symtotal, buflen, width,
-                              align&FL_ALIGN_WRAP, draw_symbols);
+      if (lines>1) e = fl_expand_text(p, buf, MAXBUF, w - symtotal, buflen, 
+				width, align&FL_ALIGN_WRAP, draw_symbols);
       else e = "";
 
       if (width > symoffset) symoffset = (int)(width + 0.5);
@@ -260,19 +327,41 @@ void fl_draw(
   }
 }
 
+/**
+  Fancy string drawing function which is used to draw all the labels.
+
+  The string is formatted and aligned inside the passed box.
+  Handles '\\t' and '\\n', expands all other control characters to '^X',
+  and aligns inside or against the edges of the box.
+  See Fl_Widget::align() for values of \p align. The value FL_ALIGN_INSIDE
+  is ignored, as this function always prints inside the box.
+  If \p img is provided and is not \p NULL, the image is drawn above or
+  below the text as specified by the \p align value.
+  The \p draw_symbols argument specifies whether or not to look for symbol
+  names starting with the '\@' character'
+  The text length is limited to 1024 characters per line.
+*/
 void fl_draw(
-  const char* str,	// the (multi-line) string
-  int x, int y, int w, int h,	// bounding box
+  const char* str,
+  int x, int y, int w, int h,
   Fl_Align align,
   Fl_Image* img,
   int draw_symbols) {
   if ((!str || !*str) && !img) return;
   if (w && h && !fl_not_clipped(x, y, w, h) && (align & FL_ALIGN_INSIDE)) return;
-  if (align & FL_ALIGN_CLIP) fl_clip(x, y, w, h);
+  if (align & FL_ALIGN_CLIP) fl_push_clip(x, y, w, h);
   fl_draw(str, x, y, w, h, align, fl_draw, img, draw_symbols);
   if (align & FL_ALIGN_CLIP) fl_pop_clip();
 }
 
+/**
+  Measure how wide and tall the string will be when printed by the
+  fl_draw() function with \p align parameter. If the incoming \p w
+  is non-zero it will wrap to that width.
+  \param[in] str nul-terminated string
+  \param[out] w,h width and height of string in current font
+  \param[in] draw_symbols non-zero to enable @@symbol handling [default=1]
+*/
 void fl_measure(const char* str, int& w, int& h, int draw_symbols) {
   if (!str || !*str) {w = 0; h = 0; return;}
   h = fl_height();
@@ -281,7 +370,7 @@ void fl_measure(const char* str, int& w, int& h, int draw_symbols) {
   char buf[MAXBUF];
   int buflen;
   int lines;
-  double width;
+  double width=0;
   int W = 0;
   char symbol[2][255], *symptr;
   int symwidth[2], symtotal;
@@ -313,7 +402,9 @@ void fl_measure(const char* str, int& w, int& h, int draw_symbols) {
   symtotal = symwidth[0] + symwidth[1];
   
   for (p = str, lines=0; p;) {
-    e = expand(p, buf, w - symtotal, buflen, width, w != 0, draw_symbols);
+//    e = expand(p, buf, w - symtotal, buflen, width, w != 0, draw_symbols);
+    e = fl_expand_text(p, buf, MAXBUF, w - symtotal, buflen, width, 
+			w != 0, draw_symbols);
     if ((int)ceil(width) > W) W = (int)ceil(width);
     lines++;
     if (!*e || (*e == '@' && draw_symbols)) break;
@@ -332,5 +423,5 @@ void fl_measure(const char* str, int& w, int& h, int draw_symbols) {
 }
 
 //
-// End of "$Id: fl_draw.cxx 5565 2006-12-21 19:39:26Z mike $".
+// End of "$Id: fl_draw.cxx 6735 2009-04-01 22:11:57Z engelsman $".
 //

@@ -1,9 +1,9 @@
 //
-// "$Id:$"
+// "$Id: names.h 6731 2009-03-31 22:41:10Z greg.ercolano $"
 //
 // Event names header file for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2007 by Bill Spitzak and others.
+// Copyright 1998-2009 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -30,7 +30,7 @@
 #ifndef FL_NAMES_H
 #define FL_NAMES_H
 
-char *fl_eventnames[] =
+const char * const fl_eventnames[] =
 {
   "FL_NO_EVENT",
   "FL_PUSH",
@@ -58,7 +58,7 @@ char *fl_eventnames[] =
   "FL_DND_RELEASE",
 };
 
-char *fl_fontnames[] =
+const char * const fl_fontnames[] =
 {
   "FL_HELVETICA",
   "FL_HELVETICA_BOLD",
@@ -81,5 +81,5 @@ char *fl_fontnames[] =
 #endif /* FL_NAMES_H */
 
 //
-// End of "$Id:$".
+// End of "$Id: names.h 6731 2009-03-31 22:41:10Z greg.ercolano $".
 //

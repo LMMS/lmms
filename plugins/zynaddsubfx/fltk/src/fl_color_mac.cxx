@@ -1,9 +1,9 @@
 //
-// "$Id: fl_color_mac.cxx 5190 2006-06-09 16:16:34Z mike $"
+// "$Id: fl_color_mac.cxx 6616 2009-01-01 21:28:26Z matt $"
 //
 // MacOS color functions for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2005 by Bill Spitzak and others.
+// Copyright 1998-2009 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -66,13 +66,7 @@ void fl_color(Fl_Color i) {
     g = c>>16;
     b = c>> 8;
   }
-#ifdef __APPLE_QD__
-  RGBColor rgb; 
-  rgb.red   = (r<<8)|r;
-  rgb.green = (g<<8)|g;
-  rgb.blue  = (b<<8)|b;
-  RGBForeColor(&rgb);
-#elif defined(__APPLE_QUARTZ__)
+#if defined(__APPLE_QUARTZ__)
   if (!fl_gc) return; // no context yet? We will assign the color later.
   float fr = r/255.0f;
   float fg = g/255.0f;
@@ -86,20 +80,14 @@ void fl_color(Fl_Color i) {
 
 void fl_color(uchar r, uchar g, uchar b) {
   fl_color_ = fl_rgb_color(r, g, b);
-#ifdef __APPLE_QD__
-  RGBColor rgb; 
-  rgb.red   = (r<<8)|r;
-  rgb.green = (g<<8)|g;
-  rgb.blue  = (b<<8)|b;
-  RGBForeColor(&rgb);
-#elif defined(__APPLE_QUARTZ__)
+#if defined(__APPLE_QUARTZ__)
   float fr = r/255.0f;
   float fg = g/255.0f;
   float fb = b/255.0f;
   CGContextSetRGBFillColor(fl_gc, fr, fg, fb, 1.0f);
   CGContextSetRGBStrokeColor(fl_gc, fr, fg, fb, 1.0f);
 #else
-#  error : neither Quickdraw nor Quartz defined
+#  error : Quartz not defined
 #endif
 }
 
@@ -110,5 +98,5 @@ void Fl::set_color(Fl_Color i, unsigned c) {
 }
 
 //
-// End of "$Id: fl_color_mac.cxx 5190 2006-06-09 16:16:34Z mike $".
+// End of "$Id: fl_color_mac.cxx 6616 2009-01-01 21:28:26Z matt $".
 //

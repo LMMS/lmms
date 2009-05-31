@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_FormsPixmap.H 4288 2005-04-16 00:13:17Z mike $"
+// "$Id: Fl_FormsPixmap.H 6614 2009-01-01 16:11:32Z matt $"
 //
 // Forms pixmap header file for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2005 by Bill Spitzak and others.
+// Copyright 1998-2009 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -25,24 +25,39 @@
 //     http://www.fltk.org/str.php
 //
 
+/* \file
+   Fl_FormsPixmap widget . */
+
 #ifndef Fl_FormsPixmap_H
 #define Fl_FormsPixmap_H
 
 #include "Fl_Pixmap.H"
 
+/**
+  \class Fl_FormsPixmap
+  \brief Forms pixmap drawing routines
+*/
 class FL_EXPORT Fl_FormsPixmap : public Fl_Widget {
     Fl_Pixmap *b;
 protected:
     void draw();
 public:
-    Fl_FormsPixmap(Fl_Boxtype, int, int, int, int, const char * = 0);
+    Fl_FormsPixmap(Fl_Boxtype t, int X, int Y, int W, int H, const char *L= 0);
+
     void set(/*const*/char * const * bits);
+
+    /**
+      Set the internal pixmap pointer to an existing pixmap.
+      \param[in] B existing pixmap
+    */
     void Pixmap(Fl_Pixmap *B) {b = B;}
+
+    /** Get the internal pixmap pointer. */
     Fl_Pixmap *Pixmap() const {return b;}
 };
 
 #endif
 
 //
-// End of "$Id: Fl_FormsPixmap.H 4288 2005-04-16 00:13:17Z mike $".
+// End of "$Id: Fl_FormsPixmap.H 6614 2009-01-01 16:11:32Z matt $".
 //

@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_own_colormap.cxx 5190 2006-06-09 16:16:34Z mike $"
+// "$Id: Fl_own_colormap.cxx 6616 2009-01-01 21:28:26Z matt $"
 //
 // Private colormap support for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2005 by Bill Spitzak and others.
+// Copyright 1998-2009 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -37,6 +37,13 @@
 #include <FL/Fl.H>
 #include <FL/x.H>
 
+/** \fn Fl::own_colormap()
+    Makes FLTK use its own colormap.  This may make FLTK display better
+    and will reduce conflicts with other programs that want lots of colors.
+    However the colors may flash as you move the cursor between windows.
+    
+    <P>This does nothing if the current visual is not colormapped.
+*/
 #ifdef WIN32
 // There is probably something relevant to do on MSWindows 8-bit displays
 // but I don't know what it is
@@ -79,5 +86,5 @@ void Fl::own_colormap() {
 #endif
 
 //
-// End of "$Id: Fl_own_colormap.cxx 5190 2006-06-09 16:16:34Z mike $".
+// End of "$Id: Fl_own_colormap.cxx 6616 2009-01-01 21:28:26Z matt $".
 //

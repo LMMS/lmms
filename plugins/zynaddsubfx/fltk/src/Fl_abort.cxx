@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_abort.cxx 5190 2006-06-09 16:16:34Z mike $"
+// "$Id: Fl_abort.cxx 6616 2009-01-01 21:28:26Z matt $"
 //
 // Warning/error message code for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2005 by Bill Spitzak and others.
+// Copyright 1998-2009 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -25,7 +25,7 @@
 //     http://www.fltk.org/str.php
 //
 
-// This method is in it's own source file so that stdlib and stdio
+// This method is in its own source file so that stdlib and stdio
 // do not need to be included in Fl.cxx:
 // You can also override this by redefining all of these.
 
@@ -98,5 +98,5 @@ void (*Fl::error)(const char* format, ...) = ::error;
 void (*Fl::fatal)(const char* format, ...) = ::fatal;
 
 //
-// End of "$Id: Fl_abort.cxx 5190 2006-06-09 16:16:34Z mike $".
+// End of "$Id: Fl_abort.cxx 6616 2009-01-01 21:28:26Z matt $".
 //

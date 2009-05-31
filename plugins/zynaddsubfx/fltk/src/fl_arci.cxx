@@ -1,9 +1,9 @@
 //
-// "$Id: fl_arci.cxx 5518 2006-10-11 01:23:52Z mike $"
+// "$Id: fl_arci.cxx 6716 2009-03-24 01:40:44Z fabien $"
 //
 // Arc (integer) drawing functions for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2006 by Bill Spitzak and others.
+// Copyright 1998-2009 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -25,6 +25,11 @@
 //     http://www.fltk.org/str.php
 //
 
+/**
+  \file fl_arci.cxx
+  \brief Utility functions for drawing circles using integers
+*/
+
 // "integer" circle drawing functions.  These draw the limited
 // circle types provided by X and NT graphics.  The advantage of
 // these is that small ones draw quite nicely (probably due to stored
@@ -40,13 +45,36 @@
 #ifdef WIN32
 #  include <FL/math.h>
 #endif
-#ifdef __APPLE__
-#  include <config.h>
-#endif
+#include <config.h>
 
+/**
+  Draw ellipse sections using integer coordinates.
+  
+  These functions match the rather limited circle drawing code provided by X
+  and WIN32. The advantage over using fl_arc with floating point coordinates
+  is that they are faster because they often use the hardware, and they draw
+  much nicer small circles, since the small sizes are often hard-coded bitmaps.
+
+  If a complete circle is drawn it will fit inside the passed bounding box.
+  The two angles are measured in degrees counterclockwise from 3 o'clock and
+  are the starting and ending angle of the arc, \p a2 must be greater or equal
+  to \p a1.
+
+  fl_arc() draws a series of lines to approximate the arc. Notice that the
+  integer version of fl_arc() has a different number of arguments than the
+  double version fl_arc(double x, double y, double r, double start, double a)
+
+  \param[in] x,y,w,h bounding box of complete circle
+  \param[in] a1,a2 start and end angles of arc measured in degrees
+             counter-clockwise from 3 o'clock. \p a2 must be greater
+	     than or equal to \p a1.
+*/
 void fl_arc(int x,int y,int w,int h,double a1,double a2) {
   if (w <= 0 || h <= 0) return;
-#ifdef WIN32
+
+#if defined(USE_X11)
+  XDrawArc(fl_display, fl_window, fl_gc, x,y,w-1,h-1, int(a1*64),int((a2-a1)*64));
+#elif defined(WIN32)
   int xa = x+w/2+int(w*cos(a1/180.0*M_PI));
   int ya = y+h/2-int(h*sin(a1/180.0*M_PI));
   int xb = x+w/2+int(w*cos(a2/180.0*M_PI));
@@ -55,10 +83,6 @@ void fl_arc(int x,int y,int w,int h,double a1,double a2) {
     if (xa == xb && ya == yb) SetPixel(fl_gc, xa, ya, fl_RGB());
     else Arc(fl_gc, x, y, x+w, y+h, xa, ya, xb, yb);
   } else Arc(fl_gc, x, y, x+w, y+h, xa, ya, xb, yb);
-#elif defined(__APPLE_QD__)
-  Rect r; r.left=x; r.right=x+w; r.top=y; r.bottom=y+h;
-  a1 = a2-a1; a2 = 450-a2;
-  FrameArc(&r, (short int)a2, (short int)a1);
 #elif defined(__APPLE_QUARTZ__)
   a1 = (-a1)/180.0f*M_PI; a2 = (-a2)/180.0f*M_PI;
   float cx = x + 0.5f*w - 0.5f, cy = y + 0.5f*h - 0.5f;
@@ -74,13 +98,28 @@ void fl_arc(int x,int y,int w,int h,double a1,double a2) {
   }
   CGContextStrokePath(fl_gc);
 #else
-  XDrawArc(fl_display, fl_window, fl_gc, x,y,w-1,h-1, int(a1*64),int((a2-a1)*64));
+# error unsupported platform
 #endif
 }
 
+/**
+  Draw filled ellipse sections using integer coordinates.
+  
+  Like fl_arc(), but fl_pie() draws a filled-in pie slice.
+  This slice may extend outside the line drawn by fl_arc();
+  to avoid this use w - 1 and h - 1.
+
+  \param[in] x,y,w,h bounding box of complete circle
+  \param[in] a1,a2 start and end angles of arc measured in degrees
+             counter-clockwise from 3 o'clock. \p a2 must be greater
+	     than or equal to \p a1.
+*/
 void fl_pie(int x,int y,int w,int h,double a1,double a2) {
   if (w <= 0 || h <= 0) return;
-#ifdef WIN32
+
+#if defined(USE_X11)
+  XFillArc(fl_display, fl_window, fl_gc, x,y,w-1,h-1, int(a1*64),int((a2-a1)*64));
+#elif defined(WIN32)
   if (a1 == a2) return;
   int xa = x+w/2+int(w*cos(a1/180.0*M_PI));
   int ya = y+h/2-int(h*sin(a1/180.0*M_PI));
@@ -94,10 +133,6 @@ void fl_pie(int x,int y,int w,int h,double a1,double a2) {
       SetPixel(fl_gc, xa, ya, fl_RGB());
     } else Pie(fl_gc, x, y, x+w, y+h, xa, ya, xb, yb);
   } else Pie(fl_gc, x, y, x+w, y+h, xa, ya, xb, yb); 
-#elif defined(__APPLE_QD__)
-  Rect r; r.left=x; r.right=x+w; r.top=y; r.bottom=y+h;
-  a1 = a2-a1; a2 = 450-a2;
-  PaintArc(&r, (short int)a2, (short int)a1);
 #elif defined(__APPLE_QUARTZ__)
   a1 = (-a1)/180.0f*M_PI; a2 = (-a2)/180.0f*M_PI;
   float cx = x + 0.5f*w - 0.5f, cy = y + 0.5f*h - 0.5f;
@@ -117,10 +152,10 @@ void fl_pie(int x,int y,int w,int h,double a1,double a2) {
   }
   CGContextFillPath(fl_gc);
 #else
-  XFillArc(fl_display, fl_window, fl_gc, x,y,w-1,h-1, int(a1*64),int((a2-a1)*64));
+# error unsupported platform
 #endif
 }
 
 //
-// End of "$Id: fl_arci.cxx 5518 2006-10-11 01:23:52Z mike $".
+// End of "$Id: fl_arci.cxx 6716 2009-03-24 01:40:44Z fabien $".
 //

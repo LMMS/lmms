@@ -1,9 +1,9 @@
 //
-// "$Id: Fl.cxx 5654 2007-02-02 13:52:37Z matt $"
+// "$Id: Fl.cxx 6787 2009-05-14 20:16:09Z engelsman $"
 //
 // Main event handling code for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2006 by Bill Spitzak and others.
+// Copyright 1998-2009 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -25,11 +25,12 @@
 //     http://www.fltk.org/str.php
 //
 
+
 // warning: the Apple Quartz version still uses some Quickdraw calls,
 //          mostly to get around the single active context in QD and 
 //          to implement clipping. This should be changed into pure
 //          Quartz calls in the near future.
-
+#include "config.h"
 #include <FL/Fl.H>
 #include <FL/Fl_Window.H>
 #include <FL/x.H>
@@ -55,7 +56,7 @@ void fl_cleanup_dc_list(void);
 //
 // Globals...
 //
-
+#ifndef FL_DOXYGEN
 Fl_Widget	*Fl::belowmouse_,
 		*Fl::pushed_,
 		*Fl::focus_,
@@ -72,39 +73,78 @@ int		Fl::damage_,
 		Fl::e_clicks,
 		Fl::e_is_click,
 		Fl::e_keysym,
-                Fl::e_original_keysym;
+                Fl::e_original_keysym,
+		Fl::scrollbar_size_ = 16;
+
 char		*Fl::e_text = (char *)"";
 int		Fl::e_length;
 int		Fl::visible_focus_ = 1,
 		Fl::dnd_text_ops_ = 1;
-
 
 Fl_Window *fl_xfocus;	// which window X thinks has focus
 Fl_Window *fl_xmousewin;// which window X thinks has FL_ENTER
 Fl_Window *Fl::grab_;	// most recent Fl::grab()
 Fl_Window *Fl::modal_;	// topmost modal() window
 
+#endif // FL_DOXYGEN
+
 //
 // 'Fl::version()' - Return the API version number...
 //
 
 double
+/**
+  Returns the compiled-in value of the FL_VERSION constant. This
+  is useful for checking the version of a shared library.
+*/
 Fl::version() {
   return FL_VERSION;
 }
 
+/**
+  Gets the default scrollbar size used by 
+  Fl_Browser_,
+  Fl_Help_View,
+  Fl_Scroll, and
+  Fl_Text_Display widgets.
+  \returns The default size for widget scrollbars, in pixels.
+*/
+int Fl::scrollbar_size() {
+  return scrollbar_size_;
+}
 
-//
-// 'Fl:event_inside()' - Return whether or not the mouse event is inside
-//                       the given rectangle.
-//
+/**
+  Sets the default scrollbar size that is used by the
+  Fl_Browser_,
+  Fl_Help_View,
+  Fl_Scroll, and
+  Fl_Text_Display widgets.
+  \param[in] W The new default size for widget scrollbars, in pixels.
+*/
+void Fl::scrollbar_size(int W) {
+  scrollbar_size_ = W;
+}
 
+
+/**
+    Returns whether or not the mouse event is inside the given rectangle.
+    Returns non-zero if the current event_x and event_y
+    put it inside the widget or inside an arbitrary bounding box.  You
+    should always call this rather than doing your own comparison so you
+    are consistent about edge effects.
+*/
 int Fl::event_inside(int xx,int yy,int ww,int hh) /*const*/ {
   int mx = e_x - xx;
   int my = e_y - yy;
   return (mx >= 0 && mx < ww && my >= 0 && my < hh);
 }
 
+/** Returns whether or not the mouse event is inside the given widget.
+    Returns non-zero if the current event_x and event_y
+    put it inside the widget or inside an arbitrary bounding box.  You
+    should always call this rather than doing your own comparison so you
+    are consistent about edge effects.
+*/
 int Fl::event_inside(const Fl_Widget *o) /*const*/ {
   int mx = e_x - o->x();
   int my = e_y - o->y();
@@ -197,12 +237,19 @@ void Fl::repeat_timeout(double time, Fl_Timeout_Handler cb, void *argp) {
   *p = t;
 }
 
+/**
+  Returns true if the timeout exists and has not been called yet.
+*/
 int Fl::has_timeout(Fl_Timeout_Handler cb, void *argp) {
   for (Timeout* t = first_timeout; t; t = t->next)
     if (t->cb == cb && t->arg == argp) return 1;
   return 0;
 }
 
+/**
+  Removes a timeout callback. It is harmless to remove a timeout
+  callback that no longer exists.
+*/
 void Fl::remove_timeout(Fl_Timeout_Handler cb, void *argp) {
   // This version removes all matching timeouts, not just the first one.
   // This may change in the future.
@@ -235,6 +282,37 @@ struct Check {
 };
 static Check *first_check, *next_check, *free_check;
 
+/**
+  FLTK will call this callback just before it flushes the display and
+  waits for events.  This is different than an idle callback because it
+  is only called once, then FLTK calls the system and tells it not to
+  return until an event happens.
+  
+  This can be used by code that wants to monitor the
+  application's state, such as to keep a display up to date. The
+  advantage of using a check callback is that it is called only when no
+  events are pending. If events are coming in quickly, whole blocks of
+  them will be processed before this is called once. This can save
+  significant time and avoid the application falling behind the events.
+  
+  Sample code:
+  
+  \code
+  bool state_changed; // anything that changes the display turns this on
+  
+  void callback(void*) {
+   if (!state_changed) return;
+   state_changed = false;
+   do_expensive_calculation();
+   widget-&gt;redraw();
+  }
+  
+  main() {
+   Fl::add_check(callback);
+   return Fl::run();
+  }
+  \endcode
+*/
 void Fl::add_check(Fl_Timeout_Handler cb, void *argp) {
   Check* t = free_check;
   if (t) free_check = t->next;
@@ -246,6 +324,10 @@ void Fl::add_check(Fl_Timeout_Handler cb, void *argp) {
   first_check = t;
 }
 
+/**
+  Removes a check callback. It is harmless to remove a check
+  callback that no longer exists.
+*/
 void Fl::remove_check(Fl_Timeout_Handler cb, void *argp) {
   for (Check** p = &first_check; *p;) {
     Check* t = *p;
@@ -261,9 +343,8 @@ void Fl::remove_check(Fl_Timeout_Handler cb, void *argp) {
 }
 
 /**
- * Return 1, if a check with the same handler and data pointer 
- * is pending, 0 otherwise.
- */
+  Returns 1 if the check exists and has not been called yet, 0 otherwise.
+*/
 int Fl::has_check(Fl_Timeout_Handler cb, void *argp) {
   for (Check** p = &first_check; *p;) {
     Check* t = *p;
@@ -302,6 +383,9 @@ void (*Fl::idle)(); // see Fl_add_idle.cxx for the add/remove functions
 extern int fl_ready(); // in Fl_<platform>.cxx
 extern int fl_wait(double time); // in Fl_<platform>.cxx
 
+/**
+  See int wait()
+*/
 double Fl::wait(double time_to_wait) {
   // delete all widgets that were listed during callbacks
   do_widget_deletion();
@@ -323,6 +407,8 @@ double Fl::wait(double time_to_wait) {
     if (idle) time_to_wait = 0.0;
   }
   flush();
+  if (idle && !in_idle) // 'idle' may have been set within flush()
+    time_to_wait = 0.0;
   return fl_wait(time_to_wait);
 
 #else
@@ -369,6 +455,8 @@ double Fl::wait(double time_to_wait) {
   } else {
     // do flush first so that user sees the display:
     flush();
+    if (idle && !in_idle) // 'idle' may have been set within flush()
+      time_to_wait = 0.0;
     return fl_wait(time_to_wait);
   }
 #endif
@@ -376,6 +464,13 @@ double Fl::wait(double time_to_wait) {
 
 #define FOREVER 1e20
 
+/**
+  As long as any windows are displayed this calls Fl::wait()
+  repeatedly.  When all the windows are closed it returns zero
+  (supposedly it would return non-zero on any errors, but FLTK calls
+  exit directly for these).  A normal program will end main()
+  with return Fl::run();.
+*/
 int Fl::run() {
   while (Fl_X::first) wait(FOREVER);
   return 0;
@@ -398,17 +493,76 @@ static Fl_Win32_At_Exit win32_at_exit;
 
 
 
+/**
+  Waits until "something happens" and then returns.  Call this
+  repeatedly to "run" your program.  You can also check what happened
+  each time after this returns, which is quite useful for managing
+  program state.
+  
+  What this really does is call all idle callbacks, all elapsed
+  timeouts, call Fl::flush() to get the screen to update, and
+  then wait some time (zero if there are idle callbacks, the shortest of
+  all pending timeouts, or infinity), for any events from the user or
+  any Fl::add_fd() callbacks.  It then handles the events and
+  calls the callbacks and then returns.
+  
+  The return value of the first form is non-zero if there are
+  any visible windows - this may change in future versions of
+  FLTK.
+  
+  The second form waits a maximum of <i>time</i>
+  seconds.  <i>It can return much sooner if something happens.</i>
+  
+  The return value is positive if an event or fd happens before the
+  time elapsed.  It is zero if nothing happens (on Win32 this will only
+  return zero if <i>time</i> is zero).  It is negative if an error
+  occurs (this will happen on UNIX if a signal happens).
+*/
 int Fl::wait() {
   if (!Fl_X::first) return 0;
   wait(FOREVER);
   return Fl_X::first != 0; // return true if there is a window
 }
 
+/**
+  Same as Fl::wait(0).  Calling this during a big calculation
+  will keep the screen up to date and the interface responsive:
+  
+  \code
+  while (!calculation_done()) {
+  calculate();
+  Fl::check();
+  if (user_hit_abort_button()) break;
+  }
+  \endcode
+  
+  The returns non-zero if any windows are displayed, and 0 if no
+  windows are displayed (this is likely to change in future versions of
+  FLTK).
+*/
 int Fl::check() {
   wait(0.0);
   return Fl_X::first != 0; // return true if there is a window
 }
 
+/**
+  This is similar to Fl::check() except this does \e not
+  call Fl::flush() or any callbacks, which is useful if your
+  program is in a state where such callbacks are illegal.  This returns
+  true if Fl::check() would do anything (it will continue to
+  return true until you call Fl::check() or Fl::wait()).
+  
+  \code
+  while (!calculation_done()) {
+  calculate();
+  if (Fl::ready()) {
+    do_expensive_cleanup();
+    Fl::check();
+    if (user_hit_abort_button()) break;
+  }
+  }
+  \endcode
+*/
 int Fl::ready() {
 #if ! defined( WIN32 )  &&  ! defined(__APPLE__)
   if (first_timeout) {
@@ -424,17 +578,19 @@ int Fl::ready() {
 ////////////////////////////////////////////////////////////////
 // Window list management:
 
+#ifndef FL_DOXYGEN
 Fl_X* Fl_X::first;
+#endif
 
 Fl_Window* fl_find(Window xid) {
   Fl_X *window;
   for (Fl_X **pp = &Fl_X::first; (window = *pp); pp = &window->next)
-#ifdef __APPLE_QD__
-    if (window->xid == xid && !window->w->window()) {
+#if defined(WIN32) || defined(USE_X11)
+   if (window->xid == xid) {
 #elif defined(__APPLE_QUARTZ__)
     if (window->xid == xid && !window->w->window()) {
 #else
-    if (window->xid == xid) {
+# error unsupported platform
 #endif // __APPLE__
       if (window != Fl_X::first && !Fl::modal()) {
 	// make this window be first to speed up searches
@@ -448,25 +604,58 @@ Fl_Window* fl_find(Window xid) {
   return 0;
 }
 
+/**
+  Returns the first top-level window in the list of shown() windows.  If
+  a modal() window is shown this is the top-most modal window, otherwise
+  it is the most recent window to get an event.
+  
+  The second form sets the window that is returned by
+  first_window.  The window is removed from wherever it is in the
+  list and inserted at the top.  This is not done if Fl::modal()
+  is on or if the window is not shown(). Because the first window
+  is used to set the "parent" of modal windows, this is often
+  useful.
+*/
 Fl_Window* Fl::first_window() {
   Fl_X* i = Fl_X::first;
   return i ? i->w : 0;
 }
 
+/**
+  Returns the next top-level window in the list of shown() windows.  You can
+  use this call to iterate through all the windows that are shown().
+*/
 Fl_Window* Fl::next_window(const Fl_Window* window) {
   Fl_X* i = Fl_X::i(window)->next;
   return i ? i->w : 0;
 }
 
+/**
+  See Fl_Window* first_window()
+*/
 void Fl::first_window(Fl_Window* window) {
   if (!window || !window->shown()) return;
   fl_find(fl_xid(window));
 }
 
+/**
+  Redraws all widgets.
+*/
 void Fl::redraw() {
   for (Fl_X* i = Fl_X::first; i; i = i->next) i->w->redraw();
 }
 
+/**
+  Causes all the windows that need it to be redrawn and graphics forced
+  out through the pipes.
+  
+  This is what wait() does before looking for events.
+
+  Note: in multi-threaded applications you should only call Fl::flush()
+  from the main thread. If a child thread needs to trigger a redraw event,
+  it should instead call Fl::awake() to get the main thread to process the
+  event queue.
+*/
 void Fl::flush() {
   if (damage()) {
     damage_ = 0;
@@ -479,19 +668,15 @@ void Fl::flush() {
       if (i->region) {XDestroyRegion(i->region); i->region = 0;}
     }
   }
-
-#ifdef WIN32
+#if defined(USE_X11)
+  if (fl_display) XFlush(fl_display);
+#elif defined(WIN32)
   GdiFlush();
-#elif defined(__APPLE_QD__)
-  GrafPtr port;
-  GetPort( &port );
-  if ( port )
-    QDFlushPortBuffer( port, 0 );
 #elif defined (__APPLE_QUARTZ__)
   if (fl_gc)
     CGContextFlush(fl_gc);
 #else
-  if (fl_display) XFlush(fl_display);
+# error unsupported platform
 #endif
 }
 
@@ -505,6 +690,20 @@ struct handler_link {
 
 static handler_link *handlers = 0;
 
+/**
+  Install a function to parse unrecognized events.  If FLTK cannot
+  figure out what to do with an event, it calls each of these functions
+  (most recent first) until one of them returns non-zero.  If none of
+  them returns non zero then the event is ignored.  Events that cause
+  this to be called are:
+  
+  - FL_SHORTCUT events that are not recognized by any  widget.
+    This lets you provide global shortcut keys.
+  - System events that FLTK does not recognize.  See fl_xevent.
+  - \e Some other events when the widget FLTK selected  returns
+    zero from its handle() method.  Exactly which  ones may change
+    in future versions, however.
+*/
 void Fl::add_handler(int (*ha)(int)) {
   handler_link *l = new handler_link;
   l->handle = ha;
@@ -512,6 +711,9 @@ void Fl::add_handler(int (*ha)(int)) {
   handlers = l;
 }
 
+/**
+  Removes a previously added event handler.
+*/
 void Fl::remove_handler(int (*ha)(int)) {
   handler_link *l, *p;
 
@@ -540,6 +742,18 @@ static int send_handlers(int e) {
 
 Fl_Widget* fl_oldfocus; // kludge for Fl_Group...
 
+/**
+    Sets the widget that will receive FL_KEYBOARD events.
+    
+    If you change Fl::focus(), the previous widget and all
+    parents (that don't contain the new widget) are sent FL_UNFOCUS
+    events.  Changing the focus does \e not send FL_FOCUS to
+    this or any widget, because sending FL_FOCUS is supposed to
+    \e test if the widget wants the focus (by it returning non-zero from
+    handle()).
+    
+    \sa Fl_Widget::take_focus()
+*/
 void Fl::focus(Fl_Widget *o) {
   if (o && !o->visible_focus()) return;
   if (grab()) return; // don't do anything while grab is on
@@ -568,6 +782,20 @@ void Fl::focus(Fl_Widget *o) {
 
 static char dnd_flag = 0; // make 'belowmouse' send DND_LEAVE instead of LEAVE
 
+/**
+    Sets the widget that is below the mouse.  This is for
+    highlighting buttons.  It is not used to send FL_PUSH or 
+    FL_MOVE directly, for several obscure reasons, but those events
+    typically go to this widget.  This is also the first widget tried for 
+    FL_SHORTCUT events.
+    
+    If you change the belowmouse widget, the previous one and all
+    parents (that don't contain the new widget) are sent FL_LEAVE
+    events.  Changing this does \e not send FL_ENTER to this
+    or any widget, because sending FL_ENTER is supposed to \e test
+    if the widget wants the mouse (by it returning non-zero from 
+    handle()).
+*/
 void Fl::belowmouse(Fl_Widget *o) {
   if (grab()) return; // don't do anything while grab is on
   Fl_Widget *p = belowmouse_;
@@ -582,7 +810,19 @@ void Fl::belowmouse(Fl_Widget *o) {
   }
 }
 
-void Fl::pushed(Fl_Widget *o) {
+/**
+    Sets the widget that is being pushed. FL_DRAG or 
+    FL_RELEASE (and any more FL_PUSH) events will be sent to
+    this widget.
+    
+    If you change the pushed widget, the previous one and all parents
+    (that don't contain the new widget) are sent FL_RELEASE
+    events.  Changing this does \e not send FL_PUSH to this
+    or any widget, because sending FL_PUSH is supposed to \e test
+    if the widget wants the mouse (by it returning non-zero from 
+    handle()).
+*/
+ void Fl::pushed(Fl_Widget *o) {
   pushed_ = o;
 }
 
@@ -703,6 +943,10 @@ static int send(int event, Fl_Widget* to, Fl_Window* window) {
 }
 
 int Fl::handle(int e, Fl_Window* window)
+/**
+  Sends the event to a window for processing.  Returns non-zero if any
+  widget uses the event.
+*/
 {
   e_number = e;
   if (fl_local_grab) return fl_local_grab(e);
@@ -717,11 +961,11 @@ int Fl::handle(int e, Fl_Window* window)
     return 1;
 
   case FL_SHOW:
-    wi->show(); // this calls Fl_Widget::show(), not Fl_Window::show()
+    wi->Fl_Widget::show(); // this calls Fl_Widget::show(), not Fl_Window::show()
     return 1;
 
   case FL_HIDE:
-    wi->hide(); // this calls Fl_Widget::hide(), not Fl_Window::hide()
+    wi->Fl_Widget::hide(); // this calls Fl_Widget::hide(), not Fl_Window::hide()
     return 1;
 
   case FL_PUSH:
@@ -955,7 +1199,7 @@ void Fl_Window::hide() {
   fl_throw_focus(this);
   handle(FL_HIDE);
 
-#ifdef WIN32
+#if defined(WIN32)
   // this little trick keeps the current clipboard alive, even if we are about
   // to destroy the window that owns the selection.
   if (GetClipboardOwner()==ip->xid) {
@@ -973,10 +1217,10 @@ void Fl_Window::hide() {
       fl_release_dc(fl_window, fl_gc);
       fl_window = (HWND)-1;
       fl_gc = 0;
+# ifdef USE_CAIRO
+      if (Fl::cairo_autolink_context()) Fl::cairo_make_current((Fl_Window*) 0);
+# endif
     }
-#elif defined(__APPLE_QD__)
-  if ( ip->xid == fl_window && !parent() )
-    fl_window = 0;
 #elif defined(__APPLE_QUARTZ__)
   Fl_X::q_release_context(ip);
   if ( ip->xid == fl_window && !parent() )
@@ -985,7 +1229,12 @@ void Fl_Window::hide() {
 
   if (ip->region) XDestroyRegion(ip->region);
 
-#ifdef WIN32
+#if defined(USE_X11)
+# if USE_XFT
+  fl_destroy_xft_draw(ip->xid);
+# endif
+  XDestroyWindow(fl_display, ip->xid);
+#elif defined(WIN32)
   // this little trickery seems to avoid the popup window stacking problem
   HWND p = GetForegroundWindow();
   if (p==GetParent(ip->xid)) {
@@ -993,15 +1242,10 @@ void Fl_Window::hide() {
     ShowWindow(p, SW_SHOWNA);
   }
   XDestroyWindow(fl_display, ip->xid);
-#elif defined(__APPLE_QD__)
-  MacDestroyWindow(this, ip->xid);
 #elif defined(__APPLE_QUARTZ__)
   MacDestroyWindow(this, ip->xid);
 #else
-# if USE_XFT
-  fl_destroy_xft_draw(ip->xid);
-# endif
-  XDestroyWindow(fl_display, ip->xid);
+# error unsupported platform
 #endif
   
 #ifdef WIN32
@@ -1019,7 +1263,7 @@ Fl_Window::~Fl_Window() {
 // FL_SHOW and FL_HIDE are called whenever the visibility of this widget
 // or any parent changes.  We must correctly map/unmap the system's window.
 
-// For top-level windows it is assummed the window has already been
+// For top-level windows it is assumed the window has already been
 // mapped or unmapped!!!  This is because this should only happen when
 // Fl_Window::show() or Fl_Window::hide() is called, or in response to
 // iconize/deiconize events from the system.
@@ -1031,12 +1275,12 @@ int Fl_Window::handle(int ev)
     case FL_SHOW:
       if (!shown()) show();
       else {
-#ifdef __APPLE_QD__
-        MacMapWindow(this, fl_xid(this));
+#if defined(USE_X11) || defined(WIN32)
+        XMapWindow(fl_display, fl_xid(this)); // extra map calls are harmless
 #elif defined(__APPLE_QUARTZ__)
         MacMapWindow(this, fl_xid(this));
 #else
-        XMapWindow(fl_display, fl_xid(this)); // extra map calls are harmless
+# error unsupported platform
 #endif // __APPLE__
       }
       break;
@@ -1053,13 +1297,13 @@ int Fl_Window::handle(int ev)
 	 Fl_Widget* p = parent(); for (;p->visible();p = p->parent()) {}
 	 if (p->type() >= FL_WINDOW) break; // don't do the unmap
 	}
-#ifdef __APPLE_QD__
-	MacUnmapWindow(this, fl_xid(this));
+#if defined(USE_X11) || defined(WIN32)
+	XUnmapWindow(fl_display, fl_xid(this));
 #elif defined(__APPLE_QUARTZ__)
 	MacUnmapWindow(this, fl_xid(this));
 #else
-	XUnmapWindow(fl_display, fl_xid(this));
-#endif // __APPLE__
+# error platform unsupported
+#endif
       }
       break;
     }
@@ -1071,15 +1315,44 @@ int Fl_Window::handle(int ev)
 }
 
 ////////////////////////////////////////////////////////////////
-// Back compatability cut & paste functions for fltk 1.1 only:
+// Back compatibility cut & paste functions for fltk 1.1 only:
 
+/** Back-compatibility only: The single-argument call can be used to
+    move the selection to another widget or to set the owner to
+    NULL, without changing the actual text of the
+    selection. FL_SELECTIONCLEAR is sent to the previous
+    selection owner, if any.
+    
+    <i>Copying the buffer every time the selection is changed is
+    obviously wasteful, especially for large selections.  An interface will
+    probably be added in a future version to allow the selection to be made
+    by a callback function.  The current interface will be emulated on top
+    of this.</i>
+*/
 void Fl::selection_owner(Fl_Widget *owner) {selection_owner_ = owner;}
 
+/**
+  Changes the current selection.  The block of text is
+  copied to an internal buffer by FLTK (be careful if doing this in
+  response to an FL_PASTE as this \e may be the same buffer
+  returned by event_text()).  The selection_owner()
+  widget is set to the passed owner.
+*/
 void Fl::selection(Fl_Widget &owner, const char* text, int len) {
   selection_owner_ = &owner;
   Fl::copy(text, len, 0);
 }
 
+/** Backward compatibility only:
+  Set things up so the receiver widget will be called with an  FL_PASTE event some
+  time in the future for the specified clipboard. The reciever
+  should be prepared to be called \e directly by this, or for
+  it to happen \e later, or possibly <i>not at all</i>.  This
+  allows the window system to take as long as necessary to retrieve
+  the paste buffer (or even to screw up completely) without complex
+  and error-prone synchronization code in FLTK.
+  \see Fl::paste(Fl_Widget &receiver, int clipboard)
+*/
 void Fl::paste(Fl_Widget &receiver) {
   Fl::paste(receiver, 0);
 }
@@ -1171,24 +1444,21 @@ void Fl_Widget::damage(uchar fl, int X, int Y, int W, int H) {
   if (wi->damage()) {
     // if we already have damage we must merge with existing region:
     if (i->region) {
-#ifdef WIN32
+#if defined(USE_X11)
+      XRectangle R;
+      R.x = X; R.y = Y; R.width = W; R.height = H;
+      XUnionRectWithRegion(&R, i->region, i->region);
+#elif defined(WIN32)
       Fl_Region R = XRectangleRegion(X, Y, W, H);
       CombineRgn(i->region, i->region, R, RGN_OR);
       XDestroyRegion(R);
-#elif defined(__APPLE_QD__)
-      Fl_Region R = NewRgn(); 
-      SetRectRgn(R, X, Y, X+W, Y+H);
-      UnionRgn(R, i->region, i->region);
-      DisposeRgn(R);
 #elif defined(__APPLE_QUARTZ__)
       Fl_Region R = NewRgn();
       SetRectRgn(R, X, Y, X+W, Y+H);
       UnionRgn(R, i->region, i->region);
       DisposeRgn(R);
 #else
-      XRectangle R;
-      R.x = X; R.y = Y; R.width = W; R.height = H;
-      XUnionRectWithRegion(&R, i->region, i->region);
+# error unsupported platform
 #endif
     }
     wi->damage_ |= fl;
@@ -1200,7 +1470,6 @@ void Fl_Widget::damage(uchar fl, int X, int Y, int W, int H) {
   }
   Fl::damage(FL_DAMAGE_CHILD);
 }
-
 void Fl_Window::flush() {
   make_current();
 //if (damage() == FL_DAMAGE_EXPOSE && can_boxcheat(box())) fl_boxcheat = this;
@@ -1222,8 +1491,17 @@ void Fl_Window::flush() {
 static int		num_dwidgets = 0, alloc_dwidgets = 0;
 static Fl_Widget	**dwidgets = 0;
 
-void
-Fl::delete_widget(Fl_Widget *wi) {
+/** 
+  Schedules a widget for deletion at the next call to the event loop.
+  Use this method to delete a widget inside a callback function. 
+  To avoid early deletion of widgets, this function
+  should be called toward the end of a callback and only after any call 
+  to the event loop (Fl:wait(), Fl::flush(), fl_ask(), etc).
+
+  When deleting groups or windows, you must only delete the group or
+  window widget and not the individual child widgets.
+*/
+void Fl::delete_widget(Fl_Widget *wi) {
   if (!wi) return;
 
   if (num_dwidgets >= alloc_dwidgets) {
@@ -1243,9 +1521,18 @@ Fl::delete_widget(Fl_Widget *wi) {
   num_dwidgets ++;
 }
 
+/** 
+    Deletes widgets previously scheduled for deletion.
+    
+    This is for internal use only. You should never call this directly.
 
-void
-Fl::do_widget_deletion() {
+    Fl::do_widget_deletion() is called from the FLTK event loop or whenever
+    you call Fl::wait(). The previously scheduled widgets are deleted in the
+    same order they were scheduled by calling Fl::delete_widget().
+
+    \see Fl::delete_widget(Fl_Widget *wi)
+*/
+void Fl::do_widget_deletion() {
   if (!num_dwidgets) return;
 
   for (int i = 0; i < num_dwidgets; i ++)
@@ -1258,6 +1545,51 @@ static Fl_Widget ***widget_watch = 0;
 static int num_widget_watch = 0;
 static int max_widget_watch = 0;
 
+/**
+  Adds a widget pointer to the widget watch list.
+  
+  \note Internal use only, please use class Fl_Widget_Tracker instead.
+
+  This can be used, if it is possible that a widget might be deleted during
+  a callback or similar function. The widget pointer must be added to the
+  watch list before calling the callback. After the callback the widget
+  pointer can be queried, if it is NULL. \e If it is NULL, then the widget has been
+  deleted during the callback and must not be accessed anymore. If the widget
+  pointer is \e not NULL, then the widget has not been deleted and can be accessed
+  safely.
+
+  After accessing the widget, the widget pointer must be released from the
+  watch list by calling Fl::release_widget_pointer().
+
+  Example for a button that is clicked (from its handle() method):
+  \code
+    Fl_Widget *wp = this;		// save 'this' in a pointer variable
+    Fl::watch_widget_pointer(wp);	// add the pointer to the watch list
+    set_changed();			// set the changed flag
+    do_callback();			// call the callback
+    if (!wp) {				// the widget has been deleted
+
+      // DO NOT ACCESS THE DELETED WIDGET !
+
+    } else {				// the widget still exists
+      clear_changed();			// reset the changed flag
+    }
+
+    Fl::release_widget_pointer(wp);	// remove the pointer from the watch list
+   \endcode
+
+   This works, because all widgets call Fl::clear_widget_pointer() in their
+   destructors.
+
+   \see Fl::release_widget_pointer()
+   \see Fl::clear_widget_pointer()
+
+   An easier and more convenient method to control widget deletion during
+   callbacks is to use the class Fl_Widget_Tracker with a local (automatic)
+   variable.
+
+   \see class Fl_Widget_Tracker
+*/
 void Fl::watch_widget_pointer(Fl_Widget *&w) 
 {
   Fl_Widget **wp = &w;
@@ -1265,31 +1597,67 @@ void Fl::watch_widget_pointer(Fl_Widget *&w)
   for (i=0; i<num_widget_watch; ++i) {
     if (widget_watch[i]==wp) return;
   }
-  for (i=0; i<num_widget_watch; ++i) {
-    if (widget_watch[i]==0L) {
-      widget_watch[i] = wp;
-      return;
-    }
-  }
   if (num_widget_watch==max_widget_watch) {
     max_widget_watch += 8;
     widget_watch = (Fl_Widget***)realloc(widget_watch, sizeof(Fl_Widget**)*max_widget_watch);
   }
   widget_watch[num_widget_watch++] = wp;
+#ifdef DEBUG
+  printf ("\nwatch_widget_pointer:   (%d/%d) %8p => %8p\n",
+    num_widget_watch,num_widget_watch,wp,*wp);
+  fflush(stdout);
+#endif // DEBUG
 }
 
+/**
+  Releases a widget pointer from the watch list.
+
+  This is used to remove a widget pointer that has been added to the watch list
+  with Fl::watch_widget_pointer(), when it is not needed anymore.
+  
+  \note Internal use only, please use class Fl_Widget_Tracker instead.
+
+  \see Fl::watch_widget_pointer()
+*/
 void Fl::release_widget_pointer(Fl_Widget *&w)
 {
   Fl_Widget **wp = &w;
-  int i;
+  int i,j=0;
   for (i=0; i<num_widget_watch; ++i) {
-    if (widget_watch[i]==wp) {
-      widget_watch[i] = 0L;
-      return;
+    if (widget_watch[i]!=wp) {
+      if (j<i) widget_watch[j] = widget_watch[i]; // fill gap
+      j++;
     }
+#ifdef DEBUG
+    else { // found widget pointer
+      printf ("release_widget_pointer: (%d/%d) %8p => %8p\n",
+	i+1,num_widget_watch,wp,*wp);
+    }
+#endif //DEBUG
   }
+  num_widget_watch = j;
+#ifdef DEBUG
+  printf ("                        num_widget_watch = %d\n\n",num_widget_watch);
+  fflush(stdout);
+#endif // DEBUG
+  return;
 }
+/**
+  Clears a widget pointer \e in the watch list.
 
+  This is called when a widget is destroyed (by its destructor). You should never
+  call this directly.
+
+  \note Internal use only !
+
+  This method searches the widget watch list for pointers to the widget and
+  clears each pointer that points to it. Widget pointers can be added to the
+  widget watch list by calling Fl::watch_widget_pointer() or by using the
+  helper class Fl_Widget_Tracker (recommended).
+
+  \see Fl::watch_widget_pointer()
+  \see class Fl_Widget_Tracker
+*/
 void Fl::clear_widget_pointer(Fl_Widget const *w) 
 {
   if (w==0L) return;
@@ -1301,7 +1669,25 @@ void Fl::clear_widget_pointer(Fl_Widget const *w)
   }
 }
 
+// Helper class Fl_Widget_Tracker
+
+/**
+  The constructor adds a widget to the watch list.
+*/
+Fl_Widget_Tracker::Fl_Widget_Tracker(Fl_Widget *wi) {
+
+  wp_ = wi;
+  Fl::watch_widget_pointer(wp_); // add pointer to watch list
+}
+
+/**
+  The destructor removes a widget from the watch list.
+*/
+Fl_Widget_Tracker::~Fl_Widget_Tracker() {
+
+  Fl::release_widget_pointer(wp_); // remove pointer from watch list
+}
 
 //
-// End of "$Id: Fl.cxx 5654 2007-02-02 13:52:37Z matt $".
+// End of "$Id: Fl.cxx 6787 2009-05-14 20:16:09Z engelsman $".
 //

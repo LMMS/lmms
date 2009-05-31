@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_get_key.cxx 5190 2006-06-09 16:16:34Z mike $"
+// "$Id: Fl_get_key.cxx 6616 2009-01-01 21:28:26Z matt $"
 //
 // Keyboard state routines for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2005 by Bill Spitzak and others.
+// Copyright 1998-2009 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -65,5 +65,5 @@ int Fl::get_key(int k) {
 #endif
 
 //
-// End of "$Id: Fl_get_key.cxx 5190 2006-06-09 16:16:34Z mike $".
+// End of "$Id: Fl_get_key.cxx 6616 2009-01-01 21:28:26Z matt $".
 //

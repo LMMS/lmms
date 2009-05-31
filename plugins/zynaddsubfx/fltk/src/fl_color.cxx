@@ -1,9 +1,9 @@
 //
-// "$Id: fl_color.cxx 5835 2007-05-16 11:46:07Z matt $"
+// "$Id: fl_color.cxx 6716 2009-03-24 01:40:44Z fabien $"
 //
 // Color functions for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2005 by Bill Spitzak and others.
+// Copyright 1998-2009 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -24,6 +24,11 @@
 //
 //     http://www.fltk.org/str.php
 //
+
+/**
+  \file fl_color.cxx
+  \brief Color handling
+*/
 
 // Implementation of fl_color(i), fl_color(r,g,b).
 
@@ -49,8 +54,15 @@
 // figure_out_visual() calculates masks & shifts for generating
 // pixels in true-color visuals:
 
-uchar fl_redmask, fl_greenmask, fl_bluemask;
-int fl_redshift, fl_greenshift, fl_blueshift, fl_extrashift;
+uchar fl_redmask;	/**< color mask used in current color map handling */
+uchar fl_greenmask;	/**< color mask used in current color map handling */
+uchar fl_bluemask;	/**< color mask used in current color map handling */
+
+int fl_redshift;	/**< color shift used in current color map handling */
+int fl_greenshift;	/**< color shift used in current color map handling */
+int fl_blueshift;	/**< color shift used in current color map handling */
+int fl_extrashift;	/**< color shift used in current color map handling */
+
 static uchar beenhere;
 
 static void figure_out_visual() {
@@ -98,16 +110,22 @@ static unsigned fl_cmap[256] = {
 };
 
 #  if HAVE_OVERLAY
+/** HAVE_OVERLAY determines whether fl_xmap is one or two planes */
 Fl_XColor fl_xmap[2][256];
+/** HAVE_OVERLAY determines whether fl_overlay is variable or defined as 0 */
 uchar fl_overlay;
 Colormap fl_overlay_colormap;
 XVisualInfo* fl_overlay_visual;
 ulong fl_transparent_pixel;
 #  else
+/** HAVE_OVERLAY determines whether fl_xmap is one or two planes */
 Fl_XColor fl_xmap[1][256];
+/** HAVE_OVERLAY determines whether fl_overlay is variable or defined as 0 */
 #    define fl_overlay 0
 #  endif
 
+/** \addtogroup  fl_attributes
+    @{ */
 ////////////////////////////////////////////////////////////////
 // Get an rgb color.  This is easy for a truecolor visual.  For
 // colormapped it picks the closest color out of the cube in the
@@ -115,6 +133,12 @@ Fl_XColor fl_xmap[1][256];
 // requested before, you will get the earlier requested color, and
 // even this may be approximated if the X colormap was full.
 
+/**
+  Returns the X pixel number used to draw the given rgb color.
+  This is the X pixel that fl_color() would use.
+  \param[in] r,g,b color components
+  \return X pixel number
+*/
 ulong fl_xpixel(uchar r,uchar g,uchar b) {
   if (!beenhere) figure_out_visual();
 #  if USE_COLORMAP
@@ -137,8 +161,19 @@ ulong fl_xpixel(uchar r,uchar g,uchar b) {
      ) >> fl_extrashift;
 }
 
+/**
+  Set the color for all subsequent drawing operations.
+  The closest possible match to the RGB color is used.
+  The RGB color is used directly on TrueColor displays.
+  For colormap visuals the nearest index in the gray
+  ramp or color cube is used.
+  If no valid graphical context (fl_gc) is available,
+  the foreground is not set for the current window.
+  \param[in] r,g,b color components
+*/
 void fl_color(uchar r,uchar g,uchar b) {
   fl_color_ = fl_rgb_color(r, g, b);
+  if(!fl_gc) return; // don't get a default gc if current window is not yet created/valid
   XSetForeground(fl_display, fl_gc, fl_xpixel(r,g,b));
 }
 
@@ -167,6 +202,12 @@ static inline uchar realcolor(uchar color, uchar mask) {
 #  endif
 }
 
+/**
+  Returns the X pixel number used to draw the given FLTK color index.
+  This is the X pixel that fl_color() would use.
+  \param[in] i color index
+  \return X pixel number
+*/
 ulong fl_xpixel(Fl_Color i) {
   if (i & 0xffffff00) {
     return fl_xpixel((i >> 24) & 255, (i >> 16) & 255, (i >> 8) & 255);
@@ -261,7 +302,7 @@ ulong fl_xpixel(Fl_Color i) {
     xmap.pixel = p.pixel;
   } else {
     // However, if that XAllocColor fails, I have to give up and
-    // assumme the pixel is ok for the duration of the program.  This
+    // assume the pixel is ok for the duration of the program.  This
     // is due to bugs (?) in the Solaris X and some X terminals
     // where XAllocColor *always* fails when the colormap is full,
     // even if we ask for a color already in it...
@@ -275,18 +316,34 @@ ulong fl_xpixel(Fl_Color i) {
 #  endif
 }
 
+/** Current color for drawing operations */
 Fl_Color fl_color_;
 
+/**
+  Sets the color for all subsequent drawing operations.
+  For colormapped displays, a color cell will be allocated out of
+  \p fl_colormap the first time you use a color. If the colormap fills up
+  then a least-squares algorithm is used to find the closest color.
+  If no valid graphical context (fl_gc) is available,
+  the foreground is not set for the current window.
+  \param[in] i color 
+*/
 void fl_color(Fl_Color i) {
   if (i & 0xffffff00) {
     unsigned rgb = (unsigned)i;
     fl_color((uchar)(rgb >> 24), (uchar)(rgb >> 16), (uchar)(rgb >> 8));
   } else {
     fl_color_ = i;
+    if(!fl_gc) return; // don't get a default gc if current window is not yet created/valid
     XSetForeground(fl_display, fl_gc, fl_xpixel(i));
   }
 }
 
+/**
+  Free color \p i if used, and clear mapping table entry.
+  \param[in] i color index
+  \param[in] overlay 0 for normal, 1 for overlay color
+*/
 void Fl::free_color(Fl_Color i, int overlay) {
 #  if HAVE_OVERLAY
 #  else
@@ -306,6 +363,11 @@ void Fl::free_color(Fl_Color i, int overlay) {
   }
 }
 
+/**
+  Set color mapping table entry \p i to color \p c
+  \param[in] i color index
+  \param[in] c color
+*/
 void Fl::set_color(Fl_Color i, unsigned c) {
   if (fl_cmap[i] != c) {
     free_color(i,0);
@@ -317,17 +379,30 @@ void Fl::set_color(Fl_Color i, unsigned c) {
 }
 
 #endif // end of X-specific code
-
+/**
+    Returns the RGB value(s) for the given FLTK color index. The
+    first form returns the RGB values packed in a 32-bit unsigned
+    integer with the red value in the upper 8 bits, the green value
+    in the next 8 bits, and the blue value in bits 8-15.  The lower
+    8 bits will always be 0.
+    
+    The second form returns the red, green, and blue values
+    separately in referenced variables.
+*/
 unsigned Fl::get_color(Fl_Color i) {
   if (i & 0xffffff00) return (i);
   else return fl_cmap[i];
 }
-
+/**
+    Sets an entry in the fl_color index table.  You can set it to
+    any 8-bit RGB color.  The color is not allocated until fl_color(i)
+    is used.
+*/
 void Fl::set_color(Fl_Color i, uchar red, uchar green, uchar blue) {
   Fl::set_color((Fl_Color)(i & 255),
 	((unsigned)red<<24)+((unsigned)green<<16)+((unsigned)blue<<8));
 }
-
+/** See unsigned get_color(Fl_Color c) */
 void Fl::get_color(Fl_Color i, uchar &red, uchar &green, uchar &blue) {
   unsigned c;
 
@@ -339,6 +414,17 @@ void Fl::get_color(Fl_Color i, uchar &red, uchar &green, uchar &blue) {
   blue  = uchar(c>>8);
 }
 
+/**
+  Returns the weighted average color between the two given colors.
+  The red, green and blue values are averages using the following formula:
+  \code
+  color = color1 * weight  + color2 * (1 - weight)
+  \endcode
+  Thus, a \p weight value of 1.0 will return the first color, while a
+  value of 0.0 will return the second color.
+  \param[in] color1, color2 boundary colors
+  \param[in] weight weighting factor
+*/
 Fl_Color fl_color_average(Fl_Color color1, Fl_Color color2, float weight) {
   unsigned rgb1;
   unsigned rgb2;
@@ -357,10 +443,21 @@ Fl_Color fl_color_average(Fl_Color color1, Fl_Color color2, float weight) {
   return fl_rgb_color(r, g, b);
 }
 
+/**
+  Returns the inactive, dimmed version of the given color
+*/
 Fl_Color fl_inactive(Fl_Color c) {
   return fl_color_average(c, FL_GRAY, .33f);
 }
 
+/**
+  Returns a color that contrasts with the background color.
+  This will be the foreground color if it contrasts sufficiently with the
+  background color. Otherwise, returns \p FL_WHITE or \p FL_BLACK depending
+  on which color provides the best contrast.
+  \param[in] fg,bg foreground and background colors
+  \return contrasting color
+*/
 Fl_Color fl_contrast(Fl_Color fg, Fl_Color bg) {
   unsigned c1, c2;	// RGB colors
   int l1, l2;		// Luminosities
@@ -383,7 +480,9 @@ Fl_Color fl_contrast(Fl_Color fg, Fl_Color bg) {
   else if (l2 > 127) return FL_BLACK;
   else return FL_WHITE;
 }
-
+/**
+   @}
+*/
 //
-// End of "$Id: fl_color.cxx 5835 2007-05-16 11:46:07Z matt $".
+// End of "$Id: fl_color.cxx 6716 2009-03-24 01:40:44Z fabien $".
 //

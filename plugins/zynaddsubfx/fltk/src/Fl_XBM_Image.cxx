@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_XBM_Image.cxx 5190 2006-06-09 16:16:34Z mike $"
+// "$Id: Fl_XBM_Image.cxx 6616 2009-01-01 21:28:26Z matt $"
 //
 // Fl_XBM_Image routines.
 //
-// Copyright 1997-2005 by Bill Spitzak and others.
+// Copyright 1997-2009 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -37,17 +37,23 @@
 #include <FL/Fl_XBM_Image.H>
 #include <stdio.h>
 #include <stdlib.h>
+#include <FL/fl_utf8.h>
 #include "flstring.h"
 
 //
 // 'Fl_XBM_Image::Fl_XBM_Image()' - Load an XBM file.
 //
 
+/**  
+  The constructor loads the named XBM file from the given name filename.
+  <P>The destructor free all memory and server resources that are used by 
+  the image.
+*/
 Fl_XBM_Image::Fl_XBM_Image(const char *name) : Fl_Bitmap((const char *)0,0,0) {
   FILE	*f;
   uchar	*ptr;
 
-  if ((f = fopen(name, "rb")) == NULL) return;
+  if ((f = fl_fopen(name, "rb")) == NULL) return;
 
   char buffer[1024];
   char junk[1024];
@@ -102,5 +108,5 @@ Fl_XBM_Image::Fl_XBM_Image(const char *name) : Fl_Bitmap((const char *)0,0,0) {
 
 
 //
-// End of "$Id: Fl_XBM_Image.cxx 5190 2006-06-09 16:16:34Z mike $".
+// End of "$Id: Fl_XBM_Image.cxx 6616 2009-01-01 21:28:26Z matt $".
 //

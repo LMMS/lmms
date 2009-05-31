@@ -1,9 +1,9 @@
 //
-// "$Id: filename_expand.cxx 5190 2006-06-09 16:16:34Z mike $"
+// "$Id: filename_expand.cxx 6641 2009-01-20 11:10:29Z fabien $"
 //
 // Filename expansion routines for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2005 by Bill Spitzak and others.
+// Copyright 1998-2009 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -31,9 +31,11 @@
 */
 
 #include <FL/filename.H>
+#include <FL/fl_utf8.h>
 #include <stdlib.h>
 #include "flstring.h"
 #if defined(WIN32) && !defined(__CYGWIN__)
+#include <windows.h>
 #else
 # include <unistd.h>
 # include <pwd.h>
@@ -45,6 +47,13 @@ static inline int isdirsep(char c) {return c=='/' || c=='\\';}
 #define isdirsep(c) ((c)=='/')
 #endif
 
+/**
+ * Expands a filename coontaining shell variables.
+ * \param[out] to resulting expanded filename
+ * \param[in]  tolen size of the expanded filename buffer 
+ * \param[in]  from filename containing shell variables
+ * \return 0 if no change, non zero otherwise
+ */
 int fl_filename_expand(char *to,int tolen, const char *from) {
 
   char *temp = new char[tolen];
@@ -60,7 +69,7 @@ int fl_filename_expand(char *to,int tolen, const char *from) {
     switch (*a) {
     case '~':	// a home directory name
       if (e <= a+1) {	// current user's directory
-	value = getenv("HOME");
+        value = fl_getenv("HOME");
 #ifndef WIN32
       } else {	// another user's directory
 	struct passwd *pwd;
@@ -72,7 +81,7 @@ int fl_filename_expand(char *to,int tolen, const char *from) {
       }
       break;
     case '$':		/* an environment variable */
-      {char t = *e; *(char *)e = 0; value = getenv(a+1); *(char *)e = t;}
+      {char t = *e; *(char *)e = 0; value = fl_getenv(a+1); *(char *)e = t;}
       break;
     }
     if (value) {
@@ -106,5 +115,5 @@ int fl_filename_expand(char *to,int tolen, const char *from) {
 
 
 //
-// End of "$Id: filename_expand.cxx 5190 2006-06-09 16:16:34Z mike $".
+// End of "$Id: filename_expand.cxx 6641 2009-01-20 11:10:29Z fabien $".
 //

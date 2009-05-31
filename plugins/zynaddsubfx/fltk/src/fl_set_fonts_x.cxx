@@ -1,9 +1,9 @@
 //
-// "$Id: fl_set_fonts_x.cxx 5190 2006-06-09 16:16:34Z mike $"
+// "$Id: fl_set_fonts_x.cxx 6712 2009-03-22 19:21:34Z AlbrechtS $"
 //
 // X11 font utilities for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2005 by Bill Spitzak and others.
+// Copyright 1998-2009 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -112,7 +112,7 @@ const char* Fl::get_font_name(Fl_Font fnum, int* ap) {
       }
       *o = 0;
 
-    } else { // standard dash-seperated font:
+    } else { // standard dash-separated font:
 
       // get the family:
       const char *x = fl_font_word(p,2); if (*x) x++; if (*x=='*') x++;
@@ -191,7 +191,7 @@ static int ultrasort(const void *aa, const void *bb) {
     if (*b != '-') return -1;
   }
 
-  // skip the foundry (assumme equal):
+  // skip the foundry (assume equal):
   for (a++; *a && *a++!='-';);
   for (b++; *b && *b++!='-';);
 
@@ -257,7 +257,7 @@ static int to_canonical(char *to, const char *from, size_t tolen) {
   return size;
 }
 
-static int fl_free_font = FL_FREE_FONT;
+static unsigned int fl_free_font = FL_FREE_FONT;
 
 Fl_Font Fl::set_fonts(const char* xstarname) {
   if (fl_free_font > FL_FREE_FONT) // already been here
@@ -289,13 +289,13 @@ Fl_Font Fl::set_fonts(const char* xstarname) {
       }
       /*if (*p=='-' || i > first_xlist+1)*/ p = canon;
     }
-    int j;
+    unsigned int j;
     for (j = 0;; j++) {
-      if (j < FL_FREE_FONT) {
+      /*if (j < FL_FREE_FONT) {
 	// see if it is one of our built-in fonts:
 	// if so, set the list of x fonts, since we have it anyway
 	if (fl_fonts[j].name && !strcmp(fl_fonts[j].name, p)) break;
-      } else {
+      } else */{
 	j = fl_free_font++;
 	if (p == canon) p = strdup(p); else used_xlist = 1;
 	Fl::set_font((Fl_Font)j, p);
@@ -346,5 +346,5 @@ int Fl::get_font_sizes(Fl_Font fnum, int*& sizep) {
 }
 
 //
-// End of "$Id: fl_set_fonts_x.cxx 5190 2006-06-09 16:16:34Z mike $".
+// End of "$Id: fl_set_fonts_x.cxx 6712 2009-03-22 19:21:34Z AlbrechtS $".
 //

@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Input.cxx 6103 2008-04-21 20:42:51Z matt $"
+// "$Id: Fl_Input.cxx 6765 2009-04-15 08:35:28Z matt $"
 //
 // Input widget for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2006 by Bill Spitzak and others.
+// Copyright 1998-2009 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -140,47 +140,210 @@ int Fl_Input::handle_key() {
     return 1;
   }
 
+  unsigned int mods = Fl::event_state() & (FL_META|FL_CTRL|FL_ALT);
   switch (Fl::event_key()) {
   case FL_Insert:
     if (Fl::event_state() & FL_CTRL) ascii = ctrl('C');
     else if (Fl::event_state() & FL_SHIFT) ascii = ctrl('V');
     break;
   case FL_Delete:
-    if (Fl::event_state() & FL_SHIFT) ascii = ctrl('X');
-    else ascii = ctrl('D');
-    break;    
+#ifdef __APPLE__
+    if (mods==0 || mods==FL_CTRL) { // delete next char
+      ascii = ctrl('D');
+    } else if (mods==FL_ALT) { // delete next word
+      if (mark() != position()) return cut();
+      cut(position(), word_end(position()));
+      return 1;
+    } else if (mods==FL_META) { // delete to the end of the line
+      if (mark() != position()) return cut();
+      cut(position(), line_end(position()));
+      return 1;
+    } else return 1;
+#else
+    if (mods==0) {
+      ascii = ctrl('D'); 
+    } else if (mods==FL_SHIFT) {
+      ascii = ctrl('X');
+    } else return 1;
+#endif
+    break;
   case FL_Left:
-    ascii = ctrl('B'); break;
+#ifdef __APPLE__
+    if (mods==0) { // char left
+      ascii = ctrl('B'); 
+    } else if (mods==FL_ALT) { // word left
+      shift_position(word_start(position()));
+      return 1; 
+    } else if (mods==FL_CTRL || mods==FL_META) { // start of line
+      shift_position(line_start(position()));
+      return 1;
+    } else return 1;
+#else
+    if (mods==0) { // char left
+      ascii = ctrl('B'); 
+    } else if (mods==FL_CTRL) { // word left
+      shift_position(word_start(position()));
+      return 1;
+    } else return 1;
+#endif
+    break;
   case FL_Right:
-    ascii = ctrl('F'); break;
+#ifdef __APPLE__
+    if (mods==0) { // char right
+      ascii = ctrl('F'); 
+    } else if (mods==FL_ALT) { // word right
+      shift_position(word_end(position()));
+      return 1;
+    } else if (mods==FL_CTRL || mods==FL_META) { // end of line
+      shift_position(line_end(position()));
+      return 1;
+    } else return 1;
+#else
+    if (mods==0) { // char right
+      ascii = ctrl('F'); 
+    } else if (mods==FL_CTRL) { // word right
+      shift_position(word_end(position()));
+      return 1;
+    } else return 1;
+#endif // __APPLE__
+    break;
   case FL_Page_Up:
-    fl_font(textfont(),textsize()); //ensure current font is set to ours
-    repeat_num=h()/fl_height(); // number of lines to scroll
-    if (!repeat_num) repeat_num=1;
+#ifdef __APPLE__
+    if (mods==0) { // scroll text one page
+      // OS X scrolls the view, but does not move the cursor
+      // Fl_Input has no scroll control, so instead we move the cursor by one page
+      repeat_num = linesPerPage();
+      ascii = ctrl('P');
+    } else if (mods==FL_ALT) { // move cursor one page
+      repeat_num = linesPerPage();
+      ascii = ctrl('P');
+    } else return 1;
+    break;
+#else
+    repeat_num = linesPerPage();
+    // fall through
+#endif
   case FL_Up:
-    ascii = ctrl('P'); break;
+#ifdef __APPLE__
+    if (mods==0) { // line up
+      ascii = ctrl('P');
+    } else if (mods==FL_CTRL) { // scroll text down one page
+      // OS X scrolls the view, but does not move the cursor
+      // Fl_Input has no scroll control, so instead we move the cursor by one page
+      repeat_num = linesPerPage();
+      ascii = ctrl('P');
+    } else if (mods==FL_ALT) { // line start and up
+      if (line_start(position())==position() && position()>0)
+        return shift_position(line_start(position()-1)) + NORMAL_INPUT_MOVE;
+      else
+        return shift_position(line_start(position())) + NORMAL_INPUT_MOVE;
+    } else if (mods==FL_META) { // start of document
+      shift_position(0);
+      return 1;
+    } else return 1;
+#else
+    if (mods==0) { // line up
+      ascii = ctrl('P');
+    } else if (mods==FL_CTRL) { // scroll text down one line
+      // Fl_Input has no scroll control, so instead we move the cursor by one page
+      ascii = ctrl('P');
+    } else return 1;
+#endif
+    break;
   case FL_Page_Down:
-    fl_font(textfont(),textsize());
-    repeat_num=h()/fl_height();
-    if (!repeat_num) repeat_num=1;
+#ifdef __APPLE__
+    if (mods==0) { // scroll text one page
+      // OS X scrolls the view, but does not move the cursor
+      // Fl_Input has no scroll control, so instead we move the cursor by one page
+      repeat_num = linesPerPage();
+      ascii = ctrl('N');
+    } else if (mods==FL_ALT) { // move cursor one page
+      repeat_num = linesPerPage();
+      ascii = ctrl('N');
+    } else return 1;
+    break;
+#else
+    repeat_num = linesPerPage();
+    // fall through
+#endif
   case FL_Down:
-    ascii = ctrl('N'); break;
+#ifdef __APPLE__
+    if (mods==0) { // line down
+      ascii = ctrl('N');
+    } else if (mods==FL_CTRL) {
+      // OS X scrolls the view, but does not move the cursor
+      // Fl_Input has no scroll control, so instead we move the cursor by one page
+      repeat_num = linesPerPage();
+      ascii = ctrl('N');
+    } else if (mods==FL_ALT) { // line end and down
+      if (line_end(position())==position() && position()<size())
+        return shift_position(line_end(position()+1)) + NORMAL_INPUT_MOVE;
+      else
+        return shift_position(line_end(position())) + NORMAL_INPUT_MOVE;
+    } else if (mods==FL_META) { // end of document
+      shift_position(size());
+      return 1;
+    } else return 1;
+#else
+    if (mods==0) { // line down
+      ascii = ctrl('N');
+    } else if (mods==FL_CTRL) { // scroll text up one line
+      // Fl_Input has no scroll control, so instead we move the cursor by one page
+      ascii = ctrl('N');
+    } else return 1;
+#endif
+    break;
   case FL_Home:
-    if (Fl::event_state() & FL_CTRL) {
+#ifdef __APPLE__
+    if (mods==0) { // scroll display to the top
+      // OS X scrolls the view, but does not move the cursor
+      // Fl_Input has no scroll control, so instead we move the cursor by one page
+      shift_position(0);
+      return 1;
+    } else return 1;
+#else
+    if (mods==0) {
+      ascii = ctrl('A');
+    } else if (mods==FL_CTRL) {
       shift_position(0);
       return 1;
     }
-    ascii = ctrl('A');
+#endif
     break;
   case FL_End:
-    if (Fl::event_state() & FL_CTRL) {
+#ifdef __APPLE__
+    if (mods==0) { // scroll display to the bottom
+      // OS X scrolls the view, but does not move the cursor
+      // Fl_Input has no scroll control, so instead we move the cursor by one page
+      shift_position(size());
+      return 1; 
+    } else return 1;
+#else
+    if (mods==0) {
+      ascii = ctrl('E');
+    } else if (mods==FL_CTRL) {
       shift_position(size());
       return 1;
-    }
-    ascii = ctrl('E'); break;
-    
+    } else return 1;
+#endif
+    break;
   case FL_BackSpace:
-    ascii = ctrl('H'); break;
+#ifdef __APPLE__
+    if (mods==0 || mods==FL_CTRL) { // delete previous char
+      ascii = ctrl('H');
+    } else if (mods==FL_ALT) { // delete previous word
+      if (mark() != position()) return cut();
+      cut(word_start(position()), position());
+      return 1;
+    } else if (mods==FL_META) { // delete to the beginning of the line
+      if (mark() != position()) return cut();
+      cut(line_start(position()), position());
+      return 1;
+    } else return 1;
+#else
+    ascii = ctrl('H'); 
+#endif
+    break;
   case FL_Enter:
   case FL_KP_Enter:
     if (when() & FL_WHEN_ENTER_KEY) {
@@ -212,13 +375,13 @@ int Fl_Input::handle_key() {
 
   int i;
   switch (ascii) {
-  case ctrl('A'):
+  case ctrl('A'): // go to the beginning of the current line
     return shift_position(line_start(position())) + NORMAL_INPUT_MOVE;
-  case ctrl('B'):
+  case ctrl('B'): // go one character backward
     return shift_position(position()-1) + NORMAL_INPUT_MOVE;
   case ctrl('C'): // copy
     return copy(1);
-  case ctrl('D'):
+  case ctrl('D'): // cut the next character
   case ctrl('?'):
     if (readonly()) {
       fl_beep();
@@ -226,11 +389,11 @@ int Fl_Input::handle_key() {
     }
     if (mark() != position()) return cut();
     else return cut(1);
-  case ctrl('E'):
+  case ctrl('E'): // go to the end of the line
     return shift_position(line_end(position())) + NORMAL_INPUT_MOVE;
-  case ctrl('F'):
+  case ctrl('F'): // go to the next character
     return shift_position(position()+1) + NORMAL_INPUT_MOVE;
-  case ctrl('H'):
+  case ctrl('H'): // cut the previous character
     if (readonly()) {
       fl_beep();
       return 1;
@@ -238,7 +401,7 @@ int Fl_Input::handle_key() {
     if (mark() != position()) cut();
     else cut(-1);
     return 1;
-  case ctrl('K'):
+  case ctrl('K'): // cut to the end of the line
     if (readonly()) {
       fl_beep();
       return 1;
@@ -248,7 +411,7 @@ int Fl_Input::handle_key() {
     if (i == position() && i < size()) i++;
     cut(position(), i);
     return copy_cuts();
-  case ctrl('N'):
+  case ctrl('N'): // go down one line
     i = position();
     if (line_end(i) >= size()) return NORMAL_INPUT_MOVE;
     while (repeat_num--) {  
@@ -258,7 +421,7 @@ int Fl_Input::handle_key() {
     }
     shift_up_down_position(i);
     return 1;
-  case ctrl('P'):
+  case ctrl('P'): // go up one line
     i = position();
     if (!line_start(i)) return NORMAL_INPUT_MOVE;
     while(repeat_num--) {
@@ -268,13 +431,13 @@ int Fl_Input::handle_key() {
     }
     shift_up_down_position(line_start(i));
     return 1;
-  case ctrl('U'):
+  case ctrl('U'): // clear the whole document? 
     if (readonly()) {
       fl_beep();
       return 1;
     }
     return cut(0, size());
-  case ctrl('V'):
+  case ctrl('V'): // paste text
   case ctrl('Y'):
     if (readonly()) {
       fl_beep();
@@ -282,7 +445,7 @@ int Fl_Input::handle_key() {
     }
     Fl::paste(*this, 1);
     return 1;
-  case ctrl('X'):
+  case ctrl('X'): // cut the selected text
   case ctrl('W'):
     if (readonly()) {
       fl_beep();
@@ -290,14 +453,14 @@ int Fl_Input::handle_key() {
     }
     copy(1);
     return cut();
-  case ctrl('Z'):
+  case ctrl('Z'): // undo
   case ctrl('_'):
     if (readonly()) {
       fl_beep();
       return 1;
     }
     return undo();
-  case ctrl('I'):
+  case ctrl('I'): // insert literal
   case ctrl('J'):
   case ctrl('L'):
   case ctrl('M'):
@@ -465,10 +628,14 @@ int Fl_Input::handle(int event) {
 	w()-Fl::box_dw(b), h()-Fl::box_dh(b));
 }
 
+/**
+  Creates a new Fl_Input widget using the given position, size,
+  and label string. The default boxtype is FL_DOWN_BOX.
+*/
 Fl_Input::Fl_Input(int X, int Y, int W, int H, const char *l)
 : Fl_Input_(X, Y, W, H, l) {
 }
 
 //
-// End of "$Id: Fl_Input.cxx 6103 2008-04-21 20:42:51Z matt $".
+// End of "$Id: Fl_Input.cxx 6765 2009-04-15 08:35:28Z matt $".
 //

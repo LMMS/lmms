@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Slider.cxx 5438 2006-09-17 14:58:25Z mike $"
+// "$Id: Fl_Slider.cxx 6683 2009-03-14 11:46:43Z engelsman $"
 //
 // Slider widget for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2006 by Bill Spitzak and others.
+// Copyright 1998-2009 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -36,14 +36,22 @@ void Fl_Slider::_Fl_Slider() {
   slider_ = 0; // FL_UP_BOX;
 }
 
-Fl_Slider::Fl_Slider(int X, int Y, int W, int H, const char* l)
-: Fl_Valuator(X, Y, W, H, l) {
+/**
+  Creates a new Fl_Slider widget using the given position,
+  size, and label string. The default boxtype is FL_DOWN_BOX.
+*/
+Fl_Slider::Fl_Slider(int X, int Y, int W, int H, const char* L)
+: Fl_Valuator(X, Y, W, H, L) {
   box(FL_DOWN_BOX);
   _Fl_Slider();
 }
 
-Fl_Slider::Fl_Slider(uchar t, int X, int Y, int W, int H, const char* l)
-  : Fl_Valuator(X, Y, W, H, l) {
+/**
+  Creates a new Fl_Slider widget using the given box type, position,
+  size, and label string.
+*/
+Fl_Slider::Fl_Slider(uchar t, int X, int Y, int W, int H, const char* L)
+  : Fl_Valuator(X, Y, W, H, L) {
   type(t);
   box(t==FL_HOR_NICE_SLIDER || t==FL_VERT_NICE_SLIDER ?
       FL_FLAT_BOX : FL_DOWN_BOX);
@@ -59,6 +67,10 @@ void Fl_Slider::slider_size(double v) {
   }
 }
 
+/** 
+  Sets the minimum (a) and maximum (b) values for the valuator widget. 
+  if at least one of the values is changed, a partial redraw is asked.
+*/
 void Fl_Slider::bounds(double a, double b) {
   if (minimum() != a || maximum() != b) {
     Fl_Valuator::bounds(a, b); 
@@ -66,16 +78,20 @@ void Fl_Slider::bounds(double a, double b) {
   }
 }
 
-int Fl_Slider::scrollvalue(int p, int W, int t, int l) {
-//	p = position, first line displayed
-//	w = window, number of lines displayed
-//	t = top, number of first line
-//	l = length, total number of lines
+/**
+  Sets the size and position of the sliding knob in the box.
+  \param[in] pos position of first line displayed
+  \param[in] size size of window in lines
+  \param[in] first number of first line
+  \param[in] total total number of lines
+  Returns Fl_Valuator::value(p)
+ */
+int Fl_Slider::scrollvalue(int pos, int size, int first, int total) {
   step(1, 1);
-  if (p+W > t+l) l = p+W-t;
-  slider_size(W >= l ? 1.0 : double(W)/double(l));
-  bounds(t, l-W+t);
-  return value(p);
+  if (pos+size > first+total) total = pos+size-first;
+  slider_size(size >= total ? 1.0 : double(size)/double(total));
+  bounds(first, total-size+first);
+  return value(pos);
 }
 
 // All slider interaction is done as though the slider ranges from
@@ -335,5 +351,5 @@ int Fl_Slider::handle(int event) {
 }
 
 //
-// End of "$Id: Fl_Slider.cxx 5438 2006-09-17 14:58:25Z mike $".
+// End of "$Id: Fl_Slider.cxx 6683 2009-03-14 11:46:43Z engelsman $".
 //

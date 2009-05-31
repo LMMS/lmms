@@ -1,9 +1,9 @@
 //
-// "$Id: fl_symbols.cxx 5190 2006-06-09 16:16:34Z mike $"
+// "$Id: fl_symbols.cxx 6716 2009-03-24 01:40:44Z fabien $"
 //
 // Symbol drawing code for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2005 by Bill Spitzak and others.
+// Copyright 1998-2009 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -77,8 +77,14 @@ static void fl_init_symbols(void);
 
 /**************** The routines seen by the user *************************/
 
+/**
+  Adds a symbol to the system.
+  \param[in] name     name of symbol (without the "@")
+  \param[in] drawit   function to draw symbol
+  \param[in] scalable set to 1 if \p drawit uses scalable vector drawing
+  \returns 1 on success, 0 on failure
+  */
 int fl_add_symbol(const char *name, void (*drawit)(Fl_Color), int scalable)
-/* Adds a symbol to the system. Returns whether correct. */
 {
   fl_init_symbols();
   int pos;
@@ -94,7 +100,15 @@ int fl_add_symbol(const char *name, void (*drawit)(Fl_Color), int scalable)
 
 int fl_return_arrow(int x,int y,int w,int h);
 
-// provided for back compatability:
+/**
+  Draw the named symbol in the given rectangle using the given color
+  \param[in] label name of symbol
+  \param[in] x,y   position of symbol
+  \param[in] w,h   size of symbol
+  \param[in] col   color of symbox
+  \returns 1 on success, 0 on failure
+  */
+// provided for back compatibility:
 int fl_draw_symbol(const char *label,int x,int y,int w,int h,Fl_Color col) {  
   const char *p = label;
   if (*p++ != '@') return 0;
@@ -696,5 +710,5 @@ static void fl_init_symbols(void) {
 }
 
 //
-// End of "$Id: fl_symbols.cxx 5190 2006-06-09 16:16:34Z mike $".
+// End of "$Id: fl_symbols.cxx 6716 2009-03-24 01:40:44Z fabien $".
 //

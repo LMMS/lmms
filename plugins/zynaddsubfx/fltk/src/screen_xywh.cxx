@@ -1,9 +1,9 @@
 //
-// "$Id: screen_xywh.cxx 5848 2007-05-20 16:18:31Z mike $"
+// "$Id: screen_xywh.cxx 6716 2009-03-24 01:40:44Z fabien $"
 //
 // Screen/monitor bounding box API for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2005 by Bill Spitzak and others.
+// Copyright 1998-2009 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -141,14 +141,21 @@ static void screen_init() {
 #endif // WIN32
 
 
-// Return the number of screens...
+/**
+  Gets the number of available screens.
+*/
 int Fl::screen_count() {
   if (!num_screens) screen_init();
 
   return num_screens;
 }
 
-// Return the screen bounding rect for the given mouse position...
+/**
+  Gets the bounding box of a screen 
+  that contains the specified screen position \p mx, \p my
+  \param[out]  X,Y,W,H the corresponding screen bounding box
+  \param[in] mx, my the absolute screen position
+*/
 void Fl::screen_xywh(int &X, int &Y, int &W, int &H, int mx, int my) {
   if (!num_screens) screen_init();
 
@@ -212,7 +219,12 @@ void Fl::screen_xywh(int &X, int &Y, int &W, int &H, int mx, int my) {
   H = Fl::h();
 }
 
-// Return the screen bounding rect for the given screen...
+/**
+  Gets the screen bounding rect for the given screen. 
+  \param[out]  X,Y,W,H the corresponding screen bounding box
+  \param[in] n the screen number (0 to Fl::screen_count() - 1)
+  \see void screen_xywh(int &x, int &y, int &w, int &h, int mx, int my) 
+*/
 void Fl::screen_xywh(int &X, int &Y, int &W, int &H, int n) {
   if (!num_screens) screen_init();
 
@@ -252,5 +264,5 @@ void Fl::screen_xywh(int &X, int &Y, int &W, int &H, int n) {
 
 
 //
-// End of "$Id: screen_xywh.cxx 5848 2007-05-20 16:18:31Z mike $".
+// End of "$Id: screen_xywh.cxx 6716 2009-03-24 01:40:44Z fabien $".
 //

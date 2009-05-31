@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Wizard.cxx 5190 2006-06-09 16:16:34Z mike $"
+// "$Id: Fl_Wizard.cxx 6616 2009-01-01 21:28:26Z matt $"
 //
 // Fl_Wizard widget routines.
 //
-// Copyright 1997-2005 by Easy Software Products.
+// Copyright 1997-2009 by Easy Software Products.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -25,6 +25,7 @@
 //     http://www.fltk.org/str.php
 //
 // Contents:
+
 //
 //   Fl_Wizard::Fl_Wizard() - Create an Fl_Wizard widget.
 //   Fl_Wizard::draw()      - Draw the wizard border and visible child.
@@ -47,6 +48,11 @@
 // 'Fl_Wizard::Fl_Wizard()' - Create an Fl_Wizard widget.
 //
 
+/**
+  The constructor creates the Fl_Wizard widget at the specified
+  position and size.
+  <P>The inherited destructor destroys the widget and its children.
+*/
 Fl_Wizard::Fl_Wizard(int        xx,	// I - Lefthand position
                      int        yy,	// I - Upper position
 		     int        ww,	// I - Width
@@ -61,12 +67,8 @@ Fl_Wizard::Fl_Wizard(int        xx,	// I - Lefthand position
 
 
 //
-// 'Fl_Wizard::draw()' - Draw the wizard border and visible child.
-//
-
-void
-Fl_Wizard::draw()
-{
+/** Draws the wizard border and visible child. */
+void Fl_Wizard::draw() {
   Fl_Widget	*kid;	// Visible child
 
 
@@ -89,13 +91,11 @@ Fl_Wizard::draw()
 }
 
 
-//
-// 'Fl_Wizard::next()' - Show the next child.
-//
-
-void
-Fl_Wizard::next()
-{
+/**
+  This method shows the next child of the wizard. If the last child
+  is already visible, this function does nothing.
+*/
+void Fl_Wizard::next() {
   int			num_kids;
   Fl_Widget	* const *kids;
 
@@ -111,14 +111,8 @@ Fl_Wizard::next()
     value(kids[1]);
 }
 
-
-//
-// 'Fl_Wizard::prev()' - Show the previous child.
-//
-
-
-void
-Fl_Wizard::prev()
+/** Shows the previous child.*/
+void Fl_Wizard::prev()
 {
   int			num_kids;
   Fl_Widget	* const *kids;
@@ -135,13 +129,8 @@ Fl_Wizard::prev()
     value(kids[-1]);
 }
 
-
-//
-// 'Fl_Wizard::value()' - Return the current visible child.
-//
-
-Fl_Widget *
-Fl_Wizard::value()
+/**  Gets the current visible child widget. */
+Fl_Widget* Fl_Wizard::value()
 {
   int			num_kids;
   Fl_Widget	* const *kids;
@@ -172,13 +161,8 @@ Fl_Wizard::value()
   return (kid);
 }
 
-
-//
-// 'Fl_Wizard::value()' - Set the visible child.
-//
-
-void
-Fl_Wizard::value(Fl_Widget *kid)
+/**  Sets the child widget that is visible.*/
+void Fl_Wizard::value(Fl_Widget *kid)
 {
   int			num_kids;
   Fl_Widget	* const *kids;
@@ -205,6 +189,7 @@ Fl_Wizard::value(Fl_Widget *kid)
 }
 
 
+
 //
-// End of "$Id: Fl_Wizard.cxx 5190 2006-06-09 16:16:34Z mike $".
+// End of "$Id: Fl_Wizard.cxx 6616 2009-01-01 21:28:26Z matt $".
 //

@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Value_Slider.cxx 5190 2006-06-09 16:16:34Z mike $"
+// "$Id: Fl_Value_Slider.cxx 6616 2009-01-01 21:28:26Z matt $"
 //
 // Value slider widget for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2005 by Bill Spitzak and others.
+// Copyright 1998-2009 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -30,6 +30,10 @@
 #include <FL/fl_draw.H>
 #include <math.h>
 
+/**
+  Creates a new Fl_Value_Slider widget using the given
+  position, size, and label string. The default boxtype is FL_DOWN_BOX.
+*/
 Fl_Value_Slider::Fl_Value_Slider(int X, int Y, int W, int H, const char*l)
 : Fl_Slider(X,Y,W,H,l) {
   step(1,100);
@@ -78,5 +82,5 @@ int Fl_Value_Slider::handle(int event) {
 }
 
 //
-// End of "$Id: Fl_Value_Slider.cxx 5190 2006-06-09 16:16:34Z mike $".
+// End of "$Id: Fl_Value_Slider.cxx 6616 2009-01-01 21:28:26Z matt $".
 //

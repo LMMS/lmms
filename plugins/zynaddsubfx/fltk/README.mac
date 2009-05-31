@@ -39,29 +39,12 @@ KNOWN MacFLTK BUGS
 	- Sub-sub-subwindow not tested.
 	- The 'shiny' demo needs work (flush/aglFlush).
 
+UNIVERSAL BINARES
 
-TEST SUITE STATUS
-
-    OS X:
-
-    CubeView(++), adjuster(++), arc(++), ask(++), bitmap(++), 
-    boxtype(++), browser(++), button(++), buttons(++),
-    checkers(++), clock(++), colbrowser(++), color_chooser(++),
-    cube(++), cursor(++), curve(++), demo(++), doublebuffer(++),
-    editor(++), fast_slow(++), file_chooser(++), fonts(++),
-    forms(++), fractals(++), fullscreen(++), gl_overlay(++),
-    glpuzzle(++), hello(++), help(++), iconize(++), image(+),
-    inactive(++), input(++), keyboard(++), label(++),
-    line_style(+), mandelbrot(++), menubar(++), message(++),
-    minimum(++), navigation(++), output(++), overlay(++),
-    pack(++), pixmap(++), pixmap_browser(++), radio(++),
-    resizebox(++), scroll(++), shape(++), shiny(-),
-    subwindow(++), symbols(++), tabs(++), tile(++),
-    tiled_image(++), valuators(++),  fluid(++)
-
-    (o)=minor bugs, (+)=usable, (++)=running perfectly,
-    (-)=major bugs, (--)=crashes  
-
+    To create Universal Binaries for Tiger, start "configure"
+    with the following flags:
+      ./configure  --with-archflags="-mmacosx-version-min=10.4\
+                                     -arch i386 -arch ppc"
 
 OTHER STUFF
 

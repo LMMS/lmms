@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Clock.cxx 5472 2006-09-20 03:03:14Z mike $"
+// "$Id: Fl_Clock.cxx 6616 2009-01-01 21:28:26Z matt $"
 //
 // Clock widget for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2006 by Bill Spitzak and others.
+// Copyright 1998-2009 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -74,6 +74,10 @@ static void rect(double x, double y, double w, double h) {
   fl_end_polygon();
 }
 
+/**
+  Draw clock with the given position and size.
+  \param[in] X, Y, W, H position and size
+*/
 void Fl_Clock_Output::draw(int X, int Y, int W, int H) {
   Fl_Color box_color = type()==FL_ROUND_CLOCK ? FL_GRAY : color();
   Fl_Color shadow_color = fl_color_average(box_color, FL_BLACK, 0.5);
@@ -107,11 +111,20 @@ void Fl_Clock_Output::draw(int X, int Y, int W, int H) {
   fl_pop_matrix();
 }
 
+/**
+  Draw clock with current position and size.
+*/
 void Fl_Clock_Output::draw() {
   draw(x(), y(), w(), h());
   draw_label();
 }
 
+/**
+  Set the displayed time.
+  Set the time in hours, minutes, and seconds.
+  \param[in] H, m, s displayed time
+  \see hour(), minute(), second()
+ */
 void Fl_Clock_Output::value(int H, int m, int s) {
   if (H!=hour_ || m!=minute_ || s!=second_) {
     hour_ = H; minute_ = m; second_ = s;
@@ -120,6 +133,12 @@ void Fl_Clock_Output::value(int H, int m, int s) {
   }
 }
 
+/**
+  Set the displayed time.
+  Set the time in seconds since the UNIX epoch (January 1, 1970).
+  \param[in] v seconds since epoch
+  \see value()
+ */
 void Fl_Clock_Output::value(ulong v) {
   value_ = v;
   struct tm *timeofday;
@@ -129,8 +148,14 @@ void Fl_Clock_Output::value(ulong v) {
   value(timeofday->tm_hour, timeofday->tm_min, timeofday->tm_sec);
 }
 
-Fl_Clock_Output::Fl_Clock_Output(int X, int Y, int W, int H, const char *l)
-: Fl_Widget(X, Y, W, H, l) {
+/**
+  Create a new Fl_Clock_Output widget with the given position, size and label.
+  The default boxtype is \c FL_NO_BOX.
+  \param[in] X, Y, W, H position and size of the widget
+  \param[in] L widget label, default is no label
+ */
+Fl_Clock_Output::Fl_Clock_Output(int X, int Y, int W, int H, const char *L)
+: Fl_Widget(X, Y, W, H, L) {
   box(FL_UP_BOX);
   selection_color(fl_gray_ramp(5));
   align(FL_ALIGN_BOTTOM);
@@ -142,11 +167,24 @@ Fl_Clock_Output::Fl_Clock_Output(int X, int Y, int W, int H, const char *l)
 
 ////////////////////////////////////////////////////////////////
 
-Fl_Clock::Fl_Clock(int X, int Y, int W, int H, const char *l)
-  : Fl_Clock_Output(X, Y, W, H, l) {}
+/**
+  Create an Fl_Clock widget using the given position, size, and label string.
+  The default boxtype is \c FL_NO_BOX.
+  \param[in] X, Y, W, H position and size of the widget
+  \param[in] L widget label, default is no label
+ */
+Fl_Clock::Fl_Clock(int X, int Y, int W, int H, const char *L)
+  : Fl_Clock_Output(X, Y, W, H, L) {}
 
-Fl_Clock::Fl_Clock(uchar t, int X, int Y, int W, int H, const char *l)
-  : Fl_Clock_Output(X, Y, W, H, l) {
+/**
+  Create an Fl_Clock widget using the given boxtype, position, size, and
+  label string.
+  \param[in] t boxtype
+  \param[in] X, Y, W, H position and size of the widget
+  \param[in] L widget label, default is no label
+ */
+Fl_Clock::Fl_Clock(uchar t, int X, int Y, int W, int H, const char *L)
+  : Fl_Clock_Output(X, Y, W, H, L) {
   type(t);
   box(t==FL_ROUND_CLOCK ? FL_NO_BOX : FL_UP_BOX);
 }
@@ -168,10 +206,13 @@ int Fl_Clock::handle(int event) {
   return Fl_Clock_Output::handle(event);
 }
   
+/**
+  The destructor removes the clock.
+ */
 Fl_Clock::~Fl_Clock() {
   Fl::remove_timeout(tick, this);
 }
 
 //
-// End of "$Id: Fl_Clock.cxx 5472 2006-09-20 03:03:14Z mike $".
+// End of "$Id: Fl_Clock.cxx 6616 2009-01-01 21:28:26Z matt $".
 //

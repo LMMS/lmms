@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Widget.cxx 5190 2006-06-09 16:16:34Z mike $"
+// "$Id: Fl_Widget.cxx 6716 2009-03-24 01:40:44Z fabien $"
 //
 // Base widget class for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2005 by Bill Spitzak and others.
+// Copyright 1998-2009 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -35,9 +35,9 @@
 
 
 ////////////////////////////////////////////////////////////////
-// for compatability with Forms, all widgets without callbacks are
+// for compatibility with Forms, all widgets without callbacks are
 // inserted into a "queue" when they are activated, and the forms
-// compatability interaction functions (fl_do_events, etc) will
+// compatibility interaction functions (fl_do_events, etc.) will
 // read one widget at a time from this queue and return it:
 
 const int QUEUE_SIZE = 20;
@@ -47,7 +47,7 @@ static int obj_head, obj_tail;
 
 void Fl_Widget::default_callback(Fl_Widget *o, void * /*v*/) {
 #if 0
-  // This is necessary for strict forms compatability but is confusing.
+  // This is necessary for strict forms compatibility but is confusing.
   // Use the parent's callback if this widget does not have one.
   for (Fl_Widget *p = o->parent(); p; p = p->parent())
     if (p->callback() != default_callback) {
@@ -62,7 +62,11 @@ void Fl_Widget::default_callback(Fl_Widget *o, void * /*v*/) {
     if (obj_tail >= QUEUE_SIZE) obj_tail = 0;
   }
 }
-
+/**
+    All Fl_Widgets that don't have a callback defined use a
+    default callback that puts a pointer to the widget in this queue,
+    and this method reads the oldest widget out of this queue.
+*/
 Fl_Widget *Fl::readqueue() {
   if (obj_tail==obj_head) return 0;
   Fl_Widget *o = obj_queue[obj_tail++];
@@ -76,7 +80,8 @@ int Fl_Widget::handle(int) {
   return 0;
 }
 
-int FL_NORMAL_SIZE = 14;
+/** Default font size for widgets */
+Fl_Fontsize FL_NORMAL_SIZE = 14;
 
 Fl_Widget::Fl_Widget(int X, int Y, int W, int H, const char* L) {
 
@@ -87,7 +92,7 @@ Fl_Widget::Fl_Widget(int X, int Y, int W, int H, const char* L) {
   label_.deimage = 0;
   label_.type	 = FL_NORMAL_LABEL;
   label_.font	 = FL_HELVETICA;
-  label_.size	 = (uchar)FL_NORMAL_SIZE;
+  label_.size	 = FL_NORMAL_SIZE;
   label_.color	 = FL_FOREGROUND_COLOR;
   tooltip_       = 0;
   callback_	 = default_callback;
@@ -128,18 +133,26 @@ int Fl_Widget::take_focus() {
 
 extern void fl_throw_focus(Fl_Widget*); // in Fl_x.cxx
 
-// Destruction does not remove from any parent group!  And groups when
-// destroyed destroy all their children.  This is convienent and fast.
-// However, it is only legal to destroy a "root" such as an Fl_Window,
-// and automatic destructors may be called.
+/**
+   Destroys the widget, taking care of throwing focus before if any.
+   Destruction removes the widget from any parent group! And groups when
+   destroyed destroy all their children. This is convenient and fast.
+*/
 Fl_Widget::~Fl_Widget() {
   Fl::clear_widget_pointer(this);
   if (flags() & COPIED_LABEL) free((void *)(label_.value));
+  // remove from parent group
+  if (parent_) parent_->remove(this);
+#ifdef DEBUG_DELETE
+  if (parent_) { // this should never happen
+    printf("*** Fl_Widget: parent_->remove(this) failed [%p,%p]\n",parent_,this);
+  }
+#endif // DEBUG_DELETE
   parent_ = 0; // Don't throw focus to a parent widget.
   fl_throw_focus(this);
 }
 
-// draw a focus box for the widget...
+/** Draws a focus box for the widget at the given position and size */
 void
 Fl_Widget::draw_focus(Fl_Boxtype B, int X, int Y, int W, int H) const {
   if (!Fl::visible_focus()) return;
@@ -156,7 +169,12 @@ Fl_Widget::draw_focus(Fl_Boxtype B, int X, int Y, int W, int H) const {
 
   fl_color(fl_contrast(FL_BLACK, color()));
 
-#if defined(WIN32) || defined(__APPLE_QD__)
+#if defined(USE_X11) || defined(__APPLE_QUARTZ__)
+  fl_line_style(FL_DOT);
+  fl_rect(X + Fl::box_dx(B), Y + Fl::box_dy(B),
+          W - Fl::box_dw(B) - 1, H - Fl::box_dh(B) - 1);
+  fl_line_style(FL_SOLID);
+#elif defined(WIN32) 
   // Windows 95/98/ME do not implement the dotted line style, so draw
   // every other pixel around the focus area...
   //
@@ -175,10 +193,7 @@ Fl_Widget::draw_focus(Fl_Boxtype B, int X, int Y, int W, int H) const {
   for (xx = W; xx > 0; xx --, i ++) if (i & 1) fl_point(X + xx, Y + H);
   for (yy = H; yy > 0; yy --, i ++) if (i & 1) fl_point(X, Y + yy);
 #else
-  fl_line_style(FL_DOT);
-  fl_rect(X + Fl::box_dx(B), Y + Fl::box_dy(B),
-          W - Fl::box_dw(B) - 1, H - Fl::box_dh(B) - 1);
-  fl_line_style(FL_SOLID);
+# error unsupported platform
 #endif // WIN32
 }
 
@@ -278,7 +293,23 @@ Fl_Widget::copy_label(const char *a) {
   redraw_label();
 }
 
+/** Calls the widget callback.
+
+  Causes a widget to invoke its callback function with arbitrary arguments.
+
+  \param[in] o call the callback with \p o as the widget argument
+  \param[in] arg use \p arg as the user data argument
+  \see callback()
+*/
+void
+Fl_Widget::do_callback(Fl_Widget* o,void* arg) {
+  Fl_Widget_Tracker wp(o);
+  callback_(o,arg); 
+  if (wp.deleted()) return;
+  if (callback_ != default_callback) 
+    clear_changed();
+}
 
 //
-// End of "$Id: Fl_Widget.cxx 5190 2006-06-09 16:16:34Z mike $".
+// End of "$Id: Fl_Widget.cxx 6716 2009-03-24 01:40:44Z fabien $".
 //

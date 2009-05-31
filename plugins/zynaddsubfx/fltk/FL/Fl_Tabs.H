@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Tabs.H 5326 2006-08-17 13:43:07Z matt $"
+// "$Id: Fl_Tabs.H 6614 2009-01-01 16:11:32Z matt $"
 //
 // Tab header file for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2005 by Bill Spitzak and others.
+// Copyright 1998-2009 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -25,11 +25,40 @@
 //     http://www.fltk.org/str.php
 //
 
+/* \file
+   Fl_Tabs widget . */
+
 #ifndef Fl_Tabs_H
 #define Fl_Tabs_H
 
 #include "Fl_Group.H"
 
+/**
+  The Fl_Tabs widget is the "file card tabs"
+  interface that allows you to put lots and lots of buttons and
+  switches in a panel, as popularized by many toolkits.
+  
+  \image html  tabs.gif
+  \image latex tabs.eps "Fl_Tabs" width=8cm
+  
+  Clicking the tab makes a child visible() by calling
+  show() on it, and all other children are made invisible
+  by calling hide() on them. Usually the children are Fl_Group widgets
+  containing several widgets themselves.
+  
+  Each child makes a card, and its label() is printed
+  on the card tab, including the label font and style.  The
+  selection color of that child is used to color the tab, while
+  the color of the child determines the background color of the pane.
+  
+  The size of the tabs is controlled by the bounding box of the
+  children (there should be some space between the children and
+  the edge of the Fl_Tabs), and the tabs may be placed
+  "inverted" on the bottom - this is determined by which
+  gap is larger. It is easiest to lay this out in fluid, using the
+  fluid browser to select each child group and resize them until
+  the tabs look the way you want them to.
+*/
 class FL_EXPORT Fl_Tabs : public Fl_Group {
   Fl_Widget *value_;
   Fl_Widget *push_;
@@ -53,5 +82,5 @@ public:
 #endif
 
 //
-// End of "$Id: Fl_Tabs.H 5326 2006-08-17 13:43:07Z matt $".
+// End of "$Id: Fl_Tabs.H 6614 2009-01-01 16:11:32Z matt $".
 //

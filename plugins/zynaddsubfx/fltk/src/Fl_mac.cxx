@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_mac.cxx 6033 2008-02-20 18:17:34Z matt $"
+// "$Id: Fl_mac.cxx 6758 2009-04-13 07:32:01Z matt $"
 //
 // MacOS specific code for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2007 by Bill Spitzak and others.
+// Copyright 1998-2009 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -43,9 +43,16 @@
 //          to implement clipping. This should be changed into pure
 //          Quartz calls in the near future.
 
+// FIXME moving away from Carbon, I am replacing the Scrap manager calls with Pasteboard
+//       calls that support utf8 encoding. As soon as these unction haven proven working
+//       the Scrap manager calls should be removed
+#define USE_PASTEBOARD 1
+
 // we don't need the following definition because we deliver only
 // true mouse moves.  On very slow systems however, this flag may
 // still be useful.
+#ifndef FL_DOXYGEN
+
 #define CONSOLIDATE_MOTION 0
 extern "C" {
 #include <pthread.h>
@@ -82,6 +89,8 @@ extern void fl_fix_focus();
 static void handleUpdateEvent( WindowPtr xid );
 //+ int fl_handle(const EventRecord &event);
 static int FSSpec2UnixPath( FSSpec *fs, char *dst );
+// converting cr lf converter function
+static void convert_crlf(char * string, size_t len);
 
 // public variables
 int fl_screen;
@@ -115,6 +124,19 @@ extern Fl_Window* fl_xmousewin;
 enum { kEventClassFLTK = 'fltk' };
 enum { kEventFLTKBreakLoop = 1, kEventFLTKDataReady };
 
+/* fltk-utf8 placekeepers */
+void fl_reset_spot()
+{
+}
+
+void fl_set_spot(int font, int size, int X, int Y, int W, int H, Fl_Window *win)
+{
+}
+
+void fl_set_status(int x, int y, int w, int h)
+{
+}
+
 /**
 * Mac keyboard lookup table
  */
@@ -134,7 +156,7 @@ static unsigned short macKeyLookUp[128] =
     0/*FL_Shift_L*/, 0/*FL_Caps_Lock*/, 0/*FL_Alt_L*/, 0/*FL_Control_L*/, 
     0/*FL_Shift_R*/, 0/*FL_Alt_R*/, 0/*FL_Control_R*/, 0,
 
-    0, FL_KP+'.', FL_Right, FL_KP+'*', 0, FL_KP+'+', FL_Left, FL_Num_Lock,
+    0, FL_KP+'.', FL_Right, FL_KP+'*', 0, FL_KP+'+', FL_Left, FL_Delete,
     FL_Down, 0, 0, FL_KP+'/', FL_KP_Enter, FL_Up, FL_KP+'-', 0,
 
     0, FL_KP+'=', FL_KP+'0', FL_KP+'1', FL_KP+'2', FL_KP+'3', FL_KP+'4', FL_KP+'5',
@@ -150,7 +172,7 @@ static unsigned short macKeyLookUp[128] =
 /**
  * convert the current mouse chord into the FLTK modifier state
  */
-static void mods_to_e_state( UInt32 mods )
+static unsigned int mods_to_e_state( UInt32 mods )
 {
   long state = 0;
   if ( mods & kEventKeyModifierNumLockMask ) state |= FL_NUM_LOCK;
@@ -159,8 +181,10 @@ static void mods_to_e_state( UInt32 mods )
   if ( mods & (controlKey|rightControlKey) ) state |= FL_CTRL;
   if ( mods & (shiftKey|rightShiftKey) ) state |= FL_SHIFT;
   if ( mods & alphaLock ) state |= FL_CAPS_LOCK;
-  Fl::e_state = ( Fl::e_state & 0xff000000 ) | state;
+  unsigned int ret = ( Fl::e_state & 0xff000000 ) | state;
+  Fl::e_state = ret;
   //printf( "State 0x%08x (%04x)\n", Fl::e_state, mods );
+  return ret;
 }
 
 
@@ -542,8 +566,11 @@ static pascal OSStatus carbonDispatchHandler( EventHandlerCallRef nextHandler, E
     switch (GetEventKind( event ) )
     {
       case kEventCommandProcess:
-        GetEventParameter( event, kEventParamDirectObject, typeHICommand, NULL, sizeof(HICommand), NULL, &cmd );
-        ret = HandleMenu( &cmd );
+        ret = GetEventParameter( event, kEventParamDirectObject, typeHICommand, NULL, sizeof(HICommand), NULL, &cmd );
+        if (ret == noErr && (cmd.attributes & kHICommandFromMenu) != 0) 
+          ret = HandleMenu( &cmd );
+        else 
+          ret = eventNotHandledErr;
         break;
     }
     break;
@@ -663,7 +690,7 @@ static pascal void do_timer(EventLoopTimerRef timer, void* data)
  */
 static double do_queued_events( double time = 0.0 ) 
 {
-  static bool been_here = 0;
+  static bool been_here = false;
   static RgnHandle rgn;
   
   // initialize events and a region that enables mouse move events
@@ -673,7 +700,7 @@ static double do_queued_events( double time = 0.0 )
     GetMouse(&mp);
     SetRectRgn(rgn, mp.h, mp.v, mp.h, mp.v);
     SetEventMask(everyEvent);
-    been_here = 1;
+    been_here = true;
   }
   OSStatus ret;
   static EventTargetRef target = 0;
@@ -1078,18 +1105,181 @@ static unsigned short keycode_to_sym( UInt32 keyCode, UInt32 mods, unsigned shor
   return deflt;
 }
 
+/*
+ * keycode_function for post-10.5 systems, allows more sophisticated decoding of keys
+ */
+static int keycodeToUnicode(
+                char * uniChars, int maxChars,
+                EventKind eKind,
+                UInt32 keycode, UInt32 modifiers,
+                UInt32 * deadKeyStatePtr,
+                unsigned char,  // not used in this function
+                unsigned short) // not used in this function
+{
+  // first get the keyboard mapping in a post 10.2 way
+  
+  Ptr resource;
+  TextEncoding encoding;
+  static TextEncoding lastEncoding = kTextEncodingMacRoman;
+  int len = 0;
+  KeyboardLayoutRef currentLayout = NULL;
+  static KeyboardLayoutRef lastLayout = NULL;
+  SInt32 currentLayoutId = 0;
+  static SInt32 lastLayoutId;
+  int hasLayoutChanged = false;
+  static Ptr uchr = NULL;
+  static Ptr KCHR = NULL;
+  // ScriptCode currentKeyScript;
+  
+  KLGetCurrentKeyboardLayout(&currentLayout);
+  if (currentLayout) {
+    KLGetKeyboardLayoutProperty(currentLayout, kKLIdentifier, (const void**)&currentLayoutId);
+    if ( (lastLayout != currentLayout) || (lastLayoutId != currentLayoutId) ) {
+      lastLayout = currentLayout;
+      lastLayoutId = currentLayoutId;
+      uchr = NULL;
+      KCHR = NULL;
+      if ((KLGetKeyboardLayoutProperty(currentLayout, kKLuchrData, (const void**)&uchr) == noErr) && (uchr != NULL)) {
+        // done
+      } else if ((KLGetKeyboardLayoutProperty(currentLayout, kKLKCHRData, (const void**)&KCHR) == noErr) && (KCHR != NULL)) {
+        // done
+      }
+      // FIXME No Layout property found. Now we have a problem. 
+    }
+  }
+  if (hasLayoutChanged) {
+    //deadKeyStateUp = deadKeyStateDown = 0;
+    if (KCHR != NULL) {
+      // FIXME this must not happen
+    } else if (uchr == NULL) {
+      KCHR = (Ptr) GetScriptManagerVariable(smKCHRCache);
+    }
+  }
+  if (uchr != NULL) {
+    // this is what I expect
+    resource = uchr;
+  } else {
+    resource = KCHR;
+    encoding = lastEncoding;
+    // this is actually not supported by the following code and will likely crash
+  }
+  
+  // now apply that keyboard mapping to our keycode
+  
+  int action;
+  //OptionBits options = 0;
+  // not used yet: OptionBits options = kUCKeyTranslateNoDeadKeysMask;
+  unsigned long keyboardType;
+  keycode &= 0xFF;
+  modifiers = (modifiers >> 8) & 0xFF;
+  keyboardType = LMGetKbdType();
+  OSStatus status;
+  UniCharCount actuallength;
+  UniChar utext[10];
+  
+  switch(eKind) {     
+    case kEventRawKeyDown:    action = kUCKeyActionDown; break;
+    case kEventRawKeyUp:      action = kUCKeyActionUp; break;
+    case kEventRawKeyRepeat:  action = kUCKeyActionAutoKey; break;
+    default: return 0;
+  }
+
+  UInt32 deadKeyState = *deadKeyStatePtr;
+  if ((action==kUCKeyActionUp)&&(*deadKeyStatePtr))
+    deadKeyStatePtr = &deadKeyState;
+
+  status = UCKeyTranslate(
+                          (const UCKeyboardLayout *) uchr,
+                          keycode, action, modifiers, keyboardType,
+                          0, deadKeyStatePtr,
+                          10, &actuallength, utext);
+
+  if (noErr != status) {
+    fprintf(stderr,"UCKeyTranslate failed: %d\n", (int) status);
+    actuallength = 0;
+  }
+
+  // convert the list of unicode chars into utf8
+  // FIXME no bounds check (see maxchars)
+  unsigned i;
+  for (i=0; i<actuallength; ++i) {
+    len += fl_utf8encode(utext[i], uniChars+len);
+  }
+  uniChars[len] = 0;
+  return len;
+}
+
+/*
+ * keycode_function for pre-10.5 systems, this is the "historic" fltk Mac key handling
+ */
+static int keycode_wrap_old(
+                char * buffer,
+                int, EventKind, UInt32, // not used in this function
+                UInt32, UInt32 *,       // not used in this function
+                unsigned char key,
+                unsigned short sym)
+{
+  if ( (sym >= FL_KP && sym <= FL_KP_Last) || !(sym & 0xff00) ||
+        sym == FL_Tab || sym == FL_Enter) {
+    buffer[0] = key;
+    return 1;
+  } else {
+    buffer[0] = 0;
+    return 0;
+  }
+} /* keycode_wrap_old */
+/* 
+ * Stub pointer to select appropriate keycode_function per operating system version. This function pointer
+ * is initialised in fl_open_display, based on the runtime identification of the host OS version. This is
+ * intended to allow us to utilise 10.5 services dynamically to improve Unicode handling, whilst still 
+ * allowing code to run satisfactorily on older systems.
+ */
+static int (*keycode_function)(char*, int, EventKind, UInt32, UInt32, UInt32*, unsigned char, unsigned short) = keycode_wrap_old;
+
+
+// EXPERIMENTAL!
+pascal OSStatus carbonTextHandler( 
+  EventHandlerCallRef nextHandler, EventRef event, void *userData )
+{
+  Fl_Window *window = (Fl_Window*)userData;
+  Fl::first_window(window);
+  fl_lock_function();
+  //int kind = GetEventKind(event);
+  unsigned short buf[200];
+  ByteCount size;
+  GetEventParameter( event, kEventParamTextInputSendText, typeUnicodeText, 
+                     NULL, 100, &size, &buf );
+//  printf("TextEvent: %02x %02x %02x %02x\n", buf[0], buf[1], buf[2], buf[3]);
+  // FIXME: oversimplified!
+  unsigned ucs = buf[0];
+  char utf8buf[20];
+  int len = fl_utf8encode(ucs, utf8buf);
+  Fl::e_length = len;
+  Fl::e_text = utf8buf;
+  while (window->parent()) window = window->window();
+  Fl::handle(FL_KEYBOARD, window);
+  fl_unlock_function();
+  fl_lock_function();
+  Fl::handle(FL_KEYUP, window);
+  fl_unlock_function();
+  // for some reason, the window does not redraw until the next mouse move or button push
+  // sending a 'redraw()' or 'awake()' does not solve the issue!
+  Fl::flush();
+  return noErr;
+}  
+
 /**
  * handle carbon keyboard events
  */
 pascal OSStatus carbonKeyboardHandler( 
   EventHandlerCallRef nextHandler, EventRef event, void *userData )
 {
-  static char buffer[5];
+  static char buffer[32];
   int sendEvent = 0;
   Fl_Window *window = (Fl_Window*)userData;
   Fl::first_window(window);
   UInt32 mods;
-  static UInt32 prevMods = 0xffffffff;
+  static UInt32 prevMods = mods_to_e_state( GetCurrentKeyModifiers() );
 
   fl_lock_function();
   
@@ -1098,10 +1288,9 @@ pascal OSStatus carbonKeyboardHandler(
   // get the modifiers for any of the events
   GetEventParameter( event, kEventParamKeyModifiers, typeUInt32, 
                      NULL, sizeof(UInt32), NULL, &mods );
-  if ( prevMods == 0xffffffff ) prevMods = mods;
   
   // get the key code only for key events
-  UInt32 keyCode = 0;
+  UInt32 keyCode = 0, maskedKeyCode = 0;
   unsigned char key = 0;
   unsigned short sym = 0;
   if (kind!=kEventRawKeyModifiersChanged) {
@@ -1110,7 +1299,12 @@ pascal OSStatus carbonKeyboardHandler(
     GetEventParameter( event, kEventParamKeyMacCharCodes, typeChar, 
                        NULL, sizeof(char), NULL, &key );
   }
-  /* output a human readbale event identifier for debugging
+  // extended keyboards can also send sequences on key-up to generate Kanji etc. codes.
+  // Some observed prefixes are 0x81 to 0x83, followed by an 8 bit keycode.
+  // In this mode, there seem to be no key-down codes
+// printf("%08x %08x %08x\n", keyCode, mods, key);
+  maskedKeyCode = keyCode & 0x7f;
+  /* output a human readable event identifier for debugging 
   const char *ev = "";
   switch (kind) {
     case kEventRawKeyDown: ev = "kEventRawKeyDown"; break;
@@ -1125,6 +1319,8 @@ pascal OSStatus carbonKeyboardHandler(
   {
   case kEventRawKeyDown:
   case kEventRawKeyRepeat:
+/*
+    // FIXME Matt: For 10.5, the keycode_function will handle all this. This is untested for ealier versions of OS X.
     // When the user presses a "dead key", no information is send about
     // which dead key symbol was created. So we need to trick Carbon into
     // giving us the code by sending a "space" after the "dead key".
@@ -1139,6 +1335,7 @@ pascal OSStatus carbonKeyboardHandler(
     } else {
       Fl::e_state &= 0xbfffffff; // clear the deadkey flag
     }
+*/
     sendEvent = FL_KEYBOARD;
     // fall through
   case kEventRawKeyUp:
@@ -1148,31 +1345,29 @@ pascal OSStatus carbonKeyboardHandler(
     }
     // if the user pressed alt/option, event_key should have the keycap, 
     // but event_text should generate the international symbol
+    sym = macKeyLookUp[maskedKeyCode];
     if ( isalpha(key) )
       sym = tolower(key);
-    else if ( Fl::e_state&FL_CTRL && key<32 )
+    else if ( Fl::e_state&FL_CTRL && key<32 && sym<0xff00)
       sym = key+96;
-    else if ( Fl::e_state&FL_ALT ) // find the keycap of this key
-      sym = keycode_to_sym( keyCode & 0x7f, 0, macKeyLookUp[ keyCode & 0x7f ] );
-    else
-      sym = macKeyLookUp[ keyCode & 0x7f ];
+    else if ( Fl::e_state&FL_ALT && sym<0xff00) // find the keycap of this key
+      sym = keycode_to_sym( maskedKeyCode, 0, macKeyLookUp[ maskedKeyCode ] );
     Fl::e_keysym = Fl::e_original_keysym = sym;
     // Handle FL_KP_Enter on regular keyboards and on Powerbooks
-    if ( keyCode==0x4c || keyCode==0x34) key=0x0d;
+    if ( maskedKeyCode==0x4c || maskedKeyCode==0x34) key=0x0d;    
+    // Handle the Delete key on the keypad
     // Matt: the Mac has no concept of a NumLock key, or at least not visible
     // Matt: to Carbon. The kEventKeyModifierNumLockMask is only set when
     // Matt: a numeric keypad key is pressed and does not correspond with
     // Matt: the NumLock light in PowerBook keyboards.
-    if ( (sym >= FL_KP && sym <= FL_KP_Last) || !(sym & 0xff00) ||
-            sym == FL_Tab || sym == FL_Enter) {
-      buffer[0] = key;
-      Fl::e_length = 1;
-    } else {
-      buffer[0] = 0;
-      Fl::e_length = 0;
-    }
+
+    // Matt: attempt to get the correct Unicode character(s) from our keycode
+    // imm:  keycode_function function pointer added to allow us to use different functions
+    // imm:  depending on which OS version we are running on (tested and set in fl_open_display)
+    static UInt32 deadKeyState = 0; // must be cleared when losing focus
+    Fl::e_length = (*keycode_function)(buffer, 31, kind, keyCode, mods, &deadKeyState, key, sym);
     Fl::e_text = buffer;
-    // insert UnicodeHandling here!
+    buffer[Fl::e_length] = 0; // just in case...
     break;
   case kEventRawKeyModifiersChanged: {
     UInt32 tMods = prevMods ^ mods;
@@ -1337,12 +1532,31 @@ void fl_open_display() {
         CFRelease(execUrl);
       }
 
+    // imm: keycode handler stub setting - use Gestalt to determine the running system version,
+    // then set the keycode_function pointer accordingly
+    SInt32 MacVersion;
+    if (Gestalt(gestaltSystemVersion, &MacVersion) == noErr)
+    {
+//      SInt32 maj, min, fix;
+//      Gestalt(gestaltSystemVersionMajor, &maj);   // e.g. 10
+//      Gestalt(gestaltSystemVersionMinor, &min);   // e.g.  4
+//      Gestalt(gestaltSystemVersionBugFix, &fix);  // e.g. 11
+      if(MacVersion >= 0x1050) { // 10.5.0 or later
+        keycode_function = keycodeToUnicode;
+      }
+      else {
+        keycode_function = keycode_wrap_old; // pre-10.5 mechanism
+      }
+    }
+    // else our default handler will be used (keycode_wrap_old)
+
+
       if( !bundle )
       {
         // Earlier versions of this code tried to use weak linking, however it
-	// appears that this does not work on 10.2.  Since 10.3 and higher provide
-	// both TransformProcessType and CPSEnableForegroundOperation, the following
-	// conditional code compiled on 10.2 will still work on newer releases...
+        // appears that this does not work on 10.2.  Since 10.3 and higher provide
+        // both TransformProcessType and CPSEnableForegroundOperation, the following
+        // conditional code compiled on 10.2 will still work on newer releases...
         OSErr err;
 
 #if MAC_OS_X_VERSION_MAX_ALLOWED > MAC_OS_X_VERSION_10_2
@@ -1439,15 +1653,8 @@ unsigned short mac2fltk(ulong macKey)
 void Fl_X::flush()
 {
   w->flush();
-#ifdef __APPLE_QD__
-  GrafPtr port; 
-  GetPort( &port );
-  if ( port )
-    QDFlushPortBuffer( port, 0 );
-#elif defined (__APPLE_QUARTZ__)
   if (fl_gc) 
     CGContextFlush(fl_gc);
-#endif          
   SetOrigin( 0, 0 );
 }
 
@@ -1488,6 +1695,46 @@ void handleUpdateEvent( WindowPtr xid )
   SetPort( oldPort );
 }     
 
+// Gets the border sizes and the titlebar size
+static void get_window_frame_sizes(int &bx, int &by, int &bt) {
+#if MAC_OS_X_VERSION_MAX_ALLOWED > MAC_OS_X_VERSION_10_2
+	static HIRect contentRect = { {50,50}, {100,100} }; // a rect to stand in for the content rect of a real window
+	static HIThemeWindowDrawInfo metrics= {0, 
+		kThemeStateActive, kThemeDocumentWindow,
+		kThemeWindowHasFullZoom + kThemeWindowHasCloseBox + 
+		kThemeWindowHasCollapseBox + kThemeWindowHasTitleText, 
+		0, 0};
+	HIShapeRef shape1=0, shape2=0, shape3=0;
+	HIRect rect1, rect2, rect3;
+	OSStatus	status;
+	status  = HIThemeGetWindowShape(&contentRect, &metrics, kWindowStructureRgn, &shape1);
+	status |= HIThemeGetWindowShape(&contentRect, &metrics, kWindowContentRgn, &shape2);
+	status |= HIThemeGetWindowShape(&contentRect, &metrics, kWindowTitleBarRgn, &shape3);
+    
+	if (!status) 
+	{
+		HIShapeGetBounds(shape1, &rect1);
+		HIShapeGetBounds(shape2, &rect2);
+		HIShapeGetBounds(shape3, &rect3);
+		bt = rect3.size.height;
+		bx = rect2.origin.x  - rect1.origin.x;
+		by = rect2.origin.y  - rect1.origin.y - bt;
+		// fprintf(stderr, "HIThemeGetWindowShape succeeded bx=%d by=%d bt=%d\n", bx, by, bt);
+	}		
+	else 
+#endif // MAC_OS_X_VERSION_MAX_ALLOWED > MAC_OS_X_VERSION_10_2
+	{
+		// sets default dimensions
+		bx = by = 6;
+		bt = 22;
+		// fprintf(stderr, "HIThemeGetWindowShape failed, bx=%d by=%d bt=%d\n", bx, by, bt);
+	}
+#if MAC_OS_X_VERSION_MAX_ALLOWED > MAC_OS_X_VERSION_10_2
+	CFRelease(shape1); // we must free HIThemeGetWindowShape() (copied) handles 
+	CFRelease(shape2);
+	CFRelease(shape3);
+#endif // MAC_OS_X_VERSION_MAX_ALLOWED > MAC_OS_X_VERSION_10_2
+}
 
 /**
  * \todo this is a leftover from OS9 times. Please check how much applies to Carbon!
@@ -1498,14 +1745,19 @@ int Fl_X::fake_X_wm(const Fl_Window* w,int &X,int &Y, int &bt,int &bx, int &by) 
   if (w->border() && !w->parent()) {
     if (w->maxw != w->minw || w->maxh != w->minh) {
       ret = 2;
-      bx = 6; // \todo Mac : GetSystemMetrics(SM_CXSIZEFRAME);
-      by = 6; // \todo Mac : get Mac window frame size GetSystemMetrics(SM_CYSIZEFRAME);
+      get_window_frame_sizes(bx, by, bt);
+      /*
+        bx = 6; // \todo Mac : GetSystemMetrics(SM_CXSIZEFRAME);
+        by = 6; // \todo Mac : get Mac window frame size GetSystemMetrics(SM_CYSIZEFRAME);
+      */
     } else {
       ret = 1;
-      bx = 6; // \todo Mac : GetSystemMetrics(SM_CXFIXEDFRAME);
-      by = 6; // \todo Mac : GetSystemMetrics(SM_CYFIXEDFRAME);
+      get_window_frame_sizes(bx, by, bt);
+      /*
+        bx = 6; // \todo Mac : GetSystemMetrics(SM_CXFIXEDFRAME);
+        by = 6; // \todo Mac : GetSystemMetrics(SM_CYFIXEDFRAME);
+      */
     }
-    bt = 22; // \todo Mac : GetSystemMetrics(SM_CYCAPTION);
   }
   //The coordinates of the whole window, including non-client area
   xoff = bx;
@@ -1599,6 +1851,12 @@ static int FSSpec2UnixPath( FSSpec *fs, char *dst )
   FSRefMakePath( &fsRef, (UInt8*)dst, 1024 );
   return strlen(dst);
 }
+static void convert_crlf(char * s, size_t len)
+{
+  // turn all \r characters into \n:
+  for (size_t x = 0; x < len; x++) if (s[x] == '\r') s[x] = '\n';
+}
+
 
 static DragReference currDragRef = 0;
 static char *currDragData = 0L;
@@ -1631,19 +1889,36 @@ static OSErr fillCurrentDragData(DragReference dragRef)
   FlavorFlags flags;
   Size itemSize, size = 0;
   CountDragItems( dragRef, &nItem );
+
   for ( i = 1; i <= nItem; i++ )
   {
     GetDragItemReferenceNumber( dragRef, i, &itemRef );
+    ret = GetFlavorFlags( dragRef, itemRef, 'utf8', &flags );
+    if ( ret == noErr )
+    {
+      GetFlavorDataSize( dragRef, itemRef, 'utf8', &itemSize );
+      size += itemSize;
+      continue;
+    }
+    ret = GetFlavorFlags( dragRef, itemRef, 'utxt', &flags );
+    if ( ret == noErr )
+    {
+      GetFlavorDataSize( dragRef, itemRef, 'utxt', &itemSize );
+      size += itemSize;
+      continue;
+    }
     ret = GetFlavorFlags( dragRef, itemRef, 'TEXT', &flags );
     if ( ret == noErr )
     {
       GetFlavorDataSize( dragRef, itemRef, 'TEXT', &itemSize );
       size += itemSize;
+      continue;
     }
     ret = GetFlavorFlags( dragRef, itemRef, 'hfs ', &flags );
     if ( ret == noErr )
     {
       size += 1024; //++ ouch! We should create the full pathname and figure out its length
+      continue;
     }
   }
 
@@ -1659,24 +1934,45 @@ static OSErr fillCurrentDragData(DragReference dragRef)
   for ( i = 1; i <= nItem; i++ )
   {
     GetDragItemReferenceNumber( dragRef, i, &itemRef );
+    ret = GetFlavorFlags( dragRef, itemRef, 'utf8', &flags );
+    if ( ret == noErr )
+    {
+      GetFlavorDataSize( dragRef, itemRef, 'utf8', &itemSize );
+      GetFlavorData( dragRef, itemRef, 'utf8', dst, &itemSize, 0L );
+      dst += itemSize;
+      *dst++ = '\n'; // add our element separator
+      continue;
+    }
+    GetDragItemReferenceNumber( dragRef, i, &itemRef );
+    ret = GetFlavorFlags( dragRef, itemRef, 'utxt', &flags );
+    if ( ret == noErr )
+    {
+      GetFlavorDataSize( dragRef, itemRef, 'utxt', &itemSize );
+      GetFlavorData( dragRef, itemRef, 'utxt', dst, &itemSize, 0L );
+      dst += itemSize;
+      *dst++ = '\n'; // add our element separator
+      continue;
+    }
     ret = GetFlavorFlags( dragRef, itemRef, 'TEXT', &flags );
     if ( ret == noErr )
     {
       GetFlavorDataSize( dragRef, itemRef, 'TEXT', &itemSize );
       GetFlavorData( dragRef, itemRef, 'TEXT', dst, &itemSize, 0L );
       dst += itemSize;
-      *dst++ = '\n'; // add our element seperator
+      *dst++ = '\n'; // add our element separator
+      continue;
     }
     ret = GetFlavorFlags( dragRef, itemRef, 'hfs ', &flags );
     if ( ret == noErr )
     {
       HFSFlavor hfs; itemSize = sizeof( hfs );
       GetFlavorData( dragRef, itemRef, 'hfs ', &hfs, &itemSize, 0L );
-      itemSize = FSSpec2UnixPath( &hfs.fileSpec, dst );
+      itemSize = FSSpec2UnixPath( &hfs.fileSpec, dst ); // return the path name in UTF8
       dst += itemSize;
       if ( itemSize>1 && ( hfs.fileType=='fold' || hfs.fileType=='disk' ) ) 
         *dst++ = '/';
-      *dst++ = '\n'; // add our element seperator
+      *dst++ = '\n'; // add our element separator
+      continue;
     }
   }
 
@@ -1788,7 +2084,24 @@ static pascal OSErr dndReceiveHandler( WindowPtr w, void *userData, DragReferenc
   breakMacEventLoop();
   return noErr;
 }
-
+// fc:  
+static void  q_set_window_title(Window xid, const char * name ) {
+#if 1
+    CFStringRef utf8_title = CFStringCreateWithCString(NULL, (name ? name : ""), kCFStringEncodingUTF8);
+    SetWindowTitleWithCFString(xid, utf8_title);
+    CFRelease(utf8_title);
+#else // old non-utf8 code to remove after new utf8 code approval :
+    Str255 pTitle;
+    if (name) {
+      if (strlen(name) > 255) pTitle[0] = 255;
+      else pTitle[0] = strlen(name);
+      memcpy(pTitle+1, name, pTitle[0]);
+    } 
+    else 
+      pTitle[0] = 0;
+    SetWTitle(xid, pTitle);
+#endif
+}
 
 /**
  * go ahead, create that (sub)window
@@ -1900,13 +2213,6 @@ void Fl_X::make(Fl_Window* w)
     wRect.right  = w->x() + w->w(); if (wRect.right<=wRect.left) wRect.right = wRect.left+1;
 
     const char *name = w->label();
-    Str255 pTitle; 
-    if (name) {
-      if (strlen(name) > 255) pTitle[0] = 255;
-      else pTitle[0] = strlen(name);
-
-      memcpy(pTitle+1, name, pTitle[0]);
-    } else pTitle[0] = 0;
 
     Fl_X* x = new Fl_X;
     x->other_xid = 0; // room for doublebuffering image map. On OS X this is only used by overlay windows
@@ -1919,7 +2225,7 @@ void Fl_X::make(Fl_Window* w)
 
     winattr &= GetAvailableWindowAttributes( winclass );	// make sure that the window will open
     CreateNewWindow( winclass, winattr, &wRect, &(x->xid) );
-    SetWTitle(x->xid, pTitle);
+    q_set_window_title(x->xid, name);
     MoveWindow(x->xid, wRect.left, wRect.top, 1);	// avoid Carbon Bug on old OS
     if (w->non_modal() && !w->modal()) {
       // Major kludge: this is to have the regular look, but stay above the document windows
@@ -1956,6 +2262,7 @@ void Fl_X::make(Fl_Window* w)
         { kEventClassMouse, kEventMouseMoved },
         { kEventClassMouse, kEventMouseDragged } };
       ret = InstallWindowEventHandler( x->xid, mouseHandler, 4, mouseEvents, w, 0L );
+
       EventHandlerUPP keyboardHandler = NewEventHandlerUPP( carbonKeyboardHandler ); // will not be disposed by Carbon...
       static EventTypeSpec keyboardEvents[] = {
         { kEventClassKeyboard, kEventRawKeyDown },
@@ -1963,6 +2270,12 @@ void Fl_X::make(Fl_Window* w)
         { kEventClassKeyboard, kEventRawKeyUp },
         { kEventClassKeyboard, kEventRawKeyModifiersChanged } };
       ret = InstallWindowEventHandler( x->xid, keyboardHandler, 4, keyboardEvents, w, 0L );
+
+      EventHandlerUPP textHandler = NewEventHandlerUPP( carbonTextHandler ); // will not be disposed by Carbon...
+      static EventTypeSpec textEvents[] = {
+        { kEventClassTextInput, kEventTextInputUnicodeForKeyEvent } };
+      ret = InstallWindowEventHandler( x->xid, textHandler, 1, textEvents, w, 0L );
+
       EventHandlerUPP windowHandler = NewEventHandlerUPP( carbonWindowHandler ); // will not be disposed by Carbon...
       static EventTypeSpec windowEvents[] = {
         { kEventClassWindow, kEventWindowDrawContent },
@@ -2056,12 +2369,10 @@ const char *fl_filename_name( const char *name )
  */
 void Fl_Window::label(const char *name,const char */*iname*/) {
   Fl_Widget::label(name);
-  Str255 pTitle;
 
-  if (name) { pTitle[0] = strlen(name); memcpy(pTitle+1, name, pTitle[0]); }
-  else pTitle[0] = 0;
-
-  if (shown() || i) SetWTitle(fl_xid(this), pTitle);
+  if (shown() || i) {
+    q_set_window_title(fl_xid(this), name);
+  }
 }
 
 
@@ -2183,17 +2494,25 @@ void Fl_Window::make_current()
   fl_gc = i->gc;
   CGContextSaveGState(fl_gc);
   Fl_X::q_fill_context();
+#if defined(USE_CAIRO) && defined (__APPLE_QUARTZ__)
+   if (Fl::cairo_autolink_context()) Fl::cairo_make_current(this); // capture gc changes automatically to update the cairo context adequately
+#endif
+
 #endif
   fl_clip_region( 0 );
   SetPortClipRegion( GetWindowPort(i->xid), fl_window_region );
-  return;
+
+#if defined(__APPLE_QUARTZ__) && defined(USE_CAIRO)
+  // update the cairo_t context
+  if (Fl::cairo_autolink_context()) Fl::cairo_make_current(this);
+#endif
 }
 
 // helper function to manage the current CGContext fl_gc
 #ifdef __APPLE_QUARTZ__
 extern Fl_Color fl_color_;
-extern class Fl_FontSize *fl_fontsize;
-extern void fl_font(class Fl_FontSize*);
+extern class Fl_Font_Descriptor *fl_fontsize;
+extern void fl_font(class Fl_Font_Descriptor*);
 extern void fl_quartz_restore_line_style_();
 
 // FLTK has only one global graphics state. This function copies the FLTK state into the
@@ -2234,6 +2553,9 @@ void Fl_X::q_release_context(Fl_X *x) {
       fprintf(stderr, "Error %d in QDEndCGContext\n", (int)err);
   }
   fl_gc = 0;
+#if defined(USE_CAIRO) && defined (__APPLE_QUARTZ__)
+  if (Fl::cairo_autolink_context()) Fl::cairo_make_current((Fl_Window*) 0); // capture gc changes automatically to update the cairo context adequately
+#endif
 }
 
 void Fl_X::q_begin_image(CGRect &rect, int cx, int cy, int w, int h) {
@@ -2258,13 +2580,38 @@ void Fl_X::q_end_image() {
 #endif
 
 ////////////////////////////////////////////////////////////////
-// Cut & paste.
+// Copy & Paste fltk implementation.
+////////////////////////////////////////////////////////////////
 
+// fltk 1.3 clipboard support constant definitions:
+const CFStringRef	flavorNames[] = {
+  CFSTR("public.utf16-plain-text"), 
+  CFSTR("public.utf8-plain-text"),
+  CFSTR("com.apple.traditional-mac-plain-text") };
+const CFStringEncoding encodings[] = { 
+  kCFStringEncodingUTF16, 
+  kCFStringEncodingUTF8, 
+  kCFStringEncodingMacRoman};
+const size_t handledFlavorsCount = sizeof(encodings)/sizeof(CFStringEncoding);
+
+// clipboard variables definitions :
 Fl_Widget *fl_selection_requestor = 0;
 char *fl_selection_buffer[2];
 int fl_selection_length[2];
-int fl_selection_buffer_length[2];
+static int fl_selection_buffer_length[2];
+
+#ifdef USE_PASTEBOARD
+static PasteboardRef myPasteboard = 0;
+static void allocatePasteboard() {
+  if (!myPasteboard)
+    PasteboardCreate(kPasteboardClipboard, &myPasteboard);
+}
+#else
+#endif
+
+#ifndef USE_PASTEBOARD
 static ScrapRef myScrap = 0;
+#endif
 
 /**
  * create a selection
@@ -2283,9 +2630,21 @@ void Fl::copy(const char *stuff, int len, int clipboard) {
   fl_selection_buffer[clipboard][len] = 0; // needed for direct paste
   fl_selection_length[clipboard] = len;
   if (clipboard) {
-    ClearCurrentScrap();
-    OSStatus ret = GetCurrentScrap( &myScrap );
-    if ( ret != noErr ) {
+#ifdef USE_PASTEBOARD
+    // FIXME no error checking done yet!
+    allocatePasteboard();
+    OSStatus err = PasteboardClear(myPasteboard);
+    if (err!=noErr) return; // clear did not work, maybe not owner of clipboard.
+    PasteboardSynchronize(myPasteboard);
+    CFDataRef text = CFDataCreate(kCFAllocatorDefault, (UInt8*)fl_selection_buffer[1], len);
+    if (text==NULL) return; // there was a pb creating the object, abort.
+    err=PasteboardPutItemFlavor(myPasteboard, (PasteboardItemID)1, CFSTR("public.utf8-plain-text"), text, 0);
+    CFRelease(text);
+#else
+    OSStatus err = ClearCurrentScrap(); // whatever happens we should clear the current scrap.
+    if(err!=noErr) {myScrap=0; return;} // don't get current scrap if a prev err occured. 
+    err = GetCurrentScrap( &myScrap );
+    if ( err != noErr ) {
       myScrap = 0;
       return;
     }
@@ -2294,38 +2653,92 @@ void Fl::copy(const char *stuff, int len, int clipboard) {
     // needed. Check to see if this is necessary on OS/X.
     PutScrapFlavor( myScrap, kScrapFlavorTypeText, 0,
 		    len, fl_selection_buffer[1] );
+#endif
   }
 }
 
 // Call this when a "paste" operation happens:
 void Fl::paste(Fl_Widget &receiver, int clipboard) {
-  if (clipboard) {
-    // see if we own the selection, if not go get it:
-    ScrapRef scrap = 0;
-    Size len = 0;
-    if (GetCurrentScrap(&scrap) == noErr && scrap != myScrap &&
-	GetScrapFlavorSize(scrap, kScrapFlavorTypeText, &len) == noErr) {
-      if ( len >= fl_selection_buffer_length[1] ) {
-	fl_selection_buffer_length[1] = len + 32;
-	delete[] fl_selection_buffer[1];
-	fl_selection_buffer[1] = new char[len + 32];
-      }
-      fl_selection_length[1] = len; len++;
-      GetScrapFlavorData( scrap, kScrapFlavorTypeText, &len,
-			  fl_selection_buffer[1] );
-      fl_selection_buffer[1][fl_selection_length[1]] = 0;
-      // turn all \r characters into \n:
-      for (int x = 0; x < len; x++) {
-	if (fl_selection_buffer[1][x] == '\r')
-	  fl_selection_buffer[1][x] = '\n';
-      }
+    if (clipboard) {
+	// see if we own the selection, if not go get it:
+	fl_selection_length[1] = 0;
+#ifdef USE_PASTEBOARD
+	OSStatus err = noErr;
+	Boolean found = false;
+	CFDataRef flavorData = NULL;
+	CFStringEncoding encoding = 0;
+
+	allocatePasteboard();
+	PasteboardSynchronize(myPasteboard);
+	ItemCount nFlavor = 0, i, j;
+	err = PasteboardGetItemCount(myPasteboard, &nFlavor);
+	if (err==noErr) {
+	    for (i=1; i<=nFlavor; i++) {
+		PasteboardItemID itemID = 0;
+		CFArrayRef flavorTypeArray = NULL;
+		found = false;
+		err = PasteboardGetItemIdentifier(myPasteboard, i, &itemID);
+		if (err!=noErr) continue;
+		err = PasteboardCopyItemFlavors(myPasteboard, itemID, &flavorTypeArray);
+		if (err!=noErr) {
+		  if (flavorTypeArray) {CFRelease(flavorTypeArray); flavorTypeArray = NULL;}
+		  continue;
+		}
+		CFIndex flavorCount = CFArrayGetCount(flavorTypeArray);
+		for (j = 0; j < handledFlavorsCount; j++) {
+		    for (CFIndex flavorIndex=0; flavorIndex<flavorCount; flavorIndex++) {
+			CFStringRef flavorType = (CFStringRef)CFArrayGetValueAtIndex(flavorTypeArray, flavorIndex);
+			if (UTTypeConformsTo(flavorType, flavorNames[j])) {
+			    err = PasteboardCopyItemFlavorData( myPasteboard, itemID, flavorNames[j], &flavorData );
+			    if(err != noErr) continue;
+			    encoding = encodings[j];
+			    found = true;
+			    break;
+			}
+		    }
+		    if(found) break;
+		}
+		if (flavorTypeArray) {CFRelease(flavorTypeArray); flavorTypeArray = NULL;}
+		if (found) break;
+	    }
+	    if(found) {
+		CFIndex len = CFDataGetLength(flavorData);
+		CFStringRef mycfs = CFStringCreateWithBytes(NULL, CFDataGetBytePtr(flavorData), len, encoding, false);
+		CFRelease(flavorData);
+		len = CFStringGetMaximumSizeForEncoding(CFStringGetLength(mycfs), kCFStringEncodingUTF8) + 1;
+		if ( len >= fl_selection_buffer_length[1] ) {
+		    fl_selection_buffer_length[1] = len;
+		    delete[] fl_selection_buffer[1];
+		    fl_selection_buffer[1] = new char[len];
+		}
+		CFStringGetCString(mycfs, fl_selection_buffer[1], len, kCFStringEncodingUTF8);
+		CFRelease(mycfs);
+		len = strlen(fl_selection_buffer[1]);
+		fl_selection_length[1] = len;
+		convert_crlf(fl_selection_buffer[1],len); // turn all \r characters into \n:
+	    }
+	}
+#else
+	ScrapRef scrap = 0;
+	if (GetCurrentScrap(&scrap) == noErr && scrap != myScrap &&
+	    GetScrapFlavorSize(scrap, kScrapFlavorTypeText, &len) == noErr) {
+	    if ( len >= fl_selection_buffer_length[1] ) {
+		fl_selection_buffer_length[1] = len + 32;
+		delete[] fl_selection_buffer[1];
+		fl_selection_buffer[1] = new char[len + 32];
+	    }
+	    fl_selection_length[1] = len; len++;
+	    GetScrapFlavorData( scrap, kScrapFlavorTypeText, &len,
+			       fl_selection_buffer[1] );
+	    fl_selection_buffer[1][fl_selection_length[1]] = 0;
+	    convert_crlf(fl_selection_buffer[1],len); 
+	}
+#endif
     }
-  }
-  Fl::e_text = fl_selection_buffer[clipboard];
-  Fl::e_length = fl_selection_length[clipboard];
-  if (!Fl::e_text) Fl::e_text = (char *)"";
-  receiver.handle(FL_PASTE);
-  return;
+    Fl::e_text = fl_selection_buffer[clipboard];
+    Fl::e_length = fl_selection_length[clipboard];
+    if (!Fl::e_text) Fl::e_text = (char *)"";
+    receiver.handle(FL_PASTE);
 }
 
 void Fl::add_timeout(double time, Fl_Timeout_Handler cb, void* data)
@@ -2465,7 +2878,8 @@ void MacUnmapWindow(Fl_Window *w, WindowPtr p) {
   if (w && Fl_X::i(w)) 
     MacUnlinkWindow(Fl_X::i(w));
 }
+#endif // FL_DOXYGEN
 
 //
-// End of "$Id: Fl_mac.cxx 6033 2008-02-20 18:17:34Z matt $".
+// End of "$Id: Fl_mac.cxx 6758 2009-04-13 07:32:01Z matt $".
 //

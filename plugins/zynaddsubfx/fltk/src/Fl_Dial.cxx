@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Dial.cxx 5472 2006-09-20 03:03:14Z mike $"
+// "$Id: Fl_Dial.cxx 6616 2009-01-01 21:28:26Z matt $"
 //
 // Circular dial widget for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2006 by Bill Spitzak and others.
+// Copyright 1998-2009 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -32,7 +32,10 @@
 #include <FL/math.h>
 
 // All angles are measured with 0 to the right and counter-clockwise
-
+/**
+  Draws dial at given position and size.
+  \param[in] X, Y, W, H position and size
+*/
 void Fl_Dial::draw(int X, int Y, int W, int H) {
   if (damage()&FL_DAMAGE_ALL) draw_box(box(), X, Y, W, H, color());
   X += Fl::box_dx(box());
@@ -92,11 +95,18 @@ void Fl_Dial::draw(int X, int Y, int W, int H) {
   fl_pop_matrix();
 }
 
+/**
+  Draws dial at current position and size.
+*/
 void Fl_Dial::draw() {
   draw(x(), y(), w(), h());
   draw_label();
 }
 
+/**
+  Allows subclasses to handle event based on given position and size.
+  \param[in] event, X, Y, W, H event to handle, related position and size.
+*/
 int Fl_Dial::handle(int event, int X, int Y, int W, int H) {
   switch (event) {
   case FL_PUSH:
@@ -130,12 +140,19 @@ int Fl_Dial::handle(int event, int X, int Y, int W, int H) {
   }
 }
 
+/**
+  Allow subclasses to handle event based on current position and size.
+*/
 int Fl_Dial::handle(int e) {
   return handle(e, x(), y(), w(), h());
 }
 
 Fl_Dial::Fl_Dial(int X, int Y, int W, int H, const char* l)
-  : Fl_Valuator(X, Y, W, H, l) {
+/**
+  Creates a new Fl_Dial widget using the given position, size,
+  and label string. The default type is FL_NORMAL_DIAL.
+*/
+: Fl_Valuator(X, Y, W, H, l) {
   box(FL_OVAL_BOX);
   selection_color(FL_INACTIVE_COLOR); // was 37
   a1 = 45;
@@ -143,5 +160,5 @@ Fl_Dial::Fl_Dial(int X, int Y, int W, int H, const char* l)
 }
 
 //
-// End of "$Id: Fl_Dial.cxx 5472 2006-09-20 03:03:14Z mike $".
+// End of "$Id: Fl_Dial.cxx 6616 2009-01-01 21:28:26Z matt $".
 //

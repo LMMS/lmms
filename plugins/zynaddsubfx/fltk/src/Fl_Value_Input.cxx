@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Value_Input.cxx 5190 2006-06-09 16:16:34Z mike $"
+// "$Id: Fl_Value_Input.cxx 6664 2009-02-18 09:27:54Z AlbrechtS $"
 //
 // Value input widget for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2005 by Bill Spitzak and others.
+// Copyright 1998-2009 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -52,7 +52,7 @@ void Fl_Value_Input::draw() {
   if (damage()&~FL_DAMAGE_CHILD) input.clear_damage(FL_DAMAGE_ALL);
   input.box(box());
   input.color(color(), selection_color());
-  input.draw();
+  Fl_Widget *i = &input; i->draw(); // calls protected input.draw()
   input.clear_damage();
 }
 
@@ -106,6 +106,8 @@ int Fl_Value_Input::handle(int event) {
     return 1;
   case FL_FOCUS:
     return input.take_focus();
+  case FL_SHORTCUT:
+    return input.handle(event);
   default:
   DEFAULT:
     input.type(((step() - floor(step()))>0.0 || step() == 0.0) ? FL_FLOAT_INPUT : FL_INT_INPUT);
@@ -113,6 +115,11 @@ int Fl_Value_Input::handle(int event) {
   }
 }
 
+/**
+  Creates a new Fl_Value_Input widget using the given
+  position, size, and label string. The default boxtype is
+  FL_DOWN_BOX.
+*/
 Fl_Value_Input::Fl_Value_Input(int X, int Y, int W, int H, const char* l)
 : Fl_Valuator(X, Y, W, H, l), input(X, Y, W, H, 0) {
   soft_ = 0;
@@ -126,8 +133,15 @@ Fl_Value_Input::Fl_Value_Input(int X, int Y, int W, int H, const char* l)
   selection_color(input.selection_color());
   align(FL_ALIGN_LEFT);
   value_damage();
+  set_flag(SHORTCUT_LABEL);
+}
+
+Fl_Value_Input::~Fl_Value_Input() {
+
+  if (input.parent() == (Fl_Group *)this)
+    input.parent(0);   // *revert* ctor kludge!
 }
 
 //
-// End of "$Id: Fl_Value_Input.cxx 5190 2006-06-09 16:16:34Z mike $".
+// End of "$Id: Fl_Value_Input.cxx 6664 2009-02-18 09:27:54Z AlbrechtS $".
 //

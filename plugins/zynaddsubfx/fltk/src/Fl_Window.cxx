@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Window.cxx 5251 2006-06-28 10:23:33Z matt $"
+// "$Id: Fl_Window.cxx 6669 2009-02-25 08:44:54Z AlbrechtS $"
 //
 // Window widget class for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2005 by Bill Spitzak and others.
+// Copyright 1998-2009 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -29,7 +29,7 @@
 // This is the system-independent portions.  The huge amount of 
 // crap you need to do to communicate with X is in Fl_x.cxx, the
 // equivalent (but totally different) crap for MSWindows is in Fl_win32.cxx
-
+#include "config.h"
 #include <FL/Fl.H>
 #include <FL/Fl_Window.H>
 #include <stdlib.h>
@@ -85,13 +85,13 @@ Fl_Window *Fl_Widget::window() const {
     if (o->type() >= FL_WINDOW) return (Fl_Window*)o;
   return 0;
 }
-
+/** Gets the x position of the window on the screen */
 int Fl_Window::x_root() const {
   Fl_Window *p = window();
   if (p) return p->x_root() + x();
   return x();
 }
-
+/** Gets the y position of the window on the screen */
 int Fl_Window::y_root() const {
   Fl_Window *p = window();
   if (p) return p->y_root() + y();
@@ -99,14 +99,16 @@ int Fl_Window::y_root() const {
 }
 
 void Fl_Window::draw() {
-  const char *savelabel = label();
-  int saveflags = flags();
-  int savex = x(); x(0);
-  int savey = y(); y(0);
-  // Make sure we don't draw the window title in the window background...
-  clear_flag(COPIED_LABEL); // do not free copied labels!
-  Fl_Widget::label(0);
-  Fl_Group::draw();
+
+  // The following is similar to Fl_Group::draw(), but ...
+  //  - we draw the box with x=0 and y=0 instead of x() and y()
+  //  - we don't draw a label
+
+  if (damage() & ~FL_DAMAGE_CHILD) {	 // draw the entire thing
+    draw_box(box(),0,0,w(),h(),color()); // draw box with x/y = 0
+  }
+  draw_children();
+
 #ifdef __APPLE_QUARTZ__
   if (!parent() && resizable() && (!size_range_set || minh!=maxh || minw!=maxw)) {
     int dx = Fl::box_dw(box())-Fl::box_dx(box());
@@ -127,11 +129,10 @@ void Fl_Window::draw() {
     }
   }
 #endif
-  // Restore the label...
-  Fl_Widget::label(savelabel);
-  set_flag(saveflags);
-  y(savey);
-  x(savex);
+
+# if defined(USE_CAIRO)
+  Fl::cairo_make_current(this); // checkout if an update is necessary
+# endif
 }
 
 void Fl_Window::label(const char *name) {
@@ -150,30 +151,33 @@ void Fl_Window::copy_label(const char *a) {
 
 
 void Fl_Window::iconlabel(const char *iname) {
+  // FIXME: 'flags' is 32 bit large!
   uchar saveflags = flags();
   label(label(), iname);
   set_flag(saveflags);
 }
 
-// the Fl::atclose pointer is provided for back compatability.  You
+// the Fl::atclose pointer is provided for back compatibility.  You
 // can now just change the callback for the window instead.
 
+/** Default callback for window widgets. It hides the window and then calls the default widget callback. */
 void Fl::default_atclose(Fl_Window* window, void* v) {
   window->hide();
   Fl_Widget::default_callback(window, v); // put on Fl::read_queue()
 }
-
+/** Back compatibility: default window callback handler \see Fl::set_atclose() */
 void (*Fl::atclose)(Fl_Window*, void*) = default_atclose;
-
+/** Back compatibility: Sets the default callback v for win to call on close event */
 void Fl_Window::default_callback(Fl_Window* win, void* v) {
   Fl::atclose(win, v);
 }
 
+/**  Returns the last window that was made current. \see Fl_Window::make_current() */
 Fl_Window *Fl_Window::current() {
   return current_;
 }
 
 
 //
-// End of "$Id: Fl_Window.cxx 5251 2006-06-28 10:23:33Z matt $".
+// End of "$Id: Fl_Window.cxx 6669 2009-02-25 08:44:54Z AlbrechtS $".
 //

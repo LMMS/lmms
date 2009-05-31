@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Scroll.cxx 5547 2006-11-16 23:17:13Z mike $"
+// "$Id: Fl_Scroll.cxx 6654 2009-02-08 18:47:37Z AlbrechtS $"
 //
 // Scroll widget for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2006 by Bill Spitzak and others.
+// Copyright 1998-2009 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -30,7 +30,7 @@
 #include <FL/Fl_Scroll.H>
 #include <FL/fl_draw.H>
 
-// Clear all but the scrollbars...
+/** Clear all but the scrollbars... */
 void Fl_Scroll::clear() {
   for (int i=children() - 1; i >= 0; i --) {
     Fl_Widget* o = child(i);
@@ -41,7 +41,7 @@ void Fl_Scroll::clear() {
   }
 }
 
-// Insure the scrollbars are the last children:
+/** Insure the scrollbars are the last children */
 void Fl_Scroll::fix_scrollbar_order() {
   Fl_Widget** a = (Fl_Widget**)array();
   if (a[children()-1] != &scrollbar) {
@@ -53,7 +53,7 @@ void Fl_Scroll::fix_scrollbar_order() {
 }
 
 void Fl_Scroll::draw_clip(void* v,int X, int Y, int W, int H) {
-  fl_clip(X,Y,W,H);
+  fl_push_clip(X,Y,W,H);
   Fl_Scroll* s = (Fl_Scroll*)v;
   // erase background as needed...
   switch (s->box()) {
@@ -92,6 +92,16 @@ void Fl_Scroll::draw_clip(void* v,int X, int Y, int W, int H) {
   fl_pop_clip();
 }
 
+/**
+  Returns the bounding box for the interior of the scrolling area, inside
+  the scrollbars.
+  
+  Currently this is only reliable after draw(), and before any resizing of
+  the Fl_Scroll or any child widgets occur.
+  
+  \todo The visibility of the scrollbars ought to be checked/calculated
+  outside of the draw() method (STR #1895).
+*/
 void Fl_Scroll::bbox(int& X, int& Y, int& W, int& H) {
   X = x()+Fl::box_dx(box());
   Y = y()+Fl::box_dy(box());
@@ -140,7 +150,7 @@ void Fl_Scroll::draw() {
       if (B < (Y + H)) draw_clip(this, X, B, W, Y + H - B);
     }
     if (d & FL_DAMAGE_CHILD) { // draw damaged children
-      fl_clip(X, Y, W, H);
+      fl_push_clip(X, Y, W, H);
       Fl_Widget*const* a = array();
       for (int i=children()-2; i--;) update_child(**a++);
       fl_pop_clip();
@@ -237,17 +247,30 @@ void Fl_Scroll::draw() {
 }
 
 void Fl_Scroll::resize(int X, int Y, int W, int H) {
+  int dx = X-x(), dy = Y-y();
+  int dw = W-w(), dh = H-h();
+  Fl_Widget::resize(X,Y,W,H); // resize _before_ moving children around
   fix_scrollbar_order();
   // move all the children:
   Fl_Widget*const* a = array();
   for (int i=children()-2; i--;) {
     Fl_Object* o = *a++;
-    o->position(o->x()+X-x(), o->y()+Y-y());
+    o->position(o->x()+dx, o->y()+dy);
   }
-  Fl_Widget::resize(X,Y,W,H);
+  if (dw==0 && dh==0) {
+    char pad = (scrollbar.visible() && hscrollbar.visible());
+    char al = (scrollbar.align()&FL_ALIGN_LEFT!=0);
+    char at = (scrollbar.align()&FL_ALIGN_TOP!=0);
+    scrollbar.position(al?X:X+W-scrollbar.w(), (at&&pad)?Y+hscrollbar.h():Y);
+    hscrollbar.position((al&&pad)?X+scrollbar.w():X, at?Y:Y+H-hscrollbar.h());
+  } else {
+    // FIXME recalculation of scrollbars needs to be moved out fo "draw()" (STR #1895)
+    redraw(); // need full recalculation of scrollbars
+  }
 }
 
-void Fl_Scroll::position(int X, int Y) {
+/**  Moves the contents of the scroll group to a new position.*/
+void Fl_Scroll::scroll_to(int X, int Y) {
   int dx = xposition_-X;
   int dy = yposition_-Y;
   if (!dx && !dy) return;
@@ -265,14 +288,23 @@ void Fl_Scroll::position(int X, int Y) {
 
 void Fl_Scroll::hscrollbar_cb(Fl_Widget* o, void*) {
   Fl_Scroll* s = (Fl_Scroll*)(o->parent());
-  s->position(int(((Fl_Scrollbar*)o)->value()), s->yposition());
+  s->scroll_to(int(((Fl_Scrollbar*)o)->value()), s->yposition());
 }
 
 void Fl_Scroll::scrollbar_cb(Fl_Widget* o, void*) {
   Fl_Scroll* s = (Fl_Scroll*)(o->parent());
-  s->position(s->xposition(), int(((Fl_Scrollbar*)o)->value()));
+  s->scroll_to(s->xposition(), int(((Fl_Scrollbar*)o)->value()));
 }
-
+/**
+  Creates a new Fl_Scroll widget using the given position,
+  size, and label string. The default boxtype is FL_NO_BOX.
+  <P>The destructor <I>also deletes all the children</I>. This allows a
+  whole tree to be deleted at once, without having to keep a pointer to
+  all the children in the user code. A kludge has been done so the 
+  Fl_Scroll and all of it's children can be automatic (local)
+  variables, but you must declare the Fl_Scroll<I>first</I>, so
+  that it is destroyed last.
+*/
 Fl_Scroll::Fl_Scroll(int X,int Y,int W,int H,const char* L)
   : Fl_Group(X,Y,W,H,L), 
     scrollbar(X+W-Fl::scrollbar_size(),Y,
@@ -293,5 +325,5 @@ int Fl_Scroll::handle(int event) {
 }
 
 //
-// End of "$Id: Fl_Scroll.cxx 5547 2006-11-16 23:17:13Z mike $".
+// End of "$Id: Fl_Scroll.cxx 6654 2009-02-08 18:47:37Z AlbrechtS $".
 //

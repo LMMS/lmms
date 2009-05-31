@@ -1,5 +1,5 @@
 //
-// "$Id: fl_open_uri.cxx 5636 2007-01-23 20:45:28Z mike $"
+// "$Id: fl_open_uri.cxx 6641 2009-01-20 11:10:29Z fabien $"
 //
 // fl_open_uri() code for FLTK.
 //
@@ -7,7 +7,7 @@
 //
 //    gcc -I/fltk/dir -I/fltk/dir/src -DTEST -o fl_open_uri fl_open_uri.cxx -lfltk
 //
-// Copyright 2003-2007 by Michael R Sweet
+// Copyright 2003-2009 by Michael R Sweet
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -59,10 +59,8 @@ static int	run_program(const char *program, char **argv, char *msg, int msglen);
 
 
 /**
- * Open the specified URI.
- *
- * fl_open_uri() opens the specified Uniform Resource Identifier (URI)
- * using an operating-system dependent program or interface. For URIs
+ * Opens the specified Uniform Resource Identifier (URI).
+ * Uses an operating-system dependent program or interface. For URIs
  * using the "ftp", "http", or "https" schemes, the system default web
  * browser is used to open the URI, while "mailto" and "news" URIs are
  * typically opened using the system default mail reader and "file" URIs
@@ -366,5 +364,5 @@ int main(int argc, char **argv) {
 
 
 //
-// End of "$Id: fl_open_uri.cxx 5636 2007-01-23 20:45:28Z mike $".
+// End of "$Id: fl_open_uri.cxx 6641 2009-01-20 11:10:29Z fabien $".
 //

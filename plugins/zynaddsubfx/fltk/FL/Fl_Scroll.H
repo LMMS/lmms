@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Scroll.H 5618 2007-01-18 19:23:24Z matt $"
+// "$Id: Fl_Scroll.H 6614 2009-01-01 16:11:32Z matt $"
 //
 // Scroll header file for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2005 by Bill Spitzak and others.
+// Copyright 1998-2009 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -25,12 +25,71 @@
 //     http://www.fltk.org/str.php
 //
 
+/* \file
+   Fl_Scroll widget . */
+
 #ifndef Fl_Scroll_H
 #define Fl_Scroll_H
 
 #include "Fl_Group.H"
 #include "Fl_Scrollbar.H"
 
+/**
+  This container widget lets you maneuver around a set of widgets much
+  larger than your window.  If the child widgets are larger than the size
+  of this object then scrollbars will appear so that you can scroll over
+  to them:
+  <P ALIGN=CENTER>\image html Fl_Scroll.gif </P> 
+  \image latex  Fl_Scroll.eps "Fl_Scroll" width=4cm
+  <P>If all of the child widgets are packed together into a solid
+  rectangle then you want to set box() to FL_NO_BOX or
+  one of the _FRAME types. This will result in the best output.
+  However, if the child widgets are a sparse arrangment you must set 
+  box() to a real _BOX type.  This can result in some
+  blinking during redrawing, but that can be solved by using a 
+  Fl_Double_Window. </P>
+
+  By default you can scroll in both directions, and the scrollbars
+  disappear if the data will fit in the area of the scroll. 
+  <P>Use Fl_Scroll::type() to change this as follows :
+  <UL>
+  <LI>0                            - No scrollbars </LI>
+  <LI>Fl_Scroll::HORIZONTAL        - Only a horizontal scrollbar. </LI>
+  <LI>Fl_Scroll::VERTICAL          - Only a vertical scrollbar. </LI>
+  <LI>Fl_Scroll::BOTH              - The default is both scrollbars. </LI>
+  <LI>Fl_Scroll::HORIZONTAL_ALWAYS - Horizontal scrollbar always on, vertical always off. </LI>
+  <LI>Fl_Scroll::VERTICAL_ALWAYS   - Vertical scrollbar always on, horizontal always off. </LI>
+  <LI>Fl_Scroll::BOTH_ALWAYS       - Both always on. </LI>
+  </UL>
+
+  <P> Use <B> scrollbar.align(int) ( see void Fl_Widget::align(Fl_Align) ) :</B>
+  to change what side the scrollbars are drawn on.<BR>If the 
+  FL_ALIGN_LEFT bit is on, the vertical scrollbar is on the left.
+  If the FL_ALIGN_TOP bit is on, the horizontal scrollbar is on
+  the top. Note that only the alignment flags in scrollbar are 
+  considered. The flags in hscrollbar however are ignored.
+
+  <P>This widget can also be used to pan around a single child widget
+  "canvas".  This child widget should be of your own class, with a 
+  draw() method that draws the contents.  The scrolling is done by
+  changing the x() and y() of the widget, so this child
+  must use the x() and y() to position it's drawing.
+  To speed up drawing it should test fl_push_clip().
+
+  <P>Another very useful child is a single 
+  Fl_Pack, which is itself a group that packs it's children
+  together and changes size to surround them.  Filling the Fl_Pack
+  with Fl_Tabs groups (and then putting
+  normal widgets inside those) gives you a very powerful scrolling list
+  of individually-openable panels. </P>
+
+  <P>Fluid lets you create these, but you can only lay out objects that
+  fit inside the Fl_Scroll without scrolling.  Be sure to leave
+  space for the scrollbars, as Fluid won't show these either. </P>
+  <P><I>You cannot use Fl_Window as a child of this since the
+  clipping is not conveyed to it when drawn, and it will draw over the
+  scrollbars and neighboring objects.</I>
+*/
 class FL_EXPORT Fl_Scroll : public Fl_Group {
 
   int xposition_, yposition_;
@@ -66,14 +125,16 @@ public:
     BOTH_ALWAYS = 7
   };
 
+  /**    Gets the current horizontal scrolling position.  */
   int xposition() const {return xposition_;}
+  /**    Gets the current vertical scrolling position.  */
   int yposition() const {return yposition_;}
-  void position(int, int);
+  void scroll_to(int, int);
   void clear();
 };
 
 #endif
 
 //
-// End of "$Id: Fl_Scroll.H 5618 2007-01-18 19:23:24Z matt $".
+// End of "$Id: Fl_Scroll.H 6614 2009-01-01 16:11:32Z matt $".
 //

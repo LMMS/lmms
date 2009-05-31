@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Menu_add.cxx 5190 2006-06-09 16:16:34Z mike $"
+// "$Id: Fl_Menu_add.cxx 6716 2009-03-24 01:40:44Z fabien $"
 //
 // Menu utilities for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2005 by Bill Spitzak and others.
+// Copyright 1998-2009 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -24,7 +24,6 @@
 //
 //     http://www.fltk.org/str.php
 //
-
 // Methods to alter the menu in an Fl_Menu_ widget.
 
 // These are for Forms emulation and for dynamically changing the
@@ -76,7 +75,8 @@ static Fl_Menu_Item* insert(
   m->callback_ = 0;
   m->user_data_ = 0;
   m->flags = flags;
-  m->labeltype_ = m->labelfont_ = m->labelsize_ = m->labelcolor_ = 0;
+  m->labeltype_ = m->labelsize_ = m->labelcolor_ = 0;
+  m->labelfont_ = FL_HELVETICA; 
   return array;
 }
 
@@ -96,9 +96,10 @@ static int compare(const char* a, const char* b) {
   }
 }
 
-// Add an item.  The text is split at '/' characters to automatically
-// produce submenus (actually a totally unnecessary feature as you can
-// now add submenu titles directly by setting SUBMENU in the flags):
+/** Adds an item.  The text is split at '/' characters to automatically
+   produce submenus (actually a totally unnecessary feature as you can
+   now add submenu titles directly by setting SUBMENU in the flags):
+*/
 int Fl_Menu_Item::add(
   const char *mytext,
   int sc,
@@ -119,7 +120,7 @@ int Fl_Menu_Item::add(
   // split at slashes to make submenus:
   for (;;) {
 
-    // leading slash makes us assumme it is a filename:
+    // leading slash makes us assume it is a filename:
     if (*mytext == '/') {item = mytext; break;}
 
     // leading underscore causes divider line:
@@ -175,6 +176,56 @@ int Fl_Menu_Item::add(
   return m-array;
 }
 
+/**
+  Adds a new menu item, with a title string,  shortcut int (or string), 
+  callback, argument to the  callback, and flags.  
+  If the menu array was directly set with menu(x), then copy() is done 
+  to make a private array.
+  
+  The characters "&", "/", "\", and "_" are treated as
+  special characters in the label string. The "&" character
+  specifies that the following character is an accelerator and
+  will be underlined. The "\" character is used to escape the next
+  character in the string. Labels starting with the "_" character
+  cause a divider to be placed after that menu item.
+  
+  A label of the form "foo/bar/baz" will create submenus called 
+  "foo" and "bar" with an entry called "baz". The "/" character is 
+  ignored if it appears as the first character of the label string, e.g.
+  "/foo/bar/baz".
+  
+  The label string is copied to new memory and can be freed.
+  The other arguments (including the shortcut) are copied into the
+  menu item unchanged.
+  
+  If an item exists already with that name then it is replaced with
+  this new one.  Otherwise this new one is added to the end of the
+  correct menu or submenu.  The return value is the offset into the array
+  that the new entry was placed at.
+  
+  Shortcut can be 0L, or either a modifier/key combination (for example
+  FL_CTRL+'A') or a string describing the shortcut in one of two ways:
+  
+  \code
+   [#+^]<ascii_value>    e.g. "97", "^97", "+97", "#97"
+   [#+^]<ascii_char>     e.g. "a", "^a", "+a", "#a"
+  \endcode
+  ..where \<ascii_value\> is a decimal value representing an
+  ascii character (eg. 97 is the ascii for 'a'), and the optional
+  prefixes enhance the value that follows. Multiple prefixes must
+  appear in the above order.
+  \code
+   # - Alt
+   + - Shift
+   ^ - Control
+  \endcode
+  Text shortcuts are converted to integer shortcut by calling 
+  int fl_old_shortcut(const char*).
+  
+  The return value is the index into the array that the entry was put.
+  
+  No items must be added to a menu during a callback to the same menu.
+ */
 int Fl_Menu_::add(const char *t, int s, Fl_Callback *c,void *v,int f) {
   // make this widget own the local array:
   if (this != fl_menu_array_owner) {
@@ -217,9 +268,19 @@ int Fl_Menu_::add(const char *t, int s, Fl_Callback *c,void *v,int f) {
   return r;
 }
 
-// This is a Forms (and SGI GL library) compatable add function, it
-// adds many menu items, with '|' seperating the menu items, and tab
-// seperating the menu item names from an optional shortcut string.
+/**
+  This is a Forms (and SGI GL library) compatible add function, it
+  adds many menu items, with '|' separating the menu items, and tab
+  separating the menu item names from an optional shortcut string.
+
+  The passed string is split at any '|' characters and then
+  add(s,0,0,0,0) is done with each section. This is
+  often useful if you are just using the value, and is compatible
+  with Forms and other GL programs. The section strings use the
+  same special characters as described for the long version of add().
+
+  No items must be added to a menu during a callback to the same menu.
+*/
 int Fl_Menu_::add(const char *str) {
   char buf[1024];
   int r = 0;
@@ -237,6 +298,11 @@ int Fl_Menu_::add(const char *str) {
   return r;
 }
 
+/**
+  Changes the text of item \p i.  This is the only way to get
+  slash into an add()'ed menu item.  If the menu array was directly set
+  with menu(x) then copy() is done to make a private array.
+*/
 void Fl_Menu_::replace(int i, const char *str) {
   if (i<0 || i>=size()) return;
   if (!alloc) copy(menu_);
@@ -246,7 +312,12 @@ void Fl_Menu_::replace(int i, const char *str) {
   }
   menu_[i].text = str;
 }
-
+/**
+  Deletes item \p i from the menu.  If the menu array was directly
+  set with menu(x) then copy() is done to make a private array.
+  
+  No items must be removed from a menu during a callback to the same menu.
+*/
 void Fl_Menu_::remove(int i) {
   int n = size();
   if (i<0 || i>=n) return;
@@ -264,5 +335,5 @@ void Fl_Menu_::remove(int i) {
 }
 
 //
-// End of "$Id: Fl_Menu_add.cxx 5190 2006-06-09 16:16:34Z mike $".
+// End of "$Id: Fl_Menu_add.cxx 6716 2009-03-24 01:40:44Z fabien $".
 //

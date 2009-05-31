@@ -1,11 +1,11 @@
 #
-# "$Id: fltk.list.in 6059 2008-02-28 16:50:07Z mike $"
+# "$Id: fltk.list.in 6614 2009-01-01 16:11:32Z matt $"
 #
 # EPM product list file for the Fast Light Tool Kit (FLTK).
 #
 # (EPM can be found at http://www.epmhome.org/)
 #
-# Copyright 1998-2008 by Bill Spitzak and others.
+# Copyright 1998-2009 by Bill Spitzak and others.
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Library General Public
@@ -28,7 +28,7 @@
 #
 
 %product Fast Light Tool Kit (FLTK)
-%copyright 1998-2008 by Bill Spitzak and others.
+%copyright 1998-2009 by Bill Spitzak and others.
 %vendor FLTK Development Team
 %license COPYING
 %readme README
@@ -408,5 +408,5 @@ f 0444 root sys $mandir/man6/checkers.6 documentation/checkers.man
 f 0444 root sys $mandir/man6/sudoku.6 documentation/sudoku.man
 
 #
-# End of "$Id: fltk.list.in 6059 2008-02-28 16:50:07Z mike $".
+# End of "$Id: fltk.list.in 6614 2009-01-01 16:11:32Z matt $".
 #

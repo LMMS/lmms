@@ -1,9 +1,9 @@
 //
-// "$Id: fl_set_fonts_xft.cxx 5505 2006-10-03 02:35:12Z mike $"
+// "$Id: fl_set_fonts_xft.cxx 6616 2009-01-01 21:28:26Z matt $"
 //
 // More font utilities for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2006 by Bill Spitzak and others.
+// Copyright 1998-2009 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -50,8 +50,8 @@ const char* Fl::get_font_name(Fl_Font fnum, int* ap) {
     case 'P': type = FL_BOLD | FL_ITALIC; break;
     default:  type = 0; break;
     }
-  
-  // NOTE: This can cause duplications in fonts that already have Bold or Italic in 
+
+  // NOTE: This can cause duplications in fonts that already have Bold or Italic in
   // their "name". Maybe we need to find a cleverer way?
     strlcpy(f->fontname, p+1, ENDOFBUFFER);
     if (type & FL_BOLD) strlcat(f->fontname, " bold", ENDOFBUFFER);
@@ -69,10 +69,10 @@ extern "C" {
 // sort returned fontconfig font names
 static int name_sort(const void *aa, const void *bb) {
   // What should we do here? Just do a string compare for now...
-  // NOTE: This yeilds some oddities - in particular a Blah Bold font will be 
+  // NOTE: This yeilds some oddities - in particular a Blah Bold font will be
   // listed before Blah...
   // Also - the fontconfig listing returns some faces that are effectively duplicates
-  // as far as fltk is concerned, e.g. where there are ko or ja variants that we 
+  // as far as fltk is concerned, e.g. where there are ko or ja variants that we
   // can't distinguish (since we are not yet fully UTF-*) - should we strip them here?
   return strcasecmp(*(char**)aa, *(char**)bb);
 } // end of name_sort
@@ -98,8 +98,26 @@ static void make_raw_name(char *raw, char *pretty)
     *style = 0; // Terminate "name" string
     style ++;   // point to start of style section
   }
+
+  // It is still possible that the "pretty" name has multiple comma separated entries
+  // I've seen this often in CJK fonts, for example... Keep only the first one... This
+  // is not ideal, the CJK fonts often have the name in utf8 in several languages. What
+  // we ought to do is use fontconfig to query the available languages and pick one... But which?
+#if 0 // loop to keep the LAST name entry...
+  char *nm1 = pretty;
+  char *nm2 = strchr(nm1, ',');
+  while(nm2) {
+    nm1 = nm2 + 1;
+    nm2 = strchr(nm1, ',');
+  }
+  raw[0] = ' '; raw[1] = 0; // Default start of "raw name" text
+  strncat(raw, nm1, LOCAL_RAW_NAME_MAX);
+#else // keep the first remaining name entry
+  char *nm2 = strchr(pretty, ',');
+  if(nm2) *nm2 = 0; // terminate name after first entry
   raw[0] = ' '; raw[1] = 0; // Default start of "raw name" text
   strncat(raw, pretty, LOCAL_RAW_NAME_MAX);
+#endif
   // At this point, the name is "marked" as regular...
   if (style)
   {
@@ -130,14 +148,14 @@ static void make_raw_name(char *raw, char *pretty)
           mods |= ITALIC;
         }
         goto NEXT_STYLE;
-        
+
       case 'B':
         if (strncasecmp(style, "Bold", 4) == 0)
         {
           mods |= BOLD;
         }
         goto NEXT_STYLE;
-        
+
       case 'O':
         if (strncasecmp(style, "Oblique", 7) == 0)
         {
@@ -206,7 +224,7 @@ Fl_Font Fl::set_fonts(const char* pattern_name)
     
   // Make sure fontconfig is ready... is this necessary? The docs say it is
   // safe to call it multiple times, so just go for it anyway!
-  if (!FcInit()) 
+  if (!FcInit())
   {
     // What to do? Just return defaults...
     return FL_FREE_FONT;
@@ -362,5 +380,5 @@ int Fl::get_font_sizes(Fl_Font fnum, int*& sizep) {
 }
 
 //
-// End of "$Id: fl_set_fonts_xft.cxx 5505 2006-10-03 02:35:12Z mike $".
+// End of "$Id: fl_set_fonts_xft.cxx 6616 2009-01-01 21:28:26Z matt $".
 //

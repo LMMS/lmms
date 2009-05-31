@@ -1,9 +1,9 @@
 //
-// "$Id: fl_cursor.cxx 5654 2007-02-02 13:52:37Z matt $"
+// "$Id: fl_cursor.cxx 6690 2009-03-15 20:52:46Z engelsman $"
 //
 // Mouse cursor support for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2005 by Bill Spitzak and others.
+// Copyright 1998-2009 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -39,10 +39,18 @@
 #endif
 #include <FL/fl_draw.H>
 
+/**
+  Sets the cursor for the current window to the specified shape and colors.
+  The cursors are defined in the <FL/Enumerations.H> header file. 
+  */
 void fl_cursor(Fl_Cursor c, Fl_Color fg, Fl_Color bg) {
   if (Fl::first_window()) Fl::first_window()->cursor(c,fg,bg);
 }
+/** 
+    Sets the default window cursor as well as its color.
 
+    For back compatibility only.
+*/
 void Fl_Window::default_cursor(Fl_Cursor c, Fl_Color fg, Fl_Color bg) {
 //  if (c == FL_CURSOR_DEFAULT) c = FL_CURSOR_ARROW;
 
@@ -230,9 +238,11 @@ void Fl_Window::cursor(Fl_Cursor c, Fl_Color, Fl_Color) {
   case FL_CURSOR_DEFAULT:
   default: break;
   }
-  SetCursor( *icrsr );
-  if (i) {
-    i->cursor = icrsr;
+  if (icrsr) { // make sure we have a non null icrsr before updating cursor state
+    SetCursor( *icrsr );
+    if (i) {
+      i->cursor = icrsr;
+    }
   }
 }
 
@@ -331,5 +341,5 @@ void Fl_Window::cursor(Fl_Cursor c, Fl_Color fg, Fl_Color bg) {
 #endif
 
 //
-// End of "$Id: fl_cursor.cxx 5654 2007-02-02 13:52:37Z matt $".
+// End of "$Id: fl_cursor.cxx 6690 2009-03-15 20:52:46Z engelsman $".
 //

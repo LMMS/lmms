@@ -1,10 +1,10 @@
 #!/bin/sh
 #
-# "$Id: fltk-config.in 6032 2008-02-20 18:10:13Z matt $"
+# "$Id: fltk-config.in 6614 2009-01-01 16:11:32Z matt $"
 # 
 # FLTK configuration utility.
 #
-# Copyright 2000-2007 by Bill Spitzak and others.
+# Copyright 2000-2009 by Bill Spitzak and others.
 # Original version Copyright 2000 by James Dean Palmer
 # Adapted by Vincent Penne and Michael Sweet
 #
@@ -35,7 +35,7 @@ VERSION="$MAJOR_VERSION.$MINOR_VERSION.$PATCH_VERSION"
 APIVERSION="$MAJOR_VERSION.$MINOR_VERSION"
 
 ### BEGIN fltk-config
-selfdir=`dirname $0`
+selfdir=`dirname "$0"`
 
 prefix=@prefix@
 exec_prefix=@exec_prefix@
@@ -49,9 +49,6 @@ srcdir=@srcdir@
 CC="@CC@"
 CXX="@CXX@"
 
-# post-process command (only needed for MacOS)
-POSTBUILD="@POSTBUILD@"
-
 # flags for C++ compiler:
 ARCHFLAGS="@ARCHFLAGS@"
 CFLAGS="@CFLAGS@ @LARGEFILE@ @PTHREAD_FLAGS@"
@@ -59,6 +56,7 @@ CXXFLAGS="@CXXFLAGS@ @LARGEFILE@ @PTHREAD_FLAGS@"
 LDFLAGS="@LDFLAGS@"
 LDLIBS="@LIBS@"
 OPTIM="@OPTIM@"
+CAIROFLAGS="@CAIROFLAGS@"
 
 # Check for local invocation, and update paths accordingly...
 if test -f "$selfdir/FL/Fl_Window.H"; then
@@ -87,11 +85,18 @@ if test -d $includedir/FL/images; then
 	CXXFLAGS="-I$includedir/FL/images $CXXFLAGS"
 fi
 
+if test -f "$libdir/libfltk_cairo.a"; then
+	CFLAGS="$CAIROFLAGS $CFLAGS"
+	CXXFLAGS="$CAIROFLAGS $CXXFLAGS"
+fi
+
 # libraries to link with:
 LIBNAME="@LIBNAME@"
 DSONAME="@DSONAME@"
 DSOLINK="@DSOLINK@"
 IMAGELIBS="@IMAGELIBS@"
+STATICIMAGELIBS="@STATICIMAGELIBS@"
+CAIROLIBS="@CAIROLIBS@"
 SHAREDSUFFIX="@SHAREDSUFFIX@"
 
 usage ()
@@ -106,6 +111,7 @@ Options telling what we are doing:
 	[--use-images]    use extra image formats (PNG, JPEG)
 	[--use-glut]      use glut compatibility layer
 	[--use-forms]     use forms compatibility layer
+	[--use-cairo]     use cairo graphics lib
 
 Options telling what information we request:
 	[--cc]            return C compiler used to compile FLTK
@@ -118,11 +124,11 @@ Options telling what information we request:
                                           even if there are DSOs installed
 	[--libs]          return FLTK libraries full path for dependencies
 
-Option to compile and link an application:
+Options to compile and link an application:
 	[-g]              compile the program with debugging information
 	[-Dname[=value]]  compile the program with the given define
 	[--compile program.cxx]
-        [--post program]
+        [--post program]  prepare the program for desktop use
 "
     exit $1
 }
@@ -173,6 +179,9 @@ do
 	--use-images)
 	    use_images=yes
 	    ;;
+	--use-cairo)
+	    use_cairo=yes
+	    ;;
 	--cflags)
 	    echo_cflags=yes
 	    ;;
@@ -195,12 +204,11 @@ do
 	    CXXFLAGS="$CXXFLAGS $1"
 	    ;;
 	--compile)
-	    compile=$2
-	    post=$2
+	    compile="$2"
 	    shift
 	    ;;
 	--post)
-	    post=$2
+	    post="$2"
 	    shift
 	    ;;
 	*)
@@ -239,6 +247,11 @@ if test x$use_images = xyes; then
     LDSTATIC="$libdir/libfltk_images.a $IMAGELIBS $LDSTATIC"
 fi
 
+if test x$use_cairo = xyes; then
+    LDLIBS="-lfltk_cairo$SHAREDSUFFIX $CAIROLIBS $LDLIBS"
+    LDSTATIC="$libdir/libfltk_cairo.a $CAIROLIBS $LDSTATIC"
+fi
+
 LDLIBS="$DSOLINK $LDFLAGS $libs $LDLIBS"
 LDSTATIC="$LDFLAGS $LDSTATIC"
 
@@ -248,40 +261,68 @@ if test -n "$echo_help"; then
 fi
 
 if test -n "$compile"; then
-    case $compile in
+    case "$compile" in
         *.cxx)
-            prog=`basename $compile .cxx`
+            prog="`basename \"$compile\" .cxx`"
 	    ;;
         *.cpp)
-            prog=`basename $compile .cpp`
+            prog="`basename \"$compile\" .cpp`"
 	    ;;
         *.cc)
-            prog=`basename $compile .cc`
+            prog="`basename \"$compile\" .cc`"
 	    ;;
         *.C)
-            prog=`basename $compile .C`
+            prog="`basename \"$compile\" .C`"
 	    ;;
 	*)
 	    echo "ERROR: Unknown/bad C++ source file extension on \"$compile\"!"
 	    exit 1
 	    ;;
     esac
-	    
-    post=$prog
 
-    echo $CXX $ARCHFLAGS $includes $CXXFLAGS $debug -o $prog $compile $LDLIBS
-    $CXX $ARCHFLAGS $includes $CXXFLAGS $debug -o $prog $compile $LDLIBS
+    post="$prog"
 
-    # stop after compilation in case of errors
-    err=$?
-    if test $err != 0; then
-	exit $err
-    fi
+    echo $CXX $ARCHFLAGS $includes $CXXFLAGS $debug -o "'$prog'" "'$compile'" $LDSTATIC
+    $CXX $ARCHFLAGS $includes $CXXFLAGS $debug -o "$prog" "$compile" $LDSTATIC || exit 1
 fi
 
-if test -n "$post" -a "$POSTBUILD" != ":"; then
-    echo $POSTBUILD $post $includedir/FL/mac.r
-    $POSTBUILD $post $includedir/FL/mac.r
+if test -n "$post"; then
+    case "`uname`" in
+	Darwin)
+	    echo Creating "'$post.app'" bundle for desktop...
+	    id=`echo $post | tr ' ' '_'`
+
+	    # Make the bundle directory and move the executable there
+	    rm -rf "$post.app/Contents/MacOS"
+	    mkdir -p "$post.app/Contents/MacOS"
+	    mv "$post" "$post.app/Contents/MacOS"
+
+	    # Make a shell script that runs the bundled executable
+	    echo "#!/bin/sh" >"$post"
+	    echo 'dir="`dirname '"'"'$0'"'"'`"' >>"$post"
+	    echo 'exec "$dir/'"$post.app/Contents/MacOS/$post"'" "$@"' >>"$post"
+	    chmod +x "$post"
+
+	    # Make the simplest Info.plist needed for an application
+	    cat >"$post.app/Contents/Info.plist" <<EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<plist version="0.9">
+    <dict>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleExecutable</key>
+	<string>$post</string>
+	<key>CFBundleIdentifier</key>
+	<string>org.fltk.$id</string>
+	<key>CFBundleName</key>
+	<string>$post</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+    </dict>
+</plist>
+EOF
+	    ;;
+    esac
 fi
 
 if test "$echo_cflags" = "yes"; then
@@ -317,28 +358,31 @@ if test "$echo_ldstaticflags" = "yes"; then
 fi
 
 if test "$echo_libs" = "yes"; then
-    echo -n $libdir/libfltk.a
+    echo $libdir/libfltk.a
 
     if test x$use_forms = xyes; then
-        echo -n " $libdir/libfltk_forms.a"
+        echo $libdir/libfltk_forms.a
     fi
 
     if test x$use_gl = xyes; then
-        echo -n " $libdir/libfltk_gl.a"
+        echo $libdir/libfltk_gl.a
+    fi
+
+    if test x$use_cairo = xyes; then
+        echo $libdir/libfltk_cairo.a
     fi
 
     if test x$use_images = xyes; then
-        echo -n " $libdir/libfltk_images.a"
+        echo $libdir/libfltk_images.a
 
         for lib in fltk_jpeg fltk_png fltk_z; do
             if test -f $libdir/lib$lib.a; then
-                echo -n " $libdir/lib$lib.a"
+                echo $libdir/lib$lib.a
             fi
 	done
     fi
-    echo
 fi
 
 #
-# End of "$Id: fltk-config.in 6032 2008-02-20 18:10:13Z matt $".
+# End of "$Id: fltk-config.in 6614 2009-01-01 16:11:32Z matt $".
 #

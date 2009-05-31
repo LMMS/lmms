@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Hor_Fill_Slider.H 4288 2005-04-16 00:13:17Z mike $"
+// "$Id: Fl_Hor_Fill_Slider.H 6614 2009-01-01 16:11:32Z matt $"
 //
 // Horizontal fill slider header file for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2005 by Bill Spitzak and others.
+// Copyright 1998-2009 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -24,6 +24,10 @@
 //
 //     http://www.fltk.org/str.php
 //
+
+/* \file
+   Fl_Hor_Fill_Slider widget . */
+
 #ifndef Fl_Hor_Fill_Slider_H
 #define Fl_Hor_Fill_Slider_H
 
@@ -38,5 +42,5 @@ public:
 #endif
 
 //
-// End of "$Id: Fl_Hor_Fill_Slider.H 4288 2005-04-16 00:13:17Z mike $".
+// End of "$Id: Fl_Hor_Fill_Slider.H 6614 2009-01-01 16:11:32Z matt $".
 //

@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Shared_Image.H 4288 2005-04-16 00:13:17Z mike $"
+// "$Id: Fl_Shared_Image.H 6614 2009-01-01 16:11:32Z matt $"
 //
 // Shared image header file for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2005 by Bill Spitzak and others.
+// Copyright 1998-2009 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -25,6 +25,9 @@
 //     http://www.fltk.org/str.php
 //
 
+/* \file
+   Fl_Shared_Image class . */
+
 #ifndef Fl_Shared_Image_H
 #  define Fl_Shared_Image_H
 
@@ -36,6 +39,13 @@ typedef Fl_Image *(*Fl_Shared_Handler)(const char *name, uchar *header,
                                        int headerlen);
 
 // Shared images class. 
+/**
+  This class supports caching, loading,
+  and drawing of image files. Most applications will also want to
+  link against the fltk_images library and call the
+  fl_register_images()
+  function to support standard image formats such as BMP, GIF, JPEG, and PNG.
+*/
 class FL_EXPORT Fl_Shared_Image : public Fl_Image {
   protected:
 
@@ -62,8 +72,9 @@ class FL_EXPORT Fl_Shared_Image : public Fl_Image {
   void update();
 
   public:
-
+  /** Returns the filename of the shared image */
   const char	*name() { return name_; }
+  /** Returns the number of references of this shared image. When reference is below 1, the image is deleted. */
   int		refcount() { return refcount_; }
   void		release();
   void		reload();
@@ -95,5 +106,5 @@ FL_EXPORT extern void fl_register_images();
 #endif // !Fl_Shared_Image_H
 
 //
-// End of "$Id: Fl_Shared_Image.H 4288 2005-04-16 00:13:17Z mike $"
+// End of "$Id: Fl_Shared_Image.H 6614 2009-01-01 16:11:32Z matt $"
 //

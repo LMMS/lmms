@@ -1,9 +1,9 @@
 //
-// "$Id: fl_overlay.cxx 5614 2007-01-18 15:25:09Z matt $"
+// "$Id: fl_overlay.cxx 6690 2009-03-15 20:52:46Z engelsman $"
 //
 // Overlay support for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2005 by Bill Spitzak and others.
+// Copyright 1998-2009 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -48,24 +48,22 @@ static int bgx, bgy, bgw, bgh;
 
 static void draw_current_rect() {
 #ifdef USE_XOR
-# ifdef WIN32
+# if defined(USE_X11)
+  XSetFunction(fl_display, fl_gc, GXxor);
+  XSetForeground(fl_display, fl_gc, 0xffffffff);
+  XDrawRectangle(fl_display, fl_window, fl_gc, px, py, pw, ph);
+  XSetFunction(fl_display, fl_gc, GXcopy);
+# elif defined(WIN32)
   int old = SetROP2(fl_gc, R2_NOT);
   fl_rect(px, py, pw, ph);
   SetROP2(fl_gc, old);
-# elif defined(__APPLE_QD__)
-  PenMode( patXor );
-  fl_rect(px, py, pw, ph);
-  PenMode( patCopy );
 # elif defined(__APPLE_QUARTZ__)
   // warning: Quartz does not support xor drawing
   // Use the Fl_Overlay_Window instead.
   fl_color(FL_WHITE);
   fl_rect(px, py, pw, ph);
 # else
-  XSetFunction(fl_display, fl_gc, GXxor);
-  XSetForeground(fl_display, fl_gc, 0xffffffff);
-  XDrawRectangle(fl_display, fl_window, fl_gc, px, py, pw, ph);
-  XSetFunction(fl_display, fl_gc, GXcopy);
+#  error unsupported platform
 # endif
 #else
   if (bgN) { free(bgN); bgN = 0L; }
@@ -105,10 +103,16 @@ static void erase_current_rect() {
 #endif
 }
 
+/**
+  Erase a selection rectangle without drawing a new one
+  */
 void fl_overlay_clear() {
   if (pw > 0) {erase_current_rect(); pw = 0;}
 }
 
+/**
+  Draws a selection rectangle, erasing a previous one by XOR'ing it first.
+  */
 void fl_overlay_rect(int x, int y, int w, int h) {
   if (w < 0) {x += w; w = -w;} else if (!w) w = 1;
   if (h < 0) {y += h; h = -h;} else if (!h) h = 1;
@@ -121,5 +125,5 @@ void fl_overlay_rect(int x, int y, int w, int h) {
 }
 
 //
-// End of "$Id: fl_overlay.cxx 5614 2007-01-18 15:25:09Z matt $".
+// End of "$Id: fl_overlay.cxx 6690 2009-03-15 20:52:46Z engelsman $".
 //

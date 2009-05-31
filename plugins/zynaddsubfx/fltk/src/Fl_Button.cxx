@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Button.cxx 6031 2008-02-20 17:59:13Z matt $"
+// "$Id: Fl_Button.cxx 6616 2009-01-01 21:28:26Z matt $"
 //
 // Button widget for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2006 by Bill Spitzak and others.
+// Copyright 1998-2009 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -34,6 +34,12 @@
 // them are implemented by setting the type() value and testing it
 // here.  This includes Fl_Radio_Button and Fl_Toggle_Button
 
+/**
+  Sets the current value of the button.
+  A non-zero value sets the button to 1 (ON), and zero sets it to 0 (OFF).
+  \param[in] v button value.
+  \see set(), clear()
+ */
 int Fl_Button::value(int v) {
   v = v ? 1 : 0;
   oldval = v;
@@ -48,6 +54,10 @@ int Fl_Button::value(int v) {
   }
 }
 
+/**
+  Turns on this button and turns off all other radio buttons in the group
+  (calling \c value(1) or \c set() does not do this).
+ */
 void Fl_Button::setonly() { // set this radio button on, turn others off
   value(1);
   Fl_Group* g = (Fl_Group*)parent();
@@ -120,11 +130,13 @@ int Fl_Button::handle(int event) {
     if (type() == FL_RADIO_BUTTON && !value_) {
       setonly();
       set_changed();
-      if (when() & FL_WHEN_CHANGED) do_callback();
+      if (when() & (FL_WHEN_CHANGED|FL_WHEN_RELEASE) ) 
+	  do_callback();
     } else if (type() == FL_TOGGLE_BUTTON) {
       value(!value());
       set_changed();
-      if (when() & FL_WHEN_CHANGED) do_callback();
+      if (when() & (FL_WHEN_CHANGED|FL_WHEN_RELEASE)) 
+	  do_callback();
     } else if (when() & FL_WHEN_RELEASE) do_callback();
     return 1;
   case FL_FOCUS :
@@ -159,8 +171,13 @@ int Fl_Button::handle(int event) {
   }
 }
 
-Fl_Button::Fl_Button(int X, int Y, int W, int H, const char *l)
-: Fl_Widget(X,Y,W,H,l) {
+/**
+  The constructor creates the button using the given position, size and label.
+  \param[in] X, Y, W, H position and size of the widget
+  \param[in] L widget label, default is no label
+ */
+Fl_Button::Fl_Button(int X, int Y, int W, int H, const char *L)
+: Fl_Widget(X,Y,W,H,L) {
   box(FL_UP_BOX);
   down_box(FL_NO_BOX);
   value_ = oldval = 0;
@@ -169,5 +186,5 @@ Fl_Button::Fl_Button(int X, int Y, int W, int H, const char *l)
 }
 
 //
-// End of "$Id: Fl_Button.cxx 6031 2008-02-20 17:59:13Z matt $".
+// End of "$Id: Fl_Button.cxx 6616 2009-01-01 21:28:26Z matt $".
 //

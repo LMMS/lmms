@@ -1,9 +1,9 @@
 //
-// "$Id: fl_dnd_x.cxx 5190 2006-06-09 16:16:34Z mike $"
+// "$Id: fl_dnd_x.cxx 6616 2009-01-01 21:28:26Z matt $"
 //
 // Drag & Drop code for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2006 by Bill Spitzak and others.
+// Copyright 1998-2009 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -197,5 +197,5 @@ int Fl::dnd() {
 
 
 //
-// End of "$Id: fl_dnd_x.cxx 5190 2006-06-09 16:16:34Z mike $".
+// End of "$Id: fl_dnd_x.cxx 6616 2009-01-01 21:28:26Z matt $".
 //

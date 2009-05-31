@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Timer.H 4288 2005-04-16 00:13:17Z mike $"
+// "$Id: Fl_Timer.H 6614 2009-01-01 16:11:32Z matt $"
 //
 // Timer header file for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2005 by Bill Spitzak and others.
+// Copyright 1998-2009 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -25,6 +25,9 @@
 //     http://www.fltk.org/str.php
 //
 
+/* \file
+   Fl_Timer widget . */
+
 #ifndef Fl_Timer_H
 #define Fl_Timer_H
 
@@ -37,6 +40,13 @@
 #define FL_VALUE_TIMER		1
 #define FL_HIDDEN_TIMER		2
 
+/**
+  This is provided only to emulate the Forms Timer widget.  It works by
+  making a timeout callback every 1/5 second.  This is wasteful and
+  inaccurate if you just want something to happen a fixed time in the
+  future.  You should directly call 
+  Fl::add_timeout() instead.
+*/
 class FL_EXPORT Fl_Timer : public Fl_Widget {
   static void stepcb(void *);
   void step();
@@ -50,9 +60,21 @@ public:
   Fl_Timer(uchar t,int x,int y,int w,int h, const char *l);
   ~Fl_Timer();
   void value(double);
+  /** See void Fl_Timer::value(double)  */
   double value() const {return delay>0.0?delay:0.0;}
+  /**
+    Gets or sets the direction of the timer.  If the direction is zero
+    then the timer will count up, otherwise it will count down from the
+    initial value().
+  */
   char direction() const {return direction_;}
+  /**
+    Gets or sets the direction of the timer.  If the direction is zero
+    then the timer will count up, otherwise it will count down from the
+    initial value().
+  */
   void direction(char d) {direction_ = d;}
+  /**    Gets or sets whether the timer is suspended.  */
   char suspended() const {return !on;}
   void suspended(char d);
 };
@@ -60,6 +82,6 @@ public:
 #endif
 
 //
-// End of "$Id: Fl_Timer.H 4288 2005-04-16 00:13:17Z mike $".
+// End of "$Id: Fl_Timer.H 6614 2009-01-01 16:11:32Z matt $".
 //
 

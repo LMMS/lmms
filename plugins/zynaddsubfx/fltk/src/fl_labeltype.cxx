@@ -1,9 +1,9 @@
 //
-// "$Id: fl_labeltype.cxx 5190 2006-06-09 16:16:34Z mike $"
+// "$Id: fl_labeltype.cxx 6616 2009-01-01 21:28:26Z matt $"
 //
 // Label drawing routines for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2005 by Bill Spitzak and others.
+// Copyright 1998-2009 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -74,6 +74,7 @@ static Fl_Label_Draw_F* table[MAX_LABELTYPE] = {
 
 static Fl_Label_Measure_F* measure[MAX_LABELTYPE];
 
+/** Sets the functions to call to draw and measure a specific labeltype. */
 void Fl::set_labeltype(Fl_Labeltype t,Fl_Label_Draw_F* f,Fl_Label_Measure_F*m) 
 {
   table[t] = f; measure[t] = m;
@@ -81,12 +82,16 @@ void Fl::set_labeltype(Fl_Labeltype t,Fl_Label_Draw_F* f,Fl_Label_Measure_F*m)
 
 ////////////////////////////////////////////////////////////////
 
-// draw label with arbitrary alignment in arbitrary box:
+/** Draws a label with arbitrary alignment in an arbitrary box. */
 void Fl_Label::draw(int X, int Y, int W, int H, Fl_Align align) const {
   if (!value && !image) return;
   table[type](this, X, Y, W, H, align);
 }
-
+/** 
+    Measures the size of the label.
+    \param[in,out] W, H : this is the requested size for the label text plus image;
+         on return, this will contain the size needed to fit the label
+*/
 void Fl_Label::measure(int& W, int& H) const {
   if (!value && !image) {
     W = H = 0;
@@ -97,7 +102,9 @@ void Fl_Label::measure(int& W, int& H) const {
   f(this, W, H);
 }
 
-// The normal call for a draw() method:
+/** Draws the widget's label at the defined label position.
+    This is the normal call for a widget's draw() method.
+ */
 void Fl_Widget::draw_label() const {
   int X = x_+Fl::box_dx(box());
   int W = w_-Fl::box_dw(box());
@@ -105,14 +112,18 @@ void Fl_Widget::draw_label() const {
   draw_label(X, y_+Fl::box_dy(box()), W, h_-Fl::box_dh(box()));
 }
 
-// draw() can use this instead to change the bounding box:
+/** Draws the label in an arbitrary bounding box.
+    draw() can use this instead of draw_label(void) to change the bounding box
+ */
 void Fl_Widget::draw_label(int X, int Y, int W, int H) const {
   // quit if we are not drawing a label inside the widget:
   if ((align()&15) && !(align() & FL_ALIGN_INSIDE)) return;
   draw_label(X,Y,W,H,align());
 }
 
-// Anybody can call this to force the label to draw anywhere:
+/** Draws the label in an arbitrary bounding box with an arbitrary alignment.
+    Anybody can call this to force the label to draw anywhere.
+ */
 void Fl_Widget::draw_label(int X, int Y, int W, int H, Fl_Align a) const {
   if (flags()&SHORTCUT_LABEL) fl_draw_shortcut = 1;
   Fl_Label l1 = label_;
@@ -129,5 +140,5 @@ void Fl_Widget::draw_label(int X, int Y, int W, int H, Fl_Align a) const {
 #include <FL/Fl_Input_.H>
 
 //
-// End of "$Id: fl_labeltype.cxx 5190 2006-06-09 16:16:34Z mike $".
+// End of "$Id: fl_labeltype.cxx 6616 2009-01-01 21:28:26Z matt $".
 //
