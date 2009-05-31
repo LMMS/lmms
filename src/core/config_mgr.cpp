@@ -78,7 +78,6 @@ configManager::configManager( void ) :
 
 configManager::~configManager()
 {
-	saveConfigFile();
 }
 
 

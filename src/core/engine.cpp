@@ -149,6 +149,8 @@ void engine::init( const bool _has_gui )
 
 void engine::destroy( void )
 {
+	configManager::inst()->saveConfigFile();
+
 	s_mixer->stopProcessing();
 
 	delete s_projectNotes;
