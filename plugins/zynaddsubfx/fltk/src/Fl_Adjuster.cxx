@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Adjuster.cxx 5190 2006-06-09 16:16:34Z mike $"
+// "$Id: Fl_Adjuster.cxx 6616 2009-01-01 21:28:26Z matt $"
 //
 // Adjuster widget for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2005 by Bill Spitzak and others.
+// Copyright 1998-2009 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -24,7 +24,6 @@
 //
 //     http://www.fltk.org/str.php
 //
-
 
 #include <FL/Fl.H>
 #include <FL/Fl_Adjuster.H>
@@ -157,6 +156,12 @@ int Fl_Adjuster::handle(int event) {
   return 0;
 }
 
+/**
+  Creates a new Fl_Adjuster widget using the given position,
+  size, and label string. It looks best if one of the dimensions is 3
+  times the other.
+  <P> Inherited destructor destroys the Valuator.
+*/
 Fl_Adjuster::Fl_Adjuster(int X, int Y, int W, int H, const char* l)
   : Fl_Valuator(X, Y, W, H, l) {
   box(FL_UP_BOX);
@@ -167,5 +172,5 @@ Fl_Adjuster::Fl_Adjuster(int X, int Y, int W, int H, const char* l)
 }
 
 //
-// End of "$Id: Fl_Adjuster.cxx 5190 2006-06-09 16:16:34Z mike $".
+// End of "$Id: Fl_Adjuster.cxx 6616 2009-01-01 21:28:26Z matt $".
 //

@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_display.cxx 5190 2006-06-09 16:16:34Z mike $"
+// "$Id: Fl_display.cxx 6616 2009-01-01 21:28:26Z matt $"
 //
 // Display function for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2005 by Bill Spitzak and others.
+// Copyright 1998-2009 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -32,6 +32,12 @@
 #include <stdlib.h>
 #include "flstring.h"
 
+/**
+    Sets the X display to use for all windows.  Actually this just sets
+    the environment variable $DISPLAY to the passed string, so this only
+    works before you show() the first window or otherwise open the display,
+    and does nothing useful under WIN32.
+*/
 void Fl::display(const char *d) {
 #if defined(__APPLE__) || defined(WIN32)
   (void)d;
@@ -50,5 +56,5 @@ void Fl::display(const char *d) {
 }
 
 //
-// End of "$Id: Fl_display.cxx 5190 2006-06-09 16:16:34Z mike $".
+// End of "$Id: Fl_display.cxx 6616 2009-01-01 21:28:26Z matt $".
 //

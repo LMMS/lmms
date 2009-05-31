@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Light_Button.cxx 5721 2007-02-27 19:23:24Z matt $"
+// "$Id: Fl_Light_Button.cxx 6616 2009-01-01 21:28:26Z matt $"
 //
 // Lighted button widget for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2006 by Bill Spitzak and others.
+// Copyright 1998-2009 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -157,6 +157,11 @@ int Fl_Light_Button::handle(int event) {
   }
 }
 
+/**
+  Creates a new Fl_Light_Button widget using the given
+  position, size, and label string.
+  <P>The destructor deletes the check button.
+*/
 Fl_Light_Button::Fl_Light_Button(int X, int Y, int W, int H, const char* l)
 : Fl_Button(X, Y, W, H, l) {
   type(FL_TOGGLE_BUTTON);
@@ -165,5 +170,5 @@ Fl_Light_Button::Fl_Light_Button(int X, int Y, int W, int H, const char* l)
 }
 
 //
-// End of "$Id: Fl_Light_Button.cxx 5721 2007-02-27 19:23:24Z matt $".
+// End of "$Id: Fl_Light_Button.cxx 6616 2009-01-01 21:28:26Z matt $".
 //

@@ -1,3 +1,7 @@
+IF(COMMAND cmake_policy)
+	cmake_policy(SET CMP0003 NEW)
+ENDIF(COMMAND cmake_policy)
+
 SET(CPPFILES
   Fl.cxx
   Fl_Adjuster.cxx
@@ -124,7 +128,8 @@ SET(CPPFILES
   fl_show_colormap.cxx
   fl_symbols.cxx
   fl_vertex.cxx
-	screen_xywh.cxx
+  screen_xywh.cxx
+  fl_utf8.cxx
   )
 SET(FLCPPFILES
   forms_compatability.cxx
@@ -160,10 +165,18 @@ SET(IMGCPPFILES
 
 SET(CFILES 
   fl_call_main.c
+  fl_utf.c
   flstring.c
   scandir.c
   numericsort.c
   vsnprintf.c
+  xutf8/case.c
+  xutf8/is_right2left.c
+  xutf8/is_spacing.c
+  xutf8/keysym2Ucs.c
+  xutf8/utf8Input.c
+  xutf8/utf8Utils.c
+  xutf8/utf8Wrap.c
   )
 
 ADD_LIBRARY(fltk ${CPPFILES} ${CFILES})

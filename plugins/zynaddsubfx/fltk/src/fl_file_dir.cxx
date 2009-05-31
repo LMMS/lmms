@@ -1,9 +1,9 @@
 //
-// "$Id: fl_file_dir.cxx 5417 2006-09-05 09:57:41Z matt $"
+// "$Id: fl_file_dir.cxx 6616 2009-01-01 21:28:26Z matt $"
 //
 // File chooser widget for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2005 by Bill Spitzak and others.
+// Copyright 1998-2009 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -42,24 +42,36 @@ static void callback(Fl_File_Chooser *, void*) {
     (*current_callback)(fc->value());
 }
 
+/** \addtogroup  group_comdlg 
+    @{ */
 
-// Set the file chooser callback
+/** \relatesalso Fl_File_Chooser
+    Set the file chooser callback
+*/
 void fl_file_chooser_callback(void (*cb)(const char*)) {
   current_callback = cb;
 }
 
 
-// Set the "OK" button label
+/** \relatesalso Fl_File_Chooser
+    Set the "OK" button label
+*/
 void fl_file_chooser_ok_label(const char *l) {
   if (l) current_label = l;
   else current_label = fl_ok;
 }
 
-
-//
-// 'fl_file_chooser()' - Show a file chooser dialog and get a filename.
-//
-
+/** \relates Fl_File_Chooser
+    Shows a file chooser dialog and gets a filename. 
+    \image html Fl_File_Chooser.jpg 
+    \image latex  Fl_File_Chooser.eps "Fl_File_Chooser" width=12cm
+    \param[in] message text in title bar
+    \param[in] pat filename pattern filter
+    \param[in] fname initial/default filename selection
+    \param[in] relative 0 for absolute path name, relative path name otherwise
+    \return the user selected filename, in absolute or relative format 
+            or NULL if user cancels
+*/
 char *					// O - Filename or NULL
 fl_file_chooser(const char *message,	// I - Message in titlebar
                 const char *pat,	// I - Filename pattern
@@ -134,10 +146,13 @@ fl_file_chooser(const char *message,	// I - Message in titlebar
   else return 0;
 }
 
-
-//
-// 'fl_dir_chooser()' - Show a file chooser dialog and get a directory.
-//
+/**  \relates Fl_File_Chooser
+    Shows a file chooser dialog and gets a directory.
+    \param[in] message title bar text
+    \param[in] fname initial/default directory name
+    \param[in] relative 0 for absolute path return, relative otherwise
+    \return the directory path string chosen by the user or NULL if user cancels
+*/
 
 char *					// O - Directory or NULL
 fl_dir_chooser(const char *message,	// I - Message for titlebar
@@ -171,8 +186,9 @@ fl_dir_chooser(const char *message,	// I - Message for titlebar
   } else if (fc->value()) return (char *)fc->value();
   else return 0;
 }
+/** @} */
 
 
 //
-// End of "$Id: fl_file_dir.cxx 5417 2006-09-05 09:57:41Z matt $".
+// End of "$Id: fl_file_dir.cxx 6616 2009-01-01 21:28:26Z matt $".
 //

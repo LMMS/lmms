@@ -1,9 +1,9 @@
 //
-// "$Id: win32.H 5436 2006-09-16 16:02:00Z matt $"
+// "$Id: win32.H 6614 2009-01-01 16:11:32Z matt $"
 //
 // WIN32 header file for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2005 by Bill Spitzak and others.
+// Copyright 1998-2009 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -29,6 +29,7 @@
 // include this file if WIN32 is defined.  This is to encourage
 // portability of even the system-specific code...
 
+#ifndef FL_DOXYGEN
 #ifndef Fl_X_H
 #  error "Never use <FL/win32.H> directly; include <FL/x.H> instead."
 #endif // !Fl_X_H
@@ -124,12 +125,12 @@ typedef HBITMAP Fl_Offscreen;
 
 extern FL_EXPORT HDC fl_makeDC(HBITMAP);
 
-#define fl_begin_offscreen(b) \
-  HDC _sgc=fl_gc; Window _sw=fl_window; \
-  fl_gc=fl_makeDC(b); int _savedc = SaveDC(fl_gc); fl_window=(HWND)b; fl_push_no_clip()
+# define fl_begin_offscreen(b) \
+   HDC _sgc=fl_gc; Window _sw=fl_window; \
+   fl_gc=fl_makeDC(b); int _savedc = SaveDC(fl_gc); fl_window=(HWND)b; fl_push_no_clip()
 
-#define fl_end_offscreen() \
-  fl_pop_clip(); RestoreDC(fl_gc, _savedc); DeleteDC(fl_gc); fl_window=_sw; fl_gc = _sgc
+# define fl_end_offscreen() \
+   fl_pop_clip(); RestoreDC(fl_gc, _savedc); DeleteDC(fl_gc); fl_window=_sw; fl_gc = _sgc
 
 FL_EXPORT void fl_copy_offscreen(int x,int y,int w,int h,HBITMAP pixmap,int srcx,int srcy);
 FL_EXPORT void fl_copy_offscreen_with_alpha(int x,int y,int w,int h,HBITMAP pixmap,int srcx,int srcy);
@@ -146,7 +147,7 @@ extern FL_EXPORT void fl_delete_bitmask(Fl_Bitmask bm);
 inline void fl_open_callback(void (*)(const char *)) {}
 
 extern FL_EXPORT int fl_parse_color(const char* p, uchar& r, uchar& g, uchar& b);
-
+#endif // FL_DOXYGEN
 //
-// End of "$Id: win32.H 5436 2006-09-16 16:02:00Z matt $".
+// End of "$Id: win32.H 6614 2009-01-01 16:11:32Z matt $".
 //

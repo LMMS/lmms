@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Browser_load.cxx 5190 2006-06-09 16:16:34Z mike $"
+// "$Id: Fl_Browser_load.cxx 6726 2009-03-27 16:52:31Z greg.ercolano $"
 //
 // File loading routines for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2005 by Bill Spitzak and others.
+// Copyright 1998-2009 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -28,7 +28,19 @@
 #include <FL/Fl.H>
 #include <FL/Fl_Browser.H>
 #include <stdio.h>
+#include <FL/fl_utf8.h>
 
+/**
+  Clears the browser and reads the file, adding each line from the file
+  to the browser.  If the filename is NULL or a zero-length
+  string then this just clears the browser.  This returns zero if there
+  was any error in opening or reading the file, in which case errno
+  is set to the system error.  The data() of each line is set
+  to NULL.
+  \param[in] filename The filename to load
+  \returns 1 if OK, 0 on error (errno has reason)
+  \see add()
+*/
 int Fl_Browser::load(const char *filename) {
 #define MAXFL_BLINE 1024
     char newtext[MAXFL_BLINE];
@@ -36,7 +48,7 @@ int Fl_Browser::load(const char *filename) {
     int i;
     clear();
     if (!filename || !(filename[0])) return 1;
-    FILE *fl = fopen(filename,"r");
+    FILE *fl = fl_fopen(filename,"r");
     if (!fl) return 0;
     i = 0;
     do {
@@ -45,13 +57,14 @@ int Fl_Browser::load(const char *filename) {
 	    newtext[i] = 0;
 	    add(newtext);
 	    i = 0;
-	} else
+	} else {
 	    newtext[i++] = c;
+	}
     } while (c >= 0);
     fclose(fl);
     return 1;
 }
 
 //
-// End of "$Id: Fl_Browser_load.cxx 5190 2006-06-09 16:16:34Z mike $".
+// End of "$Id: Fl_Browser_load.cxx 6726 2009-03-27 16:52:31Z greg.ercolano $".
 //

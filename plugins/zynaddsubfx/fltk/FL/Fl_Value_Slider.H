@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Value_Slider.H 4288 2005-04-16 00:13:17Z mike $"
+// "$Id: Fl_Value_Slider.H 6664 2009-02-18 09:27:54Z AlbrechtS $"
 //
 // Value slider header file for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2005 by Bill Spitzak and others.
+// Copyright 1998-2009 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -25,28 +25,45 @@
 //     http://www.fltk.org/str.php
 //
 
+/* \file
+   Fl_Value_Slider widget . */
+
 #ifndef Fl_Value_Slider_H
 #define Fl_Value_Slider_H
 
 #include "Fl_Slider.H"
 
+/**
+  The Fl_Value_Slider widget is a Fl_Slider widget
+  with a box displaying the current value.
+  <P ALIGN=CENTER>\image html value_slider.gif 
+  \image latex  value_slider.eps "Fl_Value_Slider" width=4cm
+*/
 class FL_EXPORT Fl_Value_Slider : public Fl_Slider {
-    uchar textfont_, textsize_;
+    Fl_Font textfont_;
+    Fl_Fontsize textsize_;
     unsigned textcolor_;
-public:
+protected:
     void draw();
+public:
     int handle(int);
     Fl_Value_Slider(int x,int y,int w,int h, const char *l = 0);
-    Fl_Font textfont() const {return (Fl_Font)textfont_;}
-    void textfont(uchar s) {textfont_ = s;}
-    uchar textsize() const {return textsize_;}
-    void textsize(uchar s) {textsize_ = s;}
+    /**    Gets the typeface of the text in the value box.  */
+    Fl_Font textfont() const {return textfont_;}
+    /**    Sets the typeface of the text in the value box.  */
+    void textfont(Fl_Font s) {textfont_ = s;}
+    /**    Gets the size of the text in the value box.  */
+    Fl_Fontsize textsize() const {return textsize_;}
+    /**    Sets the size of the text in the value box.  */
+    void textsize(Fl_Fontsize s) {textsize_ = s;}
+    /**    Gets the color of the text in the value box.  */
     Fl_Color textcolor() const {return (Fl_Color)textcolor_;}
+    /**    Sets the color of the text in the value box.  */
     void textcolor(unsigned s) {textcolor_ = s;}
 };
 
 #endif
 
 //
-// End of "$Id: Fl_Value_Slider.H 4288 2005-04-16 00:13:17Z mike $".
+// End of "$Id: Fl_Value_Slider.H 6664 2009-02-18 09:27:54Z AlbrechtS $".
 //

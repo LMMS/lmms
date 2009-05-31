@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Check_Button.cxx 5190 2006-06-09 16:16:34Z mike $"
+// "$Id: Fl_Check_Button.cxx 6616 2009-01-01 21:28:26Z matt $"
 //
 // Check button widget for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2005 by Bill Spitzak and others.
+// Copyright 1998-2009 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -28,12 +28,19 @@
 #include <FL/Fl.H>
 #include <FL/Fl_Check_Button.H>
 
+// TODO Correct incorrect Fl_Check_Button comments.
 // A subclass of Fl_Button that always draws as a diamond box.  This
 // diamond is smaller than the widget size and can be surchecked by
-// another box type, for compatability with Forms.
+// another box type, for compatibility with Forms.
 
-Fl_Check_Button::Fl_Check_Button(int X, int Y, int W, int H, const char *l)
-: Fl_Light_Button(X, Y, W, H, l) {
+/**
+  Creates a new Fl_Check_Button widget using the given position, size and
+  label string.
+  \param[in] X, Y, W, H position and size of the widget
+  \param[in] L widget label, default is no label
+ */
+Fl_Check_Button::Fl_Check_Button(int X, int Y, int W, int H, const char *L)
+: Fl_Light_Button(X, Y, W, H, L) {
   box(FL_NO_BOX);
   down_box(FL_DOWN_BOX);
   selection_color(FL_FOREGROUND_COLOR);

@@ -1,0 +1,8 @@
+ucs_table_0041[]; 	/* end: U+02B6 */
+ucs_table_0386[]; 	/* end: U+0556 */
+ucs_table_10A0[]; 	/* end: U+10C5 */
+ucs_table_1E00[]; 	/* end: U+1FFC */
+ucs_table_2102[]; 	/* end: U+2133 */
+ucs_table_24B6[]; 	/* end: U+24CF */
+ucs_table_33CE[]; 	/* end: U+33CE */
+ucs_table_FF21[]; 	/* end: U+FF3A */

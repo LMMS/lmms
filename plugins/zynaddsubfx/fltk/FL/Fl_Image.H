@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Image.H 4288 2005-04-16 00:13:17Z mike $"
+// "$Id: Fl_Image.H 6614 2009-01-01 16:11:32Z matt $"
 //
 // Image header file for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2005 by Bill Spitzak and others.
+// Copyright 1998-2009 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -25,6 +25,9 @@
 //     http://www.fltk.org/str.php
 //
 
+/* \file
+   Fl_Image, Fl_RGB_Image classes . */
+
 #ifndef Fl_Image_H
 #  define Fl_Image_H
 
@@ -34,6 +37,17 @@ class Fl_Widget;
 struct Fl_Menu_Item;
 struct Fl_Label;
 
+/**
+  Fl_Image is the base class used for caching and
+  drawing all kinds of images in FLTK. This class keeps track of
+  common image data such as the pixels, colormap, width, height,
+  and depth. Virtual methods are used to provide type-specific
+  image handling.</P>
+  
+  <P>Since the Fl_Image class does not support image
+  drawing by itself, calling the draw() method results in
+  a box with an X in it being drawn instead.
+*/
 class FL_EXPORT Fl_Image {
   int w_, h_, d_, ld_, count_;
   const char * const *data_;
@@ -44,10 +58,34 @@ class FL_EXPORT Fl_Image {
 
   protected:
 
+  /**
+    The first form of the w() method returns the current
+    image width in pixels.</P>
+    
+    <P>The second form is a protected method that sets the current
+    image width.
+  */
   void w(int W) {w_ = W;}
+  /**
+    The first form of the h() method returns the current
+    image height in pixels.</P>
+    
+    <P>The second form is a protected method that sets the current
+    image height.
+  */
   void h(int H) {h_ = H;}
+  /**
+    The first form of the d() method returns the current
+    image depth. The return value will be 0 for bitmaps, 1 for
+    pixmaps, and 1 to 4 for color images.</P>
+    
+    <P>The second form is a protected method that sets the current
+    image depth.
+  */
   void d(int D) {d_ = D;}
+  /**    See int ld()  */
   void ld(int LD) {ld_ = LD;}
+  /**    See const char * const *data()  */
   void data(const char * const *p, int c) {data_ = p; count_ = c;}
   void draw_empty(int X, int Y);
 
@@ -56,27 +94,99 @@ class FL_EXPORT Fl_Image {
 
   public:
 
+  /** See void Fl_Image::w(int) */
   int w() const {return w_;}
+  /** See void Fl_Image::h(int) */
   int h() const {return h_;}
+  /**
+    The first form of the d() method returns the current
+    image depth. The return value will be 0 for bitmaps, 1 for
+    pixmaps, and 1 to 4 for color images.</P>
+    
+    <P>The second form is a protected method that sets the current
+    image depth.
+  */
   int d() const {return d_;}
+  /**
+    The first form of the ld() method returns the current
+    line data size in bytes. Line data is extra data that is included
+    after each line of color image data and is normally not present.</P>
+    
+    <P>The second form is a protected method that sets the current
+    line data size in bytes.
+  */
   int ld() const {return ld_;}
+  /**
+    The count() method returns the number of data values
+    associated with the image. The value will be 0 for images with
+    no associated data, 1 for bitmap and color images, and greater
+    than 2 for pixmap images.
+  */
   int count() const {return count_;}
+  /**
+    The first form of the data() method returns a
+    pointer to the current image data array. Use the
+    count() method to find the size of the data array.</P>
+    
+    <P>The second form is a protected method that sets the current
+    array pointer and count of pointers in the array.
+  */
   const char * const *data() const {return data_;}
   
+  /**
+    The constructor creates an empty image with the specified
+    width, height, and depth. The width and height are in pixels.
+    The depth is 0 for bitmaps, 1 for pixmap (colormap) images, and
+    1 to 4 for color images.
+  */
   Fl_Image(int W, int H, int D) {w_ = W; h_ = H; d_ = D; ld_ = 0; count_ = 0; data_ = 0;}
   virtual ~Fl_Image();
   virtual Fl_Image *copy(int W, int H);
+  /**
+    The copy() method creates a copy of the specified
+    image. If the width and height are provided, the image is
+    resized to the specified size. The image should be deleted (or in
+    the case of Fl_Shared_Image, released) when you are done
+    with it.
+  */
   Fl_Image *copy() { return copy(w(), h()); }
   virtual void color_average(Fl_Color c, float i);
+  /**
+    The inactive() method calls
+    color_average(FL_BACKGROUND_COLOR, 0.33f) to produce 
+    an image that appears grayed out. <I>This method does not 
+    alter the original image data.</I>
+  */
   void inactive() { color_average(FL_GRAY, .33f); }
   virtual void desaturate();
   virtual void label(Fl_Widget*w);
   virtual void label(Fl_Menu_Item*m);
-  virtual void draw(int X, int Y, int W, int H, int cx=0, int cy=0);
-  void draw(int X, int Y) {draw(X, Y, w(), h(), 0, 0);}
+  /**
+    The draw() methods draw the image. This form specifies
+    a bounding box for the image, with the origin
+    (upper-lefthand corner) of the image offset by the cx
+    and cy arguments.
+  */
+  virtual void draw(int X, int Y, int W, int H, int cx=0, int cy=0); // platform dependent
+  /**
+    The draw() methods draw the image. This form
+    specifies the upper-lefthand corner of the image
+  */
+  void draw(int X, int Y) {draw(X, Y, w(), h(), 0, 0);} // platform dependent
   virtual void uncache();
 };
 
+/**
+  The Fl_RGB_Image class supports caching and drawing
+  of full-color images with 1 to 4 channels of color information.
+  Images with an even number of channels are assumed to contain
+  alpha information, which is used to blend the image with the
+  contents of the screen.</P>
+  
+  <P>Fl_RGB_Image is defined in
+  &lt;FL/Fl_Image.H&gt;, however for compatibility reasons
+  &lt;FL/Fl_RGB_Image.H&gt; should be included.
+*/
 class FL_EXPORT Fl_RGB_Image : public Fl_Image {
   public:
 
@@ -90,7 +200,7 @@ class FL_EXPORT Fl_RGB_Image : public Fl_Image {
   unsigned id; // for internal use
   unsigned mask; // for internal use (mask bitmap)
 #endif // __APPLE__ || WIN32
-
+/**  The constructor creates a new image from the specified data. */
   Fl_RGB_Image(const uchar *bits, int W, int H, int D=3, int LD=0) :
     Fl_Image(W,H,D), array(bits), alloc_array(0), id(0), mask(0) {data((const char **)&array, 1); ld(LD);}
   virtual ~Fl_RGB_Image();
@@ -108,5 +218,5 @@ class FL_EXPORT Fl_RGB_Image : public Fl_Image {
 #endif // !Fl_Image_H
 
 //
-// End of "$Id: Fl_Image.H 4288 2005-04-16 00:13:17Z mike $".
+// End of "$Id: Fl_Image.H 6614 2009-01-01 16:11:32Z matt $".
 //

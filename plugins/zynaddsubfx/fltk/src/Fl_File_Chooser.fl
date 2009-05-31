@@ -1,13 +1,13 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0108 
+version 1.0300 
 header_name {../FL/Fl_File_Chooser.H} 
 code_name {.cxx}
 comment {//
-// "$Id: Fl_File_Chooser.fl 6092 2008-04-11 12:57:37Z matt $"
+// "$Id: Fl_File_Chooser.fl 6678 2009-03-13 23:36:09Z AlbrechtS $"
 //
 // Fl_File_Chooser dialog for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2005 by Bill Spitzak and others.
+// Copyright 1998-2009 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -53,8 +53,7 @@ class FL_EXPORT Fl_File_Chooser {open
   decl {void showChoiceCB();} {}
   decl {void update_favorites();} {}
   decl {void update_preview();} {}
-  Function {Fl_File_Chooser(const char *d, const char *p, int t, const char *title)} {open
-  } {
+  Function {Fl_File_Chooser(const char *d, const char *p, int t, const char *title)} {} {
     code {Fl_Group *prev_current = Fl_Group::current();} {}
     Fl_Window window {
       label {Choose File}
@@ -62,13 +61,13 @@ class FL_EXPORT Fl_File_Chooser {open
 fileList->deselect();
 Fl::remove_timeout((Fl_Timeout_Handler)previewCB, this);
 window->hide();} open
-      private xywh {388 284 490 380} type Double resizable
+      private xywh {507 327 490 380} type Double resizable
       code0 {if (title) window->label(title);}
       code1 {\#include <stdio.h>}
       code2 {\#include <stdlib.h>}
       code3 {\#include <string.h>} modal visible
     } {
-      Fl_Group {} {
+      Fl_Group {} {open
         private xywh {10 10 470 25}
       } {
         Fl_Choice showChoice {
@@ -100,7 +99,7 @@ window->hide();} open
           code0 {\#include <FL/Fl_File_Browser.H>}
         }
         Fl_Box previewBox {
-          label {?} selected
+          label {?}
           private xywh {305 45 175 225} box DOWN_BOX labelsize 100 align 80
         }
       }
@@ -221,9 +220,12 @@ int e;
 prefs_.get("preview", e, 1);
 preview(e);
 Fl_Group::current(prev_current);} {}
+    code {ext_group=(Fl_Widget*)0;} {}
   }
-  Function {~Fl_File_Chooser()} {} {
+  Function {~Fl_File_Chooser()} {open
+  } {
     code {Fl::remove_timeout((Fl_Timeout_Handler)previewCB, this);
+if(ext_group)window->remove(ext_group);
 delete window;
 delete favWindow;} {}
   }
@@ -325,19 +327,19 @@ fileName->take_focus();} {}
   } {
     code {return (fileList->textcolor());} {}
   }
-  Function {textfont(uchar f)} {return_type void
+  Function {textfont(Fl_Font f)} {return_type void
   } {
     code {fileList->textfont(f);} {}
   }
-  Function {textfont()} {return_type uchar
+  Function {textfont()} {selected return_type Fl_Font
   } {
     code {return (fileList->textfont());} {}
   }
-  Function {textsize(uchar s)} {return_type void
+  Function {textsize(Fl_Fontsize s)} {return_type void
   } {
     code {fileList->textsize(s);} {}
   }
-  Function {textsize()} {return_type uchar
+  Function {textsize()} {return_type Fl_Fontsize
   } {
     code {return (fileList->textsize());} {}
   }
@@ -377,33 +379,79 @@ else
   } {
     code {return window->visible();} {}
   }
-  decl {static const char *add_favorites_label;} {public
+  decl {static const char *add_favorites_label;} {
+    comment {[standard text may be customized at run-time]} public
   }
-  decl {static const char *all_files_label;} {public
+  decl {static const char *all_files_label;} {
+    comment {[standard text may be customized at run-time]} public
   }
-  decl {static const char *custom_filter_label;} {public
+  decl {static const char *custom_filter_label;} {
+    comment {[standard text may be customized at run-time]} public
   }
-  decl {static const char *existing_file_label;} {public
+  decl {static const char *existing_file_label;} {
+    comment {[standard text may be customized at run-time]} public
   }
-  decl {static const char *favorites_label;} {public
+  decl {static const char *favorites_label;} {
+    comment {[standard text may be customized at run-time]} public
   }
-  decl {static const char *filename_label;} {public
+  decl {static const char *filename_label;} {
+    comment {[standard text may be customized at run-time]} public
   }
-  decl {static const char *filesystems_label;} {public
+  decl {static const char *filesystems_label;} {
+    comment {[standard text may be customized at run-time]} public
   }
-  decl {static const char *manage_favorites_label;} {public
+  decl {static const char *manage_favorites_label;} {
+    comment {[standard text may be customized at run-time]} public
   }
-  decl {static const char *new_directory_label;} {public
+  decl {static const char *new_directory_label;} {
+    comment {[standard text may be customized at run-time]} public
   }
-  decl {static const char *new_directory_tooltip;} {public
+  decl {static const char *new_directory_tooltip;} {
+    comment {[standard text may be customized at run-time]} public
   }
-  decl {static const char *preview_label;} {public
+  decl {static const char *preview_label;} {
+    comment {[standard text may be customized at run-time]} public
   }
-  decl {static const char *save_label;} {public
+  decl {static const char *save_label;} {
+    comment {[standard text may be customized at run-time]} public
   }
-  decl {static const char *show_label;} {public
+  decl {static const char *show_label;} {
+    comment {[standard text may be customized at run-time]} public
   }
-  decl {static Fl_File_Sort_F *sort;} {public
+  decl {static Fl_File_Sort_F *sort;} {
+    comment {the sort function that is used when loading
+the contents of a directory.} public
+  }
+  decl {Fl_Widget* ext_group;} {}
+  Function {add_extra(Fl_Widget* gr)} {open return_type {Fl_Widget*}
+  } {
+    code {Fl_Widget* ret=ext_group;} {}
+    codeblock {if (gr==ext_group)} {open
+    } {
+      code {return ret;} {}
+    }
+    codeblock {if (ext_group)} {open
+    } {
+      code {int sh=ext_group->h()+4;
+Fl_Widget* svres=window->resizable();
+window->resizable(NULL);
+window->size(window->w(),window->h()-sh);
+window->remove(ext_group);
+ext_group=NULL;
+window->resizable(svres);} {}
+    }
+    codeblock {if (gr)} {open
+    } {
+      code {int nh=window->h()+gr->h()+4;
+Fl_Widget* svres=window->resizable();
+window->resizable(NULL);
+window->size(window->w(),nh);
+gr->position(2,okButton->y()+okButton->h()+2);
+window->add(gr);
+ext_group=gr;
+window->resizable(svres);} {}
+    }
+    code {return ret;} {}
   }
 } 
 
@@ -421,6 +469,6 @@ decl {FL_EXPORT void fl_file_chooser_ok_label(const char*l);} {public
 
 comment {
 //
-// End of "$Id: Fl_File_Chooser.fl 6092 2008-04-11 12:57:37Z matt $".
+// End of "$Id: Fl_File_Chooser.fl 6678 2009-03-13 23:36:09Z AlbrechtS $".
 //} {in_source in_header
 } 

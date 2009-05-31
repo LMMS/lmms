@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Check_Browser.cxx 5985 2007-11-20 21:15:08Z mike $"
+// "$Id: Fl_Check_Browser.cxx 6616 2009-01-01 21:28:26Z matt $"
 //
 // Fl_Check_Browser header file for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2005 by Bill Spitzak and others.
+// Copyright 1998-2009 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -85,7 +85,8 @@ int Fl_Check_Browser::lineno(cb_item *p0) const {
 }
 
 Fl_Check_Browser::Fl_Check_Browser(int X, int Y, int W, int H, const char *l)
-	: Fl_Browser_(X, Y, W, H, l) {
+/**  The constructor makes an empty browser.*/
+: Fl_Browser_(X, Y, W, H, l) {
 	type(FL_SELECT_BROWSER);
 	when(FL_WHEN_NEVER);
 	first = last = 0;
@@ -164,11 +165,16 @@ int Fl_Check_Browser::item_selected(void *v) const {
 	cb_item *i = (cb_item *)v;
 	return i->selected;
 }
-
+/**
+    Add a new unchecked line to the end of the browser.  The text is copied
+    using the strdup() function.  It may also be NULL to make
+    a blank line.  The second form can set the item checked.
+*/
 int Fl_Check_Browser::add(char *s) {
 	return (add(s, 0));
 }
 
+/** See int Fl_Check_Browser::add(char *s) */
 int Fl_Check_Browser::add(char *s, int b) {
 	cb_item *p = (cb_item *)malloc(sizeof(cb_item));
 	p->next = 0;
@@ -193,6 +199,10 @@ int Fl_Check_Browser::add(char *s, int b) {
 	return (nitems_);
 }
 
+/**
+  Remove line n and make the browser one line shorter. Returns the 
+  number of lines left in the browser.
+*/
 int Fl_Check_Browser::remove(int item) {
   cb_item *p = find_item(item);
   
@@ -225,6 +235,7 @@ int Fl_Check_Browser::remove(int item) {
   return (nitems_);
 }
 
+/**  Remove every item from the browser.*/
 void Fl_Check_Browser::clear() {
 	cb_item *p = first;
 	cb_item *next;
@@ -246,6 +257,7 @@ void Fl_Check_Browser::clear() {
 	cached_item = -1;
 }
 
+/** Gets the current status of item item. */
 int Fl_Check_Browser::checked(int i) const {
 	cb_item *p = find_item(i);
 
@@ -253,6 +265,7 @@ int Fl_Check_Browser::checked(int i) const {
 	return 0;
 }
 
+/** Sets the check status of item item to b. */
 void Fl_Check_Browser::checked(int i, int b) {
 	cb_item *p = find_item(i);
 
@@ -267,10 +280,12 @@ void Fl_Check_Browser::checked(int i, int b) {
 	}
 }
 
+/**  Returns the index of the currently selected item.*/
 int Fl_Check_Browser::value() const {
 	return lineno((cb_item *)selection());
 }
 
+/**  Return a pointer to an internal buffer holding item item's text.*/
 char *Fl_Check_Browser::text(int i) const {
 	cb_item *p = find_item(i);
 
@@ -278,6 +293,7 @@ char *Fl_Check_Browser::text(int i) const {
 	return 0;
 }
 
+/**  Sets all the items checked.*/
 void Fl_Check_Browser::check_all() {
 	cb_item *p;
 
@@ -288,6 +304,7 @@ void Fl_Check_Browser::check_all() {
 	redraw();
 }
 
+/**  Sets all the items unchecked.*/
 void Fl_Check_Browser::check_none() {
 	cb_item *p;
 
@@ -305,5 +322,5 @@ int Fl_Check_Browser::handle(int event) {
 }
 
 //
-// End of "$Id: Fl_Check_Browser.cxx 5985 2007-11-20 21:15:08Z mike $".
+// End of "$Id: Fl_Check_Browser.cxx 6616 2009-01-01 21:28:26Z matt $".
 //

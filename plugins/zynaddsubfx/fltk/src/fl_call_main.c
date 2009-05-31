@@ -1,7 +1,7 @@
 /*
- * "$Id: fl_call_main.c 5848 2007-05-20 16:18:31Z mike $"
+ * "$Id: fl_call_main.c 6680 2009-03-14 02:11:31Z greg.ercolano $"
  *
- * Copyright 1998-2005 by Bill Spitzak and others.
+ * Copyright 1998-2009 by Bill Spitzak and others.
  *
  * fl_call_main() calls main() for you Windows people.  Needs to be done in C
  * because Borland C++ won't let you call main() from C++.
@@ -51,6 +51,7 @@
 #  include <windows.h>
 #  include <stdio.h>
 #  include <stdlib.h>
+#include <FL/fl_utf8.h>
 
 #  ifdef __MWERKS__
 #   include <crtl.h>
@@ -63,9 +64,26 @@ extern int main(int, char *[]);
 #    define __argv _argv
 #  endif /* BORLAND5 */
 
+/* static int mbcs2utf(const char *s, int l, char *dst, unsigned dstlen) */
+static int mbcs2utf(const char *s, int l, char *dst)
+{
+  static xchar *mbwbuf;
+  unsigned dstlen = 0;
+  if (!s) return 0;
+  dstlen = (l * 6) + 6;
+  mbwbuf = (xchar*)malloc(dstlen * sizeof(xchar));
+  l = mbstowcs(mbwbuf, s, l);
+/* l = fl_unicode2utf(mbwbuf, l, dst); */
+  l = fl_utf8fromwc(dst, dstlen, mbwbuf, l);
+  dst[l] = 0;
+  free(mbwbuf);
+  return l;
+}
+
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
                              LPSTR lpCmdLine, int nCmdShow) {
-  int rc;
+  int rc, i;
+  char **ar;
 
 #  ifdef _DEBUG
  /*
@@ -84,8 +102,30 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
   freopen("conout$", "w", stderr);
 #  endif /* _DEBUG */
 
+  ar = (char**) malloc(sizeof(char*) * (__argc + 1));
+  i = 0;
+  while (i < __argc) {
+    int l;
+    unsigned dstlen;
+    if (__wargv ) {
+      for (l = 0; __wargv[i] && __wargv[i][l]; l++) {}; /* is this just wstrlen??? */
+      dstlen = (l * 5) + 1;
+      ar[i] = (char*) malloc(dstlen);
+/*    ar[i][fl_unicode2utf(__wargv[i], l, ar[i])] = 0; */
+      dstlen = fl_utf8fromwc(ar[i], dstlen, __wargv[i], l);
+      ar[i][dstlen] = 0;
+    } else {
+      for (l = 0; __argv[i] && __argv[i][l]; l++) {};
+      dstlen = (l * 5) + 1;
+      ar[i] = (char*) malloc(dstlen);
+/*      ar[i][mbcs2utf(__argv[i], l, ar[i], dstlen)] = 0; */
+      ar[i][mbcs2utf(__argv[i], l, ar[i])] = 0;
+    }
+    i++;
+  }
+  ar[__argc] = 0;
   /* Run the standard main entry point function... */
-  rc = main(__argc, __argv);
+  rc = main(__argc, ar);
 
 #  ifdef _DEBUG
   fclose(stdin);
@@ -99,9 +139,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 #elif defined(__hpux)
 /* This code to prevent "empty translation unit" or similar warnings... */
 static void dummy(void) {}
-#endif // WIN32 && !FL_DLL && !__GNUC__
+#endif /* WIN32 && !FL_DLL && !__GNUC__ */
 
 /*
- * End of "$Id: fl_call_main.c 5848 2007-05-20 16:18:31Z mike $".
+ * End of "$Id: fl_call_main.c 6680 2009-03-14 02:11:31Z greg.ercolano $".
  */
 

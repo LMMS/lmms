@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Color_Chooser.cxx 5190 2006-06-09 16:16:34Z mike $"
+// "$Id: Fl_Color_Chooser.cxx 6616 2009-01-01 21:28:26Z matt $"
 //
 // Color chooser for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2005 by Bill Spitzak and others.
+// Copyright 1998-2009 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -47,6 +47,11 @@
 // you get this by defining this:
 #define UPDATE_HUE_BOX 1
 
+/**
+  This \e static method converts HSV colors to RGB colorspace.
+  \param[in] H, S, V color components
+  \param[out] R, G, B color components
+ */
 void Fl_Color_Chooser::hsv2rgb(
 	double H, double S, double V, double& R, double& G, double& B) {
   if (S < 5.0e-6) {
@@ -68,6 +73,11 @@ void Fl_Color_Chooser::hsv2rgb(
   }
 }
 
+/**
+  This \e static method converts RGB colors to HSV colorspace.
+  \param[in] R, G, B color components
+  \param[out] H, S, V color components
+ */
 void Fl_Color_Chooser::rgb2hsv(
 	double R, double G, double B, double& H, double& S, double& V) {
   double maxv = R > G ? R : G; if (B > maxv) maxv = B;
@@ -83,7 +93,13 @@ void Fl_Color_Chooser::rgb2hsv(
   }
 }
 
-enum {M_RGB, M_BYTE, M_HEX, M_HSV}; // modes
+/** Fl_Color_Chooser modes */
+enum {
+  M_RGB,	/**< mode() of Fl_Color_Chooser showing RGB values */
+  M_BYTE,	/**< mode() of Fl_Color_Chooser showing byte values */
+  M_HEX,	/**< mode() of Fl_Color_Chooser showing hex values */
+  M_HSV		/**< mode() of Fl_Color_Chooser showing HSV values */
+};
 static Fl_Menu_Item mode_menu[] = {
   {"rgb"},
   {"byte"},
@@ -92,11 +108,13 @@ static Fl_Menu_Item mode_menu[] = {
   {0}
 };
 
+#ifndef FL_DOXYGEN
 int Flcc_Value_Input::format(char* buf) {
   Fl_Color_Chooser* c = (Fl_Color_Chooser*)parent();
   if (c->mode() == M_HEX) return sprintf(buf,"0x%02X", int(value()));
   else return Fl_Valuator::format(buf);
 }
+#endif // !FL_DOXYGEN
 
 void Fl_Color_Chooser::set_valuators() {
   switch (mode()) {
@@ -119,6 +137,13 @@ void Fl_Color_Chooser::set_valuators() {
   }
 }
 
+/**
+  Sets the current rgb color values.
+  Does not do the callback. Does not clamp (but out of range values will
+  produce psychedelic effects in the hue selector).
+  \param[in] R, G, B color components.
+  \return 1 if a new rgb value was set, 0 if the rgb value was the previous one.
+ */
 int Fl_Color_Chooser::rgb(double R, double G, double B) {
   if (R == r_ && G == g_ && B == b_) return 0;
   r_ = R; g_ = G; b_ = B;
@@ -140,6 +165,13 @@ int Fl_Color_Chooser::rgb(double R, double G, double B) {
   return 1;
 }
 
+/**
+  Set the hsv values.
+  The passed values are clamped (or for hue, modulus 6 is used) to get
+  legal values. Does not do the callback.
+  \param[in] H, S, V color components.
+  \return 1 if a new hsv value was set, 0 if the hsv value was the previous one.
+*/
 int Fl_Color_Chooser::hsv(double H, double S, double V) {
   H = fmod(H,6.0); if (H < 0.0) H += 6.0;
   if (S < 0.0) S = 0.0; else if (S > 1.0) S = 1.0;
@@ -179,6 +211,7 @@ static void tohs(double x, double y, double& h, double& s) {
 #endif
 }
 
+#ifndef FL_DOXYGEN
 int Flcc_HueBox::handle(int e) {
   static double ih, is;
   Fl_Color_Chooser* c = (Fl_Color_Chooser*)parent();
@@ -213,6 +246,7 @@ int Flcc_HueBox::handle(int e) {
     return 0;
   }
 }
+#endif // !FL_DOXYGEN
 
 static void generate_image(void* vv, int X, int Y, int W, uchar* buf) {
   Flcc_HueBox* v = (Flcc_HueBox*)vv;
@@ -234,6 +268,7 @@ static void generate_image(void* vv, int X, int Y, int W, uchar* buf) {
   }
 }
 
+#ifndef FL_DOXYGEN
 int Flcc_HueBox::handle_key(int key) {
   int w1 = w()-Fl::box_dw(box())-6;
   int h1 = h()-Fl::box_dh(box())-6;
@@ -272,14 +307,16 @@ int Flcc_HueBox::handle_key(int key) {
 
   return 1;
 }
+#endif // !FL_DOXYGEN
 
+#ifndef FL_DOXYGEN
 void Flcc_HueBox::draw() {
   if (damage()&FL_DAMAGE_ALL) draw_box();
   int x1 = x()+Fl::box_dx(box());
   int yy1 = y()+Fl::box_dy(box());
   int w1 = w()-Fl::box_dw(box());
   int h1 = h()-Fl::box_dh(box());
-  if (damage() == FL_DAMAGE_EXPOSE) fl_clip(x1+px,yy1+py,6,6);
+  if (damage() == FL_DAMAGE_EXPOSE) fl_push_clip(x1+px,yy1+py,6,6);
   fl_draw_image(generate_image, this, x1, yy1, w1, h1);
   if (damage() == FL_DAMAGE_EXPOSE) fl_pop_clip();
   Fl_Color_Chooser* c = (Fl_Color_Chooser*)parent();
@@ -296,9 +333,11 @@ void Flcc_HueBox::draw() {
   draw_box(FL_UP_BOX,x1+X,yy1+Y,6,6,Fl::focus() == this ? FL_FOREGROUND_COLOR : FL_GRAY);
   px = X; py = Y;
 }
+#endif // !FL_DOXYGEN
 
 ////////////////////////////////////////////////////////////////
 
+#ifndef FL_DOXYGEN
 int Flcc_ValueBox::handle(int e) {
   static double iv;
   Fl_Color_Chooser* c = (Fl_Color_Chooser*)parent();
@@ -328,6 +367,7 @@ int Flcc_ValueBox::handle(int e) {
     return 0;
   }
 }
+#endif // !FL_DOXYGEN
 
 static double tr, tg, tb;
 static void generate_vimage(void* vv, int X, int Y, int W, uchar* buf) {
@@ -341,6 +381,7 @@ static void generate_vimage(void* vv, int X, int Y, int W, uchar* buf) {
   }
 }
 
+#ifndef FL_DOXYGEN
 void Flcc_ValueBox::draw() {
   if (damage()&FL_DAMAGE_ALL) draw_box();
   Fl_Color_Chooser* c = (Fl_Color_Chooser*)parent();
@@ -349,7 +390,7 @@ void Flcc_ValueBox::draw() {
   int yy1 = y()+Fl::box_dy(box());
   int w1 = w()-Fl::box_dw(box());
   int h1 = h()-Fl::box_dh(box());
-  if (damage() == FL_DAMAGE_EXPOSE) fl_clip(x1,yy1+py,w1,6);
+  if (damage() == FL_DAMAGE_EXPOSE) fl_push_clip(x1,yy1+py,w1,6);
   fl_draw_image(generate_vimage, this, x1, yy1, w1, h1);
   if (damage() == FL_DAMAGE_EXPOSE) fl_pop_clip();
   int Y = int((1-c->value()) * (h1-6));
@@ -357,7 +398,9 @@ void Flcc_ValueBox::draw() {
   draw_box(FL_UP_BOX,x1,yy1+Y,w1,6,Fl::focus() == this ? FL_FOREGROUND_COLOR : FL_GRAY);
   py = Y;
 }
+#endif // !FL_DOXYGEN
 
+#ifndef FL_DOXYGEN
 int Flcc_ValueBox::handle_key(int key) {
   int h1 = h()-Fl::box_dh(box())-6;
   Fl_Color_Chooser* c = (Fl_Color_Chooser*)parent();
@@ -382,6 +425,7 @@ int Flcc_ValueBox::handle_key(int key) {
 
   return 1;
 }
+#endif // !FL_DOXYGEN
 
 ////////////////////////////////////////////////////////////////
 
@@ -413,6 +457,13 @@ void Fl_Color_Chooser::mode_cb(Fl_Widget* o, void*) {
 
 ////////////////////////////////////////////////////////////////
 
+/**
+  Creates a new Fl_Color_Chooser widget using the given position, size, and
+  label string.
+  The recommended dimensions are 200x95. The color is initialized to black.
+  \param[in] X, Y, W, H position and size of the widget
+  \param[in] L widget label, default is no label
+ */
 Fl_Color_Chooser::Fl_Color_Chooser(int X, int Y, int W, int H, const char* L)
   : Fl_Group(0,0,195,115,L),
     huebox(0,0,115,115),
@@ -477,6 +528,18 @@ static void chooser_cb(Fl_Object* o, void* vv) {
 extern const char* fl_ok;
 extern const char* fl_cancel;
 
+/** \addtogroup  group_comdlg 
+    @{ */
+/**
+  \brief Pops up a window to let the user pick an arbitrary RGB color.
+  \image html fl_color_chooser.jpg 
+  \image latex  fl_color_chooser.eps "fl_color_chooser" width=8cm
+  \param[in] name title label for the window
+  \param[in,out] r, g, b color components in the range 0.0 to 1.0.
+  \retval 1 if user confirms the selection 
+  \retval 0 if user cancels the dialog
+  \relates Fl_Color_Chooser
+ */
 int fl_color_chooser(const char* name, double& r, double& g, double& b) {
   Fl_Window window(215,200,name);
   Fl_Color_Chooser chooser(10, 10, 195, 115);
@@ -511,6 +574,16 @@ int fl_color_chooser(const char* name, double& r, double& g, double& b) {
   return 0;
 }
 
+/**
+  \brief Pops up a window to let the user pick an arbitrary RGB color.
+  \image html fl_color_chooser.jpg 
+  \image latex  fl_color_chooser.eps "fl_color_chooser" width=8cm
+  \param[in] name title label for the window
+  \param[in,out] r, g, b color components in the range 0 to 255.
+  \retval 1 if user confirms the selection 
+  \retval 0 if user cancels the dialog
+  \relates Fl_Color_Chooser
+ */
 int fl_color_chooser(const char* name, uchar& r, uchar& g, uchar& b) {
   double dr = r/255.0;
   double dg = g/255.0;
@@ -523,7 +596,7 @@ int fl_color_chooser(const char* name, uchar& r, uchar& g, uchar& b) {
   }
   return 0;
 }
-
+/** @} */
 //
-// End of "$Id: Fl_Color_Chooser.cxx 5190 2006-06-09 16:16:34Z mike $".
+// End of "$Id: Fl_Color_Chooser.cxx 6616 2009-01-01 21:28:26Z matt $".
 //

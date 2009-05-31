@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Wizard.H 4288 2005-04-16 00:13:17Z mike $"
+// "$Id: Fl_Wizard.H 6614 2009-01-01 16:11:32Z matt $"
 //
 // Fl_Wizard widget definitions.
 //
-// Copyright 1999-2005 by Easy Software Products.
+// Copyright 1999-2009 by Easy Software Products.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -25,6 +25,9 @@
 //     http://www.fltk.org/str.php
 //
 
+/* \file
+   Fl_Wizard widget . */
+
 //
 // Include necessary header files...
 //
@@ -35,10 +38,15 @@
 #  include <FL/Fl_Group.H>
 
 
-//
-// Fl_Wizard class...
-//
+/**
+    This widget is based off the Fl_Tabs
+    widget, but instead of displaying tabs it only changes "tabs" under
+    program control. Its primary purpose is to support "wizards" that
+    step a user through configuration or troubleshooting tasks.
 
+    <P>As with Fl_Tabs, wizard panes are composed of child (usually
+    Fl_Group) widgets. Navigation buttons must be added separately.
+*/
 class FL_EXPORT Fl_Wizard : public Fl_Group
 {
   Fl_Widget *value_;
@@ -58,5 +66,5 @@ class FL_EXPORT Fl_Wizard : public Fl_Group
 #endif // !_Fl_Wizard_H_
 
 //
-// End of "$Id: Fl_Wizard.H 4288 2005-04-16 00:13:17Z mike $".
+// End of "$Id: Fl_Wizard.H 6614 2009-01-01 16:11:32Z matt $".
 //

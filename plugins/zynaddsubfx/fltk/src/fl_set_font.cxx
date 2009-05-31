@@ -1,9 +1,9 @@
 //
-// "$Id: fl_set_font.cxx 5420 2006-09-05 11:16:15Z matt $"
+// "$Id: fl_set_font.cxx 6616 2009-01-01 21:28:26Z matt $"
 //
 // Font utilities for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2005 by Bill Spitzak and others.
+// Copyright 1998-2009 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -36,7 +36,10 @@
 #include <stdlib.h>
 
 static int table_size;
-
+/**
+  Changes a face.  The string pointer is simply stored,
+  the string is not copied, so the string must be in static memory.
+*/    
 void Fl::set_font(Fl_Font fnum, const char* name) {
   while (fnum >= table_size) {
     int i = table_size;
@@ -65,8 +68,8 @@ void Fl::set_font(Fl_Font fnum, const char* name) {
 #if !defined(WIN32) && !defined(__APPLE__)
     if (s->xlist && s->n >= 0) XFreeFontNames(s->xlist);
 #endif
-    for (Fl_FontSize* f = s->first; f;) {
-      Fl_FontSize* n = f->next; delete f; f = n;
+    for (Fl_Font_Descriptor* f = s->first; f;) {
+      Fl_Font_Descriptor* n = f->next; delete f; f = n;
     }
     s->first = 0;
   }
@@ -78,13 +81,17 @@ void Fl::set_font(Fl_Font fnum, const char* name) {
   s->first = 0;
   fl_font(-1, 0);
 }
-
+/** Copies one face to another. */
 void Fl::set_font(Fl_Font fnum, Fl_Font from) {
   Fl::set_font(fnum, get_font(from));
 }
-
+/**
+    Gets the string for this face.  This string is different for each
+    face. Under X this value is passed to XListFonts to get all the sizes
+    of this face.
+*/
 const char* Fl::get_font(Fl_Font fnum) {return fl_fonts[fnum].name;}
 
 //
-// End of "$Id: fl_set_font.cxx 5420 2006-09-05 11:16:15Z matt $".
+// End of "$Id: fl_set_font.cxx 6616 2009-01-01 21:28:26Z matt $".
 //

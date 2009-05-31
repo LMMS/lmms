@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_XPM_Image.cxx 5190 2006-06-09 16:16:34Z mike $"
+// "$Id: Fl_XPM_Image.cxx 6616 2009-01-01 21:28:26Z matt $"
 //
 // Fl_XPM_Image routines.
 //
-// Copyright 1997-2005 by Bill Spitzak and others.
+// Copyright 1997-2009 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -36,6 +36,7 @@
 #include <FL/Fl_XPM_Image.H>
 #include <stdio.h>
 #include <stdlib.h>
+#include <FL/fl_utf8.h>
 #include "flstring.h"
 
 
@@ -52,11 +53,15 @@ static int hexdigit(int x) {	// I - Hex digit...
 
 #define MAXSIZE 2048
 #define INITIALLINES 256
-
+/**
+  The constructor loads the XPM image from the name filename.
+  <P>The destructor free all memory and server resources that are used by
+  the image.
+*/
 Fl_XPM_Image::Fl_XPM_Image(const char *name) : Fl_Pixmap((char *const*)0) {
   FILE *f;
 
-  if ((f = fopen(name, "rb")) == NULL) return;
+  if ((f = fl_fopen(name, "rb")) == NULL) return;
 
   // read all the c-strings out of the file:
   char** new_data = new char *[INITIALLINES];
@@ -127,5 +132,5 @@ Fl_XPM_Image::Fl_XPM_Image(const char *name) : Fl_Pixmap((char *const*)0) {
 
 
 //
-// End of "$Id: Fl_XPM_Image.cxx 5190 2006-06-09 16:16:34Z mike $".
+// End of "$Id: Fl_XPM_Image.cxx 6616 2009-01-01 21:28:26Z matt $".
 //

@@ -1,9 +1,9 @@
 /*
- * "$Id: filename.H 5635 2007-01-23 15:02:00Z mike $"
+ * "$Id: filename.H 6716 2009-03-24 01:40:44Z fabien $"
  *
  * Filename header file for the Fast Light Tool Kit (FLTK).
  *
- * Copyright 1998-2005 by Bill Spitzak and others.
+ * Copyright 1998-2009 by Bill Spitzak and others.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -30,9 +30,12 @@
 
 #  include "Fl_Export.H"
 
-#  define FL_PATH_MAX 256 /* all buffers are this length */
+/** \addtogroup filenames File names and URI utility functions 
+    @{ */
 
-FL_EXPORT const char *fl_filename_name(const char *);
+#  define FL_PATH_MAX 256 /**< all path buffers should use this length */
+/** Gets the file name from a path. \return a pointer to the char after the last slash, or to \p filename if there is none. */
+FL_EXPORT const char *fl_filename_name(const char * filename);
 FL_EXPORT const char *fl_filename_ext(const char *);
 FL_EXPORT char *fl_filename_setext(char *to, int tolen, const char *ext);
 FL_EXPORT int fl_filename_expand(char *to, int tolen, const char *from);
@@ -41,7 +44,7 @@ FL_EXPORT int fl_filename_relative(char *to, int tolen, const char *from);
 FL_EXPORT int fl_filename_match(const char *name, const char *pattern);
 FL_EXPORT int fl_filename_isdir(const char *name);
 
-#  ifdef __cplusplus
+#  if defined(__cplusplus) && !defined(FL_DOXYGEN)
 /*
  * Under WIN32, we include filename.H from numericsort.c; this should probably change...
  */
@@ -91,18 +94,20 @@ struct dirent {char d_name[1];};
 #    include <dirent.h>
 #  endif
 
-#  ifdef __cplusplus
+#  if defined (__cplusplus)
 extern "C" {
 #  endif /* __cplusplus */
 
+#  if !defined(FL_DOXYGEN)
 FL_EXPORT int fl_alphasort(struct dirent **, struct dirent **);
 FL_EXPORT int fl_casealphasort(struct dirent **, struct dirent **);
 FL_EXPORT int fl_casenumericsort(struct dirent **, struct dirent **);
 FL_EXPORT int fl_numericsort(struct dirent **, struct dirent **);
+#  endif
 
-typedef int (Fl_File_Sort_F)(struct dirent **, struct dirent **);
+  typedef int (Fl_File_Sort_F)(struct dirent **, struct dirent **); /**< File sorting function. \see fl_filename_list() */
 
-#  ifdef __cplusplus
+#  if defined(__cplusplus)
 }
 
 /*
@@ -120,6 +125,7 @@ FL_EXPORT int fl_filename_list(const char *d, struct dirent ***l,
 FL_EXPORT int	fl_open_uri(const char *uri, char *msg = (char *)0,
 		            int msglen = 0);
 
+#    ifndef FL_DOXYGEN
 /*
  * _fl_filename_isdir_quick() is a private function that checks for a
  * trailing slash and assumes that the passed name is a directory if
@@ -128,6 +134,7 @@ FL_EXPORT int	fl_open_uri(const char *uri, char *msg = (char *)0,
  * outside of FLTK...
  */
 int _fl_filename_isdir_quick(const char *name);
+#    endif
 
 #  endif /* __cplusplus */
 
@@ -151,6 +158,8 @@ int _fl_filename_isdir_quick(const char *name);
 
 #endif /* FL_FILENAME_H */
 
+/** @} */
+
 /*
- * End of "$Id: filename.H 5635 2007-01-23 15:02:00Z mike $".
+ * End of "$Id: filename.H 6716 2009-03-24 01:40:44Z fabien $".
  */

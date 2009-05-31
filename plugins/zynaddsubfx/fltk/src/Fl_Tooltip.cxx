@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Tooltip.cxx 5848 2007-05-20 16:18:31Z mike $"
+// "$Id: Fl_Tooltip.cxx 6712 2009-03-22 19:21:34Z AlbrechtS $"
 //
 // Tooltip source file for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2005 by Bill Spitzak and others.
+// Copyright 1998-2009 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -38,21 +38,25 @@ unsigned	Fl_Tooltip::color_ = fl_color_cube(FL_NUM_RED - 1,
 		                                   FL_NUM_GREEN - 1,
 						   FL_NUM_BLUE - 2);
 unsigned	Fl_Tooltip::textcolor_ = FL_BLACK;
-int		Fl_Tooltip::font_ = FL_HELVETICA;
-int		Fl_Tooltip::size_ = FL_NORMAL_SIZE;
+Fl_Font         Fl_Tooltip::font_ = FL_HELVETICA;
+Fl_Fontsize    Fl_Tooltip::size_ = FL_NORMAL_SIZE;
 
 #define MAX_WIDTH 400
 
 static const char* tip;
-
+/**
+    This widget creates a tooltip box window, with no caption.
+*/
 class Fl_TooltipBox : public Fl_Menu_Window {
 public:
+  /** Creates the box window */
   Fl_TooltipBox() : Fl_Menu_Window(0, 0) {
     set_override();
     end();
   }
   void draw();
   void layout();
+  /** Shows the tooltip windows only if a tooltip text is available. */
   void show() {
     if (tip) Fl_Menu_Window::show();
   }
@@ -135,14 +139,16 @@ static void tooltip_timeout(void*) {
   recursion = 0;
 }
 
-// If this widget or one of it's parents has a tooltip, enter it. This
-// will do nothing if this is the current widget (even if the mouse moved
-// out so an exit() was done and then moved back in). If no tooltip can
-// be found do Fl_Tooltip::exit_(). If you don't want this behavior (for instance
-// if you want the tooltip to reappear when the mouse moves back in)
-// call the fancier enter_area() below.
-void
-Fl_Tooltip::enter_(Fl_Widget* w) {
+/**
+   This method is called when the mouse pointer enters a  widget.
+   <P>If this widget or one of it's parents has a tooltip, enter it. This
+   will do nothing if this is the current widget (even if the mouse moved
+   out so an exit() was done and then moved back in). If no tooltip can
+   be found do Fl_Tooltip::exit_(). If you don't want this behavior (for instance
+   if you want the tooltip to reappear when the mouse moves back in)
+   call the fancier enter_area() below.
+*/
+void Fl_Tooltip::enter_(Fl_Widget* w) {
 #ifdef DEBUG
   printf("Fl_Tooltip::enter_(w=%p)\n", w);
   printf("    window=%p\n", window);
@@ -158,11 +164,13 @@ Fl_Tooltip::enter_(Fl_Widget* w) {
   }
   enter_area(w, 0, 0, w->w(), w->h(), tw->tooltip());
 }
-
-// Acts as though enter(widget) was done but does not pop up a
-// tooltip.  This is useful to prevent a tooltip from reappearing when
-// a modal overlapping window is deleted. FLTK does this automatically
-// when you click the mouse button.
+/** 
+     Sets the current widget target. 
+     Acts as though enter(widget) was done but does not pop up a
+     tooltip.  This is useful to prevent a tooltip from reappearing when
+     a modal overlapping window is deleted. FLTK does this automatically
+     when you click the mouse button.
+*/
 void Fl_Tooltip::current(Fl_Widget* w) {
 #ifdef DEBUG
   printf("Fl_Tooltip::current(w=%p)\n", w);
@@ -181,14 +189,14 @@ void Fl_Tooltip::current(Fl_Widget* w) {
 }
 
 // Hide any visible tooltip.
-void
-Fl_Tooltip::exit_(Fl_Widget *w) {
+/**  This method is called when the mouse pointer leaves a  widget. */
+void Fl_Tooltip::exit_(Fl_Widget *w) {
 #ifdef DEBUG
   printf("Fl_Tooltip::exit_(w=%p)\n", w);
   printf("    widget=%p, window=%p\n", widget_, window);
 #endif // DEBUG
 
-  if (!widget_ || w == window) return;
+  if (!widget_ || (w && w == window)) return;
   widget_ = 0;
   Fl::remove_timeout(tooltip_timeout);
   Fl::remove_timeout(recent_timeout);
@@ -201,10 +209,20 @@ Fl_Tooltip::exit_(Fl_Widget *w) {
 
 // Get ready to display a tooltip. The widget and the xywh box inside
 // it define an area the tooltip is for, this along with the current
-// mouse position places the tooltip (the mouse is assummed to point
+// mouse position places the tooltip (the mouse is assumed to point
 // inside or near the box).
-void
-Fl_Tooltip::enter_area(Fl_Widget* wid, int x,int y,int w,int h, const char* t)
+/**
+  You may be able to use this to provide tooltips for internal pieces
+  of your widget. Call this after setting Fl::belowmouse() to
+  your widget (because that calls the above enter() method). Then figure
+  out what thing the mouse is pointing at, and call this with the widget
+  (this pointer is used to remove the tooltip if the widget is deleted
+  or hidden, and to locate the tooltip), the rectangle surrounding the
+  area, relative to the top-left corner of the widget (used to calculate
+  where to put the tooltip), and the text of the tooltip (which must be
+  a pointer to static data as it is not copied).
+*/
+void Fl_Tooltip::enter_area(Fl_Widget* wid, int x,int y,int w,int h, const char* t)
 {
   (void)x;
   (void)w;
@@ -259,5 +277,5 @@ void Fl_Widget::tooltip(const char *tt) {
 }
 
 //
-// End of "$Id: Fl_Tooltip.cxx 5848 2007-05-20 16:18:31Z mike $".
+// End of "$Id: Fl_Tooltip.cxx 6712 2009-03-22 19:21:34Z AlbrechtS $".
 //

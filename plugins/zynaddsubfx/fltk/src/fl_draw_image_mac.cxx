@@ -1,9 +1,9 @@
 //
-// "$Id: fl_draw_image_mac.cxx 5614 2007-01-18 15:25:09Z matt $"
+// "$Id: fl_draw_image_mac.cxx 6765 2009-04-15 08:35:28Z matt $"
 //
 // MacOS image drawing code for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2005 by Bill Spitzak and others.
+// Copyright 1998-2009 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -56,117 +56,7 @@ static void innards(const uchar *buf, int X, int Y, int W, int H,
 {
   if (!linedelta) linedelta = W*delta;
 
-#ifdef __APPLE_QD__
-  // theoretically, if the current GPort permits, we could write
-  // directly into it, avoiding the temporary GWorld. For now I
-  // will go the safe way... .
-  char direct = 0;
-  GWorldPtr gw;
-  Rect bounds;
-  bounds.left=0; bounds.right=W; bounds.top=0; bounds.bottom=H;
-  QDErr err = NewGWorld( &gw, 32, &bounds, 0L, 0L, useTempMem );
-  if (err==noErr && gw) {
-    PixMapHandle pm = GetGWorldPixMap( gw );
-    if ( pm ) {
-      LockPixels( pm );
-      if ( *pm ) {
-        uchar *base = (uchar*)GetPixBaseAddr( pm );
-        if ( base ) {
-          PixMapPtr pmp = *pm;
-          // make absolutely sure that we can use a direct memory write to
-          // create the pixmap!
-          if ( pmp->pixelType == 16 || pmp->pixelSize == 32 || pmp->cmpCount == 3 || pmp->cmpSize == 8 ) {
-            int rowBytes = pmp->rowBytes & 0x3fff;
-            if ( cb )
-            {
-              uchar *tmpBuf = new uchar[ W*delta ];
-              if ( mono ) delta -= 1; else delta -= 3; 
-              for ( int i=0; i<H; i++ )
-              {
-                uchar *src = tmpBuf;
-                uchar *dst = base + i*rowBytes;
-                cb( userdata, 0, i, W, tmpBuf );
-                if ( mono ) {
-                  for ( int j=0; j<W; j++ )
-                    { uchar c = *src++; *dst++ = 0; *dst++ = c; *dst++ = c; *dst++ = c; src += delta; }
-                } else {
-                  for ( int j=0; j<W; j++ )
-                    { *dst++ = 0; *dst++ = *src++; *dst++ = *src++; *dst++ = *src++; src += delta; }
-                }
-              }
-              delete[] tmpBuf;
-            }
-            else
-            {
-              if ( mono ) delta -= 1; else delta -= 3; 
-              for ( int i=0; i<H; i++ )
-              {
-                const uchar *src = buf+i*linedelta;
-                uchar *dst = base + i*rowBytes;
-                if ( mono ) {
-                  for ( int j=0; j<W; j++ )
-                    { uchar c = *src++; *dst++ = 0; *dst++ = c; *dst++ = c; *dst++ = c; src += delta; }
-                } else {
-                  for ( int j=0; j<W; j++ )
-                    { *dst++ = 0; *dst++ = *src++; *dst++ = *src++; *dst++ = *src++; src += delta; }
-                }
-              }
-            }
-          
-            fl_copy_offscreen( X, Y, W, H, gw, 0, 0 );
-            direct = 1;
-          }
-        }
-      }
-
-      UnlockPixels( pm );
-    }
-
-    DisposeGWorld( gw );
-  }
-
-  // great. We were able to write the pixels directly into memory, so we can return now.
-  if ( direct )
-    return;
-
-  // following the very save (and very slow) way to write the image into the give port
-  if ( cb )
-  {
-    uchar *tmpBuf = new uchar[ W*3 ];
-    for ( int i=0; i<H; i++ )
-    {
-      uchar *src = tmpBuf;
-      cb( userdata, 0, i, W, tmpBuf );
-      for ( int j=0; j<W; j++ )
-      {
-        if ( mono )          
-          { fl_color( src[0], src[0], src[0] ); src++; }
-        else
-          { fl_color( src[0], src[1], src[2] ); src+=3; }
-        MoveTo( X+j, Y+i );
-        Line( 0, 0 );
-      }
-    }
-    delete[] tmpBuf;
-  }
-  else
-  {
-    for ( int i=0; i<H; i++ )
-    {
-      const uchar *src = buf+i*linedelta;
-      for ( int j=0; j<W; j++ )
-      {
-        if ( mono )          
-          fl_color( src[0], src[0], src[0] );
-        else
-          fl_color( src[0], src[1], src[2] );
-        MoveTo( X+j, Y+i );
-        Line( 0, 0 );
-        src += delta;
-      }
-    }
-  }
-#elif defined(__APPLE_QUARTZ__)
+#if defined(__APPLE_QUARTZ__)
   const void *array = buf;
   uchar *tmpBuf = 0;
   if (cb) {
@@ -185,7 +75,8 @@ static void innards(const uchar *buf, int X, int Y, int W, int H,
     lut = CGColorSpaceCreateDeviceRGB();
   CGDataProviderRef src = CGDataProviderCreateWithData( 0L, array, linedelta*H, 0L);
   CGImageRef        img = CGImageCreate( W, H, 8, 8*delta, linedelta,
-                            lut, delta&1?kCGImageAlphaNone:kCGImageAlphaNoneSkipLast,
+                            //lut, delta&1?kCGImageAlphaNone:kCGImageAlphaNoneSkipLast,
+                            lut, delta&1?kCGImageAlphaNone:kCGImageAlphaLast,
                             src, 0L, false, kCGRenderingIntentDefault);
   // draw the image into the destination context
   if (img) {
@@ -245,7 +136,7 @@ static void innards(const uchar *buf, int X, int Y, int W, int H,
   }
   CGContextSetShouldAntialias(fl_gc, true);
 #else
-# error : you must defined __APPLE_QD__ or __APPLE_QUARTZ__
+# error : you must define __APPLE_QUARTZ__
 #endif
 }
 
@@ -270,5 +161,5 @@ void fl_rectf(int x, int y, int w, int h, uchar r, uchar g, uchar b) {
 }
 
 //
-// End of "$Id: fl_draw_image_mac.cxx 5614 2007-01-18 15:25:09Z matt $".
+// End of "$Id: fl_draw_image_mac.cxx 6765 2009-04-15 08:35:28Z matt $".
 //

@@ -1,9 +1,9 @@
 //
-// "$Id: fl_engraved_label.cxx 5190 2006-06-09 16:16:34Z mike $"
+// "$Id: fl_engraved_label.cxx 6616 2009-01-01 21:28:26Z matt $"
 //
 // Engraved label drawing routines for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2005 by Bill Spitzak and others.
+// Copyright 1998-2009 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -39,7 +39,7 @@ static void innards(
 {
   Fl_Align a1 = align;
   if (a1 & FL_ALIGN_CLIP) {
-    fl_clip(X, Y, W, H); a1 = (Fl_Align)(a1&~FL_ALIGN_CLIP);}
+    fl_push_clip(X, Y, W, H); a1 = (Fl_Align)(a1&~FL_ALIGN_CLIP);}
   fl_font((Fl_Font)o->font, o->size);
   for (int i = 0; i < n; i++) {
     fl_color((Fl_Color)(i < n-1 ? data[i][2] : o->color));
@@ -89,5 +89,5 @@ Fl_Labeltype fl_define_FL_EMBOSSED_LABEL() {
 }
 
 //
-// End of "$Id: fl_engraved_label.cxx 5190 2006-06-09 16:16:34Z mike $".
+// End of "$Id: fl_engraved_label.cxx 6616 2009-01-01 21:28:26Z matt $".
 //

@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Progress.H 4288 2005-04-16 00:13:17Z mike $"
+// "$Id: Fl_Progress.H 6614 2009-01-01 16:11:32Z matt $"
 //
 // Progress bar widget definitions.
 //
-// Copyright 2000-2005 by Michael Sweet.
+// Copyright 2000-2009 by Michael Sweet.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -25,6 +25,9 @@
 //     http://www.fltk.org/str.php
 //
 
+/* \file
+   Fl_Progress widget . */
+
 #ifndef _Fl_Progress_H_
 #  define _Fl_Progress_H_
 
@@ -38,7 +41,9 @@
 //
 // Progress class...
 //
-
+/**
+    Displays a progress bar for the user.
+*/
 class FL_EXPORT Fl_Progress : public Fl_Widget
 {
   float	value_,
@@ -53,18 +58,24 @@ class FL_EXPORT Fl_Progress : public Fl_Widget
 
   Fl_Progress(int x, int y, int w, int h, const char *l = 0);
 
+  /** Sets the maximum value in the progress widget.  */
   void	maximum(float v) { maximum_ = v; redraw(); }
+  /** Gets the maximum value in the progress widget.  */
   float	maximum() const { return (maximum_); }
 
+  /** Sets the minimum value in the progress widget.  */
   void	minimum(float v) { minimum_ = v; redraw(); }
+  /** Gets the minimum value in the progress widget.  */
   float	minimum() const { return (minimum_); }
 
+  /** Sets the current value in the progress widget.  */
   void	value(float v) { value_ = v; redraw(); }
+  /** Gets the current value in the progress widget.  */
   float	value() const { return (value_); }
 };
 
 #endif // !_Fl_Progress_H_
 
 //
-// End of "$Id: Fl_Progress.H 4288 2005-04-16 00:13:17Z mike $".
+// End of "$Id: Fl_Progress.H 6614 2009-01-01 16:11:32Z matt $".
 //

@@ -1,9 +1,9 @@
 //
-// "$Id: fl_read_image.cxx 6065 2008-03-09 17:58:10Z matt $"
+// "$Id: fl_read_image.cxx 6616 2009-01-01 21:28:26Z matt $"
 //
 // X11 image reading routines for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2005 by Bill Spitzak and others.
+// Copyright 1998-2009 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -77,6 +77,11 @@ fl_subimage_offsets(int a, int aw, int b, int bw, int &obw)
   return off;
 }
 
+// this handler will catch and ignore exceptions during XGetImage
+// to avoid an application crash
+static int xgetimageerrhandler(Display *display, XErrorEvent *error) {
+  return 0;
+}
 
 //
 // 'fl_read_image()' - Read an image from the current window.
@@ -135,7 +140,11 @@ fl_read_image(uchar *p,		// I - Pixel buffer or NULL to allocate
     }
     if (!win || (dx >= sx && dy >= sy && dx + w <= sw && dy + h <= sh)) {
       // the image is fully contained, we can use the traditional method
+      // however, if the window is obscured etc. the function will still fail. Make sure we
+      // catch the error and continue, otherwise an exception will be thrown.
+      XErrorHandler old_handler = XSetErrorHandler(xgetimageerrhandler);
       image = XGetImage(fl_display, fl_window, X, Y, w, h, AllPlanes, ZPixmap);
+      XSetErrorHandler(old_handler);
     } else {
       // image is crossing borders, determine visible region
       int nw, nh, noffx, noffy;
@@ -151,12 +160,15 @@ fl_read_image(uchar *p,		// I - Pixel buffer or NULL to allocate
       if (!image) {
 	if (buf) free(buf);
 	return 0;
-  }
+      }
 
-      if (!XGetSubImage(fl_display, fl_window, X + noffx, Y + noffy,
-	      nw, nh, AllPlanes, ZPixmap, image, noffx, noffy)) {
-	XDestroyImage(image);
-	return 0;
+      XErrorHandler old_handler = XSetErrorHandler(xgetimageerrhandler);
+      XImage *subimg = XGetSubImage(fl_display, fl_window, X + noffx, Y + noffy,
+                                    nw, nh, AllPlanes, ZPixmap, image, noffx, noffy);
+      XSetErrorHandler(old_handler);
+      if (!subimg) {
+        XDestroyImage(image);
+        return 0;
       }
     }
   }
@@ -487,5 +499,5 @@ fl_read_image(uchar *p,		// I - Pixel buffer or NULL to allocate
 #endif
 
 //
-// End of "$Id: fl_read_image.cxx 6065 2008-03-09 17:58:10Z matt $".
+// End of "$Id: fl_read_image.cxx 6616 2009-01-01 21:28:26Z matt $".
 //

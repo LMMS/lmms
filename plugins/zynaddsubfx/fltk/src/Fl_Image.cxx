@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Image.cxx 5888 2007-06-07 17:23:41Z matt $"
+// "$Id: Fl_Image.cxx 6773 2009-04-21 09:25:22Z AlbrechtS $"
 //
 // Image drawing code for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2006 by Bill Spitzak and others.
+// Copyright 1998-2009 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -43,9 +43,18 @@ void fl_restore_clip(); // from fl_rect.cxx
 // Base image class...
 //
 
+/**
+  The destructor is a virtual method that frees all memory used
+  by the image.
+*/
 Fl_Image::~Fl_Image() {
 }
 
+/**
+  If the image has been cached for display, delete the cache
+  data. This allows you to change the data used for the image and
+  then redraw it without recreating an image object.
+*/
 void Fl_Image::uncache() {
 }
 
@@ -53,6 +62,11 @@ void Fl_Image::draw(int XP, int YP, int, int, int, int) {
   draw_empty(XP, YP);
 }
 
+/**
+  The protected method draw_empty() draws a box with
+  an X in it. It can be used to draw any image that lacks image
+  data.
+*/
 void Fl_Image::draw_empty(int X, int Y) {
   if (w() > 0 && h() > 0) {
     fl_color(FL_FOREGROUND_COLOR);
@@ -62,20 +76,56 @@ void Fl_Image::draw_empty(int X, int Y) {
   }
 }
 
+/**
+  The copy() method creates a copy of the specified
+  image. If the width and height are provided, the image is
+  resized to the specified size. The image should be deleted (or in
+  the case of Fl_Shared_Image, released) when you are done
+  with it.
+*/
 Fl_Image *Fl_Image::copy(int W, int H) {
   return new Fl_Image(W, H, d());
 }
 
+/**
+  The color_average() method averages the colors in
+  the image with the FLTK color value c. The i
+  argument specifies the amount of the original image to combine
+  with the color, so a value of 1.0 results in no color blend, and
+  a value of 0.0 results in a constant image of the specified
+  color. <I>The original image data is not altered by this
+  method.</I>
+*/
 void Fl_Image::color_average(Fl_Color, float) {
 }
 
+/**
+  The desaturate() method converts an image to
+  grayscale. If the image contains an alpha channel (depth = 4),
+  the alpha channel is preserved. <I>This method does not alter
+  the original image data.</I>
+*/
 void Fl_Image::desaturate() {
 }
 
+/**
+  The label() methods are an obsolete way to set the
+  image attribute of a widget or menu item. Use the
+  image() or deimage() methods of the
+  Fl_Widget and Fl_Menu_Item classes
+  instead.
+*/
 void Fl_Image::label(Fl_Widget* widget) {
   widget->image(this);
 }
 
+/**
+  The label() methods are an obsolete way to set the
+  image attribute of a widget or menu item. Use the
+  image() or deimage() methods of the
+  Fl_Widget and Fl_Menu_Item classes
+  instead.
+*/
 void Fl_Image::label(Fl_Menu_Item* m) {
   Fl::set_labeltype(_FL_IMAGE_LABEL, labeltype, measure);
   m->label(_FL_IMAGE_LABEL, (const char*)this);
@@ -122,7 +172,7 @@ Fl_Image::measure(const Fl_Label *lo,		// I - Label
 //
 // RGB image class...
 //
-
+/**  The destructor free all memory and server resources that are used by  the image. */
 Fl_RGB_Image::~Fl_RGB_Image() {
   uncache();
   if (alloc_array) delete[] (uchar *)array;
@@ -402,7 +452,11 @@ void Fl_RGB_Image::draw(int XP, int YP, int WP, int HP, int cx, int cy) {
   if (H <= 0) return;
   if (!id) {
 #ifdef __APPLE_QUARTZ__
-    CGColorSpaceRef lut = CGColorSpaceCreateDeviceRGB();
+    CGColorSpaceRef lut = 0;
+    if (d()<=2)
+      lut = CGColorSpaceCreateDeviceGray();
+    else
+      lut = CGColorSpaceCreateDeviceRGB();
     CGDataProviderRef src = CGDataProviderCreateWithData( 0L, array, w()*h()*d(), 0L);
     id = CGImageCreate( w(), h(), 8, d()*8, ld()?ld():w()*d(),
         lut, (d()&1)?kCGImageAlphaNone:kCGImageAlphaLast,
@@ -432,56 +486,8 @@ void Fl_RGB_Image::draw(int XP, int YP, int WP, int HP, int cx, int cy) {
     }
 #endif
   }
-#ifdef WIN32
-  if (mask) {
-    HDC new_gc = CreateCompatibleDC(fl_gc);
-    int save = SaveDC(new_gc);
-    SelectObject(new_gc, (void*)mask);
-    BitBlt(fl_gc, X, Y, W, H, new_gc, cx, cy, SRCAND);
-    SelectObject(new_gc, (void*)id);
-    BitBlt(fl_gc, X, Y, W, H, new_gc, cx, cy, SRCPAINT);
-    RestoreDC(new_gc,save);
-    DeleteDC(new_gc);
-  } else if (d()==2 || d()==4) {
-    fl_copy_offscreen_with_alpha(X, Y, W, H, (Fl_Offscreen)id, cx, cy);
-  } else {
-    fl_copy_offscreen(X, Y, W, H, (Fl_Offscreen)id, cx, cy);
-  }
-#elif defined(__APPLE_QD__)
-  if (mask) {
-    Rect src, dst;
-    // MRS: STR #114 says we should be using cx, cy, W, and H...
-//    src.left = 0; src.right = w();
-//    src.top = 0; src.bottom = h();
-//    dst.left = X; dst.right = X+w();
-//    dst.top = Y; dst.bottom = Y+h();
-    src.left = cx; src.right = cx+W;
-    src.top = cy; src.bottom = cy+H;
-    dst.left = X; dst.right = X+W;
-    dst.top = Y; dst.bottom = Y+H;
-    RGBColor rgb;
-    rgb.red = 0xffff; rgb.green = 0xffff; rgb.blue = 0xffff;
-    RGBBackColor(&rgb);
-    rgb.red = 0x0000; rgb.green = 0x0000; rgb.blue = 0x0000;
-    RGBForeColor(&rgb);
 
-    CopyMask(GetPortBitMapForCopyBits((GrafPtr)id),
-	     GetPortBitMapForCopyBits((GrafPtr)mask), 
-	     GetPortBitMapForCopyBits(GetWindowPort(fl_window)),
-             &src, &src, &dst);
-  } else if (id) fl_copy_offscreen(X, Y, W, H, (Fl_Offscreen)id, cx, cy);
-  else {
-    // Composite image with alpha manually each time...
-    alpha_blend(this, X, Y, W, H, cx, cy);
-  }
-#elif defined(__APPLE_QUARTZ__)
-  if (id && fl_gc) {
-    CGRect rect = { { X, Y }, { W, H } };
-    Fl_X::q_begin_image(rect, cx, cy, w(), h());
-    CGContextDrawImage(fl_gc, rect, (CGImageRef)id);
-    Fl_X::q_end_image();
-  }
-#else
+#if defined(USE_X11)
   if (id) {
     if (mask) {
       // I can't figure out how to combine a mask with existing region,
@@ -507,6 +513,30 @@ void Fl_RGB_Image::draw(int XP, int YP, int WP, int HP, int cx, int cy) {
     // Composite image with alpha manually each time...
     alpha_blend(this, X, Y, W, H, cx, cy);
   }
+#elif defined(WIN32)
+  if (mask) {
+    HDC new_gc = CreateCompatibleDC(fl_gc);
+    int save = SaveDC(new_gc);
+    SelectObject(new_gc, (void*)mask);
+    BitBlt(fl_gc, X, Y, W, H, new_gc, cx, cy, SRCAND);
+    SelectObject(new_gc, (void*)id);
+    BitBlt(fl_gc, X, Y, W, H, new_gc, cx, cy, SRCPAINT);
+    RestoreDC(new_gc,save);
+    DeleteDC(new_gc);
+  } else if (d()==2 || d()==4) {
+    fl_copy_offscreen_with_alpha(X, Y, W, H, (Fl_Offscreen)id, cx, cy);
+  } else {
+    fl_copy_offscreen(X, Y, W, H, (Fl_Offscreen)id, cx, cy);
+  }
+#elif defined(__APPLE_QUARTZ__)
+  if (id && fl_gc) {
+    CGRect rect = { { X, Y }, { W, H } };
+    Fl_X::q_begin_image(rect, cx, cy, w(), h());
+    CGContextDrawImage(fl_gc, rect, (CGImageRef)id);
+    Fl_X::q_end_image();
+  }
+#else
+# error unsupported platform
 #endif
 }
 
@@ -521,5 +551,5 @@ void Fl_RGB_Image::label(Fl_Menu_Item* m) {
 
 
 //
-// End of "$Id: Fl_Image.cxx 5888 2007-06-07 17:23:41Z matt $".
+// End of "$Id: Fl_Image.cxx 6773 2009-04-21 09:25:22Z AlbrechtS $".
 //

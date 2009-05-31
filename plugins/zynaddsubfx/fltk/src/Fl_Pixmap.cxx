@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Pixmap.cxx 5190 2006-06-09 16:16:34Z mike $"
+// "$Id: Fl_Pixmap.cxx 6616 2009-01-01 21:28:26Z matt $"
 //
 // Pixmap drawing code for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2005 by Bill Spitzak and others.
+// Copyright 1998-2009 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -24,6 +24,15 @@
 //
 //     http://www.fltk.org/str.php
 //
+
+/** \fn Fl_Pixmap::Fl_Pixmap(const char **data)
+  The constructors create a new pixmap from the specified XPM data.*/
+
+/** \fn Fl_Pixmap::Fl_Pixmap(const unsigned char * const *data)
+  The constructors create a new pixmap from the specified XPM data.*/
+
+/** \fn Fl_Pixmap::Fl_Pixmap(const unsigned char **data)
+  The constructors create a new pixmap from the specified XPM data.*/
 
 // Draws X pixmap data, keeping it stashed in a server pixmap so it
 // redraws fast.
@@ -109,45 +118,8 @@ void Fl_Pixmap::draw(int XP, int YP, int WP, int HP, int cx, int cy) {
     fl_end_offscreen();
 #endif
   }
-#ifdef WIN32
-  if (mask) {
-    HDC new_gc = CreateCompatibleDC(fl_gc);
-    int save = SaveDC(new_gc);
-    SelectObject(new_gc, (void*)mask);
-    BitBlt(fl_gc, X, Y, W, H, new_gc, cx, cy, SRCAND);
-    SelectObject(new_gc, (void*)id);
-    BitBlt(fl_gc, X, Y, W, H, new_gc, cx, cy, SRCPAINT);
-    RestoreDC(new_gc,save);
-    DeleteDC(new_gc);
-  } else {
-    fl_copy_offscreen(X, Y, W, H, (Fl_Offscreen)id, cx, cy);
-  }
-#elif defined(__APPLE_QD__)
-  if (mask) {
-    Rect src, dst;
-    src.left = cx; src.right = cx+W;
-    src.top = cy; src.bottom = cy+H;
-    dst.left = X; dst.right = X+W;
-    dst.top = Y; dst.bottom = Y+H;
-    RGBColor rgb, oldfg, oldbg;
-    GetForeColor(&oldfg);
-    GetBackColor(&oldbg);
-    rgb.red = 0xffff; rgb.green = 0xffff; rgb.blue = 0xffff;
-    RGBBackColor(&rgb);
-    rgb.red = 0x0000; rgb.green = 0x0000; rgb.blue = 0x0000;
-    RGBForeColor(&rgb);
-    CopyMask(GetPortBitMapForCopyBits((GrafPtr)id),
-	     GetPortBitMapForCopyBits((GrafPtr)mask), 
-	     GetPortBitMapForCopyBits(GetWindowPort(fl_window)),
-             &src, &src, &dst);
-    RGBBackColor(&oldbg);
-    RGBForeColor(&oldfg);
-  } else {
-    fl_copy_offscreen(X, Y, W, H, (Fl_Offscreen)id, cx, cy);
-  }
-#elif defined(__APPLE_QUARTZ__)
-  fl_copy_offscreen(X, Y, W, H, (Fl_Offscreen)id, cx, cy);
-#else
+
+#if defined(USE_X11)
   if (mask) {
     // I can't figure out how to combine a mask with existing region,
     // so cut the image down to a clipped rectangle:
@@ -166,9 +138,30 @@ void Fl_Pixmap::draw(int XP, int YP, int WP, int HP, int cx, int cy) {
     XSetClipOrigin(fl_display, fl_gc, 0, 0);
     fl_restore_clip();
   }
+#elif defined(WIN32)
+  if (mask) {
+    HDC new_gc = CreateCompatibleDC(fl_gc);
+    int save = SaveDC(new_gc);
+    SelectObject(new_gc, (void*)mask);
+    BitBlt(fl_gc, X, Y, W, H, new_gc, cx, cy, SRCAND);
+    SelectObject(new_gc, (void*)id);
+    BitBlt(fl_gc, X, Y, W, H, new_gc, cx, cy, SRCPAINT);
+    RestoreDC(new_gc,save);
+    DeleteDC(new_gc);
+  } else {
+    fl_copy_offscreen(X, Y, W, H, (Fl_Offscreen)id, cx, cy);
+  }
+#elif defined(__APPLE_QUARTZ__)
+  fl_copy_offscreen(X, Y, W, H, (Fl_Offscreen)id, cx, cy);
+#else
+# error unsupported platform
 #endif
 }
 
+/**
+  The destructor free all memory and server resources that are used by
+  the pixmap.
+*/
 Fl_Pixmap::~Fl_Pixmap() {
   uncache();
   delete_data();
@@ -491,5 +484,5 @@ void Fl_Pixmap::desaturate() {
 }
 
 //
-// End of "$Id: Fl_Pixmap.cxx 5190 2006-06-09 16:16:34Z mike $".
+// End of "$Id: Fl_Pixmap.cxx 6616 2009-01-01 21:28:26Z matt $".
 //

@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_File_Input.cxx 5190 2006-06-09 16:16:34Z mike $"
+// "$Id: Fl_File_Input.cxx 6758 2009-04-13 07:32:01Z matt $"
 //
 // File_Input header file for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2005 by Bill Spitzak and others.
+// Copyright 1998-2009 by Bill Spitzak and others.
 // Original version Copyright 1998 by Curtis Edwards.
 //
 // This library is free software; you can redistribute it and/or
@@ -48,12 +48,14 @@
 #define FL_DAMAGE_BAR	0x10
 
 
-//
-// 'Fl_File_Input::Fl_File_Input()' - Create a Fl_File_Input widget.
-//
-
-Fl_File_Input::Fl_File_Input(int X, int Y, int W, int H, const char *l)
-  : Fl_Input(X, Y, W, H, l) {
+/**
+  Creates a new Fl_File_Input widget using the given position,
+  size, and label string. The default boxtype is FL_DOWN_BOX.
+  \param[in] X, Y, W, H position and size of the widget
+  \param[in] L widget label, default is no label
+*/
+Fl_File_Input::Fl_File_Input(int X, int Y, int W, int H, const char *L)
+  : Fl_Input(X, Y, W, H, L) {
   buttons_[0] = 0;
   errorcolor_ = FL_RED;
   ok_entry_   = 1;
@@ -62,12 +64,10 @@ Fl_File_Input::Fl_File_Input(int X, int Y, int W, int H, const char *l)
   down_box(FL_UP_BOX);
 }
 
-//
-// 'Fl_File_Input::draw_buttons()' - Draw directory buttons.
-//
-
-void
-Fl_File_Input::draw_buttons() {
+/**
+  Draw directory buttons.
+*/
+void Fl_File_Input::draw_buttons() {
   int	i,					// Looping var
 	X;					// Current X position
 
@@ -101,12 +101,10 @@ Fl_File_Input::draw_buttons() {
   }
 }
 
-//
-// 'Fl_File_Input::update_buttons()' - Update the sizes of the directory buttons.
-//
-
-void
-Fl_File_Input::update_buttons() {
+/**
+  Update the sizes of the directory buttons.
+*/
+void Fl_File_Input::update_buttons() {
   int		i;				// Looping var
   const char	*start,				// Start of path component
 		*end;				// End of path component
@@ -140,10 +138,12 @@ Fl_File_Input::update_buttons() {
 }
 
 
-//
-// 'Fl_File_Input::value()' - Set the value of the widget...
-//
-
+/**
+  Sets the value of the widget given a new string value and its length.
+  Returns non 0 on success.
+  \param[in] str new string value
+  \param[in] len lengh of value
+*/
 int						// O - TRUE on success
 Fl_File_Input::value(const char *str,		// I - New string value
                      int        len) {		// I - Length of value
@@ -152,6 +152,11 @@ Fl_File_Input::value(const char *str,		// I - New string value
 }
 
 
+/**
+  Sets the value of the widget given a new string value.
+  Returns non 0 on success.
+  \param[in] str new string value
+*/
 int						// O - TRUE on success
 Fl_File_Input::value(const char *str) {		// I - New string value
   damage(FL_DAMAGE_BAR);
@@ -159,12 +164,10 @@ Fl_File_Input::value(const char *str) {		// I - New string value
 }
 
 
-//
-// 'Fl_File_Input::draw()' - Draw the file input widget...
-//
-
-void
-Fl_File_Input::draw() {
+/**
+  Draws the file input widget
+*/
+void Fl_File_Input::draw() {
   Fl_Boxtype b = box();
   if (damage() & (FL_DAMAGE_BAR | FL_DAMAGE_ALL)) draw_buttons();
   // this flag keeps Fl_Input_::drawtext from drawing a bogus box!
@@ -178,47 +181,55 @@ Fl_File_Input::draw() {
 }
 
 
-//
-// 'Fl_File_Input::handle()' - Handle events in the widget...
-//
 
+/**
+  Handle events in the widget.
+  Return non zero if event is handled.
+  \param[in] event
+*/
 int						// O - TRUE if we handled event
 Fl_File_Input::handle(int event) 		// I - Event
 {
 //  printf("handle(event = %d)\n", event);
+  static char inButtonBar = 0;
 
   switch (event) {
     case FL_MOVE :
     case FL_ENTER :
       if (active_r()) {
-	if (Fl::event_y() < (y() + DIR_HEIGHT)) window()->cursor(FL_CURSOR_DEFAULT);
-	else window()->cursor(FL_CURSOR_INSERT);
+	if (Fl::event_y() < (y() + DIR_HEIGHT)) 
+          window()->cursor(FL_CURSOR_DEFAULT);
+	else 
+          window()->cursor(FL_CURSOR_INSERT);
       }
 
       return 1;
 
     case FL_PUSH :
+      inButtonBar = (Fl::event_y() < (y() + DIR_HEIGHT));
     case FL_RELEASE :
     case FL_DRAG :
-      if (Fl::event_y() < (y() + DIR_HEIGHT) || pressed_ >= 0) return handle_button(event);
-
-      return Fl_Input::handle(event);
+      if (inButtonBar) 
+        return handle_button(event);
+      else
+        return Fl_Input::handle(event);
 
     default :
       if (Fl_Input::handle(event)) {
 	damage(FL_DAMAGE_BAR);
 	return 1;
       }
-
       return 0;
   }
 }
 
 
-//
-// 'Fl_File_Input::handle_button()' - Handle button events in the widget...
-//
 
+/**
+  Handles button events in the widget.
+  Return non zero if event is handled.
+  \param[in] event
+*/
 int						// O - TRUE if we handled event
 Fl_File_Input::handle_button(int event)		// I - Event
 {
@@ -271,7 +282,7 @@ Fl_File_Input::handle_button(int event)		// I - Event
 
     // Then do the callbacks, if necessary...
     set_changed();
-    if (when() & FL_WHEN_CHANGED) do_callback();
+    if (when() & (FL_WHEN_CHANGED|FL_WHEN_RELEASE) ) do_callback();
   }
 
   return 1;
@@ -279,5 +290,5 @@ Fl_File_Input::handle_button(int event)		// I - Event
 
 
 //
-// End of "$Id: Fl_File_Input.cxx 5190 2006-06-09 16:16:34Z mike $".
+// End of "$Id: Fl_File_Input.cxx 6758 2009-04-13 07:32:01Z matt $".
 //

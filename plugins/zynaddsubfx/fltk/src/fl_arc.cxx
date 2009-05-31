@@ -1,9 +1,9 @@
 //
-// "$Id: fl_arc.cxx 5349 2006-08-23 14:43:07Z matt $"
+// "$Id: fl_arc.cxx 6716 2009-03-24 01:40:44Z fabien $"
 //
 // Arc functions for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2005 by Bill Spitzak and others.
+// Copyright 1998-2009 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -25,6 +25,11 @@
 //     http://www.fltk.org/str.php
 //
 
+/**
+  \file fl_arc.cxx
+  \brief Utility functions for drawing arcs and circles.
+*/
+
 // Utility for drawing arcs and circles.  They are added to
 // the current fl_begin/fl_vertex/fl_end path.
 // Incremental math implementation:
@@ -38,7 +43,14 @@ static double _fl_hypot(double x, double y) {
   return sqrt(x*x + y*y);
 }
 
-
+/**
+  Add a series of points to the current path on the arc of a circle; you
+  can get elliptical paths by using scale and rotate before calling fl_arc().
+  \param[in] x,y,r center and radius of circular arc
+  \param[in] start,end angles of start and end of arc measured in degrees
+             counter-clockwise from 3 o'clock. If \p end is less than \p start
+	     then it draws the arc in a clockwise direction.
+*/
 void fl_arc(double x, double y, double r, double start, double end) {
 
   // draw start point accurately:
@@ -83,5 +95,5 @@ void fl_circle(double x,double y,double r) {
 #endif
 
 //
-// End of "$Id: fl_arc.cxx 5349 2006-08-23 14:43:07Z matt $".
+// End of "$Id: fl_arc.cxx 6716 2009-03-24 01:40:44Z fabien $".
 //

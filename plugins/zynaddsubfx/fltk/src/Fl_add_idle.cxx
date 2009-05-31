@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_add_idle.cxx 5190 2006-06-09 16:16:34Z mike $"
+// "$Id: Fl_add_idle.cxx 6616 2009-01-01 21:28:26Z matt $"
 //
 // Idle routine support for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2005 by Bill Spitzak and others.
+// Copyright 1998-2009 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -49,6 +49,23 @@ static void call_idle() {
   p->cb(p->data); // this may call add_idle() or remove_idle()!
 }
 
+/**
+  Adds a callback function that is called every time by Fl::wait() and also
+  makes it act as though the timeout is zero (this makes Fl::wait() return
+  immediately, so if it is in a loop it is called repeatedly, and thus the
+  idle fucntion is called repeatedly).  The idle function can be used to get
+  background processing done.
+    
+  You can have multiple idle callbacks. To remove an idle callback use
+  Fl::remove_idle().
+    
+  Fl::wait() and Fl::check() call idle callbacks, but Fl::ready() does not.
+    
+  The idle callback can call any FLTK functions, including Fl::wait(),
+  Fl::check(), and Fl::ready().
+
+  FLTK will not recursively call the idle callback.
+*/
 void Fl::add_idle(void (*cb)(void*), void* data) {
   idle_cb* p = freelist;
   if (p) freelist = p->next;
@@ -66,6 +83,9 @@ void Fl::add_idle(void (*cb)(void*), void* data) {
   }
 }
 
+/**
+  Returns true if the specified idle callback is currently installed.
+*/
 int Fl::has_idle(void (*cb)(void*), void* data) {
   idle_cb* p = first;
   if (!p) return 0;
@@ -75,6 +95,9 @@ int Fl::has_idle(void (*cb)(void*), void* data) {
   }
 }
 
+/**
+  Removes the specified idle callback, if it is installed.
+*/
 void Fl::remove_idle(void (*cb)(void*), void* data) {
   idle_cb* p = first;
   if (!p) return;
@@ -96,5 +119,5 @@ void Fl::remove_idle(void (*cb)(void*), void* data) {
 }
 
 //
-// End of "$Id: Fl_add_idle.cxx 5190 2006-06-09 16:16:34Z mike $".
+// End of "$Id: Fl_add_idle.cxx 6616 2009-01-01 21:28:26Z matt $".
 //

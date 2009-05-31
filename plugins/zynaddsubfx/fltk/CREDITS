@@ -1,4 +1,4 @@
-CREDITS - Fast Light Tool Kit (FLTK) Version 1.1.5
+CREDITS - Fast Light Tool Kit (FLTK) Version 1.3.0
 --------------------------------------------------
 
     This file lists the people responsible for the toolkit you
@@ -11,12 +11,13 @@ CORE DEVELOPERS
 
     The following people do the day-to-day development of FLTK:
 
+	Fabien Costantini (fabien67@users.sf.net)
         Craig P. Earls
 	Curtis Edwards (trilec@users.sourceforge.net)
 	Gustavo Hime (hime@users.sourceforge.net)
 	Talbot Hughes
 	Robert Kesterson (robertk@users.sourceforge.net)
-	Matthias Melcher (matthias@users.sourceforge.net)
+	Matthias Melcher (mm@robowerk.com)
 	James Dean Palmer (jamespalmer@users.sourceforge.net)
 	Vincent Penne (vincentp@users.sourceforge.net)
 	Bill Spitzak (spitzak@users.sourceforge.net)
@@ -32,12 +33,12 @@ OTHER CONTRIBUTORS
 
 	Teun Burgers
 	Paul Chambers
-	Fabien Costantini
 	Stephen Davies
 	Yuri D'Elia
 	Greg Ercolano
 	Yuri Fedorchenko
 	George Garvey
+	Duncan Gibson
 	Mikael Hultgren
 	Stuart Levy
 	Howard Lightstone

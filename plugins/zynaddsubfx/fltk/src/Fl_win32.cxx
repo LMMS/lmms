@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_win32.cxx 6017 2008-01-10 21:53:34Z matt $"
+// "$Id: Fl_win32.cxx 6668 2009-02-21 10:18:47Z AlbrechtS $"
 //
 // WIN32-specific code for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2007 by Bill Spitzak and others.
+// Copyright 1998-2009 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -29,9 +29,12 @@
 // in.  Search other files for "WIN32" or filenames ending in _win32.cxx
 // for other system-specific code.
 
+#ifndef FL_DOXYGEN
 #include <FL/Fl.H>
 #include <FL/x.H>
+#include <FL/fl_utf8.h>
 #include <FL/Fl_Window.H>
+#include <FL/fl_draw.H>
 #include <FL/Enumerations.H>
 #include <FL/Fl_Tooltip.H>
 #include "flstring.h"
@@ -44,10 +47,23 @@
 #  include <sys/time.h>
 #  include <unistd.h>
 #else
+# if !defined(USE_WSOCK1)
+#  include <winsock2.h>
+#else
 #  include <winsock.h>
+# endif
+#endif
+#if !defined(USE_WSOCK1)
+#  define WSCK_DLL_NAME "WS2_32.DLL"
+#else
+#  define WSCK_DLL_NAME "WSOCK32.DLL"
 #endif
 #include <winuser.h>
 #include <commctrl.h>
+
+#if defined(__GNUC__) && __GNUC__ >= 3
+# include <wchar.h>
+#endif
 
 // The following include files require GCC 3.x or a non-GNU compiler...
 #if !defined(__GNUC__) || __GNUC__ >= 3
@@ -55,31 +71,124 @@
 #  include <shellapi.h>
 #endif // !__GNUC__ || __GNUC__ >= 3
 
+#include "aimm.h"
 
 //
 // USE_ASYNC_SELECT - define it if you have WSAAsyncSelect()...
+// USE_ASYNC_SELECT is OBSOLETED in 1.3 for the following reasons:
+/*
+  This feature was supposed to provide an efficient alternative to the current
+  polling method, but as it has been discussed (Thanks Albrecht!) :
+  - the async mode would imply to change the socket to non blocking mode.
+    This can have unexpected side effects for 3rd party apps, especially
+    if it is set on-the-fly when socket service is really needed, as it is 
+    done today and on purpose, but still the 3rd party developer wouldn't easily
+    control the sequencing of socket operations.
+  - Finer granularity of events furthered by the async select is a plus only 
+    for socket 3rd party impl., it is simply not needed for the 'light' fltk
+    use we make of wsock, so here it would also be a bad point, because of all
+    the logic add-ons necessary for using this functionality, without a clear
+    benefit.
+
+  So async mode select would not add benefits to fltk, worse, it can slowdown
+  fltk because of this finer granularity and instrumentation code to be added
+  for async mode proper operation, not mentioning the side effects...
+*/
+
+// dynamic wsock dll handling api:
+#if defined(__CYGWIN__) && !defined(SOCKET)
+# define SOCKET int
+#endif
+typedef int (WINAPI* fl_wsk_select_f)(int, fd_set*, fd_set*, fd_set*, const struct timeval*);
+typedef int (WINAPI* fl_wsk_fd_is_set_f)(SOCKET, fd_set *);
+typedef int (WINAPI* fl_wsk_async_select_f)(SOCKET,HWND,u_int,long);
+static HMODULE s_wsock_mod = 0;
+static fl_wsk_select_f s_wsock_select=0;
+static fl_wsk_fd_is_set_f fl_wsk_fd_is_set=0;
+static fl_wsk_async_select_f fl_wsk_async_select=0;
+
+static HMODULE get_wsock_mod() {
+  if (!s_wsock_mod) {
+    s_wsock_mod = LoadLibrary(WSCK_DLL_NAME);
+    if (s_wsock_mod==NULL)
+      Fl::fatal("FLTK Lib Error: %s file not found! Please check your winsock dll accessibility.\n",WSCK_DLL_NAME);
+    s_wsock_select = (fl_wsk_select_f) GetProcAddress(s_wsock_mod, "select");
+    fl_wsk_fd_is_set = (fl_wsk_fd_is_set_f) GetProcAddress(s_wsock_mod, "__WSAFDIsSet");
+    fl_wsk_async_select = (fl_wsk_async_select_f) GetProcAddress(s_wsock_mod, "WSAAsyncSelect");
+  }
+  return s_wsock_mod;
+}
+
+/*
+ * Dynamic linking of imm32.dll
+ * This library is only needed for a hand full (four ATM) functions relating to 
+ * international text rendering and locales. Dynamically loading reduces initial
+ * size and link dependencies.
+ */
+static HMODULE s_imm_module = 0;
+typedef HIMC (WINAPI* flTypeImmGetContext)(HWND);
+static flTypeImmGetContext flImmGetContext = 0;
+typedef BOOL (WINAPI* flTypeImmSetCompositionWindow)(HIMC, LPCOMPOSITIONFORM);
+static flTypeImmSetCompositionWindow flImmSetCompositionWindow = 0;
+typedef BOOL (WINAPI* flTypeImmReleaseContext)(HWND, HIMC);
+static flTypeImmReleaseContext flImmReleaseContext = 0;
+typedef BOOL (WINAPI* flTypeImmIsIME)(HKL);
+static flTypeImmIsIME flImmIsIME = 0;
+
+static HMODULE get_imm_module() {
+  if (!s_imm_module) {
+    s_imm_module = LoadLibrary("IMM32.DLL");
+    if (!s_imm_module)
+      Fl::fatal("FLTK Lib Error: IMM32.DLL file not found!\n\n"
+        "Please check your input method manager library accessibility.");
+    flImmGetContext = (flTypeImmGetContext)GetProcAddress(s_imm_module, "ImmGetContext");
+    flImmSetCompositionWindow = (flTypeImmSetCompositionWindow)GetProcAddress(s_imm_module, "ImmSetCompositionWindow");
+    flImmReleaseContext = (flTypeImmReleaseContext)GetProcAddress(s_imm_module, "ImmReleaseContext");
+    flImmIsIME = (flTypeImmIsIME)GetProcAddress(s_imm_module, "ImmIsIME");
+  }
+  return s_imm_module;
+}
+
+// USE_TRACK_MOUSE - define NO_TRACK_MOUSE if you don't have
+// TrackMouseEvent()...
 //
-// This currently doesn't appear to work; needs to be fixed!
+// Now (Dec. 2008) we can assume that current Cygwin/MinGW versions
+// support the TrackMouseEvent() function, but WinCE obviously doesn't
+// support it (STR 2095). Therefore, USE_TRACK_MOUSE is enabled by 
+// default, but you can disable it by defining NO_TRACK_MOUSE.
 //
-
-//#define USE_ASYNC_SELECT
-
-
+// TrackMouseEvent is only used to support window leave notifications
+// under Windows. It can be used to get FL_LEAVE events, when the
+// mouse leaves the _main_ application window (FLTK detects subwindow
+// leave events by using normal move events).
 //
-// USE_TRACK_MOUSE - define it if you have TrackMouseEvent()...
-//
-// Apparently, at least some versions of Cygwin/MingW don't provide
-// the TrackMouseEvent() function.  You can define this by hand
-// if you have it - this is only needed to support subwindow
-// enter/leave notification under Windows.
-//
+// Implementation note: If the mouse cursor leaves one subwindow and
+// enters another window, then Windows sends a WM_MOUSEMOVE message to
+// the new window before it sends a WM_MOUSELEAVE message to the old
+// (just left) window. We save the current mouse window in a static variable,
+// and if we get a WM_MOUSELEAVE event for the current mouse window, this
+// means that the top level window has been left (otherwise we would have
+// got another WM_MOUSEMOVE message before).
 
-//#define USE_TRACK_MOUSE
+// #define NO_TRACK_MOUSE
 
-#if !defined(__GNUC__)
-#  define USE_TRACK_MOUSE
-#endif // !__GNUC__
+#if !defined(NO_TRACK_MOUSE)
+# define USE_TRACK_MOUSE
+#endif // NO_TRACK_MOUSE
 
+static Fl_Window *track_mouse_win=0;	// current TrackMouseEvent() window
+
+// USE_CAPTURE_MOUSE_WIN - this must be defined for TrackMouseEvent to work
+// correctly with subwindows - otherwise a single mouse click and release
+// (without a move) would generate phantom leave events.
+// This defines, if the current mouse window (maybe a subwindow) or the 
+// main window should get mouse events after pushing (and holding) a mouse
+// button, i.e. when dragging the mouse. This is done by calling SetCapture
+// (see below).
+
+#ifdef USE_TRACK_MOUSE
+#define USE_CAPTURE_MOUSE_WIN
+#endif // USE_TRACK_MOUSE
 
 //
 // WM_SYNCPAINT is an "undocumented" message, which is finally defined in
@@ -122,13 +231,11 @@
 // select function that sends a WIN32 message when the select condition
 // exists...
 static int maxfd = 0;
-#ifndef USE_ASYNC_SELECT
 static fd_set fdsets[3];
-#endif // !USE_ASYNC_SELECT
 
-#define POLLIN 1
-#define POLLOUT 4
-#define POLLERR 8
+# define POLLIN 1
+# define POLLOUT 4
+# define POLLERR 8
 
 #if !defined(__GNUC__) || __GNUC__ >= 3
 extern IDropTarget *flIDropTarget;
@@ -143,6 +250,36 @@ static struct FD {
   void* arg;
 } *fd = 0;
 
+extern unsigned int fl_codepage;
+
+void fl_reset_spot()
+{
+}
+
+void fl_set_spot(int font, int size, int X, int Y, int W, int H, Fl_Window *win)
+{
+  if (!win) return;
+  Fl_Window* tw = win;
+  while (tw->parent()) tw = tw->window(); // find top level window
+
+  get_imm_module();
+  HIMC himc = flImmGetContext(fl_xid(tw));
+
+  if (himc) {
+    COMPOSITIONFORM cfs;
+    cfs.dwStyle = CFS_POINT;
+    cfs.ptCurrentPos.x = X;
+    cfs.ptCurrentPos.y = Y - tw->labelsize();
+    MapWindowPoints(fl_xid(win), fl_xid(tw), &cfs.ptCurrentPos, 1);
+    flImmSetCompositionWindow(himc, &cfs);
+    flImmReleaseContext(fl_xid(tw), himc);
+  }
+}
+
+void fl_set_status(int x, int y, int w, int h)
+{
+}
+
 void Fl::add_fd(int n, int events, void (*cb)(int, void*), void *v) {
   remove_fd(n,events);
   int i = nfds++;
@@ -155,18 +292,10 @@ void Fl::add_fd(int n, int events, void (*cb)(int, void*), void *v) {
   fd[i].cb = cb;
   fd[i].arg = v;
 
-#ifdef USE_ASYNC_SELECT
-  int mask = 0;
-  if (events & POLLIN) mask |= FD_READ;
-  if (events & POLLOUT) mask |= FD_WRITE;
-  if (events & POLLERR) mask |= FD_CLOSE;
-  WSAAsyncSelect(n, fl_window, WM_FLSELECT, mask);
-#else
   if (events & POLLIN) FD_SET((unsigned)n, &fdsets[0]);
   if (events & POLLOUT) FD_SET((unsigned)n, &fdsets[1]);
   if (events & POLLERR) FD_SET((unsigned)n, &fdsets[2]);
   if (n > maxfd) maxfd = n;
-#endif // USE_ASYNC_SELECT
 }
 
 void Fl::add_fd(int fd, void (*cb)(int, void*), void* v) {
@@ -189,13 +318,9 @@ void Fl::remove_fd(int n, int events) {
   }
   nfds = j;
 
-#ifdef USE_ASYNC_SELECT
-  WSAAsyncSelect(n, 0, 0, 0);
-#else
   if (events & POLLIN) FD_CLR(unsigned(n), &fdsets[0]);
   if (events & POLLOUT) FD_CLR(unsigned(n), &fdsets[1]);
   if (events & POLLERR) FD_CLR(unsigned(n), &fdsets[2]);
-#endif // USE_ASYNC_SELECT
 }
 
 void Fl::remove_fd(int n) {
@@ -214,6 +339,7 @@ void* Fl::thread_message() {
   return r;
 }
 
+IActiveIMMApp *fl_aimm = NULL;
 MSG fl_msg;
 
 // This is never called with time_to_wait < 0.0.
@@ -234,7 +360,6 @@ int fl_wait(double time_to_wait) {
     in_idle = 0;
   }
   
-#ifndef USE_ASYNC_SELECT
   if (nfds) {
     // For WIN32 we need to poll for socket input FIRST, since
     // the event queue is not something we can select() on...
@@ -243,17 +368,15 @@ int fl_wait(double time_to_wait) {
     t.tv_usec = 0;
 
     fd_set fdt[3];
-    fdt[0] = fdsets[0];
-    fdt[1] = fdsets[1];
-    fdt[2] = fdsets[2];
-    if (::select(maxfd+1,&fdt[0],&fdt[1],&fdt[2],&t)) {
+    memcpy(fdt, fdsets, sizeof fdt); // one shot faster fdt init
+    if (get_wsock_mod()&& s_wsock_select(maxfd+1,&fdt[0],&fdt[1],&fdt[2],&t)) {
       // We got something - do the callback!
       for (int i = 0; i < nfds; i ++) {
-	int f = fd[i].fd;
+	SOCKET f = fd[i].fd;
 	short revents = 0;
-	if (FD_ISSET(f,&fdt[0])) revents |= POLLIN;
-	if (FD_ISSET(f,&fdt[1])) revents |= POLLOUT;
-	if (FD_ISSET(f,&fdt[2])) revents |= POLLERR;
+	if (fl_wsk_fd_is_set(f, &fdt[0])) revents |= POLLIN;
+	if (fl_wsk_fd_is_set(f, &fdt[1])) revents |= POLLOUT;
+	if (fl_wsk_fd_is_set(f, &fdt[2])) revents |= POLLERR;
 	if (fd[i].events & revents) fd[i].cb(f, fd[i].arg);
       }
       time_to_wait = 0.0; // just peek for any messages
@@ -262,13 +385,12 @@ int fl_wait(double time_to_wait) {
       if (time_to_wait > .001) time_to_wait = .001;
     }
   }
-#endif // USE_ASYNC_SELECT
 
   if (Fl::idle || Fl::damage()) 
     time_to_wait = 0.0;
 
   // if there are no more windows and this timer is set
-  // to FOREVER, continue through or look up indefinetely
+  // to FOREVER, continue through or look up indefinitely
   if (!Fl::first_window() && time_to_wait==1e20)
     time_to_wait = 0.0;
 
@@ -281,21 +403,10 @@ int fl_wait(double time_to_wait) {
   fl_lock_function();
 
   // Execute the message we got, and all other pending messages:
-  have_message = PeekMessage(&fl_msg, NULL, 0, 0, PM_REMOVE);
+  // have_message = PeekMessage(&fl_msg, NULL, 0, 0, PM_REMOVE);
+  have_message = PeekMessageW(&fl_msg, NULL, 0, 0, PM_REMOVE);
   if (have_message > 0) {
     while (have_message != 0 && have_message != -1) {
-#ifdef USE_ASYNC_SELECT
-      if (fl_msg.message == WM_FLSELECT) {
-	// Got notification for socket
-	for (int i = 0; i < nfds; i ++)
-          if (fd[i].fd == (int)fl_msg.wParam) {
-	    (fd[i].cb)(fd[i].fd, fd[i].arg);
-	    break;
-	  }
-	// looks like it is best to do the dispatch-message anyway:
-      }
-#endif
-
       if (fl_msg.message == fl_wake_msg) {
         // Used for awaking wait() from another thread
 	thread_message_ = (void*)fl_msg.wParam;
@@ -307,8 +418,8 @@ int fl_wait(double time_to_wait) {
       }
 
       TranslateMessage(&fl_msg);
-      DispatchMessage(&fl_msg);
-      have_message = PeekMessage(&fl_msg, NULL, 0, 0, PM_REMOVE);
+      DispatchMessageW(&fl_msg);
+      have_message = PeekMessageW(&fl_msg, NULL, 0, 0, PM_REMOVE);
     }
   }
   Fl::flush();
@@ -320,18 +431,13 @@ int fl_wait(double time_to_wait) {
 // fl_ready() is just like fl_wait(0.0) except no callbacks are done:
 int fl_ready() {
   if (PeekMessage(&fl_msg, NULL, 0, 0, PM_NOREMOVE)) return 1;
-#ifdef USE_ASYNC_SELECT
-  return 0;
-#else
+  if (!nfds) return 0;
   timeval t;
   t.tv_sec = 0;
   t.tv_usec = 0;
   fd_set fdt[3];
-  fdt[0] = fdsets[0];
-  fdt[1] = fdsets[1];
-  fdt[2] = fdsets[2];
-  return ::select(0,&fdt[0],&fdt[1],&fdt[2],&t);
-#endif // USE_ASYNC_SELECT
+  memcpy(fdt, fdsets, sizeof fdt);
+  return get_wsock_mod() ? s_wsock_select(0,&fdt[0],&fdt[1],&fdt[2],&t) : 0;
 }
 
 ////////////////////////////////////////////////////////////////
@@ -382,6 +488,13 @@ char *fl_selection_buffer[2];
 int fl_selection_length[2];
 int fl_selection_buffer_length[2];
 char fl_i_own_selection[2];
+
+UINT fl_get_lcid_codepage(LCID id)
+{
+  char buf[8];
+  buf[GetLocaleInfo(id, LOCALE_IDEFAULTANSICODEPAGE, buf, 8)] = 0;
+  return atol(buf);
+}
 
 // Convert \n -> \r\n
 class Lf2CrlfConvert {
@@ -441,11 +554,17 @@ void Fl::copy(const char *stuff, int len, int clipboard) {
   fl_selection_length[clipboard] = len;
   if (clipboard) {
     // set up for "delayed rendering":
-    if (OpenClipboard(fl_xid(Fl::first_window()))) {
+    if (OpenClipboard(NULL)) {
       // if the system clipboard works, use it
+      int utf16_len = fl_utf8toUtf16(fl_selection_buffer[clipboard], fl_selection_length[clipboard], 0, 0);
       EmptyClipboard();
-      SetClipboardData(CF_TEXT, NULL);
+      HGLOBAL hMem = GlobalAlloc(GHND, utf16_len * 2 + 2); // moveable and zero'ed mem alloc.
+      LPVOID memLock = GlobalLock(hMem);
+      fl_utf8toUtf16(fl_selection_buffer[clipboard], fl_selection_length[clipboard], (unsigned short*) memLock, utf16_len * 2);
+      GlobalUnlock(hMem);
+      SetClipboardData(CF_UNICODETEXT, hMem);
       CloseClipboard();
+      GlobalFree(hMem);
       fl_i_own_selection[clipboard] = 0;
     } else {
       // only if it fails, instruct paste() to use the internal buffers
@@ -480,30 +599,53 @@ void Fl::paste(Fl_Widget &receiver, int clipboard) {
     Fl::e_text = 0;
   } else {
     if (!OpenClipboard(NULL)) return;
-    HANDLE h = GetClipboardData(CF_TEXT);
+    HANDLE h = GetClipboardData(CF_UNICODETEXT);
     if (h) {
-      Fl::e_text = (LPSTR)GlobalLock(h);
+      wchar_t *memLock = (wchar_t*) GlobalLock(h);
+      int utf16_len = wcslen(memLock);
+      Fl::e_text = (char*) malloc (utf16_len * 4 + 1);
+      int utf8_len = fl_utf8fromwc(Fl::e_text, utf16_len * 4, memLock, utf16_len);
+      *(Fl::e_text + utf8_len) = 0;
       LPSTR a,b;
       a = b = Fl::e_text;
       while (*a) { // strip the CRLF pairs ($%$#@^)
-	if (*a == '\r' && a[1] == '\n') a++;
-	else *b++ = *a++;
+        if (*a == '\r' && a[1] == '\n') a++;
+        else *b++ = *a++;
       }
       *b = 0;
       Fl::e_length = b - Fl::e_text;
       receiver.handle(FL_PASTE);
       GlobalUnlock(h);
+      free(Fl::e_text);
+      Fl::e_text = 0;
     }
     CloseClipboard();
   }
 }
 
 ////////////////////////////////////////////////////////////////
+char fl_is_ime = 0;
+void fl_get_codepage()
+{
+  HKL hkl = GetKeyboardLayout(0);
+  TCHAR ld[8];
+
+  GetLocaleInfo (LOWORD(hkl), LOCALE_IDEFAULTANSICODEPAGE, ld, 6);
+  DWORD ccp = atol(ld);
+  fl_is_ime = 0;
+
+  fl_codepage = ccp;
+  if (fl_aimm) {
+    fl_aimm->GetCodePageA(GetKeyboardLayout(0), &fl_codepage);
+  } else if (get_imm_module() && flImmIsIME(hkl)) {
+    fl_is_ime = 1;
+  }
+}
 
 HWND fl_capture;
 
 static int mouse_event(Fl_Window *window, int what, int button,
-			WPARAM wParam, LPARAM lParam)
+		       WPARAM wParam, LPARAM lParam)
 {
   static int px, py, pmx, pmy;
   POINT pt;
@@ -512,6 +654,9 @@ static int mouse_event(Fl_Window *window, int what, int button,
   ClientToScreen(fl_xid(window), &pt);
   Fl::e_x_root = pt.x;
   Fl::e_y_root = pt.y;
+#ifdef USE_CAPTURE_MOUSE_WIN
+  Fl_Window *mouse_window = window;	// save "mouse window"
+#endif
   while (window->parent()) {
     Fl::e_x += window->x();
     Fl::e_y += window->y();
@@ -535,7 +680,11 @@ static int mouse_event(Fl_Window *window, int what, int button,
   case 0: // single-click
     Fl::e_clicks = 0;
   J1:
-    if (!fl_capture) SetCapture(fl_xid(window));
+#ifdef USE_CAPTURE_MOUSE_WIN
+    if (!fl_capture) SetCapture(fl_xid(mouse_window));  // use mouse window
+#else
+    if (!fl_capture) SetCapture(fl_xid(window));	// use main window
+#endif
     Fl::e_keysym = FL_Button + button;
     Fl::e_is_click = 1;
     px = pmx = Fl::e_x_root; py = pmy = Fl::e_y_root;
@@ -633,9 +782,9 @@ extern HPALETTE fl_select_palette(void); // in fl_color_win32.cxx
 
 struct Win32Timer
 {
-    UINT_PTR handle;
-    Fl_Timeout_Handler callback;
-    void *data;
+  UINT_PTR handle;
+  Fl_Timeout_Handler callback;
+  void *data;
 };
 static Win32Timer* win32_timers;
 static int win32_timer_alloc;
@@ -644,22 +793,22 @@ static HWND s_TimerWnd;
 
 static void realloc_timers()
 {
-    if (win32_timer_alloc == 0) {
-        win32_timer_alloc = 8;
-    }
-    win32_timer_alloc *= 2;
-    Win32Timer* new_timers = new Win32Timer[win32_timer_alloc];
-    memset(new_timers, 0, sizeof(Win32Timer) * win32_timer_used);
-    memcpy(new_timers, win32_timers, sizeof(Win32Timer) * win32_timer_used);
-    Win32Timer* delete_me = win32_timers;
-    win32_timers = new_timers;
-    delete [] delete_me;
+  if (win32_timer_alloc == 0) {
+    win32_timer_alloc = 8;
+  }
+  win32_timer_alloc *= 2;
+  Win32Timer* new_timers = new Win32Timer[win32_timer_alloc];
+  memset(new_timers, 0, sizeof(Win32Timer) * win32_timer_used);
+  memcpy(new_timers, win32_timers, sizeof(Win32Timer) * win32_timer_used);
+  Win32Timer* delete_me = win32_timers;
+  win32_timers = new_timers;
+  delete [] delete_me;
 }
 
 static void delete_timer(Win32Timer& t)
 {
-    KillTimer(s_TimerWnd, t.handle);
-    memset(&t, 0, sizeof(Win32Timer));
+  KillTimer(s_TimerWnd, t.handle);
+  memset(&t, 0, sizeof(Win32Timer));
 }
 
 /// END TIMERS
@@ -755,20 +904,26 @@ static LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 
   case WM_MOUSEMOVE:
 #ifdef USE_TRACK_MOUSE
-    if (Fl::belowmouse() != window) {
+    if (track_mouse_win != window) {
       TRACKMOUSEEVENT tme;
       tme.cbSize    = sizeof(TRACKMOUSEEVENT);
       tme.dwFlags   = TME_LEAVE;
       tme.hwndTrack = hWnd;
       _TrackMouseEvent(&tme);
+      track_mouse_win = window;
     }
 #endif // USE_TRACK_MOUSE
     mouse_event(window, 3, 0, wParam, lParam);
     return 0;
 
   case WM_MOUSELEAVE:
-    Fl::belowmouse(0);
-    if (!window->parent()) Fl::handle(FL_LEAVE, window);
+    if (track_mouse_win == window) { // we left the top level window !
+      Fl_Window *tw = window;
+      while (tw->parent()) tw = tw->window(); // find top level window
+      Fl::belowmouse(0);
+      Fl::handle(FL_LEAVE, tw);
+    }
+    track_mouse_win = 0; // force TrackMouseEvent() restart
     break;
 
   case WM_SETFOCUS:
@@ -807,6 +962,19 @@ static LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
     }
     break;
 
+  case WM_INPUTLANGCHANGE:
+    fl_get_codepage();
+    break;
+  case WM_IME_COMPOSITION:
+//	if (!fl_is_nt4() && lParam & GCS_RESULTCLAUSE) {
+//		HIMC himc = ImmGetContext(hWnd);
+//		wlen = ImmGetCompositionStringW(himc, GCS_RESULTSTR,
+//			wbuf, sizeof(wbuf)) / sizeof(short);
+//		if (wlen < 0) wlen = 0;
+//		wbuf[wlen] = 0;
+//		ImmReleaseContext(hWnd, himc);
+//	}
+	break;
   case WM_KEYDOWN:
   case WM_SYSKEYDOWN:
   case WM_KEYUP:
@@ -814,7 +982,8 @@ static LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
     // save the keysym until we figure out the characters:
     Fl::e_keysym = Fl::e_original_keysym = ms2fltk(wParam,lParam&(1<<24));
     // See if TranslateMessage turned it into a WM_*CHAR message:
-    if (PeekMessage(&fl_msg, hWnd, WM_CHAR, WM_SYSDEADCHAR, PM_REMOVE)) {
+    if (PeekMessageW(&fl_msg, hWnd, WM_CHAR, WM_SYSDEADCHAR, PM_REMOVE))
+    {
       uMsg = fl_msg.message;
       wParam = fl_msg.wParam;
       lParam = fl_msg.lParam;
@@ -841,10 +1010,15 @@ static LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
     }
     if (GetKeyState(VK_SCROLL)) state |= FL_SCROLL_LOCK;
     Fl::e_state = state;
-    static char buffer[2];
+    static char buffer[1024];
     if (uMsg == WM_CHAR || uMsg == WM_SYSCHAR) {
-      buffer[0] = char(wParam);
-      Fl::e_length = 1;
+
+      xchar u = (xchar) wParam;
+//    Fl::e_length = fl_unicode2utf(&u, 1, buffer);
+      Fl::e_length = fl_utf8fromwc(buffer, 1024, &u, 1);
+      buffer[Fl::e_length] = 0;
+
+
     } else if (Fl::e_keysym >= FL_KP && Fl::e_keysym <= FL_KP_Last) {
       if (state & FL_NUM_LOCK) {
         // Convert to regular keypress...
@@ -980,14 +1154,20 @@ static LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
     OpenClipboard(NULL);
     // fall through...
   case WM_RENDERFORMAT: {
-    HANDLE h = GlobalAlloc(GHND, fl_selection_length[1]+1);
+    HANDLE h;
+
+//  int l = fl_utf_nb_char((unsigned char*)fl_selection_buffer[1], fl_selection_length[1]);
+    int l = fl_utf8toUtf16(fl_selection_buffer[1], fl_selection_length[1], NULL, 0); // Pass NULL buffer to query length required
+    h = GlobalAlloc(GHND, (l+1) * sizeof(unsigned short));
     if (h) {
-      LPSTR p = (LPSTR)GlobalLock(h);
-      memcpy(p, fl_selection_buffer[1], fl_selection_length[1]);
-      p[fl_selection_length[1]] = 0;
+      unsigned short *g = (unsigned short*) GlobalLock(h);
+//    fl_utf2unicode((unsigned char *)fl_selection_buffer[1], fl_selection_length[1], (xchar*)g);
+      l = fl_utf8toUtf16(fl_selection_buffer[1], fl_selection_length[1], g, (l+1));
+      g[l] = 0;
       GlobalUnlock(h);
-      SetClipboardData(CF_TEXT, h);
+      SetClipboardData(CF_UNICODETEXT, h);
     }
+
     // Windoze also seems unhappy if I don't do this. Documentation very
     // unclear on what is correct:
     if (fl_msg.message == WM_RENDERALLFORMATS) CloseClipboard();
@@ -998,7 +1178,8 @@ static LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
     break;
   }
 
-  return DefWindowProc(hWnd, uMsg, wParam, lParam);
+
+  return DefWindowProcW(hWnd, uMsg, wParam, lParam);
 }
 
 ////////////////////////////////////////////////////////////////
@@ -1154,7 +1335,7 @@ void Fl_Window::resize(int X,int Y,int W,int H) {
 /*
  * This silly little class remembers the name of all window classes 
  * we register to avoid double registration. It has the added bonus 
- * of freeing everything on application colse as well.
+ * of freeing everything on application close as well.
  */
 class NameList {
 public:
@@ -1211,30 +1392,42 @@ Fl_X* Fl_X::make(Fl_Window* w) {
     first_class_name = class_name;
   }
 
+  const wchar_t* class_namew = L"FLTK";
+  const wchar_t* message_namew = L"FLTK::ThreadWakeup";
   if (!class_name_list.has_name(class_name)) {
     WNDCLASSEX wc;
+    WNDCLASSEXW wcw;
+
     memset(&wc, 0, sizeof(wc));
     wc.cbSize = sizeof(WNDCLASSEX);
+    memset(&wcw, 0, sizeof(wcw));
+    wcw.cbSize = sizeof(WNDCLASSEXW);
+
     // Documentation states a device context consumes about 800 bytes
     // of memory... so who cares? If 800 bytes per window is what it
     // takes to speed things up, I'm game.
     //wc.style = CS_HREDRAW | CS_VREDRAW | CS_CLASSDC | CS_DBLCLKS;
-    wc.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC | CS_DBLCLKS;
-    wc.lpfnWndProc = (WNDPROC)WndProc;
-    wc.hInstance = fl_display;
+    wcw.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC | CS_DBLCLKS;
+    wcw.lpfnWndProc = (WNDPROC)WndProc;
+    wcw.cbClsExtra = wcw.cbWndExtra = 0;
+    wcw.hInstance = fl_display;
     if (!w->icon())
       w->icon((void *)LoadIcon(NULL, IDI_APPLICATION));
-    wc.hIcon = wc.hIconSm = (HICON)w->icon();
-    wc.hCursor = fl_default_cursor = LoadCursor(NULL, IDC_ARROW);
+    wcw.hIcon = wcw.hIconSm = (HICON)w->icon();
+    wcw.hCursor = fl_default_cursor = LoadCursor(NULL, IDC_ARROW);
     //uchar r,g,b; Fl::get_color(FL_GRAY,r,g,b);
     //wc.hbrBackground = (HBRUSH)CreateSolidBrush(RGB(r,g,b));
-    wc.lpszClassName = class_name;
-    RegisterClassEx(&wc);
-    class_name_list.add_name(class_name);
+    wcw.hbrBackground = NULL;
+    wcw.lpszMenuName = NULL;
+    wcw.lpszClassName = class_namew;
+    wcw.cbSize = sizeof(WNDCLASSEXW);
+    RegisterClassExW(&wcw);
+    class_name_list.add_name((const char *)class_namew);
   }
 
-  const char* message_name = "FLTK::ThreadWakeup";
-  if (!fl_wake_msg) fl_wake_msg = RegisterWindowMessage(message_name);
+  // const char* message_name = "FLTK::ThreadWakeup";
+  // if (!fl_wake_msg) fl_wake_msg = RegisterWindowMessage(message_name);
+  if (!fl_wake_msg) fl_wake_msg = RegisterWindowMessageW(message_namew);
 
   HWND parent;
   DWORD style = WS_CLIPCHILDREN | WS_CLIPSIBLINGS;
@@ -1308,15 +1501,31 @@ Fl_X* Fl_X::make(Fl_Window* w) {
   x->region = 0;
   x->private_dc = 0;
   x->cursor = fl_default_cursor;
-  x->xid = CreateWindowEx(
+  if (!fl_codepage) fl_get_codepage();
+
+  WCHAR *lab = NULL;
+  if (w->label()) {
+    int l = strlen(w->label());
+//  lab = (WCHAR*) malloc((l + 1) * sizeof(short));
+//  l = fl_utf2unicode((unsigned char*)w->label(), l, (xchar*)lab);
+//  lab[l] = 0;
+    unsigned wlen = fl_utf8toUtf16(w->label(), l, NULL, 0); // Pass NULL to query length
+    wlen++;
+    lab = (WCHAR *) malloc(sizeof(WCHAR)*wlen);
+    wlen = fl_utf8toUtf16(w->label(), l, (unsigned short*)lab, wlen);
+    lab[wlen] = 0;
+  }
+  x->xid = CreateWindowExW(
     styleEx,
-    class_name, w->label(), style,
+    class_namew, lab, style,
     xp, yp, wp, hp,
     parent,
     NULL, // menu
     fl_display,
     NULL // creation parameters
-    );
+  );
+  if (lab) free(lab);
+
   x->next = Fl_X::first;
   Fl_X::first = x;
 
@@ -1341,6 +1550,16 @@ Fl_X* Fl_X::make(Fl_Window* w) {
   if (!oleInitialized) { OleInitialize(0L); oleInitialized=1; }
 
   RegisterDragDrop(x->xid, flIDropTarget);
+  if (!fl_aimm) {
+    static char been_here = 0;
+    if (!been_here && !oleInitialized) CoInitialize(NULL);
+    been_here = 1;
+    CoCreateInstance(CLSID_CActiveIMM, NULL, CLSCTX_INPROC_SERVER,
+		     IID_IActiveIMMApp, (void**) &fl_aimm);
+    if (fl_aimm) {
+      fl_aimm->Activate(TRUE);
+    }
+  }
 #endif // !__GNUC__ || __GNUC__ >= 3
 
   if (w->modal()) {Fl::modal_ = w; fl_fix_focus();}
@@ -1358,104 +1577,104 @@ Fl_X* Fl_X::make(Fl_Window* w) {
 static LRESULT CALLBACK s_TimerProc(HWND hwnd, UINT msg,
                                     WPARAM wParam, LPARAM lParam)
 {
-    switch (msg) {
-    case WM_TIMER:
-        {
-            unsigned int id = wParam - 1;
-            if (id < (unsigned int)win32_timer_used && win32_timers[id].handle) {
-                Fl_Timeout_Handler cb   = win32_timers[id].callback;
-                void*              data = win32_timers[id].data;
-                delete_timer(win32_timers[id]);
-                if (cb) {
-                    (*cb)(data);
-                }
-            }
+  switch (msg) {
+  case WM_TIMER:
+    {
+      unsigned int id = wParam - 1;
+      if (id < (unsigned int)win32_timer_used && win32_timers[id].handle) {
+        Fl_Timeout_Handler cb   = win32_timers[id].callback;
+        void*              data = win32_timers[id].data;
+        delete_timer(win32_timers[id]);
+        if (cb) {
+          (*cb)(data);
         }
-        return 0;
-
-    default:
-        break;
+      }
     }
+    return 0;
 
-    return DefWindowProc(hwnd, msg, wParam, lParam);
+  default:
+    break;
+  }
+
+  return DefWindowProc(hwnd, msg, wParam, lParam);
 }
 
 void Fl::add_timeout(double time, Fl_Timeout_Handler cb, void* data)
 {
-    repeat_timeout(time, cb, data);
+  repeat_timeout(time, cb, data);
 }
 
 void Fl::repeat_timeout(double time, Fl_Timeout_Handler cb, void* data)
 {
-    int timer_id = -1;
-    for (int i = 0;  i < win32_timer_used;  ++i) {
-        if ( !win32_timers[i].handle ) {
-            timer_id = i;
-            break;
-        }
+  int timer_id = -1;
+  for (int i = 0;  i < win32_timer_used;  ++i) {
+    if ( !win32_timers[i].handle ) {
+      timer_id = i;
+      break;
     }
-    if (timer_id == -1) {
-        if (win32_timer_used == win32_timer_alloc) {
-            realloc_timers();
-        }
-        timer_id = win32_timer_used++;
+  }
+  if (timer_id == -1) {
+    if (win32_timer_used == win32_timer_alloc) {
+      realloc_timers();
     }
-    unsigned int elapsed = (unsigned int)(time * 1000);
+    timer_id = win32_timer_used++;
+  }
+  unsigned int elapsed = (unsigned int)(time * 1000);
 
-    if ( !s_TimerWnd ) {
-        const char* timer_class = "FLTimer";
-        WNDCLASSEX wc;
-        memset(&wc, 0, sizeof(wc));
-        wc.cbSize = sizeof (wc);
-        wc.style = CS_CLASSDC;
-        wc.lpfnWndProc = (WNDPROC)s_TimerProc;
-        wc.hInstance = fl_display;
-        wc.lpszClassName = timer_class;
-        /*ATOM atom =*/ RegisterClassEx(&wc);
-        // create a zero size window to handle timer events
-        s_TimerWnd = CreateWindowEx(WS_EX_LEFT | WS_EX_TOOLWINDOW,
-                                    timer_class, "",
-                                    WS_POPUP,
-                                    0, 0, 0, 0,
-                                    NULL, NULL, fl_display, NULL);
-        // just in case this OS won't let us create a 0x0 size window:
-        if (!s_TimerWnd) 
-          s_TimerWnd = CreateWindowEx(WS_EX_LEFT | WS_EX_TOOLWINDOW,
-                                    timer_class, "",
-                                    WS_POPUP,
-                                    0, 0, 1, 1,
-                                    NULL, NULL, fl_display, NULL);
-        ShowWindow(s_TimerWnd, SW_SHOWNOACTIVATE);
-    }
+  if ( !s_TimerWnd ) {
+    const char* timer_class = "FLTimer";
+    WNDCLASSEX wc;
+    memset(&wc, 0, sizeof(wc));
+    wc.cbSize = sizeof (wc);
+    wc.style = CS_CLASSDC;
+    wc.lpfnWndProc = (WNDPROC)s_TimerProc;
+    wc.hInstance = fl_display;
+    wc.lpszClassName = timer_class;
+    /*ATOM atom =*/ RegisterClassEx(&wc);
+    // create a zero size window to handle timer events
+    s_TimerWnd = CreateWindowEx(WS_EX_LEFT | WS_EX_TOOLWINDOW,
+                                timer_class, "",
+                                WS_POPUP,
+                                0, 0, 0, 0,
+                                NULL, NULL, fl_display, NULL);
+    // just in case this OS won't let us create a 0x0 size window:
+    if (!s_TimerWnd)
+      s_TimerWnd = CreateWindowEx(WS_EX_LEFT | WS_EX_TOOLWINDOW,
+				  timer_class, "",
+				  WS_POPUP,
+				  0, 0, 1, 1,
+				  NULL, NULL, fl_display, NULL);
+    ShowWindow(s_TimerWnd, SW_SHOWNOACTIVATE);
+  }
 
-    win32_timers[timer_id].callback = cb;
-    win32_timers[timer_id].data     = data;
+  win32_timers[timer_id].callback = cb;
+  win32_timers[timer_id].data     = data;
 
-    win32_timers[timer_id].handle =
-        SetTimer(s_TimerWnd, timer_id + 1, elapsed, NULL);
+  win32_timers[timer_id].handle =
+    SetTimer(s_TimerWnd, timer_id + 1, elapsed, NULL);
 }
 
 int Fl::has_timeout(Fl_Timeout_Handler cb, void* data)
 {
-    for (int i = 0;  i < win32_timer_used;  ++i) {
-        Win32Timer& t = win32_timers[i];
-        if (t.handle  &&  t.callback == cb  &&  t.data == data) {
-            return 1;
-        }
+  for (int i = 0;  i < win32_timer_used;  ++i) {
+    Win32Timer& t = win32_timers[i];
+    if (t.handle  &&  t.callback == cb  &&  t.data == data) {
+      return 1;
     }
-    return 0;
+  }
+  return 0;
 }
 
 void Fl::remove_timeout(Fl_Timeout_Handler cb, void* data)
 {
-    int i;
-    for (i = 0;  i < win32_timer_used;  ++i) {
-        Win32Timer& t = win32_timers[i];
-        if (t.handle  &&  t.callback == cb  &&
-            (t.data == data  ||  data == NULL)) {
-            delete_timer(t);
-        }
+  int i;
+  for (i = 0;  i < win32_timer_used;  ++i) {
+    Win32Timer& t = win32_timers[i];
+    if (t.handle  &&  t.callback == cb  &&
+      (t.data == data  ||  data == NULL)) {
+      delete_timer(t);
     }
+  }
 }
 
 /// END TIMERS
@@ -1511,9 +1730,16 @@ void Fl_Window::label(const char *name,const char *iname) {
   iconlabel_ = iname;
   if (shown() && !parent()) {
     if (!name) name = "";
-    SetWindowText(i->xid, name);
-    // if (!iname) iname = fl_filename_name(name);
-    // should do something with iname here...
+    int l = strlen(name);
+//  WCHAR *lab = (WCHAR*) malloc((l + 1) * sizeof(short));
+//  l = fl_utf2unicode((unsigned char*)name, l, (xchar*)lab);
+    unsigned wlen = fl_utf8toUtf16(name, l, NULL, 0); // Pass NULL to query length
+    wlen++;
+    unsigned short * lab = (unsigned short*)malloc(sizeof(unsigned short)*wlen);
+    wlen = fl_utf8toUtf16(name, l, lab, wlen);
+    lab[wlen] = 0;
+    SetWindowTextW(i->xid, (WCHAR *)lab);
+    free(lab);
   }
 }
 
@@ -1570,6 +1796,7 @@ HDC fl_GetDC(HWND w) {
   // calling GetDC seems to always reset these: (?)
   SetTextAlign(fl_gc, TA_BASELINE|TA_LEFT);
   SetBkMode(fl_gc, TRANSPARENT);
+
   return fl_gc;
 }
 
@@ -1588,6 +1815,8 @@ void Fl_Window::make_current() {
 
   current_ = this;
   fl_clip_region(0);
+
+
 }
 
 /* Make sure that all allocated fonts are released. This works only if 
@@ -1595,11 +1824,11 @@ void Fl_Window::make_current() {
    will not automatically free any fonts. */
 void fl_free_fonts(void)
 {
-// remove the Fl_FontSize chains
+// remove the Fl_Font_Descriptor chains
   int i;
   Fl_Fontdesc * s;
-  Fl_FontSize * f;
-  Fl_FontSize * ff;
+  Fl_Font_Descriptor * f;
+  Fl_Font_Descriptor * ff;
   for (i=0; i<FL_FREE_FONT; i++) {
     s = fl_fonts + i;
     for (f=s->first; f; f=ff) {
@@ -1684,8 +1913,8 @@ void fl_cleanup_dc_list(void) {          // clean up the list
     t = win_DC_list;
   } while(t);
 }
-
+#endif // FL_DOXYGEN
 
 //
-// End of "$Id: Fl_win32.cxx 6017 2008-01-10 21:53:34Z matt $".
+// End of "$Id: Fl_win32.cxx 6668 2009-02-21 10:18:47Z AlbrechtS $".
 //

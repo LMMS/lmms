@@ -1,9 +1,9 @@
 //
-// "$Id: fl_ask.cxx 6035 2008-02-20 18:33:25Z matt $"
+// "$Id: fl_ask.cxx 6763 2009-04-13 22:47:21Z AlbrechtS $"
 //
 // Standard dialog functions for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2005 by Bill Spitzak and others.
+// Copyright 1998-2009 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -54,7 +54,9 @@ static Fl_Button *button[3];
 static Fl_Input *input;
 static const char *iconlabel = "?";
 Fl_Font fl_message_font_ = FL_HELVETICA;
-uchar fl_message_size_ = 14;
+Fl_Fontsize fl_message_size_ = 14;
+
+static char avoidRecursion = 0;
 
 static Fl_Window *makeform() {
  if (message_form) {
@@ -156,7 +158,7 @@ void resizeform() {
 
   message->resize(20 + icon_size, 10, message_w, message_h);
   icon->resize(10, 10, icon_size, icon_size);
-  icon->labelsize((uchar)(icon_size - 10));
+  icon->labelsize(icon_size - 10);
   input->resize(20 + icon_size, 10 + message_h, message_w, 25);
 
   for (x = w, i = 0; i < 3; i ++)
@@ -176,12 +178,15 @@ static int innards(const char* fmt, va_list ap,
   const char *b1,
   const char *b2)
 {
+  Fl::pushed(0); // stop dragging (STR #2159)
+
+  avoidRecursion = 1;
+
   makeform();
   char buffer[1024];
   if (!strcmp(fmt,"%s")) {
     message->label(va_arg(ap, const char*));
   } else {
-    //: matt: MacOS provides two equally named vsnprintf's...
     ::vsnprintf(buffer, 1024, fmt, ap);
     message->label(buffer);
   }
@@ -212,7 +217,7 @@ static int innards(const char* fmt, va_list ap,
   Fl_Window* g = Fl::grab();
   if (g) // do an alternative grab to avoid floating menus, if possible
     Fl::grab(message_form);
-  int r;
+  int r = 0;
   for (;;) {
     Fl_Widget *o = Fl::readqueue();
     if (!o) Fl::wait();
@@ -225,17 +230,26 @@ static int innards(const char* fmt, va_list ap,
     Fl::grab(g);
   message_form->hide();
   icon->label(prev_icon_label);
+
+  avoidRecursion = 0;
   return r;
 }
 
+ /** \addtogroup group_comdlg
+    @{ */
+ 
 // pointers you can use to change FLTK to a foreign language:
-const char* fl_no = "No";
-const char* fl_yes= "Yes";
-const char* fl_ok = "OK";
-const char* fl_cancel= "Cancel";
-const char* fl_close= "Close";
+const char* fl_no = "No";        ///< string pointer used in common dialogs, you can change it to a foreign language
+const char* fl_yes= "Yes";       ///< string pointer used in common dialogs, you can change it to a foreign language
+const char* fl_ok = "OK";        ///< string pointer used in common dialogs, you can change it to a foreign language
+const char* fl_cancel= "Cancel"; ///< string pointer used in common dialogs, you can change it to a foreign language
+const char* fl_close= "Close";   ///< string pointer used in common dialogs, you can change it to a foreign language
 
 // fltk functions:
+
+/**
+   Emits a system beep message.
+ */
 void fl_beep(int type) {
 #ifdef WIN32
   switch (type) {
@@ -281,8 +295,17 @@ void fl_beep(int type) {
   }
 #endif // WIN32
 }
+/** Shows an information message dialog box.
 
+   \note Common dialog boxes are application modal. No more than one common dialog box
+   can be open at any time. Requests for additional dialog boxes are ignored.
+
+   \param[in] fmt can be used as an sprintf-like format and variables for the message text
+ */
 void fl_message(const char *fmt, ...) {
+
+  if (avoidRecursion) return;
+
   va_list ap;
 
   fl_beep(FL_BEEP_MESSAGE);
@@ -294,7 +317,17 @@ void fl_message(const char *fmt, ...) {
   iconlabel = "?";
 }
 
+/** Shows an alert message dialog box
+
+   \note Common dialog boxes are application modal. No more than one common dialog box
+   can be open at any time. Requests for additional dialog boxes are ignored.
+
+   \param[in] fmt can be used as an sprintf-like format and variables for the message text
+ */
 void fl_alert(const char *fmt, ...) {
+
+  if (avoidRecursion) return;
+
   va_list ap;
 
   fl_beep(FL_BEEP_ERROR);
@@ -305,8 +338,20 @@ void fl_alert(const char *fmt, ...) {
   va_end(ap);
   iconlabel = "?";
 }
+/** Shows a dialog displaying the \p fmt message,
+    this dialog features 2 yes/no buttons
 
+   \note Common dialog boxes are application modal. No more than one common dialog box
+   can be open at any time. Requests for additional dialog boxes are ignored.
+
+   \param[in] fmt can be used as an sprintf-like format and variables for the message text
+   \retval 0 if the no button is selected or another dialog box is still open
+   \retval 1 if yes is selected
+ */
 int fl_ask(const char *fmt, ...) {
+
+  if (avoidRecursion) return 0;
+
   va_list ap;
 
   fl_beep(FL_BEEP_QUESTION);
@@ -318,7 +363,24 @@ int fl_ask(const char *fmt, ...) {
   return r;
 }
 
+/** Shows a dialog displaying the \p fmt message,
+    this dialog features up to 3 customizable choice buttons
+
+   \note Common dialog boxes are application modal. No more than one common dialog box
+   can be open at any time. Requests for additional dialog boxes are ignored.
+
+   \param[in] fmt can be used as an sprintf-like format and variables for the message text
+   \param[in] b0 text label of button 0
+   \param[in] b1 text label of button 1
+   \param[in] b2 text label of button 2
+   \retval 0 if the first button with \p b0 text is selected or another dialog box is still open
+   \retval 1 if the second button with \p b1 text is selected
+   \retval 2 if the third button with \p b2 text is selected
+ */
 int fl_choice(const char*fmt,const char *b0,const char *b1,const char *b2,...){
+
+  if (avoidRecursion) return 0;
+
   va_list ap;
 
   fl_beep(FL_BEEP_QUESTION);
@@ -328,7 +390,10 @@ int fl_choice(const char*fmt,const char *b0,const char *b1,const char *b2,...){
   va_end(ap);
   return r;
 }
-
+/** Gets the Fl_Box icon container of the current default dialog used in 
+    many common dialogs like fl_message(), fl_alert(), 
+    fl_ask(), fl_choice(), fl_input(), fl_password() 
+*/ 
 Fl_Widget *fl_message_icon() {makeform(); return icon;}
 
 static const char* input_innards(const char* fmt, va_list ap,
@@ -346,7 +411,19 @@ static const char* input_innards(const char* fmt, va_list ap,
   return r ? input->value() : 0;
 }
 
+/** Shows an input dialog displaying the \p fmt message
+
+   \note Common dialog boxes are application modal. No more than one common dialog box
+   can be open at any time. Requests for additional dialog boxes are ignored.
+
+   \param[in] fmt can be used as an sprintf-like format and variables for the message text
+   \param[in] defstr defines the default returned string if no text is entered
+   \return the user string input if OK was pushed, NULL if Cancel was pushed or another dialog box was still open
+ */
 const char* fl_input(const char *fmt, const char *defstr, ...) {
+
+  if (avoidRecursion) return 0;
+
   fl_beep(FL_BEEP_QUESTION);
 
   va_list ap;
@@ -356,7 +433,22 @@ const char* fl_input(const char *fmt, const char *defstr, ...) {
   return r;
 }
 
+/** Shows an input dialog displaying the \p fmt message.
+
+    Like fl_input() except the input text is not shown,
+    '*' characters are displayed instead.
+
+   \note Common dialog boxes are application modal. No more than one common dialog box
+   can be open at any time. Requests for additional dialog boxes are ignored.
+
+   \param[in] fmt can be used as an sprintf-like format and variables for the message text
+   \param[in] defstr defines the default returned string if no text is entered
+   \return the user string input if OK was pushed, NULL if Cancel was pushed or aother dialog box was still open
+ */
 const char *fl_password(const char *fmt, const char *defstr, ...) {
+
+  if (avoidRecursion) return 0;
+
   fl_beep(FL_BEEP_PASSWORD);
 
   va_list ap;
@@ -366,6 +458,8 @@ const char *fl_password(const char *fmt, const char *defstr, ...) {
   return r;
 }
 
+/** @} */
+
 //
-// End of "$Id: fl_ask.cxx 6035 2008-02-20 18:33:25Z matt $".
+// End of "$Id: fl_ask.cxx 6763 2009-04-13 22:47:21Z AlbrechtS $".
 //

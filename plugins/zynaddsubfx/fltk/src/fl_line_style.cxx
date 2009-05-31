@@ -1,9 +1,9 @@
 //
-// "$Id: fl_line_style.cxx 5190 2006-06-09 16:16:34Z mike $"
+// "$Id: fl_line_style.cxx 6716 2009-03-24 01:40:44Z fabien $"
 //
 // Line style code for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2005 by Bill Spitzak and others.
+// Copyright 1998-2009 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -25,6 +25,11 @@
 //     http://www.fltk.org/str.php
 //
 
+/**
+  \file fl_line_style.cxx
+  \brief Line style drawing utility hiding different platforms.
+*/
+
 #include <FL/Fl.H>
 #include <FL/fl_draw.H>
 #include <FL/x.H>
@@ -45,8 +50,67 @@ void fl_quartz_restore_line_style_() {
 }
 #endif
 
+/**
+  Sets how to draw lines (the "pen").
+  If you change this it is your responsibility to set it back to the default
+  using \c fl_line_style(0).
+
+  \param[in] style A bitmask which is a bitwise-OR of a line style, a cap
+             style, and a join style. If you don't specify a dash type you
+	     will get a solid line. If you don't specify a cap or join type
+	     you will get a system-defined default of whatever value is
+	     fastest.
+  \param[in] width The thickness of the lines in pixels. Zero results in the
+             system defined default, which on both X and Windows is somewhat
+	     different and nicer than 1.
+  \param[in] dashes A pointer to an array of dash lengths, measured in pixels.
+             The first location is how long to draw a solid portion, the next
+	     is how long to draw the gap, then the solid, etc. It is terminated
+	     with a zero-length entry. A \c NULL pointer or a zero-length
+	     array results in a solid line. Odd array sizes are not supported
+	     and result in undefined behavior.
+
+  \note      Because of how line styles are implemented on Win32 systems,
+             you \e must set the line style \e after setting the drawing
+	     color. If you set the color after the line style you will lose
+	     the line style settings.
+  \note      The \p dashes array does not work under Windows 95, 98 or Me,
+             since those operating systems do not support complex line styles.
+*/
 void fl_line_style(int style, int width, char* dashes) {
-#ifdef WIN32
+
+#if defined(USE_X11)
+  int ndashes = dashes ? strlen(dashes) : 0;
+  // emulate the WIN32 dash patterns on X
+  char buf[7];
+  if (!ndashes && (style&0xff)) {
+    int w = width ? width : 1;
+    char dash, dot, gap;
+    // adjust lengths to account for cap:
+    if (style & 0x200) {
+      dash = char(2*w);
+      dot = 1; // unfortunately 0 does not work
+      gap = char(2*w-1);
+    } else {
+      dash = char(3*w);
+      dot = gap = char(w);
+    }
+    char* p = dashes = buf;
+    switch (style & 0xff) {
+    case FL_DASH:	*p++ = dash; *p++ = gap; break;
+    case FL_DOT:	*p++ = dot; *p++ = gap; break;
+    case FL_DASHDOT:	*p++ = dash; *p++ = gap; *p++ = dot; *p++ = gap; break;
+    case FL_DASHDOTDOT: *p++ = dash; *p++ = gap; *p++ = dot; *p++ = gap; *p++ = dot; *p++ = gap; break;
+    }
+    ndashes = p-buf;
+  }
+  static int Cap[4] = {CapButt, CapButt, CapRound, CapProjecting};
+  static int Join[4] = {JoinMiter, JoinMiter, JoinRound, JoinBevel};
+  XSetLineAttributes(fl_display, fl_gc, width, 
+		     ndashes ? LineOnOffDash : LineSolid,
+		     Cap[(style>>8)&3], Join[(style>>12)&3]);
+  if (ndashes) XSetDashes(fl_display, fl_gc, 0, dashes, ndashes);
+#elif defined(WIN32)
   // According to Bill, the "default" cap and join should be the
   // "fastest" mode supported for the platform.  I don't know why
   // they should be different (same graphics cards, etc., right?) MRS
@@ -71,20 +135,6 @@ void fl_line_style(int style, int width, char* dashes) {
   DeleteObject(oldpen);
   DeleteObject(fl_current_xmap->pen);
   fl_current_xmap->pen = newpen;
-#elif defined(__APPLE_QD__)
-  // QuickDraw supports pen size and pattern, but no arbitrary line styles.
-  static Pattern	styles[] = {
-    { { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff } },	// FL_SOLID
-    { { 0xf0, 0xf0, 0xf0, 0xf0, 0x0f, 0x0f, 0x0f, 0x0f } },	// FL_DASH
-    { { 0xaa, 0x55, 0xaa, 0x55, 0xaa, 0x55, 0xaa, 0x55 } }	// FL_DOT
-  };
-
-  if (!width) width = 1;
-  PenSize(width, width);
-
-  style &= 0xff;
-  if (style > 2) style = 2;
-  PenPat(styles + style);
 #elif defined(__APPLE_QUARTZ__)
   static enum CGLineCap Cap[4] = { kCGLineCapButt, kCGLineCapButt, 
                                    kCGLineCapRound, kCGLineCapSquare };
@@ -126,40 +176,11 @@ void fl_line_style(int style, int width, char* dashes) {
   }
   fl_quartz_restore_line_style_();
 #else
-  int ndashes = dashes ? strlen(dashes) : 0;
-  // emulate the WIN32 dash patterns on X
-  char buf[7];
-  if (!ndashes && (style&0xff)) {
-    int w = width ? width : 1;
-    char dash, dot, gap;
-    // adjust lengths to account for cap:
-    if (style & 0x200) {
-      dash = char(2*w);
-      dot = 1; // unfortunately 0 does not work
-      gap = char(2*w-1);
-    } else {
-      dash = char(3*w);
-      dot = gap = char(w);
-    }
-    char* p = dashes = buf;
-    switch (style & 0xff) {
-    case FL_DASH:	*p++ = dash; *p++ = gap; break;
-    case FL_DOT:	*p++ = dot; *p++ = gap; break;
-    case FL_DASHDOT:	*p++ = dash; *p++ = gap; *p++ = dot; *p++ = gap; break;
-    case FL_DASHDOTDOT: *p++ = dash; *p++ = gap; *p++ = dot; *p++ = gap; *p++ = dot; *p++ = gap; break;
-    }
-    ndashes = p-buf;
-  }
-  static int Cap[4] = {CapButt, CapButt, CapRound, CapProjecting};
-  static int Join[4] = {JoinMiter, JoinMiter, JoinRound, JoinBevel};
-  XSetLineAttributes(fl_display, fl_gc, width, 
-		     ndashes ? LineOnOffDash : LineSolid,
-		     Cap[(style>>8)&3], Join[(style>>12)&3]);
-  if (ndashes) XSetDashes(fl_display, fl_gc, 0, dashes, ndashes);
+# error unsupported platform
 #endif
 }
 
 
 //
-// End of "$Id: fl_line_style.cxx 5190 2006-06-09 16:16:34Z mike $".
+// End of "$Id: fl_line_style.cxx 6716 2009-03-24 01:40:44Z fabien $".
 //

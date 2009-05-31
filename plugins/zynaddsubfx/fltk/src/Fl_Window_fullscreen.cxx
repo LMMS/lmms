@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Window_fullscreen.cxx 5190 2006-06-09 16:16:34Z mike $"
+// "$Id: Fl_Window_fullscreen.cxx 6660 2009-02-15 18:58:03Z AlbrechtS $"
 //
 // Fullscreen window support for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2005 by Bill Spitzak and others.
+// Copyright 1998-2009 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -30,7 +30,7 @@
 // manager.  Fullscreen still works on some window managers (fvwm is one)
 // because they allow the border to be placed off-screen.
 
-// Unfortunatly most X window managers ignore changes to the border
+// Unfortunately most X window managers ignore changes to the border
 // and refuse to position the border off-screen, so attempting to make
 // the window full screen will lose the size of the border off the
 // bottom and right.
@@ -38,9 +38,7 @@
 #include <FL/Fl.H>
 #include <FL/x.H>
 
-#ifdef __APPLE__
 #include <config.h>
-#endif 
 
 void Fl_Window::border(int b) {
   if (b) {
@@ -50,15 +48,15 @@ void Fl_Window::border(int b) {
     if (!border()) return;
     set_flag(FL_NOBORDER);
   }
-#ifdef WIN32
+#if defined(USE_X11)
+  if (shown()) Fl_X::i(this)->sendxjunk();
+#elif defined(WIN32)
   // not yet implemented, but it's possible
   // for full fullscreen we have to make the window topmost as well
-#elif defined(__APPLE_QD__)
-  // warning: not implemented in Quickdraw/Carbon
 #elif defined(__APPLE_QUARTZ__)
   // warning: not implemented in Quartz/Carbon
 #else
-  if (shown()) Fl_X::i(this)->sendxjunk();
+# error unsupported platform
 #endif
 }
 
@@ -93,5 +91,5 @@ void Fl_Window::fullscreen_off(int X,int Y,int W,int H) {
 }
 
 //
-// End of "$Id: Fl_Window_fullscreen.cxx 5190 2006-06-09 16:16:34Z mike $".
+// End of "$Id: Fl_Window_fullscreen.cxx 6660 2009-02-15 18:58:03Z AlbrechtS $".
 //

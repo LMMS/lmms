@@ -1,9 +1,9 @@
 //
-// "$Id: filename_ext.cxx 5190 2006-06-09 16:16:34Z mike $"
+// "$Id: filename_ext.cxx 6641 2009-01-20 11:10:29Z fabien $"
 //
 // Filename extension routines for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2005 by Bill Spitzak and others.
+// Copyright 1998-2009 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -29,6 +29,11 @@
 
 #include <FL/filename.H>
 
+/**
+   Gets the extensions of a filename
+   \param[in] buf the filename to be parsed
+   \return a pointer to the extension (including '.') if any or NULL otherwise
+ */
 const char *fl_filename_ext(const char *buf) {
   const char *q = 0;
   const char *p = buf;
@@ -43,5 +48,5 @@ const char *fl_filename_ext(const char *buf) {
 }
 
 //
-// End of "$Id: filename_ext.cxx 5190 2006-06-09 16:16:34Z mike $".
+// End of "$Id: filename_ext.cxx 6641 2009-01-20 11:10:29Z fabien $".
 //

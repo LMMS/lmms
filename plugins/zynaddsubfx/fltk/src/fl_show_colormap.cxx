@@ -1,9 +1,9 @@
 //
-// "$Id: fl_show_colormap.cxx 5190 2006-06-09 16:16:34Z mike $"
+// "$Id: fl_show_colormap.cxx 6616 2009-01-01 21:28:26Z matt $"
 //
 // Colormap color selection dialog for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2005 by Bill Spitzak and others.
+// Copyright 1998-2009 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -25,9 +25,6 @@
 //     http://www.fltk.org/str.php
 //
 
-// Select a color from the colormap.
-// Pretty much unchanged from Forms.
-
 #include <FL/Fl.H>
 #include <FL/Fl_Single_Window.H>
 #include <FL/fl_draw.H>
@@ -37,6 +34,10 @@
 #define BOXSIZE 14
 #define BORDER 4
 
+/** 
+ This widget creates a modal window for selecting a color from the colormap.
+ Pretty much unchanged from Forms.
+*/
 class ColorMenu : public Fl_Window {
   Fl_Color initial;
   Fl_Color which, previous;
@@ -147,7 +148,7 @@ Fl_Color ColorMenu::run() {
   Fl::grab(*this);
   done = 0;
   while (!done) Fl::wait();
-  Fl::release();
+  Fl::grab(0);
   return which;
 }
 
@@ -157,5 +158,5 @@ Fl_Color fl_show_colormap(Fl_Color oldcol) {
 }
 
 //
-// End of "$Id: fl_show_colormap.cxx 5190 2006-06-09 16:16:34Z mike $".
+// End of "$Id: fl_show_colormap.cxx 6616 2009-01-01 21:28:26Z matt $".
 //

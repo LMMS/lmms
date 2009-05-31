@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Progress.cxx 5540 2006-11-12 20:44:12Z matt $"
+// "$Id: Fl_Progress.cxx 6616 2009-01-01 21:28:26Z matt $"
 //
 // Progress bar widget routines.
 //
-// Copyright 2000-2005 by Michael Sweet.
+// Copyright 2000-2009 by Michael Sweet.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -25,6 +25,7 @@
 //     http://www.fltk.org/str.php
 //
 // Contents:
+
 //
 //   Fl_Progress::draw()        - Draw the check button.
 //   Fl_Progress::Fl_Progress() - Construct a Fl_Progress widget.
@@ -49,6 +50,7 @@
 // 'Fl_Progress::draw()' - Draw the check button.
 //
 
+/** Draws the progress bar. */
 void Fl_Progress::draw()
 {
   int	progress;	// Size of progress bar...
@@ -76,7 +78,7 @@ void Fl_Progress::draw()
     Fl_Color c = labelcolor();
     labelcolor(fl_contrast(labelcolor(), color2()));
 
-    fl_clip(x(), y(), progress + bx, h());
+    fl_push_clip(x(), y(), progress + bx, h());
       draw_box(box(), x(), y(), w(), h(), active_r() ? color2() : fl_inactive(color2()));
       draw_label(tx, y() + by, tw, h() - bh);
     fl_pop_clip();
@@ -84,7 +86,7 @@ void Fl_Progress::draw()
     labelcolor(c);
 
     if (progress<w()) {
-      fl_clip(tx + progress, y(), w() - progress, h());
+      fl_push_clip(tx + progress, y(), w() - progress, h());
         draw_box(box(), x(), y(), w(), h(), active_r() ? color() : fl_inactive(color()));
         draw_label(tx, y() + by, tw, h() - bh);
       fl_pop_clip();
@@ -96,13 +98,13 @@ void Fl_Progress::draw()
 }
 
 
-//
-// 'Fl_Progress::Fl_Progress()' - Construct a Fl_Progress widget.
-//
-
+/**  
+    The constructor creates the progress bar using the position,
+    size, and label.
+    <P> The inherited destructor removes the progress bar.
+*/
 Fl_Progress::Fl_Progress(int X, int Y, int W, int H, const char* l)
-: Fl_Widget(X, Y, W, H, l)
-{
+: Fl_Widget(X, Y, W, H, l) {
   align(FL_ALIGN_INSIDE);
   box(FL_DOWN_BOX);
   color(FL_BACKGROUND2_COLOR, FL_YELLOW);
@@ -113,5 +115,5 @@ Fl_Progress::Fl_Progress(int X, int Y, int W, int H, const char* l)
 
 
 //
-// End of "$Id: Fl_Progress.cxx 5540 2006-11-12 20:44:12Z matt $".
+// End of "$Id: Fl_Progress.cxx 6616 2009-01-01 21:28:26Z matt $".
 //

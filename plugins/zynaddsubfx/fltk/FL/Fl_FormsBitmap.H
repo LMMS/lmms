@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_FormsBitmap.H 4288 2005-04-16 00:13:17Z mike $"
+// "$Id: Fl_FormsBitmap.H 6614 2009-01-01 16:11:32Z matt $"
 //
 // Forms bitmap header file for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2005 by Bill Spitzak and others.
+// Copyright 1998-2009 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -25,11 +25,17 @@
 //     http://www.fltk.org/str.php
 //
 
+/* \file
+   Fl_FormsBitmap widget . */
+
 #ifndef Fl_FormsBitmap_H
 #define Fl_FormsBitmap_H
 
 #include "Fl_Bitmap.H"
 
+/** 
+    Forms compatibility Bitmap Image Widget
+*/
 class FL_EXPORT Fl_FormsBitmap : public Fl_Widget {
     Fl_Bitmap *b;
 protected:
@@ -37,12 +43,14 @@ protected:
 public:
     Fl_FormsBitmap(Fl_Boxtype, int, int, int, int, const char * = 0);
     void set(int W, int H, const uchar *bits);
+    /** Sets a new bitmap. */
     void bitmap(Fl_Bitmap *B) {b = B;}
+    /** Gets a the current associated Fl_Bitmap objects. */
     Fl_Bitmap *bitmap() const {return b;}
 };
 
 #endif
 
 //
-// End of "$Id: Fl_FormsBitmap.H 4288 2005-04-16 00:13:17Z mike $".
+// End of "$Id: Fl_FormsBitmap.H 6614 2009-01-01 16:11:32Z matt $".
 //

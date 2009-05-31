@@ -1,9 +1,9 @@
 //
-// "$Id: fl_curve.cxx 5190 2006-06-09 16:16:34Z mike $"
+// "$Id: fl_curve.cxx 6616 2009-01-01 21:28:26Z matt $"
 //
 // Bezier curve functions for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2005 by Bill Spitzak and others.
+// Copyright 1998-2009 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -25,15 +25,27 @@
 //     http://www.fltk.org/str.php
 //
 
-// Utility for drawing Bezier curves, adding the points to
-// the current fl_begin/fl_vertex/fl_end path.
-// Incremental math implementation:
-// I very much doubt this is optimal!  From Foley/vanDam page 511.
-// If anybody has a better algorithim, please send it!
+/**
+  \file fl_curve.cxx
+  \brief Utility for drawing Bezier curves, adding the points to the
+         current fl_begin/fl_vertex/fl_end path.
+
+  Incremental math implementation:
+  I very much doubt this is optimal!  From Foley/vanDam page 511.
+  If anybody has a better algorithm, please send it!
+*/
 
 #include <FL/fl_draw.H>
 #include <math.h>
 
+/**
+  Add a series of points on a Bezier curve to the path.
+  The curve ends (and two of the points) are at X0,Y0 and X3,Y3.
+  \param[in] X0,Y0 curve start point
+  \param[in] X1,Y1 curve control point
+  \param[in] X2,Y2 curve control point
+  \param[in] X3,Y3 curve end point
+*/
 void fl_curve(double X0, double Y0,
 	      double X1, double Y1,
 	      double X2, double Y2,
@@ -102,5 +114,5 @@ void fl_curve(double X0, double Y0,
 }
 
 //
-// End of "$Id: fl_curve.cxx 5190 2006-06-09 16:16:34Z mike $".
+// End of "$Id: fl_curve.cxx 6616 2009-01-01 21:28:26Z matt $".
 //

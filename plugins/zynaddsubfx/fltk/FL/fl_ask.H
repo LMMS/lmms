@@ -1,9 +1,9 @@
 //
-// "$Id: fl_ask.H 4279 2005-04-13 19:35:28Z mike $"
+// "$Id: fl_ask.H 6614 2009-01-01 16:11:32Z matt $"
 //
 // Standard dialog header file for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2005 by Bill Spitzak and others.
+// Copyright 1998-2009 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -31,7 +31,7 @@
 #  include "Enumerations.H"
 
 class Fl_Widget;
-
+/** Different system beeps available. \relatesalso fl_beep(int) */
 enum {
   FL_BEEP_DEFAULT = 0,
   FL_BEEP_MESSAGE,
@@ -63,9 +63,9 @@ FL_EXPORT const char *fl_password(const char *label, const char *deflt = 0, ...)
 
 FL_EXPORT Fl_Widget *fl_message_icon();
 extern FL_EXPORT Fl_Font fl_message_font_;
-extern FL_EXPORT unsigned char fl_message_size_;
-inline void fl_message_font(unsigned char f,unsigned char s) {
-  fl_message_font_ = (Fl_Font)f; fl_message_size_ = s;}
+extern FL_EXPORT Fl_Fontsize fl_message_size_;
+inline void fl_message_font(Fl_Font f, Fl_Fontsize s) {
+  fl_message_font_ = f; fl_message_size_ = s;}
 
 // pointers you can use to change FLTK to a foreign language:
 extern FL_EXPORT const char* fl_no;
@@ -73,9 +73,8 @@ extern FL_EXPORT const char* fl_yes;
 extern FL_EXPORT const char* fl_ok;
 extern FL_EXPORT const char* fl_cancel;
 extern FL_EXPORT const char* fl_close;
-
 #endif // !fl_ask_H
 
 //
-// End of "$Id: fl_ask.H 4279 2005-04-13 19:35:28Z mike $".
+// End of "$Id: fl_ask.H 6614 2009-01-01 16:11:32Z matt $".
 //

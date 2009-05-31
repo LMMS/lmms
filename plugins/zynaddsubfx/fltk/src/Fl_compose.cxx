@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_compose.cxx 5211 2006-06-19 07:43:39Z matt $"
+// "$Id: Fl_compose.cxx 6616 2009-01-01 21:28:26Z matt $"
 //
 // Character compose processing for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2005 by Bill Spitzak and others.
+// Copyright 1998-2009 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -85,8 +85,28 @@ static char dead_keys[] = {
 };
 #endif // !WIN32 && OLD_DEAD_KEY_CODE
 
+#ifndef FL_DOXYGEN
 int Fl::compose_state = 0;
+#endif
 
+/** Any text editing widget should call this for each FL_KEYBOARD event.
+    Use of this function is very simple.
+
+    <p>If <i>true</i> is returned, then it has modified the
+    Fl::event_text() and Fl::event_length() to a set of <i>bytes</i> to
+    insert (it may be of zero length!).  In will also set the "del"
+    parameter to the number of <i>bytes</i> to the left of the cursor to
+    delete, this is used to delete the results of the previous call to
+    Fl::compose().
+    
+    <p>If <i>false</i> is returned, the keys should be treated as function
+    keys, and del is set to zero. You could insert the text anyways, if
+    you don't know what else to do.
+    
+    <p>Though the current implementation returns immediately, future
+    versions may take quite awhile, as they may pop up a window or do
+    other user-interface things to allow characters to be selected.
+*/
 int Fl::compose(int& del) {
 
   del = 0;
@@ -119,9 +139,13 @@ int Fl::compose(int& del) {
 
     if (ascii == ' ') { // space turns into nbsp
 #ifdef __APPLE__
-      e_text[0] = char(0xCA);
-#else
-      e_text[0] = char(0xA0);
+      int len = fl_utf8encode(0xCA, e_text);
+      e_text[len] = '\0';
+      e_length = len;
+ #else
+      int len = fl_utf8encode(0xA0, e_text);
+      e_text[len] = '\0';
+      e_length = len;
 #endif
       compose_state = 0;
       return 1;
@@ -131,9 +155,14 @@ int Fl::compose(int& del) {
     }
 
     // see if it is either character of any pair:
-    for (const char *p = compose_pairs; *p; p += 2) 
+    for (const char *p = compose_pairs; *p; p += 2)
       if (p[0] == ascii || p[1] == ascii) {
-	if (p[1] == ' ') e_text[0] = (p-compose_pairs)/2+0x80;
+       if (p[1] == ' ') {
+               int len = fl_utf8encode((p-compose_pairs)/2+0xA0, e_text);
+               e_text[len] = '\0';
+               e_length = len;
+       }
+
 	compose_state = ascii;
 	return 1;
       }
@@ -162,7 +191,9 @@ int Fl::compose(int& del) {
     // now search for the pair in either order:
     for (const char *p = compose_pairs; *p; p += 2) {
       if (p[0] == ascii && p[1] == c1 || p[1] == ascii && p[0] == c1) {
-	e_text[0] = (p-compose_pairs)/2+0x80;
+        int len = fl_utf8encode((p-compose_pairs)/2+0xA0, e_text);
+        e_text[len] = '\0';
+        e_length = len;
 	del = 1; // delete the old character and insert new one
 	compose_state = 0;
 	return 1;
@@ -203,7 +234,7 @@ int Fl::compose(int& del) {
     ascii = e_text[0];
     for (const char *p = compose_pairs; *p; p += 2)
       if (p[0] == ascii ||
-          (p[1] == ' ' && (p - compose_pairs) / 2 + 0x80 == ascii)) {
+          (p[1] == ' ' && (p - compose_pairs) / 2 + 0xA0 == ascii)) {
         compose_state = p[0];
         return 1;
       }

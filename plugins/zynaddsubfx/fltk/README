@@ -1,4 +1,4 @@
-README - Fast Light Tool Kit (FLTK) Version 1.1.9
+README - Fast Light Tool Kit (FLTK) Version 1.3.0
 -------------------------------------------------
 
 WHAT IS FLTK?
@@ -84,9 +84,8 @@ BUILDING AND INSTALLING FLTK UNDER UNIX AND MacOS X
 BUILDING FLTK UNDER MICROSOFT WINDOWS
 
     There are two ways to build FLTK under Microsoft Windows. 
-    The first is to use the VC++ 6.0 project files under the
-    "visualc" directory.  Just open (or double-click on) the
-    "fltk.dsw" file to get the whole shebang.
+    The first is to use the Visual C++ project files under the
+    "ide/" directory.  See the file ide/README.IDE for more info.
 
     The second method is to use a GNU-based development tool
     with the files in the "makefiles" directory.  To build
@@ -164,20 +163,9 @@ TRADEMARKS
 
 COPYRIGHT
 
-    FLTK is copyright 1998-2008 by Bill Spitzak
-    (spitzak@users.sourceforge.net) and others, including:
-
-        Craig P. Earls
-	Curtis Edwards (trilex@users.sourceforge.net)
-	Gustavo Hime (hime@users.sourceforge.net)
-	Talbot Hughes
-	Robert Kesterson (robertk@users.sourceforge.net)
-	Matthias Melcher (matthiaswm@users.sourceforge.net)
-	James Dean Palmer (jamespalmer@users.sourceforge.net)
-	Vincent Penne (vincentp@users.sourceforge.net)
-        Michael Sweet (easysw@users.sourceforge.net)
-	Carl Thompson (clip@users.sourceforge.net)
-	Nafees Bin Zafar (nafees@users.sourceforge.net)
+    FLTK is copyright 1998-2009 by Bill Spitzak
+    (spitzak@users.sourceforge.net) and others, 
+    see the CREDITS file for more info.
 
     This library is free software; you can redistribute it
     and/or modify it under the terms of the GNU Library General

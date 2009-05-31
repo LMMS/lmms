@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Menu_Button.cxx 5190 2006-06-09 16:16:34Z mike $"
+// "$Id: Fl_Menu_Button.cxx 6659 2009-02-15 13:49:34Z AlbrechtS $"
 //
 // Menu button widget for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2006 by Bill Spitzak and others.
+// Copyright 1998-2009 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -37,7 +37,7 @@ void Fl_Menu_Button::draw() {
   draw_box(pressed_menu_button_ == this ? fl_down(box()) : box(), color());
   draw_label();
   if (Fl::focus() == this) draw_focus();
-  if (box() == FL_FLAT_BOX) return; // for XForms compatability
+  // ** if (box() == FL_FLAT_BOX) return; // for XForms compatibility
   int H = (labelsize()-3)&-2;
   int X = x()+w()-H*2;
   int Y = y()+(h()-H)/2;
@@ -47,12 +47,18 @@ void Fl_Menu_Button::draw() {
   fl_line(X+H, Y, X+H/2, Y+H);
 }
 
+/**
+  Act exactly as though the user clicked the button or typed the
+  shortcut key.  The menu appears, it waits for the user to pick an item,
+  and if they pick one it sets value() and does the callback or
+  sets changed() as described above.  The menu item is returned
+  or NULL if the user dismisses the menu.
+*/
 const Fl_Menu_Item* Fl_Menu_Button::popup() {
   const Fl_Menu_Item* m;
   pressed_menu_button_ = this;
   redraw();
-  Fl_Widget *mb = this;
-  Fl::watch_widget_pointer(mb);
+  Fl_Widget_Tracker mb(this);
   if (!box() || type()) {
     m = menu()->popup(Fl::event_x(), Fl::event_y(), label(), mvalue(), this);
   } else {
@@ -60,8 +66,7 @@ const Fl_Menu_Item* Fl_Menu_Button::popup() {
   }
   picked(m);
   pressed_menu_button_ = 0;
-  if (mb) mb->redraw();
-  Fl::release_widget_pointer(mb);
+  if (mb.exists()) redraw();
   return m;
 }
 
@@ -101,11 +106,17 @@ int Fl_Menu_Button::handle(int e) {
   }
 }
 
+/**
+  Creates a new Fl_Menu_Button widget using the given position,
+  size, and label string. The default boxtype is FL_UP_BOX.
+  <P>The constructor sets menu() to NULL.  See 
+  Fl_Menu_ for the methods to set or change the menu.
+*/
 Fl_Menu_Button::Fl_Menu_Button(int X,int Y,int W,int H,const char *l)
 : Fl_Menu_(X,Y,W,H,l) {
   down_box(FL_NO_BOX);
 }
 
 //
-// End of "$Id: Fl_Menu_Button.cxx 5190 2006-06-09 16:16:34Z mike $".
+// End of "$Id: Fl_Menu_Button.cxx 6659 2009-02-15 13:49:34Z AlbrechtS $".
 //

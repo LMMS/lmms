@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Chart.cxx 5942 2007-10-06 17:33:17Z matt $"
+// "$Id: Fl_Chart.cxx 6616 2009-01-01 21:28:26Z matt $"
 //
 // Forms-compatible chart widget for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2005 by Bill Spitzak and others.
+// Copyright 1998-2009 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -285,8 +285,14 @@ void Fl_Chart::draw() {
 #define FL_CHART_LCOL		FL_LCOL
 #define FL_CHART_ALIGN		FL_ALIGN_BOTTOM
 
-Fl_Chart::Fl_Chart(int X, int Y, int W, int H,const char *l) :
-Fl_Widget(X,Y,W,H,l) {
+/**
+  Create a new Fl_Chart widget using the given position, size and label string.
+  The default boxstyle is \c FL_NO_BOX.
+  \param[in] X, Y, W, H position and size of the widget
+  \param[in] L widget label, default is no label
+ */
+Fl_Chart::Fl_Chart(int X, int Y, int W, int H,const char *L) :
+Fl_Widget(X,Y,W,H,L) {
   box(FL_BORDER_BOX);
   align(FL_ALIGN_BOTTOM);
   numb       = 0;
@@ -300,15 +306,29 @@ Fl_Widget(X,Y,W,H,l) {
   entries    = (FL_CHART_ENTRY *)calloc(sizeof(FL_CHART_ENTRY), FL_CHART_MAX + 1);
 }
 
+/**
+  Destroys the Fl_Chart widget and all of its data.
+ */
 Fl_Chart::~Fl_Chart() {
   free(entries);
 }
 
+/**
+  Removes all values from the chart.
+ */
 void Fl_Chart::clear() {
   numb = 0;
+  min = max = 0;
   redraw();
 }
 
+/**
+  Add the data value \p val with optional label \p str and color \p col
+  to the chart.
+  \param[in] val data value
+  \param[in] str optional data label
+  \param[in] col optional data color
+ */
 void Fl_Chart::add(double val, const char *str, unsigned col) {
   /* Allocate more entries if required */
   if (numb >= sizenumb) {
@@ -331,6 +351,14 @@ void Fl_Chart::add(double val, const char *str, unsigned col) {
   redraw();
 }
 
+/**
+  Inserts a data value \p val at the given position \p ind.
+  Position 1 is the first data value.
+  \param[in] ind insertion position
+  \param[in] val data value
+  \param[in] str optional data label
+  \param[in] col optional data color
+ */
 void Fl_Chart::insert(int ind, double val, const char *str, unsigned col) {
   int i;
   if (ind < 1 || ind > numb+1) return;
@@ -353,6 +381,14 @@ void Fl_Chart::insert(int ind, double val, const char *str, unsigned col) {
   redraw();
 }
 
+/**
+  Replace a data value \p val at the given position \p ind.
+  Position 1 is the first data value.
+  \param[in] ind insertion position
+  \param[in] val data value
+  \param[in] str optional data label
+  \param[in] col optional data color
+ */
 void Fl_Chart::replace(int ind,double val, const char *str, unsigned col) {
   if (ind < 1 || ind > numb) return;
   entries[ind-1].val = float(val);
@@ -365,12 +401,22 @@ void Fl_Chart::replace(int ind,double val, const char *str, unsigned col) {
   redraw();
 }
 
-void Fl_Chart::bounds(double mymin, double mymax) {
-  this->min = mymin;
-  this->max = mymax;
+/**
+  Sets the lower and upper bounds of the chart values.
+  \param[in] a, b are used to set lower, upper
+ */
+void Fl_Chart::bounds(double a, double b) {
+  this->min = a;
+  this->max = b;
   redraw();
 }
 
+/**
+  Set the maximum number of data values for a chart.
+  If you do not call this method then the chart will be allowed to grow
+  to any size depending on available memory.
+  \param[in] m maximum number of data values allowed.
+ */
 void Fl_Chart::maxsize(int m) {
   int i;
   /* Fill in the new number */
@@ -386,5 +432,5 @@ void Fl_Chart::maxsize(int m) {
 }
 
 //
-// End of "$Id: Fl_Chart.cxx 5942 2007-10-06 17:33:17Z matt $".
+// End of "$Id: Fl_Chart.cxx 6616 2009-01-01 21:28:26Z matt $".
 //

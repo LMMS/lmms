@@ -1,9 +1,9 @@
 //
-// "$Id: fl_diamond_box.cxx 5190 2006-06-09 16:16:34Z mike $"
+// "$Id: fl_diamond_box.cxx 6616 2009-01-01 21:28:26Z matt $"
 //
 // Diamond box code for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2005 by Bill Spitzak and others.
+// Copyright 1998-2009 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -26,7 +26,7 @@
 //
 
 // Box drawing code for an obscure box type.
-// These box types are in seperate files so they are not linked
+// These box types are in separate files so they are not linked
 // in if not used.
 
 // The diamond box draws best if the area is square!
@@ -76,5 +76,5 @@ Fl_Boxtype fl_define_FL_DIAMOND_BOX() {
 }
 
 //
-// End of "$Id: fl_diamond_box.cxx 5190 2006-06-09 16:16:34Z mike $".
+// End of "$Id: fl_diamond_box.cxx 6616 2009-01-01 21:28:26Z matt $".
 //

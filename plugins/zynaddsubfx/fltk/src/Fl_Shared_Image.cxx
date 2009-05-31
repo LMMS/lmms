@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Shared_Image.cxx 5190 2006-06-09 16:16:34Z mike $"
+// "$Id: Fl_Shared_Image.cxx 6616 2009-01-01 21:28:26Z matt $"
 //
 // Shared image code for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2005 by Bill Spitzak and others.
+// Copyright 1998-2009 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -27,6 +27,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <FL/fl_utf8.h>
 #include "flstring.h"
 
 #include <FL/Fl.H>
@@ -57,12 +58,11 @@ extern "C" {
 }
 
 
-// Static methods that really should be inline, but some WIN32 compilers
-// can't handle it...
+/** Returns the Fl_Shared_Image* array */
 Fl_Shared_Image **Fl_Shared_Image::images() {
   return images_;
 }
-
+/** Returns the total number of shared images in the array. */
 int Fl_Shared_Image::num_images() {
   return num_images_;
 }
@@ -85,10 +85,13 @@ Fl_Shared_Image::compare(Fl_Shared_Image **i0,		// I - First image
 }
 
 
-//
-// 'Fl_Shared_Image::Fl_Shared_Image()' - Basic constructor.
-//
-
+/** 
+  Creates an empty shared image.
+  The constructors create a new shared image record in the image cache.
+  
+  <P>The constructors are protected and cannot be used directly
+  from a program. Use the get() method instead.
+*/
 Fl_Shared_Image::Fl_Shared_Image() : Fl_Image(0,0,0) {
   name_        = 0;
   refcount_    = 1;
@@ -98,10 +101,13 @@ Fl_Shared_Image::Fl_Shared_Image() : Fl_Image(0,0,0) {
 }
 
 
-//
-// 'Fl_Shared_Image::Fl_Shared_Image()' - Add an image to the image cache.
-//
-
+/** 
+  Creates a shared image from its filename and its corresponding Fl_Image* img.
+  The constructors create a new shared image record in the image cache.
+  
+  <P>The constructors are protected and cannot be used directly
+  from a program. Use the get() method instead.
+*/
 Fl_Shared_Image::Fl_Shared_Image(const char *n,		// I - Filename
                                  Fl_Image   *img)	// I - Image
   : Fl_Image(0,0,0) {
@@ -164,11 +170,12 @@ Fl_Shared_Image::update() {
   }
 }
 
-
-//
-// 'Fl_Shared_Image::~Fl_Shared_Image()' - Destroy a shared image...
-//
-
+/**
+  The destructor free all memory and server resources that are
+  used by the image. The destructor is protected and cannot be
+  used directly from a program. Use the Fl_Shared_Image::release() method
+  instead.
+*/
 Fl_Shared_Image::~Fl_Shared_Image() {
   if (name_) delete[] (char *)name_;
   if (alloc_image_) delete image_;
@@ -176,11 +183,11 @@ Fl_Shared_Image::~Fl_Shared_Image() {
 
 
 //
-// 'Fl_Shared_Image::release()' - Release and possibly destroy a shared image.
-//
-
-void
-Fl_Shared_Image::release() {
+/** 
+  Releases and possibly destroys (if refcount <=0) a shared image. 
+  In the latter case, it will reorganize the shared image array so that no hole will occur.
+*/
+void Fl_Shared_Image::release() {
   int	i;	// Looping var...
 
   refcount_ --;
@@ -210,11 +217,8 @@ Fl_Shared_Image::release() {
 
 
 //
-// 'Fl_Shared_Image::reload()' - Reload the shared image...
-//
-
-void
-Fl_Shared_Image::reload() {
+/** Reloads the shared image from disk */
+void Fl_Shared_Image::reload() {
   // Load image from disk...
   int		i;		// Looping var
   FILE		*fp;		// File pointer
@@ -223,7 +227,7 @@ Fl_Shared_Image::reload() {
 
   if (!name_) return;
 
-  if ((fp = fopen(name_, "rb")) != NULL) {
+  if ((fp = fl_fopen(name_, "rb")) != NULL) {
     fread(header, 1, sizeof(header), fp);
     fclose(fp);
   } else {
@@ -334,19 +338,15 @@ Fl_Shared_Image::draw(int X, int Y, int W, int H, int cx, int cy) {
 // 'Fl_Shared_Image::uncache()' - Uncache the shared image...
 //
 
-void
-Fl_Shared_Image::uncache()
+void Fl_Shared_Image::uncache()
 {
   if (image_) image_->uncache();
 }
 
 
-//
-// 'Fl_Shared_Image::find()' - Find a shared image...
-//
 
-Fl_Shared_Image *
-Fl_Shared_Image::find(const char *n, int W, int H) {
+/** Finds a shared image from its named and size specifications */
+Fl_Shared_Image* Fl_Shared_Image::find(const char *n, int W, int H) {
   Fl_Shared_Image	*key,		// Image key
 			**match;	// Matching image
 
@@ -373,12 +373,14 @@ Fl_Shared_Image::find(const char *n, int W, int H) {
 }
 
 
-//
-// 'Fl_Shared_Image::get()' - Get a shared image...
-//
-
-Fl_Shared_Image *
-Fl_Shared_Image::get(const char *n, int W, int H) {
+/** 
+  Gets a shared image, if it exists already ; it will return it.
+  If it does not exist or if it exist but with other size, 
+  then the existing image is deleted and replaced
+  by a new image from the n filename of the proper dimension.
+  If n is not a valid image filename, then get() will return NULL.
+*/
+Fl_Shared_Image* Fl_Shared_Image::get(const char *n, int W, int H) {
   Fl_Shared_Image	*temp;		// Image
 
   if ((temp = find(n, W, H)) != NULL) return temp;
@@ -403,12 +405,9 @@ Fl_Shared_Image::get(const char *n, int W, int H) {
 }
 
 
-//
-// 'Fl_Shared_Image::add_handler()' - Add a shared image handler.
-//
 
-void
-Fl_Shared_Image::add_handler(Fl_Shared_Handler f) {
+/** Adds a shared image handler, which is basically a test function for adding new formats */
+void Fl_Shared_Image::add_handler(Fl_Shared_Handler f) {
   int			i;		// Looping var...
   Fl_Shared_Handler	*temp;		// New image handler array...
 
@@ -436,12 +435,9 @@ Fl_Shared_Image::add_handler(Fl_Shared_Handler f) {
 }
 
 
-//
-// 'Fl_Shared_Image::remove_handler()' - Remove a shared image handler.
-//
 
-void
-Fl_Shared_Image::remove_handler(Fl_Shared_Handler f) {
+/** Removes a shared image handler */
+void Fl_Shared_Image::remove_handler(Fl_Shared_Handler f) {
   int	i;				// Looping var...
 
   // First see if the handler has been added...
@@ -463,5 +459,5 @@ Fl_Shared_Image::remove_handler(Fl_Shared_Handler f) {
 
 
 //
-// End of "$Id: Fl_Shared_Image.cxx 5190 2006-06-09 16:16:34Z mike $".
+// End of "$Id: Fl_Shared_Image.cxx 6616 2009-01-01 21:28:26Z matt $".
 //

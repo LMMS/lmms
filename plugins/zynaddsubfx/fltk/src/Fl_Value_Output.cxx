@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Value_Output.cxx 5190 2006-06-09 16:16:34Z mike $"
+// "$Id: Fl_Value_Output.cxx 6616 2009-01-01 21:28:26Z matt $"
 //
 // Value output widget for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2005 by Bill Spitzak and others.
+// Copyright 1998-2009 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -88,16 +88,21 @@ int Fl_Value_Output::handle(int event) {
   }
 }
 
+/**
+  Creates a new Fl_Value_Output widget using the given
+  position, size, and label string. The default boxtype is FL_NO_BOX.
+  <P> Inherited destructor destroys the Valuator.
+*/
 Fl_Value_Output::Fl_Value_Output(int X, int Y, int W, int H,const char *l)
 : Fl_Valuator(X,Y,W,H,l) {
   box(FL_NO_BOX);
   align(FL_ALIGN_LEFT);
   textfont_ = FL_HELVETICA;
-  textsize_ = (uchar)FL_NORMAL_SIZE;
+  textsize_ = FL_NORMAL_SIZE;
   textcolor_ = FL_FOREGROUND_COLOR;
   soft_ = 0;
 }
 
 //
-// End of "$Id: Fl_Value_Output.cxx 5190 2006-06-09 16:16:34Z mike $".
+// End of "$Id: Fl_Value_Output.cxx 6616 2009-01-01 21:28:26Z matt $".
 //

@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Double_Window.cxx 5829 2007-05-14 15:51:00Z matt $"
+// "$Id: Fl_Double_Window.cxx 6616 2009-01-01 21:28:26Z matt $"
 //
 // Double-buffered window code for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2007 by Bill Spitzak and others.
+// Copyright 1998-2009 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -64,7 +64,13 @@ void Fl_Double_Window::show() {
   Fl_Window::show();
 }
 
-#ifdef WIN32
+#if defined(USE_X11)
+
+// maybe someone feels inclined to implement alpha blending on X11?
+char fl_can_do_alpha_blending() {
+  return 0;
+}
+#elif defined(WIN32)
 
 // Code used to switch output to an off-screen window.  See macros in
 // win32.H which save the old state in local variables.
@@ -150,83 +156,6 @@ void fl_copy_offscreen_with_alpha(int x,int y,int w,int h,HBITMAP bitmap,int src
     BitBlt(fl_gc, x, y, w, h, new_gc, srcx, srcy, SRCCOPY);
   RestoreDC(new_gc, save);
   DeleteDC(new_gc);
-}
-
-extern void fl_restore_clip();
-
-#elif defined(__APPLE_QD__)
-
-char fl_can_do_alpha_blending() {
-  return 0;
-}
-
-GWorldPtr fl_create_offscreen(int w, int h) {
-  GWorldPtr gw;
-  Rect bounds;
-  bounds.left=0; bounds.right=w; bounds.top=0; bounds.bottom=h;
-  QDErr err = NewGWorld(&gw, 0, &bounds, 0L, 0L, 0); // 'useTempMem' should not be used (says the Carbon port manual)
-  if ( err == -108 )
-    { }
-//    fl_message( "The application memory is low. Please increase the initial memory assignment.\n" ); 
-  if (err!=noErr || gw==0L) return 0L;
-  return gw;
-}
-
-void fl_copy_offscreen(int x,int y,int w,int h,GWorldPtr gWorld,int srcx,int srcy) {
-  Rect src;
-  if ( !gWorld ) return;
-  src.top = srcy; src.left = srcx; src.bottom = srcy+h; src.right = srcx+w;
-  Rect dst;
-  GrafPtr dstPort; GetPort(&dstPort);
-  dst.top = y; dst.left = x; dst.bottom = y+h; dst.right = x+w;
-  RGBColor rgb, oldbg, oldfg;
-  GetForeColor(&oldfg);
-  GetBackColor(&oldbg);
-  rgb.red = 0xffff; rgb.green = 0xffff; rgb.blue = 0xffff;
-  RGBBackColor( &rgb );
-  rgb.red = 0x0000; rgb.green = 0x0000; rgb.blue = 0x0000;
-  RGBForeColor( &rgb );
-  CopyBits(GetPortBitMapForCopyBits(gWorld), GetPortBitMapForCopyBits(dstPort), &src, &dst, srcCopy, 0L);
-  RGBBackColor(&oldbg);
-  RGBForeColor(&oldfg);
-}
-
-void fl_delete_offscreen(GWorldPtr gWorld) {
-  DisposeGWorld(gWorld);
-}
-
-static GrafPtr prevPort;
-static GDHandle prevGD;
-
-void fl_begin_offscreen(GWorldPtr gWorld) {
-  GetGWorld( &prevPort, &prevGD );
-  if ( gWorld )
-  {
-    SetGWorld( gWorld, 0 ); // sets the correct port
-    PixMapHandle pm = GetGWorldPixMap(gWorld);
-    Boolean ret = LockPixels(pm);
-    if ( ret == false )
-    {
-      Rect rect;
-      GetPortBounds( gWorld, &rect );
-      UpdateGWorld( &gWorld, 0, &rect, 0, 0, 0 );
-      pm = GetGWorldPixMap( gWorld );
-      LockPixels( pm );
-    }
-    fl_window = 0;
-  }
-  fl_push_no_clip();
-}
-
-void fl_end_offscreen() {
-  GWorldPtr currPort;
-  GDHandle currGD;
-  GetGWorld( &currPort, &currGD );
-  fl_pop_clip();
-  PixMapHandle pm = GetGWorldPixMap(currPort);
-  UnlockPixels(pm);
-  SetGWorld( prevPort, prevGD );
-  fl_window = GetWindowFromPort( prevPort );
 }
 
 extern void fl_restore_clip();
@@ -318,21 +247,23 @@ void fl_end_offscreen() {
 
 extern void fl_restore_clip();
 
-#else // X11
-
-// maybe someone feels inclined to implement alpha blending on X11?
-char fl_can_do_alpha_blending() {
-  return 0;
-}
-
+#else
+# error unsupported platform
 #endif
 
-// Fl_Overlay_Window relies on flush(1) copying the back buffer to the
-// front everywhere, even if damage() == 0, thus erasing the overlay,
-// and leaving the clip region set to the entire window.
-
+/**
+  Forces the window to be redrawn.
+*/
 void Fl_Double_Window::flush() {flush(0);}
 
+/**
+  Forces the window to be redrawn.
+  \param[in] eraseoverlay non-zero to erase overlay, zero to ignore
+
+  Fl_Overlay_Window relies on flush(1) copying the back buffer to the
+  front everywhere, even if damage() == 0, thus erasing the overlay,
+  and leaving the clip region set to the entire window.
+*/
 void Fl_Double_Window::flush(int eraseoverlay) {
   make_current(); // make sure fl_gc is non-zero
   Fl_X *myi = Fl_X::i(this);
@@ -344,20 +275,16 @@ void Fl_Double_Window::flush(int eraseoverlay) {
       myi->backbuffer_bad = 1;
     } else
 #endif
-#ifdef __APPLE_QD__
-    if ( ( !QDIsPortBuffered( GetWindowPort(myi->xid) ) ) 
-        || force_doublebuffering_ ) {
-      myi->other_xid = fl_create_offscreen(w(), h());
-      clear_damage(FL_DAMAGE_ALL);
-    }
+#if defined(USE_X11) || defined(WIN32)
+    myi->other_xid = fl_create_offscreen(w(), h());
+    clear_damage(FL_DAMAGE_ALL);
 #elif defined(__APPLE_QUARTZ__)
     if (force_doublebuffering_) {
       myi->other_xid = fl_create_offscreen(w(), h());
       clear_damage(FL_DAMAGE_ALL);
     }
 #else
-    myi->other_xid = fl_create_offscreen(w(), h());
-    clear_damage(FL_DAMAGE_ALL);
+# error unsupported platform
 #endif
   }
 #if USE_XDBE
@@ -396,6 +323,9 @@ void Fl_Double_Window::flush(int eraseoverlay) {
     RestoreDC(fl_gc, save);
     DeleteDC(fl_gc);
     fl_gc = _sgc;
+    //# if defined(USE_CAIRO)
+    //if Fl::cairo_autolink_context() Fl::cairo_make_current(this); // capture gc changes automatically to update the cairo context adequately
+    //# endif
 #elif defined(__APPLE__)
     if ( myi->other_xid ) {
       fl_begin_offscreen( myi->other_xid );
@@ -443,10 +373,15 @@ void Fl_Double_Window::hide() {
   Fl_Window::hide();
 }
 
+/**
+  The destructor <I>also deletes all the children</I>. This allows a
+  whole tree to be deleted at once, without having to keep a pointer to
+  all the children in the user code.
+*/
 Fl_Double_Window::~Fl_Double_Window() {
   hide();
 }
 
 //
-// End of "$Id: Fl_Double_Window.cxx 5829 2007-05-14 15:51:00Z matt $".
+// End of "$Id: Fl_Double_Window.cxx 6616 2009-01-01 21:28:26Z matt $".
 //

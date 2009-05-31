@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Tabs.cxx 5791 2007-05-01 20:20:21Z matt $"
+// "$Id: Fl_Tabs.cxx 6616 2009-01-01 21:28:26Z matt $"
 //
 // Tab widget for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2005 by Bill Spitzak and others.
+// Copyright 1998-2009 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -25,10 +25,11 @@
 //     http://www.fltk.org/str.php
 //
 
+
 // This is the "file card tabs" interface to allow you to put lots and lots
 // of buttons and switches in a panel, as popularized by many toolkits.
 
-// Each child widget is a card, and it's label() is printed on the card tab.
+// Each child widget is a card, and its label() is printed on the card tab.
 // Clicking the tab makes that card visible.
 
 #include <stdio.h>
@@ -42,7 +43,7 @@
 
 // return the left edges of each tab (plus a fake left edge for a tab
 // past the right-hand one).  These position are actually of the left
-// edge of the slope.  They are either seperated by the correct distance
+// edge of the slope.  They are either separated by the correct distance
 // or by EXTRASPACE or by zero.
 // Return value is the index of the selected item.
 
@@ -248,10 +249,13 @@ int Fl_Tabs::push(Fl_Widget *o) {
   return 1;
 }
 
-// The value() is the first visible child (or the last child if none
-// are visible) and this also hides any other children.
-// This allows the tabs to be deleted, moved to other groups, and
-// show()/hide() called without it screwing up.
+/**  
+   Gets the currently visible widget/tab.
+   The value() is the first visible child (or the last child if none
+   are visible) and this also hides any other children.
+   This allows the tabs to be deleted, moved to other groups, and
+   show()/hide() called without it screwing up.
+*/
 Fl_Widget* Fl_Tabs::value() {
   Fl_Widget* v = 0;
   Fl_Widget*const* a = array();
@@ -264,8 +268,11 @@ Fl_Widget* Fl_Tabs::value() {
   return v;
 }
 
-// Setting the value hides all other children, and makes this one
-// visible, iff it is really a child:
+/**
+  Sets the widget to become the current visible widget/tab.
+  Setting the value hides all other children, and makes this one
+  visible, if it is really a child.
+*/
 int Fl_Tabs::value(Fl_Widget *newvalue) {
   Fl_Widget*const* a = array();
   int ret = 0;
@@ -338,8 +345,8 @@ void Fl_Tabs::draw_tab(int x1, int x2, int W, int H, Fl_Widget* o, int what) {
   if ((x2 < x1+W) && what == RIGHT) x1 = x2 - W;
 
   if (H >= 0) {
-    if (sel) fl_clip(x1, y(), x2 - x1, H + dh - dy);
-    else fl_clip(x1, y(), x2 - x1, H);
+    if (sel) fl_push_clip(x1, y(), x2 - x1, H + dh - dy);
+    else fl_push_clip(x1, y(), x2 - x1, H);
 
     H += dh;
 
@@ -364,8 +371,8 @@ void Fl_Tabs::draw_tab(int x1, int x2, int W, int H, Fl_Widget* o, int what) {
   } else {
     H = -H;
 
-    if (sel) fl_clip(x1, y() + h() - H - dy, x2 - x1, H + dy);
-    else fl_clip(x1, y() + h() - H, x2 - x1, H);
+    if (sel) fl_push_clip(x1, y() + h() - H - dy, x2 - x1, H + dy);
+    else fl_push_clip(x1, y() + h() - H, x2 - x1, H);
 
     H += dh;
 
@@ -391,6 +398,23 @@ void Fl_Tabs::draw_tab(int x1, int x2, int W, int H, Fl_Widget* o, int what) {
   fl_draw_shortcut = prev_draw_shortcut;
 }
 
+/**
+    Creates a new Fl_Tabs widget using the given position, size,
+    and label string. The default boxtype is FL_THIN_UP_BOX.
+
+    <P>Use add(Fl_Widget
+    *) to add each child, which are usually
+    Fl_Group widgets. The children should be sized to stay
+    away from the top or bottom edge of the Fl_Tabs widget,
+    which is where the tabs will be drawn.
+
+    <P>The destructor <I>also deletes all the children</I>. This
+    allows a whole tree to be deleted at once, without having to
+    keep a pointer to all the children in the user code. A kludge
+    has been done so the Fl_Tabs and all of its children
+    can be automatic (local) variables, but you must declare the
+    Fl_Tabs widget <I>first</I> so that it is destroyed last.
+*/
 Fl_Tabs::Fl_Tabs(int X,int Y,int W, int H, const char *l) :
   Fl_Group(X,Y,W,H,l)
 {
@@ -399,5 +423,5 @@ Fl_Tabs::Fl_Tabs(int X,int Y,int W, int H, const char *l) :
 }
 
 //
-// End of "$Id: Fl_Tabs.cxx 5791 2007-05-01 20:20:21Z matt $".
+// End of "$Id: Fl_Tabs.cxx 6616 2009-01-01 21:28:26Z matt $".
 //

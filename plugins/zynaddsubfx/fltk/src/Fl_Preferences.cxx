@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Preferences.cxx 6015 2008-01-09 21:23:51Z matt $"
+// "$Id: Fl_Preferences.cxx 6716 2009-03-24 01:40:44Z fabien $"
 //
 // Preferences methods for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 2002-2005 by Matthias Melcher.
+// Copyright 2002-2009 by Matthias Melcher.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -33,6 +33,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
+#include <FL/fl_utf8.h>
 #include "flstring.h"
 #include <sys/stat.h>
 
@@ -50,20 +51,34 @@
 #  include <unistd.h>
 #endif
 
+#ifdef WIN32
+#include <windows.h>
+#endif // WIN32
 
 char Fl_Preferences::nameBuffer[128];
 
 
 /**
- * create the initial preferences base
- * - root: machine or user preferences
- * - vendor: unique identification of author or vendor of application
- *     Must be a valid directory name.
- * - application: vendor unique application name, i.e. "PreferencesTest"
- *     multiple preferences files can be created per application.
- *     Must be a valid file name.
- * example: Fl_Preferences base( Fl_Preferences::USER, "fltk.org", "test01");
- */
+   The constructor creates a group that manages name/value pairs and
+   child groups. Groups are ready for reading and writing at any time.
+   The root argument is either Fl_Preferences::USER
+   or Fl_Preferences::SYSTEM.
+     
+   This constructor creates the <i>base</i> instance for all
+   following entries and reads existing databases into memory. The
+   vendor argument is a unique text string identifying the
+   development team or vendor of an application.  A domain name or
+   an EMail address are great unique names, e.g.
+   "researchATmatthiasm.com" or "fltk.org". The
+   application argument can be the working title or final
+   name of your application. Both vendor and
+   application must be valid relative UNIX pathnames and
+   may contain '/'s to create deeper file structures.
+    
+   \param[in] root can be \c USER or \c SYSTEM for user specific or system wide preferences
+   \param[in] vendor unique text describing the company or author of this file
+   \param[in] application unique text describing the application
+*/
 Fl_Preferences::Fl_Preferences( Root root, const char *vendor, const char *application )
 {
   node = new Node( "." );
@@ -72,9 +87,16 @@ Fl_Preferences::Fl_Preferences( Root root, const char *vendor, const char *appli
 
 
 /**
- * create the initial preferences base
- * - path: an application-supplied path
- * example: Fl_Preferences base( "/usr/foo" );
+   \brief Use this constructor to create or read a preferences file at an
+   arbitrary position in the file system. 
+
+   The file name is generated in the form
+   <tt><i>path</i>/<i>application</i>.prefs</tt>. If \p application
+   is \c NULL, \p path must contain the full file name.
+   
+   \param[in] path path to the directory that contains the preferences file
+   \param[in] vendor unique text describing the company or author of this file
+   \param[in] application unique text describing the application
  */
 Fl_Preferences::Fl_Preferences( const char *path, const char *vendor, const char *application )
 {
@@ -84,41 +106,46 @@ Fl_Preferences::Fl_Preferences( const char *path, const char *vendor, const char
 
 
 /**
- * create a Preferences node in relation to a parent node for reading and writing
- * - parent: base name for group
- * - group: group name (can contain '/' seperated group names)
- * example: Fl_Preferences colors( base, "setup/colors" );
+   \brief Generate or read a new group of entries within another group. 
+
+   Use the \p group argument to name the group that you would like to access.
+   \p Group can also contain a path to a group further down the hierarchy by
+   separating group names with a forward slash '/'. 
+
+   \param[in] parent reference object for the new group
+   \param[in] group name of the group to access (may contain '/'s)
  */
-Fl_Preferences::Fl_Preferences( Fl_Preferences &parent, const char *key )
+Fl_Preferences::Fl_Preferences( Fl_Preferences &parent, const char *group )
 {
   rootNode = parent.rootNode;
-  node = parent.node->addChild( key );
+  node = parent.node->addChild( group );
 }
 
 
 /**
- * create a Preferences node in relation to a parent node for reading and writing
- * - parent: base name for group
- * - group: group name (can contain '/' seperated group names)
- * example: Fl_Preferences colors( base, "setup/colors" );
+   \see Fl_Preferences( Fl_Preferences&, const char *group )
  */
-Fl_Preferences::Fl_Preferences( Fl_Preferences *parent, const char *key )
+Fl_Preferences::Fl_Preferences( Fl_Preferences *parent, const char *group )
 {
   rootNode = parent->rootNode;
-  node = parent->node->addChild( key );
+  node = parent->node->addChild( group );
 }
 
 
 /**
- * destroy individual keys
- * - destroying the base preferences will flush changes to the prefs file
- * - after destroying the base, none of the depending preferences must be read or written
+   The destructor removes allocated resources. When used on the
+   \em base preferences group, the destructor flushes all
+   changes to the preferences file and deletes all internal
+   databases.
+
+   The destructor does not remove any data from the database. It merely
+   deletes your reference to the database.
  */
 Fl_Preferences::~Fl_Preferences()
 {
   if (node && !node->parent()) delete rootNode;
   // DO NOT delete nodes! The root node will do that after writing the preferences
-  // zero all pointer to avoid memory errors, event though
+  // zero all pointer to avoid memory errors, even though
   // Valgrind does not complain (Cygwind does though)
   node = 0L;
   rootNode = 0L;
@@ -126,8 +153,9 @@ Fl_Preferences::~Fl_Preferences()
 
 
 /**
- * return the number of groups that are contained within a group
- * example: int n = base.groups();
+   Returns the number of groups that are contained within a group.
+  
+   \return 0 for no groups at all
  */
 int Fl_Preferences::groups()
 {
@@ -136,20 +164,27 @@ int Fl_Preferences::groups()
 
 
 /**
- * return the group name of the n'th group
- * - there is no guaranteed order of group names
- * - the index must be within the range given by groups()
- * example: printf( "Group(%d)='%s'\n", ix, base.group(ix) );
+   Returns the name of the Nth (\p num_group) group.
+   There is no guaranteed order of group names. The index must
+   be within the range given by groups().
+     
+   \param[in] num_group number indexing the requested group
+   \return 'C' string pointer to the group name
  */
-const char *Fl_Preferences::group( int ix )
+const char *Fl_Preferences::group( int num_group )
 {
-  return node->child( ix );
+  return node->child( num_group );
 }
 
 
 /**
- * return 1, if a group with this name exists
- * example: if ( base.groupExists( "setup/colors" ) ) ...
+   Returns non-zero if a group with this name exists.
+   Group names are relative to the Preferences node and can contain a path.
+   "." describes the current node, "./" describes the topmost node.
+   By preceding a groupname with a "./", its path becomes relative to the topmost node.
+     
+   \param[in] key name of group that is searched for
+   \return 0 if no group by that name was found
  */
 char Fl_Preferences::groupExists( const char *key )
 {
@@ -158,20 +193,26 @@ char Fl_Preferences::groupExists( const char *key )
 
 
 /**
- * delete a group
- * example: setup.deleteGroup( "colors/buttons" );
+   Deletes a group.
+
+   Removes a group and all keys and groups within that group
+   from the database.
+   
+   \param[in] group name of the group to delete
+   \return 0 if call failed
  */
-char Fl_Preferences::deleteGroup( const char *key )
+char Fl_Preferences::deleteGroup( const char *group )
 {
-  Node *nd = node->search( key );
+  Node *nd = node->search( group );
   if ( nd ) return nd->remove();
   return 0;
 }
 
 
 /**
- * return the number of entries (name/value) pairs for a group
- * example: int n = buttonColor.entries();
+   Returns the number of entries (name/value pairs) in a group.
+  
+   \return number of entries
  */
 int Fl_Preferences::entries()
 {
@@ -180,20 +221,24 @@ int Fl_Preferences::entries()
 
 
 /**
- * return the name of an entry
- * - there is no guaranteed order of entry names
- * - the index must be within the range given by entries()
- * example: printf( "Entry(%d)='%s'\n", ix, buttonColor.entry(ix) );
+   Returns the name of an entry. There is no guaranteed order of
+   entry names. The index must be within the range given by
+   entries().
+    
+   \param[in] index number indexing the requested entry
+   \return pointer to value cstring
  */
-const char *Fl_Preferences::entry( int ix )
+const char *Fl_Preferences::entry( int index )
 {
-  return node->entry[ix].name;
+  return node->entry[index].name;
 }
 
 
 /**
- * return 1, if an entry with this name exists
- * example: if ( buttonColor.entryExists( "red" ) ) ...
+   Returns non-zero if an entry with this name exists.
+     
+   \param[in] key name of entry that is searched for
+   \return 0 if entry was not found
  */
 char Fl_Preferences::entryExists( const char *key )
 {
@@ -202,8 +247,12 @@ char Fl_Preferences::entryExists( const char *key )
 
 
 /**
- * remove a single entry (name/value pair)
- * example: buttonColor.deleteEntry( "red" );
+   Deletes a single name/value pair.
+   
+   This function removes the entry \p key from the database.
+ 
+   \param[in] key name of entry to delete
+   \return 0 if deleting the entry failed
  */
 char Fl_Preferences::deleteEntry( const char *key )
 {
@@ -212,7 +261,14 @@ char Fl_Preferences::deleteEntry( const char *key )
 
 
 /**
- * read an entry from the group
+ Reads an entry from the group. A default value must be
+ supplied. The return value indicates if the value was available
+ (non-zero) or the default was used (0).
+ 
+ \param[in] key name of entry
+ \param[out] value returned from preferences or default value if none was set
+ \param[in] defaultValue default value to be used if no preference was set
+ \return 0 if the default value was used 
  */
 char Fl_Preferences::get( const char *key, int &value, int defaultValue )
 {
@@ -222,8 +278,15 @@ char Fl_Preferences::get( const char *key, int &value, int defaultValue )
 }
 
 
-/**
- * set an entry (name/value pair)
+/** 
+ Sets an entry (name/value pair). The return value indicates if there
+ was a problem storing the data in memory. However it does not
+ reflect if the value was actually stored in the preferences
+ file.
+ 
+ \param[in] key name of entry
+ \param[in] value set this entry to \p value
+ \return 0 if setting the value failed
  */
 char Fl_Preferences::set( const char *key, int value )
 {
@@ -234,7 +297,14 @@ char Fl_Preferences::set( const char *key, int value )
 
 
 /**
- * read an entry from the group
+ Reads an entry from the group. A default value must be
+ supplied. The return value indicates if the value was available
+ (non-zero) or the default was used (0). 
+ 
+ \param[in] key name of entry
+ \param[out] value returned from preferences or default value if none was set
+ \param[in] defaultValue default value to be used if no preference was set
+ \return 0 if the default value was used 
  */
 char Fl_Preferences::get( const char *key, float &value, float defaultValue )
 {
@@ -244,8 +314,15 @@ char Fl_Preferences::get( const char *key, float &value, float defaultValue )
 }
 
 
-/**
- * set an entry (name/value pair)
+/** 
+ Sets an entry (name/value pair). The return value indicates if there
+ was a problem storing the data in memory. However it does not
+ reflect if the value was actually stored in the preferences
+ file.
+ 
+ \param[in] key name of entry
+ \param[in] value set this entry to \p value
+ \return 0 if setting the value failed
  */
 char Fl_Preferences::set( const char *key, float value )
 {
@@ -255,8 +332,16 @@ char Fl_Preferences::set( const char *key, float value )
 }
 
 
-/**
- * set an entry (name/value pair)
+/** 
+ Sets an entry (name/value pair). The return value indicates if there
+ was a problem storing the data in memory. However it does not
+ reflect if the value was actually stored in the preferences
+ file.
+ 
+ \param[in] key name of entry
+ \param[in] value set this entry to \p value
+ \param[in] precision number of decimal digits to represent value
+ \return 0 if setting the value failed
  */
 char Fl_Preferences::set( const char *key, float value, int precision )
 {
@@ -267,7 +352,14 @@ char Fl_Preferences::set( const char *key, float value, int precision )
 
 
 /**
- * read an entry from the group
+ Reads an entry from the group. A default value must be
+ supplied. The return value indicates if the value was available
+ (non-zero) or the default was used (0). 
+ 
+ \param[in] key name of entry
+ \param[out] value returned from preferences or default value if none was set
+ \param[in] defaultValue default value to be used if no preference was set
+ \return 0 if the default value was used 
  */
 char Fl_Preferences::get( const char *key, double &value, double defaultValue )
 {
@@ -277,8 +369,15 @@ char Fl_Preferences::get( const char *key, double &value, double defaultValue )
 }
 
 
-/**
- * set an entry (name/value pair)
+/** 
+ Sets an entry (name/value pair). The return value indicates if there
+ was a problem storing the data in memory. However it does not
+ reflect if the value was actually stored in the preferences
+ file.
+ 
+ \param[in] key name of entry
+ \param[in] value set this entry to \p value
+ \return 0 if setting the value failed
  */
 char Fl_Preferences::set( const char *key, double value )
 {
@@ -288,8 +387,16 @@ char Fl_Preferences::set( const char *key, double value )
 }
 
 
-/**
- * set an entry (name/value pair)
+/** 
+ Sets an entry (name/value pair). The return value indicates if there
+ was a problem storing the data in memory. However it does not
+ reflect if the value was actually stored in the preferences
+ file.
+ 
+ \param[in] key name of entry
+ \param[in] value set this entry to \p value
+ \param[in] precision number of decimal digits to represent value
+ \return 0 if setting the value failed
  */
 char Fl_Preferences::set( const char *key, double value, int precision )
 {
@@ -330,9 +437,17 @@ static char *decodeText( const char *src )
 
 
 /**
- * read a text entry from the group
- * the text will be moved into the given text buffer
- * text will be clipped to the buffer size
+ Reads an entry from the group. A default value must be
+ supplied. The return value indicates if the value was available
+ (non-zero) or the default was used (0). 
+ 'maxSize' is the maximum length of text that will be read. 
+ The text buffer must allow for one additional byte for a trailling zero.
+ 
+ \param[in] key name of entry
+ \param[out] text returned from preferences or default value if none was set
+ \param[in] defaultValue default value to be used if no preference was set
+ \param[in] maxSize maximum length of value plus one byte for a trailing zero
+ \return 0 if the default value was used 
  */
 char Fl_Preferences::get( const char *key, char *text, const char *defaultValue, int maxSize )
 {
@@ -351,9 +466,16 @@ char Fl_Preferences::get( const char *key, char *text, const char *defaultValue,
 
 
 /**
- * read a text entry from the group
- * 'text' will be changed to point to a new text buffer
- * the text buffer must be deleted with 'free(text)' by the user.
+ Reads an entry from the group. A default value must be
+ supplied. The return value indicates if the value was available
+ (non-zero) or the default was used (0). get() allocates memory of
+ sufficient size to hold the value. The buffer must be free'd by 
+ the developer using 'free(value)'. 
+ 
+ \param[in] key name of entry
+ \param[out] text returned from preferences or default value if none was set
+ \param[in] defaultValue default value to be used if no preference was set
+ \return 0 if the default value was used 
  */
 char Fl_Preferences::get( const char *key, char *&text, const char *defaultValue )
 {
@@ -372,8 +494,16 @@ char Fl_Preferences::get( const char *key, char *&text, const char *defaultValue
 }
 
 
-/**
- * set an entry (name/value pair)
+
+/** 
+ Sets an entry (name/value pair). The return value indicates if there
+ was a problem storing the data in memory. However it does not
+ reflect if the value was actually stored in the preferences
+ file.
+ 
+ \param[in] key name of entry
+ \param[in] text set this entry to \p value
+ \return 0 if setting the value failed
  */
 char Fl_Preferences::set( const char *key, const char *text )
 {
@@ -427,9 +557,19 @@ static void *decodeHex( const char *src, int &size )
 
 
 /**
- * read a binary entry from the group
- * the data will be moved into the given destination buffer
- * data will be clipped to the buffer size
+ Reads an entry from the group. A default value must be
+ supplied. The return value indicates if the value was available
+ (non-zero) or the default was used (0). 
+ 'maxSize' is the maximum length of text that will be read. 
+ 
+ \param[in] key name of entry
+ \param[out] data value returned from preferences or default value if none was set
+ \param[in] defaultValue default value to be used if no preference was set
+ \param[in] defaultSize size of default value array
+ \param[in] maxSize maximum length of value
+ \return 0 if the default value was used 
+ 
+ \todo maxSize should receive the number of bytes that were read.
  */
 char Fl_Preferences::get( const char *key, void *data, const void *defaultValue, int defaultSize, int maxSize )
 {
@@ -449,9 +589,17 @@ char Fl_Preferences::get( const char *key, void *data, const void *defaultValue,
 
 
 /**
- * read a binary entry from the group
- * 'data' will be changed to point to a new data buffer
- * the data buffer must be deleted with 'free(data)' by the user.
+ Reads an entry from the group. A default value must be
+ supplied. The return value indicates if the value was available
+ (non-zero) or the default was used (0). get() allocates memory of
+ sufficient size to hold the value. The buffer must be free'd by 
+ the developer using 'free(value)'. 
+ 
+ \param[in] key name of entry
+ \param[out] data returned from preferences or default value if none was set
+ \param[in] defaultValue default value to be used if no preference was set
+ \param[in] defaultSize size of default value array
+ \return 0 if the default value was used 
  */
 char Fl_Preferences::get( const char *key, void *&data, const void *defaultValue, int defaultSize )
 {
@@ -473,8 +621,16 @@ char Fl_Preferences::get( const char *key, void *&data, const void *defaultValue
 }
 
 
-/**
- * set an entry (name/value pair)
+/** 
+ Sets an entry (name/value pair). The return value indicates if there
+ was a problem storing the data in memory. However it does not
+ reflect if the value was actually stored in the preferences
+ file.
+ 
+ \param[in] key name of entry
+ \param[in] data set this entry to \p value
+ \param[in] dsize size of data array
+ \return 0 if setting the value failed
  */
 char Fl_Preferences::set( const char *key, const void *data, int dsize )
 {
@@ -495,7 +651,10 @@ char Fl_Preferences::set( const char *key, const void *data, int dsize )
 
 
 /**
- * return the size of the value part of an entry
+ Returns the size of the value part of an entry.
+ 
+ \param[in] key name of entry
+ \return size of value
  */
 int Fl_Preferences::size( const char *key )
 {
@@ -503,19 +662,33 @@ int Fl_Preferences::size( const char *key )
   return v ? strlen( v ) : 0 ;
 }
 
+
 /**
- * creates a path that is related to the preferences file
- * and that is usable for application data beyond what is covered 
- * by Fl_Preferences.
- * - 'getUserdataPath' actually creates the directory
- * - 'path' must be large enough to receive a complete file path
- * example:
- *   Fl_Preferences prefs( USER, "matthiasm.com", "test" );
- *   char path[FL_PATH_MAX];
- *   prefs.getUserdataPath( path );
- * sample returns:
- *   Win32: c:/Documents and Settings/matt/Application Data/matthiasm.com/test/
- *   prefs: c:/Documents and Settings/matt/Application Data/matthiasm.com/test.prefs
+ \brief Creates a path that is related to the preferences file and
+ that is usable for additional application data.
+ 
+ This function creates a directory that is named after the preferences
+ database without the \c .prefs extension and located in the same directory.
+ It then fills the given buffer with the complete path name.
+ 
+ Exmaple:
+ \code
+ Fl_Preferences prefs( USER, "matthiasm.com", "test" );
+ char path[FL_PATH_MAX];
+ prefs.getUserdataPath( path );
+ \endcode
+ creates the preferences database in (MS Windows):
+ \code
+ c:/Documents and Settings/matt/Application Data/matthiasm.com/test.prefs
+ \endcode
+ and returns the userdata path:
+ \code
+ c:/Documents and Settings/matt/Application Data/matthiasm.com/test/
+ \endcode
+ 
+ \param[out] path buffer for user data path
+ \param[in] pathlen size of path buffer (should be at least \c FL_PATH_MAX)
+ \return 0 if path was not created or pathname can't fit into buffer
  */
 char Fl_Preferences::getUserdataPath( char *path, int pathlen )
 {
@@ -525,9 +698,9 @@ char Fl_Preferences::getUserdataPath( char *path, int pathlen )
 }
 
 /**
- * write all preferences to disk
- * - this function works only with the base preference group
- * - this function is rarely used as deleting the base preferences flushes automatically
+ Writes all preferences to disk. This function works only with
+ the base preferences group. This function is rarely used as
+ deleting the base preferences flushes automatically.
  */
 void Fl_Preferences::flush()
 {
@@ -540,14 +713,17 @@ void Fl_Preferences::flush()
 //
 
 /**
- * create a group name or entry name on the fly
- * - this version creates a simple unsigned integer as an entry name
- * example:
- *   int n, i;
- *   Fl_Preferences prev( appPrefs, "PreviousFiles" );
- *   prev.get( "n", 0 );
- *   for ( i=0; i<n; i++ )
- *     prev.get( Fl_Preferences::Name(i), prevFile[i], "" );
+   Creates a group name or entry name on the fly.
+   
+   This version creates a simple unsigned integer as an entry name.
+  
+   \code
+     int n, i;
+     Fl_Preferences prev( appPrefs, "PreviousFiles" );
+     prev.get( "n", 0 );
+     for ( i=0; i<n; i++ )
+       prev.get( Fl_Preferences::Name(i), prevFile[i], "" );
+   \endcode
  */
 Fl_Preferences::Name::Name( unsigned int n )
 {
@@ -556,14 +732,17 @@ Fl_Preferences::Name::Name( unsigned int n )
 }
 
 /**
- * create a group name or entry name on the fly
- * - this version creates entry names as in 'printf'
- * example:
- *   int n, i;
- *   Fl_Preferences prefs( USER, "matthiasm.com", "test" );
- *   prev.get( "nFiles", 0 );
- *   for ( i=0; i<n; i++ )
- *     prev.get( Fl_Preferences::Name( "File%d", i ), prevFile[i], "" );
+   Creates a group name or entry name on the fly.
+  
+   This version creates entry names as in 'printf'.
+   
+   \code
+     int n, i;
+     Fl_Preferences prefs( USER, "matthiasm.com", "test" );
+     prev.get( "nFiles", 0 );
+     for ( i=0; i<n; i++ )
+       prev.get( Fl_Preferences::Name( "File%d", i ), prevFile[i], "" );
+    \endcode
  */
 Fl_Preferences::Name::Name( const char *format, ... )
 {
@@ -609,6 +788,7 @@ static char makePath( const char *path ) {
   return 1;
 }
 
+#if 0
 // strip the filename and create a path
 static void makePathForFile( const char *path )
 {
@@ -621,6 +801,7 @@ static void makePathForFile( const char *path )
   makePath( p );
   free( p );
 }
+#endif
 
 // create the root node
 // - construct the name of the file that will hold our preferences
@@ -629,6 +810,7 @@ Fl_Preferences::RootNode::RootNode( Fl_Preferences *prefs, Root root, const char
   char filename[ FL_PATH_MAX ]; filename[0] = 0;
 #ifdef WIN32
 #  define FLPREFS_RESOURCE	"Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Shell Folders"
+#  define FLPREFS_RESOURCEW	L"Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Shell Folders"
   int appDataLen = strlen(vendor) + strlen(application) + 8;
   DWORD type, nn;
   LONG err;
@@ -636,35 +818,54 @@ Fl_Preferences::RootNode::RootNode( Fl_Preferences *prefs, Root root, const char
 
   switch (root) {
     case SYSTEM:
-      err = RegOpenKey( HKEY_LOCAL_MACHINE, FLPREFS_RESOURCE, &key );
+
+        err = RegOpenKeyW( HKEY_LOCAL_MACHINE, FLPREFS_RESOURCEW, &key );
+
       if (err == ERROR_SUCCESS) {
 	nn = FL_PATH_MAX - appDataLen;
-	err = RegQueryValueEx( key, "Common AppData", 0L, &type, (BYTE*)filename, &nn );
-	if ( ( err != ERROR_SUCCESS ) && ( type == REG_SZ ) )
+
+		err = RegQueryValueExW( key, L"Common AppData", 0L, &type,
+					 (BYTE*)filename, &nn );
+
+		if ( ( err != ERROR_SUCCESS ) && ( type == REG_SZ ) ) {
 	  filename[0] = 0;
-        RegCloseKey(key);
+			filename[1] = 0;
+		}
+		RegCloseKey(key);
       }
       break;
     case USER:
-      err = RegOpenKey( HKEY_CURRENT_USER, FLPREFS_RESOURCE, &key );
+        err = RegOpenKeyW( HKEY_CURRENT_USER, FLPREFS_RESOURCEW, &key );
+
+
       if (err == ERROR_SUCCESS) {
 	nn = FL_PATH_MAX - appDataLen;
-	err = RegQueryValueEx( key, "AppData", 0L, &type, (BYTE*)filename, &nn );
-	if ( ( err != ERROR_SUCCESS ) && ( type == REG_SZ ) )
-	{
-	  err = RegQueryValueEx( key, "Personal", 0L, &type, (BYTE*)filename, &nn );
-	  if ( ( err != ERROR_SUCCESS ) && ( type == REG_SZ ) )
+          err = RegQueryValueExW( key, L"AppData", 0L, &type,
+                                 (BYTE*)filename, &nn );
+
+        if ( ( err != ERROR_SUCCESS ) && ( type == REG_SZ ) ) {
 	    filename[0] = 0;
+        filename[1] = 0;
 	}
         RegCloseKey(key);
       }
       break;
   }
 
-  if (!filename[0]) {
-    strcpy(filename, "C:\\FLTK");
-  }
 
+#ifndef __CYGWIN__
+    if (!filename[1] && !filename[0]) {
+    strcpy(filename, "C:\\FLTK");
+    } else {
+      xchar *b = (xchar*)_wcsdup((xchar*)filename);
+//    filename[fl_unicode2utf(b, wcslen((xchar*)b), filename)] = 0;
+      unsigned len = fl_utf8fromwc(filename, (FL_PATH_MAX-1), b, wcslen((xchar*)b));
+      filename[len] = 0;
+      free(b);
+  }
+#else
+  if (!filename[0]) strcpy(filename, "C:\\FLTK");
+#endif
   snprintf(filename + strlen(filename), sizeof(filename) - strlen(filename),
            "/%s/%s.prefs", vendor, application);
   for (char *s = filename; *s; s++) if (*s == '\\') *s = '/';
@@ -678,7 +879,7 @@ Fl_Preferences::RootNode::RootNode( Fl_Preferences *prefs, Root root, const char
 			1, &spec.vRefNum, &spec.parID );
       break;
     case USER:
-      err = FindFolder( kUserDomain, kPreferencesFolderType, 
+      err = FindFolder( kUserDomain, kPreferencesFolderType,
 			1, &spec.vRefNum, &spec.parID );
       break;
   }
@@ -690,7 +891,7 @@ Fl_Preferences::RootNode::RootNode( Fl_Preferences *prefs, Root root, const char
   const char *e;
   switch (root) {
     case USER:
-      if ((e = getenv("HOME")) != NULL) {
+      if ((e = fl_getenv("HOME")) != NULL) {
 	strlcpy(filename, e, sizeof(filename));
 
 	if (filename[strlen(filename)-1] != '/') {
@@ -764,7 +965,7 @@ Fl_Preferences::RootNode::~RootNode()
 int Fl_Preferences::RootNode::read()
 {
   char buf[1024];
-  FILE *f = fopen( filename_, "rb" );
+  FILE *f = fl_fopen( filename_, "rb" );
   if ( !f ) return 0;
   fgets( buf, 1024, f );
   fgets( buf, 1024, f );
@@ -805,8 +1006,8 @@ int Fl_Preferences::RootNode::read()
 // write the group tree and all entry leafs
 int Fl_Preferences::RootNode::write()
 {
-  makePathForFile(filename_);
-  FILE *f = fopen( filename_, "wb" );
+  fl_make_path_for_file(filename_);
+  FILE *f = fl_fopen( filename_, "wb" );
   if ( !f ) return 1;
   fprintf( f, "; FLTK preferences file format 1.0\n" );
   fprintf( f, "; vendor: %s\n", vendor_ );
@@ -826,7 +1027,7 @@ char Fl_Preferences::RootNode::getPath( char *path, int pathlen )
   s = strrchr( path, '.' );
   if ( !s ) return 0;
   *s = 0;
-  char ret = makePath( path );
+  char ret = fl_make_path( path );
   strcpy( s, "/" );
   return ret;
 }
@@ -1112,7 +1313,7 @@ Fl_Preferences::Node *Fl_Preferences::Node::search( const char *path, int offset
   len -= offset;
   if ( ( len <= 0 ) || ( strncmp( path, path_+offset, len ) == 0 ) )
   {
-    if ( len > 0 && path[ len ] == 0 ) 
+    if ( len > 0 && path[ len ] == 0 )
       return this;
     if ( len <= 0 || path[ len ] == '/' )
     {
@@ -1178,5 +1379,5 @@ char Fl_Preferences::Node::remove()
 
 
 //
-// End of "$Id: Fl_Preferences.cxx 6015 2008-01-09 21:23:51Z matt $".
+// End of "$Id: Fl_Preferences.cxx 6716 2009-03-24 01:40:44Z fabien $".
 //

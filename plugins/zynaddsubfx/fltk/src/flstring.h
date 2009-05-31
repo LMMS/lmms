@@ -1,9 +1,9 @@
 /*
- * "$Id: flstring.h 5701 2007-02-20 18:43:10Z mike $"
+ * "$Id: flstring.h 6680 2009-03-14 02:11:31Z greg.ercolano $"
  *
  * Common string header file for the Fast Light Tool Kit (FLTK).
  *
- * Copyright 1998-2007 by Bill Spitzak and others.
+ * Copyright 1998-2009 by Bill Spitzak and others.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -51,13 +51,14 @@
 #  if defined(WIN32) && !defined(__CYGWIN__)
 #    define strcasecmp(s,t)	_stricmp((s), (t))
 #    define strncasecmp(s,t,n)	_strnicmp((s), (t), (n))
-// Visual C++ 2005 incorrectly displays a warning about the use of POSIX APIs
-// on Windows, which is supposed to be POSIX compliant...  Some of these
-// functions are also defined in ISO C99...
+/* Visual C++ 2005 incorrectly displays a warning about the use of POSIX APIs
+ * on Windows, which is supposed to be POSIX compliant...  Some of these
+ * functions are also defined in ISO C99...
+ */
 #    ifndef __WATCOMC__
 #      define strdup _strdup
 #      define unlink _unlink
-#    endif // !__WATCOMC__
+#    endif /* !__WATCOMC__ */
 #  elif defined(__EMX__)
 #    define strcasecmp(s,t)	stricmp((s), (t))
 #    define strncasecmp(s,t,n)	strnicmp((s), (t), (n))
@@ -111,5 +112,5 @@ FL_EXPORT extern size_t fl_strlcpy(char *, const char *, size_t);
 
 
 /*
- * End of "$Id: flstring.h 5701 2007-02-20 18:43:10Z mike $".
+ * End of "$Id: flstring.h 6680 2009-03-14 02:11:31Z greg.ercolano $".
  */

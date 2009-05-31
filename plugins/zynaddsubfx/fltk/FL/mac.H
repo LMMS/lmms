@@ -1,9 +1,9 @@
 //
-// "$Id: mac.H 5379 2006-08-29 11:03:05Z matt $"
+// "$Id: mac.H 6614 2009-01-01 16:11:32Z matt $"
 //
 // Mac header file for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2005 by Bill Spitzak and others.
+// Copyright 1998-2009 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -28,8 +28,9 @@
 // Do not directly include this file, instead use <FL/x.H>.  It will
 // include this file if "__APPLE__" is defined.  This is to encourage
 // portability of even the system-specific code...
+#ifndef FL_DOXYGEN
 
-#ifndef Fl_X_H
+#if !defined(Fl_X_H)
 #  error "Never use <FL/mac.H> directly; include <FL/x.H> instead."
 #endif // !Fl_X_H
 
@@ -129,8 +130,8 @@ extern void fl_open_display();
 extern void fl_open_callback(void (*cb)(const char *));
 
 extern FL_EXPORT int fl_parse_color(const char* p, uchar& r, uchar& g, uchar& b);
-
+#endif // FL_DOXYGEN
 //
-// End of "$Id: mac.H 5379 2006-08-29 11:03:05Z matt $".
+// End of "$Id: mac.H 6614 2009-01-01 16:11:32Z matt $".
 //
 

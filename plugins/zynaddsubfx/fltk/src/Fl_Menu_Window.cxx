@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Menu_Window.cxx 5190 2006-06-09 16:16:34Z mike $"
+// "$Id: Fl_Menu_Window.cxx 6616 2009-01-01 21:28:26Z matt $"
 //
 // Menu window code for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2005 by Bill Spitzak and others.
+// Copyright 1998-2009 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -67,7 +67,12 @@ void Fl_Menu_Window::flush() {
   if (!fl_overlay_visual || !overlay()) {Fl_Single_Window::flush(); return;}
   Fl_X *myi = Fl_X::i(this);
   fl_window = myi->xid;
-  if (!gc) gc = XCreateGC(fl_display, myi->xid, 0, 0);
+  if (!gc) {
+	  gc = XCreateGC(fl_display, myi->xid, 0, 0);
+# if defined(USE_CAIRO)
+	  if(Fl::autolink_context()) Fl::cairo_make_current(gc); // capture gc changes automatically to update the cairo context adequately
+# endif
+  }
   fl_gc = gc;
   fl_overlay = 1;
   fl_clip_region(myi->region); myi->region = 0; current_ = this;
@@ -78,6 +83,7 @@ void Fl_Menu_Window::flush() {
 #endif
 }
 
+/** Erases the window, does nothing if HAVE_OVERLAY is not defined config.h */
 void Fl_Menu_Window::erase() {
 #if HAVE_OVERLAY
   if (!gc || !shown()) return;
@@ -94,10 +100,11 @@ void Fl_Menu_Window::hide() {
   Fl_Single_Window::hide();
 }
 
+/**  Destroys the window and all of its children.*/
 Fl_Menu_Window::~Fl_Menu_Window() {
   hide();
 }
 
 //
-// End of "$Id: Fl_Menu_Window.cxx 5190 2006-06-09 16:16:34Z mike $".
+// End of "$Id: Fl_Menu_Window.cxx 6616 2009-01-01 21:28:26Z matt $".
 //

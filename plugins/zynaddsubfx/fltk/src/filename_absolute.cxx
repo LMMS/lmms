@@ -1,9 +1,9 @@
 //
-// "$Id: filename_absolute.cxx 6102 2008-04-21 19:54:34Z matt $"
+// "$Id: filename_absolute.cxx 6691 2009-03-15 21:16:34Z AlbrechtS $"
 //
 // Filename expansion routines for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2005 by Bill Spitzak and others.
+// Copyright 1998-2009 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -32,19 +32,14 @@
 */
 
 #include <FL/filename.H>
+#include <FL/fl_utf8.h>
 #include <stdlib.h>
 #include "flstring.h"
 #include <ctype.h>
 #if defined(WIN32) && !defined(__CYGWIN__)
 # include <direct.h>
-// Visual C++ 2005 incorrectly displays a warning about the use of POSIX APIs
-// on Windows, which is supposed to be POSIX compliant...
-#  define getcwd _getcwd
 #else
 #  include <unistd.h>
-#  ifdef __EMX__
-#    define getcwd _getcwd2
-#  endif
 #endif
 
 #if defined(WIN32) || defined(__EMX__) && !defined(__CYGWIN__)
@@ -53,6 +48,13 @@ inline int isdirsep(char c) {return c=='/' || c=='\\';}
 #define isdirsep(c) ((c)=='/')
 #endif
 
+/**
+ * Makes a filename absolute from a relative filename.
+ * \param[out] to resulting absolute filename
+ * \param[in]  tolen size of the absolute filename buffer 
+ * \param[in]  from relative filename
+ * \return 0 if no change, non zero otherwise
+ */
 int fl_filename_absolute(char *to, int tolen, const char *from) {
   if (isdirsep(*from) || *from == '|'
 #if defined(WIN32) || defined(__EMX__) && !defined(__CYGWIN__)
@@ -67,7 +69,7 @@ int fl_filename_absolute(char *to, int tolen, const char *from) {
   char *temp = new char[tolen];
   const char *start = from;
 
-  a = getcwd(temp, tolen);
+  a = fl_getcwd(temp, tolen);
   if (!a) {
     strlcpy(to, from, tolen);
     delete[] temp;
@@ -106,10 +108,13 @@ int fl_filename_absolute(char *to, int tolen, const char *from) {
   return 1;
 }
 
-/*
- * 'fl_filename_relative()' - Make a filename relative to the current working directory.
+/**
+ * Makes a filename relative to the current working directory.
+ * \param[out] to resulting relative filename
+ * \param[in]  tolen size of the relative filename buffer 
+ * \param[in]  from absolute filename
+ * \return 0 if no change, non zero otherwise
  */
-
 int					// O - 0 if no change, 1 if changed
 fl_filename_relative(char       *to,	// O - Relative filename
                      int        tolen,	// I - Size of "to" buffer
@@ -120,7 +125,7 @@ fl_filename_relative(char       *to,	// O - Relative filename
   char          *cwd = cwd_buf;
 
 
-  // return if "from" is not an absolue path
+  // return if "from" is not an absolute path
 #if defined(WIN32) || defined(__EMX__)
   if (from[0] == '\0' ||
       (!isdirsep(*from) && !isalpha(*from) && from[1] != ':' &&
@@ -133,7 +138,7 @@ fl_filename_relative(char       *to,	// O - Relative filename
   }
 
   // get the current directory and return if we can't
-  if (!getcwd(cwd_buf, sizeof(cwd_buf))) {
+  if (!fl_getcwd(cwd_buf, sizeof(cwd_buf))) {
     strlcpy(to, from, tolen);
     return 0;
   }
@@ -151,6 +156,7 @@ fl_filename_relative(char       *to,	// O - Relative filename
 
   // test for the same drive. Return the absolute path if not
   if (tolower(*from & 255) != tolower(*cwd & 255)) {
+    // Not the same drive...
     strlcpy(to, from, tolen);
     return 0;
   }
@@ -208,5 +214,5 @@ fl_filename_relative(char       *to,	// O - Relative filename
 
 
 //
-// End of "$Id: filename_absolute.cxx 6102 2008-04-21 19:54:34Z matt $".
+// End of "$Id: filename_absolute.cxx 6691 2009-03-15 21:16:34Z AlbrechtS $".
 //

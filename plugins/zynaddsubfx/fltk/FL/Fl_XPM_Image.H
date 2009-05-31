@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_XPM_Image.H 4288 2005-04-16 00:13:17Z mike $"
+// "$Id: Fl_XPM_Image.H 6614 2009-01-01 16:11:32Z matt $"
 //
 // XPM image header file for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2005 by Bill Spitzak and others.
+// Copyright 1998-2009 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -25,10 +25,18 @@
 //     http://www.fltk.org/str.php
 //
 
+/* \file
+  
+   Fl_XPM_Image class . */
+
 #ifndef Fl_XPM_Image_H
 #define Fl_XPM_Image_H
 #  include "Fl_Pixmap.H"
 
+/**
+  The Fl_XPM_Image class supports loading, caching,
+  and drawing of X Pixmap (XPM) images, including transparency.
+*/
 class FL_EXPORT Fl_XPM_Image : public Fl_Pixmap {
 
   public:
@@ -39,5 +47,5 @@ class FL_EXPORT Fl_XPM_Image : public Fl_Pixmap {
 #endif // !Fl_XPM_Image
 
 //
-// End of "$Id: Fl_XPM_Image.H 4288 2005-04-16 00:13:17Z mike $".
+// End of "$Id: Fl_XPM_Image.H 6614 2009-01-01 16:11:32Z matt $".
 //

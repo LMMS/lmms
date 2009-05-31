@@ -1,11 +1,11 @@
 //
-// "$Id: Fl_File_Icon.cxx 5190 2006-06-09 16:16:34Z mike $"
+// "$Id: Fl_File_Icon.cxx 6616 2009-01-01 21:28:26Z matt $"
 //
 // Fl_File_Icon routines.
 //
 // KDE icon code donated by Maarten De Boer.
 //
-// Copyright 1999-2005 by Michael Sweet.
+// Copyright 1999-2009 by Michael Sweet.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -43,6 +43,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <FL/fl_utf8.h>
 #include "flstring.h"
 #include <errno.h>
 #include <sys/types.h>
@@ -80,10 +81,13 @@
 Fl_File_Icon	*Fl_File_Icon::first_ = (Fl_File_Icon *)0;
 
 
-//
-// 'Fl_File_Icon::Fl_File_Icon()' - Create a new file icon.
-//
-
+/**
+  Creates a new Fl_File_Icon with the specified information.
+  \param[in] p filename pattern
+  \param[in] t file type
+  \param[in] nd number of data values
+  \param[in] d data values
+*/
 Fl_File_Icon::Fl_File_Icon(const char *p,	/* I - Filename pattern */
                 	   int        t,	/* I - File type */
 			   int        nd,	/* I - Number of data values */
@@ -113,12 +117,11 @@ Fl_File_Icon::Fl_File_Icon(const char *p,	/* I - Filename pattern */
 }
 
 
-//
-// 'Fl_File_Icon::~Fl_File_Icon()' - Remove a file icon.
-//
-
-Fl_File_Icon::~Fl_File_Icon()
-{
+/**
+  The destructor destroys the icon and frees all memory that has been
+  allocated for it.
+*/
+Fl_File_Icon::~Fl_File_Icon() {
   Fl_File_Icon	*current,	// Current icon in list
 		*prev;		// Previous icon in list
 
@@ -143,10 +146,10 @@ Fl_File_Icon::~Fl_File_Icon()
 }
 
 
-//
-// 'Fl_File_Icon::add()' - Add data to an icon.
-//
-
+/**
+  Adds a keyword value to the icon array, returning a pointer to it.
+  \param[in] d data value
+*/
 short *				// O - Pointer to new data value
 Fl_File_Icon::add(short d)	// I - Data to add
 {
@@ -177,10 +180,12 @@ Fl_File_Icon::add(short d)	// I - Data to add
 }
 
 
-//
-// 'Fl_File_Icon::find()' - Find an icon based upon a given file.
-//
-
+/**
+  Finds an icon that matches the given filename and file type.
+  \param[in] filename name of file
+  \param[in] filetype enumerated file type
+  \return matching file icon or NULL
+*/
 Fl_File_Icon *				// O - Matching file icon or NULL
 Fl_File_Icon::find(const char *filename,// I - Name of file */
                    int        filetype)	// I - Enumerated file type
@@ -203,7 +208,7 @@ Fl_File_Icon::find(const char *filename,// I - Name of file */
     else
       filetype = PLAIN;
 #else
-    if (!stat(filename, &fileinfo))
+    if (!fl_stat(filename, &fileinfo))
     {
       if (S_ISDIR(fileinfo.st_mode))
         filetype = DIRECTORY;
@@ -242,11 +247,12 @@ Fl_File_Icon::find(const char *filename,// I - Name of file */
   return (current);
 }
 
-
-//
-// 'Fl_File_Icon::draw()' - Draw an icon.
-//
-
+/**
+  Draws an icon in the indicated area.
+  \param[in] x, y, w, h position and size
+  \param[in] ic icon color
+  \param[in] active status, default is active [non-zero]
+*/
 void
 Fl_File_Icon::draw(int      x,		// I - Upper-lefthand X
         	   int      y,		// I - Upper-lefthand Y
@@ -445,23 +451,24 @@ Fl_File_Icon::draw(int      x,		// I - Upper-lefthand X
   fl_pop_matrix();
 }
 
-
-//
-// 'Fl_File_Icon::label()' - Set the widget's label to an icon.
-//
-
-void
-Fl_File_Icon::label(Fl_Widget *w)	// I - Widget to label
+/**
+  Applies the icon to the widget, registering the Fl_File_Icon
+  label type as needed.
+  \param[in] w widget for which this icon will become the label
+*/
+void Fl_File_Icon::label(Fl_Widget *w)	// I - Widget to label
 {
   Fl::set_labeltype(_FL_ICON_LABEL, labeltype, 0);
   w->label(_FL_ICON_LABEL, (const char*)this);
 }
 
 
-//
-// 'Fl_File_Icon::labeltype()' - Draw the icon label.
-//
-
+/**
+  Draw the icon label.
+  \param[in] o label data
+  \param[in] x, y, w, h position and size of label
+  \param[in] a label alignment [not used]
+*/
 void
 Fl_File_Icon::labeltype(const Fl_Label *o,	// I - Label data
                 	int            x,	// I - X position of label
@@ -481,5 +488,5 @@ Fl_File_Icon::labeltype(const Fl_Label *o,	// I - Label data
 
 
 //
-// End of "$Id: Fl_File_Icon.cxx 5190 2006-06-09 16:16:34Z mike $".
+// End of "$Id: Fl_File_Icon.cxx 6616 2009-01-01 21:28:26Z matt $".
 //

@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Tooltip.H 4288 2005-04-16 00:13:17Z mike $"
+// "$Id: Fl_Tooltip.H 6614 2009-01-01 16:11:32Z matt $"
 //
 // Tooltip header file for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2005 by Bill Spitzak and others.
+// Copyright 1998-2009 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -25,53 +25,85 @@
 //     http://www.fltk.org/str.php
 //
 
+/* \file
+   Fl_Tooltip widget . */
+
 #ifndef Fl_Tooltip_H
 #define Fl_Tooltip_H
 
 #include <FL/Fl.H>
 #include <FL/Fl_Widget.H>
 
+/**
+  The Fl_Tooltip class provides tooltip support for
+  all FLTK widgets. It contains only static methods.
+*/
 class FL_EXPORT Fl_Tooltip {
 public:
+  /**    Gets the tooltip delay. The default delay is 1.0 seconds.  */
   static float delay() { return delay_; }
+  /**    Sets the tooltip delay. The default delay is 1.0 seconds.  */
   static void delay(float f) { delay_ = f; }
+  /**
+    Gets the tooltip hover delay, the delay between tooltips.
+    The default delay is 0.2 seconds.
+  */
   static float hoverdelay() { return hoverdelay_; }
+  /**
+    Sets the tooltip hover delay, the delay between tooltips.
+    The default delay is 0.2 seconds.
+  */
   static void hoverdelay(float f) { hoverdelay_ = f; }
+  /**    Returns non-zero if tooltips are enabled.  */
   static int enabled() { return enabled_; }
+  /**    Enables tooltips on all widgets (or disables if <i>b</i> is false).  */
   static void enable(int b = 1) { enabled_ = b;}
+  /**    Same as enable(0), disables tooltips on all widgets.  */
   static void disable() { enabled_ = 0; }
   static void (*enter)(Fl_Widget* w);
   static void enter_area(Fl_Widget* w, int X, int Y, int W, int H, const char* tip);
   static void (*exit)(Fl_Widget *w);
+  /** Gets the current widget target */
   static Fl_Widget* current() {return widget_;}
   static void current(Fl_Widget*);
 
-  static int font() { return font_; }
-  static int size() { return size_; }
-  static void font(int i) { font_ = i; }
-  static void size(int s) { size_ = s; }
-  static void color(unsigned c) { color_ = c; }
+  /**    Gets the typeface for the tooltip text.  */
+  static Fl_Font font() { return font_; }
+  /**    Sets the typeface for the tooltip text.  */
+  static void font(Fl_Font i) { font_ = i; }
+  /**    Gets the size of the tooltip text.  */
+  static Fl_Fontsize size() { return size_; }
+  /**    Sets the size of the tooltip text.  */
+  static void size(Fl_Fontsize s) { size_ = s; }
+  /** Gets the background color for tooltips. The default background color is a pale yellow.  */
   static Fl_Color color() { return (Fl_Color)color_; }
-  static void textcolor(unsigned c) { textcolor_ = c; }
+  /** Sets the background color for tooltips. The default background color is a pale yellow.  */
+  static void color(unsigned c) { color_ = c; }
+  /** Gets the color of the text in the tooltip. The default is  black. */
   static Fl_Color textcolor() { return (Fl_Color)textcolor_; }
+  /** Sets the color of the text in the tooltip. The default is  black. */
+  static void textcolor(unsigned c) { textcolor_ = c; }
 
   // These should not be public, but Fl_Widget::tooltip() needs them...
+  // fabien: made it private with only a friend function access
+private:
+  friend void Fl_Widget::tooltip(const char *);
   static void enter_(Fl_Widget* w);
   static void exit_(Fl_Widget *w);
 
 private:
-  static float delay_;
-  static float hoverdelay_;
+  static float delay_; //!< delay before a tooltip is shown
+  static float hoverdelay_; //!< delay between tooltips
   static int enabled_;
   static unsigned color_;
   static unsigned textcolor_;
-  static int font_;
-  static int size_;
-  static Fl_Widget* widget_;
+  static Fl_Font font_;
+  static Fl_Fontsize size_;
+  static Fl_Widget* widget_; //!< Keeps track of the current target widget
 };
 
 #endif
 
 //
-// End of "$Id: Fl_Tooltip.H 4288 2005-04-16 00:13:17Z mike $".
+// End of "$Id: Fl_Tooltip.H 6614 2009-01-01 16:11:32Z matt $".
 //

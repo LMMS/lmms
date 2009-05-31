@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Menu_.cxx 5190 2006-06-09 16:16:34Z mike $"
+// "$Id: Fl_Menu_.cxx 6660 2009-02-15 18:58:03Z AlbrechtS $"
 //
 // Common menu code for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2005 by Bill Spitzak and others.
+// Copyright 1998-2009 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -24,7 +24,6 @@
 //
 //     http://www.fltk.org/str.php
 //
-
 // This is a base class for all items that have a menu:
 //	Fl_Menu_Bar, Fl_Menu_Button, Fl_Choice
 // This provides storage for a menu item, functions to add/modify/delete
@@ -38,15 +37,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-// Set 'pathname' of specified menuitem
-//    If finditem==NULL, mvalue() is used (the most recently picked menuitem)
-//    Returns:
-//       0 : OK
-//      -1 : item not found (name="")
-//      -2 : 'name' not large enough (name="")
-//
-#define SAFE_STRCAT(s) \
-    { len += strlen(s); if ( len >= namelen ) { *name='\0'; return(-2); } else strcat(name,(s)); }
+#define SAFE_STRCAT(s) { len += strlen(s); if ( len >= namelen ) { *name='\0'; return(-2); } else strcat(name,(s)); }
+
+/** Set 'pathname' of specified menuitem
+    If finditem==NULL, mvalue() is used (the most recently picked menuitem)
+    Returns:
+    -   0 : OK
+    -  -1 : item not found (name="")
+    -  -2 : 'name' not large enough (name="")
+*/
 int Fl_Menu_::item_pathname(char *name, int namelen, const Fl_Menu_Item *finditem) const {
     int len = 0;
     finditem = finditem ? finditem : mvalue();    
@@ -75,14 +74,13 @@ int Fl_Menu_::item_pathname(char *name, int namelen, const Fl_Menu_Item *findite
     return(-1);						// item not found
 }
 
-// FIND MENU ITEM INDEX, GIVEN MENU PATHNAME
-//     eg. "Edit/Copy"
-//     Will also return submenus, eg. "Edit"
-//     Returns NULL if not found.
-//
-const Fl_Menu_Item *
-Fl_Menu_::find_item(const char *name)
-{
+/**
+  Find menu item index, given menu pathname
+     eg. "Edit/Copy"
+     Will also return submenus, eg. "Edit"
+     Returns NULL if not found.
+*/
+const Fl_Menu_Item * Fl_Menu_::find_item(const char *name) {
   char menupath[1024] = "";	// File/Export
 
   for ( int t=0; t < size(); t++ ) {
@@ -115,15 +113,23 @@ Fl_Menu_::find_item(const char *name)
   return (const Fl_Menu_Item *)0;
 }
 
+/**
+  The value is the index into menu() of the last item chosen by
+  the user.  It is zero initially.  You can set it as an integer, or set
+  it with a pointer to a menu item.  The set routines return non-zero if
+  the new value is different than the old one.
+*/
 int Fl_Menu_::value(const Fl_Menu_Item* m) {
   clear_changed();
   if (value_ != m) {value_ = m; return 1;}
   return 0;
 }
 
-// When user picks a menu item, call this.  It will do the callback.
-// Unfortunatly this also casts away const for the checkboxes, but this
-// was necessary so non-checkbox menus can really be declared const...
+/** 
+ When user picks a menu item, call this.  It will do the callback.
+ Unfortunately this also casts away const for the checkboxes, but this
+ was necessary so non-checkbox menus can really be declared const...
+*/
 const Fl_Menu_Item* Fl_Menu_::picked(const Fl_Menu_Item* v) {
   if (v) {
     if (v->radio()) {
@@ -150,7 +156,7 @@ const Fl_Menu_Item* Fl_Menu_::picked(const Fl_Menu_Item* v) {
   return v;
 }
 
-// turn on one of a set of radio buttons
+/** Turns the radio item "on" for the menu item and turns off adjacent radio items set. */
 void Fl_Menu_Item::setonly() {
   flags |= FL_MENU_RADIO | FL_MENU_VALUE;
   Fl_Menu_Item* j;
@@ -167,6 +173,10 @@ void Fl_Menu_Item::setonly() {
 }
 
 Fl_Menu_::Fl_Menu_(int X,int Y,int W,int H,const char* l)
+/**
+  Creates a new Fl_Menu_ widget using the given position, size,
+  and label string.  menu() is initialized to null.
+*/
 : Fl_Widget(X,Y,W,H,l) {
   set_flag(SHORTCUT_LABEL);
   box(FL_UP_BOX);
@@ -175,16 +185,29 @@ Fl_Menu_::Fl_Menu_(int X,int Y,int W,int H,const char* l)
   alloc = 0;
   selection_color(FL_SELECTION_COLOR);
   textfont(FL_HELVETICA);
-  textsize((uchar)FL_NORMAL_SIZE);
+  textsize(FL_NORMAL_SIZE);
   textcolor(FL_FOREGROUND_COLOR);
   down_box(FL_NO_BOX);
 }
 
+/**
+  This returns the number of Fl_Menu_Item structures that make up the
+  menu, correctly counting submenus.  This includes the "terminator"
+  item at the end.  To copy a menu array you need to copy
+  size()*sizeof(Fl_Menu_Item) bytes.  If the menu is
+  NULL this returns zero (an empty menu will return 1).
+*/
 int Fl_Menu_::size() const {
   if (!menu_) return 0;
   return menu_->size();
 }
 
+/**
+    Sets the menu array pointer directly.  If the old menu is private it is
+    deleted.  NULL is allowed and acts the same as a zero-length
+    menu.  If you try to modify the array (with add(), replace(), or
+    delete()) a private copy is automatically done.
+*/
 void Fl_Menu_::menu(const Fl_Menu_Item* m) {
   clear();
   value_ = menu_ = (Fl_Menu_Item*)m;
@@ -192,13 +215,18 @@ void Fl_Menu_::menu(const Fl_Menu_Item* m) {
 
 // this version is ok with new Fl_Menu_add code with fl_menu_array_owner:
 
+/** 
+  Sets the menu array pointer with a copy of m that will be automatically deleted. 
+  If ud is not NULL, then all user data pointers are changed in the menus as well.
+  See void Fl_Menu_::menu(const Fl_Menu_Item* m). 
+*/
 void Fl_Menu_::copy(const Fl_Menu_Item* m, void* ud) {
   int n = m->size();
   Fl_Menu_Item* newMenu = new Fl_Menu_Item[n];
   memcpy(newMenu, m, n*sizeof(Fl_Menu_Item));
   menu(newMenu);
   alloc = 1; // make destructor free array, but not strings
-  // for convienence, provide way to change all the user data pointers:
+  // for convenience, provide way to change all the user data pointers:
   if (ud) for (; n--;) {
     if (newMenu->callback_) newMenu->user_data_ = ud;
     newMenu++;
@@ -213,6 +241,12 @@ Fl_Menu_::~Fl_Menu_() {
 // expanding array.  We must not free this array:
 Fl_Menu_* fl_menu_array_owner = 0;
 
+/**
+  Same as menu(NULL), set the array pointer to null, indicating
+  a zero-length menu.
+  
+  Menus must not be cleared during a callback to the same menu.
+*/
 void Fl_Menu_::clear() {
   if (alloc) {
     if (alloc>1) for (int i = size(); i--;)
@@ -228,5 +262,5 @@ void Fl_Menu_::clear() {
 }
 
 //
-// End of "$Id: Fl_Menu_.cxx 5190 2006-06-09 16:16:34Z mike $".
+// End of "$Id: Fl_Menu_.cxx 6660 2009-02-15 18:58:03Z AlbrechtS $".
 //

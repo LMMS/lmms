@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Round_Button.cxx 5190 2006-06-09 16:16:34Z mike $"
+// "$Id: Fl_Round_Button.cxx 6616 2009-01-01 21:28:26Z matt $"
 //
 // Round button for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2005 by Bill Spitzak and others.
+// Copyright 1998-2009 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -27,11 +27,15 @@
 
 // A subclass of Fl_Button that always draws as a round circle.  This
 // circle is smaller than the widget size and can be surrounded by
-// another box type, for compatability with Forms.
+// another box type, for compatibility with Forms.
 
 #include <FL/Fl.H>
 #include <FL/Fl_Round_Button.H>
 
+/**
+  Creates a new Fl_Round_Button widget using the given
+  position, size, and label string.
+*/
 Fl_Round_Button::Fl_Round_Button(int X,int Y,int W,int H, const char *l)
 : Fl_Light_Button(X,Y,W,H,l) {
   box(FL_NO_BOX);
@@ -40,5 +44,5 @@ Fl_Round_Button::Fl_Round_Button(int X,int Y,int W,int H, const char *l)
 }
 
 //
-// End of "$Id: Fl_Round_Button.cxx 5190 2006-06-09 16:16:34Z mike $".
+// End of "$Id: Fl_Round_Button.cxx 6616 2009-01-01 21:28:26Z matt $".
 //

@@ -1,9 +1,9 @@
 //
-// "$Id: fl_draw_image_win32.cxx 5436 2006-09-16 16:02:00Z matt $"
+// "$Id: fl_draw_image_win32.cxx 6616 2009-01-01 21:28:26Z matt $"
 //
 // WIN32 image drawing code for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2005 by Bill Spitzak and others.
+// Copyright 1998-2009 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -39,7 +39,7 @@
 // Micro$oft picked a bottom-up and BGR storage format for their
 // DIB images.  I'm pretty certain there is a way around this, but
 // I can't find any other than the brute-force method of drawing
-// each line as a seperate image.  This may also need to be done
+// each line as a separate image.  This may also need to be done
 // if the delta is any amount other than 1, 3, or 4.
 
 ////////////////////////////////////////////////////////////////
@@ -311,5 +311,5 @@ void fl_rectf(int x, int y, int w, int h, uchar r, uchar g, uchar b) {
 }
 
 //
-// End of "$Id: fl_draw_image_win32.cxx 5436 2006-09-16 16:02:00Z matt $".
+// End of "$Id: fl_draw_image_win32.cxx 6616 2009-01-01 21:28:26Z matt $".
 //

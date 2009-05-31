@@ -1,10 +1,10 @@
 /*
- * "$Id: configh.cmake.in 6106 2008-04-21 21:10:47Z matt $"
+ * "$Id: configh.cmake.in 6614 2009-01-01 16:11:32Z matt $"
  *
  * Configuration file for the Fast Light Tool Kit (FLTK).
  * @configure_input@
  *
- * Copyright 1998-2008 by Bill Spitzak and others.
+ * Copyright 1998-2009 by Bill Spitzak and others.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -46,6 +46,8 @@
  */
 
 #define BORDER_WIDTH 2
+
+#cmakedefine USE_X11 1
 
 /*
  * HAVE_GL:
@@ -265,5 +267,5 @@
 #endif
 
 /*
- * End of "$Id: configh.cmake.in 6106 2008-04-21 21:10:47Z matt $".
+ * End of "$Id: configh.cmake.in 6614 2009-01-01 16:11:32Z matt $".
  */

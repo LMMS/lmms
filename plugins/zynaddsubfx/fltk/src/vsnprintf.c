@@ -1,9 +1,9 @@
 /*
- * "$Id: vsnprintf.c 5850 2007-05-21 15:56:17Z matt $"
+ * "$Id: vsnprintf.c 6616 2009-01-01 21:28:26Z matt $"
  *
  * snprintf() and vsnprintf() functions for the Fast Light Tool Kit (FLTK).
  *
- * Copyright 1998-2007 by Bill Spitzak and others.
+ * Copyright 1998-2009 by Bill Spitzak and others.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -276,6 +276,6 @@ int fl_snprintf(char* str, size_t size, const char* fmt, ...) {
 #endif
 
 /*
- * End of "$Id: vsnprintf.c 5850 2007-05-21 15:56:17Z matt $".
+ * End of "$Id: vsnprintf.c 6616 2009-01-01 21:28:26Z matt $".
  */
 

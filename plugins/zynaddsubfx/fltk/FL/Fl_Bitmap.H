@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Bitmap.H 4288 2005-04-16 00:13:17Z mike $"
+// "$Id: Fl_Bitmap.H 6614 2009-01-01 16:11:32Z matt $"
 //
 // Bitmap header file for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2005 by Bill Spitzak and others.
+// Copyright 1998-2009 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -25,6 +25,9 @@
 //     http://www.fltk.org/str.php
 //
 
+/* \file
+   Fl_Bitmap widget . */
+
 #ifndef Fl_Bitmap_H
 #define Fl_Bitmap_H
 #  include "Fl_Image.H"
@@ -32,19 +35,28 @@
 class Fl_Widget;
 struct Fl_Menu_Item;
 
+/**
+  The Fl_Bitmap class supports caching and drawing of mono-color
+  (bitmap) images. Images are drawn using the current color.
+*/
 class FL_EXPORT Fl_Bitmap : public Fl_Image {
   public:
 
+  /** pointer to raw bitmap data */
   const uchar *array;
-  int alloc_array; // Non-zero if data was allocated
+  /** Non-zero if array points to bitmap data allocated internally */
+  int alloc_array;
 #if defined(__APPLE__) || defined(WIN32)
-  void *id; // for internal use
+  /** for internal use */
+  void *id;
 #else
-  unsigned id; // for internal use
+  /** for internal use */
+  unsigned id;
 #endif // __APPLE__ || WIN32
-  
+  /** The constructors create a new bitmap from the specified bitmap data */
   Fl_Bitmap(const uchar *bits, int W, int H) :
     Fl_Image(W,H,0), array(bits), alloc_array(0), id(0) {data((const char **)&array, 1);}
+  /** The constructors create a new bitmap from the specified bitmap data */
   Fl_Bitmap(const char *bits, int W, int H) :
     Fl_Image(W,H,0), array((const uchar *)bits), alloc_array(0), id(0) {data((const char **)&array, 1);}
   virtual ~Fl_Bitmap();
@@ -60,5 +72,5 @@ class FL_EXPORT Fl_Bitmap : public Fl_Image {
 #endif
 
 //
-// End of "$Id: Fl_Bitmap.H 4288 2005-04-16 00:13:17Z mike $".
+// End of "$Id: Fl_Bitmap.H 6614 2009-01-01 16:11:32Z matt $".
 //

@@ -3,11 +3,11 @@ version 1.0108
 header_name {../FL/Fl_Help_Dialog.H} 
 code_name {.cxx}
 comment {//
-// "$Id: Fl_Help_Dialog.fl 5643 2007-01-28 19:36:51Z mike $"
+// "$Id: Fl_Help_Dialog.fl 6616 2009-01-01 21:28:26Z matt $"
 //
 // Fl_Help_Dialog dialog for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2005 by Bill Spitzak and others.
+// Copyright 1998-2009 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -204,7 +204,7 @@ window_->label(view_->title());} {}
   } {
     code {window_->show(argc, argv);} {}
   }
-  Function {textsize(uchar s)} {return_type void
+  Function {textsize(Fl_Fontsize s)} {return_type void
   } {
     code {view_->textsize(s);
 
@@ -218,7 +218,7 @@ if (s >= 18)
 else
   larger_->activate();} {}
   }
-  Function {textsize()} {return_type uchar
+  Function {textsize()} {return_type Fl_Fontsize
   } {
     code {return (view_->textsize());} {}
   }
@@ -260,6 +260,6 @@ window_->label(view_->title());} {}
 
 comment {
 //
-// End of "$Id: Fl_Help_Dialog.fl 5643 2007-01-28 19:36:51Z mike $".
+// End of "$Id: Fl_Help_Dialog.fl 6616 2009-01-01 21:28:26Z matt $".
 //} {in_source in_header
 } 

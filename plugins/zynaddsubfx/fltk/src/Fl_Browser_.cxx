@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Browser_.cxx 5992 2007-12-15 16:20:16Z mike $"
+// "$Id: Fl_Browser_.cxx 6737 2009-04-02 06:44:34Z greg.ercolano $"
 //
 // Base Browser widget class for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2006 by Bill Spitzak and others.
+// Copyright 1998-2009 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -36,7 +36,7 @@
 
 // This is the base class for browsers.  To be useful it must be
 // subclassed and several virtual functions defined.  The
-// Forms-compatable browser and the file chooser's browser are
+// Forms-compatible browser and the file chooser's browser are
 // subclassed off of this.
 
 // Yes, I know this should be a template...
@@ -67,39 +67,38 @@ static void hscrollbar_callback(Fl_Widget* s, void*) {
   ((Fl_Browser_*)(s->parent()))->hposition(int(((Fl_Scrollbar*)s)->value()));
 }
 
-// Scrollbar size should be part of the Fl class, but is left here for
-// binary compatibility in 1.1.x - M. Sweet
-int Fl_Browser_::scrollbar_width_ = 16;
-
-// Get the standard scrollbar size
-int Fl::scrollbar_size() {
-  return Fl_Browser_::scrollbar_width();
-}
-
-// Set the standard scrollbar size
-void Fl::scrollbar_size(int W) {
-  Fl_Browser_::scrollbar_width(W);
-}
-
 // return where to draw the actual box:
+/**
+  Returns the bounding box for the interior of the list's display window, inside
+  the scrollbars.
+  \param[out] X,Y,W,H The returned bounding box.\n
+                      (The original contents of these parameters are overwritten)
+*/
 void Fl_Browser_::bbox(int& X, int& Y, int& W, int& H) const {
+  int scrollsize = scrollbar_size_ ? scrollbar_size_ : Fl::scrollbar_size();
   Fl_Boxtype b = box() ? box() : FL_DOWN_BOX;
   X = x()+Fl::box_dx(b);
   Y = y()+Fl::box_dy(b);
   W = w()-Fl::box_dw(b);
   H = h()-Fl::box_dh(b);
   if (scrollbar.visible()) {
-    W -= scrollbar_width_;
-    if (scrollbar.align() & FL_ALIGN_LEFT) X += scrollbar_width_;
+    W -= scrollsize;
+    if (scrollbar.align() & FL_ALIGN_LEFT) X += scrollsize;
   }
   if (W < 0) W = 0;
   if (hscrollbar.visible()) {
-    H -= scrollbar_width_;
-    if (scrollbar.align() & FL_ALIGN_TOP) Y += scrollbar_width_;
+    H -= scrollsize;
+    if (scrollbar.align() & FL_ALIGN_TOP) Y += scrollsize;
   }
   if (H < 0) H = 0;
 }
 
+/**
+  This method returns the X position of the left edge of the list area
+  after adjusting for the scrollbar and border, if any.
+  \returns The X position of the left edge of the list, in pixels.
+  \see Fl_Browser_::bbox()
+*/
 int Fl_Browser_::leftedge() const {
   int X, Y, W, H; bbox(X, Y, W, H);
   return X;
@@ -108,22 +107,33 @@ int Fl_Browser_::leftedge() const {
 // The scrollbars may be moved again by draw(), since each one's size
 // depends on whether the other is visible or not.  This skips over
 // Fl_Group::resize since it moves the scrollbars uselessly.
+/**
+  Repositions and/or resizes the browser.
+  \param[in] X,Y,W,H The new position and size for the browser, in pixels.
+*/
 void Fl_Browser_::resize(int X, int Y, int W, int H) {
+  int scrollsize = scrollbar_size_ ? scrollbar_size_ : Fl::scrollbar_size();
   Fl_Widget::resize(X, Y, W, H);
   // move the scrollbars so they can respond to events:
   bbox(X,Y,W,H);
   scrollbar.resize(
-	scrollbar.align()&FL_ALIGN_LEFT ? X-scrollbar_width_ : X+W,
-	Y, scrollbar_width_, H);
+	scrollbar.align()&FL_ALIGN_LEFT ? X-scrollsize : X+W,
+	Y, scrollsize, H);
   hscrollbar.resize(
-	X, scrollbar.align()&FL_ALIGN_TOP ? Y-scrollbar_width_ : Y+H,
-	W, scrollbar_width_);
+	X, scrollbar.align()&FL_ALIGN_TOP ? Y-scrollsize : Y+H,
+	W, scrollsize);
 }
 
 // Cause minimal update to redraw the given item:
-void Fl_Browser_::redraw_line(void* l) {
-  if (!redraw1 || redraw1 == l) {redraw1 = l; damage(FL_DAMAGE_EXPOSE);}
-  else if (!redraw2 || redraw2 == l) {redraw2 = l; damage(FL_DAMAGE_EXPOSE);}
+/**
+  This method should be called when the contents of \p item has changed,
+  but not its height.
+  \param[in] item The item that needs to be redrawn.
+  \see redraw_lines(), redraw_line()
+*/
+void Fl_Browser_::redraw_line(void* item) {
+  if (!redraw1 || redraw1 == item) {redraw1 = item; damage(FL_DAMAGE_EXPOSE);}
+  else if (!redraw2 || redraw2 == item) {redraw2 = item; damage(FL_DAMAGE_EXPOSE);}
   else damage(FL_DAMAGE_SCROLL);
 }
 
@@ -183,26 +193,51 @@ void Fl_Browser_::update_top() {
 
 // Change position(), top() will update when update_top() is called
 // (probably by draw() or handle()):
-void Fl_Browser_::position(int yy) {
-  if (yy < 0) yy = 0;
-  if (yy == position_) return;
-  position_ = yy;
-  if (yy != real_position_) redraw_lines();
+/**
+  Sets the vertical scroll position of the list to pixel position \p pos.
+  The position is how many pixels of the list are scrolled off the top edge
+  of the screen. Example: A position of '3' scrolls the top three pixels of
+  the list off the top edge of the screen.
+  \param[in] pos The vertical position (in pixels) to scroll the browser to.
+  \see position(), hposition()
+*/
+void Fl_Browser_::position(int pos) {
+  if (pos < 0) pos = 0;
+  if (pos == position_) return;
+  position_ = pos;
+  if (pos != real_position_) redraw_lines();
 }
 
-void Fl_Browser_::hposition(int xx) {
-  if (xx < 0) xx = 0;
-  if (xx == hposition_) return;
-  hposition_ = xx;
-  if (xx != real_hposition_) redraw_lines();
+/**
+  Sets the horizontal scroll position of the list to pixel position \p pos.
+  The position is how many pixels of the list are scrolled off the left edge
+  of the screen. Example: A position of '18' scrolls the left 18 pixels of the list
+  off the left edge of the screen.
+  \param[in] pos The horizontal position (in pixels) to scroll the browser to.
+  \see position(), hposition()
+*/
+void Fl_Browser_::hposition(int pos) {
+  if (pos < 0) pos = 0;
+  if (pos == hposition_) return;
+  hposition_ = pos;
+  if (pos != real_hposition_) redraw_lines();
 }
 
 // Tell whether item is currently displayed:
-int Fl_Browser_::displayed(void* p) const {
+/**
+  Returns non-zero if \p item has been scrolled to a position where it is being displayed.
+  Checks to see if the item's vertical position is within the top and bottom
+  edges of the display window. This does NOT take into account the hide()/show()
+  status of the widget or item.
+  \param[in] item The item to check
+  \returns 1 if visible, 0 if not visible.
+  \see display(), displayed()
+*/
+int Fl_Browser_::displayed(void* item) const {
   int X, Y, W, H; bbox(X, Y, W, H);
   int yy = H+offset_;
   for (void* l = top_; l && yy > 0; l = item_next(l)) {
-    if (l == p) return 1;
+    if (l == item) return 1;
     yy -= item_height(l);
   }
   return 0;
@@ -210,11 +245,16 @@ int Fl_Browser_::displayed(void* p) const {
 
 // Ensure this item is displayed:
 // Messy because we have no idea if it is before top or after bottom:
-void Fl_Browser_::display(void* p) {
+/**
+  Displays the \p item, scrolling the list as necessary.
+  \param[in] item The item to be displayed.
+  \see display(), displayed()
+*/
+void Fl_Browser_::display(void* item) {
 
   // First special case - want to display first item in the list?
   update_top();
-  if (p == item_first()) {position(0); return;}
+  if (item == item_first()) {position(0); return;}
 
   int X, Y, W, H, Yp; bbox(X, Y, W, H);
   void* l = top_;
@@ -222,11 +262,11 @@ void Fl_Browser_::display(void* p) {
   int h1;
 
   // 2nd special case - want to display item already displayed at top of browser?
-  if (l == p) {position(real_position_+Y); return;} // scroll up a bit
+  if (l == item) {position(real_position_+Y); return;} // scroll up a bit
 
   // 3rd special case - want to display item just above top of browser?
   void* lp = item_prev(l);
-  if (lp == p) {position(real_position_+Y-item_quick_height(lp)); return;}
+  if (lp == item) {position(real_position_+Y-item_quick_height(lp)); return;}
 
 #ifdef DISPLAY_SEARCH_BOTH_WAYS_AT_ONCE
   // search for item.  We search both up and down the list at the same time,
@@ -235,7 +275,7 @@ void Fl_Browser_::display(void* p) {
   while (l || lp) {
     if (l) {
       h1 = item_quick_height(l);
-      if (l == p) {
+      if (l == item) {
 	if (Y <= H) { // it is visible or right at bottom
 	  Y = Y+h1-H; // find where bottom edge is
 	  if (Y > 0) position(real_position_+Y); // scroll down a bit
@@ -250,7 +290,7 @@ void Fl_Browser_::display(void* p) {
     if (lp) {
       h1 = item_quick_height(lp);
       Yp -= h1;
-      if (lp == p) {
+      if (lp == item) {
 	if ((Yp + h1) >= 0) position(real_position_+Yp);
 	else position(real_position_+Yp-(H-h1)/2);
 	return;
@@ -264,7 +304,7 @@ void Fl_Browser_::display(void* p) {
   l = top_;
   for (; l; l = item_next(l)) {
     h1 = item_quick_height(l);
-    if (l == p) {
+    if (l == item) {
       if (Y <= H) { // it is visible or right at bottom
 	Y = Y+h1-H; // find where bottom edge is
 	if (Y > 0) position(real_position_+Y); // scroll down a bit
@@ -281,7 +321,7 @@ void Fl_Browser_::display(void* p) {
   for (; l; l = item_prev(l)) {
     h1 = item_quick_height(l);
     Y -= h1;
-    if (l == p) {
+    if (l == item) {
       if ((Y + h1) >= 0) position(real_position_+Y);
       else position(real_position_+Y-(H-h1)/2);
       return;
@@ -291,7 +331,9 @@ void Fl_Browser_::display(void* p) {
 }
 
 // redraw, has side effect of updating top and setting scrollbar:
-
+/**
+  Draws the list within the normal widget bounding box.
+*/
 void Fl_Browser_::draw() {
   int drawsquare = 0;
   update_top();
@@ -356,7 +398,7 @@ J1:
 
   bbox(X, Y, W, H);
 
-  fl_clip(X, Y, W, H);
+  fl_push_clip(X, Y, W, H);
   // for each line, draw it if full redraw or scrolled.  Erase background
   // if not a full redraw or if it is selected:
   void* l = top();
@@ -413,11 +455,12 @@ J1:
   }
 
   // update the scrollbars and redraw them:
+  int scrollsize = scrollbar_size_ ? scrollbar_size_ : Fl::scrollbar_size();
   int dy = top_ ? item_quick_height(top_) : 0; if (dy < 10) dy = 10;
   if (scrollbar.visible()) {
     scrollbar.damage_resize(
-	scrollbar.align()&FL_ALIGN_LEFT ? X-scrollbar_width_ : X+W,
-	Y, scrollbar_width_, H);
+	scrollbar.align()&FL_ALIGN_LEFT ? X-scrollsize : X+W,
+	Y, scrollsize, H);
     scrollbar.value(position_, H, 0, full_height_);
     scrollbar.linesize(dy);
     if (drawsquare) draw_child(scrollbar);
@@ -425,8 +468,8 @@ J1:
   }
   if (hscrollbar.visible()) {
     hscrollbar.damage_resize(
-	X, scrollbar.align()&FL_ALIGN_TOP ? Y-scrollbar_width_ : Y+H,
-	W, scrollbar_width_);
+	X, scrollbar.align()&FL_ALIGN_TOP ? Y-scrollsize : Y+H,
+	W, scrollsize);
     hscrollbar.value(hposition_, W, 0, full_width_);
     hscrollbar.linesize(dy);
     if (drawsquare) draw_child(hscrollbar);
@@ -436,13 +479,20 @@ J1:
   // draw that little square between the scrollbars:
   if (drawsquare && scrollbar.visible() && hscrollbar.visible()) {
     fl_color(parent()->color());
-    fl_rectf(scrollbar.x(), hscrollbar.y(), scrollbar_width_,scrollbar_width_);
+    fl_rectf(scrollbar.x(), hscrollbar.y(), scrollsize, scrollsize);
   }
 
   real_hposition_ = hposition_;
 }
 
 // Quick way to delete and reset everything:
+/**
+  This method should be called when the list data is completely replaced
+  or cleared. It informs the Fl_Browser_ widget that any cached
+  information it has concerning the items is invalid.
+  This method does not clear the list, it just handles the follow up
+  bookkeeping after the list has been cleared.
+*/
 void Fl_Browser_::new_list() {
   top_ = 0;
   position_ = real_position_ = 0;
@@ -456,14 +506,21 @@ void Fl_Browser_::new_list() {
 
 // Tell it that this item is going away, and that this must remove
 // all pointers to it:
-void Fl_Browser_::deleting(void* l) {
-  if (displayed(l)) {
+/**
+  This method should be used when \p item is being deleted from the list.
+  It allows the Fl_Browser_ to discard any cached data it has on the item.
+  This method does not actually delete the item, but handles the follow up
+  bookkeeping after the item has just been deleted.
+  \param[in] item The item being deleted.
+*/
+void Fl_Browser_::deleting(void* item) {
+  if (displayed(item)) {
     redraw_lines();
-    if (l == top_) {
+    if (item == top_) {
       real_position_ -= offset_;
       offset_ = 0;
-      top_ = item_next(l);
-      if (!top_) top_ = item_prev(l);
+      top_ = item_next(item);
+      if (!top_) top_ = item_prev(item);
     }
   } else {
     // we don't know where this item is, recalculate top...
@@ -471,10 +528,19 @@ void Fl_Browser_::deleting(void* l) {
     offset_ = 0;
     top_ = 0;
   }
-  if (l == selection_) selection_ = 0;
-  if (l == max_width_item) {max_width_item = 0; max_width = 0;}
+  if (item == selection_) selection_ = 0;
+  if (item == max_width_item) {max_width_item = 0; max_width = 0;}
 }
 
+/**
+  This method should be used when item \p a is being replaced by item \p b.
+  It allows the Fl_Browser_ to update its cache data as needed,
+  schedules a redraw for the item being changed, and tries to maintain the selection.
+  This method does not actually replace the item, but handles the follow up
+  bookkeeping after the item has just been replaced.
+  \param[in] a Item being replaced
+  \param[in] b Item to replace 'a'
+*/
 void Fl_Browser_::replacing(void* a, void* b) {
   redraw_line(a);
   if (a == selection_) selection_ = b;
@@ -482,6 +548,14 @@ void Fl_Browser_::replacing(void* a, void* b) {
   if (a == max_width_item) {max_width_item = 0; max_width = 0;}
 }
 
+/**
+  This method should be used when two items \p a and \p b are being swapped.
+  It allows the Fl_Browser_ to update its cache data as needed,
+  schedules a redraw for the two items, and tries to maintain the current selection.
+  This method does not actually swap items, but handles the follow up
+  bookkeeping after items have been swapped.
+  \param[in] a,b Items being swapped.
+*/
 void Fl_Browser_::swapping(void* a, void* b) {
   redraw_line(a);
   redraw_line(b);
@@ -491,47 +565,75 @@ void Fl_Browser_::swapping(void* a, void* b) {
   else if (b == top_) top_ = a;
 }
 
+/**
+  This method should be used when an item is in the process of
+  being inserted into the list.
+  It allows the Fl_Browser_ to update its cache data as needed,
+  scheduling a redraw for the affected lines.
+  This method does not actually insert items, but handles the 
+  follow up bookkeeping after items have been inserted.
+  \param[in] a The starting item position
+  \param[in] b The new item being inserted
+*/
 void Fl_Browser_::inserting(void* a, void* b) {
   if (displayed(a)) redraw_lines();
   if (a == top_) top_ = b;
 }
 
-void* Fl_Browser_::find_item(int my) {
+/**
+  This method returns the item under mouse y position \p ypos.
+  NULL is returned if no item is displayed at that position.
+  \param[in] ypos The y position (eg. Fl::event_y()) to find an item under.
+  \returns The item, or NULL if not found
+*/
+void* Fl_Browser_::find_item(int ypos) {
   update_top();
   int X, Y, W, H; bbox(X, Y, W, H);
-  void* l;
   int yy = Y-offset_;
-  for (l = top_; l; l = item_next(l)) {
+  for (void *l = top_; l; l = item_next(l)) {
     int hh = item_height(l); if (hh <= 0) continue;
     yy += hh;
-    if (my <= yy || yy>=(Y+H)) return l;
+    if (ypos <= yy || yy>=(Y+H)) return l;
   }
   return 0;
 }
 
-int Fl_Browser_::select(void* l, int i, int docallbacks) {
+/**
+  Sets the selection state of \p item to \p val,
+  and returns 1 if the state changed or 0 if it did not.
+  
+  If \p docallbacks is non-zero, select tries to call
+  the callback function for the widget.
+
+  \param[in] item The item whose selection state is to be changed
+  \param[in] val The new selection state (1=select, 0=de-select)
+  \param[in] docallbacks If 1, invokes widget callback if item changed.\n
+                         If 0, doesn't do callback (default).
+  \returns 1 if state was changed, 0 if not.
+*/
+int Fl_Browser_::select(void* item, int val, int docallbacks) {
   if (type() == FL_MULTI_BROWSER) {
-    if (selection_ != l) {
+    if (selection_ != item) {
       if (selection_) redraw_line(selection_);
-      selection_ = l;
-      redraw_line(l);
+      selection_ = item;
+      redraw_line(item);
     }
-    if ((!i)==(!item_selected(l))) return 0;
-    item_select(l, i);
-    redraw_line(l);
+    if ((!val)==(!item_selected(item))) return 0;
+    item_select(item, val);
+    redraw_line(item);
   } else {
-    if (i && selection_ == l) return 0;
-    if (!i && selection_ != l) return 0;
+    if (val && selection_ == item) return 0;
+    if (!val && selection_ != item) return 0;
     if (selection_) {
       item_select(selection_, 0);
       redraw_line(selection_);
       selection_ = 0;
     }
-    if (i) {
-      item_select(l, 1);
-      selection_ = l;
-      redraw_line(l);
-      display(l);
+    if (val) {
+      item_select(item, 1);
+      selection_ = item;
+      redraw_line(item);
+      display(item);
     }
   }	    
   if (docallbacks) {
@@ -541,6 +643,16 @@ int Fl_Browser_::select(void* l, int i, int docallbacks) {
   return 1;
 }
 
+/**
+  Deselects all items in the list and returns 1 if the state changed
+  or 0 if it did not.
+  
+  If the optional \p docallbacks parameter is non-zero, deselect tries
+  to call the callback function for the widget.
+
+  \param[in] docallbacks If 1, invokes widget callback if item changed.\n
+                         If 0, doesn't do callback (default).
+*/
 int Fl_Browser_::deselect(int docallbacks) {
   if (type() == FL_MULTI_BROWSER) {
     int change = 0;
@@ -556,18 +668,30 @@ int Fl_Browser_::deselect(int docallbacks) {
   }
 }
 
-int Fl_Browser_::select_only(void* l, int docallbacks) {
-  if (!l) return deselect(docallbacks);
+/**
+  Selects \p item and returns 1 if the state changed or 0 if it did not.
+  Any other items in the list are deselected.
+  \param[in] item The \p item to select.
+  \param[in] docallbacks If 1, invokes widget callback if item changed.\n
+                         If 0, doesn't do callback (default).
+*/
+int Fl_Browser_::select_only(void* item, int docallbacks) {
+  if (!item) return deselect(docallbacks);
   int change = 0;
   if (type() == FL_MULTI_BROWSER) {
     for (void* p = item_first(); p; p = item_next(p))
-      if (p != l) change |= select(p, 0, docallbacks);
+      if (p != item) change |= select(p, 0, docallbacks);
   }
-  change |= select(l, 1, docallbacks);
-  display(l);
+  change |= select(item, 1, docallbacks);
+  display(item);
   return change;
 }
 
+/**
+  Handles the \p event within the normal widget bounding box.
+  \param[in] event The event to process.
+  \returns 1 if event was processed, 0 if not.
+*/
 int Fl_Browser_::handle(int event) {
   // must do shortcuts first or the scrollbar will get them...
   if (event == FL_ENTER || event == FL_LEAVE) return 1;
@@ -784,8 +908,13 @@ J1:
   return 0;
 }
 
-Fl_Browser_::Fl_Browser_(int X, int Y, int W, int H, const char* l)
-  : Fl_Group(X, Y, W, H, l),
+/**
+  The constructor makes an empty browser.
+  \param[in] X,Y,W,H position and size.
+  \param[in] L The label string, may be NULL.
+*/
+Fl_Browser_::Fl_Browser_(int X, int Y, int W, int H, const char* L)
+  : Fl_Group(X, Y, W, H, L),
     scrollbar(0, 0, 0, 0, 0), // they will be resized by draw()
     hscrollbar(0, 0, 0, 0, 0)
 {
@@ -799,29 +928,99 @@ Fl_Browser_::Fl_Browser_(int X, int Y, int W, int H, const char* l)
   selection_ = 0;
   color(FL_BACKGROUND2_COLOR, FL_SELECTION_COLOR);
   scrollbar.callback(scrollbar_callback);
-//scrollbar.align(FL_ALIGN_LEFT|FL_ALIGN_BOTTOM); // back compatability?
+//scrollbar.align(FL_ALIGN_LEFT|FL_ALIGN_BOTTOM); // back compatibility?
   hscrollbar.callback(hscrollbar_callback);
   hscrollbar.type(FL_HORIZONTAL);
   textfont_ = FL_HELVETICA;
-  textsize_ = (uchar)FL_NORMAL_SIZE;
+  textsize_ = FL_NORMAL_SIZE;
   textcolor_ = FL_FOREGROUND_COLOR;
   has_scrollbar_ = BOTH;
   max_width = 0;
   max_width_item = 0;
+  scrollbar_size_ = 0;
   redraw1 = redraw2 = 0;
   end();
 }
 
-// Default versions of some of the virtual functions:
-
-int Fl_Browser_::item_quick_height(void* l) const {
-  return item_height(l);
+/**
+  Sort the items in the browser based on \p flags.
+  item_swap(void*, void*) and item_text(void*) must be implemented for this call.
+  \param[in] flags FL_SORT_ASCENDING -- sort in ascending order\n
+                   FL_SORT_DESCENDING -- sort in descending order\n
+		   Values other than the above will cause undefined behavior\n
+		   Other flags may appear in the future.
+  \todo Add a flag to ignore case
+*/
+void Fl_Browser_::sort(int flags) {
+  //
+  // Simple bubble sort - pure lazyness on my side.
+  //
+  int i, j, n = -1, desc = ((flags&FL_SORT_DESCENDING)==FL_SORT_DESCENDING);
+  void *a =item_first(), *b, *c;
+  if (!a) return;
+  while (a) {
+    a = item_next(a);
+    n++;
+  }
+  for (i=n-1; i>0; i--) {
+    char swapped = 0;
+    a = item_first();
+    b = item_next(a);
+    for (j=0; j<i; j++) {
+      const char *ta = item_text(a);
+      const char *tb = item_text(b);
+      c = item_next(b);
+      if (desc) {
+        if (strcmp(ta, tb)<0) {
+          item_swap(a, b);
+          swapped = 1;
+        }
+      } else {
+        if (strcmp(ta, tb)>0) {
+          item_swap(a, b);
+          swapped = 1;
+        }
+      }
+      b = c; a = item_prev(b);
+    }
+    if (!swapped)
+      break;
+  }
 }
 
+// Default versions of some of the virtual functions:
+
+/**
+  This method may be provided by the subclass to return the height of the
+  \p item, in pixels.  
+  Allow for two additional pixels for the list selection box.
+  This method differs from item_height in that it is only called for 
+  selection and scrolling operations. 
+  The default implementation calls item_height.
+  \param[in] item The item whose height to return.
+  \returns The height, in pixels.
+*/
+int Fl_Browser_::item_quick_height(void* item) const {
+  return item_height(item);
+}
+
+/**
+  This method may be provided to return the average height of all items
+  to be used for scrolling. 
+  The default implementation uses the height of the first item.
+  \returns The average height of items, in pixels.
+*/
 int Fl_Browser_::incr_height() const {
   return item_quick_height(item_first());
 }
 
+/**
+  This method may be provided by the subclass to indicate the full height
+  of the item list, in pixels. 
+  The default implementation computes the full height from the item heights. 
+  Includes the items that are scrolled off screen.
+  \returns The height of the entire list, in pixels.
+*/
 int Fl_Browser_::full_height() const {
   int t = 0;
   for (void* p = item_first(); p; p = item_next(p))
@@ -829,14 +1028,35 @@ int Fl_Browser_::full_height() const {
   return t;
 }
 
+/**
+  This method may be provided by the subclass to indicate the full width
+  of the item list, in pixels. 
+  The default implementation computes the full width from the item widths.
+  \returns The maximum width of all the items, in pixels.
+*/
 int Fl_Browser_::full_width() const {
   return max_width;
 }
 
-void Fl_Browser_::item_select(void*, int) {}
+/**
+  This method must be implemented by the subclass if it supports 
+  multiple selections; sets the selection state to \p val for the \p item.
+  Sets the selection state for \p item, where optional \p val is 1 (select, the default)
+  or 0 (de-select).
+  \param[in] item The item to be selected
+  \param[in] val The optional selection state; 1=select, 0=de-select.\n
+                 The default is to select the item (1).
+*/
+void Fl_Browser_::item_select(void *item, int val) {}
 
-int Fl_Browser_::item_selected(void* l) const {return l==selection_;}
+/**
+  This method must be implemented by the subclass if it supports
+  multiple selections; returns the selection state for \p item.
+  The method should return 1 if \p item is selected, or 0 otherwise.
+  \param[in] item The item to test.
+*/
+int Fl_Browser_::item_selected(void* item) const { return item==selection_ ? 1 : 0; }
 
 //
-// End of "$Id: Fl_Browser_.cxx 5992 2007-12-15 16:20:16Z mike $".
+// End of "$Id: Fl_Browser_.cxx 6737 2009-04-02 06:44:34Z greg.ercolano $".
 //

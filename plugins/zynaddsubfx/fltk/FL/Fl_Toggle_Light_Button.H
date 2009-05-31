@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Toggle_Light_Button.H 4288 2005-04-16 00:13:17Z mike $"
+// "$Id: Fl_Toggle_Light_Button.H 6614 2009-01-01 16:11:32Z matt $"
 //
 // Toggle light button header file for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2005 by Bill Spitzak and others.
+// Copyright 1998-2009 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -25,7 +25,7 @@
 //     http://www.fltk.org/str.php
 //
 
-// provided for back-compatability only
+// provided for back-compatibility only
 
 #ifndef Fl_Toggle_Light_Button
 #include "Fl_Light_Button.H"
@@ -33,5 +33,5 @@
 #endif
 
 //
-// End of "$Id: Fl_Toggle_Light_Button.H 4288 2005-04-16 00:13:17Z mike $".
+// End of "$Id: Fl_Toggle_Light_Button.H 6614 2009-01-01 16:11:32Z matt $".
 //
