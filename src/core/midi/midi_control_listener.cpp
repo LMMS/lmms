@@ -180,8 +180,12 @@ void MidiControlListener::act( EventAction _action )
 			}
 			break;
 		case ActionJumpToLoopStart:
+			tl->pos().setTicks( tl->loopBegin().getTicks() );
+			tl->pos().setCurrentFrame( 0 );
 			break;
 		case ActionJumpToLoopEnd:
+			tl->pos().setTicks( tl->loopEnd().getTicks() );
+			tl->pos().setCurrentFrame( 0 );
 			break;
 	}
 }
