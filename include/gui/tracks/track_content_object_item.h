@@ -26,12 +26,12 @@
 #ifndef TRACK_CONTENT_OBJECT_ITEM_H_
 #define TRACK_CONTENT_OBJECT_ITEM_H_
 
+#include <QtCore/QTimeLine>
 #include <QtCore/QVector>
-#include <QGraphicsScene>
-#include <QGraphicsItem>
-#include <QTimeLine>
-#include <QGraphicsItemAnimation>
-#include <QPainter>
+#include <QtGui/QGraphicsScene>
+#include <QtGui/QGraphicsItem>
+#include <QtGui/QGraphicsItemAnimation>
+#include <QtGui/QPainter>
 #include <math.h>
 
 #include "lmms_basics.h"

@@ -1,9 +1,7 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * main_window.cpp - implementation of LMMS-main-window
  *
- * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -38,10 +36,9 @@
 #include <QtGui/QSplitter>
 #include <QtGui/QCheckBox>
 #include <QtGui/QRadioButton>
-#include <QShortcut>
-
-#include <QGraphicsView>
-#include <QPixmapCache>
+#include <QtGui/QShortcut>
+#include <QtGui/QGraphicsView>
+#include <QtGui/QPixmapCache>
 
 
 #include "lmmsversion.h"
@@ -1564,7 +1561,6 @@ void mainWindow::toggleRecordAutomation( bool _recording )
 }
 
 
+
 #include "moc_main_window.cxx"
 
-
-#endif

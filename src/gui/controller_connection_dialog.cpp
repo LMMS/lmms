@@ -30,7 +30,7 @@
 #include <QtGui/QLineEdit>
 #include <QtGui/QPushButton>
 #include <QtGui/QScrollArea>
-#include <QMessageBox>
+#include <QtGui/QMessageBox>
 
 #include "controller_connection_dialog.h"
 #include "controller_connection.h"

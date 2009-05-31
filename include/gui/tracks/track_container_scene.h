@@ -29,7 +29,7 @@
 #define _TRACK_CONTAINER_SCENE_H
 
 #include <QtCore/QVector>
-#include <QGraphicsScene>
+#include <QtGui/QGraphicsScene>
 
 #include "track.h"
 

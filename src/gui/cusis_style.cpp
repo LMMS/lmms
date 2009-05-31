@@ -32,8 +32,7 @@ const int BUTTON_LENGTH = 24;
 #include <QtGui/QPixmapCache>
 #include <QtGui/QStyleOption>
 #include <QtGui/QLinearGradient>
-
-#include <QScrollBar>
+#include <QtGui/QScrollBar>
 
 #include "cusis_style.h"
 #include "gui_templates.h"

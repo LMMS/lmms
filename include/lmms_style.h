@@ -27,9 +27,9 @@
 #ifndef _LMMS_STYLE_H
 #define _LMMS_STYLE_H
 
+#include <QtCore/QRect>
+#include <QtGui/QColor>
 
-#include <QColor>
-#include <QRect>
 #include "lmms_basics.h"
 
 class QPainter;

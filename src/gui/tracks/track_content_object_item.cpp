@@ -23,12 +23,6 @@
  */
 
 
-#include <QObject>
-#include <QGraphicsItem>
-#include <QTimeLine>
-#include <QGraphicsItemAnimation>
-#include <QStyleOptionGraphicsItem>
-
 #include "gui/tracks/track_content_object_item.h"
 #include "gui/tracks/track_container_scene.h"
 #include "gui/tracks/track_item.h"

@@ -24,9 +24,7 @@
  */
 
 
-#include <QGraphicsScene>
-#include <QKeyEvent>
-#include <QTimeLine>
+#include <QtGui/QKeyEvent>
 
 #include <stdio.h>
 
