@@ -32,6 +32,9 @@
 #include "lmmsconfig.h"
 #include "audio_device.h"
 #include "midi_client.h"
+#include "midi_port.h"
+#include "midi_port_menu.h"
+#include "dummy_midi_event_processor.h"
 #include "midi_control_listener.h"
 
 
@@ -185,7 +188,10 @@ private:
 	
 	QList< QPair <char, int> > m_mclActionTableMap;
 	QTableWidget * m_mclActionTable;
-} ;
+	midiPortMenu m_mclMidiPortMenu;
+	DummyMidiEventProcessor m_mclMep;
+	midiPort m_mclMidiPort;
+};
 
 
 #endif

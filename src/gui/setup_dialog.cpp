@@ -34,7 +34,6 @@
 #include <QtGui/QMessageBox>
 #include <QtGui/QSlider>
 #include <QtGui/QWhatsThis>
-#include <QtGui/QToolButton>
 #include <QtGui/QTableWidget>
 #include <QtGui/QHeaderView>
 
@@ -54,6 +53,8 @@
 #include "led_checkbox.h"
 #include "group_box.h"
 #include "lcd_spinbox.h"
+#include "tool_button.h"
+#include "midi_port_menu.h"
 #include "midi_control_listener.h"
 #include "setup_dialog_mcl.h"
 
@@ -125,7 +126,13 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 	m_mclChannel( engine::getMidiControlListener()->getChannel() ),
 	m_mclUseControlKey( engine::getMidiControlListener()->getUseControlKey() ),
 	m_mclActionMapKeys( engine::getMidiControlListener()->getActionMapKeys() ),
-	m_mclActionMapControllers( engine::getMidiControlListener()->getActionMapControllers() )
+	m_mclActionMapControllers( engine::getMidiControlListener()->getActionMapControllers() ),
+	m_mclMidiPortMenu( midiPort::Input ),
+	m_mclMidiPort( "MCL config",
+		      engine::getMixer()->getMidiClient(),
+		      &m_mclMep,
+		      NULL,
+		      midiPort::Input )
 {
 	setWindowIcon( embed::getIconPixmap( "setup_general" ) );
 	setWindowTitle( tr( "Setup LMMS" ) );
@@ -745,12 +752,20 @@ groupBox * setupDialog::setupMidiControlListener( QWidget * midi )
 	channelSb->move( 20, 20 );
 	
 	// device
-	QToolButton * devicesBtn = new QToolButton( gb );
+	toolButton * devicesBtn = new toolButton( gb );
 	devicesBtn->setText( tr( "MIDI-device to receive "
 			     "remote control events from" ) );
 	devicesBtn->setIcon( embed::getIconPixmap( "piano" ) );
 	devicesBtn->setGeometry( 100, 20, 32, 32 );
+	devicesBtn->setMenu( &m_mclMidiPortMenu );
 	devicesBtn->setPopupMode( QToolButton::InstantPopup );
+	m_mclMidiPortMenu.setModel( &m_mclMidiPort );
+	QDomDocument mclDoc;
+	QDomElement mclPortConfig = mclDoc.createElement( "devices" );
+	engine::getMidiControlListener()->getMidiPort()->saveSettings( 
+		mclDoc, mclPortConfig );
+	m_mclMidiPort.loadSettings( mclPortConfig );
+	
 	
 	// use control key
 	ledCheckBox * controlKeyCb = new ledCheckBox(
@@ -914,7 +929,13 @@ void setupDialog::accept( void )
 	listener->setUseControlKey( m_mclUseControlKey );
 	listener->setActionMapKeys( m_mclActionMapKeys );
 	listener->setActionMapControllers( m_mclActionMapControllers );
-
+	// export port config to XML and import to MCL's port
+	QDomDocument mclDoc;
+	QDomElement mclPortConfig = mclDoc.createElement( "devices" );
+	m_mclMidiPort.saveSettings( mclDoc, mclPortConfig );
+	listener->getMidiPort()->unsubscribeAllPorts();
+	listener->getMidiPort()->loadSettings( mclPortConfig );
+	
 	configManager::inst()->saveConfigFile();
 
 	QDialog::accept();
