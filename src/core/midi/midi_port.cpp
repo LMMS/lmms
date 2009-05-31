@@ -304,6 +304,38 @@ void midiPort::subscribeWritablePort( const QString & _port, bool _subscribe )
 
 
 
+void midiPort::unsubscribeAllReadablePorts( void )
+{
+	for( map::const_iterator it = m_readablePorts.begin();
+	    it != m_readablePorts.end(); ++it )
+	{
+		// subscribed?
+		if( it.value() )
+		{
+			subscribeReadablePort( it.key(), false );
+		}
+	}
+}
+
+
+
+
+void midiPort::unsubscribeAllWriteablePorts( void )
+{
+	for( map::const_iterator it = m_writablePorts.begin();
+	    it != m_writablePorts.end(); ++it )
+	{
+		// subscribed?
+		if( it.value() )
+		{
+			subscribeWritablePort( it.key(), false );
+		}
+	}
+}
+
+
+
+
 void midiPort::updateMidiPortMode( void )
 {
 	// this small lookup-table makes everything easier
@@ -317,28 +349,12 @@ void midiPort::updateMidiPortMode( void )
 	// check whether we have to dis-check items in connection-menu
 	if( !inputEnabled() )
 	{
-		for( map::const_iterator it = m_readablePorts.begin();
-					it != m_readablePorts.end(); ++it )
-		{
-			// subscribed?
-			if( it.value() )
-			{
-				subscribeReadablePort( it.key(), false );
-			}
-		}
+		unsubscribeAllReadablePorts();
 	}
 
 	if( !outputEnabled() )
 	{
-		for( map::const_iterator it = m_writablePorts.begin();
-					it != m_writablePorts.end(); ++it )
-		{
-			// subscribed?
-			if( it.value() )
-			{
-				subscribeWritablePort( it.key(), false );
-			}
-		}
+		unsubscribeAllWriteablePorts();
 	}
 
 	emit readablePortsChanged();

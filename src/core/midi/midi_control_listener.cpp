@@ -256,16 +256,7 @@ void MidiControlListener::readConfiguration()
 	m_actionMapControllers.clear();
 	
 	// unsubscribe all ports
-	midiPort::map map = m_port.readablePorts();
-	for( midiPort::map::iterator it = map.begin();
-	    it != map.end(); ++it )
-	{
-		if( it.value() )
-		{
-			m_port.subscribeReadablePort( it.key(), false );
-		}
-	}
-	
+	m_port.unsubscribeAllPorts();
 	
 	// check whether there's a configuration tree at all
 	if( s_configTree.isNull() || ! s_configTree.hasChildNodes() )

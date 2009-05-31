@@ -126,6 +126,14 @@ public:
 		return( m_writablePorts );
 	}
 
+	void unsubscribeAllReadablePorts( void );
+	void unsubscribeAllWriteablePorts( void );
+	inline void unsubscribeAllPorts( void )
+	{
+		unsubscribeAllReadablePorts();
+		unsubscribeAllWriteablePorts();
+	}
+
 	midiPortMenu * m_readablePortsMenu;
 	midiPortMenu * m_writablePortsMenu;
 
