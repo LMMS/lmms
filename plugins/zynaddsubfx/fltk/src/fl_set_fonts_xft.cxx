@@ -271,13 +271,13 @@ Fl_Font Fl::set_fonts(const char* pattern_name)
       // So the bit we want is up to the first comma - BUT some strings have
       // more than one name, separated by, guess what?, a comma...
       stop = start = first = 0;
-      stop = strchr((const char *)font, ',');
-      start = strchr((const char *)font, ':');
+      stop = strchr((char *)font, ',');
+      start = strchr((char *)font, ':');
       if ((stop) && (start) && (stop < start))
       {
         first = stop + 1; // discard first version of name
         // find first comma *after* the end of the name
-        stop = strchr((const char *)start, ',');
+        stop = strchr((char *)start, ',');
       }
       else
       {
