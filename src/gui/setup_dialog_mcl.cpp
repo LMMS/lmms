@@ -89,7 +89,7 @@ setupDialogMCL::setupDialogMCL( setupDialog * _parent ) :
 	m_actionKeyGroupBox->setFixedHeight( 160 );
 	m_actionKeyGroupBox->ledButton()->setChecked( m_keysActive );
 	connect( m_actionKeyGroupBox->ledButton(), SIGNAL( clicked() ), 
-		this, SLOT( clickedKeyBox(  ) ) );
+		this, SLOT( clickedKeyBox( void ) ) );
 	
 	// controller group
 	m_actionControllerGroupBox = new groupBox( tr( "MIDI CONTROLLER" ),
@@ -97,7 +97,7 @@ setupDialogMCL::setupDialogMCL( setupDialog * _parent ) :
 	m_actionControllerGroupBox->setFixedHeight( 100 );
 	m_actionControllerGroupBox->ledButton()->setChecked( ! m_keysActive );
 	connect( m_actionControllerGroupBox->ledButton(), SIGNAL( clicked() ), 
-		this, SLOT( clickedControllerBox( ) ) );
+		this, SLOT( clickedControllerBox( void ) ) );
 	
 	// put settings box together
 	QVBoxLayout * settingsLayout = new QVBoxLayout( settings );
@@ -122,6 +122,8 @@ setupDialogMCL::setupDialogMCL( setupDialog * _parent ) :
 			m_actionsKeyBox->addItem( action.name );
 		}
 	}
+	connect( m_actionsKeyBox, SIGNAL( currentIndexChanged( int ) ),
+		this, SLOT( clickedKeyBox( void ) ) );
 	
 	QWidget * pianoWidget = new QWidget( m_actionKeyGroupBox );
 	pianoWidget->move( 10, 60 );
@@ -131,6 +133,10 @@ setupDialogMCL::setupDialogMCL( setupDialog * _parent ) :
 	pianoViewWidget->setModel( &m_pianoModel );
 	m_mep.baseNoteModel()->setValue( 60 );
 	m_mep.setUpdateBaseNote( true );
+	connect( pianoViewWidget, SIGNAL( keyPressed( int ) ),
+		this, SLOT( clickedKeyBox( void ) ) );
+	connect( pianoViewWidget, SIGNAL( baseNoteChanged( void ) ),
+		this, SLOT( clickedKeyBox( void ) ) );
 	
 	// populate controller box
 	m_actionsControllerBox = new QComboBox( m_actionControllerGroupBox );
@@ -146,6 +152,8 @@ setupDialogMCL::setupDialogMCL( setupDialog * _parent ) :
 			m_actionsControllerBox->addItem( action.name );
 		}
 	}
+	connect( m_actionsControllerBox, SIGNAL( currentIndexChanged( int ) ),
+		this, SLOT( clickedControllerBox( void ) ) );
 	
 	m_controllerSbModel = new lcdSpinBoxModel( /* this */ );
 	m_controllerSbModel->setRange( 0, 127 );
@@ -156,6 +164,8 @@ setupDialogMCL::setupDialogMCL( setupDialog * _parent ) :
 	controllerSb->setModel( m_controllerSbModel );
 	controllerSb->setLabel( tr( "CONTROLLER" ) );
 	controllerSb->move( 20, 60 );
+	connect( controllerSb, SIGNAL( manualChange( void ) ),
+		this, SLOT( clickedControllerBox( void ) ) );
 	
 	// widgets setup done
 	show();

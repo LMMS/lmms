@@ -104,6 +104,10 @@ private:
 private slots:
 	void pianoScrolled( int _new_pos );
 
+signals:
+	void keyPressed( int );
+	void baseNoteChanged( void );
+
 } ;
 
 

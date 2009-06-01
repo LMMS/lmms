@@ -550,6 +550,8 @@ void PianoView::mousePressEvent( QMouseEvent * _me )
 								midiTime() );
 			m_piano->m_pressedKeys[key_num] = true;
 			m_lastKey = key_num;
+
+			emit keyPressed( key_num );
 		}
 		else
 		{
@@ -567,6 +569,8 @@ void PianoView::mousePressEvent( QMouseEvent * _me )
 				m_piano->m_midiEvProc->
 					baseNoteModel()->
 						setInitValue( (float) key_num );
+
+				emit baseNoteChanged();
 			}
 		}
 
