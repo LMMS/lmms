@@ -121,6 +121,7 @@ private slots:
 	
 	void mclNewAction( void );
 	void mclDelAction( void );
+	void displayMclHelp( void );
 
 private:
 	groupBox * setupMidiControlListener( QWidget * midi );

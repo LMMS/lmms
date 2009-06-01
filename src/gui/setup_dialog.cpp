@@ -766,7 +766,6 @@ groupBox * setupDialog::setupMidiControlListener( QWidget * midi )
 		mclDoc, mclPortConfig );
 	m_mclMidiPort.loadSettings( mclPortConfig );
 	
-	
 	// use control key
 	ledCheckBox * controlKeyCb = new ledCheckBox(
 						   tr( "Use control key" ),
@@ -776,9 +775,18 @@ groupBox * setupDialog::setupMidiControlListener( QWidget * midi )
 	connect( controlKeyCb, SIGNAL( toggled( bool ) ),
 		this, SLOT( toggleMCLControlKey( bool ) ) );
 	
+	// help button
+	QPushButton * mclHelpButton = new QPushButton(
+			embed::getIconPixmap( "help" ), "", gb );
+	mclHelpButton->setGeometry( 320, 20, 28, 28 );
+	connect( mclHelpButton, SIGNAL( clicked() ), this,
+		SLOT( displayMclHelp() ) );
+	
+	// action table
 	m_mclActionTable = new QTableWidget( gb );
 	mclUpdateActionTable();
 	
+	// add/delete buttons
 	QWidget * buttons = new QWidget( gb );
 	QVBoxLayout * btn_layout = new QVBoxLayout( buttons );
 	btn_layout->setSpacing( 0 );
@@ -1401,6 +1409,24 @@ void setupDialog::mclAddControllerAction( int _controller,
 {
 	m_mclActionMapControllers[ _controller ] = _action;
 	mclUpdateActionTable();
+}
+
+
+
+
+void setupDialog::displayMclHelp( void )
+{
+	QWhatsThis::showText( QCursor::pos(),
+			     tr( "You can remote control LMMS via MIDI: " 
+				"start or stop the song, toggle loop mode "
+				"or jump to a particular position. "
+				"A remote control action can be triggered "
+				"either by a keypress or a controller "
+				"change. With the 'use control key' option "
+				"turned on, you need to press and hold the "
+				"control key before issuing a keypress "
+				"action. "
+			       ) );
 }
 
 
