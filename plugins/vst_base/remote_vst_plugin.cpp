@@ -1,7 +1,7 @@
 /*
  * remote_vst_plugin.cpp - LMMS VST Support Layer (remotePlugin client)
  *
- * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -586,6 +586,7 @@ bool remoteVstPlugin::load( const std::string & _plugin_file )
 		case CCONST( 'z', '3', 't', 'a' ):	// z3ta+
 		case CCONST( 'T', 'C', '_', 'S' ):	// Cygnus
 		case CCONST( 'S', 'y', 't', 'r' ):	// Sytrus
+		case CCONST( 'P', 'R', 'V', 'X' ):	// Proteus VX
 			__threadingModel = SplittedThreading;
 			break;
 
