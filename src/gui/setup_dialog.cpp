@@ -808,7 +808,7 @@ void setupDialog::mclUpdateActionTable( void )
 	table->setColumnCount( 2 );
 	table->setRowCount( m_mclActionMapKeys.count() + 
 			   m_mclActionMapControllers.count() );
-	table->setGeometry(20, 80, 250, 145 );
+	table->setGeometry(20, 80, 250, 148 );
 	QStringList headers;
 	headers << "Key/Ctrl" << "Action";
 	table->setHorizontalHeaderLabels( headers );
@@ -858,15 +858,14 @@ void setupDialog::mclUpdateActionTable( void )
 		m_mclActionTableMap.append( qMakePair( 'c', it.key() ) );
 	}
 	
-	//table->setColumnWidth( 0, 135 );
-	//table->setColumnWidth( 1, 135 );
+	table->setColumnWidth( 0, 100 );
+	table->setColumnWidth( 1, 130 );
 	table->setEnabled( true );
 	table->setShowGrid( false );
 	table->setSortingEnabled( false );
 	table->setSelectionBehavior( QTableWidget::SelectRows );
 	table->verticalHeader()->hide();
 	table->setAlternatingRowColors( true );
-	
 }
 
 
