@@ -195,6 +195,8 @@ void MidiControlListener::act( EventAction _action )
 			tl->pos().setTicks( tl->loopEnd().getTicks() );
 			tl->pos().setCurrentFrame( 0 );
 			break;
+		case NumActions:  // prevent compiler warnings
+			break;
 	}
 }
 
