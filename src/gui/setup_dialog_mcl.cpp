@@ -117,7 +117,7 @@ setupDialogMCL::setupDialogMCL( setupDialog * _parent ) :
 		MidiControlListener::ActionNameMap action =
 			MidiControlListener::action2ActionNameMap(
 				(MidiControlListener::EventAction) i );
-		if( action.name != "" )
+		if( !action.name.isEmpty() )
 		{
 			m_actionsKeyBox->addItem( action.name );
 		}
@@ -140,7 +140,7 @@ setupDialogMCL::setupDialogMCL( setupDialog * _parent ) :
 		MidiControlListener::ActionNameMap action =
 			MidiControlListener::action2ActionNameMap(
 				(MidiControlListener::EventAction) i );
-		if( action.name != "" && 
+		if( !action.name.isEmpty() && 
 			action.action != MidiControlListener::ActionControl )
 		{
 			m_actionsControllerBox->addItem( action.name );
