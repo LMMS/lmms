@@ -1,5 +1,3 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * setup_dialog_mcl.cpp - dialog for setting up MIDI Control Listener
  *
@@ -37,6 +35,7 @@
 #include "setup_dialog_mcl.h"
 #include "piano.h"
 
+
 setupDialogMCL::setupDialogMCL( setupDialog * _parent ) :
 	m_parent( _parent ),
 	m_keysActive( true ),
@@ -52,12 +51,13 @@ setupDialogMCL::setupDialogMCL( setupDialog * _parent ) :
 	QHBoxLayout * buttonLayout = new QHBoxLayout( buttons );
 	buttonLayout->setSpacing( 0 );
 	buttonLayout->setMargin( 0 );
-	QPushButton * okButton = new QPushButton( embed::getIconPixmap( "apply" ),
+	QPushButton * okButton = new QPushButton(
+					embed::getIconPixmap( "apply" ),
 						tr( "OK" ), buttons );
 	connect( okButton, SIGNAL( clicked() ), this, SLOT( accept() ) );
 	
-	QPushButton * cancelButton = new QPushButton( embed::getIconPixmap(
-								"cancel" ),
+	QPushButton * cancelButton = new QPushButton(
+					embed::getIconPixmap( "cancel" ),
 							tr( "Cancel" ),
 							buttons );
 	connect( cancelButton, SIGNAL( clicked() ), this, SLOT( reject() ) );
@@ -93,7 +93,7 @@ setupDialogMCL::setupDialogMCL( setupDialog * _parent ) :
 	
 	// controller group
 	m_actionControllerGroupBox = new groupBox( tr( "MIDI CONTROLLER" ),
-						settings );
+							settings );
 	m_actionControllerGroupBox->setFixedHeight( 100 );
 	m_actionControllerGroupBox->ledButton()->setChecked( ! m_keysActive );
 	connect( m_actionControllerGroupBox->ledButton(), SIGNAL( clicked() ), 
@@ -112,9 +112,11 @@ setupDialogMCL::setupDialogMCL( setupDialog * _parent ) :
 	// populate keys box
 	m_actionsKeyBox = new QComboBox( m_actionKeyGroupBox );
 	m_actionsKeyBox->setGeometry( 10, 20, 150, 22 );
-	for( int i = 0; i < MidiControlListener::numActions; ++i )
+	for( int i = 0; i < MidiControlListener::NumActions; ++i )
 	{
-		MidiControlListener::ActionNameMap action = MidiControlListener::action2ActionNameMap( (MidiControlListener::EventAction) i );
+		MidiControlListener::ActionNameMap action =
+			MidiControlListener::action2ActionNameMap(
+				(MidiControlListener::EventAction) i );
 		if( action.name != "" )
 		{
 			m_actionsKeyBox->addItem( action.name );
@@ -133,11 +135,13 @@ setupDialogMCL::setupDialogMCL( setupDialog * _parent ) :
 	// populate controller box
 	m_actionsControllerBox = new QComboBox( m_actionControllerGroupBox );
 	m_actionsControllerBox->setGeometry( 10, 30, 150, 22 );
-	for( int i = 0; i < MidiControlListener::numActions; ++i )
+	for( int i = 0; i < MidiControlListener::NumActions; ++i )
 	{
-		MidiControlListener::ActionNameMap action = MidiControlListener::action2ActionNameMap( (MidiControlListener::EventAction) i );
+		MidiControlListener::ActionNameMap action =
+			MidiControlListener::action2ActionNameMap(
+				(MidiControlListener::EventAction) i );
 		if( action.name != "" && 
-		   action.action != MidiControlListener::ActionControl )
+			action.action != MidiControlListener::ActionControl )
 		{
 			m_actionsControllerBox->addItem( action.name );
 		}
@@ -147,7 +151,8 @@ setupDialogMCL::setupDialogMCL( setupDialog * _parent ) :
 	m_controllerSbModel->setRange( 0, 127 );
 	m_controllerSbModel->setStep( 1 );
 	m_controllerSbModel->setValue( 23 );
-	lcdSpinBox * controllerSb = new lcdSpinBox( 3, m_actionControllerGroupBox );
+	lcdSpinBox * controllerSb = new lcdSpinBox( 3,
+						m_actionControllerGroupBox );
 	controllerSb->setModel( m_controllerSbModel );
 	controllerSb->setLabel( tr( "CONTROLLER" ) );
 	controllerSb->move( 20, 60 );
@@ -214,5 +219,3 @@ void setupDialogMCL::clickedControllerBox( void )
 
 #include "moc_setup_dialog_mcl.cxx"
 
-
-#endif

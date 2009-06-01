@@ -353,7 +353,7 @@ void MidiControlListener::readConfiguration()
 
 MidiControlListener::ActionNameMap MidiControlListener::action2ActionNameMap( EventAction _action )
 {
-	for( int i = 0; i < numActions; ++i )
+	for( int i = 0; i < NumActions; ++i )
 	{
 		if( actionNames[i].action == _action )
 		{
@@ -368,7 +368,7 @@ MidiControlListener::ActionNameMap MidiControlListener::action2ActionNameMap( Ev
 
 MidiControlListener::ActionNameMap MidiControlListener::actionName2ActionNameMap( QString _actionName )
 {
-	for( int i = 0; i < numActions; ++i )
+	for( int i = 0; i < NumActions; ++i )
 	{
 		if( actionNames[i].name == _actionName || 
 		    actionNames[i].nameShort == _actionName )
