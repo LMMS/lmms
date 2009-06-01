@@ -63,8 +63,16 @@ MidiControlListener::MidiControlListener() :
 	m_controlKeyCount( 0 ),
 	m_listenerEnabled( false ),
 	m_channel( -1 ),
-	m_useControlKey( false )
+	m_useControlKey( true )
 {
+	// add some nice default settings
+	m_actionMapKeys[60] = ActionControl;      // C5
+	m_actionMapKeys[57] = ActionPlay;         // A4
+	m_actionMapKeys[59] = ActionStop;         // B4
+	m_actionMapKeys[58] = ActionToggleLoop;   // B#4
+	m_actionMapControllers[24] = ActionPlay;  // Controller #24
+	m_actionMapControllers[23] = ActionStop;  // Controller #23
+	
 	readConfiguration();  // reads previously remembered configuration
 }
 
@@ -271,6 +279,12 @@ void MidiControlListener::rememberConfiguration( QDomDocument & doc )
  */
 void MidiControlListener::readConfiguration()
 {
+	// check whether there's a configuration tree at all
+	if( s_configTree.isNull() || ! s_configTree.hasChildNodes() )
+	{
+		return;
+	}
+	
 	// default settings
 	m_listenerEnabled = false;  // turn off by default
 	m_useControlKey = true;     // use control key
@@ -280,12 +294,6 @@ void MidiControlListener::readConfiguration()
 	
 	// unsubscribe all ports
 	m_port.unsubscribeAllPorts();
-	
-	// check whether there's a configuration tree at all
-	if( s_configTree.isNull() || ! s_configTree.hasChildNodes() )
-	{
-		return;
-	}
 	
 	QDomElement conf = s_configTree.firstChildElement( "config" );
 	// check whether config tag is present
