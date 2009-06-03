@@ -134,6 +134,11 @@ public:
 		return baseDir() == BaseDataDir;
 	}
 
+	bool isLocalResource( void ) const
+	{
+		return m_provider->isLocal();
+	}
+
 	const QString & tags( void ) const
 	{
 		return m_tags;
