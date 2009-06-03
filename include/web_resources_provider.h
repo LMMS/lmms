@@ -58,6 +58,11 @@ public:
 	virtual QByteArray fetchData( const ResourcesItem * _item,
 					int _maxSize = -1 ) const;
 
+	virtual bool isLocal( void ) const
+	{
+		return false;
+	}
+
 
 private slots:
 	void finishDownload( int _id, bool );

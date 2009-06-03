@@ -51,6 +51,11 @@ public:
 	virtual QByteArray fetchData( const ResourcesItem * _item,
 						int _maxSize = -1 ) const;
 
+	virtual bool isLocal( void ) const
+	{
+		return true;
+	}
+
 
 private slots:
 	void addDirectory( const QString & _path );

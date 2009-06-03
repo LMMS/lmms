@@ -64,6 +64,11 @@ public:
 		return QByteArray();
 	}
 
+	virtual bool isLocal( void ) const
+	{
+		return false;
+	}
+
 	virtual bool cacheDatabase( void ) const
 	{
 		return false;

@@ -45,6 +45,9 @@ public:
 	virtual int dataSize( const ResourcesItem * _item ) const = 0;
 	virtual QByteArray fetchData( const ResourcesItem * _item,
 					int _maxSize = -1 ) const = 0;
+	// return wether this provider provides local resources
+	virtual bool isLocal( void ) const = 0;
+
 	virtual bool cacheDatabase( void ) const
 	{
 		return true;
