@@ -28,18 +28,43 @@
 
 #include "side_bar_widget.h"
 
+class QAction;
+class ResourcesItem;
 class ResourcesTreeModel;
 class ResourcesTreeView;
 
 
 class ResourcesBrowser : public sideBarWidget
 {
+	Q_OBJECT
 public:
+	enum Actions
+	{
+		EditProperties,
+		LoadProject,
+		LoadInNewTrackSongEditor,
+		LoadInNewTrackBBEditor,
+		LoadInActiveInstrumentTrack,
+		DownloadIntoCollection,
+		UploadToWWW,
+		DeleteLocalResource,
+		ImportFile,
+		NumActions
+	} ;
+
 	ResourcesBrowser( QWidget * _parent );
 	virtual ~ResourcesBrowser();
 
 
+private slots:
+	void showContextMenu( const QPoint & _pos );
+
+
 private:
+	void triggerAction( Actions _action, ResourcesItem * _item );
+
+	QAction * m_actions[NumActions];
+
 	ResourcesTreeModel * m_treeModel;
 	ResourcesTreeView * m_treeView;
 

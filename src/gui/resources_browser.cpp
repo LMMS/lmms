@@ -22,7 +22,9 @@
  *
  */
 
+#include <QtGui/QAction>
 #include <QtGui/QLineEdit>
+#include <QtGui/QMenu>
 
 #include "resources_browser.h"
 #include "resources_tree_model.h"
@@ -30,6 +32,37 @@
 #include "unified_resources_provider.h"
 #include "engine.h"
 #include "embed.h"
+
+
+struct ActionDesc
+{
+	ResourcesBrowser::Actions action;
+	const char * pixmap;
+	const char * text;
+} ;
+
+static ActionDesc resourcesBrowserActions[] =
+{
+	{ ResourcesBrowser::EditProperties, "edit_draw",
+		QT_TRANSLATE_NOOP( "ResourcesBrowser", "Show/edit properties" ) },
+	{ ResourcesBrowser::LoadProject, "project_open",
+		QT_TRANSLATE_NOOP( "ResourcesBrowser", "Load project" ) },
+	{ ResourcesBrowser::LoadInNewTrackSongEditor, "songeditor",
+		QT_TRANSLATE_NOOP( "ResourcesBrowser", "Load in new track in Song Editor" ) },
+	{ ResourcesBrowser::LoadInNewTrackBBEditor, "bb_track",
+		QT_TRANSLATE_NOOP( "ResourcesBrowser", "Load in new track in B+B Editor" ) },
+	{ ResourcesBrowser::LoadInActiveInstrumentTrack, "instrument_track",
+		QT_TRANSLATE_NOOP( "ResourcesBrowser", "Load into active instrument track" ) },
+	{ ResourcesBrowser::DownloadIntoCollection, "mimetypes/folder-downloads",
+		QT_TRANSLATE_NOOP( "ResourcesBrowser", "Download into collection" ) },
+	{ ResourcesBrowser::UploadToWWW, "mimetypes/network-workgroup",
+		QT_TRANSLATE_NOOP( "ResourcesBrowser", "Upload to WWW" ) },
+	{ ResourcesBrowser::DeleteLocalResource, "edit-delete",
+		QT_TRANSLATE_NOOP( "ResourcesBrowser", "Delete resource" ) },
+	{ ResourcesBrowser::ImportFile, "project_import",
+		QT_TRANSLATE_NOOP( "ResourcesBrowser", "Import file" ) }
+} ;
+
 
 
 
@@ -47,6 +80,12 @@ ResourcesBrowser::ResourcesBrowser( QWidget * _parent ) :
 
 	QLineEdit * filterEdit = new QLineEdit ( contentParent() );
 
+	// set up context menu handling
+	m_treeView->setContextMenuPolicy( Qt::CustomContextMenu );
+	connect( m_treeView,
+			SIGNAL( customContextMenuRequested( const QPoint & ) ),
+			this, SLOT( showContextMenu( const QPoint & ) ) );
+
 	// add widgets to us (we're a SideBarWidget)
 	addContentWidget( m_treeView );
 	addContentWidget( filterEdit );
@@ -55,6 +94,19 @@ ResourcesBrowser::ResourcesBrowser( QWidget * _parent ) :
 	// instantly apply filter when typing into filterEdit
 	connect( filterEdit, SIGNAL( textChanged( const QString & ) ),
 	                m_treeView, SLOT( setFilter( const QString & ) ) );
+
+	// setup actions to be used in context menu
+	for( int i = 0;i < (int) ( sizeof( resourcesBrowserActions ) /
+						sizeof( ActionDesc ) ); ++i )
+	{
+		Actions a = resourcesBrowserActions[i].action;
+		m_actions[a] = new QAction(
+			embed::getIconPixmap(
+				resourcesBrowserActions[i].pixmap ),
+			tr( resourcesBrowserActions[i].text ),
+			this );
+		m_actions[a]->setData( i );
+	}
 }
 
 
@@ -65,6 +117,83 @@ ResourcesBrowser::~ResourcesBrowser()
 	delete m_treeView;
 	delete m_treeModel;
 }
+
+
+
+
+void ResourcesBrowser::showContextMenu( const QPoint & _pos )
+{
+	// clicked at a valid position?
+	QModelIndex idx = m_treeView->indexAt( _pos );
+	if( !idx.isValid() )
+	{
+		return;
+	}
+
+	// construct menu depending on selected item
+	QMenu m;
+
+	ResourcesItem * item = m_treeModel->item( idx );
+	switch( item->type() )
+	{
+		case ResourcesItem::TypeSample:
+		case ResourcesItem::TypeSoundFont:
+		case ResourcesItem::TypePreset:
+		case ResourcesItem::TypePlugin:
+			m.addAction( m_actions[LoadInNewTrackSongEditor] );
+			m.addAction( m_actions[LoadInNewTrackBBEditor] );
+			m.addAction( m_actions[LoadInActiveInstrumentTrack] );
+			break;
+		case ResourcesItem::TypeProject:
+			m.addAction( m_actions[LoadProject] );
+			break;
+		case ResourcesItem::TypeForeignProject:
+		case ResourcesItem::TypeMidiFile:
+			m.addAction( m_actions[ImportFile] );
+			break;
+		case ResourcesItem::TypeImage:
+		case ResourcesItem::TypeDirectory:
+		case ResourcesItem::TypeUnknown:
+		case ResourcesItem::NumTypes:
+			break;
+	}
+
+	if( item->type() != ResourcesItem::TypeDirectory )
+	{
+		m.addSeparator();
+		if( item->isLocalResource() )
+		{
+			m.addAction( m_actions[DeleteLocalResource] );
+			m.addAction( m_actions[UploadToWWW] );
+		}
+		else
+		{
+			m.addAction( m_actions[DownloadIntoCollection] );
+		}
+	}
+
+	m.addSeparator();
+	m.addAction( m_actions[EditProperties] );
+
+	// show and exec menu
+	QAction * a = m.exec( m_treeView->mapToGlobal( _pos ) );
+	if( a )
+	{
+		// trigger action if one has been selected
+		triggerAction( static_cast<Actions>( a->data().toInt() ),
+									item );
+	}
+
+}
+
+
+
+
+void ResourcesBrowser::triggerAction( Actions _action, ResourcesItem * _item )
+{
+	// TODO
+}
+
 
 
 
