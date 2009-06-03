@@ -1,5 +1,5 @@
 /*
- * main_window.cpp - implementation of LMMS-main-window
+ * main_window.cpp - implementation of LMMS' main window
  *
  * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
@@ -74,6 +74,7 @@
 #include "text_float.h"
 #include "cpuload_widget.h"
 #include "visualization_widget.h"
+#include "resources_browser.h"
 
 #include "gui/tracks/track_container_scene.h"
 
@@ -151,6 +152,9 @@ mainWindow::mainWindow( void ) :
 							false
 #endif
 								), ++id );
+	// add a resources browser to sidebar
+	side_bar->appendTab( new ResourcesBrowser( splitter ), ++id );
+
 
 	m_workspace = new QMdiArea( splitter );
 
