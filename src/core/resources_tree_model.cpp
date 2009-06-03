@@ -42,9 +42,7 @@ QVariant ResourcesTreeModel::data( const QModelIndex & _idx, int _role ) const
 {
 	if( _idx.isValid() )
 	{
-		ResourcesTreeItem * item =
-				static_cast<ResourcesTreeItem *>(
-						_idx.internalPointer() );
+		ResourcesTreeItem * item = treeItem( _idx );
 		if( _role == Qt::DisplayRole )
 		{
 			if( item->parent() == m_db->topLevelNode() )
@@ -121,8 +119,7 @@ int ResourcesTreeModel::rowCount( const QModelIndex & _parent ) const
 	}
 	else
 	{
-		parentItem = static_cast<ResourcesTreeItem *>(
-						_parent.internalPointer() );
+		parentItem = treeItem( _parent );
 	}
 	return parentItem->rowCount();
 }
@@ -146,8 +143,7 @@ QModelIndex ResourcesTreeModel::index( int _row, int _col,
 	}
 	else
 	{
-		parentItem = static_cast<ResourcesTreeItem *>(
-						_parent.internalPointer() );
+		parentItem = treeItem( _parent );
 	}
 
 	if( _row < parentItem->rowCount() )
@@ -167,9 +163,7 @@ QModelIndex ResourcesTreeModel::parent( const QModelIndex & _idx ) const
 		return QModelIndex();
 	}
 
-	ResourcesTreeItem * childItem =
-			static_cast<ResourcesTreeItem *>(
-						_idx.internalPointer() );
+	ResourcesTreeItem * childItem = treeItem( _idx );
 	ResourcesTreeItem * parentItem = childItem->parent();
 	if( parentItem == m_db->topLevelNode() )
 	{

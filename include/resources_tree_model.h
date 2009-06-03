@@ -62,6 +62,19 @@ public:
 
 	void setFilter( const QString & _s );
 
+	// return ResourcesTreeItem belonging to a certain index
+	static inline ResourcesTreeItem * treeItem( const QModelIndex & _idx )
+	{
+		return static_cast<ResourcesTreeItem *>(
+						_idx.internalPointer() );
+	}
+
+	// return ResourcesItem belonging to a certain index
+	static inline ResourcesItem * item( const QModelIndex & _idx )
+	{
+		return treeItem( _idx )->item();
+	}
+
 
 private:
 	bool filterItems( ResourcesTreeItem * _item,
