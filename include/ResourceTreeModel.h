@@ -1,8 +1,8 @@
 /*
- * resources_tree_model.h - tree-model for ResourcesDB
+ * ResourceTreeModel.h - tree-model for ResourceDB
  *
  * Copyright (c) 2008-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -22,20 +22,20 @@
  *
  */
 
-#ifndef _RESOURCES_TREE_MODEL_H
-#define _RESOURCES_TREE_MODEL_H
+#ifndef _RESOURCE_TREE_MODEL_H
+#define _RESOURCE_TREE_MODEL_H
 
 #include <QtCore/QAbstractItemModel>
 
-#include "resources_db.h"
+#include "ResourceDB.h"
 
 
-class ResourcesTreeModel : public QAbstractItemModel
+class ResourceTreeModel : public QAbstractItemModel
 {
 	Q_OBJECT
 public:
-	ResourcesTreeModel( ResourcesDB * _db, QObject * _parent = NULL );
-	virtual ~ResourcesTreeModel()
+	ResourceTreeModel( ResourceDB * _db, QObject * _parent = NULL );
+	virtual ~ResourceTreeModel()
 	{
 	}
 
@@ -62,15 +62,15 @@ public:
 
 	void setFilter( const QString & _s );
 
-	// return ResourcesTreeItem belonging to a certain index
-	static inline ResourcesTreeItem * treeItem( const QModelIndex & _idx )
+	// return ResourceTreeItem belonging to a certain index
+	static inline ResourceTreeItem * treeItem( const QModelIndex & _idx )
 	{
-		return static_cast<ResourcesTreeItem *>(
+		return static_cast<ResourceTreeItem *>(
 						_idx.internalPointer() );
 	}
 
-	// return ResourcesItem belonging to a certain index
-	static inline ResourcesItem * item( const QModelIndex & _idx )
+	// return ResourceItem belonging to a certain index
+	static inline ResourceItem * item( const QModelIndex & _idx )
 	{
 		return treeItem( _idx )->item();
 	}
@@ -80,15 +80,15 @@ public:
 
 
 private:
-	bool filterItems( ResourcesTreeItem * _item,
+	bool filterItems( ResourceTreeItem * _item,
 					const QModelIndex & _parent,
 						const QStringList & _keywords );
-	void setHidden( ResourcesTreeItem * _item,
+	void setHidden( ResourceTreeItem * _item,
 				const QModelIndex & _parent,
 					bool _hidden,
 						bool _recursive = true );
 
-	ResourcesDB * m_db;
+	ResourceDB * m_db;
 
 
 signals:

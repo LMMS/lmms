@@ -1,8 +1,8 @@
 /*
- * resources_db.cpp - implementation of ResourcesDB
+ * ResourceDB.cpp - implementation of ResourceDB
  *
  * Copyright (c) 2008-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -25,17 +25,17 @@
 
 #include <QtCore/QFileInfo>
 
-#include "resources_db.h"
-#include "resources_provider.h"
+#include "ResourceDB.h"
+#include "ResourceProvider.h"
 #include "mmp.h"
 
 
-QMap<ResourcesItem::Type, QString> ResourcesDB::s_typeNames;
-QMap<ResourcesItem::BaseDirectory, QString> ResourcesDB::s_baseDirNames;
+QMap<ResourceItem::Type, QString> ResourceDB::s_typeNames;
+QMap<ResourceItem::BaseDirectory, QString> ResourceDB::s_baseDirNames;
 
 
 
-ResourcesDB::ResourcesDB( ResourcesProvider * _provider ) :
+ResourceDB::ResourceDB( ResourceProvider * _provider ) :
 	m_provider( _provider )
 {
 	connect( m_provider, SIGNAL( itemsChanged() ),
@@ -43,25 +43,25 @@ ResourcesDB::ResourcesDB( ResourcesProvider * _provider ) :
 
 	if( s_typeNames.isEmpty() )
 	{
-		s_typeNames[ResourcesItem::TypeUnknown] = "Unknown";
-		s_typeNames[ResourcesItem::TypeDirectory] = "Directory";
-		s_typeNames[ResourcesItem::TypeSample] = "Sample";
-		s_typeNames[ResourcesItem::TypeSoundFont] = "SoundFont";
-		s_typeNames[ResourcesItem::TypePreset] = "Preset";
-		s_typeNames[ResourcesItem::TypeProject] = "Project";
-		s_typeNames[ResourcesItem::TypeMidiFile] = "MidiFile";
-		s_typeNames[ResourcesItem::TypeForeignProject] = "ForeignProject";
-		s_typeNames[ResourcesItem::TypePlugin] = "Plugin";
-		s_typeNames[ResourcesItem::TypeImage] = "Image";
+		s_typeNames[ResourceItem::TypeUnknown] = "Unknown";
+		s_typeNames[ResourceItem::TypeDirectory] = "Directory";
+		s_typeNames[ResourceItem::TypeSample] = "Sample";
+		s_typeNames[ResourceItem::TypeSoundFont] = "SoundFont";
+		s_typeNames[ResourceItem::TypePreset] = "Preset";
+		s_typeNames[ResourceItem::TypeProject] = "Project";
+		s_typeNames[ResourceItem::TypeMidiFile] = "MidiFile";
+		s_typeNames[ResourceItem::TypeForeignProject] = "ForeignProject";
+		s_typeNames[ResourceItem::TypePlugin] = "Plugin";
+		s_typeNames[ResourceItem::TypeImage] = "Image";
 	}
 
 	if( s_baseDirNames.isEmpty() )
 	{
-		s_baseDirNames[ResourcesItem::BaseRoot] = "Root";
-		s_baseDirNames[ResourcesItem::BaseWorkingDir] = "WorkingDir";
-		s_baseDirNames[ResourcesItem::BaseDataDir] = "DataDir";
-		s_baseDirNames[ResourcesItem::BaseHome] = "Home";
-		s_baseDirNames[ResourcesItem::BaseURL] = "URL";
+		s_baseDirNames[ResourceItem::BaseRoot] = "Root";
+		s_baseDirNames[ResourceItem::BaseWorkingDir] = "WorkingDir";
+		s_baseDirNames[ResourceItem::BaseDataDir] = "DataDir";
+		s_baseDirNames[ResourceItem::BaseHome] = "Home";
+		s_baseDirNames[ResourceItem::BaseURL] = "URL";
 	}
 
 
@@ -70,14 +70,14 @@ ResourcesDB::ResourcesDB( ResourcesProvider * _provider ) :
 
 
 
-ResourcesDB::~ResourcesDB()
+ResourceDB::~ResourceDB()
 {
 }
 
 
 
 
-void ResourcesDB::init( void )
+void ResourceDB::init( void )
 {
 	if( QFileInfo( m_provider->localCacheFile() ).exists() )
 	{
@@ -95,7 +95,7 @@ void ResourcesDB::init( void )
 
 
 
-void ResourcesDB::load( const QString & _file )
+void ResourceDB::load( const QString & _file )
 {
 	recursiveRemoveItems( topLevelNode(), false );
 
@@ -107,9 +107,9 @@ void ResourcesDB::load( const QString & _file )
 
 
 
-void ResourcesDB::save( const QString & _file )
+void ResourceDB::save( const QString & _file )
 {
-	multimediaProject m( multimediaProject::ResourcesDatabase );
+	multimediaProject m( multimediaProject::ResourceDatabase );
 
 	if( m_topLevelNode.getChild( 0 ) )
 	{
@@ -122,18 +122,18 @@ void ResourcesDB::save( const QString & _file )
 
 
 
-void ResourcesDB::saveTreeItem( const ResourcesTreeItem * _i,
+void ResourceDB::saveTreeItem( const ResourceTreeItem * _i,
 							QDomDocument & _doc,
 							QDomElement & _de )
 {
 	QDomElement e = _i->item() ? _doc.createElement( "item" ) : _de;
-	foreachConstResourcesTreeItem( _i->children() )
+	foreachConstResourceTreeItem( _i->children() )
 	{
 		saveTreeItem( *it, _doc, e );
 	}
 	if( _i->item() )
 	{
-		const ResourcesItem * it = _i->item();
+		const ResourceItem * it = _i->item();
 		e.setAttribute( "name", it->name() );
 		e.setAttribute( "type", typeName( it->type() ) );
 		e.setAttribute( "basedir", baseDirName( it->baseDir() ) );
@@ -150,7 +150,7 @@ void ResourcesDB::saveTreeItem( const ResourcesTreeItem * _i,
 
 
 
-void ResourcesDB::loadTreeItem( ResourcesTreeItem * _i, QDomElement & _de )
+void ResourceDB::loadTreeItem( ResourceTreeItem * _i, QDomElement & _de )
 {
 	QDomNode node = _de.firstChild();
 	while( !node.isNull() )
@@ -161,7 +161,7 @@ void ResourcesDB::loadTreeItem( ResourcesTreeItem * _i, QDomElement & _de )
 			const QString h = e.attribute( "hash" );
 			if( !h.isEmpty() )
 			{
-ResourcesItem * item = new ResourcesItem( m_provider,
+ResourceItem * item = new ResourceItem( m_provider,
 						e.attribute( "name" ),
 				typeFromName( e.attribute( "type" ) ),
 				baseDirFromName( e.attribute( "basedir" ) ),
@@ -171,8 +171,8 @@ ResourcesItem * item = new ResourcesItem( m_provider,
 						e.attribute( "size" ).toInt(),
 	QDateTime::fromString( e.attribute( "lastmod" ), Qt::ISODate ) );
 addItem( item );
-ResourcesTreeItem * treeItem = new ResourcesTreeItem( _i, item );
-if( item->type() == ResourcesItem::TypeDirectory )
+ResourceTreeItem * treeItem = new ResourceTreeItem( _i, item );
+if( item->type() == ResourceItem::TypeDirectory )
 {
 	emit directoryItemAdded( item->fullName() );
 }
@@ -186,7 +186,7 @@ loadTreeItem( treeItem, e );
 
 
 
-const ResourcesItem * ResourcesDB::nearestMatch( const ResourcesItem & _item )
+const ResourceItem * ResourceDB::nearestMatch( const ResourceItem & _item )
 {
 	if( !_item.hash().isEmpty() )
 	{
@@ -198,9 +198,9 @@ const ResourcesItem * ResourcesDB::nearestMatch( const ResourcesItem & _item )
 	}
 
 	int max_level = -1;
-	const ResourcesItem * max_item = NULL;
+	const ResourceItem * max_item = NULL;
 
-	foreach( const ResourcesItem * it, m_items )
+	foreach( const ResourceItem * it, m_items )
 	{
 		const int l = it->equalityLevel( _item );
 		if( l > max_level )
@@ -217,19 +217,19 @@ const ResourcesItem * ResourcesDB::nearestMatch( const ResourcesItem & _item )
 
 
 
-void ResourcesDB::addItem( ResourcesItem * newItem )
+void ResourceDB::addItem( ResourceItem * newItem )
 {
 	const QString hash = newItem->hash();
-	ResourcesItem * oldItem = m_items[hash];
+	ResourceItem * oldItem = m_items[hash];
 	if( oldItem )
 	{
-		ResourcesTreeItem * oldTreeItem = oldItem->treeItem();
+		ResourceTreeItem * oldTreeItem = oldItem->treeItem();
 		if( oldTreeItem )
 		{
 			recursiveRemoveItems( oldTreeItem, false );
 			delete oldTreeItem;
 		}
-		if( oldItem->type() == ResourcesItem::TypeDirectory )
+		if( oldItem->type() == ResourceItem::TypeDirectory )
 		{
 			emit directoryItemRemoved( oldItem->fullName() );
 		}
@@ -242,7 +242,7 @@ void ResourcesDB::addItem( ResourcesItem * newItem )
 
 
 
-void ResourcesDB::recursiveRemoveItems( ResourcesTreeItem * parent,
+void ResourceDB::recursiveRemoveItems( ResourceTreeItem * parent,
 						bool removeTopLevelParent )
 {
 	if( !parent )
@@ -257,7 +257,7 @@ void ResourcesDB::recursiveRemoveItems( ResourcesTreeItem * parent,
 
 	if( removeTopLevelParent && parent->item() )
 	{
-		if( parent->item()->type() == ResourcesItem::TypeDirectory )
+		if( parent->item()->type() == ResourceItem::TypeDirectory )
 		{
 			emit directoryItemRemoved( parent->item()->fullName() );
 		}
@@ -274,4 +274,4 @@ void ResourcesDB::recursiveRemoveItems( ResourcesTreeItem * parent,
 
 
 
-#include "moc_resources_db.cxx"
+#include "moc_ResourceDB.cxx"

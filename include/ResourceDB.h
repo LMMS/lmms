@@ -1,8 +1,8 @@
 /*
- * resources_db.h - header file for ResourcesDB
+ * ResourceDB.h - header file for ResourceDB
  *
  * Copyright (c) 2008-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef _RESOURCES_DB_H
-#define _RESOURCES_DB_H
+#ifndef _RESOURCE_DB_H
+#define _RESOURCE_DB_H
 
 #include <QtCore/QDateTime>
 #include <QtCore/QHash>
@@ -31,25 +31,25 @@
 #include <QtCore/QStringList>
 #include <QtXml/QDomDocument>
 
-#include "resources_tree_item.h"
+#include "ResourceTreeItem.h"
 
 
-class ResourcesDB : public QObject
+class ResourceDB : public QObject
 {
 	Q_OBJECT
 public:
-	typedef QHash<QString, ResourcesItem *> ItemList;
+	typedef QHash<QString, ResourceItem *> ItemList;
 
 
-	ResourcesDB( ResourcesProvider * _provider );
-	~ResourcesDB();
+	ResourceDB( ResourceProvider * _provider );
+	~ResourceDB();
 
 	void init( void );
 
 	void load( const QString & _file );
 	void save( const QString & _file );
 
-	inline ResourcesProvider * provider( void )
+	inline ResourceProvider * provider( void )
 	{
 		return m_provider;
 	}
@@ -64,35 +64,35 @@ public:
 		return m_items;
 	}
 
-	inline ResourcesTreeItem * topLevelNode( void )
+	inline ResourceTreeItem * topLevelNode( void )
 	{
 		return &m_topLevelNode;
 	}
 
-	const ResourcesItem * nearestMatch( const ResourcesItem & _item );
+	const ResourceItem * nearestMatch( const ResourceItem & _item );
 
-	void addItem( ResourcesItem * newItem );
+	void addItem( ResourceItem * newItem );
 
-	void recursiveRemoveItems( ResourcesTreeItem * parent,
+	void recursiveRemoveItems( ResourceTreeItem * parent,
 					bool removeTopLevelParent = true );
 
 
 private:
-	void saveTreeItem( const ResourcesTreeItem * _i, QDomDocument & _doc,
+	void saveTreeItem( const ResourceTreeItem * _i, QDomDocument & _doc,
 							QDomElement & _de );
-	void loadTreeItem( ResourcesTreeItem * _i, QDomElement & _de );
+	void loadTreeItem( ResourceTreeItem * _i, QDomElement & _de );
 
-	static inline QString typeName( ResourcesItem::Type _t )
+	static inline QString typeName( ResourceItem::Type _t )
 	{
 		return s_typeNames[_t];
 	}
 
-	static inline QString baseDirName( ResourcesItem::BaseDirectory _bd )
+	static inline QString baseDirName( ResourceItem::BaseDirectory _bd )
 	{
 		return s_baseDirNames[_bd];
 	}
 
-	static inline ResourcesItem::Type typeFromName( const QString & _n )
+	static inline ResourceItem::Type typeFromName( const QString & _n )
 	{
 		for( TypeStringMap::ConstIterator it = s_typeNames.begin();
 						it != s_typeNames.end(); ++it )
@@ -102,10 +102,10 @@ private:
 				return it.key();
 			}
 		}
-		return ResourcesItem::TypeUnknown;
+		return ResourceItem::TypeUnknown;
 	}
 
-	static inline ResourcesItem::BaseDirectory baseDirFromName(
+	static inline ResourceItem::BaseDirectory baseDirFromName(
 							const QString & _n )
 	{
 		for( BaseDirStringMap::ConstIterator it =
@@ -117,17 +117,17 @@ private:
 				return it.key();
 			}
 		}
-		return ResourcesItem::BaseRoot;
+		return ResourceItem::BaseRoot;
 	}
 
-	typedef QMap<ResourcesItem::Type, QString> TypeStringMap;
-	typedef QMap<ResourcesItem::BaseDirectory, QString> BaseDirStringMap;
+	typedef QMap<ResourceItem::Type, QString> TypeStringMap;
+	typedef QMap<ResourceItem::BaseDirectory, QString> BaseDirStringMap;
 	static TypeStringMap s_typeNames;
 	static BaseDirStringMap s_baseDirNames;
 
-	ResourcesProvider * m_provider;
+	ResourceProvider * m_provider;
 	ItemList m_items;
-	ResourcesTreeItem m_topLevelNode;
+	ResourceTreeItem m_topLevelNode;
 
 
 signals:

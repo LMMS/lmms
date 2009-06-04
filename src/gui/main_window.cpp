@@ -74,7 +74,7 @@
 #include "text_float.h"
 #include "cpuload_widget.h"
 #include "visualization_widget.h"
-#include "resources_browser.h"
+#include "resource_browser.h"
 
 #include "gui/tracks/track_container_scene.h"
 
@@ -152,8 +152,8 @@ mainWindow::mainWindow( void ) :
 							false
 #endif
 								), ++id );
-	// add a resources browser to sidebar
-	side_bar->appendTab( new ResourcesBrowser( splitter ), ++id );
+	// add a resource browser to sidebar
+	side_bar->appendTab( new ResourceBrowser( splitter ), ++id );
 
 
 	m_workspace = new QMdiArea( splitter );

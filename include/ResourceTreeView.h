@@ -1,8 +1,8 @@
 /*
- * resources_tree_view.h - view for ResourcesTreeModel
+ * resource_tree_view.h - view for ResourceTreeModel
  *
  * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -22,19 +22,19 @@
  *
  */
 
-#ifndef _RESOURCES_TREE_VIEW_H
-#define _RESOURCES_TREE_VIEW_H
+#ifndef _RESOURCE_TREE_VIEW_H
+#define _RESOURCE_TREE_VIEW_H
 
 #include <QtGui/QTreeView>
 
 
-class ResourcesTreeModel;
+class ResourceTreeModel;
 
-class ResourcesTreeView : public QTreeView
+class ResourceTreeView : public QTreeView
 {
 	Q_OBJECT
 public:
-	ResourcesTreeView( ResourcesTreeModel * _tm, QWidget * _parent );
+	ResourceTreeView( ResourceTreeModel * _tm, QWidget * _parent );
 
 
 public slots:
@@ -42,7 +42,7 @@ public slots:
 	void updateFilter( void );
 
 private:
-	ResourcesTreeModel * m_tm;
+	ResourceTreeModel * m_tm;
 
 	QString m_lastFilter;
 

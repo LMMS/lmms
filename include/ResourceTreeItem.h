@@ -1,8 +1,8 @@
 /*
- * resources_tree_item.h - header file for ResourcesTreeItem
+ * ResourceTreeItem.h - header file for ResourceTreeItem
  *
  * Copyright (c) 2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -22,33 +22,33 @@
  *
  */
 
-#ifndef _RESOURCES_TREE_ITEM_H
-#define _RESOURCES_TREE_ITEM_H
+#ifndef _RESOURCE_TREE_ITEM_H
+#define _RESOURCE_TREE_ITEM_H
 
 #include <QtCore/QList>
 
-#include "resources_item.h"
+#include "ResourceItem.h"
 
-#define foreachResourcesTreeItem(list)					\
-		for(ResourcesTreeItemList::Iterator it=list.begin();	\
+#define foreachResourceTreeItem(list)					\
+		for(ResourceTreeItemList::Iterator it=list.begin();	\
 					it!=list.end();++it)
 
-#define foreachConstResourcesTreeItem(list)				\
-		for(ResourcesTreeItemList::ConstIterator it=list.begin();\
+#define foreachConstResourceTreeItem(list)				\
+		for(ResourceTreeItemList::ConstIterator it=list.begin();\
 						it!=list.end();++it)
 
 
-class ResourcesTreeItem;
-typedef QList<ResourcesTreeItem *> ResourcesTreeItemList;
+class ResourceTreeItem;
+typedef QList<ResourceTreeItem *> ResourceTreeItemList;
 
 
-class ResourcesTreeItem
+class ResourceTreeItem
 {
 public:
-	ResourcesTreeItem( ResourcesTreeItem * _parent = NULL,
-					ResourcesItem * _item = NULL );
+	ResourceTreeItem( ResourceTreeItem * _parent = NULL,
+					ResourceItem * _item = NULL );
 
-	~ResourcesTreeItem();
+	~ResourceTreeItem();
 
 	inline void setHidden( bool _h )
 	{
@@ -62,49 +62,49 @@ public:
 
 	int rowCount( void ) const;
 
-	ResourcesTreeItem * getChild( int _row );
+	ResourceTreeItem * getChild( int _row );
 
 	int row( void ) const;
 
-	inline void addChild( ResourcesTreeItem * _it )
+	inline void addChild( ResourceTreeItem * _it )
 	{
 		m_children.push_back( _it );
 	}
 
-	inline void removeChild( ResourcesTreeItem * _it )
+	inline void removeChild( ResourceTreeItem * _it )
 	{
 		m_children.removeAll( _it );
 	}
 
-	inline ResourcesTreeItemList & children( void )
+	inline ResourceTreeItemList & children( void )
 	{
 		return m_children;
 	}
 
-	inline const ResourcesTreeItemList & children( void ) const
+	inline const ResourceTreeItemList & children( void ) const
 	{
 		return m_children;
 	}
 
-	ResourcesTreeItem * findChild( const QString & _name,
-				ResourcesItem::BaseDirectory _base_dir );
+	ResourceTreeItem * findChild( const QString & _name,
+				ResourceItem::BaseDirectory _base_dir );
 
-	inline ResourcesItem * item( void )
+	inline ResourceItem * item( void )
 	{
 		return m_item;
 	}
 
-	inline const ResourcesItem * item( void ) const
+	inline const ResourceItem * item( void ) const
 	{
 		return m_item;
 	}
 
-	inline ResourcesTreeItem * parent( void )
+	inline ResourceTreeItem * parent( void )
 	{
 		return m_parent;
 	}
 
-	inline void setParent( ResourcesTreeItem * _parent )
+	inline void setParent( ResourceTreeItem * _parent )
 	{
 		m_parent = _parent;
 	}
@@ -122,15 +122,15 @@ public:
 
 private:
 	// hide copy-ctor
-	ResourcesTreeItem( const ResourcesTreeItem & ) { }
+	ResourceTreeItem( const ResourceTreeItem & ) { }
 
-	ResourcesTreeItem * m_parent;
-	ResourcesTreeItemList m_children;
+	ResourceTreeItem * m_parent;
+	ResourceTreeItemList m_children;
 
 	bool m_hidden;
 	bool m_temporaryMarker;
 
-	ResourcesItem * m_item;
+	ResourceItem * m_item;
 
 } ;
 

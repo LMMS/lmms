@@ -1,8 +1,8 @@
 /*
- * local_resources_provider.cpp - implementation of LocalResourcesProvider
+ * LocalResourceProvider.cpp - implementation of LocalResourceProvider
  *
  * Copyright (c) 2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -25,14 +25,14 @@
 
 #include <QtCore/QDir>
 
-#include "local_resources_provider.h"
-#include "resources_db.h"
+#include "LocalResourceProvider.h"
+#include "ResourceDB.h"
 
 
-LocalResourcesProvider::LocalResourcesProvider(
-				ResourcesItem::BaseDirectory _baseDir,
+LocalResourceProvider::LocalResourceProvider(
+				ResourceItem::BaseDirectory _baseDir,
 						const QString & _dir ) :
-	ResourcesProvider( ResourcesItem::getBaseDirectory( _baseDir ) ),
+	ResourceProvider( ResourceItem::getBaseDirectory( _baseDir ) ),
 	m_baseDir( _baseDir ),
 	m_dir( _dir ),
 	m_watcher( this )
@@ -51,7 +51,7 @@ LocalResourcesProvider::LocalResourcesProvider(
 
 
 
-LocalResourcesProvider::~LocalResourcesProvider()
+LocalResourceProvider::~LocalResourceProvider()
 {
 	database()->save( localCacheFile() );
 }
@@ -59,7 +59,7 @@ LocalResourcesProvider::~LocalResourcesProvider()
 
 
 
-void LocalResourcesProvider::updateDatabase( void )
+void LocalResourceProvider::updateDatabase( void )
 {
 	readDir( m_dir, database()->topLevelNode() );
 }
@@ -67,7 +67,7 @@ void LocalResourcesProvider::updateDatabase( void )
 
 
 
-int LocalResourcesProvider::dataSize( const ResourcesItem * _item ) const
+int LocalResourceProvider::dataSize( const ResourceItem * _item ) const
 {
 	return QFileInfo( _item->fullName() ).size();
 }
@@ -75,7 +75,7 @@ int LocalResourcesProvider::dataSize( const ResourcesItem * _item ) const
 
 
 
-QByteArray LocalResourcesProvider::fetchData( const ResourcesItem * _item,
+QByteArray LocalResourceProvider::fetchData( const ResourceItem * _item,
 							int _maxSize ) const
 {
 	QFile f( _item->fullName() );
@@ -92,7 +92,7 @@ QByteArray LocalResourcesProvider::fetchData( const ResourcesItem * _item,
 
 
 
-void LocalResourcesProvider::addDirectory( const QString & _path )
+void LocalResourceProvider::addDirectory( const QString & _path )
 {
 	if( QFileInfo( _path ).isDir() )
 	{
@@ -103,7 +103,7 @@ void LocalResourcesProvider::addDirectory( const QString & _path )
 
 
 
-void LocalResourcesProvider::removeDirectory( const QString & _path )
+void LocalResourceProvider::removeDirectory( const QString & _path )
 {
 	m_watcher.removePath( _path );
 }
@@ -111,18 +111,18 @@ void LocalResourcesProvider::removeDirectory( const QString & _path )
 
 
 
-void LocalResourcesProvider::reloadDirectory( const QString & _path )
+void LocalResourceProvider::reloadDirectory( const QString & _path )
 {
-	ResourcesTreeItem * dirTreeItem = NULL;
+	ResourceTreeItem * dirTreeItem = NULL;
 	QString p = _path;
 	if( !p.endsWith( QDir::separator() ) )
 	{
 		p += QDir::separator();
 	}
 
-	foreach( ResourcesItem * it, database()->items() )
+	foreach( ResourceItem * it, database()->items() )
 	{
-		if( it->type() == ResourcesItem::TypeDirectory &&
+		if( it->type() == ResourceItem::TypeDirectory &&
 			it->fullName() == p )
 		{
 			dirTreeItem = it->treeItem();
@@ -131,7 +131,7 @@ void LocalResourcesProvider::reloadDirectory( const QString & _path )
 
 	if( dirTreeItem )
 	{
-		ResourcesItem * dirItem = dirTreeItem->item();
+		ResourceItem * dirItem = dirTreeItem->item();
 		if( dirItem )
 		{
 			m_scannedFolders.clear();
@@ -146,8 +146,8 @@ void LocalResourcesProvider::reloadDirectory( const QString & _path )
 
 
 
-void LocalResourcesProvider::readDir( const QString & _dir,
-					ResourcesTreeItem * _parent )
+void LocalResourceProvider::readDir( const QString & _dir,
+					ResourceTreeItem * _parent )
 {
 #ifdef LMMS_BUILD_LINUX
 	if( _dir.startsWith( "/dev" ) ||
@@ -158,18 +158,18 @@ void LocalResourcesProvider::readDir( const QString & _dir,
 	}
 #endif
 
-	QDir d( ResourcesItem::getBaseDirectory( m_baseDir ) + _dir );
+	QDir d( ResourceItem::getBaseDirectory( m_baseDir ) + _dir );
 	m_scannedFolders << d.canonicalPath();
 
-	ResourcesItem * parentItem;
-	ResourcesTreeItem * curParent = _parent->findChild( d.dirName() +
+	ResourceItem * parentItem;
+	ResourceTreeItem * curParent = _parent->findChild( d.dirName() +
 							QDir::separator(),
 							m_baseDir );
 printf("read dir: %s\n", d.canonicalPath().toAscii().constData() );
 	if( curParent )
 	{
 		parentItem = curParent->item();
-		foreachResourcesTreeItem( curParent->children() )
+		foreachResourceTreeItem( curParent->children() )
 		{
 			(*it)->setTemporaryMarker( false );
 		}
@@ -177,9 +177,9 @@ printf("read dir: %s\n", d.canonicalPath().toAscii().constData() );
 	else
 	{
 		// create new item for current dir
-		parentItem = new ResourcesItem( this,
+		parentItem = new ResourceItem( this,
 					d.dirName(),
-					ResourcesItem::TypeDirectory,
+					ResourceItem::TypeDirectory,
 					m_baseDir,
 					_parent->item() && _parent->parent() &&
 					_parent->parent()->item() ?
@@ -188,7 +188,7 @@ printf("read dir: %s\n", d.canonicalPath().toAscii().constData() );
 		parentItem->setLastMod( QFileInfo(
 					d.canonicalPath() ).lastModified() );
 		database()->addItem( parentItem );
-		curParent = new ResourcesTreeItem( _parent, parentItem );
+		curParent = new ResourceTreeItem( _parent, parentItem );
 		curParent->setTemporaryMarker( true );
 		m_watcher.addPath( parentItem->fullName() );
 	}
@@ -210,7 +210,7 @@ printf("read dir: %s\n", d.canonicalPath().toAscii().constData() );
 		{
 			fname += QDir::separator();
 		}
-		ResourcesTreeItem * curChild =
+		ResourceTreeItem * curChild =
 				curParent->findChild( fname, m_baseDir );
 		if( curChild )
 		{
@@ -220,7 +220,7 @@ printf("read dir: %s\n", d.canonicalPath().toAscii().constData() );
 				curChild->item()->setLastMod(
 							f.lastModified() );
 				if( curChild->item()->type() ==
-						ResourcesItem::TypeDirectory )
+						ResourceItem::TypeDirectory )
 				{
 					readDir( _dir + fname, curParent );
 				}
@@ -241,27 +241,27 @@ printf("read dir: %s\n", d.canonicalPath().toAscii().constData() );
 			}
 			else if( f.isFile() )
 			{
-				ResourcesItem * newItem =
-					new ResourcesItem( this,
+				ResourceItem * newItem =
+					new ResourceItem( this,
 						f.fileName(),
-						ResourcesItem::TypeUnknown,
+						ResourceItem::TypeUnknown,
 						m_baseDir, _dir );
 				newItem->setLastMod( f.lastModified() );
 				database()->addItem( newItem );
-				ResourcesTreeItem * rti =
-					new ResourcesTreeItem( curParent,
+				ResourceTreeItem * rti =
+					new ResourceTreeItem( curParent,
 								newItem );
 				rti->setTemporaryMarker( true );
 			}
 		}
 	}
 
-	for( ResourcesTreeItemList::Iterator it = curParent->children().begin();
+	for( ResourceTreeItemList::Iterator it = curParent->children().begin();
 					it != curParent->children().end(); )
 	{
 		if( (*it)->temporaryMarker() == false )
 		{
-			ResourcesTreeItem * item = *it;
+			ResourceTreeItem * item = *it;
 			it = curParent->children().erase( it );
 			database()->recursiveRemoveItems( item );
 		}
@@ -274,5 +274,5 @@ printf("read dir: %s\n", d.canonicalPath().toAscii().constData() );
 
 
 
-#include "moc_local_resources_provider.cxx"
+#include "moc_LocalResourceProvider.cxx"
 

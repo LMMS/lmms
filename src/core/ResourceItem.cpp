@@ -1,8 +1,8 @@
 /*
- * resources_item.cpp - implementation of ResourcesItem
+ * ResourceItem.cpp - implementation of ResourceItem
  *
  * Copyright (c) 2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -27,13 +27,13 @@
 #include <QtCore/QHash>
 #include <QtCore/QDir>
 
-#include "resources_item.h"
-#include "resources_provider.h"
+#include "ResourceItem.h"
+#include "ResourceProvider.h"
 #include "config_mgr.h"
 
 
 
-ResourcesItem::ResourcesItem( ResourcesProvider * _provider,
+ResourceItem::ResourceItem( ResourceProvider * _provider,
 				const QString & _name,
 				Type _type,
 				BaseDirectory _base_dir,
@@ -60,7 +60,7 @@ ResourcesItem::ResourcesItem( ResourcesProvider * _provider,
 
 
 
-void ResourcesItem::reload( void )
+void ResourceItem::reload( void )
 {
 	m_hash.clear();
 	m_size = -1;
@@ -70,7 +70,7 @@ void ResourcesItem::reload( void )
 
 
 
-bool ResourcesItem::operator==( const ResourcesItem & _other ) const
+bool ResourceItem::operator==( const ResourceItem & _other ) const
 {
 	return m_nameHash == _other.m_nameHash &&
 		m_name == _other.m_name &&
@@ -84,7 +84,7 @@ bool ResourcesItem::operator==( const ResourcesItem & _other ) const
 
 
 
-int ResourcesItem::equalityLevel( const ResourcesItem & _other ) const
+int ResourceItem::equalityLevel( const ResourceItem & _other ) const
 {
 	int l = 0;
 	if( m_nameHash == _other.m_nameHash &&
@@ -135,7 +135,7 @@ int ResourcesItem::equalityLevel( const ResourcesItem & _other ) const
 
 
 
-ResourcesItem::Type ResourcesItem::guessType( void ) const
+ResourceItem::Type ResourceItem::guessType( void ) const
 {
 	static QMap<QString, Type> typeMap;
 	if( typeMap.isEmpty() )
@@ -185,7 +185,7 @@ ResourcesItem::Type ResourcesItem::guessType( void ) const
 
 
 
-void ResourcesItem::init( void )
+void ResourceItem::init( void )
 {
 	// ensure trailing slash for path property
 	if( !m_path.isEmpty() && m_path.right( 1 ) != QDir::separator() )
@@ -241,8 +241,8 @@ void ResourcesItem::init( void )
 
 
 
-QString ResourcesItem::getBaseDirectory( BaseDirectory _bd,
-						const ResourcesItem * _item )
+QString ResourceItem::getBaseDirectory( BaseDirectory _bd,
+						const ResourceItem * _item )
 {
 	QString d;
 	switch( _bd )

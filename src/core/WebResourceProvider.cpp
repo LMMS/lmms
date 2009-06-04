@@ -1,8 +1,8 @@
 /*
- * web_resources_provider.cpp - implementation of WebResourcesProvider^
+ * WebResourceProvider.cpp - implementation of WebResourceProvider
  *
  * Copyright (c) 2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -27,15 +27,15 @@
 #include <QtCore/QUrl>
 #include <QtNetwork/QHttp>
 
-#include "web_resources_provider.h"
-#include "resources_db.h"
+#include "WebResourceProvider.h"
+#include "ResourceDB.h"
 
 
-QList<int> WebResourcesProvider::m_downloadIDs;
+QList<int> WebResourceProvider::m_downloadIDs;
 
 
-WebResourcesProvider::WebResourcesProvider( const QString & _url ) :
-	ResourcesProvider( _url ),
+WebResourceProvider::WebResourceProvider( const QString & _url ) :
+	ResourceProvider( _url ),
 	m_http( NULL ),
 	m_indexBuffer()
 {
@@ -50,7 +50,7 @@ WebResourcesProvider::WebResourcesProvider( const QString & _url ) :
 
 
 
-WebResourcesProvider::~WebResourcesProvider()
+WebResourceProvider::~WebResourceProvider()
 {
 	database()->save( localCacheFile() );
 }
@@ -58,7 +58,7 @@ WebResourcesProvider::~WebResourcesProvider()
 
 
 
-void WebResourcesProvider::updateDatabase( void )
+void WebResourceProvider::updateDatabase( void )
 {
 	m_indexBuffer.close();
 	m_indexBuffer.open( QBuffer::ReadWrite );
@@ -76,13 +76,13 @@ void WebResourcesProvider::updateDatabase( void )
 
 
 
-QByteArray WebResourcesProvider::fetchData( const ResourcesItem * _item,
+QByteArray WebResourceProvider::fetchData( const ResourceItem * _item,
 							int _maxSize ) const
 {
 	QBuffer buffer;
 	buffer.open( QBuffer::ReadWrite );
 
-	download( "/WebResources/" + _item->hash(), &buffer, true );
+	download( "/WebResource/" + _item->hash(), &buffer, true );
 
 	return buffer.data();
 }
@@ -90,7 +90,7 @@ QByteArray WebResourcesProvider::fetchData( const ResourcesItem * _item,
 
 
 
-void WebResourcesProvider::finishDownload( int _id, bool a )
+void WebResourceProvider::finishDownload( int _id, bool a )
 {
 	m_downloadIDs << _id;
 }
@@ -99,14 +99,14 @@ void WebResourcesProvider::finishDownload( int _id, bool a )
 
 
 // create a recursive tree from flat items and their path property
-ResourcesTreeItem * WebResourcesProvider::addTreeItem(
-						ResourcesTreeItem * _parent,
-						ResourcesItem * _item )
+ResourceTreeItem * WebResourceProvider::addTreeItem(
+						ResourceTreeItem * _parent,
+						ResourceItem * _item )
 {
 	if( _parent == database()->topLevelNode() ||
 						_item->path().isEmpty() )
 	{
-		return new ResourcesTreeItem( _parent, _item );
+		return new ResourceTreeItem( _parent, _item );
 	}
 
 	const QStringList itemPath = _item->path().split( '/' );
@@ -122,31 +122,31 @@ ResourcesTreeItem * WebResourcesProvider::addTreeItem(
 		{
 			if( _item->path() == parentPath )
 			{
-				return new ResourcesTreeItem( _parent, _item );
+				return new ResourceTreeItem( _parent, _item );
 			}
 			else
 			{
 				// something went wrong
-				return new ResourcesTreeItem( _parent, _item );
+				return new ResourceTreeItem( _parent, _item );
 			}
 		}
 
 		pathComponent = itemPath[parentPathSize] + "/";
 	}
 
-	ResourcesTreeItem * subParent =
+	ResourceTreeItem * subParent =
 		_parent->findChild( pathComponent,
-					ResourcesItem::BaseURL );
+					ResourceItem::BaseURL );
 	if( subParent == NULL )
 	{
-		ResourcesItem * dirItem =
-			new ResourcesItem( this,
+		ResourceItem * dirItem =
+			new ResourceItem( this,
 				pathComponent,
-				ResourcesItem::TypeDirectory,
-				ResourcesItem::BaseURL,
+				ResourceItem::TypeDirectory,
+				ResourceItem::BaseURL,
 				parentPath );
 		database()->addItem( dirItem );
-		subParent = new ResourcesTreeItem( _parent, dirItem );
+		subParent = new ResourceTreeItem( _parent, dirItem );
 	}
 	return addTreeItem( subParent, _item );
 }
@@ -154,14 +154,14 @@ ResourcesTreeItem * WebResourcesProvider::addTreeItem(
 
 
 
-void WebResourcesProvider::importNodeIntoDB( const QDomNode & _n,
-						ResourcesTreeItem * _parent )
+void WebResourceProvider::importNodeIntoDB( const QDomNode & _n,
+						ResourceTreeItem * _parent )
 {
 	QDomNode n = _n;
 	while( !n.isNull() )
 	{
 		QString path = n.firstChildElement( "dir" ).text();
-		ResourcesItem::Type type = ResourcesItem::TypeUnknown;
+		ResourceItem::Type type = ResourceItem::TypeUnknown;
 
 		if( !path.isEmpty() )
 		{
@@ -169,21 +169,21 @@ void WebResourcesProvider::importNodeIntoDB( const QDomNode & _n,
 		}
 		if( n.nodeName() == "webresources" )
 		{
-			type = ResourcesItem::TypeDirectory;
+			type = ResourceItem::TypeDirectory;
 		}
 
-		ResourcesItem * item =
-			new ResourcesItem( this,
+		ResourceItem * item =
+			new ResourceItem( this,
 				n.firstChildElement( "name" ).text(),
 				type,
-				ResourcesItem::BaseURL,
+				ResourceItem::BaseURL,
 				path,
 				n.firstChildElement( "hash" ).text(),
 				n.firstChildElement( "tags" ).text(),
 				n.firstChildElement( "size" ).text().toInt() );
 		database()->addItem( item );
 
-		ResourcesTreeItem * treeItem = addTreeItem( _parent, item );
+		ResourceTreeItem * treeItem = addTreeItem( _parent, item );
 		if( n.nodeName() != "file" )
 		{
 			importNodeIntoDB( n.firstChild(), treeItem );
@@ -196,7 +196,7 @@ void WebResourcesProvider::importNodeIntoDB( const QDomNode & _n,
 
 
 
-void WebResourcesProvider::download( const QString & _path,
+void WebResourceProvider::download( const QString & _path,
 					QBuffer * _target, bool _wait ) const
 {
 	const int id = m_http->get( _path, _target );
@@ -213,5 +213,5 @@ void WebResourcesProvider::download( const QString & _path,
 
 
 
-#include "moc_web_resources_provider.cxx"
+#include "moc_WebResourceProvider.cxx"
 

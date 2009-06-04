@@ -45,7 +45,7 @@ class mainWindow;
 class mixer;
 class pianoRoll;
 class projectNotes;
-class UnifiedResourcesProvider;
+class UnifiedResourceProvider;
 class song;
 class songEditor;
 class ladspa2LMMS;
@@ -101,9 +101,9 @@ public:
 		return s_projectJournal;
 	}
 
-	static UnifiedResourcesProvider * getResourcesProvider( void )
+	static UnifiedResourceProvider * resourceProvider( void )
 	{
-		return s_resourcesProvider;
+		return s_resourceProvider;
 	}
 
 	// GUI
@@ -201,7 +201,7 @@ private:
 	static mixer * s_mixer;
 	static fxMixer * s_fxMixer;
 	static song * s_song;
-	static UnifiedResourcesProvider * s_resourcesProvider;
+	static UnifiedResourceProvider * s_resourceProvider;
 	static bbTrackContainer * s_bbTrackContainer;
 	static projectJournal * s_projectJournal;
 	static dummyTrackContainer * s_dummyTC;

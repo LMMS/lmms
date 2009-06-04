@@ -1,8 +1,8 @@
 /*
- * unified_resources_provider.cpp - implementation of UnifiedResourcesProvider
+ * UnifiedResourceProvider.cpp - implementation of UnifiedResourceProvider
  *
  * Copyright (c) 2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -23,12 +23,12 @@
  */
 
 
-#include "unified_resources_provider.h"
-#include "resources_db.h"
+#include "UnifiedResourceProvider.h"
+#include "ResourceDB.h"
 
 
-UnifiedResourcesProvider::UnifiedResourcesProvider() :
-	ResourcesProvider( QString() )
+UnifiedResourceProvider::UnifiedResourceProvider() :
+	ResourceProvider( QString() )
 {
 	database()->init();
 }
@@ -36,11 +36,11 @@ UnifiedResourcesProvider::UnifiedResourcesProvider() :
 
 
 
-UnifiedResourcesProvider::~UnifiedResourcesProvider()
+UnifiedResourceProvider::~UnifiedResourceProvider()
 {
 	database()->items().clear();
 
-	foreach( ResourcesDB * db, m_mergedDatabases )
+	foreach( ResourceDB * db, m_mergedDatabases )
 	{
 		delete db->provider();
 	}
@@ -49,9 +49,9 @@ UnifiedResourcesProvider::~UnifiedResourcesProvider()
 
 
 
-void UnifiedResourcesProvider::addDatabase( ResourcesDB * _db )
+void UnifiedResourceProvider::addDatabase( ResourceDB * _db )
 {
-	ResourcesTreeItem * childRoot = _db->topLevelNode()->getChild( 0 );
+	ResourceTreeItem * childRoot = _db->topLevelNode()->getChild( 0 );
 	if( childRoot )
 	{
 		m_mergedDatabases << _db;
@@ -72,9 +72,9 @@ void UnifiedResourcesProvider::addDatabase( ResourcesDB * _db )
 
 
 
-void UnifiedResourcesProvider::updateDatabase( void )
+void UnifiedResourceProvider::updateDatabase( void )
 {
-	foreach( ResourcesDB * db, m_mergedDatabases )
+	foreach( ResourceDB * db, m_mergedDatabases )
 	{
 		db->provider()->updateDatabase();
 	}
@@ -83,25 +83,25 @@ void UnifiedResourcesProvider::updateDatabase( void )
 
 
 
-void UnifiedResourcesProvider::remergeItems( void )
+void UnifiedResourceProvider::remergeItems( void )
 {
-	typedef QHash<const ResourcesItem *,
-			const ResourcesItem *> PointerHashMap;
+	typedef QHash<const ResourceItem *,
+			const ResourceItem *> PointerHashMap;
 	PointerHashMap itemsSeen;
 
-	ResourcesDB::ItemList & items = database()->items();
+	ResourceDB::ItemList & items = database()->items();
 
 	itemsSeen.reserve( items.size() );
 
-	for( ResourcesDB::ItemList::Iterator it = items.begin();
+	for( ResourceDB::ItemList::Iterator it = items.begin();
 						it != items.end(); ++it )
 	{
 		itemsSeen[*it] = *it;
 	}
 
-	foreach( ResourcesDB * db, m_mergedDatabases )
+	foreach( ResourceDB * db, m_mergedDatabases )
 	{
-		for( ResourcesDB::ItemList::ConstIterator it =
+		for( ResourceDB::ItemList::ConstIterator it =
 							db->items().begin();
 						it != db->items().end(); ++it )
 		{
@@ -117,7 +117,7 @@ void UnifiedResourcesProvider::remergeItems( void )
 		}
 	}
 
-	for( ResourcesDB::ItemList::Iterator it = items.begin();
+	for( ResourceDB::ItemList::Iterator it = items.begin();
 						it != items.end(); )
 	{
 		if( itemsSeen[*it] == *it )
@@ -135,5 +135,5 @@ void UnifiedResourcesProvider::remergeItems( void )
 
 
 
-#include "moc_unified_resources_provider.cxx"
+#include "moc_UnifiedResourceProvider.cxx"
 

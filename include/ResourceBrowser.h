@@ -1,5 +1,5 @@
 /*
- * resources_browser.h - header file for ResourcesBrowser
+ * ResourceBrowser.h - header file for ResourceBrowser
  *
  * Copyright (c) 2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -23,19 +23,19 @@
  */
 
 
-#ifndef _RESOURCES_BROWSER_H
-#define _RESOURCES_BROWSER_H
+#ifndef _RESOURCE_BROWSER_H
+#define _RESOURCE_BROWSER_H
 
 #include "side_bar_widget.h"
 
 class QAction;
 class QLabel;
-class ResourcesItem;
-class ResourcesTreeModel;
-class ResourcesTreeView;
+class ResourceItem;
+class ResourceTreeModel;
+class ResourceTreeView;
 
 
-class ResourcesBrowser : public sideBarWidget
+class ResourceBrowser : public sideBarWidget
 {
 	Q_OBJECT
 public:
@@ -53,8 +53,8 @@ public:
 		NumActions
 	} ;
 
-	ResourcesBrowser( QWidget * _parent );
-	virtual ~ResourcesBrowser();
+	ResourceBrowser( QWidget * _parent );
+	virtual ~ResourceBrowser();
 
 
 private slots:
@@ -63,12 +63,12 @@ private slots:
 
 
 private:
-	void triggerAction( Actions _action, ResourcesItem * _item );
+	void triggerAction( Actions _action, ResourceItem * _item );
 
 	QAction * m_actions[NumActions];
 
-	ResourcesTreeModel * m_treeModel;
-	ResourcesTreeView * m_treeView;
+	ResourceTreeModel * m_treeModel;
+	ResourceTreeView * m_treeView;
 
 	QLabel * m_filterStatusLabel;
 

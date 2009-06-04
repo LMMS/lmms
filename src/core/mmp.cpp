@@ -54,7 +54,7 @@ multimediaProject::typeDescStruct
 	{ multimediaProject::ClipboardData, "clipboard-data" },
 	{ multimediaProject::JournalData, "journaldata" },
 	{ multimediaProject::EffectSettings, "effectsettings" },
-	{ multimediaProject::ResourcesDatabase, "resourcesdatabase" },
+	{ multimediaProject::ResourceDatabase, "resourcedatabase" },
 	{ multimediaProject::VideoProject, "videoproject" },
 	{ multimediaProject::BurnProject, "burnproject" },
 	{ multimediaProject::Playlist, "playlist" }

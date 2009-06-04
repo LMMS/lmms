@@ -1,8 +1,8 @@
 /*
- * resources_provider.h - header file for ResourcesProvider
+ * ResourceProvider.h - header file for ResourceProvider
  *
  * Copyright (c) 2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -22,28 +22,28 @@
  *
  */
 
-#ifndef _RESOURCES_PROVIDER_H
-#define _RESOURCES_PROVIDER_H
+#ifndef _RESOURCE_PROVIDER_H
+#define _RESOURCE_PROVIDER_H
 
 #include <QtCore/QByteArray>
 #include <QtCore/QObject>
 #include <QtCore/QString>
 
-class ResourcesDB;
-class ResourcesItem;
+class ResourceDB;
+class ResourceItem;
 
 
-class ResourcesProvider : public QObject
+class ResourceProvider : public QObject
 {
 	Q_OBJECT
 public:
-	ResourcesProvider( const QString & _url );
-	virtual ~ResourcesProvider();
+	ResourceProvider( const QString & _url );
+	virtual ~ResourceProvider();
 
 	virtual QString providerName( void ) const = 0;
 	virtual void updateDatabase( void ) = 0;
-	virtual int dataSize( const ResourcesItem * _item ) const = 0;
-	virtual QByteArray fetchData( const ResourcesItem * _item,
+	virtual int dataSize( const ResourceItem * _item ) const = 0;
+	virtual QByteArray fetchData( const ResourceItem * _item,
 					int _maxSize = -1 ) const = 0;
 	// return wether this provider provides local resources
 	virtual bool isLocal( void ) const = 0;
@@ -60,14 +60,14 @@ public:
 
 	QString localCacheFile( void ) const;
 
-	ResourcesDB * database( void )
+	ResourceDB * database( void )
 	{
 		return m_database;
 	}
 
 
 private:
-	ResourcesDB * m_database;
+	ResourceDB * m_database;
 	QString m_url;
 
 

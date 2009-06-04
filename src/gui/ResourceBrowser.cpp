@@ -1,5 +1,5 @@
 /*
- * resources_browser.cpp - implementation of ResourcesBrowser
+ * ResourceBrowser.cpp - implementation of ResourceBrowser
  *
  * Copyright (c) 2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -27,54 +27,54 @@
 #include <QtGui/QLineEdit>
 #include <QtGui/QMenu>
 
-#include "resources_browser.h"
-#include "resources_tree_model.h"
-#include "resources_tree_view.h"
-#include "unified_resources_provider.h"
+#include "ResourceBrowser.h"
+#include "ResourceTreeModel.h"
+#include "ResourceTreeView.h"
+#include "UnifiedResourceProvider.h"
 #include "engine.h"
 #include "embed.h"
 
 
 struct ActionDesc
 {
-	ResourcesBrowser::Actions action;
+	ResourceBrowser::Actions action;
 	const char * pixmap;
 	const char * text;
 } ;
 
-static ActionDesc resourcesBrowserActions[] =
+static ActionDesc resourceBrowserActions[] =
 {
-	{ ResourcesBrowser::EditProperties, "edit_draw",
-		QT_TRANSLATE_NOOP( "ResourcesBrowser", "Show/edit properties" ) },
-	{ ResourcesBrowser::LoadProject, "project_open",
-		QT_TRANSLATE_NOOP( "ResourcesBrowser", "Load project" ) },
-	{ ResourcesBrowser::LoadInNewTrackSongEditor, "songeditor",
-		QT_TRANSLATE_NOOP( "ResourcesBrowser", "Load in new track in Song Editor" ) },
-	{ ResourcesBrowser::LoadInNewTrackBBEditor, "bb_track",
-		QT_TRANSLATE_NOOP( "ResourcesBrowser", "Load in new track in B+B Editor" ) },
-	{ ResourcesBrowser::LoadInActiveInstrumentTrack, "instrument_track",
-		QT_TRANSLATE_NOOP( "ResourcesBrowser", "Load into active instrument track" ) },
-	{ ResourcesBrowser::DownloadIntoCollection, "mimetypes/folder-downloads",
-		QT_TRANSLATE_NOOP( "ResourcesBrowser", "Download into collection" ) },
-	{ ResourcesBrowser::UploadToWWW, "mimetypes/network-workgroup",
-		QT_TRANSLATE_NOOP( "ResourcesBrowser", "Upload to WWW" ) },
-	{ ResourcesBrowser::DeleteLocalResource, "edit-delete",
-		QT_TRANSLATE_NOOP( "ResourcesBrowser", "Delete resource" ) },
-	{ ResourcesBrowser::ImportFile, "project_import",
-		QT_TRANSLATE_NOOP( "ResourcesBrowser", "Import file" ) }
+	{ ResourceBrowser::EditProperties, "edit_draw",
+		QT_TRANSLATE_NOOP( "ResourceBrowser", "Show/edit properties" ) },
+	{ ResourceBrowser::LoadProject, "project_open",
+		QT_TRANSLATE_NOOP( "ResourceBrowser", "Load project" ) },
+	{ ResourceBrowser::LoadInNewTrackSongEditor, "songeditor",
+		QT_TRANSLATE_NOOP( "ResourceBrowser", "Load in new track in Song Editor" ) },
+	{ ResourceBrowser::LoadInNewTrackBBEditor, "bb_track",
+		QT_TRANSLATE_NOOP( "ResourceBrowser", "Load in new track in B+B Editor" ) },
+	{ ResourceBrowser::LoadInActiveInstrumentTrack, "instrument_track",
+		QT_TRANSLATE_NOOP( "ResourceBrowser", "Load into active instrument track" ) },
+	{ ResourceBrowser::DownloadIntoCollection, "mimetypes/folder-downloads",
+		QT_TRANSLATE_NOOP( "ResourceBrowser", "Download into collection" ) },
+	{ ResourceBrowser::UploadToWWW, "mimetypes/network-workgroup",
+		QT_TRANSLATE_NOOP( "ResourceBrowser", "Upload to WWW" ) },
+	{ ResourceBrowser::DeleteLocalResource, "edit-delete",
+		QT_TRANSLATE_NOOP( "ResourceBrowser", "Delete resource" ) },
+	{ ResourceBrowser::ImportFile, "project_import",
+		QT_TRANSLATE_NOOP( "ResourceBrowser", "Import file" ) }
 } ;
 
 
 
 
-ResourcesBrowser::ResourcesBrowser( QWidget * _parent ) :
-	sideBarWidget( tr( "Resources Browser" ),
-			embed::getIconPixmap( "resources_browser" ),
+ResourceBrowser::ResourceBrowser( QWidget * _parent ) :
+	sideBarWidget( tr( "Resource Browser" ),
+			embed::getIconPixmap( "resource_browser" ),
 			_parent )
 {
 	// create a model which represents our database as a tree
-	m_treeModel = new ResourcesTreeModel(
-				engine::getResourcesProvider()->database() );
+	m_treeModel = new ResourceTreeModel(
+				engine::resourceProvider()->database() );
 
 	// create filter UI
 	QHBoxLayout * filterLayout = new QHBoxLayout;
@@ -91,7 +91,7 @@ ResourcesBrowser::ResourcesBrowser( QWidget * _parent ) :
 	filterLayout->addWidget( m_filterStatusLabel );
 
 	// create an according tree-view for our tree-model
-	m_treeView = new ResourcesTreeView( m_treeModel, contentParent() );
+	m_treeView = new ResourceTreeView( m_treeModel, contentParent() );
 
 	// set up context menu handling
 	m_treeView->setContextMenuPolicy( Qt::CustomContextMenu );
@@ -113,14 +113,14 @@ ResourcesBrowser::ResourcesBrowser( QWidget * _parent ) :
 	                this, SLOT( updateFilterStatus() ) );
 
 	// setup actions to be used in context menu
-	for( int i = 0;i < (int) ( sizeof( resourcesBrowserActions ) /
+	for( int i = 0;i < (int) ( sizeof( resourceBrowserActions ) /
 						sizeof( ActionDesc ) ); ++i )
 	{
-		Actions a = resourcesBrowserActions[i].action;
+		Actions a = resourceBrowserActions[i].action;
 		m_actions[a] = new QAction(
 			embed::getIconPixmap(
-				resourcesBrowserActions[i].pixmap ),
-			tr( resourcesBrowserActions[i].text ),
+				resourceBrowserActions[i].pixmap ),
+			tr( resourceBrowserActions[i].text ),
 			this );
 		m_actions[a]->setData( i );
 	}
@@ -129,7 +129,7 @@ ResourcesBrowser::ResourcesBrowser( QWidget * _parent ) :
 
 
 
-ResourcesBrowser::~ResourcesBrowser()
+ResourceBrowser::~ResourceBrowser()
 {
 	delete m_treeView;
 	delete m_treeModel;
@@ -138,7 +138,7 @@ ResourcesBrowser::~ResourcesBrowser()
 
 
 
-void ResourcesBrowser::showContextMenu( const QPoint & _pos )
+void ResourceBrowser::showContextMenu( const QPoint & _pos )
 {
 	// clicked at a valid position?
 	QModelIndex idx = m_treeView->indexAt( _pos );
@@ -150,32 +150,32 @@ void ResourcesBrowser::showContextMenu( const QPoint & _pos )
 	// construct menu depending on selected item
 	QMenu m;
 
-	ResourcesItem * item = m_treeModel->item( idx );
+	ResourceItem * item = m_treeModel->item( idx );
 	switch( item->type() )
 	{
-		case ResourcesItem::TypeSample:
-		case ResourcesItem::TypeSoundFont:
-		case ResourcesItem::TypePreset:
-		case ResourcesItem::TypePlugin:
+		case ResourceItem::TypeSample:
+		case ResourceItem::TypeSoundFont:
+		case ResourceItem::TypePreset:
+		case ResourceItem::TypePlugin:
 			m.addAction( m_actions[LoadInNewTrackSongEditor] );
 			m.addAction( m_actions[LoadInNewTrackBBEditor] );
 			m.addAction( m_actions[LoadInActiveInstrumentTrack] );
 			break;
-		case ResourcesItem::TypeProject:
+		case ResourceItem::TypeProject:
 			m.addAction( m_actions[LoadProject] );
 			break;
-		case ResourcesItem::TypeForeignProject:
-		case ResourcesItem::TypeMidiFile:
+		case ResourceItem::TypeForeignProject:
+		case ResourceItem::TypeMidiFile:
 			m.addAction( m_actions[ImportFile] );
 			break;
-		case ResourcesItem::TypeImage:
-		case ResourcesItem::TypeDirectory:
-		case ResourcesItem::TypeUnknown:
-		case ResourcesItem::NumTypes:
+		case ResourceItem::TypeImage:
+		case ResourceItem::TypeDirectory:
+		case ResourceItem::TypeUnknown:
+		case ResourceItem::NumTypes:
 			break;
 	}
 
-	if( item->type() != ResourcesItem::TypeDirectory )
+	if( item->type() != ResourceItem::TypeDirectory )
 	{
 		m.addSeparator();
 		if( item->isLocalResource() )
@@ -206,7 +206,7 @@ void ResourcesBrowser::showContextMenu( const QPoint & _pos )
 
 
 
-void ResourcesBrowser::updateFilterStatus()
+void ResourceBrowser::updateFilterStatus()
 {
 	m_filterStatusLabel->setText( QString( "%1/%2" ).
 					arg( m_treeModel->shownItems() ).
@@ -216,7 +216,7 @@ void ResourcesBrowser::updateFilterStatus()
 
 
 
-void ResourcesBrowser::triggerAction( Actions _action, ResourcesItem * _item )
+void ResourceBrowser::triggerAction( Actions _action, ResourceItem * _item )
 {
 	// TODO
 }
@@ -224,5 +224,5 @@ void ResourcesBrowser::triggerAction( Actions _action, ResourcesItem * _item )
 
 
 
-#include "moc_resources_browser.cxx"
+#include "moc_ResourceBrowser.cxx"
 

@@ -1,8 +1,8 @@
 /*
- * web_resources_provider.h - header file for WebResourcesProvider
+ * WebResourceProvider.h - header file for WebResourceProvider
  *
  * Copyright (c) 2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -22,40 +22,40 @@
  *
  */
 
-#ifndef _WEB_RESOURCES_PROVIDER_H
-#define _WEB_RESOURCES_PROVIDER_H
+#ifndef _WEB_RESOURCE_PROVIDER_H
+#define _WEB_RESOURCE_PROVIDER_H
 
 #include <QtCore/QBuffer>
 #include <QtXml/QDomNode>
 
-#include "resources_provider.h"
-#include "resources_item.h"
+#include "ResourceProvider.h"
+#include "ResourceItem.h"
 
 
 class QHttp;
 
 
-class WebResourcesProvider : public ResourcesProvider
+class WebResourceProvider : public ResourceProvider
 {
 	Q_OBJECT
 public:
-	WebResourcesProvider( const QString & _url );
-	virtual ~WebResourcesProvider();
+	WebResourceProvider( const QString & _url );
+	virtual ~WebResourceProvider();
 
 	virtual QString providerName( void ) const
 	{
-		return "WebResourcesProvider";
+		return "WebResourceProvider";
 	}
 
 	virtual void updateDatabase( void );
 
-	virtual int dataSize( const ResourcesItem * _item ) const
+	virtual int dataSize( const ResourceItem * _item ) const
 	{
 		// asume that the size we have set before from the web
 		// catalogue is correct
 		return _item->size();
 	}
-	virtual QByteArray fetchData( const ResourcesItem * _item,
+	virtual QByteArray fetchData( const ResourceItem * _item,
 					int _maxSize = -1 ) const;
 
 	virtual bool isLocal( void ) const
@@ -69,10 +69,10 @@ private slots:
 
 
 private:
-	ResourcesTreeItem * addTreeItem( ResourcesTreeItem * _parent,
-						ResourcesItem * _item );
+	ResourceTreeItem * addTreeItem( ResourceTreeItem * _parent,
+						ResourceItem * _item );
 	void importNodeIntoDB( const QDomNode & n,
-						ResourcesTreeItem * _parent );
+						ResourceTreeItem * _parent );
 	void download( const QString & _path, QBuffer * _target,
 						bool _wait = false ) const;
 

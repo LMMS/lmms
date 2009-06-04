@@ -1,8 +1,8 @@
 /*
- * unified_resources_provider.h - header file for UnifiedResourcesProvider
+ * LocalResourceProvider.h - header file for LocalResourceProvider
  *
  * Copyright (c) 2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -22,65 +22,56 @@
  *
  */
 
-#ifndef _UNIFIED_RESOURCES_PROVIDER_H
-#define _UNIFIED_RESOURCES_PROVIDER_H
+#ifndef _LOCAL_RESOURCE_PROVIDER_H
+#define _LOCAL_RESOURCE_PROVIDER_H
 
-#include "resources_provider.h"
-#include "resources_item.h"
+#include <QtCore/QFileSystemWatcher>
+#include <QtCore/QStringList>
+
+#include "ResourceProvider.h"
+#include "ResourceItem.h"
 
 
-class UnifiedResourcesProvider : public ResourcesProvider
+class LocalResourceProvider : public ResourceProvider
 {
 	Q_OBJECT
 public:
-	UnifiedResourcesProvider();
-	virtual ~UnifiedResourcesProvider();
-
-	void addDatabase( ResourcesDB * _db );
+	LocalResourceProvider( ResourceItem::BaseDirectory _baseDir,
+						const QString & _dir );
+	virtual ~LocalResourceProvider();
 
 	virtual QString providerName( void ) const
 	{
-		return "UnifiedResourcesProvider";
+		return "LocalResourceProvider";
 	}
 
 	virtual void updateDatabase( void );
 
-	virtual int dataSize( const ResourcesItem * _item ) const
-	{
-		if( _item->provider() != this )
-		{
-			return _item->provider()->dataSize( _item );
-		}
-		return 0;
-	}
-
-	virtual QByteArray fetchData( const ResourcesItem * _item,
-					int _maxSize = -1 ) const
-	{
-		if( _item->provider() != this )
-		{
-			return _item->provider()->fetchData( _item );
-		}
-		return QByteArray();
-	}
+	virtual int dataSize( const ResourceItem * _item ) const;
+	virtual QByteArray fetchData( const ResourceItem * _item,
+						int _maxSize = -1 ) const;
 
 	virtual bool isLocal( void ) const
 	{
-		return false;
-	}
-
-	virtual bool cacheDatabase( void ) const
-	{
-		return false;
+		return true;
 	}
 
 
 private slots:
-	void remergeItems( void );
+	void addDirectory( const QString & _path );
+	void removeDirectory( const QString & _path );
+	void reloadDirectory( const QString & _path );
 
 
 private:
-	QList<ResourcesDB *> m_mergedDatabases;
+	void readDir( const QString & _dir, ResourceTreeItem * _parent );
+
+	ResourceItem::BaseDirectory m_baseDir;
+	const QString m_dir;
+
+	QStringList m_scannedFolders;
+
+	QFileSystemWatcher m_watcher;
 
 } ;
 

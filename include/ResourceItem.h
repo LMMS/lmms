@@ -1,8 +1,8 @@
 /*
- * resources_item.h - header file for ResourcesItem
+ * ResourceItem.h - header file for ResourceItem
  *
  * Copyright (c) 2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -22,18 +22,18 @@
  *
  */
 
-#ifndef _RESOURCES_ITEM_H
-#define _RESOURCES_ITEM_H
+#ifndef _RESOURCE_ITEM_H
+#define _RESOURCE_ITEM_H
 
 #include <QtCore/QByteArray>
 #include <QtCore/QDateTime>
 
-#include "resources_provider.h"
+#include "ResourceProvider.h"
 
-class ResourcesTreeItem;
+class ResourceTreeItem;
 
 
-class ResourcesItem
+class ResourceItem
 {
 public:
 	enum BaseDirectories
@@ -63,7 +63,7 @@ public:
 	} ;
 	typedef Types Type;
 
-	ResourcesItem( ResourcesProvider * _provider,
+	ResourceItem( ResourceProvider * _provider,
 			const QString & _name,
 			Type _type,
 			BaseDirectory _base_dir = BaseWorkingDir,
@@ -74,7 +74,7 @@ public:
 			const QDateTime & _last_mod = QDateTime() );
 
 
-	const ResourcesProvider * provider( void ) const
+	const ResourceProvider * provider( void ) const
 	{
 		return m_provider;
 	}
@@ -149,17 +149,17 @@ public:
 		return m_type != TypeUnknown && !m_name.isEmpty();
 	}
 
-	void setTreeItem( ResourcesTreeItem * _ti )
+	void setTreeItem( ResourceTreeItem * _ti )
 	{
 		m_treeItem = _ti;
 	}
 
-	ResourcesTreeItem * treeItem( void )
+	ResourceTreeItem * treeItem( void )
 	{
 		return m_treeItem;
 	}
 
-	const ResourcesTreeItem * treeItem( void ) const
+	const ResourceTreeItem * treeItem( void ) const
 	{
 		return m_treeItem;
 	}
@@ -186,21 +186,21 @@ public:
 
 	void reload( void );
 
-	bool operator==( const ResourcesItem & _other ) const;
+	bool operator==( const ResourceItem & _other ) const;
 
 	// rates equality with given item
-	int equalityLevel( const ResourcesItem & _other ) const;
+	int equalityLevel( const ResourceItem & _other ) const;
 
 	Type guessType( void ) const;
 
 	static QString getBaseDirectory( BaseDirectory _bd,
-					const ResourcesItem * _item = NULL );
+					const ResourceItem * _item = NULL );
 
 
 private:
 	void init( void );
 
-	ResourcesProvider * m_provider;
+	ResourceProvider * m_provider;
 	QString m_name;
 	int m_nameHash;
 	Type m_type;
@@ -211,7 +211,7 @@ private:
 	QDateTime m_lastMod;
 	QString m_tags;
 
-	ResourcesTreeItem * m_treeItem;
+	ResourceTreeItem * m_treeItem;
 
 } ;
 

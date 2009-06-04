@@ -48,10 +48,10 @@
 #include "song.h"
 #include "midi_control_listener.h"
 
-#include "resources_db.h"
-#include "local_resources_provider.h"
-#include "web_resources_provider.h"
-#include "unified_resources_provider.h"
+#include "resource_db.h"
+#include "local_resource_provider.h"
+#include "web_resource_provider.h"
+#include "unified_resource_provider.h"
 
 
 bool engine::s_hasGUI = true;
@@ -63,7 +63,7 @@ fxMixerView * engine::s_fxMixerView = NULL;
 mainWindow * engine::s_mainWindow = NULL;
 bbTrackContainer * engine::s_bbTrackContainer = NULL;
 song * engine::s_song = NULL;
-UnifiedResourcesProvider * engine::s_resourcesProvider = NULL;
+UnifiedResourceProvider * engine::s_resourceProvider = NULL;
 songEditor * engine::s_songEditor = NULL;
 automationEditor * engine::s_automationEditor = NULL;
 AutomationRecorder * engine::s_automationRecorder = NULL;
@@ -92,23 +92,23 @@ void engine::init( const bool _has_gui )
 	s_song = new song;
 
 
-	// init resources framework
-	LocalResourcesProvider * workingDirResources =
-		new LocalResourcesProvider( ResourcesItem::BaseWorkingDir,
+	// init resource framework
+	LocalResourceProvider * workingDirResource =
+		new LocalResourceProvider( ResourceItem::BaseWorkingDir,
 								QString() );
-	LocalResourcesProvider * shippedResources =
-		new LocalResourcesProvider( ResourcesItem::BaseDataDir,
+	LocalResourceProvider * shippedResource =
+		new LocalResourceProvider( ResourceItem::BaseDataDir,
 								QString() );
-	WebResourcesProvider * webResources =
-		new WebResourcesProvider( "http://lmms.sourceforge.net" );
+	WebResourceProvider * webResource =
+		new WebResourceProvider( "http://lmms.sourceforge.net" );
 
-	UnifiedResourcesProvider * unifiedResources =
-						new UnifiedResourcesProvider;
-	unifiedResources->addDatabase( workingDirResources->database() );
-	unifiedResources->addDatabase( shippedResources->database() );
-	unifiedResources->addDatabase( webResources->database() );
+	UnifiedResourceProvider * unifiedResource =
+						new UnifiedResourceProvider;
+	unifiedResource->addDatabase( workingDirResource->database() );
+	unifiedResource->addDatabase( shippedResource->database() );
+	unifiedResource->addDatabase( webResource->database() );
 
-	s_resourcesProvider = unifiedResources;
+	s_resourceProvider = unifiedResource;
 
 
 	s_fxMixer = new fxMixer;
@@ -194,8 +194,8 @@ void engine::destroy( void )
 	delete s_automationRecorder;
 	s_automationRecorder = NULL;
 
-	delete s_resourcesProvider;
-	s_resourcesProvider = NULL;
+	delete s_resourceProvider;
+	s_resourceProvider = NULL;
 
 	delete configManager::inst();
 }

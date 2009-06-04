@@ -1,8 +1,8 @@
 /*
- * resources_tree_item.cpp - implementation of ResourcesTreeItem
+ * ResourceTreeItem.cpp - implementation of ResourceTreeItem
  *
  * Copyright (c) 2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -25,11 +25,11 @@
 
 #include <QtCore/QHash>
 
-#include "resources_tree_item.h"
+#include "ResourceTreeItem.h"
 
 
-ResourcesTreeItem::ResourcesTreeItem( ResourcesTreeItem * _parent,
-					ResourcesItem * _item ) :
+ResourceTreeItem::ResourceTreeItem( ResourceTreeItem * _parent,
+					ResourceItem * _item ) :
 	m_parent( _parent ),
 	m_hidden( false ),
 	m_temporaryMarker( false ),
@@ -48,9 +48,9 @@ ResourcesTreeItem::ResourcesTreeItem( ResourcesTreeItem * _parent,
 
 
 
-ResourcesTreeItem::~ResourcesTreeItem()
+ResourceTreeItem::~ResourceTreeItem()
 {
-	foreachResourcesTreeItem( m_children )
+	foreachResourceTreeItem( m_children )
 	{
 		delete *it;
 	}
@@ -67,10 +67,10 @@ ResourcesTreeItem::~ResourcesTreeItem()
 
 
 
-int ResourcesTreeItem::rowCount( void ) const
+int ResourceTreeItem::rowCount( void ) const
 {
 	int rc = 0;
-	foreachConstResourcesTreeItem( m_children )
+	foreachConstResourceTreeItem( m_children )
 	{
 		if( !(*it)->isHidden() )
 		{
@@ -83,10 +83,10 @@ int ResourcesTreeItem::rowCount( void ) const
 
 
 
-ResourcesTreeItem * ResourcesTreeItem::getChild( int _row )
+ResourceTreeItem * ResourceTreeItem::getChild( int _row )
 {
 	int rc = 0;
-	foreachResourcesTreeItem( m_children )
+	foreachResourceTreeItem( m_children )
 	{
 		if( !(*it)->isHidden() )
 		{
@@ -103,7 +103,7 @@ ResourcesTreeItem * ResourcesTreeItem::getChild( int _row )
 
 
 
-int ResourcesTreeItem::row( void ) const
+int ResourceTreeItem::row( void ) const
 {
 	if( !m_parent )
 	{
@@ -111,7 +111,7 @@ int ResourcesTreeItem::row( void ) const
 	}
 
 	int row = 0;
-	foreachConstResourcesTreeItem( m_parent->m_children )
+	foreachConstResourceTreeItem( m_parent->m_children )
 	{
 		if( !(*it)->isHidden() )
 		{
@@ -128,9 +128,9 @@ int ResourcesTreeItem::row( void ) const
 
 
 
-ResourcesTreeItem * ResourcesTreeItem::findChild(
+ResourceTreeItem * ResourceTreeItem::findChild(
 					const QString & _name,
-					ResourcesItem::BaseDirectory _base_dir )
+					ResourceItem::BaseDirectory _base_dir )
 {
 	if( _name.isNull() || _name.isEmpty() )
 	{
@@ -139,9 +139,9 @@ ResourcesTreeItem * ResourcesTreeItem::findChild(
 
 	const int hash = qHash( _name );
 
-	foreachResourcesTreeItem( m_children )
+	foreachResourceTreeItem( m_children )
 	{
-		ResourcesTreeItem * rti = *it;
+		ResourceTreeItem * rti = *it;
 		if( rti->item() &&
 			rti->item()->nameHash() == hash &&
 			rti->item()->name() == _name &&

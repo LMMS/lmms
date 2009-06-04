@@ -1,8 +1,8 @@
 /*
- * resources_tree_view.cpp - implementation of ResourcesTreeView
+ * ResourceProvider.cpp - implementation of ResourceProvider
  *
- * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ * Copyright (c) 2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -23,51 +23,48 @@
  */
 
 
-#include "resources_tree_view.h"
-#include "resources_tree_model.h"
+#include <QtCore/QCryptographicHash>
+#include <QtCore/QDir>
+
+#include "ResourceProvider.h"
+#include "ResourceDB.h"
+#include "config_mgr.h"
 
 
-ResourcesTreeView::ResourcesTreeView( ResourcesTreeModel * _tm,
-					QWidget * _parent ) :
-	QTreeView( _parent ),
-	m_tm( _tm )
+ResourceProvider::ResourceProvider( const QString & _url ) :
+	m_database( new ResourceDB( this ) ),
+	m_url( _url )
 {
-	setHeaderHidden( true );
-	setModel( m_tm );
-	connect( m_tm, SIGNAL( itemsChanged() ),
-			this, SLOT( updateFilter() ) );
 }
 
 
 
 
-void ResourcesTreeView::setFilter( const QString & _s )
+ResourceProvider::~ResourceProvider()
 {
-	setUpdatesEnabled( false );
-	if( _s.isEmpty() )
+	delete m_database;
+}
+
+
+
+
+QString ResourceProvider::localCacheFile( void ) const
+{
+	const QString dir = configManager::inst()->workingDir() +
+					".resources" + QDir::separator();
+	if( !QDir( dir ).exists() )
 	{
-		collapseAll();
-		m_tm->setFilter( _s );
+		QDir().mkpath( dir );
 	}
-	else
-	{
-		m_tm->setFilter( _s );
-		expandToDepth( _s.size() );
-	}
-	setUpdatesEnabled( true );
 
-	m_lastFilter = _s;
+	QCryptographicHash h( QCryptographicHash::Md5 );
+
+	h.addData( QString( providerName() + url() ).toUtf8() );
+
+	return dir + h.result().toHex();
 }
 
 
 
+#include "moc_ResourceProvider.cxx"
 
-void ResourcesTreeView::updateFilter( void )
-{
-	setFilter( m_lastFilter );
-}
-
-
-
-
-#include "moc_resources_tree_view.cxx"
