@@ -1,7 +1,7 @@
 /*
  * side_bar_widget.h - base-class for all side-bar-widgets
  *
- * Copyright (c) 2004-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -59,9 +59,15 @@ protected:
 	{
 		return( m_contents );
 	}
+
 	inline void addContentWidget( QWidget * _w )
 	{
 		m_layout->addWidget( _w );
+	}
+
+	inline void addContentLayout( QLayout * _l )
+	{
+		m_layout->addLayout( _l );
 	}
 
 
