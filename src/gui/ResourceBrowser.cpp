@@ -124,6 +124,9 @@ ResourceBrowser::ResourceBrowser( QWidget * _parent ) :
 			this );
 		m_actions[a]->setData( i );
 	}
+
+	// initialize filter status label
+	updateFilterStatus();
 }
 
 
