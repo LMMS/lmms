@@ -23,6 +23,7 @@
  */
 
 #include <QtGui/QAction>
+#include <QtGui/QLabel>
 #include <QtGui/QLineEdit>
 #include <QtGui/QMenu>
 
@@ -75,10 +76,22 @@ ResourcesBrowser::ResourcesBrowser( QWidget * _parent ) :
 	m_treeModel = new ResourcesTreeModel(
 				engine::getResourcesProvider()->database() );
 
+	// create filter UI
+	QHBoxLayout * filterLayout = new QHBoxLayout;
+
+	QLabel * filterPixmap = new QLabel;
+	filterPixmap->setPixmap( embed::getIconPixmap( "edit-find" ) );
+
+	QLineEdit * filterEdit = new QLineEdit;
+
+	m_filterStatusLabel = new QLabel;
+
+	filterLayout->addWidget( filterPixmap );
+	filterLayout->addWidget( filterEdit );
+	filterLayout->addWidget( m_filterStatusLabel );
+
 	// create an according tree-view for our tree-model
 	m_treeView = new ResourcesTreeView( m_treeModel, contentParent() );
-
-	QLineEdit * filterEdit = new QLineEdit ( contentParent() );
 
 	// set up context menu handling
 	m_treeView->setContextMenuPolicy( Qt::CustomContextMenu );
@@ -86,14 +99,18 @@ ResourcesBrowser::ResourcesBrowser( QWidget * _parent ) :
 			SIGNAL( customContextMenuRequested( const QPoint & ) ),
 			this, SLOT( showContextMenu( const QPoint & ) ) );
 
-	// add widgets to us (we're a SideBarWidget)
+	// add widgets/layouts to us (we're a SideBarWidget)
+	addContentLayout( filterLayout );
 	addContentWidget( m_treeView );
-	addContentWidget( filterEdit );
 
 
 	// instantly apply filter when typing into filterEdit
 	connect( filterEdit, SIGNAL( textChanged( const QString & ) ),
 	                m_treeView, SLOT( setFilter( const QString & ) ) );
+	connect( filterEdit, SIGNAL( textChanged( const QString & ) ),
+	                this, SLOT( updateFilterStatus() ) );
+	connect( m_treeModel, SIGNAL( itemsChanged() ),
+	                this, SLOT( updateFilterStatus() ) );
 
 	// setup actions to be used in context menu
 	for( int i = 0;i < (int) ( sizeof( resourcesBrowserActions ) /
@@ -184,6 +201,16 @@ void ResourcesBrowser::showContextMenu( const QPoint & _pos )
 									item );
 	}
 
+}
+
+
+
+
+void ResourcesBrowser::updateFilterStatus()
+{
+	m_filterStatusLabel->setText( QString( "%1/%2" ).
+					arg( m_treeModel->shownItems() ).
+					arg( m_treeModel->totalItems() ) );
 }
 
 

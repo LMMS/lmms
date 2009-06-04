@@ -195,6 +195,42 @@ void ResourcesTreeModel::setFilter( const QString & _s )
 
 
 
+int ResourcesTreeModel::totalItems() const
+{
+	const ResourcesDB::ItemList & items = m_db->items();
+	int num = 0;
+	foreach( const ResourcesItem * i, items )
+	{
+		if( i->type() != ResourcesItem::TypeDirectory )
+		{
+			++num;
+		}
+	}
+	return num;
+}
+
+
+
+
+int ResourcesTreeModel::shownItems() const
+{
+	const ResourcesDB::ItemList & items = m_db->items();
+	int num = 0;
+	foreach( const ResourcesItem * i, items )
+	{
+		if( i->type() != ResourcesItem::TypeDirectory &&
+			i->treeItem()->isHidden() == false )
+		{
+			++num;
+		}
+	}
+	return num;
+}
+
+
+
+
+
 bool ResourcesTreeModel::filterItems( ResourcesTreeItem * _item,
 						const QModelIndex & _parent,
 						const QStringList & _keywords )

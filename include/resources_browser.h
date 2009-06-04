@@ -29,6 +29,7 @@
 #include "side_bar_widget.h"
 
 class QAction;
+class QLabel;
 class ResourcesItem;
 class ResourcesTreeModel;
 class ResourcesTreeView;
@@ -58,6 +59,7 @@ public:
 
 private slots:
 	void showContextMenu( const QPoint & _pos );
+	void updateFilterStatus();
 
 
 private:
@@ -67,6 +69,8 @@ private:
 
 	ResourcesTreeModel * m_treeModel;
 	ResourcesTreeView * m_treeView;
+
+	QLabel * m_filterStatusLabel;
 
 } ;
 

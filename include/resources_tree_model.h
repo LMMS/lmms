@@ -75,6 +75,9 @@ public:
 		return treeItem( _idx )->item();
 	}
 
+	int totalItems() const;
+	int shownItems() const;
+
 
 private:
 	bool filterItems( ResourcesTreeItem * _item,

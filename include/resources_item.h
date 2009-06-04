@@ -159,6 +159,11 @@ public:
 		return m_treeItem;
 	}
 
+	const ResourcesTreeItem * treeItem( void ) const
+	{
+		return m_treeItem;
+	}
+
 	const QDateTime & lastMod( void ) const
 	{
 		return m_lastMod;
