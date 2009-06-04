@@ -327,7 +327,7 @@ void trackContainerView::undoStep( journalEntry & _je )
 		case RemoveTrack:
 		{
 			multimediaProject mmp(
-				_je.data().toMap()["state"].toString(), false );
+				_je.data().toMap()["state"].toString().utf8() );
 			track::create( mmp.content().firstChild().toElement(),
 									m_tc );
 			break;
@@ -415,7 +415,7 @@ void trackContainerView::dropEvent( QDropEvent * _de )
 	}
 	else if( type.left( 6 ) == "track_" )
 	{
-		multimediaProject mmp( value, false );
+		multimediaProject mmp( value.toUtf8() );
 		track::create( mmp.content().firstChild().toElement(), m_tc );
 		_de->accept();
 	}

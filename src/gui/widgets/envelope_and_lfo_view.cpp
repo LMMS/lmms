@@ -397,7 +397,7 @@ void envelopeAndLFOView::dropEvent( QDropEvent * _de )
 	}
 	else if( type == QString( "tco_%1" ).arg( track::SampleTrack ) )
 	{
-		multimediaProject mmp( value, FALSE );
+		multimediaProject mmp( value.toUtf8() );
 		m_params->m_userWave.setAudioFile(
 				mmp.content().firstChild().toElement().
 							attribute( "src" ) );

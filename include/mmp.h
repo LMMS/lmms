@@ -1,7 +1,7 @@
 /*
  * mmp.h - class for reading and writing multimedia-project-files
  *
- * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -53,9 +53,8 @@ public:
 	} ;
 
 
-	multimediaProject( const QString & _in_file_name,
-						bool _is_filename = TRUE,
-						bool _upgrade = TRUE );
+	multimediaProject( const QString & _fileName );
+	multimediaProject( const QByteArray & _data );
 	multimediaProject( ProjectTypes _project_type );
 	virtual ~multimediaProject();
 
@@ -77,8 +76,6 @@ public:
 		return m_type;
 	}
 
-	static ProjectTypes typeOfFile( const QString & _fn );
-
 
 private:
 	static ProjectTypes type( const QString & _type_name );
@@ -87,6 +84,8 @@ private:
 	void cleanMetaNodes( QDomElement _de );
 
 	void upgrade( void );
+
+	void loadData( const QByteArray & _data, const QString & _sourceFile );
 
 
 	struct EXPORT typeDescStruct

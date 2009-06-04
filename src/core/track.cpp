@@ -488,7 +488,7 @@ void trackContentObjectView::dropEvent( QDropEvent * _de )
 	{
 		// value contains our XML-data so simply create a
 		// multimediaProject which does the rest for us...
-		multimediaProject mmp( value, false );
+		multimediaProject mmp( value.toUtf8() );
 		// at least save position before getting to moved to somewhere
 		// the user doesn't expect...
 		midiTime pos = m_tco->startPosition();
@@ -1084,7 +1084,7 @@ void trackContentWidget::dropEvent( QDropEvent * _de )
 
 		// value contains our XML-data so simply create a
 		// multimediaProject which does the rest for us...
-		multimediaProject mmp( value, false );
+		multimediaProject mmp( value.toUtf8() );
 		// at least save position before getting moved to somewhere
 		// the user doesn't expect...
 		tco->restoreState( mmp.content().firstChild().toElement() );
@@ -1219,7 +1219,8 @@ void trackContentWidget::undoStep( journalEntry & _je )
 			trackContentObject * tco = getTrack()->createTCO(
 								midiTime( 0 ) );
 			multimediaProject mmp(
-				_je.data().toMap()["state"].toString(), false );
+				_je.data().toMap()["state"].
+					toString().toUtf8() );
 			tco->restoreState(
 				mmp.content().firstChild().toElement() );
 			break;
@@ -2255,7 +2256,7 @@ void trackView::dropEvent( QDropEvent * _de )
 	{
 		// value contains our XML-data so simply create a
 		// multimediaProject which does the rest for us...
-		multimediaProject mmp( value, false );
+		multimediaProject mmp( value.toUtf8() );
 		engine::getMixer()->lock();
 		m_track->restoreState( mmp.content().firstChild().toElement() );
 		engine::getMixer()->unlock();
