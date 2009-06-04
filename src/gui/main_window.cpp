@@ -74,7 +74,7 @@
 #include "text_float.h"
 #include "cpuload_widget.h"
 #include "visualization_widget.h"
-#include "resource_browser.h"
+#include "ResourceBrowser.h"
 
 #include "gui/tracks/track_container_scene.h"
 

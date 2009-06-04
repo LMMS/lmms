@@ -1,5 +1,5 @@
 /*
- * resource_tree_view.h - view for ResourceTreeModel
+ * ResourceTreeView.h - view for ResourceTreeModel
  *
  * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *

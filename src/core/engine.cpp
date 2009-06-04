@@ -48,10 +48,10 @@
 #include "song.h"
 #include "midi_control_listener.h"
 
-#include "resource_db.h"
-#include "local_resource_provider.h"
-#include "web_resource_provider.h"
-#include "unified_resource_provider.h"
+#include "ResourceDB.h"
+#include "LocalResourceProvider.h"
+#include "WebResourceProvider.h"
+#include "UnifiedResourceProvider.h"
 
 
 bool engine::s_hasGUI = true;
