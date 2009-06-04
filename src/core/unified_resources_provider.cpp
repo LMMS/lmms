@@ -56,12 +56,16 @@ void UnifiedResourcesProvider::addDatabase( ResourcesDB * _db )
 	{
 		m_mergedDatabases << _db;
 		connect( _db, SIGNAL( itemsChanged() ),
-				database(), SIGNAL( itemsChanged() ) );
+				this, SLOT( remergeItems() ),
+				Qt::DirectConnection );
 		connect( _db, SIGNAL( itemsChanged() ),
-				this, SLOT( remergeItems() ) );
+				database(), SIGNAL( itemsChanged() ),
+				Qt::DirectConnection );
 
 		childRoot->setParent( database()->topLevelNode() );
 		database()->topLevelNode()->addChild( childRoot );
+
+		remergeItems();
 	}
 }
 
