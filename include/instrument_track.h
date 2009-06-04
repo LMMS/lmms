@@ -53,7 +53,6 @@ class midiPortMenu;
 class multimediaProject;
 class notePlayHandle;
 class pluginView;
-class presetPreviewPlayHandle;
 class tabWidget;
 class trackLabelButton;
 
@@ -233,7 +232,6 @@ private:
 	friend class instrumentTrackView;
 	friend class instrumentTrackWindow;
 	friend class notePlayHandle;
-	friend class presetPreviewPlayHandle;
 	friend class flpImport;
 
 } ;
