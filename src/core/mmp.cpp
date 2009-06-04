@@ -1,9 +1,7 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * mmp.cpp - implementation of class multimediaProject
  *
- * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -29,6 +27,7 @@
 
 #include <math.h>
 
+#include <QtCore/QDebug>
 #include <QtCore/QFile>
 #include <QtCore/QTextStream>
 #include <QtGui/QMessageBox>
@@ -84,85 +83,43 @@ multimediaProject::multimediaProject( ProjectTypes _project_type ) :
 
 
 
-multimediaProject::multimediaProject( const QString & _in_file_name,
-							bool _is_filename,
-							bool _upgrade ) :
+multimediaProject::multimediaProject( const QString & _fileName ) :
 	QDomDocument(),
 	m_content(),
 	m_head()
 {
-	QFile in_file( _in_file_name );
-	if( _is_filename == TRUE )
+	QFile inFile( _fileName );
+	if( !inFile.open( QIODevice::ReadOnly ) )
 	{
-		if( !in_file.open( QIODevice::ReadOnly ) )
-		{
-			QMessageBox::critical( NULL,
-					songEditor::tr( "Could not open file" ),
-					songEditor::tr( "Could not open "
-							"file %1. You probably "
-							"have no rights to "
-							"read this file.\n"
-							"Please make sure you "
-							"have at least read-"
-							"access to the file "
-							"and try again."
-						).arg( _in_file_name ) );
+		QMessageBox::critical( NULL,
+			songEditor::tr( "Could not open file" ),
+			songEditor::tr( "Could not open file %1. You probably "
+					"have no permissions to read this "
+					"file.\n Please make sure to have at "
+					"least read permissions to the file "
+					"and try again." ).arg( _fileName ) );
 			return;
-		}
 	}
-	QString error_msg;
-	int line;
-	int col;
-	if( _is_filename == TRUE )
+
+	if( _fileName.section( '.', -1 ) == "mmpz" )
 	{
-		bool error = FALSE;
-		if( _in_file_name.section( '.', -1 ) == "mmpz" )
-		{
-			QString data = qUncompress( in_file.readAll() );
-			error = !setContent( data, &error_msg, &line, &col );
-		}
-		else
-		{
-			error = !setContent( &in_file, &error_msg, &line,
-									&col );
-		}
-		if( error )
-		{
-			printf( "at line %d column %d: %s\n", line, col,
-					error_msg.toAscii().constData() );
-			QMessageBox::critical( NULL, songEditor::tr( "Error in "
-							"multimedia-project" ),
-					songEditor::tr( "The multimedia-"
-							"project %1 seems to contain errors. LMMS "
-							"will try its best to recover as much "
-							"data as possible data from this file."
-						).arg( _in_file_name ) );
-			return;
-		}
-		in_file.close();
+		loadData( qUncompress( inFile.readAll() ), _fileName );
 	}
 	else
 	{
-		if( !setContent( _in_file_name, &error_msg, &line, &col ) )
-		{
-			printf( "multimediaProject: error parsing XML-data "
-					"directly given to constructor!\n" );
-			return;
-		}
+		loadData( inFile.readAll(), _fileName );
 	}
+}
 
-	QDomElement root = documentElement();
-	m_type = type( root.attribute( "type" ) );
-	m_head = root.elementsByTagName( "head" ).item( 0 ).toElement();
 
-	if( _upgrade && root.hasAttribute( "creatorversion" ) &&
-			root.attribute( "creatorversion" ) != LMMS_VERSION )
-	{
-		upgrade();
-	}
 
-	m_content = root.elementsByTagName( typeName( m_type ) ).
-							item( 0 ).toElement();
+
+multimediaProject::multimediaProject( const QByteArray & _data ) :
+	QDomDocument(),
+	m_content(),
+	m_head()
+{
+	loadData( _data, "<internal data>" );
 }
 
 
@@ -187,26 +144,26 @@ QString multimediaProject::nameWithExtension( const QString & _fn ) const
 				if( configManager::inst()->value( "app",
 						"nommpz" ).toInt() == 0 )
 				{
-					return( _fn + ".mmpz" );
+					return _fn + ".mmpz";
 				}
-				return( _fn + ".mmp" );
+				return _fn + ".mmp";
 			}
 			break;
 		case SongProjectTemplate:
 			if( _fn.section( '.',-1 ) != "mpt" )
 			{
-				return( _fn + ".mpt" );
+				return _fn + ".mpt";
 			}
 			break;
 		case InstrumentTrackSettings:
 			if( _fn.section( '.', -1 ) != "xpf" )
 			{
-				return( _fn + ".xpf" );
+				return _fn + ".xpf";
 			}
 			break;
 		default: ;
 	}
-	return( _fn );
+	return _fn;
 }
 
 
@@ -236,7 +193,7 @@ bool multimediaProject::writeFile( const QString & _fn )
 							"the file and try "
 							"again."
 						).arg( fn ) );
-		return( FALSE );
+		return false;
 	}
 	QString xml = "<?xml version=\"1.0\"?>\n" + toString( 2 );
 	if( fn.section( '.', -1 ) == "mmpz" )
@@ -249,17 +206,7 @@ bool multimediaProject::writeFile( const QString & _fn )
 	}
 	outfile.close();
 
-	return( TRUE );
-}
-
-
-
-
-multimediaProject::ProjectTypes multimediaProject::typeOfFile(
-							const QString & _fn )
-{
-	multimediaProject m( _fn, TRUE, FALSE );
-	return( m.type() );
+	return true;
 }
 
 
@@ -272,15 +219,14 @@ multimediaProject::ProjectTypes multimediaProject::type(
 	{
 		if( s_types[i].m_name == _type_name )
 		{
-			return( static_cast<multimediaProject::ProjectTypes>(
-									i ) );
+			return static_cast<multimediaProject::ProjectTypes>( i );
 		}
 	}
 	if( _type_name == "channelsettings" )
 	{
-		return( multimediaProject::InstrumentTrackSettings );
+		return multimediaProject::InstrumentTrackSettings;
 	}
-	return( UnknownType );
+	return UnknownType;
 }
 
 
@@ -290,9 +236,9 @@ QString multimediaProject::typeName( ProjectTypes _project_type )
 {
 	if( _project_type >= UnknownType && _project_type < NumProjectTypes )
 	{
-		return( s_types[_project_type].m_name );
+		return s_types[_project_type].m_name;
 	}
-	return( s_types[UnknownType].m_name );
+	return s_types[UnknownType].m_name;
 }
 
 
@@ -463,7 +409,7 @@ void multimediaProject::upgrade( void )
 			}
 			else if( !el.hasAttribute( "chord-enabled" ) )
 			{
-				el.setAttribute( "chord-enabled", TRUE );
+				el.setAttribute( "chord-enabled", true );
 				el.setAttribute( "arp-enabled",
 					el.attribute( "arpdir" ).toInt() != 0 );
 			}
@@ -735,4 +681,32 @@ void multimediaProject::upgrade( void )
 
 
 
-#endif
+void multimediaProject::loadData( const QByteArray & _data,
+					const QString & _sourceFile )
+{
+	QString errorMsg;
+	int line, col;
+	if( !setContent( _data, &errorMsg, &line, &col ) )
+	{
+		qWarning() << "at line" << line << "column" << errorMsg;
+		QMessageBox::critical( NULL, songEditor::tr( "Error in file" ),
+			songEditor::tr( "The file %1 seems to contain errors "
+					"and therefore can't be loaded." ).
+							arg( _sourceFile ) );
+		return;
+	}
+
+	QDomElement root = documentElement();
+	m_type = type( root.attribute( "type" ) );
+	m_head = root.elementsByTagName( "head" ).item( 0 ).toElement();
+
+	if( root.hasAttribute( "creatorversion" ) &&
+		root.attribute( "creatorversion" ) != LMMS_VERSION )
+	{
+		upgrade();
+	}
+
+	m_content = root.elementsByTagName( typeName( m_type ) ).
+							item( 0 ).toElement();
+}
+

@@ -1,7 +1,7 @@
 /*
  * audio_file_processor.cpp - instrument for using audio-files
  *
- * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -424,7 +424,7 @@ void audioFileProcessorView::dropEvent( QDropEvent * _de )
 	}
 	else if( type == QString( "tco_%1" ).arg( track::SampleTrack ) )
 	{
-		multimediaProject mmp( value, FALSE );
+		multimediaProject mmp( value.toUtf8() );
 		castModel<audioFileProcessor>()->setAudioFile( mmp.content().
 				firstChild().toElement().attribute( "src" ) );
 		_de->accept();

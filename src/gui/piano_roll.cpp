@@ -3376,7 +3376,7 @@ void pianoRoll::pasteNotes( void )
 
 	if( !value.isEmpty() )
 	{
-		multimediaProject mmp( value, false );
+		multimediaProject mmp( value.toUtf8() );
 
 		QDomNodeList list = mmp.elementsByTagName(
 							note::classNodeName() );
