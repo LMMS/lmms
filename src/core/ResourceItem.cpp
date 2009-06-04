@@ -172,7 +172,7 @@ ResourceItem::Type ResourceItem::guessType( void ) const
 		typeMap["jpeg"] = TypeImage;
 	}
 
-	const QString s = QFileInfo( fullName() ).completeSuffix().toLower();
+	const QString s = QFileInfo( name() ).completeSuffix().toLower();
 	QMap<QString, Type>::ConstIterator it = typeMap.find( s );
 	if( it != typeMap.end() )
 	{
