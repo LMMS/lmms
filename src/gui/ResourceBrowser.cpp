@@ -159,6 +159,7 @@ void ResourceBrowser::showContextMenu( const QPoint & _pos )
 		case ResourceItem::TypeSample:
 		case ResourceItem::TypeSoundFont:
 		case ResourceItem::TypePreset:
+		case ResourceItem::TypePluginSpecificPreset:
 		case ResourceItem::TypePlugin:
 			m.addAction( m_actions[LoadInNewTrackSongEditor] );
 			m.addAction( m_actions[LoadInNewTrackBBEditor] );

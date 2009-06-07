@@ -157,6 +157,8 @@ ResourceItem::Type ResourceItem::guessType( void ) const
 		typeMap["xpf"] = TypePreset;
 		typeMap["cs.xml"] = TypePreset;
 
+		typeMap["xiz"] = TypePluginSpecificPreset;
+
 		typeMap["mmp"] = TypeProject;
 		typeMap["mmpz"] = TypeProject;
 

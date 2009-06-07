@@ -54,6 +54,7 @@ public:
 		TypeSample,
 		TypeSoundFont,
 		TypePreset,
+		TypePluginSpecificPreset,
 		TypeProject,
 		TypeMidiFile,
 		TypeForeignProject,

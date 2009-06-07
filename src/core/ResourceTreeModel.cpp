@@ -84,6 +84,7 @@ case ResourceItem::TypeDirectory:
 case ResourceItem::TypeSample:
 	return embed::getIconPixmap( "mimetypes/sample", 24, 24 );
 case ResourceItem::TypePreset:
+case ResourceItem::TypePluginSpecificPreset:
 	return embed::getIconPixmap( "mimetypes/preset", 24, 24 );
 case ResourceItem::TypeProject:
 	return embed::getIconPixmap( "project_file", 24, 24 );
