@@ -25,8 +25,10 @@
 
 #include "ResourcePreviewer.h"
 #include "ResourceItem.h"
+#include "engine.h"
 #include "instrument_track.h"
 #include "mmp.h"
+#include "project_journal.h"
 
 
 ResourcePreviewer::ResourcePreviewer() :
@@ -48,6 +50,10 @@ ResourcePreviewer::ResourcePreviewer() :
 
 void ResourcePreviewer::preview( ResourceItem * _item )
 {
+	const bool j = engine::getProjectJournal()->isJournalling();
+	engine::getProjectJournal()->setJournalling( false );
+	engine::setSuppressMessages( true );
+
 	switch( _item->type() )
 	{
 		case ResourceItem::TypePreset:
@@ -60,6 +66,9 @@ void ResourcePreviewer::preview( ResourceItem * _item )
 							midiPort::Disabled );
 			break;
 	}
+
+	engine::setSuppressMessages( false );
+	engine::getProjectJournal()->setJournalling( j );
 }
 
 

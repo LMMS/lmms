@@ -46,7 +46,7 @@ private:
 	{
 		virtual QString nodeName( void ) const
 		{
-			return( "PreviewTrackContainer" );
+			return "PreviewTrackContainer";
 		}
 	} ;
 
