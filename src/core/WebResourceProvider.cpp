@@ -82,7 +82,7 @@ QByteArray WebResourceProvider::fetchData( const ResourceItem * _item,
 	QBuffer buffer;
 	buffer.open( QBuffer::ReadWrite );
 
-	download( "/WebResource/" + _item->hash(), &buffer, true );
+	download( "/WebResources/" + _item->hash(), &buffer, true );
 
 	return buffer.data();
 }
