@@ -58,6 +58,10 @@ ResourcePreviewer::~ResourcePreviewer()
 
 void ResourcePreviewer::preview( ResourceItem * _item )
 {
+	// stop any existing preview sounds
+	stopPreview();
+
+	// disable journalling of changes in our preview track
 	const bool j = engine::getProjectJournal()->isJournalling();
 	engine::getProjectJournal()->setJournalling( false );
 	engine::setSuppressMessages( true );
@@ -75,8 +79,22 @@ void ResourcePreviewer::preview( ResourceItem * _item )
 			break;
 	}
 
+	// re-enable journalling
 	engine::setSuppressMessages( false );
 	engine::getProjectJournal()->setJournalling( j );
+
+	// playback default note
+	m_previewTrack->processInEvent(
+		midiEvent( MidiNoteOn, 0, DefaultKey, MidiMaxVelocity ),
+								midiTime() );
+}
+
+
+
+
+void ResourcePreviewer::stopPreview()
+{
+	m_previewTrack->silenceAllNotes();
 }
 
 

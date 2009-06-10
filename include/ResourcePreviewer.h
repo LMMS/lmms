@@ -39,6 +39,7 @@ public:
 	~ResourcePreviewer();
 
 	void preview( ResourceItem * _item );
+	void stopPreview();
 
 
 private:
