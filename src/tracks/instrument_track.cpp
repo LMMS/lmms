@@ -134,7 +134,10 @@ instrumentTrack::instrumentTrack( trackContainer * _tc ) :
 
 instrumentTrack::~instrumentTrack()
 {
-	engine::getMixer()->removePlayHandles( this );
+	// kill all running notes
+	silenceAllNotes();
+
+	// now we're save deleting the instrument
 	delete m_instrument;
 }
 
@@ -398,6 +401,24 @@ void instrumentTrack::processOutEvent( const midiEvent & _me,
 
 	// if appropriate, midi-port does futher routing
 	m_midiPort.processOutEvent( _me, _time );
+}
+
+
+
+
+void instrumentTrack::silenceAllNotes()
+{
+	engine::getMixer()->lock();
+	for( int i = 0; i < NumKeys; ++i )
+	{
+		m_notes[i] = NULL;
+		m_runningMidiNotes[i] = 0;
+	}
+
+	// invalidate all NotePlayHandles linked to this track
+	m_processHandles.clear();
+	engine::getMixer()->removePlayHandles( this );
+	engine::getMixer()->unlock();
 }
 
 
@@ -711,7 +732,7 @@ void instrumentTrack::saveTrackSpecificSettings( QDomDocument & _doc,
 
 void instrumentTrack::loadTrackSpecificSettings( const QDomElement & _this )
 {
-	invalidateAllMyNPH();
+	silenceAllNotes();
 
 	engine::getMixer()->lock();
 
@@ -818,7 +839,7 @@ void instrumentTrack::loadTrackSpecificSettings( const QDomElement & _this )
 
 instrument * instrumentTrack::loadInstrument( const QString & _plugin_name )
 {
-	invalidateAllMyNPH();
+	silenceAllNotes();
 
 	engine::getMixer()->lock();
 	delete m_instrument;
@@ -828,23 +849,6 @@ instrument * instrumentTrack::loadInstrument( const QString & _plugin_name )
 	emit instrumentChanged();
 
 	return m_instrument;
-}
-
-
-
-
-void instrumentTrack::invalidateAllMyNPH( void )
-{
-	engine::getMixer()->lock();
-	for( int i = 0; i < NumKeys; ++i )
-	{
-		m_notes[i] = NULL;
-	}
-
-	// invalidate all note-play-handles linked to this channel
-	m_processHandles.clear();
-	engine::getMixer()->removePlayHandles( this );
-	engine::getMixer()->unlock();
 }
 
 
