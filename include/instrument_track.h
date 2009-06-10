@@ -75,7 +75,8 @@ public:
 					const midiTime & _time );
 	virtual void processOutEvent( const midiEvent & _me,
 						const midiTime & _time );
-
+	// silence all running notes played by this track
+	void silenceAllNotes();
 
 	f_cnt_t beatLen( notePlayHandle * _n ) const;
 
@@ -194,8 +195,6 @@ protected:
 	{
 		return "instrumenttrack";
 	}
-	// invalidates all note-play-handles linked to this instrument
-	void invalidateAllMyNPH( void );
 
 
 protected slots:
