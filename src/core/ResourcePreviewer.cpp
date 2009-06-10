@@ -23,9 +23,12 @@
  */
 
 
+#include <QtCore/QFileInfo>
+
 #include "ResourcePreviewer.h"
 #include "ResourceItem.h"
 #include "engine.h"
+#include "instrument.h"
 #include "instrument_track.h"
 #include "mmp.h"
 #include "project_journal.h"
@@ -77,6 +80,25 @@ void ResourcePreviewer::preview( ResourceItem * _item )
 			m_previewTrack->getMidiPort()->setMode(
 							midiPort::Disabled );
 			break;
+		case ResourceItem::TypeSample:
+		case ResourceItem::TypeSoundFont:
+		{
+			instrument * i = m_previewTrack->getInstrument();
+			const QString ext = QFileInfo( _item->name() ).
+							suffix().toLower();
+			if( i == NULL ||
+				!i->getDescriptor()->supportsFileType( ext ) )
+			{
+				i = m_previewTrack->loadInstrument(
+					engine::pluginFileHandling()[ext] );
+			}
+			if( i != NULL )
+			{
+				// TODO: only works with local resources!
+				i->loadFile( _item->fullName() );
+			}
+			break;
+		}
 	}
 
 	// re-enable journalling
