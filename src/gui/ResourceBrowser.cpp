@@ -70,11 +70,11 @@ static ActionDesc resourceBrowserActions[] =
 ResourceBrowser::ResourceBrowser( QWidget * _parent ) :
 	sideBarWidget( tr( "Resource Browser" ),
 			embed::getIconPixmap( "resource_browser" ),
-			_parent )
+			_parent ),
+	m_previewer(),
+	m_treeModel( engine::resourceProvider()->database() )
 {
 	// create a model which represents our database as a tree
-	m_treeModel = new ResourceTreeModel(
-				engine::resourceProvider()->database() );
 
 	// create filter UI
 	QHBoxLayout * filterLayout = new QHBoxLayout;
@@ -91,13 +91,21 @@ ResourceBrowser::ResourceBrowser( QWidget * _parent ) :
 	filterLayout->addWidget( m_filterStatusLabel );
 
 	// create an according tree-view for our tree-model
-	m_treeView = new ResourceTreeView( m_treeModel, contentParent() );
+	m_treeView = new ResourceTreeView( &m_treeModel, contentParent() );
 
 	// set up context menu handling
 	m_treeView->setContextMenuPolicy( Qt::CustomContextMenu );
 	connect( m_treeView,
 			SIGNAL( customContextMenuRequested( const QPoint & ) ),
 			this, SLOT( showContextMenu( const QPoint & ) ) );
+
+	// track mouse press and release events
+	connect( m_treeView,
+			SIGNAL( pressed( const QModelIndex & ) ),
+			this, SLOT( startItemPreview( const QModelIndex & ) ) );
+	connect( m_treeView,
+			SIGNAL( clicked( const QModelIndex & ) ),
+			this, SLOT( stopItemPreview( const QModelIndex & ) ) );
 
 	// add widgets/layouts to us (we're a SideBarWidget)
 	addContentLayout( filterLayout );
@@ -109,11 +117,11 @@ ResourceBrowser::ResourceBrowser( QWidget * _parent ) :
 	                m_treeView, SLOT( setFilter( const QString & ) ) );
 	connect( filterEdit, SIGNAL( textChanged( const QString & ) ),
 	                this, SLOT( updateFilterStatus() ) );
-	connect( m_treeModel, SIGNAL( itemsChanged() ),
+	connect( &m_treeModel, SIGNAL( itemsChanged() ),
 	                this, SLOT( updateFilterStatus() ) );
 
 	// setup actions to be used in context menu
-	for( int i = 0;i < (int) ( sizeof( resourceBrowserActions ) /
+	for( int i = 0; i < (int) ( sizeof( resourceBrowserActions ) /
 						sizeof( ActionDesc ) ); ++i )
 	{
 		Actions a = resourceBrowserActions[i].action;
@@ -135,7 +143,6 @@ ResourceBrowser::ResourceBrowser( QWidget * _parent ) :
 ResourceBrowser::~ResourceBrowser()
 {
 	delete m_treeView;
-	delete m_treeModel;
 }
 
 
@@ -153,7 +160,7 @@ void ResourceBrowser::showContextMenu( const QPoint & _pos )
 	// construct menu depending on selected item
 	QMenu m;
 
-	ResourceItem * item = m_treeModel->item( idx );
+	ResourceItem * item = m_treeModel.item( idx );
 	switch( item->type() )
 	{
 		case ResourceItem::TypeSample:
@@ -210,11 +217,30 @@ void ResourceBrowser::showContextMenu( const QPoint & _pos )
 
 
 
+void ResourceBrowser::startItemPreview( const QModelIndex & _idx )
+{
+	if( _idx.isValid() )
+	{
+		m_previewer.preview( m_treeModel.item( _idx ) );
+	}
+}
+
+
+
+
+void ResourceBrowser::stopItemPreview( const QModelIndex & _idx )
+{
+	m_previewer.stopPreview();
+}
+
+
+
+
 void ResourceBrowser::updateFilterStatus()
 {
 	m_filterStatusLabel->setText( QString( "%1/%2" ).
-					arg( m_treeModel->shownItems() ).
-					arg( m_treeModel->totalItems() ) );
+					arg( m_treeModel.shownItems() ).
+					arg( m_treeModel.totalItems() ) );
 }
 
 

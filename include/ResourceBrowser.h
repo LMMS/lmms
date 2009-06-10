@@ -26,12 +26,13 @@
 #ifndef _RESOURCE_BROWSER_H
 #define _RESOURCE_BROWSER_H
 
+#include "ResourcePreviewer.h"
+#include "ResourceTreeModel.h"
 #include "side_bar_widget.h"
 
 class QAction;
 class QLabel;
 class ResourceItem;
-class ResourceTreeModel;
 class ResourceTreeView;
 
 
@@ -60,6 +61,8 @@ public:
 private slots:
 	void showContextMenu( const QPoint & _pos );
 	void updateFilterStatus();
+	void startItemPreview( const QModelIndex & _idx );
+	void stopItemPreview( const QModelIndex & _idx );
 
 
 private:
@@ -67,7 +70,13 @@ private:
 
 	QAction * m_actions[NumActions];
 
-	ResourceTreeModel * m_treeModel;
+	// the object that will preview individual resources
+	ResourcePreviewer m_previewer;
+
+	// our tree model on-top of a ResourceDB
+	ResourceTreeModel m_treeModel;
+
+	// a view for the tree model
 	ResourceTreeView * m_treeView;
 
 	QLabel * m_filterStatusLabel;
