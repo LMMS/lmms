@@ -48,6 +48,14 @@ ResourcePreviewer::ResourcePreviewer() :
 
 
 
+ResourcePreviewer::~ResourcePreviewer()
+{
+	delete m_previewTrack;
+}
+
+
+
+
 void ResourcePreviewer::preview( ResourceItem * _item )
 {
 	const bool j = engine::getProjectJournal()->isJournalling();
