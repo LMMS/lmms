@@ -37,7 +37,8 @@
 
 ResourcePreviewer::ResourcePreviewer() :
 	m_previewTrackContainer(),
-	m_previewTrack( NULL )
+	m_previewTrack( NULL ),
+	m_defaultSettings( multimediaProject::InstrumentTrackSettings )
 {
 	// do not clutter global journal with items due to changing settings
 	// in preview classes
@@ -45,10 +46,14 @@ ResourcePreviewer::ResourcePreviewer() :
 	m_previewTrack = dynamic_cast<instrumentTrack *>(
 				track::create( track::InstrumentTrack,
 						&m_previewTrackContainer ) );
+
+	// save default settings so we can restore them later
+	m_previewTrack->saveSettings( m_defaultSettings,
+					m_defaultSettings.content() );
+
 	// make sure a default instrument is loaded
 	m_previewTrack->loadInstrument( "tripleoscillator" );
 	m_previewTrack->setJournalling( false );
-
 }
 
 
@@ -71,6 +76,12 @@ void ResourcePreviewer::preview( ResourceItem * _item )
 	const bool j = engine::getProjectJournal()->isJournalling();
 	engine::getProjectJournal()->setJournalling( false );
 	engine::setSuppressMessages( true );
+
+	// restore default settings, in case we're going to load an incomplete
+	// preset or are going to preview a sample (which should be played at
+	// a default instrument track)
+	m_previewTrack->loadTrackSpecificSettings(
+		m_defaultSettings.content().firstChild().toElement() );
 
 	switch( _item->type() )
 	{

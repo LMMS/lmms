@@ -27,6 +27,7 @@
 #define _RESOURCE_PREVIEWER_H
 
 #include "track_container.h"
+#include "mmp.h"
 
 class Piano;
 class ResourceItem;
@@ -56,6 +57,8 @@ private:
 
 	PreviewTrackContainer m_previewTrackContainer;
 	instrumentTrack * m_previewTrack;
+
+	multimediaProject m_defaultSettings;
 
 } ;
 
