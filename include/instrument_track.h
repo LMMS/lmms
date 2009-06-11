@@ -143,7 +143,7 @@ public:
 		return &m_midiPort;
 	}
 
-	Piano * getPiano( void )
+	Piano * pianoModel( void )
 	{
 		return &m_piano;
 	}
