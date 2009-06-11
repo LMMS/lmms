@@ -85,7 +85,6 @@ const char * volume_help = QT_TRANSLATE_NOOP( "instrumentTrack",
 
 const int INSTRUMENT_WIDTH	= 254;
 const int INSTRUMENT_HEIGHT	= INSTRUMENT_WIDTH;
-const int PIANO_HEIGHT		= 84;
 const int INSTRUMENT_WINDOW_CACHE_SIZE = 8;
 
 
@@ -1267,7 +1266,6 @@ instrumentTrackWindow::instrumentTrackWindow( instrumentTrackView * _itv ) :
 
 	// setup piano-widget
 	m_pianoView= new PianoView( this );
-	m_pianoView->setFixedSize( INSTRUMENT_WIDTH, PIANO_HEIGHT );
 
 	vlayout->addWidget( m_generalSettingsWidget );
 	vlayout->addWidget( m_tabWidget );

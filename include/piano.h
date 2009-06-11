@@ -83,6 +83,7 @@ protected:
 	virtual void mouseReleaseEvent( QMouseEvent * me );
 	virtual void mouseMoveEvent( QMouseEvent * me );
 	virtual void focusOutEvent( QFocusEvent * _fe );
+	virtual void resizeEvent( QResizeEvent * _event );
 
 
 private:

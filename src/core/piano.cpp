@@ -43,6 +43,7 @@
 #include <QtGui/QKeyEvent>
 #include <QtGui/QMouseEvent>
 #include <QtGui/QPainter>
+#include <QtGui/QVBoxLayout>
 
 
 #include "automation_pattern.h"
@@ -109,7 +110,7 @@ Piano::Piano( MidiEventProcessor * _mep ) :
 	model( NULL ),              /*!< base class ctor */
 	m_midiEvProc( _mep )        /*!< the instrumentTrack model */
 {
-	for( int i = 0; i < KeysPerOctave * NumOctaves; ++i )
+	for( int i = 0; i < NumKeys; ++i )
 	{
 		m_pressedKeys[i] = false;
 	}
@@ -136,7 +137,7 @@ Piano::~Piano()
  */
 void Piano::setKeyState( int _key, bool _on )
 {
-	m_pressedKeys[tLimit( _key, 0, KeysPerOctave * NumOctaves - 1 )] = _on;
+	m_pressedKeys[tLimit( _key, 0, NumKeys-1 )] = _on;
 	emit dataChanged();
 }
 
@@ -210,18 +211,24 @@ PianoView::PianoView( QWidget * _parent ) :
 
 	setAttribute( Qt::WA_OpaquePaintEvent, true );
 	setFocusPolicy( Qt::StrongFocus );
+	setMaximumWidth( WhiteKeysPerOctave * NumOctaves * PW_WHITE_KEY_WIDTH );
 
+	// create scrollbar at the bottom
 	m_pianoScroll = new QScrollBar( Qt::Horizontal, this );
-	m_pianoScroll->setRange( 0, WhiteKeysPerOctave * ( NumOctaves - 3 ) -
-									5 );
 	m_pianoScroll->setSingleStep( 1 );
 	m_pianoScroll->setPageStep( 20 );
 	m_pianoScroll->setValue( Octave_3 * WhiteKeysPerOctave );
-	m_pianoScroll->setGeometry( 0, PIANO_BASE + PW_WHITE_KEY_HEIGHT, 250,
-									16 );
-	// ...and connect it to this widget...
+
+	// and connect it to this widget
 	connect( m_pianoScroll, SIGNAL( valueChanged( int ) ),
-					this, SLOT( pianoScrolled( int ) ) );
+			this, SLOT( pianoScrolled( int ) ) );
+
+	// create a layout for ourselves
+	QVBoxLayout * layout = new QVBoxLayout( this );
+	layout->setSpacing( 0 );
+	layout->setMargin( 0 );
+	layout->addSpacing( PIANO_BASE+PW_WHITE_KEY_HEIGHT );
+	layout->addWidget( m_pianoScroll );
 
 }
 
@@ -441,7 +448,7 @@ int PianoView::getKeyFromMouse( const QPoint & _p ) const
 		{
 			--key_num;
 		}
-		if( key_num < KeysPerOctave * NumOctaves - 1 &&
+		if( key_num < NumKeys - 1 &&
 			KEY_ORDER[( key_num + 1 ) % KeysPerOctave] ==
 							Piano::BlackKey &&
 			_p.x() % PW_WHITE_KEY_WIDTH >=
@@ -453,7 +460,7 @@ int PianoView::getKeyFromMouse( const QPoint & _p ) const
 	}
 
 	// some range-checking-stuff
-	return tLimit( key_num, 0, KeysPerOctave * NumOctaves - 1 );
+	return tLimit( key_num, 0, NumKeys - 1 );
 }
 
 
@@ -784,7 +791,7 @@ void PianoView::focusOutEvent( QFocusEvent * )
 	// if we loose focus, we HAVE to note off all running notes because
 	// we don't receive key-release-events anymore and so the notes would
 	// hang otherwise
-	for( int i = 0; i < KeysPerOctave * NumOctaves; ++i )
+	for( int i = 0; i < NumKeys; ++i )
 	{
 		if( m_piano->m_pressedKeys[i] == true )
 		{
@@ -795,6 +802,24 @@ void PianoView::focusOutEvent( QFocusEvent * )
 		}
 	}
 	update();
+}
+
+
+
+
+/*! \brief update scrollbar range after resize
+ *
+ *  After resizing we need to adjust range of scrollbar for not allowing
+ *  to scroll too far to the right.
+ *
+ *  \param _event resize-event object (unused)
+ */
+void PianoView::resizeEvent( QResizeEvent * _event )
+{
+	QWidget::resizeEvent( _event );
+	m_pianoScroll->setRange( 0, WhiteKeysPerOctave * NumOctaves -
+					(int) ceil( (float) width() /
+							PW_WHITE_KEY_WIDTH ) );
 }
 
 
