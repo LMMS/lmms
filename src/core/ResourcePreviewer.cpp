@@ -26,6 +26,7 @@
 #include <QtCore/QFileInfo>
 
 #include "ResourcePreviewer.h"
+#include "ResourceFileMapper.h"
 #include "ResourceItem.h"
 #include "engine.h"
 #include "instrument.h"
@@ -94,8 +95,8 @@ void ResourcePreviewer::preview( ResourceItem * _item )
 			}
 			if( i != NULL )
 			{
-				// TODO: only works with local resources!
-				i->loadFile( _item->fullName() );
+				ResourceFileMapper mapper( _item );
+				i->loadFile( mapper.fileName() );
 			}
 			break;
 		}
