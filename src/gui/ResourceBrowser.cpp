@@ -33,6 +33,7 @@
 #include "UnifiedResourceProvider.h"
 #include "engine.h"
 #include "embed.h"
+#include "piano.h"
 
 
 struct ActionDesc
@@ -107,9 +108,13 @@ ResourceBrowser::ResourceBrowser( QWidget * _parent ) :
 			SIGNAL( clicked( const QModelIndex & ) ),
 			this, SLOT( stopItemPreview( const QModelIndex & ) ) );
 
+	PianoView * pianoView = new PianoView( contentParent() );
+	pianoView->setModel( m_previewer.pianoModel() );
+
 	// add widgets/layouts to us (we're a SideBarWidget)
 	addContentLayout( filterLayout );
 	addContentWidget( m_treeView );
+	addContentWidget( pianoView );
 
 
 	// instantly apply filter when typing into filterEdit

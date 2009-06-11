@@ -28,6 +28,7 @@
 
 #include "track_container.h"
 
+class Piano;
 class ResourceItem;
 class instrumentTrack;
 
@@ -40,6 +41,8 @@ public:
 
 	void preview( ResourceItem * _item );
 	void stopPreview();
+
+	Piano * pianoModel();
 
 
 private:

@@ -45,6 +45,8 @@ ResourcePreviewer::ResourcePreviewer() :
 	m_previewTrack = dynamic_cast<instrumentTrack *>(
 				track::create( track::InstrumentTrack,
 						&m_previewTrackContainer ) );
+	// make sure a default instrument is loaded
+	m_previewTrack->loadInstrument( "tripleoscillator" );
 	m_previewTrack->setJournalling( false );
 
 }
@@ -118,6 +120,14 @@ void ResourcePreviewer::preview( ResourceItem * _item )
 void ResourcePreviewer::stopPreview()
 {
 	m_previewTrack->silenceAllNotes();
+}
+
+
+
+
+Piano * ResourcePreviewer::pianoModel()
+{
+	return m_previewTrack->pianoModel();
 }
 
 
