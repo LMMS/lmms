@@ -28,12 +28,15 @@
 #include <QtGui/QMenu>
 
 #include "ResourceBrowser.h"
+#include "ResourceFileMapper.h"
 #include "ResourceTreeModel.h"
 #include "ResourceTreeView.h"
 #include "UnifiedResourceProvider.h"
 #include "engine.h"
 #include "embed.h"
+#include "main_window.h"
 #include "piano.h"
+#include "song.h"
 
 
 struct ActionDesc
@@ -253,7 +256,17 @@ void ResourceBrowser::updateFilterStatus()
 
 void ResourceBrowser::triggerAction( Actions _action, ResourceItem * _item )
 {
-	// TODO
+	switch( _action )
+	{
+		case LoadProject:
+			if( engine::getMainWindow()->mayChangeProject() )
+			{
+				ResourceFileMapper mapper( _item );
+				engine::getSong()->loadProject(
+							mapper.fileName() );
+			}
+			break;
+	}
 }
 
 
