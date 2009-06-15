@@ -103,14 +103,7 @@ multimediaProject::multimediaProject( const QString & _fileName ) :
 			return;
 	}
 
-	if( _fileName.section( '.', -1 ) == "mmpz" )
-	{
-		loadData( qUncompress( inFile.readAll() ), _fileName );
-	}
-	else
-	{
-		loadData( inFile.readAll(), _fileName );
-	}
+	loadData( inFile.readAll(), _fileName );
 }
 
 
@@ -687,15 +680,29 @@ void multimediaProject::loadData( const QByteArray & _data,
 					const QString & _sourceFile )
 {
 	QString errorMsg;
-	int line, col;
+	int line = -1, col = -1;
 	if( !setContent( _data, &errorMsg, &line, &col ) )
 	{
-		qWarning() << "at line" << line << "column" << errorMsg;
-		QMessageBox::critical( NULL, songEditor::tr( "Error in file" ),
-			songEditor::tr( "The file %1 seems to contain errors "
-					"and therefore can't be loaded." ).
+		// parsing failed? then try to uncompress data
+		QByteArray uncompressed = qUncompress( _data );
+		if( !uncompressed.isEmpty() )
+		{
+			if( setContent( uncompressed, &errorMsg, &line, &col ) )
+			{
+				line = col = -1;
+			}
+		}
+		if( line >= 0 && col >= 0 )
+		{
+			qWarning() << "at line" << line << "column" << errorMsg;
+			QMessageBox::critical( NULL,
+				songEditor::tr( "Error in file" ),
+				songEditor::tr( "The file %1 seems to contain "
+						"errors and therefore can't be "
+						"loaded." ).
 							arg( _sourceFile ) );
-		return;
+			return;
+		}
 	}
 
 	QDomElement root = documentElement();
