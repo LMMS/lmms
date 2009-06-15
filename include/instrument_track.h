@@ -34,6 +34,7 @@
 #include "instrument_sound_shaping.h"
 #include "midi_event_processor.h"
 #include "midi_port.h"
+#include "note_play_handle.h"
 #include "piano.h"
 #include "track.h"
 
@@ -211,8 +212,7 @@ private:
 
 	intModel m_baseNoteModel;
 
-	QList<notePlayHandle *> m_processHandles;
-
+	NotePlayHandleList m_processHandles;
 
 	floatModel m_volumeModel;
 	floatModel m_panningModel;

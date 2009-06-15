@@ -4,7 +4,7 @@
  * preset_preview_play_handle.cpp - implementation of class
  *                                  presetPreviewPlayHandle
  *
- * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -32,6 +32,7 @@
 #include "preset_preview_play_handle.h"
 #include "debug.h"
 #include "engine.h"
+#include "instrument.h"
 #include "instrument_track.h"
 #include "midi_port.h"
 #include "mmp.h"
@@ -230,10 +231,10 @@ void presetPreviewPlayHandle::cleanup( void )
 
 
 
-constNotePlayHandleVector presetPreviewPlayHandle::nphsOfInstrumentTrack(
+ConstNotePlayHandleList presetPreviewPlayHandle::nphsOfInstrumentTrack(
 						const instrumentTrack * _it )
 {
-	constNotePlayHandleVector cnphv;
+	ConstNotePlayHandleList cnphv;
 	s_previewTC->lockData();
 	if( s_previewTC->previewNote() != NULL &&
 		s_previewTC->previewNote()->getInstrumentTrack() == _it )

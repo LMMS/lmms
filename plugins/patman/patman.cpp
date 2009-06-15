@@ -33,6 +33,7 @@
 #include "endian_handling.h"
 #include "engine.h"
 #include "gui_templates.h"
+#include "instrument_track.h"
 #include "note_play_handle.h"
 #include "pixmap_button.h"
 #include "song.h"

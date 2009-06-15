@@ -136,7 +136,7 @@ notePlayHandle::~notePlayHandle()
 		m_instrumentTrack->m_notes[key()] = NULL;
 	}
 
-	for( notePlayHandleVector::iterator it = m_subNotes.begin();
+	for( NotePlayHandleList::Iterator it = m_subNotes.begin();
 						it != m_subNotes.end(); ++it )
 	{
 		delete *it;
@@ -252,7 +252,7 @@ void notePlayHandle::play( sampleFrame * _working_buffer )
 	}
 
 	// play sub-notes (e.g. chords)
-	for( notePlayHandleVector::iterator it = m_subNotes.begin();
+	for( NotePlayHandleList::Iterator it = m_subNotes.begin();
 						it != m_subNotes.end(); )
 	{
 		( *it )->play( _working_buffer );
@@ -316,7 +316,7 @@ void notePlayHandle::noteOff( const f_cnt_t _s )
 	}
 
 	// first note-off all sub-notes
-	for( notePlayHandleVector::iterator it = m_subNotes.begin();
+	for( NotePlayHandleList::Iterator it = m_subNotes.begin();
 						it != m_subNotes.end(); ++it )
 	{
 		( *it )->noteOff( _s );
@@ -373,10 +373,19 @@ float notePlayHandle::volumeLevel( const f_cnt_t _frame )
 
 
 
+bool notePlayHandle::isArpeggioBaseNote( void ) const
+{
+	return isBaseNote() && ( m_partOfArpeggio ||
+			m_instrumentTrack->arpeggiatorEnabled() );
+}
+
+
+
+
 void notePlayHandle::mute( void )
 {
 	// mute all sub-notes
-	for( notePlayHandleVector::iterator it = m_subNotes.begin();
+	for( NotePlayHandleList::Iterator it = m_subNotes.begin();
 						it != m_subNotes.end(); ++it )
 	{
 		( *it )->mute();
@@ -391,7 +400,7 @@ int notePlayHandle::index( void ) const
 {
 	const playHandleVector & phv = engine::getMixer()->playHandles();
 	int idx = 0;
-	for( constPlayHandleVector::const_iterator it = phv.begin();
+	for( constPlayHandleVector::ConstIterator it = phv.begin();
 							it != phv.end(); ++it )
 	{
 		const notePlayHandle * nph =
@@ -414,13 +423,13 @@ int notePlayHandle::index( void ) const
 
 
 
-constNotePlayHandleVector notePlayHandle::nphsOfInstrumentTrack(
+ConstNotePlayHandleList notePlayHandle::nphsOfInstrumentTrack(
 				const instrumentTrack * _it, bool _all_ph )
 {
 	const playHandleVector & phv = engine::getMixer()->playHandles();
-	constNotePlayHandleVector cnphv;
+	ConstNotePlayHandleList cnphv;
 
-	for( constPlayHandleVector::const_iterator it = phv.begin();
+	for( constPlayHandleVector::ConstIterator it = phv.begin();
 							it != phv.end(); ++it )
 	{
 		const notePlayHandle * nph =
@@ -466,7 +475,7 @@ void notePlayHandle::updateFrequency( void )
 		m_instrumentTrack->pitchModel()->value() / ( 100 * 12.0f ) );
 	m_unpitchedFrequency = BaseFreq * powf( 2.0f, pitch );
 
-	for( notePlayHandleVector::iterator it = m_subNotes.begin();
+	for( NotePlayHandleList::Iterator it = m_subNotes.begin();
 						it != m_subNotes.end(); ++it )
 	{
 		( *it )->updateFrequency();
@@ -500,7 +509,7 @@ void notePlayHandle::resize( const bpm_t _new_tempo )
 	m_frames = (f_cnt_t)new_frames;
 	m_totalFramesPlayed = (f_cnt_t)( completed * new_frames );
 
-	for( notePlayHandleVector::iterator it = m_subNotes.begin();
+	for( NotePlayHandleList::Iterator it = m_subNotes.begin();
 						it != m_subNotes.end(); ++it )
 	{
 		( *it )->resize( _new_tempo );

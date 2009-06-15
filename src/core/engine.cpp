@@ -33,6 +33,7 @@
 #include "controller_rack_view.h"
 #include "fx_mixer.h"
 #include "fx_mixer_view.h"
+#include "instrument_track.h"
 #include "ladspa_2_lmms.h"
 #include "main_window.h"
 #include "mixer.h"
@@ -41,6 +42,7 @@
 #include "preset_preview_play_handle.h"
 #include "project_journal.h"
 #include "project_notes.h"
+#include "plugin.h"
 #include "song_editor.h"
 #include "song.h"
 
