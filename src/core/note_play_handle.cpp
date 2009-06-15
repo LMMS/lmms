@@ -398,10 +398,11 @@ void notePlayHandle::mute( void )
 
 int notePlayHandle::index( void ) const
 {
-	const playHandleVector & phv = engine::getMixer()->playHandles();
+	const PlayHandleList & playHandles =
+					engine::getMixer()->playHandles();
 	int idx = 0;
-	for( constPlayHandleVector::ConstIterator it = phv.begin();
-							it != phv.end(); ++it )
+	for( PlayHandleList::ConstIterator it = playHandles.begin();
+						it != playHandles.end(); ++it )
 	{
 		const notePlayHandle * nph =
 				dynamic_cast<const notePlayHandle *>( *it );
@@ -426,11 +427,11 @@ int notePlayHandle::index( void ) const
 ConstNotePlayHandleList notePlayHandle::nphsOfInstrumentTrack(
 				const instrumentTrack * _it, bool _all_ph )
 {
-	const playHandleVector & phv = engine::getMixer()->playHandles();
+	const PlayHandleList & playHandles = engine::getMixer()->playHandles();
 	ConstNotePlayHandleList cnphv;
 
-	for( constPlayHandleVector::ConstIterator it = phv.begin();
-							it != phv.end(); ++it )
+	for( PlayHandleList::ConstIterator it = playHandles.begin();
+						it != playHandles.end(); ++it )
 	{
 		const notePlayHandle * nph =
 				dynamic_cast<const notePlayHandle *>( *it );

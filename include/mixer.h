@@ -1,7 +1,7 @@
 /*
  * mixer.h - audio-device-independent mixer for LMMS
  *
- * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -227,7 +227,7 @@ public:
 
 	void removePlayHandle( playHandle * _ph );
 
-	inline playHandleVector & playHandles( void )
+	inline PlayHandleList & playHandles( void )
 	{
 		return m_playHandles;
 	}
@@ -436,8 +436,8 @@ private:
 	QWaitCondition m_queueReadyWaitCond;
 
 
-	playHandleVector m_playHandles;
-	constPlayHandleVector m_playHandlesToRemove;
+	PlayHandleList m_playHandles;
+	ConstPlayHandleList m_playHandlesToRemove;
 
 	struct qualitySettings m_qualitySettings;
 	float m_masterGain;
