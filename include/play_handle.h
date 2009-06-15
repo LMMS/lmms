@@ -1,8 +1,8 @@
 /*
  * play_handle.h - base-class playHandle - core of rendering engine
  *
- * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -21,7 +21,6 @@
  * Boston, MA 02110-1301 USA.
  *
  */
-
 
 #ifndef _PLAY_HANDLE_H
 #define _PLAY_HANDLE_H
@@ -98,8 +97,8 @@ private:
 } ;
 
 
-typedef QVector<playHandle *> playHandleVector;
-typedef QVector<const playHandle *> constPlayHandleVector;
+typedef QList<playHandle *> PlayHandleList;
+typedef QList<const playHandle *> ConstPlayHandleList;
 
 
 #endif

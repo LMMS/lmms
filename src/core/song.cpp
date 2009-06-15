@@ -136,9 +136,9 @@ void song::setTempo( void )
 {
 	const bpm_t tempo = (bpm_t) m_tempoModel.value();
 	engine::getMixer()->lock();
-	playHandleVector & phv = engine::getMixer()->playHandles();
-	for( playHandleVector::iterator it = phv.begin(); it != phv.end();
-									++it )
+	PlayHandleList & playHandles = engine::getMixer()->playHandles();
+	for( PlayHandleList::Iterator it = playHandles.begin();
+						it != playHandles.end(); ++it )
 	{
 		notePlayHandle * nph = dynamic_cast<notePlayHandle *>( *it );
 		if( nph && !nph->released() )

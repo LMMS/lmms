@@ -248,7 +248,7 @@ void MixerWorkerThread::processJobQueue( void )
 #define FILL_JOB_QUEUE_BEGIN(_vec_type,_vec,_condition)			\
 	MixerWorkerThread::s_jobQueue.queueSize = 0;			\
 	MixerWorkerThread::s_jobQueue.itemsDone = 0;			\
-	for( _vec_type::iterator it = _vec.begin();			\
+	for( _vec_type::Iterator it = _vec.begin();			\
 					it != _vec.end(); ++it )	\
 	{								\
 		if( _condition )					\
@@ -585,10 +585,10 @@ const surroundSampleFrame * mixer::renderNextBuffer( void )
 	// remove all play-handles that have to be deleted and delete
 	// them if they still exist...
 	// maybe this algorithm could be optimized...
-	constPlayHandleVector::iterator it_rem = m_playHandlesToRemove.begin();
+	ConstPlayHandleList::Iterator it_rem = m_playHandlesToRemove.begin();
 	while( it_rem != m_playHandlesToRemove.end() )
 	{
-		playHandleVector::iterator it = qFind( m_playHandles.begin(),
+		PlayHandleList::Iterator it = qFind( m_playHandles.begin(),
 						m_playHandles.end(), *it_rem );
 
 		if( it != m_playHandles.end() )
@@ -618,14 +618,14 @@ const surroundSampleFrame * mixer::renderNextBuffer( void )
 
 
 	// STAGE 1: run and render all play handles
-	FILL_JOB_QUEUE(playHandleVector,m_playHandles,
+	FILL_JOB_QUEUE(PlayHandleList,m_playHandles,
 					MixerWorkerThread::PlayHandle,
 					!( *it )->done());
 	START_JOBS();
 	WAIT_FOR_JOBS();
 
 	// removed all play handles which are done
-	for( playHandleVector::iterator it = m_playHandles.begin();
+	for( PlayHandleList::Iterator it = m_playHandles.begin();
 						it != m_playHandles.end(); )
 	{
 		if( ( *it )->affinityMatters() &&
@@ -689,7 +689,7 @@ void mixer::clear( void )
 {
 	// TODO: m_midiClient->noteOffAll();
 	lock();
-	for( playHandleVector::iterator it = m_playHandles.begin();
+	for( PlayHandleList::Iterator it = m_playHandles.begin();
 					it != m_playHandles.end(); ++it )
 	{
 		// we must not delete instrument-play-handles as they exist
@@ -903,7 +903,7 @@ void mixer::restoreAudioDevice( void )
 
 void mixer::removeAudioPort( audioPort * _port )
 {
-	QVector<audioPort *>::iterator it = qFind( m_audioPorts.begin(),
+	QVector<audioPort *>::Iterator it = qFind( m_audioPorts.begin(),
 							m_audioPorts.end(),
 							_port );
 	if( it != m_audioPorts.end() )
@@ -925,7 +925,7 @@ void mixer::removePlayHandle( playHandle * _ph )
 	if( _ph->affinityMatters() &&
 				_ph->affinity() == QThread::currentThread() )
 	{
-		playHandleVector::iterator it =
+		PlayHandleList::Iterator it =
 				qFind( m_playHandles.begin(),
 						m_playHandles.end(), _ph );
 		if( it != m_playHandles.end() )
@@ -947,7 +947,7 @@ void mixer::removePlayHandle( playHandle * _ph )
 void mixer::removePlayHandles( track * _track )
 {
 	lock();
-	playHandleVector::iterator it = m_playHandles.begin();
+	PlayHandleList::Iterator it = m_playHandles.begin();
 	while( it != m_playHandles.end() )
 	{
 		if( ( *it )->isFromTrack( _track ) )

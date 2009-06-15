@@ -234,7 +234,7 @@ public:
 
 	void removePlayHandle( playHandle * _ph );
 
-	inline playHandleVector & playHandles( void )
+	inline PlayHandleList & playHandles( void )
 	{
 		return m_playHandles;
 	}
@@ -443,8 +443,8 @@ private:
 	QWaitCondition m_queueReadyWaitCond;
 
 
-	playHandleVector m_playHandles;
-	constPlayHandleVector m_playHandlesToRemove;
+	PlayHandleList m_playHandles;
+	ConstPlayHandleList m_playHandlesToRemove;
 
 	struct qualitySettings m_qualitySettings;
 	float m_masterGain;
