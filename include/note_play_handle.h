@@ -2,7 +2,7 @@
  * note_play_handle.h - declaration of class notePlayHandle which is needed
  *                      by LMMS-Play-Engine
  *
- * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -30,16 +30,16 @@
 #include "lmmsconfig.h"
 #include "mixer.h"
 #include "note.h"
-#include "instrument.h"
-#include "instrument_track.h"
 #include "engine.h"
+#include "track.h"
 
 
+class instrumentTrack;
 class notePlayHandle;
 
 template<ch_cnt_t=DEFAULT_CHANNELS> class basicFilters;
-typedef QVector<notePlayHandle *> notePlayHandleVector;
-typedef QVector<const notePlayHandle *> constNotePlayHandleVector;
+typedef QList<notePlayHandle *> NotePlayHandleList;
+typedef QList<const notePlayHandle *> ConstNotePlayHandleList;
 
 
 class EXPORT notePlayHandle : public playHandle, public note
@@ -77,55 +77,6 @@ public:
 	virtual inline bool done( void ) const
 	{
 		return m_released && framesLeft() <= 0;
-	}
-
-	bool willFinishThisPeriod( void ) const
-	{
-		f_cnt_t rftd = m_releaseFramesToDo;
-		f_cnt_t fbr = m_framesBeforeRelease;
-		f_cnt_t rfd = m_releaseFramesDone;
-		if( m_released == TRUE )
-		{
-			f_cnt_t todo = engine::getMixer()->framesPerPeriod();
-			if( isArpeggioBaseNote() )
-			{
-				rftd = rfd + 2 *
-					engine::getMixer()->framesPerPeriod();
-			}
-			if( fbr )
-			{
-				if( fbr <=
-					engine::getMixer()->framesPerPeriod() )
-				{
-					todo -= fbr;
-					fbr = 0;
-				}
-				else
-				{
-					todo = 0;
-					fbr -=
-					engine::getMixer()->framesPerPeriod();
-				}
-			}
-			if( todo && rfd < rftd )
-			{
-				if( rftd - rfd >= todo )
-				{
-					rfd += todo;
-				}
-				else
-				{
-					rfd = rftd;
-				}
-			}
-		}
-
-		if( isArpeggioBaseNote() && m_subNotes.size() == 0 )
-		{
-			rfd = rftd;
-		}
-
-		return ( m_released && fbr == 0 && rfd >= rftd );
 	}
 
 	f_cnt_t framesLeft( void ) const;
@@ -202,11 +153,7 @@ public:
 	}
 
 	// returns whether note is base-note for arpeggio
-	inline bool isArpeggioBaseNote( void ) const
-	{
-		return isBaseNote() && ( m_partOfArpeggio || 
-				m_instrumentTrack->arpeggiatorEnabled() );
-	}
+	bool isArpeggioBaseNote( void ) const;
 
 	inline bool isMuted( void ) const
 	{
@@ -219,15 +166,15 @@ public:
 	// belonging to this instrument-track - used by arpeggiator
 	int index( void ) const;
 
-	// note-play-handles belonging to given channel, if _all_ph = TRUE,
+	// note-play-handles belonging to given channel, if _all_ph = true,
 	// also released note-play-handles are returned
-	static constNotePlayHandleVector nphsOfInstrumentTrack(
-			const instrumentTrack * _ct, bool _all_ph = FALSE );
+	static ConstNotePlayHandleList nphsOfInstrumentTrack(
+			const instrumentTrack * _ct, bool _all_ph = false );
 
 	// return whether given note-play-handle is equal to *this
 	bool operator==( const notePlayHandle & _nph ) const;
 
-	bool bbTrackMuted( void )
+	inline bool bbTrackMuted( void )
 	{
 		return m_bbTrack && m_bbTrack->isMuted();
 	}
@@ -288,7 +235,7 @@ private:
 					// played after release
 	f_cnt_t m_releaseFramesDone;	// number of frames done after
 					// release of note
-	notePlayHandleVector m_subNotes;// used for chords and arpeggios
+	NotePlayHandleList m_subNotes;	// used for chords and arpeggios
 	volatile bool m_released;	// indicates whether note is released
 	bool m_baseNote;		// indicates whether note is a
 					// base-note (i.e. no sub-note)

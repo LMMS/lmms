@@ -33,6 +33,7 @@
 #include "embed.h"
 #include "engine.h"
 #include "envelope_and_lfo_parameters.h"
+#include "instrument.h"
 #include "instrument_track.h"
 #include "note_play_handle.h"
 

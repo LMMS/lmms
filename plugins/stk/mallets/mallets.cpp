@@ -34,6 +34,7 @@
 
 #include "engine.h"
 #include "gui_templates.h"
+#include "instrument_track.h"
 
 #undef SINGLE_SOURCE_COMPILE
 #include "embed.cpp"

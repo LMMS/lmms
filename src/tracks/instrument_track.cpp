@@ -521,7 +521,7 @@ void instrumentTrack::setName( const QString & _new_name )
 void instrumentTrack::updateBaseNote( void )
 {
 	engine::getMixer()->lock();
-	for( QList<notePlayHandle *>::iterator it = m_processHandles.begin();
+	for( NotePlayHandleList::Iterator it = m_processHandles.begin();
 					it != m_processHandles.end(); ++it )
 	{
 		( *it )->updateFrequency();
@@ -592,7 +592,7 @@ bool instrumentTrack::play( const midiTime & _start,
 	}
 
 	// Handle automation: detuning
-	for( QList<notePlayHandle *>::iterator it = m_processHandles.begin();
+	for( NotePlayHandleList::Iterator it = m_processHandles.begin();
 					it != m_processHandles.end(); ++it )
 	{
 		( *it )->processMidiTime( _start );

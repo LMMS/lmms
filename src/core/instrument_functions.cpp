@@ -305,7 +305,7 @@ void arpeggiator::processNote( notePlayHandle * _n )
 
 	const int selected_arp = m_arpModel.value();
 
-	constNotePlayHandleVector cnphv = notePlayHandle::nphsOfInstrumentTrack(
+	ConstNotePlayHandleList cnphv = notePlayHandle::nphsOfInstrumentTrack(
 						_n->getInstrumentTrack() );
 	if( m_arpModeModel.value() != FreeMode && cnphv.size() == 0 )
 	{

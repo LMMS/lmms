@@ -48,7 +48,7 @@ public:
 
 	static void init( void );
 	static void cleanup( void );
-	static constNotePlayHandleVector nphsOfInstrumentTrack(
+	static ConstNotePlayHandleList nphsOfInstrumentTrack(
 						const instrumentTrack * _ct );
 
 
