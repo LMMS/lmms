@@ -77,15 +77,16 @@ void ResourcePreviewer::preview( ResourceItem * _item )
 	engine::getProjectJournal()->setJournalling( false );
 	engine::setSuppressMessages( true );
 
-	// restore default settings, in case we're going to load an incomplete
-	// preset or are going to preview a sample (which should be played at
-	// a default instrument track)
-	m_previewTrack->loadTrackSpecificSettings(
-		m_defaultSettings.content().firstChild().toElement() );
-
+	// handle individual resource types
+	bool handledItem = true;
 	switch( _item->type() )
 	{
 		case ResourceItem::TypePreset:
+			// restore default settings, in case we're going to load
+			// an incomplete preset
+			m_previewTrack->loadTrackSpecificSettings(
+				m_defaultSettings.content().
+					firstChild().toElement() );
 			// fetch data, load into multimedia project and
 			// load it as preset
 			m_previewTrack->loadTrackSpecificSettings(
@@ -97,6 +98,14 @@ void ResourcePreviewer::preview( ResourceItem * _item )
 		case ResourceItem::TypeSample:
 		case ResourceItem::TypeSoundFont:
 		{
+			// restore default settings we are going to preview a
+			// sample (which should be played at a default
+			// instrument track)
+			m_previewTrack->loadTrackSpecificSettings(
+				m_defaultSettings.content().
+					firstChild().toElement() );
+			// if neccessary, load according instrument for the
+			// file to be previewed
 			instrument * i = m_previewTrack->getInstrument();
 			const QString ext = QFileInfo( _item->name() ).
 							suffix().toLower();
@@ -113,16 +122,22 @@ void ResourcePreviewer::preview( ResourceItem * _item )
 			}
 			break;
 		}
+		default:
+			handledItem = false;
+			break;
 	}
 
 	// re-enable journalling
 	engine::setSuppressMessages( false );
 	engine::getProjectJournal()->setJournalling( j );
 
-	// playback default note
-	m_previewTrack->processInEvent(
-		midiEvent( MidiNoteOn, 0, DefaultKey, MidiMaxVelocity ),
+	if( handledItem )
+	{
+		// playback default note
+		m_previewTrack->processInEvent(
+			midiEvent( MidiNoteOn, 0, DefaultKey, MidiMaxVelocity ),
 								midiTime() );
+	}
 }
 
 
