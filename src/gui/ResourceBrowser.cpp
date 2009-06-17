@@ -110,6 +110,10 @@ ResourceBrowser::ResourceBrowser( QWidget * _parent ) :
 	connect( m_treeView,
 			SIGNAL( clicked( const QModelIndex & ) ),
 			this, SLOT( stopItemPreview( const QModelIndex & ) ) );
+	connect( m_treeView,
+			SIGNAL( doubleClicked( const QModelIndex & ) ),
+			this,
+			SLOT( triggerDefaultAction( const QModelIndex & ) ) );
 
 	PianoView * pianoView = new PianoView( contentParent() );
 	pianoView->setModel( m_previewer.pianoModel() );
@@ -239,6 +243,40 @@ void ResourceBrowser::startItemPreview( const QModelIndex & _idx )
 void ResourceBrowser::stopItemPreview( const QModelIndex & _idx )
 {
 	m_previewer.stopPreview();
+}
+
+
+
+
+void ResourceBrowser::triggerDefaultAction( const QModelIndex & _idx )
+{
+	ResourceItem * item = m_treeModel.item( _idx );
+	Actions action = NumActions;
+	switch( item->type() )
+	{
+		case ResourceItem::TypeSample:
+			action = LoadInNewTrackBBEditor;
+			break;
+		case ResourceItem::TypePreset:
+		case ResourceItem::TypePluginSpecificPreset:
+		case ResourceItem::TypePlugin:
+		case ResourceItem::TypeSoundFont:
+			action = LoadInNewTrackSongEditor;
+			break;
+		case ResourceItem::TypeProject:
+			action = LoadProject;
+			break;
+		case ResourceItem::TypeForeignProject:
+		case ResourceItem::TypeMidiFile:
+			action = ImportFile;
+			break;
+		default:
+			break;
+	}
+	if( action != NumActions )
+	{
+		triggerAction( action, item );
+	}
 }
 
 
