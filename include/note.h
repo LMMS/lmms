@@ -243,7 +243,7 @@ private:
 } ;
 
 
-typedef QVector<note *> noteVector;
+typedef QVector<note *> NoteVector;
 
 
 #endif

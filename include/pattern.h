@@ -78,7 +78,7 @@ public:
 	void rearrangeAllNotes( void );
 	void clearNotes( void );
 
-	inline const noteVector & notes( void )
+	inline const NoteVector & notes( void ) const
 	{
 		return m_notes;
 	}
@@ -154,7 +154,7 @@ private:
 	PatternTypes m_patternType;
 
 	// data-stuff
-	noteVector m_notes;
+	NoteVector m_notes;
 	int m_steps;
 
 	// pattern freezing

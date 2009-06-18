@@ -597,7 +597,7 @@ bool instrumentTrack::play( const midiTime & _start,
 
 	bool played_a_note = false;	// will be return variable
 
-	for( tcoVector::iterator it = tcos.begin(); it != tcos.end(); ++it )
+	for( tcoVector::Iterator it = tcos.begin(); it != tcos.end(); ++it )
 	{
 		pattern * p = dynamic_cast<pattern *>( *it );
 		// everything which is not a pattern or muted won't be played
@@ -627,9 +627,9 @@ bool instrumentTrack::play( const midiTime & _start,
 		}
 
 		// get all notes from the given pattern...
-		const noteVector & notes = p->notes();
+		const NoteVector & notes = p->notes();
 		// ...and set our index to zero
-		noteVector::const_iterator it = notes.begin();
+		NoteVector::ConstIterator it = notes.begin();
 #if LMMS_SINGERBOT_SUPPORT
 		int note_idx = 0;
 #endif

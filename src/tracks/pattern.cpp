@@ -88,7 +88,7 @@ pattern::pattern( const pattern & _pat_to_copy ) :
 	m_frozenPattern( NULL ),
 	m_freezeAborted( false )
 {
-	for( noteVector::const_iterator it = _pat_to_copy.m_notes.begin();
+	for( NoteVector::ConstIterator it = _pat_to_copy.m_notes.begin();
 					it != _pat_to_copy.m_notes.end(); ++it )
 	{
 		m_notes.push_back( new note( **it ) );
@@ -100,7 +100,7 @@ pattern::pattern( const pattern & _pat_to_copy ) :
 
 pattern::~pattern()
 {
-	for( noteVector::iterator it = m_notes.begin();
+	for( NoteVector::Iterator it = m_notes.begin();
 						it != m_notes.end(); ++it )
 	{
 		delete *it;
@@ -141,7 +141,7 @@ midiTime pattern::length( void ) const
 
 	tick_t max_length = midiTime::ticksPerTact();
 
-	for( noteVector::const_iterator it = m_notes.begin();
+	for( NoteVector::ConstIterator it = m_notes.begin();
 						it != m_notes.end(); ++it )
 	{
 		if( ( *it )->length() > 0 )
@@ -161,7 +161,7 @@ midiTime pattern::beatPatternLength( void ) const
 {
 	tick_t max_length = midiTime::ticksPerTact();
 
-	for( noteVector::const_iterator it = m_notes.begin();
+	for( NoteVector::ConstIterator it = m_notes.begin();
 						it != m_notes.end(); ++it )
 	{
 		if( ( *it )->length() < 0 )
@@ -206,7 +206,7 @@ note * pattern::addNote( const note & _new_note, const bool _quant_pos )
 		// going forward or backward but note-inserting isn't that
 		// time-critical since it is usually not done while playing...
 		long new_note_abs_time = new_note->pos();
-		noteVector::iterator it = m_notes.begin();
+		NoteVector::Iterator it = m_notes.begin();
 
 		while( it != m_notes.end() &&
 					( *it )->pos() < new_note_abs_time )
@@ -234,7 +234,7 @@ note * pattern::addNote( const note & _new_note, const bool _quant_pos )
 void pattern::removeNote( const note * _note_to_del )
 {
 	engine::getMixer()->lock();
-	noteVector::iterator it = m_notes.begin();
+	NoteVector::Iterator it = m_notes.begin();
 	while( it != m_notes.end() )
 	{
 		if( *it == _note_to_del )
@@ -282,7 +282,7 @@ void pattern::rearrangeAllNotes( void )
 void pattern::clearNotes( void )
 {
 	engine::getMixer()->lock();
-	for( noteVector::iterator it = m_notes.begin(); it != m_notes.end();
+	for( NoteVector::Iterator it = m_notes.begin(); it != m_notes.end();
 									++it )
 	{
 		delete *it;
@@ -299,7 +299,7 @@ void pattern::clearNotes( void )
 
 void pattern::setStep( int _step, bool _enabled )
 {
-	for( noteVector::iterator it = m_notes.begin(); it != m_notes.end();
+	for( NoteVector::Iterator it = m_notes.begin(); it != m_notes.end();
 									++it )
 	{
 		if( ( *it )->pos() == _step*DefaultTicksPerTact/16 &&
@@ -328,7 +328,7 @@ void pattern::setType( PatternTypes _new_pattern_type )
 
 void pattern::checkType( void )
 {
-	noteVector::iterator it = m_notes.begin();
+	NoteVector::Iterator it = m_notes.begin();
 	while( it != m_notes.end() )
 	{
 		if( ( *it )->length() > 0 )
@@ -366,7 +366,7 @@ void pattern::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	_this.setAttribute( "frozen", m_frozenPattern != NULL );
 
 	// now save settings of all notes
-	for( noteVector::iterator it = m_notes.begin();
+	for( NoteVector::Iterator it = m_notes.begin();
 						it != m_notes.end(); ++it )
 	{
 		if( ( *it )->length() )
@@ -506,7 +506,7 @@ void pattern::removeSteps( int _n )
 	{
 		for( int i = m_steps - _n; i < m_steps; ++i )
 		{
-			for( noteVector::iterator it = m_notes.begin();
+			for( NoteVector::Iterator it = m_notes.begin();
 						it != m_notes.end(); ++it )
 			{
 				if( ( *it )->pos() ==
@@ -542,7 +542,7 @@ void pattern::ensureBeatNotes( void )
 	for( int i = 0; i < m_steps; ++i )
 	{
 		bool found = false;
-		for( noteVector::iterator it = m_notes.begin();
+		for( NoteVector::Iterator it = m_notes.begin();
 						it != m_notes.end(); ++it )
 		{
 			if( ( *it )->pos() ==
@@ -579,7 +579,7 @@ void pattern::updateBBTrack( void )
 
 bool pattern::empty( void )
 {
-	for( noteVector::const_iterator it = m_notes.begin();
+	for( NoteVector::ConstIterator it = m_notes.begin();
 						it != m_notes.end(); ++it )
 	{
 		if( ( *it )->length() != 0 )
@@ -596,7 +596,7 @@ bool pattern::empty( void )
 void pattern::changeTimeSignature( void )
 {
 	midiTime last_pos = midiTime::ticksPerTact();
-	for( noteVector::const_iterator cit = m_notes.begin();
+	for( NoteVector::ConstIterator cit = m_notes.begin();
 						cit != m_notes.end(); ++cit )
 	{
 		if( ( *cit )->length() < 0 && ( *cit )->pos() > last_pos )
@@ -606,7 +606,7 @@ void pattern::changeTimeSignature( void )
 		}
 	}
 	last_pos = last_pos.nextFullTact() * midiTime::ticksPerTact();
-	for( noteVector::iterator it = m_notes.begin(); it != m_notes.end(); )
+	for( NoteVector::Iterator it = m_notes.begin(); it != m_notes.end(); )
 	{
 		if( ( *it )->length() == 0 && ( *it )->pos() >= last_pos )
 		{
@@ -1180,7 +1180,7 @@ void patternView::paintEvent( QPaintEvent * )
 			// first determine the central tone so that we can 
 			// display the area where most of the m_notes are
 			int total_notes = 0;
-			for( noteVector::iterator it = m_pat->m_notes.begin();
+			for( NoteVector::Iterator it = m_pat->m_notes.begin();
 					it != m_pat->m_notes.end(); ++it )
 			{
 				if( ( *it )->length() > 0 )
@@ -1211,7 +1211,7 @@ void patternView::paintEvent( QPaintEvent * )
 					p.setPen( QColor( 0xFF, 0xB0, 0x00 ) );
 				}
 
-				for( noteVector::iterator it =
+				for( NoteVector::Iterator it =
 							m_pat->m_notes.begin();
 					it != m_pat->m_notes.end(); ++it )
 				{
@@ -1261,7 +1261,7 @@ void patternView::paintEvent( QPaintEvent * )
 						s_stepBtnOffLight->height(),
 						Qt::IgnoreAspectRatio,
 						Qt::SmoothTransformation );
-		for( noteVector::iterator it = m_pat->m_notes.begin();
+		for( NoteVector::Iterator it = m_pat->m_notes.begin();
 					it != m_pat->m_notes.end(); ++it )
 		{
 			const int no = ( *it )->pos() / DefaultBeatsPerTact;
