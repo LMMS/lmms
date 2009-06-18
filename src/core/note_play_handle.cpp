@@ -259,7 +259,7 @@ void notePlayHandle::play( sampleFrame * _working_buffer )
 		if( ( *it )->done() )
 		{
 			delete *it;
-			m_subNotes.erase( it );
+			it = m_subNotes.erase( it );
 		}
 		else
 		{
