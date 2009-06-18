@@ -611,7 +611,7 @@ void pattern::changeTimeSignature( void )
 		if( ( *it )->length() == 0 && ( *it )->pos() >= last_pos )
 		{
 			delete *it;
-			m_notes.erase( it );
+			it = m_notes.erase( it );
 			--m_steps;
 		}
 		else
