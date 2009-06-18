@@ -152,7 +152,7 @@ private:
 		ModeDraw,
 		ModeErase,
 		ModeSelect,
-		ModeOpen,
+		ModeEditDetuning,
 	};
 
 	enum Actions
@@ -313,8 +313,7 @@ private:
 	void drawDetuningInfo( QPainter & _p, note * _n, int _x, int _y );
 	bool mouseOverNote( void );
 	note * noteUnderMouse( void );
-	NoteVector::const_iterator noteIteratorUnderMouse( void );
-	
+
 	// turn a selection rectangle into selected notes
 	void computeSelectedNotes( bool shift ); 
 	void clearSelectedNotes( void );
