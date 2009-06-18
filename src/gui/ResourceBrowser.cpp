@@ -300,8 +300,17 @@ void ResourceBrowser::triggerAction( Actions _action, ResourceItem * _item )
 			if( engine::getMainWindow()->mayChangeProject() )
 			{
 				ResourceFileMapper mapper( _item );
-				engine::getSong()->loadProject(
+				if( _item->isLocalResource() )
+				{
+					engine::getSong()->loadProject(
 							mapper.fileName() );
+				}
+				else
+				{
+					engine::getSong()->
+						createNewProjectFromTemplate(
+							mapper.fileName() );
+				}
 			}
 			break;
 	}
