@@ -1295,7 +1295,7 @@ void pianoRoll::mousePressEvent( QMouseEvent * _me )
 		return;
 	}
 
-	if( m_editMode == ModeOpen && noteUnderMouse() )
+	if( m_editMode == ModeEditDetuning && noteUnderMouse() )
 	{
 		noteUnderMouse()->editDetuningPattern();
 		return;
@@ -2883,7 +2883,7 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 			break;
 		case ModeErase: cursor = s_toolErase; break;
 		case ModeSelect: cursor = s_toolSelect; break;
-		case ModeOpen: cursor = s_toolOpen; break;
+		case ModeEditDetuning: cursor = s_toolOpen; break;
 	}
 	if( cursor != NULL )
 	{
@@ -3206,7 +3206,7 @@ void pianoRoll::selectButtonToggled( void )
 
 void pianoRoll::detuneButtonToggled( void )
 {
-	m_editMode = ModeOpen;
+	m_editMode = ModeEditDetuning;
 	update();
 }
 
@@ -3570,22 +3570,13 @@ midiTime pianoRoll::newNoteLen( void ) const
 
 bool pianoRoll::mouseOverNote( void )
 {
-	return validPattern() &&
-			noteIteratorUnderMouse() != m_pattern->notes().end();
+	return validPattern() && noteUnderMouse() != NULL;
 }
 
 
 
 
 note * pianoRoll::noteUnderMouse( void )
-{
-	return *noteIteratorUnderMouse();
-}
-
-
-
-
-NoteVector::ConstIterator pianoRoll::noteIteratorUnderMouse( void )
 {
 	QPoint pos = mapFromGlobal( QCursor::pos() );
 
@@ -3596,7 +3587,7 @@ NoteVector::ConstIterator pianoRoll::noteIteratorUnderMouse( void )
 		|| pos.y() < PR_TOP_MARGIN
 		|| pos.y() > keyAreaBottom() )
 	{
-		return notes.end();
+		return NULL;
 	}
 
 	int key_num = getKey( pos.y() );
@@ -3620,8 +3611,9 @@ NoteVector::ConstIterator pianoRoll::noteIteratorUnderMouse( void )
 		++it;
 	}
 
-	return it;
+	return *it;
 }
+
 
 
 
