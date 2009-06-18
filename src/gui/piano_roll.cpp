@@ -576,13 +576,13 @@ void pianoRoll::setCurrentPattern( pattern * _new_pattern )
 
 	m_leftRightScroll->setValue( 0 );
 
-	const noteVector & notes = m_pattern->notes();
+	const NoteVector & notes = m_pattern->notes();
 	int central_key = 0;
 	if( notes.empty() == false )
 	{
 		// determine the central key so that we can scroll to it
 		int total_notes = 0;
-		for( noteVector::const_iterator it = notes.begin();
+		for( NoteVector::ConstIterator it = notes.begin();
 						it != notes.end(); ++it )
 		{
 			if( ( *it )->length() > 0 )
@@ -733,7 +733,7 @@ inline void pianoRoll::drawDetuningInfo( QPainter & _p, note * _n, int _x,
 	_p.setPen( QColor( 0xFF, 0xDF, 0x20 ) );
 
 	timeMap & map = _n->detuning()->getAutomationPattern()->getTimeMap();
-	for( timeMap::const_iterator it = map.begin(); it != map.end(); ++it )
+	for( timeMap::ConstIterator it = map.begin(); it != map.end(); ++it )
 	{
 		Sint32 pos_ticks = it.key();
 		if( pos_ticks > _n->length() )
@@ -772,10 +772,10 @@ void pianoRoll::clearSelectedNotes( void )
 	if( m_pattern != NULL )
 	{
 		// get note-vector of current pattern
-		const noteVector & notes = m_pattern->notes();
+		const NoteVector & notes = m_pattern->notes();
 
 		// will be our iterator in the following loop
-		noteVector::const_iterator it = notes.begin();
+		NoteVector::ConstIterator it = notes.begin();
 		while( it != notes.end() )
 		{	
 			( *it )->setSelected( false );
@@ -808,8 +808,8 @@ void pianoRoll::closeEvent( QCloseEvent * _ce )
 void pianoRoll::shiftSemiTone( int amount ) // shift notes by amount semitones
 {
 	bool useAllNotes = ! isSelection();
-	const noteVector & notes = m_pattern->notes();
-	for( noteVector::const_iterator it = notes.begin(); it != notes.end();
+	const NoteVector & notes = m_pattern->notes();
+	for( NoteVector::ConstIterator it = notes.begin(); it != notes.end();
 									++it )
 	{
 		// if none are selected, move all notes, otherwise
@@ -832,10 +832,10 @@ void pianoRoll::shiftSemiTone( int amount ) // shift notes by amount semitones
 void pianoRoll::shiftPos( int amount ) //shift notes pos by amount
 {
 	bool useAllNotes = ! isSelection();
-	const noteVector & notes = m_pattern->notes();
+	const NoteVector & notes = m_pattern->notes();
 	
 	bool first = true;
-	for( noteVector::const_iterator it = notes.begin(); it != notes.end();
+	for( NoteVector::ConstIterator it = notes.begin(); it != notes.end();
 									++it )
 	{
 		// if none are selected, move all notes, otherwise
@@ -866,8 +866,8 @@ void pianoRoll::shiftPos( int amount ) //shift notes pos by amount
 
 bool pianoRoll::isSelection( void ) const // are any notes selected?
 {
-	const noteVector & notes = m_pattern->notes();
-	for( noteVector::const_iterator it = notes.begin(); it != notes.end();
+	const NoteVector & notes = m_pattern->notes();
+	for( NoteVector::ConstIterator it = notes.begin(); it != notes.end();
 									++it )
 	{
 		if( ( *it )->isSelected() )
@@ -885,8 +885,8 @@ int pianoRoll::selectionCount( void ) const // how many notes are selected?
 {
 	int sum = 0;
 	
-	const noteVector & notes = m_pattern->notes();
-	for( noteVector::const_iterator it = notes.begin(); it != notes.end();
+	const NoteVector & notes = m_pattern->notes();
+	for( NoteVector::ConstIterator it = notes.begin(); it != notes.end();
 									++it )
 	{
 		if( ( *it )->isSelected() )
@@ -1355,10 +1355,10 @@ void pianoRoll::mousePressEvent( QMouseEvent * _me )
 
 
 			// get note-vector of current pattern
-			const noteVector & notes = m_pattern->notes();
+			const NoteVector & notes = m_pattern->notes();
 
 			// will be our iterator in the following loop
-			noteVector::const_iterator it = notes.begin();
+			NoteVector::ConstIterator it = notes.begin();
 
 			// loop through whole note-vector...
 			while( it != notes.end() )
@@ -1691,8 +1691,8 @@ void pianoRoll::testPlayNote( note * n )
 
 void pianoRoll::pauseTestNotes( bool _pause )
 {
-	const noteVector & notes = m_pattern->notes();
-	noteVector::const_iterator it = notes.begin();
+	const NoteVector & notes = m_pattern->notes();
+	NoteVector::ConstIterator it = notes.begin();
 	while( it != notes.end() )
 	{
 		if( ( *it )->isPlaying() )
@@ -1773,9 +1773,9 @@ void pianoRoll::computeSelectedNotes(bool shift)
 	//int y_base = noteEditTop() - 1;
 	if( validPattern() == true )
 	{
-		const noteVector & notes = m_pattern->notes();
+		const NoteVector & notes = m_pattern->notes();
 
-		for( noteVector::const_iterator it = notes.begin();
+		for( NoteVector::ConstIterator it = notes.begin();
 						it != notes.end(); ++it )
 		{
 			// make a new selection unless they're holding shift
@@ -1867,9 +1867,9 @@ void pianoRoll::mouseReleaseEvent( QMouseEvent * _me )
 	if( validPattern() == true )
 	{
 		// turn off all notes that are playing
-		const noteVector & notes = m_pattern->notes();
+		const NoteVector & notes = m_pattern->notes();
 
-		noteVector::const_iterator it = notes.begin();
+		NoteVector::ConstIterator it = notes.begin();
 		while( it != notes.end() )
 		{
 			if( ( *it )->isPlaying() )
@@ -2000,7 +2000,7 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 					midiTime::ticksPerTact() / m_ppt + m_currentPosition;
 
 			// get note-vector of current pattern
-			const noteVector & notes = m_pattern->notes();
+			const NoteVector & notes = m_pattern->notes();
 
 			// determine what volume/panning to set note to
 			volume_t vol = tLimit<int>( MinVolume +
@@ -2027,7 +2027,7 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 			
 			// loop through vector
 			bool use_selection = isSelection();
-			noteVector::const_iterator it = notes.begin();
+			NoteVector::ConstIterator it = notes.begin();
 			while( it != notes.end() )
 			{
 				if( ( *it )->pos().getTicks() >= ticks_start 
@@ -2088,10 +2088,10 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 						m_ppt + m_currentPosition;
 
 			// get note-vector of current pattern
-			const noteVector & notes = m_pattern->notes();
+			const NoteVector & notes = m_pattern->notes();
 
 			// will be our iterator in the following loop
-			noteVector::const_iterator it = notes.begin();
+			NoteVector::ConstIterator it = notes.begin();
 
 			// loop through whole note-vector...
 			while( it != notes.end() )
@@ -2208,10 +2208,10 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 
 
 			// get note-vector of current pattern
-			const noteVector & notes = m_pattern->notes();
+			const NoteVector & notes = m_pattern->notes();
 
 			// will be our iterator in the following loop
-			noteVector::const_iterator it = notes.begin();
+			NoteVector::ConstIterator it = notes.begin();
 
 			// loop through whole note-vector...
 			while( it != notes.end() )
@@ -2388,10 +2388,10 @@ void pianoRoll::dragNotes( int x, int y, bool alt )
 	}
 	
 	// get note-vector of current pattern
-	const noteVector & notes = m_pattern->notes();
+	const NoteVector & notes = m_pattern->notes();
 
 	// will be our iterator in the following loop
-	noteVector::const_iterator it = notes.begin();
+	NoteVector::ConstIterator it = notes.begin();
 	while( it != notes.end() )
 	{
 		if( ( *it )->isSelected() )
@@ -2717,7 +2717,7 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 				width() - WhiteKeyWidth,
 				height() - TopMargin );
 
-		const noteVector & notes = m_pattern->notes();
+		const NoteVector & notes = m_pattern->notes();
 
 		const int visible_keys = ( keyAreaBottom()-keyAreaTop() ) /
 							KeyLineHeight + 2;
@@ -2731,7 +2731,7 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 	
 		QPolygon editHandles;
 
-		for( noteVector::const_iterator it = notes.begin();
+		for( NoteVector::ConstIterator it = notes.begin();
 						it != notes.end(); ++it )
 		{
 			Sint32 len_ticks = ( *it )->length();
@@ -3229,12 +3229,12 @@ void pianoRoll::selectAll( void )
 		return;
 	}
 
-	const noteVector & notes = m_pattern->notes();
+	const NoteVector & notes = m_pattern->notes();
 
 	// if first_time = true, we HAVE to set the vars for select
 	bool first_time = true;
 
-	for( noteVector::const_iterator it = notes.begin(); it != notes.end();
+	for( NoteVector::ConstIterator it = notes.begin(); it != notes.end();
 									++it )
 	{
 		Uint32 len_ticks = ( *it )->length();
@@ -3281,16 +3281,16 @@ void pianoRoll::selectAll( void )
 
 
 // returns vector with pointers to all selected notes
-void pianoRoll::getSelectedNotes( noteVector & _selected_notes )
+void pianoRoll::getSelectedNotes( NoteVector & _selected_notes )
 {
 	if( validPattern() == false )
 	{
 		return;
 	}
 
-	const noteVector & notes = m_pattern->notes();
+	const NoteVector & notes = m_pattern->notes();
 
-	for( noteVector::const_iterator it = notes.begin(); it != notes.end();
+	for( NoteVector::ConstIterator it = notes.begin(); it != notes.end();
 									++it )
 	{
 		if( ( *it )->isSelected() )
@@ -3303,14 +3303,14 @@ void pianoRoll::getSelectedNotes( noteVector & _selected_notes )
 
 
 
-void pianoRoll::copy_to_clipboard( const noteVector & _notes ) const
+void pianoRoll::copy_to_clipboard( const NoteVector & _notes ) const
 {
 	multimediaProject mmp( multimediaProject::ClipboardData );
 	QDomElement note_list = mmp.createElement( "note-list" );
 	mmp.content().appendChild( note_list );
 
 	midiTime start_pos( _notes.front()->pos().getTact(), 0 );
-	for( noteVector::const_iterator it = _notes.begin(); it != _notes.end();
+	for( NoteVector::ConstIterator it = _notes.begin(); it != _notes.end();
 									++it )
 	{
 		note clip_note( **it );
@@ -3329,7 +3329,7 @@ void pianoRoll::copy_to_clipboard( const noteVector & _notes ) const
 
 void pianoRoll::copySelectedNotes( void )
 {
-	noteVector selected_notes;
+	NoteVector selected_notes;
 	getSelectedNotes( selected_notes );
 
 	if( selected_notes.empty() == false )
@@ -3348,7 +3348,7 @@ void pianoRoll::cutSelectedNotes( void )
 		return;
 	}
 
-	noteVector selected_notes;
+	NoteVector selected_notes;
 	getSelectedNotes( selected_notes );
 
 	if( selected_notes.empty() == false )
@@ -3357,7 +3357,7 @@ void pianoRoll::cutSelectedNotes( void )
 
 		engine::getSong()->setModified();
 
-		for( noteVector::iterator it = selected_notes.begin();
+		for( NoteVector::Iterator it = selected_notes.begin();
 					it != selected_notes.end(); ++it )
 		{
 			// note (the memory of it) is also deleted by
@@ -3430,10 +3430,10 @@ void pianoRoll::deleteSelectedNotes( void )
 	
 	
 	// get note-vector of current pattern
-	const noteVector & notes = m_pattern->notes();
+	const NoteVector & notes = m_pattern->notes();
 
 	// will be our iterator in the following loop
-	noteVector::const_iterator it = notes.begin();
+	NoteVector::ConstIterator it = notes.begin();
 	while( it != notes.end() )
 	{
 		if( ( *it )->isSelected() )
@@ -3595,12 +3595,12 @@ note * pianoRoll::noteUnderMouse( void )
 
 
 
-noteVector::const_iterator pianoRoll::noteIteratorUnderMouse( void )
+NoteVector::ConstIterator pianoRoll::noteIteratorUnderMouse( void )
 {
 	QPoint pos = mapFromGlobal( QCursor::pos() );
 
 	// get note-vector of current pattern
-	const noteVector & notes = m_pattern->notes();
+	const NoteVector & notes = m_pattern->notes();
 
 	if( pos.x() <= WhiteKeyWidth || pos.x() > width() - ScrollBarSize
 		|| pos.y() < TopMargin
@@ -3614,7 +3614,7 @@ noteVector::const_iterator pianoRoll::noteIteratorUnderMouse( void )
 			midiTime::ticksPerTact() / m_ppt + m_currentPosition;
 
 	// will be our iterator in the following loop
-	noteVector::const_iterator it = notes.begin();
+	NoteVector::ConstIterator it = notes.begin();
 
 	// loop through whole note-vector...
 	while( it != notes.end() )

@@ -116,7 +116,7 @@ protected:
 					int  _width, note * _n );
 	void removeSelection( void );
 	void selectAll( void );
-	void getSelectedNotes( noteVector & _selected_notes );
+	void getSelectedNotes( NoteVector & _selected_notes );
 
 
 protected slots:
@@ -152,7 +152,7 @@ private:
 		ModeDraw,
 		ModeErase,
 		ModeSelect,
-		ModeOpen
+		ModeOpen,
 	};
 
 	enum Actions
@@ -308,12 +308,12 @@ private:
 	timeLine * m_timeLine;
 	bool m_scrollBack;
 
-	void copy_to_clipboard( const noteVector & _notes ) const;
+	void copy_to_clipboard( const NoteVector & _notes ) const;
 
 	void drawDetuningInfo( QPainter & _p, note * _n, int _x, int _y );
 	bool mouseOverNote( void );
 	note * noteUnderMouse( void );
-	noteVector::const_iterator noteIteratorUnderMouse( void );
+	NoteVector::const_iterator noteIteratorUnderMouse( void );
 	
 	// turn a selection rectangle into selected notes
 	void computeSelectedNotes( bool shift ); 

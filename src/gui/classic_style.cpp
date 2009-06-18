@@ -445,7 +445,7 @@ void ClassicStyle::drawTrackContentObject( QPainter * _painter,
 					// first determine the central tone so that we can
 					// display the area where most of the notes are
 					int total_notes = 0;
-					for( noteVector::const_iterator it = pat->notes().begin();
+					for( NoteVector::ConstIterator it = pat->notes().begin();
 							it != pat->notes().end(); ++it )
 					{
 						if( ( *it )->length() > 0 )
@@ -476,7 +476,7 @@ void ClassicStyle::drawTrackContentObject( QPainter * _painter,
 							p->setPen( color( LmmsStyle::PianoRollDefaultNote ) );
 						}
 
-						for( noteVector::const_iterator it =
+						for( NoteVector::ConstIterator it =
 									pat->notes().begin();
 							it != pat->notes().end(); ++it )
 						{
@@ -530,7 +530,7 @@ void ClassicStyle::drawTrackContentObject( QPainter * _painter,
 								s_stepBtnOffLight->height(),
 								Qt::IgnoreAspectRatio,
 								Qt::SmoothTransformation );
-				for( noteVector::iterator it = m_pat->m_notes.begin();
+				for( NoteVector::Iterator it = m_pat->m_notes.begin();
 							it != m_pat->m_notes.end(); ++it )
 				{
 					const int no = ( *it )->pos() / DefaultBeatsPerTact;
