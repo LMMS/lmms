@@ -852,6 +852,12 @@ void song::createNewProjectFromTemplate( const QString & _template )
 	// clear file-name so that user doesn't overwrite template when
 	// saving...
 	m_fileName = m_oldFileName = "";
+	// update window title
+	if( engine::getMainWindow() )
+	{
+		engine::getMainWindow()->resetWindowTitle();
+	}
+
 }
 
 
@@ -876,11 +882,6 @@ void song::loadProject( const QString & _file_name )
 	{
 		createNewProject();
 		return;
-	}
-
-	if( engine::getMainWindow() )
-	{
-		engine::getMainWindow()->resetWindowTitle();
 	}
 
 	engine::getMixer()->lock();
