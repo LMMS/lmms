@@ -245,7 +245,11 @@ printf("read dir: %s\n", d.canonicalPath().toAscii().constData() );
 					new ResourceItem( this,
 						f.fileName(),
 						ResourceItem::TypeUnknown,
-						m_baseDir, _dir );
+						m_baseDir,
+						_dir,
+						QString::null, // hash
+						QString::null // TODO: author
+					);
 				newItem->setLastMod( f.lastModified() );
 				database()->addItem( newItem );
 				ResourceTreeItem * rti =

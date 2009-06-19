@@ -139,6 +139,7 @@ void ResourceDB::saveTreeItem( const ResourceTreeItem * _i,
 		e.setAttribute( "basedir", baseDirName( it->baseDir() ) );
 		e.setAttribute( "path", it->path() );
 		e.setAttribute( "hash", it->hash() );
+		e.setAttribute( "author", it->author() );
 		e.setAttribute( "size", it->size() );
 		e.setAttribute( "tags", it->tags() );
 		e.setAttribute( "lastmod", it->lastMod().
@@ -167,6 +168,7 @@ ResourceItem * item = new ResourceItem( m_provider,
 				baseDirFromName( e.attribute( "basedir" ) ),
 						e.attribute( "path" ),
 						h,
+						e.attribute( "author" ),
 						e.attribute( "tags" ),
 						e.attribute( "size" ).toInt(),
 	QDateTime::fromString( e.attribute( "lastmod" ), Qt::ISODate ) );

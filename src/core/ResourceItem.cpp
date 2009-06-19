@@ -39,6 +39,7 @@ ResourceItem::ResourceItem( ResourceProvider * _provider,
 				BaseDirectory _base_dir,
 				const QString & _path,
 				const QString & _hash,
+				const QString & _author,
 				const QString & _tags,
 				int _size,
 				const QDateTime & _last_mod ) :
@@ -49,6 +50,7 @@ ResourceItem::ResourceItem( ResourceProvider * _provider,
 	m_baseDir( _base_dir ),
 	m_path( _path ),
 	m_hash( _hash ),
+	m_author( _author ),
 	m_size( _size ),
 	m_lastMod( _last_mod ),
 	m_tags( _tags ),
@@ -77,6 +79,7 @@ bool ResourceItem::operator==( const ResourceItem & _other ) const
 		m_type == _other.m_type &&
 		m_path == _other.m_path &&
 		m_hash == _other.m_hash &&
+		m_author == _other.m_author &&
 		m_size == _other.m_size &&
 		m_tags == _other.m_tags;
 }
@@ -103,6 +106,11 @@ int ResourceItem::equalityLevel( const ResourceItem & _other ) const
 	}
 
 	if( m_type == _other.m_type )
+	{
+		l += 5;
+	}
+
+	if( m_author == _other.m_author )
 	{
 		l += 5;
 	}

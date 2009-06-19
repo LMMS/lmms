@@ -70,6 +70,7 @@ public:
 			BaseDirectory _base_dir = BaseWorkingDir,
 			const QString & _path = QString::null,
 			const QString & _hash = QString::null,
+			const QString & _author = QString::null,
 			const QString & _tags = QString::null,
 			int _size = -1,
 			const QDateTime & _last_mod = QDateTime() );
@@ -123,6 +124,11 @@ public:
 	const QString & hash( void ) const
 	{
 		return m_hash;
+	}
+
+	const QString & author( void ) const
+	{
+		return m_author;
 	}
 
 	int size( void ) const
@@ -208,6 +214,7 @@ private:
 	BaseDirectory m_baseDir;
 	QString m_path;
 	QString m_hash;
+	QString m_author;
 	int m_size;
 	QDateTime m_lastMod;
 	QString m_tags;

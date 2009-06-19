@@ -179,6 +179,7 @@ void WebResourceProvider::importNodeIntoDB( const QDomNode & _n,
 				ResourceItem::BaseURL,
 				path,
 				n.firstChildElement( "hash" ).text(),
+				n.firstChildElement( "author" ).text(),
 				n.firstChildElement( "tags" ).text(),
 				n.firstChildElement( "size" ).text().toInt() );
 		database()->addItem( item );

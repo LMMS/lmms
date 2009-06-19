@@ -245,6 +245,7 @@ bool ResourceTreeModel::filterItems( ResourceTreeItem * _item,
 		{
 			if( !( i->name().toLower().contains( *it ) ||
 				i->path().toLower().contains( *it ) ||
+				i->author().toLower().contains( *it ) ||
 				i->tags().toLower().contains( *it ) ) )
 			{
 				accept = false;
