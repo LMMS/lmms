@@ -42,6 +42,7 @@ public:
 		if( m_tempFile && m_tempFile->open() )
 		{
 			m_tempFile->write( m_item->fetchData() );
+			m_tempFile->flush();
 		}
 	}
 
