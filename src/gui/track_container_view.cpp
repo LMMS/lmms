@@ -30,6 +30,10 @@
 #include <QtGui/QScrollBar>
 #include <QtGui/QWheelEvent>
 
+#include "ResourceDB.h"
+#include "ResourceItem.h"
+#include "ResourceFileMapper.h"
+#include "UnifiedResourceProvider.h"
 
 #include "track_container_view.h"
 #include "track_container.h"
@@ -46,6 +50,7 @@
 #include "song.h"
 #include "string_pair_drag.h"
 #include "track.h"
+
 
 
 trackContainerView::trackContainerView( trackContainer * _tc ) :
@@ -364,9 +369,10 @@ void trackContainerView::dragEnterEvent( QDragEnterEvent * _dee )
 {
 	stringPairDrag::processDragEnterEvent( _dee,
 		QString( "presetfile,pluginpresetfile,samplefile,instrument,"
-				"importedproject,track_%1,track_%2" ).
-						arg( track::InstrumentTrack ).
-						arg( track::SampleTrack ) );
+				"importedproject,track_%1,track_%2,%3" ).
+					arg( track::InstrumentTrack ).
+					arg( track::SampleTrack ).
+					arg( ResourceItem::mimeKey() ) );
 }
 
 
@@ -377,6 +383,7 @@ void trackContainerView::dropEvent( QDropEvent * _de )
 	QString type = stringPairDrag::decodeKey( _de );
 	QString value = stringPairDrag::decodeValue( _de );
 	engine::getMixer()->lock();
+	/* begin{obsolete code} - remove together with fileBrowser */
 	if( type == "instrument" )
 	{
 		instrumentTrack * it = dynamic_cast<instrumentTrack *>(
@@ -419,6 +426,54 @@ void trackContainerView::dropEvent( QDropEvent * _de )
 		track::create( mmp.content().firstChild().toElement(), m_tc );
 		_de->accept();
 	}
+	/* end{obsolete code} - remove together with fileBrowser */
+
+	/* begin{future code} */
+	if( type == ResourceItem::mimeKey() )
+	{
+		const ResourceItem * item =
+			engine::resourceProvider()->database()->
+						itemByHash( value );
+		if( item )
+		{
+			switch( item->type() )
+			{
+
+	case ResourceItem::TypePreset:
+	{
+		instrumentTrack * it = dynamic_cast<instrumentTrack *>(
+				track::create( track::InstrumentTrack,
+								m_tc ) );
+		// fetch data, load into multimedia project and
+		// load it as preset
+		it->loadTrackSpecificSettings(
+				multimediaProject( item->fetchData() ).
+					content().firstChild().toElement() );
+		break;
+	}
+	case ResourceItem::TypeSample:
+	case ResourceItem::TypeSoundFont:
+	{
+		instrumentTrack * it = dynamic_cast<instrumentTrack *>(
+				track::create( track::InstrumentTrack,
+								m_tc ) );
+		const QString ext = QFileInfo( item->name() ).
+							suffix().toLower();
+		instrument * i = it->loadInstrument(
+					engine::pluginFileHandling()[ext] );
+		if( i != NULL )
+		{
+			ResourceFileMapper mapper( item );
+			i->loadFile( mapper.fileName() );
+		}
+		break;
+	}
+
+			}
+		}
+	}
+	/* end{future code} */
+
 	engine::getMixer()->unlock();
 }
 
