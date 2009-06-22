@@ -5,7 +5,7 @@
  *                        for drag'n'drop of string-pairs and which is the base
  *                        for all drag'n'drop-actions within LMMS
  *
- * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -52,10 +52,7 @@ stringPairDrag::stringPairDrag( const QString & _key, const QString & _value,
 	{
 		setPixmap( _icon );
 	}
-	QString txt = _key + ":" + _value;
-	QMimeData * m = new QMimeData();
-	m->setData( mimeType(), txt.toAscii() );
-	setMimeData( m );
+	setMimeData( createMimeData( _key, _value ) );
 	start( Qt::IgnoreAction );
 }
 
@@ -75,21 +72,34 @@ stringPairDrag::~stringPairDrag()
 
 
 
+QMimeData * stringPairDrag::createMimeData( const QString & _key,
+                                                const QString & _value )
+{
+	const QString txt = _key + ":" + _value;
+	QMimeData * m = new QMimeData();
+	m->setData( mimeType(), txt.toUtf8() );
+
+	return m;
+}
+
+
+
+
 bool stringPairDrag::processDragEnterEvent( QDragEnterEvent * _dee,
 						const QString & _allowed_keys )
 {
 	if( !_dee->mimeData()->hasFormat( mimeType() ) )
 	{
-		return( FALSE );
+		return false;
 	}
 	QString txt = _dee->mimeData()->data( mimeType() );
 	if( _allowed_keys.split( ',' ).contains( txt.section( ':', 0, 0 ) ) )
 	{
 		_dee->acceptProposedAction();
-		return( TRUE );
+		return true;
 	}
 	_dee->ignore();
-	return( FALSE );
+	return false;
 }
 
 
@@ -97,8 +107,8 @@ bool stringPairDrag::processDragEnterEvent( QDragEnterEvent * _dee,
 
 QString stringPairDrag::decodeKey( QDropEvent * _de )
 {
-	return( QString( _de->mimeData()->data( mimeType()
-						) ).section( ':', 0, 0 ) );
+	return QString( _de->mimeData()->
+				data( mimeType() ) ).section( ':', 0, 0 );
 }
 
 
@@ -106,8 +116,8 @@ QString stringPairDrag::decodeKey( QDropEvent * _de )
 
 QString stringPairDrag::decodeValue( QDropEvent * _de )
 {
-	return( QString( _de->mimeData()->data( mimeType()
-						) ).section( ':', 1, -1 ) );
+	return QString( _de->mimeData()->
+				data( mimeType() ) ).section( ':', 1, -1 );
 }
 
 
