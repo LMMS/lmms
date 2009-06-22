@@ -1,7 +1,7 @@
 /*
  * ResourceTreeView.cpp - implementation of ResourceTreeView
  *
- * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -33,6 +33,8 @@ ResourceTreeView::ResourceTreeView( ResourceTreeModel * _tm,
 	m_tm( _tm )
 {
 	setHeaderHidden( true );
+	setDragEnabled( true );
+
 	setModel( m_tm );
 	connect( m_tm, SIGNAL( itemsChanged() ),
 			this, SLOT( updateFilter() ) );
