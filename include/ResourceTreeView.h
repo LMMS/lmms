@@ -1,7 +1,7 @@
 /*
  * ResourceTreeView.h - view for ResourceTreeModel
  *
- * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -41,10 +41,19 @@ public slots:
 	void setFilter( const QString & _s );
 	void updateFilter( void );
 
+
+protected:
+	virtual void startDrag( Qt::DropActions supportedActions );
+
+
 private:
 	ResourceTreeModel * m_tm;
 
 	QString m_lastFilter;
+
+
+signals:
+	void dragStarted();
 
 } ;
 

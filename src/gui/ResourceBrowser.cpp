@@ -110,6 +110,11 @@ ResourceBrowser::ResourceBrowser( QWidget * _parent ) :
 	connect( m_treeView,
 			SIGNAL( clicked( const QModelIndex & ) ),
 			this, SLOT( stopItemPreview( const QModelIndex & ) ) );
+	// setup a direct connection so preview is instantly stopped when
+	// drag operation begins
+	connect( m_treeView,
+			SIGNAL( dragStarted() ),
+			this, SLOT( stopPreview() ), Qt::DirectConnection );
 	connect( m_treeView,
 			SIGNAL( doubleClicked( const QModelIndex & ) ),
 			this,
@@ -240,7 +245,15 @@ void ResourceBrowser::startItemPreview( const QModelIndex & _idx )
 
 
 
-void ResourceBrowser::stopItemPreview( const QModelIndex & _idx )
+void ResourceBrowser::stopItemPreview( const QModelIndex & )
+{
+	stopPreview();
+}
+
+
+
+
+void ResourceBrowser::stopPreview()
 {
 	m_previewer.stopPreview();
 }

@@ -72,4 +72,13 @@ void ResourceTreeView::updateFilter( void )
 
 
 
+void ResourceTreeView::startDrag( Qt::DropActions supportedActions )
+{
+	emit dragStarted();
+
+	QTreeView::startDrag( supportedActions );
+}
+
+
+
 #include "moc_ResourceTreeView.cxx"

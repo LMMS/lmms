@@ -63,6 +63,7 @@ private slots:
 	void updateFilterStatus();
 	void startItemPreview( const QModelIndex & _idx );
 	void stopItemPreview( const QModelIndex & _idx );
+	void stopPreview();
 	void triggerDefaultAction( const QModelIndex & _idx );
 
 
