@@ -69,6 +69,7 @@ public:
 		return &m_topLevelNode;
 	}
 
+	const ResourceItem * itemByHash( const QString & _hash ) const;
 	const ResourceItem * nearestMatch( const ResourceItem & _item );
 
 	void addItem( ResourceItem * newItem );

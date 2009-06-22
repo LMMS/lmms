@@ -188,6 +188,19 @@ loadTreeItem( treeItem, e );
 
 
 
+const ResourceItem * ResourceDB::itemByHash( const QString & _hash ) const
+{
+	ItemList::ConstIterator it = m_items.find( _hash );
+	if( it != m_items.end() )
+	{
+		return it.value();
+	}
+	return NULL;
+}
+
+
+
+
 const ResourceItem * ResourceDB::nearestMatch( const ResourceItem & _item )
 {
 	if( !_item.hash().isEmpty() )
