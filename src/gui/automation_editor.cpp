@@ -438,8 +438,6 @@ inline void automationEditor::drawValueRect( QPainter & _p,
 				LmmsStyle::AutomationSelectedBarFill :
 				LmmsStyle::AutomationBarFill ) );
 
-	_p.setPen( engine::getLmmsStyle()->color(
-					LmmsStyle::AutomationBarValue ) );
 	_p.drawLine( _x - 1, _y, _x + 1, _y );
 	_p.drawLine( _x, _y - 1, _x, _y + 1 );
 }
@@ -1399,6 +1397,8 @@ void automationEditor::paintEvent( QPaintEvent * _pe )
 	{
 		timeMap & time_map = m_pattern->getTimeMap();
 		timeMap::iterator it = time_map.begin();
+		p.setPen( engine::getLmmsStyle()->color(
+					LmmsStyle::AutomationBarValue ) );
 		do
 		{
 			Sint32 len_ticks = 4;
