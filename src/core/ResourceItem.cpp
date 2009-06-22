@@ -163,7 +163,6 @@ ResourceItem::Type ResourceItem::guessType( void ) const
 		typeMap["sf2"] = TypeSoundFont;
 
 		typeMap["xpf"] = TypePreset;
-		typeMap["cs.xml"] = TypePreset;
 
 		typeMap["xiz"] = TypePluginSpecificPreset;
 
@@ -182,7 +181,7 @@ ResourceItem::Type ResourceItem::guessType( void ) const
 		typeMap["jpeg"] = TypeImage;
 	}
 
-	const QString s = QFileInfo( name() ).completeSuffix().toLower();
+	const QString s = QFileInfo( name() ).suffix().toLower();
 	QMap<QString, Type>::ConstIterator it = typeMap.find( s );
 	if( it != typeMap.end() )
 	{
