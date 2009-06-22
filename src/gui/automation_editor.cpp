@@ -442,7 +442,6 @@ inline void automationEditor::drawValueRect( QPainter & _p,
 	}
 	_p.fillRect( _x, _y, _width, _height, current_color );
 
-	_p.setPen( QColor( 0xFF, 0xDF, 0x20 ) );
 	_p.drawLine( _x - 1, _y, _x + 1, _y );
 	_p.drawLine( _x, _y - 1, _x, _y + 1 );
 //	_p.setPen( QColor( 0xFF, 0x9F, 0x00 ) );
@@ -1405,6 +1404,7 @@ void automationEditor::paintEvent( QPaintEvent * _pe )
 	{
 		timeMap & time_map = m_pattern->getTimeMap();
 		timeMap::iterator it = time_map.begin();
+		p.setPen( QColor( 0xFF, 0xDF, 0x20 ) );
 		do
 		{
 			Sint32 len_ticks = 4;
