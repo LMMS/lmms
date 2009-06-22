@@ -200,6 +200,11 @@ public:
 
 	Type guessType( void ) const;
 
+	static const char * mimeKey()
+	{
+		return "ResourceItem";
+	}
+
 	static QString getBaseDirectory( BaseDirectory _bd,
 					const ResourceItem * _item = NULL );
 

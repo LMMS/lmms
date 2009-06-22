@@ -42,10 +42,7 @@ public:
 	virtual QVariant data( const QModelIndex & _idx,
                                         int _role = Qt::DisplayRole ) const;
 
-	virtual Qt::ItemFlags flags( const QModelIndex & _index ) const
-	{
-		return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
-	}
+	virtual Qt::ItemFlags flags( const QModelIndex & _index ) const;
 
 	int rowCount( const QModelIndex & _parent = QModelIndex() ) const;
 
@@ -58,7 +55,13 @@ public:
 	virtual QModelIndex index( int _row, int _col,
 			const QModelIndex & _parent = QModelIndex() ) const;
 
-	virtual QModelIndex parent ( const QModelIndex & index ) const;
+	virtual QModelIndex parent( const QModelIndex & index ) const;
+
+	// return list of possible MIME types for items in this model
+	virtual QStringList mimeTypes() const;
+
+	// used for drag'n'drop - return proper MIME data for indexes
+	virtual QMimeData * mimeData( const QModelIndexList & _indexes ) const;
 
 	void setFilter( const QString & _s );
 

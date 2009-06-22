@@ -25,12 +25,15 @@
 
 #include "ResourceTreeModel.h"
 #include "embed.h"
+#include "string_pair_drag.h"
 
 
 ResourceTreeModel::ResourceTreeModel( ResourceDB * _db, QObject * _parent ) :
 	QAbstractItemModel( _parent ),
 	m_db( _db )
 {
+	setSupportedDragActions( Qt::CopyAction );
+
 	connect( m_db, SIGNAL( itemsChanged() ),
 			this, SIGNAL( itemsChanged() ) );
 }
@@ -100,6 +103,32 @@ default:
 		}
 	}
 	return QVariant();
+}
+
+
+
+
+Qt::ItemFlags ResourceTreeModel::flags( const QModelIndex & _index ) const
+{
+	Qt::ItemFlags flags = Qt::ItemIsEnabled | Qt::ItemIsSelectable;
+	if( _index.isValid() )
+	{
+		switch( item( _index )->type() )
+		{
+			case ResourceItem::TypeSample:
+			case ResourceItem::TypePreset:
+			case ResourceItem::TypePluginSpecificPreset:
+			case ResourceItem::TypeProject:
+			case ResourceItem::TypeMidiFile:
+			case ResourceItem::TypeImage:
+			case ResourceItem::TypePlugin:
+				flags |= Qt::ItemIsDragEnabled;
+				break;
+			default:
+				break;
+		}
+	}
+	return flags;
 }
 
 
@@ -177,6 +206,30 @@ QModelIndex ResourceTreeModel::parent( const QModelIndex & _idx ) const
 		row = parentItem->row();
 	}
 	return createIndex( row, 0, parentItem );
+}
+
+
+
+
+QStringList ResourceTreeModel::mimeTypes() const
+{
+	return QStringList() << ResourceItem::mimeKey();
+}
+
+
+
+
+QMimeData * ResourceTreeModel::mimeData( const QModelIndexList & _list ) const
+{
+	// we'll only process first item - look whether it is valid
+	if( !_list.first().isValid() )
+	{
+		return NULL;
+	}
+
+	// create a QMimeData object containing hash of current item
+	return stringPairDrag::createMimeData( ResourceItem::mimeKey(),
+					item( _list.first() )->hash() );
 }
 
 
