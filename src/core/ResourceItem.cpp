@@ -62,6 +62,27 @@ ResourceItem::ResourceItem( ResourceProvider * _provider,
 
 
 
+// copy constructor
+ResourceItem::ResourceItem( const ResourceItem & _item ) :
+	m_provider( _item.m_provider ),
+	m_name( _item.m_name ),
+	m_nameHash( _item.m_nameHash ),
+	m_type( _item.m_type ),
+	m_baseDir( _item.m_baseDir ),
+	m_path( _item.m_path ),
+	m_hash( _item.m_hash),
+	m_author( _item.m_author ),
+	m_size( _item.m_size ),
+	m_lastMod( _item.m_lastMod ),
+	m_tags( _item.m_tags ),
+	m_treeItem( NULL )
+{
+	init();
+}
+
+
+
+
 void ResourceItem::reload( void )
 {
 	m_hash.clear();

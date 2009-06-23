@@ -74,7 +74,8 @@ public:
 			const QString & _tags = QString::null,
 			int _size = -1,
 			const QDateTime & _last_mod = QDateTime() );
-
+	// copy constructor
+	ResourceItem( const ResourceItem & _item );
 
 	const ResourceProvider * provider( void ) const
 	{
