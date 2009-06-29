@@ -1,5 +1,3 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * plugin.cpp - implementation of plugin-class including plugin-loader
  *
@@ -77,7 +75,7 @@ plugin::~plugin()
 
 
 
-void plugin::loadFile( const QString & )
+void plugin::loadResource( const ResourceItem * )
 {
 }
 
@@ -229,4 +227,3 @@ QDomElement plugin::descriptor::subPluginFeatures::key::saveXML(
 }
 
 
-#endif

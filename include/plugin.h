@@ -1,7 +1,7 @@
 /*
  * plugin.h - class plugin, the base-class and generic interface for all plugins
  *
- * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -37,9 +37,9 @@
 #include "base64.h"
 
 
-
 class QWidget;
 
+class ResourceItem;
 class pixmapLoader;
 class pluginView;
 class automatableModel;
@@ -73,12 +73,21 @@ public:
 		int version;
 		PluginTypes type;
 		const pixmapLoader * logo;
-		const char * supportedFileTypes;
-		inline bool supportsFileType( const QString & _ext ) const
+		const char * * supportedFileTypes;
+		inline bool supportsFileType( const QString & _type ) const
 		{
-			return QString( supportedFileTypes ).
-						split( QChar( ',' ) ).
-							contains( _ext );
+			if( !supportedFileTypes )
+			{
+				return false;
+			}
+			for( const char * * i = supportedFileTypes; *i; ++i )
+			{
+				if( *i == _type )
+				{
+					return true;
+				}
+			}
+			return false;
 		}
 		class EXPORT subPluginFeatures
 		{
@@ -158,7 +167,7 @@ public:
 	}
 
 	// return plugin-type
-	inline PluginTypes type( void ) const
+	inline PluginTypes type() const
 	{
 		return m_descriptor->type;
 	}
@@ -169,9 +178,9 @@ public:
 		return m_descriptor;
 	}
 
-	// can be called if a file matching supportedFileTypes should be
-	// loaded/processed with the help of this plugin
-	virtual void loadFile( const QString & _file );
+	// can be called if a resource supported by this plugin should be
+	// loaded/processed by this plugin
+	virtual void loadResource( const ResourceItem * _resourceItem );
 
 	// Called if external source needs to change something but we cannot
 	// reference the class header.  Should return null if not key not found.
