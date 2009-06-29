@@ -198,7 +198,7 @@ public:
 
 kickerInstrumentView::kickerInstrumentView( instrument * _instrument,
 							QWidget * _parent ) :
-	instrumentView( _instrument, _parent )
+	InstrumentView( _instrument, _parent )
 {
 	m_startFreqKnob = new kickerKnob( this );
 	m_startFreqKnob->setHintText( tr( "Start frequency:" ) + " ", "Hz" );

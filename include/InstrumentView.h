@@ -1,7 +1,7 @@
 /*
- * instrument_view.h - definition of instrumentView-class
+ * InstrumentView.h - definition of InstrumentView class
  *
- * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -32,25 +32,30 @@
 class instrumentTrackWindow;
 
 
-class EXPORT instrumentView : public pluginView
+class EXPORT InstrumentView : public pluginView
 {
 public:
-	instrumentView( instrument * _instrument, QWidget * _parent );
-	virtual ~instrumentView();
+	InstrumentView( instrument * _instrument, QWidget * _parent );
+	virtual ~InstrumentView();
 
-	instrument * model( void )
+	instrument * model()
 	{
-		return( castModel<instrument>() );
+		return castModel<instrument>();
 	}
 
-	const instrument * model( void ) const
+	const instrument * model() const
 	{
-		return( castModel<instrument>() );
+		return castModel<instrument>();
 	}
 
-	virtual void setModel( ::model * _model, bool = FALSE );
+	virtual void setModel( ::model * _model, bool = false );
 
-	instrumentTrackWindow * getInstrumentTrackWindow( void );
+	instrumentTrackWindow * getInstrumentTrackWindow();
+
+
+protected:
+	virtual void dragEnterEvent( QDragEnterEvent * _dee );
+	virtual void dropEvent( QDropEvent * _de );
 
 } ;
 

@@ -28,7 +28,7 @@
 
 #include <QtCore/QObject>
 #include "instrument.h"
-#include "instrument_view.h"
+#include "InstrumentView.h"
 #include "knob.h"
 #include "graph.h"
 
@@ -106,7 +106,7 @@ private:
 } ;
 
 
-class papuInstrumentView : public instrumentView
+class papuInstrumentView : public InstrumentView
 {
 	Q_OBJECT
 public:

@@ -34,7 +34,7 @@
 
 #include "effect_lib.h"
 #include "instrument.h"
-#include "instrument_view.h"
+#include "InstrumentView.h"
 #include "led_checkbox.h"
 #include "knob.h"
 #include "mixer.h"
@@ -239,7 +239,7 @@ private:
 } ;
 
 
-class lb303SynthView : public instrumentView
+class lb303SynthView : public InstrumentView
 {
 public:
 	lb303SynthView( instrument * _instrument,

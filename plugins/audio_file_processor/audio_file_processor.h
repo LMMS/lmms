@@ -30,7 +30,7 @@
 #include <QtGui/QPixmap>
 
 #include "instrument.h"
-#include "instrument_view.h"
+#include "InstrumentView.h"
 #include "sample_buffer.h"
 #include "knob.h"
 #include "pixmap_button.h"
@@ -88,18 +88,18 @@ private:
 	boolModel m_loopModel;
 
 
-	friend class audioFileProcessorView;
+	friend class AudioFileProcessorView;
 
 } ;
 
 
 
-class audioFileProcessorView : public instrumentView
+class AudioFileProcessorView : public InstrumentView
 {
 	Q_OBJECT
 public:
-	audioFileProcessorView( instrument * _instrument, QWidget * _parent );
-	virtual ~audioFileProcessorView();
+	AudioFileProcessorView( instrument * _instrument, QWidget * _parent );
+	virtual ~AudioFileProcessorView();
 
 
 protected slots:
@@ -108,8 +108,6 @@ protected slots:
 
 
 protected:
-	virtual void dragEnterEvent( QDragEnterEvent * _dee );
-	virtual void dropEvent( QDropEvent * _de );
 	virtual void paintEvent( QPaintEvent * );
 
 

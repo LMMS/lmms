@@ -26,12 +26,10 @@
 #ifndef _VESTIGE_H
 #define _VESTIGE_H
 
-
 #include <QtCore/QMutex>
 
-
 #include "instrument.h"
-#include "instrument_view.h"
+#include "InstrumentView.h"
 #include "midi.h"
 #include "note.h"
 
@@ -83,18 +81,18 @@ private:
 	QString m_pluginDLL;
 
 
-	friend class vestigeInstrumentView;
+	friend class VestigeInstrumentView;
 
 } ;
 
 
 
-class vestigeInstrumentView : public instrumentView
+class VestigeInstrumentView : public InstrumentView
 {
 	Q_OBJECT
 public:
-	vestigeInstrumentView( instrument * _instrument, QWidget * _parent );
-	virtual ~vestigeInstrumentView();
+	VestigeInstrumentView( instrument * _instrument, QWidget * _parent );
+	virtual ~VestigeInstrumentView();
 
 
 protected slots:
@@ -104,8 +102,6 @@ protected slots:
 
 
 protected:
-	virtual void dragEnterEvent( QDragEnterEvent * _dee );
-	virtual void dropEvent( QDropEvent * _de );
 	virtual void paintEvent( QPaintEvent * _pe );
 
 

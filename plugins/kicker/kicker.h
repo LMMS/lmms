@@ -28,7 +28,7 @@
 
 #include <QtCore/QObject>
 #include "instrument.h"
-#include "instrument_view.h"
+#include "InstrumentView.h"
 #include "knob.h"
 
 
@@ -73,7 +73,7 @@ private:
 
 
 
-class kickerInstrumentView : public instrumentView
+class kickerInstrumentView : public InstrumentView
 {
 	Q_OBJECT
 public:

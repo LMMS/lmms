@@ -29,7 +29,7 @@
 
 #include <QtCore/QObject>
 #include "instrument.h"
-#include "instrument_view.h"
+#include "InstrumentView.h"
 #include "knob.h"
 
 
@@ -131,7 +131,7 @@ private:
 
 
 
-class sidInstrumentView : public instrumentView
+class sidInstrumentView : public InstrumentView
 {
 	Q_OBJECT
 public:

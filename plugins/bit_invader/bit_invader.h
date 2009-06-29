@@ -29,7 +29,7 @@
 
 
 #include "instrument.h"
-#include "instrument_view.h"
+#include "InstrumentView.h"
 #include "graph.h"
 #include "knob.h"
 #include "pixmap_button.h"
@@ -109,7 +109,7 @@ private:
 
 
 
-class bitInvaderView : public instrumentView
+class bitInvaderView : public InstrumentView
 {
 	Q_OBJECT
 public:

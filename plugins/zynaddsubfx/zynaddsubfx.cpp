@@ -248,7 +248,7 @@ void zynAddSubFx::initRemotePlugin( void )
 
 pluginView * zynAddSubFx::instantiateView( QWidget * _parent )
 {
-	return new zynAddSubFxView( this, _parent );
+	return new ZynAddSubFxView( this, _parent );
 }
 
 
@@ -257,8 +257,8 @@ pluginView * zynAddSubFx::instantiateView( QWidget * _parent )
 
 
 
-zynAddSubFxView::zynAddSubFxView( instrument * _instrument, QWidget * _parent ) :
-	instrumentView( _instrument, _parent )
+ZynAddSubFxView::ZynAddSubFxView( instrument * _instrument, QWidget * _parent ) :
+	InstrumentView( _instrument, _parent )
 {
 	setAutoFillBackground( true );
 	QPalette pal;
@@ -277,62 +277,19 @@ zynAddSubFxView::zynAddSubFxView( instrument * _instrument, QWidget * _parent ) 
 	m_toggleUIButton->setWhatsThis(
 		tr( "Click here to show or hide the graphical user interface "
 			"(GUI) of ZynAddSubFX." ) );
-
-	setAcceptDrops( true );
 }
 
 
 
 
-zynAddSubFxView::~zynAddSubFxView()
+ZynAddSubFxView::~ZynAddSubFxView()
 {
 }
 
 
 
 
-void zynAddSubFxView::dragEnterEvent( QDragEnterEvent * _dee )
-{
-	if( _dee->mimeData()->hasFormat( stringPairDrag::mimeType() ) )
-	{
-		QString txt = _dee->mimeData()->data(
-						stringPairDrag::mimeType() );
-		if( txt.section( ':', 0, 0 ) == "pluginpresetfile" )
-		{
-			_dee->acceptProposedAction();
-		}
-		else
-		{
-			_dee->ignore();
-		}
-	}
-	else
-	{
-		_dee->ignore();
-	}
-}
-
-
-
-
-void zynAddSubFxView::dropEvent( QDropEvent * _de )
-{
-	const QString type = stringPairDrag::decodeKey( _de );
-	const QString value = stringPairDrag::decodeValue( _de );
-	if( type == "pluginpresetfile" )
-	{
-		// TODO: replace by generic approach
-	//	castModel<zynAddSubFx>()->loadFile( value );
-		_de->accept();
-		return;
-	}
-	_de->ignore();
-}
-
-
-
-
-void zynAddSubFxView::modelChanged( void )
+void ZynAddSubFxView::modelChanged( void )
 {
 	toggleUI();
 }
@@ -340,7 +297,7 @@ void zynAddSubFxView::modelChanged( void )
 
 
 
-void zynAddSubFxView::toggleUI( void )
+void ZynAddSubFxView::toggleUI( void )
 {
 	if( m_toggleUIButton->isChecked() )
 	{

@@ -394,7 +394,7 @@ private:
 	// test-piano at the bottom of every instrument-settings-window
 	PianoView * m_pianoView;
 
-	friend class instrumentView;
+	friend class InstrumentView;
 
 } ;
 

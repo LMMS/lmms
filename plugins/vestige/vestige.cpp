@@ -70,7 +70,7 @@ plugin::descriptor vestige_plugin_descriptor =
 }
 
 
-QPixmap * vestigeInstrumentView::s_artwork = NULL;
+QPixmap * VestigeInstrumentView::s_artwork = NULL;
 
 
 vestigeInstrument::vestigeInstrument( instrumentTrack * _instrument_track ) :
@@ -246,7 +246,7 @@ void vestigeInstrument::loadFile( const QString & _file )
 
 pluginView * vestigeInstrument::instantiateView( QWidget * _parent )
 {
-	return new vestigeInstrumentView( this, _parent );
+	return new VestigeInstrumentView( this, _parent );
 }
 
 
@@ -257,9 +257,9 @@ pluginView * vestigeInstrument::instantiateView( QWidget * _parent )
 
 
 
-vestigeInstrumentView::vestigeInstrumentView( instrument * _instrument,
+VestigeInstrumentView::VestigeInstrumentView( instrument * _instrument,
 							QWidget * _parent ) :
-	instrumentView( _instrument, _parent )
+	InstrumentView( _instrument, _parent )
 {
 	if( s_artwork == NULL )
 	{
@@ -301,21 +301,19 @@ vestigeInstrumentView::vestigeInstrumentView( instrument * _instrument,
 	note_off_all_btn->setFont( pointSize<8>( note_off_all_btn->font() ) );
 	connect( note_off_all_btn, SIGNAL( clicked() ), this,
 							SLOT( noteOffAll() ) );
-
-	setAcceptDrops( true );
 }
 
 
 
 
-vestigeInstrumentView::~vestigeInstrumentView()
+VestigeInstrumentView::~VestigeInstrumentView()
 {
 }
 
 
 
 
-void vestigeInstrumentView::modelChanged()
+void VestigeInstrumentView::modelChanged()
 {
 	m_vi = castModel<vestigeInstrument>();
 }
@@ -323,7 +321,7 @@ void vestigeInstrumentView::modelChanged()
 
 
 
-void vestigeInstrumentView::openPlugin()
+void VestigeInstrumentView::openPlugin()
 {
 	QFileDialog ofd( NULL, tr( "Open VST-plugin" ) );
 
@@ -367,7 +365,7 @@ void vestigeInstrumentView::openPlugin()
 
 
 
-void vestigeInstrumentView::toggleGUI()
+void VestigeInstrumentView::toggleGUI()
 {
 	QMutexLocker ml( &m_vi->m_pluginMutex );
 	if( m_vi->m_plugin == NULL )
@@ -392,7 +390,7 @@ void vestigeInstrumentView::toggleGUI()
 
 
 
-void vestigeInstrumentView::noteOffAll()
+void VestigeInstrumentView::noteOffAll()
 {
 	m_vi->m_pluginMutex.lock();
 	if( m_vi->m_plugin != NULL )
@@ -409,47 +407,7 @@ void vestigeInstrumentView::noteOffAll()
 
 
 
-void vestigeInstrumentView::dragEnterEvent( QDragEnterEvent * _dee )
-{
-	if( _dee->mimeData()->hasFormat( stringPairDrag::mimeType() ) )
-	{
-		QString txt = _dee->mimeData()->data(
-						stringPairDrag::mimeType() );
-		if( txt.section( ':', 0, 0 ) == "vstplugin" )
-		{
-			_dee->acceptProposedAction();
-		}
-		else
-		{
-			_dee->ignore();
-		}
-	}
-	else
-	{
-		_dee->ignore();
-	}
-}
-
-
-
-
-void vestigeInstrumentView::dropEvent( QDropEvent * _de )
-{
-	QString type = stringPairDrag::decodeKey( _de );
-	QString value = stringPairDrag::decodeValue( _de );
-	if( type == "vstplugin" )
-	{
-		m_vi->loadFile( value );
-		_de->accept();
-		return;
-	}
-	_de->ignore();
-}
-
-
-
-
-void vestigeInstrumentView::paintEvent( QPaintEvent * )
+void VestigeInstrumentView::paintEvent( QPaintEvent * )
 {
 	QPainter p( this );
 

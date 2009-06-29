@@ -27,7 +27,7 @@
 #define _PATMAN_H_
 
 #include "instrument.h"
-#include "instrument_view.h"
+#include "InstrumentView.h"
 #include "sample_buffer.h"
 #include "automatable_model.h"
 
@@ -106,7 +106,7 @@ private:
 	void selectSample( notePlayHandle * _n );
 
 
-	friend class patmanView;
+	friend class PatmanView;
 
 signals:
 	void fileChanged();
@@ -115,12 +115,12 @@ signals:
 
 
 
-class patmanView : public instrumentView
+class PatmanView : public InstrumentView
 {
 	Q_OBJECT
 public:
-	patmanView( instrument * _instrument, QWidget * _parent );
-	virtual ~patmanView();
+	PatmanView( instrument * _instrument, QWidget * _parent );
+	virtual ~PatmanView();
 
 
 public slots:
@@ -129,8 +129,6 @@ public slots:
 
 
 protected:
-	virtual void dragEnterEvent( QDragEnterEvent * _dee );
-	virtual void dropEvent( QDropEvent * _de );
 	virtual void paintEvent( QPaintEvent * );
 
 

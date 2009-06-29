@@ -1,8 +1,8 @@
 /*
- * dummy_instrument.h - instrument used as fallback if an instrument couldn't
- *                      be loaded
+ * DummyInstrument.h - instrument used as fallback if an instrument couldn't
+ *                     be loaded
  *
- * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -23,23 +23,22 @@
  *
  */
 
-
 #ifndef _DUMMY_INSTRUMENT_H
 #define _DUMMY_INSTRUMENT_H
 
 #include "instrument.h"
-#include "instrument_view.h"
+#include "InstrumentView.h"
 
 
-class dummyInstrument : public instrument
+class DummyInstrument : public instrument
 {
 public:
-	dummyInstrument( instrumentTrack * _instrument_track ) :
+	DummyInstrument( instrumentTrack * _instrument_track ) :
 		instrument( _instrument_track, NULL )
 	{
 	}
 
-	virtual ~dummyInstrument()
+	virtual ~DummyInstrument()
 	{
 	}
 
@@ -57,12 +56,12 @@ public:
 
 	virtual QString nodeName( void ) const
 	{
-		return( "dummyinstrument" );
+		return "dummyinstrument";
 	}
 
 	virtual pluginView * instantiateView( QWidget * _parent )
 	{
-		return( new instrumentView( this, _parent ) );
+		return new InstrumentView( this, _parent );
 	}
 } ;
 

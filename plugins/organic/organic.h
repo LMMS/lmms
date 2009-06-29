@@ -28,7 +28,7 @@
 
 
 #include "instrument.h"
-#include "instrument_view.h"
+#include "InstrumentView.h"
 #include "oscillator.h"
 #include "automatable_model.h"
 
@@ -133,7 +133,7 @@ private slots:
 } ;
 
 
-class organicInstrumentView : public instrumentView
+class organicInstrumentView : public InstrumentView
 {
 	Q_OBJECT
 public:

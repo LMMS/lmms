@@ -30,13 +30,13 @@
 #include <QtCore/QThread>
 
 #include "instrument.h"
-#include "instrument_view.h"
+#include "InstrumentView.h"
 #include "remote_plugin.h"
 
 
 class QPushButton;
 
-class zynAddSubFxView;
+class ZynAddSubFxView;
 class notePlayHandle;
 
 
@@ -78,7 +78,7 @@ private:
 	QMutex m_pluginMutex;
 	remotePlugin * m_plugin;
 
-	friend class zynAddSubFxView;
+	friend class ZynAddSubFxView;
 
 
 signals:
@@ -88,17 +88,12 @@ signals:
 
 
 
-class zynAddSubFxView : public instrumentView
+class ZynAddSubFxView : public InstrumentView
 {
 	Q_OBJECT
 public:
-	zynAddSubFxView( instrument * _instrument, QWidget * _parent );
-	virtual ~zynAddSubFxView();
-
-
-protected:
-	virtual void dragEnterEvent( QDragEnterEvent * _dee );
-	virtual void dropEvent( QDropEvent * _de );
+	ZynAddSubFxView( instrument * _instrument, QWidget * _parent );
+	virtual ~ZynAddSubFxView();
 
 
 private:

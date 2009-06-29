@@ -1,9 +1,7 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * instrument.cpp - base-class for all instrument-plugins (synths, samplers etc)
  *
- * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -26,9 +24,8 @@
 
 
 #include "instrument.h"
-#include "instrument_view.h"
 #include "instrument_track.h"
-#include "dummy_instrument.h"
+#include "DummyInstrument.h"
 #include "note_play_handle.h"
 #include "embed.h"
 
@@ -66,7 +63,7 @@ void instrument::deleteNotePluginData( notePlayHandle * )
 
 f_cnt_t instrument::beatLen( notePlayHandle * ) const
 {
-	return( 0 );
+	return 0;
 }
 
 
@@ -81,12 +78,12 @@ instrument * instrument::instantiate( const QString & _plugin_name,
 	if( dynamic_cast<instrument *>( p ) != NULL )
 	{
 		// everything ok, so return pointer
-		return( dynamic_cast<instrument *>( p ) );
+		return dynamic_cast<instrument *>( p );
 	}
 
 	// not quite... so delete plugin and return dummy instrument
 	delete p;
-	return( new dummyInstrument( _instrument_track ) );
+	return new DummyInstrument( _instrument_track );
 }
 
 
@@ -94,7 +91,7 @@ instrument * instrument::instantiate( const QString & _plugin_name,
 
 bool instrument::isFromTrack( const track * _track ) const
 {
-	return( m_instrumentTrack == _track );
+	return m_instrumentTrack == _track;
 }
 
 
@@ -129,52 +126,3 @@ QString instrument::fullDisplayName( void ) const
 }
 
 
-
-
-
-
-
-instrumentView::instrumentView( instrument * _instrument, QWidget * _parent ) :
-	pluginView( _instrument, _parent )
-{
-	setModel( _instrument );
-	setFixedSize( 250, 250 );
-	setAttribute( Qt::WA_DeleteOnClose, TRUE );
-}
-
-
-
-
-instrumentView::~instrumentView()
-{
-	if( getInstrumentTrackWindow() )
-	{
-		getInstrumentTrackWindow()->m_instrumentView = NULL;
-	}
-}
-
-
-
-
-void instrumentView::setModel( ::model * _model, bool )
-{
-	if( dynamic_cast<instrument *>( _model ) != NULL )
-	{
-		modelView::setModel( _model );
-		getInstrumentTrackWindow()->setWindowIcon(
-				model()->getDescriptor()->logo->pixmap() );
-		connect( model(), SIGNAL( destroyed( QObject * ) ),
-					this, SLOT( close() ) );
-	}
-}
-
-
-
-
-instrumentTrackWindow * instrumentView::getInstrumentTrackWindow( void )
-{
-	return( dynamic_cast<instrumentTrackWindow *>(
-					parentWidget()->parentWidget() ) );
-}
-
-#endif

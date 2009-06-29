@@ -31,7 +31,7 @@
 
 #include "combobox.h"
 #include "instrument.h"
-#include "instrument_view.h"
+#include "InstrumentView.h"
 #include "knob.h"
 #include "note_play_handle.h"
 #include "led_checkbox.h"
@@ -177,7 +177,7 @@ private:
 } ;
 
 
-class malletsInstrumentView: public instrumentView
+class malletsInstrumentView: public InstrumentView
 {
 	Q_OBJECT
 public:

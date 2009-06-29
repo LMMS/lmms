@@ -432,7 +432,7 @@ void patmanInstrument::selectSample( notePlayHandle * _n )
 
 pluginView * patmanInstrument::instantiateView( QWidget * _parent )
 {
-	return new patmanView( this, _parent );
+	return new PatmanView( this, _parent );
 }
 
 
@@ -444,8 +444,8 @@ pluginView * patmanInstrument::instantiateView( QWidget * _parent )
 
 
 
-patmanView::patmanView( instrument * _instrument, QWidget * _parent ) :
-	instrumentView( _instrument, _parent ),
+PatmanView::PatmanView( instrument * _instrument, QWidget * _parent ) :
+	InstrumentView( _instrument, _parent ),
 	m_pi( NULL )
 {
 	setAutoFillBackground( true );
@@ -500,21 +500,19 @@ patmanView::patmanView( instrument * _instrument, QWidget * _parent ) :
 			"frequency." ) );
 
 	m_displayFilename = tr( "No file selected" );
-
-	setAcceptDrops( true );
 }
 
 
 
 
-patmanView::~patmanView()
+PatmanView::~PatmanView()
 {
 }
 
 
 
 
-void patmanView::openFile()
+void PatmanView::openFile()
 {
 	QFileDialog ofd( NULL, tr( "Open patch file" ) );
 	ofd.setFileMode( QFileDialog::ExistingFiles );
@@ -566,7 +564,7 @@ void patmanView::openFile()
 
 
 
-void patmanView::updateFilename()
+void PatmanView::updateFilename()
 {
  	m_displayFilename = "";
 	Uint16 idx = m_pi->m_patchFile.length();
@@ -593,48 +591,7 @@ void patmanView::updateFilename()
 
 
 
-void patmanView::dragEnterEvent( QDragEnterEvent * _dee )
-{
-	if( _dee->mimeData()->hasFormat( stringPairDrag::mimeType() ) )
-	{
-		QString txt = _dee->mimeData()->data(
-						stringPairDrag::mimeType() );
-		if( txt.section( ':', 0, 0 ) == "samplefile" )
-		{
-			_dee->acceptProposedAction();
-		}
-		else
-		{
-			_dee->ignore();
-		}
-	}
-	else
-	{
-		_dee->ignore();
-	}
-}
-
-
-
-
-void patmanView::dropEvent( QDropEvent * _de )
-{
-	QString type = stringPairDrag::decodeKey( _de );
-	QString value = stringPairDrag::decodeValue( _de );
-	if( type == "samplefile" )
-	{
-		m_pi->setFile( value );
-		_de->accept();
-		return;
-	}
-
-	_de->ignore();
-}
-
-
-
-
-void patmanView::paintEvent( QPaintEvent * )
+void PatmanView::paintEvent( QPaintEvent * )
 {
 	QPainter p( this );
 
@@ -647,7 +604,7 @@ void patmanView::paintEvent( QPaintEvent * )
 
 
 
-void patmanView::modelChanged()
+void PatmanView::modelChanged()
 {
 	m_pi = castModel<patmanInstrument>();
 	m_loopButton->setModel( &m_pi->m_loopedModel );

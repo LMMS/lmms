@@ -28,7 +28,7 @@
 
 
 #include "instrument.h"
-#include "instrument_view.h"
+#include "InstrumentView.h"
 #include "oscillator.h"
 #include "automatable_model.h"
 
@@ -148,7 +148,7 @@ private:
 
 
 
-class tripleOscillatorView : public instrumentView
+class tripleOscillatorView : public InstrumentView
 {
 	Q_OBJECT
 public:

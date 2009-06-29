@@ -31,7 +31,7 @@
 
 #include "instrument.h"
 #include "pixmap_button.h"
-#include "instrument_view.h"
+#include "InstrumentView.h"
 #include "knob.h"
 #include "lcd_spinbox.h"
 #include "led_checkbox.h"
@@ -181,7 +181,7 @@ public:
 
 
 
-class sf2InstrumentView : public instrumentView
+class sf2InstrumentView : public InstrumentView
 {
 	Q_OBJECT
 public:

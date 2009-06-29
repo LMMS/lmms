@@ -25,7 +25,7 @@
 #define _VIBED_H
 
 #include "instrument.h"
-#include "instrument_view.h"
+#include "InstrumentView.h"
 #include "sample_buffer.h"
 #include "graph.h"
 #include "knob.h"
@@ -82,7 +82,7 @@ private:
 
 
 
-class vibedView : public instrumentView
+class vibedView : public InstrumentView
 {
 	Q_OBJECT
 public:
