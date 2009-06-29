@@ -30,6 +30,7 @@
 #include "ResourceItem.h"
 #include "ResourceProvider.h"
 #include "config_mgr.h"
+#include "engine.h"
 
 
 
@@ -185,8 +186,6 @@ ResourceItem::Type ResourceItem::guessType( void ) const
 
 		typeMap["xpf"] = TypePreset;
 
-		typeMap["xiz"] = TypePluginSpecificPreset;
-
 		typeMap["mmp"] = TypeProject;
 		typeMap["mmpz"] = TypeProject;
 
@@ -200,6 +199,16 @@ ResourceItem::Type ResourceItem::guessType( void ) const
 		typeMap["png"] = TypeImage;
 		typeMap["jpg"] = TypeImage;
 		typeMap["jpeg"] = TypeImage;
+
+		for( QMap<QString, QString>::ConstIterator it =
+					engine::pluginFileHandling().begin();
+			it != engine::pluginFileHandling().end(); ++it )
+		{
+			if( !typeMap.contains( it.key() ) )
+			{
+				typeMap[it.key()] = TypePluginSpecificResource;
+			}
+		}
 	}
 
 	const QString s = QFileInfo( name() ).suffix().toLower();

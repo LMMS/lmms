@@ -183,7 +183,7 @@ void ResourceBrowser::showContextMenu( const QPoint & _pos )
 		case ResourceItem::TypeSample:
 		case ResourceItem::TypeSoundFont:
 		case ResourceItem::TypePreset:
-		case ResourceItem::TypePluginSpecificPreset:
+		case ResourceItem::TypePluginSpecificResource:
 		case ResourceItem::TypePlugin:
 			m.addAction( m_actions[LoadInNewTrackSongEditor] );
 			m.addAction( m_actions[LoadInNewTrackBBEditor] );
@@ -271,7 +271,7 @@ void ResourceBrowser::triggerDefaultAction( const QModelIndex & _idx )
 			action = LoadInNewTrackBBEditor;
 			break;
 		case ResourceItem::TypePreset:
-		case ResourceItem::TypePluginSpecificPreset:
+		case ResourceItem::TypePluginSpecificResource:
 		case ResourceItem::TypePlugin:
 		case ResourceItem::TypeSoundFont:
 			action = LoadInNewTrackSongEditor;
