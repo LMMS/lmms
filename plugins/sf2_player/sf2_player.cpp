@@ -30,6 +30,7 @@
 #include <QtGui/QFileDialog>
 #include <QtXml/QDomDocument>
 
+#include "ResourceFileMapper.h"
 #include "sf2_player.h"
 #include "engine.h"
 #include "instrument_track.h"
@@ -49,6 +50,9 @@
 
 #define SF2_PANNING_SUPPORT
 
+static const char * __supportedExts[] =
+{ "sf2", NULL };
+
 extern "C"
 {
 
@@ -62,7 +66,7 @@ plugin::descriptor sf2player_plugin_descriptor =
 	0x0100,
 	plugin::Instrument,
 	new pluginPixmapLoader( "logo" ),
-	"sf2",
+	__supportedExts,
 	NULL
 } ;
 
@@ -259,17 +263,16 @@ void sf2Instrument::loadSettings( const QDomElement & _this )
 
 
 
-void sf2Instrument::loadFile( const QString & _file )
+void sf2Instrument::loadResource( const ResourceItem * _item )
 {
-	if( !_file.isEmpty() )
-	{
-		openFile( _file );
-		updatePatch();
+	ResourceFileMapper mapper( _item );
 
-		// for some reason we've to call that, otherwise preview of a
-		// soundfont for the first time fails
-		updateSampleRate();
-	}
+	openFile( mapper.fileName() );
+	updatePatch();
+
+	// for some reason we've to call that, otherwise preview of a
+	// soundfont for the first time fails
+	updateSampleRate();
 }
 
 
@@ -291,7 +294,7 @@ automatableModel * sf2Instrument::getChildModel( const QString & _modelName )
 
 
 
-QString sf2Instrument::nodeName( void ) const
+QString sf2Instrument::nodeName() const
 {
 	return( sf2player_plugin_descriptor.name );
 }
@@ -299,7 +302,7 @@ QString sf2Instrument::nodeName( void ) const
 
 
 
-void sf2Instrument::freeFont( void )
+void sf2Instrument::freeFont()
 {
 	QTextStream cout( stdout, QIODevice::WriteOnly );
 
@@ -400,7 +403,7 @@ void sf2Instrument::openFile( const QString & _sf2File )
 
 
 
-void sf2Instrument::updatePatch( void )
+void sf2Instrument::updatePatch()
 {
 	if( m_bankNum.value() >= 0 && m_patchNum.value() >= 0 )
 	{
@@ -412,7 +415,7 @@ void sf2Instrument::updatePatch( void )
 
 
 
-QString sf2Instrument::getCurrentPatchName( void )
+QString sf2Instrument::getCurrentPatchName()
 {
 	int iBankSelected = m_bankNum.value();
 	int iProgSelected = m_patchNum.value();
@@ -453,7 +456,7 @@ QString sf2Instrument::getCurrentPatchName( void )
 
 
 
-void sf2Instrument::updateGain( void )
+void sf2Instrument::updateGain()
 {
 	fluid_synth_set_gain( m_synth, m_gain.value() );
 }
@@ -461,7 +464,7 @@ void sf2Instrument::updateGain( void )
 
 
 
-void sf2Instrument::updateReverbOn( void )
+void sf2Instrument::updateReverbOn()
 {
 	fluid_synth_set_reverb_on( m_synth, m_reverbOn.value() ? 1 : 0 );
 }
@@ -469,7 +472,7 @@ void sf2Instrument::updateReverbOn( void )
 
 
 
-void sf2Instrument::updateReverb( void )
+void sf2Instrument::updateReverb()
 {
 	fluid_synth_set_reverb( m_synth, m_reverbRoomSize.value(),
 			m_reverbDamping.value(), m_reverbWidth.value(),
@@ -479,7 +482,7 @@ void sf2Instrument::updateReverb( void )
 
 
 
-void  sf2Instrument::updateChorusOn( void )
+void  sf2Instrument::updateChorusOn()
 {
 	fluid_synth_set_chorus_on( m_synth, m_chorusOn.value() ? 1 : 0 );
 }
@@ -487,7 +490,7 @@ void  sf2Instrument::updateChorusOn( void )
 
 
 
-void  sf2Instrument::updateChorus( void )
+void  sf2Instrument::updateChorus()
 {
 	fluid_synth_set_chorus( m_synth, static_cast<int>( m_chorusNum.value() ),
 			m_chorusLevel.value(), m_chorusSpeed.value(),
@@ -496,7 +499,7 @@ void  sf2Instrument::updateChorus( void )
 
 
 
-void sf2Instrument::updateSampleRate( void )
+void sf2Instrument::updateSampleRate()
 {	
 	double tempRate;
 	
@@ -920,7 +923,7 @@ sf2InstrumentView::~sf2InstrumentView()
 
 
 
-void sf2InstrumentView::modelChanged( void )
+void sf2InstrumentView::modelChanged()
 {
 	sf2Instrument * k = castModel<sf2Instrument>();
 	m_bankNumLcd->setModel( &k->m_bankNum );
@@ -941,11 +944,11 @@ void sf2InstrumentView::modelChanged( void )
 	m_chorusDepthKnob->setModel( &k->m_chorusDepth );
 
 
-	connect(k, SIGNAL( fileChanged( void ) ),
-			this, SLOT( updateFilename( void ) ) );
+	connect(k, SIGNAL( fileChanged() ),
+			this, SLOT( updateFilename() ) );
 
-	connect(k, SIGNAL( fileLoading( void ) ),
-			this, SLOT( invalidateFile( void ) ) );
+	connect(k, SIGNAL( fileLoading() ),
+			this, SLOT( invalidateFile() ) );
 
 	updateFilename();
 
@@ -954,7 +957,7 @@ void sf2InstrumentView::modelChanged( void )
 
 
 
-void sf2InstrumentView::updateFilename( void )
+void sf2InstrumentView::updateFilename()
 {
 	sf2Instrument * i = castModel<sf2Instrument>();
 	QFontMetrics fm( m_filenameLabel->font() );
@@ -976,7 +979,7 @@ void sf2InstrumentView::updateFilename( void )
 
 
 
-void sf2InstrumentView::updatePatchName( void )
+void sf2InstrumentView::updatePatchName()
 {
 	sf2Instrument * i = castModel<sf2Instrument>();
 	QFontMetrics fm( font() );
@@ -992,7 +995,7 @@ void sf2InstrumentView::updatePatchName( void )
 
 
 
-void sf2InstrumentView::invalidateFile( void )
+void sf2InstrumentView::invalidateFile()
 {
 	m_patchDialogButton->setEnabled( false );
 }
@@ -1000,7 +1003,7 @@ void sf2InstrumentView::invalidateFile( void )
 
 
 
-void sf2InstrumentView::showFileDialog( void )
+void sf2InstrumentView::showFileDialog()
 {
 	sf2Instrument * k = castModel<sf2Instrument>();
 
@@ -1050,7 +1053,7 @@ void sf2InstrumentView::showFileDialog( void )
 
 
 
-void sf2InstrumentView::showPatchDialog( void )
+void sf2InstrumentView::showPatchDialog()
 {
 	sf2Instrument * k = castModel<sf2Instrument>();
 

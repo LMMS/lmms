@@ -2,6 +2,7 @@
  * sf2_player.h - a soundfont2 player using fluidSynth
  *
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail/dot/com>
+ * Copyright (c) 2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -68,18 +69,18 @@ public:
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
 	virtual void loadSettings( const QDomElement & _this );
 
-	virtual void loadFile( const QString & _file );
+	virtual void loadResource( const ResourceItem * _item );
 
 	virtual automatableModel * getChildModel( const QString & _modelName );
 
-	virtual QString nodeName( void ) const;
+	virtual QString nodeName() const;
 
-	virtual f_cnt_t desiredReleaseFrames( void ) const
+	virtual f_cnt_t desiredReleaseFrames() const
 	{
 		return 0;
 	}
 
-	virtual bool isMidiBased( void ) const
+	virtual bool isMidiBased() const
 	{
 		return true;
 	}
@@ -94,16 +95,16 @@ public:
 
 public slots:
 	void openFile( const QString & _sf2File );
-	void updatePatch( void );
-	void updateSampleRate( void );
+	void updatePatch();
+	void updateSampleRate();
 	
 	// We can't really support sample-exact with the way IPH and FS work.
 	// So, sig/slots work just fine for the synth settings right now.
-	void updateReverbOn( void );
-	void updateReverb( void );
-	void updateChorusOn( void );
-	void updateChorus( void );
-	void updateGain( void );
+	void updateReverbOn();
+	void updateReverb();
+	void updateChorusOn();
+	void updateChorus();
+	void updateGain();
 
 
 private:
@@ -152,14 +153,14 @@ private:
 
 
 private:
-	void freeFont( void );
+	void freeFont();
 
 	friend class sf2InstrumentView;
 
 signals:
-    void fileLoading( void );
-	void fileChanged( void );
-	void patchChanged( void );
+	void fileLoading();
+	void fileChanged();
+	void patchChanged();
 
 } ;
 
@@ -189,7 +190,7 @@ public:
 	virtual ~sf2InstrumentView();
 
 private:
-	virtual void modelChanged( void );
+	virtual void modelChanged();
 
 	pixmapButton * m_fileDialogButton;
 	pixmapButton * m_patchDialogButton;
@@ -217,11 +218,11 @@ private:
 	static patchesDialog * s_patchDialog;
 
 protected slots:
-	void invalidateFile( void );
-	void showFileDialog( void );
-	void showPatchDialog( void );
-	void updateFilename( void );
-	void updatePatchName( void );
+	void invalidateFile();
+	void showFileDialog();
+	void showPatchDialog();
+	void updateFilename();
+	void updatePatchName();
 } ;
 
 
