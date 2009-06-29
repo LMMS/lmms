@@ -26,6 +26,7 @@
 #include <QtGui/QLabel>
 #include <QtGui/QLineEdit>
 #include <QtGui/QMenu>
+#include <QtGui/QPushButton>
 
 #include "ResourceBrowser.h"
 #include "ResourceFileMapper.h"
@@ -120,12 +121,30 @@ ResourceBrowser::ResourceBrowser( QWidget * _parent ) :
 			this,
 			SLOT( triggerDefaultAction( const QModelIndex & ) ) );
 
+	// create buttons below tree-view
+	QHBoxLayout * buttonLayout = new QHBoxLayout;
+
+	QPushButton * manageButton = new QPushButton( tr( "Manage locations" ) );
+	connect( manageButton, SIGNAL( clicked() ),
+			this, SLOT( manageDirectories() ) );
+
+	QPushButton * pianoButton = new QPushButton( tr( "Show piano" ) );
+	pianoButton->setCheckable( true );
+	pianoButton->setChecked( true );
+
+	buttonLayout->addWidget( manageButton );
+	buttonLayout->addWidget( pianoButton );
+
+	// create PianoView allowing the user to test selected resource
 	PianoView * pianoView = new PianoView( contentParent() );
 	pianoView->setModel( m_previewer.pianoModel() );
+	connect( pianoButton, SIGNAL( toggled( bool ) ),
+			pianoView, SLOT( setVisible( bool ) ) );
 
 	// add widgets/layouts to us (we're a SideBarWidget)
 	addContentLayout( filterLayout );
 	addContentWidget( m_treeView );
+	addContentLayout( buttonLayout );
 	addContentWidget( pianoView );
 
 
@@ -300,6 +319,13 @@ void ResourceBrowser::updateFilterStatus()
 	m_filterStatusLabel->setText( QString( "%1/%2" ).
 					arg( m_treeModel.shownItems() ).
 					arg( m_treeModel.totalItems() ) );
+}
+
+
+
+
+void ResourceBrowser::manageDirectories()
+{
 }
 
 
