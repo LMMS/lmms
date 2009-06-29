@@ -1,5 +1,3 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * engine.cpp - implementation of LMMS' engine-system
  *
@@ -42,7 +40,6 @@
 #include "mixer.h"
 #include "pattern.h"
 #include "piano_roll.h"
-#include "preset_preview_play_handle.h"
 #include "project_journal.h"
 #include "project_notes.h"
 #include "plugin.h"
@@ -140,7 +137,6 @@ void engine::init( const bool _has_gui )
 		s_mainWindow->finalize();
 	}
 
-	presetPreviewPlayHandle::init();
 	s_dummyTC = new dummyTrackContainer;
 
 	s_mixer->startProcessing();
@@ -169,7 +165,6 @@ void engine::destroy( void )
 	delete s_fxMixerView;
 	s_fxMixerView = NULL;
 
-	presetPreviewPlayHandle::cleanup();
 	instrumentTrackView::cleanupWindowPool();
 
 	s_song->clearProject();
@@ -224,13 +219,11 @@ void engine::initPluginFileHandling( void )
 	{
 		if( it->type == plugin::Instrument )
 		{
-			const QStringList & ext =
-				QString( it->supportedFileTypes ).
-							split( QChar( ',' ) );
-			for( QStringList::const_iterator itExt = ext.begin();
-						itExt != ext.end(); ++itExt )
+			const char * * suppFileTypes = it->supportedFileTypes;
+			while( suppFileTypes && *suppFileTypes != NULL )
 			{
-				s_pluginFileHandling[*itExt] = it->name;
+				s_pluginFileHandling[*suppFileTypes] = it->name;
+				++suppFileTypes;
 			}
 		}
 	}
@@ -256,6 +249,3 @@ void engine::saveConfiguration( QDomDocument & doc )
 }
 
 
-
-
-#endif

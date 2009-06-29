@@ -1,5 +1,3 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * instrument_functions.cpp - models for instrument-function-tab
  *
@@ -33,7 +31,6 @@
 #include "engine.h"
 #include "instrument_track.h"
 #include "note_play_handle.h"
-#include "preset_preview_play_handle.h"
 
 
 
@@ -309,15 +306,7 @@ void arpeggiator::processNote( notePlayHandle * _n )
 						_n->getInstrumentTrack() );
 	if( m_arpModeModel.value() != FreeMode && cnphv.size() == 0 )
 	{
-		// maybe we're playing only a preset-preview-note?
-		cnphv = presetPreviewPlayHandle::nphsOfInstrumentTrack(
-						_n->getInstrumentTrack() );
-		if( cnphv.size() == 0 )
-		{
-			// still nothing found here, so lets return
-			//return;
-			cnphv.push_back( _n );
-		}
+		cnphv.push_back( _n );
 	}
 
 	const int cur_chord_size = chordCreator::getChordSize(
@@ -494,6 +483,6 @@ void arpeggiator::loadSettings( const QDomElement & _this )
 }
 
 
+
 #include "moc_instrument_functions.cxx"
 
-#endif
