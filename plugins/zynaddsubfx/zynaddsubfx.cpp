@@ -30,6 +30,8 @@
 #include <QtGui/QDropEvent>
 #include <QtGui/QPushButton>
 
+#include "ResourceFileMapper.h"
+
 #include "zynaddsubfx.h"
 #include "engine.h"
 #include "mmp.h"
@@ -44,6 +46,9 @@
 #include "moc_zynaddsubfx.cxx"
 
 
+static const char * __supportedExts[] =
+{ "xiz", NULL };
+
 extern "C"
 {
 
@@ -57,7 +62,7 @@ plugin::descriptor PLUGIN_EXPORT zynaddsubfx_plugin_descriptor =
 	0x0100,
 	plugin::Instrument,
 	new pluginPixmapLoader( "logo" ),
-	"xiz",
+	__supportedExts,
 	NULL,
 } ;
 
@@ -156,12 +161,13 @@ void zynAddSubFx::loadSettings( const QDomElement & _this )
 
 
 
-void zynAddSubFx::loadFile( const QString & _file )
+void zynAddSubFx::loadResource( const ResourceItem * _item )
 {
+	ResourceFileMapper mapper( _item );
 	m_plugin->lock();
 	m_plugin->sendMessage(
 		remotePlugin::message( IdLoadPresetFromFile ).
-				addString( _file.toStdString() ) );
+			addString( mapper.fileName().toStdString() ) );
 	m_plugin->waitForMessage( IdLoadPresetFromFile );
 	m_plugin->unlock();
 
@@ -315,7 +321,8 @@ void zynAddSubFxView::dropEvent( QDropEvent * _de )
 	const QString value = stringPairDrag::decodeValue( _de );
 	if( type == "pluginpresetfile" )
 	{
-		castModel<zynAddSubFx>()->loadFile( value );
+		// TODO: replace by generic approach
+	//	castModel<zynAddSubFx>()->loadFile( value );
 		_de->accept();
 		return;
 	}

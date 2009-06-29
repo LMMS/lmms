@@ -55,7 +55,7 @@ public:
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
 	virtual void loadSettings( const QDomElement & _this );
 
-	virtual void loadFile( const QString & _file );
+	virtual void loadResource( const ResourceItem * _item );
 
 
 	virtual QString nodeName( void ) const;
