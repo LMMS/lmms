@@ -50,16 +50,16 @@ public:
 	vestigeInstrument( instrumentTrack * _channel_track );
 	virtual ~vestigeInstrument();
 
-	virtual void play( sampleFrame * _working_buffer );
-
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
 	virtual void loadSettings( const QDomElement & _this );
 
-	virtual QString nodeName( void ) const;
+	virtual QString nodeName() const;
 
-	virtual void loadFile( const QString & _file );
+	virtual void loadResource( const ResourceItem * _item );
 
-	virtual bool isMidiBased( void ) const
+	virtual void play( sampleFrame * _working_buffer );
+
+	virtual bool isMidiBased() const
 	{
 		return true;
 	}
@@ -71,7 +71,8 @@ public:
 
 
 private:
-	void closePlugin( void );
+	void loadFile( const QString & _file );
+	void closePlugin();
 
 	int m_runningNotes[NumKeys];
 
@@ -97,9 +98,9 @@ public:
 
 
 protected slots:
-	void openPlugin( void );
-	void toggleGUI( void );
-	void noteOffAll( void );
+	void openPlugin();
+	void toggleGUI();
+	void noteOffAll();
 
 
 protected:
@@ -109,7 +110,7 @@ protected:
 
 
 private:
-	virtual void modelChanged( void );
+	virtual void modelChanged();
 
 	static QPixmap * s_artwork;
 

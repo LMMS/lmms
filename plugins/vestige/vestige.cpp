@@ -32,6 +32,7 @@
 #include <QtGui/QPushButton>
 #include <QtXml/QDomElement>
 
+#include "ResourceFileMapper.h"
 #include "engine.h"
 #include "gui_templates.h"
 #include "instrument_play_handle.h"
@@ -46,6 +47,9 @@
 #include "embed.cpp"
 
 
+static const char * __supportedExts[] =
+{ "dll", NULL };
+
 extern "C"
 {
 
@@ -59,7 +63,7 @@ plugin::descriptor vestige_plugin_descriptor =
 	0x0100,
 	plugin::Instrument,
 	new pluginPixmapLoader( "logo" ),
-	"dll",
+	__supportedExts,
 	NULL
 } ;
 
@@ -119,9 +123,69 @@ void vestigeInstrument::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 
 
-QString vestigeInstrument::nodeName( void ) const
+QString vestigeInstrument::nodeName() const
 {
-	return( vestige_plugin_descriptor.name );
+	return vestige_plugin_descriptor.name;
+}
+
+
+
+
+void vestigeInstrument::loadResource( const ResourceItem * _item )
+{
+	ResourceFileMapper mapper( _item );
+	loadFile( mapper.fileName() );
+}
+
+
+
+
+void vestigeInstrument::play( sampleFrame * _buf )
+{
+	m_pluginMutex.lock();
+	if( m_plugin == NULL )
+	{
+		m_pluginMutex.unlock();
+		return;
+	}
+
+	m_plugin->process( NULL, _buf );
+
+	const fpp_t frames = engine::getMixer()->framesPerPeriod();
+
+	getInstrumentTrack()->processAudioBuffer( _buf, frames, NULL );
+
+	m_pluginMutex.unlock();
+}
+
+
+
+
+bool vestigeInstrument::handleMidiEvent( const midiEvent & _me,
+						const midiTime & _time )
+{
+	m_pluginMutex.lock();
+	if( m_plugin != NULL )
+	{
+		m_plugin->processMidiEvent( _me, _time );
+	}
+	m_pluginMutex.unlock();
+	return true;
+}
+
+
+
+
+void vestigeInstrument::closePlugin()
+{
+	m_pluginMutex.lock();
+	if( m_plugin )
+	{
+		delete m_plugin->pluginWidget();
+	}
+	delete m_plugin;
+	m_plugin = NULL;
+	m_pluginMutex.unlock();
 }
 
 
@@ -180,59 +244,9 @@ void vestigeInstrument::loadFile( const QString & _file )
 
 
 
-void vestigeInstrument::play( sampleFrame * _buf )
-{
-	m_pluginMutex.lock();
-	if( m_plugin == NULL )
-	{
-		m_pluginMutex.unlock();
-		return;
-	}
-
-	m_plugin->process( NULL, _buf );
-
-	const fpp_t frames = engine::getMixer()->framesPerPeriod();
-
-	getInstrumentTrack()->processAudioBuffer( _buf, frames, NULL );
-
-	m_pluginMutex.unlock();
-}
-
-
-
-
-bool vestigeInstrument::handleMidiEvent( const midiEvent & _me,
-						const midiTime & _time )
-{
-	m_pluginMutex.lock();
-	if( m_plugin != NULL )
-	{
-		m_plugin->processMidiEvent( _me, _time );
-	}
-	m_pluginMutex.unlock();
-	return true;
-}
-
-
-
-
-void vestigeInstrument::closePlugin( void )
-{
-	m_pluginMutex.lock();
-	if( m_plugin )
-	{
-		delete m_plugin->pluginWidget();
-	}
-	delete m_plugin;
-	m_plugin = NULL;
-	m_pluginMutex.unlock();
-}
-
-
-
 pluginView * vestigeInstrument::instantiateView( QWidget * _parent )
 {
-	return( new vestigeInstrumentView( this, _parent ) );
+	return new vestigeInstrumentView( this, _parent );
 }
 
 
@@ -301,7 +315,7 @@ vestigeInstrumentView::~vestigeInstrumentView()
 
 
 
-void vestigeInstrumentView::modelChanged( void )
+void vestigeInstrumentView::modelChanged()
 {
 	m_vi = castModel<vestigeInstrument>();
 }
@@ -309,7 +323,7 @@ void vestigeInstrumentView::modelChanged( void )
 
 
 
-void vestigeInstrumentView::openPlugin( void )
+void vestigeInstrumentView::openPlugin()
 {
 	QFileDialog ofd( NULL, tr( "Open VST-plugin" ) );
 
@@ -353,7 +367,7 @@ void vestigeInstrumentView::openPlugin( void )
 
 
 
-void vestigeInstrumentView::toggleGUI( void )
+void vestigeInstrumentView::toggleGUI()
 {
 	QMutexLocker ml( &m_vi->m_pluginMutex );
 	if( m_vi->m_plugin == NULL )
@@ -378,7 +392,7 @@ void vestigeInstrumentView::toggleGUI( void )
 
 
 
-void vestigeInstrumentView::noteOffAll( void )
+void vestigeInstrumentView::noteOffAll()
 {
 	m_vi->m_pluginMutex.lock();
 	if( m_vi->m_plugin != NULL )
@@ -478,7 +492,7 @@ extern "C"
 // neccessary for getting instance out of shared lib
 plugin * lmms_plugin_main( model *, void * _data )
 {
-	return( new vestigeInstrument( static_cast<instrumentTrack *>( _data ) ) );
+	return new vestigeInstrument( static_cast<instrumentTrack *>( _data ) );
 }
 
 
