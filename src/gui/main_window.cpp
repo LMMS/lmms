@@ -53,7 +53,6 @@
 #include "fx_mixer_view.h" 
 #include "about_dialog.h"
 #include "controller_rack_view.h"
-#include "file_browser.h"
 #include "plugin_browser.h"
 #include "side_bar.h"
 #include "config_mgr.h"
@@ -108,50 +107,7 @@ mainWindow::mainWindow( void ) :
 	int id = 0;
 	QString wdir = configManager::inst()->workingDir();
 	side_bar->appendTab( new pluginBrowser( splitter ), ++id );
-	side_bar->appendTab( new fileBrowser(
-				configManager::inst()->userProjectsDir() + "*" +
-				configManager::inst()->factoryProjectsDir(),
-					"*.mmp *.mmpz *.xml *.mid *.flp",
-							tr( "My projects" ),
-					embed::getIconPixmap( "project_file" ),
-							splitter ), ++id );
-	side_bar->appendTab( new fileBrowser(
-				configManager::inst()->userSamplesDir() + "*" +
-				configManager::inst()->factorySamplesDir(),
-					"*", tr( "My samples" ),
-					embed::getIconPixmap( "sample_file" ),
-							splitter ), ++id );
-	side_bar->appendTab( new fileBrowser(
-				configManager::inst()->userPresetsDir() + "*" +
-				configManager::inst()->factoryPresetsDir(),
-					"*.xpf *.cs.xml *.xiz",
-					tr( "My presets" ),
-					embed::getIconPixmap( "preset_file" ),
-							splitter ), ++id );
-	side_bar->appendTab( new fileBrowser( QDir::homePath(), "*",
-							tr( "My home" ),
-					embed::getIconPixmap( "home" ),
-							splitter ), ++id );
-	QFileInfoList drives = QDir::drives();
-	QStringList root_paths;
-	foreach( const QFileInfo & drive, drives )
-	{
-		root_paths += drive.absolutePath();
-	}
-	side_bar->appendTab( new fileBrowser( root_paths.join( "*" ), "*",
-#ifdef LMMS_BUILD_WIN32
-							tr( "My computer" ),
-#else
-							tr( "Root directory" ),
-#endif
-					embed::getIconPixmap( "computer" ),
-							splitter,
-#ifdef LMMS_BUILD_WIN32
-							true
-#else
-							false
-#endif
-								), ++id );
+
 	// add a resource browser to sidebar
 	side_bar->appendTab( new ResourceBrowser( splitter ), ++id );
 
