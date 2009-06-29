@@ -94,6 +94,7 @@ void ResourcePreviewer::preview( ResourceItem * _item )
 			break;
 		case ResourceItem::TypeSample:
 		case ResourceItem::TypeSoundFont:
+		case ResourceItem::TypePluginSpecificResource:
 		{
 			// restore default settings we are going to preview a
 			// sample (which should be played at a default
