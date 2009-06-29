@@ -2,7 +2,7 @@
  * audio_file_processor.h - declaration of class audioFileProcessor
  *                          (instrument-plugin for using audio-files)
  *
- * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -52,7 +52,7 @@ public:
 						QDomElement & _parent );
 	virtual void loadSettings( const QDomElement & _this );
 
-	virtual void loadFile( const QString & _file );
+	virtual void loadResource( const ResourceItem * _resourceItem );
 
 	virtual QString nodeName( void ) const;
 
@@ -60,7 +60,7 @@ public:
 
 	virtual f_cnt_t desiredReleaseFrames( void ) const
 	{
-		return( 128 );
+		return 128;
 	}
 
 	virtual pluginView * instantiateView( QWidget * _parent );
@@ -127,8 +127,6 @@ private:
 	pixmapButton * m_loopButton;
 
 } ;
-
-
 
 
 #endif

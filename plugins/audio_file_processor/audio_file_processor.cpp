@@ -29,6 +29,7 @@
 #include <QtCore/QFileInfo>
 #include <QtGui/QDropEvent>
 
+#include "ResourceFileMapper.h"
 
 #include "audio_file_processor.h"
 #include "engine.h"
@@ -45,6 +46,8 @@
 #undef SINGLE_SOURCE_COMPILE
 #include "embed.cpp"
 
+static const char * __supportedExts[] =
+{ "wav", "ogg", "ds", "spx", "au", "voc", "aif", "aiff", "flac", "raw", NULL };
 
 extern "C"
 {
@@ -61,7 +64,7 @@ plugin::descriptor PLUGIN_EXPORT audiofileprocessor_plugin_descriptor =
 	0x0100,
 	plugin::Instrument,
 	new pluginPixmapLoader( "logo" ),
-	"wav,ogg,ds,spx,au,voc,aif,aiff,flac,raw",
+	__supportedExts,
 	NULL
 } ;
 
@@ -173,9 +176,11 @@ void audioFileProcessor::loadSettings( const QDomElement & _this )
 
 
 
-void audioFileProcessor::loadFile( const QString & _file )
+void audioFileProcessor::loadResource( const ResourceItem * _resourceItem )
 {
-	setAudioFile( _file );
+	// TODO: replace this with real support for ResourceItem's
+	ResourceFileMapper mapper( _resourceItem );
+	setAudioFile( mapper.fileName() );
 }
 
 
