@@ -1,9 +1,7 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * config_mgr.cpp - implementation of class configManager
  *
- * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -31,18 +29,22 @@
 #include <QtGui/QMessageBox>
 #include <QtGui/QApplication>
 
+#include "ResourceItem.h"
+#include "UnifiedResourceProvider.h"
+#include "ResourceDB.h"
 #include "lmmsversion.h"
 #include "config_mgr.h"
 #include "main_window.h"
 #include "engine.h"
 
+
 static inline QString ensureTrailingSlash( const QString & _s )
 {
 	if( _s.right( 1 ) != QDir::separator() )
 	{
-		return( _s + QDir::separator() );
+		return _s + QDir::separator();
 	}
-	return( _s );
+	return _s;
 }
 
 
@@ -69,7 +71,8 @@ configManager::configManager( void ) :
 	m_pluginDir( QString( PLUGIN_DIR ) ),
 #endif
 	m_vstDir( m_workingDir + "vst" + QDir::separator() ),
-	m_flDir( QDir::home().absolutePath() )
+	m_flDir( QDir::home().absolutePath() ),
+	m_defaultSoundfont( NULL )
 {
 }
 
@@ -78,6 +81,7 @@ configManager::configManager( void ) :
 
 configManager::~configManager()
 {
+	delete m_defaultSoundfont;
 }
 
 
@@ -133,10 +137,11 @@ void configManager::setSTKDir( const QString & _fd )
 
 
 
-void configManager::setDefaultSoundfont( const QString & _sf )
+void configManager::setDefaultSoundfont( const ResourceItem * _sf )
 {
 #ifdef LMMS_HAVE_FLUIDSYNTH
-	m_defaultSoundfont = _sf;
+	delete m_defaultSoundfont;
+	m_defaultSoundfont = new ResourceItem( *_sf );
 #endif
 }
 
@@ -177,12 +182,13 @@ const QString & configManager::value( const QString & _class,
 		{
 			if( ( *it ).first == _attribute )
 			{
-				return( ( *it ).second );
+				return ( *it ).second;
 			}
 		}
 	}
+
 	static QString empty;
-	return( empty );
+	return empty;
 }
 
 
@@ -287,7 +293,11 @@ void configManager::loadConfigFile( void )
 			setSTKDir( value( "paths", "stkdir" ) );
 		#endif
 		#ifdef LMMS_HAVE_FLUIDSYNTH
-			setDefaultSoundfont( value( "paths", "defaultsf2" ) );
+			/*setDefaultSoundfont(
+				engine::resourceProvider()->
+					database()->itemByHash(
+						value( "paths",
+							"defaultsf2" ) ) );*/
 		#endif
 			setBackgroundArtwork( value( "paths", "backgroundartwork" ) );
 		}
@@ -364,7 +374,9 @@ void configManager::saveConfigFile( void )
 	setValue( "paths", "stkdir", m_stkDir );
 #endif
 #ifdef LMMS_HAVE_FLUIDSYNTH
-	setValue( "paths", "defaultsf2", m_defaultSoundfont );
+	setValue( "paths", "defaultsf2",
+			m_defaultSoundfont ?
+				m_defaultSoundfont->hash() : QString() );
 #endif
 	setValue( "paths", "backgroundartwork", m_backgroundArtwork );
 
@@ -420,5 +432,3 @@ void configManager::saveConfigFile( void )
 }
 
 
-
-#endif

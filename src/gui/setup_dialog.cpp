@@ -1,9 +1,7 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * setup_dialog.cpp - dialog for setting up LMMS
  *
- * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -112,7 +110,7 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 	m_flDir( configManager::inst()->flDir() ),
 	m_ladDir( configManager::inst()->ladspaDir() ),
 #ifdef LMMS_HAVE_FLUIDSYNTH
-	m_defaultSoundfont( configManager::inst()->defaultSoundfont() ),
+//	m_defaultSoundfont( configManager::inst()->defaultSoundfont() ),
 #endif
 #ifdef LMMS_HAVE_STK
 	m_stkDir( configManager::inst()->stkDir() ),
@@ -909,7 +907,7 @@ void setupDialog::accept( void )
 	configManager::inst()->setFLDir( m_flDir );
 	configManager::inst()->setLADSPADir( m_ladDir );
 #ifdef LMMS_HAVE_FLUIDSYNTH
-	configManager::inst()->setDefaultSoundfont( m_defaultSoundfont );
+	//configManager::inst()->setDefaultSoundfont( m_defaultSoundfont );
 #endif
 #ifdef LMMS_HAVE_STK
 	configManager::inst()->setSTKDir( m_stkDir );
@@ -1434,5 +1432,3 @@ void setupDialog::displayMclHelp( void )
 
 #include "moc_setup_dialog.cxx"
 
-
-#endif
