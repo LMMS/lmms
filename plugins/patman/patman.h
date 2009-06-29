@@ -2,7 +2,8 @@
  * patman.h - header for a GUS-compatible patch instrument plugin
  *
  * Copyright (c) 2007-2008 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
- * 
+ * Copyright (c) 2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -22,10 +23,8 @@
  *
  */
 
-
 #ifndef _PATMAN_H_
 #define _PATMAN_H_
-
 
 #include "instrument.h"
 #include "instrument_view.h"
@@ -61,11 +60,11 @@ public:
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
 	virtual void loadSettings( const QDomElement & _this );
 
-	virtual void loadFile( const QString & _file );
+	virtual void loadResource( const ResourceItem * _item );
 
-	virtual QString nodeName( void ) const;
+	virtual QString nodeName() const;
 
-	virtual f_cnt_t desiredReleaseFrames( void ) const
+	virtual f_cnt_t desiredReleaseFrames() const
 	{
 		return( 128 );
 	}
@@ -102,7 +101,7 @@ private:
 	} ;
 
 	LoadErrors loadPatch( const QString & _filename );
-	void unloadCurrentPatch( void );
+	void unloadCurrentPatch();
 
 	void selectSample( notePlayHandle * _n );
 
@@ -110,7 +109,7 @@ private:
 	friend class patmanView;
 
 signals:
-	void fileChanged( void );
+	void fileChanged();
 
 } ;
 
@@ -125,8 +124,8 @@ public:
 
 
 public slots:
-	void openFile( void );
-	void updateFilename( void );
+	void openFile();
+	void updateFilename();
 
 
 protected:
@@ -136,7 +135,7 @@ protected:
 
 
 private:
-	virtual void modelChanged( void );
+	virtual void modelChanged();
 
 	patmanInstrument * m_pi;
 	QString m_displayFilename;
@@ -146,7 +145,6 @@ private:
 	pixmapButton * m_tuneButton;
 
 } ;
-
 
 
 #endif
