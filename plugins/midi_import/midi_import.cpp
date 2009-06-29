@@ -1,10 +1,10 @@
 /*
- * midi_import.cpp - support for importing MIDI-files
+ * midi_import.cpp - support for importing MIDI files
  *
  * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
  * License as published by the Free Software Foundation; either
@@ -22,12 +22,14 @@
  *
  */
 
-
 #include <QtXml/QDomDocument>
 #include <QtCore/QDir>
 #include <QtGui/QApplication>
 #include <QtGui/QMessageBox>
 #include <QtGui/QProgressDialog>
+
+#include "LocalResourceProvider.h"
+#include "ResourceDB.h"
 
 #include "midi_import.h"
 #include "track_container.h"
@@ -96,7 +98,7 @@ bool midiImport::tryImport( trackContainer * _tc )
 
 #ifdef LMMS_HAVE_FLUIDSYNTH
 	if( engine::hasGUI() &&
-		configManager::inst()->defaultSoundfont().isEmpty() )
+		configManager::inst()->defaultSoundfont() == NULL )
 	{
 		QMessageBox::information( engine::getMainWindow(),
 			tr( "Setup incomplete" ),
@@ -227,14 +229,16 @@ public:
 			if( it_inst )
 			{
 				isSF2 = true;
-				it_inst->loadFile( configManager::inst()->defaultSoundfont() );
+				it_inst->loadResource(
+					configManager::inst()->
+						defaultSoundfont() );
 				it_inst->getChildModel( "bank" )->setValue( 0 );
 				it_inst->getChildModel( "patch" )->setValue( 0 );
 			}
 			else
 			{
 				it_inst = it->loadInstrument( "patman" );
-			}	
+			}
 #else
 			it_inst = it->loadInstrument( "patman" );
 #endif
@@ -350,6 +354,10 @@ bool midiImport::readSMF( trackContainer * _tc )
 		}
 	}
 
+	// create a LocalResourceProvider for accessing pat files later
+	LocalResourceProvider midiPatterns( ResourceItem::BaseRoot,
+						"/usr/share/midi/freepats/" );
+
 	// Tracks
 	for( int t = 0; t < seq->tracks(); ++t )
 	{
@@ -402,17 +410,16 @@ bool midiImport::readSMF( trackContainer * _tc )
 						ch->it_inst->getChildModel( "bank" )->setValue( 0 );
 						ch->it_inst->getChildModel( "patch" )->setValue( prog );
 					}
-					else {
-						const QString num = QString::number( prog );
-						const QString filter = QString().fill( '0', 3 - num.length() ) + num + "*.pat";
-						const QString dir = "/usr/share/midi/"
-								"freepats/Tone_000/";
-						const QStringList files = QDir( dir ).
-						entryList( QStringList( filter ) );
-						if( ch->it_inst && !files.empty() )
-						{
-							ch->it_inst->loadFile( dir+files.front() );
-						}
+					else
+					{
+	const QString num = QString::number( prog );
+	const QString filter = QString().fill( '0', 3-num.length() ) + num;
+	const ResourceItemList items = midiPatterns.database()->
+					matchItems( QStringList() << filter );
+	if( ch->it_inst && !items.empty() )
+	{
+		ch->it_inst->loadResource( items.first() );
+	}
 					}
 				}
 				else if( update == "tracknames" )

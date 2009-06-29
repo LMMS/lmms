@@ -1,7 +1,7 @@
 /*
  * midi_import.h - support for importing MIDI-files
  *
- * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -42,7 +42,7 @@ public:
 
 	virtual pluginView * instantiateView( QWidget * )
 	{
-		return( NULL );
+		return NULL;
 	}
 
 
@@ -53,7 +53,7 @@ private:
 	bool readRIFF( trackContainer * _tc );
 	bool readTrack( int _track_end, QString & _track_name );
 
-	void error( void );
+	void error();
 
 
 	inline int readInt( int _bytes )
@@ -64,21 +64,21 @@ private:
 			c = readByte();
 			if( c == -1 )
 			{
-				return( -1 );
+				return -1;
 			}
 			value = ( value << 8 ) | c;
 		} while( --_bytes );
-		return( value );
+		return value;
 	}
-	inline Sint32 read32LE( void )
+	inline Sint32 read32LE()
 	{
 		int value = readByte();
 		value |= readByte() << 8;
 		value |= readByte() << 16;
 		value |= readByte() << 24;
-		return( value );
+		return value;
 	}
-	inline int readVar( void )
+	inline int readVar()
 	{
 		int c = readByte();
 		int value = c & 0x7f;
@@ -100,13 +100,13 @@ private:
 					}
 				}
 			}
-	        }
-        	return( !file().atEnd() ? value : -1 );
+		}
+		return ( !file().atEnd() ? value : -1 );
 	}
 
-	inline Sint32 readID( void )
+	inline Sint32 readID()
 	{
-		return( read32LE() );
+		return read32LE();
 	}
 	inline void skip( int _bytes )
 	{
