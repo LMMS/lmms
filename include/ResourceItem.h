@@ -27,6 +27,7 @@
 
 #include <QtCore/QByteArray>
 #include <QtCore/QDateTime>
+#include <QtCore/QList>
 
 #include "ResourceProvider.h"
 
@@ -77,82 +78,87 @@ public:
 	// copy constructor
 	ResourceItem( const ResourceItem & _item );
 
-	const ResourceProvider * provider( void ) const
+	const ResourceProvider * provider() const
 	{
 		return m_provider;
 	}
 
-	const QString & name( void ) const
+	const QString & name() const
 	{
 		return m_name;
 	}
 
-	inline int nameHash( void ) const
+	inline int nameHash() const
 	{
 		return m_nameHash;
 	}
 
-	Type type( void ) const
+	inline QString nameExtension() const
+	{
+		return name().section( '.', -1 );
+	}
+
+	Type type() const
 	{
 		return m_type;
 	}
 
-	const QString & path( void ) const
+	const QString & path() const
 	{
 		return m_path;
 	}
 
-	BaseDirectory baseDir( void ) const
+	BaseDirectory baseDir() const
 	{
 		return m_baseDir;
 	}
 
-	QString fullPath( void ) const
+	QString fullPath() const
 	{
 		return getBaseDirectory( m_baseDir, this ) + m_path;
 	}
 
-	QString fullName( void ) const
+	QString fullName() const
 	{
 		return fullPath() + name();
 	}
 
-	QString fullRelativeName( void ) const
+	QString fullRelativeName() const
 	{
 		return path() + name();
 	}
 
-	const QString & hash( void ) const
+	const QString & hash() const
 	{
 		return m_hash;
 	}
 
-	const QString & author( void ) const
+	const QString & author() const
 	{
 		return m_author;
 	}
 
-	int size( void ) const
+	int size() const
 	{
 		return m_size;
 	}
 
-	bool isShippedResource( void ) const
+	bool isShippedResource() const
 	{
 		return baseDir() == BaseDataDir;
 	}
 
-	bool isLocalResource( void ) const
+	bool isLocalResource() const
 	{
 		return m_provider->isLocal();
 	}
 
-	const QString & tags( void ) const
+	const QString & tags() const
 	{
 		return m_tags;
 	}
 
-	bool isValid( void ) const
+	bool isValid() const
 	{
 		return m_type != TypeUnknown && !m_name.isEmpty();
 	}
@@ -162,17 +168,17 @@ public:
 		m_treeItem = _ti;
 	}
 
-	ResourceTreeItem * treeItem( void )
+	ResourceTreeItem * treeItem()
 	{
 		return m_treeItem;
 	}
 
-	const ResourceTreeItem * treeItem( void ) const
+	const ResourceTreeItem * treeItem() const
 	{
 		return m_treeItem;
 	}
 
-	const QDateTime & lastMod( void ) const
+	const QDateTime & lastMod() const
 	{
 		return m_lastMod;
 	}
@@ -182,7 +188,7 @@ public:
 		m_lastMod = _date;
 	}
 
-	int realSize( void ) const
+	int realSize() const
 	{
 		return m_provider->dataSize( this );
 	}
@@ -192,14 +198,14 @@ public:
 		return m_provider->fetchData( this );
 	}
 
-	void reload( void );
+	void reload();
 
 	bool operator==( const ResourceItem & _other ) const;
 
 	// rates equality with given item
 	int equalityLevel( const ResourceItem & _other ) const;
 
-	Type guessType( void ) const;
+	Type guessType() const;
 
 	static const char * mimeKey()
 	{
@@ -211,7 +217,7 @@ public:
 
 
 private:
-	void init( void );
+	void init();
 
 	ResourceProvider * m_provider;
 	QString m_name;
@@ -228,6 +234,9 @@ private:
 	ResourceTreeItem * m_treeItem;
 
 } ;
+
+
+typedef QList<ResourceItem *> ResourceItemList;
 
 
 #endif
