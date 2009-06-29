@@ -25,6 +25,7 @@
 
 #include <QtCore/QFileInfo>
 
+#include "ResourceAction.h"
 #include "ResourcePreviewer.h"
 #include "ResourceFileMapper.h"
 #include "ResourceItem.h"
@@ -87,11 +88,7 @@ void ResourcePreviewer::preview( ResourceItem * _item )
 			m_previewTrack->loadTrackSpecificSettings(
 				m_defaultSettings.content().
 					firstChild().toElement() );
-			// fetch data, load into multimedia project and
-			// load it as preset
-			m_previewTrack->loadTrackSpecificSettings(
-				multimediaProject( _item->fetchData() ).
-					content().firstChild().toElement() );
+			ResourceAction( _item ).loadPreset( m_previewTrack );
 			m_previewTrack->getMidiPort()->setMode(
 							midiPort::Disabled );
 			break;
@@ -104,22 +101,7 @@ void ResourcePreviewer::preview( ResourceItem * _item )
 			m_previewTrack->loadTrackSpecificSettings(
 				m_defaultSettings.content().
 					firstChild().toElement() );
-			// if neccessary, load according instrument for the
-			// file to be previewed
-			instrument * i = m_previewTrack->getInstrument();
-			const QString ext = QFileInfo( _item->name() ).
-							suffix().toLower();
-			if( i == NULL ||
-				!i->getDescriptor()->supportsFileType( ext ) )
-			{
-				i = m_previewTrack->loadInstrument(
-					engine::pluginFileHandling()[ext] );
-			}
-			if( i != NULL )
-			{
-				ResourceFileMapper mapper( _item );
-				i->loadFile( mapper.fileName() );
-			}
+			ResourceAction( _item ).loadByPlugin( m_previewTrack );
 			break;
 		}
 		default:

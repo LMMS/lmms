@@ -39,6 +39,10 @@
 #include <QtGui/QMdiSubWindow>
 #include <QtGui/QPainter>
 
+#include "ResourceAction.h"
+#include "ResourceDB.h"
+#include "UnifiedResourceProvider.h"
+
 #include "instrument_track.h"
 #include "audio_port.h"
 #include "automation_pattern.h"
@@ -49,7 +53,6 @@
 #include "effect_rack_view.h"
 #include "embed.h"
 #include "engine.h"
-#include "file_browser.h"
 #include "fx_mixer.h"
 #include "fx_mixer_view.h"
 #include "instrument_sound_shaping.h"
@@ -1495,26 +1498,26 @@ void instrumentTrackWindow::dropEvent( QDropEvent * _de )
 		engine::getSong()->setModified();
 		_de->accept();
 	}
-	else if( type == "presetfile" )
+	else if( type == ResourceItem::mimeKey() )
 	{
-		multimediaProject mmp( value );
-		instrumentTrack::removeMidiPortNode( mmp );
-		m_track->setSimpleSerializing();
-		m_track->loadSettings( mmp.content().toElement() );
-		engine::getSong()->setModified();
-		_de->accept();
-	}
-	else if( type == "pluginpresetfile" )
-	{
-		const QString ext = fileItem::extension( value );
-		instrument * i = m_track->getInstrument();
-		if( !i->getDescriptor()->supportsFileType( ext ) )
+		const ResourceItem * item =
+			engine::resourceProvider()->database()->
+						itemByHash( value );
+		if( !item )
 		{
-			i = m_track->loadInstrument(
-					engine::pluginFileHandling()[ext] );
+			return;
 		}
-		i->loadFile( value );
-		_de->accept();
+		ResourceAction action( item );
+		if( action.loadByPlugin( m_track ) )
+		{
+			_de->accept();
+		}
+		else if( item->type() == ResourceItem::TypePreset &&
+				action.loadPreset( m_track ) )
+		{
+			engine::getSong()->setModified();
+			_de->accept();
+		}
 	}
 }
 

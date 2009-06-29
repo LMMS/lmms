@@ -30,6 +30,7 @@
 #include <QtGui/QScrollBar>
 #include <QtGui/QWheelEvent>
 
+#include "ResourceAction.h"
 #include "ResourceDB.h"
 #include "ResourceItem.h"
 #include "ResourceFileMapper.h"
@@ -40,7 +41,6 @@
 #include "bb_track.h"
 #include "main_window.h"
 #include "debug.h"
-#include "file_browser.h"
 #include "import_filter.h"
 #include "instrument.h"
 #include "instrument_track.h"
@@ -383,7 +383,6 @@ void trackContainerView::dropEvent( QDropEvent * _de )
 	QString type = stringPairDrag::decodeKey( _de );
 	QString value = stringPairDrag::decodeValue( _de );
 	engine::getMixer()->lock();
-	/* begin{obsolete code} - remove together with fileBrowser */
 	if( type == "instrument" )
 	{
 		instrumentTrack * it = dynamic_cast<instrumentTrack *>(
@@ -391,33 +390,6 @@ void trackContainerView::dropEvent( QDropEvent * _de )
 								m_tc ) );
 		it->loadInstrument( value );
 		//it->toggledInstrumentTrackButton( true );
-		_de->accept();
-	}
-	else if( type == "samplefile" || type == "pluginpresetfile" )
-	{
-		instrumentTrack * it = dynamic_cast<instrumentTrack *>(
-				track::create( track::InstrumentTrack,
-								m_tc ) );
-		instrument * i = it->loadInstrument(
-			engine::pluginFileHandling()[fileItem::extension(
-								value )]);
-		i->loadFile( value );
-		//it->toggledInstrumentTrackButton( true );
-		_de->accept();
-	}
-	else if( type == "presetfile" )
-	{
-		multimediaProject mmp( value );
-		instrumentTrack * it = dynamic_cast<instrumentTrack *>(
-				track::create( track::InstrumentTrack,
-								m_tc ) );
-		it->loadSettings( mmp.content().toElement() );
-		//it->toggledInstrumentTrackButton( true );
-		_de->accept();
-	}
-	else if( type == "importedproject" )
-	{
-		importFilter::import( value, m_tc );
 		_de->accept();
 	}
 	else if( type.left( 6 ) == "track_" )
@@ -436,39 +408,26 @@ void trackContainerView::dropEvent( QDropEvent * _de )
 						itemByHash( value );
 		if( item )
 		{
+			ResourceAction action( item );
 			switch( item->type() )
 			{
 
 	case ResourceItem::TypePreset:
-	{
-		instrumentTrack * it = dynamic_cast<instrumentTrack *>(
+		action.loadPreset(
+			dynamic_cast<instrumentTrack *>(
 				track::create( track::InstrumentTrack,
-								m_tc ) );
-		// fetch data, load into multimedia project and
-		// load it as preset
-		it->loadTrackSpecificSettings(
-				multimediaProject( item->fetchData() ).
-					content().firstChild().toElement() );
+								m_tc ) ) );
 		break;
-	}
 	case ResourceItem::TypeSample:
 	case ResourceItem::TypeSoundFont:
-	{
-		instrumentTrack * it = dynamic_cast<instrumentTrack *>(
+		action.loadByPlugin(
+			dynamic_cast<instrumentTrack *>(
 				track::create( track::InstrumentTrack,
-								m_tc ) );
-		const QString ext = QFileInfo( item->name() ).
-							suffix().toLower();
-		instrument * i = it->loadInstrument(
-					engine::pluginFileHandling()[ext] );
-		if( i != NULL )
-		{
-			ResourceFileMapper mapper( item );
-			i->loadFile( mapper.fileName() );
-		}
+								m_tc ) ) );
 		break;
-	}
-
+	case ResourceItem::TypeForeignProject:
+		action.importProject( m_tc );
+		break;
 			}
 		}
 	}
