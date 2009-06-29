@@ -89,11 +89,11 @@ void UnifiedResourceProvider::remergeItems( void )
 			const ResourceItem *> PointerHashMap;
 	PointerHashMap itemsSeen;
 
-	ResourceDB::ItemList & items = database()->items();
+	ResourceDB::ItemHashMap & items = database()->items();
 
 	itemsSeen.reserve( items.size() );
 
-	for( ResourceDB::ItemList::Iterator it = items.begin();
+	for( ResourceDB::ItemHashMap::Iterator it = items.begin();
 						it != items.end(); ++it )
 	{
 		itemsSeen[*it] = *it;
@@ -101,7 +101,7 @@ void UnifiedResourceProvider::remergeItems( void )
 
 	foreach( ResourceDB * db, m_mergedDatabases )
 	{
-		for( ResourceDB::ItemList::ConstIterator it =
+		for( ResourceDB::ItemHashMap::ConstIterator it =
 							db->items().begin();
 						it != db->items().end(); ++it )
 		{
@@ -117,7 +117,7 @@ void UnifiedResourceProvider::remergeItems( void )
 		}
 	}
 
-	for( ResourceDB::ItemList::Iterator it = items.begin();
+	for( ResourceDB::ItemHashMap::Iterator it = items.begin();
 						it != items.end(); )
 	{
 		if( itemsSeen[*it] == *it )

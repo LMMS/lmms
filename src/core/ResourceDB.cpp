@@ -190,7 +190,7 @@ loadTreeItem( treeItem, e );
 
 const ResourceItem * ResourceDB::itemByHash( const QString & _hash ) const
 {
-	ItemList::ConstIterator it = m_items.find( _hash );
+	ItemHashMap::ConstIterator it = m_items.find( _hash );
 	if( it != m_items.end() )
 	{
 		return it.value();
@@ -201,11 +201,48 @@ const ResourceItem * ResourceDB::itemByHash( const QString & _hash ) const
 
 
 
+ResourceItemList ResourceDB::matchItems( const QStringList & _keyWords )
+{
+	ResourceItemList matchingItems;
+
+	// iterate over all items in our DB
+	for( ItemHashMap::ConstIterator it = m_items.begin();
+					it != m_items.end(); ++it )
+	{
+		const ResourceItem * item = *it;
+		// build up a string containing all searchable strings of item
+		const QString itemString =
+			QString( item->name() +
+					item->path() +
+					item->author() +
+					item->tags() ).toLower();
+		bool accept = true;
+		for( QStringList::ConstIterator jt = _keyWords.begin();
+						jt != _keyWords.end(); ++jt )
+		{
+			if( !itemString.contains( *jt ) )
+			{
+				accept = false;
+				break;
+			}
+		}
+		if( accept )
+		{
+			matchingItems << *it;
+		}
+	}
+
+	return matchingItems;
+}
+
+
+
+
 const ResourceItem * ResourceDB::nearestMatch( const ResourceItem & _item )
 {
 	if( !_item.hash().isEmpty() )
 	{
-		ItemList::ConstIterator it = m_items.find( _item.hash() );
+		ItemHashMap::ConstIterator it = m_items.find( _item.hash() );
 		if( it != m_items.end() )
 		{
 			return it.value();

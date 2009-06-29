@@ -38,41 +38,49 @@ class ResourceDB : public QObject
 {
 	Q_OBJECT
 public:
-	typedef QHash<QString, ResourceItem *> ItemList;
+	typedef QHash<QString, ResourceItem *> ItemHashMap;
 
 
 	ResourceDB( ResourceProvider * _provider );
 	~ResourceDB();
 
-	void init( void );
+	void init();
 
 	void load( const QString & _file );
 	void save( const QString & _file );
 
-	inline ResourceProvider * provider( void )
+	inline ResourceProvider * provider()
 	{
 		return m_provider;
 	}
 
-	inline const ItemList & items( void ) const
+	inline const ItemHashMap & items() const
 	{
 		return m_items;
 	}
 
-	inline ItemList & items( void )
+	inline ItemHashMap & items()
 	{
 		return m_items;
 	}
 
-	inline ResourceTreeItem * topLevelNode( void )
+	inline ResourceTreeItem * topLevelNode()
 	{
 		return &m_topLevelNode;
 	}
 
+	// similiar to items()[_hash] but faster and returns NULL if not found
 	const ResourceItem * itemByHash( const QString & _hash ) const;
+
+	// return a list of ResourceItems who somehow match the given keywords
+	ResourceItemList matchItems( const QStringList & _keyWords );
+
+	// return an item which matches a resource desceibed in _item as
+	// good as possible
 	const ResourceItem * nearestMatch( const ResourceItem & _item );
 
-	void addItem( ResourceItem * newItem );
+	// add given item to DB
+	void addItem( ResourceItem * _newItem );
 
 	void recursiveRemoveItems( ResourceTreeItem * parent,
 					bool removeTopLevelParent = true );
@@ -127,12 +135,12 @@ private:
 	static BaseDirStringMap s_baseDirNames;
 
 	ResourceProvider * m_provider;
-	ItemList m_items;
+	ItemHashMap m_items;
 	ResourceTreeItem m_topLevelNode;
 
 
 signals:
-	void itemsChanged( void );
+	void itemsChanged();
 	void directoryItemAdded( const QString & _path );
 	void directoryItemRemoved( const QString & _path );
 

@@ -251,7 +251,7 @@ void ResourceTreeModel::setFilter( const QString & _s )
 
 int ResourceTreeModel::totalItems() const
 {
-	const ResourceDB::ItemList & items = m_db->items();
+	const ResourceDB::ItemHashMap & items = m_db->items();
 	int num = 0;
 	foreach( const ResourceItem * i, items )
 	{
@@ -268,7 +268,7 @@ int ResourceTreeModel::totalItems() const
 
 int ResourceTreeModel::shownItems() const
 {
-	const ResourceDB::ItemList & items = m_db->items();
+	const ResourceDB::ItemHashMap & items = m_db->items();
 	int num = 0;
 	foreach( const ResourceItem * i, items )
 	{
