@@ -117,11 +117,12 @@ vstPlugin::vstPlugin( const QString & _plugin ) :
 	VstHostLanguages hlang = LanguageEnglish;
 	switch( QLocale::system().language() )
 	{
-		case QLocale::German: hlang = LanguageGerman; break;
 		case QLocale::French: hlang = LanguageFrench; break;
+		case QLocale::German: hlang = LanguageGerman; break;
 		case QLocale::Italian: hlang = LanguageItalian; break;
-		case QLocale::Spanish: hlang = LanguageSpanish; break;
 		case QLocale::Japanese: hlang = LanguageJapanese; break;
+		case QLocale::Korean: hlang = LanguageKorean; break;
+		case QLocale::Spanish: hlang = LanguageSpanish; break;
 		default: break;
 	}
 	sendMessage( message( IdVstSetLanguage ).addInt( hlang ) );

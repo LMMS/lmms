@@ -46,7 +46,8 @@ enum VstHostLanguages
 	LanguageFrench,
 	LanguageItalian,
 	LanguageSpanish,
-	LanguageJapanese
+	LanguageJapanese,
+	LanguageKorean
 } ;
 
 
