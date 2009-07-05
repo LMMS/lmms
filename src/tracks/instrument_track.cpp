@@ -139,6 +139,8 @@ instrumentTrack::~instrumentTrack()
 	// kill all running notes
 	silenceAllNotes();
 
+	engine::getMixer()->removePlayHandles( this );
+
 	// now we're save deleting the instrument
 	delete m_instrument;
 }
