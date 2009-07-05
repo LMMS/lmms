@@ -852,15 +852,24 @@ void remoteVstPlugin::saveChunkToFile( const std::string & _file )
 
 void remoteVstPlugin::loadChunkFromFile( const std::string & _file, int _len )
 {
-	char * buf = new char[_len];
+	char buf[_len];
+
+	void * chunk = NULL;
+	// various plugins need this in order to not crash when setting
+	// chunk (also we let the plugin allocate "safe" memory this way)
+	int actualLen = m_plugin->dispatcher( m_plugin, 23, 0, 0, &chunk, 0 );
+
+	// allocated buffer big enough?
+	if( _len > actualLen )
+	{
+		// no, manually try our local buffer
+		chunk = buf;
+	}
 
 	const int fd = open( _file.c_str(), O_RDONLY );
-	read( fd, buf, _len );
+	read( fd, chunk, _len );
 	close( fd );
-
-	// doesn't work for various plugins for some reason :-(
-	// m_plugin->dispatcher( m_plugin, 24, 0, _len, buf, 0 );
-	delete[] buf;
+	m_plugin->dispatcher( m_plugin, 24, 0, _len, chunk, 0 );
 }
 
 
@@ -1237,14 +1246,14 @@ DWORD WINAPI remoteVstPlugin::processingThread( LPVOID _param )
 	while( ( m = _this->receiveMessage() ).id != IdQuit )
         {
 		VstThreadingModel oldModel = __threadingModel;
-#ifndef LMMS_BUILD_LINUX
+//#ifndef LMMS_BUILD_LINUX
 		if( __threadingModel == TraditionalThreading ||
 					m.id == IdStartProcessing )
-#endif
+//#endif
 		{
 			_this->processMessage( m );
 		}
-#ifndef LMMS_BUILD_LINUX
+//#ifndef LMMS_BUILD_LINUX
 		else
 		{
 			PostThreadMessage( __threadID,
@@ -1252,7 +1261,7 @@ DWORD WINAPI remoteVstPlugin::processingThread( LPVOID _param )
 					ProcessPluginMessage,
 					(LPARAM) new message( m ) );
 		}
-#endif
+//#endif
 
 		// did we load plugin and recognized a plugin which requires
 		// a different threading model?
