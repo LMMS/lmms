@@ -22,9 +22,11 @@
  *
  */
 
+#include <QtGui/QPainter>
 
 #include "ResourceTreeModel.h"
 #include "embed.h"
+#include "plugin.h"
 #include "string_pair_drag.h"
 
 
@@ -43,32 +45,35 @@ ResourceTreeModel::ResourceTreeModel( ResourceDB * _db, QObject * _parent ) :
 
 QVariant ResourceTreeModel::data( const QModelIndex & _idx, int _role ) const
 {
+	static QHash<ResourceItem::Type, QPixmap> pixmapCache;
+
 	if( _idx.isValid() )
 	{
-		ResourceTreeItem * item = treeItem( _idx );
+		ResourceTreeItem * treeItem = this->treeItem( _idx );
+		ResourceItem * item = treeItem->item();
 		if( _role == Qt::DisplayRole )
 		{
-			if( item->parent() == m_db->topLevelNode() )
+			if( treeItem->parent() == m_db->topLevelNode() )
 			{
-				switch( item->item()->baseDir() )
+				switch( item->baseDir() )
 				{
 					case ResourceItem::BaseWorkingDir:
 			return tr( "My LMMS files" );
 					case ResourceItem::BaseDataDir:
 			return tr( "Shipped LMMS files" );
 					case ResourceItem::BaseURL:
-			return item->item()->provider()->url();
+			return item->provider()->url();
 					default:
 						break;
 				}
 			}
-			return item->item()->name();
+			return item->name();
 		}
 		else if( _role == Qt::DecorationRole )
 		{
-			if( item->parent() == m_db->topLevelNode() )
+			if( treeItem->parent() == m_db->topLevelNode() )
 			{
-				switch( item->item()->baseDir() )
+				switch( item->baseDir() )
 				{
 					case ResourceItem::BaseWorkingDir:
 	return embed::getIconPixmap( "mimetypes/folder-workingdir", 24, 24 );
@@ -80,27 +85,78 @@ QVariant ResourceTreeModel::data( const QModelIndex & _idx, int _role ) const
 						break;
 				}
 			}
-			switch( item->item()->type() )
+			if( pixmapCache.contains( item->type() ) )
+			{
+				return pixmapCache[item->type()];
+			}
+			QPixmap pix;
+			switch( item->type() )
 			{
 case ResourceItem::TypeDirectory:
-	return embed::getIconPixmap( "mimetypes/folder", 24, 24 );
+	pix = embed::getIconPixmap( "mimetypes/folder", 24, 24 );
+	break;
 case ResourceItem::TypeSample:
-	return embed::getIconPixmap( "mimetypes/sample", 24, 24 );
+	pix = embed::getIconPixmap( "mimetypes/sample", 24, 24 );
+	break;
 case ResourceItem::TypePreset:
+	pix = embed::getIconPixmap( "mimetypes/preset", 24, 24 );
+	break;
 case ResourceItem::TypePluginSpecificResource:
-	return embed::getIconPixmap( "mimetypes/preset", 24, 24 );
-case ResourceItem::TypeProject:
-	return embed::getIconPixmap( "project_file", 24, 24 );
-case ResourceItem::TypeMidiFile:
-	return embed::getIconPixmap( "mimetypes/midi", 24, 24 );
-case ResourceItem::TypeImage:
-	return embed::getIconPixmap( "mimetypes/image", 24, 24 );
-case ResourceItem::TypePlugin:
-	return embed::getIconPixmap( "mimetypes/plugin", 24, 24 );
-default:
-	return embed::getIconPixmap( "mimetypes/unknown", 24, 24 );
-			}
+	{
+	// always cache plugin-specific pixmaps as their generation
+	// is quite expensive compared to hash-lookup
+	static QHash<QString, QPixmap> pluginPixmapCache;
+	const QString ext = item->nameExtension();
+	if( pluginPixmapCache.contains( ext ) )
+	{
+		return pluginPixmapCache[ext];
+	}
+
+	// iterate through all plugins
+	QVector<plugin::descriptor> descriptors;
+	plugin::getDescriptorsOfAvailPlugins( descriptors );
+
+	for( QVector<plugin::descriptor>::iterator it = descriptors.begin();
+						it != descriptors.end(); ++it )
+	{
+		if( it->supportsFileType( ext ) )
+		{
+			pix = embed::getIconPixmap( "mimetypes/unknown" );
+			QPainter p( &pix );
+			const QPixmap logo = it->logo->pixmap().
+				scaled( 40, 40, Qt::IgnoreAspectRatio,
+						Qt::SmoothTransformation );
+			p.drawPixmap( ( pix.width() - logo.width() ) / 2,
+					( pix.height() - logo.height() ) / 2,
+					logo );
+			p.end();
+			pix = pix.scaled( 24, 24, Qt::IgnoreAspectRatio,
+						Qt::SmoothTransformation );
+			pluginPixmapCache[ext] = pix;
+			return pix;
 		}
+	}
+	return embed::getIconPixmap( "mimetypes/preset", 24, 24 );
+	}
+case ResourceItem::TypeProject:
+	pix = embed::getIconPixmap( "project_file", 24, 24 );
+	break;
+case ResourceItem::TypeMidiFile:
+	pix = embed::getIconPixmap( "mimetypes/midi", 24, 24 );
+	break;
+case ResourceItem::TypeImage:
+	pix = embed::getIconPixmap( "mimetypes/image", 24, 24 );
+	break;
+case ResourceItem::TypePlugin:
+	pix = embed::getIconPixmap( "mimetypes/plugin", 24, 24 );
+	break;
+default:
+	pix = embed::getIconPixmap( "mimetypes/unknown", 24, 24 );
+	break;
+			}	// end switch( item->type() )
+			pixmapCache[item->type()] = pix;
+			return pix;
+		}	// end if( _role == Qt::DecorationRole )
 	}
 	return QVariant();
 }
