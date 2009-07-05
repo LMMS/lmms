@@ -95,7 +95,7 @@ public:
 
 	inline QString nameExtension() const
 	{
-		return name().section( '.', -1 );
+		return name().section( '.', -1 ).toLower();
 	}
 
 	Type type() const
