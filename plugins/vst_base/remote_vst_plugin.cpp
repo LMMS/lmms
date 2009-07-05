@@ -166,8 +166,12 @@ public:
 	// determine VST-version the plugin uses
 	int pluginVersion( void ) const
 	{
-		return m_plugin->dispatcher( m_plugin,
+		if( m_plugin )
+		{
+			return m_plugin->dispatcher( m_plugin,
 				effGetVendorVersion, 0, 0, NULL, 0.0f );
+		}
+		return 0;
 	}
 
 	// determine name of plugin
@@ -197,13 +201,21 @@ public:
 	// number of inputs
 	virtual int inputCount( void ) const
 	{
-		return m_plugin->numInputs;
+		if( m_plugin )
+		{
+			return m_plugin->numInputs;
+		}
+		return 0;
 	}
 
 	// number of outputs
 	virtual int outputCount( void ) const
 	{
-		return m_plugin->numOutputs;
+		if( m_plugin )
+		{
+			return m_plugin->numOutputs;
+		}
+		return 0;
 	}
 
 	// has to be called as soon as input- or output-count changes
