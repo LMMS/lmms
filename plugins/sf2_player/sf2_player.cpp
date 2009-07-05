@@ -657,7 +657,11 @@ void sf2Instrument::play( sampleFrame * _working_buffer )
 	{
 		const fpp_t f = frames * m_internalSampleRate /
 				engine::getMixer()->processingSampleRate();
+#ifdef __GNUC__
+		sampleFrame tmp[f];
+#else
 		sampleFrame * tmp = new sampleFrame[f];
+#endif
 		fluid_synth_write_float( m_synth, f, tmp, 0, 2, tmp, 1, 2 );
 
 		SRC_DATA src_data;
@@ -668,7 +672,9 @@ void sf2Instrument::play( sampleFrame * _working_buffer )
 		src_data.src_ratio = (double) frames / f;
 		src_data.end_of_input = 0;
 		int error = src_process( m_srcState, &src_data );
+#ifndef __GNUC__
 		delete[] tmp;
+#endif
 		if( error )
 		{
 			printf( "sf2Instrument: error while resampling: %s\n",
