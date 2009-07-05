@@ -46,7 +46,6 @@ ResourceDB::ResourceDB( ResourceProvider * _provider ) :
 		s_typeNames[ResourceItem::TypeUnknown] = "Unknown";
 		s_typeNames[ResourceItem::TypeDirectory] = "Directory";
 		s_typeNames[ResourceItem::TypeSample] = "Sample";
-		s_typeNames[ResourceItem::TypeSoundFont] = "SoundFont";
 		s_typeNames[ResourceItem::TypePreset] = "Preset";
 		s_typeNames[ResourceItem::TypeProject] = "Project";
 		s_typeNames[ResourceItem::TypeMidiFile] = "MidiFile";

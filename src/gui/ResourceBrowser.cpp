@@ -200,7 +200,6 @@ void ResourceBrowser::showContextMenu( const QPoint & _pos )
 	switch( item->type() )
 	{
 		case ResourceItem::TypeSample:
-		case ResourceItem::TypeSoundFont:
 		case ResourceItem::TypePreset:
 		case ResourceItem::TypePluginSpecificResource:
 		case ResourceItem::TypePlugin:
@@ -292,7 +291,6 @@ void ResourceBrowser::triggerDefaultAction( const QModelIndex & _idx )
 		case ResourceItem::TypePreset:
 		case ResourceItem::TypePluginSpecificResource:
 		case ResourceItem::TypePlugin:
-		case ResourceItem::TypeSoundFont:
 			action = LoadInNewTrackSongEditor;
 			break;
 		case ResourceItem::TypeProject:

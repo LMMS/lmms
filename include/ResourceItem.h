@@ -53,7 +53,6 @@ public:
 		TypeUnknown,
 		TypeDirectory,
 		TypeSample,
-		TypeSoundFont,
 		TypePreset,
 		TypePluginSpecificResource,
 		TypeProject,

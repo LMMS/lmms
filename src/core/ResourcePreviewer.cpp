@@ -93,9 +93,7 @@ void ResourcePreviewer::preview( ResourceItem * _item )
 							midiPort::Disabled );
 			break;
 		case ResourceItem::TypeSample:
-		case ResourceItem::TypeSoundFont:
 		case ResourceItem::TypePluginSpecificResource:
-		{
 			// restore default settings we are going to preview a
 			// sample (which should be played at a default
 			// instrument track)
@@ -104,7 +102,6 @@ void ResourcePreviewer::preview( ResourceItem * _item )
 					firstChild().toElement() );
 			ResourceAction( _item ).loadByPlugin( m_previewTrack );
 			break;
-		}
 		default:
 			handledItem = false;
 			break;

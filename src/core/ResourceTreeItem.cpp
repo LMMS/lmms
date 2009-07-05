@@ -67,7 +67,7 @@ ResourceTreeItem::~ResourceTreeItem()
 
 
 
-int ResourceTreeItem::rowCount( void ) const
+int ResourceTreeItem::rowCount() const
 {
 	int rc = 0;
 	foreachConstResourceTreeItem( m_children )
@@ -103,7 +103,7 @@ ResourceTreeItem * ResourceTreeItem::getChild( int _row )
 
 
 
-int ResourceTreeItem::row( void ) const
+int ResourceTreeItem::row() const
 {
 	if( !m_parent )
 	{

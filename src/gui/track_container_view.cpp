@@ -419,7 +419,6 @@ void trackContainerView::dropEvent( QDropEvent * _de )
 								m_tc ) ) );
 		break;
 	case ResourceItem::TypeSample:
-	case ResourceItem::TypeSoundFont:
 	case ResourceItem::TypePluginSpecificResource:
 		action.loadByPlugin(
 			dynamic_cast<instrumentTrack *>(

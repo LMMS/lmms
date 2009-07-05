@@ -84,7 +84,7 @@ ResourceItem::ResourceItem( const ResourceItem & _item ) :
 
 
 
-void ResourceItem::reload( void )
+void ResourceItem::reload()
 {
 	m_hash.clear();
 	m_size = -1;
@@ -165,7 +165,7 @@ int ResourceItem::equalityLevel( const ResourceItem & _other ) const
 
 
 
-ResourceItem::Type ResourceItem::guessType( void ) const
+ResourceItem::Type ResourceItem::guessType() const
 {
 	static QMap<QString, Type> typeMap;
 	if( typeMap.isEmpty() )
@@ -181,8 +181,6 @@ ResourceItem::Type ResourceItem::guessType( void ) const
 		typeMap["raw"] = TypeSample;
 		typeMap["aif"] = TypeSample;
 		typeMap["aiff"] = TypeSample;
-
-		typeMap["sf2"] = TypeSoundFont;
 
 		typeMap["xpf"] = TypePreset;
 
@@ -224,7 +222,7 @@ ResourceItem::Type ResourceItem::guessType( void ) const
 
 
 
-void ResourceItem::init( void )
+void ResourceItem::init()
 {
 	// ensure trailing slash for path property
 	if( !m_path.isEmpty() && m_path.right( 1 ) != QDir::separator() )

@@ -55,16 +55,16 @@ public:
 		m_hidden = _h;
 	}
 
-	inline bool isHidden( void ) const
+	inline bool isHidden() const
 	{
 		return m_hidden;
 	}
 
-	int rowCount( void ) const;
+	int rowCount() const;
 
 	ResourceTreeItem * getChild( int _row );
 
-	int row( void ) const;
+	int row() const;
 
 	inline void addChild( ResourceTreeItem * _it )
 	{
@@ -76,12 +76,12 @@ public:
 		m_children.removeAll( _it );
 	}
 
-	inline ResourceTreeItemList & children( void )
+	inline ResourceTreeItemList & children()
 	{
 		return m_children;
 	}
 
-	inline const ResourceTreeItemList & children( void ) const
+	inline const ResourceTreeItemList & children() const
 	{
 		return m_children;
 	}
@@ -89,17 +89,17 @@ public:
 	ResourceTreeItem * findChild( const QString & _name,
 				ResourceItem::BaseDirectory _base_dir );
 
-	inline ResourceItem * item( void )
+	inline ResourceItem * item()
 	{
 		return m_item;
 	}
 
-	inline const ResourceItem * item( void ) const
+	inline const ResourceItem * item() const
 	{
 		return m_item;
 	}
 
-	inline ResourceTreeItem * parent( void )
+	inline ResourceTreeItem * parent()
 	{
 		return m_parent;
 	}
@@ -109,7 +109,7 @@ public:
 		m_parent = _parent;
 	}
 
-	inline bool temporaryMarker( void ) const
+	inline bool temporaryMarker() const
 	{
 		return m_temporaryMarker;
 	}
