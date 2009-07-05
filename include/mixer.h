@@ -232,7 +232,8 @@ public:
 		return m_playHandles;
 	}
 
-	void removePlayHandles( track * _track );
+	void removePlayHandles( track * _track,
+		playHandle::Type _type = playHandle::NumPlayHandleTypes );
 
 	inline bool hasPlayHandles( void ) const
 	{

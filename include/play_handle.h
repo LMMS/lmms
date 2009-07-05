@@ -36,15 +36,16 @@ class track;
 class playHandle
 {
 public:
-	enum types
+	enum Types
 	{
 		NotePlayHandle,
 		InstrumentPlayHandle,
 		SamplePlayHandle,
-		PresetPreviewHandle
+		NumPlayHandleTypes
 	} ;
+	typedef Types Type;
 
-	playHandle( const types _type, f_cnt_t _offset = 0 ) :
+	playHandle( const Type _type, f_cnt_t _offset = 0 ) :
 		m_type( _type ),
 		m_offset( _offset ),
 		m_affinity( QThread::currentThread() )
@@ -55,27 +56,27 @@ public:
 	{
 	}
 
-	virtual inline bool affinityMatters( void ) const
+	virtual inline bool affinityMatters() const
 	{
 		return false;
 	}
 
-	const QThread * affinity( void ) const
+	const QThread * affinity() const
 	{
 		return m_affinity;
 	}
 
-	inline types type( void ) const
+	inline Type type() const
 	{
 		return m_type;
 	}
 
 	virtual void play( sampleFrame * _working_buffer ) = 0;
-	virtual bool done( void ) const = 0;
+	virtual bool done() const = 0;
 
 	// returns how many frames this play-handle is aligned ahead, i.e.
 	// at which position it is inserted in the according buffer
-	inline f_cnt_t offset( void ) const
+	inline f_cnt_t offset() const
 	{
 		return m_offset;
 	}
@@ -90,7 +91,7 @@ public:
 
 
 private:
-	types m_type;
+	Type m_type;
 	f_cnt_t m_offset;
 	const QThread * m_affinity;
 

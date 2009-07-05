@@ -419,7 +419,8 @@ void instrumentTrack::silenceAllNotes()
 
 	// invalidate all NotePlayHandles linked to this track
 	m_processHandles.clear();
-	engine::getMixer()->removePlayHandles( this );
+	engine::getMixer()->removePlayHandles( this,
+						playHandle::NotePlayHandle );
 	engine::getMixer()->unlock();
 }
 

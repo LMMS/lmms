@@ -914,13 +914,15 @@ void mixer::removePlayHandle( playHandle * _ph )
 
 
 
-void mixer::removePlayHandles( track * _track )
+void mixer::removePlayHandles( track * _track, playHandle::Type _type )
 {
 	lock();
 	PlayHandleList::Iterator it = m_playHandles.begin();
 	while( it != m_playHandles.end() )
 	{
-		if( ( *it )->isFromTrack( _track ) )
+		if( ( _type == playHandle::NumPlayHandleTypes ||
+			( *it )->type() == _type ) &&
+				( *it )->isFromTrack( _track ) )
 		{
 			delete *it;
 			it = m_playHandles.erase( it );
