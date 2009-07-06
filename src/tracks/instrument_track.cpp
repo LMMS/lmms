@@ -570,17 +570,17 @@ bool instrumentTrack::play( const midiTime & _start,
 	const float frames_per_tick = engine::framesPerTick();
 
 	tcoVector tcos;
-	bbTrack * bb_track;
+	bbTrack * bb_track = NULL;
 	if( _tco_num >= 0 )
 	{
 		trackContentObject * tco = getTCO( _tco_num );
 		tcos.push_back( tco );
+		bb_track = bbTrack::findBBTrack( _tco_num );
 	}
 	else
 	{
 		getTCOsInRange( tcos, _start, _start + static_cast<int>(
 					_frames / frames_per_tick ) );
-		bb_track = NULL;
 	}
 
 	// Handle automation: detuning
