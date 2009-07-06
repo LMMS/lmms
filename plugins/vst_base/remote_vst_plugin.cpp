@@ -133,21 +133,14 @@ public:
 	// set given sample-rate for plugin
 	virtual void updateSampleRate()
 	{
-		if( m_plugin )
-		{
-			m_plugin->dispatcher( m_plugin, effSetSampleRate, 0, 0,
+		pluginDispatch( effSetSampleRate, 0, 0,
 						NULL, (float) sampleRate() );
-		}
 	}
 
 	// set given buffer-size for plugin
 	virtual void updateBufferSize()
 	{
-		if( m_plugin )
-		{
-			m_plugin->dispatcher( m_plugin, effSetBlockSize, 0,
-						bufferSize(), NULL, 0.0f );
-		}
+		pluginDispatch( effSetBlockSize, 0, bufferSize() );
 	}
 
 
@@ -164,24 +157,19 @@ public:
 	}
 
 	// determine VST-version the plugin uses
-	int pluginVersion() const
+	inline int pluginVersion()
 	{
-		if( m_plugin )
-		{
-			return m_plugin->dispatcher( m_plugin,
-				effGetVendorVersion, 0, 0, NULL, 0.0f );
-		}
-		return 0;
+		return pluginDispatch( effGetVendorVersion );
 	}
 
 	// determine name of plugin
-	const char * pluginName() const;
+	const char * pluginName();
 
 	// determine vendor of plugin
-	const char * pluginVendorString() const;
+	const char * pluginVendorString();
 
 	// determine product-string of plugin
-	const char * pluginProductString() const;
+	const char * pluginProductString();
 
 	// do a complete parameter-dump and post it
 	void getParameterDump();
@@ -230,6 +218,7 @@ private:
 	{
 		None,
 		ProcessPluginMessage,
+		GiveIdle,
 		ClosePlugin
 	} ;
 
@@ -241,6 +230,20 @@ private:
 
 	bool load( const std::string & _plugin_file );
 
+	// thread-safe dispatching of plugin
+	int pluginDispatch( int cmd, int param1 = 0, int param2 = 0,
+					void * p = NULL, float f = 0 )
+	{
+		int ret = 0;
+		pthread_mutex_lock( &m_pluginLock );
+		if( m_plugin )
+		{
+			ret = m_plugin->dispatcher( m_plugin, cmd, param1,
+							param2, p, f );
+		}
+		pthread_mutex_unlock( &m_pluginLock );
+		return ret;
+	}
 
 	std::string m_shortName;
 
@@ -254,7 +257,8 @@ private:
 
 	bool m_initialized;
 
-	pthread_mutex_t m_lock;
+	pthread_mutex_t m_pluginLock;
+	pthread_mutex_t m_windowLock;
 	pthread_cond_t m_windowStatusChange;
 
 
@@ -281,7 +285,8 @@ RemoteVstPlugin::RemoteVstPlugin( key_t _shm_in, key_t _shm_out ) :
 	m_windowWidth( 0 ),
 	m_windowHeight( 0 ),
 	m_initialized( false ),
-	m_lock(),
+	m_pluginLock(),
+	m_windowLock(),
 	m_windowStatusChange(),
 	m_inputs( NULL ),
 	m_outputs( NULL ),
@@ -289,7 +294,8 @@ RemoteVstPlugin::RemoteVstPlugin( key_t _shm_in, key_t _shm_out ) :
 	m_bpm( 0 ),
 	m_currentSamplePos( 0 )
 {
-	pthread_mutex_init( &m_lock, NULL );
+	pthread_mutex_init( &m_pluginLock, NULL );
+	pthread_mutex_init( &m_windowLock, NULL );
 	pthread_cond_init( &m_windowStatusChange, NULL );
 }
 
@@ -308,10 +314,11 @@ RemoteVstPlugin::~RemoteVstPlugin()
 			{
 				//lvsMessage( "could not post message to gui thread" );
 			}
-			pthread_mutex_lock( &m_lock );
-			pthread_cond_wait( &m_windowStatusChange, &m_lock );
+			pthread_mutex_lock( &m_windowLock );
+			pthread_cond_wait( &m_windowStatusChange,
+							&m_windowLock );
 		}
-		m_plugin->dispatcher( m_plugin, effEditClose, 0, 0, NULL, 0.0 );
+		pluginDispatch( effEditClose );
 #ifdef LMMS_BUILD_LINUX
 		CloseWindow( m_window );
 #endif
@@ -327,7 +334,8 @@ RemoteVstPlugin::~RemoteVstPlugin()
 	delete[] m_inputs;
 	delete[] m_outputs;
 
-	pthread_mutex_destroy( &m_lock );
+	pthread_mutex_destroy( &m_pluginLock );
+	pthread_mutex_destroy( &m_windowLock );
 	pthread_cond_destroy( &m_windowStatusChange );
 }
 
@@ -405,10 +413,10 @@ void RemoteVstPlugin::init( const std::string & _plugin_file )
 	/* i comment this out because it breaks dfx Geometer
 	 * looks like we cant set programs for it
 	 *
-	m_plugin->dispatcher( m_plugin, effSetProgram, 0, 0, NULL, 0.0f); */
+	pluginDispatch( effSetProgram, 0, 0 ); */
 	// request rate and blocksize
 
-	m_plugin->dispatcher( m_plugin, effMainsChanged, 0, 1, NULL, 0.0f );
+	pluginDispatch( effMainsChanged, 0, 1 );
 
 	debugMessage( "creating editor\n" );
 	if( __threadingModel == TraditionalThreading )
@@ -419,8 +427,8 @@ void RemoteVstPlugin::init( const std::string & _plugin_file )
 			debugMessage( "init(): could not create GUI thread\n" );
 			return;
 		}
-		pthread_mutex_lock( &m_lock );
-		pthread_cond_wait( &m_windowStatusChange, &m_lock );
+		pthread_mutex_lock( &m_windowLock );
+		pthread_cond_wait( &m_windowStatusChange, &m_windowLock );
 	}
 	else
 	{
@@ -508,10 +516,10 @@ void RemoteVstPlugin::initEditor()
 	}
 
 
-	m_plugin->dispatcher( m_plugin, effEditOpen, 0, 0, m_window, 0 );
+	pluginDispatch( effEditOpen, 0, 0, m_window );
 
 	ERect * er;
-	m_plugin->dispatcher( m_plugin, effEditGetRect, 0, 0, &er, 0 );
+	pluginDispatch( effEditGetRect, 0, 0, &er );
 
 	m_windowWidth = er->right - er->left;
 	m_windowHeight = er->bottom - er->top;
@@ -519,7 +527,7 @@ void RemoteVstPlugin::initEditor()
 	SetWindowPos( m_window, 0, 0, 0, m_windowWidth + 8,
 			m_windowHeight + 26, SWP_NOACTIVATE |
 						SWP_NOMOVE | SWP_NOZORDER );
-	m_plugin->dispatcher( m_plugin, effEditTop, 0, 0, NULL, 0 );
+	pluginDispatch( effEditTop );
 
 	ShowWindow( m_window, SW_SHOWNORMAL );
 	UpdateWindow( m_window );
@@ -617,7 +625,7 @@ bool RemoteVstPlugin::load( const std::string & _plugin_file )
 		debugMessage( "switching to splitted threading model\n" );
 	}
 
-	m_plugin->dispatcher( m_plugin, effOpen, 0, 0, 0, 0 );
+	pluginDispatch( effOpen );
 
 	return true;
 }
@@ -652,8 +660,7 @@ void RemoteVstPlugin::process( const sampleFrame * _in, sampleFrame * _out )
 		}
 
 		m_midiEvents.clear();
-		m_plugin->dispatcher( m_plugin, effProcessEvents, 0, 0, events,
-									0.0f );
+		pluginDispatch( effProcessEvents, 0, 0, events );
 	}
 
 	// now we're ready to fetch sound from VST-plugin
@@ -726,11 +733,11 @@ void RemoteVstPlugin::processMidiEvent( const midiEvent & _event,
 
 
 
-const char * RemoteVstPlugin::pluginName() const
+const char * RemoteVstPlugin::pluginName()
 {
 	static char buf[32];
 	buf[0] = 0;
-	m_plugin->dispatcher( m_plugin, effGetEffectName, 0, 0, buf, 0.0f );
+	pluginDispatch( effGetEffectName, 0, 0, buf );
 	buf[31] = 0;
 	return buf;
 }
@@ -738,11 +745,11 @@ const char * RemoteVstPlugin::pluginName() const
 
 
 
-const char * RemoteVstPlugin::pluginVendorString() const
+const char * RemoteVstPlugin::pluginVendorString()
 {
 	static char buf[64];
 	buf[0] = 0;
-	m_plugin->dispatcher( m_plugin, effGetVendorString, 0, 0, buf, 0.0f );
+	pluginDispatch( effGetVendorString, 0, 0, buf );
 	buf[63] = 0;
 	return buf;
 }
@@ -750,11 +757,11 @@ const char * RemoteVstPlugin::pluginVendorString() const
 
 
 
-const char * RemoteVstPlugin::pluginProductString() const
+const char * RemoteVstPlugin::pluginProductString()
 {
 	static char buf[64];
 	buf[0] = 0;
-	m_plugin->dispatcher( m_plugin, effGetProductString, 0, 0, buf, 0.0f );
+	pluginDispatch( effGetProductString, 0, 0, buf );
 	buf[63] = 0;
 	return buf;
 }
@@ -769,8 +776,7 @@ void RemoteVstPlugin::getParameterDump()
 	m.addInt( m_plugin->numParams );
 	for( int i = 0; i < m_plugin->numParams; ++i )
 	{
-		m_plugin->dispatcher( m_plugin, effGetParameterProperties, i,
-							0, &vst_props, 0.0f );
+		pluginDispatch( effGetParameterProperties, i, 0, &vst_props );
 		m.addInt( i );
 		m.addString( vst_props.shortLabel );
 		m.addFloat( m_plugin->getParameter( m_plugin, i ) );
@@ -803,8 +809,7 @@ void RemoteVstPlugin::setParameterDump( const message & _m )
 void RemoteVstPlugin::getParameterProperties( const int _idx )
 {
 	VstParameterProperties p;
-	m_plugin->dispatcher( m_plugin, effGetParameterProperties, _idx, 0,
-								&p, 0.0f );
+	pluginDispatch( effGetParameterProperties, _idx, 0, &p );
 	message m( IdVstParameterProperties );
 	m.addString( p.label );
 	m.addString( p.shortLabel );
@@ -837,7 +842,7 @@ void RemoteVstPlugin::saveChunkToFile( const std::string & _file )
 	if( m_plugin->flags & 32 )
 	{
 		void * chunk = NULL;
-		int len = m_plugin->dispatcher( m_plugin, 23, 0, 0, &chunk, 0 );
+		const int len = pluginDispatch( 23, 0, 0, &chunk );
 		if( len > 0 )
 		{
 			int fd = open( _file.c_str(), O_WRONLY );
@@ -857,7 +862,7 @@ void RemoteVstPlugin::loadChunkFromFile( const std::string & _file, int _len )
 	void * chunk = NULL;
 	// various plugins need this in order to not crash when setting
 	// chunk (also we let the plugin allocate "safe" memory this way)
-	int actualLen = m_plugin->dispatcher( m_plugin, 23, 0, 0, &chunk, 0 );
+	const int actualLen = pluginDispatch( 23, 0, 0, &chunk );
 
 	// allocated buffer big enough?
 	if( _len > actualLen )
@@ -869,7 +874,7 @@ void RemoteVstPlugin::loadChunkFromFile( const std::string & _file, int _len )
 	const int fd = open( _file.c_str(), O_RDONLY );
 	read( fd, chunk, _len );
 	close( fd );
-	m_plugin->dispatcher( m_plugin, 24, 0, _len, chunk, 0 );
+	pluginDispatch( 24, 0, _len, chunk );
 }
 
 
@@ -944,8 +949,8 @@ VstIntPtr RemoteVstPlugin::hostCallback( AEffect * _effect, VstInt32 _opcode,
 			SHOW_CALLBACK ("amc: audioMasterIdle\n" );
 			// call application idle routine (this will
 			// call effEditIdle for all open editors too) 
-			_effect->dispatcher( _effect, effEditIdle, 0, 0, NULL,
-									0.0f );
+			PostThreadMessage( __GuiThreadID,
+						WM_USER, GiveIdle, 0 );
 			return 0;
 
 		case audioMasterPinConnected:		
@@ -1095,14 +1100,14 @@ VstIntPtr RemoteVstPlugin::hostCallback( AEffect * _effect, VstInt32 _opcode,
 
 		case audioMasterGetSampleRate:
 			SHOW_CALLBACK( "amc: audioMasterGetSampleRate\n" );
-			_effect->dispatcher( _effect, effSetSampleRate,
+			__plugin->pluginDispatch( effSetSampleRate,
 				0, 0, NULL, (float)__plugin->sampleRate() );
 			return __plugin->sampleRate();
 
 		case audioMasterGetBlockSize:
 			SHOW_CALLBACK( "amc: audioMasterGetBlockSize\n" );
-			_effect->dispatcher( _effect, effSetBlockSize,
-					0, __plugin->bufferSize(), NULL, 0 );
+			__plugin->pluginDispatch( effSetBlockSize,
+						0, __plugin->bufferSize() );
 
 			return __plugin->bufferSize();
 
@@ -1204,8 +1209,8 @@ VstIntPtr RemoteVstPlugin::hostCallback( AEffect * _effect, VstInt32 _opcode,
 		case audioMasterUpdateDisplay:
 			SHOW_CALLBACK( "amc: audioMasterUpdateDisplay\n" );
 			// something has changed, update 'multi-fx' display
-			_effect->dispatcher( _effect, effEditIdle, 0, 0, NULL,
-									0.0f );
+			PostThreadMessage( __GuiThreadID,
+						WM_USER, GiveIdle, 0 );
 			return 0;
 
 #if kVstVersion > 2
@@ -1315,9 +1320,7 @@ DWORD WINAPI RemoteVstPlugin::guiEventLoop( LPVOID _param )
 		if( msg.message == WM_TIMER && _this->isInitialized() )
 		{
 			// give plugin some idle-time for GUI-update
-			_this->m_plugin->dispatcher( _this->m_plugin,
-							effEditIdle, 0, 0,
-								NULL, 0 );
+			_this->pluginDispatch( effEditIdle );
 		}
 		else if( msg.message == WM_USER )
 		{
@@ -1330,6 +1333,10 @@ DWORD WINAPI RemoteVstPlugin::guiEventLoop( LPVOID _param )
 					delete m;
 					break;
 				}
+
+				case GiveIdle:
+					_this->pluginDispatch( effEditIdle );
+					break;
 
 				case ClosePlugin:
 					quit = true;
@@ -1389,7 +1396,7 @@ int main( int _argc, char * * _argv )
 		}
 		else
 		{
-			__threadID = GetCurrentThreadId();
+			__GuiThreadID = GetCurrentThreadId();
 
 			if( CreateThread( NULL, 0,
 					RemoteVstPlugin::processingThread,
