@@ -927,6 +927,12 @@ VstIntPtr RemoteVstPlugin::hostCallback( AEffect * _effect, VstInt32 _opcode,
 	SHOW_CALLBACK( buf );
 #endif
 
+	// workaround for early callbacks by some plugins
+	if( __plugin && __plugin->m_plugin == NULL )
+	{
+		__plugin->m_plugin = _effect;
+	}
+
 	switch( _opcode )
 	{
 		case audioMasterAutomate:
