@@ -36,6 +36,16 @@
 #include <cassert>
 
 #ifdef LMMS_BUILD_WIN32
+#define USE_QT_SEMAPHORES
+#define USE_QT_SHMEM
+#endif
+
+#ifdef LMMS_BUILD_APPLE
+#define USE_QT_SEMAPHORES
+#endif
+
+
+#ifdef USE_QT_SEMAPHORES
 
 #ifdef LMMS_HAVE_PROCESS_H
 #include <process.h>
@@ -44,21 +54,37 @@
 #include <Qt/qglobal.h>
 
 #if QT_VERSION >= 0x040400
-#include <QtCore/QSharedMemory>
 #include <QtCore/QSystemSemaphore>
 #else
-#error win32-build requires at least Qt 4.4.0
+#error building LMMS on this platform requires at least Qt 4.4.0
 #endif
 
-typedef int32_t key_t;
-
-#else
-
-#define USE_NATIVE_SHMEM
+#else /* USE_QT_SEMAPHORES */
 
 #ifdef LMMS_HAVE_SYS_IPC_H
 #include <sys/ipc.h>
 #endif
+
+#ifdef LMMS_HAVE_SEMAPHORE_H
+#include <semaphore.h>
+#endif
+
+#endif
+
+
+#ifdef USE_QT_SHMEM
+
+#include <Qt/qglobal.h>
+
+#if QT_VERSION >= 0x040400
+#include <QtCore/QSharedMemory>
+#else
+#error building LMMS on this platform requires at least Qt 4.4.0
+#endif
+
+typedef int32_t key_t;
+
+#else /* USE_QT_SHMEM */
 
 #ifdef LMMS_HAVE_SYS_SHM_H
 #include <sys/shm.h>
@@ -71,9 +97,6 @@ typedef int32_t key_t;
 #endif
 
 
-#ifdef LMMS_HAVE_SEMAPHORE_H
-#include <semaphore.h>
-#endif
 
 #ifdef LMMS_HAVE_LOCALE_H
 #include <locale.h>
@@ -102,7 +125,7 @@ class shmFifo
 	// and 64 bit platforms
 	union sem32_t
 	{
-#ifdef LMMS_HAVE_SEMAPHORE_H
+#ifndef USE_QT_SEMAPHORES
 		sem_t sem;
 #endif
 		int semKey;
@@ -124,13 +147,13 @@ public:
 		m_invalid( false ),
 		m_master( true ),
 		m_shmKey( 0 ),
-#ifdef USE_NATIVE_SHMEM
-		m_shmID( -1 ),
-#else
+#ifdef USE_QT_SHMEM
 		m_shmObj(),
+#else
+		m_shmID( -1 ),
 #endif
 		m_data( NULL ),
-#ifdef LMMS_BUILD_WIN32
+#ifdef USE_QT_SEMAPHORES
 		m_dataSem( QString::null ),
 		m_messageSem( QString::null ),
 #else
@@ -139,13 +162,7 @@ public:
 #endif
 		m_lockDepth( 0 )
 	{
-#ifdef USE_NATIVE_SHMEM
-		while( ( m_shmID = shmget( ++m_shmKey, sizeof( shmData ),
-					IPC_CREAT | IPC_EXCL | 0600 ) ) == -1 )
-		{
-		}
-		m_data = (shmData *) shmat( m_shmID, 0, 0 );
-#else
+#ifdef USE_QT_SHMEM
 		do
 		{
 			m_shmObj.setKey( QString( "%1" ).arg( ++m_shmKey ) );
@@ -153,10 +170,16 @@ public:
 		} while( m_shmObj.error() != QSharedMemory::NoError );
 
 		m_data = (shmData *) m_shmObj.data();
+#else
+		while( ( m_shmID = shmget( ++m_shmKey, sizeof( shmData ),
+					IPC_CREAT | IPC_EXCL | 0600 ) ) == -1 )
+		{
+		}
+		m_data = (shmData *) shmat( m_shmID, 0, 0 );
 #endif
 		assert( m_data != NULL );
 		m_data->startPtr = m_data->endPtr = 0;
-#ifdef LMMS_BUILD_WIN32
+#ifdef USE_QT_SEMAPHORES
 		static int k = 0;
 		m_data->dataSem.semKey = ( getpid()<<10 ) + ++k;
 		m_data->messageSem.semKey = ( getpid()<<10 ) + ++k;
@@ -187,13 +210,13 @@ public:
 		m_invalid( false ),
 		m_master( false ),
 		m_shmKey( 0 ),
-#ifdef USE_NATIVE_SHMEM
-		m_shmID( shmget( _shm_key, 0, 0 ) ),
-#else
+#ifdef USE_QT_SHMEM
 		m_shmObj( QString::number( _shm_key ) ),
+#else
+		m_shmID( shmget( _shm_key, 0, 0 ) ),
 #endif
 		m_data( NULL ),
-#ifdef LMMS_BUILD_WIN32
+#ifdef USE_QT_SEMAPHORES
 		m_dataSem( QString::null ),
 		m_messageSem( QString::null ),
 #else
@@ -202,19 +225,19 @@ public:
 #endif
 		m_lockDepth( 0 )
 	{
-#ifdef USE_NATIVE_SHMEM
-		if( m_shmID != -1 )
-		{
-			m_data = (shmData *) shmat( m_shmID, 0, 0 );
-		}
-#else
+#ifdef USE_QT_SHMEM
 		if( m_shmObj.attach() )
 		{
 			m_data = (shmData *) m_shmObj.data();
 		}
+#else
+		if( m_shmID != -1 )
+		{
+			m_data = (shmData *) shmat( m_shmID, 0, 0 );
+		}
 #endif
 		assert( m_data != NULL );
-#ifdef LMMS_BUILD_WIN32
+#ifdef USE_QT_SEMAPHORES
 		m_dataSem.setKey( QString::number( m_data->dataSem.semKey ) );
 		m_messageSem.setKey( QString::number(
 						m_data->messageSem.semKey ) );
@@ -226,16 +249,16 @@ public:
 
 	~shmFifo()
 	{
-#ifdef USE_NATIVE_SHMEM
+#ifndef USE_QT_SHMEM
 		shmdt( m_data );
 #endif
 		// master?
 		if( m_master )
 		{
-#ifdef USE_NATIVE_SHMEM
+#ifndef USE_QT_SHMEM
 			shmctl( m_shmID, IPC_RMID, NULL );
 #endif
-#ifndef LMMS_BUILD_WIN32
+#ifndef USE_QT_SEMAPHORES
 			sem_destroy( m_dataSem );
 			sem_destroy( m_messageSem );
 #endif
@@ -263,7 +286,7 @@ public:
 	{
 		if( !isInvalid() && ++m_lockDepth == 1 )
 		{
-#ifdef LMMS_BUILD_WIN32
+#ifdef USE_QT_SEMAPHORES
 			m_dataSem.acquire();
 #else
 			sem_wait( m_dataSem );
@@ -278,7 +301,7 @@ public:
 		{
 			if( --m_lockDepth == 0 )
 			{
-#ifdef LMMS_BUILD_WIN32
+#ifdef USE_QT_SEMAPHORES
 				m_dataSem.release();
 #else
 				sem_post( m_dataSem );
@@ -292,7 +315,7 @@ public:
 	{
 		if( !isInvalid() )
 		{
-#ifdef LMMS_BUILD_WIN32
+#ifdef USE_QT_SEMAPHORES
 			m_messageSem.acquire();
 #else
 			sem_wait( m_messageSem );
@@ -303,7 +326,7 @@ public:
 	// increase message-semaphore
 	inline void messageSent( void )
 	{
-#ifdef LMMS_BUILD_WIN32
+#ifdef USE_QT_SEMAPHORES
 		m_messageSem.release();
 #else
 		sem_post( m_messageSem );
@@ -353,7 +376,7 @@ public:
 		{
 			return false;
 		}
-#ifdef LMMS_BUILD_WIN32
+#ifdef USE_QT_SEMAPHORES
 		lock();
 		const bool empty = ( m_data->startPtr == m_data->endPtr );
 		unlock();
@@ -447,14 +470,14 @@ private:
 	volatile bool m_invalid;
 	bool m_master;
 	key_t m_shmKey;
-#ifdef USE_NATIVE_SHMEM
-	int m_shmID;
-#else
+#ifdef USE_QT_SHMEM
 	QSharedMemory m_shmObj;
+#else
+	int m_shmID;
 #endif
 	size_t m_shmSize;
 	shmData * m_data;
-#ifdef LMMS_BUILD_WIN32
+#ifdef USE_QT_SEMAPHORES
 	QSystemSemaphore m_dataSem;
 	QSystemSemaphore m_messageSem;
 #else
@@ -755,10 +778,10 @@ private:
 
 	QMutex m_commMutex;
 	bool m_splitChannels;
-#ifdef USE_NATIVE_SHMEM
-	int m_shmID;
-#else
+#ifdef USE_QT_SHMEM
 	QSharedMemory m_shmObj;
+#else
+	int m_shmID;
 #endif
 	size_t m_shmSize;
 	float * m_shm;
@@ -845,7 +868,7 @@ private:
 	void setShmKey( key_t _key, int _size );
 	void doProcessing( void );
 
-#ifndef USE_NATIVE_SHMEM
+#ifdef USE_QT_SHMEM
 	QSharedMemory m_shmObj;
 #endif
 	float * m_shm;
@@ -972,7 +995,7 @@ remotePluginBase::message remotePluginBase::waitForMessage(
 remotePluginClient::remotePluginClient( key_t _shm_in, key_t _shm_out ) :
 	remotePluginBase( new shmFifo( _shm_in ),
 				new shmFifo( _shm_out ) ),
-#ifndef USE_NATIVE_SHMEM
+#ifdef USE_QT_SHMEM
 	m_shmObj(),
 #endif
 	m_shm( NULL ),
@@ -992,7 +1015,7 @@ remotePluginClient::~remotePluginClient()
 {
 	sendMessage( IdQuit );
 
-#ifdef USE_NATIVE_SHMEM
+#ifndef USE_QT_SHMEM
 	shmdt( m_shm );
 #endif
 }
@@ -1063,7 +1086,17 @@ bool remotePluginClient::processMessage( const message & _m )
 
 void remotePluginClient::setShmKey( key_t _key, int _size )
 {
-#ifdef USE_NATIVE_SHMEM
+#ifdef USE_QT_SHMEM
+	m_shmObj.setKey( QString::number( _key ) );
+	if( m_shmObj.attach() )
+	{
+		m_shm = (float *) m_shmObj.data();
+	}
+	else
+	{
+		fprintf( stderr, "failed getting shared memory\n" );
+	}
+#else
 	if( m_shm != NULL )
 	{
 		shmdt( m_shm );
@@ -1084,16 +1117,6 @@ void remotePluginClient::setShmKey( key_t _key, int _size )
 	else
 	{
 		m_shm = (float *) shmat( shm_id, 0, 0 );
-	}
-#else
-	m_shmObj.setKey( QString::number( _key ) );
-	if( m_shmObj.attach() )
-	{
-		m_shm = (float *) m_shmObj.data();
-	}
-	else
-	{
-		fprintf( stderr, "failed getting shared memory\n" );
 	}
 #endif
 }
