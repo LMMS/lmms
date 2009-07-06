@@ -1,7 +1,7 @@
 /*
  * remote_plugin.cpp - base class providing RPC like mechanisms
  *
- * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -36,6 +36,10 @@
 #include <unistd.h>
 #endif
 
+//#define DEBUG_REMOTE_PLUGIN
+#ifdef DEBUG_REMOTE_PLUGIN
+#include <QtCore/QDebug>
+#endif
 
 
 // simple helper thread monitoring our remotePlugin - if process terminates
@@ -91,9 +95,13 @@ remotePlugin::remotePlugin( const QString & _plugin_executable,
 	args << QString::number( out()->shmKey() );
 	args << QString::number( in()->shmKey() );
 	m_process.setProcessChannelMode( QProcess::MergedChannels );
+#ifndef DEBUG_REMOTE_PLUGIN
 	m_process.start( exec, args );
 
 	m_watcher.start( QThread::LowestPriority );
+#else
+	qDebug() << exec << args;
+#endif
 
 	resizeSharedProcessingMemory();
 
