@@ -885,6 +885,9 @@ void RemoteVstPlugin::updateInOutCount()
 	delete[] m_inputs;
 	delete[] m_outputs;
 
+	m_inputs = NULL;
+	m_outputs = NULL;
+
 	setInputCount( inputCount() );
 	setOutputCount( outputCount() );
 
