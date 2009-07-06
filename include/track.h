@@ -41,7 +41,6 @@
 class QMenu;
 class QPushButton;
 
-class bbTrack;
 class pixmapButton;
 class textFloat;
 class track;
