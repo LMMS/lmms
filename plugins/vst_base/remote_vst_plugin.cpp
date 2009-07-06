@@ -103,26 +103,26 @@ enum VstThreadingModel
 } ;
 
 
-class remoteVstPlugin;
+class RemoteVstPlugin;
 
-remoteVstPlugin * __plugin = NULL;
+RemoteVstPlugin * __plugin = NULL;
 
-DWORD __threadID = NULL;
+DWORD __GuiThreadID = NULL;
 
 VstThreadingModel __threadingModel = TraditionalThreading;
 
 
 
-class remoteVstPlugin : public remotePluginClient
+class RemoteVstPlugin : public remotePluginClient
 {
 public:
-	remoteVstPlugin( key_t _shm_in, key_t _shm_out );
-	virtual ~remoteVstPlugin();
+	RemoteVstPlugin( key_t _shm_in, key_t _shm_out );
+	virtual ~RemoteVstPlugin();
 
 	virtual bool processMessage( const message & _m );
 
 	void init( const std::string & _plugin_file );
-	void initEditor( void );
+	void initEditor();
 
 	virtual void process( const sampleFrame * _in, sampleFrame * _out );
 
@@ -131,7 +131,7 @@ public:
 							const f_cnt_t _offset );
 
 	// set given sample-rate for plugin
-	virtual void updateSampleRate( void )
+	virtual void updateSampleRate()
 	{
 		if( m_plugin )
 		{
@@ -141,7 +141,7 @@ public:
 	}
 
 	// set given buffer-size for plugin
-	virtual void updateBufferSize( void )
+	virtual void updateBufferSize()
 	{
 		if( m_plugin )
 		{
@@ -151,7 +151,7 @@ public:
 	}
 
 
-	inline bool isInitialized( void ) const
+	inline bool isInitialized() const
 	{
 		return m_initialized;
 	}
@@ -164,7 +164,7 @@ public:
 	}
 
 	// determine VST-version the plugin uses
-	int pluginVersion( void ) const
+	int pluginVersion() const
 	{
 		if( m_plugin )
 		{
@@ -175,16 +175,16 @@ public:
 	}
 
 	// determine name of plugin
-	const char * pluginName( void ) const;
+	const char * pluginName() const;
 
 	// determine vendor of plugin
-	const char * pluginVendorString( void ) const;
+	const char * pluginVendorString() const;
 
 	// determine product-string of plugin
-	const char * pluginProductString( void ) const;
+	const char * pluginProductString() const;
 
 	// do a complete parameter-dump and post it
-	void getParameterDump( void );
+	void getParameterDump();
 
 	// read parameter-dump and set it for plugin
 	void setParameterDump( const message & _m );
@@ -199,7 +199,7 @@ public:
 	void loadChunkFromFile( const std::string & _file, int _len );
 
 	// number of inputs
-	virtual int inputCount( void ) const
+	virtual int inputCount() const
 	{
 		if( m_plugin )
 		{
@@ -209,7 +209,7 @@ public:
 	}
 
 	// number of outputs
-	virtual int outputCount( void ) const
+	virtual int outputCount() const
 	{
 		if( m_plugin )
 		{
@@ -219,7 +219,7 @@ public:
 	}
 
 	// has to be called as soon as input- or output-count changes
-	void updateInOutCount( void );
+	void updateInOutCount();
 
 	static DWORD WINAPI processingThread( LPVOID _param );
 	static DWORD WINAPI guiEventLoop( LPVOID _param );
@@ -271,7 +271,7 @@ private:
 
 
 
-remoteVstPlugin::remoteVstPlugin( key_t _shm_in, key_t _shm_out ) :
+RemoteVstPlugin::RemoteVstPlugin( key_t _shm_in, key_t _shm_out ) :
 	remotePluginClient( _shm_in, _shm_out ),
 	m_shortName( "" ),
 	m_libInst( NULL ),
@@ -296,14 +296,14 @@ remoteVstPlugin::remoteVstPlugin( key_t _shm_in, key_t _shm_out ) :
 
 
 
-remoteVstPlugin::~remoteVstPlugin()
+RemoteVstPlugin::~RemoteVstPlugin()
 {
 	if( m_window != NULL )
 	{
 		if( __threadingModel == TraditionalThreading )
 		{
 			// notify GUI-thread
-			if( !PostThreadMessage( __threadID, WM_USER,
+			if( !PostThreadMessage( __GuiThreadID, WM_USER,
 							ClosePlugin, 0 ) )
 			{
 				//lvsMessage( "could not post message to gui thread" );
@@ -334,7 +334,7 @@ remoteVstPlugin::~remoteVstPlugin()
 
 
 
-bool remoteVstPlugin::processMessage( const message & _m )
+bool RemoteVstPlugin::processMessage( const message & _m )
 {
 	switch( _m.id )
 	{
@@ -391,7 +391,7 @@ bool remoteVstPlugin::processMessage( const message & _m )
 
 
 
-void remoteVstPlugin::init( const std::string & _plugin_file )
+void RemoteVstPlugin::init( const std::string & _plugin_file )
 {
 	if( load( _plugin_file ) == false )
 	{
@@ -453,7 +453,7 @@ void remoteVstPlugin::init( const std::string & _plugin_file )
 
 
 
-void remoteVstPlugin::initEditor( void )
+void RemoteVstPlugin::initEditor()
 {
 	if( !( m_plugin->flags & effFlagsHasEditor ) )
 	{
@@ -532,7 +532,7 @@ void remoteVstPlugin::initEditor( void )
 
 
 
-bool remoteVstPlugin::load( const std::string & _plugin_file )
+bool RemoteVstPlugin::load( const std::string & _plugin_file )
 {
 	if( ( m_libInst = LoadLibrary( _plugin_file.c_str() ) ) == NULL )
 	{
@@ -625,7 +625,7 @@ bool remoteVstPlugin::load( const std::string & _plugin_file )
 
 
 
-void remoteVstPlugin::process( const sampleFrame * _in, sampleFrame * _out )
+void RemoteVstPlugin::process( const sampleFrame * _in, sampleFrame * _out )
 {
 	// first we gonna post all MIDI-events we enqueued so far
 	if( m_midiEvents.size() )
@@ -691,7 +691,7 @@ void remoteVstPlugin::process( const sampleFrame * _in, sampleFrame * _out )
 
 
 
-void remoteVstPlugin::processMidiEvent( const midiEvent & _event,
+void RemoteVstPlugin::processMidiEvent( const midiEvent & _event,
 							const f_cnt_t _offset )
 {
 	VstMidiEvent event;
@@ -726,7 +726,7 @@ void remoteVstPlugin::processMidiEvent( const midiEvent & _event,
 
 
 
-const char * remoteVstPlugin::pluginName( void ) const
+const char * RemoteVstPlugin::pluginName() const
 {
 	static char buf[32];
 	buf[0] = 0;
@@ -738,7 +738,7 @@ const char * remoteVstPlugin::pluginName( void ) const
 
 
 
-const char * remoteVstPlugin::pluginVendorString( void ) const
+const char * RemoteVstPlugin::pluginVendorString() const
 {
 	static char buf[64];
 	buf[0] = 0;
@@ -750,7 +750,7 @@ const char * remoteVstPlugin::pluginVendorString( void ) const
 
 
 
-const char * remoteVstPlugin::pluginProductString( void ) const
+const char * RemoteVstPlugin::pluginProductString() const
 {
 	static char buf[64];
 	buf[0] = 0;
@@ -762,7 +762,7 @@ const char * remoteVstPlugin::pluginProductString( void ) const
 
 
 
-void remoteVstPlugin::getParameterDump( void )
+void RemoteVstPlugin::getParameterDump()
 {
 	VstParameterProperties vst_props;
 	message m( IdVstParameterDump );
@@ -781,7 +781,7 @@ void remoteVstPlugin::getParameterDump( void )
 
 
 
-void remoteVstPlugin::setParameterDump( const message & _m )
+void RemoteVstPlugin::setParameterDump( const message & _m )
 {
 	const int n = _m.getInt( 0 );
 	const int params = ( n > m_plugin->numParams ) ?
@@ -800,7 +800,7 @@ void remoteVstPlugin::setParameterDump( const message & _m )
 
 
 
-void remoteVstPlugin::getParameterProperties( const int _idx )
+void RemoteVstPlugin::getParameterProperties( const int _idx )
 {
 	VstParameterProperties p;
 	m_plugin->dispatcher( m_plugin, effGetParameterProperties, _idx, 0,
@@ -832,7 +832,7 @@ void remoteVstPlugin::getParameterProperties( const int _idx )
 
 
 
-void remoteVstPlugin::saveChunkToFile( const std::string & _file )
+void RemoteVstPlugin::saveChunkToFile( const std::string & _file )
 {
 	if( m_plugin->flags & 32 )
 	{
@@ -850,7 +850,7 @@ void remoteVstPlugin::saveChunkToFile( const std::string & _file )
 
 
 
-void remoteVstPlugin::loadChunkFromFile( const std::string & _file, int _len )
+void RemoteVstPlugin::loadChunkFromFile( const std::string & _file, int _len )
 {
 	char buf[_len];
 
@@ -875,7 +875,7 @@ void remoteVstPlugin::loadChunkFromFile( const std::string & _file, int _len )
 
 
 
-void remoteVstPlugin::updateInOutCount( void )
+void RemoteVstPlugin::updateInOutCount()
 {
 	delete[] m_inputs;
 	delete[] m_outputs;
@@ -911,7 +911,7 @@ void remoteVstPlugin::updateInOutCount( void )
  * - audioMasterGetDirectory: return either VST-plugin-dir or LMMS-workingdir
  * - audioMasterOpenFileSelector: show QFileDialog?
  */
-VstIntPtr remoteVstPlugin::hostCallback( AEffect * _effect, VstInt32 _opcode,
+VstIntPtr RemoteVstPlugin::hostCallback( AEffect * _effect, VstInt32 _opcode,
 					VstInt32 _index, VstIntPtr _value,
 						void * _ptr, float _opt )
 {
@@ -1238,9 +1238,9 @@ VstIntPtr remoteVstPlugin::hostCallback( AEffect * _effect, VstInt32 _opcode,
 
 
 
-DWORD WINAPI remoteVstPlugin::processingThread( LPVOID _param )
+DWORD WINAPI RemoteVstPlugin::processingThread( LPVOID _param )
 {
-	remoteVstPlugin * _this = static_cast<remoteVstPlugin *>( _param );
+	RemoteVstPlugin * _this = static_cast<RemoteVstPlugin *>( _param );
 
 	remotePluginClient::message m;
 	while( ( m = _this->receiveMessage() ).id != IdQuit )
@@ -1256,7 +1256,7 @@ DWORD WINAPI remoteVstPlugin::processingThread( LPVOID _param )
 //#ifndef LMMS_BUILD_LINUX
 		else
 		{
-			PostThreadMessage( __threadID,
+			PostThreadMessage( __GuiThreadID,
 					WM_USER,
 					ProcessPluginMessage,
 					(LPARAM) new message( m ) );
@@ -1278,10 +1278,10 @@ DWORD WINAPI remoteVstPlugin::processingThread( LPVOID _param )
 
 
 
-DWORD WINAPI remoteVstPlugin::guiEventLoop( LPVOID _param )
+DWORD WINAPI RemoteVstPlugin::guiEventLoop( LPVOID _param )
 {
-	remoteVstPlugin * _this = static_cast<remoteVstPlugin *>( _param );
-	__threadID = GetCurrentThreadId();
+	RemoteVstPlugin * _this = static_cast<RemoteVstPlugin *>( _param );
+	__GuiThreadID = GetCurrentThreadId();
 
 	HMODULE hInst = GetModuleHandle( NULL );
 	if( hInst == NULL )
@@ -1376,30 +1376,30 @@ int main( int _argc, char * * _argv )
 #endif
 #endif
 
-	__plugin = new remoteVstPlugin( atoi( _argv[1] ), atoi( _argv[2] ) );
+	__plugin = new RemoteVstPlugin( atoi( _argv[1] ), atoi( _argv[2] ) );
 
 	// process until we have loaded the plugin
-	remoteVstPlugin::processingThread( __plugin );
+	RemoteVstPlugin::processingThread( __plugin );
 
 	if( __plugin->isInitialized() )
 	{
 		if( __threadingModel == TraditionalThreading )
 		{
-			remoteVstPlugin::processingThread( __plugin );
+			RemoteVstPlugin::processingThread( __plugin );
 		}
 		else
 		{
 			__threadID = GetCurrentThreadId();
 
 			if( CreateThread( NULL, 0,
-					remoteVstPlugin::processingThread,
+					RemoteVstPlugin::processingThread,
 						__plugin, 0, NULL ) == NULL )
 			{
 				__plugin->debugMessage( "could not create "
 							"processingThread\n" );
 				return -1;
 			}
-			remoteVstPlugin::guiEventLoop( __plugin );
+			RemoteVstPlugin::guiEventLoop( __plugin );
 		}
 	}
 
