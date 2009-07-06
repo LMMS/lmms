@@ -891,6 +891,10 @@ void RemoteVstPlugin::updateInOutCount()
 	setInputCount( inputCount() );
 	setOutputCount( outputCount() );
 
+	char buf[64];
+	sprintf( buf, "inputs: %d  output: %d\n", inputCount(), outputCount() );
+	debugMessage( buf );
+
 	if( inputCount() > 0 )
 	{
 		m_inputs = new float * [inputCount()];
