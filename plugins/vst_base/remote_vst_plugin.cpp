@@ -845,7 +845,7 @@ void RemoteVstPlugin::saveChunkToFile( const std::string & _file )
 		const int len = pluginDispatch( 23, 0, 0, &chunk );
 		if( len > 0 )
 		{
-			int fd = open( _file.c_str(), O_WRONLY );
+			int fd = open( _file.c_str(), O_WRONLY | O_BINARY );
 			write( fd, chunk, len );
 			close( fd );
 		}
@@ -871,7 +871,7 @@ void RemoteVstPlugin::loadChunkFromFile( const std::string & _file, int _len )
 		chunk = buf;
 	}
 
-	const int fd = open( _file.c_str(), O_RDONLY );
+	const int fd = open( _file.c_str(), O_RDONLY | O_BINARY );
 	read( fd, chunk, _len );
 	close( fd );
 	pluginDispatch( 24, 0, _len, chunk );
