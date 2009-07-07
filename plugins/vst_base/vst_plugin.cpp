@@ -241,8 +241,15 @@ void vstPlugin::loadSettings( const QDomElement & _this )
 	}
 
 	const int num_params = _this.attribute( "numparams" ).toInt();
-	if( num_params > 0 )
+	// if it exists try to load settings chunk
+	if( _this.hasAttribute( "chunk" ) )
 	{
+		loadChunk( QByteArray::fromBase64(
+				_this.attribute( "chunk" ).toAscii() ) );
+	}
+	else if( num_params > 0 )
+	{
+		// no chunk, restore individual parameters
 		QMap<QString, QString> dump;
 		for( int i = 0; i < num_params; ++i )
 		{
@@ -253,11 +260,6 @@ void vstPlugin::loadSettings( const QDomElement & _this )
 		setParameterDump( dump );
 	}
 
-	if( _this.hasAttribute( "chunk" ) )
-	{
-		loadChunk( QByteArray::fromBase64(
-				_this.attribute( "chunk" ).toAscii() ) );
-	}
 }
 
 
@@ -269,17 +271,24 @@ void vstPlugin::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	{
 		_this.setAttribute( "guivisible", pluginWidget()->isVisible() );
 	}
-	const QMap<QString, QString> & dump = parameterDump();
-	_this.setAttribute( "numparams", dump.size() );
-	for( QMap<QString, QString>::const_iterator it = dump.begin();
-							it != dump.end(); ++it )
-	{
-		_this.setAttribute( it.key(), it.value() );
-	}
+
+	// try to save all settings in a chunk
 	QByteArray chunk = saveChunk();
 	if( !chunk.isEmpty() )
 	{
 		_this.setAttribute( "chunk", QString( chunk.toBase64() ) );
+	}
+	else
+	{
+		// plugin doesn't seem to support chunks, therefore save
+		// individual parameters
+		const QMap<QString, QString> & dump = parameterDump();
+		_this.setAttribute( "numparams", dump.size() );
+		for( QMap<QString, QString>::const_iterator it = dump.begin();
+							it != dump.end(); ++it )
+		{
+			_this.setAttribute( it.key(), it.value() );
+		}
 	}
 }
 
