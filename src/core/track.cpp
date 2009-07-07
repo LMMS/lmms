@@ -875,9 +875,6 @@ trackContentWidget::trackContentWidget( trackView * _parent ) :
 	connect( _parent->getTrackContainerView(),
 			SIGNAL( positionChanged( const midiTime & ) ),
 			this, SLOT( changePosition( const midiTime & ) ) );
-
-	setAutoFillBackground( false );
-	setAttribute( Qt::WA_OpaquePaintEvent, true );
 }
 
 
