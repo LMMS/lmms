@@ -246,7 +246,7 @@ int Fl::arg(int argc, char **argv, int &i) {
   	<LI>-geometry WxH+X+Y
   
   	<P>Sets the initial window position and size according
-  	the the standard X geometry string.</LI>
+  	to the standard X geometry string.</LI>
   
   	<LI>-iconic
   

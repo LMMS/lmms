@@ -47,7 +47,7 @@
 
 
 //
-// 'Fl_Progress::draw()' - Draw the check button.
+// 'Fl_Progress::draw()' - Draw the progress bar.
 //
 
 /** Draws the progress bar. */
@@ -76,10 +76,10 @@ void Fl_Progress::draw()
   // Draw the box and label...
   if (progress > 0) {
     Fl_Color c = labelcolor();
-    labelcolor(fl_contrast(labelcolor(), color2()));
+    labelcolor(fl_contrast(labelcolor(), selection_color()));
 
     fl_push_clip(x(), y(), progress + bx, h());
-      draw_box(box(), x(), y(), w(), h(), active_r() ? color2() : fl_inactive(color2()));
+      draw_box(box(), x(), y(), w(), h(), active_r() ? selection_color() : fl_inactive(selection_color()));
       draw_label(tx, y() + by, tw, h() - bh);
     fl_pop_clip();
 
@@ -99,12 +99,16 @@ void Fl_Progress::draw()
 
 
 /**  
-    The constructor creates the progress bar using the position,
-    size, and label.
-    <P> The inherited destructor removes the progress bar.
+    The constructor creates the progress bar using the position, size, and label.
+    
+    You can set the background color with color() and the
+    progress bar color with selection_color(), or you can set both colors
+    together with color(unsigned bg, unsigned sel).
+    
+    The default colors are FL_BACKGROUND2_COLOR and FL_YELLOW, resp.
 */
-Fl_Progress::Fl_Progress(int X, int Y, int W, int H, const char* l)
-: Fl_Widget(X, Y, W, H, l) {
+Fl_Progress::Fl_Progress(int X, int Y, int W, int H, const char* L)
+: Fl_Widget(X, Y, W, H, L) {
   align(FL_ALIGN_INSIDE);
   box(FL_DOWN_BOX);
   color(FL_BACKGROUND2_COLOR, FL_YELLOW);

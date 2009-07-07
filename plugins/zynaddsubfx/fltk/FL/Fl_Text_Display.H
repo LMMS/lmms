@@ -98,23 +98,23 @@ class FL_EXPORT Fl_Text_Display: public Fl_Group {
       Gets the current text buffer associated with the text widget.
       Multiple text widgets can be associated with the same text buffer.
     */
-    Fl_Text_Buffer* buffer() { return mBuffer; }
+    Fl_Text_Buffer* buffer() const { return mBuffer; }
     void redisplay_range(int start, int end);
     void scroll(int topLineNum, int horizOffset);
     void insert(const char* text);
     void overstrike(const char* text);
     void insert_position(int newPos);
     /** Gets the position of the text insertion cursor for text display */
-    int insert_position() { return mCursorPos; }
-    int in_selection(int x, int y);
+    int insert_position() const { return mCursorPos; }
+    int in_selection(int x, int y) const;
     void show_insert_position();
     int move_right();
     int move_left();
     int move_up();
     int move_down();
-    int count_lines(int start, int end, bool start_pos_is_line_start);
-    int line_start(int pos);
-    int line_end(int pos, bool start_pos_is_line_start);
+    int count_lines(int start, int end, bool start_pos_is_line_start) const;
+    int line_start(int pos) const;
+    int line_end(int pos, bool start_pos_is_line_start) const;
     int skip_lines(int startPos, int nLines, bool startPosIsLineStart);
     int rewind_lines(int startPos, int nLines);
     void next_word(void);
@@ -128,17 +128,17 @@ class FL_EXPORT Fl_Text_Display: public Fl_Group {
     /**    Sets or gets the text cursor color.  */
     void cursor_color(Fl_Color n) {mCursor_color = n;}
     /**    Sets or gets the width/height of the scrollbars.  */
-    int scrollbar_width() { return scrollbar_width_; }
+    int scrollbar_width() const { return scrollbar_width_; }
     /**    Sets or gets the width/height of the scrollbars.  */
     void scrollbar_width(int W) { scrollbar_width_ = W; }
     /**    Gets the scrollbar alignment type */
-    Fl_Align scrollbar_align() { return scrollbar_align_; }
+    Fl_Align scrollbar_align() const { return scrollbar_align_; }
     /**    Sets the scrollbar alignment type */
     void scrollbar_align(Fl_Align a) { scrollbar_align_ = a; }
     /**    Moves the insert position to the beginning of the current word.  */
-    int word_start(int pos) { return buffer()->word_start(pos); }
+    int word_start(int pos) const { return buffer()->word_start(pos); }
     /**    Moves the insert position to the end of the current word.  */
-    int word_end(int pos) { return buffer()->word_end(pos); }
+    int word_end(int pos) const { return buffer()->word_end(pos); }
 
     
     void highlight_data(Fl_Text_Buffer *styleBuffer,
@@ -148,7 +148,7 @@ class FL_EXPORT Fl_Text_Display: public Fl_Group {
                         void *cbArg);
 
     int position_style(int lineStartPos, int lineLen, int lineIndex,
-                       int dispIndex);
+                       int dispIndex) const;
     /** \todo FIXME : get set methods pointing on shortcut_ 
      have no effects as shortcut_ is unused in this class and derived! */
     int shortcut() const {return shortcut_;}
@@ -169,8 +169,8 @@ class FL_EXPORT Fl_Text_Display: public Fl_Group {
     /**    Sets the default color of text in the widget.  */
     void textcolor(unsigned n) {textcolor_ = n;}
 
-    int wrapped_column(int row, int column);
-    int wrapped_row(int row);
+    int wrapped_column(int row, int column) const;
+    int wrapped_row(int row) const;
     void wrap_mode(int wrap, int wrap_margin);
 
     virtual void resize(int X, int Y, int W, int H);
@@ -206,8 +206,8 @@ class FL_EXPORT Fl_Text_Display: public Fl_Group {
 
     void calc_last_char();
 
-    int position_to_line( int pos, int* lineNum );
-    int string_width(const char* string, int length, int style);
+    int position_to_line( int pos, int* lineNum ) const;
+    int string_width(const char* string, int length, int style) const;
 
     static void scroll_timer_cb(void*);
 
@@ -220,22 +220,22 @@ class FL_EXPORT Fl_Text_Display: public Fl_Group {
     static void v_scrollbar_cb( Fl_Scrollbar* w, Fl_Text_Display* d);
     void update_v_scrollbar();
     void update_h_scrollbar();
-    int measure_vline(int visLineNum);
-    int longest_vline();
-    int empty_vlines();
-    int vline_length(int visLineNum);
-    int xy_to_position(int x, int y, int PosType = CHARACTER_POS);
+    int measure_vline(int visLineNum) const;
+    int longest_vline() const;
+    int empty_vlines() const;
+    int vline_length(int visLineNum) const;
+    int xy_to_position(int x, int y, int PosType = CHARACTER_POS) const;
 
     void xy_to_rowcol(int x, int y, int* row, int* column,
-                      int PosType = CHARACTER_POS);
+                      int PosType = CHARACTER_POS) const;
 
-    int position_to_xy(int pos, int* x, int* y);
+    int position_to_xy(int pos, int* x, int* y) const;
     void maintain_absolute_top_line_number(int state);
-    int get_absolute_top_line_number();
+    int get_absolute_top_line_number() const;
     void absolute_top_line_number(int oldFirstChar);
-    int maintaining_absolute_top_line_number();
+    int maintaining_absolute_top_line_number() const;
     void reset_absolute_top_line_number();
-    int position_to_linecol(int pos, int* lineNum, int* column);
+    int position_to_linecol(int pos, int* lineNum, int* column) const;
     void scroll_(int topLineNum, int horizOffset);
 
     void extend_range_for_styles(int* start, int* end);
@@ -248,13 +248,13 @@ class FL_EXPORT Fl_Text_Display: public Fl_Group {
                                int maxLines, bool startPosIsLineStart,
                                int styleBufOffset, int *retPos, int *retLines,
                                int *retLineStart, int *retLineEnd,
-                               bool countLastLineMissingNewLine = true);
+                               bool countLastLineMissingNewLine = true) const;
     void find_line_end(int pos, bool start_pos_is_line_start, int *lineEnd,
-                         int *nextLineStart);
-    int measure_proportional_character(char c, int colNum, int pos);
-    int wrap_uses_character(int lineEndPos);
-    int range_touches_selection(Fl_Text_Selection *sel, int rangeStart,
-                                 int rangeEnd);
+                         int *nextLineStart) const;
+    int measure_proportional_character(char c, int colNum, int pos) const;
+    int wrap_uses_character(int lineEndPos) const;
+    int range_touches_selection(const Fl_Text_Selection *sel, int rangeStart,
+                                 int rangeEnd) const;
 #ifndef FL_DOXYGEN
     int damage_range1_start, damage_range1_end;
     int damage_range2_start, damage_range2_end;
