@@ -105,7 +105,7 @@ static unsigned short cp1252[32] = {
 
 /*! Decode a single UTF-8 encoded character starting at \e p. The
     resulting Unicode value (in the range 0-0x10ffff) is returned,
-    and \e len is set the the number of bytes in the UTF-8 encoding
+    and \e len is set to the number of bytes in the UTF-8 encoding
     (adding \e len to \e p will point at the next character).
 
     If \p p points at an illegal UTF-8 encoding, including one that

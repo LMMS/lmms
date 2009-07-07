@@ -350,7 +350,7 @@ int TextDMaxFontWidth(textDisp *textD, Boolean considerStyles) {
 }
 #endif
 
-int Fl_Text_Display::longest_vline() {
+int Fl_Text_Display::longest_vline() const {
   int longest = 0;
   for (int i = 0; i < mNVisibleLines; i++)
     longest = max(longest, measure_vline(i));
@@ -798,7 +798,7 @@ void Fl_Text_Display::overstrike(const char* text) {
    X coordinate where the position would be if it were visible.
 */
 
-int Fl_Text_Display::position_to_xy( int pos, int* X, int* Y ) {
+int Fl_Text_Display::position_to_xy( int pos, int* X, int* Y ) const {
   int charIndex, lineStartPos, fontHeight, lineLen;
   int visLineNum, charLen, outIndex, xStep, charStyle;
   char expandedChar[ FL_TEXT_MAX_EXP_CHAR_LEN ];
@@ -876,7 +876,7 @@ int Fl_Text_Display::position_to_xy( int pos, int* X, int* Y ) {
    If continuous wrap mode is on, returns the absolute line number (as opposed
    to the wrapped line number which is used for scrolling).
 */
-int Fl_Text_Display::position_to_linecol( int pos, int* lineNum, int* column ) {
+int Fl_Text_Display::position_to_linecol( int pos, int* lineNum, int* column ) const {
   int retVal;
     
     /* In continuous wrap mode, the absolute (non-wrapped) line count is
@@ -904,7 +904,7 @@ int Fl_Text_Display::position_to_linecol( int pos, int* lineNum, int* column ) {
 /**
    Return 1 if position (X, Y) is inside of the primary Fl_Text_Selection
 */
-int Fl_Text_Display::in_selection( int X, int Y ) {
+int Fl_Text_Display::in_selection( int X, int Y ) const {
   int row, column, pos = xy_to_position( X, Y, CHARACTER_POS );
   Fl_Text_Buffer *buf = mBuffer;
   int ok = 0;
@@ -933,7 +933,7 @@ int Fl_Text_Display::in_selection( int X, int Y ) {
    from the last newline.  Obviously this is time consuming, because it
    invloves character re-counting.
 */
-int Fl_Text_Display::wrapped_column(int row, int column) {
+int Fl_Text_Display::wrapped_column(int row, int column) const {
     int lineStart, dispLineStart;
     
     if (!mContinuousWrap || row < 0 || row > mNVisibleLines)
@@ -953,7 +953,7 @@ int Fl_Text_Display::wrapped_column(int row, int column) {
    newlines, rather than display wrapping, and anywhere a rectangular selection
    needs a row, it needs it in terms of un-wrapped lines.
 */
-int Fl_Text_Display::wrapped_row(int row) {
+int Fl_Text_Display::wrapped_row(int row) const{
     if (!mContinuousWrap || row < 0 || row > mNVisibleLines)
     	return row;
     return buffer()->count_lines(mFirstChar, mLineStarts[row]);
@@ -1131,7 +1131,7 @@ int Fl_Text_Display::move_down() {
    by avoiding the additional step of scanning back to the last newline.
 */
 int Fl_Text_Display::count_lines(int startPos, int endPos,
-    	bool startPosIsLineStart) {
+    	bool startPosIsLineStart) const {
     int retLines, retPos, retLineStart, retLineEnd;
 
 #ifdef DEBUG
@@ -1196,7 +1196,7 @@ int Fl_Text_Display::skip_lines(int startPos, int nLines,
    the start of the next line.  This is also consistent with the model used by
    visLineLength.
 */
-int Fl_Text_Display::line_end(int pos, bool startPosIsLineStart) {
+int Fl_Text_Display::line_end(int pos, bool startPosIsLineStart) const {
     int retLines, retPos, retLineStart, retLineEnd;
     
     /* If we're not wrapping use more efficien BufEndOfLine */
@@ -1215,7 +1215,7 @@ int Fl_Text_Display::line_end(int pos, bool startPosIsLineStart) {
    Same as BufStartOfLine, but returns the character after last wrap point
    rather than the last newline.
 */
-int Fl_Text_Display::line_start(int pos) {
+int Fl_Text_Display::line_start(int pos) const {
     int retLines, retPos, retLineStart, retLineEnd;
     
     /* If we're not wrapping, use the more efficient BufStartOfLine */
@@ -1448,7 +1448,7 @@ void Fl_Text_Display::maintain_absolute_top_line_number(int state) {
    Returns the absolute (non-wrapped) line number of the first line displayed.
    Returns 0 if the absolute top line number is not being maintained.
 */
-int Fl_Text_Display::get_absolute_top_line_number() {
+int Fl_Text_Display::get_absolute_top_line_number() const {
     if (!mContinuousWrap)
 	return mTopLineNum;
     if (maintaining_absolute_top_line_number())
@@ -1472,7 +1472,7 @@ void Fl_Text_Display::absolute_top_line_number(int oldFirstChar) {
    Return true if a separate absolute top line number is being maintained
    (for displaying line numbers or showing in the statistics line).
 */
-int Fl_Text_Display::maintaining_absolute_top_line_number() {
+int Fl_Text_Display::maintaining_absolute_top_line_number() const {
     return mContinuousWrap &&
 	    (mLineNumWidth != 0 || mNeedAbsTopLineNum);
 }
@@ -1491,7 +1491,7 @@ void Fl_Text_Display::reset_absolute_top_line_number() {
    Find the line number of position "pos" relative to the first line of
    displayed text. Returns 0 if the line is not displayed.
 */
-int Fl_Text_Display::position_to_line( int pos, int *lineNum ) {
+int Fl_Text_Display::position_to_line( int pos, int *lineNum ) const {
   int i;
 
   *lineNum = 0;
@@ -1957,7 +1957,7 @@ void Fl_Text_Display::draw_cursor( int X, int Y ) {
    be more appropriate.
 */
 int Fl_Text_Display::position_style( int lineStartPos,
-                                     int lineLen, int lineIndex, int dispIndex ) {
+                                     int lineLen, int lineIndex, int dispIndex ) const {
   Fl_Text_Buffer * buf = mBuffer;
   Fl_Text_Buffer *styleBuf = mStyleBuffer;
   int pos, style = 0;
@@ -1989,7 +1989,7 @@ int Fl_Text_Display::position_style( int lineStartPos,
 /**
    Find the width of a string in the font of a particular style
 */
-int Fl_Text_Display::string_width( const char *string, int length, int style ) {
+int Fl_Text_Display::string_width( const char *string, int length, int style ) const {
   Fl_Font font;
   int fsize;
 
@@ -2016,7 +2016,7 @@ int Fl_Text_Display::string_width( const char *string, int length, int style ) {
    position, and CHARACTER_POS means return the position of the character
    closest to (X, Y).
 */
-int Fl_Text_Display::xy_to_position( int X, int Y, int posType ) {
+int Fl_Text_Display::xy_to_position( int X, int Y, int posType ) const {
   int charIndex, lineStart, lineLen, fontHeight;
   int charWidth, charLen, charStyle, visLineNum, xStep, outIndex;
   char expandedChar[ FL_TEXT_MAX_EXP_CHAR_LEN ];
@@ -2082,7 +2082,7 @@ int Fl_Text_Display::xy_to_position( int X, int Y, int posType ) {
    means translate the position to the nearest character cell.
 */
 void Fl_Text_Display::xy_to_rowcol( int X, int Y, int *row,
-                                    int *column, int posType ) {
+                                    int *column, int posType ) const {
   int fontHeight = mMaxsize;
   int fontWidth = TMPFONTWIDTH;   //mFontStruct->max_bounds.width;
 
@@ -2479,7 +2479,7 @@ static int countlines( const char *string ) {
 /**
    Return the width in pixels of the displayed line pointed to by "visLineNum"
 */
-int Fl_Text_Display::measure_vline( int visLineNum ) {
+int Fl_Text_Display::measure_vline( int visLineNum ) const {
   int i, width = 0, len, style, lineLen = vline_length( visLineNum );
   int charCount = 0, lineStartPos = mLineStarts[ visLineNum ];
   char expandedChar[ FL_TEXT_MAX_EXP_CHAR_LEN ];
@@ -2519,7 +2519,7 @@ int Fl_Text_Display::measure_vline( int visLineNum ) {
 /**
    Return true if there are lines visible with no corresponding buffer text
 */
-int Fl_Text_Display::empty_vlines() {
+int Fl_Text_Display::empty_vlines() const {
   return mNVisibleLines > 0 &&
          mLineStarts[ mNVisibleLines - 1 ] == -1;
 }
@@ -2528,7 +2528,7 @@ int Fl_Text_Display::empty_vlines() {
    Return the length of a line (number of displayable characters) by examining
    entries in the line starts array rather than by scanning for newlines
 */
-int Fl_Text_Display::vline_length( int visLineNum ) {
+int Fl_Text_Display::vline_length( int visLineNum ) const {
   int nextLineStart, lineStartPos;
 
   if (visLineNum < 0 || visLineNum >= mNVisibleLines)
@@ -2794,7 +2794,7 @@ void Fl_Text_Display::measure_deleted_lines(int pos, int nDeleted) {
 void Fl_Text_Display::wrapped_line_counter(Fl_Text_Buffer *buf, int startPos,
 	int maxPos, int maxLines, bool startPosIsLineStart, int styleBufOffset,
 	int *retPos, int *retLines, int *retLineStart, int *retLineEnd,
-	bool countLastLineMissingNewLine) {
+	bool countLastLineMissingNewLine) const {
     int lineStart, newLineStart = 0, b, p, colNum, wrapMargin;
     int maxWidth, i, foundBreak, width;
 	 bool countPixels;
@@ -2932,7 +2932,7 @@ void Fl_Text_Display::wrapped_line_counter(Fl_Text_Buffer *buf, int startPos,
    insertion/deletion, though static display and wrapping and resizing
    should now be solid because they are now used for online help display.
 */
-int Fl_Text_Display::measure_proportional_character(char c, int colNum, int pos) {
+int Fl_Text_Display::measure_proportional_character(char c, int colNum, int pos) const {
     int charLen, style;
     char expChar[ FL_TEXT_MAX_EXP_CHAR_LEN ];
     Fl_Text_Buffer *styleBuf = mStyleBuffer;
@@ -2963,7 +2963,7 @@ int Fl_Text_Display::measure_proportional_character(char c, int colNum, int pos)
    the way back to the beginning of the line.
 */
 void Fl_Text_Display::find_line_end(int startPos, bool startPosIsLineStart,
-    	int *lineEnd, int *nextLineStart) {
+    	int *lineEnd, int *nextLineStart) const {
     int retLines, retLineStart;
     
     /* if we're not wrapping use more efficient BufEndOfLine */
@@ -2996,7 +2996,7 @@ void Fl_Text_Display::find_line_end(int startPos, bool startPosIsLineStart,
    used as a wrap point, and just guesses that it wasn't.  So if an exact
    accounting is necessary, don't use this function.
 */ 
-int Fl_Text_Display::wrap_uses_character(int lineEndPos) {
+int Fl_Text_Display::wrap_uses_character(int lineEndPos) const {
     char c;
     
     if (!mContinuousWrap || lineEndPos == buffer()->length())
@@ -3011,8 +3011,8 @@ int Fl_Text_Display::wrap_uses_character(int lineEndPos) {
    Return true if the selection "sel" is rectangular, and touches a
    buffer position withing "rangeStart" to "rangeEnd"
 */
-int Fl_Text_Display::range_touches_selection(Fl_Text_Selection *sel,
-   int rangeStart, int rangeEnd) {
+int Fl_Text_Display::range_touches_selection(const Fl_Text_Selection *sel,
+   int rangeStart, int rangeEnd) const {
     return sel->selected() && sel->rectangular() && sel->end() >= rangeStart &&
     	    sel->start() <= rangeEnd;
 }

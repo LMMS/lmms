@@ -178,7 +178,7 @@ void fl_color(uchar r,uchar g,uchar b) {
 }
 
 ////////////////////////////////////////////////////////////////
-// Get a color out of the the fltk colormap.  Again for truecolor
+// Get a color out of the fltk colormap.  Again for truecolor
 // visuals this is easy.  For colormap this actually tries to allocate
 // an X color, and does a least-squares match to find the closest
 // color if X cannot allocate that color.

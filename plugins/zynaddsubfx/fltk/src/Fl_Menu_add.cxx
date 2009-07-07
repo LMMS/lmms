@@ -28,10 +28,10 @@
 
 // These are for Forms emulation and for dynamically changing the
 // menus.  They are in this source file so they are not linked in if
-// not used, which is what will happen if the the program only uses
+// not used, which is what will happen if the program only uses
 // constant menu tables.
 
-// Not at all guaranteed to be Forms compatable, especially with any
+// Not at all guaranteed to be Forms compatible, especially with any
 // string with a % sign in it!
 
 #include <FL/Fl_Menu_.H>

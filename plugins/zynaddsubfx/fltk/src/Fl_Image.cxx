@@ -465,7 +465,7 @@ void Fl_RGB_Image::draw(int XP, int YP, int WP, int HP, int cx, int cy) {
     CGDataProviderRelease(src);
 #elif defined(WIN32)
     id = fl_create_offscreen(w(), h());
-    if (d() == 2 || d() == 4 && fl_can_do_alpha_blending()) {
+    if ((d() == 2 || d() == 4) && fl_can_do_alpha_blending()) {
       fl_begin_offscreen((Fl_Offscreen)id);
       fl_draw_image(array, 0, 0, w(), h(), d()|FL_IMAGE_WITH_ALPHA, ld());
       fl_end_offscreen();

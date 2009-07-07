@@ -1,5 +1,11 @@
 CHANGES IN FLTK 1.3.0
 
+	- Corrected const methods of Fl_Text_{Buffer|Display|Selection}
+	  to be declared const, corrected an Fl_Text_Buffer attrib. typo
+	- Fixed OpenGL shared context handling (STR #2135)
+	- Fixed gray-scale images with alpha channel (STR #2105)
+	- Fixed unexpected shortcut behavior for Win32 (STR #2199)
+	- Fixed documentation for Fl_Progress (STR #2209)
 	- Fluid printing used wrong colors under Windows (STR #2195)
 	- Updated documentation for Fl_Input_
 	- Fixed fl_draw_image to obey the alpha channel, hoping that 

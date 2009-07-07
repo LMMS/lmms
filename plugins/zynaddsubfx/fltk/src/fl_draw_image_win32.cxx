@@ -153,7 +153,7 @@ static void innards(const uchar *buf, int X, int Y, int W, int H,
       bmi.bmiColors[i].rgbBlue = (uchar)i;
       bmi.bmiColors[i].rgbGreen = (uchar)i;
       bmi.bmiColors[i].rgbRed = (uchar)i;
-      bmi.bmiColors[i].rgbReserved = (uchar)i;
+      bmi.bmiColors[i].rgbReserved = (uchar)0; // must be zero
     }
   }
   bmi.bmiHeader.biWidth = w;
@@ -164,6 +164,10 @@ static void innards(const uchar *buf, int X, int Y, int W, int H,
   bmi.bmiHeader.biBitCount = depth*8;
   int pixelsize = depth;
 #endif
+  if (depth==2) { // special case: gray with alpha
+    bmi.bmiHeader.biBitCount = 32;
+    pixelsize = 4;
+  }
   int linesize = (pixelsize*w+3)&~3;
   
   static U32* buffer;
@@ -218,9 +222,13 @@ static void innards(const uchar *buf, int X, int Y, int W, int H,
             for (i=w; i--; from += delta) *to++ = *from;
             break;
           case 2:
-            for (i=w; i--; from += delta) {
-              *to++ = *from;
-              *to++ = *from;
+	    for (i=w; i--; from += delta, to += 4) {
+	      uchar a = from[1];
+	      uchar gray = (from[0]*a)>>8;
+	      to[0] = gray;
+	      to[1] = gray;
+	      to[2] = gray;
+	      to[3] = a;
             }
             break;
           case 3:

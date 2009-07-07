@@ -42,7 +42,7 @@
 #define FL_DIGITAL_CLOCK FL_SQUARE_CLOCK /**< Not yet implemented */
 
 // fabien: Please keep the horizontal formatting of both images in class desc, 
-// don't loose vert. space  for nothing!
+// don't lose vert. space for nothing!
 
 /**
   \class Fl_Clock_Output
@@ -109,7 +109,7 @@ public:
 
   Fl_Clock is provided for Forms compatibility. 
   It installs a 1-second timeout callback using Fl::add_timeout().
-  You can choose the rounded or square type of the the clock with type(), see below.
+  You can choose the rounded or square type of the clock with type(), see below.
   \htmlonly <BR>  <table align=CENTER border=1 cellpadding=5 >  
   <caption align=bottom>type() FL_SQUARE_CLOCK and FL_ROUND_CLOCK </caption> <TR><TD> \endhtmlonly
   \image html clock.gif  
