@@ -3411,6 +3411,8 @@ void pianoRoll::pasteNotes( void )
 		// we only have to do the following lines if we pasted at
 		// least one note...
 		engine::getSong()->setModified();
+		m_ctrlMode = ModeDraw;
+		m_drawButton->setChecked( true );
 		update();
 		engine::getSongEditor()->update();
 	}
