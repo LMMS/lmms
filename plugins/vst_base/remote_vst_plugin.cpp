@@ -99,21 +99,12 @@ struct ERect
 
 static VstHostLanguages hlang = LanguageEnglish;
 
-enum VstThreadingModel
-{
-	TraditionalThreading,	// all GUI related code in separate thread
-	SplittedThreading,	// sound processing in separate thread
-	
-} ;
-
 
 class RemoteVstPlugin;
 
 RemoteVstPlugin * __plugin = NULL;
 
 DWORD __GuiThreadID = NULL;
-
-VstThreadingModel __threadingModel = TraditionalThreading;
 
 
 
@@ -262,8 +253,6 @@ private:
 	bool m_initialized;
 
 	pthread_mutex_t m_pluginLock;
-	pthread_mutex_t m_windowLock;
-	pthread_cond_t m_windowStatusChange;
 
 
 	float * * m_inputs;
@@ -290,8 +279,6 @@ RemoteVstPlugin::RemoteVstPlugin( key_t _shm_in, key_t _shm_out ) :
 	m_windowHeight( 0 ),
 	m_initialized( false ),
 	m_pluginLock(),
-	m_windowLock(),
-	m_windowStatusChange(),
 	m_inputs( NULL ),
 	m_outputs( NULL ),
 	m_midiEvents(),
@@ -299,8 +286,19 @@ RemoteVstPlugin::RemoteVstPlugin( key_t _shm_in, key_t _shm_out ) :
 	m_currentSamplePos( 0 )
 {
 	pthread_mutex_init( &m_pluginLock, NULL );
-	pthread_mutex_init( &m_windowLock, NULL );
-	pthread_cond_init( &m_windowStatusChange, NULL );
+
+	__plugin = this;
+
+	// process until we have loaded the plugin
+	while( 1 )
+        {
+		message m = receiveMessage();
+		processMessage( m );
+		if( m.id == IdVstLoadPlugin || m.id == IdQuit )
+		{
+			break;
+		}
+	}
 }
 
 
@@ -310,18 +308,6 @@ RemoteVstPlugin::~RemoteVstPlugin()
 {
 	if( m_window != NULL )
 	{
-		if( __threadingModel == TraditionalThreading )
-		{
-			// notify GUI-thread
-			if( !PostThreadMessage( __GuiThreadID, WM_USER,
-							ClosePlugin, 0 ) )
-			{
-				//lvsMessage( "could not post message to gui thread" );
-			}
-			pthread_mutex_lock( &m_windowLock );
-			pthread_cond_wait( &m_windowStatusChange,
-							&m_windowLock );
-		}
 		pluginDispatch( effEditClose );
 #ifdef LMMS_BUILD_LINUX
 		CloseWindow( m_window );
@@ -339,8 +325,6 @@ RemoteVstPlugin::~RemoteVstPlugin()
 	delete[] m_outputs;
 
 	pthread_mutex_destroy( &m_pluginLock );
-	pthread_mutex_destroy( &m_windowLock );
-	pthread_cond_destroy( &m_windowStatusChange );
 }
 
 
@@ -423,21 +407,7 @@ void RemoteVstPlugin::init( const std::string & _plugin_file )
 	pluginDispatch( effMainsChanged, 0, 1 );
 
 	debugMessage( "creating editor\n" );
-	if( __threadingModel == TraditionalThreading )
-	{
-		debugMessage( "creating GUI thread\n" );
-		if( !CreateThread( NULL, 0, guiEventLoop, this, 0, NULL ) )
-		{
-			debugMessage( "init(): could not create GUI thread\n" );
-			return;
-		}
-		pthread_mutex_lock( &m_windowLock );
-		pthread_cond_wait( &m_windowStatusChange, &m_windowLock );
-	}
-	else
-	{
-		initEditor();
-	}
+	initEditor();
 	debugMessage( "editor successfully created\n" );
 
 
@@ -497,7 +467,6 @@ void RemoteVstPlugin::initEditor()
 	{
 		return;
 	}
-
 
 #ifdef LMMS_BUILD_LINUX
 	m_window = CreateWindowEx( 0, "LVSL", m_shortName.c_str(),
@@ -601,33 +570,6 @@ bool RemoteVstPlugin::load( const std::string & _plugin_file )
 					 ((char *)&m_plugin->uniqueID)[0] );
 	id[4] = 0;
 	sendMessage( message( IdVstPluginUniqueID ).addString( id ) );
-
-	// switch to appropriate threading model
-	switch( m_plugin->uniqueID )
-	{
-		// some plugins require processing to happen from within
-		// another thread
-		case CCONST( 'z', '3', 't', 'a' ):	// z3ta+
-		case CCONST( 'T', 'C', '_', 'S' ):	// Cygnus
-		case CCONST( 'S', 'y', 't', 'r' ):	// Sytrus
-		case CCONST( 'P', 'R', 'V', 'X' ):	// Proteus VX
-			__threadingModel = SplittedThreading;
-			break;
-
-		default:
-			break;
-	}
-
-	// most of MDA plugins only work with SplittedThreading model
-	if( strncmp( id, "mda", 3 ) == 0 )
-	{
-		__threadingModel = SplittedThreading;
-	}
-
-	if( __threadingModel == SplittedThreading )
-	{
-		debugMessage( "switching to splitted threading model\n" );
-	}
 
 	pluginDispatch( effOpen );
 
@@ -1267,15 +1209,10 @@ DWORD WINAPI RemoteVstPlugin::processingThread( LPVOID _param )
 	remotePluginClient::message m;
 	while( ( m = _this->receiveMessage() ).id != IdQuit )
         {
-		VstThreadingModel oldModel = __threadingModel;
-//#ifndef LMMS_BUILD_LINUX
-		if( __threadingModel == TraditionalThreading ||
-					m.id == IdStartProcessing )
-//#endif
+		if( m.id == IdStartProcessing )
 		{
 			_this->processMessage( m );
 		}
-//#ifndef LMMS_BUILD_LINUX
 		else
 		{
 			PostThreadMessage( __GuiThreadID,
@@ -1283,16 +1220,10 @@ DWORD WINAPI RemoteVstPlugin::processingThread( LPVOID _param )
 					ProcessPluginMessage,
 					(LPARAM) new message( m ) );
 		}
-//#endif
-
-		// did we load plugin and recognized a plugin which requires
-		// a different threading model?
-		if( m.id == IdVstLoadPlugin || __threadingModel != oldModel )
-		{
-			// then get out of here
-			return 0;
-		}
 	}
+
+	// notify GUI thread about shutdown
+	PostThreadMessage( __GuiThreadID, WM_USER, ClosePlugin, 0 );
 
 	return 0;
 }
@@ -1303,7 +1234,6 @@ DWORD WINAPI RemoteVstPlugin::processingThread( LPVOID _param )
 DWORD WINAPI RemoteVstPlugin::guiEventLoop( LPVOID _param )
 {
 	RemoteVstPlugin * _this = static_cast<RemoteVstPlugin *>( _param );
-	__GuiThreadID = GetCurrentThreadId();
 
 	HMODULE hInst = GetModuleHandle( NULL );
 	if( hInst == NULL )
@@ -1312,13 +1242,6 @@ DWORD WINAPI RemoteVstPlugin::guiEventLoop( LPVOID _param )
 							"module handle\n" );
 		return -1;
 	}
-
-	if( __threadingModel == TraditionalThreading )
-	{
-		_this->initEditor();
-		pthread_cond_signal( &_this->m_windowStatusChange );
-	}
-
 
 	HWND timerWindow = CreateWindowEx( 0, "LVSL", "dummy",
 						0, 0, 0, 0, 0, NULL, NULL,
@@ -1365,11 +1288,6 @@ DWORD WINAPI RemoteVstPlugin::guiEventLoop( LPVOID _param )
 		}
 	}
 
-	if( __threadingModel == TraditionalThreading )
-	{
-		pthread_cond_signal( &_this->m_windowStatusChange );
-	}
-
 	return 0;
 }
 
@@ -1400,31 +1318,21 @@ int main( int _argc, char * * _argv )
 #endif
 #endif
 
+	// constructor automatically will process messages until it receives
+	// a IdVstLoadPlugin message and processes it
 	__plugin = new RemoteVstPlugin( atoi( _argv[1] ), atoi( _argv[2] ) );
-
-	// process until we have loaded the plugin
-	RemoteVstPlugin::processingThread( __plugin );
 
 	if( __plugin->isInitialized() )
 	{
-		if( __threadingModel == TraditionalThreading )
-		{
-			RemoteVstPlugin::processingThread( __plugin );
-		}
-		else
-		{
-			__GuiThreadID = GetCurrentThreadId();
-
-			if( CreateThread( NULL, 0,
-					RemoteVstPlugin::processingThread,
+		__GuiThreadID = GetCurrentThreadId();
+		if( CreateThread( NULL, 0, RemoteVstPlugin::processingThread,
 						__plugin, 0, NULL ) == NULL )
-			{
-				__plugin->debugMessage( "could not create "
+		{
+			__plugin->debugMessage( "could not create "
 							"processingThread\n" );
-				return -1;
-			}
-			RemoteVstPlugin::guiEventLoop( __plugin );
+			return -1;
 		}
+		RemoteVstPlugin::guiEventLoop( __plugin );
 	}
 
 
