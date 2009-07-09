@@ -268,7 +268,7 @@ private:
 	float * * m_inputs;
 	float * * m_outputs;
 
-	typedef std::vector<VstMidiEventList> VstMidiEventList;
+	typedef std::vector<VstMidiEvent> VstMidiEventList;
 	VstMidiEventList m_midiEvents;
 
 	bpm_t m_bpm;
