@@ -268,7 +268,8 @@ private:
 	float * * m_inputs;
 	float * * m_outputs;
 
-	std::vector<VstMidiEvent> m_midiEvents;
+	typedef std::vector<VstMidiEventList> VstMidiEventList;
+	VstMidiEventList m_midiEvents;
 
 	bpm_t m_bpm;
 	double m_currentSamplePos;
@@ -607,8 +608,7 @@ void RemoteVstPlugin::process( const sampleFrame * _in, sampleFrame * _out )
 		events->reserved = 0;
 		events->numEvents = m_midiEvents.size();
 		int idx = 0;
-		for( std::vector<VstMidiEvent>::iterator it =
-							m_midiEvents.begin();
+		for( VstMidiEventList::iterator it = m_midiEvents.begin();
 					it != m_midiEvents.end(); ++it, ++idx )
 		{
 			memcpy( &vme[idx], &*it, sizeof( VstMidiEvent ) );
