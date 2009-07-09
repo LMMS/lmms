@@ -369,11 +369,12 @@ void instrumentTrack::processOutEvent( const midiEvent & _me,
 				if( m_runningMidiNotes[k] > 0 )
 				{
 					m_instrument->handleMidiEvent(
-	midiEvent( MidiNoteOff, getMidiPort()->outputChannel(), k, 0 ), _time );
+	midiEvent( MidiNoteOff, getMidiPort()->realOutputChannel(), k, 0 ),
+									_time );
 				}
 				++m_runningMidiNotes[k];
 				m_instrument->handleMidiEvent(
-	midiEvent( MidiNoteOn, getMidiPort()->outputChannel(), k,
+	midiEvent( MidiNoteOn, getMidiPort()->realOutputChannel(), k,
 						_me.velocity() ), _time );
 			}
 			break;
@@ -389,7 +390,8 @@ void instrumentTrack::processOutEvent( const midiEvent & _me,
 						--m_runningMidiNotes[k] <= 0 )
 			{
 				m_instrument->handleMidiEvent(
-	midiEvent( MidiNoteOff, getMidiPort()->outputChannel(), k, 0 ), _time );
+	midiEvent( MidiNoteOff, getMidiPort()->realOutputChannel(), k, 0 ),
+									_time );
 			}
 			break;
 
@@ -542,7 +544,7 @@ void instrumentTrack::updatePitch( void )
 {
 	updateBaseNote();
 	processOutEvent( midiEvent( MidiPitchBend,
-					getMidiPort()->outputChannel(),
+					getMidiPort()->realOutputChannel(),
 					midiPitch() ), 0 );
 }
 

@@ -1,5 +1,3 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * note_play_handle.cpp - implementation of class notePlayHandle, part of
  *                        rendering engine
@@ -106,7 +104,7 @@ notePlayHandle::notePlayHandle( instrumentTrack * _it,
 	{
 		// send MIDI-note-on-event
 		m_instrumentTrack->processOutEvent( midiEvent( MidiNoteOn,
-			m_instrumentTrack->getMidiPort()->outputChannel(),
+			m_instrumentTrack->getMidiPort()->realOutputChannel(),
 			key(), getMidiVelocity() ),
 				midiTime::fromFrames( offset(),
 						engine::framesPerTick() ) );
@@ -153,7 +151,7 @@ void notePlayHandle::setVolume( const volume_t _volume )
 {
 	note::setVolume( _volume );
 	m_instrumentTrack->processOutEvent( midiEvent( MidiKeyPressure,
-			m_instrumentTrack->getMidiPort()->outputChannel(),
+			m_instrumentTrack->getMidiPort()->realOutputChannel(),
 						key(), getMidiVelocity() ), 0 );
 	
 }
@@ -331,7 +329,7 @@ void notePlayHandle::noteOff( const f_cnt_t _s )
 	{
 		// send MIDI-note-off-event
 		m_instrumentTrack->processOutEvent( midiEvent( MidiNoteOff,
-			m_instrumentTrack->getMidiPort()->outputChannel(),
+			m_instrumentTrack->getMidiPort()->realOutputChannel(),
 								key(), 0 ),
 			midiTime::fromFrames( m_framesBeforeRelease,
 						engine::framesPerTick() ) );
@@ -518,6 +516,3 @@ void notePlayHandle::resize( const bpm_t _new_tempo )
 }
 
 
-
-
-#endif

@@ -81,23 +81,27 @@ public:
 
 	void setName( const QString & _name );
 
-	inline Modes mode( void ) const
+	inline Modes mode() const
 	{
-		return( m_mode );
+		return m_mode;
 	}
 
 	void setMode( Modes _mode );
 
-	inline bool inputEnabled( void ) const
+	inline bool inputEnabled() const
 	{
-		return( mode() == Input || mode() == Duplex );
+		return mode() == Input || mode() == Duplex;
 	}
 
-	inline bool outputEnabled( void ) const
+	inline bool outputEnabled() const
 	{
-		return( mode() == Output || mode() == Duplex );
+		return mode() == Output || mode() == Duplex;
 	}
 
+	inline int realOutputChannel() const
+	{
+		return outputChannel() - 1;
+	}
 
 	void processInEvent( const midiEvent & _me, const midiTime & _time );
 	void processOutEvent( const midiEvent & _me, const midiTime & _time );
@@ -106,9 +110,9 @@ public:
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
 	virtual void loadSettings( const QDomElement & _this );
 
-	virtual QString nodeName( void ) const
+	virtual QString nodeName() const
 	{
-		return( "midiport" );
+		return "midiport";
 	}
 
 	void subscribeReadablePort( const QString & _port,
@@ -116,19 +120,19 @@ public:
 	void subscribeWritablePort( const QString & _port,
 						bool _subscribe = TRUE );
 
-	const map & readablePorts( void ) const
+	const map & readablePorts() const
 	{
-		return( m_readablePorts );
+		return m_readablePorts;
 	}
 
-	const map & writablePorts( void ) const
+	const map & writablePorts() const
 	{
-		return( m_writablePorts );
+		return m_writablePorts;
 	}
 
-	void unsubscribeAllReadablePorts( void );
-	void unsubscribeAllWriteablePorts( void );
-	inline void unsubscribeAllPorts( void )
+	void unsubscribeAllReadablePorts();
+	void unsubscribeAllWriteablePorts();
+	inline void unsubscribeAllPorts()
 	{
 		unsubscribeAllReadablePorts();
 		unsubscribeAllWriteablePorts();
@@ -139,13 +143,13 @@ public:
 
 
 public slots:
-	void updateMidiPortMode( void );
+	void updateMidiPortMode();
 
 
 private slots:
-	void updateReadablePorts( void );
-	void updateWritablePorts( void );
-	void updateOutputProgram( void );
+	void updateReadablePorts();
+	void updateWritablePorts();
+	void updateOutputProgram();
 
 
 private:
@@ -173,9 +177,9 @@ private:
 
 
 signals:
-	void readablePortsChanged( void );
-	void writablePortsChanged( void );
-	void modeChanged( void );
+	void readablePortsChanged();
+	void writablePortsChanged();
+	void modeChanged();
 
 
 } ;
