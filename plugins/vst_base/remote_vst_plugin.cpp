@@ -1219,7 +1219,7 @@ DWORD WINAPI RemoteVstPlugin::processingThread( LPVOID _param )
 	remotePluginClient::message m;
 	while( ( m = _this->receiveMessage() ).id != IdQuit )
         {
-		if( m.id == IdStartProcessing )
+		if( m.id == IdStartProcessing || m.id == IdMidiEvent )
 		{
 			_this->processMessage( m );
 		}
