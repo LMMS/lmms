@@ -204,6 +204,16 @@ public:
 	// has to be called as soon as input- or output-count changes
 	void updateInOutCount();
 
+	inline void lock()
+	{
+		pthread_mutex_lock( &m_pluginLock );
+	}
+
+	inline void unlock()
+	{
+		pthread_mutex_unlock( &m_pluginLock );
+	}
+
 	static DWORD WINAPI processingThread( LPVOID _param );
 	static DWORD WINAPI guiEventLoop( LPVOID _param );
 
@@ -230,13 +240,13 @@ private:
 					void * p = NULL, float f = 0 )
 	{
 		int ret = 0;
-		pthread_mutex_lock( &m_pluginLock );
+		lock();
 		if( m_plugin )
 		{
 			ret = m_plugin->dispatcher( m_plugin, cmd, param1,
 							param2, p, f );
 		}
-		pthread_mutex_unlock( &m_pluginLock );
+		unlock();
 		return ret;
 	}
 
