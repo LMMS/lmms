@@ -152,7 +152,7 @@ void midiPort::processInEvent( const midiEvent & _me, const midiTime & _time )
 void midiPort::processOutEvent( const midiEvent & _me, const midiTime & _time )
 {
 	// mask event
-	if( outputEnabled() && outputChannel() == _me.m_channel )
+	if( outputEnabled() && realOutputChannel() == _me.m_channel )
 	{
 		midiEvent ev = _me;
 		// we use/display MIDI channels 1...16 but we need 0...15 for
@@ -406,7 +406,7 @@ void midiPort::updateWritablePorts( void )
 void midiPort::updateOutputProgram( void )
 {
 	processOutEvent( midiEvent( MidiProgramChange,
-					outputChannel(),
+					realOutputChannel(),
 					outputProgram()-1 ), midiTime( 0 ) );
 }
 
