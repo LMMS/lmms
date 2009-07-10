@@ -1244,7 +1244,8 @@ void patternView::paintEvent( QPaintEvent * )
 		QPixmap stepoverlay;
 		QPixmap stepoff;
 		QPixmap stepoffl;
-		const int steps = m_pat->length() / DefaultBeatsPerTact;
+		const int steps = qMax( 1,
+					m_pat->length() / DefaultBeatsPerTact );
 		const int w = width() - 2 * TCO_BORDER_WIDTH;
 		stepon = s_stepBtnOn->scaled( w / steps,
 					      s_stepBtnOn->height(),

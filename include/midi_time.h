@@ -135,7 +135,7 @@ public:
 
 	static int stepsPerTact( void )
 	{
-		return ticksPerTact() / DefaultBeatsPerTact;
+		return qMax( 1, ticksPerTact() / DefaultBeatsPerTact );
 	}
 
 	static void setTicksPerTact( tick_t _tpt )
