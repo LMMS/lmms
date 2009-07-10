@@ -109,7 +109,8 @@ mainWindow::mainWindow( void ) :
 	side_bar->appendTab( new pluginBrowser( splitter ), ++id );
 
 	// add a resource browser to sidebar
-	side_bar->appendTab( new ResourceBrowser( splitter ), ++id );
+	m_resourceBrowser = new ResourceBrowser( splitter );
+	side_bar->appendTab( m_resourceBrowser, ++id );
 
 
 	m_workspace = new QMdiArea( splitter );
@@ -195,6 +196,9 @@ mainWindow::~mainWindow()
 		delete *it;
 		delete m;
 	}
+
+	delete m_resourceBrowser;
+
 	// TODO: Close tools
 	// destroy engine which will do further cleanups etc.
 	engine::destroy();

@@ -1,7 +1,7 @@
 /*
  * main_window.h - declaration of class mainWindow, the main window of LMMS
  *
- * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -39,6 +39,7 @@ class QMdiArea;
 class QCheckBox;
 class QRadioButton;
 
+class ResourceBrowser;
 class lcdSpinBox;
 class meterDialog;
 class automatableSlider;
@@ -200,6 +201,7 @@ private:
 
 	QBasicTimer m_updateTimer;
 
+	ResourceBrowser * m_resourceBrowser;
 
 	friend class engine;
 
