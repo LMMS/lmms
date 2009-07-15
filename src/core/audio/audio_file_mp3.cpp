@@ -149,7 +149,7 @@ bool AudioFileMp3::startEncoding( void )
 
 
 short int AudioFileMp3::rescale(float sample) {
-    return (qMin<float>(sample, 1) / 1) * std::numeric_limits<short int>::max();
+    return (qMax<float>(qMin<float>(sample, 1), -1) / 1) * std::numeric_limits<short int>::max();
 }
 
 // encode data and write to file
