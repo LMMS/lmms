@@ -56,6 +56,8 @@ Andrew Kelley's todo:
   play the sample
 * select the output file format based on what you selected in file->save as
 * ability to read mp3 samples
+* load asdlol.mmpz. if you render it without playing it, or if you play it
+  the first time, you hear unwanted artifacts.
 
 
 - automation recording:

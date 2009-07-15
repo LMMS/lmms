@@ -24,12 +24,9 @@
  *
  */
 
-#include <QtGui/QMessageBox>
-
-#include "lame.h"
+#include "lame_library.h"
 #include "audio_file_mp3.h"
 
-#include <cstring>
 #include <limits>
 using namespace std;
 
@@ -38,134 +35,18 @@ using namespace std;
 
 
 AudioFileMp3::AudioFileMp3( const sample_rate_t _sample_rate,
-				const ch_cnt_t _channels, bool & _success_ful,
-				const QString & _file,
-				const bool _use_vbr,
-				const bitrate_t _nom_bitrate,
-				const bitrate_t _min_bitrate,
-				const bitrate_t _max_bitrate,
-				const int _depth,
-				mixer * _mixer ) :
-	audioFileDevice( _sample_rate, _channels, _file, _use_vbr,
-			_nom_bitrate, _min_bitrate, _max_bitrate,
-								_depth, _mixer ),
+    const ch_cnt_t _channels, bool & _success_ful, const QString & _file,
+    const bool _use_vbr, const bitrate_t _nom_bitrate,
+    const bitrate_t _min_bitrate, const bitrate_t _max_bitrate,
+    const int _depth, mixer * _mixer ) :
+	audioFileDevice( _sample_rate, _channels, _file, _use_vbr, _nom_bitrate,
+        _min_bitrate, _max_bitrate, _depth, _mixer ),
     m_lgf( NULL ),
-    m_lame( NULL ),
+    m_lame( LameLibrary() ),
     m_outfile( NULL ),
     m_hq_mode( false )
 {
-    // connect to lame
-    m_ok = initLame(configManager::inst()->lameLibrary());
-	m_ok = _success_ful = m_ok && startEncoding();
-    
-    if( ! m_ok )
-    {
-        // pop an informative message box
-        QMessageBox::information( NULL, QObject::tr( "Unable to load LAME" ),
-            QObject::tr( "LMMS was unable to load Lame MP3 encoder. "
-                "Please make sure "
-                "you have Lame installed and then check your folder settings " 
-                "and make sure you tell LMMS where libmp3lame.so.0 is." ),
-            QMessageBox::Ok | QMessageBox::Default );
-    }
-}
-
-
-bool AudioFileMp3::initLame(QString libpath)
-{
-    // dynamically load the .so file
-    m_lame = new QLibrary(libpath);
-
-    if( ! m_lame->load() ) return false;
-
-    // grab the functions and stuff we need
-    lame_init = (lame_init_t *)
-      m_lame->resolve("lame_init");
-    get_lame_version = (get_lame_version_t *)
-      m_lame->resolve("get_lame_version");
-    lame_init_params = (lame_init_params_t *)
-      m_lame->resolve("lame_init_params");
-    lame_encode_buffer = (lame_encode_buffer_t *)
-      m_lame->resolve("lame_encode_buffer");
-    lame_encode_buffer_interleaved = (lame_encode_buffer_interleaved_t *)
-      m_lame->resolve("lame_encode_buffer_interleaved");
-    lame_encode_flush = (lame_encode_flush_t *)
-      m_lame->resolve("lame_encode_flush");
-    lame_close = (lame_close_t *)
-      m_lame->resolve("lame_close");
-
-    lame_set_in_samplerate = (lame_set_in_samplerate_t *)
-       m_lame->resolve("lame_set_in_samplerate");
-    lame_set_out_samplerate = (lame_set_out_samplerate_t *)
-       m_lame->resolve("lame_set_out_samplerate");
-    lame_set_num_channels = (lame_set_num_channels_t *)
-       m_lame->resolve("lame_set_num_channels");
-    lame_set_quality = (lame_set_quality_t *)
-       m_lame->resolve("lame_set_quality");
-    lame_set_brate = (lame_set_brate_t *)
-       m_lame->resolve("lame_set_brate");
-    lame_set_VBR = (lame_set_VBR_t *)
-       m_lame->resolve("lame_set_VBR");
-    lame_set_VBR_q = (lame_set_VBR_q_t *)
-       m_lame->resolve("lame_set_VBR_q");
-    lame_set_VBR_min_bitrate_kbps = (lame_set_VBR_min_bitrate_kbps_t *)
-       m_lame->resolve("lame_set_VBR_min_bitrate_kbps");
-    lame_set_mode = (lame_set_mode_t *) 
-       m_lame->resolve("lame_set_mode");
-    lame_set_preset = (lame_set_preset_t *)
-       m_lame->resolve("lame_set_preset");
-    lame_set_error_protection = (lame_set_error_protection_t *)
-       m_lame->resolve("lame_set_error_protection");
-    lame_set_disable_reservoir = (lame_set_disable_reservoir_t *)
-       m_lame->resolve("lame_set_disable_reservoir");
-    lame_set_padding_type = (lame_set_padding_type_t *)
-       m_lame->resolve("lame_set_padding_type");
-    lame_set_bWriteVbrTag = (lame_set_bWriteVbrTag_t *)
-       m_lame->resolve("lame_set_bWriteVbrTag");
-
-    lame_set_findReplayGain = (lame_set_findReplayGain_t *) 
-        m_lame->resolve("lame_set_findReplayGain");
-    lame_set_VBR_quality = (lame_set_VBR_quality_t *)
-        m_lame->resolve("lame_set_VBR_quality");
-    lame_set_VBR_mean_bitrate_kbps = (lame_set_VBR_mean_bitrate_kbps_t *)
-        m_lame->resolve("lame_set_VBR_mean_bitrate_kbps");
-    lame_set_VBR_max_bitrate_kbps = (lame_set_VBR_max_bitrate_kbps_t *)
-        m_lame->resolve("lame_set_VBR_max_bitrate_kbps");
-
-    // These are optional
-    lame_get_lametag_frame = (lame_get_lametag_frame_t *)
-       m_lame->resolve("lame_get_lametag_frame");
-    lame_mp3_tags_fid = (lame_mp3_tags_fid_t *)
-       m_lame->resolve("lame_mp3_tags_fid");
-
-    if (!lame_init ||
-        !get_lame_version ||
-        !lame_init_params ||
-        !lame_encode_buffer ||
-        !lame_encode_buffer_interleaved ||
-        !lame_encode_flush ||
-        !lame_close ||
-        !lame_set_in_samplerate ||
-        !lame_set_out_samplerate ||
-        !lame_set_num_channels ||
-        !lame_set_quality ||
-        !lame_set_brate ||
-        !lame_set_VBR ||
-        !lame_set_VBR_q ||
-        !lame_set_mode ||
-        !lame_set_preset ||
-        !lame_set_error_protection ||
-        !lame_set_disable_reservoir ||
-        !lame_set_padding_type ||
-        !lame_set_bWriteVbrTag)
-    {
-        // some symbols are missing
-        printf("AudioFileMp3: some symbols are missing from the lame library\n");
-        m_lame->unload();
-        return false;
-    }
-
-    return true;
+	_success_ful = m_lame.isLoaded() && startEncoding();
 }
 
 
@@ -173,15 +54,6 @@ bool AudioFileMp3::initLame(QString libpath)
 AudioFileMp3::~AudioFileMp3()
 {
 	finishEncoding();
-
-    if( m_lame )
-    {
-        if( m_lame->isLoaded() )
-            m_lame->unload();   
-
-        delete m_lame;
-        m_lame = NULL;
-    }
 
     if( m_outfile )
     {
@@ -200,7 +72,7 @@ void AudioFileMp3::finishEncoding( void )
         // flush
         int bufSize = 7200;
         unsigned char * out = new unsigned char[bufSize];
-        int rc = lame_encode_flush(m_lgf, out, bufSize);
+        int rc = m_lame.lame_encode_flush(m_lgf, out, bufSize);
 
         if( m_outfile && m_outfile->isOpen() ){
             m_outfile->write( (const char *) out, rc );
@@ -214,7 +86,7 @@ void AudioFileMp3::finishEncoding( void )
         delete[] out;
 
         // close any open handles we may have
-        lame_close(m_lgf);
+        m_lame.lame_close(m_lgf);
         m_lgf = NULL;
     }
 }
@@ -223,7 +95,7 @@ void AudioFileMp3::finishEncoding( void )
 bool AudioFileMp3::startEncoding( void )
 {
     // open any handles, files, etc
-    m_lgf = lame_init();
+    m_lgf = m_lame.lame_init();
     if( m_lgf == NULL ){
         printf("AudioFileMp3: Unable to initialize lame\n");
         return false;
@@ -232,32 +104,32 @@ bool AudioFileMp3::startEncoding( void )
     if( channels() > 2 )
         printf("I don't think lame can do more than 2 channels\n");
 
-    lame_set_in_samplerate(m_lgf, sampleRate() );
-    lame_set_num_channels(m_lgf, channels() );
+    m_lame.lame_set_in_samplerate(m_lgf, sampleRate() );
+    m_lame.lame_set_num_channels(m_lgf, channels() );
 
     if( m_hq_mode )
-        lame_set_quality(m_lgf, 0); // best, very slow
+        m_lame.lame_set_quality(m_lgf, 0); // best, very slow
     else
-        lame_set_quality(m_lgf, 2); // near-best, not too slow
+        m_lame.lame_set_quality(m_lgf, 2); // near-best, not too slow
     
-    lame_set_mode(m_lgf, STEREO); 
-    lame_set_findReplayGain(m_lgf, 1); // perform ReplayGain analysis
+    m_lame.lame_set_mode(m_lgf, STEREO); 
+    m_lame.lame_set_findReplayGain(m_lgf, 1); // perform ReplayGain analysis
 
 	if( useVBR() == 0 )
     {
-        lame_set_VBR(m_lgf, vbr_off);
-        lame_set_brate(m_lgf, nominalBitrate() );
+        m_lame.lame_set_VBR(m_lgf, vbr_off);
+        m_lame.lame_set_brate(m_lgf, nominalBitrate() );
     }
     else
     {
-        lame_set_VBR(m_lgf, vbr_abr);
-        lame_set_VBR_quality(m_lgf, 2);
-        lame_set_VBR_mean_bitrate_kbps(m_lgf, nominalBitrate() );
-        lame_set_VBR_min_bitrate_kbps(m_lgf, minBitrate() );
-        lame_set_VBR_max_bitrate_kbps(m_lgf, maxBitrate() );
+        m_lame.lame_set_VBR(m_lgf, vbr_abr);
+        m_lame.lame_set_VBR_quality(m_lgf, 2);
+        m_lame.lame_set_VBR_mean_bitrate_kbps(m_lgf, nominalBitrate() );
+        m_lame.lame_set_VBR_min_bitrate_kbps(m_lgf, minBitrate() );
+        m_lame.lame_set_VBR_max_bitrate_kbps(m_lgf, maxBitrate() );
     }
 
-    if( lame_init_params( m_lgf ) < 0 )
+    if( m_lame.lame_init_params( m_lgf ) < 0 )
         return false;
 
     // open the file
@@ -269,6 +141,7 @@ bool AudioFileMp3::startEncoding( void )
     }
 
     // write the headers and such
+    // TODO: add a comment "created with LMMS"
 
     return true;
 
@@ -295,7 +168,8 @@ void AudioFileMp3::writeBuffer( const surroundSampleFrame * _ab,
         in[i*2+1] = rescale( _ab[i][1] );
     }
 
-    int rc = lame_encode_buffer_interleaved( m_lgf, in, _frames, out, bufSize);
+    int rc = m_lame.lame_encode_buffer_interleaved( m_lgf, in, _frames, 
+        out, bufSize);
 
     switch(rc){
         case -1:
