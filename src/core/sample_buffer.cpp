@@ -193,27 +193,26 @@ void sampleBuffer::update( bool _keep_settings )
 								"than 100 MB" );
 		}
 		else
-		{
-
-		if( m_frames == 0 )
-		{
-			m_frames = decodeSampleSF( f, buf, channels,
-								samplerate );
-		}
+        {
+            if( m_frames == 0 )
+            {
+                m_frames = decodeSampleSF( f, buf, channels,
+                                    samplerate );
+            }
 #ifdef LMMS_HAVE_OGGVORBIS
-		if( m_frames == 0 )
-		{
-			m_frames = decodeSampleOGGVorbis( f, buf, channels,
-								samplerate );
-		}
+            if( m_frames == 0 )
+            {
+                m_frames = decodeSampleOGGVorbis( f, buf, channels,
+                                    samplerate );
+            }
 #endif
-		if( m_frames == 0 )
-		{
-			m_frames = decodeSampleDS( f, buf, channels,
-								samplerate );
-		}
+            if( m_frames == 0 )
+            {
+                m_frames = decodeSampleDS( f, buf, channels,
+                                    samplerate );
+            }
 
-		delete[] f;
+            delete[] f;
 		}
 
 		if( m_frames > 0 && buf != NULL )
@@ -263,6 +262,17 @@ void sampleBuffer::update( bool _keep_settings )
 			m_frames = 1;
 			m_loopStartFrame = m_startFrame = 0;
 			m_loopEndFrame = m_endFrame = 1;
+
+            QString decoders = tr( "wav, ogg, mp3" );
+            QMessageBox::information( NULL, 
+                QObject::tr( "Unrecognized audio format" ),
+                QObject::tr( "None of the available audio decoders "
+                    "recognized the format you are trying to load. Try "
+                    "converting the file to a format LMMS understands.\n\n"
+                    "Your file: %1\n"
+                    "Available decoders: %2\n").arg( file, decoders ),
+                QMessageBox::Ok | QMessageBox::Default );
+
 		}
 	}
 	else
