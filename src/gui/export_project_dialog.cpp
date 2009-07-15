@@ -126,7 +126,6 @@ void exportProjectDialog::startBtnClicked( void )
 	startButton->setEnabled( FALSE );
 	progressBar->setEnabled( TRUE );
 
-	updateTitleBar( 0 );
 
 	mixer::qualitySettings qs = mixer::qualitySettings(
 		static_cast<mixer::qualitySettings::Interpolation>(
@@ -146,6 +145,7 @@ void exportProjectDialog::startBtnClicked( void )
 	m_renderer = new projectRenderer( qs, os, ft, m_fileName );
 	if( m_renderer->isReady() )
 	{
+        updateTitleBar( 0 );
 		connect( m_renderer, SIGNAL( progressChanged( int ) ),
 				progressBar, SLOT( setValue( int ) ) );
 		connect( m_renderer, SIGNAL( progressChanged( int ) ),

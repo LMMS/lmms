@@ -72,7 +72,8 @@ configManager::configManager( void ) :
 #endif
 	m_vstDir( m_workingDir + "vst" + QDir::separator() ),
 	m_flDir( QDir::home().absolutePath() ),
-	m_defaultSoundfont( NULL )
+	m_defaultSoundfont( NULL ),
+    m_lameLibrary( defaultLameLibrary() )
 {
 }
 
@@ -156,6 +157,10 @@ void configManager::setBackgroundArtwork( const QString & _ba )
 }
 
 
+void configManager::setLameLibrary( const QString & _ll )
+{
+	m_lameLibrary = _ll;
+}
 
 
 void configManager::addRecentlyOpenedProject( const QString & _file )
@@ -300,6 +305,11 @@ void configManager::loadConfigFile( void )
 							"defaultsf2" ) ) );*/
 		#endif
 			setBackgroundArtwork( value( "paths", "backgroundartwork" ) );
+
+            // lame library
+            QString configLameLibrary = value( "paths", "lamelibrary" );
+            if( configLameLibrary != "" )
+                setLameLibrary( configLameLibrary );
 		}
 		cfg_file.close();
 	}
@@ -379,6 +389,7 @@ void configManager::saveConfigFile( void )
 				m_defaultSoundfont->hash() : QString() );
 #endif
 	setValue( "paths", "backgroundartwork", m_backgroundArtwork );
+	setValue( "paths", "lamelibrary", m_lameLibrary );
 
 	QDomDocument doc( "lmms-config-file" );
 

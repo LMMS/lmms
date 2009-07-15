@@ -116,6 +116,7 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 	m_stkDir( configManager::inst()->stkDir() ),
 #endif
 	m_backgroundArtwork( configManager::inst()->backgroundArtwork() ),
+	m_lameLibrary( configManager::inst()->lameLibrary() ),
 	m_disableChActInd( configManager::inst()->value( "ui",
 				"disablechannelactivityindicators" ).toInt() ),
 	m_manualChPiano( configManager::inst()->value( "ui",
@@ -417,14 +418,29 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 	connect( m_sfLineEdit, SIGNAL( textChanged( const QString & ) ), this,
 		 		SLOT( setDefaultSoundfont( const QString & ) ) );
 
-	QPushButton * sf_select_btn = new QPushButton(
-				embed::getIconPixmap( "project_open", 16, 16 ),
-								"", sf_tw );
+	QPushButton * sf_select_btn = new QPushButton( embed::getIconPixmap( 
+        "project_open", 16, 16 ), "", sf_tw );
 	sf_select_btn->setFixedSize( 24, 24 );
 	sf_select_btn->move( 320, 16 );
 	connect( sf_select_btn, SIGNAL( clicked() ), this,
-				 		SLOT( openDefaultSoundfont() ) );
+        SLOT( openDefaultSoundfont() ) );
 #endif	
+    // Lame library
+    tabWidget * ll_tw = new tabWidget( tr("Lame MP3 Library").toUpper(), paths);
+    ll_tw->setFixedHeight(48);
+
+    printf("m_lameLibrary: %s\n", m_lameLibrary.toStdString().c_str());
+    m_llLineEdit = new QLineEdit( m_lameLibrary, ll_tw );
+    m_llLineEdit->setGeometry( 10, 20, 300, 16);
+    connect( m_llLineEdit, SIGNAL( textChanged( const QString & ) ), this,
+        SLOT( setLameLibrary( const QString & ) ) );
+
+    QPushButton * ll_select_btn = new QPushButton( embed::getIconPixmap(
+        "project_open", 16, 16 ), "", ll_tw );
+	ll_select_btn->setFixedSize( 24, 24 );
+	ll_select_btn->move( 320, 16 );
+    connect( ll_select_btn, SIGNAL( clicked() ), this, SLOT(
+        openLameLibrary() ) );
 
 
 	dir_layout->addWidget( lmms_wd_tw );
@@ -446,6 +462,9 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 	dir_layout->addSpacing( 10 );
 	dir_layout->addWidget( sf_tw );
 #endif	
+    dir_layout->addSpacing( 10 );
+    dir_layout->addWidget( ll_tw );
+
 	dir_layout->addStretch();
 
 
@@ -913,6 +932,7 @@ void setupDialog::accept( void )
 	configManager::inst()->setSTKDir( m_stkDir );
 #endif	
 	configManager::inst()->setBackgroundArtwork( m_backgroundArtwork );
+	configManager::inst()->setLameLibrary( m_lameLibrary );
 
 	// tell all audio-settings-widget to save their settings
 	for( aswMap::iterator it = m_audioIfaceSetupWidgets.begin();
@@ -1203,6 +1223,16 @@ void setupDialog::openDefaultSoundfont( void )
 }
 
 
+void setupDialog::openLameLibrary( void )
+{
+    QString new_file = QFileDialog::getOpenFileName( this,
+        tr( "Find LAME Library" ), m_lameLibrary, "libmp3lame.so.0" );
+	
+	if( new_file != QString::null )
+	{
+		m_llLineEdit->setText( new_file );
+	}
+}
 
 
 void setupDialog::openBackgroundArtwork( void )
@@ -1272,7 +1302,6 @@ void setupDialog::setDefaultSoundfont( const QString & _sf )
 
 
 
-
 void setupDialog::setBackgroundArtwork( const QString & _ba )
 {
 #ifdef LMMS_HAVE_FLUIDSYNTH
@@ -1280,6 +1309,12 @@ void setupDialog::setBackgroundArtwork( const QString & _ba )
 #endif
 }
 
+
+
+void setupDialog::setLameLibrary( const QString & _ll )
+{
+	m_lameLibrary = _ll;
+}
 
 
 

@@ -24,6 +24,8 @@
  *
  */
 
+#include <QtGui/QMessageBox>
+
 #include "lame.h"
 #include "audio_file_mp3.h"
 
@@ -31,6 +33,8 @@
 #include <limits>
 using namespace std;
 
+
+#include "config_mgr.h"
 
 
 AudioFileMp3::AudioFileMp3( const sample_rate_t _sample_rate,
@@ -51,8 +55,19 @@ AudioFileMp3::AudioFileMp3( const sample_rate_t _sample_rate,
     m_hq_mode( false )
 {
     // connect to lame
-    m_ok = initLame("/usr/lib/libmp3lame.so.0");
+    m_ok = initLame(configManager::inst()->lameLibrary());
 	m_ok = _success_ful = m_ok && startEncoding();
+    
+    if( ! m_ok )
+    {
+        // pop an informative message box
+        QMessageBox::information( NULL, QObject::tr( "Unable to load LAME" ),
+            QObject::tr( "LMMS was unable to load Lame MP3 encoder. "
+                "Please make sure "
+                "you have Lame installed and then check your folder settings " 
+                "and make sure you tell LMMS where libmp3lame.so.0 is." ),
+            QMessageBox::Ok | QMessageBox::Default );
+    }
 }
 
 

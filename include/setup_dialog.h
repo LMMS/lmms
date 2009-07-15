@@ -88,6 +88,7 @@ private slots:
 	void setSTKDir( const QString & _sd );
 	void setDefaultSoundfont( const QString & _sf );
 	void setBackgroundArtwork( const QString & _ba );
+	void setLameLibrary( const QString & _ll );
 	
 	// audio settings widget
 	void audioInterfaceChanged( const QString & _driver );
@@ -112,6 +113,7 @@ private slots:
 	void openSTKDir( void );
 	void openDefaultSoundfont( void );
 	void openBackgroundArtwork( void );
+	void openLameLibrary( void );
 
 	void toggleDisableChActInd( bool _disabled );
 	void toggleManualChPiano( bool _enabled );
@@ -152,6 +154,7 @@ private:
 	QLineEdit * m_stkLineEdit;
 #endif
 	QLineEdit * m_baLineEdit;
+    QLineEdit * m_llLineEdit;
 
 	QString m_workingDir;
 	QString m_vstDir;
@@ -165,6 +168,7 @@ private:
 	QString m_stkDir;
 #endif
 	QString m_backgroundArtwork;
+	QString m_lameLibrary;
 
 	bool m_disableChActInd;
 	bool m_manualChPiano;

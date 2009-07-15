@@ -102,6 +102,12 @@ public:
 		return m_dataDir + DEFAULT_THEME_PATH;
 	}
 
+	QString defaultLameLibrary( void ) const
+	{
+		return "/usr/lib/libmp3lame.so.0";
+	}
+
+
 	QString artworkDir( void ) const
 	{
 		return m_artworkDir;
@@ -146,6 +152,11 @@ public:
 	}
 #endif
 
+    const QString & lameLibrary( void ) const
+    {
+        return m_lameLibrary;
+    }
+
 	const QString & backgroundArtwork( void ) const
 	{
 		return m_backgroundArtwork;
@@ -175,6 +186,7 @@ public:
 	void setSTKDir( const QString & _fd );
 	void setDefaultSoundfont( const ResourceItem * _sf );
 	void setBackgroundArtwork( const QString & _ba );
+	void setLameLibrary( const QString & _ll );
 
 
 private:
@@ -201,6 +213,7 @@ private:
 #endif
 	QString m_backgroundArtwork;
 	QStringList m_recentlyOpenedProjects;
+	QString m_lameLibrary;
 
 
 	typedef QVector<QPair<QString, QString> > stringPairVector;
