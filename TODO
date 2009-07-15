@@ -52,6 +52,12 @@
 - add FLAC as export-format?
 
 Andrew Kelley's todo:
+* when you press down or up while browsing the resource browser, it should
+  play the sample
+* select the output file format based on what you selected in file->save as
+* segfault when you export an mp3 and press cancel
+
+
 - automation recording:
 	* when you record and there is already an auto clip, it repeats it
 	* it freezes when you try to do it with the Volume or Panning slider

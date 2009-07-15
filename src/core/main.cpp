@@ -162,7 +162,7 @@ int main( int argc, char * * argv )
 	"-r, --render <project file>	render given project file\n"
 	"-o, --output <file>		render into <file>\n"
 	"-f, --output-format <format>	specify format of render-output where\n"
-	"				format is either 'wav' or 'ogg'.\n"
+	"				format is either 'wav', 'ogg', or 'mp3'.\n"
 	"-s, --samplerate <samplerate>	specify output samplerate in Hz\n"
 	"				range: 44100 (default) to 192000\n"
 	"-b, --bitrate <bitrate>		specify output bitrate in kHz\n"
@@ -227,6 +227,10 @@ int main( int argc, char * * argv )
 				eff = projectRenderer::OggFile;
 			}
 #endif
+            else if( ext == "mp3" )
+            {
+                eff = projectRenderer::Mp3File;
+            }
 			else
 			{
 				printf( "\nInvalid output format %s.\n\n"
@@ -491,10 +495,7 @@ int main( int argc, char * * argv )
 		{
 			// create renderer
 			projectRenderer * r = new projectRenderer( qs, os, eff,
-				render_out +
-					QString( ( eff ==
-						projectRenderer::WaveFile ) ?
-							"wav" : "ogg" ) );
+				render_out + QString(projectRenderer::EFF_ext[eff]));
 			QCoreApplication::instance()->connect( r,
 					SIGNAL( finished() ), SLOT( quit() ) );
 

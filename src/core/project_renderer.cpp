@@ -31,6 +31,7 @@
 
 #include "audio_file_wave.h"
 #include "audio_file_ogg.h"
+#include "audio_file_mp3.h"
 
 #ifdef LMMS_HAVE_PTHREAD_H
 #include <pthread.h>
@@ -53,6 +54,9 @@ fileEncodeDevice __fileEncodeDevices[] =
 					NULL
 #endif
 									},
+    { projectRenderer::Mp3File,
+        QT_TRANSLATE_NOOP( "projectRenderer", "MP3 File (*.mp3)" ),
+        ".mp3", &AudioFileMp3::getInst },
 	// ... insert your own file-encoder-infos here... may be one day the
 	// user can add own encoders inside the program...
 
@@ -60,7 +64,7 @@ fileEncodeDevice __fileEncodeDevices[] =
 
 } ;
 
-
+const char * projectRenderer::EFF_ext[] = {"wav", "ogg", "mp3"};
 
 
 projectRenderer::projectRenderer( const mixer::qualitySettings & _qs,

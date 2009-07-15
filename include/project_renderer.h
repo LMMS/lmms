@@ -37,8 +37,11 @@ public:
 	{
 		WaveFile,
 		OggFile,
+        Mp3File,
 		NumFileFormats
 	} ;
+
+    static const char * EFF_ext[];
 
 	enum Depths
 	{
