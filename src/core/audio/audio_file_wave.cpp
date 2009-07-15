@@ -89,11 +89,11 @@ void audioFileWave::writeBuffer( const surroundSampleFrame * _ab,
 {
 	if( depth() == 16 )
 	{
-		intSampleFrameA * buf = (intSampleFrameA *)
-				alignedMalloc(
-					sizeof( intSampleFrameA ) * _frames );
+		intSampleFrameA * buf = (intSampleFrameA *) alignedMalloc(
+            sizeof( intSampleFrameA ) * _frames );
+
 		alignedConvertToS16( _ab, buf, _frames, _master_gain,
-							!isLittleEndian() );
+            !isLittleEndian() );
 
 		sf_writef_short( m_sf, (int_sample_t *) buf, _frames );
 		alignedFree( buf );
