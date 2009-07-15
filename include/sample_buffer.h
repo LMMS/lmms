@@ -222,6 +222,8 @@ private:
 						ch_cnt_t & _channels,
 						sample_rate_t & _sample_rate );
 
+    f_cnt_t decodeSampleMp3( QString & file, int_sample_t * & _buf, 
+        ch_cnt_t & _channels, sample_rate_t & _samplerate );
 
 	QString m_audioFile;
 	sampleFrame * m_origData;

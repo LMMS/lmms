@@ -84,6 +84,14 @@ class LameLibrary {
         typedef int lame_set_VBR_mean_bitrate_kbps_t(lame_global_flags *, int);
         typedef int lame_set_VBR_max_bitrate_kbps_t(lame_global_flags *, int);
 
+        typedef int lame_decode_init_t(void);
+        typedef int lame_decode1_headers_t(unsigned char *, int, short *,
+            short *, mp3data_struct *);
+        typedef int lame_decode_headers_t(unsigned char *, int, short *,
+            short *, mp3data_struct *);
+        typedef int lame_decode_t(unsigned char *, int, short *, short *);
+        typedef int lame_decode_exit_t(void);
+
 
     public:
 
@@ -122,6 +130,12 @@ class LameLibrary {
         lame_set_VBR_quality_t *lame_set_VBR_quality;
         lame_set_VBR_mean_bitrate_kbps_t *lame_set_VBR_mean_bitrate_kbps;
         lame_set_VBR_max_bitrate_kbps_t *lame_set_VBR_max_bitrate_kbps;
+
+        lame_decode_init_t *lame_decode_init;
+        lame_decode1_headers_t *lame_decode1_headers;
+        lame_decode_headers_t *lame_decode_headers;
+        lame_decode_t *lame_decode;
+        lame_decode_exit_t *lame_decode_exit;
 
     private:
         QLibrary * m_lameLib; // lame .so file

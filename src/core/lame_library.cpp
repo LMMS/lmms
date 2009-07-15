@@ -102,6 +102,17 @@ LameLibrary::LameLibrary() :
     lame_set_VBR_max_bitrate_kbps = (lame_set_VBR_max_bitrate_kbps_t *)
         m_lameLib->resolve("lame_set_VBR_max_bitrate_kbps");
 
+    lame_decode_init = (lame_decode_init_t*)
+        m_lameLib->resolve("lame_decode_init");
+    lame_decode1_headers = (lame_decode1_headers_t*)
+        m_lameLib->resolve("lame_decode1_headers");
+    lame_decode_headers = (lame_decode_headers_t*)
+        m_lameLib->resolve("lame_decode_headers");
+    lame_decode = (lame_decode_t*)
+        m_lameLib->resolve("lame_decode");
+    lame_decode_exit = (lame_decode_exit_t*)
+        m_lameLib->resolve("lame_decode_exit");
+
     // These are optional
     lame_get_lametag_frame = (lame_get_lametag_frame_t *)
        m_lameLib->resolve("lame_get_lametag_frame");
@@ -131,7 +142,12 @@ LameLibrary::LameLibrary() :
         !lame_set_findReplayGain ||
         !lame_set_VBR_quality ||
         !lame_set_VBR_mean_bitrate_kbps ||
-        !lame_set_VBR_max_bitrate_kbps)
+        !lame_set_VBR_max_bitrate_kbps ||
+        !lame_decode_init ||
+        !lame_decode1_headers ||
+        !lame_decode_headers ||
+        !lame_decode ||
+        !lame_decode_exit)
     {
         // some symbols are missing
         QMessageBox::information( NULL, QObject::tr( "LAME missing symbols" ),

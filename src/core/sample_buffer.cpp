@@ -63,6 +63,7 @@
 #include "interpolation.h"
 #include "templates.h"
 
+#include "lame_library.h"
 
 
 sampleBuffer::sampleBuffer( const QString & _audio_file,
@@ -194,23 +195,19 @@ void sampleBuffer::update( bool _keep_settings )
 		}
 		else
         {
+            // PCM wave
             if( m_frames == 0 )
-            {
-                m_frames = decodeSampleSF( f, buf, channels,
-                                    samplerate );
-            }
+                m_frames = decodeSampleSF( f, buf, channels, samplerate );
 #ifdef LMMS_HAVE_OGGVORBIS
             if( m_frames == 0 )
-            {
-                m_frames = decodeSampleOGGVorbis( f, buf, channels,
-                                    samplerate );
-            }
+                m_frames = decodeSampleOGGVorbis(f, buf, channels, samplerate);
 #endif
             if( m_frames == 0 )
-            {
-                m_frames = decodeSampleDS( f, buf, channels,
-                                    samplerate );
-            }
+                m_frames = decodeSampleDS( f, buf, channels, samplerate );
+
+            // MP3 
+            if( m_frames == 0 )
+                m_frames = decodeSampleMp3( file, buf, channels, samplerate );
 
             delete[] f;
 		}
@@ -502,6 +499,115 @@ f_cnt_t sampleBuffer::decodeSampleOGGVorbis( const char * _f,
 #endif
 
 
+int lame_decode_fromfile(QFile &in, short pcm_l[], short pcm_r[], 
+    mp3data_struct * mp3data, LameLibrary &lame)
+{
+    int     ret = 0;
+    size_t  len = 0;
+    unsigned char buf[1024];
+
+    /* first see if we still have data buffered in the decoder: */
+    ret = lame.lame_decode1_headers(buf, len, pcm_l, pcm_r, mp3data);
+    if (ret != 0)
+        return ret;
+
+
+    /* read until we get a valid output frame */
+    while (1) {
+        len = in.read((char *)buf, 1024);
+        if (len == 0) {
+            /* we are done reading the file, but check for buffered data */
+            ret = lame.lame_decode1_headers(buf, len, pcm_l, pcm_r, mp3data);
+            if (ret <= 0) {
+                //lame.lame_decode_exit(); /* release mp3decoder memory */
+                //return -1; /* done with file */
+
+                return 0;
+            }
+            break;
+        }
+
+        ret = lame.lame_decode1_headers(buf, len, pcm_l, pcm_r, mp3data);
+        if (ret == -1) {
+            lame.lame_decode_exit(); /* release mp3decoder memory */
+            return -1;
+        }
+        if (ret > 0)
+            break;
+    }
+    return ret;
+}
+
+f_cnt_t sampleBuffer::decodeSampleMp3( QString & file, int_sample_t * & _buf,
+    ch_cnt_t & _channels, sample_rate_t & _samplerate )
+{
+    // create instance of LameLibrary to decode
+    LameLibrary lame;
+    
+    // open the file
+    QFile in(file);
+
+    if( ! in.open(QIODevice::ReadOnly) ){
+        printf("sampleBuffer::decodeSampleMp3: error opening %s for reading\n", 
+            file.toStdString().c_str());
+        return 0;
+    }
+
+    // initialize lame decoder
+    lame.lame_decode_init();
+
+    short int pcm_l[1152];
+    short int pcm_r[1152];
+    mp3data_struct mp3data;
+
+    // TODO: calc _buf size
+
+    int bufPos = 0;
+    bool initBuf = false;
+
+    while(1)
+    {
+        int ret = lame_decode_fromfile(in, pcm_l, pcm_r, &mp3data, lame);
+        
+        if( ret == -1 ){
+            delete[] _buf;
+            printf("error decoding mp3\n");
+            return 0;
+        } else if( ret == 0 ) {
+            break;
+        }
+
+        if( ! initBuf )
+        {
+            if( mp3data.header_parsed == 0 )
+            {
+                printf("failed to parse header\n");
+                return 0;
+            }
+            else
+            {
+                // process header
+                _samplerate = mp3data.samplerate;
+                _channels = mp3data.stereo;
+                _buf = new int_sample_t[mp3data.totalframes * 
+                    mp3data.framesize * _channels];
+                initBuf = true;
+            }
+        } 
+
+        // convert the decoded PCM into sample
+        for(int i = 0; i<ret; ++i)
+        {
+            _buf[bufPos++] = pcm_l[i];
+            if( _channels == 2 )
+                _buf[bufPos++] = pcm_r[i];
+        }
+    }
+    
+    lame.lame_decode_exit();
+    
+	return bufPos / _channels;
+}
 
 
 f_cnt_t sampleBuffer::decodeSampleDS( const char * _f,
