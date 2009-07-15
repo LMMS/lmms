@@ -47,7 +47,8 @@
 #include "embed.cpp"
 
 static const char * __supportedExts[] =
-{ "wav", "ogg", "ds", "spx", "au", "voc", "aif", "aiff", "flac", "raw", NULL };
+{ "wav", "ogg", "ds", "spx", "au", "voc", "aif", "aiff", "flac", "raw", "mp3",
+    NULL };
 
 extern "C"
 {
