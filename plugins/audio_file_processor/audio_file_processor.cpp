@@ -220,14 +220,12 @@ void audioFileProcessor::setAudioFile( const QString & _audio_file,
 								bool _rename )
 {
 	// is current channel-name equal to previous-filename??
-	if( _rename && 
-		( getInstrumentTrack()->name() ==
-			QFileInfo( m_sampleBuffer.audioFile() ).fileName() ||
-		   	m_sampleBuffer.audioFile() == "" ) )
+	if( _rename && ( getInstrumentTrack()->name() == 
+        QFileInfo( m_sampleBuffer.audioFile() ).fileName() ||
+        m_sampleBuffer.audioFile() == "" ) )
 	{
 		// then set it to new one
-		getInstrumentTrack()->setName( QFileInfo( _audio_file
-								).fileName() );
+		getInstrumentTrack()->setName( QFileInfo( _audio_file).fileName() );
 	}
 	// else we don't touch the track-name, because the user named it self
 
