@@ -155,30 +155,6 @@ mainWindow::mainWindow( void ) :
 	vbox->addWidget( w );
 	setCentralWidget( main_widget );
 
-    /// HACK TO CREATE EXTRA SONG EDITOR FOR NOW ///
-	//Fun test
-	TrackContainerScene * scene = new TrackContainerScene( this, engine::getSong() );
-
-    // Mem leak
-    QPixmap * sceneBg = new QPixmap( 16*4*2, 32 );
-    QPainter * sceneBgPainter = new QPainter( sceneBg );
-    engine::getLmmsStyle()->drawTrackContentBackground(
-            sceneBgPainter,
-			QSize( 16*4, 32 ),
-            16 );
-
-    QPixmapCache::setCacheLimit( 10240 );
-	QGraphicsView *view = new QGraphicsView( scene );
-	view->setRenderHints( QPainter::Antialiasing | QPainter::SmoothPixmapTransform );
-    view->setDragMode( QGraphicsView::RubberBandDrag );
-    view->setAlignment( Qt::AlignLeft | Qt::AlignTop );
-    view->setBackgroundBrush( QBrush(*sceneBg) );
-	view->show();
-	//view->scale(2.0, 1.0);
-
-	QMdiSubWindow * subWin = workspace()->addSubWindow( view );
-    
-    /// END HACK TO CREATE EXTRA SONG EDITOR FOR NOW ///
 
 
 	m_updateTimer.start( 1000 / 20, this );	// 20 fps
@@ -320,7 +296,7 @@ void mainWindow::finalize( void )
 
 	help_menu->addSeparator();
 	help_menu->addAction( embed::getIconPixmap( "icon" ), tr( "About" ),
-			      this, SLOT( aboutLMMS() ) );
+				  this, SLOT( aboutLMMS() ) );
 
 	// create the grid layout for the first buttons area
 	QWidget * gridButtons_w = new QWidget( m_toolBar );
@@ -1528,3 +1504,4 @@ void mainWindow::toggleRecordAutomation( bool _recording )
 
 #include "moc_main_window.cxx"
 
+/* vim: set tw=0 noexpandtab: */
