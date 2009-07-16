@@ -1,9 +1,9 @@
 /*
- * audo_file_mp3.cpp - audio-device which encodes mp3-stream and writes it
- *                       into an mp3-file. This is used for song-export.
+ * audo_file_mp3.cpp - 	audio-device which encodes mp3-stream and writes it
+ *		   	into an mp3-file. This is used for song-export.
  *
  * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- *               2009 Andrew Kelley <superjoe30@gmail.com>
+ *			   2009 Andrew Kelley <superjoe30@gmail.com>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -35,16 +35,16 @@ using namespace std;
 
 
 AudioFileMp3::AudioFileMp3( const sample_rate_t _sample_rate,
-    const ch_cnt_t _channels, bool & _success_ful, const QString & _file,
-    const bool _use_vbr, const bitrate_t _nom_bitrate,
-    const bitrate_t _min_bitrate, const bitrate_t _max_bitrate,
-    const int _depth, mixer * _mixer ) :
+	const ch_cnt_t _channels, bool & _success_ful, const QString & _file,
+	const bool _use_vbr, const bitrate_t _nom_bitrate,
+	const bitrate_t _min_bitrate, const bitrate_t _max_bitrate,
+	const int _depth, mixer * _mixer ) :
 	audioFileDevice( _sample_rate, _channels, _file, _use_vbr, _nom_bitrate,
-        _min_bitrate, _max_bitrate, _depth, _mixer ),
-    m_lgf( NULL ),
-    m_lame( LameLibrary() ),
-    m_outfile( NULL ),
-    m_hq_mode( false )
+		_min_bitrate, _max_bitrate, _depth, _mixer ),
+	m_lgf( NULL ),
+	m_lame( LameLibrary() ),
+	m_outfile( NULL ),
+	m_hq_mode( false )
 {
 	_success_ful = m_lame.isLoaded() && startEncoding();
 }
@@ -55,143 +55,144 @@ AudioFileMp3::~AudioFileMp3()
 {
 	finishEncoding();
 
-    if( m_outfile )
-    {
-        if( m_outfile->isOpen() )
-            m_outfile->close();
+	if( m_outfile )
+	{
+		if( m_outfile->isOpen() )
+			m_outfile->close();
 
-        delete m_outfile;
-    }
+		delete m_outfile;
+	}
 }
 
 
 void AudioFileMp3::finishEncoding( void )
 {
-    if( m_lgf )
-    {
-        // flush
-        int bufSize = 7200;
-        unsigned char * out = new unsigned char[bufSize];
-        int rc = m_lame.lame_encode_flush(m_lgf, out, bufSize);
+	if( m_lgf )
+	{
+		// flush
+		int bufSize = 7200;
+		unsigned char * out = new unsigned char[bufSize];
+		int rc = m_lame.lame_encode_flush(m_lgf, out, bufSize);
 
-        if( m_outfile && m_outfile->isOpen() ){
-            m_outfile->write( (const char *) out, rc );
+		if( m_outfile && m_outfile->isOpen() ){
+			m_outfile->write( (const char *) out, rc );
 
-            m_outfile->close();
-            delete m_outfile;
-            m_outfile = NULL;
-        }
+			m_outfile->close();
+			delete m_outfile;
+			m_outfile = NULL;
+		}
 
-        // cleanup
-        delete[] out;
+		// cleanup
+		delete[] out;
 
-        // close any open handles we may have
-        m_lame.lame_close(m_lgf);
-        m_lgf = NULL;
-    }
+		// close any open handles we may have
+		m_lame.lame_close(m_lgf);
+		m_lgf = NULL;
+	}
 }
 
 
 bool AudioFileMp3::startEncoding( void )
 {
-    // open any handles, files, etc
-    m_lgf = m_lame.lame_init();
-    if( m_lgf == NULL ){
-        printf("AudioFileMp3: Unable to initialize lame\n");
-        return false;
-    }
+	// open any handles, files, etc
+	m_lgf = m_lame.lame_init();
+	if( m_lgf == NULL ){
+		printf("AudioFileMp3: Unable to initialize lame\n");
+		return false;
+	}
 
-    if( channels() > 2 )
-        printf("I don't think lame can do more than 2 channels\n");
+	if( channels() > 2 )
+		printf("I don't think lame can do more than 2 channels\n");
 
-    m_lame.lame_set_in_samplerate(m_lgf, sampleRate() );
-    m_lame.lame_set_num_channels(m_lgf, channels() );
+	m_lame.lame_set_in_samplerate(m_lgf, sampleRate() );
+	m_lame.lame_set_num_channels(m_lgf, channels() );
 
-    if( m_hq_mode )
-        m_lame.lame_set_quality(m_lgf, 0); // best, very slow
-    else
-        m_lame.lame_set_quality(m_lgf, 2); // near-best, not too slow
-    
-    m_lame.lame_set_mode(m_lgf, STEREO); 
-    m_lame.lame_set_findReplayGain(m_lgf, 1); // perform ReplayGain analysis
+	if( m_hq_mode )
+		m_lame.lame_set_quality(m_lgf, 0); // best, very slow
+	else
+		m_lame.lame_set_quality(m_lgf, 2); // near-best, not too slow
+	
+	m_lame.lame_set_mode(m_lgf, STEREO); 
+	m_lame.lame_set_findReplayGain(m_lgf, 1); // perform ReplayGain analysis
 
 	if( useVBR() == 0 )
-    {
-        m_lame.lame_set_VBR(m_lgf, vbr_off);
-        m_lame.lame_set_brate(m_lgf, nominalBitrate() );
-    }
-    else
-    {
-        m_lame.lame_set_VBR(m_lgf, vbr_abr);
-        m_lame.lame_set_VBR_quality(m_lgf, 2);
-        m_lame.lame_set_VBR_mean_bitrate_kbps(m_lgf, nominalBitrate() );
-        m_lame.lame_set_VBR_min_bitrate_kbps(m_lgf, minBitrate() );
-        m_lame.lame_set_VBR_max_bitrate_kbps(m_lgf, maxBitrate() );
-    }
+	{
+		m_lame.lame_set_VBR(m_lgf, vbr_off);
+		m_lame.lame_set_brate(m_lgf, nominalBitrate() );
+	}
+	else
+	{
+		m_lame.lame_set_VBR(m_lgf, vbr_abr);
+		m_lame.lame_set_VBR_quality(m_lgf, 2);
+		m_lame.lame_set_VBR_mean_bitrate_kbps(m_lgf, nominalBitrate() );
+		m_lame.lame_set_VBR_min_bitrate_kbps(m_lgf, minBitrate() );
+		m_lame.lame_set_VBR_max_bitrate_kbps(m_lgf, maxBitrate() );
+	}
 
-    if( m_lame.lame_init_params( m_lgf ) < 0 )
-        return false;
+	if( m_lame.lame_init_params( m_lgf ) < 0 )
+		return false;
 
-    // open the file
-    m_outfile = new QFile( outputFile() );
-    if( ! m_outfile->open( QIODevice::WriteOnly ) )
-    {
-        printf("AudioFileMp3: unable to open file for output\n");
-        return false;
-    }
+	// open the file
+	m_outfile = new QFile( outputFile() );
+	if( ! m_outfile->open( QIODevice::WriteOnly ) )
+	{
+		printf("AudioFileMp3: unable to open file for output\n");
+		return false;
+	}
 
-    // write the headers and such
-    // TODO: add a comment "created with LMMS"
+	// write the headers and such
+	// TODO: add a comment "created with LMMS"
 
-    return true;
+	return true;
 
 }
 
 
 short int AudioFileMp3::rescale(float sample) {
-    return (qMax<float>(qMin<float>(sample, 1), -1) / 1) * std::numeric_limits<short int>::max();
+	return (qMax<float>(qMin<float>(sample, 1), -1) / 1) 
+		* std::numeric_limits<short int>::max();
 }
 
 // encode data and write to file
 void AudioFileMp3::writeBuffer( const surroundSampleFrame * _ab,
-						const fpp_t _frames, const float _master_gain )
+	const fpp_t _frames, const float _master_gain )
 {
-    // encode with lame
-    int bufSize = 1.25 * _frames + 7200;
-    short int * in = new short int[_frames*2];
-    unsigned char * out = new unsigned char[bufSize];
-    
-    // scale to short int instead of float
-    for(int i=0; i < _frames; ++i)
-    {
-        in[i*2] = rescale( _ab[i][0] );
-        in[i*2+1] = rescale( _ab[i][1] );
-    }
+	// encode with lame
+	int bufSize = 1.25 * _frames + 7200;
+	short int * in = new short int[_frames*2];
+	unsigned char * out = new unsigned char[bufSize];
+	
+	// scale to short int instead of float
+	for(int i=0; i < _frames; ++i)
+	{
+		in[i*2] = rescale( _ab[i][0] );
+		in[i*2+1] = rescale( _ab[i][1] );
+	}
 
-    int rc = m_lame.lame_encode_buffer_interleaved( m_lgf, in, _frames, 
-        out, bufSize);
+	int rc = m_lame.lame_encode_buffer_interleaved( m_lgf, in, _frames, 
+		out, bufSize);
 
-    switch(rc){
-        case -1:
-            printf("AudioFileMp3: encode error: buffer too small.\n");
-            return;
-        case -2: 
-            printf("AudioFileMp3: encode error: out of memory\n");
-            return;
-        case -3: 
-            printf("AudioFileMp3: encode error: lame_init_params not called\n");
-            return;
-        case -4: 
-            printf("AudioFileMp3: encode error: psycho acoustic problems\n");
-            return;
-    }
+	switch(rc){
+		case -1:
+			printf("AudioFileMp3: encode error: buffer too small.\n");
+			return;
+		case -2: 
+			printf("AudioFileMp3: encode error: out of memory\n");
+			return;
+		case -3: 
+			printf("AudioFileMp3: encode error: lame_init_params not called\n");
+			return;
+		case -4: 
+			printf("AudioFileMp3: encode error: psycho acoustic problems\n");
+			return;
+	}
 
-    // write to file
-    m_outfile->write( (const char *) out, rc );
+	// write to file
+	m_outfile->write( (const char *) out, rc );
 
-    // clean up
-    delete[] out;
-    delete[] in;
+	// clean up
+	delete[] out;
+	delete[] in;
 }
 
 
@@ -199,3 +200,4 @@ void AudioFileMp3::writeBuffer( const surroundSampleFrame * _ab,
 
 
 
+/* vim: set tw=0 noexpandtab: */

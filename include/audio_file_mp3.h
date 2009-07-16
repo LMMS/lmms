@@ -1,9 +1,9 @@
 /*
  * audio_file_mp3.h - Audio-device which encodes mp3-stream and writes it
- *                     into an mp3-file. This is used for song-export.
+ *					 into an mp3-file. This is used for song-export.
  *
  * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- *               2009 Andrew Kelley <superjoe30@gmail.com>
+ *			   2009 Andrew Kelley <superjoe30@gmail.com>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -69,9 +69,9 @@ public:
 
 
 private:
-    short int rescale(float sample); // convert float flame to short int frame
+	short int rescale(float sample); // convert float flame to short int frame
 
-    // overloaded functions
+	// overloaded functions
 	virtual void writeBuffer( const surroundSampleFrame * _ab,
 						const fpp_t _frames,
 						float _master_gain );
@@ -80,15 +80,16 @@ private:
 	void finishEncoding( void );
 
 
-    // handle to lame
-    lame_global_flags *m_lgf;
-    LameLibrary m_lame;
+	// handle to lame
+	lame_global_flags *m_lgf;
+	LameLibrary m_lame;
 
-    QFile * m_outfile;
-    bool m_hq_mode; // true if we want really high quality
+	QFile * m_outfile;
+	bool m_hq_mode; // true if we want really high quality
 
 } ;
 
 
 #endif
 
+/* vim: set tw=0 noexpandtab: */
