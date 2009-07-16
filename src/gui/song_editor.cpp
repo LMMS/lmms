@@ -496,3 +496,5 @@ bool songEditor::allowRubberband( void ) const
 
 
 #endif
+
+/* vim: set tw=0 noexpandtab: */

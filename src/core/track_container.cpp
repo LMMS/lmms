@@ -239,3 +239,4 @@ dummyTrackContainer::dummyTrackContainer( void ) :
 
 #include "moc_track_container.cxx"
 
+/* vim: set tw=0 noexpandtab: */

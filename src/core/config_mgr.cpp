@@ -72,7 +72,9 @@ configManager::configManager( void ) :
 #endif
 	m_vstDir( m_workingDir + "vst" + QDir::separator() ),
 	m_flDir( QDir::home().absolutePath() ),
+#ifdef LMMS_HAVE_FLUIDSYNTH
 	m_defaultSoundfont( NULL ),
+#endif
     m_lameLibrary( defaultLameLibrary() )
 {
 }
@@ -82,7 +84,11 @@ configManager::configManager( void ) :
 
 configManager::~configManager()
 {
+
+#ifdef LMMS_HAVE_FLUIDSYNTH
 	delete m_defaultSoundfont;
+#endif
+
 }
 
 
