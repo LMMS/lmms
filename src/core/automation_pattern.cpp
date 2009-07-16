@@ -150,32 +150,13 @@ midiTime automationPattern::length( void ) const
 
 
 midiTime automationPattern::putValue( const midiTime & _time,
-							const float _value,
-							const bool _quant_pos )
+	const float _value, const bool _quant_pos )
 {
 	midiTime newTime = _quant_pos && engine::getAutomationEditor() ?
-		note::quantized( _time,
-			engine::getAutomationEditor()->quantization() ) :
-		_time;
+		note::quantized( _time, engine::getAutomationEditor()->quantization() )
+		: _time;
 
 	m_timeMap[newTime] = _value;
-
-	if( newTime == 0 )
-	{
-		for( objectVector::iterator it = m_objects.begin();
-						it != m_objects.end(); )
-		{
-			if( *it )
-			{
-				( *it )->setValue( _value );
-				++it;
-			}
-			else
-			{
-				it = m_objects.erase( it );
-			}
-		}
-	}
 
 	// just one automation value?
 	if( m_timeMap.size() == 1 )
@@ -544,3 +525,4 @@ void automationPattern::objectDestroyed( jo_id_t _id )
 
 #include "moc_automation_pattern.cxx"
 
+/* vim: set tw=0 noexpandtab: */

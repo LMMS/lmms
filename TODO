@@ -53,7 +53,8 @@
 
 Andrew Kelley's todo:
 * load asdlol.mmpz. if you render it without playing it, or if you play it
-  the first time, you hear unwanted artifacts.
+  the first time, you hear unwanted artifacts. (solution: apply automation
+  before playing)
 * VST presets don't work. when you save a project, it doesn't even save
   what you did.
 
