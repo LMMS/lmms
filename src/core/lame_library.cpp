@@ -180,4 +180,4 @@ bool LameLibrary::isLoaded()
 	return m_lameLib != NULL;
 }
 
-/* vim: set tw=0 expandtab: */
+/* vim: set tw=0 noexpandtab: */

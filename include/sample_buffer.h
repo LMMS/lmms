@@ -46,6 +46,11 @@ class EXPORT sampleBuffer : public QObject, public sharedObject
 {
 	Q_OBJECT
 public:
+	static const char * supportedExts[];
+	
+	QString niceListOfExts() const;
+	
+
 	class EXPORT handleState
 	{
 	public:
@@ -254,4 +259,4 @@ signals:
 
 #endif
 
-/* vim: set tw=0 expandtab: */
+/* vim: set tw=0 noexpandtab: */

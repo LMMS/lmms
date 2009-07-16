@@ -155,10 +155,10 @@ int main( int argc, char * * argv )
 			printf( "\nLinux MultiMedia Studio %s\n"
 	"Copyright (c) 2004-2008 LMMS developers.\n\n"
 	"usage: lmms [ -r <project file> ] [ options ]\n"
-	"            [ -u <in> <out> ]\n"
-	"            [ -d <in> ]\n"
-	"            [ -h ]\n"
-	"            [ <file to load> ]\n\n"
+	"			[ -u <in> <out> ]\n"
+	"			[ -d <in> ]\n"
+	"			[ -h ]\n"
+	"			[ <file to load> ]\n\n"
 	"-r, --render <project file>	render given project file\n"
 	"-o, --output <file>		render into <file>\n"
 	"-f, --output-format <format>	specify format of render-output where\n"
@@ -227,10 +227,10 @@ int main( int argc, char * * argv )
 				eff = projectRenderer::OggFile;
 			}
 #endif
-            else if( ext == "mp3" )
-            {
-                eff = projectRenderer::Mp3File;
-            }
+			else if( ext == "mp3" )
+			{
+				eff = projectRenderer::Mp3File;
+			}
 			else
 			{
 				printf( "\nInvalid output format %s.\n\n"
@@ -522,3 +522,5 @@ int main( int argc, char * * argv )
 
 
 #endif
+
+/* vim: set tw=0 noexpandtab: */

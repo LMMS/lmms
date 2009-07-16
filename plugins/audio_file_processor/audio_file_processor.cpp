@@ -46,9 +46,6 @@
 #undef SINGLE_SOURCE_COMPILE
 #include "embed.cpp"
 
-static const char * __supportedExts[] =
-{ "wav", "ogg", "ds", "spx", "au", "voc", "aif", "aiff", "flac", "raw", "mp3",
-    NULL };
 
 extern "C"
 {
@@ -65,7 +62,7 @@ plugin::descriptor PLUGIN_EXPORT audiofileprocessor_plugin_descriptor =
 	0x0100,
 	plugin::Instrument,
 	new pluginPixmapLoader( "logo" ),
-	__supportedExts,
+	sampleBuffer::supportedExts,
 	NULL
 } ;
 
@@ -222,8 +219,8 @@ void audioFileProcessor::setAudioFile( const QString & _audio_file,
 {
 	// is current channel-name equal to previous-filename??
 	if( _rename && ( getInstrumentTrack()->name() == 
-        QFileInfo( m_sampleBuffer.audioFile() ).fileName() ||
-        m_sampleBuffer.audioFile() == "" ) )
+		QFileInfo( m_sampleBuffer.audioFile() ).fileName() ||
+		m_sampleBuffer.audioFile() == "" ) )
 	{
 		// then set it to new one
 		getInstrumentTrack()->setName( QFileInfo( _audio_file).fileName() );
@@ -503,3 +500,4 @@ plugin * PLUGIN_EXPORT lmms_plugin_main( model *, void * _data )
 
 #include "moc_audio_file_processor.cxx"
 
+/* vim: set tw=0 expandtab: */

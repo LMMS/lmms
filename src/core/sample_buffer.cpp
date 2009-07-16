@@ -66,6 +66,21 @@
 #include "lame_library.h"
 
 
+const char * sampleBuffer::supportedExts[] = { 
+	"wav", 
+	"ogg", 
+	"ds", 
+	"spx", 
+	"au", 
+	"voc", 
+	"aif", 
+	"aiff",
+	"flac", 
+	"raw", 
+	"mp3",
+	NULL 
+};
+
 sampleBuffer::sampleBuffer( const QString & _audio_file,
 							bool _is_base64_data ) :
 	m_audioFile( ( _is_base64_data == true ) ? "" : _audio_file ),
@@ -260,7 +275,8 @@ void sampleBuffer::update( bool _keep_settings )
 			m_loopStartFrame = m_startFrame = 0;
 			m_loopEndFrame = m_endFrame = 1;
 
-			QString decoders = tr( "wav, ogg, mp3" );
+			// TODO: this list probably shouldn't be hardcoded
+			QString decoders = niceListOfExts();
 			QMessageBox::information( NULL, 
 				QObject::tr( "Unrecognized audio format" ),
 				QObject::tr( "None of the available audio decoders "
@@ -292,10 +308,22 @@ void sampleBuffer::update( bool _keep_settings )
 }
 
 
+QString sampleBuffer::niceListOfExts() const
+{
+	QString ret = "";
+	for( const char * * i = supportedExts; *i; ++i )
+	{
+		ret.append(*i);
+		if( *(i+1) )
+			ret.append(", ");
+	}
+	
+	return ret;
+}
 
 
 void sampleBuffer::normalizeSampleRate( const sample_rate_t _src_sr,
-							bool _keep_settings )
+	bool _keep_settings )
 {
 	// do samplerate-conversion to our default-samplerate
 	if( _src_sr != engine::getMixer()->baseSampleRate() )
@@ -1328,4 +1356,4 @@ sampleBuffer::handleState::~handleState()
 
 #endif
 
-/* vim: set tw=0 expandtab: */
+/* vim: set tw=0 noexpandtab: */

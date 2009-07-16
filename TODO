@@ -55,7 +55,6 @@ Andrew Kelley's todo:
 * when you press down or up while browsing the resource browser, it should
   play the sample
 * select the output file format based on what you selected in file->save as
-* ability to read mp3 samples
 * load asdlol.mmpz. if you render it without playing it, or if you play it
   the first time, you hear unwanted artifacts.
 

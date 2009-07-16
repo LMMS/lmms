@@ -1,6 +1,6 @@
 /*
  * audio_file_processor.h - declaration of class audioFileProcessor
- *                          (instrument-plugin for using audio-files)
+ *						  (instrument-plugin for using audio-files)
  *
  * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
@@ -128,3 +128,5 @@ private:
 
 
 #endif
+
+/* vim: set tw=0 noexpandtab: */
