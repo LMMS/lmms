@@ -46,12 +46,32 @@ exportProjectDialog::exportProjectDialog( const QString & _file_name,
 	setWindowTitle( tr( "Export project to %1" ).arg( 
 					QFileInfo( _file_name ).fileName() ) );
 
+	// get the extension of the chosen file
+	QStringList parts = _file_name.split(".");
+	QString file_ext = "";
+	if( parts.size() > 0 )
+		file_ext = parts[parts.size()-1];
+
+	int cbIndex = 0;
 	for( int i = 0; i < projectRenderer::NumFileFormats; ++i )
 	{
 		if( __fileEncodeDevices[i].m_getDevInst != NULL )
 		{
+			// get the extension of this format
+			QString render_ext = projectRenderer::EFF_ext[i];
+
+			// add to combo box
 			fileFormatCB->addItem( projectRenderer::tr(
 				__fileEncodeDevices[i].m_description ) );
+
+			// if this is our extension, select it
+			if( QString::compare(render_ext, file_ext, 
+				Qt::CaseInsensitive ) == 0 )
+			{
+				fileFormatCB->setCurrentIndex(cbIndex);
+			}
+			
+			cbIndex++;
 		}
 	}
 
@@ -145,7 +165,7 @@ void exportProjectDialog::startBtnClicked( void )
 	m_renderer = new projectRenderer( qs, os, ft, m_fileName );
 	if( m_renderer->isReady() )
 	{
-        updateTitleBar( 0 );
+		updateTitleBar( 0 );
 		connect( m_renderer, SIGNAL( progressChanged( int ) ),
 				progressBar, SLOT( setValue( int ) ) );
 		connect( m_renderer, SIGNAL( progressChanged( int ) ),
@@ -178,3 +198,6 @@ void exportProjectDialog::updateTitleBar( int _prog )
 
 
 #endif
+
+
+/* vim: set tw=0 noexpandtab: */

@@ -37,11 +37,11 @@ public:
 	{
 		WaveFile,
 		OggFile,
-        Mp3File,
+		Mp3File,
 		NumFileFormats
 	} ;
 
-    static const char * EFF_ext[];
+	static const char * EFF_ext[];
 
 	enum Depths
 	{
@@ -120,3 +120,5 @@ struct fileEncodeDevice
 extern fileEncodeDevice __fileEncodeDevices[];
 
 #endif
+
+/* vim: set tw=0 noexpandtab: */
