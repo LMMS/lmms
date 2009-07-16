@@ -163,23 +163,26 @@ void ResourceDB::loadTreeItem( ResourceTreeItem * _i, QDomElement & _de )
 			const QString h = e.attribute( "hash" );
 			if( !h.isEmpty() )
 			{
-ResourceItem * item = new ResourceItem( m_provider,
-						e.attribute( "name" ),
-				typeFromName( e.attribute( "type" ) ),
-				baseDirFromName( e.attribute( "basedir" ) ),
-						e.attribute( "path" ),
-						h,
-						e.attribute( "author" ),
-						e.attribute( "tags" ),
-						e.attribute( "size" ).toInt(),
-	QDateTime::fromString( e.attribute( "lastmod" ), Qt::ISODate ) );
-addItem( item );
-ResourceTreeItem * treeItem = new ResourceTreeItem( _i, item );
-if( item->type() == ResourceItem::TypeDirectory )
-{
-	emit directoryItemAdded( item->fullName() );
-}
-loadTreeItem( treeItem, e );
+				ResourceItem * item = new ResourceItem(
+					m_provider,
+					e.attribute( "name" ),
+					typeFromName( e.attribute( "type" ) ),
+					baseDirFromName( e.attribute( "basedir" ) ),
+					e.attribute( "path" ),
+					h,
+					e.attribute( "author" ),
+					e.attribute( "tags" ),
+					e.attribute( "size" ).toInt(),
+					QDateTime::fromString( e.attribute( "lastmod" ),
+						Qt::ISODate )
+				);
+				addItem( item );
+				ResourceTreeItem * treeItem = new ResourceTreeItem( _i, item );
+				if( item->type() == ResourceItem::TypeDirectory )
+				{
+					emit directoryItemAdded( item->fullName() );
+				}
+				loadTreeItem( treeItem, e );
 			}
 		}
 		node = node.nextSibling();
@@ -328,3 +331,5 @@ void ResourceDB::recursiveRemoveItems( ResourceTreeItem * parent,
 
 
 #include "moc_ResourceDB.cxx"
+
+/* vim: set tw=0 noexpandtab: */

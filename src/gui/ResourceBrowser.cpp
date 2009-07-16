@@ -27,6 +27,7 @@
 #include <QtGui/QLineEdit>
 #include <QtGui/QMenu>
 #include <QtGui/QPushButton>
+#include <QKeyEvent>
 
 #include "ResourceBrowser.h"
 #include "ResourceFileMapper.h"
@@ -77,6 +78,7 @@ ResourceBrowser::ResourceBrowser( QWidget * _parent ) :
 			embed::getIconPixmap( "resource_browser" ),
 			_parent ),
 	m_previewer(),
+	m_filterEdit( NULL ),
 	m_treeModel( engine::resourceProvider()->database() )
 {
 	// create a model which represents our database as a tree
@@ -87,12 +89,12 @@ ResourceBrowser::ResourceBrowser( QWidget * _parent ) :
 	QLabel * filterPixmap = new QLabel;
 	filterPixmap->setPixmap( embed::getIconPixmap( "edit-find" ) );
 
-	QLineEdit * filterEdit = new QLineEdit;
+	m_filterEdit = new QLineEdit;
 
 	m_filterStatusLabel = new QLabel;
 
 	filterLayout->addWidget( filterPixmap );
-	filterLayout->addWidget( filterEdit );
+	filterLayout->addWidget( m_filterEdit );
 	filterLayout->addWidget( m_filterStatusLabel );
 
 	// create an according tree-view for our tree-model
@@ -107,10 +109,15 @@ ResourceBrowser::ResourceBrowser( QWidget * _parent ) :
 	// track mouse press and release events
 	connect( m_treeView,
 			SIGNAL( pressed( const QModelIndex & ) ),
-			this, SLOT( startItemPreview( const QModelIndex & ) ) );
+			this, SLOT( setFocusAndPreview( const QModelIndex & ) ) );
 	connect( m_treeView,
 			SIGNAL( clicked( const QModelIndex & ) ),
 			this, SLOT( stopItemPreview( const QModelIndex & ) ) );
+	// play the noise when a new item is selected
+	connect( m_treeView, SIGNAL( treeViewCurrentChanged( const QModelIndex &, 
+		const QModelIndex & ) ), this, 
+		SLOT( currentChanged( const QModelIndex &, const QModelIndex & ) ) );
+
 	// setup a direct connection so preview is instantly stopped when
 	// drag operation begins
 	connect( m_treeView,
@@ -148,13 +155,13 @@ ResourceBrowser::ResourceBrowser( QWidget * _parent ) :
 	addContentWidget( pianoView );
 
 
-	// instantly apply filter when typing into filterEdit
-	connect( filterEdit, SIGNAL( textChanged( const QString & ) ),
-	                m_treeView, SLOT( setFilter( const QString & ) ) );
-	connect( filterEdit, SIGNAL( textChanged( const QString & ) ),
-	                this, SLOT( updateFilterStatus() ) );
+	// instantly apply filter when typing into m_filterEdit
+	connect( m_filterEdit, SIGNAL( textChanged( const QString & ) ),
+					m_treeView, SLOT( setFilter( const QString & ) ) );
+	connect( m_filterEdit, SIGNAL( textChanged( const QString & ) ),
+					this, SLOT( updateFilterStatus() ) );
 	connect( &m_treeModel, SIGNAL( itemsChanged() ),
-	                this, SLOT( updateFilterStatus() ) );
+					this, SLOT( updateFilterStatus() ) );
 
 	// setup actions to be used in context menu
 	for( int i = 0; i < (int) ( sizeof( resourceBrowserActions ) /
@@ -179,6 +186,7 @@ ResourceBrowser::ResourceBrowser( QWidget * _parent ) :
 ResourceBrowser::~ResourceBrowser()
 {
 	delete m_treeView;
+	delete m_filterEdit;
 }
 
 
@@ -261,6 +269,17 @@ void ResourceBrowser::startItemPreview( const QModelIndex & _idx )
 }
 
 
+void ResourceBrowser::setFocusAndPreview( const QModelIndex & _idx )
+{
+	// transfor focus to the treeview. for some reason you have to
+	// setFocus to the line edit above it first.
+	m_filterEdit->setFocus(Qt::MouseFocusReason);
+	m_treeView->setFocus(Qt::MouseFocusReason);
+
+	startItemPreview( _idx );
+}
+
+
 
 
 void ResourceBrowser::stopItemPreview( const QModelIndex & )
@@ -268,6 +287,21 @@ void ResourceBrowser::stopItemPreview( const QModelIndex & )
 	stopPreview();
 }
 
+
+
+
+void ResourceBrowser::currentChanged( const QModelIndex & current, 
+	const QModelIndex & previous )
+{
+
+	// stop previous previews
+	stopPreview();
+
+	// start previewing the sound we just changed to
+	startItemPreview( current );
+
+	
+}
 
 
 
@@ -358,3 +392,4 @@ void ResourceBrowser::triggerAction( Actions _action, ResourceItem * _item )
 
 #include "moc_ResourceBrowser.cxx"
 
+/* vim: set tw=0 noexpandtab: */

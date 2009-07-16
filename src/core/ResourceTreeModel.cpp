@@ -429,3 +429,4 @@ void ResourceTreeModel::setHidden( ResourceTreeItem * _item,
 
 #include "moc_ResourceTreeModel.cxx"
 
+/* vim: set tw=0 noexpandtab: */

@@ -61,11 +61,14 @@ public:
 private slots:
 	void showContextMenu( const QPoint & _pos );
 	void startItemPreview( const QModelIndex & _idx );
+	void setFocusAndPreview( const QModelIndex & _idx );
 	void stopItemPreview( const QModelIndex & _idx );
 	void stopPreview();
 	void triggerDefaultAction( const QModelIndex & _idx );
 	void updateFilterStatus();
 	void manageDirectories();
+
+	void currentChanged( const QModelIndex &, const QModelIndex & );
 
 
 private:
@@ -76,8 +79,10 @@ private:
 	// the object that will preview individual resources
 	ResourcePreviewer m_previewer;
 
+	QLineEdit * m_filterEdit;
 	// our tree model on-top of a ResourceDB
 	ResourceTreeModel m_treeModel;
+	
 
 	// a view for the tree model
 	ResourceTreeView * m_treeView;
@@ -88,3 +93,5 @@ private:
 
 
 #endif
+
+/* vim: set tw=0 noexpandtab: */

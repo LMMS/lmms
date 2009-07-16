@@ -41,6 +41,10 @@ public slots:
 	void setFilter( const QString & _s );
 	void updateFilter( void );
 
+	void currentChanged( const QModelIndex & current,
+		const QModelIndex & previous );
+	void selectionChanged( const QItemSelection & selected, 
+		const QItemSelection & deselected );
 
 protected:
 	virtual void startDrag( Qt::DropActions supportedActions );
@@ -48,14 +52,21 @@ protected:
 
 private:
 	ResourceTreeModel * m_tm;
-
+ 
 	QString m_lastFilter;
 
 
 signals:
 	void dragStarted();
 
+	void treeViewCurrentChanged( const QModelIndex & current,
+		const QModelIndex & previous );
+	void treeViewSelectionChanged( const QItemSelection & selected, 
+		const QItemSelection & deselected );
+
 } ;
 
 
 #endif
+
+/* vim: set tw=0 noexpandtab: */

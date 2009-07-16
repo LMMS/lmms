@@ -62,6 +62,18 @@ void ResourceTreeView::setFilter( const QString & _s )
 }
 
 
+void ResourceTreeView::currentChanged( const QModelIndex & current,
+	const QModelIndex & previous )
+{
+	emit treeViewCurrentChanged( current, previous );
+	QTreeView::currentChanged( current, previous );
+}
+void ResourceTreeView::selectionChanged( const QItemSelection & selected, 
+	const QItemSelection & deselected )
+{
+	emit treeViewSelectionChanged( selected, deselected );
+	QTreeView::selectionChanged( selected, deselected );
+}
 
 
 void ResourceTreeView::updateFilter( void )
@@ -82,3 +94,5 @@ void ResourceTreeView::startDrag( Qt::DropActions supportedActions )
 
 
 #include "moc_ResourceTreeView.cxx"
+
+/* vim: set tw=0 noexpandtab: */

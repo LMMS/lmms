@@ -139,3 +139,4 @@ Piano * ResourcePreviewer::pianoModel()
 
 #include "moc_ResourcePreviewer.cxx"
 
+/* vim: set tw=0 noexpandtab: */
