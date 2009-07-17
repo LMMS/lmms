@@ -57,6 +57,7 @@ Andrew Kelley's todo:
   before playing)
 * VST presets don't work. when you save a project, it doesn't even save
   what you did.
+* if you listen to LB302 presets and then listen to Organic presets, segfault
 
 
 - automation recording:

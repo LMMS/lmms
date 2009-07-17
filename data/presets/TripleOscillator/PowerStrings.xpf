@@ -4,7 +4,7 @@
  <head/>
  <instrumenttracksettings>
   <instrumenttrack width="250" x="301" surpos-x="0" y="24" surpos-y="0" fxch="0" height="436" basenote="66" vol="11" name="PowerStrings" tab="3" visible="1" >
-   <tripleoscillator userwavefile1="" wavetype1="2" coarse1="0" userwavefile2="samples/shapes/smooth_inv_saw.ogg" wavetype2="3" coarse2="12" vol0="100" vol1="100" finel0="0" vol2="42" finel1="-16" finel2="0" modalgo1="2" stphdetun0="121" pan0="0" modalgo2="0" stphdetun1="259" pan1="0" stphdetun2="92" pan2="0" phoffset0="0" phoffset1="266" phoffset2="80" finer0="0" finer1="13" finer2="0" userwavefile0="" wavetype0="2" coarse0="0" />
+   <tripleoscillator userwavefile1="" wavetype1="2" coarse1="0" userwavefile2="shapes/smooth_inv_saw.ogg" wavetype2="3" coarse2="12" vol0="100" vol1="100" finel0="0" vol2="42" finel1="-16" finel2="0" modalgo1="2" stphdetun0="121" pan0="0" modalgo2="0" stphdetun1="259" pan1="0" stphdetun2="92" pan2="0" phoffset0="0" phoffset1="266" phoffset2="80" finer0="0" finer1="13" finer2="0" userwavefile0="" wavetype0="2" coarse0="0" />
    <eldata fres="1.04" ftype="7" fcut="3224" fwet="1" >
     <elvol lspd_numerator="1" lpdel="0" amt="1" rel="0.219" ctlenvamt="0" latt="0" syncmode="0" sus="0" lspd_denominator="1" lspd="0.1" att="0" pdel="0" lamt="0" dec="0.797" userwavefile="" x100="0" lshp="0" hold="0" />
     <elcut lspd_numerator="1" lpdel="0" amt="1" rel="0.016" ctlenvamt="0" latt="0" syncmode="0" sus="0.998" lspd_denominator="1" lspd="0.6268" att="0" pdel="0" lamt="0" dec="0.336" userwavefile="" x100="0" lshp="1" hold="0" />

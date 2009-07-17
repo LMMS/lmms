@@ -4,7 +4,7 @@
   <head/>
   <channelsettings>
     <channeltrack surpos="135792616" fxch="0" baseoct="4" vol="100" name="Play some rock" basetone="9" tab="3" >
-      <tripleoscillator userwavefile1="samples/empty.wav" wavetype1="4" coarse1="0" userwavefile2="samples/empty.wav" wavetype2="5" coarse2="-12" vol0="100" vol1="54" finel0="0" vol2="26" finel1="0" finel2="-14" modalgo1="0" stphdetun0="247" pan0="0" modalgo2="0" stphdetun1="109" pan1="0" stphdetun2="334" pan2="0" phoffset0="0" phoffset1="271" phoffset2="82" finer0="0" finer1="0" finer2="13" userwavefile0="samples/empty.wav" wavetype0="3" coarse0="0" />
+      <tripleoscillator userwavefile1="" wavetype1="4" coarse1="0" userwavefile2="" wavetype2="5" coarse2="-12" vol0="100" vol1="54" finel0="0" vol2="26" finel1="0" finel2="-14" modalgo1="0" stphdetun0="247" pan0="0" modalgo2="0" stphdetun1="109" pan1="0" stphdetun2="334" pan2="0" phoffset0="0" phoffset1="271" phoffset2="82" finer0="0" finer1="0" finer2="13" userwavefile0="" wavetype0="3" coarse0="0" />
       <eldata fres="0.33" ftype="0" fcut="0" fwet="1" >
         <elvol lfosyncmode="0" lpdel="0" amt="1" rel="0.277" ctlenvamt="0" latt="0" sus="0" lspd="0.0917" att="0" pdel="0" lamt="0" dec="0.296" userwavefile="" x100="0" lshp="0" hold="0" />
         <elcut lfosyncmode="0" lpdel="0" amt="1" rel="0.25" ctlenvamt="0" latt="0" sus="0.34" lspd="0.767" att="0" pdel="0" lamt="0" dec="0.665" userwavefile="" x100="0" lshp="1" hold="0" />

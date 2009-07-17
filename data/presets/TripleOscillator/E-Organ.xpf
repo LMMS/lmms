@@ -5,7 +5,7 @@
   <instrumenttracksettings muted="0" type="0" name="E-Organ" >
     <instrumenttrack pan="0" fxch="0" pitch="0" basenote="62" vol="19" >
       <instrument name="tripleoscillator" >
-        <tripleoscillator phoffset2="146" userwavefile0="samples/empty.wav" finer0="0" userwavefile1="samples/empty.wav" finer1="0" userwavefile2="samples/empty.wav" finer2="11" coarse0="-7" coarse1="0" coarse2="0" finel0="0" finel1="0" modalgo1="1" modalgo2="1" finel2="-18" pan0="0" modalgo3="0" pan1="0" stphdetun0="0" pan2="0" stphdetun1="125" wavetype0="0" stphdetun2="59" wavetype1="0" wavetype2="0" vol0="100" vol1="100" phoffset0="0" phoffset1="265" vol2="100" />
+        <tripleoscillator phoffset2="146" userwavefile0="" finer0="0" userwavefile1="" finer1="0" userwavefile2="" finer2="11" coarse0="-7" coarse1="0" coarse2="0" finel0="0" finel1="0" modalgo1="1" modalgo2="1" finel2="-18" pan0="0" modalgo3="0" pan1="0" stphdetun0="0" pan2="0" stphdetun1="125" wavetype0="0" stphdetun2="59" wavetype1="0" wavetype2="0" vol0="100" vol1="100" phoffset0="0" phoffset1="265" vol2="100" />
       </instrument>
       <eldata fres="0.5" ftype="0" fcut="14000" fwet="0" >
         <elvol lspd_denominator="1" pdel="0" userwavefile="" dec="0.394" lamt="0" syncmode="0" latt="0" rel="0.215" sus="0" amt="1" x100="0" att="0.079" lpdel="0" hold="0" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="1" />
