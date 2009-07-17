@@ -22,6 +22,7 @@
  *
  */
 
+#include <QtCore/QBuffer>
 #include <QtCore/QCoreApplication>
 #include <QtCore/QDebug>
 #include <QtCore/QUrl>
@@ -35,15 +36,8 @@ QList<int> WebResourceProvider::m_downloadIDs;
 
 
 WebResourceProvider::WebResourceProvider( const QString & _url ) :
-	ResourceProvider( _url ),
-	m_http( NULL ),
-	m_indexBuffer()
+	ResourceProvider( _url )
 {
-	QUrl u( _url );
-	m_http = new QHttp( u.host(), u.port() > 0 ? u.port() : 80, this );
-	connect( m_http, SIGNAL( requestFinished( int, bool ) ),
-			this, SLOT( finishDownload( int, bool ) ) );
-
 	database()->init();
 }
 
@@ -58,16 +52,16 @@ WebResourceProvider::~WebResourceProvider()
 
 
 
-void WebResourceProvider::updateDatabase( void )
+void WebResourceProvider::updateDatabase()
 {
-	m_indexBuffer.close();
-	m_indexBuffer.open( QBuffer::ReadWrite );
-	download( "/WebResources/Index", &m_indexBuffer, true );
+	QBuffer indexBuffer;
+	indexBuffer.open( QBuffer::ReadWrite );
+	download( url() + "/WebResources/Index", &indexBuffer );
 
-	m_indexBuffer.seek( 0 );
+	indexBuffer.seek( 0 );
 
 	QDomDocument doc;
-	doc.setContent( &m_indexBuffer );
+	doc.setContent( &indexBuffer );
 
 	importNodeIntoDB( doc.firstChildElement( "webresources" ),
 						database()->topLevelNode() );
@@ -82,7 +76,7 @@ QByteArray WebResourceProvider::fetchData( const ResourceItem * _item,
 	QBuffer buffer;
 	buffer.open( QBuffer::ReadWrite );
 
-	download( "/WebResources/" + _item->hash(), &buffer, true );
+	download( url() + "/WebResources/" + _item->hash(), &buffer );
 
 	return buffer.data();
 }
@@ -198,17 +192,39 @@ void WebResourceProvider::importNodeIntoDB( const QDomNode & _n,
 
 
 void WebResourceProvider::download( const QString & _path,
-					QBuffer * _target, bool _wait ) const
+					QBuffer * _target ) const
 {
-	const int id = m_http->get( _path, _target );
+	// create local http object;
+	QHttp http;
+	connect( &http, SIGNAL( requestFinished( int, bool ) ),
+			this, SLOT( finishDownload( int, bool ) ) );
 
-	if( _wait )
+	// set current URL for http object
+	QUrl u( _path );
+	http.setHost( u.host(), u.port() > 0 ? u.port() : 80 );
+
+	// start the download
+	const int id = http.get( _path, _target );
+
+	// wait for the download to finish
+	while( !m_downloadIDs.contains( id ) )
 	{
-		while( !m_downloadIDs.contains( id ) )
+		QCoreApplication::instance()->processEvents();
+	}
+	m_downloadIDs.removeAll( id );
+
+	if( http.lastResponse().statusCode() == 302 )
+	{
+		const QString newLocation =
+				http.lastResponse().value( "location" );
+		if( newLocation != _path )
 		{
-			QCoreApplication::instance()->processEvents();
+			qDebug() << "HTTP forwarding to" << newLocation;
+
+			_target->seek( 0 );
+			_target->buffer().clear();
+			download( newLocation, _target );
 		}
-		m_downloadIDs.removeAll( id );
 	}
 }
 

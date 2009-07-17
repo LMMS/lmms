@@ -25,14 +25,13 @@
 #ifndef _WEB_RESOURCE_PROVIDER_H
 #define _WEB_RESOURCE_PROVIDER_H
 
-#include <QtCore/QBuffer>
 #include <QtXml/QDomNode>
 
 #include "ResourceProvider.h"
 #include "ResourceItem.h"
 
 
-class QHttp;
+class QBuffer;
 
 
 class WebResourceProvider : public ResourceProvider
@@ -42,12 +41,12 @@ public:
 	WebResourceProvider( const QString & _url );
 	virtual ~WebResourceProvider();
 
-	virtual QString providerName( void ) const
+	virtual QString providerName() const
 	{
 		return "WebResourceProvider";
 	}
 
-	virtual void updateDatabase( void );
+	virtual void updateDatabase();
 
 	virtual int dataSize( const ResourceItem * _item ) const
 	{
@@ -58,7 +57,7 @@ public:
 	virtual QByteArray fetchData( const ResourceItem * _item,
 					int _maxSize = -1 ) const;
 
-	virtual bool isLocal( void ) const
+	virtual bool isLocal() const
 	{
 		return false;
 	}
@@ -73,11 +72,8 @@ private:
 						ResourceItem * _item );
 	void importNodeIntoDB( const QDomNode & n,
 						ResourceTreeItem * _parent );
-	void download( const QString & _path, QBuffer * _target,
-						bool _wait = false ) const;
+	void download( const QString & _path, QBuffer * _target ) const;
 
-	QHttp * m_http;
-	QBuffer m_indexBuffer;
 	static QList<int> m_downloadIDs;
 
 } ;
