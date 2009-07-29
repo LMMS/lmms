@@ -1138,4 +1138,6 @@ void remotePluginClient::doProcessing( void )
 
 #endif
 
+#define QSTR_TO_STDSTR(s)	std::string( s.toUtf8().constData() )
+
 #endif

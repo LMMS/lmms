@@ -111,7 +111,7 @@ vstPlugin::vstPlugin( const QString & _plugin ) :
 	(void) target->winId();
 
 	sendMessage( message( IdVstPluginWindowInformation ).
-					addString( t.toStdString() ) );
+					addString( QSTR_TO_STDSTR( t ) ) );
 #endif
 
 	VstHostLanguages hlang = LanguageEnglish;
@@ -134,7 +134,7 @@ vstPlugin::vstPlugin( const QString & _plugin ) :
 		p = configManager::inst()->vstDir() + QDir::separator() + p;
 	}
 
-	sendMessage( message( IdVstLoadPlugin ).addString( p.toStdString() ) );
+	sendMessage( message( IdVstLoadPlugin ).addString( QSTR_TO_STDSTR( p ) ) );
 
 	waitForInitDone();
 
@@ -424,8 +424,9 @@ void vstPlugin::loadChunk( const QByteArray & _chunk )
 		tf.write( _chunk );
 		lock();
 		sendMessage( message( IdLoadSettingsFromFile ).
-				addString( QDir::toNativeSeparators(
-					tf.fileName() ).toStdString() ).
+				addString(
+					QSTR_TO_STDSTR(
+						QDir::toNativeSeparators( tf.fileName() ) ) ).
 				addInt( _chunk.size() ) );
 		waitForMessage( IdLoadSettingsFromFile );
 		unlock();
@@ -443,8 +444,9 @@ QByteArray vstPlugin::saveChunk( void )
 	{
 		lock();
 		sendMessage( message( IdSaveSettingsToFile ).
-				addString( QDir::toNativeSeparators(
-					tf.fileName() ).toStdString() ) );
+				addString(
+					QSTR_TO_STDSTR(
+						QDir::toNativeSeparators( tf.fileName() ) ) ) );
 		waitForMessage( IdSaveSettingsToFile );
 		unlock();
 		a = tf.readAll();
