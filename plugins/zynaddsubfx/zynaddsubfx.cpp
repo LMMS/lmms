@@ -103,8 +103,9 @@ void zynAddSubFx::saveSettings( QDomDocument & _doc,
 		m_plugin->lock();
 		m_plugin->sendMessage(
 			remotePlugin::message( IdSaveSettingsToFile ).
-				addString( QDir::toNativeSeparators(
-					tf.fileName() ).toStdString() ) );
+				addString(
+					QSTR_TO_STDSTR(
+						QDir::toNativeSeparators( tf.fileName() ) ) ) );
 		m_plugin->waitForMessage( IdSaveSettingsToFile );
 		m_plugin->unlock();
 		QByteArray a = tf.readAll();
@@ -144,8 +145,9 @@ void zynAddSubFx::loadSettings( const QDomElement & _this )
 		m_plugin->lock();
 		m_plugin->sendMessage(
 			remotePlugin::message( IdLoadSettingsFromFile ).
-				addString( QDir::toNativeSeparators(
-					tf.fileName() ).toStdString() ) );
+				addString(
+					QSTR_TO_STDSTR(
+						QDir::toNativeSeparators( tf.fileName() ) ) ) );
 		m_plugin->waitForMessage( IdLoadSettingsFromFile );
 		m_plugin->unlock();
 
@@ -161,7 +163,7 @@ void zynAddSubFx::loadFile( const QString & _file )
 	m_plugin->lock();
 	m_plugin->sendMessage(
 		remotePlugin::message( IdLoadPresetFromFile ).
-				addString( _file.toStdString() ) );
+								QSTR_TO_STD_STR( _file ) );
 	m_plugin->waitForMessage( IdLoadPresetFromFile );
 	m_plugin->unlock();
 
@@ -230,10 +232,9 @@ void zynAddSubFx::initRemotePlugin( void )
 
 	m_plugin->sendMessage(
 		remotePlugin::message( IdZasfPresetDirectory ).
-				addString(
-		( configManager::inst()->factoryPresetsDir() +
-			QDir::separator() + "ZynAddSubFX" ).
-						toStdString() ) );
+			addString(
+				QSTR_TO_STDSTR( configManager::inst()->factoryPresetsDir() +
+					QDir::separator() + "ZynAddSubFX" ) ) );
 	m_plugin->unlock();
 }
 
