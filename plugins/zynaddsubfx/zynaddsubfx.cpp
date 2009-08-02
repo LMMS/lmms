@@ -239,8 +239,9 @@ void zynAddSubFx::initRemotePlugin( void )
 	m_plugin->sendMessage(
 		remotePlugin::message( IdZasfPresetDirectory ).
 			addString(
-				QSTR_TO_STDSTR( configManager::inst()->factoryPresetsDir() +
-					QDir::separator() + "ZynAddSubFX" ) ) );
+				QSTR_TO_STDSTR(
+					QString( configManager::inst()->factoryPresetsDir() +
+								QDir::separator() + "ZynAddSubFX" ) ) ) );
 	m_plugin->unlock();
 }
 
