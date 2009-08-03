@@ -280,7 +280,7 @@ void MixerWorkerThread::processJobQueue( void )
 
 // define a pause instruction for spinlock-loop - merely useful on
 // HyperThreading systems with just one physical core (e.g. Intel Atom)
-#ifdef LMMS_HOST_X86_64
+#ifdef LMMS_HOST_X86
 #define SPINLOCK_PAUSE()        asm( "pause" )
 #else
 #ifdef LMMS_HOST_X86_64
