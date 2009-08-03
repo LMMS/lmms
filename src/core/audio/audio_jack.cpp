@@ -44,7 +44,7 @@
 #include "lcd_spinbox.h"
 #include "audio_port.h"
 #include "main_window.h"
-#include "basic_ops.h"
+#include "Cpu.h"
 
 
 
@@ -57,7 +57,7 @@ audioJACK::audioJACK( bool & _success_ful, mixer * _mixer ) :
 	m_client( NULL ),
 	m_active( false ),
 	m_stopSemaphore( 1 ),
-	m_outBuf( alignedAllocFrames( getMixer()->framesPerPeriod() ) ),
+	m_outBuf( CPU::allocFrames( getMixer()->framesPerPeriod() ) ),
 	m_framesDoneInCurBuf( 0 ),
 	m_framesToDoInCurBuf( 0 )
 {
@@ -93,7 +93,7 @@ audioJACK::~audioJACK()
 		jack_client_close( m_client );
 	}
 
-	alignedFreeFrames( m_outBuf );
+	CPU::freeFrames( m_outBuf );
 
 }
 

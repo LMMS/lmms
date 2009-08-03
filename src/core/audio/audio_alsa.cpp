@@ -1,10 +1,8 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * audio_alsa.cpp - device-class which implements ALSA-PCM-output
  *
  * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -25,7 +23,6 @@
  */
 
 
-
 #include <QtGui/QLineEdit>
 #include <QtGui/QLabel>
 
@@ -39,7 +36,7 @@
 #include "lcd_spinbox.h"
 #include "gui_templates.h"
 #include "templates.h"
-#include "basic_ops.h"
+#include "Cpu.h"
 
 
 
@@ -230,10 +227,10 @@ void audioALSA::applyQualitySettings( void )
 
 void audioALSA::run( void )
 {
-	sampleFrameA * temp = alignedAllocFrames(
+	sampleFrameA * temp = CPU::allocFrames(
 					getMixer()->framesPerPeriod() );
 	intSampleFrameA * outbuf = (intSampleFrameA *)
-		alignedMalloc( sizeof( intSampleFrameA ) * channels() /
+		CPU::memAlloc( sizeof( intSampleFrameA ) * channels() /
 			DEFAULT_CHANNELS * getMixer()->framesPerPeriod() );
 
 	int_sample_t * pcmbuf = new int_sample_t[m_periodSize * channels()];
@@ -261,7 +258,7 @@ void audioALSA::run( void )
 				}
 				outbuf_size = frames * channels();
 
-				alignedConvertToS16( temp, outbuf, frames,
+				CPU::convertToS16( temp, outbuf, frames,
 						getMixer()->masterGain(),
 							m_convertEndian );
 			}
@@ -300,8 +297,8 @@ void audioALSA::run( void )
 		}
 	}
 
-	alignedFreeFrames( temp );
-	alignedFree( outbuf );
+	CPU::freeFrames( temp );
+	CPU::memFree( outbuf );
 	delete[] pcmbuf;
 }
 
@@ -526,5 +523,3 @@ void audioALSA::setupWidget::saveSettings( void )
 
 #endif
 
-
-#endif

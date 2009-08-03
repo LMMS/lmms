@@ -1,10 +1,8 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * audio_sdl.cpp - device-class that performs PCM-output via SDL
  *
  * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -25,7 +23,6 @@
  */
 
 
-
 #include "audio_sdl.h"
 
 #ifdef LMMS_HAVE_SDL
@@ -38,13 +35,13 @@
 #include "config_mgr.h"
 #include "gui_templates.h"
 #include "templates.h"
-#include "basic_ops.h"
+#include "Cpu.h"
 
 
 
 audioSDL::audioSDL( bool & _success_ful, mixer * _mixer ) :
 	audioDevice( DEFAULT_CHANNELS, _mixer ),
-	m_outBuf( alignedAllocFrames( getMixer()->framesPerPeriod() ) ),
+	m_outBuf( CPU::allocFrames( getMixer()->framesPerPeriod() ) ),
 	m_convertedBufPos( 0 ),
 	m_convertEndian( false ),
 	m_stopSemaphore( 1 )
@@ -53,7 +50,7 @@ audioSDL::audioSDL( bool & _success_ful, mixer * _mixer ) :
 
 	m_convertedBufSize = getMixer()->framesPerPeriod() *
 						sizeof( intSampleFrameA );
-	m_convertedBuf = (intSampleFrameA *) alignedMalloc( m_convertedBufSize );
+	m_convertedBuf = (intSampleFrameA *) CPU::memAlloc( m_convertedBufSize );
 
 
 	if( SDL_Init( SDL_INIT_AUDIO | SDL_INIT_NOPARACHUTE ) < 0 )
@@ -97,8 +94,8 @@ audioSDL::~audioSDL()
 
 	SDL_CloseAudio();
 	SDL_Quit();
-	alignedFree( m_convertedBuf );
-	alignedFreeFrames( m_outBuf );
+	CPU::memFree( m_convertedBuf );
+	CPU::freeFrames( m_outBuf );
 }
 
 
@@ -192,7 +189,7 @@ void audioSDL::sdlAudioCallback( Uint8 * _buf, int _len )
 			}
 			m_convertedBufSize = frames * sizeof( intSampleFrameA );
 
-			alignedConvertToS16( m_outBuf,
+			CPU::convertToS16( m_outBuf,
 						m_convertedBuf,
 						frames,
 						getMixer()->masterGain(),
@@ -243,4 +240,3 @@ void audioSDL::setupWidget::saveSettings( void )
 
 #endif
 
-#endif

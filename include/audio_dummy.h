@@ -1,8 +1,8 @@
 /*
  * audio_dummy.h - dummy-audio-device
  *
- * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -22,12 +22,11 @@
  *
  */
 
-
 #ifndef _AUDIO_DUMMY_H
 #define _AUDIO_DUMMY_H
 
 #include "audio_device.h"
-#include "basic_ops.h"
+#include "Cpu.h"
 #include "micro_timer.h"
 
 
@@ -45,7 +44,7 @@ public:
 		stopProcessing();
 	}
 
-	inline static QString name( void )
+	inline static QString name()
 	{
 		return( QT_TRANSLATE_NOOP( "setupWidget",
 						"Dummy (no sound output)" ) );
@@ -64,11 +63,11 @@ public:
 		{
 		}
 
-		virtual void saveSettings( void )
+		virtual void saveSettings()
 		{
 		}
 
-		virtual void show( void )
+		virtual void show()
 		{
 			parentWidget()->hide();
 			QWidget::show();
@@ -78,12 +77,12 @@ public:
 
 
 private:
-	virtual void startProcessing( void )
+	virtual void startProcessing()
 	{
 		start();
 	}
 
-	virtual void stopProcessing( void )
+	virtual void stopProcessing()
 	{
 		if( isRunning() )
 		{
@@ -92,7 +91,7 @@ private:
 		}
 	}
 
-	virtual void run( void )
+	virtual void run()
 	{
 		microTimer timer;
 		while( true )
@@ -104,7 +103,7 @@ private:
 			{
 				break;
 			}
-			alignedFreeFrames( b );
+			CPU::freeFrames( b );
 
 			const Sint32 microseconds = static_cast<Sint32>(
 					getMixer()->framesPerPeriod() *

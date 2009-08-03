@@ -1,10 +1,8 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * audio_pulseaudio.cpp - device-class which implements PulseAudio-output
  *
- * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ * Copyright (c) 2008-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -25,7 +23,6 @@
  */
 
 
-
 #include <QtGui/QLineEdit>
 #include <QtGui/QLabel>
 
@@ -40,7 +37,7 @@
 #include "lcd_spinbox.h"
 #include "gui_templates.h"
 #include "templates.h"
-#include "basic_ops.h"
+#include "Cpu.h"
 
 
 static void stream_write_callback(pa_stream *s, size_t length, void *userdata)
@@ -231,7 +228,7 @@ void audioPulseAudio::run( void )
 void audioPulseAudio::streamWriteCallback(pa_stream *s, size_t length)
 {
 	const fpp_t fpp = getMixer()->framesPerPeriod();
-	sampleFrameA * temp = alignedAllocFrames( fpp );
+	sampleFrameA * temp = CPU::allocFrames( fpp );
 	Sint16 * pcmbuf = (Sint16*)pa_xmalloc( fpp * channels() *
 							sizeof(Sint16) );
 
@@ -243,7 +240,7 @@ void audioPulseAudio::streamWriteCallback(pa_stream *s, size_t length)
 		{
 			return;
 		}
-		int bytes = alignedConvertToS16( temp,
+		int bytes = CPU::convertToS16( temp,
 						(intSampleFrameA *) pcmbuf,
 						frames,
 						getMixer()->masterGain(),
@@ -257,7 +254,7 @@ void audioPulseAudio::streamWriteCallback(pa_stream *s, size_t length)
 	}
 
 	pa_xfree( pcmbuf );
-	alignedFreeFrames( temp );
+	CPU::freeFrames( temp );
 }
 
 
@@ -305,8 +302,6 @@ void audioPulseAudio::setupWidget::saveSettings( void )
 				QString::number( m_channels->value<int>() ) );
 }
 
-
-#endif
 
 #endif
 

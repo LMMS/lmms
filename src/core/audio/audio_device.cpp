@@ -1,10 +1,8 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * audio_device.cpp - base-class for audio-devices used by LMMS-mixer
  *
- * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -25,13 +23,10 @@
  */
 
 
-#include <cstring>
-
-
 #include "audio_device.h"
 #include "config_mgr.h"
 #include "debug.h"
-#include "basic_ops.h"
+#include "Cpu.h"
 
 
 
@@ -40,7 +35,7 @@ audioDevice::audioDevice( const ch_cnt_t _channels, mixer * _mixer ) :
 	m_sampleRate( _mixer->processingSampleRate() ),
 	m_channels( _channels ),
 	m_mixer( _mixer ),
-	m_buffer( alignedAllocFrames( getMixer()->framesPerPeriod() ) )
+	m_buffer( CPU::allocFrames( getMixer()->framesPerPeriod() ) )
 {
 	int error;
 	if( ( m_srcState = src_new(
@@ -57,7 +52,7 @@ audioDevice::audioDevice( const ch_cnt_t _channels, mixer * _mixer ) :
 audioDevice::~audioDevice()
 {
 	src_delete( m_srcState );
-	alignedFreeFrames( m_buffer );
+	CPU::freeFrames( m_buffer );
 
 	m_devMutex.tryLock();
 	unlock();
@@ -104,7 +99,7 @@ fpp_t audioDevice::getNextBuffer( sampleFrameA * _ab )
 	}
 	else
 	{
-		alignedMemCpy( _ab, b, frames * sizeof( surroundSampleFrame ) );
+		CPU::memCpy( _ab, b, frames * sizeof( surroundSampleFrame ) );
 	}
 
 	// release lock
@@ -112,7 +107,7 @@ fpp_t audioDevice::getNextBuffer( sampleFrameA * _ab )
 
 	if( getMixer()->hasFifoWriter() )
 	{
-		alignedFreeFrames( b );
+		CPU::freeFrames( b );
 	}
 
 	return frames;
@@ -200,7 +195,7 @@ void audioDevice::resample( const sampleFrame * _src, const fpp_t _frames,
 
 void audioDevice::clearS16Buffer( intSampleFrameA * _outbuf, const fpp_t _frames )
 {
-	alignedMemClear( _outbuf, _frames * sizeof( *_outbuf ) );
+	CPU::memClear( _outbuf, _frames * sizeof( *_outbuf ) );
 //	memset( _outbuf, 0,  _frames * channels() * BYTES_PER_INT_SAMPLE );
 }
 
@@ -213,5 +208,3 @@ bool audioDevice::hqAudio( void ) const
 }
 
 
-
-#endif

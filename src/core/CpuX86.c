@@ -1,8 +1,8 @@
 /*
- * basic_ops_x86.c - x86 specific optimized operations
+ * cpu_x86.c - x86 specific optimized operations
  *
- * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ * Copyright (c) 2008-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -22,9 +22,7 @@
  *
  */
 
-
-
-#include "basic_ops.h"
+#include "Cpu.h"
 
 #ifdef X86_OPTIMIZATIONS
 
@@ -32,7 +30,7 @@
 
 #include <mmintrin.h>
 
-void alignedMemCpyMMX( void * RP _dst, const void * RP _src, int _size )
+void memCpyMMX( void * RP _dst, const void * RP _src, int _size )
 {
 	const int s = _size / ( sizeof( __m64 ) * 8 );
 	int i;
@@ -79,7 +77,7 @@ void alignedMemCpyMMX( void * RP _dst, const void * RP _src, int _size )
 
 
 
-void alignedMemClearMMX( void * RP _dst, int _size )
+void memClearMMX( void * RP _dst, int _size )
 {
 	__m64 * dst = (__m64 *) _dst;
 	const int s = _size / ( sizeof( *dst ) * 8 );
@@ -109,7 +107,7 @@ void alignedMemClearMMX( void * RP _dst, int _size )
 
 #include <xmmintrin.h>
 
-void alignedMemCpySSE( void * RP _dst, const void * RP _src, int _size )
+void memCpySSE( void * RP _dst, const void * RP _src, int _size )
 {
 	__m128 * dst = (__m128 *) _dst;
 	__m128 * src = (__m128 *) _src;
@@ -133,7 +131,7 @@ void alignedMemCpySSE( void * RP _dst, const void * RP _src, int _size )
 
 
 
-void alignedMemClearSSE( void * RP _dst, int _size )
+void memClearSSE( void * RP _dst, int _size )
 {
 	__m128 * dst = (__m128 *) _dst;
 	const int s = _size / ( sizeof( *dst ) * 4 );
@@ -152,7 +150,7 @@ void alignedMemClearSSE( void * RP _dst, int _size )
 
 
 
-void alignedBufApplyGainSSE( sampleFrameA * RP _dst, float _gain, int _frames )
+void bufApplyGainSSE( sampleFrameA * RP _dst, float _gain, int _frames )
 {
 	int i;
 	for( i = 0; i < _frames; )
@@ -180,7 +178,7 @@ void alignedBufApplyGainSSE( sampleFrameA * RP _dst, float _gain, int _frames )
 
 
 
-void alignedBufMixSSE( sampleFrameA * RP _dst, const sampleFrameA * RP _src,
+void bufMixSSE( sampleFrameA * RP _dst, const sampleFrameA * RP _src,
 								int _frames )
 {
 	int i;
@@ -209,7 +207,7 @@ void alignedBufMixSSE( sampleFrameA * RP _dst, const sampleFrameA * RP _src,
 
 
 
-void alignedBufMixLRCoeffSSE( sampleFrameA * RP _dst,
+void bufMixLRCoeffSSE( sampleFrameA * RP _dst,
 					const sampleFrameA * RP _src,
 					float _left, float _right, int _frames )
 {
@@ -257,7 +255,7 @@ void unalignedBufMixLRCoeffSSE( sampleFrame * RP _dst, const sampleFrame * RP _s
 
 
 
-void alignedBufWetDryMixSSE( sampleFrameA * RP _dst,
+void bufWetDryMixSSE( sampleFrameA * RP _dst,
 					const sampleFrameA * RP _src,
 					float _wet, float _dry, int _frames )
 {
@@ -279,7 +277,7 @@ void alignedBufWetDryMixSSE( sampleFrameA * RP _dst,
 
 
 
-void alignedBufWetDryMixSplittedSSE( sampleFrameA * RP _dst,
+void bufWetDryMixSplittedSSE( sampleFrameA * RP _dst,
 					const float * RP _left,
 					const float * RP _right,
 					float _wet, float _dry, int _frames )
@@ -304,7 +302,7 @@ void alignedBufWetDryMixSplittedSSE( sampleFrameA * RP _dst,
 
 #include <emmintrin.h>
 
-void alignedMemCpySSE2( void * RP _dst, const void * RP _src, int _size )
+void memCpySSE2( void * RP _dst, const void * RP _src, int _size )
 {
 	__m128i * dst = (__m128i *) _dst;
 	__m128i * src = (__m128i *) _src;
@@ -324,7 +322,7 @@ void alignedMemCpySSE2( void * RP _dst, const void * RP _src, int _size )
 
 
 
-void alignedMemClearSSE2( void * RP _dst, int _size )
+void memClearSSE2( void * RP _dst, int _size )
 {
 	__m128i * dst = (__m128i *) _dst;
 	const int s = _size / ( sizeof( *dst ) * 4 );
@@ -342,7 +340,7 @@ void alignedMemClearSSE2( void * RP _dst, int _size )
 
 
 
-int alignedConvertToS16SSE2( const sampleFrameA * RP _src,
+int convertToS16SSE2( const sampleFrameA * RP _src,
 					intSampleFrameA * RP _dst,
 					const fpp_t _frames,
 					const float _master_gain,

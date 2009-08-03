@@ -1,8 +1,8 @@
 /*
- * basic_ops.h - basic memory operations
+ * Cpu.h - CPU specific accellerated operations
  *
- * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ * Copyright (c) 2008-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -22,9 +22,8 @@
  *
  */
 
-
-#ifndef _BASIC_OPS_H
-#define _BASIC_OPS_H
+#ifndef _CPU_H
+#define _CPU_H
 
 #include "lmms_basics.h"
 
@@ -32,56 +31,64 @@
 #include <stdbool.h>
 #endif
 
-void initBasicOps( void );
+#ifdef __cplusplus
+namespace CPU
+{
+#endif
 
-void * alignedMalloc( int _bytes );
-void alignedFree( void * _buf );
+void init();
 
-sampleFrameA * alignedAllocFrames( int _frames );
-void alignedFreeFrames( sampleFrameA * _buf );
+void * memAlloc( int _bytes );
+void memFree( void * _buf );
+
+sampleFrameA * allocFrames( int _frames );
+void freeFrames( sampleFrameA * _buf );
 
 
-// all aligned* functions assume data to be 16 byte aligned and size to be
-// multiples of 64
-typedef void (*alignedMemCpyFunc)( void * RP _dst, const void * RP _src,
+// all functions assume data to be 16 byte  and size to be
+// multiples of 64 (except for unaligned*())
+typedef void (*MemCpyFunc)( void * RP _dst, const void * RP _src,
 								int _size );
-typedef void (*alignedMemClearFunc)( void * RP _dst, int _size );
-typedef void (*alignedBufApplyGainFunc)( sampleFrameA * RP _dst,
+typedef void (*MemClearFunc)( void * RP _dst, int _size );
+typedef void (*BufApplyGainFunc)( sampleFrameA * RP _dst,
 						float _gain, int _frames );
-typedef void (*alignedBufMixFunc)( sampleFrameA * RP _dst,
+typedef void (*BufMixFunc)( sampleFrameA * RP _dst,
 						const sampleFrameA * RP _src,
 								int _frames );
-typedef void (*alignedBufMixLRCoeffFunc)( sampleFrameA * RP _dst,
+typedef void (*BufMixLRCoeffFunc)( sampleFrameA * RP _dst,
 						const sampleFrameA * RP _src,
 						float _left, float _right,
 								int _frames );
-typedef void (*unalignedBufMixLRCoeffFunc)( sampleFrame * RP _dst,
+typedef void (*UnalignedBufMixLRCoeffFunc)( sampleFrame * RP _dst,
 						const sampleFrame * RP _src,
 						float _left, float _right,
 								int _frames );
-typedef void (*alignedBufWetDryMixFunc)( sampleFrameA * RP _dst,
+typedef void (*BufWetDryMixFunc)( sampleFrameA * RP _dst,
 					const sampleFrameA * RP _src,
 					float _wet, float _dry, int _frames );
-typedef void (*alignedBufWetDryMixSplittedFunc)( sampleFrameA * RP _dst,
+typedef void (*BufWetDryMixSplittedFunc)( sampleFrameA * RP _dst,
 					const float * RP _left,
 					const float * RP _right,
 					float _wet, float _dry, int _frames );
-typedef int (*alignedConvertToS16Func)( const sampleFrameA * RP _src,
+typedef int (*ConvertToS16Func)( const sampleFrameA * RP _src,
 					intSampleFrameA * RP _dst,
 					const fpp_t _frames,
 					const float _master_gain,
 					const bool _convert_endian );
 
-extern alignedMemCpyFunc alignedMemCpy;
-extern alignedMemClearFunc alignedMemClear;
-extern alignedBufApplyGainFunc alignedBufApplyGain;
-extern alignedBufMixFunc alignedBufMix;
-extern alignedBufMixLRCoeffFunc alignedBufMixLRCoeff;
-extern unalignedBufMixLRCoeffFunc unalignedBufMixLRCoeff;
-extern alignedBufWetDryMixFunc alignedBufWetDryMix;
-extern alignedBufWetDryMixSplittedFunc alignedBufWetDryMixSplitted;
-extern alignedConvertToS16Func alignedConvertToS16;
+extern MemCpyFunc memCpy;
+extern MemClearFunc memClear;
+extern BufApplyGainFunc bufApplyGain;
+extern BufMixFunc bufMix;
+extern BufMixLRCoeffFunc bufMixLRCoeff;
+extern UnalignedBufMixLRCoeffFunc unalignedBufMixLRCoeff;
+extern BufWetDryMixFunc bufWetDryMix;
+extern BufWetDryMixSplittedFunc bufWetDryMixSplitted;
+extern ConvertToS16Func convertToS16;
 
+#ifdef __cplusplus
+}
+#endif
 
 #ifdef LMMS_HOST_X86
 #define X86_OPTIMIZATIONS

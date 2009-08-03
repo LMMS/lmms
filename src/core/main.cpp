@@ -62,7 +62,7 @@
 #include "main_window.h"
 #include "project_renderer.h"
 #include "song.h"
-#include "basic_ops.h"
+#include "Cpu.h"
 
 // TODO Make a factory class for this (or hide it behind engine)
 #include "lmms_style.h"
@@ -96,8 +96,8 @@ int main( int argc, char * * argv )
 	// intialize RNG
 	srand( getpid() + time( 0 ) );
 
-	// init CPU specific optimized basic ops
-	initBasicOps();
+	// init CPU specific optimized operations
+	CPU::init();
 
 	bool core_only = false;
 	bool fullscreen = true;

@@ -60,7 +60,7 @@ audioPortAudio::audioPortAudio( bool & _success_ful, mixer * _mixer ) :
 					DEFAULT_CHANNELS, SURROUND_CHANNELS ),
 								_mixer ),
 	m_wasPAInitError( false ),
-	m_outBuf( alignedAllocFrames( getMixer()->framesPerPeriod() ) ),
+	m_outBuf( CPU::allocFrames( getMixer()->framesPerPeriod() ) ),
 	m_outBufPos( 0 ),
 	m_stopSemaphore( 1 )
 {
@@ -206,7 +206,7 @@ audioPortAudio::~audioPortAudio()
 	{
 		Pa_Terminate();
 	}
-	alignedFreeFrames( m_outBuf );
+	CPU::freeFrames( m_outBuf );
 }
 
 

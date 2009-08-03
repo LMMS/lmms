@@ -2,7 +2,7 @@
  * mixer.cpp - audio-device-independent mixer for LMMS
  *
  * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -22,7 +22,6 @@
  *
  */
 
-
 #include <math.h>
 
 #include "mixer.h"
@@ -41,7 +40,7 @@
 #include "sample_play_handle.h"
 #include "piano_roll.h"
 #include "micro_timer.h"
-#include "basic_ops.h"
+#include "Cpu.h"
 
 #include "audio_device.h"
 #include "midi_client.h"
@@ -125,7 +124,7 @@ public:
 
 	MixerWorkerThread( int _worker_num, mixer * _mixer ) :
 		QThread( _mixer ),
-		m_workingBuf( alignedAllocFrames( _mixer->framesPerPeriod() ) ),
+		m_workingBuf( CPU::allocFrames( _mixer->framesPerPeriod() ) ),
 		m_workerNum( _worker_num ),
 		m_quit( false ),
 		m_mixer( _mixer ),
@@ -135,7 +134,7 @@ public:
 
 	virtual ~MixerWorkerThread()
 	{
-		alignedFreeFrames( m_workingBuf );
+		CPU::freeFrames( m_workingBuf );
 	}
 
 	virtual void quit( void )
@@ -295,7 +294,7 @@ mixer::mixer( void ) :
 	{
 		m_inputBufferFrames[i] = 0;
 		m_inputBufferSize[i] = DEFAULT_BUFFER_SIZE * 100;
-		m_inputBuffer[i] = alignedAllocFrames( 
+		m_inputBuffer[i] = CPU::allocFrames( 
 						DEFAULT_BUFFER_SIZE * 100 );
 		clearAudioBuffer( m_inputBuffer[i], m_inputBufferSize[i] );
 	}
@@ -337,10 +336,10 @@ mixer::mixer( void ) :
 		m_fifo = new fifo( 1 );
 	}
 
-	m_workingBuf = alignedAllocFrames( m_framesPerPeriod );
+	m_workingBuf = CPU::allocFrames( m_framesPerPeriod );
 	for( Uint8 i = 0; i < 3; i++ )
 	{
-		m_readBuf = alignedAllocFrames( m_framesPerPeriod );
+		m_readBuf = CPU::allocFrames( m_framesPerPeriod );
 		clearAudioBuffer( m_readBuf, m_framesPerPeriod );
 		m_bufferPool.push_back( m_readBuf );
 	}
@@ -389,10 +388,10 @@ mixer::~mixer()
 
 	for( Uint8 i = 0; i < 3; i++ )
 	{
-		alignedFreeFrames( m_bufferPool[i] );
+		CPU::freeFrames( m_bufferPool[i] );
 	}
 
-	alignedFreeFrames( m_workingBuf );
+	CPU::freeFrames( m_workingBuf );
 }
 
 
@@ -504,9 +503,9 @@ void mixer::pushInputFrames( sampleFrame * _ab, const f_cnt_t _frames )
 	if( frames + _frames > size )
 	{
 		size = qMax( size * 2, frames + _frames );
-		sampleFrame * ab = alignedAllocFrames( size );
-		alignedMemCpy( ab, buf, frames * sizeof( sampleFrame ) );
-		alignedFreeFrames( buf );
+		sampleFrame * ab = CPU::allocFrames( size );
+		CPU::memCpy( ab, buf, frames * sizeof( sampleFrame ) );
+		CPU::freeFrames( buf );
 
 		m_inputBufferSize[ m_inputBufferWrite ] = size;
 		m_inputBuffer[ m_inputBufferWrite ] = ab;
@@ -514,7 +513,7 @@ void mixer::pushInputFrames( sampleFrame * _ab, const f_cnt_t _frames )
 		buf = ab;
 	}
 	
-	alignedMemCpy( &buf[ frames ], _ab, _frames * sizeof( sampleFrame ) );
+	CPU::memCpy( &buf[ frames ], _ab, _frames * sizeof( sampleFrame ) );
 	m_inputBufferFrames[ m_inputBufferWrite ] += _frames;
 	
 	unlockInputFrames();
@@ -686,7 +685,7 @@ void mixer::bufferToPort( const sampleFrame * _buf,
 	const int loop1_frame = qMin<int>( end_frame, m_framesPerPeriod );
 
 	_port->lockFirstBuffer();
-	unalignedBufMixLRCoeff( _port->firstBuffer() + start_frame,
+	CPU::unalignedBufMixLRCoeff( _port->firstBuffer() + start_frame,
 					_buf, _vv.vol[0], _vv.vol[1],
 						loop1_frame - start_frame );
 	_port->unlockFirstBuffer();
@@ -697,7 +696,7 @@ void mixer::bufferToPort( const sampleFrame * _buf,
 		const int frames_done = m_framesPerPeriod - start_frame;
 		end_frame -= m_framesPerPeriod;
 		end_frame = qMin<int>( end_frame, m_framesPerPeriod );
-		unalignedBufMixLRCoeff( _port->secondBuffer(),
+		CPU::unalignedBufMixLRCoeff( _port->secondBuffer(),
 						_buf+frames_done,
 						_vv.vol[0], _vv.vol[1],
 						end_frame );
@@ -720,7 +719,7 @@ void mixer::clearAudioBuffer( sampleFrame * _ab, const f_cnt_t _frames,
 {
 	if( likely( (size_t)( _ab+_offset ) % 16 == 0 && _frames % 8 == 0 ) )
 	{
-		alignedMemClear( _ab+_offset, sizeof( *_ab ) * _frames );
+		CPU::memClear( _ab+_offset, sizeof( *_ab ) * _frames );
 	}
 	else
 	{
@@ -1157,9 +1156,9 @@ void mixer::fifoWriter::run( void )
 	const fpp_t frames = m_mixer->framesPerPeriod();
 	while( m_writing )
 	{
-		sampleFrameA * buffer = alignedAllocFrames( frames );
+		sampleFrameA * buffer = CPU::allocFrames( frames );
 		const sampleFrameA * b = m_mixer->renderNextBuffer();
-		alignedMemCpy( buffer, b, frames * sizeof( sampleFrameA ) );
+		CPU::memCpy( buffer, b, frames * sizeof( sampleFrameA ) );
 		m_fifo->write( buffer );
 	}
 

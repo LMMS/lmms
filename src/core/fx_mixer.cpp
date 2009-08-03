@@ -1,10 +1,8 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * fx_mixer.cpp - effect-mixer for LMMS
  *
- * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ * Copyright (c) 2008-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -28,7 +26,7 @@
 #include <QtXml/QDomElement>
 
 #include "fx_mixer.h"
-#include "basic_ops.h"
+#include "Cpu.h"
 #include "effect.h"
 #include "song.h"
 
@@ -39,7 +37,7 @@ fxChannel::fxChannel( model * _parent ) :
 	m_stillRunning( false ),
 	m_peakLeft( 0.0f ),
 	m_peakRight( 0.0f ),
-	m_buffer( alignedAllocFrames( engine::getMixer()->framesPerPeriod() ) ),
+	m_buffer( CPU::allocFrames( engine::getMixer()->framesPerPeriod() ) ),
 	m_muteModel( false, _parent ),
 	m_volumeModel( 1.0, 0.0, 2.0, 0.01, _parent ),
 	m_name(),
@@ -54,7 +52,7 @@ fxChannel::fxChannel( model * _parent ) :
 
 fxChannel::~fxChannel()
 {
-	alignedFreeFrames( m_buffer );
+	CPU::freeFrames( m_buffer );
 }
 
 
@@ -93,7 +91,8 @@ void fxMixer::mixToChannel( const sampleFrame * _buf, fx_ch_t _ch )
 	if( m_fxChannels[_ch]->m_muteModel.value() == false )
 	{
 		m_fxChannels[_ch]->m_lock.lock();
-		alignedBufMix( m_fxChannels[_ch]->m_buffer, _buf, engine::getMixer()->framesPerPeriod() );
+		CPU::bufMix( m_fxChannels[_ch]->m_buffer, _buf,
+						engine::getMixer()->framesPerPeriod() );
 		m_fxChannels[_ch]->m_used = true;
 		m_fxChannels[_ch]->m_lock.unlock();
 	}
@@ -248,4 +247,3 @@ void fxMixer::loadSettings( const QDomElement & _this )
 }
 
 
-#endif

@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2006-2008 Danny McRae <khjklujn/at/users.sourceforge.net>
  * Copyright (c) 2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -23,7 +23,6 @@
  *
  */
 
-
 #include <QtGui/QMessageBox>
 
 #include "ladspa_effect.h"
@@ -35,7 +34,7 @@
 #include "ladspa_subplugin_features.h"
 #include "mixer.h"
 #include "effect_chain.h"
-#include "basic_ops.h"
+#include "Cpu.h"
 #include "automation_pattern.h"
 #include "controller_connection.h"
 
@@ -82,7 +81,7 @@ ladspaEffect::ladspaEffect( model * _parent,
 							arg( m_key.second ),
 				QMessageBox::Ok, QMessageBox::NoButton );
 		}
-		setOkay( FALSE );
+		setOkay( false );
 		return;
 	}
 
@@ -105,7 +104,7 @@ ladspaEffect::~ladspaEffect()
 
 
 
-void ladspaEffect::changeSampleRate( void )
+void ladspaEffect::changeSampleRate()
 {
 	multimediaProject mmp( multimediaProject::EffectSettings );
 	m_controls->saveState( mmp, mmp.content() );
@@ -141,7 +140,7 @@ bool ladspaEffect::processAudioBuffer( sampleFrame * _buf,
 	if( !isOkay() || dontRun() || !isRunning() || !isEnabled() )
 	{
 		m_pluginMutex.unlock();
-		return( FALSE );
+		return false;
 	}
 
 	int frames = _frames;
@@ -150,7 +149,7 @@ bool ladspaEffect::processAudioBuffer( sampleFrame * _buf,
 	if( m_maxSampleRate < engine::getMixer()->processingSampleRate() )
 	{
 		o_buf = _buf;
-		_buf = alignedAllocFrames( _frames );
+		_buf = CPU::allocFrames( _frames );
 		sampleDown( o_buf, _buf, m_maxSampleRate );
 		frames = _frames * m_maxSampleRate /
 				engine::getMixer()->processingSampleRate();
@@ -258,7 +257,7 @@ bool ladspaEffect::processAudioBuffer( sampleFrame * _buf,
 	}
 	if( channel >= 1 && channel <= DEFAULT_CHANNELS )
 	{
-		alignedBufWetDryMixSplitted( _buf, buffers[0], buffers[1],
+		CPU::bufWetDryMixSplitted( _buf, buffers[0], buffers[1],
 					getWetLevel(), getDryLevel(), frames );
 	}
 
@@ -272,7 +271,7 @@ bool ladspaEffect::processAudioBuffer( sampleFrame * _buf,
 	if( o_buf != NULL )
 	{
 		sampleBack( _buf, o_buf, m_maxSampleRate );
-		alignedFreeFrames( _buf );
+		CPU::freeFrames( _buf );
 	}
 
 	checkGate( out_sum / frames );
@@ -280,7 +279,7 @@ bool ladspaEffect::processAudioBuffer( sampleFrame * _buf,
 
 	bool is_running = isRunning();
 	m_pluginMutex.unlock();
-	return( is_running );
+	return is_running;
 }
 
 
@@ -298,7 +297,7 @@ void ladspaEffect::setControl( int _control, LADSPA_Data _value )
 
 
 
-void ladspaEffect::pluginInstantiation( void )
+void ladspaEffect::pluginInstantiation()
 {
 	m_maxSampleRate = maxSamplerate( displayName() );
 
@@ -469,7 +468,7 @@ void ladspaEffect::pluginInstantiation( void )
 		QMessageBox::warning( 0, "Effect", 
 			"Can't get LADSPA descriptor function: " + m_key.second,
 			QMessageBox::Ok, QMessageBox::NoButton );
-		setOkay( FALSE );
+		setOkay( false );
 		return;
 	}
 	if( m_descriptor->run == NULL )
@@ -477,7 +476,7 @@ void ladspaEffect::pluginInstantiation( void )
 		QMessageBox::warning( 0, "Effect",
 			"Plugin has no processor: " + m_key.second,
 			QMessageBox::Ok, QMessageBox::NoButton );
-		setDontRun( TRUE );
+		setDontRun( true );
 	}
 	for( ch_cnt_t proc = 0; proc < getProcessorCount(); proc++ )
 	{
@@ -488,7 +487,7 @@ void ladspaEffect::pluginInstantiation( void )
 			QMessageBox::warning( 0, "Effect",
 				"Can't get LADSPA instance: " + m_key.second,
 				QMessageBox::Ok, QMessageBox::NoButton );
-			setOkay( FALSE );
+			setOkay( false );
 			return;
 		}
 		m_handles.append( effect );
@@ -508,7 +507,7 @@ void ladspaEffect::pluginInstantiation( void )
 				QMessageBox::warning( 0, "Effect", 
 				"Failed to connect port: " + m_key.second, 
 				QMessageBox::Ok, QMessageBox::NoButton );
-				setDontRun( TRUE );
+				setDontRun( true );
 				return;
 			}
 		}
@@ -525,7 +524,7 @@ void ladspaEffect::pluginInstantiation( void )
 
 
 
-void ladspaEffect::pluginDestruction( void )
+void ladspaEffect::pluginDestruction()
 {
 	if( !isOkay() )
 	{
@@ -571,9 +570,9 @@ sample_rate_t ladspaEffect::maxSamplerate( const QString & _name )
 	}
 	if( __buggy_plugins.contains( _name ) )
 	{
-		return( __buggy_plugins[_name] );
+		return __buggy_plugins[_name];
 	}
-	return( engine::getMixer()->processingSampleRate() );
+	return engine::getMixer()->processingSampleRate();
 }
 
 
@@ -585,9 +584,9 @@ extern "C"
 // neccessary for getting instance out of shared lib
 plugin * PLUGIN_EXPORT lmms_plugin_main( model * _parent, void * _data )
 {
-	return( new ladspaEffect( _parent,
+	return new ladspaEffect( _parent,
 		static_cast<const plugin::descriptor::subPluginFeatures::key *>(
-								_data ) ) );
+								_data ) );
 }
 
 }

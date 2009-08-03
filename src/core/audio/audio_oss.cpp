@@ -1,10 +1,8 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * audio_oss.cpp - device-class that implements OSS-PCM-output
  *
  * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -39,7 +37,7 @@
 #include "engine.h"
 #include "gui_templates.h"
 #include "templates.h"
-#include "basic_ops.h"
+#include "Cpu.h"
 
 #ifdef LMMS_HAVE_UNISTD_H
 #include <unistd.h>
@@ -299,10 +297,10 @@ void audioOSS::applyQualitySettings( void )
 
 void audioOSS::run( void )
 {
-	sampleFrameA * temp = alignedAllocFrames(
+	sampleFrameA * temp = CPU::allocFrames(
 						getMixer()->framesPerPeriod() );
 	intSampleFrameA * outbuf = (intSampleFrameA *)
-			alignedMalloc( sizeof( intSampleFrameA ) *
+			CPU::memAlloc( sizeof( intSampleFrameA ) *
 						getMixer()->framesPerPeriod() );
 
 	while( 1 )
@@ -313,7 +311,7 @@ void audioOSS::run( void )
 			break;
 		}
 
-		int bytes = alignedConvertToS16( temp, outbuf, frames,
+		int bytes = CPU::convertToS16( temp, outbuf, frames,
 						getMixer()->masterGain(),
 							m_convertEndian );
 		if( write( m_audioFD, outbuf, bytes ) != bytes )
@@ -322,8 +320,8 @@ void audioOSS::run( void )
 		}
 	}
 
-	alignedFreeFrames( temp );
-	alignedFree( outbuf );
+	CPU::freeFrames( temp );
+	CPU::memFree( outbuf );
 }
 
 
@@ -374,5 +372,3 @@ void audioOSS::setupWidget::saveSettings( void )
 
 #endif
 
-
-#endif

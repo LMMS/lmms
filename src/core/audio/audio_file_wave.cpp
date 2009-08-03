@@ -1,11 +1,9 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * audio_file_wave.cpp - audio-device which encodes wave-stream and writes it
  *                       into a WAVE-file. This is used for song-export.
  *
  * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -26,10 +24,9 @@
  */
 
 
-
 #include "audio_file_wave.h"
 #include "endian_handling.h"
-#include "basic_ops.h"
+#include "Cpu.h"
 
 #include <cstring>
 
@@ -89,14 +86,14 @@ void audioFileWave::writeBuffer( const surroundSampleFrame * _ab,
 {
 	if( depth() == 16 )
 	{
-		intSampleFrameA * buf = (intSampleFrameA *) alignedMalloc(
+		intSampleFrameA * buf = (intSampleFrameA *) CPU::memAlloc(
             sizeof( intSampleFrameA ) * _frames );
 
-		alignedConvertToS16( _ab, buf, _frames, _master_gain,
+		CPU::convertToS16( _ab, buf, _frames, _master_gain,
             !isLittleEndian() );
 
 		sf_writef_short( m_sf, (int_sample_t *) buf, _frames );
-		alignedFree( buf );
+		CPU::memFree( buf );
 	}
 	else
 	{
@@ -123,4 +120,3 @@ void audioFileWave::finishEncoding( void )
 }
 
 
-#endif

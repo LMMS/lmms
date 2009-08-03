@@ -1,8 +1,8 @@
 /*
- * basic_ops.cpp - basic memory operations
+ * Cpu.cpp - CPU specific accellerated operations
  *
- * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ * Copyright (c) 2008-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -23,17 +23,19 @@
  */
 
 
-#include "basic_ops.h"
+#include "Cpu.h"
 
 #include <cstdlib>
 #include <cstdio>
 #include <memory.h>
 
 
-
-void * alignedMalloc( int _bytes )
+namespace CPU
 {
-	char *ptr,*ptr2,*aligned_ptr;
+
+void * memAlloc( int _bytes )
+{
+	char *ptr,*ptr2,*_ptr;
 	int align_mask = ALIGN_SIZE- 1;
 	ptr =(char *) malloc( _bytes + ALIGN_SIZE + sizeof(int) );
 	if( ptr == NULL )
@@ -42,17 +44,19 @@ void * alignedMalloc( int _bytes )
 	}
 
 	ptr2 = ptr + sizeof(int);
-	aligned_ptr = ptr2 + ( ALIGN_SIZE- ( (size_t) ptr2 & align_mask ) );
+	_ptr = ptr2 + ( ALIGN_SIZE- ( (size_t) ptr2 & align_mask ) );
 
 
-	ptr2 = aligned_ptr - sizeof(int);
-	*((int *) ptr2) = (int)( aligned_ptr - ptr );
+	ptr2 = _ptr - sizeof(int);
+	*((int *) ptr2) = (int)( _ptr - ptr );
 
-	return aligned_ptr;
+	return _ptr;
 }
 
 
-void alignedFree( void * _buf )
+
+
+void memFree( void * _buf )
 {
 	if( _buf )
 	{
@@ -66,22 +70,26 @@ void alignedFree( void * _buf )
 }
 
 
-sampleFrameA * alignedAllocFrames( int _n )
+
+
+sampleFrameA * allocFrames( int _n )
 {
-	return (sampleFrameA *) alignedMalloc( _n * sizeof( sampleFrameA ) );
+	return (sampleFrameA *) memAlloc( _n * sizeof( sampleFrameA ) );
 }
 
 
-void alignedFreeFrames( sampleFrame * _buf )
+
+
+void freeFrames( sampleFrame * _buf )
 {
-	alignedFree( _buf );
+	memFree( _buf );
 }
 
 
 
 
 // slow fallback
-void alignedMemCpyNoOpt( void * RP _dst, const void * RP _src, int _size )
+void memCpyNoOpt( void * RP _dst, const void * RP _src, int _size )
 {
 	const int s = _size / sizeof( int );
 	const int * RP src = (const int *) _src;
@@ -110,7 +118,7 @@ void alignedMemCpyNoOpt( void * RP _dst, const void * RP _src, int _size )
 
 
 // slow fallback
-void alignedMemClearNoOpt( void * _dst, int _size )
+void memClearNoOpt( void * _dst, int _size )
 {
 	const int s = _size / ( sizeof( int ) * 4 );
 	int * dst = (int *) _dst;
@@ -126,7 +134,7 @@ void alignedMemClearNoOpt( void * _dst, int _size )
 
 
 
-void alignedBufApplyGainNoOpt( sampleFrameA * RP _dst, float _gain,
+void bufApplyGainNoOpt( sampleFrameA * RP _dst, float _gain,
 								int _frames )
 {
 	for( int i = 0; i < _frames; )
@@ -152,7 +160,7 @@ void alignedBufApplyGainNoOpt( sampleFrameA * RP _dst, float _gain,
 }
 
 
-void alignedBufMixNoOpt( sampleFrameA * RP _dst, const sampleFrameA * RP _src,
+void bufMixNoOpt( sampleFrameA * RP _dst, const sampleFrameA * RP _src,
 								int _frames )
 {
 	for( int i = 0; i < _frames; )
@@ -171,7 +179,7 @@ void alignedBufMixNoOpt( sampleFrameA * RP _dst, const sampleFrameA * RP _src,
 
 
 
-void alignedBufMixLRCoeffNoOpt( sampleFrameA * RP _dst,
+void bufMixLRCoeffNoOpt( sampleFrameA * RP _dst,
 					const sampleFrameA * RP _src,
 					float _left, float _right, int _frames )
 {
@@ -217,7 +225,7 @@ void unalignedBufMixLRCoeffNoOpt( sampleFrame * RP _dst,
 
 
 
-void alignedBufWetDryMixNoOpt( sampleFrameA * RP _dst,
+void bufWetDryMixNoOpt( sampleFrameA * RP _dst,
 					const sampleFrameA * RP _src,
 					float _wet, float _dry, int _frames )
 {
@@ -231,7 +239,7 @@ void alignedBufWetDryMixNoOpt( sampleFrameA * RP _dst,
 
 
 
-void alignedBufWetDryMixSplittedNoOpt( sampleFrameA * RP _dst,
+void bufWetDryMixSplittedNoOpt( sampleFrameA * RP _dst,
 					const float * RP _left,
 					const float * RP _right,
 					float _wet, float _dry, int _frames )
@@ -248,7 +256,7 @@ void alignedBufWetDryMixSplittedNoOpt( sampleFrameA * RP _dst,
 
 
 
-int alignedConvertToS16NoOpt( const sampleFrameA * RP _src,
+int convertToS16NoOpt( const sampleFrameA * RP _src,
 					intSampleFrameA * RP _dst,
 					const fpp_t _frames,
 					const float _master_gain,
@@ -294,15 +302,15 @@ int alignedConvertToS16NoOpt( const sampleFrameA * RP _src,
 }
 
 
-alignedMemCpyFunc alignedMemCpy = alignedMemCpyNoOpt;
-alignedMemClearFunc alignedMemClear = alignedMemClearNoOpt;
-alignedBufApplyGainFunc alignedBufApplyGain = alignedBufApplyGainNoOpt;
-alignedBufMixFunc alignedBufMix = alignedBufMixNoOpt;
-alignedBufMixLRCoeffFunc alignedBufMixLRCoeff = alignedBufMixLRCoeffNoOpt;
-unalignedBufMixLRCoeffFunc unalignedBufMixLRCoeff = unalignedBufMixLRCoeffNoOpt;
-alignedBufWetDryMixFunc alignedBufWetDryMix = alignedBufWetDryMixNoOpt;
-alignedBufWetDryMixSplittedFunc alignedBufWetDryMixSplitted = alignedBufWetDryMixSplittedNoOpt;
-alignedConvertToS16Func alignedConvertToS16 = alignedConvertToS16NoOpt;
+MemCpyFunc memCpy = memCpyNoOpt;
+MemClearFunc memClear = memClearNoOpt;
+BufApplyGainFunc bufApplyGain = bufApplyGainNoOpt;
+BufMixFunc bufMix = bufMixNoOpt;
+BufMixLRCoeffFunc bufMixLRCoeff = bufMixLRCoeffNoOpt;
+UnalignedBufMixLRCoeffFunc unalignedBufMixLRCoeff = unalignedBufMixLRCoeffNoOpt;
+BufWetDryMixFunc bufWetDryMix = bufWetDryMixNoOpt;
+BufWetDryMixSplittedFunc bufWetDryMixSplitted = bufWetDryMixSplittedNoOpt;
+ConvertToS16Func convertToS16 = convertToS16NoOpt;
 
 
 #ifdef X86_OPTIMIZATIONS
@@ -322,28 +330,28 @@ enum CPUFeatures
 extern "C"
 {
 #ifdef LMMS_HOST_X86
-void alignedMemCpyMMX( void * RP _dst, const void * RP _src, int _size );
-void alignedMemClearMMX( void * RP _dst, int _size );
+void memCpyMMX( void * RP _dst, const void * RP _src, int _size );
+void memClearMMX( void * RP _dst, int _size );
 #endif
-void alignedMemCpySSE( void * RP _dst, const void * RP _src, int _size );
-void alignedMemClearSSE( void * RP _dst, int _size );
-void alignedBufApplyGainSSE( sampleFrameA * RP _dst, float _gain, int _frames );
-void alignedBufMixSSE( sampleFrameA * RP _dst, const sampleFrameA * RP _src, int _frames );
-void alignedBufMixLRCoeffSSE( sampleFrameA * RP _dst, const sampleFrameA * RP _src, float _left, float _right, int _frames );
+void memCpySSE( void * RP _dst, const void * RP _src, int _size );
+void memClearSSE( void * RP _dst, int _size );
+void bufApplyGainSSE( sampleFrameA * RP _dst, float _gain, int _frames );
+void bufMixSSE( sampleFrameA * RP _dst, const sampleFrameA * RP _src, int _frames );
+void bufMixLRCoeffSSE( sampleFrameA * RP _dst, const sampleFrameA * RP _src, float _left, float _right, int _frames );
 void unalignedBufMixLRCoeffSSE( sampleFrame * RP _dst, const sampleFrame * RP _src, const float _left, const float _right, int _frames );
-void alignedBufWetDryMixSSE( sampleFrameA * RP _dst, const sampleFrameA * RP _src, float _wet, float _dry, int _frames );
-void alignedBufWetDryMixSplittedSSE( sampleFrameA * RP _dst, const float * RP _left, const float * RP _right, float _wet, float _dry, int _frames );
+void bufWetDryMixSSE( sampleFrameA * RP _dst, const sampleFrameA * RP _src, float _wet, float _dry, int _frames );
+void bufWetDryMixSplittedSSE( sampleFrameA * RP _dst, const float * RP _left, const float * RP _right, float _wet, float _dry, int _frames );
 #ifdef X86_OPTIMIZATIONS
-void alignedMemCpySSE2( void * RP _dst, const void * RP _src, int _size );
-void alignedMemClearSSE2( void * RP _dst, int _size );
-int alignedConvertToS16SSE2( const sampleFrameA * RP _src, intSampleFrameA * RP _dst, const fpp_t _frames, const float _master_gain, const bool _convert_endian );
+void memCpySSE2( void * RP _dst, const void * RP _src, int _size );
+void memClearSSE2( void * RP _dst, int _size );
+int convertToS16SSE2( const sampleFrameA * RP _src, intSampleFrameA * RP _dst, const fpp_t _frames, const float _master_gain, const bool _convert_endian );
 #endif
 } ;
 #endif
 
 
 
-void initBasicOps( void )
+void init()
 {
 #ifdef X86_OPTIMIZATIONS
 	static bool extensions_checked = false;
@@ -428,29 +436,29 @@ void initBasicOps( void )
 #ifdef LMMS_HOST_X86
 		if( features & MMX )
 		{
-			alignedMemCpy = alignedMemCpyMMX;
-			alignedMemClear = alignedMemClearMMX;
+			memCpy = memCpyMMX;
+			memClear = memClearMMX;
 		}
 #endif
 		if( features & SSE )
 		{
 			fprintf( stderr, "Using SSE optimized routines\n" );
-			alignedMemCpy = alignedMemCpySSE;
-			alignedMemClear = alignedMemClearSSE;
-			alignedBufApplyGain = alignedBufApplyGainSSE;
-			alignedBufMix = alignedBufMixSSE;
-			alignedBufMixLRCoeff = alignedBufMixLRCoeffSSE;
+			memCpy = memCpySSE;
+			memClear = memClearSSE;
+			bufApplyGain = bufApplyGainSSE;
+			bufMix = bufMixSSE;
+			bufMixLRCoeff = bufMixLRCoeffSSE;
 			unalignedBufMixLRCoeff = unalignedBufMixLRCoeffSSE;
-			alignedBufWetDryMix = alignedBufWetDryMixSSE;
-			alignedBufWetDryMixSplitted =
-						alignedBufWetDryMixSplittedSSE;
+			bufWetDryMix = bufWetDryMixSSE;
+			bufWetDryMixSplitted =
+						bufWetDryMixSplittedSSE;
 		}
 		if( features & SSE2 )
 		{
 			fprintf( stderr, "Using SSE2 optimized routines\n" );
-			alignedMemCpy = alignedMemCpySSE2;
-			alignedMemClear = alignedMemClearSSE2;
-			alignedConvertToS16 = alignedConvertToS16SSE2;
+			memCpy = memCpySSE2;
+			memClear = memClearSSE2;
+			convertToS16 = convertToS16SSE2;
 		}
 		extensions_checked = true;
 	}
@@ -458,4 +466,5 @@ void initBasicOps( void )
 }
 
 
+}
 
