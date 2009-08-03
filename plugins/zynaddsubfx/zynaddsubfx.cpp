@@ -163,7 +163,7 @@ void zynAddSubFx::loadFile( const QString & _file )
 	m_plugin->lock();
 	m_plugin->sendMessage(
 		remotePlugin::message( IdLoadPresetFromFile ).
-								QSTR_TO_STD_STR( _file ) );
+								addString( QSTR_TO_STDSTR( _file ) ) );
 	m_plugin->waitForMessage( IdLoadPresetFromFile );
 	m_plugin->unlock();
 
