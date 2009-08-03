@@ -1,7 +1,7 @@
 /*
 	dsp/windows.h
 	
-	Copyright 2004 Tim Goetze <tim@quitte.de>
+	Copyright 2004-9 Tim Goetze <tim@quitte.de>
 	
 	http://quitte.de/dsp/
 
@@ -147,17 +147,13 @@ kaiser (d_sample * s, int n, double beta)
 	{
 		double k = besseli ((beta * sqrt (1 - pow ((2 * i / (n - 1)), 2)))) / bb;
 
-#if LMMS_BUILD_WIN64
-		if (!isfinite (k))
-#else
 		/* can you spell hack */
-		if (!finite (k))
-#endif
+		if (!isfinite (k) || isnan(k))
 			k = 0;
 
 		F (s[si], k);
 	}
-	/* assymetrical hack: sort out first value!
+	/* asymmetrical hack: sort out first value!
 	win[0] = win[len-1];
 	*/
 }

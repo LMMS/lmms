@@ -1,7 +1,7 @@
 /*
 	dsp/OnePole.h
 	
-	Copyright 2003-4 Tim Goetze <tim@quitte.de>
+	Copyright 2003-7 Tim Goetze <tim@quitte.de>
 	
 	http://quitte.de/dsp/
 

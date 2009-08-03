@@ -32,9 +32,11 @@ namespace DSP {
 
 class RMS
 {
-	public:
+	protected:
 		d_sample buffer[64];
 		int write;
+
+	public:
 		double sum;
 
 		RMS()

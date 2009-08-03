@@ -205,9 +205,6 @@ CabinetII::init()
 void
 CabinetII::switch_model (int m)
 {
-	if (m < 0) m = 0;
-	else if (m > 5) m = 5;
-
 	model = m;
 
 	n = models[m].n;
@@ -276,7 +273,7 @@ CabinetII::port_info [] =
 	}, {
 		"model",
 		INPUT | CONTROL,
-		{BOUNDED | INTEGER | DEFAULT_1, 0, 5}
+		{BOUNDED | INTEGER | DEFAULT_1, 0, 7}
 	}, {
 		"gain (dB)",
 		INPUT | CONTROL,

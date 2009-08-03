@@ -47,7 +47,7 @@ adjust_gain (int i, double g)
 	return g * adjust[i];
 }
 
-#define Q 1.2
+#define Q 1.414
 
 void
 Eq::init()
@@ -116,7 +116,7 @@ Eq::port_info [] =
 	}, {
 		"31 Hz",
 		INPUT | CONTROL,
-		{BOUNDED | DEFAULT_LOW, -48, 24}
+		{BOUNDED | DEFAULT_0, -48, 24}
 	}, {
 		"63 Hz",
 		INPUT | CONTROL,
@@ -327,4 +327,9 @@ Descriptor<Eq2x2>::setup()
 	autogen();
 }
 
+/* //////////////////////////////////////////////////////////////////////// */
 
+/*
+	todo: parametric -- 20-400, 60-1k, 150-2.5k, 500-8k, 1k-20k 
+	bandwidth 0-2 octaves
+ */

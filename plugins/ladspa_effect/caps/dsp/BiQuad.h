@@ -1,11 +1,11 @@
 /*
 	dsp/BiQuad.h
 	
-	Copyright 2003-4 Tim Goetze <tim@quitte.de>
+	Copyright 2003-7 Tim Goetze <tim@quitte.de>
 	
 	http://quitte.de/dsp/
 
-	bi-quad implementation.
+	Bi-quad IIR filter.
 
 */
 /*
@@ -42,6 +42,7 @@ class BiQuad
 
 		BiQuad()
 			{
+				/* initialize to unity */
 				a[0] = 1;
 				a[1] = a[2] = b[0] = b[1] = b[2] = 0;
 
@@ -92,8 +93,9 @@ class BiQuad
 				return r;
 			}
 
-		/* additional methods for using the biquad to filter an
-		 * upsampled signal with 0 padding */
+		/* Following are additional methods for using the biquad to filter an
+		 * upsampled signal with 0 padding -- some terms reduce to 0 in this
+		 * case */
 		inline d_sample process_0_1()
 			{
 				register int z = h;

@@ -1,7 +1,7 @@
 /*
 	basics.h
 	
-	Copyright 2004-5 Tim Goetze <tim@quitte.de>
+	Copyright 2004-9 Tim Goetze <tim@quitte.de>
 	
 	http://quitte.de/dsp/
 
@@ -32,7 +32,7 @@
 #define _GNU_SOURCE 1
 #define _USE_GNU 1
 
-/* gcc protects a lot of standard math calls. */
+/* unlocking some standard math calls. */
 #define __USE_ISOC99 1
 #define __USE_ISOC9X 1
 #define _ISOC99_SOURCE 1
@@ -49,9 +49,9 @@
 
 #include <ladspa.h> 	 
 
+/* reducing LADSPA_DEFINES_WITH_LOTS_OF_CHARACTERS_REALLY verbosity */
 #define BOUNDED (LADSPA_HINT_BOUNDED_BELOW | LADSPA_HINT_BOUNDED_ABOVE)
 #define INTEGER LADSPA_HINT_INTEGER
-/* #define FS LADSPA_HINT_SAMPLE_RATE *//* deprecated */
 #define LOG LADSPA_HINT_LOGARITHMIC
 #define TOGGLE LADSPA_HINT_TOGGLED
 
@@ -75,6 +75,8 @@
 #define TEN_TO_THE_SIXTH 1000000
 
 #define MIN_GAIN .000001 /* -120 dB */
+
+/* smallest non-denormal 32 bit IEEE float is 1.18×10-38 */
 #define NOISE_FLOOR .00000000000005 /* -266 dB */
 
 typedef int8_t			int8;
@@ -87,7 +89,7 @@ typedef int64_t			int64;
 typedef uint64_t		uint64;
 
 typedef struct {
-	char * name;
+	const char * name;
 	LADSPA_PortDescriptor descriptor;
 	LADSPA_PortRangeHint range;
 } PortInfo;
@@ -141,7 +143,7 @@ frandom()
 	return (float) rand() / (float) RAND_MAX;
 }
 
-/* for testing only. */
+/* NB: also true if 0  */
 inline bool 
 is_denormal (float & f)
 {
@@ -149,7 +151,7 @@ is_denormal (float & f)
 	return ((i & 0x7f800000) == 0);
 }
 
-/* not sure if this double version is correct, actually ... */
+/* todo: not sure if this double version is correct, actually ... */
 inline bool 
 is_denormal (double & f)
 {
