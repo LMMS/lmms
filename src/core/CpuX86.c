@@ -24,6 +24,20 @@
 
 #include "Cpu.h"
 
+#define PREFETCH_RW(x,rw)								\
+			__builtin_prefetch(x,rw,0);					\
+			__builtin_prefetch(x+128/sizeof(*x),rw,0);	\
+			__builtin_prefetch(x+256/sizeof(*x),rw,0);	\
+			__builtin_prefetch(x+384/sizeof(*x),rw,0);
+
+#if 0	/* for benchmarking only */
+#undef PREFETCH_RW
+#define PREFETCH_RW(x,rw)
+#endif
+#define PREFETCH_READ(x)	PREFETCH_RW(x,0)
+#define PREFETCH_WRITE(x)	PREFETCH_RW(x,1)
+
+
 #ifdef X86_OPTIMIZATIONS
 
 #ifdef BUILD_MMX
@@ -39,14 +53,10 @@ void memCpyMMX( void * RP _dst, const void * RP _src, int _size )
 	char * RP dst = (char *) _dst;
 	__asm__ __volatile__ ( " fsave %0; fwait\n"::"m"(fpu_save[0]) );
 
-	__asm__ __volatile__ (
-		"1: prefetchnta (%0)\n"
-		"   prefetchnta 64(%0)\n"
-		"   prefetchnta 128(%0)\n"
-		"   prefetchnta 192(%0)\n"
-		"   prefetchnta 256(%0)\n"
-		: : "r" (src) );
-	for(i=0; i<s; i++)
+	PREFETCH_READ(src);
+	PREFETCH_WRITE(dst);
+
+	for( i=0; i<s; ++i )
 	{
 		__asm__ __volatile__ (
 		"1: prefetchnta 320(%0)\n"
@@ -83,6 +93,9 @@ void memClearMMX( void * RP _dst, int _size )
 	const int s = _size / ( sizeof( *dst ) * 8 );
 	__m64 val = _mm_setzero_si64();
 	int i;
+
+	PREFETCH_WRITE(dst);
+
 	for( i = 0; i < s; ++i )
 	{
 		__asm__ __volatile__ (
@@ -113,12 +126,12 @@ void memCpySSE( void * RP _dst, const void * RP _src, int _size )
 	__m128 * src = (__m128 *) _src;
 	const int s = _size / ( sizeof( *dst ) * 4 );
 	int i;
+
+	PREFETCH_READ(src);
+	PREFETCH_WRITE(dst);
+
 	for( i = 0; i < s; ++i )
 	{
-/*		_mm_store_ps( dst+0, _mm_load_ps( src+0 ) );
-		_mm_store_ps( dst+1, _mm_load_ps( src+1 ) );
-		_mm_store_ps( dst+2, _mm_load_ps( src+2 ) );
-		_mm_store_ps( dst+3, _mm_load_ps( src+3 ) );*/
 		dst[0] = src[0];
 		dst[1] = src[1];
 		dst[2] = src[2];
@@ -137,6 +150,9 @@ void memClearSSE( void * RP _dst, int _size )
 	const int s = _size / ( sizeof( *dst ) * 4 );
 	__m128 val = _mm_setzero_ps();
 	int i;
+
+	PREFETCH_WRITE(dst);
+
 	for( i = 0; i < s; ++i )
 	{
 		dst[0] = val;
@@ -153,6 +169,9 @@ void memClearSSE( void * RP _dst, int _size )
 void bufApplyGainSSE( sampleFrameA * RP _dst, float _gain, int _frames )
 {
 	int i;
+
+	PREFETCH_WRITE(_dst);
+
 	for( i = 0; i < _frames; )
 	{
 		_dst[i+0][0] *= _gain;
@@ -182,6 +201,10 @@ void bufMixSSE( sampleFrameA * RP _dst, const sampleFrameA * RP _src,
 								int _frames )
 {
 	int i;
+
+	PREFETCH_READ(_src);
+	PREFETCH_WRITE(_dst);
+
 	for( i = 0; i < _frames; )
 	{
 		_dst[i+0][0] += _src[i+0][0];
@@ -206,12 +229,15 @@ void bufMixSSE( sampleFrameA * RP _dst, const sampleFrameA * RP _src,
 }
 
 
-
 void bufMixLRCoeffSSE( sampleFrameA * RP _dst,
 					const sampleFrameA * RP _src,
 					float _left, float _right, int _frames )
 {
 	int i;
+
+	PREFETCH_READ(_src);
+	PREFETCH_WRITE(_dst);
+
 	for( i = 0; i < _frames; )
 	{
 		_dst[i+0][0] += _src[i+0][0]*_left;
@@ -243,6 +269,9 @@ void unalignedBufMixLRCoeffSSE( sampleFrame * RP _dst, const sampleFrame * RP _s
 		--_frames;
 	}
 
+	PREFETCH_READ(_src);
+	PREFETCH_WRITE(_dst);
+
 	for( i = 0; i < _frames; )
 	{
 		_dst[i+0][0] += _src[i+0][0]*_left;
@@ -260,6 +289,10 @@ void bufWetDryMixSSE( sampleFrameA * RP _dst,
 					float _wet, float _dry, int _frames )
 {
 	int i;
+
+	PREFETCH_READ(_src);
+	PREFETCH_WRITE(_dst);
+
 	for( i = 0; i < _frames; )
 	{
 		_dst[i+0][0] = _dst[i+0][0]*_dry + _src[i+0][0]*_wet;
@@ -283,6 +316,11 @@ void bufWetDryMixSplittedSSE( sampleFrameA * RP _dst,
 					float _wet, float _dry, int _frames )
 {
 	int i;
+
+	PREFETCH_READ(_left);
+	PREFETCH_READ(_right);
+	PREFETCH_WRITE(_dst);
+
 	for( i = 0; i < _frames; )
 	{
 		_dst[i+0][0] = _dst[i+0][0]*_dry + _left[i+0]*_wet;
@@ -308,6 +346,10 @@ void memCpySSE2( void * RP _dst, const void * RP _src, int _size )
 	__m128i * src = (__m128i *) _src;
 	const int s = _size / ( sizeof( *dst ) * 4 );
 	int i;
+
+	PREFETCH_READ(src);
+	PREFETCH_WRITE(dst);
+
 	for( i = 0; i < s; ++i )
 	{
 		_mm_store_si128( dst+0, _mm_load_si128( src+0 ) );
@@ -328,6 +370,9 @@ void memClearSSE2( void * RP _dst, int _size )
 	const int s = _size / ( sizeof( *dst ) * 4 );
 	__m128i val = _mm_setzero_si128();
 	int i;
+
+	PREFETCH_WRITE(dst);
+
 	for( i = 0; i < s; ++i )
 	{
 		_mm_store_si128( dst+0, val );
@@ -350,6 +395,10 @@ int convertToS16SSE2( const sampleFrameA * RP _src,
 	int t2;
 	fpp_t frame;
 	const float f = _master_gain * OUTPUT_SAMPLE_MULTIPLIER;
+
+	PREFETCH_READ(_src);
+	PREFETCH_WRITE(_dst);
+
 	if( _convert_endian )
 	{
 		for( frame = 0; frame < _frames; ++frame )
