@@ -1,7 +1,7 @@
 /*
 	Amp.h
 	
-	Copyright 2002-7 Tim Goetze <tim@quitte.de>
+	Copyright 2002-9 Tim Goetze <tim@quitte.de>
 	
 	http://quitte.de/dsp/
 
@@ -310,6 +310,8 @@ class AmpV
 
 				cut = 2;
 				supply = 0.;
+
+				tone = -1; /* causes initialisation of the filter at first cycle */
 			}
 
 		void run (int n)

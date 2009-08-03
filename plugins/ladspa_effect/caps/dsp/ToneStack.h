@@ -1,7 +1,7 @@
 /*
 	ToneStack.h
 	
-	Copyright 2006-7
+	Copyright 2006-9
 		David Yeh <dtyeh@ccrma.stanford.edu> (implementation)
 		Tim Goetze <tim@quitte.de> (cosmetics)
 
@@ -83,6 +83,7 @@ class ToneStack
 
 		ToneStack() 
 			{
+				model = -1;
 				setparams (presets[0]);
 			}
 		

@@ -1,7 +1,7 @@
 /*
 	Descriptor.h
 	
-	Copyright 2004-6 Tim Goetze <tim@quitte.de>
+	Copyright 2004-9 Tim Goetze <tim@quitte.de>
 	
 	http://quitte.de/dsp/
 
@@ -11,7 +11,7 @@
 
 	Descriptor<P> expects P to declare some common methods, like init(),
 	activate() etc, plus a static port_info[] and LADSPA_Data * ports[]
-	and adding_gain.
+	and adding_gain.  (P should derive from Plugin, too.)
  
 */
 /*
@@ -48,8 +48,6 @@ class DescriptorStub
 : public LADSPA_Descriptor
 {
 	public:
-		static int thishostsucks;
-
 		DescriptorStub()
 			{
 				PortCount = 0;
@@ -85,10 +83,6 @@ class Descriptor
 : public DescriptorStub
 {
 	public:
-		/* Tom Szilyagi reports that hosts exist which call activate() before
-		 * connect_port(). Since CAPS' plugins expect ports to be valid we
-		 * need a safeguard: at instantiation, each port is connected to the
-		 * lower bound. */
 		LADSPA_PortRangeHint * ranges;
 
 	public:
@@ -100,7 +94,7 @@ class Descriptor
 				PortCount = (sizeof (T::port_info) / sizeof (PortInfo));
 
 				/* unroll PortInfo members */
-				char ** names = new char * [PortCount];
+				const char ** names = new const char * [PortCount];
 				LADSPA_PortDescriptor * desc = new LADSPA_PortDescriptor [PortCount];
 				ranges = new LADSPA_PortRangeHint [PortCount];
 
