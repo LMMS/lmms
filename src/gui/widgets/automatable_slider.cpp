@@ -1,5 +1,3 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * automatable_slider.cpp - implementation of class automatableSlider
  *
@@ -149,4 +147,3 @@ void automatableSlider::updateSlider( void )
 
 #include "moc_automatable_slider.cxx"
 
-#endif

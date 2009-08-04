@@ -1,5 +1,3 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * project_version.cpp - compare versions in import upgrades
  *
@@ -82,4 +80,3 @@ int projectVersion::compare( const projectVersion & _v1,
 
 
 
-#endif

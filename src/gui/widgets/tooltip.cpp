@@ -1,5 +1,3 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * tooltip.cpp - namespace toolTip, a tooltip-wrapper for LMMS
  *
@@ -40,4 +38,3 @@ void toolTip::add( QWidget * _w, const QString & _txt )
 }
 
 
-#endif

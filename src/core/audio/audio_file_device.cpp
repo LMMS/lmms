@@ -1,5 +1,3 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * audio_file_device.cpp - base-class for audio-device-classes which write
  *                         their output into a file
@@ -90,4 +88,3 @@ Sint32 audioFileDevice::writeData( const void * _data, Sint32 _len )
 
 
 
-#endif

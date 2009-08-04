@@ -1,5 +1,3 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * controller_connection.cpp - implementation of class controller connection 
  *            which handles the link between automatableModels and controllers
@@ -228,4 +226,3 @@ controllerDialog * controller::createDialog( QWidget * _parent )
 #include "moc_controller_connection.cxx"
 
 
-#endif

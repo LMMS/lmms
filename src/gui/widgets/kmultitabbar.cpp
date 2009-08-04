@@ -1,5 +1,3 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * kmultitabbar.cpp - widget for horizontal and vertical tabs
  *
@@ -917,4 +915,3 @@ QList<KMultiTabBarButton *>* KMultiTabBar::buttons() {return &m_buttons;}
 
 
 
-#endif

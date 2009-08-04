@@ -1,11 +1,9 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * effect_control_dialog.cpp - base-class for effect-dialogs for displaying
  *                            and editing control port values
  *
- * Copyright (c) 2006-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ * Copyright (c) 2006-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -24,7 +22,6 @@
  * Boston, MA 02110-1301 USA.
  *
  */
-
 
 #include <QtGui/QMessageBox>
 #include <QtGui/QCloseEvent>
@@ -56,13 +53,10 @@ effectControlDialog::~effectControlDialog()
 void effectControlDialog::closeEvent( QCloseEvent * _ce )
 {
 	_ce->ignore();
-	emit( closed() );
+	emit closed();
 }
 
 
 
-
 #include "moc_effect_control_dialog.cxx"
-
-#endif
 

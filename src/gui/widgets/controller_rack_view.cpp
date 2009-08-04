@@ -1,5 +1,3 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * controller_rack_view.cpp - view for song's controllers
  *
@@ -183,4 +181,3 @@ void controllerRackView::addController( void )
 
 #include "moc_controller_rack_view.cxx"
 
-#endif

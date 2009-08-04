@@ -1,5 +1,3 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * lcd_spinbox.cpp - class lcdSpinBox, an improved QLCDNumber
  *
@@ -83,7 +81,7 @@ lcdSpinBox::lcdSpinBox( int _num_digits, const QString & _lcd_style,
 
 	// We should make a factory for these or something.
 	m_lcdPixmap = new QPixmap( embed::getIconPixmap( QString( "lcd_" +
-			_lcd_style ).toAscii().constData() ) );
+			_lcd_style ).toUtf8().constData() ) );
 
 	m_cellWidth = m_lcdPixmap->size().width() / lcdSpinBox::charsPerPixmap;
 	m_cellHeight = m_lcdPixmap->size().height() / 2;
@@ -341,5 +339,3 @@ void lcdSpinBox::wheelEvent( QWheelEvent * _we )
 
 #include "moc_lcd_spinbox.cxx"
 
-
-#endif

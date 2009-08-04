@@ -22,7 +22,6 @@
  *
  */
 
-
 #include "patman.h"
 
 #include <QtGui/QFileDialog>
@@ -40,7 +39,6 @@
 #include "string_pair_drag.h"
 #include "tooltip.h"
 
-#undef SINGLE_SOURCE_COMPILE
 #include "embed.cpp"
 
 

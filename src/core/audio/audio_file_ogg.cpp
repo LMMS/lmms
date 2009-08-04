@@ -1,5 +1,3 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * audio_file_ogg.cpp - audio-device which encodes wave-stream and writes it
  *                      into an OGG-file. This is used for song-export.
@@ -270,4 +268,3 @@ void audioFileOgg::finishEncoding( void )
 #endif
 
 
-#endif

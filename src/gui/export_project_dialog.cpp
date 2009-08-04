@@ -1,10 +1,8 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * export_project_dialog.cpp - implementation of dialog for exporting project
  *
- * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -24,10 +22,8 @@
  *
  */
 
-
 #include <QtCore/QFileInfo>
 #include <QtGui/QMessageBox>
-
 
 #include "export_project_dialog.h"
 #include "engine.h"
@@ -71,7 +67,7 @@ exportProjectDialog::~exportProjectDialog()
 
 
 
-void exportProjectDialog::reject( void )
+void exportProjectDialog::reject()
 {
 	if( m_renderer == NULL )
 	{
@@ -98,7 +94,7 @@ void exportProjectDialog::closeEvent( QCloseEvent * _ce )
 
 
 
-void exportProjectDialog::startBtnClicked( void )
+void exportProjectDialog::startBtnClicked()
 {
 	projectRenderer::ExportFileFormats ft = projectRenderer::NumFileFormats;
 
@@ -177,4 +173,4 @@ void exportProjectDialog::updateTitleBar( int _prog )
 #include "moc_export_project_dialog.cxx"
 
 
-#endif
+/* vim: set tw=0 noexpandtab: */

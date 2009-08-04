@@ -1,5 +1,3 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * plugin_browser.cpp - implementation of the plugin-browser
  *
@@ -225,4 +223,3 @@ void pluginDescWidget::updateHeight( void )
 #include "moc_plugin_browser.cxx"
 
 
-#endif

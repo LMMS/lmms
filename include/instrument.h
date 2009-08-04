@@ -2,8 +2,8 @@
  * instrument.h - declaration of class instrument, which provides a
  *                standard interface for all instrument plugins
  *
- * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -22,7 +22,6 @@
  * Boston, MA 02110-1301 USA.
  *
  */
-
 
 #ifndef _INSTRUMENT_H
 #define _INSTRUMENT_H
@@ -80,20 +79,20 @@ public:
 	// if no envelope is active - such instruments can re-implement this
 	// method for returning how many frames they at least like to have for
 	// release
-	virtual f_cnt_t desiredReleaseFrames( void ) const
+	virtual f_cnt_t desiredReleaseFrames() const
 	{
 		return 0;
 	}
 
 	// return false if instrument is not bendable
-	inline virtual bool isBendable( void ) const
+	inline virtual bool isBendable() const
 	{
 		return true;
 	}
 
 	// return true if instruments reacts to MIDI events passed to
 	// handleMidiEvent() rather than playNote() & Co
-	inline virtual bool isMidiBased( void ) const
+	inline virtual bool isMidiBased() const
 	{
 		return false;
 	}
@@ -106,7 +105,7 @@ public:
 		return false;
 	}
 
-	virtual QString fullDisplayName( void ) const;
+	virtual QString fullDisplayName() const;
 
 	// --------------------------------------------------------------------
 	// provided functions:
@@ -121,7 +120,7 @@ public:
 
 
 protected:
-	inline instrumentTrack * getInstrumentTrack( void ) const
+	inline instrumentTrack * getInstrumentTrack() const
 	{
 		return m_instrumentTrack;
 	}
@@ -136,6 +135,5 @@ private:
 	instrumentTrack * m_instrumentTrack;
 
 } ;
-
 
 #endif

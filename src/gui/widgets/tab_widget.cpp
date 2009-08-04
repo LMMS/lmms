@@ -1,5 +1,3 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * tab_widget.cpp - tabwidget for LMMS
  *
@@ -234,4 +232,3 @@ void tabWidget::wheelEvent( QWheelEvent * _we )
 #include "moc_tab_widget.cxx"
 
 
-#endif

@@ -1,5 +1,3 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * nstate_button.cpp - implementation of n-state-button
  *
@@ -105,4 +103,3 @@ void nStateButton::mousePressEvent( QMouseEvent * _me )
 #include "moc_nstate_button.cxx"
 
 
-#endif

@@ -1,5 +1,3 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * controller_dialog.cpp - per-controller-specific view for changing a
  * controller's settings
@@ -55,4 +53,3 @@ void controllerDialog::closeEvent( QCloseEvent * _ce )
 
 #include "moc_controller_dialog.cxx"
 
-#endif

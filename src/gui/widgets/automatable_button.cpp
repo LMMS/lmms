@@ -1,5 +1,3 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * automatable_button.cpp - implementation of class automatableButton and
  *                          automatableButtonGroup
@@ -258,4 +256,3 @@ void automatableButtonGroup::updateButtons( void )
 
 #include "moc_automatable_button.cxx"
 
-#endif

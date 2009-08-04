@@ -1,5 +1,3 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * envelope_and_lfo_parameters.cpp - class envelopeAndLFOParameters
  *
@@ -499,4 +497,3 @@ void envelopeAndLFOParameters::updateSampleVars( void )
 #include "moc_envelope_and_lfo_parameters.cxx"
 
 
-#endif

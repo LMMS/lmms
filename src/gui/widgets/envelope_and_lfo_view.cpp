@@ -1,5 +1,3 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * envelope_and_lfo_view.cpp - widget which is m_used by envelope/lfo/filter-
  *                               tab of channel-window
@@ -584,4 +582,3 @@ void envelopeAndLFOView::lfoUserWaveChanged( void )
 #include "moc_envelope_and_lfo_view.cxx"
 
 
-#endif

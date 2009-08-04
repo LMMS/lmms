@@ -1,5 +1,3 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * project_notes.cpp - implementation of project-notes-editor
  *
@@ -399,4 +397,3 @@ void projectNotes::loadSettings( const QDomElement & _this )
 #include "moc_project_notes.cxx"
 
 
-#endif

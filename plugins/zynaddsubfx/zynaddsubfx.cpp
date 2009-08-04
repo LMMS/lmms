@@ -39,7 +39,6 @@
 #include "string_pair_drag.h"
 #include "remote_zynaddsubfx.h"
 
-#undef SINGLE_SOURCE_COMPILE
 #include "embed.cpp"
 #include "moc_zynaddsubfx.cxx"
 

@@ -1,5 +1,3 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * tool.cpp - base class for all tool plugins (graphs, extensions, etc)
  *
@@ -82,4 +80,3 @@ toolView::toolView( tool * _tool ) :
 }
 
 
-#endif

@@ -1,5 +1,3 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * effect_rack_view.cpp - view for effectChain-model
  *
@@ -259,4 +257,3 @@ void effectRackView::modelChanged( void )
 
 #include "moc_effect_rack_view.cxx"
 
-#endif

@@ -1,5 +1,3 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * sample_record_handle.cpp - implementation of class sampleRecordHandle
  *
@@ -154,4 +152,3 @@ void sampleRecordHandle::writeBuffer( const sampleFrame * _ab,
 
 
 
-#endif

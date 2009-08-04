@@ -1,5 +1,3 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * automation_track.cpp - automationTrack handles automation of objects without
  *                        a track
@@ -199,4 +197,3 @@ void automationTrackView::dropEvent( QDropEvent * _de )
 
 
 
-#endif

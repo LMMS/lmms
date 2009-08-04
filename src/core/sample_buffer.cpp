@@ -1,10 +1,8 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * sample_buffer.cpp - container-class sampleBuffer
  *
  * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -62,7 +60,6 @@
 #include "engine.h"
 #include "interpolation.h"
 #include "templates.h"
-
 
 
 sampleBuffer::sampleBuffer( const QString & _audio_file,
@@ -178,10 +175,10 @@ void sampleBuffer::update( bool _keep_settings )
 			m_loopEndFrame = m_endFrame = m_frames;
 		}
 	}
-	else if( m_audioFile != "" )
+	else if( !m_audioFile.isEmpty() )
 	{
 		QString file = tryToMakeAbsolute( m_audioFile );
-		char * f = qstrdup( file.toAscii().constData() );
+		char * f = qstrdup( file.toUtf8().constData() );
 		int_sample_t * buf = NULL;
 		ch_cnt_t channels = DEFAULT_CHANNELS;
 		sample_rate_t samplerate = engine::getMixer()->baseSampleRate();
@@ -723,12 +720,12 @@ void sampleBuffer::visualize( QPainter & _p, const QRect & _dr,
 
 
 
-QString sampleBuffer::openAudioFile( void ) const
+QString sampleBuffer::openAudioFile() const
 {
 	QFileDialog ofd( NULL, tr( "Open audio file" ) );
 
 	QString dir;
-	if( m_audioFile != "" )
+	if( !m_audioFile.isEmpty() )
 	{
 		QString f = m_audioFile;
 		if( QFileInfo( f ).isRelative() )
@@ -768,7 +765,7 @@ QString sampleBuffer::openAudioFile( void ) const
 		//<< tr( "MOD-Files (*.mod)" )
 		;
 	ofd.setFilters( types );
-	if( m_audioFile != "" )
+	if( !m_audioFile.isEmpty() )
 	{
 		// select previously opened file
 		ofd.selectFile( QFileInfo( m_audioFile ).fileName() );
@@ -794,7 +791,7 @@ QString sampleBuffer::openAudioFile( void ) const
 FLAC__StreamEncoderWriteStatus flacStreamEncoderWriteCallback(
 					const FLAC__StreamEncoder *
 								/*_encoder*/,
-					const FLAC__byte _buffer[], 
+					const FLAC__byte _buffer[],
 					unsigned int/* _samples*/,
 					unsigned int _bytes,
 					unsigned int/* _current_frame*/,
@@ -1005,7 +1002,7 @@ FLAC__StreamDecoderWriteStatus flacStreamDecoderWriteCallback(
 		static_cast<flacStreamDecoderClientData *>(
 					_client_data )->write_buffer->write(
 				(const char *) sframe, sizeof( sframe ) );
-	} 
+	}
 	return FLAC__STREAM_DECODER_WRITE_STATUS_CONTINUE;
 }
 
@@ -1073,14 +1070,14 @@ void sampleBuffer::loadFromBase64( const QString & _data )
 	orig_data = ba_writer.buffer();
 	printf("%d\n", (int) orig_data.size() );
 
-	m_origFrames = orig_data.size() / sizeof( sampleFrame ); 
+	m_origFrames = orig_data.size() / sizeof( sampleFrame );
 	delete[] m_origData;
 	m_origData = new sampleFrame[m_origFrames];
 	memcpy( m_origData, orig_data.data(), orig_data.size() );
 
 #else /* LMMS_HAVE_FLAC_STREAM_DECODER_H */
 
-	m_origFrames = dsize / sizeof( sampleFrame ); 
+	m_origFrames = dsize / sizeof( sampleFrame );
 	delete[] m_origData;
 	m_origData = new sampleFrame[m_origFrames];
 	memcpy( m_origData, dst, dsize );
@@ -1089,7 +1086,7 @@ void sampleBuffer::loadFromBase64( const QString & _data )
 
 	delete[] dst;
 
-	m_audioFile = "";
+	m_audioFile = QString();
 	update();
 }
 
@@ -1210,4 +1207,4 @@ sampleBuffer::handleState::~handleState()
 #include "moc_sample_buffer.cxx"
 
 
-#endif
+/* vim: set tw=0 noexpandtab: */

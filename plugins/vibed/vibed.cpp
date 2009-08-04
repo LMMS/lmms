@@ -22,7 +22,6 @@
  *
  */
 
-
 #include <QtXml/QDomDocument>
 #include <QtCore/QMap>
 #include <QtGui/QWhatsThis>
@@ -40,7 +39,6 @@
 #include "volume.h"
 #include "song.h"
 
-#undef SINGLE_SOURCE_COMPILE
 #include "embed.cpp"
 
 

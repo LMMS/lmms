@@ -43,7 +43,6 @@
 #include "tooltip.h"
 #include "lcd_spinbox.h"
 
-#undef SINGLE_SOURCE_COMPILE
 #include "embed.cpp"
 
 

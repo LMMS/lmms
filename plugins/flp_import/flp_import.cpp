@@ -1,10 +1,10 @@
 /*
  * flp_import.cpp - support for importing FLP-files
  *
- * Copyright (c) 2006-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
  * License as published by the Free Software Foundation; either
@@ -21,7 +21,6 @@
  * Boston, MA 02110-1301 USA.
  *
  */
-
 
 #include <QtXml/QDomDocument>
 #include <QtGui/QApplication>
@@ -1723,9 +1722,8 @@ p->putValue( jt->pos, value, false );
 			continue;
 		}
 		effectChain * ec = &engine::getFxMixer()->
-					getEffectChannel( it->fxChannel )->
-								m_fxChain;
-		printf("adding %s to %d\n", effName.toAscii().constData(),
+					getEffectChannel( it->fxChannel )->m_fxChain;
+		printf("adding %s to %d\n", effName.toUtf8().constData(),
 								it->fxChannel );
 		for( effectKeyList::iterator jt = effKeys.begin();
 						jt != effKeys.end(); ++jt )

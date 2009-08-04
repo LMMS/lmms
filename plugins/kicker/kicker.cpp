@@ -1,7 +1,7 @@
 /*
  * kicker.cpp - bassdrum-synthesizer
  *
- * Copyright (c) 2006-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -33,7 +33,6 @@
 #include "note_play_handle.h"
 #include "sweep_oscillator.h"
 
-#undef SINGLE_SOURCE_COMPILE
 #include "embed.cpp"
 
 

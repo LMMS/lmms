@@ -1,5 +1,3 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * midi_alsa_seq.cpp - ALSA-sequencer-client
  *
@@ -655,4 +653,3 @@ void midiALSASeq::setupWidget::saveSettings( void )
 
 #endif
 
-#endif

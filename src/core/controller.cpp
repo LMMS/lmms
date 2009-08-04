@@ -1,5 +1,3 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * controller.cpp - implementation of class controller which handles
  *                  remote-control of automatableModels
@@ -259,4 +257,3 @@ controllerDialog * controller::createDialog( QWidget * _parent )
 #include "moc_controller.cxx"
 
 
-#endif

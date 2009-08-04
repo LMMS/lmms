@@ -1,5 +1,3 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * instrument_function_views.cpp - view for instrument-functions-tab
  *
@@ -206,4 +204,3 @@ void arpeggiatorView::modelChanged( void )
 
 #include "moc_instrument_function_views.cxx"
 
-#endif

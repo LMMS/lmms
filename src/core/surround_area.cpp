@@ -1,5 +1,3 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * surround_area.cpp - a widget for setting position of a channel +
  *                     calculation of volume for each speaker
@@ -285,4 +283,3 @@ automationPattern * surroundAreaModel::automationPatternY( void )
 #include "moc_surround_area.cxx"
 
 
-#endif

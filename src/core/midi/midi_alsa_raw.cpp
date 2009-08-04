@@ -1,10 +1,8 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * midi_alsa_raw.cpp - midi-client for RawMIDI via ALSA
  *
- * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -24,10 +22,8 @@
  *
  */
 
-
 #include <QtGui/QLabel>
 #include <QtGui/QLineEdit>
-
 
 #include "midi_alsa_raw.h"
 #include "config_mgr.h"
@@ -207,8 +203,6 @@ void midiALSARaw::setupWidget::saveSettings( void )
 							m_device->text() );
 }
 
-
-#endif
 
 #endif
 

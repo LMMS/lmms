@@ -244,7 +244,7 @@ void vstPlugin::loadSettings( const QDomElement & _this )
 	if( _this.hasAttribute( "chunk" ) )
 	{
 		loadChunk( QByteArray::fromBase64(
-				_this.attribute( "chunk" ).toAscii() ) );
+				_this.attribute( "chunk" ).toUtf8() ) );
 	}
 	else if( num_params > 0 )
 	{

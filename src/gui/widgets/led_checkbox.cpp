@@ -1,10 +1,8 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * led_checkbox.cpp - class ledCheckBox, an improved QCheckBox
  *
- * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -52,7 +50,7 @@ ledCheckBox::ledCheckBox( const QString & _text, QWidget * _parent,
 		_color = Yellow;
 	}
 	m_ledOnPixmap = new QPixmap( embed::getIconPixmap(
-					names[_color].toAscii().constData() ) );
+					names[_color].toUtf8().constData() ) );
 	m_ledOffPixmap = new QPixmap( embed::getIconPixmap( "led_off" ) );
 
 	setFont( pointSize<7>( font() ) );
@@ -97,4 +95,3 @@ void ledCheckBox::paintEvent( QPaintEvent * )
 
 #include "moc_led_checkbox.cxx"
 
-#endif

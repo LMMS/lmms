@@ -1,9 +1,7 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * import_filter.cpp - base-class for all import-filters (MIDI, FLP etc)
  *
- * Copyright (c) 2006-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -59,7 +57,7 @@ void importFilter::import( const QString & _file_to_import,
 
 	bool successful = FALSE;
 
-	char * s = qstrdup( _file_to_import.toAscii().constData() );
+	char * s = qstrdup( _file_to_import.toUtf8().constData() );
 
 	// do not record changes while importing files
 	const bool j = engine::getProjectJournal()->isJournalling();
@@ -127,5 +125,3 @@ bool importFilter::openFile( void )
 
 
 
-
-#endif

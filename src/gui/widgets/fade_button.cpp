@@ -1,5 +1,3 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * fade_button.cpp - implementation of fade-button
  *
@@ -123,4 +121,3 @@ void fadeButton::signalUpdate( void )
 #include "moc_fade_button.cxx"
 
 
-#endif

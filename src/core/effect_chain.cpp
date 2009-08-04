@@ -2,7 +2,7 @@
  * effect_chain.cpp - class for processing and effects chain
  *
  * Copyright (c) 2006-2008 Danny McRae <khjklujn/at/users.sourceforge.net>
- * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -201,7 +201,7 @@ bool effectChain::processAudioBuffer( sampleFrame * _buf, const fpp_t _frames )
 				it = m_effects.end()-1;
 				printf( "numerical overflow after processing "
 					"plugin \"%s\"\n", ( *it )->
-					publicName().toAscii().constData() );
+					publicName().toUtf8().constData() );
 				break;
 			}
 		}

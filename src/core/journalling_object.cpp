@@ -1,9 +1,7 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * journalling_object.cpp - implementation of journalling-object related stuff
  *
- * Copyright (c) 2006-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -37,11 +35,11 @@
 
 
 
-journallingObject::journallingObject( void ) :
+journallingObject::journallingObject() :
 	m_id( engine::getProjectJournal()->allocID( this ) ),
 	m_journalEntries(),
 	m_currentJournalEntry( m_journalEntries.end() ),
-	m_journalling( TRUE ),
+	m_journalling( true ),
 	m_journallingStateStack()
 {
 }
@@ -60,9 +58,9 @@ journallingObject::~journallingObject()
 
 
 
-void journallingObject::undo( void )
+void journallingObject::undo()
 {
-	if( m_journalEntries.empty() == TRUE )
+	if( m_journalEntries.empty() == true )
 	{
 		return;
 	}
@@ -76,9 +74,9 @@ void journallingObject::undo( void )
 
 
 
-void journallingObject::redo( void )
+void journallingObject::redo()
 {
-	if( m_journalEntries.empty() == TRUE )
+	if( m_journalEntries.empty() == true )
 	{
 		return;
 	}
@@ -97,7 +95,7 @@ QDomElement journallingObject::saveState( QDomDocument & _doc,
 {
 	QDomElement _this = serializingObject::saveState( _doc, _parent );
 	saveJournal( _doc, _this );
-	return( _this );
+	return _this;
 }
 
 
@@ -107,7 +105,7 @@ void journallingObject::restoreState( const QDomElement & _this )
 {
 	serializingObject::restoreState( _this );
 
-	saveJournallingState( FALSE );
+	saveJournallingState( false );
 
 	// search for journal-node
 	QDomNode node = _this.firstChild();
@@ -118,7 +116,7 @@ void journallingObject::restoreState( const QDomElement & _this )
 			loadJournal( node.toElement() );
 		}
 		node = node.nextSibling();
-        }
+	}
 
 	restoreJournallingState();
 }
@@ -158,7 +156,7 @@ void journallingObject::changeID( jo_id_t _id )
 								displayName();
 			}
 			fprintf( stderr, "JO-ID %d already in use by %s!\n",
-				(int) _id, used_by.toAscii().constData() );
+				(int) _id, used_by.toUtf8().constData() );
 			return;
 		}
 		engine::getProjectJournal()->forgetAboutID( id() );
@@ -183,7 +181,7 @@ void journallingObject::saveJournal( QDomDocument & _doc,
 	journal_de.setAttribute( "entries", m_journalEntries.size() );
 	journal_de.setAttribute( "curentry", (int)( m_currentJournalEntry -
 						m_journalEntries.begin() ) );
-	journal_de.setAttribute( "metadata", TRUE );
+	journal_de.setAttribute( "metadata", true );
 
 	for( journalEntryVector::const_iterator it = m_journalEntries.begin();
 					it != m_journalEntries.end(); ++it )
@@ -236,5 +234,3 @@ void journallingObject::loadJournal( const QDomElement & _this )
 }
 
 
-
-#endif

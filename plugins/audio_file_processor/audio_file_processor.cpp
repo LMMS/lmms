@@ -41,8 +41,6 @@
 #include "string_pair_drag.h"
 #include "mmp.h"
 
-
-#undef SINGLE_SOURCE_COMPILE
 #include "embed.cpp"
 
 
@@ -212,13 +210,13 @@ pluginView * audioFileProcessor::instantiateView( QWidget * _parent )
 
 
 void audioFileProcessor::setAudioFile( const QString & _audio_file,
-								bool _rename )
+													bool _rename )
 {
 	// is current channel-name equal to previous-filename??
-	if( _rename && 
+	if( _rename &&
 		( getInstrumentTrack()->name() ==
 			QFileInfo( m_sampleBuffer.audioFile() ).fileName() ||
-		   	m_sampleBuffer.audioFile() == "" ) )
+				m_sampleBuffer.audioFile().isEmpty() ) )
 	{
 		// then set it to new one
 		getInstrumentTrack()->setName( QFileInfo( _audio_file
