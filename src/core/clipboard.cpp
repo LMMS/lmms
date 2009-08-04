@@ -1,5 +1,3 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * clipboard.cpp - the clipboard for patterns, notes etc.
  *
@@ -59,4 +57,3 @@ const QDomElement * clipboard::getContent( const QString & _node_name )
 
 
 
-#endif

@@ -193,7 +193,7 @@ bool multimediaProject::writeFile( const QString & _fn )
 	QString xml = "<?xml version=\"1.0\"?>\n" + toString( 2 );
 	if( fn.section( '.', -1 ) == "mmpz" )
 	{
-		outfile.write( qCompress( xml.toAscii() ) );
+		outfile.write( qCompress( xml.toUtf8() ) );
 	}
 	else
 	{
@@ -670,7 +670,7 @@ void multimediaProject::upgrade( void )
 	{
 		m_head.setAttribute( "mastervol", 100 );
 	}
-//printf("%s\n", toString( 2 ).toAscii().constData());
+//printf("%s\n", toString( 2 ).toUtf8().constData());
 }
 
 

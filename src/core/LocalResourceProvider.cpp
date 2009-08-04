@@ -165,7 +165,7 @@ void LocalResourceProvider::readDir( const QString & _dir,
 	ResourceTreeItem * curParent = _parent->findChild( d.dirName() +
 							QDir::separator(),
 							m_baseDir );
-printf("read dir: %s\n", d.canonicalPath().toAscii().constData() );
+printf("read dir: %s\n", d.canonicalPath().toUtf8().constData() );
 	if( curParent )
 	{
 		parentItem = curParent->item();

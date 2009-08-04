@@ -45,7 +45,6 @@
 #include "lcd_spinbox.h"
 #include "panning.h"
 
-#undef SINGLE_SOURCE_COMPILE
 #include "embed.cpp"
 
 #define SF2_PANNING_SUPPORT

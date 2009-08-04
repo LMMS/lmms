@@ -25,8 +25,6 @@
 
 #include "stereo_matrix.h"
 
-
-#undef SINGLE_SOURCE_COMPILE
 #include "embed.cpp"
 
 

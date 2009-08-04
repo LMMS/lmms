@@ -1,5 +1,3 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * effect.cpp - base-class for effects
  *
@@ -206,4 +204,3 @@ void effect::resample( int _i, const sampleFrame * _src_buf,
 }
 
 
-#endif

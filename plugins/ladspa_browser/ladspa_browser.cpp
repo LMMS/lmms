@@ -37,10 +37,7 @@
 #include "tab_bar.h"
 #include "tab_button.h"
 
-
-#undef SINGLE_SOURCE_COMPILE
 #include "embed.cpp"
-
 
 
 

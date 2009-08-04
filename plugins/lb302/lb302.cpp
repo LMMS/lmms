@@ -44,7 +44,6 @@
 #include "templates.h"
 #include "tooltip.h"
 
-#undef SINGLE_SOURCE_COMPILE
 #include "embed.cpp"
 #include "moc_lb302.cxx"
 

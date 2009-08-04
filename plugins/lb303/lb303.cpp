@@ -40,7 +40,6 @@
 #include "templates.h"
 #include "audio_port.h"
 
-#undef SINGLE_SOURCE_COMPILE
 #include "embed.cpp"
 #include "moc_lb303.cxx"
 

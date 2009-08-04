@@ -22,7 +22,6 @@
  *
  */
 
-
 #include "vestige.h"
 
 #include <QtGui/QDropEvent>
@@ -43,7 +42,6 @@
 #include "text_float.h"
 #include "tooltip.h"
 
-#undef SINGLE_SOURCE_COMPILE
 #include "embed.cpp"
 
 

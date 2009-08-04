@@ -1,5 +1,3 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * group_box.cpp - groupbox for LMMS
  *
@@ -147,4 +145,3 @@ void groupBox::updatePixmap( void )
 #include "moc_group_box.cxx"
 
 
-#endif

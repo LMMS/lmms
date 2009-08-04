@@ -1,5 +1,3 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * audio_portaudio.cpp - device-class that performs PCM-output via PortAudio
  *
@@ -538,4 +536,3 @@ void audioPortAudio::setupWidget::saveSettings( void )
 
 #include "moc_audio_portaudio.cxx"
 
-#endif

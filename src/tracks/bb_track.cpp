@@ -1,5 +1,3 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * bb_track.cpp - implementation of class bbTrack and bbTCO
  *
@@ -596,4 +594,3 @@ void bbTrackView::clickedTrackLabel( void )
 #include "moc_bb_track.cxx"
 
 
-#endif

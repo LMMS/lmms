@@ -40,7 +40,6 @@
 #include "pixmap_button.h"
 #include "tooltip.h"
 
-#undef SINGLE_SOURCE_COMPILE
 #include "embed.cpp"
 
 #define C64_PAL_CYCLES_PER_SEC  985248

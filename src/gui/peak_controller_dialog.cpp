@@ -1,5 +1,3 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * lfo_controller_dialog.cpp - per-controller-specific view for changing a
  * controller's settings
@@ -110,4 +108,3 @@ void peakControllerDialog::modelChanged( void )
 }
 
 
-#endif

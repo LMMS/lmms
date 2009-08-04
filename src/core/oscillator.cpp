@@ -1,5 +1,3 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * oscillator.cpp - implementation of powerful oscillator-class
  *
@@ -552,4 +550,3 @@ inline sample_t oscillator::getSample<oscillator::UserDefinedWave>(
 
 
 
-#endif

@@ -2,7 +2,7 @@
  * midi.h - constants, structs etc. concerning MIDI
  *
  * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -21,7 +21,6 @@
  * Boston, MA 02110-1301 USA.
  *
  */
-
 
 #ifndef _MIDI_H
 #define _MIDI_H

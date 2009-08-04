@@ -1,5 +1,3 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * track.cpp - implementation of classes concerning tracks -> neccessary for
  *             all track-like objects (beat/bassline, sample-track...)
@@ -2420,4 +2418,3 @@ void trackView::createTCOView( trackContentObject * _tco )
 #include "moc_track.cxx"
 
 
-#endif

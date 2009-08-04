@@ -1,5 +1,3 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * controller_view.cpp - view-component for an controller
  *
@@ -210,4 +208,3 @@ void controllerView::displayHelp( void )
 
 #include "moc_controller_view.cxx"
 
-#endif

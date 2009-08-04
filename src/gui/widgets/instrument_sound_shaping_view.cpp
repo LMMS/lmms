@@ -76,7 +76,7 @@ instrumentSoundShapingView::instrumentSoundShapingView( QWidget * _parent ) :
 		m_envLFOViews[i] = new envelopeAndLFOView( m_targetsTabWidget );
 		m_targetsTabWidget->addTab( m_envLFOViews[i],
 						tr( __targetNames[i][0]
-						.toAscii().constData() ) );
+						.toUtf8().constData() ) );
 	}
 
 

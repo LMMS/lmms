@@ -38,8 +38,6 @@
 #include "automation_pattern.h"
 #include "controller_connection.h"
 
-
-#undef SINGLE_SOURCE_COMPILE
 #include "embed.cpp"
 
 

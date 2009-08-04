@@ -1,7 +1,7 @@
 /*
  * spectrum_analyzer.cpp - spectrum analyzer plugin
  *
- * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -22,11 +22,8 @@
  *
  */
 
-
 #include "spectrum_analyzer.h"
 
-
-#undef SINGLE_SOURCE_COMPILE
 #include "embed.cpp"
 
 

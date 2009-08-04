@@ -1,9 +1,7 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * embed.cpp - misc stuff for using embedded resources (linked into binary)
  *
- * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -81,7 +79,7 @@ QPixmap getIconPixmap( const char * _name, int _w, int _h )
         if( p.isNull() )
         {
 			const embed::descriptor & e = findEmbeddedData(
-			name.toAscii().constData() );
+									name.toUtf8().constData() );
 			// found?
 			if( QString( e.name ) == name )
 			{
@@ -113,4 +111,3 @@ QString getText( const char * _name )
 }
 
 
-#endif

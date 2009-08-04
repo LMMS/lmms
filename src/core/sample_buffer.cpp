@@ -1,10 +1,8 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * sample_buffer.cpp - container-class sampleBuffer
  *
  * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -66,19 +64,19 @@
 #include "lame_library.h"
 
 
-const char * sampleBuffer::supportedExts[] = { 
-	"wav", 
-	"ogg", 
-	"ds", 
-	"spx", 
-	"au", 
-	"voc", 
-	"aif", 
+const char * sampleBuffer::supportedExts[] = {
+	"wav",
+	"ogg",
+	"ds",
+	"spx",
+	"au",
+	"voc",
+	"aif",
 	"aiff",
-	"flac", 
-	"raw", 
+	"flac",
+	"raw",
 	"mp3",
-	NULL 
+	NULL
 };
 
 sampleBuffer::sampleBuffer( const QString & _audio_file,
@@ -194,10 +192,10 @@ void sampleBuffer::update( bool _keep_settings )
 			m_loopEndFrame = m_endFrame = m_frames;
 		}
 	}
-	else if( m_audioFile != "" )
+	else if( !m_audioFile.isEmpty() )
 	{
 		QString file = tryToMakeAbsolute( m_audioFile );
-		char * f = qstrdup( file.toAscii().constData() );
+		char * f = qstrdup( file.toUtf8().constData() );
 		int_sample_t * buf = NULL;
 		ch_cnt_t channels = DEFAULT_CHANNELS;
 		sample_rate_t samplerate = engine::getMixer()->baseSampleRate();
@@ -215,12 +213,12 @@ void sampleBuffer::update( bool _keep_settings )
 				m_frames = decodeSampleSF( f, buf, channels, samplerate );
 #ifdef LMMS_HAVE_OGGVORBIS
 			if( m_frames == 0 )
-				m_frames = decodeSampleOGGVorbis(f, buf, channels, samplerate);
+				m_frames = decodeSampleOGGVorbis( f, buf, channels, samplerate );
 #endif
 			if( m_frames == 0 )
 				m_frames = decodeSampleDS( f, buf, channels, samplerate );
 
-			// MP3 
+			// MP3
 			if( m_frames == 0 )
 				m_frames = decodeSampleMp3( file, buf, channels, samplerate );
 
@@ -311,18 +309,22 @@ void sampleBuffer::update( bool _keep_settings )
 }
 
 
+
+
 QString sampleBuffer::niceListOfExts() const
 {
-	QString ret = "";
+	QString ret;
 	for( const char * * i = supportedExts; *i; ++i )
 	{
-		ret.append(*i);
+		ret.append( *i );
 		if( *(i+1) )
-			ret.append(", ");
+			ret.append( ", " );
 	}
-	
+
 	return ret;
 }
+
+
 
 
 void sampleBuffer::normalizeSampleRate( const sample_rate_t _src_sr,
@@ -530,7 +532,7 @@ f_cnt_t sampleBuffer::decodeSampleOGGVorbis( const char * _f,
 #endif
 
 
-int lame_decode_fromfile(QFile &in, short pcm_l[], short pcm_r[], 
+int lame_decode_fromfile(QFile &in, short pcm_l[], short pcm_r[],
 	mp3data_struct * mp3data, LameLibrary &lame)
 {
 	int	 ret = 0;
@@ -574,12 +576,12 @@ f_cnt_t sampleBuffer::decodeSampleMp3( QString & file, int_sample_t * & _buf,
 {
 	// create instance of LameLibrary to decode
 	LameLibrary lame;
-	
+
 	// open the file
 	QFile in(file);
 
 	if( ! in.open(QIODevice::ReadOnly) ){
-		printf("sampleBuffer::decodeSampleMp3: error opening %s for reading\n", 
+		printf("sampleBuffer::decodeSampleMp3: error opening %s for reading\n",
 			file.toStdString().c_str());
 		return 0;
 	}
@@ -599,7 +601,7 @@ f_cnt_t sampleBuffer::decodeSampleMp3( QString & file, int_sample_t * & _buf,
 	while(1)
 	{
 		int ret = lame_decode_fromfile(in, pcm_l, pcm_r, &mp3data, lame);
-		
+
 		if( ret == -1 ){
 			delete[] _buf;
 			printf("error decoding mp3\n");
@@ -620,11 +622,11 @@ f_cnt_t sampleBuffer::decodeSampleMp3( QString & file, int_sample_t * & _buf,
 				// process header
 				_samplerate = mp3data.samplerate;
 				_channels = mp3data.stereo;
-				_buf = new int_sample_t[mp3data.totalframes * 
+				_buf = new int_sample_t[mp3data.totalframes *
 					mp3data.framesize * _channels];
 				initBuf = true;
 			}
-		} 
+		}
 
 		// convert the decoded PCM into sample
 		for(int i = 0; i<ret; ++i)
@@ -634,9 +636,9 @@ f_cnt_t sampleBuffer::decodeSampleMp3( QString & file, int_sample_t * & _buf,
 				_buf[bufPos++] = pcm_r[i];
 		}
 	}
-	
+
 	lame.lame_decode_exit();
-	
+
 	return bufPos / _channels;
 }
 
@@ -870,12 +872,12 @@ void sampleBuffer::visualize( QPainter & _p, const QRect & _dr,
 
 
 
-QString sampleBuffer::openAudioFile( void ) const
+QString sampleBuffer::openAudioFile() const
 {
 	QFileDialog ofd( NULL, tr( "Open audio file" ) );
 
 	QString dir;
-	if( m_audioFile != "" )
+	if( !m_audioFile.isEmpty() )
 	{
 		QString f = m_audioFile;
 		if( QFileInfo( f ).isRelative() )
@@ -915,7 +917,7 @@ QString sampleBuffer::openAudioFile( void ) const
 		//<< tr( "MOD-Files (*.mod)" )
 		;
 	ofd.setFilters( types );
-	if( m_audioFile != "" )
+	if( !m_audioFile.isEmpty() )
 	{
 		// select previously opened file
 		ofd.selectFile( QFileInfo( m_audioFile ).fileName() );
@@ -941,7 +943,7 @@ QString sampleBuffer::openAudioFile( void ) const
 FLAC__StreamEncoderWriteStatus flacStreamEncoderWriteCallback(
 					const FLAC__StreamEncoder *
 								/*_encoder*/,
-					const FLAC__byte _buffer[], 
+					const FLAC__byte _buffer[],
 					unsigned int/* _samples*/,
 					unsigned int _bytes,
 					unsigned int/* _current_frame*/,
@@ -1152,7 +1154,7 @@ FLAC__StreamDecoderWriteStatus flacStreamDecoderWriteCallback(
 		static_cast<flacStreamDecoderClientData *>(
 					_client_data )->write_buffer->write(
 				(const char *) sframe, sizeof( sframe ) );
-	} 
+	}
 	return FLAC__STREAM_DECODER_WRITE_STATUS_CONTINUE;
 }
 
@@ -1220,14 +1222,14 @@ void sampleBuffer::loadFromBase64( const QString & _data )
 	orig_data = ba_writer.buffer();
 	printf("%d\n", (int) orig_data.size() );
 
-	m_origFrames = orig_data.size() / sizeof( sampleFrame ); 
+	m_origFrames = orig_data.size() / sizeof( sampleFrame );
 	delete[] m_origData;
 	m_origData = new sampleFrame[m_origFrames];
 	memcpy( m_origData, orig_data.data(), orig_data.size() );
 
 #else /* LMMS_HAVE_FLAC_STREAM_DECODER_H */
 
-	m_origFrames = dsize / sizeof( sampleFrame ); 
+	m_origFrames = dsize / sizeof( sampleFrame );
 	delete[] m_origData;
 	m_origData = new sampleFrame[m_origFrames];
 	memcpy( m_origData, dst, dsize );
@@ -1236,7 +1238,7 @@ void sampleBuffer::loadFromBase64( const QString & _data )
 
 	delete[] dst;
 
-	m_audioFile = "";
+	m_audioFile = QString();
 	update();
 }
 
@@ -1356,7 +1358,5 @@ sampleBuffer::handleState::~handleState()
 
 #include "moc_sample_buffer.cxx"
 
-
-#endif
 
 /* vim: set tw=0 noexpandtab: */

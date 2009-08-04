@@ -39,7 +39,6 @@
 #include "tooltip.h"
 #include "song.h"
 
-#undef SINGLE_SOURCE_COMPILE
 #include "embed.cpp"
 
 extern "C"

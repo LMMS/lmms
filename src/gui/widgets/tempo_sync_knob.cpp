@@ -1,5 +1,3 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * tempo_sync_knob.cpp - adds bpm to ms conversion for knob class
  *
@@ -491,4 +489,3 @@ void tempoSyncKnob::showCustom( void )
 #include "moc_tempo_sync_knob.cxx"
 
 
-#endif

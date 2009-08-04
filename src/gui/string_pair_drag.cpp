@@ -1,5 +1,3 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * string_pair_drag.cpp - class stringPairDrag which provides general support
  *                        for drag'n'drop of string-pairs and which is the base
@@ -121,4 +119,3 @@ QString stringPairDrag::decodeValue( QDropEvent * _de )
 }
 
 
-#endif

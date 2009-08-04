@@ -1,5 +1,3 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * effect_select_dialog.cpp - dialog to choose effect plugin
  *
@@ -316,4 +314,3 @@ void effectListWidget::updateSelection( void )
 
 #include "moc_effect_select_dialog.cxx"
 
-#endif

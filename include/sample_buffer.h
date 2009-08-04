@@ -2,7 +2,7 @@
  * sample_buffer.h - container-class sampleBuffer
  *
  * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -47,14 +47,14 @@ class EXPORT sampleBuffer : public QObject, public sharedObject
 	Q_OBJECT
 public:
 	static const char * supportedExts[];
-	
+
 	QString niceListOfExts() const;
-	
+
 
 	class EXPORT handleState
 	{
 	public:
-		handleState( bool _varying_pitch = FALSE );
+		handleState( bool _varying_pitch = false );
 		virtual ~handleState();
 
 
@@ -71,16 +71,16 @@ public:
 	// constructor which either loads sample _audio_file or decodes
 	// base64-data out of string
 	sampleBuffer( const QString & _audio_file = QString(),
-						bool _is_base64_data = FALSE );
+						bool _is_base64_data = false );
 	sampleBuffer( const sampleFrame * _data, const f_cnt_t _frames );
 	sampleBuffer( const f_cnt_t _frames );
-	
+
 	virtual ~sampleBuffer();
 
 	bool play( sampleFrame * _ab, handleState * _state,
 				const fpp_t _frames,
 				const float _freq,
-				const bool _looped = FALSE );
+				const bool _looped = false );
 
 	void visualize( QPainter & _p, const QRect & _dr, const QRect & _clip );
 	inline void visualize( QPainter & _p, const QRect & _dr )
@@ -88,17 +88,17 @@ public:
 		visualize( _p, _dr, _dr );
 	}
 
-	inline const QString & audioFile( void ) const
+	inline const QString & audioFile() const
 	{
 		return m_audioFile;
 	}
 
-	inline f_cnt_t startFrame( void ) const
+	inline f_cnt_t startFrame() const
 	{
 		return m_startFrame;
 	}
 
-	inline f_cnt_t endFrame( void ) const
+	inline f_cnt_t endFrame() const
 	{
 		return m_endFrame;
 	}
@@ -117,22 +117,22 @@ public:
 		m_varLock.unlock();
 	}
 
-	inline f_cnt_t frames( void ) const
+	inline f_cnt_t frames() const
 	{
 		return m_frames;
 	}
 
-	inline float amplification( void ) const
+	inline float amplification() const
 	{
 		return m_amplification;
 	}
 
-	inline bool reversed( void ) const
+	inline bool reversed() const
 	{
 		return m_reversed;
 	}
 
-	inline float frequency( void ) const
+	inline float frequency() const
 	{
 		return m_frequency;
 	}
@@ -151,12 +151,12 @@ public:
 		m_varLock.unlock();
 	}
 
-	inline const sampleFrame * data( void ) const
+	inline const sampleFrame * data() const
 	{
 		return m_data;
 	}
 
-	QString openAudioFile( void ) const;
+	QString openAudioFile() const;
 
 	QString & toBase64( QString & _dst ) const;
 
@@ -175,7 +175,7 @@ public:
 	}
 
 	void normalizeSampleRate( const sample_rate_t _src_sr,
-						bool _keep_settings = FALSE );
+						bool _keep_settings = false );
 
 	inline sample_t userWaveSample( const float _sample ) const
 	{
@@ -212,7 +212,7 @@ public slots:
 
 
 private:
-	void update( bool _keep_settings = FALSE );
+	void update( bool _keep_settings = false );
 
 
 	f_cnt_t decodeSampleSF( const char * _f, int_sample_t * & _buf,
@@ -227,7 +227,7 @@ private:
 						ch_cnt_t & _channels,
 						sample_rate_t & _sample_rate );
 
-	f_cnt_t decodeSampleMp3( QString & file, int_sample_t * & _buf, 
+	f_cnt_t decodeSampleMp3( QString & file, int_sample_t * & _buf,
 		ch_cnt_t & _channels, sample_rate_t & _samplerate );
 
 	QString m_audioFile;
@@ -252,7 +252,7 @@ private:
 
 
 signals:
-	void sampleUpdated( void );
+	void sampleUpdated();
 
 } ;
 

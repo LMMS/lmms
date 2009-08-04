@@ -1,5 +1,3 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * project_journal.cpp - implementation of project-journal
  *
@@ -171,4 +169,3 @@ void projectJournal::clearJournal( void )
 
 
 
-#endif

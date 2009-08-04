@@ -1,5 +1,3 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * instrument_sound_shaping.cpp - class instrumentSoundShaping
  *
@@ -423,4 +421,3 @@ void instrumentSoundShaping::loadSettings( const QDomElement & _this )
 
 #include "moc_instrument_sound_shaping.cxx"
 
-#endif

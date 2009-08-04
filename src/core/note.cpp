@@ -1,5 +1,3 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * note.cpp - implementation of class note
  *
@@ -235,7 +233,7 @@ void note::loadSettings( const QDomElement & _this )
 			break;
 
 		case ChangePanning:
-			setVolume( getPanning() - _je.data().toInt() );
+			setPanning( getPanning() - _je.data().toInt() );
 			break;
 
 		case ChangeLength:
@@ -287,4 +285,3 @@ bool note::hasDetuningInfo( void ) const
 
 
 
-#endif

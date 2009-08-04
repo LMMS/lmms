@@ -1,5 +1,3 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * base64.cpp - namespace base64 with methods for encoding/decoding binary data
  *              to/from base64
@@ -76,4 +74,3 @@ QVariant decode( const QString & _b64, QVariant::Type _force_type )
 
 } ;
 
-#endif

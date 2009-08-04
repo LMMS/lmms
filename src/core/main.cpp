@@ -1,5 +1,3 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * main.cpp - just main.cpp which is starting up app...
  *
@@ -196,7 +194,7 @@ int main( int argc, char * * argv )
 			QFile f( argv[i + 1] );
 			f.open( QIODevice::ReadOnly );
 			QString d = qUncompress( f.readAll() );
-			printf( "%s\n", d.toAscii().constData() );
+			printf( "%s\n", d.toUtf8().constData() );
 			return( 0 );
 		}
 		else if( argc > i && ( QString( argv[i] ) == "--render" ||
@@ -520,7 +518,5 @@ int main( int argc, char * * argv )
 	return( ret );
 }
 
-
-#endif
 
 /* vim: set tw=0 noexpandtab: */

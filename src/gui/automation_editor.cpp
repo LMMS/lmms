@@ -1,5 +1,3 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * automation_editor.cpp - implementation of automationEditor which is used for
  *                         actual setting of dynamic values
@@ -2158,4 +2156,3 @@ void automationEditor::update( void )
 #include "moc_automation_editor.cxx"
 
 
-#endif

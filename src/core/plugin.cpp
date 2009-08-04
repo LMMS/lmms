@@ -164,13 +164,13 @@ void plugin::getDescriptorsOfAvailPlugins( QVector<descriptor> & _plugin_descs )
 		}
 		descriptor * plugin_desc =
 			(descriptor *) plugin_lib.resolve(
-					desc_name.toAscii().constData() );
+					desc_name.toUtf8().constData() );
 		if( plugin_desc == NULL )
 		{
 			printf( "LMMS-plugin %s does not have a "
 				"plugin-descriptor named %s!\n",
-				f.absoluteFilePath().toAscii().constData(),
-					desc_name.toAscii().constData() );
+				f.absoluteFilePath().toUtf8().constData(),
+					desc_name.toUtf8().constData() );
 			continue;
 		}
 		_plugin_descs.push_back( *plugin_desc );

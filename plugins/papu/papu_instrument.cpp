@@ -36,7 +36,6 @@
 #include "tooltip.h"
 #include "graph.h"
 
-#undef SINGLE_SOURCE_COMPILE
 #include "embed.cpp"
 
 extern "C"

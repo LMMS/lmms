@@ -1,9 +1,7 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * knob.cpp - powerful knob-widget
  *
- * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -81,7 +79,7 @@ knob::knob( int _knob_num, QWidget * _parent, const QString & _name ) :
 	if( m_knobNum != knobStyled )
 	{
 		m_knobPixmap = new QPixmap( embed::getIconPixmap( QString( "knob0" +
-			QString::number( m_knobNum + 1 ) ).toAscii().constData() ) );
+			QString::number( m_knobNum + 1 ) ).toUtf8().constData() ) );
 
 		setFixedSize( m_knobPixmap->width(), m_knobPixmap->height() );
 	}
@@ -692,5 +690,3 @@ void knob::displayHelp( void )
 
 #include "moc_knob.cxx"
 
-
-#endif

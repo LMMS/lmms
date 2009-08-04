@@ -1,5 +1,3 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * lfo_controller.cpp - implementation of class controller which handles
  *                      remote-control of automatableModels
@@ -133,7 +131,4 @@ controllerDialog * peakController::createDialog( QWidget * _parent )
 
 
 #include "moc_peak_controller.cxx"
-
-
-#endif
 

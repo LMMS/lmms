@@ -1,5 +1,3 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * pattern.cpp - implementation of class pattern which holds notes
  *
@@ -1338,4 +1336,3 @@ void patternView::paintEvent( QPaintEvent * )
 #include "moc_pattern.cxx"
 
 
-#endif

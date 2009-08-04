@@ -1,5 +1,3 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * combobox.cpp - implementation of LMMS-combobox
  *
@@ -251,4 +249,3 @@ void comboBox::setItem( QAction * _item )
 #include "moc_combobox.cxx"
 
 
-#endif

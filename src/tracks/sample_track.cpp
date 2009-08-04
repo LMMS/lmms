@@ -1,5 +1,3 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * sample_track.cpp - implementation of class sampleTrack, a track which
  *                    provides arrangement of samples
@@ -568,4 +566,3 @@ void sampleTrackView::showEffects( void )
 #include "moc_sample_track.cxx"
 
 
-#endif

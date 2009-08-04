@@ -1,5 +1,3 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * caption_menu.cpp - context menu with a caption
  *
@@ -50,4 +48,3 @@ captionMenu::~captionMenu()
 #include "moc_caption_menu.cxx"
 
 
-#endif

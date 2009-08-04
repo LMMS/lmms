@@ -1,10 +1,8 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * song_editor.cpp - basic window for song-editing
  *
  * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -23,7 +21,6 @@
  * Boston, MA 02110-1301 USA.
  *
  */
-
 
 #include <QtGui/QAction>
 #include <QtGui/QButtonGroup>
@@ -494,7 +491,5 @@ bool songEditor::allowRubberband( void ) const
 
 #include "moc_song_editor.cxx"
 
-
-#endif
 
 /* vim: set tw=0 noexpandtab: */

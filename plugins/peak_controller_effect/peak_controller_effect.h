@@ -1,5 +1,5 @@
 /*
- * stereo_matrix.h - stereo-matrix-effect-plugin
+ * peak_controller_effect.h - PeakController effect plugin
  *
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail/dot/com>
  * 
