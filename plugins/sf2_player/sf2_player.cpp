@@ -43,7 +43,6 @@
 #include "patches_dialog.h"
 #include "tooltip.h"
 #include "lcd_spinbox.h"
-#include "panning.h"
 
 #include "embed.cpp"
 
@@ -616,20 +615,14 @@ void sf2Instrument::playNote( notePlayHandle * _n, sampleFrame * )
 
 		// get new voice and save it
 		fluid_synth_get_voicelist( m_synth, voices, poly, -1 );
-		int last = -1;
 		for( int i = 0; i < poly && voices[i]; ++i )
 		{
-			last = i;
 			const unsigned int newID = fluid_voice_get_id( voices[i] );
 			if( id[i] != newID || newID == 0 )
 			{
 				pluginData->fluidVoice = voices[i];
 				break;
 			}
-		}
-		if( pluginData->fluidVoice == NULL )
-		{
-			pluginData->fluidVoice = voices[last];
 		}
 
 		m_synthMutex.unlock();
@@ -641,26 +634,33 @@ void sf2Instrument::playNote( notePlayHandle * _n, sampleFrame * )
 
 	SF2PluginData * pluginData = static_cast<SF2PluginData *>(
 							_n->m_pluginData );
-	if( pluginData->lastPanning != _n->getPanning() )
+	if( pluginData->fluidVoice &&
+			pluginData->lastPanning != _n->getPanning() )
 	{
 		const float pan = -500 +
 			  ( (float)( _n->getPanning() - PanningLeft ) ) / 
 			  ( (float)( PanningRight - PanningLeft ) ) * 1000;
+
+		m_synthMutex.lock();
 		fluid_voice_gen_set( pluginData->fluidVoice, GEN_PAN, pan );
 		fluid_voice_update_param( pluginData->fluidVoice, GEN_PAN );
+		m_synthMutex.unlock();
 
 		pluginData->lastPanning = _n->getPanning();
 	}
 
 	const float currentVelocity = _n->volumeLevel( tfp ) * 127;
-	if( pluginData->lastVelocity != currentVelocity )
+	if( pluginData->fluidVoice &&
+			pluginData->lastVelocity != currentVelocity )
 	{
+		m_synthMutex.lock();
 		fluid_voice_gen_set( pluginData->fluidVoice, GEN_VELOCITY,
 													currentVelocity );
 		fluid_voice_update_param( pluginData->fluidVoice, GEN_VELOCITY );
 		// make sure, FluidSynth modulates our changed GEN_VELOCITY via internal
 		// attenuation modulator, so changes take effect (7=Volume CC)
 		fluid_synth_cc( m_synth, m_channel, 7, 127 );
+		m_synthMutex.unlock();
 
 		pluginData->lastVelocity = currentVelocity;
 	}

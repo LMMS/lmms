@@ -62,7 +62,7 @@ public:
 	virtual void playNote( notePlayHandle * _n,
 						sampleFrame * _working_buffer );
 	virtual void deleteNotePluginData( notePlayHandle * _n );
-		
+
 
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
 	virtual void loadSettings( const QDomElement & _this );
