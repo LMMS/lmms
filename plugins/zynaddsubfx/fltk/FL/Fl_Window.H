@@ -75,7 +75,9 @@ class FL_EXPORT Fl_Window : public Fl_Group {
     FL_NOBORDER = 8,
     FL_FORCE_POSITION = 16,
     FL_NON_MODAL = 32,
-    FL_OVERRIDE = 256
+    FL_OVERRIDE = 256,
+    FL_MENU_WINDOW = 4096,
+    FL_TOOLTIP_WINDOW = 8192
   };
   void _Fl_Window(); // constructor innards
 
@@ -177,7 +179,7 @@ public:
     being delivered to other windows in the same program, and will also
     remain on top of the other windows (if the X window manager supports
     the "transient for" property).  Several modal windows may be shown at
-    once, in which case only the last one shown gets events.  You can See
+    once, in which case only the last one shown gets events.  You can see
     which window (if any) is modal by calling 
     Fl::modal().
   */
@@ -193,6 +195,45 @@ public:
   void set_non_modal()	{set_flag(FL_NON_MODAL);}
   /**  Returns true if this window is modal or non-modal. */
   int non_modal() const {return flags() & (FL_NON_MODAL|FL_MODAL);}
+
+  /**
+    Marks the window as a menu window.
+    
+    This is intended for internal use, but it can also be used if you
+    write your own menu handling. However, this is not recommended.
+
+    This flag is used for correct "parenting" of windows in communication
+    with the windowing system. Modern X window managers can use different
+    flags to distinguish menu and tooltip windows from normal windows.
+    
+    This must be called before the window is shown and cannot be changed
+    later.
+  */
+  void set_menu_window()	{set_flag(FL_MENU_WINDOW);}
+
+  /**  Returns true if this window is a menu window. */
+  int menu_window() const {return flags() & FL_MENU_WINDOW;}
+
+  /**
+    Marks the window as a tooltip window.
+    
+    This is intended for internal use, but it can also be used if you
+    write your own tooltip handling. However, this is not recommended.
+
+    This flag is used for correct "parenting" of windows in communication
+    with the windowing system. Modern X window managers can use different
+    flags to distinguish menu and tooltip windows from normal windows.
+    
+    This must be called before the window is shown and cannot be changed
+    later.
+
+    \note Since Fl_Tooltip_Window is derived from Fl_Menu_Window, this
+    also \b clears the menu_window() state.
+  */
+  void set_tooltip_window()	{ set_flag(FL_TOOLTIP_WINDOW);
+				  clear_flag(FL_MENU_WINDOW); }
+  /**  Returns true if this window is a tooltip window. */
+  int tooltip_window() const {return flags() & FL_TOOLTIP_WINDOW;}
 
   /**
     Position the window so that the mouse is pointing at the

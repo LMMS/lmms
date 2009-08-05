@@ -1,5 +1,5 @@
 //
-// "$Id: filename_list.cxx 6641 2009-01-20 11:10:29Z fabien $"
+// "$Id: filename_list.cxx 6833 2009-07-23 22:51:56Z AlbrechtS $"
 //
 // Filename list routines for the Fast Light Tool Kit (FLTK).
 //
@@ -78,7 +78,7 @@ int fl_filename_list(const char *d, dirent ***list,
 #ifndef HAVE_SCANDIR
   int n = scandir(d, list, 0, sort);
 #elif defined(__hpux) || defined(__CYGWIN__) || (__GLIBC__ >= 2 && __GLIBC_MINOR__ >= 10 )
-  // HP-UX, Cygwin define the comparison function like this:
+  // HP-UX, Cygwin and POSIX (2008) define the comparison function like this:
   int n = scandir(d, list, 0, (int(*)(const dirent **, const dirent **))sort);
 #elif defined(__osf__)
   // OSF, DU 4.0x
@@ -126,5 +126,5 @@ int fl_filename_list(const char *d, dirent ***list,
 }
 
 //
-// End of "$Id: filename_list.cxx 6641 2009-01-20 11:10:29Z fabien $".
+// End of "$Id: filename_list.cxx 6833 2009-07-23 22:51:56Z AlbrechtS $".
 //

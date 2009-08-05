@@ -1046,7 +1046,7 @@ Fl_File_Chooser::newdir()
 
 
   // Get a directory name from the user
-  if ((dir = fl_input("%s", new_directory_label, NULL)) == NULL)
+  if ((dir = fl_input("%s", new_directory_label, (char *)NULL)) == NULL)
     return;
 
   // Make it relative to the current directory as needed...

@@ -82,7 +82,7 @@
   simply incrementing such an index will not reliably advance to the next character
   in the text buffer. 
 
-  Indices and pointers into the text buffer shoudl always point at an 7 bit ASCII 
+  Indices and pointers into the text buffer should always point at a 7 bit ASCII 
   character or the beginning of a utf8 character sequence. Behavior for false
   utf8 sequences and pointers into the middle of a seqeunce are undefined.
 
@@ -116,7 +116,7 @@ class FL_EXPORT Fl_Input_ : public Fl_Widget {
   /** \internal Positin of the cursor in the document */
   int position_;
 
-  /** \internal Position of the other and of the selected text. If \p position_ equals 
+  /** \internal Position of the other end of the selected text. If \p position_ equals 
       \p mark_, no text is selected */
   int mark_;
 
@@ -130,7 +130,7 @@ class FL_EXPORT Fl_Input_ : public Fl_Widget {
   /** \internal Maximum size of buffer. \todo Is this really needed? */
   int maximum_size_;
 
-  /** \internal Shorcut key that will get this widget the focus. */
+  /** \internal Shortcut key that will fetch focus for this widget. */
   int shortcut_;
 
   /** \internal This is set if no text but only the cursor needs updating. */
@@ -174,16 +174,16 @@ class FL_EXPORT Fl_Input_ : public Fl_Widget {
 
 protected:
 
-  /* Finds the start of a word. */
+  /* Find the start of a word. */
   int word_start(int i) const;
 
-  /* Finds the end of a word. */
+  /* Find the end of a word. */
   int word_end(int i) const;
 
-  /* Finds the start of a line. */
+  /* Find the start of a line. */
   int line_start(int i) const;
   
-  /* Finds the end of a line. */
+  /* Find the end of a line. */
   int line_end(int i) const;
 
   /* Draw the text in the passed bounding box. */
@@ -215,7 +215,7 @@ public:
   /* Change the size of the widget. */
   void resize(int, int, int, int);
 
-  /* Creator */
+  /* Constructor */
   Fl_Input_(int, int, int, int, const char* = 0);
 
   /* Destructor */

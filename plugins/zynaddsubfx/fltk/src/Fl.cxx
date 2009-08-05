@@ -1493,13 +1493,23 @@ static Fl_Widget	**dwidgets = 0;
 
 /** 
   Schedules a widget for deletion at the next call to the event loop.
-  Use this method to delete a widget inside a callback function. 
-  To avoid early deletion of widgets, this function
-  should be called toward the end of a callback and only after any call 
-  to the event loop (Fl:wait(), Fl::flush(), fl_ask(), etc).
+  Use this method to delete a widget inside a callback function.
+
+  To avoid early deletion of widgets, this function should be called
+  toward the end of a callback and only after any call to the event
+  loop (Fl::wait(), Fl::flush(), Fl::check(), fl_ask(), etc.).
 
   When deleting groups or windows, you must only delete the group or
   window widget and not the individual child widgets.
+
+  \since FLTK 1.3 it is not necessary to remove widgets from their parent
+  groups or windows before calling this, because it will be done in the
+  widget's destructor, but it is not a failure to do this nevertheless.
+
+  \note In FLTK 1.1 you \b must remove widgets from their parent group
+  (or window) before deleting them.
+
+  \see Fl_Widget::~Fl_Widget()
 */
 void Fl::delete_widget(Fl_Widget *wi) {
   if (!wi) return;
