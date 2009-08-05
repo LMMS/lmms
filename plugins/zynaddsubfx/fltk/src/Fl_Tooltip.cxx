@@ -52,6 +52,7 @@ public:
   /** Creates the box window */
   Fl_TooltipBox() : Fl_Menu_Window(0, 0) {
     set_override();
+    set_tooltip_window();
     end();
   }
   void draw();

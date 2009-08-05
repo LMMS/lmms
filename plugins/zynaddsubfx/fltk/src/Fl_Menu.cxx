@@ -268,6 +268,7 @@ menutitle::menutitle(int X, int Y, int W, int H, const Fl_Menu_Item* L) :
   end();
   set_modal();
   clear_border();
+  set_menu_window();
   menu = L;
   if (L->labelcolor_ || Fl::scheme() || L->labeltype_ > FL_NO_LABEL) clear_overlay();
 }
@@ -286,6 +287,7 @@ menuwindow::menuwindow(const Fl_Menu_Item* m, int X, int Y, int Wp, int Hp,
   end();
   set_modal();
   clear_border();
+  set_menu_window();
   menu = m;
   if (m) m = m->first(); // find the first item that needs to be rendered
   drawn_selected = -1;

@@ -95,10 +95,32 @@ class FL_EXPORT Fl_Scroll : public Fl_Group {
   int xposition_, yposition_;
   int width_, height_;
   int oldx, oldy;
+  int scrollbar_size_;
   static void hscrollbar_cb(Fl_Widget*, void*);
   static void scrollbar_cb(Fl_Widget*, void*);
   void fix_scrollbar_order();
   static void draw_clip(void*,int,int,int,int);
+
+private:
+
+  //
+  //  Structure to manage scrollbar and widget interior sizes.
+  //
+  //  Private for now -- we'd like to expose some of this at 
+  //  some point to solve STR#1895.)
+  //
+  typedef struct {
+      int scrollsize;							// the scrollsize (global|local)
+      int innerbox_x, innerbox_y, innerbox_w, innerbox_h;		// widget's inner box (excludes scrollbars)
+      int innerchild_x, innerchild_y, innerchild_w, innerchild_h;	// widget's inner box including scrollbars
+      int child_l, child_r, child_b, child_t;				// child bounding box: left/right/bottom/top
+      int hneeded, vneeded;						// hor + ver scrollbar visibility
+      int hscroll_x, hscroll_y, hscroll_w, hscroll_h;			// hor scrollbar size/position
+      int vscroll_x, vscroll_y, vscroll_w, vscroll_h;			// ver scrollbar size/position
+      int hpos, hsize, hfirst, htotal;					// hor scrollbar values (pos/size/first/total)
+      int vpos, vsize, vfirst, vtotal;					// ver scrollbar values (pos/size/first/total)
+  } ScrollInfo;
+  void recalc_scrollbars(ScrollInfo &si);
 
 protected:
 
@@ -131,6 +153,41 @@ public:
   int yposition() const {return yposition_;}
   void scroll_to(int, int);
   void clear();
+  /**
+    Gets the current size of the scrollbars' troughs, in pixels.
+
+    If this value is zero (default), this widget will use the 
+    Fl::scrollbar_size() value as the scrollbar's width.
+  
+    \returns Scrollbar size in pixels, or 0 if the global Fl::scrollsize() is being used.
+    \see Fl::scrollbar_size(int)
+  */
+  int scrollbar_size() const {
+      return(scrollbar_size_);
+  }
+  /**
+    Sets the pixel size of the scrollbars' troughs to the \p size, in pixels.
+
+    Normally you should not need this method, and should use
+    Fl::scrollbar_size(int) instead to manage the size of ALL 
+    your widgets' scrollbars. This ensures your application 
+    has a consistent UI, is the default behavior, and is normally
+    what you want.
+
+    Only use THIS method if you really need to override the global
+    scrollbar size. The need for this should be rare.
+    
+    Setting \p size to the special value of 0 causes the widget to
+    track the global Fl::scrollbar_size(), which is the default.
+    
+    \param[in] size Sets the scrollbar size in pixels.\n
+                    If 0 (default), scrollbar size tracks the global Fl::scrollbar_size()
+    \see Fl::scrollbar_size()
+  */
+  void scrollbar_size(int size) {
+      if ( size != scrollbar_size_ ) redraw();
+      scrollbar_size_ = size;
+  }   
 };
 
 #endif
