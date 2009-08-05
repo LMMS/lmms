@@ -46,8 +46,6 @@ class notePlayHandle;
 class patchesDialog;
 class QLabel;
 
-const int MaxFluidChannels = 5;
-
 
 class sf2Instrument : public instrument
 {
@@ -129,7 +127,7 @@ private:
 	QMutex m_synthMutex;
 	QMutex m_loadMutex;
 
-	int m_notesRunning[128][MaxFluidChannels];
+	int m_notesRunning[128];
 	sample_rate_t m_internalSampleRate;
 	int m_lastMidiPitch;
 	int m_channel;

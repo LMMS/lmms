@@ -47,8 +47,6 @@
 
 #include "embed.cpp"
 
-#define SF2_PANNING_SUPPORT
-
 static const char * __supportedExts[] =
 { "sf2", NULL };
 
@@ -75,8 +73,9 @@ plugin::descriptor sf2player_plugin_descriptor =
 struct SF2PluginData
 {
 	int midiNote;
-	int midiChannel;
 	int lastPanning;
+	float lastVelocity;
+	fluid_voice_t * fluidVoice;
 } ;
 
 
@@ -119,10 +118,7 @@ sf2Instrument::sf2Instrument( instrumentTrack * _instrument_track ) :
 {
 	for( int i = 0; i < 128; ++i )
 	{
-		for( int j = 0; j < MaxFluidChannels; ++j )
-		{
-			m_notesRunning[i][j] = 0;
-		}
+		m_notesRunning[i] = 0;
 	}
 
 	m_settings = new_fluid_settings();
@@ -592,47 +588,82 @@ void sf2Instrument::playNote( notePlayHandle * _n, sampleFrame * )
 	{
 		SF2PluginData * pluginData = new SF2PluginData;
 		pluginData->midiNote = midiNote;
-		pluginData->midiChannel = m_channel;
 		pluginData->lastPanning = -1;
+		pluginData->lastVelocity = 127;
+		pluginData->fluidVoice = NULL;
 
 		_n->m_pluginData = pluginData;
 
 		m_synthMutex.lock();
 
-#ifdef SF2_PANNING_SUPPORT
-		updatePatch();
-#endif
+		// get list of current voice IDs so we can easily spot the new
+		// voice after the fluid_synth_noteon() call
+		const int poly = fluid_synth_get_polyphony( m_synth );
+		fluid_voice_t * voices[poly];
+		unsigned int id[poly];
+		fluid_synth_get_voicelist( m_synth, voices, poly, -1 );
+		for( int i = 0; i < poly; ++i )
+		{
+			id[i] = 0;
+		}
+		for( int i = 0; i < poly && voices[i]; ++i )
+		{
+			id[i] = fluid_voice_get_id( voices[i] );
+		}
 
-		fluid_synth_noteon( m_synth, pluginData->midiChannel, midiNote,
+		fluid_synth_noteon( m_synth, m_channel, midiNote,
 							_n->getMidiVelocity() );
 
-#ifdef SF2_PANNING_SUPPORT
-		if( ++m_channel > MaxFluidChannels )
+		// get new voice and save it
+		fluid_synth_get_voicelist( m_synth, voices, poly, -1 );
+		int last = -1;
+		for( int i = 0; i < poly && voices[i]; ++i )
 		{
-			m_channel = 1;
+			last = i;
+			const unsigned int newID = fluid_voice_get_id( voices[i] );
+			if( id[i] != newID || newID == 0 )
+			{
+				pluginData->fluidVoice = voices[i];
+				break;
+			}
 		}
-#endif
+		if( pluginData->fluidVoice == NULL )
+		{
+			pluginData->fluidVoice = voices[last];
+		}
 
 		m_synthMutex.unlock();
 
 		m_notesRunningMutex.lock();
-		++m_notesRunning[midiNote][pluginData->midiChannel-1];
+		++m_notesRunning[midiNote];
 		m_notesRunningMutex.unlock();
 	}
 
-#ifdef SF2_PANNING_SUPPORT
 	SF2PluginData * pluginData = static_cast<SF2PluginData *>(
 							_n->m_pluginData );
 	if( pluginData->lastPanning != _n->getPanning() )
 	{
-		int pan = 0 + 
+		const float pan = -500 +
 			  ( (float)( _n->getPanning() - PanningLeft ) ) / 
-			  ( (float)( PanningRight - PanningLeft ) ) *
-			  ( (float)( 127 - 0 ) );
-		fluid_synth_cc( m_synth, pluginData->midiChannel, 0x0A, pan );
+			  ( (float)( PanningRight - PanningLeft ) ) * 1000;
+		fluid_voice_gen_set( pluginData->fluidVoice, GEN_PAN, pan );
+		fluid_voice_update_param( pluginData->fluidVoice, GEN_PAN );
+
 		pluginData->lastPanning = _n->getPanning();
 	}
-#endif
+
+	const float currentVelocity = _n->volumeLevel( tfp ) * 127;
+	if( pluginData->lastVelocity != currentVelocity )
+	{
+		fluid_voice_gen_set( pluginData->fluidVoice, GEN_VELOCITY,
+													currentVelocity );
+		fluid_voice_update_param( pluginData->fluidVoice, GEN_VELOCITY );
+		// make sure, FluidSynth modulates our changed GEN_VELOCITY via internal
+		// attenuation modulator, so changes take effect (7=Volume CC)
+		fluid_synth_cc( m_synth, m_channel, 7, 127 );
+
+		pluginData->lastVelocity = currentVelocity;
+	}
 }
 
 
@@ -704,15 +735,13 @@ void sf2Instrument::deleteNotePluginData( notePlayHandle * _n )
 	SF2PluginData * pluginData = static_cast<SF2PluginData *>(
 							_n->m_pluginData );
 	m_notesRunningMutex.lock();
-	const int n = --m_notesRunning[pluginData->midiNote]
-					[pluginData->midiChannel-1];
+	const int n = --m_notesRunning[pluginData->midiNote];
 	m_notesRunningMutex.unlock();
 
 	if( n <= 0 )
 	{
 		m_synthMutex.lock();
-		fluid_synth_noteoff( m_synth, pluginData->midiChannel,
-						pluginData->midiNote );
+		fluid_synth_noteoff( m_synth, m_channel, pluginData->midiNote );
 		m_synthMutex.unlock();
 	}
 
