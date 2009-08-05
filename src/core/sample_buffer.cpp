@@ -273,20 +273,35 @@ void sampleBuffer::update( bool _keep_settings )
 			m_loopStartFrame = m_startFrame = 0;
 			m_loopEndFrame = m_endFrame = 1;
 
-			// TODO: this list probably shouldn't be hardcoded
-			QString decoders = niceListOfExts();
 			if( engine::hasGUI() )
 			{
-				QMessageBox::information( NULL,
-					QObject::tr( "Unrecognized audio format" ),
-					QObject::tr( "None of the available audio decoders "
-						"recognized the format you are trying to load. Try "
-						"converting the file to a format LMMS understands.\n\n"
-						"Your file: %1\n"
-						"Available decoders: %2\n").arg( file, decoders ),
-					QMessageBox::Ok | QMessageBox::Default );
+				if( QFileInfo( file ).exists() )
+				{
+					// TODO: this list probably shouldn't be hardcoded
+					QString decoders = niceListOfExts();
+					QMessageBox::information( NULL,
+						QObject::tr( "Unrecognized audio format" ),
+						QObject::tr( "None of the available audio decoders "
+							"recognized the format you are trying to load. Try "
+							"converting the file to a format LMMS understands.\n\n"
+							"Your file: %1\n"
+							"Available decoders: %2\n").arg( file, decoders ),
+						QMessageBox::Ok | QMessageBox::Default );
+				}
+				else
+				{
+					QMessageBox::information( NULL,
+						QObject::tr( "File not found" ),
+						QObject::tr( "The file %1 could not be found! "
+							"You should set a valid file in order to allow "
+							"proper playback." ).arg( file ),
+						QMessageBox::Ok | QMessageBox::Default );
+				}
 			}
-
+			else
+			{
+				// TODO: qWarning() & Co
+			}
 		}
 	}
 	else
