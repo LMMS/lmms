@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail/dot/com>
  * Copyright (c) 2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -94,22 +94,22 @@ sf2Instrument::sf2Instrument( instrumentTrack * _instrument_track ) :
 	m_patchNum( 0, 0, 127, this, tr("Patch") ),
 	m_gain( 1.0f, 0.0f, 5.0f, 0.01f, this, tr( "Gain" ) ),
 	m_reverbOn( FALSE, this, tr( "Reverb" ) ),
-	m_reverbRoomSize( FLUID_REVERB_DEFAULT_ROOMSIZE, 0, 1.0, 0.01f, 
+	m_reverbRoomSize( FLUID_REVERB_DEFAULT_ROOMSIZE, 0, 1.0, 0.01f,
 			this, tr( "Reverb Roomsize" ) ),
-	m_reverbDamping( FLUID_REVERB_DEFAULT_DAMP, 0, 1.0, 0.01, 
+	m_reverbDamping( FLUID_REVERB_DEFAULT_DAMP, 0, 1.0, 0.01,
 			this, tr( "Reverb Damping" ) ),
-	m_reverbWidth( FLUID_REVERB_DEFAULT_WIDTH, 0, 1.0, 0.01f, 
+	m_reverbWidth( FLUID_REVERB_DEFAULT_WIDTH, 0, 1.0, 0.01f,
 			this, tr( "Reverb Width" ) ),
-	m_reverbLevel( FLUID_REVERB_DEFAULT_LEVEL, 0, 1.0, 0.01f, 
+	m_reverbLevel( FLUID_REVERB_DEFAULT_LEVEL, 0, 1.0, 0.01f,
 			this, tr( "Reverb Level" ) ),
 	m_chorusOn( FALSE, this, tr( "Chorus" ) ),
-	m_chorusNum( FLUID_CHORUS_DEFAULT_N, 0, 10.0, 1.0, 
+	m_chorusNum( FLUID_CHORUS_DEFAULT_N, 0, 10.0, 1.0,
 			this, tr( "Chorus Lines" ) ),
-	m_chorusLevel( FLUID_CHORUS_DEFAULT_LEVEL, 0, 10.0, 0.01, 
+	m_chorusLevel( FLUID_CHORUS_DEFAULT_LEVEL, 0, 10.0, 0.01,
 			this, tr( "Chorus Level" ) ),
-	m_chorusSpeed( FLUID_CHORUS_DEFAULT_SPEED, 0.29, 5.0, 0.01, 
+	m_chorusSpeed( FLUID_CHORUS_DEFAULT_SPEED, 0.29, 5.0, 0.01,
 			this, tr( "Chorus Speed" ) ),
-	m_chorusDepth( FLUID_CHORUS_DEFAULT_DEPTH, 0, 46.0, 0.05, 
+	m_chorusDepth( FLUID_CHORUS_DEFAULT_DEPTH, 0, 46.0, 0.05,
 			this, tr( "Chorus Depth" ) )
 {
 	for( int i = 0; i < 128; ++i )
@@ -358,7 +358,7 @@ void sf2Instrument::openFile( const QString & _sf2File )
 		m_fontId = fluid_synth_add_sfont( m_synth, m_font->fluidFont );		
 	}
 
-	// Add to map, if doesn't exist.  
+	// Add to map, if doesn't exist.
 	else
 	{
 		m_fontId = fluid_synth_sfload( m_synth, sf2Ascii, TRUE );
@@ -506,7 +506,7 @@ void sf2Instrument::updateSampleRate()
 	{
 		// Now, delete the old one and replace
 		m_synthMutex.lock();
-		fluid_synth_remove_sfont( m_synth, m_font->fluidFont ); 
+		fluid_synth_remove_sfont( m_synth, m_font->fluidFont );
 		delete_fluid_synth( m_synth );
 
 		// New synth
@@ -636,7 +636,7 @@ void sf2Instrument::playNote( notePlayHandle * _n, sampleFrame * )
 			pluginData->lastPanning != _n->getPanning() )
 	{
 		const float pan = -500 +
-			  ( (float)( _n->getPanning() - PanningLeft ) ) / 
+			  ( (float)( _n->getPanning() - PanningLeft ) ) /
 			  ( (float)( PanningRight - PanningLeft ) ) * 1000;
 
 		m_synthMutex.lock();
@@ -667,7 +667,7 @@ void sf2Instrument::playNote( notePlayHandle * _n, sampleFrame * )
 
 
 
-// Could we get iph-based instruments support sample-exact models by using a 
+// Could we get iph-based instruments support sample-exact models by using a
 // frame-length of 1 while rendering?
 void sf2Instrument::play( sampleFrame * _working_buffer )
 {
@@ -997,7 +997,7 @@ void sf2InstrumentView::updateFilename()
 			i->m_filename.left( i->m_filename.length() - 4 ) :
 			i->m_filename;
 	m_filenameLabel->setText(
-			fm.elidedText( file, Qt::ElideLeft, 
+			fm.elidedText( file, Qt::ElideLeft,
 			m_filenameLabel->width() ) );
 			//		i->m_filename + "\nPatch: TODO" );
 
@@ -1017,7 +1017,7 @@ void sf2InstrumentView::updatePatchName()
 	QFontMetrics fm( font() );
 	QString patch = i->getCurrentPatchName();
 	m_patchLabel->setText(
-			fm.elidedText( patch, Qt::ElideLeft, 
+			fm.elidedText( patch, Qt::ElideLeft,
 			m_patchLabel->width() ) );
 
 
