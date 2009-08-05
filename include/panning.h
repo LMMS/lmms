@@ -3,7 +3,7 @@
  *             panning of a note
  *
  * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -41,9 +41,10 @@ inline stereoVolumeVector panningToVolumeVector( panning_t _p,
 	return v;
 }
 
-inline Sint16 panningToMidi( panning_t _p )
+
+inline int panningToMidi( panning_t _p )
 {
-	return MidiMinPanning + (panning_t) (
+	return MidiMinPanning + (int) (
 			  ( (float)( _p - PanningLeft ) ) / 
 			  ( (float)( PanningRight - PanningLeft ) ) *
 			  ( (float)( MidiMaxPanning - MidiMinPanning ) ) );
