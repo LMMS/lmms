@@ -1671,10 +1671,7 @@ void pianoRoll::testPlayNote( note * n )
 				panningToMidi( n->getPanning() ) );
 		
 		evt.m_metaEvent = MidiNotePanning;
-		m_pattern->getInstrumentTrack()->processInEvent(
-							evt, midiTime() );		
-		m_pattern->getInstrumentTrack()->processInEvent( evt,
-								midiTime() );
+		m_pattern->getInstrumentTrack()->processInEvent( evt, midiTime() );
 	}
 }
 
