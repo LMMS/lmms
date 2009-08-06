@@ -145,7 +145,7 @@ void midiWinMM::subscribeReadablePort( midiPort * _port,
 {
 	if( _subscribe && _port->inputEnabled() == FALSE )
 	{
-		printf( "port %s can't be (un)subscribed!\n",
+		qWarning( "port %s can't be (un)subscribed!\n",
 				_port->displayName().toAscii().constData() );
 		return;
 	}
@@ -166,7 +166,7 @@ void midiWinMM::subscribeWritablePort( midiPort * _port,
 {
 	if( _subscribe && _port->outputEnabled() == FALSE )
 	{
-		printf( "port %s can't be (un)subscribed!\n",
+		qWarning( "port %s can't be (un)subscribed!\n",
 				_port->displayName().toAscii().constData() );
 		return;
 	}
@@ -243,7 +243,7 @@ void midiWinMM::handleInputEvent( HMIDIIN _hm, DWORD _ev )
 							par1 + par2*128, 0 ),
 								midiTime() );
 			default:
-				printf( "WinMM-MIDI: unhandled input "
+				qWarning( "WinMM-MIDI: unhandled input "
 							"event %d\n", cmdtype );
 				break;
 		}
