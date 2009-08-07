@@ -476,6 +476,7 @@ void mainWindow::finalize( void )
 	QVBoxLayout * tempo_hq_layout = new QVBoxLayout( tempo_hq_w );
 	tempo_hq_layout->setMargin( 0 );
 	tempo_hq_layout->setSpacing( 0 );
+	tempo_hq_layout->addSpacing( 22 );
 	
 	// tempo spin box
 	m_tempoSpinBox = new lcdSpinBox( 3, tempo_hq_w, tr( "Tempo" ) );
@@ -493,6 +494,7 @@ void mainWindow::finalize( void )
 
 	tempo_hq_layout->addWidget( m_tempoSpinBox );
 
+#if 0
 	// high quality button
 	toolButton * hq_btn = new toolButton( embed::getIconPixmap( "hq_mode" ),
 						tr( "High quality mode" ),
@@ -503,18 +505,26 @@ void mainWindow::finalize( void )
 	hq_btn->setFixedWidth( 42 );
 	
 	tempo_hq_layout->addWidget( hq_btn );
+#endif
 
 	// add container to main toolbar
 	m_toolBarLayout->addWidget( tempo_hq_w );
 
-	
+
 	m_toolBarLayout->insertSpacing( -1, 10 );
 
 	// time signature spin boxes
+	QWidget * timeSigWidget = new QWidget( m_toolBar );
+	QVBoxLayout * timeSigLayout = new QVBoxLayout( timeSigWidget );
+	timeSigLayout->setMargin( 0 );
+	timeSigLayout->setSpacing( 0 );
+	timeSigLayout->addSpacing( 3 );
+
 	m_timeSigDisplay = new meterDialog( this, TRUE );
 	m_timeSigDisplay->setModel( &( engine::getSong()->m_timeSigModel ) );
-	
-	m_toolBarLayout->addWidget( m_timeSigDisplay, 0, Qt::AlignLeft );
+	timeSigLayout->addWidget( m_timeSigDisplay );
+
+	m_toolBarLayout->addWidget( timeSigWidget );
 
 	m_toolBarLayout->insertSpacing( -1, 10 );
 	
