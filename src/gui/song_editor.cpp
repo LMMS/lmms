@@ -117,10 +117,9 @@ songEditor::songEditor( song * _song, songEditor * & _engine_ptr ) :
 			"should be played within a minute (or how many measures "
 			"should be played within four minutes)." ) );
 
-	int col = engine::getMainWindow()->addWidgetToToolBar( m_tempoSpinBox,
-									0 );
+	engine::getMainWindow()->addWidgetToToolBar( m_tempoSpinBox, 0 );
 
-
+#if 0
 	toolButton * hq_btn = new toolButton( embed::getIconPixmap( "hq_mode" ),
 						tr( "High quality mode" ),
 						NULL, NULL, tb );
@@ -129,7 +128,7 @@ songEditor::songEditor( song * _song, songEditor * & _engine_ptr ) :
 			this, SLOT( setHighQuality( bool ) ) );
 	hq_btn->setFixedWidth( 42 );
 	engine::getMainWindow()->addWidgetToToolBar( hq_btn, 1, col );
-
+#endif
 
 	engine::getMainWindow()->addSpacingToToolBar( 10 );
 
