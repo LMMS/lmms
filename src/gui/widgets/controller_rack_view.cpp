@@ -1,7 +1,7 @@
 /*
  * controller_rack_view.cpp - view for song's controllers
  *
- * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail.com>
+ * Copyright (c) 2008-2009 Paul Giblock <drfaygo/at/gmail.com>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -41,41 +41,49 @@
 
 
 controllerRackView::controllerRackView( ) :
-	QWidget()
+	QWidget(),
+	m_lastY( 0 )
 {
-	setFixedSize( 250, 250 );
+	setMinimumWidth( 250 );
+	setMaximumWidth( 250 );
+
 	setWindowIcon( embed::getIconPixmap( "controller" ) );
 	setWindowTitle( tr( "Controller Rack" ) );
 
 	m_scrollArea = new QScrollArea( this );
-	m_scrollArea->setFixedSize( 230, 184 );
 	m_scrollArea->setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOn );
 	m_scrollArea->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
 	m_scrollArea->setPalette( QApplication::palette( m_scrollArea ) );
-	m_scrollArea->move( 6, 22 );
+	m_scrollArea->setMinimumHeight( 64 );
+	m_scrollArea->setHeight( 128 );
 
-	m_addButton = new QPushButton( this/*, "Add Effect"*/ );
+	m_addButton = new QPushButton( this );
 	m_addButton->setText( tr( "Add" ) );
-	m_addButton->move( 75, 210 );
-	connect( m_addButton, SIGNAL( clicked( void ) ), 
+
+	QWidget * w = new QWidget();
+	m_scrollArea->setWidget( w );
+
+	connect( m_addButton, SIGNAL( clicked( void ) ),
 			this, SLOT( addController( void ) ) );
 
 	connect( engine::getSong(), SIGNAL( dataChanged( void ) ),
 			this, SLOT( update( void ) ) );
 
-	QWidget * w = new QWidget();
-	m_scrollArea->setWidget( w );
+	QVBoxLayout * layout = new QVBoxLayout();
+	layout->addWidget( m_scrollArea );
+	layout->addWidget( m_addButton );
+	this->setLayout( layout );
 
-	m_lastY = 0;
+	QMdiSubWindow * subWin =
+			engine::getMainWindow()->workspace()->addSubWindow( this );
 
-	QMdiSubWindow * subWin = 
-		engine::getMainWindow()->workspace()->addSubWindow( this );
+	// No maximize button
 	Qt::WindowFlags flags = subWin->windowFlags();
-	flags |= Qt::MSWindowsFixedSizeDialogHint;
 	flags &= ~Qt::WindowMaximizeButtonHint;
 	subWin->setWindowFlags( flags );
-	setWindowFlags( flags );
-	subWin->layout()->setSizeConstraint( QLayout::SetFixedSize );
+	
+
+	subWin->layout()->setSizeConstraint( QLayout::SetMaximumSize );
 
 	parentWidget()->setAttribute( Qt::WA_DeleteOnClose, FALSE );
 	parentWidget()->move( 880, 310 );
@@ -114,7 +122,7 @@ void controllerRackView::deleteController( controllerView * _view )
 {
 	
 	controller * c = _view->getController();
-	m_controllerViews.erase( qFind( m_controllerViews.begin(), 
+	m_controllerViews.erase( qFind( m_controllerViews.begin(),
 				m_controllerViews.end(), _view ) );
 	delete _view;
 	delete c;
@@ -128,7 +136,6 @@ void controllerRackView::update( void )
 {
 	QWidget * w = m_scrollArea->widget();
 	song * s = engine::getSong();
-//	QVector<bool> view_map( fxChain()->m_effects.size(), FALSE );
 
 	setUpdatesEnabled( false );
 
@@ -163,15 +170,6 @@ void controllerRackView::update( void )
 void controllerRackView::addController( void )
 {
 	// TODO: Eventually let the user pick from available controller types
-	/*
-	effectSelectDialog esd( this );
-	esd.exec();
-
-	if( esd.result() == QDialog::Rejected )
-	{
-		return;
-	}
-	*/
 
 	engine::getSong()->addController( new lfoController( engine::getSong() ) );
 	update();

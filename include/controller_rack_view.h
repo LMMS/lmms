@@ -1,7 +1,7 @@
 /*
  * controller_rack_view.h - view for song's controllers
  *
- * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail.com>
+ * Copyright (c) 2008-2009 Paul Giblock <drfaygo/at/gmail.com>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
