@@ -46,7 +46,7 @@ class projectNotes;
 class song;
 class songEditor;
 class ladspa2LMMS;
-class controllerRackView;
+class ControllerRackView;
 
 
 class EXPORT engine
@@ -142,7 +142,7 @@ public:
 		return( s_dummyTC );
 	}
 
-	static controllerRackView * getControllerRackView( void )
+	static ControllerRackView * getControllerRackView( void )
 	{
 		return( s_controllerRackView );
 	}
@@ -171,7 +171,7 @@ private:
 	static bbTrackContainer * s_bbTrackContainer;
 	static projectJournal * s_projectJournal;
 	static dummyTrackContainer * s_dummyTC;
-	static controllerRackView * s_controllerRackView;
+	static ControllerRackView * s_controllerRackView;
 
 	// GUI
 	static mainWindow * s_mainWindow;

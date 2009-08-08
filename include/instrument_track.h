@@ -58,7 +58,7 @@ class tabWidget;
 class trackLabelButton;
 
 
-class EXPORT instrumentTrack : public track, public midiEventProcessor
+class EXPORT instrumentTrack : public track, public MidiEventProcessor
 {
 	Q_OBJECT
 	mapPropertyFromModel(int,getVolume,setVolume,m_volumeModel);

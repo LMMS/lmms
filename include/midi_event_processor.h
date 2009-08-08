@@ -1,8 +1,8 @@
 /*
  * midi_event_processor.h - base-class for midi-processing classes
  *
- * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -22,7 +22,6 @@
  *
  */
 
-
 #ifndef _MIDI_EVENT_PROCESSOR_H
 #define _MIDI_EVENT_PROCESSOR_H
 
@@ -31,14 +30,14 @@ class midiTime;
 
 
 // all classes being able to process MIDI-events should inherit from this
-class midiEventProcessor
+class MidiEventProcessor
 {
 public:
-	inline midiEventProcessor( void )
+	inline MidiEventProcessor()
 	{
 	}
 
-	virtual inline ~midiEventProcessor()
+	virtual inline ~MidiEventProcessor()
 	{
 	}
 

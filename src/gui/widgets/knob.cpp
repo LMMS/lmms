@@ -41,7 +41,7 @@
 
 #include "caption_menu.h"
 #include "config_mgr.h"
-#include "controller_connection.h"
+#include "ControllerConnection.h"
 #include "embed.h"
 #include "engine.h"
 #include "gui_templates.h"
@@ -616,7 +616,7 @@ void knob::friendlyUpdate( void )
 	if( model()->getControllerConnection() == NULL ||
 		model()->getControllerConnection()->getController()->
 						frequentUpdates() == FALSE ||
-				controller::runningFrames() % (256*4) == 0 )
+				Controller::runningFrames() % (256*4) == 0 )
 	{
 		update();
 	}

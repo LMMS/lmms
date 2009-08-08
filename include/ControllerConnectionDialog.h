@@ -1,5 +1,5 @@
 /*
- * controller_connection_dialog.h - dialog allowing the user to create and
+ * ControllerConnectionDialog.h - dialog allowing the user to create and
  *	modify links between controllers and models
  *
  * Copyright (c) 2008  Paul Giblock <drfaygo/at/gmail.com>
@@ -31,14 +31,14 @@
 #include <QtGui/QSortFilterProxyModel>
 #include <QtGui/QStandardItemModel>
 
-#include "controller.h"
+#include "Controller.h"
 #include "automatable_model.h"
 
 
 class QLineEdit;
 class QListView;
 class QScrollArea;
-class autoDetectMidiController;
+class AutoDetectMidiController;
 class comboBox;
 class groupBox;
 class tabWidget;
@@ -48,15 +48,15 @@ class midiPortMenu;
 
 
 
-class controllerConnectionDialog : public QDialog
+class ControllerConnectionDialog : public QDialog
 {
 	Q_OBJECT
 public:
-	controllerConnectionDialog( QWidget * _parent,
+	ControllerConnectionDialog( QWidget * _parent,
 			const automatableModel * _target_model );
-	virtual ~controllerConnectionDialog();
+	virtual ~ControllerConnectionDialog();
 
-	controller * chosenController( void )
+	Controller * chosenController( void )
 	{
 		return m_controller;
 	}
@@ -91,11 +91,11 @@ private:
 	tabWidget * m_mappingBox;
 	QLineEdit * m_mappingFunction;
 
-	controller * m_controller;
+	Controller * m_controller;
 	const automatableModel * m_targetModel;
 
 	// Temporary midiController 
-	autoDetectMidiController * m_midiController;
+	AutoDetectMidiController * m_midiController;
 } ;
 
 #endif

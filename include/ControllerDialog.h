@@ -1,8 +1,8 @@
 /*
- * controller_dialog.cpp - per-controller-specific view for changing a
+ * ControllerDialog.h - per-controller-specific view for changing a
  * controller's settings
  *
- * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail.com>
+ * Copyright (c) 2008-2009 Paul Giblock <drfaygo/at/gmail.com>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -23,33 +23,31 @@
  *
  */
 
-#include <QtGui/QCloseEvent>
+#ifndef _CONTROLLER_DIALOG_H
+#define _CONTROLLER_DIALOG_H
 
-#include "controller_dialog.h"
-#include "controller.h"
+#include <QtGui/QWidget>
+
+#include "mv_base.h"
+
+class Controller;
 
 
-controllerDialog::controllerDialog( controller * _controller,
-							QWidget * _parent ) :
-	QWidget( _parent ),
-	modelView( _controller, this )
+class ControllerDialog : public QWidget, public modelView
 {
-}
+    Q_OBJECT
+public:
+	ControllerDialog( Controller * _controller, QWidget * _parent );
+
+	virtual ~ControllerDialog();
+
+signals:
+	void closed();
 
 
+protected:
+	virtual void closeEvent( QCloseEvent * _ce );
 
-controllerDialog::~controllerDialog()
-{
-}
+} ;
 
-
-
-void controllerDialog::closeEvent( QCloseEvent * _ce )
-{
-	_ce->ignore();
-	emit closed();
-}
-
-
-#include "moc_controller_dialog.cxx"
-
+#endif

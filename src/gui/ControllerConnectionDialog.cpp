@@ -1,5 +1,5 @@
 /*
- * controller_connection_dialog.cpp - dialog allowing the user to create and
+ * ControllerConnectionDialog.cpp - dialog allowing the user to create and
  *	modify links between controllers and models
  *
  * Copyright (c) 2008  Paul Giblock <drfaygo/at/gmail.com>
@@ -30,28 +30,28 @@
 #include <QtGui/QScrollArea>
 #include <QMessageBox>
 
-#include "controller_connection_dialog.h"
-#include "controller_connection.h"
+#include "ControllerConnectionDialog.h"
+#include "ControllerConnection.h"
+#include "MidiController.h"
+#include "midi_client.h"
+#include "midi_port_menu.h"
+#include "midi.h"
 #include "lcd_spinbox.h"
 #include "led_checkbox.h"
 #include "combobox.h"
 #include "tab_widget.h"
 #include "group_box.h"
-#include "midi_controller.h"
-#include "midi_client.h"
-#include "midi_port_menu.h"
-#include "midi.h"
 #include "song.h"
 #include "tool_button.h"
 
 #include "gui_templates.h"
 #include "embed.h"
 
-class autoDetectMidiController : public midiController
+class AutoDetectMidiController : public MidiController
 {
 public:
-	autoDetectMidiController( model * _parent ) :
-		midiController( _parent ),
+	AutoDetectMidiController( model * _parent ) :
+		MidiController( _parent ),
 		m_detectedMidiChannel( 0 ),
 		m_detectedMidiController( 0 )
 	{
@@ -59,7 +59,7 @@ public:
 	}
 
 
-	virtual ~autoDetectMidiController()
+	virtual ~AutoDetectMidiController()
 	{
 	}
 
@@ -84,9 +84,9 @@ public:
 
 	// Would be a nice copy ctor, but too hard to add copy ctor because
 	// model has none.
-	midiController * copyToMidiController( model * _parent )
+	MidiController * copyToMidiController( model * _parent )
 	{
-		midiController * c = new midiController( _parent );
+		MidiController * c = new MidiController( _parent );
 		c->m_midiPort.setInputChannel( m_midiPort.inputChannel() );
 		c->m_midiPort.setInputController( m_midiPort.inputController() );
 		c->subscribeReadablePorts( m_midiPort.readablePorts() );
@@ -115,7 +115,7 @@ public slots:
 
 
 
-controllerConnectionDialog::controllerConnectionDialog( QWidget * _parent, 
+ControllerConnectionDialog::ControllerConnectionDialog( QWidget * _parent, 
 		const automatableModel * _target_model
 	) :
 	QDialog( _parent ),
@@ -184,7 +184,7 @@ controllerConnectionDialog::controllerConnectionDialog( QWidget * _parent,
 
 	for( int i = 0; i < engine::getSong()->controllers().size(); ++i )
 	{
-		controller * c = engine::getSong()->controllers().at( i );
+		Controller * c = engine::getSong()->controllers().at( i );
 		m_userController->model()->addItem( c->name() );
 	}
 	
@@ -230,29 +230,29 @@ controllerConnectionDialog::controllerConnectionDialog( QWidget * _parent,
 	// Crazy MIDI View stuff
 	
 	// TODO, handle by making this a model for the Dialog "view"
-	controllerConnection * cc = NULL;
+	ControllerConnection * cc = NULL;
 	if( m_targetModel )
 	{
 		cc = m_targetModel->getControllerConnection();
 
 		if( cc && cc->getController()->type() != 
-				controller::DummyController && engine::getSong() )
+				Controller::DummyController && engine::getSong() )
 		{
 			if ( cc->getController()->type() == 
-					controller::MidiController )
+					Controller::MidiController )
 			{
 				m_midiGroupBox->model()->setValue( TRUE );
 				// ensure controller is created
 				midiToggled();
 			
-				midiController * cont = 
-					(midiController*)( cc->getController() );
+				MidiController * cont = 
+					(MidiController*)( cc->getController() );
 				m_midiChannelSpinBox->model()->setValue(
 						cont->m_midiPort.inputChannel() );
 				m_midiControllerSpinBox->model()->setValue(
 						cont->m_midiPort.inputController() );
 
-				m_midiController->subscribeReadablePorts( static_cast<midiController*>( cc->getController() )->m_midiPort.readablePorts() );
+				m_midiController->subscribeReadablePorts( static_cast<MidiController*>( cc->getController() )->m_midiPort.readablePorts() );
 			}
 			else
 			{
@@ -279,7 +279,7 @@ controllerConnectionDialog::controllerConnectionDialog( QWidget * _parent,
 
 
 
-controllerConnectionDialog::~controllerConnectionDialog()
+ControllerConnectionDialog::~ControllerConnectionDialog()
 {
 	delete m_readablePorts;
 
@@ -290,14 +290,14 @@ controllerConnectionDialog::~controllerConnectionDialog()
 
 
 
-void controllerConnectionDialog::selectController( void )
+void ControllerConnectionDialog::selectController( void )
 {
 	// Midi
 	if( m_midiGroupBox->model()->value() > 0 )
 	{
 		if( m_midiControllerSpinBox->model()->value() > 0 )
 		{
-			midiController * mc;
+			MidiController * mc;
 			mc = m_midiController->copyToMidiController(
 					engine::getSong() );
 	
@@ -342,7 +342,7 @@ void controllerConnectionDialog::selectController( void )
 
 
 
-void controllerConnectionDialog::midiToggled( void )
+void ControllerConnectionDialog::midiToggled( void )
 {
 	int enabled = m_midiGroupBox->model()->value();
 	if( enabled != 0 )
@@ -354,7 +354,7 @@ void controllerConnectionDialog::midiToggled( void )
 
 		if( !m_midiController )
 		{
-			m_midiController = new autoDetectMidiController( engine::getSong() );
+			m_midiController = new AutoDetectMidiController( engine::getSong() );
 			m_midiChannelSpinBox->setModel( 
 					&m_midiController->m_midiPort.m_inputChannelModel );
 			m_midiControllerSpinBox->setModel( 
@@ -382,7 +382,7 @@ void controllerConnectionDialog::midiToggled( void )
 
 
 
-void controllerConnectionDialog::userToggled( void )
+void ControllerConnectionDialog::userToggled( void )
 {
 	int enabled = m_userGroupBox->model()->value();
 	if( enabled != 0 && m_midiGroupBox->model()->value() != 0 )
@@ -396,7 +396,7 @@ void controllerConnectionDialog::userToggled( void )
 
 
 
-void controllerConnectionDialog::autoDetectToggled( void )
+void ControllerConnectionDialog::autoDetectToggled( void )
 {
 	if( m_midiAutoDetect.value() )
 	{
@@ -407,7 +407,7 @@ void controllerConnectionDialog::autoDetectToggled( void )
 
 
 
-void controllerConnectionDialog::midiValueChanged( void )
+void ControllerConnectionDialog::midiValueChanged( void )
 {
 	if( m_midiAutoDetect.value() )
 	{
@@ -419,7 +419,7 @@ void controllerConnectionDialog::midiValueChanged( void )
 
 
 
-void controllerConnectionDialog::enableAutoDetect( QAction * _a )
+void ControllerConnectionDialog::enableAutoDetect( QAction * _a )
 {
 	if( _a->isChecked() )
 	{
@@ -429,5 +429,5 @@ void controllerConnectionDialog::enableAutoDetect( QAction * _a )
 
 
 
-#include "moc_controller_connection_dialog.cxx"
+#include "moc_ControllerConnectionDialog.cxx"
 

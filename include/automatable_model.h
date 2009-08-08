@@ -59,7 +59,7 @@
 
 
 
-class controllerConnection;
+class ControllerConnection;
 
 
 class EXPORT automatableModel : public model, public journallingObject
@@ -94,13 +94,13 @@ public:
 
 	bool isAutomated( void ) const;
 
-	inline controllerConnection * getControllerConnection( void ) const
+	inline ControllerConnection * getControllerConnection( void ) const
 	{
 		return m_controllerConnection;
 	}
 
 
-	void setControllerConnection( controllerConnection * _c );
+	void setControllerConnection( ControllerConnection * _c );
 
 
 	template<class T>
@@ -250,7 +250,7 @@ private:
 	bool m_hasLinkedModels;
 
 
-	controllerConnection * m_controllerConnection;
+	ControllerConnection * m_controllerConnection;
 
 
 	static float __copiedValue;

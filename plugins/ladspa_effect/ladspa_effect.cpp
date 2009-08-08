@@ -36,7 +36,7 @@
 #include "mixer.h"
 #include "effect_chain.h"
 #include "automation_pattern.h"
-#include "controller_connection.h"
+#include "ControllerConnection.h"
 
 #include "embed.cpp"
 
@@ -125,7 +125,7 @@ void ladspaEffect::changeSampleRate( void )
 	automationPattern::resolveAllIDs();
 
 	// make sure, connections are ok
-        controllerConnection::finalizeConnections();
+        ControllerConnection::finalizeConnections();
 }
 
 

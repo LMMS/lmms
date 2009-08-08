@@ -1,5 +1,5 @@
 /*
- * controller_dialog.h - per-controller-specific view for changing a
+ * ControllerDialog.cpp - per-controller-specific view for changing a
  * controller's settings
  *
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail.com>
@@ -23,34 +23,33 @@
  *
  */
 
-#ifndef _CONTROLLER_DIALOG_H
-#define _CONTROLLER_DIALOG_H
+#include <QtGui/QCloseEvent>
 
-#include <QtGui/QWidget>
-
-#include "mv_base.h"
-
-class controller;
+#include "ControllerDialog.h"
+#include "Controller.h"
 
 
-class controllerDialog : public QWidget, public modelView
+ControllerDialog::ControllerDialog( Controller * _controller,
+							QWidget * _parent ) :
+	QWidget( _parent ),
+	modelView( _controller, this )
 {
-    Q_OBJECT
-public:
-	controllerDialog( controller * _controller, QWidget * _parent );
-
-	virtual ~controllerDialog();
-
-signals:
-	void closed();
+}
 
 
-protected:
-/*	virtual void contextMenuEvent( QContextMenuEvent * _me ) {};
-	virtual void paintEvent( QPaintEvent * _pe ) {};
-	virtual void modelChanged( void ) {};*/
-	virtual void closeEvent( QCloseEvent * _ce );
 
-} ;
+ControllerDialog::~ControllerDialog()
+{
+}
 
-#endif
+
+
+void ControllerDialog::closeEvent( QCloseEvent * _ce )
+{
+	_ce->ignore();
+	emit closed();
+}
+
+
+#include "moc_ControllerDialog.cxx"
+

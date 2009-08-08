@@ -1,5 +1,5 @@
 /*
- * lfo_controller.h - A LFO-based controller and dialog
+ * LfoController.h - A LFO-based controller and dialog
  *
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail.com>
  * 
@@ -29,8 +29,8 @@
 
 #include "mv_base.h"
 #include "automatable_model.h"
-#include "controller.h"
-#include "controller_dialog.h"
+#include "Controller.h"
+#include "ControllerDialog.h"
 #include "tempo_sync_knob.h"
 #include "oscillator.h"
 
@@ -42,13 +42,13 @@ class tempoSyncKnob;
 class pixmapButton;
 class oscillator;
 
-class lfoController : public controller 
+class LfoController : public Controller 
 {
 	Q_OBJECT
 public:
-	lfoController( model * _parent );
+	LfoController( model * _parent );
 
-	virtual ~lfoController();
+	virtual ~LfoController();
 
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _this );
 	virtual void loadSettings( const QDomElement & _this );
@@ -56,7 +56,7 @@ public:
 
 
 public slots:
-	virtual controllerDialog * createDialog( QWidget * _parent );
+	virtual ControllerDialog * createDialog( QWidget * _parent );
 
 
 protected:
@@ -80,24 +80,24 @@ protected:
 protected slots:
 	void updateSampleFunction( void );
 
-	friend class lfoControllerDialog;
+	friend class LfoControllerDialog;
 } ;
 
 
 
-class lfoControllerDialog : public controllerDialog
+class LfoControllerDialog : public ControllerDialog
 {
 	Q_OBJECT
 public:
-	lfoControllerDialog( controller * _controller, QWidget * _parent );
-	virtual ~lfoControllerDialog();
+	LfoControllerDialog( Controller * _controller, QWidget * _parent );
+	virtual ~LfoControllerDialog();
 
 
 protected:
 	virtual void contextMenuEvent( QContextMenuEvent * _me );
 	virtual void modelChanged( void );
 
-	lfoController * m_lfo;
+	LfoController * m_lfo;
 
 	knob * m_baseKnob;
 	tempoSyncKnob * m_speedKnob;

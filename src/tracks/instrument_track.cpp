@@ -92,7 +92,7 @@ const int INSTRUMENT_WINDOW_CACHE_SIZE = 8;
 // #### IT:
 instrumentTrack::instrumentTrack( trackContainer * _tc ) :
 	track( InstrumentTrack, _tc ),
-	midiEventProcessor(),
+	MidiEventProcessor(),
 	m_audioPort( tr( "unnamed_track" ) ),
 	m_midiPort( tr( "unnamed_track" ), engine::getMixer()->getMidiClient(),
 								this, this ),

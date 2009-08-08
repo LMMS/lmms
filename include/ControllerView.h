@@ -1,5 +1,5 @@
 /*
- * controller_view.h - view-component for an control
+ * ControllerView.h - view-component for an control
  *
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail.com>
  * 
@@ -28,7 +28,7 @@
 #include <QtGui/QWidget>
 
 #include "automatable_model.h"
-#include "controller.h"
+#include "Controller.h"
 #include "mv_base.h"
 
 class QGroupBox;
@@ -39,21 +39,21 @@ class QMdiSubWindow;
 class ledCheckBox;
 
 
-class controllerView : public QWidget, public modelView
+class ControllerView : public QWidget, public modelView
 {
 	Q_OBJECT
 public:
-	controllerView( controller * _controller, QWidget * _parent );
-	virtual ~controllerView();
+	ControllerView( Controller * _controller, QWidget * _parent );
+	virtual ~ControllerView();
 	
-	inline controller * getController( void )
+	inline Controller * getController( void )
 	{
-		return( castModel<controller>() );
+		return( castModel<Controller>() );
 	}
 
-	inline const controller * getController( void ) const
+	inline const Controller * getController( void ) const
 	{
-		return( castModel<controller>() );
+		return( castModel<Controller>() );
 	}
 
 
@@ -65,7 +65,7 @@ public slots:
 
 	
 signals:
-	void deleteController( controllerView * _view );
+	void deleteController( ControllerView * _view );
 
 
 protected:
@@ -79,7 +79,7 @@ private:
 	QPixmap m_bg;
 	ledCheckBox * m_bypass;
 	QMdiSubWindow * m_subWindow;
-	controllerDialog * m_controllerDlg;
+	ControllerDialog * m_controllerDlg;
 	bool m_show;
 
 } ;

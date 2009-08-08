@@ -33,7 +33,7 @@
 
 
 midiPort::midiPort( const QString & _name, midiClient * _mc,
-			midiEventProcessor * _mep, model * _parent,
+			MidiEventProcessor * _mep, model * _parent,
 							Modes _mode ) :
 	model( _parent ),
 	m_readablePortsMenu( NULL ),

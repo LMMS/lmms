@@ -1,5 +1,5 @@
 /*
- * lfo_controller.cpp - implementation of class controller which handles
+ * LfoController.cpp - implementation of class controller which handles
  *                      remote-control of automatableModels
  *
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail.com>
@@ -32,13 +32,13 @@
 #include "song.h"
 #include "engine.h"
 #include "mixer.h"
-#include "lfo_controller.h"
-#include "controller_dialog.h"
+#include "LfoController.h"
+#include "ControllerDialog.h"
 
 //const float TWO_PI = 6.28318531f;
 
-lfoController::lfoController( model * _parent ) :
-	controller( LfoController, _parent, tr( "LFO Controller" ) ),
+LfoController::LfoController( model * _parent ) :
+	Controller( Controller::LfoController, _parent, tr( "LFO Controller" ) ),
 	m_baseModel( 0.5, 0.0, 1.0, 0.001, this, tr( "Base value" ) ),
 	m_speedModel( 2.0, 0.01, 20.0, 0.0001, 20000.0, this, tr( "Oscillator speed" ) ),
 	m_amountModel( 1.0, -1.0, 1.0, 0.005, this, tr( "Oscillator amount" ) ),
@@ -59,7 +59,7 @@ lfoController::lfoController( model * _parent ) :
 
 
 
-lfoController::~lfoController()
+LfoController::~LfoController()
 {
 	m_baseModel.disconnect( this );
 	m_speedModel.disconnect( this );
@@ -77,7 +77,7 @@ lfoController::~lfoController()
 // The code should probably be integrated with the oscillator class. But I
 // don't know how to use oscillator because it is so confusing
 
-float lfoController::value( int _offset )
+float LfoController::value( int _offset )
 {
 	int frame = runningFrames() + _offset + m_phaseCorrection;
 
@@ -171,7 +171,7 @@ float lfoController::value( int _offset )
 
 
 
-void lfoController::updateSampleFunction( void )
+void LfoController::updateSampleFunction( void )
 {
 	switch( m_waveModel.value() )
 	{
@@ -201,9 +201,9 @@ void lfoController::updateSampleFunction( void )
 
 
 
-void lfoController::saveSettings( QDomDocument & _doc, QDomElement & _this )
+void LfoController::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
-	controller::saveSettings( _doc, _this );
+	Controller::saveSettings( _doc, _this );
 
 	m_baseModel.saveSettings( _doc, _this, "base" );
 	m_speedModel.saveSettings( _doc, _this, "speed" );
@@ -215,9 +215,9 @@ void lfoController::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 
 
-void lfoController::loadSettings( const QDomElement & _this )
+void LfoController::loadSettings( const QDomElement & _this )
 {
-	controller::loadSettings( _this );
+	Controller::loadSettings( _this );
 
 	m_baseModel.loadSettings( _this, "base" );
 	m_speedModel.loadSettings( _this, "speed" );
@@ -231,20 +231,19 @@ void lfoController::loadSettings( const QDomElement & _this )
 
 
 
-QString lfoController::nodeName( void ) const
+QString LfoController::nodeName( void ) const
 {
 	return( "lfocontroller" );
 }
 
 
 
-controllerDialog * lfoController::createDialog( QWidget * _parent )
+ControllerDialog * LfoController::createDialog( QWidget * _parent )
 {
-	controllerDialog * d = new lfoControllerDialog( this, _parent );
-	return d;
+	return new LfoControllerDialog( this, _parent );
 }
 
 
-#include "moc_lfo_controller.cxx"
+#include "moc_LfoController.cxx"
 
 

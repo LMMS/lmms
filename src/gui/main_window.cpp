@@ -46,7 +46,7 @@
 #include "engine.h"
 #include "fx_mixer_view.h" 
 #include "about_dialog.h"
-#include "controller_rack_view.h"
+#include "ControllerRackView.h"
 #include "file_browser.h"
 #include "plugin_browser.h"
 #include "side_bar.h"

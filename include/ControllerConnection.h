@@ -1,5 +1,5 @@
 /*
- * controller_connection.h - declaration of a controller connect, which
+ * ControllerConnection.h - declaration of a controller connect, which
  *              provides a definition of the link between a controller and
  *              model, also handles deferred creation of links while
  *              loading project
@@ -32,30 +32,30 @@
 #include <QtCore/QObject>
 #include <QtCore/QVector>
 
-#include "controller.h"
+#include "Controller.h"
 #include "journalling_object.h"
 
-class controllerConnection;
+class ControllerConnection;
 
-typedef QVector<controllerConnection *> controllerConnectionVector;
+typedef QVector<ControllerConnection *> ControllerConnectionVector;
 
 
-class EXPORT controllerConnection : public QObject, public journallingObject
+class EXPORT ControllerConnection : public QObject, public journallingObject
 {
 	Q_OBJECT
 public:
 
-	controllerConnection( controller * _controller );
-	controllerConnection( int _controllerId );
+	ControllerConnection( Controller * _controller );
+	ControllerConnection( int _controllerId );
 
-	virtual ~controllerConnection();
+	virtual ~ControllerConnection();
 
-	inline controller * getController( void )
+	inline Controller * getController( void )
 	{
 		return m_controller;
 	}
 
-	void setController( controller * _controller );
+	void setController( Controller * _controller );
 
 	inline void setController( int _controllerId );
 
@@ -87,19 +87,19 @@ public slots:
 
 protected:
 	//virtual controllerDialog * createDialog( QWidget * _parent );
-	controller * m_controller;
+	Controller * m_controller;
 	QString m_targetName;
 	int m_controllerId;	
 	
 	bool m_ownsController;
 
-	static controllerConnectionVector s_connections;
+	static ControllerConnectionVector s_connections;
 
 signals:
 	// The value changed while the mixer isn't running (i.e: MIDI CC)
 	void valueChanged( void );
 
-	friend class controllerConnectionDialog;
+	friend class ControllerConnectionDialog;
 };
 
 #endif

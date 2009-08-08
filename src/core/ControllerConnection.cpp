@@ -1,5 +1,5 @@
 /*
- * controller_connection.cpp - implementation of class controller connection 
+ * ControllerConnection.cpp - implementation of class controller connection 
  *            which handles the link between automatableModels and controllers
  *
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail.com>
@@ -31,14 +31,14 @@
 #include "song.h"
 #include "engine.h"
 #include "mixer.h"
-#include "controller_connection.h"
+#include "ControllerConnection.h"
 
 
-controllerConnectionVector controllerConnection::s_connections;
+ControllerConnectionVector ControllerConnection::s_connections;
 
 
 
-controllerConnection::controllerConnection( controller * _controller ) :
+ControllerConnection::ControllerConnection( Controller * _controller ) :
 	m_controllerId( -1 ),
 	m_ownsController( FALSE )
 {
@@ -48,7 +48,7 @@ controllerConnection::controllerConnection( controller * _controller ) :
 	}
 	else
 	{
-		m_controller = controller::create( controller::DummyController,
+		m_controller = Controller::create( Controller::DummyController,
 									NULL );
 	}
 	s_connections.append( this );
@@ -57,8 +57,8 @@ controllerConnection::controllerConnection( controller * _controller ) :
 
 
 
-controllerConnection::controllerConnection( int _controllerId ) :
-	m_controller( controller::create( controller::DummyController, NULL ) ),
+ControllerConnection::ControllerConnection( int _controllerId ) :
+	m_controller( Controller::create( Controller::DummyController, NULL ) ),
 	m_controllerId( _controllerId ),
 	m_ownsController( FALSE )
 {
@@ -68,7 +68,7 @@ controllerConnection::controllerConnection( int _controllerId ) :
 
 
 
-controllerConnection::~controllerConnection()
+ControllerConnection::~ControllerConnection()
 {
 	s_connections.remove( s_connections.indexOf( this ) );
 	if( m_ownsController )
@@ -80,14 +80,14 @@ controllerConnection::~controllerConnection()
 
 
 
-void controllerConnection::setController( int /*_controllerId*/ )
+void ControllerConnection::setController( int /*_controllerId*/ )
 {
 }
 
 
 
 
-void controllerConnection::setController( controller * _controller )
+void ControllerConnection::setController( Controller * _controller )
 {
 	if( m_ownsController && m_controller )
 	{
@@ -96,7 +96,7 @@ void controllerConnection::setController( controller * _controller )
 
 	if( !_controller )
 	{
-		m_controller = controller::create( controller::DummyController, NULL );
+		m_controller = Controller::create( Controller::DummyController, NULL );
 	}
 	else
 	{
@@ -104,14 +104,14 @@ void controllerConnection::setController( controller * _controller )
 	}
 	m_controllerId = -1;
 
-	if( _controller->type() != controller::DummyController )
+	if( _controller->type() != Controller::DummyController )
 	{
 		QObject::connect( _controller, SIGNAL( valueChanged() ),
 				this, SIGNAL( valueChanged() ) );
 	}
 
 	m_ownsController = 
-			( _controller->type() == controller::MidiController );
+			( _controller->type() == Controller::MidiController );
 
 	// If we don't own the controller, allow deletion of controller
 	// to delete the connection
@@ -123,7 +123,7 @@ void controllerConnection::setController( controller * _controller )
 
 
 
-inline void controllerConnection::setTargetName( const QString & _name )
+inline void ControllerConnection::setTargetName( const QString & _name )
 {
 	m_targetName = _name;
 	if( m_controller )
@@ -141,11 +141,11 @@ inline void controllerConnection::setTargetName( const QString & _name )
  * controllers. So, we remember the controller-ID and use a dummyController 
  * instead.  Once the song is loaded, finalizeConnections() connects to the proper controllers
  */
-void controllerConnection::finalizeConnections( void )
+void ControllerConnection::finalizeConnections( void )
 {
 	for( int i = 0; i < s_connections.size(); ++i )
 	{
-		controllerConnection * c = s_connections[i];
+		ControllerConnection * c = s_connections[i];
 		if ( !c->isFinalized() && c->m_controllerId <
 				engine::getSong()->controllers().size() )
 		{
@@ -158,7 +158,7 @@ void controllerConnection::finalizeConnections( void )
 
 
 
-void controllerConnection::saveSettings( QDomDocument & _doc, QDomElement & _this )
+void ControllerConnection::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
 	if( engine::getSong() )
 	{
@@ -180,12 +180,12 @@ void controllerConnection::saveSettings( QDomDocument & _doc, QDomElement & _thi
 
 
 
-void controllerConnection::loadSettings( const QDomElement & _this )
+void ControllerConnection::loadSettings( const QDomElement & _this )
 {
 	QDomNode node = _this.firstChild();
 	if( !node.isNull() )
 	{
-		setController( controller::create( node.toElement(), engine::getSong() ) );
+		setController( Controller::create( node.toElement(), engine::getSong() ) );
 	}
 	else
 	{
@@ -198,31 +198,22 @@ void controllerConnection::loadSettings( const QDomElement & _this )
 			qWarning( "controller index invalid\n" );
 			m_controllerId = -1;
 		}
-		m_controller = controller::create( controller::DummyController, NULL );
+		m_controller = Controller::create( Controller::DummyController, NULL );
 	}
 }
 
 
-void controllerConnection::deleteConnection( void )
+void ControllerConnection::deleteConnection( void )
 {
 	delete this;
 }
 
-QString controllerConnection::nodeName( void ) const
+QString ControllerConnection::nodeName( void ) const
 {
 	return( "connection" );
 }
 
 
-/*
-controllerDialog * controller::createDialog( QWidget * _parent )
-{
-	controllerDialog * d = new controllerDialog( this, _parent );
-
-	return d;
-}
-*/
-
-#include "moc_controller_connection.cxx"
+#include "moc_ControllerConnection.cxx"
 
 

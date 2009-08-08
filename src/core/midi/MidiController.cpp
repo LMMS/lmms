@@ -1,7 +1,5 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
- * midi_controller.cpp - implementation of class midi-controller which handles
+ * MidiController.cpp - implementation of class midi-controller which handles
  *                      MIDI control change messages
  *
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail.com>
@@ -34,13 +32,12 @@
 #include "engine.h"
 #include "mixer.h"
 #include "midi_client.h"
-#include "midi_controller.h"
+#include "MidiController.h"
 
 
-
-midiController::midiController( model * _parent ) :
-	controller( MidiController, _parent, tr( "MIDI Controller" ) ),
-	midiEventProcessor(),
+MidiController::MidiController( model * _parent ) :
+	Controller( Controller::MidiController, _parent, tr( "MIDI Controller" ) ),
+	MidiEventProcessor(),
 	m_midiPort( tr( "unnamed_midi_controller" ),
 			engine::getMixer()->getMidiClient(), this, this,
 							midiPort::Input ),
@@ -53,14 +50,14 @@ midiController::midiController( model * _parent ) :
 
 
 
-midiController::~midiController()
+MidiController::~MidiController()
 {
 }
 
 
 
 
-float midiController::value( int _offset )
+float MidiController::value( int _offset )
 {
 	return m_lastValue;
 }
@@ -68,7 +65,7 @@ float midiController::value( int _offset )
 
 
 
-void midiController::updateName( void )
+void MidiController::updateName( void )
 {
 	setName( QString("MIDI ch%1 ctrl%2").
 			arg( m_midiPort.inputChannel() ).
@@ -78,7 +75,7 @@ void midiController::updateName( void )
 
 
 
-void midiController::processInEvent( const midiEvent & _me,
+void MidiController::processInEvent( const midiEvent & _me,
 						const midiTime & _time )
 {
 	Uint8 controllerNum;
@@ -108,7 +105,7 @@ void midiController::processInEvent( const midiEvent & _me,
 
 
 
-void midiController::subscribeReadablePorts( const midiPort::map & _map )
+void MidiController::subscribeReadablePorts( const midiPort::map & _map )
 {
 	for( midiPort::map::const_iterator it = _map.constBegin();
 						it != _map.constEnd(); ++it )
@@ -120,9 +117,9 @@ void midiController::subscribeReadablePorts( const midiPort::map & _map )
 
 
 
-void midiController::saveSettings( QDomDocument & _doc, QDomElement & _this )
+void MidiController::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
-	controller::saveSettings( _doc, _this );
+	Controller::saveSettings( _doc, _this );
 	m_midiPort.saveSettings( _doc, _this );
 
 }
@@ -130,9 +127,9 @@ void midiController::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 
 
-void midiController::loadSettings( const QDomElement & _this )
+void MidiController::loadSettings( const QDomElement & _this )
 {
-	controller::loadSettings( _this );
+	Controller::loadSettings( _this );
 
 	m_midiPort.loadSettings( _this );
 
@@ -142,22 +139,19 @@ void midiController::loadSettings( const QDomElement & _this )
 
 
 
-QString midiController::nodeName( void ) const
+QString MidiController::nodeName( void ) const
 {
-	return( "midicontroller" );
+	return( "Midicontroller" );
 }
 
 
 
 
-controllerDialog * midiController::createDialog( QWidget * _parent )
+ControllerDialog * MidiController::createDialog( QWidget * _parent )
 {
 	return NULL;
 }
 
 
-#include "moc_midi_controller.cxx"
-
-
-#endif
+#include "moc_MidiController.cxx"
 
