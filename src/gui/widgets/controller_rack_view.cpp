@@ -46,6 +46,7 @@ controllerRackView::controllerRackView( ) :
 {
 	setMinimumWidth( 250 );
 	setMaximumWidth( 250 );
+	resize( 250, 160 );
 
 	setWindowIcon( embed::getIconPixmap( "controller" ) );
 	setWindowTitle( tr( "Controller Rack" ) );
@@ -55,7 +56,6 @@ controllerRackView::controllerRackView( ) :
 	m_scrollArea->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
 	m_scrollArea->setPalette( QApplication::palette( m_scrollArea ) );
 	m_scrollArea->setMinimumHeight( 64 );
-	m_scrollArea->setHeight( 128 );
 
 	m_addButton = new QPushButton( this );
 	m_addButton->setText( tr( "Add" ) );
@@ -72,7 +72,7 @@ controllerRackView::controllerRackView( ) :
 	QVBoxLayout * layout = new QVBoxLayout();
 	layout->addWidget( m_scrollArea );
 	layout->addWidget( m_addButton );
-	this->setLayout( layout );
+	setLayout( layout );
 
 	QMdiSubWindow * subWin =
 			engine::getMainWindow()->workspace()->addSubWindow( this );
