@@ -1,5 +1,5 @@
 /*
- * controller_rack_view.h - view for song's controllers
+ * ControllerRackView.h - view for song's controllers
  *
  * Copyright (c) 2008-2009 Paul Giblock <drfaygo/at/gmail.com>
  *
@@ -33,29 +33,28 @@
 
 class QPushButton;
 class QScrollArea;
-//class QVBoxLayout;
 
-class controllerView;
+class ControllerView;
 
 
-class controllerRackView : public QWidget, public serializingObject
+class ControllerRackView : public QWidget, public serializingObject
 {
 	Q_OBJECT
 public:
-	controllerRackView();
-	virtual ~controllerRackView();
+	ControllerRackView();
+	virtual ~ControllerRackView();
 
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
 	virtual void loadSettings( const QDomElement & _this );
 
 	inline virtual QString nodeName( void ) const
 	{
-		return( "controllerrackview" );
+		return( "ControllerRackView" );
 	}
 
 
 public slots:
-	void deleteController( controllerView * _view );
+	void deleteController( ControllerView * _view );
 
 
 private slots:
@@ -64,7 +63,7 @@ private slots:
 
 
 private:
-	QVector<controllerView *> m_controllerViews;
+	QVector<ControllerView *> m_controllerViews;
 
 	QVBoxLayout * m_mainLayout;
 	QScrollArea * m_scrollArea;

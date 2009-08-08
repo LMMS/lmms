@@ -62,7 +62,7 @@ private:
 
 	float m_lastSample;
 
-	controller * m_autoController;
+	Controller * m_autoController;
 } ;
 
 

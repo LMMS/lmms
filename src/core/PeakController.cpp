@@ -1,5 +1,5 @@
 /*
- * lfo_controller.cpp - implementation of class controller which handles
+ * PeakController.cpp - implementation of class controller which handles
  *                      remote-control of automatableModels
  *
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail.com>
@@ -33,17 +33,17 @@
 #include "song.h"
 #include "engine.h"
 #include "mixer.h"
-#include "peak_controller.h"
-#include "controller_dialog.h"
+#include "PeakController.h"
+#include "ControllerDialog.h"
 #include "plugins/peak_controller_effect/peak_controller_effect.h"
 
-int peakController::s_lastEffectId = 0;
-peakControllerEffectVector peakController::s_effects;
+int PeakController::s_lastEffectId = 0;
+peakControllerEffectVector PeakController::s_effects;
 
 
-peakController::peakController( model * _parent, 
+PeakController::PeakController( model * _parent, 
 		peakControllerEffect * _peak_effect ) :
-	controller( PeakController, _parent, tr( "Peak Controller" ) ),
+	Controller( Controller::PeakController, _parent, tr( "Peak Controller" ) ),
 	m_peakEffect( _peak_effect )
 {
 	if( m_peakEffect )
@@ -56,14 +56,14 @@ peakController::peakController( model * _parent,
 
 
 
-peakController::~peakController()
+PeakController::~PeakController()
 {
 	// disconnects
 }
 
 
 
-float peakController::value( int _offset )
+float PeakController::value( int _offset )
 {
 	if( m_peakEffect )
 	{
@@ -74,7 +74,7 @@ float peakController::value( int _offset )
 
 
 
-void peakController::handleDestroyedEffect( )
+void PeakController::handleDestroyedEffect( )
 {
 	// possible race condition...
 	printf("disconnecting effect\n");
@@ -86,11 +86,11 @@ void peakController::handleDestroyedEffect( )
 
 
 
-void peakController::saveSettings( QDomDocument & _doc, QDomElement & _this )
+void PeakController::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
 	if( m_peakEffect )
 	{
-		controller::saveSettings( _doc, _this );
+		Controller::saveSettings( _doc, _this );
 
 		_this.setAttribute( "effectId", m_peakEffect->m_effectId );
 	}
@@ -98,7 +98,7 @@ void peakController::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 
 
-void peakController::loadSettings( const QDomElement & _this )
+void PeakController::loadSettings( const QDomElement & _this )
 {
 	int effectId = _this.attribute( "effectId" ).toInt();
 
@@ -116,19 +116,18 @@ void peakController::loadSettings( const QDomElement & _this )
 
 
 
-QString peakController::nodeName( void ) const
+QString PeakController::nodeName( void ) const
 {
-	return( "peakcontroller" );
+	return( "Peakcontroller" );
 }
 
 
 
-controllerDialog * peakController::createDialog( QWidget * _parent )
+ControllerDialog * PeakController::createDialog( QWidget * _parent )
 {
-	controllerDialog * d = new peakControllerDialog( this, _parent );
-	return d;
+	return new PeakControllerDialog( this, _parent );
 }
 
 
-#include "moc_peak_controller.cxx"
+#include "moc_PeakController.cxx"
 

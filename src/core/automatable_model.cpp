@@ -29,7 +29,7 @@
 #include "automatable_model.h"
 #include "automation_recorder.h"
 #include "automation_pattern.h"
-#include "controller_connection.h"
+#include "ControllerConnection.h"
 
 
 float automatableModel::__copiedValue = 0;
@@ -170,7 +170,7 @@ void automatableModel::loadSettings( const QDomElement & _this,
 		node = node.namedItem( _name );
 		if( node.isElement() )
 		{
-			setControllerConnection( new controllerConnection( (controller*)NULL ) );
+			setControllerConnection( new ControllerConnection( (Controller*)NULL ) );
 			m_controllerConnection->loadSettings( node.toElement() );
 			//m_controllerConnection->setTargetName( displayName() );
 		}
@@ -417,7 +417,7 @@ void automatableModel::unlinkModels( automatableModel * _model1,
 
 
 
-void automatableModel::setControllerConnection( controllerConnection * _c )
+void automatableModel::setControllerConnection( ControllerConnection * _c )
 {
 	m_controllerConnection = _c;
 	if( _c )

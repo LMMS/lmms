@@ -1,7 +1,7 @@
 /*
- * controller_view.cpp - view-component for an controller
+ * ControllerView.cpp - view-component for an controller
  *
- * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail.com>
+ * Copyright (c) 2008-2009 Paul Giblock <drfaygo/at/gmail.com>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -23,8 +23,6 @@
  */
 
 
-#include "controller_view.h"
-
 #include <QtGui/QLabel>
 #include <QtGui/QPushButton>
 #include <QtGui/QMdiArea>
@@ -32,8 +30,10 @@
 #include <QtGui/QPainter>
 #include <QtGui/QInputDialog>
 
+#include "ControllerView.h"
+
 #include "caption_menu.h"
-#include "controller_dialog.h"
+#include "ControllerDialog.h"
 #include "gui_templates.h"
 #include "embed.h"
 #include "engine.h"
@@ -43,7 +43,7 @@
 #include "mv_base.h"
 
 
-controllerView::controllerView( controller * _model, QWidget * _parent ) :
+ControllerView::ControllerView( Controller * _model, QWidget * _parent ) :
 	QWidget( _parent ),
 	modelView( _model, this ),
 	m_bg( embed::getIconPixmap( "controller_bg" ) ),
@@ -86,7 +86,7 @@ controllerView::controllerView( controller * _model, QWidget * _parent ) :
 
 
 
-controllerView::~controllerView()
+ControllerView::~ControllerView()
 {
 	delete m_subWindow;
 }
@@ -94,7 +94,7 @@ controllerView::~controllerView()
 
 
 
-void controllerView::editControls( void )
+void ControllerView::editControls( void )
 {
 	if( m_show )
 	{
@@ -112,21 +112,21 @@ void controllerView::editControls( void )
 
 
 
-void controllerView::closeControls( void )
+void ControllerView::closeControls( void )
 {
 	m_subWindow->hide();
 	m_show = TRUE;
 }
 
 
-void controllerView::deleteController()
+void ControllerView::deleteController()
 {
 	emit( deleteController( this ) );
 }
 
 
 
-void controllerView::paintEvent( QPaintEvent * )
+void ControllerView::paintEvent( QPaintEvent * )
 {
 	QPainter p( this );
 	p.drawPixmap( 0, 0, m_bg );
@@ -135,7 +135,7 @@ void controllerView::paintEvent( QPaintEvent * )
 	f.setBold( TRUE );
 	p.setFont( f );
 
-	controller * c = castModel<controller>();
+	Controller * c = castModel<Controller>();
 
 	p.setPen( QColor( 64, 64, 64 ) );
 	p.drawText( 7, 13, c->displayName() );
@@ -149,10 +149,10 @@ void controllerView::paintEvent( QPaintEvent * )
 
 
 
-void controllerView::mouseDoubleClickEvent( QMouseEvent * event )
+void ControllerView::mouseDoubleClickEvent( QMouseEvent * event )
 {
 	bool ok;
-	controller * c = castModel<controller>();
+	Controller * c = castModel<Controller>();
 	QString new_name = QInputDialog::getText( this,
 			tr( "Rename controller" ),
 			tr( "Enter the new name for this controller" ),
@@ -166,13 +166,13 @@ void controllerView::mouseDoubleClickEvent( QMouseEvent * event )
 
 
 
-void controllerView::modelChanged( void )
+void ControllerView::modelChanged( void )
 {
 }
 
 
 
-void controllerView::contextMenuEvent( QContextMenuEvent * )
+void ControllerView::contextMenuEvent( QContextMenuEvent * )
 {
 	QPointer<captionMenu> contextMenu = new captionMenu(
 						getModel()->displayName() );
@@ -198,7 +198,7 @@ void controllerView::contextMenuEvent( QContextMenuEvent * )
 
 
 
-void controllerView::displayHelp( void )
+void ControllerView::displayHelp( void )
 {
 	QWhatsThis::showText( mapToGlobal( rect().center() ),
 								whatsThis() );
@@ -206,5 +206,5 @@ void controllerView::displayHelp( void )
 
 
 
-#include "moc_controller_view.cxx"
+#include "moc_ControllerView.cxx"
 

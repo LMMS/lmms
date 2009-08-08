@@ -1,8 +1,8 @@
 /*
- * controller.h - declaration of class controller, which provides a
+ * Controller.h - declaration of class controller, which provides a
  *                standard for all controllers and controller plugins
  *
- * Copyright (c) 2008 Paul Giblock <pgllama/at/gmail.com>
+ * Copyright (c) 2008-2009 Paul Giblock <pgllama/at/gmail.com>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -32,13 +32,13 @@
 #include "mv_base.h"
 #include "journalling_object.h"
 
-class controllerDialog;
-class controller; 
+class ControllerDialog;
+class Controller; 
 
-typedef QVector<controller *> controllerVector;
+typedef QVector<Controller *> ControllerVector;
 
 
-class controller : public model, public journallingObject
+class Controller : public model, public journallingObject
 {
 	Q_OBJECT
 public:
@@ -55,10 +55,10 @@ public:
 		NumControllerTypes
 	} ;
 
-	controller( ControllerTypes _type, model * _parent,
+	Controller( ControllerTypes _type, model * _parent,
 						const QString & _display_name );
 
-	virtual ~controller();
+	virtual ~Controller();
 
 	virtual float currentValue( int _offset );
 
@@ -103,8 +103,8 @@ public:
 	virtual void loadSettings( const QDomElement & _this );
 	virtual QString nodeName( void ) const;
 
-	static controller * create( ControllerTypes _tt, model * _parent );
-	static controller * create( const QDomElement & _this,
+	static Controller * create( ControllerTypes _tt, model * _parent );
+	static Controller * create( const QDomElement & _this,
 							model * _parent );
 
 	inline static float fittedValue( float _val )
@@ -120,7 +120,7 @@ public:
 
 
 public slots:
-	virtual controllerDialog * createDialog( QWidget * _parent );
+	virtual ControllerDialog * createDialog( QWidget * _parent );
 
 	virtual void setName( const QString & _new_name )
 	{
@@ -140,7 +140,7 @@ protected:
 	QString m_name;
 	ControllerTypes m_type;
 
-	static controllerVector s_controllers;
+	static ControllerVector s_controllers;
 
 	static unsigned int s_frames;
 
@@ -149,7 +149,7 @@ signals:
 	// The value changed while the mixer isn't running (i.e: MIDI CC)
 	void valueChanged( void );
 
-	friend class controllerDialog;
+	friend class ControllerDialog;
 
 } ;
 

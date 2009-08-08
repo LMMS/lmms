@@ -1,5 +1,5 @@
 /*
- * controller.cpp - implementation of class controller which handles
+ * Controller.cpp - implementation of class controller which handles
  *                  remote-control of automatableModels
  *
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail.com>
@@ -31,20 +31,20 @@
 #include "song.h"
 #include "engine.h"
 #include "mixer.h"
-#include "controller.h"
-#include "controller_connection.h"
-#include "controller_dialog.h"
-#include "lfo_controller.h"
-#include "midi_controller.h"
-#include "peak_controller.h"
+#include "Controller.h"
+#include "ControllerConnection.h"
+#include "ControllerDialog.h"
+#include "LfoController.h"
+#include "MidiController.h"
+#include "PeakController.h"
 
 
-unsigned int controller::s_frames = 0;
-QVector<controller *> controller::s_controllers;
+unsigned int Controller::s_frames = 0;
+QVector<Controller *> Controller::s_controllers;
 
 
 
-controller::controller( ControllerTypes _type, model * _parent,
+Controller::Controller( ControllerTypes _type, model * _parent,
 					const QString & _display_name ) :
 	model( _parent, _display_name ),
 	journallingObject(),
@@ -60,7 +60,7 @@ controller::controller( ControllerTypes _type, model * _parent,
 
 
 
-controller::~controller()
+Controller::~Controller()
 {
 	int idx = s_controllers.indexOf( this );
 	if( idx >= 0 )
@@ -79,7 +79,7 @@ controller::~controller()
 
 
 // Get current value, with an offset into the current buffer for sample exactness
-float controller::currentValue( int _offset )
+float Controller::currentValue( int _offset )
 {
 	if( _offset == 0 || isSampleExact() )
 	{
@@ -91,7 +91,7 @@ float controller::currentValue( int _offset )
 
 
 
-float controller::value( int _offset )
+float Controller::value( int _offset )
 {
 	return 0.5f;
 }
@@ -99,7 +99,7 @@ float controller::value( int _offset )
 
 
 // Get position in frames
-unsigned int controller::runningFrames()
+unsigned int Controller::runningFrames()
 {
 	return s_frames;
 }
@@ -107,14 +107,14 @@ unsigned int controller::runningFrames()
 
 
 // Get position in seconds
-float controller::runningTime()
+float Controller::runningTime()
 {
 	return s_frames / engine::getMixer()->processingSampleRate();
 }
 
 
 
-void controller::triggerFrameCounter( void )
+void Controller::triggerFrameCounter( void )
 {
 	for( int i = 0; i < s_controllers.size(); ++i ) 
 	{
@@ -131,38 +131,38 @@ void controller::triggerFrameCounter( void )
 
 
 
-void controller::resetFrameCounter( void )
+void Controller::resetFrameCounter( void )
 {
 	s_frames = 0;
 }
 
 
 
-controller * controller::create( ControllerTypes _ct, model * _parent )
+Controller * Controller::create( ControllerTypes _ct, model * _parent )
 {
-	static controller * dummy = NULL;
-	controller * c = NULL;
+	static Controller * dummy = NULL;
+	Controller * c = NULL;
 
 	switch( _ct )
 	{
-		case DummyController: 
+		case Controller::DummyController: 
 			if( dummy )
 				c = dummy;
 			else
-				c = new controller( DummyController, NULL,
+				c = new Controller( DummyController, NULL,
 								QString() );
 			break;
 
-		case LfoController: 
-			c = new lfoController( _parent ); 
+		case Controller::LfoController: 
+			c = new ::LfoController( _parent ); 
 			break;
 
-		case PeakController:
-			c = new peakController( _parent );
+		case Controller::PeakController:
+			c = new ::PeakController( _parent );
 			break;
 
-		case MidiController:
-			c = new midiController( _parent );
+		case Controller::MidiController:
+			c = new ::MidiController( _parent );
 			break;
 
 		default: 
@@ -174,9 +174,9 @@ controller * controller::create( ControllerTypes _ct, model * _parent )
 
 
 
-controller * controller::create( const QDomElement & _this, model * _parent )
+Controller * Controller::create( const QDomElement & _this, model * _parent )
 {
-	controller * c = create(
+	Controller * c = create(
 		static_cast<ControllerTypes>( _this.attribute( "type" ).toInt() ),
 									_parent );
 	if( c != NULL )
@@ -189,7 +189,7 @@ controller * controller::create( const QDomElement & _this, model * _parent )
 
 
 
-bool controller::hasModel( const model * m )
+bool Controller::hasModel( const model * m )
 {
 	QObjectList chldren = children();
 	for( int i = 0; i < chldren.size(); ++i )
@@ -203,7 +203,7 @@ bool controller::hasModel( const model * m )
 				return true;
 			}
 
-			controllerConnection * cc = am->getControllerConnection();
+			ControllerConnection * cc = am->getControllerConnection();
 			if( cc != NULL )
 			{
 				if( cc->getController()->hasModel( m ) )
@@ -219,7 +219,7 @@ bool controller::hasModel( const model * m )
 
 
 
-void controller::saveSettings( QDomDocument & _doc, QDomElement & _this )
+void Controller::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
 	_this.setAttribute( "type", type() );
 	_this.setAttribute( "name", name() );
@@ -227,7 +227,7 @@ void controller::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 
 
-void controller::loadSettings( const QDomElement & _this )
+void Controller::loadSettings( const QDomElement & _this )
 {
 	if( _this.attribute( "type" ).toInt() != type() )
 	{
@@ -239,21 +239,21 @@ void controller::loadSettings( const QDomElement & _this )
 }
 
 
-QString controller::nodeName( void ) const
+QString Controller::nodeName( void ) const
 {
-	return( "controller" );
+	return( "Controller" );
 }
 
 
 
-controllerDialog * controller::createDialog( QWidget * _parent )
+ControllerDialog * Controller::createDialog( QWidget * _parent )
 {
-	controllerDialog * d = new controllerDialog( this, _parent );
+	ControllerDialog * d = new ControllerDialog( this, _parent );
 
 	return d;
 }
 
 
-#include "moc_controller.cxx"
+#include "moc_Controller.cxx"
 
 

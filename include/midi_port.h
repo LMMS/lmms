@@ -172,7 +172,7 @@ private:
 	map m_writablePorts;
 
 
-	friend class controllerConnectionDialog;
+	friend class ControllerConnectionDialog;
 	friend class instrumentMidiIOView;
 
 

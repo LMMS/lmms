@@ -38,8 +38,8 @@
 #include "bb_track.h"
 #include "bb_track_container.h"
 #include "config_mgr.h"
-#include "controller_rack_view.h"
-#include "controller_connection.h"
+#include "ControllerRackView.h"
+#include "ControllerConnection.h"
 #include "embed.h"
 #include "envelope_and_lfo_parameters.h"
 #include "export_project_dialog.h"
@@ -220,7 +220,7 @@ void song::doActions( void )
 			case ActionPlaySong:
 				m_playMode = Mode_PlaySong;
 				m_playing = true;
-				controller::resetFrameCounter();
+				Controller::resetFrameCounter();
 				break;
 
 			case ActionPlayTrack:
@@ -970,7 +970,7 @@ void song::loadProject( const QString & _file_name )
 
 	// Connect controller links to their controllers 
 	// now that everything is loaded
-	controllerConnection::finalizeConnections();
+	ControllerConnection::finalizeConnections();
 
 	// resolve all IDs so that autoModels are automated
 	automationPattern::resolveAllIDs();
@@ -1112,7 +1112,7 @@ void song::restoreControllerStates( const QDomElement & _this )
 	QDomNode node = _this.firstChild();
 	while( !node.isNull() )
 	{
-		addController( controller::create( node.toElement(), this ) );
+		addController( Controller::create( node.toElement(), this ) );
 
 		node = node.nextSibling();
 	}
@@ -1198,7 +1198,7 @@ void song::setModified( void )
 
 
 
-void song::addController( controller * _c )
+void song::addController( Controller * _c )
 {
 	if( _c != NULL && !m_controllers.contains( _c ) ) 
 	{
@@ -1210,7 +1210,7 @@ void song::addController( controller * _c )
 
 
 
-void song::removeController( controller * _controller )
+void song::removeController( Controller * _controller )
 {
 	int index = m_controllers.indexOf( _controller );
 	if( index != -1 )

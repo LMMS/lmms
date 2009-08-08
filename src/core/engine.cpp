@@ -31,7 +31,7 @@
 #include "bb_editor.h"
 #include "bb_track_container.h"
 #include "config_mgr.h"
-#include "controller_rack_view.h"
+#include "ControllerRackView.h"
 #include "fx_mixer.h"
 #include "fx_mixer_view.h"
 #include "instrument_track.h"
@@ -72,7 +72,7 @@ projectNotes * engine::s_projectNotes = NULL;
 projectJournal * engine::s_projectJournal = NULL;
 ladspa2LMMS * engine::s_ladspaManager = NULL;
 dummyTrackContainer * engine::s_dummyTC = NULL;
-controllerRackView * engine::s_controllerRackView = NULL;
+ControllerRackView * engine::s_controllerRackView = NULL;
 MidiControlListener * engine::s_midiControlListener = NULL;
 QMap<QString, QString> engine::s_pluginFileHandling;
 LmmsStyle * engine::s_lmmsStyle = NULL;
@@ -128,7 +128,7 @@ void engine::init( const bool _has_gui )
 		s_mainWindow = new mainWindow;
 		s_songEditor = new songEditor( s_song, s_songEditor );
 		s_fxMixerView = new fxMixerView;
-		s_controllerRackView = new controllerRackView;
+		s_controllerRackView = new ControllerRackView;
 		s_projectNotes = new projectNotes;
 		s_bbEditor = new bbEditor( s_bbTrackContainer );
 		s_pianoRoll = new pianoRoll;

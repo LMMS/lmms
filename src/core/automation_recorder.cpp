@@ -26,7 +26,7 @@
  */
 
 #include "automation_recorder.h"
-#include "controller.h"
+#include "Controller.h"
 #include "song.h"
 
 

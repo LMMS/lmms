@@ -25,7 +25,7 @@
 
 #include <QtXml/QDomElement>
 
-#include "peak_controller.h"
+#include "PeakController.h"
 #include "peak_controller_effect_controls.h"
 #include "peak_controller_effect.h"
 
@@ -50,9 +50,9 @@ void peakControllerEffectControls::loadSettings( const QDomElement & _this )
 	m_muteModel.setValue( _this.attribute( "mute" ).toFloat() );
 	
 	int effectId = _this.attribute( "effectId" ).toInt();
-	if( effectId > peakController::s_lastEffectId )
+	if( effectId > PeakController::s_lastEffectId )
 	{
-		peakController::s_lastEffectId = effectId;
+		PeakController::s_lastEffectId = effectId;
 	}
 	m_effect->m_effectId = effectId;
 

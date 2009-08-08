@@ -28,8 +28,8 @@
 
 #include "automatable_model_view.h"
 #include "automation_pattern.h"
-#include "controller_connection_dialog.h"
-#include "controller_connection.h"
+#include "ControllerConnectionDialog.h"
+#include "ControllerConnection.h"
 #include "embed.h"
 #include "main_window.h"
 #include "string_pair_drag.h"
@@ -94,7 +94,7 @@ void automatableModelView::addDefaultActions( QMenu * _menu )
 	QString controllerTxt;
 	if( _model->getControllerConnection() )
 	{
-		controller * cont = _model->getControllerConnection()->
+		Controller * cont = _model->getControllerConnection()->
 								getController();
 		if( cont )
 		{
@@ -199,7 +199,7 @@ void automatableModelViewSlots::execConnectionDialog( void )
 	automatableModel * m = amv->modelUntyped();	
 
 	m->displayName();
-	controllerConnectionDialog * d = new controllerConnectionDialog( 
+	ControllerConnectionDialog * d = new ControllerConnectionDialog( 
 			(QWidget*)engine::getMainWindow(), m );
 
 	if( d->exec() == 1) 
@@ -216,8 +216,8 @@ void automatableModelViewSlots::execConnectionDialog( void )
 			// New
 			else
 			{
-				controllerConnection * cc =
-						new controllerConnection( d->chosenController() );
+				ControllerConnection * cc =
+						new ControllerConnection( d->chosenController() );
 				m->setControllerConnection( cc );
 				//cc->setTargetName( m->displayName() );
 				

@@ -31,7 +31,6 @@
 
 #include <QObject>
 
-#include "controller.h"
 #include "automation_track.h"
 #include "automation_pattern.h"
 

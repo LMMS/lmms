@@ -1,5 +1,5 @@
 /*
- * controller_rack_view.cpp - view for song's controllers
+ * ControllerRackView.cpp - view for song's controllers
  *
  * Copyright (c) 2008-2009 Paul Giblock <drfaygo/at/gmail.com>
  *
@@ -35,12 +35,12 @@
 #include "embed.h"
 #include "main_window.h"
 #include "group_box.h"
-#include "controller_rack_view.h"
-#include "controller_view.h"
-#include "lfo_controller.h"
+#include "ControllerRackView.h"
+#include "ControllerView.h"
+#include "LfoController.h"
 
 
-controllerRackView::controllerRackView( ) :
+ControllerRackView::ControllerRackView( ) :
 	QWidget(),
 	m_lastY( 0 )
 {
@@ -72,7 +72,7 @@ controllerRackView::controllerRackView( ) :
 	QVBoxLayout * layout = new QVBoxLayout();
 	layout->addWidget( m_scrollArea );
 	layout->addWidget( m_addButton );
-	setLayout( layout );
+	this->setLayout( layout );
 
 	QMdiSubWindow * subWin =
 			engine::getMainWindow()->workspace()->addSubWindow( this );
@@ -92,7 +92,7 @@ controllerRackView::controllerRackView( ) :
 
 
 
-controllerRackView::~controllerRackView()
+ControllerRackView::~ControllerRackView()
 {
 	// delete scroll-area with all children
 	delete m_scrollArea;
@@ -101,7 +101,7 @@ controllerRackView::~controllerRackView()
 
 
 
-void controllerRackView::saveSettings( QDomDocument & _doc,
+void ControllerRackView::saveSettings( QDomDocument & _doc,
 							QDomElement & _this )
 {
 	mainWindow::saveWidgetState( this, _this );
@@ -110,7 +110,7 @@ void controllerRackView::saveSettings( QDomDocument & _doc,
 
 
 
-void controllerRackView::loadSettings( const QDomElement & _this )
+void ControllerRackView::loadSettings( const QDomElement & _this )
 {
 	mainWindow::restoreWidgetState( this, _this );
 }
@@ -118,10 +118,10 @@ void controllerRackView::loadSettings( const QDomElement & _this )
 
 
 
-void controllerRackView::deleteController( controllerView * _view )
+void ControllerRackView::deleteController( ControllerView * _view )
 {
 	
-	controller * c = _view->getController();
+	Controller * c = _view->getController();
 	m_controllerViews.erase( qFind( m_controllerViews.begin(),
 				m_controllerViews.end(), _view ) );
 	delete _view;
@@ -132,7 +132,7 @@ void controllerRackView::deleteController( controllerView * _view )
 
 
 
-void controllerRackView::update( void )
+void ControllerRackView::update( void )
 {
 	QWidget * w = m_scrollArea->widget();
 	song * s = engine::getSong();
@@ -149,10 +149,10 @@ void controllerRackView::update( void )
 
 	for( i = 0; i < s->m_controllers.size(); ++i )
 	{
-		controllerView * v = new controllerView( s->m_controllers[i], w );
+		ControllerView * v = new ControllerView( s->m_controllers[i], w );
 
-		connect( v, SIGNAL( deleteController( controllerView * ) ),
-			this, SLOT( deleteController( controllerView * ) ),
+		connect( v, SIGNAL( deleteController( ControllerView * ) ),
+			this, SLOT( deleteController( ControllerView * ) ),
 						Qt::QueuedConnection );
 
 		m_controllerViews.append( v );
@@ -167,15 +167,15 @@ void controllerRackView::update( void )
 }
 
 
-void controllerRackView::addController( void )
+void ControllerRackView::addController( void )
 {
 	// TODO: Eventually let the user pick from available controller types
 
-	engine::getSong()->addController( new lfoController( engine::getSong() ) );
+	engine::getSong()->addController( new LfoController( engine::getSong() ) );
 	update();
 }
 
 
 
-#include "moc_controller_rack_view.cxx"
+#include "moc_ControllerRackView.cxx"
 

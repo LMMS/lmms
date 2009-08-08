@@ -1,5 +1,5 @@
 /*
- * peak_controller.h - peak-controller class
+ * MidiController.h - A controller to receive MIDI control-changes
  *
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail.com>
  * 
@@ -22,70 +22,63 @@
  *
  */
 
-#ifndef _PEAK_CONTROLLER_H
-#define _PEAK_CONTROLLER_H
+#ifndef _MIDI_CONTROLLER_H
+#define _MIDI_CONTROLLER_H
 
 #include <QtGui/QWidget>
 
-#include "mv_base.h"
 #include "automatable_model.h"
-#include "controller.h"
-#include "controller_dialog.h"
-
-class automatableButtonGroup;
-class knob;
-class peakControllerEffect;
-
-typedef QVector<peakControllerEffect *> peakControllerEffectVector;
+#include "Controller.h"
+#include "midi_event_processor.h"
+#include "midi_port.h"
 
 
-class EXPORT peakController : public controller
+class midiPort;
+
+
+class MidiController : public Controller, public MidiEventProcessor
 {
 	Q_OBJECT
 public:
-	peakController( model * _parent,
-		peakControllerEffect *_peak_effect = NULL );
+	MidiController( model * _parent );
+	virtual ~MidiController();
 
+	virtual void processInEvent( const midiEvent & _me,
+					const midiTime & _time );
 
-	virtual ~peakController();
+	virtual void processOutEvent( const midiEvent& _me,
+					const midiTime & _time)
+	{
+		// No output yet (TODO?)
+	}
 
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _this );
 	virtual void loadSettings( const QDomElement & _this );
 	virtual QString nodeName( void ) const;
 
-	static peakControllerEffectVector s_effects;
-	static int s_lastEffectId;
+	// Used by controllerConnectionDialog to copy
+	void subscribeReadablePorts( const midiPort::map & _map );
 
 
 public slots:
-	virtual controllerDialog * createDialog( QWidget * _parent );
-	void handleDestroyedEffect( ); 
+	virtual ControllerDialog * createDialog( QWidget * _parent );
+	void updateName( void );
+
 
 protected:
 	// The internal per-controller get-value function
 	virtual float value( int _offset );
 
-	peakControllerEffect * m_peakEffect;
 
-	friend class peakControllerDialog;
-} ;
+	midiPort m_midiPort;
 
 
+	float m_lastValue;
 
-class peakControllerDialog : public controllerDialog
-{
-	Q_OBJECT
-public:
-	peakControllerDialog( controller * _controller, QWidget * _parent );
-	virtual ~peakControllerDialog();
-
-protected:
-	virtual void contextMenuEvent( QContextMenuEvent * _me );
-	virtual void paintEvent( QPaintEvent * _pe );
-	virtual void modelChanged( void );
-
-	peakController * m_peakController;
+	friend class ControllerConnectionDialog;
+	friend class AutoDetectMidiController;
 
 } ;
+
 
 #endif

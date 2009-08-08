@@ -23,9 +23,9 @@
  */
 
 
-#include "controller.h"
+#include "Controller.h"
 #include "song.h"
-#include "peak_controller.h"
+#include "PeakController.h"
 #include "peak_controller_effect.h"
 
 #include "embed.cpp"
@@ -60,13 +60,13 @@ peakControllerEffect::peakControllerEffect(
 			model * _parent,
 			const descriptor::subPluginFeatures::key * _key ) :
 	effect( &peakcontrollereffect_plugin_descriptor, _parent, _key ),
-	m_effectId( ++peakController::s_lastEffectId ),
+	m_effectId( ++PeakController::s_lastEffectId ),
 	m_peakControls( this ),
 	m_autoController( NULL )
 {
-	m_autoController = new peakController( engine::getSong(), this );
+	m_autoController = new PeakController( engine::getSong(), this );
 	engine::getSong()->addController( m_autoController );
-	peakController::s_effects.append( this );
+	PeakController::s_effects.append( this );
 }
 
 
@@ -74,10 +74,10 @@ peakControllerEffect::peakControllerEffect(
 
 peakControllerEffect::~peakControllerEffect()
 {
-	int idx = peakController::s_effects.indexOf( this );
+	int idx = PeakController::s_effects.indexOf( this );
 	if( idx >= 0 )
 	{
-		peakController::s_effects.remove( idx );
+		PeakController::s_effects.remove( idx );
 	}
 }
 

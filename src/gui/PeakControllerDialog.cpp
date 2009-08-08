@@ -1,8 +1,8 @@
 /*
- * lfo_controller_dialog.cpp - per-controller-specific view for changing a
+ * PeakController_Dialog.cpp - per-controller-specific view for changing a
  * controller's settings
  *
- * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail.com>
+ * Copyright (c) 2008-2009 Paul Giblock <drfaygo/at/gmail.com>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -38,15 +38,15 @@
 #include "tooltip.h"
 
 
-#include "peak_controller.h"
-#include "controller_dialog.h"
+#include "PeakController.h"
+#include "ControllerDialog.h"
 #include "mv_base.h"
 #include "knob.h"
 #include "tempo_sync_knob.h"
 #include "pixmap_button.h"
 
-peakControllerDialog::peakControllerDialog( controller * _model, QWidget * _parent ) :
-	controllerDialog( _model, _parent )
+PeakControllerDialog::PeakControllerDialog( Controller * _model, QWidget * _parent ) :
+	ControllerDialog( _model, _parent )
 {
 	setWindowTitle( tr( "PEAK" ) );
 	setWindowIcon( embed::getIconPixmap( "controller" ) );
@@ -64,7 +64,7 @@ peakControllerDialog::peakControllerDialog( controller * _model, QWidget * _pare
 
 
 
-peakControllerDialog::~peakControllerDialog()
+PeakControllerDialog::~PeakControllerDialog()
 {
 }
 
@@ -88,23 +88,23 @@ void effectView::closeEffects( void )
 */
 
 
-void peakControllerDialog::contextMenuEvent( QContextMenuEvent * )
+void PeakControllerDialog::contextMenuEvent( QContextMenuEvent * )
 {
 }
 
 
 
 
-void peakControllerDialog::paintEvent( QPaintEvent * )
+void PeakControllerDialog::paintEvent( QPaintEvent * )
 {
 	QPainter p( this );
 }
 
 
 
-void peakControllerDialog::modelChanged( void )
+void PeakControllerDialog::modelChanged( void )
 {
-	m_peakController = castModel<peakController>();
+	m_peakController = castModel<PeakController>();
 }
 
 

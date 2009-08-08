@@ -639,7 +639,7 @@ sampleFrameA * mixer::renderNextBuffer( void )
 
 	// and trigger LFOs
 	envelopeAndLFOParameters::triggerLFO();
-	controller::triggerFrameCounter();
+	Controller::triggerFrameCounter();
 
 	const float new_cpu_load = timer.elapsed() / 10000.0f *
 				processingSampleRate() / m_framesPerPeriod;

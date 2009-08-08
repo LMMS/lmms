@@ -1,8 +1,8 @@
 /*
- * lfo_controller_dialog.cpp - per-controller-specific view for changing a
+ * LfoControllerDialog.cpp - per-controller-specific view for changing a
  * controller's settings
  *
- * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail.com>
+ * Copyright (c) 2008-2009 Paul Giblock <drfaygo/at/gmail.com>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -39,8 +39,8 @@
 #include "tooltip.h"
 
 
-#include "lfo_controller.h"
-#include "controller_dialog.h"
+#include "LfoController.h"
+#include "ControllerDialog.h"
 #include "mv_base.h"
 #include "knob.h"
 #include "tempo_sync_knob.h"
@@ -61,8 +61,8 @@ const int CD_LFO_AMOUNT_CD_KNOB_X = CD_LFO_SPEED_CD_KNOB_X+CD_KNOB_X_SPACING;
 const int CD_LFO_PHASE_CD_KNOB_X = CD_LFO_AMOUNT_CD_KNOB_X+CD_KNOB_X_SPACING;
 const int CD_LFO_MULTIPLIER_X = CD_LFO_PHASE_CD_KNOB_X+CD_KNOB_X_SPACING;
 
-lfoControllerDialog::lfoControllerDialog( controller * _model, QWidget * _parent ) :
-	controllerDialog( _model, _parent )
+LfoControllerDialog::LfoControllerDialog( Controller * _model, QWidget * _parent ) :
+	ControllerDialog( _model, _parent )
 {
 	QString title = tr( "LFO" );
 	title.append( " (" );
@@ -240,32 +240,14 @@ lfoControllerDialog::lfoControllerDialog( controller * _model, QWidget * _parent
 
 
 
-lfoControllerDialog::~lfoControllerDialog()
+LfoControllerDialog::~LfoControllerDialog()
 {
 	//delete m_subWindow;
 }
 
 
 
-/*
-void effectView::displayHelp( void )
-{
-	QWhatsThis::showText( mapToGlobal( rect().bottomRight() ),
-								whatsThis() );
-}
-
-
-
-
-void effectView::closeEffects( void )
-{
-	m_subWindow->hide();
-	m_show = TRUE;
-}
-*/
-
-
-void lfoControllerDialog::contextMenuEvent( QContextMenuEvent * )
+void LfoControllerDialog::contextMenuEvent( QContextMenuEvent * )
 {
 	/*
 	QPointer<captionMenu> contextMenu = new captionMenu(
@@ -298,9 +280,9 @@ void lfoControllerDialog::paintEvent( QPaintEvent * _pe )
 */
 
 
-void lfoControllerDialog::modelChanged( void )
+void LfoControllerDialog::modelChanged( void )
 {
-	m_lfo = castModel<lfoController>();
+	m_lfo = castModel<LfoController>();
 
 	m_baseKnob->setModel( &m_lfo->m_baseModel );
 	m_speedKnob->setModel( &m_lfo->m_speedModel );
