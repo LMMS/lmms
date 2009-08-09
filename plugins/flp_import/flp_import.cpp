@@ -1310,7 +1310,14 @@ if( p.currentEffectChannel <= NumFxChannels )
 					len /= (4*ppq) / DefaultTicksPerTact;
 					note n( len, pos, key, vol * 100 / 128,
 							pan*200 / 128 - 100 );
+					if( ch < p.numChannels )
+					{
 	p.channels[ch].notes.push_back( qMakePair( p.currentPattern, n ) );
+					}
+					else
+					{
+						qDebug( "invalid " );
+					}
 					qDebug( "note: " );
 					dump_mem( text+i*bpn, bpn );
 				}
