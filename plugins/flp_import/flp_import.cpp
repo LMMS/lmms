@@ -112,9 +112,9 @@ static void dump_mem( const void * buffer, uint n_bytes )
 	uchar * cp = (uchar *) buffer;
 	for( uint k = 0; k < n_bytes; ++k )
 	{
-		printf( "%02x ", (unsigned int)cp[k] );//( cp[k] > 31 || cp[k] < 7 ) ? cp[k] : '.' );
+		qDebug( "%02x ", (unsigned int)cp[k] );//( cp[k] > 31 || cp[k] < 7 ) ? cp[k] : '.' );
 	}
-	printf( "\n" );
+	qDebug( "\n" );
 }
 
 
@@ -614,7 +614,8 @@ bool flpImport::tryZIPImport( trackContainer * _tc )
 
 	if( zfile == NULL )
 	{
-		if( err == ZIP_ER_NOZIP ) {
+		if( err == ZIP_ER_NOZIP )
+		{
 			printf("flp import (zip): not a valid zip file\n");
 		}
 		else if( err == ZIP_ER_OPEN )
@@ -814,21 +815,21 @@ bool flpImport::tryFLPImport( trackContainer * _tc )
 
 	if( readID() != makeID( 'F', 'L', 'h', 'd' ) )
 	{
-		printf( "flpImport::tryImport(): not a valid FL project\n" );
+		qWarning( "flpImport::tryImport(): not a valid FL project\n" );
 		return false;
 	}
 
 	const int header_len = read32LE();
 	if( header_len != 6 )
 	{
-		printf( "flpImport::tryImport(): invalid file format\n" );
+		qWarning( "flpImport::tryImport(): invalid file format\n" );
 		return false;
 	}
 
 	const int type = read16LE();
 	if( type != 0 )
 	{
-		printf( "flpImport::tryImport(): type %d format is not "
+		qWarning( "flpImport::tryImport(): type %d format is not "
 							"supported\n", type );
 		return false;
 	}
@@ -836,7 +837,7 @@ bool flpImport::tryFLPImport( trackContainer * _tc )
 	p.numChannels = read16LE();
 	if( p.numChannels < 1 || p.numChannels > 1000 )
 	{
-		printf( "flpImport::tryImport(): invalid number of channels "
+		qWarning( "flpImport::tryImport(): invalid number of channels "
 						"(%d)\n", p.numChannels );
 		return false;
 	}
@@ -844,7 +845,7 @@ bool flpImport::tryFLPImport( trackContainer * _tc )
 	const int ppq = read16LE();
 	if( ppq < 0 )
 	{
-		printf( "flpImport::tryImport(): invalid ppq\n" );
+		qWarning( "flpImport::tryImport(): invalid ppq\n" );
 		return false;
 	}
 
@@ -863,14 +864,14 @@ bool flpImport::tryFLPImport( trackContainer * _tc )
 		const int len = read32LE();
 		if( file().atEnd() )
 		{
-			printf( "flpImport::tryImport(): unexpected "
-					"end of file\n" );
+			qWarning( "flpImport::tryImport(): unexpected "
+						"end of file\n" );
 			return false;
 		}
 		if( len < 0 || len >= 0x10000000 )
 		{
-			printf( "flpImport::tryImport(): invalid "
-					"chunk length %d\n", len );
+			qWarning( "flpImport::tryImport(): invalid "
+						"chunk length %d\n", len );
 			return false;
 		}
 		if( id == makeID( 'F', 'L', 'd', 't' ) )
@@ -891,7 +892,7 @@ bool flpImport::tryFLPImport( trackContainer * _tc )
 		p.channels += FL_Channel();
 	}
 
-	printf( "channels: %d\n", p.numChannels );
+	qDebug( "channels: %d\n", p.numChannels );
 
 
 	char * text = NULL;
@@ -936,8 +937,8 @@ bool flpImport::tryFLPImport( trackContainer * _tc )
 			text = new char[text_len+1];
 			if( readBlock( text, text_len ) <= 0 )
 			{
-				printf( "could not read string (len: %d)\n",
-						text_len );
+				qWarning( "could not read string (len: %d)\n",
+							text_len );
 			}
 
 			text[text_len] = 0;
@@ -953,32 +954,32 @@ bool flpImport::tryFLPImport( trackContainer * _tc )
 		{
 			// BYTE EVENTS
 			case FLP_Byte:
-				printf( "undefined byte %d\n", data );
+				qDebug( "undefined byte %d\n", data );
 				break;
 
 			case FLP_NoteOn:
-				printf( "note on: %d\n", data );
+				qDebug( "note on: %d\n", data );
 				// data = pos   how to handle?
 				break;
 
 			case FLP_Vol:
-				printf( "vol %d\n", data );
+				qDebug( "vol %d\n", data );
 				break;
 
 			case FLP_Pan:
-				printf( "pan %d\n", data );
+				qDebug( "pan %d\n", data );
 				break;
 
 			case FLP_LoopActive:
-				printf( "active loop: %d\n", data );
+				qDebug( "active loop: %d\n", data );
 				break;
 
 			case FLP_ShowInfo:
-				printf( "show info: %d\n", data );
+				qDebug( "show info: %d\n", data );
 				break;
 
 			case FLP_Shuffle:
-				printf( "shuffle: %d\n", data );
+				qDebug( "shuffle: %d\n", data );
 				break;
 
 			case FLP_MainVol:
@@ -986,11 +987,11 @@ bool flpImport::tryFLPImport( trackContainer * _tc )
 				break;
 
 			case FLP_PatLength:
-				printf( "pattern length: %d\n", data );
+				qDebug( "pattern length: %d\n", data );
 				break;
 
 			case FLP_BlockLength:
-				printf( "block length: %d\n", data );
+				qDebug( "block length: %d\n", data );
 				break;
 
 			case FLP_UseLoopPoints:
@@ -998,11 +999,11 @@ bool flpImport::tryFLPImport( trackContainer * _tc )
 				break;
 
 			case FLP_LoopType:
-				printf( "loop type: %d\n", data );
+				qDebug( "loop type: %d\n", data );
 				break;
 
 			case FLP_ChanType:
-				printf( "channel type: %d\n", data );
+				qDebug( "channel type: %d\n", data );
 				if( cc )
 				{
 		switch( data )
@@ -1033,7 +1034,7 @@ if( p.currentEffectChannel <= NumFxChannels )
 			// WORD EVENTS
 			case FLP_NewChan:
 				cur_channel = data;
-				printf( "new channel: %d\n", data );
+				qDebug( "new channel: %d\n", data );
 				break;
 
 			case FLP_NewPat:
@@ -1053,7 +1054,7 @@ if( p.currentEffectChannel <= NumFxChannels )
 				break;
 
 			case FLP_FX:
-				printf( "FX: %d\n", data );
+				qDebug( "FX: %d\n", data );
 				break;
 
 			case FLP_Fade_Stereo:
@@ -1065,11 +1066,11 @@ if( p.currentEffectChannel <= NumFxChannels )
 				{
 					cc->sampleReverseStereo = true;
 				}
-				printf( "fade stereo: %d\n", data );
+				qDebug( "fade stereo: %d\n", data );
 				break;
 
 			case FLP_CutOff:
-				printf( "cutoff (sample): %d\n", data );
+				qDebug( "cutoff (sample): %d\n", data );
 				break;
 
 			case FLP_PreAmp:
@@ -1077,11 +1078,11 @@ if( p.currentEffectChannel <= NumFxChannels )
 				break;
 
 			case FLP_Decay:
-				printf( "decay (sample): %d\n", data );
+				qDebug( "decay (sample): %d\n", data );
 				break;
 
 			case FLP_Attack:
-				printf( "attack (sample): %d\n", data );
+				qDebug( "attack (sample): %d\n", data );
 				break;
 
 			case FLP_MainPitch:
@@ -1089,23 +1090,23 @@ if( p.currentEffectChannel <= NumFxChannels )
 				break;
 
 			case FLP_Resonance:
-				printf( "reso (sample): %d\n", data );
+				qDebug( "reso (sample): %d\n", data );
 				break;
 
 			case FLP_LoopBar:
-				printf( "loop bar: %d\n", data );
+				qDebug( "loop bar: %d\n", data );
 				break;
 
 			case FLP_StDel:
-				printf( "stdel (delay?): %d\n", data );
+				qDebug( "stdel (delay?): %d\n", data );
 				break;
 
 			case FLP_FX3:
-				printf( "FX 3: %d\n", data );
+				qDebug( "FX 3: %d\n", data );
 				break;
 
 			case FLP_ShiftDelay:
-				printf( "shift delay: %d\n", data );
+				qDebug( "shift delay: %d\n", data );
 				break;
 
 			case FLP_Dot:
@@ -1137,11 +1138,11 @@ if( p.currentEffectChannel <= NumFxChannels )
 			}
 
 			case FLP_FXSine:
-				printf( "fx sine: %d\n", data );
+				qDebug( "fx sine: %d\n", data );
 				break;
 
 			case FLP_CutCutBy:
-				printf( "cut cut by: %d\n", data );
+				qDebug( "cut cut by: %d\n", data );
 				break;
 
 			case FLP_MiddleNote:
@@ -1149,15 +1150,15 @@ if( p.currentEffectChannel <= NumFxChannels )
 				break;
 
 			case FLP_DelayReso:
-				printf( "delay resonance: %d\n", data );
+				qDebug( "delay resonance: %d\n", data );
 				break;
 
 			case FLP_Reverb:
-				printf( "reverb (sample): %d\n", data );
+				qDebug( "reverb (sample): %d\n", data );
 				break;
 
 			case FLP_IntStretch:
-				printf( "int stretch (sample): %d\n", data );
+				qDebug( "int stretch (sample): %d\n", data );
 				break;
 
 			// TEXT EVENTS
@@ -1235,7 +1236,7 @@ if( p.currentEffectChannel <= NumFxChannels )
 
 			case FLP_Text_Version:
 			{
-				printf( "FLP version: %s\n", text );
+				qDebug( "FLP version: %s\n", text );
 				p.versionString = text;
 				QStringList l = p.versionString.split( '.' );
 				p.version = ( l[0].toInt() << 8 ) +
@@ -1256,36 +1257,32 @@ if( p.currentEffectChannel <= NumFxChannels )
 				mappedPluginTypes[QString( text ).toLower()] );
 					if( t > FL_Plugin::EffectPlugin )
 					{
-						printf( "recognized new "
-							"effect %s\n", text );
-						p.effects.push_back(
-							FL_Effect( t ) );
+						qDebug( "recognized new effect %s\n", text );
+						p.effects.push_back( FL_Effect( t ) );
 					}
 					else if( cc )
 					{
-						printf( "recognized new "
-							"plugin %s\n", text );
+						qDebug( "recognized new plugin %s\n", text );
 						cc->pluginType = t;
 					}
 					last_plugin_type = t;
 				}
 				else
 				{
-					printf( "unsupported plugin: %s!\n",
-									text );
+					qDebug( "unsupported plugin: %s!\n", text );
 				}
 				break;
 
 			case FLP_Text_EffectChanName:
-++p.currentEffectChannel;
-if( p.currentEffectChannel <= NumFxChannels )
-{
-	p.effectChannels[p.currentEffectChannel].name = text;
-}
+				++p.currentEffectChannel;
+				if( p.currentEffectChannel <= NumFxChannels )
+				{
+					p.effectChannels[p.currentEffectChannel].name = text;
+				}
 				break;
 
 			case FLP_Text_Delay:
-				printf( "delay data: " );
+				qDebug( "delay data: " );
 				// pi[1] seems to be volume or similiar and
 				// needs to be divided
 				// by p.versionSpecificFactor
@@ -1293,30 +1290,27 @@ if( p.currentEffectChannel <= NumFxChannels )
 				break;
 
 			case FLP_Text_TS404Params:
-				if( cc && cc->pluginType ==
-					FL_Plugin::UnknownPlugin &&
+				if( cc && cc->pluginType == FL_Plugin::UnknownPlugin &&
 						cc->pluginSettings == NULL )
 				{
 					cc->pluginSettings = new char[text_len];
-					memcpy( cc->pluginSettings, text,
-								text_len );
+					memcpy( cc->pluginSettings, text, text_len );
 					cc->pluginSettingsLength = text_len;
-					cc->pluginType =
-						FL_Plugin::TS404;
+					cc->pluginType = FL_Plugin::TS404;
 				}
 				break;
 
 			case FLP_Text_NewPlugin:
 				if( last_plugin_type > FL_Plugin::EffectPlugin )
 				{
-		FL_Effect * e = &p.effects.last();
-		e->fxChannel = puc[0];
-		e->fxPos = puc[4];
-					printf( "new effect: " );
+					FL_Effect * e = &p.effects.last();
+					e->fxChannel = puc[0];
+					e->fxPos = puc[4];
+					qDebug( "new effect: " );
 				}
 				else
 				{
-					printf( "new plugin: " );
+					qDebug( "new plugin: " );
 				}
 				dump_mem( text, text_len );
 				break;
@@ -1329,7 +1323,7 @@ if( p.currentEffectChannel <= NumFxChannels )
 								text_len );
 					cc->pluginSettingsLength = text_len;
 				}
-				printf( "plugin params: " );
+				qDebug( "plugin params: " );
 				dump_mem( text, text_len );
 				break;
 
@@ -1347,7 +1341,7 @@ if( p.currentEffectChannel <= NumFxChannels )
 				cc->arpGate = ( pi[14] * 100.0f ) / 48.0f;
 				cc->arpEnabled = pi[10] > 0;
 
-				printf( "channel params: " );
+				qDebug( "channel params: " );
 				dump_mem( text, text_len );
 				break;
 
@@ -1388,7 +1382,7 @@ if( p.currentEffectChannel <= NumFxChannels )
 //				e.lfoAmount = pi[11] / 128.0f;
 				cc->envelopes.push_back( e );
 
-				printf( "envelope and lfo params:\n" );
+				qDebug( "envelope and lfo params:\n" );
 				dump_mem( text, text_len );
 
 				break;
@@ -1409,7 +1403,7 @@ if( p.currentEffectChannel <= NumFxChannels )
 				cc->filterCut *= 0.5f;
 			}
 				}
-				printf( "basic chan params: " );
+				qDebug( "basic chan params: " );
 				dump_mem( text, text_len );
 				break;
 
@@ -1422,7 +1416,7 @@ if( p.currentEffectChannel <= NumFxChannels )
 				{
 					cc->filterCut *= 0.5;
 				}
-				printf( "old filter params: " );
+				qDebug( "old filter params: " );
 				dump_mem( text, text_len );
 				break;
 
@@ -1430,7 +1424,7 @@ if( p.currentEffectChannel <= NumFxChannels )
 			{
 				const int bpae = 12;
 				const int imax = text_len / bpae;
-				printf( "automation data (%d items)\n", imax );
+				qDebug( "automation data (%d items)\n", imax );
 				for( int i = 0; i < imax; ++i )
 				{
 					FL_Automation a;
@@ -1442,8 +1436,9 @@ if( p.currentEffectChannel <= NumFxChannels )
 					if( a.channel >= 0 &&
 						a.channel < p.numChannels )
 					{
-printf("add channel %d at %d  val %d  control:%d\n", a.channel, a.pos, a.value, a.control );
-				p.channels[a.channel].automationData += a;
+						qDebug( "add channel %d at %d  val %d  control:%d\n",
+									a.channel, a.pos, a.value, a.control );
+						p.channels[a.channel].automationData += a;
 					}
 //					dump_mem( text+i*bpae, bpae );
 				}
@@ -1469,14 +1464,14 @@ printf("add channel %d at %d  val %d  control:%d\n", a.channel, a.pos, a.value, 
 					note n( len, pos, key, vol * 100 / 128,
 							pan*200 / 128 - 100 );
 	p.channels[ch].notes.push_back( qMakePair( p.currentPattern, n ) );
-					printf( "note: " );
+					qDebug( "note: " );
 					dump_mem( text+i*bpn, bpn );
 				}
 				break;
 			}
 
 			case FLP_Text_ChanGroupName:
-				printf( "channel group name: %s\n", text );
+				qDebug( "channel group name: %s\n", text );
 				break;
 
 			// case 216: pi[2] /= p.versionSpecificFactor
@@ -1507,7 +1502,7 @@ p.effectChannels[ch].volume = ( val / p.versionSpecificFactor ) * 100 / 128;
 					}
 					else
 					{
-printf("FX-ch: %d  param: %x  value:%x\n", ch, param, val );
+qDebug( "FX-ch: %d  param: %x  value:%x\n", ch, param, val );
 					}
 				}
 				break;
@@ -1532,7 +1527,7 @@ if( pat > 2146 && pat <= 2278 )	// whatever these magic numbers are for...
 }
 else
 {
-	printf( "playlist item: " );
+	qDebug( "unknown playlist item: " );
 	dump_mem( text+i*bpi, bpi );
 }
 				}
@@ -1542,25 +1537,18 @@ else
 			default:
 				if( ev >= FLP_Text )
 				{
-					printf( "!! unhandled text (ev: %d, "
-							"len: %d): ",
-							ev, text_len );
+					qDebug( "!! unhandled text (ev: %d, len: %d): ",
+								ev, text_len );
 					dump_mem( text, text_len );
 				}
 				else
 				{
-					printf( "!! handling of FLP-event %d "
-						"not implemented yet "
-						"(data=%d).\n", ev, data );
+					qDebug( "!! handling of FLP-event %d not implemented yet "
+							"(data=%d).\n", ev, data );
 				}
 				break;
 		}
-/*		if( ev >= FLP_Text )
-		{
-			printf( "dump (ev: %d, len: %d): ", ev, text_len );
-			dump_mem( text, text_len );
-		}*/
-        }
+	}
 
 
 	// now create a project from FL_Project data structure
@@ -1577,7 +1565,7 @@ else
 
 
 	progressDialog.setMaximum( p.maxPatterns + p.channels.size() +
-							p.effects.size() );
+								p.effects.size() );
 	int cur_progress = 0;
 
 	// create BB tracks
@@ -1633,8 +1621,7 @@ else
 			case FL_Plugin::UnknownPlugin:
 			default:
 				it->instrumentPlugin =
-					t->loadInstrument(
-							"audiofileprocessor" );
+					t->loadInstrument( "audiofileprocessor" );
 				break;
 		}
 		processPluginParams( &( *it ) );
@@ -1657,8 +1644,7 @@ else
 					iss->m_filterResModel.minValue() );
 		iss->m_filterEnabledModel.setValue( it->filterEnabled );
 
-		for( QList<FL_Channel_Envelope>::iterator jt =
-							it->envelopes.begin();
+		for( QList<FL_Channel_Envelope>::iterator jt = it->envelopes.begin();
 					jt != it->envelopes.end(); ++jt )
 		{
 			if( jt->target != instrumentSoundShaping::NumTargets )
@@ -1707,8 +1693,7 @@ else
 		}
 
 		// process all notes
-		for( FL_Channel::noteVector::const_iterator jt =
-							it->notes.begin();
+		for( FL_Channel::noteVector::const_iterator jt = it->notes.begin();
 						jt != it->notes.end(); ++jt )
 		{
 			const int pat = jt->first;
@@ -1717,8 +1702,7 @@ else
 			{
 				continue;
 			}
-			pattern * p = dynamic_cast<pattern *>(
-							t->getTCO( pat ) );
+			pattern * p = dynamic_cast<pattern *>( t->getTCO( pat ) );
 			if( p != NULL )
 			{
 				p->addNote( jt->second, false );
@@ -1737,8 +1721,7 @@ else
 			{
 				case FL_Automation::ControlVolume:
 					m = t->volumeModel();
-					value *= ( 100.0f / 128.0f ) /
-							p.versionSpecificFactor;
+					value *= ( 100.0f / 128.0f ) / p.versionSpecificFactor;
 					break;
 				case FL_Automation::ControlPanning:
 					m = t->panningModel();
@@ -1766,9 +1749,9 @@ else
 					value = mappedFilter[jt->value];
 					break;
 				default:
-					printf( "handling automation data of "
-						"control %d not implemented "
-						"yet\n", jt->control );
+					qDebug( "handling automation data of "
+							"control %d not implemented "
+							"yet\n", jt->control );
 					break;
 			}
 			if( m )
@@ -1806,14 +1789,12 @@ p->putValue( jt->pos, value, false );
 		else
 		{
 			effKeys << effectKey( &( *it ), it->name );
-
 		}
 	}
 
 	for( int fx_ch = 0; fx_ch <= NumFxChannels ; ++fx_ch )
 	{
-		fxChannel * ch = engine::getFxMixer()->getEffectChannel(
-									fx_ch );
+		fxChannel * ch = engine::getFxMixer()->getEffectChannel( fx_ch );
 		if( !ch )
 		{
 			continue;
@@ -1877,7 +1858,7 @@ p->putValue( jt->pos, value, false );
 		}
 		effectChain * ec = &engine::getFxMixer()->
 					getEffectChannel( it->fxChannel )->m_fxChain;
-		printf("adding %s to %d\n", effName.toUtf8().constData(),
+		qDebug( "adding %s to %d\n", effName.toUtf8().constData(),
 								it->fxChannel );
 		for( effectKeyList::iterator jt = effKeys.begin();
 						jt != effKeys.end(); ++jt )
@@ -1887,7 +1868,7 @@ p->putValue( jt->pos, value, false );
 				( jt->desc->sub_plugin_features != NULL &&
 					jt->name.contains( effName ) ) )
 			{
-				printf("instantiate %s\n", jt->desc->name );
+				qDebug( "instantiate %s\n", jt->desc->name );
 				effect * e = effect::instantiate(
 						jt->desc->name, ec, &( *jt ) );
 				ec->appendEffect( e );
@@ -1940,7 +1921,7 @@ p->putValue( jt->pos, value, false );
 
 void flpImport::processPluginParams( FL_Channel * _ch )
 {
-	printf( "plugin params for plugin %d (%d bytes): ", _ch->pluginType,
+	qDebug( "plugin params for plugin %d (%d bytes): ", _ch->pluginType,
 						_ch->pluginSettingsLength );
 	dump_mem( _ch->pluginSettings, _ch->pluginSettingsLength );
 	switch( _ch->pluginType )
@@ -2029,7 +2010,7 @@ void flpImport::processPluginParams( FL_Channel * _ch )
 
 		case FL_Plugin::UnknownPlugin:
 		default:
-			printf( "handling of plugin params not implemented "
+			qDebug( "handling of plugin params not implemented "
 					"for current plugin\n" );
 			break;
 	}
