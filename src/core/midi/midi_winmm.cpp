@@ -242,6 +242,8 @@ void midiWinMM::handleInputEvent( HMIDIIN _hm, DWORD _ev )
 					midiEvent( cmdtype, chan,
 							par1 + par2*128, 0 ),
 								midiTime() );
+				break;
+
 			default:
 				qWarning( "WinMM-MIDI: unhandled input "
 							"event %d\n", cmdtype );
