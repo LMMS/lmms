@@ -49,6 +49,7 @@ ELSE(LMMS_HOST_X86_64)
 ENDIF(LMMS_HOST_X86_64)
 
 OPTION(WANT_ALSA	"Include ALSA (Advanced Linux Sound Architecture) support" ON)
+OPTION(WANT_CALF	"Include CALF LADSPA plugins" ON)
 OPTION(WANT_CAPS	"Include C* Audio Plugin Suite (LADSPA plugins)" ON)
 OPTION(WANT_CMT		"Include Computer Music Toolkit LADSPA plugins" ON)
 OPTION(WANT_FFTW3F	"Include SpectrumAnalyzer and ZynAddSubFX plugin" ON)
@@ -129,6 +130,13 @@ PKG_CHECK_MODULES(SNDFILE REQUIRED sndfile>=1.0.11)
 IF(NOT SNDFILE_FOUND)
 	MESSAGE(FATAL_ERROR "LMMS requires libsndfile1 and libsndfile1-dev >= 1.0.11 - please install, remove CMakeCache.txt and try again!")
 ENDIF(NOT SNDFILE_FOUND)
+
+IF(WANT_CALF)
+SET(LMMS_HAVE_CALF TRUE)
+SET(STATUS_CALF "OK")
+ELSE(WANT_CALF)
+SET(STATUS_CALF "not built as requested")
+ENDIF(WANT_CALF)
 
 IF(WANT_CAPS)
 SET(LMMS_HAVE_CAPS TRUE)
@@ -701,6 +709,7 @@ MESSAGE(
 "* VST-effect hoster           : ${STATUS_VST}\n"
 "* LV2 hoster                  : ${STATUS_LV2}\n"
 "* SpectrumAnalyzer            : ${STATUS_FFTW3F}\n"
+"* CALF LADSPA plugins         : ${STATUS_CALF}\n"
 "* CAPS LADSPA plugins         : ${STATUS_CAPS}\n"
 "* CMT LADSPA plugins          : ${STATUS_CMT}\n"
 "* TAP LADSPA plugins          : ${STATUS_TAP}\n"
