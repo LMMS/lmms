@@ -44,7 +44,7 @@ class groupBox;
 class tabWidget;
 class lcdSpinBox;
 class ledCheckBox;
-class midiPortMenu;
+class MidiPortMenu;
 
 
 
@@ -80,7 +80,7 @@ private:
 	lcdSpinBox * m_midiChannelSpinBox;
 	lcdSpinBox * m_midiControllerSpinBox;
 	ledCheckBox * m_midiAutoDetectCheckBox;
-	midiPortMenu * m_readablePorts;
+	MidiPortMenu * m_readablePorts;
 	boolModel m_midiAutoDetect;
 
 	// User

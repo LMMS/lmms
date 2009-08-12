@@ -2,7 +2,7 @@
  * effect_view.cpp - view-component for an effect
  *
  * Copyright (c) 2006-2007 Danny McRae <khjklujn/at/users.sourceforge.net>
- * Copyright (c) 2007-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2007-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -32,7 +32,6 @@
 #include <QtGui/QMdiSubWindow>
 #include <QtGui/QPainter>
 
-#include "audio_port.h"
 #include "caption_menu.h"
 #include "effect_controls.h"
 #include "effect_control_dialog.h"

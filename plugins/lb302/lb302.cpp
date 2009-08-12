@@ -28,11 +28,7 @@
  *
  */
 
-
-#include <QtXml/QDomDocument>
-
 #include "lb302.h"
-#include "audio_port.h"
 #include "automatable_button.h"
 #include "engine.h"
 #include "instrument_play_handle.h"

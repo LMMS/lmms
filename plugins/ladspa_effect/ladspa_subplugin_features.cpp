@@ -4,7 +4,7 @@
  *                                 hosting LADSPA-plugins
  *
  * Copyright (c) 2006-2007 Danny McRae <khjklujn/at/users.sourceforge.net>
- * Copyright (c) 2006-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -25,15 +25,12 @@
  *
  */
 
-
 #include "ladspa_subplugin_features.h"
-
 
 #include <QtGui/QHBoxLayout>
 #include <QtGui/QLabel>
 
-
-#include "audio_device.h"
+#include "AudioDevice.h"
 #include "engine.h"
 #include "ladspa_2_lmms.h"
 #include "ladspa_base.h"

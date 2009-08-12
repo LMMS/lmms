@@ -2,7 +2,7 @@
  * mixer.h - audio-device-independent mixer for LMMS
  *
  * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -21,7 +21,6 @@
  * Boston, MA 02110-1301 USA.
  *
  */
-
 
 #ifndef _MIXER_H
 #define _MIXER_H
@@ -50,9 +49,9 @@
 #include "fifo_buffer.h"
 
 
-class audioDevice;
-class midiClient;
-class audioPort;
+class AudioDevice;
+class MidiClient;
+class AudioPort;
 
 
 const fpp_t DEFAULT_BUFFER_SIZE = 256;
@@ -138,7 +137,7 @@ public:
 		{
 		}
 
-		int sampleRateMultiplier( void ) const
+		int sampleRateMultiplier() const
 		{
 			switch( oversampling )
 			{
@@ -150,7 +149,7 @@ public:
 			return 1;
 		}
 
-		int libsrcInterpolation( void ) const
+		int libsrcInterpolation() const
 		{
 			switch( interpolation )
 			{
@@ -167,45 +166,45 @@ public:
 		}
 	} ;
 
-	void initDevices( void );
-	void clear( void );
+	void initDevices();
+	void clear();
 
 
 	// audio-device-stuff
-	inline const QString & audioDevName( void ) const
+	inline const QString & audioDevName() const
 	{
 		return m_audioDevName;
 	}
 
-	void setAudioDevice( audioDevice * _dev );
-	void setAudioDevice( audioDevice * _dev,
+	void setAudioDevice( AudioDevice * _dev );
+	void setAudioDevice( AudioDevice * _dev,
 				const struct qualitySettings & _qs,
 							bool _needs_fifo );
-	void restoreAudioDevice( void );
-	inline audioDevice * audioDev( void )
+	void restoreAudioDevice();
+	inline AudioDevice * audioDev()
 	{
 		return m_audioDev;
 	}
 
 
 	// audio-port-stuff
-	inline void addAudioPort( audioPort * _port )
+	inline void addAudioPort( AudioPort * _port )
 	{
 		lock();
 		m_audioPorts.push_back( _port );
 		unlock();
 	}
 
-	void removeAudioPort( audioPort * _port );
+	void removeAudioPort( AudioPort * _port );
 
 
 	// MIDI-client-stuff
-	inline const QString & midiClientName( void ) const
+	inline const QString & midiClientName() const
 	{
 		return m_midiClientName;
 	}
 
-	inline midiClient * getMidiClient( void )
+	inline MidiClient * midiClient()
 	{
 		return m_midiClient;
 	}
@@ -227,7 +226,7 @@ public:
 
 	void removePlayHandle( playHandle * _ph );
 
-	inline PlayHandleList & playHandles( void )
+	inline PlayHandleList & playHandles()
 	{
 		return m_playHandles;
 	}
@@ -235,42 +234,42 @@ public:
 	void removePlayHandles( track * _track,
 		playHandle::Type _type = playHandle::NumPlayHandleTypes );
 
-	inline bool hasPlayHandles( void ) const
+	inline bool hasPlayHandles() const
 	{
 		return !m_playHandles.empty();
 	}
 
 
 	// methods providing information for other classes
-	inline fpp_t framesPerPeriod( void ) const
+	inline fpp_t framesPerPeriod() const
 	{
 		return m_framesPerPeriod;
 	}
 
-	inline const surroundSampleFrame * currentReadBuffer( void ) const
+	inline const surroundSampleFrame * currentReadBuffer() const
 	{
 		return m_readBuf;
 	}
 
 
-	inline int cpuLoad( void ) const
+	inline int cpuLoad() const
 	{
 		return m_cpuLoad;
 	}
 
-	const qualitySettings & currentQualitySettings( void ) const
+	const qualitySettings & currentQualitySettings() const
 	{
 		return m_qualitySettings;
 	}
 
 
-	sample_rate_t baseSampleRate( void ) const;
-	sample_rate_t outputSampleRate( void ) const;
-	sample_rate_t inputSampleRate( void ) const;
-	sample_rate_t processingSampleRate( void ) const;
+	sample_rate_t baseSampleRate() const;
+	sample_rate_t outputSampleRate() const;
+	sample_rate_t inputSampleRate() const;
+	sample_rate_t processingSampleRate() const;
 
 
-	inline float masterGain( void ) const
+	inline float masterGain() const
 	{
 		return m_masterGain;
 	}
@@ -296,22 +295,22 @@ public:
 
 
 	// methods needed by other threads to alter knob values, waveforms, etc
-	void lock( void )
+	void lock()
 	{
 		m_globalMutex.lock();
 	}
 
-	void unlock( void )
+	void unlock()
 	{
 		m_globalMutex.unlock();
 	}
 
-	void lockInputFrames( void )
+	void lockInputFrames()
 	{
 		m_inputFramesMutex.lock();
 	}
 
-	void unlockInputFrames( void )
+	void unlockInputFrames()
 	{
 		m_inputFramesMutex.unlock();
 	}
@@ -321,7 +320,7 @@ public:
 					const fpp_t _frames,
 					const f_cnt_t _offset,
 					stereoVolumeVector _volume_vector,
-					audioPort * _port );
+					AudioPort * _port );
 
 	static void clearAudioBuffer( sampleFrame * _ab,
 						const f_cnt_t _frames,
@@ -336,26 +335,26 @@ public:
 	static float peakValueRight( sampleFrame * _ab, const f_cnt_t _frames );
 
 
-	bool criticalXRuns( void ) const;
+	bool criticalXRuns() const;
 
-	inline bool hasFifoWriter( void ) const
+	inline bool hasFifoWriter() const
 	{
 		return m_fifoWriter != NULL;
 	}
 
 	void pushInputFrames( sampleFrame * _ab, const f_cnt_t _frames );
 	
-	inline const sampleFrame * inputBuffer( void )
+	inline const sampleFrame * inputBuffer()
 	{
 		return m_inputBuffer[ m_inputBufferRead ];
 	}
 
-	inline f_cnt_t inputBufferFrames( void ) const
+	inline f_cnt_t inputBufferFrames() const
 	{
 		return m_inputBufferFrames[ m_inputBufferRead ];
 	}
 
-	inline surroundSampleFrame * nextBuffer( void )
+	inline surroundSampleFrame * nextBuffer()
 	{
 		return hasFifoWriter() ? m_fifo->read() : renderNextBuffer();
 	}
@@ -364,9 +363,9 @@ public:
 
 
 signals:
-	void qualitySettingsChanged( void );
-	void sampleRateChanged( void );
-	void nextAudioBuffer( void );
+	void qualitySettingsChanged();
+	void sampleRateChanged();
+	void nextAudioBuffer();
 
 
 private:
@@ -377,7 +376,7 @@ private:
 	public:
 		fifoWriter( mixer * _mixer, fifo * _fifo );
 
-		void finish( void );
+		void finish();
 
 
 	private:
@@ -385,27 +384,27 @@ private:
 		fifo * m_fifo;
 		volatile bool m_writing;
 
-		virtual void run( void );
+		virtual void run();
 
 	} ;
 
 
-	mixer( void );
+	mixer();
 	virtual ~mixer();
 
 	void startProcessing( bool _needs_fifo = true );
-	void stopProcessing( void );
+	void stopProcessing();
 
 
-	audioDevice * tryAudioDevices( void );
-	midiClient * tryMidiClients( void );
+	AudioDevice * tryAudioDevices();
+	MidiClient * tryMidiClients();
 
 
-	surroundSampleFrame * renderNextBuffer( void );
+	surroundSampleFrame * renderNextBuffer();
 
 
 
-	QVector<audioPort *> m_audioPorts;
+	QVector<AudioPort *> m_audioPorts;
 
 	fpp_t m_framesPerPeriod;
 
@@ -444,12 +443,12 @@ private:
 	float m_masterGain;
 
 
-	audioDevice * m_audioDev;
-	audioDevice * m_oldAudioDev;
+	AudioDevice * m_audioDev;
+	AudioDevice * m_oldAudioDev;
 	QString m_audioDevName;
 
 
-	midiClient * m_midiClient;
+	MidiClient * m_midiClient;
 	QString m_midiClientName;
 
 

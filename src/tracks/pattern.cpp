@@ -23,7 +23,6 @@
  *
  */
 
-
 #include <QtXml/QDomElement>
 #include <QtCore/QTimer>
 #include <QtGui/QMenu>
@@ -33,8 +32,6 @@
 #include <QtGui/QProgressBar>
 #include <QtGui/QPushButton>
 #include <QtAlgorithms>
-
-
 
 #include "pattern.h"
 #include "instrument_track.h"
@@ -46,7 +43,7 @@
 #include "track_container.h"
 #include "rename_dialog.h"
 #include "sample_buffer.h"
-#include "audio_sample_recorder.h"
+#include "AudioSampleRecorder.h"
 #include "song.h"
 #include "tooltip.h"
 #include "bb_track_container.h"
@@ -743,8 +740,8 @@ void patternFreezeThread::run( void )
 	bool b;
 	// we cannot create local copy, because at a later stage
 	// mixer::restoreAudioDevice(...) deletes old audio-dev and thus
-	// audioSampleRecorder would be destroyed two times...
-	audioSampleRecorder * freeze_recorder = new audioSampleRecorder(
+	// AudioSampleRecorder would be destroyed two times...
+	AudioSampleRecorder * freeze_recorder = new AudioSampleRecorder(
 							DEFAULT_CHANNELS, b,
 							engine::getMixer() );
 	engine::getMixer()->setAudioDevice( freeze_recorder );

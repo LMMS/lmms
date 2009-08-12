@@ -3,7 +3,7 @@
  *                      which holds an instrument-plugin
  *
  * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -23,17 +23,16 @@
  *
  */
 
-
 #ifndef _INSTRUMENT_TRACK_H
 #define _INSTRUMENT_TRACK_H
 
 #include <QtGui/QPushButton>
 
-#include "audio_port.h"
+#include "AudioPort.h"
 #include "instrument_functions.h"
 #include "instrument_sound_shaping.h"
-#include "midi_event_processor.h"
-#include "midi_port.h"
+#include "MidiEventProcessor.h"
+#include "MidiPort.h"
 #include "note_play_handle.h"
 #include "piano.h"
 #include "track.h"
@@ -86,13 +85,13 @@ public:
 	// filter and so on
 	void playNote( notePlayHandle * _n, sampleFrame * _working_buffer );
 
-	QString instrumentName( void ) const;
-	inline const instrument * getInstrument( void ) const
+	QString instrumentName() const;
+	inline const instrument * getInstrument() const
 	{
 		return m_instrument;
 	}
 
-	inline instrument * getInstrument( void )
+	inline instrument * getInstrument()
 	{
 		return m_instrument;
 	}
@@ -107,7 +106,7 @@ public:
 	int masterKey( int _midi_key ) const;
 
 	// translate pitch to midi-pitch [0,16383]
-	inline int midiPitch( void ) const
+	inline int midiPitch() const
 	{
 		return (int)( ( m_pitchModel.value()+100 ) * 16383 ) / 200;
 	}
@@ -134,22 +133,22 @@ public:
 	// load instrument whose name matches given one
 	instrument * loadInstrument( const QString & _instrument_name );
 
-	inline audioPort * getAudioPort( void )
+	inline AudioPort * audioPort()
 	{
 		return &m_audioPort;
 	}
 
-	inline midiPort * getMidiPort( void )
+	inline MidiPort * midiPort()
 	{
 		return &m_midiPort;
 	}
 
-	Piano * pianoModel( void )
+	Piano * pianoModel()
 	{
 		return &m_piano;
 	}
 
-	bool arpeggiatorEnabled( void ) const
+	bool arpeggiatorEnabled() const
 	{
 		return m_arpeggiator.m_arpEnabledModel.value();
 	}
@@ -157,56 +156,56 @@ public:
 	// simple helper for removing midiport-XML-node when loading presets
 	static void removeMidiPortNode( multimediaProject & _mmp );
 
-	floatModel * volumeModel( void )
+	floatModel * volumeModel()
 	{
 		return &m_volumeModel;
 	}
 
-	floatModel * panningModel( void )
+	floatModel * panningModel()
 	{
 		return &m_panningModel;
 	}
 
-	floatModel * pitchModel( void )
+	floatModel * pitchModel()
 	{
 		return &m_pitchModel;
 	}
 
-	intModel * pitchRangeModel( void )
+	intModel * pitchRangeModel()
 	{
 		return &m_pitchRangeModel;
 	}
 
-	intModel * effectChannelModel( void )
+	intModel * effectChannelModel()
 	{
 		return &m_effectChannelModel;
 	}
 
 
 signals:
-	void instrumentChanged( void );
-	void newNote( void );
+	void instrumentChanged();
+	void newNote();
 	void noteOn( const note & _n );
 	void noteOff( const note & _n );
-	void nameChanged( void );
+	void nameChanged();
 
 
 protected:
-	virtual QString nodeName( void ) const
+	virtual QString nodeName() const
 	{
 		return "instrumenttrack";
 	}
 
 
 protected slots:
-	void updateBaseNote( void );
-	void updatePitch( void );
-	void updatePitchRange( void );
+	void updateBaseNote();
+	void updatePitch();
+	void updatePitchRange();
 
 
 private:
-	audioPort m_audioPort;
-	midiPort m_midiPort;
+	AudioPort m_audioPort;
+	MidiPort m_midiPort;
 
 	notePlayHandle * m_notes[NumKeys];
 	int m_runningMidiNotes[NumKeys];
@@ -246,27 +245,27 @@ public:
 	instrumentTrackView( instrumentTrack * _it, trackContainerView * _tc );
 	virtual ~instrumentTrackView();
 
-	instrumentTrackWindow * getInstrumentTrackWindow( void );
+	instrumentTrackWindow * getInstrumentTrackWindow();
 
-	instrumentTrack * model( void )
+	instrumentTrack * model()
 	{
 		return castModel<instrumentTrack>();
 	}
 
-	const instrumentTrack * model( void ) const
+	const instrumentTrack * model() const
 	{
 		return castModel<instrumentTrack>();
 	}
 
 
-	QMenu * midiMenu( void )
+	QMenu * midiMenu()
 	{
 		return m_midiMenu;
 	}
 
-	void freeInstrumentTrackWindow( void );
+	void freeInstrumentTrackWindow();
 
-	static void cleanupWindowPool( void );
+	static void cleanupWindowPool();
 
 
 protected:
@@ -276,12 +275,12 @@ protected:
 
 private slots:
 	void toggleInstrumentWindow( bool _on );
-	void activityIndicatorPressed( void );
-	void activityIndicatorReleased( void );
+	void activityIndicatorPressed();
+	void activityIndicatorReleased();
 
-	void midiInSelected( void );
-	void midiOutSelected( void );
-	void midiConfigChanged( void );
+	void midiInSelected();
+	void midiOutSelected();
+	void midiConfigChanged();
 
 
 private:
@@ -319,17 +318,17 @@ public:
 	virtual ~instrumentTrackWindow();
 
 	// parent for all internal tab-widgets
-	tabWidget * tabWidgetParent( void )
+	tabWidget * tabWidgetParent()
 	{
 		return m_tabWidget;
 	}
 
-	instrumentTrack * model( void )
+	instrumentTrack * model()
 	{
 		return castModel<instrumentTrack>();
 	}
 
-	const instrumentTrack * model( void ) const
+	const instrumentTrack * model() const
 	{
 		return castModel<instrumentTrack>();
 	}
@@ -348,8 +347,8 @@ public:
 public slots:
 	void textChanged( const QString & _new_name );
 	void toggleVisibility( bool _on );
-	void updateName( void );
-	void updateInstrumentView( void );
+	void updateName();
+	void updateInstrumentView();
 
 
 protected:
@@ -362,11 +361,11 @@ protected:
 
 
 protected slots:
-	void saveSettingsBtnClicked( void );
+	void saveSettingsBtnClicked();
 
 
 private:
-	virtual void modelChanged( void );
+	virtual void modelChanged();
 
 	instrumentTrack * m_track;
 	instrumentTrackView * m_itv;

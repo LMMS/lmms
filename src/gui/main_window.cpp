@@ -60,7 +60,7 @@
 #include "plugin_view.h"
 #include "project_notes.h"
 #include "setup_dialog.h"
-#include "audio_dummy.h"
+#include "AudioDummy.h"
 #include "tool.h"
 #include "tool_button.h"
 #include "project_journal.h"
@@ -745,8 +745,8 @@ void mainWindow::finalize( void )
 		setupDialog sd;
 		sd.exec();
 	}
-	// look whether mixer could use a audio-interface beside audioDummy
-	else if( engine::getMixer()->audioDevName() == audioDummy::name() )
+	// look whether mixer could use a audio-interface beside AudioDummy
+	else if( engine::getMixer()->audioDevName() == AudioDummy::name() )
 	{
 		// no, so we offer setup-dialog with audio-settings...
 		setupDialog sd( setupDialog::AudioSettings );

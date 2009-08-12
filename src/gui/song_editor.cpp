@@ -43,7 +43,7 @@
 #include "timeline.h"
 #include "tool_button.h"
 #include "tooltip.h"
-#include "audio_device.h"
+#include "AudioDevice.h"
 #include "piano_roll.h"
 
 

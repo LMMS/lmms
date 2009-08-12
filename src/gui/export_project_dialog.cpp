@@ -28,7 +28,7 @@
 #include "export_project_dialog.h"
 #include "engine.h"
 #include "main_window.h"
-#include "project_renderer.h"
+#include "ProjectRenderer.h"
 
 
 exportProjectDialog::exportProjectDialog( const QString & _file_name,
@@ -51,15 +51,15 @@ exportProjectDialog::exportProjectDialog( const QString & _file_name,
 	}
 
 	int cbIndex = 0;
-	for( int i = 0; i < projectRenderer::NumFileFormats; ++i )
+	for( int i = 0; i < ProjectRenderer::NumFileFormats; ++i )
 	{
 		if( __fileEncodeDevices[i].m_getDevInst != NULL )
 		{
 			// get the extension of this format
-			QString render_ext = projectRenderer::EFF_ext[i];
+			QString render_ext = ProjectRenderer::EFF_ext[i];
 
 			// add to combo box
-			fileFormatCB->addItem( projectRenderer::tr(
+			fileFormatCB->addItem( ProjectRenderer::tr(
 				__fileEncodeDevices[i].m_description ) );
 
 			// if this is our extension, select it
@@ -118,12 +118,12 @@ void exportProjectDialog::closeEvent( QCloseEvent * _ce )
 
 void exportProjectDialog::startBtnClicked()
 {
-	projectRenderer::ExportFileFormats ft = projectRenderer::NumFileFormats;
+	ProjectRenderer::ExportFileFormats ft = ProjectRenderer::NumFileFormats;
 
-	for( int i = 0; i < projectRenderer::NumFileFormats; ++i )
+	for( int i = 0; i < ProjectRenderer::NumFileFormats; ++i )
 	{
 		if( fileFormatCB->currentText() ==
-			projectRenderer::tr(
+			ProjectRenderer::tr(
 				__fileEncodeDevices[i].m_description ) )
 		{
 			ft = __fileEncodeDevices[i].m_fileFormat;
@@ -131,7 +131,7 @@ void exportProjectDialog::startBtnClicked()
 		}
 	}
 
-	if( ft == projectRenderer::NumFileFormats )
+	if( ft == ProjectRenderer::NumFileFormats )
 	{
 		QMessageBox::information( this, tr( "Error" ),
 			tr( "Error while determining file-encoder device. "
@@ -141,8 +141,8 @@ void exportProjectDialog::startBtnClicked()
 		return;
 	}
 
-	startButton->setEnabled( FALSE );
-	progressBar->setEnabled( TRUE );
+	startButton->setEnabled( false );
+	progressBar->setEnabled( true );
 
 
 	mixer::qualitySettings qs = mixer::qualitySettings(
@@ -153,14 +153,14 @@ void exportProjectDialog::startBtnClicked()
 					sampleExactControllersCB->isChecked(),
 					aliasFreeOscillatorsCB->isChecked() );
 
-	projectRenderer::outputSettings os = projectRenderer::outputSettings(
+	ProjectRenderer::OutputSettings os = ProjectRenderer::OutputSettings(
 		samplerateCB->currentText().section( " ", 0, 0 ).toUInt(),
-		FALSE,
+		false,
 		bitrateCB->currentText().section( " ", 0, 0 ).toUInt(),
-		static_cast<projectRenderer::Depths>(
+		static_cast<ProjectRenderer::Depths>(
 						depthCB->currentIndex() ) );
 
-	m_renderer = new projectRenderer( qs, os, ft, m_fileName );
+	m_renderer = new ProjectRenderer( qs, os, ft, m_fileName );
 	if( m_renderer->isReady() )
 	{
 		updateTitleBar( 0 );

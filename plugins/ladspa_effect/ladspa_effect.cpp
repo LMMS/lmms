@@ -27,7 +27,7 @@
 
 #include "ladspa_effect.h"
 #include "mmp.h"
-#include "audio_device.h"
+#include "AudioDevice.h"
 #include "config_mgr.h"
 #include "ladspa_2_lmms.h"
 #include "ladspa_control.h"

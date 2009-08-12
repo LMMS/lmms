@@ -2,7 +2,7 @@
  * setup_dialog.cpp - dialog for setting up LMMS
  *
  * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -22,7 +22,6 @@
  *
  */
 
-
 #include <QtGui/QComboBox>
 #include <QtGui/QFileDialog>
 #include <QtGui/QImageReader>
@@ -34,7 +33,6 @@
 #include <QtGui/QWhatsThis>
 #include <QtGui/QTableWidget>
 #include <QtGui/QHeaderView>
-
 
 #include "setup_dialog.h"
 #include "tab_bar.h"
@@ -52,33 +50,34 @@
 #include "group_box.h"
 #include "lcd_spinbox.h"
 #include "tool_button.h"
-#include "midi_port_menu.h"
-#include "midi_control_listener.h"
+#include "MidiPortMenu.h"
+#include "MidiControlListener.h"
 #include "setup_dialog_mcl.h"
 
 
 // platform-specific audio-interface-classes
-#include "audio_alsa.h"
-#include "audio_jack.h"
-#include "audio_oss.h"
-#include "audio_portaudio.h"
-#include "audio_pulseaudio.h"
-#include "audio_sdl.h"
-#include "audio_dummy.h"
+#include "AudioAlsa.h"
+#include "AudioJack.h"
+#include "AudioOss.h"
+#include "AudioPortAudio.h"
+#include "AudioPulseAudio.h"
+#include "AudioSdl.h"
+#include "AudioDummy.h"
 
 // platform-specific midi-interface-classes
-#include "midi_alsa_raw.h"
-#include "midi_alsa_seq.h"
-#include "midi_oss.h"
-#include "midi_winmm.h"
-#include "midi_dummy.h"
+#include "MidiAlsaRaw.h"
+#include "MidiAlsaSeq.h"
+#include "MidiOss.h"
+#include "MidiWinMM.h"
+#include "MidiDummy.h"
+
 
 
 inline void labelWidget( QWidget * _w, const QString & _txt )
 {
 	QLabel * title = new QLabel( _txt, _w );
 	QFont f = title->font();
-	f.setBold( TRUE );
+	f.setBold( true );
 	title->setFont( pointSize<12>( f ) );
 
 #ifdef LMMS_DEBUG
@@ -126,18 +125,18 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 	m_mclUseControlKey( engine::getMidiControlListener()->getUseControlKey() ),
 	m_mclActionMapKeys( engine::getMidiControlListener()->getActionMapKeys() ),
 	m_mclActionMapControllers( engine::getMidiControlListener()->getActionMapControllers() ),
-	m_mclMidiPortMenu( midiPort::Input ),
+	m_mclMidiPortMenu( MidiPort::Input ),
 	m_mclMidiPort( "MCL config",
-		      engine::getMixer()->getMidiClient(),
+		      engine::getMixer()->midiClient(),
 		      &m_mclMep,
 		      NULL,
-		      midiPort::Input )
+		      MidiPort::Input )
 {
 	setWindowIcon( embed::getIconPixmap( "setup_general" ) );
 	setWindowTitle( tr( "Setup LMMS" ) );
-	setModal( TRUE );
+	setModal( true );
 
-	engine::getProjectJournal()->setJournalling( FALSE );
+	engine::getProjectJournal()->setJournalling( false );
 
 	QVBoxLayout * vlayout = new QVBoxLayout( this );
 	vlayout->setSpacing( 0 );
@@ -148,7 +147,7 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 	hlayout->setMargin( 0 );
 
 	m_tabBar = new tabBar( settings, QBoxLayout::TopToBottom );
-	m_tabBar->setExclusive( TRUE );
+	m_tabBar->setExclusive( true );
 	m_tabBar->setFixedWidth( 72 );
 
 	QWidget * ws = new QWidget( settings );
@@ -536,42 +535,42 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 	QHBoxLayout * asw_layout = new QHBoxLayout( asw );
 	asw_layout->setSpacing( 0 );
 	asw_layout->setMargin( 0 );
-	//asw_layout->setAutoAdd( TRUE );
+	//asw_layout->setAutoAdd( true );
 
 #ifdef LMMS_HAVE_JACK
-	m_audioIfaceSetupWidgets[audioJACK::name()] =
-					new audioJACK::setupWidget( asw );
+	m_audioIfaceSetupWidgets[AudioJack::name()] =
+					new AudioJack::setupWidget( asw );
 #endif
 
 #ifdef LMMS_HAVE_ALSA
-	m_audioIfaceSetupWidgets[audioALSA::name()] =
-					new audioALSA::setupWidget( asw );
+	m_audioIfaceSetupWidgets[AudioAlsa::name()] =
+					new AudioAlsa::setupWidget( asw );
 #endif
 
 #ifdef LMMS_HAVE_PULSEAUDIO
-	m_audioIfaceSetupWidgets[audioPulseAudio::name()] =
-					new audioPulseAudio::setupWidget( asw );
+	m_audioIfaceSetupWidgets[AudioPulseAudio::name()] =
+					new AudioPulseAudio::setupWidget( asw );
 #endif
 
 #ifdef LMMS_HAVE_PORTAUDIO
-	m_audioIfaceSetupWidgets[audioPortAudio::name()] =
-					new audioPortAudio::setupWidget( asw );
+	m_audioIfaceSetupWidgets[AudioPortAudio::name()] =
+					new AudioPortAudio::setupWidget( asw );
 #endif
 
 #ifdef LMMS_HAVE_SDL
-	m_audioIfaceSetupWidgets[audioSDL::name()] =
-					new audioSDL::setupWidget( asw );
+	m_audioIfaceSetupWidgets[AudioSdl::name()] =
+					new AudioSdl::setupWidget( asw );
 #endif
 
 #ifdef LMMS_HAVE_OSS
-	m_audioIfaceSetupWidgets[audioOSS::name()] =
-					new audioOSS::setupWidget( asw );
+	m_audioIfaceSetupWidgets[AudioOss::name()] =
+					new AudioOss::setupWidget( asw );
 #endif
-	m_audioIfaceSetupWidgets[audioDummy::name()] =
-					new audioDummy::setupWidget( asw );
+	m_audioIfaceSetupWidgets[AudioDummy::name()] =
+					new AudioDummy::setupWidget( asw );
 
 
-	for( aswMap::iterator it = m_audioIfaceSetupWidgets.begin();
+	for( AswMap::iterator it = m_audioIfaceSetupWidgets.begin();
 				it != m_audioIfaceSetupWidgets.end(); ++it )
 	{
 		m_audioIfaceNames[tr( it.key().toAscii())] = it.key();
@@ -628,30 +627,30 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 	QHBoxLayout * msw_layout = new QHBoxLayout( msw );
 	msw_layout->setSpacing( 0 );
 	msw_layout->setMargin( 0 );
-	//msw_layout->setAutoAdd( TRUE );
+	//msw_layout->setAutoAdd( true );
 
 #ifdef LMMS_HAVE_ALSA
-	m_midiIfaceSetupWidgets[midiALSASeq::name()] =
-					new midiALSASeq::setupWidget( msw );
-	m_midiIfaceSetupWidgets[midiALSARaw::name()] =
-					new midiALSARaw::setupWidget( msw );
+	m_midiIfaceSetupWidgets[MidiAlsaSeq::name()] =
+					new MidiAlsaSeq::setupWidget( msw );
+	m_midiIfaceSetupWidgets[MidiAlsaRaw::name()] =
+					new MidiAlsaRaw::setupWidget( msw );
 #endif
 
 #ifdef LMMS_HAVE_OSS
-	m_midiIfaceSetupWidgets[midiOSS::name()] =
-					new midiOSS::setupWidget( msw );
+	m_midiIfaceSetupWidgets[MidiOss::name()] =
+					new MidiOss::setupWidget( msw );
 #endif
 
 #ifdef LMMS_BUILD_WIN32
-	m_midiIfaceSetupWidgets[midiWinMM::name()] =
-					new midiWinMM::setupWidget( msw );
+	m_midiIfaceSetupWidgets[MidiWinMM::name()] =
+					new MidiWinMM::setupWidget( msw );
 #endif
 
-	m_midiIfaceSetupWidgets[midiDummy::name()] =
-					new midiDummy::setupWidget( msw );
+	m_midiIfaceSetupWidgets[MidiDummy::name()] =
+					new MidiDummy::setupWidget( msw );
 
 
-	for( mswMap::iterator it = m_midiIfaceSetupWidgets.begin();
+	for( MswMap::iterator it = m_midiIfaceSetupWidgets.begin();
 				it != m_midiIfaceSetupWidgets.end(); ++it )
 	{
 		m_midiIfaceNames[tr( it.key().toAscii())] = it.key();
@@ -681,17 +680,17 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 	midi_layout->addWidget( midicl_gb );
 	midi_layout->addStretch();
 
-	m_tabBar->addTab( general, tr( "General settings" ), 0, FALSE, TRUE 
+	m_tabBar->addTab( general, tr( "General settings" ), 0, false, true 
 			)->setIcon( embed::getIconPixmap( "setup_general" ) );
-	m_tabBar->addTab( paths, tr( "Paths" ), 1, FALSE, TRUE 
+	m_tabBar->addTab( paths, tr( "Paths" ), 1, false, true 
 			)->setIcon( embed::getIconPixmap(
 							"setup_directories" ) );
-	m_tabBar->addTab( performance, tr( "Performance settings" ), 2, FALSE,
-				TRUE )->setIcon( embed::getIconPixmap(
+	m_tabBar->addTab( performance, tr( "Performance settings" ), 2, false,
+				true )->setIcon( embed::getIconPixmap(
 							"setup_performance" ) );
-	m_tabBar->addTab( audio, tr( "Audio settings" ), 3, FALSE, TRUE
+	m_tabBar->addTab( audio, tr( "Audio settings" ), 3, false, true
 			)->setIcon( embed::getIconPixmap( "setup_audio" ) );
-	m_tabBar->addTab( midi, tr( "MIDI settings" ), 4, TRUE, TRUE
+	m_tabBar->addTab( midi, tr( "MIDI settings" ), 4, true, true
 			)->setIcon( embed::getIconPixmap( "setup_midi" ) );
 
 
@@ -740,7 +739,7 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 
 setupDialog::~setupDialog()
 {
-	engine::getProjectJournal()->setJournalling( TRUE );
+	engine::getProjectJournal()->setJournalling( true );
 }
 
 
@@ -779,7 +778,7 @@ groupBox * setupDialog::setupMidiControlListener( QWidget * midi )
 	m_mclMidiPortMenu.setModel( &m_mclMidiPort );
 	QDomDocument mclDoc;
 	QDomElement mclPortConfig = mclDoc.createElement( "devices" );
-	engine::getMidiControlListener()->getMidiPort()->saveSettings( 
+	engine::getMidiControlListener()->midiPort()->saveSettings( 
 		mclDoc, mclPortConfig );
 	m_mclMidiPort.loadSettings( mclPortConfig );
 	
@@ -896,7 +895,7 @@ void setupDialog::mclUpdateActionTable( void )
 
 
 
-void setupDialog::accept( void )
+void setupDialog::accept()
 {
 	configManager::inst()->setValue( "mixer", "framesperaudiobuffer",
 					QString::number( m_bufferSize ) );
@@ -935,13 +934,13 @@ void setupDialog::accept( void )
 	configManager::inst()->setLameLibrary( m_lameLibrary );
 
 	// tell all audio-settings-widget to save their settings
-	for( aswMap::iterator it = m_audioIfaceSetupWidgets.begin();
+	for( AswMap::iterator it = m_audioIfaceSetupWidgets.begin();
 				it != m_audioIfaceSetupWidgets.end(); ++it )
 	{
 		it.value()->saveSettings();
 	}
 	// tell all MIDI-settings-widget to save their settings
-	for( mswMap::iterator it = m_midiIfaceSetupWidgets.begin();
+	for( MswMap::iterator it = m_midiIfaceSetupWidgets.begin();
 				it != m_midiIfaceSetupWidgets.end(); ++it )
 	{
 		it.value()->saveSettings();
@@ -958,8 +957,8 @@ void setupDialog::accept( void )
 	QDomDocument mclDoc;
 	QDomElement mclPortConfig = mclDoc.createElement( "devices" );
 	m_mclMidiPort.saveSettings( mclDoc, mclPortConfig );
-	listener->getMidiPort()->unsubscribeAllPorts();
-	listener->getMidiPort()->loadSettings( mclPortConfig );
+	listener->midiPort()->unsubscribeAllPorts();
+	listener->midiPort()->loadSettings( mclPortConfig );
 	
 	configManager::inst()->saveConfigFile();
 
@@ -1010,7 +1009,7 @@ void setupDialog::setBufferSize( int _value )
 
 
 
-void setupDialog::resetBufSize( void )
+void setupDialog::resetBufSize()
 {
 	setBufferSize( DEFAULT_BUFFER_SIZE / 64 );
 }
@@ -1018,7 +1017,7 @@ void setupDialog::resetBufSize( void )
 
 
 
-void setupDialog::displayBufSizeHelp( void )
+void setupDialog::displayBufSizeHelp()
 {
 	QWhatsThis::showText( QCursor::pos(),
 			tr( "Here you can setup the internal buffer-size "
@@ -1090,7 +1089,7 @@ void setupDialog::toggleManualChPiano( bool _enabled )
 
 
 
-void setupDialog::openWorkingDir( void )
+void setupDialog::openWorkingDir()
 {
 	QString new_dir = QFileDialog::getExistingDirectory( this,
 					tr( "Choose LMMS working directory" ),
@@ -1112,7 +1111,7 @@ void setupDialog::setWorkingDir( const QString & _wd )
 
 
 
-void setupDialog::openVSTDir( void )
+void setupDialog::openVSTDir()
 {
 	QString new_dir = QFileDialog::getExistingDirectory( this,
 				tr( "Choose your VST-plugin directory" ),
@@ -1134,7 +1133,7 @@ void setupDialog::setVSTDir( const QString & _vd )
 
 
 
-void setupDialog::openArtworkDir( void )
+void setupDialog::openArtworkDir()
 {
 	QString new_dir = QFileDialog::getExistingDirectory( this,
 				tr( "Choose artwork-theme directory" ),
@@ -1156,7 +1155,7 @@ void setupDialog::setArtworkDir( const QString & _ad )
 
 
 
-void setupDialog::openFLDir( void )
+void setupDialog::openFLDir()
 {
 	QString new_dir = QFileDialog::getExistingDirectory( this,
 				tr( "Choose FL Studio installation directory" ),
@@ -1170,7 +1169,7 @@ void setupDialog::openFLDir( void )
 
 
 
-void setupDialog::openLADSPADir( void )
+void setupDialog::openLADSPADir()
 {
 	QString new_dir = QFileDialog::getExistingDirectory( this,
 				tr( "Choose LADSPA plugin directory" ),
@@ -1192,7 +1191,7 @@ void setupDialog::openLADSPADir( void )
 
 
 
-void setupDialog::openSTKDir( void )
+void setupDialog::openSTKDir()
 {
 #ifdef LMMS_HAVE_STK
 	QString new_dir = QFileDialog::getExistingDirectory( this,
@@ -1208,7 +1207,7 @@ void setupDialog::openSTKDir( void )
 
 
 
-void setupDialog::openDefaultSoundfont( void )
+void setupDialog::openDefaultSoundfont()
 {
 #ifdef LMMS_HAVE_FLUIDSYNTH
 	QString new_file = QFileDialog::getOpenFileName( this,
@@ -1235,7 +1234,7 @@ void setupDialog::openLameLibrary( void )
 }
 
 
-void setupDialog::openBackgroundArtwork( void )
+void setupDialog::openBackgroundArtwork()
 {
 	QList<QByteArray> fileTypesList = QImageReader::supportedImageFormats();
 	QString fileTypes;
@@ -1320,7 +1319,7 @@ void setupDialog::setLameLibrary( const QString & _ll )
 
 void setupDialog::audioInterfaceChanged( const QString & _iface )
 {
-	for( aswMap::iterator it = m_audioIfaceSetupWidgets.begin();
+	for( AswMap::iterator it = m_audioIfaceSetupWidgets.begin();
 				it != m_audioIfaceSetupWidgets.end(); ++it )
 	{
 		it.value()->hide();
@@ -1332,7 +1331,7 @@ void setupDialog::audioInterfaceChanged( const QString & _iface )
 
 
 
-void setupDialog::displayAudioHelp( void )
+void setupDialog::displayAudioHelp()
 {
 	QWhatsThis::showText( QCursor::pos(),
 				tr( "Here you can select your preferred "
@@ -1350,7 +1349,7 @@ void setupDialog::displayAudioHelp( void )
 
 void setupDialog::midiInterfaceChanged( const QString & _iface )
 {
-	for( mswMap::iterator it = m_midiIfaceSetupWidgets.begin();
+	for( MswMap::iterator it = m_midiIfaceSetupWidgets.begin();
 				it != m_midiIfaceSetupWidgets.end(); ++it )
 	{
 		it.value()->hide();
@@ -1362,7 +1361,7 @@ void setupDialog::midiInterfaceChanged( const QString & _iface )
 
 
 
-void setupDialog::displayMIDIHelp( void )
+void setupDialog::displayMIDIHelp()
 {
 	QWhatsThis::showText( QCursor::pos(),
 				tr( "Here you can select your preferred "

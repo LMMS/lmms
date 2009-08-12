@@ -29,11 +29,11 @@
 
 #include "automatable_model.h"
 #include "Controller.h"
-#include "midi_event_processor.h"
-#include "midi_port.h"
+#include "MidiEventProcessor.h"
+#include "MidiPort.h"
 
 
-class midiPort;
+class MidiPort;
 
 
 class MidiController : public Controller, public MidiEventProcessor
@@ -57,7 +57,7 @@ public:
 	virtual QString nodeName( void ) const;
 
 	// Used by controllerConnectionDialog to copy
-	void subscribeReadablePorts( const midiPort::map & _map );
+	void subscribeReadablePorts( const MidiPort::Map & _map );
 
 
 public slots:
@@ -70,7 +70,7 @@ protected:
 	virtual float value( int _offset );
 
 
-	midiPort m_midiPort;
+	MidiPort m_midiPort;
 
 
 	float m_lastValue;

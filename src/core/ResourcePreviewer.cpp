@@ -89,8 +89,7 @@ void ResourcePreviewer::preview( ResourceItem * _item )
 				m_defaultSettings.content().
 					firstChild().toElement() );
 			ResourceAction( _item ).loadPreset( m_previewTrack );
-			m_previewTrack->getMidiPort()->setMode(
-							midiPort::Disabled );
+			m_previewTrack->midiPort()->setMode( MidiPort::Disabled );
 			break;
 		case ResourceItem::TypeSample:
 		case ResourceItem::TypePluginSpecificResource:

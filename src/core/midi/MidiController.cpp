@@ -27,11 +27,10 @@
 #include <QtCore/QObject>
 #include <QtCore/QVector>
 
-
 #include "song.h"
 #include "engine.h"
 #include "mixer.h"
-#include "midi_client.h"
+#include "MidiClient.h"
 #include "MidiController.h"
 #include "automation_recorder.h"
 
@@ -40,8 +39,7 @@ MidiController::MidiController( model * _parent ) :
 	Controller( Controller::MidiController, _parent, tr( "MIDI Controller" ) ),
 	MidiEventProcessor(),
 	m_midiPort( tr( "unnamed_midi_controller" ),
-			engine::getMixer()->getMidiClient(), this, this,
-							midiPort::Input ),
+			engine::getMixer()->midiClient(), this, this, MidiPort::Input ),
 	m_lastValue( 0.0f )
 {
 	connect( &m_midiPort, SIGNAL( modeChanged() ),
@@ -106,9 +104,9 @@ void MidiController::processInEvent( const midiEvent & _me,
 
 
 
-void MidiController::subscribeReadablePorts( const midiPort::map & _map )
+void MidiController::subscribeReadablePorts( const MidiPort::Map & _map )
 {
-	for( midiPort::map::const_iterator it = _map.constBegin();
+	for( MidiPort::Map::ConstIterator it = _map.constBegin();
 						it != _map.constEnd(); ++it )
 	{
 		m_midiPort.subscribeReadablePort( it.key(), *it );

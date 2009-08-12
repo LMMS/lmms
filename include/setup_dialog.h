@@ -1,8 +1,8 @@
 /*
  * setup_dialog.h - dialog for setting up LMMS
  *
- * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -22,7 +22,6 @@
  *
  */
 
-
 #ifndef _SETUP_DIALOG_H
 #define _SETUP_DIALOG_H
 
@@ -30,13 +29,12 @@
 #include <QtCore/QMap>
 
 #include "lmmsconfig.h"
-#include "audio_device.h"
-#include "midi_client.h"
-#include "midi_port.h"
-#include "midi_port_menu.h"
-#include "dummy_midi_event_processor.h"
-#include "midi_control_listener.h"
-
+#include "AudioDevice.h"
+#include "MidiClient.h"
+#include "MidiPort.h"
+#include "MidiPortMenu.h"
+#include "DummyMidiEventProcessor.h"
+#include "MidiControlListener.h"
 
 
 class QComboBox;
@@ -173,16 +171,16 @@ private:
 	bool m_disableChActInd;
 	bool m_manualChPiano;
 
-	typedef QMap<QString, audioDevice::setupWidget *> aswMap;
-	typedef QMap<QString, midiClient::setupWidget *> mswMap;
+	typedef QMap<QString, AudioDevice::setupWidget *> AswMap;
+	typedef QMap<QString, MidiClient::setupWidget *> MswMap;
 	typedef QMap<QString, QString> trMap;
 
 	QComboBox * m_audioInterfaces;
-	aswMap m_audioIfaceSetupWidgets;
+	AswMap m_audioIfaceSetupWidgets;
 	trMap m_audioIfaceNames;
 
 	QComboBox * m_midiInterfaces;
-	mswMap m_midiIfaceSetupWidgets;
+	MswMap m_midiIfaceSetupWidgets;
 	trMap m_midiIfaceNames;
 
 	bool m_mclEnabled;
@@ -193,9 +191,9 @@ private:
 	
 	QList< QPair <char, int> > m_mclActionTableMap;
 	QTableWidget * m_mclActionTable;
-	midiPortMenu m_mclMidiPortMenu;
+	MidiPortMenu m_mclMidiPortMenu;
 	DummyMidiEventProcessor m_mclMep;
-	midiPort m_mclMidiPort;
+	MidiPort m_mclMidiPort;
 };
 
 

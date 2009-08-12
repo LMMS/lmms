@@ -22,13 +22,12 @@
  *
  */
 
-
 #ifndef _SETUP_DIALOG_MCL_H
 #define _SETUP_DIALOG_MCL_H
 
 #include <QtGui/QDialog>
 
-#include "dummy_midi_event_processor.h"
+#include "DummyMidiEventProcessor.h"
 #include "piano.h"
 
 class setupDialog;
@@ -38,15 +37,15 @@ class setupDialogMCL : public QDialog
 	Q_OBJECT
 public:
 	setupDialogMCL( setupDialog * _parent );
-	virtual ~setupDialogMCL( void );
+	virtual ~setupDialogMCL();
 
 
 protected slots:
-	virtual void accept( void );
+	virtual void accept();
 
 private slots:
-	void clickedKeyBox( void );
-	void clickedControllerBox( void );
+	void clickedKeyBox();
+	void clickedControllerBox();
 
 private:
 	setupDialog * m_parent;

@@ -3,7 +3,7 @@
  *                        (window + data-structures)
  *
  * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -22,7 +22,6 @@
  * Boston, MA 02110-1301 USA.
  *
  */
-
 
 #include <QtCore/QDir>
 #include <QtCore/QFile>
@@ -44,7 +43,7 @@
 #include "UnifiedResourceProvider.h"
 
 #include "instrument_track.h"
-#include "audio_port.h"
+#include "AudioPort.h"
 #include "automation_pattern.h"
 #include "bb_track.h"
 #include "config_mgr.h"
@@ -65,8 +64,8 @@
 #include "lcd_spinbox.h"
 #include "led_checkbox.h"
 #include "main_window.h"
-#include "midi_client.h"
-#include "midi_port_menu.h"
+#include "MidiClient.h"
+#include "MidiPortMenu.h"
 #include "mmp.h"
 #include "note_play_handle.h"
 #include "pattern.h"
@@ -96,7 +95,7 @@ instrumentTrack::instrumentTrack( trackContainer * _tc ) :
 	track( InstrumentTrack, _tc ),
 	MidiEventProcessor(),
 	m_audioPort( tr( "unnamed_track" ) ),
-	m_midiPort( tr( "unnamed_track" ), engine::getMixer()->getMidiClient(),
+	m_midiPort( tr( "unnamed_track" ), engine::getMixer()->midiClient(),
 								this, this ),
 	m_notes(),
         m_volumeModel( DefaultVolume, MinVolume, MaxVolume, 0.1f, this,
@@ -369,12 +368,12 @@ void instrumentTrack::processOutEvent( const midiEvent & _me,
 				if( m_runningMidiNotes[k] > 0 )
 				{
 					m_instrument->handleMidiEvent(
-	midiEvent( MidiNoteOff, getMidiPort()->realOutputChannel(), k, 0 ),
+	midiEvent( MidiNoteOff, midiPort()->realOutputChannel(), k, 0 ),
 									_time );
 				}
 				++m_runningMidiNotes[k];
 				m_instrument->handleMidiEvent(
-	midiEvent( MidiNoteOn, getMidiPort()->realOutputChannel(), k,
+	midiEvent( MidiNoteOn, midiPort()->realOutputChannel(), k,
 						_me.velocity() ), _time );
 			}
 			break;
@@ -390,7 +389,7 @@ void instrumentTrack::processOutEvent( const midiEvent & _me,
 						--m_runningMidiNotes[k] <= 0 )
 			{
 				m_instrument->handleMidiEvent(
-	midiEvent( MidiNoteOff, getMidiPort()->realOutputChannel(), k, 0 ),
+	midiEvent( MidiNoteOff, midiPort()->realOutputChannel(), k, 0 ),
 									_time );
 			}
 			break;
@@ -544,7 +543,7 @@ void instrumentTrack::updatePitch( void )
 {
 	updateBaseNote();
 	processOutEvent( midiEvent( MidiPitchBend,
-					getMidiPort()->realOutputChannel(),
+					midiPort()->realOutputChannel(),
 					midiPitch() ), 0 );
 }
 
@@ -925,12 +924,12 @@ instrumentTrackView::instrumentTrackView( instrumentTrack * _it,
 	m_midiMenu = new QMenu( tr( "MIDI" ), this );
 
 	// sequenced MIDI?
-	if( !engine::getMixer()->getMidiClient()->isRaw() )
+	if( !engine::getMixer()->midiClient()->isRaw() )
 	{
-		_it->m_midiPort.m_readablePortsMenu = new midiPortMenu(
-							midiPort::Input );
-		_it->m_midiPort.m_writablePortsMenu = new midiPortMenu(
-							midiPort::Output );
+		_it->m_midiPort.m_readablePortsMenu = new MidiPortMenu(
+							MidiPort::Input );
+		_it->m_midiPort.m_writablePortsMenu = new MidiPortMenu(
+							MidiPort::Output );
 		_it->m_midiPort.m_readablePortsMenu->setModel(
 							&_it->m_midiPort );
 		_it->m_midiPort.m_writablePortsMenu->setModel(

@@ -22,9 +22,7 @@
  *
  */
 
-
 #include "ladspa_description.h"
-
 
 #include <QtGui/QGroupBox>
 #include <QtGui/QLabel>
@@ -32,12 +30,10 @@
 #include <QtGui/QScrollArea>
 #include <QtGui/QVBoxLayout>
 
-
-#include "audio_device.h"
+#include "AudioDevice.h"
 #include "engine.h"
 #include "ladspa_2_lmms.h"
 #include "mixer.h"
-
 
 
 

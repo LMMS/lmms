@@ -33,7 +33,7 @@
 #include <QtGui/QVBoxLayout>
 
 
-#include "audio_device.h"
+#include "AudioDevice.h"
 #include "engine.h"
 #include "mixer.h"
 

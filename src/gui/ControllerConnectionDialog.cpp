@@ -33,9 +33,8 @@
 #include "ControllerConnectionDialog.h"
 #include "ControllerConnection.h"
 #include "MidiController.h"
-#include "midi_client.h"
-#include "midi_port_menu.h"
-#include "midi.h"
+#include "MidiClient.h"
+#include "MidiPortMenu.h"
 #include "lcd_spinbox.h"
 #include "led_checkbox.h"
 #include "combobox.h"
@@ -158,9 +157,9 @@ ControllerConnectionDialog::ControllerConnectionDialog( QWidget * _parent,
 
 	// when using with non-raw-clients we can provide buttons showing
 	// our port-menus when being clicked
-	if( !engine::getMixer()->getMidiClient()->isRaw() )
+	if( !engine::getMixer()->midiClient()->isRaw() )
 	{
-		m_readablePorts = new midiPortMenu( midiPort::Input );
+		m_readablePorts = new MidiPortMenu( MidiPort::Input );
 		connect( m_readablePorts, SIGNAL( triggered( QAction * ) ),
 				this, SLOT( enableAutoDetect( QAction * ) ) );
 		toolButton * rp_btn = new toolButton( m_midiGroupBox );

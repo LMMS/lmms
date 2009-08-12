@@ -45,7 +45,7 @@
 #include "plugin.h"
 #include "song_editor.h"
 #include "song.h"
-#include "midi_control_listener.h"
+#include "MidiControlListener.h"
 
 #include "ResourceDB.h"
 #include "LocalResourceProvider.h"
