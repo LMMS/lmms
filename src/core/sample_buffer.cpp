@@ -611,6 +611,7 @@ f_cnt_t sampleBuffer::decodeSampleMp3( QString & file, int_sample_t * & _buf,
 	// TODO: calc _buf size
 
 	int bufPos = 0;
+	int bufSize = 0;
 	bool initBuf = false;
 
 	while(1)
@@ -629,27 +630,40 @@ f_cnt_t sampleBuffer::decodeSampleMp3( QString & file, int_sample_t * & _buf,
 		{
 			if( mp3data.header_parsed == 0 )
 			{
-				printf("failed to parse header\n");
+				qWarning("MP3 decoder: failed to parse header\n");
 				return 0;
 			}
 			else
 			{
+				// calculate buffer size
+				int safetyPad = 7200;
+				int sampleSafetyPad = 1096;
+				bufSize = (int)( (float)in.size() / 
+					((float)mp3data.bitrate * 1000.0 / 8.0) *
+					(float)mp3data.samplerate + sampleSafetyPad);
+				bufSize = (bufSize + safetyPad) * _channels;
+
 				// process header
 				_samplerate = mp3data.samplerate;
 				_channels = mp3data.stereo;
-				_buf = new int_sample_t[mp3data.totalframes *
-					mp3data.framesize * _channels];
+				_buf = new int_sample_t[bufSize];
 				initBuf = true;
 			}
 		}
 
 		// convert the decoded PCM into sample
-		for(int i = 0; i<ret; ++i)
+		for(int i = 0; i<ret && bufPos<bufSize; ++i)
 		{
 			_buf[bufPos++] = pcm_l[i];
 			if( _channels == 2 )
 				_buf[bufPos++] = pcm_r[i];
 		}
+
+		if( bufPos >= bufSize )
+		{
+			qWarning("MP3 file exceeded the calculated buffer size");
+		}
+
 	}
 
 	lame.lame_decode_exit();

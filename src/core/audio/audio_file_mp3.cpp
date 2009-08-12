@@ -97,12 +97,12 @@ bool AudioFileMp3::startEncoding( void )
 	// open any handles, files, etc
 	m_lgf = m_lame.lame_init();
 	if( m_lgf == NULL ){
-		printf("AudioFileMp3: Unable to initialize lame\n");
+		qWarning("AudioFileMp3: Unable to initialize lame\n");
 		return false;
 	}
 
 	if( channels() > 2 )
-		printf("I don't think lame can do more than 2 channels\n");
+		qWarning("I don't think lame can do more than 2 channels\n");
 
 	m_lame.lame_set_in_samplerate(m_lgf, sampleRate() );
 	m_lame.lame_set_num_channels(m_lgf, channels() );
@@ -136,12 +136,13 @@ bool AudioFileMp3::startEncoding( void )
 	m_outfile = new QFile( outputFile() );
 	if( ! m_outfile->open( QIODevice::WriteOnly ) )
 	{
-		printf("AudioFileMp3: unable to open file for output\n");
+		qWarning("AudioFileMp3: unable to open file for output\n");
 		return false;
 	}
 
 	// write the headers and such
-	// TODO: add a comment "created with LMMS"
+	// TODO: add meta information with artist, title, etc, and
+	//       add a comment "created with LMMS"
 
 	return true;
 
@@ -174,16 +175,16 @@ void AudioFileMp3::writeBuffer( const surroundSampleFrame * _ab,
 
 	switch(rc){
 		case -1:
-			printf("AudioFileMp3: encode error: buffer too small.\n");
+			qWarning("AudioFileMp3: encode error: buffer too small.\n");
 			return;
 		case -2: 
-			printf("AudioFileMp3: encode error: out of memory\n");
+			qWarning("AudioFileMp3: encode error: out of memory\n");
 			return;
 		case -3: 
-			printf("AudioFileMp3: encode error: lame_init_params not called\n");
+			qWarning("AudioFileMp3: encode error: lame_init_params not called\n");
 			return;
 		case -4: 
-			printf("AudioFileMp3: encode error: psycho acoustic problems\n");
+			qWarning("AudioFileMp3: encode error: psycho acoustic problems\n");
 			return;
 	}
 

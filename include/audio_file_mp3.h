@@ -2,8 +2,7 @@
  * audio_file_mp3.h - Audio-device which encodes mp3-stream and writes it
  *					 into an mp3-file. This is used for song-export.
  *
- * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- *			   2009 Andrew Kelley <superjoe30@gmail.com>
+ * Copyright (c) 2009 Andrew Kelley <superjoe30@gmail.com>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
