@@ -28,11 +28,12 @@
 #include "audio_file_mp3.h"
 
 #include <limits>
-using namespace std;
+#include <QtDebug>
 
-
+#include "lmms_basics.h"
 #include "config_mgr.h"
 
+using namespace std;
 
 AudioFileMp3::AudioFileMp3( const sample_rate_t _sample_rate,
 	const ch_cnt_t _channels, bool & _success_ful, const QString & _file,
@@ -97,12 +98,12 @@ bool AudioFileMp3::startEncoding( void )
 	// open any handles, files, etc
 	m_lgf = m_lame.lame_init();
 	if( m_lgf == NULL ){
-		qWarning("AudioFileMp3: Unable to initialize lame\n");
+		qWarning() << "AudioFileMp3: Unable to initialize lame";
 		return false;
 	}
 
 	if( channels() > 2 )
-		qWarning("I don't think lame can do more than 2 channels\n");
+		qWarning() << "I don't think lame can do more than 2 channels";
 
 	m_lame.lame_set_in_samplerate(m_lgf, sampleRate() );
 	m_lame.lame_set_num_channels(m_lgf, channels() );
@@ -136,7 +137,7 @@ bool AudioFileMp3::startEncoding( void )
 	m_outfile = new QFile( outputFile() );
 	if( ! m_outfile->open( QIODevice::WriteOnly ) )
 	{
-		qWarning("AudioFileMp3: unable to open file for output\n");
+		qWarning() << "AudioFileMp3: unable to open file for output";
 		return false;
 	}
 
@@ -149,9 +150,9 @@ bool AudioFileMp3::startEncoding( void )
 }
 
 
-short int AudioFileMp3::rescale(float sample) {
+Sint16 AudioFileMp3::rescale(float sample) {
 	return (qMax<float>(qMin<float>(sample, 1), -1) / 1) 
-		* std::numeric_limits<short int>::max();
+		* std::numeric_limits<Sint16>::max();
 }
 
 // encode data and write to file
@@ -160,14 +161,16 @@ void AudioFileMp3::writeBuffer( const surroundSampleFrame * _ab,
 {
 	// encode with lame
 	int bufSize = 1.25 * _frames + 7200;
-	short int * in = new short int[_frames*2];
+	Sint16 * in = new Sint16[_frames*channels()];
 	unsigned char * out = new unsigned char[bufSize];
 	
-	// scale to short int instead of float
+	// scale to Sint16 instead of float
 	for(int i=0; i < _frames; ++i)
 	{
-		in[i*2] = rescale( _ab[i][0] );
-		in[i*2+1] = rescale( _ab[i][1] );
+		for(int c=0; c < channels(); ++c)
+		{
+			in[i*channels()+c] = rescale( _ab[i][c] * _master_gain );
+		}
 	}
 
 	int rc = m_lame.lame_encode_buffer_interleaved( m_lgf, in, _frames, 
@@ -175,16 +178,16 @@ void AudioFileMp3::writeBuffer( const surroundSampleFrame * _ab,
 
 	switch(rc){
 		case -1:
-			qWarning("AudioFileMp3: encode error: buffer too small.\n");
+			qWarning() << "AudioFileMp3: encode error: buffer too small.";
 			return;
 		case -2: 
-			qWarning("AudioFileMp3: encode error: out of memory\n");
+			qWarning() << "AudioFileMp3: encode error: out of memory";
 			return;
 		case -3: 
-			qWarning("AudioFileMp3: encode error: lame_init_params not called\n");
+			qWarning() << "AudioFileMp3: encode error: lame_init_params not called";
 			return;
 		case -4: 
-			qWarning("AudioFileMp3: encode error: psycho acoustic problems\n");
+			qWarning() << "AudioFileMp3: encode error: psycho acoustic problems";
 			return;
 	}
 
