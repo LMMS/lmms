@@ -1,7 +1,7 @@
 /*
  * instrument_midi_io_view.cpp - MIDI-IO-View
  *
- * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -22,19 +22,17 @@
  *
  */
 
-
 #include <QtGui/QMenu>
 #include <QtGui/QToolButton>
 
-
 #include "instrument_midi_io_view.h"
-#include "midi_port_menu.h"
+#include "MidiPortMenu.h"
 #include "engine.h"
 #include "embed.h"
 #include "group_box.h"
 #include "gui_templates.h"
 #include "lcd_spinbox.h"
-#include "midi_client.h"
+#include "MidiClient.h"
 #include "mixer.h"
 #include "tooltip.h"
 
@@ -95,18 +93,16 @@ instrumentMidiIOView::instrumentMidiIOView( QWidget * _parent ) :
 			m_outputProgramSpinBox, SLOT( setEnabled( bool ) ) );
 
 
-	if( !engine::getMixer()->getMidiClient()->isRaw() )
+	if( !engine::getMixer()->midiClient()->isRaw() )
 	{
 		m_rpBtn = new QToolButton( m_midiInputGroupBox );
-		m_rpBtn->setText( tr( "MIDI-devices to receive "
-						"MIDI-events from" ) );
+		m_rpBtn->setText( tr( "MIDI devices to receive MIDI events from" ) );
 		m_rpBtn->setIcon( embed::getIconPixmap( "piano" ) );
 		m_rpBtn->setGeometry( 186, 24, 32, 32 );
 		m_rpBtn->setPopupMode( QToolButton::InstantPopup );
 
 		m_wpBtn = new QToolButton( m_midiOutputGroupBox );
-		m_wpBtn->setText( tr( "MIDI-devices to send MIDI-events "
-								"to" ) );
+		m_wpBtn->setText( tr( "MIDI devices to send MIDI events to" ) );
 		m_wpBtn->setIcon( embed::getIconPixmap( "piano" ) );
 		m_wpBtn->setGeometry( 186, 24, 32, 32 );
 		m_wpBtn->setPopupMode( QToolButton::InstantPopup );
@@ -123,9 +119,9 @@ instrumentMidiIOView::~instrumentMidiIOView()
 
 
 
-void instrumentMidiIOView::modelChanged( void )
+void instrumentMidiIOView::modelChanged()
 {
-	midiPort * mp = castModel<midiPort>();
+	MidiPort * mp = castModel<MidiPort>();
 
 	m_midiInputGroupBox->setModel( &mp->m_readableModel );
 	m_inputChannelSpinBox->setModel( &mp->m_inputChannelModel );

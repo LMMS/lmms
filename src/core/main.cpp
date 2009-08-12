@@ -58,7 +58,7 @@
 #include "import_filter.h"
 #include "lmms_style.h"
 #include "main_window.h"
-#include "project_renderer.h"
+#include "ProjectRenderer.h"
 #include "song.h"
 
 #warning TODO: move somewhere else
@@ -117,9 +117,9 @@ int main( int argc, char * * argv )
 
 
 	mixer::qualitySettings qs( mixer::qualitySettings::Mode_HighQuality );
-	projectRenderer::outputSettings os( 44100, false, 160,
-						projectRenderer::Depth_16Bit );
-	projectRenderer::ExportFileFormats eff = projectRenderer::WaveFile;
+	ProjectRenderer::OutputSettings os( 44100, false, 160,
+						ProjectRenderer::Depth_16Bit );
+	ProjectRenderer::ExportFileFormats eff = ProjectRenderer::WaveFile;
 
 
 	for( int i = 1; i < argc; ++i )
@@ -207,12 +207,12 @@ int main( int argc, char * * argv )
 			const QString ext = QString( argv[i + 1] );
 			if( ext == "wav" )
 			{
-				eff = projectRenderer::WaveFile;
+				eff = ProjectRenderer::WaveFile;
 			}
 #ifdef LMMS_HAVE_OGGVORBIS
 			else if( ext == "ogg" )
 			{
-				eff = projectRenderer::OggFile;
+				eff = ProjectRenderer::OggFile;
 			}
 #endif
 			else
@@ -463,10 +463,10 @@ int main( int argc, char * * argv )
 		if( !render_out.isEmpty() )
 		{
 			// create renderer
-			projectRenderer * r = new projectRenderer( qs, os, eff,
+			ProjectRenderer * r = new ProjectRenderer( qs, os, eff,
 				render_out +
 					QString( ( eff ==
-						projectRenderer::WaveFile ) ?
+						ProjectRenderer::WaveFile ) ?
 							"wav" : "ogg" ) );
 			QCoreApplication::instance()->connect( r,
 					SIGNAL( finished() ), SLOT( quit() ) );

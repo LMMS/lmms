@@ -47,7 +47,7 @@
 #include "tool_button.h"
 #include "tooltip.h"
 #include "visualization_widget.h"
-#include "audio_device.h"
+#include "AudioDevice.h"
 #include "piano_roll.h"
 
 

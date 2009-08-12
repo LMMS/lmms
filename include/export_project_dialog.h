@@ -31,7 +31,7 @@
 
 #include "ui_export_project.h"
 
-class projectRenderer;
+class ProjectRenderer;
 
 
 class exportProjectDialog : public QDialog, public Ui::ExportProjectDialog
@@ -54,7 +54,7 @@ private slots:
 
 private:
 	QString m_fileName;
-	projectRenderer * m_renderer;
+	ProjectRenderer * m_renderer;
 
 } ;
 

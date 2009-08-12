@@ -1,8 +1,8 @@
 /*
  * sample_play_handle.cpp - implementation of class samplePlayHandle
  *
- * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -24,7 +24,7 @@
 
 
 #include "sample_play_handle.h"
-#include "audio_port.h"
+#include "AudioPort.h"
 #include "bb_track.h"
 #include "engine.h"
 #include "instrument_track.h"
@@ -39,7 +39,7 @@ samplePlayHandle::samplePlayHandle( const QString & _sample_file ) :
 	m_sampleBuffer( new sampleBuffer( _sample_file ) ),
 	m_doneMayReturnTrue( true ),
 	m_frame( 0 ),
-	m_audioPort( new audioPort( "samplePlayHandle", false ) ),
+	m_audioPort( new AudioPort( "samplePlayHandle", false ) ),
 	m_ownAudioPort( true ),
 	m_defaultVolumeModel( DefaultVolume, MinVolume, MaxVolume, 1 ),
 	m_volumeModel( &m_defaultVolumeModel ),
@@ -56,7 +56,7 @@ samplePlayHandle::samplePlayHandle( sampleBuffer * _sample_buffer ) :
 	m_sampleBuffer( sharedObject::ref( _sample_buffer ) ),
 	m_doneMayReturnTrue( true ),
 	m_frame( 0 ),
-	m_audioPort( new audioPort( "samplePlayHandle", false ) ),
+	m_audioPort( new AudioPort( "samplePlayHandle", false ) ),
 	m_ownAudioPort( true ),
 	m_defaultVolumeModel( DefaultVolume, MinVolume, MaxVolume, 1 ),
 	m_volumeModel( &m_defaultVolumeModel ),
@@ -73,7 +73,7 @@ samplePlayHandle::samplePlayHandle( sampleTCO * _tco ) :
 	m_sampleBuffer( sharedObject::ref( _tco->getSampleBuffer() ) ),
 	m_doneMayReturnTrue( true ),
 	m_frame( 0 ),
-	m_audioPort( ( (sampleTrack *)_tco->getTrack() )->getAudioPort() ),
+	m_audioPort( ( (sampleTrack *)_tco->getTrack() )->audioPort() ),
 	m_ownAudioPort( false ),
 	m_defaultVolumeModel( DefaultVolume, MinVolume, MaxVolume, 1 ),
 	m_volumeModel( &m_defaultVolumeModel ),
@@ -90,7 +90,7 @@ samplePlayHandle::samplePlayHandle( pattern * _pattern ) :
 	m_sampleBuffer( sharedObject::ref( _pattern->getFrozenPattern() ) ),
 	m_doneMayReturnTrue( true ),
 	m_frame( 0 ),
-	m_audioPort( _pattern->getInstrumentTrack()->getAudioPort() ),
+	m_audioPort( _pattern->getInstrumentTrack()->audioPort() ),
 	m_ownAudioPort( false ),
 	m_defaultVolumeModel( DefaultVolume, MinVolume, MaxVolume, 1 ),
 	m_volumeModel( &m_defaultVolumeModel ),

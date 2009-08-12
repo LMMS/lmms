@@ -1,11 +1,9 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * preset_preview_play_handle.cpp - implementation of class
  *                                  presetPreviewPlayHandle
  *
  * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -25,7 +23,6 @@
  *
  */
 
-
 #include <QtCore/QFileInfo>
 #include <QtCore/QMutexLocker>
 
@@ -34,7 +31,7 @@
 #include "engine.h"
 #include "instrument.h"
 #include "instrument_track.h"
-#include "midi_port.h"
+#include "MidiPort.h"
 #include "mmp.h"
 #include "note_play_handle.h"
 #include "project_journal.h"
@@ -46,7 +43,7 @@
 class previewTrackContainer : public trackContainer
 {
 public:
-	previewTrackContainer( void ) :
+	previewTrackContainer() :
 		m_previewInstrumentTrack( NULL ),
 		m_previewNote( NULL ),
 		m_dataMutex()
@@ -62,19 +59,19 @@ public:
 	{
 	}
 
-	virtual QString nodeName( void ) const
+	virtual QString nodeName() const
 	{
-		return( "bbtrackcontainer" );
+		return "bbtrackcontainer";
 	}
 
-	instrumentTrack * previewInstrumentTrack( void )
+	instrumentTrack * previewInstrumentTrack()
 	{
-		return( m_previewInstrumentTrack );
+		return m_previewInstrumentTrack;
 	}
 
-	notePlayHandle * previewNote( void )
+	notePlayHandle * previewNote()
 	{
-		return( m_previewNote );
+		return m_previewNote;
 	}
 
 	void setPreviewNote( notePlayHandle * _note )
@@ -82,12 +79,12 @@ public:
 		m_previewNote = _note;
 	}
 
-	void lockData( void )
+	void lockData()
 	{
 		m_dataMutex.lock();
 	}
 
-	void unlockData( void )
+	void unlockData()
 	{
 		m_dataMutex.unlock();
 	}
@@ -153,7 +150,7 @@ presetPreviewPlayHandle::presetPreviewPlayHandle( const QString & _preset_file,
 	// make sure, our preset-preview-track does not appear in any MIDI-
 	// devices list, so just disable receiving/sending MIDI-events at all
 	s_previewTC->previewInstrumentTrack()->
-				getMidiPort()->setMode( midiPort::Disabled );
+				midiPort()->setMode( MidiPort::Disabled );
 
 	// create note-play-handle for it
 	m_previewNote = new notePlayHandle(
@@ -195,9 +192,9 @@ void presetPreviewPlayHandle::play( sampleFrame * _working_buffer )
 
 
 
-bool presetPreviewPlayHandle::done( void ) const
+bool presetPreviewPlayHandle::done() const
 {
-	return( m_previewNote->isMuted() );
+	return m_previewNote->isMuted();
 }
 
 
@@ -205,13 +202,13 @@ bool presetPreviewPlayHandle::done( void ) const
 
 bool presetPreviewPlayHandle::isFromTrack( const track * _track ) const
 {
-	return( s_previewTC->previewInstrumentTrack() == _track );
+	return s_previewTC->previewInstrumentTrack() == _track;
 }
 
 
 
 
-void presetPreviewPlayHandle::init( void )
+void presetPreviewPlayHandle::init()
 {
 	if( !s_previewTC )
 	{
@@ -222,7 +219,7 @@ void presetPreviewPlayHandle::init( void )
 
 
 
-void presetPreviewPlayHandle::cleanup( void )
+void presetPreviewPlayHandle::cleanup()
 {
 	delete s_previewTC;
 	s_previewTC = NULL;
@@ -242,11 +239,7 @@ ConstNotePlayHandleList presetPreviewPlayHandle::nphsOfInstrumentTrack(
 		cnphv.push_back( s_previewTC->previewNote() );
 	}
 	s_previewTC->unlockData();
-	return( cnphv );
+	return cnphv;
 }
 
 
-
-
-
-#endif

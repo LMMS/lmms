@@ -34,7 +34,7 @@ class bbTrack;
 class pattern;
 class sampleTCO;
 class track;
-class audioPort;
+class AudioPort;
 
 
 class samplePlayHandle : public playHandle
@@ -85,7 +85,7 @@ private:
 	f_cnt_t m_frame;
 	sampleBuffer::handleState m_state;
 
-	audioPort * m_audioPort;
+	AudioPort * m_audioPort;
 	const bool m_ownAudioPort;
 
 	floatModel m_defaultVolumeModel;

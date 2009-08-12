@@ -2,7 +2,7 @@
  * song.cpp - root of the model-tree
  *
  * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -47,14 +47,14 @@
 #include "import_filter.h"
 #include "instrument_track.h"
 #include "main_window.h"
-#include "midi_client.h"
+#include "MidiClient.h"
 #include "mmp.h"
 #include "note_play_handle.h"
 #include "pattern.h"
 #include "piano_roll.h"
 #include "project_journal.h"
 #include "project_notes.h"
-#include "project_renderer.h"
+#include "ProjectRenderer.h"
 #include "rename_dialog.h"
 #include "song_editor.h"
 #include "templates.h"
@@ -66,7 +66,7 @@ tick_t midiTime::s_ticksPerTact = DefaultTicksPerTact;
 
 
 
-song::song( void ) :
+song::song() :
 	trackContainer(),
 	m_globalAutomationTrack( dynamic_cast<automationTrack *>(
 				track::create( track::HiddenAutomationTrack,
@@ -123,7 +123,7 @@ song::~song()
 
 
 
-void song::masterVolumeChanged( void )
+void song::masterVolumeChanged()
 {
 	engine::getMixer()->setMasterGain( m_masterVolumeModel.value() /
 								100.0f );
@@ -132,7 +132,7 @@ void song::masterVolumeChanged( void )
 
 
 
-void song::setTempo( void )
+void song::setTempo()
 {
 	const bpm_t tempo = (bpm_t) m_tempoModel.value();
 	engine::getMixer()->lock();
@@ -156,7 +156,7 @@ void song::setTempo( void )
 
 
 
-void song::setTimeSignature( void )
+void song::setTimeSignature()
 {
 	midiTime::setTicksPerTact( ticksPerTact() );
 	emit timeSignatureChanged( m_oldTicksPerTact, ticksPerTact() );
@@ -167,7 +167,7 @@ void song::setTimeSignature( void )
 
 
 
-void song::doActions( void )
+void song::doActions()
 {
 	while( !m_actions.empty() )
 	{
@@ -281,7 +281,7 @@ void song::doActions( void )
 
 
 
-void song::processNextBuffer( void )
+void song::processNextBuffer()
 {
 	doActions();
 
@@ -467,7 +467,7 @@ void song::processNextBuffer( void )
 
 
 
-bool song::realTimeTask( void ) const
+bool song::realTimeTask() const
 {
 	return !( m_exporting == true || ( m_playMode == Mode_PlayPattern &&
 		  	m_patternToPlay != NULL &&
@@ -477,7 +477,7 @@ bool song::realTimeTask( void ) const
 
 
 
-void song::play( void )
+void song::play()
 {
 	m_recording = false;
 	if( m_playing == true )
@@ -500,7 +500,7 @@ void song::play( void )
 
 
 
-void song::record( void )
+void song::record()
 {
 	m_recording = true;
 	// TODO: Implement
@@ -509,7 +509,7 @@ void song::record( void )
 
 
 
-void song::playAndRecord( void )
+void song::playAndRecord()
 {
 	play();
 	m_recording = true;
@@ -532,7 +532,7 @@ void song::playTrack( track * _trackToPlay )
 
 
 
-void song::playBB( void )
+void song::playBB()
 {
 	if( m_playing == true )
 	{
@@ -561,7 +561,7 @@ void song::playPattern( pattern * _patternToPlay, bool _loop )
 
 
 
-void song::updateLength( void )
+void song::updateLength()
 {
 	m_length = 0;
 	m_tracksMutex.lockForRead();
@@ -591,7 +591,7 @@ void song::setPlayPos( tick_t _ticks, PlayModes _play_mode )
 
 
 
-void song::stop( void )
+void song::stop()
 {
 	m_actions.push_back( ActionStop );
 }
@@ -601,7 +601,7 @@ void song::stop( void )
 
 
 
-void song::pause( void )
+void song::pause()
 {
 	m_actions.push_back( ActionPause );
 }
@@ -609,7 +609,7 @@ void song::pause( void )
 
 
 
-void song::resumeFromPause( void )
+void song::resumeFromPause()
 {
 	m_actions.push_back( ActionResumeFromPause );
 }
@@ -617,7 +617,7 @@ void song::resumeFromPause( void )
 
 
 
-void song::startExport( void )
+void song::startExport()
 {
 	stop();
 	doActions();
@@ -631,7 +631,7 @@ void song::startExport( void )
 
 
 
-void song::stopExport( void )
+void song::stopExport()
 {
 	stop();
 	m_exporting = false;
@@ -640,7 +640,7 @@ void song::stopExport( void )
 
 
 
-void song::insertBar( void )
+void song::insertBar()
 {
 	m_tracksMutex.lockForRead();
 	for( trackList::const_iterator it = tracks().begin();
@@ -654,7 +654,7 @@ void song::insertBar( void )
 
 
 
-void song::removeBar( void )
+void song::removeBar()
 {
 	m_tracksMutex.lockForRead();
 	for( trackList::const_iterator it = tracks().begin();
@@ -668,7 +668,7 @@ void song::removeBar( void )
 
 
 
-void song::addBBTrack( void )
+void song::addBBTrack()
 {
 	engine::getMixer()->lock();
 	track * t = track::create( track::BBTrack, this );
@@ -680,7 +680,7 @@ void song::addBBTrack( void )
 
 
 
-void song::addSampleTrack( void )
+void song::addSampleTrack()
 {
 	engine::getMixer()->lock();
 	(void) track::create( track::SampleTrack, this );
@@ -690,7 +690,7 @@ void song::addSampleTrack( void )
 
 
 
-void song::addAutomationTrack( void )
+void song::addAutomationTrack()
 {
 	engine::getMixer()->lock();
 	(void) track::create( track::AutomationTrack, this );
@@ -700,7 +700,7 @@ void song::addAutomationTrack( void )
 
 
 
-bpm_t song::getTempo( void )
+bpm_t song::getTempo()
 {
 	return (bpm_t) m_tempoModel.value();
 }
@@ -708,7 +708,7 @@ bpm_t song::getTempo( void )
 
 
 
-automationPattern * song::tempoAutomationPattern( void )
+automationPattern * song::tempoAutomationPattern()
 {
 	return automationPattern::globalAutomationPattern( &m_tempoModel );
 }
@@ -716,7 +716,7 @@ automationPattern * song::tempoAutomationPattern( void )
 
 
 
-void song::clearProject( void )
+void song::clearProject()
 {
 	engine::getProjectJournal()->setJournalling( false );
 
@@ -779,7 +779,7 @@ void song::clearProject( void )
 
 
 // create new file
-void song::createNewProject( void )
+void song::createNewProject()
 {
 	QString default_template = configManager::inst()->userProjectsDir()
 						+ "templates/default.mpt";
@@ -996,7 +996,7 @@ void song::loadProject( const QString & _file_name )
 
 
 // save current song
-bool song::saveProject( void )
+bool song::saveProject()
 {
 	multimediaProject mmp( multimediaProject::SongProject );
 
@@ -1069,7 +1069,7 @@ bool song::saveProjectAs( const QString & _file_name )
 
 
 
-void song::importProject( void )
+void song::importProject()
 {
 	QFileDialog ofd( NULL, tr( "Import file" ),
 			configManager::inst()->userProjectsDir(),
@@ -1112,7 +1112,7 @@ void song::restoreControllerStates( const QDomElement & _this )
 
 
 
-void song::exportProject( void )
+void song::exportProject()
 {
 	if( isEmpty() )
 	{
@@ -1130,7 +1130,7 @@ void song::exportProject( void )
 	int idx = 0;
 	QStringList types;
 	while( __fileEncodeDevices[idx].m_fileFormat !=
-					projectRenderer::NumFileFormats )
+					ProjectRenderer::NumFileFormats )
 	{
 		types << tr( __fileEncodeDevices[idx].m_description );
 		++idx;
@@ -1138,7 +1138,7 @@ void song::exportProject( void )
 	efd.setFilters( types );
 
 	QString base_filename;
-	if( m_fileName != "" )
+	if( !m_fileName.isEmpty() )
 	{
 		efd.setDirectory( QFileInfo( m_fileName ).absolutePath() );
 		base_filename = QFileInfo( m_fileName ).completeBaseName();
@@ -1152,7 +1152,7 @@ void song::exportProject( void )
 	efd.setWindowTitle( tr( "Select file for project-export..." ) );
 
 	if( efd.exec() == QDialog::Accepted &&
-		!efd.selectedFiles().isEmpty() && efd.selectedFiles()[0] != "" )
+		!efd.selectedFiles().isEmpty() && !efd.selectedFiles()[0].isEmpty() )
 	{
 		const QString export_file_name = efd.selectedFiles()[0];
 		exportProjectDialog epd( export_file_name,
@@ -1164,7 +1164,7 @@ void song::exportProject( void )
 
 
 
-void song::updateFramesPerTick( void )
+void song::updateFramesPerTick()
 {
 	engine::updateFramesPerTick();
 }
@@ -1172,7 +1172,7 @@ void song::updateFramesPerTick( void )
 
 
 
-void song::setModified( void )
+void song::setModified()
 {
 	if( !m_loadingProject )
 	{

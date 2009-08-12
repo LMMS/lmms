@@ -3,7 +3,7 @@
  *                        rendering engine
  *
  * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -30,7 +30,7 @@
 #include "detuning_helper.h"
 #include "instrument_sound_shaping.h"
 #include "instrument_track.h"
-#include "midi_port.h"
+#include "MidiPort.h"
 #include "song.h"
 
 
@@ -104,7 +104,7 @@ notePlayHandle::notePlayHandle( instrumentTrack * _it,
 	{
 		// send MIDI-note-on-event
 		m_instrumentTrack->processOutEvent( midiEvent( MidiNoteOn,
-			m_instrumentTrack->getMidiPort()->realOutputChannel(),
+			m_instrumentTrack->midiPort()->realOutputChannel(),
 			key(), getMidiVelocity() ),
 				midiTime::fromFrames( offset(),
 						engine::framesPerTick() ) );
@@ -151,7 +151,7 @@ void notePlayHandle::setVolume( const volume_t _volume )
 {
 	note::setVolume( _volume );
 	m_instrumentTrack->processOutEvent( midiEvent( MidiKeyPressure,
-			m_instrumentTrack->getMidiPort()->realOutputChannel(),
+			m_instrumentTrack->midiPort()->realOutputChannel(),
 						key(), getMidiVelocity() ), 0 );
 	
 }
@@ -159,7 +159,7 @@ void notePlayHandle::setVolume( const volume_t _volume )
 
 
 
-int notePlayHandle::getMidiVelocity( void ) const
+int notePlayHandle::getMidiVelocity() const
 {
 	int vel = getVolume();
 	if( m_instrumentTrack->getVolume() < DefaultVolume )
@@ -281,7 +281,7 @@ void notePlayHandle::play( sampleFrame * _working_buffer )
 
 
 
-f_cnt_t notePlayHandle::framesLeft( void ) const
+f_cnt_t notePlayHandle::framesLeft() const
 {
 	if( m_released && actualReleaseFramesToDo() == 0 )
 	{
@@ -329,7 +329,7 @@ void notePlayHandle::noteOff( const f_cnt_t _s )
 	{
 		// send MIDI-note-off-event
 		m_instrumentTrack->processOutEvent( midiEvent( MidiNoteOff,
-			m_instrumentTrack->getMidiPort()->realOutputChannel(),
+			m_instrumentTrack->midiPort()->realOutputChannel(),
 								key(), 0 ),
 			midiTime::fromFrames( m_framesBeforeRelease,
 						engine::framesPerTick() ) );
@@ -341,7 +341,7 @@ void notePlayHandle::noteOff( const f_cnt_t _s )
 
 
 
-f_cnt_t notePlayHandle::actualReleaseFramesToDo( void ) const
+f_cnt_t notePlayHandle::actualReleaseFramesToDo() const
 {
 	return m_instrumentTrack->m_soundShaping.releaseFrames(/*
 							isArpeggioBaseNote()*/ );
@@ -371,7 +371,7 @@ float notePlayHandle::volumeLevel( const f_cnt_t _frame )
 
 
 
-bool notePlayHandle::isArpeggioBaseNote( void ) const
+bool notePlayHandle::isArpeggioBaseNote() const
 {
 	return isBaseNote() && ( m_partOfArpeggio ||
 			m_instrumentTrack->arpeggiatorEnabled() );
@@ -380,7 +380,7 @@ bool notePlayHandle::isArpeggioBaseNote( void ) const
 
 
 
-void notePlayHandle::mute( void )
+void notePlayHandle::mute()
 {
 	// mute all sub-notes
 	for( NotePlayHandleList::Iterator it = m_subNotes.begin();
@@ -394,7 +394,7 @@ void notePlayHandle::mute( void )
 
 
 
-int notePlayHandle::index( void ) const
+int notePlayHandle::index() const
 {
 	const PlayHandleList & playHandles =
 					engine::getMixer()->playHandles();
@@ -465,7 +465,7 @@ bool notePlayHandle::operator==( const notePlayHandle & _nph ) const
 
 
 
-void notePlayHandle::updateFrequency( void )
+void notePlayHandle::updateFrequency()
 {
 	const float pitch =
 		( key() - m_instrumentTrack->baseNoteModel()->value() +

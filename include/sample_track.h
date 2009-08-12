@@ -2,8 +2,8 @@
  * sample_track.h - class sampleTrack, a track which provides arrangement of
  *                  samples
  *
- * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -23,13 +23,12 @@
  *
  */
 
-
 #ifndef _SAMPLE_TRACK_H
 #define _SAMPLE_TRACK_H
 
 #include <QtGui/QDialog>
 
-#include "audio_port.h"
+#include "AudioPort.h"
 #include "track.h"
 
 class effectRackView;
@@ -46,21 +45,21 @@ public:
 	virtual ~sampleTCO();
 
 	virtual void changeLength( const midiTime & _length );
-	const QString & sampleFile( void ) const;
+	const QString & sampleFile() const;
 
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
 	virtual void loadSettings( const QDomElement & _this );
-	inline virtual QString nodeName( void ) const
+	inline virtual QString nodeName() const
 	{
-		return( "sampletco" );
+		return "sampletco";
 	}
 
-	sampleBuffer * getSampleBuffer( void )
+	sampleBuffer * getSampleBuffer()
 	{
-		return( m_sampleBuffer );
+		return m_sampleBuffer;
 	}
 
-	midiTime sampleLength( void ) const;
+	midiTime sampleLength() const;
 
 	virtual trackContentObjectView * createView( trackView * _tv );
 
@@ -69,7 +68,7 @@ public slots:
 	void setSampleBuffer( sampleBuffer * _sb );
 	void setSampleFile( const QString & _sf );
 	void updateLength( bpm_t = 0 );
-	void toggleRecord( void );
+	void toggleRecord();
 
 
 private:
@@ -81,7 +80,7 @@ private:
 
 
 signals:
-	void sampleChanged( void );
+	void sampleChanged();
 
 } ;
 
@@ -96,7 +95,7 @@ public:
 
 
 public slots:
-	void updateSample( void );
+	void updateSample();
 
 
 protected:
@@ -134,19 +133,19 @@ public:
 							QDomElement & _parent );
 	virtual void loadTrackSpecificSettings( const QDomElement & _this );
 
-	inline audioPort * getAudioPort( void )
+	inline AudioPort * audioPort()
 	{
-		return( &m_audioPort );
+		return &m_audioPort;
 	}
 
-	virtual QString nodeName( void ) const
+	virtual QString nodeName() const
 	{
-		return( "sampletrack" );
+		return "sampletrack";
 	}
 
 
 private:
-	audioPort m_audioPort;
+	AudioPort m_audioPort;
 	floatModel m_volumeModel;
 
 
@@ -165,7 +164,7 @@ public:
 
 
 public slots:
-	void showEffects( void );
+	void showEffects();
 
 
 private:
