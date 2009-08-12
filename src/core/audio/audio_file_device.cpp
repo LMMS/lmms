@@ -25,9 +25,11 @@
 
 
 #include <QtGui/QMessageBox>
+#include <QtDebug>
 
 #include "audio_file_device.h"
 #include "export_project_dialog.h"
+#include "engine.h"
 
 
 audioFileDevice::audioFileDevice( const sample_rate_t _sample_rate,
@@ -51,17 +53,24 @@ audioFileDevice::audioFileDevice( const sample_rate_t _sample_rate,
 
 	if( m_outputFile.open( QFile::WriteOnly | QFile::Truncate ) == FALSE )
 	{
-		QMessageBox::critical( NULL,
-			exportProjectDialog::tr( "Could not open file" ),
-			exportProjectDialog::tr( "Could not open file %1 "
-						"for writing.\nPlease make "
-						"sure you have write-"
-						"permission to the file and "
-						"the directory containing the "
-						"file and try again!" ).arg(
-									_file ),
-					QMessageBox::Ok,
-					QMessageBox::NoButton );
+        QString warningMessage = exportProjectDialog::tr( 
+                            "Could not open file %1 "
+                            "for writing.\nPlease make "
+                            "sure you have write-"
+                            "permission to the file and "
+                            "the directory containing the "
+                            "file and try again!" ).arg( _file );
+        if( engine::hasGUI() ){
+            QMessageBox::critical( NULL,
+                exportProjectDialog::tr( "Could not open file" ),
+                warningMessage,
+                        QMessageBox::Ok,
+                        QMessageBox::NoButton );
+        }
+        else
+        {
+            qWarning() << warningMessage;
+        }
 	}
 }
 

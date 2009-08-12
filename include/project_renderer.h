@@ -28,6 +28,7 @@
 #include "audio_file_device.h"
 #include "lmmsconfig.h"
 
+class QTimer;
 
 class projectRenderer : public QThread
 {
@@ -83,6 +84,10 @@ public:
 	static ExportFileFormats getFileFormatFromExtension(
 							const QString & _ext );
 
+	void setConsoleUpdateTimer(QTimer * t)
+	{
+		m_consoleUpdateTimer = t;
+	}
 
 public slots:
 	void startProcessing( void );
@@ -104,6 +109,8 @@ private:
 
 	volatile int m_progress;
 	volatile bool m_abort;
+
+	QTimer * m_consoleUpdateTimer;
 
 } ;
 

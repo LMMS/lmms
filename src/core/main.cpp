@@ -499,6 +499,7 @@ int main( int argc, char * * argv )
 
 			// timer for progress-updates
 			QTimer * t = new QTimer( r );
+			r->setConsoleUpdateTimer(t);
 			r->connect( t, SIGNAL( timeout() ),
 					SLOT( updateConsoleProgress() ) );
 			t->start( 200 );

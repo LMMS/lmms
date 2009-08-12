@@ -24,6 +24,7 @@
 
 
 #include <QtCore/QFile>
+#include <QTimer>
 
 #include "project_renderer.h"
 #include "song.h"
@@ -213,6 +214,14 @@ void projectRenderer::updateConsoleProgress( void )
 	static int rot = 0;
 	char buf[80];
 	char prog[cols+1];
+
+    if( m_fileDev == NULL ){
+        qWarning("Error occured. Aborting render.");
+        m_consoleUpdateTimer->stop();
+        delete m_consoleUpdateTimer;
+        // TODO: kill the program. I can't figure out how to do it...
+        return;
+    }
 
 	for( int i = 0; i < cols; ++i )
 	{
