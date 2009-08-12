@@ -2,7 +2,7 @@
  * audio_jack.cpp - support for JACK-transport
  *
  * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -213,13 +213,6 @@ void audioJACK::startProcessing( void )
 	m_active = true;
 
 
-	// make sure, JACK transport is rolling
-	if( jack_transport_query( m_client, NULL ) != JackTransportRolling )
-	{
-		jack_transport_start( m_client );
-	}
-
-
 	// try to sync JACK's and LMMS's buffer-size
 //	jack_set_buffer_size( m_client, getMixer()->framesPerPeriod() );
 
@@ -343,8 +336,6 @@ void audioJACK::renamePort( audioPort * _port )
 
 int audioJACK::processCallback( jack_nframes_t _nframes, void * _udata )
 {
-	jack_transport_state_t ts = jack_transport_query( m_client, NULL );
-
 	QVector<jack_default_audio_sample_t *> outbufs( channels(), NULL );
 	ch_cnt_t chnl = 0;
 	for( QVector<jack_default_audio_sample_t *>::iterator it =
@@ -385,19 +376,16 @@ int audioJACK::processCallback( jack_nframes_t _nframes, void * _udata )
 						_nframes,
 						m_framesToDoInCurBuf -
 							m_framesDoneInCurBuf );
-		if( ts == JackTransportRolling )
+		const float gain = getMixer()->masterGain();
+		for( ch_cnt_t chnl = 0; chnl < channels(); ++chnl )
 		{
-			const float gain = getMixer()->masterGain();
-			for( ch_cnt_t chnl = 0; chnl < channels(); ++chnl )
+			jack_default_audio_sample_t * o = outbufs[chnl];
+			for( jack_nframes_t frame = 0; frame < todo;
+							++frame )
 			{
-				jack_default_audio_sample_t * o = outbufs[chnl];
-				for( jack_nframes_t frame = 0; frame < todo;
-								++frame )
-				{
-					o[done+frame] = 
-						m_outBuf[m_framesDoneInCurBuf+
-							frame][chnl] * gain;
-				}
+				o[done+frame] =
+					m_outBuf[m_framesDoneInCurBuf+
+						frame][chnl] * gain;
 			}
 		}
 		done += todo;
@@ -414,7 +402,7 @@ int audioJACK::processCallback( jack_nframes_t _nframes, void * _udata )
 		}
 	}
 
-	if( ts != JackTransportRolling || m_stopped == true )
+	if( m_stopped == true )
 	{
 		for( ch_cnt_t ch = 0; ch < channels(); ++ch )
 		{
