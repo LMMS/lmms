@@ -19,6 +19,7 @@
 #cmakedefine LMMS_HAVE_STK
 #cmakedefine LMMS_HAVE_VST
 #cmakedefine LMMS_HAVE_ZIP
+#cmakedefine LMMS_HAVE_FLAC
 
 #cmakedefine LMMS_HAVE_STDINT_H
 #cmakedefine LMMS_HAVE_STDBOOL_H

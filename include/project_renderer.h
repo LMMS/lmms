@@ -39,6 +39,7 @@ public:
 		WaveFile,
 		OggFile,
 		Mp3File,
+		FlacFile,
 		NumFileFormats
 	} ;
 
