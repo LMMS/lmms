@@ -6,12 +6,12 @@
 #  FLAC_LIBRARIES       - list of libraries when using libflac++
 #  FLAC_FOUND           - True if libflac++ found.
 
-FIND_PATH(FLAC_INCLUDE_DIRS all.h /usr/include/FLAC++ /local/usr/include/FLAC++)
-FIND_PATH(FLAC_INCLUDE_DIRS decoder.h /usr/include/FLAC++ /local/usr/include/FLAC++)
-FIND_PATH(FLAC_INCLUDE_DIRS encoder.h /usr/include/FLAC++ /local/usr/include/FLAC++)
-FIND_PATH(FLAC_INCLUDE_DIRS export.h /usr/include/FLAC++ /local/usr/include/FLAC++)
-FIND_PATH(FLAC_INCLUDE_DIRS metadata.h /usr/include/FLAC++ /local/usr/include/FLAC++)
-FIND_LIBRARY(FLAC_LIBRARIES NAMES FLAC++ PATH /usr/lib /usr/local/lib)
+FIND_PATH(FLAC_INCLUDE_DIRS decoder.h /usr/include/FLAC++ /usr/local/include/FLAC++ ${CMAKE_INSTALL_PREFIX}/include/FLAC++ ${CMAKE_INSTALL_PREFIX}/local/include/FLAC++)
+FIND_PATH(FLAC_INCLUDE_DIRS encoder.h /usr/include/FLAC++ /usr/local/include/FLAC++ ${CMAKE_INSTALL_PREFIX}/include/FLAC++ ${CMAKE_INSTALL_PREFIX}/local/include/FLAC++)
+FIND_PATH(FLAC_INCLUDE_DIRS export.h /usr/include/FLAC++ /usr/local/include/FLAC++ ${CMAKE_INSTALL_PREFIX}/include/FLAC++ ${CMAKE_INSTALL_PREFIX}/local/include/FLAC++)
+FIND_PATH(FLAC_INCLUDE_DIRS metadata.h /usr/include/FLAC++ /usr/local/include/FLAC++ ${CMAKE_INSTALL_PREFIX}/include/FLAC++ ${CMAKE_INSTALL_PREFIX}/local/include/FLAC++)
+FIND_PATH(FLAC_INCLUDE_DIRS all.h /usr/include/FLAC++ /usr/local/include/FLAC++ ${CMAKE_INSTALL_PREFIX}/include/FLAC++ ${CMAKE_INSTALL_PREFIX}/local/include/FLAC++)
+FIND_LIBRARY(FLAC_LIBRARIES NAMES FLAC++ PATH /usr/lib /usr/local/lib ${CMAKE_INSTALL_PREFIX}/lib/FLAC++ ${CMAKE_INSTALL_PREFIX}/local/lib/FLAC++)
 
 IF(FLAC_INCLUDE_DIRS AND FLAC_LIBRARIES)
     SET(FLAC_FOUND TRUE)
