@@ -39,6 +39,19 @@
 const int EventPollTimeOut = 250;
 
 
+// static helper functions
+static QString __portName( snd_seq_client_info_t * _cinfo,
+								snd_seq_port_info_t * _pinfo )
+{
+	return QString( "%1:%2 %3:%4" ).
+					arg( snd_seq_port_info_get_client( _pinfo ) ).
+					arg( snd_seq_port_info_get_port( _pinfo ) ).
+					arg( snd_seq_client_info_get_name( _cinfo ) ).
+					arg( snd_seq_port_info_get_name( _pinfo ) );
+}
+
+
+
 MidiAlsaSeq::MidiAlsaSeq() :
 	MidiClient(),
 	m_seqHandle( NULL ),
@@ -548,8 +561,8 @@ void MidiAlsaSeq::changeQueueTempo( bpm_t _bpm )
 
 void MidiAlsaSeq::updatePortList()
 {
-	QStringList readable_ports;
-	QStringList writable_ports;
+	QStringList readablePorts;
+	QStringList writablePorts;
 
 	// get input- and output-ports
 	snd_seq_client_info_t * cinfo;
@@ -574,16 +587,7 @@ void MidiAlsaSeq::updatePortList()
 					( SND_SEQ_PORT_CAP_READ |
 					  	SND_SEQ_PORT_CAP_SUBS_READ ) )
 			{
-				readable_ports.push_back( 
-					QString( "%1:%2 %3:%4" ).
-					arg( snd_seq_port_info_get_client(
-								pinfo ) ).
-					arg( snd_seq_port_info_get_port(
-								pinfo ) ).
-					arg( snd_seq_client_info_get_name(
-								cinfo ) ).
-					arg( snd_seq_port_info_get_name(
-								pinfo ) ) );
+				readablePorts.push_back( __portName( cinfo, pinfo ) );
 			}
 			if( ( snd_seq_port_info_get_capability( pinfo )
 			     & ( SND_SEQ_PORT_CAP_WRITE |
@@ -591,16 +595,7 @@ void MidiAlsaSeq::updatePortList()
 					( SND_SEQ_PORT_CAP_WRITE |
 					  	SND_SEQ_PORT_CAP_SUBS_WRITE ) )
 			{
-				writable_ports.push_back( 
-					QString( "%1:%2 %3:%4" ).
-					arg( snd_seq_port_info_get_client(
-								pinfo ) ).
-					arg( snd_seq_port_info_get_port(
-								pinfo ) ).
-					arg( snd_seq_client_info_get_name(
-								cinfo ) ).
-					arg( snd_seq_port_info_get_name(
-								pinfo ) ) );
+				writablePorts.push_back( __portName( cinfo, pinfo ) );
 			}
 		}
 	}
@@ -608,15 +603,15 @@ void MidiAlsaSeq::updatePortList()
 	snd_seq_client_info_free( cinfo );
 	snd_seq_port_info_free( pinfo );
 
-	if( m_readablePorts != readable_ports )
+	if( m_readablePorts != readablePorts )
 	{
-		m_readablePorts = readable_ports;
+		m_readablePorts = readablePorts;
 		emit readablePortsChanged();
 	}
 
-	if( m_writablePorts != writable_ports )
+	if( m_writablePorts != writablePorts )
 	{
-		m_writablePorts = writable_ports;
+		m_writablePorts = writablePorts;
 		emit writablePortsChanged();
 	}
 }
