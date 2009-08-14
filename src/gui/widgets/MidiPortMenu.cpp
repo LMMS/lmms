@@ -53,14 +53,14 @@ void MidiPortMenu::modelChanged()
 	if( m_mode == MidiPort::Input )
 	{
 		connect( mp, SIGNAL( readablePortsChanged() ),
-				this, SLOT( updatePorts() ) );
+				this, SLOT( updateMenu() ) );
 	}
 	else if( m_mode == MidiPort::Output )
 	{
 		connect( mp, SIGNAL( writablePortsChanged() ),
-				this, SLOT( updatePorts() ) );
+				this, SLOT( updateMenu() ) );
 	}
-	updatePorts();
+	updateMenu();
 }
 
 
@@ -83,7 +83,7 @@ void MidiPortMenu::activatedPort( QAction * _item )
 
 
 
-void MidiPortMenu::updatePorts()
+void MidiPortMenu::updateMenu()
 {
 	MidiPort * mp = castModel<MidiPort>();
 	const MidiPort::Map & map = ( m_mode == MidiPort::Input ) ?
