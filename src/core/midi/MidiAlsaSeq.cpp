@@ -112,7 +112,7 @@ MidiAlsaSeq::~MidiAlsaSeq()
 QString MidiAlsaSeq::probeDevice()
 {
 	QString dev = configManager::inst()->value( "Midialsaseq", "device" );
-	if( dev == "" )
+	if( dev.isEmpty() )
 	{
 		if( getenv( "MIDIDEV" ) != NULL )
 		{
@@ -241,7 +241,7 @@ void MidiAlsaSeq::applyPortMode( MidiPort * _port )
 				m_portIDs[_port][i] =
 						snd_seq_create_simple_port(
 							m_seqHandle,
-				_port->displayName().toAscii().constData(),
+				_port->displayName().toUtf8().constData(),
 							caps[i],
 						SND_SEQ_PORT_TYPE_MIDI_GENERIC |
 						SND_SEQ_PORT_TYPE_APPLICATION );
@@ -284,7 +284,7 @@ void MidiAlsaSeq::applyPortName( MidiPort * _port )
 		snd_seq_get_port_info( m_seqHandle, m_portIDs[_port][i],
 							port_info );
 		snd_seq_port_info_set_name( port_info,
-				_port->displayName().toAscii().constData() );
+				_port->displayName().toUtf8().constData() );
 		snd_seq_set_port_info( m_seqHandle, m_portIDs[_port][i],
 							port_info );
 		snd_seq_port_info_free( port_info );
