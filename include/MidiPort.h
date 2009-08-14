@@ -115,9 +115,9 @@ public:
 	}
 
 	void subscribeReadablePort( const QString & _port,
-						bool _subscribe = TRUE );
+						bool _subscribe = true );
 	void subscribeWritablePort( const QString & _port,
-						bool _subscribe = TRUE );
+						bool _subscribe = true );
 
 	const Map & readablePorts() const
 	{
@@ -171,7 +171,6 @@ signals:
 	void readablePortsChanged();
 	void writablePortsChanged();
 	void modeChanged();
-
 
 } ;
 

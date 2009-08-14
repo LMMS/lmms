@@ -61,7 +61,7 @@ void MidiWinMM::processOutEvent( const midiEvent & _me,
 						const midiTime & _time,
 						const MidiPort * _port )
 {
-	const DWORD short_msg = ( _me.m_type + _me.channel() ) +
+	const DWORD shortMsg = ( _me.m_type + _me.channel() ) +
 				( ( _me.m_data.m_param[0] & 0xff ) << 8 ) +
 				( ( _me.m_data.m_param[1] & 0xff ) << 16 );
 
@@ -85,7 +85,7 @@ void MidiWinMM::processOutEvent( const midiEvent & _me,
 	{
 		if( out_devs.contains( *it ) )
 		{
-			midiOutShortMsg( it.key(), short_msg );
+			midiOutShortMsg( it.key(), shortMsg );
 		}
 	}
 }
@@ -132,6 +132,19 @@ void MidiWinMM::removePort( MidiPort * _port )
 		it.value().removeAll( _port );
 	}
 	MidiClient::removePort( _port );
+}
+
+
+
+
+QString MidiWinMM::sourcePortName( const midiEvent & _event ) const
+{
+	if( _event.sourcePort() )
+	{
+		return m_inputDevices.value( *static_cast<const HMIDIIN *>(
+														_event.sourcePort() ) );
+	}
+	return MidiClient::sourcePortName( _event );
 }
 
 
@@ -219,25 +232,21 @@ void MidiWinMM::handleInputEvent( HMIDIIN _hm, DWORD _ev )
 			case MidiNoteOff:
 			case MidiKeyPressure:
 				( *it )->processInEvent(
-					midiEvent( cmdtype, chan,
-							par1 - KeysPerOctave,
-							par2 & 0xff ),
-								midiTime() );
+					midiEvent( cmdtype, chan, par1 - KeysPerOctave,
+								par2 & 0xff, &_hm ), midiTime() );
 				break;
 
 			case MidiControlChange:
 			case MidiProgramChange:
 			case MidiChannelPressure:
 				( *it )->processInEvent(
-					midiEvent( cmdtype, chan, par1,
-							par2 & 0xff ),
+					midiEvent( cmdtype, chan, par1, par2 & 0xff, &_hm ),
 								midiTime() );
 				break;
 
 			case MidiPitchBend:
 				( *it )->processInEvent(
-					midiEvent( cmdtype, chan,
-							par1 + par2*128, 0 ),
+					midiEvent( cmdtype, chan, par1 + par2*128, 0, &_hm ),
 								midiTime() );
 				break;
 
