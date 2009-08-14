@@ -477,6 +477,7 @@ void MidiAlsaSeq::run()
 		snd_seq_event_t * ev;
 		if( snd_seq_event_input( m_seqHandle, &ev ) < 0 )
 		{
+			qCritical( "error while fetching MIDI event from sequencer" );
 			break;
 		}
 
