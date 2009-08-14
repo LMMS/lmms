@@ -36,6 +36,8 @@
 
 #ifdef LMMS_HAVE_ALSA
 
+const int EventPollTimeOut = 250;
+
 
 MidiAlsaSeq::MidiAlsaSeq() :
 	MidiClient(),
@@ -95,10 +97,7 @@ MidiAlsaSeq::~MidiAlsaSeq()
 	if( isRunning() )
 	{
 		m_quit = true;
-		// wake up input queue
-		if( write( m_pipe[1], "\n", 1 ) )
-			/* fix warning */;
-		wait( 1000 );
+		wait( EventPollTimeOut*2 );
 
 		snd_seq_stop_queue( m_seqHandle, m_queueID, NULL );
 		snd_seq_free_queue( m_seqHandle, m_queueID );
@@ -405,26 +404,36 @@ void MidiAlsaSeq::run()
 
 	while( m_quit == false )
 	{
-		if( poll( pollfd_set, pollfd_count, -1 ) == -1 )
+		int pollRet = poll( pollfd_set, pollfd_count, EventPollTimeOut );
+		if( pollRet == 0 )
+		{
+			continue;
+		}
+		else if( pollRet == -1 )
 		{
 			// gdb may interrupt the poll
 			if( errno == EINTR )
 			{
 				continue;
 			}
-			perror( __FILE__ ": poll" );
+			qCritical( "error while polling ALSA sequencer handle" );
+			break;
 		}
 		// shutdown?
-		if( pollfd_set[0].revents )
+		if( m_quit )
 		{
 			break;
 		}
 
-		do	// while event queue is not empty
+		// while event queue is not empty
+		while( snd_seq_event_input_pending( m_seqHandle, true ) > 0 )
 		{
 
 		snd_seq_event_t * ev;
-		snd_seq_event_input( m_seqHandle, &ev );
+		if( snd_seq_event_input( m_seqHandle, &ev ) < 0 )
+		{
+			break;
+		}
 
 		MidiPort * dest = NULL;
 		for( int i = 0; i < m_portIDs.size(); ++i )
@@ -515,9 +524,9 @@ void MidiAlsaSeq::run()
 					"ALSA-sequencer: unhandled input "
 						"event %d\n", ev->type );
 				break;
-		}
+		}	// end switch
 
-		} while( snd_seq_event_input_pending( m_seqHandle, 0 ) > 0 );
+		}	// end while
 
 	}
 
