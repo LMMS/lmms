@@ -71,7 +71,7 @@ public:
 		return m_inputDevices.values();
 	}
 
-	virtual QStringList writeblePorts() const
+	virtual QStringList writablePorts() const
 	{
 		return m_outputDevices.values();
 	}
