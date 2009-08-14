@@ -2,7 +2,7 @@
  * remote_plugin.h - base class providing RPC like mechanisms
  *
  * Copyright (c) 2008-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -22,7 +22,6 @@
  *
  */
 
-
 #ifndef _REMOTE_PLUGIN_H
 #define _REMOTE_PLUGIN_H
 
@@ -31,6 +30,7 @@
 
 #include <vector>
 #include <cstdio>
+#include <cstdlib>
 #include <cstring>
 #include <string>
 #include <cassert>
@@ -265,24 +265,24 @@ public:
 		}
 	}
 
-	inline bool isInvalid( void ) const
+	inline bool isInvalid() const
 	{
 		return m_invalid;
 	}
 
-	void invalidate( void )
+	void invalidate()
 	{
 		m_invalid = true;
 	}
 
 	// do we act as master (i.e. not as remote-process?)
-	inline bool isMaster( void ) const
+	inline bool isMaster() const
 	{
 		return m_master;
 	}
 
 	// recursive lock
-	inline void lock( void )
+	inline void lock()
 	{
 		if( !isInvalid() && ++m_lockDepth == 1 )
 		{
@@ -295,7 +295,7 @@ public:
 	}
 
 	// recursive unlock
-	inline void unlock( void )
+	inline void unlock()
 	{
 		if( m_lockDepth > 0 )
 		{
@@ -311,7 +311,7 @@ public:
 	}
 
 	// wait until message-semaphore is available
-	inline void waitForMessage( void )
+	inline void waitForMessage()
 	{
 		if( !isInvalid() )
 		{
@@ -324,7 +324,7 @@ public:
 	}
 
 	// increase message-semaphore
-	inline void messageSent( void )
+	inline void messageSent()
 	{
 #ifdef USE_QT_SEMAPHORES
 		m_messageSem.release();
@@ -334,7 +334,7 @@ public:
 	}
 
 
-	inline int32_t readInt( void )
+	inline int32_t readInt()
 	{
 		int32_t i;
 		read( &i, sizeof( i ) );
@@ -346,7 +346,7 @@ public:
 		write( &_i, sizeof( _i ) );
 	}
 
-	inline std::string readString( void )
+	inline std::string readString()
 	{
 		const int len = readInt();
 		if( len )
@@ -370,7 +370,7 @@ public:
 	}
 
 
-	inline bool messagesLeft( void )
+	inline bool messagesLeft()
 	{
 		if( isInvalid() )
 		{
@@ -389,7 +389,7 @@ public:
 	}
 
 
-	inline int shmKey( void ) const
+	inline int shmKey() const
 	{
 		return m_shmKey;
 	}
@@ -603,14 +603,14 @@ public:
 	virtual ~remotePluginBase();
 
 	void sendMessage( const message & _m );
-	message receiveMessage( void );
+	message receiveMessage();
 
-	inline bool isInvalid( void ) const
+	inline bool isInvalid() const
 	{
 		return m_in->isInvalid() || m_out->isInvalid();
 	}
 
-	inline bool messagesLeft( void )
+	inline bool messagesLeft()
 	{
 		return m_in->messagesLeft();
 	}
@@ -619,14 +619,14 @@ public:
 	message waitForMessage( const message & _m,
 						bool _busy_waiting = false );
 
-	inline message fetchAndProcessNextMessage( void )
+	inline message fetchAndProcessNextMessage()
 	{
 		message m = receiveMessage();
 		processMessage( m );
 		return m;
 	}
 
-	inline void fetchAndProcessAllMessages( void )
+	inline void fetchAndProcessAllMessages()
 	{
 		while( messagesLeft() )
 		{
@@ -638,17 +638,17 @@ public:
 
 
 protected:
-	inline const shmFifo * in( void ) const
+	inline const shmFifo * in() const
 	{
 		return m_in;
 	}
 
-	inline const shmFifo * out( void ) const
+	inline const shmFifo * out() const
 	{
 		return m_out;
 	}
 
-	inline void invalidate( void )
+	inline void invalidate()
 	{
 		m_in->invalidate();
 		m_out->invalidate();
@@ -678,13 +678,13 @@ public:
 	}
 
 
-	void quit( void )
+	void quit()
 	{
 		m_quit = true;
 	}
 
 private:
-	virtual void run( void );
+	virtual void run();
 
 	remotePlugin * m_plugin;
 	volatile bool m_quit;
@@ -699,7 +699,7 @@ public:
 					bool _wait_for_init_done = true );
 	virtual ~remotePlugin();
 
-	inline bool isRunning( void )
+	inline bool isRunning()
 	{
 		return m_process.state() != QProcess::NotRunning;
 	}
@@ -723,26 +723,26 @@ public:
 		unlock();
 	}
 
-	void showUI( void )
+	void showUI()
 	{
 		lock();
 		sendMessage( IdShowUI );
 		unlock();
 	}
 
-	void hideUI( void )
+	void hideUI()
 	{
 		lock();
 		sendMessage( IdHideUI );
 		unlock();
 	}
 
-	inline bool failed( void ) const
+	inline bool failed() const
 	{
 		return m_failed;
 	}
 
-	inline void lock( void )
+	inline void lock()
 	{
 		if( !isInvalid() )
 		{
@@ -750,7 +750,7 @@ public:
 		}
 	}
 
-	inline void unlock( void )
+	inline void unlock()
 	{
 		if( !isInvalid() )
 		{
@@ -767,7 +767,7 @@ protected:
 
 
 private:
-	void resizeSharedProcessingMemory( void );
+	void resizeSharedProcessingMemory();
 
 
 	bool m_initialized;
@@ -813,25 +813,25 @@ public:
 	{
 	}
 
-	inline float * sharedMemory( void )
+	inline float * sharedMemory()
 	{
 		return m_shm;
 	}
 
-	virtual void updateSampleRate( void )
+	virtual void updateSampleRate()
 	{
 	}
 
-	virtual void updateBufferSize( void )
+	virtual void updateBufferSize()
 	{
 	}
 
-	inline sample_rate_t sampleRate( void ) const
+	inline sample_rate_t sampleRate() const
 	{
 		return m_sampleRate;
 	}
 
-	inline fpp_t bufferSize( void ) const
+	inline fpp_t bufferSize() const
 	{
 		return m_bufferSize;
 	}
@@ -848,12 +848,12 @@ public:
 		sendMessage( message( IdChangeOutputCount ).addInt( _i ) );
 	}
 
-	virtual int inputCount( void ) const
+	virtual int inputCount() const
 	{
 		return m_inputCount;
 	}
 
-	virtual int outputCount( void ) const
+	virtual int outputCount() const
 	{
 		return m_outputCount;
 	}
@@ -866,7 +866,7 @@ public:
 
 private:
 	void setShmKey( key_t _key, int _size );
-	void doProcessing( void );
+	void doProcessing();
 
 #ifdef USE_QT_SHMEM
 	QSharedMemory m_shmObj;
@@ -935,7 +935,7 @@ void remotePluginBase::sendMessage( const message & _m )
 
 
 
-remotePluginBase::message remotePluginBase::receiveMessage( void )
+remotePluginBase::message remotePluginBase::receiveMessage()
 {
 	m_in->waitForMessage();
 	m_in->lock();
@@ -1124,7 +1124,7 @@ void remotePluginClient::setShmKey( key_t _key, int _size )
 
 
 
-void remotePluginClient::doProcessing( void )
+void remotePluginClient::doProcessing()
 {
 	if( m_shm != NULL )
 	{
