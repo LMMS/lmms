@@ -50,6 +50,25 @@ static QString __portName( snd_seq_client_info_t * _cinfo,
 					arg( snd_seq_port_info_get_name( _pinfo ) );
 }
 
+static QString __portName( snd_seq_t * _seq, const snd_seq_addr_t * _addr )
+{
+	snd_seq_client_info_t * cinfo;
+	snd_seq_port_info_t * pinfo;
+
+	snd_seq_client_info_malloc( &cinfo );
+	snd_seq_port_info_malloc( &pinfo );
+
+	snd_seq_get_any_port_info( _seq, _addr->client, _addr->port, pinfo );
+	snd_seq_get_any_client_info( _seq, _addr->client, cinfo );
+
+	const QString name = __portName( cinfo, pinfo );
+
+	snd_seq_client_info_free( cinfo );
+	snd_seq_port_info_free( pinfo );
+
+	return name;
+}
+
 
 
 MidiAlsaSeq::MidiAlsaSeq() :
@@ -320,6 +339,20 @@ void MidiAlsaSeq::removePort( MidiPort * _port )
 
 
 
+QString MidiAlsaSeq::sourcePortName( const midiEvent & _event ) const
+{
+	if( _event.sourcePort() )
+	{
+		const snd_seq_addr_t * addr =
+			static_cast<const snd_seq_addr_t *>( _event.sourcePort() );
+		return __portName( m_seqHandle, addr );
+	}
+	return MidiClient::sourcePortName( _event );
+}
+
+
+
+
 void MidiAlsaSeq::subscribeReadablePort( MidiPort * _port,
 						const QString & _dest,
 						bool _subscribe )
@@ -441,19 +474,25 @@ void MidiAlsaSeq::run()
 		// while event queue is not empty
 		while( snd_seq_event_input_pending( m_seqHandle, true ) > 0 )
 		{
-
 		snd_seq_event_t * ev;
 		if( snd_seq_event_input( m_seqHandle, &ev ) < 0 )
 		{
 			break;
 		}
 
+		snd_seq_addr_t * source = NULL;
 		MidiPort * dest = NULL;
 		for( int i = 0; i < m_portIDs.size(); ++i )
 		{
 			if( m_portIDs.values()[i][0] == ev->dest.port )
 			{
 				dest = m_portIDs.keys()[i];
+			}
+			if( ( m_portIDs.values()[i][1] != -1 &&
+					m_portIDs.values()[i][1] == ev->source.port ) ||
+						m_portIDs.values()[i][0] == ev->source.port )
+			{
+				source = &ev->source;
 			}
 		}
 
@@ -469,7 +508,8 @@ void MidiAlsaSeq::run()
 							ev->data.note.channel,
 							ev->data.note.note -
 							KeysPerOctave,
-							ev->data.note.velocity
+							ev->data.note.velocity,
+							source
 							),
 						midiTime( ev->time.tick ) );
 				break;
@@ -479,7 +519,8 @@ void MidiAlsaSeq::run()
 							ev->data.note.channel,
 							ev->data.note.note -
 							KeysPerOctave,
-							ev->data.note.velocity
+							ev->data.note.velocity,
+							source
 							),
 						midiTime( ev->time.tick) );
 				break;
@@ -490,7 +531,8 @@ void MidiAlsaSeq::run()
 							ev->data.note.channel,
 							ev->data.note.note -
 							KeysPerOctave,
-							ev->data.note.velocity
+							ev->data.note.velocity,
+							source
 							), midiTime() );
 				break;
 
@@ -499,7 +541,7 @@ void MidiAlsaSeq::run()
 							MidiControlChange,
 						ev->data.control.channel,
 						ev->data.control.param,
-						ev->data.control.value ),
+						ev->data.control.value, source ),
 								midiTime() );
 				break;
 
@@ -508,7 +550,7 @@ void MidiAlsaSeq::run()
 							MidiProgramChange,
 						ev->data.control.channel,
 						ev->data.control.param,
-						ev->data.control.value ),
+						ev->data.control.value, source ),
 								midiTime() );
 				break;
 
@@ -517,15 +559,15 @@ void MidiAlsaSeq::run()
 							MidiChannelPressure,
 						ev->data.control.channel,
 						ev->data.control.param,
-						ev->data.control.value ),
+						ev->data.control.value, source ),
 								midiTime() );
 				break;
 
 			case SND_SEQ_EVENT_PITCHBEND:
 				dest->processInEvent( midiEvent( MidiPitchBend,
 						ev->data.control.channel,
-						ev->data.control.value + 8192,
-							0 ), midiTime() );
+						ev->data.control.value + 8192, 0, source ),
+								midiTime() );
 				break;
 
 			case SND_SEQ_EVENT_SENSING:

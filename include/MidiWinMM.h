@@ -77,6 +77,9 @@ public:
 	}
 #endif
 
+	// return name of port which specified MIDI event came from
+	virtual QString sourcePortName( const midiEvent & ) const;
+
 	// (un)subscribe given MidiPort to/from destination-port 
 	virtual void subscribeReadablePort( MidiPort * _port,
 						const QString & _dest,

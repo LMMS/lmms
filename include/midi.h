@@ -95,21 +95,25 @@ struct midiEvent
 	midiEvent( MidiEventTypes _type = MidiActiveSensing,
 			Sint8 _channel = 0,
 			Sint16 _param1 = 0,
-			Sint16 _param2 = 0 ) :
+			Sint16 _param2 = 0,
+			const void * _sourcePort = NULL ) :
 		m_type( _type ),
 		m_metaEvent( MidiMetaInvalid ),
 		m_channel( _channel ),
-		m_sysExData( NULL )
+		m_sysExData( NULL ),
+		m_sourcePort( _sourcePort )
 	{
 		m_data.m_param[0] = _param1;
 		m_data.m_param[1] = _param2;
 	}
+
 	midiEvent( MidiEventTypes _type, const char * _sysex_data,
 							int _data_len ) :
 		m_type( _type ),
 		m_metaEvent( MidiMetaInvalid ),
 		m_channel( 0 ),
-		m_sysExData( _sysex_data )
+		m_sysExData( _sysex_data ),
+		m_sourcePort( NULL )
 	{
 		m_data.m_sysExDataLen = _data_len;
 	}
@@ -119,46 +123,52 @@ struct midiEvent
 		m_metaEvent( _copy.m_metaEvent ),
 		m_channel( _copy.m_channel ),
 		m_data( _copy.m_data ),
-		m_sysExData( _copy.m_sysExData )
+		m_sysExData( _copy.m_sysExData ),
+		m_sourcePort( _copy.m_sourcePort )
 	{
 	}
 
-	inline int channel( void ) const
+	inline int channel() const
 	{
 		return m_channel;
 	}
 
-	inline Sint16 key( void ) const
+	inline Sint16 key() const
 	{
 		return m_data.m_param[0];
 	}
 
-	inline Sint16 & key( void )
+	inline Sint16 & key()
 	{
 		return m_data.m_param[0];
 	}
 
-	inline Sint16 velocity( void ) const
+	inline Sint16 velocity() const
 	{
 		return m_data.m_param[1];
 	}
 
-	inline Sint16 & velocity( void )
-	{
-		return m_data.m_param[1];
-	}
-		
-	inline Sint16 midiPanning( void ) const
+	inline Sint16 & velocity()
 	{
 		return m_data.m_param[1];
 	}
 
-	inline volume_t getVolume( void ) const
+	inline Sint16 midiPanning() const
+	{
+		return m_data.m_param[1];
+	}
+
+	inline volume_t getVolume() const
 	{
 		return (volume_t)( velocity() * 100 / MidiMaxVelocity );
 	}
-	
-	inline panning_t getPanning( void ) const
+
+	inline const void * sourcePort() const
+	{
+		return m_sourcePort;
+	}
+
+	inline panning_t getPanning() const
 	{
 		return (panning_t) ( PanningLeft +
 			( (float)( midiPanning() - MidiMinPanning ) ) / 
@@ -178,6 +188,7 @@ struct midiEvent
 	} m_data;
 
 	const char * m_sysExData;
+	const void * m_sourcePort;
 
 } ;
 
