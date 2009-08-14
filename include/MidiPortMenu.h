@@ -43,9 +43,12 @@ public:
 	virtual ~MidiPortMenu();
 
 
+public slots:
+	void updateMenu();
+
+
 protected slots:
 	void activatedPort( QAction * _item );
-	void updatePorts();
 
 
 private:
