@@ -41,9 +41,9 @@ public:
 	virtual QModelIndex index( int _row, int _col,
 			const QModelIndex & _parent = QModelIndex() ) const;
 
-	virtual QModelIndex parent( const QModelIndex & index ) const;
+	virtual QModelIndex parent( const QModelIndex & _index ) const;
 
-	void setFilter( const QString & _s );
+	virtual void setFilter( const QString & _s );
 
 
 private:

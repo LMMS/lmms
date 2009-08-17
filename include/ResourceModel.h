@@ -71,6 +71,10 @@ public:
 	int shownItems() const;
 
 
+public slots:
+	virtual void setFilter( const QString & _s ) = 0;
+
+
 protected:
 	ResourceDB * db() const
 	{
