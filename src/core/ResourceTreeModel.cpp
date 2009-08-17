@@ -22,12 +22,7 @@
  *
  */
 
-#include <QtGui/QPainter>
-
 #include "ResourceTreeModel.h"
-#include "embed.h"
-#include "plugin.h"
-#include "string_pair_drag.h"
 
 
 ResourceTreeModel::ResourceTreeModel( ResourceDB * _db, QObject * _parent ) :
