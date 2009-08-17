@@ -138,8 +138,10 @@ public:
   
 	// all functions are called while master->mutex is held
 	virtual void processMidiEvent( const midiEvent & _e,
-                                                const f_cnt_t /* _offset */ )
-        {
+									const f_cnt_t /* _offset */ )
+	{
+		static MidiIn midiIn;
+
 		switch( _e.m_type )
 		{
 			case MidiNoteOn:
@@ -173,6 +175,11 @@ public:
 					C_pitchwheel,
 					_e.m_data.m_param[0] +
 						_e.m_data.m_param[1]*128-8192 );
+				break;
+			case MidiControlChange:
+				master->SetController( 0,
+					midiIn.getcontroller( _e.m_data.m_param[0] ),
+					_e.m_data.m_param[1] );
 				break;
 			default:
 				break;
@@ -356,11 +363,11 @@ int main( int _argc, char * * _argv )
 
 	remotePluginClient::message m;
 	while( ( m = __remote_zasf->receiveMessage() ).id != IdQuit )
-        {
+	{
 		pthread_mutex_lock( &master->mutex );
-                __remote_zasf->processMessage( m );
+		__remote_zasf->processMessage( m );
 		pthread_mutex_unlock( &master->mutex );
-        }
+	}
 
 	__exit = 1;
 
