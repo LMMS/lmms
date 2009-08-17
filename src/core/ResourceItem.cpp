@@ -94,6 +94,25 @@ void ResourceItem::reload()
 
 
 
+bool ResourceItem::keywordMatch( const QStringList & _keywords )
+{
+	for( QStringList::ConstIterator it = _keywords.begin();
+								it != _keywords.end(); ++it )
+	{
+		if( !( name().toLower().contains( *it ) ||
+				path().toLower().contains( *it ) ||
+				author().toLower().contains( *it ) ||
+				tags().toLower().contains( *it ) ) )
+		{
+			return false;
+		}
+	}
+	return true;
+}
+
+
+
+
 bool ResourceItem::operator==( const ResourceItem & _other ) const
 {
 	return m_nameHash == _other.m_nameHash &&

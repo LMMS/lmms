@@ -124,21 +124,7 @@ bool ResourceTreeModel::filterItems( ResourceItem::Relation * _item,
 {
 	if( _item->item() )
 	{
-		ResourceItem * i = _item->item();
-		bool accept = true;
-		for( QStringList::ConstIterator it = _keywords.begin();
-						it != _keywords.end(); ++it )
-		{
-			if( !( i->name().toLower().contains( *it ) ||
-				i->path().toLower().contains( *it ) ||
-				i->author().toLower().contains( *it ) ||
-				i->tags().toLower().contains( *it ) ) )
-			{
-				accept = false;
-				break;
-			}
-		}
-		if( accept )
+		if( _item->item()->keywordMatch( _keywords ) )
 		{
 			setHidden( _item, _parent, false );
 			return true;
@@ -150,7 +136,7 @@ bool ResourceTreeModel::filterItems( ResourceItem::Relation * _item,
 	foreachResourceItemRelation( _item->children() )
 	{
 		QModelIndex idx = createIndex( row, 0, *it );
-		if( filterItems( *it, idx , _keywords ) )
+		if( filterItems( *it, idx, _keywords ) )
 		{
 			hide = false;
 		}
