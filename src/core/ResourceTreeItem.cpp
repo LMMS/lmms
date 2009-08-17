@@ -31,7 +31,6 @@
 ResourceTreeItem::ResourceTreeItem( ResourceTreeItem * _parent,
 					ResourceItem * _item ) :
 	m_parent( _parent ),
-	m_hidden( false ),
 	m_temporaryMarker( false ),
 	m_item( _item )
 {
@@ -67,12 +66,12 @@ ResourceTreeItem::~ResourceTreeItem()
 
 
 
-int ResourceTreeItem::rowCount() const
+int ResourceTreeItem::rowCount( const ResourceModel * _model ) const
 {
 	int rc = 0;
 	foreachConstResourceTreeItem( m_children )
 	{
-		if( !(*it)->isHidden() )
+		if( !(*it)->item()->isHidden( _model ) )
 		{
 			++rc;
 		}
@@ -83,12 +82,13 @@ int ResourceTreeItem::rowCount() const
 
 
 
-ResourceTreeItem * ResourceTreeItem::getChild( int _row )
+ResourceTreeItem * ResourceTreeItem::getChild( int _row,
+												const ResourceModel * _model )
 {
 	int rc = 0;
 	foreachResourceTreeItem( m_children )
 	{
-		if( !(*it)->isHidden() )
+		if( !(*it)->item()->isHidden( _model ) )
 		{
 			if( rc == _row )
 			{
@@ -103,7 +103,7 @@ ResourceTreeItem * ResourceTreeItem::getChild( int _row )
 
 
 
-int ResourceTreeItem::row() const
+int ResourceTreeItem::row( const ResourceModel * _model ) const
 {
 	if( !m_parent )
 	{
@@ -113,7 +113,7 @@ int ResourceTreeItem::row() const
 	int row = 0;
 	foreachConstResourceTreeItem( m_parent->m_children )
 	{
-		if( !(*it)->isHidden() )
+		if( !(*it)->item()->isHidden( _model ) )
 		{
 			if( *it == this )
 			{

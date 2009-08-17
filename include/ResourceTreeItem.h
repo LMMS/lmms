@@ -50,21 +50,12 @@ public:
 
 	~ResourceTreeItem();
 
-	inline void setHidden( bool _h )
-	{
-		m_hidden = _h;
-	}
+	int rowCount( const ResourceModel * _model = NULL ) const;
 
-	inline bool isHidden() const
-	{
-		return m_hidden;
-	}
+	ResourceTreeItem * getChild( int _row,
+									const ResourceModel * _model = NULL );
 
-	int rowCount() const;
-
-	ResourceTreeItem * getChild( int _row );
-
-	int row() const;
+	int row( const ResourceModel * _model = NULL ) const;
 
 	inline void addChild( ResourceTreeItem * _it )
 	{
@@ -127,7 +118,6 @@ private:
 	ResourceTreeItem * m_parent;
 	ResourceTreeItemList m_children;
 
-	bool m_hidden;
 	bool m_temporaryMarker;
 
 	ResourceItem * m_item;

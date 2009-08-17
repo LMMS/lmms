@@ -27,12 +27,13 @@
 
 #include <QtCore/QByteArray>
 #include <QtCore/QDateTime>
+#include <QtCore/QHash>
 #include <QtCore/QList>
 
 #include "ResourceProvider.h"
 
 class ResourceTreeItem;
-
+class ResourceModel;
 
 class ResourceItem
 {
@@ -76,6 +77,17 @@ public:
 			const QDateTime & _last_mod = QDateTime() );
 	// copy constructor
 	ResourceItem( const ResourceItem & _item );
+
+	inline void setHidden( bool _h, const ResourceModel * _model  )
+	{
+		m_hidden[_model] = _h;
+	}
+
+	inline bool isHidden( const ResourceModel * _model ) const
+	{
+		return m_hidden[_model];
+	}
+
 
 	const ResourceProvider * provider() const
 	{
@@ -229,6 +241,8 @@ private:
 	int m_size;
 	QDateTime m_lastMod;
 	QString m_tags;
+
+	QHash<const ResourceModel *, bool> m_hidden;
 
 	ResourceTreeItem * m_treeItem;
 
