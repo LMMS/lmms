@@ -113,7 +113,7 @@ void LocalResourceProvider::removeDirectory( const QString & _path )
 
 void LocalResourceProvider::reloadDirectory( const QString & _path )
 {
-	ResourceTreeItem * dirTreeItem = NULL;
+	ResourceItem::Relation * dirRelation = NULL;
 	QString p = _path;
 	if( !p.endsWith( QDir::separator() ) )
 	{
@@ -125,18 +125,18 @@ void LocalResourceProvider::reloadDirectory( const QString & _path )
 		if( it->type() == ResourceItem::TypeDirectory &&
 			it->fullName() == p )
 		{
-			dirTreeItem = it->treeItem();
+			dirRelation = it->relation();
 		}
 	}
 
-	if( dirTreeItem )
+	if( dirRelation )
 	{
-		ResourceItem * dirItem = dirTreeItem->item();
+		ResourceItem * dirItem = dirRelation->item();
 		if( dirItem )
 		{
 			m_scannedFolders.clear();
 			readDir( dirItem->fullRelativeName(),
-					dirTreeItem->parent() );
+						dirRelation->parent() );
 		}
 	}
 
@@ -147,7 +147,7 @@ void LocalResourceProvider::reloadDirectory( const QString & _path )
 
 
 void LocalResourceProvider::readDir( const QString & _dir,
-					ResourceTreeItem * _parent )
+					ResourceItem::Relation * _parent )
 {
 #ifdef LMMS_BUILD_LINUX
 	if( _dir.startsWith( "/dev" ) ||
@@ -162,14 +162,14 @@ void LocalResourceProvider::readDir( const QString & _dir,
 	m_scannedFolders << d.canonicalPath();
 
 	ResourceItem * parentItem;
-	ResourceTreeItem * curParent = _parent->findChild( d.dirName() +
+	ResourceItem::Relation * curParent = _parent->findChild( d.dirName() +
 							QDir::separator(),
 							m_baseDir );
 printf("read dir: %s\n", d.canonicalPath().toUtf8().constData() );
 	if( curParent )
 	{
 		parentItem = curParent->item();
-		foreachResourceTreeItem( curParent->children() )
+		foreachResourceItemRelation( curParent->children() )
 		{
 			(*it)->setTemporaryMarker( false );
 		}
@@ -188,7 +188,7 @@ printf("read dir: %s\n", d.canonicalPath().toUtf8().constData() );
 		parentItem->setLastMod( QFileInfo(
 					d.canonicalPath() ).lastModified() );
 		database()->addItem( parentItem );
-		curParent = new ResourceTreeItem( _parent, parentItem );
+		curParent = new ResourceItem::Relation( _parent, parentItem );
 		curParent->setTemporaryMarker( true );
 		m_watcher.addPath( parentItem->fullName() );
 	}
@@ -210,7 +210,7 @@ printf("read dir: %s\n", d.canonicalPath().toUtf8().constData() );
 		{
 			fname += QDir::separator();
 		}
-		ResourceTreeItem * curChild =
+		ResourceItem::Relation * curChild =
 				curParent->findChild( fname, m_baseDir );
 		if( curChild )
 		{
@@ -252,20 +252,21 @@ printf("read dir: %s\n", d.canonicalPath().toUtf8().constData() );
 					);
 				newItem->setLastMod( f.lastModified() );
 				database()->addItem( newItem );
-				ResourceTreeItem * rti =
-					new ResourceTreeItem( curParent,
+				ResourceItem::Relation * relation =
+					new ResourceItem::Relation( curParent,
 								newItem );
-				rti->setTemporaryMarker( true );
+				relation->setTemporaryMarker( true );
 			}
 		}
 	}
 
-	for( ResourceTreeItemList::Iterator it = curParent->children().begin();
-					it != curParent->children().end(); )
+	for( ResourceItem::Relation::List::Iterator it =
+			curParent->children().begin();
+						it != curParent->children().end(); )
 	{
 		if( (*it)->temporaryMarker() == false )
 		{
-			ResourceTreeItem * item = *it;
+			ResourceItem::Relation * item = *it;
 			it = curParent->children().erase( it );
 			database()->recursiveRemoveItems( item );
 		}

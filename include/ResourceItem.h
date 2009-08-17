@@ -31,13 +31,14 @@
 #include <QtCore/QList>
 
 #include "ResourceProvider.h"
+#include "TreeRelation.h"
 
-class ResourceTreeItem;
-class ResourceModel;
 
 class ResourceItem
 {
 public:
+	typedef TreeRelation<ResourceItem> Relation;
+
 	enum BaseDirectories
 	{
 		BaseRoot,
@@ -78,12 +79,12 @@ public:
 	// copy constructor
 	ResourceItem( const ResourceItem & _item );
 
-	inline void setHidden( bool _h, const ResourceModel * _model  )
+	inline void setHidden( bool _h, const QAbstractItemModel * _model )
 	{
 		m_hidden[_model] = _h;
 	}
 
-	inline bool isHidden( const ResourceModel * _model ) const
+	inline bool isHidden( const QAbstractItemModel * _model ) const
 	{
 		return m_hidden[_model];
 	}
@@ -174,19 +175,19 @@ public:
 		return m_type != TypeUnknown && !m_name.isEmpty();
 	}
 
-	void setTreeItem( ResourceTreeItem * _ti )
+	void setRelation( Relation * _relation )
 	{
-		m_treeItem = _ti;
+		m_relation = _relation;
 	}
 
-	ResourceTreeItem * treeItem()
+	Relation * relation()
 	{
-		return m_treeItem;
+		return m_relation;
 	}
 
-	const ResourceTreeItem * treeItem() const
+	const Relation * relation() const
 	{
-		return m_treeItem;
+		return m_relation;
 	}
 
 	const QDateTime & lastMod() const
@@ -242,14 +243,22 @@ private:
 	QDateTime m_lastMod;
 	QString m_tags;
 
-	QHash<const ResourceModel *, bool> m_hidden;
+	QHash<const QAbstractItemModel *, bool> m_hidden;
 
-	ResourceTreeItem * m_treeItem;
+	Relation * m_relation;
 
 } ;
 
 
 typedef QList<ResourceItem *> ResourceItemList;
 
+
+#define foreachResourceItemRelation(list)								\
+		for(ResourceItem::Relation::List::Iterator it=list.begin();		\
+					it!=list.end();++it)
+
+#define foreachConstResourceItemRelation(list)							\
+		for(ResourceItem::Relation::List::ConstIterator it=list.begin();\
+						it!=list.end();++it)
 
 #endif

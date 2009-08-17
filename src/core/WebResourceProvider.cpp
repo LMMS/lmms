@@ -93,14 +93,14 @@ void WebResourceProvider::finishDownload( int _id, bool a )
 
 
 // create a recursive tree from flat items and their path property
-ResourceTreeItem * WebResourceProvider::addTreeItem(
-						ResourceTreeItem * _parent,
+ResourceItem::Relation * WebResourceProvider::addRelation(
+						ResourceItem::Relation * _parent,
 						ResourceItem * _item )
 {
 	if( _parent == database()->topLevelNode() ||
 						_item->path().isEmpty() )
 	{
-		return new ResourceTreeItem( _parent, _item );
+		return new ResourceItem::Relation( _parent, _item );
 	}
 
 	const QStringList itemPath = _item->path().split( '/' );
@@ -114,23 +114,22 @@ ResourceTreeItem * WebResourceProvider::addTreeItem(
 		const int parentPathSize = parentPath.count( '/' );
 		if( parentPathSize+1 >= itemPath.size() )
 		{
-			if( _item->path() == parentPath )
+//			if( _item->path() == parentPath )
 			{
-				return new ResourceTreeItem( _parent, _item );
+				return new ResourceItem::Relation( _parent, _item );
 			}
-			else
+/*			else
 			{
 				// something went wrong
-				return new ResourceTreeItem( _parent, _item );
-			}
+				return new ResourceItem::Relation( _parent, _item );
+			}*/
 		}
 
 		pathComponent = itemPath[parentPathSize] + "/";
 	}
 
-	ResourceTreeItem * subParent =
-		_parent->findChild( pathComponent,
-					ResourceItem::BaseURL );
+	ResourceItem::Relation * subParent =
+		_parent->findChild( pathComponent, ResourceItem::BaseURL );
 	if( subParent == NULL )
 	{
 		ResourceItem * dirItem =
@@ -140,16 +139,16 @@ ResourceTreeItem * WebResourceProvider::addTreeItem(
 				ResourceItem::BaseURL,
 				parentPath );
 		database()->addItem( dirItem );
-		subParent = new ResourceTreeItem( _parent, dirItem );
+		subParent = new ResourceItem::Relation( _parent, dirItem );
 	}
-	return addTreeItem( subParent, _item );
+	return addRelation( subParent, _item );
 }
 
 
 
 
 void WebResourceProvider::importNodeIntoDB( const QDomNode & _n,
-						ResourceTreeItem * _parent )
+											ResourceItem::Relation * _parent )
 {
 	QDomNode n = _n;
 	while( !n.isNull() )
@@ -178,10 +177,10 @@ void WebResourceProvider::importNodeIntoDB( const QDomNode & _n,
 				n.firstChildElement( "size" ).text().toInt() );
 		database()->addItem( item );
 
-		ResourceTreeItem * treeItem = addTreeItem( _parent, item );
+		ResourceItem::Relation * relation = addRelation( _parent, item );
 		if( n.nodeName() != "file" )
 		{
-			importNodeIntoDB( n.firstChild(), treeItem );
+			importNodeIntoDB( n.firstChild(), relation );
 		}
 		n = n.nextSibling();
 	}

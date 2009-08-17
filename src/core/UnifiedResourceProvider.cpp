@@ -51,7 +51,7 @@ UnifiedResourceProvider::~UnifiedResourceProvider()
 
 void UnifiedResourceProvider::addDatabase( ResourceDB * _db )
 {
-	ResourceTreeItem * childRoot = _db->topLevelNode()->getChild( 0 );
+	ResourceItem::Relation * childRoot = _db->topLevelNode()->getChild( 0 );
 	if( childRoot )
 	{
 		m_mergedDatabases << _db;

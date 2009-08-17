@@ -102,7 +102,7 @@ void ResourceDB::load( const QString & _file )
 
 	multimediaProject m( _file );
 
-	loadTreeItem( &m_topLevelNode, m.content() );
+	loadRelation( &m_topLevelNode, m.content() );
 }
 
 
@@ -114,7 +114,7 @@ void ResourceDB::save( const QString & _file )
 
 	if( m_topLevelNode.getChild( 0 ) )
 	{
-		saveTreeItem( m_topLevelNode.getChild( 0 ), m, m.content() );
+		saveRelation( m_topLevelNode.getChild( 0 ), m, m.content() );
 	}
 
 	m.writeFile( _file );
@@ -123,14 +123,14 @@ void ResourceDB::save( const QString & _file )
 
 
 
-void ResourceDB::saveTreeItem( const ResourceTreeItem * _i,
-							QDomDocument & _doc,
-							QDomElement & _de )
+void ResourceDB::saveRelation( const ResourceItem::Relation * _i,
+								QDomDocument & _doc,
+								QDomElement & _de )
 {
 	QDomElement e = _i->item() ? _doc.createElement( "item" ) : _de;
-	foreachConstResourceTreeItem( _i->children() )
+	foreachConstResourceItemRelation( _i->children() )
 	{
-		saveTreeItem( *it, _doc, e );
+		saveRelation( *it, _doc, e );
 	}
 	if( _i->item() )
 	{
@@ -152,7 +152,7 @@ void ResourceDB::saveTreeItem( const ResourceTreeItem * _i,
 
 
 
-void ResourceDB::loadTreeItem( ResourceTreeItem * _i, QDomElement & _de )
+void ResourceDB::loadRelation( ResourceItem::Relation * _i, QDomElement & _de )
 {
 	QDomNode node = _de.firstChild();
 	while( !node.isNull() )
@@ -177,12 +177,13 @@ void ResourceDB::loadTreeItem( ResourceTreeItem * _i, QDomElement & _de )
 						Qt::ISODate )
 				);
 				addItem( item );
-				ResourceTreeItem * treeItem = new ResourceTreeItem( _i, item );
+				ResourceItem::Relation * relation =
+										new ResourceItem::Relation( _i, item );
 				if( item->type() == ResourceItem::TypeDirectory )
 				{
 					emit directoryItemAdded( item->fullName() );
 				}
-				loadTreeItem( treeItem, e );
+				loadRelation( relation, e );
 			}
 		}
 		node = node.nextSibling();
@@ -279,11 +280,11 @@ void ResourceDB::addItem( ResourceItem * newItem )
 	ResourceItem * oldItem = m_items[hash];
 	if( oldItem )
 	{
-		ResourceTreeItem * oldTreeItem = oldItem->treeItem();
-		if( oldTreeItem )
+		ResourceItem::Relation * oldRelation = oldItem->relation();
+		if( oldRelation )
 		{
-			recursiveRemoveItems( oldTreeItem, false );
-			delete oldTreeItem;
+			recursiveRemoveItems( oldRelation, false );
+			delete oldRelation;
 		}
 		if( oldItem->type() == ResourceItem::TypeDirectory )
 		{
@@ -298,8 +299,8 @@ void ResourceDB::addItem( ResourceItem * newItem )
 
 
 
-void ResourceDB::recursiveRemoveItems( ResourceTreeItem * parent,
-						bool removeTopLevelParent )
+void ResourceDB::recursiveRemoveItems( ResourceItem::Relation * parent,
+										bool removeTopLevelParent )
 {
 	if( !parent )
 	{

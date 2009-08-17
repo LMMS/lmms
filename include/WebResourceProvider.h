@@ -68,10 +68,10 @@ private slots:
 
 
 private:
-	ResourceTreeItem * addTreeItem( ResourceTreeItem * _parent,
-						ResourceItem * _item );
+	ResourceItem::Relation * addRelation( ResourceItem::Relation * _parent,
+											ResourceItem * _item );
 	void importNodeIntoDB( const QDomNode & n,
-						ResourceTreeItem * _parent );
+							ResourceItem::Relation * _parent );
 	void download( const QString & _path, QBuffer * _target ) const;
 
 	static QList<int> m_downloadIDs;

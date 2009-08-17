@@ -56,16 +56,15 @@ public:
 	virtual QMimeData * mimeData( const QModelIndexList & _indexes ) const;
 
 	// return ResourceTreeItem belonging to a certain index
-	static inline ResourceTreeItem * treeItem( const QModelIndex & _idx )
+	static inline ResourceItem::Relation * relation( const QModelIndex & _idx )
 	{
-		return static_cast<ResourceTreeItem *>(
-						_idx.internalPointer() );
+		return static_cast<ResourceItem::Relation *>( _idx.internalPointer() );
 	}
 
 	// return ResourceItem belonging to a certain index
 	static inline ResourceItem * item( const QModelIndex & _idx )
 	{
-		return treeItem( _idx )->item();
+		return relation( _idx )->item();
 	}
 
 	int totalItems() const;

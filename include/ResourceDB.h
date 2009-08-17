@@ -31,7 +31,7 @@
 #include <QtCore/QStringList>
 #include <QtXml/QDomDocument>
 
-#include "ResourceTreeItem.h"
+#include "ResourceItem.h"
 
 
 class ResourceDB : public QObject
@@ -64,7 +64,7 @@ public:
 		return m_items;
 	}
 
-	inline ResourceTreeItem * topLevelNode()
+	inline ResourceItem::Relation * topLevelNode()
 	{
 		return &m_topLevelNode;
 	}
@@ -82,14 +82,14 @@ public:
 	// add given item to DB
 	void addItem( ResourceItem * _newItem );
 
-	void recursiveRemoveItems( ResourceTreeItem * parent,
+	void recursiveRemoveItems( ResourceItem::Relation * parent,
 					bool removeTopLevelParent = true );
 
 
 private:
-	void saveTreeItem( const ResourceTreeItem * _i, QDomDocument & _doc,
+	void saveRelation( const ResourceItem::Relation * _i, QDomDocument & _doc,
 							QDomElement & _de );
-	void loadTreeItem( ResourceTreeItem * _i, QDomElement & _de );
+	void loadRelation( ResourceItem::Relation * _i, QDomElement & _de );
 
 	static inline QString typeName( ResourceItem::Type _t )
 	{
@@ -136,7 +136,7 @@ private:
 
 	ResourceProvider * m_provider;
 	ItemHashMap m_items;
-	ResourceTreeItem m_topLevelNode;
+	ResourceItem::Relation m_topLevelNode;
 
 
 signals:

@@ -64,7 +64,7 @@ private slots:
 
 
 private:
-	void readDir( const QString & _dir, ResourceTreeItem * _parent );
+	void readDir( const QString & _dir, ResourceItem::Relation * _parent );
 
 	ResourceItem::BaseDirectory m_baseDir;
 	const QString m_dir;

@@ -36,7 +36,7 @@ ResourceModel::ResourceModel( ResourceDB * _db, QObject * _parent ) :
 {
 	setSupportedDragActions( Qt::CopyAction );
 
-	connect( m_db, SIGNAL( itemsChanged() ),
+	connect( db(), SIGNAL( itemsChanged() ),
 			this, SIGNAL( itemsChanged() ) );
 }
 
@@ -49,11 +49,11 @@ QVariant ResourceModel::data( const QModelIndex & _idx, int _role ) const
 
 	if( _idx.isValid() )
 	{
-		ResourceTreeItem * treeItem = this->treeItem( _idx );
-		ResourceItem * item = treeItem->item();
+		ResourceItem::Relation * relation = this->relation( _idx );
+		ResourceItem * item = relation->item();
 		if( _role == Qt::DisplayRole )
 		{
-			if( treeItem->parent() == m_db->topLevelNode() )
+			if( relation->parent() == db()->topLevelNode() )
 			{
 				switch( item->baseDir() )
 				{
@@ -71,7 +71,7 @@ QVariant ResourceModel::data( const QModelIndex & _idx, int _role ) const
 		}
 		else if( _role == Qt::DecorationRole )
 		{
-			if( treeItem->parent() == m_db->topLevelNode() )
+			if( relation->parent() == db()->topLevelNode() )
 			{
 				switch( item->baseDir() )
 				{
@@ -216,7 +216,7 @@ QMimeData * ResourceModel::mimeData( const QModelIndexList & _list ) const
 
 int ResourceModel::totalItems() const
 {
-	const ResourceDB::ItemHashMap & items = m_db->items();
+	const ResourceDB::ItemHashMap & items = db()->items();
 	int num = 0;
 	foreach( const ResourceItem * i, items )
 	{
@@ -233,7 +233,7 @@ int ResourceModel::totalItems() const
 
 int ResourceModel::shownItems() const
 {
-	const ResourceDB::ItemHashMap & items = m_db->items();
+	const ResourceDB::ItemHashMap & items = db()->items();
 	int num = 0;
 	foreach( const ResourceItem * i, items )
 	{

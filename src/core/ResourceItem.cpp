@@ -55,7 +55,7 @@ ResourceItem::ResourceItem( ResourceProvider * _provider,
 	m_size( _size ),
 	m_lastMod( _last_mod ),
 	m_tags( _tags ),
-	m_treeItem( NULL )
+	m_relation( NULL )
 {
 	init();
 }
@@ -76,7 +76,7 @@ ResourceItem::ResourceItem( const ResourceItem & _item ) :
 	m_size( _item.m_size ),
 	m_lastMod( _item.m_lastMod ),
 	m_tags( _item.m_tags ),
-	m_treeItem( NULL )
+	m_relation( NULL )
 {
 	init();
 }

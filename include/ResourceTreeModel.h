@@ -47,11 +47,11 @@ public:
 
 
 private:
-	bool filterItems( ResourceTreeItem * _item,
-					const QModelIndex & _parent,
+	bool filterItems( ResourceItem::Relation * _item,
+						const QModelIndex & _parent,
 						const QStringList & _keywords );
-	void setHidden( ResourceTreeItem * _item,
-				const QModelIndex & _parent,
+	void setHidden( ResourceItem::Relation * _item,
+					const QModelIndex & _parent,
 					bool _hidden,
 						bool _recursive = true );
 

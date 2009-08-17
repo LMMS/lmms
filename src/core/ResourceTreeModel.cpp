@@ -49,7 +49,7 @@ int ResourceTreeModel::rowCount( const QModelIndex & _parent ) const
 	{
 		return db()->topLevelNode()->rowCount( this );
 	}
-	return treeItem( _parent )->rowCount( this );
+	return relation( _parent )->rowCount( this );
 }
 
 
@@ -63,7 +63,7 @@ QModelIndex ResourceTreeModel::index( int _row, int _col,
 		return QModelIndex();
 	}
 
-	ResourceTreeItem * parentItem;
+	ResourceItem::Relation * parentItem;
 
 	if( !_parent.isValid() )
 	{
@@ -71,7 +71,7 @@ QModelIndex ResourceTreeModel::index( int _row, int _col,
 	}
 	else
 	{
-		parentItem = treeItem( _parent );
+		parentItem = relation( _parent );
 	}
 
 	if( _row < parentItem->rowCount( this ) )
@@ -91,8 +91,8 @@ QModelIndex ResourceTreeModel::parent( const QModelIndex & _idx ) const
 		return QModelIndex();
 	}
 
-	ResourceTreeItem * childItem = treeItem( _idx );
-	ResourceTreeItem * parentItem = childItem->parent();
+	ResourceItem::Relation * childItem = relation( _idx );
+	ResourceItem::Relation * parentItem = childItem->parent();
 	if( parentItem == db()->topLevelNode() )
 	{
 		return QModelIndex();
@@ -123,7 +123,7 @@ void ResourceTreeModel::setFilter( const QString & _s )
 
 
 
-bool ResourceTreeModel::filterItems( ResourceTreeItem * _item,
+bool ResourceTreeModel::filterItems( ResourceItem::Relation * _item,
 						const QModelIndex & _parent,
 						const QStringList & _keywords )
 {
@@ -152,8 +152,7 @@ bool ResourceTreeModel::filterItems( ResourceTreeItem * _item,
 
 	int row = 0;
 	bool hide = true;
-	for( ResourceTreeItemList::Iterator it = _item->children().begin();
-					it != _item->children().end(); ++it )
+	foreachResourceItemRelation( _item->children() )
 	{
 		QModelIndex idx = createIndex( row, 0, *it );
 		if( filterItems( *it, idx , _keywords ) )
@@ -170,16 +169,14 @@ bool ResourceTreeModel::filterItems( ResourceTreeItem * _item,
 
 
 
-void ResourceTreeModel::setHidden( ResourceTreeItem * _item,
+void ResourceTreeModel::setHidden( ResourceItem::Relation * _item,
 						const QModelIndex & _parent,
 						bool _hide, bool _recursive )
 {
 	if( _recursive )
 	{
 		int row = 0;
-		for( ResourceTreeItemList::Iterator it =
-						_item->children().begin();
-					it != _item->children().end(); ++it )
+		foreachResourceItemRelation( _item->children() )
 		{
 			setHidden( *it, createIndex( row, 0, *it ), _hide );
 			++row;
