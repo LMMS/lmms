@@ -1,5 +1,5 @@
 /*
- * ResourceTreeModel.h - tree-model for ResourceDB
+ * ResourceTreeModel.h - a tree model implementation for resources
  *
  * Copyright (c) 2008-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -25,61 +25,25 @@
 #ifndef _RESOURCE_TREE_MODEL_H
 #define _RESOURCE_TREE_MODEL_H
 
-#include <QtCore/QAbstractItemModel>
-
-#include "ResourceDB.h"
+#include "ResourceModel.h"
 
 
-class ResourceTreeModel : public QAbstractItemModel
+class ResourceTreeModel : public ResourceModel
 {
-	Q_OBJECT
 public:
 	ResourceTreeModel( ResourceDB * _db, QObject * _parent = NULL );
 	virtual ~ResourceTreeModel()
 	{
 	}
 
-	virtual QVariant data( const QModelIndex & _idx,
-                                        int _role = Qt::DisplayRole ) const;
-
-	virtual Qt::ItemFlags flags( const QModelIndex & _index ) const;
-
 	int rowCount( const QModelIndex & _parent = QModelIndex() ) const;
-
-	virtual int columnCount( const QModelIndex & _parent =
-							QModelIndex() ) const
-	{
-		return 1;
-	}
 
 	virtual QModelIndex index( int _row, int _col,
 			const QModelIndex & _parent = QModelIndex() ) const;
 
 	virtual QModelIndex parent( const QModelIndex & index ) const;
 
-	// return list of possible MIME types for items in this model
-	virtual QStringList mimeTypes() const;
-
-	// used for drag'n'drop - return proper MIME data for indexes
-	virtual QMimeData * mimeData( const QModelIndexList & _indexes ) const;
-
 	void setFilter( const QString & _s );
-
-	// return ResourceTreeItem belonging to a certain index
-	static inline ResourceTreeItem * treeItem( const QModelIndex & _idx )
-	{
-		return static_cast<ResourceTreeItem *>(
-						_idx.internalPointer() );
-	}
-
-	// return ResourceItem belonging to a certain index
-	static inline ResourceItem * item( const QModelIndex & _idx )
-	{
-		return treeItem( _idx )->item();
-	}
-
-	int totalItems() const;
-	int shownItems() const;
 
 
 private:
@@ -90,12 +54,6 @@ private:
 				const QModelIndex & _parent,
 					bool _hidden,
 						bool _recursive = true );
-
-	ResourceDB * m_db;
-
-
-signals:
-	void itemsChanged( void );
 
 } ;
 
