@@ -74,6 +74,7 @@
 #include "cpuload_widget.h"
 #include "visualization_widget.h"
 #include "ResourceBrowser.h"
+#include "QuickLoadDialog.h"
 
 #include "gui/tracks/track_container_scene.h"
 
@@ -245,6 +246,11 @@ void mainWindow::finalize( void )
 					tr( "Redo" ),
 					this, SLOT( redo() ),
 					Qt::CTRL + Qt::Key_R );
+	edit_menu->addSeparator();
+	edit_menu->addAction( embed::getIconPixmap( "---TODO---" ),
+					tr( "Load resource into current context" ),
+					this, SLOT( loadResource() ),
+					Qt::CTRL + Qt::Key_L );
 	edit_menu->addSeparator();
 	edit_menu->addAction( embed::getIconPixmap( "setup_general" ),
 					tr( "Settings" ),
@@ -1151,6 +1157,14 @@ void mainWindow::undo( void )
 void mainWindow::redo( void )
 {
 	engine::getProjectJournal()->redo();
+}
+
+
+
+
+void mainWindow::loadResource()
+{
+	QuickLoadDialog( this ).exec();
 }
 
 

@@ -137,6 +137,8 @@ public slots:
 	void undo( void );
 	void redo( void );
 
+	void loadResource();
+
 	void toggleRecordAutomation( bool );
 
 protected:
