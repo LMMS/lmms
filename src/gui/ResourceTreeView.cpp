@@ -22,7 +22,6 @@
  *
  */
 
-
 #include "ResourceTreeView.h"
 #include "ResourceTreeModel.h"
 
@@ -62,21 +61,29 @@ void ResourceTreeView::setFilter( const QString & _s )
 }
 
 
-void ResourceTreeView::currentChanged( const QModelIndex & current,
-	const QModelIndex & previous )
+
+
+void ResourceTreeView::currentChanged( const QModelIndex & _current,
+										const QModelIndex & _previous )
 {
-	emit treeViewCurrentChanged( current, previous );
-	QTreeView::currentChanged( current, previous );
-}
-void ResourceTreeView::selectionChanged( const QItemSelection & selected, 
-	const QItemSelection & deselected )
-{
-	emit treeViewSelectionChanged( selected, deselected );
-	QTreeView::selectionChanged( selected, deselected );
+	emit treeViewCurrentChanged( _current, _previous );
+	QTreeView::currentChanged( _current, _previous );
 }
 
 
-void ResourceTreeView::updateFilter( void )
+
+
+void ResourceTreeView::selectionChanged( const QItemSelection & _selected,
+											const QItemSelection & _deselected )
+{
+	emit treeViewSelectionChanged( _selected, _deselected );
+	QTreeView::selectionChanged( _selected, _deselected );
+}
+
+
+
+
+void ResourceTreeView::updateFilter()
 {
 	setFilter( m_lastFilter );
 }
