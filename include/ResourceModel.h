@@ -73,6 +73,13 @@ public:
 
 
 protected:
+	ResourceDB * db() const
+	{
+		return m_db;
+	}
+
+
+private:
 	ResourceDB * m_db;
 
 

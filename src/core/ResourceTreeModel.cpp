@@ -40,8 +40,6 @@ ResourceTreeModel::ResourceTreeModel( ResourceDB * _db, QObject * _parent ) :
 
 int ResourceTreeModel::rowCount( const QModelIndex & _parent ) const
 {
-	ResourceTreeItem * parentItem;
-
 	if( _parent.column() > 0 )
 	{
 		return 0;
@@ -49,13 +47,9 @@ int ResourceTreeModel::rowCount( const QModelIndex & _parent ) const
 
 	if( !_parent.isValid() )
 	{
-		parentItem = m_db->topLevelNode();
+		return db()->topLevelNode()->rowCount( this );
 	}
-	else
-	{
-		parentItem = treeItem( _parent );
-	}
-	return parentItem->rowCount( this );
+	return treeItem( _parent )->rowCount( this );
 }
 
 
@@ -73,7 +67,7 @@ QModelIndex ResourceTreeModel::index( int _row, int _col,
 
 	if( !_parent.isValid() )
 	{
-		parentItem = m_db->topLevelNode();
+		parentItem = db()->topLevelNode();
 	}
 	else
 	{
@@ -99,7 +93,7 @@ QModelIndex ResourceTreeModel::parent( const QModelIndex & _idx ) const
 
 	ResourceTreeItem * childItem = treeItem( _idx );
 	ResourceTreeItem * parentItem = childItem->parent();
-	if( parentItem == m_db->topLevelNode() )
+	if( parentItem == db()->topLevelNode() )
 	{
 		return QModelIndex();
 	}
@@ -117,8 +111,8 @@ QModelIndex ResourceTreeModel::parent( const QModelIndex & _idx ) const
 
 void ResourceTreeModel::setFilter( const QString & _s )
 {
-	filterItems( m_db->topLevelNode(),
-				createIndex( 0, 0, m_db->topLevelNode() ),
+	filterItems( db()->topLevelNode(),
+				createIndex( 0, 0, db()->topLevelNode() ),
 						_s.toLower().split( " " ) );
 	if( _s.isEmpty() )
 	{
