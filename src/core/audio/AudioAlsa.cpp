@@ -46,9 +46,9 @@ AudioAlsa::AudioAlsa( bool & _success_ful, mixer * _mixer ) :
 	m_handle( NULL ),
 	m_hwParams( NULL ),
 	m_swParams( NULL ),
-	m_convertEndian( FALSE )
+	m_convertEndian( false )
 {
-	_success_ful = FALSE;
+	_success_ful = false;
 
 	int err;
 
@@ -78,7 +78,22 @@ AudioAlsa::AudioAlsa( bool & _success_ful, mixer * _mixer ) :
 		return;
 	}
 
-	_success_ful = TRUE;
+	// set FD_CLOEXEC flag for all file descriptors so forked processes
+	// do not inherit them
+	struct pollfd * ufds;
+	int count = snd_pcm_poll_descriptors_count( m_handle );
+	ufds = new pollfd[count];
+	snd_pcm_poll_descriptors( m_handle, ufds, count );
+	for( int i = 0; i < qMax( 3, count ); ++i )
+	{
+		const int fd = ( i >= count ) ? ufds[0].fd+i : ufds[i].fd;
+		int oldflags = fcntl( fd, F_GETFD, 0 );
+		if( oldflags < 0 )
+			continue;
+		oldflags |= FD_CLOEXEC;
+		fcntl( fd, F_SETFD, oldflags );
+	}
+	_success_ful = true;
 }
 
 
@@ -236,8 +251,8 @@ void AudioAlsa::run()
 	int outbuf_pos = 0;
 	int pcmbuf_size = m_periodSize * channels();
 
-	bool quit = FALSE;
-	while( quit == FALSE )
+	bool quit = false;
+	while( quit == false )
 	{
 		int_sample_t * ptr = pcmbuf;
 		int len = pcmbuf_size;
@@ -249,7 +264,7 @@ void AudioAlsa::run()
 				const fpp_t frames = getNextBuffer( temp );
 				if( !frames )
 				{
-					quit = TRUE;
+					quit = true;
 					memset( ptr, 0, len
 						* sizeof( int_sample_t ) );
 					break;
