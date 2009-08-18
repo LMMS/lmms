@@ -51,10 +51,10 @@ static pthread_mutex_t __gui_mutex;
 static std::queue<remotePluginClient::message> __gui_messages;
 
 
-class remoteZynAddSubFX : public remotePluginClient
+class RemoteZynAddSubFX : public remotePluginClient
 {
 public:
-	remoteZynAddSubFX( int _shm_in, int _shm_out ) :
+	RemoteZynAddSubFX( int _shm_in, int _shm_out ) :
 		remotePluginClient( _shm_in, _shm_out )
 	{
 		for( int i = 0; i < NumKeys; ++i )
@@ -64,14 +64,41 @@ public:
 		setInputCount( 0 );
 		sendMessage( IdInitDone );
 		waitForMessage( IdInitDone );
+
+		config.init();
+		OSCIL_SIZE = config.cfg.OscilSize;
+
+		config.cfg.GzipCompression = 0;
+
+		srand( time( NULL ) );
+		denormalkillbuf = new REALTYPE[SOUND_BUFFER_SIZE];
+		for( int i = 0; i < SOUND_BUFFER_SIZE; ++i )
+		{
+			denormalkillbuf[i] = (RND-0.5)*1e-16;
+		}
+
+		OscilGen::tmpsmps = new REALTYPE[OSCIL_SIZE];
+		newFFTFREQS( &OscilGen::outoscilFFTfreqs, OSCIL_SIZE/2 );
+
+		master = new Master();
+		master->swaplr = 0;
 	}
 
-	virtual void updateSampleRate( void )
+	virtual ~RemoteZynAddSubFX()
+	{
+		delete master;
+
+		delete[] denormalkillbuf;
+		delete[] OscilGen::tmpsmps;
+		deleteFFTFREQS( &OscilGen::outoscilFFTfreqs );
+	}
+
+	virtual void updateSampleRate()
 	{
 		SAMPLE_RATE = sampleRate();
 	}
 
-	virtual void updateBufferSize( void )
+	virtual void updateBufferSize()
 	{
 		SOUND_BUFFER_SIZE = bufferSize();
 	}
@@ -82,7 +109,6 @@ public:
 		switch( _m.id )
 		{
 			case IdQuit:
-				delete master;
 				break;
 
 			case IdShowUI:
@@ -132,10 +158,6 @@ public:
 		return true;
 	}
 
-	virtual ~remoteZynAddSubFX()
-	{
-	}
-  
 	// all functions are called while master->mutex is held
 	virtual void processMidiEvent( const midiEvent & _e,
 									const f_cnt_t /* _offset */ )
@@ -207,7 +229,7 @@ private:
 
 } ;
 
-static remoteZynAddSubFX * __remote_zasf = NULL;
+static RemoteZynAddSubFX * __remote_zasf = NULL;
 static int __exit = 0;
 
 
@@ -327,7 +349,7 @@ int main( int _argc, char * * _argv )
 	if( _argc < 3 )
 	{
 		fprintf( stderr, "not enough arguments\n" );
-		return( -1 );
+		return -1;
 	}
 
 #ifdef LMMS_BUILD_WIN32
@@ -336,28 +358,9 @@ int main( int _argc, char * * _argv )
 	pthread_win32_thread_attach_np();
 #endif
 
-	__remote_zasf = new remoteZynAddSubFX( atoi( _argv[1] ),
-							atoi( _argv[2] ) );
-
-	config.init();
-	OSCIL_SIZE = config.cfg.OscilSize;
-
-	config.cfg.GzipCompression = 0;
-
-	srand( time( NULL ) );
-	denormalkillbuf = new REALTYPE[SOUND_BUFFER_SIZE];
-	for( int i = 0; i < SOUND_BUFFER_SIZE; ++i )
-	{
-		denormalkillbuf[i] = (RND-0.5)*1e-16;
-	}
-
-	OscilGen::tmpsmps = new REALTYPE[OSCIL_SIZE];
-	newFFTFREQS( &OscilGen::outoscilFFTfreqs, OSCIL_SIZE/2 );
-
 	pthread_mutex_init( &__gui_mutex, NULL );
 
-	master = new Master();
-	master->swaplr = 0;
+	__remote_zasf = new RemoteZynAddSubFX( atoi( _argv[1] ), atoi( _argv[2] ) );
 
 	pthread_create( &__gui_thread_handle, NULL, guiThread, NULL );
 
@@ -370,10 +373,13 @@ int main( int _argc, char * * _argv )
 	}
 
 	__exit = 1;
+#ifdef LMMS_BUILD_WIN32
+	Sleep( 200 );
+#else
+	usleep( 200*1000 );
+#endif
 
-	delete denormalkillbuf;
-	delete OscilGen::tmpsmps;
-	deleteFFTFREQS( &OscilGen::outoscilFFTfreqs );
+	delete __remote_zasf;
 
 	pthread_mutex_destroy( &__gui_mutex );
 
