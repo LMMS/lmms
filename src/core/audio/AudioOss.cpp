@@ -98,6 +98,10 @@ AudioOss::AudioOss( bool & _success_ful, mixer * _mixer ) :
 		return;
 	}
 
+	// set FD_CLOEXEC flag for file descriptor so forked processes
+	// do not inherit it
+	fcntl( m_audioFD, F_SETFD, fcntl( m_audioFD, F_GETFD ) | FD_CLOEXEC );
+
 	int frag_spec;
 	for( frag_spec = 0; static_cast<int>( 0x01 << frag_spec ) <
 		getMixer()->framesPerPeriod() * channels() *

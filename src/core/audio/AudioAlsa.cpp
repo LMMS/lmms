@@ -79,6 +79,21 @@ AudioAlsa::AudioAlsa( bool & _success_ful, mixer * _mixer ) :
 		return;
 	}
 
+	// set FD_CLOEXEC flag for all file descriptors so forked processes
+	// do not inherit them
+	struct pollfd * ufds;
+	int count = snd_pcm_poll_descriptors_count( m_handle );
+	ufds = new pollfd[count];
+	snd_pcm_poll_descriptors( m_handle, ufds, count );
+	for( int i = 0; i < qMax( 3, count ); ++i )
+	{
+		const int fd = ( i >= count ) ? ufds[0].fd+i : ufds[i].fd;
+		int oldflags = fcntl( fd, F_GETFD, 0 );
+		if( oldflags < 0 )
+			continue;
+		oldflags |= FD_CLOEXEC;
+		fcntl( fd, F_SETFD, oldflags );
+	}
 	_success_ful = true;
 }
 
