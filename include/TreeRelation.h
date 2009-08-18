@@ -44,6 +44,7 @@ class TreeRelation
 public:
 	typedef TreeRelation<T> ThisTreeRelation;
 	typedef QList<ThisTreeRelation *> List;
+	typedef List TreeRelationList;
 
 	TreeRelation( ThisTreeRelation * _parent = NULL, T * _item = NULL ) :
 		m_parent( _parent ),
@@ -140,12 +141,12 @@ public:
 		children().removeAll( _it );
 	}
 
-	TreeRelation::List & children()
+	TreeRelationList & children()
 	{
 		return m_children;
 	}
 
-	const TreeRelation::List & children() const
+	const TreeRelationList & children() const
 	{
 		return m_children;
 	}
@@ -215,7 +216,7 @@ private:
 	TreeRelation( const ThisTreeRelation & ) { }
 
 	ThisTreeRelation * m_parent;
-	TreeRelation::List m_children;
+	TreeRelationList m_children;
 
 	bool m_temporaryMarker;
 
