@@ -17,7 +17,11 @@
 
     $Id: tap_utils.h,v 1.5 2004/02/21 17:33:36 tszilagyi Exp $
 */
+#ifndef _ISOC99_SOURCE
+#define _ISOC99_SOURCE
+#endif
 
+#include <stdint.h>
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846264338327
@@ -92,7 +96,6 @@ for any bugs or malfunction. */
 
 
 #define LN_2_2 0.34657359f
-#define FLUSH_TO_ZERO(x) (((*(unsigned int*)&(x))&0x7f800000)==0)?0.0f:(x)
 #define LIMIT(v,l,u) ((v)<(l)?(l):((v)>(u)?(u):(v)))
 
 #define BIQUAD_TYPE float
@@ -246,15 +249,19 @@ static inline
 bq_t
 biquad_run(biquad *f, bq_t x) {
 
-	bq_t y;
+	union {
+	  bq_t y;
+	  uint32_t y_int;
+	} u;
 	
-	y = f->b0 * x + f->b1 * f->x1 + f->b2 * f->x2
-		      + f->a1 * f->y1 + f->a2 * f->y2;
-	y = FLUSH_TO_ZERO(y);
+	u.y = f->b0 * x + f->b1 * f->x1 + f->b2 * f->x2
+		        + f->a1 * f->y1 + f->a2 * f->y2;
+	if ((u.y_int & 0x7f800000) == 0)
+	  u.y = 0.0f;
 	f->x2 = f->x1;
 	f->x1 = x;
 	f->y2 = f->y1;
-	f->y1 = y;
+	f->y1 = u.y;
 
-	return y;
+	return u.y;
 }
