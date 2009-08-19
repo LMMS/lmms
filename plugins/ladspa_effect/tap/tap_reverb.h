@@ -17,6 +17,11 @@
 
     $Id: tap_reverb.h,v 1.10 2004/06/14 16:43:55 tszilagyi Exp $
 */
+#ifndef _ISOC99_SOURCE
+#define _ISOC99_SOURCE
+#endif
+
+#include <stdint.h>
 
 
 
@@ -117,7 +122,6 @@ write_buffer(rev_t insample, rev_t * buffer, unsigned long buflen,
 #define db2lin(x) ((x) > -90.0f ? powf(10.0f, (x) * 0.05f) : 0.0f)
 #define ABS(x)  (x)>0.0f?(x):-1.0f*(x)
 #define LN_2_2 0.34657359f
-#define FLUSH_TO_ZERO(x) (((*(unsigned int*)&(x))&0x7f800000)==0)?0.0f:(x)
 #define LIMIT(v,l,u) ((v)<(l)?(l):((v)>(u)?(u):(v)))
 
 #define BIQUAD_TYPE float
@@ -195,19 +199,23 @@ static inline
 rev_t
 biquad_run(biquad *f, rev_t x) {
 
-        rev_t y;
+	union {
+	  rev_t y;
+	  uint32_t y_int;
+	} u;
 
-        y = f->b0 * x + f->b1 * f->x1 + f->b2 * f->x2
-		+ f->a1 * f->y1 + f->a2 * f->y2;
+        u.y = f->b0 * x + f->b1 * f->x1 + f->b2 * f->x2
+		        + f->a1 * f->y1 + f->a2 * f->y2;
 #ifdef REVERB_CALC_FLOAT
-        y = FLUSH_TO_ZERO(y);
+	if ((u.y_int & 0x7f800000) == 0)
+	  u.y = 0.0f;
 #endif
         f->x2 = f->x1;
         f->x1 = x;
         f->y2 = f->y1;
-        f->y1 = y;
+        f->y1 = u.y;
 
-        return y;
+        return u.y;
 }
 
 

@@ -15,7 +15,7 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-    $Id: tap_echo.c,v 1.6 2004/08/05 16:18:44 tszilagyi Exp $
+    $Id: tap_echo.c,v 1.7 2004/12/06 09:32:41 tszilagyi Exp $
 */
 
 
@@ -103,6 +103,24 @@ instantiate_Echo(const LADSPA_Descriptor * Descriptor,
 	if ((ptr = malloc(sizeof(Echo))) != NULL) {
 		((Echo *)ptr)->sample_rate = SampleRate;
 		((Echo *)ptr)->run_adding_gain = 1.0f;
+
+		/* allocate memory for ringbuffers and related dynamic vars */
+		if ((((Echo *)ptr)->ringbuffer_L = 
+		     calloc(MAX_DELAY * ((Echo *)ptr)->sample_rate / 1000,
+			    sizeof(LADSPA_Data))) == NULL)
+			exit(1);
+		if ((((Echo *)ptr)->ringbuffer_R = 
+		     calloc(MAX_DELAY * ((Echo *)ptr)->sample_rate / 1000,
+			    sizeof(LADSPA_Data))) == NULL)
+			exit(1);
+		if ((((Echo *)ptr)->buffer_pos_L = calloc(1, sizeof(unsigned long))) == NULL)
+			exit(1);
+		if ((((Echo *)ptr)->buffer_pos_R = calloc(1, sizeof(unsigned long))) == NULL)
+			exit(1);
+		
+		*(((Echo *)ptr)->buffer_pos_L) = 0;
+		*(((Echo *)ptr)->buffer_pos_R) = 0;
+		
 		return ptr;
 	}
 	
@@ -114,45 +132,19 @@ instantiate_Echo(const LADSPA_Descriptor * Descriptor,
 void
 activate_Echo(LADSPA_Handle Instance) {
 
-	Echo * ptr;
-
-	ptr = (Echo *)Instance;
+	Echo * ptr = (Echo *)Instance;
+	int i;
 	
 	ptr->mpx_out_L = 0;
 	ptr->mpx_out_R = 0;
 	
-	/* allocate memory for ringbuffers and related dynamic vars */
-	if ((ptr->ringbuffer_L = 
-	     calloc(MAX_DELAY * ptr->sample_rate / 1000,
-		    sizeof(LADSPA_Data))) == NULL)
-		exit(1);
-	if ((ptr->ringbuffer_R = 
-	     calloc(MAX_DELAY * ptr->sample_rate / 1000,
-		    sizeof(LADSPA_Data))) == NULL)
-		exit(1);
-	if ((ptr->buffer_pos_L = calloc(1, sizeof(unsigned long))) == NULL)
-		exit(1);
-	if ((ptr->buffer_pos_R = calloc(1, sizeof(unsigned long))) == NULL)
-		exit(1);
-	
 	*(ptr->buffer_pos_L) = 0;
-	*(ptr->buffer_pos_R) = 0;	
-}
+	*(ptr->buffer_pos_R) = 0;
 
-
-/* deactivate a plugin instance */
-void
-deactivate_Echo(LADSPA_Handle Instance) {
-
-	Echo * ptr;
-
-	ptr = (Echo *)Instance;
-
-	/* free memory allocated for ringbuffers & co. in activate_Echo() */
-	free(ptr->ringbuffer_L);
-	free(ptr->ringbuffer_R);
-	free(ptr->buffer_pos_L);
-	free(ptr->buffer_pos_R);
+	for (i = 0; i < MAX_DELAY * ptr->sample_rate / 1000; i++) {
+		ptr->ringbuffer_L[i] = 0.0f;
+		ptr->ringbuffer_R[i] = 0.0f;
+	}
 }
 
 
@@ -428,6 +420,13 @@ run_adding_gain_Echo(LADSPA_Handle Instance,
 void 
 cleanup_Echo(LADSPA_Handle Instance) {
 
+	Echo * ptr = (Echo *)Instance;
+
+	free(ptr->ringbuffer_L);
+	free(ptr->ringbuffer_R);
+	free(ptr->buffer_pos_L);
+	free(ptr->buffer_pos_R);
+
 	free(Instance);
 }
 
@@ -584,7 +583,7 @@ __attribute__((constructor)) _init() {
 	stereo_descriptor->run = run_Echo;
 	stereo_descriptor->run_adding = run_adding_gain_Echo;
 	stereo_descriptor->set_run_adding_gain = set_run_adding_gain;
-	stereo_descriptor->deactivate = deactivate_Echo;
+	stereo_descriptor->deactivate = NULL;
 	stereo_descriptor->cleanup = cleanup_Echo;
 	
 }

@@ -49,6 +49,15 @@ Fractal Doubler would have never been written. He also helped a lot
 with the CPU runaway problems in TAP Reverberator, by reporting the
 problem and trying out my solutions.
 
+Maarten Maathuis <madman2003@gmail.com> contributed the Bauer
+stereophonic-to-binaural DSP plugin. NOTE: this plugin only existed in
+CVS between releases 0.7.0 and 0.7.1; it has been agreed to be removed
+from TAP-plugins and released separately.
+
+Damon Chaplin <damon@karuna.eclipse.co.uk> tracked down issues that
+caused problems on 64-bit machines, found uninitialised variables via
+Valgrind, and also pinned down long lurking denormal issues. Thanks!
+
 
 And, of course, special thanks to the Ardour [http://ardour.org] and
 JACK [http://jackit.sf.net] development teams for their tireless
