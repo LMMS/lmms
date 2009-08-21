@@ -73,6 +73,7 @@
 #include "visualization_widget.h"
 #include "ResourceBrowser.h"
 #include "QuickLoadDialog.h"
+#include "WelcomeScreen.h"
 
 #include "gui/tracks/track_container_scene.h"
 
@@ -85,13 +86,13 @@ MainWindow::MainWindow() :
 {
 	setAttribute( Qt::WA_DeleteOnClose );
 
-	QWidget * main_widget = new QWidget( this );
-	QVBoxLayout * vbox = new QVBoxLayout( main_widget );
+	m_mainWidget = new QWidget( this );
+	QVBoxLayout * vbox = new QVBoxLayout( m_mainWidget );
 	vbox->setSpacing( 0 );
 	vbox->setMargin( 0 );
 
 
-	QWidget * w = new QWidget( main_widget );
+	QWidget * w = new QWidget( m_mainWidget );
 	QHBoxLayout * hbox = new QHBoxLayout( w );
 	hbox->setSpacing( 0 );
 	hbox->setMargin( 0 );
@@ -139,7 +140,7 @@ MainWindow::MainWindow() :
 
 
 	// create global-toolbar at the top of our window
-	m_toolBar = new QWidget( main_widget );
+	m_toolBar = new QWidget( m_mainWidget );
 	m_toolBar->setObjectName( "mainToolbar" );
 	m_toolBar->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 	m_toolBar->setFixedHeight( 64 );
@@ -152,9 +153,11 @@ MainWindow::MainWindow() :
 
 	vbox->addWidget( m_toolBar );
 	vbox->addWidget( w );
-	setCentralWidget( main_widget );
 
 
+	m_welcomeScreen = new WelcomeScreen( this );
+
+	setCentralWidget( m_welcomeScreen );
 
 	m_updateTimer.start( 1000 / 20, this );	// 20 fps
 }
@@ -177,6 +180,14 @@ MainWindow::~MainWindow()
 	// TODO: Close tools
 	// destroy engine which will do further cleanups etc.
 	engine::destroy();
+}
+
+
+
+
+void MainWindow::setMainWidgetVisible( bool _visible )
+{
+	setCentralWidget( _visible ? m_mainWidget : m_welcomeScreen );
 }
 
 

@@ -26,6 +26,7 @@
 
 #include "WelcomeScreen.h"
 #include "RecentResourceListModel.h"
+#include "MainWindow.h"
 #include "engine.h"
 #include "embed.h"
 
@@ -102,6 +103,7 @@ WelcomeScreen::~WelcomeScreen()
 
 void WelcomeScreen::createNewProject()
 {
+	engine::mainWindow()->setMainWidgetVisible( true );
 }
 
 

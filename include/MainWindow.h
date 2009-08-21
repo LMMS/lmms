@@ -69,6 +69,9 @@ public:
 		return m_toolBar;
 	}
 
+	// show MainWidget or WelcomeScreen
+	void setMainWidgetVisible( bool _visible );
+
 	//int addWidgetToToolBar( QWidget * _w, int _row = -1, int _col = -1 );
 	//void addSpacingToToolBar( int _size );
 
@@ -157,6 +160,9 @@ private:
 
 	void toggleWindow( QWidget * _w );
 
+
+	QWidget * m_mainWidget;
+	QWidget * m_welcomeScreen;
 
 	QMdiArea * m_workspace;
 
