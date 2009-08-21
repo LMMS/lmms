@@ -48,11 +48,11 @@ void ResourceTreeView::setFilter( const QString & _s )
 	if( _s.isEmpty() )
 	{
 		collapseAll();
-		m_tm->setFilter( _s );
+		m_tm->setKeywordFilter( _s );
 	}
 	else
 	{
-		m_tm->setFilter( _s );
+		m_tm->setKeywordFilter( _s );
 		expandToDepth( _s.size() );
 	}
 	setUpdatesEnabled( true );

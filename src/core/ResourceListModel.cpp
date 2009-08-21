@@ -29,11 +29,7 @@ ResourceListModel::ResourceListModel( ResourceDB * _db, QObject * _parent ) :
 	ResourceModel( _db, _parent ),
 	m_lookupTable()
 {
-	connect( db(), SIGNAL( itemsChanged() ),
-				this, SLOT( updateLookupTable() ),
-				Qt::DirectConnection );
-
-	updateLookupTable();
+	updateFilters();
 }
 
 
@@ -63,27 +59,12 @@ QModelIndex ResourceListModel::index( int _row, int _col,
 
 
 
-void ResourceListModel::setFilter( const QString & _s )
+void ResourceListModel::updateFilters()
 {
-	if( !_s.isEmpty() )
-	{
-		m_filterKeywords = _s.toLower().split( " " );
-	}
-	else
-	{
-		m_filterKeywords.clear();
-	}
-	updateLookupTable();
-}
-
-
-
-
-// update lookup table so ResourceListModel::index(...) can run with O(1)
-void ResourceListModel::updateLookupTable()
-{
+	// update lookup table so ResourceListModel::index(...) can run with O(1)
 	int items = 0;
-	if( m_filterKeywords.isEmpty() )
+	if( keywordFilter().isEmpty() &&
+			typeFilter() == ResourceItem::TypeUnknown )
 	{
 		// unhide all items if empty filter string given
 		m_lookupTable.resize( db()->items().size() );
@@ -99,7 +80,7 @@ void ResourceListModel::updateLookupTable()
 		// filter and count number of non-hidden items
 		foreach( ResourceItem * item, db()->items() )
 		{
-			if( item->keywordMatch( m_filterKeywords ) )
+			if( itemMatchesFilter( *item ) )
 			{
 				item->setHidden( false, this );
 				++items;
@@ -130,8 +111,5 @@ void ResourceListModel::updateLookupTable()
 	emit layoutChanged();
 }
 
-
-
-#include "moc_ResourceListModel.cxx"
 
 /* vim: set tw=0 noexpandtab: */

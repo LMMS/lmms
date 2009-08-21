@@ -27,6 +27,7 @@
 
 #include <QtCore/QAbstractItemModel>
 
+#include "lmms_basics.h"
 #include "ResourceDB.h"
 
 
@@ -70,12 +71,32 @@ public:
 	int totalItems() const;
 	int shownItems() const;
 
+	QStringList keywordFilter() const
+	{
+		return m_keywordFilter;
+	}
+
+	ResourceItem::Type typeFilter() const
+	{
+		return m_typeFilter;
+	}
+
 
 public slots:
-	virtual void setFilter( const QString & _s ) = 0;
+	virtual void updateFilters() = 0;
+	void setKeywordFilter( const QString & _keywords );
+	void setTypeFilter( ResourceItem::Type _type = ResourceItem::TypeUnknown );
 
 
 protected:
+	inline bool itemMatchesFilter( const ResourceItem & _item ) const
+	{
+		return ( likely( typeFilter() == ResourceItem::TypeUnknown ) ||
+					typeFilter() == _item.type() ) &&
+				( likely( m_keywordFilterSet == false ) ||
+						_item.keywordMatch( keywordFilter() ) );
+	}
+
 	ResourceDB * db() const
 	{
 		return m_db;
@@ -84,6 +105,9 @@ protected:
 
 private:
 	ResourceDB * m_db;
+	QStringList m_keywordFilter;
+	bool m_keywordFilterSet;
+	ResourceItem::Type m_typeFilter;
 
 
 signals:

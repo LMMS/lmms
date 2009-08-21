@@ -36,20 +36,19 @@ public:
 	{
 	}
 
-	int rowCount( const QModelIndex & _parent = QModelIndex() ) const;
+	virtual int rowCount( const QModelIndex & _parent = QModelIndex() ) const;
 
 	virtual QModelIndex index( int _row, int _col,
 			const QModelIndex & _parent = QModelIndex() ) const;
 
 	virtual QModelIndex parent( const QModelIndex & _index ) const;
 
-	virtual void setFilter( const QString & _s );
+	virtual void updateFilters();
 
 
 private:
 	bool filterItems( ResourceItem::Relation * _item,
-						const QModelIndex & _parent,
-						const QStringList & _keywords );
+						const QModelIndex & _parent );
 	void setHidden( ResourceItem::Relation * _item,
 					const QModelIndex & _parent,
 					bool _hidden,

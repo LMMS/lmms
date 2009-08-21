@@ -32,12 +32,18 @@
 
 ResourceModel::ResourceModel( ResourceDB * _db, QObject * _parent ) :
 	QAbstractItemModel( _parent ),
-	m_db( _db )
+	m_db( _db ),
+	m_keywordFilter(),
+	m_keywordFilterSet( false ),
+	m_typeFilter( ResourceItem::TypeUnknown )
 {
 	setSupportedDragActions( Qt::CopyAction );
 
 	connect( db(), SIGNAL( itemsChanged() ),
-			this, SIGNAL( itemsChanged() ) );
+				this, SIGNAL( itemsChanged() ) );
+	connect( db(), SIGNAL( itemsChanged() ),
+				this, SLOT( updateFilters() ),
+				Qt::DirectConnection );
 }
 
 
@@ -249,6 +255,29 @@ int ResourceModel::shownItems() const
 
 
 
+void ResourceModel::setKeywordFilter( const QString & _keywords )
+{
+	if( !_keywords.isEmpty() )
+	{
+		m_keywordFilter = _keywords.toLower().split( " " );
+		m_keywordFilterSet = true;
+	}
+	else
+	{
+		m_keywordFilter.clear();
+		m_keywordFilterSet = false;
+	}
+	updateFilters();
+}
+
+
+
+
+void ResourceModel::setTypeFilter( ResourceItem::Type _type )
+{
+	m_typeFilter = _type;
+	updateFilters();
+}
 
 
 

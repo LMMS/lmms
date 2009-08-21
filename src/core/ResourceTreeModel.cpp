@@ -104,12 +104,11 @@ QModelIndex ResourceTreeModel::parent( const QModelIndex & _idx ) const
 
 
 
-void ResourceTreeModel::setFilter( const QString & _s )
+void ResourceTreeModel::updateFilters()
 {
 	filterItems( db()->topLevelNode(),
-				createIndex( 0, 0, db()->topLevelNode() ),
-						_s.toLower().split( " " ) );
-	if( _s.isEmpty() )
+					createIndex( 0, 0, db()->topLevelNode() ) );
+	if( keywordFilter().isEmpty() )
 	{
 		emit layoutChanged();
 	}
@@ -119,16 +118,12 @@ void ResourceTreeModel::setFilter( const QString & _s )
 
 
 bool ResourceTreeModel::filterItems( ResourceItem::Relation * _item,
-						const QModelIndex & _parent,
-						const QStringList & _keywords )
+										const QModelIndex & _parent )
 {
-	if( _item->item() )
+	if( _item->item() && itemMatchesFilter( *( _item->item() ) ) )
 	{
-		if( _item->item()->keywordMatch( _keywords ) )
-		{
-			setHidden( _item, _parent, false );
-			return true;
-		}
+		setHidden( _item, _parent, false );
+		return true;
 	}
 
 	int row = 0;
@@ -136,7 +131,7 @@ bool ResourceTreeModel::filterItems( ResourceItem::Relation * _item,
 	foreachResourceItemRelation( _item->children() )
 	{
 		QModelIndex idx = createIndex( row, 0, *it );
-		if( filterItems( *it, idx, _keywords ) )
+		if( filterItems( *it, idx ) )
 		{
 			hide = false;
 		}

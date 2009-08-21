@@ -1,5 +1,5 @@
 /*
- * ResourceListModel.h - a tree model implementation for resources
+ * ResourceListModel.h - a list model implementation for resources
  *
  * Copyright (c) 2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -32,14 +32,13 @@
 
 class ResourceListModel : public ResourceModel
 {
-	Q_OBJECT
 public:
 	ResourceListModel( ResourceDB * _db, QObject * _parent = NULL );
 	virtual ~ResourceListModel()
 	{
 	}
 
-	int rowCount( const QModelIndex & _parent = QModelIndex() ) const;
+	virtual int rowCount( const QModelIndex & _parent = QModelIndex() ) const;
 
 	virtual QModelIndex index( int _row, int _col,
 			const QModelIndex & _parent = QModelIndex() ) const;
@@ -49,15 +48,10 @@ public:
 		return QModelIndex();
 	}
 
-	virtual void setFilter( const QString & _s );
-
-
-private slots:
-	void updateLookupTable();
+	virtual void updateFilters();
 
 
 private:
-	QStringList m_filterKeywords;
 	QVector<ResourceItem *> m_lookupTable;
 
 } ;

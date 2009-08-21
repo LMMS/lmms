@@ -94,7 +94,7 @@ void ResourceItem::reload()
 
 
 
-bool ResourceItem::keywordMatch( const QStringList & _keywords )
+bool ResourceItem::keywordMatch( const QStringList & _keywords ) const
 {
 	for( QStringList::ConstIterator it = _keywords.begin();
 								it != _keywords.end(); ++it )
