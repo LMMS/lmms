@@ -1,6 +1,6 @@
 /* LMMS style sheet */
 
-QWhatsThat {
+QWhatsThis {
 	color: black;
 }
 
@@ -11,6 +11,28 @@ QMdiArea {
 automationEditor {
 	background-color: rgb(0, 0, 0);
 }
+
+#WelcomeFrame {
+	border: 2px solid rgb(32,32,32);
+	border-radius: 8px;
+	padding:2px;
+}
+
+#TitleSeparator {
+	border: 1px solid qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                                       stop:0 #ccc, stop: 0.5 #444,
+                                       stop:1 #ccc);
+	border-width: 1px 0px 0px 0px;
+}
+#WelcomeFrame, #WelcomeFrame * {
+	background-color: rgb(232,232,232);
+	color: black;
+}
+
+#WelcomeFrame QLabel {
+	color: rgb(128, 128, 128);
+}
+
 
 QMenu {
 	border:1px solid black;
