@@ -1,8 +1,8 @@
 /*
- * about_dialog.cpp - implementation of about-dialog
+ * AboutDialog.cpp - implementation of about-dialog
  *
- * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -22,13 +22,12 @@
  *
  */
 
-
 #include "lmmsversion.h"
-#include "about_dialog.h"
+#include "AboutDialog.h"
 #include "embed.h"
 #include "engine.h"
 #include "MainWindow.h"
-
+#include "ui_AboutDialog.h"
 
 #ifdef __GNUC__
 #define GCC_VERSION "GCC "__VERSION__
@@ -61,24 +60,24 @@
 #endif
 
 
-aboutDialog::aboutDialog() :
+AboutDialog::AboutDialog() :
 	QDialog( engine::mainWindow() ),
-	Ui::AboutDialog()
+	ui( new Ui::AboutDialog )
 {
-	setupUi( this );
+	ui->setupUi( this );
 
-	iconLabel->setPixmap( embed::getIconPixmap( "icon" ) );
+	ui->iconLabel->setPixmap( embed::getIconPixmap( "icon" ) );
 
-	versionLabel->setText( versionLabel->text().
-					arg( LMMS_VERSION ).
-					arg( PLATFORM ).
-					arg( MACHINE ).
-					arg( QT_VERSION_STR ).
-					arg( GCC_VERSION ) );
+	ui->versionLabel->setText( ui->versionLabel->text().
+									arg( LMMS_VERSION ).
+									arg( PLATFORM ).
+									arg( MACHINE ).
+									arg( QT_VERSION_STR ).
+									arg( GCC_VERSION ) );
 
-	authorLabel->setPlainText( embed::getText( "AUTHORS" ) );
+	ui->authorLabel->setPlainText( embed::getText( "AUTHORS" ) );
 
-	licenseLabel->setPlainText( embed::getText( "COPYING" ) );
+	ui->licenseLabel->setPlainText( embed::getText( "COPYING" ) );
 }
 
 

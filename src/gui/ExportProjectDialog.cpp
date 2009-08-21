@@ -1,5 +1,5 @@
 /*
- * export_project_dialog.cpp - implementation of dialog for exporting project
+ * ExportProjectDialog.cpp - implementation of dialog for exporting project
  *
  * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -25,29 +25,31 @@
 #include <QtCore/QFileInfo>
 #include <QtGui/QMessageBox>
 
-#include "export_project_dialog.h"
+#include "ExportProjectDialog.h"
 #include "engine.h"
 #include "MainWindow.h"
 #include "ProjectRenderer.h"
+#include "ui_ExportProjectDialog.h"
 
 
-exportProjectDialog::exportProjectDialog( const QString & _file_name,
+ExportProjectDialog::ExportProjectDialog( const QString & _file_name,
 							QWidget * _parent ) :
 	QDialog( _parent ),
-	Ui::ExportProjectDialog(),
+	ui( new Ui::ExportProjectDialog ),
 	m_fileName( _file_name ),
 	m_renderer( NULL )
 {
-	setupUi( this );
-	setWindowTitle( tr( "Export project to %1" ).arg( 
+	ui->setupUi( this );
+
+	setWindowTitle( tr( "Export project to %1" ).arg(
 					QFileInfo( _file_name ).fileName() ) );
 
 	// get the extension of the chosen file
 	QStringList parts = _file_name.split( '.' );
-	QString file_ext;
+	QString fileExt;
 	if( parts.size() > 0 )
 	{
-		file_ext = parts[parts.size()-1];
+		fileExt = parts[parts.size()-1];
 	}
 
 	int cbIndex = 0;
@@ -56,32 +58,32 @@ exportProjectDialog::exportProjectDialog( const QString & _file_name,
 		if( __fileEncodeDevices[i].m_getDevInst != NULL )
 		{
 			// get the extension of this format
-			QString render_ext = ProjectRenderer::EFF_ext[i];
+			QString renderExt = ProjectRenderer::EFF_ext[i];
 
 			// add to combo box
-			fileFormatCB->addItem( ProjectRenderer::tr(
+			ui->fileFormatCB->addItem( ProjectRenderer::tr(
 				__fileEncodeDevices[i].m_description ) );
 
 			// if this is our extension, select it
-			if( QString::compare(render_ext, file_ext, 
-				Qt::CaseInsensitive ) == 0 )
+			if( QString::compare( renderExt, fileExt,
+									Qt::CaseInsensitive ) == 0 )
 			{
-				fileFormatCB->setCurrentIndex(cbIndex);
+				ui->fileFormatCB->setCurrentIndex(cbIndex);
 			}
-			
+
 			cbIndex++;
 		}
 	}
 
-	connect( startButton, SIGNAL( clicked() ),
-			this, SLOT( startBtnClicked() ) );
+	connect( ui->startButton, SIGNAL( clicked() ),
+				this, SLOT( startBtnClicked() ) );
 
 }
 
 
 
 
-exportProjectDialog::~exportProjectDialog()
+ExportProjectDialog::~ExportProjectDialog()
 {
 	delete m_renderer;
 }
@@ -89,7 +91,7 @@ exportProjectDialog::~exportProjectDialog()
 
 
 
-void exportProjectDialog::reject()
+void ExportProjectDialog::reject()
 {
 	if( m_renderer == NULL )
 	{
@@ -104,7 +106,7 @@ void exportProjectDialog::reject()
 
 
 
-void exportProjectDialog::closeEvent( QCloseEvent * _ce )
+void ExportProjectDialog::closeEvent( QCloseEvent * _ce )
 {
 	if( m_renderer != NULL && m_renderer->isRunning() )
 	{
@@ -116,15 +118,14 @@ void exportProjectDialog::closeEvent( QCloseEvent * _ce )
 
 
 
-void exportProjectDialog::startBtnClicked()
+void ExportProjectDialog::startBtnClicked()
 {
 	ProjectRenderer::ExportFileFormats ft = ProjectRenderer::NumFileFormats;
 
 	for( int i = 0; i < ProjectRenderer::NumFileFormats; ++i )
 	{
-		if( fileFormatCB->currentText() ==
-			ProjectRenderer::tr(
-				__fileEncodeDevices[i].m_description ) )
+		if( ui->fileFormatCB->currentText() ==
+				ProjectRenderer::tr( __fileEncodeDevices[i].m_description ) )
 		{
 			ft = __fileEncodeDevices[i].m_fileFormat;
 			break;
@@ -141,31 +142,30 @@ void exportProjectDialog::startBtnClicked()
 		return;
 	}
 
-	startButton->setEnabled( false );
-	progressBar->setEnabled( true );
+	ui->startButton->setEnabled( false );
+	ui->progressBar->setEnabled( true );
 
 
 	mixer::qualitySettings qs = mixer::qualitySettings(
 		static_cast<mixer::qualitySettings::Interpolation>(
-					interpolationCB->currentIndex() ),
+						ui->interpolationCB->currentIndex() ),
 		static_cast<mixer::qualitySettings::Oversampling>(
-					oversamplingCB->currentIndex() ),
-					sampleExactControllersCB->isChecked(),
-					aliasFreeOscillatorsCB->isChecked() );
+						ui->oversamplingCB->currentIndex() ),
+					ui->sampleExactControllersCB->isChecked(),
+					ui->aliasFreeOscillatorsCB->isChecked() );
 
 	ProjectRenderer::OutputSettings os = ProjectRenderer::OutputSettings(
-		samplerateCB->currentText().section( " ", 0, 0 ).toUInt(),
+		ui->samplerateCB->currentText().section( " ", 0, 0 ).toUInt(),
 		false,
-		bitrateCB->currentText().section( " ", 0, 0 ).toUInt(),
-		static_cast<ProjectRenderer::Depths>(
-						depthCB->currentIndex() ) );
+		ui->bitrateCB->currentText().section( " ", 0, 0 ).toUInt(),
+		static_cast<ProjectRenderer::Depths>( ui->depthCB->currentIndex() ) );
 
 	m_renderer = new ProjectRenderer( qs, os, ft, m_fileName );
 	if( m_renderer->isReady() )
 	{
 		updateTitleBar( 0 );
 		connect( m_renderer, SIGNAL( progressChanged( int ) ),
-				progressBar, SLOT( setValue( int ) ) );
+				ui->progressBar, SLOT( setValue( int ) ) );
 		connect( m_renderer, SIGNAL( progressChanged( int ) ),
 				this, SLOT( updateTitleBar( int ) ) );
 		connect( m_renderer, SIGNAL( finished() ),
@@ -184,7 +184,7 @@ void exportProjectDialog::startBtnClicked()
 
 
 
-void exportProjectDialog::updateTitleBar( int _prog )
+void ExportProjectDialog::updateTitleBar( int _prog )
 {
 	engine::mainWindow()->setWindowTitle(
 					tr( "Rendering: %1%" ).arg( _prog ) );
@@ -192,7 +192,7 @@ void exportProjectDialog::updateTitleBar( int _prog )
 
 
 
-#include "moc_export_project_dialog.cxx"
+#include "moc_ExportProjectDialog.cxx"
 
 
 /* vim: set tw=0 noexpandtab: */

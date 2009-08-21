@@ -28,6 +28,7 @@
 #include <QtGui/QCloseEvent>
 #include <QtGui/QDesktopServices>
 #include <QtGui/QFileDialog>
+#include <QtGui/QLabel>
 #include <QtGui/QMdiArea>
 #include <QtGui/QMdiSubWindow>
 #include <QtGui/QMenuBar>
@@ -49,7 +50,7 @@
 #include "embed.h"
 #include "engine.h"
 #include "fx_mixer_view.h"
-#include "about_dialog.h"
+#include "AboutDialog.h"
 #include "ControllerRackView.h"
 #include "plugin_browser.h"
 #include "side_bar.h"
@@ -1061,7 +1062,7 @@ void MainWindow::showSettingsDialog()
 
 void MainWindow::aboutLMMS()
 {
-	aboutDialog().exec();
+	AboutDialog().exec();
 }
 
 

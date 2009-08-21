@@ -1,9 +1,8 @@
 /*
- * export_project_dialog.h - declaration of class exportProjectDialog which is
- *                           responsible for exporting project
+ * AboutDialog.h - declaration of class AboutDialog
  *
- * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -23,39 +22,22 @@
  *
  */
 
-
-#ifndef _EXPORT_PROJECT_DIALOG_H
-#define _EXPORT_PROJECT_DIALOG_H
+#ifndef _ABOUT_DIALOG_H
+#define _ABOUT_DIALOG_H
 
 #include <QtGui/QDialog>
 
-#include "ui_export_project.h"
+namespace Ui { class AboutDialog; }
 
-class ProjectRenderer;
-
-
-class exportProjectDialog : public QDialog, public Ui::ExportProjectDialog
+class AboutDialog : public QDialog
 {
-	Q_OBJECT
 public:
-	exportProjectDialog( const QString & _file_name, QWidget * _parent );
-	virtual ~exportProjectDialog();
-
-
-protected:
-	virtual void reject( void );
-	virtual void closeEvent( QCloseEvent * _ce );
-
-
-private slots:
-	void startBtnClicked( void );
-	void updateTitleBar( int );
-
+	AboutDialog();
 
 private:
-	QString m_fileName;
-	ProjectRenderer * m_renderer;
+	Ui::AboutDialog * ui;
 
 } ;
 
 #endif
+

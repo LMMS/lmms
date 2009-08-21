@@ -22,7 +22,7 @@
  *
  */
 
-
+#include <QtCore/QCoreApplication>
 #include <QtCore/QFile>
 #include <QtCore/QFileInfo>
 #include <QtGui/QFileDialog>
@@ -42,7 +42,7 @@
 #include "ControllerConnection.h"
 #include "embed.h"
 #include "envelope_and_lfo_parameters.h"
-#include "export_project_dialog.h"
+#include "ExportProjectDialog.h"
 #include "fx_mixer.h"
 #include "fx_mixer_view.h"
 #include "import_filter.h"
@@ -1164,7 +1164,7 @@ void song::exportProject()
 		!efd.selectedFiles().isEmpty() && !efd.selectedFiles()[0].isEmpty() )
 	{
 		const QString export_file_name = efd.selectedFiles()[0];
-		exportProjectDialog epd( export_file_name,
+		ExportProjectDialog epd( export_file_name,
 						engine::mainWindow() );
 		epd.exec();
 	}
