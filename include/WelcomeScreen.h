@@ -25,11 +25,13 @@
 #ifndef _WELCOME_SCREEN_H
 #define _WELCOME_SCREEN_H
 
+#include <QtCore/QModelIndex>
 #include <QtGui/QWidget>
 
 
 namespace Ui { class WelcomeScreen; }
 class QListWidgetItem;
+class RecentResourceListModel;
 
 
 class WelcomeScreen : public QWidget
@@ -45,11 +47,17 @@ private slots:
 	void importProject();
 	void openTutorial();
 	void instantMidiAction();
+	void openRecentProject( const QModelIndex & );
+	void openCommunityResource( const QModelIndex & );
 	void openOnlineResource( QListWidgetItem * _item );
 
 
 private:
+	void switchView();
+
 	Ui::WelcomeScreen * ui;
+	RecentResourceListModel * m_recentProjectsModel;
+	RecentResourceListModel * m_communityResourcesModel;
 
 } ;
 

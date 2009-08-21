@@ -27,6 +27,7 @@
 #include "WelcomeScreen.h"
 #include "RecentResourceListModel.h"
 #include "MainWindow.h"
+#include "ResourceAction.h"
 #include "engine.h"
 #include "embed.h"
 
@@ -68,16 +69,24 @@ WelcomeScreen::WelcomeScreen( QWidget * _parent ) :
 				this, SLOT( instantMidiAction() ) );
 
 	// setup recent projects list view
-	RecentResourceListModel * recentProjectsModel =
+	m_recentProjectsModel =
 		new RecentResourceListModel( engine::workingDirResourceDB(), -1, this );
-	recentProjectsModel->resourceListModel()->
+	m_recentProjectsModel->resourceListModel()->
 							setTypeFilter( ResourceItem::TypeProject );
-	ui->recentProjectsListView->setModel( recentProjectsModel );
+	ui->recentProjectsListView->setModel( m_recentProjectsModel );
+
+	connect( ui->recentProjectsListView,
+					SIGNAL( clicked( const QModelIndex & ) ),
+				this, SLOT( openRecentProject( const QModelIndex & ) ) );
 
 	// setup recent community resources list view
-	RecentResourceListModel * recentCommunityResourcesModel =
+	m_communityResourcesModel =
 		new RecentResourceListModel( engine::webResourceDB(), 100, this );
-	ui->communityResourcesListView->setModel( recentCommunityResourcesModel );
+	ui->communityResourcesListView->setModel( m_communityResourcesModel );
+
+	connect( ui->communityResourcesListView,
+					SIGNAL( clicked( const QModelIndex & ) ),
+				this, SLOT( openCommunityResource( const QModelIndex & ) ) );
 
 	// setup online resources list widget
 	for( int i = 0; i < ui->onlineResourcesListWidget->count(); ++i )
@@ -103,7 +112,7 @@ WelcomeScreen::~WelcomeScreen()
 
 void WelcomeScreen::createNewProject()
 {
-	engine::mainWindow()->setMainWidgetVisible( true );
+	switchView();
 }
 
 
@@ -130,11 +139,47 @@ void WelcomeScreen::instantMidiAction()
 
 
 
+void WelcomeScreen::openRecentProject( const QModelIndex & _idx )
+{
+	switchView();
+	ResourceAction( m_recentProjectsModel->item( _idx ) ).loadProject();
+}
+
+
+
+
+void WelcomeScreen::openCommunityResource( const QModelIndex & _idx )
+{
+	ResourceItem * item = m_communityResourcesModel->item( _idx );
+	ResourceAction action( item );
+
+	switch( item->type() )
+	{
+		case ResourceItem::TypeProject:
+			switchView();
+			action.loadProject();
+			break;
+		default:
+			break;
+	}
+}
+
+
+
+
 void WelcomeScreen::openOnlineResource( QListWidgetItem * _item )
 {
 	// the URL to be opened is encoded in status tip (no other
 	// possibility to store such information in Qt Designer)
 	QDesktopServices::openUrl( _item->statusTip() );
+}
+
+
+
+
+void WelcomeScreen::switchView()
+{
+	engine::mainWindow()->setMainWidgetVisible( true );
 }
 
 
