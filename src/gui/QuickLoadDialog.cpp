@@ -30,12 +30,29 @@
 
 
 
-QuickLoadDialog::QuickLoadDialog( QWidget * _parent ) :
+QuickLoadDialog::QuickLoadDialog( QWidget * _parent,
+									ResourceItem::Type _typeFilter ) :
 	QDialog( _parent ),
 	ui( new Ui::QuickLoadDialog ),
 	m_listModel( new ResourceListModel( engine::mergedResourceDB(), this ) )
 {
 	ui->setupUi( this );
+
+	// setup type combobox + type filtering
+	for( int i = ResourceItem::TypeUnknown+1; i < ResourceItem::NumTypes; ++i )
+	{
+		ui->resourceTypeComboBox->addItem(
+			ResourceItem::descriptiveTypeName(
+				static_cast<ResourceItem::Type>( i ) ) );
+	}
+
+	connect( ui->resourceTypeComboBox, SIGNAL( currentIndexChanged( int ) ),
+				this, SLOT( setTypeFilter( int ) ) );
+
+	if( _typeFilter != ResourceItem::TypeUnknown )
+	{
+		ui->resourceTypeComboBox->setCurrentIndex( _typeFilter );
+	}
 
 	// setup list view to display our model
 	ui->resourceListView->setModel( m_listModel );
@@ -56,4 +73,15 @@ QuickLoadDialog::~QuickLoadDialog()
 	delete m_listModel;
 }
 
+
+
+
+void QuickLoadDialog::setTypeFilter( int _type )
+{
+	m_listModel->setTypeFilter( static_cast<ResourceItem::Type>( _type ) );
+}
+
+
+
+#include "moc_QuickLoadDialog.cxx"
 

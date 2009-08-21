@@ -27,15 +27,22 @@
 
 #include <QtGui/QDialog>
 
+#include "ResourceItem.h"
 
 namespace Ui { class QuickLoadDialog; }
 class ResourceListModel;
 
 class QuickLoadDialog : public QDialog
 {
+	Q_OBJECT
 public:
-	QuickLoadDialog( QWidget * _parent );
-	~QuickLoadDialog();
+	QuickLoadDialog( QWidget * _parent, ResourceItem::Type _typeFilter =
+													ResourceItem::TypeUnknown );
+	virtual ~QuickLoadDialog();
+
+
+private slots:
+	void setTypeFilter( int );
 
 
 private:

@@ -40,13 +40,18 @@
       </spacer>
      </item>
      <item>
-      <widget class="QComboBox" name="comboBox">
+      <widget class="QComboBox" name="resourceTypeComboBox">
        <property name="sizePolicy">
         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
+       <item>
+        <property name="text">
+         <string>All types</string>
+        </property>
+       </item>
       </widget>
      </item>
     </layout>
@@ -79,7 +84,7 @@
  <tabstops>
   <tabstop>filterEdit</tabstop>
   <tabstop>resourceListView</tabstop>
-  <tabstop>comboBox</tabstop>
+  <tabstop>resourceTypeComboBox</tabstop>
   <tabstop>buttonBox</tabstop>
  </tabstops>
  <resources/>
