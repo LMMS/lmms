@@ -39,7 +39,16 @@ RecentResourceListModel::RecentResourceListModel( ResourceDB * _db,
 
 
 
-bool RecentResourceListModel::lessThan ( const QModelIndex & _left,
+
+ResourceItem * RecentResourceListModel::item( const QModelIndex & _idx )
+{
+	return m_model->item( mapToSource( _idx ) );
+}
+
+
+
+
+bool RecentResourceListModel::lessThan( const QModelIndex & _left,
 											const QModelIndex & _right ) const
 {
 	return m_model->item( _left )->lastMod() < m_model->item( _right )->lastMod();

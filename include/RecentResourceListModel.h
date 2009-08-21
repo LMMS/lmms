@@ -50,6 +50,8 @@ public:
 		return m_model;
 	}
 
+	ResourceItem * item( const QModelIndex & _idx );
+
 
 protected:
 	// compares items at two indices by date-property
