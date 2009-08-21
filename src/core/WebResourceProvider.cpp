@@ -174,7 +174,9 @@ void WebResourceProvider::importNodeIntoDB( const QDomNode & _n,
 				n.firstChildElement( "hash" ).text(),
 				n.firstChildElement( "author" ).text(),
 				n.firstChildElement( "tags" ).text(),
-				n.firstChildElement( "size" ).text().toInt() );
+				n.firstChildElement( "size" ).text().toInt(),
+				QDateTime::fromString(
+					n.firstChildElement( "date" ).text(), Qt::ISODate ) );
 		database()->addItem( item );
 
 		ResourceItem::Relation * relation = addRelation( _parent, item );
