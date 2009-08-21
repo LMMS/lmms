@@ -34,7 +34,6 @@
 #include "ResourceDB.h"
 #include "ResourceItem.h"
 #include "ResourceFileMapper.h"
-#include "UnifiedResourceProvider.h"
 
 #include "track_container_view.h"
 #include "track_container.h"
@@ -404,8 +403,7 @@ void trackContainerView::dropEvent( QDropEvent * _de )
 	if( type == ResourceItem::mimeKey() )
 	{
 		const ResourceItem * item =
-			engine::resourceProvider()->database()->
-						itemByHash( value );
+			engine::mergedResourceDB()->itemByHash( value );
 		if( item )
 		{
 			ResourceAction action( item );
@@ -415,15 +413,13 @@ void trackContainerView::dropEvent( QDropEvent * _de )
 	case ResourceItem::TypePreset:
 		action.loadPreset(
 			dynamic_cast<instrumentTrack *>(
-				track::create( track::InstrumentTrack,
-								m_tc ) ) );
+				track::create( track::InstrumentTrack, m_tc ) ) );
 		break;
 	case ResourceItem::TypeSample:
 	case ResourceItem::TypePluginSpecificResource:
 		action.loadByPlugin(
 			dynamic_cast<instrumentTrack *>(
-				track::create( track::InstrumentTrack,
-								m_tc ) ) );
+				track::create( track::InstrumentTrack, m_tc ) ) );
 		break;
 	case ResourceItem::TypeForeignProject:
 		action.importProject( m_tc );

@@ -62,7 +62,9 @@ fxMixerView * engine::s_fxMixerView = NULL;
 MainWindow * engine::s_mainWindow = NULL;
 bbTrackContainer * engine::s_bbTrackContainer = NULL;
 song * engine::s_song = NULL;
-UnifiedResourceProvider * engine::s_resourceProvider = NULL;
+ResourceDB * engine::s_workingDirResourceDB = NULL;
+ResourceDB * engine::s_webResourceDB = NULL;
+ResourceDB * engine::s_mergedResourceDB = NULL;
 songEditor * engine::s_songEditor = NULL;
 automationEditor * engine::s_automationEditor = NULL;
 AutomationRecorder * engine::s_automationRecorder = NULL;
@@ -92,22 +94,22 @@ void engine::init( const bool _has_gui )
 
 
 	// init resource framework
-	LocalResourceProvider * workingDirResource =
-		new LocalResourceProvider( ResourceItem::BaseWorkingDir,
-								QString() );
-	LocalResourceProvider * shippedResource =
-		new LocalResourceProvider( ResourceItem::BaseDataDir,
-								QString() );
-	WebResourceProvider * webResource =
-		new WebResourceProvider( "http://lmms.sourceforge.net" );
+	s_workingDirResourceDB =
+		( new LocalResourceProvider( ResourceItem::BaseWorkingDir,
+													QString() ) )->database();
+	ResourceDB * shippedResourceDB =
+		( new LocalResourceProvider( ResourceItem::BaseDataDir,
+													QString() ) )->database();
+	s_webResourceDB =
+		( new WebResourceProvider( "http://lmms.sourceforge.net" ) )
+																->database();
 
-	UnifiedResourceProvider * unifiedResource =
-						new UnifiedResourceProvider;
-	unifiedResource->addDatabase( workingDirResource->database() );
-	unifiedResource->addDatabase( shippedResource->database() );
-	unifiedResource->addDatabase( webResource->database() );
+	UnifiedResourceProvider * unifiedResource = new UnifiedResourceProvider;
+	unifiedResource->addDatabase( s_workingDirResourceDB );
+	unifiedResource->addDatabase( shippedResourceDB );
+	unifiedResource->addDatabase( s_webResourceDB );
 
-	s_resourceProvider = unifiedResource;
+	s_mergedResourceDB = unifiedResource->database();
 
 
 	s_fxMixer = new fxMixer;
@@ -191,8 +193,8 @@ void engine::destroy( void )
 	delete s_automationRecorder;
 	s_automationRecorder = NULL;
 
-	delete s_resourceProvider;
-	s_resourceProvider = NULL;
+	delete s_mergedResourceDB->provider();
+	s_mergedResourceDB = NULL;
 
 	delete configManager::inst();
 }

@@ -33,7 +33,6 @@
 #include "ResourceFileMapper.h"
 #include "ResourceTreeModel.h"
 #include "ResourceTreeView.h"
-#include "UnifiedResourceProvider.h"
 #include "engine.h"
 #include "embed.h"
 #include "MainWindow.h"
@@ -79,7 +78,7 @@ ResourceBrowser::ResourceBrowser( QWidget * _parent ) :
 			_parent ),
 	m_previewer(),
 	m_filterEdit( NULL ),
-	m_treeModel( engine::resourceProvider()->database() )
+	m_treeModel( engine::mergedResourceDB() )
 {
 	// create a model which represents our database as a tree
 

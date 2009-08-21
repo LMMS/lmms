@@ -24,7 +24,6 @@
 
 #include "QuickLoadDialog.h"
 #include "ResourceListModel.h"
-#include "UnifiedResourceProvider.h"
 #include "engine.h"
 
 #include "ui_QuickLoadDialog.h"
@@ -34,8 +33,7 @@
 QuickLoadDialog::QuickLoadDialog( QWidget * _parent ) :
 	QDialog( _parent ),
 	ui( new Ui::QuickLoadDialog ),
-	m_listModel( new ResourceListModel(
-							engine::resourceProvider()->database(), this ) )
+	m_listModel( new ResourceListModel( engine::mergedResourceDB(), this ) )
 {
 	ui->setupUi( this );
 
@@ -47,7 +45,7 @@ QuickLoadDialog::QuickLoadDialog( QWidget * _parent ) :
 
 	// connect filter edit with model
 	connect( ui->filterEdit, SIGNAL( textChanged( const QString & ) ),
-				m_listModel, SLOT( setFilter( const QString & ) ) );
+				m_listModel, SLOT( setKeywordFilter( const QString & ) ) );
 }
 
 

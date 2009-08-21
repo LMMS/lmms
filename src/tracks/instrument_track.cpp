@@ -40,7 +40,6 @@
 
 #include "ResourceAction.h"
 #include "ResourceDB.h"
-#include "UnifiedResourceProvider.h"
 
 #include "instrument_track.h"
 #include "AudioPort.h"
@@ -1505,8 +1504,7 @@ void instrumentTrackWindow::dropEvent( QDropEvent * _de )
 	else if( type == ResourceItem::mimeKey() )
 	{
 		const ResourceItem * item =
-			engine::resourceProvider()->database()->
-						itemByHash( value );
+			engine::mergedResourceDB()->itemByHash( value );
 		if( !item )
 		{
 			return;

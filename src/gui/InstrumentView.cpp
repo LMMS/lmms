@@ -29,7 +29,6 @@
 #include "instrument_track.h"
 #include "ResourceDB.h"
 #include "string_pair_drag.h"
-#include "UnifiedResourceProvider.h"
 
 
 InstrumentView::InstrumentView( instrument * _instrument, QWidget * _parent ) :
@@ -84,7 +83,7 @@ void InstrumentView::dragEnterEvent( QDragEnterEvent * _dee )
 	if( stringPairDrag::decodeKey( _dee ) == ResourceItem::mimeKey() )
 	{
 		const ResourceItem * item =
-			engine::resourceProvider()->database()->
+			engine::mergedResourceDB()->
 				itemByHash( stringPairDrag::decodeValue( _dee ) );
 		if( item &&
 			model()->getDescriptor()->supportsFileType(
@@ -103,7 +102,7 @@ void InstrumentView::dropEvent( QDropEvent * _de )
 	if( stringPairDrag::decodeKey( _de ) == ResourceItem::mimeKey() )
 	{
 		const ResourceItem * item =
-			engine::resourceProvider()->database()->
+			engine::mergedResourceDB()->
 				itemByHash( stringPairDrag::decodeValue( _de ) );
 		model()->loadResource( item );
 		_de->accept();
