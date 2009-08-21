@@ -231,6 +231,8 @@ public:
 	static QString getBaseDirectory( BaseDirectory _bd,
 					const ResourceItem * _item = NULL );
 
+	static QString descriptiveTypeName( Type _type );
+
 
 private:
 	void init();

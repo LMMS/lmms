@@ -29,6 +29,7 @@
 
 #include "ResourceItem.h"
 #include "ResourceProvider.h"
+#include "ResourceDB.h"
 #include "config_mgr.h"
 #include "engine.h"
 
@@ -236,6 +237,30 @@ ResourceItem::Type ResourceItem::guessType() const
 	}
 
 	return TypeUnknown;
+}
+
+
+
+
+QString ResourceItem::descriptiveTypeName( Type _type )
+{
+	switch( _type )
+	{
+		case TypeDirectory: return ResourceDB::tr( "Directory" );
+		case TypeSample: return ResourceDB::tr( "Sample" );
+		case TypePreset: return ResourceDB::tr( "Preset" );
+		case TypePluginSpecificResource:
+			return ResourceDB::tr( "Plugin-specific resource" );
+		case TypeProject: return ResourceDB::tr( "Project" );
+		case TypeMidiFile: return ResourceDB::tr( "MIDI file" );
+		case TypeForeignProject: return ResourceDB::tr( "Foreign project" );
+		case TypePlugin: return ResourceDB::tr( "Plugin" );
+		case TypeImage: return ResourceDB::tr( "Image" );
+		case TypeUnknown:
+		case NumTypes:
+			break;
+	}
+	return ResourceDB::tr( "Unknown" );
 }
 
 
