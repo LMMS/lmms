@@ -34,7 +34,7 @@
 #include "gui_templates.h"
 #include "embed.h"
 #include "engine.h"
-#include "main_window.h"
+#include "MainWindow.h"
 #include "tooltip.h"
 
 

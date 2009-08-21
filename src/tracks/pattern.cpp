@@ -48,7 +48,6 @@
 #include "tooltip.h"
 #include "bb_track_container.h"
 #include "string_pair_drag.h"
-#include "main_window.h"
 
 
 QPixmap * patternView::s_stepBtnOn = NULL;

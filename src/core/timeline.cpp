@@ -33,7 +33,7 @@
 #include "embed.h"
 #include "engine.h"
 #include "lmms_style.h"
-#include "main_window.h"
+#include "MainWindow.h"
 #include "nstate_button.h"
 #include "templates.h"
 #include "text_float.h"

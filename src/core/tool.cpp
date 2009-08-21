@@ -30,7 +30,7 @@
 
 #include "embed.h"
 #include "engine.h"
-#include "main_window.h"
+#include "MainWindow.h"
 
 
 
@@ -72,7 +72,7 @@ tool * tool::instantiate( const QString & _plugin_name, model * _parent )
 toolView::toolView( tool * _tool ) :
 	pluginView( _tool, NULL )
 {
-	engine::getMainWindow()->workspace()->addSubWindow( this );
+	engine::mainWindow()->workspace()->addSubWindow( this );
 	parentWidget()->setAttribute( Qt::WA_DeleteOnClose, FALSE );
 
 	setWindowTitle( _tool->displayName() );

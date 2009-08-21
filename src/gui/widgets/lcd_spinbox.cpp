@@ -38,7 +38,7 @@
 #include "embed.h"
 #include "gui_templates.h"
 #include "templates.h"
-#include "main_window.h"
+#include "MainWindow.h"
 
 
 

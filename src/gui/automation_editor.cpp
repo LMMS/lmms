@@ -48,7 +48,7 @@
 
 
 #include "song_editor.h"
-#include "main_window.h"
+#include "MainWindow.h"
 #include "embed.h"
 #include "engine.h"
 #include "pixmap_button.h"
@@ -355,9 +355,9 @@ automationEditor::automationEditor( void ) :
 	setMinimumSize( tb_layout->minimumSize().width(), 128 );
 
 	// add us to workspace
-	if( engine::getMainWindow()->workspace() )
+	if( engine::mainWindow()->workspace() )
 	{
-		engine::getMainWindow()->workspace()->addSubWindow( this );
+		engine::mainWindow()->workspace()->addSubWindow( this );
 		parentWidget()->resize( InitialWidth, InitialHeight );
 		parentWidget()->hide();
 	}
@@ -412,7 +412,7 @@ void automationEditor::setCurrentPattern( automationPattern * _new_pattern )
 
 void automationEditor::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
-	mainWindow::saveWidgetState( this, _this );
+	MainWindow::saveWidgetState( this, _this );
 }
 
 
@@ -420,7 +420,7 @@ void automationEditor::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 void automationEditor::loadSettings( const QDomElement & _this )
 {
-	mainWindow::restoreWidgetState( this, _this );
+	MainWindow::restoreWidgetState( this, _this );
 }
 
 

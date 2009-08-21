@@ -28,7 +28,7 @@
 #include <QtGui/QPainter>
 
 #include "pixmap_button.h"
-#include "main_window.h"
+#include "MainWindow.h"
 #include "embed.h"
 
 

@@ -38,7 +38,7 @@
 #include "effect_rack_view.h"
 #include "engine.h"
 #include "embed.h"
-#include "main_window.h"
+#include "MainWindow.h"
 #include "lcd_spinbox.h"
 #include "gui_templates.h"
 #include "tooltip.h"
@@ -219,13 +219,13 @@ fxMixerView::fxMixerView() :
 	setCurrentFxLine( m_fxChannelViews[0].m_fxLine );
 
 	// timer for updating faders
-	connect( engine::getMainWindow(), SIGNAL( periodicUpdate() ),
+	connect( engine::mainWindow(), SIGNAL( periodicUpdate() ),
 					this, SLOT( updateFaders() ) );
 
 
 	// add ourself to workspace
 	QMdiSubWindow * subWin = 
-		engine::getMainWindow()->workspace()->addSubWindow( this );
+		engine::mainWindow()->workspace()->addSubWindow( this );
 	Qt::WindowFlags flags = subWin->windowFlags();
 	flags |= Qt::MSWindowsFixedSizeDialogHint;
 	flags &= ~Qt::WindowMaximizeButtonHint;
@@ -251,7 +251,7 @@ fxMixerView::~fxMixerView()
 
 void fxMixerView::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
-	mainWindow::saveWidgetState( this, _this );
+	MainWindow::saveWidgetState( this, _this );
 }
 
 
@@ -259,7 +259,7 @@ void fxMixerView::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 void fxMixerView::loadSettings( const QDomElement & _this )
 {
-	mainWindow::restoreWidgetState( this, _this );
+	MainWindow::restoreWidgetState( this, _this );
 }
 
 

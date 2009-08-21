@@ -63,7 +63,7 @@
 #include "instrument_midi_io_view.h"
 #include "lcd_spinbox.h"
 #include "led_checkbox.h"
-#include "main_window.h"
+#include "MainWindow.h"
 #include "MidiClient.h"
 #include "MidiPortMenu.h"
 #include "mmp.h"
@@ -1287,7 +1287,7 @@ instrumentTrackWindow::instrumentTrackWindow( instrumentTrackView * _itv ) :
 	resize( sizeHint() );
 
 	QMdiSubWindow * subWin = 
-			engine::getMainWindow()->workspace()->addSubWindow( this );
+			engine::mainWindow()->workspace()->addSubWindow( this );
 	Qt::WindowFlags flags = subWin->windowFlags();
 	flags |= Qt::MSWindowsFixedSizeDialogHint;
 	flags &= ~Qt::WindowMaximizeButtonHint;
@@ -1303,7 +1303,7 @@ instrumentTrackWindow::instrumentTrackWindow( instrumentTrackView * _itv ) :
 instrumentTrackWindow::~instrumentTrackWindow()
 {
 	delete m_instrumentView;
-	if( engine::getMainWindow()->workspace() )
+	if( engine::mainWindow()->workspace() )
 	{
 		parentWidget()->hide();
 		parentWidget()->deleteLater();
@@ -1452,7 +1452,7 @@ void instrumentTrackWindow::toggleVisibility( bool _on )
 void instrumentTrackWindow::closeEvent( QCloseEvent * _ce )
 {
 	_ce->ignore();
-	if( engine::getMainWindow()->workspace() )
+	if( engine::mainWindow()->workspace() )
 	{
 		parentWidget()->hide();
 	}
@@ -1532,7 +1532,7 @@ void instrumentTrackWindow::saveSettings( QDomDocument & _doc,
 							QDomElement & _this )
 {
 	_this.setAttribute( "tab", m_tabWidget->activeTab() );
-	mainWindow::saveWidgetState( this, _this );
+	MainWindow::saveWidgetState( this, _this );
 }
 
 
@@ -1541,7 +1541,7 @@ void instrumentTrackWindow::saveSettings( QDomDocument & _doc,
 void instrumentTrackWindow::loadSettings( const QDomElement & _this )
 {
 	m_tabWidget->setActiveTab( _this.attribute( "tab" ).toInt() );
-	mainWindow::restoreWidgetState( this, _this );
+	MainWindow::restoreWidgetState( this, _this );
 	if( isVisible() )
 	{
 		m_itv->m_tlb->setChecked( true );

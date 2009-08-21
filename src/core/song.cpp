@@ -47,7 +47,7 @@
 #include "fx_mixer_view.h"
 #include "import_filter.h"
 #include "instrument_track.h"
-#include "main_window.h"
+#include "MainWindow.h"
 #include "MidiClient.h"
 #include "mmp.h"
 #include "note_play_handle.h"
@@ -837,9 +837,9 @@ void song::createNewProject()
 
 	m_modified = false;
 
-	if( engine::getMainWindow() )
+	if( engine::mainWindow() )
 	{
-		engine::getMainWindow()->resetWindowTitle();
+		engine::mainWindow()->resetWindowTitle();
 	}
 }
 
@@ -853,9 +853,9 @@ void song::createNewProjectFromTemplate( const QString & _template )
 	// saving...
 	m_fileName = m_oldFileName = "";
 	// update window title
-	if( engine::getMainWindow() )
+	if( engine::mainWindow() )
 	{
-		engine::getMainWindow()->resetWindowTitle();
+		engine::mainWindow()->resetWindowTitle();
 	}
 
 }
@@ -985,9 +985,9 @@ void song::loadProject( const QString & _file_name )
 	m_loadingProject = false;
 	m_modified = false;
 
-	if( engine::getMainWindow() )
+	if( engine::mainWindow() )
 	{
-		engine::getMainWindow()->resetWindowTitle();
+		engine::mainWindow()->resetWindowTitle();
 	}
 	if( engine::getSongEditor() )
 	{
@@ -1036,7 +1036,7 @@ bool song::saveProject()
 									2000 );
 		configManager::inst()->addRecentlyOpenedProject( m_fileName );
 		m_modified = false;
-		engine::getMainWindow()->resetWindowTitle();
+		engine::mainWindow()->resetWindowTitle();
 	}
 	else if( engine::hasGUI() )
 	{
@@ -1125,7 +1125,7 @@ void song::exportProject()
 {
 	if( isEmpty() )
 	{
-		QMessageBox::information( engine::getMainWindow(),
+		QMessageBox::information( engine::mainWindow(),
 				tr( "Empty project" ),
 				tr( "This project is empty so exporting makes "
 					"no sense. Please put some items into "
@@ -1133,7 +1133,7 @@ void song::exportProject()
 		return;
 	}
 
-	QFileDialog efd( engine::getMainWindow() );
+	QFileDialog efd( engine::mainWindow() );
 	efd.setFileMode( QFileDialog::AnyFile );
 	efd.setAcceptMode( QFileDialog::AcceptSave );
 	int idx = 0;
@@ -1165,7 +1165,7 @@ void song::exportProject()
 	{
 		const QString export_file_name = efd.selectedFiles()[0];
 		exportProjectDialog epd( export_file_name,
-						engine::getMainWindow() );
+						engine::mainWindow() );
 		epd.exec();
 	}
 }
@@ -1186,11 +1186,11 @@ void song::setModified()
 	if( !m_loadingProject )
 	{
 		m_modified = true;
-		if( engine::getMainWindow() &&
+		if( engine::mainWindow() &&
 			QThread::currentThread() ==
-					engine::getMainWindow()->thread() )
+					engine::mainWindow()->thread() )
 		{
-			engine::getMainWindow()->resetWindowTitle();
+			engine::mainWindow()->resetWindowTitle();
 		}
 	}
 }

@@ -2,7 +2,7 @@
  * engine.h - engine-system of LMMS
  *
  * Copyright (c) 2006-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -22,7 +22,6 @@
  *
  */
 
-
 #ifndef _ENGINE_H
 #define _ENGINE_H
 
@@ -41,7 +40,7 @@ class dummyTrackContainer;
 class fxMixer;
 class fxMixerView;
 class projectJournal;
-class mainWindow;
+class MainWindow;
 class mixer;
 class pianoRoll;
 class projectNotes;
@@ -58,9 +57,9 @@ class EXPORT engine
 {
 public:
 	static void init( const bool _has_gui = true );
-	static void destroy( void );
+	static void destroy();
 
-	static bool hasGUI( void )
+	static bool hasGUI()
 	{
 		return s_hasGUI;
 	}
@@ -70,105 +69,105 @@ public:
 		s_suppressMessages = _on;
 	}
 
-	static bool suppressMessages( void )
+	static bool suppressMessages()
 	{
 		return !s_hasGUI || s_suppressMessages;
 	}
 
 	// core
-	static mixer * getMixer( void )
+	static mixer * getMixer()
 	{
 		return s_mixer;
 	}
 
-	static fxMixer * getFxMixer( void )
+	static fxMixer * getFxMixer()
 	{
 		return s_fxMixer;
 	}
 
-	static song * getSong( void )
+	static song * getSong()
 	{
 		return s_song;
 	}
 
-	static bbTrackContainer * getBBTrackContainer( void )
+	static bbTrackContainer * getBBTrackContainer()
 	{
 		return s_bbTrackContainer;
 	}
 
-	static projectJournal * getProjectJournal( void )
+	static projectJournal * getProjectJournal()
 	{
 		return s_projectJournal;
 	}
 
-	static UnifiedResourceProvider * resourceProvider( void )
+	static UnifiedResourceProvider * resourceProvider()
 	{
 		return s_resourceProvider;
 	}
 
 	// GUI
-	static mainWindow * getMainWindow( void )
+	static MainWindow * mainWindow()
 	{
 		return s_mainWindow;
 	}
 
-	static fxMixerView * getFxMixerView( void )
+	static fxMixerView * getFxMixerView()
 	{
 		return s_fxMixerView;
 	}
 
-	static songEditor * getSongEditor( void )
+	static songEditor * getSongEditor()
 	{
 		return s_songEditor;
 	}
 
-	static bbEditor * getBBEditor( void )
+	static bbEditor * getBBEditor()
 	{
 		return s_bbEditor;
 	}
 
-	static pianoRoll * getPianoRoll( void )
+	static pianoRoll * getPianoRoll()
 	{
 		return s_pianoRoll;
 	}
 
-	static projectNotes * getProjectNotes( void )
+	static projectNotes * getProjectNotes()
 	{
 		return s_projectNotes;
 	}
 
-	static automationEditor * getAutomationEditor( void )
+	static automationEditor * getAutomationEditor()
 	{
 		return s_automationEditor;
 	}
 
-	static AutomationRecorder * getAutomationRecorder( void )
+	static AutomationRecorder * getAutomationRecorder()
 	{
 		return s_automationRecorder;
 	}
 
-	static ladspa2LMMS * getLADSPAManager( void )
+	static ladspa2LMMS * getLADSPAManager()
 	{
 		return s_ladspaManager;
 	}
 
-	static dummyTrackContainer * getDummyTrackContainer( void )
+	static dummyTrackContainer * getDummyTrackContainer()
 	{
 		return s_dummyTC;
 	}
 
-	static ControllerRackView * getControllerRackView( void )
+	static ControllerRackView * getControllerRackView()
 	{
 		return s_controllerRackView;
 	}
 
-	static float framesPerTick( void )
+	static float framesPerTick()
 	{
 		return s_framesPerTick;
 	}
-	static void updateFramesPerTick( void );
+	static void updateFramesPerTick();
 
-	static const QMap<QString, QString> & pluginFileHandling( void )
+	static const QMap<QString, QString> & pluginFileHandling()
 	{
 		return s_pluginFileHandling;
 	}
@@ -178,7 +177,7 @@ public:
 		s_lmmsStyle = _style;
 	}
 
-	static LmmsStyle * getLmmsStyle( void )
+	static LmmsStyle * getLmmsStyle()
 	{
 		return s_lmmsStyle;
 	}
@@ -187,7 +186,7 @@ public:
 
 	static void loadConfiguration( QDomDocument & doc );
 
-	static MidiControlListener * getMidiControlListener( void )
+	static MidiControlListener * getMidiControlListener()
 	{
 		return s_midiControlListener;
 	}
@@ -209,7 +208,7 @@ private:
 	static MidiControlListener * s_midiControlListener;
 
 	// GUI
-	static mainWindow * s_mainWindow;
+	static MainWindow * s_mainWindow;
 	static fxMixerView * s_fxMixerView;
 	static songEditor * s_songEditor;
 	static automationEditor * s_automationEditor;
@@ -223,7 +222,7 @@ private:
 
 	static QMap<QString, QString> s_pluginFileHandling;
 
-	static void initPluginFileHandling( void );
+	static void initPluginFileHandling();
 
 } ;
 

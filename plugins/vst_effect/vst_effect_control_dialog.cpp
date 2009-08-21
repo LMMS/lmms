@@ -1,8 +1,8 @@
 /*
  * vst_effect_control_dialog.cpp - dialog for displaying VST-effect GUI
  *
- * Copyright (c) 2006-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ * Copyright (c) 2006-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -27,7 +27,6 @@
 
 #include "vst_effect_control_dialog.h"
 #include "vst_effect.h"
-#include "main_window.h"
 
 
 

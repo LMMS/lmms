@@ -56,7 +56,7 @@
 #include "embed.h"
 #include "gui_templates.h"
 #include "instrument_track.h"
-#include "main_window.h"
+#include "MainWindow.h"
 #include "midi.h"
 #include "mmp.h"
 #include "pattern.h"
@@ -517,9 +517,9 @@ pianoRoll::pianoRoll( void ) :
 	setMinimumSize( tb_layout->minimumSize().width(), 160 );
 
 	// add us to workspace
-	if( engine::getMainWindow()->workspace() )
+	if( engine::mainWindow()->workspace() )
 	{
-		engine::getMainWindow()->workspace()->addSubWindow( this );
+		engine::mainWindow()->workspace()->addSubWindow( this );
 		parentWidget()->resize( InitialPianoRollWidth,
 						InitialPianoRollHeight );
 		parentWidget()->hide();
@@ -622,7 +622,7 @@ void pianoRoll::setCurrentPattern( pattern * _new_pattern )
 
 void pianoRoll::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
-	mainWindow::saveWidgetState( this, _this );
+	MainWindow::saveWidgetState( this, _this );
 }
 
 
@@ -630,7 +630,7 @@ void pianoRoll::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 void pianoRoll::loadSettings( const QDomElement & _this )
 {
-	mainWindow::restoreWidgetState( this, _this );
+	MainWindow::restoreWidgetState( this, _this );
 }
 
 
@@ -3008,7 +3008,7 @@ song::PlayModes pianoRoll::desiredPlayModeForAccompany( void ) const
 
 void pianoRoll::play( void )
 {
-	engine::getMainWindow()->setPlaybackMode( PPM_PianoRoll );
+	engine::mainWindow()->setPlaybackMode( PPM_PianoRoll );
 
 	if( validPattern() == false )
 	{
@@ -3047,7 +3047,7 @@ void pianoRoll::play( void )
 
 void pianoRoll::record( void )
 {
-	engine::getMainWindow()->setPlaybackMode( PPM_PianoRoll );
+	engine::mainWindow()->setPlaybackMode( PPM_PianoRoll );
 	
 	if( engine::getSong()->isPlaying() )
 	{
@@ -3068,7 +3068,7 @@ void pianoRoll::record( void )
 
 void pianoRoll::recordAccompany( void )
 {
-	engine::getMainWindow()->setPlaybackMode( PPM_PianoRoll );
+	engine::mainWindow()->setPlaybackMode( PPM_PianoRoll );
 	
 	if( engine::getSong()->isPlaying() )
 	{

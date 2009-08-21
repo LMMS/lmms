@@ -39,7 +39,6 @@
 #include "knob.h"
 #include "song.h"
 
-#include "main_window.h"
 #include "patches_dialog.h"
 #include "tooltip.h"
 #include "lcd_spinbox.h"

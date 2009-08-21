@@ -31,7 +31,7 @@
 #include "track_container.h"
 #include "instrument_track.h"
 #include "engine.h"
-#include "main_window.h"
+#include "MainWindow.h"
 #include "song.h"
 
 
@@ -83,7 +83,7 @@ void trackContainer::loadSettings( const QDomElement & _this )
 			pd = new QProgressDialog( tr( "Loading project..." ),
 						tr( "Cancel" ), 0,
 						_this.childNodes().count(),
-						engine::getMainWindow() );
+						engine::mainWindow() );
 			pd->setWindowModality( Qt::ApplicationModal );
 			pd->setWindowTitle( tr( "Please wait..." ) );
 			pd->show();

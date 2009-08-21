@@ -42,7 +42,7 @@
 #include "sample_record_handle.h"
 #include "string_pair_drag.h"
 #include "knob.h"
-#include "main_window.h"
+#include "MainWindow.h"
 #include "effect_rack_view.h"
 #include "track_label_button.h"
 
@@ -527,7 +527,7 @@ sampleTrackView::sampleTrackView( sampleTrack * _t, trackContainerView * _tcv ) 
 	m_effectRack = new effectRackView( _t->audioPort()->getEffects() );
 	m_effectRack->setFixedSize( 240, 242 );
 
-	engine::getMainWindow()->workspace()->addSubWindow( m_effectRack );
+	engine::mainWindow()->workspace()->addSubWindow( m_effectRack );
 	m_effWindow = m_effectRack->parentWidget();
 	m_effWindow->setAttribute( Qt::WA_DeleteOnClose, false );
 	m_effWindow->layout()->setSizeConstraint( QLayout::SetFixedSize );

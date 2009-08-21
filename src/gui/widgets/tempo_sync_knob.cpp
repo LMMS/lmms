@@ -35,7 +35,7 @@
 #include "engine.h"
 #include "caption_menu.h"
 #include "embed.h"
-#include "main_window.h"
+#include "MainWindow.h"
 #include "meter_dialog.h"
 #include "song.h"
 
@@ -475,8 +475,8 @@ void tempoSyncKnob::showCustom( void )
 	if( m_custom == NULL )
 	{
 	 	m_custom = new meterDialog(
-					engine::getMainWindow()->workspace() );
-		engine::getMainWindow()->workspace()->addSubWindow( m_custom );
+					engine::mainWindow()->workspace() );
+		engine::mainWindow()->workspace()->addSubWindow( m_custom );
 		m_custom->setWindowTitle( "Meter" );
 		m_custom->setModel( &model()->m_custom );
 	}

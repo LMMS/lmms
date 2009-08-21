@@ -48,7 +48,7 @@
 
 #include "config_mgr.h"
 #include "engine.h"
-#include "main_window.h"
+#include "MainWindow.h"
 #include "song.h"
 #include "templates.h"
 
@@ -145,7 +145,7 @@ vstPlugin::vstPlugin( const QString & _plugin ) :
 	{
 		target->setFixedSize( m_pluginGeometry );
 		vstSubWin * sw = new vstSubWin(
-					engine::getMainWindow()->workspace() );
+					engine::mainWindow()->workspace() );
 		sw->setWidget( helper );
 		helper->setWindowTitle( name() );
 		m_pluginWidget = helper;
@@ -195,7 +195,7 @@ void vstPlugin::showEditor( QWidget * _parent )
 	if( _parent == NULL )
 	{
 		vstSubWin * sw = new vstSubWin(
-					engine::getMainWindow()->workspace() );
+					engine::mainWindow()->workspace() );
 		sw->setWidget( m_pluginWidget );
 	}
 

@@ -1,8 +1,8 @@
 /*
  * ladspa_effect.h - class for handling LADSPA effect plugins
  *
- * Copyright (c) 2006-2008 Danny McRae <khjklujn/at/users.sourceforge.net>
- * 
+ * Copyright (c) 2006-2009 Danny McRae <khjklujn/at/users.sourceforge.net>
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -28,11 +28,8 @@
 #include <QtCore/QMutex>
 
 #include "effect.h"
-#include "engine.h"
 #include "ladspa_base.h"
 #include "ladspa_controls.h"
-#include "main_window.h"
-#include "mixer.h"
 
 
 typedef QVector<port_desc_t *> multi_proc_t;

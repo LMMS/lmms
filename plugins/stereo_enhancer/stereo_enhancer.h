@@ -26,12 +26,8 @@
 #ifndef _STEREO_ENHANCER_H
 #define _STEREO_ENHANCER_H
 
-#include <QtGui/QWorkspace>
-
 #include "effect.h"
 #include "effect_lib.h"
-#include "engine.h"
-#include "main_window.h"
 #include "stereoenhancer_controls.h"
 
 class stereoEnhancerEffect : public effect

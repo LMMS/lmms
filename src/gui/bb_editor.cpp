@@ -31,7 +31,7 @@
 #include "bb_editor.h"
 #include "bb_track_container.h"
 #include "embed.h"
-#include "main_window.h"
+#include "MainWindow.h"
 #include "song.h"
 #include "tool_button.h"
 
@@ -112,7 +112,7 @@ bbEditor::bbEditor( bbTrackContainer * _tc ) :
 	tb_layout->addWidget( l );
 	tb_layout->addSpacing( 15 );
 
-	engine::getMainWindow()->workspace()->addSubWindow( this );
+	engine::mainWindow()->workspace()->addSubWindow( this );
 	parentWidget()->setAttribute( Qt::WA_DeleteOnClose, FALSE );
 	parentWidget()->layout()->setSizeConstraint( QLayout::SetMinimumSize );
 	parentWidget()->resize( minimumWidth(), 300 );
@@ -149,7 +149,7 @@ void bbEditor::removeBBView( int _bb )
 
 void bbEditor::play( void )
 {
-	engine::getMainWindow()->setPlaybackMode( PPM_BB );
+	engine::mainWindow()->setPlaybackMode( PPM_BB );
 	
 	if( engine::getSong()->isPlaying() )
 	{

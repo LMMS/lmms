@@ -54,7 +54,7 @@
 #include "instrument_track.h"
 #include "knob.h"
 #include "string_pair_drag.h"
-#include "main_window.h"
+#include "MainWindow.h"
 #include "midi.h"
 #include "templates.h"
 #include "update_event.h"

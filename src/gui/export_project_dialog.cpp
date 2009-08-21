@@ -27,7 +27,7 @@
 
 #include "export_project_dialog.h"
 #include "engine.h"
-#include "main_window.h"
+#include "MainWindow.h"
 #include "ProjectRenderer.h"
 
 
@@ -171,7 +171,7 @@ void exportProjectDialog::startBtnClicked()
 		connect( m_renderer, SIGNAL( finished() ),
 				this, SLOT( accept() ) );
 		connect( m_renderer, SIGNAL( finished() ),
-			engine::getMainWindow(), SLOT( resetWindowTitle() ) );
+			engine::mainWindow(), SLOT( resetWindowTitle() ) );
 
 		m_renderer->startProcessing();
 	}
@@ -186,7 +186,7 @@ void exportProjectDialog::startBtnClicked()
 
 void exportProjectDialog::updateTitleBar( int _prog )
 {
-	engine::getMainWindow()->setWindowTitle(
+	engine::mainWindow()->setWindowTitle(
 					tr( "Rendering: %1%" ).arg( _prog ) );
 }
 

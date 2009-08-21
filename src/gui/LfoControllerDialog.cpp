@@ -35,7 +35,7 @@
 #include "embed.h"
 #include "engine.h"
 #include "led_checkbox.h"
-#include "main_window.h"
+#include "MainWindow.h"
 #include "tooltip.h"
 
 

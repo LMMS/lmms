@@ -32,7 +32,7 @@
 #include "caption_menu.h"
 #include "engine.h"
 #include "embed.h"
-#include "main_window.h"
+#include "MainWindow.h"
 #include "string_pair_drag.h"
 
 

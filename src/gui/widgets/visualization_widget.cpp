@@ -28,7 +28,7 @@
 
 #include "visualization_widget.h"
 #include "gui_templates.h"
-#include "main_window.h"
+#include "MainWindow.h"
 #include "embed.h"
 #include "engine.h"
 #include "tooltip.h"
@@ -89,7 +89,7 @@ void visualizationWidget::setActive( bool _active )
 	m_active = _active;
 	if( m_active )
 	{
-		connect( engine::getMainWindow(),
+		connect( engine::mainWindow(),
 					SIGNAL( periodicUpdate() ),
 					this, SLOT( update() ) );
 		connect( engine::getMixer(),
@@ -98,7 +98,7 @@ void visualizationWidget::setActive( bool _active )
 	}
 	else
 	{
-		disconnect( engine::getMainWindow(),
+		disconnect( engine::mainWindow(),
 					SIGNAL( periodicUpdate() ),
 					this, SLOT( update() ) );
 		disconnect( engine::getMixer(),

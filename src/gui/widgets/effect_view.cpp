@@ -40,7 +40,7 @@
 #include "gui_templates.h"
 #include "knob.h"
 #include "led_checkbox.h"
-#include "main_window.h"
+#include "MainWindow.h"
 #include "tempo_sync_knob.h"
 #include "tooltip.h"
 
@@ -102,7 +102,7 @@ effectView::effectView( effect * _model, QWidget * _parent ) :
 		m_controlView = getEffect()->getControls()->createView();
 		if( m_controlView )
 		{
-			m_subWindow = engine::getMainWindow()->workspace()->addSubWindow(
+			m_subWindow = engine::mainWindow()->workspace()->addSubWindow(
 								m_controlView,
 				Qt::SubWindow | Qt::CustomizeWindowHint  |
 					Qt::WindowTitleHint | Qt::WindowSystemMenuHint );

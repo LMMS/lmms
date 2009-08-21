@@ -39,7 +39,7 @@
 #include "track_container_view.h"
 #include "track_container.h"
 #include "bb_track.h"
-#include "main_window.h"
+#include "MainWindow.h"
 #include "debug.h"
 #include "import_filter.h"
 #include "instrument.h"
@@ -111,7 +111,7 @@ trackContainerView::~trackContainerView()
 void trackContainerView::saveSettings( QDomDocument & _doc,
 							QDomElement & _this )
 {
-	mainWindow::saveWidgetState( this, _this );
+	MainWindow::saveWidgetState( this, _this );
 }
 
 
@@ -119,7 +119,7 @@ void trackContainerView::saveSettings( QDomDocument & _doc,
 
 void trackContainerView::loadSettings( const QDomElement & _this )
 {
-	mainWindow::restoreWidgetState( this, _this );
+	MainWindow::restoreWidgetState( this, _this );
 }
 
 

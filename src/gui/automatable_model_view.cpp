@@ -31,7 +31,7 @@
 #include "ControllerConnectionDialog.h"
 #include "ControllerConnection.h"
 #include "embed.h"
-#include "main_window.h"
+#include "MainWindow.h"
 #include "string_pair_drag.h"
 
 
@@ -200,7 +200,7 @@ void automatableModelViewSlots::execConnectionDialog( void )
 
 	m->displayName();
 	ControllerConnectionDialog * d = new ControllerConnectionDialog( 
-			(QWidget*)engine::getMainWindow(), m );
+			(QWidget*)engine::mainWindow(), m );
 
 	if( d->exec() == 1) 
 	{

@@ -1,8 +1,8 @@
 /*
- * main_window.h - declaration of class mainWindow, the main window of LMMS
+ * MainWindow.h - declaration of class MainWindow
  *
  * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -21,7 +21,6 @@
  * Boston, MA 02110-1301 USA.
  *
  */
-
 
 #ifndef _MAIN_WINDOW_H
 #define _MAIN_WINDOW_H
@@ -56,18 +55,18 @@ enum ProjectPlaybackMode
 	PPM_PianoRoll
 };
 
-class mainWindow : public QMainWindow
+class MainWindow : public QMainWindow
 {
 	Q_OBJECT
 public:
-	inline QMdiArea * workspace( void )
+	inline QMdiArea * workspace()
 	{
-		return( m_workspace );
+		return m_workspace;
 	}
 
-	inline QWidget * toolBar( void )
+	inline QWidget * toolBar()
 	{
-		return( m_toolBar );
+		return m_toolBar;
 	}
 
 	//int addWidgetToToolBar( QWidget * _w, int _row = -1, int _col = -1 );
@@ -77,24 +76,24 @@ public:
 	// every function that replaces current file (e.g. creates new file,
 	// opens another file...) has to call this before and may only process
 	// if this function returns true
-	bool mayChangeProject( void );
+	bool mayChangeProject();
 
 
-	void clearKeyModifiers( void );
+	void clearKeyModifiers();
 
-	inline bool isCtrlPressed( void )
+	inline bool isCtrlPressed()
 	{
-		return( m_keyMods.m_ctrl );
+		return m_keyMods.m_ctrl;
 	}
 
-	inline bool isShiftPressed( void )
+	inline bool isShiftPressed()
 	{
-		return( m_keyMods.m_shift );
+		return m_keyMods.m_shift;
 	}
 
-	inline bool isAltPressed( void )
+	inline bool isAltPressed()
 	{
-		return( m_keyMods.m_alt );
+		return m_keyMods.m_alt;
 	}
 
 	static void saveWidgetState( QWidget * _w, QDomElement & _de );
@@ -102,40 +101,40 @@ public:
 
 	inline ProjectPlaybackMode playbackMode() const
 	{
-		return m_playbackMode;	
+		return m_playbackMode;
 	}
 
 	void setPlaybackMode( ProjectPlaybackMode _playbackMode );
 
 
 public slots:
-	void resetWindowTitle( void );
+	void resetWindowTitle();
 
-	inline void emptySlot( void )
+	inline void emptySlot()
 	{
 	}
-	inline void enterWhatsThisMode( void )
+	inline void enterWhatsThisMode()
 	{
 		QWhatsThis::enterWhatsThisMode();
 	}
-	void createNewProject( void );
+	void createNewProject();
 	void createNewProjectFromTemplate( QAction * _idx );
-	void openProject( void );
-	bool saveProject( void );
-	bool saveProjectAs( void );
-	void showSettingsDialog( void );
-	void aboutLMMS( void );
-	void help( void );
-	void toggleAutomationEditorWin( void );
-	void toggleBBEditorWin( void );
-	void toggleSongEditorWin( void );
-	void toggleProjectNotesWin( void );
-	void toggleFxMixerWin( void );
-	void togglePianoRollWin( void );
-	void toggleControllerRack( void );
+	void openProject();
+	bool saveProject();
+	bool saveProjectAs();
+	void showSettingsDialog();
+	void aboutLMMS();
+	void help();
+	void toggleAutomationEditorWin();
+	void toggleBBEditorWin();
+	void toggleSongEditorWin();
+	void toggleProjectNotesWin();
+	void toggleFxMixerWin();
+	void togglePianoRollWin();
+	void toggleControllerRack();
 
-	void undo( void );
-	void redo( void );
+	void undo();
+	void redo();
 
 	void loadResource();
 
@@ -150,11 +149,11 @@ protected:
 
 
 private:
-	mainWindow( void );
-	mainWindow( const mainWindow & );
-	virtual ~mainWindow();
+	MainWindow();
+	MainWindow( const MainWindow & );
+	virtual ~MainWindow();
 
-	void finalize( void );
+	void finalize();
 
 	void toggleWindow( QWidget * _w );
 
@@ -171,16 +170,16 @@ private:
 	QRadioButton * m_radpPianoRoll;
 
 	ProjectPlaybackMode m_playbackMode;
-	
+
 	lcdSpinBox * m_tempoSpinBox;
 	meterDialog * m_timeSigDisplay;
-		
+
 	automatableSlider * m_masterVolumeSlider;
 	automatableSlider * m_masterPitchSlider;
-		
+
 	textFloat * m_mvsStatus;
 	textFloat * m_mpsStatus;
-		
+
 	QMenu * m_templatesMenu;
 	QMenu * m_recentlyOpenedProjectsMenu;
 	int m_custom_templates_count;
@@ -210,36 +209,36 @@ private:
 
 private slots:
 	void setHighQuality( bool );
-	
+
 	void masterVolumeChanged( int _new_val );
-	void masterVolumePressed( void );
+	void masterVolumePressed();
 	void masterVolumeMoved( int _new_val );
-	void masterVolumeReleased( void );
+	void masterVolumeReleased();
 	void masterPitchChanged( int _new_val );
-	void masterPitchPressed( void );
+	void masterPitchPressed();
 	void masterPitchMoved( int _new_val );
-	void masterPitchReleased( void );
-		
-	void browseHelp( void );
-	void fillTemplatesMenu( void );
+	void masterPitchReleased();
+
+	void browseHelp();
+	void fillTemplatesMenu();
 	void openRecentlyOpenedProject( QAction * _action );
 	void showTool( QAction * _idx );
-	void updateRecentlyOpenedProjectsMenu( void );
+	void updateRecentlyOpenedProjectsMenu();
 
 	void playbackSongClicked( bool );
 	void playbackBBClicked( bool );
 	void playbackPianoRollClicked( bool );
-	
-	void shortcutSpacePressed( void );
-	void shortcutLPressed( void );
 
-	void play( void );
-	void record( void );
-	void playAndRecord( void );
-	void stop( void );
+	void shortcutSpacePressed();
+	void shortcutLPressed();
+
+	void play();
+	void record();
+	void playAndRecord();
+	void stop();
 
 signals:
-	void periodicUpdate( void );
+	void periodicUpdate();
 
 } ;
 

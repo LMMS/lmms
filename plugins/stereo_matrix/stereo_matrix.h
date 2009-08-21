@@ -2,7 +2,7 @@
  * stereo_matrix.h - stereo-matrix-effect-plugin
  *
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail/dot/com>
- * 
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -22,16 +22,10 @@
  *
  */
 
-
 #ifndef _STEREO_MATRIX_H
 #define _STEREO_MATRIX_H
 
-#include <QtGui/QWorkspace>
-
 #include "effect.h"
-#include "effect_lib.h"
-#include "engine.h"
-#include "main_window.h"
 #include "stereomatrix_controls.h"
 
 class stereoMatrixEffect : public effect

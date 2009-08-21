@@ -2,7 +2,7 @@
  * engine.cpp - implementation of LMMS' engine-system
  *
  * Copyright (c) 2006-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -36,7 +36,7 @@
 #include "fx_mixer_view.h"
 #include "instrument_track.h"
 #include "ladspa_2_lmms.h"
-#include "main_window.h"
+#include "MainWindow.h"
 #include "mixer.h"
 #include "pattern.h"
 #include "piano_roll.h"
@@ -59,7 +59,7 @@ float engine::s_framesPerTick;
 mixer * engine::s_mixer = NULL;
 fxMixer * engine::s_fxMixer = NULL;
 fxMixerView * engine::s_fxMixerView = NULL;
-mainWindow * engine::s_mainWindow = NULL;
+MainWindow * engine::s_mainWindow = NULL;
 bbTrackContainer * engine::s_bbTrackContainer = NULL;
 song * engine::s_song = NULL;
 UnifiedResourceProvider * engine::s_resourceProvider = NULL;
@@ -125,7 +125,7 @@ void engine::init( const bool _has_gui )
 
 	if( s_hasGUI )
 	{
-		s_mainWindow = new mainWindow;
+		s_mainWindow = new MainWindow;
 		s_songEditor = new songEditor( s_song, s_songEditor );
 		s_fxMixerView = new fxMixerView;
 		s_controllerRackView = new ControllerRackView;

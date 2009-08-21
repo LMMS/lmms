@@ -32,7 +32,7 @@
 #include "caption_menu.h"
 #include "embed.h"
 #include "engine.h"
-#include "main_window.h"
+#include "MainWindow.h"
 
 
 

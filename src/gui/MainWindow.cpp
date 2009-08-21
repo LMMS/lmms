@@ -1,8 +1,8 @@
 /*
- * main_window.cpp - implementation of LMMS' main window
+ * MainWindow.cpp - implementation of LMMS' main window
  *
  * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -22,7 +22,6 @@
  *
  */
 
-
 #include <QtXml/QDomElement>
 #include <QtCore/QUrl>
 #include <QtGui/QApplication>
@@ -40,9 +39,8 @@
 #include <QtGui/QGraphicsView>
 #include <QtGui/QPixmapCache>
 
-
 #include "lmmsversion.h"
-#include "main_window.h"
+#include "MainWindow.h"
 #include "bb_editor.h"
 #include "song_editor.h"
 #include "automation_recorder.h"
@@ -50,7 +48,7 @@
 #include "piano_roll.h"
 #include "embed.h"
 #include "engine.h"
-#include "fx_mixer_view.h" 
+#include "fx_mixer_view.h"
 #include "about_dialog.h"
 #include "ControllerRackView.h"
 #include "plugin_browser.h"
@@ -79,7 +77,7 @@
 #include "gui/tracks/track_container_scene.h"
 
 
-mainWindow::mainWindow( void ) :
+MainWindow::MainWindow() :
 	m_workspace( NULL ),
 	m_templatesMenu( NULL ),
 	m_recentlyOpenedProjectsMenu( NULL ),
@@ -103,7 +101,7 @@ mainWindow::mainWindow( void ) :
 	side_bar->setPosition( sideBar::Left );
 
 	QSplitter * splitter = new QSplitter( Qt::Horizontal, w );
-	splitter->setChildrenCollapsible( FALSE );
+	splitter->setChildrenCollapsible( false );
 
 	int id = 0;
 	QString wdir = configManager::inst()->workingDir();
@@ -118,7 +116,7 @@ mainWindow::mainWindow( void ) :
 
 	// Load background
 	QString bgArtwork = configManager::inst()->backgroundArtwork();
-	QImage bgImage; 
+	QImage bgImage;
 	if( !bgArtwork.isEmpty() )
 	{
 		bgImage = QImage( bgArtwork );
@@ -164,7 +162,7 @@ mainWindow::mainWindow( void ) :
 
 
 
-mainWindow::~mainWindow()
+MainWindow::~MainWindow()
 {
 	for( QList<pluginView *>::iterator it = m_tools.begin();
 						it != m_tools.end(); ++it )
@@ -184,7 +182,7 @@ mainWindow::~mainWindow()
 
 
 
-void mainWindow::finalize( void )
+void MainWindow::finalize()
 {
 	resetWindowTitle();
 	setWindowIcon( embed::getIconPixmap( "icon" ) );
@@ -201,7 +199,7 @@ void mainWindow::finalize( void )
 	project_menu->addAction( embed::getIconPixmap( "project_open" ),
 					tr( "&Open..." ),
 					this, SLOT( openProject() ),
-					Qt::CTRL + Qt::Key_O );	
+					Qt::CTRL + Qt::Key_O );
 
 	m_recentlyOpenedProjectsMenu = project_menu->addMenu(
 				embed::getIconPixmap( "project_open_recent" ),
@@ -284,7 +282,7 @@ void mainWindow::finalize( void )
 	QMenu * help_menu = new QMenu( this );
 	menuBar()->addMenu( help_menu )->setText( tr( "&Help" ) );
 	// May use offline help
-	if( TRUE )
+	if( true )
 	{
 		help_menu->addAction( embed::getIconPixmap( "help" ),
 						tr( "Online help" ),
@@ -308,7 +306,7 @@ void mainWindow::finalize( void )
 	QWidget * gridButtons_w = new QWidget( m_toolBar );
 	QGridLayout * gridButtons_layout = new QGridLayout( gridButtons_w/*, 2, 1*/ );
 
-	
+
 	// create tool-buttons
 	toolButton * project_new = new toolButton(
 					embed::getIconPixmap( "project_new" ),
@@ -330,28 +328,28 @@ void mainWindow::finalize( void )
 	project_new_from_template->setMenu( m_templatesMenu );
 	project_new_from_template->setPopupMode( toolButton::InstantPopup );
 
-	toolButton * project_open = new toolButton( 
+	toolButton * project_open = new toolButton(
 					embed::getIconPixmap( "project_open" ),
 					tr( "Open existing project" ),
 					this, SLOT( openProject() ),
 								gridButtons_w );
 
 
-	toolButton * project_open_recent = new toolButton( 
+	toolButton * project_open_recent = new toolButton(
 				embed::getIconPixmap( "project_open_recent" ),
 					tr( "Recently opened project" ),
 					this, SLOT( emptySlot() ), gridButtons_w );
 	project_open_recent->setMenu( m_recentlyOpenedProjectsMenu );
 	project_open_recent->setPopupMode( toolButton::InstantPopup );
 
-	toolButton * project_save = new toolButton( 
+	toolButton * project_save = new toolButton(
 					embed::getIconPixmap( "project_save" ),
 					tr( "Save current project" ),
 					this, SLOT( saveProject() ),
 								gridButtons_w );
 
 
-	toolButton * project_export = new toolButton( 
+	toolButton * project_export = new toolButton(
 				embed::getIconPixmap( "project_export" ),
 					tr( "Export current project" ),
 					engine::getSong(),
@@ -436,7 +434,7 @@ void mainWindow::finalize( void )
 					this, SLOT( toggleFxMixerWin() ),
 					gridButtons_w );
 	fx_mixer_window->setShortcut( Qt::Key_F9 );
-	fx_mixer_window->setWhatsThis( 
+	fx_mixer_window->setWhatsThis(
 		tr( "Click here to show or hide the "
 			"FX Mixer. The FX Mixer is a very powerful tool "
 			"for managing effects for your song. You can insert "
@@ -472,18 +470,18 @@ void mainWindow::finalize( void )
 	gridButtons_layout->addWidget( controllers_window, 1, 7 );
 	gridButtons_layout->setColumnStretch( 100, 1 );
 
-	
+
 	m_toolBarLayout->addWidget( gridButtons_w, 0, Qt::AlignLeft );
-	
+
 	m_toolBarLayout->insertSpacing( -1, 10 );
-	
+
 	// container for tempo/bpm and high quality
 	QWidget * tempo_hq_w = new QWidget( m_toolBar );
 	QVBoxLayout * tempo_hq_layout = new QVBoxLayout( tempo_hq_w );
 	tempo_hq_layout->setMargin( 0 );
 	tempo_hq_layout->setSpacing( 0 );
 	tempo_hq_layout->addSpacing( 22 );
-	
+
 	// tempo spin box
 	m_tempoSpinBox = new lcdSpinBox( 3, tempo_hq_w, tr( "Tempo" ) );
 	m_tempoSpinBox->setModel( &( engine::getSong()->m_tempoModel) );
@@ -505,11 +503,11 @@ void mainWindow::finalize( void )
 	toolButton * hq_btn = new toolButton( embed::getIconPixmap( "hq_mode" ),
 						tr( "High quality mode" ),
 						NULL, NULL, tempo_hq_w );
-	hq_btn->setCheckable( TRUE );
+	hq_btn->setCheckable( true );
 	connect( hq_btn, SIGNAL( toggled( bool ) ),
 			this, SLOT( setHighQuality( bool ) ) );
 	hq_btn->setFixedWidth( 42 );
-	
+
 	tempo_hq_layout->addWidget( hq_btn );
 #endif
 
@@ -526,14 +524,14 @@ void mainWindow::finalize( void )
 	timeSigLayout->setSpacing( 0 );
 	timeSigLayout->addSpacing( 3 );
 
-	m_timeSigDisplay = new meterDialog( this, TRUE );
+	m_timeSigDisplay = new meterDialog( this, true );
 	m_timeSigDisplay->setModel( &( engine::getSong()->m_timeSigModel ) );
 	timeSigLayout->addWidget( m_timeSigDisplay );
 
 	m_toolBarLayout->addWidget( timeSigWidget );
 
 	m_toolBarLayout->insertSpacing( -1, 10 );
-	
+
 	// master volume slider
 	QLabel * master_vol_lbl = new QLabel( m_toolBar );
 	master_vol_lbl->setPixmap( embed::getIconPixmap( "master_volume" ) );
@@ -600,7 +598,7 @@ void mainWindow::finalize( void )
 	// box to hold all new controls we're adding to main toolbar
 	//QWidget * add_w = new QWidget( tb );
 	//QHBoxLayout * add_layout = new QHBoxLayout( add_w );
-	
+
 	// create widget for visualization- and cpu-load-widget
 	QWidget * vc_w = new QWidget( m_toolBar );
 	QVBoxLayout * vcw_layout = new QVBoxLayout( vc_w );
@@ -613,29 +611,29 @@ void mainWindow::finalize( void )
 
 	vcw_layout->addWidget( new cpuloadWidget( vc_w ) );
 	vcw_layout->addStretch();
-	
+
 	m_toolBarLayout->addWidget( vc_w, 0, Qt::AlignLeft );
 	m_toolBarLayout->insertSpacing( -1, 10 );
-	
-	
+
+
 	// global playback and record controls
 	// main box
 	QWidget * gpbr_w = new QWidget( m_toolBar );
 	QHBoxLayout * gpbrw_layout = new QHBoxLayout( gpbr_w );
-	
+
 	// playback half
 	QWidget * gpb_w = new QWidget( gpbr_w );
 	QVBoxLayout * gpbw_layout = new QVBoxLayout( gpb_w );
 	gpbw_layout->setMargin( 0 );
 	gpbw_layout->setSpacing( 0 );
 	gpbw_layout->addWidget( new QLabel( tr( "PLAYBACK" ), gpb_w ) );
-	
+
 	QWidget * btns = new QWidget( gpb_w );
 	QHBoxLayout * btns_layout = new QHBoxLayout( btns );
 	btns_layout->setMargin(0);
 	btns_layout->setSpacing(0);
 
-		
+
 	toolButton * m_playButton =
 		new toolButton(
 					   embed::getIconPixmap( "play" ),
@@ -645,14 +643,14 @@ void mainWindow::finalize( void )
 					   btns );
 
 	toolButton * m_recordButton =
-		new toolButton( 
+		new toolButton(
 						embed::getIconPixmap( "record" ),
-						tr( "Record from the checked items to the right" ), 
+						tr( "Record from the checked items to the right" ),
 						this,
 						SLOT(record()),
 						btns );
 
-	toolButton * m_recordAccompanyButton = 
+	toolButton * m_recordAccompanyButton =
 		new toolButton(
 					   embed::getIconPixmap( "record_accompany" ),
 					   tr( "Record from the checked items to "
@@ -660,7 +658,7 @@ void mainWindow::finalize( void )
 					   this,
 					   SLOT(playAndRecord()),
 					   btns );
-	
+
 	toolButton * m_stopButton =
 		new toolButton(
 					   embed::getIconPixmap( "stop" ),
@@ -673,10 +671,10 @@ void mainWindow::finalize( void )
 	btns_layout->addWidget( m_recordButton );
 	btns_layout->addWidget( m_recordAccompanyButton );
 	btns_layout->addWidget( m_stopButton );
-	
+
 	gpbw_layout->addWidget( btns );
-	
-	// choose between song or BB to playback	
+
+	// choose between song or BB to playback
 	QWidget * pbopt_w = new QWidget( gpb_w );
 	QHBoxLayout * pbopt_layout = new QHBoxLayout( pbopt_w );
 	pbopt_layout->setSpacing(0);
@@ -685,14 +683,14 @@ void mainWindow::finalize( void )
 	m_radpSong = new QRadioButton( tr( "Song" ), pbopt_w );
 	m_radpSong->setToolTip( tr("Playback: song mode") );
 	connect(m_radpSong, SIGNAL(clicked(bool)), SLOT(playbackSongClicked(bool)));
-	m_radpBB = new QRadioButton( tr( "B+B" ), pbopt_w );	
-	m_radpBB->setToolTip( tr("Playback: beat+bassline mode") );	
+	m_radpBB = new QRadioButton( tr( "B+B" ), pbopt_w );
+	m_radpBB->setToolTip( tr("Playback: beat+bassline mode") );
 	connect(m_radpBB, SIGNAL(clicked(bool)), SLOT(playbackBBClicked(bool)));
-	m_radpPianoRoll = new QRadioButton( tr( "Piano Roll" ), pbopt_w );	
-	m_radpPianoRoll->setToolTip( tr("Playback: piano roll mode") );	
+	m_radpPianoRoll = new QRadioButton( tr( "Piano Roll" ), pbopt_w );
+	m_radpPianoRoll->setToolTip( tr("Playback: piano roll mode") );
 	connect(m_radpPianoRoll, SIGNAL(clicked(bool)), SLOT(playbackPianoRollClicked(bool)));
-	
-	
+
+
 	pbopt_layout->setMargin(0);
 	pbopt_layout->setSpacing(0);
 	pbopt_layout->addWidget( m_radpSong );
@@ -700,37 +698,37 @@ void mainWindow::finalize( void )
 	pbopt_layout->addWidget( m_radpPianoRoll );
 
 	gpbw_layout->addWidget( pbopt_w );
-	
+
 	gpbw_layout->addStretch();
-	
+
 	QWidget * gr_w = new QWidget( gpbr_w );
 	QVBoxLayout * grw_layout = new QVBoxLayout( gr_w );
 	grw_layout->setMargin( 0 );
 	grw_layout->setSpacing( 0 );
 
-		
+
 	m_chkrAudio = new QCheckBox( tr( "Audio-device" ), gr_w );
 	m_chkrAutomation = new QCheckBox( tr( "Automation" ), gr_w );
 	m_chkrMidi = new QCheckBox( tr( "MIDI" ), gr_w );
-	
+
 	connect(m_chkrAutomation, SIGNAL(toggled(bool)), SLOT(toggleRecordAutomation(bool)));
 
 	grw_layout->addWidget( new QLabel( tr( "RECORD" ), gr_w ) );
 	grw_layout->addWidget( m_chkrAudio );
 	grw_layout->addWidget( m_chkrAutomation );
-	grw_layout->addWidget( m_chkrMidi ); 
-	
-	
+	grw_layout->addWidget( m_chkrMidi );
+
+
 	gpbrw_layout->setMargin( 0 );
 	gpbrw_layout->setSpacing( 0 );
 	gpbrw_layout->addWidget( gpb_w );
 	gpbrw_layout->addSpacing( 20 );
 	gpbrw_layout->addWidget( gr_w );
 	gpbrw_layout->addStretch();
-	
-	
+
+
 	m_toolBarLayout->addWidget( gpbr_w );
-	
+
 	// initial toolbar settings
 	m_chkrAutomation->click();
 	m_chkrMidi->click();
@@ -763,7 +761,7 @@ void mainWindow::finalize( void )
 
 
 /*
-int mainWindow::addWidgetToToolBar( QWidget * _w, int _row, int _col )
+int MainWindow::addWidgetToToolBar( QWidget * _w, int _row, int _col )
 {
 	int col = ( _col == -1 ) ? m_toolBarLayout->columnCount() + 7 : _col;
 	if( _w->height() > 32 || _row == -1 )
@@ -774,13 +772,13 @@ int mainWindow::addWidgetToToolBar( QWidget * _w, int _row, int _col )
 	{
 		m_toolBarLayout->addWidget( _w, _row, col );
 	}
-	return( col );
+	return col;
 }
 
 
 
 
-void mainWindow::addSpacingToToolBar( int _size )
+void MainWindow::addSpacingToToolBar( int _size )
 {
 	m_toolBarLayout->setColumnMinimumWidth( m_toolBarLayout->columnCount() +
 								7, _size );
@@ -789,7 +787,7 @@ void mainWindow::addSpacingToToolBar( int _size )
 
 
 
-void mainWindow::resetWindowTitle( void )
+void MainWindow::resetWindowTitle()
 {
 	QString title = "";
 	if( engine::getSong()->projectFileName() != "" )
@@ -811,11 +809,11 @@ void mainWindow::resetWindowTitle( void )
 
 
 
-bool mainWindow::mayChangeProject( void )
+bool MainWindow::mayChangeProject()
 {
 	if( !engine::getSong()->isModified() )
 	{
-		return( TRUE );
+		return true;
 	}
 
 	QMessageBox mb( tr( "Project not saved" ),
@@ -831,37 +829,37 @@ bool mainWindow::mayChangeProject( void )
 
 	if( answer == QMessageBox::Yes )
 	{
-		return( saveProject() );
+		return saveProject();
 	}
 	else if( answer == QMessageBox::No )
 	{
-		return( TRUE );
+		return true;
 	}
 
-	return( FALSE );
+	return false;
 }
 
 
 
 
-void mainWindow::clearKeyModifiers( void )
+void MainWindow::clearKeyModifiers()
 {
-	m_keyMods.m_ctrl = FALSE;
-	m_keyMods.m_shift = FALSE;
-	m_keyMods.m_alt = FALSE;
+	m_keyMods.m_ctrl = false;
+	m_keyMods.m_shift = false;
+	m_keyMods.m_alt = false;
 }
 
 
 
 
-void mainWindow::saveWidgetState( QWidget * _w, QDomElement & _de )
+void MainWindow::saveWidgetState( QWidget * _w, QDomElement & _de )
 {
 	if( _w->parentWidget() != NULL &&
 			_w->parentWidget()->inherits( "QMdiSubWindow" ) )
 	{
 		_w = _w->parentWidget();
 	}
-	
+
 	_de.setAttribute( "x", _w->x() );
 	_de.setAttribute( "y", _w->y() );
 	_de.setAttribute( "visible", _w->isVisible() );
@@ -875,7 +873,7 @@ void mainWindow::saveWidgetState( QWidget * _w, QDomElement & _de )
 
 
 
-void mainWindow::restoreWidgetState( QWidget * _w, const QDomElement & _de )
+void MainWindow::restoreWidgetState( QWidget * _w, const QDomElement & _de )
 {
 	QRect r( qMax( 0, _de.attribute( "x" ).toInt() ),
 			qMax( 0, _de.attribute( "y" ).toInt() ),
@@ -904,7 +902,7 @@ void mainWindow::restoreWidgetState( QWidget * _w, const QDomElement & _de )
 
 
 
-void mainWindow::createNewProject( void )
+void MainWindow::createNewProject()
 {
 	if( mayChangeProject() )
 	{
@@ -915,7 +913,7 @@ void mainWindow::createNewProject( void )
 
 
 
-void mainWindow::createNewProjectFromTemplate( QAction * _idx )
+void MainWindow::createNewProjectFromTemplate( QAction * _idx )
 {
 	if( m_templatesMenu != NULL && mayChangeProject() )
 	{
@@ -932,7 +930,7 @@ void mainWindow::createNewProjectFromTemplate( QAction * _idx )
 
 
 
-void mainWindow::openProject( void )
+void MainWindow::openProject()
 {
 	if( mayChangeProject() )
 	{
@@ -954,7 +952,7 @@ void mainWindow::openProject( void )
 
 
 
-void mainWindow::updateRecentlyOpenedProjectsMenu( void )
+void MainWindow::updateRecentlyOpenedProjectsMenu()
 {
 	m_recentlyOpenedProjectsMenu->clear();
 	QStringList rup = configManager::inst()->recentlyOpenedProjects();
@@ -965,24 +963,24 @@ void mainWindow::updateRecentlyOpenedProjectsMenu( void )
 	}
 }
 
-void mainWindow::playbackSongClicked( bool checked )
+void MainWindow::playbackSongClicked( bool checked )
 {
 	m_playbackMode = PPM_Song;
 }
 
 
-void mainWindow::playbackBBClicked( bool checked )
+void MainWindow::playbackBBClicked( bool checked )
 {
 	m_playbackMode = PPM_BB;
 }
 
-void mainWindow::playbackPianoRollClicked( bool checked )
+void MainWindow::playbackPianoRollClicked( bool checked )
 {
 	m_playbackMode = PPM_PianoRoll;
 }
 
 
-void mainWindow::openRecentlyOpenedProject( QAction * _action )
+void MainWindow::openRecentlyOpenedProject( QAction * _action )
 {
 	const QString & f = _action->text();
 	setCursor( Qt::WaitCursor );
@@ -994,23 +992,23 @@ void mainWindow::openRecentlyOpenedProject( QAction * _action )
 
 
 
-bool mainWindow::saveProject( void )
+bool MainWindow::saveProject()
 {
 	if( engine::getSong()->projectFileName() == "" )
 	{
-		return( saveProjectAs() );
+		return saveProjectAs();
 	}
 	else
 	{
 		engine::getSong()->saveProject();
 	}
-	return( TRUE );
+	return true;
 }
 
 
 
 
-bool mainWindow::saveProjectAs( void )
+bool MainWindow::saveProjectAs()
 {
 	QFileDialog sfd( this, tr( "Save project" ), "",
 			tr( "MultiMedia Project (*.mmp *.mmpz);;"
@@ -1033,15 +1031,15 @@ bool mainWindow::saveProjectAs( void )
 	{
 		engine::getSong()->saveProjectAs(
 						sfd.selectedFiles()[0] );
-		return( TRUE );
+		return true;
 	}
-	return( FALSE );
+	return false;
 }
 
 
 
 
-void mainWindow::showSettingsDialog( void )
+void MainWindow::showSettingsDialog()
 {
 	setupDialog sd;
 	sd.exec();
@@ -1050,7 +1048,7 @@ void mainWindow::showSettingsDialog( void )
 
 
 
-void mainWindow::aboutLMMS( void )
+void MainWindow::aboutLMMS()
 {
 	aboutDialog().exec();
 }
@@ -1058,7 +1056,7 @@ void mainWindow::aboutLMMS( void )
 
 
 
-void mainWindow::help( void )
+void MainWindow::help()
 {
 	QMessageBox::information( this, tr( "Help not available" ),
 				  tr( "Currently there's no help "
@@ -1072,7 +1070,7 @@ void mainWindow::help( void )
 
 
 
-void mainWindow::toggleWindow( QWidget * _w )
+void MainWindow::toggleWindow( QWidget * _w )
 {
 	if( m_workspace->activeSubWindow() != _w->parentWidget()
 				|| _w->parentWidget()->isHidden() )
@@ -1090,7 +1088,7 @@ void mainWindow::toggleWindow( QWidget * _w )
 
 
 
-void mainWindow::toggleBBEditorWin( void )
+void MainWindow::toggleBBEditorWin()
 {
 	toggleWindow( engine::getBBEditor() );
 }
@@ -1098,7 +1096,7 @@ void mainWindow::toggleBBEditorWin( void )
 
 
 
-void mainWindow::toggleSongEditorWin( void )
+void MainWindow::toggleSongEditorWin()
 {
 	toggleWindow( engine::getSongEditor() );
 }
@@ -1106,7 +1104,7 @@ void mainWindow::toggleSongEditorWin( void )
 
 
 
-void mainWindow::toggleProjectNotesWin( void )
+void MainWindow::toggleProjectNotesWin()
 {
 	toggleWindow( engine::getProjectNotes() );
 }
@@ -1114,7 +1112,7 @@ void mainWindow::toggleProjectNotesWin( void )
 
 
 
-void mainWindow::togglePianoRollWin( void )
+void MainWindow::togglePianoRollWin()
 {
 	toggleWindow( engine::getPianoRoll() );
 }
@@ -1122,7 +1120,7 @@ void mainWindow::togglePianoRollWin( void )
 
 
 
-void mainWindow::toggleAutomationEditorWin( void )
+void MainWindow::toggleAutomationEditorWin()
 {
 	toggleWindow( engine::getAutomationEditor() );
 }
@@ -1130,7 +1128,7 @@ void mainWindow::toggleAutomationEditorWin( void )
 
 
 
-void mainWindow::toggleFxMixerWin( void )
+void MainWindow::toggleFxMixerWin()
 {
 	toggleWindow( engine::getFxMixerView() );
 }
@@ -1138,7 +1136,7 @@ void mainWindow::toggleFxMixerWin( void )
 
 
 
-void mainWindow::toggleControllerRack( void )
+void MainWindow::toggleControllerRack()
 {
 	toggleWindow( engine::getControllerRackView() );
 }
@@ -1146,7 +1144,7 @@ void mainWindow::toggleControllerRack( void )
 
 
 
-void mainWindow::undo( void )
+void MainWindow::undo()
 {
 	engine::getProjectJournal()->undo();
 }
@@ -1154,7 +1152,7 @@ void mainWindow::undo( void )
 
 
 
-void mainWindow::redo( void )
+void MainWindow::redo()
 {
 	engine::getProjectJournal()->redo();
 }
@@ -1162,7 +1160,7 @@ void mainWindow::redo( void )
 
 
 
-void mainWindow::loadResource()
+void MainWindow::loadResource()
 {
 	QuickLoadDialog( this ).exec();
 }
@@ -1170,7 +1168,7 @@ void mainWindow::loadResource()
 
 
 
-void mainWindow::closeEvent( QCloseEvent * _ce )
+void MainWindow::closeEvent( QCloseEvent * _ce )
 {
 	if( mayChangeProject() )
 	{
@@ -1185,7 +1183,7 @@ void mainWindow::closeEvent( QCloseEvent * _ce )
 
 
 
-void mainWindow::focusOutEvent( QFocusEvent * _fe )
+void MainWindow::focusOutEvent( QFocusEvent * _fe )
 {
 	// when loosing focus we do not receive key-(release!)-events anymore,
 	// so we might miss release-events of one the modifiers we're watching!
@@ -1196,23 +1194,26 @@ void mainWindow::focusOutEvent( QFocusEvent * _fe )
 
 
 
-void mainWindow::keyPressEvent( QKeyEvent * _ke )
+void MainWindow::keyPressEvent( QKeyEvent * _ke )
 {
 	switch( _ke->key() )
 	{
-		case Qt::Key_Control: m_keyMods.m_ctrl = TRUE; break;
-		case Qt::Key_Shift: m_keyMods.m_shift = TRUE; break;
-		case Qt::Key_Alt: m_keyMods.m_alt = TRUE; break;
+		case Qt::Key_Control: m_keyMods.m_ctrl = true; break;
+		case Qt::Key_Shift: m_keyMods.m_shift = true; break;
+		case Qt::Key_Alt: m_keyMods.m_alt = true; break;
 		default:
 			QMainWindow::keyPressEvent( _ke );
 	}
 }
 
-void mainWindow::shortcutSpacePressed( void )
+
+
+
+void MainWindow::shortcutSpacePressed()
 {
 	if( engine::getSong()->isPlaying() )
 	{
-		if( 
+		if(
 			( engine::getSong()->playMode() == song::Mode_PlaySong &&
 				m_playbackMode == PPM_Song ) ||
 			( engine::getSong()->playMode() == song::Mode_PlayBB &&
@@ -1236,9 +1237,12 @@ void mainWindow::shortcutSpacePressed( void )
 	{
 		play();
 	}
-}	
+}
 
-void mainWindow::shortcutLPressed( void )
+
+
+
+void MainWindow::shortcutLPressed()
 {
 	// cycle through global playback mode
 	if( m_playbackMode == PPM_BB )
@@ -1252,10 +1256,13 @@ void mainWindow::shortcutLPressed( void )
 	else
 	{
 		m_radpBB->click();
-	}	
+	}
 }
 
-void mainWindow::play( void )
+
+
+
+void MainWindow::play()
 {
 	if( m_playbackMode == PPM_BB )
 	{
@@ -1269,9 +1276,12 @@ void mainWindow::play( void )
 	{
 		engine::getSongEditor()->play();
 	}
-}	
+}
 
-void mainWindow::stop( void )
+
+
+
+void MainWindow::stop()
 {
 	if( m_playbackMode == PPM_BB )
 	{
@@ -1285,10 +1295,12 @@ void mainWindow::stop( void )
 	{
 		engine::getSongEditor()->stop();
 	}
-}	
+}
 
 
-void mainWindow::record( void )
+
+
+void MainWindow::record()
 {
 	if( m_playbackMode == PPM_BB )
 	{
@@ -1302,14 +1314,16 @@ void mainWindow::record( void )
 	{
 		engine::getSongEditor()->record();
 	}
+}
 
-}	
 
-void mainWindow::playAndRecord( void )
+
+
+void MainWindow::playAndRecord()
 {
 	if( m_playbackMode == PPM_BB )
 	{
-		printf("bb editor does not support record accompany\n");	
+		printf("bb editor does not support record accompany\n");
 	}
 	else if( m_playbackMode == PPM_PianoRoll )
 	{
@@ -1319,12 +1333,12 @@ void mainWindow::playAndRecord( void )
 	{
 		engine::getSongEditor()->recordAccompany();
 	}
-
-}	
-
+}
 
 
-void mainWindow::setPlaybackMode( ProjectPlaybackMode _playbackMode )
+
+
+void MainWindow::setPlaybackMode( ProjectPlaybackMode _playbackMode )
 {
 	if( _playbackMode == PPM_BB )
 	{
@@ -1342,13 +1356,13 @@ void mainWindow::setPlaybackMode( ProjectPlaybackMode _playbackMode )
 
 
 
-void mainWindow::keyReleaseEvent( QKeyEvent * _ke )
+void MainWindow::keyReleaseEvent( QKeyEvent * _ke )
 {
 	switch( _ke->key() )
 	{
-		case Qt::Key_Control: m_keyMods.m_ctrl = FALSE; break;
-		case Qt::Key_Shift: m_keyMods.m_shift = FALSE; break;
-		case Qt::Key_Alt: m_keyMods.m_alt = FALSE; break;
+		case Qt::Key_Control: m_keyMods.m_ctrl = false; break;
+		case Qt::Key_Shift: m_keyMods.m_shift = false; break;
+		case Qt::Key_Alt: m_keyMods.m_alt = false; break;
 		default:
 			QMainWindow::keyReleaseEvent( _ke );
 	}
@@ -1357,7 +1371,7 @@ void mainWindow::keyReleaseEvent( QKeyEvent * _ke )
 
 
 
-void mainWindow::timerEvent( QTimerEvent * )
+void MainWindow::timerEvent( QTimerEvent * )
 {
 	emit periodicUpdate();
 }
@@ -1365,7 +1379,7 @@ void mainWindow::timerEvent( QTimerEvent * )
 
 
 
-void mainWindow::fillTemplatesMenu( void )
+void MainWindow::fillTemplatesMenu()
 {
 	m_templatesMenu->clear();
 
@@ -1403,7 +1417,7 @@ void mainWindow::fillTemplatesMenu( void )
 
 
 
-void mainWindow::showTool( QAction * _idx )
+void MainWindow::showTool( QAction * _idx )
 {
 	pluginView * p = m_tools[m_toolsMenu->actions().indexOf( _idx )];
 	p->show();
@@ -1414,7 +1428,7 @@ void mainWindow::showTool( QAction * _idx )
 
 
 
-void mainWindow::browseHelp( void )
+void MainWindow::browseHelp()
 {
 	// file:// alternative for offline help
 	QString url = "http://lmms.sf.net/wiki/index.php?title=Main_Page";
@@ -1425,7 +1439,7 @@ void mainWindow::browseHelp( void )
 
 
 
-void mainWindow::setHighQuality( bool _hq )
+void MainWindow::setHighQuality( bool _hq )
 {
 	engine::getMixer()->changeQuality( mixer::qualitySettings(
 			_hq ? mixer::qualitySettings::Mode_HighQuality :
@@ -1434,10 +1448,10 @@ void mainWindow::setHighQuality( bool _hq )
 
 
 
-void mainWindow::masterVolumeChanged( int _new_val )
+void MainWindow::masterVolumeChanged( int _new_val )
 {
 	masterVolumeMoved( _new_val );
-	if( m_mvsStatus->isVisible() == FALSE && engine::getSong()->m_loadingProject == FALSE
+	if( m_mvsStatus->isVisible() == false && engine::getSong()->m_loadingProject == false
 					&& m_masterVolumeSlider->showStatus() )
 	{
 		m_mvsStatus->moveGlobal( m_masterVolumeSlider,
@@ -1450,7 +1464,7 @@ void mainWindow::masterVolumeChanged( int _new_val )
 
 
 
-void mainWindow::masterVolumePressed( void )
+void MainWindow::masterVolumePressed()
 {
 	m_mvsStatus->moveGlobal( m_masterVolumeSlider,
 			QPoint( m_masterVolumeSlider->width() + 2, -2 ) );
@@ -1461,7 +1475,7 @@ void mainWindow::masterVolumePressed( void )
 
 
 
-void mainWindow::masterVolumeMoved( int _new_val )
+void MainWindow::masterVolumeMoved( int _new_val )
 {
 	m_mvsStatus->setText( tr( "Value: %1%" ).arg( _new_val ) );
 }
@@ -1469,7 +1483,7 @@ void mainWindow::masterVolumeMoved( int _new_val )
 
 
 
-void mainWindow::masterVolumeReleased( void )
+void MainWindow::masterVolumeReleased()
 {
 	m_mvsStatus->hide();
 }
@@ -1477,11 +1491,12 @@ void mainWindow::masterVolumeReleased( void )
 
 
 
-void mainWindow::masterPitchChanged( int _new_val )
+void MainWindow::masterPitchChanged( int _new_val )
 {
 	masterPitchMoved( _new_val );
-	if( m_mpsStatus->isVisible() == FALSE && engine::getSong()->m_loadingProject == FALSE
-					&& m_masterPitchSlider->showStatus() )
+	if( m_mpsStatus->isVisible() == false &&
+			engine::getSong()->m_loadingProject == false &&
+			m_masterPitchSlider->showStatus() )
 	{
 		m_mpsStatus->moveGlobal( m_masterPitchSlider,
 			QPoint( m_masterPitchSlider->width() + 2, -2 ) );
@@ -1492,7 +1507,7 @@ void mainWindow::masterPitchChanged( int _new_val )
 
 
 
-void mainWindow::masterPitchPressed( void )
+void MainWindow::masterPitchPressed()
 {
 	m_mpsStatus->moveGlobal( m_masterPitchSlider,
 			QPoint( m_masterPitchSlider->width() + 2, -2 ) );
@@ -1503,29 +1518,29 @@ void mainWindow::masterPitchPressed( void )
 
 
 
-void mainWindow::masterPitchMoved( int _new_val )
+void MainWindow::masterPitchMoved( int _new_val )
 {
-	m_mpsStatus->setText( tr( "Value: %1 semitones").arg( _new_val ) );
+	m_mpsStatus->setText( tr( "Value: %1 semitones" ).arg( _new_val ) );
 
 }
 
 
 
 
-void mainWindow::masterPitchReleased( void )
+void MainWindow::masterPitchReleased()
 {
 	m_mpsStatus->hide();
 }
 
 
 
-void mainWindow::toggleRecordAutomation( bool _recording )
+void MainWindow::toggleRecordAutomation( bool _recording )
 {
 	engine::getAutomationRecorder()->setRecording( _recording );
 }
 
 
 
-#include "moc_main_window.cxx"
+#include "moc_MainWindow.cxx"
 
 /* vim: set tw=0 noexpandtab: */

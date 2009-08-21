@@ -312,7 +312,7 @@ private:
 
 	friend class engine;
 	friend class songEditor;
-	friend class mainWindow;
+	friend class MainWindow;
 	friend class ControllerRackView;
 
 signals:

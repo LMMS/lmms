@@ -57,7 +57,7 @@
 #include "engine.h"
 #include "gui_templates.h"
 #include "instrument_track.h"
-#include "main_window.h"
+#include "MainWindow.h"
 #include "mmp.h"
 #include "pixmap_button.h"
 #include "project_journal.h"
@@ -578,7 +578,7 @@ void trackContentObjectView::mousePressEvent( QMouseEvent * _me )
 					mmp.toString(), thumbnail, this );
 	}
 	else if( _me->button() == Qt::LeftButton &&
-		/*	engine::getMainWindow()->isShiftPressed() == false &&*/
+		/*	engine::mainWindow()->isShiftPressed() == false &&*/
 							fixedTCOs() == false )
 	{
 		// move or resize

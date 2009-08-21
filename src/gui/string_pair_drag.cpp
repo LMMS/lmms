@@ -32,7 +32,7 @@
 
 #include "string_pair_drag.h"
 #include "engine.h"
-#include "main_window.h"
+#include "MainWindow.h"
 
 
 stringPairDrag::stringPairDrag( const QString & _key, const QString & _value,
@@ -61,9 +61,9 @@ stringPairDrag::~stringPairDrag()
 {
 	// during a drag, we might have lost key-press-events, so reset
 	// modifiers of main-win
-	if( engine::getMainWindow() )
+	if( engine::mainWindow() )
 	{
-		engine::getMainWindow()->clearKeyModifiers();
+		engine::mainWindow()->clearKeyModifiers();
 	}
 }
 

@@ -45,7 +45,7 @@
 #include "embed.h"
 #include "engine.h"
 #include "gui_templates.h"
-#include "main_window.h"
+#include "MainWindow.h"
 #include "project_journal.h"
 #include "song.h"
 #include "string_pair_drag.h"
@@ -374,7 +374,7 @@ void knob::drawKnob( QPainter * _p )
 
 float knob::getValue( const QPoint & _p )
 {
-	if( engine::getMainWindow()->isShiftPressed() )
+	if( engine::mainWindow()->isShiftPressed() )
 	{
 		//return( ( _p.y() - m_origMousePos.y() ) * model()->step<float>() );
 		return( ( _p.y() - m_origMousePos.y() ) * pageSize() );
@@ -463,7 +463,7 @@ void knob::mousePressEvent( QMouseEvent * _me )
 		m_buttonPressed = TRUE;
 	}
 	else if( _me->button() == Qt::LeftButton &&
-			engine::getMainWindow()->isShiftPressed() == TRUE )
+			engine::mainWindow()->isShiftPressed() == TRUE )
 	{
 		new stringPairDrag( "float_value",
 					QString::number( model()->value() ),

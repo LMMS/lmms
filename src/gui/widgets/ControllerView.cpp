@@ -38,7 +38,7 @@
 #include "embed.h"
 #include "engine.h"
 #include "led_checkbox.h"
-#include "main_window.h"
+#include "MainWindow.h"
 #include "tooltip.h"
 #include "mv_base.h"
 
@@ -60,9 +60,9 @@ ControllerView::ControllerView( Controller * _model, QWidget * _parent ) :
 	ctls_btn->setGeometry( 140, 2, 50, 14 );
 	connect( ctls_btn, SIGNAL( clicked() ), this, SLOT( editControls() ) );
 
-	m_controllerDlg = getController()->createDialog( engine::getMainWindow()->workspace() );
+	m_controllerDlg = getController()->createDialog( engine::mainWindow()->workspace() );
 
-	m_subWindow = engine::getMainWindow()->workspace()->addSubWindow( m_controllerDlg );
+	m_subWindow = engine::mainWindow()->workspace()->addSubWindow( m_controllerDlg );
 
 	Qt::WindowFlags flags = m_subWindow->windowFlags();
 	flags |= Qt::MSWindowsFixedSizeDialogHint;

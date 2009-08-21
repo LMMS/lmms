@@ -36,7 +36,7 @@
 #include "UnifiedResourceProvider.h"
 #include "engine.h"
 #include "embed.h"
-#include "main_window.h"
+#include "MainWindow.h"
 #include "piano.h"
 #include "song.h"
 
@@ -368,7 +368,7 @@ void ResourceBrowser::triggerAction( Actions _action, ResourceItem * _item )
 	switch( _action )
 	{
 		case LoadProject:
-			if( engine::getMainWindow()->mayChangeProject() )
+			if( engine::mainWindow()->mayChangeProject() )
 			{
 				ResourceFileMapper mapper( _item );
 				if( _item->isLocalResource() )

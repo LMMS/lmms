@@ -28,7 +28,7 @@
 #include "import_filter.h"
 #include "instrument.h"
 #include "instrument_track.h"
-#include "main_window.h"
+#include "MainWindow.h"
 #include "mmp.h"
 #include "song.h"
 
@@ -36,7 +36,7 @@
 
 bool ResourceAction::loadProject()
 {
-	if( engine::getMainWindow()->mayChangeProject() )
+	if( engine::mainWindow()->mayChangeProject() )
 	{
 		ResourceFileMapper mapper( m_item );
 		if( m_item->isLocalResource() )

@@ -38,7 +38,7 @@
 #include "song_editor.h"
 #include "combobox.h"
 #include "embed.h"
-#include "main_window.h"
+#include "MainWindow.h"
 #include "mmp.h"
 #include "timeline.h"
 #include "tool_button.h"
@@ -250,7 +250,7 @@ songEditor::songEditor( song * _song, songEditor * & _engine_ptr ) :
 			this, SLOT( updateScrollBar( int ) ) );
 
 
-	engine::getMainWindow()->workspace()->addSubWindow( this );
+	engine::mainWindow()->workspace()->addSubWindow( this );
 	parentWidget()->setAttribute( Qt::WA_DeleteOnClose, FALSE );
 	parentWidget()->resize( 600, 300 );
 	parentWidget()->move( 5, 5 );
@@ -277,7 +277,7 @@ void songEditor::scrolled( int _new_pos )
 
 void songEditor::play( void )
 {
-	engine::getMainWindow()->setPlaybackMode( PPM_Song );
+	engine::mainWindow()->setPlaybackMode( PPM_Song );
 	
 	m_s->play();
 	engine::getPianoRoll()->stopRecording();
@@ -296,7 +296,7 @@ void songEditor::play( void )
 
 void songEditor::record( void )
 {
-	engine::getMainWindow()->setPlaybackMode( PPM_Song );
+	engine::mainWindow()->setPlaybackMode( PPM_Song );
 	
 	m_s->record();
 }
@@ -306,7 +306,7 @@ void songEditor::record( void )
 
 void songEditor::recordAccompany( void )
 {
-	engine::getMainWindow()->setPlaybackMode( PPM_Song );
+	engine::mainWindow()->setPlaybackMode( PPM_Song );
 	
 	m_s->playAndRecord();
 }
