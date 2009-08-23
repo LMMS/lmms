@@ -1,8 +1,8 @@
 /*
  * automatable_model.cpp - some implementations of automatableModel-class
  *
- * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ * Copyright (c) 2008-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -309,6 +309,15 @@ float automatableModel::fittedValue( float _value ) const
 							qAbs<float>( m_step ) )
 	{
 		_value = 0;
+	}
+
+	if( _value < m_minValue )
+	{
+		return m_minValue;
+	}
+	else if( _value > m_maxValue )
+	{
+		return m_maxValue;
 	}
 
 	return _value;
