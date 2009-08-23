@@ -55,6 +55,7 @@ private:
 	friend class peakControllerEffectControls;
 
 	float m_lastSample;
+	float m_lastRMS;
 
 	Controller * m_autoController;
 } ;

@@ -1,8 +1,9 @@
 /*
- * stereomatrix_controls.h - controls for stereoMatrix-effect
+ * peak_controller_effect_controls.h - controls for peakController effect
  *
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail/dot/com>
- * 
+ * Copyright (c) 2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -35,7 +36,7 @@ class peakControllerEffectControls : public effectControls
 {
 	Q_OBJECT
 public:
-	peakControllerEffectControls( peakControllerEffect( * _eff ) ); 
+	peakControllerEffectControls( peakControllerEffect * _eff );
 	virtual ~peakControllerEffectControls()
 	{
 	}
@@ -44,14 +45,14 @@ public:
 	virtual void loadSettings( const QDomElement & _this );
 	inline virtual QString nodeName( void ) const
 	{
-		return( "peakcontrollereffectcontrols" );
+		return "peakcontrollereffectcontrols";
 	}
 
 	virtual int getControlCount( void )
 	{
-		return( 1 );
+		return 1;
 	}
-	
+
 	virtual effectControlDialog * createView( void )
 	{
 		return new peakControllerEffectControlDialog( this );
@@ -63,13 +64,14 @@ private:
 
 	floatModel m_baseModel;
 	floatModel m_amountModel;
-	tempoSyncKnobModel m_decayModel;
+	floatModel m_attackModel;
+	floatModel m_decayModel;
 	boolModel m_muteModel;
-	
+
 	friend class peakControllerEffectControlDialog;
 	friend class peakControllerEffect;
 
 } ;
 
 
-#endif 
+#endif
