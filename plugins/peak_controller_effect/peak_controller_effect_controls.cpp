@@ -1,7 +1,8 @@
 /*
- * peak_controller_effect_controls.cpp - controls for PeakController effect
+ * peak_controller_effect_controls.cpp - controls for peakController effect
  *
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail/dot/com>
+ * Copyright (c) 2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -36,8 +37,9 @@ PeakControllerEffectControls( PeakControllerEffect * _eff ) :
 	m_effect( _eff ),
 	m_baseModel( 0.5, 0.0, 1.0, 0.001, this, tr( "Base value" ) ),
 	m_amountModel( 1.0, -1.0, 1.0, 0.005, this, tr( "Modulation amount" ) ),
-	m_decayModel( 0.1, 0.01, 5.0, 0.0001, this, tr( "Release decay" ) ),
-	m_muteModel( FALSE, this, tr( "Mute output" ) )
+	m_attackModel( 0, 0, 0.999, 0.001, this, tr( "Attack" ) ),
+	m_decayModel( 0, 0, 0.999, 0.001, this, tr( "Release" ) ),
+	m_muteModel( false, this, tr( "Mute output" ) )
 {
 }
 

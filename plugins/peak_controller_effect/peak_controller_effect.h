@@ -54,6 +54,7 @@ private:
 	PeakControllerEffectControls m_peakControls;
 
 	float m_lastSample;
+	float m_lastRMS;
 
 	Controller * m_autoController;
 

@@ -2,7 +2,8 @@
  * peak_controller_EffectControls.h - controls for peakController effect
  *
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail/dot/com>
- * 
+ * Copyright (c) 2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -44,12 +45,12 @@ public:
 	virtual void loadSettings( const QDomElement & _this );
 	inline virtual QString nodeName() const
 	{
-		return( "peakcontrollereffectcontrols" );
+		return "peakcontrollereffectcontrols";
 	}
 
 	virtual int controlCount()
 	{
-		return( 1 );
+		return 1;
 	}
 	virtual EffectControlDialog * createView()
 	{
@@ -62,6 +63,7 @@ private:
 
 	FloatModel m_baseModel;
 	FloatModel m_amountModel;
+	FloatModel m_attackModel;
 	FloatModel m_decayModel;
 	BoolModel m_muteModel;
 
@@ -71,4 +73,4 @@ private:
 } ;
 
 
-#endif 
+#endif

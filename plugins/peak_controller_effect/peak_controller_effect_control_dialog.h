@@ -42,13 +42,15 @@ public:
 	{
 	}
 
+
 protected:
 	knob * m_baseKnob;
 	knob * m_amountKnob;
+	knob * m_attackKnob;
 	knob * m_decayKnob;
 	ledCheckBox * m_muteLed;
 
-};
+} ;
 
 
 #endif

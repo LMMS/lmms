@@ -2,7 +2,8 @@
  * peak_controller_effect.cpp - PeakController effect plugin
  *
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail/dot/com>
- * 
+ * Copyright (c) 2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -39,7 +40,7 @@ Plugin::Descriptor PLUGIN_EXPORT peakcontrollereffect_plugin_descriptor =
 	STRINGIFY( PLUGIN_NAME ),
 	"Peak Controller",
 	QT_TRANSLATE_NOOP( "pluginBrowser",
-				"Plugin for controlling knobs with sound peaks" ),
+			"Plugin for controlling knobs with sound peaks" ),
 	"Paul Giblock <drfaygo/at/gmail.com>",
 	0x0100,
 	Plugin::Effect,
@@ -61,6 +62,8 @@ PeakControllerEffect::PeakControllerEffect(
 			const Descriptor::SubPluginFeatures::Key * _key ) :
 	Effect( &peakcontrollereffect_plugin_descriptor, _parent, _key ),
 	m_peakControls( this ),
+	m_lastSample( 0 ),
+	m_lastRMS( -1 ),
 	m_autoController( NULL )
 {
 	m_autoController = new PeakController( engine::getSong(), this );
@@ -91,9 +94,8 @@ bool PeakControllerEffect::processAudioBuffer( sampleFrame * _buf,
 	// audio with this effect	
 	if( !isEnabled() || !isRunning() )
 	{
-		return( FALSE );
+		return false;
 	}
-
 
 	// RMS:
 	double sum = 0;
@@ -110,12 +112,33 @@ bool PeakControllerEffect::processAudioBuffer( sampleFrame * _buf,
 		}
 	}
 
-	m_lastSample = c.m_baseModel.value() + c.m_amountModel.value() *
-							sqrtf( sum / _frames );
+	float curRMS = sqrtf( sum / _frames );
+	const float origRMS = curRMS;
+	if( m_lastRMS < 0 )
+	{
+		m_lastRMS = curRMS;
+	}
+	const float v = ( curRMS >= m_lastRMS ) ?
+				c.m_attackModel.value() :
+					c.m_decayModel.value();
+	const float a = sqrtf( sqrtf( v ) );
+	curRMS = (1-a)*curRMS + a*m_lastRMS;
+
+	m_lastSample = c.m_baseModel.value() + c.m_amountModel.value()*curRMS;
+	m_lastRMS = curRMS;
+
+	// on greater buffer sizes our LP is updated less frequently, therfore
+	// replay a certain number of passes so the LP state is as if it was
+	// updated N times with buffer-size 1/N
+	const int timeOversamp = (4*_frames) / DEFAULT_BUFFER_SIZE-1;
+	for( int i = 0; i < timeOversamp; ++i )
+	{
+		m_lastRMS = (1-a)*origRMS + a*m_lastRMS;
+	}
 
 	//checkGate( out_sum / _frames );
 
-	return( isRunning() );
+	return isRunning();
 }
 
 
@@ -128,8 +151,7 @@ extern "C"
 Plugin * PLUGIN_EXPORT lmms_plugin_main( Model * _parent, void * _data )
 {
 	return new PeakControllerEffect( _parent,
-		static_cast<const Plugin::Descriptor::SubPluginFeatures::Key *>(
-								_data ) );
+		static_cast<const Plugin::Descriptor::SubPluginFeatures::Key *>( _data ) );
 }
 
 }

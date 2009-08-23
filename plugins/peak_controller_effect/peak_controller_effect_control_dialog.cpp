@@ -39,12 +39,12 @@ PeakControllerEffectControlDialog::PeakControllerEffectControlDialog(
 				PeakControllerEffectControls * _controls ) :
 	EffectControlDialog( _controls )
 {
-	setAutoFillBackground( TRUE );
+	setAutoFillBackground( true );
 	QPalette pal;
 	pal.setBrush( backgroundRole(),
 				PLUGIN_NAME::getIconPixmap( "artwork" ) );
 	setPalette( pal );
-	setFixedSize( 120, 104 );
+	setFixedSize( 144, 110 );
 
 	QVBoxLayout * tl = new QVBoxLayout( this );
 	tl->addSpacing( 25 );
@@ -61,13 +61,19 @@ PeakControllerEffectControlDialog::PeakControllerEffectControlDialog(
 	m_amountKnob->setModel( &_controls->m_amountModel );
 	m_amountKnob->setHintText( tr( "Modulation amount:" ) + " ", "" );
 
+	m_attackKnob = new knob( knobBright_26, this );
+	m_attackKnob->setLabel( tr( "ATTACK" ) );
+	m_attackKnob->setModel( &_controls->m_attackModel );
+	m_attackKnob->setHintText( tr( "Attack:" ) + " ", "" );
+
 	m_decayKnob = new knob( knobBright_26, this );
 	m_decayKnob->setLabel( tr( "DECAY" ) );
 	m_decayKnob->setModel( &_controls->m_decayModel );
-	m_decayKnob->setHintText( tr( "Release decay (not implemented):" ) + " ", "" );
+	m_decayKnob->setHintText( tr( "Release:" ) + " ", "" );
 
 	l->addWidget( m_baseKnob );
 	l->addWidget( m_amountKnob );
+	l->addWidget( m_attackKnob );
 	l->addWidget( m_decayKnob );
 	tl->addLayout( l );
 
