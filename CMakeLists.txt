@@ -454,7 +454,7 @@ SET(lmms_MOC ${lmms_INCLUDES})
 
 SET(lmms_EMBEDDED_RESOURCES ${CMAKE_SOURCE_DIR}/AUTHORS ${CMAKE_SOURCE_DIR}/COPYING)
 
-QT4_WRAP_CPP(lmms_MOC_out ${lmms_MOC})
+QT4_WRAP_CPP(lmms_MOC_out ${lmms_MOC} OPTIONS -nw)
 QT4_WRAP_UI(lmms_UI_out ${lmms_UI})
 
 
