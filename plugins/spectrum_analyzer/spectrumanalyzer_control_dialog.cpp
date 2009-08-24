@@ -27,7 +27,7 @@
 #include <QtGui/QPainter>
 
 #include "spectrum_analyzer.h"
-#include "main_window.h"
+#include "MainWindow.h"
 #include "led_checkbox.h"
 #include "embed.h"
 
@@ -60,7 +60,7 @@ public:
 		m_background( PLUGIN_NAME::getIconPixmap( "spectrum_background" ).toImage() )
 	{
 		setFixedSize( 249, 151 );
-		connect( engine::getMainWindow(), SIGNAL( periodicUpdate() ),
+		connect( engine::mainWindow(), SIGNAL( periodicUpdate() ),
 				this, SLOT( update() ) );
 		setAttribute( Qt::WA_OpaquePaintEvent, TRUE );
 	}
@@ -146,7 +146,7 @@ private:
 
 spectrumAnalyzerControlDialog::spectrumAnalyzerControlDialog(
 					spectrumAnalyzerControls * _controls ) :
-	effectControlDialog( _controls ),
+	EffectControlDialog( _controls ),
 	m_controls( _controls ),
 	m_logXAxis( PLUGIN_NAME::getIconPixmap( "log_x_axis" ) ),
 	m_logYAxis( PLUGIN_NAME::getIconPixmap( "log_y_axis" ) )

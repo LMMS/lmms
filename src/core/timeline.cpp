@@ -36,7 +36,7 @@
 #include "engine.h"
 #include "templates.h"
 #include "nstate_button.h"
-#include "main_window.h"
+#include "MainWindow.h"
 #include "text_float.h"
 
 

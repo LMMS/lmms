@@ -1,7 +1,7 @@
 /*
  * remote_zynaddsubfx.cpp - ZynAddSubFX-embedding plugin
  *
- * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -30,7 +30,7 @@
 #include "engine.h"
 #include "instrument_play_handle.h"
 #include "note_play_handle.h"
-#include "remote_plugin.h"
+#include "RemotePlugin.h"
 #include "remote_zynaddsubfx.h"
 
 
@@ -48,14 +48,14 @@ std::string __presets_dir;
 
 static pthread_t __gui_thread_handle;
 static pthread_mutex_t __gui_mutex;
-static std::queue<remotePluginClient::message> __gui_messages;
+static std::queue<RemotePluginClient::message> __gui_messages;
 
 
-class RemoteZynAddSubFX : public remotePluginClient
+class RemoteZynAddSubFX : public RemotePluginClient
 {
 public:
 	RemoteZynAddSubFX( int _shm_in, int _shm_out ) :
-		remotePluginClient( _shm_in, _shm_out )
+		RemotePluginClient( _shm_in, _shm_out )
 	{
 		for( int i = 0; i < NumKeys; ++i )
 		{
@@ -147,7 +147,7 @@ public:
 				break;
 
 			default:
-				return remotePluginClient::processMessage( _m );
+				return RemotePluginClient::processMessage( _m );
 		}
 		if( gui_message )
 		{
@@ -255,7 +255,7 @@ void * guiThread( void * )
 		pthread_mutex_lock( &__gui_mutex );
 		while( __gui_messages.size() )
 		{
-			remotePluginClient::message m = __gui_messages.front();
+			RemotePluginClient::message m = __gui_messages.front();
 			__gui_messages.pop();
 			switch( m.id )
 			{
@@ -364,7 +364,7 @@ int main( int _argc, char * * _argv )
 
 	pthread_create( &__gui_thread_handle, NULL, guiThread, NULL );
 
-	remotePluginClient::message m;
+	RemotePluginClient::message m;
 	while( ( m = __remote_zasf->receiveMessage() ).id != IdQuit )
 	{
 		pthread_mutex_lock( &master->mutex );

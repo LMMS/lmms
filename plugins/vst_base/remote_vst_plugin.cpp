@@ -1,5 +1,5 @@
 /*
- * remote_vst_plugin.cpp - LMMS VST Support Layer (remotePlugin client)
+ * remote_vst_plugin.cpp - LMMS VST Support Layer (RemotePlugin client)
  *
  * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
@@ -32,7 +32,7 @@
 
 #define BUILD_REMOTE_PLUGIN_CLIENT
 
-#include "remote_plugin.h"
+#include "RemotePlugin.h"
 
 #ifdef LMMS_HAVE_PTHREAD_H
 #include <pthread.h>
@@ -108,7 +108,7 @@ DWORD __GuiThreadID = NULL;
 
 
 
-class RemoteVstPlugin : public remotePluginClient
+class RemoteVstPlugin : public RemotePluginClient
 {
 public:
 	RemoteVstPlugin( key_t _shm_in, key_t _shm_out );
@@ -280,7 +280,7 @@ private:
 
 
 RemoteVstPlugin::RemoteVstPlugin( key_t _shm_in, key_t _shm_out ) :
-	remotePluginClient( _shm_in, _shm_out ),
+	RemotePluginClient( _shm_in, _shm_out ),
 	m_shortName( "" ),
 	m_libInst( NULL ),
 	m_plugin( NULL ),
@@ -390,7 +390,7 @@ bool RemoteVstPlugin::processMessage( const message & _m )
 			break;
 
 		default:
-			return remotePluginClient::processMessage( _m );
+			return RemotePluginClient::processMessage( _m );
 	}
 	return true;
 }
@@ -751,7 +751,7 @@ void RemoteVstPlugin::setParameterDump( const message & _m )
 	int p = 0;
 	for( int i = 0; i < params; ++i )
 	{
-		vstParameterDumpItem item;
+		VstParameterDumpItem item;
 		item.index = _m.getInt( ++p );
 		item.shortLabel = _m.getString( ++p );
 		item.value = _m.getFloat( ++p );
@@ -1216,7 +1216,7 @@ DWORD WINAPI RemoteVstPlugin::processingThread( LPVOID _param )
 {
 	RemoteVstPlugin * _this = static_cast<RemoteVstPlugin *>( _param );
 
-	remotePluginClient::message m;
+	RemotePluginClient::message m;
 	while( ( m = _this->receiveMessage() ).id != IdQuit )
         {
 		if( m.id == IdStartProcessing || m.id == IdMidiEvent )

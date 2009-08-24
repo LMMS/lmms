@@ -28,13 +28,13 @@
 
 #include <QtGui/QPushButton>
 
-#include "automatable_model_view.h"
+#include "AutomatableModelView.h"
 
 
 class automatableButtonGroup;
 
 
-class EXPORT automatableButton : public QPushButton, public boolModelView
+class EXPORT automatableButton : public QPushButton, public BoolModelView
 {
 	Q_OBJECT
 public:
@@ -79,7 +79,7 @@ private:
 
 
 
-class EXPORT automatableButtonGroup : public QWidget, public intModelView
+class EXPORT automatableButtonGroup : public QWidget, public IntModelView
 {
 	Q_OBJECT
 public:

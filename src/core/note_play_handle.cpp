@@ -23,13 +23,12 @@
  *
  */
 
-
 #include "note_play_handle.h"
 #include "basic_filters.h"
 #include "config_mgr.h"
 #include "detuning_helper.h"
-#include "instrument_sound_shaping.h"
-#include "instrument_track.h"
+#include "InstrumentSoundShaping.h"
+#include "InstrumentTrack.h"
 #include "MidiPort.h"
 #include "song.h"
 
@@ -46,7 +45,7 @@ inline notePlayHandle::baseDetuning::baseDetuning(
 
 
 
-notePlayHandle::notePlayHandle( instrumentTrack * _it,
+notePlayHandle::notePlayHandle( InstrumentTrack * _it,
 						const f_cnt_t _offset,
 						const f_cnt_t _frames,
 						const note & _n,
@@ -100,7 +99,7 @@ notePlayHandle::notePlayHandle( instrumentTrack * _it,
 	setFrames( _frames );
 
 
-	if( !isBaseNote() || !getInstrumentTrack()->arpeggiatorEnabled() )
+	if( !isBaseNote() || !instrumentTrack()->isArpeggiatorEnabled() )
 	{
 		// send MIDI-note-on-event
 		m_instrumentTrack->processOutEvent( midiEvent( MidiNoteOn,
@@ -325,7 +324,7 @@ void notePlayHandle::noteOff( const f_cnt_t _s )
 	m_releaseFramesToDo = qMax<f_cnt_t>( 0, // 10,
 			m_instrumentTrack->m_soundShaping.releaseFrames() );
 
-	if( !isBaseNote() || !getInstrumentTrack()->arpeggiatorEnabled() )
+	if( !isBaseNote() || !instrumentTrack()->isArpeggiatorEnabled() )
 	{
 		// send MIDI-note-off-event
 		m_instrumentTrack->processOutEvent( midiEvent( MidiNoteOff,
@@ -374,7 +373,7 @@ float notePlayHandle::volumeLevel( const f_cnt_t _frame )
 bool notePlayHandle::isArpeggioBaseNote() const
 {
 	return isBaseNote() && ( m_partOfArpeggio ||
-			m_instrumentTrack->arpeggiatorEnabled() );
+			m_instrumentTrack->isArpeggiatorEnabled() );
 }
 
 
@@ -423,7 +422,7 @@ int notePlayHandle::index() const
 
 
 ConstNotePlayHandleList notePlayHandle::nphsOfInstrumentTrack(
-				const instrumentTrack * _it, bool _all_ph )
+				const InstrumentTrack * _it, bool _all_ph )
 {
 	const PlayHandleList & playHandles = engine::getMixer()->playHandles();
 	ConstNotePlayHandleList cnphv;

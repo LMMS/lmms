@@ -29,12 +29,12 @@
 #include "preset_preview_play_handle.h"
 #include "debug.h"
 #include "engine.h"
-#include "instrument.h"
-#include "instrument_track.h"
+#include "Instrument.h"
+#include "InstrumentTrack.h"
 #include "MidiPort.h"
 #include "mmp.h"
 #include "note_play_handle.h"
-#include "project_journal.h"
+#include "ProjectJournal.h"
 #include "track_container.h"
 
 
@@ -49,7 +49,7 @@ public:
 		m_dataMutex()
 	{
 		setJournalling( FALSE );
-		m_previewInstrumentTrack = dynamic_cast<instrumentTrack *>(
+		m_previewInstrumentTrack = dynamic_cast<InstrumentTrack *>(
 					track::create( track::InstrumentTrack,
 								this ) );
 		m_previewInstrumentTrack->setJournalling( FALSE );
@@ -64,7 +64,7 @@ public:
 		return "bbtrackcontainer";
 	}
 
-	instrumentTrack * previewInstrumentTrack()
+	InstrumentTrack * previewInstrumentTrack()
 	{
 		return m_previewInstrumentTrack;
 	}
@@ -91,7 +91,7 @@ public:
 
 
 private:
-	instrumentTrack * m_previewInstrumentTrack;
+	InstrumentTrack * m_previewInstrumentTrack;
 	notePlayHandle * m_previewNote;
 	QMutex m_dataMutex;
 
@@ -115,18 +115,17 @@ presetPreviewPlayHandle::presetPreviewPlayHandle( const QString & _preset_file,
 	}
 
 
-	const bool j = engine::getProjectJournal()->isJournalling();
-	engine::getProjectJournal()->setJournalling( FALSE );
+	const bool j = engine::projectJournal()->isJournalling();
+	engine::projectJournal()->setJournalling( FALSE );
 
 	engine::setSuppressMessages( true );
 
 	if( _load_by_plugin )
 	{
-		instrument * i = s_previewTC->previewInstrumentTrack()->
-								getInstrument();
+		Instrument * i = s_previewTC->previewInstrumentTrack()->instrument();
 		const QString ext = QFileInfo( _preset_file ).
 							suffix().toLower();
-		if( i == NULL || !i->getDescriptor()->supportsFileType( ext ) )
+		if( i == NULL || !i->descriptor()->supportsFileType( ext ) )
 		{
 			i = s_previewTC->previewInstrumentTrack()->
 				loadInstrument(
@@ -162,7 +161,7 @@ presetPreviewPlayHandle::presetPreviewPlayHandle( const QString & _preset_file,
 	s_previewTC->setPreviewNote( m_previewNote );
 
 	s_previewTC->unlockData();
-	engine::getProjectJournal()->setJournalling( j );
+	engine::projectJournal()->setJournalling( j );
 }
 
 
@@ -229,12 +228,12 @@ void presetPreviewPlayHandle::cleanup()
 
 
 ConstNotePlayHandleList presetPreviewPlayHandle::nphsOfInstrumentTrack(
-						const instrumentTrack * _it )
+						const InstrumentTrack * _it )
 {
 	ConstNotePlayHandleList cnphv;
 	s_previewTC->lockData();
 	if( s_previewTC->previewNote() != NULL &&
-		s_previewTC->previewNote()->getInstrumentTrack() == _it )
+		s_previewTC->previewNote()->instrumentTrack() == _it )
 	{
 		cnphv.push_back( s_previewTC->previewNote() );
 	}

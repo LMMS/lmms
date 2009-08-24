@@ -25,13 +25,13 @@
 #ifndef _STEREO_MATRIX_CONTROLS_H
 #define _STEREO_MATRIX_CONTROLS_H
 
-#include "effect_controls.h"
+#include "EffectControls.h"
 #include "stereomatrix_control_dialog.h"
 #include "knob.h"
 
 class stereoMatrixEffect;
 
-class stereoMatrixControls : public effectControls
+class stereoMatrixControls : public EffectControls
 {
 	Q_OBJECT
 public:
@@ -47,12 +47,12 @@ public:
 		return( "stereomatrixcontrols" );
 	}
 
-	virtual int getControlCount( void )
+	virtual int controlCount( void )
 	{
 		return( 1 );
 	}
 	
-	virtual effectControlDialog * createView( void )
+	virtual EffectControlDialog * createView( void )
 	{
 		return new stereoMatrixControlDialog( this );
 	}
@@ -65,10 +65,10 @@ private slots:
 private:
 	stereoMatrixEffect * m_effect;
 
-	knobModel m_llModel;
-	knobModel m_lrModel;
-	knobModel m_rlModel;
-	knobModel m_rrModel;
+	FloatModel m_llModel;
+	FloatModel m_lrModel;
+	FloatModel m_rlModel;
+	FloatModel m_rrModel;
 	
 	friend class stereoMatrixControlDialog;
 	friend class stereoMatrixEffect;

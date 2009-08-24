@@ -1,11 +1,11 @@
 /*
- * vst_base.cpp - VST-base-code to be used by any LMMS-plugins dealing with VST-
+ * vst_base.cpp - VST-base-code to be used by any LMMS plugins dealing with VST-
  *                plugins
  *
- * Copyright (c) 2006-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
  * License as published by the Free Software Foundation; either
@@ -24,21 +24,21 @@
  */
 
 
-#include "plugin.h"
+#include "Plugin.h"
 #include "embed.h"
 
 
 extern "C"
 {
 
-plugin::descriptor vstbase_plugin_descriptor =
+Plugin::Descriptor vstbase_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"VST Base",
-	"library for all LMMS-plugins dealing with VST-plugins",
+	"library for all LMMS plugins dealing with VST-plugins",
 	"Tobias Doerffel <tobydox/at/users/dot/sf/dot/net>",
 	0x0100,
-	plugin::Library,
+	Plugin::Library,
 	NULL,
 	NULL
 } ;

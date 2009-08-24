@@ -1,6 +1,6 @@
 /*
  * LfoController.cpp - implementation of class controller which handles
- *                      remote-control of automatableModels
+ *                      remote-control of AutomatableModels
  *
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail.com>
  *
@@ -37,19 +37,19 @@
 
 //const float TWO_PI = 6.28318531f;
 
-LfoController::LfoController( model * _parent ) :
+LfoController::LfoController( Model * _parent ) :
 	Controller( Controller::LfoController, _parent, tr( "LFO Controller" ) ),
 	m_baseModel( 0.5, 0.0, 1.0, 0.001, this, tr( "Base value" ) ),
 	m_speedModel( 2.0, 0.01, 20.0, 0.0001, 20000.0, this, tr( "Oscillator speed" ) ),
 	m_amountModel( 1.0, -1.0, 1.0, 0.005, this, tr( "Oscillator amount" ) ),
 	m_phaseModel( 0.0, 0.0, 360.0, 4.0, this, tr( "Oscillator phase" ) ),
-	m_waveModel( oscillator::SineWave, 0, oscillator::NumWaveShapes,
+	m_waveModel( Oscillator::SineWave, 0, Oscillator::NumWaveShapes,
 			this, tr( "Oscillator waveform" ) ),
 	m_multiplierModel( 0, 0, 2, this, tr( "Frequency Multiplier" ) ),
 	m_duration( 1000 ),
 	m_phaseCorrection( 0 ),
 	m_phaseOffset( 0 ),
-	m_sampleFunction( &oscillator::sinSample )
+	m_sampleFunction( &Oscillator::sinSample )
 {
 
 	connect( &m_waveModel, SIGNAL( dataChanged() ),
@@ -175,26 +175,26 @@ void LfoController::updateSampleFunction( void )
 {
 	switch( m_waveModel.value() )
 	{
-		case oscillator::SineWave:
-			m_sampleFunction = &oscillator::sinSample;
+		case Oscillator::SineWave:
+			m_sampleFunction = &Oscillator::sinSample;
 			break;
-		case oscillator::TriangleWave:
-			m_sampleFunction = &oscillator::triangleSample;
+		case Oscillator::TriangleWave:
+			m_sampleFunction = &Oscillator::triangleSample;
 			break;
-		case oscillator::SawWave:
-			m_sampleFunction = &oscillator::sawSample;
+		case Oscillator::SawWave:
+			m_sampleFunction = &Oscillator::sawSample;
 			break;
-		case oscillator::SquareWave:
-			m_sampleFunction = &oscillator::squareSample;
+		case Oscillator::SquareWave:
+			m_sampleFunction = &Oscillator::squareSample;
 			break;
-		case oscillator::MoogSawWave:
-			m_sampleFunction = &oscillator::moogSawSample;
+		case Oscillator::MoogSawWave:
+			m_sampleFunction = &Oscillator::moogSawSample;
 			break;
-		case oscillator::ExponentialWave:
-			m_sampleFunction = &oscillator::expSample;
+		case Oscillator::ExponentialWave:
+			m_sampleFunction = &Oscillator::expSample;
 			break;
-		case oscillator::WhiteNoise:
-			m_sampleFunction = &oscillator::noiseSample;
+		case Oscillator::WhiteNoise:
+			m_sampleFunction = &Oscillator::noiseSample;
 			break;
 	}
 }

@@ -29,10 +29,10 @@
 #include <QtCore/QMap>
 #include <QtGui/QWidget>
 
-#include "automatable_model_view.h"
+#include "AutomatableModelView.h"
 
 
-class EXPORT lcdSpinBox : public QWidget, public intModelView
+class EXPORT lcdSpinBox : public QWidget, public IntModelView
 {
 	Q_OBJECT
 public:
@@ -52,9 +52,9 @@ public:
 		update();
 	}
 
-	virtual void modelChanged( void )
+	virtual void modelChanged()
 	{
-		modelView::modelChanged();
+		ModelView::modelChanged();
 		update();
 	}
 
@@ -62,7 +62,7 @@ public:
 public slots:
 	virtual void setEnabled( bool _on );
 	virtual void setMarginWidth( int _width );
-	virtual void update( void );
+	virtual void update();
 
 
 protected:
@@ -95,10 +95,10 @@ private:
 
 
 signals:
-	void manualChange( void );
+	void manualChange();
 
 } ;
 
-typedef intModel lcdSpinBoxModel;
+typedef IntModel lcdSpinBoxModel;
 
 #endif

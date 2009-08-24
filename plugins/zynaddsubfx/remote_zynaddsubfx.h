@@ -26,7 +26,7 @@
 #ifndef _REMOTE_ZYNADDSUBFX_H
 #define _REMOTE_ZYNADDSUBFX_H
 
-#include "remote_plugin.h"
+#include "RemotePlugin.h"
 
 enum ZasfRemoteMessageIDs
 {

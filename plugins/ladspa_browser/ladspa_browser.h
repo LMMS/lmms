@@ -3,7 +3,8 @@
  *                    plugins
  *
  * Copyright (c) 2006-2008 Danny McRae <khjklujn/at/users.sourceforge.net>
- * 
+ * Copyright (c) 2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -23,23 +24,21 @@
  *
  */
 
-
 #ifndef _LADSPA_BROWSER_H
 #define _LADSPA_BROWSER_H
 
-
 #include "ladspa_manager.h"
-#include "tool.h"
-
+#include "ToolPlugin.h"
+#include "ToolPluginView.h"
 
 class tabBar;
 
 
-class ladspaBrowserView : public toolView
+class ladspaBrowserView : public ToolPluginView
 {
 	Q_OBJECT
 public:
-	ladspaBrowserView( tool * _tool );
+	ladspaBrowserView( ToolPlugin * _tool );
 	virtual ~ladspaBrowserView();
 
 
@@ -56,18 +55,18 @@ private:
 } ;
 
 
-class ladspaBrowser : public tool
+class ladspaBrowser : public ToolPlugin
 {
 public:
-	ladspaBrowser( void );
+	ladspaBrowser();
 	virtual ~ladspaBrowser();
 
-	virtual pluginView * instantiateView( QWidget * )
+	virtual PluginView * instantiateView( QWidget * )
 	{
-		return( new ladspaBrowserView( this ) );
+		return new ladspaBrowserView( this );
 	}
 
-	virtual QString nodeName( void ) const;
+	virtual QString nodeName() const;
 
 } ;
 

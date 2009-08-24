@@ -25,13 +25,13 @@
 #ifndef _SPECTRUMANALYZER_CONTROL_DIALOG_H
 #define _SPECTRUMANALYZER_CONTROL_DIALOG_H
 
-#include "effect_control_dialog.h"
+#include "EffectControlDialog.h"
 
 
 class spectrumAnalyzerControls;
 
 
-class spectrumAnalyzerControlDialog : public effectControlDialog
+class spectrumAnalyzerControlDialog : public EffectControlDialog
 {
 public:
 	spectrumAnalyzerControlDialog( spectrumAnalyzerControls * _controls );

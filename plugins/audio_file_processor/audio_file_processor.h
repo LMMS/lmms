@@ -29,19 +29,19 @@
 
 #include <QtGui/QPixmap>
 
-#include "instrument.h"
-#include "instrument_view.h"
+#include "Instrument.h"
+#include "InstrumentView.h"
 #include "sample_buffer.h"
 #include "knob.h"
 #include "pixmap_button.h"
 
 
 
-class audioFileProcessor : public instrument
+class audioFileProcessor : public Instrument
 {
 	Q_OBJECT
 public:
-	audioFileProcessor( instrumentTrack * _instrument_track );
+	audioFileProcessor( InstrumentTrack * _instrument_track );
 	virtual ~audioFileProcessor();
 
 	virtual void playNote( notePlayHandle * _n, 
@@ -63,7 +63,7 @@ public:
 		return( 128 );
 	}
 
-	virtual pluginView * instantiateView( QWidget * _parent );
+	virtual PluginView * instantiateView( QWidget * _parent );
 
 
 public slots:
@@ -81,25 +81,25 @@ private:
 
 	sampleBuffer m_sampleBuffer;
 	
-	knobModel m_ampModel;
-	knobModel m_startPointModel;
-	knobModel m_endPointModel;
-	boolModel m_reverseModel;
-	boolModel m_loopModel;
+	FloatModel m_ampModel;
+	FloatModel m_startPoIntModel;
+	FloatModel m_endPoIntModel;
+	BoolModel m_reverseModel;
+	BoolModel m_loopModel;
 
 
-	friend class audioFileProcessorView;
+	friend class AudioFileProcessorView;
 
 } ;
 
 
 
-class audioFileProcessorView : public instrumentView
+class AudioFileProcessorView : public InstrumentView
 {
 	Q_OBJECT
 public:
-	audioFileProcessorView( instrument * _instrument, QWidget * _parent );
-	virtual ~audioFileProcessorView();
+	AudioFileProcessorView( Instrument * _instrument, QWidget * _parent );
+	virtual ~AudioFileProcessorView();
 
 
 protected slots:

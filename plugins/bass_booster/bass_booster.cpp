@@ -31,7 +31,7 @@
 extern "C"
 {
 
-plugin::descriptor PLUGIN_EXPORT bassbooster_plugin_descriptor =
+Plugin::Descriptor PLUGIN_EXPORT bassbooster_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"BassBooster Effect",
@@ -39,8 +39,8 @@ plugin::descriptor PLUGIN_EXPORT bassbooster_plugin_descriptor =
 				"plugin for boosting bass" ),
 	"Tobias Doerffel <tobydox/at/users.sf.net>",
 	0x0100,
-	plugin::Effect,
-	new pluginPixmapLoader( "logo" ),
+	Plugin::Effect,
+	new PluginPixmapLoader( "logo" ),
 	NULL,
 	NULL
 } ;
@@ -49,9 +49,9 @@ plugin::descriptor PLUGIN_EXPORT bassbooster_plugin_descriptor =
 
 
 
-bassBoosterEffect::bassBoosterEffect( model * _parent,
-			const descriptor::subPluginFeatures::key * _key ) :
-	effect( &bassbooster_plugin_descriptor, _parent, _key ),
+bassBoosterEffect::bassBoosterEffect( Model * _parent,
+			const Descriptor::SubPluginFeatures::Key * _key ) :
+	Effect( &bassbooster_plugin_descriptor, _parent, _key ),
 	m_bbFX( effectLib::fastBassBoost( 70.0f, 1.0f, 2.8f ) ),
 	m_bbControls( this )
 {
@@ -76,8 +76,8 @@ bool bassBoosterEffect::processAudioBuffer( sampleFrame * _buf,
 	}
 
 	double out_sum = 0.0;
-	const float d = getDryLevel();
-	const float w = getWetLevel();
+	const float d = dryLevel();
+	const float w = wetLevel();
 	for( fpp_t f = 0; f < _frames; ++f )
 	{
 		sample_t s[2] = { _buf[f][0], _buf[f][1] };
@@ -102,10 +102,10 @@ extern "C"
 {
 
 // neccessary for getting instance out of shared lib
-plugin * PLUGIN_EXPORT lmms_plugin_main( model * _parent, void * _data )
+Plugin * PLUGIN_EXPORT lmms_plugin_main( Model * _parent, void * _data )
 {
 	return( new bassBoosterEffect( _parent,
-		static_cast<const plugin::descriptor::subPluginFeatures::key *>(
+		static_cast<const Plugin::Descriptor::SubPluginFeatures::Key *>(
 								_data ) ) );
 }
 

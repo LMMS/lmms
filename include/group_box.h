@@ -28,14 +28,14 @@
 
 #include <QtGui/QWidget>
 
-#include "automatable_model_view.h"
+#include "AutomatableModelView.h"
 #include "pixmap_button.h"
 
 
 class QPixmap;
 
 
-class groupBox : public QWidget, public boolModelView
+class groupBox : public QWidget, public BoolModelView
 {
 	Q_OBJECT
 public:
@@ -64,7 +64,7 @@ private:
 } ;
 
 
-typedef boolModel groupBoxModel;
+typedef BoolModel groupBoxModel;
 
 
 #endif

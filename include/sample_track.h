@@ -31,7 +31,7 @@
 #include "AudioPort.h"
 #include "track.h"
 
-class effectRackView;
+class EffectRackView;
 class knob;
 class sampleBuffer;
 
@@ -73,7 +73,7 @@ public slots:
 
 private:
 	sampleBuffer * m_sampleBuffer;
-	boolModel m_recordModel;
+	BoolModel m_recordModel;
 
 
 	friend class sampleTCOView;
@@ -146,7 +146,7 @@ public:
 
 private:
 	AudioPort m_audioPort;
-	floatModel m_volumeModel;
+	FloatModel m_volumeModel;
 
 
 	friend class sampleTrackView;
@@ -168,7 +168,7 @@ public slots:
 
 
 private:
-	effectRackView * m_effectRack;
+	EffectRackView * m_effectRack;
 	QWidget * m_effWindow;
 	knob * m_volumeKnob;
 

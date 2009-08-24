@@ -33,7 +33,7 @@
 
 stereoEnhancerControlDialog::stereoEnhancerControlDialog(
 	stereoEnhancerControls * _controls ) :
-	effectControlDialog( _controls )
+	EffectControlDialog( _controls )
 {
 	QHBoxLayout * l = new QHBoxLayout( this );
 

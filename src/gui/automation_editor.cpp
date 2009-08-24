@@ -48,7 +48,7 @@
 
 
 #include "song_editor.h"
-#include "main_window.h"
+#include "MainWindow.h"
 #include "embed.h"
 #include "engine.h"
 #include "pixmap_button.h"
@@ -308,7 +308,7 @@ automationEditor::automationEditor( void ) :
 	m_quantizeComboBox->setFixedSize( 60, 22 );
 
 	// TODO: leak
-	comboBoxModel * quantize_model = new comboBoxModel( /* this */ );
+	ComboBoxModel * quantize_model = new ComboBoxModel( /* this */ );
 	for( int i = 0; i < 7; ++i )
 	{
 		quantize_model->addItem( "1/" + QString::number( 1 << i ) );
@@ -357,9 +357,9 @@ automationEditor::automationEditor( void ) :
 	setMinimumSize( tb_layout->minimumSize().width(), 128 );
 
 	// add us to workspace
-	if( engine::getMainWindow()->workspace() )
+	if( engine::mainWindow()->workspace() )
 	{
-		engine::getMainWindow()->workspace()->addSubWindow( this );
+		engine::mainWindow()->workspace()->addSubWindow( this );
 		parentWidget()->resize( INITIAL_WIDTH, INITIAL_HEIGHT );
 		parentWidget()->hide();
 	}
@@ -414,7 +414,7 @@ void automationEditor::setCurrentPattern( automationPattern * _new_pattern )
 
 void automationEditor::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
-	mainWindow::saveWidgetState( this, _this );
+	MainWindow::saveWidgetState( this, _this );
 }
 
 
@@ -422,7 +422,7 @@ void automationEditor::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 void automationEditor::loadSettings( const QDomElement & _this )
 {
-	mainWindow::restoreWidgetState( this, _this );
+	MainWindow::restoreWidgetState( this, _this );
 }
 
 

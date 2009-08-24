@@ -33,7 +33,7 @@
 #include "audio_file_processor.h"
 #include "engine.h"
 #include "song.h"
-#include "instrument_track.h"
+#include "InstrumentTrack.h"
 #include "note_play_handle.h"
 #include "interpolation.h"
 #include "gui_templates.h"
@@ -47,7 +47,7 @@
 extern "C"
 {
 
-plugin::descriptor PLUGIN_EXPORT audiofileprocessor_plugin_descriptor =
+Plugin::Descriptor PLUGIN_EXPORT audiofileprocessor_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"AudioFileProcessor",
@@ -57,8 +57,8 @@ plugin::descriptor PLUGIN_EXPORT audiofileprocessor_plugin_descriptor =
 				"instrument-track" ),
 	"Tobias Doerffel <tobydox/at/users.sf.net>",
 	0x0100,
-	plugin::Instrument,
-	new pluginPixmapLoader( "logo" ),
+	Plugin::Instrument,
+	new PluginPixmapLoader( "logo" ),
 	"wav,ogg,ds,spx,au,voc,aif,aiff,flac,raw",
 	NULL
 } ;
@@ -68,22 +68,22 @@ plugin::descriptor PLUGIN_EXPORT audiofileprocessor_plugin_descriptor =
 
 
 
-audioFileProcessor::audioFileProcessor( instrumentTrack * _instrument_track ) :
-	instrument( _instrument_track, &audiofileprocessor_plugin_descriptor ),
+audioFileProcessor::audioFileProcessor( InstrumentTrack * _instrument_track ) :
+	Instrument( _instrument_track, &audiofileprocessor_plugin_descriptor ),
 	m_sampleBuffer(),
 	m_ampModel( 100, 0, 500, 1, this, tr( "Amplify" ) ),
-	m_startPointModel( 0, 0, 1, 0.0000001f, this, tr( "Start of sample") ),
-	m_endPointModel( 1, 0, 1, 0.0000001f, this, tr( "End of sample" ) ),
-	m_reverseModel( FALSE, this, tr( "Reverse sample" ) ),
-	m_loopModel( FALSE, this, tr( "Loop") )
+	m_startPoIntModel( 0, 0, 1, 0.0000001f, this, tr( "Start of sample") ),
+	m_endPoIntModel( 1, 0, 1, 0.0000001f, this, tr( "End of sample" ) ),
+	m_reverseModel( false, this, tr( "Reverse sample" ) ),
+	m_loopModel( false, this, tr( "Loop") )
 {
 	connect( &m_reverseModel, SIGNAL( dataChanged() ),
 				this, SLOT( reverseModelChanged() ) );
 	connect( &m_ampModel, SIGNAL( dataChanged() ),
 				this, SLOT( ampModelChanged() ) );
-	connect( &m_startPointModel, SIGNAL( dataChanged() ),
+	connect( &m_startPoIntModel, SIGNAL( dataChanged() ),
 				this, SLOT( loopPointChanged() ) );
-	connect( &m_endPointModel, SIGNAL( dataChanged() ),
+	connect( &m_endPoIntModel, SIGNAL( dataChanged() ),
 				this, SLOT( loopPointChanged() ) );
 }
 
@@ -113,7 +113,7 @@ void audioFileProcessor::playNote( notePlayHandle * _n,
 						m_loopModel.value() ) == TRUE )
 	{
 		applyRelease( _working_buffer, _n );
-		getInstrumentTrack()->processAudioBuffer( _working_buffer,
+		instrumentTrack()->processAudioBuffer( _working_buffer,
 								frames,_n );
 	}
 }
@@ -142,8 +142,8 @@ void audioFileProcessor::saveSettings( QDomDocument & _doc,
 	m_reverseModel.saveSettings( _doc, _this, "reversed" );
 	m_loopModel.saveSettings( _doc, _this, "looped" );
 	m_ampModel.saveSettings( _doc, _this, "amp" );
-	m_startPointModel.saveSettings( _doc, _this, "sframe" );
-	m_endPointModel.saveSettings( _doc, _this, "eframe" );
+	m_startPoIntModel.saveSettings( _doc, _this, "sframe" );
+	m_endPoIntModel.saveSettings( _doc, _this, "eframe" );
 }
 
 
@@ -162,8 +162,8 @@ void audioFileProcessor::loadSettings( const QDomElement & _this )
 	m_reverseModel.loadSettings( _this, "reversed" );
 	m_loopModel.loadSettings( _this, "looped" );
 	m_ampModel.loadSettings( _this, "amp" );
-	m_startPointModel.loadSettings( _this, "sframe" );
-	m_endPointModel.loadSettings( _this, "eframe" );
+	m_startPoIntModel.loadSettings( _this, "sframe" );
+	m_endPoIntModel.loadSettings( _this, "eframe" );
 
 	loopPointChanged();
 }
@@ -201,9 +201,9 @@ Uint32 audioFileProcessor::getBeatLen( notePlayHandle * _n ) const
 
 
 
-pluginView * audioFileProcessor::instantiateView( QWidget * _parent )
+PluginView * audioFileProcessor::instantiateView( QWidget * _parent )
 {
-	return( new audioFileProcessorView( this, _parent ) );
+	return( new AudioFileProcessorView( this, _parent ) );
 }
 
 
@@ -214,13 +214,12 @@ void audioFileProcessor::setAudioFile( const QString & _audio_file,
 {
 	// is current channel-name equal to previous-filename??
 	if( _rename &&
-		( getInstrumentTrack()->name() ==
+		( instrumentTrack()->name() ==
 			QFileInfo( m_sampleBuffer.audioFile() ).fileName() ||
 				m_sampleBuffer.audioFile().isEmpty() ) )
 	{
 		// then set it to new one
-		getInstrumentTrack()->setName( QFileInfo( _audio_file
-								).fileName() );
+		instrumentTrack()->setName( QFileInfo( _audio_file).fileName() );
 	}
 	// else we don't touch the track-name, because the user named it self
 
@@ -249,9 +248,9 @@ void audioFileProcessor::ampModelChanged( void )
 
 void audioFileProcessor::loopPointChanged( void )
 {
-	const f_cnt_t f1 = static_cast<f_cnt_t>( m_startPointModel.value() *
+	const f_cnt_t f1 = static_cast<f_cnt_t>( m_startPoIntModel.value() *
 						( m_sampleBuffer.frames()-1 ) );
-	const f_cnt_t f2 = static_cast<f_cnt_t>( m_endPointModel.value() *
+	const f_cnt_t f2 = static_cast<f_cnt_t>( m_endPoIntModel.value() *
 						( m_sampleBuffer.frames()-1 ) );
 	m_sampleBuffer.setStartFrame( qMin<f_cnt_t>( f1, f2 ) );
 	m_sampleBuffer.setEndFrame( qMax<f_cnt_t>( f1, f2 ) );
@@ -277,12 +276,12 @@ public:
 
 
 
-QPixmap * audioFileProcessorView::s_artwork = NULL;
+QPixmap * AudioFileProcessorView::s_artwork = NULL;
 
 
-audioFileProcessorView::audioFileProcessorView( instrument * _instrument,
+AudioFileProcessorView::AudioFileProcessorView( Instrument * _instrument,
 							QWidget * _parent ) :
-	instrumentView( _instrument, _parent )
+	InstrumentView( _instrument, _parent )
 {
 	if( s_artwork == NULL )
 	{
@@ -374,14 +373,14 @@ audioFileProcessorView::audioFileProcessorView( instrument * _instrument,
 
 
 
-audioFileProcessorView::~audioFileProcessorView()
+AudioFileProcessorView::~AudioFileProcessorView()
 {
 }
 
 
 
 
-void audioFileProcessorView::dragEnterEvent( QDragEnterEvent * _dee )
+void AudioFileProcessorView::dragEnterEvent( QDragEnterEvent * _dee )
 {
 	if( _dee->mimeData()->hasFormat( stringPairDrag::mimeType() ) )
 	{
@@ -410,7 +409,7 @@ void audioFileProcessorView::dragEnterEvent( QDragEnterEvent * _dee )
 
 
 
-void audioFileProcessorView::dropEvent( QDropEvent * _de )
+void AudioFileProcessorView::dropEvent( QDropEvent * _de )
 {
 	QString type = stringPairDrag::decodeKey( _de );
 	QString value = stringPairDrag::decodeValue( _de );
@@ -435,7 +434,7 @@ void audioFileProcessorView::dropEvent( QDropEvent * _de )
 
 
 
-void audioFileProcessorView::paintEvent( QPaintEvent * )
+void AudioFileProcessorView::paintEvent( QPaintEvent * )
 {
 	QPainter p( this );
 
@@ -490,7 +489,7 @@ void audioFileProcessorView::paintEvent( QPaintEvent * )
 
 
 
-void audioFileProcessorView::sampleUpdated( void )
+void AudioFileProcessorView::sampleUpdated( void )
 {
 	m_graph = QPixmap( 245, 75 );
 	m_graph.fill( Qt::transparent );
@@ -506,7 +505,7 @@ void audioFileProcessorView::sampleUpdated( void )
 
 
 
-void audioFileProcessorView::openAudioFile( void )
+void AudioFileProcessorView::openAudioFile( void )
 {
 	QString af = castModel<audioFileProcessor>()->m_sampleBuffer.
 							openAudioFile();
@@ -520,14 +519,14 @@ void audioFileProcessorView::openAudioFile( void )
 
 
 
-void audioFileProcessorView::modelChanged( void )
+void AudioFileProcessorView::modelChanged( void )
 {
 	audioFileProcessor * a = castModel<audioFileProcessor>();
 	connect( &a->m_sampleBuffer, SIGNAL( sampleUpdated() ),
 					this, SLOT( sampleUpdated() ) );
 	m_ampKnob->setModel( &a->m_ampModel );
-	m_startKnob->setModel( &a->m_startPointModel );
-	m_endKnob->setModel( &a->m_endPointModel );
+	m_startKnob->setModel( &a->m_startPoIntModel );
+	m_endKnob->setModel( &a->m_endPoIntModel );
 	m_reverseButton->setModel( &a->m_reverseModel );
 	m_loopButton->setModel( &a->m_loopModel );
 	sampleUpdated();
@@ -541,10 +540,10 @@ extern "C"
 {
 
 // neccessary for getting instance out of shared lib
-plugin * PLUGIN_EXPORT lmms_plugin_main( model *, void * _data )
+Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, void * _data )
 {
-	return( new audioFileProcessor(
-				static_cast<instrumentTrack *>( _data ) ) );
+	return new audioFileProcessor(
+				static_cast<InstrumentTrack *>( _data ) );
 }
 
 

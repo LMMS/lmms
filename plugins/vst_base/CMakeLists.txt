@@ -2,7 +2,7 @@ IF(LMMS_SUPPORT_VST)
 
 INCLUDE(BuildPlugin)
 
-BUILD_PLUGIN(vstbase vst_base.cpp vst_plugin.cpp vst_plugin.h communication.h MOCFILES vst_plugin.h)
+BUILD_PLUGIN(vstbase vst_base.cpp VstPlugin.cpp VstPlugin.h communication.h MOCFILES VstPlugin.h)
 
 
 IF(LMMS_BUILD_WIN32)

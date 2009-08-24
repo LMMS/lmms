@@ -33,7 +33,7 @@
 
 #include "song.h"
 #include "embed.h"
-#include "main_window.h"
+#include "MainWindow.h"
 #include "group_box.h"
 #include "ControllerRackView.h"
 #include "ControllerView.h"
@@ -75,7 +75,7 @@ ControllerRackView::ControllerRackView( ) :
 	this->setLayout( layout );
 
 	QMdiSubWindow * subWin =
-			engine::getMainWindow()->workspace()->addSubWindow( this );
+			engine::mainWindow()->workspace()->addSubWindow( this );
 
 	// No maximize button
 	Qt::WindowFlags flags = subWin->windowFlags();
@@ -104,7 +104,7 @@ ControllerRackView::~ControllerRackView()
 void ControllerRackView::saveSettings( QDomDocument & _doc,
 							QDomElement & _this )
 {
-	mainWindow::saveWidgetState( this, _this );
+	MainWindow::saveWidgetState( this, _this );
 }
 
 
@@ -112,7 +112,7 @@ void ControllerRackView::saveSettings( QDomDocument & _doc,
 
 void ControllerRackView::loadSettings( const QDomElement & _this )
 {
-	mainWindow::restoreWidgetState( this, _this );
+	MainWindow::restoreWidgetState( this, _this );
 }
 
 

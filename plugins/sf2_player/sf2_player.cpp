@@ -32,13 +32,12 @@
 
 #include "sf2_player.h"
 #include "engine.h"
-#include "instrument_track.h"
+#include "InstrumentTrack.h"
 #include "instrument_play_handle.h"
 #include "note_play_handle.h"
 #include "knob.h"
 #include "song.h"
 
-#include "main_window.h"
 #include "patches_dialog.h"
 #include "tooltip.h"
 #include "lcd_spinbox.h"
@@ -49,7 +48,7 @@
 extern "C"
 {
 
-plugin::descriptor sf2player_plugin_descriptor =
+Plugin::Descriptor sf2player_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"Sf2 Player",
@@ -57,8 +56,8 @@ plugin::descriptor sf2player_plugin_descriptor =
 			"Player for SoundFont files" ),
 	"Paul Giblock <drfaygo/at/gmail/dot/com>",
 	0x0100,
-	plugin::Instrument,
-	new pluginPixmapLoader( "logo" ),
+	Plugin::Instrument,
+	new PluginPixmapLoader( "logo" ),
 	"sf2",
 	NULL
 } ;
@@ -82,8 +81,8 @@ QMutex sf2Instrument::s_fontsMutex;
 
 
 
-sf2Instrument::sf2Instrument( instrumentTrack * _instrument_track ) :
-	instrument( _instrument_track, &sf2player_plugin_descriptor ),
+sf2Instrument::sf2Instrument( InstrumentTrack * _instrument_track ) :
+	Instrument( _instrument_track, &sf2player_plugin_descriptor ),
 	m_srcState( NULL ),
 	m_font( NULL ),
 	m_fontId( 0 ),
@@ -126,7 +125,7 @@ sf2Instrument::sf2Instrument( instrumentTrack * _instrument_track ) :
 	// everytime we load a new soundfont.
 	m_synth = new_fluid_synth( m_settings );
 
-	instrumentPlayHandle * iph = new instrumentPlayHandle( this );
+	InstrumentPlayHandle * iph = new InstrumentPlayHandle( this );
 	engine::getMixer()->addPlayHandle( iph );
 
 	//loadFile( configManager::inst()->defaultSoundfont() );
@@ -190,7 +189,7 @@ sf2Instrument::sf2Instrument( instrumentTrack * _instrument_track ) :
 
 sf2Instrument::~sf2Instrument()
 {
-	engine::getMixer()->removePlayHandles( getInstrumentTrack() );
+	engine::getMixer()->removePlayHandles( instrumentTrack() );
 	freeFont();
 	delete_fluid_synth( m_synth );
 	delete_fluid_settings( m_settings );
@@ -270,7 +269,7 @@ void sf2Instrument::loadFile( const QString & _file )
 
 
 
-automatableModel * sf2Instrument::getChildModel( const QString & _modelName )
+AutomatableModel * sf2Instrument::childModel( const QString & _modelName )
 {
 	if( _modelName == "bank" )
 	{
@@ -674,9 +673,9 @@ void sf2Instrument::play( sampleFrame * _working_buffer )
 	const fpp_t frames = engine::getMixer()->framesPerPeriod();
 
 	m_synthMutex.lock();
-	if( m_lastMidiPitch != getInstrumentTrack()->midiPitch() )
+	if( m_lastMidiPitch != instrumentTrack()->midiPitch() )
 	{
-		m_lastMidiPitch = getInstrumentTrack()->midiPitch();
+		m_lastMidiPitch = instrumentTrack()->midiPitch();
 		fluid_synth_pitch_bend( m_synth, m_channel, m_lastMidiPitch );
 	}
 
@@ -721,7 +720,7 @@ void sf2Instrument::play( sampleFrame * _working_buffer )
 	}
 	m_synthMutex.unlock();
 
-	getInstrumentTrack()->processAudioBuffer( _working_buffer, frames,
+	instrumentTrack()->processAudioBuffer( _working_buffer, frames,
 									NULL );
 }
 
@@ -749,7 +748,7 @@ void sf2Instrument::deleteNotePluginData( notePlayHandle * _n )
 
 
 
-pluginView * sf2Instrument::instantiateView( QWidget * _parent )
+PluginView * sf2Instrument::instantiateView( QWidget * _parent )
 {
 	return new sf2InstrumentView( this, _parent );
 }
@@ -772,9 +771,9 @@ public:
 
 
 
-sf2InstrumentView::sf2InstrumentView( instrument * _instrument,
+sf2InstrumentView::sf2InstrumentView( Instrument * _instrument,
 			QWidget * _parent ) :
-	instrumentView( _instrument, _parent )
+	InstrumentView( _instrument, _parent )
 {
 //	QVBoxLayout * vl = new QVBoxLayout( this );
 //	QHBoxLayout * hl = new QHBoxLayout();
@@ -1091,7 +1090,7 @@ void sf2InstrumentView::showPatchDialog()
 
 	patchesDialog pd( this );
 
-	pd.setup( k->m_synth, 1, k->getInstrumentTrack()->name(),
+	pd.setup( k->m_synth, 1, k->instrumentTrack()->name(),
 		&k->m_bankNum, &k->m_patchNum, m_patchLabel );
 
 	pd.exec();
@@ -1103,10 +1102,9 @@ extern "C"
 {
 
 // neccessary for getting instance out of shared lib
-plugin * lmms_plugin_main( model *, void * _data )
+Plugin * lmms_plugin_main( Model *, void * _data )
 {
-	return( new sf2Instrument(
-			static_cast<instrumentTrack *>( _data ) ) );
+	return new sf2Instrument( static_cast<InstrumentTrack *>( _data ) );
 }
 
 

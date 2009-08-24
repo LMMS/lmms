@@ -54,7 +54,7 @@ nineButtonSelector::nineButtonSelector(	QPixmap _button0_on,
 					Uint32 _x, Uint32 _y,
 					QWidget * _parent ):
 	QWidget( _parent ),
-	intModelView( new nineButtonSelectorModel(0, 8, _default, NULL, 
+	IntModelView( new nineButtonSelectorModel(0, 8, _default, NULL, 
 				QString::null, TRUE ), this )
 {
 	setFixedSize( 50, 50 );

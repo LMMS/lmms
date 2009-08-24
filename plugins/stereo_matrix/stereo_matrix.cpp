@@ -31,7 +31,7 @@
 extern "C"
 {
 
-plugin::descriptor PLUGIN_EXPORT stereomatrix_plugin_descriptor =
+Plugin::Descriptor PLUGIN_EXPORT stereomatrix_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"Stereophonic Matrix",
@@ -39,8 +39,8 @@ plugin::descriptor PLUGIN_EXPORT stereomatrix_plugin_descriptor =
 				"Plugin for freely manipulating stereo output" ),
 	"Paul Giblock <drfaygo/at/gmail.com>",
 	0x0100,
-	plugin::Effect,
-	new pluginPixmapLoader( "logo" ),
+	Plugin::Effect,
+	new PluginPixmapLoader( "logo" ),
 	NULL,
 	NULL
 } ;
@@ -50,9 +50,9 @@ plugin::descriptor PLUGIN_EXPORT stereomatrix_plugin_descriptor =
 
 
 stereoMatrixEffect::stereoMatrixEffect(
-			model * _parent,
-			const descriptor::subPluginFeatures::key * _key ) :
-	effect( &stereomatrix_plugin_descriptor, _parent, _key ),
+			Model * _parent,
+			const Descriptor::SubPluginFeatures::Key * _key ) :
+	Effect( &stereomatrix_plugin_descriptor, _parent, _key ),
 	m_smControls( this )
 {
 }
@@ -81,8 +81,8 @@ bool stereoMatrixEffect::processAudioBuffer( sampleFrame * _buf,
 
 	for( fpp_t f = 0; f < _frames; ++f )
 	{	
-		const float d = getDryLevel();
-		const float w = getWetLevel();
+		const float d = dryLevel();
+		const float w = wetLevel();
 		
 		sample_t l = _buf[f][0];
 		sample_t r = _buf[f][1];
@@ -113,10 +113,10 @@ extern "C"
 {
 
 // neccessary for getting instance out of shared lib
-plugin * PLUGIN_EXPORT lmms_plugin_main( model * _parent, void * _data )
+Plugin * PLUGIN_EXPORT lmms_plugin_main( Model * _parent, void * _data )
 {
 	return( new stereoMatrixEffect( _parent,
-		static_cast<const plugin::descriptor::subPluginFeatures::key *>(
+		static_cast<const Plugin::Descriptor::SubPluginFeatures::Key *>(
 								_data ) ) );
 }
 

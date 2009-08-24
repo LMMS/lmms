@@ -27,9 +27,9 @@
 
 #include <QtGui/QWidget>
 
-#include "automatable_model.h"
+#include "AutomatableModel.h"
 #include "Controller.h"
-#include "mv_base.h"
+#include "ModelView.h"
 
 class QGroupBox;
 class QLabel;
@@ -39,7 +39,7 @@ class QMdiSubWindow;
 class ledCheckBox;
 
 
-class ControllerView : public QWidget, public modelView
+class ControllerView : public QWidget, public ModelView
 {
 	Q_OBJECT
 public:

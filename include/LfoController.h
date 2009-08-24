@@ -27,32 +27,31 @@
 
 #include <QtGui/QWidget>
 
-#include "mv_base.h"
-#include "automatable_model.h"
+#include "Model.h"
+#include "AutomatableModel.h"
 #include "Controller.h"
 #include "ControllerDialog.h"
-#include "tempo_sync_knob.h"
-#include "oscillator.h"
-
+#include "TempoSyncKnobModel.h"
+#include "Oscillator.h"
 
 class automatableButtonGroup;
 class knob;
 class ledCheckBox;
-class tempoSyncKnob;
+class TempoSyncKnob;
 class pixmapButton;
-class oscillator;
+
 
 class LfoController : public Controller 
 {
 	Q_OBJECT
 public:
-	LfoController( model * _parent );
+	LfoController( Model * _parent );
 
 	virtual ~LfoController();
 
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _this );
 	virtual void loadSettings( const QDomElement & _this );
-	virtual QString nodeName( void ) const;
+	virtual QString nodeName() const;
 
 
 public slots:
@@ -63,12 +62,12 @@ protected:
 	// The internal per-controller get-value function
 	virtual float value( int _offset );
 
-	floatModel m_baseModel;
-	tempoSyncKnobModel m_speedModel;
-	floatModel m_amountModel;
-	floatModel m_phaseModel;
-	intModel m_waveModel;
-	intModel m_multiplierModel;
+	FloatModel m_baseModel;
+	TempoSyncKnobModel m_speedModel;
+	FloatModel m_amountModel;
+	FloatModel m_phaseModel;
+	IntModel m_waveModel;
+	IntModel m_multiplierModel;
 
 	int m_duration;
 	int m_phaseCorrection;
@@ -78,9 +77,10 @@ protected:
 
 
 protected slots:
-	void updateSampleFunction( void );
+	void updateSampleFunction();
 
 	friend class LfoControllerDialog;
+
 } ;
 
 
@@ -95,12 +95,12 @@ public:
 
 protected:
 	virtual void contextMenuEvent( QContextMenuEvent * _me );
-	virtual void modelChanged( void );
+	virtual void modelChanged();
 
 	LfoController * m_lfo;
 
 	knob * m_baseKnob;
-	tempoSyncKnob * m_speedKnob;
+	TempoSyncKnob * m_speedKnob;
 	knob * m_amountKnob;
 	knob * m_phaseKnob;
 	pixmapButton * m_userLfoBtn;

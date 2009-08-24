@@ -25,7 +25,7 @@
 #ifndef _BASSBOOSTER_CONTROLS_H
 #define _BASSBOOSTER_CONTROLS_H
 
-#include "effect_controls.h"
+#include "EffectControls.h"
 #include "bassbooster_control_dialog.h"
 #include "knob.h"
 
@@ -33,7 +33,7 @@
 class bassBoosterEffect;
 
 
-class bassBoosterControls : public effectControls
+class bassBoosterControls : public EffectControls
 {
 	Q_OBJECT
 public:
@@ -49,12 +49,12 @@ public:
 		return( "bassboostercontrols" );
 	}
 
-	virtual int getControlCount( void )
+	virtual int controlCount( void )
 	{
 		return( 3 );
 	}
 
-	virtual effectControlDialog * createView( void )
+	virtual EffectControlDialog * createView( void )
 	{
 		return( new bassBoosterControlDialog( this ) );
 	}
@@ -68,9 +68,9 @@ private slots:
 
 private:
 	bassBoosterEffect * m_effect;
-	knobModel m_freqModel;
-	knobModel m_gainModel;
-	knobModel m_ratioModel;
+	FloatModel m_freqModel;
+	FloatModel m_gainModel;
+	FloatModel m_ratioModel;
 
 	friend class bassBoosterControlDialog;
 

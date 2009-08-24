@@ -30,7 +30,7 @@
 #include "note_play_handle.h"
 
 
-class instrumentTrack;
+class InstrumentTrack;
 class previewTrackContainer;
 
 
@@ -49,7 +49,7 @@ public:
 	static void init( void );
 	static void cleanup( void );
 	static ConstNotePlayHandleList nphsOfInstrumentTrack(
-						const instrumentTrack * _ct );
+						const InstrumentTrack * _ct );
 
 
 private:

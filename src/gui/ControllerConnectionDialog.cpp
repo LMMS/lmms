@@ -2,8 +2,8 @@
  * ControllerConnectionDialog.cpp - dialog allowing the user to create and
  *	modify links between controllers and models
  *
- * Copyright (c) 2008  Paul Giblock <drfaygo/at/gmail.com>
- * 
+ * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail.com>
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -22,7 +22,6 @@
  * Boston, MA 02110-1301 USA.
  *
  */
-
 
 #include <QtGui/QLayout>
 #include <QtGui/QLineEdit>
@@ -46,10 +45,11 @@
 #include "gui_templates.h"
 #include "embed.h"
 
+
 class AutoDetectMidiController : public MidiController
 {
 public:
-	AutoDetectMidiController( model * _parent ) :
+	AutoDetectMidiController( Model * _parent ) :
 		MidiController( _parent ),
 		m_detectedMidiChannel( 0 ),
 		m_detectedMidiController( 0 )
@@ -82,7 +82,7 @@ public:
 
 	// Would be a nice copy ctor, but too hard to add copy ctor because
 	// model has none.
-	MidiController * copyToMidiController( model * _parent )
+	MidiController * copyToMidiController( Model * _parent )
 	{
 		MidiController * c = new MidiController( _parent );
 		c->m_midiPort.setInputChannel( m_midiPort.inputChannel() );
@@ -127,8 +127,7 @@ private:
 
 
 ControllerConnectionDialog::ControllerConnectionDialog( QWidget * _parent, 
-		const automatableModel * _target_model
-	) :
+		const AutomatableModel * _target_model ) :
 	QDialog( _parent ),
 	m_readablePorts( NULL ),
 	m_midiAutoDetect( false ),

@@ -1,5 +1,5 @@
 /*
- * peak_controller_effect.h - PeakController effect plugin
+ * peak_controller_Effect.h - PeakController effect plugin
  *
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail/dot/com>
  * 
@@ -26,29 +26,24 @@
 #ifndef _PEAK_CONTROLLER_EFFECT_H
 #define _PEAK_CONTROLLER_EFFECT_H
 
-#include <QtGui/QWorkspace>
-
-#include "effect.h"
-#include "effect_lib.h"
-#include "engine.h"
-#include "main_window.h"
+#include "Effect.h"
 #include "peak_controller_effect_controls.h"
 
-class peakControllerEffect : public effect
+class PeakControllerEffect : public Effect
 {
 public:
-	peakControllerEffect( model * parent, 
-	                      const descriptor::subPluginFeatures::key * _key );
-	virtual ~peakControllerEffect();
+	PeakControllerEffect( Model * parent, 
+	                      const Descriptor::SubPluginFeatures::Key * _key );
+	virtual ~PeakControllerEffect();
 	virtual bool processAudioBuffer( sampleFrame * _buf,
 		                                          const fpp_t _frames );
 
-	virtual effectControls * getControls( void )
+	virtual EffectControls * controls()
 	{
 		return &m_peakControls;
 	}
 
-	float lastSample( void )
+	float lastSample()
 	{
 		return m_lastSample;
 	}
@@ -56,15 +51,14 @@ public:
 	int m_effectId;
 
 private:
-	peakControllerEffectControls m_peakControls;
-
-	friend class peakControllerEffectControls;
+	PeakControllerEffectControls m_peakControls;
 
 	float m_lastSample;
 
 	Controller * m_autoController;
+
+	friend class PeakControllerEffectControls;
+
 } ;
-
-
 
 #endif

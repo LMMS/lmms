@@ -32,7 +32,7 @@
 #include "endian_handling.h"
 #include "engine.h"
 #include "gui_templates.h"
-#include "instrument_track.h"
+#include "InstrumentTrack.h"
 #include "note_play_handle.h"
 #include "pixmap_button.h"
 #include "song.h"
@@ -47,7 +47,7 @@
 extern "C"
 {
 
-plugin::descriptor PLUGIN_EXPORT patman_plugin_descriptor =
+Plugin::Descriptor PLUGIN_EXPORT patman_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"PatMan",
@@ -55,17 +55,17 @@ plugin::descriptor PLUGIN_EXPORT patman_plugin_descriptor =
 				"GUS-compatible patch instrument" ),
 	"Javier Serrano Polo <jasp00/at/users.sourceforge.net>",
 	0x0100,
-	plugin::Instrument,
-	new pluginPixmapLoader( "logo" ),
+	Plugin::Instrument,
+	new PluginPixmapLoader( "logo" ),
 	"pat",
 	NULL
 } ;
 
 
 // necessary for getting instance out of shared lib
-plugin * PLUGIN_EXPORT lmms_plugin_main( model *, void * _data )
+Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, void * _data )
 {
-	return( new patmanInstrument( static_cast<instrumentTrack *>( _data ) ) );
+	return new patmanInstrument( static_cast<InstrumentTrack *>( _data ) );
 }
 
 }
@@ -73,8 +73,8 @@ plugin * PLUGIN_EXPORT lmms_plugin_main( model *, void * _data )
 
 
 
-patmanInstrument::patmanInstrument( instrumentTrack * _instrument_track ) :
-	instrument( _instrument_track, &patman_plugin_descriptor ),
+patmanInstrument::patmanInstrument( InstrumentTrack * _instrument_track ) :
+	Instrument( _instrument_track, &patman_plugin_descriptor ),
 	m_patchFile( QString::null ),
 	m_loopedModel( true, this ),
 	m_tunedModel( true, this )
@@ -151,7 +151,7 @@ void patmanInstrument::playNote( notePlayHandle * _n,
 					play_freq, m_loopedModel.value() ) )
 	{
 		applyRelease( _working_buffer, _n );
-		getInstrumentTrack()->processAudioBuffer( _working_buffer,
+		instrumentTrack()->processAudioBuffer( _working_buffer,
 								frames, _n );
 	}
 }
@@ -180,12 +180,12 @@ void patmanInstrument::setFile( const QString & _patch_file, bool _rename )
 
 	// is current instrument-track-name equal to previous-filename??
 	if( _rename &&
-		( getInstrumentTrack()->name() ==
+		( instrumentTrack()->name() ==
 					QFileInfo( m_patchFile ).fileName() ||
 				   	m_patchFile == "" ) )
 	{
 		// then set it to new one
-		getInstrumentTrack()->setName( QFileInfo( _patch_file
+		instrumentTrack()->setName( QFileInfo( _patch_file
 								).fileName() );
 	}
 	// else we don't touch the instrument-track-name, because the user
@@ -423,9 +423,9 @@ void patmanInstrument::selectSample( notePlayHandle * _n )
 
 
 
-pluginView * patmanInstrument::instantiateView( QWidget * _parent )
+PluginView * patmanInstrument::instantiateView( QWidget * _parent )
 {
-	return( new patmanView( this, _parent ) );
+	return( new PatmanView( this, _parent ) );
 }
 
 
@@ -437,8 +437,8 @@ pluginView * patmanInstrument::instantiateView( QWidget * _parent )
 
 
 
-patmanView::patmanView( instrument * _instrument, QWidget * _parent ) :
-	instrumentView( _instrument, _parent ),
+PatmanView::PatmanView( Instrument * _instrument, QWidget * _parent ) :
+	InstrumentView( _instrument, _parent ),
 	m_pi( NULL )
 {
 	setAutoFillBackground( TRUE );
@@ -500,14 +500,14 @@ patmanView::patmanView( instrument * _instrument, QWidget * _parent ) :
 
 
 
-patmanView::~patmanView()
+PatmanView::~PatmanView()
 {
 }
 
 
 
 
-void patmanView::openFile( void )
+void PatmanView::openFile( void )
 {
 	QFileDialog ofd( NULL, tr( "Open patch file" ) );
 	ofd.setFileMode( QFileDialog::ExistingFiles );
@@ -559,7 +559,7 @@ void patmanView::openFile( void )
 
 
 
-void patmanView::updateFilename( void )
+void PatmanView::updateFilename( void )
 {
  	m_displayFilename = "";
 	Uint16 idx = m_pi->m_patchFile.length();
@@ -586,7 +586,7 @@ void patmanView::updateFilename( void )
 
 
 
-void patmanView::dragEnterEvent( QDragEnterEvent * _dee )
+void PatmanView::dragEnterEvent( QDragEnterEvent * _dee )
 {
 	if( _dee->mimeData()->hasFormat( stringPairDrag::mimeType() ) )
 	{
@@ -610,7 +610,7 @@ void patmanView::dragEnterEvent( QDragEnterEvent * _dee )
 
 
 
-void patmanView::dropEvent( QDropEvent * _de )
+void PatmanView::dropEvent( QDropEvent * _de )
 {
 	QString type = stringPairDrag::decodeKey( _de );
 	QString value = stringPairDrag::decodeValue( _de );
@@ -627,7 +627,7 @@ void patmanView::dropEvent( QDropEvent * _de )
 
 
 
-void patmanView::paintEvent( QPaintEvent * )
+void PatmanView::paintEvent( QPaintEvent * )
 {
 	QPainter p( this );
 
@@ -640,7 +640,7 @@ void patmanView::paintEvent( QPaintEvent * )
 
 
 
-void patmanView::modelChanged( void )
+void PatmanView::modelChanged( void )
 {
 	m_pi = castModel<patmanInstrument>();
 	m_loopButton->setModel( &m_pi->m_loopedModel );

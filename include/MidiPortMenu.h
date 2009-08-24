@@ -28,14 +28,13 @@
 
 #include <QtGui/QMenu>
 
-#include "mv_base.h"
+#include "ModelView.h"
 #include "MidiPort.h"
-
 
 class QAction;
 
 
-class MidiPortMenu : public QMenu, public modelView
+class MidiPortMenu : public QMenu, public ModelView
 {
 	Q_OBJECT
 public:

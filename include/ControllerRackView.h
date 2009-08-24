@@ -27,7 +27,7 @@
 
 #include <QtGui/QWidget>
 
-#include "serializing_object.h"
+#include "SerializingObject.h"
 #include "lmms_basics.h"
 
 
@@ -37,7 +37,7 @@ class QScrollArea;
 class ControllerView;
 
 
-class ControllerRackView : public QWidget, public serializingObject
+class ControllerRackView : public QWidget, public SerializingObject
 {
 	Q_OBJECT
 public:
@@ -47,9 +47,9 @@ public:
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
 	virtual void loadSettings( const QDomElement & _this );
 
-	inline virtual QString nodeName( void ) const
+	inline virtual QString nodeName() const
 	{
-		return( "ControllerRackView" );
+		return "ControllerRackView";
 	}
 
 
@@ -58,8 +58,8 @@ public slots:
 
 
 private slots:
-	virtual void update( void );
-	void addController( void );
+	virtual void update();
+	void addController();
 
 
 private:

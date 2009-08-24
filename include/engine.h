@@ -35,11 +35,11 @@
 class automationEditor;
 class bbEditor;
 class bbTrackContainer;
-class dummyTrackContainer;
-class fxMixer;
-class fxMixerView;
-class projectJournal;
-class mainWindow;
+class DummyTrackContainer;
+class FxMixer;
+class FxMixerView;
+class ProjectJournal;
+class MainWindow;
 class mixer;
 class pianoRoll;
 class projectNotes;
@@ -53,11 +53,11 @@ class EXPORT engine
 {
 public:
 	static void init( const bool _has_gui = true );
-	static void destroy( void );
+	static void destroy();
 
-	static bool hasGUI( void )
+	static bool hasGUI()
 	{
-		return( s_hasGUI );
+		return s_hasGUI;
 	}
 
 	static void setSuppressMessages( bool _on )
@@ -65,97 +65,97 @@ public:
 		s_suppressMessages = _on;
 	}
 
-	static bool suppressMessages( void )
+	static bool suppressMessages()
 	{
 		return !s_hasGUI || s_suppressMessages;
 	}
 
 	// core
-	static mixer * getMixer( void )
+	static mixer * getMixer()
 	{
-		return( s_mixer );
+		return s_mixer;
 	}
 
-	static fxMixer * getFxMixer( void )
+	static FxMixer * fxMixer()
 	{
-		return( s_fxMixer );
+		return s_fxMixer;
 	}
 
-	static song * getSong( void )
+	static song * getSong()
 	{
-		return( s_song );
+		return s_song;
 	}
 
-	static bbTrackContainer * getBBTrackContainer( void )
+	static bbTrackContainer * getBBTrackContainer()
 	{
-		return( s_bbTrackContainer );
+		return s_bbTrackContainer;
 	}
 
-	static projectJournal * getProjectJournal( void )
+	static ProjectJournal * projectJournal()
 	{
-		return( s_projectJournal );
+		return s_projectJournal;
 	}
 
 	// GUI
-	static mainWindow * getMainWindow( void )
+	static MainWindow * mainWindow()
 	{
-		return( s_mainWindow );
+		return s_mainWindow;
 	}
 
-	static fxMixerView * getFxMixerView( void )
+	static FxMixerView * fxMixerView()
 	{
-		return( s_fxMixerView );
+		return s_fxMixerView;
 	}
 
-	static songEditor * getSongEditor( void )
+	static songEditor * getSongEditor()
 	{
-		return( s_songEditor );
+		return s_songEditor;
 	}
 
-	static bbEditor * getBBEditor( void )
+	static bbEditor * getBBEditor()
 	{
-		return( s_bbEditor );
+		return s_bbEditor;
 	}
 
-	static pianoRoll * getPianoRoll( void )
+	static pianoRoll * getPianoRoll()
 	{
-		return( s_pianoRoll );
+		return s_pianoRoll;
 	}
 
-	static projectNotes * getProjectNotes( void )
+	static projectNotes * getProjectNotes()
 	{
-		return( s_projectNotes );
+		return s_projectNotes;
 	}
 
-	static automationEditor * getAutomationEditor( void )
+	static automationEditor * getAutomationEditor()
 	{
-		return( s_automationEditor );
+		return s_automationEditor;
 	}
 
-	static ladspa2LMMS * getLADSPAManager( void )
+	static ladspa2LMMS * getLADSPAManager()
 	{
-		return( s_ladspaManager );
+		return s_ladspaManager;
 	}
 
-	static dummyTrackContainer * getDummyTrackContainer( void )
+	static DummyTrackContainer * dummyTrackContainer()
 	{
-		return( s_dummyTC );
+		return s_dummyTC;
 	}
 
-	static ControllerRackView * getControllerRackView( void )
+	static ControllerRackView * getControllerRackView()
 	{
-		return( s_controllerRackView );
+		return s_controllerRackView;
 	}
 
-	static float framesPerTick( void )
+	static float framesPerTick()
 	{
-		return( s_framesPerTick );
+		return s_framesPerTick;
 	}
-	static void updateFramesPerTick( void );
+	static void updateFramesPerTick();
 
-	static const QMap<QString, QString> & pluginFileHandling( void )
+	static const QMap<QString, QString> & pluginFileHandling()
 	{
-		return( s_pluginFileHandling );
+		return s_pluginFileHandling;
 	}
 
 
@@ -166,16 +166,16 @@ private:
 
 	// core
 	static mixer * s_mixer;
-	static fxMixer * s_fxMixer;
+	static FxMixer * s_fxMixer;
 	static song * s_song;
 	static bbTrackContainer * s_bbTrackContainer;
-	static projectJournal * s_projectJournal;
-	static dummyTrackContainer * s_dummyTC;
+	static ProjectJournal * s_projectJournal;
+	static DummyTrackContainer * s_dummyTC;
 	static ControllerRackView * s_controllerRackView;
 
 	// GUI
-	static mainWindow * s_mainWindow;
-	static fxMixerView * s_fxMixerView;
+	static MainWindow * s_mainWindow;
+	static FxMixerView * s_fxMixerView;
 	static songEditor * s_songEditor;
 	static automationEditor * s_automationEditor;
 	static bbEditor * s_bbEditor;
@@ -185,7 +185,7 @@ private:
 
 	static QMap<QString, QString> s_pluginFileHandling;
 
-	static void initPluginFileHandling( void );
+	static void initPluginFileHandling();
 
 } ;
 

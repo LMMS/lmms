@@ -37,7 +37,7 @@
 class QLineEdit;
 
 class fileItem;
-class instrumentTrack;
+class InstrumentTrack;
 class fileBrowserTreeWidget;
 class playHandle;
 class trackContainer;
@@ -95,7 +95,7 @@ protected:
 
 
 private:
-	void handleFile( fileItem * _fi, instrumentTrack * _it );
+	void handleFile( fileItem * _fi, InstrumentTrack * _it );
 	void openInNewInstrumentTrack( trackContainer * _tc );
 
 

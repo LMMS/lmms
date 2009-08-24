@@ -31,7 +31,7 @@
 
 #include "mixer.h"
 
-class effectChain;
+class EffectChain;
 
 class AudioPort
 {
@@ -88,7 +88,7 @@ public:
 		return m_nextFxChannel;
 	}
 
-	inline effectChain * getEffects()
+	inline EffectChain * effects()
 	{
 		return m_effects;
 	}
@@ -131,7 +131,7 @@ private:
 
 	QString m_name;
 	
-	effectChain * m_effects;
+	EffectChain * m_effects;
 
 
 	friend class mixer;

@@ -25,12 +25,12 @@
 #ifndef _STEREOMATRIX_CONTROL_DIALOG_H
 #define _STEREOMATRIX_CONTROL_DIALOG_H
 
-#include "effect_control_dialog.h"
+#include "EffectControlDialog.h"
 
 class stereoMatrixControls;
 
 
-class stereoMatrixControlDialog : public effectControlDialog
+class stereoMatrixControlDialog : public EffectControlDialog
 {
 public:
 	stereoMatrixControlDialog( stereoMatrixControls * _controls );

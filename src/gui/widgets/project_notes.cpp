@@ -39,13 +39,13 @@
 
 #include "embed.h"
 #include "engine.h"
-#include "main_window.h"
+#include "MainWindow.h"
 #include "song.h"
 
 
 
 projectNotes::projectNotes( void ) :
-	QMainWindow( engine::getMainWindow()->workspace() )
+	QMainWindow( engine::mainWindow()->workspace() )
 {
 	m_edit = new QTextEdit( this );
 	m_edit->setAutoFillBackground( TRUE );
@@ -70,7 +70,7 @@ projectNotes::projectNotes( void ) :
 	setWindowTitle( tr( "Project notes" ) );
 	setWindowIcon( embed::getIconPixmap( "project_notes" ) );
 
-	engine::getMainWindow()->workspace()->addSubWindow( this );
+	engine::mainWindow()->workspace()->addSubWindow( this );
 	parentWidget()->setAttribute( Qt::WA_DeleteOnClose, false );
 	parentWidget()->move( 700, 10 );
 	parentWidget()->resize( 400, 300 );
@@ -378,7 +378,7 @@ void projectNotes::alignmentChanged( int _a )
 
 void projectNotes::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
-	mainWindow::saveWidgetState( this, _this );
+	MainWindow::saveWidgetState( this, _this );
 
 	QDomCDATASection ds = _doc.createCDATASection( m_edit->toHtml() );
 	_this.appendChild( ds );
@@ -389,7 +389,7 @@ void projectNotes::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 void projectNotes::loadSettings( const QDomElement & _this )
 {
-	mainWindow::restoreWidgetState( this, _this );
+	MainWindow::restoreWidgetState( this, _this );
 	m_edit->setHtml( _this.text() );
 }
 

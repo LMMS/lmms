@@ -43,15 +43,15 @@ class EXPORT automationPattern : public trackContentObject
 	Q_OBJECT
 public:
 	typedef QMap<int, float> timeMap;
-	typedef QVector<QPointer<automatableModel> > objectVector;
+	typedef QVector<QPointer<AutomatableModel> > objectVector;
 
 	automationPattern( automationTrack * _auto_track );
 	automationPattern( const automationPattern & _pat_to_copy );
 	virtual ~automationPattern();
 
-	void addObject( automatableModel * _obj, bool _search_dup = true );
+	void addObject( AutomatableModel * _obj, bool _search_dup = true );
 
-	const automatableModel * firstObject( void ) const;
+	const AutomatableModel * firstObject( void ) const;
 
 	virtual midiTime length( void ) const;
 
@@ -98,9 +98,9 @@ public:
 	virtual trackContentObjectView * createView( trackView * _tv );
 
 
-	static bool isAutomated( const automatableModel * _m );
+	static bool isAutomated( const AutomatableModel * _m );
 	static automationPattern * globalAutomationPattern(
-							automatableModel * _m );
+							AutomatableModel * _m );
 	static void resolveAllIDs( void );
 
 

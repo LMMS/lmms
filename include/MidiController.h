@@ -27,7 +27,7 @@
 
 #include <QtGui/QWidget>
 
-#include "automatable_model.h"
+#include "AutomatableModel.h"
 #include "Controller.h"
 #include "MidiEventProcessor.h"
 #include "MidiPort.h"
@@ -40,7 +40,7 @@ class MidiController : public Controller, public MidiEventProcessor
 {
 	Q_OBJECT
 public:
-	MidiController( model * _parent );
+	MidiController( Model * _parent );
 	virtual ~MidiController();
 
 	virtual void processInEvent( const midiEvent & _me,

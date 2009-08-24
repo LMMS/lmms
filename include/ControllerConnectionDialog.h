@@ -32,7 +32,7 @@
 #include <QtGui/QStandardItemModel>
 
 #include "Controller.h"
-#include "automatable_model.h"
+#include "AutomatableModel.h"
 
 
 class QLineEdit;
@@ -53,7 +53,7 @@ class ControllerConnectionDialog : public QDialog
 	Q_OBJECT
 public:
 	ControllerConnectionDialog( QWidget * _parent,
-			const automatableModel * _target_model );
+			const AutomatableModel * _target_model );
 	virtual ~ControllerConnectionDialog();
 
 	Controller * chosenController( void )
@@ -81,7 +81,7 @@ private:
 	lcdSpinBox * m_midiControllerSpinBox;
 	ledCheckBox * m_midiAutoDetectCheckBox;
 	MidiPortMenu * m_readablePorts;
-	boolModel m_midiAutoDetect;
+	BoolModel m_midiAutoDetect;
 
 	// User
 	groupBox * m_userGroupBox;
@@ -92,7 +92,7 @@ private:
 	QLineEdit * m_mappingFunction;
 
 	Controller * m_controller;
-	const automatableModel * m_targetModel;
+	const AutomatableModel * m_targetModel;
 
 	// Temporary midiController 
 	AutoDetectMidiController * m_midiController;

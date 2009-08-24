@@ -1,5 +1,6 @@
 /*
- * stereomatrix_control_dialog.h - control dialog for stereoMatrix-effect
+ * peak_controller_EffectControlDialog.h - control dialog for
+ *                                           peakControllerEffect
  *
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail/dot/com>
  * 
@@ -25,26 +26,26 @@
 #ifndef _PEAK_CONTROLLER_EFFECT_CONTROL_DIALOG_H
 #define _PEAK_CONTROLLER_EFFECT_CONTROL_DIALOG_H
 
-#include "effect_control_dialog.h"
+#include "EffectControlDialog.h"
 
-class peakControllerEffectControls;
+class PeakControllerEffectControls;
 class knob;
-class tempoSyncKnob;
 class ledCheckBox;
 
 
-class peakControllerEffectControlDialog : public effectControlDialog
+class PeakControllerEffectControlDialog : public EffectControlDialog
 {
 public:
-	peakControllerEffectControlDialog( peakControllerEffectControls * _controls );
-	virtual ~peakControllerEffectControlDialog()
+	PeakControllerEffectControlDialog(
+				PeakControllerEffectControls * _controls );
+	virtual ~PeakControllerEffectControlDialog()
 	{
 	}
 
 protected:
 	knob * m_baseKnob;
 	knob * m_amountKnob;
-	tempoSyncKnob * m_decayKnob;
+	knob * m_decayKnob;
 	ledCheckBox * m_muteLed;
 
 };

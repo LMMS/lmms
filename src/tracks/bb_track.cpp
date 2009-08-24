@@ -2,7 +2,7 @@
  * bb_track.cpp - implementation of class bbTrack and bbTCO
  *
  * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -22,12 +22,10 @@
  *
  */
 
-
 #include <QtXml/QDomElement>
 #include <QtGui/QColorDialog>
 #include <QtGui/QMenu>
 #include <QtGui/QPainter>
-
 
 #include "bb_editor.h"
 #include "bb_track.h"
@@ -432,7 +430,7 @@ void bbTrack::saveTrackSpecificSettings( QDomDocument & _doc,
 			_this.parentNode().parentNode().nodeName() != "clone" &&
 			_this.parentNode().nodeName() != "journaldata" )
 	{
-		( (journallingObject *)( engine::getBBTrackContainer() ) )->
+		( (JournallingObject *)( engine::getBBTrackContainer() ) )->
 						saveState( _doc, _this );
 	}
 	if( _this.parentNode().parentNode().nodeName() == "clone" )
@@ -471,7 +469,7 @@ void bbTrack::loadTrackSpecificSettings( const QDomElement & _this )
 					trackContainer::classNodeName() );
 		if( node.isElement() )
 		{
-			( (journallingObject *)engine::getBBTrackContainer() )->
+			( (JournallingObject *)engine::getBBTrackContainer() )->
 					restoreState( node.toElement() );
 		}
 	}

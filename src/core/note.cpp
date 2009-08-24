@@ -67,7 +67,7 @@ note::note( const midiTime & _length, const midiTime & _pos,
 
 
 note::note( const note & _note ) :
-	serializingObject( _note ),
+	SerializingObject( _note ),
 	m_selected( _note.m_selected ),
 	m_oldKey( _note.m_oldKey ),
 	m_oldPos( _note.m_oldPos ),

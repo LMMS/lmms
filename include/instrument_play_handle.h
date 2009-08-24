@@ -27,19 +27,19 @@
 #define _INSTRUMENT_PLAY_HANDLE_H
 
 #include "play_handle.h"
-#include "instrument.h"
+#include "Instrument.h"
 
 
-class instrumentPlayHandle : public playHandle
+class InstrumentPlayHandle : public playHandle
 {
 public:
-	instrumentPlayHandle( instrument * _instrument ) :
-		playHandle( InstrumentPlayHandle ),
+	InstrumentPlayHandle( Instrument * _instrument ) :
+		playHandle( playHandle::InstrumentPlayHandle ),
 		m_instrument( _instrument )
 	{
 	}
 
-	virtual ~instrumentPlayHandle()
+	virtual ~InstrumentPlayHandle()
 	{
 	}
 
@@ -49,7 +49,7 @@ public:
 		m_instrument->play( _working_buffer );
 	}
 
-	virtual bool done( void ) const
+	virtual bool done() const
 	{
 		return false;
 	}
@@ -61,7 +61,7 @@ public:
 
 
 private:
-	instrument * m_instrument;
+	Instrument * m_instrument;
 
 } ;
 

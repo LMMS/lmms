@@ -33,7 +33,7 @@
 
 
 #include "config_mgr.h"
-#include "main_window.h"
+#include "MainWindow.h"
 
 
 static inline QString ensureTrailingSlash( const QString & _s )
@@ -331,8 +331,8 @@ void configManager::loadConfigFile( void )
 	if( !QDir( m_workingDir ).exists() )
 	{
 		if( QMessageBox::question( 0,
-			mainWindow::tr( "Working directory" ),
-			mainWindow::tr( "The LMMS working directory %1 does not "
+			MainWindow::tr( "Working directory" ),
+			MainWindow::tr( "The LMMS working directory %1 does not "
 				"exist. Create it now? You can change the directory "
 				"later via Edit -> Settings." ).arg( m_workingDir ),
 					QMessageBox::Yes, QMessageBox::No ) ==
@@ -402,8 +402,8 @@ void configManager::saveConfigFile( void )
 	if( !outfile.open( QIODevice::WriteOnly | QIODevice::Truncate ) )
 	{
 		QMessageBox::critical( NULL,
-			mainWindow::tr( "Could not save config-file" ),
-			mainWindow::tr( "Could not save configuration file %1. "
+			MainWindow::tr( "Could not save config-file" ),
+			MainWindow::tr( "Could not save configuration file %1. "
 					"You're probably not permitted to "
 					"write to this file.\n"
 					"Please make sure you have write-"

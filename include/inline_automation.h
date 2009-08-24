@@ -30,11 +30,11 @@
 #include "shared_object.h"
 
 
-class inlineAutomation : public floatModel, public sharedObject
+class inlineAutomation : public FloatModel, public sharedObject
 {
 public:
 	inlineAutomation( void ) :
-		floatModel(),
+		FloatModel(),
 		sharedObject(),
 		m_autoPattern( NULL )
 	{

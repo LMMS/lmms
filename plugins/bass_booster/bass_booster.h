@@ -26,22 +26,22 @@
 #ifndef _BASS_BOOSTER_H
 #define _BASS_BOOSTER_H
 
-#include "effect.h"
+#include "Effect.h"
 #include "effect_lib.h"
 #include "bassbooster_controls.h"
 
 
 
-class bassBoosterEffect : public effect
+class bassBoosterEffect : public Effect
 {
 public:
-	bassBoosterEffect( model * _parent,
-			const descriptor::subPluginFeatures::key * _key );
+	bassBoosterEffect( Model * _parent,
+			const Descriptor::SubPluginFeatures::Key * _key );
 	virtual ~bassBoosterEffect();
 	virtual bool processAudioBuffer( sampleFrame * _buf,
 							const fpp_t _frames );
 
-	virtual effectControls * getControls( void )
+	virtual EffectControls * controls( void )
 	{
 		return( &m_bbControls );
 	}

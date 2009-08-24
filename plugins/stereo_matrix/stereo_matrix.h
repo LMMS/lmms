@@ -26,24 +26,19 @@
 #ifndef _STEREO_MATRIX_H
 #define _STEREO_MATRIX_H
 
-#include <QtGui/QWorkspace>
-
-#include "effect.h"
-#include "effect_lib.h"
-#include "engine.h"
-#include "main_window.h"
+#include "Effect.h"
 #include "stereomatrix_controls.h"
 
-class stereoMatrixEffect : public effect
+class stereoMatrixEffect : public Effect
 {
 public:
-	stereoMatrixEffect( model * parent, 
-	                      const descriptor::subPluginFeatures::key * _key );
+	stereoMatrixEffect( Model * parent, 
+	                      const Descriptor::SubPluginFeatures::Key * _key );
 	virtual ~stereoMatrixEffect();
 	virtual bool processAudioBuffer( sampleFrame * _buf,
 		                                          const fpp_t _frames );
 
-	virtual effectControls * getControls( void )
+	virtual EffectControls * controls( void )
 	{
 		return( &m_smControls );
 	}

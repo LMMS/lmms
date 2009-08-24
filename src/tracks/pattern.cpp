@@ -34,7 +34,7 @@
 #include <QtAlgorithms>
 
 #include "pattern.h"
-#include "instrument_track.h"
+#include "InstrumentTrack.h"
 #include "templates.h"
 #include "gui_templates.h"
 #include "embed.h"
@@ -48,7 +48,7 @@
 #include "tooltip.h"
 #include "bb_track_container.h"
 #include "string_pair_drag.h"
-#include "main_window.h"
+#include "MainWindow.h"
 
 
 QPixmap * patternView::s_stepBtnOn = NULL;
@@ -59,7 +59,7 @@ QPixmap * patternView::s_frozen = NULL;
 
 
 
-pattern::pattern( instrumentTrack * _instrument_track ) :
+pattern::pattern( InstrumentTrack * _instrument_track ) :
 	trackContentObject( _instrument_track ),
 	m_instrumentTrack( _instrument_track ),
 	m_patternType( BeatPattern ),
@@ -1301,7 +1301,7 @@ void patternView::paintEvent( QPaintEvent * )
 		p.setPen( QColor( 32, 240, 32 ) );
 	}
 
-	if( m_pat->name() != m_pat->getInstrumentTrack()->name() )
+	if( m_pat->name() != m_pat->instrumentTrack()->name() )
 	{
 		p.drawText( 2, p.fontMetrics().height() - 1, m_pat->name() );
 	}

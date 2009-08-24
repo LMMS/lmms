@@ -1,5 +1,6 @@
 /*
- * stereomatrix_control_dialog.cpp - control dialog for stereoMatrix-effect
+ * peak_controller_effect_control_dialog.cpp - control dialog for
+ *                                             PeakControllerEffect
  *
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail/dot/com>
  * 
@@ -30,14 +31,13 @@
 #include "peak_controller_effect_control_dialog.h"
 #include "peak_controller_effect_controls.h"
 #include "knob.h"
-#include "tempo_sync_knob.h"
 #include "led_checkbox.h"
 #include "embed.h"
 
 
-peakControllerEffectControlDialog::peakControllerEffectControlDialog(
-				peakControllerEffectControls * _controls ) :
-	effectControlDialog( _controls )
+PeakControllerEffectControlDialog::PeakControllerEffectControlDialog(
+				PeakControllerEffectControls * _controls ) :
+	EffectControlDialog( _controls )
 {
 	setAutoFillBackground( TRUE );
 	QPalette pal;
@@ -61,7 +61,7 @@ peakControllerEffectControlDialog::peakControllerEffectControlDialog(
 	m_amountKnob->setModel( &_controls->m_amountModel );
 	m_amountKnob->setHintText( tr( "Modulation amount:" ) + " ", "" );
 
-	m_decayKnob = new tempoSyncKnob( knobBright_26, this );
+	m_decayKnob = new knob( knobBright_26, this );
 	m_decayKnob->setLabel( tr( "DECAY" ) );
 	m_decayKnob->setModel( &_controls->m_decayModel );
 	m_decayKnob->setHintText( tr( "Release decay (not implemented):" ) + " ", "" );

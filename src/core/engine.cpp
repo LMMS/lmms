@@ -31,18 +31,18 @@
 #include "bb_track_container.h"
 #include "config_mgr.h"
 #include "ControllerRackView.h"
-#include "fx_mixer.h"
-#include "fx_mixer_view.h"
-#include "instrument_track.h"
+#include "FxMixer.h"
+#include "FxMixerView.h"
+#include "InstrumentTrack.h"
 #include "ladspa_2_lmms.h"
-#include "main_window.h"
+#include "MainWindow.h"
 #include "mixer.h"
 #include "pattern.h"
 #include "piano_roll.h"
 #include "preset_preview_play_handle.h"
-#include "project_journal.h"
+#include "ProjectJournal.h"
 #include "project_notes.h"
-#include "plugin.h"
+#include "Plugin.h"
 #include "song_editor.h"
 #include "song.h"
 
@@ -51,9 +51,9 @@ bool engine::s_hasGUI = true;
 bool engine::s_suppressMessages = false;
 float engine::s_framesPerTick;
 mixer * engine::s_mixer = NULL;
-fxMixer * engine::s_fxMixer = NULL;
-fxMixerView * engine::s_fxMixerView = NULL;
-mainWindow * engine::s_mainWindow = NULL;
+FxMixer * engine::s_fxMixer = NULL;
+FxMixerView * engine::s_fxMixerView = NULL;
+MainWindow * engine::s_mainWindow = NULL;
 bbTrackContainer * engine::s_bbTrackContainer = NULL;
 song * engine::s_song = NULL;
 songEditor * engine::s_songEditor = NULL;
@@ -61,9 +61,9 @@ automationEditor * engine::s_automationEditor = NULL;
 bbEditor * engine::s_bbEditor = NULL;
 pianoRoll * engine::s_pianoRoll = NULL;
 projectNotes * engine::s_projectNotes = NULL;
-projectJournal * engine::s_projectJournal = NULL;
+ProjectJournal * engine::s_projectJournal = NULL;
 ladspa2LMMS * engine::s_ladspaManager = NULL;
-dummyTrackContainer * engine::s_dummyTC = NULL;
+DummyTrackContainer * engine::s_dummyTC = NULL;
 ControllerRackView * engine::s_controllerRackView = NULL;
 QMap<QString, QString> engine::s_pluginFileHandling;
 
@@ -76,10 +76,10 @@ void engine::init( const bool _has_gui )
 
 	initPluginFileHandling();
 
-	s_projectJournal = new projectJournal;
+	s_projectJournal = new ProjectJournal;
 	s_mixer = new mixer;
 	s_song = new song;
-	s_fxMixer = new fxMixer;
+	s_fxMixer = new FxMixer;
 	s_bbTrackContainer = new bbTrackContainer;
 
 	s_ladspaManager = new ladspa2LMMS;
@@ -90,9 +90,9 @@ void engine::init( const bool _has_gui )
 
 	if( s_hasGUI )
 	{
-		s_mainWindow = new mainWindow;
+		s_mainWindow = new MainWindow;
 		s_songEditor = new songEditor( s_song, s_songEditor );
-		s_fxMixerView = new fxMixerView;
+		s_fxMixerView = new FxMixerView;
 		s_controllerRackView = new ControllerRackView;
 		s_projectNotes = new projectNotes;
 		s_bbEditor = new bbEditor( s_bbTrackContainer );
@@ -103,7 +103,7 @@ void engine::init( const bool _has_gui )
 	}
 
 	presetPreviewPlayHandle::init();
-	s_dummyTC = new dummyTrackContainer;
+	s_dummyTC = new DummyTrackContainer;
 
 	s_mixer->startProcessing();
 }
@@ -111,7 +111,7 @@ void engine::init( const bool _has_gui )
 
 
 
-void engine::destroy( void )
+void engine::destroy()
 {
 	s_mixer->stopProcessing();
 
@@ -130,7 +130,7 @@ void engine::destroy( void )
 	s_fxMixerView = NULL;
 
 	presetPreviewPlayHandle::cleanup();
-	instrumentTrackView::cleanupWindowPool();
+	InstrumentTrackView::cleanupWindowPool();
 
 	s_song->clearProject();
 	delete s_bbTrackContainer;
@@ -159,7 +159,7 @@ void engine::destroy( void )
 
 
 
-void engine::updateFramesPerTick( void )
+void engine::updateFramesPerTick()
 {
 	s_framesPerTick = s_mixer->processingSampleRate() * 60.0f * 4 /
 				DefaultTicksPerTact / s_song->getTempo();
@@ -168,15 +168,14 @@ void engine::updateFramesPerTick( void )
 
 
 
-void engine::initPluginFileHandling( void )
+void engine::initPluginFileHandling()
 {
-	QVector<plugin::descriptor> pluginDescriptors;
-	plugin::getDescriptorsOfAvailPlugins( pluginDescriptors );
-	for( QVector<plugin::descriptor>::iterator it =
-						pluginDescriptors.begin();
-					it != pluginDescriptors.end(); ++it )
+	QVector<Plugin::Descriptor> pluginDescriptors;
+	Plugin::getDescriptorsOfAvailPlugins( pluginDescriptors );
+	for( QVector<Plugin::Descriptor>::Iterator it = pluginDescriptors.begin();
+										it != pluginDescriptors.end(); ++it )
 	{
-		if( it->type == plugin::Instrument )
+		if( it->type == Plugin::Instrument )
 		{
 			const QStringList & ext =
 				QString( it->supportedFileTypes ).

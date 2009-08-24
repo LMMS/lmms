@@ -26,7 +26,7 @@
 #ifndef _SPECTRUM_ANALYZER_H
 #define _SPECTRUM_ANALYZER_H
 
-#include "effect.h"
+#include "Effect.h"
 #include "fft_helpers.h"
 #include "spectrumanalyzer_controls.h"
 
@@ -34,7 +34,7 @@
 const int MAX_BANDS = 249;
 
 
-class spectrumAnalyzer : public effect
+class spectrumAnalyzer : public Effect
 {
 public:
 	enum ChannelModes
@@ -44,13 +44,13 @@ public:
 		RightChannel
 	} ;
 
-	spectrumAnalyzer( model * _parent,
-			const descriptor::subPluginFeatures::key * _key );
+	spectrumAnalyzer( Model * _parent,
+			const Descriptor::SubPluginFeatures::Key * _key );
 	virtual ~spectrumAnalyzer();
 	virtual bool processAudioBuffer( sampleFrame * _buf,
 							const fpp_t _frames );
 
-	virtual effectControls * getControls( void )
+	virtual EffectControls * controls( void )
 	{
 		return( &m_saControls );
 	}

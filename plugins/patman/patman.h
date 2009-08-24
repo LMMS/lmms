@@ -26,11 +26,10 @@
 #ifndef _PATMAN_H_
 #define _PATMAN_H_
 
-
-#include "instrument.h"
-#include "instrument_view.h"
+#include "Instrument.h"
+#include "InstrumentView.h"
 #include "sample_buffer.h"
-#include "automatable_model.h"
+#include "AutomatableModel.h"
 
 
 class pixmapButton;
@@ -46,11 +45,11 @@ class pixmapButton;
 #define MODES_CLAMPED	( 1 << 7 )
 
 
-class patmanInstrument : public instrument
+class patmanInstrument : public Instrument
 {
 	Q_OBJECT
 public:
-	patmanInstrument( instrumentTrack * _track );
+	patmanInstrument( InstrumentTrack * _track );
 	virtual ~patmanInstrument();
 
 	virtual void playNote( notePlayHandle * _n,
@@ -70,7 +69,7 @@ public:
 		return( 128 );
 	}
 
-	virtual pluginView * instantiateView( QWidget * _parent );
+	virtual PluginView * instantiateView( QWidget * _parent );
 
 
 public slots:
@@ -87,8 +86,8 @@ private:
 
 	QString m_patchFile;
 	QVector<sampleBuffer *> m_patchSamples;
-	boolModel m_loopedModel;
-	boolModel m_tunedModel;
+	BoolModel m_loopedModel;
+	BoolModel m_tunedModel;
 
 
 	enum LoadErrors
@@ -107,7 +106,7 @@ private:
 	void selectSample( notePlayHandle * _n );
 
 
-	friend class patmanView;
+	friend class PatmanView;
 
 signals:
 	void fileChanged( void );
@@ -116,12 +115,12 @@ signals:
 
 
 
-class patmanView : public instrumentView
+class PatmanView : public InstrumentView
 {
 	Q_OBJECT
 public:
-	patmanView( instrument * _instrument, QWidget * _parent );
-	virtual ~patmanView();
+	PatmanView( Instrument * _instrument, QWidget * _parent );
+	virtual ~PatmanView();
 
 
 public slots:

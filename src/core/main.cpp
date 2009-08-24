@@ -55,9 +55,9 @@
 #include "config_mgr.h"
 #include "embed.h"
 #include "engine.h"
-#include "import_filter.h"
 #include "lmms_style.h"
-#include "main_window.h"
+#include "ImportFilter.h"
+#include "MainWindow.h"
 #include "ProjectRenderer.h"
 #include "song.h"
 
@@ -417,26 +417,25 @@ int main( int argc, char * * argv )
 		// we try to load given file
 		if( !file_to_load.isEmpty() )
 		{
-			engine::getMainWindow()->show();
+			engine::mainWindow()->show();
 			if( fullscreen )
 			{
-				engine::getMainWindow()->showMaximized();
+				engine::mainWindow()->showMaximized();
 			}
 			engine::getSong()->loadProject( file_to_load );
 		}
 		else if( !file_to_import.isEmpty() )
 		{
-			importFilter::import( file_to_import,
-							engine::getSong() );
+			ImportFilter::import( file_to_import, engine::getSong() );
 			if( exit_after_import )
 			{
 				return 0;
 			}
 
-			engine::getMainWindow()->show();
+			engine::mainWindow()->show();
 			if( fullscreen )
 			{
-				engine::getMainWindow()->showMaximized();
+				engine::mainWindow()->showMaximized();
 			}
 		}
 		else
@@ -445,10 +444,10 @@ int main( int argc, char * * argv )
 
 			// [Settel] workaround: showMaximized() doesn't work with
 			// FVWM2 unless the window is already visible -> show() first
-			engine::getMainWindow()->show();
+			engine::mainWindow()->show();
 			if( fullscreen )
 			{
-				engine::getMainWindow()->showMaximized();
+				engine::mainWindow()->showMaximized();
 			}
 		}
 	}

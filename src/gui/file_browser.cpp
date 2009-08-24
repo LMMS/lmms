@@ -39,10 +39,10 @@
 #include "embed.h"
 #include "engine.h"
 #include "gui_templates.h"
-#include "import_filter.h"
-#include "instrument.h"
-#include "instrument_track.h"
-#include "main_window.h"
+#include "ImportFilter.h"
+#include "Instrument.h"
+#include "InstrumentTrack.h"
+#include "MainWindow.h"
 #include "mmp.h"
 #include "preset_preview_play_handle.h"
 #include "sample_play_handle.h"
@@ -542,13 +542,13 @@ void fileBrowserTreeWidget::mouseReleaseEvent( QMouseEvent * _me )
 
 
 
-void fileBrowserTreeWidget::handleFile( fileItem * f, instrumentTrack * _it )
+void fileBrowserTreeWidget::handleFile( fileItem * f, InstrumentTrack * _it )
 {
 	engine::getMixer()->lock();
 	switch( f->handling() )
 	{
 		case fileItem::LoadAsProject:
-			if( engine::getMainWindow()->mayChangeProject() )
+			if( engine::mainWindow()->mayChangeProject() )
 			{
 				engine::getSong()->loadProject( f->fullName() );
 			}
@@ -557,9 +557,9 @@ void fileBrowserTreeWidget::handleFile( fileItem * f, instrumentTrack * _it )
 		case fileItem::LoadByPlugin:
 		{
 			const QString e = f->extension();
-			instrument * i = _it->getInstrument();
+			Instrument * i = _it->instrument();
 			if( i == NULL ||
-				!i->getDescriptor()->supportsFileType( e ) )
+				!i->descriptor()->supportsFileType( e ) )
 			{
 				i = _it->loadInstrument(
 					engine::pluginFileHandling()[e] );
@@ -571,7 +571,7 @@ void fileBrowserTreeWidget::handleFile( fileItem * f, instrumentTrack * _it )
 		case fileItem::LoadAsPreset:
 		{
 			multimediaProject mmp( f->fullName() );
-			instrumentTrack::removeMidiPortNode( mmp );
+			InstrumentTrack::removeMidiPortNode( mmp );
 			_it->setSimpleSerializing();
 			_it->loadSettings( mmp.content().toElement() );
 			break;
@@ -579,11 +579,11 @@ void fileBrowserTreeWidget::handleFile( fileItem * f, instrumentTrack * _it )
 
 		case fileItem::ImportAsProject:
 			if( f->type() == fileItem::FlpFile &&
-				!engine::getMainWindow()->mayChangeProject() )
+				!engine::mainWindow()->mayChangeProject() )
 			{
 				break;
 			}
-			importFilter::import( f->fullName(),
+			ImportFilter::import( f->fullName(),
 							engine::getSong() );
 			break;
 
@@ -615,7 +615,7 @@ void fileBrowserTreeWidget::activateListItem( QTreeWidgetItem * _item,
 	else if( f->handling() != fileItem::NotSupported )
 	{
 		engine::getMixer()->lock();
-		instrumentTrack * it = dynamic_cast<instrumentTrack *>(
+		InstrumentTrack * it = dynamic_cast<InstrumentTrack *>(
 				track::create( track::InstrumentTrack,
 					engine::getBBTrackContainer() ) );
 		handleFile( f, it );
@@ -632,7 +632,7 @@ void fileBrowserTreeWidget::openInNewInstrumentTrack( trackContainer * _tc )
 		m_contextMenuItem->handling() == fileItem::LoadByPlugin )
 	{
 		engine::getMixer()->lock();
-		instrumentTrack * it = dynamic_cast<instrumentTrack *>(
+		InstrumentTrack * it = dynamic_cast<InstrumentTrack *>(
 				track::create( track::InstrumentTrack, _tc ) );
 		handleFile( m_contextMenuItem, it );
 		engine::getMixer()->unlock();
@@ -662,7 +662,7 @@ void fileBrowserTreeWidget::sendToActiveInstrumentTrack( void )
 {
 	// get all windows opened in the workspace
 	QList<QMdiSubWindow*> pl =
-			engine::getMainWindow()->workspace()->
+			engine::mainWindow()->workspace()->
 				subWindowList( QMdiArea::StackingOrder );
 	QListIterator<QMdiSubWindow *> w( pl );
 	w.toBack();
@@ -670,8 +670,8 @@ void fileBrowserTreeWidget::sendToActiveInstrumentTrack( void )
 	// instrument-track
 	while( w.hasPrevious() )
 	{
-		instrumentTrackWindow * itw =
-			dynamic_cast<instrumentTrackWindow *>(
+		InstrumentTrackWindow * itw =
+			dynamic_cast<InstrumentTrackWindow *>(
 						w.previous()->widget() );
 		if( itw != NULL && itw->isHidden() == false )
 		{

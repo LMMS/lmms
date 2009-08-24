@@ -29,15 +29,15 @@
 #include <QtXml/QDomElement>
 
 #include "track_container.h"
-#include "instrument_track.h"
+#include "InstrumentTrack.h"
 #include "engine.h"
-#include "main_window.h"
+#include "MainWindow.h"
 #include "song.h"
 
 
-trackContainer::trackContainer( void ) :
-	model( NULL ),
-	journallingObject(),
+trackContainer::trackContainer() :
+	Model( NULL ),
+	JournallingObject(),
 	m_tracksMutex(),
 	m_tracks()
 {
@@ -83,7 +83,7 @@ void trackContainer::loadSettings( const QDomElement & _this )
 			pd = new QProgressDialog( tr( "Loading project..." ),
 						tr( "Cancel" ), 0,
 						_this.childNodes().count(),
-						engine::getMainWindow() );
+						engine::mainWindow() );
 			pd->setWindowModality( Qt::ApplicationModal );
 			pd->setWindowTitle( tr( "Please wait..." ) );
 			pd->show();
@@ -183,14 +183,14 @@ void trackContainer::removeTrack( track * _track )
 
 
 
-void trackContainer::updateAfterTrackAdd( void )
+void trackContainer::updateAfterTrackAdd()
 {
 }
 
 
 
 
-void trackContainer::clearAllTracks( void )
+void trackContainer::clearAllTracks()
 {
 	//m_tracksMutex.lockForWrite();
 	while( !m_tracks.isEmpty() )
@@ -203,7 +203,7 @@ void trackContainer::clearAllTracks( void )
 
 
 
-bool trackContainer::isEmpty( void ) const
+bool trackContainer::isEmpty() const
 {
 	for( trackList::const_iterator it = m_tracks.begin();
 						it != m_tracks.end(); ++it )
@@ -221,15 +221,15 @@ bool trackContainer::isEmpty( void ) const
 
 
 
-dummyTrackContainer::dummyTrackContainer( void ) :
+DummyTrackContainer::DummyTrackContainer() :
 	trackContainer(),
 	m_dummyInstrumentTrack( NULL )
 {
 	setJournalling( FALSE );
-	m_dummyInstrumentTrack = dynamic_cast<instrumentTrack *>(
+	m_dummyInstrumentTrack = dynamic_cast<InstrumentTrack *>(
 				track::create( track::InstrumentTrack,
 							this ) );
-	m_dummyInstrumentTrack->setJournalling( FALSE );
+	m_dummyInstrumentTrack->setJournalling( false );
 }
 
 

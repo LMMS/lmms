@@ -21,6 +21,6 @@ ENDIF(WANT_CALF)
 
 INCLUDE(BuildPlugin)
 
-BUILD_PLUGIN(ladspaeffect ladspa_effect.cpp ladspa_controls.cpp ladspa_control_dialog.cpp ladspa_subplugin_features.cpp ladspa_effect.h ladspa_controls.h ladspa_control_dialog.h ladspa_subplugin_features.h MOCFILES ladspa_effect.h ladspa_controls.h ladspa_control_dialog.h EMBEDDED_RESOURCES ${CMAKE_CURRENT_SOURCE_DIR}/*.png)
+BUILD_PLUGIN(ladspaeffect LadspaEffect.cpp LadspaControls.cpp LadspaControlDialog.cpp LadspaSubPluginFeatures.cpp LadspaEffect.h LadspaControls.h LadspaControlDialog.h LadspaSubPluginFeatures.h MOCFILES LadspaEffect.h LadspaControls.h LadspaControlDialog.h EMBEDDED_RESOURCES ${CMAKE_CURRENT_SOURCE_DIR}/*.png)
 
 

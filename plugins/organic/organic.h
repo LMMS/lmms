@@ -26,11 +26,10 @@
 #ifndef _ORGANIC_H
 #define _ORGANIC_H
 
-
-#include "instrument.h"
-#include "instrument_view.h"
-#include "oscillator.h"
-#include "automatable_model.h"
+#include "Instrument.h"
+#include "InstrumentView.h"
+#include "Oscillator.h"
+#include "AutomatableModel.h"
 
 class QPixmap;
 
@@ -39,16 +38,16 @@ class notePlayHandle;
 class pixmapButton;
 
 
-class oscillatorObject : public model
+class OscillatorObject : public Model
 {
 	Q_OBJECT
 private:
 	int m_numOscillators;
-	intModel m_waveShape;
-	floatModel m_oscModel;
-	floatModel m_volModel;
-	floatModel m_panModel;
-	floatModel m_detuneModel;
+	IntModel m_waveShape;
+	FloatModel m_oscModel;
+	FloatModel m_volModel;
+	FloatModel m_panModel;
+	FloatModel m_detuneModel;
 
 	float m_harmonic;
 	float m_volumeLeft;
@@ -60,8 +59,8 @@ private:
 	float m_phaseOffsetLeft;
 	float m_phaseOffsetRight;
 
-	oscillatorObject( model * _parent, int _index );
-	virtual ~oscillatorObject();
+	OscillatorObject( Model * _parent, int _index );
+	virtual ~OscillatorObject();
 
 	friend class organicInstrument;
 	friend class organicInstrumentView;
@@ -75,11 +74,11 @@ private slots:
 } ;
 
 
-class organicInstrument : public instrument
+class organicInstrument : public Instrument
 {
 	Q_OBJECT
 public:
-	organicInstrument( instrumentTrack * _instrument_track );
+	organicInstrument( InstrumentTrack * _instrument_track );
 	virtual ~organicInstrument();
 
 	virtual void playNote( notePlayHandle * _n,
@@ -111,20 +110,20 @@ private:
 	
 	int m_numOscillators;
 	
-	oscillatorObject ** m_osc;
+	OscillatorObject ** m_osc;
 	
 	struct oscPtr
 	{
-		oscillator * oscLeft;
-		oscillator * oscRight;
+		Oscillator * oscLeft;
+		Oscillator * oscRight;
 	} ;
 
-	const intModel m_modulationAlgo;
+	const IntModel m_modulationAlgo;
 
-	floatModel  m_fx1Model;
-	floatModel  m_volModel;
+	FloatModel  m_fx1Model;
+	FloatModel  m_volModel;
 
-	virtual pluginView * instantiateView( QWidget * _parent );
+	virtual PluginView * instantiateView( QWidget * _parent );
 
 private slots:
 	void updateAllDetuning( void );
@@ -133,19 +132,19 @@ private slots:
 } ;
 
 
-class organicInstrumentView : public instrumentView
+class organicInstrumentView : public InstrumentView
 {
 	Q_OBJECT
 public:
-	organicInstrumentView( instrument * _instrument, QWidget * _parent );
+	organicInstrumentView( Instrument * _instrument, QWidget * _parent );
 	virtual ~organicInstrumentView();
 
 private:
 	virtual void modelChanged( void );
 
-	struct oscillatorKnobs
+	struct OscillatorKnobs
 	{
-		oscillatorKnobs( knob * v,
+		OscillatorKnobs( knob * v,
 					knob * o,
 					knob * p,
 					knob * dt ) :
@@ -155,7 +154,7 @@ private:
 			m_detuneKnob( dt )
 		{
 		}
-		oscillatorKnobs()
+		OscillatorKnobs()
 		{
 		}
 		
@@ -165,7 +164,7 @@ private:
 		knob * m_detuneKnob;
 	} ;
 
-	oscillatorKnobs * m_oscKnobs;
+	OscillatorKnobs * m_oscKnobs;
 
 	knob * m_fx1Knob;
 	knob * m_volKnob;

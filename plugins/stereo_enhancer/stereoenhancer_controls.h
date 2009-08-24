@@ -25,13 +25,13 @@
 #ifndef _STEREO_ENHANCER_CONTROLS_H
 #define _STEREO_ENHANCER_CONTROLS_H
 
-#include "effect_controls.h"
+#include "EffectControls.h"
 #include "stereoenhancer_control_dialog.h"
 #include "knob.h"
 
 class stereoEnhancerEffect;
 
-class stereoEnhancerControls : public effectControls
+class stereoEnhancerControls : public EffectControls
 {
 	Q_OBJECT
 public:
@@ -47,12 +47,12 @@ public:
 		return( "stereoenhancercontrols" );
 	}
 
-	virtual int getControlCount( void )
+	virtual int controlCount( void )
 	{
 		return( 1 );
 	}
 	
-	virtual effectControlDialog * createView( void )
+	virtual EffectControlDialog * createView( void )
 	{
 		return new stereoEnhancerControlDialog( this );
 	}
@@ -64,7 +64,7 @@ private slots:
 
 private:
 	stereoEnhancerEffect * m_effect;
-	knobModel m_widthModel;
+	FloatModel m_widthModel;
 	
 	friend class stereoEnhancerControlDialog;
 

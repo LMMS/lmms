@@ -39,7 +39,7 @@
 #include "config_mgr.h"
 #include "lcd_spinbox.h"
 #include "AudioPort.h"
-#include "main_window.h"
+#include "MainWindow.h"
 
 
 
@@ -100,7 +100,7 @@ void AudioJack::restartAfterZombified()
 	{
 		m_active = false;
 		startProcessing();
-		QMessageBox::information( engine::getMainWindow(),
+		QMessageBox::information( engine::mainWindow(),
 			tr( "JACK client restarted" ),
 			tr( "LMMS was kicked by JACK for some reason. "
 				"Therefore the JACK backend of LMMS has been "
@@ -109,7 +109,7 @@ void AudioJack::restartAfterZombified()
 	}
 	else
 	{
-		QMessageBox::information( engine::getMainWindow(),
+		QMessageBox::information( engine::mainWindow(),
 			tr( "JACK server down" ),
 			tr( "The JACK server seems to have been shutdown "
 				"and starting a new instance failed. "

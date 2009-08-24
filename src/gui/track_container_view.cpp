@@ -34,14 +34,13 @@
 #include "track_container_view.h"
 #include "track_container.h"
 #include "bb_track.h"
-#include "main_window.h"
+#include "MainWindow.h"
 #include "debug.h"
 #include "file_browser.h"
-#include "import_filter.h"
-#include "instrument.h"
-#include "instrument_track.h"
+#include "ImportFilter.h"
+#include "Instrument.h"
+#include "InstrumentTrack.h"
 #include "mmp.h"
-#include "project_journal.h"
 #include "rubberband.h"
 #include "song.h"
 #include "string_pair_drag.h"
@@ -50,9 +49,9 @@
 
 trackContainerView::trackContainerView( trackContainer * _tc ) :
 	QWidget(),
-	modelView( NULL, this ),
-	journallingObject(),
-	serializingObjectHook(),
+	ModelView( NULL, this ),
+	JournallingObject(),
+	SerializingObjectHook(),
 	m_currentPosition( 0, 0 ),
 	m_tc( _tc ),
 	m_trackViews(),
@@ -106,7 +105,7 @@ trackContainerView::~trackContainerView()
 void trackContainerView::saveSettings( QDomDocument & _doc,
 							QDomElement & _this )
 {
-	mainWindow::saveWidgetState( this, _this );
+	MainWindow::saveWidgetState( this, _this );
 }
 
 
@@ -114,7 +113,7 @@ void trackContainerView::saveSettings( QDomDocument & _doc,
 
 void trackContainerView::loadSettings( const QDomElement & _this )
 {
-	mainWindow::restoreWidgetState( this, _this );
+	MainWindow::restoreWidgetState( this, _this );
 }
 
 
@@ -124,7 +123,7 @@ trackView * trackContainerView::addTrackView( trackView * _tv )
 {
 /*	QMap<QString, QVariant> map;
 	map["id"] = _tv->getTrack()->id();
-	addJournalEntry( journalEntry( AddTrack, map ) );*/
+	addJournalEntry( JournalEntry( AddTrack, map ) );*/
 
 	m_trackViews.push_back( _tv );
 	m_scrollLayout->addWidget( _tv );
@@ -148,7 +147,7 @@ void trackContainerView::removeTrackView( trackView * _tv )
 		_tv->getTrack()->saveState( mmp, mmp.content() );
 		map["id"] = _tv->getTrack()->id();
 		map["state"] = mmp.toString();
-		addJournalEntry( journalEntry( RemoveTrack, map ) );*/
+		addJournalEntry( JournalEntry( RemoveTrack, map ) );*/
 
 		m_trackViews.removeAt( index );
 
@@ -211,7 +210,7 @@ void trackContainerView::moveTrackViewDown( trackView * _tv )
 
 
 
-void trackContainerView::realignTracks( void )
+void trackContainerView::realignTracks()
 {
 	QWidget * content = m_scrollArea->widget();
 	content->setFixedWidth( width()
@@ -271,7 +270,7 @@ const trackView * trackContainerView::trackViewAt( const int _y ) const
 
 
 
-bool trackContainerView::allowRubberband( void ) const
+bool trackContainerView::allowRubberband() const
 {
 	return( false );
 }
@@ -287,7 +286,7 @@ void trackContainerView::setPixelsPerTact( int _ppt )
 
 
 
-void trackContainerView::clearAllTracks( void )
+void trackContainerView::clearAllTracks()
 {
 	while( !m_trackViews.empty() )
 	{
@@ -301,7 +300,7 @@ void trackContainerView::clearAllTracks( void )
 
 
 
-void trackContainerView::undoStep( journalEntry & _je )
+void trackContainerView::undoStep( JournalEntry & _je )
 {
 #if 0
 	saveJournallingState( false );
@@ -312,7 +311,7 @@ void trackContainerView::undoStep( journalEntry & _je )
 			QMap<QString, QVariant> map = _je.data().toMap();
 			track * t =
 				dynamic_cast<track *>(
-			engine::getProjectJournal()->getJournallingObject(
+			engine::projectJournal()->getJournallingObject(
 							map["id"].toInt() ) );
 			assert( t != NULL );
 			multimediaProject mmp( multimediaProject::JournalData );
@@ -339,7 +338,7 @@ void trackContainerView::undoStep( journalEntry & _je )
 
 
 
-void trackContainerView::redoStep( journalEntry & _je )
+void trackContainerView::redoStep( JournalEntry & _je )
 {
 #if 0
 	switch( _je.actionID() )
@@ -378,7 +377,7 @@ void trackContainerView::dropEvent( QDropEvent * _de )
 	engine::getMixer()->lock();
 	if( type == "instrument" )
 	{
-		instrumentTrack * it = dynamic_cast<instrumentTrack *>(
+		InstrumentTrack * it = dynamic_cast<InstrumentTrack *>(
 				track::create( track::InstrumentTrack,
 								m_tc ) );
 		it->loadInstrument( value );
@@ -387,10 +386,10 @@ void trackContainerView::dropEvent( QDropEvent * _de )
 	}
 	else if( type == "samplefile" || type == "pluginpresetfile" )
 	{
-		instrumentTrack * it = dynamic_cast<instrumentTrack *>(
+		InstrumentTrack * it = dynamic_cast<InstrumentTrack *>(
 				track::create( track::InstrumentTrack,
 								m_tc ) );
-		instrument * i = it->loadInstrument(
+		Instrument * i = it->loadInstrument(
 			engine::pluginFileHandling()[fileItem::extension(
 								value )]);
 		i->loadFile( value );
@@ -400,7 +399,7 @@ void trackContainerView::dropEvent( QDropEvent * _de )
 	else if( type == "presetfile" )
 	{
 		multimediaProject mmp( value );
-		instrumentTrack * it = dynamic_cast<instrumentTrack *>(
+		InstrumentTrack * it = dynamic_cast<InstrumentTrack *>(
 				track::create( track::InstrumentTrack,
 								m_tc ) );
 		it->loadSettings( mmp.content().toElement() );
@@ -409,7 +408,7 @@ void trackContainerView::dropEvent( QDropEvent * _de )
 	}
 	else if( type == "importedproject" )
 	{
-		importFilter::import( value, m_tc );
+		ImportFilter::import( value, m_tc );
 		_de->accept();
 	}
 	else if( type.left( 6 ) == "track_" )

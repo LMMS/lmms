@@ -1,7 +1,7 @@
 /*
  * track_container_view.h - view-component for trackContainer
  *
- * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -32,16 +32,16 @@
 
 
 #include "track.h"
-#include "journalling_object.h"
+#include "JournallingObject.h"
 
 
 class QVBoxLayout;
 class trackContainer;
 
 
-class trackContainerView : public QWidget, public modelView,
-						public journallingObject,
-						public serializingObjectHook
+class trackContainerView : public QWidget, public ModelView,
+						public JournallingObject,
+						public SerializingObjectHook
 {
 	Q_OBJECT
 public:
@@ -51,22 +51,22 @@ public:
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _this );
 	virtual void loadSettings( const QDomElement & _this );
 
-	QWidget * contentWidget( void )
+	QWidget * contentWidget()
 	{
 		return( m_scrollArea );
 	}
 
-	inline const midiTime & currentPosition( void ) const
+	inline const midiTime & currentPosition() const
 	{
 		return( m_currentPosition );
 	}
 
-	virtual bool fixedTCOs( void ) const
+	virtual bool fixedTCOs() const
 	{
 		return( FALSE );
 	}
 
-	inline float pixelsPerTact( void ) const
+	inline float pixelsPerTact() const
 	{
 		return( m_ppt );
 	}
@@ -75,14 +75,14 @@ public:
 
 	const trackView * trackViewAt( const int _y ) const;
 
-	virtual bool allowRubberband( void ) const;
+	virtual bool allowRubberband() const;
 
-	inline bool rubberBandActive( void ) const
+	inline bool rubberBandActive() const
 	{
 		return( m_rubberBand->isVisible() );
 	}
 
-	inline QVector<selectableObject *> selectedObjects( void )
+	inline QVector<selectableObject *> selectedObjects()
 	{
 		if( allowRubberband() == TRUE )
 		{
@@ -92,12 +92,12 @@ public:
 	}
 
 
-	trackContainer * model( void )
+	trackContainer * model()
 	{
 		return( m_tc );
 	}
 
-	const trackContainer * model( void ) const
+	const trackContainer * model() const
 	{
 		return( m_tc );
 	}
@@ -110,16 +110,16 @@ public:
 	void removeTrackView( trackView * _tv );
 	// -------------------------------------------------------
 
-	void clearAllTracks( void );
+	void clearAllTracks();
 
-	virtual QString nodeName( void ) const
+	virtual QString nodeName() const
 	{
 		return( "trackcontainerview" );
 	}
 
 
 public slots:
-	void realignTracks( void );
+	void realignTracks();
 	void createTrackView( track * _t );
 	void deleteTrackView( trackView * _tv );
 
@@ -127,7 +127,7 @@ public slots:
 protected:
 	static const int DEFAULT_PIXELS_PER_TACT = 16;
 
-	const QList<trackView *> & trackViews( void ) const
+	const QList<trackView *> & trackViews() const
 	{
 		return( m_trackViews );
 	}
@@ -139,8 +139,8 @@ protected:
 	virtual void mouseReleaseEvent( QMouseEvent * _me );
 	virtual void resizeEvent( QResizeEvent * );
 
-	virtual void undoStep( journalEntry & _je );
-	virtual void redoStep( journalEntry & _je );
+	virtual void undoStep( JournalEntry & _je );
+	virtual void redoStep( JournalEntry & _je );
 
 	midiTime m_currentPosition;
 

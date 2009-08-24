@@ -27,7 +27,7 @@
 #include "about_dialog.h"
 #include "embed.h"
 #include "engine.h"
-#include "main_window.h"
+#include "MainWindow.h"
 
 
 #ifdef __GNUC__
@@ -62,7 +62,7 @@
 
 
 aboutDialog::aboutDialog() :
-	QDialog( engine::getMainWindow() ),
+	QDialog( engine::mainWindow() ),
 	Ui::AboutDialog()
 {
 	setupUi( this );

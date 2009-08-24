@@ -25,13 +25,13 @@
 #ifndef _BASSBOOSTER_CONTROL_DIALOG_H
 #define _BASSBOOSTER_CONTROL_DIALOG_H
 
-#include "effect_control_dialog.h"
+#include "EffectControlDialog.h"
 
 
 class bassBoosterControls;
 
 
-class bassBoosterControlDialog : public effectControlDialog
+class bassBoosterControlDialog : public EffectControlDialog
 {
 public:
 	bassBoosterControlDialog( bassBoosterControls * _controls );
