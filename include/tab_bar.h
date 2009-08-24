@@ -45,8 +45,8 @@ public:
 	virtual ~tabBar();
 
 	tabButton * addTab( QWidget * _w, const QString & _text,
-					int _id, bool _add_stretch = FALSE,
-					bool _text_is_tooltip = FALSE );
+					int _id, bool _add_stretch = false,
+					bool _text_is_tooltip = false );
 	void removeTab( int _id );
 
 	inline void setExclusive( bool _on )
@@ -54,7 +54,7 @@ public:
 		m_exclusive = _on;
 	}
 
-	int activeTab( void );
+	int activeTab();
 
 
 public slots:
@@ -64,7 +64,7 @@ public slots:
 protected:
 	bool tabState( int _id );
 	void setTabState( int _id, bool _checked );
-	bool allHidden( void );
+	bool allHidden();
 
 
 protected slots:
@@ -79,8 +79,8 @@ private:
 
 
 signals:
-	void allWidgetsHidden( void );
-	void widgetShown( void );
+	void allWidgetsHidden();
+	void widgetShown();
 
 } ;
 

@@ -85,7 +85,7 @@ void FLUIQ::CollapsibleWidgetHeader::setCollapsed( bool _c )
 
 
 
-QSize FLUIQ::CollapsibleWidgetHeader::sizeHint( void ) const
+QSize FLUIQ::CollapsibleWidgetHeader::sizeHint() const
 {
 	if( m_parent->orientation() == Qt::Horizontal )
 	{
@@ -349,7 +349,7 @@ void FLUIQ::CollapsibleWidget::insertWidget( int _idx, QWidget * _w )
 
 
 
-void FLUIQ::CollapsibleWidget::expand( void )
+void FLUIQ::CollapsibleWidget::expand()
 {
 	m_header->setCollapsed( false );
 
@@ -388,7 +388,7 @@ void FLUIQ::CollapsibleWidget::expand( void )
 
 
 
-void FLUIQ::CollapsibleWidget::collapse( void )
+void FLUIQ::CollapsibleWidget::collapse()
 {
 	m_header->setCollapsed( true );
 

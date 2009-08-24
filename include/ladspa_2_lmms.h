@@ -34,27 +34,27 @@ class EXPORT ladspa2LMMS : public ladspaManager
 {
 public:
 	
-	inline l_sortable_plugin_t getInstruments( void )
+	inline l_sortable_plugin_t getInstruments()
 	{
 		return( m_instruments );
 	}
 	
-	inline l_sortable_plugin_t getValidEffects( void )
+	inline l_sortable_plugin_t getValidEffects()
 	{
 		return( m_validEffects );
 	}
 	
-	inline l_sortable_plugin_t getInvalidEffects( void )
+	inline l_sortable_plugin_t getInvalidEffects()
 	{
 		return( m_invalidEffects );
 	}
 	
-	inline l_sortable_plugin_t getAnalysisTools( void )
+	inline l_sortable_plugin_t getAnalysisTools()
 	{
 		return( m_analysisTools );
 	}
 	
-	inline l_sortable_plugin_t getOthers( void )
+	inline l_sortable_plugin_t getOthers()
 	{
 		return( m_otherPlugins );
 	}
@@ -62,7 +62,7 @@ public:
 	QString getShortName( const ladspa_key_t & _key );
 
 private:
-	ladspa2LMMS( void );
+	ladspa2LMMS();
 	virtual ~ladspa2LMMS();
 
 	l_sortable_plugin_t m_instruments;

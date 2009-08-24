@@ -70,7 +70,7 @@ enum {
 
 
 
-extern void attr_clear_all( void );
+extern void attr_clear_all();
 
 extern void attr_push_core (int attr, char* param);
 

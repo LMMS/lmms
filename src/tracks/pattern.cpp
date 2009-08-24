@@ -111,7 +111,7 @@ pattern::~pattern()
 
 
 
-void pattern::init( void )
+void pattern::init()
 {
 	connect( engine::getSong(), SIGNAL( timeSignatureChanged( int, int ) ),
 				this, SLOT( changeTimeSignature() ) );
@@ -126,7 +126,7 @@ void pattern::init( void )
 
 
 
-midiTime pattern::length( void ) const
+midiTime pattern::length() const
 {
 	if( m_patternType == BeatPattern )
 	{
@@ -151,7 +151,7 @@ midiTime pattern::length( void ) const
 
 
 
-midiTime pattern::beatPatternLength( void ) const
+midiTime pattern::beatPatternLength() const
 {
 	tick_t max_length = midiTime::ticksPerTact();
 
@@ -265,7 +265,7 @@ note * pattern::rearrangeNote( const note * _note_to_proc,
 
 
 
-void pattern::rearrangeAllNotes( void )
+void pattern::rearrangeAllNotes()
 {
 	// sort notes by start time
 	qSort(m_notes.begin(), m_notes.end(), note::lessThan );
@@ -273,7 +273,7 @@ void pattern::rearrangeAllNotes( void )
 
 
 
-void pattern::clearNotes( void )
+void pattern::clearNotes()
 {
 	engine::getMixer()->lock();
 	for( NoteVector::Iterator it = m_notes.begin(); it != m_notes.end();
@@ -320,7 +320,7 @@ void pattern::setType( PatternTypes _new_pattern_type )
 
 
 
-void pattern::checkType( void )
+void pattern::checkType()
 {
 	NoteVector::Iterator it = m_notes.begin();
 	while( it != m_notes.end() )
@@ -426,7 +426,7 @@ void pattern::loadSettings( const QDomElement & _this )
 
 
 
-void pattern::clear( void )
+void pattern::clear()
 {
 	clearNotes();
 	ensureBeatNotes();
@@ -435,7 +435,7 @@ void pattern::clear( void )
 
 
 
-void pattern::freeze( void )
+void pattern::freeze()
 {
 	if( engine::getSong()->isPlaying() )
 	{
@@ -463,7 +463,7 @@ void pattern::freeze( void )
 
 
 
-void pattern::unfreeze( void )
+void pattern::unfreeze()
 {
 	if( m_frozenPattern != NULL )
 	{
@@ -476,7 +476,7 @@ void pattern::unfreeze( void )
 
 
 
-void pattern::abortFreeze( void )
+void pattern::abortFreeze()
 {
 	m_freezeAborted = true;
 }
@@ -530,7 +530,7 @@ trackContentObjectView * pattern::createView( trackView * _tv )
 
 
 
-void pattern::ensureBeatNotes( void )
+void pattern::ensureBeatNotes()
 {
 	// make sure, that all step-note exist
 	for( int i = 0; i < m_steps; ++i )
@@ -560,7 +560,7 @@ void pattern::ensureBeatNotes( void )
 
 
 
-void pattern::updateBBTrack( void )
+void pattern::updateBBTrack()
 {
 	if( getTrack()->getTrackContainer() == engine::getBBTrackContainer() )
 	{
@@ -571,7 +571,7 @@ void pattern::updateBBTrack( void )
 
 
 
-bool pattern::empty( void )
+bool pattern::empty()
 {
 	for( NoteVector::ConstIterator it = m_notes.begin();
 						it != m_notes.end(); ++it )
@@ -587,7 +587,7 @@ bool pattern::empty( void )
 
 
 
-void pattern::changeTimeSignature( void )
+void pattern::changeTimeSignature()
 {
 	midiTime last_pos = midiTime::ticksPerTact();
 	for( NoteVector::ConstIterator cit = m_notes.begin();
@@ -683,7 +683,7 @@ void patternFreezeStatusDialog::closeEvent( QCloseEvent * _ce )
 
 
 
-void patternFreezeStatusDialog::cancelBtnClicked( void )
+void patternFreezeStatusDialog::cancelBtnClicked()
 {
 	emit( aborted() );
 	done( -1 );
@@ -692,7 +692,7 @@ void patternFreezeStatusDialog::cancelBtnClicked( void )
 
 
 
-void patternFreezeStatusDialog::updateProgress( void )
+void patternFreezeStatusDialog::updateProgress()
 {
 	if( m_progress < 0 )
 	{
@@ -733,7 +733,7 @@ patternFreezeThread::~patternFreezeThread()
 
 
 
-void patternFreezeThread::run( void )
+void patternFreezeThread::run()
 {
 	// create and install audio-sample-recorder
 	bool b;
@@ -865,7 +865,7 @@ patternView::~patternView()
 
 
 
-void patternView::update( void )
+void patternView::update()
 {
 	m_needsUpdate = true;
 	m_pat->changeLength( m_pat->length() );
@@ -875,7 +875,7 @@ void patternView::update( void )
 
 
 
-void patternView::openInPianoRoll( void )
+void patternView::openInPianoRoll()
 {
 	engine::getPianoRoll()->setCurrentPattern( m_pat );
 	engine::getPianoRoll()->parentWidget()->show();
@@ -885,7 +885,7 @@ void patternView::openInPianoRoll( void )
 
 
 
-void patternView::resetName( void )
+void patternView::resetName()
 {
 	m_pat->setName( m_pat->m_instrumentTrack->name() );
 }
@@ -893,7 +893,7 @@ void patternView::resetName( void )
 
 
 
-void patternView::changeName( void )
+void patternView::changeName()
 {
 	QString s = m_pat->name();
 	renameDialog rename_dlg( s );

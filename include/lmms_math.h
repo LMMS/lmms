@@ -97,7 +97,7 @@ static inline float absFraction( float _x )
 
 
 #define FAST_RAND_MAX 32767
-static inline int fast_rand( void )
+static inline int fast_rand()
 {
 	static unsigned long next = 1;
 	next = next * 1103515245 + 12345;

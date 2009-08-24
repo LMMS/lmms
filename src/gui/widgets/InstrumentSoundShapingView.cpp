@@ -129,7 +129,7 @@ InstrumentSoundShapingView::~InstrumentSoundShapingView()
 
 
 
-void InstrumentSoundShapingView::modelChanged( void )
+void InstrumentSoundShapingView::modelChanged()
 {
 	m_ss = castModel<InstrumentSoundShaping>();
 	m_filterGroupBox->setModel( &m_ss->m_filterEnabledModel );

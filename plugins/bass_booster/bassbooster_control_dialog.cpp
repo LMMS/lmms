@@ -35,7 +35,7 @@ bassBoosterControlDialog::bassBoosterControlDialog(
 					bassBoosterControls * _controls ) :
 	EffectControlDialog( _controls )
 {
-	setAutoFillBackground( TRUE );
+	setAutoFillBackground( true );
 	QPalette pal;
 	pal.setBrush( backgroundRole(),
 				PLUGIN_NAME::getIconPixmap( "artwork" ) );

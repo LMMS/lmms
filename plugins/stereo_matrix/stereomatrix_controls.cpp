@@ -37,21 +37,21 @@ stereoMatrixControls::stereoMatrixControls( stereoMatrixEffect * _eff ) :
 		m_rlModel( 0.0f, -1.0f, 1.0f, 0.01f, this, tr( "Right to Left" ) ),
 		m_rrModel( 1.0f, -1.0f, 1.0f, 0.01f, this, tr( "Right to Right" ) )
 {
-	connect( &m_llModel, SIGNAL( dataChanged( void ) ),
-			this, SLOT( changeMatrix( void ) ) );
-	connect( &m_lrModel, SIGNAL( dataChanged( void ) ),
-			this, SLOT( changeMatrix( void ) ) );
-	connect( &m_rlModel, SIGNAL( dataChanged( void ) ),
-			this, SLOT( changeMatrix( void ) ) );
-	connect( &m_rrModel, SIGNAL( dataChanged( void ) ),
-			this, SLOT( changeMatrix( void ) ) );
+	connect( &m_llModel, SIGNAL( dataChanged() ),
+			this, SLOT( changeMatrix() ) );
+	connect( &m_lrModel, SIGNAL( dataChanged() ),
+			this, SLOT( changeMatrix() ) );
+	connect( &m_rlModel, SIGNAL( dataChanged() ),
+			this, SLOT( changeMatrix() ) );
+	connect( &m_rrModel, SIGNAL( dataChanged() ),
+			this, SLOT( changeMatrix() ) );
 
 	changeMatrix();
 }
 
 
 
-void stereoMatrixControls::changeMatrix( void )
+void stereoMatrixControls::changeMatrix()
 {
 }
 

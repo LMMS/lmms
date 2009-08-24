@@ -40,11 +40,11 @@ public:
 	virtual ~pixmapButton();
 
 	void setActiveGraphic( const QPixmap & _pm );
-	void setInactiveGraphic( const QPixmap & _pm, bool _update = TRUE );
+	void setInactiveGraphic( const QPixmap & _pm, bool _update = true );
 
 
 signals:
-	void doubleClicked( void );
+	void doubleClicked();
 
 
 protected:

@@ -65,7 +65,7 @@ AudioFileMp3::~AudioFileMp3()
 }
 
 
-void AudioFileMp3::finishEncoding( void )
+void AudioFileMp3::finishEncoding()
 {
 	if( m_lgf )
 	{
@@ -92,7 +92,7 @@ void AudioFileMp3::finishEncoding( void )
 }
 
 
-bool AudioFileMp3::startEncoding( void )
+bool AudioFileMp3::startEncoding()
 {
 	// open any handles, files, etc
 	m_lgf = m_lame.lame_init();

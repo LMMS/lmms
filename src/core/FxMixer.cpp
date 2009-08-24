@@ -135,7 +135,7 @@ void FxMixer::processChannel( fx_ch_t _ch, sampleFrame * _buf )
 
 
 
-void FxMixer::prepareMasterMix( void )
+void FxMixer::prepareMasterMix()
 {
 	engine::getMixer()->clearAudioBuffer( m_fxChannels[0]->m_buffer,
 					engine::getMixer()->framesPerPeriod() );

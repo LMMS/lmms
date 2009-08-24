@@ -65,7 +65,7 @@ trackLabelButton::~trackLabelButton()
 
 
 
-void trackLabelButton::rename( void )
+void trackLabelButton::rename()
 {
 	QString txt = m_trackView->getTrack()->name();
 	renameDialog rename_dlg( txt );

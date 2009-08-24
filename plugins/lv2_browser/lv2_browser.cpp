@@ -70,7 +70,7 @@ Plugin * PLUGIN_EXPORT lmms_plugin_main( Model * _parent, void * _data )
 
 
 
-lv2Browser::lv2Browser( void ) :
+lv2Browser::lv2Browser() :
 	ToolPlugin( &lv2browser_plugin_descriptor, NULL )
 {
 	if( static_lv2_manager == NULL )
@@ -93,7 +93,7 @@ lv2Browser::~lv2Browser()
 
 
 
-QString lv2Browser::nodeName( void ) const
+QString lv2Browser::nodeName() const
 {
 	return lv2browser_plugin_descriptor.name;
 }

@@ -74,8 +74,8 @@ private:
 						const fpp_t _frames,
 						float _master_gain );
 
-	bool startEncoding( void );
-	void finishEncoding( void );
+	bool startEncoding();
+	void finishEncoding();
 
 
 	// handle to lame

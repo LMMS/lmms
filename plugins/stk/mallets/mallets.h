@@ -76,14 +76,14 @@ public:
 			const Uint8 _delay,
 			const sample_rate_t _sample_rate );
 
-	inline ~malletsSynth( void )
+	inline ~malletsSynth()
 	{
 		m_voice->noteOff( 0.0 );
 		delete[] m_delay;
 		delete m_voice;
 	}
 
-	inline sample_t nextSampleLeft( void )
+	inline sample_t nextSampleLeft()
 	{
 		if( m_voice == NULL )
 		{
@@ -98,7 +98,7 @@ public:
 		}
 	}
 	
-	inline sample_t nextSampleRight( void )
+	inline sample_t nextSampleRight()
 	{
 		StkFloat s = m_delay[m_delayRead];
 		m_delayRead++;
@@ -129,7 +129,7 @@ class malletsInstrument : public Instrument
 {
 public:
 	malletsInstrument( InstrumentTrack * _instrument_track );
-	virtual ~malletsInstrument( void );
+	virtual ~malletsInstrument();
 
 	virtual void playNote( notePlayHandle * _n,
 						sampleFrame * _working_buffer );
@@ -139,7 +139,7 @@ public:
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
 	virtual void loadSettings( const QDomElement & _this );
 
-	virtual QString nodeName( void ) const;
+	virtual QString nodeName() const;
 
 	virtual PluginView * instantiateView( QWidget * _parent );
 
@@ -183,13 +183,13 @@ class malletsInstrumentView: public InstrumentView
 public:
 	malletsInstrumentView( malletsInstrument * _instrument,
 				QWidget * _parent );
-	virtual ~malletsInstrumentView( void );
+	virtual ~malletsInstrumentView();
 
 public slots:
-	void changePreset( void );
+	void changePreset();
 
 private:
-	virtual void modelChanged( void );
+	virtual void modelChanged();
 
 	void setWidgetBackground( QWidget * _widget, const QString & _pic );
 	QWidget * setupModalBarControls( QWidget * _parent );

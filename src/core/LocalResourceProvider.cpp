@@ -59,7 +59,7 @@ LocalResourceProvider::~LocalResourceProvider()
 
 
 
-void LocalResourceProvider::updateDatabase( void )
+void LocalResourceProvider::updateDatabase()
 {
 	readDir( m_dir, database()->topLevelNode() );
 }

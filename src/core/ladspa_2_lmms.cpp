@@ -27,7 +27,7 @@
 #include "ladspa_2_lmms.h"
 
 
-ladspa2LMMS::ladspa2LMMS( void )
+ladspa2LMMS::ladspa2LMMS()
 {
 	l_sortable_plugin_t plugins = getSortedPlugins();
 	

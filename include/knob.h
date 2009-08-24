@@ -75,28 +75,28 @@ public:
 	void setTotalAngle( float _angle );
 
 	// Begin styled knob accessors
-	float innerRadius( void ) const;
+	float innerRadius() const;
 	void setInnerRadius( float _r );
 
-	float outerRadius( void ) const;
+	float outerRadius() const;
 	void setOuterRadius( float _r );
 
-	QPointF centerPoint( void ) const;
-	float centerPointX( void ) const;
+	QPointF centerPoint() const;
+	float centerPointX() const;
 	void setCenterPointX( float _c );
-	float centerPointY( void ) const;
+	float centerPointY() const;
 	void setCenterPointY( float _c );
 
-	float lineWidth( void ) const;
+	float lineWidth() const;
 	void setLineWidth( float _w );
 	
-	QColor outerColor( void ) const; 
+	QColor outerColor() const; 
 	void setOuterColor( const QColor & _c );
 
 
 signals:
-	void sliderPressed( void );
-	void sliderReleased( void );
+	void sliderPressed();
+	void sliderReleased();
 	void sliderMoved( float value );
 
 
@@ -113,15 +113,15 @@ protected:
 	virtual void wheelEvent( QWheelEvent * _me );
 
 private slots:
-	virtual void enterValue( void );
-	void displayHelp( void );
-	void friendlyUpdate( void );
+	virtual void enterValue();
+	void displayHelp();
+	void friendlyUpdate();
 
 
 private:
-	QString displayValue( void ) const;
+	QString displayValue() const;
 
-	virtual void doConnections( void );
+	virtual void doConnections();
 
 	QLineF calculateLine( const QPointF & _mid, float _radius,
 						float _innerRadius = 1) const;
@@ -129,9 +129,9 @@ private:
 	void drawKnob( QPainter * _p );
 	void setPosition( const QPoint & _p );
 	float getValue( const QPoint & _p );
-	bool updateAngle( void );
+	bool updateAngle();
 
-	inline float pageSize( void ) const
+	inline float pageSize() const
 	{
 		return( qMax<float>( ( model()->maxValue() -
 					model()->minValue() ) / 100.0f,

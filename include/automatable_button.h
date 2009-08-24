@@ -48,12 +48,12 @@ public:
 		model()->setJournalling( _on );
 	}
 
-	virtual void modelChanged( void );
+	virtual void modelChanged();
 
 
 public slots:
-	virtual void update( void );
-	virtual void toggle( void );
+	virtual void update();
+	virtual void toggle();
 	virtual void setChecked( bool _on )
 	{
 		// QPushButton::setChecked is called in update-slot
@@ -92,11 +92,11 @@ public:
 
 	void activateButton( automatableButton * _btn );
 
-	virtual void modelChanged( void );
+	virtual void modelChanged();
 
 
 private slots:
-	void updateButtons( void );
+	void updateButtons();
 
 
 private:

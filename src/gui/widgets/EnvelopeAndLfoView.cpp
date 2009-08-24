@@ -293,7 +293,7 @@ EnvelopeAndLfoView::EnvelopeAndLfoView( QWidget * _parent ) :
 				tr( "control envelope-amount by this LFO" ) );
 
 
-	setAcceptDrops( TRUE );
+	setAcceptDrops( true );
 
 }
 
@@ -338,7 +338,7 @@ void EnvelopeAndLfoView::mousePressEvent( QMouseEvent * _me )
 	}
 
 	if( QRect( ENV_GRAPH_X, ENV_GRAPH_Y, s_envGraph->width(),
-			s_envGraph->height() ).contains( _me->pos() ) == TRUE )
+			s_envGraph->height() ).contains( _me->pos() ) == true )
 	{
 		if( m_amountKnob->value<float>() < 1.0f )
 		{
@@ -350,7 +350,7 @@ void EnvelopeAndLfoView::mousePressEvent( QMouseEvent * _me )
 		}
 	}
 	else if( QRect( LFO_GRAPH_X, LFO_GRAPH_Y, s_lfoGraph->width(),
-			s_lfoGraph->height() ).contains( _me->pos() ) == TRUE )
+			s_lfoGraph->height() ).contains( _me->pos() ) == true )
 	{
 		if( m_lfoAmountKnob->value<float>() < 1.0f )
 		{
@@ -384,7 +384,7 @@ void EnvelopeAndLfoView::dropEvent( QDropEvent * _de )
 	{
 		m_params->m_userWave.setAudioFile(
 					stringPairDrag::decodeValue( _de ) );
-		m_userLfoBtn->model()->setValue( TRUE );
+		m_userLfoBtn->model()->setValue( true );
 		_de->accept();
 	}
 	else if( type == QString( "tco_%1" ).arg( track::SampleTrack ) )
@@ -393,7 +393,7 @@ void EnvelopeAndLfoView::dropEvent( QDropEvent * _de )
 		m_params->m_userWave.setAudioFile(
 				mmp.content().firstChild().toElement().
 							attribute( "src" ) );
-		m_userLfoBtn->model()->setValue( TRUE );
+		m_userLfoBtn->model()->setValue( true );
 		_de->accept();
 	}
 }

@@ -42,9 +42,9 @@ public:
 	groupBox( const QString & _caption, QWidget * _parent = NULL );
 	virtual ~groupBox();
 
-	virtual void modelChanged( void );
+	virtual void modelChanged();
 
-	pixmapButton * ledButton( void )
+	pixmapButton * ledButton()
 	{
 		return m_led;
 	}
@@ -56,7 +56,7 @@ protected:
 
 
 private:
-	void updatePixmap( void );
+	void updatePixmap();
 
 	pixmapButton * m_led;
 	QString m_caption;

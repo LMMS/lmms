@@ -70,7 +70,7 @@ void positionLine::paintEvent( QPaintEvent * _pe )
 songEditor::songEditor( song * _song, songEditor * & _engine_ptr ) :
 	trackContainerView( _song ),
 	m_s( _song ),
-	m_scrollBack( FALSE )
+	m_scrollBack( false )
 {
 	_engine_ptr = this;
 
@@ -98,7 +98,7 @@ songEditor::songEditor( song * _song, songEditor * & _engine_ptr ) :
 	// create own toolbar
 	m_toolBar = new QWidget( this );
 	m_toolBar->setFixedHeight( 32 );
-	m_toolBar->setAutoFillBackground( TRUE );
+	m_toolBar->setAutoFillBackground( true );
 	QPalette pal;
 	pal.setBrush( m_toolBar->backgroundRole(), 
 				embed::getIconPixmap( "toolbar_bg" ) );
@@ -162,19 +162,19 @@ songEditor::songEditor( song * _song, songEditor * & _engine_ptr ) :
 								"edit_draw" ),
 							tr( "Draw mode" ),
 							NULL, NULL, m_toolBar );
-	m_drawModeButton->setCheckable( TRUE );
-	m_drawModeButton->setChecked( TRUE );
+	m_drawModeButton->setCheckable( true );
+	m_drawModeButton->setChecked( true );
 
 	m_editModeButton = new toolButton( embed::getIconPixmap(
 								"edit_select" ),
 					tr( "Edit mode (select and move)" ),
 							NULL, NULL, m_toolBar );
-	m_editModeButton->setCheckable( TRUE );
+	m_editModeButton->setCheckable( true );
 
 	QButtonGroup * tool_button_group = new QButtonGroup( this );
 	tool_button_group->addButton( m_drawModeButton );
 	tool_button_group->addButton( m_editModeButton );
-	tool_button_group->setExclusive( TRUE );
+	tool_button_group->setExclusive( true );
 
 #if 0
 #warning TODO
@@ -214,7 +214,7 @@ songEditor::songEditor( song * _song, songEditor * & _engine_ptr ) :
 	m_zoomingComboBox->model()->setInitValue(
 			m_zoomingComboBox->model()->findText( "100%" ) );
 	connect( m_zoomingComboBox->model(), SIGNAL( dataChanged() ),
-					this, SLOT( zoomingChanged( void ) ) );
+					this, SLOT( zoomingChanged() ) );
 
 
 	tb_layout->addSpacing( 5 );
@@ -251,7 +251,7 @@ songEditor::songEditor( song * _song, songEditor * & _engine_ptr ) :
 
 
 	engine::mainWindow()->workspace()->addSubWindow( this );
-	parentWidget()->setAttribute( Qt::WA_DeleteOnClose, FALSE );
+	parentWidget()->setAttribute( Qt::WA_DeleteOnClose, false );
 	parentWidget()->resize( 600, 300 );
 	parentWidget()->move( 5, 5 );
 	parentWidget()->show();
@@ -275,7 +275,7 @@ void songEditor::scrolled( int _new_pos )
 
 
 
-void songEditor::play( void )
+void songEditor::play()
 {
 	engine::mainWindow()->setPlaybackMode( PPM_Song );
 	
@@ -294,7 +294,7 @@ void songEditor::play( void )
 
 
 
-void songEditor::record( void )
+void songEditor::record()
 {
 	engine::mainWindow()->setPlaybackMode( PPM_Song );
 	
@@ -304,7 +304,7 @@ void songEditor::record( void )
 
 
 
-void songEditor::recordAccompany( void )
+void songEditor::recordAccompany()
 {
 	engine::mainWindow()->setPlaybackMode( PPM_Song );
 	
@@ -314,7 +314,7 @@ void songEditor::recordAccompany( void )
 
 
 
-void songEditor::stop( void )
+void songEditor::stop()
 {
 	m_s->stop();
 	engine::getPianoRoll()->stopRecording();
@@ -430,7 +430,7 @@ void songEditor::updatePosition( const midiTime & _t )
 {
 	if( ( m_s->isPlaying() && m_s->m_playMode == song::Mode_PlaySong
 		  && m_timeLine->autoScroll() == timeLine::AutoScrollEnabled) ||
-							m_scrollBack == TRUE )
+							m_scrollBack == true )
 	{
 		const int w = width() - DEFAULT_SETTINGS_WIDGET_WIDTH
 							- TRACK_OP_WIDTH;
@@ -447,7 +447,7 @@ void songEditor::updatePosition( const midiTime & _t )
 									0 );
 			m_leftRightScroll->setValue( t.getTact() );
 		}
-		m_scrollBack = FALSE;
+		m_scrollBack = false;
 	}
 
 	const int x = m_s->m_playPos[song::Mode_PlaySong].m_timeLine->
@@ -468,7 +468,7 @@ void songEditor::updatePosition( const midiTime & _t )
 
 
 
-void songEditor::zoomingChanged( void )
+void songEditor::zoomingChanged()
 {
 	const QString & zfac = m_zoomingComboBox->model()->currentText();
 	setPixelsPerTact( zfac.left( zfac.length() - 1 ).toInt() *
@@ -481,7 +481,7 @@ void songEditor::zoomingChanged( void )
 
 
 
-bool songEditor::allowRubberband( void ) const
+bool songEditor::allowRubberband() const
 {
 	return( m_editModeButton->isChecked() );
 }

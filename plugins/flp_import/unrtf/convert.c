@@ -564,11 +564,11 @@ static CodepageInfo * charset_codepage;
 /* Nested tables aren't supported.
  */
 static int coming_pars_that_are_tabular = 0;
-static int within_table = FALSE;
-static int have_printed_row_begin=FALSE;
-static int have_printed_cell_begin=FALSE;
-static int have_printed_row_end=FALSE;
-static int have_printed_cell_end=FALSE;
+static int within_table = false;
+static int have_printed_row_begin=false;
+static int have_printed_cell_begin=false;
+static int have_printed_row_end=false;
+static int have_printed_cell_end=false;
 
 
 /* Previously in word_print_core function 
@@ -604,7 +604,7 @@ enum {
 	PICT_JPEG,
 	PICT_PNG,
 };
-static int within_picture=FALSE;
+static int within_picture=false;
 static int picture_file_number=1;
 static char picture_path[255];
 static int picture_width;
@@ -615,8 +615,8 @@ static int picture_wmetafile_type;
 static const char *picture_wmetafile_type_str;
 
 
-static int have_printed_body=FALSE;
-static int within_header=TRUE;
+static int have_printed_body=false;
+static int within_header=true;
 
 
 
@@ -653,8 +653,8 @@ starting_body ()
 			outstring+=QString().sprintf("%s", op->header_end);
 			outstring+=QString().sprintf("%s", op->body_begin);
 		}
-		within_header = FALSE;
-		have_printed_body = TRUE;
+		within_header = false;
+		have_printed_body = true;
 	}
 }
 
@@ -1180,7 +1180,7 @@ cmd_cf (Word *w, int align, char has_param, int num) {
 			color_table[num].b);
 		attr_push(ATTR_FOREGROUND,str);
 	}
-	return FALSE;
+	return false;
 }
 
 
@@ -1207,7 +1207,7 @@ cmd_cb (Word *w, int align, char has_param, int num) {
 			color_table[num].b);
 		attr_push(ATTR_BACKGROUND,str);
 	}
-	return FALSE;
+	return false;
 }
 
 
@@ -1221,7 +1221,7 @@ static int
 cmd_fs (Word *w, int align, char has_param, int points) {
 	char str[20];
 
-	if (!has_param) return FALSE;
+	if (!has_param) return false;
 
 	/* Note, fs20 means 10pt */
 	points /= 2;
@@ -1229,7 +1229,7 @@ cmd_fs (Word *w, int align, char has_param, int points) {
 	sprintf(str,"%d",points);
 	attr_push(ATTR_FONTSIZE,str);
 
-	return FALSE;
+	return false;
 }
 
 
@@ -1315,7 +1315,7 @@ cmd_field (Word *w, int align, char has_param, int num) {
 							    outstring+=QString().sprintf("%s", op->hyperlink_begin);
 							    outstring+=QString().sprintf("%s", s4);
 							    outstring+=QString().sprintf("%s", op->hyperlink_end);
-							    return TRUE;
+							    return true;
 						    }
 					    	
 					    }
@@ -1329,7 +1329,7 @@ cmd_field (Word *w, int align, char has_param, int num) {
 		}
 		w=w->next;
 	}
-	return TRUE;
+	return true;
 }
 
 
@@ -1346,7 +1346,7 @@ cmd_f (Word *w, int align, char has_param, int num) {
 
 	/* no param exit early XX */
 	if (!has_param) 
-		return FALSE;
+		return false;
 
 	name = lookup_fontname(num);
 #if 1 /* daved - 0.19.6 */
@@ -1372,7 +1372,7 @@ cmd_f (Word *w, int align, char has_param, int num) {
 		outstring+=QString().sprintf("<numchar_table set to %d>", numchar_table);
 	}
 
-	return FALSE;
+	return false;
 }
 
 
@@ -1399,7 +1399,7 @@ cmd_highlight (Word *w, int align, char has_param, int num)
 			color_table[num].b);
 		attr_push(ATTR_BACKGROUND,str);
 	}
-	return FALSE;
+	return false;
 }
 
 
@@ -1427,7 +1427,7 @@ cmd_tab (Word *w, int align, char has_param, int param)
 		need--;
 	}
 	outstring+=QString().sprintf("\n");
-	return FALSE;
+	return false;
 }
 
 
@@ -1441,7 +1441,7 @@ cmd_tab (Word *w, int align, char has_param, int param)
 static int 
 cmd_plain (Word *w, int align, char has_param, int param) {
 	attr_pop_all();
-	return FALSE;
+	return false;
 }
 
 
@@ -1454,7 +1454,7 @@ cmd_plain (Word *w, int align, char has_param, int param) {
 static int 
 cmd_fnil (Word *w, int align, char has_param, int param) {
 	attr_push(ATTR_FONTFACE,FONTNIL_STR);
-	return FALSE;
+	return false;
 }
 
 
@@ -1468,7 +1468,7 @@ cmd_fnil (Word *w, int align, char has_param, int param) {
 static int 
 cmd_froman (Word *w, int align, char has_param, int param) {
 	attr_push(ATTR_FONTFACE,FONTROMAN_STR);
-	return FALSE;
+	return false;
 }
 
 
@@ -1482,7 +1482,7 @@ cmd_froman (Word *w, int align, char has_param, int param) {
 static int 
 cmd_fswiss (Word *w, int align, char has_param, int param) {
 	attr_push(ATTR_FONTFACE,FONTSWISS_STR);
-	return FALSE;
+	return false;
 }
 
 
@@ -1496,7 +1496,7 @@ cmd_fswiss (Word *w, int align, char has_param, int param) {
 static int 
 cmd_fmodern (Word *w, int align, char has_param, int param) {
 	attr_push(ATTR_FONTFACE,FONTMODERN_STR);
-	return FALSE;
+	return false;
 }
 
 
@@ -1510,7 +1510,7 @@ cmd_fmodern (Word *w, int align, char has_param, int param) {
 static int 
 cmd_fscript (Word *w, int align, char has_param, int param) {
 	attr_push(ATTR_FONTFACE,FONTSCRIPT_STR);
-	return FALSE;
+	return false;
 }
 
 /*========================================================================
@@ -1523,7 +1523,7 @@ cmd_fscript (Word *w, int align, char has_param, int param) {
 static int 
 cmd_fdecor (Word *w, int align, char has_param, int param) {
 	attr_push(ATTR_FONTFACE,FONTDECOR_STR);
-	return FALSE;
+	return false;
 }
 
 /*========================================================================
@@ -1536,7 +1536,7 @@ cmd_fdecor (Word *w, int align, char has_param, int param) {
 static int 
 cmd_ftech (Word *w, int align, char has_param, int param) {
 	attr_push(ATTR_FONTFACE,FONTTECH_STR);
-	return FALSE;
+	return false;
 }
 
 /*========================================================================
@@ -1556,7 +1556,7 @@ cmd_expand (Word *w, int align, char has_param, int param) {
 		else 
 			attr_push(ATTR_EXPAND, str);
 	}
-	return FALSE;
+	return false;
 }
 
 
@@ -1577,7 +1577,7 @@ cmd_emboss (Word *w, int align, char has_param, int param) {
 		sprintf(str, "%d", param);
 		attr_push(ATTR_EMBOSS, str);
 	}
-	return FALSE;
+	return false;
 }
 
 
@@ -1598,7 +1598,7 @@ cmd_engrave (Word *w, int align, char has_param, int param) {
 		sprintf(str, "%d", param);
 		attr_push(ATTR_ENGRAVE, str);
 	}
-	return FALSE;
+	return false;
 }
 
 /*========================================================================
@@ -1614,7 +1614,7 @@ cmd_caps (Word *w, int align, char has_param, int param) {
 		attr_pop(ATTR_CAPS);
 	else 
 		attr_push(ATTR_CAPS,NULL);
-	return FALSE;
+	return false;
 }
 
 
@@ -1630,7 +1630,7 @@ cmd_scaps (Word *w, int align, char has_param, int param) {
 		attr_pop(ATTR_SMALLCAPS);
 	else 
 		attr_push(ATTR_SMALLCAPS,NULL);
-	return FALSE;
+	return false;
 }
 
 
@@ -1646,7 +1646,7 @@ cmd_bullet (Word *w, int align, char has_param, int param) {
 		outstring+=QString().sprintf("%s", op->chars.bullet);
 		++total_chars_this_line; /* \tab */
 	}
-	return FALSE;
+	return false;
 }
 
 /*========================================================================
@@ -1661,7 +1661,7 @@ cmd_ldblquote (Word *w, int align, char has_param, int param) {
 		outstring+=QString().sprintf("%s", op->chars.left_dbl_quote);
 		++total_chars_this_line; /* \tab */
 	}
-	return FALSE;
+	return false;
 }
 
 
@@ -1678,7 +1678,7 @@ cmd_rdblquote (Word *w, int align, char has_param, int param) {
 		outstring+=QString().sprintf("%s", op->chars.right_dbl_quote);
 		++total_chars_this_line; /* \tab */
 	}
-	return FALSE;
+	return false;
 }
 
 
@@ -1694,7 +1694,7 @@ cmd_lquote (Word *w, int align, char has_param, int param) {
 		outstring+=QString().sprintf("%s", op->chars.left_quote);
 		++total_chars_this_line; /* \tab */
 	}
-	return FALSE;
+	return false;
 }
 
 
@@ -1711,7 +1711,7 @@ cmd_nonbreaking_space (Word *w, int align, char has_param, int param) {
 		outstring+=QString().sprintf("%s", op->chars.nonbreaking_space);
 		++total_chars_this_line; /* \tab */
 	}
-	return FALSE;
+	return false;
 }
 
 
@@ -1728,7 +1728,7 @@ cmd_nonbreaking_hyphen (Word *w, int align, char has_param, int param) {
 		outstring+=QString().sprintf("%s", op->chars.nonbreaking_hyphen);
 		++total_chars_this_line; /* \tab */
 	}
-	return FALSE;
+	return false;
 }
 
 
@@ -1745,7 +1745,7 @@ cmd_optional_hyphen (Word *w, int align, char has_param, int param) {
 		outstring+=QString().sprintf("%s", op->chars.optional_hyphen);
 		++total_chars_this_line; /* \tab */
 	}
-	return FALSE;
+	return false;
 }
 
 
@@ -1761,7 +1761,7 @@ cmd_emdash (Word *w, int align, char has_param, int param) {
 		outstring+=QString().sprintf("%s", op->chars.emdash);
 		++total_chars_this_line; /* \tab */
 	}
-	return FALSE;
+	return false;
 }
 
 
@@ -1778,7 +1778,7 @@ cmd_endash (Word *w, int align, char has_param, int param) {
 		outstring+=QString().sprintf("%s", op->chars.endash);
 		++total_chars_this_line; /* \tab */
 	}
-	return FALSE;
+	return false;
 }
 
 
@@ -1795,7 +1795,7 @@ cmd_rquote (Word *w, int align, char has_param, int param) {
 		outstring+=QString().sprintf("%s", op->chars.right_quote);
 		++total_chars_this_line; /* \tab */
 	}
-	return FALSE;
+	return false;
 }
 
 
@@ -1811,7 +1811,7 @@ cmd_par (Word *w, int align, char has_param, int param) {
 		outstring+=QString().sprintf("%s", op->line_break);
 		total_chars_this_line = 0; /* \tab */
 	}
-	return FALSE;
+	return false;
 }
 
 
@@ -1828,7 +1828,7 @@ cmd_line (Word *w, int align, char has_param, int param) {
 		outstring+=QString().sprintf("%s", op->line_break);
 		total_chars_this_line = 0; /* \tab */
 	}
-	return FALSE;
+	return false;
 }
 
 
@@ -1844,7 +1844,7 @@ static int cmd_page (Word *w, int align, char has_param, int param) {
 		outstring+=QString().sprintf("%s", op->page_break);
 		total_chars_this_line = 0; /* \tab */
 	}
-	return FALSE;
+	return false;
 }
 
 
@@ -1857,7 +1857,7 @@ static int cmd_page (Word *w, int align, char has_param, int param) {
 
 static int cmd_intbl (Word *w, int align, char has_param, int param) {
 	++coming_pars_that_are_tabular;
-	return FALSE;
+	return false;
 }
 
 
@@ -1869,7 +1869,7 @@ static int cmd_intbl (Word *w, int align, char has_param, int param) {
  *=======================================================================*/
 
 static int cmd_ulnone (Word *w, int align, char has_param, int param) {
-	int attr, more=TRUE;
+	int attr, more=true;
 #ifdef BINARY_ATTRS
 	attr_remove_underlining();
 #else
@@ -1887,10 +1887,10 @@ static int cmd_ulnone (Word *w, int align, char has_param, int param) {
 		{
 		  attr_pop(ATTR_UNDERLINE);
 		} else
-		  more=FALSE;
+		  more=false;
 	} while(more);
 #endif
-	return FALSE;
+	return false;
 }
 
 /*========================================================================
@@ -1906,7 +1906,7 @@ static int cmd_ul (Word *w, int align, char has_param, int param) {
 	} else {
 		attr_push(ATTR_UNDERLINE, NULL);
 	}
-	return FALSE;
+	return false;
 }
 
 /*========================================================================
@@ -1918,7 +1918,7 @@ static int cmd_ul (Word *w, int align, char has_param, int param) {
 
 static int cmd_uld (Word *w, int align, char has_param, int param) {
 	attr_push(ATTR_DOUBLE_UL, NULL);
-	return FALSE;
+	return false;
 }
 
 /*========================================================================
@@ -1930,7 +1930,7 @@ static int cmd_uld (Word *w, int align, char has_param, int param) {
 
 static int cmd_uldb (Word *w, int align, char has_param, int param) {
 	attr_push(ATTR_DOT_UL, NULL);
-	return FALSE;
+	return false;
 }
 
 
@@ -1943,7 +1943,7 @@ static int cmd_uldb (Word *w, int align, char has_param, int param) {
 
 static int cmd_uldash (Word *w, int align, char has_param, int param) {
 	attr_push(ATTR_DASH_UL, NULL);
-	return FALSE;
+	return false;
 }
 
 
@@ -1956,7 +1956,7 @@ static int cmd_uldash (Word *w, int align, char has_param, int param) {
 
 static int cmd_uldashd (Word *w, int align, char has_param, int param) {
 	attr_push(ATTR_DOT_DASH_UL,NULL);
-	return FALSE;
+	return false;
 }
 
 
@@ -1969,7 +1969,7 @@ static int cmd_uldashd (Word *w, int align, char has_param, int param) {
 
 static int cmd_uldashdd (Word *w, int align, char has_param, int param) {
 	attr_push(ATTR_2DOT_DASH_UL,NULL);
-	return FALSE;
+	return false;
 }
 
 
@@ -1982,7 +1982,7 @@ static int cmd_uldashdd (Word *w, int align, char has_param, int param) {
 
 static int cmd_ulw (Word *w, int align, char has_param, int param) {
 	attr_push(ATTR_WORD_UL,NULL);
-	return FALSE;
+	return false;
 }
 
 
@@ -1995,7 +1995,7 @@ static int cmd_ulw (Word *w, int align, char has_param, int param) {
 
 static int cmd_ulth (Word *w, int align, char has_param, int param) {
 	attr_push(ATTR_THICK_UL,NULL);
-	return FALSE;
+	return false;
 }
 
 
@@ -2008,7 +2008,7 @@ static int cmd_ulth (Word *w, int align, char has_param, int param) {
 
 static int cmd_ulthd (Word *w, int align, char has_param, int param) {
 	attr_push(ATTR_THICK_UL, NULL);
-	return FALSE;
+	return false;
 }
 
 
@@ -2021,7 +2021,7 @@ static int cmd_ulthd (Word *w, int align, char has_param, int param) {
 
 static int cmd_ulthdash (Word *w, int align, char has_param, int param) {
 	attr_push(ATTR_THICK_UL, NULL);
-	return FALSE;
+	return false;
 }
 
 
@@ -2034,7 +2034,7 @@ static int cmd_ulthdash (Word *w, int align, char has_param, int param) {
 
 static int cmd_ulwave (Word *w, int align, char has_param, int param) {
 	attr_push(ATTR_WAVE_UL,NULL);
-	return FALSE;
+	return false;
 }
 
 
@@ -2050,7 +2050,7 @@ static int cmd_strike (Word *w, int align, char has_param, int param) {
 		attr_pop(ATTR_STRIKE);
 	else
 		attr_push(ATTR_STRIKE,NULL);
-	return FALSE;
+	return false;
 }
 
 /*========================================================================
@@ -2065,7 +2065,7 @@ static int cmd_strikedl (Word *w, int align, char has_param, int param) {
 		attr_pop(ATTR_DBL_STRIKE);
 	else
 		attr_push(ATTR_DBL_STRIKE,NULL);
-	return FALSE;
+	return false;
 }
 
 
@@ -2081,7 +2081,7 @@ static int cmd_striked (Word *w, int align, char has_param, int param) {
 		attr_pop(ATTR_DBL_STRIKE);
 	else
 		attr_push(ATTR_DBL_STRIKE,NULL);
-	return FALSE;
+	return false;
 }
 
 
@@ -2093,7 +2093,7 @@ static int cmd_striked (Word *w, int align, char has_param, int param) {
  *=======================================================================*/
 
 static int cmd_rtf (Word *w, int align, char has_param, int param) {
-	return FALSE;
+	return false;
 }
 
 
@@ -2109,7 +2109,7 @@ static int cmd_up (Word *w, int align, char has_param, int param) {
 		attr_pop(ATTR_SUPER);
 	else
 		attr_push(ATTR_SUPER,NULL);
-	return FALSE;
+	return false;
 }
 
 #if 1 /* daved - 0.19.4 */
@@ -2124,7 +2124,7 @@ static int cmd_u (Word *w, int align, char has_param, int param) {
 	short	done=0;
 /*#if DEBUG
 	char	*str;
-	if (has_param == TRUE)
+	if (has_param == true)
 	{
 		fprintf(stderr,"param is %d (x%x) (0%o)\n", param,
 			param, param);
@@ -2208,7 +2208,7 @@ static int cmd_u (Word *w, int align, char has_param, int param) {
 	*/
 	if (done)
 		return(SKIP_ONE_WORD);
-	return(FALSE);
+	return(false);
 }
 #endif
 
@@ -2224,7 +2224,7 @@ static int cmd_dn (Word *w, int align, char has_param, int param) {
 		attr_pop(ATTR_SUB);
 	else
 		attr_push(ATTR_SUB,NULL);
-	return FALSE;
+	return false;
 }
 
 /*========================================================================
@@ -2237,7 +2237,7 @@ static int cmd_dn (Word *w, int align, char has_param, int param) {
 static int cmd_nosupersub (Word *w, int align, char has_param, int param) {
 	attr_pop(ATTR_SUPER);
 	attr_pop(ATTR_SUB);
-	return FALSE;
+	return false;
 }
 
 /*========================================================================
@@ -2252,7 +2252,7 @@ static int cmd_super (Word *w, int align, char has_param, int param) {
 		attr_pop(ATTR_SUPER);
 	else
 		attr_push(ATTR_SUPER,NULL);
-	return FALSE;
+	return false;
 }
 
 /*========================================================================
@@ -2267,7 +2267,7 @@ static int cmd_sub (Word *w, int align, char has_param, int param) {
 		attr_pop(ATTR_SUB);
 	else
 		attr_push(ATTR_SUB,NULL);
-	return FALSE;
+	return false;
 }
 
 /*========================================================================
@@ -2282,7 +2282,7 @@ static int cmd_shad (Word *w, int align, char has_param, int param) {
 		attr_pop(ATTR_SHADOW);
 	else
 		attr_push(ATTR_SHADOW,NULL);
-	return FALSE;
+	return false;
 }
 
 /*========================================================================
@@ -2299,7 +2299,7 @@ cmd_b (Word *w, int align, char has_param, int param) {
 	}
 	else
 		attr_push(ATTR_BOLD,NULL);
-	return FALSE;
+	return false;
 }
 
 /*========================================================================
@@ -2314,7 +2314,7 @@ static int cmd_i (Word *w, int align, char has_param, int param) {
 		attr_pop(ATTR_ITALIC);
 	else
 		attr_push(ATTR_ITALIC,NULL);
-	return FALSE;
+	return false;
 }
 
 /*========================================================================
@@ -2324,7 +2324,7 @@ static int cmd_i (Word *w, int align, char has_param, int param) {
  * Returns:	Flag, true only if rest of Words on line should be ignored.
  *=======================================================================*/
 static int cmd_s (Word *w, int align, char has_param, int param) {
-	return FALSE;
+	return false;
 }
 
 /*========================================================================
@@ -2339,7 +2339,7 @@ static int cmd_sect (Word *w, int align, char has_param, int param) {
 	if (op->paragraph_begin) {
 		outstring+=QString().sprintf("%s", op->paragraph_begin);
 	}
-	return FALSE;
+	return false;
 }
 
 /*========================================================================
@@ -2356,7 +2356,7 @@ static int cmd_shp (Word *w, int align, char has_param, int param) {
 		outstring+=QString().sprintf("%s", op->comment_end);	/* daved 0.20.2 */
 	}
 
-	return FALSE;
+	return false;
 }
 
 /*========================================================================
@@ -2371,7 +2371,7 @@ static int cmd_outl (Word *w, int align, char has_param, int param) {
 		attr_pop(ATTR_OUTLINE);
 	else
 		attr_push(ATTR_OUTLINE,NULL);
-	return FALSE;
+	return false;
 }
 
 /*========================================================================
@@ -2388,7 +2388,7 @@ static int cmd_ansi (Word *w, int align, char has_param, int param) {
 		outstring+=QString().sprintf("document uses ANSI character set");
 		outstring+=QString().sprintf("%s",op->comment_end);
 	}
-	return FALSE;
+	return false;
 }
 
 /*========================================================================
@@ -2416,7 +2416,7 @@ static int cmd_ansicpg (Word *w, int align, char has_param, int param) {
 		outstring+=QString().sprintf("document uses default ANSI codepage character set");
 		outstring+=QString().sprintf("%s", op->comment_end);
 	}
-	return FALSE;
+	return false;
 }
 
 /*========================================================================
@@ -2433,7 +2433,7 @@ static int cmd_pc (Word *w, int align, char has_param, int param) {
 		outstring+=QString().sprintf("document uses PC codepage 437 character set");
 		outstring+=QString().sprintf("%s",op->comment_end);
 	}
-	return FALSE;
+	return false;
 }
 
 /*========================================================================
@@ -2450,7 +2450,7 @@ static int cmd_pca (Word *w, int align, char has_param, int param) {
 		outstring+=QString().sprintf("document uses PC codepage 850 character set");
 		outstring+=QString().sprintf("%s",op->comment_end);
 	}
-	return FALSE;
+	return false;
 }
 
 /*========================================================================
@@ -2467,7 +2467,7 @@ static int cmd_mac (Word *w, int align, char has_param, int param) {
 		outstring+=QString().sprintf("document uses Macintosh character set");
 		outstring+=QString().sprintf("%s",op->comment_end);
 	}
-	return FALSE;
+	return false;
 }
 
 /*========================================================================
@@ -2481,7 +2481,7 @@ static int cmd_colortbl (Word *w, int align, char has_param, int param) {
 	if (w->next) {
 		process_color_table(w->next);
 	}
-	return TRUE;
+	return true;
 }
 
 /*========================================================================
@@ -2495,7 +2495,7 @@ static int cmd_fonttbl (Word *w, int align, char has_param, int param) {
 	if (w->next) {
 		process_font_table(w->next);
 	}
-	return TRUE;
+	return true;
 }
 
 /*========================================================================
@@ -2506,7 +2506,7 @@ static int cmd_fonttbl (Word *w, int align, char has_param, int param) {
  *=======================================================================*/
 
 static int cmd_header (Word *w, int align, char has_param, int param) {
-	return TRUE;
+	return true;
 }
 
 /*========================================================================
@@ -2517,7 +2517,7 @@ static int cmd_header (Word *w, int align, char has_param, int param) {
  *=======================================================================*/
 
 static int cmd_headerl (Word *w, int align, char has_param, int param) {
-	return TRUE;
+	return true;
 }
 
 /*========================================================================
@@ -2528,7 +2528,7 @@ static int cmd_headerl (Word *w, int align, char has_param, int param) {
  *=======================================================================*/
 
 static int cmd_headerr (Word *w, int align, char has_param, int param) {
-	return TRUE;
+	return true;
 }
 
 /*========================================================================
@@ -2539,7 +2539,7 @@ static int cmd_headerr (Word *w, int align, char has_param, int param) {
  *=======================================================================*/
 
 static int cmd_headerf (Word *w, int align, char has_param, int param) {
-	return TRUE;
+	return true;
 }
 
 /*========================================================================
@@ -2550,7 +2550,7 @@ static int cmd_headerf (Word *w, int align, char has_param, int param) {
  *=======================================================================*/
 
 static int cmd_footer (Word *w, int align, char has_param, int param) {
-	return TRUE;
+	return true;
 }
 
 /*========================================================================
@@ -2561,7 +2561,7 @@ static int cmd_footer (Word *w, int align, char has_param, int param) {
  *=======================================================================*/
 
 static int cmd_footerl (Word *w, int align, char has_param, int param) {
-	return TRUE;
+	return true;
 }
 
 /*========================================================================
@@ -2572,7 +2572,7 @@ static int cmd_footerl (Word *w, int align, char has_param, int param) {
  *=======================================================================*/
 
 static int cmd_footerr (Word *w, int align, char has_param, int param) {
-	return TRUE;
+	return true;
 }
 
 /*========================================================================
@@ -2583,7 +2583,7 @@ static int cmd_footerr (Word *w, int align, char has_param, int param) {
  *=======================================================================*/
 
 static int cmd_footerf (Word *w, int align, char has_param, int param) {
-	return TRUE;
+	return true;
 }
 
 /*========================================================================
@@ -2594,7 +2594,7 @@ static int cmd_footerf (Word *w, int align, char has_param, int param) {
  *=======================================================================*/
 
 static int cmd_ignore (Word *w, int align, char has_param, int param) {
-	return TRUE;
+	return true;
 }
 
 /*========================================================================
@@ -2606,7 +2606,7 @@ static int cmd_ignore (Word *w, int align, char has_param, int param) {
 
 static int cmd_info (Word *w, int align, char has_param, int param) {
 	process_info_group (w->next);
-	return TRUE;
+	return true;
 }
 
 /*========================================================================
@@ -2617,10 +2617,10 @@ static int cmd_info (Word *w, int align, char has_param, int param) {
  *=======================================================================*/
 
 static int cmd_pict (Word *w, int align, char has_param, int param) {
-	within_picture=TRUE;
+	within_picture=true;
 	picture_width = picture_height = 0;
 	picture_type = PICT_WB;
-	return FALSE;		
+	return false;		
 }
 
 /*========================================================================
@@ -2631,7 +2631,7 @@ static int cmd_pict (Word *w, int align, char has_param, int param) {
  *=======================================================================*/
 
 static int cmd_bin (Word *w, int align, char has_param, int param) {
-	return FALSE;		
+	return false;		
 }
 
 
@@ -2644,7 +2644,7 @@ static int cmd_bin (Word *w, int align, char has_param, int param) {
 
 static int cmd_macpict (Word *w, int align, char has_param, int param) {
 	picture_type = PICT_MAC;
-	return FALSE;		
+	return false;		
 }
 
 /*========================================================================
@@ -2656,7 +2656,7 @@ static int cmd_macpict (Word *w, int align, char has_param, int param) {
 
 static int cmd_jpegblip (Word *w, int align, char has_param, int param) {
 	picture_type = PICT_JPEG;
-	return FALSE;		
+	return false;		
 }
 
 /*========================================================================
@@ -2668,7 +2668,7 @@ static int cmd_jpegblip (Word *w, int align, char has_param, int param) {
 
 static int cmd_pngblip (Word *w, int align, char has_param, int param) {
 	picture_type = PICT_PNG;
-	return FALSE;		
+	return false;		
 }
 
 /*========================================================================
@@ -2680,7 +2680,7 @@ static int cmd_pngblip (Word *w, int align, char has_param, int param) {
 
 static int cmd_pnmetafile (Word *w, int align, char has_param, int param) {
 	picture_type = PICT_PM;
-	return FALSE;		
+	return false;		
 }
 
 /*========================================================================
@@ -2706,7 +2706,7 @@ static int cmd_wmetafile (Word *w, int align, char has_param, int param) {
 		default: picture_wmetafile_type_str="default:MM_TEXT"; break;
 		}
 	}
-	return FALSE;		
+	return false;		
 }
 
 /*========================================================================
@@ -2719,7 +2719,7 @@ static int cmd_wmetafile (Word *w, int align, char has_param, int param) {
 static int cmd_wbmbitspixel (Word *w, int align, char has_param, int param) {
 	if (within_picture && has_param) 
 		picture_bits_per_pixel = param;
-	return FALSE;		
+	return false;		
 }
 
 /*========================================================================
@@ -2732,7 +2732,7 @@ static int cmd_wbmbitspixel (Word *w, int align, char has_param, int param) {
 static int cmd_picw (Word *w, int align, char has_param, int param) {
 	if (within_picture && has_param) 
 		picture_width = param;
-	return FALSE;		
+	return false;		
 }
 
 /*========================================================================
@@ -2745,7 +2745,7 @@ static int cmd_picw (Word *w, int align, char has_param, int param) {
 static int cmd_pich (Word *w, int align, char has_param, int param) {
 	if (within_picture && has_param) 
 		picture_height = param;
-	return FALSE;		
+	return false;		
 }
 
 
@@ -2758,7 +2758,7 @@ static int cmd_pich (Word *w, int align, char has_param, int param) {
 
 static int cmd_xe (Word *w, int align, char has_param, int param) {
 	process_index_entry (w);
-	return TRUE;		
+	return true;		
 }
 
 /*========================================================================
@@ -2769,8 +2769,8 @@ static int cmd_xe (Word *w, int align, char has_param, int param) {
  *=======================================================================*/
 
 static int cmd_tc (Word *w, int align, char has_param, int param) {
-	process_toc_entry (w, TRUE);
-	return TRUE;		
+	process_toc_entry (w, true);
+	return true;		
 }
 
 /*========================================================================
@@ -2781,8 +2781,8 @@ static int cmd_tc (Word *w, int align, char has_param, int param) {
  *=======================================================================*/
 
 static int cmd_tcn (Word *w, int align, char has_param, int param) {
-	process_toc_entry (w, FALSE);
-	return TRUE;		
+	process_toc_entry (w, false);
+	return true;		
 }
 
 
@@ -3161,11 +3161,11 @@ enum { SMALL=0, BIG=1 };
 static void 
 begin_table()
 {
-	within_table=TRUE;
-	have_printed_row_begin = FALSE;
-	have_printed_cell_begin = FALSE;
-	have_printed_row_end = FALSE;
-	have_printed_cell_end = FALSE;
+	within_table=true;
+	have_printed_row_begin = false;
+	have_printed_cell_begin = false;
+	have_printed_row_end = false;
+	have_printed_cell_end = false;
 	attrstack_push();
 	starting_body();
 	outstring+=QString().sprintf("%s", op->table_begin);
@@ -3192,11 +3192,11 @@ end_table ()
 			outstring+=QString().sprintf("%s", op->table_row_end);
 		}
 		outstring+=QString().sprintf("%s", op->table_end);
-		within_table=FALSE;
-		have_printed_row_begin = FALSE;
-		have_printed_cell_begin = FALSE;
-		have_printed_row_end = FALSE;
-		have_printed_cell_end = FALSE;
+		within_table=false;
+		have_printed_row_begin = false;
+		have_printed_cell_begin = false;
+		have_printed_row_end = false;
+		have_printed_cell_end = false;
 	}
 }
 
@@ -3214,15 +3214,15 @@ starting_text() {
 	if (within_table) {
 		if (!have_printed_row_begin) {
 			outstring+=QString().sprintf("%s", op->table_row_begin);
-			have_printed_row_begin=TRUE;
-			have_printed_row_end=FALSE;
-			have_printed_cell_begin=FALSE;
+			have_printed_row_begin=true;
+			have_printed_row_end=false;
+			have_printed_cell_begin=false;
 		}
 		if (!have_printed_cell_begin) {
 			outstring+=QString().sprintf("%s", op->table_cell_begin);
 			attrstack_express_all();
-			have_printed_cell_begin=TRUE;
-			have_printed_cell_end=FALSE;
+			have_printed_cell_begin=true;
+			have_printed_cell_end=false;
 		}
 	}
 }
@@ -3301,8 +3301,8 @@ word_print_core (Word *w)
 {
 	char *s;
 	FILE *pictfile=NULL;
-	int is_cell_group=FALSE;
-	int paragraph_begined=FALSE;
+	int is_cell_group=false;
+	int paragraph_begined=false;
 	int paragraph_align=ALIGN_LEFT;
 
 	CHECK_PARAM_NOT_NULL(w);
@@ -3334,7 +3334,7 @@ word_print_core (Word *w)
 
 				if (!paragraph_begined) {
 					starting_paragraph_align (paragraph_align);
-					paragraph_begined=TRUE;
+					paragraph_begined=true;
 				}
 
 				/*----------------------------------------*/
@@ -3422,7 +3422,7 @@ word_print_core (Word *w)
 #endif
 			/*---Handle RTF keywords---------------------------*/
 			else {
-				int done=FALSE;
+				int done=false;
 
 				s++;
 
@@ -3448,12 +3448,12 @@ word_print_core (Word *w)
 					 */
 					ending_paragraph_align(paragraph_align);
 					paragraph_align = ALIGN_LEFT;
-					paragraph_begined = FALSE;
+					paragraph_begined = false;
 				}
 /*----Table keywords---------------------------------------------------------*/
 				else
 				if (!strcmp (s, "cell")) {
-					is_cell_group=TRUE;
+					is_cell_group=true;
 					if (!have_printed_cell_begin) {
 						/* Need this with empty cells */
 						outstring+=QString().sprintf("%s", op->table_cell_begin);
@@ -3461,14 +3461,14 @@ word_print_core (Word *w)
 					}
 					attr_pop_dump();
 					outstring+=QString().sprintf("%s", op->table_cell_end);
-					have_printed_cell_begin = FALSE;
-					have_printed_cell_end=TRUE;
+					have_printed_cell_begin = false;
+					have_printed_cell_end=true;
 				}
 				else if (!strcmp (s, "row")) {
 					if (within_table) {
 						outstring+=QString().sprintf("%s", op->table_row_end);
-						have_printed_row_begin = FALSE;
-						have_printed_row_end=TRUE;
+						have_printed_row_begin = false;
+						have_printed_row_end=true;
 					} else {
 						if (debug_mode) {
 							outstring+=QString().sprintf("%s",op->comment_begin);
@@ -3507,16 +3507,16 @@ word_print_core (Word *w)
 				{
 					int ch;
 					int index=0;
-					int have_param = FALSE, param = 0;
+					int have_param = false, param = 0;
 					HashItem *hip;
 					char *p;
-					int match = FALSE;  /* Pacify gcc,  st001906 - 0.19.6 */
+					int match = false;  /* Pacify gcc,  st001906 - 0.19.6 */
 
 					/* Look for a parameter */
 					p = s;
 					while (*p && (!isdigit(*p) && *p != '-')) p++;
 					if (*p && (isdigit(*p) || *p == '-')) { 
-						have_param = TRUE; 
+						have_param = true; 
 						param = atoi(p);
 					}
 
@@ -3536,12 +3536,12 @@ word_print_core (Word *w)
 					}
 					else {
 						while (!done) {
-							match = FALSE;
+							match = false;
 
 							if (have_param) {
 								int len=p-s;
 								if (!hip[index].name[len] && !strncmp(s, hip[index].name, len))
-									match = TRUE;
+									match = true;
 							}
 							else
 								match = !strcmp(s, hip[index].name);
@@ -3570,12 +3570,12 @@ word_print_core (Word *w)
 									outstring+=QString().sprintf("%s",op->comment_end);
 								}
 
-								done=TRUE;
+								done=true;
 							}
 							else {
 								index++;
 								if (!hip[index].name)
-									done = TRUE;
+									done = true;
 							}
 						}
 					}
@@ -3596,7 +3596,7 @@ word_print_core (Word *w)
 
 			if (!paragraph_begined) {
 				starting_paragraph_align (paragraph_align);
-				paragraph_begined=TRUE;
+				paragraph_begined=true;
 			}
 
 			if (child) 
@@ -3614,7 +3614,7 @@ word_print_core (Word *w)
 			outstring+=QString().sprintf("%s", picture_path);
 			outstring+=QString().sprintf("%s", op->imagelink_end);
 		}
-		within_picture=FALSE;
+		within_picture=false;
 	}
 
 	/* Undo font attributes UNLESS we're doing table cells
@@ -3669,10 +3669,10 @@ word_print (Word *w, QString & _s)
 		outstring+=QString().sprintf("%s", op->header_begin);
 	}
 
-	within_header=TRUE;
-	have_printed_body=FALSE;
-	within_table=FALSE;
-	simulate_allcaps=FALSE;
+	within_header=true;
+	have_printed_body=false;
+	within_table=false;
+	simulate_allcaps=false;
 	word_print_core (w);
 	end_table();
 

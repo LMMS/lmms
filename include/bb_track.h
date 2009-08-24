@@ -44,12 +44,12 @@ public:
 
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
 	virtual void loadSettings( const QDomElement & _this );
-	inline virtual QString nodeName( void ) const
+	inline virtual QString nodeName() const
 	{
 		return( "bbtco" );
 	}
 
-	inline unsigned int color( void ) const
+	inline unsigned int color() const
 	{
 		return( m_color );
 	}
@@ -74,7 +74,7 @@ public:
 	bbTCOView( trackContentObject * _tco, trackView * _tv );
 	virtual ~bbTCOView();
 
-	QColor color( void ) const
+	QColor color() const
 	{
 		return( m_bbTCO->m_color );
 	}
@@ -82,10 +82,10 @@ public:
 
 
 protected slots:
-	void openInBBEditor( void );
-	void resetName( void );
-	void changeName( void );
-	void changeColor( void );
+	void openInBBEditor();
+	void resetName();
+	void changeName();
+	void changeColor();
 
 
 protected:
@@ -139,7 +139,7 @@ public:
 
 
 protected:
-	inline virtual QString nodeName( void ) const
+	inline virtual QString nodeName() const
 	{
 		return( "bbtrack" );
 	}
@@ -165,16 +165,16 @@ public:
 	bbTrackView( bbTrack * _bbt, trackContainerView * _tcv );
 	virtual ~bbTrackView();
 
-	virtual bool close( void );
+	virtual bool close();
 
-	const bbTrack * getBBTrack( void ) const
+	const bbTrack * getBBTrack() const
 	{
 		return( m_bbTrack );
 	}
 
 
 public slots:
-	void clickedTrackLabel( void );
+	void clickedTrackLabel();
 
 
 private:

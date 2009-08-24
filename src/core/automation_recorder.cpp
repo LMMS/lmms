@@ -125,7 +125,7 @@ void AutomationRecorder::modelDataEvent( AutomatableModel * _model )
 	}
 } 
 
-void AutomationRecorder::initRecord( void )
+void AutomationRecorder::initRecord()
 {
 	// starting a new recording, clear map
 	m_clips.clear();

@@ -74,7 +74,7 @@ bool stereoMatrixEffect::processAudioBuffer( sampleFrame * _buf,
 	// audio with this effect	
 	if( !isEnabled() || !isRunning() )
 	{
-		return( FALSE );
+		return( false );
 	}
 
 	double out_sum = 0.0;

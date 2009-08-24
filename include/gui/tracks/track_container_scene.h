@@ -49,12 +49,12 @@ public:
 	virtual ~TrackContainerScene();
 
 
-	inline const midiTime & currentPosition( void ) const
+	inline const midiTime & currentPosition() const
 	{
 		return( m_currentPosition );
 	}
 
-	inline float pixelsPerTact( void ) const
+	inline float pixelsPerTact() const
 	{
 		return( m_ppt );
 	}
@@ -62,18 +62,18 @@ public:
 
 	void setPixelsPerTact( float _ppt );
 
-	trackContainer * model( void )
+	trackContainer * model()
 	{
 		return( m_trackContainer );
 	}
 
-	const trackContainer * model( void ) const
+	const trackContainer * model() const
 	{
 		return( m_trackContainer );
 	}
 
 
-	virtual QString nodeName( void ) const
+	virtual QString nodeName() const
 	{
 		return( "trackcontainerscene" );
 	}

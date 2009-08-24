@@ -32,7 +32,7 @@
 
 
 
-bbTrackContainer::bbTrackContainer( void ) :
+bbTrackContainer::bbTrackContainer() :
 	trackContainer(),
 	m_bbComboBoxModel( this )
 {
@@ -58,10 +58,10 @@ bool bbTrackContainer::play( midiTime _start, fpp_t _frames,
 							f_cnt_t _offset,
 							Sint16 _tco_num )
 {
-	bool played_a_note = FALSE;
+	bool played_a_note = false;
 	if( lengthOfBB( _tco_num ) <= 0 )
 	{
-		return( FALSE );
+		return( false );
 	}
 
 	_start = _start % ( lengthOfBB( _tco_num ) * midiTime::ticksPerTact() );
@@ -71,7 +71,7 @@ bool bbTrackContainer::play( midiTime _start, fpp_t _frames,
 	{
 		if( ( *it )->play( _start, _frames, _offset, _tco_num ) )
 		{
-			played_a_note = TRUE;
+			played_a_note = true;
 		}
 	}
 
@@ -81,7 +81,7 @@ bool bbTrackContainer::play( midiTime _start, fpp_t _frames,
 
 
 
-void bbTrackContainer::updateAfterTrackAdd( void )
+void bbTrackContainer::updateAfterTrackAdd()
 {
 	// make sure, new track(s) have TCOs for every beat/bassline
 	for( int i = 0; i < qMax<int>( 1, numOfBBs() ); ++i )
@@ -110,7 +110,7 @@ tact_t bbTrackContainer::lengthOfBB( int _bb )
 
 
 
-int bbTrackContainer::numOfBBs( void ) const
+int bbTrackContainer::numOfBBs() const
 {
 	return( engine::getSong()->countTracks( track::BBTrack ) );
 }
@@ -161,7 +161,7 @@ void bbTrackContainer::updateBBTrack( trackContentObject * _tco )
 
 
 
-void bbTrackContainer::fixIncorrectPositions( void )
+void bbTrackContainer::fixIncorrectPositions()
 {
 	trackList tl = tracks();
 	for( trackList::iterator it = tl.begin(); it != tl.end(); ++it )
@@ -176,7 +176,7 @@ void bbTrackContainer::fixIncorrectPositions( void )
 
 
 
-void bbTrackContainer::play( void )
+void bbTrackContainer::play()
 {
 	if( engine::getSong()->isPlaying() )
 	{
@@ -204,7 +204,7 @@ void bbTrackContainer::play( void )
 
 
 
-void bbTrackContainer::stop( void )
+void bbTrackContainer::stop()
 {
 	engine::getSong()->stop();
 }
@@ -212,7 +212,7 @@ void bbTrackContainer::stop( void )
 
 
 
-void bbTrackContainer::updateComboBox( void )
+void bbTrackContainer::updateComboBox()
 {
 	const int cur_bb = currentBB();
 
@@ -229,7 +229,7 @@ void bbTrackContainer::updateComboBox( void )
 
 
 
-void bbTrackContainer::currentBBChanged( void )
+void bbTrackContainer::currentBBChanged()
 {
 	// first make sure, all channels have a TCO at current BB
 	createTCOsForBB( currentBB() );

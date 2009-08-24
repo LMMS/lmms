@@ -43,14 +43,14 @@ public:
 	virtual ~CollapsibleWidgetHeader();
 
 
-	inline bool isCollapsed( void ) const
+	inline bool isCollapsed() const
 	{
 		return m_collapsed;
 	}
 
 	void setCollapsed( bool _c );
 
-	virtual QSize sizeHint( void ) const;
+	virtual QSize sizeHint() const;
 
 	static const int MinimalHeight = 20;
 
@@ -76,8 +76,8 @@ private:
 
 
 signals:
-	void expanded( void );
-	void collapsed( void );
+	void expanded();
+	void collapsed();
 
 } ;
 
@@ -93,20 +93,20 @@ public:
 	void addWidget( QWidget * _w );
 	void insertWidget( int _idx, QWidget * _w );
 
-	inline Qt::Orientation orientation( void ) const
+	inline Qt::Orientation orientation() const
 	{
 		return m_orientation;
 	}
 
-	inline bool isCollapsed( void ) const
+	inline bool isCollapsed() const
 	{
 		return m_header->isCollapsed();
 	}
 
 
 public slots:
-	void expand( void );
-	void collapse( void );
+	void expand();
+	void collapse();
 
 
 private:

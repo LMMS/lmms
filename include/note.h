@@ -120,43 +120,43 @@ public:
 		return (bool) ((int) ( *lhs ).pos() < (int) ( *rhs ).pos());
 	}
 
-	inline bool isSelected( void ) const
+	inline bool isSelected() const
 	{
 		return m_selected;
 	}
 
-	inline int oldKey( void ) const
+	inline int oldKey() const
 	{
 		return m_oldKey;
 	}
 
-	inline midiTime oldPos( void ) const
+	inline midiTime oldPos() const
 	{
 		return m_oldPos;
 	}
 
-	inline midiTime oldLength( void ) const
+	inline midiTime oldLength() const
 	{
 		return m_oldLength;
 	}
 
-	inline bool isPlaying( void ) const
+	inline bool isPlaying() const
 	{
 		return m_isPlaying;
 	}
 
-	inline midiTime endPos( void ) const
+	inline midiTime endPos() const
 	{
 		const int l = length();
 		return pos() + l;
 	}
 
-	inline const midiTime & length( void ) const
+	inline const midiTime & length() const
 	{
 		return m_length;
 	}
 
-	inline const midiTime & pos( void ) const
+	inline const midiTime & pos() const
 	{
 		return m_pos;
 	}
@@ -167,41 +167,41 @@ public:
 		return m_pos - bp;
 	}
 
-	inline int key( void ) const
+	inline int key() const
 	{
 		return m_key;
 	}
 
-	inline volume_t getVolume( void ) const
+	inline volume_t getVolume() const
 	{
 		return m_volume;
 	}
 
-	inline panning_t getPanning( void ) const
+	inline panning_t getPanning() const
 	{
 		return m_panning;
 	}
 
-	static QString classNodeName( void )
+	static QString classNodeName()
 	{
 		return "note";
 	}
 
-	inline virtual QString nodeName( void ) const
+	inline virtual QString nodeName() const
 	{
 		return classNodeName();
 	}
 
 	static midiTime quantized( const midiTime & _m, const int _q_grid );
 
-	detuningHelper * detuning( void ) const
+	detuningHelper * detuning() const
 	{
 		return m_detuning;
 	}
 
-	void editDetuningPattern( void );
+	void editDetuningPattern();
 
-	bool hasDetuningInfo( void ) const;
+	bool hasDetuningInfo() const;
 
 
 protected:
@@ -238,7 +238,7 @@ private:
 	midiTime m_pos;
 	detuningHelper * m_detuning;
 
-	void createDetuning( void );
+	void createDetuning();
 
 } ;
 

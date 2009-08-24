@@ -37,7 +37,7 @@ public:
 	virtual bool processAudioBuffer( sampleFrame * _buf,
 		                                          const fpp_t _frames );
 
-	virtual EffectControls * controls( void )
+	virtual EffectControls * controls()
 	{
 		return( &m_smControls );
 	}

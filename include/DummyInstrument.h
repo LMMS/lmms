@@ -54,7 +54,7 @@ public:
 	{
 	}
 
-	virtual QString nodeName( void ) const
+	virtual QString nodeName() const
 	{
 		return "dummyinstrument";
 	}

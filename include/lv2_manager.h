@@ -115,7 +115,7 @@ typedef struct lv2ManagerStorage
 class EXPORT lv2Manager
 {
 public:
-	lv2Manager( void );
+	lv2Manager();
 	virtual ~lv2Manager();
 
 	void loadFromCacheFile();

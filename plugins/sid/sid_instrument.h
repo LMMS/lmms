@@ -99,16 +99,16 @@ public:
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
 	virtual void loadSettings( const QDomElement & _this );
 
-	virtual QString nodeName( void ) const;
+	virtual QString nodeName() const;
 
-	virtual f_cnt_t desiredReleaseFrames( void ) const;
+	virtual f_cnt_t desiredReleaseFrames() const;
 
 	virtual PluginView * instantiateView( QWidget * _parent );
 
 
 /*public slots:
-	void updateKnobHint( void );
-	void updateKnobToolTip( void );*/
+	void updateKnobHint();
+	void updateKnobToolTip();*/
 
 private:
 	// voices
@@ -139,7 +139,7 @@ public:
 	virtual ~sidInstrumentView();
 
 private:
-	virtual void modelChanged( void );
+	virtual void modelChanged();
 	
 	automatableButtonGroup * m_passBtnGrp;
 	automatableButtonGroup * m_sidTypeBtnGrp;
@@ -194,8 +194,8 @@ private:
 	pixmapButton * m_offButton;
 
 protected slots:
-	void updateKnobHint( void );
-	void updateKnobToolTip( void );
+	void updateKnobHint();
+	void updateKnobToolTip();
 } ;
 
 

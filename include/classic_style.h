@@ -40,7 +40,7 @@ public:
 
     // QT stuff
 
-	virtual QPalette standardPalette( void ) const;
+	virtual QPalette standardPalette() const;
 
 	virtual void drawComplexControl(
 				ComplexControl control,

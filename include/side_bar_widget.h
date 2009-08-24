@@ -38,11 +38,11 @@ public:
 	sideBarWidget( const QString & _title, const QPixmap & _icon,
 							QWidget * _parent );
 	virtual ~sideBarWidget();
-	inline const QPixmap & icon( void ) const
+	inline const QPixmap & icon() const
 	{
 		return( m_icon );
 	}
-	inline const QString & title( void ) const
+	inline const QString & title() const
 	{
 		return( m_title );
 	}
@@ -55,7 +55,7 @@ protected:
 	{
 	}
 
-	inline QWidget * contentParent( void )
+	inline QWidget * contentParent()
 	{
 		return( m_contents );
 	}

@@ -217,7 +217,7 @@ void sidInstrument::loadSettings( const QDomElement & _this )
 
 
 
-QString sidInstrument::nodeName( void ) const
+QString sidInstrument::nodeName() const
 {
 	return( sid_plugin_descriptor.name );
 }
@@ -225,7 +225,7 @@ QString sidInstrument::nodeName( void ) const
 
 
 
-f_cnt_t sidInstrument::desiredReleaseFrames( void ) const
+f_cnt_t sidInstrument::desiredReleaseFrames() const
 {
 	const float samplerate = engine::getMixer()->processingSampleRate();
 	int maxrel = 0;
@@ -477,7 +477,7 @@ sidInstrumentView::sidInstrumentView( Instrument * _instrument,
 	InstrumentView( _instrument, _parent )
 {
 
-	setAutoFillBackground( TRUE );
+	setAutoFillBackground( true );
 	QPalette pal;
 	pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap( "artwork" ) );
 	setPalette( pal );
@@ -518,7 +518,7 @@ sidInstrumentView::sidInstrumentView( Instrument * _instrument,
 	m_passBtnGrp->addButton( lp_btn );
 
 	m_offButton = new pixmapButton( this, NULL );
-	m_offButton->setCheckable( TRUE );
+	m_offButton->setCheckable( true );
 	m_offButton->move( 176 + 3*14, 53 );
 	m_offButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "3offred" ) );
 	m_offButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "3off" ) );
@@ -624,7 +624,7 @@ sidInstrumentView::sidInstrumentView( Instrument * _instrument,
 		int syncRingWidth[] = { 3, 1, 2 };
 
 		pixmapButton * sync_btn = new pixmapButton( this, NULL );
-		sync_btn->setCheckable( TRUE );
+		sync_btn->setCheckable( true );
 		sync_btn->move( 191, 117 + i*50 );
 		sync_btn->setActiveGraphic(
 			PLUGIN_NAME::getIconPixmap( "syncred" ) );
@@ -637,7 +637,7 @@ sidInstrumentView::sidInstrumentView( Instrument * _instrument,
 			.arg( syncRingWidth[i] ) );
 
 		pixmapButton * ringMod_btn = new pixmapButton( this, NULL );
-		ringMod_btn->setCheckable( TRUE );
+		ringMod_btn->setCheckable( true );
 		ringMod_btn->move( 191 + 2*14, 117 + i*50 );
 		ringMod_btn->setActiveGraphic(
 			PLUGIN_NAME::getIconPixmap( "ringred" ) );
@@ -650,7 +650,7 @@ sidInstrumentView::sidInstrumentView( Instrument * _instrument,
 			.arg( syncRingWidth[i] ) );
 
 		pixmapButton * filter_btn = new pixmapButton( this, NULL );
-		filter_btn->setCheckable( TRUE );
+		filter_btn->setCheckable( true );
 		filter_btn->move( 191, 131 + i*50 );
 		filter_btn->setActiveGraphic(
 			PLUGIN_NAME::getIconPixmap( "filterred" ) );
@@ -663,7 +663,7 @@ sidInstrumentView::sidInstrumentView( Instrument * _instrument,
 			"it." ).arg( i+1 ) );
 
 		pixmapButton * test_btn = new pixmapButton( this, NULL );
-		test_btn->setCheckable( TRUE );
+		test_btn->setCheckable( true );
 		test_btn->move( 191 +2*14, 131 + i*50 );
 		test_btn->setActiveGraphic(
 			PLUGIN_NAME::getIconPixmap( "testred" ) );
@@ -683,7 +683,7 @@ sidInstrumentView::~sidInstrumentView()
 {
 }
 
-void sidInstrumentView::updateKnobHint( void )
+void sidInstrumentView::updateKnobHint()
 {
 	sidInstrument * k = castModel<sidInstrument>();
 
@@ -724,7 +724,7 @@ void sidInstrumentView::updateKnobHint( void )
 
 
 
-void sidInstrumentView::updateKnobToolTip( void )
+void sidInstrumentView::updateKnobToolTip()
 {
 	sidInstrument * k = castModel<sidInstrument>();
 	for( int i = 0; i < 3; ++i )
@@ -744,7 +744,7 @@ void sidInstrumentView::updateKnobToolTip( void )
 
 
 
-void sidInstrumentView::modelChanged( void )
+void sidInstrumentView::modelChanged()
 {
 	sidInstrument * k = castModel<sidInstrument>();
 

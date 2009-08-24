@@ -49,7 +49,7 @@ public:
 private:
 	class PreviewTrackContainer : public trackContainer
 	{
-		virtual QString nodeName( void ) const
+		virtual QString nodeName() const
 		{
 			return "PreviewTrackContainer";
 		}

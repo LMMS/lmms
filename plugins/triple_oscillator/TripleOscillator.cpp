@@ -481,7 +481,7 @@ TripleOscillatorView::TripleOscillatorView( Instrument * _instrument,
 							QWidget * _parent ) :
 	InstrumentView( _instrument, _parent )
 {
-	setAutoFillBackground( TRUE );
+	setAutoFillBackground( true );
 	QPalette pal;
 	pal.setBrush( backgroundRole(),
 				PLUGIN_NAME::getIconPixmap( "artwork" ) );
@@ -612,7 +612,7 @@ TripleOscillatorView::TripleOscillatorView( Instrument * _instrument,
 
 		// setup volume-knob
 		knob * vk = new knob( knobStyled, this );
-		vk->setVolumeKnob( TRUE );
+		vk->setVolumeKnob( true );
 		vk->setFixedSize( 28, 35 );
 		vk->move( 2, knob_y );
 		vk->setHintText( tr( "Osc %1 volume:" ).arg(

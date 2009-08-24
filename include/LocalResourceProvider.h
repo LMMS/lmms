@@ -40,18 +40,18 @@ public:
 						const QString & _dir );
 	virtual ~LocalResourceProvider();
 
-	virtual QString providerName( void ) const
+	virtual QString providerName() const
 	{
 		return "LocalResourceProvider";
 	}
 
-	virtual void updateDatabase( void );
+	virtual void updateDatabase();
 
 	virtual int dataSize( const ResourceItem * _item ) const;
 	virtual QByteArray fetchData( const ResourceItem * _item,
 						int _maxSize = -1 ) const;
 
-	virtual bool isLocal( void ) const
+	virtual bool isLocal() const
 	{
 		return true;
 	}

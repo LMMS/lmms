@@ -203,7 +203,7 @@ void papuInstrument::loadSettings( const QDomElement & _this )
 	m_graphModel.setSamples( (float*) dst );
 }
 
-QString papuInstrument::nodeName( void ) const
+QString papuInstrument::nodeName() const
 {
 	return( papu_plugin_descriptor.name );
 }
@@ -211,7 +211,7 @@ QString papuInstrument::nodeName( void ) const
 
 
 
-/*f_cnt_t papuInstrument::desiredReleaseFrames( void ) const
+/*f_cnt_t papuInstrument::desiredReleaseFrames() const
 {
 	const float samplerate = engine::getMixer()->processingSampleRate();
 	int maxrel = 0;
@@ -224,7 +224,7 @@ QString papuInstrument::nodeName( void ) const
 	return f_cnt_t( float(relTime[maxrel])*samplerate/1000.0 );
 }*/
 
-f_cnt_t papuInstrument::desiredReleaseFrames( void ) const
+f_cnt_t papuInstrument::desiredReleaseFrames() const
 {
 	return f_cnt_t( 1000 );
 }
@@ -689,7 +689,7 @@ papuInstrumentView::~papuInstrumentView()
 }
 
 
-void papuInstrumentView::modelChanged( void )
+void papuInstrumentView::modelChanged()
 {
 	papuInstrument * p = castModel<papuInstrument>();
 

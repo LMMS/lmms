@@ -43,7 +43,7 @@ AudioFileFlac::AudioFileFlac( const sample_rate_t _sample_rate,
 }
 
 
-bool AudioFileFlac::startEncoding( void )
+bool AudioFileFlac::startEncoding()
 {
 	// check the encoder
 	if( ! m_encoder )
@@ -111,7 +111,7 @@ void AudioFileFlac::writeBuffer( const surroundSampleFrame * _ab,
 }
 
 
-void AudioFileFlac::finishEncoding( void )
+void AudioFileFlac::finishEncoding()
 {
 	m_encoder.finish();
 }

@@ -48,7 +48,7 @@ ResourceProvider::~ResourceProvider()
 
 
 
-QString ResourceProvider::localCacheFile( void ) const
+QString ResourceProvider::localCacheFile() const
 {
 	const QString dir = configManager::inst()->workingDir() +
 					".resources" + QDir::separator();

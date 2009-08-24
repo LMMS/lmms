@@ -72,7 +72,7 @@ bool bassBoosterEffect::processAudioBuffer( sampleFrame * _buf,
 {
 	if( !isEnabled() || !isRunning () )
 	{
-		return( FALSE );
+		return( false );
 	}
 
 	double out_sum = 0.0;

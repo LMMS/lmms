@@ -72,7 +72,7 @@ void UnifiedResourceProvider::addDatabase( ResourceDB * _db )
 
 
 
-void UnifiedResourceProvider::updateDatabase( void )
+void UnifiedResourceProvider::updateDatabase()
 {
 	foreach( ResourceDB * db, m_mergedDatabases )
 	{
@@ -83,7 +83,7 @@ void UnifiedResourceProvider::updateDatabase( void )
 
 
 
-void UnifiedResourceProvider::remergeItems( void )
+void UnifiedResourceProvider::remergeItems()
 {
 	typedef QHash<const ResourceItem *,
 			const ResourceItem *> PointerHashMap;

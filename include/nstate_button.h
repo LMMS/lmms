@@ -46,7 +46,7 @@ public:
 		m_generalToolTip = _tooltip;
 	}
 
-	inline int state( void ) const
+	inline int state() const
 	{
 		return( m_curState );
 	}

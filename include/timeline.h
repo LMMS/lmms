@@ -64,33 +64,33 @@ public:
 				const midiTime & _begin, QWidget * _parent );
 	virtual ~timeLine();
 
-	inline song::playPos & pos( void )
+	inline song::playPos & pos()
 	{
 		return( m_pos );
 	}
 
-	AutoScrollStates autoScroll( void ) const
+	AutoScrollStates autoScroll() const
 	{
 		return m_autoScroll;
 	}
 
-	BehaviourAtStopStates behaviourAtStop( void ) const
+	BehaviourAtStopStates behaviourAtStop() const
 	{
 		return m_behaviourAtStop;
 	}
 
-	bool loopPointsEnabled( void ) const
+	bool loopPointsEnabled() const
 	{
 		return m_loopPoints == LoopPointsEnabled;
 	}
 
-	inline const midiTime & loopBegin( void ) const
+	inline const midiTime & loopBegin() const
 	{
 		return ( m_loopPos[0] < m_loopPos[1] ) ?
 						m_loopPos[0] : m_loopPos[1];
 	}
 
-	inline const midiTime & loopEnd( void ) const
+	inline const midiTime & loopEnd() const
 	{
 		return ( m_loopPos[0] > m_loopPos[1] ) ?
 						m_loopPos[0] : m_loopPos[1];
@@ -100,7 +100,7 @@ public:
 	{
 		m_savedPos = _pos;
 	}
-	inline const midiTime & savedPos( void ) const
+	inline const midiTime & savedPos() const
 	{
 		return m_savedPos;
 	}
@@ -116,7 +116,7 @@ public:
 
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
 	virtual void loadSettings( const QDomElement & _this );
-	inline virtual QString nodeName( void ) const
+	inline virtual QString nodeName() const
 	{
 		return "timeline";
 	}
@@ -130,7 +130,7 @@ public:
 
 public slots:
 	void updatePosition( const midiTime & );
-	void updatePosition( void )
+	void updatePosition()
 	{
 		updatePosition( midiTime() );
 	}

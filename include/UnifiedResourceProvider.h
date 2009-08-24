@@ -38,12 +38,12 @@ public:
 
 	void addDatabase( ResourceDB * _db );
 
-	virtual QString providerName( void ) const
+	virtual QString providerName() const
 	{
 		return "UnifiedResourceProvider";
 	}
 
-	virtual void updateDatabase( void );
+	virtual void updateDatabase();
 
 	virtual int dataSize( const ResourceItem * _item ) const
 	{
@@ -64,19 +64,19 @@ public:
 		return QByteArray();
 	}
 
-	virtual bool isLocal( void ) const
+	virtual bool isLocal() const
 	{
 		return false;
 	}
 
-	virtual bool cacheDatabase( void ) const
+	virtual bool cacheDatabase() const
 	{
 		return false;
 	}
 
 
 private slots:
-	void remergeItems( void );
+	void remergeItems();
 
 
 private:

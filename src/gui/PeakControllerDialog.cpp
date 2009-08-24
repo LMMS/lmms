@@ -70,7 +70,7 @@ PeakControllerDialog::~PeakControllerDialog()
 
 
 /*
-void effectView::displayHelp( void )
+void effectView::displayHelp()
 {
 	QWhatsThis::showText( mapToGlobal( rect().bottomRight() ),
 								whatsThis() );
@@ -79,10 +79,10 @@ void effectView::displayHelp( void )
 
 
 
-void effectView::closeEffects( void )
+void effectView::closeEffects()
 {
 	m_subWindow->hide();
-	m_show = TRUE;
+	m_show = true;
 }
 */
 
@@ -101,7 +101,7 @@ void PeakControllerDialog::paintEvent( QPaintEvent * )
 
 
 
-void PeakControllerDialog::modelChanged( void )
+void PeakControllerDialog::modelChanged()
 {
 	m_peakController = castModel<PeakController>();
 }

@@ -79,7 +79,7 @@ bool spectrumAnalyzer::processAudioBuffer( sampleFrame * _buf,
 {
 	if( !isEnabled() || !isRunning () )
 	{
-		return( FALSE );
+		return( false );
 	}
 
 	fpp_t f = 0;

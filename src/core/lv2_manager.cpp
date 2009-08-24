@@ -78,7 +78,7 @@ LV2World::~LV2World()
 
 
 
-lv2Manager::lv2Manager( void )
+lv2Manager::lv2Manager()
 {
 	if( m_lv2_bundle.world == NULL )
 	{

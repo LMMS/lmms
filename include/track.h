@@ -184,7 +184,7 @@ protected:
 	virtual void mouseMoveEvent( QMouseEvent * _me );
 	virtual void mouseReleaseEvent( QMouseEvent * _me );
 
-	void setAutoResizeEnabled( bool _e = FALSE );
+	void setAutoResizeEnabled( bool _e = false );
 	float pixelsPerTact();
 
 	inline trackView * getTrackView()
@@ -383,7 +383,7 @@ public:
 
 	void setSimpleSerializing()
 	{
-		m_simpleSerializingMode = TRUE;
+		m_simpleSerializingMode = true;
 	}
 
 	// -- for usage by trackContentObject only ---------------

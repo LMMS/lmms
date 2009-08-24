@@ -42,12 +42,12 @@ public:
 	comboBox( QWidget * _parent, const QString & _name = QString() );
 	virtual ~comboBox();
 
-	ComboBoxModel * model( void )
+	ComboBoxModel * model()
 	{
 		return( castModel<ComboBoxModel>() );
 	}
 
-	const ComboBoxModel * model( void ) const
+	const ComboBoxModel * model() const
 	{
 		return( castModel<ComboBoxModel>() );
 	}

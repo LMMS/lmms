@@ -68,7 +68,7 @@ visualizationWidget::~visualizationWidget()
 
 
 
-void visualizationWidget::updateAudioBuffer( void )
+void visualizationWidget::updateAudioBuffer()
 {
 	if( !engine::getSong()->isExporting() )
 	{

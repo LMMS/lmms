@@ -68,14 +68,14 @@ public:
 			     MidiControlListener::EventAction _action );
 
 protected slots:
-	virtual void accept( void );
+	virtual void accept();
 
 
 private slots:
 	// general settings widget
 	void setBufferSize( int _value );
-	void resetBufSize( void );
-	void displayBufSizeHelp( void );
+	void resetBufSize();
+	void displayBufSizeHelp();
 
 	// path settings widget
 	void setWorkingDir( const QString & _wd );
@@ -90,11 +90,11 @@ private slots:
 	
 	// audio settings widget
 	void audioInterfaceChanged( const QString & _driver );
-	void displayAudioHelp( void );
+	void displayAudioHelp();
 
 	// MIDI settings widget
 	void midiInterfaceChanged( const QString & _driver );
-	void displayMIDIHelp( void );
+	void displayMIDIHelp();
 
 
 	void toggleToolTips( bool _enabled );
@@ -103,15 +103,15 @@ private slots:
 	void toggleMMPZ( bool _enabled );
 	void toggleHQAudioDev( bool _enabled );
 
-	void openWorkingDir( void );
-	void openVSTDir( void );
-	void openArtworkDir( void );
-	void openFLDir( void );
-	void openLADSPADir( void );
-	void openSTKDir( void );
-	void openDefaultSoundfont( void );
-	void openBackgroundArtwork( void );
-	void openLameLibrary( void );
+	void openWorkingDir();
+	void openVSTDir();
+	void openArtworkDir();
+	void openFLDir();
+	void openLADSPADir();
+	void openSTKDir();
+	void openDefaultSoundfont();
+	void openBackgroundArtwork();
+	void openLameLibrary();
 
 	void toggleDisableChActInd( bool _disabled );
 	void toggleManualChPiano( bool _enabled );
@@ -119,13 +119,13 @@ private slots:
 	void toggleMCLEnabled( bool _enabled );
 	void toggleMCLControlKey( bool _enabled );
 	
-	void mclNewAction( void );
-	void mclDelAction( void );
-	void displayMclHelp( void );
+	void mclNewAction();
+	void mclDelAction();
+	void displayMclHelp();
 
 private:
 	groupBox * setupMidiControlListener( QWidget * midi );
-	void mclUpdateActionTable( void );
+	void mclUpdateActionTable();
 	
 	tabBar * m_tabBar;
 

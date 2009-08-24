@@ -68,9 +68,9 @@ private:
 
 
 private slots:
-	void oscButtonChanged( void );
-	void updateVolume( void );
-	void updateDetuning( void );
+	void oscButtonChanged();
+	void updateVolume();
+	void updateDetuning();
 
 } ;
 
@@ -90,13 +90,13 @@ public:
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
 	virtual void loadSettings( const QDomElement & _this );
 
-	virtual QString nodeName( void ) const;
+	virtual QString nodeName() const;
 	
 	int intRand( int min, int max );
 
 
 public slots:
-	void randomiseSettings( void );
+	void randomiseSettings();
 
 
 private:
@@ -127,7 +127,7 @@ private:
 	virtual PluginView * instantiateView( QWidget * _parent );
 
 private slots:
-	void updateAllDetuning( void );
+	void updateAllDetuning();
 
 	friend class organicInstrumentView;
 } ;
@@ -141,7 +141,7 @@ public:
 	virtual ~organicInstrumentView();
 
 private:
-	virtual void modelChanged( void );
+	virtual void modelChanged();
 
 	struct OscillatorKnobs
 	{

@@ -40,27 +40,27 @@ public:
 	ResourceProvider( const QString & _url );
 	virtual ~ResourceProvider();
 
-	virtual QString providerName( void ) const = 0;
-	virtual void updateDatabase( void ) = 0;
+	virtual QString providerName() const = 0;
+	virtual void updateDatabase() = 0;
 	virtual int dataSize( const ResourceItem * _item ) const = 0;
 	virtual QByteArray fetchData( const ResourceItem * _item,
 					int _maxSize = -1 ) const = 0;
 	// return wether this provider provides local resources
-	virtual bool isLocal( void ) const = 0;
+	virtual bool isLocal() const = 0;
 
-	virtual bool cacheDatabase( void ) const
+	virtual bool cacheDatabase() const
 	{
 		return true;
 	}
 
-	inline const QString & url( void ) const
+	inline const QString & url() const
 	{
 		return m_url;
 	}
 
-	QString localCacheFile( void ) const;
+	QString localCacheFile() const;
 
-	ResourceDB * database( void )
+	ResourceDB * database()
 	{
 		return m_database;
 	}
@@ -72,7 +72,7 @@ private:
 
 
 signals:
-	void itemsChanged( void );
+	void itemsChanged();
 
 } ;
 

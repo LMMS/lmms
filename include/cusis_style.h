@@ -39,7 +39,7 @@ public:
 	{
 	}
 
-	virtual QPalette standardPalette( void ) const;
+	virtual QPalette standardPalette() const;
 
 	virtual void drawComplexControl( ComplexControl _control,
 			const QStyleOptionComplex * _option, QPainter * _painter,

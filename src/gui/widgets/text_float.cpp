@@ -33,7 +33,7 @@
 
 
 
-textFloat::textFloat( void ) :
+textFloat::textFloat() :
 	QWidget( engine::mainWindow(), Qt::ToolTip ),
 	m_title( "" ),
 	m_text( "" ),
@@ -101,7 +101,7 @@ textFloat * textFloat::displayMessage( const QString & _msg, int _timeout,
 	tf->show();
 	if( _timeout > 0 )
 	{
-		tf->setAttribute( Qt::WA_DeleteOnClose, TRUE );
+		tf->setAttribute( Qt::WA_DeleteOnClose, true );
 		QTimer::singleShot( _timeout, tf, SLOT( close() ) );
 	}
 	return( tf );
@@ -144,14 +144,14 @@ void textFloat::paintEvent( QPaintEvent * _pe )
 	else
 	{
 		int text_x = 2;
-		if( m_pixmap.isNull() == FALSE )
+		if( m_pixmap.isNull() == false )
 		{
 			p.drawPixmap( 5, 5, m_pixmap );
 			text_x += m_pixmap.width() + 8;
 		}
 		p.drawText( text_x, 28, m_text );
 		QFont f = p.font();
-		f.setBold( TRUE );
+		f.setBold( true );
 		p.setFont( f );
 		p.drawText( text_x, 12, m_title );
 	}
@@ -168,14 +168,14 @@ void textFloat::mousePressEvent( QMouseEvent * )
 
 
 
-void textFloat::updateSize( void )
+void textFloat::updateSize()
 {
 	QFontMetrics metrics( pointSize<8>( font() ) );
 	QRect textBound = metrics.boundingRect( m_text );
 	if( m_title != "" )
 	{
 		QFont f = pointSize<8>( font() );
-		f.setBold( TRUE );
+		f.setBold( true );
 		int title_w = QFontMetrics( f ).boundingRect( m_title ).width();
 		if( title_w > textBound.width() )
 		{
@@ -183,7 +183,7 @@ void textFloat::updateSize( void )
 		}
 		textBound.setHeight( textBound.height() * 2 + 14 );
 	}
-	if( m_pixmap.isNull() == FALSE )
+	if( m_pixmap.isNull() == false )
 	{
 		textBound.setWidth( textBound.width() + m_pixmap.width() + 10 );
 	}

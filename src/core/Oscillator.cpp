@@ -306,7 +306,7 @@ void Oscillator::updateFM( sampleFrame * _ab, const fpp_t _frames,
 
 
 // should be called every time phase-offset is changed...
-inline void Oscillator::recalcPhase( void )
+inline void Oscillator::recalcPhase()
 {
 	if( !typeInfo<float>::isEqual( m_phaseOffset, m_ext_phaseOffset ) )
 	{

@@ -40,12 +40,12 @@ public:
 
 
 public slots:
-	virtual void update( void );
+	virtual void update();
 
 
 protected slots:
-	void resetName( void );
-	void changeName( void );
+	void resetName();
+	void changeName();
 	void disconnectObject( QAction * _a );
 
 

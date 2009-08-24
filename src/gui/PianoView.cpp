@@ -306,7 +306,7 @@ int PianoView::getKeyFromKeyEvent( QKeyEvent * _ke )
 /*! \brief Register a change to this piano display view
  *
  */
-void PianoView::modelChanged( void )
+void PianoView::modelChanged()
 {
 	m_piano = castModel<Piano>();
 	if( m_piano != NULL )

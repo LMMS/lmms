@@ -824,7 +824,7 @@ groupBox * setupDialog::setupMidiControlListener( QWidget * midi )
 
 
 
-void setupDialog::mclUpdateActionTable( void )
+void setupDialog::mclUpdateActionTable()
 {
 	m_mclActionTableMap.clear();
 	
@@ -1222,7 +1222,7 @@ void setupDialog::openDefaultSoundfont()
 }
 
 
-void setupDialog::openLameLibrary( void )
+void setupDialog::openLameLibrary()
 {
     QString new_file = QFileDialog::getOpenFileName( this,
         tr( "Find LAME Library" ), m_lameLibrary, "libmp3lame.so.0" );
@@ -1393,7 +1393,7 @@ void setupDialog::toggleMCLControlKey( bool _enabled )
 
 
 
-void setupDialog::mclNewAction( void )
+void setupDialog::mclNewAction()
 {
 	setupDialogMCL sdMcl( this );
 	sdMcl.exec();
@@ -1402,7 +1402,7 @@ void setupDialog::mclNewAction( void )
 
 
 
-void setupDialog::mclDelAction( void )
+void setupDialog::mclDelAction()
 {
 	
 	int row = m_mclActionTable->currentRow();
@@ -1446,7 +1446,7 @@ void setupDialog::mclAddControllerAction( int _controller,
 
 
 
-void setupDialog::displayMclHelp( void )
+void setupDialog::displayMclHelp()
 {
 	QWhatsThis::showText( QCursor::pos(),
 			     tr( "You can remote control LMMS via MIDI: " 

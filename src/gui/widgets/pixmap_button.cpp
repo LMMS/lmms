@@ -37,10 +37,10 @@ pixmapButton::pixmapButton( QWidget * _parent, const QString & _name ) :
 	automatableButton( _parent, _name ),
 	m_activePixmap(),
 	m_inactivePixmap(),
-	m_pressed( FALSE )
+	m_pressed( false )
 {
 	setActiveGraphic( embed::getIconPixmap( "led_yellow" ) );
-	setInactiveGraphic( embed::getIconPixmap( "led_off" ), FALSE );
+	setInactiveGraphic( embed::getIconPixmap( "led_off" ), false );
 }
 
 
@@ -79,7 +79,7 @@ void pixmapButton::mousePressEvent( QMouseEvent * _me )
 	// Show pressing graphics if this isn't checkable
 	if( !isCheckable() )
 	{
-		m_pressed = TRUE;
+		m_pressed = true;
 		update();
 	}
 
@@ -95,7 +95,7 @@ void pixmapButton::mouseReleaseEvent( QMouseEvent * _me )
 
 	if( !isCheckable() )
 	{
-		m_pressed = FALSE;
+		m_pressed = false;
 		update();
 	}
 }

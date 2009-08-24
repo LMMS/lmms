@@ -128,7 +128,7 @@ HDC fl_makeDC(HBITMAP bitmap) {
   SetTextAlign(new_gc, TA_BASELINE|TA_LEFT);
   SetBkMode(new_gc, TRANSPARENT);
 #if USE_COLORMAP
-  if (fl_palette) SelectPalette(new_gc, fl_palette, FALSE);
+  if (fl_palette) SelectPalette(new_gc, fl_palette, false);
 #endif
   SelectObject(new_gc, bitmap);
   return new_gc;

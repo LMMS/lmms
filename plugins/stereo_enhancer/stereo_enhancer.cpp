@@ -93,7 +93,7 @@ bool stereoEnhancerEffect::processAudioBuffer( sampleFrame * _buf,
 	
 	if( !isEnabled() || !isRunning() )
 	{
-		return( FALSE );
+		return( false );
 	}
 
 	const float d = dryLevel();

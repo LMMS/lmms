@@ -78,7 +78,7 @@ ResourceDB::~ResourceDB()
 
 
 
-void ResourceDB::init( void )
+void ResourceDB::init()
 {
 	if( QFileInfo( m_provider->localCacheFile() ).exists() )
 	{

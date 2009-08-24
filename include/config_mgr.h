@@ -48,7 +48,7 @@ const QString LOCALE_PATH = "locale/";
 class EXPORT configManager
 {
 public:
-	static inline configManager * inst( void )
+	static inline configManager * inst()
 	{
 		if( s_instanceOfMe == NULL )
 		{
@@ -57,112 +57,112 @@ public:
 		return s_instanceOfMe;
 	}
 
-	const QString & dataDir( void ) const
+	const QString & dataDir() const
 	{
 		return m_dataDir;
 	}
 
-	const QString & workingDir( void ) const
+	const QString & workingDir() const
 	{
 		return m_workingDir;
 	}
 
-	QString userProjectsDir( void ) const
+	QString userProjectsDir() const
 	{
 		return workingDir() + PROJECTS_PATH;
 	}
 
-	QString userPresetsDir( void ) const
+	QString userPresetsDir() const
 	{
 		return workingDir() + PRESETS_PATH;
 	}
 
-	QString userSamplesDir( void ) const
+	QString userSamplesDir() const
 	{
 		return workingDir() + SAMPLES_PATH;
 	}
 
-	QString factoryProjectsDir( void ) const
+	QString factoryProjectsDir() const
 	{
 		return dataDir() + PROJECTS_PATH;
 	}
 
-	QString factoryPresetsDir( void ) const
+	QString factoryPresetsDir() const
 	{
 		return dataDir() + PRESETS_PATH;
 	}
 
-	QString factorySamplesDir( void ) const
+	QString factorySamplesDir() const
 	{
 		return dataDir() + SAMPLES_PATH;
 	}
 
-	QString defaultArtworkDir( void ) const
+	QString defaultArtworkDir() const
 	{
 		return m_dataDir + DEFAULT_THEME_PATH;
 	}
 
-	QString defaultLameLibrary( void ) const
+	QString defaultLameLibrary() const
 	{
 		return "/usr/lib/libmp3lame.so.0";
 	}
 
 
-	QString artworkDir( void ) const
+	QString artworkDir() const
 	{
 		return m_artworkDir;
 	}
 
-	QString localeDir( void ) const
+	QString localeDir() const
 	{
 		return m_dataDir + LOCALE_PATH;
 	}
 
-	const QString & pluginDir( void ) const
+	const QString & pluginDir() const
 	{
 		return m_pluginDir;
 	}
 
-	const QString & vstDir( void ) const
+	const QString & vstDir() const
 	{
 		return m_vstDir;
 	}
 
-	const QString & flDir( void ) const
+	const QString & flDir() const
 	{
 		return m_flDir;
 	}
 
-	const QString & ladspaDir( void ) const
+	const QString & ladspaDir() const
 	{
 		return m_ladDir;
 	}
 
 #ifdef LMMS_HAVE_STK
-	const QString & stkDir( void ) const
+	const QString & stkDir() const
 	{
 		return m_stkDir;
 	}
 #endif
 
 #ifdef LMMS_HAVE_FLUIDSYNTH
-	const ResourceItem * defaultSoundfont( void ) const
+	const ResourceItem * defaultSoundfont() const
 	{
 		return m_defaultSoundfont;
 	}
 #endif
 
-    const QString & lameLibrary( void ) const
+    const QString & lameLibrary() const
     {
         return m_lameLibrary;
     }
 
-	const QString & backgroundArtwork( void ) const
+	const QString & backgroundArtwork() const
 	{
 		return m_backgroundArtwork;
 	}
 
-	inline const QStringList & recentlyOpenedProjects( void ) const
+	inline const QStringList & recentlyOpenedProjects() const
 	{
 		return m_recentlyOpenedProjects;
 	}
@@ -174,8 +174,8 @@ public:
 	void setValue( const QString & _class, const QString & _attribute,
 						const QString & _value );
 
-	void loadConfigFile( void );
-	void saveConfigFile( void );
+	void loadConfigFile();
+	void saveConfigFile();
 
 
 	void setWorkingDir( const QString & _wd );
@@ -192,7 +192,7 @@ public:
 private:
 	static configManager * s_instanceOfMe;
 
-	configManager( void );
+	configManager();
 	configManager( const configManager & _c );
 	~configManager();
 

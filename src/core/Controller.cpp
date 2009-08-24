@@ -114,7 +114,7 @@ float Controller::runningTime()
 
 
 
-void Controller::triggerFrameCounter( void )
+void Controller::triggerFrameCounter()
 {
 	for( int i = 0; i < s_controllers.size(); ++i ) 
 	{
@@ -131,7 +131,7 @@ void Controller::triggerFrameCounter( void )
 
 
 
-void Controller::resetFrameCounter( void )
+void Controller::resetFrameCounter()
 {
 	s_frames = 0;
 }
@@ -239,7 +239,7 @@ void Controller::loadSettings( const QDomElement & _this )
 }
 
 
-QString Controller::nodeName( void ) const
+QString Controller::nodeName() const
 {
 	return( "Controller" );
 }

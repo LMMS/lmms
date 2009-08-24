@@ -88,7 +88,7 @@ QColor ClassicStyle::color( LmmsStyle::ColorRole _role ) const
 
 
 
-QPalette ClassicStyle::standardPalette( void ) const
+QPalette ClassicStyle::standardPalette() const
 {
 	QPalette pal = QPlastiqueStyle::standardPalette();
 	pal.setColor( QPalette::Background, QColor( 72, 76, 88 ) );

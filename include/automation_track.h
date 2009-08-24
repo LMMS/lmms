@@ -34,14 +34,14 @@
 class automationTrack : public track
 {
 public:
-	automationTrack( trackContainer * _tc, bool _hidden = FALSE );
+	automationTrack( trackContainer * _tc, bool _hidden = false );
 	virtual ~automationTrack();
 
 	virtual bool play( const midiTime & _start, const fpp_t _frames,
 						const f_cnt_t _frame_base,
 							Sint16 _tco_num = -1 );
 
-	virtual QString nodeName( void ) const
+	virtual QString nodeName() const
 	{
 		return( "automationtrack" );
 	}

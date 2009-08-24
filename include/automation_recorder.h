@@ -58,9 +58,9 @@ public:
 	
 	// must be called at some point between a recording ending and a new
 	// one beginning
-	void initRecord( void );
+	void initRecord();
 
-	inline bool recording( void ) const { return m_recording; }
+	inline bool recording() const { return m_recording; }
 	inline void setRecording( bool _recording ){ m_recording = _recording; }
 
 private:

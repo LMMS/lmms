@@ -46,22 +46,22 @@ public:
 	ControllerView( Controller * _controller, QWidget * _parent );
 	virtual ~ControllerView();
 	
-	inline Controller * getController( void )
+	inline Controller * getController()
 	{
 		return( castModel<Controller>() );
 	}
 
-	inline const Controller * getController( void ) const
+	inline const Controller * getController() const
 	{
 		return( castModel<Controller>() );
 	}
 
 
 public slots:
-	void editControls( void );
-	void deleteController( void );
-	void displayHelp( void );
-	void closeControls( void );
+	void editControls();
+	void deleteController();
+	void displayHelp();
+	void closeControls();
 
 	
 signals:
@@ -71,7 +71,7 @@ signals:
 protected:
 	virtual void contextMenuEvent( QContextMenuEvent * _me );
 	virtual void paintEvent( QPaintEvent * _pe );
-	virtual void modelChanged( void );
+	virtual void modelChanged();
 	virtual void mouseDoubleClickEvent( QMouseEvent * event );
 
 

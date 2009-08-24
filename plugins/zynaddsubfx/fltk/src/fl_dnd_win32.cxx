@@ -343,7 +343,7 @@ public:
   }
 
   HRESULT __stdcall Next(ULONG celt, FORMATETC * rgelt, ULONG *pceltFetched) {
-    if (n > 0) return S_FALSE;
+    if (n > 0) return S_false;
     for (ULONG i = 0; i < celt; i++) {
       n++;
       rgelt->cfFormat = CF_HDROP;
@@ -358,7 +358,7 @@ public:
 
   HRESULT __stdcall Skip(ULONG celt) {
     n += celt;
-    return  (n == 0) ? S_OK : S_FALSE;
+    return  (n == 0) ? S_OK : S_false;
   }
 
   HRESULT __stdcall Reset(void) {
@@ -434,14 +434,14 @@ public:
 //      df->pFiles = sizeof(DROPFILES);
 //      df->pt.x = 0;
 //      df->pt.y = 0;
-//      df->fNC = FALSE;
+//      df->fNC = false;
 //      for (int i = 0; i < fl_selection_length[0]; i++) {
 //        if (fl_selection_buffer[0][i] == '\n') {
 //          fl_selection_buffer[0][i] = '\0';
 //        }
 //      }
 //
-//        df->fWide = TRUE;
+//        df->fWide = true;
 //        l = fl_utf2unicode((unsigned char*)fl_selection_buffer[0],
 //                             fl_selection_length[0], (xchar*)(((char*)pMem)
 //                              + sizeof(DROPFILES)));

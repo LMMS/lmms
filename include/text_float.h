@@ -35,7 +35,7 @@
 class EXPORT textFloat : public QWidget
 {
 public:
-	textFloat( void );
+	textFloat();
 	virtual ~textFloat()
 	{
 	}
@@ -70,7 +70,7 @@ protected:
 
 
 private:
-	void updateSize( void );
+	void updateSize();
 
 	QString m_title;
 	QString m_text;

@@ -58,24 +58,24 @@ public:
 
 public slots:
 	void scrolled( int _new_pos );
-	void play( void );
-	void record( void );
-	void recordAccompany( void );
-	void stop( void );
+	void play();
+	void record();
+	void recordAccompany();
+	void stop();
 
 
 
 private slots:
 	void updateScrollBar( int );
 	void updatePosition( const midiTime & _t );
-	void zoomingChanged( void );
+	void zoomingChanged();
 
 
 private:
 	virtual void keyPressEvent( QKeyEvent * _ke );
 	virtual void wheelEvent( QWheelEvent * _we );
 
-	virtual bool allowRubberband( void ) const;
+	virtual bool allowRubberband() const;
 
 
 	song * m_s;

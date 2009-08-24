@@ -88,7 +88,7 @@ ChordCreatorView::~ChordCreatorView()
 
 
 
-void ChordCreatorView::modelChanged( void )
+void ChordCreatorView::modelChanged()
 {
 	m_cc = castModel<ChordCreator>();
 	m_chordsGroupBox->setModel( &m_cc->m_chordsEnabledModel );
@@ -187,7 +187,7 @@ ArpeggiatorView::~ArpeggiatorView()
 
 
 
-void ArpeggiatorView::modelChanged( void )
+void ArpeggiatorView::modelChanged()
 {
 	m_a = castModel<Arpeggiator>();
 	m_arpGroupBox->setModel( &m_a->m_arpEnabledModel );

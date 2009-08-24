@@ -39,7 +39,7 @@ public:
 
 public slots:
 	void setFilter( const QString & _s );
-	void updateFilter( void );
+	void updateFilter();
 
 	void currentChanged( const QModelIndex & current,
 		const QModelIndex & previous );

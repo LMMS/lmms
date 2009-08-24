@@ -34,7 +34,7 @@
 class sharedObject
 {
 public:
-	sharedObject( void ) :
+	sharedObject() :
 		m_referenceCount( 1 ),
 		m_lock()
 	{

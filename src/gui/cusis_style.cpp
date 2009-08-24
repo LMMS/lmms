@@ -278,7 +278,7 @@ CusisStyle::CusisStyle() :
 
 
 
-QPalette CusisStyle::standardPalette( void ) const
+QPalette CusisStyle::standardPalette() const
 {
 	QPalette pal = QPlastiqueStyle::standardPalette();
 	pal.setColor( QPalette::WindowText, QColor( 240, 240, 240 ) );

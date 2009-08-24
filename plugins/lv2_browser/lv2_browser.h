@@ -59,7 +59,7 @@ private:
 class lv2Browser : public ToolPlugin
 {
 public:
-	lv2Browser( void );
+	lv2Browser();
 	virtual ~lv2Browser();
 
 	virtual PluginView * instantiateView( QWidget * )
@@ -67,7 +67,7 @@ public:
 		return new lv2BrowserView( this );
 	}
 
-	virtual QString nodeName( void ) const;
+	virtual QString nodeName() const;
 
 } ;
 

@@ -34,15 +34,15 @@ stereoEnhancerControls::stereoEnhancerControls( stereoEnhancerEffect * _eff ) :
 		m_effect( _eff ),
 		m_widthModel(0.0f, 0.0f, 180.0f, 1.0f, this, tr( "Width" ) )
 {
-	connect( &m_widthModel, SIGNAL( dataChanged( void ) ),
-			this, SLOT( changeWideCoeff( void ) ) );
+	connect( &m_widthModel, SIGNAL( dataChanged() ),
+			this, SLOT( changeWideCoeff() ) );
 
 	changeWideCoeff();
 }
 
 
 
-void stereoEnhancerControls::changeWideCoeff( void )
+void stereoEnhancerControls::changeWideCoeff()
 {
 	m_effect->m_seFX.setWideCoeff( m_widthModel.value() );
 }

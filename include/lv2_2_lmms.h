@@ -34,27 +34,27 @@
 class EXPORT lv22LMMS : public lv2Manager
 {
 public:
-	inline l_sortable_plugin_t getInstruments( void )
+	inline l_sortable_plugin_t getInstruments()
 	{
 		return  m_instruments;
 	}
 
-	inline l_sortable_plugin_t getValidEffects( void )
+	inline l_sortable_plugin_t getValidEffects()
 	{
 		return  m_validEffects;
 	}
 
-	inline l_sortable_plugin_t getInvalidEffects( void )
+	inline l_sortable_plugin_t getInvalidEffects()
 	{
 		return  m_invalidEffects;
 	}
 
-	inline l_sortable_plugin_t getAnalysisTools( void )
+	inline l_sortable_plugin_t getAnalysisTools()
 	{
 		return  m_analysisTools;
 	}
 
-	inline l_sortable_plugin_t getOthers( void )
+	inline l_sortable_plugin_t getOthers()
 	{
 		return  m_otherPlugins;
 	}
@@ -63,7 +63,7 @@ public:
 
 
 private:
-	lv22LMMS( void );
+	lv22LMMS();
 	virtual ~lv22LMMS();
 
 	l_sortable_plugin_t m_instruments;

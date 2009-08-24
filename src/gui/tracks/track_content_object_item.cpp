@@ -50,17 +50,17 @@ TrackContentObjectItem::TrackContentObjectItem(
 	m_snapBackAnimation->setItem( this );
 
 
-	connect( m_tco, SIGNAL( lengthChanged( void ) ),
-	         this, SLOT( updateLength( void ) ), Qt::QueuedConnection );
+	connect( m_tco, SIGNAL( lengthChanged() ),
+	         this, SLOT( updateLength() ), Qt::QueuedConnection );
 
-	connect( m_tco, SIGNAL( positionChanged( void ) ),
-	         this, SLOT( updatePosition( void ) ), Qt::QueuedConnection );
+	connect( m_tco, SIGNAL( positionChanged() ),
+	         this, SLOT( updatePosition() ), Qt::QueuedConnection );
 
 }
 
 
 
-void TrackContentObjectItem::updateLength( void )
+void TrackContentObjectItem::updateLength()
 {
 	// TODO: only change if different?
 	prepareGeometryChange();
@@ -69,7 +69,7 @@ void TrackContentObjectItem::updateLength( void )
 
 
 
-void TrackContentObjectItem::updatePosition( void )
+void TrackContentObjectItem::updatePosition()
 {
 	midiTime startPos = m_tco->startPosition();
 	float x = TrackContainerScene::DEFAULT_CELL_WIDTH *

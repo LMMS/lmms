@@ -35,7 +35,7 @@
 
 
 
-ladspaManager::ladspaManager( void )
+ladspaManager::ladspaManager()
 {
 	QStringList ladspaDirectories = QString( getenv( "LADSPA_PATH" ) ).
 								split( ',' );
@@ -72,7 +72,7 @@ ladspaManager::ladspaManager( void )
 
 			QLibrary plugin_lib( f.absoluteFilePath() );
 
-			if( plugin_lib.load() == TRUE )
+			if( plugin_lib.load() == true )
 			{
 				LADSPA_Descriptor_Function descriptorFunction =
 			( LADSPA_Descriptor_Function ) plugin_lib.resolve(
@@ -269,7 +269,7 @@ bool ladspaManager::hasRealTimeDependency(
 	}
 	else
 	{
-		return( FALSE );
+		return( false );
 	}
 }
 
@@ -289,7 +289,7 @@ bool ladspaManager::isInplaceBroken( const ladspa_key_t &  _plugin )
 	}
 	else
 	{
-		return( FALSE );
+		return( false );
 	}
 }
 
@@ -310,7 +310,7 @@ bool ladspaManager::isRealTimeCapable(
 	}
 	else
 	{
-		return( FALSE );
+		return( false );
 	}
 }
 
@@ -414,7 +414,7 @@ bool ladspaManager::isPortInput( const ladspa_key_t & _plugin,
 	}
 	else
 	{
-		return( FALSE );
+		return( false );
 	}
 }
 
@@ -438,7 +438,7 @@ bool ladspaManager::isPortOutput( const ladspa_key_t & _plugin,
 	}
 	else
 	{
-		return( FALSE );
+		return( false );
 	}
 }
 
@@ -462,7 +462,7 @@ bool ladspaManager::isPortAudio( const ladspa_key_t & _plugin,
 	}
 	else
 	{
-		return( FALSE );
+		return( false );
 	}
 }
 
@@ -486,7 +486,7 @@ bool ladspaManager::isPortControl( const ladspa_key_t & _plugin,
 	}
 	else
 	{
-		return( FALSE );
+		return( false );
 	}
 }
 
@@ -511,7 +511,7 @@ bool ladspaManager::areHintsSampleRateDependent(
 	}
 	else
 	{
-		return( FALSE );
+		return( false );
 	}
 }
 
@@ -596,7 +596,7 @@ bool ladspaManager::isPortToggled( const ladspa_key_t & _plugin,
 	}
 	else
 	{
-		return( FALSE );
+		return( false );
 	}
 }
 
@@ -707,7 +707,7 @@ bool ladspaManager::isLogarithmic( const ladspa_key_t & _plugin,
 	}
 	else
 	{
-		return( FALSE );
+		return( false );
 	}
 }
 
@@ -731,7 +731,7 @@ bool ladspaManager::isInteger( const ladspa_key_t & _plugin,
 	}
 	else
 	{
-		return( FALSE );
+		return( false );
 	}
 }
 
@@ -843,10 +843,10 @@ bool ladspaManager::connectPort( const ladspa_key_t & _plugin,
 		{
 			( descriptor->connect_port )
 					( _instance, _port, _data_location );
-			return( TRUE );
+			return( true );
 		}
 	}
-	return( FALSE );
+	return( false );
 }
 
 
@@ -865,10 +865,10 @@ bool ladspaManager::activate( const ladspa_key_t & _plugin,
 		if( descriptor->activate != NULL )
 		{
 			( descriptor->activate ) ( _instance );
-			return( TRUE );
+			return( true );
 		}
 	}
-	return( FALSE );
+	return( false );
 }
 
 
@@ -888,10 +888,10 @@ bool ladspaManager::run( const ladspa_key_t & _plugin,
 		if( descriptor->run != NULL )
 		{
 			( descriptor->run ) ( _instance, _sample_count );
-			return( TRUE );
+			return( true );
 		}
 	}
-	return( FALSE );
+	return( false );
 }
 
 
@@ -912,10 +912,10 @@ bool ladspaManager::runAdding( const ladspa_key_t & _plugin,
 			  	descriptor->set_run_adding_gain != NULL )
 		{
 			( descriptor->run_adding ) ( _instance, _sample_count );
-			return( TRUE );
+			return( true );
 		}
 	}
-	return( FALSE );
+	return( false );
 }
 
 
@@ -937,10 +937,10 @@ bool ladspaManager::setRunAddingGain( const ladspa_key_t & _plugin,
 		{
 			( descriptor->set_run_adding_gain )
 							( _instance, _gain );
-			return( TRUE );
+			return( true );
 		}
 	}
-	return( FALSE );
+	return( false );
 }
 
 
@@ -959,10 +959,10 @@ bool ladspaManager::deactivate( const ladspa_key_t & _plugin,
 		if( descriptor->deactivate != NULL )
 		{
 			( descriptor->deactivate ) ( _instance );
-			return( TRUE );
+			return( true );
 		}
 	}
-	return( FALSE );
+	return( false );
 }
 
 
@@ -981,8 +981,8 @@ bool ladspaManager::cleanup( const ladspa_key_t & _plugin,
 		if( descriptor->cleanup != NULL )
 		{
 			( descriptor->cleanup ) ( _instance );
-			return( TRUE );
+			return( true );
 		}
 	}
-	return( FALSE );
+	return( false );
 }

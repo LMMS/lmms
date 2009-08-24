@@ -95,7 +95,7 @@ sf2Instrument::sf2Instrument( InstrumentTrack * _instrument_track ) :
 	m_bankNum( 0, 0, 999, this, tr("Bank") ),
 	m_patchNum( 0, 0, 127, this, tr("Patch") ),
 	m_gain( 1.0f, 0.0f, 5.0f, 0.01f, this, tr( "Gain" ) ),
-	m_reverbOn( FALSE, this, tr( "Reverb" ) ),
+	m_reverbOn( false, this, tr( "Reverb" ) ),
 	m_reverbRoomSize( FLUID_REVERB_DEFAULT_ROOMSIZE, 0, 1.0, 0.01f,
 			this, tr( "Reverb Roomsize" ) ),
 	m_reverbDamping( FLUID_REVERB_DEFAULT_DAMP, 0, 1.0, 0.01,
@@ -104,7 +104,7 @@ sf2Instrument::sf2Instrument( InstrumentTrack * _instrument_track ) :
 			this, tr( "Reverb Width" ) ),
 	m_reverbLevel( FLUID_REVERB_DEFAULT_LEVEL, 0, 1.0, 0.01f,
 			this, tr( "Reverb Level" ) ),
-	m_chorusOn( FALSE, this, tr( "Chorus" ) ),
+	m_chorusOn( false, this, tr( "Chorus" ) ),
 	m_chorusNum( FLUID_CHORUS_DEFAULT_N, 0, 10.0, 1.0,
 			this, tr( "Chorus Lines" ) ),
 	m_chorusLevel( FLUID_CHORUS_DEFAULT_LEVEL, 0, 10.0, 0.01,
@@ -311,7 +311,7 @@ void sf2Instrument::freeFont()
 		{
 			cout << "Really deleting " << m_filename << endl;
 
-			fluid_synth_sfunload( m_synth, m_fontId, TRUE );
+			fluid_synth_sfunload( m_synth, m_fontId, true );
 			s_fonts.remove( m_filename );
 			delete m_font;
 		}
@@ -362,7 +362,7 @@ void sf2Instrument::openFile( const QString & _sf2File )
 	// Add to map, if doesn't exist.
 	else
 	{
-		m_fontId = fluid_synth_sfload( m_synth, sf2Ascii, TRUE );
+		m_fontId = fluid_synth_sfload( m_synth, sf2Ascii, true );
 
 		if( fluid_synth_sfcount( m_synth ) > 0 )
 		{
@@ -809,7 +809,7 @@ sf2InstrumentView::sf2InstrumentView( Instrument * _instrument,
 							"patches_on" ) );
 	m_patchDialogButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"patches_off" ) );
-	m_patchDialogButton->setEnabled( FALSE );
+	m_patchDialogButton->setEnabled( false );
 	m_patchDialogButton->move( 217, 125 );
 
 	connect( m_patchDialogButton, SIGNAL( clicked() ),
@@ -821,12 +821,12 @@ sf2InstrumentView::sf2InstrumentView( Instrument * _instrument,
 	m_bankNumLcd = new lcdSpinBox( 3, "21pink", this );
 	m_bankNumLcd->move(131, 62);
 //	m_bankNumLcd->addTextForValue( -1, "---" );
-//	m_bankNumLcd->setEnabled( FALSE );
+//	m_bankNumLcd->setEnabled( false );
 
 	m_patchNumLcd = new lcdSpinBox( 3, "21pink", this );
 	m_patchNumLcd->move(190, 62);
 //	m_patchNumLcd->addTextForValue( -1, "---" );
-//	m_patchNumLcd->setEnabled( FALSE );
+//	m_patchNumLcd->setEnabled( false );
 
 	/*hl->addWidget( m_fileDialogButton );
 	hl->addWidget( m_bankNumLcd );
@@ -858,7 +858,7 @@ sf2InstrumentView::sf2InstrumentView( Instrument * _instrument,
 
 	
 	m_reverbButton = new pixmapButton( this );
-	m_reverbButton->setCheckable( TRUE );
+	m_reverbButton->setCheckable( true );
 	m_reverbButton->move( 24, 176 );
 	m_reverbButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"reverb_on" ) );
@@ -900,7 +900,7 @@ sf2InstrumentView::sf2InstrumentView( Instrument * _instrument,
 //	hl = new QHBoxLayout();
 
 	m_chorusButton = new pixmapButton( this );
-	m_chorusButton->setCheckable( TRUE );
+	m_chorusButton->setCheckable( true );
 	m_chorusButton->move( 24, 222 );
 	m_chorusButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"chorus_on" ) );
@@ -936,7 +936,7 @@ sf2InstrumentView::sf2InstrumentView( Instrument * _instrument,
 
 	vl->addLayout( hl );
 */
-	setAutoFillBackground( TRUE );
+	setAutoFillBackground( true );
 	QPalette pal;
 	pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap(
 								"artwork" ) );
@@ -1054,7 +1054,7 @@ void sf2InstrumentView::showFileDialog()
 		if( QFileInfo( f ).isRelative() )
 		{
 			f = configManager::inst()->userSamplesDir() + f;
-			if( QFileInfo( f ).exists() == FALSE )
+			if( QFileInfo( f ).exists() == false )
 			{
 				f = configManager::inst()->factorySamplesDir() +
 						k->m_filename;

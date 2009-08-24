@@ -193,9 +193,9 @@ private:
 	struct keyModifiers
 	{
 		keyModifiers() :
-			m_ctrl( FALSE ),
-			m_shift( FALSE ),
-			m_alt( FALSE )
+			m_ctrl( false ),
+			m_shift( false ),
+			m_alt( false )
 		{
 		}
 		bool m_ctrl;

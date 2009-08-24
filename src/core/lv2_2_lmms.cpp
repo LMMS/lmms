@@ -29,7 +29,7 @@
 
 #ifdef LMMS_HAVE_LV2
 
-lv22LMMS::lv22LMMS( void )
+lv22LMMS::lv22LMMS()
 {
 	l_sortable_plugin_t plugins = getSortedPlugins();
 

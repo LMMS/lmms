@@ -227,7 +227,7 @@ DummyTrackContainer::DummyTrackContainer() :
 	trackContainer(),
 	m_dummyInstrumentTrack( NULL )
 {
-	setJournalling( FALSE );
+	setJournalling( false );
 	m_dummyInstrumentTrack = dynamic_cast<InstrumentTrack *>(
 				track::create( track::InstrumentTrack,
 							this ) );

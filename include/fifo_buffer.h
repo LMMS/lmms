@@ -58,7 +58,7 @@ public:
 		m_readerSem.release();
 	}
 
-	T read( void )
+	T read()
 	{
 		m_readerSem.acquire();
 		T element = m_buffer[m_readerIndex++];
@@ -67,7 +67,7 @@ public:
 		return element;
 	}
 
-	bool available( void )
+	bool available()
 	{
 		return m_readerSem.available();
 	}

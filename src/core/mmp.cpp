@@ -265,7 +265,7 @@ void multimediaProject::cleanMetaNodes( QDomElement _de )
 
 
 
-void multimediaProject::upgrade( void )
+void multimediaProject::upgrade()
 {
 	projectVersion version =
 		documentElement().attribute( "creatorversion" ).

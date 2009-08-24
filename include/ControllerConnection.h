@@ -50,7 +50,7 @@ public:
 
 	virtual ~ControllerConnection();
 
-	inline Controller * getController( void )
+	inline Controller * getController()
 	{
 		return m_controller;
 	}
@@ -66,24 +66,24 @@ public:
 
 	inline void setTargetName( const QString & _name );
 
-	inline QString targetName( void ) const
+	inline QString targetName() const
 	{
 		return m_targetName;
 	}
 
-	inline bool isFinalized( void )
+	inline bool isFinalized()
 	{
 		return m_controllerId < 0;
 	}
 
-	static void finalizeConnections( void );
+	static void finalizeConnections();
 
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _this );
 	virtual void loadSettings( const QDomElement & _this );
-	virtual QString nodeName( void ) const;
+	virtual QString nodeName() const;
 
 public slots:
-	void deleteConnection( void );
+	void deleteConnection();
 
 protected:
 	//virtual controllerDialog * createDialog( QWidget * _parent );
@@ -97,7 +97,7 @@ protected:
 
 signals:
 	// The value changed while the mixer isn't running (i.e: MIDI CC)
-	void valueChanged( void );
+	void valueChanged();
 
 	friend class ControllerConnectionDialog;
 };

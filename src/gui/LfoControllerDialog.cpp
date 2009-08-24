@@ -229,7 +229,7 @@ LfoControllerDialog::LfoControllerDialog( Controller * _model, QWidget * _parent
 
 	setModel( _model );
 
-	setAutoFillBackground( TRUE );
+	setAutoFillBackground( true );
 	QPalette pal;
 	pal.setBrush( backgroundRole(),
 			embed::getIconPixmap( "lfo_controller_artwork" ) );
@@ -279,7 +279,7 @@ void lfoControllerDialog::paintEvent( QPaintEvent * _pe )
 */
 
 
-void LfoControllerDialog::modelChanged( void )
+void LfoControllerDialog::modelChanged()
 {
 	m_lfo = castModel<LfoController>();
 

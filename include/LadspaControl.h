@@ -40,7 +40,7 @@ class EXPORT LadspaControl : public Model, public JournallingObject
 	Q_OBJECT
 public:
 	LadspaControl( Model * _parent, port_desc_t * _port,
-							bool _link = FALSE );
+							bool _link = false );
 	~LadspaControl();
 
 	LADSPA_Data value();

@@ -44,11 +44,11 @@
 
 
 
-projectNotes::projectNotes( void ) :
+projectNotes::projectNotes() :
 	QMainWindow( engine::mainWindow()->workspace() )
 {
 	m_edit = new QTextEdit( this );
-	m_edit->setAutoFillBackground( TRUE );
+	m_edit->setAutoFillBackground( true );
 	//QPalette pal;
 	//pal.setColor( m_edit->backgroundRole(), QColor( 64, 64, 64 ) );
 	//m_edit->setPalette( pal );
@@ -87,7 +87,7 @@ projectNotes::~projectNotes()
 
 
 
-void projectNotes::clear( void )
+void projectNotes::clear()
 {
 	m_edit->setHtml( tr( "Put down your project notes here." ) );
 	m_edit->selectAll();
@@ -147,7 +147,7 @@ void projectNotes::setupActions()
 	tb = addToolBar( tr( "Format Actions" ) );
 
 	m_comboFont = new QComboBox( tb );
-	m_comboFont->setEditable( TRUE );
+	m_comboFont->setEditable( true );
 	QFontDatabase db;
 	m_comboFont->addItems( db.families() );
 	connect( m_comboFont, SIGNAL( activated( const QString & ) ),
@@ -155,7 +155,7 @@ void projectNotes::setupActions()
 	m_comboFont->lineEdit()->setText( QApplication::font().family() );
 
 	m_comboSize = new QComboBox( tb );
-	m_comboSize->setEditable( TRUE );
+	m_comboSize->setEditable( true );
 	QList<int> sizes = db.standardSizes();
 	QList<int>::Iterator it = sizes.begin();
 	for ( ; it != sizes.end(); ++it )
@@ -170,14 +170,14 @@ void projectNotes::setupActions()
 	m_actionTextBold = new QAction( embed::getIconPixmap( "text_bold" ),
 							tr( "&Bold" ), this );
 	m_actionTextBold->setShortcut( tr( "Ctrl+B" ) );
-	m_actionTextBold->setCheckable( TRUE );
+	m_actionTextBold->setCheckable( true );
 	connect( m_actionTextBold, SIGNAL( triggered() ), this,
 							SLOT( textBold() ) );
 
 	m_actionTextItalic = new QAction( embed::getIconPixmap( "text_italic" ),
 							tr( "&Italic" ), this );
 	m_actionTextItalic->setShortcut( tr( "Ctrl+I" ) );
-	m_actionTextItalic->setCheckable( TRUE );
+	m_actionTextItalic->setCheckable( true );
 	connect( m_actionTextItalic, SIGNAL( triggered() ), this,
 							SLOT( textItalic() ) );
 
@@ -185,7 +185,7 @@ void projectNotes::setupActions()
 								"text_under" ),
 						tr( "&Underline" ), this );
 	m_actionTextUnderline->setShortcut( tr( "Ctrl+U" ) );
-	m_actionTextUnderline->setCheckable( TRUE );
+	m_actionTextUnderline->setCheckable( true );
 	connect( m_actionTextUnderline, SIGNAL( triggered() ), this,
 						SLOT( textUnderline() ) );
 
@@ -197,7 +197,7 @@ void projectNotes::setupActions()
 	m_actionAlignLeft = new QAction( embed::getIconPixmap( "text_left" ),
 						tr( "&Left" ), m_edit );
 	m_actionAlignLeft->setShortcut( tr( "Ctrl+L" ) );
-	m_actionAlignLeft->setCheckable( TRUE );
+	m_actionAlignLeft->setCheckable( true );
 	grp->addAction( m_actionAlignLeft );
 
 	m_actionAlignCenter = new QAction( embed::getIconPixmap(
@@ -205,21 +205,21 @@ void projectNotes::setupActions()
 						tr( "C&enter" ), m_edit );
 	m_actionAlignCenter->setShortcutContext( Qt::WidgetShortcut );
 	m_actionAlignCenter->setShortcut( tr( "Ctrl+E" ) );
-	m_actionAlignCenter->setCheckable( TRUE );
+	m_actionAlignCenter->setCheckable( true );
 	grp->addAction( m_actionAlignCenter );
 
 	m_actionAlignRight = new QAction( embed::getIconPixmap( "text_right" ),
 						tr( "&Right" ), m_edit );
 	m_actionAlignRight->setShortcutContext( Qt::WidgetShortcut );
 	m_actionAlignRight->setShortcut( tr( "Ctrl+R" ) );
-	m_actionAlignRight->setCheckable( TRUE );
+	m_actionAlignRight->setCheckable( true );
 	grp->addAction( m_actionAlignRight );
 
 	m_actionAlignJustify = new QAction( embed::getIconPixmap(
 								"text_block" ),
 						tr( "&Justify" ), m_edit );
 	m_actionAlignJustify->setShortcut( tr( "Ctrl+J" ) );
-	m_actionAlignJustify->setCheckable( TRUE );
+	m_actionAlignJustify->setCheckable( true );
 	grp->addAction( m_actionAlignJustify );
 
 
@@ -356,19 +356,19 @@ void projectNotes::alignmentChanged( int _a )
 {
 	if ( _a & Qt::AlignLeft )
 	{
-		m_actionAlignLeft->setChecked( TRUE );
+		m_actionAlignLeft->setChecked( true );
 	}
 	else if ( ( _a & Qt::AlignHCenter ) )
 	{
-		m_actionAlignCenter->setChecked( TRUE );
+		m_actionAlignCenter->setChecked( true );
 	}
 	else if ( ( _a & Qt::AlignRight ) )
 	{
-		m_actionAlignRight->setChecked( TRUE );
+		m_actionAlignRight->setChecked( true );
 	}
 	else if ( ( _a & Qt::AlignJustify ) )
 	{
-		m_actionAlignJustify->setChecked( TRUE );
+		m_actionAlignJustify->setChecked( true );
 	}
 	engine::getSong()->setModified();
 }

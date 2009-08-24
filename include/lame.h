@@ -633,12 +633,12 @@ int CDECL lame_init_params(lame_global_flags *);
  * get the version number, in a string. of the form:
  * "3.63 (beta)" or just "3.63".
  */
-const char*  CDECL get_lame_version       ( void );
-const char*  CDECL get_lame_short_version ( void );
-const char*  CDECL get_lame_very_short_version ( void );
-const char*  CDECL get_psy_version        ( void );
-const char*  CDECL get_lame_url           ( void );
-const char*  CDECL get_lame_os_bitness    ( void );
+const char*  CDECL get_lame_version       ();
+const char*  CDECL get_lame_short_version ();
+const char*  CDECL get_lame_very_short_version ();
+const char*  CDECL get_psy_version        ();
+const char*  CDECL get_lame_url           ();
+const char*  CDECL get_lame_os_bitness    ();
 
 /*
  * OPTIONAL:

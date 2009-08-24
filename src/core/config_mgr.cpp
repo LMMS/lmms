@@ -51,7 +51,7 @@ static inline QString ensureTrailingSlash( const QString & _s )
 configManager * configManager::s_instanceOfMe = NULL;
 
 
-configManager::configManager( void ) :
+configManager::configManager() :
 	m_lmmsRcFile( QDir::home().absolutePath() + QDir::separator() +
 								".lmmsrc.xml" ),
 	m_workingDir( QDir::home().absolutePath() + QDir::separator() +
@@ -228,7 +228,7 @@ void configManager::setValue( const QString & _class,
 
 
 
-void configManager::loadConfigFile( void )
+void configManager::loadConfigFile()
 {
 	// read the XML file and create DOM tree
 	QFile cfg_file( m_lmmsRcFile );
@@ -379,7 +379,7 @@ void configManager::loadConfigFile( void )
 
 
 
-void configManager::saveConfigFile( void )
+void configManager::saveConfigFile()
 {
 	setValue( "paths", "artwork", m_artworkDir );
 	setValue( "paths", "workingdir", m_workingDir );

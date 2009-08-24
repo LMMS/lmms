@@ -46,12 +46,12 @@ public:
 	int indexOf( QWidget * _widget ) const;
 	QWidget * widget( int _idx );
 
-	int count( void ) const
+	int count() const
 	{
 		return m_children.count();
 	}
 
-	Qt::Orientation orientation( void ) const
+	Qt::Orientation orientation() const
 	{
 		return m_orientation;
 	}

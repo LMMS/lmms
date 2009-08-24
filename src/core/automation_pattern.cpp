@@ -117,7 +117,7 @@ void automationPattern::addObject( AutomatableModel * _obj, bool _search_dup )
 
 
 
-const AutomatableModel * automationPattern::firstObject( void ) const
+const AutomatableModel * automationPattern::firstObject() const
 {
 	AutomatableModel * m;
 	if( !m_objects.isEmpty() && ( m = m_objects.first() ) != NULL )
@@ -134,7 +134,7 @@ const AutomatableModel * automationPattern::firstObject( void ) const
 
 
 //TODO: Improve this
-midiTime automationPattern::length( void ) const
+midiTime automationPattern::length() const
 {
 	tick_t max_length = 0;
 
@@ -330,7 +330,7 @@ void automationPattern::loadSettings( const QDomElement & _this )
 
 
 
-const QString automationPattern::name( void ) const
+const QString automationPattern::name() const
 {
 	if( !trackContentObject::name().isEmpty() )
 	{
@@ -445,7 +445,7 @@ automationPattern * automationPattern::globalAutomationPattern(
 
 
 
-void automationPattern::resolveAllIDs( void )
+void automationPattern::resolveAllIDs()
 {
 	trackContainer::trackList l = engine::getSong()->tracks() +
 				engine::getBBTrackContainer()->tracks();
@@ -485,7 +485,7 @@ void automationPattern::resolveAllIDs( void )
 
 
 
-void automationPattern::clear( void )
+void automationPattern::clear()
 {
 	const float val = firstObject()->value<float>();
 	m_timeMap.clear();
@@ -501,7 +501,7 @@ void automationPattern::clear( void )
 
 
 
-void automationPattern::openInAutomationEditor( void )
+void automationPattern::openInAutomationEditor()
 {
 	engine::getAutomationEditor()->setCurrentPattern( this );
 	engine::getAutomationEditor()->parentWidget()->show();

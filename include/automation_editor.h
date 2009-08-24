@@ -53,29 +53,29 @@ class automationEditor : public QWidget, public JournallingObject
 public:
 	void setCurrentPattern( automationPattern * _new_pattern );
 
-	inline const automationPattern * currentPattern( void ) const
+	inline const automationPattern * currentPattern() const
 	{
 		return m_pattern;
 	}
 
-	inline bool validPattern( void ) const
+	inline bool validPattern() const
 	{
 		return m_pattern != NULL;
 	}
 
-	int quantization( void ) const;
+	int quantization() const;
 
 
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
 	virtual void loadSettings( const QDomElement & _this );
-	inline virtual QString nodeName( void ) const
+	inline virtual QString nodeName() const
 	{
 		return "automationeditor";
 	}
 
 
 public slots:
-	void update( void );
+	void update();
 
 
 protected:
@@ -95,34 +95,34 @@ protected:
 	static inline void drawValueRect( QPainter & _p, int _x, int _y,
 						int _width, int _height,
 						const bool _is_selected );
-	void removeSelection( void );
-	void selectAll( void );
+	void removeSelection();
+	void selectAll();
 	void getSelectedValues( timeMap & _selected_values );
 
 	void drawLine( int x0, float y0, int x1, float y1 );
 
 
 protected slots:
-	void play( void );
-	void stop( void );
+	void play();
+	void stop();
 
 	void horScrolled( int _new_pos );
 	void verScrolled( int _new_pos );
 
-	void drawButtonToggled( void );
-	void eraseButtonToggled( void );
-	void selectButtonToggled( void );
-	void moveButtonToggled( void );
+	void drawButtonToggled();
+	void eraseButtonToggled();
+	void selectButtonToggled();
+	void moveButtonToggled();
 
-	void copySelectedValues( void );
-	void cutSelectedValues( void );
-	void pasteValues( void );
-	void deleteSelectedValues( void );
+	void copySelectedValues();
+	void cutSelectedValues();
+	void pasteValues();
+	void deleteSelectedValues();
 
 	void updatePosition( const midiTime & _t );
 
-	void zoomingXChanged( void );
-	void zoomingYChanged( void );
+	void zoomingXChanged();
+	void zoomingYChanged();
 
 
 private:
@@ -157,7 +157,7 @@ private:
 	static const int ValuesWidth = 64;
 
 
-	automationEditor( void );
+	automationEditor();
 	automationEditor( const automationEditor & );
 	virtual ~automationEditor();
 
@@ -198,7 +198,7 @@ private:
 	float m_bottomLevel;
 	float m_topLevel;
 
-	void updateTopBottomLevels( void );
+	void updateTopBottomLevels();
 
 	QScrollBar * m_leftRightScroll;
 	QScrollBar * m_topBottomScroll;
@@ -234,7 +234,7 @@ private:
 	bool m_scrollBack;
 
 	void drawCross( QPainter & _p );
-	bool inBBEditor( void );
+	bool inBBEditor();
 
 
 

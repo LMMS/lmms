@@ -39,7 +39,7 @@ toolButton::toolButton( const QPixmap & _pixmap, const QString & _tooltip,
 	m_colorStandard( s_stdColor ),
 	m_colorHighlighted( s_hlColor )
 {
-	setAutoFillBackground( FALSE );
+	setAutoFillBackground( false );
 	QPalette pal = palette();
 	pal.setColor( backgroundRole(), m_colorStandard );
 	pal.setColor( QPalette::Window, m_colorStandard );
@@ -94,7 +94,7 @@ void toolButton::leaveEvent( QEvent * )
 
 void toolButton::toggledBool( bool _on )
 {
-	if( _on == TRUE )
+	if( _on == true )
 	{
 		emit( clicked() );
 	}

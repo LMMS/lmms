@@ -84,8 +84,8 @@ protected:
 	void prepareSnapBackAnimation( QTimeLine * timeLine, int newX );
 
 protected slots:
-	void updateLength( void );
-	void updatePosition( void );
+	void updateLength();
+	void updatePosition();
 
 protected:
 	QPointF m_lastPos;

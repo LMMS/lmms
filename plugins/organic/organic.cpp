@@ -379,7 +379,7 @@ organicInstrumentView::organicInstrumentView( Instrument * _instrument,
 {
 	organicInstrument * oi = castModel<organicInstrument>();
 
-	setAutoFillBackground( TRUE );
+	setAutoFillBackground( true );
 	QPalette pal;
 	pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap(
 								"artwork" ) );
@@ -394,7 +394,7 @@ organicInstrumentView::organicInstrumentView( Instrument * _instrument,
 
 	// setup volume-knob
 	m_volKnob = new organicKnob( this );
-	m_volKnob->setVolumeKnob( TRUE );
+	m_volKnob->setVolumeKnob( true );
 	m_volKnob->move( 60, 201 );
 	m_volKnob->setFixedSize( 37, 47 );
 	m_volKnob->setHintText( tr( "Volume:" ).arg( 1 ) + " ", "%" );
@@ -455,7 +455,7 @@ void organicInstrumentView::modelChanged()
 										
 		// setup volume-knob
 		knob * volKnob = new knob( knobStyled, this );
-		volKnob->setVolumeKnob( TRUE );
+		volKnob->setVolumeKnob( true );
 		volKnob->move( x + i * colWidth, y + rowHeight*1 );
 		volKnob->setFixedSize( 21, 21 );
 		volKnob->setHintText( tr( "Osc %1 volume:" ).arg(

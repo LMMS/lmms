@@ -45,7 +45,7 @@ bbEditor::bbEditor( bbTrackContainer * _tc ) :
 	m_toolBar = new QWidget;
 	m_toolBar->setFixedHeight( 32 );
 	m_toolBar->move( 0, 0 );
-	m_toolBar->setAutoFillBackground( TRUE );
+	m_toolBar->setAutoFillBackground( true );
 	QPalette pal;
 	pal.setBrush( m_toolBar->backgroundRole(),
 					embed::getIconPixmap( "toolbar_bg" ) );
@@ -113,7 +113,7 @@ bbEditor::bbEditor( bbTrackContainer * _tc ) :
 	tb_layout->addSpacing( 15 );
 
 	engine::mainWindow()->workspace()->addSubWindow( this );
-	parentWidget()->setAttribute( Qt::WA_DeleteOnClose, FALSE );
+	parentWidget()->setAttribute( Qt::WA_DeleteOnClose, false );
 	parentWidget()->layout()->setSizeConstraint( QLayout::SetMinimumSize );
 	parentWidget()->resize( minimumWidth(), 300 );
 	parentWidget()->move( 610, 5 );
@@ -147,7 +147,7 @@ void bbEditor::removeBBView( int _bb )
 
 
 
-void bbEditor::play( void )
+void bbEditor::play()
 {
 	engine::mainWindow()->setPlaybackMode( PPM_BB );
 	
@@ -183,7 +183,7 @@ void bbEditor::play( void )
 
 
 
-void bbEditor::stop( void )
+void bbEditor::stop()
 {
 	engine::getSong()->stop();
 	m_playButton->setIcon( embed::getIconPixmap( "play" ) );
@@ -193,7 +193,7 @@ void bbEditor::stop( void )
 
 
 
-void bbEditor::updatePosition( void )
+void bbEditor::updatePosition()
 {
 	//realignTracks();
 	emit positionChanged( m_currentPosition );
@@ -202,7 +202,7 @@ void bbEditor::updatePosition( void )
 
 
 
-void bbEditor::addAutomationTrack( void )
+void bbEditor::addAutomationTrack()
 {
 	(void) track::create( track::AutomationTrack, model() );
 }

@@ -50,9 +50,9 @@ public:
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
 	virtual void loadSettings( const QDomElement & _this );
 
-	virtual QString nodeName( void ) const;
+	virtual QString nodeName() const;
 
-	virtual f_cnt_t desiredReleaseFrames( void ) const
+	virtual f_cnt_t desiredReleaseFrames() const
 	{
 		return( 512 );
 	}
@@ -81,7 +81,7 @@ public:
 	virtual ~kickerInstrumentView();
 
 private:
-	virtual void modelChanged( void );
+	virtual void modelChanged();
 
 	knob * m_startFreqKnob;
 	knob * m_endFreqKnob;

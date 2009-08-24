@@ -753,7 +753,7 @@ public:
     }
 };
 
-/// 4-input priority multiplexer - without inertia. Outputs the first input if gate_1 is TRUE, else second input if gate_2 is TRUE, else... else "Else" input
+/// 4-input priority multiplexer - without inertia. Outputs the first input if gate_1 is true, else second input if gate_2 is true, else... else "Else" input
 class prio_mux_c_audio_module: public null_small_audio_module
 {
 public:    

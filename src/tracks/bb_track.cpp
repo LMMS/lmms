@@ -53,7 +53,7 @@ bbTCO::bbTCO( track * _track, unsigned int _color ) :
 					bbTrack::numOfBBTrack( getTrack() ) );
 	if( t > 0 )
 	{
-		saveJournallingState( FALSE );
+		saveJournallingState( false );
 		changeLength( midiTime( t, 0 ) );
 		restoreJournallingState();
 	}
@@ -177,7 +177,7 @@ void bbTCOView::paintEvent( QPaintEvent * )
 	{
 		col = QColor( 160, 160, 160 );
 	}
-	if( isSelected() == TRUE )
+	if( isSelected() == true )
 	{
 		col = QColor( qMax( col.red() - 128, 0 ),
 					qMax( col.green() - 128, 0 ), 255 );
@@ -221,7 +221,7 @@ void bbTCOView::paintEvent( QPaintEvent * )
 
 
 
-void bbTCOView::openInBBEditor( void )
+void bbTCOView::openInBBEditor()
 {
 	engine::getBBTrackContainer()->setCurrentBB( bbTrack::numOfBBTrack(
 							m_bbTCO->getTrack() ) );
@@ -232,7 +232,7 @@ void bbTCOView::openInBBEditor( void )
 
 
 
-void bbTCOView::resetName( void )
+void bbTCOView::resetName()
 {
 	m_bbTCO->setName( m_bbTCO->getTrack()->name() );
 }
@@ -240,7 +240,7 @@ void bbTCOView::resetName( void )
 
 
 
-void bbTCOView::changeName( void )
+void bbTCOView::changeName()
 {
 	QString s = m_bbTCO->name();
 	renameDialog rename_dlg( s );
@@ -251,7 +251,7 @@ void bbTCOView::changeName( void )
 
 
 
-void bbTCOView::changeColor( void )
+void bbTCOView::changeColor()
 {
 	QColor _new_color = QColorDialog::getColor( m_bbTCO->m_color );
 	if( !_new_color.isValid() )
@@ -346,7 +346,7 @@ bool bbTrack::play( const midiTime & _start, const fpp_t _frames,
 {
 	if( isMuted() )
 	{
-		return( FALSE );
+		return( false );
 	}
 
 	if( _tco_num >= 0 )
@@ -362,7 +362,7 @@ bool bbTrack::play( const midiTime & _start, const fpp_t _frames,
 
 	if( tcos.size() == 0 )
 	{
-		return( FALSE );
+		return( false );
 	}
 
 	midiTime lastPosition;
@@ -385,7 +385,7 @@ bool bbTrack::play( const midiTime & _start, const fpp_t _frames,
 							_offset,
 							s_infoMap[this] ) );
 	}
-	return( FALSE );
+	return( false );
 }
 
 
@@ -542,7 +542,7 @@ bbTrackView::bbTrackView( bbTrack * _bbt, trackContainerView * _tcv ) :
 	setFixedHeight( 32 );
 	// drag'n'drop with bb-tracks only causes troubles (and makes no sense
 	// too), so disable it
-	setAcceptDrops( FALSE );
+	setAcceptDrops( false );
 
 	m_trackLabel = new trackLabelButton( this, getTrackSettingsWidget() );
 	m_trackLabel->setIcon( embed::getIconPixmap( "bb_track" ) );
@@ -564,7 +564,7 @@ bbTrackView::~bbTrackView()
 
 
 
-bool bbTrackView::close( void )
+bool bbTrackView::close()
 {
 	engine::getBBEditor()->removeBBView( bbTrack::s_infoMap[m_bbTrack] );
 	return( trackView::close() );
@@ -573,7 +573,7 @@ bool bbTrackView::close( void )
 
 
 
-void bbTrackView::clickedTrackLabel( void )
+void bbTrackView::clickedTrackLabel()
 {
 	engine::getBBTrackContainer()->setCurrentBB(
 					bbTrack::numOfBBTrack( m_bbTrack ) );

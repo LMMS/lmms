@@ -50,7 +50,7 @@ public:
 	static QString decodeKey( QDropEvent * _de );
 	static QString decodeValue( QDropEvent * _de );
 
-	static const char * mimeType( void )
+	static const char * mimeType()
 	{
 		return "application/x-lmms-stringpair";
 	}

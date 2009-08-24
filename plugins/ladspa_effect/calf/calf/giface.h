@@ -45,7 +45,7 @@ enum parameter_flags
   PF_TYPEMASK = 0x000F, ///< bit mask for type
   PF_FLOAT = 0x0000, ///< any float value
   PF_INT = 0x0001,   ///< integer value (still represented as float)
-  PF_BOOL = 0x0002,  ///< bool value (usually >=0.5f is treated as TRUE, which is inconsistent with LV2 etc. which treats anything >0 as TRUE)
+  PF_BOOL = 0x0002,  ///< bool value (usually >=0.5f is treated as true, which is inconsistent with LV2 etc. which treats anything >0 as true)
   PF_ENUM = 0x0003,  ///< enum value (min, min+1, ..., max, only guaranteed to work when min = 0)
   PF_ENUM_MULTI = 0x0004, ///< SET / multiple-choice
   PF_STRING = 0x0005, ///< see: http://lv2plug.in/docs/index.php?title=String_port

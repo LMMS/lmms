@@ -54,11 +54,11 @@ public:
 
 	virtual void loadResource( const ResourceItem * _resourceItem );
 
-	virtual QString nodeName( void ) const;
+	virtual QString nodeName() const;
 
 	virtual Uint32 getBeatLen( notePlayHandle * _n ) const;
 
-	virtual f_cnt_t desiredReleaseFrames( void ) const
+	virtual f_cnt_t desiredReleaseFrames() const
 	{
 		return 128;
 	}
@@ -67,13 +67,13 @@ public:
 
 
 public slots:
-	void setAudioFile( const QString & _audio_file, bool _rename = TRUE );
+	void setAudioFile( const QString & _audio_file, bool _rename = true );
 
 
 private slots:
-	void reverseModelChanged( void );
-	void ampModelChanged( void );
-	void loopPointChanged( void );
+	void reverseModelChanged();
+	void ampModelChanged();
+	void loopPointChanged();
 
 
 private:
@@ -103,8 +103,8 @@ public:
 
 
 protected slots:
-	void sampleUpdated( void );
-	void openAudioFile( void );
+	void sampleUpdated();
+	void openAudioFile();
 
 
 protected:
@@ -112,7 +112,7 @@ protected:
 
 
 private:
-	virtual void modelChanged( void );
+	virtual void modelChanged();
 
 	static QPixmap * s_artwork;
 

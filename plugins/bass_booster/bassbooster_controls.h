@@ -44,26 +44,26 @@ public:
 
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
 	virtual void loadSettings( const QDomElement & _this );
-	inline virtual QString nodeName( void ) const
+	inline virtual QString nodeName() const
 	{
 		return( "bassboostercontrols" );
 	}
 
-	virtual int controlCount( void )
+	virtual int controlCount()
 	{
 		return( 3 );
 	}
 
-	virtual EffectControlDialog * createView( void )
+	virtual EffectControlDialog * createView()
 	{
 		return( new bassBoosterControlDialog( this ) );
 	}
 
 
 private slots:
-	void changeFrequency( void );
-	void changeGain( void );
-	void changeRatio( void );
+	void changeFrequency();
+	void changeGain();
+	void changeRatio();
 
 
 private:
