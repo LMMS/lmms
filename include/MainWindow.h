@@ -40,12 +40,12 @@ class QRadioButton;
 
 class ResourceBrowser;
 class lcdSpinBox;
-class meterDialog;
+class MeterDialog;
 class automatableSlider;
 class textFloat;
 
 class configManager;
-class pluginView;
+class PluginView;
 class toolButton;
 
 enum ProjectPlaybackMode
@@ -178,7 +178,7 @@ private:
 	ProjectPlaybackMode m_playbackMode;
 
 	lcdSpinBox * m_tempoSpinBox;
-	meterDialog * m_timeSigDisplay;
+	MeterDialog * m_timeSigDisplay;
 
 	automatableSlider * m_masterVolumeSlider;
 	automatableSlider * m_masterPitchSlider;
@@ -204,7 +204,7 @@ private:
 	} m_keyMods;
 
 	QMenu * m_toolsMenu;
-	QList<pluginView *> m_tools;
+	QList<PluginView *> m_tools;
 
 	QBasicTimer m_updateTimer;
 

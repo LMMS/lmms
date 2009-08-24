@@ -59,16 +59,16 @@ pluginBrowser::pluginBrowser( QWidget * _parent ) :
 					"existing instrument track." ),
 								m_view );
 	hint->setFont( pointSize<8>( hint->font() ) );
-	hint->setWordWrap( TRUE );
+	hint->setWordWrap( true );
 	view_layout->addWidget( hint );
 
-	plugin::getDescriptorsOfAvailPlugins( m_pluginDescriptors );
+	Plugin::getDescriptorsOfAvailPlugins( m_pluginDescriptors );
 
-	for( QVector<plugin::descriptor>::iterator it =
+	for( QVector<Plugin::Descriptor>::iterator it =
 						m_pluginDescriptors.begin();
 					it != m_pluginDescriptors.end(); ++it )
 	{
-		if( it->type == plugin::Instrument )
+		if( it->type == Plugin::Instrument )
 		{
 			pluginDescWidget * p = new pluginDescWidget( *it,
 								m_view );
@@ -93,18 +93,18 @@ pluginBrowser::~pluginBrowser()
 
 
 
-pluginDescWidget::pluginDescWidget( const plugin::descriptor & _pd,
+pluginDescWidget::pluginDescWidget( const Plugin::Descriptor & _pd,
 							QWidget * _parent ) :
 	QWidget( _parent ),
 	m_updateTimer( this ),
 	m_pluginDescriptor( _pd ),
 	m_logo( _pd.logo->pixmap() ),
-	m_mouseOver( FALSE ),
+	m_mouseOver( false ),
 	m_targetHeight( 24 )
 {
 	connect( &m_updateTimer, SIGNAL( timeout() ), SLOT( updateHeight() ) );
 	setFixedHeight( m_targetHeight );
-	setMouseTracking( TRUE );
+	setMouseTracking( true );
 	setCursor( Qt::PointingHandCursor );
 }
 
@@ -136,14 +136,14 @@ void pluginDescWidget::paintEvent( QPaintEvent * )
 	p.drawPixmap( 4, 4, logo );
 
 	QFont f = pointSize<8>( p.font() );
-	f.setBold( TRUE );
+	f.setBold( true );
 	p.setFont( f );
 	p.drawText( 10 + logo_size.width(), 15,
 					m_pluginDescriptor.displayName );
 
 	if( height() > 24 || m_mouseOver )
 	{
-		f.setBold( FALSE );
+		f.setBold( false );
 		p.setFont( pointSize<7>( f ) );
 		QRect br;
 		p.drawText( 10 + logo_size.width(), 20, width() - 58 - 5, 999,
@@ -163,7 +163,7 @@ void pluginDescWidget::paintEvent( QPaintEvent * )
 
 void pluginDescWidget::enterEvent( QEvent * _e )
 {
-	m_mouseOver = TRUE;
+	m_mouseOver = true;
 	m_targetHeight = height() + 1;
 	updateHeight();
 	QWidget::enterEvent( _e );
@@ -174,7 +174,7 @@ void pluginDescWidget::enterEvent( QEvent * _e )
 
 void pluginDescWidget::leaveEvent( QEvent * _e )
 {
-	m_mouseOver = FALSE;
+	m_mouseOver = false;
 	m_targetHeight = 24;
 	updateHeight();
 	QWidget::leaveEvent( _e );
@@ -196,7 +196,7 @@ void pluginDescWidget::mousePressEvent( QMouseEvent * _me )
 
 
 
-void pluginDescWidget::updateHeight( void )
+void pluginDescWidget::updateHeight()
 {
 	if( m_targetHeight > height() )
 	{

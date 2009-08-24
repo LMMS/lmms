@@ -25,14 +25,13 @@
 #include <math.h>
 
 #include "mixer.h"
-#include "fx_mixer.h"
+#include "FxMixer.h"
 #include "play_handle.h"
-#include "effect.h"
 #include "song.h"
 #include "templates.h"
-#include "envelope_and_lfo_parameters.h"
+#include "EnvelopeAndLfoParameters.h"
 #include "note_play_handle.h"
-#include "instrument_track.h"
+#include "InstrumentTrack.h"
 #include "debug.h"
 #include "engine.h"
 #include "config_mgr.h"
@@ -196,14 +195,14 @@ void MixerWorkerThread::processJobQueue()
 	const bool me = a->processEffects();
 	if( me || a->m_bufferUsage != AudioPort::NoUsage )
 	{
-		engine::getFxMixer()->mixToChannel( a->firstBuffer(),
+		engine::fxMixer()->mixToChannel( a->firstBuffer(),
 							a->nextFxChannel() );
 		a->nextPeriod();
 	}
 					}
 					break;
 				case EffectChannel:
-	engine::getFxMixer()->processChannel( (fx_ch_t) it->param );
+	engine::fxMixer()->processChannel( (fx_ch_t) it->param );
 					break;
 				default:
 					break;
@@ -576,7 +575,7 @@ sampleFrameA * mixer::renderNextBuffer()
 	clearAudioBuffer( m_writeBuf, m_framesPerPeriod );
 
 	// prepare master mix (clear internal buffers etc.)
-	engine::getFxMixer()->prepareMasterMix();
+	engine::fxMixer()->prepareMasterMix();
 
 	// create play-handles for new notes, samples etc.
 	engine::getSong()->processNextBuffer();
@@ -626,7 +625,7 @@ sampleFrameA * mixer::renderNextBuffer()
 
 
 	// STAGE 4: do master mix in FX mixer
-	engine::getFxMixer()->masterMix( m_writeBuf );
+	engine::fxMixer()->masterMix( m_writeBuf );
 
 	unlock();
 
@@ -634,7 +633,7 @@ sampleFrameA * mixer::renderNextBuffer()
 	emit nextAudioBuffer();
 
 	// and trigger LFOs
-	envelopeAndLFOParameters::triggerLFO();
+	EnvelopeAndLfoParameters::triggerLfo();
 	Controller::triggerFrameCounter();
 
 	const float new_cpu_load = timer.elapsed() / 10000.0f *

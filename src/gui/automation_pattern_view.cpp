@@ -33,7 +33,7 @@
 #include "embed.h"
 #include "engine.h"
 #include "gui_templates.h"
-#include "project_journal.h"
+#include "ProjectJournal.h"
 #include "rename_dialog.h"
 #include "string_pair_drag.h"
 #include "tooltip.h"
@@ -69,7 +69,7 @@ automationPatternView::~automationPatternView()
 
 
 
-void automationPatternView::update( void )
+void automationPatternView::update()
 {
 	m_needsUpdate = true;
 	if( fixedTCOs() )
@@ -82,7 +82,7 @@ void automationPatternView::update( void )
 
 
 
-void automationPatternView::resetName( void )
+void automationPatternView::resetName()
 {
 	m_pat->setName( QString::null );
 }
@@ -90,7 +90,7 @@ void automationPatternView::resetName( void )
 
 
 
-void automationPatternView::changeName( void )
+void automationPatternView::changeName()
 {
 	QString s = m_pat->name();
 	renameDialog rename_dlg( s );
@@ -104,13 +104,13 @@ void automationPatternView::changeName( void )
 
 void automationPatternView::disconnectObject( QAction * _a )
 {
-	journallingObject * j = engine::getProjectJournal()->
-				getJournallingObject( _a->data().toInt() );
-	if( j && dynamic_cast<automatableModel *>( j ) )
+	JournallingObject * j = engine::projectJournal()->
+				journallingObject( _a->data().toInt() );
+	if( j && dynamic_cast<AutomatableModel *>( j ) )
 	{
 		m_pat->m_objects.erase( qFind( m_pat->m_objects.begin(),
 					m_pat->m_objects.end(),
-				dynamic_cast<automatableModel *>( j ) ) );
+				dynamic_cast<AutomatableModel *>( j ) ) );
 		update();
 	}
 }
@@ -314,9 +314,9 @@ void automationPatternView::dropEvent( QDropEvent * _de )
 	QString val = stringPairDrag::decodeValue( _de );
 	if( type == "automatable_model" )
 	{
-		automatableModel * mod = dynamic_cast<automatableModel *>(
-				engine::getProjectJournal()->
-					getJournallingObject( val.toInt() ) );
+		AutomatableModel * mod = dynamic_cast<AutomatableModel *>(
+				engine::projectJournal()->
+					journallingObject( val.toInt() ) );
 		if( mod != NULL )
 		{
 			m_pat->addObject( mod );

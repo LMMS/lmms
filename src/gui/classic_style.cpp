@@ -37,7 +37,7 @@
 #include "embed.h"
 #include "bb_track.h"
 #include "pattern.h"
-#include "instrument_track.h"
+#include "InstrumentTrack.h"
 
 
 
@@ -575,7 +575,7 @@ void ClassicStyle::drawTrackContentObject( QPainter * _painter,
 				p->setPen( QColor( 32, 240, 32 ) );
 			}
 
-			if( pat->name() != pat->getInstrumentTrack()->name() )
+			if( pat->name() != pat->instrumentTrack()->name() )
 			{
 				p->drawText( 2, p->fontMetrics().height() - 1, pat->name() );
 			}

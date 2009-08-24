@@ -1,8 +1,8 @@
 /*
  * embed.h - misc. stuff for using embedded data (resources linked into binary)
  *
- * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -22,13 +22,11 @@
  *
  */
 
-
 #ifndef _EMBED_H
 #define _EMBED_H
 
 #include <QtGui/QPixmap>
 #include <QtCore/QString>
-
 
 #include "export.h"
 #include "lmms_basics.h"
@@ -63,15 +61,15 @@ QPixmap getIconPixmap( const char *  _name, int _w = -1, int _h = -1 );
 
 
 
-class pixmapLoader
+class PixmapLoader
 {
 public:
-	pixmapLoader( const pixmapLoader * _ref ) :
+	PixmapLoader( const PixmapLoader * _ref ) :
 		m_name( _ref != NULL ? _ref->m_name : QString::null )
 	{
 	}
 
-	pixmapLoader( const QString & _name = QString::null ) :
+	PixmapLoader( const QString & _name = QString::null ) :
 		m_name( _name )
 	{
 	}
@@ -86,7 +84,7 @@ public:
 		return( QPixmap() );
 	}
 
-	virtual ~pixmapLoader()
+	virtual ~PixmapLoader()
 	{
 	}
 
@@ -101,11 +99,11 @@ protected:
 
 
 #ifdef PLUGIN_NAME
-class pluginPixmapLoader : public pixmapLoader
+class PluginPixmapLoader : public PixmapLoader
 {
 public:
-	pluginPixmapLoader( const QString & _name = QString::null ) :
-		pixmapLoader( _name )
+	PluginPixmapLoader( const QString & _name = QString::null ) :
+		PixmapLoader( _name )
 	{
 	}
 

@@ -31,7 +31,7 @@
 #include <QtCore/QPair>
 
 #include "midi.h"
-#include "automatable_model.h"
+#include "AutomatableModel.h"
 
 
 class MidiClient;
@@ -41,7 +41,7 @@ class midiTime;
 
 
 // class for abstraction of MIDI-port
-class MidiPort : public model, public serializingObject
+class MidiPort : public Model, public SerializingObject
 {
 	Q_OBJECT
 	mapPropertyFromModel(int,inputChannel,setInputChannel,
@@ -74,7 +74,7 @@ public:
 	MidiPort( const QString & _name,
 			MidiClient * _mc,
 			MidiEventProcessor * _mep,
-			model * _parent = NULL,
+			Model * _parent = NULL,
 			Modes _mode = Disabled );
 	virtual ~MidiPort();
 
@@ -157,22 +157,22 @@ private:
 
 	Modes m_mode;
 
-	intModel m_inputChannelModel;
-	intModel m_outputChannelModel;
-	intModel m_inputControllerModel;
-	intModel m_outputControllerModel;
-	intModel m_fixedInputVelocityModel;
-	intModel m_fixedOutputVelocityModel;
-	intModel m_outputProgramModel;
-	boolModel m_readableModel;
-	boolModel m_writableModel;
+	IntModel m_inputChannelModel;
+	IntModel m_outputChannelModel;
+	IntModel m_inputControllerModel;
+	IntModel m_outputControllerModel;
+	IntModel m_fixedInputVelocityModel;
+	IntModel m_fixedOutputVelocityModel;
+	IntModel m_outputProgramModel;
+	BoolModel m_readableModel;
+	BoolModel m_writableModel;
 
 	Map m_readablePorts;
 	Map m_writablePorts;
 
 
 	friend class ControllerConnectionDialog;
-	friend class instrumentMidiIOView;
+	friend class InstrumentMidiIOView;
 
 
 signals:

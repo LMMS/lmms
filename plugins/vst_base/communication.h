@@ -27,10 +27,10 @@
 #ifndef _COMMUNICATION_H
 #define _COMMUNICATION_H
 
-#include "remote_plugin.h"
+#include "RemotePlugin.h"
 
 
-struct vstParameterDumpItem
+struct VstParameterDumpItem
 {
 	int32_t index;
 	std::string shortLabel;

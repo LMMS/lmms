@@ -30,7 +30,7 @@
 #include "Instrmnt.h"
 
 #include "combobox.h"
-#include "instrument.h"
+#include "Instrument.h"
 #include "InstrumentView.h"
 #include "knob.h"
 #include "note_play_handle.h"
@@ -125,10 +125,10 @@ protected:
 
 
 
-class malletsInstrument : public instrument
+class malletsInstrument : public Instrument
 {
 public:
-	malletsInstrument( instrumentTrack * _channel_track );
+	malletsInstrument( InstrumentTrack * _instrument_track );
 	virtual ~malletsInstrument( void );
 
 	virtual void playNote( notePlayHandle * _n,
@@ -141,31 +141,31 @@ public:
 
 	virtual QString nodeName( void ) const;
 
-	virtual pluginView * instantiateView( QWidget * _parent );
+	virtual PluginView * instantiateView( QWidget * _parent );
 
 
 private:
-	knobModel m_hardnessModel;
-	knobModel m_positionModel;
-	knobModel m_vibratoGainModel;
-	knobModel m_vibratoFreqModel;
-	knobModel m_stickModel;
+	FloatModel m_hardnessModel;
+	FloatModel m_positionModel;
+	FloatModel m_vibratoGainModel;
+	FloatModel m_vibratoFreqModel;
+	FloatModel m_stickModel;
 
-	knobModel m_modulatorModel;
-	knobModel m_crossfadeModel;
-	knobModel m_lfoSpeedModel;
-	knobModel m_lfoDepthModel;
-	knobModel m_adsrModel;
+	FloatModel m_modulatorModel;
+	FloatModel m_crossfadeModel;
+	FloatModel m_lfoSpeedModel;
+	FloatModel m_lfoDepthModel;
+	FloatModel m_adsrModel;
 
-	knobModel m_pressureModel;
-	knobModel m_motionModel;
-	knobModel m_vibratoModel;
-	knobModel m_velocityModel;
+	FloatModel m_pressureModel;
+	FloatModel m_motionModel;
+	FloatModel m_vibratoModel;
+	FloatModel m_velocityModel;
 
-	boolModel m_strikeModel;
+	BoolModel m_strikeModel;
 
-	comboBoxModel m_presetsModel;
-	knobModel m_spreadModel;
+	ComboBoxModel m_presetsModel;
+	FloatModel m_spreadModel;
 
 	QVector<sample_t> m_scalers;
 

@@ -1,6 +1,6 @@
 /*
  * ControllerConnection.cpp - implementation of class controller connection 
- *            which handles the link between automatableModels and controllers
+ *            which handles the link between AutomatableModels and controllers
  *
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail.com>
  *

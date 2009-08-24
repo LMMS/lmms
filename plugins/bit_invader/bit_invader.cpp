@@ -28,11 +28,11 @@
 #include "bit_invader.h"
 #include "engine.h"
 #include "graph.h"
-#include "instrument_track.h"
+#include "InstrumentTrack.h"
 #include "knob.h"
 #include "led_checkbox.h"
 #include "note_play_handle.h"
-#include "oscillator.h"
+#include "Oscillator.h"
 #include "pixmap_button.h"
 #include "song_editor.h"
 #include "templates.h"
@@ -44,7 +44,7 @@
 extern "C"
 {
 
-plugin::descriptor PLUGIN_EXPORT bitinvader_plugin_descriptor =
+Plugin::Descriptor PLUGIN_EXPORT bitinvader_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"BitInvader",
@@ -52,8 +52,8 @@ plugin::descriptor PLUGIN_EXPORT bitinvader_plugin_descriptor =
 				"Customizable wavetable synthesizer" ),
 	"Andreas Brandmaier <andreas/at/brandmaier/dot/de>",
 	0x0100,
-	plugin::Instrument,
-	new pluginPixmapLoader( "logo" ),
+	Plugin::Instrument,
+	new PluginPixmapLoader( "logo" ),
 	NULL,
 	NULL
 } ;
@@ -134,8 +134,8 @@ sample_t bSynth::nextStringSample( void )
 ***********************************************************************/
 
 
-bitInvader::bitInvader( instrumentTrack * _channel_track ) :
-	instrument( _channel_track, &bitinvader_plugin_descriptor ),
+bitInvader::bitInvader( InstrumentTrack * _instrument_track ) :
+	Instrument( _instrument_track, &bitinvader_plugin_descriptor ),
 	m_sampleLength( 128, 8, 128, 1, this, tr( "Samplelength" ) ),
 	m_graph( -1.0f, 1.0f, 128, this ),
 	m_interpolation( FALSE, this ),
@@ -295,7 +295,7 @@ void bitInvader::playNote( notePlayHandle * _n,
 
 	applyRelease( _working_buffer, _n );
 
-	getInstrumentTrack()->processAudioBuffer( _working_buffer, frames, _n );
+	instrumentTrack()->processAudioBuffer( _working_buffer, frames, _n );
 }
 
 
@@ -309,7 +309,7 @@ void bitInvader::deleteNotePluginData( notePlayHandle * _n )
 
 
 
-pluginView * bitInvader::instantiateView( QWidget * _parent )
+PluginView * bitInvader::instantiateView( QWidget * _parent )
 {
 	return( new bitInvaderView( this, _parent ) );
 }
@@ -320,7 +320,7 @@ pluginView * bitInvader::instantiateView( QWidget * _parent )
 
 
 
-bitInvaderView::bitInvaderView( instrument * _instrument,
+bitInvaderView::bitInvaderView( Instrument * _instrument,
 					QWidget * _parent ) :
 	InstrumentView( _instrument, _parent )
 {
@@ -576,9 +576,9 @@ extern "C"
 {
 
 // neccessary for getting instance out of shared lib
-plugin * PLUGIN_EXPORT lmms_plugin_main( model *, void * _data )
+Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, void * _data )
 {
-	return( new bitInvader( static_cast<instrumentTrack *>( _data ) ) );
+	return( new bitInvader( static_cast<InstrumentTrack *>( _data ) ) );
 }
 
 

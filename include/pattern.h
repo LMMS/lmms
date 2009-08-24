@@ -3,7 +3,7 @@
  *             about a pattern
  *
  * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -23,7 +23,6 @@
  *
  */
 
-
 #ifndef _PATTERN_H
 #define _PATTERN_H
 
@@ -42,7 +41,7 @@ class QAction;
 class QProgressBar;
 class QPushButton;
 
-class instrumentTrack;
+class InstrumentTrack;
 class patternFreezeThread;
 class sampleBuffer;
 
@@ -58,15 +57,15 @@ public:
 		MelodyPattern
 	} ;
 
-	pattern( instrumentTrack * _instrument_track );
+	pattern( InstrumentTrack * _instrument_track );
 	pattern( const pattern & _pat_to_copy );
 	virtual ~pattern();
 
-	void init( void );
+	void init();
 
 
-	virtual midiTime length( void ) const;
-	midiTime beatPatternLength( void ) const;
+	virtual midiTime length() const;
+	midiTime beatPatternLength() const;
 
 	// note management
 	note * addNote( const note & _new_note, const bool _quant_pos = true );
@@ -75,10 +74,10 @@ public:
 
 	note * rearrangeNote( const note * _note_to_proc,
 						const bool _quant_pos = true );
-	void rearrangeAllNotes( void );
-	void clearNotes( void );
+	void rearrangeAllNotes();
+	void clearNotes();
 
-	inline const NoteVector & notes( void ) const
+	inline const NoteVector & notes() const
 	{
 		return m_notes;
 	}
@@ -86,26 +85,26 @@ public:
 	void setStep( int _step, bool _enabled );
 
 	// pattern-type stuff
-	inline PatternTypes type( void ) const
+	inline PatternTypes type() const
 	{
 		return m_patternType;
 	}
 	void setType( PatternTypes _new_pattern_type );
-	void checkType( void );
+	void checkType();
 
 
 	// functions which are part of freezing-feature
-	inline bool freezing( void ) const
+	inline bool freezing() const
 	{
 		return m_freezing;
 	}
 
-	inline bool frozen( void ) const
+	inline bool frozen() const
 	{
 		return m_frozenPattern != NULL;
 	}
 
-	sampleBuffer * getFrozenPattern( void )
+	sampleBuffer * frozenPattern()
 	{
 		return m_frozenPattern;
 	}
@@ -113,17 +112,17 @@ public:
 	// settings-management
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
 	virtual void loadSettings( const QDomElement & _this );
-	inline virtual QString nodeName( void ) const
+	inline virtual QString nodeName() const
 	{
 		return "pattern";
 	}
 
-	inline instrumentTrack * getInstrumentTrack( void ) const
+	inline InstrumentTrack * instrumentTrack() const
 	{
 		return m_instrumentTrack;
 	}
 
-	bool empty( void );
+	bool empty();
 
 
 	void addSteps( int _n );
@@ -132,24 +131,24 @@ public:
 	virtual trackContentObjectView * createView( trackView * _tv );
 
 
-	using model::dataChanged;
+	using Model::dataChanged;
 
 
 protected:
-	void ensureBeatNotes( void );
-	void updateBBTrack( void );
+	void ensureBeatNotes();
+	void updateBBTrack();
 
 
 protected slots:
-	void clear( void );
-	void freeze( void );
-	void unfreeze( void );
-	void abortFreeze( void );
-	void changeTimeSignature( void );
+	void clear();
+	void freeze();
+	void unfreeze();
+	void abortFreeze();
+	void changeTimeSignature();
 
 
 private:
-	instrumentTrack * m_instrumentTrack;
+	InstrumentTrack * m_instrumentTrack;
 
 	PatternTypes m_patternType;
 
@@ -179,14 +178,14 @@ public:
 
 
 public slots:
-	virtual void update( void );
+	virtual void update();
 
 
 protected slots:
-	void openInPianoRoll( void );
+	void openInPianoRoll();
 
-	void resetName( void );
-	void changeName( void );
+	void resetName();
+	void changeName();
 
 	void addSteps( QAction * _item );
 	void removeSteps( QAction * _item );
@@ -240,8 +239,8 @@ protected:
 
 
 protected slots:
-	void cancelBtnClicked( void );
-	void updateProgress( void );
+	void cancelBtnClicked();
+	void updateProgress();
 
 
 private:
@@ -254,7 +253,7 @@ private:
 
 
 signals:
-	void aborted( void );
+	void aborted();
 
 } ;
 
@@ -270,7 +269,7 @@ public:
 
 
 protected:
-	virtual void run( void );
+	virtual void run();
 
 
 private:

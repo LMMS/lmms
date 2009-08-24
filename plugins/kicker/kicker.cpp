@@ -28,10 +28,10 @@
 
 #include "kicker.h"
 #include "engine.h"
-#include "instrument_track.h"
+#include "InstrumentTrack.h"
 #include "knob.h"
 #include "note_play_handle.h"
-#include "sweep_oscillator.h"
+#include "SweepOscillator.h"
 
 #include "embed.cpp"
 
@@ -39,7 +39,7 @@
 extern "C"
 {
 
-plugin::descriptor PLUGIN_EXPORT kicker_plugin_descriptor =
+Plugin::Descriptor PLUGIN_EXPORT kicker_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"Kicker",
@@ -47,8 +47,8 @@ plugin::descriptor PLUGIN_EXPORT kicker_plugin_descriptor =
 				"versatile kick- & bassdrum-synthesizer" ),
 	"Tobias Doerffel <tobydox/at/users.sf.net>",
 	0x0100,
-	plugin::Instrument,
-	new pluginPixmapLoader( "logo" ),
+	Plugin::Instrument,
+	new PluginPixmapLoader( "logo" ),
 	NULL,
 	NULL
 } ;
@@ -56,8 +56,8 @@ plugin::descriptor PLUGIN_EXPORT kicker_plugin_descriptor =
 }
 
 
-kickerInstrument::kickerInstrument( instrumentTrack * _instrument_track ) :
-	instrument( _instrument_track, &kicker_plugin_descriptor ),
+kickerInstrument::kickerInstrument( InstrumentTrack * _instrument_track ) :
+	Instrument( _instrument_track, &kicker_plugin_descriptor ),
 	m_startFreqModel( 150.0f, 5.0f, 1000.0f, 1.0f, this, tr( "Start frequency" ) ),
 	m_endFreqModel( 40.0f, 5.0f, 1000.0f, 1.0f, this, tr( "End frequency" ) ),
 	m_decayModel( 120.0f, 5.0f, 1000.0f, 1.0f, this, tr( "Decay" ) ),
@@ -101,16 +101,16 @@ void kickerInstrument::loadSettings( const QDomElement & _this )
 
 
 
-QString kickerInstrument::nodeName( void ) const
+QString kickerInstrument::nodeName() const
 {
-	return( kicker_plugin_descriptor.name );
+	return kicker_plugin_descriptor.name;
 }
 
 
 
-//typedef effectLib::foldbackDistortion<> distFX;
-typedef effectLib::distortion distFX;
-typedef sweepOscillator<effectLib::monoToStereoAdaptor<distFX> > sweepOsc;
+//typedef effectLib::foldbackDistortion<> DistFX;
+typedef effectLib::distortion DistFX;
+typedef SweepOscillator<effectLib::monoToStereoAdaptor<DistFX> > SweepOsc;
 
 
 void kickerInstrument::playNote( notePlayHandle * _n,
@@ -122,8 +122,8 @@ void kickerInstrument::playNote( notePlayHandle * _n,
 
 	if ( tfp == 0 )
 	{
-		_n->m_pluginData = new sweepOsc(
-					distFX( m_distModel.value(),
+		_n->m_pluginData = new SweepOsc(
+					DistFX( m_distModel.value(),
 							m_gainModel.value() ) );
 	}
 	else if( tfp > decfr && !_n->released() )
@@ -131,7 +131,7 @@ void kickerInstrument::playNote( notePlayHandle * _n,
 		_n->noteOff();
 	}
 
-	//const float freq = getInstrumentTrack()->frequency( _n ) / 2;
+	//const float freq = instrumentTrack()->frequency( _n ) / 2;
 	const float fdiff = m_endFreqModel.value() - m_startFreqModel.value();
 /*	const fpp_t frames = _n->released() ?
 		tMax( tMin<f_cnt_t>( desiredReleaseFrames() -
@@ -144,7 +144,7 @@ void kickerInstrument::playNote( notePlayHandle * _n,
 	const float f2 = m_startFreqModel.value() + (frames+tfp-1)*fdiff/decfr;
 
 
-	sweepOsc * so = static_cast<sweepOsc *>( _n->m_pluginData );
+	SweepOsc * so = static_cast<SweepOsc *>( _n->m_pluginData );
 	so->update( _working_buffer, frames, f1, f2,
 				engine::getMixer()->processingSampleRate() );
 
@@ -160,7 +160,7 @@ void kickerInstrument::playNote( notePlayHandle * _n,
 		}
 	}
 
-	getInstrumentTrack()->processAudioBuffer( _working_buffer, frames, _n );
+	instrumentTrack()->processAudioBuffer( _working_buffer, frames, _n );
 }
 
 
@@ -168,15 +168,15 @@ void kickerInstrument::playNote( notePlayHandle * _n,
 
 void kickerInstrument::deleteNotePluginData( notePlayHandle * _n )
 {
-	delete static_cast<sweepOsc *>( _n->m_pluginData );
+	delete static_cast<SweepOsc *>( _n->m_pluginData );
 }
 
 
 
 
-pluginView * kickerInstrument::instantiateView( QWidget * _parent )
+PluginView * kickerInstrument::instantiateView( QWidget * _parent )
 {
-	return( new kickerInstrumentView( this, _parent ) );
+	return new kickerInstrumentView( this, _parent );
 }
 
 
@@ -195,7 +195,7 @@ public:
 
 
 
-kickerInstrumentView::kickerInstrumentView( instrument * _instrument,
+kickerInstrumentView::kickerInstrumentView( Instrument * _instrument,
 							QWidget * _parent ) :
 	InstrumentView( _instrument, _parent )
 {
@@ -236,7 +236,7 @@ kickerInstrumentView::~kickerInstrumentView()
 
 
 
-void kickerInstrumentView::modelChanged( void )
+void kickerInstrumentView::modelChanged()
 {
 	kickerInstrument * k = castModel<kickerInstrument>();
 	m_startFreqKnob->setModel( &k->m_startFreqModel );
@@ -254,10 +254,9 @@ extern "C"
 {
 
 // neccessary for getting instance out of shared lib
-plugin * PLUGIN_EXPORT lmms_plugin_main( model *, void * _data )
+Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, void * _data )
 {
-	return( new kickerInstrument(
-				static_cast<instrumentTrack *>( _data ) ) );
+	return new kickerInstrument( static_cast<InstrumentTrack *>( _data ) );
 }
 
 

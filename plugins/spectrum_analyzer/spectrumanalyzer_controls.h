@@ -25,7 +25,7 @@
 #ifndef _SPECTRUMANALYZER_CONTROLS_H
 #define _SPECTRUMANALYZER_CONTROLS_H
 
-#include "effect_controls.h"
+#include "EffectControls.h"
 #include "spectrumanalyzer_control_dialog.h"
 #include "knob.h"
 
@@ -33,7 +33,7 @@
 class spectrumAnalyzer;
 
 
-class spectrumAnalyzerControls : public effectControls
+class spectrumAnalyzerControls : public EffectControls
 {
 	Q_OBJECT
 public:
@@ -49,12 +49,12 @@ public:
 		return( "spectrumanaylzercontrols" );
 	}
 
-	virtual int getControlCount( void )
+	virtual int controlCount( void )
 	{
 		return( 1 );
 	}
 
-	virtual effectControlDialog * createView( void )
+	virtual EffectControlDialog * createView( void )
 	{
 		return( new spectrumAnalyzerControlDialog( this ) );
 	}
@@ -62,9 +62,9 @@ public:
 
 private:
 	spectrumAnalyzer * m_effect;
-	boolModel m_linearSpec;
-	boolModel m_linearYAxis;
-	intModel m_channelMode;
+	BoolModel m_linearSpec;
+	BoolModel m_linearYAxis;
+	IntModel m_channelMode;
 
 	friend class spectrumAnalyzer;
 	friend class spectrumAnalyzerControlDialog;

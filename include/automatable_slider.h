@@ -28,11 +28,11 @@
 
 #include <QtGui/QSlider>
 
-#include "automatable_model_view.h"
+#include "AutomatableModelView.h"
 
 
 
-class automatableSlider : public QSlider, public intModelView
+class automatableSlider : public QSlider, public IntModelView
 {
 	Q_OBJECT
 public:
@@ -71,7 +71,7 @@ private slots:
 } ;
 
 
-typedef intModel sliderModel;
+typedef IntModel sliderModel;
 
 
 #endif

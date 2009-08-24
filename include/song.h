@@ -29,9 +29,9 @@
 #include <QtCore/QVector>
 
 #include "track_container.h"
-#include "automatable_model.h"
+#include "AutomatableModel.h"
 #include "Controller.h"
-#include "meter_model.h"
+#include "MeterModel.h"
 
 
 class automationTrack;
@@ -187,7 +187,7 @@ public:
 	}
 
 
-	meterModel & getTimeSigModel( void )
+	MeterModel & getTimeSigModel( void )
 	{
 		return m_timeSigModel;
 	}
@@ -268,11 +268,11 @@ private:
 
 	automationTrack * m_globalAutomationTrack;
 
-	intModel m_tempoModel;
-	meterModel m_timeSigModel;
+	IntModel m_tempoModel;
+	MeterModel m_timeSigModel;
 	int m_oldTicksPerTact;
-	intModel m_masterVolumeModel;
-	intModel m_masterPitchModel;
+	IntModel m_masterVolumeModel;
+	IntModel m_masterPitchModel;
 
 	ControllerVector m_controllers;
 

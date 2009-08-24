@@ -32,10 +32,10 @@
 #include "automatable_button.h"
 #include "engine.h"
 #include "instrument_play_handle.h"
-#include "instrument_track.h"
+#include "InstrumentTrack.h"
 #include "knob.h"
 #include "note_play_handle.h"
-#include "oscillator.h"
+#include "Oscillator.h"
 #include "pixmap_button.h"
 #include "templates.h"
 #include "tooltip.h"
@@ -76,7 +76,7 @@
 extern "C"
 {
 
-plugin::descriptor PLUGIN_EXPORT lb302_plugin_descriptor =
+Plugin::Descriptor PLUGIN_EXPORT lb302_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"LB302",
@@ -84,8 +84,8 @@ plugin::descriptor PLUGIN_EXPORT lb302_plugin_descriptor =
 			"Incomplete monophonic immitation tb303" ),
 	"Paul Giblock <pgib/at/users.sf.net>",
 	0x0100,
-	plugin::Instrument,
-	new pluginPixmapLoader( "logo" ),
+	Plugin::Instrument,
+	new PluginPixmapLoader( "logo" ),
 	NULL,
 	NULL
 };
@@ -268,8 +268,8 @@ float lb302Filter3Pole::process(const float& samp)
 // LBSynth
 //
 
-lb302Synth::lb302Synth( instrumentTrack * _instrumentTrack ) :
-	instrument( _instrumentTrack, &lb302_plugin_descriptor ),
+lb302Synth::lb302Synth( InstrumentTrack * _instrumentTrack ) :
+	Instrument( _instrumentTrack, &lb302_plugin_descriptor ),
 	vcf_cut_knob( 0.75f, 0.0f, 1.5f, 0.005f, this, tr( "VCF Cutoff Frequency" ) ),
 	vcf_res_knob( 0.75f, 0.0f, 1.25f, 0.005f, this, tr( "VCF Resonance" ) ),
 	vcf_mod_knob( 0.1f, 0.0f, 1.0f, 0.005f, this, tr( "VCF Envelope Mod" ) ),
@@ -277,10 +277,10 @@ lb302Synth::lb302Synth( instrumentTrack * _instrumentTrack ) :
 	dist_knob( 0.0f, 0.0f, 1.0f, 0.01f, this, tr( "Distortion" ) ),
 	wave_shape( 0.0f, 0.0f, 7.0f, this, tr( "Waveform" ) ),
 	slide_dec_knob( 0.6f, 0.0f, 1.0f, 0.005f, this, tr( "Slide Decay" ) ),
-	slideToggle( FALSE, this, tr( "Slide" ) ),
-	accentToggle( FALSE, this, tr( "Accent" ) ),
-	deadToggle( FALSE, this, tr( "Dead" ) ),
-	db24Toggle( FALSE, this, tr( "24dB/oct Filter" ) )	
+	slideToggle( false, this, tr( "Slide" ) ),
+	accentToggle( false, this, tr( "Accent" ) ),
+	deadToggle( false, this, tr( "Dead" ) ),
+	db24Toggle( false, this, tr( "24dB/oct Filter" ) )	
 
 {
 
@@ -353,7 +353,7 @@ lb302Synth::lb302Synth( instrumentTrack * _instrumentTrack ) :
 	current_freq = -1;
 	delete_freq = -1;
 
-	instrumentPlayHandle * iph = new instrumentPlayHandle( this );
+	InstrumentPlayHandle * iph = new InstrumentPlayHandle( this );
 	engine::getMixer()->addPlayHandle( iph );
 
 	filterChanged();
@@ -403,7 +403,7 @@ void lb302Synth::loadSettings( const QDomElement & _this )
 
 // TODO: Split into one function per knob.  envdecay doesn't require
 // recalcFilter.
-void lb302Synth::filterChanged( void )
+void lb302Synth::filterChanged()
 {
 	fs.cutoff = vcf_cut_knob.value();
 	fs.reso   = vcf_res_knob.value();
@@ -420,7 +420,7 @@ void lb302Synth::filterChanged( void )
 }
 
 
-void lb302Synth::db24Toggled( void )
+void lb302Synth::db24Toggled()
 {
 	delete vcf;
 	if(db24Toggle.value()) {
@@ -434,7 +434,7 @@ void lb302Synth::db24Toggled( void )
 
 
 
-QString lb302Synth::nodeName( void ) const
+QString lb302Synth::nodeName() const
 {
 	return( lb302_plugin_descriptor.name );
 }
@@ -583,15 +583,15 @@ int lb302Synth::process(sampleFrame *outbuf, const Uint32 size)
 
 			case SINE:
 				// [-0.5, 0.5]  : [-pi, pi]
-				vco_k = 0.5f * oscillator::sinSample( vco_c );
+				vco_k = 0.5f * Oscillator::sinSample( vco_c );
 				break;
 
 			case EXPONENTIAL:
-				vco_k = 0.5 * oscillator::expSample( vco_c );
+				vco_k = 0.5 * Oscillator::expSample( vco_c );
 				break;
 
 			case WHITE_NOISE:
-				vco_k = 0.5 * oscillator::noiseSample( vco_c );
+				vco_k = 0.5 * Oscillator::noiseSample( vco_c );
 				break;
 		}
 
@@ -775,7 +775,7 @@ void lb302Synth::play( sampleFrame * _working_buffer )
 	const fpp_t frames = engine::getMixer()->framesPerPeriod();
 
 	process( _working_buffer, frames); 
-	getInstrumentTrack()->processAudioBuffer( _working_buffer, frames,
+	instrumentTrack()->processAudioBuffer( _working_buffer, frames,
 									NULL );
 }
 
@@ -791,13 +791,13 @@ void lb302Synth::deleteNotePluginData( notePlayHandle * _n )
 }
 
 
-pluginView * lb302Synth::instantiateView( QWidget * _parent )
+PluginView * lb302Synth::instantiateView( QWidget * _parent )
 {
 	return( new lb302SynthView( this, _parent ) );
 }
 
 
-lb302SynthView::lb302SynthView( instrument * _instrument, QWidget * _parent ) :
+lb302SynthView::lb302SynthView( Instrument * _instrument, QWidget * _parent ) :
 	InstrumentView( _instrument, _parent )
 {
 	// GUI
@@ -940,7 +940,7 @@ lb302SynthView::lb302SynthView( instrument * _instrument, QWidget * _parent ) :
 	m_waveBtnGrp->addButton( exponentialWaveBtn );
 	m_waveBtnGrp->addButton( whiteNoiseWaveBtn );
 
-	setAutoFillBackground( TRUE );
+	setAutoFillBackground( true );
 	QPalette pal;
 	pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap(
 			"artwork" ) );
@@ -953,7 +953,7 @@ lb302SynthView::~lb302SynthView()
 }
 
 
-void lb302SynthView::modelChanged( void )
+void lb302SynthView::modelChanged()
 {
 	lb302Synth * syn = castModel<lb302Synth>();
 	
@@ -978,11 +978,11 @@ extern "C"
 {
 
 // neccessary for getting instance out of shared lib
-plugin * PLUGIN_EXPORT lmms_plugin_main( model *, void * _data )
+Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, void * _data )
 {
 
 	return( new lb302Synth(
-	        static_cast<instrumentTrack *>( _data ) ) );
+	        static_cast<InstrumentTrack *>( _data ) ) );
 }
 
 

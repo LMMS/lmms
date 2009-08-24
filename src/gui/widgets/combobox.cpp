@@ -51,26 +51,23 @@ const int CB_ARROW_BTN_WIDTH = 20;
 
 comboBox::comboBox( QWidget * _parent, const QString & _name ) :
 	QWidget( _parent ),
-	intModelView( new comboBoxModel( NULL, QString::null, TRUE ), this ),
+	IntModelView( new ComboBoxModel( NULL, QString::null, true ), this ),
 	m_menu( this ),
-	m_pressed( FALSE )
+	m_pressed( false )
 {
 	if( s_background == NULL )
 	{
-		s_background = new QPixmap( embed::getIconPixmap(
-				"combobox_bg" ) );
+		s_background = new QPixmap( embed::getIconPixmap( "combobox_bg" ) );
 	}
 
 	if( s_arrow == NULL )
 	{
-		s_arrow = new QPixmap( embed::getIconPixmap(
-				"combobox_arrow" ) );
+		s_arrow = new QPixmap( embed::getIconPixmap( "combobox_arrow" ) );
 	}
 
 	if( s_arrowSelected == NULL )
 	{
-		s_arrowSelected = new QPixmap( embed::getIconPixmap(
-				"combobox_arrow_selected" ) );
+		s_arrowSelected = new QPixmap( embed::getIconPixmap( "combobox_arrow_selected" ) );
 	}
 
 	setFont( pointSize<9>( font() ) );
@@ -116,7 +113,7 @@ void comboBox::mousePressEvent( QMouseEvent * _me )
 	{
 		if( _me->x() > width() - CB_ARROW_BTN_WIDTH )
 		{
-			m_pressed = TRUE;
+			m_pressed = true;
 			update();
 
 			m_menu.clear();
@@ -142,7 +139,7 @@ void comboBox::mousePressEvent( QMouseEvent * _me )
 				m_menu.exec( mapToGlobal(
 						QPoint( width(), 0 ) ) );
 			}
-			m_pressed = FALSE;
+			m_pressed = false;
 			update();
 		}
 		else if( _me->button() == Qt::LeftButton )
@@ -158,7 +155,7 @@ void comboBox::mousePressEvent( QMouseEvent * _me )
 	}
 	else
 	{
-		automatableModelView::mousePressEvent( _me );
+		IntModelView::mousePressEvent( _me );
 	}
 }
 

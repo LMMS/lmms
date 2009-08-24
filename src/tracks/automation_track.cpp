@@ -29,7 +29,7 @@
 #include "automation_pattern.h"
 #include "engine.h"
 #include "embed.h"
-#include "project_journal.h"
+#include "ProjectJournal.h"
 #include "string_pair_drag.h"
 #include "track_container_view.h"
 #include "track_label_button.h"
@@ -56,7 +56,7 @@ bool automationTrack::play( const midiTime & _start, const fpp_t _frames,
 {
 	if( isMuted() )
 	{
-		return( FALSE );
+		return false;
 	}
 
 	tcoVector tcos;
@@ -86,7 +86,7 @@ bool automationTrack::play( const midiTime & _start, const fpp_t _frames,
 		}
 		p->processMidiTime( cur_start );
 	}
-	return( FALSE );
+	return false;
 }
 
 
@@ -94,7 +94,7 @@ bool automationTrack::play( const midiTime & _start, const fpp_t _frames,
 
 trackView * automationTrack::createView( trackContainerView * _tcv )
 {
-	return( new automationTrackView( this, _tcv ) );
+	return new automationTrackView( this, _tcv );
 }
 
 
@@ -102,7 +102,7 @@ trackView * automationTrack::createView( trackContainerView * _tcv )
 
 trackContentObject * automationTrack::createTCO( const midiTime & )
 {
-	return( new automationPattern( this ) );
+	return new automationPattern( this );
 }
 
 
@@ -121,7 +121,7 @@ void automationTrack::loadTrackSpecificSettings( const QDomElement & _this )
 	// just in case something somehow wrent wrong...
 	if( type() == HiddenAutomationTrack )
 	{
-		setMuted( FALSE );
+		setMuted( false );
 	}
 }
 
@@ -166,9 +166,9 @@ void automationTrackView::dropEvent( QDropEvent * _de )
 	QString val = stringPairDrag::decodeValue( _de );
 	if( type == "automatable_model" )
 	{
-		automatableModel * mod = dynamic_cast<automatableModel *>(
-				engine::getProjectJournal()->
-					getJournallingObject( val.toInt() ) );
+		AutomatableModel * mod = dynamic_cast<AutomatableModel *>(
+				engine::projectJournal()->
+					journallingObject( val.toInt() ) );
 		if( mod != NULL )
 		{
 			midiTime pos = midiTime( getTrackContainerView()->

@@ -33,14 +33,14 @@
 #include <QtCore/QVector>
 
 #include "Controller.h"
-#include "journalling_object.h"
+#include "JournallingObject.h"
 
 class ControllerConnection;
 
 typedef QVector<ControllerConnection *> ControllerConnectionVector;
 
 
-class EXPORT ControllerConnection : public QObject, public journallingObject
+class EXPORT ControllerConnection : public QObject, public JournallingObject
 {
 	Q_OBJECT
 public:

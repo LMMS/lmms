@@ -28,7 +28,7 @@
 #include <QtCore/QObject>
 
 #include "lmmsconfig.h"
-#include "combobox_model.h"
+#include "ComboBoxModel.h"
 
 class AudioPortAudioSetupUtil : public QObject
 {
@@ -38,8 +38,8 @@ public slots:
 	void updateChannels();
 		
 public:
-	comboBoxModel m_backendModel;
-	comboBoxModel m_deviceModel;
+	ComboBoxModel m_backendModel;
+	ComboBoxModel m_deviceModel;
 } ;
 
 

@@ -1,6 +1,6 @@
 /*
  * PeakController.cpp - implementation of class controller which handles
- *                      remote-control of automatableModels
+ *                      remote-control of AutomatableModels
  *
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail.com>
  *
@@ -38,11 +38,11 @@
 #include "plugins/peak_controller_effect/peak_controller_effect.h"
 
 int PeakController::s_lastEffectId = 0;
-peakControllerEffectVector PeakController::s_effects;
+PeakControllerEffectVector PeakController::s_effects;
 
 
-PeakController::PeakController( model * _parent, 
-		peakControllerEffect * _peak_effect ) :
+PeakController::PeakController( Model * _parent, 
+		PeakControllerEffect * _peak_effect ) :
 	Controller( Controller::PeakController, _parent, tr( "Peak Controller" ) ),
 	m_peakEffect( _peak_effect )
 {
@@ -92,7 +92,7 @@ void PeakController::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	{
 		Controller::saveSettings( _doc, _this );
 
-		_this.setAttribute( "effectId", m_peakEffect->m_effectId );
+		_this.setAttribute( "effectId", m_peakEffect->effectId() );
 	}
 }
 
@@ -102,12 +102,11 @@ void PeakController::loadSettings( const QDomElement & _this )
 {
 	int effectId = _this.attribute( "effectId" ).toInt();
 
-	peakControllerEffectVector::iterator i;
+	PeakControllerEffectVector::Iterator i;
 	for( i = s_effects.begin(); i != s_effects.end(); ++i )
 	{
-		if( (*i)->m_effectId == effectId )
+		if( (*i)->effectId() == effectId )
 		{
-			if( (*i)->m_effectId == effectId )
 			m_peakEffect = *i;
 			return;
 		}
@@ -116,7 +115,7 @@ void PeakController::loadSettings( const QDomElement & _this )
 
 
 
-QString PeakController::nodeName( void ) const
+QString PeakController::nodeName() const
 {
 	return( "Peakcontroller" );
 }

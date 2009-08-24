@@ -26,7 +26,7 @@
 #ifndef _TRANSFORMABLE_AUTO_MODEL_H
 #define _TRANSFORMABLE_AUTO_MODEL_H
 
-#include "automatable_model.h"
+#include "AutomatableModel.h"
 //#include "automatable_model_templates.h"
 
 
@@ -41,7 +41,7 @@ struct AutoModelTransformer
 
 
 template<typename T, typename EDIT_STEP_TYPE>
-class transformableAutoModel : public automatableModel<T, EDIT_STEP_TYPE>
+class transformableAutoModel : public AutomatableModel<T, EDIT_STEP_TYPE>
 {
 public:
 	transformableAutoModel( const AutoModelTransformer<T> * _transformer,
@@ -49,9 +49,9 @@ public:
 				const T _min = 0,
 				const T _max = 0,
 				const T _step = defaultRelStep(),
-				::model * _parent = NULL,
+				Model * _parent = NULL,
 				bool _default_constructed = FALSE ) :
-		automatableModel( _val, _min, _max, _step, _parent,
+		AutomatableModel( _val, _min, _max, _step, _parent,
 						_default_constructed ),
 		m_transformer( _transformer )
 	{

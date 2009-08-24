@@ -1,9 +1,9 @@
 /*
  * ControllerDialog.h - per-controller-specific view for changing a
- * controller's settings
+ *                      controller's settings
  *
  * Copyright (c) 2008-2009 Paul Giblock <drfaygo/at/gmail.com>
- * 
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -28,18 +28,19 @@
 
 #include <QtGui/QWidget>
 
-#include "mv_base.h"
+#include "ModelView.h"
 
 class Controller;
 
 
-class ControllerDialog : public QWidget, public modelView
+class ControllerDialog : public QWidget, public ModelView
 {
     Q_OBJECT
 public:
 	ControllerDialog( Controller * _controller, QWidget * _parent );
 
 	virtual ~ControllerDialog();
+
 
 signals:
 	void closed();

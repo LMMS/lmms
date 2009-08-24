@@ -24,7 +24,7 @@
 
 #include "AudioPort.h"
 #include "AudioDevice.h"
-#include "effect_chain.h"
+#include "EffectChain.h"
 #include "engine.h"
 #include "Cpu.h"
 
@@ -38,7 +38,7 @@ AudioPort::AudioPort( const QString & _name, bool _has_effect_chain ) :
 	m_extOutputEnabled( false ),
 	m_nextFxChannel( 0 ),
 	m_name( "unnamed port" ),
-	m_effects( _has_effect_chain ? new effectChain( NULL ) : NULL )
+	m_effects( _has_effect_chain ? new EffectChain( NULL ) : NULL )
 {
 	engine::getMixer()->clearAudioBuffer( m_firstBuffer,
 				engine::getMixer()->framesPerPeriod() );

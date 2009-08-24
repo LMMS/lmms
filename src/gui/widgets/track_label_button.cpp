@@ -31,8 +31,8 @@
 #include "track_label_button.h"
 #include "embed.h"
 #include "rename_dialog.h"
-#include "instrument_track.h"
-#include "instrument.h"
+#include "InstrumentTrack.h"
+#include "Instrument.h"
 #include "config_mgr.h"
 #include "engine.h"
 
@@ -123,13 +123,13 @@ void trackLabelButton::paintEvent( QPaintEvent * _pe )
 {
 	if( m_trackView->getTrack()->type() == track::InstrumentTrack )
 	{
-		instrumentTrack * it =
-			dynamic_cast<instrumentTrack *>(
+		InstrumentTrack * it =
+			dynamic_cast<InstrumentTrack *>(
 						m_trackView->getTrack() );
-		const pixmapLoader * pl;
-		if( it && it->getInstrument() &&
-			it->getInstrument()->getDescriptor() &&
-			( pl = it->getInstrument()->getDescriptor()->logo ) )
+		const PixmapLoader * pl;
+		if( it && it->instrument() &&
+			it->instrument()->descriptor() &&
+			( pl = it->instrument()->descriptor()->logo ) )
 		{
 			if( pl->pixmapName() != m_iconName )
 			{

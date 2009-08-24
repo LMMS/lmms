@@ -1,5 +1,5 @@
 /*
- * papu_instrument.h - GameBoy papu based instrument
+ * papu_Instrument.h - GameBoy papu based instrument
  *
  * Copyright (c) 2008 <Attila Herman <attila589/at/gmail.com>
  *				Csaba Hruska <csaba.hruska/at/gmail.com>
@@ -27,7 +27,7 @@
 #define _PAPU_H
 
 #include <QtCore/QObject>
-#include "instrument.h"
+#include "Instrument.h"
 #include "InstrumentView.h"
 #include "knob.h"
 #include "graph.h"
@@ -36,12 +36,12 @@ class papuInstrumentView;
 class notePlayHandle;
 class pixmapButton;
 
-class papuInstrument : public instrument
+class papuInstrument : public Instrument
 {
 	Q_OBJECT
 public:
 
-	papuInstrument( instrumentTrack * _instrument_track );
+	papuInstrument( InstrumentTrack * _instrument_track );
 	virtual ~papuInstrument();
 
 	virtual void playNote( notePlayHandle * _n,
@@ -56,7 +56,7 @@ public:
 
 	virtual f_cnt_t desiredReleaseFrames( void ) const;
 
-	virtual pluginView * instantiateView( QWidget * _parent );
+	virtual PluginView * instantiateView( QWidget * _parent );
 
 
 /*public slots:
@@ -64,41 +64,41 @@ public:
 	void updateKnobToolTip( void );*/
 
 private:
-	knobModel m_ch1SweepTimeModel;
-	boolModel m_ch1SweepDirModel;
-	knobModel m_ch1SweepRtShiftModel;
-	knobModel m_ch1WavePatternDutyModel;
-	knobModel m_ch1VolumeModel;
-	boolModel m_ch1VolSweepDirModel;
-	knobModel m_ch1SweepStepLengthModel;
+	FloatModel m_ch1SweepTimeModel;
+	BoolModel m_ch1SweepDirModel;
+	FloatModel m_ch1SweepRtShiftModel;
+	FloatModel m_ch1WavePatternDutyModel;
+	FloatModel m_ch1VolumeModel;
+	BoolModel m_ch1VolSweepDirModel;
+	FloatModel m_ch1SweepStepLengthModel;
 
-	knobModel m_ch2WavePatternDutyModel;
-	knobModel m_ch2VolumeModel;
-	boolModel m_ch2VolSweepDirModel;
-	knobModel m_ch2SweepStepLengthModel;
+	FloatModel m_ch2WavePatternDutyModel;
+	FloatModel m_ch2VolumeModel;
+	BoolModel m_ch2VolSweepDirModel;
+	FloatModel m_ch2SweepStepLengthModel;
 
-	boolModel m_ch3OnModel;
-	knobModel m_ch3VolumeModel;
+	BoolModel m_ch3OnModel;
+	FloatModel m_ch3VolumeModel;
 
-	knobModel m_ch4VolumeModel;
-	boolModel m_ch4VolSweepDirModel;
-	knobModel m_ch4SweepStepLengthModel;
-	knobModel m_ch4ShiftClockFreqModel;
-	boolModel m_ch4ShiftRegWidthModel;
-	knobModel m_ch4FreqDivRatioModel;
+	FloatModel m_ch4VolumeModel;
+	BoolModel m_ch4VolSweepDirModel;
+	FloatModel m_ch4SweepStepLengthModel;
+	FloatModel m_ch4ShiftClockFreqModel;
+	BoolModel m_ch4ShiftRegWidthModel;
+	FloatModel m_ch4FreqDivRatioModel;
 
-	knobModel m_so1VolumeModel;
-	knobModel m_so2VolumeModel;
-	boolModel m_ch1So1Model;
-	boolModel m_ch2So1Model;
-	boolModel m_ch3So1Model;
-	boolModel m_ch4So1Model;
-	boolModel m_ch1So2Model;
-	boolModel m_ch2So2Model;
-	boolModel m_ch3So2Model;
-	boolModel m_ch4So2Model;
-	knobModel m_trebleModel;
-	knobModel m_bassModel;
+	FloatModel m_so1VolumeModel;
+	FloatModel m_so2VolumeModel;
+	BoolModel m_ch1So1Model;
+	BoolModel m_ch2So1Model;
+	BoolModel m_ch3So1Model;
+	BoolModel m_ch4So1Model;
+	BoolModel m_ch1So2Model;
+	BoolModel m_ch2So2Model;
+	BoolModel m_ch3So2Model;
+	BoolModel m_ch4So2Model;
+	FloatModel m_trebleModel;
+	FloatModel m_bassModel;
 
 	graphModel  m_graphModel;
 
@@ -110,7 +110,7 @@ class papuInstrumentView : public InstrumentView
 {
 	Q_OBJECT
 public:
-	papuInstrumentView( instrument * _instrument, QWidget * _parent );
+	papuInstrumentView( Instrument * _instrument, QWidget * _parent );
 	virtual ~papuInstrumentView();
 
 private:

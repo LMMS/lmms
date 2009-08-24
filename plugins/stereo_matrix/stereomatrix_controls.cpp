@@ -30,7 +30,7 @@
 
 
 stereoMatrixControls::stereoMatrixControls( stereoMatrixEffect * _eff ) :
-		effectControls( _eff ),
+		EffectControls( _eff ),
 		m_effect( _eff ),
 		m_llModel( 1.0f, -1.0f, 1.0f, 0.01f, this, tr( "Left to Left" ) ),
 		m_lrModel( 0.0f, -1.0f, 1.0f, 0.01f, this, tr( "Left to Right" ) ),

@@ -1,6 +1,6 @@
 /*
  * peak_controller_effect_control_dialog.cpp - control dialog for
- *                                             peakControllerEffect
+ *                                             PeakControllerEffect
  *
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail/dot/com>
  * 
@@ -35,9 +35,9 @@
 #include "embed.h"
 
 
-peakControllerEffectControlDialog::peakControllerEffectControlDialog(
-				peakControllerEffectControls * _controls ) :
-	effectControlDialog( _controls )
+PeakControllerEffectControlDialog::PeakControllerEffectControlDialog(
+				PeakControllerEffectControls * _controls ) :
+	EffectControlDialog( _controls )
 {
 	setAutoFillBackground( true );
 	QPalette pal;

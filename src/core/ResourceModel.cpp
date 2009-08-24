@@ -26,7 +26,7 @@
 
 #include "ResourceModel.h"
 #include "embed.h"
-#include "plugin.h"
+#include "Plugin.h"
 #include "string_pair_drag.h"
 
 
@@ -119,10 +119,10 @@ case ResourceItem::TypePluginSpecificResource:
 	}
 
 	// iterate through all plugins
-	QVector<plugin::descriptor> descriptors;
-	plugin::getDescriptorsOfAvailPlugins( descriptors );
+	QVector<Plugin::Descriptor> descriptors;
+	Plugin::getDescriptorsOfAvailPlugins( descriptors );
 
-	for( QVector<plugin::descriptor>::iterator it = descriptors.begin();
+	for( QVector<Plugin::Descriptor>::iterator it = descriptors.begin();
 						it != descriptors.end(); ++it )
 	{
 		if( it->supportsFileType( ext ) )

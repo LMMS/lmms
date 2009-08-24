@@ -2,8 +2,8 @@
  * automatable_slider.cpp - implementation of class automatableSlider
  *
  * Copyright (c) 2006-2007 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
- * Copyright (c) 2007-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ * Copyright (c) 2007-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -23,7 +23,6 @@
  *
  */
 
-
 #include "automatable_slider.h"
 
 #include <QtGui/QCursor>
@@ -40,8 +39,8 @@
 automatableSlider::automatableSlider( QWidget * _parent,
 						const QString & _name ) :
 	QSlider( _parent ),
-	intModelView( new intModel( 0, 0, 0, NULL, _name, TRUE ), this ),
-	m_showStatus( FALSE )
+	IntModelView( new IntModel( 0, 0, 0, NULL, _name, true ), this ),
+	m_showStatus( false )
 {
 	setAccessibleName( _name );
 
@@ -76,12 +75,12 @@ void automatableSlider::mousePressEvent( QMouseEvent * _me )
 	if( _me->button() == Qt::LeftButton &&
 	   ! ( _me->modifiers() & Qt::ControlModifier ) )
 	{
-		m_showStatus = TRUE;
+		m_showStatus = true;
 		QSlider::mousePressEvent( _me );
 	}
 	else
 	{
-		automatableModelView::mousePressEvent( _me );
+		IntModelView::mousePressEvent( _me );
 	}
 }
 
@@ -90,7 +89,7 @@ void automatableSlider::mousePressEvent( QMouseEvent * _me )
 
 void automatableSlider::mouseReleaseEvent( QMouseEvent * _me )
 {
-	m_showStatus = FALSE;
+	m_showStatus = false;
 	QSlider::mouseReleaseEvent( _me );
 }
 
@@ -100,7 +99,7 @@ void automatableSlider::mouseReleaseEvent( QMouseEvent * _me )
 void automatableSlider::wheelEvent( QWheelEvent * _me )
 {
 	bool old_status = m_showStatus;
-	m_showStatus = TRUE;
+	m_showStatus = true;
 	QSlider::wheelEvent( _me );
 	m_showStatus = old_status;
 }
@@ -108,7 +107,7 @@ void automatableSlider::wheelEvent( QWheelEvent * _me )
 
 
 
-void automatableSlider::modelChanged( void )
+void automatableSlider::modelChanged()
 {
 	QSlider::setRange( model()->minValue(), model()->maxValue() );
 	updateSlider();
@@ -137,7 +136,7 @@ void automatableSlider::moveSlider( int _value )
 
 
 
-void automatableSlider::updateSlider( void )
+void automatableSlider::updateSlider()
 {
 	QSlider::setValue( model()->value() );
 }

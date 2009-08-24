@@ -35,7 +35,7 @@
 
 stereoMatrixControlDialog::stereoMatrixControlDialog(
 	stereoMatrixControls * _controls ) :
-	effectControlDialog( _controls )
+	EffectControlDialog( _controls )
 {
 
 	setFixedSize( 105, 115);

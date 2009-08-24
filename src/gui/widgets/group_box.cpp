@@ -2,7 +2,7 @@
  * group_box.cpp - groupbox for LMMS
  *
  * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -22,17 +22,14 @@
  *
  */
 
-
 #include <QtGui/QMouseEvent>
 #include <QtGui/QPainter>
-
 
 #ifndef __USE_XOPEN
 #define __USE_XOPEN
 #endif
 
 #include <math.h>
-
 
 #include "group_box.h"
 #include "embed.h"
@@ -42,19 +39,19 @@
 
 groupBox::groupBox( const QString & _caption, QWidget * _parent ) :
 	QWidget( _parent ),
-	boolModelView( NULL, this ),
+	BoolModelView( NULL, this ),
 	m_caption( _caption )
 {
 	updatePixmap();
 
 	m_led = new pixmapButton( this, _caption );
-	m_led->setCheckable( TRUE );
+	m_led->setCheckable( true );
 	m_led->move( 3, 3 );
 	m_led->setActiveGraphic( embed::getIconPixmap( "led_green" ) );
 	m_led->setInactiveGraphic( embed::getIconPixmap( "led_off" ) );
 
-	setModel( new boolModel( FALSE, NULL, _caption, TRUE ) );
-	setAutoFillBackground( TRUE );
+	setModel( new BoolModel( false, NULL, _caption, true ) );
+	setAutoFillBackground( true );
 	unsetCursor();
 }
 
@@ -69,7 +66,7 @@ groupBox::~groupBox()
 
 
 
-void groupBox::modelChanged( void )
+void groupBox::modelChanged()
 {
 	m_led->setModel( model() );
 }
@@ -96,7 +93,7 @@ void groupBox::resizeEvent( QResizeEvent * _ev )
 
 
 
-void groupBox::updatePixmap( void )
+void groupBox::updatePixmap()
 {
 	QColor bg_color = QApplication::palette().color( QPalette::Active,
 							QPalette::Background );

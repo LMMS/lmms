@@ -22,12 +22,11 @@
  *
  */
 
-
 #include "sample_play_handle.h"
 #include "AudioPort.h"
 #include "bb_track.h"
 #include "engine.h"
-#include "instrument_track.h"
+#include "InstrumentTrack.h"
 #include "pattern.h"
 #include "sample_buffer.h"
 #include "sample_track.h"
@@ -87,14 +86,14 @@ samplePlayHandle::samplePlayHandle( sampleTCO * _tco ) :
 
 samplePlayHandle::samplePlayHandle( pattern * _pattern ) :
 	playHandle( SamplePlayHandle ),
-	m_sampleBuffer( sharedObject::ref( _pattern->getFrozenPattern() ) ),
+	m_sampleBuffer( sharedObject::ref( _pattern->frozenPattern() ) ),
 	m_doneMayReturnTrue( true ),
 	m_frame( 0 ),
-	m_audioPort( _pattern->getInstrumentTrack()->audioPort() ),
+	m_audioPort( _pattern->instrumentTrack()->audioPort() ),
 	m_ownAudioPort( false ),
 	m_defaultVolumeModel( DefaultVolume, MinVolume, MaxVolume, 1 ),
 	m_volumeModel( &m_defaultVolumeModel ),
-	m_track( _pattern->getInstrumentTrack() ),
+	m_track( _pattern->instrumentTrack() ),
 	m_bbTrack( NULL )
 {
 }

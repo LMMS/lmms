@@ -33,7 +33,7 @@
 
 #include "setup_dialog.h"
 #include "setup_dialog_mcl.h"
-#include "piano.h"
+#include "PianoView.h"
 
 
 setupDialogMCL::setupDialogMCL( setupDialog * _parent ) :

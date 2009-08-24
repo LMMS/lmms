@@ -1,6 +1,6 @@
 /*
  * Controller.cpp - implementation of class controller which handles
- *                  remote-control of automatableModels
+ *                  remote-control of AutomatableModels
  *
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail.com>
  *
@@ -44,10 +44,10 @@ QVector<Controller *> Controller::s_controllers;
 
 
 
-Controller::Controller( ControllerTypes _type, model * _parent,
+Controller::Controller( ControllerTypes _type, Model * _parent,
 					const QString & _display_name ) :
-	model( _parent, _display_name ),
-	journallingObject(),
+	Model( _parent, _display_name ),
+	JournallingObject(),
 	m_type( _type )
 {
 	if( _type != DummyController && _type != MidiController )
@@ -138,7 +138,7 @@ void Controller::resetFrameCounter( void )
 
 
 
-Controller * Controller::create( ControllerTypes _ct, model * _parent )
+Controller * Controller::create( ControllerTypes _ct, Model * _parent )
 {
 	static Controller * dummy = NULL;
 	Controller * c = NULL;
@@ -174,7 +174,7 @@ Controller * Controller::create( ControllerTypes _ct, model * _parent )
 
 
 
-Controller * Controller::create( const QDomElement & _this, model * _parent )
+Controller * Controller::create( const QDomElement & _this, Model * _parent )
 {
 	Controller * c = create(
 		static_cast<ControllerTypes>( _this.attribute( "type" ).toInt() ),
@@ -189,13 +189,13 @@ Controller * Controller::create( const QDomElement & _this, model * _parent )
 
 
 
-bool Controller::hasModel( const model * m )
+bool Controller::hasModel( const Model * m )
 {
 	QObjectList chldren = children();
 	for( int i = 0; i < chldren.size(); ++i )
 	{
 		QObject * c = chldren.at(i);
-		automatableModel * am = qobject_cast<automatableModel*>(c);
+		AutomatableModel * am = qobject_cast<AutomatableModel*>(c);
 		if( am != NULL )
 		{
 			if( am == m )

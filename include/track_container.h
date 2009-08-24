@@ -30,21 +30,21 @@
 #include <QReadWriteLock>
 
 #include "track.h"
-#include "journalling_object.h"
+#include "JournallingObject.h"
 
 
 class automationPattern;
-class instrumentTrack;
+class InstrumentTrack;
 class trackContainerView;
 
 
-class EXPORT trackContainer : public model, public journallingObject
+class EXPORT trackContainer : public Model, public JournallingObject
 {
 	Q_OBJECT
 public:
 	typedef QVector<track *> trackList;
 
-	trackContainer( void );
+	trackContainer();
 	virtual ~trackContainer();
 
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
@@ -52,7 +52,7 @@ public:
 	virtual void loadSettings( const QDomElement & _this );
 
 
-	virtual automationPattern * tempoAutomationPattern( void )
+	virtual automationPattern * tempoAutomationPattern()
 	{
 		return NULL;
 	}
@@ -63,18 +63,18 @@ public:
 	void addTrack( track * _track );
 	void removeTrack( track * _track );
 
-	virtual void updateAfterTrackAdd( void );
+	virtual void updateAfterTrackAdd();
 
-	void clearAllTracks( void );
+	void clearAllTracks();
 
-	const trackList & tracks( void ) const
+	const trackList & tracks() const
 	{
 		return m_tracks;
 	}
 
-	bool isEmpty( void ) const;
+	bool isEmpty() const;
 
-	static const QString classNodeName( void )
+	static const QString classNodeName()
 	{
 		return "trackcontainer";
 	}
@@ -97,28 +97,28 @@ private:
 } ;
 
 
-class dummyTrackContainer : public trackContainer
+class DummyTrackContainer : public trackContainer
 {
 public:
-	dummyTrackContainer( void );
+	DummyTrackContainer();
 
-	virtual ~dummyTrackContainer()
+	virtual ~DummyTrackContainer()
 	{
 	}
 
-	virtual QString nodeName( void ) const
+	virtual QString nodeName() const
 	{
-		return "dummytrackcontainer";
+		return "DummyTrackContainer";
 	}
 
-	instrumentTrack * dummyInstrumentTrack( void )
+	InstrumentTrack * dummyInstrumentTrack()
 	{
 		return m_dummyInstrumentTrack;
 	}
 
 
 private:
-	instrumentTrack * m_dummyInstrumentTrack;
+	InstrumentTrack * m_dummyInstrumentTrack;
 
 } ;
 

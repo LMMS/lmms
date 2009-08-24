@@ -48,13 +48,13 @@ public:
 		// the tco that we're putting this automation in
 		automationPattern* pat;
 	} ClipData;
-	typedef QMap<const automatableModel *, ClipData> AutoClipMap;
+	typedef QMap<const AutomatableModel *, ClipData> AutoClipMap;
 
 	AutomationRecorder();
 	~AutomationRecorder();
 	
 	// automatable models call this when their data changes
-	void modelDataEvent( automatableModel * _model );
+	void modelDataEvent( AutomatableModel * _model );
 	
 	// must be called at some point between a recording ending and a new
 	// one beginning

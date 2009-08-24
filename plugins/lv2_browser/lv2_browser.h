@@ -28,17 +28,18 @@
 
 
 #include "lv2_manager.h"
-#include "tool.h"
+#include "ToolPlugin.h"
+#include "ToolPluginView.h"
 
 
 class tabBar;
 
 
-class lv2BrowserView : public toolView
+class lv2BrowserView : public ToolPluginView
 {
 	Q_OBJECT
 public:
-	lv2BrowserView( tool * _tool );
+	lv2BrowserView( ToolPlugin * _tool );
 	virtual ~lv2BrowserView();
 
 
@@ -55,13 +56,13 @@ private:
 } ;
 
 
-class lv2Browser : public tool
+class lv2Browser : public ToolPlugin
 {
 public:
 	lv2Browser( void );
 	virtual ~lv2Browser();
 
-	virtual pluginView * instantiateView( QWidget * )
+	virtual PluginView * instantiateView( QWidget * )
 	{
 		return new lv2BrowserView( this );
 	}

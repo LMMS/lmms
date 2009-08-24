@@ -28,7 +28,7 @@
 #define _BIT_INVADER_H
 
 
-#include "instrument.h"
+#include "Instrument.h"
 #include "InstrumentView.h"
 #include "graph.h"
 #include "knob.h"
@@ -61,11 +61,11 @@ private:
 	
 } ;
 
-class bitInvader : public instrument
+class bitInvader : public Instrument
 {
 	Q_OBJECT
 public:
-	bitInvader(instrumentTrack * _channel_track );
+	bitInvader(InstrumentTrack * _instrument_track );
 	virtual ~bitInvader();
 
 	virtual void playNote( notePlayHandle * _n,
@@ -84,7 +84,7 @@ public:
 		return( 64 );
 	}
 
-	virtual pluginView * instantiateView( QWidget * _parent );
+	virtual PluginView * instantiateView( QWidget * _parent );
 
 protected slots:
 	void lengthChanged( void );
@@ -94,11 +94,11 @@ protected slots:
 
 
 private:
-	knobModel  m_sampleLength;
+	FloatModel  m_sampleLength;
 	graphModel  m_graph;
 	
-	boolModel m_interpolation;
-	boolModel m_normalize;
+	BoolModel m_interpolation;
+	BoolModel m_normalize;
 	
 	float normalizeFactor;
 	
@@ -113,7 +113,7 @@ class bitInvaderView : public InstrumentView
 {
 	Q_OBJECT
 public:
-	bitInvaderView( instrument * _instrument,
+	bitInvaderView( Instrument * _instrument,
 					QWidget * _parent );
 
 	virtual ~bitInvaderView() {};

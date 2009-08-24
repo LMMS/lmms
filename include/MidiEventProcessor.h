@@ -25,8 +25,10 @@
 #ifndef _MIDI_EVENT_PROCESSOR_H
 #define _MIDI_EVENT_PROCESSOR_H
 
-#include "piano.h"
-#include "automatable_model.h"
+#include <QtCore/QCoreApplication>
+
+#include "note.h"
+#include "AutomatableModel.h"
 
 
 // all classes being able to process MIDI-events should inherit from this
@@ -38,7 +40,7 @@ public:
 					0,
 					KeysPerOctave * NumOctaves - 1,
 					NULL,
-					PianoView::tr( "Base note" ) )
+					QCoreApplication::tr( "Base note" ) )
 	{
 	}
 
@@ -46,12 +48,12 @@ public:
 	{
 	}
 
-	intModel * baseNoteModel( void )
+	IntModel * baseNoteModel()
 	{
 		return &m_baseNoteModel;
 	}
 
-	const intModel * baseNoteModel( void ) const
+	const IntModel * baseNoteModel() const
 	{
 		return &m_baseNoteModel;
 	}
@@ -64,7 +66,7 @@ public:
 						const midiTime & _time ) = 0;
 
 private:
-	intModel m_baseNoteModel;
+	IntModel m_baseNoteModel;
 
 } ;
 

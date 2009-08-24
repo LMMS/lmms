@@ -25,12 +25,12 @@
 #ifndef _STEREOENHANCER_CONTROL_DIALOG_H
 #define _STEREOENHANCER_CONTROL_DIALOG_H
 
-#include "effect_control_dialog.h"
+#include "EffectControlDialog.h"
 
 class stereoEnhancerControls;
 
 
-class stereoEnhancerControlDialog : public effectControlDialog
+class stereoEnhancerControlDialog : public EffectControlDialog
 {
 public:
 	stereoEnhancerControlDialog( stereoEnhancerControls * _controls );

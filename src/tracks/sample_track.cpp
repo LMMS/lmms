@@ -43,7 +43,7 @@
 #include "string_pair_drag.h"
 #include "knob.h"
 #include "MainWindow.h"
-#include "effect_rack_view.h"
+#include "EffectRackView.h"
 #include "track_label_button.h"
 
 
@@ -404,7 +404,7 @@ bool sampleTrack::play( const midiTime & _start, const fpp_t _frames,
 						const f_cnt_t _offset,
 							Sint16 /*_tco_num*/ )
 {
-	m_audioPort.getEffects()->startRunning();
+	m_audioPort.effects()->startRunning();
 	bool played_a_note = false;	// will be return variable
 
 	for( int i = 0; i < numOfTCOs(); ++i )
@@ -467,7 +467,7 @@ trackContentObject * sampleTrack::createTCO( const midiTime & )
 void sampleTrack::saveTrackSpecificSettings( QDomDocument & _doc,
 							QDomElement & _this )
 {
-	m_audioPort.getEffects()->saveState( _doc, _this );
+	m_audioPort.effects()->saveState( _doc, _this );
 #if 0
 	_this.setAttribute( "icon", tlb->pixmapFile() );
 #endif
@@ -480,16 +480,14 @@ void sampleTrack::saveTrackSpecificSettings( QDomDocument & _doc,
 void sampleTrack::loadTrackSpecificSettings( const QDomElement & _this )
 {
 	QDomNode node = _this.firstChild();
-	m_audioPort.getEffects()->clear();
+	m_audioPort.effects()->clear();
 	while( !node.isNull() )
 	{
 		if( node.isElement() )
 		{
-			if( m_audioPort.getEffects()->nodeName() ==
-							node.nodeName() )
+			if( m_audioPort.effects()->nodeName() == node.nodeName() )
 			{
-				m_audioPort.getEffects()->restoreState(
-							node.toElement() );
+				m_audioPort.effects()->restoreState( node.toElement() );
 			}
 		}
 		node = node.nextSibling();
@@ -524,7 +522,7 @@ sampleTrackView::sampleTrackView( sampleTrack * _t, trackContainerView * _tcv ) 
 	m_volumeKnob->setLabel( tr( "VOL" ) );
 	m_volumeKnob->show();
 
-	m_effectRack = new effectRackView( _t->audioPort()->getEffects() );
+	m_effectRack = new EffectRackView( _t->audioPort()->effects() );
 	m_effectRack->setFixedSize( 240, 242 );
 
 	engine::mainWindow()->workspace()->addSubWindow( m_effectRack );

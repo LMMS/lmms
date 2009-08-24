@@ -2,7 +2,7 @@
  * knob.cpp - powerful knob-widget
  *
  * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -22,9 +22,6 @@
  *
  */
 
-
-#include "knob.h"
-
 #include <QtGui/QApplication>
 #include <QtGui/QBitmap>
 #include <QtGui/QFontMetrics>
@@ -38,7 +35,7 @@
 #endif
 #include <math.h>
 
-
+#include "knob.h"
 #include "caption_menu.h"
 #include "config_mgr.h"
 #include "ControllerConnection.h"
@@ -46,7 +43,7 @@
 #include "engine.h"
 #include "gui_templates.h"
 #include "MainWindow.h"
-#include "project_journal.h"
+#include "ProjectJournal.h"
 #include "song.h"
 #include "string_pair_drag.h"
 #include "templates.h"
@@ -59,13 +56,13 @@ textFloat * knob::s_textFloat = NULL;
 
 knob::knob( int _knob_num, QWidget * _parent, const QString & _name ) :
 	QWidget( _parent ),
-	floatModelView( new knobModel( 0, 0, 0, 1, NULL, _name, TRUE ), this ),
+	FloatModelView( new FloatModel( 0, 0, 0, 1, NULL, _name, true ), this ),
 	m_knobNum( _knob_num ),
 	m_label( "" ),
 	m_knobPixmap( NULL ),
-	m_volumeKnob( FALSE ),
+	m_volumeKnob( false ),
 	m_mouseOffset( 0.0f ),
-	m_buttonPressed( FALSE ),
+	m_buttonPressed( false ),
 	m_angle( -10 ),
 	m_outerColor( NULL )
 {
@@ -140,7 +137,7 @@ void knob::setTotalAngle( float _angle )
 
 
 
-float knob::innerRadius( void ) const
+float knob::innerRadius() const
 {
 	return m_innerRadius;
 }
@@ -154,7 +151,7 @@ void knob::setInnerRadius( float _r )
 
 
 
-float knob::outerRadius( void ) const
+float knob::outerRadius() const
 {
 	return m_outerRadius;
 }
@@ -168,14 +165,14 @@ void knob::setOuterRadius( float _r )
 
 
 
-QPointF knob::centerPoint( void ) const
+QPointF knob::centerPoint() const
 {
 	return m_centerPoint;
 }
 
 
 
-float knob::centerPointX( void ) const
+float knob::centerPointX() const
 {
 	return m_centerPoint.x();
 }
@@ -189,7 +186,7 @@ void knob::setCenterPointX( float _c )
 
 
 
-float knob::centerPointY( void ) const
+float knob::centerPointY() const
 {
 	return m_centerPoint.y();
 }
@@ -203,7 +200,7 @@ void knob::setCenterPointY( float _c )
 
 
 
-float knob::lineWidth( void ) const
+float knob::lineWidth() const
 {
 	return m_lineWidth;
 }
@@ -217,7 +214,7 @@ void knob::setLineWidth( float _w )
 
 
 
-QColor knob::outerColor( void ) const
+QColor knob::outerColor() const
 {
 	if( m_outerColor )
 	{
@@ -258,7 +255,7 @@ QLineF knob::calculateLine( const QPointF & _mid, float _radius, float _innerRad
 
 
 
-bool knob::updateAngle( void )
+bool knob::updateAngle()
 {
 	int angle = 0;
 	if( model() && model()->maxValue() != model()->minValue() )
@@ -272,9 +269,9 @@ bool knob::updateAngle( void )
 	if( qAbs( angle - m_angle ) > 3 )
 	{
 		m_angle = angle;
-		return( TRUE );
+		return true;
 	}
-	return( FALSE );
+	return false;
 }
 
 
@@ -282,7 +279,7 @@ bool knob::updateAngle( void )
 
 void knob::drawKnob( QPainter * _p )
 {
-	if( updateAngle() == FALSE && !m_cache.isNull() )
+	if( updateAngle() == false && !m_cache.isNull() )
 	{
 		_p->drawImage( 0, 0, m_cache );
 		return;
@@ -376,8 +373,8 @@ float knob::getValue( const QPoint & _p )
 {
 	if( engine::mainWindow()->isShiftPressed() )
 	{
-		//return( ( _p.y() - m_origMousePos.y() ) * model()->step<float>() );
-		return( ( _p.y() - m_origMousePos.y() ) * pageSize() );
+		//return ( _p.y() - m_origMousePos.y() ) * model()->step<float>();
+		return ( _p.y() - m_origMousePos.y() ) * pageSize();
 	}
 	else
 	{
@@ -428,12 +425,12 @@ void knob::dropEvent( QDropEvent * _de )
 	}
 	else if( type == "automatable_model" )
 	{
-		automatableModel * mod = dynamic_cast<automatableModel *>(
-				engine::getProjectJournal()->
-					getJournallingObject( val.toInt() ) );
+		AutomatableModel * mod = dynamic_cast<AutomatableModel *>(
+				engine::projectJournal()->
+					journallingObject( val.toInt() ) );
 		if( mod != NULL )
 		{
-			automatableModel::linkModels( model(), mod );
+			AutomatableModel::linkModels( model(), mod );
 			mod->setValue( model()->value() );
 		}
 	}
@@ -460,10 +457,10 @@ void knob::mousePressEvent( QMouseEvent * _me )
 		s_textFloat->moveGlobal( this,
 				QPoint( width() + 2, 0 ) );
 		s_textFloat->show();
-		m_buttonPressed = TRUE;
+		m_buttonPressed = true;
 	}
 	else if( _me->button() == Qt::LeftButton &&
-			engine::mainWindow()->isShiftPressed() == TRUE )
+			engine::mainWindow()->isShiftPressed() == true )
 	{
 		new stringPairDrag( "float_value",
 					QString::number( model()->value() ),
@@ -471,7 +468,7 @@ void knob::mousePressEvent( QMouseEvent * _me )
 	}
 	else
 	{
-		automatableModelView::mousePressEvent( _me );
+		FloatModelView::mousePressEvent( _me );
 	}
 }
 
@@ -480,7 +477,7 @@ void knob::mousePressEvent( QMouseEvent * _me )
 
 void knob::mouseMoveEvent( QMouseEvent * _me )
 {
-	if( m_buttonPressed == TRUE && _me->pos() != m_origMousePos )
+	if( m_buttonPressed == true && _me->pos() != m_origMousePos )
 	{
 		setPosition( _me->pos() );
 		emit sliderMoved( model()->value() );
@@ -497,7 +494,7 @@ void knob::mouseReleaseEvent( QMouseEvent * /* _me*/ )
 {
 	model()->addJournalEntryFromOldToCurVal();
 
-	m_buttonPressed = FALSE;
+	m_buttonPressed = false;
 
 	m_mouseOffset = 0;
 	emit sliderReleased();
@@ -590,7 +587,7 @@ void knob::setPosition( const QPoint & _p )
 
 
 
-void knob::enterValue( void )
+void knob::enterValue()
 {
 	bool ok;
 	float new_val;
@@ -634,11 +631,11 @@ void knob::enterValue( void )
 
 
 
-void knob::friendlyUpdate( void )
+void knob::friendlyUpdate()
 {
 	if( model()->getControllerConnection() == NULL ||
 		model()->getControllerConnection()->getController()->
-						frequentUpdates() == FALSE ||
+						frequentUpdates() == false ||
 				Controller::runningFrames() % (256*4) == 0 )
 	{
 		update();
@@ -648,23 +645,23 @@ void knob::friendlyUpdate( void )
 
 
 
-QString knob::displayValue( void ) const
+QString knob::displayValue() const
 {
 	if( isVolumeKnob() &&
 		configManager::inst()->value( "app", "displaydbv" ).toInt() )
 	{
-		return( m_description.trimmed() + QString( " %1 dBV" ).
+		return m_description.trimmed() + QString( " %1 dBV" ).
 				arg( 20.0 * log10( model()->value() / 100.0 ),
-								3, 'f', 2 ) );
+								3, 'f', 2 );
 	}
-	return( m_description.trimmed() + QString( " %1" ).
-					arg( model()->value() ) + m_unit );
+	return m_description.trimmed() + QString( " %1" ).
+					arg( model()->value() ) + m_unit;
 }
 
 
 
 
-void knob::doConnections( void )
+void knob::doConnections()
 {
 	if( model() != NULL )
 	{
@@ -679,7 +676,7 @@ void knob::doConnections( void )
 
 
 
-void knob::displayHelp( void )
+void knob::displayHelp()
 {
 	QWhatsThis::showText( mapToGlobal( rect().bottomRight() ),
 								whatsThis() );

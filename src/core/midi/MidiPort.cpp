@@ -32,9 +32,9 @@
 
 
 MidiPort::MidiPort( const QString & _name, MidiClient * _mc,
-			MidiEventProcessor * _mep, model * _parent,
+			MidiEventProcessor * _mep, Model * _parent,
 							Modes _mode ) :
-	model( _parent ),
+	Model( _parent ),
 	m_readablePortsMenu( NULL ),
 	m_writablePortsMenu( NULL ),
 	m_midiClient( _mc ),

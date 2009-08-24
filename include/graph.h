@@ -31,13 +31,14 @@
 #include <QtGui/QPixmap>
 #include <QtGui/QCursor>
 
-#include "mv_base.h"
+#include "Model.h"
+#include "ModelView.h"
 #include "lmms_basics.h"
 
 class graphModel;
 
 
-class EXPORT graph : public QWidget, public modelView
+class EXPORT graph : public QWidget, public ModelView
 {
 	Q_OBJECT
 public:
@@ -55,12 +56,12 @@ public:
 
 	void setGraphColor( const QColor );
 
-	inline graphModel * model( void )
+	inline graphModel * model()
 	{
 		return castModel<graphModel>();
 	}
 
-	inline graphStyle getGraphStyle( void )
+	inline graphStyle getGraphStyle()
 	{
 		return m_graphStyle;
 	}
@@ -82,10 +83,10 @@ protected:
 
 protected slots:
 	void updateGraph( int _startPos, int _endPos );
-	void updateGraph( void );
+	void updateGraph();
 
 private:
-	virtual void modelChanged( void );
+	virtual void modelChanged();
 
 	void changeSampleAt(int _x, int _y);
 
@@ -102,14 +103,14 @@ private:
 } ;
 
 
-class EXPORT graphModel : public model
+class EXPORT graphModel : public Model
 {
 	Q_OBJECT
 public:
 	graphModel( float _min,
 			float _max,
 			int _size,
-			:: model * _parent,
+			:: Model * _parent,
 			bool _default_constructed = FALSE,
 			float _step = 0.0 );
 
@@ -117,22 +118,22 @@ public:
 
 	// TODO: saveSettings, loadSettings?
 	
-	inline float minValue( void ) const
+	inline float minValue() const
 	{
 		return( m_minValue );
 	}
 
-	inline float maxValue( void ) const
+	inline float maxValue() const
 	{
 		return( m_maxValue );
 	}
 
-	inline int length( void ) const
+	inline int length() const
 	{
 		return( m_samples.count() );
 	}
 	
-	inline const float * samples( void ) const
+	inline const float * samples() const
 	{
 		return( m_samples.data() );
 	}
@@ -145,20 +146,20 @@ public slots:
 	void setSampleAt( int _samplePos, float _value );
 	void setSamples( const float * _value );
 
-	void setWaveToSine( void );
-	void setWaveToTriangle( void );
-	void setWaveToSaw( void );
-	void setWaveToSquare( void );
-	void setWaveToNoise( void );
+	void setWaveToSine();
+	void setWaveToTriangle();
+	void setWaveToSaw();
+	void setWaveToSquare();
+	void setWaveToNoise();
 	//void setWaveToUser( );
 	
-	void smooth( void );
-	void normalize( void );
+	void smooth();
+	void normalize();
 
 signals:
-	void lengthChanged( void );
+	void lengthChanged();
 	void samplesChanged( int startPos, int endPos );
-	void rangeChanged( void );
+	void rangeChanged();
 
 private:
 

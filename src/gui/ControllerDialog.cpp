@@ -1,9 +1,9 @@
 /*
  * ControllerDialog.cpp - per-controller-specific view for changing a
- * controller's settings
+ *                        controller's settings
  *
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail.com>
- * 
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -32,7 +32,7 @@
 ControllerDialog::ControllerDialog( Controller * _controller,
 							QWidget * _parent ) :
 	QWidget( _parent ),
-	modelView( _controller, this )
+	ModelView( _controller, this )
 {
 }
 

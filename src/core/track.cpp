@@ -52,15 +52,15 @@
 #include "bb_editor.h"
 #include "bb_track.h"
 #include "bb_track_container.h"
-#include "clipboard.h"
+#include "Clipboard.h"
 #include "embed.h"
 #include "engine.h"
 #include "gui_templates.h"
-#include "instrument_track.h"
+#include "InstrumentTrack.h"
 #include "MainWindow.h"
 #include "mmp.h"
 #include "pixmap_button.h"
-#include "project_journal.h"
+#include "ProjectJournal.h"
 #include "sample_track.h"
 #include "song.h"
 #include "string_pair_drag.h"
@@ -106,7 +106,7 @@ textFloat * trackContentObjectView::s_textFloat = NULL;
  * \param _track The track that will contain the new object
  */
 trackContentObject::trackContentObject( track * _track ) :
-	model( _track ),
+	Model( _track ),
 	m_track( _track ),
 	m_name( QString::null ),
 	m_startPosition(),
@@ -155,7 +155,7 @@ void trackContentObject::movePosition( const midiTime & _pos )
 {
 	if( m_startPosition != _pos )
 	{
-		addJournalEntry( journalEntry( Move, m_startPosition - _pos ) );
+		addJournalEntry( JournalEntry( Move, m_startPosition - _pos ) );
 		m_startPosition = _pos;
 		engine::getSong()->updateLength();
 	}
@@ -176,7 +176,7 @@ void trackContentObject::changeLength( const midiTime & _length )
 {
 	if( m_length != _length )
 	{
-		addJournalEntry( journalEntry( Resize, m_length - _length ) );
+		addJournalEntry( JournalEntry( Resize, m_length - _length ) );
 		m_length = _length;
 		engine::getSong()->updateLength();
 	}
@@ -194,7 +194,7 @@ void trackContentObject::changeLength( const midiTime & _length )
  *
  * \param _je The journal entry to undo
  */
-void trackContentObject::undoStep( journalEntry & _je )
+void trackContentObject::undoStep( JournalEntry & _je )
 {
 	saveJournallingState( false );
 	switch( _je.actionID() )
@@ -218,9 +218,9 @@ void trackContentObject::undoStep( journalEntry & _je )
  *
  * \param _je The journal entry to redo
  */
-void trackContentObject::redoStep( journalEntry & _je )
+void trackContentObject::redoStep( JournalEntry & _je )
 {
-	journalEntry je( _je.actionID(), -_je.data().toInt() );
+	JournalEntry je( _je.actionID(), -_je.data().toInt() );
 	undoStep( je );
 }
 
@@ -231,9 +231,9 @@ void trackContentObject::redoStep( journalEntry & _je )
  *
  *  Copies this track content object to the clipboard.
  */
-void trackContentObject::copy( void )
+void trackContentObject::copy()
 {
-	clipboard::copy( this );
+	Clipboard::copy( this );
 }
 
 
@@ -245,11 +245,11 @@ void trackContentObject::copy( void )
  *
  * \param _je The journal entry to undo
  */
-void trackContentObject::paste( void )
+void trackContentObject::paste()
 {
-	if( clipboard::getContent( nodeName() ) != NULL )
+	if( Clipboard::getContent( nodeName() ) != NULL )
 	{
-		restoreState( *( clipboard::getContent( nodeName() ) ) );
+		restoreState( *( Clipboard::getContent( nodeName() ) ) );
 	}
 }
 
@@ -264,7 +264,7 @@ void trackContentObject::paste( void )
  *
  * \param _je The journal entry to undo
  */
-void trackContentObject::toggleMute( void )
+void trackContentObject::toggleMute()
 {
 	m_mutedModel.setValue( !m_mutedModel.value() );
 	emit dataChanged();
@@ -290,7 +290,7 @@ void trackContentObject::toggleMute( void )
 trackContentObjectView::trackContentObjectView( trackContentObject * _tco,
 							trackView * _tv ) :
 	selectableObject( _tv->getTrackContentWidget() ),
-	modelView( NULL, this ),
+	ModelView( NULL, this ),
 	m_tco( _tco ),
 	m_trackView( _tv ),
 	m_action( NoAction ),
@@ -354,9 +354,9 @@ trackContentObjectView::~trackContentObjectView()
  * \todo What the hell is a TCO here - track content object?  And in
  *  what circumstance are they fixed?
  */
-bool trackContentObjectView::fixedTCOs( void )
+bool trackContentObjectView::fixedTCOs()
 {
-	return( m_trackView->getTrackContainerView()->fixedTCOs() );
+	return m_trackView->getTrackContainerView()->fixedTCOs();
 }
 
 
@@ -369,10 +369,10 @@ bool trackContentObjectView::fixedTCOs( void )
  *
  * \return Boolean state of whether the QWidget was able to close.
  */
-bool trackContentObjectView::close( void )
+bool trackContentObjectView::close()
 {
 	m_trackView->getTrackContentWidget()->removeTCOView( this );
-	return( QWidget::close() );
+	return QWidget::close();
 }
 
 
@@ -385,7 +385,7 @@ bool trackContentObjectView::close( void )
  *  scheduled for later deletion rather than closed immediately.
  *
  */
-void trackContentObjectView::remove( void )
+void trackContentObjectView::remove()
 {
 	// delete ourself
 	close();
@@ -400,7 +400,7 @@ void trackContentObjectView::remove( void )
  *  Perform the 'cut' action of the clipboard - copies the track content
  *  object to the clipboard and then removes it from the track.
  */
-void trackContentObjectView::cut( void )
+void trackContentObjectView::cut()
 {
 	m_tco->copy();
 	remove();
@@ -416,7 +416,7 @@ void trackContentObjectView::cut( void )
  *  the track content object's length in pixels adding in the border.
  *
  */
-void trackContentObjectView::updateLength( void )
+void trackContentObjectView::updateLength()
 {
 	if( fixedTCOs() )
 	{
@@ -442,7 +442,7 @@ void trackContentObjectView::updateLength( void )
  *  view's length.
  *
  */
-void trackContentObjectView::updatePosition( void )
+void trackContentObjectView::updatePosition()
 {
 	m_trackView->getTrackContentWidget()->changePosition();
 	// moving a TCO can result in change of song-length etc.,
@@ -777,7 +777,7 @@ void trackContentObjectView::mouseReleaseEvent( QMouseEvent * _me )
 	if( m_action == Move || m_action == Resize )
 	{
 		m_tco->setJournalling( true );
-		m_tco->addJournalEntry( journalEntry( m_action, m_oldTime -
+		m_tco->addJournalEntry( JournalEntry( m_action, m_oldTime -
 			( ( m_action == Move ) ?
 				m_tco->startPosition() : m_tco->length() ) ) );
 	}
@@ -832,9 +832,9 @@ void trackContentObjectView::contextMenuEvent( QContextMenuEvent * _cme )
  *
  * \return the number of pixels per tact (bar).
  */
-float trackContentObjectView::pixelsPerTact( void )
+float trackContentObjectView::pixelsPerTact()
 {
-	return( m_trackView->getTrackContainerView()->pixelsPerTact() );
+	return m_trackView->getTrackContainerView()->pixelsPerTact();
 }
 
 
@@ -901,7 +901,7 @@ void trackContentWidget::addTCOView( trackContentObjectView * _tcov )
 	trackContentObject * tco = _tcov->getTrackContentObject();
 /*	QMap<QString, QVariant> map;
 	map["id"] = tco->id();
-	addJournalEntry( journalEntry( AddTrackContentObject, map ) );*/
+	addJournalEntry( JournalEntry( AddTrackContentObject, map ) );*/
 
 	m_tcoViews.push_back( _tcov );
 
@@ -931,7 +931,7 @@ void trackContentWidget::removeTCOView( trackContentObjectView * _tcov )
 		_tcov->getTrackContentObject()->saveState( mmp, mmp.content() );
 		map["id"] = _tcov->getTrackContentObject()->id();
 		map["state"] = mmp.toString();
-		addJournalEntry( journalEntry( RemoveTrackContentObject,
+		addJournalEntry( JournalEntry( RemoveTrackContentObject,
 								map ) );*/
 
 		m_tcoViews.erase( it );
@@ -945,7 +945,7 @@ void trackContentWidget::removeTCOView( trackContentObjectView * _tcov )
 /*! \brief Update ourselves by updating all the tCOViews attached.
  *
  */
-void trackContentWidget::update( void )
+void trackContentWidget::update()
 {
 	for( tcoViewVector::iterator it = m_tcoViews.begin();
 				it != m_tcoViews.end(); ++it )
@@ -1163,7 +1163,7 @@ void trackContentWidget::resizeEvent( QResizeEvent * _re )
 
 
 
-void trackContentWidget::updateBackground( void )
+void trackContentWidget::updateBackground()
 {
 	const int tactsPerBar = 4;
 	const trackContainerView * tcv = m_trackView->getTrackContainerView();
@@ -1188,7 +1188,7 @@ void trackContentWidget::updateBackground( void )
  *
  * \param _je the details of the edit journal
  */
-void trackContentWidget::undoStep( journalEntry & _je )
+void trackContentWidget::undoStep( JournalEntry & _je )
 {
 	saveJournallingState( false );
 	switch( _je.actionID() )
@@ -1198,10 +1198,8 @@ void trackContentWidget::undoStep( journalEntry & _je )
 			QMap<QString, QVariant> map = _je.data().toMap();
 			trackContentObject * tco =
 				dynamic_cast<trackContentObject *>(
-			engine::getProjectJournal()->getJournallingObject(
-							map["id"].toInt() ) );
-			multimediaProject mmp(
-					multimediaProject::JournalData );
+			engine::projectJournal()->journallingObject( map["id"].toInt() ) );
+			multimediaProject mmp( multimediaProject::JournalData );
 			tco->saveState( mmp, mmp.content() );
 			map["state"] = mmp.toString();
 			_je.data() = map;
@@ -1211,13 +1209,11 @@ void trackContentWidget::undoStep( journalEntry & _je )
 
 		case RemoveTrackContentObject:
 		{
-			trackContentObject * tco = getTrack()->createTCO(
-								midiTime( 0 ) );
+			trackContentObject * tco = getTrack()->createTCO( midiTime( 0 ) );
 			multimediaProject mmp(
 				_je.data().toMap()["state"].
 					toString().toUtf8() );
-			tco->restoreState(
-				mmp.content().firstChild().toElement() );
+			tco->restoreState( mmp.content().firstChild().toElement() );
 			break;
 		}
 	}
@@ -1231,7 +1227,7 @@ void trackContentWidget::undoStep( journalEntry & _je )
  *
  * \param _je the entry in the edit journal to redo.
  */
-void trackContentWidget::redoStep( journalEntry & _je )
+void trackContentWidget::redoStep( JournalEntry & _je )
 {
 	switch( _je.actionID() )
 	{
@@ -1256,9 +1252,9 @@ void trackContentWidget::redoStep( journalEntry & _je )
 /*! \brief Return the track shown by the trackContentWidget
  *
  */
-track * trackContentWidget::getTrack( void )
+track * trackContentWidget::getTrack()
 {
-	return( m_trackView->getTrack() );
+	return m_trackView->getTrack();
 }
 
 
@@ -1270,11 +1266,11 @@ track * trackContentWidget::getTrack( void )
  */
 midiTime trackContentWidget::getPosition( int _mouse_x )
 {
-	return( midiTime( m_trackView->getTrackContainerView()->
+	return midiTime( m_trackView->getTrackContainerView()->
 					currentPosition() + _mouse_x *
 						midiTime::ticksPerTact() /
 			static_cast<int>( m_trackView->
-				getTrackContainerView()->pixelsPerTact() ) ) );
+				getTrackContainerView()->pixelsPerTact() ) );
 }
 
 
@@ -1287,8 +1283,7 @@ midiTime trackContentWidget::endPosition( const midiTime & _pos_start )
 {
 	const float ppt = m_trackView->getTrackContainerView()->pixelsPerTact();
 	const int w = width();
-	return( _pos_start + static_cast<int>( w * midiTime::ticksPerTact() /
-									ppt ) );
+	return _pos_start + static_cast<int>( w * midiTime::ticksPerTact() / ppt );
 }
 
 
@@ -1443,7 +1438,7 @@ void trackOperationsWidget::paintEvent( QPaintEvent * _pe )
 /*! \brief Clone this track
  *
  */
-void trackOperationsWidget::cloneTrack( void )
+void trackOperationsWidget::cloneTrack()
 {
 	engine::getMixer()->lock();
 	m_trackView->getTrack()->clone();
@@ -1456,7 +1451,7 @@ void trackOperationsWidget::cloneTrack( void )
 /*! \brief Remove this track from the track list
  *
  */
-void trackOperationsWidget::removeTrack( void )
+void trackOperationsWidget::removeTrack()
 {
 	emit trackRemovalScheduled( m_trackView );
 }
@@ -1469,7 +1464,7 @@ void trackOperationsWidget::removeTrack( void )
  *  For all track types, we have the Clone and Remove options.
  *  For instrument-tracks we also offer the MIDI-control-menu
  */
-void trackOperationsWidget::updateMenu( void )
+void trackOperationsWidget::updateMenu()
 {
 	QMenu * to_menu = m_trackOps->menu();
 	to_menu->clear();
@@ -1480,10 +1475,10 @@ void trackOperationsWidget::updateMenu( void )
 						tr( "Remove this track" ),
 						this, SLOT( removeTrack() ) );
 
-	if( dynamic_cast<instrumentTrackView *>( m_trackView ) )
+	if( dynamic_cast<InstrumentTrackView *>( m_trackView ) )
 	{
 		to_menu->addSeparator();
-		to_menu->addMenu( dynamic_cast<instrumentTrackView *>(
+		to_menu->addMenu( dynamic_cast<InstrumentTrackView *>(
 						m_trackView )->midiMenu() );
 	}
 }
@@ -1507,7 +1502,7 @@ void trackOperationsWidget::updateMenu( void )
  * \todo check the definitions of all the properties - are they OK?
  */
 track::track( TrackTypes _type, trackContainer * _tc ) :
-	model( _tc ),                   /*!< The track model */
+	Model( _tc ),                   /*!< The track Model */
 	m_trackContainer( _tc ),        /*!< The track container object */
 	m_type( _type ),                /*!< The track type */
 	m_name(),                       /*!< The track's name */
@@ -1560,7 +1555,7 @@ track * track::create( TrackTypes _tt, trackContainer * _tc )
 
 	switch( _tt )
 	{
-		case InstrumentTrack: t = new instrumentTrack( _tc ); break;
+		case InstrumentTrack: t = new ::InstrumentTrack( _tc ); break;
 		case BBTrack: t = new bbTrack( _tc ); break;
 		case SampleTrack: t = new sampleTrack( _tc ); break;
 //		case EVENT_TRACK:
@@ -1573,7 +1568,7 @@ track * track::create( TrackTypes _tt, trackContainer * _tc )
 
 	_tc->updateAfterTrackAdd();
 
-	return( t );
+	return t;
 }
 
 
@@ -1593,7 +1588,7 @@ track * track::create( const QDomElement & _this, trackContainer * _tc )
 	{
 		t->restoreState( _this );
 	}
-	return( t );
+	return t;
 }
 
 
@@ -1602,7 +1597,7 @@ track * track::create( const QDomElement & _this, trackContainer * _tc )
 /*! \brief Clone a track from this track
  *
  */
-void track::clone( void )
+void track::clone()
 {
 	QDomDocument doc;
 	QDomElement parent = doc.createElement( "clone" );
@@ -1639,7 +1634,7 @@ void track::saveSettings( QDomDocument & _doc, QDomElement & _this )
 //	_this.setAttribute( "height", m_trackView->height() );
 
 	QDomElement ts_de = _doc.createElement( nodeName() );
-	// let actual track (instrumentTrack, bbTrack, sampleTrack etc.) save
+	// let actual track (InstrumentTrack, bbTrack, sampleTrack etc.) save
 	// its settings
 	_this.appendChild( ts_de );
 	saveTrackSpecificSettings( _doc, ts_de );
@@ -1781,9 +1776,9 @@ void track::removeTCO( trackContentObject * _tco )
  *
  *  \return the number of trackContentObjects we currently contain.
  */
-int track::numOfTCOs( void )
+int track::numOfTCOs()
 {
-	return( m_trackContentObjects.size() );
+	return m_trackContentObjects.size();
 }
 
 
@@ -1805,11 +1800,11 @@ trackContentObject * track::getTCO( int _tco_num )
 {
 	if( _tco_num < m_trackContentObjects.size() )
 	{
-		return( m_trackContentObjects[_tco_num] );
+		return m_trackContentObjects[_tco_num];
 	}
 	printf( "called track::getTCO( %d ), "
 			"but TCO %d doesn't exist\n", _tco_num, _tco_num );
-	return( createTCO( _tco_num * midiTime::ticksPerTact() ) );
+	return createTCO( _tco_num * midiTime::ticksPerTact() );
 	
 }
 
@@ -1831,12 +1826,12 @@ int track::getTCONum( trackContentObject * _tco )
 	{
 /*		if( getTCO( i ) == _tco )
 		{
-			return( i );
+			return i;
 		}*/
-		return( it - m_trackContentObjects.begin() );
+		return it - m_trackContentObjects.begin();
 	}
 	qWarning( "track::getTCONum(...) -> _tco not found!\n" );
-	return( 0 );
+	return 0;
 }
 
 
@@ -1968,7 +1963,7 @@ void track::removeTact( const midiTime & _pos )
  *  keeping track of the latest time found in ticks.  Then we return
  *  that in bars by dividing by the number of ticks per bar.
  */
-tact_t track::length( void ) const
+tact_t track::length() const
 {
 	// find last end-position
 	tick_t last = 0;
@@ -1993,7 +1988,7 @@ tact_t track::length( void ) const
  *  is already soloed.  Then we have to save the mute state of all tracks,
  *  and set our mute state to on and all the others to off.
  */
-void track::toggleSolo( void )
+void track::toggleSolo()
 {
 	const trackContainer::trackList & tl = m_trackContainer->tracks();
 
@@ -2055,7 +2050,7 @@ void track::toggleSolo( void )
  */
 trackView::trackView( track * _track, trackContainerView * _tcv ) :
 	QWidget( _tcv->contentWidget() ),   /*!< The Track Container View's content widget. */
-	modelView( NULL, this ),            /*!< The model view of this track */
+	ModelView( NULL, this ),            /*!< The model view of this track */
 	m_track( _track ),                  /*!< The track we're displaying */
 	m_trackContainerView( _tcv ),       /*!< The track Container View we're displayed in */
 	m_trackOperationsWidget( this ),    /*!< Our trackOperationsWidget */
@@ -2136,7 +2131,7 @@ void trackView::resizeEvent( QResizeEvent * _re )
 /*! \brief Update this track View and all its content objects.
  *
  */
-void trackView::update( void )
+void trackView::update()
 {
 	m_trackContentWidget.update();
 	if( !m_trackContainerView->fixedTCOs() )
@@ -2152,10 +2147,10 @@ void trackView::update( void )
 /*! \brief Close this track View.
  *
  */
-bool trackView::close( void )
+bool trackView::close()
 {
 	m_trackContainerView->removeTrackView( this );
-	return( QWidget::close() );
+	return QWidget::close();
 }
 
 
@@ -2164,14 +2159,14 @@ bool trackView::close( void )
 /*! \brief Register that the model of this track View has changed.
  *
  */
-void trackView::modelChanged( void )
+void trackView::modelChanged()
 {
 	m_track = castModel<track>();
 	assert( m_track != NULL );
 	connect( m_track, SIGNAL( destroyedTrack() ), this, SLOT( close() ) );
 	m_trackOperationsWidget.m_muteBtn->setModel( &m_track->m_mutedModel );
 	m_trackOperationsWidget.m_soloBtn->setModel( &m_track->m_soloModel );
-	modelView::modelChanged();
+	ModelView::modelChanged();
 }
 
 
@@ -2181,7 +2176,7 @@ void trackView::modelChanged( void )
  *
  *  \param _je the Journal Entry to undo.
  */
-void trackView::undoStep( journalEntry & _je )
+void trackView::undoStep( JournalEntry & _je )
 {
 	saveJournallingState( false );
 	switch( _je.actionID() )
@@ -2213,9 +2208,9 @@ void trackView::undoStep( journalEntry & _je )
  *
  *  \param _je the Journal Event to redo.
  */
-void trackView::redoStep( journalEntry & _je )
+void trackView::redoStep( JournalEntry & _je )
 {
-	journalEntry je( _je.actionID(), -_je.data().toInt() );
+	JournalEntry je( _je.actionID(), -_je.data().toInt() );
 	undoStep( je );
 }
 
@@ -2354,7 +2349,7 @@ void trackView::mouseMoveEvent( QMouseEvent * _me )
 			{
 				m_trackContainerView->moveTrackViewDown( this );
 			}
-			addJournalEntry( journalEntry( MoveTrack, _me->y() ) );
+			addJournalEntry( JournalEntry( MoveTrack, _me->y() ) );
 		}
 	}
 	else if( m_action == ResizeTrack )

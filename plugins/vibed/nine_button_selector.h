@@ -28,7 +28,7 @@
 #include "pixmap_button.h"
 
 
-class nineButtonSelector: public QWidget , public intModelView
+class nineButtonSelector: public QWidget , public IntModelView
 {
 	Q_OBJECT
 			
@@ -91,6 +91,6 @@ private:
 
 } ;
 
-typedef intModel nineButtonSelectorModel;
+typedef IntModel nineButtonSelectorModel;
 
 #endif

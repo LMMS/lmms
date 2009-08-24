@@ -24,7 +24,7 @@
 #ifndef _VIBED_H
 #define _VIBED_H
 
-#include "instrument.h"
+#include "Instrument.h"
 #include "InstrumentView.h"
 #include "sample_buffer.h"
 #include "graph.h"
@@ -36,11 +36,11 @@
 class vibedView;
 class notePlayHandle;
 
-class vibed : public instrument
+class vibed : public Instrument
 {
 	Q_OBJECT
 public:
-	vibed( instrumentTrack * _instrument_track );
+	vibed( InstrumentTrack * _instrument_track );
 	virtual ~vibed();
 
 	virtual void playNote( notePlayHandle * _n,
@@ -58,21 +58,21 @@ public:
 		return( false );
 	}
 
-	virtual pluginView * instantiateView( QWidget * _parent );
+	virtual PluginView * instantiateView( QWidget * _parent );
 
 
 private:
-	QList<knobModel*> m_pickKnobs;
-	QList<knobModel*> m_pickupKnobs;
-	QList<knobModel*> m_stiffnessKnobs;
-	QList<knobModel*> m_volumeKnobs;
-	QList<knobModel*> m_panKnobs;
-	QList<knobModel*> m_detuneKnobs;
-	QList<knobModel*> m_randomKnobs;
-	QList<knobModel*> m_lengthKnobs;
-	QList<boolModel*> m_powerButtons;
+	QList<FloatModel*> m_pickKnobs;
+	QList<FloatModel*> m_pickupKnobs;
+	QList<FloatModel*> m_stiffnessKnobs;
+	QList<FloatModel*> m_volumeKnobs;
+	QList<FloatModel*> m_panKnobs;
+	QList<FloatModel*> m_detuneKnobs;
+	QList<FloatModel*> m_randomKnobs;
+	QList<FloatModel*> m_lengthKnobs;
+	QList<BoolModel*> m_powerButtons;
 	QList<graphModel*> m_graphs;
-	QList<boolModel*> m_impulses;
+	QList<BoolModel*> m_impulses;
 	QList<nineButtonSelectorModel*> m_harmonics;
 
 	static const int __sampleLength = 128;
@@ -86,7 +86,7 @@ class vibedView : public InstrumentView
 {
 	Q_OBJECT
 public:
-	vibedView( instrument * _instrument,
+	vibedView( Instrument * _instrument,
 					QWidget * _parent );
 	virtual ~vibedView() {};
 

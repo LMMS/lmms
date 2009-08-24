@@ -26,20 +26,20 @@
 #ifndef _STEREO_ENHANCER_H
 #define _STEREO_ENHANCER_H
 
-#include "effect.h"
+#include "Effect.h"
 #include "effect_lib.h"
 #include "stereoenhancer_controls.h"
 
-class stereoEnhancerEffect : public effect
+class stereoEnhancerEffect : public Effect
 {
 public:
-	stereoEnhancerEffect( model * parent, 
-	                      const descriptor::subPluginFeatures::key * _key );
+	stereoEnhancerEffect( Model * parent, 
+	                      const Descriptor::SubPluginFeatures::Key * _key );
 	virtual ~stereoEnhancerEffect();
 	virtual bool processAudioBuffer( sampleFrame * _buf,
 		                                          const fpp_t _frames );
 
-	virtual effectControls * getControls( void )
+	virtual EffectControls * controls( void )
 	{
 		return( &m_bbControls );
 	}

@@ -29,8 +29,8 @@
 
 #include "engine.h"
 #include "mixer.h"
-#include "mv_base.h"
-#include "journalling_object.h"
+#include "Model.h"
+#include "JournallingObject.h"
 
 class ControllerDialog;
 class Controller; 
@@ -38,7 +38,7 @@ class Controller;
 typedef QVector<Controller *> ControllerVector;
 
 
-class Controller : public model, public journallingObject
+class Controller : public Model, public JournallingObject
 {
 	Q_OBJECT
 public:
@@ -55,7 +55,7 @@ public:
 		NumControllerTypes
 	} ;
 
-	Controller( ControllerTypes _type, model * _parent,
+	Controller( ControllerTypes _type, Model * _parent,
 						const QString & _display_name );
 
 	virtual ~Controller();
@@ -103,9 +103,9 @@ public:
 	virtual void loadSettings( const QDomElement & _this );
 	virtual QString nodeName( void ) const;
 
-	static Controller * create( ControllerTypes _tt, model * _parent );
+	static Controller * create( ControllerTypes _tt, Model * _parent );
 	static Controller * create( const QDomElement & _this,
-							model * _parent );
+							Model * _parent );
 
 	inline static float fittedValue( float _val )
 	{
@@ -127,7 +127,7 @@ public slots:
 		m_name = _new_name;
 	}
 
-	bool hasModel( const model * m );
+	bool hasModel( const Model * m );
 
 
 protected:

@@ -33,7 +33,7 @@
 #include "automation_pattern_view.h"
 #include "automation_editor.h"
 #include "automation_track.h"
-#include "project_journal.h"
+#include "ProjectJournal.h"
 #include "bb_track_container.h"
 #include "song.h"
 
@@ -80,7 +80,7 @@ automationPattern::~automationPattern()
 
 
 
-void automationPattern::addObject( automatableModel * _obj, bool _search_dup )
+void automationPattern::addObject( AutomatableModel * _obj, bool _search_dup )
 {
 	bool addIt = true;
 
@@ -117,15 +117,15 @@ void automationPattern::addObject( automatableModel * _obj, bool _search_dup )
 
 
 
-const automatableModel * automationPattern::firstObject( void ) const
+const AutomatableModel * automationPattern::firstObject( void ) const
 {
-	automatableModel * m;
+	AutomatableModel * m;
 	if( !m_objects.isEmpty() && ( m = m_objects.first() ) != NULL )
 	{
 		return m;
 	}
 
-	static floatModel _fm( 0, 0, 1, 0.001 );
+	static FloatModel _fm( 0, 0, 1, 0.001 );
 	return &_fm;
 }
 
@@ -376,7 +376,7 @@ trackContentObjectView * automationPattern::createView( trackView * _tv )
 
 
 
-bool automationPattern::isAutomated( const automatableModel * _m )
+bool automationPattern::isAutomated( const AutomatableModel * _m )
 {
 	trackContainer::trackList l = engine::getSong()->tracks() +
 				engine::getBBTrackContainer()->tracks();
@@ -416,7 +416,7 @@ bool automationPattern::isAutomated( const automatableModel * _m )
 
 
 automationPattern * automationPattern::globalAutomationPattern(
-							automatableModel * _m )
+							AutomatableModel * _m )
 {
 	automationTrack * t = engine::getSong()->globalAutomationTrack();
 	track::tcoVector v = t->getTCOs();
@@ -464,14 +464,14 @@ void automationPattern::resolveAllIDs( void )
 					dynamic_cast<automationPattern *>( *j );
 				if( a )
 				{
-	for( QVector<jo_id_t>::iterator k = a->m_idsToResolve.begin();
+	for( QVector<jo_id_t>::Iterator k = a->m_idsToResolve.begin();
 					k != a->m_idsToResolve.end(); ++k )
 	{
-		journallingObject * o = engine::getProjectJournal()->
-						getJournallingObject( *k );
-		if( o && dynamic_cast<automatableModel *>( o ) )
+		JournallingObject * o = engine::projectJournal()->
+										journallingObject( *k );
+		if( o && dynamic_cast<AutomatableModel *>( o ) )
 		{
-			a->addObject( dynamic_cast<automatableModel *>( o ), false );
+			a->addObject( dynamic_cast<AutomatableModel *>( o ), false );
 		}
 	}
 	a->m_idsToResolve.clear();

@@ -57,9 +57,9 @@
 
 
 
-fader::fader( floatModel * _model, const QString & _name, QWidget * _parent ) :
+fader::fader( FloatModel * _model, const QString & _name, QWidget * _parent ) :
 	QWidget( _parent ),
-	floatModelView( _model, this ),
+	FloatModelView( _model, this ),
 	m_model( _model ),
 	m_fPeakValue_L( 0.0 ),
 	m_fPeakValue_R( 0.0 ),
@@ -120,7 +120,7 @@ void fader::mousePressEvent( QMouseEvent * _me )
 	}
 	else
 	{
-		automatableModelView::mousePressEvent( _me );
+		AutomatableModelView::mousePressEvent( _me );
 	}
 }
 

@@ -25,9 +25,9 @@
 #include "ResourceAction.h"
 #include "ResourceItem.h"
 #include "ResourceFileMapper.h"
-#include "import_filter.h"
-#include "instrument.h"
-#include "instrument_track.h"
+#include "ImportFilter.h"
+#include "Instrument.h"
+#include "InstrumentTrack.h"
 #include "MainWindow.h"
 #include "mmp.h"
 #include "song.h"
@@ -56,12 +56,11 @@ bool ResourceAction::loadProject()
 
 
 
-bool ResourceAction::loadByPlugin( instrumentTrack * _target )
+bool ResourceAction::loadByPlugin( InstrumentTrack * _target )
 {
-	instrument * i = _target->getInstrument();
-	if( i == NULL ||
-		!i->getDescriptor()->supportsFileType(
-						m_item->nameExtension() ) )
+	Instrument * i = _target->instrument();
+	if( i == NULL || !i->descriptor()->supportsFileType(
+										m_item->nameExtension() ) )
 	{
 		i = _target->loadInstrument(
 			engine::pluginFileHandling()[m_item->nameExtension()] );
@@ -77,10 +76,10 @@ bool ResourceAction::loadByPlugin( instrumentTrack * _target )
 
 
 
-bool ResourceAction::loadPreset( instrumentTrack * _target )
+bool ResourceAction::loadPreset( InstrumentTrack * _target )
 {
 	multimediaProject mmp( m_item->fetchData() );
-	instrumentTrack::removeMidiPortNode( mmp );
+	InstrumentTrack::removeMidiPortNode( mmp );
 	_target->setSimpleSerializing();
 	_target->loadSettings( mmp.content().toElement() );
 
@@ -93,7 +92,7 @@ bool ResourceAction::loadPreset( instrumentTrack * _target )
 bool ResourceAction::importProject( trackContainer * _target )
 {
 	ResourceFileMapper mapper( m_item );
-	/*return*/ importFilter::import( mapper.fileName(), _target );
+	/*return*/ ImportFilter::import( mapper.fileName(), _target );
 	return true;
 }
 

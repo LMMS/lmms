@@ -29,7 +29,7 @@
 
 #include <QtCore/QMutex>
 
-#include "instrument.h"
+#include "Instrument.h"
 #include "pixmap_button.h"
 #include "InstrumentView.h"
 #include "knob.h"
@@ -47,14 +47,14 @@ class patchesDialog;
 class QLabel;
 
 
-class sf2Instrument : public instrument
+class sf2Instrument : public Instrument
 {
 	Q_OBJECT
 	mapPropertyFromModel(int,getBank,setBank,m_bankNum);
 	mapPropertyFromModel(int,getPatch,setPatch,m_patchNum);
 
 public:
-	sf2Instrument( instrumentTrack * _instrument_track );
+	sf2Instrument( InstrumentTrack * _instrument_track );
 	virtual ~sf2Instrument();
 
 	virtual void play( sampleFrame * _working_buffer );
@@ -69,7 +69,7 @@ public:
 
 	virtual void loadResource( const ResourceItem * _item );
 
-	virtual automatableModel * getChildModel( const QString & _modelName );
+	virtual AutomatableModel * childModel( const QString & _modelName );
 
 	virtual QString nodeName() const;
 
@@ -83,7 +83,7 @@ public:
 		return true;
 	}
 
-	virtual pluginView * instantiateView( QWidget * _parent );
+	virtual PluginView * instantiateView( QWidget * _parent );
 	
 	QString getCurrentPatchName();
 
@@ -135,19 +135,19 @@ private:
 	lcdSpinBoxModel m_bankNum;
 	lcdSpinBoxModel m_patchNum;
 
-	knobModel m_gain;
+	FloatModel m_gain;
 
-	boolModel m_reverbOn;
-	knobModel m_reverbRoomSize;
-	knobModel m_reverbDamping;
-	knobModel m_reverbWidth;
-	knobModel m_reverbLevel;
+	BoolModel m_reverbOn;
+	FloatModel m_reverbRoomSize;
+	FloatModel m_reverbDamping;
+	FloatModel m_reverbWidth;
+	FloatModel m_reverbLevel;
 
-	boolModel m_chorusOn;
-	knobModel m_chorusNum;
-	knobModel m_chorusLevel;
-	knobModel m_chorusSpeed;
-	knobModel m_chorusDepth;
+	BoolModel m_chorusOn;
+	FloatModel m_chorusNum;
+	FloatModel m_chorusLevel;
+	FloatModel m_chorusSpeed;
+	FloatModel m_chorusDepth;
 
 
 private:
@@ -183,7 +183,7 @@ class sf2InstrumentView : public InstrumentView
 {
 	Q_OBJECT
 public:
-	sf2InstrumentView( instrument * _instrument,
+	sf2InstrumentView( Instrument * _instrument,
 					QWidget * _parent );
 	virtual ~sf2InstrumentView();
 

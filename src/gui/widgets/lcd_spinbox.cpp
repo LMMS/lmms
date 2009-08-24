@@ -45,7 +45,7 @@
 lcdSpinBox::lcdSpinBox( int _num_digits, QWidget * _parent,
 			const QString & _name ) :
 	QWidget( _parent ),
-	intModelView( new intModel( 0, 0, 0, NULL, _name, true ), this ),
+	IntModelView( new IntModel( 0, 0, 0, NULL, _name, true ), this ),
 	m_label(),
 	m_numDigits( _num_digits ),
 	m_origMousePos()
@@ -70,7 +70,7 @@ lcdSpinBox::lcdSpinBox( int _num_digits, QWidget * _parent,
 lcdSpinBox::lcdSpinBox( int _num_digits, const QString & _lcd_style,
 			QWidget * _parent, const QString & _name ) :
 	QWidget( _parent ),
-	intModelView( new intModel( 0, 0, 0, NULL, _name, true ), this ),
+	IntModelView( new IntModel( 0, 0, 0, NULL, _name, true ), this ),
 	m_label(),
 	m_numDigits( _num_digits ),
 	m_origMousePos()
@@ -291,7 +291,7 @@ void lcdSpinBox::mousePressEvent( QMouseEvent * _me )
 	}
 	else
 	{
-		automatableModelView::mousePressEvent( _me );
+		IntModelView::mousePressEvent( _me );
 	}
 }
 

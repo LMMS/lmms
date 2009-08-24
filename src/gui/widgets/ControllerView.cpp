@@ -40,16 +40,15 @@
 #include "led_checkbox.h"
 #include "MainWindow.h"
 #include "tooltip.h"
-#include "mv_base.h"
 
 
 ControllerView::ControllerView( Controller * _model, QWidget * _parent ) :
 	QWidget( _parent ),
-	modelView( _model, this ),
+	ModelView( _model, this ),
 	m_bg( embed::getIconPixmap( "controller_bg" ) ),
 	m_subWindow( NULL ),
 	m_controllerDlg( NULL ),
-	m_show( TRUE )
+	m_show( true )
 {
 	setFixedSize( 210, 32 );
 
@@ -94,28 +93,28 @@ ControllerView::~ControllerView()
 
 
 
-void ControllerView::editControls( void )
+void ControllerView::editControls()
 {
 	if( m_show )
 	{
 		m_subWindow->show();
 		m_subWindow->raise();
-		m_show = FALSE;
+		m_show = false;
 	}
 	else
 	{
 		m_subWindow->hide();
-		m_show = TRUE;
+		m_show = true;
 	}
 }
 
 
 
 
-void ControllerView::closeControls( void )
+void ControllerView::closeControls()
 {
 	m_subWindow->hide();
-	m_show = TRUE;
+	m_show = true;
 }
 
 
@@ -132,7 +131,7 @@ void ControllerView::paintEvent( QPaintEvent * )
 	p.drawPixmap( 0, 0, m_bg );
 
 	QFont f = pointSizeF( font(), 7.5f );
-	f.setBold( TRUE );
+	f.setBold( true );
 	p.setFont( f );
 
 	Controller * c = castModel<Controller>();
@@ -142,7 +141,7 @@ void ControllerView::paintEvent( QPaintEvent * )
 	p.setPen( palette().text().color() );
 	p.drawText( 6, 12, c->displayName() );
 
-	f.setBold( FALSE );
+	f.setBold( false );
 	p.setFont( f );
 	p.drawText( 8, 26, c->name() );
 }
@@ -166,7 +165,7 @@ void ControllerView::mouseDoubleClickEvent( QMouseEvent * event )
 
 
 
-void ControllerView::modelChanged( void )
+void ControllerView::modelChanged()
 {
 }
 
@@ -174,17 +173,7 @@ void ControllerView::modelChanged( void )
 
 void ControllerView::contextMenuEvent( QContextMenuEvent * )
 {
-	QPointer<captionMenu> contextMenu = new captionMenu(
-						getModel()->displayName() );
-	/*
-	contextMenu->addAction( embed::getIconPixmap( "arp_up" ),
-						tr( "Move &up" ),
-						this, SLOT( moveUp() ) );
-	contextMenu->addAction( embed::getIconPixmap( "arp_down" ),
-						tr( "Move &down" ),
-						this, SLOT( moveDown() ) );
-	contextMenu->addSeparator();
-	*/
+	QPointer<captionMenu> contextMenu = new captionMenu( model()->displayName() );
 	contextMenu->addAction( embed::getIconPixmap( "cancel" ),
 						tr( "&Remove this plugin" ),
 						this, SLOT( deleteController() ) );
@@ -198,7 +187,7 @@ void ControllerView::contextMenuEvent( QContextMenuEvent * )
 
 
 
-void ControllerView::displayHelp( void )
+void ControllerView::displayHelp()
 {
 	QWhatsThis::showText( mapToGlobal( rect().center() ),
 								whatsThis() );

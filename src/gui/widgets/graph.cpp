@@ -23,7 +23,6 @@
  *
  */
 
-
 #include <QtGui/QPaintEvent>
 #include <QtGui/QFontMetrics>
 #include <QtGui/QPainter>
@@ -31,26 +30,21 @@
 #include "graph.h"
 #include "string_pair_drag.h"
 #include "sample_buffer.h"
-#include "oscillator.h"
+#include "Oscillator.h"
 #include "engine.h"
-//#include <cstdlib>
-//#include <math.h>
-
-using namespace std;
-
 
 
 graph::graph( QWidget * _parent, graphStyle _style ) :
 	QWidget( _parent ),
 	/* TODO: size, background? */
-	modelView( new graphModel( -1.0, 1.0, 128, NULL, TRUE ), this ),
+	ModelView( new graphModel( -1.0, 1.0, 128, NULL, true ), this ),
 	m_graphStyle( _style )
 {
 	m_mouseDown = false;
 	m_graphColor = engine::getLmmsStyle()->color(LmmsStyle::StandardGraphLine);
 
 	resize( 132, 104 );
-	setAcceptDrops( TRUE );
+	setAcceptDrops( true );
 	setCursor( Qt::CrossCursor );
 
 	graphModel * gModel = castModel<graphModel>();
@@ -126,18 +120,18 @@ void graph::mouseMoveEvent ( QMouseEvent * _me )
 
 	if( diff >= 1 )
 	{
-		x = min( width() - 2, m_lastCursorX + 1);
+		x = qMin( width() - 2, m_lastCursorX + 1);
 	}
 	else if( diff <= 1 )
 	{
-		x = max( 2, m_lastCursorX - 1 );
+		x = qMax( 2, m_lastCursorX - 1 );
 	}
 	else
 	{
 		x = m_lastCursorX;
 	}
 
-	y = max( 2, min( y, height()-3 ) );
+	y = qMax( 2, qMin( y, height()-3 ) );
 
 	changeSampleAt( x, y );
 
@@ -238,7 +232,7 @@ void graph::paintEvent( QPaintEvent * )
 	switch( m_graphStyle )
 	{
 		case graph::LinearStyle:
-			p.setRenderHints( QPainter::Antialiasing, TRUE );
+			p.setRenderHints( QPainter::Antialiasing, true );
 
 			for( int i=0; i < length; i++ )
 			{
@@ -256,7 +250,7 @@ void graph::paintEvent( QPaintEvent * )
 				width()-2,
 				2+static_cast<int>( ( (*samps)[0] - maxVal ) * yscale ) );
 
-			p.setRenderHints( QPainter::Antialiasing, FALSE );
+			p.setRenderHints( QPainter::Antialiasing, false );
 			break;
 
 
@@ -315,7 +309,7 @@ void graph::dropEvent( QDropEvent * _de )
 void graph::dragEnterEvent( QDragEnterEvent * _dee )
 {
 	if( stringPairDrag::processDragEnterEvent( _dee,
-		QString( "samplefile" ) ) == FALSE )
+		QString( "samplefile" ) ) == false )
 	{
 		_dee->ignore();
 	}
@@ -323,7 +317,7 @@ void graph::dragEnterEvent( QDragEnterEvent * _dee )
 
 
 
-void graph::modelChanged( void )
+void graph::modelChanged()
 {
 	graphModel * gModel = castModel<graphModel>();
 
@@ -342,15 +336,15 @@ void graph::updateGraph( int _startPos, int _endPos )
 }
 
 
-void graph::updateGraph( void )
+void graph::updateGraph()
 {
     updateGraph( 0, model()->length() - 1 );
 }
 
 
 graphModel::graphModel( float _min, float _max, int _length,
-			::model * _parent, bool _default_constructed,  float _step ) :
-	model( _parent, tr( "Graph" ), _default_constructed ),
+			::Model * _parent, bool _default_constructed,  float _step ) :
+	Model( _parent, tr( "Graph" ), _default_constructed ),
 	m_samples( _length ),
 	m_minValue( _min ),
 	m_maxValue( _max ),
@@ -425,11 +419,11 @@ void graphModel::setSamples( const float * _samples )
 
 
 
-void graphModel::setWaveToSine( void )
+void graphModel::setWaveToSine()
 {
 	for( int i = 0; i < length(); i++ )
 	{
-		m_samples[i] = oscillator::sinSample(
+		m_samples[i] = Oscillator::sinSample(
 				i / static_cast<float>( length() ) );
 	}
 
@@ -438,11 +432,11 @@ void graphModel::setWaveToSine( void )
 
 
 
-void graphModel::setWaveToTriangle( void )
+void graphModel::setWaveToTriangle()
 {
 	for( int i = 0; i < length(); i++ )
 	{
-		m_samples[i] = oscillator::triangleSample(
+		m_samples[i] = Oscillator::triangleSample(
 				i / static_cast<float>( length() ) );
 	}
 
@@ -451,11 +445,11 @@ void graphModel::setWaveToTriangle( void )
 
 
 
-void graphModel::setWaveToSaw( void )
+void graphModel::setWaveToSaw()
 {
 	for( int i = 0; i < length(); i++ )
 	{
-		m_samples[i] = oscillator::sawSample(
+		m_samples[i] = Oscillator::sawSample(
 				i / static_cast<float>( length() ) );
 	}
 
@@ -464,11 +458,11 @@ void graphModel::setWaveToSaw( void )
 
 
 
-void graphModel::setWaveToSquare( void )
+void graphModel::setWaveToSquare()
 {
 	for( int i = 0; i < length(); i++ )
 	{
-		m_samples[i] = oscillator::squareSample(
+		m_samples[i] = Oscillator::squareSample(
 				i / static_cast<float>( length() ) );
 	}
 
@@ -477,11 +471,11 @@ void graphModel::setWaveToSquare( void )
 
 
 
-void graphModel::setWaveToNoise( void )
+void graphModel::setWaveToNoise()
 {
 	for( int i = 0; i < length(); i++ )
 	{
-		m_samples[i] = oscillator::noiseSample(
+		m_samples[i] = Oscillator::noiseSample(
 				i / static_cast<float>( length() ) );
 	}
 
@@ -490,7 +484,7 @@ void graphModel::setWaveToNoise( void )
 
 
 
-void graphModel::smooth( void )
+void graphModel::smooth()
 {
 	// store values in temporary array
 	QVector<float> temp = m_samples;
@@ -507,7 +501,7 @@ void graphModel::smooth( void )
 
 
 
-void graphModel::normalize( void )
+void graphModel::normalize()
 {
 	float max = 0.0001f;
 	for( int i = 0; i < length(); i++ )

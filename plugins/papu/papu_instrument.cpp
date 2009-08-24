@@ -29,7 +29,7 @@
 #include "Basic_Gb_Apu.h"
 
 #include "papu_instrument.h"
-#include "instrument_track.h"
+#include "InstrumentTrack.h"
 #include "knob.h"
 #include "note_play_handle.h"
 #include "pixmap_button.h"
@@ -40,7 +40,7 @@
 
 extern "C"
 {
-plugin::descriptor PLUGIN_EXPORT papu_plugin_descriptor =
+Plugin::Descriptor PLUGIN_EXPORT papu_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"FreeBoy",
@@ -49,16 +49,16 @@ plugin::descriptor PLUGIN_EXPORT papu_plugin_descriptor =
 	"Attila Herman <attila589/at/gmail.com>"
 	"Csaba Hruska <csaba.hruska/at/gmail.com>",
 	0x0100,
-	plugin::Instrument,
-	new pluginPixmapLoader( "logo" ),
+	Plugin::Instrument,
+	new PluginPixmapLoader( "logo" ),
 	NULL
 } ;
 
 }
 
 
-papuInstrument::papuInstrument( instrumentTrack * _instrument_track ) :
-	instrument( _instrument_track, &papu_plugin_descriptor ),
+papuInstrument::papuInstrument( InstrumentTrack * _instrument_track ) :
+	Instrument( _instrument_track, &papu_plugin_descriptor ),
 
 	m_ch1SweepTimeModel( 4.0f, 0.0f, 7.0f, 1.0f, this, tr( "Sweep time" ) ),
 	m_ch1SweepDirModel( false, this, tr( "Sweep direction" ) ),
@@ -404,7 +404,7 @@ void papuInstrument::playNote( notePlayHandle * _n,
 		}
 		framesleft -= count;
 	}
-	getInstrumentTrack()->processAudioBuffer( _working_buffer, frames, _n );
+	instrumentTrack()->processAudioBuffer( _working_buffer, frames, _n );
 }
 
 
@@ -417,7 +417,7 @@ void papuInstrument::deleteNotePluginData( notePlayHandle * _n )
 
 
 
-pluginView * papuInstrument::instantiateView( QWidget * _parent )
+PluginView * papuInstrument::instantiateView( QWidget * _parent )
 {
 	return( new papuInstrumentView( this, _parent ) );
 }
@@ -442,7 +442,7 @@ public:
 
 
 
-papuInstrumentView::papuInstrumentView( instrument * _instrument,
+papuInstrumentView::papuInstrumentView( Instrument * _instrument,
 							QWidget * _parent ) :
 	InstrumentView( _instrument, _parent )
 {
@@ -733,10 +733,10 @@ extern "C"
 {
 
 // neccessary for getting instance out of shared lib
-plugin * PLUGIN_EXPORT lmms_plugin_main( model *, void * _data )
+Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, void * _data )
 {
 	return( new papuInstrument(
-				static_cast<instrumentTrack *>( _data ) ) );
+				static_cast<InstrumentTrack *>( _data ) ) );
 }
 
 

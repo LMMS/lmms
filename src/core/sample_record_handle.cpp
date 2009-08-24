@@ -26,7 +26,7 @@
 #include "sample_record_handle.h"
 #include "bb_track.h"
 #include "engine.h"
-#include "instrument_track.h"
+#include "InstrumentTrack.h"
 #include "pattern.h"
 #include "sample_buffer.h"
 #include "sample_track.h"

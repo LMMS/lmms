@@ -35,8 +35,8 @@
 #include "engine.h"
 #include "gui_templates.h"
 #include "instrument_play_handle.h"
-#include "instrument_track.h"
-#include "vst_plugin.h"
+#include "InstrumentTrack.h"
+#include "VstPlugin.h"
 #include "pixmap_button.h"
 #include "string_pair_drag.h"
 #include "text_float.h"
@@ -51,7 +51,7 @@ static const char * __supportedExts[] =
 extern "C"
 {
 
-plugin::descriptor vestige_plugin_descriptor =
+Plugin::Descriptor vestige_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"VeSTige",
@@ -59,8 +59,8 @@ plugin::descriptor vestige_plugin_descriptor =
 			"VST-host for using VST(i)-plugins within LMMS" ),
 	"Tobias Doerffel <tobydox/at/users.sf.net>",
 	0x0100,
-	plugin::Instrument,
-	new pluginPixmapLoader( "logo" ),
+	Plugin::Instrument,
+	new PluginPixmapLoader( "logo" ),
 	__supportedExts,
 	NULL
 } ;
@@ -71,13 +71,13 @@ plugin::descriptor vestige_plugin_descriptor =
 QPixmap * VestigeInstrumentView::s_artwork = NULL;
 
 
-vestigeInstrument::vestigeInstrument( instrumentTrack * _instrument_track ) :
-	instrument( _instrument_track, &vestige_plugin_descriptor ),
+vestigeInstrument::vestigeInstrument( InstrumentTrack * _instrument_track ) :
+	Instrument( _instrument_track, &vestige_plugin_descriptor ),
 	m_plugin( NULL ),
 	m_pluginMutex()
 {
 	// now we need a play-handle which cares for calling play()
-	instrumentPlayHandle * iph = new instrumentPlayHandle( this );
+	InstrumentPlayHandle * iph = new InstrumentPlayHandle( this );
 	engine::getMixer()->addPlayHandle( iph );
 }
 
@@ -86,7 +86,7 @@ vestigeInstrument::vestigeInstrument( instrumentTrack * _instrument_track ) :
 
 vestigeInstrument::~vestigeInstrument()
 {
-	engine::getMixer()->removePlayHandles( getInstrumentTrack() );
+	engine::getMixer()->removePlayHandles( instrumentTrack() );
 	closePlugin();
 }
 
@@ -151,7 +151,7 @@ void vestigeInstrument::play( sampleFrame * _buf )
 
 	const fpp_t frames = engine::getMixer()->framesPerPeriod();
 
-	getInstrumentTrack()->processAudioBuffer( _buf, frames, NULL );
+	instrumentTrack()->processAudioBuffer( _buf, frames, NULL );
 
 	m_pluginMutex.unlock();
 }
@@ -193,9 +193,9 @@ void vestigeInstrument::loadFile( const QString & _file )
 {
 	m_pluginMutex.lock();
 	const bool set_ch_name = ( m_plugin != NULL &&
-		getInstrumentTrack()->name() == m_plugin->name() ) ||
-			getInstrumentTrack()->name() ==
-				instrumentTrack::tr( "Default preset" );
+		instrumentTrack()->name() == m_plugin->name() ) ||
+			instrumentTrack()->name() ==
+				InstrumentTrack::tr( "Default preset" );
 	m_pluginMutex.unlock();
 
 	closePlugin();
@@ -207,7 +207,7 @@ void vestigeInstrument::loadFile( const QString & _file )
 			PLUGIN_NAME::getIconPixmap( "logo", 24, 24 ), 0 );
 
 	m_pluginMutex.lock();
-	m_plugin = new vstPlugin( m_pluginDLL );
+	m_plugin = new VstPlugin( m_pluginDLL );
 	if( m_plugin->failed() )
 	{
 		m_pluginMutex.unlock();
@@ -229,7 +229,7 @@ void vestigeInstrument::loadFile( const QString & _file )
 
 	if( set_ch_name )
 	{
-		getInstrumentTrack()->setName( m_plugin->name() );
+		instrumentTrack()->setName( m_plugin->name() );
 	}
 
 	m_pluginMutex.unlock();
@@ -242,7 +242,7 @@ void vestigeInstrument::loadFile( const QString & _file )
 
 
 
-pluginView * vestigeInstrument::instantiateView( QWidget * _parent )
+PluginView * vestigeInstrument::instantiateView( QWidget * _parent )
 {
 	return new VestigeInstrumentView( this, _parent );
 }
@@ -255,7 +255,7 @@ pluginView * vestigeInstrument::instantiateView( QWidget * _parent )
 
 
 
-VestigeInstrumentView::VestigeInstrumentView( instrument * _instrument,
+VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 							QWidget * _parent ) :
 	InstrumentView( _instrument, _parent )
 {
@@ -446,9 +446,9 @@ extern "C"
 {
 
 // neccessary for getting instance out of shared lib
-plugin * lmms_plugin_main( model *, void * _data )
+Plugin * lmms_plugin_main( Model *, void * _data )
 {
-	return new vestigeInstrument( static_cast<instrumentTrack *>( _data ) );
+	return new vestigeInstrument( static_cast<InstrumentTrack *>( _data ) );
 }
 
 

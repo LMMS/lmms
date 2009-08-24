@@ -30,7 +30,7 @@
 
 #include <QtGui/QWidget>
 
-#include "automatable_model.h"
+#include "AutomatableModel.h"
 #include "mixer.h"
 
 
@@ -41,13 +41,13 @@ class knob;
 const int SURROUND_AREA_SIZE = 1024;
 
 
-class surroundAreaModel : public model
+class surroundAreaModel : public Model
 {
 	Q_OBJECT
 	mapPropertyFromModel(int,x,setX,m_posX);
 	mapPropertyFromModel(int,y,setY,m_posY);
 public:
-	surroundAreaModel( ::model * _parent,
+	surroundAreaModel( Model * _parent,
 					bool _default_constructed = FALSE );
 
 	surroundVolumeVector getVolumeVector( float _v_scale ) const;
@@ -74,14 +74,14 @@ public:
 
 
 private:
-	intModel m_posX;
-	intModel m_posY;
+	IntModel m_posX;
+	IntModel m_posY;
 
 } ;
 
 
 /*
-class surroundArea : public QWidget, public modelView
+class surroundArea : public QWidget, public ModelView
 {
 	Q_OBJECT
 public:

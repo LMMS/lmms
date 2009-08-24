@@ -30,7 +30,7 @@
 
 
 stereoEnhancerControls::stereoEnhancerControls( stereoEnhancerEffect * _eff ) :
-		effectControls( _eff ),
+		EffectControls( _eff ),
 		m_effect( _eff ),
 		m_widthModel(0.0f, 0.0f, 180.0f, 1.0f, this, tr( "Width" ) )
 {

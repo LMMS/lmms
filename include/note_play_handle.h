@@ -34,7 +34,7 @@
 #include "track.h"
 
 
-class instrumentTrack;
+class InstrumentTrack;
 class notePlayHandle;
 
 template<ch_cnt_t=DEFAULT_CHANNELS> class basicFilters;
@@ -48,7 +48,7 @@ public:
 	void * m_pluginData;
 	basicFilters<> * m_filter;
 
-	notePlayHandle( instrumentTrack * _instrument_track,
+	notePlayHandle( InstrumentTrack * _instrument_track,
 					const f_cnt_t _offset,
 					const f_cnt_t _frames, const note & _n,
 					notePlayHandle * _parent = NULL,
@@ -57,31 +57,31 @@ public:
 
 	virtual void setVolume( const volume_t _volume = DefaultVolume );
 	
-	int getMidiVelocity( void ) const;
+	int getMidiVelocity() const;
 
-	const float & frequency( void ) const
+	const float & frequency() const
 	{
 		return m_frequency;
 	}
 
-	void updateFrequency( void );
+	void updateFrequency();
 
 	// returns frequency without pitch-wheel influence
-	float unpitchedFrequency( void ) const
+	float unpitchedFrequency() const
 	{
 		return m_unpitchedFrequency;
 	}
 
 	virtual void play( sampleFrame * _working_buffer );
 
-	virtual inline bool done( void ) const
+	virtual inline bool done() const
 	{
 		return m_released && framesLeft() <= 0;
 	}
 
-	f_cnt_t framesLeft( void ) const;
+	f_cnt_t framesLeft() const;
 
-	inline fpp_t framesLeftForCurrentPeriod( void ) const
+	inline fpp_t framesLeftForCurrentPeriod() const
 	{
 		return (fpp_t) qMin<f_cnt_t>( framesLeft(),
 				engine::getMixer()->framesPerPeriod() );
@@ -93,21 +93,21 @@ public:
 
 	void noteOff( const f_cnt_t _s = 0 );
 
-	inline f_cnt_t framesBeforeRelease( void ) const
+	inline f_cnt_t framesBeforeRelease() const
 	{
 		return m_framesBeforeRelease;
 	}
 
-	inline f_cnt_t releaseFramesDone( void ) const
+	inline f_cnt_t releaseFramesDone() const
 	{
 		return m_releaseFramesDone;
 	}
 
-	f_cnt_t actualReleaseFramesToDo( void ) const;
+	f_cnt_t actualReleaseFramesToDo() const;
 
 
 	// returns total numbers of frames to play
-	inline f_cnt_t frames( void ) const
+	inline f_cnt_t frames() const
 	{
 		return m_frames;
 	}
@@ -115,13 +115,13 @@ public:
 	void setFrames( const f_cnt_t _frames );
 
 	// returns whether note was released
-	inline bool released( void ) const
+	inline bool released() const
 	{
 		return m_released;
 	}
 
 	// returns total numbers of played frames
-	inline f_cnt_t totalFramesPlayed( void ) const
+	inline f_cnt_t totalFramesPlayed() const
 	{
 		return m_totalFramesPlayed;
 	}
@@ -130,19 +130,19 @@ public:
 	float volumeLevel( const f_cnt_t _frame );
 
 	// returns instrument-track this note-play-handle plays
-	inline instrumentTrack * getInstrumentTrack( void )
+	inline InstrumentTrack * instrumentTrack()
 	{
-		return m_instrumentTrack;
+		return m_InstrumentTrack;
 	}
 
 	// returns whether note is a base-note, e.g. is not part of an arpeggio
 	// or a chord
-	inline bool isBaseNote( void ) const
+	inline bool isBaseNote() const
 	{
 		return m_baseNote;
 	}
 
-	inline bool isPartOfArpeggio( void ) const
+	inline bool isPartOfArpeggio() const
 	{
 		return m_partOfArpeggio;
 	}
@@ -153,28 +153,28 @@ public:
 	}
 
 	// returns whether note is base-note for arpeggio
-	bool isArpeggioBaseNote( void ) const;
+	bool isArpeggioBaseNote() const;
 
-	inline bool isMuted( void ) const
+	inline bool isMuted() const
 	{
 		return m_muted;
 	}
 
-	void mute( void );
+	void mute();
 
 	// returns index of note-play-handle in vector of note-play-handles 
 	// belonging to this instrument-track - used by arpeggiator
-	int index( void ) const;
+	int index() const;
 
 	// note-play-handles belonging to given channel, if _all_ph = true,
 	// also released note-play-handles are returned
 	static ConstNotePlayHandleList nphsOfInstrumentTrack(
-			const instrumentTrack * _ct, bool _all_ph = false );
+			const InstrumentTrack * _ct, bool _all_ph = false );
 
 	// return whether given note-play-handle is equal to *this
 	bool operator==( const notePlayHandle & _nph ) const;
 
-	inline bool bbTrackMuted( void )
+	inline bool bbTrackMuted()
 	{
 		return m_bbTrack && m_bbTrack->isMuted();
 	}
@@ -187,7 +187,7 @@ public:
 	void resize( const bpm_t _new_tempo );
 
 #ifdef LMMS_SINGERBOT_SUPPORT
-	int patternIndex( void )
+	int patternIndex()
 	{
 		return m_patternIndex;
 	}
@@ -210,7 +210,7 @@ private:
 			m_value = _val;
 		}
 
-		float value( void ) const
+		float value() const
 		{
 			return m_value;
 		}
@@ -223,8 +223,8 @@ private:
 	} ;
 	
 
-	instrumentTrack * m_instrumentTrack;	// needed for calling
-					// instrumentTrack::playNote
+	InstrumentTrack * m_InstrumentTrack;	// needed for calling
+					// InstrumentTrack::playNote
 	f_cnt_t m_frames;		// total frames to play
 	f_cnt_t m_totalFramesPlayed;	// total frame-counter - used for
 					// figuring out whether a whole note

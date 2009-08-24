@@ -2,7 +2,7 @@
  * setup_dialog_mcl.h - dialog for setting up MIDI Control Listener
  *
  * Copyright (c) 2009 Achim Settelmeier <lmms/at/m1.sirlab.de>
- * 
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -28,7 +28,7 @@
 #include <QtGui/QDialog>
 
 #include "DummyMidiEventProcessor.h"
-#include "piano.h"
+#include "Piano.h"
 
 class setupDialog;
 

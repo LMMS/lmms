@@ -3,7 +3,7 @@
  *           track-like objects (beat/bassline, sample-track...)
  *
  * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -23,7 +23,6 @@
  *
  */
 
-
 #ifndef _TRACK_H
 #define _TRACK_H
 
@@ -34,8 +33,9 @@
 #include "lmms_basics.h"
 #include "midi_time.h"
 #include "rubberband.h"
-#include "journalling_object.h"
-#include "automatable_model.h"
+#include "JournallingObject.h"
+#include "AutomatableModel.h"
+#include "ModelView.h"
 
 
 class QMenu;
@@ -59,7 +59,7 @@ const int TRACK_OP_WIDTH = 78;
 const int TCO_BORDER_WIDTH = 1;
 
 
-class trackContentObject : public model, public journallingObject
+class trackContentObject : public Model, public JournallingObject
 {
 	Q_OBJECT
 	mapPropertyFromModel( bool, isMuted, setMuted, m_mutedModel);
@@ -67,14 +67,14 @@ public:
 	trackContentObject( track * _track );
 	virtual ~trackContentObject();
 
-	inline track * getTrack( void ) const
+	inline track * getTrack() const
 	{
-		return( m_track );
+		return m_track;
 	}
 
-	inline const QString & name( void ) const
+	inline const QString & name() const
 	{
-		return( m_name );
+		return m_name;
 	}
 
 	inline void setName( const QString & _name )
@@ -83,26 +83,26 @@ public:
 		emit dataChanged();
 	}
 
-	virtual QString displayName( void ) const
+	virtual QString displayName() const
 	{
-		return( name() );
+		return name();
 	}
 
 
-	inline const midiTime & startPosition( void ) const
+	inline const midiTime & startPosition() const
 	{
-		return( m_startPosition );
+		return m_startPosition;
 	}
 
-	inline midiTime endPosition( void ) const
+	inline midiTime endPosition() const
 	{
 		const int sp = m_startPosition;
 		return sp + m_length;
 	}
 
-	inline const midiTime & length( void ) const
+	inline const midiTime & length() const
 	{
-		return( m_length );
+		return m_length;
 	}
 
 	virtual void movePosition( const midiTime & _pos );
@@ -112,20 +112,20 @@ public:
 
 
 public slots:
-	void copy( void );
-	void paste( void );
-	void toggleMute( void );
+	void copy();
+	void paste();
+	void toggleMute();
 
 
 protected:
-	virtual void undoStep( journalEntry & _je );
-	virtual void redoStep( journalEntry & _je );
+	virtual void undoStep( JournalEntry & _je );
+	virtual void redoStep( JournalEntry & _je );
 
 
 signals:
-	void lengthChanged( void );
-	void positionChanged( void );
-	void destroyedTCO( void );
+	void lengthChanged();
+	void positionChanged();
+	void destroyedTCO();
 
 
 private:
@@ -142,7 +142,7 @@ private:
 	midiTime m_startPosition;
 	midiTime m_length;
 
-	boolModel m_mutedModel;
+	BoolModel m_mutedModel;
 
 
 	friend class trackContentObjectView;
@@ -151,25 +151,25 @@ private:
 
 
 
-class trackContentObjectView : public selectableObject, public modelView
+class trackContentObjectView : public selectableObject, public ModelView
 {
 	Q_OBJECT
 public:
 	trackContentObjectView( trackContentObject * _tco, trackView * _tv );
 	virtual ~trackContentObjectView();
 
-	bool fixedTCOs( void );
+	bool fixedTCOs();
 
-	inline trackContentObject * getTrackContentObject( void )
+	inline trackContentObject * getTrackContentObject()
 	{
-		return( m_tco );
+		return m_tco;
 	}
 
 
 public slots:
-	virtual bool close( void );
-	void cut( void );
-	void remove( void );
+	virtual bool close();
+	void cut();
+	void remove();
 
 protected:
 	virtual void constructContextMenu( QMenu * )
@@ -185,17 +185,17 @@ protected:
 	virtual void mouseReleaseEvent( QMouseEvent * _me );
 
 	void setAutoResizeEnabled( bool _e = FALSE );
-	float pixelsPerTact( void );
+	float pixelsPerTact();
 
-	inline trackView * getTrackView( void )
+	inline trackView * getTrackView()
 	{
-		return( m_trackView );
+		return m_trackView;
 	}
 
 
 protected slots:
-	void updateLength( void );
-	void updatePosition( void );
+	void updateLength();
+	void updatePosition();
 
 
 private:
@@ -225,7 +225,7 @@ private:
 
 
 
-class trackContentWidget : public QWidget, public journallingObject
+class trackContentWidget : public QWidget, public JournallingObject
 {
 	Q_OBJECT
 public:
@@ -244,10 +244,10 @@ public:
 
 	midiTime endPosition( const midiTime & _pos_start );
 
-    void updateBackground( void );
+    void updateBackground();
 
 public slots:
-	void update( void );
+	void update();
 	void changePosition( const midiTime & _new_pos = midiTime( -1 ) );
 
 
@@ -258,13 +258,13 @@ protected:
 	virtual void paintEvent( QPaintEvent * _pe );
 	virtual void resizeEvent( QResizeEvent * _re );
 
-	virtual QString nodeName( void ) const
+	virtual QString nodeName() const
 	{
-		return( "trackcontentwidget" );
+		return "trackcontentwidget";
 	}
 
-	virtual void undoStep( journalEntry & _je );
-	virtual void redoStep( journalEntry & _je );
+	virtual void undoStep( JournalEntry & _je );
+	virtual void redoStep( JournalEntry & _je );
 
 
 private:
@@ -274,7 +274,7 @@ private:
 		RemoveTrackContentObject
 	} ;
 
-	track * getTrack( void );
+	track * getTrack();
 	midiTime getPosition( int _mouse_x );
 
 	trackView * m_trackView;
@@ -304,9 +304,9 @@ protected:
 
 
 private slots:
-	void cloneTrack( void );
-	void removeTrack( void );
-	void updateMenu( void );
+	void cloneTrack();
+	void removeTrack();
+	void updateMenu();
 
 
 private:
@@ -331,7 +331,7 @@ signals:
 
 
 // base-class for all tracks
-class EXPORT track : public model, public journallingObject
+class EXPORT track : public Model, public JournallingObject
 {
 	Q_OBJECT
 	mapPropertyFromModel(bool,isMuted,setMuted,m_mutedModel);
@@ -356,13 +356,13 @@ public:
 	static track * create( TrackTypes _tt, trackContainer * _tc );
 	static track * create( const QDomElement & _this,
 							trackContainer * _tc );
-	void clone( void );
+	void clone();
 
 
 	// pure virtual functions
-	TrackTypes type( void ) const
+	TrackTypes type() const
 	{
-		return( m_type );
+		return m_type;
 	}
 
 	virtual bool play( const midiTime & _start, const fpp_t _frames,
@@ -381,7 +381,7 @@ public:
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _this );
 	virtual void loadSettings( const QDomElement & _this );
 
-	void setSimpleSerializing( void )
+	void setSimpleSerializing()
 	{
 		m_simpleSerializingMode = TRUE;
 	}
@@ -391,11 +391,11 @@ public:
 	void removeTCO( trackContentObject * _tco );
 	// -------------------------------------------------------
 
-	int numOfTCOs( void );
+	int numOfTCOs();
 	trackContentObject * getTCO( int _tco_num );
 	int getTCONum( trackContentObject * _tco );
 
-	const tcoVector & getTCOs( void ) const
+	const tcoVector & getTCOs() const
 	{
 		return( m_trackContentObjects );
 	}
@@ -407,26 +407,26 @@ public:
 	void insertTact( const midiTime & _pos );
 	void removeTact( const midiTime & _pos );
 
-	tact_t length( void ) const;
+	tact_t length() const;
 
 
-	inline trackContainer * getTrackContainer( void ) const
+	inline trackContainer * getTrackContainer() const
 	{
 		return( m_trackContainer );
 	}
 
 	// name-stuff
-	virtual const QString & name( void ) const
+	virtual const QString & name() const
 	{
 		return( m_name );
 	}
 
-	virtual QString displayName( void ) const
+	virtual QString displayName() const
 	{
 		return( name() );
 	}
 
-	using model::dataChanged;
+	using Model::dataChanged;
 
 
 public slots:
@@ -436,7 +436,7 @@ public slots:
 		emit nameChanged();
 	}
 
-	void toggleSolo( void );
+	void toggleSolo();
 
 
 private:
@@ -444,8 +444,8 @@ private:
 	TrackTypes m_type;
 	QString m_name;
 
-	boolModel m_mutedModel;
-	boolModel m_soloModel;
+	BoolModel m_mutedModel;
+	BoolModel m_soloModel;
 	bool m_mutedBeforeSolo;
 
 	bool m_simpleSerializingMode;
@@ -457,8 +457,8 @@ private:
 
 
 signals:
-	void destroyedTrack( void );
-	void nameChanged( void );
+	void destroyedTrack();
+	void nameChanged();
 	void trackContentObjectAdded( trackContentObject * );
 	void trackContentObjectRemoved( trackContentObject * );
 
@@ -467,63 +467,63 @@ signals:
 
 
 
-class trackView : public QWidget, public modelView, public journallingObject
+class trackView : public QWidget, public ModelView, public JournallingObject
 {
 	Q_OBJECT
 public:
 	trackView( track * _track, trackContainerView * _tcv );
 	virtual ~trackView();
 
-	inline const track * getTrack( void ) const
+	inline const track * getTrack() const
 	{
 		return( m_track );
 	}
 
-	inline track * getTrack( void )
+	inline track * getTrack()
 	{
 		return( m_track );
 	}
 
-	inline trackContainerView * getTrackContainerView( void )
+	inline trackContainerView * getTrackContainerView()
 	{
 		return( m_trackContainerView );
 	}
 
-	inline trackOperationsWidget * getTrackOperationsWidget( void )
+	inline trackOperationsWidget * getTrackOperationsWidget()
 	{
 		return( &m_trackOperationsWidget );
 	}
 
-	inline trackSettingsWidget * getTrackSettingsWidget( void )
+	inline trackSettingsWidget * getTrackSettingsWidget()
 	{
 		return( &m_trackSettingsWidget );
 	}
 
-	inline trackContentWidget * getTrackContentWidget( void )
+	inline trackContentWidget * getTrackContentWidget()
 	{
 		return( &m_trackContentWidget );
 	}
 
-	bool isMovingTrack( void ) const
+	bool isMovingTrack() const
 	{
 		return( m_action == MoveTrack );
 	}
 
-	virtual void update( void );
+	virtual void update();
 
 
 public slots:
-	virtual bool close( void );
+	virtual bool close();
 
 
 protected:
-	virtual void modelChanged( void );
-	virtual void undoStep( journalEntry & _je );
-	virtual void redoStep( journalEntry & _je );
+	virtual void modelChanged();
+	virtual void undoStep( JournalEntry & _je );
+	virtual void redoStep( JournalEntry & _je );
 
-	virtual QString nodeName( void ) const
+	virtual QString nodeName() const
 	{
-		return( "trackview" );
+		return "trackview";
 	}
 
 

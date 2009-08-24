@@ -3,6 +3,7 @@
  *                      plugins
  *
  * Copyright (c) 2006-2008 Danny McRae <khjklujn/at/users.sourceforge.net>
+ * Copyright (c) 2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -44,7 +45,7 @@
 extern "C"
 {
 
-plugin::descriptor PLUGIN_EXPORT ladspabrowser_plugin_descriptor =
+Plugin::Descriptor PLUGIN_EXPORT ladspabrowser_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"LADSPA Plugin Browser",
@@ -52,17 +53,17 @@ plugin::descriptor PLUGIN_EXPORT ladspabrowser_plugin_descriptor =
 				"List installed LADSPA plugins" ),
 	"Danny McRae <khjklujn/at/users.sourceforge.net>",
 	0x0100,
-	plugin::Tool,
-	new pluginPixmapLoader( "logo" ),
+	Plugin::Tool,
+	new PluginPixmapLoader( "logo" ),
 	NULL,
 	NULL
 } ;
 
 
 // neccessary for getting instance out of shared lib
-plugin * PLUGIN_EXPORT lmms_plugin_main( model * _parent, void * _data )
+Plugin * PLUGIN_EXPORT lmms_plugin_main( Model * _parent, void * _data )
 {
-	return( new ladspaBrowser );
+	return new ladspaBrowser;
 }
 
 }
@@ -70,8 +71,8 @@ plugin * PLUGIN_EXPORT lmms_plugin_main( model * _parent, void * _data )
 
 
 
-ladspaBrowser::ladspaBrowser( void ) :
-	tool( &ladspabrowser_plugin_descriptor, NULL )
+ladspaBrowser::ladspaBrowser() :
+	ToolPlugin( &ladspabrowser_plugin_descriptor, NULL )
 {
 }
 
@@ -85,9 +86,9 @@ ladspaBrowser::~ladspaBrowser()
 
 
 
-QString ladspaBrowser::nodeName( void ) const
+QString ladspaBrowser::nodeName() const
 {
-	return( ladspabrowser_plugin_descriptor.name );
+	return ladspabrowser_plugin_descriptor.name;
 }
 
 
@@ -95,8 +96,8 @@ QString ladspaBrowser::nodeName( void ) const
 
 
 
-ladspaBrowserView::ladspaBrowserView( tool * _tool ) :
-	toolView( _tool  )
+ladspaBrowserView::ladspaBrowserView( ToolPlugin * _tool ) :
+	ToolPluginView( _tool  )
 {
 	QHBoxLayout * hlayout = new QHBoxLayout( this );
 	hlayout->setSpacing( 0 );
@@ -219,7 +220,7 @@ QWidget * ladspaBrowserView::createTab( QWidget * _parent, const QString & _txt,
 				SLOT( showPorts( const ladspa_key_t & ) ) );
 	layout->addWidget( description, 1 );
 
-	return( tab );
+	return tab;
 }
 
 

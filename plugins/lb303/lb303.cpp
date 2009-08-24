@@ -34,7 +34,7 @@
 #include "lb303.h"
 #include "engine.h"
 #include "instrument_play_handle.h"
-#include "instrument_track.h"
+#include "InstrumentTrack.h"
 #include "knob.h"
 #include "note_play_handle.h"
 #include "templates.h"
@@ -76,7 +76,7 @@
 extern "C"
 {
 
-plugin::descriptor PLUGIN_EXPORT lb303_plugin_descriptor =
+Plugin::Descriptor PLUGIN_EXPORT lb303_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"LB303",
@@ -84,8 +84,8 @@ plugin::descriptor PLUGIN_EXPORT lb303_plugin_descriptor =
 			"Incomplete monophonic immitation tb303" ),
 	"Paul Giblock <pgib/at/users.sf.net>",
 	0x0100,
-	plugin::Instrument,
-	new pluginPixmapLoader( "logo" ),
+	Plugin::Instrument,
+	new PluginPixmapLoader( "logo" ),
 	NULL
 };
 
@@ -267,8 +267,8 @@ float lb303Filter3Pole::process(const float& samp)
 // LBSynth
 //
 
-lb303Synth::lb303Synth( instrumentTrack * _instrumentTrack ) :
-	instrument( _instrumentTrack, &lb303_plugin_descriptor ),
+lb303Synth::lb303Synth( InstrumentTrack * _InstrumentTrack ) :
+	instrument( _InstrumentTrack, &lb303_plugin_descriptor ),
 	vcf_cut_knob( 0.75f, 0.0f, 1.5f, 0.005f, this, tr( "VCF Cutoff Frequency" ) ),
 	vcf_res_knob( 0.75f, 0.0f, 1.25f, 0.005f, this, tr( "VCF Resonance" ) ),
 	vcf_mod_knob( 0.1f, 0.0f, 1.0f, 0.005f, this, tr( "VCF Envelope Mod" ) ),
@@ -713,7 +713,7 @@ void lb303Synth::play( sampleFrame * _working_buffer )
 	const fpp_t frames = engine::getMixer()->framesPerPeriod();
 
 	process( _working_buffer, frames); 
-	getInstrumentTrack()->processAudioBuffer( _working_buffer, frames,
+	instrumentTrack()->processAudioBuffer( _working_buffer, frames,
 									NULL );
 }
 
@@ -729,13 +729,13 @@ void lb303Synth::deleteNotePluginData( notePlayHandle * _n )
 }
 
 
-pluginView * lb303Synth::instantiateView( QWidget * _parent )
+PluginView * lb303Synth::instantiateView( QWidget * _parent )
 {
 	return( new lb303SynthView( this, _parent ) );
 }
 
 
-lb303SynthView::lb303SynthView( instrument * _instrument, QWidget * _parent ) :
+lb303SynthView::lb303SynthView( Instrument * _instrument, QWidget * _parent ) :
 	InstrumentView( _instrument, _parent )
 {
 	// GUI
@@ -830,11 +830,11 @@ extern "C"
 {
 
 // neccessary for getting instance out of shared lib
-plugin * PLUGIN_EXPORT lmms_plugin_main( model *, void * _data )
+Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, void * _data )
 {
 
 	return( new lb303Synth(
-	        static_cast<instrumentTrack *>( _data ) ) );
+	        static_cast<InstrumentTrack *>( _data ) ) );
 }
 
 

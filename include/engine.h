@@ -36,10 +36,10 @@ class automationEditor;
 class AutomationRecorder;
 class bbEditor;
 class bbTrackContainer;
-class dummyTrackContainer;
-class fxMixer;
-class fxMixerView;
-class projectJournal;
+class DummyTrackContainer;
+class FxMixer;
+class FxMixerView;
+class ProjectJournal;
 class MainWindow;
 class mixer;
 class pianoRoll;
@@ -80,7 +80,7 @@ public:
 		return s_mixer;
 	}
 
-	static fxMixer * getFxMixer()
+	static FxMixer * fxMixer()
 	{
 		return s_fxMixer;
 	}
@@ -95,7 +95,7 @@ public:
 		return s_bbTrackContainer;
 	}
 
-	static projectJournal * getProjectJournal()
+	static ProjectJournal * projectJournal()
 	{
 		return s_projectJournal;
 	}
@@ -121,7 +121,7 @@ public:
 		return s_mainWindow;
 	}
 
-	static fxMixerView * getFxMixerView()
+	static FxMixerView * fxMixerView()
 	{
 		return s_fxMixerView;
 	}
@@ -161,7 +161,7 @@ public:
 		return s_ladspaManager;
 	}
 
-	static dummyTrackContainer * getDummyTrackContainer()
+	static DummyTrackContainer * dummyTrackContainer()
 	{
 		return s_dummyTC;
 	}
@@ -208,20 +208,20 @@ private:
 
 	// core
 	static mixer * s_mixer;
-	static fxMixer * s_fxMixer;
+	static FxMixer * s_fxMixer;
 	static song * s_song;
 	static ResourceDB * s_workingDirResourceDB;
 	static ResourceDB * s_webResourceDB;
 	static ResourceDB * s_mergedResourceDB;
 	static bbTrackContainer * s_bbTrackContainer;
-	static projectJournal * s_projectJournal;
-	static dummyTrackContainer * s_dummyTC;
+	static ProjectJournal * s_projectJournal;
+	static DummyTrackContainer * s_dummyTC;
 	static ControllerRackView * s_controllerRackView;
 	static MidiControlListener * s_midiControlListener;
 
 	// GUI
 	static MainWindow * s_mainWindow;
-	static fxMixerView * s_fxMixerView;
+	static FxMixerView * s_fxMixerView;
 	static songEditor * s_songEditor;
 	static automationEditor * s_automationEditor;
 	static AutomationRecorder * s_automationRecorder;

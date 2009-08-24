@@ -2,8 +2,8 @@
  * surround_area.cpp - a widget for setting position of a channel +
  *                     calculation of volume for each speaker
  *
- * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -23,168 +23,15 @@
  *
  */
 
-
-#include "surround_area.h"
-
-
-#include <QtGui/QApplication>
-#include <QtGui/QMouseEvent>
-#include <QtGui/QPainter>
 #include <QtXml/QDomElement>
 
-
-#include "caption_menu.h"
-#include "embed.h"
+#include "surround_area.h"
 #include "templates.h"
-#include "tooltip.h"
 
 
-
-/*
-QPixmap * surroundArea::s_backgroundArtwork = NULL;
-
-
-
-
-surroundArea::surroundArea( QWidget * _parent, const QString & _name ) :
-	QWidget( _parent ),
-	modelView( new surroundAreaModel( NULL, NULL, TRUE ) )
-{
-	if( s_backgroundArtwork == NULL )
-	{
-		s_backgroundArtwork = new QPixmap( embed::getIconPixmap(
-							"surround_area" ) );
-	}
-
-	setFixedSize( s_backgroundArtwork->width(),
-						s_backgroundArtwork->height() );
-	setAccessibleName( _name );
-	toolTip::add( this,
-			tr( "click to where this channel should be audible" ) );
-}
-
-
-
-
-surroundArea::~surroundArea()
-{
-}
-
-
-
-
-
-
-void surroundArea::contextMenuEvent( QContextMenuEvent * )
-{
-	// for the case, the user clicked right while pressing left mouse-
-	// button, the context-menu appears while mouse-cursor is still hidden
-	// and it isn't shown again until user does something which causes
-	// an QApplication::restoreOverrideCursor()-call...
-	mouseReleaseEvent( NULL );
-
-	captionMenu contextMenu( accessibleName() );
-	contextMenu.addAction( embed::getIconPixmap( "automation" ),
-					tr( "Open &X in automation editor" ),
-					model()->automationPatternX(),
-					SLOT( openInAutomationEditor() ) );
-	contextMenu.addAction( embed::getIconPixmap( "automation" ),
-					tr( "Open &Y in automation editor" ),
-					model()->automationPatternY(),
-					SLOT( openInAutomationEditor() ) );
-	contextMenu.exec( QCursor::pos() );
-}
-
-
-
-
-void surroundArea::paintEvent( QPaintEvent * )
-{
-	QPainter p( this );
-	if( s_backgroundArtwork->size() != size() )
-	{
-		p.drawPixmap( 0, 0, *s_backgroundArtwork );
-	}
-	else
-	{
-		p.drawPixmap( 0, 0, s_backgroundArtwork->scaled(
-						width(), height(),
-						Qt::IgnoreAspectRatio,
-						Qt::SmoothTransformation ) );
-	}
-	const int x = ( width() + model()->x() * ( width() - 4 ) /
-						SURROUND_AREA_SIZE ) / 2;
-	const int y = ( height() + model()->y() * ( height() - 4 ) /
-						SURROUND_AREA_SIZE ) / 2;
-	p.setPen( QColor( 64, 255, 64 ) );
-	p.drawPoint( x, y - 1 );
-	p.drawPoint( x - 1, y );
-	p.drawPoint( x, y );
-	p.drawPoint( x + 1, y );
-	p.drawPoint( x, y + 1 );
-}
-
-
-
-
-void surroundArea::mousePressEvent( QMouseEvent * _me )
-{
-	if( _me->button() == Qt::RightButton )
-	{
-		return;
-	}
-
-	model()->prepareJournalEntryFromOldVal();
-
-	const int w = width();//s_backgroundArtwork->width();
-	const int h = height();//s_backgroundArtwork->height();
-	if( _me->x() > 1 && _me->x() < w-1 && _me->y() > 1 && _me->y() < h-1 )
-	{
-		model()->setX( ( _me->x() * 2 - w ) * SURROUND_AREA_SIZE /
-								( w - 4 ) );
-		model()->setY( ( _me->y() * 2 - h ) * SURROUND_AREA_SIZE /
-								( h - 4 ) );
-		//update();
-		if( _me->button() != Qt::NoButton )
-		{
-			QApplication::setOverrideCursor( Qt::BlankCursor );
-		}
-	}
-	else
-	{
-		int x = tLimit( _me->x(), 2, w - 2 );
-		int y = tLimit( _me->y(), 2, h - 2 );
-		QCursor::setPos( mapToGlobal( QPoint( x, y ) ) );
-	}
-}
-
-
-
-
-void surroundArea::mouseMoveEvent( QMouseEvent * _me )
-{
-	mousePressEvent( _me );
-}
-
-
-
-
-void surroundArea::mouseReleaseEvent( QMouseEvent * )
-{
-	model()->addJournalEntryFromOldToCurVal();
-	QApplication::restoreOverrideCursor();
-}
-*/
-
-
-
-
-
-
-
-surroundAreaModel::surroundAreaModel( ::model * _parent,
+surroundAreaModel::surroundAreaModel( ::Model * _parent,
 						bool _default_constructed ) :
-	model( _parent, QString::null, _default_constructed ),
+	Model( _parent, QString::null, _default_constructed ),
 	m_posX( 0, -SURROUND_AREA_SIZE, SURROUND_AREA_SIZE, _parent ),
 	m_posY( 0, -SURROUND_AREA_SIZE, SURROUND_AREA_SIZE, _parent )
 {
@@ -264,20 +111,6 @@ void surroundAreaModel::loadSettings( const QDomElement & _this,
 		m_posY.loadSettings( _this, _name + "-y" );
 	}
 }
-
-
-
-/*
-automationPattern * surroundAreaModel::automationPatternX( void )
-{
-	return( m_posX.getAutomationPattern() );
-}
-
-automationPattern * surroundAreaModel::automationPatternY( void )
-{
-	return( m_posY.getAutomationPattern() );
-}
-*/
 
 
 #include "moc_surround_area.cxx"

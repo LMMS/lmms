@@ -30,7 +30,7 @@
 extern "C"
 {
 
-plugin::descriptor PLUGIN_EXPORT spectrumanalyzer_plugin_descriptor =
+Plugin::Descriptor PLUGIN_EXPORT spectrumanalyzer_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"Spectrum Analyzer",
@@ -39,8 +39,8 @@ plugin::descriptor PLUGIN_EXPORT spectrumanalyzer_plugin_descriptor =
 				"inside LMMS." ),
 	"Tobias Doerffel <tobydox/at/users.sf.net>",
 	0x0100,
-	plugin::Effect,
-	new pluginPixmapLoader( "logo" ),
+	Plugin::Effect,
+	new PluginPixmapLoader( "logo" ),
 	NULL,
 	NULL
 } ;
@@ -49,9 +49,9 @@ plugin::descriptor PLUGIN_EXPORT spectrumanalyzer_plugin_descriptor =
 
 
 
-spectrumAnalyzer::spectrumAnalyzer( model * _parent,
-			const descriptor::subPluginFeatures::key * _key ) :
-	effect( &spectrumanalyzer_plugin_descriptor, _parent, _key ),
+spectrumAnalyzer::spectrumAnalyzer( Model * _parent,
+			const Descriptor::SubPluginFeatures::Key * _key ) :
+	Effect( &spectrumanalyzer_plugin_descriptor, _parent, _key ),
 	m_saControls( this ),
 	m_framesFilledUp( 0 ),
 	m_energy( 0 )
@@ -164,10 +164,10 @@ extern "C"
 {
 
 // neccessary for getting instance out of shared lib
-plugin * PLUGIN_EXPORT lmms_plugin_main( model * _parent, void * _data )
+Plugin * PLUGIN_EXPORT lmms_plugin_main( Model * _parent, void * _data )
 {
 	return( new spectrumAnalyzer( _parent,
-		static_cast<const plugin::descriptor::subPluginFeatures::key *>(
+		static_cast<const Plugin::Descriptor::SubPluginFeatures::Key *>(
 								_data ) ) );
 }
 

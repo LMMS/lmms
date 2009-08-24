@@ -30,8 +30,8 @@
 
 #include <QtGui/QWidget>
 
-#include "combobox_model.h"
-#include "serializing_object.h"
+#include "ComboBoxModel.h"
+#include "SerializingObject.h"
 #include "note.h"
 #include "lmms_basics.h"
 #include "song.h"
@@ -51,7 +51,7 @@ class timeLine;
 class toolButton;
 
 
-class pianoRoll : public QWidget, public serializingObject
+class pianoRoll : public QWidget, public SerializingObject
 {
 	Q_OBJECT
 public:
@@ -243,9 +243,9 @@ private:
 	comboBox * m_quantizeComboBox;
 	comboBox * m_noteLenComboBox;
 
-	comboBoxModel m_zoomingModel;
-	comboBoxModel m_quantizeModel;
-	comboBoxModel m_noteLenModel;
+	ComboBoxModel m_zoomingModel;
+	ComboBoxModel m_quantizeModel;
+	ComboBoxModel m_noteLenModel;
 
 
 

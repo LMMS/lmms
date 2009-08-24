@@ -28,8 +28,7 @@
 
 #include <QtGui/QMainWindow>
 
-#include "journalling_object.h"
-
+#include "JournallingObject.h"
 
 class QAction;
 class QComboBox;
@@ -37,36 +36,36 @@ class QTextCharFormat;
 class QTextEdit;
 
 
-class EXPORT projectNotes : public QMainWindow, public serializingObject
+class EXPORT projectNotes : public QMainWindow, public SerializingObject
 {
 	Q_OBJECT
 public:
-	projectNotes( void );
+	projectNotes();
 	virtual ~projectNotes();
 
-	void clear( void );
+	void clear();
 	void setText( const QString & _text );
 
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
 	virtual void loadSettings( const QDomElement & _this );
 
-	inline virtual QString nodeName( void ) const
+	inline virtual QString nodeName() const
 	{
-		return( "projectnotes" );
+		return "projectnotes";
 	}
 
 
 protected:
-	void setupActions( void );
+	void setupActions();
 
 
 private slots:
-	void textBold( void );
-	void textUnderline( void );
-	void textItalic( void );
+	void textBold();
+	void textUnderline();
+	void textItalic();
 	void textFamily( const QString & _f );
 	void textSize( const QString & _p );
-	void textColor( void );
+	void textColor();
 	void textAlign( QAction * _a );
 
 	void formatChanged( const QTextCharFormat & _f );

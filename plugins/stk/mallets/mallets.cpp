@@ -33,7 +33,7 @@
 
 #include "engine.h"
 #include "gui_templates.h"
-#include "instrument_track.h"
+#include "InstrumentTrack.h"
 
 #include "embed.cpp"
 
@@ -41,7 +41,7 @@
 extern "C"
 {
 
-plugin::descriptor malletsstk_plugin_descriptor =
+Plugin::Descriptor malletsstk_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"Mallets",
@@ -49,8 +49,8 @@ plugin::descriptor malletsstk_plugin_descriptor =
 				"Tuneful things to bang on" ),
 	"Danny McRae <khjklujn/at/users.sf.net>",
 	0x0100,
-	plugin::Instrument,
-	new pluginPixmapLoader( "logo" ),
+	Plugin::Instrument,
+	new PluginPixmapLoader( "logo" ),
 	NULL,
 	NULL
 } ;
@@ -58,8 +58,8 @@ plugin::descriptor malletsstk_plugin_descriptor =
 }
 
 
-malletsInstrument::malletsInstrument( instrumentTrack * _instrument_track ):
-	instrument( _instrument_track, &malletsstk_plugin_descriptor ),
+malletsInstrument::malletsInstrument( InstrumentTrack * _instrument_track ):
+	Instrument( _instrument_track, &malletsstk_plugin_descriptor ),
 	m_hardnessModel(64.0f, 0.0f, 128.0f, 0.1f, this, tr( "Hardness" )),
 	m_positionModel(64.0f, 0.0f, 128.0f, 0.1f, this, tr( "Position" )),
 	m_vibratoGainModel(64.0f, 0.0f, 128.0f, 0.1f, this, tr( "Vibrato Gain" )),
@@ -281,7 +281,7 @@ void malletsInstrument::playNote( notePlayHandle * _n,
 				( m_scalers[m_presetsModel.value()] + add_scale );
 	}
 	
-	getInstrumentTrack()->processAudioBuffer( _working_buffer, frames, _n );
+	instrumentTrack()->processAudioBuffer( _working_buffer, frames, _n );
 }
 
 
@@ -295,7 +295,7 @@ void malletsInstrument::deleteNotePluginData( notePlayHandle * _n )
 
 
 
-pluginView * malletsInstrument::instantiateView( QWidget * _parent )
+PluginView * malletsInstrument::instantiateView( QWidget * _parent )
 {
 	return( new malletsInstrumentView( this, _parent ) );
 }
@@ -655,9 +655,9 @@ extern "C"
 {
 
 // neccessary for getting instance out of shared lib
-plugin * lmms_plugin_main( model *, void * _data )
+Plugin * lmms_plugin_main( Model *, void * _data )
 {
-	return( new malletsInstrument( static_cast<instrumentTrack *>( _data ) ) );
+	return new malletsInstrument( static_cast<InstrumentTrack *>( _data ) );
 }
 
 

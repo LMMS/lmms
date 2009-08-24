@@ -49,25 +49,25 @@
 #include "piano_roll.h"
 #include "embed.h"
 #include "engine.h"
-#include "fx_mixer_view.h"
+#include "FxMixerView.h"
 #include "AboutDialog.h"
 #include "ControllerRackView.h"
 #include "plugin_browser.h"
 #include "side_bar.h"
 #include "config_mgr.h"
 #include "mixer.h"
-#include "plugin_view.h"
 #include "project_notes.h"
 #include "setup_dialog.h"
 #include "AudioDummy.h"
-#include "tool.h"
+#include "ToolPlugin.h"
+#include "ToolPluginView.h"
 #include "tool_button.h"
-#include "project_journal.h"
+#include "ProjectJournal.h"
 #include "automation_editor.h"
 #include "templates.h"
 #include "lcd_spinbox.h"
 #include "tooltip.h"
-#include "meter_dialog.h"
+#include "MeterDialog.h"
 #include "automatable_slider.h"
 #include "text_float.h"
 #include "cpuload_widget.h"
@@ -168,10 +168,10 @@ MainWindow::MainWindow() :
 
 MainWindow::~MainWindow()
 {
-	for( QList<pluginView *>::iterator it = m_tools.begin();
+	for( QList<PluginView *>::Iterator it = m_tools.begin();
 						it != m_tools.end(); ++it )
 	{
-		model * m = ( *it )->getModel();
+		Model * m = ( *it )->model();
 		delete *it;
 		delete m;
 	}
@@ -268,17 +268,16 @@ void MainWindow::finalize()
 
 
 	m_toolsMenu = new QMenu( this );
-	QVector<plugin::descriptor> pluginDescriptors;
-	plugin::getDescriptorsOfAvailPlugins( pluginDescriptors );
-	for( QVector<plugin::descriptor>::iterator it =
-						pluginDescriptors.begin();
-					it != pluginDescriptors.end(); ++it )
+	QVector<Plugin::Descriptor> pluginDescriptors;
+	Plugin::getDescriptorsOfAvailPlugins( pluginDescriptors );
+	for( QVector<Plugin::Descriptor>::iterator it = pluginDescriptors.begin();
+										it != pluginDescriptors.end(); ++it )
 	{
-		if( it->type == plugin::Tool )
+		if( it->type == Plugin::Tool )
 		{
 			m_toolsMenu->addAction( it->logo->pixmap(),
 							it->displayName );
-			m_tools.push_back( tool::instantiate( it->name,
+			m_tools.push_back( ToolPlugin::instantiate( it->name,
 					/*this*/NULL )->createView( this ) );
 		}
 	}
@@ -536,7 +535,7 @@ void MainWindow::finalize()
 	timeSigLayout->setSpacing( 0 );
 	timeSigLayout->addSpacing( 3 );
 
-	m_timeSigDisplay = new meterDialog( this, true );
+	m_timeSigDisplay = new MeterDialog( this, true );
 	m_timeSigDisplay->setModel( &( engine::getSong()->m_timeSigModel ) );
 	timeSigLayout->addWidget( m_timeSigDisplay );
 
@@ -1142,7 +1141,7 @@ void MainWindow::toggleAutomationEditorWin()
 
 void MainWindow::toggleFxMixerWin()
 {
-	toggleWindow( engine::getFxMixerView() );
+	toggleWindow( engine::fxMixerView() );
 }
 
 
@@ -1158,7 +1157,7 @@ void MainWindow::toggleControllerRack()
 
 void MainWindow::undo()
 {
-	engine::getProjectJournal()->undo();
+	engine::projectJournal()->undo();
 }
 
 
@@ -1166,7 +1165,7 @@ void MainWindow::undo()
 
 void MainWindow::redo()
 {
-	engine::getProjectJournal()->redo();
+	engine::projectJournal()->redo();
 }
 
 
@@ -1431,7 +1430,7 @@ void MainWindow::fillTemplatesMenu()
 
 void MainWindow::showTool( QAction * _idx )
 {
-	pluginView * p = m_tools[m_toolsMenu->actions().indexOf( _idx )];
+	PluginView * p = m_tools[m_toolsMenu->actions().indexOf( _idx )];
 	p->show();
 	p->parentWidget()->show();
 	p->setFocus();

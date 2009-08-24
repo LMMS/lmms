@@ -41,7 +41,7 @@
 automatableButton::automatableButton( QWidget * _parent,
 						const QString & _name ) :
 	QPushButton( _parent ),
-	boolModelView( new boolModel( FALSE, NULL, _name, TRUE ), this ),
+	BoolModelView( new BoolModel( false, NULL, _name, true ), this ),
 	m_group( NULL )
 {
 	setAccessibleName( _name );
@@ -63,7 +63,7 @@ automatableButton::~automatableButton()
 
 
 
-void automatableButton::modelChanged( void )
+void automatableButton::modelChanged()
 {
 	if( QPushButton::isChecked() != model()->value() )
 	{
@@ -74,7 +74,7 @@ void automatableButton::modelChanged( void )
 
 
 
-void automatableButton::update( void )
+void automatableButton::update()
 {
 	if( QPushButton::isChecked() != model()->value() )
 	{
@@ -130,7 +130,7 @@ void automatableButton::mousePressEvent( QMouseEvent * _me )
         if( m_group )
         {
             // A group, we must get process it instead
-            automatableModelView* groupView = (automatableModelView*)m_group;
+            AutomatableModelView* groupView = (AutomatableModelView*)m_group;
             new stringPairDrag( "automatable_model",
                         QString::number( groupView->modelUntyped()->id() ),
                                 QPixmap(), widget() );
@@ -140,7 +140,7 @@ void automatableButton::mousePressEvent( QMouseEvent * _me )
         else
         {
             // Otherwise, drag the standalone button
-            automatableModelView::mousePressEvent( _me );
+            BoolModelView::mousePressEvent( _me );
             QPushButton::mousePressEvent( _me );
         }
 	}
@@ -160,11 +160,11 @@ void automatableButton::mouseReleaseEvent( QMouseEvent * _me )
 
 
 
-void automatableButton::toggle( void )
+void automatableButton::toggle()
 {
 	if( isCheckable() && m_group != NULL )
 	{
-		if( model()->value() == FALSE )
+		if( model()->value() == false )
 		{
 			m_group->activateButton( this );
 		}
@@ -185,7 +185,7 @@ void automatableButton::toggle( void )
 automatableButtonGroup::automatableButtonGroup( QWidget * _parent,
 						const QString & _name ) :
 	QWidget( _parent ),
-	intModelView( new intModel( 0, 0, 0, NULL, _name, TRUE ), this )
+	IntModelView( new IntModel( 0, 0, 0, NULL, _name, true ), this )
 {
 	hide();
 	setAccessibleName( _name );
@@ -209,11 +209,11 @@ automatableButtonGroup::~automatableButtonGroup()
 void automatableButtonGroup::addButton( automatableButton * _btn )
 {
 	_btn->m_group = this;
-	_btn->setCheckable( TRUE );
-	_btn->model()->setValue( FALSE );
+	_btn->setCheckable( true );
+	_btn->model()->setValue( false );
 	// disable journalling as we're recording changes of states of 
 	// button-group members on our own
-	_btn->model()->setJournalling( FALSE );
+	_btn->model()->setJournalling( false );
 
 	m_buttons.push_back( _btn );
 	model()->setRange( 0, m_buttons.size() - 1 );
@@ -248,18 +248,18 @@ void automatableButtonGroup::activateButton( automatableButton * _btn )
 
 
 
-void automatableButtonGroup::modelChanged( void )
+void automatableButtonGroup::modelChanged()
 {
 	connect( model(), SIGNAL( dataChanged() ),
 			this, SLOT( updateButtons() ) );
-	intModelView::modelChanged();
+	IntModelView::modelChanged();
 	updateButtons();
 }
 
 
 
 
-void automatableButtonGroup::updateButtons( void )
+void automatableButtonGroup::updateButtons()
 {
 	model()->setRange( 0, m_buttons.size() - 1 );
 	int i = 0;

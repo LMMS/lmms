@@ -29,9 +29,9 @@
 #include <QtCore/QMutex>
 #include <QtCore/QThread>
 
-#include "instrument.h"
+#include "Instrument.h"
 #include "InstrumentView.h"
-#include "remote_plugin.h"
+#include "RemotePlugin.h"
 
 
 class QPushButton;
@@ -40,11 +40,11 @@ class ZynAddSubFxView;
 class notePlayHandle;
 
 
-class zynAddSubFx : public instrument
+class zynAddSubFx : public Instrument
 {
 	Q_OBJECT
 public:
-	zynAddSubFx( instrumentTrack * _instrument_track );
+	zynAddSubFx( InstrumentTrack * _instrument_track );
 	virtual ~zynAddSubFx();
 
 	virtual void play( sampleFrame * _working_buffer );
@@ -58,31 +58,31 @@ public:
 	virtual void loadResource( const ResourceItem * _item );
 
 
-	virtual QString nodeName( void ) const;
+	virtual QString nodeName() const;
 
-	virtual bool isMidiBased( void ) const
+	virtual bool isMidiBased() const
 	{
 		return true;
 	}
 
-	virtual pluginView * instantiateView( QWidget * _parent );
+	virtual PluginView * instantiateView( QWidget * _parent );
 
 
 private slots:
-	void updateSampleRate( void );
+	void updateSampleRate();
 
 
 private:
-	void initRemotePlugin( void );
+	void initRemotePlugin();
 
 	QMutex m_pluginMutex;
-	remotePlugin * m_plugin;
+	RemotePlugin * m_plugin;
 
 	friend class ZynAddSubFxView;
 
 
 signals:
-	void settingsChanged( void );
+	void settingsChanged();
 
 } ;
 
@@ -92,18 +92,18 @@ class ZynAddSubFxView : public InstrumentView
 {
 	Q_OBJECT
 public:
-	ZynAddSubFxView( instrument * _instrument, QWidget * _parent );
+	ZynAddSubFxView( Instrument * _instrument, QWidget * _parent );
 	virtual ~ZynAddSubFxView();
 
 
 private:
-	void modelChanged( void );
+	void modelChanged();
 
 	QPushButton * m_toggleUIButton;
 
 
 private slots:
-	void toggleUI( void );
+	void toggleUI();
 
 } ;
 

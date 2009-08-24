@@ -44,7 +44,7 @@
 extern "C"
 {
 
-plugin::descriptor PLUGIN_EXPORT lv2browser_plugin_descriptor =
+Plugin::Descriptor PLUGIN_EXPORT lv2browser_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"LV2 Plugin Browser",
@@ -52,15 +52,15 @@ plugin::descriptor PLUGIN_EXPORT lv2browser_plugin_descriptor =
 				"List installed LV2 plugins" ),
 	"Martin Andrews <mdda/at/users.sourceforge.net>",
 	0x0100,
-	plugin::Tool,
-	new pluginPixmapLoader( "logo" ),
+	Plugin::Tool,
+	new PluginPixmapLoader( "logo" ),
 	NULL,
 	NULL
 } ;
 
 
 // neccessary for getting instance out of shared lib
-plugin * PLUGIN_EXPORT lmms_plugin_main( model * _parent, void * _data )
+Plugin * PLUGIN_EXPORT lmms_plugin_main( Model * _parent, void * _data )
 {
 	return  new lv2Browser;
 }
@@ -71,7 +71,7 @@ plugin * PLUGIN_EXPORT lmms_plugin_main( model * _parent, void * _data )
 
 
 lv2Browser::lv2Browser( void ) :
-	tool( &lv2browser_plugin_descriptor, NULL )
+	ToolPlugin( &lv2browser_plugin_descriptor, NULL )
 {
 	if( static_lv2_manager == NULL )
 	{
@@ -103,8 +103,8 @@ QString lv2Browser::nodeName( void ) const
 
 
 
-lv2BrowserView::lv2BrowserView( tool * _tool ) :
-	toolView( _tool  )
+lv2BrowserView::lv2BrowserView( ToolPlugin * _tool ) :
+	ToolPluginView( _tool  )
 {
 	QHBoxLayout * hlayout = new QHBoxLayout( this );
 	hlayout->setSpacing( 0 );

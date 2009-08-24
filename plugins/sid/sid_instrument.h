@@ -1,5 +1,5 @@
 /*
- * sid_instrument.h - ResID based software-synthesizer
+ * sid_Instrument.h - ResID based software-synthesizer
  *
  * Copyright (c) 2008 Csaba Hruska <csaba.hruska/at/gmail.com>
  *                    Attila Herman <attila589/at/gmail.com>
@@ -28,7 +28,7 @@
 #define _SID_H
 
 #include <QtCore/QObject>
-#include "instrument.h"
+#include "Instrument.h"
 #include "InstrumentView.h"
 #include "knob.h"
 
@@ -38,7 +38,7 @@ class notePlayHandle;
 class automatableButtonGroup;
 class pixmapButton;
 
-class voiceObject : public model
+class voiceObject : public Model
 {
 	Q_OBJECT
 public:
@@ -49,28 +49,28 @@ public:
 		NoiseWave,
 		NumWaveShapes
 	};
-	voiceObject( model * _parent, int _idx );
+	voiceObject( Model * _parent, int _idx );
 	virtual ~voiceObject();
 
 
 private:
-	knobModel m_pulseWidthModel;
-	knobModel m_attackModel;
-	knobModel m_decayModel;
-	knobModel m_sustainModel;
-	knobModel m_releaseModel;
-	knobModel m_coarseModel;
-	intModel m_waveFormModel;
-	boolModel m_syncModel;
-	boolModel m_ringModModel;
-	boolModel m_filteredModel;
-	boolModel m_testModel;
+	FloatModel m_pulseWidthModel;
+	FloatModel m_attackModel;
+	FloatModel m_decayModel;
+	FloatModel m_sustainModel;
+	FloatModel m_releaseModel;
+	FloatModel m_coarseModel;
+	IntModel m_waveFormModel;
+	BoolModel m_syncModel;
+	BoolModel m_ringModModel;
+	BoolModel m_filteredModel;
+	BoolModel m_testModel;
 
 	friend class sidInstrument;
 	friend class sidInstrumentView;
 } ;
 
-class sidInstrument : public instrument
+class sidInstrument : public Instrument
 {
 	Q_OBJECT
 public:
@@ -88,7 +88,7 @@ public:
 	};
 
 
-	sidInstrument( instrumentTrack * _instrument_track );
+	sidInstrument( InstrumentTrack * _instrument_track );
 	virtual ~sidInstrument();
 
 	virtual void playNote( notePlayHandle * _n,
@@ -103,7 +103,7 @@ public:
 
 	virtual f_cnt_t desiredReleaseFrames( void ) const;
 
-	virtual pluginView * instantiateView( QWidget * _parent );
+	virtual PluginView * instantiateView( QWidget * _parent );
 
 
 /*public slots:
@@ -115,15 +115,15 @@ private:
 	voiceObject * m_voice[3];
 
 	// filter	
-	knobModel m_filterFCModel;
-	knobModel m_filterResonanceModel;
-	intModel m_filterModeModel;
+	FloatModel m_filterFCModel;
+	FloatModel m_filterResonanceModel;
+	IntModel m_filterModeModel;
 	
 	// misc
-	boolModel m_voice3OffModel;
-	knobModel m_volumeModel;
+	BoolModel m_voice3OffModel;
+	FloatModel m_volumeModel;
 
-	intModel m_chipModel;
+	IntModel m_chipModel;
 
 	friend class sidInstrumentView;
 
@@ -135,7 +135,7 @@ class sidInstrumentView : public InstrumentView
 {
 	Q_OBJECT
 public:
-	sidInstrumentView( instrument * _instrument, QWidget * _parent );
+	sidInstrumentView( Instrument * _instrument, QWidget * _parent );
 	virtual ~sidInstrumentView();
 
 private:

@@ -2,7 +2,7 @@
  * InstrumentView.cpp - base-class for views of all instruments
  *
  * Copyright (c) 2008-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -22,17 +22,16 @@
  *
  */
 
-
 #include "InstrumentView.h"
 #include "embed.h"
-#include "instrument.h"
-#include "instrument_track.h"
+#include "Instrument.h"
+#include "InstrumentTrack.h"
 #include "ResourceDB.h"
 #include "string_pair_drag.h"
 
 
-InstrumentView::InstrumentView( instrument * _instrument, QWidget * _parent ) :
-	pluginView( _instrument, _parent )
+InstrumentView::InstrumentView( Instrument * _instrument, QWidget * _parent ) :
+	PluginView( _instrument, _parent )
 {
 	setModel( _instrument );
 	setFixedSize( 250, 250 );
@@ -45,22 +44,22 @@ InstrumentView::InstrumentView( instrument * _instrument, QWidget * _parent ) :
 
 InstrumentView::~InstrumentView()
 {
-	if( getInstrumentTrackWindow() )
+	if( instrumentTrackWindow() )
 	{
-		getInstrumentTrackWindow()->m_instrumentView = NULL;
+		instrumentTrackWindow()->m_instrumentView = NULL;
 	}
 }
 
 
 
 
-void InstrumentView::setModel( ::model * _model, bool )
+void InstrumentView::setModel( Model * _model, bool )
 {
-	if( dynamic_cast<instrument *>( _model ) != NULL )
+	if( dynamic_cast<Instrument *>( _model ) != NULL )
 	{
-		modelView::setModel( _model );
-		getInstrumentTrackWindow()->setWindowIcon(
-				model()->getDescriptor()->logo->pixmap() );
+		ModelView::setModel( _model );
+		instrumentTrackWindow()->setWindowIcon(
+				model()->descriptor()->logo->pixmap() );
 		connect( model(), SIGNAL( destroyed( QObject * ) ),
 					this, SLOT( close() ) );
 	}
@@ -69,10 +68,10 @@ void InstrumentView::setModel( ::model * _model, bool )
 
 
 
-instrumentTrackWindow * InstrumentView::getInstrumentTrackWindow( void )
+InstrumentTrackWindow * InstrumentView::instrumentTrackWindow()
 {
-	return dynamic_cast<instrumentTrackWindow *>(
-					parentWidget()->parentWidget() );
+	return dynamic_cast<InstrumentTrackWindow *>(
+											parentWidget()->parentWidget() );
 }
 
 
@@ -86,7 +85,7 @@ void InstrumentView::dragEnterEvent( QDragEnterEvent * _dee )
 			engine::mergedResourceDB()->
 				itemByHash( stringPairDrag::decodeValue( _dee ) );
 		if( item &&
-			model()->getDescriptor()->supportsFileType(
+			model()->descriptor()->supportsFileType(
 						item->nameExtension() ) )
 		{
 			_dee->acceptProposedAction();

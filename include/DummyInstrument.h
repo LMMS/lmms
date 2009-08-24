@@ -26,15 +26,15 @@
 #ifndef _DUMMY_INSTRUMENT_H
 #define _DUMMY_INSTRUMENT_H
 
-#include "instrument.h"
+#include "Instrument.h"
 #include "InstrumentView.h"
 
 
-class DummyInstrument : public instrument
+class DummyInstrument : public Instrument
 {
 public:
-	DummyInstrument( instrumentTrack * _instrument_track ) :
-		instrument( _instrument_track, NULL )
+	DummyInstrument( InstrumentTrack * _instrument_track ) :
+		Instrument( _instrument_track, NULL )
 	{
 	}
 
@@ -59,7 +59,7 @@ public:
 		return "dummyinstrument";
 	}
 
-	virtual pluginView * instantiateView( QWidget * _parent )
+	virtual PluginView * instantiateView( QWidget * _parent )
 	{
 		return new InstrumentView( this, _parent );
 	}

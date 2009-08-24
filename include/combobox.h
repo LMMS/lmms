@@ -30,26 +30,26 @@
 #include <QtGui/QMenu>
 #include <QtGui/QWidget>
 
-#include "combobox_model.h"
-#include "automatable_model_view.h"
+#include "ComboBoxModel.h"
+#include "AutomatableModelView.h"
 
 
 
-class EXPORT comboBox : public QWidget, public intModelView
+class EXPORT comboBox : public QWidget, public IntModelView
 {
 	Q_OBJECT
 public:
 	comboBox( QWidget * _parent, const QString & _name = QString() );
 	virtual ~comboBox();
 
-	comboBoxModel * model( void )
+	ComboBoxModel * model( void )
 	{
-		return( castModel<comboBoxModel>() );
+		return( castModel<ComboBoxModel>() );
 	}
 
-	const comboBoxModel * model( void ) const
+	const ComboBoxModel * model( void ) const
 	{
-		return( castModel<comboBoxModel>() );
+		return( castModel<ComboBoxModel>() );
 	}
 
 

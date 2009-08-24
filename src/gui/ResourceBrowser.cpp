@@ -36,7 +36,8 @@
 #include "engine.h"
 #include "embed.h"
 #include "MainWindow.h"
-#include "piano.h"
+#include "Piano.h"
+#include "PianoView.h"
 #include "song.h"
 
 

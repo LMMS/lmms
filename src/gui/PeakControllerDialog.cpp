@@ -37,13 +37,12 @@
 #include "MainWindow.h"
 #include "tooltip.h"
 
-
 #include "PeakController.h"
 #include "ControllerDialog.h"
-#include "mv_base.h"
 #include "knob.h"
-#include "tempo_sync_knob.h"
+#include "TempoSyncKnob.h"
 #include "pixmap_button.h"
+
 
 PeakControllerDialog::PeakControllerDialog( Controller * _model, QWidget * _parent ) :
 	ControllerDialog( _model, _parent )

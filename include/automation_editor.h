@@ -31,10 +31,10 @@
 #include <QtGui/QWidget>
 
 #include "lmms_basics.h"
-#include "journalling_object.h"
+#include "JournallingObject.h"
 #include "midi_time.h"
 #include "automation_pattern.h"
-#include "combobox_model.h"
+#include "ComboBoxModel.h"
 
 
 class QPainter;
@@ -47,7 +47,7 @@ class timeLine;
 class toolButton;
 
 
-class automationEditor : public QWidget, public journallingObject
+class automationEditor : public QWidget, public JournallingObject
 {
 	Q_OBJECT
 public:
@@ -186,9 +186,9 @@ private:
 	comboBox * m_zoomingYComboBox;
 	comboBox * m_quantizeComboBox;
 
-	comboBoxModel m_zoomingXModel;
-	comboBoxModel m_zoomingYModel;
-	comboBoxModel m_quantizeModel;
+	ComboBoxModel m_zoomingXModel;
+	ComboBoxModel m_zoomingYModel;
+	ComboBoxModel m_quantizeModel;
 
 	automationPattern * m_pattern;
 	float m_minLevel;

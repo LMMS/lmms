@@ -146,7 +146,7 @@ private:
 
 spectrumAnalyzerControlDialog::spectrumAnalyzerControlDialog(
 					spectrumAnalyzerControls * _controls ) :
-	effectControlDialog( _controls ),
+	EffectControlDialog( _controls ),
 	m_controls( _controls ),
 	m_logXAxis( PLUGIN_NAME::getIconPixmap( "log_x_axis" ) ),
 	m_logYAxis( PLUGIN_NAME::getIconPixmap( "log_y_axis" ) )

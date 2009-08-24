@@ -1,7 +1,7 @@
 /*
  * automation_recorder.cpp - declaration of class AutomationRecorder 
  *						which handles the dataChanged event of every
- * 						automatableModel and records it if automation
+ * 						AutomatableModel and records it if automation
  *						recording is on.
  *
  * Copyright (c) 2009-2009 Andrew Kelley <superjoe30/at/gmail.com>
@@ -40,7 +40,7 @@ AutomationRecorder::~AutomationRecorder()
 {
 } 
 
-void AutomationRecorder::modelDataEvent( automatableModel * _model )
+void AutomationRecorder::modelDataEvent( AutomatableModel * _model )
 {
 	if( _model->armed() &&
 		engine::getSong()->isRecording() &&

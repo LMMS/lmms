@@ -51,14 +51,14 @@
 #include <QtGui/QWidget>
 #include <QtGui/QPixmap>
 
-#include "automatable_model_view.h"
+#include "AutomatableModelView.h"
 
 
-class fader : public QWidget, public floatModelView
+class fader : public QWidget, public FloatModelView
 {
 	Q_OBJECT
 public:
-	fader( floatModel * _model, const QString & _name, QWidget * _parent );
+	fader( FloatModel * _model, const QString & _name, QWidget * _parent );
 	virtual ~fader();
 
 	void setMaxPeak( float _max );
@@ -78,7 +78,7 @@ private:
 	virtual void wheelEvent( QWheelEvent *ev );
 	virtual void paintEvent( QPaintEvent *ev );
 
-	floatModel * m_model;
+	FloatModel * m_model;
 
 	float m_fPeakValue_L;
 	float m_fPeakValue_R;

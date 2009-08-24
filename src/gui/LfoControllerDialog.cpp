@@ -41,9 +41,8 @@
 
 #include "LfoController.h"
 #include "ControllerDialog.h"
-#include "mv_base.h"
 #include "knob.h"
-#include "tempo_sync_knob.h"
+#include "TempoSyncKnob.h"
 #include "pixmap_button.h"
 
 const int CD_ENV_KNOBS_LBL_Y = 20;
@@ -81,7 +80,7 @@ LfoControllerDialog::LfoControllerDialog( Controller * _model, QWidget * _parent
 	m_baseKnob->setWhatsThis( tr("todo") );
 
 
-	m_speedKnob = new tempoSyncKnob( knobBright_26, this );
+	m_speedKnob = new TempoSyncKnob( knobBright_26, this );
 	m_speedKnob->setLabel( tr( "SPD" ) );
 	m_speedKnob->move( CD_LFO_SPEED_CD_KNOB_X, CD_LFO_CD_KNOB_Y );
 	m_speedKnob->setHintText( tr( "LFO-speed:" ) + " ", "" );

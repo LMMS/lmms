@@ -125,7 +125,7 @@ typedef enum asm_optimizations_e {
 } asm_optimizations;
 
 
-/* psychoacoustic model */
+/* psychoacoustic Model */
 typedef enum Psy_model_e {
     PSY_GPSYCHO = 1,
     PSY_NSPSYTUNE = 2
@@ -651,7 +651,7 @@ typedef struct {
     int alpha;               /* 0 if not an alpha version                  */
     int beta;                /* 0 if not a beta version                    */
 
-    /* version of the psy model */
+    /* version of the psy Model */
     int psy_major;
     int psy_minor;
     int psy_alpha;           /* 0 if not an alpha version                  */

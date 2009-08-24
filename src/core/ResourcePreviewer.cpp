@@ -30,10 +30,10 @@
 #include "ResourceFileMapper.h"
 #include "ResourceItem.h"
 #include "engine.h"
-#include "instrument.h"
-#include "instrument_track.h"
+#include "Instrument.h"
+#include "InstrumentTrack.h"
 #include "mmp.h"
-#include "project_journal.h"
+#include "ProjectJournal.h"
 
 
 ResourcePreviewer::ResourcePreviewer() :
@@ -44,7 +44,7 @@ ResourcePreviewer::ResourcePreviewer() :
 	// do not clutter global journal with items due to changing settings
 	// in preview classes
 	m_previewTrackContainer.setJournalling( false );
-	m_previewTrack = dynamic_cast<instrumentTrack *>(
+	m_previewTrack = dynamic_cast<InstrumentTrack *>(
 				track::create( track::InstrumentTrack,
 						&m_previewTrackContainer ) );
 
@@ -74,8 +74,8 @@ void ResourcePreviewer::preview( ResourceItem * _item )
 	stopPreview();
 
 	// disable journalling of changes in our preview track
-	const bool j = engine::getProjectJournal()->isJournalling();
-	engine::getProjectJournal()->setJournalling( false );
+	const bool j = engine::projectJournal()->isJournalling();
+	engine::projectJournal()->setJournalling( false );
 	engine::setSuppressMessages( true );
 
 	// handle individual resource types
@@ -108,7 +108,7 @@ void ResourcePreviewer::preview( ResourceItem * _item )
 
 	// re-enable journalling
 	engine::setSuppressMessages( false );
-	engine::getProjectJournal()->setJournalling( j );
+	engine::projectJournal()->setJournalling( j );
 
 	if( handledItem )
 	{

@@ -28,7 +28,7 @@
 
 #include <QtCore/QMutex>
 
-#include "instrument.h"
+#include "Instrument.h"
 #include "InstrumentView.h"
 #include "midi.h"
 #include "note.h"
@@ -38,14 +38,14 @@ class QPixmap;
 class QPushButton;
 
 class pixmapButton;
-class vstPlugin;
+class VstPlugin;
 
 
-class vestigeInstrument : public instrument
+class vestigeInstrument : public Instrument
 {
 	Q_OBJECT
 public:
-	vestigeInstrument( instrumentTrack * _channel_track );
+	vestigeInstrument( InstrumentTrack * _instrument_track );
 	virtual ~vestigeInstrument();
 
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
@@ -65,7 +65,7 @@ public:
 	virtual bool handleMidiEvent( const midiEvent & _me,
 						const midiTime & _time );
 
-	virtual pluginView * instantiateView( QWidget * _parent );
+	virtual PluginView * instantiateView( QWidget * _parent );
 
 
 private:
@@ -75,7 +75,7 @@ private:
 	int m_runningNotes[NumKeys];
 
 
-	vstPlugin * m_plugin;
+	VstPlugin * m_plugin;
 	QMutex m_pluginMutex;
 
 	QString m_pluginDLL;
@@ -91,7 +91,7 @@ class VestigeInstrumentView : public InstrumentView
 {
 	Q_OBJECT
 public:
-	VestigeInstrumentView( instrument * _instrument, QWidget * _parent );
+	VestigeInstrumentView( Instrument * _instrument, QWidget * _parent );
 	virtual ~VestigeInstrumentView();
 
 

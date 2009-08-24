@@ -33,7 +33,7 @@
 #define _LB302_H_
 
 #include "effect_lib.h"
-#include "instrument.h"
+#include "Instrument.h"
 #include "InstrumentView.h"
 #include "led_checkbox.h"
 #include "knob.h"
@@ -131,11 +131,11 @@ public:
 };
 
 
-class lb302Synth : public instrument
+class lb302Synth : public Instrument
 {
 	Q_OBJECT
 public:
-	lb302Synth( instrumentTrack * _channel_track );
+	lb302Synth( InstrumentTrack * _instrument_track );
 	virtual ~lb302Synth();
 
 	virtual void play( sampleFrame * _working_buffer );
@@ -154,7 +154,7 @@ public:
 		return 0; //4048;
 	}
 
-	virtual pluginView * instantiateView( QWidget * _parent );
+	virtual PluginView * instantiateView( QWidget * _parent );
 
 private:
 
@@ -162,21 +162,21 @@ private:
 
 
 private:
-	knobModel vcf_cut_knob;
-	knobModel vcf_res_knob;
-	knobModel vcf_mod_knob;
-	knobModel vcf_dec_knob;
+	FloatModel vcf_cut_knob;
+	FloatModel vcf_res_knob;
+	FloatModel vcf_mod_knob;
+	FloatModel vcf_dec_knob;
 
-	knobModel vco_fine_detune_knob;
+	FloatModel vco_fine_detune_knob;
 
-	knobModel dist_knob;
-	intModel wave_shape;
-	knobModel slide_dec_knob;
+	FloatModel dist_knob;
+	IntModel wave_shape;
+	FloatModel slide_dec_knob;
     
-	boolModel slideToggle;
-	boolModel accentToggle;
-	boolModel deadToggle;
-	boolModel db24Toggle;
+	BoolModel slideToggle;
+	BoolModel accentToggle;
+	BoolModel deadToggle;
+	BoolModel db24Toggle;
 
 
 public slots:
@@ -241,7 +241,7 @@ private:
 class lb302SynthView : public InstrumentView
 {
 public:
-	lb302SynthView( instrument * _instrument,
+	lb302SynthView( Instrument * _instrument,
 	                QWidget * _parent );
 	virtual ~lb302SynthView();
 

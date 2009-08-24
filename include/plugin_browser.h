@@ -32,7 +32,7 @@
 
 
 #include "side_bar_widget.h"
-#include "plugin.h"
+#include "Plugin.h"
 
 
 class trackContainer;
@@ -47,7 +47,7 @@ public:
 
 
 private:
-	QVector<plugin::descriptor> m_pluginDescriptors;
+	QVector<Plugin::Descriptor> m_pluginDescriptors;
 
 	QWidget * m_view;
 
@@ -60,7 +60,7 @@ class pluginDescWidget : public QWidget
 {
 	Q_OBJECT
 public:
-	pluginDescWidget( const plugin::descriptor & _pd, QWidget * _parent );
+	pluginDescWidget( const Plugin::Descriptor & _pd, QWidget * _parent );
 	virtual ~pluginDescWidget();
 
 
@@ -78,7 +78,7 @@ private slots:
 private:
 	QTimer m_updateTimer;
 
-	const plugin::descriptor & m_pluginDescriptor;
+	const Plugin::Descriptor & m_pluginDescriptor;
 	QPixmap m_logo;
 
 	bool m_mouseOver;

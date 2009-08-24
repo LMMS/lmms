@@ -31,7 +31,7 @@
 extern "C"
 {
 
-plugin::descriptor PLUGIN_EXPORT stereoenhancer_plugin_descriptor =
+Plugin::Descriptor PLUGIN_EXPORT stereoenhancer_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"StereoEnhancer Effect",
@@ -39,8 +39,8 @@ plugin::descriptor PLUGIN_EXPORT stereoenhancer_plugin_descriptor =
 				"Plugin for enhancing stereo separation of a stereo input file" ),
 	"Lou Herard <lherard/at/gmail.com>",
 	0x0100,
-	plugin::Effect,
-	new pluginPixmapLoader( "logo" ),
+	Plugin::Effect,
+	new PluginPixmapLoader( "logo" ),
 	NULL,
 	NULL
 } ;
@@ -50,9 +50,9 @@ plugin::descriptor PLUGIN_EXPORT stereoenhancer_plugin_descriptor =
 
 
 stereoEnhancerEffect::stereoEnhancerEffect(
-			model * _parent,
-			const descriptor::subPluginFeatures::key * _key ) :
-	effect( &stereoenhancer_plugin_descriptor, _parent, _key ),
+			Model * _parent,
+			const Descriptor::SubPluginFeatures::Key * _key ) :
+	Effect( &stereoenhancer_plugin_descriptor, _parent, _key ),
 	m_seFX( effectLib::stereoEnhancer( 0.0f ) ),
 	m_delayBuffer( new sampleFrame[DEFAULT_BUFFER_SIZE] ),
 	m_currFrame( 0 ),
@@ -96,8 +96,8 @@ bool stereoEnhancerEffect::processAudioBuffer( sampleFrame * _buf,
 		return( FALSE );
 	}
 
-	const float d = getDryLevel();
-	const float w = getWetLevel();
+	const float d = dryLevel();
+	const float w = wetLevel();
 
 	for( fpp_t f = 0; f < _frames; ++f )
 	{
@@ -164,10 +164,10 @@ extern "C"
 {
 
 // neccessary for getting instance out of shared lib
-plugin * PLUGIN_EXPORT lmms_plugin_main( model * _parent, void * _data )
+Plugin * PLUGIN_EXPORT lmms_plugin_main( Model * _parent, void * _data )
 {
 	return( new stereoEnhancerEffect( _parent,
-		static_cast<const plugin::descriptor::subPluginFeatures::key *>(
+		static_cast<const Plugin::Descriptor::SubPluginFeatures::Key *>(
 								_data ) ) );
 }
 

@@ -31,7 +31,7 @@
 
 class Piano;
 class ResourceItem;
-class instrumentTrack;
+class InstrumentTrack;
 
 
 class ResourcePreviewer
@@ -56,7 +56,7 @@ private:
 	} ;
 
 	PreviewTrackContainer m_previewTrackContainer;
-	instrumentTrack * m_previewTrack;
+	InstrumentTrack * m_previewTrack;
 
 	multimediaProject m_defaultSettings;
 

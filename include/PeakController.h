@@ -27,24 +27,24 @@
 
 #include <QtGui/QWidget>
 
-#include "mv_base.h"
-#include "automatable_model.h"
+#include "Model.h"
+#include "AutomatableModel.h"
 #include "Controller.h"
 #include "ControllerDialog.h"
 
 class automatableButtonGroup;
 class knob;
-class peakControllerEffect;
+class PeakControllerEffect;
 
-typedef QVector<peakControllerEffect *> peakControllerEffectVector;
+typedef QVector<PeakControllerEffect *> PeakControllerEffectVector;
 
 
 class EXPORT PeakController : public Controller
 {
 	Q_OBJECT
 public:
-	PeakController( model * _parent,
-		peakControllerEffect *_peak_effect = NULL );
+	PeakController( Model * _parent,
+		PeakControllerEffect *_peak_effect = NULL );
 
 
 	virtual ~PeakController();
@@ -53,7 +53,7 @@ public:
 	virtual void loadSettings( const QDomElement & _this );
 	virtual QString nodeName( void ) const;
 
-	static peakControllerEffectVector s_effects;
+	static PeakControllerEffectVector s_effects;
 	static int s_lastEffectId;
 
 
@@ -65,7 +65,7 @@ protected:
 	// The internal per-controller get-value function
 	virtual float value( int _offset );
 
-	peakControllerEffect * m_peakEffect;
+	PeakControllerEffect * m_peakEffect;
 
 	friend class PeakControllerDialog;
 } ;

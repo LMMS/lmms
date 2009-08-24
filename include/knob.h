@@ -29,7 +29,7 @@
 #include <QtGui/QWidget>
 #include <QtCore/QPoint>
 
-#include "automatable_model_view.h"
+#include "AutomatableModelView.h"
 #include "templates.h"
 
 
@@ -44,7 +44,7 @@ enum knobTypes
 
 
 
-class EXPORT knob : public QWidget, public floatModelView
+class EXPORT knob : public QWidget, public FloatModelView
 {
 	Q_OBJECT
 	Q_PROPERTY(float innerRadius READ innerRadius WRITE setInnerRadius)
@@ -150,7 +150,7 @@ private:
 	QString m_label;
 
 	QPixmap * m_knobPixmap;
-	boolModel m_volumeKnob;
+	BoolModel m_volumeKnob;
 
 	float m_mouseOffset;
 	QPoint m_origMousePos;
@@ -168,8 +168,5 @@ private:
 	QColor * m_outerColor;
 
 } ;
-
-
-typedef floatModel knobModel;
 
 #endif

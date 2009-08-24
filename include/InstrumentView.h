@@ -26,31 +26,31 @@
 #ifndef _INSTRUMENT_VIEW_H
 #define _INSTRUMENT_VIEW_H
 
-#include "instrument.h"
-#include "plugin_view.h"
+#include "Instrument.h"
+#include "PluginView.h"
 
-class instrumentTrackWindow;
+class InstrumentTrackWindow;
 
 
-class EXPORT InstrumentView : public pluginView
+class EXPORT InstrumentView : public PluginView
 {
 public:
-	InstrumentView( instrument * _instrument, QWidget * _parent );
+	InstrumentView( Instrument * _instrument, QWidget * _parent );
 	virtual ~InstrumentView();
 
-	instrument * model()
+	Instrument * model()
 	{
-		return castModel<instrument>();
+		return castModel<Instrument>();
 	}
 
-	const instrument * model() const
+	const Instrument * model() const
 	{
-		return castModel<instrument>();
+		return castModel<Instrument>();
 	}
 
-	virtual void setModel( ::model * _model, bool = false );
+	virtual void setModel( Model * _model, bool = false );
 
-	instrumentTrackWindow * getInstrumentTrackWindow();
+	InstrumentTrackWindow * instrumentTrackWindow();
 
 
 protected:

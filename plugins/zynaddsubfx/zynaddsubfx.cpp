@@ -36,7 +36,7 @@
 #include "engine.h"
 #include "mmp.h"
 #include "instrument_play_handle.h"
-#include "instrument_track.h"
+#include "InstrumentTrack.h"
 #include "gui_templates.h"
 #include "string_pair_drag.h"
 #include "remote_zynaddsubfx.h"
@@ -51,7 +51,7 @@ static const char * __supportedExts[] =
 extern "C"
 {
 
-plugin::descriptor PLUGIN_EXPORT zynaddsubfx_plugin_descriptor =
+Plugin::Descriptor PLUGIN_EXPORT zynaddsubfx_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"ZynAddSubFX",
@@ -59,8 +59,8 @@ plugin::descriptor PLUGIN_EXPORT zynaddsubfx_plugin_descriptor =
 			"Embedded ZynAddSubFX" ),
 	"Tobias Doerffel <tobydox/at/users.sf.net>",
 	0x0100,
-	plugin::Instrument,
-	new pluginPixmapLoader( "logo" ),
+	Plugin::Instrument,
+	new PluginPixmapLoader( "logo" ),
 	__supportedExts,
 	NULL,
 } ;
@@ -69,14 +69,14 @@ plugin::descriptor PLUGIN_EXPORT zynaddsubfx_plugin_descriptor =
 
 
 
-zynAddSubFx::zynAddSubFx( instrumentTrack * _instrumentTrack ) :
-	instrument( _instrumentTrack, &zynaddsubfx_plugin_descriptor ),
+zynAddSubFx::zynAddSubFx( InstrumentTrack * _instrumentTrack ) :
+	Instrument( _instrumentTrack, &zynaddsubfx_plugin_descriptor ),
 	m_plugin( NULL )
 {
 	initRemotePlugin();
 
 	// now we need a play-handle which cares for calling play()
-	instrumentPlayHandle * iph = new instrumentPlayHandle( this );
+	InstrumentPlayHandle * iph = new InstrumentPlayHandle( this );
 	engine::getMixer()->addPlayHandle( iph );
 
 	connect( engine::getMixer(), SIGNAL( sampleRateChanged() ),
@@ -88,7 +88,7 @@ zynAddSubFx::zynAddSubFx( instrumentTrack * _instrumentTrack ) :
 
 zynAddSubFx::~zynAddSubFx()
 {
-	engine::getMixer()->removePlayHandles( getInstrumentTrack() );
+	engine::getMixer()->removePlayHandles( instrumentTrack() );
 
 	m_pluginMutex.lock();
 	delete m_plugin;
@@ -106,7 +106,7 @@ void zynAddSubFx::saveSettings( QDomDocument & _doc,
 	{
 		m_plugin->lock();
 		m_plugin->sendMessage(
-			remotePlugin::message( IdSaveSettingsToFile ).
+			RemotePlugin::message( IdSaveSettingsToFile ).
 				addString(
 					QSTR_TO_STDSTR(
 						QDir::toNativeSeparators( tf.fileName() ) ) ) );
@@ -148,7 +148,7 @@ void zynAddSubFx::loadSettings( const QDomElement & _this )
 		tf.write( a );
 		m_plugin->lock();
 		m_plugin->sendMessage(
-			remotePlugin::message( IdLoadSettingsFromFile ).
+			RemotePlugin::message( IdLoadSettingsFromFile ).
 				addString(
 					QSTR_TO_STDSTR(
 						QDir::toNativeSeparators( tf.fileName() ) ) ) );
@@ -167,7 +167,7 @@ void zynAddSubFx::loadResource( const ResourceItem * _item )
 	ResourceFileMapper mapper( _item );
 	m_plugin->lock();
 	m_plugin->sendMessage(
-		remotePlugin::message( IdLoadPresetFromFile ).
+		RemotePlugin::message( IdLoadPresetFromFile ).
 			addString( QSTR_TO_STDSTR( mapper.fileName() ) ) );
 	m_plugin->waitForMessage( IdLoadPresetFromFile );
 	m_plugin->unlock();
@@ -178,7 +178,7 @@ void zynAddSubFx::loadResource( const ResourceItem * _item )
 
 
 
-QString zynAddSubFx::nodeName( void ) const
+QString zynAddSubFx::nodeName() const
 {
 	return zynaddsubfx_plugin_descriptor.name;
 }
@@ -191,7 +191,7 @@ void zynAddSubFx::play( sampleFrame * _buf )
 	m_pluginMutex.lock();
 	m_plugin->process( NULL, _buf );
 	m_pluginMutex.unlock();
-	getInstrumentTrack()->processAudioBuffer( _buf,
+	instrumentTrack()->processAudioBuffer( _buf,
 				engine::getMixer()->framesPerPeriod(), NULL );
 }
 
@@ -211,7 +211,7 @@ bool zynAddSubFx::handleMidiEvent( const midiEvent & _me,
 
 
 
-void zynAddSubFx::updateSampleRate( void )
+void zynAddSubFx::updateSampleRate()
 {
 	m_pluginMutex.lock();
 
@@ -228,15 +228,15 @@ void zynAddSubFx::updateSampleRate( void )
 
 
 
-void zynAddSubFx::initRemotePlugin( void )
+void zynAddSubFx::initRemotePlugin()
 {
 	delete m_plugin;
-	m_plugin = new remotePlugin( "remote_zynaddsubfx", false );
+	m_plugin = new RemotePlugin( "remote_zynaddsubfx", false );
 	m_plugin->lock();
 	m_plugin->waitForInitDone( false );
 
 	m_plugin->sendMessage(
-		remotePlugin::message( IdZasfPresetDirectory ).
+		RemotePlugin::message( IdZasfPresetDirectory ).
 			addString(
 				QSTR_TO_STDSTR(
 					QString( configManager::inst()->factoryPresetsDir() +
@@ -247,7 +247,7 @@ void zynAddSubFx::initRemotePlugin( void )
 
 
 
-pluginView * zynAddSubFx::instantiateView( QWidget * _parent )
+PluginView * zynAddSubFx::instantiateView( QWidget * _parent )
 {
 	return new ZynAddSubFxView( this, _parent );
 }
@@ -258,7 +258,7 @@ pluginView * zynAddSubFx::instantiateView( QWidget * _parent )
 
 
 
-ZynAddSubFxView::ZynAddSubFxView( instrument * _instrument, QWidget * _parent ) :
+ZynAddSubFxView::ZynAddSubFxView( Instrument * _instrument, QWidget * _parent ) :
 	InstrumentView( _instrument, _parent )
 {
 	setAutoFillBackground( true );
@@ -290,7 +290,7 @@ ZynAddSubFxView::~ZynAddSubFxView()
 
 
 
-void ZynAddSubFxView::modelChanged( void )
+void ZynAddSubFxView::modelChanged()
 {
 	toggleUI();
 }
@@ -298,7 +298,7 @@ void ZynAddSubFxView::modelChanged( void )
 
 
 
-void ZynAddSubFxView::toggleUI( void )
+void ZynAddSubFxView::toggleUI()
 {
 	if( m_toggleUIButton->isChecked() )
 	{
@@ -319,10 +319,10 @@ extern "C"
 {
 
 // neccessary for getting instance out of shared lib
-plugin * PLUGIN_EXPORT lmms_plugin_main( model *, void * _data )
+Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, void * _data )
 {
 
-	return new zynAddSubFx( static_cast<instrumentTrack *>( _data ) );
+	return new zynAddSubFx( static_cast<InstrumentTrack *>( _data ) );
 }
 
 

@@ -25,7 +25,7 @@
 #ifndef _RESOURCE_ACTION_H
 #define _RESOURCE_ACTION_H
 
-class instrumentTrack;
+class InstrumentTrack;
 class trackContainer;
 class ResourceItem;
 
@@ -56,8 +56,8 @@ public:
 	}
 
 	bool loadProject();
-	bool loadByPlugin( instrumentTrack * _target );
-	bool loadPreset( instrumentTrack * _target );
+	bool loadByPlugin( InstrumentTrack * _target );
+	bool loadPreset( InstrumentTrack * _target );
 	bool importProject( trackContainer * _target );
 
 

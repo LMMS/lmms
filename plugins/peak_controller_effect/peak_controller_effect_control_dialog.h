@@ -1,5 +1,5 @@
 /*
- * peak_controller_effect_control_dialog.h - control dialog for
+ * peak_controller_EffectControlDialog.h - control dialog for
  *                                           peakControllerEffect
  *
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail/dot/com>
@@ -26,20 +26,20 @@
 #ifndef _PEAK_CONTROLLER_EFFECT_CONTROL_DIALOG_H
 #define _PEAK_CONTROLLER_EFFECT_CONTROL_DIALOG_H
 
-#include "effect_control_dialog.h"
+#include "EffectControlDialog.h"
 
-class peakControllerEffectControls;
+class PeakControllerEffectControls;
 class knob;
 class tempoSyncKnob;
 class ledCheckBox;
 
 
-class peakControllerEffectControlDialog : public effectControlDialog
+class PeakControllerEffectControlDialog : public EffectControlDialog
 {
 public:
-	peakControllerEffectControlDialog(
-				peakControllerEffectControls * _controls );
-	virtual ~peakControllerEffectControlDialog()
+	PeakControllerEffectControlDialog(
+				PeakControllerEffectControls * _controls );
+	virtual ~PeakControllerEffectControlDialog()
 	{
 	}
 

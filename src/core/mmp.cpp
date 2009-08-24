@@ -36,7 +36,7 @@
 #include "config_mgr.h"
 #include "project_version.h"
 #include "song_editor.h"
-#include "effect.h"
+#include "Effect.h"
 #include "lmmsversion.h"
 
 
@@ -606,28 +606,25 @@ void multimediaProject::upgrade( void )
 			if( !k.isEmpty() )
 			{
 				const QList<QVariant> l =
-					base64::decode( k, QVariant::List ).
-								toList();
+					base64::decode( k, QVariant::List ).toList();
 				if( !l.isEmpty() )
 				{
 					QString name = l[0].toString();
 					QVariant u = l[1];
-					effectKey::attributeMap m;
+					EffectKey::AttributeMap m;
 					// VST-effect?
 					if( u.type() == QVariant::String )
 					{
 						m["file"] = u.toString();
 					}
 					// LADSPA-effect?
-					else if( u.type() ==
-							QVariant::StringList )
+					else if( u.type() == QVariant::StringList )
 					{
-						const QStringList sl =
-							u.toStringList();
+						const QStringList sl = u.toStringList();
 						m["plugin"] = sl.value( 0 );
 						m["file"] = sl.value( 1 );
 					}
-					effectKey key( NULL, name, m );
+					EffectKey key( NULL, name, m );
 					el.appendChild( key.saveXML( *this ) );
 				}
 			}

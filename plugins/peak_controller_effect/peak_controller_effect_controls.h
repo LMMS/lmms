@@ -1,5 +1,5 @@
 /*
- * peak_controller_effect_controls.h - controls for peakController effect
+ * peak_controller_EffectControls.h - controls for peakController effect
  *
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail/dot/com>
  * Copyright (c) 2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
@@ -26,50 +26,50 @@
 #ifndef _PEAK_CONTROLLER_EFFECT_CONTROLS_H
 #define _PEAK_CONTROLLER_EFFECT_CONTROLS_H
 
-#include "effect_controls.h"
+#include "EffectControls.h"
 #include "peak_controller_effect_control_dialog.h"
 #include "knob.h"
 
-class peakControllerEffect;
+class PeakControllerEffect;
 
-class peakControllerEffectControls : public effectControls
+class PeakControllerEffectControls : public EffectControls
 {
 	Q_OBJECT
 public:
-	peakControllerEffectControls( peakControllerEffect * _eff );
-	virtual ~peakControllerEffectControls()
+	PeakControllerEffectControls( PeakControllerEffect * _eff );
+	virtual ~PeakControllerEffectControls()
 	{
 	}
 
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
 	virtual void loadSettings( const QDomElement & _this );
-	inline virtual QString nodeName( void ) const
+	inline virtual QString nodeName() const
 	{
 		return "peakcontrollereffectcontrols";
 	}
 
-	virtual int getControlCount( void )
+	virtual int controlCount()
 	{
 		return 1;
 	}
 
-	virtual effectControlDialog * createView( void )
+	virtual EffectControlDialog * createView()
 	{
-		return new peakControllerEffectControlDialog( this );
+		return new PeakControllerEffectControlDialog( this );
 	}
 
 
 private:
-	peakControllerEffect * m_effect;
+	PeakControllerEffect * m_effect;
 
-	floatModel m_baseModel;
-	floatModel m_amountModel;
-	floatModel m_attackModel;
-	floatModel m_decayModel;
-	boolModel m_muteModel;
+	FloatModel m_baseModel;
+	FloatModel m_amountModel;
+	FloatModel m_attackModel;
+	FloatModel m_decayModel;
+	BoolModel m_muteModel;
 
-	friend class peakControllerEffectControlDialog;
-	friend class peakControllerEffect;
+	friend class PeakControllerEffectControlDialog;
+	friend class PeakControllerEffect;
 
 } ;
 

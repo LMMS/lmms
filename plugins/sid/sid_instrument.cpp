@@ -33,10 +33,9 @@
 
 #include "sid_instrument.h"
 #include "engine.h"
-#include "instrument_track.h"
+#include "InstrumentTrack.h"
 #include "knob.h"
 #include "note_play_handle.h"
-#include "sweep_oscillator.h"
 #include "pixmap_button.h"
 #include "tooltip.h"
 
@@ -69,7 +68,7 @@ static const int relTime[16] = { 6, 24, 48, 72, 114, 168, 204, 240, 300, 750,
 
 extern "C"
 {
-plugin::descriptor PLUGIN_EXPORT sid_plugin_descriptor =
+Plugin::Descriptor PLUGIN_EXPORT sid_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"SID",
@@ -79,16 +78,16 @@ plugin::descriptor PLUGIN_EXPORT sid_plugin_descriptor =
 	"Csaba Hruska <csaba.hruska/at/gmail.com>"
 	"Attila Herman <attila589/at/gmail.com>",
 	0x0100,
-	plugin::Instrument,
-	new pluginPixmapLoader( "logo" ),
+	Plugin::Instrument,
+	new PluginPixmapLoader( "logo" ),
 	NULL,
 	NULL
 } ;
 
 }
 
-voiceObject::voiceObject( model * _parent, int _idx ) :
-	model( _parent ),
+voiceObject::voiceObject( Model * _parent, int _idx ) :
+	Model( _parent ),
 	m_pulseWidthModel( 2048.0f, 0.0f, 4095.0f, 1.0f, this,
 					tr( "Voice %1 pulse width" ).arg( _idx+1 ) ),
 	m_attackModel( 8.0f, 0.0f, 15.0f, 1.0f, this,
@@ -117,8 +116,8 @@ voiceObject::~voiceObject()
 }
 
 
-sidInstrument::sidInstrument( instrumentTrack * _instrument_track ) :
-	instrument( _instrument_track, &sid_plugin_descriptor ),
+sidInstrument::sidInstrument( InstrumentTrack * _instrument_track ) :
+	Instrument( _instrument_track, &sid_plugin_descriptor ),
 	// filter	
 	m_filterFCModel( 1024.0f, 0.0f, 2047.0f, 1.0f, this, tr( "Cutoff" ) ),
 	m_filterResonanceModel( 8.0f, 0.0f, 15.0f, 1.0f, this, tr( "Resonance" ) ),
@@ -432,7 +431,7 @@ void sidInstrument::playNote( notePlayHandle * _n,
 		}
 	}
 
-	getInstrumentTrack()->processAudioBuffer( _working_buffer, frames, _n );
+	instrumentTrack()->processAudioBuffer( _working_buffer, frames, _n );
 }
 
 
@@ -446,7 +445,7 @@ void sidInstrument::deleteNotePluginData( notePlayHandle * _n )
 
 
 
-pluginView * sidInstrument::instantiateView( QWidget * _parent )
+PluginView * sidInstrument::instantiateView( QWidget * _parent )
 {
 	return( new sidInstrumentView( this, _parent ) );
 }
@@ -473,7 +472,7 @@ public:
 
 
 
-sidInstrumentView::sidInstrumentView( instrument * _instrument,
+sidInstrumentView::sidInstrumentView( Instrument * _instrument,
 							QWidget * _parent ) :
 	InstrumentView( _instrument, _parent )
 {
@@ -817,10 +816,10 @@ extern "C"
 {
 
 // neccessary for getting instance out of shared lib
-plugin * PLUGIN_EXPORT lmms_plugin_main( model *, void * _data )
+Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, void * _data )
 {
 	return( new sidInstrument(
-				static_cast<instrumentTrack *>( _data ) ) );
+				static_cast<InstrumentTrack *>( _data ) ) );
 }
 
 

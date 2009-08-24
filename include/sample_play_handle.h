@@ -28,7 +28,7 @@
 
 #include "mixer.h"
 #include "sample_buffer.h"
-#include "automatable_model.h"
+#include "AutomatableModel.h"
 
 class bbTrack;
 class pattern;
@@ -72,7 +72,7 @@ public:
 		m_bbTrack = _bb_track;
 	}
 
-	void setVolumeModel( floatModel * _model )
+	void setVolumeModel( FloatModel * _model )
 	{
 		m_volumeModel = _model;
 	}
@@ -88,8 +88,8 @@ private:
 	AudioPort * m_audioPort;
 	const bool m_ownAudioPort;
 
-	floatModel m_defaultVolumeModel;
-	floatModel * m_volumeModel;
+	FloatModel m_defaultVolumeModel;
+	FloatModel * m_volumeModel;
 	track * m_track;
 
 	bbTrack * m_bbTrack;

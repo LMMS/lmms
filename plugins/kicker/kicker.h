@@ -27,7 +27,7 @@
 #define _KICKER_H
 
 #include <QtCore/QObject>
-#include "instrument.h"
+#include "Instrument.h"
 #include "InstrumentView.h"
 #include "knob.h"
 
@@ -36,10 +36,10 @@ class kickerInstrumentView;
 class notePlayHandle;
 
 
-class kickerInstrument : public instrument
+class kickerInstrument : public Instrument
 {
 public:
-	kickerInstrument( instrumentTrack * _instrument_track );
+	kickerInstrument( InstrumentTrack * _instrument_track );
 	virtual ~kickerInstrument();
 
 	virtual void playNote( notePlayHandle * _n,
@@ -57,15 +57,15 @@ public:
 		return( 512 );
 	}
 
-	virtual pluginView * instantiateView( QWidget * _parent );
+	virtual PluginView * instantiateView( QWidget * _parent );
 
 
 private:
-	knobModel m_startFreqModel;
-	knobModel m_endFreqModel;
-	knobModel m_decayModel;
-	knobModel m_distModel;
-	knobModel m_gainModel;
+	FloatModel m_startFreqModel;
+	FloatModel m_endFreqModel;
+	FloatModel m_decayModel;
+	FloatModel m_distModel;
+	FloatModel m_gainModel;
 
 	friend class kickerInstrumentView;
 
@@ -77,7 +77,7 @@ class kickerInstrumentView : public InstrumentView
 {
 	Q_OBJECT
 public:
-	kickerInstrumentView( instrument * _instrument, QWidget * _parent );
+	kickerInstrumentView( Instrument * _instrument, QWidget * _parent );
 	virtual ~kickerInstrumentView();
 
 private:

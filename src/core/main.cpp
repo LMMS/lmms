@@ -56,7 +56,7 @@
 #include "config_mgr.h"
 #include "embed.h"
 #include "engine.h"
-#include "import_filter.h"
+#include "ImportFilter.h"
 #include "MainWindow.h"
 #include "ProjectRenderer.h"
 #include "song.h"
@@ -461,8 +461,7 @@ int main( int argc, char * * argv )
 		}
 		else if( !file_to_import.isEmpty() )
 		{
-			importFilter::import( file_to_import,
-							engine::getSong() );
+			ImportFilter::import( file_to_import, engine::getSong() );
 			if( exit_after_import )
 			{
 				return 0;

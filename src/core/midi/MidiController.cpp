@@ -35,7 +35,7 @@
 #include "automation_recorder.h"
 
 
-MidiController::MidiController( model * _parent ) :
+MidiController::MidiController( Model * _parent ) :
 	Controller( Controller::MidiController, _parent, tr( "MIDI Controller" ) ),
 	MidiEventProcessor(),
 	m_midiPort( tr( "unnamed_midi_controller" ),

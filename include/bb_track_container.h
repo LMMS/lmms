@@ -72,7 +72,7 @@ public slots:
 
 
 private:
-	comboBoxModel m_bbComboBoxModel;
+	ComboBoxModel m_bbComboBoxModel;
 
 
 	friend class bbEditor;
