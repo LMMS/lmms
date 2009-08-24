@@ -41,7 +41,7 @@ public:
 
 
 public slots:
-	void rename( void );
+	void rename();
 
 
 protected:

@@ -53,7 +53,7 @@ public:
 	{
 	}
 
-	inline midiTime toNearestTact( void ) const
+	inline midiTime toNearestTact() const
 	{
 		if( m_ticks % s_ticksPerTact >= s_ticksPerTact/2 )
 		{
@@ -80,12 +80,12 @@ public:
 		return *this;
 	}
 
-	inline tact_t getTact( void ) const
+	inline tact_t getTact() const
 	{
 		return m_ticks / s_ticksPerTact;
 	}
 
-	inline tact_t nextFullTact( void ) const
+	inline tact_t nextFullTact() const
 	{
 		if( m_ticks % s_ticksPerTact == 0 )
 		{
@@ -99,12 +99,12 @@ public:
 		m_ticks = _t;
 	}
 
-	inline tick_t getTicks( void ) const
+	inline tick_t getTicks() const
 	{
 		return m_ticks;
 	}
 
-	inline operator int( void ) const
+	inline operator int() const
 	{
 		return m_ticks;
 	}
@@ -128,12 +128,12 @@ public:
 	}
 
 
-	static tick_t ticksPerTact( void )
+	static tick_t ticksPerTact()
 	{
 		return s_ticksPerTact;
 	}
 
-	static int stepsPerTact( void )
+	static int stepsPerTact()
 	{
 		return qMax( 1, ticksPerTact() / DefaultBeatsPerTact );
 	}

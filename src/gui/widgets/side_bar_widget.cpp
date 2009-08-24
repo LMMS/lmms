@@ -62,7 +62,7 @@ void sideBarWidget::paintEvent( QPaintEvent * )
 	p.fillRect( 0, 0, width(), 27, palette().highlight().color() );
 
 	QFont f = p.font();
-	f.setBold( TRUE );
+	f.setBold( true );
 	p.setFont( pointSize<TITLE_FONT_HEIGHT>( f ) );
 
 	p.setPen( palette().highlightedText().color() );

@@ -32,7 +32,7 @@ captionMenu::captionMenu( const QString & _title, QWidget * _parent ) :
 	QMenu( _title, _parent )
 {
 	QAction * caption = addAction( _title );
-	caption->setEnabled( FALSE );
+	caption->setEnabled( false );
 }
 
 

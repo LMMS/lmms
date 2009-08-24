@@ -51,7 +51,7 @@ public:
 
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _this );
 	virtual void loadSettings( const QDomElement & _this );
-	virtual QString nodeName( void ) const;
+	virtual QString nodeName() const;
 
 	static PeakControllerEffectVector s_effects;
 	static int s_lastEffectId;
@@ -82,7 +82,7 @@ public:
 protected:
 	virtual void contextMenuEvent( QContextMenuEvent * _me );
 	virtual void paintEvent( QPaintEvent * _pe );
-	virtual void modelChanged( void );
+	virtual void modelChanged();
 
 	PeakController * m_peakController;
 

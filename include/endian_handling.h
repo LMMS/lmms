@@ -31,7 +31,7 @@
 #include "lmms_basics.h"
 
 
-inline bool isLittleEndian( void )
+inline bool isLittleEndian()
 {
 	return( QSysInfo::ByteOrder == QSysInfo::LittleEndian );
 }

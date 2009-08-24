@@ -63,7 +63,7 @@ float MidiController::value( int _offset )
 
 
 
-void MidiController::updateName( void )
+void MidiController::updateName()
 {
 	setName( QString("MIDI ch%1 ctrl%2").
 			arg( m_midiPort.inputChannel() ).
@@ -137,7 +137,7 @@ void MidiController::loadSettings( const QDomElement & _this )
 
 
 
-QString MidiController::nodeName( void ) const
+QString MidiController::nodeName() const
 {
 	return( "Midicontroller" );
 }

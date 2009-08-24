@@ -38,7 +38,7 @@ cpuloadWidget::cpuloadWidget( QWidget * _parent ) :
 	m_temp(),
 	m_background( embed::getIconPixmap( "cpuload_bg" ) ),
 	m_leds( embed::getIconPixmap( "cpuload_leds" ) ),
-	m_changed( TRUE ),
+	m_changed( true ),
 	m_updateTimer()
 {
 	setAttribute( Qt::WA_OpaquePaintEvent, true );
@@ -63,9 +63,9 @@ cpuloadWidget::~cpuloadWidget()
 
 void cpuloadWidget::paintEvent( QPaintEvent *  )
 {
-	if( m_changed == TRUE )
+	if( m_changed == true )
 	{
-		m_changed = FALSE;
+		m_changed = false;
 
 		QPainter p( &m_temp );
 		p.drawPixmap( 0, 0, m_background );
@@ -94,7 +94,7 @@ void cpuloadWidget::updateCpuLoad()
 	if( new_load != m_currentLoad )
 	{
 		m_currentLoad = new_load;
-		m_changed = TRUE;
+		m_changed = true;
 		update();
 	}
 }

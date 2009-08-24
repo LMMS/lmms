@@ -52,16 +52,16 @@ public:
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
 	virtual void loadSettings( const QDomElement & _this );
 
-	virtual QString nodeName( void ) const;
+	virtual QString nodeName() const;
 
-	virtual f_cnt_t desiredReleaseFrames( void ) const;
+	virtual f_cnt_t desiredReleaseFrames() const;
 
 	virtual PluginView * instantiateView( QWidget * _parent );
 
 
 /*public slots:
-	void updateKnobHint( void );
-	void updateKnobToolTip( void );*/
+	void updateKnobHint();
+	void updateKnobToolTip();*/
 
 private:
 	FloatModel m_ch1SweepTimeModel;
@@ -114,7 +114,7 @@ public:
 	virtual ~papuInstrumentView();
 
 private:
-	virtual void modelChanged( void );
+	virtual void modelChanged();
 
 	knob * m_ch1SweepTimeKnob;
 	pixmapButton * m_ch1SweepDirButton;
@@ -155,8 +155,8 @@ private:
 	graph * m_graph;
 
 /*protected slots:
-	void updateKnobHint( void );
-	void updateKnobToolTip( void );*/
+	void updateKnobHint();
+	void updateKnobToolTip();*/
 } ;
 
 

@@ -35,40 +35,40 @@ class EXPORT bbTrackContainer : public trackContainer
 	Q_OBJECT
 	mapPropertyFromModel(int,currentBB,setCurrentBB,m_bbComboBoxModel);
 public:
-	bbTrackContainer( void );
+	bbTrackContainer();
 	virtual ~bbTrackContainer();
 
 	virtual bool play( midiTime _start, const fpp_t _frames,
 						const f_cnt_t _frame_base,
 							Sint16 _tco_num = -1 );
 
-	virtual void updateAfterTrackAdd( void );
+	virtual void updateAfterTrackAdd();
 
-	inline virtual QString nodeName( void ) const
+	inline virtual QString nodeName() const
 	{
 		return "bbtrackcontainer";
 	}
 
 	tact_t lengthOfBB( int _bb );
-	inline tact_t lengthOfCurrentBB( void )
+	inline tact_t lengthOfCurrentBB()
 	{
 		return lengthOfBB( currentBB() );
 	}
-	int numOfBBs( void ) const;
+	int numOfBBs() const;
 	void removeBB( int _bb );
 
 	void swapBB( int _bb1, int _bb2 );
 
 	void updateBBTrack( trackContentObject * _tco );
-	void fixIncorrectPositions( void );
+	void fixIncorrectPositions();
 	void createTCOsForBB( int _bb );
 
 
 public slots:
-	void play( void );
-	void stop( void );
-	void updateComboBox( void );
-	void currentBBChanged( void );
+	void play();
+	void stop();
+	void updateComboBox();
+	void currentBBChanged();
 
 
 private:

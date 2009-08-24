@@ -39,7 +39,7 @@ public:
 	automatableSlider( QWidget * _parent, const QString & _name = QString::null );
 	virtual ~automatableSlider();
 
-	bool showStatus( void )
+	bool showStatus()
 	{
 		return( m_showStatus );
 	}
@@ -56,7 +56,7 @@ protected:
 	virtual void mouseReleaseEvent( QMouseEvent * _me );
 	virtual void wheelEvent( QWheelEvent * _me );
 
-	virtual void modelChanged( void );
+	virtual void modelChanged();
 
 
 private:
@@ -66,7 +66,7 @@ private:
 private slots:
 	void changeValue( int _value );
 	void moveSlider( int _value );
-	void updateSlider( void );
+	void updateSlider();
 
 } ;
 

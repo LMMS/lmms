@@ -57,12 +57,12 @@ public:
 		NumFilters
 	} ;
 
-	static inline float minFreq( void )
+	static inline float minFreq()
 	{
 		return( 0.01f );
 	}
 
-	static inline float minQ( void )
+	static inline float minQ()
 	{
 		return( 0.01f );
 	}
@@ -104,7 +104,7 @@ public:
 		delete m_subFilter;
 	}
 
-	inline void clearHistory( void )
+	inline void clearHistory()
 	{
 		// reset in/out history
 		for( ch_cnt_t _chnl = 0; _chnl < CHANNELS; ++_chnl )

@@ -63,7 +63,7 @@ public:
 
 	virtual bool fixedTCOs() const
 	{
-		return( FALSE );
+		return( false );
 	}
 
 	inline float pixelsPerTact() const
@@ -84,7 +84,7 @@ public:
 
 	inline QVector<selectableObject *> selectedObjects()
 	{
-		if( allowRubberband() == TRUE )
+		if( allowRubberband() == true )
 		{
 			return( m_rubberBand->selectedObjects() );
 		}

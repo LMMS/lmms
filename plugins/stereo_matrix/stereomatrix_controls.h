@@ -42,24 +42,24 @@ public:
 
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
 	virtual void loadSettings( const QDomElement & _this );
-	inline virtual QString nodeName( void ) const
+	inline virtual QString nodeName() const
 	{
 		return( "stereomatrixcontrols" );
 	}
 
-	virtual int controlCount( void )
+	virtual int controlCount()
 	{
 		return( 1 );
 	}
 	
-	virtual EffectControlDialog * createView( void )
+	virtual EffectControlDialog * createView()
 	{
 		return new stereoMatrixControlDialog( this );
 	}
 
 
 private slots:
-	void changeMatrix( void );
+	void changeMatrix();
 
 
 private:

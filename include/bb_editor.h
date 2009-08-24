@@ -41,19 +41,19 @@ public:
 	bbEditor( bbTrackContainer * _tc );
 	virtual ~bbEditor();
 
-	virtual inline bool fixedTCOs( void ) const
+	virtual inline bool fixedTCOs() const
 	{
-		return( TRUE );
+		return( true );
 	}
 
 	void removeBBView( int _bb );
 
 
 public slots:
-	void play( void );
-	void stop( void );
-	void updatePosition( void );
-	void addAutomationTrack( void );
+	void play();
+	void stop();
+	void updatePosition();
+	void addAutomationTrack();
 
 private:
 	virtual void keyPressEvent( QKeyEvent * _ke );

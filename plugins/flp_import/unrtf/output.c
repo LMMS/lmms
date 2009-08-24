@@ -131,7 +131,7 @@ op_translate_char (OutputPersonality *op, int charset, CodepageInfo *codepage, i
 	CHECK_PARAM_NOT_NULL(op);
 
 #if 1	/* daved - 0.20.5 */
-	if (no_remap_mode == TRUE && ch < 256)
+	if (no_remap_mode == true && ch < 256)
 	{
 		output_buffer[0]=ch;
 		result=output_buffer;
@@ -229,7 +229,7 @@ void
 op_begin_std_fontsize (OutputPersonality *op, int size)
 {
 	size = ( size * 3 ) / 2;
-	int found_std_expr = FALSE;
+	int found_std_expr = false;
 
 	CHECK_PARAM_NOT_NULL(op);
 
@@ -239,49 +239,49 @@ op_begin_std_fontsize (OutputPersonality *op, int size)
 	case 8:
 		if (op->fontsize8_begin) {
 			outstring+=QString().sprintf("%s", op->fontsize8_begin);
-			found_std_expr = TRUE;
+			found_std_expr = true;
 		}
 		break;
 	case 10:
 		if (op->fontsize10_begin) {
 			outstring+=QString().sprintf("%s", op->fontsize10_begin);
-			found_std_expr = TRUE;
+			found_std_expr = true;
 		}
 		break;
 	case 12:
 		if (op->fontsize12_begin) {
 			outstring+=QString().sprintf("%s", op->fontsize12_begin);
-			found_std_expr = TRUE;
+			found_std_expr = true;
 		}
 		break;
 	case 14:
 		if (op->fontsize14_begin) {
 			outstring+=QString().sprintf("%s", op->fontsize14_begin);
-			found_std_expr = TRUE;
+			found_std_expr = true;
 		}
 		break;
 	case 18:
 		if (op->fontsize18_begin) {
 			outstring+=QString().sprintf("%s", op->fontsize18_begin);
-			found_std_expr = TRUE;
+			found_std_expr = true;
 		}
 		break;
 	case 24:
 		if (op->fontsize24_begin) {
 			outstring+=QString().sprintf("%s", op->fontsize24_begin);
-			found_std_expr = TRUE;
+			found_std_expr = true;
 		}
 		break;
 	case 36:
 		if (op->fontsize36_begin) {
 			outstring+=QString().sprintf("%s", op->fontsize36_begin);
-			found_std_expr = TRUE;
+			found_std_expr = true;
 		}
 		break;
 	case 48:
 		if (op->fontsize48_begin) {
 			outstring+=QString().sprintf("%s", op->fontsize48_begin);
-			found_std_expr = TRUE;
+			found_std_expr = true;
 		}
 		break;
 	}
@@ -358,7 +358,7 @@ op_begin_std_fontsize (OutputPersonality *op, int size)
 void
 op_end_std_fontsize (OutputPersonality *op, int size)
 {
-	int found_std_expr = FALSE;
+	int found_std_expr = false;
 
 	CHECK_PARAM_NOT_NULL(op);
 
@@ -368,49 +368,49 @@ op_end_std_fontsize (OutputPersonality *op, int size)
 	case 8:
 		if (op->fontsize8_end) {
 			outstring+=QString().sprintf("%s", op->fontsize8_end);
-			found_std_expr = TRUE;
+			found_std_expr = true;
 		}
 		break;
 	case 10:
 		if (op->fontsize10_end) {
 			outstring+=QString().sprintf("%s", op->fontsize10_end);
-			found_std_expr = TRUE;
+			found_std_expr = true;
 		}
 		break;
 	case 12:
 		if (op->fontsize12_end) {
 			outstring+=QString().sprintf("%s", op->fontsize12_end);
-			found_std_expr = TRUE;
+			found_std_expr = true;
 		}
 		break;
 	case 14:
 		if (op->fontsize14_end) {
 			outstring+=QString().sprintf("%s", op->fontsize14_end);
-			found_std_expr = TRUE;
+			found_std_expr = true;
 		}
 		break;
 	case 18:
 		if (op->fontsize18_end) {
 			outstring+=QString().sprintf("%s", op->fontsize18_end);
-			found_std_expr = TRUE;
+			found_std_expr = true;
 		}
 		break;
 	case 24:
 		if (op->fontsize24_end) {
 			outstring+=QString().sprintf("%s", op->fontsize24_end);
-			found_std_expr = TRUE;
+			found_std_expr = true;
 		}
 		break;
 	case 36:
 		if (op->fontsize36_end) {
 			outstring+=QString().sprintf("%s", op->fontsize36_end);
-			found_std_expr = TRUE;
+			found_std_expr = true;
 		}
 		break;
 	case 48:
 		if (op->fontsize48_end) {
 			outstring+=QString().sprintf("%s", op->fontsize48_end);
-			found_std_expr = TRUE;
+			found_std_expr = true;
 		}
 		break;
 	}

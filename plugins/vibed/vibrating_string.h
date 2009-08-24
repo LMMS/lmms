@@ -45,7 +45,7 @@ public:
 				float _detune,
 				bool _state );
 	
-	inline ~vibratingString( void )
+	inline ~vibratingString()
 	{
 		delete[] m_outsamp;
 		delete[] m_impulse;
@@ -53,7 +53,7 @@ public:
 		vibratingString::freeDelayLine( m_toBridge );
 	}
 
-	inline sample_t nextSample( void )
+	inline sample_t nextSample()
 	{	
 		sample_t ym0;
 		sample_t ypM;

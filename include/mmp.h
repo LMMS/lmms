@@ -61,16 +61,16 @@ public:
 
 	bool writeFile( const QString & _fn );
 
-	inline QDomElement & content( void )
+	inline QDomElement & content()
 	{
 		return( m_content );
 	}
-	inline QDomElement & head( void )
+	inline QDomElement & head()
 	{
 		return( m_head );
 	}
 
-	inline ProjectTypes type( void ) const
+	inline ProjectTypes type() const
 	{
 		return( m_type );
 	}
@@ -82,7 +82,7 @@ private:
 
 	void cleanMetaNodes( QDomElement _de );
 
-	void upgrade( void );
+	void upgrade();
 
 	void loadData( const QByteArray & _data, const QString & _sourceFile );
 

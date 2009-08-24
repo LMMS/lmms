@@ -74,7 +74,7 @@ public:
 	{
 	}
 
-	virtual QPixmap pixmap( void ) const
+	virtual QPixmap pixmap() const
 	{
 		if( !m_name.isEmpty() )
 		{
@@ -88,7 +88,7 @@ public:
 	{
 	}
 
-	virtual QString pixmapName( void ) const
+	virtual QString pixmapName() const
 	{
 		return m_name;
 	}
@@ -107,7 +107,7 @@ public:
 	{
 	}
 
-	virtual QPixmap pixmap( void ) const
+	virtual QPixmap pixmap() const
 	{
 		if( !m_name.isEmpty() )
 		{
@@ -117,7 +117,7 @@ public:
 		return( QPixmap() );
 	}
 
-	virtual QString pixmapName( void ) const
+	virtual QString pixmapName() const
 	{
 		return QString( STRINGIFY(PLUGIN_NAME) ) + "::" + m_name;
 	}

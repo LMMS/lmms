@@ -40,7 +40,7 @@ stereoMatrixControlDialog::stereoMatrixControlDialog(
 
 	setFixedSize( 105, 115);
 
-	setAutoFillBackground( TRUE );
+	setAutoFillBackground( true );
 	QPalette pal;
 	pal.setBrush( backgroundRole(),
 				PLUGIN_NAME::getIconPixmap( "artwork" ) );

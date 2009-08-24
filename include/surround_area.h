@@ -48,7 +48,7 @@ class surroundAreaModel : public Model
 	mapPropertyFromModel(int,y,setY,m_posY);
 public:
 	surroundAreaModel( Model * _parent,
-					bool _default_constructed = FALSE );
+					bool _default_constructed = false );
 
 	surroundVolumeVector getVolumeVector( float _v_scale ) const;
 
@@ -57,20 +57,20 @@ public:
 	void loadSettings( const QDomElement & _this,
 					const QString & _name = "surpos" );
 
-	inline void prepareJournalEntryFromOldVal( void )
+	inline void prepareJournalEntryFromOldVal()
 	{
 		m_posX.prepareJournalEntryFromOldVal();
 		m_posY.prepareJournalEntryFromOldVal();
 	}
 
-	inline void addJournalEntryFromOldToCurVal( void )
+	inline void addJournalEntryFromOldToCurVal()
 	{
 		m_posX.addJournalEntryFromOldToCurVal();
 		m_posY.addJournalEntryFromOldToCurVal();
 	}
 
-//	automationPattern * automationPatternX( void );
-//	automationPattern * automationPatternY( void );
+//	automationPattern * automationPatternX();
+//	automationPattern * automationPatternY();
 
 
 private:
@@ -89,12 +89,12 @@ public:
 	virtual ~surroundArea();
 
 
-	surroundAreaModel * model( void )
+	surroundAreaModel * model()
 	{
 		return( castModel<surroundAreaModel>() );
 	}
 
-	const surroundAreaModel * model( void ) const
+	const surroundAreaModel * model() const
 	{
 		return( castModel<surroundAreaModel>() );
 	}

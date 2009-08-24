@@ -148,9 +148,9 @@ public:
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
 	virtual void loadSettings( const QDomElement & _this );
 
-	virtual QString nodeName( void ) const;
+	virtual QString nodeName() const;
 
-	virtual f_cnt_t desiredReleaseFrames( void ) const
+	virtual f_cnt_t desiredReleaseFrames() const
 	{
 		return 0; //4048;
 	}
@@ -181,8 +181,8 @@ private:
 
 
 public slots:
-	void filterChanged( void );
-	void db24Toggled( void );
+	void filterChanged();
+	void db24Toggled();
 
 private:
 	// Oscillator
@@ -247,7 +247,7 @@ public:
 	virtual ~lb303SynthView();
 
 private:
-	virtual void modelChanged( void );
+	virtual void modelChanged();
 	
 	knob * m_vcfCutKnob;
 	knob * m_vcfResKnob;

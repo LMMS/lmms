@@ -40,7 +40,7 @@ ControllerConnectionVector ControllerConnection::s_connections;
 
 ControllerConnection::ControllerConnection( Controller * _controller ) :
 	m_controllerId( -1 ),
-	m_ownsController( FALSE )
+	m_ownsController( false )
 {
 	if( _controller != NULL )
 	{
@@ -60,7 +60,7 @@ ControllerConnection::ControllerConnection( Controller * _controller ) :
 ControllerConnection::ControllerConnection( int _controllerId ) :
 	m_controller( Controller::create( Controller::DummyController, NULL ) ),
 	m_controllerId( _controllerId ),
-	m_ownsController( FALSE )
+	m_ownsController( false )
 {
 	s_connections.append( this );
 }
@@ -141,7 +141,7 @@ inline void ControllerConnection::setTargetName( const QString & _name )
  * controllers. So, we remember the controller-ID and use a dummyController 
  * instead.  Once the song is loaded, finalizeConnections() connects to the proper controllers
  */
-void ControllerConnection::finalizeConnections( void )
+void ControllerConnection::finalizeConnections()
 {
 	for( int i = 0; i < s_connections.size(); ++i )
 	{
@@ -203,12 +203,12 @@ void ControllerConnection::loadSettings( const QDomElement & _this )
 }
 
 
-void ControllerConnection::deleteConnection( void )
+void ControllerConnection::deleteConnection()
 {
 	delete this;
 }
 
-QString ControllerConnection::nodeName( void ) const
+QString ControllerConnection::nodeName() const
 {
 	return( "connection" );
 }

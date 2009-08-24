@@ -35,7 +35,7 @@ stringContainer::stringContainer(const float _pitch,
 {
 	for( Uint8 i = 0; i < _strings; i++ )
 	{
-		m_exists.append( FALSE );
+		m_exists.append( false );
 	}
 }
 
@@ -98,5 +98,5 @@ void stringContainer::addString(Uint8 _harm,
 						_string_loss,
 						_detune,
 						_state ) );
-	m_exists[_id] = TRUE;
+	m_exists[_id] = true;
 }

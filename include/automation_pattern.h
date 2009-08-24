@@ -51,44 +51,44 @@ public:
 
 	void addObject( AutomatableModel * _obj, bool _search_dup = true );
 
-	const AutomatableModel * firstObject( void ) const;
+	const AutomatableModel * firstObject() const;
 
-	virtual midiTime length( void ) const;
+	virtual midiTime length() const;
 
 	midiTime putValue( const midiTime & _time, const float _value,
 						const bool _quant_pos = true );
 
 	void removeValue( const midiTime & _time );
 
-	inline const timeMap & getTimeMap( void ) const
+	inline const timeMap & getTimeMap() const
 	{
 		return m_timeMap;
 	}
 
-	inline timeMap & getTimeMap( void )
+	inline timeMap & getTimeMap()
 	{
 		return m_timeMap;
 	}
 
-	inline bool hasAutomation( void ) const
+	inline bool hasAutomation() const
 	{
 		return m_hasAutomation;
 	}
 
 	float valueAt( const midiTime & _time ) const;
 
-	const QString name( void ) const;
+	const QString name() const;
 
 	// settings-management
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
 	virtual void loadSettings( const QDomElement & _this );
 
-	static inline const QString classNodeName( void )
+	static inline const QString classNodeName()
 	{
 		return "automationpattern";
 	}
 
-	inline virtual QString nodeName( void ) const
+	inline virtual QString nodeName() const
 	{
 		return classNodeName();
 	}
@@ -101,12 +101,12 @@ public:
 	static bool isAutomated( const AutomatableModel * _m );
 	static automationPattern * globalAutomationPattern(
 							AutomatableModel * _m );
-	static void resolveAllIDs( void );
+	static void resolveAllIDs();
 
 
 public slots:
-	void clear( void );
-	void openInAutomationEditor( void );
+	void clear();
+	void openInAutomationEditor();
 	void objectDestroyed( jo_id_t );
 
 

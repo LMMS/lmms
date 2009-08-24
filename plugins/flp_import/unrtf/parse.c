@@ -220,7 +220,7 @@ expand_word_buffer ()
 	memcpy (new_ptr, input_str, old_length);
 	my_free(input_str);
 	input_str = new_ptr;
-	return TRUE;
+	return true;
 }
 
 
@@ -243,10 +243,10 @@ read_word (QBuffer*f)
 	int ch, ch2;
 	unsigned long ix=0;
 #endif
-	int have_whitespace=FALSE;
-	int is_control_word=FALSE;
-	int has_numeric_param=FALSE; /* if is_control_word==TRUE */
-	int need_unget=FALSE;
+	int have_whitespace=false;
+	int is_control_word=false;
+	int has_numeric_param=false; /* if is_control_word==true */
+	int need_unget=false;
 
 	CHECK_PARAM_NOT_NULL(f);
 
@@ -269,7 +269,7 @@ read_word (QBuffer*f)
 		 */
 		while (ch == ' ') {
 			ch = my_getchar(f);
-			have_whitespace=TRUE;
+			have_whitespace=true;
 		}
 		if (have_whitespace) {
 			my_unget_char (ch);
@@ -330,7 +330,7 @@ read_word (QBuffer*f)
 			return ix;
 		}
 
-		is_control_word=TRUE;
+		is_control_word=true;
 		ix=1;
 		input_str[0]=ch;
 		ch=ch2;
@@ -356,7 +356,7 @@ read_word (QBuffer*f)
 		/* Several chars always ends a word, and we need to save them.
 		 */
 		if (ch=='\t' || ch=='{' || ch=='}' || ch=='\\') {
-			need_unget=TRUE;
+			need_unget=true;
 			break;
 		}
 
@@ -375,7 +375,7 @@ read_word (QBuffer*f)
 		 */
 		if (ch==';') {
 			if (is_control_word) {
-				need_unget=TRUE;
+				need_unget=true;
 				break;
 			}
 		}
@@ -386,7 +386,7 @@ read_word (QBuffer*f)
 		 */
 		if (ch==' ') {
 			if (!is_control_word)
-				need_unget=TRUE;
+				need_unget=true;
 			break;
 		}
 
@@ -394,11 +394,11 @@ read_word (QBuffer*f)
 		 */
 		if (is_control_word) {
 			if (!has_numeric_param && (isdigit(ch) || ch=='-'))
-				has_numeric_param = TRUE;
+				has_numeric_param = true;
 			else
 			if (has_numeric_param && !isdigit(ch)) {
 				if (ch!=' ')
-					need_unget=TRUE;
+					need_unget=true;
 				break;
 			}
 		}

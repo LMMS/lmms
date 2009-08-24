@@ -84,7 +84,7 @@ void engine::init( const bool _has_gui )
 
 	s_ladspaManager = new ladspa2LMMS;
 
-	s_projectJournal->setJournalling( TRUE );
+	s_projectJournal->setJournalling( true );
 
 	s_mixer->initDevices();
 

@@ -76,9 +76,9 @@ public:
 							QDomElement & _parent );
 	virtual void loadSettings( const QDomElement & _this );
 
-	virtual QString nodeName( void ) const;
+	virtual QString nodeName() const;
 
-	virtual f_cnt_t desiredReleaseFrames( void ) const
+	virtual f_cnt_t desiredReleaseFrames() const
 	{
 		return( 64 );
 	}
@@ -86,10 +86,10 @@ public:
 	virtual PluginView * instantiateView( QWidget * _parent );
 
 protected slots:
-	void lengthChanged( void );
+	void lengthChanged();
 	void samplesChanged( int, int );
 
-	void normalize( void );
+	void normalize();
 
 
 private:
@@ -123,17 +123,17 @@ protected slots:
 	void interpolationToggled( bool value );
 	void normalizeToggled( bool value );
 
-	void sinWaveClicked( void );
-	void triangleWaveClicked( void );
-	void sqrWaveClicked( void );
-	void sawWaveClicked( void );
-	void noiseWaveClicked( void );
-	void usrWaveClicked( void );
+	void sinWaveClicked();
+	void triangleWaveClicked();
+	void sqrWaveClicked();
+	void sawWaveClicked();
+	void noiseWaveClicked();
+	void usrWaveClicked();
 	
 	void smoothClicked( void  );
 
 private:
-	virtual void modelChanged( void );
+	virtual void modelChanged();
 
 	knob * m_sampleLengthKnob;
 	pixmapButton * sinWaveBtn;

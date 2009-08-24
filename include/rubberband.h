@@ -37,7 +37,7 @@ class selectableObject : public QWidget
 public:
 	selectableObject( QWidget * _parent ) :
 		QWidget( _parent ),
-		m_selected( FALSE )
+		m_selected( false )
 	{
 	}
 
@@ -51,14 +51,14 @@ public:
 		update();
 	}
 
-	inline bool isSelected( void ) const
+	inline bool isSelected() const
 	{
 		return( m_selected );
 	}
 
 
 public slots:
-	virtual void update( void )
+	virtual void update()
 	{
 		QWidget::update();
 	}
@@ -78,14 +78,14 @@ public:
 	rubberBand( QWidget * _parent );
 	virtual ~rubberBand();
 
-	QVector<selectableObject *> selectedObjects( void ) const;
+	QVector<selectableObject *> selectedObjects() const;
 
 
 protected:
 	virtual void resizeEvent( QResizeEvent * _re );
 
 private:
-	QVector<selectableObject *> selectableObjects( void ) const;
+	QVector<selectableObject *> selectableObjects() const;
 
 };
 

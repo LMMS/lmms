@@ -90,12 +90,12 @@ namespace effectLib
 			_in_right = m_rightFX.nextSample( _in_right );
 		}
 
-		FXL & leftFX( void )
+		FXL & leftFX()
 		{
 			return( m_leftFX );
 		}
 
-		FXR & rightFX( void )
+		FXR & rightFX()
 		{
 			return( m_rightFX );
 		}
@@ -303,7 +303,7 @@ namespace effectLib
 		}
 
 	private:
-		void updateFilter( void )
+		void updateFilter()
 		{
 			m_beta = sqrtf( ( m_a*m_a + 1 ) / m_shape -
 							powf( m_a - 1, 2 ) );

@@ -1183,9 +1183,9 @@ html_init (void)
 	op->numericlist_item_begin = "<li>";
 	op->numericlist_item_end = "</li>\n";
 
-	op->simulate_small_caps = TRUE;
-	op->simulate_all_caps = TRUE;
-	op->simulate_word_underline = TRUE;
+	op->simulate_small_caps = true;
+	op->simulate_all_caps = true;
+	op->simulate_word_underline = true;
 
 	op->ascii_translation_table = ascii;
 

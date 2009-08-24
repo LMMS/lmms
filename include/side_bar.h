@@ -65,9 +65,9 @@ private slots:
 		QMap<int, QWidget *>::Iterator it;
 		for( it = m_widgets.begin(); it != m_widgets.end(); ++it )
 		{
-			if( it.key() != _id/* && isTabRaised(it.key()) == TRUE*/ )
+			if( it.key() != _id/* && isTabRaised(it.key()) == true*/ )
 			{
-				setTab( it.key(), FALSE );
+				setTab( it.key(), false );
 			}
 			if( m_widgets[it.key()] != NULL )
 			{

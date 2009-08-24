@@ -53,7 +53,7 @@ timeLine::timeLine( const int _xoff, const int _yoff, const float _ppt,
 	m_autoScroll( AutoScrollEnabled ),
 	m_loopPoints( LoopPointsDisabled ),
 	m_behaviourAtStop( BackToZero ),
-	m_changedPosition( TRUE ),
+	m_changedPosition( true ),
 	m_xOffset( _xoff ),
 	m_posMarkerX( 0 ),
 	m_ppt( _ppt ),
@@ -182,7 +182,7 @@ void timeLine::updatePosition( const midiTime & )
 	if( new_x != m_posMarkerX )
 	{
 		m_posMarkerX = new_x;
-		m_changedPosition = TRUE;
+		m_changedPosition = true;
 		emit positionChanged( m_pos );
 		update();
 	}

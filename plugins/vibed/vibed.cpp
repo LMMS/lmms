@@ -105,7 +105,7 @@ vibed::vibed( InstrumentTrack * _instrumentTrack ) :
 				tr( "Length %1" ).arg( harm+1 ) );
 		m_lengthKnobs.append( knob );
 
-		led = new BoolModel( FALSE, this,
+		led = new BoolModel( false, this,
 				tr( "Impulse %1" ).arg( harm+1 ) );
 		m_impulses.append( led );
 
@@ -264,7 +264,7 @@ void vibed::loadSettings( const QDomElement & _this )
 
 
 
-QString vibed::nodeName( void ) const
+QString vibed::nodeName() const
 {
 	return( vibedstrings_plugin_descriptor.name );
 }
@@ -355,14 +355,14 @@ vibedView::vibedView( Instrument * _instrument,
 				QWidget * _parent ) :
 	InstrumentView( _instrument, _parent )
 {
-	setAutoFillBackground( TRUE );
+	setAutoFillBackground( true );
 	QPalette pal;
 	pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap(
 								"artwork" ) );
 	setPalette( pal );
 	
 	m_volumeKnob = new knob( knobBright_26, this );
-	m_volumeKnob->setVolumeKnob( TRUE );
+	m_volumeKnob->setVolumeKnob( true );
 	m_volumeKnob->move( 103, 142 );
 	m_volumeKnob->setHintText( tr( "Volume:" ) + " ", "" );
 	m_volumeKnob->setWhatsThis( tr( "The 'V' knob sets the volume "
@@ -561,8 +561,8 @@ vibedView::vibedView( Instrument * _instrument,
 	toolTip::add( m_sinWaveBtn,
 				tr( "Use a sine-wave for "
 				    "current oscillator." ) );
-	connect( m_sinWaveBtn, SIGNAL (clicked ( void ) ),
-			this, SLOT ( sinWaveClicked( void ) ) );
+	connect( m_sinWaveBtn, SIGNAL (clicked () ),
+			this, SLOT ( sinWaveClicked() ) );
 
 	
 	m_triangleWaveBtn = new pixmapButton( this, tr( "Triangle wave" ) );
@@ -574,7 +574,7 @@ vibedView::vibedView( Instrument * _instrument,
 	toolTip::add( m_triangleWaveBtn,
 			tr( "Use a triangle-wave "
 			    "for current oscillator." ) );
-	connect( m_triangleWaveBtn, SIGNAL ( clicked ( void ) ),
+	connect( m_triangleWaveBtn, SIGNAL ( clicked () ),
 			this, SLOT ( triangleWaveClicked( ) ) );
 
 	
@@ -587,8 +587,8 @@ vibedView::vibedView( Instrument * _instrument,
 	toolTip::add( m_sawWaveBtn,
 				tr( "Use a saw-wave for "
 				    "current oscillator." ) );
-	connect( m_sawWaveBtn, SIGNAL (clicked ( void ) ),
-			this, SLOT ( sawWaveClicked( void ) ) );
+	connect( m_sawWaveBtn, SIGNAL (clicked () ),
+			this, SLOT ( sawWaveClicked() ) );
 
 	
 	m_sqrWaveBtn = new pixmapButton( this, tr( "Square wave" ) );
@@ -600,8 +600,8 @@ vibedView::vibedView( Instrument * _instrument,
 	toolTip::add( m_sqrWaveBtn,
 			tr( "Use a square-wave for "
 			    "current oscillator." ) );
-	connect( m_sqrWaveBtn, SIGNAL ( clicked ( void ) ),
-			this, SLOT ( sqrWaveClicked( void ) ) );
+	connect( m_sqrWaveBtn, SIGNAL ( clicked () ),
+			this, SLOT ( sqrWaveClicked() ) );
 
 	
 	m_whiteNoiseWaveBtn = new pixmapButton( this, tr( "White noise wave" ) );
@@ -613,8 +613,8 @@ vibedView::vibedView( Instrument * _instrument,
 	toolTip::add( m_whiteNoiseWaveBtn,
 			tr( "Use white-noise for "
 			    "current oscillator." ) );
-	connect( m_whiteNoiseWaveBtn, SIGNAL ( clicked ( void ) ),
-			this, SLOT ( noiseWaveClicked( void ) ) );
+	connect( m_whiteNoiseWaveBtn, SIGNAL ( clicked () ),
+			this, SLOT ( noiseWaveClicked() ) );
 
 	
 	m_usrWaveBtn = new pixmapButton( this, tr( "User defined wave" ) );
@@ -626,8 +626,8 @@ vibedView::vibedView( Instrument * _instrument,
 	toolTip::add( m_usrWaveBtn,
 			tr( "Use a user-defined "
 			    "waveform for current oscillator." ) );
-	connect( m_usrWaveBtn, SIGNAL ( clicked ( void ) ),
-			this, SLOT ( usrWaveClicked( void ) ) );
+	connect( m_usrWaveBtn, SIGNAL ( clicked () ),
+			this, SLOT ( usrWaveClicked() ) );
 
 
 	m_smoothBtn = new pixmapButton( this, tr( "Smooth" ) );
@@ -636,11 +636,11 @@ vibedView::vibedView( Instrument * _instrument,
 			"smooth_active" ) );
 	m_smoothBtn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
 			"smooth_inactive" ) );
-	m_smoothBtn->setChecked( FALSE );
+	m_smoothBtn->setChecked( false );
 	toolTip::add( m_smoothBtn,
 			tr( "Click here to smooth waveform." ) );
-	connect( m_smoothBtn, SIGNAL ( clicked ( void ) ),
-			this, SLOT ( smoothClicked( void ) ) );
+	connect( m_smoothBtn, SIGNAL ( clicked () ),
+			this, SLOT ( smoothClicked() ) );
 	
 	m_normalizeBtn = new pixmapButton( this, tr( "Normalize" ) );
 	m_normalizeBtn->move( 96, 129 );
@@ -648,19 +648,19 @@ vibedView::vibedView( Instrument * _instrument,
 			"normalize_active" ) );
 	m_normalizeBtn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
 			"normalize_inactive" ) );
-	m_normalizeBtn->setChecked( FALSE );
+	m_normalizeBtn->setChecked( false );
 	toolTip::add( m_normalizeBtn,
 			tr( "Click here to normalize waveform." ) );
 
-	connect( m_normalizeBtn, SIGNAL ( clicked ( void ) ),
-			this, SLOT ( normalizeClicked( void ) ) );
+	connect( m_normalizeBtn, SIGNAL ( clicked () ),
+			this, SLOT ( normalizeClicked() ) );
 
 }
 
 
 
 
-void vibedView::modelChanged( void )
+void vibedView::modelChanged()
 {
 	showString( 0 );
 }
@@ -690,7 +690,7 @@ void vibedView::showString( Uint8 _string )
 
 
 
-void vibedView::sinWaveClicked( void )
+void vibedView::sinWaveClicked()
 {
 	m_graph->model()->setWaveToSine();
 	engine::getSong()->setModified();
@@ -698,7 +698,7 @@ void vibedView::sinWaveClicked( void )
 
 
 
-void vibedView::triangleWaveClicked( void )
+void vibedView::triangleWaveClicked()
 {
 	m_graph->model()->setWaveToTriangle();
 	engine::getSong()->setModified();
@@ -706,7 +706,7 @@ void vibedView::triangleWaveClicked( void )
 
 
 
-void vibedView::sawWaveClicked( void )
+void vibedView::sawWaveClicked()
 {
 	m_graph->model()->setWaveToSaw();
 	engine::getSong()->setModified();
@@ -714,7 +714,7 @@ void vibedView::sawWaveClicked( void )
 
 
 
-void vibedView::sqrWaveClicked( void )
+void vibedView::sqrWaveClicked()
 {
 	m_graph->model()->setWaveToSquare();
 	engine::getSong()->setModified();
@@ -722,7 +722,7 @@ void vibedView::sqrWaveClicked( void )
 
 
 
-void vibedView::noiseWaveClicked( void )
+void vibedView::noiseWaveClicked()
 {
 	m_graph->model()->setWaveToNoise();
 	engine::getSong()->setModified();
@@ -730,7 +730,7 @@ void vibedView::noiseWaveClicked( void )
 
 
 
-void vibedView::usrWaveClicked( void )
+void vibedView::usrWaveClicked()
 {
 	// TODO: load file
 	//m_graph->model()->setWaveToUser();
@@ -739,7 +739,7 @@ void vibedView::usrWaveClicked( void )
 
 
 
-void vibedView::smoothClicked( void )
+void vibedView::smoothClicked()
 {
 	m_graph->model()->smooth();
 	engine::getSong()->setModified();
@@ -747,7 +747,7 @@ void vibedView::smoothClicked( void )
 
 
 
-void vibedView::normalizeClicked( void )
+void vibedView::normalizeClicked()
 {
 	m_graph->model()->normalize();
 	engine::getSong()->setModified();
@@ -769,7 +769,7 @@ void vibedView::contextMenuEvent( QContextMenuEvent * )
 
 
 
-void vibedView::displayHelp( void )
+void vibedView::displayHelp()
 {
 	QWhatsThis::showText( mapToGlobal( rect().bottomRight() ),
 					whatsThis() );

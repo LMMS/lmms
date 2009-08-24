@@ -43,7 +43,7 @@ ledCheckBox::ledCheckBox( const QString & _text, QWidget * _parent,
 	automatableButton( _parent, _name ),
 	m_text( _text )
 {
-	setCheckable( TRUE );
+	setCheckable( true );
 
 	if( _color >= NumColors || _color < Yellow )
 	{
@@ -76,7 +76,7 @@ void ledCheckBox::paintEvent( QPaintEvent * )
 	QPainter p( this );
 	p.setFont( pointSize<7>( font() ) );
 
-	if( model()->value() == TRUE )
+	if( model()->value() == true )
 	{
 		p.drawPixmap( 0, 0, *m_ledOnPixmap );
 	}

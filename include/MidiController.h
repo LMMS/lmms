@@ -54,7 +54,7 @@ public:
 
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _this );
 	virtual void loadSettings( const QDomElement & _this );
-	virtual QString nodeName( void ) const;
+	virtual QString nodeName() const;
 
 	// Used by controllerConnectionDialog to copy
 	void subscribeReadablePorts( const MidiPort::Map & _map );
@@ -62,7 +62,7 @@ public:
 
 public slots:
 	virtual ControllerDialog * createDialog( QWidget * _parent );
-	void updateName( void );
+	void updateName();
 
 
 protected:

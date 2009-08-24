@@ -276,10 +276,10 @@ lb303Synth::lb303Synth( InstrumentTrack * _InstrumentTrack ) :
 	dist_knob( 0.0f, 0.0f, 1.0f, 0.01f, this, tr( "Distortion" ) ),
 	wave_knob( 0.0f, 0.0f, 5.0f, 1.0f, this, tr( "Waveform" ) ),
 	slide_dec_knob( 0.6f, 0.0f, 1.0f, 0.005f, this, tr( "Slide Decay" ) ),
-	slideToggle( FALSE, this, tr( "Slide" ) ),
-	accentToggle( FALSE, this, tr( "Accent" ) ),
-	deadToggle( FALSE, this, tr( "Dead" ) ),
-	db24Toggle( FALSE, this, tr( "24dB/oct Filter" ) )	
+	slideToggle( false, this, tr( "Slide" ) ),
+	accentToggle( false, this, tr( "Accent" ) ),
+	deadToggle( false, this, tr( "Dead" ) ),
+	db24Toggle( false, this, tr( "24dB/oct Filter" ) )	
 
 {
 
@@ -403,7 +403,7 @@ void lb303Synth::loadSettings( const QDomElement & _this )
 
 // TODO: Split into one function per knob.  envdecay doesn't require
 // recalcFilter.
-void lb303Synth::filterChanged( void )
+void lb303Synth::filterChanged()
 {
 	fs.cutoff = vcf_cut_knob.value();
 	fs.reso   = vcf_res_knob.value();
@@ -420,7 +420,7 @@ void lb303Synth::filterChanged( void )
 }
 
 
-void lb303Synth::db24Toggled( void )
+void lb303Synth::db24Toggled()
 {
 	delete vcf;
 	if(db24Toggle.value()) {
@@ -434,7 +434,7 @@ void lb303Synth::db24Toggled( void )
 
 
 
-QString lb303Synth::nodeName( void ) const
+QString lb303Synth::nodeName() const
 {
 	return( lb303_plugin_descriptor.name );
 }
@@ -792,7 +792,7 @@ lb303SynthView::lb303SynthView( Instrument * _instrument, QWidget * _parent ) :
 	m_waveKnob->setLabel( tr( "WAVE"));
 
 
-	setAutoFillBackground( TRUE );
+	setAutoFillBackground( true );
 	QPalette pal;
 	pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap(
 			"artwork" ) );
@@ -805,7 +805,7 @@ lb303SynthView::~lb303SynthView()
 }
 
 
-void lb303SynthView::modelChanged( void )
+void lb303SynthView::modelChanged()
 {
 	lb303Synth * syn = castModel<lb303Synth>();
 	

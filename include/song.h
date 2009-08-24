@@ -78,7 +78,7 @@ public:
 		{
 			m_currentFrame = _f;
 		}
-		inline float currentFrame( void ) const
+		inline float currentFrame() const
 		{
 			return m_currentFrame;
 		}
@@ -92,38 +92,38 @@ public:
 
 
 
-	void processNextBuffer( void );
+	void processNextBuffer();
 
 
-	inline bool isPaused( void ) const
+	inline bool isPaused() const
 	{
 		return m_paused;
 	}
 
-	inline bool isPlaying( void ) const
+	inline bool isPlaying() const
 	{
 		return m_playing && m_exporting == false;
 	}
 
-	inline bool isExporting( void ) const
+	inline bool isExporting() const
 	{
 		return m_exporting;
 	}
 
-	inline bool isRecording( void ) const
+	inline bool isRecording() const
 	{
 		return m_recording;
 	}
 
-	bool realTimeTask( void ) const;
+	bool realTimeTask() const;
 
-	inline bool isExportDone( void ) const
+	inline bool isExportDone() const
 	{
 		return m_exporting == true &&
 			m_playPos[Mode_PlaySong].getTact() >= length() + 1;
 	}
 
-	inline PlayModes playMode( void ) const
+	inline PlayModes playMode() const
 	{
 		return m_playMode;
 	}
@@ -133,46 +133,46 @@ public:
 		return m_playPos[_pm];
 	}
 
-	void updateLength( void );
-	tact_t length( void ) const
+	void updateLength();
+	tact_t length() const
 	{
 		return m_length;
 	}
 
 
-	bpm_t getTempo( void );
-	virtual automationPattern * tempoAutomationPattern( void );
+	bpm_t getTempo();
+	virtual automationPattern * tempoAutomationPattern();
 
-	automationTrack * globalAutomationTrack( void )
+	automationTrack * globalAutomationTrack()
 	{
 		return m_globalAutomationTrack;
 	}
 
 	// file management
-	void createNewProject( void );
+	void createNewProject();
 	void createNewProjectFromTemplate( const QString & _template );
 	void loadProject( const QString & _file_name );
-	bool saveProject( void );
+	bool saveProject();
 	bool saveProjectAs( const QString & _file_name );
-	inline const QString & projectFileName( void ) const
+	inline const QString & projectFileName() const
 	{
 		return m_fileName;
 	}
-	inline bool isLoadingProject( void ) const
+	inline bool isLoadingProject() const
 	{
 		return m_loadingProject;
 	}
-	inline bool isModified( void ) const
+	inline bool isModified() const
 	{
 		return m_modified;
 	}
 
-	inline virtual QString nodeName( void ) const
+	inline virtual QString nodeName() const
 	{
 		return "song";
 	}
 
-	virtual inline bool fixedTCOs( void ) const
+	virtual inline bool fixedTCOs() const
 	{
 		return false;
 	}
@@ -181,78 +181,78 @@ public:
 	void removeController( Controller * _c );
 	
 
-	const ControllerVector & controllers( void ) const
+	const ControllerVector & controllers() const
 	{
 		return m_controllers;
 	}
 
 
-	MeterModel & getTimeSigModel( void )
+	MeterModel & getTimeSigModel()
 	{
 		return m_timeSigModel;
 	}
 
 
 public slots:
-	void play( void );
-	void record( void );
-	void playAndRecord( void );
-	void stop( void );
+	void play();
+	void record();
+	void playAndRecord();
+	void stop();
 	void playTrack( track * _trackToPlay );
-	void playBB( void );
+	void playBB();
 	void playPattern( pattern * _patternToPlay, bool _loop = true );
-	void pause( void );
-	void resumeFromPause( void );
+	void pause();
+	void resumeFromPause();
 
-	void importProject( void );
-	void exportProject( void );
+	void importProject();
+	void exportProject();
 
-	void startExport( void );
-	void stopExport( void );
+	void startExport();
+	void stopExport();
 
 
-	void setModified( void );
+	void setModified();
 
-	void clearProject( void );
+	void clearProject();
 
 
 private slots:
-	void insertBar( void );
-	void removeBar( void );
-	void addBBTrack( void );
-	void addSampleTrack( void );
-	void addAutomationTrack( void );
+	void insertBar();
+	void removeBar();
+	void addBBTrack();
+	void addSampleTrack();
+	void addAutomationTrack();
 
-	void setTempo( void );
-	void setTimeSignature( void );
+	void setTempo();
+	void setTimeSignature();
 
-	void masterVolumeChanged( void );
+	void masterVolumeChanged();
 
-	void doActions( void );
+	void doActions();
 
-	void updateFramesPerTick( void );
+	void updateFramesPerTick();
 
 
 
 private:
-	song( void );
+	song();
 	song( const song & );
 	virtual ~song();
 
 
-	inline int ticksPerTact( void ) const
+	inline int ticksPerTact() const
 	{
 		return DefaultTicksPerTact *
 				m_timeSigModel.getNumerator() /
 					 m_timeSigModel.getDenominator();
 	}
 
-	inline tact_t currentTact( void ) const
+	inline tact_t currentTact() const
 	{
 		return m_playPos[m_playMode].getTact();
 	}
 
-	inline tick_t currentTick( void ) const
+	inline tick_t currentTick() const
 	{
 		return m_playPos[m_playMode].getTicks();
 	}

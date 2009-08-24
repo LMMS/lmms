@@ -50,8 +50,8 @@ note::note( const midiTime & _length, const midiTime & _pos,
 	m_pos( _pos ),
 	m_detuning( NULL )
 {
-	//saveJournallingState( FALSE );
-//	setJournalling( FALSE );
+	//saveJournallingState( false );
+//	setJournalling( false );
 	if( _detuning )
 	{
 		m_detuning = sharedObject::ref( _detuning );
@@ -221,7 +221,7 @@ void note::loadSettings( const QDomElement & _this )
 
 /*void note::undoStep( journalEntry & _je )
 {
-	saveJournallingState( FALSE );
+	saveJournallingState( false );
 	switch( static_cast<Actions>( _je.actionID() ) )
 	{
 		case ChangeKey:
@@ -259,7 +259,7 @@ void note::redoStep( journalEntry & _je )
 
 
 
-void note::editDetuningPattern( void )
+void note::editDetuningPattern()
 {
 	m_detuning->getAutomationPattern()->openInAutomationEditor();
 }
@@ -267,7 +267,7 @@ void note::editDetuningPattern( void )
 
 
 
-void note::createDetuning( void )
+void note::createDetuning()
 {
 	m_detuning = new detuningHelper;
 	(void) m_detuning->getAutomationPattern();
@@ -277,7 +277,7 @@ void note::createDetuning( void )
 
 
 
-bool note::hasDetuningInfo( void ) const
+bool note::hasDetuningInfo() const
 {
 	return m_detuning && m_detuning->hasAutomation();
 }

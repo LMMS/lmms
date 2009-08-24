@@ -64,23 +64,23 @@ protected:
 	void setSelected( Uint8 _new_button );
 	
 public slots:
-	void button0Clicked( void );
-	void button1Clicked( void );
-	void button2Clicked( void );
-	void button3Clicked( void );
-	void button4Clicked( void );
-	void button5Clicked( void );
-	void button6Clicked( void );
-	void button7Clicked( void );
-	void button8Clicked( void );
+	void button0Clicked();
+	void button1Clicked();
+	void button2Clicked();
+	void button3Clicked();
+	void button4Clicked();
+	void button5Clicked();
+	void button6Clicked();
+	void button7Clicked();
+	void button8Clicked();
 	void contextMenuEvent( QContextMenuEvent * );
-	void displayHelp( void );
+	void displayHelp();
 	
 signals:
 	void nineButtonSelection( Uint8 );
 	
 private:
-	virtual void modelChanged( void );
+	virtual void modelChanged();
 	void updateButton( Uint8 );
 
 	QList<pixmapButton *> m_buttons;

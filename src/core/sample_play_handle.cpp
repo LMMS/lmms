@@ -140,7 +140,7 @@ void samplePlayHandle::play( sampleFrame * _working_buffer )
 
 
 
-bool samplePlayHandle::done( void ) const
+bool samplePlayHandle::done() const
 {
 	return( framesDone() >= totalFrames() && m_doneMayReturnTrue == true );
 }
@@ -156,7 +156,7 @@ bool samplePlayHandle::isFromTrack( const track * _track ) const
 
 
 
-f_cnt_t samplePlayHandle::totalFrames( void ) const
+f_cnt_t samplePlayHandle::totalFrames() const
 {
 	return( ( m_sampleBuffer->endFrame() - m_sampleBuffer->startFrame() ) *
 			( engine::getMixer()->processingSampleRate() /

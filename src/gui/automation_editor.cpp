@@ -72,7 +72,7 @@ QPixmap * automationEditor::s_toolSelect = NULL;
 QPixmap * automationEditor::s_toolMove = NULL;
 
 
-automationEditor::automationEditor( void ) :
+automationEditor::automationEditor() :
 	QWidget(),
 	m_zoomingXModel(),
 	m_zoomingYModel(),
@@ -450,7 +450,7 @@ inline void automationEditor::drawValueRect( QPainter & _p,
 
 
 
-void automationEditor::removeSelection( void )
+void automationEditor::removeSelection()
 {
 	m_selectStartTick = 0;
 	m_selectedTick = 0;
@@ -1670,7 +1670,7 @@ float automationEditor::getLevel( int _y )
 
 
 
-inline bool automationEditor::inBBEditor( void )
+inline bool automationEditor::inBBEditor()
 {
 	return( m_pattern->getTrack()->getTrackContainer()
 					== engine::getBBTrackContainer() );
@@ -1679,7 +1679,7 @@ inline bool automationEditor::inBBEditor( void )
 
 
 
-void automationEditor::play( void )
+void automationEditor::play()
 {
 	if( validPattern() == FALSE )
 	{
@@ -1753,7 +1753,7 @@ void automationEditor::play( void )
 
 
 
-void automationEditor::stop( void )
+void automationEditor::stop()
 {
 	if( !validPattern() )
 	{
@@ -1795,7 +1795,7 @@ void automationEditor::verScrolled( int _new_pos )
 
 
 
-void automationEditor::drawButtonToggled( void )
+void automationEditor::drawButtonToggled()
 {
 	m_editMode = DRAW;
 	removeSelection();
@@ -1805,7 +1805,7 @@ void automationEditor::drawButtonToggled( void )
 
 
 
-void automationEditor::eraseButtonToggled( void )
+void automationEditor::eraseButtonToggled()
 {
 	m_editMode = ERASE;
 	removeSelection();
@@ -1815,7 +1815,7 @@ void automationEditor::eraseButtonToggled( void )
 
 
 
-void automationEditor::selectButtonToggled( void )
+void automationEditor::selectButtonToggled()
 {
 	m_editMode = SELECT;
 	removeSelection();
@@ -1825,7 +1825,7 @@ void automationEditor::selectButtonToggled( void )
 
 
 
-void automationEditor::moveButtonToggled( void )
+void automationEditor::moveButtonToggled()
 {
 	m_editMode = MOVE;
 	m_selValuesForMove.clear();
@@ -1836,7 +1836,7 @@ void automationEditor::moveButtonToggled( void )
 
 
 
-void automationEditor::selectAll( void )
+void automationEditor::selectAll()
 {
 	if( validPattern() == FALSE )
 	{
@@ -1918,7 +1918,7 @@ void automationEditor::getSelectedValues( timeMap & _selected_values )
 
 
 
-void automationEditor::copySelectedValues( void )
+void automationEditor::copySelectedValues()
 {
 	m_valuesToCopy.clear();
 
@@ -1942,7 +1942,7 @@ void automationEditor::copySelectedValues( void )
 
 
 
-void automationEditor::cutSelectedValues( void )
+void automationEditor::cutSelectedValues()
 {
 	if( validPattern() == FALSE )
 	{
@@ -1973,7 +1973,7 @@ void automationEditor::cutSelectedValues( void )
 
 
 
-void automationEditor::pasteValues( void )
+void automationEditor::pasteValues()
 {
 	if( validPattern() == FALSE )
 	{
@@ -2000,7 +2000,7 @@ void automationEditor::pasteValues( void )
 
 
 
-void automationEditor::deleteSelectedValues( void )
+void automationEditor::deleteSelectedValues()
 {
 	if( validPattern() == FALSE )
 	{
@@ -2056,7 +2056,7 @@ void automationEditor::updatePosition( const midiTime & _t )
 
 
 
-void automationEditor::zoomingXChanged( void )
+void automationEditor::zoomingXChanged()
 {
 	const QString & zfac = m_zoomingXModel.currentText();
 	m_ppt = zfac.left( zfac.length() - 1 ).toInt() * DEFAULT_PPT / 100;
@@ -2070,7 +2070,7 @@ void automationEditor::zoomingXChanged( void )
 
 
 
-void automationEditor::zoomingYChanged( void )
+void automationEditor::zoomingYChanged()
 {
 	const QString & zfac = m_zoomingYModel.currentText();
 	m_y_auto = zfac == "Auto";
@@ -2088,7 +2088,7 @@ void automationEditor::zoomingYChanged( void )
 
 
 
-int automationEditor::quantization( void ) const
+int automationEditor::quantization() const
 {
 	return( DefaultTicksPerTact /
 		m_quantizeComboBox->model()->currentText().right(
@@ -2099,7 +2099,7 @@ int automationEditor::quantization( void ) const
 
 
 
-void automationEditor::updateTopBottomLevels( void )
+void automationEditor::updateTopBottomLevels()
 {
 	if( m_y_auto )
 	{
@@ -2146,7 +2146,7 @@ void automationEditor::updateTopBottomLevels( void )
 
 
 
-void automationEditor::update( void )
+void automationEditor::update()
 {
 	QWidget::update();
 	// Note detuning?

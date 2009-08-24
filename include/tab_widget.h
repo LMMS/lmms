@@ -41,7 +41,7 @@ public:
 
 	void setActiveTab( int _idx );
 
-	inline int activeTab( void ) const
+	inline int activeTab() const
 	{
 		return( m_activeTab );
 	}

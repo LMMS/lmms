@@ -33,7 +33,7 @@
 tabBar::tabBar( QWidget * _parent, QBoxLayout::Direction _dir ) :
 	QWidget( _parent ),
 	m_layout( new QBoxLayout( _dir, this ) ),
-	m_exclusive( FALSE )
+	m_exclusive( false )
 {
 	m_layout->setMargin( 8 );
 	m_layout->setSpacing( 0 );
@@ -119,7 +119,7 @@ void tabBar::removeTab( int _id )
 
 void tabBar::setActiveTab( int _id )
 {
-	setTabState( _id, TRUE );
+	setTabState( _id, true );
 	hideAll( _id );
 	if( allHidden() )
 	{
@@ -134,12 +134,12 @@ void tabBar::setActiveTab( int _id )
 
 
 
-int tabBar::activeTab( void )
+int tabBar::activeTab()
 {
 	QMap<int, QPair<tabButton *, QWidget *> >::iterator it;
 	for( it = m_tabs.begin(); it != m_tabs.end(); ++it )
 	{
-		if( tabState( it.key() ) == TRUE )
+		if( tabState( it.key() ) == true )
 		{
 			return( it.key() );
 		}
@@ -154,7 +154,7 @@ bool tabBar::tabState( int _id )
 {
 	if( m_tabs.find( _id ) == m_tabs.end() )
 	{
-		return( FALSE );
+		return( false );
 	}
 	return( m_tabs[_id].first->isChecked() );
 }
@@ -180,7 +180,7 @@ void tabBar::hideAll( int _exception )
 	{
 		if( it.key() != _exception )
 		{
-			setTabState( it.key(), FALSE );
+			setTabState( it.key(), false );
 		}
 		it.value().second->hide();
 	}
@@ -202,7 +202,7 @@ void tabBar::hideAll( int _exception )
 
 void tabBar::tabClicked( int _id )
 {
-	if( m_exclusive == TRUE && activeTab() == -1 )
+	if( m_exclusive == true && activeTab() == -1 )
 	{
 		setActiveTab( _id );
 	}
@@ -212,11 +212,11 @@ void tabBar::tabClicked( int _id )
 		// disable tabbar-buttons except the one clicked
 		hideAll( _id );
 		bool now_hidden = allHidden();
-		if( all_hidden_before == TRUE && now_hidden == FALSE )
+		if( all_hidden_before == true && now_hidden == false )
 		{
 			emit widgetShown();
 		}
-		else if( all_hidden_before == FALSE && now_hidden == TRUE )
+		else if( all_hidden_before == false && now_hidden == true )
 		{
 			emit allWidgetsHidden();
 		}
@@ -226,17 +226,17 @@ void tabBar::tabClicked( int _id )
 
 
 
-bool tabBar::allHidden( void )
+bool tabBar::allHidden()
 {
 	QMap<int, QPair<tabButton *, QWidget *> >::iterator it;
 	for( it = m_tabs.begin(); it != m_tabs.end(); ++it )
 	{
 		if( !it.value().second->isHidden() )
 		{
-			return( FALSE );
+			return( false );
 		}
 	}
-	return( TRUE );
+	return( true );
 }
 
 

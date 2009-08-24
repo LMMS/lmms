@@ -42,7 +42,7 @@ public:
 
 
 public slots:
-	void activate( void );
+	void activate();
 
 
 protected:
@@ -55,7 +55,7 @@ private:
 	QColor m_normalColor;
 	QColor m_activatedColor;
 
-	void signalUpdate( void );
+	void signalUpdate();
 
 } ;
 

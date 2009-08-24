@@ -72,17 +72,17 @@ typedef Uint32 jo_id_t;			// (unique) ID of a journalling object
 template<typename T>
 struct typeInfo
 {
-	static inline T min( void )
+	static inline T min()
 	{
 		return std::numeric_limits<T>::min();
 	}
 
-	static inline T max( void )
+	static inline T max()
 	{
 		return std::numeric_limits<T>::max();
 	}
 
-	static inline T minEps( void )
+	static inline T minEps()
 	{
 		return 1;
 	}
@@ -100,7 +100,7 @@ struct typeInfo
 
 
 template<>
-inline float typeInfo<float>::minEps( void )
+inline float typeInfo<float>::minEps()
 {
 	return 1.0e-10;
 }

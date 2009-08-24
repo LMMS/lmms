@@ -72,7 +72,7 @@ protected:
 
 
 private slots:
-	void updateHeight( void );
+	void updateHeight();
 
 
 private:

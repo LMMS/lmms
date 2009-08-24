@@ -111,7 +111,7 @@ public:
 			float _max,
 			int _size,
 			:: Model * _parent,
-			bool _default_constructed = FALSE,
+			bool _default_constructed = false,
 			float _step = 0.0 );
 
 	virtual ~graphModel();

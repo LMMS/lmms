@@ -57,35 +57,35 @@ class pianoRoll : public QWidget, public SerializingObject
 public:
 	void setCurrentPattern( pattern * _new_pattern );
 
-	inline void stopRecording( void )
+	inline void stopRecording()
 	{
 		m_recording = false;
 	}
 
-	inline bool isRecording( void ) const
+	inline bool isRecording() const
 	{
 		return m_recording;
 	}
 
-	inline const pattern * currentPattern( void ) const
+	inline const pattern * currentPattern() const
 	{
 		return m_pattern;
 	}
 
-	inline bool validPattern( void ) const
+	inline bool validPattern() const
 	{
 		return m_pattern != NULL;
 	}
 
-	song::PlayModes desiredPlayModeForAccompany( void ) const;
+	song::PlayModes desiredPlayModeForAccompany() const;
 
-	int quantization( void ) const;
+	int quantization() const;
 
 
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
 	virtual void loadSettings( const QDomElement & _this );
 
-	inline virtual QString nodeName( void ) const
+	inline virtual QString nodeName() const
 	{
 		return "pianoroll";
 	}
@@ -107,16 +107,16 @@ protected:
 	int getKey( int _y ) const;
 	static inline void drawNoteRect( QPainter & _p, int _x, int _y,
 					int  _width, note * _n );
-	void removeSelection( void );
-	void selectAll( void );
+	void removeSelection();
+	void selectAll();
 	void getSelectedNotes( NoteVector & _selected_notes );
 
 
 protected slots:
-	void play( void );
-	void record( void );
-	void recordAccompany( void );
-	void stop( void );
+	void play();
+	void record();
+	void recordAccompany();
+	void stop();
 
 	void startRecordNote( const note & _n );
 	void finishRecordNote( const note & _n );
@@ -124,21 +124,21 @@ protected slots:
 	void horScrolled( int _new_pos );
 	void verScrolled( int _new_pos );
 
-	void drawButtonToggled( void );
-	void eraseButtonToggled( void );
-	void selectButtonToggled( void );
-	void detuneButtonToggled( void );
+	void drawButtonToggled();
+	void eraseButtonToggled();
+	void selectButtonToggled();
+	void detuneButtonToggled();
 
-	void copySelectedNotes( void );
-	void cutSelectedNotes( void );
-	void pasteNotes( void );
-	void deleteSelectedNotes( void );
+	void copySelectedNotes();
+	void cutSelectedNotes();
+	void pasteNotes();
+	void deleteSelectedNotes();
 
 	void updatePosition( const midiTime & _t );
 	void updatePositionAccompany( const midiTime & _t );
 
-	void zoomingChanged( void );
-	void quantizeChanged( void );
+	void zoomingChanged();
+	void quantizeChanged();
 		
 	void changeNoteEditMode( int i );
 
@@ -181,13 +181,13 @@ private:
 	QMenu * m_noteEditMenu; // when you right click below the key area
 	QSignalMapper * m_signalMapper; // to keep track of edit mode events
 
-	pianoRoll( void );
+	pianoRoll();
 	pianoRoll( const pianoRoll & );
 	virtual ~pianoRoll();
 
 	void autoScroll( const midiTime & _t );
 
-	midiTime newNoteLen( void ) const;
+	midiTime newNoteLen() const;
 	
 	void shiftPos(int amount);
 	void shiftSemiTone(int amount);
@@ -309,12 +309,12 @@ private:
 	void copy_to_clipboard( const NoteVector & _notes ) const;
 
 	void drawDetuningInfo( QPainter & _p, note * _n, int _x, int _y );
-	bool mouseOverNote( void );
-	note * noteUnderMouse( void );
+	bool mouseOverNote();
+	note * noteUnderMouse();
 
 	// turn a selection rectangle into selected notes
 	void computeSelectedNotes( bool shift ); 
-	void clearSelectedNotes( void );
+	void clearSelectedNotes();
 
 	friend class engine;
 

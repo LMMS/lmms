@@ -89,7 +89,7 @@ static AttrStack *stack_of_stacks = NULL;
 static AttrStack *stack_of_stacks_top = NULL;
 
 
-void attr_clear_all( void )
+void attr_clear_all()
 {
     stack_of_stacks = NULL;
     stack_of_stacks_top = NULL;
@@ -181,12 +181,12 @@ attr_express_begin (int attr, const char* param) {
 
 	case ATTR_CAPS:
 		if (op->simulate_all_caps)
-			simulate_allcaps = TRUE;
+			simulate_allcaps = true;
 		break;
 
 	case ATTR_SMALLCAPS: 
 		if (op->simulate_small_caps)
-			simulate_smallcaps = TRUE;
+			simulate_smallcaps = true;
 		else {
 			if (op->small_caps_begin)
 				outstring+=QString().sprintf("%s", op->small_caps_begin); 
@@ -281,12 +281,12 @@ attr_express_end (int attr, char *param)
 
 	case ATTR_CAPS:
 		if (op->simulate_all_caps)
-			simulate_allcaps = FALSE;
+			simulate_allcaps = false;
 		break;
 
 	case ATTR_SMALLCAPS: 
 		if (op->simulate_small_caps)
-			simulate_smallcaps = FALSE;
+			simulate_smallcaps = false;
 		else {
 			if (op->small_caps_end)
 				outstring+=QString().sprintf("%s", op->small_caps_end); 
@@ -483,7 +483,7 @@ attr_pop (int attr)
 
 	if (!stack) {
 		warning_handler ("no stack to pop attribute from");
-		return FALSE;
+		return false;
 	}
 
 	if(stack->tos>=0 && stack->attr_stack[stack->tos]==attr)
@@ -496,10 +496,10 @@ attr_pop (int attr)
 
 		stack->tos--;
 
-		return TRUE;
+		return true;
 	}
 	else
-		return FALSE;
+		return false;
 }
 
 
@@ -517,7 +517,7 @@ attr_read() {
 	AttrStack *stack = stack_of_stacks_top;
 	if (!stack) {
 		warning_handler ("no stack to read attribute from");
-		return FALSE;
+		return false;
 	}
 
 	if(stack->tos>=0)

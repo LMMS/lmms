@@ -56,22 +56,22 @@ public:
 			const AutomatableModel * _target_model );
 	virtual ~ControllerConnectionDialog();
 
-	Controller * chosenController( void )
+	Controller * chosenController()
 	{
 		return m_controller;
 	}
 
 public slots:
 //	void setSelection( const effectKey & _selection );
-	void selectController( void );
-	void midiToggled( void );
-	void userToggled( void );
-	void autoDetectToggled( void );
+	void selectController();
+	void midiToggled();
+	void userToggled();
+	void autoDetectToggled();
 	void enableAutoDetect( QAction * _a );
 
 
 protected slots:
-	void midiValueChanged( void );
+	void midiValueChanged();
 
 
 private:

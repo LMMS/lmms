@@ -192,7 +192,7 @@ void lcdSpinBox::paintEvent( QPaintEvent * _me )
 
 
 
-void lcdSpinBox::update( void )
+void lcdSpinBox::update()
 {
 	QString s = m_textForValue[model()->value()];
 	if( s == "" )

@@ -50,7 +50,7 @@ public:
 	virtual ~ledCheckBox();
 
 
-	inline const QString & text( void )
+	inline const QString & text()
 	{
 		return( m_text );
 	}

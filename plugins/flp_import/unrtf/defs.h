@@ -53,11 +53,11 @@
 #endif
 
 
-#ifndef TRUE /* daved 0.19.0 */
-#define TRUE (1)
+#ifndef true /* daved 0.19.0 */
+#define true (1)
 #endif
-#ifndef FALSE /* daved 0.19.0 */
-#define FALSE (0)
+#ifndef false /* daved 0.19.0 */
+#define false (0)
 #endif
 #if 1 /* daved - 0.19.4 */
 #define SKIP_ONE_WORD	2

@@ -37,7 +37,7 @@ public:
 		QPushButton( _text, _parent ),
 		m_id( _id )
 	{
-		setCheckable( TRUE );
+		setCheckable( true );
 		connect( this, SIGNAL( clicked() ), this,
 						SLOT( slotClicked() ) );
 	}
@@ -52,7 +52,7 @@ signals:
 
 
 protected slots:
-	void slotClicked( void )
+	void slotClicked()
 	{
 		emit clicked( m_id );
 	}

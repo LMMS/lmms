@@ -46,19 +46,19 @@ public:
 	samplePlayHandle( pattern * _pattern );
 	virtual ~samplePlayHandle();
 
-	virtual inline bool affinityMatters( void ) const
+	virtual inline bool affinityMatters() const
 	{
 		return true;
 	}
 
 
 	virtual void play( sampleFrame * _working_buffer );
-	virtual bool done( void ) const;
+	virtual bool done() const;
 
 	virtual bool isFromTrack( const track * _track ) const;
 
-	f_cnt_t totalFrames( void ) const;
-	inline f_cnt_t framesDone( void ) const
+	f_cnt_t totalFrames() const;
+	inline f_cnt_t framesDone() const
 	{
 		return( m_frame );
 	}

@@ -58,7 +58,7 @@ fadeButton::~fadeButton()
 
 
 
-void fadeButton::activate( void )
+void fadeButton::activate()
 {
 	m_stateTimer.restart();
 	signalUpdate();
@@ -110,7 +110,7 @@ void fadeButton::paintEvent( QPaintEvent * _pe )
 
 
 
-void fadeButton::signalUpdate( void )
+void fadeButton::signalUpdate()
 {
 	QApplication::postEvent( this, new updateEvent() );
 }

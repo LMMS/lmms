@@ -171,7 +171,7 @@ float LfoController::value( int _offset )
 
 
 
-void LfoController::updateSampleFunction( void )
+void LfoController::updateSampleFunction()
 {
 	switch( m_waveModel.value() )
 	{
@@ -231,7 +231,7 @@ void LfoController::loadSettings( const QDomElement & _this )
 
 
 
-QString LfoController::nodeName( void ) const
+QString LfoController::nodeName() const
 {
 	return( "lfocontroller" );
 }

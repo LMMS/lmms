@@ -145,7 +145,7 @@ void ladspaDescription::update( const ladspa_key_t & _key )
 	maker_label->setAlignment( Qt::AlignTop );
 	QLabel * maker_content = new QLabel( maker );
 	maker_content->setText( manager->getMaker( _key ) );
-	maker_content->setWordWrap( TRUE );
+	maker_content->setWordWrap( true );
 	makerLayout->addWidget( maker_label );
 	makerLayout->addWidget( maker_content, 1 );
 
@@ -161,7 +161,7 @@ void ladspaDescription::update( const ladspa_key_t & _key )
 
 	QLabel * copyright_content = new QLabel( copyright );
 	copyright_content->setText( manager->getCopyright( _key ) );
-	copyright_content->setWordWrap( TRUE );
+	copyright_content->setWordWrap( true );
 	copyrightLayout->addWidget( copyright_label );
 	copyrightLayout->addWidget( copyright_content, 1 );
 

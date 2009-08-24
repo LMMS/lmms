@@ -84,7 +84,7 @@ bSynth::~bSynth()
 }
 
 
-sample_t bSynth::nextStringSample( void )
+sample_t bSynth::nextStringSample()
 {
 	float sample_step = 
 		static_cast<float>( sample_length / ( sample_rate / nph->frequency() ) );
@@ -138,8 +138,8 @@ bitInvader::bitInvader( InstrumentTrack * _instrument_track ) :
 	Instrument( _instrument_track, &bitinvader_plugin_descriptor ),
 	m_sampleLength( 128, 8, 128, 1, this, tr( "Samplelength" ) ),
 	m_graph( -1.0f, 1.0f, 128, this ),
-	m_interpolation( FALSE, this ),
-	m_normalize( FALSE, this )
+	m_interpolation( false, this ),
+	m_normalize( false, this )
 {
 
 	m_graph.setWaveToSine();
@@ -214,7 +214,7 @@ void bitInvader::loadSettings( const QDomElement & _this )
 
 
 
-void bitInvader::lengthChanged( void )
+void bitInvader::lengthChanged()
 {
 	m_graph.setLength( (int) m_sampleLength.value() );
 
@@ -233,7 +233,7 @@ void bitInvader::samplesChanged( int _begin, int _end )
 
 
 
-void bitInvader::normalize( void )
+void bitInvader::normalize()
 {
 	// analyze
 	float max = 0;
@@ -249,7 +249,7 @@ void bitInvader::normalize( void )
 
 
 
-QString bitInvader::nodeName( void ) const
+QString bitInvader::nodeName() const
 {
 	return( bitinvader_plugin_descriptor.name );
 }
@@ -324,7 +324,7 @@ bitInvaderView::bitInvaderView( Instrument * _instrument,
 					QWidget * _parent ) :
 	InstrumentView( _instrument, _parent )
 {
-	setAutoFillBackground( TRUE );
+	setAutoFillBackground( true );
 	QPalette pal;
 
 	pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap(
@@ -337,7 +337,7 @@ bitInvaderView::bitInvaderView( Instrument * _instrument,
 
 	m_graph = new graph( this, graph::NearestStyle );
 	m_graph->move(53,118);	// 55,120 - 2px border
-	m_graph->setAutoFillBackground( TRUE );
+	m_graph->setAutoFillBackground( true );
 
 	toolTip::add( m_graph, tr ( "Draw your own waveform here "
 				"by dragging your mouse on this graph."
@@ -411,7 +411,7 @@ bitInvaderView::bitInvaderView( Instrument * _instrument,
 						"smooth" ) );
 	smoothBtn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
 						"smooth" ) );
-	smoothBtn->setChecked( TRUE );
+	smoothBtn->setChecked( true );
 	toolTip::add( smoothBtn,
 			tr( "Click here to smooth waveform." ) );
 
@@ -426,21 +426,21 @@ bitInvaderView::bitInvaderView( Instrument * _instrument,
 	m_normalizeToggle->move( 55, 100 );
 	
 	
-	connect( sinWaveBtn, SIGNAL (clicked ( void ) ),
-			this, SLOT ( sinWaveClicked( void ) ) );
-	connect( triangleWaveBtn, SIGNAL ( clicked ( void ) ),
-			this, SLOT ( triangleWaveClicked( void ) ) );
-	connect( sawWaveBtn, SIGNAL (clicked ( void ) ),
-			this, SLOT ( sawWaveClicked( void ) ) );
-	connect( sqrWaveBtn, SIGNAL ( clicked ( void ) ),
-			this, SLOT ( sqrWaveClicked( void ) ) );
-	connect( whiteNoiseWaveBtn, SIGNAL ( clicked ( void ) ),
-			this, SLOT ( noiseWaveClicked( void ) ) );
-	connect( usrWaveBtn, SIGNAL ( clicked ( void ) ),
-			this, SLOT ( usrWaveClicked( void ) ) );
+	connect( sinWaveBtn, SIGNAL (clicked () ),
+			this, SLOT ( sinWaveClicked() ) );
+	connect( triangleWaveBtn, SIGNAL ( clicked () ),
+			this, SLOT ( triangleWaveClicked() ) );
+	connect( sawWaveBtn, SIGNAL (clicked () ),
+			this, SLOT ( sawWaveClicked() ) );
+	connect( sqrWaveBtn, SIGNAL ( clicked () ),
+			this, SLOT ( sqrWaveClicked() ) );
+	connect( whiteNoiseWaveBtn, SIGNAL ( clicked () ),
+			this, SLOT ( noiseWaveClicked() ) );
+	connect( usrWaveBtn, SIGNAL ( clicked () ),
+			this, SLOT ( usrWaveClicked() ) );
 	
-	connect( smoothBtn, SIGNAL ( clicked ( void ) ),
-			this, SLOT ( smoothClicked( void ) ) );		
+	connect( smoothBtn, SIGNAL ( clicked () ),
+			this, SLOT ( smoothClicked() ) );		
 
 	connect( m_interpolationToggle, SIGNAL( toggled( bool ) ),
 			this, SLOT ( interpolationToggled( bool ) ) );
@@ -453,7 +453,7 @@ bitInvaderView::bitInvaderView( Instrument * _instrument,
 
 
 
-void bitInvaderView::modelChanged( void )
+void bitInvaderView::modelChanged()
 {
 	bitInvader * b = castModel<bitInvader>();
 
@@ -467,7 +467,7 @@ void bitInvaderView::modelChanged( void )
 
 
 
-void bitInvaderView::sinWaveClicked( void )
+void bitInvaderView::sinWaveClicked()
 {
 	m_graph->model()->setWaveToSine();
 	engine::getSong()->setModified();
@@ -476,7 +476,7 @@ void bitInvaderView::sinWaveClicked( void )
 
 
 
-void bitInvaderView::triangleWaveClicked( void )
+void bitInvaderView::triangleWaveClicked()
 {
 	m_graph->model()->setWaveToTriangle();
 	engine::getSong()->setModified();
@@ -485,7 +485,7 @@ void bitInvaderView::triangleWaveClicked( void )
 
 
 
-void bitInvaderView::sawWaveClicked( void )
+void bitInvaderView::sawWaveClicked()
 {
 	m_graph->model()->setWaveToSaw();
 	engine::getSong()->setModified();
@@ -494,7 +494,7 @@ void bitInvaderView::sawWaveClicked( void )
 
 
 
-void bitInvaderView::sqrWaveClicked( void )
+void bitInvaderView::sqrWaveClicked()
 {
 	m_graph->model()->setWaveToSquare();
 	engine::getSong()->setModified();
@@ -503,7 +503,7 @@ void bitInvaderView::sqrWaveClicked( void )
 
 
 
-void bitInvaderView::noiseWaveClicked( void )
+void bitInvaderView::noiseWaveClicked()
 {
 	m_graph->model()->setWaveToNoise();
 	engine::getSong()->setModified();
@@ -512,7 +512,7 @@ void bitInvaderView::noiseWaveClicked( void )
 
 
 
-void bitInvaderView::usrWaveClicked( void )
+void bitInvaderView::usrWaveClicked()
 {
 	/*
 	m_graph->model()->setWaveToNoise();
@@ -546,7 +546,7 @@ void bitInvaderView::usrWaveClicked( void )
 
 
 
-void bitInvaderView::smoothClicked( void )
+void bitInvaderView::smoothClicked()
 {
 	m_graph->model()->smooth();
 	engine::getSong()->setModified();

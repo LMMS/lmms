@@ -104,7 +104,7 @@ ladspaBrowserView::ladspaBrowserView( ToolPlugin * _tool ) :
 	hlayout->setMargin( 0 );
 
 	m_tabBar = new tabBar( this, QBoxLayout::TopToBottom );
-	m_tabBar->setExclusive( TRUE );
+	m_tabBar->setExclusive( true );
 	m_tabBar->setFixedWidth( 72 );
 
 	QWidget * ws = new QWidget( this );
@@ -119,21 +119,21 @@ ladspaBrowserView::ladspaBrowserView( ToolPlugin * _tool ) :
 
 
 	m_tabBar->addTab( available, tr( "Available Effects" ), 
-				0, FALSE, TRUE 
+				0, false, true 
 			)->setIcon( embed::getIconPixmap( "setup_audio" ) );
 	m_tabBar->addTab( unavailable, tr( "Unavailable Effects" ), 
-				1, FALSE, TRUE 
+				1, false, true 
 			)->setIcon( embed::getIconPixmap(
 						"unavailable_sound" ) );
 	m_tabBar->addTab( instruments, tr( "Instruments" ), 
-				2, FALSE, TRUE 
+				2, false, true 
 			)->setIcon( embed::getIconPixmap(
 							"setup_midi" ) );
 	m_tabBar->addTab( analysis, tr( "Analysis Tools" ), 
-				3, FALSE, TRUE
+				3, false, true
 			)->setIcon( embed::getIconPixmap( "analysis" ) );
 	m_tabBar->addTab( other, tr( "Don't know" ), 
-				4, TRUE, TRUE
+				4, true, true
 			)->setIcon( embed::getIconPixmap( "uhoh" ) );
 
 
@@ -208,7 +208,7 @@ QWidget * ladspaBrowserView::createTab( QWidget * _parent, const QString & _txt,
 	const QString type = "<b>" + tr( "Type:" ) + "</b> ";
 	QLabel * title = new QLabel( type + _txt, tab );
 	QFont f = title->font();
-	f.setBold( TRUE );
+	f.setBold( true );
 	title->setFont( pointSize<12>( f ) );
 
 	layout->addSpacing( 5 );

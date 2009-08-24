@@ -33,7 +33,7 @@
 class inlineAutomation : public FloatModel, public sharedObject
 {
 public:
-	inlineAutomation( void ) :
+	inlineAutomation() :
 		FloatModel(),
 		sharedObject(),
 		m_autoPattern( NULL )
@@ -48,9 +48,9 @@ public:
 		}
 	}
 
-	virtual float defaultValue( void ) const = 0;
+	virtual float defaultValue() const = 0;
 
-	inline bool hasAutomation( void ) const
+	inline bool hasAutomation() const
 	{
 		return m_autoPattern != NULL &&
 			!typeInfo<float>::isEqual(
@@ -58,7 +58,7 @@ public:
 							defaultValue() );
 	}
 
-	automationPattern * getAutomationPattern( void )
+	automationPattern * getAutomationPattern()
 	{
 		if( m_autoPattern == NULL )
 		{

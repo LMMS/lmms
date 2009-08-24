@@ -84,7 +84,7 @@ void sampleRecordHandle::play( sampleFrame * /*_working_buffer*/ )
 
 
 
-bool sampleRecordHandle::done( void ) const
+bool sampleRecordHandle::done() const
 {
 	return false;
 }
@@ -100,7 +100,7 @@ bool sampleRecordHandle::isFromTrack( const track * _track ) const
 
 
 
-f_cnt_t sampleRecordHandle::framesRecorded( void ) const
+f_cnt_t sampleRecordHandle::framesRecorded() const
 {
 	return( m_framesRecorded );
 }

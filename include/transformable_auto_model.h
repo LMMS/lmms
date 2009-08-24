@@ -50,7 +50,7 @@ public:
 				const T _max = 0,
 				const T _step = defaultRelStep(),
 				Model * _parent = NULL,
-				bool _default_constructed = FALSE ) :
+				bool _default_constructed = false ) :
 		AutomatableModel( _val, _min, _max, _step, _parent,
 						_default_constructed ),
 		m_transformer( _transformer )
@@ -75,7 +75,7 @@ public:
 		}
 	}
 
-	inline virtual T value( void ) const
+	inline virtual T value() const
 	{
 		return( m_transformedValue );
 	}

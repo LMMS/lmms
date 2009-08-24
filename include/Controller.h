@@ -62,7 +62,7 @@ public:
 
 	virtual float currentValue( int _offset );
 
-	inline bool isSampleExact( void ) const
+	inline bool isSampleExact() const
 	{
 		return m_sampleExact ||
 			engine::getMixer()->currentQualitySettings().
@@ -74,26 +74,26 @@ public:
 		m_sampleExact = _exact;
 	}
 
-	inline ControllerTypes type( void ) const
+	inline ControllerTypes type() const
 	{
 		return( m_type );
 	}
 
 	// return whether this controller updates models frequently - used for
 	// determining when to update GUI
-	inline bool frequentUpdates( void ) const
+	inline bool frequentUpdates() const
 	{
 		switch( m_type )
 		{
-			case LfoController: return( TRUE );
-			case PeakController: return( TRUE );
+			case LfoController: return( true );
+			case PeakController: return( true );
 			default:
 				break;
 		}
-		return( FALSE );
+		return( false );
 	}
 
-	virtual const QString & name( void ) const
+	virtual const QString & name() const
 	{
 		return( m_name );
 	}
@@ -101,7 +101,7 @@ public:
 
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _this );
 	virtual void loadSettings( const QDomElement & _this );
-	virtual QString nodeName( void ) const;
+	virtual QString nodeName() const;
 
 	static Controller * create( ControllerTypes _tt, Model * _parent );
 	static Controller * create( const QDomElement & _this,
@@ -115,8 +115,8 @@ public:
 	static unsigned int runningFrames();
 	static float runningTime();
 
-	static void triggerFrameCounter( void );
-	static void resetFrameCounter( void );
+	static void triggerFrameCounter();
+	static void resetFrameCounter();
 
 
 public slots:
@@ -147,7 +147,7 @@ protected:
 
 signals:
 	// The value changed while the mixer isn't running (i.e: MIDI CC)
-	void valueChanged( void );
+	void valueChanged();
 
 	friend class ControllerDialog;
 

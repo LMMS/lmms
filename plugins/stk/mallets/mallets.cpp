@@ -73,7 +73,7 @@ malletsInstrument::malletsInstrument( InstrumentTrack * _instrument_track ):
 	m_pressureModel(64.0f, 0.0f, 128.0f, 0.1f, this, tr( "Pressure" )),
 	m_motionModel(64.0f, 0.0f, 128.0f, 0.1f, this, tr( "Motion" )),
 	m_velocityModel(64.0f, 0.0f, 128.0f, 0.1f, this, tr( "Speed" )),
-	m_strikeModel( FALSE, this, tr( "Bowed" ) ),
+	m_strikeModel( false, this, tr( "Bowed" ) ),
 	m_presetsModel(this),
 	m_spreadModel(0, 0, 255, 1, this, tr( "Spread" )),
 	m_filesMissing( !QDir( configManager::inst()->stkDir() ).exists() ||
@@ -195,7 +195,7 @@ void malletsInstrument::loadSettings( const QDomElement & _this )
 
 
 
-QString malletsInstrument::nodeName( void ) const
+QString malletsInstrument::nodeName() const
 {
 	return( malletsstk_plugin_descriptor.name );
 }
@@ -342,7 +342,7 @@ malletsInstrumentView::~malletsInstrumentView()
 
 void malletsInstrumentView::setWidgetBackground( QWidget * _widget, const QString & _pic )
 {
-	_widget->setAutoFillBackground( TRUE );
+	_widget->setAutoFillBackground( true );
 	QPalette pal;
 	pal.setBrush( _widget->backgroundRole(),
 		PLUGIN_NAME::getIconPixmap( _pic.toAscii().constData() ) );
@@ -459,7 +459,7 @@ QWidget * malletsInstrumentView::setupBandedWGControls( QWidget * _parent )
 
 
 
-void malletsInstrumentView::modelChanged( void )
+void malletsInstrumentView::modelChanged()
 {
 	malletsInstrument * inst = castModel<malletsInstrument>();
 	m_hardnessKnob->setModel( &inst->m_hardnessModel );

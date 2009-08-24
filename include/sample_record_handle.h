@@ -46,11 +46,11 @@ public:
 	virtual ~sampleRecordHandle();
 
 	virtual void play( sampleFrame * _working_buffer );
-	virtual bool done( void ) const;
+	virtual bool done() const;
 
 	virtual bool isFromTrack( const track * _track ) const;
 
-	f_cnt_t framesRecorded( void ) const;
+	f_cnt_t framesRecorded() const;
 	void createSampleBuffer( sampleBuffer * * _sample_buf );
 
 

@@ -63,11 +63,11 @@ ControllerRackView::ControllerRackView( ) :
 	QWidget * w = new QWidget();
 	m_scrollArea->setWidget( w );
 
-	connect( m_addButton, SIGNAL( clicked( void ) ),
-			this, SLOT( addController( void ) ) );
+	connect( m_addButton, SIGNAL( clicked() ),
+			this, SLOT( addController() ) );
 
-	connect( engine::getSong(), SIGNAL( dataChanged( void ) ),
-			this, SLOT( update( void ) ) );
+	connect( engine::getSong(), SIGNAL( dataChanged() ),
+			this, SLOT( update() ) );
 
 	QVBoxLayout * layout = new QVBoxLayout();
 	layout->addWidget( m_scrollArea );
@@ -85,7 +85,7 @@ ControllerRackView::ControllerRackView( ) :
 
 	subWin->layout()->setSizeConstraint( QLayout::SetMaximumSize );
 
-	parentWidget()->setAttribute( Qt::WA_DeleteOnClose, FALSE );
+	parentWidget()->setAttribute( Qt::WA_DeleteOnClose, false );
 	parentWidget()->move( 880, 310 );
 }
 
@@ -132,7 +132,7 @@ void ControllerRackView::deleteController( ControllerView * _view )
 
 
 
-void ControllerRackView::update( void )
+void ControllerRackView::update()
 {
 	QWidget * w = m_scrollArea->widget();
 	song * s = engine::getSong();
@@ -167,7 +167,7 @@ void ControllerRackView::update( void )
 }
 
 
-void ControllerRackView::addController( void )
+void ControllerRackView::addController()
 {
 	// TODO: Eventually let the user pick from available controller types
 

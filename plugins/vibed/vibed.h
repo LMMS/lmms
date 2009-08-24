@@ -51,9 +51,9 @@ public:
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
 	virtual void loadSettings( const QDomElement & _this );
 
-	virtual QString nodeName( void ) const;
+	virtual QString nodeName() const;
 
-	inline virtual bool isBendable( void ) const
+	inline virtual bool isBendable() const
 	{
 		return( false );
 	}
@@ -93,20 +93,20 @@ public:
 public slots:
 	void showString( Uint8 _string );
 	void contextMenuEvent( QContextMenuEvent * );
-	void displayHelp( void );
+	void displayHelp();
 
 protected slots:
-	void sinWaveClicked( void );
-	void triangleWaveClicked( void );
-	void sawWaveClicked( void );
-	void sqrWaveClicked( void );
-	void noiseWaveClicked( void );
-	void usrWaveClicked( void );
-	void smoothClicked( void );
-	void normalizeClicked( void );
+	void sinWaveClicked();
+	void triangleWaveClicked();
+	void sawWaveClicked();
+	void sqrWaveClicked();
+	void noiseWaveClicked();
+	void usrWaveClicked();
+	void smoothClicked();
+	void normalizeClicked();
 
 private:
-	virtual void modelChanged( void );
+	virtual void modelChanged();
 
 
 	// String-related

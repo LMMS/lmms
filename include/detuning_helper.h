@@ -33,7 +33,7 @@
 class detuningHelper : public inlineAutomation
 {
 public:
-	detuningHelper( void ) :
+	detuningHelper() :
 		inlineAutomation()
 	{
 	}
@@ -42,17 +42,17 @@ public:
 	{
 	}
 
-	virtual float defaultValue( void ) const
+	virtual float defaultValue() const
 	{
 		return( 0 );
 	}
 
-	virtual QString displayName( void ) const
+	virtual QString displayName() const
 	{
 		return( tr( "Note detuning" ) );
 	}
 
-	inline virtual QString nodeName( void ) const
+	inline virtual QString nodeName() const
 	{
 		return( "detuning" );
 	}

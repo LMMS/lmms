@@ -54,7 +54,7 @@ protected:
 
 
 protected slots:
-	void updateAudioBuffer( void );
+	void updateAudioBuffer();
 
 
 private:

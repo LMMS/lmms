@@ -62,7 +62,7 @@ public:
 		setFixedSize( 249, 151 );
 		connect( engine::mainWindow(), SIGNAL( periodicUpdate() ),
 				this, SLOT( update() ) );
-		setAttribute( Qt::WA_OpaquePaintEvent, TRUE );
+		setAttribute( Qt::WA_OpaquePaintEvent, true );
 	}
 
 	virtual ~spectrumView()
@@ -151,7 +151,7 @@ spectrumAnalyzerControlDialog::spectrumAnalyzerControlDialog(
 	m_logXAxis( PLUGIN_NAME::getIconPixmap( "log_x_axis" ) ),
 	m_logYAxis( PLUGIN_NAME::getIconPixmap( "log_y_axis" ) )
 {
-	setAutoFillBackground( TRUE );
+	setAutoFillBackground( true );
 	QPalette pal;
 	pal.setBrush( backgroundRole(),
 				PLUGIN_NAME::getIconPixmap( "background" ) );

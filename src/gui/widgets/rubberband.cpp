@@ -43,13 +43,13 @@ rubberBand::~rubberBand()
 
 
 
-QVector<selectableObject *> rubberBand::selectedObjects( void ) const
+QVector<selectableObject *> rubberBand::selectedObjects() const
 {
 	QVector<selectableObject *> so = selectableObjects();
 	for( QVector<selectableObject *>::iterator it = so.begin();
 							it != so.end(); )
 	{
-		if( ( *it )->isSelected() == FALSE )
+		if( ( *it )->isSelected() == false )
 		{
 			so.erase( it );
 		}
@@ -81,7 +81,7 @@ void rubberBand::resizeEvent( QResizeEvent * _re )
 
 
 
-QVector<selectableObject *> rubberBand::selectableObjects( void ) const
+QVector<selectableObject *> rubberBand::selectableObjects() const
 {
 	QVector<selectableObject *> so;
 	if( parentWidget() == NULL )

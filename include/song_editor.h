@@ -67,31 +67,31 @@ public slots:
 private slots:
 	void setHighQuality( bool );
 
-	void play( void );
-	void record( void );
-	void recordAccompany( void );
-	void stop( void );
+	void play();
+	void record();
+	void recordAccompany();
+	void stop();
 
 	void masterVolumeChanged( int _new_val );
-	void masterVolumePressed( void );
+	void masterVolumePressed();
 	void masterVolumeMoved( int _new_val );
-	void masterVolumeReleased( void );
+	void masterVolumeReleased();
 	void masterPitchChanged( int _new_val );
-	void masterPitchPressed( void );
+	void masterPitchPressed();
 	void masterPitchMoved( int _new_val );
-	void masterPitchReleased( void );
+	void masterPitchReleased();
 
 	void updateScrollBar( int );
 	void updatePosition( const midiTime & _t );
 
-	void zoomingChanged( void );
+	void zoomingChanged();
 
 
 private:
 	virtual void keyPressEvent( QKeyEvent * _ke );
 	virtual void wheelEvent( QWheelEvent * _we );
 
-	virtual bool allowRubberband( void ) const;
+	virtual bool allowRubberband() const;
 
 
 	song * m_s;
