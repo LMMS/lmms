@@ -146,7 +146,7 @@ public:
 			const Plugin::PluginTypes m_type;
 		} ;
 
-		SubPluginFeatures * sub_plugin_features;
+		SubPluginFeatures * subPluginFeatures;
 
 	} ;
 

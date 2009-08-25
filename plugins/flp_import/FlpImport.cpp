@@ -1787,10 +1787,9 @@ p->putValue( jt->pos, value, false );
 		{
 			continue;
 		}
-		if( it->sub_plugin_features )
+		if( it->subPluginFeatures )
 		{
-			it->sub_plugin_features->listSubPluginKeys(
-							&( *it ), effKeys );
+			it->subPluginFeatures->listSubPluginKeys( &( *it ), effKeys );
 		}
 		else
 		{
@@ -1870,7 +1869,7 @@ p->putValue( jt->pos, value, false );
 						jt != effKeys.end(); ++jt )
 		{
 			if( QString( jt->desc->displayName ).contains( effName ) ||
-				( jt->desc->sub_plugin_features != NULL &&
+				( jt->desc->subPluginFeatures != NULL &&
 					jt->name.contains( effName ) ) )
 			{
 				qDebug( "instantiate %s\n", jt->desc->name );
