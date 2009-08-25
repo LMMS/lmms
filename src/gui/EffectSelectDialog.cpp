@@ -51,9 +51,9 @@ EffectSelectDialog::EffectSelectDialog( QWidget * _parent ) :
 		{
 			continue;
 		}
-		if( it->sub_plugin_features )
+		if( it->subPluginFeatures )
 		{
-			it->sub_plugin_features->listSubPluginKeys(
+			it->subPluginFeatures->listSubPluginKeys(
 				// as iterators are always stated to be not
 				// equal with pointers, we dereference the
 				// iterator and take the address of the item,
@@ -75,7 +75,7 @@ EffectSelectDialog::EffectSelectDialog( QWidget * _parent ) :
 										it != m_effectKeys.end(); ++it )
 	{
 		pluginNames += QString( ( *it ).desc->displayName ) +
-			( ( ( *it ).desc->sub_plugin_features != NULL ) ?
+			( ( ( *it ).desc->subPluginFeatures != NULL ) ?
 							": " + ( *it ).name
 						:
 							"" );
@@ -110,7 +110,7 @@ EffectSelectDialog::EffectSelectDialog( QWidget * _parent ) :
 				SLOT( acceptSelection() ) );
 
 	// try to accept current selection when pressing "OK"
-	connect( ui->buttonBox, SIGNAL( accepted() ), 
+	connect( ui->buttonBox, SIGNAL( accepted() ),
 				this, SLOT( acceptSelection() ) );
 	
 	updateSelection();
@@ -166,8 +166,7 @@ void EffectSelectDialog::rowChanged( const QModelIndex & _idx,
 	{
 		m_currentSelection = m_effectKeys[m_model.mapToSource( _idx ).row()];
 	}
-	if( m_currentSelection.desc &&
-				m_currentSelection.desc->sub_plugin_features )
+	if( m_currentSelection.desc && m_currentSelection.desc->subPluginFeatures )
 	{
 		m_descriptionWidget = new QWidget;
 		QVBoxLayout * l = new QVBoxLayout( m_descriptionWidget );
@@ -176,7 +175,7 @@ void EffectSelectDialog::rowChanged( const QModelIndex & _idx,
 
 		ui->scrollArea->setWidget( m_descriptionWidget );
 
-		m_currentSelection.desc->sub_plugin_features->
+		m_currentSelection.desc->subPluginFeatures->
 			fillDescriptionWidget( m_descriptionWidget, &m_currentSelection );
 		foreach( QWidget * w, m_descriptionWidget->findChildren<QWidget *>() )
 		{
