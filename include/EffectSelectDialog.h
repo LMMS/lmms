@@ -33,9 +33,7 @@
 #include "Effect.h"
 
 
-class QLineEdit;
-class QListView;
-class QScrollArea;
+namespace Ui { class EffectSelectDialog; }
 
 
 class EffectSelectDialog : public QDialog
@@ -48,54 +46,25 @@ public:
 	Effect * instantiateSelectedPlugin( EffectChain * _parent );
 
 
-public slots:
-	void setSelection( const EffectKey & _selection );
-	void selectPlugin();
-	
-private:
-	EffectKey m_currentSelection;
-
-} ;
-
-
-
-class EffectListWidget : public QWidget
-{
-	Q_OBJECT
-public:
-	EffectListWidget( QWidget * _parent );
-
-	virtual ~EffectListWidget();
-	
-	inline EffectKey getSelected()
-	{
-		return( m_currentSelection );
-	}
-	
-
-signals:
-	void highlighted( const EffectKey & _key );
-	void doubleClicked( const EffectKey & _key );
-	
-
 protected slots:
+	void acceptSelection();
 	void rowChanged( const QModelIndex &, const QModelIndex & );
-	void onDoubleClicked( const QModelIndex & );
 	void updateSelection();
 
 
 private:
+	Ui::EffectSelectDialog * ui;
+
 	QVector<Plugin::Descriptor> m_pluginDescriptors;
 	EffectKeyList m_effectKeys;
 	EffectKey m_currentSelection;
 
-	QLineEdit * m_filterEdit;
-	QListView * m_pluginList;
 	QStandardItemModel m_sourceModel;
 	QSortFilterProxyModel m_model;
-	QScrollArea * m_scrollArea;
 	QWidget * m_descriptionWidget;
 
 } ;
+
+
 
 #endif
