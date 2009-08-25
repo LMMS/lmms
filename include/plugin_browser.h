@@ -1,8 +1,8 @@
 /*
  * plugin_browser.h - include file for pluginBrowser
  *
- * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -22,14 +22,11 @@
  *
  */
 
-
 #ifndef _PLUGIN_BROWSER_H
 #define _PLUGIN_BROWSER_H
 
 #include <QtCore/QTimer>
-#include <QtCore/QVector>
 #include <QtGui/QPixmap>
-
 
 #include "side_bar_widget.h"
 #include "Plugin.h"
@@ -47,7 +44,7 @@ public:
 
 
 private:
-	QVector<Plugin::Descriptor> m_pluginDescriptors;
+	Plugin::DescriptorList m_pluginDescriptors;
 
 	QWidget * m_view;
 

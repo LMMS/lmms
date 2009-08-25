@@ -70,7 +70,7 @@ typedef struct PortDescription
 
 
 inline Plugin::Descriptor::SubPluginFeatures::Key ladspaKeyToSubPluginKey(
-						Plugin::Descriptor * _desc,
+						const Plugin::Descriptor * _desc,
 						const QString & _name,
 						const ladspa_key_t & _key )
 {

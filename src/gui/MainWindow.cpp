@@ -273,11 +273,10 @@ void MainWindow::finalize( void )
 
 
 	m_toolsMenu = new QMenu( this );
-	QVector<Plugin::Descriptor> pluginDescriptors;
+	Plugin::DescriptorList pluginDescriptors;
 	Plugin::getDescriptorsOfAvailPlugins( pluginDescriptors );
-	for( QVector<Plugin::Descriptor>::iterator it =
-						pluginDescriptors.begin();
-					it != pluginDescriptors.end(); ++it )
+	for( Plugin::DescriptorList::ConstIterator it = pluginDescriptors.begin();
+										it != pluginDescriptors.end(); ++it )
 	{
 		if( it->type == Plugin::Tool )
 		{

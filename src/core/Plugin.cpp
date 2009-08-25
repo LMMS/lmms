@@ -133,7 +133,7 @@ Plugin * Plugin::instantiate( const QString & _plugin_name, Model * _parent,
 
 
 
-void Plugin::getDescriptorsOfAvailPlugins( QVector<Descriptor> & _plugin_descs )
+void Plugin::getDescriptorsOfAvailPlugins( DescriptorList & _plugin_descs )
 {
 	QDir directory( configManager::inst()->pluginDir() );
 #ifdef LMMS_BUILD_WIN32

@@ -1,8 +1,8 @@
 /*
  * plugin_browser.cpp - implementation of the plugin-browser
  *
- * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -22,12 +22,10 @@
  *
  */
 
-
 #include <QtGui/QLabel>
 #include <QtGui/QPainter>
 #include <QtGui/QCursor>
 #include <QtGui/QMouseEvent>
-
 
 #include "plugin_browser.h"
 #include "embed.h"
@@ -64,14 +62,12 @@ pluginBrowser::pluginBrowser( QWidget * _parent ) :
 
 	Plugin::getDescriptorsOfAvailPlugins( m_pluginDescriptors );
 
-	for( QVector<Plugin::Descriptor>::iterator it =
-						m_pluginDescriptors.begin();
-					it != m_pluginDescriptors.end(); ++it )
+	for( Plugin::DescriptorList::ConstIterator it = m_pluginDescriptors.begin();
+										it != m_pluginDescriptors.end(); ++it )
 	{
 		if( it->type == Plugin::Instrument )
 		{
-			pluginDescWidget * p = new pluginDescWidget( *it,
-								m_view );
+			pluginDescWidget * p = new pluginDescWidget( *it, m_view );
 			p->show();
 			view_layout->addWidget( p );
 		}

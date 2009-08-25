@@ -52,7 +52,7 @@ ImportFilter::~ImportFilter()
 void ImportFilter::import( const QString & _file_to_import,
 							trackContainer * _tc )
 {
-	QVector<Descriptor> d;
+	DescriptorList d;
 	Plugin::getDescriptorsOfAvailPlugins( d );
 
 	bool successful = false;
@@ -63,8 +63,8 @@ void ImportFilter::import( const QString & _file_to_import,
 	const bool j = engine::projectJournal()->isJournalling();
 	engine::projectJournal()->setJournalling( false );
 
-	for( QVector<Plugin::Descriptor>::Iterator it = d.begin();
-							it != d.end(); ++it )
+	for( Plugin::DescriptorList::ConstIterator it = d.begin();
+												it != d.end(); ++it )
 	{
 		if( it->type == Plugin::ImportFilter )
 		{
