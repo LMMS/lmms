@@ -132,7 +132,7 @@ public:
 	// returns instrument-track this note-play-handle plays
 	inline InstrumentTrack * instrumentTrack()
 	{
-		return m_InstrumentTrack;
+		return m_instrumentTrack;
 	}
 
 	// returns whether note is a base-note, e.g. is not part of an arpeggio
@@ -223,7 +223,7 @@ private:
 	} ;
 	
 
-	InstrumentTrack * m_InstrumentTrack;	// needed for calling
+	InstrumentTrack * m_instrumentTrack;	// needed for calling
 					// InstrumentTrack::playNote
 	f_cnt_t m_frames;		// total frames to play
 	f_cnt_t m_totalFramesPlayed;	// total frame-counter - used for

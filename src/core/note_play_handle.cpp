@@ -56,7 +56,7 @@ notePlayHandle::notePlayHandle( InstrumentTrack * _it,
 			_n.getVolume(), _n.getPanning(), _n.detuning() ),
 	m_pluginData( NULL ),
 	m_filter( NULL ),
-	m_InstrumentTrack( _it ),
+	m_instrumentTrack( _it ),
 	m_frames( 0 ),
 	m_totalFramesPlayed( 0 ), 
 	m_framesBeforeRelease( 0 ),
@@ -75,7 +75,7 @@ notePlayHandle::notePlayHandle( InstrumentTrack * _it,
 	if( m_baseNote )
 	{
 		m_baseDetuning = new baseDetuning( detuning() );
-		m_InstrumentTrack->m_processHandles.push_back( this );
+		m_instrumentTrack->m_processHandles.push_back( this );
 	}
 	else
 	{
@@ -102,8 +102,8 @@ notePlayHandle::notePlayHandle( InstrumentTrack * _it,
 	if( !isBaseNote() || !instrumentTrack()->isArpeggiatorEnabled() )
 	{
 		// send MIDI-note-on-event
-		m_InstrumentTrack->processOutEvent( midiEvent( MidiNoteOn,
-			m_InstrumentTrack->midiPort()->realOutputChannel(),
+		m_instrumentTrack->processOutEvent( midiEvent( MidiNoteOn,
+			m_instrumentTrack->midiPort()->realOutputChannel(),
 			key(), getMidiVelocity() ),
 				midiTime::fromFrames( offset(),
 						engine::framesPerTick() ) );
@@ -120,17 +120,17 @@ notePlayHandle::~notePlayHandle()
 	if( m_baseNote )
 	{
 		delete m_baseDetuning;
-		m_InstrumentTrack->m_processHandles.removeAll( this );
+		m_instrumentTrack->m_processHandles.removeAll( this );
 	}
 
 	if( m_pluginData != NULL )
 	{
-		m_InstrumentTrack->deleteNotePluginData( this );
+		m_instrumentTrack->deleteNotePluginData( this );
 	}
 
-	if( m_InstrumentTrack->m_notes[key()] == this )
+	if( m_instrumentTrack->m_notes[key()] == this )
 	{
-		m_InstrumentTrack->m_notes[key()] = NULL;
+		m_instrumentTrack->m_notes[key()] = NULL;
 	}
 
 	for( NotePlayHandleList::Iterator it = m_subNotes.begin();
@@ -149,8 +149,8 @@ notePlayHandle::~notePlayHandle()
 void notePlayHandle::setVolume( const volume_t _volume )
 {
 	note::setVolume( _volume );
-	m_InstrumentTrack->processOutEvent( midiEvent( MidiKeyPressure,
-			m_InstrumentTrack->midiPort()->realOutputChannel(),
+	m_instrumentTrack->processOutEvent( midiEvent( MidiKeyPressure,
+			m_instrumentTrack->midiPort()->realOutputChannel(),
 						key(), getMidiVelocity() ), 0 );
 	
 }
@@ -161,9 +161,9 @@ void notePlayHandle::setVolume( const volume_t _volume )
 int notePlayHandle::getMidiVelocity() const
 {
 	int vel = getVolume();
-	if( m_InstrumentTrack->getVolume() < DefaultVolume )
+	if( m_instrumentTrack->getVolume() < DefaultVolume )
 	{
-		vel = ( vel * m_InstrumentTrack->getVolume() ) / DefaultVolume;
+		vel = ( vel * m_instrumentTrack->getVolume() ) / DefaultVolume;
 	}
 	return qMin( MidiMaxVelocity, vel * MidiMaxVelocity / DefaultVolume );
 }
@@ -191,7 +191,7 @@ void notePlayHandle::play( sampleFrame * _working_buffer )
 	if( framesLeft() > 0 )
 	{
 		// play note!
-		m_InstrumentTrack->playNote( this, _working_buffer );
+		m_instrumentTrack->playNote( this, _working_buffer );
 	}
 
 	if( m_released )
@@ -299,7 +299,7 @@ f_cnt_t notePlayHandle::framesLeft() const
 
 bool notePlayHandle::isFromTrack( const track * _track ) const
 {
-	return m_InstrumentTrack == _track || m_bbTrack == _track;
+	return m_instrumentTrack == _track || m_bbTrack == _track;
 }
 
 
@@ -322,13 +322,13 @@ void notePlayHandle::noteOff( const f_cnt_t _s )
 	// then set some variables indicating release-state
 	m_framesBeforeRelease = _s;
 	m_releaseFramesToDo = qMax<f_cnt_t>( 0, // 10,
-			m_InstrumentTrack->m_soundShaping.releaseFrames() );
+			m_instrumentTrack->m_soundShaping.releaseFrames() );
 
 	if( !isBaseNote() || !instrumentTrack()->isArpeggiatorEnabled() )
 	{
 		// send MIDI-note-off-event
-		m_InstrumentTrack->processOutEvent( midiEvent( MidiNoteOff,
-			m_InstrumentTrack->midiPort()->realOutputChannel(),
+		m_instrumentTrack->processOutEvent( midiEvent( MidiNoteOff,
+			m_instrumentTrack->midiPort()->realOutputChannel(),
 								key(), 0 ),
 			midiTime::fromFrames( m_framesBeforeRelease,
 						engine::framesPerTick() ) );
@@ -342,7 +342,7 @@ void notePlayHandle::noteOff( const f_cnt_t _s )
 
 f_cnt_t notePlayHandle::actualReleaseFramesToDo() const
 {
-	return m_InstrumentTrack->m_soundShaping.releaseFrames(/*
+	return m_instrumentTrack->m_soundShaping.releaseFrames(/*
 							isArpeggioBaseNote()*/ );
 }
 
@@ -354,7 +354,7 @@ void notePlayHandle::setFrames( const f_cnt_t _frames )
 	m_frames = _frames;
 	if( m_frames == 0 )
 	{
-		m_frames = m_InstrumentTrack->beatLen( this );
+		m_frames = m_instrumentTrack->beatLen( this );
 	}
 	m_origFrames = m_frames;
 }
@@ -364,7 +364,7 @@ void notePlayHandle::setFrames( const f_cnt_t _frames )
 
 float notePlayHandle::volumeLevel( const f_cnt_t _frame )
 {
-	return m_InstrumentTrack->m_soundShaping.volumeLevel( this, _frame );
+	return m_instrumentTrack->m_soundShaping.volumeLevel( this, _frame );
 }
 
 
@@ -373,7 +373,7 @@ float notePlayHandle::volumeLevel( const f_cnt_t _frame )
 bool notePlayHandle::isArpeggioBaseNote() const
 {
 	return isBaseNote() && ( m_partOfArpeggio ||
-			m_InstrumentTrack->isArpeggiatorEnabled() );
+			m_instrumentTrack->isArpeggiatorEnabled() );
 }
 
 
@@ -404,7 +404,7 @@ int notePlayHandle::index() const
 		const notePlayHandle * nph =
 				dynamic_cast<const notePlayHandle *>( *it );
 		if( nph == NULL ||
-			nph->m_InstrumentTrack != m_InstrumentTrack ||
+			nph->m_instrumentTrack != m_instrumentTrack ||
 						nph->released() == true )
 		{
 			continue;
@@ -432,7 +432,7 @@ ConstNotePlayHandleList notePlayHandle::nphsOfInstrumentTrack(
 	{
 		const notePlayHandle * nph =
 				dynamic_cast<const notePlayHandle *>( *it );
-		if( nph != NULL && nph->m_InstrumentTrack == _it &&
+		if( nph != NULL && nph->m_instrumentTrack == _it &&
 			( nph->released() == false || _all_ph == true ) )
 		{
 			cnphv.push_back( nph );
@@ -451,7 +451,7 @@ bool notePlayHandle::operator==( const notePlayHandle & _nph ) const
 			key() == _nph.key() &&
 			getVolume() == _nph.getVolume() &&
 			getPanning() == _nph.getPanning() &&
-			m_InstrumentTrack == _nph.m_InstrumentTrack &&
+			m_instrumentTrack == _nph.m_instrumentTrack &&
 			m_frames == _nph.m_frames &&
 			offset() == _nph.offset() &&
 			m_totalFramesPlayed == _nph.m_totalFramesPlayed &&
@@ -467,10 +467,10 @@ bool notePlayHandle::operator==( const notePlayHandle & _nph ) const
 void notePlayHandle::updateFrequency()
 {
 	const float pitch =
-		( key() - m_InstrumentTrack->baseNoteModel()->value() +
+		( key() - m_instrumentTrack->baseNoteModel()->value() +
 				engine::getSong()->masterPitch() ) / 12.0f;
 	m_frequency = BaseFreq * powf( 2.0f, pitch +
-		m_InstrumentTrack->pitchModel()->value() / ( 100 * 12.0f ) );
+		m_instrumentTrack->pitchModel()->value() / ( 100 * 12.0f ) );
 	m_unpitchedFrequency = BaseFreq * powf( 2.0f, pitch );
 
 	for( NotePlayHandleList::Iterator it = m_subNotes.begin();

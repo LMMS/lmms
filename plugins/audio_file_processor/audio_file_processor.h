@@ -82,8 +82,8 @@ private:
 	sampleBuffer m_sampleBuffer;
 	
 	FloatModel m_ampModel;
-	FloatModel m_startPoIntModel;
-	FloatModel m_endPoIntModel;
+	FloatModel m_startPointModel;
+	FloatModel m_endPointModel;
 	BoolModel m_reverseModel;
 	BoolModel m_loopModel;
 

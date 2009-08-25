@@ -73,8 +73,8 @@ audioFileProcessor::audioFileProcessor( InstrumentTrack * _instrument_track ) :
 	Instrument( _instrument_track, &audiofileprocessor_plugin_descriptor ),
 	m_sampleBuffer(),
 	m_ampModel( 100, 0, 500, 1, this, tr( "Amplify" ) ),
-	m_startPoIntModel( 0, 0, 1, 0.0000001f, this, tr( "Start of sample") ),
-	m_endPoIntModel( 1, 0, 1, 0.0000001f, this, tr( "End of sample" ) ),
+	m_startPointModel( 0, 0, 1, 0.0000001f, this, tr( "Start of sample") ),
+	m_endPointModel( 1, 0, 1, 0.0000001f, this, tr( "End of sample" ) ),
 	m_reverseModel( false, this, tr( "Reverse sample" ) ),
 	m_loopModel( false, this, tr( "Loop") )
 {
@@ -82,9 +82,9 @@ audioFileProcessor::audioFileProcessor( InstrumentTrack * _instrument_track ) :
 				this, SLOT( reverseModelChanged() ) );
 	connect( &m_ampModel, SIGNAL( dataChanged() ),
 				this, SLOT( ampModelChanged() ) );
-	connect( &m_startPoIntModel, SIGNAL( dataChanged() ),
+	connect( &m_startPointModel, SIGNAL( dataChanged() ),
 				this, SLOT( loopPointChanged() ) );
-	connect( &m_endPoIntModel, SIGNAL( dataChanged() ),
+	connect( &m_endPointModel, SIGNAL( dataChanged() ),
 				this, SLOT( loopPointChanged() ) );
 }
 
@@ -143,8 +143,8 @@ void audioFileProcessor::saveSettings( QDomDocument & _doc,
 	m_reverseModel.saveSettings( _doc, _this, "reversed" );
 	m_loopModel.saveSettings( _doc, _this, "looped" );
 	m_ampModel.saveSettings( _doc, _this, "amp" );
-	m_startPoIntModel.saveSettings( _doc, _this, "sframe" );
-	m_endPoIntModel.saveSettings( _doc, _this, "eframe" );
+	m_startPointModel.saveSettings( _doc, _this, "sframe" );
+	m_endPointModel.saveSettings( _doc, _this, "eframe" );
 }
 
 
@@ -163,8 +163,8 @@ void audioFileProcessor::loadSettings( const QDomElement & _this )
 	m_reverseModel.loadSettings( _this, "reversed" );
 	m_loopModel.loadSettings( _this, "looped" );
 	m_ampModel.loadSettings( _this, "amp" );
-	m_startPoIntModel.loadSettings( _this, "sframe" );
-	m_endPoIntModel.loadSettings( _this, "eframe" );
+	m_startPointModel.loadSettings( _this, "sframe" );
+	m_endPointModel.loadSettings( _this, "eframe" );
 
 	loopPointChanged();
 }
@@ -251,9 +251,9 @@ void audioFileProcessor::ampModelChanged()
 
 void audioFileProcessor::loopPointChanged()
 {
-	const f_cnt_t f1 = static_cast<f_cnt_t>( m_startPoIntModel.value() *
+	const f_cnt_t f1 = static_cast<f_cnt_t>( m_startPointModel.value() *
 						( m_sampleBuffer.frames()-1 ) );
-	const f_cnt_t f2 = static_cast<f_cnt_t>( m_endPoIntModel.value() *
+	const f_cnt_t f2 = static_cast<f_cnt_t>( m_endPointModel.value() *
 						( m_sampleBuffer.frames()-1 ) );
 	m_sampleBuffer.setStartFrame( qMin<f_cnt_t>( f1, f2 ) );
 	m_sampleBuffer.setEndFrame( qMax<f_cnt_t>( f1, f2 ) );
@@ -472,8 +472,8 @@ void AudioFileProcessorView::modelChanged()
 	connect( &a->m_sampleBuffer, SIGNAL( sampleUpdated() ),
 					this, SLOT( sampleUpdated() ) );
 	m_ampKnob->setModel( &a->m_ampModel );
-	m_startKnob->setModel( &a->m_startPoIntModel );
-	m_endKnob->setModel( &a->m_endPoIntModel );
+	m_startKnob->setModel( &a->m_startPointModel );
+	m_endKnob->setModel( &a->m_endPointModel );
 	m_reverseButton->setModel( &a->m_reverseModel );
 	m_loopButton->setModel( &a->m_loopModel );
 	sampleUpdated();
