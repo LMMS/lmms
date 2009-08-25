@@ -40,18 +40,17 @@ VstSubPluginFeatures::VstSubPluginFeatures( Plugin::PluginTypes _type ) :
 
 
 void VstSubPluginFeatures::fillDescriptionWidget( QWidget * _parent,
-							const Key * _key  )
+													const Key * _key  ) const
 {
 	new QLabel( QWidget::tr( "Name: " ) + _key->name, _parent );
-	new QLabel( QWidget::tr( "File: " ) + _key->attributes["file"],
-								_parent );
+	new QLabel( QWidget::tr( "File: " ) + _key->attributes["file"], _parent );
 }
 
 
 
 
-void VstSubPluginFeatures::listSubPluginKeys( Plugin::Descriptor * _desc,
-								KeyList & _kl )
+void VstSubPluginFeatures::listSubPluginKeys( const Plugin::Descriptor * _desc,
+														KeyList & _kl ) const
 {
 	QStringList dlls = QDir( configManager::inst()->vstDir() ).
 				entryList( QStringList() << "*.dll",
@@ -64,6 +63,5 @@ void VstSubPluginFeatures::listSubPluginKeys( Plugin::Descriptor * _desc,
 		am["file"] = *it;
 		_kl.push_back( Key( _desc, QFileInfo( *it ).baseName(), am ) );
 	}
-
 }
 
