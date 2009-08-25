@@ -119,11 +119,11 @@ case ResourceItem::TypePluginSpecificResource:
 	}
 
 	// iterate through all plugins
-	QVector<Plugin::Descriptor> descriptors;
+	Plugin::DescriptorList descriptors;
 	Plugin::getDescriptorsOfAvailPlugins( descriptors );
 
-	for( QVector<Plugin::Descriptor>::iterator it = descriptors.begin();
-						it != descriptors.end(); ++it )
+	for( Plugin::DescriptorList::ConstIterator it = descriptors.begin();
+											it != descriptors.end(); ++it )
 	{
 		if( it->supportsFileType( ext ) )
 		{

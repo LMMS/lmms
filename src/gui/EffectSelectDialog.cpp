@@ -44,7 +44,7 @@ EffectSelectDialog::EffectSelectDialog( QWidget * _parent ) :
 	// query effects
 	Plugin::getDescriptorsOfAvailPlugins( m_pluginDescriptors );
 
-	for( QVector<Plugin::Descriptor>::Iterator it = m_pluginDescriptors.begin();
+	for( Plugin::DescriptorList::ConstIterator it = m_pluginDescriptors.begin();
 										it != m_pluginDescriptors.end(); ++it )
 	{
 		if( it->type != Plugin::Effect )

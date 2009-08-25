@@ -1778,10 +1778,10 @@ p->putValue( jt->pos, value, false );
 
 	// process all effects
 	EffectKeyList effKeys;
-	QVector<Plugin::Descriptor> pluginDescs;
+	Plugin::DescriptorList pluginDescs;
 	Plugin::getDescriptorsOfAvailPlugins( pluginDescs );
-	for( QVector<Plugin::Descriptor>::Iterator it = pluginDescs.begin();
-					it != pluginDescs.end(); ++it )
+	for( Plugin::DescriptorList::ConstIterator it = pluginDescs.begin();
+											it != pluginDescs.end(); ++it )
 	{
 		if( it->type != Plugin::Effect )
 		{

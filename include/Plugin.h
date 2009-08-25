@@ -2,7 +2,7 @@
  * Plugin.h - class plugin, the base-class and generic interface for all plugins
  *
  * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -22,14 +22,12 @@
  *
  */
 
-
 #ifndef _PLUGIN_H
 #define _PLUGIN_H
 
-
 #include <QtCore/QString>
 #include <QtCore/QStringList>
-#include <QtCore/QVector>
+#include <QtCore/QList>
 #include <QtXml/QDomDocument>
 
 #include "JournallingObject.h"
@@ -96,7 +94,7 @@ public:
 			{
 				typedef QMap<QString, QString> AttributeMap;
 
-				inline Key( Plugin::Descriptor * _desc = NULL,
+				inline Key( const Plugin::Descriptor * _desc = NULL,
 							const QString & _name = QString(),
 							const AttributeMap & _am = AttributeMap() )
 					:
@@ -116,7 +114,7 @@ public:
 							name != QString::null;
 				}
 
-				Plugin::Descriptor * desc;
+				const Plugin::Descriptor * desc;
 				QString name;
 				AttributeMap attributes;
 			} ;
@@ -150,6 +148,9 @@ public:
 		SubPluginFeatures * subPluginFeatures;
 
 	} ;
+
+	// typedef a list so we can easily work with list of plugin descriptors
+	typedef QList<Descriptor> DescriptorList;
 
 	// contructor of a plugin
 	Plugin( const Descriptor * _descriptor, Model * _parent );
@@ -188,9 +189,8 @@ public:
 	static Plugin * instantiate( const QString & _plugin_name,
 									Model * _parent, void * _data );
 
-	// fills given vector with descriptors of all available plugins
-	static void getDescriptorsOfAvailPlugins(
-					QVector<Descriptor> & _plugin_descs );
+	// fills given list with descriptors of all available plugins
+	static void getDescriptorsOfAvailPlugins( DescriptorList & _plugin_descs );
 
 	// create a view for the model 
 	PluginView * createView( QWidget * _parent );
