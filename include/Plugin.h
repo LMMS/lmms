@@ -124,11 +124,12 @@ public:
 			{
 			}
 
-			virtual void fillDescriptionWidget( QWidget *, const Key * )
+			virtual void fillDescriptionWidget( QWidget *, const Key * ) const
 			{
 			}
 
-			virtual void listSubPluginKeys( Plugin::Descriptor *, KeyList & )
+			virtual void listSubPluginKeys( const Plugin::Descriptor *,
+															KeyList & ) const
 			{
 			}
 

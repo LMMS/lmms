@@ -25,7 +25,6 @@
  *
  */
 
-
 #include <QtGui/QHBoxLayout>
 #include <QtGui/QLabel>
 
@@ -46,7 +45,7 @@ LadspaSubPluginFeatures::LadspaSubPluginFeatures( Plugin::PluginTypes _type ) :
 
 
 void LadspaSubPluginFeatures::fillDescriptionWidget( QWidget * _parent,
-														const Key * _key  )
+													const Key * _key  ) const
 {
 	const ladspa_key_t & lkey = subPluginKeyToLadspaKey( _key );
 	ladspa2LMMS * lm = engine::getLADSPAManager();
@@ -114,8 +113,8 @@ void LadspaSubPluginFeatures::fillDescriptionWidget( QWidget * _parent,
 
 
 
-void LadspaSubPluginFeatures::listSubPluginKeys( Plugin::Descriptor * _desc,
-																KeyList & _kl )
+void LadspaSubPluginFeatures::listSubPluginKeys(
+						const Plugin::Descriptor * _desc, KeyList & _kl ) const
 {
 	ladspa2LMMS * lm = engine::getLADSPAManager();
 
