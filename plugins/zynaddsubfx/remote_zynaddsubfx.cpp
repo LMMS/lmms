@@ -2,7 +2,7 @@
  * remote_zynaddsubfx.cpp - ZynAddSubFX-embedding plugin
  *
  * Copyright (c) 2008-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -22,40 +22,29 @@
  *
  */
 
-
 #include <lmmsconfig.h>
 #include <queue>
 
 #define BUILD_REMOTE_PLUGIN_CLIENT
-#include "engine.h"
-#include "instrument_play_handle.h"
-#include "note_play_handle.h"
+#include "note.h"
 #include "RemotePlugin.h"
 #include "remote_zynaddsubfx.h"
 
-
-std::string __presets_dir;
-
-#define main unused_main
-#ifdef LMMS_BUILD_LINUX
-#define ATOM(x) (x)
-#endif
-#include "src/main.C"
-
-#undef main
+#include "src/Misc/Master.h"
+#include "src/Misc/Util.h"
+#include "src/Misc/Dump.h"
+#include "src/UI/MasterUI.h"
 
 #include <FL/x.H>
-
-static pthread_t __gui_thread_handle;
-static pthread_mutex_t __gui_mutex;
-static std::queue<RemotePluginClient::message> __gui_messages;
 
 
 class RemoteZynAddSubFX : public RemotePluginClient
 {
 public:
 	RemoteZynAddSubFX( int _shm_in, int _shm_out ) :
-		RemotePluginClient( _shm_in, _shm_out )
+		RemotePluginClient( _shm_in, _shm_out ),
+		m_guiSleepTime( 100 ),
+		m_guiExit( false )
 	{
 		for( int i = 0; i < NumKeys; ++i )
 		{
@@ -80,17 +69,29 @@ public:
 		OscilGen::tmpsmps = new REALTYPE[OSCIL_SIZE];
 		newFFTFREQS( &OscilGen::outoscilFFTfreqs, OSCIL_SIZE/2 );
 
-		master = new Master();
-		master->swaplr = 0;
+		m_master = new Master();
+		m_master->swaplr = 0;
+
+		pthread_mutex_init( &m_guiMutex, NULL );
+		pthread_create( &m_guiThreadHandle, NULL, guiThread, this );
+
 	}
 
 	virtual ~RemoteZynAddSubFX()
 	{
-		delete master;
+		m_guiExit = true;
+#ifdef LMMS_BUILD_WIN32
+		Sleep( m_guiSleepTime * 2 );
+#else
+		usleep( m_guiSleepTime * 2 * 1000 );
+#endif
+
+		delete m_master;
 
 		delete[] denormalkillbuf;
 		delete[] OscilGen::tmpsmps;
 		deleteFFTFREQS( &OscilGen::outoscilFFTfreqs );
+		pthread_mutex_destroy( &m_guiMutex );
 	}
 
 	virtual void updateSampleRate()
@@ -103,9 +104,19 @@ public:
 		SOUND_BUFFER_SIZE = bufferSize();
 	}
 
+	void run()
+	{
+		message m;
+		while( ( m = receiveMessage() ).id != IdQuit )
+		{
+			pthread_mutex_lock( &m_master->mutex );
+			processMessage( m );
+			pthread_mutex_unlock( &m_master->mutex );
+		}
+	}
+
 	virtual bool processMessage( const message & _m )
 	{
-		bool gui_message = false;
 		switch( _m.id )
 		{
 			case IdQuit:
@@ -115,50 +126,47 @@ public:
 			case IdHideUI:
 			case IdLoadSettingsFromFile:
 			case IdLoadPresetFromFile:
-				gui_message = true;
+				pthread_mutex_lock( &m_guiMutex );
+				m_guiMessages.push( _m );
+				pthread_mutex_unlock( &m_guiMutex );
 				break;
 
 			case IdSaveSettingsToFile:
 			{
 				char * name = strdup( _m.getString().c_str() );
-				master->saveXML( name );
+				m_master->saveXML( name );
 				free( name );
 				sendMessage( IdSaveSettingsToFile );
-				return true;
 				break;
 			}
 
 			case IdZasfPresetDirectory:
-				__presets_dir = _m.getString();
-	for( int i = 0; i < MAX_BANK_ROOT_DIRS; ++i )
-	{
-		if( config.cfg.bankRootDirList[i] == NULL )
-		{
-			config.cfg.bankRootDirList[i] = new char[MAX_STRING_SIZE];
-			strcpy(config.cfg.bankRootDirList[i], __presets_dir.c_str() );
-			break;
-		}
-		else if( strcmp( config.cfg.bankRootDirList[i],
-						__presets_dir.c_str() ) == 0 )
-		{
-			break;
-		}
-	}
+				m_presetsDir = _m.getString();
+				for( int i = 0; i < MAX_BANK_ROOT_DIRS; ++i )
+				{
+					if( config.cfg.bankRootDirList[i] == NULL )
+					{
+						config.cfg.bankRootDirList[i] =
+												new char[MAX_STRING_SIZE];
+						strcpy( config.cfg.bankRootDirList[i],
+												m_presetsDir.c_str() );
+						break;
+					}
+					else if( strcmp( config.cfg.bankRootDirList[i],
+										m_presetsDir.c_str() ) == 0 )
+					{
+						break;
+					}
+				}
 				break;
 
 			default:
 				return RemotePluginClient::processMessage( _m );
 		}
-		if( gui_message )
-		{
-			pthread_mutex_lock( &__gui_mutex );
-			__gui_messages.push( _m );
-			pthread_mutex_unlock( &__gui_mutex );
-		}
 		return true;
 	}
 
-	// all functions are called while master->mutex is held
+	// all functions are called while m_master->mutex is held
 	virtual void processMidiEvent( const midiEvent & _e,
 									const f_cnt_t /* _offset */ )
 	{
@@ -175,11 +183,10 @@ public:
 					}
 					if( m_runningNotes[_e.key()] > 0 )
 					{
-						master->NoteOff( 0, _e.key() );
+						m_master->NoteOff( 0, _e.key() );
 					}
 					++m_runningNotes[_e.key()];
-					master->NoteOn( 0, _e.key(),
-							_e.velocity() );
+					m_master->NoteOn( 0, _e.key(), _e.velocity() );
 					break;
 				}
 			case MidiNoteOff:
@@ -189,19 +196,18 @@ public:
 				}
 				if( --m_runningNotes[_e.key()] <= 0 )
 				{
-					master->NoteOff( 0, _e.key() );
+					m_master->NoteOff( 0, _e.key() );
 				}
 				break;
 			case MidiPitchBend:
-				master->SetController( 0,
-					C_pitchwheel,
-					_e.m_data.m_param[0] +
-						_e.m_data.m_param[1]*128-8192 );
+				m_master->SetController( 0, C_pitchwheel,
+							_e.m_data.m_param[0] +
+								_e.m_data.m_param[1]*128-8192 );
 				break;
 			case MidiControlChange:
-				master->SetController( 0,
-					midiIn.getcontroller( _e.m_data.m_param[0] ),
-					_e.m_data.m_param[1] );
+				m_master->SetController( 0,
+							midiIn.getcontroller( _e.m_data.m_param[0] ),
+							_e.m_data.m_param[1] );
 				break;
 			default:
 				break;
@@ -214,49 +220,61 @@ public:
 		REALTYPE outputl[SOUND_BUFFER_SIZE];
 		REALTYPE outputr[SOUND_BUFFER_SIZE];
 
-		master->AudioOut( outputl, outputr );
+		m_master->AudioOut( outputl, outputr );
 
-		for( fpp_t f = 0; f < SOUND_BUFFER_SIZE; ++f )
+		for( int f = 0; f < SOUND_BUFFER_SIZE; ++f )
 		{
 			_out[f][0] = outputl[f];
 			_out[f][1] = outputr[f];
 		}
 	}
 
+	static void * guiThread( void * _arg );
+
 
 private:
+	std::string m_presetsDir;
+
+	const int m_guiSleepTime;
 	int m_runningNotes[NumKeys];
+	Master * m_master;
+
+	pthread_t m_guiThreadHandle;
+	pthread_mutex_t m_guiMutex;
+	std::queue<RemotePluginClient::message> m_guiMessages;
+	bool m_guiExit;
 
 } ;
 
-static RemoteZynAddSubFX * __remote_zasf = NULL;
-static int __exit = 0;
 
 
-void * guiThread( void * )
+void * RemoteZynAddSubFX::guiThread( void * _arg )
 {
 	int e;
-	ui = NULL;
+	MasterUI * ui = NULL;
 
-	while( !__exit )
+	RemoteZynAddSubFX * _this = static_cast<RemoteZynAddSubFX *>( _arg );
+	Master * master = _this->m_master;
+
+	while( !_this->m_guiExit )
 	{
 		if( ui )
 		{
-			Fl::wait( 0.1 );
+			Fl::wait( _this->m_guiSleepTime / 1000.0 );
 		}
 		else
 		{
 #ifdef LMMS_BUILD_WIN32
-			Sleep( 100 );
+			Sleep( _this->m_guiSleepTime );
 #else
-			usleep( 100*1000 );
+			usleep( _this->m_guiSleepTime*1000 );
 #endif
 		}
-		pthread_mutex_lock( &__gui_mutex );
-		while( __gui_messages.size() )
+		pthread_mutex_lock( &_this->m_guiMutex );
+		while( _this->m_guiMessages.size() )
 		{
-			RemotePluginClient::message m = __gui_messages.front();
-			__gui_messages.pop();
+			RemotePluginClient::message m = _this->m_guiMessages.front();
+			_this->m_guiMessages.pop();
 			switch( m.id )
 			{
 				case IdShowUI:
@@ -275,21 +293,20 @@ void * guiThread( void * )
 					switch( config.cfg.UserInterfaceMode )
 					{
 						case 0:
-				ui->selectuiwindow->hide();
-				break;
+							ui->selectuiwindow->hide();
+							break;
 						case 1:
-				ui->masterwindow->hide();
-				break;
+							ui->masterwindow->hide();
+							break;
 						case 2:
-				ui->simplemasterwindow->hide();
-				break;
+							ui->simplemasterwindow->hide();
+							break;
 					}
 					break;
 
 				case IdLoadSettingsFromFile:
 				{
-					char * f = strdup( m.getString().
-								c_str() );
+					char * f = strdup( m.getString().c_str() );
 					pthread_mutex_lock( &master->mutex );
 					master->defaults();
 					master->loadXML( f );
@@ -299,16 +316,14 @@ void * guiThread( void * )
 					unlink( f );
 					free( f );
 					pthread_mutex_lock( &master->mutex );
-					__remote_zasf->sendMessage(
-						IdLoadSettingsFromFile );
+					_this->sendMessage( IdLoadSettingsFromFile );
 					pthread_mutex_unlock( &master->mutex );
 					break;
 				}
 
 				case IdLoadPresetFromFile:
 				{
-					char * f = strdup( m.getString().
-								c_str() );
+					char * f = strdup( m.getString().c_str() );
 					pthread_mutex_lock( &master->mutex );
 					const int npart = ui ?
 						ui->npartcounter->value()-1 : 0;
@@ -324,8 +339,7 @@ void * guiThread( void * )
 					}
 					free( f );
 					pthread_mutex_lock( &master->mutex );
-					__remote_zasf->sendMessage(
-							IdLoadPresetFromFile );
+					_this->sendMessage( IdLoadPresetFromFile );
 					pthread_mutex_unlock( &master->mutex );
 					break;
 				}
@@ -334,9 +348,11 @@ void * guiThread( void * )
 					break;
 			}
 		}
-		pthread_mutex_unlock( &__gui_mutex );
+		pthread_mutex_unlock( &_this->m_guiMutex );
 	}
 	Fl::flush();
+
+	delete ui;
 
 	return NULL;
 }
@@ -358,30 +374,14 @@ int main( int _argc, char * * _argv )
 	pthread_win32_thread_attach_np();
 #endif
 
-	pthread_mutex_init( &__gui_mutex, NULL );
 
-	__remote_zasf = new RemoteZynAddSubFX( atoi( _argv[1] ), atoi( _argv[2] ) );
+	RemoteZynAddSubFX * remoteZASF =
+		new RemoteZynAddSubFX( atoi( _argv[1] ), atoi( _argv[2] ) );
 
-	pthread_create( &__gui_thread_handle, NULL, guiThread, NULL );
+	remoteZASF->run();
 
-	RemotePluginClient::message m;
-	while( ( m = __remote_zasf->receiveMessage() ).id != IdQuit )
-	{
-		pthread_mutex_lock( &master->mutex );
-		__remote_zasf->processMessage( m );
-		pthread_mutex_unlock( &master->mutex );
-	}
+	delete remoteZASF;
 
-	__exit = 1;
-#ifdef LMMS_BUILD_WIN32
-	Sleep( 200 );
-#else
-	usleep( 200*1000 );
-#endif
-
-	delete __remote_zasf;
-
-	pthread_mutex_destroy( &__gui_mutex );
 
 #ifdef LMMS_BUILD_WIN32
 	pthread_win32_thread_detach_np();
@@ -390,7 +390,5 @@ int main( int _argc, char * * _argv )
 
 	return 0;
 }
-
-
 
 
