@@ -343,7 +343,7 @@ public:
   }
 
   HRESULT __stdcall Next(ULONG celt, FORMATETC * rgelt, ULONG *pceltFetched) {
-    if (n > 0) return S_false;
+    if (n > 0) return S_FALSE;
     for (ULONG i = 0; i < celt; i++) {
       n++;
       rgelt->cfFormat = CF_HDROP;
@@ -358,7 +358,7 @@ public:
 
   HRESULT __stdcall Skip(ULONG celt) {
     n += celt;
-    return  (n == 0) ? S_OK : S_false;
+    return  (n == 0) ? S_OK : S_FALSE;
   }
 
   HRESULT __stdcall Reset(void) {
