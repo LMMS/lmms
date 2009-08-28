@@ -1,8 +1,8 @@
 /*
- * remote_zynaddsubfx.h - ZynAddSubFX-embedding plugin
+ * RemoteZynAddSubFx.h - ZynAddSubFX-embedding plugin
  *
- * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ * Copyright (c) 2008-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -21,7 +21,6 @@
  * Boston, MA 02110-1301 USA.
  *
  */
-
 
 #ifndef _REMOTE_ZYNADDSUBFX_H
 #define _REMOTE_ZYNADDSUBFX_H

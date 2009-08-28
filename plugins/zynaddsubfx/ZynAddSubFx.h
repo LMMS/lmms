@@ -1,5 +1,5 @@
 /*
- * zynaddsubfx.h - ZynAddSubFX-embedding plugin
+ * ZynAddSubFx.h - ZynAddSubFX-embedding plugin
  *
  * Copyright (c) 2008-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
@@ -22,12 +22,10 @@
  *
  */
 
-
 #ifndef _ZYNADDSUBFX_H
 #define _ZYNADDSUBFX_H
 
 #include <QtCore/QMutex>
-#include <QtCore/QThread>
 
 #include "Instrument.h"
 #include "InstrumentView.h"
@@ -36,16 +34,17 @@
 
 class QPushButton;
 
+class LocalZynAddSubFx;
 class ZynAddSubFxView;
 class notePlayHandle;
 
 
-class zynAddSubFx : public Instrument
+class ZynAddSubFxInstrument : public Instrument
 {
 	Q_OBJECT
 public:
-	zynAddSubFx( InstrumentTrack * _instrument_track );
-	virtual ~zynAddSubFx();
+	ZynAddSubFxInstrument( InstrumentTrack * _instrument_track );
+	virtual ~ZynAddSubFxInstrument();
 
 	virtual void play( sampleFrame * _working_buffer );
 
@@ -69,15 +68,16 @@ public:
 
 
 private slots:
-	void updateSampleRate();
+	void reloadPlugin();
 
 
 private:
-	void initRemotePlugin();
+	void initPlugin();
 
+	bool m_hasGUI;
 	QMutex m_pluginMutex;
-	RemotePlugin * m_plugin;
-
+	LocalZynAddSubFx * m_plugin;
+	RemotePlugin * m_remotePlugin;
 	friend class ZynAddSubFxView;
 
 
