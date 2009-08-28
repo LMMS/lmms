@@ -3,7 +3,7 @@
  *					 into a flac file. This is used for song-export.
  *
  * Copyright (c) 2009 Andrew Kelley <superjoe30@gmail.com>
- * 
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -25,6 +25,10 @@
 
 #ifndef _AUDIO_FILE_FLAC_H_
 #define _AUDIO_FILE_FLAC_H_
+
+#include "lmmsconfig.h"
+
+#ifdef LMMS_HAVE_FLAC
 
 #include <QFile>
 #include "AudioFileDevice.h"
@@ -82,6 +86,7 @@ private:
 
 } ;
 
+#endif
 
 #endif //_AUDIO_FILE_FLAC_H_
 

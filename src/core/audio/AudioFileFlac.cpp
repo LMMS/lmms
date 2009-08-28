@@ -25,6 +25,8 @@
 
 #include "AudioFileFlac.h"
 
+#ifdef LMMS_HAVE_FLAC
+
 #include <QtDebug>
 
 #include "lmms_basics.h"
@@ -121,5 +123,7 @@ AudioFileFlac::~AudioFileFlac()
 {
 	finishEncoding();
 }
+
+#endif
 
 /* vim: set tw=0 noexpandtab: */
