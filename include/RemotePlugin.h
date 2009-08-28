@@ -701,7 +701,11 @@ public:
 
 	inline bool isRunning()
 	{
+#ifdef DEBUG_REMOTE_PLUGIN
+		return true;
+#else
 		return m_process.state() != QProcess::NotRunning;
+#endif
 	}
 
 	inline void waitForInitDone( bool _busy_waiting = true )
@@ -993,8 +997,7 @@ RemotePluginBase::message RemotePluginBase::waitForMessage(
 
 
 RemotePluginClient::RemotePluginClient( key_t _shm_in, key_t _shm_out ) :
-	RemotePluginBase( new shmFifo( _shm_in ),
-				new shmFifo( _shm_out ) ),
+	RemotePluginBase( new shmFifo( _shm_in ), new shmFifo( _shm_out ) ),
 #ifdef USE_QT_SHMEM
 	m_shmObj(),
 #endif

@@ -22,8 +22,11 @@
  *
  */
 
-
 #define COMPILE_REMOTE_PLUGIN_BASE
+//#define DEBUG_REMOTE_PLUGIN
+#ifdef DEBUG_REMOTE_PLUGIN
+#include <QtCore/QDebug>
+#endif
 
 #include "RemotePlugin.h"
 #include "mixer.h"
@@ -34,11 +37,6 @@
 
 #ifdef LMMS_HAVE_UNISTD_H
 #include <unistd.h>
-#endif
-
-//#define DEBUG_REMOTE_PLUGIN
-#ifdef DEBUG_REMOTE_PLUGIN
-#include <QtCore/QDebug>
 #endif
 
 
