@@ -208,7 +208,7 @@ DllMain(HINSTANCE hinst,		/* I - DLL module handle */
   { 
     case DLL_PROCESS_ATTACH :		/* Called on library initialization */
         if ((_mxml_tls_index = TlsAlloc()) == TLS_OUT_OF_INDEXES) 
-          return (false); 
+          return (FALSE); 
         break; 
 
     case DLL_THREAD_DETACH :		/* Called when a thread terminates */
@@ -227,7 +227,7 @@ DllMain(HINSTANCE hinst,		/* I - DLL module handle */
         break; 
   } 
 
-  return (true);
+  return (TRUE);
 }
 
 
