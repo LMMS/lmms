@@ -1,5 +1,5 @@
 /*
- * remote_zynaddsubfx.cpp - ZynAddSubFX-embedding plugin
+ * RemoteZynAddSubFx.cpp - ZynAddSubFx-embedding plugin
  *
  * Copyright (c) 2008-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -28,56 +28,32 @@
 #define BUILD_REMOTE_PLUGIN_CLIENT
 #include "note.h"
 #include "RemotePlugin.h"
-#include "remote_zynaddsubfx.h"
+#include "RemoteZynAddSubFx.h"
+#include "LocalZynAddSubFx.h"
 
-#include "src/Misc/Master.h"
-#include "src/Misc/Util.h"
-#include "src/Misc/Dump.h"
 #include "src/UI/MasterUI.h"
 
 #include <FL/x.H>
 
 
-class RemoteZynAddSubFX : public RemotePluginClient
+class RemoteZynAddSubFx : public RemotePluginClient, public LocalZynAddSubFx
 {
 public:
-	RemoteZynAddSubFX( int _shm_in, int _shm_out ) :
+	RemoteZynAddSubFx( int _shm_in, int _shm_out ) :
 		RemotePluginClient( _shm_in, _shm_out ),
+		LocalZynAddSubFx(),
 		m_guiSleepTime( 100 ),
 		m_guiExit( false )
 	{
-		for( int i = 0; i < NumKeys; ++i )
-		{
-			m_runningNotes[i] = 0;
-		}
 		setInputCount( 0 );
 		sendMessage( IdInitDone );
 		waitForMessage( IdInitDone );
 
-		config.init();
-		OSCIL_SIZE = config.cfg.OscilSize;
-
-		config.cfg.GzipCompression = 0;
-
-		srand( time( NULL ) );
-		denormalkillbuf = new REALTYPE[SOUND_BUFFER_SIZE];
-		for( int i = 0; i < SOUND_BUFFER_SIZE; ++i )
-		{
-			denormalkillbuf[i] = (RND-0.5)*1e-16;
-		}
-
-		OscilGen::tmpsmps = new REALTYPE[OSCIL_SIZE];
-		newFFTFREQS( &OscilGen::outoscilFFTfreqs, OSCIL_SIZE/2 );
-
-		m_master = new Master();
-		m_master->swaplr = 0;
-
 		pthread_mutex_init( &m_guiMutex, NULL );
 		pthread_create( &m_guiThreadHandle, NULL, guiThread, this );
-
 	}
 
-	virtual ~RemoteZynAddSubFX()
+	virtual ~RemoteZynAddSubFx()
 	{
 		m_guiExit = true;
 #ifdef LMMS_BUILD_WIN32
@@ -85,23 +61,16 @@ public:
 #else
 		usleep( m_guiSleepTime * 2 * 1000 );
 #endif
-
-		delete m_master;
-
-		delete[] denormalkillbuf;
-		delete[] OscilGen::tmpsmps;
-		deleteFFTFREQS( &OscilGen::outoscilFFTfreqs );
-		pthread_mutex_destroy( &m_guiMutex );
 	}
 
 	virtual void updateSampleRate()
 	{
-		SAMPLE_RATE = sampleRate();
+		LocalZynAddSubFx::setSampleRate( sampleRate() );
 	}
 
 	virtual void updateBufferSize()
 	{
-		SOUND_BUFFER_SIZE = bufferSize();
+		LocalZynAddSubFx::setBufferSize( bufferSize() );
 	}
 
 	void run()
@@ -133,31 +102,13 @@ public:
 
 			case IdSaveSettingsToFile:
 			{
-				char * name = strdup( _m.getString().c_str() );
-				m_master->saveXML( name );
-				free( name );
+				LocalZynAddSubFx::saveXML( _m.getString() );
 				sendMessage( IdSaveSettingsToFile );
 				break;
 			}
 
 			case IdZasfPresetDirectory:
-				m_presetsDir = _m.getString();
-				for( int i = 0; i < MAX_BANK_ROOT_DIRS; ++i )
-				{
-					if( config.cfg.bankRootDirList[i] == NULL )
-					{
-						config.cfg.bankRootDirList[i] =
-												new char[MAX_STRING_SIZE];
-						strcpy( config.cfg.bankRootDirList[i],
-												m_presetsDir.c_str() );
-						break;
-					}
-					else if( strcmp( config.cfg.bankRootDirList[i],
-										m_presetsDir.c_str() ) == 0 )
-					{
-						break;
-					}
-				}
+				LocalZynAddSubFx::setPresetDir( _m.getString() );
 				break;
 
 			default:
@@ -170,74 +121,20 @@ public:
 	virtual void processMidiEvent( const midiEvent & _e,
 									const f_cnt_t /* _offset */ )
 	{
-		static MidiIn midiIn;
-
-		switch( _e.m_type )
-		{
-			case MidiNoteOn:
-				if( _e.velocity() > 0 )
-				{
-					if( _e.key() <= 0 || _e.key() >= 128 )
-					{
-						break;
-					}
-					if( m_runningNotes[_e.key()] > 0 )
-					{
-						m_master->NoteOff( 0, _e.key() );
-					}
-					++m_runningNotes[_e.key()];
-					m_master->NoteOn( 0, _e.key(), _e.velocity() );
-					break;
-				}
-			case MidiNoteOff:
-				if( _e.key() <= 0 || _e.key() >= 128 )
-				{
-					break;
-				}
-				if( --m_runningNotes[_e.key()] <= 0 )
-				{
-					m_master->NoteOff( 0, _e.key() );
-				}
-				break;
-			case MidiPitchBend:
-				m_master->SetController( 0, C_pitchwheel,
-							_e.m_data.m_param[0] +
-								_e.m_data.m_param[1]*128-8192 );
-				break;
-			case MidiControlChange:
-				m_master->SetController( 0,
-							midiIn.getcontroller( _e.m_data.m_param[0] ),
-							_e.m_data.m_param[1] );
-				break;
-			default:
-				break;
-		}
+		LocalZynAddSubFx::processMidiEvent( _e );
 	}
 
 
 	virtual void process( const sampleFrame * _in, sampleFrame * _out )
 	{
-		REALTYPE outputl[SOUND_BUFFER_SIZE];
-		REALTYPE outputr[SOUND_BUFFER_SIZE];
-
-		m_master->AudioOut( outputl, outputr );
-
-		for( int f = 0; f < SOUND_BUFFER_SIZE; ++f )
-		{
-			_out[f][0] = outputl[f];
-			_out[f][1] = outputr[f];
-		}
+		LocalZynAddSubFx::processAudio( _out );
 	}
 
 	static void * guiThread( void * _arg );
 
 
 private:
-	std::string m_presetsDir;
-
 	const int m_guiSleepTime;
-	int m_runningNotes[NumKeys];
-	Master * m_master;
 
 	pthread_t m_guiThreadHandle;
 	pthread_mutex_t m_guiMutex;
@@ -248,12 +145,12 @@ private:
 
 
 
-void * RemoteZynAddSubFX::guiThread( void * _arg )
+void * RemoteZynAddSubFx::guiThread( void * _arg )
 {
 	int e;
 	MasterUI * ui = NULL;
 
-	RemoteZynAddSubFX * _this = static_cast<RemoteZynAddSubFX *>( _arg );
+	RemoteZynAddSubFx * _this = static_cast<RemoteZynAddSubFx *>( _arg );
 	Master * master = _this->m_master;
 
 	while( !_this->m_guiExit )
@@ -306,15 +203,11 @@ void * RemoteZynAddSubFX::guiThread( void * _arg )
 
 				case IdLoadSettingsFromFile:
 				{
-					char * f = strdup( m.getString().c_str() );
-					pthread_mutex_lock( &master->mutex );
-					master->defaults();
-					master->loadXML( f );
-					pthread_mutex_unlock( &master->mutex );
-					master->applyparameters();
-					if( ui ) ui->refresh_master_ui();
-					unlink( f );
-					free( f );
+					_this->LocalZynAddSubFx::loadXML( m.getString() );
+					if( ui )
+					{
+						ui->refresh_master_ui();
+					}
 					pthread_mutex_lock( &master->mutex );
 					_this->sendMessage( IdLoadSettingsFromFile );
 					pthread_mutex_unlock( &master->mutex );
@@ -323,21 +216,14 @@ void * RemoteZynAddSubFX::guiThread( void * _arg )
 
 				case IdLoadPresetFromFile:
 				{
-					char * f = strdup( m.getString().c_str() );
-					pthread_mutex_lock( &master->mutex );
-					const int npart = ui ?
-						ui->npartcounter->value()-1 : 0;
-					master->part[npart]->defaultsinstrument();
-					master->part[npart]->loadXMLinstrument( f );
-					pthread_mutex_unlock( &master->mutex );
-					master->applyparameters();
+					_this->LocalZynAddSubFx::loadPreset( m.getString(), ui ?
+											ui->npartcounter->value()-1 : 0 );
 					if( ui )
 					{
 						ui->npartcounter->do_callback();
 						ui->updatepanel();
 						ui->refresh_master_ui();
 					}
-					free( f );
 					pthread_mutex_lock( &master->mutex );
 					_this->sendMessage( IdLoadPresetFromFile );
 					pthread_mutex_unlock( &master->mutex );
@@ -375,8 +261,8 @@ int main( int _argc, char * * _argv )
 #endif
 
 
-	RemoteZynAddSubFX * remoteZASF =
-		new RemoteZynAddSubFX( atoi( _argv[1] ), atoi( _argv[2] ) );
+	RemoteZynAddSubFx * remoteZASF =
+		new RemoteZynAddSubFx( atoi( _argv[1] ), atoi( _argv[2] ) );
 
 	remoteZASF->run();
 
