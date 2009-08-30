@@ -32,7 +32,7 @@
 #include "ResourceItem.h"
 
 
-class LocalResourceProvider : public ResourceProvider
+class EXPORT LocalResourceProvider : public ResourceProvider
 {
 	Q_OBJECT
 public:

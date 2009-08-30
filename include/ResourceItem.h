@@ -30,11 +30,12 @@
 #include <QtCore/QHash>
 #include <QtCore/QList>
 
+#include "export.h"
 #include "ResourceProvider.h"
 #include "TreeRelation.h"
 
 
-class ResourceItem
+class EXPORT ResourceItem
 {
 public:
 	typedef TreeRelation<ResourceItem> Relation;

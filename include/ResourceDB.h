@@ -34,7 +34,7 @@
 #include "ResourceItem.h"
 
 
-class ResourceDB : public QObject
+class EXPORT ResourceDB : public QObject
 {
 	Q_OBJECT
 public:

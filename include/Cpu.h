@@ -26,6 +26,7 @@
 #define _CPU_H
 
 #include "lmms_basics.h"
+#include "export.h"
 
 #ifdef LMMS_HAVE_STDBOOL_H
 #include <stdbool.h>
@@ -41,8 +42,8 @@ void init();
 void * memAlloc( int _bytes );
 void memFree( void * _buf );
 
-sampleFrameA * allocFrames( int _frames );
-void freeFrames( sampleFrameA * _buf );
+sampleFrameA * EXPORT allocFrames( int _frames );
+void EXPORT freeFrames( sampleFrameA * _buf );
 
 
 // all functions assume data to be 16 byte  and size to be
@@ -83,7 +84,7 @@ extern BufMixFunc bufMix;
 extern BufMixLRCoeffFunc bufMixLRCoeff;
 extern UnalignedBufMixLRCoeffFunc unalignedBufMixLRCoeff;
 extern BufWetDryMixFunc bufWetDryMix;
-extern BufWetDryMixSplittedFunc bufWetDryMixSplitted;
+extern EXPORT BufWetDryMixSplittedFunc bufWetDryMixSplitted;
 extern ConvertToS16Func convertToS16;
 
 #ifdef __cplusplus
