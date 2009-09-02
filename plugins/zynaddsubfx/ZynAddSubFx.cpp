@@ -51,7 +51,7 @@ static const char * __supportedExts[] =
 extern "C"
 {
 
-Plugin::Descriptor PLUGIN_EXPORT ZynAddSubFx_plugin_descriptor =
+Plugin::Descriptor PLUGIN_EXPORT zynaddsubfx_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"ZynAddSubFX",
@@ -71,7 +71,7 @@ Plugin::Descriptor PLUGIN_EXPORT ZynAddSubFx_plugin_descriptor =
 
 ZynAddSubFxInstrument::ZynAddSubFxInstrument(
 									InstrumentTrack * _instrumentTrack ) :
-	Instrument( _instrumentTrack, &ZynAddSubFx_plugin_descriptor ),
+	Instrument( _instrumentTrack, &zynaddsubfx_plugin_descriptor ),
 	m_hasGUI( false ),
 	m_plugin( NULL ),
 	m_remotePlugin( NULL )
@@ -211,7 +211,7 @@ void ZynAddSubFxInstrument::loadResource( const ResourceItem * _item )
 
 QString ZynAddSubFxInstrument::nodeName() const
 {
-	return ZynAddSubFx_plugin_descriptor.name;
+	return zynaddsubfx_plugin_descriptor.name;
 }
 
 
