@@ -798,17 +798,25 @@ void MainWindow::help( void )
 
 void MainWindow::toggleWindow( QWidget * _w )
 {
-	if( m_workspace->activeSubWindow() != _w->parentWidget()
-				|| _w->parentWidget()->isHidden() )
+	QWidget * parent = _w->parentWidget();
+
+	if( m_workspace->activeSubWindow() != parent
+				|| parent->isHidden() )
 	{
-		_w->parentWidget()->show();
+		parent->show();
 		_w->show();
 		_w->setFocus();
 	}
 	else
 	{
-		_w->parentWidget()->hide();
+		parent->hide();
 	}
+
+	// Workaround for Qt Bug #260116
+	m_workspace->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
+	m_workspace->setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
+	m_workspace->setHorizontalScrollBarPolicy( Qt::ScrollBarAsNeeded );
+	m_workspace->setVerticalScrollBarPolicy( Qt::ScrollBarAsNeeded );
 }
 
 
