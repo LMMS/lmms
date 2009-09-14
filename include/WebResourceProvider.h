@@ -29,9 +29,11 @@
 
 #include "ResourceProvider.h"
 #include "ResourceItem.h"
+#include "ProgressTrackingNetworkAccessManager.h"
 
 
 class QBuffer;
+class QNetworkReply;
 
 
 class WebResourceProvider : public ResourceProvider
@@ -64,7 +66,7 @@ public:
 
 
 private slots:
-	void finishDownload( int _id, bool );
+	void finishDownload( QNetworkReply * _reply );
 
 
 private:
@@ -72,9 +74,11 @@ private:
 											ResourceItem * _item );
 	void importNodeIntoDB( const QDomNode & n,
 							ResourceItem::Relation * _parent );
-	void download( const QString & _path, QBuffer * _target ) const;
+	void download( const QUrl & _url, QBuffer * _target ) const;
+	void downloadAsync( const QUrl & _url, QBuffer * _target ) const;
 
-	static QList<int> m_downloadIDs;
+	typedef QMap<QNetworkReply *, QBuffer *> DownloadMap;
+	static DownloadMap m_downloads;
 
 } ;
 

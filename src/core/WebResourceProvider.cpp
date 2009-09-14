@@ -26,13 +26,12 @@
 #include <QtCore/QCoreApplication>
 #include <QtCore/QDebug>
 #include <QtCore/QUrl>
-#include <QtNetwork/QHttp>
 
 #include "WebResourceProvider.h"
 #include "ResourceDB.h"
 
 
-QList<int> WebResourceProvider::m_downloadIDs;
+WebResourceProvider::DownloadMap WebResourceProvider::m_downloads;
 
 
 WebResourceProvider::WebResourceProvider( const QString & _url ) :
@@ -84,9 +83,26 @@ QByteArray WebResourceProvider::fetchData( const ResourceItem * _item,
 
 
 
-void WebResourceProvider::finishDownload( int _id, bool a )
+void WebResourceProvider::finishDownload( QNetworkReply * _reply )
 {
-	m_downloadIDs << _id;
+	if( _reply->attribute(
+			QNetworkRequest::HttpStatusCodeAttribute ).toInt() == 302 )
+	{
+		const QUrl newLocation =
+			_reply->attribute(
+						QNetworkRequest::RedirectionTargetAttribute ).toUrl();
+		if( newLocation != _reply->url() )
+		{
+			qDebug() << "HTTP forwarding to" << newLocation;
+
+			download( newLocation, m_downloads[_reply] );
+		}
+	}
+	else
+	{
+		m_downloads[_reply]->write( _reply->readAll() );
+	}
+	m_downloads.remove( _reply );
 }
 
 
@@ -192,44 +208,41 @@ void WebResourceProvider::importNodeIntoDB( const QDomNode & _n,
 
 
 
-void WebResourceProvider::download( const QString & _path,
-					QBuffer * _target ) const
+void WebResourceProvider::download( const QUrl & _url, QBuffer * _target ) const
 {
-	// create local http object;
-	QHttp http;
-	connect( &http, SIGNAL( requestFinished( int, bool ) ),
-			this, SLOT( finishDownload( int, bool ) ) );
+	ProgressTrackingNetworkAccessManager netAccMgr( NULL );
+	connect( &netAccMgr, SIGNAL( finished( QNetworkReply * ) ),
+				this, SLOT( finishDownload( QNetworkReply * ) ) );
 
-	// set current URL for http object
-	QUrl u( _path );
-	http.setHost( u.host(), u.port() > 0 ? u.port() : 80 );
-
-	// start the download
-	const int id = http.get( _path, _target );
+	QNetworkReply * activeDownload = netAccMgr.get( QNetworkRequest( _url ) );
+	m_downloads[activeDownload] = _target;
 
 	// wait for the download to finish
-	while( !m_downloadIDs.contains( id ) )
+	while( m_downloads.contains( activeDownload ) )
 	{
 		QCoreApplication::instance()->processEvents();
-	}
-	m_downloadIDs.removeAll( id );
-
-	if( http.lastResponse().statusCode() == 302 )
-	{
-		const QString newLocation =
-				http.lastResponse().value( "location" );
-		if( newLocation != _path )
-		{
-			qDebug() << "HTTP forwarding to" << newLocation;
-
-			_target->seek( 0 );
-			_target->buffer().clear();
-			download( newLocation, _target );
-		}
 	}
 }
 
 
 
+
+void WebResourceProvider::downloadAsync( const QUrl & _url,
+											QBuffer * _target ) const
+{
+	ProgressTrackingNetworkAccessManager * netAccMgr =
+		new ProgressTrackingNetworkAccessManager( NULL );
+	connect( netAccMgr, SIGNAL( finished( QNetworkReply * ) ),
+				this, SLOT( finishDownload( QNetworkReply * ) ) );
+	connect( netAccMgr, SIGNAL( finished( QNetworkReply * ) ),
+				netAccMgr, SLOT( deleteLater() ) );
+
+	QNetworkReply * activeDownload = netAccMgr->get( QNetworkRequest( _url ) );
+	m_downloads[activeDownload] = _target;
+}
+
+
+
 #include "moc_WebResourceProvider.cxx"
+#include "moc_ProgressTrackingNetworkAccessManager.cxx"
 
