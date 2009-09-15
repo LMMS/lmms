@@ -34,7 +34,7 @@
 #include "ResourceFileMapper.h"
 #include "engine.h"
 #include "gui_templates.h"
-#include "instrument_play_handle.h"
+#include "InstrumentPlayHandle.h"
 #include "InstrumentTrack.h"
 #include "VstPlugin.h"
 #include "pixmap_button.h"
@@ -162,12 +162,15 @@ void vestigeInstrument::play( sampleFrame * _buf )
 bool vestigeInstrument::handleMidiEvent( const midiEvent & _me,
 						const midiTime & _time )
 {
-	m_pluginMutex.lock();
-	if( m_plugin != NULL )
+	if( !isMuted() )
 	{
-		m_plugin->processMidiEvent( _me, _time );
+		m_pluginMutex.lock();
+		if( m_plugin != NULL )
+		{
+			m_plugin->processMidiEvent( _me, _time );
+		}
+		m_pluginMutex.unlock();
 	}
-	m_pluginMutex.unlock();
 	return true;
 }
 
