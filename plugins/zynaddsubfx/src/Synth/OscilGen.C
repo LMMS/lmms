@@ -27,14 +27,12 @@
 #include "OscilGen.h"
 #include "../Effects/Distorsion.h"
 
-REALTYPE *OscilGen::tmpsmps;//this array stores some termporary data and it has SOUND_BUFFER_SIZE elements
-FFTFREQS OscilGen::outoscilFFTfreqs;
-
-
 OscilGen::OscilGen(FFTwrapper *fft_,Resonance *res_):Presets(){
     setpresettype("Poscilgen");
     fft=fft_;
     res=res_;
+	tmpsmps = new REALTYPE[OSCIL_SIZE];
+	newFFTFREQS(&outoscilFFTfreqs, OSCIL_SIZE/2);
     newFFTFREQS(&oscilFFTfreqs,OSCIL_SIZE/2);
     newFFTFREQS(&basefuncFFTfreqs,OSCIL_SIZE/2);
 
@@ -45,6 +43,8 @@ OscilGen::OscilGen(FFTwrapper *fft_,Resonance *res_):Presets(){
 };
 
 OscilGen::~OscilGen(){
+	delete[] tmpsmps;
+	deleteFFTFREQS(&outoscilFFTfreqs);
     deleteFFTFREQS(&basefuncFFTfreqs);
     deleteFFTFREQS(&oscilFFTfreqs);
 };

@@ -60,9 +60,6 @@ LocalZynAddSubFx::LocalZynAddSubFx()
 		{
 			denormalkillbuf[i] = (RND-0.5)*1e-16;
 		}
-
-		OscilGen::tmpsmps = new REALTYPE[OSCIL_SIZE];
-		newFFTFREQS( &OscilGen::outoscilFFTfreqs, OSCIL_SIZE/2 );
 	}
 	++s_instanceCount;
 
@@ -80,8 +77,6 @@ LocalZynAddSubFx::~LocalZynAddSubFx()
 	if( --s_instanceCount == 0 )
 	{
 		delete[] denormalkillbuf;
-		delete[] OscilGen::tmpsmps;
-		deleteFFTFREQS( &OscilGen::outoscilFFTfreqs );
 	}
 }
 

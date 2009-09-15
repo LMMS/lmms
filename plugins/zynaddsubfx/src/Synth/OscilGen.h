@@ -107,11 +107,11 @@ class OscilGen:public Presets{
 	
 	bool ADvsPAD;//if it is used by ADsynth or by PADsynth
 
-	static REALTYPE *tmpsmps;//this array stores some termporary data and it has SOUND_BUFFER_SIZE elements
-	static FFTFREQS outoscilFFTfreqs;
-
     private:
 	
+	REALTYPE *tmpsmps;//this array stores some termporary data and it has SOUND_BUFFER_SIZE elements
+	FFTFREQS outoscilFFTfreqs;
+
 	REALTYPE hmag[MAX_AD_HARMONICS],hphase[MAX_AD_HARMONICS];//the magnituides and the phases of the sine/nonsine harmonics
 //    private:
 	FFTwrapper *fft;
