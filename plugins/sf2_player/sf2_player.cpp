@@ -33,7 +33,7 @@
 #include "sf2_player.h"
 #include "engine.h"
 #include "InstrumentTrack.h"
-#include "instrument_play_handle.h"
+#include "InstrumentPlayHandle.h"
 #include "note_play_handle.h"
 #include "knob.h"
 #include "song.h"

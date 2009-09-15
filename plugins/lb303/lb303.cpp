@@ -33,7 +33,7 @@
 
 #include "lb303.h"
 #include "engine.h"
-#include "instrument_play_handle.h"
+#include "InstrumentPlayHandle.h"
 #include "InstrumentTrack.h"
 #include "knob.h"
 #include "note_play_handle.h"

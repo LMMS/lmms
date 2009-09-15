@@ -32,7 +32,7 @@
 #include "ZynAddSubFx.h"
 #include "engine.h"
 #include "mmp.h"
-#include "instrument_play_handle.h"
+#include "InstrumentPlayHandle.h"
 #include "InstrumentTrack.h"
 #include "gui_templates.h"
 #include "string_pair_drag.h"
@@ -232,16 +232,19 @@ void ZynAddSubFxInstrument::play( sampleFrame * _buf )
 bool ZynAddSubFxInstrument::handleMidiEvent( const midiEvent & _me,
                                                 const midiTime & _time )
 {
-	m_pluginMutex.lock();
-	if( m_remotePlugin )
+	if( !isMuted() )
 	{
-		m_remotePlugin->processMidiEvent( _me, 0 );
+		m_pluginMutex.lock();
+		if( m_remotePlugin )
+		{
+			m_remotePlugin->processMidiEvent( _me, 0 );
+		}
+		else
+		{
+			m_plugin->processMidiEvent( _me );
+		}
+		m_pluginMutex.unlock();
 	}
-	else
-	{
-		m_plugin->processMidiEvent( _me );
-	}
-	m_pluginMutex.unlock();
 
 	return true;
 }

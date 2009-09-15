@@ -117,6 +117,8 @@ public:
 
 	virtual bool isFromTrack( const track * _track ) const;
 
+	bool isMuted() const;
+
 
 protected:
 	inline InstrumentTrack * instrumentTrack() const
