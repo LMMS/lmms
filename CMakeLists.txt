@@ -374,7 +374,7 @@ SET(CMAKE_CXX_FLAGS "-O2 -g -fno-exceptions -Wall -ftree-vectorize ${CMAKE_CXX_F
 FILE(REMOVE include/lmmsconfig.h)
 
 FILE(GLOB lmms_INCLUDES ${CMAKE_SOURCE_DIR}/include/*.h)
-FILE(GLOB lmms_UI ${CMAKE_SOURCE_DIR}/src/gui/dialogs/*.ui)
+FILE(GLOB lmms_UI ${CMAKE_SOURCE_DIR}/src/gui/dialogs/*.ui ${CMAKE_SOURCE_DIR}/src/gui/Forms/*.ui)
 FILE(GLOB_RECURSE lmms_SOURCES ${CMAKE_SOURCE_DIR}/src/*.cpp)
 
 SET(lmms_MOC ${lmms_INCLUDES})
