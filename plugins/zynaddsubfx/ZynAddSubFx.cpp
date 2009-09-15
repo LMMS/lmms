@@ -178,7 +178,7 @@ void ZynAddSubFxInstrument::loadSettings( const QDomElement & _this )
 
 
 
-void zynAddSubFx::loadFile( const QString & _file )
+void ZynAddSubFxInstrument::loadFile( const QString & _file )
 {
 	const std::string fn = QSTR_TO_STDSTR( _file );
 	if( m_remotePlugin )
@@ -378,7 +378,7 @@ void ZynAddSubFxView::dropEvent( QDropEvent * _de )
 	const QString value = stringPairDrag::decodeValue( _de );
 	if( type == "pluginpresetfile" )
 	{
-		castModel<zynAddSubFx>()->loadFile( value );
+		castModel<ZynAddSubFxInstrument>()->loadFile( value );
 		_de->accept();
 		return;
 	}
