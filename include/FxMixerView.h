@@ -26,6 +26,8 @@
 #define _FX_MIXER_VIEW_H
 
 #include <QtGui/QWidget>
+#include <QtGui/QHBoxLayout>
+#include <QtGui/QScrollArea>
 
 #include "FxMixer.h"
 #include "ModelView.h"
@@ -61,7 +63,7 @@ public:
 
 private slots:
 	void updateFaders();
-
+	void addNewChannel();
 
 private:
 	struct FxChannelView
@@ -72,13 +74,15 @@ private:
 		fader * m_fader;
 	} ;
 
-	FxChannelView m_fxChannelViews[NumFxChannels+1];
+	QVector<FxChannelView> m_fxChannelViews;
 
 	QStackedLayout * m_fxRacksLayout;
-	QStackedLayout * m_fxLineBanks;
-	QButtonGroup * m_bankButtons;
 	FxLine * m_currentFxLine;
 
+	QScrollArea * channelArea;
+	QHBoxLayout * chLayout;
+
+	void addFxLine(int i, QWidget * parent, QLayout * layout);
 } ;
 
 #endif

@@ -61,10 +61,6 @@
 #endif
 
 
-static QVector<fx_ch_t> __fx_channel_jobs( NumFxChannels );
-
-
-
 class MixerWorkerThread : public QThread
 {
 public:
@@ -282,11 +278,6 @@ mixer::mixer() :
 		m_inputBuffer[i] = CPU::allocFrames( 
 						DEFAULT_BUFFER_SIZE * 100 );
 		clearAudioBuffer( m_inputBuffer[i], m_inputBufferSize[i] );
-	}
-
-	for( int i = 1; i < NumFxChannels+1; ++i )
-	{
-		__fx_channel_jobs[i-1] = (fx_ch_t) i;
 	}
 
 	// just rendering?

@@ -104,7 +104,7 @@ extern QString outstring;
 
 }
 
-
+const int NumFLFxChannels = 64;
 
 static void dump_mem( const void * buffer, uint n_bytes )
 {
@@ -542,7 +542,7 @@ struct FL_Project
 	int currentPattern;
 	int activeEditPattern;
 
-	FL_EffectChannel effectChannels[NumFxChannels+1];
+	FL_EffectChannel effectChannels[NumFLFxChannels+1];
 	int currentEffectChannel;
 
 	QString projectNotes;
@@ -1022,7 +1022,7 @@ bool FlpImport::tryFLPImport( trackContainer * _tc )
 				break;
 
 			case FLP_EffectChannelMuted:
-if( p.currentEffectChannel <= NumFxChannels )
+if( p.currentEffectChannel <= NumFLFxChannels )
 {
 	p.effectChannels[p.currentEffectChannel].isMuted =
 					( data & 0x08 ) > 0 ? false : true;
@@ -1274,7 +1274,7 @@ if( p.currentEffectChannel <= NumFxChannels )
 
 			case FLP_Text_EffectChanName:
 				++p.currentEffectChannel;
-				if( p.currentEffectChannel <= NumFxChannels )
+				if( p.currentEffectChannel <= NumFLFxChannels )
 				{
 					p.effectChannels[p.currentEffectChannel].name = text;
 				}
@@ -1497,7 +1497,7 @@ if( p.currentEffectChannel <= NumFxChannels )
 					const int param = pi[i*3+1] & 0xffff;
 					const int ch = ( pi[i*3+1] >> 22 )
 									& 0x7f;
-					if( ch < 0 || ch > NumFxChannels )
+					if( ch < 0 || ch > NumFLFxChannels )
 					{
 						continue;
 					}
@@ -1797,7 +1797,7 @@ p->putValue( jt->pos, value, false );
 		}
 	}
 
-	for( int fx_ch = 0; fx_ch <= NumFxChannels ; ++fx_ch )
+	for( int fx_ch = 0; fx_ch <= NumFLFxChannels ; ++fx_ch )
 	{
 		FxChannel * ch = engine::fxMixer()->effectChannel( fx_ch );
 		if( !ch )
@@ -1857,7 +1857,7 @@ p->putValue( jt->pos, value, false );
 				break;
 		}
 		if( effName.isEmpty() || it->fxChannel < 0 ||
-						it->fxChannel > NumFxChannels )
+						it->fxChannel > NumFLFxChannels )
 		{
 			continue;
 		}

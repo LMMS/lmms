@@ -31,7 +31,6 @@
 #include "JournallingObject.h"
 
 
-const int NumFxChannels = 64;
 
 
 struct FxChannel
@@ -54,6 +53,7 @@ struct FxChannel
 
 	// pointers to other channels that this one sends to
 	QVector<fx_ch_t> m_sends;
+	QVector<FloatModel *> m_sendAmount;
 
 	// pointers to other channels that send to this one
 	QVector<fx_ch_t> m_receives;
@@ -86,26 +86,36 @@ public:
 
 	FxChannel * effectChannel( int _ch )
 	{
-		if( _ch >= 0 && _ch <= NumFxChannels )
-		{
-			return m_fxChannels[_ch];
-		}
-		return NULL;
+		return m_fxChannels[_ch];
 	}
 
 	// make the output of channel fromChannel go to the input of channel toChannel
-	void createChannelSend(fx_ch_t fromChannel, fx_ch_t toChannel);
+	// it is safe to call even if the send already exists
+	void createChannelSend(fx_ch_t fromChannel, fx_ch_t toChannel,
+						   float amount = 1.0f);
 
 	// delete the connection made by createChannelSend
 	void deleteChannelSend(fx_ch_t fromChannel, fx_ch_t toChannel);
 
-	// does fromChannel send its output to the input of toChannel?
-	bool channelSendsTo(fx_ch_t fromChannel, fx_ch_t toChannel);
+	// return the FloatModel of fromChannel sending its output to the input of
+	// toChannel. NULL if there is no send.
+	FloatModel * channelSendModel(fx_ch_t fromChannel, fx_ch_t toChannel);
 
+	// add a new channel to the Fx Mixer.
+	// returns the index of the channel that was just added
+	int createChannel();
 
+	// reset a channel's name, fx, sends, etc
+	void clearChannel(fx_ch_t channelIndex);
+
+	inline fx_ch_t numChannels() const
+	{
+		return m_fxChannels.size();
+	}
 
 private:
-	FxChannel * m_fxChannels[NumFxChannels+1];	// +1 = master
+	// the fx channels in the mixer. index 0 is always master.
+	QVector<FxChannel *> m_fxChannels;
 
 	friend class mixerWorkerThread;
 	friend class FxMixerView;

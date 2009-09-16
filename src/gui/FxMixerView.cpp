@@ -22,6 +22,8 @@
  *
  */
 
+#include <QtGlobal>
+
 #include <QtGui/QButtonGroup>
 #include <QtGui/QInputDialog>
 #include <QtGui/QLayout>
@@ -31,9 +33,12 @@
 #include <QtGui/QPushButton>
 #include <QtGui/QToolButton>
 #include <QtGui/QStackedLayout>
+#include <QtGui/QScrollArea>
+
 
 #include "FxMixerView.h"
 #include "fader.h"
+#include "knob.h"
 #include "EffectRackView.h"
 #include "engine.h"
 #include "embed.h"
@@ -44,26 +49,40 @@
 #include "pixmap_button.h"
 
 
+class SendIndicator : public QWidget
+{
+	public:
+		SendIndicator( QWidget * _parent ) :
+			QWidget( _parent )
+		{
+			setFixedSize(23, 16);
+		}
+
+};
 
 class FxLine : public QWidget
 {
 public:
-	FxLine( QWidget * _parent, FxMixerView * _mv, QString & _name ) :
+	FxLine( QWidget * _parent, FxMixerView * _mv, QString & _name,
+			int _channelIndex) :
 		QWidget( _parent ),
+		m_channelIndex( _channelIndex ),
 		m_mv( _mv ),
 		m_name( _name )
 	{
-		setFixedSize( 32, 232 );
+		setFixedSize( 32, 287 );
 		setAttribute( Qt::WA_OpaquePaintEvent, true );
 		setCursor( QCursor( embed::getIconPixmap( "hand" ), 0, 0 ) );
 	}
 
 	virtual void paintEvent( QPaintEvent * )
 	{
+		bool sendToThis = engine::fxMixer()->channelSendModel(
+			m_mv->currentFxLine()->m_channelIndex, m_channelIndex) != NULL;
 		QPainter painter;
 		painter.begin( this );
-		engine::getLmmsStyle()->drawFxLine( &painter,
-				this, m_name, m_mv->currentFxLine() == this );
+		engine::getLmmsStyle()->drawFxLine( &painter, this, m_name,
+			m_mv->currentFxLine() == this, sendToThis );
 		painter.end();
 	}
 
@@ -87,7 +106,8 @@ public:
 		}
 	}
 
-
+	knob * m_sendKnob;
+	int m_channelIndex;
 private:
 	FxMixerView * m_mv;
 	QString & m_name;
@@ -114,10 +134,6 @@ FxMixerView::FxMixerView() :
 	setWindowTitle( tr( "FX-Mixer" ) );
 	setWindowIcon( embed::getIconPixmap( "fx_mixer" ) );
 
-	m_fxLineBanks = new QStackedLayout;
-	m_fxLineBanks->setSpacing( 0 );
-	m_fxLineBanks->setMargin( 1 );
-
 	m_fxRacksLayout = new QStackedLayout;
 	m_fxRacksLayout->setSpacing( 0 );
 	m_fxRacksLayout->setMargin( 0 );
@@ -128,93 +144,40 @@ FxMixerView::FxMixerView() :
 	ml->setSpacing( 0 );
 	ml->addSpacing( 6 );
 
+	m_fxChannelViews.resize(m->numChannels());
+	channelArea = new QScrollArea(this);
+	chLayout = new QHBoxLayout(channelArea);
 
-	QHBoxLayout * banks[NumFxChannels/16];
-	for( int i = 0; i < NumFxChannels/16; ++i )
+	// add master channel
+	FxChannelView * masterView = &m_fxChannelViews[0];
+	addFxLine(0, this, ml);
+	ml->addSpacing(5);
+	QSize fxLineSize = masterView->m_fxLine->size();
+
+	chLayout->setSizeConstraint(QLayout::SetMinimumSize);
+	channelArea->setWidgetResizable(true);
+
+	// add mixer channels
+	for( int i = 1; i < m_fxChannelViews.size(); ++i )
 	{
-		QWidget * w = new QWidget( this );
-		banks[i] = new QHBoxLayout( w );
-		banks[i]->setMargin( 5 );
-		banks[i]->setSpacing( 1 );
-		m_fxLineBanks->addWidget( w );
+		addFxLine(i, channelArea, chLayout);
 	}
+	// add the scrolling section to the main layout
+	ml->addLayout(chLayout);
 
-	for( int i = 0; i < NumFxChannels+1; ++i )
-	{
-		FxChannelView * cv = &m_fxChannelViews[i];
-		if( i == 0 )
-		{
-			cv->m_fxLine = new FxLine( NULL, this,
-						m->m_fxChannels[i]->m_name  );
-			ml->addWidget( cv->m_fxLine );
-			ml->addSpacing( 10 );
-		}
-		else
-		{
-			const int bank = (i-1) / 16;
-			cv->m_fxLine = new FxLine( NULL, this,
-						m->m_fxChannels[i]->m_name );
-			banks[bank]->addWidget( cv->m_fxLine );
-		}
-		lcdSpinBox * l = new lcdSpinBox( 2, cv->m_fxLine );
-		l->model()->setRange( i, i );
-		l->model()->setValue( i );
-		l->move( 2, 4 );
-		l->setMarginWidth( 1 );
+	// show the add new effect channel button
+	QPushButton * newChannelBtn = new QPushButton("new", this );
+	newChannelBtn->setFont(QFont("sans-serif", 10, 1, false));
+	newChannelBtn->setFixedSize(fxLineSize);
+	connect( newChannelBtn, SIGNAL(clicked()), this, SLOT(addNewChannel()));
+	ml->addWidget( newChannelBtn );
 
-
-		cv->m_fader = new fader( &m->m_fxChannels[i]->m_volumeModel,
-						tr( "FX Fader %1" ).arg( i ),
-								cv->m_fxLine );
-		cv->m_fader->move( 15-cv->m_fader->width()/2,
-						cv->m_fxLine->height()-
-						cv->m_fader->height()-5 );
-
-		cv->m_muteBtn = new pixmapButton( cv->m_fxLine, tr( "Mute" ) );
-		cv->m_muteBtn->setModel( &m->m_fxChannels[i]->m_muteModel );
-		cv->m_muteBtn->setActiveGraphic(
-					embed::getIconPixmap( "led_off" ) );
-		cv->m_muteBtn->setInactiveGraphic(
-					embed::getIconPixmap( "led_green" ) );
-		cv->m_muteBtn->setCheckable( true );
-		cv->m_muteBtn->move( 9,  cv->m_fader->y()-16);
-		toolTip::add( cv->m_muteBtn, tr( "Mute this FX channel" ) );
-
-		cv->m_rackView = new EffectRackView(
-				&m->m_fxChannels[i]->m_fxChain, this );
-		m_fxRacksLayout->addWidget( cv->m_rackView );
-		if( i == 0 )
-		{
-			QVBoxLayout * l = new QVBoxLayout;
-			l->addSpacing( 10 );
-			QButtonGroup * g = new QButtonGroup( this );
-			m_bankButtons = g;
-			g->setExclusive( true );
-			for( int j = 0; j < 4; ++j )
-			{
-				QToolButton * btn = new QToolButton;
-				btn->setText( QString( 'A'+j ) );
-				btn->setCheckable( true );
-				btn->setSizePolicy( QSizePolicy::Preferred,
-						QSizePolicy::Expanding );
-				l->addWidget( btn );
-				g->addButton( btn, j );
-				btn->setChecked( j == 0);
-			}
-			l->addSpacing( 10 );
-			ml->addLayout( l );
-			connect( g, SIGNAL( buttonClicked( int ) ),
-				m_fxLineBanks, SLOT( setCurrentIndex( int ) ) );
-		}
-	}
-
-	ml->addLayout( m_fxLineBanks );
 	ml->addLayout( m_fxRacksLayout );
+
 
 	setLayout( ml );
 	updateGeometry();
 
-	m_fxLineBanks->setCurrentIndex( 0 );
 	setCurrentFxLine( m_fxChannelViews[0].m_fxLine );
 
 	// timer for updating faders
@@ -226,10 +189,9 @@ FxMixerView::FxMixerView() :
 	QMdiSubWindow * subWin = 
 		engine::mainWindow()->workspace()->addSubWindow( this );
 	Qt::WindowFlags flags = subWin->windowFlags();
-	flags |= Qt::MSWindowsFixedSizeDialogHint;
 	flags &= ~Qt::WindowMaximizeButtonHint;
 	subWin->setWindowFlags( flags );
-	subWin->layout()->setSizeConstraint(QLayout::SetFixedSize);
+	subWin->layout()->setSizeConstraint(QLayout::SetMinimumSize);
 
 	parentWidget()->setAttribute( Qt::WA_DeleteOnClose, false );
 	parentWidget()->move( 5, 310 );
@@ -239,12 +201,72 @@ FxMixerView::FxMixerView() :
 }
 
 
+void FxMixerView::addFxLine(int i, QWidget * parent, QLayout * layout)
+{
+	FxMixer * m = engine::fxMixer();
+
+	FxChannelView * cv = &m_fxChannelViews[i];
+
+	cv->m_fxLine = new FxLine( parent, this,
+						   m->m_fxChannels[i]->m_name, i );
+	layout->addWidget(cv->m_fxLine);
+
+	// mixer sends knob
+	cv->m_fxLine->m_sendKnob = new knob(0, cv->m_fxLine,
+									  tr("Channel send amount"));
+	cv->m_fxLine->m_sendKnob->move(0, 22);
+	cv->m_fxLine->m_sendKnob->setVisible(false);
+
+	// send light indicator
+
+
+	// channel number
+	lcdSpinBox * l = new lcdSpinBox( 2, cv->m_fxLine );
+	l->model()->setRange( i, i );
+	l->model()->setValue( i );
+	l->move( 2, 58 );
+	l->setMarginWidth( 1 );
+
+
+	cv->m_fader = new fader( &m->m_fxChannels[i]->m_volumeModel,
+					tr( "FX Fader %1" ).arg( i ),
+							cv->m_fxLine );
+	cv->m_fader->move( 15-cv->m_fader->width()/2,
+					cv->m_fxLine->height()-
+					cv->m_fader->height()-5 );
+
+	cv->m_muteBtn = new pixmapButton( cv->m_fxLine, tr( "Mute" ) );
+	cv->m_muteBtn->setModel( &m->m_fxChannels[i]->m_muteModel );
+	cv->m_muteBtn->setActiveGraphic(
+				embed::getIconPixmap( "led_off" ) );
+	cv->m_muteBtn->setInactiveGraphic(
+				embed::getIconPixmap( "led_green" ) );
+	cv->m_muteBtn->setCheckable( true );
+	cv->m_muteBtn->move( 9,  cv->m_fader->y()-16);
+	toolTip::add( cv->m_muteBtn, tr( "Mute this FX channel" ) );
+
+	cv->m_rackView = new EffectRackView(
+			&m->m_fxChannels[i]->m_fxChain, this );
+	m_fxRacksLayout->addWidget( cv->m_rackView );
+}
 
 
 FxMixerView::~FxMixerView()
 {
 }
 
+
+
+void FxMixerView::addNewChannel()
+{
+	// add new fx mixer channel and redraw the form.
+	FxMixer * mix = engine::fxMixer();
+
+	int newChannelIndex = mix->createChannel();
+	m_fxChannelViews.push_back(FxChannelView());
+
+	addFxLine(newChannelIndex, channelArea, chLayout);
+}
 
 
 
@@ -266,13 +288,29 @@ void FxMixerView::loadSettings( const QDomElement & _this )
 
 void FxMixerView::setCurrentFxLine( FxLine * _line )
 {
+	FxMixer * mix = engine::fxMixer();
+
+	// select
 	m_currentFxLine = _line;
-	for( int i = 0; i < NumFxChannels+1; ++i )
+	m_fxRacksLayout->setCurrentIndex( _line->m_channelIndex );
+
+	// set up send knob
+	for(int i = 0; i < m_fxChannelViews.size(); ++i)
 	{
-		if( m_fxChannelViews[i].m_fxLine == _line )
+		// does current channel send to this channel?
+		FloatModel * sendModel = mix->channelSendModel(_line->m_channelIndex, i);
+		if( sendModel == NULL )
 		{
-			m_fxRacksLayout->setCurrentIndex( i );
+			// does not send, hide send knob
+			m_fxChannelViews[i].m_fxLine->m_sendKnob->setVisible(false);
 		}
+		else
+		{
+			// it does send, show knob and connect
+			m_fxChannelViews[i].m_fxLine->m_sendKnob->setVisible(true);
+			m_fxChannelViews[i].m_fxLine->m_sendKnob->setModel(sendModel);
+		}
+
 		m_fxChannelViews[i].m_fxLine->update();
 	}
 }
@@ -281,12 +319,7 @@ void FxMixerView::setCurrentFxLine( FxLine * _line )
 
 void FxMixerView::setCurrentFxLine( int _line )
 {
-	if ( _line >= 0 && _line < NumFxChannels+1 )
-	{
-		setCurrentFxLine( m_fxChannelViews[_line].m_fxLine );
-		
-		m_bankButtons->button( (_line-1) / 16 )->click();
-	}
+	setCurrentFxLine( m_fxChannelViews[_line].m_fxLine );
 }
 
 
@@ -294,7 +327,7 @@ void FxMixerView::setCurrentFxLine( int _line )
 
 void FxMixerView::clear()
 {
-	for( int i = 0; i <= NumFxChannels; ++i )
+	for( int i = 0; i < m_fxChannelViews.size(); ++i )
 	{
 		m_fxChannelViews[i].m_rackView->clearViews();
 	}
@@ -306,7 +339,7 @@ void FxMixerView::clear()
 void FxMixerView::updateFaders()
 {
 	FxMixer * m = engine::fxMixer();
-	for( int i = 0; i < NumFxChannels+1; ++i )
+	for( int i = 0; i < m_fxChannelViews.size(); ++i )
 	{
 		const float opl = m_fxChannelViews[i].m_fader->getPeak_L();
 		const float opr = m_fxChannelViews[i].m_fader->getPeak_R();
