@@ -143,16 +143,6 @@ public:
 private:
 	virtual void run()
 	{
-#if 0
-#ifdef LMMS_BUILD_LINUX
-#ifdef LMMS_HAVE_PTHREAD_H
-		cpu_set_t mask;
-		CPU_ZERO( &mask );
-		CPU_SET( m_workerNum, &mask );
-		pthread_setaffinity_np( pthread_self(), sizeof( mask ), &mask );
-#endif
-#endif
-#endif
 		QMutex m;
 		while( m_quit == false )
 		{
@@ -618,14 +608,16 @@ sampleFrameA * mixer::renderNextBuffer()
 
 
 	// STAGE 3: process effects in FX mixer
-	FILL_JOB_QUEUE_PARAM(QVector<fx_ch_t>,__fx_channel_jobs,
+	/*FILL_JOB_QUEUE_PARAM(QVector<fx_ch_t>,__fx_channel_jobs,
 					MixerWorkerThread::EffectChannel,1);
 	START_JOBS();
-	WAIT_FOR_JOBS();
+	WAIT_FOR_JOBS();*/
 
 
 	// STAGE 4: do master mix in FX mixer
 	engine::fxMixer()->masterMix( m_writeBuf );
+
+	WAIT_FOR_JOBS();
 
 	unlock();
 
@@ -1137,17 +1129,6 @@ void mixer::fifoWriter::finish()
 
 void mixer::fifoWriter::run()
 {
-#if 0
-#ifdef LMMS_BUILD_LINUX
-#ifdef LMMS_HAVE_PTHREAD_H
-	cpu_set_t mask;
-	CPU_ZERO( &mask );
-	CPU_SET( 0, &mask );
-	pthread_setaffinity_np( pthread_self(), sizeof( mask ), &mask );
-#endif
-#endif
-#endif
-
 	const fpp_t frames = m_mixer->framesPerPeriod();
 	while( m_writing )
 	{

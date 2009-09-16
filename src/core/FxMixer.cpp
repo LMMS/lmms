@@ -33,7 +33,6 @@
 
 FxChannel::FxChannel( Model * _parent ) :
 	m_fxChain( NULL ),
-	m_used( false ),
 	m_stillRunning( false ),
 	m_peakLeft( 0.0f ),
 	m_peakRight( 0.0f ),
@@ -64,10 +63,19 @@ FxMixer::FxMixer() :
 	JournallingObject(),
 	Model( NULL )
 {
-	for( int i = 0; i < NumFxChannels+1; ++i )
+	// create master channel
+	m_fxChannels[0] = new FxChannel(this);
+
+	// create the rest of the channels
+	for( int i = 1; i < NumFxChannels+1; ++i )
 	{
+		// create new channel
 		m_fxChannels[i] = new FxChannel( this );
+
+		// send the channel into master
+		createChannelSend(i, 0);
 	}
+
 	// reset name etc.
 	clear();
 }
@@ -85,6 +93,64 @@ FxMixer::~FxMixer()
 
 
 
+void FxMixer::createChannelSend(fx_ch_t fromChannel, fx_ch_t toChannel)
+{
+	// first make sure the send doesn't already exist
+	if( ! channelSendsTo(fromChannel, toChannel) )
+	{
+		// add to from's sends
+		m_fxChannels[fromChannel]->m_sends.push_back(toChannel);
+
+		// add to to's receives
+		m_fxChannels[toChannel]->m_receives.push_back(fromChannel);
+	}
+}
+
+
+
+// delete the connection made by createChannelSend
+void FxMixer::deleteChannelSend(fx_ch_t fromChannel, fx_ch_t toChannel)
+{
+	// delete the send
+	FxChannel * from = m_fxChannels[fromChannel];
+	FxChannel * to   = m_fxChannels[toChannel];
+
+	// find and delete the send entry
+	for(int i=0; i<from->m_sends.size(); ++i) {
+		if( from->m_sends[i] == toChannel )
+		{
+			// delete this index
+			from->m_sends.remove(i);
+			break;
+		}
+	}
+
+	// find and delete the receive entry
+	for(int i=0; i<to->m_receives.size(); ++i)
+	{
+		if( to->m_receives[i] == fromChannel )
+		{
+			// delete this index
+			to->m_receives.remove(i);
+			break;
+		}
+	}
+}
+
+
+
+// does fromChannel send its output to the input of toChannel?
+bool FxMixer::channelSendsTo(fx_ch_t fromChannel, fx_ch_t toChannel)
+{
+	FxChannel * from = m_fxChannels[fromChannel];
+	for(int i=0; i<from->m_sends.size(); ++i){
+		if( from->m_sends[i] == toChannel )
+			return true;
+	}
+	return false;
+}
+
+
 
 void FxMixer::mixToChannel( const sampleFrame * _buf, fx_ch_t _ch )
 {
@@ -93,7 +159,6 @@ void FxMixer::mixToChannel( const sampleFrame * _buf, fx_ch_t _ch )
 		m_fxChannels[_ch]->m_lock.lock();
 		CPU::bufMix( m_fxChannels[_ch]->m_buffer, _buf,
 						engine::getMixer()->framesPerPeriod() );
-		m_fxChannels[_ch]->m_used = true;
 		m_fxChannels[_ch]->m_lock.unlock();
 	}
 }
@@ -103,32 +168,49 @@ void FxMixer::mixToChannel( const sampleFrame * _buf, fx_ch_t _ch )
 
 void FxMixer::processChannel( fx_ch_t _ch, sampleFrame * _buf )
 {
-	if( m_fxChannels[_ch]->m_muteModel.value() == false &&
-		( m_fxChannels[_ch]->m_used ||
-				m_fxChannels[_ch]->m_stillRunning ||
-								_ch == 0 ) )
+	const fpp_t fpp = engine::getMixer()->framesPerPeriod();
+	FxChannel * thisCh = m_fxChannels[_ch];
+	if( ! thisCh->m_muteModel.value() )
 	{
+		// do mixer sends. loop through the channels that send to this one
+		for( int i = 0; i < thisCh->m_receives.size(); ++i)
+		{
+			fx_ch_t senderIndex = thisCh->m_receives[i];
+			FxChannel * sender = m_fxChannels[senderIndex];
+
+			// compute the sending channel
+			processChannel( senderIndex );
+
+			// mix it with this one
+			sampleFrame * ch_buf = sender->m_buffer;
+			const float v = sender->m_volumeModel.value();
+			for( f_cnt_t f = 0; f < fpp; ++f )
+			{
+				_buf[f][0] += ch_buf[f][0] * v;
+				_buf[f][1] += ch_buf[f][1] * v;
+			}
+			engine::getMixer()->clearAudioBuffer( ch_buf,
+					engine::getMixer()->framesPerPeriod() );
+		}
+
+
 		if( _buf == NULL )
 		{
-			_buf = m_fxChannels[_ch]->m_buffer;
+			_buf = thisCh->m_buffer;
 		}
-		const fpp_t f = engine::getMixer()->framesPerPeriod();
-		m_fxChannels[_ch]->m_fxChain.startRunning();
-		m_fxChannels[_ch]->m_stillRunning =
-			m_fxChannels[_ch]->m_fxChain.processAudioBuffer(
-								_buf, f );
-		m_fxChannels[_ch]->m_peakLeft =
-			engine::getMixer()->peakValueLeft( _buf, f ) *
-				m_fxChannels[_ch]->m_volumeModel.value();
-		m_fxChannels[_ch]->m_peakRight =
-			engine::getMixer()->peakValueRight( _buf, f ) *
-				m_fxChannels[_ch]->m_volumeModel.value();
-		m_fxChannels[_ch]->m_used = true;
+		const float v = thisCh->m_volumeModel.value();
+
+		thisCh->m_fxChain.startRunning();
+		thisCh->m_stillRunning = thisCh->
+			m_fxChain.processAudioBuffer( _buf, fpp);
+		thisCh->m_peakLeft =
+			engine::getMixer()->peakValueLeft( _buf, fpp ) * v;
+		thisCh->m_peakRight =
+			engine::getMixer()->peakValueRight( _buf, fpp ) * v;
 	}
 	else
 	{
-		m_fxChannels[_ch]->m_peakLeft =
-					m_fxChannels[_ch]->m_peakRight = 0.0f; 
+		thisCh->m_peakLeft = thisCh->m_peakRight = 0.0f;
 	}
 }
 
@@ -149,31 +231,14 @@ void FxMixer::masterMix( sampleFrame * _buf )
 	const int fpp = engine::getMixer()->framesPerPeriod();
 	memcpy( _buf, m_fxChannels[0]->m_buffer, sizeof( sampleFrame ) * fpp );
 
-	for( int i = 1; i < NumFxChannels+1; ++i )
-	{
-		if( m_fxChannels[i]->m_used )
-		{
-			sampleFrame * ch_buf = m_fxChannels[i]->m_buffer;
-			const float v = m_fxChannels[i]->m_volumeModel.value();
-			for( f_cnt_t f = 0; f < fpp; ++f )
-			{
-				_buf[f][0] += ch_buf[f][0] * v;
-				_buf[f][1] += ch_buf[f][1] * v;
-			}
-			engine::getMixer()->clearAudioBuffer( ch_buf,
-					engine::getMixer()->framesPerPeriod() );
-			m_fxChannels[i]->m_used = false;
-		}
-	}
-
 	processChannel( 0, _buf );
 
-	if( m_fxChannels[0]->m_muteModel.value() )
+	/*if( m_fxChannels[0]->m_muteModel.value() )
 	{
 		engine::getMixer()->clearAudioBuffer( _buf,
 					engine::getMixer()->framesPerPeriod() );
 		return;
-	}
+	}*/
 
 	const float v = m_fxChannels[0]->m_volumeModel.value();
 	for( f_cnt_t f = 0; f < engine::getMixer()->framesPerPeriod(); ++f )

@@ -40,8 +40,10 @@ struct FxChannel
 	~FxChannel();
 
 	EffectChain m_fxChain;
-	bool m_used;
+
+	// set to true if any effect in the channel is enabled and running
 	bool m_stillRunning;
+
 	float m_peakLeft;
 	float m_peakRight;
 	sampleFrame * m_buffer;
@@ -50,6 +52,11 @@ struct FxChannel
 	QString m_name;
 	QMutex m_lock;
 
+	// pointers to other channels that this one sends to
+	QVector<fx_ch_t> m_sends;
+
+	// pointers to other channels that send to this one
+	QVector<fx_ch_t> m_receives;
 } ;
 
 
@@ -86,10 +93,19 @@ public:
 		return NULL;
 	}
 
+	// make the output of channel fromChannel go to the input of channel toChannel
+	void createChannelSend(fx_ch_t fromChannel, fx_ch_t toChannel);
+
+	// delete the connection made by createChannelSend
+	void deleteChannelSend(fx_ch_t fromChannel, fx_ch_t toChannel);
+
+	// does fromChannel send its output to the input of toChannel?
+	bool channelSendsTo(fx_ch_t fromChannel, fx_ch_t toChannel);
+
+
 
 private:
 	FxChannel * m_fxChannels[NumFxChannels+1];	// +1 = master
-
 
 	friend class mixerWorkerThread;
 	friend class FxMixerView;
