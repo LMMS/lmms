@@ -1,12 +1,12 @@
 /*
   ZynAddSubFX - a software synthesizer
- 
+
   Envelope.h - Envelope implementation
   Copyright (C) 2002-2005 Nasca Octavian Paul
   Author: Nasca Octavian Paul
 
   This program is free software; you can redistribute it and/or modify
-  it under the terms of version 2 of the GNU General Public License 
+  it under the terms of version 2 of the GNU General Public License
   as published by the Free Software Foundation.
 
   This program is distributed in the hope that it will be useful,
@@ -27,32 +27,40 @@
 #include "../globals.h"
 #include "../Params/EnvelopeParams.h"
 
-class Envelope{
+/**Implementation of a general Envelope*/
+class Envelope
+{
 public:
+
+    /**Constructor*/
     Envelope(EnvelopeParams *envpars,REALTYPE basefreq);
+    /**Destructor*/
     ~Envelope();
     void relasekey();
     REALTYPE envout();
     REALTYPE envout_dB();
-    int finished();//returns 1 if the envelope is finished
+    /**Determines the status of the Envelope
+     *
+     *\todo see if this can be changed to use a boolean
+     * @return returns 1 if the envelope is finished*/
+    int finished();
 private:
     int envpoints;
     int envsustain;//"-1" means disabled
     REALTYPE envdt[MAX_ENVELOPE_POINTS];//millisecons
     REALTYPE envval[MAX_ENVELOPE_POINTS];// [0.0 .. 1.0]
-    REALTYPE envstretch; 
+    REALTYPE envstretch;
     int linearenvelope;
 
     int currentpoint; //current envelope point (starts from 1)
     int forcedrelase;
-    char keyreleased; //if the key was released 
-    char envfinish;    
+    char keyreleased; //if the key was released /** \todo figure out WHY IS THIS A CHAR*/
+    char envfinish; /** \todo figure out WHY IS THIS A CHAR*/
     REALTYPE t;   // the time from the last point
-    REALTYPE inct;// the time increment 
+    REALTYPE inct;// the time increment
     REALTYPE envoutval;//used to do the forced release
 };
 
 
 #endif
-
 

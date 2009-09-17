@@ -1,12 +1,12 @@
 /*
   ZynAddSubFX - a software synthesizer
- 
+
   LFO.h - LFO implementation
   Copyright (C) 2002-2005 Nasca Octavian Paul
   Author: Nasca Octavian Paul
 
   This program is free software; you can redistribute it and/or modify
-  it under the terms of version 2 of the GNU General Public License 
+  it under the terms of version 2 of the GNU General Public License
   as published by the Free Software Foundation.
 
   This program is distributed in the hope that it will be useful,
@@ -26,27 +26,35 @@
 #include "../globals.h"
 #include "../Params/LFOParams.h"
 
-
-class LFO{
- public:
+/**Class for creating Low Frequency Ocillators*/
+class LFO
+{
+public:
+    /**Constructor
+     *
+     * @param lfopars pointer to a LFOParams object
+     * @param basefreq base frequency of LFO
+     */
     LFO(LFOParams *lfopars, REALTYPE basefreq);
+    /**Deconstructor*/
     ~LFO();
     REALTYPE lfoout();
     REALTYPE amplfoout();
- private:
+private:
     REALTYPE x;
     REALTYPE incx,incrnd,nextincrnd;
     REALTYPE amp1,amp2;// used for randomness
     REALTYPE lfointensity;
     REALTYPE lfornd,lfofreqrnd;
     REALTYPE lfodelay;
+    /**\todo see if an enum would be better here*/
     char lfotype;
     int freqrndenabled;
-    
-    
+
+
     void computenextincrnd();
-    
+
 };
 
-
 #endif
+

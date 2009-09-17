@@ -272,6 +272,10 @@ midiinputnamebox->label(config.winmididevices[config.cfg.WindowsMidiInId].name);
               label QWERTZ
               xywh {35 35 100 20} labelfont 1 labelsize 11
             }
+            menuitem {} {
+              label AZERTY
+              xywh {45 45 100 20} labelfont 1 labelsize 11
+            }
           }
         }
         Fl_Group {} {

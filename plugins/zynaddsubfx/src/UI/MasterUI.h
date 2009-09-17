@@ -427,8 +427,8 @@ public:
   void showUI();
   void simplerefresh();
   void do_new_master();
-  void do_load_master(char* file = NULL);
-  void do_save_master(char* file = NULL);
+  void do_load_master(const char* file = NULL);
+  void do_save_master(const char* file = NULL);
   void refresh_master_ui();
 private:
   Master *master; 

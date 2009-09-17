@@ -10,6 +10,8 @@ static const int keysoct1dw[]={'\'','2',',','3','.','p','5','y','6','f','7','g',
 static const int keysoct2dw[]={';','o','q','e','j','k','i','x','d','b','h','m','w','n','v','s','z',0}; 
 static const int keysoct1qwertz[]={'q','2','w','3','e','r','5','t','6','z','7','u','i','9','o','0','p',252,'\'','+','\\',FL_Enter,0}; 
 static const int keysoct2qwertz[]={'y','s','x','d','c','v','g','b','h','n','j','m',',','l','.',246,'-',0}; 
+static const int keysoct1az[]={'a',233,'z','\"','e','r','(','t','-','y',232,'u','i',231,'o',224,'p',65106,'=','$',0}; 
+static const int keysoct2az[]={'w','s','x','d','c','v','g','b','h','n','j',',',';','l',':','m','!',0}; 
 
 VirKeys::VirKeys(int x,int y, int w, int h, const char *label):Fl_Box(x,y,w,h,label) {
   master=NULL;
@@ -125,6 +127,9 @@ if (config.cfg.VirKeybLayout==2) {
 }else if (config.cfg.VirKeybLayout==3) {
 	keysoct1=keysoct1qwertz;
 	keysoct2=keysoct2qwertz;
+}else if (config.cfg.VirKeybLayout==4) {
+	keysoct1=keysoct1az;
+	keysoct2=keysoct2az;
 };
 
 if ((event==FL_KEYDOWN)||(event==FL_KEYUP)){
@@ -146,11 +151,14 @@ return(1);
 }
 
 void VirKeys::presskey(int nk,int exclusive,int type) {
-  if (nk>=N_OCT*12) return;
+  //Exclusive means that multiple keys can be pressed at once
+//when the user uses the shift key
+if (nk>=N_OCT*12) return;
 if ((nk<0)&&(exclusive==0)) {
   relaseallkeys(type);
   return;
 };
+if (nk<0) return;
 if (pressed[nk]!=0) return;//the key is already pressed
 
 if (exclusive!=0) relaseallkeys(type);

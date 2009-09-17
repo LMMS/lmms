@@ -1,12 +1,12 @@
 /*
   ZynAddSubFX - a software synthesizer
- 
+
   Analog Filter.h - Several analog filters (lowpass, highpass...)
   Copyright (C) 2002-2005 Nasca Octavian Paul
   Author: Nasca Octavian Paul
 
   This program is free software; you can redistribute it and/or modify
-  it under the terms of version 2 of the GNU General Public License 
+  it under the terms of version 2 of the GNU General Public License
   as published by the Free Software Foundation.
 
   This program is distributed in the hope that it will be useful,
@@ -25,10 +25,13 @@
 
 #include "../globals.h"
 #include "Filter_.h"
-class AnalogFilter:public Filter_{
- public:
+
+/**Implementation of Several analog filters (lowpass, highpass...)*/
+class AnalogFilter:public Filter_
+{
+public:
     AnalogFilter(unsigned char Ftype,REALTYPE Ffreq, REALTYPE Fq,unsigned char Fstages);
-    ~AnalogFilter();	
+    ~AnalogFilter();
     void filterout(REALTYPE *smp);
     void setfreq(REALTYPE frequency);
     void setfreq_and_q(REALTYPE frequency,REALTYPE q_);
@@ -38,14 +41,14 @@ class AnalogFilter:public Filter_{
     void setgain(REALTYPE dBgain);
     void setstages(int stages_);
     void cleanup();
-    
+
     REALTYPE H(REALTYPE freq);//Obtains the response for a given frequency
-    
- private:
-    struct fstage{
-      REALTYPE c1,c2;
+
+private:
+    struct fstage {
+        REALTYPE c1,c2;
     } x[MAX_FILTER_STAGES+1],y[MAX_FILTER_STAGES+1],
-      oldx[MAX_FILTER_STAGES+1],oldy[MAX_FILTER_STAGES+1];
+    oldx[MAX_FILTER_STAGES+1],oldy[MAX_FILTER_STAGES+1];
 
     void singlefilterout(REALTYPE *smp,fstage &x,fstage &y,REALTYPE *c,REALTYPE *d);
     void computefiltercoefs();
@@ -54,7 +57,7 @@ class AnalogFilter:public Filter_{
     REALTYPE freq;//Frequency given in Hz
     REALTYPE q; //Q factor (resonance or Q factor)
     REALTYPE gain;//the gain of the filter (if are shelf/peak) filters
-    
+
     int order;//the order of the filter (number of poles)
 
     REALTYPE c[3],d[3];//coefficients
@@ -62,7 +65,7 @@ class AnalogFilter:public Filter_{
     REALTYPE oldc[3],oldd[3];//old coefficients(used only if some filter paremeters changes very fast, and it needs interpolation)
 
     REALTYPE xd[3],yd[3];//used if the filter is applied more times
-    int needsinterpolation,firsttime;
+    int needsinterpolation,firsttime;/**\todo see if bool works for these*/
     int abovenq;//this is 1 if the frequency is above the nyquist
     int oldabovenq;//if the last time was above nyquist (used to see if it needs interpolation)
 };

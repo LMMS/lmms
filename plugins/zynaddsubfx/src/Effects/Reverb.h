@@ -1,12 +1,12 @@
 /*
   ZynAddSubFX - a software synthesizer
- 
+
   Reverb.h - Reverberation effect
   Copyright (C) 2002-2005 Nasca Octavian Paul
   Author: Nasca Octavian Paul
 
   This program is free software; you can redistribute it and/or modify
-  it under the terms of version 2 of the GNU General Public License 
+  it under the terms of version 2 of the GNU General Public License
   as published by the Free Software Foundation.
 
   This program is distributed in the hope that it will be useful,
@@ -32,18 +32,19 @@
 #define REV_APS 4
 
 /**Creates Reverberation Effects*/
-class Reverb:public Effect {
-    public:
+class Reverb:public Effect
+{
+public:
     Reverb(const int &insertion_,REALTYPE *efxoutl_,REALTYPE *efxoutr_);
     ~Reverb();
     void out(REALTYPE *smps_l,REALTYPE *smps_r);
     void cleanup();
 
-        void setpreset(unsigned char npreset);
+    void setpreset(unsigned char npreset);
     void changepar(const int &npar,const unsigned char &value);
     unsigned char getpar(const int &npar)const;
 
-    private:
+private:
     //Parametrii
     /**Amount of the reverb*/
     unsigned char Pvolume;
@@ -93,32 +94,32 @@ class Reverb:public Effect {
     void setlpf(const unsigned char &Plpf);
     void settype( unsigned char Ptype);
     void setroomsize(const unsigned char &Proomsize);
-    
+
     REALTYPE pan,erbalance;
-    //Parametrii 2  
+    //Parametrii 2
     int lohidamptype;/**<0=disable,1=highdamp(lowpass),2=lowdamp(highpass)*/
     int idelaylen,rdelaylen;
     int idelayk;
     REALTYPE lohifb,idelayfb,roomsize,rs;//rs is used to "normalise" the volume according to the roomsize
-    int comblen[REV_COMBS*2];       
+    int comblen[REV_COMBS*2];
     int aplen[REV_APS*2];
-    
+
     //Internal Variables
-    
+
     REALTYPE *comb[REV_COMBS*2];
-    
+
     int combk[REV_COMBS*2];
     REALTYPE combfb[REV_COMBS*2];/**<feedback-ul fiecarui filtru "comb"*/
     REALTYPE lpcomb[REV_COMBS*2];/**<pentru Filtrul LowPass*/
 
     REALTYPE *ap[REV_APS*2];
-    
+
     int apk[REV_APS*2];
-    
+
     REALTYPE *idelay;
     AnalogFilter *lpf,*hpf;//filters
     REALTYPE *inputbuf;
-    
+
     void processmono(int ch,REALTYPE *output);
 };
 
