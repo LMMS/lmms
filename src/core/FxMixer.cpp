@@ -215,8 +215,6 @@ void FxMixer::processChannel( fx_ch_t _ch, sampleFrame * _buf )
 				_buf[f][0] += ch_buf[f][0] * v * amt;
 				_buf[f][1] += ch_buf[f][1] * v * amt;
 			}
-			engine::getMixer()->clearAudioBuffer( ch_buf,
-					engine::getMixer()->framesPerPeriod() );
 		}
 
 

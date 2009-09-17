@@ -503,6 +503,8 @@ sampleFrameA * mixer::renderNextBuffer()
 	MicroTimer timer;
 	static song::playPos last_metro_pos = -1;
 
+	FxMixer * fxm = engine::fxMixer();
+
 	song::playPos p = engine::getSong()->getPlayPos(
 						song::Mode_PlayPattern );
 	if( engine::getSong()->playMode() == song::Mode_PlayPattern &&
@@ -556,7 +558,7 @@ sampleFrameA * mixer::renderNextBuffer()
 	clearAudioBuffer( m_writeBuf, m_framesPerPeriod );
 
 	// prepare master mix (clear internal buffers etc.)
-	engine::fxMixer()->prepareMasterMix();
+	fxm->prepareMasterMix();
 
 	// create play-handles for new notes, samples etc.
 	engine::getSong()->processNextBuffer();
@@ -606,9 +608,16 @@ sampleFrameA * mixer::renderNextBuffer()
 
 
 	// STAGE 4: do master mix in FX mixer
-	engine::fxMixer()->masterMix( m_writeBuf );
+	fxm->masterMix( m_writeBuf );
 
 	WAIT_FOR_JOBS();
+
+	// clear all channel buffers
+	for( int i = 0; i < fxm->numChannels(); ++i)
+	{
+		engine::getMixer()->clearAudioBuffer( fxm->effectChannel(i)->m_buffer,
+			engine::getMixer()->framesPerPeriod() );
+	}
 
 	unlock();
 
