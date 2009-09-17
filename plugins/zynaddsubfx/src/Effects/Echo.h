@@ -1,12 +1,12 @@
 /*
   ZynAddSubFX - a software synthesizer
- 
+
   Echo.h - Echo Effect
   Copyright (C) 2002-2005 Nasca Octavian Paul
   Author: Nasca Octavian Paul
 
   This program is free software; you can redistribute it and/or modify
-  it under the terms of version 2 of the GNU General Public License 
+  it under the terms of version 2 of the GNU General Public License
   as published by the Free Software Foundation.
 
   This program is distributed in the hope that it will be useful,
@@ -25,108 +25,112 @@
 
 #include "../globals.h"
 #include "Effect.h"
+#include "../Samples/AuSample.h"
+#include "../Misc/Stereo.h"
+#include "../Controls/DelayCtl.h"
 
 /**Echo Effect*/
-class Echo:public Effect{
-    public:
+class Echo:public Effect
+{
+public:
 
-        /**
-         * The Constructor For Echo
-         * @param insertion_ integer to determine if Echo is an insertion effect
-         * or not
-         * @param efxoutl_ Effect out Left Channel
-         * @param efxoutr_ Effect out Right Channel
-         * @return An initialized Echo Object
-         */
-        Echo(const int & insertion_,REALTYPE *const efxoutl_,REALTYPE *const efxoutr_);
+    /**
+     * The Constructor For Echo
+     * @param insertion_ integer to determine if Echo is an insertion effect
+     * or not
+     * @param efxoutl_ Effect out Left Channel
+     * @param efxoutr_ Effect out Right Channel
+     * @return An initialized Echo Object
+     */
+    Echo(const int & insertion_,REALTYPE *const efxoutl_,REALTYPE *const efxoutr_);
 
-        /**
-         * The destructor
-         */
-        ~Echo();
+    /**
+     * The destructor
+     */
+    ~Echo();
 
-        /**
-         * Outputs the echo to efxoutl and efxoutr
-         * @param smpsl Sample from Left channel
-         * @param smpsr Sample from Right channel
-         * \todo try to figure out if smpsl should be const *const
-         * or not
-         */
-        void out(REALTYPE *const smpsl,REALTYPE *const smpr);
-        
-        /**
-         * Sets the state of Echo to the specified preset
-         * @param npreset number of chosen preset
-         */
-        void setpreset(unsigned char npreset);
+    /**
+     * Outputs the echo to efxoutl and efxoutr
+     * @param smpsl Sample from Left channel
+     * @param smpsr Sample from Right channel
+     * \todo try to figure out if smpsl should be const *const
+     * or not (It should be)
+     */
+    void out(REALTYPE *const smpsl,REALTYPE *const smpr);
+    void out(const Stereo<AuSample> &input);
 
-        /**
-         * Sets the value of the chosen variable
-         *
-         * The possible parameters are:
-         *   -# Volume
-         *   -# Panning
-         *   -# Delay
-         *   -# L/R Delay
-         *   -# L/R Crossover
-         *   -# Feedback
-         *   -# Dampening
-         * @param npar number of chosen parameter
-         * @param value the new value
-         */
-        void changepar(const int & npar,const unsigned char & value);
+    /**
+     * Sets the state of Echo to the specified preset
+     * @param npreset number of chosen preset
+     */
+    void setpreset(unsigned char npreset);
 
-        /**
-         * Gets the specified parameter
-         *
-         * The possible parameters are
-         *   -# Volume
-         *   -# Panning
-         *   -# Delay
-         *   -# L/R Delay
-         *   -# L/R Crossover
-         *   -# Feedback
-         *   -# Dampening
-         * @param npar number of chosen parameter
-         * @return value of parameter
-         * 
-         * \todo make this method use constant variables by reference
-         *Currently doing so results in strange behavior
-         */
-        unsigned char getpar(const int & npar)const;
+    /**
+     * Sets the value of the chosen variable
+     *
+     * The possible parameters are:
+     *   -# Volume
+     *   -# Panning
+     *   -# Delay
+     *   -# L/R Delay
+     *   -# L/R Crossover
+     *   -# Feedback
+     *   -# Dampening
+     * @param npar number of chosen parameter
+     * @param value the new value
+     */
+    void changepar(const int & npar,const unsigned char & value);
 
-        /**Zeros out the state of the Echo*/
-        void cleanup();
-        
-        /**\todo This function needs to be implemented or the  prototype should be removed*/
-        void setdryonly();
-    private:
-        /**\todo remove all of these once they have been depreciated*/
-        //Parameters
-        unsigned char Pvolume;/**<#1 Volume or Dry/Wetness*/
-        unsigned char Ppanning;/**<#2 Panning*/
-        unsigned char Pdelay;/**<#3 Delay of the Echo*/
-        unsigned char Plrdelay;/**<#4 L/R delay difference*/
-        unsigned char Plrcross;/**<#5 L/R Mixing*/
-        unsigned char Pfb;/**<#6Feedback*/
-        unsigned char Phidamp;/**<#7Dampening of the Echo*/
-        
-        void setvolume(const unsigned char & Pvolume);
-        void setpanning(const unsigned char & Ppanning);
-        void setdelay(const unsigned char & Pdelay);
-        void setlrdelay(const unsigned char & Plrdelay);
-        void setlrcross(const unsigned char & Plrcross);
-        void setfb(const unsigned char & Pfb);
-        void sethidamp(const unsigned char & Phidamp);
+    /**
+     * Gets the specified parameter
+     *
+     * The possible parameters are
+     *   -# Volume
+     *   -# Panning
+     *   -# Delay
+     *   -# L/R Delay
+     *   -# L/R Crossover
+     *   -# Feedback
+     *   -# Dampening
+     * @param npar number of chosen parameter
+     * @return value of parameter
+     */
+    unsigned char getpar(const int & npar)const;
 
-        //Real Parameters
-        REALTYPE panning,lrcross,fb,hidamp;
-        int dl,dr,delay,lrdelay;
-        
-        void initdelays();
-        REALTYPE *ldelay,*rdelay;
-        REALTYPE oldl,oldr;//pt. lpf
-        int kl,kr;
+    int getnumparams();
+
+    /**Zeros out the state of the Echo*/
+    void cleanup();
+
+    /**\todo This function needs to be implemented or the  prototype should be removed*/
+    void setdryonly();
+private:
+    //Parameters
+    char     Pvolume;/**<#1 Volume or Dry/Wetness*/
+    char     Ppanning;/**<#2 Panning*/
+    DelayCtl delay;/**<#3 Delay of the Echo*/
+    char     Plrdelay;/**<#4 L/R delay difference*/
+    char     Plrcross;/**<#5 L/R Mixing*/
+    char     Pfb;/**<#6Feedback*/
+    char     Phidamp;/**<#7Dampening of the Echo*/
+
+    void setvolume(const unsigned char & Pvolume);
+    void setpanning(const unsigned char & Ppanning);
+    void setdelay(const unsigned char & Pdelay);
+    void setlrdelay(const unsigned char & Plrdelay);
+    void setlrcross(const unsigned char & Plrcross);
+    void setfb(const unsigned char & Pfb);
+    void sethidamp(const unsigned char & Phidamp);
+
+    //Real Parameters
+    REALTYPE panning,lrcross,fb,hidamp; //needs better names
+    int dl,dr,lrdelay; //needs better names
+
+    void initdelays();
+    Stereo<AuSample> delaySample;
+    Stereo<REALTYPE> old;
+
+    int kl,kr;
 };
 
 #endif

@@ -1,12 +1,12 @@
 /*
   ZynAddSubFX - a software synthesizer
- 
+
   Util.h - Miscellaneous functions
   Copyright (C) 2002-2005 Nasca Octavian Paul
   Author: Nasca Octavian Paul
 
   This program is free software; you can redistribute it and/or modify
-  it under the terms of version 2 of the GNU General Public License 
+  it under the terms of version 2 of the GNU General Public License
   as published by the Free Software Foundation.
 
   This program is distributed in the hope that it will be useful,
@@ -32,12 +32,12 @@
 //Velocity Sensing function
 extern REALTYPE VelF(REALTYPE velocity,unsigned char scaling);
 
-bool fileexists(char *filename);
+bool fileexists(const char *filename);
 
 #define N_DETUNE_TYPES 4 //the number of detune types
 extern REALTYPE getdetune(unsigned char type,unsigned short int coarsedetune,unsigned short int finedetune);
 
-extern REALTYPE *denormalkillbuf;//the buffer to add noise in order to avoid denormalisation
+extern REALTYPE *denormalkillbuf;/**<the buffer to add noise in order to avoid denormalisation*/
 
 extern Config config;
 

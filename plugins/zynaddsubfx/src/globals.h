@@ -1,13 +1,13 @@
 /*
   ZynAddSubFX - a software synthesizer
 
-  globals.h - it contains program settings and the program capabilities 
+  globals.h - it contains program settings and the program capabilities
               like number of parts, of effects
   Copyright (C) 2002-2005 Nasca Octavian Paul
   Author: Nasca Octavian Paul
 
   This program is free software; you can redistribute it and/or modify
-  it under the terms of version 2 of the GNU General Public License 
+  it under the terms of version 2 of the GNU General Public License
   as published by the Free Software Foundation.
 
   This program is distributed in the hope that it will be useful,
@@ -28,42 +28,42 @@
 //What float type I use for internal sampledata
 #define REALTYPE float
 
-struct FFTFREQS{
+struct FFTFREQS {
     REALTYPE *s,*c;//sine and cosine components
 };
 
 extern void newFFTFREQS(FFTFREQS *f,int size);
 extern void deleteFFTFREQS(FFTFREQS *f);
 
-// Sampling rate
+/**Sampling rate*/
 extern int SAMPLE_RATE;
 
-/* 
+/**
  * The size of a sound buffer (or the granularity)
  * All internal transfer of sound data use buffer of this size
  * All parameters are constant during this period of time, exception
  * some parameters(like amplitudes) which are linear interpolated.
- * If you increase this you'll ecounter big latencies, but if you 
+ * If you increase this you'll ecounter big latencies, but if you
  * decrease this the CPU requirements gets high.
  */
 extern int SOUND_BUFFER_SIZE;
 
 
-/*
+/**
  * The size of ADnote Oscillator
  * Decrease this => poor quality
  * Increase this => CPU requirements gets high (only at start of the note)
  */
 extern int OSCIL_SIZE;
 
-/*
+/**
  * The number of harmonics of additive synth
  * This must be smaller than OSCIL_SIZE/2
  */
 #define MAX_AD_HARMONICS 128
 
 
-/*
+/**
  * The number of harmonics of substractive
  */
 #define MAX_SUB_HARMONICS 64
@@ -107,7 +107,7 @@ extern int OSCIL_SIZE;
 #define NUM_INS_EFX 8
 
 /*
- * Number of part's insertion effects 
+ * Number of part's insertion effects
  */
 #define NUM_PART_EFX 3
 
@@ -142,7 +142,7 @@ extern int OSCIL_SIZE;
 #define MAX_FILTER_STAGES 5
 
 /*
- * Formant filter (FF) limits 
+ * Formant filter (FF) limits
  */
 #define FF_MAX_VOWELS 6
 #define FF_MAX_FORMANTS 12
@@ -173,7 +173,7 @@ extern int OSCIL_SIZE;
 
 
 /*
- * dB 
+ * dB
  */
 #define dB2rap(dB) ((exp((dB)*LOG_10/20.0)))
 #define rap2dB(rap) ((20*log(rap)/LOG_10))
@@ -185,16 +185,17 @@ extern int OSCIL_SIZE;
 
 #define ZERO(data,size) {char *data_=(char *) data;for (int i=0;i<size;i++) data_[i]=0;};
 
-enum ONOFFTYPE{OFF=0,ON=1};
+enum ONOFFTYPE {OFF=0,ON=1};
 
-enum MidiControllers{C_NULL=0,C_pitchwheel=1000,C_expression=11,C_panning=10,
-    C_filtercutoff=74,C_filterq=71,C_bandwidth=75,C_modwheel=1,C_fmamp=76,
-    C_volume=7,C_sustain=64,C_allnotesoff=123,C_allsoundsoff=120,C_resetallcontrollers=121,
-    C_portamento=65,C_resonance_center=77,C_resonance_bandwidth=78,
+enum MidiControllers {C_NULL=0,C_pitchwheel=1000,C_expression=11,C_panning=10,
+                      C_filtercutoff=74,C_filterq=71,C_bandwidth=75,C_modwheel=1,C_fmamp=76,
+                      C_volume=7,C_sustain=64,C_allnotesoff=123,C_allsoundsoff=120,C_resetallcontrollers=121,
+                      C_portamento=65,C_resonance_center=77,C_resonance_bandwidth=78,
 
-    C_dataentryhi=0x06,C_dataentrylo=0x26,C_nrpnhi=99,C_nrpnlo=98};
+                      C_dataentryhi=0x06,C_dataentrylo=0x26,C_nrpnhi=99,C_nrpnlo=98
+                     };
 
-enum LegatoMsg{LM_Norm, LM_FadeIn, LM_FadeOut, LM_CatchUp, LM_ToNorm};
+enum LegatoMsg {LM_Norm, LM_FadeIn, LM_FadeOut, LM_CatchUp, LM_ToNorm};
 
 //is like i=(int)(floor(f))
 #ifdef ASM_F2I_YES
@@ -206,7 +207,7 @@ enum LegatoMsg{LM_Norm, LM_FadeIn, LM_FadeOut, LM_CatchUp, LM_ToNorm};
 
 
 #ifndef  O_BINARY
-#define O_BINARY 0 
+#define O_BINARY 0
 #endif
 
 #endif

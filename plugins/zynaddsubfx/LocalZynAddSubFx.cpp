@@ -26,7 +26,7 @@
 
 #include "LocalZynAddSubFx.h"
 
-#include "src/Input/MidiIn.h"
+#include "src/Input/NULLMidiIn.h"
 #include "src/Misc/Master.h"
 #include "src/Misc/Dump.h"
 
@@ -169,7 +169,7 @@ void LocalZynAddSubFx::setPresetDir( const std::string & _dir )
 void LocalZynAddSubFx::processMidiEvent( const midiEvent & _e )
 {
 	// all functions are called while m_master->mutex is held
-	static MidiIn midiIn;
+	static NULLMidiIn midiIn;
 
 	switch( _e.m_type )
 	{

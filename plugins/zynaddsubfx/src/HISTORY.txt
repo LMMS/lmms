@@ -1,3 +1,16 @@
+2.4.0 (21 Jun 2009)
+	- extended mono functionality
+	- legato mode
+	- export functionality on PADsynth
+	- inclusion of LASH client
+	- inclusion of DSSI audio output
+	- enabled tooltips for knobs (both description and value tooltips)
+	- added support for newer JACK api
+	- added quertz support for virtual keyboard
+	- started to encorperate cxxtest for unit testing
+	- many bugfixes
+	- code cleanup
+
 2.2.1 (28 Apr 2005)
 	- made to work with mxml-2.2 (will NOT work on older versions)
 	- it is possible to remove completely the graphical user interface (e.g. it can run without X). For this you need to modify the DISABLE_GUI option from the Makefile.inc

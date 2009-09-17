@@ -207,6 +207,18 @@ private:
   static void cb_th(Fl_Check_Button*, void*);
   void cb_t_i(WidgetPDial*, void*);
   static void cb_t(WidgetPDial*, void*);
+public:
+  WidgetPDial *propta;
+private:
+  void cb_propta_i(WidgetPDial*, void*);
+  static void cb_propta(WidgetPDial*, void*);
+public:
+  WidgetPDial *proptb;
+private:
+  void cb_proptb_i(WidgetPDial*, void*);
+  static void cb_proptb(WidgetPDial*, void*);
+  void cb_Proprt_i(Fl_Check_Button*, void*);
+  static void cb_Proprt(Fl_Check_Button*, void*);
   void cb_BWdpth_i(WidgetPDial*, void*);
   static void cb_BWdpth(WidgetPDial*, void*);
   void cb_CFdpth_i(WidgetPDial*, void*);

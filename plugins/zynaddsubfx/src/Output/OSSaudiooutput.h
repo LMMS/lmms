@@ -1,12 +1,12 @@
 /*
   ZynAddSubFX - a software synthesizer
- 
+
   OSSaudiooutput.h - Audio output for Open Sound System
   Copyright (C) 2002-2005 Nasca Octavian Paul
   Author: Nasca Octavian Paul
 
   This program is free software; you can redistribute it and/or modify
-  it under the terms of version 2 of the GNU General Public License 
+  it under the terms of version 2 of the GNU General Public License
   as published by the Free Software Foundation.
 
   This program is distributed in the hope that it will be useful,
@@ -23,25 +23,25 @@
 #ifndef OSS_AUDIO_OUTPUT_H
 #define OSS_AUDIO_OUTPUT_H
 
-
-#include <sys/soundcard.h>
 #include "../globals.h"
-class OSSaudiooutput{
-    public:
-	OSSaudiooutput();
-	~OSSaudiooutput();
 
-	//the out is [-1.0 .. 1.0]
-	/* smp_left[] and smp_right[] has the size of SOUND_BUFFER_SIZE */
-	void OSSout(REALTYPE *smp_left,REALTYPE *smp_right);
-    private:
-	int snd_handle;
-	int snd_fragment; 
-	int snd_stereo;
-	int snd_format;
-	int snd_samplerate;
-	
-	short int *smps;//Samples to be sent to soundcard
+class OSSaudiooutput
+{
+public:
+    OSSaudiooutput();
+    ~OSSaudiooutput();
+
+    //the out is [-1.0 .. 1.0]
+    /* smp_left[] and smp_right[] has the size of SOUND_BUFFER_SIZE */
+    void OSSout(REALTYPE *smp_left,REALTYPE *smp_right);
+private:
+    int snd_handle;
+    int snd_fragment;
+    int snd_stereo;
+    int snd_format;
+    int snd_samplerate;
+
+    short int *smps;//Samples to be sent to soundcard
 };
 
 #endif

@@ -1,12 +1,12 @@
 /*
   ZynAddSubFX - a software synthesizer
- 
+
   FormantFilter.h - formant filter
   Copyright (C) 2002-2005 Nasca Octavian Paul
   Author: Nasca Octavian Paul
 
   This program is free software; you can redistribute it and/or modify
-  it under the terms of version 2 of the GNU General Public License 
+  it under the terms of version 2 of the GNU General Public License
   as published by the Free Software Foundation.
 
   This program is distributed in the hope that it will be useful,
@@ -29,37 +29,38 @@
 #include "../Params/FilterParams.h"
 
 
-class FormantFilter:public Filter_{
- public:
+class FormantFilter:public Filter_
+{
+public:
     FormantFilter(FilterParams *pars);
-    ~FormantFilter();	
+    ~FormantFilter();
     void filterout(REALTYPE *smp);
     void setfreq(REALTYPE frequency);
     void setfreq_and_q(REALTYPE frequency,REALTYPE q_);
     void setq(REALTYPE q_);
 
     void cleanup();
- private:
+private:
     AnalogFilter *formant[FF_MAX_FORMANTS];
     REALTYPE *inbuffer,*tmpbuf;
 
     struct {
-	REALTYPE freq,amp,q;//frequency,amplitude,Q
+        REALTYPE freq,amp,q;//frequency,amplitude,Q
     } formantpar[FF_MAX_VOWELS][FF_MAX_FORMANTS],currentformants[FF_MAX_FORMANTS];
 
     struct {
-	unsigned char nvowel;
+        unsigned char nvowel;
     } sequence [FF_MAX_SEQUENCE];
-    
+
     REALTYPE oldformantamp[FF_MAX_FORMANTS];
-    
+
     int sequencesize,numformants,firsttime;
     REALTYPE oldinput,slowinput;
     REALTYPE Qfactor,formantslowness,oldQfactor;
     REALTYPE vowelclearness,sequencestretch;
-    
+
     void setpos(REALTYPE input);
-    
+
 };
 
 

@@ -4,7 +4,7 @@
   Author: Nasca Octavian Paul
 
   This program is free software; you can redistribute it and/or modify
-  it under the terms of version 2 of the GNU General Public License 
+  it under the terms of version 2 of the GNU General Public License
   as published by the Free Software Foundation.
 
   This program is distributed in the hope that it will be useful,
@@ -20,22 +20,23 @@
 #ifndef WAVOUTPUT_H
 #define WAVOUTPUT_H
 #include <string>
-#include <stdio.h>
 
-class WAVaudiooutput{
-    public:
-	WAVaudiooutput();
-	~WAVaudiooutput();
-	
-	bool newfile(std::string filename,int samplerate,int channels);
-	void close();
+class WAVaudiooutput
+{
+public:
+    WAVaudiooutput();
+    ~WAVaudiooutput();
 
-	void write(int nsmps, short int *smps);
-	
-    private:
-	int sampleswritten;
-	int samplerate;
-	int channels;
-	FILE *file;
+    bool newfile(std::string filename,int samplerate,int channels);
+    void close();
+
+    void write_mono_samples(int nsmps, short int *smps);
+    void write_stereo_samples(int nsmps, short int *smps);
+
+private:
+    int sampleswritten;
+    int samplerate;
+    int channels;
+    FILE *file;
 };
 #endif

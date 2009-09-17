@@ -1,12 +1,12 @@
 /*
   ZynAddSubFX - a software synthesizer
- 
+
   PADnote.h - The "pad" synthesizer
   Copyright (C) 2002-2005 Nasca Octavian Paul
   Author: Nasca Octavian Paul
 
   This program is free software; you can redistribute it and/or modify
-  it under the terms of version 2 of the GNU General Public License 
+  it under the terms of version 2 of the GNU General Public License
   as published by the Free Software Foundation.
 
   This program is distributed in the hope that it will be useful,
@@ -29,95 +29,97 @@
 #include "../DSP/Filter.h"
 #include "../Params/Controller.h"
 
-class PADnote{
-    public:
-        PADnote(PADnoteParameters *parameters, Controller *ctl_,REALTYPE freq, REALTYPE velocity, int portamento_, int midinote, bool besilent);
-	~PADnote();
+/**The "pad" synthesizer*/
+class PADnote
+{
+public:
+    PADnote(PADnoteParameters *parameters, Controller *ctl_,REALTYPE freq, REALTYPE velocity, int portamento_, int midinote, bool besilent);
+    ~PADnote();
 
-	void PADlegatonote(REALTYPE freq, REALTYPE velocity, int portamento_, int midinote, bool externcall);
+    void PADlegatonote(REALTYPE freq, REALTYPE velocity, int portamento_, int midinote, bool externcall);
 
-	int noteout(REALTYPE *outl,REALTYPE *outr); 
-	int finished();
-	void relasekey();
-	
-	int ready;
-		
-    private:
-	void fadein(REALTYPE *smps);
-	void computecurrentparameters();
-	bool finished_;
-	PADnoteParameters *pars;
-	
-	int poshi_l,poshi_r;
-	REALTYPE poslo;
-	
-	REALTYPE basefreq;
-	bool firsttime,released;
-	
-	int nsample,portamento;
+    int noteout(REALTYPE *outl,REALTYPE *outr);
+    int finished();
+    void relasekey();
 
-        int Compute_Linear(REALTYPE *outl,REALTYPE *outr,int freqhi,REALTYPE freqlo); 
-        int Compute_Cubic(REALTYPE *outl,REALTYPE *outr,int freqhi,REALTYPE freqlo); 
+    int ready;
+
+private:
+    void fadein(REALTYPE *smps);
+    void computecurrentparameters();
+    bool finished_;
+    PADnoteParameters *pars;
+
+    int poshi_l,poshi_r;
+    REALTYPE poslo;
+
+    REALTYPE basefreq;
+    bool firsttime,released;
+
+    int nsample,portamento;
+
+    int Compute_Linear(REALTYPE *outl,REALTYPE *outr,int freqhi,REALTYPE freqlo);
+    int Compute_Cubic(REALTYPE *outl,REALTYPE *outr,int freqhi,REALTYPE freqlo);
 
 
-	struct{
-    	    /******************************************
-	    *     FREQUENCY GLOBAL PARAMETERS        *
-	    ******************************************/
-	    REALTYPE Detune;//cents
+    struct {
+        /******************************************
+        *     FREQUENCY GLOBAL PARAMETERS        *
+        ******************************************/
+        REALTYPE Detune;//cents
 
-	    Envelope *FreqEnvelope;
-	    LFO *FreqLfo;
+        Envelope *FreqEnvelope;
+        LFO *FreqLfo;
 
-	   /********************************************
-	    *     AMPLITUDE GLOBAL PARAMETERS          *
-	    ********************************************/
-	    REALTYPE Volume;// [ 0 .. 1 ]
+        /********************************************
+         *     AMPLITUDE GLOBAL PARAMETERS          *
+         ********************************************/
+        REALTYPE Volume;// [ 0 .. 1 ]
 
-	    REALTYPE Panning;// [ 0 .. 1 ]
+        REALTYPE Panning;// [ 0 .. 1 ]
 
-	    Envelope *AmpEnvelope;
-	    LFO *AmpLfo;   
-	
-	    struct {
-		int Enabled;
-		REALTYPE initialvalue,dt,t;
-	    } Punch;
+        Envelope *AmpEnvelope;
+        LFO *AmpLfo;
 
-           /******************************************
-	    *        FILTER GLOBAL PARAMETERS        *
-	    ******************************************/
-	    Filter *GlobalFilterL,*GlobalFilterR;
+        struct {
+            int Enabled;
+            REALTYPE initialvalue,dt,t;
+        } Punch;
 
-	    REALTYPE FilterCenterPitch;//octaves
-	    REALTYPE FilterQ;
-	    REALTYPE FilterFreqTracking;
-    
-	    Envelope *FilterEnvelope;
-    
-	    LFO *FilterLfo;
-	} NoteGlobalPar;  
+        /******************************************
+        *        FILTER GLOBAL PARAMETERS        *
+        ******************************************/
+        Filter *GlobalFilterL,*GlobalFilterR;
 
-	
-	REALTYPE globaloldamplitude,globalnewamplitude,velocity,realfreq;
-	REALTYPE *tmpwave;
-	Controller *ctl;
+        REALTYPE FilterCenterPitch;//octaves
+        REALTYPE FilterQ;
+        REALTYPE FilterFreqTracking;
 
-	// Legato vars
-	struct {
-	  bool silent;
-	  REALTYPE lastfreq;
-	  LegatoMsg msg;
-	  int decounter;
-	  struct { // Fade In/Out vars
-	    int length;
-	    REALTYPE m, step;
-	  } fade;
-	  struct { // Note parameters
-	    REALTYPE freq, vel;
-	    int portamento, midinote;
-	  } param;
-	} Legato;
+        Envelope *FilterEnvelope;
+
+        LFO *FilterLfo;
+    } NoteGlobalPar;
+
+
+    REALTYPE globaloldamplitude,globalnewamplitude,velocity,realfreq;
+    REALTYPE *tmpwave;
+    Controller *ctl;
+
+    // Legato vars
+    struct {
+        bool silent;
+        REALTYPE lastfreq;
+        LegatoMsg msg;
+        int decounter;
+        struct { // Fade In/Out vars
+            int length;
+            REALTYPE m, step;
+        } fade;
+        struct { // Note parameters
+            REALTYPE freq, vel;
+            int portamento, midinote;
+        } param;
+    } Legato;
 };
 
 

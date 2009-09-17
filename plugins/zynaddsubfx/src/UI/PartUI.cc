@@ -678,6 +678,29 @@ void PartUI::cb_t(WidgetPDial* o, void* v) {
   ((PartUI*)(o->parent()->parent()->user_data()))->cb_t_i(o,v);
 }
 
+void PartUI::cb_propta_i(WidgetPDial* o, void*) {
+  part->ctl.portamento.propRate=(int) o->value();
+}
+void PartUI::cb_propta(WidgetPDial* o, void* v) {
+  ((PartUI*)(o->parent()->parent()->user_data()))->cb_propta_i(o,v);
+}
+
+void PartUI::cb_proptb_i(WidgetPDial* o, void*) {
+  part->ctl.portamento.propDepth=(int) o->value();
+}
+void PartUI::cb_proptb(WidgetPDial* o, void* v) {
+  ((PartUI*)(o->parent()->parent()->user_data()))->cb_proptb_i(o,v);
+}
+
+void PartUI::cb_Proprt_i(Fl_Check_Button* o, void*) {
+  part->ctl.portamento.proportional=(int) o->value();
+if(o->value()){propta->activate();proptb->activate();}
+else {propta->deactivate();proptb->deactivate();};
+}
+void PartUI::cb_Proprt(Fl_Check_Button* o, void* v) {
+  ((PartUI*)(o->parent()->parent()->user_data()))->cb_Proprt_i(o,v);
+}
+
 void PartUI::cb_BWdpth_i(WidgetPDial* o, void*) {
   part->ctl.resonancebandwidth.depth=(int) o->value();
 }
@@ -1168,7 +1191,7 @@ nge the name or middle button to change the instrument information");
     } // Fl_Check_Button* o
     partgroup->end();
   } // Fl_Group* partgroup
-  { ctlwindow = new Fl_Double_Window(460, 130, "Controllers");
+  { ctlwindow = new Fl_Double_Window(500, 130, "Controllers");
     ctlwindow->user_data((void*)(this));
     { Fl_Check_Button* o = new Fl_Check_Button(155, 55, 45, 20, "Expr");
       o->tooltip("Expression enable");
@@ -1301,7 +1324,7 @@ nge the name or middle button to change the instrument information");
       o->box(FL_THIN_UP_BOX);
       o->callback((Fl_Callback*)cb_Reset);
     } // Fl_Button* o
-    { Fl_Group* o = new Fl_Group(280, 15, 120, 85, "Portamento");
+    { Fl_Group* o = new Fl_Group(280, 15, 160, 90, "Portamento");
       o->box(FL_ENGRAVED_FRAME);
       o->labelfont(1);
       o->labelsize(10);
@@ -1340,7 +1363,7 @@ cents)");
         o->callback((Fl_Callback*)cb_thresh);
         o->value(part->ctl.portamento.pitchthresh);
       } // Fl_Counter* o
-      { Fl_Check_Button* o = new Fl_Check_Button(370, 70, 15, 15, "th.type");
+      { Fl_Check_Button* o = new Fl_Check_Button(365, 70, 15, 15, "th.type");
         o->tooltip("Threshold type (min/max)");
         o->down_box(FL_DOWN_BOX);
         o->labelsize(10);
@@ -1368,13 +1391,55 @@ cents)");
         o->when(FL_WHEN_CHANGED);
         o->value(part->ctl.portamento.updowntimestretch);
       } // WidgetPDial* o
+      { WidgetPDial* o = propta = new WidgetPDial(405, 20, 25, 25, "Prp.Rate");
+        propta->tooltip("Distance required to double change from nonpropotinal portamento time");
+        propta->box(FL_OVAL_BOX);
+        propta->color(FL_BACKGROUND_COLOR);
+        propta->selection_color(FL_INACTIVE_COLOR);
+        propta->labeltype(FL_NORMAL_LABEL);
+        propta->labelfont(0);
+        propta->labelsize(9);
+        propta->labelcolor(FL_FOREGROUND_COLOR);
+        propta->maximum(127);
+        propta->step(1);
+        propta->callback((Fl_Callback*)cb_propta);
+        propta->align(Fl_Align(FL_ALIGN_BOTTOM));
+        propta->when(FL_WHEN_CHANGED);
+        o->value(part->ctl.portamento.propRate);
+      } // WidgetPDial* propta
+      { WidgetPDial* o = proptb = new WidgetPDial(405, 60, 25, 25, "Prp.Dpth");
+        proptb->tooltip("The difference from nonproportinal portamento");
+        proptb->box(FL_OVAL_BOX);
+        proptb->color(FL_BACKGROUND_COLOR);
+        proptb->selection_color(FL_INACTIVE_COLOR);
+        proptb->labeltype(FL_NORMAL_LABEL);
+        proptb->labelfont(0);
+        proptb->labelsize(9);
+        proptb->labelcolor(FL_FOREGROUND_COLOR);
+        proptb->maximum(127);
+        proptb->step(1);
+        proptb->callback((Fl_Callback*)cb_proptb);
+        proptb->align(Fl_Align(FL_ALIGN_BOTTOM));
+        proptb->when(FL_WHEN_CHANGED);
+        o->value(part->ctl.portamento.propDepth);
+      } // WidgetPDial* proptb
+      { Fl_Check_Button* o = new Fl_Check_Button(285, 40, 50, 15, "Proprt.");
+        o->tooltip("Enable Proportinal Portamento (over fixed Portamento)");
+        o->box(FL_THIN_UP_BOX);
+        o->down_box(FL_DOWN_BOX);
+        o->labelsize(9);
+        o->callback((Fl_Callback*)cb_Proprt);
+        o->value(part->ctl.portamento.proportional);
+        if(o->value()){propta->activate();proptb->activate();}
+        else {propta->deactivate();proptb->deactivate();}
+      } // Fl_Check_Button* o
       o->end();
     } // Fl_Group* o
-    { Fl_Group* o = new Fl_Group(400, 15, 45, 85, "Resonance");
+    { Fl_Group* o = new Fl_Group(440, 15, 50, 90, "Resonance");
       o->box(FL_ENGRAVED_BOX);
       o->labelfont(1);
       o->labelsize(10);
-      { WidgetPDial* o = new WidgetPDial(410, 60, 25, 25, "BWdpth");
+      { WidgetPDial* o = new WidgetPDial(450, 60, 25, 25, "BWdpth");
         o->tooltip("BandWidth controller depth");
         o->box(FL_OVAL_BOX);
         o->color(FL_BACKGROUND_COLOR);
@@ -1390,7 +1455,7 @@ cents)");
         o->when(FL_WHEN_CHANGED);
         o->value(part->ctl.resonancebandwidth.depth);
       } // WidgetPDial* o
-      { WidgetPDial* o = new WidgetPDial(410, 20, 25, 25, "CFdpth");
+      { WidgetPDial* o = new WidgetPDial(450, 20, 25, 25, "CFdpth");
         o->tooltip("Center Frequency controller Depth");
         o->box(FL_OVAL_BOX);
         o->color(FL_BACKGROUND_COLOR);

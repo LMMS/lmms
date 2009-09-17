@@ -2,55 +2,6 @@ IF(LMMS_HAVE_FFTW3F)
 
 INCLUDE(BuildPlugin)
 
-SET(ZYN_SRC_CORE
-	${CMAKE_CURRENT_SOURCE_DIR}/src/DSP/AnalogFilter.C
-	${CMAKE_CURRENT_SOURCE_DIR}/src/DSP/Filter.C
-	${CMAKE_CURRENT_SOURCE_DIR}/src/DSP/SVFilter.C
-	${CMAKE_CURRENT_SOURCE_DIR}/src/DSP/FFTwrapper.C
-	${CMAKE_CURRENT_SOURCE_DIR}/src/DSP/FormantFilter.C
-	${CMAKE_CURRENT_SOURCE_DIR}/src/Input/NULLMidiIn.C
-	${CMAKE_CURRENT_SOURCE_DIR}/src/Input/MidiIn.C
-	${CMAKE_CURRENT_SOURCE_DIR}/src/Output/Recorder.C 
-	${CMAKE_CURRENT_SOURCE_DIR}/src/Output/WAVaudiooutput.C 
-	${CMAKE_CURRENT_SOURCE_DIR}/src/Effects/EffectMgr.C
-	${CMAKE_CURRENT_SOURCE_DIR}/src/Effects/Effect.C
-	${CMAKE_CURRENT_SOURCE_DIR}/src/Effects/Phaser.C
-	${CMAKE_CURRENT_SOURCE_DIR}/src/Effects/Echo.C
-	${CMAKE_CURRENT_SOURCE_DIR}/src/Effects/EffectLFO.C
-	${CMAKE_CURRENT_SOURCE_DIR}/src/Effects/Chorus.C
-	${CMAKE_CURRENT_SOURCE_DIR}/src/Effects/DynamicFilter.C
-	${CMAKE_CURRENT_SOURCE_DIR}/src/Effects/Reverb.C
-	${CMAKE_CURRENT_SOURCE_DIR}/src/Effects/EQ.C
-	${CMAKE_CURRENT_SOURCE_DIR}/src/Effects/Distorsion.C
-	${CMAKE_CURRENT_SOURCE_DIR}/src/Effects/Alienwah.C
-	${CMAKE_CURRENT_SOURCE_DIR}/src/Params/LFOParams.C
-	${CMAKE_CURRENT_SOURCE_DIR}/src/Params/EnvelopeParams.C
-	${CMAKE_CURRENT_SOURCE_DIR}/src/Params/SUBnoteParameters.C
-	${CMAKE_CURRENT_SOURCE_DIR}/src/Params/ADnoteParameters.C
-	${CMAKE_CURRENT_SOURCE_DIR}/src/Params/Presets.C
-	${CMAKE_CURRENT_SOURCE_DIR}/src/Params/FilterParams.C
-	${CMAKE_CURRENT_SOURCE_DIR}/src/Params/PADnoteParameters.C
-	${CMAKE_CURRENT_SOURCE_DIR}/src/Params/Controller.C
-	${CMAKE_CURRENT_SOURCE_DIR}/src/Params/PresetsStore.C
-	${CMAKE_CURRENT_SOURCE_DIR}/src/Seq/MIDIFile.C
-	${CMAKE_CURRENT_SOURCE_DIR}/src/Seq/MIDIEvents.C
-	${CMAKE_CURRENT_SOURCE_DIR}/src/Seq/Sequencer.C
-	${CMAKE_CURRENT_SOURCE_DIR}/src/Synth/PADnote.C
-	${CMAKE_CURRENT_SOURCE_DIR}/src/Synth/SUBnote.C
-	${CMAKE_CURRENT_SOURCE_DIR}/src/Synth/LFO.C
-	${CMAKE_CURRENT_SOURCE_DIR}/src/Synth/Resonance.C
-	${CMAKE_CURRENT_SOURCE_DIR}/src/Synth/ADnote.C
-	${CMAKE_CURRENT_SOURCE_DIR}/src/Synth/Envelope.C
-	${CMAKE_CURRENT_SOURCE_DIR}/src/Synth/OscilGen.C
-	${CMAKE_CURRENT_SOURCE_DIR}/src/Misc/Dump.C
-	${CMAKE_CURRENT_SOURCE_DIR}/src/Misc/Bank.C
-	${CMAKE_CURRENT_SOURCE_DIR}/src/Misc/Config.C
-	${CMAKE_CURRENT_SOURCE_DIR}/src/Misc/XMLwrapper.C
-	${CMAKE_CURRENT_SOURCE_DIR}/src/Misc/Util.C
-	${CMAKE_CURRENT_SOURCE_DIR}/src/Misc/Master.C
-	${CMAKE_CURRENT_SOURCE_DIR}/src/Misc/Microtonal.C
-	${CMAKE_CURRENT_SOURCE_DIR}/src/Misc/Part.C)
-
 SET(ZYN_SRC_GUI
 	${CMAKE_CURRENT_SOURCE_DIR}/src/UI/MasterUI.cc
 	${CMAKE_CURRENT_SOURCE_DIR}/src/UI/VirKeyboard.cc
@@ -71,6 +22,7 @@ SET(ZYN_SRC_GUI
 	${CMAKE_CURRENT_SOURCE_DIR}/src/UI/SUBnoteUI.cc
 	${CMAKE_CURRENT_SOURCE_DIR}/src/UI/BankUI.cc
 )
+
 
 SET(MXML_SRC
 	${CMAKE_CURRENT_SOURCE_DIR}/mxml/mxml-attr.c
@@ -108,10 +60,37 @@ IF(LMMS_BUILD_WIN32)
 	ADD_DEFINITIONS(-DPTW32_STATIC_LIB)
 ENDIF(LMMS_BUILD_WIN32)
 
-INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/fltk/ ${CMAKE_CURRENT_SOURCE_DIR} ${FFTW3F_INCLUDE_DIRS})
+INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/fltk/ ${CMAKE_CURRENT_SOURCE_DIR}/mxml ${CMAKE_CURRENT_SOURCE_DIR} ${FFTW3F_INCLUDE_DIRS})
 
-ADD_LIBRARY(ZynAddSubFxCore SHARED LocalZynAddSubFx.cpp ${ZYN_SRC_CORE} ${MXML_SRC})
-TARGET_LINK_LIBRARIES(ZynAddSubFxCore ${FFTW3F_LIBRARIES} -lz -lpthread)
+set(ZASF_CORE_LIBS
+    zynaddsubfx_input
+    zynaddsubfx_output
+    zynaddsubfx_misc
+    zynaddsubfx_synth
+    zynaddsubfx_seq
+    zynaddsubfx_effect
+    zynaddsubfx_params
+    zynaddsubfx_dsp
+    zynaddsubfx_samples
+    zynaddsubfx_controls
+    )
+
+macro(unit_test NAME CXX_FILE FILES)
+endmacro(unit_test)
+
+add_subdirectory(src/Misc)
+add_subdirectory(src/Input)
+add_subdirectory(src/Controls)
+add_subdirectory(src/Synth)
+add_subdirectory(src/Output)
+add_subdirectory(src/Seq)
+add_subdirectory(src/Effects)
+add_subdirectory(src/Params)
+add_subdirectory(src/DSP)
+add_subdirectory(src/Samples)
+
+ADD_LIBRARY(ZynAddSubFxCore SHARED LocalZynAddSubFx.cpp ${MXML_SRC})
+TARGET_LINK_LIBRARIES(ZynAddSubFxCore ${FFTW3F_LIBRARIES} ${ZASF_CORE_LIBS} -lz -lpthread)
 IF(LMMS_BUILD_WIN32)
 	TARGET_LINK_LIBRARIES(ZynAddSubFxCore -lwsock32)
 	INSTALL(TARGETS ZynAddSubFxCore DESTINATION ${PLUGIN_DIR})

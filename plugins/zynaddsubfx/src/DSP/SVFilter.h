@@ -1,12 +1,12 @@
 /*
   ZynAddSubFX - a software synthesizer
- 
+
   SV Filter.h - Several state-variable filters
   Copyright (C) 2002-2005 Nasca Octavian Paul
   Author: Nasca Octavian Paul
 
   This program is free software; you can redistribute it and/or modify
-  it under the terms of version 2 of the GNU General Public License 
+  it under the terms of version 2 of the GNU General Public License
   as published by the Free Software Foundation.
 
   This program is distributed in the hope that it will be useful,
@@ -25,10 +25,11 @@
 
 #include "../globals.h"
 #include "Filter_.h"
-class SVFilter:public Filter_{
- public:
+class SVFilter:public Filter_
+{
+public:
     SVFilter(unsigned char Ftype,REALTYPE Ffreq, REALTYPE Fq,unsigned char Fstages);
-    ~SVFilter();	
+    ~SVFilter();
     void filterout(REALTYPE *smp);
     void setfreq(REALTYPE frequency);
     void setfreq_and_q(REALTYPE frequency,REALTYPE q_);
@@ -39,13 +40,13 @@ class SVFilter:public Filter_{
     void setstages(int stages_);
     void cleanup();
 
- private:
-    struct fstage{
-      REALTYPE low,high,band,notch;
+private:
+    struct fstage {
+        REALTYPE low,high,band,notch;
     } st[MAX_FILTER_STAGES+1];
 
-    struct parameters{
-	REALTYPE f,q,q_sqrt;
+    struct parameters {
+        REALTYPE f,q,q_sqrt;
     }par,ipar;
 
 
@@ -56,7 +57,7 @@ class SVFilter:public Filter_{
     REALTYPE freq;//Frequency given in Hz
     REALTYPE q; //Q factor (resonance or Q factor)
     REALTYPE gain;//the gain of the filter (if are shelf/peak) filters
-    
+
     int abovenq;//this is 1 if the frequency is above the nyquist
     int oldabovenq;
     int needsinterpolation,firsttime;

@@ -1,12 +1,12 @@
 /*
   ZynAddSubFX - a software synthesizer
- 
+
   MIDIEvents.h - It stores the midi events from midi file or sequencer
   Copyright (C) 2003-2005 Nasca Octavian Paul
   Author: Nasca Octavian Paul
 
   This program is free software; you can redistribute it and/or modify
-  it under the terms of version 2 of the GNU General Public License 
+  it under the terms of version 2 of the GNU General Public License
   as published by the Free Software Foundation.
 
   This program is distributed in the hope that it will be useful,
@@ -25,42 +25,46 @@
 #include "../globals.h"
 #define NUM_MIDI_TRACKS NUM_MIDI_CHANNELS
 
-class MIDIEvents{
+/**storage the midi events from midi file or sequencer
+ * \todo this looks quite like a remake of a linked list
+ *       if it is, then it should be rewritten to use <list>*/
+class MIDIEvents
+{
     friend class MIDIFile;
-    public:
-	MIDIEvents();
-	~MIDIEvents();
+public:
+    MIDIEvents();
+    ~MIDIEvents();
 
-    protected:
+protected:
 
     /* Events */
-    struct event{
+    struct event {
         int deltatime;
-	int channel;//on what midi channel is
-	int type,par1,par2;//type=1 for note, type=2 for controller, type=255 for time messages
+        int channel;//on what midi channel is
+        int type,par1,par2;//type=1 for note, type=2 for controller, type=255 for time messages
     } tmpevent;
-    struct listpos{
-	event ev;
+    struct listpos {
+        event ev;
         struct listpos *next;
     };
-    struct list{
-	listpos *first,*current;
-	int size;//how many events are
-	double length;//in seconds
+    struct list {
+        listpos *first,*current;
+        int size;//how many events are
+        double length;//in seconds
     };
     struct {
-	list track;//the stored track
-	list record;//the track being "recorded" from midi
+        list track;//the stored track
+        list record;//the track being "recorded" from midi
     } miditrack[NUM_MIDI_TRACKS];
-    
+
     void writeevent(list *l,event *ev);
     void readevent(list *l,event *ev);
-    
+
     void rewindlist(list *l);
     void deletelist(list *l);
     void deletelistreference(list *l);
 
 };
 
-
 #endif
+

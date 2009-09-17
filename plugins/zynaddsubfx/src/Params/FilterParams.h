@@ -1,12 +1,12 @@
 /*
   ZynAddSubFX - a software synthesizer
- 
+
   FilterParams.h - Parameters for filter
   Copyright (C) 2002-2005 Nasca Octavian Paul
   Author: Nasca Octavian Paul
 
   This program is free software; you can redistribute it and/or modify
-  it under the terms of version 2 of the GNU General Public License 
+  it under the terms of version 2 of the GNU General Public License
   as published by the Free Software Foundation.
 
   This program is distributed in the hope that it will be useful,
@@ -27,73 +27,74 @@
 #include "../Misc/XMLwrapper.h"
 #include "Presets.h"
 
-class FilterParams:public Presets{
-    public:
-	FilterParams(unsigned char Ptype_,unsigned char Pfreq,unsigned char Pq_);
-	~FilterParams();
+class FilterParams:public Presets
+{
+public:
+    FilterParams(unsigned char Ptype_,unsigned char Pfreq,unsigned char Pq_);
+    ~FilterParams();
 
-	void add2XML(XMLwrapper *xml);
-	void add2XMLsection(XMLwrapper *xml,int n);
-	void defaults();
-	void getfromXML(XMLwrapper *xml);
-	void getfromXMLsection(XMLwrapper *xml,int n);
+    void add2XML(XMLwrapper *xml);
+    void add2XMLsection(XMLwrapper *xml,int n);
+    void defaults();
+    void getfromXML(XMLwrapper *xml);
+    void getfromXMLsection(XMLwrapper *xml,int n);
 
 
-	void getfromFilterParams(FilterParams *pars);
+    void getfromFilterParams(FilterParams *pars);
 
-	REALTYPE getfreq();
-	REALTYPE getq();
-	REALTYPE getfreqtracking(REALTYPE notefreq);
-	REALTYPE getgain();
-	
-        unsigned char Pcategory;//Filter category (Analog/Formant/StVar)
-	unsigned char Ptype;// Filter type  (for analog lpf,hpf,bpf..)
-	unsigned char Pfreq;// Frequency (64-central frequency)
-	unsigned char Pq;   // Q parameters (resonance or bandwidth)
-	unsigned char Pstages; //filter stages+1
-	unsigned char Pfreqtrack;//how the filter frequency is changing according the note frequency
-	unsigned char Pgain;//filter's output gain
-	
-	//Formant filter parameters
-	unsigned char Pnumformants;//how many formants are used
-	unsigned char Pformantslowness;//how slow varies the formants
-	unsigned char Pvowelclearness;//how vowels are kept clean (how much try to avoid "mixed" vowels)
-	unsigned char Pcenterfreq,Poctavesfreq;//the center frequency of the res. func., and the number of octaves
+    REALTYPE getfreq();
+    REALTYPE getq();
+    REALTYPE getfreqtracking(REALTYPE notefreq);
+    REALTYPE getgain();
 
-	struct {
-	    struct {
-		unsigned char freq,amp,q;//frequency,amplitude,Q
-	    }formants[FF_MAX_FORMANTS];
-	}Pvowels[FF_MAX_VOWELS];
-	
-	
-	unsigned char Psequencesize;//how many vowels are in the sequence
-	unsigned char Psequencestretch;//how the sequence is stretched (how the input from filter envelopes/LFOs/etc. is "stretched")
-	unsigned char Psequencereversed;//if the input from filter envelopes/LFOs/etc. is reversed(negated)
-	struct {
-	    unsigned char nvowel;//the vowel from the position
-	} Psequence[FF_MAX_SEQUENCE];
+    unsigned char Pcategory;//Filter category (Analog/Formant/StVar)
+    unsigned char Ptype;// Filter type  (for analog lpf,hpf,bpf..)
+    unsigned char Pfreq;// Frequency (64-central frequency)
+    unsigned char Pq;   // Q parameters (resonance or bandwidth)
+    unsigned char Pstages; //filter stages+1
+    unsigned char Pfreqtrack;//how the filter frequency is changing according the note frequency
+    unsigned char Pgain;//filter's output gain
 
-	REALTYPE getcenterfreq();
-	REALTYPE getoctavesfreq();
-	REALTYPE getfreqpos(REALTYPE freq);
-	REALTYPE getfreqx(REALTYPE x);
-	
-	void formantfilterH(int nvowel,int nfreqs,REALTYPE *freqs);//used by UI
-    
-	REALTYPE getformantfreq(unsigned char freq);
-	REALTYPE getformantamp(unsigned char amp);
-	REALTYPE getformantq(unsigned char q);
+    //Formant filter parameters
+    unsigned char Pnumformants;//how many formants are used
+    unsigned char Pformantslowness;//how slow varies the formants
+    unsigned char Pvowelclearness;//how vowels are kept clean (how much try to avoid "mixed" vowels)
+    unsigned char Pcenterfreq,Poctavesfreq;//the center frequency of the res. func., and the number of octaves
 
-	bool changed;
-	
-    private:
-	void defaults(int n);
-    
-	//stored default parameters
-	unsigned char Dtype;
-	unsigned char Dfreq;
-	unsigned char Dq;
+    struct {
+        struct {
+            unsigned char freq,amp,q;//frequency,amplitude,Q
+        }formants[FF_MAX_FORMANTS];
+    }Pvowels[FF_MAX_VOWELS];
+
+
+    unsigned char Psequencesize;//how many vowels are in the sequence
+    unsigned char Psequencestretch;//how the sequence is stretched (how the input from filter envelopes/LFOs/etc. is "stretched")
+    unsigned char Psequencereversed;//if the input from filter envelopes/LFOs/etc. is reversed(negated)
+    struct {
+        unsigned char nvowel;//the vowel from the position
+    } Psequence[FF_MAX_SEQUENCE];
+
+    REALTYPE getcenterfreq();
+    REALTYPE getoctavesfreq();
+    REALTYPE getfreqpos(REALTYPE freq);
+    REALTYPE getfreqx(REALTYPE x);
+
+    void formantfilterH(int nvowel,int nfreqs,REALTYPE *freqs);//used by UI
+
+    REALTYPE getformantfreq(unsigned char freq);
+    REALTYPE getformantamp(unsigned char amp);
+    REALTYPE getformantq(unsigned char q);
+
+    bool changed;
+
+private:
+    void defaults(int n);
+
+    //stored default parameters
+    unsigned char Dtype;
+    unsigned char Dfreq;
+    unsigned char Dq;
 };
 
 #endif

@@ -840,7 +840,7 @@
 	      hovers over them
 	    - Created tooltips for the effects knobs
 	    - Standardized the code, so it could compile with pedantic without
-	      errors [it looks like some errors may have ben missed]
+	      errors [it looks like some errors may have been missed]
 
 22 Feb 2009 (Mark McCurry)
 	    - Fix improper deallocation in PresetsStore
@@ -861,3 +861,34 @@
 	    - Almost all changes contained in Effects until further
 	      discussion on the style, so consistancy can be reached
 
+28 May 2009 (Mark McCurry)
+	    - Added some more Doxygen comments
+	    - Added Audio Samples classes
+	    - Added Stereo template
+	    - Added Control class
+	    - Added DelayCtl class
+
+20 Iun 2009 (Paul Nasca)
+	    - Bugfix: WAV export of PADsynth
+	    
+10 Iul 2009 (Paul Nasca)
+	    - Update copyright info
+
+11 Jul 2009 (Mark McCurry)
+	    - Added Proportinal Portamento
+	    - Replaced Docbook with AsciiDoc
+
+18 Jul 2009 (Mark McCurry)
+	    - Enabled volume controller by default
+
+20 Jul 2009 (Mark McCurry)
+	    - Incorperated AZERTY layout by sourceforge user jimee
+
+02 Sep 2009 (Mark McCurry)
+	    - Incorperated const char* <-> string mismatch by Alexis Ballier 
+	    
+04 Sep 2009 (Mark McCurry)
+	    - Incorperated NULLMidiIn function prototype fix by Alexis Ballier
+
+07 Sep 2009 (Mark McCurry)
+	    - Fixed glitch in XMLwrapper, which would prevent file loading

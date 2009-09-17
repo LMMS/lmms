@@ -191,8 +191,7 @@ void ZynAddSubFxInstrument::loadResource( const ResourceItem * _item )
 	{
 		m_remotePlugin->lock();
 		m_remotePlugin->sendMessage(
-			RemotePlugin::message( IdLoadPresetFromFile ).
-				addString( QSTR_TO_STDSTR( mapper.fileName() ) ) );
+			RemotePlugin::message( IdLoadPresetFromFile ).addString( fn ) );
 		m_remotePlugin->waitForMessage( IdLoadPresetFromFile );
 		m_remotePlugin->unlock();
 	}

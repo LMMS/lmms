@@ -1,12 +1,12 @@
 /*
   ZynAddSubFX - a software synthesizer
- 
+
   Filter.h - Filters, uses analog,formant,etc. filters
   Copyright (C) 2002-2005 Nasca Octavian Paul
   Author: Nasca Octavian Paul
 
   This program is free software; you can redistribute it and/or modify
-  it under the terms of version 2 of the GNU General Public License 
+  it under the terms of version 2 of the GNU General Public License
   as published by the Free Software Foundation.
 
   This program is distributed in the hope that it will be useful,
@@ -31,17 +31,18 @@
 #include "SVFilter.h"
 #include "../Params/FilterParams.h"
 
-class Filter{
- public:
+class Filter
+{
+public:
     Filter(FilterParams *pars);
-    ~Filter();	
+    ~Filter();
     void filterout(REALTYPE *smp);
     void setfreq(REALTYPE frequency);
     void setfreq_and_q(REALTYPE frequency,REALTYPE q_);
     void setq(REALTYPE q_);
 
     REALTYPE getrealfreq(REALTYPE freqpitch);
- private:
+private:
     Filter_ *filter;
     unsigned char category;
 };
