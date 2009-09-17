@@ -74,7 +74,10 @@ FxMixer::~FxMixer()
 {
 	for( int i = 0; i < m_fxChannels.size(); ++i )
 	{
-		delete m_fxChannels[i]->m_sendAmount[i];
+		for( int j = 0; j < m_fxChannels[i]->m_sendAmount.size(); ++j)
+		{
+			delete m_fxChannels[i]->m_sendAmount[j];
+		}
 		delete m_fxChannels[i];
 	}
 }
@@ -187,6 +190,11 @@ void FxMixer::processChannel( fx_ch_t _ch, sampleFrame * _buf )
 {
 	const fpp_t fpp = engine::getMixer()->framesPerPeriod();
 	FxChannel * thisCh = m_fxChannels[_ch];
+	if( _buf == NULL )
+	{
+		_buf = thisCh->m_buffer;
+	}
+
 	if( ! thisCh->m_muteModel.value() )
 	{
 		// do mixer sends. loop through the channels that send to this one
@@ -212,10 +220,7 @@ void FxMixer::processChannel( fx_ch_t _ch, sampleFrame * _buf )
 		}
 
 
-		if( _buf == NULL )
-		{
-			_buf = thisCh->m_buffer;
-		}
+
 		const float v = thisCh->m_volumeModel.value();
 
 		thisCh->m_fxChain.startRunning();

@@ -29,60 +29,74 @@
 #include <QtGui/QHBoxLayout>
 #include <QtGui/QScrollArea>
 
+#include "FxLine.h"
 #include "FxMixer.h"
 #include "ModelView.h"
+#include "engine.h"
+#include "fader.h"
+#include "pixmap_button.h"
+#include "tooltip.h"
+#include "embed.h"
+#include "EffectRackView.h"
 
 class QStackedLayout;
 class QButtonGroup;
-class fader;
 class FxLine;
-class EffectRackView;
-class pixmapButton;
-
 
 class FxMixerView : public QWidget, public ModelView,
 					public SerializingObjectHook
 {
 	Q_OBJECT
 public:
-	FxMixerView();
-	virtual ~FxMixerView();
-
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _this );
-	virtual void loadSettings( const QDomElement & _this );
-
-	FxLine * currentFxLine()
-	{
-		return m_currentFxLine;
-	}
-	void setCurrentFxLine( FxLine * _line );
-	void setCurrentFxLine( int _line );
-
-	void clear();
-
-
-private slots:
-	void updateFaders();
-	void addNewChannel();
-
-private:
 	struct FxChannelView
 	{
+		FxChannelView(QWidget * _parent, FxMixerView * _mv, int _chIndex );
+
 		FxLine * m_fxLine;
 		EffectRackView * m_rackView;
 		pixmapButton * m_muteBtn;
 		fader * m_fader;
 	} ;
 
-	QVector<FxChannelView> m_fxChannelViews;
+
+	FxMixerView();
+	virtual ~FxMixerView();
+
+	virtual void saveSettings( QDomDocument & _doc, QDomElement & _this );
+	virtual void loadSettings( const QDomElement & _this );
+
+	inline FxLine * currentFxLine()
+	{
+		return m_currentFxLine;
+	}
+
+	inline FxChannelView * channelView(int index)
+	{
+		return m_fxChannelViews[index];
+	}
+
+	void setCurrentFxLine( FxLine * _line );
+	void setCurrentFxLine( int _line );
+
+	void clear();
+
+
+	// display the send button and knob correctly
+	void updateFxLine(int i);
+
+private slots:
+	void updateFaders();
+	void addNewChannel();
+
+private:
+
+	QVector<FxChannelView *> m_fxChannelViews;
 
 	QStackedLayout * m_fxRacksLayout;
 	FxLine * m_currentFxLine;
 
 	QScrollArea * channelArea;
 	QHBoxLayout * chLayout;
-
-	void addFxLine(int i, QWidget * parent, QLayout * layout);
 } ;
 
 #endif
