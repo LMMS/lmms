@@ -97,13 +97,22 @@ ADnote::ADnote(ADnoteParameters *pars,Controller *ctl_,REALTYPE freq,REALTYPE ve
             continue; //the voice is disabled
         };
 
-#warning get from parameter
-		int unison=30;
+		int unison=pars->VoicePar[nvoice].Unison_size;
+		if (unison<1) unison=1;
+		
 		unison_size[nvoice]=unison;
 
 		unison_freq_rap[nvoice]=new REALTYPE[unison];
+		REALTYPE unison_spread=pars->VoicePar[nvoice].Unison_frequency_spread/127.0;
+		unison_spread=pow(unison_spread*2.0,4.0)*50.0;//cents
+
 		for (int k=0;k<unison;k++){
-			unison_freq_rap[nvoice][k]=1.0*pow(1.0001,k);
+			REALTYPE current_rnd=RND*2.0-1.0;
+
+#warning TODO: make current_rnd to be spread evenly (keep a current_rnd array and fix that)
+
+
+			unison_freq_rap[nvoice][k]=pow(2.0,(unison_spread*current_rnd)/1200);
 		};
 			
 		if (unison==1) unison_freq_rap[nvoice][0]=1.0;//if the unison is not used, always make the only subvoice to have the default note

@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0107 
+version 1.0109 
 header_name {.h} 
 code_name {.cc}
 decl {//Copyright (c) 2002-2005 Nasca Octavian Paul} {} 
@@ -177,20 +177,20 @@ class ADvoiceUI {open : {public Fl_Group}
   Function {make_window()} {open
   } {
     Fl_Window ADnoteVoiceParameters {
-      label Voice
-      xywh {225 174 765 525} type Double hide
-      class Fl_Group
+      label Voice open
+      xywh {69 185 765 575} type Double
+      class Fl_Group visible
     } {
-      Fl_Group voiceparametersgroup {
-        xywh {0 0 765 525} box THIN_UP_BOX color 48
+      Fl_Group voiceparametersgroup {open
+        xywh {0 0 765 580} box THIN_UP_BOX color 48
         code0 {if (pars->VoicePar[nvoice].Enabled==0) o->deactivate();}
       } {
-        Fl_Group voicemodegroup {
-          xywh {0 5 760 515}
+        Fl_Group voicemodegroup {open
+          xywh {0 5 760 575}
         } {
           Fl_Group voiceFMparametersgroup {
             label MODULATOR
-            xywh {530 5 230 515} box THIN_UP_FRAME color 48 labeltype EMBOSSED_LABEL labelfont 1 labelsize 13 align 17
+            xywh {530 5 230 565} box THIN_UP_FRAME color 48 labeltype EMBOSSED_LABEL labelfont 1 labelsize 13 align 17
             code0 {if (pars->VoicePar[nvoice].PFMEnabled==0) o->deactivate();}
           } {
             Fl_Group modfrequency {
@@ -209,7 +209,7 @@ class ADvoiceUI {open : {public Fl_Group}
                 callback {pars->VoicePar[nvoice].PFMFreqEnvelopeEnabled=(int)o->value();
 if (o->value()==0) voiceFMfreqenvgroup->deactivate();
 else voiceFMfreqenvgroup->activate();
-o->redraw();} selected
+o->redraw();}
                 tooltip {Forced Relase} xywh {545 295 50 10} down_box DOWN_BOX labelfont 1 labelsize 10
                 code0 {o->value(pars->VoicePar[nvoice].PFMFreqEnvelopeEnabled);}
               }
@@ -298,10 +298,10 @@ o->redraw();}
               }
             }
             Fl_Group modoscil {
-              xywh {535 365 220 150}
+              xywh {535 365 220 200}
             } {
               Fl_Group fmoscil {open
-                xywh {535 405 220 110} box THIN_DOWN_BOX color 32 selection_color 71 labelcolor 179
+                xywh {535 425 220 140} box THIN_DOWN_BOX color 32 selection_color 71 labelcolor 179
                 code0 {oscFM=new Oscilloscope(o->x(),o->y(),o->w(),o->h(),"");}
                 code1 {int nv=nvoice; if (pars->VoicePar[nvoice].PextFMoscil>=0) nv=pars->VoicePar[nvoice].PextFMoscil;}
                 code2 {oscFM->init(pars->VoicePar[nv].FMSmp,0,pars->VoicePar[nvoice].PFMoscilphase,master);}
@@ -326,7 +326,7 @@ oscedit=new OscilEditor(pars->VoicePar[nv].FMSmp,fmoscil,NULL,NULL,master);}
                 callback {pars->VoicePar[nvoice].PFMoscilphase=64-(int)o->value();
 oscFM->phase=64-(int) o->value();
 fmoscil->redraw();}
-                xywh {665 395 65 10} type {Horz Knob} box FLAT_BOX labelsize 10 align 5 minimum -64 maximum 63 step 1
+                xywh {665 400 65 10} type {Horz Knob} box FLAT_BOX labelsize 10 align 5 minimum -64 maximum 63 step 1
                 code0 {o->value(64-pars->VoicePar[nvoice].PFMoscilphase);}
               }
               Fl_Choice {} {
@@ -340,7 +340,7 @@ if ((int) o->value() != 0) {
     changeFMoscilbutton->labelcolor(FL_BLACK);
 };
 voiceFMparametersgroup->redraw();} open
-                xywh {560 390 75 15} down_box BORDER_BOX labelsize 10 textfont 1 textsize 10
+                xywh {560 395 75 15} down_box BORDER_BOX labelsize 10 textfont 1 textsize 10
                 code0 {o->add("Internal");}
                 code1 {char tmp[50]; for (int i=0;i<nvoice;i++) {sprintf(tmp,"ExtM.%2d",i+1);o->add(tmp);};}
                 code3 {o->value(pars->VoicePar[nvoice].PextFMoscil+1);}
@@ -548,6 +548,32 @@ voiceonbutton->redraw();} open
             code1 {char tmp[50]; for (int i=0;i<nvoice;i++) {sprintf(tmp,"Ext.%2d",i+1);o->add(tmp);};}
             code3 {o->value(pars->VoicePar[nvoice].Pextoscil+1);}
           } {}
+          Fl_Group {} {
+            label {Unison:} open
+            xywh {5 525 520 45} box UP_FRAME labeltype ENGRAVED_LABEL labelsize 15 align 20
+          } {
+            Fl_Counter {} {
+              label SIze
+              callback {int k=(int) o->value();
+
+pars->VoicePar[nvoice].Unison_size=k;}
+              tooltip {Unison Size} xywh {85 540 50 20} type Simple labelsize 10 align 1 minimum 1 maximum 8 step 1 value 1 textfont 1 textsize 12
+              code0 {int k=pars->VoicePar[nvoice].Unison_size;}
+              code2 {o->value(k);}
+            }
+            Fl_Value_Slider {} {
+              label {Frequency Spread}
+              callback {pars->VoicePar[nvoice].Unison_frequency_spread=(int)o->value();}
+              tooltip {Frequency Spread of the Unison} xywh {155 543 155 17} type {Horz Knob} box FLAT_BOX labelsize 11 align 5 maximum 127 step 1 value 64
+              code0 {o->value(pars->VoicePar[nvoice].Unison_frequency_spread);}
+            }
+            Fl_Value_Slider {} {
+              label {Stereo Spread}
+              callback {pars->VoicePar[nvoice].Unison_stereo_spread=(int)o->value();}
+              tooltip {Stereo Spread of the Unison} xywh {345 543 155 17} type {Horz Knob} box FLAT_BOX labelsize 11 align 5 maximum 127 step 1 value 100
+              code0 {o->value(pars->VoicePar[nvoice].Unison_stereo_spread);}
+            }
+          }
         }
         Fl_Group {} {
           label AMPLITUDE
@@ -752,7 +778,7 @@ if (oscedit!=NULL) {
   decl {Master *master;} {}
 } 
 
-class ADnoteUI {: {public PresetsUI_}
+class ADnoteUI {open : {public PresetsUI_}
 } {
   Function {make_window()} {open private
   } {
@@ -966,11 +992,11 @@ resui->resonancewindow->show();}
       }
     }
     Fl_Window ADnoteVoice {
-      label {ADsynth Voice Parameters}
-      xywh {53 58 765 560} type Double hide
+      label {ADsynth Voice Parameters} selected
+      xywh {53 58 765 620} type Double visible
     } {
       Fl_Group advoice {
-        xywh {0 0 760 525} box BORDER_BOX
+        xywh {0 0 760 575} box BORDER_BOX
         code0 {o->init(pars,nvoice,master);}
         code1 {o->show();}
         class ADvoiceUI
@@ -978,7 +1004,7 @@ resui->resonancewindow->show();}
       Fl_Button {} {
         label {Close Window}
         callback {ADnoteVoice->hide();}
-        xywh {300 530 195 25} box THIN_UP_BOX labelfont 1
+        xywh {300 585 195 25} box THIN_UP_BOX labelfont 1
       }
       Fl_Counter currentvoicecounter {
         label {Current Voice}
@@ -991,18 +1017,18 @@ ADnoteVoice->add(advoice);
 advoice->init(pars,nvoice,master);
 advoice->show();
 ADnoteVoice->redraw();}
-        xywh {5 530 130 25} type Simple labelfont 1 align 8 minimum 0 maximum 2 step 1 value 1 textfont 1 textsize 13
+        xywh {5 585 130 25} type Simple labelfont 1 align 8 minimum 0 maximum 2 step 1 value 1 textfont 1 textsize 13
         code0 {o->bounds(1,NUM_VOICES);}
       }
       Fl_Button {} {
         label C
         callback {presetsui->copy(pars,nvoice);}
-        xywh {700 535 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
+        xywh {700 590 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
       }
       Fl_Button {} {
         label P
         callback {presetsui->paste(pars,this,nvoice);}
-        xywh {730 535 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
+        xywh {730 590 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
       }
     }
     Fl_Window ADnoteVoiceList {

@@ -115,6 +115,15 @@ struct ADnoteVoiceParam {
     /** If the voice is enabled */
     unsigned char Enabled;
 
+	/** How many subvoices are used in this voice */
+	unsigned char Unison_size;
+
+	/** How subvoices are spread */
+	unsigned char Unison_frequency_spread;
+
+	/** Stereo spread of the subvoices*/
+	unsigned char Unison_stereo_spread;
+
     /** Type of the voice (0=Sound,1=Noise)*/
     unsigned char Type;
 
