@@ -178,7 +178,8 @@ private:
         *   FILTER PARAMETERS    *
         *************************/
 
-        Filter *VoiceFilter;
+        Filter *VoiceFilterL;
+        Filter *VoiceFilterR;
 
         REALTYPE FilterCenterPitch;/* Filter center Pitch*/
         REALTYPE FilterFreqTracking;
@@ -206,6 +207,7 @@ private:
 
         Envelope *FMFreqEnvelope;
         Envelope *FMAmpEnvelope;
+	
     } NoteVoicePar[NUM_VOICES];
 
 
@@ -216,17 +218,23 @@ private:
     //time from the start of the note
     REALTYPE time;
 
+	//the size of unison for a single voice
+	int unison_size[NUM_VOICES];
+
     //fractional part (skip)
-    REALTYPE oscposlo[NUM_VOICES],oscfreqlo[NUM_VOICES];
+    REALTYPE *oscposlo[NUM_VOICES],*oscfreqlo[NUM_VOICES];
 
     //integer part (skip)
-    int oscposhi[NUM_VOICES],oscfreqhi[NUM_VOICES];
+    int *oscposhi[NUM_VOICES],*oscfreqhi[NUM_VOICES];
 
     //fractional part (skip) of the Modullator
-    REALTYPE oscposloFM[NUM_VOICES],oscfreqloFM[NUM_VOICES];
+    REALTYPE *oscposloFM[NUM_VOICES],*oscfreqloFM[NUM_VOICES];
+
+	//how the unison subvoice's frequency is changed (1.0 for no change)
+	REALTYPE *unison_freq_rap[NUM_VOICES];
 
     //integer part (skip) of the Modullator
-    unsigned short int oscposhiFM[NUM_VOICES],oscfreqhiFM[NUM_VOICES];
+    unsigned int *oscposhiFM[NUM_VOICES],*oscfreqhiFM[NUM_VOICES];
 
     //used to compute and interpolate the amplitudes of voices and modullators
     REALTYPE oldamplitude[NUM_VOICES],
@@ -235,10 +243,13 @@ private:
     FMnewamplitude[NUM_VOICES];
 
     //used by Frequency Modulation (for integration)
-    REALTYPE FMoldsmp[NUM_VOICES];
+    REALTYPE *FMoldsmp[NUM_VOICES];
 
     //temporary buffer
-    REALTYPE *tmpwave;
+    REALTYPE *tmpwavel;
+    REALTYPE *tmpwaver;
+	int max_unison;
+    REALTYPE **tmpwave_unison;
 
     //Filter bypass samples
     REALTYPE *bypassl,*bypassr;

@@ -33,7 +33,8 @@ ADnote::ADnote(ADnoteParameters *pars,Controller *ctl_,REALTYPE freq,REALTYPE ve
 {
     ready=0;
 
-    tmpwave=new REALTYPE [SOUND_BUFFER_SIZE];
+    tmpwavel=new REALTYPE [SOUND_BUFFER_SIZE];
+    tmpwaver=new REALTYPE [SOUND_BUFFER_SIZE];
     bypassl=new REALTYPE [SOUND_BUFFER_SIZE];
     bypassr=new REALTYPE [SOUND_BUFFER_SIZE];
 
@@ -83,17 +84,39 @@ ADnote::ADnote(ADnoteParameters *pars,Controller *ctl_,REALTYPE freq,REALTYPE ve
     } else NoteGlobalPar.Punch.Enabled=0;
 
     for (int nvoice=0;nvoice<NUM_VOICES;nvoice++) {
-        pars->VoicePar[nvoice].OscilSmp->newrandseed(rand());
+        pars->VoicePar[nvoice].OscilSmp->newrandseed(rand());		
         NoteVoicePar[nvoice].OscilSmp=NULL;
         NoteVoicePar[nvoice].FMSmp=NULL;
         NoteVoicePar[nvoice].VoiceOut=NULL;
 
         NoteVoicePar[nvoice].FMVoice=-1;
+		unison_size[nvoice]=1;
 
         if (pars->VoicePar[nvoice].Enabled==0) {
             NoteVoicePar[nvoice].Enabled=OFF;
             continue; //the voice is disabled
         };
+
+#warning get from parameter
+		int unison=30;
+		unison_size[nvoice]=unison;
+
+		unison_freq_rap[nvoice]=new REALTYPE[unison];
+		for (int k=0;k<unison;k++){
+			unison_freq_rap[nvoice][k]=1.0*pow(1.0001,k);
+		};
+			
+		if (unison==1) unison_freq_rap[nvoice][0]=1.0;//if the unison is not used, always make the only subvoice to have the default note
+
+
+		oscfreqhi[nvoice]=new int[unison];
+		oscfreqlo[nvoice]=new REALTYPE[unison];
+		oscfreqhiFM[nvoice]=new unsigned int[unison];
+		oscfreqloFM[nvoice]=new REALTYPE[unison];
+		oscposhi[nvoice]=new int[unison];
+		oscposlo[nvoice]=new REALTYPE[unison];
+		oscposhiFM[nvoice]=new unsigned int[unison];
+		oscposloFM[nvoice]=new REALTYPE[unison];
 
         NoteVoicePar[nvoice].Enabled=ON;
         NoteVoicePar[nvoice].fixedfreq=pars->VoicePar[nvoice].Pfixedfreq;
@@ -119,10 +142,13 @@ ADnote::ADnote(ADnoteParameters *pars,Controller *ctl_,REALTYPE freq,REALTYPE ve
                                                     ,pars->VoicePar[nvoice].PFMCoarseDetune,pars->VoicePar[nvoice].PFMDetune);
         };
 
-        oscposhi[nvoice]=0;
-        oscposlo[nvoice]=0.0;
-        oscposhiFM[nvoice]=0;
-        oscposloFM[nvoice]=0.0;
+		
+		for (int k=0;k<unison;k++){
+			oscposhi[nvoice][k]=0;
+			oscposlo[nvoice][k]=0.0;
+			oscposhiFM[nvoice][k]=0;
+			oscposloFM[nvoice][k]=0.0;
+		};
 
         NoteVoicePar[nvoice].OscilSmp=new REALTYPE[OSCIL_SIZE+OSCIL_SMP_EXTRA_SAMPLES];//the extra points contains the first point
 
@@ -130,15 +156,18 @@ ADnote::ADnote(ADnoteParameters *pars,Controller *ctl_,REALTYPE freq,REALTYPE ve
         int vc=nvoice;
         if (pars->VoicePar[nvoice].Pextoscil!=-1) vc=pars->VoicePar[nvoice].Pextoscil;
         if (!pars->GlobalPar.Hrandgrouping) pars->VoicePar[vc].OscilSmp->newrandseed(rand());
-        oscposhi[nvoice]=pars->VoicePar[vc].OscilSmp->get(NoteVoicePar[nvoice].OscilSmp,getvoicebasefreq(nvoice),
-                         pars->VoicePar[nvoice].Presonance);
+        int oscposhi_start=pars->VoicePar[vc].OscilSmp->get(NoteVoicePar[nvoice].OscilSmp,getvoicebasefreq(nvoice), pars->VoicePar[nvoice].Presonance);
 
         //I store the first elments to the last position for speedups
         for (int i=0;i<OSCIL_SMP_EXTRA_SAMPLES;i++) NoteVoicePar[nvoice].OscilSmp[OSCIL_SIZE+i]=NoteVoicePar[nvoice].OscilSmp[i];
 
-        oscposhi[nvoice]+=(int)((pars->VoicePar[nvoice].Poscilphase-64.0)/128.0*OSCIL_SIZE+OSCIL_SIZE*4);
-        oscposhi[nvoice]%=OSCIL_SIZE;
+        oscposhi_start+=(int)((pars->VoicePar[nvoice].Poscilphase-64.0)/128.0*OSCIL_SIZE+OSCIL_SIZE*4);
+        oscposhi_start%=OSCIL_SIZE;
 
+		for (int k=0;k<unison;k++){
+			oscposhi[nvoice][k]=oscposhi_start;
+        	oscposhi_start=(int)(RND*(OSCIL_SIZE-1));//put random starting point for other subvoices
+		};
 
         NoteVoicePar[nvoice].FreqLfo=NULL;
         NoteVoicePar[nvoice].FreqEnvelope=NULL;
@@ -146,7 +175,8 @@ ADnote::ADnote(ADnoteParameters *pars,Controller *ctl_,REALTYPE freq,REALTYPE ve
         NoteVoicePar[nvoice].AmpLfo=NULL;
         NoteVoicePar[nvoice].AmpEnvelope=NULL;
 
-        NoteVoicePar[nvoice].VoiceFilter=NULL;
+        NoteVoicePar[nvoice].VoiceFilterL=NULL;
+        NoteVoicePar[nvoice].VoiceFilterR=NULL;
         NoteVoicePar[nvoice].FilterEnvelope=NULL;
         NoteVoicePar[nvoice].FilterLfo=NULL;
 
@@ -197,16 +227,29 @@ ADnote::ADnote(ADnoteParameters *pars,Controller *ctl_,REALTYPE freq,REALTYPE ve
         //Voice's modulator velocity sensing
         NoteVoicePar[nvoice].FMVolume*=VelF(velocity,partparams->VoicePar[nvoice].PFMVelocityScaleFunction);
 
-        FMoldsmp[nvoice]=0.0;//this is for FM (integration)
+		FMoldsmp[nvoice]=new REALTYPE [unison];
+		for (int k=0;k<unison;k++) FMoldsmp[nvoice][k]=0.0;//this is for FM (integration)
 
         firsttick[nvoice]=1;
         NoteVoicePar[nvoice].DelayTicks=(int)((exp(pars->VoicePar[nvoice].PDelay/127.0*log(50.0))-1.0)/SOUND_BUFFER_SIZE/10.0*SAMPLE_RATE);
+
+
     };
+
+	max_unison=1;
+	for (int nvoice=0;nvoice<NUM_VOICES;nvoice++){
+		if (unison_size[nvoice]>max_unison) max_unison=unison_size[nvoice];
+	};
+
+	tmpwave_unison=new REALTYPE*[max_unison];
+	for (int k=0;k<max_unison;k++){
+		tmpwave_unison[k]=new REALTYPE[SOUND_BUFFER_SIZE];
+		for (int i=0;i<SOUND_BUFFER_SIZE;i++) tmpwave_unison[k][i]=0.0;
+	};
 
     initparameters();
     ready=1;
 };
-
 
 // ADlegatonote: This function is (mostly) a copy of ADnote(...) and
 // initparameters() stuck together with some lines removed so that it
@@ -290,7 +333,6 @@ void ADnote::ADlegatonote(REALTYPE freq, REALTYPE velocity, int portamento_, int
         if (pars->VoicePar[nvoice].Pextoscil!=-1) vc=pars->VoicePar[nvoice].Pextoscil;
         if (!pars->GlobalPar.Hrandgrouping) pars->VoicePar[vc].OscilSmp->newrandseed(rand());
 
-        ///oscposhi[nvoice]=pars->VoicePar[vc].OscilSmp->get(NoteVoicePar[nvoice].OscilSmp,getvoicebasefreq(nvoice),pars->VoicePar[nvoice].Presonance);
         pars->VoicePar[vc].OscilSmp->get(NoteVoicePar[nvoice].OscilSmp,getvoicebasefreq(nvoice),pars->VoicePar[nvoice].Presonance);//(gf)Modif of the above line.
 
         //I store the first elments to the last position for speedups
@@ -325,6 +367,10 @@ void ADnote::ADlegatonote(REALTYPE freq, REALTYPE velocity, int portamento_, int
         NoteVoicePar[nvoice].FMVolume*=VelF(velocity,partparams->VoicePar[nvoice].PFMVelocityScaleFunction);
 
         NoteVoicePar[nvoice].DelayTicks=(int)((exp(pars->VoicePar[nvoice].PDelay/127.0*log(50.0))-1.0)/SOUND_BUFFER_SIZE/10.0*SAMPLE_RATE);
+
+
+#warning TODO: ADD HERE THE CODE FOR UNISON 
+
     };
 
     ///    initparameters();
@@ -426,22 +472,36 @@ void ADnote::ADlegatonote(REALTYPE freq, REALTYPE velocity, int portamento_, int
 void ADnote::KillVoice(int nvoice)
 {
 
-    delete []NoteVoicePar[nvoice].OscilSmp;
+	delete []oscfreqhi[nvoice];
+	delete []oscfreqlo[nvoice];
+	delete []oscfreqhiFM[nvoice];
+	delete []oscfreqloFM[nvoice];
+	delete []oscposhi[nvoice];
+	delete []oscposlo[nvoice];
+	delete []oscposhiFM[nvoice];
+	delete []oscposloFM[nvoice];
 
-    if (NoteVoicePar[nvoice].FreqEnvelope!=NULL) delete(NoteVoicePar[nvoice].FreqEnvelope);
-    NoteVoicePar[nvoice].FreqEnvelope=NULL;
+	delete []NoteVoicePar[nvoice].OscilSmp;
+	delete []unison_freq_rap[nvoice];
+	delete []FMoldsmp[nvoice];
 
-    if (NoteVoicePar[nvoice].FreqLfo!=NULL) delete(NoteVoicePar[nvoice].FreqLfo);
-    NoteVoicePar[nvoice].FreqLfo=NULL;
+	if (NoteVoicePar[nvoice].FreqEnvelope!=NULL) delete(NoteVoicePar[nvoice].FreqEnvelope);
+	NoteVoicePar[nvoice].FreqEnvelope=NULL;
 
-    if (NoteVoicePar[nvoice].AmpEnvelope!=NULL) delete (NoteVoicePar[nvoice].AmpEnvelope);
+	if (NoteVoicePar[nvoice].FreqLfo!=NULL) delete(NoteVoicePar[nvoice].FreqLfo);
+	NoteVoicePar[nvoice].FreqLfo=NULL;
+
+	if (NoteVoicePar[nvoice].AmpEnvelope!=NULL) delete (NoteVoicePar[nvoice].AmpEnvelope);
     NoteVoicePar[nvoice].AmpEnvelope=NULL;
 
     if (NoteVoicePar[nvoice].AmpLfo!=NULL) delete (NoteVoicePar[nvoice].AmpLfo);
     NoteVoicePar[nvoice].AmpLfo=NULL;
 
-    if (NoteVoicePar[nvoice].VoiceFilter!=NULL) delete (NoteVoicePar[nvoice].VoiceFilter);
-    NoteVoicePar[nvoice].VoiceFilter=NULL;
+    if (NoteVoicePar[nvoice].VoiceFilterL!=NULL) delete (NoteVoicePar[nvoice].VoiceFilterL);
+    NoteVoicePar[nvoice].VoiceFilterL=NULL;
+
+    if (NoteVoicePar[nvoice].VoiceFilterR!=NULL) delete (NoteVoicePar[nvoice].VoiceFilterR);
+    NoteVoicePar[nvoice].VoiceFilterR=NULL;
 
     if (NoteVoicePar[nvoice].FilterEnvelope!=NULL) delete (NoteVoicePar[nvoice].FilterEnvelope);
     NoteVoicePar[nvoice].FilterEnvelope=NULL;
@@ -492,9 +552,14 @@ void ADnote::KillNote()
 ADnote::~ADnote()
 {
     if (NoteEnabled==ON) KillNote();
-    delete [] tmpwave;
+    delete [] tmpwavel;
+    delete [] tmpwaver;
     delete [] bypassl;
     delete [] bypassr;
+	for (int k=0;k<max_unison;k++) delete[]tmpwave_unison[k];
+	delete[]tmpwave_unison;
+
+
 };
 
 
@@ -564,7 +629,8 @@ void ADnote::initparameters()
 
         /* Voice Filter Parameters Init */
         if (partparams->VoicePar[nvoice].PFilterEnabled!=0) {
-            NoteVoicePar[nvoice].VoiceFilter=new Filter(partparams->VoicePar[nvoice].VoiceFilter);
+            NoteVoicePar[nvoice].VoiceFilterL=new Filter(partparams->VoicePar[nvoice].VoiceFilter);
+            NoteVoicePar[nvoice].VoiceFilterR=new Filter(partparams->VoicePar[nvoice].VoiceFilter);
         };
 
         if (partparams->VoicePar[nvoice].PFilterEnvelopeEnabled!=0)
@@ -593,10 +659,15 @@ void ADnote::initparameters()
             };
             if (!partparams->GlobalPar.Hrandgrouping) partparams->VoicePar[vc].FMSmp->newrandseed(rand());
 
-            oscposhiFM[nvoice]=(oscposhi[nvoice]+partparams->VoicePar[vc].FMSmp->get(NoteVoicePar[nvoice].FMSmp,tmp)) % OSCIL_SIZE;
+			for (int k=0;k<unison_size[nvoice];k++){
+				oscposhiFM[nvoice][k]=(oscposhi[nvoice][k]+partparams->VoicePar[vc].FMSmp->get(NoteVoicePar[nvoice].FMSmp,tmp)) % OSCIL_SIZE;
+			};
             for (int i=0;i<OSCIL_SMP_EXTRA_SAMPLES;i++) NoteVoicePar[nvoice].FMSmp[OSCIL_SIZE+i]=NoteVoicePar[nvoice].FMSmp[i];
-            oscposhiFM[nvoice]+=(int)((partparams->VoicePar[nvoice].PFMoscilphase-64.0)/128.0*OSCIL_SIZE+OSCIL_SIZE*4);
-            oscposhiFM[nvoice]%=OSCIL_SIZE;
+			int oscposhiFM_add=(int)((partparams->VoicePar[nvoice].PFMoscilphase-64.0)/128.0*OSCIL_SIZE+OSCIL_SIZE*4);
+			for (int k=0;k<unison_size[nvoice];k++){
+				oscposhiFM[nvoice][k]+=oscposhiFM_add;
+				oscposhiFM[nvoice][k]%=OSCIL_SIZE;
+			};
         };
 
         if (partparams->VoicePar[nvoice].PFMFreqEnvelopeEnabled!=0)
@@ -628,13 +699,15 @@ void ADnote::initparameters()
  */
 void ADnote::setfreq(int nvoice,REALTYPE freq)
 {
-    REALTYPE speed;
-    freq=fabs(freq);
-    speed=freq*REALTYPE(OSCIL_SIZE)/(REALTYPE) SAMPLE_RATE;
-    if (speed>OSCIL_SIZE) speed=OSCIL_SIZE;
+	for (int k=0;k<unison_size[nvoice];k++){
+		REALTYPE speed;
+		freq=fabs(freq)*unison_freq_rap[nvoice][k];
+		speed=freq*REALTYPE(OSCIL_SIZE)/(REALTYPE) SAMPLE_RATE;
+		if (speed>OSCIL_SIZE) speed=OSCIL_SIZE;
 
-    F2I(speed,oscfreqhi[nvoice]);
-    oscfreqlo[nvoice]=speed-floor(speed);
+		F2I(speed,oscfreqhi[nvoice][k]);
+		oscfreqlo[nvoice][k]=speed-floor(speed);
+	};
 };
 
 /*
@@ -642,13 +715,15 @@ void ADnote::setfreq(int nvoice,REALTYPE freq)
  */
 void ADnote::setfreqFM(int nvoice,REALTYPE freq)
 {
-    REALTYPE speed;
-    freq=fabs(freq);
-    speed=freq*REALTYPE(OSCIL_SIZE)/(REALTYPE) SAMPLE_RATE;
-    if (speed>OSCIL_SIZE) speed=OSCIL_SIZE;
+	for (int k=0;k<unison_size[nvoice];k++){
+		REALTYPE speed;
+		freq=fabs(freq)*unison_freq_rap[nvoice][k];
+		speed=freq*REALTYPE(OSCIL_SIZE)/(REALTYPE) SAMPLE_RATE;
+		if (speed>OSCIL_SIZE) speed=OSCIL_SIZE;
 
-    F2I(speed,oscfreqhiFM[nvoice]);
-    oscfreqloFM[nvoice]=speed-floor(speed);
+		F2I(speed,oscfreqhiFM[nvoice][k]);
+		oscfreqloFM[nvoice][k]=speed-floor(speed);
+	};
 };
 
 /*
@@ -736,7 +811,7 @@ void ADnote::computecurrentparameters()
         /****************/
         /* Voice Filter */
         /****************/
-        if (NoteVoicePar[nvoice].VoiceFilter!=NULL) {
+        if (NoteVoicePar[nvoice].VoiceFilterL!=NULL) {
             filterpitch=NoteVoicePar[nvoice].FilterCenterPitch;
 
             if (NoteVoicePar[nvoice].FilterEnvelope!=NULL)
@@ -746,9 +821,10 @@ void ADnote::computecurrentparameters()
                 filterpitch+=NoteVoicePar[nvoice].FilterLfo->lfoout();
 
             filterfreq=filterpitch+NoteVoicePar[nvoice].FilterFreqTracking;
-            filterfreq=NoteVoicePar[nvoice].VoiceFilter->getrealfreq(filterfreq);
+            filterfreq=NoteVoicePar[nvoice].VoiceFilterL->getrealfreq(filterfreq);
 
-            NoteVoicePar[nvoice].VoiceFilter->setfreq(filterfreq);
+            NoteVoicePar[nvoice].VoiceFilterL->setfreq(filterfreq);
+            if (stereo&&NoteVoicePar[nvoice].VoiceFilterR) NoteVoicePar[nvoice].VoiceFilterR->setfreq(filterfreq);
         };
 
         if (NoteVoicePar[nvoice].noisetype==0) {//compute only if the voice isn't noise
@@ -815,22 +891,27 @@ inline void ADnote::ComputeVoiceOscillator_LinearInterpolation(int nvoice)
 {
     int i,poshi;
     REALTYPE poslo;
-
-    poshi=oscposhi[nvoice];
-    poslo=oscposlo[nvoice];
-    REALTYPE *smps=NoteVoicePar[nvoice].OscilSmp;
-    for (i=0;i<SOUND_BUFFER_SIZE;i++) {
-        tmpwave[i]=smps[poshi]*(1.0-poslo)+smps[poshi+1]*poslo;
-        poslo+=oscfreqlo[nvoice];
-        if (poslo>=1.0) {
-            poslo-=1.0;
-            poshi++;
-        };
-        poshi+=oscfreqhi[nvoice];
-        poshi&=OSCIL_SIZE-1;
-    };
-    oscposhi[nvoice]=poshi;
-    oscposlo[nvoice]=poslo;
+		
+	for (int k=0;k<unison_size[nvoice];k++){
+		poshi=oscposhi[nvoice][k];
+		poslo=oscposlo[nvoice][k];
+		int freqhi=oscfreqhi[nvoice][k];
+		REALTYPE freqlo=oscfreqlo[nvoice][k];
+		REALTYPE *smps=NoteVoicePar[nvoice].OscilSmp;
+		REALTYPE *tw=tmpwave_unison[k];
+		for (i=0;i<SOUND_BUFFER_SIZE;i++) {
+			tw[i]=smps[poshi]*(1.0-poslo)+smps[poshi+1]*poslo;
+			poslo+=freqlo;
+			if (poslo>=1.0) {
+				poslo-=1.0;
+				poshi++;
+			};
+			poshi+=freqhi;
+			poshi&=OSCIL_SIZE-1;
+		};
+		oscposhi[nvoice][k]=poshi;
+		oscposlo[nvoice][k]=poslo;
+	};
 };
 
 
@@ -881,35 +962,43 @@ inline void ADnote::ComputeVoiceOscillatorMorph(int nvoice)
     if (FMnewamplitude[nvoice]>1.0) FMnewamplitude[nvoice]=1.0;
     if (FMoldamplitude[nvoice]>1.0) FMoldamplitude[nvoice]=1.0;
 
-    if (NoteVoicePar[nvoice].FMVoice>=0) {
-        //if I use VoiceOut[] as modullator
-        int FMVoice=NoteVoicePar[nvoice].FMVoice;
-        for (i=0;i<SOUND_BUFFER_SIZE;i++) {
-            amp=INTERPOLATE_AMPLITUDE(FMoldamplitude[nvoice]
-                                      ,FMnewamplitude[nvoice],i,SOUND_BUFFER_SIZE);
-            tmpwave[i]=tmpwave[i]*(1.0-amp)+amp*NoteVoicePar[FMVoice].VoiceOut[i];
-        };
-    } else {
-        int poshiFM=oscposhiFM[nvoice];
-        REALTYPE posloFM=oscposloFM[nvoice];
+	if (NoteVoicePar[nvoice].FMVoice>=0) {
+		//if I use VoiceOut[] as modullator
+		int FMVoice=NoteVoicePar[nvoice].FMVoice;
+		for (int k=0;k<unison_size[nvoice];k++){
+			REALTYPE *tw=tmpwave_unison[k];
+			for (i=0;i<SOUND_BUFFER_SIZE;i++) {
+				amp=INTERPOLATE_AMPLITUDE(FMoldamplitude[nvoice]
+						,FMnewamplitude[nvoice],i,SOUND_BUFFER_SIZE);
+				tw[i]=tw[i]*(1.0-amp)+amp*NoteVoicePar[FMVoice].VoiceOut[i];
+			};
+		};
+	} else {
+		for (int k=0;k<unison_size[nvoice];k++){
+			int poshiFM=oscposhiFM[nvoice][k];
+			REALTYPE posloFM=oscposloFM[nvoice][k];
+			int freqhiFM=oscfreqhiFM[nvoice][k];
+			REALTYPE freqloFM=oscfreqloFM[nvoice][k];
+			REALTYPE *tw=tmpwave_unison[k];
 
-        for (i=0;i<SOUND_BUFFER_SIZE;i++) {
-            amp=INTERPOLATE_AMPLITUDE(FMoldamplitude[nvoice]
-                                      ,FMnewamplitude[nvoice],i,SOUND_BUFFER_SIZE);
-            tmpwave[i]=tmpwave[i]*(1.0-amp)+amp
-                       *(NoteVoicePar[nvoice].FMSmp[poshiFM]*(1-posloFM)
-                         +NoteVoicePar[nvoice].FMSmp[poshiFM+1]*posloFM);
-            posloFM+=oscfreqloFM[nvoice];
-            if (posloFM>=1.0) {
-                posloFM-=1.0;
-                poshiFM++;
-            };
-            poshiFM+=oscfreqhiFM[nvoice];
-            poshiFM&=OSCIL_SIZE-1;
-        };
-        oscposhiFM[nvoice]=poshiFM;
-        oscposloFM[nvoice]=posloFM;
-    };
+			for (i=0;i<SOUND_BUFFER_SIZE;i++) {
+				amp=INTERPOLATE_AMPLITUDE(FMoldamplitude[nvoice]
+						,FMnewamplitude[nvoice],i,SOUND_BUFFER_SIZE);
+				tw[i]=tw[i]*(1.0-amp)+amp
+					*(NoteVoicePar[nvoice].FMSmp[poshiFM]*(1-posloFM)
+							+NoteVoicePar[nvoice].FMSmp[poshiFM+1]*posloFM);
+				posloFM+=freqloFM;
+				if (posloFM>=1.0) {
+					posloFM-=1.0;
+					poshiFM++;
+				};
+				poshiFM+=freqhiFM;
+				poshiFM&=OSCIL_SIZE-1;
+			};
+			oscposhiFM[nvoice][k]=poshiFM;
+			oscposloFM[nvoice][k]=posloFM;
+		};
+	};
 };
 
 /*
@@ -922,36 +1011,44 @@ inline void ADnote::ComputeVoiceOscillatorRingModulation(int nvoice)
     ComputeVoiceOscillator_LinearInterpolation(nvoice);
     if (FMnewamplitude[nvoice]>1.0) FMnewamplitude[nvoice]=1.0;
     if (FMoldamplitude[nvoice]>1.0) FMoldamplitude[nvoice]=1.0;
-    if (NoteVoicePar[nvoice].FMVoice>=0) {
-        // if I use VoiceOut[] as modullator
-        for (i=0;i<SOUND_BUFFER_SIZE;i++) {
-            amp=INTERPOLATE_AMPLITUDE(FMoldamplitude[nvoice]
-                                      ,FMnewamplitude[nvoice],i,SOUND_BUFFER_SIZE);
-            int FMVoice=NoteVoicePar[nvoice].FMVoice;
-            for (i=0;i<SOUND_BUFFER_SIZE;i++)
-                tmpwave[i]*=(1.0-amp)+amp*NoteVoicePar[FMVoice].VoiceOut[i];
-        };
-    } else {
-        int poshiFM=oscposhiFM[nvoice];
-        REALTYPE posloFM=oscposloFM[nvoice];
+	if (NoteVoicePar[nvoice].FMVoice>=0) {
+		// if I use VoiceOut[] as modullator
+		for (int k=0;k<unison_size[nvoice];k++){
+			REALTYPE *tw=tmpwave_unison[k];
+			for (i=0;i<SOUND_BUFFER_SIZE;i++) {
+				amp=INTERPOLATE_AMPLITUDE(FMoldamplitude[nvoice]
+						,FMnewamplitude[nvoice],i,SOUND_BUFFER_SIZE);
+				int FMVoice=NoteVoicePar[nvoice].FMVoice;
+				for (i=0;i<SOUND_BUFFER_SIZE;i++)
+					tw[i]*=(1.0-amp)+amp*NoteVoicePar[FMVoice].VoiceOut[i];
+			};
+		};
+	} else {
+		for (int k=0;k<unison_size[nvoice];k++){
+			int poshiFM=oscposhiFM[nvoice][k];
+			REALTYPE posloFM=oscposloFM[nvoice][k];
+			int freqhiFM=oscfreqhiFM[nvoice][k];
+			REALTYPE freqloFM=oscfreqloFM[nvoice][k];
+			REALTYPE *tw=tmpwave_unison[k];
 
-        for (i=0;i<SOUND_BUFFER_SIZE;i++) {
-            amp=INTERPOLATE_AMPLITUDE(FMoldamplitude[nvoice]
-                                      ,FMnewamplitude[nvoice],i,SOUND_BUFFER_SIZE);
-            tmpwave[i]*=( NoteVoicePar[nvoice].FMSmp[poshiFM]*(1.0-posloFM)
-                          +NoteVoicePar[nvoice].FMSmp[poshiFM+1]*posloFM)*amp
-                        +(1.0-amp);
-            posloFM+=oscfreqloFM[nvoice];
-            if (posloFM>=1.0) {
-                posloFM-=1.0;
-                poshiFM++;
-            };
-            poshiFM+=oscfreqhiFM[nvoice];
-            poshiFM&=OSCIL_SIZE-1;
-        };
-        oscposhiFM[nvoice]=poshiFM;
-        oscposloFM[nvoice]=posloFM;
-    };
+			for (i=0;i<SOUND_BUFFER_SIZE;i++) {
+				amp=INTERPOLATE_AMPLITUDE(FMoldamplitude[nvoice]
+						,FMnewamplitude[nvoice],i,SOUND_BUFFER_SIZE);
+				tw[i]*=( NoteVoicePar[nvoice].FMSmp[poshiFM]*(1.0-posloFM)
+						+NoteVoicePar[nvoice].FMSmp[poshiFM+1]*posloFM)*amp
+					+(1.0-amp);
+				posloFM+=freqloFM;
+				if (posloFM>=1.0) {
+					posloFM-=1.0;
+					poshiFM++;
+				};
+				poshiFM+=freqhiFM;
+				poshiFM&=OSCIL_SIZE-1;
+			};
+			oscposhiFM[nvoice][k]=poshiFM;
+			oscposloFM[nvoice][k]=posloFM;
+		};
+	};
 };
 
 
@@ -961,80 +1058,116 @@ inline void ADnote::ComputeVoiceOscillatorRingModulation(int nvoice)
  */
 inline void ADnote::ComputeVoiceOscillatorFrequencyModulation(int nvoice,int FMmode)
 {
-    int carposhi;
-    int i,FMmodfreqhi;
-    REALTYPE FMmodfreqlo,carposlo;
+    int carposhi=0;
+    int i,FMmodfreqhi=0;
+    REALTYPE FMmodfreqlo=0,carposlo=0;
 
     if (NoteVoicePar[nvoice].FMVoice>=0) {
         //if I use VoiceOut[] as modulator
-        for (i=0;i<SOUND_BUFFER_SIZE;i++) tmpwave[i]=NoteVoicePar[NoteVoicePar[nvoice].FMVoice].VoiceOut[i];
-    } else {
-        //Compute the modulator and store it in tmpwave[]
-        int poshiFM=oscposhiFM[nvoice];
-        REALTYPE posloFM=oscposloFM[nvoice];
+		for (int k=0;k<unison_size[nvoice];k++){
+			REALTYPE *tw=tmpwave_unison[k];
+        	for (i=0;i<SOUND_BUFFER_SIZE;i++) tw[i]=NoteVoicePar[NoteVoicePar[nvoice].FMVoice].VoiceOut[i];
+		};
+	} else {
+		//Compute the modulator and store it in tmpwave_unison[][]
+		for (int k=0;k<unison_size[nvoice];k++){
+			int poshiFM=oscposhiFM[nvoice][k];
+			REALTYPE posloFM=oscposloFM[nvoice][k];
+			int freqhiFM=oscfreqhiFM[nvoice][k];
+			REALTYPE freqloFM=oscfreqloFM[nvoice][k];
+			REALTYPE *tw=tmpwave_unison[k];
 
-        for (i=0;i<SOUND_BUFFER_SIZE;i++) {
-            tmpwave[i]=(NoteVoicePar[nvoice].FMSmp[poshiFM]*(1.0-posloFM)
-                        +NoteVoicePar[nvoice].FMSmp[poshiFM+1]*posloFM);
-            posloFM+=oscfreqloFM[nvoice];
-            if (posloFM>=1.0) {
-                posloFM=fmod(posloFM,1.0);
-                poshiFM++;
-            };
-            poshiFM+=oscfreqhiFM[nvoice];
-            poshiFM&=OSCIL_SIZE-1;
-        };
-        oscposhiFM[nvoice]=poshiFM;
-        oscposloFM[nvoice]=posloFM;
-    };
+			for (i=0;i<SOUND_BUFFER_SIZE;i++) {
+				tw[i]=(NoteVoicePar[nvoice].FMSmp[poshiFM]*(1.0-posloFM)
+						+NoteVoicePar[nvoice].FMSmp[poshiFM+1]*posloFM);
+				posloFM+=freqloFM;
+				if (posloFM>=1.0) {
+					posloFM=fmod(posloFM,1.0);
+					poshiFM++;
+				};
+				poshiFM+=freqhiFM;
+				poshiFM&=OSCIL_SIZE-1;
+			};
+			oscposhiFM[nvoice][k]=poshiFM;
+			oscposloFM[nvoice][k]=posloFM;
+		};
+	};
     // Amplitude interpolation
-    if (ABOVE_AMPLITUDE_THRESHOLD(FMoldamplitude[nvoice],FMnewamplitude[nvoice])) {
-        for (i=0;i<SOUND_BUFFER_SIZE;i++) {
-            tmpwave[i]*=INTERPOLATE_AMPLITUDE(FMoldamplitude[nvoice]
-                                              ,FMnewamplitude[nvoice],i,SOUND_BUFFER_SIZE);
-        };
-    } else for (i=0;i<SOUND_BUFFER_SIZE;i++) tmpwave[i]*=FMnewamplitude[nvoice];
+	if (ABOVE_AMPLITUDE_THRESHOLD(FMoldamplitude[nvoice],FMnewamplitude[nvoice])) {
+		for (int k=0;k<unison_size[nvoice];k++){
+			REALTYPE *tw=tmpwave_unison[k];
+			for (i=0;i<SOUND_BUFFER_SIZE;i++) {
+				tw[i]*=INTERPOLATE_AMPLITUDE(FMoldamplitude[nvoice]
+						,FMnewamplitude[nvoice],i,SOUND_BUFFER_SIZE);
+			};
+		};
+	} else {
+		for (int k=0;k<unison_size[nvoice];k++){
+			REALTYPE *tw=tmpwave_unison[k];
+			for (i=0;i<SOUND_BUFFER_SIZE;i++) tw[i]*=FMnewamplitude[nvoice];
+		};
+	};
 
 
     //normalize makes all sample-rates, oscil_sizes toproduce same sound
     if (FMmode!=0) {//Frequency modulation
         REALTYPE normalize=OSCIL_SIZE/262144.0*44100.0/(REALTYPE)SAMPLE_RATE;
-        for (i=0;i<SOUND_BUFFER_SIZE;i++) {
-            FMoldsmp[nvoice]=fmod(FMoldsmp[nvoice]+tmpwave[i]*normalize,OSCIL_SIZE);
-            tmpwave[i]=FMoldsmp[nvoice];
-        };
+		for (int k=0;k<unison_size[nvoice];k++){
+			REALTYPE *tw=tmpwave_unison[k];
+			REALTYPE fmold=FMoldsmp[nvoice][k];
+			for (i=0;i<SOUND_BUFFER_SIZE;i++) {
+				fmold=fmod(fmold+tw[i]*normalize,OSCIL_SIZE);
+				tw[i]=fmold;
+			};
+			FMoldsmp[nvoice][k]=fmold;
+		};
     } else {//Phase modulation
         REALTYPE normalize=OSCIL_SIZE/262144.0;
-        for (i=0;i<SOUND_BUFFER_SIZE;i++) tmpwave[i]*=normalize;
+		for (int k=0;k<unison_size[nvoice];k++){
+			REALTYPE *tw=tmpwave_unison[k];
+        	for (i=0;i<SOUND_BUFFER_SIZE;i++) tw[i]*=normalize;
+		};
     };
 
-    for (i=0;i<SOUND_BUFFER_SIZE;i++) {
-        F2I(tmpwave[i],FMmodfreqhi);
-        FMmodfreqlo=fmod(tmpwave[i]+0.0000000001,1.0);
-        if (FMmodfreqhi<0) FMmodfreqlo++;
+	//do the modulation
+	for (int k=0;k<unison_size[nvoice];k++){
+		REALTYPE *tw=tmpwave_unison[k];
+		int poshi=oscposhi[nvoice][k];
+		REALTYPE poslo=oscposlo[nvoice][k];
+		int freqhi=oscfreqhi[nvoice][k];
+		REALTYPE freqlo=oscfreqlo[nvoice][k];
 
-        //carrier
-        carposhi=oscposhi[nvoice]+FMmodfreqhi;
-        carposlo=oscposlo[nvoice]+FMmodfreqlo;
+		for (i=0;i<SOUND_BUFFER_SIZE;i++) {
+			F2I(tw[i],FMmodfreqhi);
+			FMmodfreqlo=fmod(tw[i]+0.0000000001,1.0);
+			if (FMmodfreqhi<0) FMmodfreqlo++;
 
-        if (carposlo>=1.0) {
-            carposhi++;
-            carposlo=fmod(carposlo,1.0);
-        };
-        carposhi&=(OSCIL_SIZE-1);
+			//carrier
+			carposhi=poshi+FMmodfreqhi;
+			carposlo=poslo+FMmodfreqlo;
 
-        tmpwave[i]=NoteVoicePar[nvoice].OscilSmp[carposhi]*(1.0-carposlo)
-                   +NoteVoicePar[nvoice].OscilSmp[carposhi+1]*carposlo;
+			if (carposlo>=1.0) {
+				carposhi++;
+				carposlo=fmod(carposlo,1.0);
+			};
+			carposhi&=(OSCIL_SIZE-1);
 
-        oscposlo[nvoice]+=oscfreqlo[nvoice];
-        if (oscposlo[nvoice]>=1.0) {
-            oscposlo[nvoice]=fmod(oscposlo[nvoice],1.0);
-            oscposhi[nvoice]++;
-        };
+			tw[i]=NoteVoicePar[nvoice].OscilSmp[carposhi]*(1.0-carposlo)
+				+NoteVoicePar[nvoice].OscilSmp[carposhi+1]*carposlo;
 
-        oscposhi[nvoice]+=oscfreqhi[nvoice];
-        oscposhi[nvoice]&=OSCIL_SIZE-1;
-    };
+			poslo+=freqlo;
+			if (poslo>=1.0) {
+				poslo=fmod(freqlo,1.0);
+				poshi++;
+			};
+
+			poshi+=freqhi;
+			poshi&=OSCIL_SIZE-1;
+		};
+		oscposhi[nvoice][k]=poshi;
+		oscposlo[nvoice][k]=poslo;
+		
+	};
 };
 
 
@@ -1049,7 +1182,10 @@ inline void ADnote::ComputeVoiceOscillatorPitchModulation(int nvoice)
  */
 inline void ADnote::ComputeVoiceNoise(int nvoice)
 {
-    for (int i=0;i<SOUND_BUFFER_SIZE;i++) tmpwave[i]=RND*2.0-1.0;
+	for (int k=0;k<unison_size[nvoice];k++){
+		REALTYPE *tw=tmpwave_unison[k];
+    	for (int i=0;i<SOUND_BUFFER_SIZE;i++) tw[i]=RND*2.0-1.0;
+	};
 };
 
 
@@ -1101,60 +1237,97 @@ int ADnote::noteout(REALTYPE *outl,REALTYPE *outr)
         } else ComputeVoiceNoise(nvoice);
         // Voice Processing
 
+
+		for (i=0;i<SOUND_BUFFER_SIZE;i++) tmpwavel[i]=0.0;
+		if (stereo) for (i=0;i<SOUND_BUFFER_SIZE;i++) tmpwaver[i]=0.0;
+		for (int k=0;k<unison_size[nvoice];k++){
+			REALTYPE *tw=tmpwave_unison[k];
+			if (stereo){
+#warning #make stereo mixing 
+				for (i=0;i<SOUND_BUFFER_SIZE;i++) tmpwavel[i]+=tw[i];
+				for (i=0;i<SOUND_BUFFER_SIZE;i++) tmpwaver[i]+=tw[i];
+			}else{
+				for (i=0;i<SOUND_BUFFER_SIZE;i++) tmpwavel[i]+=tw[i];
+			};
+
+		};
+
+
+		REALTYPE unison_amplitude=1.0/sqrt(unison_size[nvoice]);//reduce the amplitude for large unison sizes
         // Amplitude
-        if (ABOVE_AMPLITUDE_THRESHOLD(oldamplitude[nvoice],newamplitude[nvoice])) {
+		REALTYPE oldam=oldamplitude[nvoice]*unison_amplitude;
+		REALTYPE newam=newamplitude[nvoice]*unison_amplitude;
+        if (ABOVE_AMPLITUDE_THRESHOLD(oldam,newam)) {
             int rest=SOUND_BUFFER_SIZE;
             //test if the amplitude if raising and the difference is high
-            if ((newamplitude[nvoice]>oldamplitude[nvoice])&&((newamplitude[nvoice]-oldamplitude[nvoice])>0.25)) {
+            if ((newam>oldam)&&((newam-oldam)>0.25)) {
                 rest=10;
                 if (rest>SOUND_BUFFER_SIZE) rest=SOUND_BUFFER_SIZE;
-                for (int i=0;i<SOUND_BUFFER_SIZE-rest;i++) tmpwave[i]*=oldamplitude[nvoice];
+                for (int i=0;i<SOUND_BUFFER_SIZE-rest;i++) tmpwavel[i]*=oldam;
+                if (stereo) for (int i=0;i<SOUND_BUFFER_SIZE-rest;i++) tmpwaver[i]*=oldam;
             };
             // Amplitude interpolation
             for (i=0;i<rest;i++) {
-                tmpwave[i+(SOUND_BUFFER_SIZE-rest)]*=INTERPOLATE_AMPLITUDE(oldamplitude[nvoice]
-                                                     ,newamplitude[nvoice],i,rest);
+                REALTYPE amp=INTERPOLATE_AMPLITUDE(oldam,newam,i,rest);
+                tmpwavel[i+(SOUND_BUFFER_SIZE-rest)]*=amp;
+                if (stereo) tmpwaver[i+(SOUND_BUFFER_SIZE-rest)]*=amp;
             };
-        } else for (i=0;i<SOUND_BUFFER_SIZE;i++) tmpwave[i]*=newamplitude[nvoice];
+        } else {
+			for (i=0;i<SOUND_BUFFER_SIZE;i++) tmpwavel[i]*=newam;
+			if (stereo) for (i=0;i<SOUND_BUFFER_SIZE;i++) tmpwaver[i]*=newam;
+		};
 
         // Fade in
         if (firsttick[nvoice]!=0) {
-            fadein(&tmpwave[0]);
+            fadein(&tmpwavel[0]);
+            if (stereo) fadein(&tmpwaver[0]);
             firsttick[nvoice]=0;
         };
 
 
         // Filter
-        if (NoteVoicePar[nvoice].VoiceFilter!=NULL) NoteVoicePar[nvoice].VoiceFilter->filterout(&tmpwave[0]);
+        if (NoteVoicePar[nvoice].VoiceFilterL!=NULL) NoteVoicePar[nvoice].VoiceFilterL->filterout(&tmpwavel[0]);
+        if ((stereo)&&(NoteVoicePar[nvoice].VoiceFilterR!=NULL)) NoteVoicePar[nvoice].VoiceFilterR->filterout(&tmpwaver[0]);
 
         //check if the amplitude envelope is finished, if yes, the voice will be fadeout
         if (NoteVoicePar[nvoice].AmpEnvelope!=NULL) {
             if (NoteVoicePar[nvoice].AmpEnvelope->finished()!=0)
-                for (i=0;i<SOUND_BUFFER_SIZE;i++)
-                    tmpwave[i]*=1.0-(REALTYPE)i/(REALTYPE)SOUND_BUFFER_SIZE;
+                for (i=0;i<SOUND_BUFFER_SIZE;i++) tmpwavel[i]*=1.0-(REALTYPE)i/(REALTYPE)SOUND_BUFFER_SIZE;
+                if (stereo) for (i=0;i<SOUND_BUFFER_SIZE;i++) tmpwaver[i]*=1.0-(REALTYPE)i/(REALTYPE)SOUND_BUFFER_SIZE;
             //the voice is killed later
         };
 
 
         // Put the ADnote samples in VoiceOut (without appling Global volume, because I wish to use this voice as a modullator)
-        if (NoteVoicePar[nvoice].VoiceOut!=NULL)
-            for (i=0;i<SOUND_BUFFER_SIZE;i++) NoteVoicePar[nvoice].VoiceOut[i]=tmpwave[i];
+        if (NoteVoicePar[nvoice].VoiceOut!=NULL){
+            if (stereo) {
+				for (i=0;i<SOUND_BUFFER_SIZE;i++) NoteVoicePar[nvoice].VoiceOut[i]=tmpwavel[i]+tmpwaver[i];
+			}else {//mono
+				for (i=0;i<SOUND_BUFFER_SIZE;i++) NoteVoicePar[nvoice].VoiceOut[i]=tmpwavel[i];
+			};
+		};
 
 
         // Add the voice that do not bypass the filter to out
-        if (NoteVoicePar[nvoice].filterbypass==0) {//no bypass
-            if (stereo==0) for (i=0;i<SOUND_BUFFER_SIZE;i++) outl[i]+=tmpwave[i]*NoteVoicePar[nvoice].Volume;//mono
-            else for (i=0;i<SOUND_BUFFER_SIZE;i++) {//stereo
-                    outl[i]+=tmpwave[i]*NoteVoicePar[nvoice].Volume*NoteVoicePar[nvoice].Panning*2.0;
-                    outr[i]+=tmpwave[i]*NoteVoicePar[nvoice].Volume*(1.0-NoteVoicePar[nvoice].Panning)*2.0;
-                };
-        } else {//bypass the filter
-            if (stereo==0) for (i=0;i<SOUND_BUFFER_SIZE;i++) bypassl[i]+=tmpwave[i]*NoteVoicePar[nvoice].Volume;//mono
-            else for (i=0;i<SOUND_BUFFER_SIZE;i++) {//stereo
-                    bypassl[i]+=tmpwave[i]*NoteVoicePar[nvoice].Volume*NoteVoicePar[nvoice].Panning*2.0;
-                    bypassr[i]+=tmpwave[i]*NoteVoicePar[nvoice].Volume*(1.0-NoteVoicePar[nvoice].Panning)*2.0;
-                };
-        };
+		if (NoteVoicePar[nvoice].filterbypass==0) {//no bypass
+			if (stereo) {
+				for (i=0;i<SOUND_BUFFER_SIZE;i++) {//stereo
+					outl[i]+=tmpwavel[i]*NoteVoicePar[nvoice].Volume*NoteVoicePar[nvoice].Panning*2.0;
+					outr[i]+=tmpwaver[i]*NoteVoicePar[nvoice].Volume*(1.0-NoteVoicePar[nvoice].Panning)*2.0;
+				};
+			}else{
+				for (i=0;i<SOUND_BUFFER_SIZE;i++) outl[i]+=tmpwavel[i]*NoteVoicePar[nvoice].Volume;//mono
+			};
+		} else {//bypass the filter
+			if (stereo) {
+				for (i=0;i<SOUND_BUFFER_SIZE;i++) {//stereo
+					bypassl[i]+=tmpwavel[i]*NoteVoicePar[nvoice].Volume*NoteVoicePar[nvoice].Panning*2.0;
+					bypassr[i]+=tmpwaver[i]*NoteVoicePar[nvoice].Volume*(1.0-NoteVoicePar[nvoice].Panning)*2.0;
+				};
+			}else{
+				for (i=0;i<SOUND_BUFFER_SIZE;i++) bypassl[i]+=tmpwavel[i]*NoteVoicePar[nvoice].Volume;//mono
+			};
+		};
         // chech if there is necesary to proces the voice longer (if the Amplitude envelope isn't finished)
         if (NoteVoicePar[nvoice].AmpEnvelope!=NULL) {
             if (NoteVoicePar[nvoice].AmpEnvelope->finished()!=0) KillVoice(nvoice);
