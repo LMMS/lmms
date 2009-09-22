@@ -36,6 +36,7 @@
 #include "Presets.h"
 
 enum FMTYPE {NONE,MORPH,RING_MOD,PHASE_MOD,FREQ_MOD,PITCH_MOD};
+extern int ADnote_unison_sizes[];
 
 /*****************************************************************/
 /*                    GLOBAL PARAMETERS                          */
@@ -278,6 +279,8 @@ public:
     void getfromXML(XMLwrapper *xml);
 
     REALTYPE getBandwidthDetuneMultiplier();
+	int get_unison_size_index(int nvoice);
+	void set_unison_size_index(int nvoice,int index);
 private:
     void defaults(int n);//n is the nvoice
 

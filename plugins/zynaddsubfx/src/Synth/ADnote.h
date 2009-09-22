@@ -57,8 +57,8 @@ public:
 
 private:
 
-    void setfreq(int nvoice,REALTYPE freq);
-    void setfreqFM(int nvoice,REALTYPE freq);
+    void setfreq(int nvoice,REALTYPE in_freq);
+    void setfreqFM(int nvoice,REALTYPE in_freq);
     void computecurrentparameters();
     void initparameters();
     void KillVoice(int nvoice);
@@ -220,6 +220,9 @@ private:
 
 	//the size of unison for a single voice
 	int unison_size[NUM_VOICES];
+
+	//the stereo spread of the unison subvoices (0.0=mono,1.0=max)
+	REALTYPE unison_stereo_spread[NUM_VOICES];
 
     //fractional part (skip)
     REALTYPE *oscposlo[NUM_VOICES],*oscfreqlo[NUM_VOICES];

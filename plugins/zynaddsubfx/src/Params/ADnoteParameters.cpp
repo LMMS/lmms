@@ -25,6 +25,7 @@
 #include <math.h>
 
 #include "ADnoteParameters.h"
+int ADnote_unison_sizes[]={1,2,3,4,6,8,12,16,24,32,48,64,0};
 
 ADnoteParameters::ADnoteParameters(FFTwrapper *fft_):Presets()
 {
@@ -99,7 +100,7 @@ void ADnoteParameters::defaults(int n)
 
 	VoicePar[nvoice].Unison_size=1;
 	VoicePar[nvoice].Unison_frequency_spread=64;
-	VoicePar[nvoice].Unison_stereo_spread=100;
+	VoicePar[nvoice].Unison_stereo_spread=64;
 
     VoicePar[nvoice].Type=0;
     VoicePar[nvoice].Pfixedfreq=0;
@@ -235,6 +236,29 @@ ADnoteParameters::~ADnoteParameters()
     };
 };
 
+int ADnoteParameters::get_unison_size_index(int nvoice){
+	int index=0;
+	if (nvoice>=NUM_VOICES) return 0;
+	int unison=VoicePar[nvoice].Unison_size;
+	while(1){
+		if ((ADnote_unison_sizes[index]<=unison)||(ADnote_unison_sizes[index]==0)) return index;
+		index++;
+	};
+	return 0;
+};
+
+void ADnoteParameters::set_unison_size_index(int nvoice,int index){
+	int unison=1;
+	for (int i=0;i<=index;i++){
+		unison=ADnote_unison_sizes[i];
+		if (unison==0) {
+			unison=ADnote_unison_sizes[i-1];
+			break;
+		};
+	};
+
+	VoicePar[nvoice].Unison_size=unison;
+};
 
 
 

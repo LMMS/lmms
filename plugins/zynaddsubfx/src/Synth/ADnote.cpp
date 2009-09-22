@@ -97,26 +97,44 @@ ADnote::ADnote(ADnoteParameters *pars,Controller *ctl_,REALTYPE freq,REALTYPE ve
             continue; //the voice is disabled
         };
 
+		unison_stereo_spread[nvoice]=pars->VoicePar[nvoice].Unison_stereo_spread/127.0;
 		int unison=pars->VoicePar[nvoice].Unison_size;
 		if (unison<1) unison=1;
-		
+	
+		//compute unison	
 		unison_size[nvoice]=unison;
 
 		unison_freq_rap[nvoice]=new REALTYPE[unison];
 		REALTYPE unison_spread=pars->VoicePar[nvoice].Unison_frequency_spread/127.0;
-		unison_spread=pow(unison_spread*2.0,4.0)*50.0;//cents
+		unison_spread=pow(unison_spread*2.0,2.0)*50.0;//cents
 
-		for (int k=0;k<unison;k++){
-			REALTYPE current_rnd=RND*2.0-1.0;
-
-#warning TODO: make current_rnd to be spread evenly (keep a current_rnd array and fix that)
-
-
-			unison_freq_rap[nvoice][k]=pow(2.0,(unison_spread*current_rnd)/1200);
+		switch (unison){
+			case 1:
+				unison_freq_rap[nvoice][0]=1.0;//if the unison is not used, always make the only subvoice to have the default note
+				break;
+			case 2:{//unison for 2 subvoices
+					   REALTYPE tmp=pow(2.0,(unison_spread*0.5)/1200.0);
+					   unison_freq_rap[nvoice][0]=1.0/tmp;
+					   unison_freq_rap[nvoice][1]=tmp;
+				   };
+				break;
+			default:{//unison for more than 2 subvoices
+						REALTYPE unison_values[unison];
+						REALTYPE min=-1e-6,max=1e-6;
+						for (int k=0;k<unison;k++){
+							REALTYPE step=(k/(REALTYPE) (unison-1))*2.0-1.0;//this makes the unison spread more uniform							
+							REALTYPE val=step+(RND*2.0-1.0)/(unison-1);
+							unison_values[k]=val;
+							if (val>max) max=val;
+							if (val<min) min=val;
+						};
+						REALTYPE diff=max-min;
+						for (int k=0;k<unison;k++){
+							unison_values[k]=(unison_values[k]-(max+min)*0.5)/diff;//the lowest value will be -1 and the highest will be 1
+							unison_freq_rap[nvoice][k]=pow(2.0,(unison_spread*unison_values[k]*0.5)/1200);
+						};
+					};
 		};
-			
-		if (unison==1) unison_freq_rap[nvoice][0]=1.0;//if the unison is not used, always make the only subvoice to have the default note
-
 
 		oscfreqhi[nvoice]=new int[unison];
 		oscfreqlo[nvoice]=new REALTYPE[unison];
@@ -706,12 +724,11 @@ void ADnote::initparameters()
 /*
  * Computes the frequency of an oscillator
  */
-void ADnote::setfreq(int nvoice,REALTYPE freq)
+void ADnote::setfreq(int nvoice,REALTYPE in_freq)
 {
 	for (int k=0;k<unison_size[nvoice];k++){
-		REALTYPE speed;
-		freq=fabs(freq)*unison_freq_rap[nvoice][k];
-		speed=freq*REALTYPE(OSCIL_SIZE)/(REALTYPE) SAMPLE_RATE;
+		REALTYPE freq=fabs(in_freq)*unison_freq_rap[nvoice][k];
+		REALTYPE speed=freq*REALTYPE(OSCIL_SIZE)/(REALTYPE) SAMPLE_RATE;
 		if (speed>OSCIL_SIZE) speed=OSCIL_SIZE;
 
 		F2I(speed,oscfreqhi[nvoice][k]);
@@ -722,12 +739,11 @@ void ADnote::setfreq(int nvoice,REALTYPE freq)
 /*
  * Computes the frequency of an modullator oscillator
  */
-void ADnote::setfreqFM(int nvoice,REALTYPE freq)
+void ADnote::setfreqFM(int nvoice,REALTYPE in_freq)
 {
 	for (int k=0;k<unison_size[nvoice];k++){
-		REALTYPE speed;
-		freq=fabs(freq)*unison_freq_rap[nvoice][k];
-		speed=freq*REALTYPE(OSCIL_SIZE)/(REALTYPE) SAMPLE_RATE;
+		REALTYPE freq=fabs(in_freq)*unison_freq_rap[nvoice][k];
+		REALTYPE speed=freq*REALTYPE(OSCIL_SIZE)/(REALTYPE) SAMPLE_RATE;
 		if (speed>OSCIL_SIZE) speed=OSCIL_SIZE;
 
 		F2I(speed,oscfreqhiFM[nvoice][k]);
@@ -1247,14 +1263,33 @@ int ADnote::noteout(REALTYPE *outl,REALTYPE *outr)
         // Voice Processing
 
 
+		//mix subvoices into
 		for (i=0;i<SOUND_BUFFER_SIZE;i++) tmpwavel[i]=0.0;
 		if (stereo) for (i=0;i<SOUND_BUFFER_SIZE;i++) tmpwaver[i]=0.0;
 		for (int k=0;k<unison_size[nvoice];k++){
 			REALTYPE *tw=tmpwave_unison[k];
 			if (stereo){
-#warning #make stereo mixing 
-				for (i=0;i<SOUND_BUFFER_SIZE;i++) tmpwavel[i]+=tw[i];
-				for (i=0;i<SOUND_BUFFER_SIZE;i++) tmpwaver[i]+=tw[i];
+				REALTYPE stereo_pos=0;
+				if (unison_size[nvoice]>1) stereo_pos=k/(REALTYPE)(unison_size[nvoice]-1)*2.0-1.0;
+				REALTYPE stereo_spread=unison_stereo_spread[nvoice]*2.0;//between 0 and 2.0
+				if (stereo_spread>1.0){
+					REALTYPE stereo_pos_1=(stereo_pos>=0.0)?1.0:-1.0;
+					stereo_pos=(2.0-stereo_spread)*stereo_pos+(stereo_spread-1.0)*stereo_pos_1;
+				}else{
+					stereo_pos*=stereo_spread;
+				};
+				if (unison_size[nvoice]==1) stereo_pos=0.0;
+				REALTYPE panning=(stereo_pos+1.0)*0.5;
+				
+
+				REALTYPE lvol=(1.0-panning)*2.0;
+				if (lvol>1.0) lvol=1.0;
+
+				REALTYPE rvol=panning*2.0;
+				if (rvol>1.0) rvol=1.0;
+
+				for (i=0;i<SOUND_BUFFER_SIZE;i++) tmpwavel[i]+=tw[i]*lvol;
+				for (i=0;i<SOUND_BUFFER_SIZE;i++) tmpwaver[i]+=tw[i]*rvol;
 			}else{
 				for (i=0;i<SOUND_BUFFER_SIZE;i++) tmpwavel[i]+=tw[i];
 			};
