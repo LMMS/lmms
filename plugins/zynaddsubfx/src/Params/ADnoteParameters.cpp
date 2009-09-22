@@ -99,8 +99,9 @@ void ADnoteParameters::defaults(int n)
     VoicePar[nvoice].Enabled=0;
 
 	VoicePar[nvoice].Unison_size=1;
-	VoicePar[nvoice].Unison_frequency_spread=64;
+	VoicePar[nvoice].Unison_frequency_spread=30;
 	VoicePar[nvoice].Unison_stereo_spread=64;
+	VoicePar[nvoice].Unison_vibratto=64;
 
     VoicePar[nvoice].Type=0;
     VoicePar[nvoice].Pfixedfreq=0;
@@ -283,6 +284,7 @@ void ADnoteParameters::add2XMLsection(XMLwrapper *xml,int n)
 	xml->addpar("unison_size",VoicePar[nvoice].Unison_size);
 	xml->addpar("unison_frequency_spread",VoicePar[nvoice].Unison_frequency_spread);
 	xml->addpar("unison_stereo_spread",VoicePar[nvoice].Unison_stereo_spread);
+	xml->addpar("unison_vibratto",VoicePar[nvoice].Unison_vibratto);
     
 	xml->addpar("delay",VoicePar[nvoice].PDelay);
     xml->addparbool("resonance",VoicePar[nvoice].Presonance);
@@ -563,6 +565,7 @@ void ADnoteParameters::getfromXMLsection(XMLwrapper *xml,int n)
     VoicePar[nvoice].Unison_size=xml->getpar127("unison_size",VoicePar[nvoice].Unison_size);
     VoicePar[nvoice].Unison_frequency_spread=xml->getpar127("unison_frequency_spread",VoicePar[nvoice].Unison_frequency_spread);
     VoicePar[nvoice].Unison_stereo_spread=xml->getpar127("unison_stereo_spread",VoicePar[nvoice].Unison_stereo_spread);
+    VoicePar[nvoice].Unison_vibratto=xml->getpar127("unison_vibratto",VoicePar[nvoice].Unison_vibratto);
     
 	VoicePar[nvoice].Type=xml->getpar127("type",VoicePar[nvoice].Type);
     VoicePar[nvoice].PDelay=xml->getpar127("delay",VoicePar[nvoice].PDelay);

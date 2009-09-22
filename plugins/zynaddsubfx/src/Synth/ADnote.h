@@ -59,6 +59,7 @@ private:
 
     void setfreq(int nvoice,REALTYPE in_freq);
     void setfreqFM(int nvoice,REALTYPE in_freq);
+	void compute_unison_freq_rap(int nvoice);
     void computecurrentparameters();
     void initparameters();
     void KillVoice(int nvoice);
@@ -233,8 +234,19 @@ private:
     //fractional part (skip) of the Modullator
     REALTYPE *oscposloFM[NUM_VOICES],*oscfreqloFM[NUM_VOICES];
 
+	//the unison base_value
+	REALTYPE *unison_base_freq_rap[NUM_VOICES];
+	
 	//how the unison subvoice's frequency is changed (1.0 for no change)
 	REALTYPE *unison_freq_rap[NUM_VOICES];
+
+	//unison vibratto
+	struct {
+		REALTYPE amplitude;	//amplitude which be added to unison_freq_rap
+		REALTYPE *step; //value which increments the position
+		REALTYPE *position;//between -1.0 and 1.0
+	}unison_vibratto[NUM_VOICES];
+
 
     //integer part (skip) of the Modullator
     unsigned int *oscposhiFM[NUM_VOICES],*oscfreqhiFM[NUM_VOICES];

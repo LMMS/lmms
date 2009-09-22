@@ -104,18 +104,20 @@ ADnote::ADnote(ADnoteParameters *pars,Controller *ctl_,REALTYPE freq,REALTYPE ve
 		//compute unison	
 		unison_size[nvoice]=unison;
 
+		unison_base_freq_rap[nvoice]=new REALTYPE[unison];
 		unison_freq_rap[nvoice]=new REALTYPE[unison];
 		REALTYPE unison_spread=pars->VoicePar[nvoice].Unison_frequency_spread/127.0;
-		unison_spread=pow(unison_spread*2.0,2.0)*50.0;//cents
+		unison_spread=pow(unison_spread*2.0,2.0)*100.0;//cents
+		REALTYPE unison_real_spread=pow(2.0,(unison_spread*0.5)/1200.0);
+		REALTYPE unison_vibratto_a=pars->VoicePar[nvoice].Unison_vibratto/127.0;//0.0 .. 1.0
 
 		switch (unison){
 			case 1:
-				unison_freq_rap[nvoice][0]=1.0;//if the unison is not used, always make the only subvoice to have the default note
+				unison_base_freq_rap[nvoice][0]=1.0;//if the unison is not used, always make the only subvoice to have the default note
 				break;
 			case 2:{//unison for 2 subvoices
-					   REALTYPE tmp=pow(2.0,(unison_spread*0.5)/1200.0);
-					   unison_freq_rap[nvoice][0]=1.0/tmp;
-					   unison_freq_rap[nvoice][1]=tmp;
+					   unison_base_freq_rap[nvoice][0]=1.0/unison_real_spread;
+					   unison_base_freq_rap[nvoice][1]=unison_real_spread;
 				   };
 				break;
 			default:{//unison for more than 2 subvoices
@@ -131,9 +133,38 @@ ADnote::ADnote(ADnoteParameters *pars,Controller *ctl_,REALTYPE freq,REALTYPE ve
 						REALTYPE diff=max-min;
 						for (int k=0;k<unison;k++){
 							unison_values[k]=(unison_values[k]-(max+min)*0.5)/diff;//the lowest value will be -1 and the highest will be 1
-							unison_freq_rap[nvoice][k]=pow(2.0,(unison_spread*unison_values[k]*0.5)/1200);
+							unison_base_freq_rap[nvoice][k]=pow(2.0,(unison_spread*unison_values[k]*0.5)/1200);
 						};
 					};
+		};
+		
+		//unison vibrattos
+
+		if (unison>1){
+			for (int k=0;k<unison;k++){//reduce the frequency difference for larger vibrattos
+				unison_base_freq_rap[nvoice][k]=1.0+(unison_base_freq_rap[nvoice][k]-1.0)*(1.0-unison_vibratto_a);
+			};
+		};
+		unison_vibratto[nvoice].step=new REALTYPE[unison];
+		unison_vibratto[nvoice].position=new REALTYPE[unison];
+		unison_vibratto[nvoice].amplitude=(unison_real_spread-1.0)*unison_vibratto_a*0.5;
+
+		REALTYPE increments_per_second=SAMPLE_RATE/(REALTYPE)SOUND_BUFFER_SIZE;
+		for (int k=0;k<unison;k++){
+			unison_vibratto[nvoice].position[k]=RND*0.9-0.45;
+			REALTYPE vibratto_period=0.5+RND*2.5;
+
+
+			unison_vibratto[nvoice].position[k]=0;
+			REALTYPE m=4.0/(vibratto_period*increments_per_second);
+			if (RND<0.5) m=-m;
+			unison_vibratto[nvoice].step[k]=m;
+		};
+
+		if (unison==1) {//no vibratto for a single voice
+			unison_vibratto[nvoice].step[0]=0.0;
+			unison_vibratto[nvoice].position[0]=0.0;
+			unison_vibratto[nvoice].amplitude=0.0;
 		};
 
 		oscfreqhi[nvoice]=new int[unison];
@@ -395,9 +426,6 @@ void ADnote::ADlegatonote(REALTYPE freq, REALTYPE velocity, int portamento_, int
 
         NoteVoicePar[nvoice].DelayTicks=(int)((exp(pars->VoicePar[nvoice].PDelay/127.0*log(50.0))-1.0)/SOUND_BUFFER_SIZE/10.0*SAMPLE_RATE);
 
-
-#warning TODO: ADD HERE THE CODE FOR UNISON 
-
     };
 
     ///    initparameters();
@@ -509,8 +537,11 @@ void ADnote::KillVoice(int nvoice)
 	delete []oscposloFM[nvoice];
 
 	delete []NoteVoicePar[nvoice].OscilSmp;
+	delete []unison_base_freq_rap[nvoice];
 	delete []unison_freq_rap[nvoice];
 	delete []FMoldsmp[nvoice];
+	delete []unison_vibratto[nvoice].step;
+	delete []unison_vibratto[nvoice].position;
 
 	if (NoteVoicePar[nvoice].FreqEnvelope!=NULL) delete(NoteVoicePar[nvoice].FreqEnvelope);
 	NoteVoicePar[nvoice].FreqEnvelope=NULL;
@@ -719,6 +750,35 @@ void ADnote::initparameters()
     };
 };
 
+	
+/*
+ * Computes the relative frequency of each unison voice and it's vibratto
+ * This must be called before setfreq* functions
+ */
+void ADnote::compute_unison_freq_rap(int nvoice){
+	if (unison_size[nvoice]==1){//no unison
+		unison_freq_rap[nvoice][0]=1.0;
+		return;
+	};
+	for (int k=0;k<unison_size[nvoice];k++){
+		REALTYPE pos=unison_vibratto[nvoice].position[k];
+		REALTYPE step=unison_vibratto[nvoice].step[k];
+		pos+=step;
+		if (pos<=-1.0) {
+			pos=-1.0;
+			step=-step;
+		};
+		if (pos>=1.0){
+			pos=1.0;
+			step=-step;
+		};
+		unison_freq_rap[nvoice][k]=unison_base_freq_rap[nvoice][k]+pos*unison_vibratto[nvoice].amplitude;
+		
+		unison_vibratto[nvoice].position[k]=pos;
+		step=unison_vibratto[nvoice].step[k]=step;
+	};
+
+};
 
 
 /*
@@ -820,6 +880,8 @@ void ADnote::computecurrentparameters()
         if (NoteVoicePar[nvoice].Enabled!=ON) continue;
         NoteVoicePar[nvoice].DelayTicks-=1;
         if (NoteVoicePar[nvoice].DelayTicks>0) continue;
+
+		compute_unison_freq_rap(nvoice);
 
         /*******************/
         /* Voice Amplitude */

@@ -892,6 +892,9 @@
 
 07 Sep 2009 (Mark McCurry)
 	    - Fixed glitch in XMLwrapper, which would prevent file loading
+
 20 Sep 2009 (Paul Nasca)
 	    - Started to implement the Unison effect for ADsynth
 	    
+22 Sep 2009 (Paul Nasca)
+	    - Added vibratto and other features to Unison effect

@@ -124,6 +124,9 @@ struct ADnoteVoiceParam {
 
 	/** Stereo spread of the subvoices*/
 	unsigned char Unison_stereo_spread;
+	
+	/** Vibratto of the subvoices (which makes the unison more "natural")*/
+	unsigned char Unison_vibratto;
 
     /** Type of the voice (0=Sound,1=Noise)*/
     unsigned char Type;

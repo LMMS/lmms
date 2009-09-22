@@ -571,6 +571,13 @@ voiceonbutton->redraw();} open
               code0 {o->add("OFF");char tmp[100];for (int i=1;ADnote_unison_sizes[i];i++){snprintf(tmp,100,"size %d",ADnote_unison_sizes[i]);o->add(tmp);};}
               code1 {o->value(pars->VoicePar[nvoice].PDetuneType);}
             } {}
+            Fl_Dial {} {
+              label Vibratto
+              callback {pars->VoicePar[nvoice].Unison_vibratto=(int)o->value();} selected
+              tooltip Vibratto xywh {340 540 25 25} box ROUND_UP_BOX labelsize 10 align 8 maximum 127 step 1
+              code0 {o->value(pars->VoicePar[nvoice].Unison_vibratto);}
+              class WidgetPDial
+            }
           }
         }
         Fl_Group {} {
@@ -1015,7 +1022,7 @@ advoice=new ADvoiceUI(0,0,765,585);
 ADnoteVoice->add(advoice);
 advoice->init(pars,nvoice,master);
 advoice->show();
-ADnoteVoice->redraw();} selected
+ADnoteVoice->redraw();}
         xywh {5 585 130 25} type Simple labelfont 1 align 8 minimum 0 maximum 2 step 1 value 1 textfont 1 textsize 13
         code0 {o->bounds(1,NUM_VOICES);}
       }
