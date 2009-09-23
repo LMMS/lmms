@@ -776,6 +776,7 @@ void ADnote::compute_unison_freq_rap(int nvoice){
 		unison_freq_rap[nvoice][0]=1.0;
 		return;
 	};
+	REALTYPE relbw=ctl->bandwidth.relbw*bandwidthDetuneMultiplier;
 	for (int k=0;k<unison_size[nvoice];k++){
 		REALTYPE pos=unison_vibratto[nvoice].position[k];
 		REALTYPE step=unison_vibratto[nvoice].step[k];
@@ -788,7 +789,7 @@ void ADnote::compute_unison_freq_rap(int nvoice){
 			pos=1.0;
 			step=-step;
 		};
-		unison_freq_rap[nvoice][k]=unison_base_freq_rap[nvoice][k]+pos*unison_vibratto[nvoice].amplitude;
+		unison_freq_rap[nvoice][k]=1.0+((unison_base_freq_rap[nvoice][k]-1.0)+pos*unison_vibratto[nvoice].amplitude)*relbw;
 		
 		unison_vibratto[nvoice].position[k]=pos;
 		step=unison_vibratto[nvoice].step[k]=step;

@@ -901,4 +901,4 @@
 
 23 Sep 2009 (Paul Nasca)
 	    - Added unison invert phase
-	    
+	    - Made unison frequency spread to depend on Bandwidth controllers and parameters
