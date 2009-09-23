@@ -107,8 +107,7 @@ ADnote::ADnote(ADnoteParameters *pars,Controller *ctl_,REALTYPE freq,REALTYPE ve
 		unison_base_freq_rap[nvoice]=new REALTYPE[unison];
 		unison_freq_rap[nvoice]=new REALTYPE[unison];
 		unison_invert_phase[nvoice]=new bool[unison];
-		REALTYPE unison_spread=pars->VoicePar[nvoice].Unison_frequency_spread/127.0;
-		unison_spread=pow(unison_spread*2.0,2.0)*100.0;//cents
+		REALTYPE unison_spread=pars->getUnisonFrequencySpreadCents(nvoice);
 		REALTYPE unison_real_spread=pow(2.0,(unison_spread*0.5)/1200.0);
 		REALTYPE unison_vibratto_a=pars->VoicePar[nvoice].Unison_vibratto/127.0;//0.0 .. 1.0
 		
@@ -151,10 +150,10 @@ ADnote::ADnote(ADnoteParameters *pars,Controller *ctl_,REALTYPE freq,REALTYPE ve
 		unison_vibratto[nvoice].amplitude=(unison_real_spread-1.0)*unison_vibratto_a*0.5;
 
 		REALTYPE increments_per_second=SAMPLE_RATE/(REALTYPE)SOUND_BUFFER_SIZE;
+		REALTYPE vibratto_base_period=0.25*pow(2.0,(1.0-pars->VoicePar[nvoice].Unison_vibratto_speed/127.0)*4.0);	
 		for (int k=0;k<unison;k++){
 			unison_vibratto[nvoice].position[k]=RND*0.9-0.45;
-			REALTYPE vibratto_period=0.5+RND*2.5;
-
+			REALTYPE vibratto_period=vibratto_base_period*pow(2.0,RND*2.0-1.0);//make period to vary randomly from 50% to 200% vibratto base period
 
 			unison_vibratto[nvoice].position[k]=0;
 			REALTYPE m=4.0/(vibratto_period*increments_per_second);

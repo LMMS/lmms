@@ -553,16 +553,10 @@ voiceonbutton->redraw();} open
           } {
             Fl_Dial {} {
               label Stereo
-              callback {pars->VoicePar[nvoice].Unison_stereo_spread=(int)o->value();}
-              tooltip {Stereo Spread} xywh {265 540 25 25} box ROUND_UP_BOX labelsize 10 align 8 maximum 127 step 1
+              callback {pars->VoicePar[nvoice].Unison_stereo_spread=(int)o->value();} selected
+              tooltip {Stereo Spread} xywh {285 540 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
               code0 {o->value(pars->VoicePar[nvoice].Unison_stereo_spread);}
               class WidgetPDial
-            }
-            Fl_Value_Slider {} {
-              label {Frequency Spread}
-              callback {pars->VoicePar[nvoice].Unison_frequency_spread=(int)o->value();}
-              tooltip {Frequency Spread of the Unison} xywh {90 548 155 17} type {Horz Knob} box FLAT_BOX labelsize 11 align 5 maximum 127 step 1 value 64
-              code0 {o->value(pars->VoicePar[nvoice].Unison_frequency_spread);}
             }
             Fl_Choice {} {
               label Unison
@@ -574,17 +568,37 @@ voiceonbutton->redraw();} open
             Fl_Dial {} {
               label Vibratto
               callback {pars->VoicePar[nvoice].Unison_vibratto=(int)o->value();}
-              tooltip Vibratto xywh {340 540 25 25} box ROUND_UP_BOX labelsize 10 align 8 maximum 127 step 1
+              tooltip Vibratto xywh {340 540 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
               code0 {o->value(pars->VoicePar[nvoice].Unison_vibratto);}
               class WidgetPDial
             }
             Fl_Choice {} {
               label Invert
-              callback {pars->VoicePar[nvoice].Unison_invert_phase=(int) o->value();} open selected
-              tooltip {Phase Invert} xywh {425 545 70 15} down_box BORDER_BOX labelsize 11 align 5 textfont 1 textsize 10
+              callback {pars->VoicePar[nvoice].Unison_invert_phase=(int) o->value();} open
+              tooltip {Phase Invert} xywh {445 545 65 15} down_box BORDER_BOX labelsize 11 align 5 textfont 1 textsize 10
               code0 {o->add("None");o->add("Random");char tmp[100];for (int i=2;i<=5;i++){snprintf(tmp,100,"%d %%",100/i);o->add(tmp);};}
               code1 {o->value(pars->VoicePar[nvoice].Unison_invert_phase);}
             } {}
+            Fl_Slider {} {
+              label {Frequency Spread}
+              callback {pars->VoicePar[nvoice].Unison_frequency_spread=(int)o->value();
+unisonspreadoutput->do_callback();}
+              tooltip {Frequency Spread of the Unison} xywh {95 547 125 13} type {Horz Knob} box FLAT_BOX labelsize 12 align 1 maximum 127 step 1 value 64
+              code0 {o->value(pars->VoicePar[nvoice].Unison_frequency_spread);}
+            }
+            Fl_Value_Output unisonspreadoutput {
+              label {(cents)}
+              callback {o->value(pars->getUnisonFrequencySpreadCents(nvoice));}
+              xywh {225 545 40 15} labelsize 10 align 5 maximum 1000 step 0.1 textfont 1 textsize 10
+              code0 {o->value(pars->getUnisonFrequencySpreadCents(nvoice));}
+            }
+            Fl_Dial {} {
+              label {Vib.speed}
+              callback {pars->VoicePar[nvoice].Unison_vibratto_speed=(int)o->value();}
+              tooltip {Vibratto Average Speed} xywh {390 540 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
+              code0 {o->value(pars->VoicePar[nvoice].Unison_vibratto_speed);}
+              class WidgetPDial
+            }
           }
         }
         Fl_Group {} {

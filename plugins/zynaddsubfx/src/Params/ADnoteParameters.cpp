@@ -102,6 +102,7 @@ void ADnoteParameters::defaults(int n)
 	VoicePar[nvoice].Unison_frequency_spread=30;
 	VoicePar[nvoice].Unison_stereo_spread=64;
 	VoicePar[nvoice].Unison_vibratto=64;
+	VoicePar[nvoice].Unison_vibratto_speed=64;
 	VoicePar[nvoice].Unison_invert_phase=0;
 
     VoicePar[nvoice].Type=0;
@@ -199,6 +200,16 @@ REALTYPE ADnoteParameters::getBandwidthDetuneMultiplier()
     return(bw);
 };
 
+/*
+ * Get the unison spread in cents for a voice
+ */
+
+REALTYPE ADnoteParameters::getUnisonFrequencySpreadCents(int nvoice){
+	REALTYPE unison_spread=VoicePar[nvoice].Unison_frequency_spread/127.0;
+	unison_spread=pow(unison_spread*2.0,2.0)*100.0;//cents
+	return unison_spread;
+
+};
 
 /*
  * Kill the voice
@@ -286,6 +297,7 @@ void ADnoteParameters::add2XMLsection(XMLwrapper *xml,int n)
 	xml->addpar("unison_frequency_spread",VoicePar[nvoice].Unison_frequency_spread);
 	xml->addpar("unison_stereo_spread",VoicePar[nvoice].Unison_stereo_spread);
 	xml->addpar("unison_vibratto",VoicePar[nvoice].Unison_vibratto);
+	xml->addpar("unison_vibratto_speed",VoicePar[nvoice].Unison_vibratto_speed);
 	xml->addpar("unison_invert_phase",VoicePar[nvoice].Unison_invert_phase);
     
 	xml->addpar("delay",VoicePar[nvoice].PDelay);
@@ -568,6 +580,7 @@ void ADnoteParameters::getfromXMLsection(XMLwrapper *xml,int n)
     VoicePar[nvoice].Unison_frequency_spread=xml->getpar127("unison_frequency_spread",VoicePar[nvoice].Unison_frequency_spread);
     VoicePar[nvoice].Unison_stereo_spread=xml->getpar127("unison_stereo_spread",VoicePar[nvoice].Unison_stereo_spread);
     VoicePar[nvoice].Unison_vibratto=xml->getpar127("unison_vibratto",VoicePar[nvoice].Unison_vibratto);
+    VoicePar[nvoice].Unison_vibratto_speed=xml->getpar127("unison_vibratto_speed",VoicePar[nvoice].Unison_vibratto_speed);
     VoicePar[nvoice].Unison_invert_phase=xml->getpar127("Unison_invert_phase",VoicePar[nvoice].Unison_invert_phase);
     
 	VoicePar[nvoice].Type=xml->getpar127("type",VoicePar[nvoice].Type);
