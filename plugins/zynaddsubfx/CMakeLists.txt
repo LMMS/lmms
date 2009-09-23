@@ -90,7 +90,7 @@ add_subdirectory(src/DSP)
 add_subdirectory(src/Samples)
 
 ADD_LIBRARY(ZynAddSubFxCore SHARED LocalZynAddSubFx.cpp ${MXML_SRC})
-TARGET_LINK_LIBRARIES(ZynAddSubFxCore ${FFTW3F_LIBRARIES} ${ZASF_CORE_LIBS} -lz -lpthread)
+TARGET_LINK_LIBRARIES(ZynAddSubFxCore ${ZASF_CORE_LIBS} ${FFTW3F_LIBRARIES} -lz -lpthread)
 IF(LMMS_BUILD_WIN32)
 	TARGET_LINK_LIBRARIES(ZynAddSubFxCore -lwsock32)
 	INSTALL(TARGETS ZynAddSubFxCore DESTINATION ${PLUGIN_DIR})
