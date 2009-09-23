@@ -53,7 +53,7 @@ IF(LMMS_HOST_X86 OR LMMS_HOST_X86_64)
 ENDIF(LMMS_HOST_X86 OR LMMS_HOST_X86_64)
 
 # build ZynAddSubFX with full optimizations
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -Wno-write-strings -Wno-deprecated-declarations")
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 -Wno-write-strings -Wno-deprecated-declarations")
 
 # link system-libraries when on win32
 IF(LMMS_BUILD_WIN32)
