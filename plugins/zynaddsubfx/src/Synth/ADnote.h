@@ -239,6 +239,9 @@ private:
 	
 	//how the unison subvoice's frequency is changed (1.0 for no change)
 	REALTYPE *unison_freq_rap[NUM_VOICES];
+	
+	//which subvoice has phase inverted
+	bool *unison_invert_phase[NUM_VOICES];
 
 	//unison vibratto
 	struct {

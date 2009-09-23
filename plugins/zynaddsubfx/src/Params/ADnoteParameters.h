@@ -128,6 +128,9 @@ struct ADnoteVoiceParam {
 	/** Vibratto of the subvoices (which makes the unison more "natural")*/
 	unsigned char Unison_vibratto;
 
+	/** Unison invert phase */
+	unsigned char Unison_invert_phase;//0=none,1=random,2=50%,3=33%,4=25%
+
     /** Type of the voice (0=Sound,1=Noise)*/
     unsigned char Type;
 

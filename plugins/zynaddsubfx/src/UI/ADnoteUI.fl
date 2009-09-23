@@ -549,7 +549,7 @@ voiceonbutton->redraw();} open
             code3 {o->value(pars->VoicePar[nvoice].Pextoscil+1);}
           } {}
           Fl_Group {} {open
-            xywh {5 525 475 45} box ENGRAVED_BOX
+            xywh {5 525 515 45} box ENGRAVED_BOX
           } {
             Fl_Dial {} {
               label Stereo
@@ -573,11 +573,18 @@ voiceonbutton->redraw();} open
             } {}
             Fl_Dial {} {
               label Vibratto
-              callback {pars->VoicePar[nvoice].Unison_vibratto=(int)o->value();} selected
+              callback {pars->VoicePar[nvoice].Unison_vibratto=(int)o->value();}
               tooltip Vibratto xywh {340 540 25 25} box ROUND_UP_BOX labelsize 10 align 8 maximum 127 step 1
               code0 {o->value(pars->VoicePar[nvoice].Unison_vibratto);}
               class WidgetPDial
             }
+            Fl_Choice {} {
+              label Invert
+              callback {pars->VoicePar[nvoice].Unison_invert_phase=(int) o->value();} open selected
+              tooltip {Phase Invert} xywh {425 545 70 15} down_box BORDER_BOX labelsize 11 align 5 textfont 1 textsize 10
+              code0 {o->add("None");o->add("Random");char tmp[100];for (int i=2;i<=5;i++){snprintf(tmp,100,"%d %%",100/i);o->add(tmp);};}
+              code1 {o->value(pars->VoicePar[nvoice].Unison_invert_phase);}
+            } {}
           }
         }
         Fl_Group {} {

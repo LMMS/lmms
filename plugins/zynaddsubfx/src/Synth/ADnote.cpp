@@ -106,10 +106,12 @@ ADnote::ADnote(ADnoteParameters *pars,Controller *ctl_,REALTYPE freq,REALTYPE ve
 
 		unison_base_freq_rap[nvoice]=new REALTYPE[unison];
 		unison_freq_rap[nvoice]=new REALTYPE[unison];
+		unison_invert_phase[nvoice]=new bool[unison];
 		REALTYPE unison_spread=pars->VoicePar[nvoice].Unison_frequency_spread/127.0;
 		unison_spread=pow(unison_spread*2.0,2.0)*100.0;//cents
 		REALTYPE unison_real_spread=pow(2.0,(unison_spread*0.5)/1200.0);
 		REALTYPE unison_vibratto_a=pars->VoicePar[nvoice].Unison_vibratto/127.0;//0.0 .. 1.0
+		
 
 		switch (unison){
 			case 1:
@@ -139,7 +141,6 @@ ADnote::ADnote(ADnoteParameters *pars,Controller *ctl_,REALTYPE freq,REALTYPE ve
 		};
 		
 		//unison vibrattos
-
 		if (unison>1){
 			for (int k=0;k<unison;k++){//reduce the frequency difference for larger vibrattos
 				unison_base_freq_rap[nvoice][k]=1.0+(unison_base_freq_rap[nvoice][k]-1.0)*(1.0-unison_vibratto_a);
@@ -166,6 +167,21 @@ ADnote::ADnote(ADnoteParameters *pars,Controller *ctl_,REALTYPE freq,REALTYPE ve
 			unison_vibratto[nvoice].position[0]=0.0;
 			unison_vibratto[nvoice].amplitude=0.0;
 		};
+		
+		//phase invert for unison
+		unison_invert_phase[nvoice][0]=false;
+		if (unison!=1){
+			int inv=pars->VoicePar[nvoice].Unison_invert_phase;
+			switch(inv){
+				case 0:	for (int k=0;k<unison;k++) unison_invert_phase[nvoice][k]=false;
+					break;
+				case 1:	for (int k=0;k<unison;k++) unison_invert_phase[nvoice][k]=(RND>0.5);
+					break;
+				default:for (int k=0;k<unison;k++) unison_invert_phase[nvoice][k]=(k%inv==0)?true:false;
+					break;
+			};
+		};
+
 
 		oscfreqhi[nvoice]=new int[unison];
 		oscfreqlo[nvoice]=new REALTYPE[unison];
@@ -513,7 +529,6 @@ void ADnote::ADlegatonote(REALTYPE freq, REALTYPE velocity, int portamento_, int
             if ((NoteVoicePar[i].FMVoice==nvoice)&&(tmp[i]==0)) {
                 tmp[i]=1;
             };
-        ///      if (NoteVoicePar[nvoice].VoiceOut!=NULL) for (i=0;i<SOUND_BUFFER_SIZE;i++) NoteVoicePar[nvoice].VoiceOut[i]=0.0;
     };
     ///////////////
 
@@ -539,6 +554,7 @@ void ADnote::KillVoice(int nvoice)
 	delete []NoteVoicePar[nvoice].OscilSmp;
 	delete []unison_base_freq_rap[nvoice];
 	delete []unison_freq_rap[nvoice];
+	delete []unison_invert_phase[nvoice];
 	delete []FMoldsmp[nvoice];
 	delete []unison_vibratto[nvoice].step;
 	delete []unison_vibratto[nvoice].position;
@@ -1325,7 +1341,7 @@ int ADnote::noteout(REALTYPE *outl,REALTYPE *outr)
         // Voice Processing
 
 
-		//mix subvoices into
+		//mix subvoices into voice
 		for (i=0;i<SOUND_BUFFER_SIZE;i++) tmpwavel[i]=0.0;
 		if (stereo) for (i=0;i<SOUND_BUFFER_SIZE;i++) tmpwaver[i]=0.0;
 		for (int k=0;k<unison_size[nvoice];k++){
@@ -1349,6 +1365,11 @@ int ADnote::noteout(REALTYPE *outl,REALTYPE *outr)
 
 				REALTYPE rvol=panning*2.0;
 				if (rvol>1.0) rvol=1.0;
+
+				if (unison_invert_phase[nvoice][k]) {
+					lvol=-lvol;
+					rvol=-rvol;
+				};
 
 				for (i=0;i<SOUND_BUFFER_SIZE;i++) tmpwavel[i]+=tw[i]*lvol;
 				for (i=0;i<SOUND_BUFFER_SIZE;i++) tmpwaver[i]+=tw[i]*rvol;
