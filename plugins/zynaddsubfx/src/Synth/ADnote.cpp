@@ -1213,7 +1213,7 @@ inline void ADnote::ComputeVoiceOscillatorFrequencyModulation(int nvoice,int FMm
 	};
 
 
-    //normalize makes all sample-rates, oscil_sizes toproduce same sound
+    //normalize: makes all sample-rates, oscil_sizes to produce same sound
     if (FMmode!=0) {//Frequency modulation
         REALTYPE normalize=OSCIL_SIZE/262144.0*44100.0/(REALTYPE)SAMPLE_RATE;
 		for (int k=0;k<unison_size[nvoice];k++){
@@ -1261,7 +1261,7 @@ inline void ADnote::ComputeVoiceOscillatorFrequencyModulation(int nvoice,int FMm
 
 			poslo+=freqlo;
 			if (poslo>=1.0) {
-				poslo=fmod(freqlo,1.0);
+				poslo=fmod(poslo,1.0);
 				poshi++;
 			};
 
@@ -1385,6 +1385,7 @@ int ADnote::noteout(REALTYPE *outl,REALTYPE *outr)
         // Amplitude
 		REALTYPE oldam=oldamplitude[nvoice]*unison_amplitude;
 		REALTYPE newam=newamplitude[nvoice]*unison_amplitude;
+
         if (ABOVE_AMPLITUDE_THRESHOLD(oldam,newam)) {
             int rest=SOUND_BUFFER_SIZE;
             //test if the amplitude if raising and the difference is high
@@ -1419,9 +1420,10 @@ int ADnote::noteout(REALTYPE *outl,REALTYPE *outr)
 
         //check if the amplitude envelope is finished, if yes, the voice will be fadeout
         if (NoteVoicePar[nvoice].AmpEnvelope!=NULL) {
-            if (NoteVoicePar[nvoice].AmpEnvelope->finished()!=0)
+            if (NoteVoicePar[nvoice].AmpEnvelope->finished()!=0){
                 for (i=0;i<SOUND_BUFFER_SIZE;i++) tmpwavel[i]*=1.0-(REALTYPE)i/(REALTYPE)SOUND_BUFFER_SIZE;
                 if (stereo) for (i=0;i<SOUND_BUFFER_SIZE;i++) tmpwaver[i]*=1.0-(REALTYPE)i/(REALTYPE)SOUND_BUFFER_SIZE;
+			};
             //the voice is killed later
         };
 
