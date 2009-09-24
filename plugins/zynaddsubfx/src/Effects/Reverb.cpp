@@ -25,10 +25,120 @@
 
 /**\todo: EarlyReflections,Prdelay,Perbalance */
 
+ReverbBandwidth::ReverbBandwidth (int small_buffer_size_,int n_small_buffers_per_half_big_buffer_):
+	OverlapAdd (small_buffer_size_,n_small_buffers_per_half_big_buffer_){
+	bandwidth=0.1;
+	fft=new FFTwrapper(big_buffer_size);
+	newFFTFREQS(&freqs,half_big_buffer_size);
+	srcfreq=new REALTYPE[half_big_buffer_size];
+	destfreq=new REALTYPE[half_big_buffer_size];
+	tmpfreq=new REALTYPE[half_big_buffer_size];
+	window=new REALTYPE[big_buffer_size];
+	ZERO(srcfreq,half_big_buffer_size);
+	ZERO(destfreq,half_big_buffer_size);
+	ZERO(tmpfreq,half_big_buffer_size);
+
+	for (int i=0;i<big_buffer_size;i++) window[i]=0.5*(1.0-cos(2*M_PI*i/(big_buffer_size-1.0)));
+};
+
+ReverbBandwidth::~ReverbBandwidth(){
+	delete fft;
+	deleteFFTFREQS(&freqs);
+	delete []srcfreq;
+	delete []destfreq;
+	delete []tmpfreq;
+	delete []window;
+};
+
+void ReverbBandwidth::do_process_big_buffer(){
+
+	for (int i=0;i<big_buffer_size;i++) big_buffer[i]*=window[i];
+
+	fft->smps2freqs(big_buffer,freqs);
+	for (int i=0;i<half_big_buffer_size;i++){
+		srcfreq[i]=sqrt(freqs.c[i]*freqs.c[i]+freqs.s[i]*freqs.s[i])/half_big_buffer_size;
+	};
+
+
+	//spread
+	do_spread(half_big_buffer_size,srcfreq,destfreq,bandwidth);
+
+	unsigned int rand_seed=rand();
+	REALTYPE inv_2p15_2pi=1.0/16384.0*M_PI;
+	freqs.c[0]=freqs.s[0]=0.0;
+	for (int i=1;i<half_big_buffer_size;i++) {
+		rand_seed=(rand_seed*1103515245+12345);
+		unsigned int rand=(rand_seed>>16)&0x7fff;
+		REALTYPE phase=rand*inv_2p15_2pi;
+		freqs.c[i]=destfreq[i]*cos(phase);
+		freqs.s[i]=destfreq[i]*sin(phase);
+	};
+
+
+	fft->freqs2smps(freqs,big_buffer);
+	for (int i=0;i<big_buffer_size;i++) big_buffer[i]*=window[i];
+};
+
+void ReverbBandwidth::do_spread(int nfreq,REALTYPE *freq1,REALTYPE *freq2,REALTYPE bandwidth){
+	//convert to log spectrum
+	REALTYPE minfreq=20.0;
+	REALTYPE maxfreq=0.5*SAMPLE_RATE;
+
+	REALTYPE log_minfreq=log(minfreq);
+	REALTYPE log_maxfreq=log(maxfreq);
+		
+	for (int i=0;i<nfreq;i++){
+		REALTYPE freqx=i/(REALTYPE) nfreq;
+		REALTYPE x=exp(log_minfreq+freqx*(log_maxfreq-log_minfreq))/maxfreq*nfreq;
+		REALTYPE y=0.0;
+		int x0=(int)floor(x); if (x0>=nfreq) x0=nfreq-1;
+		int x1=x0+1; if (x1>=nfreq) x1=nfreq-1;
+		REALTYPE xp=x-x0;
+		if (x<nfreq){
+			y=freq1[x0]*(1.0-xp)+freq1[x1]*xp;
+		};
+		tmpfreq[i]=y;
+	};
+
+	//increase the bandwidth of each harmonic (by smoothing the log spectrum)
+	int n=2;
+	REALTYPE a=1.0-pow(2.0,-bandwidth*bandwidth*10.0);
+	a=pow(a,8192.0/nfreq*n);
+
+	for (int k=0;k<n;k++){                                                  
+		tmpfreq[0]=0.0;
+		for (int i=1;i<nfreq;i++){                                       
+			tmpfreq[i]=tmpfreq[i-1]*a+tmpfreq[i]*(1.0-a);
+		};                                                              
+		tmpfreq[nfreq-1]=0.0;                                               
+		for (int i=nfreq-2;i>0;i--){                                     
+			tmpfreq[i]=tmpfreq[i+1]*a+tmpfreq[i]*(1.0-a);                    
+		};                                                              
+	};                                                                      
+
+	freq2[0]=0;
+	REALTYPE log_maxfreq_d_minfreq=log(maxfreq/minfreq);
+	for (int i=1;i<nfreq;i++){
+		REALTYPE freqx=i/(REALTYPE) nfreq;
+		REALTYPE x=log((freqx*maxfreq)/minfreq)/log_maxfreq_d_minfreq*nfreq;
+		REALTYPE y=0.0;
+		if ((x>0.0)&&(x<nfreq)){
+			int x0=(int)floor(x); if (x0>=nfreq) x0=nfreq-1;
+			int x1=x0+1; if (x1>=nfreq) x1=nfreq-1;
+			REALTYPE xp=x-x0;
+			y=tmpfreq[x0]*(1.0-xp)+tmpfreq[x1]*xp;
+		};
+		freq2[i]=y;
+	};
+};
+
+
 Reverb::Reverb(const int &insertion_,REALTYPE *efxoutl_,REALTYPE *efxoutr_)
         :Effect(insertion_,efxoutl_,efxoutr_,NULL,0)
 {
     inputbuf=new REALTYPE[SOUND_BUFFER_SIZE];
+
+	bandwidth=NULL;
 
     //defaults
     Pvolume=48;
@@ -43,6 +153,7 @@ Reverb::Reverb(const int &insertion_,REALTYPE *efxoutl_,REALTYPE *efxoutr_)
     Plohidamp=80;
     Ptype=1;
     Proomsize=64;
+	Pbandwidth=30;
     roomsize=1.0;
     rs=1.0;
 
@@ -80,6 +191,7 @@ Reverb::~Reverb()
     for (i=0;i<REV_COMBS*2;i++) delete [] comb[i];
 
     delete [] inputbuf;
+	if (bandwidth) delete bandwidth;
 };
 
 /*
@@ -156,15 +268,19 @@ void Reverb::out(REALTYPE *smps_l, REALTYPE *smps_r)
 
     for (i=0;i<SOUND_BUFFER_SIZE;i++) {
         inputbuf[i]=(smps_l[i]+smps_r[i])/2.0;
-        //Initial delay r
-        if (idelay!=NULL) {
-            REALTYPE tmp=inputbuf[i]+idelay[idelayk]*idelayfb;
-            inputbuf[i]=idelay[idelayk];
-            idelay[idelayk]=tmp;
-            idelayk++;
-            if (idelayk>=idelaylen) idelayk=0;
-        };
-    };
+	};
+	if (idelay!=NULL) {
+		for (i=0;i<SOUND_BUFFER_SIZE;i++) {
+			//Initial delay r
+			REALTYPE tmp=inputbuf[i]+idelay[idelayk]*idelayfb;
+			inputbuf[i]=idelay[idelayk];
+			idelay[idelayk]=tmp;
+			idelayk++;
+			if (idelayk>=idelaylen) idelayk=0;
+		};
+	};
+
+	if (bandwidth) bandwidth->process(inputbuf);
 
     if (lpf!=NULL) lpf->filterout(inputbuf);
     if (hpf!=NULL) hpf->filterout(inputbuf);
@@ -288,17 +404,21 @@ void Reverb::setlpf(const unsigned char &Plpf)
 
 void Reverb::settype(unsigned char Ptype)
 {
-    const int NUM_TYPES=2;
+    const int NUM_TYPES=3;
     int combtunings[NUM_TYPES][REV_COMBS]={
         //this is unused (for random)
         {0,0,0,0,0,0,0,0},
         //Freeverb by Jezar at Dreampoint
+        {1116,1188,1277,1356,1422,1491,1557,1617},
+        //Freeverb by Jezar at Dreampoint //duplicate
         {1116,1188,1277,1356,1422,1491,1557,1617}
     };
     int aptunings[NUM_TYPES][REV_APS]={
         //this is unused (for random)
         {0,0,0,0},
         //Freeverb by Jezar at Dreampoint
+        {225,341,441,556},
+        //Freeverb by Jezar at Dreampoint (duplicate)
         {225,341,441,556}
     };
 
@@ -335,6 +455,15 @@ void Reverb::settype(unsigned char Ptype)
     };
     settime(Ptime);
     cleanup();
+	if (bandwidth) delete bandwidth;
+	bandwidth=NULL;
+	if (Ptype==2){//bandwidth
+
+#warning sa calculez numarul optim de buffere
+		bandwidth=new ReverbBandwidth(SOUND_BUFFER_SIZE,32);
+
+
+	};
 };
 
 void Reverb::setroomsize(const unsigned char &Proomsize)
@@ -348,37 +477,42 @@ void Reverb::setroomsize(const unsigned char &Proomsize)
     settype(Ptype);
 };
 
+void Reverb::setbandwidth(const unsigned char &Pbandwidth){
+	this->Pbandwidth=Pbandwidth;
+	if (bandwidth) bandwidth->set_bandwidth(Pbandwidth/127.0);
+};
+
 void Reverb::setpreset(unsigned char npreset)
 {
-    const int PRESET_SIZE=12;
+    const int PRESET_SIZE=13;
     const int NUM_PRESETS=13;
     unsigned char presets[NUM_PRESETS][PRESET_SIZE]={
         //Cathedral1
-        {80,64,63,24,0,0,0,85,5,83,1,64},
+        {80,64,63,24,0,0,0,85,5,83,1,64,0},
         //Cathedral2
-        {80,64,69,35,0,0,0,127,0,71,0,64},
+        {80,64,69,35,0,0,0,127,0,71,0,64,0},
         //Cathedral3
-        {80,64,69,24,0,0,0,127,75,78,1,85},
+        {80,64,69,24,0,0,0,127,75,78,1,85,0},
         //Hall1
-        {90,64,51,10,0,0,0,127,21,78,1,64},
+        {90,64,51,10,0,0,0,127,21,78,1,64,0},
         //Hall2
-        {90,64,53,20,0,0,0,127,75,71,1,64},
+        {90,64,53,20,0,0,0,127,75,71,1,64,0},
         //Room1
-        {100,64,33,0,0,0,0,127,0,106,0,30},
+        {100,64,33,0,0,0,0,127,0,106,0,30,0},
         //Room2
-        {100,64,21,26,0,0,0,62,0,77,1,45},
+        {100,64,21,26,0,0,0,62,0,77,1,45,0},
         //Basement
-        {110,64,14,0,0,0,0,127,5,71,0,25},
+        {110,64,14,0,0,0,0,127,5,71,0,25,0},
         //Tunnel
-        {85,80,84,20,42,0,0,51,0,78,1,105},
+        {85,80,84,20,42,0,0,51,0,78,1,105,0},
         //Echoed1
-        {95,64,26,60,71,0,0,114,0,64,1,64},
+        {95,64,26,60,71,0,0,114,0,64,1,64,0},
         //Echoed2
-        {90,64,40,88,71,0,0,114,0,88,1,64},
+        {90,64,40,88,71,0,0,114,0,88,1,64,0},
         //VeryLong1
-        {90,64,93,15,0,0,0,114,0,77,0,95},
+        {90,64,93,15,0,0,0,114,0,77,0,95,0},
         //VeryLong2
-        {90,64,111,30,0,0,0,114,90,74,1,80}
+        {90,64,111,30,0,0,0,114,90,74,1,80,0}
     };
 
     if (npreset>=NUM_PRESETS) npreset=NUM_PRESETS-1;
@@ -425,6 +559,9 @@ void Reverb::changepar(const int &npar,const unsigned char &value)
     case 11:
         setroomsize(value);
         break;
+    case 12:
+        setbandwidth(value);
+        break;
     };
 };
 
@@ -464,6 +601,9 @@ unsigned char Reverb::getpar(const int &npar)const
         break;
     case 11:
         return(Proomsize);
+        break;
+    case 12:
+        return(Pbandwidth);
         break;
     };
     return(0);//in case of bogus "parameter"

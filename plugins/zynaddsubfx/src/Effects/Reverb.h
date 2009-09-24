@@ -2,7 +2,7 @@
   ZynAddSubFX - a software synthesizer
 
   Reverb.h - Reverberation effect
-  Copyright (C) 2002-2005 Nasca Octavian Paul
+  Copyright (C) 2002-2009 Nasca Octavian Paul
   Author: Nasca Octavian Paul
 
   This program is free software; you can redistribute it and/or modify
@@ -23,15 +23,133 @@
 #ifndef REVERB_H
 #define REVERB_H
 
-
+#include <math.h>
 #include "../globals.h"
 #include "../DSP/AnalogFilter.h"
+#include "../DSP/FFTwrapper.h"
 #include "Effect.h"
 
 #define REV_COMBS 8
 #define REV_APS 4
 
 /**Creates Reverberation Effects*/
+
+class OverlapAdd{//50% overlap
+	public:
+		OverlapAdd(int small_buffer_size_,int n_small_buffers_per_half_big_buffer_){
+			small_buffer_size=small_buffer_size_;
+			n_small_buffers_per_half_big_buffer=n_small_buffers_per_half_big_buffer_;
+			half_big_buffer_size=small_buffer_size*n_small_buffers_per_half_big_buffer;
+			big_buffer_size=half_big_buffer_size*2;
+
+			new_half_big_buffer_input=new REALTYPE[half_big_buffer_size];
+			old_half_big_buffer_input=new REALTYPE[half_big_buffer_size];
+			new_half_big_buffer_processed=new REALTYPE[half_big_buffer_size];
+			half_big_buffer_output=new REALTYPE[half_big_buffer_size];
+			big_buffer=new REALTYPE[big_buffer_size];
+			for (int i=0;i<half_big_buffer_size;i++){
+				new_half_big_buffer_input[i]=0.0;
+				old_half_big_buffer_input[i]=0.0;
+				new_half_big_buffer_processed[i]=0.0;
+				half_big_buffer_output[i]=0.0;
+			};
+			for (int i=0;i<big_buffer_size;i++){
+				big_buffer[i]=0.0;
+			};
+			small_buffer_k=0;
+		};
+		virtual ~OverlapAdd(){
+			delete []new_half_big_buffer_input;
+			delete []old_half_big_buffer_input;
+			delete []new_half_big_buffer_processed;
+			delete []half_big_buffer_output;
+			delete []big_buffer;
+		};
+
+		
+		void process(REALTYPE *small_buffer){
+
+			int input_start_pos=small_buffer_size*small_buffer_k; 
+
+			for (int i=0;i<small_buffer_size;i++){
+				new_half_big_buffer_input[input_start_pos+i]=small_buffer[i];
+			};
+			small_buffer_k++;
+			if (small_buffer_k>=n_small_buffers_per_half_big_buffer){
+				small_buffer_k=0;
+				process_big_buffer();
+			};
+
+			int output_start_pos=small_buffer_size*small_buffer_k; //check if this is correct
+
+			for (int i=0;i<small_buffer_size;i++){
+				small_buffer[i]=half_big_buffer_output[output_start_pos+i];
+			};
+
+
+		};	
+	protected:
+		int half_big_buffer_size;
+		int big_buffer_size;
+		REALTYPE *big_buffer;
+
+		virtual void do_process_big_buffer(){//the resulting buffer must be windowed
+			for (int i=0;i<big_buffer_size;i++){
+				big_buffer[i]*=(1.0-cos(i*M_PI*2.0/big_buffer_size))*0.5;
+//				big_buffer[i]*=0.5;
+			};
+//			printf("BIG_BUFFER:\n"); for (int i=0;i<big_buffer_size;i++) printf(" %g ",big_buffer[i]); printf("\n\n"); 
+		};
+	private:		
+		void process_big_buffer(){
+			for (int i=0;i<half_big_buffer_size;i++){
+				big_buffer[i]=old_half_big_buffer_input[i];
+				big_buffer[i+half_big_buffer_size]=new_half_big_buffer_input[i];
+			};
+			
+			do_process_big_buffer();//process input buffer and get windowed buffer
+
+			for (int i=0;i<half_big_buffer_size;i++){
+				old_half_big_buffer_input[i]=new_half_big_buffer_input[i];
+			};
+			
+//				printf("OUT1:\n"); for (int i=0;i<half_big_buffer_size;i++) printf(" %g,%g ",big_buffer[i],new_half_big_buffer_processed[i]); printf("\n\n"); 
+			for (int i=0;i<half_big_buffer_size;i++){
+				half_big_buffer_output[i]=big_buffer[i]+new_half_big_buffer_processed[i];
+				new_half_big_buffer_processed[i]=big_buffer[i+half_big_buffer_size];
+			};
+
+		};
+
+		int small_buffer_size;
+		int n_small_buffers_per_half_big_buffer;
+		int small_buffer_k;
+
+		REALTYPE *old_half_big_buffer_input,*new_half_big_buffer_input;
+		REALTYPE *new_half_big_buffer_processed;
+
+		REALTYPE *half_big_buffer_output;	
+};
+
+class ReverbBandwidth: public OverlapAdd{
+	public:
+		ReverbBandwidth (int small_buffer_size_,int n_small_buffers_per_half_big_buffer_);
+		~ReverbBandwidth();
+		void do_spread(int nfreq,REALTYPE *freq1,REALTYPE *freq2, REALTYPE bandwidth);
+		void set_bandwidth(REALTYPE par){
+			if (par<0.0) par=0.0;
+			if (par>1.0) par=1.0;
+			bandwidth=par;
+		};
+	private:
+		void do_process_big_buffer();
+		FFTwrapper *fft;
+		FFTFREQS freqs;
+		REALTYPE *srcfreq,*destfreq,*tmpfreq;
+		REALTYPE *window;
+		REALTYPE bandwidth;
+};
+
 class Reverb:public Effect
 {
 public:
@@ -83,6 +201,9 @@ private:
     /**Room Size*/
     unsigned char Proomsize;
 
+	/**Bandwidth */
+	unsigned char Pbandwidth;
+
     //parameter control
     void setvolume(const unsigned char &Pvolume);
     void setpan(const unsigned char &Ppan);
@@ -94,6 +215,7 @@ private:
     void setlpf(const unsigned char &Plpf);
     void settype( unsigned char Ptype);
     void setroomsize(const unsigned char &Proomsize);
+    void setbandwidth(const unsigned char &Pbandwidth);
 
     REALTYPE pan,erbalance;
     //Parametrii 2
@@ -103,6 +225,7 @@ private:
     REALTYPE lohifb,idelayfb,roomsize,rs;//rs is used to "normalise" the volume according to the roomsize
     int comblen[REV_COMBS*2];
     int aplen[REV_APS*2];
+	ReverbBandwidth *bandwidth;
 
     //Internal Variables
 
