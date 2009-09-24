@@ -4,9 +4,6 @@
 //Copyright (c) 2002-2005 Nasca Octavian Paul
 //License: GNU GPL version 2 or later
 
-void BankProcess_::process() {
-}
-
 BankSlot::BankSlot(int x,int y, int w, int h, const char *label):Fl_Button(x,y,w,h,label) {
   what=NULL;
 whatslot=NULL;

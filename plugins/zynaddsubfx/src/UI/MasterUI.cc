@@ -214,7 +214,8 @@ labelsize(10);
 align(FL_ALIGN_TOP);
 
 value(master->Psysefxsend[neff1][neff2]);
-char tmp[20];snprintf(tmp,20,"%d->%d",neff1+1,neff2+1);this->label(strdup(tmp));
+char tmp[20];snprintf(tmp,20,"%d->%d",neff1+1,neff2+1);
+this->copy_label(tmp);
 }
 
 SysEffSend::~SysEffSend() {
@@ -380,7 +381,7 @@ Fl_Group* Panellistitem::make_window() {
       partenabled->labelsize(13);
       partenabled->callback((Fl_Callback*)cb_partenabled);
       partenabled->align(Fl_Align(FL_ALIGN_RIGHT|FL_ALIGN_INSIDE));
-      char tmp[10];snprintf(tmp,10,"%d",npart+1);o->label(strdup(tmp));
+      char tmp[10];snprintf(tmp,10,"%d",npart+1);o->copy_label(tmp);
       o->value(master->part[npart]->Penabled);
     } // Fl_Check_Button* partenabled
     panellistitem->end();
@@ -1986,7 +1987,7 @@ General Public License for details.");
       partenabled->labelsize(13);
       partenabled->callback((Fl_Callback*)cb_partenabled1);
       partenabled->align(Fl_Align(FL_ALIGN_RIGHT|FL_ALIGN_INSIDE));
-      //char tmp[10];snprintf(tmp,10,"%d",npart+1);o->label(strdup(tmp));
+      //char tmp[10];snprintf(tmp,10,"%d",npart+1);o->copy_label(tmp);
       o->value(master->part[npart]->Penabled);
     } // Fl_Check_Button* partenabled
     { VirKeys* o = virkeys = new VirKeys(5, 215, 590, 80, "Keyboard");
@@ -2338,19 +2339,23 @@ simplerefresh();
 
 MasterUI::~MasterUI() {
   masterwindow->hide();
-delete (masterwindow);
+delete masterwindow;
+simplemasterwindow->hide();
+delete simplemasterwindow;
 aboutwindow->hide();
-delete (aboutwindow);
+delete aboutwindow;
 syseffsendwindow->hide();
-delete(syseffsendwindow);
+delete syseffsendwindow;
 
-delete (virkeyboard);
-delete (microtonalui);
-delete (bankui);
-delete (configui);
-delete (sequi);
+delete virkeyboard;
+delete microtonalui;
+delete bankui;
+delete configui;
+delete sequi;
 
-delete(presetsui);
+delete presetsui;
+delete panelwindow;
+delete selectuiwindow;
 }
 
 void MasterUI::showUI() {

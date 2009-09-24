@@ -80,9 +80,6 @@ for (i=0;i<n;i++){
 delete [] spc;
 }
 
-PSlider::PSlider(int x,int y, int w, int h, const char *label):Fl_Slider(x,y,w,h,label) {
-}
-
 int PSlider::handle(int event) {
   int X=x(),Y=y(),W=w(),H=h();
 

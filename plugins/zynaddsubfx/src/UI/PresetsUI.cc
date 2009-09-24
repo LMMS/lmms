@@ -2,12 +2,6 @@
 
 #include "PresetsUI.h"
 
-void PresetsUI_::refresh() {
-}
-
-PresetsUI_::~PresetsUI_() {
-}
-
 void PresetsUI::cb_copybrowse_i(Fl_Browser* o, void*) {
   int val=o->value();
 if (val!=0){
