@@ -134,7 +134,7 @@ ADnote::ADnote(ADnoteParameters *pars,Controller *ctl_,REALTYPE freq,REALTYPE ve
 						REALTYPE diff=max-min;
 						for (int k=0;k<unison;k++){
 							unison_values[k]=(unison_values[k]-(max+min)*0.5)/diff;//the lowest value will be -1 and the highest will be 1
-							unison_base_freq_rap[nvoice][k]=pow(2.0,(unison_spread*unison_values[k]*0.5)/1200);
+							unison_base_freq_rap[nvoice][k]=pow(2.0,(unison_spread*unison_values[k])/1200);
 						};
 					};
 		};
@@ -147,15 +147,14 @@ ADnote::ADnote(ADnoteParameters *pars,Controller *ctl_,REALTYPE freq,REALTYPE ve
 		};
 		unison_vibratto[nvoice].step=new REALTYPE[unison];
 		unison_vibratto[nvoice].position=new REALTYPE[unison];
-		unison_vibratto[nvoice].amplitude=(unison_real_spread-1.0)*unison_vibratto_a*0.5;
+		unison_vibratto[nvoice].amplitude=(unison_real_spread-1.0)*unison_vibratto_a;
 
 		REALTYPE increments_per_second=SAMPLE_RATE/(REALTYPE)SOUND_BUFFER_SIZE;
 		REALTYPE vibratto_base_period=0.25*pow(2.0,(1.0-pars->VoicePar[nvoice].Unison_vibratto_speed/127.0)*4.0);	
 		for (int k=0;k<unison;k++){
-			unison_vibratto[nvoice].position[k]=RND*0.9-0.45;
+			unison_vibratto[nvoice].position[k]=RND*1.8-0.9;
 			REALTYPE vibratto_period=vibratto_base_period*pow(2.0,RND*2.0-1.0);//make period to vary randomly from 50% to 200% vibratto base period
 
-			unison_vibratto[nvoice].position[k]=0;
 			REALTYPE m=4.0/(vibratto_period*increments_per_second);
 			if (RND<0.5) m=-m;
 			unison_vibratto[nvoice].step[k]=m;

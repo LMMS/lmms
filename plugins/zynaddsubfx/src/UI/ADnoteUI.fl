@@ -177,7 +177,7 @@ class ADvoiceUI {open : {public Fl_Group}
   Function {make_window()} {open
   } {
     Fl_Window ADnoteVoiceParameters {
-      label Voice open
+      label Voice
       xywh {69 185 765 575} type Double
       class Fl_Group visible
     } {
@@ -553,17 +553,17 @@ voiceonbutton->redraw();} open
           } {
             Fl_Dial {} {
               label Stereo
-              callback {pars->VoicePar[nvoice].Unison_stereo_spread=(int)o->value();} selected
+              callback {pars->VoicePar[nvoice].Unison_stereo_spread=(int)o->value();}
               tooltip {Stereo Spread} xywh {285 540 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
               code0 {o->value(pars->VoicePar[nvoice].Unison_stereo_spread);}
               class WidgetPDial
             }
             Fl_Choice {} {
               label Unison
-              callback {pars->set_unison_size_index(nvoice,(int) o->value());} open
+              callback {pars->set_unison_size_index(nvoice,(int) o->value());} open selected
               tooltip {Unison size} xywh {10 545 75 20} down_box BORDER_BOX labelfont 1 align 5 textfont 1 textsize 10
               code0 {o->add("OFF");char tmp[100];for (int i=1;ADnote_unison_sizes[i];i++){snprintf(tmp,100,"size %d",ADnote_unison_sizes[i]);o->add(tmp);};}
-              code1 {o->value(pars->VoicePar[nvoice].PDetuneType);}
+              code1 {o->value(pars->get_unison_size_index(nvoice));}
             } {}
             Fl_Dial {} {
               label Vibratto
