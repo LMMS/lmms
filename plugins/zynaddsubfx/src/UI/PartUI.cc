@@ -65,6 +65,9 @@ PartSysEffSend::~PartSysEffSend() {
 //delete(syseffsend);
 }
 
+void PartUI_::showparameters(int kititem,int engine) {
+}
+
 void PartKitItem::cb_minkcounter_i(Fl_Counter* o, void*) {
   part->kit[n].Pminkey=(int)o->value();
 }
