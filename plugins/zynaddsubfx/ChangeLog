@@ -899,6 +899,11 @@
 22 Sep 2009 (Paul Nasca)
 	    - Added vibratto and other features to Unison effect
 
+22 Sep 2009 (Mark McCurry)
+	    - Changed temporary data for Oscilgen from static to instance
+	      recommended by Tobias Doerffel
+	    - Fixed Memory leaks in UI based upon James Morris' patch
+
 23 Sep 2009 (Paul Nasca)
 	    - Added unison invert phase
 	    - Made unison frequency spread to depend on Bandwidth controllers and parameters

@@ -1,9 +1,8 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0109 
+version 1.0107 
 header_name {.h} 
 code_name {.cc}
-decl {//Copyright (c) 2002-2009 Nasca Octavian Paul} {selected
-} 
+decl {//Copyright (c) 2002-2009 Nasca Octavian Paul} {} 
 
 decl {//License: GNU GPL version 2 or later} {} 
 
@@ -275,7 +274,8 @@ labelsize(10);
 align(FL_ALIGN_TOP);
 
 value(master->Psysefxsend[neff1][neff2]);
-char tmp[20];snprintf(tmp,20,"%d->%d",neff1+1,neff2+1);this->label(strdup(tmp));} {}
+char tmp[20];snprintf(tmp,20,"%d->%d",neff1+1,neff2+1);
+this->copy_label(tmp);} {}
   }
   Function {~SysEffSend()} {} {
     code {hide();} {}
@@ -344,7 +344,7 @@ bankui->show();}
           xywh {15 235 40 20} box PLASTIC_UP_BOX labelsize 10
         }
         Fl_Choice partrcv {
-          callback {master->part[npart]->Prcvchn=(int) o->value();} open
+          callback {master->part[npart]->Prcvchn=(int) o->value();}
           tooltip {receive from Midi channel} xywh {10 213 50 15} down_box BORDER_BOX labelsize 10 align 5 textfont 1 textsize 10
           code0 {char nrstr[10]; for(int i=0;i<NUM_MIDI_CHANNELS;i++){sprintf(nrstr,"Ch%d",i+1);if (i!=9) o->add(nrstr); else o->add("Dr10");};}
           code1 {o->value(master->part[npart]->Prcvchn);}
@@ -367,7 +367,7 @@ if ((int) o->value()==0) panellistitemgroup->deactivate();
 
 o->redraw();}
         private xywh {5 0 45 20} down_box DOWN_BOX labeltype EMBOSSED_LABEL labelfont 1 labelsize 13 align 24
-        code0 {char tmp[10];snprintf(tmp,10,"%d",npart+1);o->label(strdup(tmp));}
+        code0 {char tmp[10];snprintf(tmp,10,"%d",npart+1);o->copy_label(tmp);}
         code1 {o->value(master->part[npart]->Penabled);}
       }
     }
@@ -386,8 +386,7 @@ make_window();
 panellistitem->show();
 end();} {}
   }
-  Function {refresh()} {open
-  } {
+  Function {refresh()} {} {
     code {partenabled->value(master->part[npart]->Penabled);
 if (master->part[npart]->Penabled!=0) panellistitemgroup->activate();
      else panellistitemgroup->deactivate();
@@ -415,7 +414,8 @@ panellistitemgroup->redraw();} {}
 } 
 
 class MasterUI {} {
-  Function {make_window()} {} {
+  Function {make_window()} {selected
+  } {
     Fl_Window masterwindow {
       label zynaddsubfx
       callback {\#ifdef VSTAUDIOOUT
@@ -426,7 +426,7 @@ if (fl_choice("Exit and leave the unsaved data?","No","Yes",NULL)) {
     *exitprogram=1;
 };
 \#endif}
-      xywh {31 206 390 465} type Double xclass zynaddsubfx visible
+      xywh {31 206 390 465} type Double hide xclass zynaddsubfx
     } {
       Fl_Menu_Bar mastermenu {
         xywh {-5 0 690 25}
@@ -1043,18 +1043,18 @@ GNU General Public License for details.}
       label {ZynAddSubFX Panel}
       xywh {89 59 630 635} type Double hide
     } {
-      Fl_Scroll {} {open
+      Fl_Scroll {} {
         xywh {0 5 570 310} type HORIZONTAL box THIN_UP_BOX
       } {
-        Fl_Pack {} {open
+        Fl_Pack {} {
           xywh {5 10 560 285} type HORIZONTAL
           code0 {for (int i=0;i<NUM_MIDI_PARTS/2;i++){panellistitem[i]=new Panellistitem(0,0,70,260,"");panellistitem[i]->init(master,i,bankui);}}
         } {}
       }
-      Fl_Scroll {} {open
+      Fl_Scroll {} {
         xywh {0 320 570 310} type HORIZONTAL box THIN_UP_BOX
       } {
-        Fl_Pack {} {open
+        Fl_Pack {} {
           xywh {5 325 560 285} type HORIZONTAL
           code0 {for (int i=NUM_MIDI_PARTS/2;i<NUM_MIDI_PARTS;i++){panellistitem[i]=new Panellistitem(0,0,70,260,"");panellistitem[i]->init(master,i,bankui);}}
         } {}
@@ -1288,7 +1288,7 @@ if ((int) o->value()==0) simplelistitemgroup->deactivate();
 
 o->redraw();}
         private xywh {250 40 85 20} down_box DOWN_BOX labeltype EMBOSSED_LABEL labelfont 1 labelsize 13 align 24
-        code0 {//char tmp[10];snprintf(tmp,10,"%d",npart+1);o->label(strdup(tmp));}
+        code0 {//char tmp[10];snprintf(tmp,10,"%d",npart+1);o->copy_label(tmp);}
         code1 {o->value(master->part[npart]->Penabled);}
       }
       Fl_Box virkeys {
@@ -1643,19 +1643,23 @@ simplerefresh();} {}
   }
   Function {~MasterUI()} {} {
     code {masterwindow->hide();
-delete (masterwindow);
+delete masterwindow;
+simplemasterwindow->hide();
+delete simplemasterwindow;
 aboutwindow->hide();
-delete (aboutwindow);
+delete aboutwindow;
 syseffsendwindow->hide();
-delete(syseffsendwindow);
+delete syseffsendwindow;
 
-delete (virkeyboard);
-delete (microtonalui);
-delete (bankui);
-delete (configui);
-delete (sequi);
+delete virkeyboard;
+delete microtonalui;
+delete bankui;
+delete configui;
+delete sequi;
 
-delete(presetsui);} {}
+delete presetsui;
+delete panelwindow;
+delete selectuiwindow;} {}
   }
   Function {showUI()} {} {
     code {switch (config.cfg.UserInterfaceMode){
