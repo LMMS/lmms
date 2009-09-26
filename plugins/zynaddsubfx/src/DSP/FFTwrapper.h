@@ -63,5 +63,8 @@ private:
     fftw_real *tmpfftdata1,*tmpfftdata2;
     rfftw_plan planfftw,planfftw_inv;
 };
+
+void newFFTFREQS(FFTFREQS *f, int size);
+void deleteFFTFREQS(FFTFREQS *f);
 #endif
 

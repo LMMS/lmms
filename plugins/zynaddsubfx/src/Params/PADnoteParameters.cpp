@@ -601,7 +601,7 @@ void PADnoteParameters::export2wav(string basefilename)
 
 void PADnoteParameters::add2XML(XMLwrapper *xml)
 {
-    xml->information.PADsynth_used=true;
+    xml->setPadSynth(true);
 
     xml->addparbool("stereo",PStereo);
     xml->addpar("mode",Pmode);

@@ -31,11 +31,6 @@
 #ifndef XML_WRAPPER_H
 #define XML_WRAPPER_H
 
-#define TMPSTR_SIZE 50
-
-//the maxim tree depth
-#define STACKSIZE 100
-
 /**Mxml wrapper*/
 class XMLwrapper
 {
@@ -54,14 +49,14 @@ public:
      * @param filename the name of the destination file.
      * @returns 0 if ok or -1 if the file cannot be saved.
      */
-    int saveXMLfile(const std::string &filename);
+    int saveXMLfile(const std::string &filename) const;
 
     /**
      * Return XML tree as a string.
      * Note: The string must be freed with free() to deallocate
      * @returns a newly allocated NULL terminated string of the XML data.
      */
-    char *getXMLdata();
+    char *getXMLdata() const;
 
     /**
      * Add simple parameter.
@@ -150,7 +145,7 @@ public:
      * if there isn't any id, will return min
      * this must be called only imediately after enterbranch()
      */
-    int getbranchid(int min, int max);
+    int getbranchid(int min, int max) const;
 
     /**
      * Returns the integer value stored in node name.
@@ -162,21 +157,21 @@ public:
      * @param min The minimum return value.
      * @param max The maximum return value.
      */
-    int getpar(const std::string &name,int defaultpar,int min,int max);
+    int getpar(const std::string &name,int defaultpar,int min,int max) const;
 
     /**
      * Returns the integer value stored in the node with range [0,127].
      * @param name The parameter name.
      * @param defaultpar The default value if the real value is not found.
      */
-    int getpar127(const std::string &name,int defaultpar);
+    int getpar127(const std::string &name,int defaultpar) const;
 
     /**
      * Returns the boolean value stored in the node.
      * @param name The parameter name.
      * @param defaultpar The default value if the real value is not found.
      */
-    int getparbool(const std::string &name,int defaultpar);
+    int getparbool(const std::string &name,int defaultpar) const;
 
     /**
      * Get the string value stored in the node.
@@ -184,14 +179,21 @@ public:
      * @param par  Pointer to destination string
      * @param maxstrlen Max string length for destination
      */
-    void getparstr(const std::string &name,char *par,int maxstrlen);
+    void getparstr(const std::string &name,char *par,int maxstrlen) const;
+
+    /**
+     * Get the string value stored in the node.
+     * @param name The parameter name.
+     * @param defaultpar The default value if the real value is not found.
+     */
+    std::string getparstr(const std::string &name,const std::string &defaultpar) const;
 
     /**
      * Returns the real value stored in the node.
      * @param name The parameter name.
      * @param defaultpar The default value if the real value is not found.
      */
-    REALTYPE getparreal(const char *name,REALTYPE defaultpar);
+    REALTYPE getparreal(const char *name,REALTYPE defaultpar) const;
 
     /**
      * Returns the real value stored in the node.
@@ -200,19 +202,18 @@ public:
      * @param min The minimum value
      * @param max The maximum value
      */
-    REALTYPE getparreal(const char *name,REALTYPE defaultpar,REALTYPE min,REALTYPE max);
+    REALTYPE getparreal(const char *name,REALTYPE defaultpar,REALTYPE min,REALTYPE max) const;
 
     bool minimal;/**<false if all parameters will be stored (used only for clipboard)*/
 
-    struct {
-        bool PADsynth_used;/**<if PADsynth is used*/
-    }information;/**<Defines if PADsynth is used*/
-
     /**
-     * Opens a file and parses the "information" section data on it.
-     * @returns "true" if all went ok or "false" on errors.
+     * Sets the current tree's PAD Synth usage
      */
-    bool checkfileinformation(const char *filename);
+    void setPadSynth(bool enabled);
+    /**
+     * Checks the current tree for PADsynth usage
+     */
+    bool hasPadSynth() const;
 
 private:
 
@@ -222,7 +223,7 @@ private:
      * @param compression Level of gzip compression
      * @param xmldata String to be saved
      */
-    int dosavefile(const char *filename,int compression,const char *xmldata);
+    int dosavefile(const char *filename,int compression,const char *xmldata) const;
 
     /**
      * Loads specified file and returns data.
@@ -231,86 +232,32 @@ private:
      * @param filename the file
      * @return The decompressed data
      */
-    char *doloadfile(const std::string &filename);
-
+    char *doloadfile(const std::string &filename) const;
 
     mxml_node_t *tree;/**<all xml data*/
     mxml_node_t *root;/**<xml data used by zynaddsubfx*/
-    mxml_node_t *node;/**<current node*/
+    mxml_node_t *node;/**<current subtree in parsing or writing */
     mxml_node_t *info;/**<Node used to store the information about the data*/
 
     /**
-     * Adds params like this:
-     * <name>.
-     * @returns The node
+     * Create mxml_node_t with specified name and parameters
+     *
+     * Results should look like:
+     * <name optionalParam1="value1" optionalParam2="value2" ...>
+     *
+     * @param name The name of the xml node
+     * @param params The number of the attributes
+     * @param ... const char * pairs that are in the format attribute_name,
+     * attribute_value
      */
-    mxml_node_t *addparams0(const char *name);
+    mxml_node_t *addparams(const char *name, unsigned int params, ...) const;
 
-    /**
-     * Adds params like this:
-     * <name par1="val1">.
-     * @returns The node
-     */
-    mxml_node_t *addparams1(const char *name,const char *par1,const char *val1);
-
-    /**
-     * Adds params like this:
-     * <name par1="val1" par2="val2">.
-     * @returns the node
-     */
-    mxml_node_t *addparams2(const char *name,const char *par1,const char *val1,const char *par2, const char *val2);
-
-    /**
-     * Convert integer to string
-     * @param x integer input
-     * @returns string output
-     */
-    char *int2str(int x);
-
-    /**
-     * Convert integer to string
-     * @param x integer input
-     * @returns string output
-     */
-    char *real2str(REALTYPE x);
-
-    /**
-     * Convert string to int
-     * @param str string input
-     * @returns integer output
-     */
-    int str2int(const char *str);
-
-    /**
-     * Convert string to realtype
-     * @param x integer input
-     * @returns string output
-     */
-    REALTYPE str2real(const char *str);
-
-    /**Temporary string for various uses*/
-    char tmpstr[TMPSTR_SIZE];
-
-
-    /**this is used to store the parents.
-     * @todo Use the stack class provided by C++*/
-    mxml_node_t *parentstack[STACKSIZE];
-    int stackpos;/**<position in stack*/
-
-
-    void push(mxml_node_t *node);
-
-    /**Pops top node off of parent stack*/
-    mxml_node_t *pop();
-    /**Returns top node off of parent stack*/
-    mxml_node_t *peek();
-
-    struct {
-        struct {
-            int major;/**<major version number.*/
-            int minor;/**<minor version number.*/
-        }xml_version;/**<Stores ZynAddSubFX versioning information*/
-    }values;/**< Stores ZynAddSubFX versioning information*/
+    /**@todo keep these numbers up to date*/
+    struct{
+        int Major;/**<major version number.*/
+        int Minor;/**<minor version number.*/
+        int Revision;/**<version revision number.*/
+    }version;
 
 };
 

@@ -23,10 +23,9 @@
 #ifndef UTIL_H
 #define UTIL_H
 
-#include <pthread.h>
+#include <string>
+#include <sstream>
 #include "../globals.h"
-#include "Microtonal.h"
-#include "../DSP/FFTwrapper.h"
 #include "Config.h"
 
 //Velocity Sensing function
@@ -40,6 +39,24 @@ extern REALTYPE getdetune(unsigned char type,unsigned short int coarsedetune,uns
 extern REALTYPE *denormalkillbuf;/**<the buffer to add noise in order to avoid denormalisation*/
 
 extern Config config;
+
+template <class T>
+std::string stringFrom(T x)
+{
+    std::stringstream ss;
+    ss << x;
+    return ss.str();
+}
+
+template <class T>
+T stringTo(const char * x)
+{
+    std::string str = x!=NULL ? x : "0"; //should work for the basic float/int
+    std::stringstream ss(str);
+    T ans;
+    ss >> ans;
+    return ans;
+}
 
 #endif
 

@@ -98,3 +98,19 @@ void FFTwrapper::freqs2smps(FFTFREQS freqs,REALTYPE *smps)
 
 };
 
+void newFFTFREQS(FFTFREQS *f, int size)
+{
+    f->c = new REALTYPE[size];
+    f->s = new REALTYPE[size];
+    for (int i=0; i<size; i++) {
+        f->c[i] = 0.0;
+        f->s[i] = 0.0;
+    }
+}
+
+void deleteFFTFREQS(FFTFREQS *f)
+{
+    delete[] f->c;
+    delete[] f->s;
+    f->c = f->s = NULL;
+}
