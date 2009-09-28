@@ -1,5 +1,5 @@
 //
-// "$Id: Fl_Text_Buffer.H 6618 2009-01-01 21:54:10Z matt $"
+// "$Id: Fl_Text_Buffer.H 6822 2009-07-04 00:24:26Z fabien $"
 //
 // Header file for Fl_Text_Buffer class.
 //
@@ -322,5 +322,5 @@ class FL_EXPORT Fl_Text_Buffer {
 #endif
 
 //
-// End of "$Id: Fl_Text_Buffer.H 6618 2009-01-01 21:54:10Z matt $".
+// End of "$Id: Fl_Text_Buffer.H 6822 2009-07-04 00:24:26Z fabien $".
 //

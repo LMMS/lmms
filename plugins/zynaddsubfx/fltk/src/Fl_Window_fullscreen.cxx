@@ -1,5 +1,5 @@
 //
-// "$Id: Fl_Window_fullscreen.cxx 6660 2009-02-15 18:58:03Z AlbrechtS $"
+// "$Id: Fl_Window_fullscreen.cxx 6905 2009-09-27 12:06:35Z matt $"
 //
 // Fullscreen window support for the Fast Light Tool Kit (FLTK).
 //
@@ -43,10 +43,10 @@
 void Fl_Window::border(int b) {
   if (b) {
     if (border()) return;
-    clear_flag(FL_NOBORDER);
+    clear_flag(NOBORDER);
   } else {
     if (!border()) return;
-    set_flag(FL_NOBORDER);
+    set_flag(NOBORDER);
   }
 #if defined(USE_X11)
   if (shown()) Fl_X::i(this)->sendxjunk();
@@ -91,5 +91,5 @@ void Fl_Window::fullscreen_off(int X,int Y,int W,int H) {
 }
 
 //
-// End of "$Id: Fl_Window_fullscreen.cxx 6660 2009-02-15 18:58:03Z AlbrechtS $".
+// End of "$Id: Fl_Window_fullscreen.cxx 6905 2009-09-27 12:06:35Z matt $".
 //

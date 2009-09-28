@@ -1,5 +1,5 @@
 //
-// "$Id: Fl_Progress.cxx 6616 2009-01-01 21:28:26Z matt $"
+// "$Id: Fl_Progress.cxx 6794 2009-06-27 09:29:36Z AlbrechtS $"
 //
 // Progress bar widget routines.
 //
@@ -119,5 +119,5 @@ Fl_Progress::Fl_Progress(int X, int Y, int W, int H, const char* L)
 
 
 //
-// End of "$Id: Fl_Progress.cxx 6616 2009-01-01 21:28:26Z matt $".
+// End of "$Id: Fl_Progress.cxx 6794 2009-06-27 09:29:36Z AlbrechtS $".
 //

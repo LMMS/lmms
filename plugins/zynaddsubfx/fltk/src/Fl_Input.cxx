@@ -1,5 +1,5 @@
 //
-// "$Id: Fl_Input.cxx 6765 2009-04-15 08:35:28Z matt $"
+// "$Id: Fl_Input.cxx 6888 2009-09-19 21:16:21Z matt $"
 //
 // Input widget for the Fast Light Tool Kit (FLTK).
 //
@@ -621,6 +621,18 @@ int Fl_Input::handle(int event) {
     take_focus();
     return 1;
 
+/* TODO: this will scroll the area, but stop if the cursor would become invisible.
+         That clipping happens in drawtext(). Do we change the clipping or should 
+         we move the cursor (ouch)?
+  case FL_MOUSEWHEEL:
+    if (Fl::e_dy > 0) {
+      yscroll( yscroll() - Fl::e_dy*15 );
+    } else if (Fl::e_dy < 0) {
+      yscroll( yscroll() - Fl::e_dy*15 );
+    }
+    return 1;
+*/
+
   }
   Fl_Boxtype b = box();
   return Fl_Input_::handletext(event,
@@ -637,5 +649,5 @@ Fl_Input::Fl_Input(int X, int Y, int W, int H, const char *l)
 }
 
 //
-// End of "$Id: Fl_Input.cxx 6765 2009-04-15 08:35:28Z matt $".
+// End of "$Id: Fl_Input.cxx 6888 2009-09-19 21:16:21Z matt $".
 //

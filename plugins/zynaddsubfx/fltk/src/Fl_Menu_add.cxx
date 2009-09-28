@@ -1,5 +1,5 @@
 //
-// "$Id: Fl_Menu_add.cxx 6716 2009-03-24 01:40:44Z fabien $"
+// "$Id: Fl_Menu_add.cxx 6878 2009-09-17 22:12:24Z matt $"
 //
 // Menu utilities for the Fast Light Tool Kit (FLTK).
 //
@@ -177,56 +177,95 @@ int Fl_Menu_Item::add(
 }
 
 /**
-  Adds a new menu item, with a title string,  shortcut int (or string), 
-  callback, argument to the  callback, and flags.  
+  Adds a new menu item.
+  
+  \param[in] label The text label for the menu item.
+  \param[in] shortcut Optional keyboard shortcut that can be an int or string; (FL_CTRL+'a') or "^a". Default 0 if none.
+  \param[in] callback Optional callback invoked when user clicks the item. Default 0 if none.
+  \param[in] userdata Optional user data passed as an argument to the callback. Default 0 if none.
+  \param[in] flags Optional flags that control the type of menu item; see below. Default is 0 for none.
+  \returns The index into the menu() array, where the entry was added.
+  
+  \par Description
   If the menu array was directly set with menu(x), then copy() is done 
   to make a private array.
-  
-  The characters "&", "/", "\", and "_" are treated as
-  special characters in the label string. The "&" character
-  specifies that the following character is an accelerator and
-  will be underlined. The "\" character is used to escape the next
-  character in the string. Labels starting with the "_" character
-  cause a divider to be placed after that menu item.
-  
-  A label of the form "foo/bar/baz" will create submenus called 
-  "foo" and "bar" with an entry called "baz". The "/" character is 
-  ignored if it appears as the first character of the label string, e.g.
-  "/foo/bar/baz".
-  
+  \par 
+  A menu item's callback must not add() items to its parent menu during the callback.
+
+  <B>Detailed Description of Parameters</B>
+  \par label
+  The menu item's label. This option is required.
+  \par
+  The characters "&", "/", "\", and "_" are treated as special characters in the label string. 
+  The "&" character specifies that the following character is an accelerator and will be underlined.
+  The "\" character is used to escape the next character in the string. 
+  Labels starting with the "_" character cause a divider to be placed after that menu item.
+  \par 
+  A label of the form "File/Quit" will create the submenu "File"
+  with a menu item called "Quit". The "/" character is ignored if it appears
+  as the first character of the label string, e.g.  "/File/Quit".
+  \par 
   The label string is copied to new memory and can be freed.
   The other arguments (including the shortcut) are copied into the
   menu item unchanged.
-  
+  \par 
   If an item exists already with that name then it is replaced with
   this new one.  Otherwise this new one is added to the end of the
   correct menu or submenu.  The return value is the offset into the array
   that the new entry was placed at.
   
+  \par shortcut
+  The keyboard shortcut for this menu item. 
+  \par 
+  This parameter is optional, and defaults to 0 to indicate no shortcut.
+  \par
   Shortcut can be 0L, or either a modifier/key combination (for example
   FL_CTRL+'A') or a string describing the shortcut in one of two ways:
-  
-  \code
+  \verbatim
    [#+^]<ascii_value>    e.g. "97", "^97", "+97", "#97"
    [#+^]<ascii_char>     e.g. "a", "^a", "+a", "#a"
-  \endcode
+  \endverbatim
   ..where \<ascii_value\> is a decimal value representing an
   ascii character (eg. 97 is the ascii for 'a'), and the optional
   prefixes enhance the value that follows. Multiple prefixes must
   appear in the above order.
-  \code
+  \verbatim
    # - Alt
    + - Shift
    ^ - Control
-  \endcode
+  \endverbatim
   Text shortcuts are converted to integer shortcut by calling 
-  int fl_old_shortcut(const char*).
-  
-  The return value is the index into the array that the entry was put.
-  
-  No items must be added to a menu during a callback to the same menu.
+  Fl_Shortcut fl_old_shortcut(const char*).
+
+  \par callback
+  The callback to invoke when this menu item is selected. 
+  \par 
+  This parameter is optional, and defaults to 0 for no callback.
+
+  \par userdata
+  The callback's 'user data' that is passed to the callback. 
+  \par 
+  This parameter is optional, and defaults to 0.
+
+  \par flags
+  These are bit flags to define what kind of menu item this is. 
+  \par
+  This parameter is optional, and defaults to 0 to define a 'regular' menu item.
+  \par 
+  These flags can be 'OR'ed together:
+  \code
+      FL_MENU_INACTIVE     // Deactivate menu item (gray out)
+      FL_MENU_TOGGLE       // Item is a checkbox toggle (shows checkbox for on/off state)
+      FL_MENU_VALUE        // The on/off state for checkbox/radio buttons (if set, state is 'on')
+      FL_MENU_RADIO        // Item is a radio button (one checkbox of many can be on)
+      FL_MENU_INVISIBLE    // Item will not show up (shortcut will work)
+      FL_SUBMENU_POINTER   // Indicates user_data() is a pointer to another menu array
+      FL_SUBMENU           // This item is a submenu to other items
+      FL_MENU_DIVIDER      // Creates divider line below this item. Also ends a group of radio buttons.
+  \endcode
+
  */
-int Fl_Menu_::add(const char *t, int s, Fl_Callback *c,void *v,int f) {
+int Fl_Menu_::add(const char *label,int shortcut,Fl_Callback *callback,void *userdata,int flags) {
   // make this widget own the local array:
   if (this != fl_menu_array_owner) {
     if (fl_menu_array_owner) {
@@ -260,7 +299,7 @@ int Fl_Menu_::add(const char *t, int s, Fl_Callback *c,void *v,int f) {
     }
     fl_menu_array_owner = this;
   }
-  int r = menu_->add(t,s,c,v,f);
+  int r = menu_->add(label,shortcut,callback,userdata,flags);
   // if it rellocated array we must fix the pointer:
   int value_offset = value_-menu_;
   menu_ = local_array; // in case it reallocated it
@@ -335,5 +374,5 @@ void Fl_Menu_::remove(int i) {
 }
 
 //
-// End of "$Id: Fl_Menu_add.cxx 6716 2009-03-24 01:40:44Z fabien $".
+// End of "$Id: Fl_Menu_add.cxx 6878 2009-09-17 22:12:24Z matt $".
 //

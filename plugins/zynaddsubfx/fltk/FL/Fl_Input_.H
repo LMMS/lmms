@@ -1,5 +1,5 @@
 //
-// "$Id: Fl_Input_.H 6777 2009-04-23 15:32:19Z matt $"
+// "$Id: Fl_Input_.H 6902 2009-09-27 11:06:56Z matt $"
 //
 // Input base class header file for the Fast Light Tool Kit (FLTK).
 //
@@ -120,7 +120,7 @@ class FL_EXPORT Fl_Input_ : public Fl_Widget {
       \p mark_, no text is selected */
   int mark_;
 
-  /** \internal Offset to text origin within wdget bounds */
+  /** \internal Offset to text origin within widget bounds */
   int xscroll_, yscroll_;
 
   /** \internal Minimal update pointer. Display requirs redraw from here to the end
@@ -143,10 +143,10 @@ class FL_EXPORT Fl_Input_ : public Fl_Widget {
   Fl_Fontsize textsize_;
 
   /** \internal color of the entire text */
-  unsigned textcolor_;
+  Fl_Color textcolor_;
 
   /** \internal color of the text cursor */
-  unsigned cursor_color_;
+  Fl_Color cursor_color_;
 
   /** \internal Horizontal cursor position in pixels while movin up or down.  */
   static double up_down_pos;
@@ -206,6 +206,7 @@ protected:
 
   /** \internal Vertical offset of text to top edge of widget. */
   int yscroll() const {return yscroll_;}
+  void yscroll(int y) { yscroll_ = y; damage(FL_DAMAGE_EXPOSE);}
 
   /* Return the number of lines displayed on a single page.  */
   int linesPerPage();
@@ -396,23 +397,23 @@ public:
 
   /** Gets the color of the text in the input field.
     \return the text color
-    \see textcolor(unsigned) */
-  Fl_Color textcolor() const {return (Fl_Color)textcolor_;}
+    \see textcolor(Fl_Color) */
+  Fl_Color textcolor() const {return textcolor_;}
 
   /** Sets the color of the text in the input field.
     The text color defaults to \c FL_FOREGROUND_COLOR.
     \param [in] n new text color
     \see textcolor() */
-  void textcolor(unsigned n) {textcolor_ = n;}
+  void textcolor(Fl_Color n) {textcolor_ = n;}
 
   /** Gets the color of the cursor.  
     \return the current cursor color */
-  Fl_Color cursor_color() const {return (Fl_Color)cursor_color_;}
+  Fl_Color cursor_color() const {return cursor_color_;}
 
   /** Sets the color of the cursor.  
     The default color for the cursor is \c FL_BLACK.
     \param [in] n the new cursor color */
-  void cursor_color(unsigned n) {cursor_color_ = n;}
+  void cursor_color(Fl_Color n) {cursor_color_ = n;}
 
   /** Gets the input field type. 
     \return the current input type */
@@ -450,5 +451,5 @@ public:
 #endif 
 
 //
-// End of "$Id: Fl_Input_.H 6777 2009-04-23 15:32:19Z matt $".
+// End of "$Id: Fl_Input_.H 6902 2009-09-27 11:06:56Z matt $".
 //

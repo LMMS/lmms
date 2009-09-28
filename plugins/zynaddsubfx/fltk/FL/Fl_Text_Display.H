@@ -1,5 +1,5 @@
 //
-// "$Id: Fl_Text_Display.H 6614 2009-01-01 16:11:32Z matt $"
+// "$Id: Fl_Text_Display.H 6902 2009-09-27 11:06:56Z matt $"
 //
 // Header file for Fl_Text_Display class.
 //
@@ -165,9 +165,9 @@ class FL_EXPORT Fl_Text_Display: public Fl_Group {
     /**    Sets the default size of text in the widget.  */
     void textsize(Fl_Fontsize s) {textsize_ = s;}
     /**    Gets the default color of text in the widget.  */
-    Fl_Color textcolor() const {return (Fl_Color)textcolor_;}
+    Fl_Color textcolor() const {return textcolor_;}
     /**    Sets the default color of text in the widget.  */
-    void textcolor(unsigned n) {textcolor_ = n;}
+    void textcolor(Fl_Color n) {textcolor_ = n;}
 
     int wrapped_column(int row, int column) const;
     int wrapped_row(int row) const;
@@ -327,7 +327,7 @@ class FL_EXPORT Fl_Text_Display: public Fl_Group {
 
     Fl_Font textfont_;
     Fl_Fontsize textsize_;
-    unsigned textcolor_;
+    Fl_Color textcolor_;
 
 	 // The following are not presently used from the original NEdit code,
 	 // but are being put here so that future versions of Fl_Text_Display
@@ -340,5 +340,5 @@ class FL_EXPORT Fl_Text_Display: public Fl_Group {
 #endif
 
 //
-// End of "$Id: Fl_Text_Display.H 6614 2009-01-01 16:11:32Z matt $".
+// End of "$Id: Fl_Text_Display.H 6902 2009-09-27 11:06:56Z matt $".
 //

@@ -1,5 +1,5 @@
 //
-// "$Id: Fl_Window.H 6614 2009-01-01 16:11:32Z matt $"
+// "$Id: Fl_Window.H 6907 2009-09-28 14:34:52Z matt $"
 //
 // Window header file for the Fast Light Tool Kit (FLTK).
 //
@@ -69,16 +69,6 @@ class FL_EXPORT Fl_Window : public Fl_Group {
   Fl_Cursor cursor_default;
   Fl_Color cursor_fg, cursor_bg;
   void size_range_();
-  // values for flags():
-  enum {
-    FL_MODAL = 64,
-    FL_NOBORDER = 8,
-    FL_FORCE_POSITION = 16,
-    FL_NON_MODAL = 32,
-    FL_OVERRIDE = 256,
-    FL_MENU_WINDOW = 4096,
-    FL_TOOLTIP_WINDOW = 8192
-  };
   void _Fl_Window(); // constructor innards
 
   // unimplemented copy ctor and assignment operator
@@ -167,13 +157,13 @@ public:
     Fast inline function to turn the border
     off. It only works before show() is called.
   */
-  void clear_border()	{set_flag(FL_NOBORDER);}
+  void clear_border()	{set_flag(NOBORDER);}
   /** See int Fl_Window::border(int) */
-  int border() const	{return !(flags() & FL_NOBORDER);}
-  /** Activate the flags FL_NOBORDER|FL_OVERRIDE */
-  void set_override()	{set_flag(FL_NOBORDER|FL_OVERRIDE);}
+  unsigned int border() const	{return !(flags() & NOBORDER);}
+  /** Activate the flags NOBORDER|FL_OVERRIDE */
+  void set_override()	{set_flag(NOBORDER|OVERRIDE);}
   /** Returns non zero if FL_OVERRIDE flag is set, 0 otherwise. */
-  int override() const  { return flags()&FL_OVERRIDE; }
+  unsigned int override() const  { return flags()&OVERRIDE; }
   /**
     A "modal" window, when shown(), will prevent any events from
     being delivered to other windows in the same program, and will also
@@ -183,18 +173,18 @@ public:
     which window (if any) is modal by calling 
     Fl::modal().
   */
-  void set_modal()	{set_flag(FL_MODAL);}
+  void set_modal()	{set_flag(MODAL);}
   /**  Returns true if this window is modal.  */
-  int modal() const	{return flags() & FL_MODAL;}
+  unsigned int modal() const	{return flags() & MODAL;}
   /**
     A "non-modal" window (terminology borrowed from Microsoft Windows)
     acts like a modal() one in that it remains on top, but it has
     no effect on event delivery.  There are <I>three</I> states for a
     window: modal, non-modal, and normal.
   */
-  void set_non_modal()	{set_flag(FL_NON_MODAL);}
+  void set_non_modal()	{set_flag(NON_MODAL);}
   /**  Returns true if this window is modal or non-modal. */
-  int non_modal() const {return flags() & (FL_NON_MODAL|FL_MODAL);}
+  unsigned int non_modal() const {return flags() & (NON_MODAL|MODAL);}
 
   /**
     Marks the window as a menu window.
@@ -209,10 +199,10 @@ public:
     This must be called before the window is shown and cannot be changed
     later.
   */
-  void set_menu_window()	{set_flag(FL_MENU_WINDOW);}
+  void set_menu_window()	{set_flag(MENU_WINDOW);}
 
   /**  Returns true if this window is a menu window. */
-  int menu_window() const {return flags() & FL_MENU_WINDOW;}
+  unsigned int menu_window() const {return flags() & MENU_WINDOW;}
 
   /**
     Marks the window as a tooltip window.
@@ -230,10 +220,10 @@ public:
     \note Since Fl_Tooltip_Window is derived from Fl_Menu_Window, this
     also \b clears the menu_window() state.
   */
-  void set_tooltip_window()	{ set_flag(FL_TOOLTIP_WINDOW);
-				  clear_flag(FL_MENU_WINDOW); }
+  void set_tooltip_window()	{ set_flag(TOOLTIP_WINDOW);
+				  clear_flag(MENU_WINDOW); }
   /**  Returns true if this window is a tooltip window. */
-  int tooltip_window() const {return flags() & FL_TOOLTIP_WINDOW;}
+  unsigned int tooltip_window() const {return flags() & TOOLTIP_WINDOW;}
 
   /**
     Position the window so that the mouse is pointing at the
@@ -252,7 +242,7 @@ public:
     so that the next time show() is called the window manager is
     free to position the window.
   */
-  void free_position()	{clear_flag(FL_FORCE_POSITION);}
+  void free_position()	{clear_flag(FORCE_POSITION);}
   /**
     Set the allowable range the user can resize this window to.  This only
     works for top-level windows.
@@ -410,5 +400,5 @@ public:
 #endif
 
 //
-// End of "$Id: Fl_Window.H 6614 2009-01-01 16:11:32Z matt $".
+// End of "$Id: Fl_Window.H 6907 2009-09-28 14:34:52Z matt $".
 //

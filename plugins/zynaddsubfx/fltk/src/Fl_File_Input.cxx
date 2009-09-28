@@ -144,7 +144,7 @@ void Fl_File_Input::update_buttons() {
   \param[in] str new string value
   \param[in] len lengh of value
 */
-int						// O - true on success
+int						// O - TRUE on success
 Fl_File_Input::value(const char *str,		// I - New string value
                      int        len) {		// I - Length of value
   damage(FL_DAMAGE_BAR);
@@ -157,7 +157,7 @@ Fl_File_Input::value(const char *str,		// I - New string value
   Returns non 0 on success.
   \param[in] str new string value
 */
-int						// O - true on success
+int						// O - TRUE on success
 Fl_File_Input::value(const char *str) {		// I - New string value
   damage(FL_DAMAGE_BAR);
   return Fl_Input::value(str);
@@ -187,7 +187,7 @@ void Fl_File_Input::draw() {
   Return non zero if event is handled.
   \param[in] event
 */
-int						// O - true if we handled event
+int						// O - TRUE if we handled event
 Fl_File_Input::handle(int event) 		// I - Event
 {
 //  printf("handle(event = %d)\n", event);
@@ -230,7 +230,7 @@ Fl_File_Input::handle(int event) 		// I - Event
   Return non zero if event is handled.
   \param[in] event
 */
-int						// O - true if we handled event
+int						// O - TRUE if we handled event
 Fl_File_Input::handle_button(int event)		// I - Event
 {
   int		i,				// Looping var

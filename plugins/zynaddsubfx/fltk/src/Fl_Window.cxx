@@ -1,5 +1,5 @@
 //
-// "$Id: Fl_Window.cxx 6669 2009-02-25 08:44:54Z AlbrechtS $"
+// "$Id: Fl_Window.cxx 6905 2009-09-27 12:06:35Z matt $"
 //
 // Window widget class for the Fast Light Tool Kit (FLTK).
 //
@@ -66,7 +66,7 @@ Fl_Window::Fl_Window(int X,int Y,int W, int H, const char *l)
   cursor_bg      = FL_WHITE;
 
   _Fl_Window();
-  set_flag(FL_FORCE_POSITION);
+  set_flag(FORCE_POSITION);
 }
 
 Fl_Window::Fl_Window(int W, int H, const char *l)
@@ -151,8 +151,7 @@ void Fl_Window::copy_label(const char *a) {
 
 
 void Fl_Window::iconlabel(const char *iname) {
-  // FIXME: 'flags' is 32 bit large!
-  uchar saveflags = flags();
+  unsigned saveflags = flags();
   label(label(), iname);
   set_flag(saveflags);
 }
@@ -179,5 +178,5 @@ Fl_Window *Fl_Window::current() {
 
 
 //
-// End of "$Id: Fl_Window.cxx 6669 2009-02-25 08:44:54Z AlbrechtS $".
+// End of "$Id: Fl_Window.cxx 6905 2009-09-27 12:06:35Z matt $".
 //

@@ -1,5 +1,5 @@
 //
-// "$Id: Fl_Menu_.H 6614 2009-01-01 16:11:32Z matt $"
+// "$Id: Fl_Menu_.H 6902 2009-09-27 11:06:56Z matt $"
 //
 // Menu base class header file for the Fast Light Tool Kit (FLTK).
 //
@@ -56,7 +56,7 @@ protected:
   uchar down_box_;
   Fl_Font textfont_;
   Fl_Fontsize textsize_;
-  unsigned textcolor_;
+  Fl_Color textcolor_;
 
 public:
   Fl_Menu_(int,int,int,int,const char * =0);
@@ -119,9 +119,9 @@ public:
   /**  Sets the font size of menu item labels.  */
   void textsize(Fl_Fontsize c) {textsize_=c;}
   /** Get the current color of menu item labels.  */
-  Fl_Color textcolor() const {return (Fl_Color)textcolor_;}
+  Fl_Color textcolor() const {return textcolor_;}
   /** Sets the current color of menu item labels. */
-  void textcolor(unsigned c) {textcolor_=c;}
+  void textcolor(Fl_Color c) {textcolor_=c;}
 
   /**
     This box type is used to surround the currently-selected items in the
@@ -142,5 +142,5 @@ public:
 #endif
 
 //
-// End of "$Id: Fl_Menu_.H 6614 2009-01-01 16:11:32Z matt $".
+// End of "$Id: Fl_Menu_.H 6902 2009-09-27 11:06:56Z matt $".
 //

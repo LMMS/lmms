@@ -1,5 +1,5 @@
 //
-// "$Id: fl_font_xft.cxx 6779 2009-04-24 09:28:30Z yuri $"
+// "$Id: fl_font_xft.cxx 6862 2009-09-13 10:15:42Z matt $"
 //
 // Xft font code for the Fast Light Tool Kit (FLTK).
 //
@@ -128,8 +128,6 @@ void fl_font(Fl_Font fnum, Fl_Fontsize size, int angle) {
   fl_fontsize = f;
 #if XFT_MAJOR < 2
   fl_xfont    = f->font->u.core.font;
-#else
-  fl_xfont    = NULL; // invalidate
 #endif // XFT_MAJOR < 2
   fl_xftfont = (void*)f->font;
 }
@@ -415,19 +413,6 @@ static XFontStruct* load_xfont_for_xft2(void) {
   default: name--;                  // no prefix, restore name
   }
 
-  // map generic Xft names to customary XLFD faces
-  if (!strcmp(name, "sans")) {
-    name = "helvetica";
-  } else if (!strcmp(name, "mono")) {
-    name = "courier";
-  } else if (!strcmp(name, "serif")) {
-    name = "times";
-  } else if (!strcmp(name, "screen")) {
-    name = "lucidatypewriter";
-  } else if (!strcmp(name, "dingbats")) {
-    name = "zapf dingbats";
-  }
-
   // first, we do a query with no prefered size, to see if the font exists at all
   snprintf(xlfd, 128, "-*-*%s*-%s-%c-*--*-*-*-*-*-*-*-*", name, weight, slant); // make up xlfd style name
   xgl_font = XLoadQueryFont(fl_display, xlfd);
@@ -635,5 +620,5 @@ void fl_rtl_draw(const char* c, int n, int x, int y) {
 #endif
 
 //
-// End of "$Id: fl_font_xft.cxx 6779 2009-04-24 09:28:30Z yuri $"
+// End of "$Id: fl_font_xft.cxx 6862 2009-09-13 10:15:42Z matt $"
 //
