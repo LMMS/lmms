@@ -241,6 +241,10 @@ struct waveform_oscillator: public simple_oscillator
 {
     enum { SIZE = 1 << SIZE_BITS, MASK = SIZE - 1, SCALE = 1 << (32 - SIZE_BITS) };
     float *waveform;
+    waveform_oscillator()
+    {
+        waveform = NULL;
+    }
     inline float get()
     {
         uint32_t wpos = phase >> (32 - SIZE_BITS);
