@@ -73,7 +73,7 @@ void Unison::update_parameters(){
 	};
 
 #warning compute unison_amplitude_samples in functie de centi
-	unison_amplitude_samples=20.0;
+	unison_amplitude_samples=200.0;
 
 	if (unison_amplitude_samples>=max_delay-1) unison_amplitude_samples=max_delay-2;
 
@@ -96,7 +96,7 @@ void Unison::process(int bufsize,REALTYPE *inbuf,REALTYPE *outbuf){
 		xpos+=xpos_step;
 		REALTYPE in=inbuf[i],out=0.0;
 
-
+		REALTYPE sign=1.0;
 		for (int k=0;k<unison_size;k++){
 			REALTYPE vpos=uv[k].realpos1*(1.0-xpos)+uv[k].realpos2*xpos;//optimize
 			REALTYPE pos=delay_k+max_delay-vpos-1.0;//optimize
@@ -105,7 +105,8 @@ void Unison::process(int bufsize,REALTYPE *inbuf,REALTYPE *outbuf){
 			F2I(pos,posi);//optimize!
 			if (posi>=max_delay) posi-=max_delay;
 			posf=pos-floor(pos);
-			out+=(1.0-posf)*delay_buffer[posi]+posf*delay_buffer[posi+1];
+			out+=((1.0-posf)*delay_buffer[posi]+posf*delay_buffer[posi+1])*sign;
+			sign=-sign;
 		};
 		outbuf[i]=out*volume;
 //		printf("%d %g\n",i,outbuf[i]);
@@ -129,8 +130,7 @@ void Unison::update_unison_data(){
 			pos=1.0;
 			step=-step;
 		};
-		//REALTYPE vibratto_val=pos-0.35*pos*pos*pos;//make the vibratto lfo smoother
-		REALTYPE vibratto_val=(pos+1);
+		REALTYPE vibratto_val=pos-0.35*pos*pos*pos;//make the vibratto lfo smoother
 		REALTYPE newval=1.0+0.5*(vibratto_val+1.0)*unison_amplitude_samples;
 
 		if (first_time){
@@ -146,21 +146,4 @@ void Unison::update_unison_data(){
 	if (first_time) first_time=false;
 
 };
-/*
-int main(){
-	srand(time(NULL));
-	Unison unison(10,0.2);
-	//unison.set_base_frequency(1.0);
-	
 
-	int bufsize=100;
-	REALTYPE in[bufsize],out[bufsize];
-	ZERO_REALTYPE (in,bufsize);
-	ZERO_REALTYPE (out,bufsize);
-	in[20]=1;
-	for (int i=0;i<100000;i++) unison.process(bufsize,in,out);
-	for (int i=0;i<bufsize;i++) printf("%.3g ",out[i]);printf("\n");
-
-	return 1;
-};
-*/

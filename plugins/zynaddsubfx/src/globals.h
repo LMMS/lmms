@@ -184,6 +184,7 @@ extern int OSCIL_SIZE;
 #define RND (rand()/(RAND_MAX+1.0))
 
 #define ZERO(data,size) {char *data_=(char *) data;for (int i=0;i<size;i++) data_[i]=0;};
+#define ZERO_REALTYPE(data,size) {REALTYPE *data_=(REALTYPE *) data;for (int i=0;i<size;i++) data_[i]=0.0;};
 
 enum ONOFFTYPE {OFF=0,ON=1};
 

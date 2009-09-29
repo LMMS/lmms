@@ -934,3 +934,6 @@
 25 Sep 2009 (Mark McCurry)
 	    - Allowed for XMLwrapper to retrieve strings stored in mxml TEXT
 	      fields
+29 Sep 2009 (Paul Nasca)
+	    - Remove the old (FFT based) Bandwidth effect to Reverb and started rewrite it (based on multivoice chorus/unison effect)
+	    

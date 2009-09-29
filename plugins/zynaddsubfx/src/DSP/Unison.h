@@ -21,6 +21,7 @@
 
 #ifndef UNISON_H
 #define UNISON_H
+#include <stdlib.h>
 #include "../globals.h"
 
 
@@ -31,6 +32,8 @@ class Unison{
 
 		void set_size(int new_size);
 		void set_base_frequency(REALTYPE freq);
+		void set_bandwidth(REALTYPE bandwidth_cents){
+		};
 
 		void process(int bufsize,REALTYPE *inbuf,REALTYPE *outbuf=NULL);
 
@@ -44,7 +47,7 @@ class Unison{
 			REALTYPE step,position;//base LFO
 			REALTYPE realpos1,realpos2; //the position regarding samples
 			int lin_ipos,lin_ifreq;
-#error sa calculez frecventa si pozitia a.i. la inceput sa fie realpos1 si la final sa fie realpos2
+//#error sa calculez frecventa si pozitia a.i. la inceput sa fie realpos1 si la final sa fie realpos2
 		    REALTYPE lin_fpos,lin_ffreq;	
 			UnisonVoice(){
 				position=RND*1.8-0.9;
