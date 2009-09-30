@@ -229,9 +229,11 @@ public:
 			if( it_inst )
 			{
 				isSF2 = true;
-				it_inst->loadResource(
-					configManager::inst()->
-						defaultSoundfont() );
+                if( configManager::inst()->defaultSoundfont() )
+                {
+                    it_inst->loadResource(
+                        configManager::inst()->defaultSoundfont() );
+                }
 				it_inst->childModel( "bank" )->setValue( 0 );
 				it_inst->childModel( "patch" )->setValue( 0 );
 			}
