@@ -39,7 +39,6 @@
 #include "embed.h"
 #include "EffectRackView.h"
 
-class QStackedLayout;
 class QButtonGroup;
 class FxLine;
 
@@ -53,7 +52,7 @@ public:
 		FxChannelView(QWidget * _parent, FxMixerView * _mv, int _chIndex );
 
 		FxLine * m_fxLine;
-		EffectRackView * m_rackView;
+		//EffectRackView * m_rackView;
 		pixmapButton * m_muteBtn;
 		fader * m_fader;
 	} ;
@@ -92,12 +91,12 @@ private:
 
 	QVector<FxChannelView *> m_fxChannelViews;
 
-	QStackedLayout * m_fxRacksLayout;
 	FxLine * m_currentFxLine;
 
 	QScrollArea * channelArea;
 	QHBoxLayout * chLayout;
 	QWidget * m_channelAreaWidget;
+	EffectRackView * m_rackView;
 } ;
 
 #endif
