@@ -173,7 +173,7 @@ void FxMixer::deleteChannel(int index)
 void FxMixer::moveChannelLeft(int index)
 {
 	// can't move master or first channel
-	if( index <= 1 )
+	if( index <= 1 || index >= m_fxChannels.size() )
 	{
 		return;
 	}
@@ -182,6 +182,63 @@ void FxMixer::moveChannelLeft(int index)
 	int a = index - 1, b = index;
 
 	// go through every instrument and adjust for the channel index change
+	QVector<track *> songTrackList = engine::getSong()->tracks();
+	QVector<track *> bbTrackList = engine::getBBTrackContainer()->tracks();
+
+	QVector<track *> trackLists[] = {songTrackList, bbTrackList};
+	for(int tl=0; tl<2; ++tl)
+	{
+		QVector<track *> trackList = trackLists[tl];
+		for(int i=0; i<trackList.size(); ++i)
+		{
+			if( trackList[i]->type() == track::InstrumentTrack )
+			{
+				InstrumentTrack * inst = (InstrumentTrack *) trackList[i];
+				int val = inst->effectChannelModel()->value(0);
+				if( val == a )
+				{
+					inst->effectChannelModel()->setValue(b);
+				}
+				else if( val == b )
+				{
+					inst->effectChannelModel()->setValue(a);
+				}
+
+			}
+		}
+	}
+
+	for(int i=0; i<m_fxChannels.size(); ++i)
+	{
+		// for every send/receive, adjust for the channel index change
+		for(int j=0; j<m_fxChannels[i]->m_sends.size(); ++j)
+		{
+			if( m_fxChannels[i]->m_sends[j] == a )
+			{
+				m_fxChannels[i]->m_sends[j] = b;
+			}
+			else if( m_fxChannels[i]->m_sends[j] == b )
+			{
+				m_fxChannels[i]->m_sends[j] = a;
+			}
+		}
+		for(int j=0; j<m_fxChannels[i]->m_receives.size(); ++j)
+		{
+			if( m_fxChannels[i]->m_receives[j] == a )
+			{
+				m_fxChannels[i]->m_receives[j] = b;
+			}
+			else if( m_fxChannels[i]->m_receives[j] == b )
+			{
+				m_fxChannels[i]->m_receives[j] = a;
+			}
+		}
+	}
+
+	// actually do the swap
+	FxChannel * tmpChannel = m_fxChannels[a];
+	m_fxChannels[a] = m_fxChannels[b];
+	m_fxChannels[b] = tmpChannel;
 }
 
 

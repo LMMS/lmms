@@ -89,7 +89,22 @@ FxMixerView::FxMixerView() :
 		chLayout->addWidget(m_fxChannelViews[i]->m_fxLine);
 	}
 	// add the scrolling section to the main layout
-	channelArea = new QScrollArea(this);
+
+	// class for scroll area to pass key presses down
+	class ChannelArea : public QScrollArea
+	{
+		public:
+			ChannelArea(QWidget * parent, FxMixerView * mv) :
+				QScrollArea(parent), m_mv(mv) {}
+			~ChannelArea() {}
+			virtual void keyPressEvent(QKeyEvent * e)
+			{
+				m_mv->keyPressEvent(e);
+			}
+		private:
+			FxMixerView * m_mv;
+	};
+	channelArea = new ChannelArea(this, this);
 	channelArea->setWidget(m_channelAreaWidget);
 	channelArea->setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
 	channelArea->setFrameStyle( QFrame::NoFrame );
@@ -237,12 +252,11 @@ void FxMixerView::updateFxLine(int index)
 
 void FxMixerView::deleteChannel(int index)
 {
+	// can't delete master
+	if( index == 0 ) return;
+
 	// remember selected line
 	int selLine = m_currentFxLine->channelIndex();
-
-	// can't delete master
-	if( index == 0 )
-		return;
 
 	// delete the real channel
 	engine::fxMixer()->deleteChannel(index);
@@ -253,6 +267,7 @@ void FxMixerView::deleteChannel(int index)
 	delete m_fxChannelViews[index]->m_muteBtn;
 	delete m_fxChannelViews[index]->m_fxLine;
 	delete m_fxChannelViews[index];
+	m_channelAreaWidget->adjustSize();
 
 	// make sure every channel knows what index it is
 	for(int i=0; i<m_fxChannelViews.size(); ++i)
@@ -274,12 +289,73 @@ void FxMixerView::deleteChannel(int index)
 }
 
 
+
+void FxMixerView::moveChannelLeft(int index) 
+{
+	// can't move master or first channel left or last channel right
+	if( index <= 1 || index >= m_fxChannelViews.size() ) return;
+
+	int selIndex = m_currentFxLine->channelIndex();
+
+	FxMixer * mix = engine::fxMixer();
+	mix->moveChannelLeft(index);
+
+	// refresh the two mixer views
+	for( int i = index-1; i <= index; ++i )
+	{
+		// delete the mixer view
+		int replaceIndex = chLayout->indexOf(m_fxChannelViews[i]->m_fxLine);
+
+		chLayout->removeWidget(m_fxChannelViews[i]->m_fxLine);
+		delete m_fxChannelViews[i]->m_fader;
+		delete m_fxChannelViews[i]->m_muteBtn;
+		delete m_fxChannelViews[i]->m_fxLine;
+		delete m_fxChannelViews[i];
+
+		// add it again
+		m_fxChannelViews[i] = new FxChannelView(m_channelAreaWidget, this, i);
+		chLayout->insertWidget(replaceIndex, m_fxChannelViews[i]->m_fxLine);
+	}
+
+	// keep selected channel
+	if( selIndex == index )
+	{
+		selIndex = index-1;
+	}
+	else if( selIndex == index - 1 )
+	{
+		selIndex = index;
+	}
+	setCurrentFxLine(selIndex);
+}
+
+
+
+void FxMixerView::moveChannelRight(int index)
+{
+	moveChannelLeft(index+1);
+}
+
+
+
 void FxMixerView::keyPressEvent(QKeyEvent * e)
 {
 	switch(e->key())
 	{
 		case Qt::Key_Delete:
 			deleteChannel(m_currentFxLine->channelIndex());
+			break;
+		case Qt::Key_Left:
+			if( e->modifiers() & Qt::AltModifier )
+			{
+				moveChannelLeft( m_currentFxLine->channelIndex() );
+			}
+			break;
+		case Qt::Key_Right:
+			if( e->modifiers() & Qt::AltModifier )
+			{
+				moveChannelRight( m_currentFxLine->channelIndex() );
+			}
 			break;
 	}
 }
