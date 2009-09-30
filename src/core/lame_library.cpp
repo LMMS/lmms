@@ -44,6 +44,7 @@ LameLibrary::LameLibrary() :
 			QMessageBox::Ok | QMessageBox::Default );
 		delete m_lameLib;
 		m_lameLib = NULL;
+		return;
 	}
 
 	// grab the functions and stuff we need
@@ -155,6 +156,7 @@ LameLibrary::LameLibrary() :
 		m_lameLib->unload();
 		delete m_lameLib;
 		m_lameLib = NULL;
+		return;
 	}
 }
 
