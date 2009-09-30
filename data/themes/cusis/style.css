@@ -139,7 +139,7 @@ QToolBar {
 }
 
 
-fxMixerView QPushButton, effectRackView QPushButton, controllerRackView QPushButton {
+FxMixerView QPushButton, EffectRackView QPushButton, ControllerRackView QPushButton {
 	font-size: 10px;
 }
 
@@ -149,7 +149,7 @@ timeLine {
 
 /* Plugins */
 
-tripleOscillatorView knob {
+TripleOscillatorView knob {
 	color: rgb(1, 114, 216);
 	qproperty-outerColor: rgb(0, 0, 0);
 	qproperty-innerRadius: 1;
@@ -171,7 +171,7 @@ kickerInstrumentView knob {
 }
 
 
-audioFileProcessorView knob {
+AudioFileProcessorView knob {
 	color: rgb(240, 147, 14);
 	qproperty-outerColor: rgb(30, 35, 37);
 	qproperty-innerRadius: 4;
