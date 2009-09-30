@@ -97,6 +97,10 @@ public:
 	// delete the connection made by createChannelSend
 	void deleteChannelSend(fx_ch_t fromChannel, fx_ch_t toChannel);
 
+	// determine if adding a send from sendFrom to
+	// sendTo would result in an infinite mixer loop.
+	bool isInfiniteLoop(fx_ch_t fromChannel, fx_ch_t toChannel);
+
 	// return the FloatModel of fromChannel sending its output to the input of
 	// toChannel. NULL if there is no send.
 	FloatModel * channelSendModel(fx_ch_t fromChannel, fx_ch_t toChannel);

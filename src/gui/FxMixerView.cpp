@@ -148,6 +148,8 @@ void FxMixerView::addNewChannel()
 												 newChannelIndex));
 	chLayout->addWidget(m_fxChannelViews[newChannelIndex]->m_fxLine);
 	m_fxRacksLayout->addWidget( m_fxChannelViews[newChannelIndex]->m_rackView );
+
+	updateFxLine(newChannelIndex);
 }
 
 
@@ -207,28 +209,33 @@ void FxMixerView::setCurrentFxLine( FxLine * _line )
 }
 
 
-void FxMixerView::updateFxLine(int i)
+void FxMixerView::updateFxLine(int index)
 {
 	FxMixer * mix = engine::fxMixer();
 
 	// does current channel send to this channel?
-	FloatModel * sendModel = mix->channelSendModel(m_currentFxLine->channelIndex(), i);
+	int selIndex = m_currentFxLine->channelIndex();
+	FxLine * thisLine = m_fxChannelViews[index]->m_fxLine;
+	FloatModel * sendModel = mix->channelSendModel(selIndex, index);
 	if( sendModel == NULL )
 	{
 		// does not send, hide send knob
-		m_fxChannelViews[i]->m_fxLine->m_sendKnob->setVisible(false);
+		thisLine->m_sendKnob->setVisible(false);
 	}
 	else
 	{
 		// it does send, show knob and connect
-		m_fxChannelViews[i]->m_fxLine->m_sendKnob->setVisible(true);
-		m_fxChannelViews[i]->m_fxLine->m_sendKnob->setModel(sendModel);
+		thisLine->m_sendKnob->setVisible(true);
+		thisLine->m_sendKnob->setModel(sendModel);
 	}
 
-
-	m_fxChannelViews[i]->m_fxLine->update();
-	m_fxChannelViews[i]->m_fxLine->m_sendBtn->updateLightStatus();
+	// disable the send button if it would cause an infinite loop
+	thisLine->m_sendBtn->setVisible(! mix->isInfiniteLoop(selIndex, index));
+	thisLine->m_sendBtn->updateLightStatus();
+	thisLine->update();
 }
+
+
 
 void FxMixerView::setCurrentFxLine( int _line )
 {

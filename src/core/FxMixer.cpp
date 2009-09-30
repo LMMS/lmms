@@ -158,6 +158,26 @@ void FxMixer::deleteChannelSend(fx_ch_t fromChannel, fx_ch_t toChannel)
 }
 
 
+bool FxMixer::isInfiniteLoop(fx_ch_t sendFrom, fx_ch_t sendTo) {
+	// can't send master to anything
+	if( sendFrom == 0 ) return true;
+
+	// can't send channel to itself
+	if( sendFrom == sendTo ) return true;
+
+	// follow sendTo's outputs recursively looking for something that sends
+	// to sendFrom
+	for(int i=0; i<m_fxChannels[sendTo]->m_sends.size(); ++i)
+	{
+		if( isInfiniteLoop( sendFrom, m_fxChannels[sendTo]->m_sends[i] ) )
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
 
 // how much does fromChannel send its output to the input of toChannel?
 FloatModel * FxMixer::channelSendModel(fx_ch_t fromChannel, fx_ch_t toChannel)
