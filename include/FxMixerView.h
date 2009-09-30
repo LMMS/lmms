@@ -97,6 +97,7 @@ private:
 
 	QScrollArea * channelArea;
 	QHBoxLayout * chLayout;
+	QWidget * m_channelAreaWidget;
 } ;
 
 #endif

@@ -56,7 +56,9 @@ FxMixerView::FxMixerView() :
 	//pal.setColor( QPalette::Background, QColor( 72, 76, 88 ) );
 	//setPalette( pal );
 	setAutoFillBackground( true );
-	setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Minimum );
+	setSizePolicy( QSizePolicy::MinimumExpanding, QSizePolicy::Fixed );
+	setFixedSize(600, 300);
+
 
 	setWindowTitle( tr( "FX-Mixer" ) );
 	setWindowIcon( embed::getIconPixmap( "fx_mixer" ) );
@@ -64,6 +66,7 @@ FxMixerView::FxMixerView() :
 	m_fxRacksLayout = new QStackedLayout;
 	m_fxRacksLayout->setSpacing( 0 );
 	m_fxRacksLayout->setMargin( 0 );
+	//m_fxRacksLayout->setAlignment(Qt::AlignRight);
 
 	// main-layout
 	QHBoxLayout * ml = new QHBoxLayout;
@@ -71,8 +74,8 @@ FxMixerView::FxMixerView() :
 	ml->setSpacing( 0 );
 	ml->addSpacing( 6 );
 
-	channelArea = new QScrollArea(this);
-	chLayout = new QHBoxLayout(channelArea);
+	m_channelAreaWidget = new QWidget;
+	chLayout = new QHBoxLayout(m_channelAreaWidget);
 
 	// add master channel
 	m_fxChannelViews.resize(m->numChannels());
@@ -85,17 +88,20 @@ FxMixerView::FxMixerView() :
 	QSize fxLineSize = masterView->m_fxLine->size();
 
 	chLayout->setSizeConstraint(QLayout::SetMinimumSize);
-	channelArea->setWidgetResizable(true);
 
 	// add mixer channels
 	for( int i = 1; i < m_fxChannelViews.size(); ++i )
 	{
-		m_fxChannelViews[i] = new FxChannelView(channelArea, this, i);
+		m_fxChannelViews[i] = new FxChannelView(m_channelAreaWidget, this, i);
 		chLayout->addWidget(m_fxChannelViews[i]->m_fxLine);
 		m_fxRacksLayout->addWidget( m_fxChannelViews[i]->m_rackView );
 	}
 	// add the scrolling section to the main layout
-	ml->addLayout(chLayout);
+	m_channelAreaWidget->setLayout(chLayout);
+	channelArea = new QScrollArea(this);
+	channelArea->setWidget(m_channelAreaWidget);
+	//channelArea-> get rid of padding
+	ml->addWidget(channelArea);
 
 	// show the add new effect channel button
 	QPushButton * newChannelBtn = new QPushButton("new", this );
@@ -123,7 +129,7 @@ FxMixerView::FxMixerView() :
 	Qt::WindowFlags flags = subWin->windowFlags();
 	flags &= ~Qt::WindowMaximizeButtonHint;
 	subWin->setWindowFlags( flags );
-	subWin->layout()->setSizeConstraint(QLayout::SetMinimumSize);
+	//subWin->layout()->setSizeConstraint(QLayout::SetMinimumSize);
 
 	parentWidget()->setAttribute( Qt::WA_DeleteOnClose, false );
 	parentWidget()->move( 5, 310 );
@@ -144,7 +150,7 @@ void FxMixerView::addNewChannel()
 	FxMixer * mix = engine::fxMixer();
 
 	int newChannelIndex = mix->createChannel();
-	m_fxChannelViews.push_back(new FxChannelView(channelArea, this,
+	m_fxChannelViews.push_back(new FxChannelView(m_channelAreaWidget, this,
 												 newChannelIndex));
 	chLayout->addWidget(m_fxChannelViews[newChannelIndex]->m_fxLine);
 	m_fxRacksLayout->addWidget( m_fxChannelViews[newChannelIndex]->m_rackView );
