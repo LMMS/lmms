@@ -30,6 +30,9 @@
 #include "Effect.h"
 #include "song.h"
 
+#include "InstrumentTrack.h"
+#include "bb_track_container.h"
+
 
 FxChannel::FxChannel( Model * _parent ) :
 	m_fxChain( NULL ),
@@ -94,6 +97,98 @@ int FxMixer::createChannel()
 	clearChannel(index);
 
 	return index;
+}
+
+
+void FxMixer::deleteChannel(int index)
+{
+	// go through every instrument and adjust for the channel index change
+	QVector<track *> songTrackList = engine::getSong()->tracks();
+	QVector<track *> bbTrackList = engine::getBBTrackContainer()->tracks();
+
+	QVector<track *> trackLists[] = {songTrackList, bbTrackList};
+	for(int tl=0; tl<2; ++tl)
+	{
+		QVector<track *> trackList = trackLists[tl];
+		for(int i=0; i<trackList.size(); ++i)
+		{
+			if( trackList[i]->type() == track::InstrumentTrack )
+			{
+				InstrumentTrack * inst = (InstrumentTrack *) trackList[i];
+				int val = inst->effectChannelModel()->value(0);
+				if( val == index )
+				{
+					// we are deleting this track's fx send
+					// send to master
+					inst->effectChannelModel()->setValue(0);
+				}
+				else if( val > index )
+				{
+					// subtract 1 to make up for the missing channel
+					inst->effectChannelModel()->setValue(val-1);
+				}
+
+			}
+		}
+	}
+
+	// delete all of this channel's sends and receives
+	for(int i=0; i<m_fxChannels[index]->m_sends.size(); ++i)
+	{
+		deleteChannelSend(index, m_fxChannels[index]->m_sends[i]);
+	}
+	for(int i=0; i<m_fxChannels[index]->m_receives.size(); ++i)
+	{
+		deleteChannelSend(m_fxChannels[index]->m_receives[i], index);
+	}
+
+	for(int i=0; i<m_fxChannels.size(); ++i)
+	{
+		// for every send/receive, adjust for the channel index change
+		for(int j=0; j<m_fxChannels[i]->m_sends.size(); ++j)
+		{
+			if( m_fxChannels[i]->m_sends[j] > index )
+			{
+				// subtract 1 to make up for the missing channel
+				--m_fxChannels[i]->m_sends[j];
+			}
+		}
+		for(int j=0; j<m_fxChannels[i]->m_receives.size(); ++j)
+		{
+			if( m_fxChannels[i]->m_receives[j] > index )
+			{
+				// subtract 1 to make up for the missing channel
+				--m_fxChannels[i]->m_receives[j];
+			}
+		}
+
+	}
+
+	// actually delete the channel
+	m_fxChannels.remove(index);
+}
+
+
+
+void FxMixer::moveChannelLeft(int index)
+{
+	// can't move master or first channel
+	if( index <= 1 )
+	{
+		return;
+	}
+
+	// channels to swap
+	int a = index - 1, b = index;
+
+	// go through every instrument and adjust for the channel index change
+}
+
+
+
+void FxMixer::moveChannelRight(int index)
+{
+	moveChannelLeft(index+1);
 }
 
 

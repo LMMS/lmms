@@ -109,6 +109,13 @@ public:
 	// returns the index of the channel that was just added
 	int createChannel();
 
+	// delete a channel from the FX mixer.
+	void deleteChannel(int index);
+
+	// re-arrange channels
+	void moveChannelLeft(int index);
+	void moveChannelRight(int index);
+
 	// reset a channel's name, fx, sends, etc
 	void clearChannel(fx_ch_t channelIndex);
 

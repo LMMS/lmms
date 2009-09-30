@@ -24,6 +24,7 @@
 
 #include <QtGlobal>
 #include <QDebug>
+#include <QKeyEvent>
 
 #include <QtGui/QButtonGroup>
 #include <QtGui/QInputDialog>
@@ -63,9 +64,6 @@ FxMixerView::FxMixerView() :
 
 	// main-layout
 	QHBoxLayout * ml = new QHBoxLayout;
-	//ml->setMargin( 0 );
-	//ml->setSpacing( 0 );
-	//ml->addSpacing( 6 );
 
 	// Channel area
 	m_channelAreaWidget = new QWidget;
@@ -237,12 +235,61 @@ void FxMixerView::updateFxLine(int index)
 }
 
 
+void FxMixerView::deleteChannel(int index)
+{
+	// remember selected line
+	int selLine = m_currentFxLine->channelIndex();
+
+	// can't delete master
+	if( index == 0 )
+		return;
+
+	// delete the real channel
+	engine::fxMixer()->deleteChannel(index);
+
+	// delete the view
+	chLayout->removeWidget(m_fxChannelViews[index]->m_fxLine);
+	delete m_fxChannelViews[index]->m_fader;
+	delete m_fxChannelViews[index]->m_muteBtn;
+	delete m_fxChannelViews[index]->m_fxLine;
+	delete m_fxChannelViews[index];
+
+	// make sure every channel knows what index it is
+	for(int i=0; i<m_fxChannelViews.size(); ++i)
+	{
+		if( i > index )
+		{
+			m_fxChannelViews[i]->m_fxLine->setChannelIndex(i-1);
+		}
+	}
+	m_fxChannelViews.remove(index);
+
+	// select the next channel
+	if( selLine >= m_fxChannelViews.size() )
+	{
+		selLine = m_fxChannelViews.size()-1;
+	}
+	setCurrentFxLine(selLine);
+
+}
+
+
+void FxMixerView::keyPressEvent(QKeyEvent * e)
+{
+	switch(e->key())
+	{
+		case Qt::Key_Delete:
+			deleteChannel(m_currentFxLine->channelIndex());
+			break;
+	}
+}
+
+
 
 void FxMixerView::setCurrentFxLine( int _line )
 {
 	setCurrentFxLine( m_fxChannelViews[_line]->m_fxLine );
 }
-
 
 
 

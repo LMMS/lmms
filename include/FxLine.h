@@ -21,10 +21,10 @@ public:
 	virtual void mouseDoubleClickEvent( QMouseEvent * );
 
 	inline int channelIndex() { return m_channelIndex; }
+	inline void setChannelIndex(int index) { m_channelIndex = index; }
 
 	knob * m_sendKnob;
 	SendButtonIndicator * m_sendBtn;
-
 
 private:
 	FxMixerView * m_mv;

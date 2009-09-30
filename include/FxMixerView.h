@@ -52,14 +52,15 @@ public:
 		FxChannelView(QWidget * _parent, FxMixerView * _mv, int _chIndex );
 
 		FxLine * m_fxLine;
-		//EffectRackView * m_rackView;
 		pixmapButton * m_muteBtn;
 		fader * m_fader;
-	} ;
+	};
 
 
 	FxMixerView();
 	virtual ~FxMixerView();
+
+	virtual void keyPressEvent(QKeyEvent * e);
 
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _this );
 	virtual void loadSettings( const QDomElement & _this );
@@ -81,7 +82,10 @@ public:
 
 
 	// display the send button and knob correctly
-	void updateFxLine(int i);
+	void updateFxLine(int index);
+
+	// notify the view that an fx channel was deleted
+	void deleteChannel(int index);
 
 private slots:
 	void updateFaders();
