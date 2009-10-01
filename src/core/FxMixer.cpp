@@ -102,6 +102,8 @@ int FxMixer::createChannel()
 
 void FxMixer::deleteChannel(int index)
 {
+	m_fxChannels[index]->m_lock.lock();
+
 	// go through every instrument and adjust for the channel index change
 	QVector<track *> songTrackList = engine::getSong()->tracks();
 	QVector<track *> bbTrackList = engine::getBBTrackContainer()->tracks();
@@ -165,6 +167,7 @@ void FxMixer::deleteChannel(int index)
 	}
 
 	// actually delete the channel
+	delete m_fxChannels[index];
 	m_fxChannels.remove(index);
 }
 
