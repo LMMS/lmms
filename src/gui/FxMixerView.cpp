@@ -404,11 +404,21 @@ void FxMixerView::keyPressEvent(QKeyEvent * e)
 			{
 				moveChannelLeft( m_currentFxLine->channelIndex() );
 			}
+			else
+			{
+				// select channel to the left
+				setCurrentFxLine( m_currentFxLine->channelIndex()-1 );
+			}
 			break;
 		case Qt::Key_Right:
 			if( e->modifiers() & Qt::AltModifier )
 			{
 				moveChannelRight( m_currentFxLine->channelIndex() );
+			}
+			else
+			{
+				// select channel to the right
+				setCurrentFxLine( m_currentFxLine->channelIndex()+1 );
 			}
 			break;
 	}
@@ -418,7 +428,10 @@ void FxMixerView::keyPressEvent(QKeyEvent * e)
 
 void FxMixerView::setCurrentFxLine( int _line )
 {
-	setCurrentFxLine( m_fxChannelViews[_line]->m_fxLine );
+	if( _line >= 0 && _line < m_fxChannelViews.size() )
+	{
+		setCurrentFxLine( m_fxChannelViews[_line]->m_fxLine );
+	}
 }
 
 
