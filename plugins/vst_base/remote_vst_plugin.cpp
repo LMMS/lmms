@@ -1069,14 +1069,10 @@ VstIntPtr RemoteVstPlugin::hostCallback( AEffect * _effect, VstInt32 _opcode,
 
 		case audioMasterGetSampleRate:
 			SHOW_CALLBACK( "amc: audioMasterGetSampleRate\n" );
-			__plugin->pluginDispatch( effSetSampleRate,
-				0, 0, NULL, (float)__plugin->sampleRate() );
 			return __plugin->sampleRate();
 
 		case audioMasterGetBlockSize:
 			SHOW_CALLBACK( "amc: audioMasterGetBlockSize\n" );
-			__plugin->pluginDispatch( effSetBlockSize,
-						0, __plugin->bufferSize() );
 
 			return __plugin->bufferSize();
 
