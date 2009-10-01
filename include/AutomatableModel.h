@@ -280,18 +280,6 @@ signals:
 	inline type maxValue() const								\
 	{															\
 		return AutomatableModel::maxValue<type>();				\
-	}															\
-																\
-	inline void setMinValue(type val)							\
-	{															\
-		m_minValue = val;										\
-		if( m_value < m_minValue ) m_value = m_minValue;		\
-	}															\
-																\
-	inline void setMaxValue(type val)							\
-	{															\
-		m_maxValue = val;										\
-		if( m_value > m_maxValue ) m_value = m_maxValue;		\
 	}
 
 // some typed AutomatableModel-definitions

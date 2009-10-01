@@ -442,11 +442,14 @@ void FxMixer::masterMix( sampleFrame * _buf )
 
 void FxMixer::clear()
 {
-	for( int i = 0; i < m_fxChannels.size(); ++i )
+	while( m_fxChannels.size() > 1 )
 	{
-		clearChannel(i);
+		deleteChannel(1);
 	}
+
+	clearChannel(0);
 }
+
 
 
 void FxMixer::clearChannel(fx_ch_t index)
@@ -483,36 +486,92 @@ void FxMixer::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
 	for( int i = 0; i < m_fxChannels.size(); ++i )
 	{
+		FxChannel * ch = m_fxChannels[i];
+
 		QDomElement fxch = _doc.createElement( QString( "fxchannel" ) );
 		_this.appendChild( fxch );
-		m_fxChannels[i]->m_fxChain.saveState( _doc, fxch );
-		m_fxChannels[i]->m_volumeModel.saveSettings( _doc, fxch,
-								"volume" );
-		m_fxChannels[i]->m_muteModel.saveSettings( _doc, fxch,
-								"muted" );
+
+		ch->m_fxChain.saveState( _doc, fxch );
+		ch->m_volumeModel.saveSettings( _doc, fxch, "volume" );
+		ch->m_muteModel.saveSettings( _doc, fxch, "muted" );
 		fxch.setAttribute( "num", i );
-		fxch.setAttribute( "name", m_fxChannels[i]->m_name );
+		fxch.setAttribute( "name", ch->m_name );
+
+		// add the channel sends
+		for( int si = 0; si < ch->m_sends.size(); ++si )
+		{
+			QDomElement sendsDom = _doc.createElement( QString( "send" ) );
+			fxch.appendChild( sendsDom );
+
+			sendsDom.setAttribute( "channel", ch->m_sends[si] );
+			ch->m_sendAmount[si]->saveSettings( _doc, sendsDom, "amount");
+		}
 	}
 }
 
 
+void FxMixer::allocateChannelsTo(int num)
+{
+	while( num > m_fxChannels.size() - 1 )
+	{
+		createChannel();
+
+		// delete the default send to master
+		deleteChannelSend(m_fxChannels.size()-1, 0);
+	}
+}
 
 
 void FxMixer::loadSettings( const QDomElement & _this )
 {
 	clear();
 	QDomNode node = _this.firstChild();
-	for( int i = 0; i <= 64; ++i ) // TODO make this work
+	bool thereIsASend = false;
+
+	while( ! node.isNull() )
 	{
 		QDomElement fxch = node.toElement();
+
+		// index of the channel we are about to load
 		int num = fxch.attribute( "num" ).toInt();
-		m_fxChannels[num]->m_fxChain.restoreState(
-			fxch.firstChildElement(
-				m_fxChannels[num]->m_fxChain.nodeName() ) );
+
+		// allocate enough channels
+		allocateChannelsTo( num );
+
 		m_fxChannels[num]->m_volumeModel.loadSettings( fxch, "volume" );
 		m_fxChannels[num]->m_muteModel.loadSettings( fxch, "muted" );
 		m_fxChannels[num]->m_name = fxch.attribute( "name" );
+
+		m_fxChannels[num]->m_fxChain.restoreState( fxch.firstChildElement(
+			m_fxChannels[num]->m_fxChain.nodeName() ) );
+
+		// mixer sends
+		QDomNodeList chData = fxch.childNodes();
+		for( unsigned int i=0; i<chData.length(); ++i )
+		{
+			QDomElement chDataItem = chData.at(i).toElement();
+			if( chDataItem.nodeName() == QString( "send" ) )
+			{
+				thereIsASend = true;
+				int sendTo = chDataItem.attribute( "channel" ).toInt();
+				allocateChannelsTo( sendTo) ;
+				float amount = chDataItem.attribute( "amount" ).toFloat();
+				createChannelSend( num, sendTo, amount );
+			}
+		}
+
+
+
 		node = node.nextSibling();
+	}
+
+	// check for old format. 65 fx channels and no explicit sends.
+	if( ! thereIsASend && m_fxChannels.size() == 65 ) {
+		// create a send from every channel into master
+		for( int i=1; i<m_fxChannels.size(); ++i )
+		{
+			createChannelSend(i, 0);
+		}
 	}
 
 	emit dataChanged();

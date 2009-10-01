@@ -9,7 +9,6 @@
 #include "FxMixerView.h"
 #include "embed.h"
 #include "engine.h"
-#include "lcd_spinbox.h"
 #include "SendButtonIndicator.h"
 
 FxLine::FxLine( QWidget * _parent, FxMixerView * _mv, int _channelIndex) :
@@ -32,11 +31,27 @@ FxLine::FxLine( QWidget * _parent, FxMixerView * _mv, int _channelIndex) :
 	m_sendBtn->move(4,4);
 
 	// channel number
-	lcdSpinBox * l = new lcdSpinBox( 2, this );
-	l->model()->setRange( m_channelIndex, m_channelIndex );
-	l->model()->setValue( m_channelIndex );
-	l->move( 2, 58 );
-	l->setMarginWidth( 1 );
+	m_lcd = new lcdSpinBox( 2, this );
+	m_lcd->model()->setRange( m_channelIndex, m_channelIndex );
+	m_lcd->model()->setValue( m_channelIndex );
+	m_lcd->move( 2, 58 );
+	m_lcd->setMarginWidth( 1 );
+}
+
+FxLine::~FxLine()
+{
+	delete m_sendKnob;
+	delete m_sendBtn;
+	delete m_lcd;
+}
+
+
+void FxLine::setChannelIndex(int index) {
+	m_channelIndex = index;
+
+	m_lcd->model()->setRange( m_channelIndex, m_channelIndex );
+	m_lcd->model()->setValue( m_channelIndex );
+	m_lcd->update();
 }
 
 

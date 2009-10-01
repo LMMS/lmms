@@ -73,9 +73,6 @@ public:
 	void prepareMasterMix();
 	void masterMix( sampleFrame * _buf );
 
-
-	void clear();
-
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
 	virtual void loadSettings( const QDomElement & _this );
 
@@ -112,6 +109,9 @@ public:
 	// delete a channel from the FX mixer.
 	void deleteChannel(int index);
 
+	// delete all the mixer channels except master and remove all effects
+	void clear();
+
 	// re-arrange channels
 	void moveChannelLeft(int index);
 	void moveChannelRight(int index);
@@ -127,6 +127,9 @@ public:
 private:
 	// the fx channels in the mixer. index 0 is always master.
 	QVector<FxChannel *> m_fxChannels;
+
+
+	void allocateChannelsTo(int num);
 
 	friend class mixerWorkerThread;
 	friend class FxMixerView;

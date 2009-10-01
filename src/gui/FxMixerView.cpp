@@ -91,8 +91,8 @@ FxMixerView::FxMixerView() :
 		m_fxChannelViews[i] = new FxChannelView(m_channelAreaWidget, this, i);
 		chLayout->addWidget(m_fxChannelViews[i]->m_fxLine);
 	}
-	// add the scrolling section to the main layout
 
+	// add the scrolling section to the main layout
 	// class solely for scroll area to pass key presses down
 	class ChannelArea : public QScrollArea
 	{
@@ -175,6 +175,32 @@ void FxMixerView::addNewChannel()
 }
 
 
+void FxMixerView::refreshDisplay()
+{
+	// delete all views and re-add them
+	for( int i = 1; i<m_fxChannelViews.size(); ++i )
+	{
+		chLayout->removeWidget(m_fxChannelViews[i]->m_fxLine);
+		delete m_fxChannelViews[i]->m_fader;
+		delete m_fxChannelViews[i]->m_muteBtn;
+		delete m_fxChannelViews[i]->m_fxLine;
+		delete m_fxChannelViews[i];
+	}
+	m_channelAreaWidget->adjustSize();
+
+	// re-add the views
+	m_fxChannelViews.resize(engine::fxMixer()->numChannels());
+	for( int i = 1; i < m_fxChannelViews.size(); ++i )
+	{
+		m_fxChannelViews[i] = new FxChannelView(m_channelAreaWidget, this, i);
+		chLayout->addWidget(m_fxChannelViews[i]->m_fxLine);
+	}
+
+	// fix master
+//TODO
+}
+
+
 void FxMixerView::updateMaxChannelSelector()
 {
 	// update the and max. channel number for every instrument
@@ -190,8 +216,8 @@ void FxMixerView::updateMaxChannelSelector()
 			if( trackList[i]->type() == track::InstrumentTrack )
 			{
 				InstrumentTrack * inst = (InstrumentTrack *) trackList[i];
-				inst->effectChannelModel()->setMaxValue(
-						m_fxChannelViews.size()-1);
+				inst->effectChannelModel()->setRange(0,
+					m_fxChannelViews.size()-1,1);
 			}
 		}
 	}
