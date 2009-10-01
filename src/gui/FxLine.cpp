@@ -1,9 +1,9 @@
 #include "FxLine.h"
 
 #include <QDebug>
-#include <QPainter>
-#include <QInputDialog>
-#include <QLineEdit>
+#include <QtGui/QInputDialog>
+#include <QtGui/QPainter>
+#include <QtGui/QLineEdit>
 
 #include "FxMixer.h"
 #include "FxMixerView.h"

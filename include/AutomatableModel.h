@@ -225,6 +225,9 @@ protected:
 
 	float fittedValue( float _value ) const;
 
+	float m_minValue;
+	float m_maxValue;
+	float m_value;
 
 private:
 	void linkModel( AutomatableModel * _model );
@@ -232,10 +235,7 @@ private:
 
 
 	DataType m_dataType;
-	float m_value;
 	float m_initValue;
-	float m_minValue;
-	float m_maxValue;
 	float m_step;
 	float m_range;
 
@@ -281,7 +281,18 @@ signals:
 	{															\
 		return AutomatableModel::maxValue<type>();				\
 	}															\
-
+																\
+	inline void setMinValue(type val)							\
+	{															\
+		m_minValue = val;										\
+		if( m_value < m_minValue ) m_value = m_minValue;		\
+	}															\
+																\
+	inline void setMaxValue(type val)							\
+	{															\
+		m_maxValue = val;										\
+		if( m_value > m_maxValue ) m_value = m_maxValue;		\
+	}
 
 // some typed AutomatableModel-definitions
 

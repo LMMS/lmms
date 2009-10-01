@@ -105,6 +105,8 @@ private:
 	QHBoxLayout * chLayout;
 	QWidget * m_channelAreaWidget;
 	EffectRackView * m_rackView;
+
+	void updateMaxChannelSelector();
 } ;
 
 #endif

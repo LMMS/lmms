@@ -24,7 +24,6 @@
 
 #include <QtGlobal>
 #include <QDebug>
-#include <QKeyEvent>
 
 #include <QtGui/QButtonGroup>
 #include <QtGui/QInputDialog>
@@ -37,6 +36,7 @@
 #include <QtGui/QStackedLayout>
 #include <QtGui/QScrollArea>
 #include <QtGui/QStyle>
+#include <QtGui/QKeyEvent>
 
 #include "FxMixerView.h"
 #include "knob.h"
@@ -45,6 +45,9 @@
 #include "MainWindow.h"
 #include "lcd_spinbox.h"
 #include "gui_templates.h"
+#include "InstrumentTrack.h"
+#include "song.h"
+#include "bb_track_container.h"
 
 FxMixerView::FxMixerView() :
 	QWidget(),
@@ -90,7 +93,7 @@ FxMixerView::FxMixerView() :
 	}
 	// add the scrolling section to the main layout
 
-	// class for scroll area to pass key presses down
+	// class solely for scroll area to pass key presses down
 	class ChannelArea : public QScrollArea
 	{
 		public:
@@ -167,8 +170,32 @@ void FxMixerView::addNewChannel()
 	chLayout->addWidget(m_fxChannelViews[newChannelIndex]->m_fxLine);
 
 	updateFxLine(newChannelIndex);
+
+	updateMaxChannelSelector();
 }
 
+
+void FxMixerView::updateMaxChannelSelector()
+{
+	// update the and max. channel number for every instrument
+	QVector<track *> songTrackList = engine::getSong()->tracks();
+	QVector<track *> bbTrackList = engine::getBBTrackContainer()->tracks();
+
+	QVector<track *> trackLists[] = {songTrackList, bbTrackList};
+	for(int tl=0; tl<2; ++tl)
+	{
+		QVector<track *> trackList = trackLists[tl];
+		for(int i=0; i<trackList.size(); ++i)
+		{
+			if( trackList[i]->type() == track::InstrumentTrack )
+			{
+				InstrumentTrack * inst = (InstrumentTrack *) trackList[i];
+				inst->effectChannelModel()->setMaxValue(
+						m_fxChannelViews.size()-1);
+			}
+		}
+	}
+}
 
 
 void FxMixerView::saveSettings( QDomDocument & _doc, QDomElement & _this )
@@ -286,6 +313,7 @@ void FxMixerView::deleteChannel(int index)
 	}
 	setCurrentFxLine(selLine);
 
+	updateMaxChannelSelector();
 }
 
 
