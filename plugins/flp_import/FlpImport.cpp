@@ -27,6 +27,7 @@
 #include <QtGui/QProgressDialog>
 #include <QtCore/QDir>
 #include <QtCore/QBuffer>
+#include <QtCore/QDebug>
 
 #include "FlpImport.h"
 #include "note_play_handle.h"
@@ -40,6 +41,7 @@
 #include "Effect.h"
 #include "engine.h"
 #include "FxMixer.h"
+#include "FxMixerView.h"
 #include "group_box.h"
 #include "Instrument.h"
 #include "InstrumentTrack.h"
@@ -903,7 +905,6 @@ bool FlpImport::tryFLPImport( trackContainer * _tc )
 	const bool is_journ = engine::projectJournal()->isJournalling();
 	engine::projectJournal()->setJournalling( false );
 
-
 	while( file().atEnd() == false )
 	{
 		FLP_Events ev = static_cast<FLP_Events>( readByte() );
@@ -1558,8 +1559,14 @@ else
 
 
 	// now create a project from FL_Project data structure
-
 	engine::getSong()->clearProject();
+
+	// configure the mixer
+	for( int i=0; i<NumFLFxChannels; ++i )
+	{
+		engine::fxMixer()->createChannel();
+	}
+	engine::fxMixerView()->refreshDisplay();
 
 	// set global parameters
 	engine::getSong()->setMasterVolume( p.mainVolume );
