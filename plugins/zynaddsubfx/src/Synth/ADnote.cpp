@@ -787,7 +787,7 @@ void ADnote::compute_unison_freq_rap(int nvoice){
 			pos=1.0;
 			step=-step;
 		};
-		REALTYPE vibratto_val=pos-0.3*pos*pos*pos;//make the vibratto lfo smoother
+		REALTYPE vibratto_val=(pos-0.333333333*pos*pos*pos)*1.5;//make the vibratto lfo smoother
 		unison_freq_rap[nvoice][k]=1.0+((unison_base_freq_rap[nvoice][k]-1.0)+vibratto_val*unison_vibratto[nvoice].amplitude)*relbw;
 		
 		unison_vibratto[nvoice].position[k]=pos;

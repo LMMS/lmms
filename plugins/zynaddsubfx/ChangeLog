@@ -936,4 +936,10 @@
 	      fields
 29 Sep 2009 (Paul Nasca)
 	    - Remove the old (FFT based) Bandwidth effect to Reverb and started rewrite it (based on multivoice chorus/unison effect)
-	    
+
+01 Oct 2009 (Paul Nasca)
+	    - Corrected the ADsynth unison LFO rounding function 
+	    - Made Unison based on Bandwidth (in cents) parameter
+
+
+

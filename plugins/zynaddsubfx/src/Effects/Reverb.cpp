@@ -353,7 +353,7 @@ void Reverb::settype(unsigned char Ptype)
 	if (bandwidth) delete bandwidth;
 	bandwidth=NULL;
 	if (Ptype==2){//bandwidth
-		bandwidth=new Unison(SOUND_BUFFER_SIZE/4+1,0.5);
+		bandwidth=new Unison(SOUND_BUFFER_SIZE/4+1,2.0);
 		bandwidth->set_size(50);
 		bandwidth->set_base_frequency(1.0);
 #warning sa schimb size-ul
@@ -373,7 +373,8 @@ void Reverb::setroomsize(const unsigned char &Proomsize)
 
 void Reverb::setbandwidth(const unsigned char &Pbandwidth){
 	this->Pbandwidth=Pbandwidth;
-	if (bandwidth) bandwidth->set_bandwidth(Pbandwidth/127.0*200.0);
+	REALTYPE v=Pbandwidth/127.0;
+	if (bandwidth) bandwidth->set_bandwidth(pow(v,2.0)*200.0);
 };
 
 void Reverb::setpreset(unsigned char npreset)
@@ -382,31 +383,31 @@ void Reverb::setpreset(unsigned char npreset)
     const int NUM_PRESETS=13;
     unsigned char presets[NUM_PRESETS][PRESET_SIZE]={
         //Cathedral1
-        {80,64,63,24,0,0,0,85,5,83,1,64,0},
+        {80,64,63,24,0,0,0,85,5,83,1,64,20},
         //Cathedral2
-        {80,64,69,35,0,0,0,127,0,71,0,64,0},
+        {80,64,69,35,0,0,0,127,0,71,0,64,20},
         //Cathedral3
-        {80,64,69,24,0,0,0,127,75,78,1,85,0},
+        {80,64,69,24,0,0,0,127,75,78,1,85,20},
         //Hall1
-        {90,64,51,10,0,0,0,127,21,78,1,64,0},
+        {90,64,51,10,0,0,0,127,21,78,1,64,20},
         //Hall2
-        {90,64,53,20,0,0,0,127,75,71,1,64,0},
+        {90,64,53,20,0,0,0,127,75,71,1,64,20},
         //Room1
-        {100,64,33,0,0,0,0,127,0,106,0,30,0},
+        {100,64,33,0,0,0,0,127,0,106,0,30,20},
         //Room2
-        {100,64,21,26,0,0,0,62,0,77,1,45,0},
+        {100,64,21,26,0,0,0,62,0,77,1,45,20},
         //Basement
-        {110,64,14,0,0,0,0,127,5,71,0,25,0},
+        {110,64,14,0,0,0,0,127,5,71,0,25,20},
         //Tunnel
-        {85,80,84,20,42,0,0,51,0,78,1,105,0},
+        {85,80,84,20,42,0,0,51,0,78,1,105,20},
         //Echoed1
-        {95,64,26,60,71,0,0,114,0,64,1,64,0},
+        {95,64,26,60,71,0,0,114,0,64,1,64,20},
         //Echoed2
-        {90,64,40,88,71,0,0,114,0,88,1,64,0},
+        {90,64,40,88,71,0,0,114,0,88,1,64,20},
         //VeryLong1
-        {90,64,93,15,0,0,0,114,0,77,0,95,0},
+        {90,64,93,15,0,0,0,114,0,77,0,95,20},
         //VeryLong2
-        {90,64,111,30,0,0,0,114,90,74,1,80,0}
+        {90,64,111,30,0,0,0,114,90,74,1,80,20}
     };
 
     if (npreset>=NUM_PRESETS) npreset=NUM_PRESETS-1;
