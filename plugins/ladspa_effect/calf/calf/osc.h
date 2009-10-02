@@ -111,9 +111,7 @@ struct bandlimiter
     void make_waveform(float output[SIZE], int cutoff, bool foldover = false)
     {
         dsp::fft<float, SIZE_BITS> &fft = get_fft();
-        std::vector<std::complex<float> > new_spec, iffted;
-        new_spec.resize(SIZE);
-        iffted.resize(SIZE);
+        std::complex<float> new_spec[SIZE], iffted[SIZE];
         // Copy original harmonics up to cutoff point
         new_spec[0] = spectrum[0];
         for (int i = 1; i < cutoff; i++)
@@ -146,7 +144,7 @@ struct bandlimiter
                 new_spec[SIZE - i] = 0.f;
         }
         // convert back to time domain (IFFT) and extract only real part
-        fft.calculate(new_spec.data(), iffted.data(), true);
+        fft.calculate(new_spec, iffted, true);
         for (int i = 0; i < SIZE; i++)
             output[i] = iffted[i].real();
     }

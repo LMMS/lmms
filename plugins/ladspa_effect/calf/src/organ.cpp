@@ -171,11 +171,10 @@ static void padsynth(bandlimiter<ORGAN_WAVE_BITS> blSrc, bandlimiter<ORGAN_BIG_W
         blDest.spectrum[ORGAN_BIG_WAVE_SIZE - i] = conj(blDest.spectrum[i]);
     }
     // same as above - put large array on heap to avoid stack overflow in ingen
-    vector<float> tmp;
-    tmp.resize(ORGAN_BIG_WAVE_SIZE);
-    blDest.compute_waveform(tmp.data());
-    normalize_waveform(tmp.data(), ORGAN_BIG_WAVE_SIZE);
-    blDest.compute_spectrum(tmp.data());
+    float tmp[ORGAN_BIG_WAVE_SIZE];
+    blDest.compute_waveform(tmp);
+    normalize_waveform(tmp, ORGAN_BIG_WAVE_SIZE);
+    blDest.compute_spectrum(tmp);
     
     // limit is 1/2 of the number of harmonics of the original wave
     result.make_from_spectrum(blDest, foldover, ORGAN_WAVE_SIZE >> (1 + ORGAN_BIG_WAVE_SHIFT));
