@@ -196,14 +196,13 @@ void FxMixerView::refreshDisplay()
 		chLayout->addWidget(m_fxChannelViews[i]->m_fxLine);
 	}
 
-	// fix master
-//TODO
+	updateMaxChannelSelector();
 }
 
 
+// update the and max. channel number for every instrument
 void FxMixerView::updateMaxChannelSelector()
 {
-	// update the and max. channel number for every instrument
 	QVector<track *> songTrackList = engine::getSong()->tracks();
 	QVector<track *> bbTrackList = engine::getBBTrackContainer()->tracks();
 
@@ -439,6 +438,7 @@ void FxMixerView::setCurrentFxLine( int _line )
 void FxMixerView::clear()
 {
 	m_rackView->clearViews();
+	refreshDisplay();
 }
 
 

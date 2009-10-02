@@ -512,7 +512,7 @@ void FxMixer::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	}
 }
 
-
+// make sure we have at least num channels
 void FxMixer::allocateChannelsTo(int num)
 {
 	while( num > m_fxChannels.size() - 1 )
