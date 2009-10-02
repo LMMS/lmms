@@ -941,5 +941,6 @@
 	    - Corrected the ADsynth unison LFO rounding function 
 	    - Made Unison based on Bandwidth (in cents) parameter
 
-
+02 Oct 2009 (Mark McCurry)
+	    - Added OSS failsafe by Jérémie Andréi
 

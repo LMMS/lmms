@@ -23,6 +23,7 @@
 #ifndef OSS_AUDIO_OUTPUT_H
 #define OSS_AUDIO_OUTPUT_H
 
+#include <sys/time.h>
 #include "../globals.h"
 
 class OSSaudiooutput
@@ -40,6 +41,7 @@ private:
     int snd_stereo;
     int snd_format;
     int snd_samplerate;
+    struct timeval playing_until;
 
     short int *smps;//Samples to be sent to soundcard
 };

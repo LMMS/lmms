@@ -11,7 +11,7 @@ Contributors:
         Daniel Clemente (with a workaround of X11 repeated key bug)
         Emmanuel Saracco (fix for JACK output)
         Achim Settelmeier (QUERTZ keyboard layout for virtual keyboard)
-        Jérémie Andréi (AZERTY keyboard layout, Array index fix)
+        Jérémie Andréi (AZERTY keyboard layout, Array index fix, OSS failsafe)
         Alexis Ballier (const char* <-> string mismatch, NULLMidi prototype fix)
         Tobias Doerffel (static vs instance variables alteration)
         James Morris (Memory leaks in FLTK GUI)

@@ -42,6 +42,8 @@ OSSaudiooutput::OSSaudiooutput()
     snd_stereo=1;//stereo
     snd_format=AFMT_S16_LE;
     snd_samplerate=SAMPLE_RATE;
+    playing_until.tv_sec=0;
+    playing_until.tv_usec=0;
 
     smps=new short int[SOUND_BUFFER_SIZE*2];
     for (i=0;i<SOUND_BUFFER_SIZE*2;i++) smps[i]=0;
@@ -71,7 +73,31 @@ void OSSaudiooutput::OSSout(REALTYPE *smp_left,REALTYPE *smp_right)
 {
     int i;
     REALTYPE l,r;
-    if (snd_handle<0) return;
+    if (snd_handle < 0) { //output could not be opened
+        struct timeval now;
+        int remaining;
+        gettimeofday(&now, NULL);
+        if((playing_until.tv_usec==0)&&(playing_until.tv_sec==0)) {
+            playing_until.tv_usec = now.tv_usec;
+            playing_until.tv_sec  = now.tv_sec;
+        }
+        else {
+            remaining = (playing_until.tv_usec - now.tv_usec)
+                + (playing_until.tv_sec - now.tv_sec)*1000000;
+            if(remaining > 10000) //Don't sleep() less than 10ms.
+                                  //This will add latency...
+                usleep(remaining-10000);
+            if(remaining < 0)
+                cerr << "WARNING - too late" << endl;
+        }
+        playing_until.tv_usec += SOUND_BUFFER_SIZE*1000000/SAMPLE_RATE;
+        if(remaining < 0)
+            playing_until.tv_usec -= remaining;
+        playing_until.tv_sec  += playing_until.tv_usec/1000000;
+        playing_until.tv_usec %= 1000000;
+        return;
+    }
+
     for (i=0;i<SOUND_BUFFER_SIZE;i++) {
         l=smp_left[i];
         r=smp_right[i];
