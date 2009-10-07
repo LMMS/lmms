@@ -6007,9 +6007,9 @@ Latenz: %2 ms</translation>
         <translation>DIeses Projekt ist leer, weshalb das Exportieren keinen Sinn macht. Bitte erstellen Sie erst ein paar Einträge im Song-Editor!</translation>
     </message>
     <message>
-        <location filename="../../src/core/song.cpp" line="1076"/>
-        <source>MIDI sequences (*.mid *.rif);;FL Studio projects (*.flp)</source>
-        <translation>MIDI-Dateien (*.mid *.rif);;FL Studio Projekte (*.flp)</translation>
+        <location filename="../../src/core/song.cpp" line="1073"/>
+        <source>MIDI sequences (*.mid *.midi *.rif *.riff);;FL Studio projects (*.flp)</source>
+        <translation>MIDI-Dateien (*.mid *.midi *.rif *.riff);;FL Studio Projekte (*.flp)</translation>
     </message>
 </context>
 <context>
