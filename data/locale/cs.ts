@@ -8406,8 +8406,8 @@ Zpoždění %2 ms</translation>
     </message>
     <message>
         <location filename="../../src/core/song.cpp" line="1073"/>
-        <source>MIDI sequences (*.mid *.rif);;FL Studio projects (*.flp)</source>
-        <translation>MIDI sekvence (*.mid *.rif);;FL Studio projekt (*.flp)</translation>
+        <source>MIDI sequences (*.mid *.midi *.rif *.riff);;FL Studio projects (*.flp)</source>
+        <translation>MIDI sekvence (*.mid *.midi *.rif *.riff);;FL Studio projekt (*.flp)</translation>
     </message>
     <message>
         <location filename="../../src/core/song.cpp" line="1117"/>

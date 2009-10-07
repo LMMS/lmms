@@ -8761,7 +8761,7 @@ Vertraging: %2 ms</translation>
     </message>
     <message>
         <location filename="../../src/core/song.cpp" line="1073"/>
-        <source>MIDI sequences (*.mid *.rif);;FL Studio projects (*.flp)</source>
+        <source>MIDI sequences (*.mid *.midi *.rif *.riff);;FL Studio projects (*.flp)</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

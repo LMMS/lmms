@@ -1074,7 +1074,7 @@ void song::importProject()
 {
 	QFileDialog ofd( NULL, tr( "Import file" ),
 			configManager::inst()->userProjectsDir(),
-			tr("MIDI sequences (*.mid *.rif);;FL Studio projects (*.flp"
+			tr("MIDI sequences (*.mid *.midi *.rif *.riff);;FL Studio projects (*.flp"
 #ifdef LMMS_HAVE_ZIP	
 			 " *.zip)") );
 #else 
