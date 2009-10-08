@@ -58,9 +58,9 @@ static inline float dB_grid_inv(float pos)
 static void set_channel_color(cairo_iface *context, int channel)
 {
     if (channel & 1)
-        context->set_source_rgba(0.75, 1, 0);
+        context->set_source_rgba(0.35, 0.4, 0.2, 1);
     else
-        context->set_source_rgba(0, 1, 0.75);
+        context->set_source_rgba(0.35, 0.4, 0.2, 0.5);
     context->set_line_width(1.5);
 }
 
@@ -87,9 +87,9 @@ static bool get_freq_gridline(int subindex, float &pos, bool &vertical, std::str
                 freq = 10000 * (subindex - 27 + 1);
             pos = log(freq / 20.0) / log(1000);
             if (!legend.empty())
-                context->set_source_rgba(0.25, 0.25, 0.25, 0.75);
+                context->set_source_rgba(0, 0, 0, 0.2);
             else
-                context->set_source_rgba(0.25, 0.25, 0.25, 0.5);
+                context->set_source_rgba(0, 0, 0, 0.1);
             return true;
         }
         subindex -= 28;
@@ -101,7 +101,7 @@ static bool get_freq_gridline(int subindex, float &pos, bool &vertical, std::str
     if (pos < -1)
         return false;
     if (subindex != 4)
-        context->set_source_rgba(0.25, 0.25, 0.25, subindex & 1 ? 0.5 : 0.75);
+        context->set_source_rgba(0, 0, 0, subindex & 1 ? 0.1 : 0.2);
     if (!(subindex & 1))
     {
         std::stringstream ss;
@@ -119,7 +119,7 @@ bool frequency_response_line_graph::get_gridline(int index, int subindex, float 
     return get_freq_gridline(subindex, pos, vertical, legend, context);
 }
 
-int frequency_response_line_graph::get_changed_offsets(int generation, int &subindex_graph, int &subindex_dot, int &subindex_gridline)
+int frequency_response_line_graph::get_changed_offsets(int index, int generation, int &subindex_graph, int &subindex_dot, int &subindex_gridline)
 {
     subindex_graph = 0;
     subindex_dot = 0;
@@ -242,7 +242,7 @@ bool filter_audio_module::get_graph(int index, int subindex, float *data, int po
     return false;
 }
 
-int filter_audio_module::get_changed_offsets(int generation, int &subindex_graph, int &subindex_dot, int &subindex_gridline)
+int filter_audio_module::get_changed_offsets(int index, int generation, int &subindex_graph, int &subindex_dot, int &subindex_gridline)
 {
     if (fabs(inertia_cutoff.get_last() - old_cutoff) + 100 * fabs(inertia_resonance.get_last() - old_resonance) + fabs(*params[par_mode] - old_mode) > 0.1f)
     {
@@ -359,7 +359,7 @@ bool multichorus_audio_module::get_graph(int index, int subindex, float *data, i
         if (subindex < 2)
             set_channel_color(context, subindex);
         else {
-            context->set_source_rgba(0, 1, 0);
+            context->set_source_rgba(0.35, 0.4, 0.2);
             context->set_line_width(1.0);
         }
         return ::get_graph(*this, subindex, data, points);
@@ -470,9 +470,9 @@ bool compressor_audio_module::get_graph(int index, int subindex, float *data, in
             data[i] = dB_grid(output); 
     }
     if (subindex == (*params[param_bypass] > 0.5f ? 1 : 0))
-        context->set_source_rgba(0.5, 0.5, 0.5, 0.5);
+        context->set_source_rgba(0.35, 0.4, 0.2, 0.3);
     else {
-        context->set_source_rgba(0, 1, 0, 1);
+        context->set_source_rgba(0.35, 0.4, 0.2, 1);
         context->set_line_width(2);
     }
     return true;
@@ -635,4 +635,629 @@ uint32_t compressor_audio_module::process(uint32_t offset, uint32_t numsamples, 
     }
 
     return inputs_mask;
+}
+
+/// Multibandcompressor by Markus Schmidt
+///////////////////////////////////////////////////////////////////////////////////////////////
+
+multibandcompressor_audio_module::multibandcompressor_audio_module()
+{
+    is_active = false;
+    srate = 0;
+    // zero all dsplays
+    clip_inL    = 0.f;
+    clip_inR    = 0.f;
+    clip_outL   = 0.f;
+    clip_outR   = 0.f;
+    meter_inL  = 0.f;
+    meter_inR  = 0.f;
+    meter_outL = 0.f;
+    meter_outR = 0.f;
+}
+
+void multibandcompressor_audio_module::activate()
+{
+    is_active = true;
+    // set all filters and strips
+    params_changed();
+    // activate all strips
+    for (int j = 0; j < strips; j ++) {
+        strip[j].activate();
+        strip[j].id = j;
+    }
+}
+
+void multibandcompressor_audio_module::deactivate()
+{
+    is_active = false;
+    // deactivate all strips
+    for (int j = 0; j < strips; j ++) {
+        strip[j].deactivate();
+    }
+}
+
+void multibandcompressor_audio_module::params_changed()
+{
+    // set the params of all filters
+    if(*params[param_freq0] != freq_old[0] or *params[param_sep0] != sep_old[0] or *params[param_q0] != q_old[0]) {
+        lpL0.set_lp_rbj((float)(*params[param_freq0] * (1 - *params[param_sep0])), *params[param_q0], (float)srate);
+        lpR0.set_lp_rbj((float)(*params[param_freq0] * (1 - *params[param_sep0])), *params[param_q0], (float)srate);
+        hpL0.set_hp_rbj((float)(*params[param_freq0] * (1 + *params[param_sep0])), *params[param_q0], (float)srate);
+        hpR0.set_hp_rbj((float)(*params[param_freq0] * (1 + *params[param_sep0])), *params[param_q0], (float)srate);
+        freq_old[0] = *params[param_freq0];
+        sep_old[0]  = *params[param_sep2];
+        q_old[0]    = *params[param_q2];
+    }
+    if(*params[param_freq1] != freq_old[1] or *params[param_sep1] != sep_old[1] or *params[param_q1] != q_old[1]) {
+        lpL1.set_lp_rbj((float)(*params[param_freq1] * (1 - *params[param_sep1])), *params[param_q1], (float)srate);
+        lpR1.set_lp_rbj((float)(*params[param_freq1] * (1 - *params[param_sep1])), *params[param_q1], (float)srate);
+        hpL1.set_hp_rbj((float)(*params[param_freq1] * (1 + *params[param_sep1])), *params[param_q1], (float)srate);
+        hpR1.set_hp_rbj((float)(*params[param_freq1] * (1 + *params[param_sep1])), *params[param_q1], (float)srate);
+        freq_old[1] = *params[param_freq1];
+        sep_old[1]  = *params[param_sep2];
+        q_old[1]    = *params[param_q2];
+    }
+    if(*params[param_freq2] != freq_old[2] or *params[param_sep2] != sep_old[2] or *params[param_q2] != q_old[2]) {
+        lpL2.set_lp_rbj((float)(*params[param_freq2] * (1 - *params[param_sep2])), *params[param_q2], (float)srate);
+        lpR2.set_lp_rbj((float)(*params[param_freq2] * (1 - *params[param_sep2])), *params[param_q2], (float)srate);
+        hpL2.set_hp_rbj((float)(*params[param_freq2] * (1 + *params[param_sep2])), *params[param_q2], (float)srate);
+        hpR2.set_hp_rbj((float)(*params[param_freq2] * (1 + *params[param_sep2])), *params[param_q2], (float)srate);
+        freq_old[2] = *params[param_freq2];
+        sep_old[2]  = *params[param_sep2];
+        q_old[2]    = *params[param_q2];
+    }
+    // set the params of all strips
+    for (int j = 0; j < strips; j ++) {
+        switch (j) {
+            case 0:
+                strip[j].set_params(*params[param_attack0], *params[param_release0], *params[param_threshold0], *params[param_ratio0], *params[param_knee0], *params[param_makeup0], *params[param_detection0], *params[param_bypass0], *params[param_mute0]);
+                break;
+            case 1:
+                strip[j].set_params(*params[param_attack1], *params[param_release1], *params[param_threshold1], *params[param_ratio1], *params[param_knee1], *params[param_makeup1], *params[param_detection1], *params[param_bypass1], *params[param_mute1]);
+                break;
+            case 2:
+                strip[j].set_params(*params[param_attack2], *params[param_release2], *params[param_threshold2], *params[param_ratio2], *params[param_knee2], *params[param_makeup2], *params[param_detection2], *params[param_bypass2], *params[param_mute2]);
+                break;
+            case 3:
+                strip[j].set_params(*params[param_attack3], *params[param_release3], *params[param_threshold3], *params[param_ratio3], *params[param_knee3], *params[param_makeup3], *params[param_detection3], *params[param_bypass3], *params[param_mute3]);
+                break;
+        }
+    }
+}
+
+void multibandcompressor_audio_module::set_sample_rate(uint32_t sr)
+{
+    srate = sr;
+    // set srate of all strips
+    for (int j = 0; j < strips; j ++) {
+        strip[j].set_sample_rate(srate);
+    }
+}
+
+uint32_t multibandcompressor_audio_module::process(uint32_t offset, uint32_t numsamples, uint32_t inputs_mask, uint32_t outputs_mask)
+{
+    bool bypass = *params[param_bypass] > 0.5f;
+    numsamples += offset;
+    if(bypass) {
+        // everything bypassed
+        while(offset < numsamples) {
+            outs[0][offset] = ins[0][offset];
+            outs[1][offset] = ins[1][offset];
+            ++offset;
+        }
+        // displays, too
+        clip_inL    = 0.f;
+        clip_inR    = 0.f;
+        clip_outL   = 0.f;
+        clip_outR   = 0.f;
+        meter_inL  = 0.f;
+        meter_inR  = 0.f;
+        meter_outL = 0.f;
+        meter_outR = 0.f;
+    } else {
+        // process all strips
+        
+        // determine mute state of strips
+        mute[0] = *params[param_mute0] > 0.f ? true : false;
+        mute[1] = *params[param_mute1] > 0.f ? true : false;
+        mute[2] = *params[param_mute2] > 0.f ? true : false;
+        mute[3] = *params[param_mute3] > 0.f ? true : false;
+        
+        // let meters fall a bit
+        clip_inL    -= std::min(clip_inL,  numsamples);
+        clip_inR    -= std::min(clip_inR,  numsamples);
+        clip_outL   -= std::min(clip_outL, numsamples);
+        clip_outR   -= std::min(clip_outR, numsamples);
+        meter_inL  -= meter_inL * 5.f * numsamples / srate;
+        meter_inR  -= meter_inR * 5.f * numsamples / srate;
+        meter_outL -= meter_outL * 5.f * numsamples / srate;
+        meter_outR -= meter_outR * 5.f * numsamples / srate;
+        for(int k = 0; k < strips; k ++) {
+            meter_out[k] -= meter_out[k] * 5.f * numsamples / srate;
+        }
+        
+        while(offset < numsamples) {
+            // cycle trough samples
+            float inL = ins[0][offset];
+            float inR = ins[1][offset];
+            // in level
+            inR *= *params[param_level_in];
+            inL *= *params[param_level_in];
+            // out vars
+            float outL = 0.f;
+            float outR = 0.f;
+            for (int i = 0; i < strips; i ++) {
+                // cycle trough strips
+                if (!mute[i]) {
+                    // strip unmuted
+                    float left  = inL;
+                    float right = inR;
+                    // send trough filters
+                    switch (i) {
+                        case 0:
+                            left  = lpL0.process(left);
+                            right = lpR0.process(right);
+                            lpL0.sanitize();
+                            lpR0.sanitize();
+                            break;
+                        case 1:
+                            left  = lpL1.process(left);
+                            right = lpR1.process(right);
+                            left  = hpL0.process(left);
+                            right = hpR0.process(right);
+                            lpL1.sanitize();
+                            lpR1.sanitize();
+                            hpL0.sanitize();
+                            hpR0.sanitize();
+                            break;
+                        case 2:
+                            left  = lpL2.process(left);
+                            right = lpR2.process(right);
+                            left  = hpL1.process(left);
+                            right = hpR1.process(right);
+                            lpL2.sanitize();
+                            lpR2.sanitize();
+                            hpL1.sanitize();
+                            hpR1.sanitize();
+                            break;
+                        case 3:
+                            left  = hpL2.process(left);
+                            right = hpR2.process(right);
+                            hpL2.sanitize();
+                            hpR2.sanitize();
+                            break;
+                    }
+                    // process gain reduction
+                    strip[i].process(left, right);
+                    // sum up output
+                    outL += left;
+                    outR += right;
+                } else {
+                    // strip muted
+                    
+                }
+                
+                
+            } // process single strip
+            
+            // even out filters gain reduction
+            // 3dB - levelled manually (based on sep and q settings)
+            outL *= 1.414213562;
+            outR *= 1.414213562;
+            
+            // out level
+            outL *= *params[param_level_out];
+            outR *= *params[param_level_out];
+            
+            // send to output
+            outs[0][offset] = outL;
+            outs[1][offset] = outR;
+            
+            // clip LED's
+            if(inL > 1.f) {
+                clip_inL  = srate >> 3;
+            }
+            if(inR > 1.f) {
+                clip_inR  = srate >> 3;
+            }
+            if(outL > 1.f) {
+                clip_outL = srate >> 3;
+            }
+            if(outR > 1.f) {
+                clip_outR = srate >> 3;
+            }
+            // in / out meters
+            if(meter_inL < inL) {
+                meter_inL = inL;
+            }
+            if(meter_inR < inR) {
+                meter_inR = inR;
+            }
+            if(meter_outL < outL) {
+                meter_outL = outL;
+            }
+            if(meter_outR < outR) {
+                meter_outR = outR;
+            }
+            // next sample
+            ++offset;
+//            printf("inL: %+7.4f inR: %+7.4f outL: %+7.4f outR: %+7.4f input: %+7.4f output: %+7.4f\n", inL, inR, outL, outR, *params[param_level_in], *params[param_level_out]);
+        } // cycle trough samples
+        
+    } // process all strips (no bypass)
+    
+    // draw meters
+    if(params[param_clip_inL] != NULL) {
+        *params[param_clip_inL] = clip_inL;
+    }
+    if(params[param_clip_inR] != NULL) {
+        *params[param_clip_inR] = clip_inR;
+    }
+    if(params[param_clip_outL] != NULL) {
+        *params[param_clip_outL] = clip_outL;
+    }
+    if(params[param_clip_outR] != NULL) {
+        *params[param_clip_outR] = clip_outR;
+    }
+    
+    if(params[param_meter_inL] != NULL) {
+        *params[param_meter_inL] = meter_inL;
+    }
+    if(params[param_meter_inR] != NULL) {
+        *params[param_meter_inR] = meter_inR;
+    }
+    if(params[param_meter_outL] != NULL) {
+        *params[param_meter_outL] = meter_outL;
+    }
+    if(params[param_meter_outR] != NULL) {
+        *params[param_meter_outR] = meter_outR;
+    }
+    // draw strip meters
+    if(bypass > 0.5f) {
+        if(params[param_compression0] != NULL) {
+            *params[param_compression0] = 1.0f;
+        }
+        if(params[param_compression1] != NULL) {
+            *params[param_compression1] = 1.0f;
+        }
+        if(params[param_compression2] != NULL) {
+            *params[param_compression2] = 1.0f;
+        }
+        if(params[param_compression3] != NULL) {
+            *params[param_compression3] = 1.0f;
+        }
+
+        if(params[param_output0] != NULL) {
+            *params[param_output0] = 0.0f;
+        }
+        if(params[param_output1] != NULL) {
+            *params[param_output1] = 0.0f;
+        }
+        if(params[param_output2] != NULL) {
+            *params[param_output2] = 0.0f;
+        }
+        if(params[param_output3] != NULL) {
+            *params[param_output3] = 0.0f;
+        }
+    } else {
+        if(params[param_compression0] != NULL) {
+            *params[param_compression0] = strip[0].get_comp_level();
+        }
+        if(params[param_compression1] != NULL) {
+            *params[param_compression1] = strip[1].get_comp_level();
+        }
+        if(params[param_compression2] != NULL) {
+            *params[param_compression2] = strip[2].get_comp_level();
+        }
+        if(params[param_compression3] != NULL) {
+            *params[param_compression3] = strip[3].get_comp_level();
+        }
+
+        if(params[param_output0] != NULL) {
+            *params[param_output0] = strip[0].get_output_level();
+        }
+        if(params[param_output1] != NULL) {
+            *params[param_output1] = strip[1].get_output_level();
+        }
+        if(params[param_output2] != NULL) {
+            *params[param_output2] = strip[2].get_output_level();
+        }
+        if(params[param_output3] != NULL) {
+            *params[param_output3] = strip[3].get_output_level();
+        }
+    }
+    // whatever has to be returned x)
+    return outputs_mask;
+}
+bool multibandcompressor_audio_module::get_graph(int index, int subindex, float *data, int points, cairo_iface *context)
+{ 
+//    printf("get_graph   : %i\n", index);
+    switch (index) {
+        case param_compression0:
+            return strip[0].get_graph(subindex, data, points, context);
+            break;
+        case param_compression1:
+            return strip[1].get_graph(subindex, data, points, context);
+            break;
+        case param_compression2:
+            return strip[2].get_graph(subindex, data, points, context);
+            break;
+        case param_compression3:
+            return strip[3].get_graph(subindex, data, points, context);
+            break;
+    }
+    return false;
+}
+
+bool multibandcompressor_audio_module::get_dot(int index, int subindex, float &x, float &y, int &size, cairo_iface *context)
+{
+//    printf("get_dot     : %i\n", index);
+    switch (index) {
+        case param_compression0:
+            return strip[0].get_dot(subindex, x, y, size, context);
+            break;
+        case param_compression1:
+            return strip[1].get_dot(subindex, x, y, size, context);
+            break;
+        case param_compression2:
+            return strip[2].get_dot(subindex, x, y, size, context);
+            break;
+        case param_compression3:
+            return strip[3].get_dot(subindex, x, y, size, context);
+            break;
+    }
+    return false;
+}
+
+bool multibandcompressor_audio_module::get_gridline(int index, int subindex, float &pos, bool &vertical, std::string &legend, cairo_iface *context)
+{
+//    printf("get_gridline: %i\n", index);
+    switch (index) {
+        case param_compression0:
+            return strip[0].get_gridline(subindex, pos, vertical, legend, context);
+            break;
+        case param_compression1:
+            return strip[1].get_gridline(subindex, pos, vertical, legend, context);
+            break;
+        case param_compression2:
+            return strip[2].get_gridline(subindex, pos, vertical, legend, context);
+            break;
+        case param_compression3:
+            return strip[3].get_gridline(subindex, pos, vertical, legend, context);
+            break;
+    }
+    return false;
+}
+
+int multibandcompressor_audio_module::get_changed_offsets(int index, int generation, int &subindex_graph, int &subindex_dot, int &subindex_gridline)
+{   
+//    printf("get_changed : %i\n", index);
+    switch (index) {
+        case param_compression0:
+            return strip[0].get_changed_offsets(generation, subindex_graph, subindex_dot, subindex_gridline);
+            break;
+        case param_compression1:
+            return strip[1].get_changed_offsets(generation, subindex_graph, subindex_dot, subindex_gridline);
+            break;
+        case param_compression2:
+            return strip[2].get_changed_offsets(generation, subindex_graph, subindex_dot, subindex_gridline);
+            break;
+        case param_compression3:
+            return strip[3].get_changed_offsets(generation, subindex_graph, subindex_dot, subindex_gridline);
+            break;
+    }
+    return 0;
+}
+/// Gain reduction module by Markus Schmidt
+////////////////////////////////////////////////////////////////////////////////
+gain_reduction_audio_module::gain_reduction_audio_module()
+{
+    is_active       = false;
+    last_generation = 0;
+}
+
+void gain_reduction_audio_module::activate()
+{
+    is_active = true;
+    linSlope = 0.f;
+    meter_out = 0.f;
+    meter_comp = 0.f;
+    float l, r;
+    float byp = bypass;
+    bypass = 0.0;
+    process(l, r);
+    bypass = byp;
+}
+
+void gain_reduction_audio_module::deactivate()
+{
+    is_active = false;
+}
+
+void gain_reduction_audio_module::process(float &left, float &right)
+{
+    if(bypass > 0.5f) {
+        meter_comp = 1.f;
+        meter_out = 0.f;
+        return;
+    }
+    // this routine is mainly copied from thor's compressor module
+    // greatest sounding compressor I've heard!
+    bool rms = detection == 0;
+    float linThreshold = threshold;
+    float attack_coeff = std::min(1.f, 1.f / (attack * srate / 4000.f));
+    float release_coeff = std::min(1.f, 1.f / (release * srate / 4000.f));
+    float linKneeSqrt = sqrt(knee);
+    linKneeStart = linThreshold / linKneeSqrt;
+    adjKneeStart = linKneeStart*linKneeStart;
+    float linKneeStop = linThreshold * linKneeSqrt;
+    thres = log(linThreshold);
+    kneeStart = log(linKneeStart);
+    kneeStop = log(linKneeStop);
+    compressedKneeStop = (kneeStop - thres) / ratio + thres;
+    float compression = 1.f;
+    float absample = (fabs(left) + fabs(right)) * 0.5f;
+    if(rms) absample *= absample;
+    meter_out -= meter_out * 5.f * 1 / srate;
+    
+    linSlope += (absample - linSlope) * (absample > linSlope ? attack_coeff : release_coeff);
+    
+    float gain = 1.f;
+
+    if(linSlope > 0.f) {
+        gain = output_gain(linSlope, rms);
+    }
+
+    compression = gain;
+    gain *= makeup;
+    
+    left *= gain;
+    right *= gain;
+
+    float maxLR = std::max(fabs(left), fabs(right));
+    
+    if(maxLR > meter_out) {
+        meter_out = maxLR;
+    }
+    meter_comp = compression;
+    
+    detected = rms ? sqrt(linSlope) : linSlope;
+}
+
+float gain_reduction_audio_module::output_level(float slope) {
+    return slope * output_gain(slope, false) * makeup;
+}
+
+float gain_reduction_audio_module::output_gain(float linSlope, bool rms) {
+    //this calculation is also thor's work
+    if(linSlope > (rms ? adjKneeStart : linKneeStart)) {
+        float slope = log(linSlope);
+        if(rms) slope *= 0.5f;
+
+        float gain = 0.f;
+        float delta = 0.f;
+        if(IS_FAKE_INFINITY(ratio)) {
+            gain = thres;
+            delta = 0.f;
+        } else {
+            gain = (slope - thres) / ratio + thres;
+            delta = 1.f / ratio;
+        }
+        
+        if(knee > 1.f && slope < kneeStop) {
+            gain = hermite_interpolation(slope, kneeStart, kneeStop, kneeStart, compressedKneeStop, 1.f, delta);
+        }
+        
+        return exp(gain - slope);
+    }
+
+    return 1.f;
+}
+
+void gain_reduction_audio_module::set_sample_rate(uint32_t sr)
+{
+    srate = sr;
+}
+void gain_reduction_audio_module::set_params(float att, float rel, float thr, float rat, float kn, float mak, float det, float byp, float mu)
+{
+    // set all params
+    attack          = att;
+    release         = rel;
+    threshold       = thr;
+    ratio           = rat;
+    knee            = kn;
+    makeup          = mak;
+    detection       = det;
+    bypass          = byp;
+    mute            = mu;
+    // if bypass, zero meters
+    if(bypass > 0.5 or mute > 0.f) {
+        meter_out  = 0.f;
+        meter_comp = 1.f;
+    }
+}
+float gain_reduction_audio_module::get_output_level() {
+    // returns output level (max(left, right))
+    return meter_out;
+}
+float gain_reduction_audio_module::get_comp_level() {
+    // returns amount of compression
+    return meter_comp;
+}
+
+bool gain_reduction_audio_module::get_graph(int subindex, float *data, int points, cairo_iface *context)
+{
+    if (!is_active)
+        return false;
+    if (subindex > 1) // 1
+        return false;
+    for (int i = 0; i < points; i++)
+    {
+        float input = dB_grid_inv(-1.0 + i * 2.0 / (points - 1));
+        float output = output_level(input);
+        if (subindex == 0)
+            data[i] = dB_grid(input);
+        else
+            data[i] = dB_grid(output); 
+    }
+    if (subindex == (bypass > 0.5f ? 1 : 0))
+        context->set_source_rgba(0.35, 0.4, 0.2, 0.3);
+    else {
+        context->set_source_rgba(0.35, 0.4, 0.2, 1);
+        context->set_line_width(2);
+    }
+    return true;
+}
+
+bool gain_reduction_audio_module::get_dot(int subindex, float &x, float &y, int &size, cairo_iface *context)
+{
+    if (!is_active)
+        return false;
+    if (!subindex)
+    {
+        x = 0.5 + 0.5 * dB_grid(detected);
+        y = dB_grid(bypass > 0.5f ? detected : output_level(detected));
+        return bypass > 0.5f ? false : true;
+    }
+    return false;
+}
+
+bool gain_reduction_audio_module::get_gridline(int subindex, float &pos, bool &vertical, std::string &legend, cairo_iface *context)
+{
+    bool tmp;
+    vertical = (subindex & 1) != 0;
+    bool result = get_freq_gridline(subindex >> 1, pos, tmp, legend, context, false);
+    if (result && vertical) {
+        if ((subindex & 4) && !legend.empty()) {
+            legend = "";
+        }
+        else {
+            size_t pos = legend.find(" dB");
+            if (pos != std::string::npos)
+                legend.erase(pos);
+        }
+        pos = 0.5 + 0.5 * pos;
+    }
+    return result;
+}
+
+int gain_reduction_audio_module::get_changed_offsets(int generation, int &subindex_graph, int &subindex_dot, int &subindex_gridline)
+{
+    subindex_graph = 0;
+    subindex_dot = 0;
+    subindex_gridline = generation ? INT_MAX : 0;
+
+    if (fabs(threshold-old_threshold) + fabs(ratio - old_ratio) + fabs(knee - old_knee) + fabs(makeup - old_makeup) + fabs(bypass - old_bypass) > 0.01f)
+    {
+        old_threshold = threshold;
+        old_ratio = ratio;
+        old_knee = knee;
+        old_makeup = makeup;
+        old_bypass = bypass;
+        last_generation++;
+    }
+
+    if (generation == last_generation)
+        subindex_graph = 2;
+    return last_generation;
 }

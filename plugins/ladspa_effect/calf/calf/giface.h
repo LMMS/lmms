@@ -45,7 +45,7 @@ enum parameter_flags
   PF_TYPEMASK = 0x000F, ///< bit mask for type
   PF_FLOAT = 0x0000, ///< any float value
   PF_INT = 0x0001,   ///< integer value (still represented as float)
-  PF_BOOL = 0x0002,  ///< bool value (usually >=0.5f is treated as true, which is inconsistent with LV2 etc. which treats anything >0 as true)
+  PF_BOOL = 0x0002,  ///< bool value (usually >=0.5f is treated as TRUE, which is inconsistent with LV2 etc. which treats anything >0 as TRUE)
   PF_ENUM = 0x0003,  ///< enum value (min, min+1, ..., max, only guaranteed to work when min = 0)
   PF_ENUM_MULTI = 0x0004, ///< SET / multiple-choice
   PF_STRING = 0x0005, ///< see: http://lv2plug.in/docs/index.php?title=String_port
@@ -195,7 +195,7 @@ struct line_graph_iface
     /// @param subindex_dot First dot that has to be redrawn
     /// @param subindex_gridline First gridline/legend that has to be redrawn
     /// @retval Current generation (to pass when calling the function next time); if different than passed generation value, call the function again to retrieve which graph offsets should be put into cache
-    virtual int get_changed_offsets(int generation, int &subindex_graph, int &subindex_dot, int &subindex_gridline) { subindex_graph = subindex_dot = subindex_gridline = 0; return 0; }
+    virtual int get_changed_offsets(int index, int generation, int &subindex_graph, int &subindex_dot, int &subindex_gridline) { subindex_graph = subindex_dot = subindex_gridline = 0; return 0; }
     
     /// Standard destructor to make compiler happy
     virtual ~line_graph_iface() {}

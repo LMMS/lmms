@@ -136,6 +136,27 @@ struct compressor_metadata: public plugin_metadata<compressor_metadata>
     PLUGIN_NAME_ID_LABEL("compressor", "compressor", "Compressor")
 };
 
+/// Markus's multibandcompressor - metadata
+struct multibandcompressor_metadata: public plugin_metadata<multibandcompressor_metadata>
+{
+    enum { in_count = 2, out_count = 2, support_midi = false, require_midi = false, rt_capable = true };
+    enum { param_bypass, param_level_in, param_level_out, param_meter_inL, param_meter_inR,
+           param_meter_outL, param_meter_outR, param_clip_inL, param_clip_inR, param_clip_outL, param_clip_outR,
+           param_freq0, param_freq1, param_freq2,
+           param_sep0, param_sep1, param_sep2,
+           param_q0, param_q1, param_q2,
+           param_threshold0, param_ratio0, param_attack0, param_release0, param_makeup0, param_knee0,
+           param_detection0, param_compression0, param_output0, param_bypass0, param_mute0,
+           param_threshold1, param_ratio1, param_attack1, param_release1, param_makeup1, param_knee1,
+           param_detection1, param_compression1, param_output1, param_bypass1, param_mute1,
+           param_threshold2, param_ratio2, param_attack2, param_release2, param_makeup2, param_knee2,
+           param_detection2, param_compression2, param_output2, param_bypass2, param_mute2,
+           param_threshold3, param_ratio3, param_attack3, param_release3, param_makeup3, param_knee3,
+           param_detection3, param_compression3, param_output3, param_bypass3, param_mute3,
+           param_count };
+    PLUGIN_NAME_ID_LABEL("multibandcompressor", "multibandcompressor", "Multibandcompressor")
+};
+
 /// Organ - enums for parameter IDs etc. (this mess is caused by organ split between plugin and generic class - which was
 /// a bad design decision and should be sorted out some day) XXXKF @todo
 struct organ_enums

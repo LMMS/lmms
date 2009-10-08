@@ -10,6 +10,7 @@
     PER_MODULE_ITEM(phaser, false, "phaser")
     PER_MODULE_ITEM(multichorus, false, "multichorus")
     PER_MODULE_ITEM(compressor, false, "compressor")
+    PER_MODULE_ITEM(multibandcompressor, false, "multibandcompressor")
 #ifdef ENABLE_EXPERIMENTAL
     PER_MODULE_ITEM(fluidsynth, true, "fluidsynth")
     PER_MODULE_ITEM(wavetable, true, "wavetable")
