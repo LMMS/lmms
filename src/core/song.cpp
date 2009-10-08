@@ -1083,7 +1083,7 @@ void song::importProject()
 #else 
 			 	");;" +
 #endif
-			tr("All Files") +
+			tr("All file types") +
 			" (*.*)");
 
 	ofd.setFileMode( QFileDialog::ExistingFiles );
