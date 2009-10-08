@@ -5876,8 +5876,13 @@ Latency: %2 ms</source>
     </message>
     <message>
         <location filename="../../src/core/song.cpp" line="1073"/>
-        <source>MIDI sequences (*.mid *.midi *.rif *.riff);;FL Studio projects (*.flp)</source>
-        <translation type="unfinished">MIDI シーケンス (*.mid *.midi *.rif *.riff);; FL Studio プロジェクト (*.flp)</translation>
+        <source>MIDI sequences</source>
+        <translation type="unfinished">MIDI シーケンス</translation>
+    </message>
+    <message>
+        <location filename="../../src/core/song.cpp" line="1073"/>
+        <source>FL Studio projects</source>
+        <translation type="unfinished"> FL Studio プロジェクト</translation>
     </message>
 </context>
 <context>
