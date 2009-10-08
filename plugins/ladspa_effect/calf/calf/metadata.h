@@ -154,7 +154,7 @@ struct multibandcompressor_metadata: public plugin_metadata<multibandcompressor_
            param_threshold3, param_ratio3, param_attack3, param_release3, param_makeup3, param_knee3,
            param_detection3, param_compression3, param_output3, param_bypass3, param_mute3,
            param_count };
-    PLUGIN_NAME_ID_LABEL("multibandcompressor", "multibandcompressor", "Multibandcompressor")
+    PLUGIN_NAME_ID_LABEL("multiband_compressor", "multibandcompressor", "Multiband Compressor")
 };
 
 /// Organ - enums for parameter IDs etc. (this mess is caused by organ split between plugin and generic class - which was
