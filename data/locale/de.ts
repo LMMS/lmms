@@ -6016,6 +6016,11 @@ Latenz: %2 ms</translation>
         <source>FL Studio projects</source>
         <translation>FL Studio Projekte</translation>
     </message>
+    <message>
+        <location filename="../../src/core/song.cpp" line="1073"/>
+        <source>All file types</source>
+        <translation>Alle Dateitypen</translation>
+    </message>
 </context>
 <context>
     <name>songEditor</name>

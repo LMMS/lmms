@@ -1076,7 +1076,7 @@ void song::importProject()
 			tr("FL Studio projects") +
 			" (*.flp"
 			 	");;" +
-			tr("All Files") +
+			tr("All file types") +
 			" (*.*)");
 
 	ofd.setFileMode( QFileDialog::ExistingFiles );

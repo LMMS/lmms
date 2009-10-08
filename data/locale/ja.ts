@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="1.1" language="ja_JP">
-<defaultcodec></defaultcodec>
+<!DOCTYPE TS>
+<TS version="2.0" language="ja_JP">
 <context>
     <name>QWidget</name>
     <message>
@@ -5882,7 +5882,7 @@ Latency: %2 ms</source>
     <message>
         <location filename="../../src/core/song.cpp" line="1073"/>
         <source>FL Studio projects</source>
-        <translation type="unfinished"> FL Studio プロジェクト</translation>
+        <translation type="unfinished">FL Studio プロジェクト</translation>
     </message>
 </context>
 <context>
