@@ -22,7 +22,7 @@
 #include <math.h>
 #include <stdlib.h>
 #include <stdio.h>
-
+#include <string.h>
 
 #include "../globals.h"
 #include "../Misc/Util.h"
@@ -590,7 +590,7 @@ void ADnote::KillVoice(int nvoice)
     if ((NoteVoicePar[nvoice].FMEnabled!=NONE)&&(NoteVoicePar[nvoice].FMVoice<0)) delete []NoteVoicePar[nvoice].FMSmp;
 
     if (NoteVoicePar[nvoice].VoiceOut!=NULL)
-        for (int i=0;i<SOUND_BUFFER_SIZE;i++) NoteVoicePar[nvoice].VoiceOut[i]=0.0;//do not delete, yet: perhaps is used by another voice
+        memset(NoteVoicePar[nvoice].VoiceOut, 0, SOUND_BUFFER_SIZE * sizeof(REALTYPE));//do not delete, yet: perhaps is used by another voice
 
     NoteVoicePar[nvoice].Enabled=OFF;
 };
@@ -1301,18 +1301,13 @@ int ADnote::noteout(REALTYPE *outl,REALTYPE *outr)
 {
     int i,nvoice;
 
-    for (i=0;i<SOUND_BUFFER_SIZE;i++) {
-        outl[i]=denormalkillbuf[i];
-        outr[i]=denormalkillbuf[i];
-    };
+    memcpy(outl, denormalkillbuf, SOUND_BUFFER_SIZE*sizeof(REALTYPE));
+    memcpy(outr, denormalkillbuf, SOUND_BUFFER_SIZE*sizeof(REALTYPE));
 
     if (NoteEnabled==OFF) return(0);
 
-    for (i=0;i<SOUND_BUFFER_SIZE;i++) {
-        bypassl[i]=0.0;
-        bypassr[i]=0.0;
-    };
-
+    memset(bypassl, 0, SOUND_BUFFER_SIZE*sizeof(REALTYPE));
+    memset(bypassr, 0, SOUND_BUFFER_SIZE*sizeof(REALTYPE));
     computecurrentparameters();
 
     for (nvoice=0;nvoice<NUM_VOICES;nvoice++) {
@@ -1512,10 +1507,8 @@ int ADnote::noteout(REALTYPE *outl,REALTYPE *outr)
     // Apply legato-specific sound signal modifications
     if (Legato.silent) { // Silencer
         if (Legato.msg!=LM_FadeIn) {
-            for (i=0;i<SOUND_BUFFER_SIZE;i++) {
-                outl[i]=0.0;
-                outr[i]=0.0;
-            }
+            memset(outl, 0, SOUND_BUFFER_SIZE * sizeof(REALTYPE));
+            memset(outl, 0, SOUND_BUFFER_SIZE * sizeof(REALTYPE));
         }
     }
     switch (Legato.msg) {

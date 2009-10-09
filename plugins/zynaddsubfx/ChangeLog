@@ -944,3 +944,12 @@
 02 Oct 2009 (Mark McCurry)
 	    - Added OSS failsafe by Jérémie Andréi
 
+04 Oct 2009 (Mark McCurry)
+	    - fixed Ctest issues
+
+06 Oct 2009 (Mark McCurry)
+	    - Added first simple profiling test
+
+08 Oct 2009 (Mark McCurry)
+	    - Started to see if memset/memcpy offer performance benifits when
+	      widely used
