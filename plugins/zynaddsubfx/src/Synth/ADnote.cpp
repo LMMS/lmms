@@ -830,7 +830,7 @@ void ADnote::setfreqFM(int nvoice,REALTYPE in_freq)
 /*
  * Get Voice base frequency
  */
-REALTYPE ADnote::getvoicebasefreq(int nvoice)
+REALTYPE ADnote::getvoicebasefreq(int nvoice) const
 {
     REALTYPE detune=NoteVoicePar[nvoice].Detune/100.0+
                     NoteVoicePar[nvoice].FineDetune/100.0*ctl->bandwidth.relbw*bandwidthDetuneMultiplier+
@@ -852,7 +852,7 @@ REALTYPE ADnote::getvoicebasefreq(int nvoice)
 /*
  * Get Voice's Modullator base frequency
  */
-REALTYPE ADnote::getFMvoicebasefreq(int nvoice)
+REALTYPE ADnote::getFMvoicebasefreq(int nvoice) const
 {
     REALTYPE detune=NoteVoicePar[nvoice].FMDetune/100.0;
     return(getvoicebasefreq(nvoice)*pow(2,detune/12.0));
@@ -969,7 +969,7 @@ void ADnote::computecurrentparameters()
 /*
  * Fadein in a way that removes clicks but keep sound "punchy"
  */
-inline void ADnote::fadein(REALTYPE *smps)
+inline void ADnote::fadein(REALTYPE *smps) const
 {
     int zerocrossings=0;
     for (int i=1;i<SOUND_BUFFER_SIZE;i++)
@@ -1613,7 +1613,7 @@ void ADnote::relasekey()
 /*
  * Check if the note is finished
  */
-int ADnote::finished()
+int ADnote::finished() const
 {
     if (NoteEnabled==ON) return(0);
     else return(1);

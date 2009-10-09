@@ -41,42 +41,86 @@
 class ADnote    //ADDitive note
 {
 public:
-    ADnote(ADnoteParameters *pars,Controller *ctl_,REALTYPE freq,REALTYPE velocity,int portamento_,int midinote_,bool besilent);//(gf)Added the besilent parameter to tell it to start silent (if true).
+    /**Constructor.
+     * @param pars Note Parameters
+     * @param ctl_ Pointer to system Controller
+     * @param freq Base frequency for note
+     * @param velocity Velocity of note
+     * @param portamento_ 1 if the note has portamento
+     * @param midinote_ The midi number of the note
+     * @param besilent Start silent note if true*/
+    ADnote(ADnoteParameters *pars, Controller *ctl_, REALTYPE freq,
+           REALTYPE velocity, int portamento_, int midinote_,
+           bool besilent);
+    /**Destructor*/
     ~ADnote();
 
-    void ADlegatonote(REALTYPE freq, REALTYPE velocity, int portamento_, int midinote_, bool externcall);
+    /**Alters the playing note for legato effect*/
+    void ADlegatonote(REALTYPE freq, REALTYPE velocity, int portamento_,
+                      int midinote_, bool externcall);
 
+    /**Compute ADnote Samples.
+     * @return 0 if note is finished*/
     int noteout(REALTYPE *outl,REALTYPE *outr);
+
+    /**Release the key for the note and start release portion of envelopes.*/
     void relasekey();
-    int finished();
+    /**Return if note is finished.
+     * @return finished=1 unfinished=0*/
+    int finished() const;
 
 
-    /*ready - this is 0 if it is not ready (the parameters has to be computed)
-     or other value if the parameters has been computed and if it is ready to output*/
+    /**Nonzero when ready for output(the parameters has been computed)
+     * zero when parameters need to be computed.*/
     char ready;
 
 private:
 
+    /**Changes the frequency of an oscillator.
+     * @param nvoice voice to run computations on
+     * @param in_freq new frequency*/
     void setfreq(int nvoice,REALTYPE in_freq);
+    /**Set the frequency of the modulator oscillator*/
     void setfreqFM(int nvoice,REALTYPE in_freq);
-	void compute_unison_freq_rap(int nvoice);
+    /**Computes relative frequency for unison and unison's vibratto.
+     * Note: Must be called before setfreq* functions.*/
+    void compute_unison_freq_rap(int nvoice);
+    /**Compute parameters for next tick*/
     void computecurrentparameters();
+    /**Initializes All Parameters*/
     void initparameters();
+    /**Deallocate/Cleanup given voice*/
     void KillVoice(int nvoice);
+    /**Deallocate Note resources and voice resources*/
     void KillNote();
-    inline REALTYPE getvoicebasefreq(int nvoice);
-    inline REALTYPE getFMvoicebasefreq(int nvoice);
+    /**Get the Voice's base frequency*/
+    inline REALTYPE getvoicebasefreq(int nvoice) const;
+    /**Get modulator's base frequency*/
+    inline REALTYPE getFMvoicebasefreq(int nvoice) const;
+    /**Compute the Oscillator's samples.
+     * Affects tmpwave_unison and updates oscposhi/oscposlo*/
     inline void ComputeVoiceOscillator_LinearInterpolation(int nvoice);
+    /**Compute the Oscillator's samples.
+     * Affects tmpwave_unison and updates oscposhi/oscposlo
+     * @todo remove this declaration if it is commented out*/
     inline void ComputeVoiceOscillator_CubicInterpolation(int nvoice);
+    /**Computes the Oscillator samples with morphing.
+     * updates tmpwave_unison*/
     inline void ComputeVoiceOscillatorMorph(int nvoice);
+    /**Computes the Ring Modulated Oscillator.*/
     inline void ComputeVoiceOscillatorRingModulation(int nvoice);
+    /**Computes the Frequency Modulated Oscillator.
+     * @param FMmode modulation type 0=Phase 1=Frequency*/
     inline void ComputeVoiceOscillatorFrequencyModulation(int nvoice,int FMmode);//FMmode=0 for phase modulation, 1 for Frequency modulation
     //  inline void ComputeVoiceOscillatorFrequencyModulation(int nvoice);
+    /**TODO*/
     inline void ComputeVoiceOscillatorPitchModulation(int nvoice);
 
+    /**Generate Noise Samples for Voice*/
     inline void ComputeVoiceNoise(int nvoice);
 
-    inline void fadein(REALTYPE *smps);
+    /**Fadein in a way that removes clicks but keep sound "punchy"*/
+    inline void fadein(REALTYPE *smps) const;
 
 
     //GLOBALS
