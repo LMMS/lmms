@@ -418,7 +418,6 @@ void SUBnote::filter(bpfilter &filter,REALTYPE *smps)
         filter.yn2=filter.yn1;
         filter.yn1=out;
         smps[i]=out;
-
     };
 };
 
@@ -519,17 +518,15 @@ int SUBnote::noteout(REALTYPE *outl,REALTYPE *outr)
 {
     int i;
 
-    for (i=0;i<SOUND_BUFFER_SIZE;i++) {
-        outl[i]=denormalkillbuf[i];
-        outr[i]=denormalkillbuf[i];
-    };
+    memcpy(outl, denormalkillbuf, SOUND_BUFFER_SIZE * sizeof(REALTYPE));
+    memcpy(outr, denormalkillbuf, SOUND_BUFFER_SIZE * sizeof(REALTYPE));
 
     if (NoteEnabled==OFF) return(0);
 
     //left channel
     for (i=0;i<SOUND_BUFFER_SIZE;i++) tmprnd[i]=RND*2.0-1.0;
     for (int n=0;n<numharmonics;n++) {
-        for (i=0;i<SOUND_BUFFER_SIZE;i++) tmpsmp[i]=tmprnd[i];
+        memcpy(tmpsmp, tmprnd, SOUND_BUFFER_SIZE * sizeof(REALTYPE));
         for (int nph=0;nph<numstages;nph++)
             filter(lfilter[nph+n*numstages],tmpsmp);
         for (i=0;i<SOUND_BUFFER_SIZE;i++) outl[i]+=tmpsmp[i];
@@ -541,13 +538,13 @@ int SUBnote::noteout(REALTYPE *outl,REALTYPE *outr)
     if (stereo!=0) {
         for (i=0;i<SOUND_BUFFER_SIZE;i++) tmprnd[i]=RND*2.0-1.0;
         for (int n=0;n<numharmonics;n++) {
-            for (i=0;i<SOUND_BUFFER_SIZE;i++) tmpsmp[i]=tmprnd[i];
+            memcpy(tmpsmp, tmprnd, SOUND_BUFFER_SIZE * sizeof(REALTYPE));
             for (int nph=0;nph<numstages;nph++)
                 filter(rfilter[nph+n*numstages],tmpsmp);
             for (i=0;i<SOUND_BUFFER_SIZE;i++) outr[i]+=tmpsmp[i];
         };
         if (GlobalFilterR!=NULL) GlobalFilterR->filterout(&outr[0]);
-    } else for (i=0;i<SOUND_BUFFER_SIZE;i++) outr[i]=outl[i];
+    } else memcpy(outr, outl, SOUND_BUFFER_SIZE * sizeof(REALTYPE));
 
     if (firsttick!=0) {
         int n=10;
@@ -581,10 +578,8 @@ int SUBnote::noteout(REALTYPE *outl,REALTYPE *outr)
     // Apply legato-specific sound signal modifications
     if (Legato.silent) { // Silencer
         if (Legato.msg!=LM_FadeIn) {
-            for (i=0;i<SOUND_BUFFER_SIZE;i++) {
-                outl[i]=0.0;
-                outr[i]=0.0;
-            }
+            memset(outl, 0, SOUND_BUFFER_SIZE* sizeof(REALTYPE));
+            memset(outr, 0, SOUND_BUFFER_SIZE* sizeof(REALTYPE));
         }
     }
     switch (Legato.msg) {

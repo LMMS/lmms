@@ -83,7 +83,7 @@ private:
 
     void initfilter(bpfilter &filter,REALTYPE freq,REALTYPE bw,REALTYPE amp,REALTYPE mag);
     void computefiltercoefs(bpfilter &filter,REALTYPE freq,REALTYPE bw,REALTYPE gain);
-    void filter(bpfilter &filter,REALTYPE *smps);
+    inline void filter(bpfilter &filter,REALTYPE *smps);
 
     bpfilter *lfilter,*rfilter;
 
