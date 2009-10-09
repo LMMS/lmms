@@ -902,7 +902,7 @@ private:
     float linSlope, detected, kneeSqrt, kneeStart, linKneeStart, kneeStop;
     float compressedKneeStop, adjKneeStart, thres;
     float attack, release, threshold, ratio, knee, makeup, detection, bypass, mute, meter_out, meter_comp;
-    float old_threshold, old_ratio, old_knee, old_makeup, old_bypass;
+    float old_threshold, old_ratio, old_knee, old_makeup, old_bypass, old_mute, old_detection;
     int last_generation;
     uint32_t srate;
     bool is_active;
@@ -928,8 +928,6 @@ public:
 class multibandcompressor_audio_module: public audio_module<multibandcompressor_metadata>, public line_graph_iface {
 private:
     static const int strips = 4;
-    float meter_out[strips];
-    float meter_comp[strips];
     bool mute[strips];
     uint32_t clip_inL, clip_inR, clip_outL, clip_outR;
     float meter_inL, meter_inR, meter_outL, meter_outR;
@@ -953,7 +951,6 @@ public:
     virtual bool get_gridline(int index, int subindex, float &pos, bool &vertical, std::string &legend, cairo_iface *context);
     virtual int  get_changed_offsets(int index, int generation, int &subindex_graph, int &subindex_dot, int &subindex_gridline);
 };
-
 
 /// Filterclavier --- MIDI controlled filter by Hans Baier
 class filterclavier_audio_module: 
