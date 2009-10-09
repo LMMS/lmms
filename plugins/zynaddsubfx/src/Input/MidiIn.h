@@ -25,23 +25,27 @@
 
 #include "../globals.h"
 
-enum MidiCmdType {MidiNull,MidiNoteOFF,MidiNoteON,MidiController};
+enum MidiCmdType {
+    MidiNull, MidiNoteOFF, MidiNoteON, MidiController
+};
 #define MP_MAX_BYTES 4000  //in case of loooong SYS_EXes
 
 /**This class is inherited by all the Midi input classes*/
 class MidiIn
 {
-public:
-    /**Get the command,channel and parameters of the MIDI
-    *
-    * \todo make pure virtual
-    * @param cmdtype the referece to the variable that will store the type
-    * @param cmdchan the channel for the event
-    * @param parameters for the event*/
-    virtual void getmidicmd(MidiCmdType &cmdtype,unsigned char &cmdchan,int *cmdparams)=0;
-    int getcontroller(unsigned char b);
-protected:
-    bool inputok;/**<1 if I can read midi bytes from input ports*/
+    public:
+        /**Get the command,channel and parameters of the MIDI
+        *
+        * \todo make pure virtual
+        * @param cmdtype the referece to the variable that will store the type
+        * @param cmdchan the channel for the event
+        * @param parameters for the event*/
+        virtual void getmidicmd(MidiCmdType &cmdtype,
+                                unsigned char &cmdchan,
+                                int *cmdparams) = 0;
+        int getcontroller(unsigned char b);
+    protected:
+        bool inputok; /**<1 if I can read midi bytes from input ports*/
 };
 
 #endif

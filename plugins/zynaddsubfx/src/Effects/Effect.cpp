@@ -23,8 +23,9 @@
 #include "Effect.h"
 
 
-Effect::Effect(bool insertion_,REALTYPE *const efxoutl_,
-               REALTYPE *const efxoutr_,FilterParams *filterpars_,
-               const unsigned char & Ppreset_)
-        :Ppreset(Ppreset_),efxoutl(efxoutl_),efxoutr(efxoutr_),
-        filterpars(filterpars_),insertion(insertion_) {}
+Effect::Effect(bool insertion_, REALTYPE *const efxoutl_,
+               REALTYPE *const efxoutr_, FilterParams *filterpars_,
+               const unsigned char &Ppreset_)
+    :Ppreset(Ppreset_), efxoutl(efxoutl_), efxoutr(efxoutr_),
+      filterpars(filterpars_), insertion(insertion_) {}
+

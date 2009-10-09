@@ -31,39 +31,38 @@
 class MIDIEvents
 {
     friend class MIDIFile;
-public:
-    MIDIEvents();
-    ~MIDIEvents();
+    public:
+        MIDIEvents();
+        ~MIDIEvents();
 
-protected:
+    protected:
 
-    /* Events */
-    struct event {
-        int deltatime;
-        int channel;//on what midi channel is
-        int type,par1,par2;//type=1 for note, type=2 for controller, type=255 for time messages
-    } tmpevent;
-    struct listpos {
-        event ev;
-        struct listpos *next;
-    };
-    struct list {
-        listpos *first,*current;
-        int size;//how many events are
-        double length;//in seconds
-    };
-    struct {
-        list track;//the stored track
-        list record;//the track being "recorded" from midi
-    } miditrack[NUM_MIDI_TRACKS];
+        /* Events */
+        struct event {
+            int deltatime;
+            int channel; //on what midi channel is
+            int type, par1, par2; //type=1 for note, type=2 for controller, type=255 for time messages
+        } tmpevent;
+        struct listpos {
+            event ev;
+            struct listpos *next;
+        };
+        struct list {
+            listpos *first, *current;
+            int      size; //how many events are
+            double   length; //in seconds
+        };
+        struct {
+            list track; //the stored track
+            list record; //the track being "recorded" from midi
+        } miditrack[NUM_MIDI_TRACKS];
 
-    void writeevent(list *l,event *ev);
-    void readevent(list *l,event *ev);
+        void writeevent(list *l, event *ev);
+        void readevent(list *l, event *ev);
 
-    void rewindlist(list *l);
-    void deletelist(list *l);
-    void deletelistreference(list *l);
-
+        void rewindlist(list *l);
+        void deletelist(list *l);
+        void deletelistreference(list *l);
 };
 
 #endif

@@ -24,14 +24,14 @@
 #include "FqSample.h"
 #include "Sample.h"
 
-class FqSample : public Sample
+class FqSample:public Sample
 {
-public:
-    FqSample(int length,REALTYPE fill=0);
-    FqSample(int length,const REALTYPE *input);
-    ~FqSample();
-    //FqSample &operator=(const FqSample &smp);
-    //float *dontuse(){return buffer;};
+    public:
+        FqSample(int length, REALTYPE fill = 0);
+        FqSample(int length, const REALTYPE *input);
+        ~FqSample();
+        //FqSample &operator=(const FqSample &smp);
+        //float *dontuse(){return buffer;};
 };
 #endif
 

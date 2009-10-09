@@ -29,28 +29,29 @@
 /**Records sound to a file*/
 class Recorder
 {
-public:
+    public:
 
-    Recorder();
-    ~Recorder();
-    int preparefile(std::string filename_,int overwrite);//returns 1 if the file exists
-    void start();
-    void stop();
-    void pause();
-    int recording();
-    void triggernow();
-    void recordbuffer(REALTYPE *outl,REALTYPE *outr);
+        Recorder();
+        ~Recorder();
+        int preparefile(std::string filename_, int overwrite); //returns 1 if the file exists
+        void start();
+        void stop();
+        void pause();
+        int recording();
+        void triggernow();
+        void recordbuffer(REALTYPE *outl, REALTYPE *outr);
 
-    /** Status:
-     *  0 - not ready(no file selected),
-     *  1 - ready
-     *  2 - recording */
-    int status;
+        /** Status:
+         *  0 - not ready(no file selected),
+         *  1 - ready
+         *  2 - recording */
+        int status;
 
-private:
-    WAVaudiooutput wav;
-    short int *recordbuf_16bit;
-    int notetrigger;
+    private:
+        WAVaudiooutput wav;
+        short int     *recordbuf_16bit;
+        int notetrigger;
 };
 
 #endif
+

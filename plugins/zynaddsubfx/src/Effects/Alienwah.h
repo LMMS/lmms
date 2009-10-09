@@ -34,49 +34,51 @@ using namespace std;
 /**"AlienWah" Effect*/
 class Alienwah:public Effect
 {
-public:
-    /**
-     * Constructor
-     * @param insetion_ 1 for insertion Effect, 0 for others
-     * @param efxoutl_ Pointer to Alienwah's left channel output buffer
-     * @param efxoutr_ Pointer to Alienwah's left channel output buffer
-     * @return Initialized Alienwah
-     */
-    Alienwah(const int &insetion_,REALTYPE *const efxoutl_,REALTYPE *const efxoutr_);
-    ~Alienwah();
-    void out(REALTYPE *const smpsl,REALTYPE *const smpsr);
+    public:
+        /**
+         * Constructor
+         * @param insetion_ 1 for insertion Effect, 0 for others
+         * @param efxoutl_ Pointer to Alienwah's left channel output buffer
+         * @param efxoutr_ Pointer to Alienwah's left channel output buffer
+         * @return Initialized Alienwah
+         */
+        Alienwah(const int &insetion_,
+                 REALTYPE *const efxoutl_,
+                 REALTYPE *const efxoutr_);
+        ~Alienwah();
+        void out(REALTYPE *const smpsl, REALTYPE *const smpsr);
 
-    void setpreset(unsigned char npreset);
-    void changepar(const int &npar,const unsigned char &value);
-    unsigned char getpar(const int &npar)const;
-    void cleanup();
+        void setpreset(unsigned char npreset);
+        void changepar(const int &npar, const unsigned char &value);
+        unsigned char getpar(const int &npar) const;
+        void cleanup();
 
-private:
-    //Alienwah Parameters
-    EffectLFO lfo;//lfo-ul Alienwah
-    unsigned char Pvolume;
-    unsigned char Ppanning;
-    unsigned char Pdepth;//the depth of the Alienwah
-    unsigned char Pfb;//feedback
-    unsigned char Plrcross;//feedback
-    unsigned char Pdelay;
-    unsigned char Pphase;
+    private:
+        //Alienwah Parameters
+        EffectLFO     lfo; //lfo-ul Alienwah
+        unsigned char Pvolume;
+        unsigned char Ppanning;
+        unsigned char Pdepth; //the depth of the Alienwah
+        unsigned char Pfb; //feedback
+        unsigned char Plrcross; //feedback
+        unsigned char Pdelay;
+        unsigned char Pphase;
 
 
-    //Control Parameters
-    void setvolume(const unsigned char &Pvolume);
-    void setpanning(const unsigned char &Ppanning);
-    void setdepth(const unsigned char &Pdepth);
-    void setfb(const unsigned char &Pfb);
-    void setlrcross(const unsigned char &Plrcross);
-    void setdelay(const unsigned char &Pdelay);
-    void setphase(const unsigned char &Pphase);
+        //Control Parameters
+        void setvolume(const unsigned char &Pvolume);
+        void setpanning(const unsigned char &Ppanning);
+        void setdepth(const unsigned char &Pdepth);
+        void setfb(const unsigned char &Pfb);
+        void setlrcross(const unsigned char &Plrcross);
+        void setdelay(const unsigned char &Pdelay);
+        void setphase(const unsigned char &Pphase);
 
-    //Internal Values
-    REALTYPE panning,fb,depth,lrcross,phase;
-    complex<REALTYPE> *oldl,*oldr;
-    complex<REALTYPE> oldclfol,oldclfor;
-    int oldk;
+        //Internal Values
+        REALTYPE panning, fb, depth, lrcross, phase;
+        complex<REALTYPE> *oldl, *oldr;
+        complex<REALTYPE>  oldclfol, oldclfor;
+        int oldk;
 };
 
 #endif

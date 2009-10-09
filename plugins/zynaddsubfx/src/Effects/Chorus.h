@@ -33,83 +33,83 @@
 /**Chorus and Flange effects*/
 class Chorus:public Effect
 {
-public:
-    Chorus(const int &insetion_,REALTYPE *efxoutl_,REALTYPE *efxoutr_);
-    /**Destructor*/
-    ~Chorus();
-    void out(REALTYPE *smpsl,REALTYPE *smpsr);
-    void out(const Stereo<AuSample> &input);
-    void setpreset(unsigned char npreset);
-    /**
-     * Sets the value of the chosen variable
-     *
-     * The possible parameters are:
-     *   -# Volume
-     *   -# Panning
-     *   -# LFO Frequency
-     *   -# LFO Randomness
-     *   -# LFO Type
-     *   -# LFO stereo
-     *   -# Depth
-     *   -# Delay
-     *   -# Feedback
-     *   -# Flange Mode
-     *   -# Subtractive
-     * @param npar number of chosen parameter
-     * @param value the new value
-     */
-    void changepar(const int &npar,const unsigned char &value);
-    /**
-     * Gets the value of the chosen variable
-     *
-     * The possible parameters are:
-     *   -# Volume
-     *   -# Panning
-     *   -# LFO Frequency
-     *   -# LFO Randomness
-     *   -# LFO Type
-     *   -# LFO stereo
-     *   -# Depth
-     *   -# Delay
-     *   -# Feedback
-     *   -# Flange Mode
-     *   -# Subtractive
-     * @param npar number of chosen parameter
-     * @return the value of the parameter
-     */
-    unsigned char getpar(const int &npar)const;
-    void cleanup();
+    public:
+        Chorus(const int &insetion_, REALTYPE *efxoutl_, REALTYPE *efxoutr_);
+        /**Destructor*/
+        ~Chorus();
+        void out(REALTYPE *smpsl, REALTYPE *smpsr);
+        void out(const Stereo<AuSample> &input);
+        void setpreset(unsigned char npreset);
+        /**
+         * Sets the value of the chosen variable
+         *
+         * The possible parameters are:
+         *   -# Volume
+         *   -# Panning
+         *   -# LFO Frequency
+         *   -# LFO Randomness
+         *   -# LFO Type
+         *   -# LFO stereo
+         *   -# Depth
+         *   -# Delay
+         *   -# Feedback
+         *   -# Flange Mode
+         *   -# Subtractive
+         * @param npar number of chosen parameter
+         * @param value the new value
+         */
+        void changepar(const int &npar, const unsigned char &value);
+        /**
+         * Gets the value of the chosen variable
+         *
+         * The possible parameters are:
+         *   -# Volume
+         *   -# Panning
+         *   -# LFO Frequency
+         *   -# LFO Randomness
+         *   -# LFO Type
+         *   -# LFO stereo
+         *   -# Depth
+         *   -# Delay
+         *   -# Feedback
+         *   -# Flange Mode
+         *   -# Subtractive
+         * @param npar number of chosen parameter
+         * @return the value of the parameter
+         */
+        unsigned char getpar(const int &npar) const;
+        void cleanup();
 
-private:
-    //Chorus Parameters
-    EffectLFO lfo;//lfo-ul chorus
-    unsigned char Pvolume;
-    unsigned char Ppanning;
-    unsigned char Pdepth;//the depth of the Chorus(ms)
-    unsigned char Pdelay;//the delay (ms)
-    unsigned char Pfb;//feedback
-    unsigned char Plrcross;//feedback
-    unsigned char Pflangemode;//how the LFO is scaled, to result chorus or flange
-    unsigned char Poutsub;//if I wish to substract the output instead of the adding it
+    private:
+        //Chorus Parameters
+        EffectLFO     lfo; //lfo-ul chorus
+        unsigned char Pvolume;
+        unsigned char Ppanning;
+        unsigned char Pdepth; //the depth of the Chorus(ms)
+        unsigned char Pdelay; //the delay (ms)
+        unsigned char Pfb; //feedback
+        unsigned char Plrcross; //feedback
+        unsigned char Pflangemode; //how the LFO is scaled, to result chorus or flange
+        unsigned char Poutsub; //if I wish to substract the output instead of the adding it
 
 
-    //Parameter Controls
-    void setvolume(const unsigned char &Pvolume);
-    void setpanning(const unsigned char &Ppanning);
-    void setdepth(const unsigned char &Pdepth);
-    void setdelay(const unsigned char &Pdelay);
-    void setfb(const unsigned char &Pfb);
-    void setlrcross(const unsigned char &Plrcross);
+        //Parameter Controls
+        void setvolume(const unsigned char &Pvolume);
+        void setpanning(const unsigned char &Ppanning);
+        void setdepth(const unsigned char &Pdepth);
+        void setdelay(const unsigned char &Pdelay);
+        void setfb(const unsigned char &Pfb);
+        void setlrcross(const unsigned char &Plrcross);
 
-    //Internal Values
-    REALTYPE depth,delay,fb,lrcross,panning;
-    REALTYPE dl1,dl2,dr1,dr2,lfol,lfor;
-    int maxdelay;
-    Stereo<AuSample> delaySample;
-    //REALTYPE *delayl,*delayr;
-    int dlk,drk,dlhi,dlhi2;
-    REALTYPE getdelay(REALTYPE xlfo);
-    REALTYPE dllo,mdel;
+        //Internal Values
+        REALTYPE depth, delay, fb, lrcross, panning;
+        REALTYPE dl1, dl2, dr1, dr2, lfol, lfor;
+        int      maxdelay;
+        Stereo<AuSample> delaySample;
+        //REALTYPE *delayl,*delayr;
+        int dlk, drk, dlhi, dlhi2;
+        REALTYPE getdelay(REALTYPE xlfo);
+        REALTYPE dllo, mdel;
 };
 
 #endif

@@ -20,12 +20,12 @@
 */
 #include "FqSample.h"
 
-FqSample::FqSample(int length,REALTYPE fill)
-        :Sample(length,fill)
+FqSample::FqSample(int length, REALTYPE fill)
+    :Sample(length, fill)
 {}
 
-FqSample::FqSample(int length,const REALTYPE *input)
-        : Sample(length,input)
+FqSample::FqSample(int length, const REALTYPE *input)
+    :Sample(length, input)
 {}
 
 FqSample::~FqSample()

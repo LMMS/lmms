@@ -31,84 +31,101 @@
 
 class SUBnote
 {
-public:
-    SUBnote(SUBnoteParameters *parameters,Controller *ctl_,REALTYPE freq,REALTYPE velocity,int portamento_,int midinote,bool besilent);
-    ~SUBnote();
+    public:
+        SUBnote(SUBnoteParameters *parameters,
+                Controller *ctl_,
+                REALTYPE freq,
+                REALTYPE velocity,
+                int portamento_,
+                int midinote,
+                bool besilent);
+        ~SUBnote();
 
-    void SUBlegatonote(REALTYPE freq, REALTYPE velocity, int portamento_, int midinote, bool externcall);
+        void SUBlegatonote(REALTYPE freq,
+                           REALTYPE velocity,
+                           int portamento_,
+                           int midinote,
+                           bool externcall);
 
-    int noteout(REALTYPE *outl,REALTYPE *outr);//note output,return 0 if the note is finished
-    void relasekey();
-    int finished();
+        int noteout(REALTYPE *outl, REALTYPE *outr); //note output,return 0 if the note is finished
+        void relasekey();
+        int finished();
 
-    int ready; //if I can get the sampledata
+        int ready; //if I can get the sampledata
 
-private:
+    private:
 
-    void computecurrentparameters();
-    void initparameters(REALTYPE freq);
-    void KillNote();
+        void computecurrentparameters();
+        void initparameters(REALTYPE freq);
+        void KillNote();
 
-    SUBnoteParameters *pars;
+        SUBnoteParameters *pars;
 
-    //parameters
-    int stereo;
-    int numstages;//number of stages of filters
-    int numharmonics;//number of harmonics (after the too higher hamonics are removed)
-    int firstnumharmonics;//To keep track of the first note's numharmonics value, useful in legato mode.
-    int start;//how the harmonics start
-    REALTYPE basefreq;
-    REALTYPE panning;
-    Envelope *AmpEnvelope;
-    Envelope *FreqEnvelope;
-    Envelope *BandWidthEnvelope;
+        //parameters
+        int stereo;
+        int numstages; //number of stages of filters
+        int numharmonics; //number of harmonics (after the too higher hamonics are removed)
+        int firstnumharmonics; //To keep track of the first note's numharmonics value, useful in legato mode.
+        int start; //how the harmonics start
+        REALTYPE  basefreq;
+        REALTYPE  panning;
+        Envelope *AmpEnvelope;
+        Envelope *FreqEnvelope;
+        Envelope *BandWidthEnvelope;
 
-    Filter *GlobalFilterL,*GlobalFilterR;
+        Filter *GlobalFilterL, *GlobalFilterR;
 
-    Envelope *GlobalFilterEnvelope;
+        Envelope *GlobalFilterEnvelope;
 
-    //internal values
-    ONOFFTYPE NoteEnabled;
-    int firsttick,portamento;
-    REALTYPE volume,oldamplitude,newamplitude;
+        //internal values
+        ONOFFTYPE NoteEnabled;
+        int      firsttick, portamento;
+        REALTYPE volume, oldamplitude, newamplitude;
 
-    REALTYPE GlobalFilterCenterPitch;//octaves
-    REALTYPE GlobalFilterFreqTracking;
+        REALTYPE GlobalFilterCenterPitch; //octaves
+        REALTYPE GlobalFilterFreqTracking;
 
-    struct bpfilter {
-        REALTYPE freq,bw,amp; //filter parameters
-        REALTYPE a1,a2,b0,b2;//filter coefs. b1=0
-        REALTYPE xn1,xn2,yn1,yn2;  //filter internal values
-    };
+        struct bpfilter {
+            REALTYPE freq, bw, amp; //filter parameters
+            REALTYPE a1, a2, b0, b2; //filter coefs. b1=0
+            REALTYPE xn1, xn2, yn1, yn2; //filter internal values
+        };
 
-    void initfilter(bpfilter &filter,REALTYPE freq,REALTYPE bw,REALTYPE amp,REALTYPE mag);
-    void computefiltercoefs(bpfilter &filter,REALTYPE freq,REALTYPE bw,REALTYPE gain);
-    inline void filter(bpfilter &filter,REALTYPE *smps);
+        void initfilter(bpfilter &filter,
+                        REALTYPE freq,
+                        REALTYPE bw,
+                        REALTYPE amp,
+                        REALTYPE mag);
+        void computefiltercoefs(bpfilter &filter,
+                                REALTYPE freq,
+                                REALTYPE bw,
+                                REALTYPE gain);
+        inline void filter(bpfilter &filter, REALTYPE *smps);
 
-    bpfilter *lfilter,*rfilter;
+        bpfilter *lfilter, *rfilter;
 
-    REALTYPE *tmpsmp;
-    REALTYPE *tmprnd;//this is filled with random numbers
+        REALTYPE *tmpsmp;
+        REALTYPE *tmprnd; //this is filled with random numbers
 
-    Controller *ctl;
-    int oldpitchwheel,oldbandwidth;
-    REALTYPE globalfiltercenterq;
+        Controller *ctl;
+        int      oldpitchwheel, oldbandwidth;
+        REALTYPE globalfiltercenterq;
 
-    // Legato vars
-    struct {
-        bool silent;
-        REALTYPE lastfreq;
-        LegatoMsg msg;
-        int decounter;
-        struct { // Fade In/Out vars
-            int length;
-            REALTYPE m, step;
-        } fade;
-        struct { // Note parameters
-            REALTYPE freq, vel;
-            int portamento, midinote;
-        } param;
-    } Legato;
+        // Legato vars
+        struct {
+            bool      silent;
+            REALTYPE  lastfreq;
+            LegatoMsg msg;
+            int decounter;
+            struct { // Fade In/Out vars
+                int      length;
+                REALTYPE m, step;
+            } fade;
+            struct { // Note parameters
+                REALTYPE freq, vel;
+                int      portamento, midinote;
+            } param;
+        } Legato;
 };
 
 

@@ -29,18 +29,20 @@
 #include "Config.h"
 
 //Velocity Sensing function
-extern REALTYPE VelF(REALTYPE velocity,unsigned char scaling);
+extern REALTYPE VelF(REALTYPE velocity, unsigned char scaling);
 
 bool fileexists(const char *filename);
 
 #define N_DETUNE_TYPES 4 //the number of detune types
-extern REALTYPE getdetune(unsigned char type,unsigned short int coarsedetune,unsigned short int finedetune);
+extern REALTYPE getdetune(unsigned char type,
+                          unsigned short int coarsedetune,
+                          unsigned short int finedetune);
 
-extern REALTYPE *denormalkillbuf;/**<the buffer to add noise in order to avoid denormalisation*/
+extern REALTYPE *denormalkillbuf; /**<the buffer to add noise in order to avoid denormalisation*/
 
 extern Config config;
 
-template <class T>
+template<class T>
 std::string stringFrom(T x)
 {
     std::stringstream ss;
@@ -48,10 +50,10 @@ std::string stringFrom(T x)
     return ss.str();
 }
 
-template <class T>
-T stringTo(const char * x)
+template<class T>
+T stringTo(const char *x)
 {
-    std::string str = x!=NULL ? x : "0"; //should work for the basic float/int
+    std::string str = x != NULL ? x : "0"; //should work for the basic float/int
     std::stringstream ss(str);
     T ans;
     ss >> ans;

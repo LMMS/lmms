@@ -19,19 +19,20 @@
   Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 */
 
-template <class T>
+template<class T>
 Stereo<T>::Stereo(const T &left, const T &right)
-        :leftChannel(left),rightChannel(right)
+    :leftChannel(left), rightChannel(right)
 {}
 
-template <class T>
+template<class T>
 Stereo<T>::Stereo(const T &val)
-        :leftChannel(val),rightChannel(val)
+    :leftChannel(val), rightChannel(val)
 {}
 
-template <class T>
-void Stereo<T>::operator=(const Stereo<T> & nstr)
+template<class T>
+void Stereo<T>::operator=(const Stereo<T> &nstr)
 {
-    leftChannel=nstr.leftChannel;
-    rightChannel=nstr.rightChannel;
+    leftChannel  = nstr.leftChannel;
+    rightChannel = nstr.rightChannel;
 }
+

@@ -27,42 +27,43 @@
 #define UNISON_FREQ_SPAN 2.0
 //how much the unison frequencies varies (always >= 1.0)
 
-class Unison{
-	public:
-		Unison(int update_period_samples_,REALTYPE max_delay_sec_);
-		~Unison();	
+class Unison
+{
+    public:
+        Unison(int update_period_samples_, REALTYPE max_delay_sec_);
+        ~Unison();
 
-		void set_size(int new_size);
-		void set_base_frequency(REALTYPE freq);
-		void set_bandwidth(REALTYPE bandwidth_cents);
+        void set_size(int new_size);
+        void set_base_frequency(REALTYPE freq);
+        void set_bandwidth(REALTYPE bandwidth_cents);
 
-		void process(int bufsize,REALTYPE *inbuf,REALTYPE *outbuf=NULL);
+        void process(int bufsize, REALTYPE *inbuf, REALTYPE *outbuf = NULL);
 
-	private:
-		void update_parameters();
-		void update_unison_data();
+    private:
+        void update_parameters();
+        void update_unison_data();
 
-		int unison_size;
-		REALTYPE base_freq;
-		struct UnisonVoice{
-			REALTYPE step,position;//base LFO
-			REALTYPE realpos1,realpos2; //the position regarding samples
-			REALTYPE relative_amplitude;
-		    REALTYPE lin_fpos,lin_ffreq;	
-			UnisonVoice(){
-				position=RND*1.8-0.9;
-				realpos1=0.0;
-				realpos2=0.0;
-				step=0.0;
-				relative_amplitude=1.0;
-			};
-		}*uv;
-		int update_period_samples,update_period_sample_k;
-		int max_delay,delay_k;
-		bool first_time;
-		REALTYPE *delay_buffer;
-		REALTYPE unison_amplitude_samples;
-		REALTYPE unison_bandwidth_cents;
+        int      unison_size;
+        REALTYPE base_freq;
+        struct UnisonVoice {
+            REALTYPE step, position; //base LFO
+            REALTYPE realpos1, realpos2; //the position regarding samples
+            REALTYPE relative_amplitude;
+            REALTYPE lin_fpos, lin_ffreq;
+            UnisonVoice() {
+                position = RND * 1.8 - 0.9;
+                realpos1 = 0.0;
+                realpos2 = 0.0;
+                step     = 0.0;
+                relative_amplitude = 1.0;
+            }
+        } *uv;
+        int       update_period_samples, update_period_sample_k;
+        int       max_delay, delay_k;
+        bool      first_time;
+        REALTYPE *delay_buffer;
+        REALTYPE  unison_amplitude_samples;
+        REALTYPE  unison_bandwidth_cents;
 };
 #endif
 

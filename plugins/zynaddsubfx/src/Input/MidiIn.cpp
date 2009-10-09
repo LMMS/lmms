@@ -26,70 +26,71 @@
 int MidiIn::getcontroller(unsigned char b)
 {
     /**\todo there might be a better way to do this*/
-    int ctl=C_NULL;
-    switch (b) {
+    int ctl = C_NULL;
+    switch(b) {
     case 1:
-        ctl=C_modwheel;//Modulation Wheel
+        ctl = C_modwheel; //Modulation Wheel
         break;
     case 7:
-        ctl=C_volume;//Volume
+        ctl = C_volume; //Volume
         break;
     case 10:
-        ctl=C_panning;//Panning
+        ctl = C_panning; //Panning
         break;
     case 11:
-        ctl=C_expression;//Expression
+        ctl = C_expression; //Expression
         break;
     case 64:
-        ctl=C_sustain;//Sustain pedal
+        ctl = C_sustain; //Sustain pedal
         break;
     case 65:
-        ctl=C_portamento;//Portamento
+        ctl = C_portamento; //Portamento
         break;
     case 71:
-        ctl=C_filterq;//Filter Q (Sound Timbre)
+        ctl = C_filterq; //Filter Q (Sound Timbre)
         break;
     case 74:
-        ctl=C_filtercutoff;//Filter Cutoff (Brightness)
+        ctl = C_filtercutoff; //Filter Cutoff (Brightness)
         break;
     case 75:
-        ctl=C_bandwidth;//BandWidth
+        ctl = C_bandwidth; //BandWidth
         break;
     case 76:
-        ctl=C_fmamp;//FM amplitude
+        ctl = C_fmamp; //FM amplitude
         break;
     case 77:
-        ctl=C_resonance_center;//Resonance Center Frequency
+        ctl = C_resonance_center; //Resonance Center Frequency
         break;
     case 78:
-        ctl=C_resonance_bandwidth;//Resonance Bandwith
+        ctl = C_resonance_bandwidth; //Resonance Bandwith
         break;
     case 120:
-        ctl=C_allsoundsoff;//All Sounds OFF
+        ctl = C_allsoundsoff; //All Sounds OFF
         break;
     case 121:
-        ctl=C_resetallcontrollers;//Reset All Controllers
+        ctl = C_resetallcontrollers; //Reset All Controllers
         break;
     case 123:
-        ctl=C_allnotesoff;//All Notes OFF
+        ctl = C_allnotesoff; //All Notes OFF
         break;
-        //RPN and NRPN
+    //RPN and NRPN
     case 0x06:
-        ctl=C_dataentryhi;//Data Entry (Coarse)
+        ctl = C_dataentryhi; //Data Entry (Coarse)
         break;
     case 0x26:
-        ctl=C_dataentrylo;//Data Entry (Fine)
+        ctl = C_dataentrylo; //Data Entry (Fine)
         break;
     case 99:
-        ctl=C_nrpnhi;//NRPN (Coarse)
+        ctl = C_nrpnhi; //NRPN (Coarse)
         break;
     case 98:
-        ctl=C_nrpnlo;//NRPN (Fine)
+        ctl = C_nrpnlo; //NRPN (Fine)
         break;
     default:
-        ctl=C_NULL;//unknown controller
+        ctl = C_NULL; //unknown controller
         //fprintf(stderr,"Controller=%d , par=%d\n",midievent->data.control.param,cmdparams[1]);
         break;
-    };
-    return(ctl);
-};
+    }
+    return ctl;
+}
+

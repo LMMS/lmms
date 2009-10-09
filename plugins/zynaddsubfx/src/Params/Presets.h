@@ -30,30 +30,30 @@
 /**Presets and Clipboard management*/
 class Presets
 {
-public:
-    Presets();
-    virtual ~Presets();
+    public:
+        Presets();
+        virtual ~Presets();
 
-    void copy(const char *name);/**<if name==NULL, the clipboard is used*/
-    void paste(int npreset);//npreset==0 for clipboard
-    bool checkclipboardtype();
-    void deletepreset(int npreset);
+        void copy(const char *name); /**<if name==NULL, the clipboard is used*/
+        void paste(int npreset); //npreset==0 for clipboard
+        bool checkclipboardtype();
+        void deletepreset(int npreset);
 
-    char type[MAX_PRESETTYPE_SIZE];
-    void setelement(int n);
+        char type[MAX_PRESETTYPE_SIZE];
+        void setelement(int n);
 
-    void rescanforpresets();
+        void rescanforpresets();
 
-protected:
-    void setpresettype(const char *type);
-private:
-    virtual void add2XML(XMLwrapper *xml)=0;
-    virtual void getfromXML(XMLwrapper *xml)=0;
-    virtual void defaults()=0;
-    virtual void add2XMLsection(XMLwrapper *xml,int n) {};
-    virtual void getfromXMLsection(XMLwrapper *xml,int n) {};
-    virtual void defaults(int n) {};
-    int nelement;
+    protected:
+        void setpresettype(const char *type);
+    private:
+        virtual void add2XML(XMLwrapper *xml)    = 0;
+        virtual void getfromXML(XMLwrapper *xml) = 0;
+        virtual void defaults() = 0;
+        virtual void add2XMLsection(XMLwrapper *xml, int n) {}
+        virtual void getfromXMLsection(XMLwrapper *xml, int n) {}
+        virtual void defaults(int n) {}
+        int nelement;
 };
 
 #endif
