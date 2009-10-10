@@ -62,10 +62,45 @@ const Keys BaseKey = Key_A;
 const Octaves BaseOctave = DefaultOctave;
 
 
-#include "play_handle.h"
-
 
 class MixerWorkerThread;
+
+// TODO: move to ThreadableJob.h
+class ThreadableJob
+{
+public:
+	ThreadableJob() :
+		m_done( false )
+	{
+	}
+
+	void reset()
+	{
+		m_done = false;
+	}
+
+	bool process( sampleFrame * _working_buffer )
+	{
+		if( m_done.fetchAndStoreOrdered( true ) == false )
+		{
+			doProcessing( _working_buffer );
+			return true;
+		}
+		return false;
+	}
+
+	virtual bool requiresProcessing() const = 0;
+
+
+private:
+	virtual void doProcessing( sampleFrame * _working_buffer ) = 0;
+
+	QAtomicInt m_done;
+
+} ;
+
+
+#include "play_handle.h"
 
 
 class EXPORT mixer : public QObject
@@ -462,6 +497,144 @@ private:
 
 	friend class engine;
 	friend class MixerWorkerThread;
+
+} ;
+
+
+// TODO: move to MixerWorkerThread.h / MixerWorkerThread.cpp
+#include "Cpu.h"
+#include "engine.h"
+
+class MixerWorkerThread : public QThread
+{
+public:
+	struct JobQueue
+	{
+#define JOB_QUEUE_SIZE 1024
+		JobQueue() :
+			queueSize( 0 ),
+			itemsDone( 0 )
+		{
+			for( int i = 0; i < JOB_QUEUE_SIZE; ++i )
+			{
+				items[i] = NULL;
+			}
+		}
+
+		ThreadableJob * items[JOB_QUEUE_SIZE];
+		QAtomicInt queueSize;
+		QAtomicInt itemsDone;
+	} ;
+
+	static JobQueue s_jobQueue;
+
+	MixerWorkerThread( int _worker_num, mixer * _mixer ) :
+		QThread( _mixer ),
+		m_workingBuf( CPU::allocFrames( _mixer->framesPerPeriod() ) ),
+		m_workerNum( _worker_num ),
+		m_quit( false ),
+		m_mixer( _mixer ),
+		m_queueReadyWaitCond( &m_mixer->m_queueReadyWaitCond )
+	{
+	}
+
+	virtual ~MixerWorkerThread()
+	{
+		CPU::freeFrames( m_workingBuf );
+	}
+
+	virtual void quit()
+	{
+		m_quit = true;
+	}
+
+	void processJobQueue()
+	{
+		for( int i = 0; i < s_jobQueue.queueSize; ++i )
+		{
+			// returns true if ThreadableJob was not processed before
+			if( s_jobQueue.items[i]->process( m_workingBuf ) )
+			{
+				s_jobQueue.itemsDone.fetchAndAddOrdered( 1 );
+			}
+		}
+	}
+
+	template<typename T>
+	static void fillJobQueue( const T & _vec )
+	{
+		s_jobQueue.queueSize = 0;
+		s_jobQueue.itemsDone = 0;
+		for( typename T::ConstIterator it = _vec.begin(); it != _vec.end(); ++it )
+		{
+			addJob( *it );
+		}
+	}
+
+	static void addJob( ThreadableJob * _job )
+	{
+		if( _job->requiresProcessing() )
+		{
+			_job->reset();
+			s_jobQueue.items[s_jobQueue.queueSize.fetchAndAddOrdered(1)] = _job;
+		}
+	}
+
+
+// define a pause instruction for spinlock-loop - merely useful on
+// HyperThreading systems with just one physical core (e.g. Intel Atom)
+#ifdef LMMS_HOST_X86
+#define SPINLOCK_PAUSE() 	asm( "pause" )
+#else
+#ifdef LMMS_HOST_X86_64
+#define SPINLOCK_PAUSE() 	asm( "pause" )
+#else
+#define SPINLOCK_PAUSE()
+#endif
+#endif
+
+	static void startJobs()
+	{
+		// TODO: this is dirty!
+		engine::getMixer()->m_queueReadyWaitCond.wakeAll();
+	}
+
+	static void waitForJobs()
+	{
+		// TODO: this is dirty!
+		mixer * m = engine::getMixer();
+		m->m_workers[m->m_numWorkers]->processJobQueue();
+		while( s_jobQueue.itemsDone < s_jobQueue.queueSize )
+		{
+			SPINLOCK_PAUSE();
+		}
+	}
+
+	static void startAndWaitForJobs()
+	{
+		startJobs();
+		waitForJobs();
+	}
+
+
+private:
+	virtual void run()
+	{
+		QMutex m;
+		while( m_quit == false )
+		{
+			m.lock();
+			m_queueReadyWaitCond->wait( &m );
+			processJobQueue();
+			m.unlock();
+		}
+	}
+
+	sampleFrame * m_workingBuf;
+	int m_workerNum;
+	volatile bool m_quit;
+	mixer * m_mixer;
+	QWaitCondition * m_queueReadyWaitCond;
 
 } ;
 

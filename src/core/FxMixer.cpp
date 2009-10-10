@@ -438,6 +438,13 @@ void FxMixer::masterMix( sampleFrame * _buf )
 
 	m_fxChannels[0]->m_peakLeft *= engine::getMixer()->masterGain();
 	m_fxChannels[0]->m_peakRight *= engine::getMixer()->masterGain();
+
+	// clear all channel buffers
+	for( int i = 0; i < numChannels(); ++i)
+	{
+		engine::getMixer()->clearAudioBuffer( m_fxChannels[i]->m_buffer,
+			engine::getMixer()->framesPerPeriod() );
+	}
 }
 
 
