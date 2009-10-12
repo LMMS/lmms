@@ -69,21 +69,31 @@ class MixerWorkerThread;
 class ThreadableJob
 {
 public:
+
+	enum ProcessingState
+	{
+		Unstarted,
+		Queued,
+		InProgress,
+		Done
+	};
+
 	ThreadableJob() :
-		m_done( false )
+		m_state( ThreadableJob::Unstarted )
 	{
 	}
 
 	void reset()
 	{
-		m_done = false;
+		m_state = ThreadableJob::Unstarted;
 	}
 
 	bool process( sampleFrame * _working_buffer )
 	{
-		if( m_done.fetchAndStoreOrdered( true ) == false )
+		if( m_state.testAndSetOrdered( Queued, InProgress ) )
 		{
 			doProcessing( _working_buffer );
+			m_state = Done;
 			return true;
 		}
 		return false;
@@ -91,11 +101,10 @@ public:
 
 	virtual bool requiresProcessing() const = 0;
 
+	QAtomicInt m_state;
 
 private:
 	virtual void doProcessing( sampleFrame * _working_buffer ) = 0;
-
-	QAtomicInt m_done;
 
 } ;
 
@@ -575,7 +584,7 @@ public:
 	{
 		if( _job->requiresProcessing() )
 		{
-			_job->reset();
+			_job->m_state = ThreadableJob::Queued;
 			s_jobQueue.items[s_jobQueue.queueSize.fetchAndAddOrdered(1)] = _job;
 		}
 	}

@@ -59,6 +59,75 @@ FxChannel::~FxChannel()
 
 
 
+void FxChannel::doProcessing(sampleFrame * _buf)
+{
+	FxMixer * fxm = engine::fxMixer();
+
+	const fpp_t fpp = engine::getMixer()->framesPerPeriod();
+	if( _buf == NULL )
+	{
+		_buf = m_buffer;
+	}
+
+	if( ! m_muteModel.value() )
+	{
+		// do mixer sends. loop through the channels that send to this one
+		for( int i = 0; i < m_receives.size(); ++i)
+		{
+			fx_ch_t senderIndex = m_receives[i];
+			FxChannel * sender = fxm->effectChannel(senderIndex);
+
+			// mix it with this one
+			float amt = fxm->channelSendModel(senderIndex,
+											  m_channelIndex)->value();
+			sampleFrame * ch_buf = sender->m_buffer;
+			const float v = sender->m_volumeModel.value();
+			for( f_cnt_t f = 0; f < fpp; ++f )
+			{
+				_buf[f][0] += ch_buf[f][0] * v * amt;
+				_buf[f][1] += ch_buf[f][1] * v * amt;
+			}
+		}
+
+		const float v = m_volumeModel.value();
+
+		m_fxChain.startRunning();
+		m_stillRunning = m_fxChain.processAudioBuffer( _buf, fpp);
+		m_peakLeft = engine::getMixer()->peakValueLeft( _buf, fpp ) * v;
+		m_peakRight = engine::getMixer()->peakValueRight( _buf, fpp ) * v;
+	}
+	else
+	{
+		m_peakLeft = m_peakRight = 0.0f;
+	}
+
+	m_state = ThreadableJob::Done;
+
+	// check if any of its parents are now able to be processed
+	for(int i=0; i<m_sends.size(); ++i)
+	{
+		// if parent.unstarted and every parent.leaf.done:
+		FxChannel * parent = fxm->effectChannel(m_sends[i]);
+		if( parent->m_state == ThreadableJob::Unstarted )
+		{
+			bool everyLeafDone = true;
+			for( int j=0; j<parent->m_receives.size(); ++j )
+			{
+				if( fxm->effectChannel(parent->m_receives[j])->m_state !=
+					ThreadableJob::Done )
+				{
+					everyLeafDone = false;
+					break;
+				}
+			}
+			if( everyLeafDone )
+			{
+				MixerWorkerThread::addJob(parent);
+			}
+		}
+	}
+
+}
 
 
 
@@ -363,51 +432,8 @@ void FxMixer::mixToChannel( const sampleFrame * _buf, fx_ch_t _ch )
 
 void FxMixer::processChannel( fx_ch_t _ch, sampleFrame * _buf )
 {
-	const fpp_t fpp = engine::getMixer()->framesPerPeriod();
-	FxChannel * thisCh = m_fxChannels[_ch];
-	if( _buf == NULL )
-	{
-		_buf = thisCh->m_buffer;
-	}
+	m_fxChannels[_ch]->process(_buf);
 
-	if( ! thisCh->m_muteModel.value() )
-	{
-		// do mixer sends. loop through the channels that send to this one
-		for( int i = 0; i < thisCh->m_receives.size(); ++i)
-		{
-			fx_ch_t senderIndex = thisCh->m_receives[i];
-			FxChannel * sender = m_fxChannels[senderIndex];
-
-			// compute the sending channel
-			processChannel( senderIndex );
-
-			// mix it with this one
-			float amt = channelSendModel(senderIndex, _ch)->value();
-			sampleFrame * ch_buf = sender->m_buffer;
-			const float v = sender->m_volumeModel.value();
-			for( f_cnt_t f = 0; f < fpp; ++f )
-			{
-				_buf[f][0] += ch_buf[f][0] * v * amt;
-				_buf[f][1] += ch_buf[f][1] * v * amt;
-			}
-		}
-
-
-
-		const float v = thisCh->m_volumeModel.value();
-
-		thisCh->m_fxChain.startRunning();
-		thisCh->m_stillRunning = thisCh->
-			m_fxChain.processAudioBuffer( _buf, fpp);
-		thisCh->m_peakLeft =
-			engine::getMixer()->peakValueLeft( _buf, fpp ) * v;
-		thisCh->m_peakRight =
-			engine::getMixer()->peakValueRight( _buf, fpp ) * v;
-	}
-	else
-	{
-		thisCh->m_peakLeft = thisCh->m_peakRight = 0.0f;
-	}
 }
 
 
@@ -421,13 +447,42 @@ void FxMixer::prepareMasterMix()
 
 
 
+void FxMixer::addChannelLeaf( int _ch, sampleFrame * _buf )
+{
+	FxChannel * thisCh = m_fxChannels[_ch];
+
+	// remember what channel number we are, 'cause we need it later
+	thisCh->m_channelIndex = _ch;
+
+	int numDeps = thisCh->m_receives.size();
+	if( numDeps > 0 )
+	{
+		for(int i=0; i<numDeps; ++i)
+		{
+			addChannelLeaf( thisCh->m_receives[i], _buf );
+		}
+	}
+	else
+	{
+		// add this channel to job list
+		MixerWorkerThread::addJob( thisCh );
+	}
+
+}
+
+
 
 void FxMixer::masterMix( sampleFrame * _buf )
 {
 	const int fpp = engine::getMixer()->framesPerPeriod();
 	memcpy( _buf, m_fxChannels[0]->m_buffer, sizeof( sampleFrame ) * fpp );
 
-	processChannel( 0, _buf );
+	// recursively loop through channel dependency chain
+	// and add all channels to job list that have no dependencies
+	// when the channel completes it will check its parent to see if it needs
+	// to be processed.
+	addChannelLeaf( 0, _buf );
+	MixerWorkerThread::startAndWaitForJobs();
 
 	const float v = m_fxChannels[0]->m_volumeModel.value();
 	for( f_cnt_t f = 0; f < engine::getMixer()->framesPerPeriod(); ++f )
@@ -439,11 +494,13 @@ void FxMixer::masterMix( sampleFrame * _buf )
 	m_fxChannels[0]->m_peakLeft *= engine::getMixer()->masterGain();
 	m_fxChannels[0]->m_peakRight *= engine::getMixer()->masterGain();
 
-	// clear all channel buffers
+	// clear all channel buffers and
+	// reset channel process state
 	for( int i = 0; i < numChannels(); ++i)
 	{
 		engine::getMixer()->clearAudioBuffer( m_fxChannels[i]->m_buffer,
 			engine::getMixer()->framesPerPeriod() );
+		m_fxChannels[i]->reset();
 	}
 }
 

@@ -33,31 +33,38 @@
 
 
 
-struct FxChannel
+class FxChannel : public ThreadableJob
 {
-	FxChannel( Model * _parent );
-	~FxChannel();
+	public:
+		FxChannel( Model * _parent );
+		~FxChannel();
 
-	EffectChain m_fxChain;
+		EffectChain m_fxChain;
 
-	// set to true if any effect in the channel is enabled and running
-	bool m_stillRunning;
+		// set to true if any effect in the channel is enabled and running
+		bool m_stillRunning;
 
-	float m_peakLeft;
-	float m_peakRight;
-	sampleFrame * m_buffer;
-	BoolModel m_muteModel;
-	FloatModel m_volumeModel;
-	QString m_name;
-	QMutex m_lock;
+		float m_peakLeft;
+		float m_peakRight;
+		sampleFrame * m_buffer;
+		BoolModel m_muteModel;
+		FloatModel m_volumeModel;
+		QString m_name;
+		QMutex m_lock;
+		int m_channelIndex; // what channel index are we
 
-	// pointers to other channels that this one sends to
-	QVector<fx_ch_t> m_sends;
-	QVector<FloatModel *> m_sendAmount;
+		// pointers to other channels that this one sends to
+		QVector<fx_ch_t> m_sends;
+		QVector<FloatModel *> m_sendAmount;
 
-	// pointers to other channels that send to this one
-	QVector<fx_ch_t> m_receives;
-} ;
+		// pointers to other channels that send to this one
+		QVector<fx_ch_t> m_receives;
+
+		virtual bool requiresProcessing() const { return true; }
+
+	private:
+		virtual void doProcessing( sampleFrame * _working_buffer );
+};
 
 
 
@@ -128,8 +135,10 @@ private:
 	// the fx channels in the mixer. index 0 is always master.
 	QVector<FxChannel *> m_fxChannels;
 
-
+	// make sure we have at least num channels
 	void allocateChannelsTo(int num);
+
+	void addChannelLeaf( int _ch, sampleFrame * _buf );
 
 	friend class mixerWorkerThread;
 	friend class FxMixerView;
