@@ -569,11 +569,16 @@ public:
 		}
 	}
 
-	template<typename T>
-	static void fillJobQueue( const T & _vec )
+	static void resetJobQueue()
 	{
 		s_jobQueue.queueSize = 0;
 		s_jobQueue.itemsDone = 0;
+	}
+
+	template<typename T>
+	static void fillJobQueue( const T & _vec )
+	{
+		resetJobQueue();
 		for( typename T::ConstIterator it = _vec.begin(); it != _vec.end(); ++it )
 		{
 			addJob( *it );

@@ -43,7 +43,8 @@ FxChannel::FxChannel( Model * _parent ) :
 	m_muteModel( false, _parent ),
 	m_volumeModel( 1.0, 0.0, 2.0, 0.01, _parent ),
 	m_name(),
-	m_lock()
+	m_lock(),
+	m_queued( false )
 {
 	engine::getMixer()->clearAudioBuffer( m_buffer,
 					engine::getMixer()->framesPerPeriod() );
@@ -62,12 +63,16 @@ FxChannel::~FxChannel()
 void FxChannel::doProcessing(sampleFrame * _buf)
 {
 	FxMixer * fxm = engine::fxMixer();
-
 	const fpp_t fpp = engine::getMixer()->framesPerPeriod();
-	if( _buf == NULL )
-	{
-		_buf = m_buffer;
-	}
+
+	// <tobydox> ignore the passed _buf
+	// <tobydox> always use m_buffer
+	// <tobydox> this is just an auxilliary buffer if doProcessing()
+	//			 needs one for processing while running
+	// <tobydox> particularly important for playHandles, so Instruments
+	//			 can operate on this buffer the whole time
+	// <tobydox> this improves cache hit rate
+	_buf = m_buffer;
 
 	if( ! m_muteModel.value() )
 	{
@@ -454,6 +459,10 @@ void FxMixer::addChannelLeaf( int _ch, sampleFrame * _buf )
 	// remember what channel number we are, 'cause we need it later
 	thisCh->m_channelIndex = _ch;
 
+	// if we're muted or this channel is seen already, discount it
+	if( thisCh->m_muteModel.value() || thisCh->m_queued )
+		return;
+
 	int numDeps = thisCh->m_receives.size();
 	if( numDeps > 0 )
 	{
@@ -465,6 +474,7 @@ void FxMixer::addChannelLeaf( int _ch, sampleFrame * _buf )
 	else
 	{
 		// add this channel to job list
+		thisCh->m_queued = true;
 		MixerWorkerThread::addJob( thisCh );
 	}
 
@@ -475,14 +485,16 @@ void FxMixer::addChannelLeaf( int _ch, sampleFrame * _buf )
 void FxMixer::masterMix( sampleFrame * _buf )
 {
 	const int fpp = engine::getMixer()->framesPerPeriod();
-	memcpy( _buf, m_fxChannels[0]->m_buffer, sizeof( sampleFrame ) * fpp );
 
 	// recursively loop through channel dependency chain
 	// and add all channels to job list that have no dependencies
 	// when the channel completes it will check its parent to see if it needs
 	// to be processed.
+	MixerWorkerThread::resetJobQueue();
 	addChannelLeaf( 0, _buf );
 	MixerWorkerThread::startAndWaitForJobs();
+
+	memcpy( _buf, m_fxChannels[0]->m_buffer, sizeof( sampleFrame ) * fpp );
 
 	const float v = m_fxChannels[0]->m_volumeModel.value();
 	for( f_cnt_t f = 0; f < engine::getMixer()->framesPerPeriod(); ++f )
@@ -501,6 +513,7 @@ void FxMixer::masterMix( sampleFrame * _buf )
 		engine::getMixer()->clearAudioBuffer( m_fxChannels[i]->m_buffer,
 			engine::getMixer()->framesPerPeriod() );
 		m_fxChannels[i]->reset();
+		m_fxChannels[i]->m_queued = false;
 	}
 }
 

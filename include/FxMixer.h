@@ -52,6 +52,7 @@ class FxChannel : public ThreadableJob
 		QString m_name;
 		QMutex m_lock;
 		int m_channelIndex; // what channel index are we
+		bool m_queued; // are we queued up for rendering yet?
 
 		// pointers to other channels that this one sends to
 		QVector<fx_ch_t> m_sends;
