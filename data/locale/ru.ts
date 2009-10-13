@@ -8843,7 +8843,12 @@ Please note that in some cases parallelizing won&apos;t work with small buffer-s
     </message>
     <message>
         <location filename="../../src/core/song.cpp" line="1073"/>
-        <source>MIDI sequences (*.mid *.rif);;FL Studio projects (*.flp)</source>
+        <source>MIDI sequences</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/core/song.cpp" line="1073"/>
+        <source>FL Studio projects</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

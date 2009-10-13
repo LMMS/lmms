@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="1.1" language="de_DE">
+<!DOCTYPE TS>
+<TS version="2.0" language="de_DE">
 <context>
     <name>QWidget</name>
     <message>
@@ -5850,8 +5851,18 @@ Latenz: %2 ms</translation>
     </message>
     <message>
         <location filename="../../src/core/song.cpp" line="1073"/>
-        <source>MIDI sequences (*.mid *.rif);;FL Studio projects (*.flp)</source>
-        <translation>MIDI-Dateien (*.mid *.rif);;FL Studio Projekte (*.flp)</translation>
+        <source>MIDI sequences</source>
+        <translation>MIDI-Dateien</translation>
+    </message>
+    <message>
+        <location filename="../../src/core/song.cpp" line="1073"/>
+        <source>FL Studio projects</source>
+        <translation>FL Studio Projekte</translation>
+    </message>
+    <message>
+        <location filename="../../src/core/song.cpp" line="1073"/>
+        <source>All file types</source>
+        <translation>Alle Dateitypen</translation>
     </message>
 </context>
 <context>
