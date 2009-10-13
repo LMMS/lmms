@@ -22,10 +22,10 @@
  *
  */
 
-
 #include <QtXml/QDomElement>
 
 #include "FxMixer.h"
+#include "MixerWorkerThread.h"
 #include "Cpu.h"
 #include "Effect.h"
 #include "song.h"
@@ -60,7 +60,7 @@ FxChannel::~FxChannel()
 
 
 
-void FxChannel::doProcessing(sampleFrame * _buf)
+void FxChannel::doProcessing( sampleFrame * _buf )
 {
 	FxMixer * fxm = engine::fxMixer();
 	const fpp_t fpp = engine::getMixer()->framesPerPeriod();
@@ -97,7 +97,7 @@ void FxChannel::doProcessing(sampleFrame * _buf)
 		const float v = m_volumeModel.value();
 
 		m_fxChain.startRunning();
-		m_stillRunning = m_fxChain.processAudioBuffer( _buf, fpp);
+		m_stillRunning = m_fxChain.processAudioBuffer( _buf, fpp );
 		m_peakLeft = engine::getMixer()->peakValueLeft( _buf, fpp ) * v;
 		m_peakRight = engine::getMixer()->peakValueRight( _buf, fpp ) * v;
 	}
@@ -113,13 +113,13 @@ void FxChannel::doProcessing(sampleFrame * _buf)
 	{
 		// if parent.unstarted and every parent.leaf.done:
 		FxChannel * parent = fxm->effectChannel(m_sends[i]);
-		if( parent->m_state == ThreadableJob::Unstarted )
+		if( parent->state() == ThreadableJob::Unstarted )
 		{
 			bool everyLeafDone = true;
 			for( int j=0; j<parent->m_receives.size(); ++j )
 			{
-				if( fxm->effectChannel(parent->m_receives[j])->m_state !=
-					ThreadableJob::Done )
+				if( fxm->effectChannel( parent->m_receives[j] )->state() !=
+														ThreadableJob::Done )
 				{
 					everyLeafDone = false;
 					break;
@@ -435,15 +435,6 @@ void FxMixer::mixToChannel( const sampleFrame * _buf, fx_ch_t _ch )
 
 
 
-void FxMixer::processChannel( fx_ch_t _ch, sampleFrame * _buf )
-{
-	m_fxChannels[_ch]->process(_buf);
-
-}
-
-
-
-
 void FxMixer::prepareMasterMix()
 {
 	engine::getMixer()->clearAudioBuffer( m_fxChannels[0]->m_buffer,
@@ -492,7 +483,7 @@ void FxMixer::masterMix( sampleFrame * _buf )
 	// to be processed.
 	MixerWorkerThread::resetJobQueue();
 	addChannelLeaf( 0, _buf );
-	while( m_fxChannels[0]->m_state != ThreadableJob::Done )
+	while( m_fxChannels[0]->state() != ThreadableJob::Done )
 	{
 		MixerWorkerThread::startAndWaitForJobs();
 	}

@@ -27,7 +27,6 @@
 
 #include <QtCore/QString>
 #include <QtCore/QMutex>
-#include <QtCore/QMutexLocker>
 
 #include "mixer.h"
 

@@ -76,7 +76,6 @@ public:
 	virtual ~FxMixer();
 
 	void mixToChannel( const sampleFrame * _buf, fx_ch_t _ch );
-	void processChannel( fx_ch_t _ch, sampleFrame * _buf = NULL );
 
 	void prepareMasterMix();
 	void masterMix( sampleFrame * _buf );

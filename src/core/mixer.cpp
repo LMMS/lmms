@@ -26,6 +26,7 @@
 
 #include "mixer.h"
 #include "FxMixer.h"
+#include "MixerWorkerThread.h"
 #include "play_handle.h"
 #include "song.h"
 #include "templates.h"
@@ -59,13 +60,6 @@
 #ifdef LMMS_HAVE_PTHREAD_H
 #include <pthread.h>
 #endif
-
-
-
-MixerWorkerThread::JobQueue MixerWorkerThread::s_jobQueue;
-
-
-
 
 
 mixer::mixer() :

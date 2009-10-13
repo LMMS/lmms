@@ -25,6 +25,7 @@
 #ifndef _PLAY_HANDLE_H
 #define _PLAY_HANDLE_H
 
+#include "ThreadableJob.h"
 #include "mixer.h"
 
 class track;
