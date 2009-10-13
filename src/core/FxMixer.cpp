@@ -492,7 +492,10 @@ void FxMixer::masterMix( sampleFrame * _buf )
 	// to be processed.
 	MixerWorkerThread::resetJobQueue();
 	addChannelLeaf( 0, _buf );
-	MixerWorkerThread::startAndWaitForJobs();
+	while( m_fxChannels[0]->m_state != ThreadableJob::Done )
+	{
+		MixerWorkerThread::startAndWaitForJobs();
+	}
 
 	memcpy( _buf, m_fxChannels[0]->m_buffer, sizeof( sampleFrame ) * fpp );
 

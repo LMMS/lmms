@@ -620,7 +620,7 @@ public:
 		m->m_workers[m->m_numWorkers]->processJobQueue();
 		while( s_jobQueue.itemsDone < s_jobQueue.queueSize )
 		{
-			SPINLOCK_PAUSE();
+			startJobs();
 		}
 	}
 
