@@ -35,10 +35,11 @@
 #include <alsa/asoundlib.h>
 
 #include "AudioDevice.h"
+#include "QAbstractListModel"
 
 
 class lcdSpinBox;
-class QLineEdit;
+class QComboBox;
 
 
 class AudioAlsa : public AudioDevice, public QThread
@@ -54,6 +55,23 @@ public:
 	}
 
 	static QString probeDevice();
+	
+
+	class DeviceListModel : public QAbstractListModel
+	{
+	public:
+		// iface = {"pcm", "rawmidi", "timer", "seq"}
+		// stream =  {SND_PCM_STREAM_CAPTURE, SND_PCM_STREAM_PLAYBACK}
+		DeviceListModel( const char * _iface, snd_pcm_stream_t stream );
+
+		int rowCount( const QModelIndex & parent = QModelIndex() ) const;
+		QVariant data( const QModelIndex & index,
+		               int role = Qt::DisplayRole ) const;
+	private:
+		typedef QPair<QString,QString> StringPair;
+		typedef QList<StringPair> DeviceList;
+		DeviceList m_devices;
+	};
 
 
 	class setupWidget : public AudioDevice::setupWidget
@@ -65,8 +83,13 @@ public:
 		virtual void saveSettings();
 
 	private:
-		QLineEdit * m_device;
+		QComboBox * m_device;
 		lcdSpinBox * m_channels;
+
+		void poo(const QString & s)
+		{
+			printf("Got %s\n", qPrintable( s ) );
+		}
 
 	} ;
 
