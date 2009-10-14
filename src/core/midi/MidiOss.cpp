@@ -28,6 +28,8 @@
 #ifdef LMMS_HAVE_OSS
 
 
+#include <QtGui/QCompleter>
+#include <QtGui/QDirModel>
 #include <QtGui/QLabel>
 #include <QtGui/QLineEdit>
 
@@ -118,11 +120,17 @@ MidiOss::setupWidget::setupWidget( QWidget * _parent ) :
 	MidiClientRaw::setupWidget( MidiOss::name(), _parent )
 {
 	m_device = new QLineEdit( MidiOss::probeDevice(), this );
-	m_device->setGeometry( 10, 20, 160, 20 );
+	m_device->setGeometry( 10, 20, 180, 20 );
+	QDirModel * model = new QDirModel( QStringList(), 
+			QDir::AllDirs | QDir::System,
+			QDir::Name | QDir::DirsFirst,
+			this );
+	m_device->setCompleter(	new QCompleter( model, this ) );
+
 
 	QLabel * dev_lbl = new QLabel( tr( "DEVICE" ), this );
 	dev_lbl->setFont( pointSize<6>( dev_lbl->font() ) );
-	dev_lbl->setGeometry( 10, 40, 160, 10 );
+	dev_lbl->setGeometry( 10, 40, 180, 10 );
 }
 
 
