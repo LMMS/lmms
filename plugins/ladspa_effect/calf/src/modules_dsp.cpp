@@ -1087,8 +1087,9 @@ void gain_reduction_audio_module::deactivate()
 
 void gain_reduction_audio_module::process(float &left, float &right)
 {
-    float compression = 1.f;
     meter_out -= meter_out * 5.f * 1 / srate;
+    meter_comp += (1 - meter_comp) * 5.f * 1 / srate;
+    float gain = 1.f;
     if(bypass < 0.5f) {
         // this routine is mainly copied from thor's compressor module
         // greatest sounding compressor I've heard!
@@ -1110,13 +1111,10 @@ void gain_reduction_audio_module::process(float &left, float &right)
             
         linSlope += (absample - linSlope) * (absample > linSlope ? attack_coeff : release_coeff);
         
-        float gain = 1.f;
-
         if(linSlope > 0.f) {
             gain = output_gain(linSlope, rms);
         }
 
-        compression = gain;
         gain *= makeup;
         
         left *= gain;
@@ -1130,7 +1128,9 @@ void gain_reduction_audio_module::process(float &left, float &right)
     if(maxLR > meter_out) {
         meter_out = maxLR;
     }
-    meter_comp = compression;
+    if(gain < meter_comp) {
+        meter_comp = gain;
+    }
 }
 
 float gain_reduction_audio_module::output_level(float slope) {
