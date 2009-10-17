@@ -626,7 +626,7 @@ void monosynth_audio_module::set_frequency()
 {
     float detune_scaled = (detune - 1); // * log(freq / 440);
     if (*params[par_scaledetune] > 0)
-        detune_scaled *= pow(20.0 / freq, *params[par_scaledetune]);
+        detune_scaled *= pow(20.0 / freq, (double)*params[par_scaledetune]);
     float p1 = 1, p2 = 1;
     if (moddest[moddest_o1detune] != 0)
         p1 = pow(2.0, moddest[moddest_o1detune] * (1.0 / 1200.0));
