@@ -131,7 +131,7 @@ struct monosynth_metadata: public plugin_metadata<monosynth_metadata>
 struct compressor_metadata: public plugin_metadata<compressor_metadata>
 {
     enum { in_count = 2, out_count = 2, support_midi = false, require_midi = false, rt_capable = true };
-    enum { param_threshold, param_ratio, param_attack, param_release, param_makeup, param_knee, param_detection, param_stereo_link, param_aweighting, param_compression, param_peak, param_clip, param_bypass, // param_freq, param_bw, 
+    enum { param_threshold, param_ratio, param_attack, param_release, param_makeup, param_knee, param_detection, param_stereo_link, param_aweighting, param_compression, param_peak, param_clip, param_bypass, param_input,// param_freq, param_bw, 
         param_count };
     PLUGIN_NAME_ID_LABEL("compressor", "compressor", "Compressor")
 };

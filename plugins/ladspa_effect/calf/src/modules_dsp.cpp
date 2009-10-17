@@ -580,8 +580,8 @@ uint32_t compressor_audio_module::process(uint32_t offset, uint32_t numsamples, 
     clip -= std::min(clip, numsamples);
 
     while(offset < numsamples) {
-        float left = ins[0][offset];
-        float right = ins[1][offset];
+        float left = ins[0][offset] * *params[param_input];
+        float right = ins[1][offset] * *params[param_input];
         
         if(aweighting == 1) {
             left = awL.process(left);
