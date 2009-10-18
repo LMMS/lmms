@@ -63,8 +63,10 @@ void MixerWorkerThread::quit()
 
 void MixerWorkerThread::processJobQueue()
 {
-	while( s_jobQueue.itemsDone != s_jobQueue.queueSize )
+	bool processedJob = true;
+	while( processedJob && (int) s_jobQueue.itemsDone < (int) s_jobQueue.queueSize )
 	{
+		processedJob = false;
 		for( int i = 0; i < s_jobQueue.queueSize; ++i )
 		{
 			ThreadableJob * job =
@@ -72,6 +74,7 @@ void MixerWorkerThread::processJobQueue()
 			if( job )
 			{
 				job->process( m_workingBuf );
+				processedJob = true;
 				s_jobQueue.itemsDone.fetchAndAddOrdered( 1 );
 			}
 		}
@@ -118,6 +121,13 @@ void MixerWorkerThread::waitForJobs()
 	// TODO: this is dirty!
 	mixer * m = engine::getMixer();
 	m->m_workers[m->m_numWorkers]->processJobQueue();
+
+	while( (int) s_jobQueue.itemsDone < (int) s_jobQueue.queueSize )
+	{
+#if defined(LMMS_HOST_X86) || defined(LMMS_HOST_X86_64)
+		asm( "pause" );
+#endif
+	}
 }
 
 
