@@ -912,8 +912,11 @@ void song::loadProject( const QString & _file_name )
 		{
 			engine::fxMixer()->restoreState( node.toElement() );
 
-			// refresh FxMixerView
-			engine::fxMixerView()->refreshDisplay();
+			if( engine::hasGUI() )
+			{
+				// refresh FxMixerView
+				engine::fxMixerView()->refreshDisplay();
+			}
 		}
 
 		node = node.nextSibling();
