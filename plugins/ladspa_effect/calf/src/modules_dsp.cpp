@@ -606,8 +606,8 @@ uint32_t compressor_audio_module::process(uint32_t offset, uint32_t numsamples, 
         compression = gain;
         gain *= makeup;
 
-        float outL = ins[0][offset] * gain;
-        float outR = ins[1][offset] * gain;
+        float outL = ins[0][offset] * gain * *params[param_input];
+        float outR = ins[1][offset] * gain * *params[param_input];
         
         outs[0][offset] = outL;
         outs[1][offset] = outR;

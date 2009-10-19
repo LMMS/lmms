@@ -203,6 +203,8 @@ public:
     uint32_t srate;
     gain_smoothing amount, dryamount;
     int predelay_amt;
+    float meter_wet, meter_out;
+    uint32_t clip;
     float *ins[in_count]; 
     float *outs[out_count];
     float *params[param_count];
@@ -223,7 +225,9 @@ public:
     }
     uint32_t process(uint32_t offset, uint32_t numsamples, uint32_t inputs_mask, uint32_t outputs_mask) {
         numsamples += offset;
-        
+        meter_wet  -= meter_wet * 2.5 * numsamples / srate;
+        meter_out  -= meter_out * 2.5 * numsamples / srate;
+        clip   -= std::min(clip, numsamples);
         for (uint32_t i = offset; i < numsamples; i++) {
             float dry = dryamount.get();
             float wet = amount.get();
@@ -236,12 +240,32 @@ public:
             reverb.process(rl, rr);
             outs[0][i] = dry*s.left + wet*rl;
             outs[1][i] = dry*s.right + wet*rr;
+            float m_wet = std::max(fabs(wet*rl), fabs(wet*rr));
+            float m_out = std::max(fabs(outs[0][i]), fabs(outs[1][i]));
+            if(m_wet > meter_wet) {
+                meter_wet = m_wet;
+            }
+            if(m_out > meter_out) {
+                meter_out = m_out;
+            }
+            if(outs[0][i] > 1.f or outs[1][i] > 1.f) {
+                clip = srate >> 3;
+            }
         }
         reverb.extra_sanitize();
         left_lo.sanitize();
         left_hi.sanitize();
         right_lo.sanitize();
         right_hi.sanitize();
+        if(params[par_meter_wet] != NULL) {
+            *params[par_meter_wet] = meter_wet;
+        }
+        if(params[par_meter_out] != NULL) {
+            *params[par_meter_out] = meter_out;
+        }
+        if(params[par_clip] != NULL) {
+            *params[par_clip] = clip;
+        }
         return outputs_mask;
     }
     void activate();
@@ -416,7 +440,9 @@ public:
     float maspeed_l;
     /// Current rotation speed for treble rotor - manual mode
     float maspeed_h;
-
+    
+    int meter_l, meter_h;
+    
     rotary_speaker_audio_module();
     void set_sample_rate(uint32_t sr);
     void setup();
@@ -501,7 +527,8 @@ public:
             int xl = pseudo_sine_scl(phase_l), yl = pseudo_sine_scl(phase_l + 0x40000000);
             int xh = pseudo_sine_scl(phase_h), yh = pseudo_sine_scl(phase_h + 0x40000000);
             // printf("%d %d %d\n", shift, pdelta, shift + pdelta + 20 * xl);
-            
+            meter_l = xl;
+            meter_h = xh;
             // float out_hi_l = in_mono - delay.get_interp_1616(shift + md * xh) + delay.get_interp_1616(shift + md * 65536 + pdelta - md * yh) - delay.get_interp_1616(shift + md * 65536 + pdelta + pdelta - md * xh);
             // float out_hi_r = in_mono + delay.get_interp_1616(shift + md * 65536 - md * yh) - delay.get_interp_1616(shift + pdelta + md * xh) + delay.get_interp_1616(shift + pdelta + pdelta + md * yh);
             float out_hi_l = in_mono + delay.get_interp_1616(shift + md * xh) - mix2 * delay.get_interp_1616(shift + md * 65536 + pdelta - md * yh) + mix3 * delay.get_interp_1616(shift + md * 65536 + pdelta + pdelta - md * xh);
@@ -540,6 +567,12 @@ public:
             bool u2 = incr_towards(aspeed_h, dspeed, delta, delta * 0.5);
             if (u1 || u2)
                 set_vibrato();
+        }
+        if(params[par_meter_l] != NULL) {
+            *params[par_meter_l] = (float)meter_l / 65536.0;
+        }
+        if(params[par_meter_h] != NULL) {
+            *params[par_meter_h] = (float)meter_h / 65536.0;
         }
         return outputs_mask;
     }
