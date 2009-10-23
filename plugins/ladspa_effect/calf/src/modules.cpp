@@ -369,11 +369,11 @@ CALF_PORT_PROPS(monosynth) = {
     { 1,          0,    1,    0, PF_FLOAT | PF_SCALE_PERC | PF_CTL_KNOB, NULL, "env2res", "Env->Res" },
     { 1,          0,    1,    0, PF_FLOAT | PF_SCALE_PERC | PF_CTL_KNOB, NULL, "env2amp", "Env->Amp" },
     
-    { 1,          1,20000,    0, PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_MSEC, NULL, "adsr_a", "Attack" },
-    { 350,       10,20000,    0, PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_MSEC, NULL, "adsr_d", "Decay" },
+    { 1,          1,20000,    0, PF_FLOAT | PF_SCALE_LOG | PF_CTL_FADER | PF_UNIT_MSEC, NULL, "adsr_a", "Attack" },
+    { 350,       10,20000,    0, PF_FLOAT | PF_SCALE_LOG | PF_CTL_FADER | PF_UNIT_MSEC, NULL, "adsr_d", "Decay" },
     { 0.5,        0,    1,    0, PF_FLOAT | PF_SCALE_PERC, NULL, "adsr_s", "Sustain" },
-    { 0,     -10000,10000,   21, PF_FLOAT | PF_SCALE_LINEAR | PF_CTL_KNOB | PF_UNIT_MSEC, NULL, "adsr_f", "Fade" },
-    { 50,       10,20000,     0, PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_MSEC, NULL, "adsr_r", "Release" },
+    { 0,     -10000,10000,   21, PF_FLOAT | PF_SCALE_LINEAR | PF_CTL_FADER | PF_UNIT_MSEC, NULL, "adsr_f", "Fade" },
+    { 50,       10,20000,     0, PF_FLOAT | PF_SCALE_LOG | PF_CTL_FADER | PF_UNIT_MSEC, NULL, "adsr_r", "Release" },
     
     { 0,          0,    2,    0, PF_FLOAT | PF_SCALE_PERC, NULL, "key_follow", "Key Follow" },
     { 0,          0,    3,    0, PF_ENUM | PF_CTL_COMBO, monosynth_legato_names, "legato", "Legato Mode" },
@@ -614,8 +614,8 @@ CALF_PORT_PROPS(fluidsynth) = {
     { 0.5,         0,   1, 100, PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_PROP_OUTPUT_GAIN, NULL, "master", "Volume" },
     { 0,          0,    0,    0, PF_STRING | PF_PROP_MSGCONTEXT, &fluidsynth_init_soundfont, "soundfont", "Soundfont" },
     { 2,          0,    3,    0, PF_ENUM | PF_CTL_COMBO, fluidsynth_interpolation_names, "interpolation", "Interpolation" },
-    { 1,          0,    1,    0, PF_BOOL | PF_CTL_TOGGLE, NULL, "reverb", "Enable Reverb" },
-    { 1,          0,    1,    0, PF_BOOL | PF_CTL_TOGGLE, NULL, "chorus", "Enable Chorus" },
+    { 1,          0,    1,    0, PF_BOOL | PF_CTL_TOGGLE, NULL, "reverb", "Reverb" },
+    { 1,          0,    1,    0, PF_BOOL | PF_CTL_TOGGLE, NULL, "chorus", "Chorus" },
 };
 
 ////////////////////////////////////////////////////////////////////////////
