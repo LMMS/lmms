@@ -574,9 +574,7 @@ uint32_t compressor_audio_module::process(uint32_t offset, uint32_t numsamples, 
     numsamples += offset;
     
     float compression = 1.f;
-
-    peak -= peak * 5.f * numsamples / srate;
-    
+    peak = 0.f;
     clip -= std::min(clip, numsamples);
 
     while(offset < numsamples) {
@@ -615,12 +613,10 @@ uint32_t compressor_audio_module::process(uint32_t offset, uint32_t numsamples, 
         ++offset;
         
         float maxLR = std::max(fabs(outL), fabs(outR));
-        
-        if(maxLR > 1.f) clip = srate >> 3; /* blink clip LED for 125 ms */
-        
-        if(maxLR > peak) {
+        if(maxLR > peak)
             peak = maxLR;
-        }
+        
+        if(peak > 1.f) clip = srate >> 3; /* blink clip LED for 125 ms */
     }
     
     detected = linSlope;
@@ -778,11 +774,10 @@ uint32_t multibandcompressor_audio_module::process(uint32_t offset, uint32_t num
         clip_inR    -= std::min(clip_inR,  numsamples);
         clip_outL   -= std::min(clip_outL, numsamples);
         clip_outR   -= std::min(clip_outR, numsamples);
-        meter_inL  -= meter_inL * 2.5 * numsamples / srate;
-        meter_inR  -= meter_inR * 2.5 * numsamples / srate;
-        meter_outL -= meter_outL * 2.5 * numsamples / srate;
-        meter_outR -= meter_outR * 2.5 * numsamples / srate;
-        
+        meter_inL = 0.f;
+        meter_inR = 0.f;
+        meter_outL = 0.f;
+        meter_outR = 0.f;
         while(offset < numsamples) {
             // cycle through samples
             float inL = ins[0][offset];
@@ -873,7 +868,7 @@ uint32_t multibandcompressor_audio_module::process(uint32_t offset, uint32_t num
             if(outR > 1.f) {
                 clip_outR = srate >> 3;
             }
-            // rise up in / out meters
+            // set up in / out meters
             if(inL > meter_inL) {
                 meter_inL = inL;
             }
@@ -1087,9 +1082,8 @@ void gain_reduction_audio_module::deactivate()
 
 void gain_reduction_audio_module::process(float &left, float &right)
 {
-    meter_out -= meter_out * 5.f * 1 / srate;
-    meter_comp += (1 - meter_comp) * 5.f * 1 / srate;
     float gain = 1.f;
+    float maxLR = 0.f;
     if(bypass < 0.5f) {
         // this routine is mainly copied from thor's compressor module
         // greatest sounding compressor I've heard!
@@ -1119,18 +1113,11 @@ void gain_reduction_audio_module::process(float &left, float &right)
         
         left *= gain;
         right *= gain;
-        
+        maxLR = std::max(fabs(left), fabs(right));
         detected = rms ? sqrt(linSlope) : linSlope;
     }
-    
-    float maxLR = std::max(fabs(left), fabs(right));
-    
-    if(maxLR > meter_out) {
-        meter_out = maxLR;
-    }
-    if(gain < meter_comp) {
-        meter_comp = gain;
-    }
+    meter_out = maxLR;
+    meter_comp = gain;
 }
 
 float gain_reduction_audio_module::output_level(float slope) {

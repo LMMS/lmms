@@ -225,8 +225,6 @@ public:
     }
     uint32_t process(uint32_t offset, uint32_t numsamples, uint32_t inputs_mask, uint32_t outputs_mask) {
         numsamples += offset;
-        meter_wet  -= meter_wet * 2.5 * numsamples / srate;
-        meter_out  -= meter_out * 2.5 * numsamples / srate;
         clip   -= std::min(clip, numsamples);
         for (uint32_t i = offset; i < numsamples; i++) {
             float dry = dryamount.get();
@@ -240,14 +238,8 @@ public:
             reverb.process(rl, rr);
             outs[0][i] = dry*s.left + wet*rl;
             outs[1][i] = dry*s.right + wet*rr;
-            float m_wet = std::max(fabs(wet*rl), fabs(wet*rr));
-            float m_out = std::max(fabs(outs[0][i]), fabs(outs[1][i]));
-            if(m_wet > meter_wet) {
-                meter_wet = m_wet;
-            }
-            if(m_out > meter_out) {
-                meter_out = m_out;
-            }
+            meter_wet = std::max(fabs(wet*rl), fabs(wet*rr));
+            meter_out = std::max(fabs(outs[0][i]), fabs(outs[1][i]));
             if(outs[0][i] > 1.f or outs[1][i] > 1.f) {
                 clip = srate >> 3;
             }
