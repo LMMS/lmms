@@ -72,7 +72,6 @@ mixer::mixer() :
 	m_cpuLoad( 0 ),
 	m_workers(),
 	m_numWorkers( QThread::idealThreadCount()-1 ),
-	m_queueReadyWaitCond(),
 	m_qualitySettings( qualitySettings::Mode_Draft ),
 	m_masterGain( 1.0f ),
 	m_audioDev( NULL ),
@@ -130,7 +129,7 @@ mixer::mixer() :
 
 	for( int i = 0; i < m_numWorkers+1; ++i )
 	{
-		MixerWorkerThread * wt = new MixerWorkerThread( i, this );
+		MixerWorkerThread * wt = new MixerWorkerThread( this );
 		if( i < m_numWorkers )
 		{
 			wt->start( QThread::TimeCriticalPriority );
@@ -148,14 +147,11 @@ mixer::mixer() :
 
 mixer::~mixer()
 {
-	// distribute an empty job-queue so that worker-threads
-	// get out of their processing-loop
-	MixerWorkerThread::s_jobQueue.queueSize = 0;
 	for( int w = 0; w < m_numWorkers; ++w )
 	{
 		m_workers[w]->quit();
 	}
-	MixerWorkerThread::startJobs();
+	MixerWorkerThread::startAndWaitForJobs();
 	for( int w = 0; w < m_numWorkers; ++w )
 	{
 		m_workers[w]->wait( 500 );

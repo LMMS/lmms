@@ -481,7 +481,7 @@ void FxMixer::masterMix( sampleFrame * _buf )
 	// and add all channels to job list that have no dependencies
 	// when the channel completes it will check its parent to see if it needs
 	// to be processed.
-	MixerWorkerThread::resetJobQueue();
+	MixerWorkerThread::resetJobQueue( MixerWorkerThread::JobQueue::Dynamic );
 	addChannelLeaf( 0, _buf );
 	while( m_fxChannels[0]->state() != ThreadableJob::Done )
 	{

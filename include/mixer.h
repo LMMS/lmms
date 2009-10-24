@@ -433,7 +433,6 @@ private:
 	int m_cpuLoad;
 	QVector<MixerWorkerThread *> m_workers;
 	int m_numWorkers;
-	QWaitCondition m_queueReadyWaitCond;
 
 
 	PlayHandleList m_playHandles;
@@ -461,7 +460,6 @@ private:
 
 
 	friend class engine;
-	friend class MixerWorkerThread;
 
 } ;
 
