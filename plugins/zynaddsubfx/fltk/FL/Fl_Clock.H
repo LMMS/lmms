@@ -1,5 +1,5 @@
 //
-// "$Id: Fl_Clock.H 6754 2009-04-12 11:32:22Z AlbrechtS $"
+// "$Id: Fl_Clock.H 6812 2009-07-01 07:27:25Z AlbrechtS $"
 //
 // Clock header file for the Fast Light Tool Kit (FLTK).
 //
@@ -133,5 +133,5 @@ public:
 #endif
 
 //
-// End of "$Id: Fl_Clock.H 6754 2009-04-12 11:32:22Z AlbrechtS $".
+// End of "$Id: Fl_Clock.H 6812 2009-07-01 07:27:25Z AlbrechtS $".
 //

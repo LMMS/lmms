@@ -1,5 +1,5 @@
 //
-// "$Id: fl_draw.H 6779 2009-04-24 09:28:30Z yuri $"
+// "$Id: fl_draw.H 6878 2009-09-17 22:12:24Z matt $"
 //
 // Portable drawing function header file for the Fast Light Tool Kit (FLTK).
 //
@@ -203,14 +203,7 @@ inline Fl_Fontsize fl_size() {return fl_size_;}
   You can also use the value of \p size passed to fl_font()
 */
 FL_EXPORT int   fl_height();	// using "size" should work ok
-/**
-  Dummy passthru function called only in Fl_Text_Display that simply returns
-  the font height as given by the \p size parameter in the same call!
-
-  \todo Is fl_height(int, int size) required for Fl_Text_Dispay?
-        Why not use \p size parameter directly?
-*/
-inline int fl_height(int, int size) {return size;}
+FL_EXPORT int fl_height(int font, int size);
 /**
   Returns the recommended distance above the bottom of a fl_height() tall box to
   draw the text at so it looks centered vertically in that box.
@@ -448,8 +441,8 @@ FL_EXPORT int fl_measure_pixmap(const char* const* cdata, int &w, int &h);
 // other:
 FL_EXPORT void fl_scroll(int X, int Y, int W, int H, int dx, int dy,
                          void (*draw_area)(void*, int,int,int,int), void* data);
-FL_EXPORT const char* fl_shortcut_label(int shortcut);
-FL_EXPORT const char* fl_shortcut_label(int shortcuti, const char **eom);
+FL_EXPORT const char* fl_shortcut_label(Fl_Shortcut shortcut);
+FL_EXPORT const char* fl_shortcut_label(Fl_Shortcut shortcut, const char **eom);
 FL_EXPORT void fl_overlay_rect(int x,int y,int w,int h);
 FL_EXPORT void fl_overlay_clear();
 FL_EXPORT void fl_cursor(Fl_Cursor, Fl_Color fg=FL_BLACK, Fl_Color bg=FL_WHITE);
@@ -475,5 +468,5 @@ FL_EXPORT int fl_add_symbol(const char* name, void (*drawit)(Fl_Color), int scal
 #endif
 
 //
-// End of "$Id: fl_draw.H 6779 2009-04-24 09:28:30Z yuri $".
+// End of "$Id: fl_draw.H 6878 2009-09-17 22:12:24Z matt $".
 //

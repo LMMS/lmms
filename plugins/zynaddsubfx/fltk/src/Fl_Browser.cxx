@@ -1,5 +1,5 @@
 //
-// "$Id: Fl_Browser.cxx 6726 2009-03-27 16:52:31Z greg.ercolano $"
+// "$Id: Fl_Browser.cxx 6895 2009-09-21 06:35:08Z greg.ercolano $"
 //
 // Browser widget for the Fast Light Tool Kit (FLTK).
 //
@@ -44,10 +44,16 @@
 #define SELECTED 1
 #define NOTDISPLAYED 2
 
+// WARNING:
+//       Fl_File_Chooser.cxx also has a definition of this structure (FL_BLINE).
+//       Changes to FL_BLINE *must* be reflected in Fl_File_Chooser.cxx as well.
+//       This hack in Fl_File_Chooser should be solved.
+//
 struct FL_BLINE {	// data is in a linked list of these
   FL_BLINE* prev;
   FL_BLINE* next;
   void* data;
+  Fl_Image* icon;
   short length;		// sizeof(txt)-1, may be longer than string
   char flags;		// selected, displayed
   char txt[1];		// start of allocated array
@@ -138,7 +144,8 @@ const char *Fl_Browser::item_text(void *item) const {
   item_next(), etc. to access the internal linked list more efficiently.
 
   \param[in] line The line number of the item to return. (1 based)
-  \returns The returned item.
+  \retval item that was found.
+  \retval NULL if line is out of range.
   \see item_at(), find_line(), lineno()
 */
 FL_BLINE* Fl_Browser::find_line(int line) const {
@@ -287,6 +294,7 @@ void Fl_Browser::insert(int line, const char* newtext, void* d) {
   t->flags = 0;
   strcpy(t->txt, newtext);
   t->data = d;
+  t->icon = 0;
   insert(line, t);
 }
 
@@ -321,6 +329,7 @@ void Fl_Browser::text(int line, const char* newtext) {
     replacing(t, n);
     cache = n;
     n->data = t->data;
+    n->icon = t->icon;
     n->length = (short)l;
     n->flags = t->flags;
     n->prev = t->prev;
@@ -364,8 +373,7 @@ int Fl_Browser::item_height(void *item) const {
     fl_font(textfont(), textsize());
     int hh = fl_height();
     if (hh > hmax) hmax = hh;
-  }
-  else {
+  } else {
     const int* i = column_widths();
     // do each column separately as they may all set different fonts:
     for (char* str = l->txt; str && *str; str++) {
@@ -400,6 +408,9 @@ int Fl_Browser::item_height(void *item) const {
     }
   }
 
+  if (l->icon && (l->icon->h()+2)>hmax) {
+    hmax = l->icon->h() + 2;	// leave 2px above/below
+  }
   return hmax; // previous version returned hmax+2!
 }
 
@@ -412,7 +423,8 @@ int Fl_Browser::item_height(void *item) const {
        incr_height(), full_height()
 */
 int Fl_Browser::item_width(void *item) const {
-  char* str = ((FL_BLINE*)item)->txt;
+  FL_BLINE* l=(FL_BLINE*)item;
+  char* str = l->txt;
   const int* i = column_widths();
   int ww = 0;
 
@@ -457,6 +469,8 @@ int Fl_Browser::item_width(void *item) const {
   if (*str == format_char_ && str[1])
     str ++;
 
+  if (ww==0 && l->icon) ww = l->icon->w();
+
   fl_font(font, tsize);
   return ww + int(fl_width(str)) + 6;
 }
@@ -492,15 +506,26 @@ int Fl_Browser::incr_height() const {
   \param[in] X,Y,W,H position and size.
 */
 void Fl_Browser::item_draw(void* item, int X, int Y, int W, int H) const {
-  char* str = ((FL_BLINE*)item)->txt;
+  FL_BLINE* l = (FL_BLINE*)item;
+  char* str = l->txt;
   const int* i = column_widths();
 
+  bool first = true;	// for icon
   while (W > 6) {	// do each tab-separated field
     int w1 = W;	// width for this field
     char* e = 0; // pointer to end of field or null if none
     if (*i) { // find end of field and temporarily replace with 0
       e = strchr(str, column_char());
       if (e) {*e = 0; w1 = *i++;}
+    }
+    // Icon drawing code
+    if (first) {
+      first = false;
+      if (l->icon) {
+	l->icon->draw(X+2,Y+1);	// leave 2px left, 1px above
+	int iconw = l->icon->w()+2;
+	X += iconw; W -= iconw; w1 -= iconw;
+      }
     }
     int tsize = textsize();
     Fl_Font font = textfont();
@@ -521,7 +546,7 @@ void Fl_Browser::item_draw(void* item, int X, int Y, int W, int H) const {
       case 'c': talign = FL_ALIGN_CENTER; break;
       case 'r': talign = FL_ALIGN_RIGHT; break;
       case 'B': 
-	if (!(((FL_BLINE*)item)->flags & SELECTED)) {
+	if (!(l->flags & SELECTED)) {
 	  fl_color((Fl_Color)strtol(str, &str, 10));
 	  fl_rectf(X, Y, w1, H);
 	} else strtol(str, &str, 10);
@@ -557,7 +582,7 @@ void Fl_Browser::item_draw(void* item, int X, int Y, int W, int H) const {
     }
   BREAK:
     fl_font(font, tsize);
-    if (((FL_BLINE*)item)->flags & SELECTED)
+    if (l->flags & SELECTED)
       lcol = fl_contrast(lcol, selection_color());
     if (!active_r()) lcol = fl_inactive(lcol);
     fl_color(lcol);
@@ -592,8 +617,7 @@ Fl_Browser::Fl_Browser(int X, int Y, int W, int H, const char *L)
   Updates the browser so that \p line is shown at position \p pos.
   \param[in] line line number. (1 based)
   \param[in] pos position.
-  \see topline(), middleline(), bottomline(), \n
-+: Command not found.
+  \see topline(), middleline(), bottomline()
 */
 void Fl_Browser::lineposition(int line, Fl_Line_Position pos) {
   if (line<1) line = 1;
@@ -835,6 +859,58 @@ void Fl_Browser::swap(int a, int b) {
   swap(ai,bi);
 }
 
+/**
+  Set the image icon for \p line to the value \p icon.
+  Caller is responsible for keeping the icon allocated.
+  The \p line is automatically redrawn.
+  \param[in] line The line to be modified. If out of range, nothing is done.
+  \param[in] icon The image icon to be assigned to the \p line.
+                  If NULL, any previous icon is removed.
+*/
+void Fl_Browser::icon(int line, Fl_Image* icon) {
+
+  if (line<1 || line > lines) return;
+
+  FL_BLINE* bl = find_line(line);
+
+  int old_h = bl->icon ? bl->icon->h()+2 : 0;	// init with *old* icon height
+  bl->icon = 0;					// remove icon, if any
+  int th = item_height(bl);			// height of text only
+  int new_h = icon ? icon->h()+2 : 0;		// init with *new* icon height
+  if (th > old_h) old_h = th;
+  if (th > new_h) new_h = th;
+  int dh = new_h - old_h;
+  full_height_ += dh;				// do this *always*
+
+  bl->icon = icon;				// set new icon
+  if (dh>0) {
+    redraw();					// icon larger than item? must redraw widget
+  } else {
+    redraw_line(bl);				// icon same or smaller? can redraw just this line
+  }
+  replacing(bl,bl);				// recalc Fl_Browser_::max_width et al
+}
+
+/**
+  Returns the icon currently defined for \p line.
+  If no icon is defined, NULL is returned.
+  \param[in] line The line whose icon is returned.
+  \returns The icon defined, or NULL if none.
+*/
+Fl_Image* Fl_Browser::icon(int line) const {
+  FL_BLINE* l = find_line(line);
+  return(l ? l->icon : NULL);
+}
+
+/**
+  Removes the icon for \p line.
+  It's ok to remove an icon if none has been defined.
+  \param[in] line The line whose icon is to be removed.
+*/
+void Fl_Browser::remove_icon(int line) { 
+  icon(line,0);
+}
+
 //
-// End of "$Id: Fl_Browser.cxx 6726 2009-03-27 16:52:31Z greg.ercolano $".
+// End of "$Id: Fl_Browser.cxx 6895 2009-09-21 06:35:08Z greg.ercolano $".
 //

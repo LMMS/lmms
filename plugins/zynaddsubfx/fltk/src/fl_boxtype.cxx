@@ -1,5 +1,5 @@
 //
-// "$Id: fl_boxtype.cxx 6716 2009-03-24 01:40:44Z fabien $"
+// "$Id: fl_boxtype.cxx 6902 2009-09-27 11:06:56Z matt $"
 //
 // Box drawing code for the Fast Light Tool Kit (FLTK).
 //
@@ -406,7 +406,7 @@ void Fl_Widget::draw_box() const {
 //     if (t == FL_FLAT_BOX) return;
 //     t += 2; // convert box to frame
 //   }
-  draw_box((Fl_Boxtype)t, x_, y_, w_, h_, (Fl_Color)color_);
+  draw_box((Fl_Boxtype)t, x_, y_, w_, h_, color_);
 }
 /** Draws a box of type t, of color c at the widget's position and size. */
 void Fl_Widget::draw_box(Fl_Boxtype t, Fl_Color c) const {
@@ -420,5 +420,5 @@ void Fl_Widget::draw_box(Fl_Boxtype t, int X, int Y, int W, int H, Fl_Color c) c
 }
 
 //
-// End of "$Id: fl_boxtype.cxx 6716 2009-03-24 01:40:44Z fabien $".
+// End of "$Id: fl_boxtype.cxx 6902 2009-09-27 11:06:56Z matt $".
 //

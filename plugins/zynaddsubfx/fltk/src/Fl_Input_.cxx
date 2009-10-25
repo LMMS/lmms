@@ -1,5 +1,5 @@
 //
-// "$Id: Fl_Input_.cxx 6777 2009-04-23 15:32:19Z matt $"
+// "$Id: Fl_Input_.cxx 6887 2009-09-19 20:57:48Z matt $"
 //
 // Common input widget routines for the Fast Light Tool Kit (FLTK).
 //
@@ -134,7 +134,7 @@ double Fl_Input_::expandpos(
     if (c < ' ' || c == 127) {
       if (c == '\t' && input_type()==FL_MULTILINE_INPUT) {
          n += 8-(chr%8);
-         chr += 8-(chr%8);
+         chr += 7-(chr%8);
       } else n += 2;
     } else {
       n++;
@@ -239,6 +239,7 @@ void Fl_Input_::drawtext(int X, int Y, int W, int H) {
   // count how many lines and put the last one into the buffer:
   // And figure out where the cursor is:
   int height = fl_height();
+  int threshold = height/2;
   int lines;
   int curx, cury;
   for (p=value(), curx=cury=lines=0; ;) {
@@ -248,15 +249,15 @@ void Fl_Input_::drawtext(int X, int Y, int W, int H) {
       if (Fl::focus()==this && !was_up_down) up_down_pos = curx;
       cury = lines*height;
       int newscroll = xscroll_;
-      if (curx > newscroll+W-20) {
+      if (curx > newscroll+W-threshold) {
 	// figure out scrolling so there is space after the cursor:
-	newscroll = curx+20-W;
+	newscroll = curx+threshold-W;
 	// figure out the furthest left we ever want to scroll:
 	int ex = int(expandpos(p, e, buf, 0))+2-W;
 	// use minimum of both amounts:
 	if (ex < newscroll) newscroll = ex;
-      } else if (curx < newscroll+20) {
-	newscroll = curx-20;
+      } else if (curx < newscroll+threshold) {
+	newscroll = curx-threshold;
       }
       if (newscroll < 0) newscroll = 0;
       if (newscroll != xscroll_) {
@@ -1253,5 +1254,5 @@ Fl_Char Fl_Input_::index(int i) const
 }
 
 //
-// End of "$Id: Fl_Input_.cxx 6777 2009-04-23 15:32:19Z matt $".
+// End of "$Id: Fl_Input_.cxx 6887 2009-09-19 20:57:48Z matt $".
 //

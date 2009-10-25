@@ -241,7 +241,7 @@ fl_select_palette(void)
     fl_palette = CreatePalette(pPal);
   }
   if (fl_palette) {
-    SelectPalette(fl_gc, fl_palette, false);
+    SelectPalette(fl_gc, fl_palette, FALSE);
     RealizePalette(fl_gc);
   }
   return fl_palette;

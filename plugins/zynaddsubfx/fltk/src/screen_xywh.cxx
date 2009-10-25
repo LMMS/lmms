@@ -58,7 +58,7 @@ static fl_gmi_func fl_gmi = NULL; // used to get a proc pointer for GetMonitorIn
 static RECT screens[16];
 
 static BOOL CALLBACK screen_cb(HMONITOR mon, HDC, LPRECT r, LPARAM) {
-  if (num_screens >= 16) return true;
+  if (num_screens >= 16) return TRUE;
 
   MONITORINFO mi;
   mi.cbSize = sizeof(mi);
@@ -69,7 +69,7 @@ static BOOL CALLBACK screen_cb(HMONITOR mon, HDC, LPRECT r, LPARAM) {
     screens[num_screens] = mi.rcWork;
     num_screens ++;
   }
-  return true;
+  return TRUE;
 }
 
 static void screen_init() {

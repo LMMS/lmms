@@ -67,6 +67,7 @@ IF(UNIX)
 ENDIF(UNIX)
 
 
+# OS X with X11 is not currently supported!
 SET(FLTK_X11 1)
 SET(FLTK_APPLE 0)
 IF(APPLE)
@@ -92,7 +93,7 @@ ENDIF(CYGWIN)
 
 IF(MINGW)
   ADD_DEFINITIONS(-DWIN32)
-  SET( FLTK_PLATFORM_DEPENDENT_LIBS ole32 uuid wsock32 gdi32 comdlg32)
+  SET( FLTK_PLATFORM_DEPENDENT_LIBS ole32 uuid comctl32 gdi32 comdlg32)
 ENDIF(MINGW)
 
 INCLUDE(CheckIncludeFiles)

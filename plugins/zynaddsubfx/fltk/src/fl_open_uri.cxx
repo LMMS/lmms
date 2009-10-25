@@ -1,5 +1,5 @@
 //
-// "$Id: fl_open_uri.cxx 6641 2009-01-20 11:10:29Z fabien $"
+// "$Id: fl_open_uri.cxx 6901 2009-09-26 13:56:04Z matt $"
 //
 // fl_open_uri() code for FLTK.
 //
@@ -117,9 +117,9 @@ fl_open_uri(const char *uri, char *msg, int msglen) {
 #elif defined(__APPLE__)
   char	*argv[3];			// Command-line arguments
 
-  argv[0] = "open";
-  argv[1] = (char *)uri;
-  argv[2] = 0;
+  argv[0] = (char*)"open";
+  argv[1] = (char*)uri;
+  argv[2] = (char*)0;
 
   if (msg) snprintf(msg, msglen, "open %s", uri);
 
@@ -364,5 +364,5 @@ int main(int argc, char **argv) {
 
 
 //
-// End of "$Id: fl_open_uri.cxx 6641 2009-01-20 11:10:29Z fabien $".
+// End of "$Id: fl_open_uri.cxx 6901 2009-09-26 13:56:04Z matt $".
 //
