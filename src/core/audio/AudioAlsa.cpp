@@ -22,13 +22,14 @@
  *
  */
 
-#include <QtGui/QLineEdit>
+#include <QtGui/QComboBox>
 #include <QtGui/QLabel>
 
 #include "AudioAlsa.h"
 
 #ifdef LMMS_HAVE_ALSA
 
+#include "AlsaDeviceListModel.h"
 #include "endian_handling.h"
 #include "config_mgr.h"
 #include "engine.h"
@@ -491,16 +492,21 @@ int AudioAlsa::setSWParams()
 
 
 
-
 AudioAlsa::setupWidget::setupWidget( QWidget * _parent ) :
 	AudioDevice::setupWidget( AudioAlsa::name(), _parent )
 {
-	m_device = new QLineEdit( AudioAlsa::probeDevice(), this );
-	m_device->setGeometry( 10, 20, 160, 20 );
+
+	m_device = new QComboBox( this );
+	m_device->setGeometry( 10, 20, 180, 20 );
+	m_device->setModel( new AlsaDeviceListModel(
+				SND_PCM_STREAM_PLAYBACK, this ) );
+	m_device->setEditable( true );
+	m_device->setInsertPolicy( QComboBox::NoInsert );
+	m_device->setEditText( AudioAlsa::probeDevice() );
 
 	QLabel * dev_lbl = new QLabel( tr( "DEVICE" ), this );
 	dev_lbl->setFont( pointSize<6>( dev_lbl->font() ) );
-	dev_lbl->setGeometry( 10, 40, 160, 10 );
+	dev_lbl->setGeometry( 10, 40, 180, 10 );
 
 	lcdSpinBoxModel * m = new lcdSpinBoxModel( /* this */ );
 	m->setRange( DEFAULT_CHANNELS, SURROUND_CHANNELS );
@@ -511,7 +517,7 @@ AudioAlsa::setupWidget::setupWidget( QWidget * _parent ) :
 	m_channels = new lcdSpinBox( 1, this );
 	m_channels->setModel( m );
 	m_channels->setLabel( tr( "CHANNELS" ) );
-	m_channels->move( 180, 20 );
+	m_channels->move( 200, 20 );
 
 }
 
@@ -529,7 +535,7 @@ AudioAlsa::setupWidget::~setupWidget()
 void AudioAlsa::setupWidget::saveSettings()
 {
 	configManager::inst()->setValue( "audioalsa", "device",
-							m_device->text() );
+							m_device->currentText() );
 	configManager::inst()->setValue( "audioalsa", "channels",
 				QString::number( m_channels->value<int>() ) );
 }

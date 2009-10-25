@@ -27,6 +27,8 @@
 #ifdef LMMS_HAVE_OSS
 
 #include <QtCore/QFileInfo>
+#include <QtGui/QCompleter>
+#include <QtGui/QDirModel>
 #include <QtGui/QLabel>
 #include <QtGui/QLineEdit>
 
@@ -334,6 +336,13 @@ AudioOss::setupWidget::setupWidget( QWidget * _parent ) :
 {
 	m_device = new QLineEdit( probeDevice(), this );
 	m_device->setGeometry( 10, 20, 160, 20 );
+
+	QDirModel * model = new QDirModel( QStringList(), 
+			QDir::AllDirs | QDir::System,
+			QDir::Name | QDir::DirsFirst,
+			this );
+	m_device->setCompleter(	new QCompleter( model, this ) );
+
 
 	QLabel * dev_lbl = new QLabel( tr( "DEVICE" ), this );
 	dev_lbl->setFont( pointSize<6>( dev_lbl->font() ) );

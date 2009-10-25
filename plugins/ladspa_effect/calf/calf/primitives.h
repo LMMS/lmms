@@ -224,14 +224,14 @@ inline T clip(T value, T min, T max) {
 inline double clip11(double value) {
     double a = fabs(value);
     if (a<=1) return value;
-    return (a<0) ? -1.0 : 1.0;
+    return (value<0) ? -1.0 : 1.0;
 }
 
 /// Clip a float to [-1.0f, +1.0f]
 inline float clip11(float value) {
     float a = fabsf(value);
     if (a<=1) return value;
-    return (a<0) ? -1.0f : 1.0f;
+    return (value<0) ? -1.0f : 1.0f;
 }
 
 /// Clip a double to [0.0, +1.0]
@@ -245,7 +245,7 @@ inline double clip01(double value) {
 inline float clip01(float value) {
     float a = fabsf(value-0.5f);
     if (a<=0.5f) return value;
-    return (a<0) ? -0.0f : 1.0f;
+    return (value < 0) ? -0.0f : 1.0f;
 }
 
 // Linear interpolation (mix-way between v1 and v2).

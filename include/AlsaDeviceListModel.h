@@ -1,7 +1,7 @@
 /*
- * MidiAlsaRaw.h - midi-client for RawMIDI via ALSA
+ * AlsaDeviceListModel - allows quick access to a list of alsa devices
  *
- * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2009 Paul Giblock <pgib/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -22,69 +22,41 @@
  *
  */
 
-#ifndef _MIDI_ALSA_RAW_H
-#define _MIDI_ALSA_RAW_H
+#ifndef _ALSA_DEVICE_LIST_MODEL
+#define _ALSA_DEVICE_LIST_MODEL
 
 #include "lmmsconfig.h"
 
 #ifdef LMMS_HAVE_ALSA
 
 #include <alsa/asoundlib.h>
-
-#include <QtCore/QThread>
-
-#include "MidiClient.h"
+#include "QAbstractListModel"
 
 
-struct pollfd;
-class QComboBox;
-
-
-class MidiAlsaRaw : public MidiClientRaw , public QThread
+class AlsaDeviceListModel : public QAbstractListModel
 {
 public:
-	MidiAlsaRaw();
-	virtual ~MidiAlsaRaw();
+	AlsaDeviceListModel(
+		snd_rawmidi_stream_t _stream, QObject * _parent );
 
-	static QString probeDevice();
+	AlsaDeviceListModel(
+		snd_pcm_stream_t _stream, QObject * _parent );
 
-
-	inline static QString name()
-	{
-		return QT_TRANSLATE_NOOP( "setupWidget",
-			"ALSA Raw-MIDI (Advanced Linux Sound Architecture)" );
-	}
-
-
-	class setupWidget : public MidiClientRaw::setupWidget
-	{
-	public:
-		setupWidget( QWidget * _parent );
-		virtual ~setupWidget();
-
-		virtual void saveSettings();
-
-	private:
-		QComboBox * m_device;
-
-	} ;
-
+	AlsaDeviceListModel( QObject * _parent );
 
 protected:
-	virtual void sendByte( const Uint8 _c );
-	virtual void run();
+	void init( const char * _iface, const char * _filter );
 
-
+	int rowCount( const QModelIndex & parent = QModelIndex() ) const;
+	QVariant data( const QModelIndex & index,
+				   int role = Qt::DisplayRole ) const;
 private:
-	snd_rawmidi_t * m_input, * * m_inputp;
-	snd_rawmidi_t * m_output, * * m_outputp;
-	int m_npfds;
-	pollfd * m_pfds;
+	typedef QPair<QString,QString> StringPair;
+	typedef QList<StringPair> DeviceList;
+	DeviceList m_devices;
+};
 
-	volatile bool m_quit;
 
-} ;
-
-#endif
+#endif // LMMS_HAVE_ALSA
 
 #endif
