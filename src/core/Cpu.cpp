@@ -179,6 +179,25 @@ void bufMixNoOpt( sampleFrameA * RP _dst, const sampleFrameA * RP _src,
 
 
 
+void bufMixCoeffNoOpt( sampleFrameA * RP _dst, const sampleFrameA * RP _src,
+								float _coeff, int _frames )
+{
+	for( int i = 0; i < _frames; )
+	{
+		_dst[i+0][0] += _src[i+0][0]*_coeff;
+		_dst[i+0][1] += _src[i+0][1]*_coeff;
+		_dst[i+1][0] += _src[i+1][0]*_coeff;
+		_dst[i+1][1] += _src[i+1][1]*_coeff;
+		_dst[i+2][0] += _src[i+2][0]*_coeff;
+		_dst[i+2][1] += _src[i+2][1]*_coeff;
+		_dst[i+3][0] += _src[i+3][0]*_coeff;
+		_dst[i+3][1] += _src[i+3][1]*_coeff;
+		i += 4;
+	}
+}
+
+
+
 void bufMixLRCoeffNoOpt( sampleFrameA * RP _dst,
 					const sampleFrameA * RP _src,
 					float _left, float _right, int _frames )
@@ -306,6 +325,7 @@ MemCpyFunc memCpy = memCpyNoOpt;
 MemClearFunc memClear = memClearNoOpt;
 BufApplyGainFunc bufApplyGain = bufApplyGainNoOpt;
 BufMixFunc bufMix = bufMixNoOpt;
+BufMixCoeffFunc bufMixCoeff = bufMixCoeffNoOpt;
 BufMixLRCoeffFunc bufMixLRCoeff = bufMixLRCoeffNoOpt;
 UnalignedBufMixLRCoeffFunc unalignedBufMixLRCoeff = unalignedBufMixLRCoeffNoOpt;
 BufWetDryMixFunc bufWetDryMix = bufWetDryMixNoOpt;
@@ -337,6 +357,7 @@ void memCpySSE( void * RP _dst, const void * RP _src, int _size );
 void memClearSSE( void * RP _dst, int _size );
 void bufApplyGainSSE( sampleFrameA * RP _dst, float _gain, int _frames );
 void bufMixSSE( sampleFrameA * RP _dst, const sampleFrameA * RP _src, int _frames );
+void bufMixCoeffSSE( sampleFrameA * RP _dst, const sampleFrameA * RP _src, float _coeff, int _frames );
 void bufMixLRCoeffSSE( sampleFrameA * RP _dst, const sampleFrameA * RP _src, float _left, float _right, int _frames );
 void unalignedBufMixLRCoeffSSE( sampleFrame * RP _dst, const sampleFrame * RP _src, const float _left, const float _right, int _frames );
 void bufWetDryMixSSE( sampleFrameA * RP _dst, const sampleFrameA * RP _src, float _wet, float _dry, int _frames );
@@ -447,6 +468,7 @@ void init()
 			memClear = memClearSSE;
 			bufApplyGain = bufApplyGainSSE;
 			bufMix = bufMixSSE;
+			bufMixCoeff = bufMixCoeffSSE;
 			bufMixLRCoeff = bufMixLRCoeffSSE;
 			unalignedBufMixLRCoeff = unalignedBufMixLRCoeffSSE;
 			bufWetDryMix = bufWetDryMixSSE;
