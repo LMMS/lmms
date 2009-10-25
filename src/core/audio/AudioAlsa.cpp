@@ -29,6 +29,7 @@
 
 #ifdef LMMS_HAVE_ALSA
 
+#include "AlsaDeviceListModel.h"
 #include "endian_handling.h"
 #include "config_mgr.h"
 #include "engine.h"
@@ -491,83 +492,17 @@ int AudioAlsa::setSWParams()
 
 
 
-AudioAlsa::DeviceListModel::DeviceListModel(
-		const char * _iface, snd_pcm_stream_t _stream )
-{
-	void **hints, **n;
-	char *name, *descr, *io;
-	const char *filter;
-
-	if (snd_device_name_hint(-1, _iface, &hints) < 0)
-		return;
-	n = hints;
-	filter = _stream == SND_PCM_STREAM_CAPTURE ? "Input" : "Output";
-	while (*n != NULL) {
-		name = snd_device_name_get_hint(*n, "NAME");
-		descr = snd_device_name_get_hint(*n, "DESC");
-		io = snd_device_name_get_hint(*n, "IOID");
-		
-		// Filter out non-null or filtered items
-		if (io != NULL && strcmp(io, filter) != 0)
-			continue;
-
-		m_devices.append(StringPair(name, descr));
-		if (name != NULL)
-			free(name);
-		if (descr != NULL)
-			free(descr);
-		if (io != NULL)
-			free(io);
-		n++;
-	}
-	snd_device_name_free_hint(hints);
-}
-
-
-
-int AudioAlsa::DeviceListModel::rowCount(
-		const QModelIndex & parent ) const
-{
-	return m_devices.count();
-}
-
-
-
-QVariant AudioAlsa::DeviceListModel::data(
-		const QModelIndex & index,
-		int role ) const
-{
-	switch( role )
-	{
-	case Qt::DisplayRole:
-		return m_devices.at(index.row()).first;
-	case Qt::ToolTipRole:
-	case Qt::StatusTipRole:
-		return m_devices.at(index.row()).second;
-	default:
-		return QVariant();
-	};
-}
-
-
-
-
 AudioAlsa::setupWidget::setupWidget( QWidget * _parent ) :
 	AudioDevice::setupWidget( AudioAlsa::name(), _parent )
 {
 
 	m_device = new QComboBox( this );
 	m_device->setGeometry( 10, 20, 180, 20 );
-	m_device->setModel(
-			new DeviceListModel( "pcm", SND_PCM_STREAM_PLAYBACK ) );
+	m_device->setModel( new AlsaDeviceListModel(
+				SND_PCM_STREAM_PLAYBACK, this ) );
 	m_device->setEditable( true );
 	m_device->setInsertPolicy( QComboBox::NoInsert );
 	m_device->setEditText( AudioAlsa::probeDevice() );
-
-	// Why doesn't Qt already do this?
-	connect( m_device, SIGNAL(currentIndexChanged(const QString &)),
-			this, SLOT(poo(const QString &)) );
-
 
 	QLabel * dev_lbl = new QLabel( tr( "DEVICE" ), this );
 	dev_lbl->setFont( pointSize<6>( dev_lbl->font() ) );
