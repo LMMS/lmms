@@ -85,13 +85,8 @@ void FxChannel::doProcessing( sampleFrame * _buf )
 			// mix it with this one
 			float amt = fxm->channelSendModel(senderIndex,
 											  m_channelIndex)->value();
-			sampleFrame * ch_buf = sender->m_buffer;
-			const float v = sender->m_volumeModel.value();
-			for( f_cnt_t f = 0; f < fpp; ++f )
-			{
-				_buf[f][0] += ch_buf[f][0] * v * amt;
-				_buf[f][1] += ch_buf[f][1] * v * amt;
-			}
+			CPU::bufMixCoeff( _buf, sender->m_buffer,
+								sender->m_volumeModel.value() * amt, fpp );
 		}
 
 		const float v = m_volumeModel.value();
