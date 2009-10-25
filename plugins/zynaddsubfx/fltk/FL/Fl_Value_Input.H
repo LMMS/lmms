@@ -1,5 +1,5 @@
 //
-// "$Id: Fl_Value_Input.H 6664 2009-02-18 09:27:54Z AlbrechtS $"
+// "$Id: Fl_Value_Input.H 6902 2009-09-27 11:06:56Z matt $"
 //
 // Value input header file for the Fast Light Tool Kit (FLTK).
 //
@@ -120,16 +120,16 @@ public:
   /** Gets the color of the text in the value box.  */
   Fl_Color textcolor() const {return input.textcolor();}
   /** Sets the color of the text in the value box.*/
-  void textcolor(unsigned n) {input.textcolor(n);}
+  void textcolor(Fl_Color n) {input.textcolor(n);}
   /** Gets the color of the text cursor. The text cursor is black by default. */
   Fl_Color cursor_color() const {return input.cursor_color();}
   /** Sets the color of the text cursor. The text cursor is black by default. */
-  void cursor_color(unsigned n) {input.cursor_color(n);}
+  void cursor_color(Fl_Color n) {input.cursor_color(n);}
 
 };
 
 #endif
 
 //
-// End of "$Id: Fl_Value_Input.H 6664 2009-02-18 09:27:54Z AlbrechtS $".
+// End of "$Id: Fl_Value_Input.H 6902 2009-09-27 11:06:56Z matt $".
 //

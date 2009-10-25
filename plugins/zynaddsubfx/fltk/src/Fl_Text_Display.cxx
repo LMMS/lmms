@@ -1,5 +1,5 @@
 //
-// "$Id: Fl_Text_Display.cxx 6765 2009-04-15 08:35:28Z matt $"
+// "$Id: Fl_Text_Display.cxx 6909 2009-09-28 14:41:43Z matt $"
 //
 // Copyright 2001-2009 by Bill Spitzak and others.
 // Original code Copyright Mark Edel.  Permission to distribute under
@@ -387,8 +387,8 @@ void Fl_Text_Display::resize(int X, int Y, int W, int H) {
     mMaxsize = max(mMaxsize, fl_height(mStyleTable[i].font, mStyleTable[i].size));
 
   // did we have scrollbars initially?
-  int hscrollbarvisible = mHScrollBar->visible();
-  int vscrollbarvisible = mVScrollBar->visible();
+  unsigned int hscrollbarvisible = mHScrollBar->visible();
+  unsigned int vscrollbarvisible = mVScrollBar->visible();
 
   // try without scrollbars first
   mVScrollBar->clear_visible();
@@ -3439,5 +3439,5 @@ int Fl_Text_Display::handle(int event) {
 
 
 //
-// End of "$Id: Fl_Text_Display.cxx 6765 2009-04-15 08:35:28Z matt $".
+// End of "$Id: Fl_Text_Display.cxx 6909 2009-09-28 14:41:43Z matt $".
 //

@@ -1,5 +1,5 @@
 //
-// "$Id: Fl_win32.cxx 6668 2009-02-21 10:18:47Z AlbrechtS $"
+// "$Id: Fl_win32.cxx 6905 2009-09-27 12:06:35Z matt $"
 //
 // WIN32-specific code for the Fast Light Tool Kit (FLTK).
 //
@@ -398,7 +398,7 @@ int fl_wait(double time_to_wait) {
 
   time_to_wait = (time_to_wait > 10000 ? 10000 : time_to_wait);
   int t_msec = (int) (time_to_wait * 1000.0 + 0.5);
-  MsgWaitForMultipleObjects(0, NULL, false, t_msec, QS_ALLINPUT);
+  MsgWaitForMultipleObjects(0, NULL, FALSE, t_msec, QS_ALLINPUT);
 
   fl_lock_function();
 
@@ -1127,7 +1127,7 @@ static LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 #if USE_COLORMAP
   case WM_QUERYNEWPALETTE :
     fl_GetDC(hWnd);
-    if (fl_select_palette()) InvalidateRect(hWnd, NULL, false);
+    if (fl_select_palette()) InvalidateRect(hWnd, NULL, FALSE);
     break;
 
   case WM_PALETTECHANGED:
@@ -1215,7 +1215,7 @@ int Fl_X::fake_X_wm(const Fl_Window* w,int &X,int &Y, int &bt,int &bx, int &by) 
       r.right = w->x()+w->w();
       r.bottom = w->y()+w->h();
       // get the decoration rectangle for the desired client rectangle
-      BOOL ok = AdjustWindowRectEx(&r, style, false, exstyle);
+      BOOL ok = AdjustWindowRectEx(&r, style, FALSE, exstyle);
       if (ok) {
         X = r.left;
         Y = r.top;
@@ -1292,7 +1292,7 @@ void Fl_Window::resize(int X,int Y,int W,int H) {
   int resize_from_program = (this != resize_bug_fix);
   if (!resize_from_program) resize_bug_fix = 0;
   if (X != x() || Y != y()) {
-    set_flag(FL_FORCE_POSITION);
+    set_flag(FORCE_POSITION);
   } else {
     if (!is_a_resize) return;
     flags |= SWP_NOMOVE;
@@ -1474,7 +1474,7 @@ Fl_X* Fl_X::make(Fl_Window* w) {
       wp += 2*bx;
       hp += 2*by+bt;
     }
-    if (!(w->flags() & Fl_Window::FL_FORCE_POSITION)) {
+    if (!(w->flags() & Fl_Widget::FORCE_POSITION)) {
       xp = yp = CW_USEDEFAULT;
     } else {
       if (!Fl::grab()) {
@@ -1557,7 +1557,7 @@ Fl_X* Fl_X::make(Fl_Window* w) {
     CoCreateInstance(CLSID_CActiveIMM, NULL, CLSCTX_INPROC_SERVER,
 		     IID_IActiveIMMApp, (void**) &fl_aimm);
     if (fl_aimm) {
-      fl_aimm->Activate(true);
+      fl_aimm->Activate(TRUE);
     }
   }
 #endif // !__GNUC__ || __GNUC__ >= 3
@@ -1916,5 +1916,5 @@ void fl_cleanup_dc_list(void) {          // clean up the list
 #endif // FL_DOXYGEN
 
 //
-// End of "$Id: Fl_win32.cxx 6668 2009-02-21 10:18:47Z AlbrechtS $".
+// End of "$Id: Fl_win32.cxx 6905 2009-09-27 12:06:35Z matt $".
 //

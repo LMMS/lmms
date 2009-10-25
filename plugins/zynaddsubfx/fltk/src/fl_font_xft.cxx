@@ -1,5 +1,5 @@
 //
-// "$Id: fl_font_xft.cxx 6779 2009-04-24 09:28:30Z yuri $"
+// "$Id: fl_font_xft.cxx 6862 2009-09-13 10:15:42Z matt $"
 //
 // Xft font code for the Fast Light Tool Kit (FLTK).
 //
@@ -635,5 +635,5 @@ void fl_rtl_draw(const char* c, int n, int x, int y) {
 #endif
 
 //
-// End of "$Id: fl_font_xft.cxx 6779 2009-04-24 09:28:30Z yuri $"
+// End of "$Id: fl_font_xft.cxx 6862 2009-09-13 10:15:42Z matt $"
 //

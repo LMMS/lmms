@@ -1,5 +1,5 @@
 //
-// "$Id: Fl_Menu_Window.H 6614 2009-01-01 16:11:32Z matt $"
+// "$Id: Fl_Menu_Window.H 6909 2009-09-28 14:41:43Z matt $"
 //
 // Menu window header file for the Fast Light Tool Kit (FLTK).
 //
@@ -40,14 +40,13 @@
   redraw.
 */
 class FL_EXPORT Fl_Menu_Window : public Fl_Single_Window {
-  enum {NO_OVERLAY = 128};
 public:
   void show();
   void erase();
   void flush();
   void hide();
   /** Tells if hardware overlay mode is set */
-  int overlay() {return !(flags()&NO_OVERLAY);}
+  unsigned int overlay() {return !(flags()&NO_OVERLAY);}
   /** Tells FLTK to use hardware overlay planes if they are available.  */
   void set_overlay() {clear_flag(NO_OVERLAY);}
   /** Tells FLTK to use normal drawing planes instead of overlay planes.
@@ -65,5 +64,5 @@ public:
 #endif
 
 //
-// End of "$Id: Fl_Menu_Window.H 6614 2009-01-01 16:11:32Z matt $".
+// End of "$Id: Fl_Menu_Window.H 6909 2009-09-28 14:41:43Z matt $".
 //

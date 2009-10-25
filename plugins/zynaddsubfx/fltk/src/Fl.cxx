@@ -1,5 +1,5 @@
 //
-// "$Id: Fl.cxx 6787 2009-05-14 20:16:09Z engelsman $"
+// "$Id: Fl.cxx 6836 2009-07-25 12:56:16Z AlbrechtS $"
 //
 // Main event handling code for the Fast Light Tool Kit (FLTK).
 //
@@ -1699,5 +1699,5 @@ Fl_Widget_Tracker::~Fl_Widget_Tracker() {
 }
 
 //
-// End of "$Id: Fl.cxx 6787 2009-05-14 20:16:09Z engelsman $".
+// End of "$Id: Fl.cxx 6836 2009-07-25 12:56:16Z AlbrechtS $".
 //

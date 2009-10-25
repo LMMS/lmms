@@ -29,7 +29,7 @@ int main()
 {
 	struct jpeg_decompress_struct cinfo;
 	jpeg_create_decompress(&cinfo);
-	jpeg_read_header(&cinfo, true);
+	jpeg_read_header(&cinfo, TRUE);
 	return 1;
 }
 

@@ -1,5 +1,5 @@
 //
-// "$Id: Fl_File_Browser.cxx 6616 2009-01-01 21:28:26Z matt $"
+// "$Id: Fl_File_Browser.cxx 6853 2009-09-09 05:16:41Z greg.ercolano $"
 //
 // Fl_File_Browser routines.
 //
@@ -42,6 +42,7 @@
 #include <FL/Fl_File_Browser.H>
 #include <FL/fl_draw.H>
 #include <FL/filename.H>
+#include <FL/Fl_Image.H>	// icon
 #include <stdio.h>
 #include <stdlib.h>
 #include "flstring.h"
@@ -80,11 +81,17 @@
 #define SELECTED 1
 #define NOTDISPLAYED 2
 
+// TODO -- Warning: The definition of FL_BLINE here is a hack.
+//    Fl_File_Browser should not do this. PLEASE FIX.
+//    FL_BLINE should be private to Fl_Browser, and not re-defined here.
+//    For now, make sure this struct is precisely consistent with Fl_Browser.cxx.
+//
 struct FL_BLINE			// data is in a linked list of these
 {
   FL_BLINE	*prev;		// Previous item in list
   FL_BLINE	*next;		// Next item in list
   void		*data;		// Pointer to data (function)
+  Fl_Image      *icon;		// Pointer to optional icon
   short		length;		// sizeof(txt)-1, may be longer than string
   char		flags;		// selected, displayed
   char		txt[1];		// start of allocated array
@@ -635,5 +642,5 @@ Fl_File_Browser::filter(const char *pattern)	// I - Pattern string
 
 
 //
-// End of "$Id: Fl_File_Browser.cxx 6616 2009-01-01 21:28:26Z matt $".
+// End of "$Id: Fl_File_Browser.cxx 6853 2009-09-09 05:16:41Z greg.ercolano $".
 //

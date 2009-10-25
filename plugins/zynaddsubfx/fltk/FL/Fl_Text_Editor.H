@@ -1,5 +1,5 @@
 //
-// "$Id: Fl_Text_Editor.H 6614 2009-01-01 16:11:32Z matt $"
+// "$Id: Fl_Text_Editor.H 6893 2009-09-20 19:24:24Z greg.ercolano $"
 //
 // Header file for Fl_Text_Editor class.
 //
@@ -103,6 +103,8 @@ class FL_EXPORT Fl_Text_Editor : public Fl_Text_Display {
     static int kf_shift_move(int c, Fl_Text_Editor* e);
     static int kf_ctrl_move(int c, Fl_Text_Editor* e);
     static int kf_c_s_move(int c, Fl_Text_Editor* e);
+    static int kf_meta_move(int c, Fl_Text_Editor* e);
+    static int kf_m_s_move(int c, Fl_Text_Editor* e);
     static int kf_home(int, Fl_Text_Editor* e);
     static int kf_end(int c, Fl_Text_Editor* e);
     static int kf_left(int c, Fl_Text_Editor* e);
@@ -134,6 +136,6 @@ class FL_EXPORT Fl_Text_Editor : public Fl_Text_Display {
 #endif
 
 //
-// End of "$Id: Fl_Text_Editor.H 6614 2009-01-01 16:11:32Z matt $".
+// End of "$Id: Fl_Text_Editor.H 6893 2009-09-20 19:24:24Z greg.ercolano $".
 //
 

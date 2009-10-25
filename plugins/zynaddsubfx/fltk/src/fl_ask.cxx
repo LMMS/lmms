@@ -1,5 +1,5 @@
 //
-// "$Id: fl_ask.cxx 6763 2009-04-13 22:47:21Z AlbrechtS $"
+// "$Id: fl_ask.cxx 6869 2009-09-13 21:57:46Z AlbrechtS $"
 //
 // Standard dialog functions for the Fast Light Tool Kit (FLTK).
 //
@@ -215,8 +215,7 @@ static int innards(const char* fmt, va_list ap,
   message_form->show();
   // deactivate Fl::grab(), because it is incompatible with Fl::readqueue()
   Fl_Window* g = Fl::grab();
-  if (g) // do an alternative grab to avoid floating menus, if possible
-    Fl::grab(message_form);
+  if (g) Fl::grab(0);
   int r = 0;
   for (;;) {
     Fl_Widget *o = Fl::readqueue();
@@ -461,5 +460,5 @@ const char *fl_password(const char *fmt, const char *defstr, ...) {
 /** @} */
 
 //
-// End of "$Id: fl_ask.cxx 6763 2009-04-13 22:47:21Z AlbrechtS $".
+// End of "$Id: fl_ask.cxx 6869 2009-09-13 21:57:46Z AlbrechtS $".
 //
