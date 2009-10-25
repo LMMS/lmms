@@ -136,6 +136,17 @@ struct compressor_metadata: public plugin_metadata<compressor_metadata>
     PLUGIN_NAME_ID_LABEL("compressor", "compressor", "Compressor")
 };
 
+/// Markus's sidechain compressor - metadata
+struct sidechaincompressor_metadata: public plugin_metadata<sidechaincompressor_metadata>
+{
+    enum { in_count = 2, out_count = 2, support_midi = false, require_midi = false, rt_capable = true };
+    enum { param_bypass, param_level_in, param_meter_in, param_meter_out, param_clip_in, param_clip_out,
+           param_threshold, param_ratio, param_attack, param_release, param_makeup, param_knee, param_detection, param_stereo_link, param_compression, 
+           param_sc_mode, param_f1_freq, param_f2_freq, param_f1_level, param_f2_level,
+           param_sc_listen, param_f1_active, param_f2_active, param_count };
+    PLUGIN_NAME_ID_LABEL("sidechaincompressor", "sidechaincompressor", "Sidechain Compressor")
+};
+
 /// Markus's multibandcompressor - metadata
 struct multibandcompressor_metadata: public plugin_metadata<multibandcompressor_metadata>
 {

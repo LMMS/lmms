@@ -240,6 +240,51 @@ CALF_PLUGIN_INFO(compressor) = { 0x8502, "Compressor", "Calf Compressor", "Thor 
 
 ////////////////////////////////////////////////////////////////////////////
 
+CALF_PORT_NAMES(sidechaincompressor) = {"In L", "In R", "Out L", "Out R"};
+
+const char *sidechaincompressor_detection_names[] = { "RMS", "Peak" };
+const char *sidechaincompressor_stereo_link_names[] = { "Average", "Maximum" };
+const char *sidechaincompressor_mode_names[] = {"Wideband (F1:off / F2:off)",
+                                                "Deesser wide (F1:HP / F2:Bell)",
+                                                "Deesser split (F1:HP / F2:off)",
+                                                "Derumbler wide (F1:Bell / F2:LP)",
+                                                "Derumbler split (F1:off / F2:LP)",
+                                                "Weighted #1 (F1:Shelf / F2:Shelf)",
+                                                "Weighted #2 (F1:Shelf / F2:Bell)",
+                                                "Weighted #3 (F1:Bell / F2:Shelf)",
+                                                "Bandpass #1 (F1:BP / F2:off)",
+                                                "Bandpass #2 (F1:HP / F2:LP)"};
+
+CALF_PORT_PROPS(sidechaincompressor) = {
+    { 0,      0,  1,    0, PF_BOOL | PF_CTL_TOGGLE, NULL, "bypass", "Bypass" },
+    { 1,           0,           64,    0,  PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_COEF | PF_PROP_NOBOUNDS, NULL, "level_in", "Input" },
+    { 0,      0,  1,    0, PF_FLOAT | PF_SCALE_GAIN | PF_CTL_METER | PF_CTLO_LABEL | PF_UNIT_DB | PF_PROP_OUTPUT | PF_PROP_OPTIONAL, NULL, "meter_in", "Input" },
+    { 0,      0,  1,    0, PF_FLOAT | PF_SCALE_GAIN | PF_CTL_METER | PF_CTLO_LABEL | PF_UNIT_DB | PF_PROP_OUTPUT | PF_PROP_OPTIONAL, NULL, "meter_out", "Output" },
+    { 0,      0,  1,    0, PF_BOOL | PF_CTL_LED | PF_PROP_OUTPUT | PF_PROP_OPTIONAL, NULL, "clip_in", "0dB" },
+    { 0,      0,  1,    0, PF_BOOL | PF_CTL_LED | PF_PROP_OUTPUT | PF_PROP_OPTIONAL, NULL, "clip_out", "0dB" },
+    { 0.125,      0.000976563, 1,    0, PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_DB, NULL, "threshold", "Threshold" },
+    { 2,      1, 20,  21, PF_FLOAT | PF_SCALE_LOG_INF | PF_CTL_KNOB | PF_UNIT_COEF, NULL, "ratio", "Ratio" },
+    { 20,     0.01, 2000, 0, PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_MSEC, NULL, "attack", "Attack" },
+    { 250,    0.01, 2000, 0, PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_MSEC, NULL, "release", "Release" },
+    { 2,      1, 64,    0, PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_DB, NULL, "makeup", "Makeup Gain" },
+    { 2.828427125,      1,  8,   0, PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_DB, NULL, "knee", "Knee" },
+    { 0,      0,  1,    0, PF_ENUM | PF_CTL_COMBO, sidechaincompressor_detection_names, "detection", "Detection" },
+    { 0,      0,  1,    0, PF_ENUM | PF_CTL_COMBO, sidechaincompressor_stereo_link_names, "stereo_link", "Stereo Link" },
+    { 0, 0.03125, 1,    0, PF_FLOAT | PF_SCALE_GAIN | PF_CTL_METER | PF_CTLO_LABEL | PF_CTLO_REVERSE | PF_UNIT_DB | PF_PROP_OUTPUT | PF_PROP_OPTIONAL| PF_PROP_GRAPH, NULL, "compression", "Gain Reduction" },
+    { 0,      0,  9,    0, PF_ENUM | PF_CTL_COMBO, sidechaincompressor_mode_names, "sc_mode", "Sidechain Mode" },
+    { 200,    10,20000, 0, PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_HZ | PF_PROP_GRAPH, NULL, "f1_freq", "Freq" },
+    { 4000,   10,20000, 0, PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_HZ, NULL, "f2_freq", "Freq" },
+    { 1,      0.0625,  16, 0, PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_DB, NULL, "f1_level", "Level" },
+    { 1,      0.0625,  16, 0, PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_DB, NULL, "f2_level", "Level" },
+    { 0,      0,  1,    0, PF_BOOL | PF_CTL_TOGGLE, NULL, "sc_listen", "S/C-Listen" },
+    { 0,      0,  1,    0, PF_BOOL | PF_CTL_LED | PF_PROP_OUTPUT | PF_PROP_OPTIONAL, NULL, "f1_active", "active" },
+    { 0,      0,  1,    0, PF_BOOL | PF_CTL_LED | PF_PROP_OUTPUT | PF_PROP_OPTIONAL, NULL, "f2_active", "active" },
+};
+
+CALF_PLUGIN_INFO(sidechaincompressor) = { 0x8502, "Sidechaincompressor", "Calf Sidechain Compressor", "Thor Harald Johansen / Markus Schmidt", calf_plugins::calf_copyright_info, "CompressorPlugin" };
+
+////////////////////////////////////////////////////////////////////////////
+
 CALF_PORT_NAMES(multibandcompressor) = {"In L", "In R", "Out L", "Out R"};
 
 const char *multibandcompressor_detection_names[] = { "RMS", "Peak" };

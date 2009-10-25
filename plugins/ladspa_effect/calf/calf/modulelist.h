@@ -11,6 +11,7 @@
     PER_MODULE_ITEM(multichorus, false, "multichorus")
     PER_MODULE_ITEM(compressor, false, "compressor")
     PER_MODULE_ITEM(multibandcompressor, false, "multibandcompressor")
+    PER_MODULE_ITEM(sidechaincompressor, false, "sidechaincompressor")
 #ifdef ENABLE_EXPERIMENTAL
     PER_MODULE_ITEM(fluidsynth, true, "fluidsynth")
     PER_MODULE_ITEM(wavetable, true, "wavetable")

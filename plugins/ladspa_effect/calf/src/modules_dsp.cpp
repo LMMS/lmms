@@ -716,16 +716,16 @@ void multibandcompressor_audio_module::params_changed()
     for (int j = 0; j < strips; j ++) {
         switch (j) {
             case 0:
-                strip[j].set_params(*params[param_attack0], *params[param_release0], *params[param_threshold0], *params[param_ratio0], *params[param_knee0], *params[param_makeup0], *params[param_detection0], *params[param_bypass0], *params[param_mute0]);
+                strip[j].set_params(*params[param_attack0], *params[param_release0], *params[param_threshold0], *params[param_ratio0], *params[param_knee0], *params[param_makeup0], *params[param_detection0], 1.f, *params[param_bypass0], *params[param_mute0]);
                 break;
             case 1:
-                strip[j].set_params(*params[param_attack1], *params[param_release1], *params[param_threshold1], *params[param_ratio1], *params[param_knee1], *params[param_makeup1], *params[param_detection1], *params[param_bypass1], *params[param_mute1]);
+                strip[j].set_params(*params[param_attack1], *params[param_release1], *params[param_threshold1], *params[param_ratio1], *params[param_knee1], *params[param_makeup1], *params[param_detection1], 1.f, *params[param_bypass1], *params[param_mute1]);
                 break;
             case 2:
-                strip[j].set_params(*params[param_attack2], *params[param_release2], *params[param_threshold2], *params[param_ratio2], *params[param_knee2], *params[param_makeup2], *params[param_detection2], *params[param_bypass2], *params[param_mute2]);
+                strip[j].set_params(*params[param_attack2], *params[param_release2], *params[param_threshold2], *params[param_ratio2], *params[param_knee2], *params[param_makeup2], *params[param_detection2], 1.f, *params[param_bypass2], *params[param_mute2]);
                 break;
             case 3:
-                strip[j].set_params(*params[param_attack3], *params[param_release3], *params[param_threshold3], *params[param_ratio3], *params[param_knee3], *params[param_makeup3], *params[param_detection3], *params[param_bypass3], *params[param_mute3]);
+                strip[j].set_params(*params[param_attack3], *params[param_release3], *params[param_threshold3], *params[param_ratio3], *params[param_knee3], *params[param_makeup3], *params[param_detection3], 1.f, *params[param_bypass3], *params[param_mute3]);
                 break;
         }
     }
@@ -1049,6 +1049,328 @@ int multibandcompressor_audio_module::get_changed_offsets(int index, int generat
     }
     return 0;
 }
+
+/// Sidecain Compressor by Markus Schmidt
+///
+/// This module splits the signal in a sidechain- and a process signal.
+/// The sidechain is processed through Krzystofs filters and compresses
+/// the process signal via Thor's compression routine afterwards.
+///////////////////////////////////////////////////////////////////////////////////////////////
+
+sidechaincompressor_audio_module::sidechaincompressor_audio_module()
+{
+    is_active = false;
+    srate = 0;
+}
+
+void sidechaincompressor_audio_module::activate()
+{
+    is_active = true;
+    // set all filters and strips
+    compressor.activate();
+    params_changed();
+    meter_in = 0.f;
+    meter_out = 0.f;
+    clip_in = 0.f;
+    clip_out = 0.f;
+}
+void sidechaincompressor_audio_module::deactivate()
+{
+    is_active = false;
+    compressor.deactivate();
+}
+
+void sidechaincompressor_audio_module::params_changed()
+{
+    // set the params of all filters
+    if(*params[param_f1_freq] != f1_freq_old or *params[param_f1_level] != f1_level_old or *params[param_sc_mode] != sc_mode
+        or *params[param_f2_freq] != f2_freq_old or *params[param_f2_level] != f2_level_old) {
+        switch ((int)*params[param_sc_mode]) {
+            default:
+            case WIDEBAND:
+                f1L.set_hp_rbj((float)*params[param_f1_freq], 0.707, (float)srate);
+                f1R.set_hp_rbj((float)*params[param_f1_freq], 0.707, (float)srate);
+                f2L.set_lp_rbj((float)*params[param_f2_freq], 0.707, (float)srate);
+                f2R.set_lp_rbj((float)*params[param_f2_freq], 0.707, (float)srate);
+                f1_active = 0.f;
+                f2_active = 0.f;
+                break;
+            case DEESSER_WIDE:
+                f1L.set_hp_rbj((float)*params[param_f1_freq], 0.707, (float)srate);
+                f1R.set_hp_rbj((float)*params[param_f1_freq], 0.707, (float)srate);
+                f2L.set_peakeq_rbj((float)*params[param_f2_freq], 0.707, *params[param_f2_level], (float)srate);
+                f2R.set_peakeq_rbj((float)*params[param_f2_freq], 0.707, *params[param_f2_level], (float)srate);
+                f1_active = 1.f;
+                f2_active = 0.5f;
+                break;
+            case DEESSER_SPLIT:
+                f1L.set_hp_rbj((float)*params[param_f1_freq] * (1 - 0.17), 0.707, (float)srate);
+                f1R.set_hp_rbj((float)*params[param_f1_freq] * (1 - 0.17), 0.707, (float)srate);
+                f2L.set_lp_rbj((float)*params[param_f1_freq] * (1 + 0.17), 0.707, (float)srate);
+                f2R.set_lp_rbj((float)*params[param_f1_freq] * (1 + 0.17), 0.707, (float)srate);
+                f1_active = 1.f;
+                f2_active = 0.f;
+                break;
+            case DERUMBLER_WIDE:
+                f1L.set_lp_rbj((float)*params[param_f1_freq], 0.707, (float)srate);
+                f1R.set_lp_rbj((float)*params[param_f1_freq], 0.707, (float)srate);
+                f2L.set_peakeq_rbj((float)*params[param_f2_freq], 0.707, *params[param_f2_level], (float)srate);
+                f2R.set_peakeq_rbj((float)*params[param_f2_freq], 0.707, *params[param_f2_level], (float)srate);
+                f1_active = 1.f;
+                f2_active = 0.5f;
+                break;
+            case DERUMBLER_SPLIT:
+                f1L.set_lp_rbj((float)*params[param_f1_freq] * (1 + 0.17), 0.707, (float)srate);
+                f1R.set_lp_rbj((float)*params[param_f1_freq] * (1 + 0.17), 0.707, (float)srate);
+                f2L.set_hp_rbj((float)*params[param_f1_freq] * (1 - 0.17), 0.707, (float)srate);
+                f2R.set_hp_rbj((float)*params[param_f1_freq] * (1 - 0.17), 0.707, (float)srate);
+                f1_active = 1.f;
+                f2_active = 0.f;
+                break;
+            case WEIGHTED_1:
+                f1L.set_lowshelf_rbj((float)*params[param_f1_freq], 0.707, *params[param_f1_level], (float)srate);
+                f1R.set_lowshelf_rbj((float)*params[param_f1_freq], 0.707, *params[param_f1_level], (float)srate);
+                f2L.set_highshelf_rbj((float)*params[param_f2_freq], 0.707, *params[param_f2_level], (float)srate);
+                f2R.set_highshelf_rbj((float)*params[param_f2_freq], 0.707, *params[param_f2_level], (float)srate);
+                f1_active = 0.5f;
+                f2_active = 0.5f;
+                break;
+            case WEIGHTED_2:
+                f1L.set_lowshelf_rbj((float)*params[param_f1_freq], 0.707, *params[param_f1_level], (float)srate);
+                f1R.set_lowshelf_rbj((float)*params[param_f1_freq], 0.707, *params[param_f1_level], (float)srate);
+                f2L.set_peakeq_rbj((float)*params[param_f2_freq], 0.707, *params[param_f2_level], (float)srate);
+                f2R.set_peakeq_rbj((float)*params[param_f2_freq], 0.707, *params[param_f2_level], (float)srate);
+                f1_active = 0.5f;
+                f2_active = 0.5f;
+                break;
+            case WEIGHTED_3:
+                f1L.set_peakeq_rbj((float)*params[param_f1_freq], 0.707, *params[param_f1_level], (float)srate);
+                f1R.set_peakeq_rbj((float)*params[param_f1_freq], 0.707, *params[param_f1_level], (float)srate);
+                f2L.set_highshelf_rbj((float)*params[param_f2_freq], 0.707, *params[param_f2_level], (float)srate);
+                f2R.set_highshelf_rbj((float)*params[param_f2_freq], 0.707, *params[param_f2_level], (float)srate);
+                f1_active = 0.5f;
+                f2_active = 0.5f;
+                break;
+            case BANDPASS_1:
+                f1L.set_bp_rbj((float)*params[param_f1_freq], 0.707, *params[param_f1_level], (float)srate);
+                f1R.set_bp_rbj((float)*params[param_f1_freq], 0.707, *params[param_f1_level], (float)srate);
+                f2L.set_highshelf_rbj((float)*params[param_f2_freq], 0.707, *params[param_f2_level], (float)srate);
+                f2R.set_highshelf_rbj((float)*params[param_f2_freq], 0.707, *params[param_f2_level], (float)srate);
+                f1_active = 1.f;
+                f2_active = 0.f;
+                break;
+            case BANDPASS_2:
+                f1L.set_hp_rbj((float)*params[param_f1_freq], 0.707, (float)srate);
+                f1R.set_hp_rbj((float)*params[param_f1_freq], 0.707, (float)srate);
+                f2L.set_lp_rbj((float)*params[param_f2_freq], 0.707, (float)srate);
+                f2R.set_lp_rbj((float)*params[param_f2_freq], 0.707, (float)srate);
+                f1_active = 1.f;
+                f2_active = 1.f;
+                break;
+        }
+        f1_freq_old = *params[param_f1_freq];
+        f1_level_old = *params[param_f1_level];
+        f2_freq_old = *params[param_f2_freq];
+        f2_level_old = *params[param_f2_level];
+        sc_mode = (CalfScModes)*params[param_sc_mode];
+    }
+    // light LED's
+    if(params[param_f1_active] != NULL) {
+        *params[param_f1_active] = f1_active;
+    }
+    if(params[param_f2_active] != NULL) {
+        *params[param_f2_active] = f2_active;
+    }
+    // and set the compressor module
+    compressor.set_params(*params[param_attack], *params[param_release], *params[param_threshold], *params[param_ratio], *params[param_knee], *params[param_makeup], *params[param_detection], *params[param_stereo_link], *params[param_bypass], 0.f);
+}
+
+void sidechaincompressor_audio_module::set_sample_rate(uint32_t sr)
+{
+    srate = sr;
+    compressor.set_sample_rate(srate);
+}
+
+uint32_t sidechaincompressor_audio_module::process(uint32_t offset, uint32_t numsamples, uint32_t inputs_mask, uint32_t outputs_mask)
+{
+    bool bypass = *params[param_bypass] > 0.5f;
+    numsamples += offset;
+    if(bypass) {
+        // everything bypassed
+        while(offset < numsamples) {
+            outs[0][offset] = ins[0][offset];
+            outs[1][offset] = ins[1][offset];
+            ++offset;
+        }
+        // displays, too
+        clip_in    = 0.f;
+        clip_out   = 0.f;
+        meter_in   = 0.f;
+        meter_out  = 0.f;
+    } else {
+        // process
+        
+        clip_in    -= std::min(clip_in,  numsamples);
+        clip_out   -= std::min(clip_out,  numsamples);
+        
+        while(offset < numsamples) {
+            // cycle through samples
+            float outL = 0.f;
+            float outR = 0.f;
+            float inL = ins[0][offset];
+            float inR = ins[1][offset];
+            // in level
+            inR *= *params[param_level_in];
+            inL *= *params[param_level_in];
+            
+            
+            float leftAC = inL;
+            float rightAC = inR;
+            float leftSC = inL;
+            float rightSC = inR;
+            float leftMC = inL;
+            float rightMC = inR;
+            
+            switch ((int)*params[param_sc_mode]) {
+                default:
+                case WIDEBAND:
+                    compressor.process(leftAC, rightAC, leftSC, rightSC);
+                    break;
+                case DEESSER_WIDE:
+                case DERUMBLER_WIDE:
+                case WEIGHTED_1:
+                case WEIGHTED_2:
+                case WEIGHTED_3:
+                case BANDPASS_2:
+                    leftSC = f2L.process(f1L.process(leftSC));
+                    rightSC = f2L.process(f1L.process(rightSC));
+                    leftMC = leftSC;
+                    rightMC = rightSC;
+                    compressor.process(leftAC, rightAC, leftSC, rightSC);
+                    break;
+                case DEESSER_SPLIT:
+                case DERUMBLER_SPLIT:
+                    leftSC = f1L.process(leftSC);
+                    rightSC = f1L.process(rightSC);
+                    leftMC = leftSC;
+                    rightMC = rightSC;
+                    compressor.process(leftSC, rightSC, leftSC, rightSC);
+                    leftAC = f2L.process(leftAC);
+                    rightAC = f2L.process(rightAC);
+                    leftAC += leftSC;
+                    rightAC += rightSC;
+                    break;
+                case BANDPASS_1:
+                    leftSC = f1L.process(leftSC);
+                    rightSC = f1L.process(rightSC);
+                    leftMC = leftSC;
+                    rightMC = rightSC;
+                    compressor.process(leftAC, rightAC, leftSC, rightSC);
+                    break;
+            }
+            f1L.sanitize();
+            f1R.sanitize();
+            f2L.sanitize();
+            f2R.sanitize();
+            
+            if(*params[param_sc_listen] > 0.f) {
+                outL = leftMC;
+                outR = rightMC;
+            } else {
+                outL = leftAC;
+                outR = rightAC;
+            }
+            
+            // send to output
+            outs[0][offset] = outL;
+            outs[1][offset] = outR;
+            
+            // clip LED's
+            if(std::max(fabs(inL), fabs(inR)) > 1.f) {
+                clip_in   = srate >> 3;
+            }
+            if(std::max(fabs(outL), fabs(outR)) > 1.f) {
+                clip_out  = srate >> 3;
+            }
+            // rise up out meter
+            meter_in = std::max(fabs(inL), fabs(inR));;
+            meter_out = std::max(fabs(outL), fabs(outR));;
+            
+            // next sample
+            ++offset;
+        } // cycle trough samples
+    }
+    // draw meters
+    if(params[param_clip_in] != NULL) {
+        *params[param_clip_in] = clip_in;
+    }
+    if(params[param_clip_out] != NULL) {
+        *params[param_clip_out] = clip_out;
+    }
+    if(params[param_meter_in] != NULL) {
+        *params[param_meter_in] = meter_in;
+    }
+    if(params[param_meter_out] != NULL) {
+        *params[param_meter_out] = meter_out;
+    }
+    // draw strip meter
+    if(bypass > 0.5f) {
+        if(params[param_compression] != NULL) {
+            *params[param_compression] = 1.0f;
+        }
+    } else {
+        if(params[param_compression] != NULL) {
+            *params[param_compression] = compressor.get_comp_level();
+        }
+    }
+    // whatever has to be returned x)
+    return outputs_mask;
+}
+bool sidechaincompressor_audio_module::get_graph(int index, int subindex, float *data, int points, cairo_iface *context)
+{
+    if (!is_active)
+        return false;
+    if (index == param_f1_freq && !subindex) {
+        context->set_line_width(1.5);
+        return ::get_graph(*this, subindex, data, points);
+    } else if(index == param_compression) {
+        return compressor.get_graph(subindex, data, points, context);
+    }
+    return false;
+}
+
+bool sidechaincompressor_audio_module::get_dot(int index, int subindex, float &x, float &y, int &size, cairo_iface *context)
+{
+    if (!is_active)
+        return false;
+    if (index == param_compression) {
+        return compressor.get_dot(subindex, x, y, size, context);
+    }
+    return false;
+}
+
+bool sidechaincompressor_audio_module::get_gridline(int index, int subindex, float &pos, bool &vertical, std::string &legend, cairo_iface *context)
+{
+    if (!is_active)
+        return false;
+    if (index == param_compression) {
+        return compressor.get_gridline(subindex, pos, vertical, legend, context);
+    } else {
+        return get_freq_gridline(subindex, pos, vertical, legend, context);
+    }
+//    return false;
+}
+
+int sidechaincompressor_audio_module::get_changed_offsets(int index, int generation, int &subindex_graph, int &subindex_dot, int &subindex_gridline)
+{
+    if (!is_active)
+        return false;
+    if(index == param_compression) {
+        return compressor.get_changed_offsets(generation, subindex_graph, subindex_dot, subindex_gridline);
+    }
+    return false;
+}
+
 /// Gain reduction module implemented by Markus Schmidt
 /// Nearly all functions of this module are originally written
 /// by Thor, while some features have been stripped (mainly stereo linking
@@ -1080,14 +1402,20 @@ void gain_reduction_audio_module::deactivate()
     is_active = false;
 }
 
-void gain_reduction_audio_module::process(float &left, float &right)
+void gain_reduction_audio_module::process(float &left, float &right, float det_left, float det_right)
 {
+    if(!det_left) {
+        det_left = left;
+    }
+    if(!det_right) {
+        det_right = right;
+    }
     float gain = 1.f;
-    float maxLR = 0.f;
     if(bypass < 0.5f) {
         // this routine is mainly copied from thor's compressor module
         // greatest sounding compressor I've heard!
         bool rms = detection == 0;
+        bool average = stereo_link == 0;
         float linThreshold = threshold;
         float attack_coeff = std::min(1.f, 1.f / (attack * srate / 4000.f));
         float release_coeff = std::min(1.f, 1.f / (release * srate / 4000.f));
@@ -1100,7 +1428,7 @@ void gain_reduction_audio_module::process(float &left, float &right)
         kneeStop = log(linKneeStop);
         compressedKneeStop = (kneeStop - thres) / ratio + thres;
         
-        float absample = (fabs(left) + fabs(right)) * 0.5f;
+        float absample = average ? (fabs(det_left) + fabs(det_right)) * 0.5f : std::max(fabs(det_left), fabs(det_right));
         if(rms) absample *= absample;
             
         linSlope += (absample - linSlope) * (absample > linSlope ? attack_coeff : release_coeff);
@@ -1109,15 +1437,12 @@ void gain_reduction_audio_module::process(float &left, float &right)
             gain = output_gain(linSlope, rms);
         }
 
-        gain *= makeup;
-        
-        left *= gain;
-        right *= gain;
-        maxLR = std::max(fabs(left), fabs(right));
+        left *= gain * makeup;
+        right *= gain * makeup;
+        meter_out = std::max(fabs(left), fabs(right));;
+        meter_comp = gain;
         detected = rms ? sqrt(linSlope) : linSlope;
     }
-    meter_out = maxLR;
-    meter_comp = gain;
 }
 
 float gain_reduction_audio_module::output_level(float slope) {
@@ -1154,7 +1479,7 @@ void gain_reduction_audio_module::set_sample_rate(uint32_t sr)
 {
     srate = sr;
 }
-void gain_reduction_audio_module::set_params(float att, float rel, float thr, float rat, float kn, float mak, float det, float byp, float mu)
+void gain_reduction_audio_module::set_params(float att, float rel, float thr, float rat, float kn, float mak, float det, float stl, float byp, float mu)
 {
     // set all params
     attack          = att;
@@ -1164,6 +1489,7 @@ void gain_reduction_audio_module::set_params(float att, float rel, float thr, fl
     knee            = kn;
     makeup          = mak;
     detection       = det;
+    stereo_link     = stl;
     bypass          = byp;
     mute            = mu;
     if(mute > 0.f) {

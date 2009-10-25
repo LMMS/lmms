@@ -926,8 +926,8 @@ class gain_reduction_audio_module {
 private:
     float linSlope, detected, kneeSqrt, kneeStart, linKneeStart, kneeStop;
     float compressedKneeStop, adjKneeStart, thres;
-    float attack, release, threshold, ratio, knee, makeup, detection, bypass, mute, meter_out, meter_comp;
-    float old_threshold, old_ratio, old_knee, old_makeup, old_bypass, old_mute, old_detection;
+    float attack, release, threshold, ratio, knee, makeup, detection, stereo_link, bypass, mute, meter_out, meter_comp;
+    float old_threshold, old_ratio, old_knee, old_makeup, old_bypass, old_mute, old_detection, old_stereo_link;
     int last_generation;
     uint32_t srate;
     bool is_active;
@@ -935,8 +935,8 @@ private:
     inline float output_gain(float linSlope, bool rms);
 public:
     gain_reduction_audio_module();
-    void set_params(float att, float rel, float thr, float rat, float kn, float mak, float det, float byp, float mu);
-    void process(float &left, float &right);
+    void set_params(float att, float rel, float thr, float rat, float kn, float mak, float det, float stl, float byp, float mu);
+    void process(float &left, float &right, float det_left = NULL, float det_right = NULL);
     void activate();
     void deactivate();
     int id;
@@ -947,6 +947,78 @@ public:
     virtual bool get_dot(int subindex, float &x, float &y, int &size, cairo_iface *context);
     virtual bool get_gridline(int subindex, float &pos, bool &vertical, std::string &legend, cairo_iface *context);
     virtual int  get_changed_offsets(int generation, int &subindex_graph, int &subindex_dot, int &subindex_gridline);
+};
+
+
+/// Sidecain Compressor by Markus Schmidt (based on Thor's compressor and Krzysztof's filters)
+class sidechaincompressor_audio_module: public audio_module<sidechaincompressor_metadata>, public frequency_response_line_graph  {
+private:
+    enum CalfScModes {
+        WIDEBAND,
+        DEESSER_WIDE,
+        DEESSER_SPLIT,
+        DERUMBLER_WIDE,
+        DERUMBLER_SPLIT,
+        WEIGHTED_1,
+        WEIGHTED_2,
+        WEIGHTED_3,
+        BANDPASS_1,
+        BANDPASS_2
+    };
+    float f1_freq_old, f2_freq_old, f1_level_old, f2_level_old;
+    CalfScModes sc_mode;
+    float f1_active, f2_active;
+    uint32_t clip_in, clip_out;
+    float meter_in, meter_out;
+    gain_reduction_audio_module compressor;
+    biquad_d2<float> f1L, f1R, f2L, f2R;
+public:
+    typedef std::complex<double> cfloat;
+    float *ins[in_count];
+    float *outs[out_count];
+    float *params[param_count];
+    uint32_t srate;
+    bool is_active;
+    sidechaincompressor_audio_module();
+    void activate();
+    void deactivate();
+    void params_changed();
+    inline cfloat h_z(const cfloat &z) {
+        switch (sc_mode) {
+            default:
+            case WIDEBAND:
+                return false;
+                break;
+            case DEESSER_WIDE:
+            case DERUMBLER_WIDE:
+            case WEIGHTED_1:
+            case WEIGHTED_2:
+            case WEIGHTED_3:
+            case BANDPASS_2:
+                return f1L.h_z(z) * f2L.h_z(z);
+                break;
+            case DEESSER_SPLIT:
+            case DERUMBLER_SPLIT:
+            case BANDPASS_1:
+                return f1L.h_z(z);
+                break;
+        }
+                
+    }
+    float freq_gain(int index, double freq, uint32_t sr)
+    {
+        typedef std::complex<double> cfloat;
+        freq *= 2.0 * M_PI / sr;
+        cfloat z = 1.0 / exp(cfloat(0.0, freq));
+        
+        return std::abs(h_z(z));
+    }
+    void set_sample_rate(uint32_t sr);
+    uint32_t process(uint32_t offset, uint32_t numsamples, uint32_t inputs_mask, uint32_t outputs_mask);
+    virtual bool get_graph(int index, int subindex, float *data, int points, cairo_iface *context);
+    virtual bool get_dot(int index, int subindex, float &x, float &y, int &size, cairo_iface *context);
+    virtual bool get_gridline(int index, int subindex, float &pos, bool &vertical, std::string &legend, cairo_iface *context);
+    virtual int  get_changed_offsets(int index, int generation, int &subindex_graph, int &subindex_dot, int &subindex_gridline);
 };
 
 /// Multibandcompressor by Markus Schmidt
