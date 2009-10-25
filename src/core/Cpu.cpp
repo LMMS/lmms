@@ -22,11 +22,11 @@
  *
  */
 
+#include <QtCore/QDebug>
 
 #include "Cpu.h"
 
 #include <cstdlib>
-#include <cstdio>
 #include <memory.h>
 
 
@@ -442,7 +442,7 @@ void init()
 #endif
 		if( features & SSE )
 		{
-			fprintf( stderr, "Using SSE optimized routines\n" );
+			qDebug( "Using SSE optimized routines" );
 			memCpy = memCpySSE;
 			memClear = memClearSSE;
 			bufApplyGain = bufApplyGainSSE;
@@ -455,7 +455,7 @@ void init()
 		}
 		if( features & SSE2 )
 		{
-			fprintf( stderr, "Using SSE2 optimized routines\n" );
+			qDebug( "Using SSE2 optimized routines" );
 			memCpy = memCpySSE2;
 			memClear = memClearSSE2;
 			convertToS16 = convertToS16SSE2;
