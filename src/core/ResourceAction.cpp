@@ -98,6 +98,21 @@ bool ResourceAction::importProject( trackContainer * _target )
 
 
 
+bool ResourceAction::defaultTrigger()
+{
+	switch( m_action )
+	{
+		case LoadProject:
+			return loadProject();
+		case ImportFile:
+			return importProject( engine::getSong() );
+		default:
+			break;
+	}
+	return false;
+}
+
+
 
 #include "moc_ResourceAction.cxx"
 

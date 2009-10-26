@@ -364,25 +364,11 @@ void ResourceBrowser::manageDirectories()
 void ResourceBrowser::triggerAction( ResourceAction::Action _action,
 										ResourceItem * _item )
 {
+	ResourceAction action( _item, _action );
 	switch( _action )
 	{
-		case ResourceAction::LoadProject:
-			if( engine::mainWindow()->mayChangeProject() )
-			{
-				ResourceFileMapper mapper( _item );
-				if( _item->isLocalResource() )
-				{
-					engine::getSong()->loadProject( mapper.fileName() );
-				}
-				else
-				{
-					engine::getSong()->
-						createNewProjectFromTemplate( mapper.fileName() );
-				}
-			}
-			break;
-		case ResourceAction::ImportFile:
-			ResourceAction( _item ).importProject( engine::getSong() );
+		default:
+			action.defaultTrigger();
 			break;
 	}
 }
