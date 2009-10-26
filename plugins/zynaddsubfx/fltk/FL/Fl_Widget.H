@@ -1,5 +1,5 @@
 //
-// "$Id: Fl_Widget.H 6753 2009-04-12 09:40:59Z AlbrechtS $"
+// "$Id: Fl_Widget.H 6912 2009-10-02 19:08:55Z matt $"
 //
 // Widget header file for the Fast Light Tool Kit (FLTK).
 //
@@ -69,7 +69,7 @@ struct FL_EXPORT Fl_Label {
   /** size of label font */
   Fl_Fontsize size;
   /** text color */
-  unsigned color;
+  Fl_Color color;
   /** Draws the label aligned to the given box */
   void draw(int,int,int,int, Fl_Align) const ;
   void measure(int &w, int &h) const ;
@@ -96,9 +96,9 @@ class FL_EXPORT Fl_Widget {
   void* user_data_;
   int x_,y_,w_,h_;
   Fl_Label label_;
-  int flags_;
-  unsigned color_;
-  unsigned color2_;
+  unsigned int flags_;
+  Fl_Color color_;
+  Fl_Color color2_;
   uchar type_;
   uchar damage_;
   uchar box_;
@@ -135,23 +135,37 @@ protected:
   /** Internal use only. Use position(int,int), size(int,int) or resize(int,int,int,int) instead. */
   void h(int v) {h_ = v;}
   /** Gets the widget flags mask */
-  int flags() const {return flags_;}
+  unsigned int flags() const {return flags_;}
   /** Sets a flag in the flags mask */
-  void set_flag(int c) {flags_ |= c;}
+  void set_flag(unsigned int c) {flags_ |= c;}
   /** Clears a flag in the flags mask */
-  void clear_flag(int c) {flags_ &= ~c;}
+  void clear_flag(unsigned int c) {flags_ &= ~c;}
   /** flags possible values enumeration.
       See activate(), output(), visible(), changed(), set_visible_focus()
   */
   enum {
-        INACTIVE=1,	    ///< the widget can't receive focus, and is disabled but potentially visible
-        INVISIBLE=2,	    ///< the widget is not drawn but can receive events
-        OUTPUT=4,           ///< for output only
-        SHORTCUT_LABEL=64,  ///< the label contains a shortcut we need to draw
-        CHANGED=128,	    ///< the widget value changed
-        VISIBLE_FOCUS=512,  ///< accepts keyboard focus navigation if the widget can have the focus
-        COPIED_LABEL=1024   ///< the widget label is internally copied, its destruction is handled by the widget
-       };
+        INACTIVE        = 1<<0,   ///< the widget can't receive focus, and is disabled but potentially visible
+        INVISIBLE       = 1<<1,   ///< the widget is not drawn but can receive events
+        OUTPUT          = 1<<2,   ///< for output only
+        NOBORDER        = 1<<3,   ///< don't draw a decoration (Fl_Window)
+        FORCE_POSITION  = 1<<4,   ///< don't let the window manager position the window (Fl_Window)
+        NON_MODAL       = 1<<5,   ///< thisis a hovering toolbar window (Fl_Window)
+        SHORTCUT_LABEL  = 1<<6,   ///< the label contains a shortcut we need to draw
+        CHANGED         = 1<<7,   ///< the widget value changed
+        OVERRIDE        = 1<<8,   ///< position window on top (Fl_Window)
+        VISIBLE_FOCUS   = 1<<9,   ///< accepts keyboard focus navigation if the widget can have the focus
+        COPIED_LABEL    = 1<<10,  ///< the widget label is internally copied, its destruction is handled by the widget
+        CLIP_CHILDREN   = 1<<11,  ///< all drawing within this widget will be clipped (Fl_Group)
+        MENU_WINDOW     = 1<<12,  ///< a temporary popup window, dismissed by clicking outside (Fl_Window)
+        TOOLTIP_WINDOW  = 1<<13,  ///< a temporary popup, transparent to events, and dismissed easily (Fl_Window)
+        MODAL           = 1<<14,  ///< a window blocking input to all other winows (Fl_Window)
+        NO_OVERLAY      = 1<<15,  ///< window not using a hardware overlay plane (Fl_Menu_Window)
+        GROUP_RELATIVE  = 1<<16,  ///< position this idget relative to the parent group, not to the window
+        // (space for more flags)
+        USERFLAG3       = 1<<29,  ///< reserved for 3rd party extensions
+        USERFLAG2       = 1<<30,  ///< reserved for 3rd party extensions
+        USERFLAG1       = 1<<31   ///< reserved for 3rd party extensions
+  };
   void draw_box() const;
   void draw_box(Fl_Boxtype t, Fl_Color c) const;
   void draw_box(Fl_Boxtype t, int x,int y,int w,int h, Fl_Color c) const;
@@ -343,9 +357,9 @@ public:
 
   /** Gets the background color of the widget.
       \return current background color
-      \see color(unsigned), color(unsigned, unsigned)
+      \see color(Fl_Color), color(Fl_Color, Fl_Color)
    */
-  Fl_Color color() const {return (Fl_Color)color_;}
+  Fl_Color color() const {return color_;}
 
   /** Sets the background color of the widget. 
       The color is passed to the box routine. The color is either an index into 
@@ -355,25 +369,25 @@ public:
       The default for most widgets is FL_BACKGROUND_COLOR. Use Fl::set_color()
       to redefine colors in the color map.
       \param[in] bg background color
-      \see color(), color(unsigned, unsigned), selection_color(unsigned)
+      \see color(), color(Fl_Color, Fl_Color), selection_color(Fl_Color)
    */
-  void color(unsigned bg) {color_ = bg;}
+  void color(Fl_Color bg) {color_ = bg;}
 
   /** Gets the selection color.
       \return the current selection color
-      \see selection_color(unsigned), color(unsigned, unsigned)
+      \see selection_color(Fl_Color), color(Fl_Color, Fl_Color)
    */
-  Fl_Color selection_color() const {return (Fl_Color)color2_;}
+  Fl_Color selection_color() const {return color2_;}
 
   /** Sets the selection color.
       The selection color is defined for Forms compatibility and is usually 
       used to color the widget when it is selected, although some widgets 
       use this color for other purposes. You can set both colors at once 
-      with color(unsigned bg, unsigned sel).
+      with color(Fl_Color bg, Fl_Color sel).
       \param[in] a the new selection color
-      \see selection_color(), color(unsigned, unsigned)
+      \see selection_color(), color(Fl_Color, Fl_Color)
    */
-  void selection_color(unsigned a) {color2_ = a;}
+  void selection_color(Fl_Color a) {color2_ = a;}
 
   /** Sets the background and selection color of the widget. 
 
@@ -382,7 +396,7 @@ public:
       \param[in] sel selection color
       \see color(unsigned), selection_color(unsigned)
    */
-  void color(unsigned bg, unsigned sel) {color_=bg; color2_=sel;}
+  void color(Fl_Color bg, Fl_Color sel) {color_=bg; color2_=sel;}
 
   /** Gets the current label text.
       \return a pointer to the current label text
@@ -439,13 +453,13 @@ public:
       The default color is FL_FOREGROUND_COLOR. 
       \return the current label color
    */
-  Fl_Color labelcolor() const {return (Fl_Color)label_.color;}
+  Fl_Color labelcolor() const {return label_.color;}
 
   /** Sets the label color. 
       The default color is FL_FOREGROUND_COLOR. 
       \param[in] c the new label color
    */
-  void labelcolor(unsigned c) {label_.color=c;}
+  void labelcolor(Fl_Color c) {label_.color=c;}
 
   /** Gets the font to use. 
       Fonts are identified by indexes into a table. The default value
@@ -633,7 +647,7 @@ public:
       \retval 0 if the widget is not drawn and hence invisible.
       \see show(), hide(), visible_r()
    */
-  int visible() const {return !(flags_&INVISIBLE);}
+  unsigned int visible() const {return !(flags_&INVISIBLE);}
 
   /** Returns whether a widget and all its parents are visible.
       \retval 0 if the widget or any of its parents are invisible.
@@ -678,7 +692,7 @@ public:
       \retval 0 if the widget is inactive
       \see active_r(), activate(), deactivate()
    */
-  int active() const {return !(flags_&INACTIVE);}
+  unsigned int active() const {return !(flags_&INACTIVE);}
 
   /** Returns whether the widget and all of its parents are active. 
       \retval 0 if this or any of the parent widgets are inactive
@@ -717,7 +731,7 @@ public:
       \retval 0 if the widget is used for input and output
       \see set_output(), clear_output() 
    */
-  int output() const {return (flags_&OUTPUT);}
+  unsigned int output() const {return (flags_&OUTPUT);}
 
   /** Sets a widget to output only.
       \see output(), clear_output() 
@@ -734,7 +748,7 @@ public:
       && visible()) but is faster.
       \retval 0 if the widget takes no events
    */ 
-  int takesevents() const {return !(flags_&(INACTIVE|INVISIBLE|OUTPUT));}
+  unsigned int takesevents() const {return !(flags_&(INACTIVE|INVISIBLE|OUTPUT));}
 
   /** 
       Checks if the widget value changed since the last callback.
@@ -751,7 +765,7 @@ public:
      \retval 0 if the value did not change
      \see set_changed(), clear_changed()
    */
-  int changed() const {return flags_&CHANGED;}
+  unsigned int changed() const {return flags_&CHANGED;}
 
   /** Marks the value of the widget as changed.
       \see changed(), clear_changed()
@@ -796,7 +810,7 @@ public:
       \retval 0 if this widget has no visible focus.
       \see visible_focus(int), set_visible_focus(), clear_visible_focus()
    */
-  int  visible_focus() { return flags_ & VISIBLE_FOCUS; }
+  unsigned int  visible_focus() { return flags_ & VISIBLE_FOCUS; }
 
   /** Sets the default callback for all widgets.
       Sets the default callback, which puts a pointer to the widget on the queue 
@@ -828,7 +842,7 @@ public:
   /** Internal use only. */
   int test_shortcut();
   /** Internal use only. */
-  static char label_shortcut(const char *t);
+  static Fl_Shortcut label_shortcut(const char *t);
   /** Internal use only. */
   static int test_shortcut(const char*);
 
@@ -866,9 +880,16 @@ public:
    */
   uchar damage() const {return damage_;}
 
-  /** Clears the damage flags.
+  /** Clears or sets the damage flags.
       Damage flags are cleared when parts of the widget drawing is repaired.
-      \param[in] c bitmask of flags to clear
+
+      The optional argument \p c specifies the bits that <b>are set</b>
+      after the call (default: 0) and \b not the bits that are cleared!
+
+      \note Therefore it is possible to set damage bits with this method, but
+      this should be avoided. Use damage(uchar) instead.
+      
+      \param[in] c new bitmask of damage flags (default: 0)
       \see damage(uchar), damage()
    */
   void clear_damage(uchar c = 0) {damage_ = c;}
@@ -923,5 +944,5 @@ public:
 #endif
 
 //
-// End of "$Id: Fl_Widget.H 6753 2009-04-12 09:40:59Z AlbrechtS $".
+// End of "$Id: Fl_Widget.H 6912 2009-10-02 19:08:55Z matt $".
 //

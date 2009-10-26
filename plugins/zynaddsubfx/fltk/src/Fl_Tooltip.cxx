@@ -1,5 +1,5 @@
 //
-// "$Id: Fl_Tooltip.cxx 6712 2009-03-22 19:21:34Z AlbrechtS $"
+// "$Id: Fl_Tooltip.cxx 6902 2009-09-27 11:06:56Z matt $"
 //
 // Tooltip source file for the Fast Light Tool Kit (FLTK).
 //
@@ -34,10 +34,10 @@
 float		Fl_Tooltip::delay_ = 1.0f;
 float		Fl_Tooltip::hoverdelay_ = 0.2f;
 int		Fl_Tooltip::enabled_ = 1;
-unsigned	Fl_Tooltip::color_ = fl_color_cube(FL_NUM_RED - 1,
+Fl_Color	Fl_Tooltip::color_ = fl_color_cube(FL_NUM_RED - 1,
 		                                   FL_NUM_GREEN - 1,
 						   FL_NUM_BLUE - 2);
-unsigned	Fl_Tooltip::textcolor_ = FL_BLACK;
+Fl_Color	Fl_Tooltip::textcolor_ = FL_BLACK;
 Fl_Font         Fl_Tooltip::font_ = FL_HELVETICA;
 Fl_Fontsize    Fl_Tooltip::size_ = FL_NORMAL_SIZE;
 
@@ -278,5 +278,5 @@ void Fl_Widget::tooltip(const char *tt) {
 }
 
 //
-// End of "$Id: Fl_Tooltip.cxx 6712 2009-03-22 19:21:34Z AlbrechtS $".
+// End of "$Id: Fl_Tooltip.cxx 6902 2009-09-27 11:06:56Z matt $".
 //

@@ -1,5 +1,5 @@
 //
-// "$Id: Fl_File_Chooser2.cxx 6678 2009-03-13 23:36:09Z AlbrechtS $"
+// "$Id: Fl_File_Chooser2.cxx 6899 2009-09-23 21:32:23Z matt $"
 //
 // More Fl_File_Chooser routines.
 //
@@ -858,7 +858,7 @@ Fl_File_Chooser::fileNameCB()
       }
     } else {
       // File doesn't exist, so beep at and alert the user...
-      fl_alert("%s", existing_file_label);
+      fl_alert(existing_file_label);
     }
   }
   else if (Fl::event_key() != FL_Delete &&
@@ -1046,7 +1046,7 @@ Fl_File_Chooser::newdir()
 
 
   // Get a directory name from the user
-  if ((dir = fl_input("%s", new_directory_label, (char *)NULL)) == NULL)
+  if ((dir = fl_input(new_directory_label, NULL)) == NULL)
     return;
 
   // Make it relative to the current directory as needed...
@@ -1213,7 +1213,7 @@ Fl_File_Chooser::showChoiceCB()
   item = showChoice->text(showChoice->value());
 
   if (strcmp(item, custom_filter_label) == 0) {
-    if ((item = fl_input("%s",custom_filter_label, pattern_)) != NULL) {
+    if ((item = fl_input(custom_filter_label, pattern_)) != NULL) {
       strlcpy(pattern_, item, sizeof(pattern_));
 
       quote_pathname(temp, item, sizeof(temp));
@@ -1332,10 +1332,37 @@ Fl_File_Chooser::update_preview()
     window->cursor(FL_CURSOR_DEFAULT);
     Fl::check();
 
-    // Scan the buffer for printable chars...
-    for (ptr = preview_text_;
+    // Scan the buffer for printable UTF8 chars...
+    for (ptr = preview_text_; *ptr; ptr++) {
+      uchar c = uchar(*ptr);
+      if ( (c&0x80)==0 ) {
+        if (!isprint(c&255) && !isspace(c&255)) break;
+      } else if ( (c&0xe0)==0xc0 ) {
+        if (ptr[1] && (ptr[1]&0xc0)!=0x80) break;
+        ptr++;
+      } else if ( (c&0xf0)==0xe0 ) {
+        if (ptr[1] && (ptr[1]&0xc0)!=0x80) break;
+        ptr++;
+        if (ptr[1] && (ptr[1]&0xc0)!=0x80) break;
+        ptr++;
+      } else if ( (c&0xf8)==0xf0 ) {
+        if (ptr[1] && (ptr[1]&0xc0)!=0x80) break;
+        ptr++;
+        if (ptr[1] && (ptr[1]&0xc0)!=0x80) break;
+        ptr++;
+        if (ptr[1] && (ptr[1]&0xc0)!=0x80) break;
+        ptr++;
+      }
+    } 
+//         *ptr && (isprint(*ptr & 255) || isspace(*ptr & 255));
+//	 ptr ++);
+
+    // Scan the buffer for printable characters in 8 bit
+    if (*ptr || ptr == preview_text_) {
+      for (ptr = preview_text_;
          *ptr && (isprint(*ptr & 255) || isspace(*ptr & 255));
 	 ptr ++);
+    }
 
     if (*ptr || ptr == preview_text_) {
       // Non-printable file, just show a big ?...
@@ -1589,5 +1616,5 @@ unquote_pathname(char       *dst,	// O - Destination string
 
 
 //
-// End of "$Id: Fl_File_Chooser2.cxx 6678 2009-03-13 23:36:09Z AlbrechtS $".
+// End of "$Id: Fl_File_Chooser2.cxx 6899 2009-09-23 21:32:23Z matt $".
 //

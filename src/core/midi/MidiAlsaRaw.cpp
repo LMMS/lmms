@@ -23,8 +23,9 @@
  */
 
 #include <QtGui/QLabel>
-#include <QtGui/QLineEdit>
+#include <QtGui/QComboBox>
 
+#include "AlsaDeviceListModel.h"
 #include "MidiAlsaRaw.h"
 #include "config_mgr.h"
 #include "gui_templates.h"
@@ -179,8 +180,14 @@ void MidiAlsaRaw::run()
 MidiAlsaRaw::setupWidget::setupWidget( QWidget * _parent ) :
 	MidiClientRaw::setupWidget( MidiAlsaRaw::name(), _parent )
 {
-	m_device = new QLineEdit( MidiAlsaRaw::probeDevice(), this );
-	m_device->setGeometry( 10, 20, 160, 20 );
+	m_device = new QComboBox( this );
+	m_device->setGeometry( 10, 20, 180, 20 );
+	m_device->setModel( new AlsaDeviceListModel(
+			SND_RAWMIDI_STREAM_INPUT,
+			this ) );
+	m_device->setEditable( true );
+	m_device->setInsertPolicy( QComboBox::NoInsert );
+	m_device->setEditText( MidiAlsaRaw::probeDevice() );
 
 	QLabel * dev_lbl = new QLabel( tr( "DEVICE" ), this );
 	dev_lbl->setFont( pointSize<6>( dev_lbl->font() ) );
@@ -200,7 +207,7 @@ MidiAlsaRaw::setupWidget::~setupWidget()
 void MidiAlsaRaw::setupWidget::saveSettings()
 {
 	configManager::inst()->setValue( "MidiAlsaRaw", "Device",
-							m_device->text() );
+							m_device->currentText() );
 }
 
 

@@ -110,39 +110,11 @@ public:
         inertia_pitchbend.set_inertia(pow(2.0, (value * *params[par_pwhlrange]) / (1200.0 * 8192.0)));
     }
     /// Update oscillator frequency based on base frequency, detune amount, pitch bend scaling factor and sample rate.
-    inline void set_frequency()
-    {
-        float detune_scaled = (detune - 1); // * log(freq / 440);
-        if (*params[par_scaledetune] > 0)
-            detune_scaled *= pow(20.0 / freq, *params[par_scaledetune]);
-        float p1 = 1, p2 = 1;
-        if (moddest[moddest_o1detune] != 0)
-            p1 = pow(2.0, moddest[moddest_o1detune] * (1.0 / 1200.0));
-        if (moddest[moddest_o2detune] != 0)
-            p2 = pow(2.0, moddest[moddest_o2detune] * (1.0 / 1200.0));
-        osc1.set_freq(freq * (1 - detune_scaled) * p1 * inertia_pitchbend.get_last() * lfo_bend, srate);
-        osc2.set_freq(freq * (1 + detune_scaled) * p2 * inertia_pitchbend.get_last() * lfo_bend * xpose, srate);
-    }
+    void set_frequency();
     /// Handle control change messages.
     void control_change(int controller, int value);
     /// Update variables from control ports.
-    void params_changed() {
-        float sf = 0.001f;
-        envelope.set(*params[par_attack] * sf, *params[par_decay] * sf, std::min(0.999f, *params[par_sustain]), *params[par_release] * sf, srate / step_size, *params[par_fade] * sf);
-        filter_type = dsp::fastf2i_drm(*params[par_filtertype]);
-        decay_factor = odcr * 1000.0 / *params[par_decay];
-        separation = pow(2.0, *params[par_cutoffsep] / 1200.0);
-        wave1 = dsp::clip(dsp::fastf2i_drm(*params[par_wave1]), 0, (int)wave_count - 1);
-        wave2 = dsp::clip(dsp::fastf2i_drm(*params[par_wave2]), 0, (int)wave_count - 1);
-        detune = pow(2.0, *params[par_detune] / 1200.0);
-        xpose = pow(2.0, *params[par_osc2xpose] / 12.0);
-        xfade = *params[par_oscmix];
-        legato = dsp::fastf2i_drm(*params[par_legato]);
-        master.set_inertia(*params[par_master]);
-        set_frequency();
-        if (wave1 != prev_wave1 || wave2 != prev_wave2)
-            lookup_waveforms();
-    }
+    void params_changed();
     void activate();
     void deactivate();
     void post_instantiate()

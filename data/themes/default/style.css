@@ -107,7 +107,7 @@ trackWidget {
 /*	border-bottom: 1px solid rgb(0, 0, 0);*/
 	background-color: rgb(0, 0, 0);
 }
-nameLabel, effectLabel, sf2InstrumentView > QLabel {
+nameLabel, effectLabel, sf2InstrumentView > QLabel, QComboBox {
 	font-size:10px;
 }
 

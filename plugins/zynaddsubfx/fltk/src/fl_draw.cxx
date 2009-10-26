@@ -1,5 +1,5 @@
 //
-// "$Id: fl_draw.cxx 6735 2009-04-01 22:11:57Z engelsman $"
+// "$Id: fl_draw.cxx 6845 2009-08-28 20:14:41Z greg.ercolano $"
 //
 // Label drawing code for the Fast Light Tool Kit (FLTK).
 //
@@ -422,6 +422,31 @@ void fl_measure(const char* str, int& w, int& h, int draw_symbols) {
   h = lines*h;
 }
 
+/**
+  This function returns the actual height of the specified \p font
+  and \p size. Normally the font height should always be 'size',
+  but with the advent of XFT, there are (currently) complexities
+  that seem to only be solved by asking the font what its actual
+  font height is. (See STR#2115)
+  
+  This function was originally undocumented in 1.1.x, and was used
+  only by Fl_Text_Display. We're now documenting it in 1.3.x so that
+  apps that need precise height info can get it with this function.
+
+  \returns the height of the font in pixels.
+  
+  \todo  In the future, when the XFT issues are resolved, this function
+         should simply return the 'size' value.
+*/
+int fl_height(int font, int size) {
+    if ( font == fl_font() && size == fl_size() ) return(fl_height());
+    int tf = fl_font(), ts = fl_size();   // save
+    fl_font(font,size);
+    int height = fl_height();
+    fl_font(tf,ts);                       // restore
+    return(height);
+}
+
 //
-// End of "$Id: fl_draw.cxx 6735 2009-04-01 22:11:57Z engelsman $".
+// End of "$Id: fl_draw.cxx 6845 2009-08-28 20:14:41Z greg.ercolano $".
 //

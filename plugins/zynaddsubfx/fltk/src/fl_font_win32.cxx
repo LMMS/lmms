@@ -44,8 +44,8 @@ Fl_Font_Descriptor::Fl_Font_Descriptor(const char* name, Fl_Fontsize size) {
     fl_angle_*10,	            // base-line orientation angle
     weight,
     italic,
-    false,	        // underline attribute flag
-    false,	        // strikeout attribute flag
+    FALSE,	        // underline attribute flag
+    FALSE,	        // strikeout attribute flag
     DEFAULT_CHARSET,    // character set identifier
     OUT_DEFAULT_PRECIS,	// output precision
     CLIP_DEFAULT_PRECIS,// clipping precision

@@ -1,5 +1,5 @@
 //
-// "$Id: Fl_x.cxx 6767 2009-04-16 22:23:36Z AlbrechtS $"
+// "$Id: Fl_x.cxx 6905 2009-09-27 12:06:35Z matt $"
 //
 // X specific code for the Fast Light Tool Kit (FLTK).
 //
@@ -1352,7 +1352,7 @@ void Fl_Window::resize(int X,int Y,int W,int H) {
   int is_a_resize = (W != w() || H != h());
   int resize_from_program = (this != resize_bug_fix);
   if (!resize_from_program) resize_bug_fix = 0;
-  if (is_a_move && resize_from_program) set_flag(FL_FORCE_POSITION);
+  if (is_a_move && resize_from_program) set_flag(FORCE_POSITION);
   else if (!is_a_resize && !is_a_move) return;
   if (is_a_resize) {
     Fl_Group::resize(X,Y,W,H);
@@ -1430,7 +1430,7 @@ void Fl_X::make_xid(Fl_Window* win, XVisualInfo *visual, Colormap colormap)
   if (!win->parent() && !Fl::grab()) {
     // center windows in case window manager does not do anything:
 #ifdef FL_CENTER_WINDOWS
-    if (!(win->flags() & Fl_Window::FL_FORCE_POSITION)) {
+    if (!(win->flags() & Fl_Widget::FORCE_POSITION)) {
       win->x(X = scr_x+(scr_w-W)/2);
       win->y(Y = scr_y+(scr_h-H)/2);
     }
@@ -1636,7 +1636,7 @@ void Fl_X::sendxjunk() {
     prop[1] = 1|2|16; // MWM_FUNC_ALL | MWM_FUNC_RESIZE | MWM_FUNC_MAXIMIZE
   }
 
-  if (w->flags() & Fl_Window::FL_FORCE_POSITION) {
+  if (w->flags() & Fl_Widget::FORCE_POSITION) {
     hints->flags |= USPosition;
     hints->x = w->x();
     hints->y = w->y();
@@ -1741,5 +1741,5 @@ void Fl_Window::make_current() {
 #endif
 
 //
-// End of "$Id: Fl_x.cxx 6767 2009-04-16 22:23:36Z AlbrechtS $".
+// End of "$Id: Fl_x.cxx 6905 2009-09-27 12:06:35Z matt $".
 //

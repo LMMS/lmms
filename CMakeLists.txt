@@ -499,14 +499,14 @@ FOREACH(opt_target ${opt_targets})
 	IF("${CMAKE_C_COMPILER_ARG1}" STREQUAL " gcc")
 		SET(CMAKE_C_COMPILER_ARG1 gcc)
 	ENDIF("${CMAKE_C_COMPILER_ARG1}" STREQUAL " gcc")
-	SET(COMPILE_CMD ${CMAKE_C_COMPILER} ${CPU_X86_C} -O2 -fno-stack-protector -ftree-vectorize -fomit-frame-pointer -c -I${CMAKE_SOURCE_DIR}/include -I${CMAKE_BINARY_DIR} -g0 -DBUILD_${OPT_TARGET} -m${opt_target} ${FPMATH_FLAGS})
+	SET(CFLAGS ${CMAKE_C_FLAGS})
+	SEPARATE_ARGUMENTS(CFLAGS)
+	SET(COMPILE_CMD ${CMAKE_C_COMPILER} ${CPU_X86_C} ${CFLAGS} -O2 -fno-stack-protector -ftree-vectorize -fomit-frame-pointer -c -I${CMAKE_SOURCE_DIR}/include -I${CMAKE_BINARY_DIR} -g0 -DBUILD_${OPT_TARGET} -m${opt_target} ${FPMATH_FLAGS})
 	ADD_CUSTOM_COMMAND(OUTPUT ${CPU_X86_TARGET_O} COMMAND ${COMPILE_CMD} -o ${CPU_X86_TARGET_O} DEPENDS ${CPU_X86_C})
 	ADD_CUSTOM_TARGET(debug-${opt_target} COMMAND ${COMPILE_CMD} -o ${CPU_X86_TARGET_O}.s -S -ftree-vectorizer-verbose=2)
 	SET(cpu_objects ${cpu_objects} ${CPU_X86_TARGET_O})
 
 ENDFOREACH(opt_target ${opt_targets})
-
-	SET(lmms_SOURCES ${lmms_SOURCES} ${cpu_objects})
 
 ENDIF(LMMS_HOST_X86 OR LMMS_HOST_X86_64)
 
@@ -547,7 +547,7 @@ LINK_LIBRARIES(${QT_LIBRARIES} ${ASOUND_LIBRARY} ${SDL_LIBRARY} ${PORTAUDIO_LIBR
 
 ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_BINARY_DIR}/lmms.1.gz COMMAND gzip -c ${CMAKE_SOURCE_DIR}/lmms.1 > ${CMAKE_BINARY_DIR}/lmms.1.gz DEPENDS ${CMAKE_SOURCE_DIR}/lmms.1 COMMENT "Generating lmms.1.gz")
 
-ADD_EXECUTABLE(lmms ${lmms_SOURCES} ${lmms_INCLUDES} ${LIBSAMPLERATE_SOURCES} ${LMMS_ER_H} ${lmms_UI_out} lmmsconfig.h lmmsversion.h ${WINRC} ${CMAKE_BINARY_DIR}/lmms.1.gz)
+ADD_EXECUTABLE(lmms ${lmms_SOURCES} ${cpu_objects} ${lmms_INCLUDES} ${LIBSAMPLERATE_SOURCES} ${LMMS_ER_H} ${lmms_UI_out} lmmsconfig.h lmmsversion.h ${WINRC} ${CMAKE_BINARY_DIR}/lmms.1.gz)
 
 IF(LMMS_BUILD_WIN32)
 
@@ -581,7 +581,7 @@ FOREACH(_ts_file ${lmms_LOCALES})
 	STRING(REPLACE "${CMAKE_SOURCE_DIR}/data/locale/" "" _ts_target "${_ts_file}")
 	STRING(REPLACE ".ts" ".qm" _qm_file "${_ts_file}")
 	STRING(REPLACE ".ts" ".qm" _qm_target "${_ts_target}")
-	ADD_CUSTOM_TARGET(${_ts_target} COMMAND ${QT_LUPDATE_EXECUTABLE} ${lmms_SOURCES} `find ${CMAKE_SOURCE_DIR}/plugins/ -type f -name '*.cpp'` -ts ${_ts_file})
+	ADD_CUSTOM_TARGET(${_ts_target} COMMAND ${QT_LUPDATE_EXECUTABLE} -locations none -no-obsolete ${lmms_SOURCES} `find ${CMAKE_SOURCE_DIR}/plugins/ -type f -name '*.cpp'` -ts ${_ts_file})
 	ADD_CUSTOM_TARGET(${_qm_target} COMMAND ${QT_LRELEASE_EXECUTABLE} ${_ts_file} -qm ${_qm_file})
 	LIST(APPEND ts_targets "${_ts_target}")
 	LIST(APPEND qm_targets "${_qm_target}")
@@ -631,7 +631,7 @@ ADD_CUSTOM_TARGET(dist
 			COMMAND make clean
 			COMMAND rm -rf ${TMP}
 			COMMAND mkdir -p ${TMP}
-			COMMAND cp AUTHORS build_mingw32 ChangeLog CMakeLists.txt configure COPYING INSTALL lmms.1 lmms.rc.in lmms.spec.in lmmsconfig.h.in README TODO ${TMP}
+			COMMAND cp AUTHORS build_mingw32 CMakeLists.txt configure COPYING INSTALL lmms.1 lmms.rc.in lmms.spec.in lmmsconfig.h.in README TODO ${TMP}
 			COMMAND cp -r buildtools cmake data include plugins src ${TMP}
 			COMMAND rm -rf `find ${TMP} -type d -name ".svn"`  `find ${TMP} -name cmake_install.cmake` `find ${TMP} -name Makefile` `find ${TMP} -type d -name CMakeFiles` ${TMP}/CMakeCache.txt
 			COMMAND tar cjf lmms-${VERSION}.tar.bz2 ${TMP}

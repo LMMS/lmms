@@ -1,5 +1,5 @@
 //
-// "$Id: Fl_Menu_Item.H 6614 2009-01-01 16:11:32Z matt $"
+// "$Id: Fl_Menu_Item.H 6902 2009-09-27 11:06:56Z matt $"
 //
 // Menu item header file for the Fast Light Tool Kit (FLTK).
 //
@@ -36,18 +36,18 @@
 #  endif
 
 enum { // values for flags:
-  FL_MENU_INACTIVE = 1,
-  FL_MENU_TOGGLE= 2,
-  FL_MENU_VALUE = 4,
-  FL_MENU_RADIO = 8,
-  FL_MENU_INVISIBLE = 0x10,
-  FL_SUBMENU_POINTER = 0x20,
-  FL_SUBMENU = 0x40,
-  FL_MENU_DIVIDER = 0x80,
-  FL_MENU_HORIZONTAL = 0x100
+  FL_MENU_INACTIVE = 1,		///< Deactivate menu item (gray out)
+  FL_MENU_TOGGLE= 2,		///< Item is a checkbox toggle (shows checkbox for on/off state)
+  FL_MENU_VALUE = 4,		///< The on/off state for checkbox/radio buttons (if set, state is 'on')
+  FL_MENU_RADIO = 8,		///< Item is a radio button (one checkbox of many can be on)
+  FL_MENU_INVISIBLE = 0x10,	///< Item will not show up (shortcut will work)
+  FL_SUBMENU_POINTER = 0x20,	///< Indicates user_data() is a pointer to another menu array
+  FL_SUBMENU = 0x40,		///< This item is a submenu to other items
+  FL_MENU_DIVIDER = 0x80,	///< Creates divider line below this item. Also ends a group of radio buttons.
+  FL_MENU_HORIZONTAL = 0x100	///< ??? -- reserved
 };
 
-extern FL_EXPORT int fl_old_shortcut(const char*);
+extern FL_EXPORT Fl_Shortcut fl_old_shortcut(const char*);
 
 class Fl_Menu_;
 
@@ -68,15 +68,15 @@ class Fl_Menu_;
   };
   
   enum { // values for flags:
-   FL_MENU_INACTIVE	= 1,
-   FL_MENU_TOGGLE	= 2,
-   FL_MENU_VALUE	= 4,
-   FL_MENU_RADIO	= 8,
-   FL_MENU_INVISIBLE	= 0x10,
-   FL_SUBMENU_POINTER	= 0x20,
-   FL_SUBMENU		= 0x40,
-   FL_MENU_DIVIDER	= 0x80,
-   FL_MENU_HORIZONTAL	= 0x100
+   FL_MENU_INACTIVE	= 1,      // Deactivate menu item (gray out)
+   FL_MENU_TOGGLE	= 2,      // Item is a checkbox toggle (shows checkbox for on/off state)
+   FL_MENU_VALUE	= 4,      // The on/off state for checkbox/radio buttons (if set, state is 'on')
+   FL_MENU_RADIO	= 8,      // Item is a radio button (one checkbox of many can be on)
+   FL_MENU_INVISIBLE	= 0x10,   // Item will not show up (shortcut will work)
+   FL_SUBMENU_POINTER	= 0x20,   // Indicates user_data() is a pointer to another menu array
+   FL_SUBMENU		= 0x40,   // This item is a submenu to other items
+   FL_MENU_DIVIDER	= 0x80,   // Creates divider line below this item. Also ends a group of radio buttons.
+   FL_MENU_HORIZONTAL	= 0x100   // ??? -- reserved
   };
   \endcode
   Typically menu items are statically defined; for example:
@@ -124,7 +124,7 @@ struct FL_EXPORT Fl_Menu_Item {
   uchar labeltype_;	    ///< how the menu item text looks like
   Fl_Font labelfont_;	    ///< which font for this menu item text
   Fl_Fontsize labelsize_;   ///< size of menu item text
-  unsigned labelcolor_;	    ///< menu item text color 
+  Fl_Color labelcolor_;	    ///< menu item text color 
 
   // advance N items, skipping submenus:
   const Fl_Menu_Item *next(int=1) const;
@@ -181,10 +181,10 @@ struct FL_EXPORT Fl_Menu_Item {
     color is not black fltk will <I>not</I> use overlay bitplanes to draw
     the menu - this is so that images put in the menu draw correctly.
   */
-  Fl_Color labelcolor() const {return (Fl_Color)labelcolor_;}
+  Fl_Color labelcolor() const {return labelcolor_;}
 
   /** See Fl_Color Fl_Menu_Item::labelcolor() const */
-  void labelcolor(unsigned a) {labelcolor_ = a;}
+  void labelcolor(Fl_Color a) {labelcolor_ = a;}
   /**
     Fonts are identified by small 8-bit indexes into a table. See the 
     enumeration list for predefined fonts. The default value is a
@@ -414,5 +414,5 @@ enum {	// back-compatibility enum:
 #endif
 
 //
-// End of "$Id: Fl_Menu_Item.H 6614 2009-01-01 16:11:32Z matt $".
+// End of "$Id: Fl_Menu_Item.H 6902 2009-09-27 11:06:56Z matt $".
 //

@@ -669,7 +669,7 @@ MidiAlsaSeq::setupWidget::setupWidget( QWidget * _parent ) :
 	MidiClient::setupWidget( MidiAlsaSeq::name(), _parent )
 {
 	m_device = new QLineEdit( MidiAlsaSeq::probeDevice(), this );
-	m_device->setGeometry( 10, 20, 160, 20 );
+	m_device->setGeometry( 10, 20, 180, 20 );
 
 	QLabel * dev_lbl = new QLabel( tr( "DEVICE" ), this );
 	dev_lbl->setFont( pointSize<6>( dev_lbl->font() ) );
