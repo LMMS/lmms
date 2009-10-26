@@ -269,6 +269,8 @@ void ResourceBrowser::startItemPreview( const QModelIndex & _idx )
 }
 
 
+
+
 void ResourceBrowser::setFocusAndPreview( const QModelIndex & _idx )
 {
 	// transfor focus to the treeview. for some reason you have to
@@ -291,7 +293,7 @@ void ResourceBrowser::stopItemPreview( const QModelIndex & )
 
 
 void ResourceBrowser::currentChanged( const QModelIndex & current, 
-	const QModelIndex & previous )
+										const QModelIndex & previous )
 {
 
 	// stop previous previews
@@ -300,6 +302,7 @@ void ResourceBrowser::currentChanged( const QModelIndex & current,
 	// start previewing the sound we just changed to
 	startItemPreview( current );
 }
+
 
 
 
