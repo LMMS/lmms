@@ -1,5 +1,5 @@
 /*
- * QuickLoadDialog.h - header file for QuickLoadDialog
+ * ResourceSelectDialog.h - header file for ResourceSelectDialog
  *
  * Copyright (c) 2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -22,25 +22,50 @@
  *
  */
 
-#ifndef _QUICK_LOAD_DIALOG_H
-#define _QUICK_LOAD_DIALOG_H
+#ifndef _RESOURCE_SELECT_DIALOG_H
+#define _RESOURCE_SELECT_DIALOG_H
 
-#include "ResourceItem.h"
-#include "ResourceSelectDialog.h"
+#include <QtGui/QDialog>
 
-namespace Ui { class QuickLoadDialog; }
+class ResourceItem;
+class ResourceModel;
 
-class QuickLoadDialog : public ResourceSelectDialog
+class ResourceSelectDialog : public QDialog
 {
+	Q_OBJECT
 public:
-	QuickLoadDialog( QWidget * _parent, ResourceItem::Type _typeFilter =
-													ResourceItem::TypeUnknown,
-								DatabaseScope _databaseScope = AllResources );
-	virtual ~QuickLoadDialog();
+	enum ModelTypes
+	{
+		ListModel,
+		TreeModel
+	} ;
+
+	enum DatabaseScope
+	{
+		WorkingDirResources,
+		WebResources,
+		AllResources
+	} ;
+
+	ResourceSelectDialog( QWidget * _parent, ModelTypes _modelType,
+							DatabaseScope _databaseScope = AllResources );
+	virtual ~ResourceSelectDialog();
+
+	// returns the selected item (NULL if the dialog was not accepted or no
+	// valid item was selected)
+	ResourceItem * selectedItem();
+
+
+protected:
+	void setupUi();
+
+
+private slots:
+	void setTypeFilter( int );
 
 
 private:
-	Ui::QuickLoadDialog * ui;
+	ResourceModel * m_model;
 
 } ;
 

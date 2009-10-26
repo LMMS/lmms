@@ -23,20 +23,22 @@
  */
 
 #include "QuickLoadDialog.h"
-#include "ResourceListModel.h"
-#include "engine.h"
 
 #include "ui_QuickLoadDialog.h"
 
 
-
 QuickLoadDialog::QuickLoadDialog( QWidget * _parent,
-									ResourceItem::Type _typeFilter ) :
-	QDialog( _parent ),
-	ui( new Ui::QuickLoadDialog ),
-	m_listModel( new ResourceListModel( engine::mergedResourceDB(), this ) )
+									ResourceItem::Type _typeFilter,
+									DatabaseScope _databaseScope ) :
+	ResourceSelectDialog( _parent, ResourceSelectDialog::ListModel,
+							_databaseScope ),
+	ui( new Ui::QuickLoadDialog )
 {
+	// setup form
 	ui->setupUi( this );
+
+	// setup ResourceSelectDialog
+	setupUi();
 
 	// setup type combobox + type filtering
 	for( int i = ResourceItem::TypeUnknown+1; i < ResourceItem::NumTypes; ++i )
@@ -53,16 +55,6 @@ QuickLoadDialog::QuickLoadDialog( QWidget * _parent,
 	{
 		ui->resourceTypeComboBox->setCurrentIndex( _typeFilter );
 	}
-
-	// setup list view to display our model
-	ui->resourceListView->setModel( m_listModel );
-	ui->resourceListView->selectionModel()->select(
-										m_listModel->index( 0, 0 ),
-										QItemSelectionModel::SelectCurrent );
-
-	// connect filter edit with model
-	connect( ui->filterEdit, SIGNAL( textChanged( const QString & ) ),
-				m_listModel, SLOT( setKeywordFilter( const QString & ) ) );
 }
 
 
@@ -70,18 +62,6 @@ QuickLoadDialog::QuickLoadDialog( QWidget * _parent,
 
 QuickLoadDialog::~QuickLoadDialog()
 {
-	delete m_listModel;
 }
 
-
-
-
-void QuickLoadDialog::setTypeFilter( int _type )
-{
-	m_listModel->setTypeFilter( static_cast<ResourceItem::Type>( _type ) );
-}
-
-
-
-#include "moc_QuickLoadDialog.cxx"
 
