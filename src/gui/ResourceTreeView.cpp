@@ -26,17 +26,39 @@
 #include "ResourceTreeModel.h"
 
 
-ResourceTreeView::ResourceTreeView( ResourceTreeModel * _tm,
-					QWidget * _parent ) :
+ResourceTreeView::ResourceTreeView( QWidget * _parent,
+										ResourceTreeModel * _tm ) :
 	QTreeView( _parent ),
-	m_tm( _tm )
+	m_treeModel( NULL )
 {
 	setHeaderHidden( true );
 	setDragEnabled( true );
 
-	setModel( m_tm );
-	connect( m_tm, SIGNAL( itemsChanged() ),
-			this, SLOT( updateFilter() ) );
+	setModel( _tm );
+}
+
+
+
+
+ResourceTreeView::~ResourceTreeView()
+{
+}
+
+
+
+
+void ResourceTreeView::setModel( QAbstractItemModel * _model )
+{
+	if( _model )
+	{
+		m_treeModel = dynamic_cast<ResourceTreeModel *>( _model );
+		if( m_treeModel )
+		{
+			QTreeView::setModel( m_treeModel );
+			connect( m_treeModel, SIGNAL( itemsChanged() ),
+						this, SLOT( updateFilter() ) );
+		}
+	}
 }
 
 
@@ -48,11 +70,11 @@ void ResourceTreeView::setFilter( const QString & _s )
 	if( _s.isEmpty() )
 	{
 		collapseAll();
-		m_tm->setKeywordFilter( _s );
+		m_treeModel->setKeywordFilter( _s );
 	}
 	else
 	{
-		m_tm->setKeywordFilter( _s );
+		m_treeModel->setKeywordFilter( _s );
 		expandToDepth( _s.size() );
 	}
 	setUpdatesEnabled( true );

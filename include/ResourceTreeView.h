@@ -34,7 +34,10 @@ class ResourceTreeView : public QTreeView
 {
 	Q_OBJECT
 public:
-	ResourceTreeView( ResourceTreeModel * _tm, QWidget * _parent );
+	ResourceTreeView( QWidget * _parent, ResourceTreeModel * _tm = NULL );
+	virtual ~ResourceTreeView();
+
+	virtual void setModel( QAbstractItemModel * _model );
 
 
 public slots:
@@ -51,7 +54,7 @@ protected:
 
 
 private:
-	ResourceTreeModel * m_tm;
+	ResourceTreeModel * m_treeModel;
  
 	QString m_lastFilter;
 

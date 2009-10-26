@@ -98,7 +98,7 @@ ResourceBrowser::ResourceBrowser( QWidget * _parent ) :
 	filterLayout->addWidget( m_filterStatusLabel );
 
 	// create an according tree-view for our tree-model
-	m_treeView = new ResourceTreeView( &m_treeModel, contentParent() );
+	m_treeView = new ResourceTreeView( contentParent(), &m_treeModel );
 
 	// set up context menu handling
 	m_treeView->setContextMenuPolicy( Qt::CustomContextMenu );
