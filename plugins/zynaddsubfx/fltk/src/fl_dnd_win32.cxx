@@ -434,14 +434,14 @@ public:
 //      df->pFiles = sizeof(DROPFILES);
 //      df->pt.x = 0;
 //      df->pt.y = 0;
-//      df->fNC = FALSE;
+//      df->fNC = false;
 //      for (int i = 0; i < fl_selection_length[0]; i++) {
 //        if (fl_selection_buffer[0][i] == '\n') {
 //          fl_selection_buffer[0][i] = '\0';
 //        }
 //      }
 //
-//        df->fWide = TRUE;
+//        df->fWide = true;
 //        l = fl_utf2unicode((unsigned char*)fl_selection_buffer[0],
 //                             fl_selection_length[0], (xchar*)(((char*)pMem)
 //                              + sizeof(DROPFILES)));

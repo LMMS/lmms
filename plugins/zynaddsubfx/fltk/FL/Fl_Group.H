@@ -1,5 +1,5 @@
 //
-// "$Id: Fl_Group.H 6907 2009-09-28 14:34:52Z matt $"
+// "$Id: Fl_Group.H 6716 2009-03-24 01:40:44Z fabien $"
 //
 // Group header file for the Fast Light Tool Kit (FLTK).
 //
@@ -58,6 +58,8 @@ class FL_EXPORT Fl_Group : public Fl_Widget {
   Fl_Group& operator=(const Fl_Group&);
 
 protected:
+  enum { CLIP_CHILDREN = 2048 };
+
   void draw();
   void draw_child(Fl_Widget& widget) const;
   void draw_children();
@@ -174,7 +176,7 @@ public:
 
     \see void Fl_Group::clip_children(int c)
   */
-  unsigned int clip_children() { return (flags() & CLIP_CHILDREN) != 0; }
+  int clip_children() { return (flags() & CLIP_CHILDREN) != 0; }
 
   // back compatibility functions:
 
@@ -222,5 +224,5 @@ public:
 #endif
 
 //
-// End of "$Id: Fl_Group.H 6907 2009-09-28 14:34:52Z matt $".
+// End of "$Id: Fl_Group.H 6716 2009-03-24 01:40:44Z fabien $".
 //

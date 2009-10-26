@@ -1,5 +1,5 @@
 //
-// "$Id: Fl_Value_Output.H 6902 2009-09-27 11:06:56Z matt $"
+// "$Id: Fl_Value_Output.H 6664 2009-02-18 09:27:54Z AlbrechtS $"
 //
 // Value output header file for the Fast Light Tool Kit (FLTK).
 //
@@ -51,7 +51,7 @@ class FL_EXPORT Fl_Value_Output : public Fl_Valuator {
   Fl_Font textfont_;
   Fl_Fontsize textsize_;
   uchar soft_;
-  Fl_Color textcolor_;
+  unsigned textcolor_;
 
 protected:
   void draw();
@@ -83,13 +83,13 @@ public:
   Fl_Fontsize textsize() const {return textsize_;}
   void textsize(Fl_Fontsize s) {textsize_ = s;}
   /**    Sets the color of the text in the value box.  */
-  Fl_Color textcolor() const {return textcolor_;}
+  Fl_Color textcolor() const {return (Fl_Color)textcolor_;}
   /**    Gets the color of the text in the value box.  */
-  void textcolor(Fl_Color s) {textcolor_ = s;}
+  void textcolor(unsigned s) {textcolor_ = s;}
 };
 
 #endif
 
 //
-// End of "$Id: Fl_Value_Output.H 6902 2009-09-27 11:06:56Z matt $".
+// End of "$Id: Fl_Value_Output.H 6664 2009-02-18 09:27:54Z AlbrechtS $".
 //

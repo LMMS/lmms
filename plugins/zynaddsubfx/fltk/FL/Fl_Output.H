@@ -1,5 +1,5 @@
 //
-// "$Id: Fl_Output.H 6898 2009-09-23 20:43:27Z matt $"
+// "$Id: Fl_Output.H 6614 2009-01-01 16:11:32Z matt $"
 //
 // Output header file for the Fast Light Tool Kit (FLTK).
 //
@@ -42,8 +42,7 @@
   \image latex text.eps "Fl_Output" width=8cm
   <P>There is a single subclass, 
   Fl_Multiline_Output, which allows you to display multiple lines of
-  text. Fl_Multiline_Output does not provide scroll bars. If a more 
-  complete text editing widget is needed, use Fl_Text_Display instead.</P>
+  text. </P>
   <P>The text may contain any characters except \\0, and will correctly
   display anything, using ^X notation for unprintable control characters
   and \\nnn notation for unprintable characters with the high bit set. It
@@ -64,5 +63,5 @@ public:
 #endif 
 
 //
-// End of "$Id: Fl_Output.H 6898 2009-09-23 20:43:27Z matt $".
+// End of "$Id: Fl_Output.H 6614 2009-01-01 16:11:32Z matt $".
 //

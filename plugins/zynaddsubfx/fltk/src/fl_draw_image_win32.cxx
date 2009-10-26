@@ -1,5 +1,5 @@
 //
-// "$Id: fl_draw_image_win32.cxx 6844 2009-08-24 19:55:29Z AlbrechtS $"
+// "$Id: fl_draw_image_win32.cxx 6616 2009-01-01 21:28:26Z matt $"
 //
 // WIN32 image drawing code for the Fast Light Tool Kit (FLTK).
 //
@@ -115,10 +115,8 @@ static void innards(const uchar *buf, int X, int Y, int W, int H,
 		    int delta, int linedelta, int depth,
 		    Fl_Draw_Image_Cb cb, void* userdata)
 {
-  char indexed = 0;
-
 #if USE_COLORMAP
-  indexed = (fl_palette != 0);
+  char indexed = (fl_palette != 0);
 #endif
 
   if (depth==0) depth = 3;
@@ -321,5 +319,5 @@ void fl_rectf(int x, int y, int w, int h, uchar r, uchar g, uchar b) {
 }
 
 //
-// End of "$Id: fl_draw_image_win32.cxx 6844 2009-08-24 19:55:29Z AlbrechtS $".
+// End of "$Id: fl_draw_image_win32.cxx 6616 2009-01-01 21:28:26Z matt $".
 //
