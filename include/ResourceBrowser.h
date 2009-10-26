@@ -26,6 +26,7 @@
 #ifndef _RESOURCE_BROWSER_H
 #define _RESOURCE_BROWSER_H
 
+#include "ResourceAction.h"
 #include "ResourcePreviewer.h"
 #include "ResourceTreeModel.h"
 #include "side_bar_widget.h"
@@ -40,20 +41,6 @@ class ResourceBrowser : public sideBarWidget
 {
 	Q_OBJECT
 public:
-	enum Actions
-	{
-		EditProperties,
-		LoadProject,
-		LoadInNewTrackSongEditor,
-		LoadInNewTrackBBEditor,
-		LoadInActiveInstrumentTrack,
-		DownloadIntoCollection,
-		UploadToWWW,
-		DeleteLocalResource,
-		ImportFile,
-		NumActions
-	} ;
-
 	ResourceBrowser( QWidget * _parent );
 	virtual ~ResourceBrowser();
 
@@ -72,9 +59,9 @@ private slots:
 
 
 private:
-	void triggerAction( Actions _action, ResourceItem * _item );
+	void triggerAction( ResourceAction::Action _action, ResourceItem * _item );
 
-	QAction * m_actions[NumActions];
+	QAction * m_actions[ResourceAction::NumActions];
 
 	// the object that will preview individual resources
 	ResourcePreviewer m_previewer;
