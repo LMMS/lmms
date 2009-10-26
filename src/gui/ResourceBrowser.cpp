@@ -29,6 +29,7 @@
 #include <QtGui/QPushButton>
 #include <QKeyEvent>
 
+#include "ResourceAction.h"
 #include "ResourceBrowser.h"
 #include "ResourceFileMapper.h"
 #include "ResourceTreeModel.h"
@@ -383,6 +384,9 @@ void ResourceBrowser::triggerAction( Actions _action, ResourceItem * _item )
 							mapper.fileName() );
 				}
 			}
+			break;
+		case ImportFile:
+			ResourceAction( _item ).importProject( engine::getSong() );
 			break;
 	}
 }
