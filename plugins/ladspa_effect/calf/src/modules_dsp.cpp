@@ -687,27 +687,27 @@ void multibandcompressor_audio_module::params_changed()
     // set the params of all filters
     if(*params[param_freq0] != freq_old[0] or *params[param_sep0] != sep_old[0] or *params[param_q0] != q_old[0]) {
         lpL0.set_lp_rbj((float)(*params[param_freq0] * (1 - *params[param_sep0])), *params[param_q0], (float)srate);
-        lpR0.set_lp_rbj((float)(*params[param_freq0] * (1 - *params[param_sep0])), *params[param_q0], (float)srate);
+        lpR0.copy_coeffs(lpL0);
         hpL0.set_hp_rbj((float)(*params[param_freq0] * (1 + *params[param_sep0])), *params[param_q0], (float)srate);
-        hpR0.set_hp_rbj((float)(*params[param_freq0] * (1 + *params[param_sep0])), *params[param_q0], (float)srate);
+        hpR0.copy_coeffs(hpL0);
         freq_old[0] = *params[param_freq0];
         sep_old[0]  = *params[param_sep2];
         q_old[0]    = *params[param_q2];
     }
     if(*params[param_freq1] != freq_old[1] or *params[param_sep1] != sep_old[1] or *params[param_q1] != q_old[1]) {
         lpL1.set_lp_rbj((float)(*params[param_freq1] * (1 - *params[param_sep1])), *params[param_q1], (float)srate);
-        lpR1.set_lp_rbj((float)(*params[param_freq1] * (1 - *params[param_sep1])), *params[param_q1], (float)srate);
+        lpR1.copy_coeffs(lpL1);
         hpL1.set_hp_rbj((float)(*params[param_freq1] * (1 + *params[param_sep1])), *params[param_q1], (float)srate);
-        hpR1.set_hp_rbj((float)(*params[param_freq1] * (1 + *params[param_sep1])), *params[param_q1], (float)srate);
+        hpR1.copy_coeffs(hpL1);
         freq_old[1] = *params[param_freq1];
         sep_old[1]  = *params[param_sep2];
         q_old[1]    = *params[param_q2];
     }
     if(*params[param_freq2] != freq_old[2] or *params[param_sep2] != sep_old[2] or *params[param_q2] != q_old[2]) {
         lpL2.set_lp_rbj((float)(*params[param_freq2] * (1 - *params[param_sep2])), *params[param_q2], (float)srate);
-        lpR2.set_lp_rbj((float)(*params[param_freq2] * (1 - *params[param_sep2])), *params[param_q2], (float)srate);
+        lpR2.copy_coeffs(lpL2);
         hpL2.set_hp_rbj((float)(*params[param_freq2] * (1 + *params[param_sep2])), *params[param_q2], (float)srate);
-        hpR2.set_hp_rbj((float)(*params[param_freq2] * (1 + *params[param_sep2])), *params[param_q2], (float)srate);
+        hpR2.copy_coeffs(hpL2);
         freq_old[2] = *params[param_freq2];
         sep_old[2]  = *params[param_sep2];
         q_old[2]    = *params[param_q2];
@@ -1061,6 +1061,7 @@ sidechaincompressor_audio_module::sidechaincompressor_audio_module()
 {
     is_active = false;
     srate = 0;
+    last_generation = 0;
 }
 
 void sidechaincompressor_audio_module::activate()
@@ -1083,87 +1084,89 @@ void sidechaincompressor_audio_module::deactivate()
 void sidechaincompressor_audio_module::params_changed()
 {
     // set the params of all filters
-    if(*params[param_f1_freq] != f1_freq_old or *params[param_f1_level] != f1_level_old or *params[param_sc_mode] != sc_mode
-        or *params[param_f2_freq] != f2_freq_old or *params[param_f2_level] != f2_level_old) {
+    if(*params[param_f1_freq] != f1_freq_old or *params[param_f1_level] != f1_level_old
+        or *params[param_f2_freq] != f2_freq_old or *params[param_f2_level] != f2_level_old
+        or *params[param_sc_mode] != sc_mode) {
+        float q = 0.707;
         switch ((int)*params[param_sc_mode]) {
             default:
             case WIDEBAND:
-                f1L.set_hp_rbj((float)*params[param_f1_freq], 0.707, (float)srate);
-                f1R.set_hp_rbj((float)*params[param_f1_freq], 0.707, (float)srate);
-                f2L.set_lp_rbj((float)*params[param_f2_freq], 0.707, (float)srate);
-                f2R.set_lp_rbj((float)*params[param_f2_freq], 0.707, (float)srate);
+                f1L.set_hp_rbj((float)*params[param_f1_freq], q, (float)srate, *params[param_f1_level]);
+                f1R.copy_coeffs(f1L);
+                f2L.set_lp_rbj((float)*params[param_f2_freq], q, (float)srate, *params[param_f2_level]);
+                f2R.copy_coeffs(f2L);
                 f1_active = 0.f;
                 f2_active = 0.f;
                 break;
             case DEESSER_WIDE:
-                f1L.set_hp_rbj((float)*params[param_f1_freq], 0.707, (float)srate);
-                f1R.set_hp_rbj((float)*params[param_f1_freq], 0.707, (float)srate);
-                f2L.set_peakeq_rbj((float)*params[param_f2_freq], 0.707, *params[param_f2_level], (float)srate);
-                f2R.set_peakeq_rbj((float)*params[param_f2_freq], 0.707, *params[param_f2_level], (float)srate);
+                f1L.set_hp_rbj((float)*params[param_f1_freq], q, (float)srate, *params[param_f1_level]);
+                f1R.copy_coeffs(f1L);
+                f2L.set_peakeq_rbj((float)*params[param_f2_freq], q, *params[param_f2_level], (float)srate);
+                f2R.copy_coeffs(f2L);
                 f1_active = 1.f;
                 f2_active = 0.5f;
                 break;
             case DEESSER_SPLIT:
-                f1L.set_hp_rbj((float)*params[param_f1_freq] * (1 - 0.17), 0.707, (float)srate);
-                f1R.set_hp_rbj((float)*params[param_f1_freq] * (1 - 0.17), 0.707, (float)srate);
-                f2L.set_lp_rbj((float)*params[param_f1_freq] * (1 + 0.17), 0.707, (float)srate);
-                f2R.set_lp_rbj((float)*params[param_f1_freq] * (1 + 0.17), 0.707, (float)srate);
-                f1_active = 1.f;
-                f2_active = 0.f;
+                f2L.set_hp_rbj((float)*params[param_f2_freq] * (1 - 0.17), q, (float)srate, *params[param_f1_level]);
+                f2R.copy_coeffs(f1L);
+                f1L.set_lp_rbj((float)*params[param_f2_freq] * (1 + 0.17), q, (float)srate);
+                f1R.copy_coeffs(f2L);
+                f2_active = 1.f;
+                f1_active = 0.f;
                 break;
             case DERUMBLER_WIDE:
-                f1L.set_lp_rbj((float)*params[param_f1_freq], 0.707, (float)srate);
-                f1R.set_lp_rbj((float)*params[param_f1_freq], 0.707, (float)srate);
-                f2L.set_peakeq_rbj((float)*params[param_f2_freq], 0.707, *params[param_f2_level], (float)srate);
-                f2R.set_peakeq_rbj((float)*params[param_f2_freq], 0.707, *params[param_f2_level], (float)srate);
-                f1_active = 1.f;
-                f2_active = 0.5f;
+                f1L.set_peakeq_rbj((float)*params[param_f1_freq], q, *params[param_f1_level], (float)srate);
+                f1R.copy_coeffs(f1L);
+                f2L.set_lp_rbj((float)*params[param_f2_freq], q, (float)srate, *params[param_f2_level]);
+                f2R.copy_coeffs(f2L);
+                f1_active = 0.5f;
+                f2_active = 1.f;
                 break;
             case DERUMBLER_SPLIT:
-                f1L.set_lp_rbj((float)*params[param_f1_freq] * (1 + 0.17), 0.707, (float)srate);
-                f1R.set_lp_rbj((float)*params[param_f1_freq] * (1 + 0.17), 0.707, (float)srate);
-                f2L.set_hp_rbj((float)*params[param_f1_freq] * (1 - 0.17), 0.707, (float)srate);
-                f2R.set_hp_rbj((float)*params[param_f1_freq] * (1 - 0.17), 0.707, (float)srate);
-                f1_active = 1.f;
+                f2L.set_hp_rbj((float)*params[param_f1_freq] * (1 - 0.17), q, (float)srate);
+                f2R.copy_coeffs(f1L);
+                f1L.set_lp_rbj((float)*params[param_f1_freq] * (1 + 0.17), q, (float)srate, *params[param_f2_level]);
+                f1R.copy_coeffs(f2L);
                 f2_active = 0.f;
+                f1_active = 1.f;
                 break;
             case WEIGHTED_1:
-                f1L.set_lowshelf_rbj((float)*params[param_f1_freq], 0.707, *params[param_f1_level], (float)srate);
-                f1R.set_lowshelf_rbj((float)*params[param_f1_freq], 0.707, *params[param_f1_level], (float)srate);
-                f2L.set_highshelf_rbj((float)*params[param_f2_freq], 0.707, *params[param_f2_level], (float)srate);
-                f2R.set_highshelf_rbj((float)*params[param_f2_freq], 0.707, *params[param_f2_level], (float)srate);
+                f1L.set_lowshelf_rbj((float)*params[param_f1_freq], q, *params[param_f1_level], (float)srate);
+                f1R.copy_coeffs(f1L);
+                f2L.set_highshelf_rbj((float)*params[param_f2_freq], q, *params[param_f2_level], (float)srate);
+                f2R.copy_coeffs(f2L);
                 f1_active = 0.5f;
                 f2_active = 0.5f;
                 break;
             case WEIGHTED_2:
-                f1L.set_lowshelf_rbj((float)*params[param_f1_freq], 0.707, *params[param_f1_level], (float)srate);
-                f1R.set_lowshelf_rbj((float)*params[param_f1_freq], 0.707, *params[param_f1_level], (float)srate);
-                f2L.set_peakeq_rbj((float)*params[param_f2_freq], 0.707, *params[param_f2_level], (float)srate);
-                f2R.set_peakeq_rbj((float)*params[param_f2_freq], 0.707, *params[param_f2_level], (float)srate);
+                f1L.set_lowshelf_rbj((float)*params[param_f1_freq], q, *params[param_f1_level], (float)srate);
+                f1R.copy_coeffs(f1L);
+                f2L.set_peakeq_rbj((float)*params[param_f2_freq], q, *params[param_f2_level], (float)srate);
+                f2R.copy_coeffs(f2L);
                 f1_active = 0.5f;
                 f2_active = 0.5f;
                 break;
             case WEIGHTED_3:
-                f1L.set_peakeq_rbj((float)*params[param_f1_freq], 0.707, *params[param_f1_level], (float)srate);
-                f1R.set_peakeq_rbj((float)*params[param_f1_freq], 0.707, *params[param_f1_level], (float)srate);
-                f2L.set_highshelf_rbj((float)*params[param_f2_freq], 0.707, *params[param_f2_level], (float)srate);
-                f2R.set_highshelf_rbj((float)*params[param_f2_freq], 0.707, *params[param_f2_level], (float)srate);
+                f1L.set_peakeq_rbj((float)*params[param_f1_freq], q, *params[param_f1_level], (float)srate);
+                f1R.copy_coeffs(f1L);
+                f2L.set_highshelf_rbj((float)*params[param_f2_freq], q, *params[param_f2_level], (float)srate);
+                f2R.copy_coeffs(f2L);
                 f1_active = 0.5f;
                 f2_active = 0.5f;
                 break;
             case BANDPASS_1:
-                f1L.set_bp_rbj((float)*params[param_f1_freq], 0.707, *params[param_f1_level], (float)srate);
-                f1R.set_bp_rbj((float)*params[param_f1_freq], 0.707, *params[param_f1_level], (float)srate);
-                f2L.set_highshelf_rbj((float)*params[param_f2_freq], 0.707, *params[param_f2_level], (float)srate);
-                f2R.set_highshelf_rbj((float)*params[param_f2_freq], 0.707, *params[param_f2_level], (float)srate);
+                f1L.set_bp_rbj((float)*params[param_f1_freq], q, (float)srate, *params[param_f1_level]);
+                f1R.copy_coeffs(f1L);
+                f2L.set_highshelf_rbj((float)*params[param_f2_freq], q, *params[param_f2_level], (float)srate);
+                f2R.copy_coeffs(f2L);
                 f1_active = 1.f;
                 f2_active = 0.f;
                 break;
             case BANDPASS_2:
-                f1L.set_hp_rbj((float)*params[param_f1_freq], 0.707, (float)srate);
-                f1R.set_hp_rbj((float)*params[param_f1_freq], 0.707, (float)srate);
-                f2L.set_lp_rbj((float)*params[param_f2_freq], 0.707, (float)srate);
-                f2R.set_lp_rbj((float)*params[param_f2_freq], 0.707, (float)srate);
+                f1L.set_hp_rbj((float)*params[param_f1_freq], q, (float)srate, *params[param_f1_level]);
+                f1R.copy_coeffs(f1L);
+                f2L.set_lp_rbj((float)*params[param_f2_freq], q, (float)srate, *params[param_f2_level]);
+                f2R.copy_coeffs(f2L);
                 f1_active = 1.f;
                 f2_active = 1.f;
                 break;
@@ -1243,35 +1246,41 @@ uint32_t sidechaincompressor_audio_module::process(uint32_t offset, uint32_t num
                 case WEIGHTED_3:
                 case BANDPASS_2:
                     leftSC = f2L.process(f1L.process(leftSC));
-                    rightSC = f2L.process(f1L.process(rightSC));
+                    rightSC = f2R.process(f1R.process(rightSC));
                     leftMC = leftSC;
                     rightMC = rightSC;
                     compressor.process(leftAC, rightAC, leftSC, rightSC);
                     break;
                 case DEESSER_SPLIT:
+                    leftSC = f2L.process(leftSC);
+                    rightSC = f2R.process(rightSC);
+                    leftMC = leftSC;
+                    rightMC = rightSC;
+                    compressor.process(leftSC, rightSC, leftSC, rightSC);
+                    leftAC = f1L.process(leftAC);
+                    rightAC = f1R.process(rightAC);
+                    leftAC += leftSC;
+                    rightAC += rightSC;
+                    break;
                 case DERUMBLER_SPLIT:
                     leftSC = f1L.process(leftSC);
-                    rightSC = f1L.process(rightSC);
+                    rightSC = f1R.process(rightSC);
                     leftMC = leftSC;
                     rightMC = rightSC;
                     compressor.process(leftSC, rightSC, leftSC, rightSC);
                     leftAC = f2L.process(leftAC);
-                    rightAC = f2L.process(rightAC);
+                    rightAC = f2R.process(rightAC);
                     leftAC += leftSC;
                     rightAC += rightSC;
                     break;
                 case BANDPASS_1:
                     leftSC = f1L.process(leftSC);
-                    rightSC = f1L.process(rightSC);
+                    rightSC = f1R.process(rightSC);
                     leftMC = leftSC;
                     rightMC = rightSC;
                     compressor.process(leftAC, rightAC, leftSC, rightSC);
                     break;
             }
-            f1L.sanitize();
-            f1R.sanitize();
-            f2L.sanitize();
-            f2R.sanitize();
             
             if(*params[param_sc_listen] > 0.f) {
                 outL = leftMC;
@@ -1299,6 +1308,11 @@ uint32_t sidechaincompressor_audio_module::process(uint32_t offset, uint32_t num
             // next sample
             ++offset;
         } // cycle trough samples
+        f1L.sanitize();
+        f1R.sanitize();
+        f2L.sanitize();
+        f2R.sanitize();
+            
     }
     // draw meters
     if(params[param_clip_in] != NULL) {
@@ -1367,6 +1381,31 @@ int sidechaincompressor_audio_module::get_changed_offsets(int index, int generat
         return false;
     if(index == param_compression) {
         return compressor.get_changed_offsets(generation, subindex_graph, subindex_dot, subindex_gridline);
+    } else {
+        //  (fabs(inertia_cutoff.get_last() - old_cutoff) + 100 * fabs(inertia_resonance.get_last() - old_resonance) + fabs(*params[par_mode] - old_mode) > 0.1f)
+        if (*params[param_f1_freq] != f1_freq_old1
+            or *params[param_f2_freq] != f2_freq_old1
+            or *params[param_f1_level] != f1_level_old1
+            or *params[param_f2_level] != f2_level_old1
+            or *params[param_sc_mode] !=sc_mode_old1)
+        {
+            f1_freq_old1 = *params[param_f1_freq];
+            f2_freq_old1 = *params[param_f2_freq];
+            f1_level_old1 = *params[param_f1_level];
+            f2_level_old1 = *params[param_f2_level];
+            sc_mode_old1 = (CalfScModes)*params[param_sc_mode];
+            last_generation++;
+            subindex_graph = 0;
+            subindex_dot = INT_MAX;
+            subindex_gridline = INT_MAX;
+        }
+        else {
+            subindex_graph = 0;
+            subindex_dot = subindex_gridline = generation ? INT_MAX : 0;
+        }
+        if (generation == last_calculated_generation)
+            subindex_graph = INT_MAX;
+        return last_generation;
     }
     return false;
 }

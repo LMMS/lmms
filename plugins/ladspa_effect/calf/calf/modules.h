@@ -966,7 +966,8 @@ private:
         BANDPASS_2
     };
     float f1_freq_old, f2_freq_old, f1_level_old, f2_level_old;
-    CalfScModes sc_mode;
+    float f1_freq_old1, f2_freq_old1, f1_level_old1, f2_level_old1;
+    CalfScModes sc_mode, sc_mode_old, sc_mode_old1;
     float f1_active, f2_active;
     uint32_t clip_in, clip_out;
     float meter_in, meter_out;
@@ -979,6 +980,7 @@ public:
     float *params[param_count];
     uint32_t srate;
     bool is_active;
+    volatile int last_generation, last_calculated_generation;
     sidechaincompressor_audio_module();
     void activate();
     void deactivate();
@@ -998,6 +1000,8 @@ public:
                 return f1L.h_z(z) * f2L.h_z(z);
                 break;
             case DEESSER_SPLIT:
+                return f2L.h_z(z);
+                break;
             case DERUMBLER_SPLIT:
             case BANDPASS_1:
                 return f1L.h_z(z);
@@ -1015,10 +1019,10 @@ public:
     }
     void set_sample_rate(uint32_t sr);
     uint32_t process(uint32_t offset, uint32_t numsamples, uint32_t inputs_mask, uint32_t outputs_mask);
-    virtual bool get_graph(int index, int subindex, float *data, int points, cairo_iface *context);
-    virtual bool get_dot(int index, int subindex, float &x, float &y, int &size, cairo_iface *context);
-    virtual bool get_gridline(int index, int subindex, float &pos, bool &vertical, std::string &legend, cairo_iface *context);
-    virtual int  get_changed_offsets(int index, int generation, int &subindex_graph, int &subindex_dot, int &subindex_gridline);
+    bool get_graph(int index, int subindex, float *data, int points, cairo_iface *context);
+    bool get_dot(int index, int subindex, float &x, float &y, int &size, cairo_iface *context);
+    bool get_gridline(int index, int subindex, float &pos, bool &vertical, std::string &legend, cairo_iface *context);
+    int  get_changed_offsets(int index, int generation, int &subindex_graph, int &subindex_dot, int &subindex_gridline);
 };
 
 /// Multibandcompressor by Markus Schmidt
