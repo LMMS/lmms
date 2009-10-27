@@ -93,18 +93,18 @@ QPixmap getIconPixmap( const char * _name, int _w, int _h )
 
 		// Save to cache and return
 		s_pixmapCache.insert( _name, p );
-		return( p );
+		return p;
 	}
 
-	return( getIconPixmap( _name ).scaled( _w, _h, Qt::IgnoreAspectRatio,
-	        Qt::SmoothTransformation ) );
+	return getIconPixmap( _name ).
+			scaled( _w, _h, Qt::IgnoreAspectRatio, Qt::SmoothTransformation );
 }
 
 
 QString getText( const char * _name )
 {
 	const embed::descriptor & e = findEmbeddedData( _name );
-	return( QString::fromLatin1( (const char *) e.data, e.size ) );
+	return QString::fromUtf8( (const char *) e.data, e.size );
 }
 
 
