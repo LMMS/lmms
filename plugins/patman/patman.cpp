@@ -210,7 +210,7 @@ patmanInstrument::LoadErrors patmanInstrument::loadPatch(
 {
 	unloadCurrentPatch();
 
-	FILE * fd = fopen( _filename.toAscii().constData() , "rb" );
+	FILE * fd = fopen( _filename.toUtf8().constData() , "rb" );
 	if( !fd )
 	{
 		perror( "fopen" );

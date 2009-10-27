@@ -79,10 +79,10 @@ QPixmap getIconPixmap( const char * _name, int _w, int _h )
 				p = QPixmap( 1, 1 );
 			}
 		}
-		return( p );
+		return p;
 	}
-	return( getIconPixmap( _name ).scaled( _w, _h, Qt::IgnoreAspectRatio,
-						Qt::SmoothTransformation ) );
+	return getIconPixmap( _name ).
+			scaled( _w, _h, Qt::IgnoreAspectRatio, Qt::SmoothTransformation );
 }
 
 
@@ -91,7 +91,7 @@ QPixmap getIconPixmap( const char * _name, int _w, int _h )
 QString getText( const char * _name )
 {
 	const embed::descriptor & e = findEmbeddedData( _name );
-	return( QString::fromLatin1( (const char *) e.data, e.size ) );
+	return QString::fromUtf8( (const char *) e.data, e.size );
 }
 
 
