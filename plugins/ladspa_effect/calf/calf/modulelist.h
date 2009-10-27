@@ -10,8 +10,11 @@
     PER_MODULE_ITEM(phaser, false, "phaser")
     PER_MODULE_ITEM(multichorus, false, "multichorus")
     PER_MODULE_ITEM(compressor, false, "compressor")
-    PER_MODULE_ITEM(multibandcompressor, false, "multibandcompressor")
     PER_MODULE_ITEM(sidechaincompressor, false, "sidechaincompressor")
+    PER_MODULE_ITEM(multibandcompressor, false, "multibandcompressor")
+    PER_MODULE_ITEM(equalizer5band, false, "equalizer5band")
+    PER_MODULE_ITEM(equalizer8band, false, "equalizer8band")
+    PER_MODULE_ITEM(equalizer12band, false, "equalizer12band")
 #ifdef ENABLE_EXPERIMENTAL
     PER_MODULE_ITEM(fluidsynth, true, "fluidsynth")
     PER_MODULE_ITEM(wavetable, true, "wavetable")

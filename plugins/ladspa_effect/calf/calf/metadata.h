@@ -126,7 +126,7 @@ struct monosynth_metadata: public plugin_metadata<monosynth_metadata>
     };
     PLUGIN_NAME_ID_LABEL("monosynth", "monosynth", "Monosynth")
 };
-    
+
 /// Thor's compressor - metadata
 struct compressor_metadata: public plugin_metadata<compressor_metadata>
 {
@@ -166,6 +166,59 @@ struct multibandcompressor_metadata: public plugin_metadata<multibandcompressor_
            param_detection3, param_compression3, param_output3, param_bypass3, param_mute3,
            param_count };
     PLUGIN_NAME_ID_LABEL("multiband_compressor", "multibandcompressor", "Multiband Compressor")
+};
+
+/// Markus's 5-band EQ - metadata
+struct equalizer5band_metadata: public plugin_metadata<equalizer5band_metadata>
+{
+    enum { in_count = 2, out_count = 2, support_midi = false, require_midi = false, rt_capable = true };
+    enum { param_bypass, param_level_in, param_level_out, param_meter_in,
+           param_meter_out, param_clip_in, param_clip_out,
+           param_ls_active, param_ls_level, param_ls_freq,
+           param_hs_active, param_hs_level, param_hs_freq,
+           param_p1_active, param_p1_level, param_p1_freq, param_p1_q,
+           param_p2_active, param_p2_level, param_p2_freq, param_p2_q,
+           param_p3_active, param_p3_level, param_p3_freq, param_p3_q,
+           param_count };
+    PLUGIN_NAME_ID_LABEL("equalizer5band", "equalizer5band", "Equalizer 5 Band")
+};
+/// Markus's 8-band EQ - metadata
+struct equalizer8band_metadata: public plugin_metadata<equalizer8band_metadata>
+{
+    enum { in_count = 2, out_count = 2, support_midi = false, require_midi = false, rt_capable = true };
+    enum { param_bypass, param_level_in, param_level_out, param_meter_inL, param_meter_inR,
+           param_meter_outL, param_meter_outR, param_clip_inL, param_clip_inR, param_clip_outL, param_clip_outR,
+           param_hp_active, param_hp_freq, param_hp_mode,
+           param_lp_active, param_lp_freq, param_lp_mode,
+           param_ls_active, param_ls_level, param_ls_freq,
+           param_hs_active, param_hs_level, param_hs_freq,
+           param_p1_active, param_p1_level, param_p1_freq, param_p1_q,
+           param_p2_active, param_p2_level, param_p2_freq, param_p2_q,
+           param_p3_active, param_p3_level, param_p3_freq, param_p3_q,
+           param_p4_active, param_p4_level, param_p4_freq, param_p4_q,
+           param_count };
+    PLUGIN_NAME_ID_LABEL("equalizer8band", "equalizer8band", "Equalizer 8 Band")
+};
+/// Markus's 12-band EQ - metadata
+struct equalizer12band_metadata: public plugin_metadata<equalizer12band_metadata>
+{
+    enum { in_count = 2, out_count = 2, support_midi = false, require_midi = false, rt_capable = true };
+    enum { param_bypass, param_level_in, param_level_out, param_meter_inL, param_meter_inR,
+           param_meter_outL, param_meter_outR, param_clip_inL, param_clip_inR, param_clip_outL, param_clip_outR,
+           param_hp_active, param_hp_freq, param_hp_mode,
+           param_lp_active, param_lp_freq, param_lp_mode,
+           param_ls_active, param_ls_level, param_ls_freq,
+           param_hs_active, param_hs_level, param_hs_freq,
+           param_p1_active, param_p1_level, param_p1_freq, param_p1_q,
+           param_p2_active, param_p2_level, param_p2_freq, param_p2_q,
+           param_p3_active, param_p3_level, param_p3_freq, param_p3_q,
+           param_p4_active, param_p4_level, param_p4_freq, param_p4_q,
+           param_p5_active, param_p5_level, param_p5_freq, param_p5_q,
+           param_p6_active, param_p6_level, param_p6_freq, param_p6_q,
+           param_p7_active, param_p7_level, param_p7_freq, param_p7_q,
+           param_p8_active, param_p8_level, param_p8_freq, param_p8_q,
+           param_count };
+    PLUGIN_NAME_ID_LABEL("equalizer12band", "equalizer12band", "Equalizer 12 Band")
 };
 
 /// Organ - enums for parameter IDs etc. (this mess is caused by organ split between plugin and generic class - which was
