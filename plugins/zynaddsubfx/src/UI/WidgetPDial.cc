@@ -33,7 +33,8 @@ textmode=false;
 }
 
 void TipWin::setText(const char * c) {
-  strcpy(text,c);
+  strncpy(text, c, max_tooltip_len-1);
+text[max_tooltip_len-1] = 0;
 textmode=true;
         // Recalc size of window
         fl_font(labelfont(), labelsize());

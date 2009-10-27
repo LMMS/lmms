@@ -24,34 +24,35 @@
 /**\TODO start using pointer math here as these will be Frequency called
  * functions throughout the code*/
 Sample::Sample(const Sample &smp)
-        : bufferSize(smp.bufferSize)
+    :bufferSize(smp.bufferSize)
 {
-    buffer=new REALTYPE[bufferSize];
-    for (int i=0;i<bufferSize;++i)
-        *(i+buffer)=*(i+smp.buffer);
+    buffer = new REALTYPE[bufferSize];
+    for(int i = 0; i < bufferSize; ++i)
+        *(i + buffer) = *(i + smp.buffer);
 }
 
-Sample::Sample(int length,REALTYPE fill)
-        : bufferSize(length)
+Sample::Sample(int length, REALTYPE fill)
+    :bufferSize(length)
 {
-    if (length<1)
-        bufferSize=1;
-    buffer=new REALTYPE[bufferSize];
-    for(int i=0;i<bufferSize;++i)
-        buffer[i]=fill;
+    if(length < 1)
+        bufferSize = 1;
+    buffer = new REALTYPE[bufferSize];
+    for(int i = 0; i < bufferSize; ++i)
+        buffer[i] = fill;
 }
 
-Sample::Sample(int length,const REALTYPE *input)
-        : bufferSize(length)
+Sample::Sample(int length, const REALTYPE *input)
+    :bufferSize(length)
 {
-    if (length>0) {
-        buffer=new REALTYPE[length];
-        for (int i=0;i<length;++i)
-            *(buffer+i)=*(input+i);
-    } else {
-        buffer=new REALTYPE[1];
-        bufferSize=1;
-        *buffer=0;
+    if(length > 0) {
+        buffer = new REALTYPE[length];
+        for(int i = 0; i < length; ++i)
+            *(buffer + i) = *(input + i);
+    }
+    else {
+        buffer     = new REALTYPE[1];
+        bufferSize = 1;
+        *buffer    = 0;
     }
 }
 
@@ -62,58 +63,59 @@ Sample::~Sample()
 
 void Sample::clear()
 {
-    for (int i=0;i<bufferSize;++i)
-        *(i+buffer)=0;
+    for(int i = 0; i < bufferSize; ++i)
+        *(i + buffer) = 0;
 }
 
 void Sample::operator=(const Sample &smp)
 {
     /**\todo rewrite to be less repetitive*/
-    if (bufferSize==smp.bufferSize) {
-        for (int i=0;i<bufferSize;++i)
-            *(i+buffer)=*(i+smp.buffer);
-    } else {
+    if(bufferSize == smp.bufferSize)
+        for(int i = 0; i < bufferSize; ++i)
+            *(i + buffer) = *(i + smp.buffer);
+    else {
         delete[] buffer;
-        buffer=new REALTYPE[smp.bufferSize];
-        bufferSize=smp.bufferSize;
-        for (int i=0;i<bufferSize;++i)
-            *(i+buffer)=*(i+smp.buffer);
+        buffer     = new REALTYPE[smp.bufferSize];
+        bufferSize = smp.bufferSize;
+        for(int i = 0; i < bufferSize; ++i)
+            *(i + buffer) = *(i + smp.buffer);
     }
 }
 
-bool Sample::operator==(const Sample &smp)const
+bool Sample::operator==(const Sample &smp) const
 {
-    if(this->bufferSize!=smp.bufferSize)
+    if(this->bufferSize != smp.bufferSize)
         return false;
-    for(int i=0;i<bufferSize;++i)
-        if(this->buffer[i]!=smp.buffer[i])
+    for(int i = 0; i < bufferSize; ++i)
+        if(this->buffer[i] != smp.buffer[i])
             return false;
     return true;
 }
 
-REALTYPE Sample::max()const
+REALTYPE Sample::max() const
 {
-    REALTYPE max=-1500;//a good low considering that samples should store values -1.0 to 1.0
-    for(int i=0;i<bufferSize;++i)
-        if(buffer[i]>max)
-            max=buffer[i];
+    REALTYPE max = -1500; //a good low considering that samples should store values -1.0 to 1.0
+    for(int i = 0; i < bufferSize; ++i)
+        if(buffer[i] > max)
+            max = buffer[i];
     return max;
 }
 
-REALTYPE Sample::min()const
+REALTYPE Sample::min() const
 {
-    REALTYPE min=1500;//a good high considering that samples should store values -1.0 to 1.0
-    for(int i=0;i<bufferSize;++i)
-        if(buffer[i]<min)
-            min=buffer[i];
+    REALTYPE min = 1500; //a good high considering that samples should store values -1.0 to 1.0
+    for(int i = 0; i < bufferSize; ++i)
+        if(buffer[i] < min)
+            min = buffer[i];
     return min;
 }
 
-REALTYPE Sample::absMax()const
+REALTYPE Sample::absMax() const
 {
-    REALTYPE max=0;
-    for(int i=0;i<bufferSize;++i)
-        if(fabs(buffer[i])>max)
-            max=fabs(buffer[i]);
+    REALTYPE max = 0;
+    for(int i = 0; i < bufferSize; ++i)
+        if(fabs(buffer[i]) > max)
+            max = fabs(buffer[i]);
     return max;
 }
+

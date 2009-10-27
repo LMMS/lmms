@@ -23,25 +23,27 @@
 #ifndef OSS_AUDIO_OUTPUT_H
 #define OSS_AUDIO_OUTPUT_H
 
+#include <sys/time.h>
 #include "../globals.h"
 
 class OSSaudiooutput
 {
-public:
-    OSSaudiooutput();
-    ~OSSaudiooutput();
+    public:
+        OSSaudiooutput();
+        ~OSSaudiooutput();
 
-    //the out is [-1.0 .. 1.0]
-    /* smp_left[] and smp_right[] has the size of SOUND_BUFFER_SIZE */
-    void OSSout(REALTYPE *smp_left,REALTYPE *smp_right);
-private:
-    int snd_handle;
-    int snd_fragment;
-    int snd_stereo;
-    int snd_format;
-    int snd_samplerate;
+        //the out is [-1.0 .. 1.0]
+        /* smp_left[] and smp_right[] has the size of SOUND_BUFFER_SIZE */
+        void OSSout(REALTYPE *smp_left, REALTYPE *smp_right);
+    private:
+        int snd_handle;
+        int snd_fragment;
+        int snd_stereo;
+        int snd_format;
+        int snd_samplerate;
+        struct timeval playing_until;
 
-    short int *smps;//Samples to be sent to soundcard
+        short int *smps; //Samples to be sent to soundcard
 };
 
 #endif

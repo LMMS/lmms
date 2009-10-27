@@ -517,6 +517,56 @@ void ADvoiceUI::cb_Use1(Fl_Choice* o, void* v) {
   ((ADvoiceUI*)(o->parent()->parent()->parent()->user_data()))->cb_Use1_i(o,v);
 }
 
+void ADvoiceUI::cb_Stereo_i(WidgetPDial* o, void*) {
+  pars->VoicePar[nvoice].Unison_stereo_spread=(int)o->value();
+}
+void ADvoiceUI::cb_Stereo(WidgetPDial* o, void* v) {
+  ((ADvoiceUI*)(o->parent()->parent()->parent()->parent()->user_data()))->cb_Stereo_i(o,v);
+}
+
+void ADvoiceUI::cb_Unison_i(Fl_Choice* o, void*) {
+  pars->set_unison_size_index(nvoice,(int) o->value());
+}
+void ADvoiceUI::cb_Unison(Fl_Choice* o, void* v) {
+  ((ADvoiceUI*)(o->parent()->parent()->parent()->parent()->user_data()))->cb_Unison_i(o,v);
+}
+
+void ADvoiceUI::cb_Vibratto_i(WidgetPDial* o, void*) {
+  pars->VoicePar[nvoice].Unison_vibratto=(int)o->value();
+}
+void ADvoiceUI::cb_Vibratto(WidgetPDial* o, void* v) {
+  ((ADvoiceUI*)(o->parent()->parent()->parent()->parent()->user_data()))->cb_Vibratto_i(o,v);
+}
+
+void ADvoiceUI::cb_Invert_i(Fl_Choice* o, void*) {
+  pars->VoicePar[nvoice].Unison_invert_phase=(int) o->value();
+}
+void ADvoiceUI::cb_Invert(Fl_Choice* o, void* v) {
+  ((ADvoiceUI*)(o->parent()->parent()->parent()->parent()->user_data()))->cb_Invert_i(o,v);
+}
+
+void ADvoiceUI::cb_Frequency_i(Fl_Slider* o, void*) {
+  pars->VoicePar[nvoice].Unison_frequency_spread=(int)o->value();
+unisonspreadoutput->do_callback();
+}
+void ADvoiceUI::cb_Frequency(Fl_Slider* o, void* v) {
+  ((ADvoiceUI*)(o->parent()->parent()->parent()->parent()->user_data()))->cb_Frequency_i(o,v);
+}
+
+void ADvoiceUI::cb_unisonspreadoutput_i(Fl_Value_Output* o, void*) {
+  o->value(pars->getUnisonFrequencySpreadCents(nvoice));
+}
+void ADvoiceUI::cb_unisonspreadoutput(Fl_Value_Output* o, void* v) {
+  ((ADvoiceUI*)(o->parent()->parent()->parent()->parent()->user_data()))->cb_unisonspreadoutput_i(o,v);
+}
+
+void ADvoiceUI::cb_Vib_i(WidgetPDial* o, void*) {
+  pars->VoicePar[nvoice].Unison_vibratto_speed=(int)o->value();
+}
+void ADvoiceUI::cb_Vib(WidgetPDial* o, void* v) {
+  ((ADvoiceUI*)(o->parent()->parent()->parent()->parent()->user_data()))->cb_Vib_i(o,v);
+}
+
 void ADvoiceUI::cb_Vol1_i(Fl_Value_Slider* o, void*) {
   pars->VoicePar[nvoice].PVolume=(int)o->value();
 }
@@ -645,7 +695,7 @@ void ADvoiceUI::cb_voiceonbutton(Fl_Check_Button* o, void* v) {
 }
 
 Fl_Group* ADvoiceUI::make_window() {
-  { ADnoteVoiceParameters = new Fl_Group(0, 0, 765, 525, "Voice");
+  { ADnoteVoiceParameters = new Fl_Group(0, 0, 765, 575, "Voice");
     ADnoteVoiceParameters->box(FL_FLAT_BOX);
     ADnoteVoiceParameters->color(FL_BACKGROUND_COLOR);
     ADnoteVoiceParameters->selection_color(FL_BACKGROUND_COLOR);
@@ -656,11 +706,11 @@ Fl_Group* ADvoiceUI::make_window() {
     ADnoteVoiceParameters->user_data((void*)(this));
     ADnoteVoiceParameters->align(Fl_Align(FL_ALIGN_TOP));
     ADnoteVoiceParameters->when(FL_WHEN_RELEASE);
-    { Fl_Group* o = voiceparametersgroup = new Fl_Group(0, 0, 765, 525);
+    { Fl_Group* o = voiceparametersgroup = new Fl_Group(0, 0, 765, 580);
       voiceparametersgroup->box(FL_THIN_UP_BOX);
       voiceparametersgroup->color((Fl_Color)48);
-      { voicemodegroup = new Fl_Group(0, 5, 760, 515);
-        { Fl_Group* o = voiceFMparametersgroup = new Fl_Group(530, 5, 230, 515, "MODULATOR");
+      { voicemodegroup = new Fl_Group(0, 5, 760, 575);
+        { Fl_Group* o = voiceFMparametersgroup = new Fl_Group(530, 5, 230, 565, "MODULATOR");
           voiceFMparametersgroup->box(FL_THIN_UP_FRAME);
           voiceFMparametersgroup->color((Fl_Color)48);
           voiceFMparametersgroup->labeltype(FL_EMBOSSED_LABEL);
@@ -823,8 +873,8 @@ Fl_Group* ADvoiceUI::make_window() {
             } // Fl_Value_Slider* o
             o->end();
           } // Fl_Group* o
-          { modoscil = new Fl_Group(535, 365, 220, 150);
-            { Fl_Group* o = fmoscil = new Fl_Group(535, 405, 220, 110);
+          { modoscil = new Fl_Group(535, 365, 220, 200);
+            { Fl_Group* o = fmoscil = new Fl_Group(535, 425, 220, 140);
               fmoscil->box(FL_THIN_DOWN_BOX);
               fmoscil->color(FL_GRAY0);
               fmoscil->selection_color((Fl_Color)71);
@@ -845,7 +895,7 @@ Fl_Group* ADvoiceUI::make_window() {
               changeFMoscilbutton->callback((Fl_Callback*)cb_changeFMoscilbutton);
               if (pars->VoicePar[nvoice].PextFMoscil>=0) o->labelcolor(FL_BLUE);
             } // Fl_Button* changeFMoscilbutton
-            { Fl_Slider* o = new Fl_Slider(665, 395, 65, 10, "Phase");
+            { Fl_Slider* o = new Fl_Slider(665, 400, 65, 10, "Phase");
               o->type(5);
               o->box(FL_FLAT_BOX);
               o->labelsize(10);
@@ -856,7 +906,7 @@ Fl_Group* ADvoiceUI::make_window() {
               o->align(Fl_Align(FL_ALIGN_TOP_LEFT));
               o->value(64-pars->VoicePar[nvoice].PFMoscilphase);
             } // Fl_Slider* o
-            { Fl_Choice* o = new Fl_Choice(560, 390, 75, 15, "Use");
+            { Fl_Choice* o = new Fl_Choice(560, 395, 75, 15, "Use");
               o->down_box(FL_BORDER_BOX);
               o->labelsize(10);
               o->textfont(1);
@@ -1082,6 +1132,102 @@ cy)");
           char tmp[50]; for (int i=0;i<nvoice;i++) {sprintf(tmp,"Ext.%2d",i+1);o->add(tmp);};
           o->value(pars->VoicePar[nvoice].Pextoscil+1);
         } // Fl_Choice* o
+        { Fl_Group* o = new Fl_Group(5, 525, 515, 45);
+          o->box(FL_ENGRAVED_BOX);
+          { WidgetPDial* o = new WidgetPDial(285, 540, 25, 25, "Stereo");
+            o->tooltip("Stereo Spread");
+            o->box(FL_ROUND_UP_BOX);
+            o->color(FL_BACKGROUND_COLOR);
+            o->selection_color(FL_INACTIVE_COLOR);
+            o->labeltype(FL_NORMAL_LABEL);
+            o->labelfont(0);
+            o->labelsize(10);
+            o->labelcolor(FL_FOREGROUND_COLOR);
+            o->maximum(127);
+            o->step(1);
+            o->callback((Fl_Callback*)cb_Stereo);
+            o->align(Fl_Align(FL_ALIGN_TOP));
+            o->when(FL_WHEN_CHANGED);
+            o->value(pars->VoicePar[nvoice].Unison_stereo_spread);
+          } // WidgetPDial* o
+          { Fl_Choice* o = new Fl_Choice(10, 545, 75, 20, "Unison");
+            o->tooltip("Unison size");
+            o->down_box(FL_BORDER_BOX);
+            o->labelfont(1);
+            o->textfont(1);
+            o->textsize(10);
+            o->callback((Fl_Callback*)cb_Unison);
+            o->align(Fl_Align(FL_ALIGN_TOP_LEFT));
+            o->add("OFF");char tmp[100];for (int i=1;ADnote_unison_sizes[i];i++){snprintf(tmp,100,"size %d",ADnote_unison_sizes[i]);o->add(tmp);};
+            o->value(pars->get_unison_size_index(nvoice));
+          } // Fl_Choice* o
+          { WidgetPDial* o = new WidgetPDial(340, 540, 25, 25, "Vibratto");
+            o->tooltip("Vibratto");
+            o->box(FL_ROUND_UP_BOX);
+            o->color(FL_BACKGROUND_COLOR);
+            o->selection_color(FL_INACTIVE_COLOR);
+            o->labeltype(FL_NORMAL_LABEL);
+            o->labelfont(0);
+            o->labelsize(10);
+            o->labelcolor(FL_FOREGROUND_COLOR);
+            o->maximum(127);
+            o->step(1);
+            o->callback((Fl_Callback*)cb_Vibratto);
+            o->align(Fl_Align(FL_ALIGN_TOP));
+            o->when(FL_WHEN_CHANGED);
+            o->value(pars->VoicePar[nvoice].Unison_vibratto);
+          } // WidgetPDial* o
+          { Fl_Choice* o = new Fl_Choice(445, 545, 65, 15, "Invert");
+            o->tooltip("Phase Invert");
+            o->down_box(FL_BORDER_BOX);
+            o->labelsize(11);
+            o->textfont(1);
+            o->textsize(10);
+            o->callback((Fl_Callback*)cb_Invert);
+            o->align(Fl_Align(FL_ALIGN_TOP_LEFT));
+            o->add("None");o->add("Random");char tmp[100];for (int i=2;i<=5;i++){snprintf(tmp,100,"%d %%",100/i);o->add(tmp);};
+            o->value(pars->VoicePar[nvoice].Unison_invert_phase);
+          } // Fl_Choice* o
+          { Fl_Slider* o = new Fl_Slider(95, 547, 125, 13, "Frequency Spread");
+            o->tooltip("Frequency Spread of the Unison");
+            o->type(5);
+            o->box(FL_FLAT_BOX);
+            o->labelsize(12);
+            o->maximum(127);
+            o->step(1);
+            o->value(64);
+            o->callback((Fl_Callback*)cb_Frequency);
+            o->align(Fl_Align(FL_ALIGN_TOP));
+            o->value(pars->VoicePar[nvoice].Unison_frequency_spread);
+          } // Fl_Slider* o
+          { Fl_Value_Output* o = unisonspreadoutput = new Fl_Value_Output(225, 545, 40, 15, "(cents)");
+            unisonspreadoutput->labelsize(10);
+            unisonspreadoutput->maximum(1000);
+            unisonspreadoutput->step(0.1);
+            unisonspreadoutput->textfont(1);
+            unisonspreadoutput->textsize(10);
+            unisonspreadoutput->callback((Fl_Callback*)cb_unisonspreadoutput);
+            unisonspreadoutput->align(Fl_Align(FL_ALIGN_TOP_LEFT));
+            o->value(pars->getUnisonFrequencySpreadCents(nvoice));
+          } // Fl_Value_Output* unisonspreadoutput
+          { WidgetPDial* o = new WidgetPDial(390, 540, 25, 25, "Vib.speed");
+            o->tooltip("Vibratto Average Speed");
+            o->box(FL_ROUND_UP_BOX);
+            o->color(FL_BACKGROUND_COLOR);
+            o->selection_color(FL_INACTIVE_COLOR);
+            o->labeltype(FL_NORMAL_LABEL);
+            o->labelfont(0);
+            o->labelsize(10);
+            o->labelcolor(FL_FOREGROUND_COLOR);
+            o->maximum(127);
+            o->step(1);
+            o->callback((Fl_Callback*)cb_Vib);
+            o->align(Fl_Align(FL_ALIGN_TOP));
+            o->when(FL_WHEN_CHANGED);
+            o->value(pars->VoicePar[nvoice].Unison_vibratto_speed);
+          } // WidgetPDial* o
+          o->end();
+        } // Fl_Group* o
         voicemodegroup->end();
       } // Fl_Group* voicemodegroup
       { Fl_Group* o = new Fl_Group(5, 40, 240, 210, "AMPLITUDE");
@@ -1522,7 +1668,7 @@ void ADnoteUI::cb_currentvoicecounter_i(Fl_Counter* o, void*) {
 advoice->hide();
 ADnoteVoice->remove(advoice);
 delete advoice;
-advoice=new ADvoiceUI(0,0,765,525);
+advoice=new ADvoiceUI(0,0,765,585);
 ADnoteVoice->add(advoice);
 advoice->init(pars,nvoice,master);
 advoice->show();
@@ -1899,9 +2045,9 @@ Fl_Double_Window* ADnoteUI::make_window() {
     } // Fl_Button* o
     ADnoteGlobalParameters->end();
   } // Fl_Double_Window* ADnoteGlobalParameters
-  { ADnoteVoice = new Fl_Double_Window(765, 560, "ADsynth Voice Parameters");
+  { ADnoteVoice = new Fl_Double_Window(765, 620, "ADsynth Voice Parameters");
     ADnoteVoice->user_data((void*)(this));
-    { ADvoiceUI* o = advoice = new ADvoiceUI(0, 0, 760, 525);
+    { ADvoiceUI* o = advoice = new ADvoiceUI(0, 0, 760, 575);
       advoice->box(FL_BORDER_BOX);
       advoice->color(FL_BACKGROUND_COLOR);
       advoice->selection_color(FL_BACKGROUND_COLOR);
@@ -1915,12 +2061,12 @@ Fl_Double_Window* ADnoteUI::make_window() {
       o->show();
       advoice->end();
     } // ADvoiceUI* advoice
-    { Fl_Button* o = new Fl_Button(300, 530, 195, 25, "Close Window");
+    { Fl_Button* o = new Fl_Button(300, 585, 195, 25, "Close Window");
       o->box(FL_THIN_UP_BOX);
       o->labelfont(1);
       o->callback((Fl_Callback*)cb_Close1);
     } // Fl_Button* o
-    { Fl_Counter* o = currentvoicecounter = new Fl_Counter(5, 530, 130, 25, "Current Voice");
+    { Fl_Counter* o = currentvoicecounter = new Fl_Counter(5, 585, 130, 25, "Current Voice");
       currentvoicecounter->type(1);
       currentvoicecounter->labelfont(1);
       currentvoicecounter->minimum(0);
@@ -1933,7 +2079,7 @@ Fl_Double_Window* ADnoteUI::make_window() {
       currentvoicecounter->align(Fl_Align(FL_ALIGN_RIGHT));
       o->bounds(1,NUM_VOICES);
     } // Fl_Counter* currentvoicecounter
-    { Fl_Button* o = new Fl_Button(700, 535, 25, 15, "C");
+    { Fl_Button* o = new Fl_Button(700, 590, 25, 15, "C");
       o->box(FL_THIN_UP_BOX);
       o->color((Fl_Color)179);
       o->labelfont(1);
@@ -1941,7 +2087,7 @@ Fl_Double_Window* ADnoteUI::make_window() {
       o->labelcolor(FL_BACKGROUND2_COLOR);
       o->callback((Fl_Callback*)cb_C1);
     } // Fl_Button* o
-    { Fl_Button* o = new Fl_Button(730, 535, 25, 15, "P");
+    { Fl_Button* o = new Fl_Button(730, 590, 25, 15, "P");
       o->box(FL_THIN_UP_BOX);
       o->color((Fl_Color)179);
       o->labelfont(1);

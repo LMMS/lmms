@@ -84,10 +84,10 @@ private:
   void cb_revp4_i(WidgetPDial*, void*);
   static void cb_revp4(WidgetPDial*, void*);
 public:
-  WidgetPDial *revp5;
+  WidgetPDial *revp12;
 private:
-  void cb_revp5_i(WidgetPDial*, void*);
-  static void cb_revp5(WidgetPDial*, void*);
+  void cb_revp12_i(WidgetPDial*, void*);
+  static void cb_revp12(WidgetPDial*, void*);
 public:
   WidgetPDial *revp6;
 private:
@@ -545,8 +545,8 @@ public:
   Fl_Group *effreverbwindow;
   Fl_Choice *revp;
 private:
-  void cb_revpa_i(Fl_Choice*, void*);
-  static void cb_revpa(Fl_Choice*, void*);
+  void cb_revp5_i(Fl_Choice*, void*);
+  static void cb_revp5(Fl_Choice*, void*);
   static Fl_Menu_Item menu_revp1[];
 public:
   WidgetPDial *revp0;

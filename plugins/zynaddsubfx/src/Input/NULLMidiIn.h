@@ -29,19 +29,21 @@
 /**a dummy Midi port*/
 class NULLMidiIn:public MidiIn
 {
-public:
-    /**Dummy Constructor
-     * \todo see if the default constructor would work here*/
-    NULLMidiIn();
-    /**Dummy Destructor
-     * \todo see if the default destructor would work here*/
-    ~NULLMidiIn();
-    /**Get the midi command,channel and parameters
-     * It returns MidiNull because it is a dummy driver
-     */
-    void getmidicmd(MidiCmdType &cmdtype,unsigned char &cmdchan,int *cmdparams);
+    public:
+        /**Dummy Constructor
+         * \todo see if the default constructor would work here*/
+        NULLMidiIn();
+        /**Dummy Destructor
+         * \todo see if the default destructor would work here*/
+        ~NULLMidiIn();
+        /**Get the midi command,channel and parameters
+         * It returns MidiNull because it is a dummy driver
+         */
+        void getmidicmd(MidiCmdType &cmdtype,
+                        unsigned char &cmdchan,
+                        int *cmdparams);
 
-private:
+    private:
 };
 
 #endif

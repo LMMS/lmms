@@ -30,19 +30,21 @@
 /**Midi input for ALSA (this creates an ALSA virtual port)*/
 class ALSAMidiIn:public MidiIn
 {
-public:
-    /**Constructor*/
-    ALSAMidiIn();
-    /**Destructor*/
-    ~ALSAMidiIn();
+    public:
+        /**Constructor*/
+        ALSAMidiIn();
+        /**Destructor*/
+        ~ALSAMidiIn();
 
-    void getmidicmd(MidiCmdType &cmdtype,unsigned char &cmdchan,int *cmdparams);
-    /**Get the ALSA id
-     * @return ALSA id*/
-    int getalsaid();
+        void getmidicmd(MidiCmdType &cmdtype,
+                        unsigned char &cmdchan,
+                        int *cmdparams);
+        /**Get the ALSA id
+         * @return ALSA id*/
+        int getalsaid();
 
-private:
-    snd_seq_t *midi_handle;
+    private:
+        snd_seq_t *midi_handle;
 };
 
 #endif

@@ -28,24 +28,24 @@
  * \todo see if this should inherit LFO*/
 class EffectLFO
 {
-public:
-    EffectLFO();
-    ~EffectLFO();
-    void effectlfoout(REALTYPE *outl,REALTYPE *outr);
-    void updateparams();
-    unsigned char Pfreq;
-    unsigned char Prandomness;
-    unsigned char PLFOtype;
-    unsigned char Pstereo;//"64"=0
-private:
-    REALTYPE getlfoshape(REALTYPE x);
+    public:
+        EffectLFO();
+        ~EffectLFO();
+        void effectlfoout(REALTYPE *outl, REALTYPE *outr);
+        void updateparams();
+        unsigned char Pfreq;
+        unsigned char Prandomness;
+        unsigned char PLFOtype;
+        unsigned char Pstereo; //"64"=0
+    private:
+        REALTYPE getlfoshape(REALTYPE x);
 
-    REALTYPE xl,xr;
-    REALTYPE incx;
-    REALTYPE ampl1,ampl2,ampr1,ampr2;//necessary for "randomness"
-    REALTYPE lfointensity;
-    REALTYPE lfornd;
-    char lfotype; /**\todo GET RID OF CHAR (replace with short or enum)*/
+        REALTYPE xl, xr;
+        REALTYPE incx;
+        REALTYPE ampl1, ampl2, ampr1, ampr2; //necessary for "randomness"
+        REALTYPE lfointensity;
+        REALTYPE lfornd;
+        char     lfotype; /**\todo GET RID OF CHAR (replace with short or enum)*/
 };
 
 

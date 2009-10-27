@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0109 
+version 1.0107 
 header_name {.h} 
 code_name {.cc}
 decl {//Copyright (c) 2003-2005 Nasca Octavian Paul} {} 
@@ -61,7 +61,8 @@ textmode=false;
   }
   Function {setText(const char * c)} {return_type void
   } {
-    code {strcpy(text,c);
+    code {strncpy(text, c, max_tooltip_len-1);
+text[max_tooltip_len-1] = 0;
 textmode=true;
         // Recalc size of window
         fl_font(labelfont(), labelsize());
@@ -84,7 +85,9 @@ textmode=true;
   }
   decl {char tip[40];} {}
   decl {bool textmode;} {}
-  decl {char text[400];//bad stuff will happen if too much is put in this (perhaps dynamically allocate?)} {}
+  decl {enum { max_tooltip_len = 400 };} {selected
+  }
+  decl {char text[max_tooltip_len];} {}
 } 
 
 class WidgetPDial {: {public Fl_Dial}
@@ -153,8 +156,7 @@ case FL_RELEASE:
 	return(1);
      break;
 };
-return(0);} {selected
-    }
+return(0);} {}
   }
   Function {drawgradient(int cx,int cy,int sx,double m1,double m2)} {return_type void
   } {

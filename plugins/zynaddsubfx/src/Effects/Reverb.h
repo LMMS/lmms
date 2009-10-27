@@ -2,7 +2,7 @@
   ZynAddSubFX - a software synthesizer
 
   Reverb.h - Reverberation effect
-  Copyright (C) 2002-2005 Nasca Octavian Paul
+  Copyright (C) 2002-2009 Nasca Octavian Paul
   Author: Nasca Octavian Paul
 
   This program is free software; you can redistribute it and/or modify
@@ -23,104 +23,112 @@
 #ifndef REVERB_H
 #define REVERB_H
 
-
+#include <math.h>
 #include "../globals.h"
 #include "../DSP/AnalogFilter.h"
+#include "../DSP/FFTwrapper.h"
+#include "../DSP/Unison.h"
 #include "Effect.h"
 
 #define REV_COMBS 8
 #define REV_APS 4
 
 /**Creates Reverberation Effects*/
+
 class Reverb:public Effect
 {
-public:
-    Reverb(const int &insertion_,REALTYPE *efxoutl_,REALTYPE *efxoutr_);
-    ~Reverb();
-    void out(REALTYPE *smps_l,REALTYPE *smps_r);
-    void cleanup();
+    public:
+        Reverb(const int &insertion_, REALTYPE *efxoutl_, REALTYPE *efxoutr_);
+        ~Reverb();
+        void out(REALTYPE *smps_l, REALTYPE *smps_r);
+        void cleanup();
 
-    void setpreset(unsigned char npreset);
-    void changepar(const int &npar,const unsigned char &value);
-    unsigned char getpar(const int &npar)const;
+        void setpreset(unsigned char npreset);
+        void changepar(const int &npar, const unsigned char &value);
+        unsigned char getpar(const int &npar) const;
 
-private:
-    //Parametrii
-    /**Amount of the reverb*/
-    unsigned char Pvolume;
+    private:
+        //Parametrii
+        /**Amount of the reverb*/
+        unsigned char Pvolume;
 
-    /**Left/Right Panning*/
-    unsigned char Ppan;
+        /**Left/Right Panning*/
+        unsigned char Ppan;
 
-    /**duration of reverb*/
-    unsigned char Ptime;
+        /**duration of reverb*/
+        unsigned char Ptime;
 
-    /**Initial delay*/
-    unsigned char Pidelay;
+        /**Initial delay*/
+        unsigned char Pidelay;
 
-    /**Initial delay feedback*/
-    unsigned char Pidelayfb;
+        /**Initial delay feedback*/
+        unsigned char Pidelayfb;
 
-    /**delay between ER/Reverbs*/
-    unsigned char Prdelay;
+        /**delay between ER/Reverbs*/
+        unsigned char Prdelay;
 
-    /**EarlyReflections/Reverb Balance*/
-    unsigned char Perbalance;
+        /**EarlyReflections/Reverb Balance*/
+        unsigned char Perbalance;
 
-    /**HighPassFilter*/
-    unsigned char Plpf;
+        /**HighPassFilter*/
+        unsigned char Plpf;
 
-    /**LowPassFilter*/
-    unsigned char Phpf;
+        /**LowPassFilter*/
+        unsigned char Phpf;
 
-    /**Low/HighFrequency Damping
-         * \todo 0..63 lpf,64=off,65..127=hpf(TODO)*/
-    unsigned char Plohidamp;
+        /**Low/HighFrequency Damping
+             * \todo 0..63 lpf,64=off,65..127=hpf(TODO)*/
+        unsigned char Plohidamp;
 
-    /**Reverb type*/
-    unsigned char Ptype;
+        /**Reverb type*/
+        unsigned char Ptype;
 
-    /**Room Size*/
-    unsigned char Proomsize;
+        /**Room Size*/
+        unsigned char Proomsize;
 
-    //parameter control
-    void setvolume(const unsigned char &Pvolume);
-    void setpan(const unsigned char &Ppan);
-    void settime(const unsigned char &Ptime);
-    void setlohidamp(unsigned char Plohidamp);
-    void setidelay(const unsigned char &Pidelay);
-    void setidelayfb(const unsigned char &Pidelayfb);
-    void sethpf(const unsigned char &Phpf);
-    void setlpf(const unsigned char &Plpf);
-    void settype( unsigned char Ptype);
-    void setroomsize(const unsigned char &Proomsize);
+        /**Bandwidth */
+        unsigned char Pbandwidth;
 
-    REALTYPE pan,erbalance;
-    //Parametrii 2
-    int lohidamptype;/**<0=disable,1=highdamp(lowpass),2=lowdamp(highpass)*/
-    int idelaylen,rdelaylen;
-    int idelayk;
-    REALTYPE lohifb,idelayfb,roomsize,rs;//rs is used to "normalise" the volume according to the roomsize
-    int comblen[REV_COMBS*2];
-    int aplen[REV_APS*2];
+        //parameter control
+        void setvolume(const unsigned char &Pvolume);
+        void setpan(const unsigned char &Ppan);
+        void settime(const unsigned char &Ptime);
+        void setlohidamp(unsigned char Plohidamp);
+        void setidelay(const unsigned char &Pidelay);
+        void setidelayfb(const unsigned char &Pidelayfb);
+        void sethpf(const unsigned char &Phpf);
+        void setlpf(const unsigned char &Plpf);
+        void settype(unsigned char Ptype);
+        void setroomsize(const unsigned char &Proomsize);
+        void setbandwidth(const unsigned char &Pbandwidth);
 
-    //Internal Variables
+        REALTYPE pan, erbalance;
+        //Parameters
+        int      lohidamptype; /**<0=disable,1=highdamp(lowpass),2=lowdamp(highpass)*/
+        int      idelaylen, rdelaylen;
+        int      idelayk;
+        REALTYPE lohifb, idelayfb, roomsize, rs; //rs is used to "normalise" the volume according to the roomsize
+        int      comblen[REV_COMBS * 2];
+        int      aplen[REV_APS * 2];
+        Unison  *bandwidth;
 
-    REALTYPE *comb[REV_COMBS*2];
+        //Internal Variables
 
-    int combk[REV_COMBS*2];
-    REALTYPE combfb[REV_COMBS*2];/**<feedback-ul fiecarui filtru "comb"*/
-    REALTYPE lpcomb[REV_COMBS*2];/**<pentru Filtrul LowPass*/
+        REALTYPE *comb[REV_COMBS * 2];
 
-    REALTYPE *ap[REV_APS*2];
+        int      combk[REV_COMBS * 2];
+        REALTYPE combfb[REV_COMBS * 2]; /**<feedback-ul fiecarui filtru "comb"*/
+        REALTYPE lpcomb[REV_COMBS * 2]; /**<pentru Filtrul LowPass*/
 
-    int apk[REV_APS*2];
+        REALTYPE *ap[REV_APS * 2];
 
-    REALTYPE *idelay;
-    AnalogFilter *lpf,*hpf;//filters
-    REALTYPE *inputbuf;
+        int apk[REV_APS * 2];
 
-    void processmono(int ch,REALTYPE *output);
+        REALTYPE     *idelay;
+        AnalogFilter *lpf, *hpf; //filters
+        REALTYPE     *inputbuf;
+
+        void processmono(int ch, REALTYPE *output);
 };
 
 #endif

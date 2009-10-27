@@ -23,23 +23,42 @@
 #ifndef UTIL_H
 #define UTIL_H
 
-#include <pthread.h>
+#include <string>
+#include <sstream>
 #include "../globals.h"
-#include "Microtonal.h"
-#include "../DSP/FFTwrapper.h"
 #include "Config.h"
 
 //Velocity Sensing function
-extern REALTYPE VelF(REALTYPE velocity,unsigned char scaling);
+extern REALTYPE VelF(REALTYPE velocity, unsigned char scaling);
 
 bool fileexists(const char *filename);
 
 #define N_DETUNE_TYPES 4 //the number of detune types
-extern REALTYPE getdetune(unsigned char type,unsigned short int coarsedetune,unsigned short int finedetune);
+extern REALTYPE getdetune(unsigned char type,
+                          unsigned short int coarsedetune,
+                          unsigned short int finedetune);
 
-extern REALTYPE *denormalkillbuf;/**<the buffer to add noise in order to avoid denormalisation*/
+extern REALTYPE *denormalkillbuf; /**<the buffer to add noise in order to avoid denormalisation*/
 
 extern Config config;
+
+template<class T>
+std::string stringFrom(T x)
+{
+    std::stringstream ss;
+    ss << x;
+    return ss.str();
+}
+
+template<class T>
+T stringTo(const char *x)
+{
+    std::string str = x != NULL ? x : "0"; //should work for the basic float/int
+    std::stringstream ss(str);
+    T ans;
+    ss >> ans;
+    return ans;
+}
 
 #endif
 

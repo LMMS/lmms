@@ -56,7 +56,7 @@ class PartSysEffSend {: {public Fl_Group}
         xywh {0 0 25 25} box ROUND_UP_BOX labelfont 1 labelsize 10 align 130 maximum 127 step 1
         code0 {o->size(25,25);}
         code1 {o->value(master->Psysefxvol[neff][npart]);}
-        code2 {char tmp[10];snprintf(tmp,10,"%d",neff+1);o->label(strdup(tmp));}
+        code2 {char tmp[10];snprintf(tmp,10,"%d",neff+1);o->copy_label(tmp);}
         class WidgetPDial
       }
     }
@@ -212,7 +212,7 @@ o->redraw();
 partui->showparameters(n,-1);//use to delete the ui, if it is not to item 0
 } else o->value(1);}
         private xywh {30 0 20 15} down_box DOWN_BOX labeltype EMBOSSED_LABEL labelfont 1 labelsize 13 align 4
-        code0 {snprintf(label,10,"%d",n+1);o->label(strdup(label));}
+        code0 {snprintf(label,10,"%d",n+1);o->label(label);}
         code1 {o->value(part->kit[n].Penabled);}
         code2 {if (n==0) o->deactivate();}
       }
@@ -590,7 +590,7 @@ part->ctl.portamento.updowntimestretch=x;}
         }
         Fl_Dial proptb {
           label {Prp.Dpth}
-          callback {part->ctl.portamento.propDepth=(int) o->value();} selected
+          callback {part->ctl.portamento.propDepth=(int) o->value();}
           tooltip {The difference from nonproportinal portamento} xywh {405 60 25 25} labelsize 9 maximum 127 step 1
           code0 {o->value(part->ctl.portamento.propDepth);}
           class WidgetPDial
@@ -841,7 +841,7 @@ if (part->Pkitmode==0) {
       }
     }
     Fl_Window instrumenteditwindow {
-      label {Instrument Edit}
+      label {Instrument Edit} selected
       xywh {182 214 395 360} type Double hide
     } {
       Fl_Group {} {

@@ -21,46 +21,45 @@
 #ifndef STEREO_H
 #define STEREO_H
 
-template <class T>
+template<class T>
 class Stereo
 {
-public:
-    Stereo(const T &left,const T &right);
+    public:
+        Stereo(const T &left, const T &right);
 
-    /**Initializes Stereo with left and right set to val
-     * @param val the value for both channels*/
-    Stereo(const T &val);
-    ~Stereo() {};
+        /**Initializes Stereo with left and right set to val
+         * @param val the value for both channels*/
+        Stereo(const T &val);
+        ~Stereo() {}
 
-    void operator=(const Stereo<T> &smp);
-    T &left() {
-        return leftChannel;
-    };
-    T &right() {
-        return rightChannel;
-    };
-    T &l() {
-        return leftChannel;
-    };
-    T &r() {
-        return rightChannel;
-    };
-    const T &left()const {
-        return leftChannel;
-    };
-    const T &right()const {
-        return rightChannel;
-    };
-    const T &l()const {
-        return leftChannel;
-    };
-    const T &r()const {
-        return rightChannel;
-    };
-private:
-    T leftChannel;
-    T rightChannel;
-
+        void operator=(const Stereo<T> &smp);
+        T &left() {
+            return leftChannel;
+        }
+        T &right() {
+            return rightChannel;
+        }
+        T &l() {
+            return leftChannel;
+        }
+        T &r() {
+            return rightChannel;
+        }
+        const T &left() const {
+            return leftChannel;
+        }
+        const T &right() const {
+            return rightChannel;
+        }
+        const T &l() const {
+            return leftChannel;
+        }
+        const T &r() const {
+            return rightChannel;
+        }
+    private:
+        T leftChannel;
+        T rightChannel;
 };
 #include "Stereo.cpp"
 #endif

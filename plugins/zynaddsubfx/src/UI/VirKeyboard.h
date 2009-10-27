@@ -80,6 +80,7 @@ private:
   static void cb_partrcv(Fl_Choice*, void*);
 public:
   VirKeyboard(Master *master_);
+  ~VirKeyboard();
   void show();
   void relaseallkeys();
 private:

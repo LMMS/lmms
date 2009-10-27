@@ -53,7 +53,7 @@ IF(LMMS_HOST_X86 OR LMMS_HOST_X86_64)
 ENDIF(LMMS_HOST_X86 OR LMMS_HOST_X86_64)
 
 # build ZynAddSubFX with full optimizations
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -Wno-write-strings -Wno-deprecated-declarations")
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 -Wno-write-strings -Wno-deprecated-declarations")
 
 # link system-libraries when on win32
 IF(LMMS_BUILD_WIN32)
@@ -106,7 +106,8 @@ SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${PLUGIN_DIR}")
 SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 ADD_EXECUTABLE(RemoteZynAddSubFx RemoteZynAddSubFx.cpp ${ZYN_SRC_GUI})
 INSTALL(TARGETS RemoteZynAddSubFx RUNTIME DESTINATION ${PLUGIN_DIR})
-TARGET_LINK_LIBRARIES(RemoteZynAddSubFx ZynAddSubFxCore ${CMAKE_CURRENT_BINARY_DIR}/fltk/bin/libfltk.a)
+TARGET_LINK_LIBRARIES(RemoteZynAddSubFx -L${CMAKE_CURRENT_BINARY_DIR} -lZynAddSubFxCore ${CMAKE_CURRENT_BINARY_DIR}/fltk/bin/libfltk.a)
+ADD_DEPENDENCIES(RemoteZynAddSubFx ZynAddSubFxCore)
 
 # link system libraries when on win32
 IF(LMMS_BUILD_WIN32)
