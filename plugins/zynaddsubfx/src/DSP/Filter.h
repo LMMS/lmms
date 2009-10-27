@@ -33,18 +33,18 @@
 
 class Filter
 {
-public:
-    Filter(FilterParams *pars);
-    ~Filter();
-    void filterout(REALTYPE *smp);
-    void setfreq(REALTYPE frequency);
-    void setfreq_and_q(REALTYPE frequency,REALTYPE q_);
-    void setq(REALTYPE q_);
+    public:
+        Filter(FilterParams *pars);
+        ~Filter();
+        void filterout(REALTYPE *smp);
+        void setfreq(REALTYPE frequency);
+        void setfreq_and_q(REALTYPE frequency, REALTYPE q_);
+        void setq(REALTYPE q_);
 
-    REALTYPE getrealfreq(REALTYPE freqpitch);
-private:
-    Filter_ *filter;
-    unsigned char category;
+        REALTYPE getrealfreq(REALTYPE freqpitch);
+    private:
+        Filter_      *filter;
+        unsigned char category;
 };
 
 

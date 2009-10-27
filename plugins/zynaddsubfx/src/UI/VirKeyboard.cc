@@ -486,6 +486,10 @@ midictl=75;
 make_window();
 }
 
+VirKeyboard::~VirKeyboard() {
+  delete virkeyboardwindow;
+}
+
 void VirKeyboard::show() {
   virkeyboardwindow->show();
 }

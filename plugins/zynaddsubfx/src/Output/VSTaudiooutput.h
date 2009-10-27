@@ -32,26 +32,28 @@
 
 class VSTSynth:public AudioEffectX
 {
-public:
-    VSTSynth (audioMasterCallback audioMaster);
-    ~VSTSynth();
+    public:
+        VSTSynth(audioMasterCallback audioMaster);
+        ~VSTSynth();
 
-    virtual void process (float **inputs, float **outputs, long sampleframes);
-    virtual void processReplacing (float **inputs, float **outputs, long sampleframes);
-    virtual long processEvents(VstEvents *events);//this is used for Midi input
-    virtual long int canDo(char *txt);
-    virtual bool getVendorString(char *txt);
-    virtual bool getProductString(char *txt);
-    virtual void resume();
+        virtual void process(float **inputs, float **outputs, long sampleframes);
+        virtual void processReplacing(float **inputs,
+                                      float **outputs,
+                                      long sampleframes);
+        virtual long processEvents(VstEvents *events); //this is used for Midi input
+        virtual long int canDo(char *txt);
+        virtual bool getVendorString(char *txt);
+        virtual bool getProductString(char *txt);
+        virtual void resume();
 
-    virtual long getChunk(void** data,bool isPreset=false);
-    virtual long setChunk(void *data,long size,bool isPreset=false);
+        virtual long getChunk(void **data, bool isPreset = false);
+        virtual long setChunk(void *data, long size, bool isPreset = false);
 
-    MasterUI *ui;
-    int Pexitprogram;
+        MasterUI *ui;
+        int Pexitprogram;
 
-    Master *vmaster;
-    pthread_t thr;
+        Master   *vmaster;
+        pthread_t thr;
 };
 
 #endif

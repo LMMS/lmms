@@ -25,80 +25,89 @@
 
 Recorder::Recorder()
 {
-    recordbuf_16bit=new short int [SOUND_BUFFER_SIZE*2];
-    status=0;
-    notetrigger=0;
-    for (int i=0;i<SOUND_BUFFER_SIZE*2;i++) {
-        recordbuf_16bit[i]=0;
-    }
-};
+    recordbuf_16bit = new short int [SOUND_BUFFER_SIZE * 2];
+    status = 0;
+    notetrigger     = 0;
+    for(int i = 0; i < SOUND_BUFFER_SIZE * 2; i++)
+        recordbuf_16bit[i] = 0;
+}
 
 Recorder::~Recorder()
 {
-    if (recording()==1) stop();
+    if(recording() == 1)
+        stop();
     delete [] recordbuf_16bit;
-};
+}
 
-int Recorder::preparefile(std::string filename_,int overwrite)
+int Recorder::preparefile(std::string filename_, int overwrite)
 {
-    if (!overwrite) {
+    if(!overwrite) {
         struct stat fileinfo;
         int statr;
-        statr = stat(filename_.c_str(),&fileinfo);
-        if (statr == 0) {//file exists
+        statr = stat(filename_.c_str(), &fileinfo);
+        if(statr == 0)   //file exists
             return 1;
-        }
     }
 
-    if (!wav.newfile(filename_, SAMPLE_RATE,2)) return 2;
+    if(!wav.newfile(filename_, SAMPLE_RATE, 2))
+        return 2;
 
-    status=1;//ready
+    status = 1; //ready
 
-    return(0);
-};
+    return 0;
+}
 
 void Recorder::start()
 {
-    notetrigger=0;
-    status=2;//recording
-};
+    notetrigger = 0;
+    status      = 2; //recording
+}
 
 void Recorder::stop()
 {
     wav.close();
-    status=0;
-};
+    status = 0;
+}
 
 void Recorder::pause()
 {
-    status=0;
-};
+    status = 0;
+}
 
 int Recorder::recording()
 {
-    if ((status==2)&&(notetrigger!=0)) return(1);
-    else return(0);
-};
+    if((status == 2) && (notetrigger != 0))
+        return 1;
+    else
+        return 0;
+}
 
-void Recorder::recordbuffer(REALTYPE *outl,REALTYPE *outr)
+void Recorder::recordbuffer(REALTYPE *outl, REALTYPE *outr)
 {
     int tmp;
-    if (status!=2) return;
-    for (int i=0;i<SOUND_BUFFER_SIZE;i++) {
-        tmp=(int)(outl[i]*32767.0);
-        if (tmp<-32768) tmp=-32768;
-        if (tmp>32767) tmp=32767;
-        recordbuf_16bit[i*2]=tmp;
+    if(status != 2)
+        return;
+    for(int i = 0; i < SOUND_BUFFER_SIZE; i++) {
+        tmp = (int)(outl[i] * 32767.0);
+        if(tmp < -32768)
+            tmp = -32768;
+        if(tmp > 32767)
+            tmp = 32767;
+        recordbuf_16bit[i * 2] = tmp;
 
-        tmp=(int)(outr[i]*32767.0);
-        if (tmp<-32768) tmp=-32768;
-        if (tmp>32767) tmp=32767;
-        recordbuf_16bit[i*2+1]=tmp;
-    };
-    wav.write_stereo_samples(SOUND_BUFFER_SIZE,recordbuf_16bit);
-};
+        tmp = (int)(outr[i] * 32767.0);
+        if(tmp < -32768)
+            tmp = -32768;
+        if(tmp > 32767)
+            tmp = 32767;
+        recordbuf_16bit[i * 2 + 1] = tmp;
+    }
+    wav.write_stereo_samples(SOUND_BUFFER_SIZE, recordbuf_16bit);
+}
 
 void Recorder::triggernow()
 {
-    if (status==2) notetrigger=1;
-};
+    if(status == 2)
+        notetrigger = 1;
+}
+

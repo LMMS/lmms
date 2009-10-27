@@ -28,80 +28,97 @@ Dump dump;
 
 Dump::Dump()
 {
-    file=NULL;
-    tick=0;
-    k=0;
-    keyspressed=0;
-};
+    file = NULL;
+    tick = 0;
+    k    = 0;
+    keyspressed = 0;
+}
 
 Dump::~Dump()
 {
-    if (file!=NULL) {
-        double duration=(double)tick*(double) SOUND_BUFFER_SIZE/(double) SAMPLE_RATE;
-        fprintf(file,"\n# statistics: duration = %d seconds; keyspressed = %d\n\n\n\n",(int) duration,keyspressed);
+    if(file != NULL) {
+        double duration = (double)tick * (double) SOUND_BUFFER_SIZE
+                          / (double) SAMPLE_RATE;
+        fprintf(
+            file,
+            "\n# statistics: duration = %d seconds; keyspressed = %d\n\n\n\n",
+            (int) duration,
+            keyspressed);
         fclose(file);
-    };
-};
+    }
+}
 
 void Dump::startnow()
 {
-    if (file!=NULL) return;//the file is already open
+    if(file != NULL)
+        return;            //the file is already open
 
-    if (config.cfg.DumpNotesToFile!=0) {
-        if (config.cfg.DumpAppend!=0) file=fopen(config.cfg.DumpFile,"a");
-        else file=fopen(config.cfg.DumpFile,"w");
-        if (file==NULL) return;
-        if (config.cfg.DumpAppend!=0) fprintf(file,"%s","#************************************\n");
+    if(config.cfg.DumpNotesToFile != 0) {
+        if(config.cfg.DumpAppend != 0)
+            file = fopen(config.cfg.DumpFile, "a");
+        else
+            file = fopen(config.cfg.DumpFile, "w");
+        if(file == NULL)
+            return;
+        if(config.cfg.DumpAppend != 0)
+            fprintf(file, "%s", "#************************************\n");
 
-        time_t tm=time(NULL);
+        time_t tm = time(NULL);
 
-        fprintf(file,"#date/time = %s\n",ctime(&tm));
-        fprintf(file,"#1 tick = %g milliseconds\n",SOUND_BUFFER_SIZE*1000.0/SAMPLE_RATE);
-        fprintf(file,"SAMPLERATE = %d\n",SAMPLE_RATE);
-        fprintf(file,"TICKSIZE = %d #samples\n",SOUND_BUFFER_SIZE);
-        fprintf(file,"\n\nSTART\n");
-    };
-};
+        fprintf(file, "#date/time = %s\n", ctime(&tm));
+        fprintf(file,
+                "#1 tick = %g milliseconds\n",
+                SOUND_BUFFER_SIZE * 1000.0 / SAMPLE_RATE);
+        fprintf(file, "SAMPLERATE = %d\n", SAMPLE_RATE);
+        fprintf(file, "TICKSIZE = %d #samples\n", SOUND_BUFFER_SIZE);
+        fprintf(file, "\n\nSTART\n");
+    }
+}
 
 void Dump::inctick()
 {
     tick++;
-};
+}
 
 
-void Dump::dumpnote(char chan,char note, char vel)
+void Dump::dumpnote(char chan, char note, char vel)
 {
-    if (file==NULL) return;
-    if (note==0) return;
-    if (vel==0) fprintf(file,"n %d -> %d %d \n",tick,chan,note);//note off
-    else fprintf(file,"N %d -> %d %d %d \n",tick,chan,note,vel);//note on
+    if(file == NULL)
+        return;
+    if(note == 0)
+        return;
+    if(vel == 0)
+        fprintf(file, "n %d -> %d %d \n", tick, chan, note);    //note off
+    else
+        fprintf(file, "N %d -> %d %d %d \n", tick, chan, note, vel); //note on
 
-    if (vel!=0) keyspressed++;
+    if(vel != 0)
+        keyspressed++;
 #ifndef JACKAUDIOOUT
-    if (k++>25) {
+    if(k++ > 25) {
         fflush(file);
-        k=0;
-    };
+        k = 0;
+    }
 #endif
-};
+}
 
-void Dump::dumpcontroller(char chan,unsigned int type,int par)
+void Dump::dumpcontroller(char chan, unsigned int type, int par)
 {
-    if (file==NULL) return;
-    switch (type) {
+    if(file == NULL)
+        return;
+    switch(type) {
     case C_pitchwheel:
-        fprintf(file,"P %d -> %d %d\n",tick,chan,par);
+        fprintf(file, "P %d -> %d %d\n", tick, chan, par);
         break;
     default:
-        fprintf(file,"C %d -> %d %d %d\n",tick,chan,type,par);
+        fprintf(file, "C %d -> %d %d %d\n", tick, chan, type, par);
         break;
-    };
+    }
 #ifndef JACKAUDIOOUT
-    if (k++>25) {
+    if(k++ > 25) {
         fflush(file);
-        k=0;
-    };
+        k = 0;
+    }
 #endif
-};
-
+}
 

@@ -174,6 +174,23 @@ private:
   static void cb_R(Fl_Check_Button*, void*);
   void cb_Use1_i(Fl_Choice*, void*);
   static void cb_Use1(Fl_Choice*, void*);
+  void cb_Stereo_i(WidgetPDial*, void*);
+  static void cb_Stereo(WidgetPDial*, void*);
+  void cb_Unison_i(Fl_Choice*, void*);
+  static void cb_Unison(Fl_Choice*, void*);
+  void cb_Vibratto_i(WidgetPDial*, void*);
+  static void cb_Vibratto(WidgetPDial*, void*);
+  void cb_Invert_i(Fl_Choice*, void*);
+  static void cb_Invert(Fl_Choice*, void*);
+  void cb_Frequency_i(Fl_Slider*, void*);
+  static void cb_Frequency(Fl_Slider*, void*);
+public:
+  Fl_Value_Output *unisonspreadoutput;
+private:
+  void cb_unisonspreadoutput_i(Fl_Value_Output*, void*);
+  static void cb_unisonspreadoutput(Fl_Value_Output*, void*);
+  void cb_Vib_i(WidgetPDial*, void*);
+  static void cb_Vib(WidgetPDial*, void*);
   void cb_Vol1_i(Fl_Value_Slider*, void*);
   static void cb_Vol1(Fl_Value_Slider*, void*);
   void cb_V1_i(Fl_Value_Slider*, void*);

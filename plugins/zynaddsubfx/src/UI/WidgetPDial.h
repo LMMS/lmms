@@ -22,7 +22,8 @@ public:
 private:
   char tip[40]; 
   bool textmode; 
-  char text[400]; //bad stuff will happen if too much is put in this (perhaps dynamically allocate?)
+  enum { max_tooltip_len = 400 }; 
+  char text[max_tooltip_len]; 
 };
 
 class WidgetPDial : public Fl_Dial {

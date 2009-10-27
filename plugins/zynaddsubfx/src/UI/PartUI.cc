@@ -38,7 +38,7 @@ Fl_Group* PartSysEffSend::make_window() {
       o->when(FL_WHEN_CHANGED);
       o->size(25,25);
       o->value(master->Psysefxvol[neff][npart]);
-      char tmp[10];snprintf(tmp,10,"%d",neff+1);o->label(strdup(tmp));
+      char tmp[10];snprintf(tmp,10,"%d",neff+1);o->copy_label(tmp);
     } // WidgetPDial* o
     syseffsend->end();
   } // Fl_Group* syseffsend
@@ -333,7 +333,7 @@ Fl_Group* PartKitItem::make_window() {
       enabledcheck->labelsize(13);
       enabledcheck->callback((Fl_Callback*)cb_enabledcheck);
       enabledcheck->align(Fl_Align(FL_ALIGN_LEFT));
-      snprintf(label,10,"%d",n+1);o->label(strdup(label));
+      snprintf(label,10,"%d",n+1);o->label(label);
       o->value(part->kit[n].Penabled);
       if (n==0) o->deactivate();
     } // Fl_Check_Button* enabledcheck

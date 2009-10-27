@@ -28,36 +28,35 @@
 
 class PresetsStore
 {
-public:
-    PresetsStore();
-    ~PresetsStore();
+    public:
+        PresetsStore();
+        ~PresetsStore();
 
-    //Clipboard stuff
-    void copyclipboard(XMLwrapper *xml,char *type);
-    bool pasteclipboard(XMLwrapper *xml);
-    bool checkclipboardtype(char *type);
+        //Clipboard stuff
+        void copyclipboard(XMLwrapper *xml, char *type);
+        bool pasteclipboard(XMLwrapper *xml);
+        bool checkclipboardtype(char *type);
 
-    //presets stuff
-    void copypreset(XMLwrapper *xml,char *type, const char *name);
-    bool pastepreset(XMLwrapper *xml, int npreset);
-    void deletepreset(int npreset);
+        //presets stuff
+        void copypreset(XMLwrapper *xml, char *type, const char *name);
+        bool pastepreset(XMLwrapper *xml, int npreset);
+        void deletepreset(int npreset);
 
-    struct presetstruct {
-        char *file;
-        char *name;
-    };
-    presetstruct presets[MAX_PRESETS];
+        struct presetstruct {
+            char *file;
+            char *name;
+        };
+        presetstruct presets[MAX_PRESETS];
 
-    void rescanforpresets(char *type);
+        void rescanforpresets(char *type);
 
-private:
-    struct {
-        char *data;
-        char type[MAX_PRESETTYPE_SIZE];
-    } clipboard;
+    private:
+        struct {
+            char *data;
+            char  type[MAX_PRESETTYPE_SIZE];
+        } clipboard;
 
-    void clearpresets();
-
+        void clearpresets();
 };
 
 extern PresetsStore presetsstore;

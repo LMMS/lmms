@@ -28,11 +28,12 @@
 #include "../Misc/Master.h"
 
 
-#if (REALTYPE!=jack_default_audio_sample_t)
-#error "The internal sample datatype of ZynAddSubFX and the datatype of jack differs.\
- In order to compile ZynAddSubFX the 'REALTYPE' and 'jack_default_audio_sample_t' must be equal.\
- Set the 'REALTYPE' data type (which is defined in 'globals.h') to what is defined \
- in the file types.h from jack include directory as 'jack_default_audio_sample_t' (as float or double)."
+#if (REALTYPE != jack_default_audio_sample_t)
+#error \
+    "The internal sample datatype of ZynAddSubFX and the datatype of jack differs. \
+    In order to compile ZynAddSubFX the 'REALTYPE' and 'jack_default_audio_sample_t' must be equal. \
+    Set the 'REALTYPE' data type (which is defined in 'globals.h') to what is defined \
+    in the file types.h from jack include directory as 'jack_default_audio_sample_t' (as float or double)."
 #endif
 
 
@@ -41,7 +42,7 @@
 bool JACKaudiooutputinit(Master *master_);
 void JACKfinish();
 void JACKhandlemidi(unsigned long frames);
-const char* JACKgetname();
+const char *JACKgetname();
 
 #endif
 

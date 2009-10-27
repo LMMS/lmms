@@ -24,13 +24,12 @@
 #include "Sample.h"
 #include "FqSample.h"
 
-class AuSample : public Sample
+class AuSample:public Sample
 {
-public:
-    AuSample(int length,REALTYPE fill=0);
-    AuSample(int length,const REALTYPE *input);
-    FqSample getFqSample();/**\todo implement this*/
-
+    public:
+        AuSample(int length, REALTYPE fill = 0);
+        AuSample(int length, const REALTYPE *input);
+        FqSample getFqSample(); /**\todo implement this*/
 };
 #endif
 

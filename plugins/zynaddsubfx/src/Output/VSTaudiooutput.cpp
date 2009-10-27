@@ -24,42 +24,45 @@
 
 //the constructor and the destructor are defined in main.C
 
-void VSTSynth::process (float **inputs, float **outputs, long sampleframes)
+void VSTSynth::process(float **inputs, float **outputs, long sampleframes)
 {
-    float *outl=outputs[0];
-    float *outr=outputs[1];
+    float *outl = outputs[0];
+    float *outr = outputs[1];
     pthread_mutex_lock(&vmaster->mutex);
-    vmaster->GetAudioOutSamples(sampleframes,(int) getSampleRate(),outl,outr);
+    vmaster->GetAudioOutSamples(sampleframes, (int) getSampleRate(), outl, outr);
     pthread_mutex_unlock(&vmaster->mutex);
-};
+}
 
-void VSTSynth::processReplacing (float **inputs, float **outputs, long sampleframes)
+void VSTSynth::processReplacing(float **inputs,
+                                float **outputs,
+                                long sampleframes)
 {
-    process(inputs,outputs,sampleframes);
-};
+    process(inputs, outputs, sampleframes);
+}
 
 long int VSTSynth::canDo(char *txt)
 {
-    if (strcmp(txt,"receiveVstEvents")==0) return (1);
-    if (strcmp(txt,"receiveVstMidiEvent")==0) return (1);
-    return(-1);
-};
+    if(strcmp(txt, "receiveVstEvents") == 0)
+        return 1;
+    if(strcmp(txt, "receiveVstMidiEvent") == 0)
+        return 1;
+    return -1;
+}
 
 bool VSTSynth::getVendorString(char *txt)
 {
-    strcpy(txt,"Nasca O. Paul");
-    return(true);
-};
+    strcpy(txt, "Nasca O. Paul");
+    return true;
+}
 
 bool VSTSynth::getProductString(char *txt)
 {
-    strcpy(txt,"ZynAddSubFX");
-    return(true);
-};
+    strcpy(txt, "ZynAddSubFX");
+    return true;
+}
 
 void VSTSynth::resume()
 {
     wantEvents();
-};
-
+}
 

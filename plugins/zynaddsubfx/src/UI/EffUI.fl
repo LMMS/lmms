@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0107 
+version 1.0109 
 header_name {.h} 
 code_name {.cc}
 decl {//Copyright (c) 2002-2005 Nasca Octavian Paul} {} 
@@ -36,7 +36,7 @@ decl {\#include "../Effects/EffectMgr.h"} {public
 decl {\#include "PresetsUI.h"} {public
 } 
 
-class EQGraph {selected : {public Fl_Box}
+class EQGraph {: {public Fl_Box}
 } {
   Function {EQGraph(int x,int y, int w, int h, const char *label=0):Fl_Box(x,y,w,h,label)} {} {
     code {eff=NULL;
@@ -155,7 +155,7 @@ return(log(freq/20.0)/log(1000.0));} {}
   decl {int maxdB;} {}
 } 
 
-class EffUI {: {public Fl_Group,public PresetsUI_}
+class EffUI {open : {public Fl_Group,public PresetsUI_}
 } {
   Function {EffUI(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {eff=NULL;
@@ -188,10 +188,11 @@ if (filterwindow!=NULL){
       }
     }
   }
-  Function {make_reverb_window()} {} {
-    Fl_Window effreverbwindow {
-      xywh {343 337 380 95} type Double box PLASTIC_UP_BOX color 221 labelfont 1 hide
-      class Fl_Group
+  Function {make_reverb_window()} {open
+  } {
+    Fl_Window effreverbwindow {open
+      xywh {343 337 380 95} type Double box PLASTIC_UP_BOX color 221 labelfont 1
+      class Fl_Group visible
     } {
       Fl_Text_Display {} {
         label {Reverb }
@@ -259,8 +260,8 @@ refresh(eff);}
       }
       Fl_Choice revp10 {
         label Type
-        callback {eff->seteffectpar(10,(int) o->value());}
-        xywh {110 15 75 15} down_box BORDER_BOX color 14 labelfont 1 labelsize 10 align 5 textfont 1 textsize 10 textcolor 7
+        callback {eff->seteffectpar(10,(int) o->value());} open
+        xywh {110 15 85 15} down_box BORDER_BOX color 14 labelfont 1 labelsize 10 align 5 textfont 1 textsize 10 textcolor 7
       } {
         MenuItem {} {
           label Random
@@ -269,6 +270,10 @@ refresh(eff);}
         MenuItem {} {
           label Freeverb
           xywh {30 30 100 20} labelfont 1 labelsize 10 labelcolor 7
+        }
+        MenuItem {} {
+          label Bandwidth
+          xywh {40 40 100 20} labelfont 1 labelsize 10 labelcolor 7
         }
       }
       Fl_Dial revp0 {
@@ -301,10 +306,10 @@ refresh(eff);}
         tooltip {Initial Delay Feedback} xywh {155 40 30 30} box ROUND_UP_BOX labelfont 1 labelsize 11 maximum 127
         class WidgetPDial
       }
-      Fl_Dial revp5 {
-        label {R.delay}
-        callback {eff->seteffectpar(5,(int) o->value());}
-        xywh {200 40 30 30} box ROUND_UP_BOX labelfont 1 labelsize 11 when 4 maximum 127 deactivate
+      Fl_Dial revp12 {
+        label bw
+        callback {eff->seteffectpar(12,(int) o->value());}
+        xywh {200 40 30 30} box ROUND_UP_BOX labelfont 1 labelsize 11 when 4 maximum 127
         class WidgetPDial
       }
       Fl_Dial revp6 {
@@ -337,7 +342,7 @@ refresh(eff);}
 if (Fl::event_button1()) x=(int)o->value();
    else o->value(x);
 eff->seteffectpar(11,x);}
-        tooltip RoomSize xywh {190 10 25 25} box ROUND_UP_BOX labelfont 1 labelsize 8 align 8 minimum 1 maximum 127 step 1
+        tooltip RoomSize xywh {200 10 25 25} box ROUND_UP_BOX labelfont 1 labelsize 8 align 8 minimum 1 maximum 127 step 1
         class WidgetPDial
       }
     }
@@ -1263,7 +1268,8 @@ effdynamicfilterwindow->position(px,py);
 
 refresh(eff);} {}
   }
-  Function {refresh(EffectMgr *eff_)} {} {
+  Function {refresh(EffectMgr *eff_)} {open
+  } {
     code {eff=eff_;
 this->hide();
 
@@ -1293,13 +1299,14 @@ switch(eff->geteffect()){
 	revp2->value(eff->geteffectpar(2));
 	revp3->value(eff->geteffectpar(3));
 	revp4->value(eff->geteffectpar(4));
-	revp5->value(eff->geteffectpar(5));
+	//revp5->value(eff->geteffectpar(5));
 	revp6->value(eff->geteffectpar(6));
 	revp7->value(eff->geteffectpar(7));
 	revp8->value(eff->geteffectpar(8));
 	revp9->value(eff->geteffectpar(9));
 	revp10->value(eff->geteffectpar(10));
 	revp11->value(eff->geteffectpar(11));
+	revp12->value(eff->geteffectpar(12));
             
         effreverbwindow->show();
         break; 
@@ -1410,7 +1417,8 @@ switch(eff->geteffect()){
             break; 
 };
 
-this->show();} {}
+this->show();} {selected
+    }
   }
   Function {refresh()} {} {
     code {refresh(eff);} {}
