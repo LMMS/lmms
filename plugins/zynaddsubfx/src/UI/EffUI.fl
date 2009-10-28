@@ -260,7 +260,9 @@ refresh(eff);}
       }
       Fl_Choice revp10 {
         label Type
-        callback {eff->seteffectpar(10,(int) o->value());} open
+        callback {eff->seteffectpar(10,(int) o->value());
+if (eff->geteffectpar(10)==2) revp12->activate();
+	else revp12->deactivate();}
         xywh {110 15 85 15} down_box BORDER_BOX color 14 labelfont 1 labelsize 10 align 5 textfont 1 textsize 10 textcolor 7
       } {
         MenuItem {} {
@@ -309,7 +311,8 @@ refresh(eff);}
       Fl_Dial revp12 {
         label bw
         callback {eff->seteffectpar(12,(int) o->value());}
-        xywh {200 40 30 30} box ROUND_UP_BOX labelfont 1 labelsize 11 when 4 maximum 127
+        xywh {200 40 30 30} box ROUND_UP_BOX labelfont 1 labelsize 11 when 4 maximum 127 deactivate
+        code0 {if (eff->geteffectpar(10)==2) o->activate();}
         class WidgetPDial
       }
       Fl_Dial revp6 {
@@ -341,7 +344,7 @@ refresh(eff);}
         callback {int x=64;
 if (Fl::event_button1()) x=(int)o->value();
    else o->value(x);
-eff->seteffectpar(11,x);}
+eff->seteffectpar(11,x);} selected
         tooltip RoomSize xywh {200 10 25 25} box ROUND_UP_BOX labelfont 1 labelsize 8 align 8 minimum 1 maximum 127 step 1
         class WidgetPDial
       }
@@ -1417,8 +1420,7 @@ switch(eff->geteffect()){
             break; 
 };
 
-this->show();} {selected
-    }
+this->show();} {}
   }
   Function {refresh()} {} {
     code {refresh(eff);} {}

@@ -146,6 +146,8 @@ Fl_Menu_Item EffUI::menu_revp[] = {
 
 void EffUI::cb_revp10_i(Fl_Choice* o, void*) {
   eff->seteffectpar(10,(int) o->value());
+if (eff->geteffectpar(10)==2) revp12->activate();
+	else revp12->deactivate();
 }
 void EffUI::cb_revp10(Fl_Choice* o, void* v) {
   ((EffUI*)(o->parent()->user_data()))->cb_revp10_i(o,v);
@@ -1104,7 +1106,7 @@ Fl_Group* EffUI::make_reverb_window() {
       revp4->align(Fl_Align(FL_ALIGN_BOTTOM));
       revp4->when(FL_WHEN_CHANGED);
     } // WidgetPDial* revp4
-    { revp12 = new WidgetPDial(200, 40, 30, 30, "bw");
+    { WidgetPDial* o = revp12 = new WidgetPDial(200, 40, 30, 30, "bw");
       revp12->box(FL_ROUND_UP_BOX);
       revp12->color(FL_BACKGROUND_COLOR);
       revp12->selection_color(FL_INACTIVE_COLOR);
@@ -1116,6 +1118,8 @@ Fl_Group* EffUI::make_reverb_window() {
       revp12->callback((Fl_Callback*)cb_revp12);
       revp12->align(Fl_Align(FL_ALIGN_BOTTOM));
       revp12->when(FL_WHEN_RELEASE);
+      revp12->deactivate();
+      if (eff->geteffectpar(10)==2) o->activate();
     } // WidgetPDial* revp12
     { revp6 = new WidgetPDial(235, 40, 30, 30, "E/R");
       revp6->box(FL_ROUND_UP_BOX);

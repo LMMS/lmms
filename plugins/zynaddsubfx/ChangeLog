@@ -957,3 +957,6 @@
 
 09 Oct 2009 (Mark McCurry)
 	    - Restylized codebase with uncrustify
+
+28 Oct 2009 (Paul Nasca)
+	    - Disable "bw" control on Reverb when Bandwidth mode is not enabled
