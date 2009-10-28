@@ -168,6 +168,18 @@ struct multibandcompressor_metadata: public plugin_metadata<multibandcompressor_
     PLUGIN_NAME_ID_LABEL("multiband_compressor", "multibandcompressor", "Multiband Compressor")
 };
 
+/// Markus's deesser - metadata
+struct deesser_metadata: public plugin_metadata<deesser_metadata>
+{
+    enum { in_count = 2, out_count = 2, support_midi = false, require_midi = false, rt_capable = true };
+    enum { param_bypass, param_detected, param_compression, param_detected_led, param_clip_out,
+           param_detection, param_mode,
+           param_threshold, param_ratio, param_laxity, param_makeup,
+           param_f1_freq, param_f2_freq, param_f1_level, param_f2_level, param_f2_q,
+           param_sc_listen, param_count };
+    PLUGIN_NAME_ID_LABEL("deesser", "deesser", "Deesser")
+};
+
 /// Markus's 5-band EQ - metadata
 struct equalizer5band_metadata: public plugin_metadata<equalizer5band_metadata>
 {

@@ -12,6 +12,7 @@
     PER_MODULE_ITEM(compressor, false, "compressor")
     PER_MODULE_ITEM(sidechaincompressor, false, "sidechaincompressor")
     PER_MODULE_ITEM(multibandcompressor, false, "multibandcompressor")
+    PER_MODULE_ITEM(deesser, false, "deesser")
     PER_MODULE_ITEM(equalizer5band, false, "equalizer5band")
     PER_MODULE_ITEM(equalizer8band, false, "equalizer8band")
     PER_MODULE_ITEM(equalizer12band, false, "equalizer12band")

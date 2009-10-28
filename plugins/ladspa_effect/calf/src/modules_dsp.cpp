@@ -1107,7 +1107,7 @@ void sidechaincompressor_audio_module::params_changed()
                 f2_active = 1.f;
                 break;
             case DEESSER_SPLIT:
-                f1L.set_lp_rbj((float)*params[param_f1_freq] * (1 + 0.17), q, (float)srate);
+                f1L.set_lp_rbj((float)*params[param_f2_freq] * (1 + 0.17), q, (float)srate);
                 f1R.copy_coeffs(f1L);
                 f2L.set_hp_rbj((float)*params[param_f2_freq] * (1 - 0.17), q, (float)srate, *params[param_f2_level]);
                 f2R.copy_coeffs(f2L);
@@ -1125,7 +1125,7 @@ void sidechaincompressor_audio_module::params_changed()
             case DERUMBLER_SPLIT:
                 f1L.set_lp_rbj((float)*params[param_f1_freq] * (1 + 0.17), q, (float)srate, *params[param_f1_level]);
                 f1R.copy_coeffs(f1L);
-                f2L.set_hp_rbj((float)*params[param_f2_freq] * (1 - 0.17), q, (float)srate);
+                f2L.set_hp_rbj((float)*params[param_f1_freq] * (1 - 0.17), q, (float)srate);
                 f2R.copy_coeffs(f2L);
                 f1_active = 1.f;
                 f2_active = 0.f;
@@ -1157,7 +1157,7 @@ void sidechaincompressor_audio_module::params_changed()
             case BANDPASS_1:
                 f1L.set_bp_rbj((float)*params[param_f1_freq], q, (float)srate, *params[param_f1_level]);
                 f1R.copy_coeffs(f1L);
-                f2L.set_highshelf_rbj((float)*params[param_f2_freq], q, *params[param_f2_level], (float)srate);
+                f2L.set_hp_rbj((float)*params[param_f2_freq], q, *params[param_f2_level], (float)srate);
                 f2R.copy_coeffs(f2L);
                 f1_active = 1.f;
                 f2_active = 0.f;
@@ -1394,6 +1394,222 @@ int sidechaincompressor_audio_module::get_changed_offsets(int index, int generat
             f1_level_old1 = *params[param_f1_level];
             f2_level_old1 = *params[param_f2_level];
             sc_mode_old1 = (CalfScModes)*params[param_sc_mode];
+            last_generation++;
+            subindex_graph = 0;
+            subindex_dot = INT_MAX;
+            subindex_gridline = INT_MAX;
+        }
+        else {
+            subindex_graph = 0;
+            subindex_dot = subindex_gridline = generation ? INT_MAX : 0;
+        }
+        if (generation == last_calculated_generation)
+            subindex_graph = INT_MAX;
+        return last_generation;
+    }
+    return false;
+}
+
+/// Deesser by Markus Schmidt
+///
+/// This module splits the signal in a sidechain- and a process signal.
+/// The sidechain is processed through Krzystofs filters and compresses
+/// the process signal via Thor's compression routine afterwards.
+///////////////////////////////////////////////////////////////////////////////////////////////
+
+deesser_audio_module::deesser_audio_module()
+{
+    is_active = false;
+    srate = 0;
+    last_generation = 0;
+}
+
+void deesser_audio_module::activate()
+{
+    is_active = true;
+    // set all filters and strips
+    compressor.activate();
+    params_changed();
+    detected = 0.f;
+    detected_led = 0.f;
+    clip_out = 0.f;
+}
+void deesser_audio_module::deactivate()
+{
+    is_active = false;
+    compressor.deactivate();
+}
+
+void deesser_audio_module::params_changed()
+{
+    // set the params of all filters
+    if(*params[param_f1_freq] != f1_freq_old or *params[param_f1_level] != f1_level_old
+        or *params[param_f2_freq] != f2_freq_old or *params[param_f2_level] != f2_level_old
+        or *params[param_f2_q] != f2_q_old) {
+        float q = 0.707;
+        
+        hpL.set_hp_rbj((float)*params[param_f1_freq] * (1 - 0.17), q, (float)srate, *params[param_f1_level]);
+        hpR.copy_coeffs(hpL);
+        lpL.set_lp_rbj((float)*params[param_f1_freq] * (1 + 0.17), q, (float)srate);
+        lpR.copy_coeffs(lpL);
+        pL.set_peakeq_rbj((float)*params[param_f2_freq], *params[param_f2_q], *params[param_f2_level], (float)srate);
+        pR.copy_coeffs(pL);
+        f1_freq_old = *params[param_f1_freq];
+        f1_level_old = *params[param_f1_level];
+        f2_freq_old = *params[param_f2_freq];
+        f2_level_old = *params[param_f2_level];
+        f2_q_old = *params[param_f2_q];
+    }
+    // and set the compressor module
+    compressor.set_params((float)*params[param_laxity], (float)*params[param_laxity] * 1.33, *params[param_threshold], *params[param_ratio], 2.8, *params[param_makeup], *params[param_detection], 0.f, *params[param_bypass], 0.f);
+}
+
+void deesser_audio_module::set_sample_rate(uint32_t sr)
+{
+    srate = sr;
+    compressor.set_sample_rate(srate);
+}
+
+uint32_t deesser_audio_module::process(uint32_t offset, uint32_t numsamples, uint32_t inputs_mask, uint32_t outputs_mask)
+{
+    bool bypass = *params[param_bypass] > 0.5f;
+    numsamples += offset;
+    if(bypass) {
+        // everything bypassed
+        while(offset < numsamples) {
+            outs[0][offset] = ins[0][offset];
+            outs[1][offset] = ins[1][offset];
+            ++offset;
+        }
+        // displays, too
+        clip_out   = 0.f;
+        detected = 0.f;
+        detected_led = 0.f;
+    } else {
+        // process
+        
+        detected_led -= std::min(detected_led,  numsamples);
+        
+        while(offset < numsamples) {
+            // cycle through samples
+            float outL = 0.f;
+            float outR = 0.f;
+            float inL = ins[0][offset];
+            float inR = ins[1][offset];
+            
+            
+            float leftAC = inL;
+            float rightAC = inR;
+            float leftSC = inL;
+            float rightSC = inR;
+            float leftMC = inL;
+            float rightMC = inR;
+            
+            leftSC = pL.process(hpL.process(leftSC));
+            rightSC = pR.process(hpR.process(rightSC));
+            leftMC = leftSC;
+            rightMC = rightSC;
+                    
+            switch ((int)*params[param_mode]) {
+                default:
+                case WIDE:
+                    compressor.process(leftAC, rightAC, leftSC, rightSC);
+                    break;
+                case SPLIT:
+                    compressor.process(leftSC, rightSC, leftSC, rightSC);
+                    leftAC = lpL.process(leftAC);
+                    rightAC = lpR.process(rightAC);
+                    leftAC += leftSC;
+                    rightAC += rightSC;
+                    break;
+            }
+            
+            if(*params[param_sc_listen] > 0.f) {
+                outL = leftMC;
+                outR = rightMC;
+            } else {
+                outL = leftAC;
+                outR = rightAC;
+            }
+            
+            // send to output
+            outs[0][offset] = outL;
+            outs[1][offset] = outR;
+            
+            if(std::max(fabs(leftSC), fabs(rightSC)) > 0.1) {
+                detected_led   = srate >> 3;
+            }
+            clip_out = std::max(fabs(outL), fabs(outR));
+            detected = std::max(fabs(leftMC), fabs(rightMC));
+            
+            // next sample
+            ++offset;
+        } // cycle trough samples
+        hpL.sanitize();
+        hpR.sanitize();
+        lpL.sanitize();
+        lpR.sanitize();
+        pL.sanitize();
+        pR.sanitize();
+    }
+    // draw meters
+    if(params[param_detected_led] != NULL) {
+        *params[param_detected_led] = detected_led;
+    }
+    if(params[param_clip_out] != NULL) {
+        *params[param_clip_out] = clip_out;
+    }
+    if(params[param_detected] != NULL) {
+        *params[param_detected] = detected;
+    }
+    // draw strip meter
+    if(bypass > 0.5f) {
+        if(params[param_compression] != NULL) {
+            *params[param_compression] = 1.0f;
+        }
+    } else {
+        if(params[param_compression] != NULL) {
+            *params[param_compression] = compressor.get_comp_level();
+        }
+    }
+    // whatever has to be returned x)
+    return outputs_mask;
+}
+bool deesser_audio_module::get_graph(int index, int subindex, float *data, int points, cairo_iface *context)
+{
+    if (!is_active)
+        return false;
+    if (index == param_f1_freq && !subindex) {
+        context->set_line_width(1.5);
+        return ::get_graph(*this, subindex, data, points);
+    }
+    return false;
+}
+
+bool deesser_audio_module::get_gridline(int index, int subindex, float &pos, bool &vertical, std::string &legend, cairo_iface *context)
+{
+    return get_freq_gridline(subindex, pos, vertical, legend, context);
+    
+//    return false;
+}
+
+int deesser_audio_module::get_changed_offsets(int index, int generation, int &subindex_graph, int &subindex_dot, int &subindex_gridline)
+{
+    if (!is_active) {
+        return false;
+    } else {
+        //  (fabs(inertia_cutoff.get_last() - old_cutoff) + 100 * fabs(inertia_resonance.get_last() - old_resonance) + fabs(*params[par_mode] - old_mode) > 0.1f)
+        if (*params[param_f1_freq] != f1_freq_old1
+            or *params[param_f2_freq] != f2_freq_old1
+            or *params[param_f1_level] != f1_level_old1
+            or *params[param_f2_level] != f2_level_old1
+            or *params[param_f2_q] !=f2_q_old1)
+        {
+            f1_freq_old1 = *params[param_f1_freq];
+            f2_freq_old1 = *params[param_f2_freq];
+            f1_level_old1 = *params[param_f1_level];
+            f2_level_old1 = *params[param_f2_level];
+            f2_q_old1 = *params[param_f2_q];
             last_generation++;
             subindex_graph = 0;
             subindex_dot = INT_MAX;

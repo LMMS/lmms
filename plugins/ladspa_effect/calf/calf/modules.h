@@ -1052,6 +1052,41 @@ public:
     virtual int  get_changed_offsets(int index, int generation, int &subindex_graph, int &subindex_dot, int &subindex_gridline);
 };
 
+/// Deesser by Markus Schmidt (based on Thor's compressor and Krzysztof's filters)
+class deesser_audio_module: public audio_module<deesser_metadata>, public frequency_response_line_graph  {
+private:
+    enum CalfDeessModes {
+        WIDE,
+        SPLIT
+    };
+    float f1_freq_old, f2_freq_old, f1_level_old, f2_level_old, f2_q_old;
+    float f1_freq_old1, f2_freq_old1, f1_level_old1, f2_level_old1, f2_q_old1;
+    uint32_t detected_led;
+    float detected, clip_out;
+    gain_reduction_audio_module compressor;
+    biquad_d2<float> hpL, hpR, lpL, lpR, pL, pR;
+public:
+    float *ins[in_count];
+    float *outs[out_count];
+    float *params[param_count];
+    uint32_t srate;
+    bool is_active;
+    volatile int last_generation, last_calculated_generation;
+    deesser_audio_module();
+    void activate();
+    void deactivate();
+    void params_changed();
+    float freq_gain(int index, double freq, uint32_t sr)
+    {
+        return hpL.freq_gain(freq, sr) * pL.freq_gain(freq, sr);
+    }
+    void set_sample_rate(uint32_t sr);
+    uint32_t process(uint32_t offset, uint32_t numsamples, uint32_t inputs_mask, uint32_t outputs_mask);
+    bool get_graph(int index, int subindex, float *data, int points, cairo_iface *context);
+    bool get_gridline(int index, int subindex, float &pos, bool &vertical, std::string &legend, cairo_iface *context);
+    int  get_changed_offsets(int index, int generation, int &subindex_graph, int &subindex_dot, int &subindex_gridline);
+};
+
 /// Equalizer 12 Band by Markus Schmidt (based on Krzysztof's filters)
 class equalizer12band_audio_module: public audio_module<equalizer12band_metadata>, public frequency_response_line_graph  {
 private:
