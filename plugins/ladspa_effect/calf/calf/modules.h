@@ -1063,6 +1063,7 @@ private:
     float f1_freq_old1, f2_freq_old1, f1_level_old1, f2_level_old1, f2_q_old1;
     uint32_t detected_led;
     float detected, clip_out;
+    uint32_t clip_led;
     gain_reduction_audio_module compressor;
     biquad_d2<float> hpL, hpR, lpL, lpR, pL, pR;
 public:

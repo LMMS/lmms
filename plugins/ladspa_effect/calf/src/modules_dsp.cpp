@@ -1489,6 +1489,7 @@ uint32_t deesser_audio_module::process(uint32_t offset, uint32_t numsamples, uin
         // process
         
         detected_led -= std::min(detected_led,  numsamples);
+        clip_led   -= std::min(clip_led,  numsamples);
         
         while(offset < numsamples) {
             // cycle through samples
@@ -1502,6 +1503,8 @@ uint32_t deesser_audio_module::process(uint32_t offset, uint32_t numsamples, uin
             float rightAC = inR;
             float leftSC = inL;
             float rightSC = inR;
+            float leftRC = inL;
+            float rightRC = inR;
             float leftMC = inL;
             float rightMC = inR;
             
@@ -1516,11 +1519,15 @@ uint32_t deesser_audio_module::process(uint32_t offset, uint32_t numsamples, uin
                     compressor.process(leftAC, rightAC, leftSC, rightSC);
                     break;
                 case SPLIT:
-                    compressor.process(leftSC, rightSC, leftSC, rightSC);
+                    hpL.sanitize();
+                    hpR.sanitize();
+                    leftRC = hpL.process(leftRC);
+                    rightRC = hpR.process(rightRC);
+                    compressor.process(leftRC, rightRC, leftSC, rightSC);
                     leftAC = lpL.process(leftAC);
                     rightAC = lpR.process(rightAC);
-                    leftAC += leftSC;
-                    rightAC += rightSC;
+                    leftAC += leftRC;
+                    rightAC += rightRC;
                     break;
             }
             
@@ -1539,7 +1546,14 @@ uint32_t deesser_audio_module::process(uint32_t offset, uint32_t numsamples, uin
             if(std::max(fabs(leftSC), fabs(rightSC)) > 0.1) {
                 detected_led   = srate >> 3;
             }
-            clip_out = std::max(fabs(outL), fabs(outR));
+            if(std::max(fabs(leftAC), fabs(rightAC)) > 1.f) {
+                clip_led   = srate >> 3;
+            }
+            if(clip_led > 0) {
+                clip_out = 1.f;
+            } else {
+                clip_out = std::max(fabs(outL), fabs(outR));
+            }
             detected = std::max(fabs(leftMC), fabs(rightMC));
             
             // next sample
