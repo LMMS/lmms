@@ -13,6 +13,6 @@ Contributors:
         Achim Settelmeier (QUERTZ keyboard layout for virtual keyboard)
         Jérémie Andréi (AZERTY keyboard layout, Array index fix, OSS failsafe)
         Alexis Ballier (const char* <-> string mismatch, NULLMidi prototype fix)
-        Tobias Doerffel (static vs instance variables alteration)
+        Tobias Doerffel (static-instance variables fix, missing include fix)
         James Morris (Memory leaks in FLTK GUI)
 

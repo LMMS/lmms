@@ -35,6 +35,7 @@
 #include "FilterParams.h"
 #include "Presets.h"
 #include <string>
+#include <pthread.h>
 
 class PADnoteParameters:public Presets
 {
