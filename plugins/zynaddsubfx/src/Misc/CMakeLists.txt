@@ -8,7 +8,7 @@ set(zynaddsubfx_misc_SRCS
 	Microtonal.cpp
 	Part.cpp
 	Util.cpp
-	XMLwrapper.cpp
+	QtXmlWrapper.cpp
 )
 
 add_library(zynaddsubfx_misc STATIC
