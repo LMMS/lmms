@@ -29,7 +29,7 @@
 #include "ResourceAction.h"
 #include "ResourcePreviewer.h"
 #include "ResourceTreeModel.h"
-#include "side_bar_widget.h"
+#include "SideBarWidget.h"
 
 class QAction;
 class QLabel;
@@ -37,7 +37,7 @@ class ResourceItem;
 class ResourceTreeView;
 
 
-class ResourceBrowser : public sideBarWidget
+class ResourceBrowser : public SideBarWidget
 {
 	Q_OBJECT
 public:

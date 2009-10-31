@@ -1,8 +1,8 @@
 /*
- * side_bar_widget.cpp - implementation of base-widget for side-bar
+ * SideBarWidget.cpp - implementation of base-widget for side-bar
  *
- * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -22,17 +22,16 @@
  *
  */
 
-
 #include <QtGui/QApplication>
 #include <QtGui/QFontMetrics>
 #include <QtGui/QPainter>
 
-#include "side_bar_widget.h"
+#include "SideBarWidget.h"
 #include "gui_templates.h"
 
 
 
-sideBarWidget::sideBarWidget( const QString & _title, const QPixmap & _icon,
+SideBarWidget::SideBarWidget( const QString & _title, const QPixmap & _icon,
 							QWidget * _parent ) :
 	QWidget( _parent ),
 	m_title( _title ),
@@ -47,14 +46,14 @@ sideBarWidget::sideBarWidget( const QString & _title, const QPixmap & _icon,
 
 
 
-sideBarWidget::~sideBarWidget()
+SideBarWidget::~SideBarWidget()
 {
 }
 
 
 
 
-void sideBarWidget::paintEvent( QPaintEvent * )
+void SideBarWidget::paintEvent( QPaintEvent * )
 {
 	const int TITLE_FONT_HEIGHT = 13;
 
@@ -77,7 +76,7 @@ void sideBarWidget::paintEvent( QPaintEvent * )
 
 
 
-void sideBarWidget::resizeEvent( QResizeEvent * )
+void SideBarWidget::resizeEvent( QResizeEvent * )
 {
 	const int MARGIN = 6;
 	m_contents->setGeometry( MARGIN, 40 + MARGIN, width() - MARGIN * 2,
@@ -86,6 +85,5 @@ void sideBarWidget::resizeEvent( QResizeEvent * )
 
 
 
-#include "moc_side_bar.cxx"
-#include "moc_side_bar_widget.cxx"
+#include "moc_SideBarWidget.cxx"
 

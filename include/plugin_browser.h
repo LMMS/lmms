@@ -28,14 +28,14 @@
 #include <QtCore/QTimer>
 #include <QtGui/QPixmap>
 
-#include "side_bar_widget.h"
+#include "SideBarWidget.h"
 #include "Plugin.h"
 
 
 class trackContainer;
 
 
-class pluginBrowser : public sideBarWidget
+class pluginBrowser : public SideBarWidget
 {
 	Q_OBJECT
 public:
