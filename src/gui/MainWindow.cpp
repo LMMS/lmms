@@ -49,7 +49,7 @@
 #include "ControllerRackView.h"
 #include "file_browser.h"
 #include "plugin_browser.h"
-#include "side_bar.h"
+#include "SideBar.h"
 #include "config_mgr.h"
 #include "mixer.h"
 #include "PluginView.h"
@@ -84,47 +84,44 @@ MainWindow::MainWindow( void ) :
 	hbox->setSpacing( 0 );
 	hbox->setMargin( 0 );
 
-	sideBar * side_bar = new sideBar( sideBar::Vertical, w );
-	side_bar->setStyle( sideBar::VSNET/*KDEV3ICON*/ );
-	side_bar->setPosition( sideBar::Left );
+	SideBar * sideBar = new SideBar( Qt::Vertical, w );
 
 	QSplitter * splitter = new QSplitter( Qt::Horizontal, w );
 	splitter->setChildrenCollapsible( FALSE );
 
-	int id = 0;
 	QString wdir = configManager::inst()->workingDir();
-	side_bar->appendTab( new pluginBrowser( splitter ), ++id );
-	side_bar->appendTab( new fileBrowser(
+	sideBar->appendTab( new pluginBrowser( splitter ) );
+	sideBar->appendTab( new fileBrowser(
 				configManager::inst()->userProjectsDir() + "*" +
 				configManager::inst()->factoryProjectsDir(),
 					"*.mmp *.mmpz *.xml *.mid *.flp",
 							tr( "My projects" ),
 					embed::getIconPixmap( "project_file" ),
-							splitter ), ++id );
-	side_bar->appendTab( new fileBrowser(
+							splitter ) );
+	sideBar->appendTab( new fileBrowser(
 				configManager::inst()->userSamplesDir() + "*" +
 				configManager::inst()->factorySamplesDir(),
 					"*", tr( "My samples" ),
 					embed::getIconPixmap( "sample_file" ),
-							splitter ), ++id );
-	side_bar->appendTab( new fileBrowser(
+							splitter ) );
+	sideBar->appendTab( new fileBrowser(
 				configManager::inst()->userPresetsDir() + "*" +
 				configManager::inst()->factoryPresetsDir(),
 					"*.xpf *.cs.xml *.xiz",
 					tr( "My presets" ),
 					embed::getIconPixmap( "preset_file" ),
-							splitter ), ++id );
-	side_bar->appendTab( new fileBrowser( QDir::homePath(), "*",
+							splitter ) );
+	sideBar->appendTab( new fileBrowser( QDir::homePath(), "*",
 							tr( "My home" ),
 					embed::getIconPixmap( "home" ),
-							splitter ), ++id );
+							splitter ) );
 	QFileInfoList drives = QDir::drives();
 	QStringList root_paths;
 	foreach( const QFileInfo & drive, drives )
 	{
 		root_paths += drive.absolutePath();
 	}
-	side_bar->appendTab( new fileBrowser( root_paths.join( "*" ), "*",
+	sideBar->appendTab( new fileBrowser( root_paths.join( "*" ), "*",
 #ifdef LMMS_BUILD_WIN32
 							tr( "My computer" ),
 #else
@@ -137,7 +134,7 @@ MainWindow::MainWindow( void ) :
 #else
 							false
 #endif
-								), ++id );
+								) );
 
 	m_workspace = new QMdiArea( splitter );
 
@@ -161,7 +158,7 @@ MainWindow::MainWindow( void ) :
 	m_workspace->setHorizontalScrollBarPolicy( Qt::ScrollBarAsNeeded );
 	m_workspace->setVerticalScrollBarPolicy( Qt::ScrollBarAsNeeded );
 
-	hbox->addWidget( side_bar );
+	hbox->addWidget( sideBar );
 	hbox->addWidget( splitter );
 
 

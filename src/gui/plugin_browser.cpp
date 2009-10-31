@@ -37,7 +37,7 @@
 
 
 pluginBrowser::pluginBrowser( QWidget * _parent ) :
-	sideBarWidget( tr( "Instrument plugins" ),
+	SideBarWidget( tr( "Instrument plugins" ),
 				embed::getIconPixmap( "plugins" ), _parent )
 {
 	setWindowTitle( tr( "Instrument browser" ) );

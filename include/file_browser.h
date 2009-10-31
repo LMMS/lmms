@@ -31,7 +31,7 @@
 #include <QtGui/QTreeWidget>
 
 
-#include "side_bar_widget.h"
+#include "SideBarWidget.h"
 
 
 class QLineEdit;
@@ -44,7 +44,7 @@ class trackContainer;
 
 
 
-class fileBrowser : public sideBarWidget
+class fileBrowser : public SideBarWidget
 {
 	Q_OBJECT
 public:

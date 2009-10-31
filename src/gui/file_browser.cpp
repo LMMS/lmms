@@ -63,7 +63,7 @@ enum TreeWidgetItemTypes
 fileBrowser::fileBrowser( const QString & _directories, const QString & _filter,
 			const QString & _title, const QPixmap & _pm,
 			QWidget * _parent, bool _dirs_as_items ) :
-	sideBarWidget( _title, _pm, _parent ),
+	SideBarWidget( _title, _pm, _parent ),
 	m_directories( _directories ),
 	m_filter( _filter ),
 	m_dirsAsItems( _dirs_as_items )

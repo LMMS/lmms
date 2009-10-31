@@ -128,6 +128,14 @@ QToolButton:checked {
 	padding: 3px 0px 0px 3px;
 }
 
+SideBar {
+	background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop: 0 #66728c, stop: 1.0 #38404e);
+}
+
+SideBar QToolButton {
+	font-size: 12px;
+}
+
 FxMixerView QPushButton, EffectRackView QPushButton, ControllerRackView QPushButton {
 	font-size: 10px;
 }
