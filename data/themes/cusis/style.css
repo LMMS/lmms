@@ -131,11 +131,11 @@ nameLabel, effectLabel, sf2InstrumentView > QLabel {
 
 
 QWidget#mainToolbar {
-	background-image: url(resources:main_toolbar_bg.png);
+	background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop: 0 #4a4a4a, stop: 1.0 #383838);
 }
 
 QToolBar {
-	background: url(resources:toolbar_bg.png);
+	background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop: 0 #4a4a4a, stop: 1.0 #383838);
 }
 
 

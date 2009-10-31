@@ -113,11 +113,11 @@ nameLabel, effectLabel, sf2InstrumentView > QLabel, QComboBox {
 
 
 QWidget#mainToolbar {
-	background-image: url(resources:main_toolbar_bg.png);
+	background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop: 0 #66728c, stop: 1.0 #38404e);
 }
 
 QToolBar {
-	background: url(resources:toolbar_bg.png);
+	background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop: 0 #66728c, stop: 1.0 #38404e);
 }
 
 QToolButton, toolButton {
