@@ -230,7 +230,7 @@ void AudioPulseAudio::streamWriteCallback(pa_stream *s, size_t length)
 {
 	const fpp_t fpp = getMixer()->framesPerPeriod();
 	sampleFrameA * temp = CPU::allocFrames( fpp );
-	Sint16 * pcmbuf = (Sint16*)pa_xmalloc( fpp * channels() *
+	Sint16 * pcmbuf = (Sint16*)CPU::memAlloc( fpp * channels() *
 							sizeof(Sint16) );
 
 	size_t fd = 0;
@@ -254,7 +254,7 @@ void AudioPulseAudio::streamWriteCallback(pa_stream *s, size_t length)
 		fd += frames;
 	}
 
-	pa_xfree( pcmbuf );
+	CPU::memFree( pcmbuf );
 	CPU::freeFrames( temp );
 }
 
