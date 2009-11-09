@@ -1640,10 +1640,10 @@ int deesser_audio_module::get_changed_offsets(int index, int generation, int &su
     return false;
 }
 
-/// Gain reduction module implemented by Markus Schmidt
-/// Nearly all functions of this module are originally written
+/// Gain reduction module by Thor
+/// All functions of this module are originally written
 /// by Thor, while some features have been stripped (mainly stereo linking
-/// and frequency correction as implemented in his Compressor above)
+/// and frequency correction as implemented in Sidechain Compressor above)
 /// To save some CPU.
 ////////////////////////////////////////////////////////////////////////////////
 gain_reduction_audio_module::gain_reduction_audio_module()
