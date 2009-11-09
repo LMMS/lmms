@@ -1267,13 +1267,9 @@ public:
 /// Equalizer 5 Band by Markus Schmidt (based on Krzysztof's filters)
 class equalizer5band_audio_module: public audio_module<equalizer5band_metadata>, public frequency_response_line_graph  {
 private:
-    float hp_mode_old, hp_freq_old;
-    float lp_mode_old, lp_freq_old;
     float ls_level_old, ls_freq_old;
     float hs_level_old, hs_freq_old;
     float p_level_old[3], p_freq_old[3], p_q_old[3];
-    float hp_mode_old1, hp_freq_old1, hp_active_old1;
-    float lp_mode_old1, lp_freq_old1, lp_active_old1;
     float ls_level_old1, ls_freq_old1, ls_active_old1;
     float hs_level_old1, hs_freq_old1, hs_active_old1;
     float p_level_old1[3], p_freq_old1[3], p_q_old1[3], p_active_old1[3];
