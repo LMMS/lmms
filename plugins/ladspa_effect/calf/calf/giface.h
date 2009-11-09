@@ -69,6 +69,7 @@ enum parameter_flags
   PF_CTL_BUTTON =  0x0600, ///< push button
   PF_CTL_METER  =  0x0700, ///< volume meter
   PF_CTL_LED    =  0x0800, ///< light emitting diode
+  PF_CTL_LABEL  =  0x0900, ///< label
   
   PF_CTLOPTIONS     = 0x00F000, ///< bit mask for control (widget) options
   PF_CTLO_HORIZ     = 0x001000, ///< horizontal version of the control (unused)

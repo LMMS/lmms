@@ -203,6 +203,8 @@ public:
     uint32_t srate;
     gain_smoothing amount, dryamount;
     int predelay_amt;
+    float meter_wet, meter_out;
+    uint32_t clip;
     float *ins[in_count]; 
     float *outs[out_count];
     float *params[param_count];
@@ -223,7 +225,7 @@ public:
     }
     uint32_t process(uint32_t offset, uint32_t numsamples, uint32_t inputs_mask, uint32_t outputs_mask) {
         numsamples += offset;
-        
+        clip   -= std::min(clip, numsamples);
         for (uint32_t i = offset; i < numsamples; i++) {
             float dry = dryamount.get();
             float wet = amount.get();
@@ -236,12 +238,26 @@ public:
             reverb.process(rl, rr);
             outs[0][i] = dry*s.left + wet*rl;
             outs[1][i] = dry*s.right + wet*rr;
+            meter_wet = std::max(fabs(wet*rl), fabs(wet*rr));
+            meter_out = std::max(fabs(outs[0][i]), fabs(outs[1][i]));
+            if(outs[0][i] > 1.f or outs[1][i] > 1.f) {
+                clip = srate >> 3;
+            }
         }
         reverb.extra_sanitize();
         left_lo.sanitize();
         left_hi.sanitize();
         right_lo.sanitize();
         right_hi.sanitize();
+        if(params[par_meter_wet] != NULL) {
+            *params[par_meter_wet] = meter_wet;
+        }
+        if(params[par_meter_out] != NULL) {
+            *params[par_meter_out] = meter_out;
+        }
+        if(params[par_clip] != NULL) {
+            *params[par_clip] = clip;
+        }
         return outputs_mask;
     }
     void activate();
@@ -416,7 +432,9 @@ public:
     float maspeed_l;
     /// Current rotation speed for treble rotor - manual mode
     float maspeed_h;
-
+    
+    int meter_l, meter_h;
+    
     rotary_speaker_audio_module();
     void set_sample_rate(uint32_t sr);
     void setup();
@@ -501,7 +519,8 @@ public:
             int xl = pseudo_sine_scl(phase_l), yl = pseudo_sine_scl(phase_l + 0x40000000);
             int xh = pseudo_sine_scl(phase_h), yh = pseudo_sine_scl(phase_h + 0x40000000);
             // printf("%d %d %d\n", shift, pdelta, shift + pdelta + 20 * xl);
-            
+            meter_l = xl;
+            meter_h = xh;
             // float out_hi_l = in_mono - delay.get_interp_1616(shift + md * xh) + delay.get_interp_1616(shift + md * 65536 + pdelta - md * yh) - delay.get_interp_1616(shift + md * 65536 + pdelta + pdelta - md * xh);
             // float out_hi_r = in_mono + delay.get_interp_1616(shift + md * 65536 - md * yh) - delay.get_interp_1616(shift + pdelta + md * xh) + delay.get_interp_1616(shift + pdelta + pdelta + md * yh);
             float out_hi_l = in_mono + delay.get_interp_1616(shift + md * xh) - mix2 * delay.get_interp_1616(shift + md * 65536 + pdelta - md * yh) + mix3 * delay.get_interp_1616(shift + md * 65536 + pdelta + pdelta - md * xh);
@@ -540,6 +559,12 @@ public:
             bool u2 = incr_towards(aspeed_h, dspeed, delta, delta * 0.5);
             if (u1 || u2)
                 set_vibrato();
+        }
+        if(params[par_meter_l] != NULL) {
+            *params[par_meter_l] = (float)meter_l / 65536.0;
+        }
+        if(params[par_meter_h] != NULL) {
+            *params[par_meter_h] = (float)meter_h / 65536.0;
         }
         return outputs_mask;
     }
@@ -901,8 +926,8 @@ class gain_reduction_audio_module {
 private:
     float linSlope, detected, kneeSqrt, kneeStart, linKneeStart, kneeStop;
     float compressedKneeStop, adjKneeStart, thres;
-    float attack, release, threshold, ratio, knee, makeup, detection, bypass, mute, meter_out, meter_comp;
-    float old_threshold, old_ratio, old_knee, old_makeup, old_bypass, old_mute, old_detection;
+    float attack, release, threshold, ratio, knee, makeup, detection, stereo_link, bypass, mute, meter_out, meter_comp;
+    float old_threshold, old_ratio, old_knee, old_makeup, old_bypass, old_mute, old_detection, old_stereo_link;
     int last_generation;
     uint32_t srate;
     bool is_active;
@@ -910,8 +935,8 @@ private:
     inline float output_gain(float linSlope, bool rms);
 public:
     gain_reduction_audio_module();
-    void set_params(float att, float rel, float thr, float rat, float kn, float mak, float det, float byp, float mu);
-    void process(float &left, float &right);
+    void set_params(float att, float rel, float thr, float rat, float kn, float mak, float det, float stl, float byp, float mu);
+    void process(float &left, float &right, float det_left = NULL, float det_right = NULL);
     void activate();
     void deactivate();
     int id;
@@ -922,6 +947,81 @@ public:
     virtual bool get_dot(int subindex, float &x, float &y, int &size, cairo_iface *context);
     virtual bool get_gridline(int subindex, float &pos, bool &vertical, std::string &legend, cairo_iface *context);
     virtual int  get_changed_offsets(int generation, int &subindex_graph, int &subindex_dot, int &subindex_gridline);
+};
+
+/// Sidecain Compressor by Markus Schmidt (based on Thor's compressor and Krzysztof's filters)
+class sidechaincompressor_audio_module: public audio_module<sidechaincompressor_metadata>, public frequency_response_line_graph  {
+private:
+    enum CalfScModes {
+        WIDEBAND,
+        DEESSER_WIDE,
+        DEESSER_SPLIT,
+        DERUMBLER_WIDE,
+        DERUMBLER_SPLIT,
+        WEIGHTED_1,
+        WEIGHTED_2,
+        WEIGHTED_3,
+        BANDPASS_1,
+        BANDPASS_2
+    };
+    float f1_freq_old, f2_freq_old, f1_level_old, f2_level_old;
+    float f1_freq_old1, f2_freq_old1, f1_level_old1, f2_level_old1;
+    CalfScModes sc_mode, sc_mode_old, sc_mode_old1;
+    float f1_active, f2_active;
+    uint32_t clip_in, clip_out;
+    float meter_in, meter_out;
+    gain_reduction_audio_module compressor;
+    biquad_d2<float> f1L, f1R, f2L, f2R;
+public:
+    typedef std::complex<double> cfloat;
+    float *ins[in_count];
+    float *outs[out_count];
+    float *params[param_count];
+    uint32_t srate;
+    bool is_active;
+    volatile int last_generation, last_calculated_generation;
+    sidechaincompressor_audio_module();
+    void activate();
+    void deactivate();
+    void params_changed();
+    inline cfloat h_z(const cfloat &z) {
+        switch (sc_mode) {
+            default:
+            case WIDEBAND:
+                return false;
+                break;
+            case DEESSER_WIDE:
+            case DERUMBLER_WIDE:
+            case WEIGHTED_1:
+            case WEIGHTED_2:
+            case WEIGHTED_3:
+            case BANDPASS_2:
+                return f1L.h_z(z) * f2L.h_z(z);
+                break;
+            case DEESSER_SPLIT:
+                return f2L.h_z(z);
+                break;
+            case DERUMBLER_SPLIT:
+            case BANDPASS_1:
+                return f1L.h_z(z);
+                break;
+        }
+                
+    }
+    float freq_gain(int index, double freq, uint32_t sr)
+    {
+        typedef std::complex<double> cfloat;
+        freq *= 2.0 * M_PI / sr;
+        cfloat z = 1.0 / exp(cfloat(0.0, freq));
+        
+        return std::abs(h_z(z));
+    }
+    void set_sample_rate(uint32_t sr);
+    uint32_t process(uint32_t offset, uint32_t numsamples, uint32_t inputs_mask, uint32_t outputs_mask);
+    bool get_graph(int index, int subindex, float *data, int points, cairo_iface *context);
+    bool get_dot(int index, int subindex, float &x, float &y, int &size, cairo_iface *context);
+    bool get_gridline(int index, int subindex, float &pos, bool &vertical, std::string &legend, cairo_iface *context);
+    int  get_changed_offsets(int index, int generation, int &subindex_graph, int &subindex_dot, int &subindex_gridline);
 };
 
 /// Multibandcompressor by Markus Schmidt
@@ -950,6 +1050,264 @@ public:
     virtual bool get_dot(int index, int subindex, float &x, float &y, int &size, cairo_iface *context);
     virtual bool get_gridline(int index, int subindex, float &pos, bool &vertical, std::string &legend, cairo_iface *context);
     virtual int  get_changed_offsets(int index, int generation, int &subindex_graph, int &subindex_dot, int &subindex_gridline);
+};
+
+/// Deesser by Markus Schmidt (based on Thor's compressor and Krzysztof's filters)
+class deesser_audio_module: public audio_module<deesser_metadata>, public frequency_response_line_graph  {
+private:
+    enum CalfDeessModes {
+        WIDE,
+        SPLIT
+    };
+    float f1_freq_old, f2_freq_old, f1_level_old, f2_level_old, f2_q_old;
+    float f1_freq_old1, f2_freq_old1, f1_level_old1, f2_level_old1, f2_q_old1;
+    uint32_t detected_led;
+    float detected, clip_out;
+    uint32_t clip_led;
+    gain_reduction_audio_module compressor;
+    biquad_d2<float> hpL, hpR, lpL, lpR, pL, pR;
+public:
+    float *ins[in_count];
+    float *outs[out_count];
+    float *params[param_count];
+    uint32_t srate;
+    bool is_active;
+    volatile int last_generation, last_calculated_generation;
+    deesser_audio_module();
+    void activate();
+    void deactivate();
+    void params_changed();
+    float freq_gain(int index, double freq, uint32_t sr)
+    {
+        return hpL.freq_gain(freq, sr) * pL.freq_gain(freq, sr);
+    }
+    void set_sample_rate(uint32_t sr);
+    uint32_t process(uint32_t offset, uint32_t numsamples, uint32_t inputs_mask, uint32_t outputs_mask);
+    bool get_graph(int index, int subindex, float *data, int points, cairo_iface *context);
+    bool get_gridline(int index, int subindex, float &pos, bool &vertical, std::string &legend, cairo_iface *context);
+    int  get_changed_offsets(int index, int generation, int &subindex_graph, int &subindex_dot, int &subindex_gridline);
+};
+
+/// Equalizer 12 Band by Markus Schmidt (based on Krzysztof's filters)
+class equalizer12band_audio_module: public audio_module<equalizer12band_metadata>, public frequency_response_line_graph  {
+private:
+    float hp_mode_old, hp_freq_old;
+    float lp_mode_old, lp_freq_old;
+    float ls_level_old, ls_freq_old;
+    float hs_level_old, hs_freq_old;
+    float p_level_old[8], p_freq_old[8], p_q_old[8];
+    float hp_mode_old1, hp_freq_old1, hp_active_old1;
+    float lp_mode_old1, lp_freq_old1, lp_active_old1;
+    float ls_level_old1, ls_freq_old1, ls_active_old1;
+    float hs_level_old1, hs_freq_old1, hs_active_old1;
+    float p_level_old1[8], p_freq_old1[8], p_q_old1[8], p_active_old1[8];
+    enum CalfEqModes {
+        MODE12DB,
+        MODE24DB,
+        MODE36DB
+    };
+    CalfEqModes eq_mode, eq_mode_old1[2];
+    uint32_t clip_inL, clip_outL, clip_inR, clip_outR;
+    float meter_inL, meter_outL, meter_inR, meter_outR;
+    biquad_d2<float> hpL[3], hpR[3], lpL[3], lpR[3];
+    biquad_d2<float> lsL, lsR, hsL, hsR;
+    biquad_d2<float> pL[8], pR[8];
+public:
+    typedef std::complex<double> cfloat;
+    float *ins[in_count];
+    float *outs[out_count];
+    float *params[param_count];
+    uint32_t srate;
+    bool is_active;
+    volatile int last_generation, last_calculated_generation;
+    equalizer12band_audio_module();
+    void activate();
+    void deactivate();
+    void params_changed();
+    float freq_gain(int index, double freq, uint32_t sr)
+    {
+        float ret = 1.f;
+        if(*params[param_hp_active] > 0.f) {
+            switch((int)*params[param_hp_mode]) {
+                case MODE12DB:
+                    ret *= hpL[0].freq_gain(freq, sr);
+                    ret *= hpR[0].freq_gain(freq, sr);
+                    break;
+                case MODE24DB:
+                    ret *= hpL[0].freq_gain(freq, sr) * hpL[0].freq_gain(freq, sr);
+                    ret *= hpR[0].freq_gain(freq, sr) * hpR[0].freq_gain(freq, sr);
+                    break;
+                case MODE36DB:
+                    ret *= hpL[0].freq_gain(freq, sr) * hpL[0].freq_gain(freq, sr) * hpL[0].freq_gain(freq, sr);
+                    ret *= hpR[0].freq_gain(freq, sr) * hpR[0].freq_gain(freq, sr) * hpR[0].freq_gain(freq, sr);
+                    break;
+            }
+        }
+        if(*params[param_lp_active] > 0.f) {
+            switch((int)*params[param_lp_mode]) {
+                case MODE12DB:
+                    ret *= lpL[0].freq_gain(freq, sr);
+                    ret *= lpR[0].freq_gain(freq, sr);
+                    break;
+                case MODE24DB:
+                    ret *= lpL[0].freq_gain(freq, sr) * lpL[0].freq_gain(freq, sr);
+                    ret *= lpR[0].freq_gain(freq, sr) * lpR[0].freq_gain(freq, sr);
+                    break;
+                case MODE36DB:
+                    ret *= lpL[0].freq_gain(freq, sr) * lpL[0].freq_gain(freq, sr) * lpL[0].freq_gain(freq, sr);
+                    ret *= lpR[0].freq_gain(freq, sr) * lpR[0].freq_gain(freq, sr) * lpR[0].freq_gain(freq, sr);
+                    break;
+            }
+        }
+        ret *= (*params[param_ls_active] > 0.f) ? lsL.freq_gain(freq, sr) : 1;
+        ret *= (*params[param_hs_active] > 0.f) ? hsL.freq_gain(freq, sr) : 1;
+        ret *= (*params[param_p1_active] > 0.f) ? pL[0].freq_gain(freq, sr) : 1;
+        ret *= (*params[param_p2_active] > 0.f) ? pL[1].freq_gain(freq, sr) : 1;
+        ret *= (*params[param_p3_active] > 0.f) ? pL[2].freq_gain(freq, sr) : 1;
+        ret *= (*params[param_p4_active] > 0.f) ? pL[3].freq_gain(freq, sr) : 1;
+        ret *= (*params[param_p5_active] > 0.f) ? pL[4].freq_gain(freq, sr) : 1;
+        ret *= (*params[param_p6_active] > 0.f) ? pL[5].freq_gain(freq, sr) : 1;
+        ret *= (*params[param_p7_active] > 0.f) ? pL[6].freq_gain(freq, sr) : 1;
+        ret *= (*params[param_p8_active] > 0.f) ? pL[7].freq_gain(freq, sr) : 1;
+        return ret;
+    }
+    void set_sample_rate(uint32_t sr);
+    uint32_t process(uint32_t offset, uint32_t numsamples, uint32_t inputs_mask, uint32_t outputs_mask);
+    bool get_graph(int index, int subindex, float *data, int points, cairo_iface *context);
+    bool get_gridline(int index, int subindex, float &pos, bool &vertical, std::string &legend, cairo_iface *context);
+    int  get_changed_offsets(int index, int generation, int &subindex_graph, int &subindex_dot, int &subindex_gridline);
+};
+
+/// Equalizer 8 Band by Markus Schmidt (based on Krzysztof's filters)
+class equalizer8band_audio_module: public audio_module<equalizer8band_metadata>, public frequency_response_line_graph  {
+private:
+    float hp_mode_old, hp_freq_old;
+    float lp_mode_old, lp_freq_old;
+    float ls_level_old, ls_freq_old;
+    float hs_level_old, hs_freq_old;
+    float p_level_old[4], p_freq_old[4], p_q_old[4];
+    float hp_mode_old1, hp_freq_old1, hp_active_old1;
+    float lp_mode_old1, lp_freq_old1, lp_active_old1;
+    float ls_level_old1, ls_freq_old1, ls_active_old1;
+    float hs_level_old1, hs_freq_old1, hs_active_old1;
+    float p_level_old1[4], p_freq_old1[4], p_q_old1[4], p_active_old1[4];
+    enum CalfEqModes {
+        MODE12DB,
+        MODE24DB,
+        MODE36DB
+    };
+    CalfEqModes eq_mode, eq_mode_old1[2];
+    uint32_t clip_inL, clip_outL, clip_inR, clip_outR;
+    float meter_inL, meter_outL, meter_inR, meter_outR;
+    biquad_d2<float> hpL[3], hpR[3], lpL[3], lpR[3];
+    biquad_d2<float> lsL, lsR, hsL, hsR;
+    biquad_d2<float> pL[4], pR[4];
+public:
+    typedef std::complex<double> cfloat;
+    float *ins[in_count];
+    float *outs[out_count];
+    float *params[param_count];
+    uint32_t srate;
+    bool is_active;
+    volatile int last_generation, last_calculated_generation;
+    equalizer8band_audio_module();
+    void activate();
+    void deactivate();
+    void params_changed();
+    float freq_gain(int index, double freq, uint32_t sr)
+    {
+        float ret = 1.f;
+        if(*params[param_hp_active] > 0.f) {
+            switch((int)*params[param_hp_mode]) {
+                case MODE12DB:
+                    ret *= hpL[0].freq_gain(freq, sr);
+                    ret *= hpR[0].freq_gain(freq, sr);
+                    break;
+                case MODE24DB:
+                    ret *= hpL[0].freq_gain(freq, sr) * hpL[0].freq_gain(freq, sr);
+                    ret *= hpR[0].freq_gain(freq, sr) * hpR[0].freq_gain(freq, sr);
+                    break;
+                case MODE36DB:
+                    ret *= hpL[0].freq_gain(freq, sr) * hpL[0].freq_gain(freq, sr) * hpL[0].freq_gain(freq, sr);
+                    ret *= hpR[0].freq_gain(freq, sr) * hpR[0].freq_gain(freq, sr) * hpR[0].freq_gain(freq, sr);
+                    break;
+            }
+        }
+        if(*params[param_lp_active] > 0.f) {
+            switch((int)*params[param_lp_mode]) {
+                case MODE12DB:
+                    ret *= lpL[0].freq_gain(freq, sr);
+                    ret *= lpR[0].freq_gain(freq, sr);
+                    break;
+                case MODE24DB:
+                    ret *= lpL[0].freq_gain(freq, sr) * lpL[0].freq_gain(freq, sr);
+                    ret *= lpR[0].freq_gain(freq, sr) * lpR[0].freq_gain(freq, sr);
+                    break;
+                case MODE36DB:
+                    ret *= lpL[0].freq_gain(freq, sr) * lpL[0].freq_gain(freq, sr) * lpL[0].freq_gain(freq, sr);
+                    ret *= lpR[0].freq_gain(freq, sr) * lpR[0].freq_gain(freq, sr) * lpR[0].freq_gain(freq, sr);
+                    break;
+            }
+        }
+        ret *= (*params[param_ls_active] > 0.f) ? lsL.freq_gain(freq, sr) : 1;
+        ret *= (*params[param_hs_active] > 0.f) ? hsL.freq_gain(freq, sr) : 1;
+        ret *= (*params[param_p1_active] > 0.f) ? pL[0].freq_gain(freq, sr) : 1;
+        ret *= (*params[param_p2_active] > 0.f) ? pL[1].freq_gain(freq, sr) : 1;
+        ret *= (*params[param_p3_active] > 0.f) ? pL[2].freq_gain(freq, sr) : 1;
+        ret *= (*params[param_p4_active] > 0.f) ? pL[3].freq_gain(freq, sr) : 1;
+        return ret;
+    }
+    void set_sample_rate(uint32_t sr);
+    uint32_t process(uint32_t offset, uint32_t numsamples, uint32_t inputs_mask, uint32_t outputs_mask);
+    bool get_graph(int index, int subindex, float *data, int points, cairo_iface *context);
+    bool get_gridline(int index, int subindex, float &pos, bool &vertical, std::string &legend, cairo_iface *context);
+    int  get_changed_offsets(int index, int generation, int &subindex_graph, int &subindex_dot, int &subindex_gridline);
+};
+
+/// Equalizer 5 Band by Markus Schmidt (based on Krzysztof's filters)
+class equalizer5band_audio_module: public audio_module<equalizer5band_metadata>, public frequency_response_line_graph  {
+private:
+    float hp_mode_old, hp_freq_old;
+    float lp_mode_old, lp_freq_old;
+    float ls_level_old, ls_freq_old;
+    float hs_level_old, hs_freq_old;
+    float p_level_old[3], p_freq_old[3], p_q_old[3];
+    float hp_mode_old1, hp_freq_old1, hp_active_old1;
+    float lp_mode_old1, lp_freq_old1, lp_active_old1;
+    float ls_level_old1, ls_freq_old1, ls_active_old1;
+    float hs_level_old1, hs_freq_old1, hs_active_old1;
+    float p_level_old1[3], p_freq_old1[3], p_q_old1[3], p_active_old1[3];
+    uint32_t clip_in, clip_out;
+    float meter_in, meter_out;
+    biquad_d2<float> lsL, lsR, hsL, hsR;
+    biquad_d2<float> pL[3], pR[3];
+public:
+    typedef std::complex<double> cfloat;
+    float *ins[in_count];
+    float *outs[out_count];
+    float *params[param_count];
+    uint32_t srate;
+    bool is_active;
+    volatile int last_generation, last_calculated_generation;
+    equalizer5band_audio_module();
+    void activate();
+    void deactivate();
+    void params_changed();
+    float freq_gain(int index, double freq, uint32_t sr)
+    {
+        float ret = 1.f;
+        ret *= (*params[param_ls_active] > 0.f) ? lsL.freq_gain(freq, sr) : 1;
+        ret *= (*params[param_hs_active] > 0.f) ? hsL.freq_gain(freq, sr) : 1;
+        ret *= (*params[param_p1_active] > 0.f) ? pL[0].freq_gain(freq, sr) : 1;
+        ret *= (*params[param_p2_active] > 0.f) ? pL[1].freq_gain(freq, sr) : 1;
+        ret *= (*params[param_p3_active] > 0.f) ? pL[2].freq_gain(freq, sr) : 1;
+        return ret;
+    }
+    void set_sample_rate(uint32_t sr);
+    uint32_t process(uint32_t offset, uint32_t numsamples, uint32_t inputs_mask, uint32_t outputs_mask);
+    bool get_graph(int index, int subindex, float *data, int points, cairo_iface *context);
+    bool get_gridline(int index, int subindex, float &pos, bool &vertical, std::string &legend, cairo_iface *context);
+    int  get_changed_offsets(int index, int generation, int &subindex_graph, int &subindex_dot, int &subindex_gridline);
 };
 
 /// Filterclavier --- MIDI controlled filter by Hans Baier
