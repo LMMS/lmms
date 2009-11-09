@@ -1543,7 +1543,7 @@ uint32_t deesser_audio_module::process(uint32_t offset, uint32_t numsamples, uin
             outs[0][offset] = outL;
             outs[1][offset] = outR;
             
-            if(std::max(fabs(leftSC), fabs(rightSC)) > 0.1) {
+            if(std::max(fabs(leftSC), fabs(rightSC)) > *params[param_threshold]) {
                 detected_led   = srate >> 3;
             }
             if(std::max(fabs(leftAC), fabs(rightAC)) > 1.f) {
