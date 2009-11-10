@@ -1543,7 +1543,7 @@ uint32_t deesser_audio_module::process(uint32_t offset, uint32_t numsamples, uin
             outs[0][offset] = outL;
             outs[1][offset] = outR;
             
-            if(std::max(fabs(leftSC), fabs(rightSC)) > 0.1) {
+            if(std::max(fabs(leftSC), fabs(rightSC)) > *params[param_threshold]) {
                 detected_led   = srate >> 3;
             }
             if(std::max(fabs(leftAC), fabs(rightAC)) > 1.f) {
@@ -1640,10 +1640,10 @@ int deesser_audio_module::get_changed_offsets(int index, int generation, int &su
     return false;
 }
 
-/// Gain reduction module implemented by Markus Schmidt
-/// Nearly all functions of this module are originally written
+/// Gain reduction module by Thor
+/// All functions of this module are originally written
 /// by Thor, while some features have been stripped (mainly stereo linking
-/// and frequency correction as implemented in his Compressor above)
+/// and frequency correction as implemented in Sidechain Compressor above)
 /// To save some CPU.
 ////////////////////////////////////////////////////////////////////////////////
 gain_reduction_audio_module::gain_reduction_audio_module()
