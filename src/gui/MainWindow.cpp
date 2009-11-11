@@ -72,7 +72,8 @@ MainWindow::MainWindow( void ) :
 	m_workspace( NULL ),
 	m_templatesMenu( NULL ),
 	m_recentlyOpenedProjectsMenu( NULL ),
-	m_toolsMenu( NULL )
+	m_toolsMenu( NULL ),
+	m_autoSaveTimer( this )
 {
 	setAttribute( Qt::WA_DeleteOnClose );
 
@@ -182,6 +183,10 @@ MainWindow::MainWindow( void ) :
 
 
 	m_updateTimer.start( 1000 / 20, this );	// 20 fps
+
+	// connect auto save
+	connect(&m_autoSaveTimer, SIGNAL(timeout()), this, SLOT(autoSave()));
+	m_autoSaveTimer.start(1000 * 60); // 1 minute
 }
 
 
@@ -898,6 +903,9 @@ void MainWindow::closeEvent( QCloseEvent * _ce )
 {
 	if( mayChangeProject() )
 	{
+		// delete recovery file
+		QDir working(configManager::inst()->workingDir());
+		working.remove("recover.mmp");
 		_ce->accept();
 	}
 	else
@@ -969,7 +977,7 @@ void MainWindow::keyReleaseEvent( QKeyEvent * _ke )
 
 
 
-void MainWindow::timerEvent( QTimerEvent * )
+void MainWindow::timerEvent( QTimerEvent * _te)
 {
 	emit periodicUpdate();
 }
@@ -1035,6 +1043,13 @@ void MainWindow::browseHelp( void )
 }
 
 
+
+
+void MainWindow::autoSave()
+{
+	QDir work(configManager::inst()->workingDir());
+	engine::getSong()->saveProjectAs(work.absoluteFilePath("recover.mmp"));
+}
 
 
 #include "moc_MainWindow.cxx"

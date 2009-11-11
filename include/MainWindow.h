@@ -27,6 +27,7 @@
 #define _MAIN_WINDOW_H
 
 #include <QtCore/QBasicTimer>
+#include <QtCore/QTimer>
 #include <QtCore/QList>
 #include <QtGui/QMainWindow>
 #include <QtGui/QWhatsThis>
@@ -160,6 +161,7 @@ private:
 	QList<PluginView *> m_tools;
 
 	QBasicTimer m_updateTimer;
+	QTimer m_autoSaveTimer;
 
 
 	friend class engine;
@@ -172,6 +174,8 @@ private slots:
 	void showTool( QAction * _idx );
 	void updateRecentlyOpenedProjectsMenu( void );
 
+
+	void autoSave();
 
 signals:
 	void periodicUpdate( void );
