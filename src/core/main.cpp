@@ -458,6 +458,9 @@ int main( int argc, char * * argv )
 				engine::mainWindow()->showMaximized();
 			}
 			engine::getSong()->loadProject( file_to_load );
+
+			// don't show welcome screen
+			engine::mainWindow()->showWelcomeScreen( false );
 		}
 		else if( !file_to_import.isEmpty() )
 		{
@@ -472,6 +475,9 @@ int main( int argc, char * * argv )
 			{
 				engine::mainWindow()->showMaximized();
 			}
+
+			// don't show welcome screen
+			engine::mainWindow()->showWelcomeScreen( false );
 		}
 		else
 		{
@@ -484,6 +490,9 @@ int main( int argc, char * * argv )
 			{
 				engine::mainWindow()->showMaximized();
 			}
+
+			// show welcome screen
+			engine::mainWindow()->showWelcomeScreen();
 		}
 	}
 	else
@@ -519,9 +528,7 @@ int main( int argc, char * * argv )
 		}
 	}
 
-	const int ret = app->exec();
-	delete app;
-	return( ret );
+	return app->exec();
 }
 
 
