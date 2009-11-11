@@ -26,6 +26,7 @@
 #define _MAIN_WINDOW_H
 
 #include <QtCore/QBasicTimer>
+#include <QtCore/QTimer>
 #include <QtCore/QList>
 #include <QtGui/QMainWindow>
 #include <QtGui/QWhatsThis>
@@ -207,6 +208,7 @@ private:
 	QList<PluginView *> m_tools;
 
 	QBasicTimer m_updateTimer;
+	QTimer m_autoSaveTimer;
 
 	ResourceBrowser * m_resourceBrowser;
 
@@ -242,6 +244,8 @@ private slots:
 	void record();
 	void playAndRecord();
 	void stop();
+
+	void autoSave();
 
 signals:
 	void periodicUpdate();
