@@ -2,6 +2,55 @@
 <!DOCTYPE TS>
 <TS version="2.0">
 <context>
+    <name>AboutDialog</name>
+    <message>
+        <source>About LMMS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LMMS (Linux MultiMedia Studio)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Version %1 (%2/%3, Qt %4, %5)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>About</source>
+        <translation type="unfinished">Quant a</translation>
+    </message>
+    <message>
+        <source>LMMS - easy music production for everyone</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Copyright (c) 2004-2008, LMMS developers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>http://lmms.sourceforge.net</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Authors</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Translation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Current language not translated (or native English).
+
+If you&apos;re interested in translating LMMS in another language or want to improve existing translations, you&apos;re welcome to help us! Simply contact the maintainer!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>License</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>Arpeggiator</name>
     <message>
         <source>Arpeggio</source>
@@ -834,6 +883,17 @@
     </message>
 </context>
 <context>
+    <name>EffectSelectDialog</name>
+    <message>
+        <source>Add effect</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Plugin description</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>EffectView</name>
     <message>
         <source>Toggles the effect on or off.</source>
@@ -1148,6 +1208,149 @@ Right clicking will bring up a context menu where you can change the order in wh
     <message>
         <source>Drag a sample from somewhere and drop it in this window.</source>
         <translation type="unfinished">Arrossega una mostra d&apos;on sigui i amolla-la en aquesta finestra.</translation>
+    </message>
+</context>
+<context>
+    <name>ExportProjectDialog</name>
+    <message>
+        <source>Export project</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Output</source>
+        <translation type="unfinished">Sortida</translation>
+    </message>
+    <message>
+        <source>File format:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Samplerate:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>44100 Hz</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>48000 Hz</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>88200 Hz</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>96000 Hz</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>192000 Hz</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bitrate:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>64 KBit/s</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>128 KBit/s</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>160 KBit/s</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>192 KBit/s</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>256 KBit/s</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>320 KBit/s</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Depth:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>16 Bit Integer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>32 Bit Float</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please note that not all of the parameters above apply for all file formats.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Quality settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Interpolation:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Zero Order Hold</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sinc Fastest</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sinc Medium (recommended)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sinc Best (very slow!)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Oversampling (use with care!):</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>1x (None)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>2x</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>4x</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>8x</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sample-exact controllers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Alias-free oscillators</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Cancel·la</translation>
     </message>
 </context>
 <context>
@@ -2485,13 +2688,6 @@ Reason: &quot;%2&quot;</source>
     </message>
 </context>
 <context>
-    <name>Ui</name>
-    <message>
-        <source>Export project to %1</source>
-        <translation type="unfinished">Exporta projecte a %1</translation>
-    </message>
-</context>
-<context>
     <name>VestigeInstrumentView</name>
     <message>
         <source>Open other VST-plugin</source>
@@ -2933,6 +3129,10 @@ Per favor, assegura&apos;t que tens permís d&apos;escriptura per al fitxer i el
     <message>
         <source>Rendering: %1%</source>
         <translation type="unfinished">Representant: %1%</translation>
+    </message>
+    <message>
+        <source>Export project to %1</source>
+        <translation type="unfinished">Exporta projecte a %1</translation>
     </message>
 </context>
 <context>
