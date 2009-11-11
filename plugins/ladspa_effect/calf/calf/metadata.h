@@ -31,21 +31,21 @@ struct flanger_metadata: public plugin_metadata<flanger_metadata>
 {
 public:
     enum { par_delay, par_depth, par_rate, par_fb, par_stereo, par_reset, par_amount, par_dryamount, param_count };
-    enum { in_count = 2, out_count = 2, support_midi = false, require_midi = false, rt_capable = true };
+    enum { in_count = 2, out_count = 2, ins_optional = 0, outs_optional = 0, support_midi = false, require_midi = false, rt_capable = true };
     PLUGIN_NAME_ID_LABEL("flanger", "flanger", "Flanger")
 };
 
 struct phaser_metadata: public plugin_metadata<phaser_metadata>
 {
     enum { par_freq, par_depth, par_rate, par_fb, par_stages, par_stereo, par_reset, par_amount, par_dryamount, param_count };
-    enum { in_count = 2, out_count = 2, support_midi = false, require_midi = false, rt_capable = true };
+    enum { in_count = 2, out_count = 2, ins_optional = 0, outs_optional = 0, support_midi = false, require_midi = false, rt_capable = true };
     PLUGIN_NAME_ID_LABEL("phaser", "phaser", "Phaser")
 };
 
 struct filter_metadata: public plugin_metadata<filter_metadata>
 {
     enum { par_cutoff, par_resonance, par_mode, par_inertia, param_count };
-    enum { in_count = 2, out_count = 2, rt_capable = true, require_midi = false, support_midi = false };
+    enum { in_count = 2, out_count = 2, ins_optional = 0, outs_optional = 0, rt_capable = true, require_midi = false, support_midi = false };
     PLUGIN_NAME_ID_LABEL("filter", "filter", "Filter")
     /// do not export mode and inertia as CVs, as those are settings and not parameters
     bool is_cv(int param_no) { return param_no != par_mode && param_no != par_inertia; }
@@ -55,7 +55,7 @@ struct filter_metadata: public plugin_metadata<filter_metadata>
 struct filterclavier_metadata: public plugin_metadata<filterclavier_metadata>
 {
     enum { par_transpose, par_detune, par_max_resonance, par_mode, par_inertia,  param_count };
-    enum { in_count = 2, out_count = 2, rt_capable = true, require_midi = true, support_midi = true };
+    enum { in_count = 2, out_count = 2, ins_optional = 0, outs_optional = 0, rt_capable = true, require_midi = true, support_midi = true };
     PLUGIN_NAME_ID_LABEL("filterclavier", "filterclavier", "Filterclavier")
     /// do not export mode and inertia as CVs, as those are settings and not parameters
     bool is_cv(int param_no) { return param_no != par_mode && param_no != par_inertia; }
@@ -64,14 +64,14 @@ struct filterclavier_metadata: public plugin_metadata<filterclavier_metadata>
 struct reverb_metadata: public plugin_metadata<reverb_metadata>
 {
     enum { par_clip, par_meter_wet, par_meter_out, par_decay, par_hfdamp, par_roomsize, par_diffusion, par_amount, par_dry, par_predelay, par_basscut, par_treblecut, param_count };
-    enum { in_count = 2, out_count = 2, support_midi = false, require_midi = false, rt_capable = true };
+    enum { in_count = 2, out_count = 2, ins_optional = 0, outs_optional = 0, support_midi = false, require_midi = false, rt_capable = true };
     PLUGIN_NAME_ID_LABEL("reverb", "reverb", "Reverb")
 };
 
 struct vintage_delay_metadata: public plugin_metadata<vintage_delay_metadata>
 {
     enum { par_bpm, par_divide, par_time_l, par_time_r, par_feedback, par_amount, par_mixmode, par_medium, par_dryamount, param_count };
-    enum { in_count = 2, out_count = 2, rt_capable = true, support_midi = false, require_midi = false };
+    enum { in_count = 2, out_count = 2, ins_optional = 0, outs_optional = 0, rt_capable = true, support_midi = false, require_midi = false };
     PLUGIN_NAME_ID_LABEL("vintage_delay", "vintagedelay", "Vintage Delay")
 };
 
@@ -79,7 +79,7 @@ struct rotary_speaker_metadata: public plugin_metadata<rotary_speaker_metadata>
 {
 public:
     enum { par_speed, par_spacing, par_shift, par_moddepth, par_treblespeed, par_bassspeed, par_micdistance, par_reflection, par_meter_l, par_meter_h, param_count };
-    enum { in_count = 2, out_count = 2, support_midi = true, require_midi = false, rt_capable = true };
+    enum { in_count = 2, out_count = 2, ins_optional = 0, outs_optional = 0, support_midi = true, require_midi = false, rt_capable = true };
     PLUGIN_NAME_ID_LABEL("rotary_speaker", "rotaryspeaker", "Rotary Speaker")
 };
 
@@ -88,7 +88,7 @@ struct multichorus_metadata: public plugin_metadata<multichorus_metadata>
 {
 public:    
     enum { par_delay, par_depth, par_rate, par_stereo, par_voices, par_vphase, par_amount, par_dryamount, par_freq, par_freq2, par_q, par_overlap, param_count };
-    enum { in_count = 2, out_count = 2, rt_capable = true, support_midi = false, require_midi = false };
+    enum { in_count = 2, out_count = 2, ins_optional = 0, outs_optional = 0, rt_capable = true, support_midi = false, require_midi = false };
     PLUGIN_NAME_ID_LABEL("multichorus", "multichorus", "Multi Chorus")
 };
 
@@ -101,7 +101,7 @@ struct monosynth_metadata: public plugin_metadata<monosynth_metadata>
         par_keyfollow, par_legato, par_portamento, par_vel2filter, par_vel2amp, par_master, par_pwhlrange, 
         par_lforate, par_lfodelay, par_lfofilter, par_lfopitch, par_lfopw, par_mwhl_lfo, par_scaledetune,
         param_count };
-    enum { in_count = 0, out_count = 2, support_midi = true, require_midi = true, rt_capable = true };
+    enum { in_count = 0, out_count = 2, ins_optional = 0, outs_optional = 0, support_midi = true, require_midi = true, rt_capable = true };
     enum { step_size = 64, step_shift = 6 };
     enum {
         modsrc_none,
@@ -128,18 +128,20 @@ struct monosynth_metadata: public plugin_metadata<monosynth_metadata>
 };
 
 /// Thor's compressor - metadata
+/// Added some meters and stripped the weighting part
 struct compressor_metadata: public plugin_metadata<compressor_metadata>
 {
-    enum { in_count = 2, out_count = 2, support_midi = false, require_midi = false, rt_capable = true };
-    enum { param_threshold, param_ratio, param_attack, param_release, param_makeup, param_knee, param_detection, param_stereo_link, param_aweighting, param_compression, param_peak, param_clip, param_bypass, param_input,// param_freq, param_bw, 
-        param_count };
+    enum { in_count = 2, out_count = 2, ins_optional = 0, outs_optional = 0, support_midi = false, require_midi = false, rt_capable = true };
+    enum { param_bypass, param_level_in, param_meter_in, param_meter_out, param_clip_in, param_clip_out,
+           param_threshold, param_ratio, param_attack, param_release, param_makeup, param_knee, param_detection, param_stereo_link, param_compression, 
+           param_count };
     PLUGIN_NAME_ID_LABEL("compressor", "compressor", "Compressor")
 };
 
 /// Markus's sidechain compressor - metadata
 struct sidechaincompressor_metadata: public plugin_metadata<sidechaincompressor_metadata>
 {
-    enum { in_count = 2, out_count = 2, support_midi = false, require_midi = false, rt_capable = true };
+    enum { in_count = 2, out_count = 2, ins_optional = 0, outs_optional = 0, support_midi = false, require_midi = false, rt_capable = true };
     enum { param_bypass, param_level_in, param_meter_in, param_meter_out, param_clip_in, param_clip_out,
            param_threshold, param_ratio, param_attack, param_release, param_makeup, param_knee, param_detection, param_stereo_link, param_compression, 
            param_sc_mode, param_f1_freq, param_f2_freq, param_f1_level, param_f2_level,
@@ -150,7 +152,7 @@ struct sidechaincompressor_metadata: public plugin_metadata<sidechaincompressor_
 /// Markus's multibandcompressor - metadata
 struct multibandcompressor_metadata: public plugin_metadata<multibandcompressor_metadata>
 {
-    enum { in_count = 2, out_count = 2, support_midi = false, require_midi = false, rt_capable = true };
+    enum { in_count = 2, out_count = 2, ins_optional = 0, outs_optional = 0, support_midi = false, require_midi = false, rt_capable = true };
     enum { param_bypass, param_level_in, param_level_out, param_meter_inL, param_meter_inR,
            param_meter_outL, param_meter_outR, param_clip_inL, param_clip_inR, param_clip_outL, param_clip_outR,
            param_freq0, param_freq1, param_freq2,
@@ -171,7 +173,7 @@ struct multibandcompressor_metadata: public plugin_metadata<multibandcompressor_
 /// Markus's deesser - metadata
 struct deesser_metadata: public plugin_metadata<deesser_metadata>
 {
-    enum { in_count = 2, out_count = 2, support_midi = false, require_midi = false, rt_capable = true };
+    enum { in_count = 2, out_count = 2, ins_optional = 0, outs_optional = 0, support_midi = false, require_midi = false, rt_capable = true };
     enum { param_bypass, param_detected, param_compression, param_detected_led, param_clip_out,
            param_detection, param_mode,
            param_threshold, param_ratio, param_laxity, param_makeup,
@@ -183,7 +185,7 @@ struct deesser_metadata: public plugin_metadata<deesser_metadata>
 /// Markus's 5-band EQ - metadata
 struct equalizer5band_metadata: public plugin_metadata<equalizer5band_metadata>
 {
-    enum { in_count = 2, out_count = 2, support_midi = false, require_midi = false, rt_capable = true };
+    enum { in_count = 2, out_count = 2, ins_optional = 0, outs_optional = 0, support_midi = false, require_midi = false, rt_capable = true };
     enum { param_bypass, param_level_in, param_level_out, param_meter_in,
            param_meter_out, param_clip_in, param_clip_out,
            param_ls_active, param_ls_level, param_ls_freq,
@@ -197,7 +199,7 @@ struct equalizer5band_metadata: public plugin_metadata<equalizer5band_metadata>
 /// Markus's 8-band EQ - metadata
 struct equalizer8band_metadata: public plugin_metadata<equalizer8band_metadata>
 {
-    enum { in_count = 2, out_count = 2, support_midi = false, require_midi = false, rt_capable = true };
+    enum { in_count = 2, out_count = 2, ins_optional = 0, outs_optional = 0, support_midi = false, require_midi = false, rt_capable = true };
     enum { param_bypass, param_level_in, param_level_out, param_meter_inL, param_meter_inR,
            param_meter_outL, param_meter_outR, param_clip_inL, param_clip_inR, param_clip_outL, param_clip_outR,
            param_hp_active, param_hp_freq, param_hp_mode,
@@ -214,7 +216,7 @@ struct equalizer8band_metadata: public plugin_metadata<equalizer8band_metadata>
 /// Markus's 12-band EQ - metadata
 struct equalizer12band_metadata: public plugin_metadata<equalizer12band_metadata>
 {
-    enum { in_count = 2, out_count = 2, support_midi = false, require_midi = false, rt_capable = true };
+    enum { in_count = 2, out_count = 2, ins_optional = 0, outs_optional = 0, support_midi = false, require_midi = false, rt_capable = true };
     enum { param_bypass, param_level_in, param_level_out, param_meter_inL, param_meter_inR,
            param_meter_outL, param_meter_outR, param_clip_inL, param_clip_inR, param_clip_outL, param_clip_outR,
            param_hp_active, param_hp_freq, param_hp_mode,
@@ -319,7 +321,7 @@ struct organ_enums
 /// Organ - metadata
 struct organ_metadata: public organ_enums, public plugin_metadata<organ_metadata>
 {
-    enum { in_count = 0, out_count = 2, support_midi = true, require_midi = true, rt_capable = true };
+    enum { in_count = 0, out_count = 2, ins_optional = 0, outs_optional = 0, support_midi = true, require_midi = true, rt_capable = true };
     PLUGIN_NAME_ID_LABEL("organ", "organ", "Organ")
     plugin_command_info *get_commands();
     const char **get_default_configure_vars();
@@ -329,7 +331,7 @@ struct organ_metadata: public organ_enums, public plugin_metadata<organ_metadata
 struct fluidsynth_metadata: public plugin_metadata<fluidsynth_metadata>
 {
     enum { par_master, par_soundfont, par_interpolation, par_reverb, par_chorus, param_count };
-    enum { in_count = 0, out_count = 2, support_midi = true, require_midi = true, rt_capable = false };
+    enum { in_count = 0, out_count = 2, ins_optional = 0, outs_optional = 0, support_midi = true, require_midi = true, rt_capable = false };
     PLUGIN_NAME_ID_LABEL("fluidsynth", "fluidsynth", "Fluidsynth")
     const char **get_default_configure_vars();
 };
@@ -399,7 +401,7 @@ struct wavetable_metadata: public plugin_metadata<wavetable_metadata>
         par_eg3attack, par_eg3decay, par_eg3sustain, par_eg3fade, par_eg3release, par_eg3velscl,
         par_pwhlrange, 
         param_count };
-    enum { in_count = 0, out_count = 2, support_midi = true, require_midi = true, rt_capable = true };
+    enum { in_count = 0, out_count = 2, ins_optional = 0, outs_optional = 0, support_midi = true, require_midi = true, rt_capable = true };
     enum { step_size = 64 };
     PLUGIN_NAME_ID_LABEL("wavetable", "wavetable", "Wavetable")
 };

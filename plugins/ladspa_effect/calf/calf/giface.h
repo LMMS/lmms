@@ -306,6 +306,10 @@ struct plugin_metadata_iface
     virtual int get_input_count()=0;
     /// @return number of audio outputs
     virtual int get_output_count()=0;
+    /// @return number of optional inputs
+    virtual int get_inputs_optional()=0;
+    /// @return number of optional outputs
+    virtual int get_outputs_optional()=0;
     /// @return true if plugin can work in hard-realtime conditions
     virtual bool is_rt_capable()=0;
     /// @return true if plugin has MIDI input
@@ -489,6 +493,8 @@ public:
     const char *get_label() { return Metadata::impl_get_label(); } 
     int get_input_count() { return Metadata::in_count; }
     int get_output_count() { return Metadata::out_count; }
+    int get_inputs_optional() { return Metadata::ins_optional; }
+    int get_outputs_optional() { return Metadata::outs_optional; }
     int get_param_count() { return Metadata::param_count; }
     bool get_midi() { return Metadata::support_midi; }
     bool requires_midi() { return Metadata::require_midi; }
@@ -528,6 +534,8 @@ public:
     const char *get_label() { return impl->get_label(); } 
     int get_input_count() { return impl->get_input_count(); }
     int get_output_count() { return impl->get_output_count(); }
+    int get_inputs_optional() { return impl->get_inputs_optional(); }
+    int get_outputs_optional() { return impl->get_outputs_optional(); }
     int get_param_count() { return impl->get_param_count(); }
     bool get_midi() { return impl->get_midi(); }
     bool requires_midi() { return impl->requires_midi(); }
