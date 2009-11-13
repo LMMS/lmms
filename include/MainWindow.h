@@ -125,6 +125,7 @@ public slots:
 	bool saveProject();
 	bool saveProjectAs();
 	void showSettingsDialog();
+	void showPreferencesDialog();
 	void aboutLMMS();
 	void help();
 	void toggleAutomationEditorWin();

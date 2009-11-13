@@ -51,6 +51,7 @@
 #include "engine.h"
 #include "FxMixerView.h"
 #include "AboutDialog.h"
+#include "PreferencesDialog.h"
 #include "ControllerRackView.h"
 #include "plugin_browser.h"
 #include "SideBar.h"
@@ -257,6 +258,10 @@ void MainWindow::finalize()
 	edit_menu->addAction( embed::getIconPixmap( "setup_general" ),
 					tr( "Settings" ),
 					this, SLOT( showSettingsDialog() ) );
+	edit_menu->addSeparator();
+	edit_menu->addAction( embed::getIconPixmap( "setup_general" ),
+					tr( "Preferences (premature dialog)" ),
+					this, SLOT( showPreferencesDialog() ) );
 
 
 	m_toolsMenu = new QMenu( this );
@@ -1045,6 +1050,14 @@ void MainWindow::showSettingsDialog()
 {
 	setupDialog sd;
 	sd.exec();
+}
+
+
+
+
+void MainWindow::showPreferencesDialog()
+{
+	PreferencesDialog().exec();
 }
 
 

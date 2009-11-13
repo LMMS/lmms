@@ -12,6 +12,17 @@ automationEditor {
 	background-color: rgb(0, 0, 0);
 }
 
+#PreferencesDialog QListView::item:selected {
+	background: qlineargradient(x1: 0, y1:0, x2:0,y2:1, stop:0 rgb(84,87,96), stop:1 rgb(54,57,66));
+	border-radius: 8px;
+	color: white;
+}
+
+#PreferencesDialog QListView::item:hover:!selected {
+	background: qlineargradient(x1: 0, y1:0, x2:0,y2:1, stop:0 rgb(104,107,116), stop:1 rgb(94,97,106));
+	border-radius: 8px;
+}
+
 #WelcomeFrame {
 	border: 2px solid rgb(32,32,32);
 	border-radius: 8px;
