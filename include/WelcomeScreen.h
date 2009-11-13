@@ -53,7 +53,7 @@ private slots:
 
 
 private:
-	void switchView();
+	void hideWelcomeScreen();
 
 	Ui::WelcomeScreen * ui;
 	RecentResourceListModel * m_recentProjectsModel;

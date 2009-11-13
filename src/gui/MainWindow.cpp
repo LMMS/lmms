@@ -92,7 +92,6 @@ MainWindow::MainWindow() :
 	vbox->setSpacing( 0 );
 	vbox->setMargin( 0 );
 
-
 	QWidget * w = new QWidget( m_mainWidget );
 	QHBoxLayout * hbox = new QHBoxLayout( w );
 	hbox->setSpacing( 0 );
@@ -152,14 +151,11 @@ MainWindow::MainWindow() :
 	vbox->addWidget( m_toolBar );
 	vbox->addWidget( w );
 
+	m_updateTimer.start( 1000 / 20, this );	// 20 fps
 
 	m_welcomeScreen = new WelcomeScreen( this );
-
-	setCentralWidget( m_welcomeScreen );
-
-	m_updateTimer.start( 1000 / 20, this );	// 20 fps
+	m_welcomeScreen->setVisible( false );
 }
-
 
 
 
@@ -182,12 +178,11 @@ MainWindow::~MainWindow()
 
 
 
-
-void MainWindow::setMainWidgetVisible( bool _visible )
+void MainWindow::showWelcomeScreen(bool _visible)
 {
-	setCentralWidget( _visible ? m_mainWidget : m_welcomeScreen );
+	m_welcomeScreen->setVisible( _visible );
+	setCentralWidget( _visible ? m_welcomeScreen : m_mainWidget );
 }
-
 
 
 
@@ -312,8 +307,7 @@ void MainWindow::finalize()
 
 	// create the grid layout for the first buttons area
 	QWidget * gridButtons_w = new QWidget( m_toolBar );
-	QGridLayout * gridButtons_layout = new QGridLayout( gridButtons_w/*, 2, 1*/ );
-
+	QGridLayout * gridButtons_layout = new QGridLayout( gridButtons_w );
 
 	// create tool-buttons
 	toolButton * project_new = new toolButton(
@@ -1196,6 +1190,12 @@ void MainWindow::closeEvent( QCloseEvent * _ce )
 	}
 }
 
+
+void MainWindow::showEvent( QShowEvent * _se )
+{
+	//showWelcomeScreen( false ); // must explicitly ask for welcome screen
+	_se->accept();
+}
 
 
 
