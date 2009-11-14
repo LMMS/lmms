@@ -1007,7 +1007,7 @@ bool MainWindow::saveProject()
 	}
 	else
 	{
-		engine::getSong()->saveProject();
+		engine::getSong()->guiSaveProject();
 	}
 	return true;
 }
@@ -1036,7 +1036,7 @@ bool MainWindow::saveProjectAs()
 	if( sfd.exec () == QFileDialog::Accepted &&
 		!sfd.selectedFiles().isEmpty() && sfd.selectedFiles()[0] != "" )
 	{
-		engine::getSong()->saveProjectAs(
+		engine::getSong()->guiSaveProjectAs(
 						sfd.selectedFiles()[0] );
 		return true;
 	}
@@ -1568,7 +1568,7 @@ void MainWindow::toggleRecordAutomation( bool _recording )
 void MainWindow::autoSave()
 {
 	QDir work(configManager::inst()->workingDir());
-	engine::getSong()->saveProjectAs(work.absoluteFilePath("recover.mmp"));
+	engine::getSong()->saveProjectFile(work.absoluteFilePath("recover.mmp"));
 }
 
 
