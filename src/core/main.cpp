@@ -489,7 +489,7 @@ int main( int argc, char * * argv )
 		}
 		else
 		{
-			engine::getSong()->saveProjectAs( file_to_save );
+			engine::getSong()->saveProjectFile( file_to_save );
 			return( 0 );
 		}
 	}
