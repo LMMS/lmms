@@ -30,7 +30,7 @@
 using namespace dsp;
 using namespace calf_plugins;
 
-const char *calf_plugins::calf_copyright_info = "(C) 2001-2008 Krzysztof Foltman, license: LGPL";
+const char *calf_plugins::calf_copyright_info = "(C) 2001-2009 Krzysztof Foltman, Thor Harald Johanssen, Markus Schmidt and others; license: LGPL";
 
 ////////////////////////////////////////////////////////////////////////////
 

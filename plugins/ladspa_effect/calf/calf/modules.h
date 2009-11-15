@@ -37,7 +37,7 @@ namespace calf_plugins {
 using namespace dsp;
 
 struct ladspa_plugin_info;
-    
+
 #if 0
 class amp_audio_module: public null_audio_module
 {
@@ -1038,30 +1038,28 @@ public:
     int  get_changed_offsets(int index, int generation, int &subindex_graph, int &subindex_dot, int &subindex_gridline);
 };
 
-/// Equalizer 12 Band by Markus Schmidt (based on Krzysztof's filters)
-class equalizer12band_audio_module: public audio_module<equalizer12band_metadata>, public frequency_response_line_graph  {
+/// Equalizer N Band by Markus Schmidt (based on Krzysztof's filters)
+template<class BaseClass>
+class equalizerNband_audio_module: public audio_module<BaseClass>, public frequency_response_line_graph {
+public:
+    typedef audio_module<BaseClass> AM;
+    using AM::in_count;
+    using AM::out_count;
+    using AM::param_count;
+    using AM::PeakBands;
 private:
+    enum { graph_param_count = BaseClass::last_graph_param - BaseClass::first_graph_param + 1, params_per_band = AM::param_p2_active - AM::param_p1_active };
     float hp_mode_old, hp_freq_old;
     float lp_mode_old, lp_freq_old;
     float ls_level_old, ls_freq_old;
     float hs_level_old, hs_freq_old;
-    float p_level_old[8], p_freq_old[8], p_q_old[8];
-    float hp_mode_old1, hp_freq_old1, hp_active_old1;
-    float lp_mode_old1, lp_freq_old1, lp_active_old1;
-    float ls_level_old1, ls_freq_old1, ls_active_old1;
-    float hs_level_old1, hs_freq_old1, hs_active_old1;
-    float p_level_old1[8], p_freq_old1[8], p_q_old1[8], p_active_old1[8];
-    enum CalfEqModes {
-        MODE12DB,
-        MODE24DB,
-        MODE36DB
-    };
-    CalfEqModes eq_mode, eq_mode_old1[2];
+    float p_level_old[PeakBands], p_freq_old[PeakBands], p_q_old[PeakBands];
+    float old_params_for_graph[graph_param_count];
     uint32_t clip_inL, clip_outL, clip_inR, clip_outR;
     float meter_inL, meter_outL, meter_inR, meter_outR;
-    biquad_d2<float> hpL[3], hpR[3], lpL[3], lpR[3];
+    biquad_d2<float> hp[3][2], lp[3][2];
     biquad_d2<float> lsL, lsR, hsL, hsR;
-    biquad_d2<float> pL[8], pR[8];
+    biquad_d2<float> pL[PeakBands], pR[PeakBands];
 public:
     typedef std::complex<double> cfloat;
     float *ins[in_count];
@@ -1070,149 +1068,23 @@ public:
     uint32_t srate;
     bool is_active;
     volatile int last_generation, last_calculated_generation;
-    equalizer12band_audio_module();
+    equalizerNband_audio_module();
     void activate();
     void deactivate();
     void params_changed();
-    float freq_gain(int index, double freq, uint32_t sr)
+    float freq_gain(int index, double freq, uint32_t sr);
+    void set_sample_rate(uint32_t sr)
     {
-        float ret = 1.f;
-        if(*params[param_hp_active] > 0.f) {
-            switch((int)*params[param_hp_mode]) {
-                case MODE12DB:
-                    ret *= hpL[0].freq_gain(freq, sr);
-                    ret *= hpR[0].freq_gain(freq, sr);
-                    break;
-                case MODE24DB:
-                    ret *= hpL[0].freq_gain(freq, sr) * hpL[0].freq_gain(freq, sr);
-                    ret *= hpR[0].freq_gain(freq, sr) * hpR[0].freq_gain(freq, sr);
-                    break;
-                case MODE36DB:
-                    ret *= hpL[0].freq_gain(freq, sr) * hpL[0].freq_gain(freq, sr) * hpL[0].freq_gain(freq, sr);
-                    ret *= hpR[0].freq_gain(freq, sr) * hpR[0].freq_gain(freq, sr) * hpR[0].freq_gain(freq, sr);
-                    break;
-            }
-        }
-        if(*params[param_lp_active] > 0.f) {
-            switch((int)*params[param_lp_mode]) {
-                case MODE12DB:
-                    ret *= lpL[0].freq_gain(freq, sr);
-                    ret *= lpR[0].freq_gain(freq, sr);
-                    break;
-                case MODE24DB:
-                    ret *= lpL[0].freq_gain(freq, sr) * lpL[0].freq_gain(freq, sr);
-                    ret *= lpR[0].freq_gain(freq, sr) * lpR[0].freq_gain(freq, sr);
-                    break;
-                case MODE36DB:
-                    ret *= lpL[0].freq_gain(freq, sr) * lpL[0].freq_gain(freq, sr) * lpL[0].freq_gain(freq, sr);
-                    ret *= lpR[0].freq_gain(freq, sr) * lpR[0].freq_gain(freq, sr) * lpR[0].freq_gain(freq, sr);
-                    break;
-            }
-        }
-        ret *= (*params[param_ls_active] > 0.f) ? lsL.freq_gain(freq, sr) : 1;
-        ret *= (*params[param_hs_active] > 0.f) ? hsL.freq_gain(freq, sr) : 1;
-        ret *= (*params[param_p1_active] > 0.f) ? pL[0].freq_gain(freq, sr) : 1;
-        ret *= (*params[param_p2_active] > 0.f) ? pL[1].freq_gain(freq, sr) : 1;
-        ret *= (*params[param_p3_active] > 0.f) ? pL[2].freq_gain(freq, sr) : 1;
-        ret *= (*params[param_p4_active] > 0.f) ? pL[3].freq_gain(freq, sr) : 1;
-        ret *= (*params[param_p5_active] > 0.f) ? pL[4].freq_gain(freq, sr) : 1;
-        ret *= (*params[param_p6_active] > 0.f) ? pL[5].freq_gain(freq, sr) : 1;
-        ret *= (*params[param_p7_active] > 0.f) ? pL[6].freq_gain(freq, sr) : 1;
-        ret *= (*params[param_p8_active] > 0.f) ? pL[7].freq_gain(freq, sr) : 1;
-        return ret;
+        srate = sr;
     }
-    void set_sample_rate(uint32_t sr);
     uint32_t process(uint32_t offset, uint32_t numsamples, uint32_t inputs_mask, uint32_t outputs_mask);
     bool get_graph(int index, int subindex, float *data, int points, cairo_iface *context);
     bool get_gridline(int index, int subindex, float &pos, bool &vertical, std::string &legend, cairo_iface *context);
     int  get_changed_offsets(int index, int generation, int &subindex_graph, int &subindex_dot, int &subindex_gridline);
 };
 
-/// Equalizer 8 Band by Markus Schmidt (based on Krzysztof's filters)
-class equalizer8band_audio_module: public audio_module<equalizer8band_metadata>, public frequency_response_line_graph  {
-private:
-    float hp_mode_old, hp_freq_old;
-    float lp_mode_old, lp_freq_old;
-    float ls_level_old, ls_freq_old;
-    float hs_level_old, hs_freq_old;
-    float p_level_old[4], p_freq_old[4], p_q_old[4];
-    float hp_mode_old1, hp_freq_old1, hp_active_old1;
-    float lp_mode_old1, lp_freq_old1, lp_active_old1;
-    float ls_level_old1, ls_freq_old1, ls_active_old1;
-    float hs_level_old1, hs_freq_old1, hs_active_old1;
-    float p_level_old1[4], p_freq_old1[4], p_q_old1[4], p_active_old1[4];
-    enum CalfEqModes {
-        MODE12DB,
-        MODE24DB,
-        MODE36DB
-    };
-    CalfEqModes eq_mode, eq_mode_old1[2];
-    uint32_t clip_inL, clip_outL, clip_inR, clip_outR;
-    float meter_inL, meter_outL, meter_inR, meter_outR;
-    biquad_d2<float> hpL[3], hpR[3], lpL[3], lpR[3];
-    biquad_d2<float> lsL, lsR, hsL, hsR;
-    biquad_d2<float> pL[4], pR[4];
-public:
-    typedef std::complex<double> cfloat;
-    float *ins[in_count];
-    float *outs[out_count];
-    float *params[param_count];
-    uint32_t srate;
-    bool is_active;
-    volatile int last_generation, last_calculated_generation;
-    equalizer8band_audio_module();
-    void activate();
-    void deactivate();
-    void params_changed();
-    float freq_gain(int index, double freq, uint32_t sr)
-    {
-        float ret = 1.f;
-        if(*params[param_hp_active] > 0.f) {
-            switch((int)*params[param_hp_mode]) {
-                case MODE12DB:
-                    ret *= hpL[0].freq_gain(freq, sr);
-                    ret *= hpR[0].freq_gain(freq, sr);
-                    break;
-                case MODE24DB:
-                    ret *= hpL[0].freq_gain(freq, sr) * hpL[0].freq_gain(freq, sr);
-                    ret *= hpR[0].freq_gain(freq, sr) * hpR[0].freq_gain(freq, sr);
-                    break;
-                case MODE36DB:
-                    ret *= hpL[0].freq_gain(freq, sr) * hpL[0].freq_gain(freq, sr) * hpL[0].freq_gain(freq, sr);
-                    ret *= hpR[0].freq_gain(freq, sr) * hpR[0].freq_gain(freq, sr) * hpR[0].freq_gain(freq, sr);
-                    break;
-            }
-        }
-        if(*params[param_lp_active] > 0.f) {
-            switch((int)*params[param_lp_mode]) {
-                case MODE12DB:
-                    ret *= lpL[0].freq_gain(freq, sr);
-                    ret *= lpR[0].freq_gain(freq, sr);
-                    break;
-                case MODE24DB:
-                    ret *= lpL[0].freq_gain(freq, sr) * lpL[0].freq_gain(freq, sr);
-                    ret *= lpR[0].freq_gain(freq, sr) * lpR[0].freq_gain(freq, sr);
-                    break;
-                case MODE36DB:
-                    ret *= lpL[0].freq_gain(freq, sr) * lpL[0].freq_gain(freq, sr) * lpL[0].freq_gain(freq, sr);
-                    ret *= lpR[0].freq_gain(freq, sr) * lpR[0].freq_gain(freq, sr) * lpR[0].freq_gain(freq, sr);
-                    break;
-            }
-        }
-        ret *= (*params[param_ls_active] > 0.f) ? lsL.freq_gain(freq, sr) : 1;
-        ret *= (*params[param_hs_active] > 0.f) ? hsL.freq_gain(freq, sr) : 1;
-        ret *= (*params[param_p1_active] > 0.f) ? pL[0].freq_gain(freq, sr) : 1;
-        ret *= (*params[param_p2_active] > 0.f) ? pL[1].freq_gain(freq, sr) : 1;
-        ret *= (*params[param_p3_active] > 0.f) ? pL[2].freq_gain(freq, sr) : 1;
-        ret *= (*params[param_p4_active] > 0.f) ? pL[3].freq_gain(freq, sr) : 1;
-        return ret;
-    }
-    void set_sample_rate(uint32_t sr);
-    uint32_t process(uint32_t offset, uint32_t numsamples, uint32_t inputs_mask, uint32_t outputs_mask);
-    bool get_graph(int index, int subindex, float *data, int points, cairo_iface *context);
-    bool get_gridline(int index, int subindex, float &pos, bool &vertical, std::string &legend, cairo_iface *context);
-    int  get_changed_offsets(int index, int generation, int &subindex_graph, int &subindex_dot, int &subindex_gridline);
-};
+typedef equalizerNband_audio_module<equalizer8band_metadata> equalizer8band_audio_module;
+typedef equalizerNband_audio_module<equalizer12band_metadata> equalizer12band_audio_module;
 
 /// Equalizer 5 Band by Markus Schmidt (based on Krzysztof's filters)
 class equalizer5band_audio_module: public audio_module<equalizer5band_metadata>, public frequency_response_line_graph  {

@@ -92,6 +92,12 @@ public:
     PLUGIN_NAME_ID_LABEL("multichorus", "multichorus", "Multi Chorus")
 };
 
+enum CalfEqMode {
+    MODE12DB,
+    MODE24DB,
+    MODE36DB
+};
+
 /// Monosynth - metadata
 struct monosynth_metadata: public plugin_metadata<monosynth_metadata>
 {
@@ -211,6 +217,7 @@ struct equalizer8band_metadata: public plugin_metadata<equalizer8band_metadata>
            param_p3_active, param_p3_level, param_p3_freq, param_p3_q,
            param_p4_active, param_p4_level, param_p4_freq, param_p4_q,
            param_count };
+    enum { PeakBands = 4, first_graph_param = param_hp_active, last_graph_param = param_p4_q };
     PLUGIN_NAME_ID_LABEL("equalizer8band", "equalizer8band", "Equalizer 8 Band")
 };
 /// Markus's 12-band EQ - metadata
@@ -232,6 +239,7 @@ struct equalizer12band_metadata: public plugin_metadata<equalizer12band_metadata
            param_p7_active, param_p7_level, param_p7_freq, param_p7_q,
            param_p8_active, param_p8_level, param_p8_freq, param_p8_q,
            param_count };
+    enum { PeakBands = 8, first_graph_param = param_hp_active, last_graph_param = param_p8_q };
     PLUGIN_NAME_ID_LABEL("equalizer12band", "equalizer12band", "Equalizer 12 Band")
 };
 

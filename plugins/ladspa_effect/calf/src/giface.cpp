@@ -21,6 +21,7 @@
 #include <assert.h>
 #include <memory.h>
 #include <calf/giface.h>
+#include <calf/osctlnet.h>
 #include <stdio.h>
 using namespace std;
 using namespace calf_utils;
@@ -202,12 +203,10 @@ void calf_plugins::plugin_ctl_iface::clear_preset() {
 
 const char *calf_plugins::load_gui_xml(const std::string &plugin_id)
 {
-#if 0
     try {
         return strdup(calf_utils::load_file((std::string(PKGLIBDIR) + "/gui-" + plugin_id + ".xml").c_str()).c_str());
     }
     catch(file_exception e)
-#endif
     {
         return NULL;
     }
@@ -233,6 +232,63 @@ bool calf_plugins::check_for_string_ports(parameter_properties *parameters, int 
             return false;
     }
     return false;
+}
+
+bool calf_plugins::get_freq_gridline(int subindex, float &pos, bool &vertical, std::string &legend, cairo_iface *context, bool use_frequencies)
+{
+    if (subindex < 0 )
+	return false;
+    if (use_frequencies)
+    {
+        if (subindex < 28)
+        {
+            vertical = true;
+            if (subindex == 9) legend = "100 Hz";
+            if (subindex == 18) legend = "1 kHz";
+            if (subindex == 27) legend = "10 kHz";
+            float freq = 100;
+            if (subindex < 9)
+                freq = 10 * (subindex + 1);
+            else if (subindex < 18)
+                freq = 100 * (subindex - 9 + 1);
+            else if (subindex < 27)
+                freq = 1000 * (subindex - 18 + 1);
+            else
+                freq = 10000 * (subindex - 27 + 1);
+            pos = log(freq / 20.0) / log(1000);
+            if (!legend.empty())
+                context->set_source_rgba(0, 0, 0, 0.2);
+            else
+                context->set_source_rgba(0, 0, 0, 0.1);
+            return true;
+        }
+        subindex -= 28;
+    }
+    if (subindex >= 32)
+        return false;
+    float gain = 16.0 / (1 << subindex);
+    pos = dB_grid(gain);
+    if (pos < -1)
+        return false;
+    if (subindex != 4)
+        context->set_source_rgba(0, 0, 0, subindex & 1 ? 0.1 : 0.2);
+    if (!(subindex & 1))
+    {
+        std::stringstream ss;
+        ss << (24 - 6 * subindex) << " dB";
+        legend = ss.str();
+    }
+    vertical = false;
+    return true;
+}
+
+void calf_plugins::set_channel_color(cairo_iface *context, int channel)
+{
+    if (channel & 1)
+        context->set_source_rgba(0.35, 0.4, 0.2, 1);
+    else
+        context->set_source_rgba(0.35, 0.4, 0.2, 0.5);
+    context->set_line_width(1.5);
 }
 
 #if USE_DSSI
@@ -322,4 +378,5 @@ calf_plugins::dssi_feedback_sender::~dssi_feedback_sender()
     // client->send("/iQuit");
     delete client;
 }
+
 #endif
