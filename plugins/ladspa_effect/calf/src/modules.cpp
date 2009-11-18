@@ -281,7 +281,7 @@ CALF_PORT_PROPS(sidechaincompressor) = {
     { 0,      0,  1,    0, PF_BOOL | PF_CTL_LED | PF_PROP_OUTPUT | PF_PROP_OPTIONAL, NULL, "f2_active", "F2 Active" },
 };
 
-CALF_PLUGIN_INFO(sidechaincompressor) = { 0x8502, "Sidechaincompressor", "Calf Sidechain Compressor", "Markus Schmidt / Thor Harald Johansen", calf_plugins::calf_copyright_info, "CompressorPlugin" };
+CALF_PLUGIN_INFO(sidechaincompressor) = { 0x8517, "Sidechaincompressor", "Calf Sidechain Compressor", "Markus Schmidt / Thor Harald Johansen", calf_plugins::calf_copyright_info, "CompressorPlugin" };
 
 ////////////////////////////////////////////////////////////////////////////
 
@@ -367,7 +367,7 @@ CALF_PORT_PROPS(multibandcompressor) = {
     { 0,           0,           1,     0,  PF_BOOL | PF_CTL_TOGGLE, NULL, "mute3", "Mute 4" },
 };
 
-CALF_PLUGIN_INFO(multibandcompressor) = { 0x8502, "Multibandcompressor", "Calf Multiband Compressor", "Markus Schmidt / Thor Harald Johansen", calf_plugins::calf_copyright_info, "CompressorPlugin" };
+CALF_PLUGIN_INFO(multibandcompressor) = { 0x8516, "Multibandcompressor", "Calf Multiband Compressor", "Markus Schmidt / Thor Harald Johansen", calf_plugins::calf_copyright_info, "CompressorPlugin" };
 
 ////////////////////////////////////////////////////////////////////////////
 
@@ -398,7 +398,7 @@ CALF_PORT_PROPS(deesser) = {
     { 0,      0,  1,    0, PF_BOOL | PF_CTL_TOGGLE, NULL, "sc_listen", "S/C-Listen" },
 };
 
-CALF_PLUGIN_INFO(deesser) = { 0x8502, "Deesser", "Calf Deesser", "Markus Schmidt / Thor Harald Johansen", calf_plugins::calf_copyright_info, "CompressorPlugin" };
+CALF_PLUGIN_INFO(deesser) = { 0x8515, "Deesser", "Calf Deesser", "Markus Schmidt / Thor Harald Johansen", calf_plugins::calf_copyright_info, "CompressorPlugin" };
 
 ////////////////////////////////////////////////////////////////////////////
 // A few macros to make 
@@ -453,7 +453,7 @@ CALF_PORT_PROPS(equalizer5band) = {
     EQ_BAND_PARAMS(3, 2500)
 };
 
-CALF_PLUGIN_INFO(equalizer5band) = { 0x8501, "Equalizer5Band", "Calf Equalizer 5 Band", "Markus Schmidt", calf_plugins::calf_copyright_info, "EqualizerPlugin" };
+CALF_PLUGIN_INFO(equalizer5band) = { 0x8511, "Equalizer5Band", "Calf Equalizer 5 Band", "Markus Schmidt", calf_plugins::calf_copyright_info, "EqualizerPlugin" };
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -472,7 +472,7 @@ CALF_PORT_PROPS(equalizer8band) = {
     EQ_BAND_PARAMS(4, 5000)
 };
 
-CALF_PLUGIN_INFO(equalizer8band) = { 0x8501, "Equalizer8Band", "Calf Equalizer 8 Band", "Markus Schmidt", calf_plugins::calf_copyright_info, "EqualizerPlugin" };
+CALF_PLUGIN_INFO(equalizer8band) = { 0x8512, "Equalizer8Band", "Calf Equalizer 8 Band", "Markus Schmidt", calf_plugins::calf_copyright_info, "EqualizerPlugin" };
 
 ////////////////////////////////////////////////////////////////////////////
 
@@ -493,7 +493,7 @@ CALF_PORT_PROPS(equalizer12band) = {
     EQ_BAND_PARAMS(8, 6000)
 };
 
-CALF_PLUGIN_INFO(equalizer12band) = { 0x8501, "Equalizer12Band", "Calf Equalizer 12 Band", "Markus Schmidt", calf_plugins::calf_copyright_info, "EqualizerPlugin" };
+CALF_PLUGIN_INFO(equalizer12band) = { 0x8513, "Equalizer12Band", "Calf Equalizer 12 Band", "Markus Schmidt", calf_plugins::calf_copyright_info, "EqualizerPlugin" };
 
 ////////////////////////////////////////////////////////////////////////////
 
@@ -511,7 +511,7 @@ CALF_PORT_PROPS(pulsator) = {
     { 0,           0,           1,     0,  PF_BOOL | PF_CTL_TOGGLE, NULL, "mono", "Mono-in" },
 };
 
-CALF_PLUGIN_INFO(pulsator) = { 0x8502, "Pulsator", "Calf Pulsator", "Markus Schmidt", calf_plugins::calf_copyright_info, "ModulationPlugin" };
+CALF_PLUGIN_INFO(pulsator) = { 0x8514, "Pulsator", "Calf Pulsator", "Markus Schmidt", calf_plugins::calf_copyright_info, "ModulationPlugin" };
 
 ////////////////////////////////////////////////////////////////////////////
 
