@@ -192,14 +192,18 @@ struct deesser_metadata: public plugin_metadata<deesser_metadata>
 struct equalizer5band_metadata: public plugin_metadata<equalizer5band_metadata>
 {
     enum { in_count = 2, out_count = 2, ins_optional = 0, outs_optional = 0, support_midi = false, require_midi = false, rt_capable = true };
-    enum { param_bypass, param_level_in, param_level_out, param_meter_in,
-           param_meter_out, param_clip_in, param_clip_out,
+    enum { param_bypass, param_level_in, param_level_out, param_meter_inL, param_meter_inR,
+           param_meter_outL, param_meter_outR, param_clip_inL, param_clip_outL, param_clip_inR, param_clip_outR,
            param_ls_active, param_ls_level, param_ls_freq,
            param_hs_active, param_hs_level, param_hs_freq,
            param_p1_active, param_p1_level, param_p1_freq, param_p1_q,
            param_p2_active, param_p2_level, param_p2_freq, param_p2_q,
            param_p3_active, param_p3_level, param_p3_freq, param_p3_q,
            param_count };
+    // dummy parameter numbers, shouldn't be used EVER, they're only there to avoid pushing LP/HP filters to a separate class
+    // and potentially making inlining and optimization harder for the compiler
+    enum { param_lp_active = 0xDEADBEEF, param_hp_active, param_hp_mode, param_lp_mode, param_hp_freq, param_lp_freq };
+    enum { PeakBands = 3, first_graph_param = param_ls_active, last_graph_param = param_p3_q };
     PLUGIN_NAME_ID_LABEL("equalizer5band", "equalizer5band", "Equalizer 5 Band")
 };
 /// Markus's 8-band EQ - metadata
@@ -241,6 +245,16 @@ struct equalizer12band_metadata: public plugin_metadata<equalizer12band_metadata
            param_count };
     enum { PeakBands = 8, first_graph_param = param_hp_active, last_graph_param = param_p8_q };
     PLUGIN_NAME_ID_LABEL("equalizer12band", "equalizer12band", "Equalizer 12 Band")
+};
+
+/// Markus's Pulsator - metadata
+struct pulsator_metadata: public plugin_metadata<pulsator_metadata>
+{
+    enum { in_count = 2, out_count = 2, ins_optional = 0, outs_optional = 0, support_midi = false, require_midi = false, rt_capable = true };
+    enum { param_bypass, param_level_in, param_level_out, param_meter_inL, param_meter_inR,
+           param_meter_outL, param_meter_outR, param_clip_inL, param_clip_inR, param_clip_outL, param_clip_outR,
+           param_mode, param_freq, param_amount, param_offset, param_mono, param_count };
+    PLUGIN_NAME_ID_LABEL("pulsator", "pulsator", "Pulsator")
 };
 
 /// Organ - enums for parameter IDs etc. (this mess is caused by organ split between plugin and generic class - which was

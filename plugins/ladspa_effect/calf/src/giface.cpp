@@ -21,7 +21,6 @@
 #include <assert.h>
 #include <memory.h>
 #include <calf/giface.h>
-#include <calf/osctlnet.h>
 #include <stdio.h>
 using namespace std;
 using namespace calf_utils;
@@ -203,6 +202,7 @@ void calf_plugins::plugin_ctl_iface::clear_preset() {
 
 const char *calf_plugins::load_gui_xml(const std::string &plugin_id)
 {
+#if 0
     try {
         return strdup(calf_utils::load_file((std::string(PKGLIBDIR) + "/gui-" + plugin_id + ".xml").c_str()).c_str());
     }
@@ -210,6 +210,7 @@ const char *calf_plugins::load_gui_xml(const std::string &plugin_id)
     {
         return NULL;
     }
+#endif
 }
 
 bool calf_plugins::check_for_message_context_ports(parameter_properties *parameters, int count)
