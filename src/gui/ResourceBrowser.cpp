@@ -74,7 +74,7 @@ static ActionDesc resourceBrowserActions[] =
 
 
 ResourceBrowser::ResourceBrowser( QWidget * _parent ) :
-	sideBarWidget( tr( "Resource Browser" ),
+	SideBarWidget( tr( "Resource Browser" ),
 			embed::getIconPixmap( "resource_browser" ),
 			_parent ),
 	m_previewer(),

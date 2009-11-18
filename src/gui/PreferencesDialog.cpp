@@ -1,5 +1,5 @@
 /*
- * WelcomeScreen.h - header file for WelcomeScreen
+ * PreferencesDialog.cpp - implementation of PreferencesDialog
  *
  * Copyright (c) 2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -22,44 +22,34 @@
  *
  */
 
-#ifndef _WELCOME_SCREEN_H
-#define _WELCOME_SCREEN_H
-
-#include <QtCore/QModelIndex>
-#include <QtGui/QWidget>
-
-
-namespace Ui { class WelcomeScreen; }
-class QListWidgetItem;
-class RecentResourceListModel;
+#include "PreferencesDialog.h"
+#include "embed.h"
+#include "engine.h"
+#include "MainWindow.h"
+#include "ui_PreferencesDialog.h"
 
 
-class WelcomeScreen : public QWidget
+PreferencesDialog::PreferencesDialog() :
+	QDialog( engine::mainWindow() ),
+	ui( new Ui::PreferencesDialog )
 {
-	Q_OBJECT
-public:
-	WelcomeScreen( QWidget * _parent );
-	~WelcomeScreen();
+	ui->setupUi( this );
+
+	// set up icons in page selector view on the left side
+	static const char * icons[] = {
+		"preferences-system",
+		"folder-64",
+		"preferences-desktop-sound",
+		"setup-midi",
+		"setup-plugins"
+	} ;
+	for( int i = 0; i < qMin<int>( sizeof( icons ),
+								ui->configPageSelector->count() ); ++i )
+	{
+		ui->configPageSelector->item( i )->setIcon(
+									embed::getIconPixmap( icons[i] ) );
+	}
+}
 
 
-private slots:
-	void createNewProject();
-	void importProject();
-	void openTutorial();
-	void instantMidiAction();
-	void openRecentProject( const QModelIndex & );
-	void openCommunityResource( const QModelIndex & );
-	void openOnlineResource( QListWidgetItem * _item );
-
-
-private:
-	void hideWelcomeScreen();
-
-	Ui::WelcomeScreen * ui;
-	RecentResourceListModel * m_recentProjectsModel;
-	RecentResourceListModel * m_communityResourcesModel;
-
-} ;
-
-#endif
 

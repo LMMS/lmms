@@ -30,7 +30,8 @@
 #ifdef LMMS_HAVE_ALSA
 
 #include <alsa/asoundlib.h>
-#include "QAbstractListModel"
+#include <QAbstractListModel>
+#include <QPair>
 
 
 class AlsaDeviceListModel : public QAbstractListModel

@@ -1,5 +1,5 @@
 /*
- * WelcomeScreen.h - header file for WelcomeScreen
+ * PreferencesDialog.h - declaration of class PreferencesDialog
  *
  * Copyright (c) 2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -22,42 +22,20 @@
  *
  */
 
-#ifndef _WELCOME_SCREEN_H
-#define _WELCOME_SCREEN_H
+#ifndef _PREFERENCES_DIALOG_H
+#define _PREFERENCES_DIALOG_H
 
-#include <QtCore/QModelIndex>
-#include <QtGui/QWidget>
+#include <QtGui/QDialog>
 
+namespace Ui { class PreferencesDialog; }
 
-namespace Ui { class WelcomeScreen; }
-class QListWidgetItem;
-class RecentResourceListModel;
-
-
-class WelcomeScreen : public QWidget
+class PreferencesDialog : public QDialog
 {
-	Q_OBJECT
 public:
-	WelcomeScreen( QWidget * _parent );
-	~WelcomeScreen();
-
-
-private slots:
-	void createNewProject();
-	void importProject();
-	void openTutorial();
-	void instantMidiAction();
-	void openRecentProject( const QModelIndex & );
-	void openCommunityResource( const QModelIndex & );
-	void openOnlineResource( QListWidgetItem * _item );
-
+	PreferencesDialog();
 
 private:
-	void hideWelcomeScreen();
-
-	Ui::WelcomeScreen * ui;
-	RecentResourceListModel * m_recentProjectsModel;
-	RecentResourceListModel * m_communityResourcesModel;
+	Ui::PreferencesDialog * ui;
 
 } ;
 

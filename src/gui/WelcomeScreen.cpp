@@ -112,7 +112,7 @@ WelcomeScreen::~WelcomeScreen()
 
 void WelcomeScreen::createNewProject()
 {
-	switchView();
+	hideWelcomeScreen();
 }
 
 
@@ -141,7 +141,7 @@ void WelcomeScreen::instantMidiAction()
 
 void WelcomeScreen::openRecentProject( const QModelIndex & _idx )
 {
-	switchView();
+	hideWelcomeScreen();
 	ResourceAction( m_recentProjectsModel->item( _idx ) ).loadProject();
 }
 
@@ -156,7 +156,7 @@ void WelcomeScreen::openCommunityResource( const QModelIndex & _idx )
 	switch( item->type() )
 	{
 		case ResourceItem::TypeProject:
-			switchView();
+			hideWelcomeScreen();
 			action.loadProject();
 			break;
 		default:
@@ -177,9 +177,9 @@ void WelcomeScreen::openOnlineResource( QListWidgetItem * _item )
 
 
 
-void WelcomeScreen::switchView()
+void WelcomeScreen::hideWelcomeScreen()
 {
-	engine::mainWindow()->setMainWidgetVisible( true );
+	engine::mainWindow()->showWelcomeScreen( false );
 }
 
 

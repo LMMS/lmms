@@ -356,6 +356,9 @@ p, li { white-space: pre-wrap; }
           <property name="verticalScrollBarPolicy">
            <enum>Qt::ScrollBarAlwaysOff</enum>
           </property>
+          <property name="horizontalScrollBarPolicy">
+           <enum>Qt::ScrollBarAlwaysOff</enum>
+          </property>
           <property name="iconSize">
            <size>
             <width>16</width>
@@ -373,6 +376,9 @@ p, li { white-space: pre-wrap; }
            <enum>QFrame::NoFrame</enum>
           </property>
           <property name="verticalScrollBarPolicy">
+           <enum>Qt::ScrollBarAlwaysOff</enum>
+          </property>
+          <property name="horizontalScrollBarPolicy">
            <enum>Qt::ScrollBarAlwaysOff</enum>
           </property>
           <property name="iconSize">

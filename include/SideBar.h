@@ -1,7 +1,7 @@
 /*
- * WelcomeScreen.h - header file for WelcomeScreen
+ * SideBar.h - side-bar in LMMS' MainWindow
  *
- * Copyright (c) 2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -22,44 +22,36 @@
  *
  */
 
-#ifndef _WELCOME_SCREEN_H
-#define _WELCOME_SCREEN_H
+#ifndef _SIDE_BAR_H
+#define _SIDE_BAR_H
 
-#include <QtCore/QModelIndex>
-#include <QtGui/QWidget>
+#include <QtCore/QMap>
+#include <QtGui/QButtonGroup>
+#include <QtGui/QToolBar>
+
+class QToolButton;
+class SideBarWidget;
 
 
-namespace Ui { class WelcomeScreen; }
-class QListWidgetItem;
-class RecentResourceListModel;
-
-
-class WelcomeScreen : public QWidget
+class SideBar : public QToolBar
 {
 	Q_OBJECT
 public:
-	WelcomeScreen( QWidget * _parent );
-	~WelcomeScreen();
+	SideBar( Qt::Orientation _orientation, QWidget * _parent );
+	virtual ~SideBar();
+
+	void appendTab( SideBarWidget * _sbw );
 
 
 private slots:
-	void createNewProject();
-	void importProject();
-	void openTutorial();
-	void instantMidiAction();
-	void openRecentProject( const QModelIndex & );
-	void openCommunityResource( const QModelIndex & );
-	void openOnlineResource( QListWidgetItem * _item );
+	void toggleButton( QAbstractButton * _btn );
 
 
 private:
-	void hideWelcomeScreen();
-
-	Ui::WelcomeScreen * ui;
-	RecentResourceListModel * m_recentProjectsModel;
-	RecentResourceListModel * m_communityResourcesModel;
+	QButtonGroup m_btnGroup;
+	typedef QMap<QToolButton *, QWidget *> ButtonMap;
+	ButtonMap m_widgets;
 
 } ;
 
 #endif
-

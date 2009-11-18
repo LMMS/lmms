@@ -51,9 +51,10 @@
 #include "engine.h"
 #include "FxMixerView.h"
 #include "AboutDialog.h"
+#include "PreferencesDialog.h"
 #include "ControllerRackView.h"
 #include "plugin_browser.h"
-#include "side_bar.h"
+#include "SideBar.h"
 #include "config_mgr.h"
 #include "mixer.h"
 #include "project_notes.h"
@@ -92,26 +93,22 @@ MainWindow::MainWindow() :
 	vbox->setSpacing( 0 );
 	vbox->setMargin( 0 );
 
-
 	QWidget * w = new QWidget( m_mainWidget );
 	QHBoxLayout * hbox = new QHBoxLayout( w );
 	hbox->setSpacing( 0 );
 	hbox->setMargin( 0 );
 
-	sideBar * side_bar = new sideBar( sideBar::Vertical, w );
-	side_bar->setStyle( sideBar::VSNET/*KDEV3ICON*/ );
-	side_bar->setPosition( sideBar::Left );
+	SideBar * sideBar = new SideBar( Qt::Vertical, w );
 
 	QSplitter * splitter = new QSplitter( Qt::Horizontal, w );
 	splitter->setChildrenCollapsible( false );
 
-	int id = 0;
 	QString wdir = configManager::inst()->workingDir();
-	side_bar->appendTab( new pluginBrowser( splitter ), ++id );
+	sideBar->appendTab( new pluginBrowser( splitter ) );
 
 	// add a resource browser to sidebar
 	m_resourceBrowser = new ResourceBrowser( splitter );
-	side_bar->appendTab( m_resourceBrowser, ++id );
+	sideBar->appendTab( m_resourceBrowser );
 
 
 	m_workspace = new QMdiArea( splitter );
@@ -136,7 +133,7 @@ MainWindow::MainWindow() :
 	m_workspace->setHorizontalScrollBarPolicy( Qt::ScrollBarAsNeeded );
 	m_workspace->setVerticalScrollBarPolicy( Qt::ScrollBarAsNeeded );
 
-	hbox->addWidget( side_bar );
+	hbox->addWidget( sideBar );
 	hbox->addWidget( splitter );
 
 
@@ -155,14 +152,11 @@ MainWindow::MainWindow() :
 	vbox->addWidget( m_toolBar );
 	vbox->addWidget( w );
 
+	m_updateTimer.start( 1000 / 20, this );	// 20 fps
 
 	m_welcomeScreen = new WelcomeScreen( this );
-
-	setCentralWidget( m_welcomeScreen );
-
-	m_updateTimer.start( 1000 / 20, this );	// 20 fps
+	m_welcomeScreen->setVisible( false );
 }
-
 
 
 
@@ -185,12 +179,11 @@ MainWindow::~MainWindow()
 
 
 
-
-void MainWindow::setMainWidgetVisible( bool _visible )
+void MainWindow::showWelcomeScreen(bool _visible)
 {
-	setCentralWidget( _visible ? m_mainWidget : m_welcomeScreen );
+	m_welcomeScreen->setVisible( _visible );
+	setCentralWidget( _visible ? m_welcomeScreen : m_mainWidget );
 }
-
 
 
 
@@ -265,6 +258,10 @@ void MainWindow::finalize()
 	edit_menu->addAction( embed::getIconPixmap( "setup_general" ),
 					tr( "Settings" ),
 					this, SLOT( showSettingsDialog() ) );
+	edit_menu->addSeparator();
+	edit_menu->addAction( embed::getIconPixmap( "setup_general" ),
+					tr( "Preferences (premature dialog)" ),
+					this, SLOT( showPreferencesDialog() ) );
 
 
 	m_toolsMenu = new QMenu( this );
@@ -315,8 +312,7 @@ void MainWindow::finalize()
 
 	// create the grid layout for the first buttons area
 	QWidget * gridButtons_w = new QWidget( m_toolBar );
-	QGridLayout * gridButtons_layout = new QGridLayout( gridButtons_w/*, 2, 1*/ );
-
+	QGridLayout * gridButtons_layout = new QGridLayout( gridButtons_w );
 
 	// create tool-buttons
 	toolButton * project_new = new toolButton(
@@ -1059,6 +1055,14 @@ void MainWindow::showSettingsDialog()
 
 
 
+void MainWindow::showPreferencesDialog()
+{
+	PreferencesDialog().exec();
+}
+
+
+
+
 void MainWindow::aboutLMMS()
 {
 	AboutDialog().exec();
@@ -1199,6 +1203,12 @@ void MainWindow::closeEvent( QCloseEvent * _ce )
 	}
 }
 
+
+void MainWindow::showEvent( QShowEvent * _se )
+{
+	//showWelcomeScreen( false ); // must explicitly ask for welcome screen
+	_se->accept();
+}
 
 
 
