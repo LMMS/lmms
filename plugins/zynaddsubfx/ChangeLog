@@ -828,6 +828,8 @@
 	    - Codul de recorder wav a fost rescris
 	    - Adaugata functia de export la sample-urile din PADsynth
 
+*  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *
+
 20 Feb 2009 (Mark McCurry)
 	    - Made several functions accept 'constant char' over 'char' to
 	      prevent warnings
