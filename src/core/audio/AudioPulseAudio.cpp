@@ -34,6 +34,7 @@
 #include "lcd_spinbox.h"
 #include "gui_templates.h"
 #include "templates.h"
+#include "engine.h"
 
 
 static void stream_write_callback(pa_stream *s, size_t length, void *userdata)
@@ -168,11 +169,29 @@ static void context_state_callback(pa_context *c, void *userdata)
 			_this->m_s = pa_stream_new( c, "lmms", &_this->m_sampleSpec,  NULL);
 			pa_stream_set_state_callback( _this->m_s, stream_state_callback, _this );
 			pa_stream_set_write_callback( _this->m_s, stream_write_callback, _this );
-			pa_stream_connect_playback( _this->m_s, NULL, NULL,
-						(pa_stream_flags) 0,
-						pa_cvolume_set( &cv, _this->m_sampleSpec.channels,
-											PA_VOLUME_NORM ),
-						NULL );
+
+			pa_buffer_attr buffer_attr;
+
+			buffer_attr.maxlength = (uint32_t)(-1);
+
+			// play silence in case of buffer underun instead of using default rewind
+			buffer_attr.prebuf = 0;
+
+			buffer_attr.minreq = (uint32_t)(-1);
+			buffer_attr.fragsize = (uint32_t)(-1);
+
+			double latency = (double)( engine::getMixer()->framesPerPeriod() ) /
+													(double)_this->sampleRate();
+
+			// ask PulseAudio for the desired latency (which might not be approved)
+			buffer_attr.tlength = pa_usec_to_bytes( latency * PA_USEC_PER_MSEC,
+														&_this->m_sampleSpec );
+
+			pa_stream_connect_playback( _this->m_s, NULL, &buffer_attr,
+										PA_STREAM_ADJUST_LATENCY,
+										pa_cvolume_set( &cv, _this->m_sampleSpec.channels,
+															PA_VOLUME_NORM ),
+										NULL );
 			break;
 		}
 
