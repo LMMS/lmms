@@ -50,6 +50,7 @@ AudioPulseAudio::AudioPulseAudio( bool & _success_ful, mixer * _mixer ) :
 					DEFAULT_CHANNELS, SURROUND_CHANNELS ),
 								_mixer ),
 	m_s( NULL ),
+	m_quit( false ),
 	m_convertEndian( false )
 {
 	_success_ful = false;
@@ -67,11 +68,6 @@ AudioPulseAudio::AudioPulseAudio( bool & _success_ful, mixer * _mixer ) :
 AudioPulseAudio::~AudioPulseAudio()
 {
 	stopProcessing();
-
-	if( m_s != NULL )
-	{
-		pa_stream_unref( m_s );
-	}
 }
 
 
@@ -194,50 +190,58 @@ static void context_state_callback(pa_context *c, void *userdata)
 
 void AudioPulseAudio::run()
 {
-	pa_mainloop * m = NULL;
-
-
-	if (!(m = pa_mainloop_new())) {
+	pa_mainloop * mainLoop = pa_mainloop_new();
+	if( !mainLoop )
+	{
 		qCritical( "pa_mainloop_new() failed.\n" );
 		return;
 	}
-	pa_mainloop_api * mainloop_api = pa_mainloop_get_api(m);
+	pa_mainloop_api * mainloop_api = pa_mainloop_get_api( mainLoop );
 
-	pa_context *context = pa_context_new(mainloop_api, "lmms");
+	pa_context *context = pa_context_new( mainloop_api, "lmms" );
 	if ( context == NULL )
 	{
-        	qCritical( "pa_context_new() failed." );
+		qCritical( "pa_context_new() failed." );
 		return;
 	}
 
-	pa_context_set_state_callback(context, context_state_callback, this );
-	/* Connect the context */
-	pa_context_connect(context, NULL, (pa_context_flags) 0, NULL);
+	pa_context_set_state_callback( context, context_state_callback, this  );
+	// connect the context
+	pa_context_connect( context, NULL, (pa_context_flags) 0, NULL );
 
-	int ret;
-	/* Run the main loop */
-	if (pa_mainloop_run(m, &ret) < 0)
+	// run the main loop
+	int ret = 0;
+	m_quit = false;
+	while( m_quit == false && pa_mainloop_iterate( mainLoop, 1, &ret ) >= 0 )
 	{
-		qCritical( "pa_mainloop_run() failed.\n" );
 	}
+
+	pa_stream_disconnect( m_s );
+	pa_stream_unref( m_s );
+
+	pa_context_disconnect( context );
+	pa_context_unref( context );
+
+	pa_mainloop_free( mainLoop );
 }
 
 
 
 
-void AudioPulseAudio::streamWriteCallback(pa_stream *s, size_t length)
+void AudioPulseAudio::streamWriteCallback( pa_stream *s, size_t length )
 {
 	const fpp_t fpp = getMixer()->framesPerPeriod();
 	surroundSampleFrame * temp = new surroundSampleFrame[fpp];
 	Sint16 * pcmbuf = (Sint16*)pa_xmalloc( fpp * channels() * sizeof(Sint16) );
 
 	size_t fd = 0;
-	while( fd < length/4 )
+	while( fd < length/4 && m_quit == false )
 	{
 		const fpp_t frames = getNextBuffer( temp );
 		if( !frames )
 		{
-			return;
+			m_quit = true;
+			break;
 		}
 		int bytes = convertToS16( temp, frames,
 						getMixer()->masterGain(),
