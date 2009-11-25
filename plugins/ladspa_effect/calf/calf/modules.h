@@ -1103,6 +1103,7 @@ public:
     void set_params(float f, int m, float o, uint32_t sr, float amount = 1.f);
     float get_value();
     void advance(uint32_t count);
+    void set_phase(float ph);
     void activate();
     void deactivate();
     float get_value_from_phase(float ph, float off);
@@ -1117,6 +1118,7 @@ private:
     float meter_inL, meter_inR, meter_outL, meter_outR;
     float offset_old;
     int mode_old;
+    bool clear_reset;
     lfo_audio_module lfoL, lfoR;
 public:
     float *ins[in_count];
@@ -1129,6 +1131,13 @@ public:
     void deactivate();
     void params_changed();
     void set_sample_rate(uint32_t sr);
+    void params_reset()
+    {
+        if (clear_reset) {
+            *params[param_reset] = 0.f;
+            clear_reset = false;
+        }
+    }
     uint32_t process(uint32_t offset, uint32_t numsamples, uint32_t inputs_mask, uint32_t outputs_mask);
     bool get_graph(int index, int subindex, float *data, int points, cairo_iface *context);
     bool get_dot(int index, int subindex, float &x, float &y, int &size, cairo_iface *context);

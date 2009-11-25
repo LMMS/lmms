@@ -2151,6 +2151,14 @@ void lfo_audio_module::advance(uint32_t count)
         phase = fmod(phase, 1.f);
 }
 
+void lfo_audio_module::set_phase(float ph)
+{
+    //set the phase from outsinde
+    phase = fabs(ph);
+    if (phase >= 1.0)
+        phase = fmod(phase, 1.f);
+}
+
 void lfo_audio_module::set_params(float f, int m, float o, uint32_t sr, float a)
 {
     // freq: a value in Hz
@@ -2225,6 +2233,12 @@ void pulsator_audio_module::params_changed()
 {
     lfoL.set_params(*params[param_freq], *params[param_mode], 0.f, srate, *params[param_amount]);
     lfoR.set_params(*params[param_freq], *params[param_mode], *params[param_offset], srate, *params[param_amount]);
+    clear_reset = false;
+    if (*params[param_reset] >= 0.5) {
+        clear_reset = true;
+        lfoL.set_phase(0.f);
+        lfoR.set_phase(0.f);
+    }
 }
 
 void pulsator_audio_module::set_sample_rate(uint32_t sr)

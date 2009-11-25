@@ -509,6 +509,7 @@ CALF_PORT_PROPS(pulsator) = {
     { 1,           0,           1,     0,  PF_FLOAT | PF_SCALE_PERC, NULL, "amount", "Modulation" },
     { 0.5,         0,           1,     0,  PF_FLOAT | PF_SCALE_PERC, NULL, "offset", "Offset L/R" },
     { 0,           0,           1,     0,  PF_BOOL | PF_CTL_TOGGLE, NULL, "mono", "Mono-in" },
+    { 0,           0,           1,     2,  PF_BOOL | PF_CTL_BUTTON , NULL, "reset", "Reset" },
 };
 
 CALF_PLUGIN_INFO(pulsator) = { 0x8514, "Pulsator", "Calf Pulsator", "Markus Schmidt", calf_plugins::calf_copyright_info, "ModulationPlugin" };

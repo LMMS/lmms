@@ -253,7 +253,7 @@ struct pulsator_metadata: public plugin_metadata<pulsator_metadata>
     enum { in_count = 2, out_count = 2, ins_optional = 0, outs_optional = 0, support_midi = false, require_midi = false, rt_capable = true };
     enum { param_bypass, param_level_in, param_level_out, param_meter_inL, param_meter_inR,
            param_meter_outL, param_meter_outR, param_clip_inL, param_clip_inR, param_clip_outL, param_clip_outR,
-           param_mode, param_freq, param_amount, param_offset, param_mono, param_count };
+           param_mode, param_freq, param_amount, param_offset, param_mono, param_reset, param_count };
     PLUGIN_NAME_ID_LABEL("pulsator", "pulsator", "Pulsator")
 };
 
