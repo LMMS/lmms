@@ -104,6 +104,11 @@ fpp_t AudioDevice::getNextBuffer( sampleFrameA * _ab )
 	// release lock
 	unlock();
 
+	if( getMixer()->hasFifoWriter() )
+	{
+		CPU::freeFrames( b );
+	}
+
 	return frames;
 }
 

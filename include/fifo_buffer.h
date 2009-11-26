@@ -41,10 +41,6 @@ public:
 		m_size( _size )
 	{
 		m_buffer = new T[_size];
-		for( int i = 0; i < m_size; ++i )
-		{
-			m_buffer[i] = NULL;
-		}
 		m_readerSem.acquire( _size );
 	}
 
@@ -54,15 +50,9 @@ public:
 		m_readerSem.release( m_size );
 	}
 
-	T nextWriteBuffer()
-	{
-		m_writerSem.acquire();
-		T buf = m_buffer[m_writerIndex];
-		return buf;
-	}
-
 	void write( T _element )
 	{
+		m_writerSem.acquire();
 		m_buffer[m_writerIndex++] = _element;
 		m_writerIndex %= m_size;
 		m_readerSem.release();

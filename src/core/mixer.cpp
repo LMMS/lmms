@@ -1151,12 +1151,8 @@ void mixer::fifoWriter::run()
 	const fpp_t frames = m_mixer->framesPerPeriod();
 	while( m_writing )
 	{
+		sampleFrameA * buffer = CPU::allocFrames( frames );
 		const sampleFrameA * b = m_mixer->renderNextBuffer();
-		sampleFrameA * buffer = m_fifo->nextWriteBuffer();
-		if( buffer == NULL )
-		{
-			buffer = CPU::allocFrames( frames );
-		}
 		CPU::memCpy( buffer, b, frames * sizeof( sampleFrameA ) );
 		m_fifo->write( buffer );
 	}
