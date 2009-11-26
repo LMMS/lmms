@@ -25,68 +25,69 @@
 #include <stdio.h>
 
 MIDIEvents::MIDIEvents()
-{
-};
+{}
 
 MIDIEvents::~MIDIEvents()
-{
-};
+{}
 
 
 /************** Track stuff ***************/
-void MIDIEvents::writeevent(list *l,event *ev)
+void MIDIEvents::writeevent(list *l, event *ev)
 {
-    listpos *tmp=new listpos;
-    tmp->next=NULL;
-    tmp->ev=*ev;
-    if (l->current!=NULL) l->current->next=tmp;
-    else l->first=tmp;
-    l->current=tmp;
+    listpos *tmp = new listpos;
+    tmp->next = NULL;
+    tmp->ev   = *ev;
+    if(l->current != NULL)
+        l->current->next = tmp;
+    else
+        l->first = tmp;
+    l->current = tmp;
 //    printf("Wx%x ",(int) l->current);
 //    printf("-> %d  \n",l->current->ev.deltatime);
     l->size++;
-};
+}
 
-void MIDIEvents::readevent(list *l,event *ev)
+void MIDIEvents::readevent(list *l, event *ev)
 {
-    if (l->current==NULL) {
-        ev->type=-1;
+    if(l->current == NULL) {
+        ev->type = -1;
         return;
-    };
-    *ev=l->current->ev;
-    l->current=l->current->next;
+    }
+    *ev = l->current->ev;
+    l->current = l->current->next;
 
     //test
-    if (l->current!=NULL) {
+    if(l->current != NULL) {
 //	ev->deltatime=10000;
 //	printf("Rx%d\n",l->current->ev.deltatime);
 //	printf("Rx%x  ",(int) l->current);
 //	printf("-> %d  (next=%x) \n",(int)l->current->ev.deltatime,(int)l->current->next);
-    };
-
-};
+    }
+}
 
 
 void MIDIEvents::rewindlist(list *l)
 {
-    l->current=l->first;
-};
+    l->current = l->first;
+}
 
 void MIDIEvents::deletelist(list *l)
 {
-    l->current=l->first;
-    if (l->current==NULL) return;
-    while (l->current->next!=NULL) {
-        listpos *tmp=l->current;
-        l->current=l->current->next;
-        delete(tmp);
-    };
+    l->current = l->first;
+    if(l->current == NULL)
+        return;
+    while(l->current->next != NULL) {
+        listpos *tmp = l->current;
+        l->current = l->current->next;
+        delete (tmp);
+    }
     deletelistreference(l);
-};
+}
 
 void MIDIEvents::deletelistreference(list *l)
 {
-    l->current=l->first=NULL;
-    l->size=0;
-    l->length=0.0;
-};
+    l->current = l->first = NULL;
+    l->size    = 0;
+    l->length  = 0.0;
+}
+

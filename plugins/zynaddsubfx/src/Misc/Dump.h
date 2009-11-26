@@ -30,34 +30,35 @@
  * \todo upgrade from stdio to iostream*/
 class Dump
 {
-public:
-    /**Constructor*/
-    Dump();
-    /**Destructor
-     * Closes the dumpfile*/
-    ~Dump();
-    /**Open dumpfile and prepare it for dumps
-     * \todo see if this fits better in the constructor*/
-    void startnow();
-    /**Tick the timestamp*/
-    void inctick();
-    /**Dump Note to dumpfile
-     * @param chan The channel of the note
-     * @param note The note
-     * @param vel The velocity of the note*/
-    void dumpnote(char chan,char note, char vel);
-    /** Dump the Controller
-     * @param chan The channel of the Controller
-     * @param type The type
-     * @param par The value of the controller
-     * \todo figure out what type is exactly meaning*/
-    void dumpcontroller(char chan,unsigned int type,int par);
+    public:
+        /**Constructor*/
+        Dump();
+        /**Destructor
+         * Closes the dumpfile*/
+        ~Dump();
+        /**Open dumpfile and prepare it for dumps
+         * \todo see if this fits better in the constructor*/
+        void startnow();
+        /**Tick the timestamp*/
+        void inctick();
+        /**Dump Note to dumpfile
+         * @param chan The channel of the note
+         * @param note The note
+         * @param vel The velocity of the note*/
+        void dumpnote(char chan, char note, char vel);
+        /** Dump the Controller
+         * @param chan The channel of the Controller
+         * @param type The type
+         * @param par The value of the controller
+         * \todo figure out what type is exactly meaning*/
+        void dumpcontroller(char chan, unsigned int type, int par);
 
-private:
-    FILE *file;
-    int tick;
-    int k;//This appears to be a constant used to flush the file
-    //periodically when JACK is used
-    int keyspressed;
+    private:
+        FILE *file;
+        int   tick;
+        int   k; //This appears to be a constant used to flush the file
+        //periodically when JACK is used
+        int keyspressed;
 };
 #endif
+

@@ -1,5 +1,5 @@
 //
-// "$Id: Fl_Text_Buffer.cxx 6765 2009-04-15 08:35:28Z matt $"
+// "$Id: Fl_Text_Buffer.cxx 6825 2009-07-04 05:18:29Z fabien $"
 //
 // Copyright 2001-2009 by Bill Spitzak and others.
 // Original code Copyright Mark Edel.  Permission to distribute under
@@ -2502,5 +2502,5 @@ Fl_Text_Buffer::outputfile(const char *file, int start, int end, int buflen) {
 
 
 //
-// End of "$Id: Fl_Text_Buffer.cxx 6765 2009-04-15 08:35:28Z matt $".
+// End of "$Id: Fl_Text_Buffer.cxx 6825 2009-07-04 05:18:29Z fabien $".
 //

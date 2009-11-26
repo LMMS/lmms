@@ -1,8 +1,8 @@
 /*
- * side_bar_widget.h - base-class for all side-bar-widgets
+ * SideBarWidget.h - base-class for all side-bar-widgets
  *
  * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -22,7 +22,6 @@
  *
  */
 
-
 #ifndef _SIDE_BAR_WIDGET_H
 #define _SIDE_BAR_WIDGET_H
 
@@ -31,41 +30,42 @@
 #include <QtGui/QWidget>
 
 
-class sideBarWidget : public QWidget
+class SideBarWidget : public QWidget
 {
 	Q_OBJECT
 public:
-	sideBarWidget( const QString & _title, const QPixmap & _icon,
+	SideBarWidget( const QString & _title, const QPixmap & _icon,
 							QWidget * _parent );
-	virtual ~sideBarWidget();
+	virtual ~SideBarWidget();
+
 	inline const QPixmap & icon() const
 	{
-		return( m_icon );
+		return m_icon;
 	}
 	inline const QString & title() const
 	{
-		return( m_title );
+		return m_title;
 	}
 
 
 protected:
 	virtual void paintEvent( QPaintEvent * _pe );
 	virtual void resizeEvent( QResizeEvent * _re );
-	inline virtual void contextMenuEvent( QContextMenuEvent * )
+	virtual void contextMenuEvent( QContextMenuEvent * )
 	{
 	}
 
-	inline QWidget * contentParent()
+	QWidget * contentParent()
 	{
 		return( m_contents );
 	}
 
-	inline void addContentWidget( QWidget * _w )
+	void addContentWidget( QWidget * _w )
 	{
 		m_layout->addWidget( _w );
 	}
 
-	inline void addContentLayout( QLayout * _l )
+	void addContentLayout( QLayout * _l )
 	{
 		m_layout->addLayout( _l );
 	}
@@ -78,6 +78,5 @@ private:
 	QPixmap m_icon;
 
 } ;
-
 
 #endif

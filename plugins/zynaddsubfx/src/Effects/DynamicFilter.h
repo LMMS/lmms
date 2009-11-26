@@ -30,42 +30,42 @@
 /**DynamicFilter Effect*/
 class DynamicFilter:public Effect
 {
-public:
-    DynamicFilter(int insetion_,REALTYPE *efxoutl_,REALTYPE *efxoutr_);
-    ~DynamicFilter();
-    void out(REALTYPE *smpsl,REALTYPE *smpsr);
+    public:
+        DynamicFilter(int insetion_, REALTYPE *efxoutl_, REALTYPE *efxoutr_);
+        ~DynamicFilter();
+        void out(REALTYPE *smpsl, REALTYPE *smpsr);
 
-    void setpreset(unsigned char npreset);
-    void changepar(const int &npar,const unsigned char &value);
-    unsigned char getpar(const int &npar)const;
-    void cleanup();
+        void setpreset(unsigned char npreset);
+        void changepar(const int &npar, const unsigned char &value);
+        unsigned char getpar(const int &npar) const;
+        void cleanup();
 
 //	void setdryonly();
 
-private:
-    //Parametrii DynamicFilter
-    EffectLFO lfo;//lfo-ul DynamicFilter
-    unsigned char Pvolume;
-    unsigned char Ppanning;
-    unsigned char Pdepth;/**<the depth of the lfo of the DynamicFilter*/
-    unsigned char Pampsns;/**<how the filter varies according to the input amplitude*/
-    unsigned char Pampsnsinv;//if the filter freq is lowered if the input amplitude rises
-    unsigned char Pampsmooth;//how smooth the input amplitude changes the filter
+    private:
+        //Parametrii DynamicFilter
+        EffectLFO     lfo; //lfo-ul DynamicFilter
+        unsigned char Pvolume;
+        unsigned char Ppanning;
+        unsigned char Pdepth; /**<the depth of the lfo of the DynamicFilter*/
+        unsigned char Pampsns; /**<how the filter varies according to the input amplitude*/
+        unsigned char Pampsnsinv; //if the filter freq is lowered if the input amplitude rises
+        unsigned char Pampsmooth; //how smooth the input amplitude changes the filter
 
-    //Parameter Control
-    void setvolume(const unsigned char &Pvolume);
-    void setpanning(const unsigned char &Ppanning);
-    void setdepth(const unsigned char &Pdepth);
-    void setampsns(const unsigned char &Pampsns);
+        //Parameter Control
+        void setvolume(const unsigned char &Pvolume);
+        void setpanning(const unsigned char &Ppanning);
+        void setdepth(const unsigned char &Pdepth);
+        void setampsns(const unsigned char &Pampsns);
 
-    void reinitfilter();
+        void reinitfilter();
 
-    //Internal Values
-    REALTYPE panning,depth,ampsns,ampsmooth;
+        //Internal Values
+        REALTYPE panning, depth, ampsns, ampsmooth;
 
-    Filter *filterl,*filterr;
+        Filter *filterl, *filterr;
 
-    REALTYPE ms1,ms2,ms3,ms4;//mean squares
+        REALTYPE ms1, ms2, ms3, ms4; //mean squares
 };
 
 #endif

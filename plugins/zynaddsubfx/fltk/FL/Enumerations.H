@@ -1,5 +1,5 @@
 //
-// "$Id: Enumerations.H 6735 2009-04-01 22:11:57Z engelsman $"
+// "$Id: Enumerations.H 6902 2009-09-27 11:06:56Z matt $"
 //
 // Enumerations for the Fast Light Tool Kit (FLTK).
 //
@@ -330,6 +330,8 @@ enum Fl_When { // Fl_Widget::when():
 
 /*@{*/
 
+// FIXME: These codes collide with valid Unicode keys
+
 #define FL_Button	0xfee8	///< A mouse button; use Fl_Button + n for mouse button n.
 #define FL_BackSpace	0xff08	///< The backspace key.
 #define FL_Tab		0xff09	///< The tab key.
@@ -391,6 +393,9 @@ enum Fl_When { // Fl_Widget::when():
 
 /*@{*/		// group: Event States
 
+// FIXME: it would be nice to have the modifiers in the upper 8 bit so that
+//        a unicode ke (24bit) can be sent as an unsigned with the modifiers.
+
 #define FL_SHIFT	0x00010000	///< One of the shift keys is down
 #define FL_CAPS_LOCK	0x00020000	///< The caps lock is on
 #define FL_CTRL		0x00040000	///< One of the ctrl keys is down
@@ -407,10 +412,15 @@ enum Fl_When { // Fl_Widget::when():
 #define FL_BUTTONS	0x7f000000	///< Any mouse button is pushed
 #define FL_BUTTON(n)	(0x00800000<<(n)) ///< Mouse button n (n > 0) is pushed
 
+#define FL_KEY_MASK 0x0000ffff  ///< All keys are 16 bit for now 
+                                //   FIXME: Unicode needs 24 bits!
+
 #ifdef __APPLE__
-#  define FL_COMMAND	FL_META		///< An alias for FL_CTRL on WIN32 and X11, or FL_META on MacOS X
+#  define FL_COMMAND	FL_META   ///< An alias for FL_CTRL on WIN32 and X11, or FL_META on MacOS X
+#  define FL_CONTROL  FL_CTRL   ///< An alias for FL_META on WIN32 and X11, or FL_META on MacOS X
 #else
 #  define FL_COMMAND	FL_CTRL		///< An alias for FL_CTRL on WIN32 and X11, or FL_META on MacOS X
+#  define FL_CONTROL  FL_META   ///< An alias for FL_META on WIN32 and X11, or FL_META on MacOS X
 #endif // __APPLE__
 
 /*@}*/		// group: Event States
@@ -689,7 +699,7 @@ extern FL_EXPORT Fl_Fontsize FL_NORMAL_SIZE;	///< normal font size
 
 /** \name Colors */
 /*@{*/
-/** The Fl_Color enumeration type holds a FLTK color value.
+/** The Fl_Color type holds an FLTK color value.
 
     Colors are either 8-bit indexes into a virtual colormap
     or 24-bit RGB color values.
@@ -697,75 +707,94 @@ extern FL_EXPORT Fl_Fontsize FL_NORMAL_SIZE;	///< normal font size
     Color indices occupy the lower 8 bits of the value, while
     RGB colors occupy the upper 24 bits, for a byte organization of RGBI.
     
-    \todo	enum Fl_Color needs some more comments for values,
-    		see Fl/Enumerations.H
+<pre>
+ Fl_Color => 0xrrggbbii
+                | | | |
+                | | | +--- index between 0 and 255
+                | | +----- blue color component (8 bit)
+                | +------- green component (8 bit)
+                +--------- red component (8 bit)
+ </pre>
+ 
+    A color can have either an index or an rgb value. Colors with rgb set 
+    and an index >0 are reserved for special use.
+ 
  */
 
-enum Fl_Color {	// standard colors
-  // These are used as default colors in widgets and altered as necessary
-  FL_FOREGROUND_COLOR   = 0,	///< the default foreground color (0) used for labels and text
-  FL_BACKGROUND2_COLOR  = 7,	///< the default background color for text, list, and valuator widgets
-  FL_INACTIVE_COLOR	= 8,	///< the inactive foreground color
-  FL_SELECTION_COLOR	= 15,	///< the default selection/highlight color
+typedef unsigned int Fl_Color;
+
+// Standard colors. These are used as default colors in widgets and altered as necessary
+const Fl_Color FL_FOREGROUND_COLOR  = 0;	///< the default foreground color (0) used for labels and text
+const Fl_Color FL_BACKGROUND2_COLOR = 7;	///< the default background color for text, list, and valuator widgets
+const Fl_Color FL_INACTIVE_COLOR    = 8;	///< the inactive foreground color
+const Fl_Color FL_SELECTION_COLOR   = 15;	///< the default selection/highlight color
 
   // boxtypes generally limit themselves to these colors so
   // the whole ramp is not allocated:
 
-  FL_GRAY0		= 32,	// 'A'
-  FL_DARK3		= 39,	// 'H'
-  FL_DARK2		= 45,   // 'N'
-  FL_DARK1		= 47,	// 'P'
-  FL_BACKGROUND_COLOR	= 49,	// 'R' default background color
-  FL_LIGHT1		= 50,	// 'S'
-  FL_LIGHT2		= 52,	// 'U'
-  FL_LIGHT3		= 54,	// 'W'
+const Fl_Color FL_GRAY0   = 32;	// 'A'
+const Fl_Color FL_DARK3   = 39;	// 'H'
+const Fl_Color FL_DARK2   = 45; // 'N'
+const Fl_Color FL_DARK1   = 47;	// 'P'
+const Fl_Color FL_BACKGROUND_COLOR  = 49;	// 'R' default background color
+const Fl_Color FL_LIGHT1  = 50;	// 'S'
+const Fl_Color FL_LIGHT2  = 52;	// 'U'
+const Fl_Color FL_LIGHT3  = 54;	// 'W'
 
   // FLTK provides a 5x8x5 color cube that is used with colormap visuals
 
-  FL_BLACK		= 56,
-  FL_RED		= 88,
-  FL_GREEN		= 63,
-  FL_YELLOW		= 95,
-  FL_BLUE		= 216,
-  FL_MAGENTA		= 248,
-  FL_CYAN		= 223,
-  FL_DARK_RED		= 72,
+const Fl_Color FL_BLACK   = 56;
+const Fl_Color FL_RED     = 88;
+const Fl_Color FL_GREEN   = 63;
+const Fl_Color FL_YELLOW  = 95;
+const Fl_Color FL_BLUE    = 216;
+const Fl_Color FL_MAGENTA = 248;
+const Fl_Color FL_CYAN    = 223;
+const Fl_Color FL_DARK_RED = 72;
 
-  FL_DARK_GREEN		= 60,
-  FL_DARK_YELLOW	= 76,
-  FL_DARK_BLUE		= 136,
-  FL_DARK_MAGENTA	= 152,
-  FL_DARK_CYAN		= 140,
+const Fl_Color FL_DARK_GREEN    = 60;
+const Fl_Color FL_DARK_YELLOW   = 76;
+const Fl_Color FL_DARK_BLUE     = 136;
+const Fl_Color FL_DARK_MAGENTA  = 152;
+const Fl_Color FL_DARK_CYAN     = 140;
 
-  FL_WHITE		= 255
-};
+const Fl_Color FL_WHITE         = 255;
 
-#define FL_FREE_COLOR		(Fl_Color)16
-#define FL_NUM_FREE_COLOR	16
-#define FL_GRAY_RAMP		(Fl_Color)32
-#define FL_NUM_GRAY		24
-#define FL_GRAY			FL_BACKGROUND_COLOR
-#define FL_COLOR_CUBE		(Fl_Color)56
-#define FL_NUM_RED		5
-#define FL_NUM_GREEN		8
-#define FL_NUM_BLUE		5
+
+#define FL_FREE_COLOR     (Fl_Color)16
+#define FL_NUM_FREE_COLOR 16
+#define FL_GRAY_RAMP      (Fl_Color)32
+#define FL_NUM_GRAY       24
+#define FL_GRAY           FL_BACKGROUND_COLOR
+#define FL_COLOR_CUBE     (Fl_Color)56
+#define FL_NUM_RED        5
+#define FL_NUM_GREEN      8
+#define FL_NUM_BLUE       5
 
 FL_EXPORT Fl_Color fl_inactive(Fl_Color c);
+
 FL_EXPORT Fl_Color fl_contrast(Fl_Color fg, Fl_Color bg);
+
 FL_EXPORT Fl_Color fl_color_average(Fl_Color c1, Fl_Color c2, float weight);
+
 inline Fl_Color fl_lighter(Fl_Color c) { return fl_color_average(c, FL_WHITE, .67f); }
+
 inline Fl_Color fl_darker(Fl_Color c) { return fl_color_average(c, FL_BLACK, .67f); }
+
 /** return 24-bit color value closest to \p r, \p g, \p b. */
 inline Fl_Color fl_rgb_color(uchar r, uchar g, uchar b) {
   if (!r && !g && !b) return FL_BLACK;
   else return (Fl_Color)(((((r << 8) | g) << 8) | b) << 8);
 }
+
 /** return 24-bit color value closest to \p grayscale */
 inline Fl_Color fl_rgb_color(uchar g) {
   if (!g) return FL_BLACK;
   else return (Fl_Color)(((((g << 8) | g) << 8) | g) << 8);
 }
+
 inline Fl_Color fl_gray_ramp(int i) {return (Fl_Color)(i+FL_GRAY_RAMP);}
+
 inline Fl_Color fl_color_cube(int r, int g, int b) {
   return (Fl_Color)((b*FL_NUM_RED + r) * FL_NUM_GREEN + g + FL_COLOR_CUBE);}
 
@@ -857,5 +886,5 @@ enum Fl_Damage {
 #endif
 
 //
-// End of "$Id: Enumerations.H 6735 2009-04-01 22:11:57Z engelsman $".
+// End of "$Id: Enumerations.H 6902 2009-09-27 11:06:56Z matt $".
 //

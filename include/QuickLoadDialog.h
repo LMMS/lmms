@@ -25,29 +25,22 @@
 #ifndef _QUICK_LOAD_DIALOG_H
 #define _QUICK_LOAD_DIALOG_H
 
-#include <QtGui/QDialog>
-
 #include "ResourceItem.h"
+#include "ResourceSelectDialog.h"
 
 namespace Ui { class QuickLoadDialog; }
-class ResourceListModel;
 
-class QuickLoadDialog : public QDialog
+class QuickLoadDialog : public ResourceSelectDialog
 {
-	Q_OBJECT
 public:
 	QuickLoadDialog( QWidget * _parent, ResourceItem::Type _typeFilter =
-													ResourceItem::TypeUnknown );
+													ResourceItem::TypeUnknown,
+								DatabaseScope _databaseScope = AllResources );
 	virtual ~QuickLoadDialog();
-
-
-private slots:
-	void setTypeFilter( int );
 
 
 private:
 	Ui::QuickLoadDialog * ui;
-	ResourceListModel * m_listModel;
 
 } ;
 

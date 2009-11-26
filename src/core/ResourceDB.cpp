@@ -98,7 +98,7 @@ void ResourceDB::init()
 
 void ResourceDB::load( const QString & _file )
 {
-	recursiveRemoveItems( topLevelNode(), false );
+	removeItemsRecursively( topLevelNode(), false );
 
 	multimediaProject m( _file );
 
@@ -283,7 +283,7 @@ void ResourceDB::addItem( ResourceItem * newItem )
 		ResourceItem::Relation * oldRelation = oldItem->relation();
 		if( oldRelation )
 		{
-			recursiveRemoveItems( oldRelation, false );
+			removeItemsRecursively( oldRelation, false );
 			delete oldRelation;
 		}
 		if( oldItem->type() == ResourceItem::TypeDirectory )
@@ -299,8 +299,8 @@ void ResourceDB::addItem( ResourceItem * newItem )
 
 
 
-void ResourceDB::recursiveRemoveItems( ResourceItem::Relation * parent,
-										bool removeTopLevelParent )
+void ResourceDB::removeItemsRecursively( ResourceItem::Relation * parent,
+											bool removeParent )
 {
 	if( !parent )
 	{
@@ -309,10 +309,10 @@ void ResourceDB::recursiveRemoveItems( ResourceItem::Relation * parent,
 
 	while( !parent->children().isEmpty() )
 	{
-		recursiveRemoveItems( parent->children().front() );
+		removeItemsRecursively( parent->children().front() );
 	}
 
-	if( removeTopLevelParent && parent->item() )
+	if( removeParent && parent->item() )
 	{
 		if( parent->item()->type() == ResourceItem::TypeDirectory )
 		{

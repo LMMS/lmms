@@ -23,19 +23,19 @@
 #include "NULLMidiIn.h"
 
 NULLMidiIn::NULLMidiIn()
-{
-};
+{}
 
 NULLMidiIn::~NULLMidiIn()
-{
-};
+{}
 
 /*
  * Get the midi command,channel and parameters
  * It returns MidiNull because it is a dummy driver
  */
-void NULLMidiIn::getmidicmd(MidiCmdType &cmdtype,unsigned char &cmdchan,int *cmdparams)
+void NULLMidiIn::getmidicmd(MidiCmdType &cmdtype,
+                            unsigned char &cmdchan,
+                            int *cmdparams)
 {
-    cmdtype=MidiNull;
-};
+    cmdtype = MidiNull;
+}
 

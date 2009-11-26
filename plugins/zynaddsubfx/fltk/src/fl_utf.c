@@ -138,11 +138,11 @@ unsigned fl_utf8decode(const char* p, const char* end, int* len)
 {
   unsigned char c = *(unsigned char*)p;
   if (c < 0x80) {
-    *len = 1;
+    if (len) *len = 1;
     return c;
 #if ERRORS_TO_CP1252
   } else if (c < 0xa0) {
-    *len = 1;
+    if (len) *len = 1;
     return cp1252[c-0x80];
 #endif
   } else if (c < 0xc2) {
@@ -150,7 +150,7 @@ unsigned fl_utf8decode(const char* p, const char* end, int* len)
   }
   if (p+1 >= end || (p[1]&0xc0) != 0x80) goto FAIL;
   if (c < 0xe0) {
-    *len = 2;
+    if (len) *len = 2;
     return
       ((p[0] & 0x1f) << 6) +
       ((p[1] & 0x3f));
@@ -171,7 +171,7 @@ unsigned fl_utf8decode(const char* p, const char* end, int* len)
   } else if (c < 0xf0) {
   UTF8_3:
     if (p+2 >= end || (p[2]&0xc0) != 0x80) goto FAIL;
-    *len = 3;
+    if (len) *len = 3;
     return
       ((p[0] & 0x0f) << 12) +
       ((p[1] & 0x3f) << 6) +
@@ -182,7 +182,7 @@ unsigned fl_utf8decode(const char* p, const char* end, int* len)
   } else if (c < 0xf4) {
   UTF8_4:
     if (p+3 >= end || (p[2]&0xc0) != 0x80 || (p[3]&0xc0) != 0x80) goto FAIL;
-    *len = 4;
+    if (len) *len = 4;
 #if STRICT_RFC3629
     /* RFC 3629 says all codes ending in fffe or ffff are illegal: */
     if ((p[1]&0xf)==0xf &&
@@ -199,7 +199,7 @@ unsigned fl_utf8decode(const char* p, const char* end, int* len)
     goto UTF8_4;
   } else {
   FAIL:
-    *len = 1;
+    if (len) *len = 1;
 #if ERRORS_TO_ISO8859_1
     return c;
 #else

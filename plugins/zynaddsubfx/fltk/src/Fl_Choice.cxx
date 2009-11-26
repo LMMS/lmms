@@ -1,5 +1,5 @@
 //
-// "$Id: Fl_Choice.cxx 6616 2009-01-01 21:28:26Z matt $"
+// "$Id: Fl_Choice.cxx 6873 2009-09-16 07:06:41Z AlbrechtS $"
 //
 // Choice widget for the Fast Light Tool Kit (FLTK).
 //
@@ -209,5 +209,5 @@ int Fl_Choice::handle(int e) {
 }
 
 //
-// End of "$Id: Fl_Choice.cxx 6616 2009-01-01 21:28:26Z matt $".
+// End of "$Id: Fl_Choice.cxx 6873 2009-09-16 07:06:41Z AlbrechtS $".
 //

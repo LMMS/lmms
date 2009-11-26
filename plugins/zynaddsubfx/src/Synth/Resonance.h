@@ -31,39 +31,40 @@
 
 class Resonance:public Presets
 {
-public:
-    Resonance();
-    ~Resonance();
-    void setpoint(int n,unsigned char p);
-    void applyres(int n,FFTFREQS fftdata,REALTYPE freq);
-    void smooth();
-    void interpolatepeaks(int type);
-    void randomize(int type);
+    public:
+        Resonance();
+        ~Resonance();
+        void setpoint(int n, unsigned char p);
+        void applyres(int n, FFTFREQS fftdata, REALTYPE freq);
+        void smooth();
+        void interpolatepeaks(int type);
+        void randomize(int type);
 
-    void add2XML(XMLwrapper *xml);
-    void defaults();
-    void getfromXML(XMLwrapper *xml);
+        void add2XML(XMLwrapper *xml);
+        void defaults();
+        void getfromXML(XMLwrapper *xml);
 
 
-    REALTYPE getfreqpos(REALTYPE freq);
-    REALTYPE getfreqx(REALTYPE x);
-    REALTYPE getfreqresponse(REALTYPE freq);
-    REALTYPE getcenterfreq();
-    REALTYPE getoctavesfreq();
-    void sendcontroller(MidiControllers ctl,REALTYPE par);
+        REALTYPE getfreqpos(REALTYPE freq);
+        REALTYPE getfreqx(REALTYPE x);
+        REALTYPE getfreqresponse(REALTYPE freq);
+        REALTYPE getcenterfreq();
+        REALTYPE getoctavesfreq();
+        void sendcontroller(MidiControllers ctl, REALTYPE par);
 
-    //parameters
-    unsigned char Penabled;			//if the ressonance is enabled
-    unsigned char Prespoints[N_RES_POINTS];	//how many points define the resonance function
-    unsigned char PmaxdB;			//how many dB the signal may be amplified
-    unsigned char Pcenterfreq,Poctavesfreq;     //the center frequency of the res. func., and the number of octaves
-    unsigned char Pprotectthefundamental;       //the fundamental (1-st harmonic) is not damped, even it resonance function is low
+        //parameters
+        unsigned char Penabled;     //if the ressonance is enabled
+        unsigned char Prespoints[N_RES_POINTS]; //how many points define the resonance function
+        unsigned char PmaxdB;       //how many dB the signal may be amplified
+        unsigned char Pcenterfreq, Poctavesfreq; //the center frequency of the res. func., and the number of octaves
+        unsigned char Pprotectthefundamental;   //the fundamental (1-st harmonic) is not damped, even it resonance function is low
 
-    //controllers
-    REALTYPE ctlcenter;//center frequency(relative)
-    REALTYPE ctlbw;//bandwidth(relative)
+        //controllers
+        REALTYPE ctlcenter; //center frequency(relative)
+        REALTYPE ctlbw; //bandwidth(relative)
 
-private:
+    private:
 };
 
 #endif
+

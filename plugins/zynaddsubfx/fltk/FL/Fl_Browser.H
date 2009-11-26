@@ -1,5 +1,5 @@
 //
-// "$Id: Fl_Browser.H 6726 2009-03-27 16:52:31Z greg.ercolano $"
+// "$Id: Fl_Browser.H 6850 2009-09-07 02:25:51Z greg.ercolano $"
 //
 // Browser header file for the Fast Light Tool Kit (FLTK).
 //
@@ -36,6 +36,7 @@
 #define Fl_Browser_H
 
 #include "Fl_Browser_.H"
+#include "Fl_Image.H"
 
 struct FL_BLINE;
 
@@ -306,6 +307,11 @@ public:
     else Fl_Browser_::display(find_line(line));
   }
 
+  // icon support
+  void icon(int line, Fl_Image* icon);
+  Fl_Image* icon(int line) const;
+  void remove_icon(int line);
+
   /** For back compatibility only. */
   void replace(int a, const char* b) { text(a, b); }
   void display(int line, int val=1);
@@ -314,5 +320,5 @@ public:
 #endif
 
 //
-// End of "$Id: Fl_Browser.H 6726 2009-03-27 16:52:31Z greg.ercolano $".
+// End of "$Id: Fl_Browser.H 6850 2009-09-07 02:25:51Z greg.ercolano $".
 //

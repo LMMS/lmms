@@ -12,6 +12,17 @@ automationEditor {
 	background-color: rgb(0, 0, 0);
 }
 
+#PreferencesDialog QListView::item:selected {
+	background: qlineargradient(x1: 0, y1:0, x2:0,y2:1, stop:0 rgb(84,87,96), stop:1 rgb(54,57,66));
+	border-radius: 8px;
+	color: white;
+}
+
+#PreferencesDialog QListView::item:hover:!selected {
+	background: qlineargradient(x1: 0, y1:0, x2:0,y2:1, stop:0 rgb(104,107,116), stop:1 rgb(94,97,106));
+	border-radius: 8px;
+}
+
 #WelcomeFrame {
 	border: 2px solid rgb(32,32,32);
 	border-radius: 8px;
@@ -113,11 +124,11 @@ nameLabel, effectLabel, sf2InstrumentView > QLabel, QComboBox {
 
 
 QWidget#mainToolbar {
-	background-image: url(resources:main_toolbar_bg.png);
+	background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop: 0 #66728c, stop: 1.0 #38404e);
 }
 
 QToolBar {
-	background: url(resources:toolbar_bg.png);
+	background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop: 0 #66728c, stop: 1.0 #38404e);
 }
 
 QToolButton, toolButton {
@@ -148,6 +159,14 @@ QToolButton:checked {
 	border-radius: 3px;
 	border: 1px solid black;
 	padding: 3px 0px 0px 3px;
+}
+
+SideBar {
+	background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop: 0 #66728c, stop: 1.0 #38404e);
+}
+
+SideBar QToolButton {
+	font-size: 12px;
 }
 
 FxMixerView QPushButton, EffectRackView QPushButton, ControllerRackView QPushButton {

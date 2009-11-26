@@ -69,8 +69,6 @@ public:
 		return m_toolBar;
 	}
 
-	// show MainWidget or WelcomeScreen
-	void setMainWidgetVisible( bool _visible );
 
 	//int addWidgetToToolBar( QWidget * _w, int _row = -1, int _col = -1 );
 	//void addSpacingToToolBar( int _size );
@@ -109,6 +107,7 @@ public:
 
 	void setPlaybackMode( ProjectPlaybackMode _playbackMode );
 
+    void showWelcomeScreen(bool _visible = true);
 
 public slots:
 	void resetWindowTitle();
@@ -126,6 +125,7 @@ public slots:
 	bool saveProject();
 	bool saveProjectAs();
 	void showSettingsDialog();
+	void showPreferencesDialog();
 	void aboutLMMS();
 	void help();
 	void toggleAutomationEditorWin();
@@ -145,6 +145,7 @@ public slots:
 
 protected:
 	virtual void closeEvent( QCloseEvent * _ce );
+	virtual void showEvent( QShowEvent * _se );
 	virtual void focusOutEvent( QFocusEvent * _fe );
 	virtual void keyPressEvent( QKeyEvent * _ke );
 	virtual void keyReleaseEvent( QKeyEvent * _ke );

@@ -27,7 +27,7 @@
 #include "DSSIaudiooutput.h"
 
 static LADSPA_Descriptor *tsLDescriptor = NULL;
-static DSSI_Descriptor *tsDDescriptor = NULL;
+static DSSI_Descriptor   *tsDDescriptor = NULL;
 
 typedef struct {
     LADSPA_Data *outl;
@@ -42,11 +42,11 @@ static void cleanupTS(LADSPA_Handle instance)
     free(instance);
 }
 static void connectPortTS(LADSPA_Handle instance, unsigned long port,
-                          LADSPA_Data * data)
+                          LADSPA_Data *data)
 {
     TS *plugin;
     plugin = (TS *) instance;
-    switch (port) {
+    switch(port) {
     case 0:
         plugin->outl = data;
         break;
@@ -58,7 +58,7 @@ static void connectPortTS(LADSPA_Handle instance, unsigned long port,
 
 const LADSPA_Descriptor *ladspa_descriptor(unsigned long index)
 {
-    switch (index) {
+    switch(index) {
     case 0:
         return tsLDescriptor;
     default:
@@ -71,7 +71,7 @@ const DSSI_Descriptor *dssi_descriptor(unsigned long index)
 //    FILE *a=fopen("/tmp/zzzzz11z","w");
 //    fprintf(a,"aaaaaaaaaaa  TEST\n");
 //    fclose(a);
-    switch (index) {
+    switch(index) {
     case 0:
         return tsDDescriptor;
     default:
@@ -79,14 +79,13 @@ const DSSI_Descriptor *dssi_descriptor(unsigned long index)
     }
 }
 
-static LADSPA_Handle instantiateTS(const LADSPA_Descriptor * descriptor,
+static LADSPA_Handle instantiateTS(const LADSPA_Descriptor *descriptor,
                                    unsigned long s_rate)
 {
-
     TS *plugin_data = (TS *) malloc(sizeof(TS));
     /*    for (i=0; i<MIDI_NOTES; i++) {
-    	    plugin_data->omega[i] = M_PI * 2.0 / (double)s_rate *
-    				    pow(2.0, (i-69.0) / 12.0);
+            plugin_data->omega[i] = M_PI * 2.0 / (double)s_rate *
+                        pow(2.0, (i-69.0) / 12.0);
         }
     */
     return (LADSPA_Handle) plugin_data;
@@ -115,47 +114,47 @@ static void runTS(LADSPA_Handle instance, unsigned long sample_count,
     unsigned long note;
 
     /*    if (freq < 1.0) {
-    	freq = 440.0f;
+        freq = 440.0f;
         }
         if (vol < 0.000001) {
-    	vol = 1.0f;
+        vol = 1.0f;
         }
 
         if (event_count > 0) {
-    	printf("trivial_synth: have %ld events\n", event_count);
+        printf("trivial_synth: have %ld events\n", event_count);
         }
 
         for (pos = 0, event_pos = 0; pos < sample_count; pos++) {
 
-    	while (event_pos < event_count
-    	       && pos == events[event_pos].time.tick) {
+        while (event_pos < event_count
+               && pos == events[event_pos].time.tick) {
 
-    	    printf("trivial_synth: event type %d\n", events[event_pos].type);
+            printf("trivial_synth: event type %d\n", events[event_pos].type);
 
-    	    if (events[event_pos].type == SND_SEQ_EVENT_NOTEON) {
-    		data[events[event_pos].data.note.note].amp =
-    		    events[event_pos].data.note.velocity / 512.0f;
-    		data[events[event_pos].data.note.note].
-    		    active = events[event_pos].data.note.velocity > 0;
-    		data[events[event_pos].data.note.note].
-    		    phase = 0.0;
-    	    } else if (events[event_pos].type == SND_SEQ_EVENT_NOTEOFF) {
-    		data[events[event_pos].data.note.note].
-    		    active = 0;
-    	    }
-    	    event_pos++;
-    	}
+            if (events[event_pos].type == SND_SEQ_EVENT_NOTEON) {
+            data[events[event_pos].data.note.note].amp =
+                events[event_pos].data.note.velocity / 512.0f;
+            data[events[event_pos].data.note.note].
+                active = events[event_pos].data.note.velocity > 0;
+            data[events[event_pos].data.note.note].
+                phase = 0.0;
+            } else if (events[event_pos].type == SND_SEQ_EVENT_NOTEOFF) {
+            data[events[event_pos].data.note.note].
+                active = 0;
+            }
+            event_pos++;
+        }
 
-    	output[pos] = 0.0f;
-    	for (note = 0; note < MIDI_NOTES; note++) {
-    	    if (data[note].active) {
-    		output[pos] += sin(data[note].phase) * data[note].amp * vol;
-    		data[note].phase += plugin_data->omega[note] * freq;
-    		if (data[note].phase > M_PI * 2.0) {
-    		    data[note].phase -= M_PI * 2.0;
-    		}
-    	    }
-    	}
+        output[pos] = 0.0f;
+        for (note = 0; note < MIDI_NOTES; note++) {
+            if (data[note].active) {
+            output[pos] += sin(data[note].phase) * data[note].amp * vol;
+            data[note].phase += plugin_data->omega[note] * freq;
+            if (data[note].phase > M_PI * 2.0) {
+                data[note].phase -= M_PI * 2.0;
+            }
+            }
+        }
         }
         */
 }
@@ -176,22 +175,23 @@ void _init()
 {
     char **port_names;
     LADSPA_PortDescriptor *port_descriptors;
-    LADSPA_PortRangeHint *port_range_hints;
+    LADSPA_PortRangeHint  *port_range_hints;
 
-    FILE *a=fopen("/tmp/zzzzzz","w");
-    fprintf(a,"aaaaaaaaaaa  TEST\n");
+    FILE *a = fopen("/tmp/zzzzzz", "w");
+    fprintf(a, "aaaaaaaaaaa  TEST\n");
     fclose(a);
 
 
     tsLDescriptor = (LADSPA_Descriptor *) malloc(sizeof(LADSPA_Descriptor));
-    if (tsLDescriptor) {
-        tsLDescriptor->UniqueID = 100;
-        tsLDescriptor->Label = "ZASF";
+    if(tsLDescriptor) {
+        tsLDescriptor->UniqueID   = 100;
+        tsLDescriptor->Label      = "ZASF";
         tsLDescriptor->Properties = 0;
         tsLDescriptor->Name = "ZynAddSubFX";
-        tsLDescriptor->Maker = "Nasca Octavian Paul <zynaddsubfx@yahoo.com>";
-        tsLDescriptor->Copyright = "GNU General Public License v.2";
-        tsLDescriptor->PortCount = 2;
+        tsLDescriptor->Maker      =
+            "Nasca Octavian Paul <zynaddsubfx@yahoo.com>";
+        tsLDescriptor->Copyright  = "GNU General Public License v.2";
+        tsLDescriptor->PortCount  = 2;
 
         port_descriptors = (LADSPA_PortDescriptor *)
                            calloc(tsLDescriptor->PortCount, sizeof
@@ -208,42 +208,40 @@ void _init()
         port_names = (char **) calloc(tsLDescriptor->PortCount, sizeof(char *));
         tsLDescriptor->PortNames = (const char **) port_names;
 
-        port_descriptors[0] = LADSPA_PORT_OUTPUT | LADSPA_PORT_AUDIO;
+        port_descriptors[0]      = LADSPA_PORT_OUTPUT | LADSPA_PORT_AUDIO;
         port_names[0] = "Output L";
         port_range_hints[0].HintDescriptor = 0;
         port_descriptors[1] = LADSPA_PORT_OUTPUT | LADSPA_PORT_AUDIO;
         port_names[1] = "Output R";
         port_range_hints[1].HintDescriptor = 0;
 
-        tsLDescriptor->activate = activateTS;
-        tsLDescriptor->cleanup = cleanupTS;
+        tsLDescriptor->activate     = activateTS;
+        tsLDescriptor->cleanup      = cleanupTS;
         tsLDescriptor->connect_port = connectPortTS;
-        tsLDescriptor->deactivate = NULL;
-        tsLDescriptor->instantiate = instantiateTS;
+        tsLDescriptor->deactivate   = NULL;
+        tsLDescriptor->instantiate  = instantiateTS;
         tsLDescriptor->run = runTSWrapper;
-        tsLDescriptor->run_adding = NULL;
+        tsLDescriptor->run_adding   = NULL;
         tsLDescriptor->set_run_adding_gain = NULL;
     }
 
     tsDDescriptor = (DSSI_Descriptor *) malloc(sizeof(DSSI_Descriptor));
-    if (tsDDescriptor) {
-        tsDDescriptor->DSSI_API_Version = 1;
-        tsDDescriptor->LADSPA_Plugin = tsLDescriptor;
+    if(tsDDescriptor) {
+        tsDDescriptor->DSSI_API_Version    = 1;
+        tsDDescriptor->LADSPA_Plugin       = tsLDescriptor;
         tsDDescriptor->configure = NULL;
-        tsDDescriptor->get_program = NULL;
+        tsDDescriptor->get_program         = NULL;
         tsDDescriptor->get_midi_controller_for_port = getControllerTS;
-        tsDDescriptor->select_program = NULL;
+        tsDDescriptor->select_program      = NULL;
         tsDDescriptor->run_synth = runTS;
-        tsDDescriptor->run_synth_adding = NULL;
+        tsDDescriptor->run_synth_adding    = NULL;
         tsDDescriptor->run_multiple_synths = NULL;
         tsDDescriptor->run_multiple_synths_adding = NULL;
     }
-
-};
+}
 
 void _fini()
-{
-};
+{}
 
 
 
@@ -272,17 +270,18 @@ long int VSTSynth::canDo(char *txt){
 };
 
 bool VSTSynth::getVendorString(char *txt){
-	strcpy(txt,"Nasca O. Paul");
-	return(true);
+    strcpy(txt,"Nasca O. Paul");
+    return(true);
 };
 
 bool VSTSynth::getProductString(char *txt){
-	strcpy(txt,"ZynAddSubFX");
-	return(true);
+    strcpy(txt,"ZynAddSubFX");
+    return(true);
 };
 
 void VSTSynth::resume(){
-	wantEvents();
+    wantEvents();
 };
 
 */
+

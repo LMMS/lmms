@@ -22,7 +22,7 @@
  *
  */
 
-
+#include <QtCore/QDebug>
 #include <QtCore/QDir>
 
 #include "LocalResourceProvider.h"
@@ -44,6 +44,8 @@ LocalResourceProvider::LocalResourceProvider(
 			this, SLOT( addDirectory( const QString & ) ) );
 	connect( database(), SIGNAL( directoryItemRemoved( const QString & ) ),
 			this, SLOT( removeDirectory( const QString & ) ) );
+
+	m_watcher.addPath( ResourceItem::getBaseDirectory( m_baseDir ) + m_dir );
 
 	database()->init();
 }
@@ -120,23 +122,30 @@ void LocalResourceProvider::reloadDirectory( const QString & _path )
 		p += QDir::separator();
 	}
 
-	foreach( ResourceItem * it, database()->items() )
+	if( p == ResourceItem::getBaseDirectory( m_baseDir ) + m_dir )
 	{
-		if( it->type() == ResourceItem::TypeDirectory &&
-			it->fullName() == p )
-		{
-			dirRelation = it->relation();
-		}
+		updateDatabase();
 	}
-
-	if( dirRelation )
+	else
 	{
-		ResourceItem * dirItem = dirRelation->item();
-		if( dirItem )
+		foreach( ResourceItem * it, database()->items() )
 		{
-			m_scannedFolders.clear();
-			readDir( dirItem->fullRelativeName(),
-						dirRelation->parent() );
+			if( it->type() == ResourceItem::TypeDirectory &&
+				it->fullName() == p )
+			{
+				dirRelation = it->relation();
+			}
+		}
+
+		if( dirRelation )
+		{
+			ResourceItem * dirItem = dirRelation->item();
+			if( dirItem )
+			{
+				m_scannedFolders.clear();
+				readDir( dirItem->fullRelativeName(),
+							dirRelation->parent() );
+			}
 		}
 	}
 
@@ -165,7 +174,7 @@ void LocalResourceProvider::readDir( const QString & _dir,
 	ResourceItem::Relation * curParent = _parent->findChild( d.dirName() +
 							QDir::separator(),
 							m_baseDir );
-printf("read dir: %s\n", d.canonicalPath().toUtf8().constData() );
+qDebug() << "read dir" << d.canonicalPath();
 	if( curParent )
 	{
 		parentItem = curParent->item();
@@ -202,6 +211,7 @@ printf("read dir: %s\n", d.canonicalPath().toUtf8().constData() );
 	{
 		if( f.isSymLink() )
 		{
+			qDebug() << "following symlink" << f.canonicalFilePath() << "to" << f.symLinkTarget();
 			f = QFileInfo( f.symLinkTarget() );
 		}
 
@@ -268,7 +278,7 @@ printf("read dir: %s\n", d.canonicalPath().toUtf8().constData() );
 		{
 			ResourceItem::Relation * item = *it;
 			it = curParent->children().erase( it );
-			database()->recursiveRemoveItems( item );
+			database()->removeItemsRecursively( item );
 		}
 		else
 		{

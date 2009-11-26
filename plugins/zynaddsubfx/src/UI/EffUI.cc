@@ -154,6 +154,7 @@ void EffUI::cb_revp10(Fl_Choice* o, void* v) {
 Fl_Menu_Item EffUI::menu_revp10[] = {
  {"Random", 0,  0, 0, 0, FL_NORMAL_LABEL, 1, 10, 7},
  {"Freeverb", 0,  0, 0, 0, FL_NORMAL_LABEL, 1, 10, 7},
+ {"Bandwidth", 0,  0, 0, 0, FL_NORMAL_LABEL, 1, 10, 7},
  {0,0,0,0,0,0,0,0,0}
 };
 
@@ -192,11 +193,11 @@ void EffUI::cb_revp4(WidgetPDial* o, void* v) {
   ((EffUI*)(o->parent()->user_data()))->cb_revp4_i(o,v);
 }
 
-void EffUI::cb_revp5_i(WidgetPDial* o, void*) {
-  eff->seteffectpar(5,(int) o->value());
+void EffUI::cb_revp12_i(WidgetPDial* o, void*) {
+  eff->seteffectpar(12,(int) o->value());
 }
-void EffUI::cb_revp5(WidgetPDial* o, void* v) {
-  ((EffUI*)(o->parent()->user_data()))->cb_revp5_i(o,v);
+void EffUI::cb_revp12(WidgetPDial* o, void* v) {
+  ((EffUI*)(o->parent()->user_data()))->cb_revp12_i(o,v);
 }
 
 void EffUI::cb_revp6_i(WidgetPDial* o, void*) {
@@ -1022,7 +1023,7 @@ Fl_Group* EffUI::make_reverb_window() {
       revp->align(Fl_Align(FL_ALIGN_TOP_LEFT));
       revp->menu(menu_revp);
     } // Fl_Choice* revp
-    { revp10 = new Fl_Choice(110, 15, 75, 15, "Type");
+    { revp10 = new Fl_Choice(110, 15, 85, 15, "Type");
       revp10->down_box(FL_BORDER_BOX);
       revp10->color((Fl_Color)14);
       revp10->labelfont(1);
@@ -1103,20 +1104,19 @@ Fl_Group* EffUI::make_reverb_window() {
       revp4->align(Fl_Align(FL_ALIGN_BOTTOM));
       revp4->when(FL_WHEN_CHANGED);
     } // WidgetPDial* revp4
-    { revp5 = new WidgetPDial(200, 40, 30, 30, "R.delay");
-      revp5->box(FL_ROUND_UP_BOX);
-      revp5->color(FL_BACKGROUND_COLOR);
-      revp5->selection_color(FL_INACTIVE_COLOR);
-      revp5->labeltype(FL_NORMAL_LABEL);
-      revp5->labelfont(1);
-      revp5->labelsize(11);
-      revp5->labelcolor(FL_FOREGROUND_COLOR);
-      revp5->maximum(127);
-      revp5->callback((Fl_Callback*)cb_revp5);
-      revp5->align(Fl_Align(FL_ALIGN_BOTTOM));
-      revp5->when(FL_WHEN_RELEASE);
-      revp5->deactivate();
-    } // WidgetPDial* revp5
+    { revp12 = new WidgetPDial(200, 40, 30, 30, "bw");
+      revp12->box(FL_ROUND_UP_BOX);
+      revp12->color(FL_BACKGROUND_COLOR);
+      revp12->selection_color(FL_INACTIVE_COLOR);
+      revp12->labeltype(FL_NORMAL_LABEL);
+      revp12->labelfont(1);
+      revp12->labelsize(11);
+      revp12->labelcolor(FL_FOREGROUND_COLOR);
+      revp12->maximum(127);
+      revp12->callback((Fl_Callback*)cb_revp12);
+      revp12->align(Fl_Align(FL_ALIGN_BOTTOM));
+      revp12->when(FL_WHEN_RELEASE);
+    } // WidgetPDial* revp12
     { revp6 = new WidgetPDial(235, 40, 30, 30, "E/R");
       revp6->box(FL_ROUND_UP_BOX);
       revp6->color(FL_BACKGROUND_COLOR);
@@ -1175,7 +1175,7 @@ Fl_Group* EffUI::make_reverb_window() {
       revp9->align(Fl_Align(FL_ALIGN_BOTTOM));
       revp9->when(FL_WHEN_CHANGED);
     } // WidgetPDial* revp9
-    { revp11 = new WidgetPDial(190, 10, 25, 25, "R.S.");
+    { revp11 = new WidgetPDial(200, 10, 25, 25, "R.S.");
       revp11->tooltip("RoomSize");
       revp11->box(FL_ROUND_UP_BOX);
       revp11->color(FL_BACKGROUND_COLOR);
@@ -2449,13 +2449,14 @@ switch(eff->geteffect()){
 	revp2->value(eff->geteffectpar(2));
 	revp3->value(eff->geteffectpar(3));
 	revp4->value(eff->geteffectpar(4));
-	revp5->value(eff->geteffectpar(5));
+	//revp5->value(eff->geteffectpar(5));
 	revp6->value(eff->geteffectpar(6));
 	revp7->value(eff->geteffectpar(7));
 	revp8->value(eff->geteffectpar(8));
 	revp9->value(eff->geteffectpar(9));
 	revp10->value(eff->geteffectpar(10));
 	revp11->value(eff->geteffectpar(11));
+	revp12->value(eff->geteffectpar(12));
             
         effreverbwindow->show();
         break; 
@@ -2573,13 +2574,13 @@ void EffUI::refresh() {
   refresh(eff);
 }
 
-void SimpleEffUI::cb_revpa_i(Fl_Choice* o, void*) {
+void SimpleEffUI::cb_revp5_i(Fl_Choice* o, void*) {
   eff->changepreset((int)o->value());
 
 refresh(eff);
 }
-void SimpleEffUI::cb_revpa(Fl_Choice* o, void* v) {
-  ((SimpleEffUI*)(o->parent()->user_data()))->cb_revpa_i(o,v);
+void SimpleEffUI::cb_revp5(Fl_Choice* o, void* v) {
+  ((SimpleEffUI*)(o->parent()->user_data()))->cb_revp5_i(o,v);
 }
 
 Fl_Menu_Item SimpleEffUI::menu_revp1[] = {
@@ -3118,7 +3119,7 @@ Fl_Group* SimpleEffUI::make_reverb_window() {
       revp->textfont(1);
       revp->textsize(10);
       revp->textcolor(FL_BACKGROUND2_COLOR);
-      revp->callback((Fl_Callback*)cb_revpa);
+      revp->callback((Fl_Callback*)cb_revp5);
       revp->align(Fl_Align(FL_ALIGN_TOP_LEFT));
       revp->menu(menu_revp1);
     } // Fl_Choice* revp

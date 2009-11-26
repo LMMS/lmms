@@ -1,0 +1,686 @@
+
+  R E A D M E . 1 2 3
+ =====================
+
+This file listst the differences between FLTK 1 and FLTK 2 with annotations
+for a possible implementation of FLTK 3. The all new and improved FLTK 3
+needs to be compatible with 1 and 2. It must have a moder API, plenty of
+widgets, lots of options, customization at run-time, but still be easily 
+portable, fast, and of course light.
+
+FLTK 1 has become a nice starting point for the first steps in GUI 
+programming. It runs on al major platform (and on many minor ones
+as well), is small, compact, and easy to use. FLTK 2 was the 
+attempt to continue the success of FLTK 1 with a much cleaber API
+and many important details improved. Unfortunately many users never 
+made the jump to FLTK 2 and so it not only ended in a crawling slow
+branch, it also became instable and at last unmaintainable.
+
+FLTK 3 sets out to surprise FLTK 1 users and satisfy FLTK 2 junkies.
+It will basically be the improved FLTK 2 API combined with the quite
+stable innards of FLTK 1. As an extra bonus, FLTK 3 will be compatible
+to 1 and 2. Just prepend your code with the "coding_style" instruction
+and FLTK 3 will do the rest. It is even possible to intermix F1 and 
+F2 coding styles at any place.
+
+Nice challange, eh? So let's get going:
+
+
+ The Big Differences
+---------------------
+
+FLTK 2 is based on FLTK 1 in many ways, and while the FLTK 1 API was based
+on the Forms Library, FLTK 2 is Bill's take on how FLTK 1 should have been.
+This chapter outlines the biggest differences between version.
+
+(1) Coordinate System: FLTK 1 child coordinates are always relative to the 
+window, not as most would expect to the parent. FLTK 2 does the logical 
+thing and uses group-relative origins. This is somewhat difficult to port
+if we want to stay downward compatible. Fl_Widget will need an additional
+flag indicating absolute or relative coordinates.
+
+(2) Pulldown Menus: The developers of the Forms Library did not implement
+the idea of hierarchies all the way through. Pulldown menus, which are 
+hierarchical by nature, were instead implemented as a list with lots of
+tricks and cludges to make them usable. FLTK 2 went half way by using the
+existing Windget/Group relation to create menus, however, menu items are 
+still specialized widgets. For FLTK 3, I would like to allow any widget
+inside a pulldown menu. 
+
+(3) Browsers and Tree Views: Browsers in FLTK1 are implemented even worse
+than Pulldown Menus. FLTK 2 solved the issues in a similar way, and here
+again, I prefer the FLTK 2 way very mch, but also would like to extend 
+functionality to allow arbitrary widgets as list items. A Tree-like 
+widget comes free with the FLTK 2 concept. FLTK 1 has no such thing and
+even Fluid had to hack the library badly to generate a tree view.
+
+(4) Namespaces: this is a minr issue that I include for completeness. FLTK 2
+introduces the ftk namespace, renaming all widgets. FLTK 3 will use the 
+FLTK 2 naming scheme and map FLTK 1 class names using typedefs. This is, as
+most things in programming are, a compromise. The "coding_style" function 
+must be used to switch between FLTK 1 and FLTK 2 code. No worries though,
+it's easy and straight forward.
+
+(5) Layout: FLTK 1 uses a top-down approach for widget layout in which the
+parent widget decides about the childs size "resize(x, y, w, h)". In FLTK 2
+any widget can call "layout()" which will query children for their preffered
+size and propagate the information up. This is a great concept that FLTK 3
+should adapt, plus it is compatible.
+
+(6) Ractangle: FLTK 2's base class is fltk::Rectangle. This is nice and
+easy to implement. The API is pretty much the same in both versions.
+
+(7) Styles: FLTK 2 uses a minimal number of styles to define the basic 
+(and often repeated) parameters of every widget. API's are similar though,
+so this is luckily another pretty straight-forward upgrade.
+
+
+ Comparison Chart by Class
+---------------------------
+
+This chart contains a list of all classes in FLTK 1 and 2, how they 
+correspond, and how they could be implemented in FLTK 3.
+
+1: class Fl
+2: namespace fltk
+*: this is a pretty straight-forward mapping of functions. The actual work
+   lies in finding and listing all global functions and adapting those.
+
+1: class Fl_Adjuster
+2: class Adjuster
+*: should map easily
+
+1: 
+2: class AlignGroup
+*: undocumented in FLTK 2. Minimal code. Can be transfered easily.
+
+1: 
+2: class AnsiWidget
+*: There is no equvalet in FLTK 1, but the widget may be easily ported.
+
+1: 
+2: class AssociationFunctor
+*: Associations are a new and rarly used concept in FLTK 2. We need to 
+   decide if these should be moved into FLTK 3
+
+1: 
+2: class AssociationType
+*: Associations are a new and rarly used concept in FLTK 2. We need to 
+   decide if these should be moved into FLTK 3
+
+1: 
+2: class BarGroup
+*: undocumented in FLTK 2. Minimal code. Can be transfered easily.
+
+1: class Fl_BMP_Image
+2: class bmpImage
+*: should map easily
+
+1: class Fl_Bitmap
+2:
+
+1: class Fl_Box
+2: class Widget
+*: This actually maps pretty much exactly to fltk::Widget. FLTK 2 provides
+   a bunch of other box-like classes which have some predefined properties,
+   however this is the best match for FLTK 1. fltk::InvisibleBox can be used
+   as well.
+
+1: class Fl_Browser
+2: class Browser
+
+1: class Fl_Browser_
+2:
+
+1: class Fl_Button
+2: class Button
+*: should map easily
+
+1: class Fl_Cairo_State
+2:
+
+1: class Fl_Cairo_Window
+2:
+
+1: class Fl_Chart
+2:
+
+1: class Fl_Check_Browser
+2:
+
+1: class Fl_Check_Button
+2: class CheckButton
+*: should map easily
+
+1: class Fl_Choice
+2: class Choice
+*: should map easily
+
+1: class Fl_Clock
+2: class Clock
+*: should map easily
+
+1: class Fl_Clock_Output
+2: class ClockOutput
+*: should map easily
+
+1: class Fl_Color_Chooser
+2: class ColorChooser
+*: should map easily
+
+1: 
+2: class ComboBrowser
+
+1: 
+2: class ComboWindow
+
+1: 
+2: class CycleButton
+
+1: class Fl_Counter
+2:
+
+1: class Fl_Dial
+2: class Dial
+*: should map easily
+
+1: 
+2: class Divider
+
+1: class Fl_Double_Window
+2: class DoubleBufferWindow
+*: should map easily
+
+1: class Fl_End
+2:
+
+1: 
+2: class EngravedLabel
+
+1: class Fl_File_Browser
+2: class FileBrowser
+*: should map easily
+
+1: class Fl_File_Chooser
+2: class FileChooser
+*: should map easily
+
+1: class Fl_File_Icon
+2: class FileIcon
+*: should map easily
+
+1: class Fl_File_Input
+2: class FileInput
+*: should map easily
+
+1: class Fl_Fill_Dial
+2: class FillDial
+*: should map easily
+
+1: class Fl_Fill_Slider
+2: class FillSlider
+*: should map easily
+
+1: 
+2: class FlatBox
+
+1: class Fl_Float_Input
+2: class FloatInput
+*: should map easily
+
+1: class Fl_FormsBitmap
+2:
+
+1: class Fl_FormsPixmap
+2:
+
+1: class Fl_FormsText
+2: class Fl_FormsText
+*: should map easily
+
+1: 
+2: class FrameBox
+
+1: class Fl_Free
+2:
+
+1: class Fl_GIF_Image
+2: class gifImage
+*: should map easily
+
+1: class Fl_Gl_Choice
+2: class GlChoice
+*: should map easily
+
+1: class Fl_Gl_Window
+2: class GlWindow
+*: should map easily
+
+1: 
+2: class GlOverlay
+
+1: class Fl_Glut_Window
+2: class GlutWindow
+
+1: class Fl_Group
+2: class Group
+*: should map easily, must manage coordinate systems
+
+1: 
+2: class GSave
+
+1: 
+2: class Guard
+
+1: class Fl_Help_Dialog
+2: class HelpDialog
+*: should map easily
+
+1: class Fl_Help_View
+2: class HelpView
+*: should map easily
+
+1: 
+2: class HighlightBox
+
+1: 
+2: class HighlightButton
+
+1: class Fl_Hold_Browser
+2:
+
+1: class Fl_Hor_Fill_Slider
+2:
+
+1: class Fl_Hor_Nice_Slider
+2:
+
+1: class Fl_Hor_Slider
+2:
+
+1: class Fl_Hor_Value_Slider
+2:
+
+1: class Fl_Image
+2: class Image
+*: should map easily
+
+1: class Fl_Input
+2: class Input
+*: should map easily
+
+1: class Fl_Input_
+2:
+
+1: 
+2: class InputBrowser
+
+1: class Fl_Input_Choice
+2: class ComboBox
+*: should map easily
+
+1: class Fl_Int_Input
+2: class IntInput
+*: should map easily
+
+1: 
+2: class InvisibleBox
+
+1: 
+2: class Item
+
+1: 
+2: class ItemGroup
+
+1: class Fl_JPEG_Image
+2: class jpegImage
+*: should map easily
+
+1: 
+2: class LabelType
+
+1: class Fl_Light_Button
+2: class LightButton
+*: should map easily
+
+1: class Fl_Line_Dial
+2: class LineDial
+*: should map easily
+
+1: 
+2: class List
+
+1: class Fl_Menu_
+2: class Menu
+
+1: class Fl_Menu_Bar
+2: class MenuBar
+
+1: class Fl_Menu_Button
+2: class PopupMenu
+
+1: 
+2: class MenuSection
+
+1: class Fl_Menu_Window
+2: class MenuWindow
+
+1: 
+2: class Monitor
+
+1: class Fl_Multi_Browser
+2: class MultiBrowser
+
+1: 
+2: class MultiImage
+
+1: class Fl_Multiline_Input
+2: class MultiLineInput
+*: should map easily
+
+1: class Fl_Multiline_Output
+2: class MultiLineOutput
+*: should map easily
+
+1: 
+2: class Mutex
+
+1: class Fl_Nice_Slider
+2:
+
+1: 
+2: class NumericInput
+
+1: class Fl_Output
+2: class Output
+*: should map easily
+
+1: class Fl_Overlay_Window
+2:
+
+1: class Fl_PNG_Image
+2: class pngImage
+*: should map easily
+
+1: class Fl_PNM_Image
+2: class pnmImage
+*: should map easily
+
+1: class Fl_Pack
+2: class PackedGroup
+*: should map easily, FLTK 2 has soem additional functionaity
+
+1: class Fl_Pixmap
+2:
+
+1: class Fl_Positioner
+2:
+
+1: class Fl_Preferences 
+2: class Preferences
+*: should map easily
+
+1: class Fl_Progress
+2: class ProgressBar
+*: should map easily
+
+1: class Fl_RGB_Image
+2: class rgbImage
+*: should map easily
+
+1: class Fl_Radio_Button
+2: class RadioButton
+*: should map easily
+
+1: 
+2: class RadioItem
+
+1: class Fl_Radio_Light_Button
+2: class RadioLightButton
+*: should map easily
+
+1: class Fl_Radio_Round_Button
+2:
+
+1: 
+2: class Rectangle
+
+1: 
+2: class RecursiveMutex
+
+1: class Fl_Repeat_Button
+2: class RepeatButton
+*: should map easily
+
+1: class Fl_Return_Button
+2: class ReturnButton
+*: should map easily
+
+1: class Fl_Roller
+2: class ThumbWheel
+*: should map easily
+
+1: class Fl_Round_Button
+2:
+
+1: class Fl_Round_Clock
+2:
+
+1: class Fl_Scroll
+2: class ScrollGroup
+*: should map easily
+
+1: class Fl_Scrollbar
+2: class Scrollbar
+*: should map easily
+
+1: class Fl_Secret_Input
+2: class SecretInput
+*: should map easily
+
+1: class Fl_Select_Browser
+2:
+
+1: 
+2: class ShapedWindow
+
+1: class Fl_Shared_Image
+2: class SharedImage
+*: should map easily
+
+1: 
+2: class ShortcutFunctor
+
+1: class Fl_Simple_Counter
+2:
+
+1: class Fl_Single_Window
+2:
+
+1: 
+2: class SignalMutex
+
+1: class Fl_Slider
+2: class Slider
+*: should map easily
+
+1: class Fl_Spinner
+2:
+
+1: 
+2: class StatusBarGroup
+
+1: 
+2: class StringArray
+
+1: 
+2: class StringHierarchy
+
+1: 
+2: class StringList
+
+1: 
+2: class Style
+
+1: 
+2: class StyleSet
+
+1: 
+2: class Symbol
+
+1: class Fl_Sys_Menu_Bar
+2: class SystemMenuBar
+*: should map easily
+
+1: class Fl_Tabs
+2: class TabGroup
+*: should map easily
+
+1: 
+2: class TabGroupPager
+
+1: class Fl_Text_Buffer
+2: class TextBuffer
+*: should map easily
+
+1: class Fl_Text_Display
+2: class TextDisplay
+*: should map easily
+
+1: class Fl_Text_Editor
+2: class TextEditor
+*: should map easily
+
+1: class Fl_Text_Selection
+2: class TextSelection
+*: should map easily
+
+1: class Fl_Tile
+2: class TiledGroup
+*: should map easily
+
+1: class Fl_Tiled_Image
+2: class TiledImage
+*: should map easily
+
+1: class Fl_Timer
+2:
+
+1: class Fl_Toggle_Button
+2: class ToggleButton
+*: should map easily
+
+1: 
+2: class ToggleItem
+
+1: class Fl_Tooltip
+2: class Tooltip
+*: should map easily
+
+1: 
+2: class WordwrapInput
+
+1: 
+2: class WordwrapOutput
+
+1: class Fl_Valuator
+2: class Valuator
+*: should map easily
+
+1: class Fl_Value_Input
+2: class ValueInput
+*: should map easily
+
+1: class Fl_Value_Output
+2: class ValueOutput
+*: should map easily
+
+1: class Fl_Value_Slider
+2: class ValueSlider
+*: should map easily
+
+1: class Fl_Widget
+2: class Widget
+*: should map easily for the most part
+
+1: class Fl_Widget_Tracker
+2:
+
+1: class Fl_Window
+2: class Window
+*: should map easily
+
+1: class Fl_Wizard
+2: class WizardGroup
+*: should map easily
+
+1: class Fl_X 
+2: class CreatedWindow
+*: should map easily
+
+1: class Fl_XBM_Image
+2: class xbmImage
+*: should map easily
+
+1: class Fl_XPM_Image
+2: class xpmImage
+*: should map easily
+
+1: 
+2: class xpmFileImage
+
+1: 
+2: struct Cursor
+
+1: 
+2: struct Font
+
+1: struct Fl_Glut_Bitmap_Font
+2:
+
+1: struct Fl_Glut_StrokeChar
+2:
+
+1: struct Fl_Glut_StrokeFont
+2:
+
+1: struct Fl_Glut_StrokeStrip
+2:
+
+1: struct Fl_Glut_StrokeVertex
+2:
+
+1: struct Fl_Help_Block
+2: struct HelpBlock
+*: should map easily
+
+1: struct Fl_Help_Font_Stack
+2:
+
+1: struct Fl_Help_Font_Style
+2:
+
+1: struct Fl_Help_Link
+2: struct HelpLink
+*: should map easily
+
+1: struct Fl_Help_Target
+2: struct HelpTarget
+*: should map easily
+
+1: 
+2: struct ImageType
+
+1: struct Fl_Label
+2:
+
+1: struct Fl_Menu_Item
+2:
+
+1: struct Fl_Multi_Label
+2:
+
+1: 
+2: struct NamedStyle
+
+

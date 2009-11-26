@@ -157,6 +157,7 @@ void ZynAddSubFxInstrument::loadSettings( const QDomElement & _this )
 		QByteArray a = doc.toString( 0 ).toUtf8();
 		a.prepend( "<?xml version=\"1.0\"?>\n" );
 		tf.write( a );
+		tf.flush();
 
 		const std::string fn = QSTR_TO_STDSTR(
 									QDir::toNativeSeparators( tf.fileName() ) );

@@ -29,10 +29,10 @@
 #define REALTYPE float
 
 struct FFTFREQS {
-    REALTYPE *s,*c;//sine and cosine components
+    REALTYPE *s, *c; //sine and cosine components
 };
 
-extern void newFFTFREQS(FFTFREQS *f,int size);
+extern void newFFTFREQS(FFTFREQS *f, int size);
 extern void deleteFFTFREQS(FFTFREQS *f);
 
 /**Sampling rate*/
@@ -131,7 +131,7 @@ extern int OSCIL_SIZE;
  * The maximum number of bands of the equaliser
  */
 #define MAX_EQ_BANDS 8
-#if (MAX_EQ_BANDS>=20)
+#if (MAX_EQ_BANDS >= 20)
 #error "Too many EQ bands in globals.h"
 #endif
 
@@ -162,46 +162,67 @@ extern int OSCIL_SIZE;
 /*
  * How the amplitude threshold is computed
  */
-#define ABOVE_AMPLITUDE_THRESHOLD(a,b) ( ( 2.0*fabs( (b) - (a) ) /  \
-      ( fabs( (b) + (a) + 0.0000000001) ) ) > AMPLITUDE_INTERPOLATION_THRESHOLD )
+#define ABOVE_AMPLITUDE_THRESHOLD(a, b) ((2.0 * fabs((b) - (a)) \
+                                          / (fabs((b) + (a) + 0.0000000001))) > \
+                                         AMPLITUDE_INTERPOLATION_THRESHOLD)
 
 /*
  * Interpolate Amplitude
  */
-#define INTERPOLATE_AMPLITUDE(a,b,x,size) ( (a) + \
-      ( (b) - (a) ) * (REALTYPE)(x) / (REALTYPE) (size) )
+#define INTERPOLATE_AMPLITUDE(a, b, x, size) ((a) \
+                                              + ((b) \
+                                                 - (a)) * (REALTYPE)(x) \
+                                              / (REALTYPE) (size))
 
 
 /*
  * dB
  */
-#define dB2rap(dB) ((exp((dB)*LOG_10/20.0)))
-#define rap2dB(rap) ((20*log(rap)/LOG_10))
+#define dB2rap(dB) ((exp((dB) * LOG_10 / 20.0)))
+#define rap2dB(rap) ((20 * log(rap) / LOG_10))
 
 /*
  * The random generator (0.0..1.0)
  */
-#define RND (rand()/(RAND_MAX+1.0))
+#define RND (rand() / (RAND_MAX + 1.0))
 
-#define ZERO(data,size) {char *data_=(char *) data;for (int i=0;i<size;i++) data_[i]=0;};
+#define ZERO(data, size) {char *data_ = (char *) data; for(int i = 0; \
+                                                           i < size; \
+                                                           i++) \
+                              data_[i] = 0;}
+#define ZERO_REALTYPE(data, size) {REALTYPE *data_ = (REALTYPE *) data; \
+                                   for(int i = 0; \
+                                       i < size; \
+                                       i++) \
+                                       data_[i] = 0.0;}
 
-enum ONOFFTYPE {OFF=0,ON=1};
+enum ONOFFTYPE {
+    OFF = 0, ON = 1
+};
 
-enum MidiControllers {C_NULL=0,C_pitchwheel=1000,C_expression=11,C_panning=10,
-                      C_filtercutoff=74,C_filterq=71,C_bandwidth=75,C_modwheel=1,C_fmamp=76,
-                      C_volume=7,C_sustain=64,C_allnotesoff=123,C_allsoundsoff=120,C_resetallcontrollers=121,
-                      C_portamento=65,C_resonance_center=77,C_resonance_bandwidth=78,
+enum MidiControllers {
+    C_NULL = 0, C_pitchwheel = 1000, C_expression = 11, C_panning = 10,
+    C_filtercutoff = 74, C_filterq = 71, C_bandwidth = 75, C_modwheel = 1,
+    C_fmamp  = 76,
+    C_volume = 7, C_sustain = 64, C_allnotesoff = 123, C_allsoundsoff = 120,
+    C_resetallcontrollers = 121,
+    C_portamento = 65, C_resonance_center = 77, C_resonance_bandwidth = 78,
 
-                      C_dataentryhi=0x06,C_dataentrylo=0x26,C_nrpnhi=99,C_nrpnlo=98
-                     };
+    C_dataentryhi = 0x06, C_dataentrylo = 0x26, C_nrpnhi = 99, C_nrpnlo = 98
+};
 
-enum LegatoMsg {LM_Norm, LM_FadeIn, LM_FadeOut, LM_CatchUp, LM_ToNorm};
+enum LegatoMsg {
+    LM_Norm, LM_FadeIn, LM_FadeOut, LM_CatchUp, LM_ToNorm
+};
 
 //is like i=(int)(floor(f))
 #ifdef ASM_F2I_YES
-#define F2I(f,i) __asm__ __volatile__ ("fistpl %0" : "=m" (i) : "t" (f-0.49999999) : "st") ;
+#define F2I(f, \
+            i) __asm__ __volatile__ ("fistpl %0" : "=m" (i) : "t" (f \
+                                                                   - 0.49999999) \
+                                     : "st");
 #else
-#define F2I(f,i) (i)=((f>0) ? ( (int)(f) ) :( (int)(f-1.0) ));
+#define F2I(f, i) (i) = ((f > 0) ? ((int)(f)) : ((int)(f - 1.0)));
 #endif
 
 

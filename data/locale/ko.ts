@@ -2,6 +2,57 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="ko_KR" sourcelanguage="en">
 <context>
+    <name>AboutDialog</name>
+    <message>
+        <source>About LMMS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LMMS (Linux MultiMedia Studio)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Version %1 (%2/%3, Qt %4, %5)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>About</source>
+        <translation type="unfinished">LMMS란</translation>
+    </message>
+    <message>
+        <source>LMMS - easy music production for everyone</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Copyright (c) 2004-2009, LMMS developers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>http://lmms.sourceforge.net
+
+Join us on Freenode (irc.freenode.net) in ##lmms!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Authors</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Translation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Current language not translated (or native English).
+
+If you&apos;re interested in translating LMMS in another language or want to improve existing translations, you&apos;re welcome to help us! Simply contact the maintainer!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>License</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>Arpeggiator</name>
     <message>
         <source>Arpeggio</source>
@@ -57,7 +108,7 @@
     </message>
     <message>
         <source>Sync</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">동기</translation>
     </message>
 </context>
 <context>
@@ -755,7 +806,7 @@
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">취소</translation>
     </message>
     <message>
         <source>LMMS</source>
@@ -805,6 +856,13 @@
     </message>
 </context>
 <context>
+    <name>DirectorySelectDialog</name>
+    <message>
+        <source>Select directory</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>Effect</name>
     <message>
         <source>Effect enabled</source>
@@ -839,6 +897,17 @@
     <message>
         <source>Add effect</source>
         <translation type="unfinished">효과 더하기</translation>
+    </message>
+</context>
+<context>
+    <name>EffectSelectDialog</name>
+    <message>
+        <source>Add effect</source>
+        <translation type="unfinished">효과 더하기</translation>
+    </message>
+    <message>
+        <source>Plugin description</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1184,6 +1253,150 @@ Please make sure you have write-permission to the file and the directory contain
     <message>
         <source>Rendering: %1%</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Export project</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Output</source>
+        <translation type="unfinished">출력</translation>
+    </message>
+    <message>
+        <source>File format:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Samplerate:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>44100 Hz</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>48000 Hz</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>88200 Hz</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>96000 Hz</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>192000 Hz</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bitrate:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>64 KBit/s</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>128 KBit/s</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>160 KBit/s</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>192 KBit/s</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>256 KBit/s</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>320 KBit/s</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Depth:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>16 Bit Integer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>24 Bit Integer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>32 Bit Float</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please note that not all of the parameters above apply for all file formats.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Quality settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Interpolation:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Zero Order Hold</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sinc Fastest</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sinc Medium (recommended)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sinc Best (very slow!)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Oversampling (use with care!):</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>1x (None)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>2x</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>4x</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>8x</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sample-exact controllers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Alias-free oscillators</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">취소</translation>
     </message>
 </context>
 <context>
@@ -2478,6 +2691,21 @@ Available decoders: %2
     </message>
 </context>
 <context>
+    <name>QuickLoadDialog</name>
+    <message>
+        <source>Load resource</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Resource type:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All types</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>ResourceBrowser</name>
     <message>
         <source>Show/edit properties</source>
@@ -2859,19 +3087,90 @@ Available decoders: %2
     <name>VstPlugin</name>
     <message>
         <source>Loading plugin</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">플러그인 읽는 중</translation>
     </message>
     <message>
         <source>Please wait while loading VST-plugin...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">VST 플러그인 읽은 동안 잠시 대기...</translation>
     </message>
     <message>
         <source>Failed loading VST-plugin</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">VST 플러그인 읽는 중 오류</translation>
     </message>
     <message>
         <source>The VST-plugin %1 could not be loaded for some reason.
 If it runs with other VST-software under Linux, please contact an LMMS-developer!</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>WelcomeScreen</name>
+    <message>
+        <source>Welcome to LMMS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New project</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Import project</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open tutorial</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Instant MIDI action</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recent projects</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recent community resources</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Did you know...?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Linux Biolinum O&apos;; font-size:12pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Online resources</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Users forum</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>http://sourceforge.net/apps/phpbb/lmms/</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Online manual</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>http://lmms.sourceforge.net/wiki/NewManual</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Wiki</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>http://lmms.sourceforge.net/wiki/</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5146,7 +5445,7 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">취소</translation>
     </message>
     <message>
         <source>MIDI KEYBOARD</source>

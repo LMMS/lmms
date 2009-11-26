@@ -56,7 +56,7 @@ public:
 	// used for drag'n'drop - return proper MIME data for indexes
 	virtual QMimeData * mimeData( const QModelIndexList & _indexes ) const;
 
-	// return ResourceTreeItem belonging to a certain index
+	// return ResourceItem::Relation belonging to a certain index
 	static inline ResourceItem::Relation * relation( const QModelIndex & _idx )
 	{
 		return static_cast<ResourceItem::Relation *>( _idx.internalPointer() );

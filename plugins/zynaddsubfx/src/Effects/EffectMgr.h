@@ -41,62 +41,62 @@
 /**Effect manager, an interface betwen the program and effects*/
 class EffectMgr:public Presets
 {
-public:
-    EffectMgr(int insertion_,pthread_mutex_t *mutex_);
-    ~EffectMgr();
+    public:
+        EffectMgr(int insertion_, pthread_mutex_t *mutex_);
+        ~EffectMgr();
 
-    void add2XML(XMLwrapper *xml);
-    void defaults();
-    void getfromXML(XMLwrapper *xml);
+        void add2XML(XMLwrapper *xml);
+        void defaults();
+        void getfromXML(XMLwrapper *xml);
 
-    void out(REALTYPE *smpsl,REALTYPE *smpsr);
+        void out(REALTYPE *smpsl, REALTYPE *smpsr);
 
-    void setdryonly(bool value);
+        void setdryonly(bool value);
 
-    /**get the output(to speakers) volume of the systemeffect*/
-    REALTYPE sysefxgetvolume();
+        /**get the output(to speakers) volume of the systemeffect*/
+        REALTYPE sysefxgetvolume();
 
-    void cleanup();/**<cleanup the effect*/
+        void cleanup(); /**<cleanup the effect*/
 
-    /**change effect to the given int
-         * @param nefx_ the number of the effect*/
-    void changeeffect(int nefx_);
-    /**Get the number of the effect
-     * @return the number*/
-    int geteffect();
-    /**
-     * Change the preset to the given one
-     * @param npreset number of the chosen preset
-     */
-    void changepreset(unsigned char npreset);
-    /**
-     * Change the preset to the given one without locking the thread
-     * @param npreset number of the chosen preset
-     */
-    void changepreset_nolock(unsigned char npreset);
-    /**
-     * Get the current preset
-     * @return the current preset*/
-    unsigned char getpreset();
-    /**sets the effect par*/
-    void seteffectpar(int npar,unsigned char value);
-    /**<sets the effect par without thread lock*/
-    void seteffectpar_nolock(int npar,unsigned char value);
-    unsigned char geteffectpar(int npar);
-    const bool insertion;/**<1 if the effect is connected as insertion effect*/
-    REALTYPE *efxoutl,*efxoutr;
+        /**change effect to the given int
+             * @param nefx_ the number of the effect*/
+        void changeeffect(int nefx_);
+        /**Get the number of the effect
+         * @return the number*/
+        int geteffect();
+        /**
+         * Change the preset to the given one
+         * @param npreset number of the chosen preset
+         */
+        void changepreset(unsigned char npreset);
+        /**
+         * Change the preset to the given one without locking the thread
+         * @param npreset number of the chosen preset
+         */
+        void changepreset_nolock(unsigned char npreset);
+        /**
+         * Get the current preset
+         * @return the current preset*/
+        unsigned char getpreset();
+        /**sets the effect par*/
+        void seteffectpar(int npar, unsigned char value);
+        /**<sets the effect par without thread lock*/
+        void seteffectpar_nolock(int npar, unsigned char value);
+        unsigned char geteffectpar(int npar);
+        const bool insertion; /**<1 if the effect is connected as insertion effect*/
+        REALTYPE  *efxoutl, *efxoutr;
 
-    /**used by UI
-         * \todo needs to be decoupled*/
-    REALTYPE getEQfreqresponse(REALTYPE freq);
+        /**used by UI
+             * \todo needs to be decoupled*/
+        REALTYPE getEQfreqresponse(REALTYPE freq);
 
-    FilterParams *filterpars;
+        FilterParams *filterpars;
 
-private:
-    int nefx;
-    Effect *efx;
-    pthread_mutex_t *mutex;
-    bool dryonly;
+    private:
+        int     nefx;
+        Effect *efx;
+        pthread_mutex_t *mutex;
+        bool dryonly;
 };
 
 #endif

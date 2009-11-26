@@ -29,66 +29,64 @@
 /**MIDI file loader*/
 class MIDIFile
 {
-public:
-    MIDIFile();
-    ~MIDIFile();
+    public:
+        MIDIFile();
+        ~MIDIFile();
 
-    /**Loads the given file
-         * @param filename The name of the file to load
-         * @return -1 if there is an error, otherwise 0*/
-    int loadfile(const char *filename);
+        /**Loads the given file
+             * @param filename The name of the file to load
+             * @return -1 if there is an error, otherwise 0*/
+        int loadfile(const char *filename);
 
-    //returns -1 if there is an error, otherwise 0
-    int parsemidifile(MIDIEvents *me_);
+        //returns -1 if there is an error, otherwise 0
+        int parsemidifile(MIDIEvents *me_);
 
-private:
-    MIDIEvents *me;
+    private:
+        MIDIEvents *me;
 
-    unsigned char *midifile;
-    int midifilesize,midifilek;
-    bool midieof;
+        unsigned char *midifile;
+        int  midifilesize, midifilek;
+        bool midieof;
 
-    //returns -1 if there is an error, otherwise 0
-    int parsetrack(int ntrack);
+        //returns -1 if there is an error, otherwise 0
+        int parsetrack(int ntrack);
 
-    void parsenoteoff(char ntrack,char chan,unsigned int dt);
-    void parsenoteon(char ntrack,char chan,unsigned int dt);
-    void parsecontrolchange(char ntrack,char chan,unsigned int dt);
-    void parsepitchwheel(char ntrack,char chan, unsigned int dt);
-    void parsemetaevent(unsigned char mtype,unsigned char mlength);
+        void parsenoteoff(char ntrack, char chan, unsigned int dt);
+        void parsenoteon(char ntrack, char chan, unsigned int dt);
+        void parsecontrolchange(char ntrack, char chan, unsigned int dt);
+        void parsepitchwheel(char ntrack, char chan, unsigned int dt);
+        void parsemetaevent(unsigned char mtype, unsigned char mlength);
 
-    void add_dt(char ntrack, unsigned int dt);
+        void add_dt(char ntrack, unsigned int dt);
 
-    void clearmidifile();
+        void clearmidifile();
 
-    //convert the delta-time to internal format
-    unsigned int convertdt(unsigned int dt);
+        //convert the delta-time to internal format
+        unsigned int convertdt(unsigned int dt);
 
-    /* Low Level MIDIfile functions */
+        /* Low Level MIDIfile functions */
 
-    //get a byte from the midifile
-    unsigned char getbyte();
+        //get a byte from the midifile
+        unsigned char getbyte();
 
-    //peek the current byte from the midifile
-    unsigned char peekbyte();
+        //peek the current byte from the midifile
+        unsigned char peekbyte();
 
-    //get a set of 4 bytes from the midifile
-    unsigned int getint32();
+        //get a set of 4 bytes from the midifile
+        unsigned int getint32();
 
-    //get a word of 2 bytes from the midifile
-    unsigned short int getint16();
+        //get a word of 2 bytes from the midifile
+        unsigned short int getint16();
 
-    //read a variable length quantity
-    unsigned int getvarint32();
+        //read a variable length quantity
+        unsigned int getvarint32();
 
-    //skip some bytes
-    void skipnbytes(int n);
+        //skip some bytes
+        void skipnbytes(int n);
 
-    struct {
-        double tick;//how many seconds one tick has
-
-    }data;
-
+        struct {
+            double tick; //how many seconds one tick has
+        } data;
 };
 
 #endif

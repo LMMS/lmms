@@ -27,74 +27,74 @@
 
 class Control
 {
-public:
-    /**
-     * The parent is the logical owner of this control. Parent should only
-     * be null for the root node.
-     * The id is a string uniquely identifying this control within the
-     * context of the parent control. No spaces or dots are allowed in this
-     * id.
-     * Children id's are denoted by <parent-id>.<children-id>, so that one
-     * can refer to any control in the hierarchy by separating them with
-     * dots. Example: Main.AddSynth.FrequencyLFO.Amplitude
-     */
-    Control(Control *parent, string id);
+    public:
+        /**
+         * The parent is the logical owner of this control. Parent should only
+         * be null for the root node.
+         * The id is a string uniquely identifying this control within the
+         * context of the parent control. No spaces or dots are allowed in this
+         * id.
+         * Children id's are denoted by <parent-id>.<children-id>, so that one
+         * can refer to any control in the hierarchy by separating them with
+         * dots. Example: Main.AddSynth.FrequencyLFO.Amplitude
+         */
+        Control(Control *parent, string id);
 
-    /**
-     * Will recursively get the XML representation for all the subcontrols.
-     * Used for saving to file and copy-pasting settings
-     */
-    string getXMLRepresentation();
+        /**
+         * Will recursively get the XML representation for all the subcontrols.
+         * Used for saving to file and copy-pasting settings
+         */
+        string getXMLRepresentation();
 
-    /**
-     * Set the value of this (and possibly subcomponents as well) based on
-     * a xml description.
-     */
-    void restoreFromXML(string xml);
+        /**
+         * Set the value of this (and possibly subcomponents as well) based on
+         * a xml description.
+         */
+        void restoreFromXML(string xml);
 
-    /**
-     * Register a controluser. This will cause this user to be notified
-     * whenever the contents of the control changes.
-     */
-    void registerControlUser(ControlUser *user);
+        /**
+         * Register a controluser. This will cause this user to be notified
+         * whenever the contents of the control changes.
+         */
+        void registerControlUser(ControlUser *user);
 
-    /**
-     * This should return a string representation of the controls internal
-     * value
-     */
-    virtual string getStringRepresentation() = 0;
-
+        /**
+         * This should return a string representation of the controls internal
+         * value
+         */
+        virtual string getStringRepresentation() = 0;
 };
 
-class FloatControl : public Control
+class FloatControl:public Control
 {
-public:
-    /**
-     * Set the value of this control. If the ControlUser variable is set,
-     * then this user will not be updated with the new value. This is to
-     * avoid setting a value being set back to the source that set it
-     * (which would be redundant, or possibly causing infinite setValue
-     * loops).
-     * NOTE: this function is thread-safe (using a mutex internally)
-     */
-    void setValue(float value, ControlUser *user = NULL);
+    public:
+        /**
+         * Set the value of this control. If the ControlUser variable is set,
+         * then this user will not be updated with the new value. This is to
+         * avoid setting a value being set back to the source that set it
+         * (which would be redundant, or possibly causing infinite setValue
+         * loops).
+         * NOTE: this function is thread-safe (using a mutex internally)
+         */
+        void setValue(float value, ControlUser *user = NULL);
 
-    /**
-     * Reimplemented from Control
-     */
-    virtual string getStringRepresentation();
+        /**
+         * Reimplemented from Control
+         */
+        virtual string getStringRepresentation();
 
-    float value();
+        float value();
 };
 
 class ControlUser
 {
-public:
-    /**
-     * Pure virtual method, to notify the controluser that the value has
-     * been changed internally, and needs to be read again.
-     */
-    virtual void controlUpdated(Control *control) = 0;
+    public:
+        /**
+         * Pure virtual method, to notify the controluser that the value has
+         * been changed internally, and needs to be read again.
+         */
+        virtual void controlUpdated(Control *control) = 0;
 };
 
 #endif /* _CONTROL_H_ */
+

@@ -43,30 +43,30 @@
 
 struct ActionDesc
 {
-	ResourceBrowser::Actions action;
+	ResourceAction::Action action;
 	const char * pixmap;
 	const char * text;
 } ;
 
 static ActionDesc resourceBrowserActions[] =
 {
-	{ ResourceBrowser::EditProperties, "edit_draw",
+	{ ResourceAction::EditProperties, "edit_draw",
 		QT_TRANSLATE_NOOP( "ResourceBrowser", "Show/edit properties" ) },
-	{ ResourceBrowser::LoadProject, "project_open",
+	{ ResourceAction::LoadProject, "project_open",
 		QT_TRANSLATE_NOOP( "ResourceBrowser", "Load project" ) },
-	{ ResourceBrowser::LoadInNewTrackSongEditor, "songeditor",
+	{ ResourceAction::LoadInNewTrackSongEditor, "songeditor",
 		QT_TRANSLATE_NOOP( "ResourceBrowser", "Load in new track in Song Editor" ) },
-	{ ResourceBrowser::LoadInNewTrackBBEditor, "bb_track",
+	{ ResourceAction::LoadInNewTrackBBEditor, "bb_track",
 		QT_TRANSLATE_NOOP( "ResourceBrowser", "Load in new track in B+B Editor" ) },
-	{ ResourceBrowser::LoadInActiveInstrumentTrack, "instrument_track",
+	{ ResourceAction::LoadInActiveInstrumentTrack, "instrument_track",
 		QT_TRANSLATE_NOOP( "ResourceBrowser", "Load into active instrument track" ) },
-	{ ResourceBrowser::DownloadIntoCollection, "mimetypes/folder-downloads",
+	{ ResourceAction::DownloadIntoCollection, "mimetypes/folder-downloads",
 		QT_TRANSLATE_NOOP( "ResourceBrowser", "Download into collection" ) },
-	{ ResourceBrowser::UploadToWWW, "mimetypes/network-workgroup",
+	{ ResourceAction::UploadToWWW, "mimetypes/network-workgroup",
 		QT_TRANSLATE_NOOP( "ResourceBrowser", "Upload to WWW" ) },
-	{ ResourceBrowser::DeleteLocalResource, "edit-delete",
+	{ ResourceAction::DeleteLocalResource, "edit-delete",
 		QT_TRANSLATE_NOOP( "ResourceBrowser", "Delete resource" ) },
-	{ ResourceBrowser::ImportFile, "project_import",
+	{ ResourceAction::ImportFile, "project_import",
 		QT_TRANSLATE_NOOP( "ResourceBrowser", "Import file" ) }
 } ;
 
@@ -74,7 +74,7 @@ static ActionDesc resourceBrowserActions[] =
 
 
 ResourceBrowser::ResourceBrowser( QWidget * _parent ) :
-	sideBarWidget( tr( "Resource Browser" ),
+	SideBarWidget( tr( "Resource Browser" ),
 			embed::getIconPixmap( "resource_browser" ),
 			_parent ),
 	m_previewer(),
@@ -98,7 +98,7 @@ ResourceBrowser::ResourceBrowser( QWidget * _parent ) :
 	filterLayout->addWidget( m_filterStatusLabel );
 
 	// create an according tree-view for our tree-model
-	m_treeView = new ResourceTreeView( &m_treeModel, contentParent() );
+	m_treeView = new ResourceTreeView( contentParent(), &m_treeModel );
 
 	// set up context menu handling
 	m_treeView->setContextMenuPolicy( Qt::CustomContextMenu );
@@ -167,7 +167,7 @@ ResourceBrowser::ResourceBrowser( QWidget * _parent ) :
 	for( int i = 0; i < (int) ( sizeof( resourceBrowserActions ) /
 						sizeof( ActionDesc ) ); ++i )
 	{
-		Actions a = resourceBrowserActions[i].action;
+		ResourceAction::Action a = resourceBrowserActions[i].action;
 		m_actions[a] = new QAction(
 			embed::getIconPixmap(
 				resourceBrowserActions[i].pixmap ),
@@ -211,16 +211,16 @@ void ResourceBrowser::showContextMenu( const QPoint & _pos )
 		case ResourceItem::TypePreset:
 		case ResourceItem::TypePluginSpecificResource:
 		case ResourceItem::TypePlugin:
-			m.addAction( m_actions[LoadInNewTrackSongEditor] );
-			m.addAction( m_actions[LoadInNewTrackBBEditor] );
-			m.addAction( m_actions[LoadInActiveInstrumentTrack] );
+			m.addAction( m_actions[ResourceAction::LoadInNewTrackSongEditor] );
+			m.addAction( m_actions[ResourceAction::LoadInNewTrackBBEditor] );
+			m.addAction( m_actions[ResourceAction::LoadInActiveInstrumentTrack] );
 			break;
 		case ResourceItem::TypeProject:
-			m.addAction( m_actions[LoadProject] );
+			m.addAction( m_actions[ResourceAction::LoadProject] );
 			break;
 		case ResourceItem::TypeForeignProject:
 		case ResourceItem::TypeMidiFile:
-			m.addAction( m_actions[ImportFile] );
+			m.addAction( m_actions[ResourceAction::ImportFile] );
 			break;
 		case ResourceItem::TypeImage:
 		case ResourceItem::TypeDirectory:
@@ -234,25 +234,25 @@ void ResourceBrowser::showContextMenu( const QPoint & _pos )
 		m.addSeparator();
 		if( item->isLocalResource() )
 		{
-			m.addAction( m_actions[DeleteLocalResource] );
-			m.addAction( m_actions[UploadToWWW] );
+			m.addAction( m_actions[ResourceAction::DeleteLocalResource] );
+			m.addAction( m_actions[ResourceAction::UploadToWWW] );
 		}
 		else
 		{
-			m.addAction( m_actions[DownloadIntoCollection] );
+			m.addAction( m_actions[ResourceAction::DownloadIntoCollection] );
 		}
 	}
 
 	m.addSeparator();
-	m.addAction( m_actions[EditProperties] );
+	m.addAction( m_actions[ResourceAction::EditProperties] );
 
 	// show and exec menu
 	QAction * a = m.exec( m_treeView->mapToGlobal( _pos ) );
 	if( a )
 	{
 		// trigger action if one has been selected
-		triggerAction( static_cast<Actions>( a->data().toInt() ),
-									item );
+		triggerAction( static_cast<ResourceAction::Action>( a->data().toInt() ),
+						item );
 	}
 
 }
@@ -269,12 +269,14 @@ void ResourceBrowser::startItemPreview( const QModelIndex & _idx )
 }
 
 
+
+
 void ResourceBrowser::setFocusAndPreview( const QModelIndex & _idx )
 {
 	// transfor focus to the treeview. for some reason you have to
 	// setFocus to the line edit above it first.
-	m_filterEdit->setFocus(Qt::MouseFocusReason);
-	m_treeView->setFocus(Qt::MouseFocusReason);
+	m_filterEdit->setFocus( Qt::MouseFocusReason );
+	m_treeView->setFocus( Qt::MouseFocusReason );
 
 	startItemPreview( _idx );
 }
@@ -291,7 +293,7 @@ void ResourceBrowser::stopItemPreview( const QModelIndex & )
 
 
 void ResourceBrowser::currentChanged( const QModelIndex & current, 
-	const QModelIndex & previous )
+										const QModelIndex & previous )
 {
 
 	// stop previous previews
@@ -299,9 +301,8 @@ void ResourceBrowser::currentChanged( const QModelIndex & current,
 
 	// start previewing the sound we just changed to
 	startItemPreview( current );
-
-	
 }
+
 
 
 
@@ -316,28 +317,28 @@ void ResourceBrowser::stopPreview()
 void ResourceBrowser::triggerDefaultAction( const QModelIndex & _idx )
 {
 	ResourceItem * item = m_treeModel.item( _idx );
-	Actions action = NumActions;
+	ResourceAction::Action action = ResourceAction::NumActions;
 	switch( item->type() )
 	{
 		case ResourceItem::TypeSample:
-			action = LoadInNewTrackBBEditor;
+			action = ResourceAction::LoadInNewTrackBBEditor;
 			break;
 		case ResourceItem::TypePreset:
 		case ResourceItem::TypePluginSpecificResource:
 		case ResourceItem::TypePlugin:
-			action = LoadInNewTrackSongEditor;
+			action = ResourceAction::LoadInNewTrackSongEditor;
 			break;
 		case ResourceItem::TypeProject:
-			action = LoadProject;
+			action = ResourceAction::LoadProject;
 			break;
 		case ResourceItem::TypeForeignProject:
 		case ResourceItem::TypeMidiFile:
-			action = ImportFile;
+			action = ResourceAction::ImportFile;
 			break;
 		default:
 			break;
 	}
-	if( action != NumActions )
+	if( action != ResourceAction::NumActions )
 	{
 		triggerAction( action, item );
 	}
@@ -363,26 +364,14 @@ void ResourceBrowser::manageDirectories()
 
 
 
-void ResourceBrowser::triggerAction( Actions _action, ResourceItem * _item )
+void ResourceBrowser::triggerAction( ResourceAction::Action _action,
+										ResourceItem * _item )
 {
+	ResourceAction action( _item, _action );
 	switch( _action )
 	{
-		case LoadProject:
-			if( engine::mainWindow()->mayChangeProject() )
-			{
-				ResourceFileMapper mapper( _item );
-				if( _item->isLocalResource() )
-				{
-					engine::getSong()->loadProject(
-							mapper.fileName() );
-				}
-				else
-				{
-					engine::getSong()->
-						createNewProjectFromTemplate(
-							mapper.fileName() );
-				}
-			}
+		default:
+			action.defaultTrigger();
 			break;
 	}
 }

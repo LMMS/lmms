@@ -1,5 +1,5 @@
 //
-// "$Id: Fl.H 6771 2009-04-19 12:47:36Z matt $"
+// "$Id: Fl.H 6903 2009-09-27 11:09:03Z matt $"
 //
 // Main header file for the Fast Light Tool Kit (FLTK).
 //
@@ -489,18 +489,25 @@ public:
   static int event_state()	{return e_state;}
   /** See int event_state() */
   static int event_state(int i) {return e_state&i;}
-  /** Gets which key on the keyboard was last pushed.
-      \retval 0 if the last event was not a key press or release.
-    \see int event_key(int) */
+  /**
+    Gets which key on the keyboard was last pushed.
+
+    The returned integer 'key code' is not necessarily a text
+    equivalent for the keystroke. For instance: if someone presses '5' on the 
+    numeric keypad with numlock on, Fl::event_key() may return the 'key code'
+    for this key, and NOT the character '5'. To always get the '5', use Fl::event_text() instead.
+    
+    \returns an integer 'key code', or 0 if the last event was not a key press or release.
+    \see int event_key(int), event_text(), compose(int&).
+  */
   static int event_key()	{return e_keysym;}
   /**
     Returns the keycode of the last key event, regardless of the NumLock state.
-
+      
     If NumLock is deactivated, FLTK translates events from the 
     numeric keypad into the corresponding arrow key events. 
     event_key() returns the translated key code, whereas
-    event_original_key() returns the keycode before 
-    NumLock translation.
+    event_original_key() returns the keycode before NumLock translation.
   */
   static int event_original_key(){return e_original_keysym;}
   /** 
@@ -548,7 +555,20 @@ public:
     slower than Fl::event_key(int). \see event_key(int)
   */
   static int get_key(int key); // platform dependent
-  /** Returns the text associated with the current FL_PASTE or FL_DND_RELEASE event. */
+  /** 
+    Returns the text associated with the current event, including FL_PASTE or FL_DND_RELEASE events.
+    This can be used in response to FL_KEYUP, FL_KEYDOWN, FL_PASTE, FL_DND_RELEASE.
+
+    When responding to FL_KEYUP/FL_KEYDOWN, use this function instead of Fl::event_key()
+    to get the text equivalent of keystrokes suitable for inserting into strings 
+    and text widgets.
+
+    The returned string is guaranteed to be be NULL terminated.
+    However, see Fl::event_length() for the actual length of the string,
+    in case the string itself contains NULLs that are part of the text data.
+
+    \returns A NULL terminated text string equivalent of the last keystroke.
+   */
   static const char* event_text() {return e_text;}
   /**
     Returns the length of the text in Fl::event_text(). There
@@ -568,7 +588,7 @@ public:
   static void compose_reset() {compose_state = 0;}
   static int event_inside(int,int,int,int);
   static int event_inside(const Fl_Widget*);
-  static int test_shortcut(int);
+  static int test_shortcut(Fl_Shortcut);
 
   // event destinations:
   static int handle(int, Fl_Window*);
@@ -660,7 +680,7 @@ public:
     8-bit RGB color. The color is not allocated until fl_color(i) is used.
   */
   static void	set_color(Fl_Color, unsigned); // platform dependent
-  static unsigned get_color(Fl_Color);
+  static Fl_Color get_color(Fl_Color);
   static void	get_color(Fl_Color, uchar&, uchar&, uchar&);
   /**
     Frees the specified color from the colormap, if applicable.
@@ -1022,5 +1042,5 @@ public:
 #endif // !Fl_H
 
 //
-// End of "$Id: Fl.H 6771 2009-04-19 12:47:36Z matt $".
+// End of "$Id: Fl.H 6903 2009-09-27 11:09:03Z matt $".
 //

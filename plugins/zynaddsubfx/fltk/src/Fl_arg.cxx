@@ -1,5 +1,5 @@
 //
-// "$Id: Fl_arg.cxx 6712 2009-03-22 19:21:34Z AlbrechtS $"
+// "$Id: Fl_arg.cxx 6813 2009-07-01 07:32:14Z AlbrechtS $"
 //
 // Optional argument initialization code for the Fast Light Tool Kit (FLTK).
 //
@@ -538,5 +538,5 @@ int XParseGeometry(const char* string, int* x, int* y,
 #endif // ifdef WIN32
 
 //
-// End of "$Id: Fl_arg.cxx 6712 2009-03-22 19:21:34Z AlbrechtS $".
+// End of "$Id: Fl_arg.cxx 6813 2009-07-01 07:32:14Z AlbrechtS $".
 //

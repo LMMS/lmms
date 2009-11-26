@@ -35,6 +35,7 @@
 #include "gui_templates.h"
 #include "templates.h"
 #include "Cpu.h"
+#include "engine.h"
 
 
 static void stream_write_callback(pa_stream *s, size_t length, void *userdata)
@@ -51,6 +52,7 @@ AudioPulseAudio::AudioPulseAudio( bool & _success_ful, mixer * _mixer ) :
 					DEFAULT_CHANNELS, SURROUND_CHANNELS ),
 								_mixer ),
 	m_s( NULL ),
+	m_quit( false ),
 	m_convertEndian( false )
 {
 	_success_ful = false;
@@ -68,11 +70,6 @@ AudioPulseAudio::AudioPulseAudio( bool & _success_ful, mixer * _mixer ) :
 AudioPulseAudio::~AudioPulseAudio()
 {
 	stopProcessing();
-
-	if( m_s != NULL )
-	{
-		pa_stream_unref( m_s );
-	}
 }
 
 
@@ -173,11 +170,29 @@ static void context_state_callback(pa_context *c, void *userdata)
 			_this->m_s = pa_stream_new( c, "lmms", &_this->m_sampleSpec,  NULL);
 			pa_stream_set_state_callback( _this->m_s, stream_state_callback, _this );
 			pa_stream_set_write_callback( _this->m_s, stream_write_callback, _this );
-			pa_stream_connect_playback( _this->m_s, NULL, NULL,
-						(pa_stream_flags) 0,
-						pa_cvolume_set( &cv, _this->m_sampleSpec.channels,
-											PA_VOLUME_NORM ),
-						NULL );
+
+			pa_buffer_attr buffer_attr;
+
+			buffer_attr.maxlength = (uint32_t)(-1);
+
+			// play silence in case of buffer underun instead of using default rewind
+			buffer_attr.prebuf = 0;
+
+			buffer_attr.minreq = (uint32_t)(-1);
+			buffer_attr.fragsize = (uint32_t)(-1);
+
+			double latency = (double)( engine::getMixer()->framesPerPeriod() ) /
+													(double)_this->sampleRate();
+
+			// ask PulseAudio for the desired latency (which might not be approved)
+			buffer_attr.tlength = pa_usec_to_bytes( latency * PA_USEC_PER_MSEC,
+														&_this->m_sampleSpec );
+
+			pa_stream_connect_playback( _this->m_s, NULL, &buffer_attr,
+										PA_STREAM_ADJUST_LATENCY,
+										pa_cvolume_set( &cv, _this->m_sampleSpec.channels,
+															PA_VOLUME_NORM ),
+										NULL );
 			break;
 		}
 
@@ -195,51 +210,59 @@ static void context_state_callback(pa_context *c, void *userdata)
 
 void AudioPulseAudio::run()
 {
-	pa_mainloop * m = NULL;
-
-
-	if (!(m = pa_mainloop_new())) {
+	pa_mainloop * mainLoop = pa_mainloop_new();
+	if( !mainLoop )
+	{
 		qCritical( "pa_mainloop_new() failed.\n" );
 		return;
 	}
-	pa_mainloop_api * mainloop_api = pa_mainloop_get_api(m);
+	pa_mainloop_api * mainloop_api = pa_mainloop_get_api( mainLoop );
 
-	pa_context *context = pa_context_new(mainloop_api, "lmms");
+	pa_context *context = pa_context_new( mainloop_api, "lmms" );
 	if ( context == NULL )
 	{
-        	qCritical( "pa_context_new() failed." );
+		qCritical( "pa_context_new() failed." );
 		return;
 	}
 
-	pa_context_set_state_callback(context, context_state_callback, this );
-	/* Connect the context */
-	pa_context_connect(context, NULL, (pa_context_flags) 0, NULL);
+	pa_context_set_state_callback( context, context_state_callback, this  );
+	// connect the context
+	pa_context_connect( context, NULL, (pa_context_flags) 0, NULL );
 
-	int ret;
-	/* Run the main loop */
-	if (pa_mainloop_run(m, &ret) < 0)
+	// run the main loop
+	int ret = 0;
+	m_quit = false;
+	while( m_quit == false && pa_mainloop_iterate( mainLoop, 1, &ret ) >= 0 )
 	{
-		qCritical( "pa_mainloop_run() failed.\n" );
 	}
+
+	pa_stream_disconnect( m_s );
+	pa_stream_unref( m_s );
+
+	pa_context_disconnect( context );
+	pa_context_unref( context );
+
+	pa_mainloop_free( mainLoop );
 }
 
 
 
 
-void AudioPulseAudio::streamWriteCallback(pa_stream *s, size_t length)
+void AudioPulseAudio::streamWriteCallback( pa_stream *s, size_t length )
 {
 	const fpp_t fpp = getMixer()->framesPerPeriod();
 	sampleFrameA * temp = CPU::allocFrames( fpp );
-	Sint16 * pcmbuf = (Sint16*)pa_xmalloc( fpp * channels() *
+	Sint16 * pcmbuf = (Sint16*)CPU::memAlloc( fpp * channels() *
 							sizeof(Sint16) );
 
 	size_t fd = 0;
-	while( fd < length/4 )
+	while( fd < length/4 && m_quit == false )
 	{
 		const fpp_t frames = getNextBuffer( temp );
 		if( !frames )
 		{
-			return;
+			m_quit = true;
+			break;
 		}
 		int bytes = CPU::convertToS16( temp,
 						(intSampleFrameA *) pcmbuf,
@@ -254,7 +277,7 @@ void AudioPulseAudio::streamWriteCallback(pa_stream *s, size_t length)
 		fd += frames;
 	}
 
-	pa_xfree( pcmbuf );
+	CPU::memFree( pcmbuf );
 	CPU::freeFrames( temp );
 }
 

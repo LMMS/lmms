@@ -35,59 +35,96 @@
 #include "TreeRelation.h"
 
 
+/*! \brief The ResourceItem class provides information about a local/remote file/directory.
+ *
+ * All relevant properties of a file or directory are stored within a
+ * ResourceItem and can be accessed easily. All resources are identified by
+ * a unique hash (based on file content or (absolute) directory name).
+ *
+ * ResourceItems are managed within a ResourceDB. Reading and writing resource
+ * data is abstracted into the ResourceProvider class.
+ *
+ * The ResourceItem class does not provide any actual functionality.
+ * Use ResourceAction or more high level classes like ResourcePreviewer and
+ * ResourceBrowser.
+ */
+
 class EXPORT ResourceItem
 {
 public:
+	/*! A relation specifies how ResourceItems are organized among each other.
+	 * See documentation of TreeRelation for details. */
 	typedef TreeRelation<ResourceItem> Relation;
 
+	/*! Lists all supported base directories for ResourceItems. */
 	enum BaseDirectories
 	{
-		BaseRoot,
-		BaseWorkingDir,
-		BaseDataDir,
-		BaseHome,
-		BaseURL,
+		BaseRoot,		/*!< Item is relative to root directory */
+		BaseWorkingDir,	/*!< Item is relative to working directory */
+		BaseDataDir,	/*!< Item is relative to LMMS' data directory */
+		BaseHome,		/*!< Item is relative to user's home directory */
+		BaseURL,		/*!< Item is relative to the URL of the ResourceProvider */
 		NumBaseDirectories
 	} ;
 	typedef BaseDirectories BaseDirectory;
 
+	/*! Lists all supported ResourceItem types. */
 	enum Types
 	{
-		TypeUnknown,
-		TypeDirectory,
-		TypeSample,
-		TypePreset,
-		TypePluginSpecificResource,
-		TypeProject,
-		TypeMidiFile,
-		TypeForeignProject,
-		TypePlugin,
-		TypeImage,
+		TypeUnknown,	/*!< No known resource type */
+		TypeDirectory,	/*!< Item is a directory */
+		TypeSample,		/*!< Item is a supported sample file */
+		TypePreset,		/*!< Item is a LMMS-specific preset */
+		TypePluginSpecificResource,	/* Item is a file supported by one of the available plugins */
+		TypeProject,	/*!< Item is a LMMS project */
+		TypeMidiFile,	/*!< Item is a MIDI file (and can be imported via MIDI import filter) */
+		TypeForeignProject,	/*!< Item is any other kind of project which can be imported via an ImportFilter plugin */
+		TypePlugin,		/*!< Item is a Plugin binary */
+		TypeImage,		/*!< Item is an image */
 		NumTypes
 	} ;
 	typedef Types Type;
 
-	ResourceItem( ResourceProvider * _provider,
-			const QString & _name,
+	/*! \brief Constructs a ResourceItem object.
+	* \param provider The provider this item belongs to
+	* \param name The name used to identify the item towards the user
+	* \param baseDir The base directory this item is relative to
+	* \param path The path from base directory to this item
+	* \param hash A unique hash based on file content, pass QString::null to compute it automatically
+	* \param author A string describing the author
+	* \param tags A comma-separated list of tags for this item
+	* \param size The size of the item, pass -1 to compute it automatically
+	* \param lastMod The date and time of the last modification of the item
+	*/
+	ResourceItem( ResourceProvider * provider,
+			const QString & name,
 			Type _type,
-			BaseDirectory _base_dir = BaseWorkingDir,
-			const QString & _path = QString::null,
-			const QString & _hash = QString::null,
-			const QString & _author = QString::null,
-			const QString & _tags = QString::null,
-			int _size = -1,
-			const QDateTime & _last_mod = QDateTime() );
-	// copy constructor
-	ResourceItem( const ResourceItem & _item );
+			BaseDirectory baseDir = BaseWorkingDir,
+			const QString & path = QString::null,
+			const QString & hash = QString::null,
+			const QString & author = QString::null,
+			const QString & tags = QString::null,
+			int size = -1,
+			const QDateTime & lastMod = QDateTime() );
+	/*! \brief Copy constructor. */
+	ResourceItem( const ResourceItem & item );
 
-	inline void setHidden( bool _h, const QAbstractItemModel * _model )
+	/*! \brief Sets hidden property for the given item model
+	* \param hidden A boolean specifying the desired value
+	* \param model A pointer to a QAbstractItemModel (allows to use this item
+	* for multiple models and views) */
+	inline void setHidden( bool hidden, const QAbstractItemModel * model )
 	{
-		m_hidden[_model] = _h;
+		m_hidden[model] = hidden;
 	}
 
-	inline bool isHidden( const QAbstractItemModel * _model ) const
+	/*! \brief Returns whether item is hidden for the given item model
+	* \param model A pointer to a QAbstractItemModel (allows to use this item
+	* for multiple models and views)
+	* \return true if the item is hidden, false otherwise */
+	inline bool isHidden( const QAbstractItemModel * model ) const
 	{
-		return m_hidden[_model];
+		return m_hidden[model];
 	}
 
 
@@ -206,6 +243,8 @@ public:
 		return m_provider->dataSize( this );
 	}
 
+	/*! \brief Fetch data (contents) of the resource via ResourceProvider.
+	* \return QByteArray with complete contents of the resource */
 	QByteArray fetchData( int _maxSize = -1 ) const
 	{
 		return m_provider->fetchData( this );
@@ -213,15 +252,19 @@ public:
 
 	void reload();
 
-	// returns true if all given keywords match name, tags etc.
+	/*! \brief Returns, whether keywords match certain properties.
+	* \return true if all given keywords match name, tags etc. */
 	bool keywordMatch( const QStringList & _keywords ) const;
 
-	// return true, if given ResourceItem is equal
+	/*! \brief Tests for equality with another ResourceItem.
+	* \return true, if given ResourceItem is equal */
 	bool operator==( const ResourceItem & _other ) const;
 
-	// rates equality with given item
+	/*! \brief Rates equality with another ResourceItem.
+	* \return An integer specifying how close the two ResourceItems are (between 0 and about 250) */
 	int equalityLevel( const ResourceItem & _other ) const;
 
+	/*! \brief Guesses resource type by various criteria */
 	Type guessType() const;
 
 	static const char * mimeKey()

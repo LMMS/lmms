@@ -2,6 +2,57 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="it_IT">
 <context>
+    <name>AboutDialog</name>
+    <message>
+        <source>About LMMS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LMMS (Linux MultiMedia Studio)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Version %1 (%2/%3, Qt %4, %5)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>About</source>
+        <translation type="unfinished">Informazioni su</translation>
+    </message>
+    <message>
+        <source>LMMS - easy music production for everyone</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Copyright (c) 2004-2009, LMMS developers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>http://lmms.sourceforge.net
+
+Join us on Freenode (irc.freenode.net) in ##lmms!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Authors</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Translation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Current language not translated (or native English).
+
+If you&apos;re interested in translating LMMS in another language or want to improve existing translations, you&apos;re welcome to help us! Simply contact the maintainer!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>License</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>Arpeggiator</name>
     <message>
         <source>Arpeggio</source>
@@ -805,6 +856,13 @@
     </message>
 </context>
 <context>
+    <name>DirectorySelectDialog</name>
+    <message>
+        <source>Select directory</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>Effect</name>
     <message>
         <source>Effect enabled</source>
@@ -839,6 +897,17 @@
     <message>
         <source>Add effect</source>
         <translation type="unfinished">Aggiungi effetto</translation>
+    </message>
+</context>
+<context>
+    <name>EffectSelectDialog</name>
+    <message>
+        <source>Add effect</source>
+        <translation type="unfinished">Aggiungi effetto</translation>
+    </message>
+    <message>
+        <source>Plugin description</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1119,7 +1188,7 @@ Con il click destro si apre un menu conestuale che permette di cambiare l&apos;o
     </message>
     <message>
         <source>Click here for a triangle-wave.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cliccando qui si ottiene un&apos;onda triangolare.</translation>
     </message>
     <message>
         <source>Click here for a saw-wave for current.</source>
@@ -1127,7 +1196,7 @@ Con il click destro si apre un menu conestuale che permette di cambiare l&apos;o
     </message>
     <message>
         <source>Click here for a square-wave.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cliccando qui si ottiene un&apos;onda quadra.</translation>
     </message>
     <message>
         <source>Click here for a user-defined wave. Afterwards, drag an according sample-file onto the LFO graph.</source>
@@ -1180,7 +1249,7 @@ Assicurarsi di avere i permessi in scrittura per il file e la directory contenen
     </message>
     <message>
         <source>Could not open file</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Non è stato possibile aprire il file</translation>
     </message>
     <message>
         <source>Export project to %1</source>
@@ -1197,6 +1266,150 @@ Assicurarsi di avere i permessi in scrittura per il file e la directory contenen
     <message>
         <source>Rendering: %1%</source>
         <translation type="unfinished">Renderizzazione: %1%</translation>
+    </message>
+    <message>
+        <source>Export project</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Output</source>
+        <translation type="unfinished">Uscita</translation>
+    </message>
+    <message>
+        <source>File format:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Samplerate:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>44100 Hz</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>48000 Hz</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>88200 Hz</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>96000 Hz</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>192000 Hz</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bitrate:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>64 KBit/s</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>128 KBit/s</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>160 KBit/s</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>192 KBit/s</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>256 KBit/s</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>320 KBit/s</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Depth:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>16 Bit Integer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>24 Bit Integer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>32 Bit Float</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please note that not all of the parameters above apply for all file formats.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Quality settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Interpolation:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Zero Order Hold</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sinc Fastest</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sinc Medium (recommended)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sinc Best (very slow!)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Oversampling (use with care!):</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>1x (None)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>2x</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>4x</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>8x</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sample-exact controllers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Alias-free oscillators</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Annulla</translation>
     </message>
 </context>
 <context>
@@ -1726,15 +1939,15 @@ Assicurarsi di avere i permessi in scrittura per il file e la directory contenen
     </message>
     <message>
         <source>Click here for a triangle-wave.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cliccando qui si ottiene un&apos;onda triangolare.</translation>
     </message>
     <message>
         <source>Click here for a saw-wave.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cliccando qui si ottiene un&apos;onda a dente di sega.</translation>
     </message>
     <message>
         <source>Click here for a square-wave.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cliccando qui si ottiene un&apos;onda quadra.</translation>
     </message>
     <message>
         <source>Click here for a a moog saw-wave.</source>
@@ -1750,7 +1963,7 @@ Assicurarsi di avere i permessi in scrittura per il file e la directory contenen
     </message>
     <message>
         <source>Click here for a user-defined shape.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cliccando qui è possibile definire una forma d&apos;onda personalizzata.</translation>
     </message>
 </context>
 <context>
@@ -2247,7 +2460,7 @@ Visitare http://lmms.sf.net/wiki  per la documentazione di LMMS.</translation>
     </message>
     <message>
         <source>Loop</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ripetizione</translation>
     </message>
     <message>
         <source>Loop mode</source>
@@ -2492,6 +2705,21 @@ Available decoders: %2
     </message>
 </context>
 <context>
+    <name>QuickLoadDialog</name>
+    <message>
+        <source>Load resource</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Resource type:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All types</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>ResourceBrowser</name>
     <message>
         <source>Show/edit properties</source>
@@ -2719,7 +2947,7 @@ Available decoders: %2
     </message>
     <message>
         <source>Osc %1 volume:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Volume osc %1:</translation>
     </message>
     <message>
         <source>With this knob you can set the volume of oscillator %1. When setting a value of 0 the oscillator is turned off. Otherwise you can hear the oscillator as loud as you set it here.</source>
@@ -2727,7 +2955,7 @@ Available decoders: %2
     </message>
     <message>
         <source>Osc %1 panning:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Panning osc %1:</translation>
     </message>
     <message>
         <source>With this knob you can set the panning of the oscillator %1. A value of -100 means 100% left and a value of 100 moves oscillator-output right.</source>
@@ -2747,7 +2975,7 @@ Available decoders: %2
     </message>
     <message>
         <source>Osc %1 fine detuning left:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Intonazione precisa osc %1 sinistra:</translation>
     </message>
     <message>
         <source>cents</source>
@@ -2873,19 +3101,91 @@ Available decoders: %2
     <name>VstPlugin</name>
     <message>
         <source>Loading plugin</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Caricamento plugin</translation>
     </message>
     <message>
         <source>Please wait while loading VST-plugin...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Prego attendere, caricamento del plugin VST...</translation>
     </message>
     <message>
         <source>Failed loading VST-plugin</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Errore nel caricamento del plugin VST</translation>
     </message>
     <message>
         <source>The VST-plugin %1 could not be loaded for some reason.
 If it runs with other VST-software under Linux, please contact an LMMS-developer!</source>
+        <translation type="unfinished">Non è stato possibile caricare il plugin VST %1 a causa di alcuni errori.
+Se, con altre applicazioni GNU/Linux il plugin funziona, si prega di contattare uno sviluppatore di LMMS!</translation>
+    </message>
+</context>
+<context>
+    <name>WelcomeScreen</name>
+    <message>
+        <source>Welcome to LMMS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New project</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Import project</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open tutorial</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Instant MIDI action</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recent projects</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recent community resources</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Did you know...?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Linux Biolinum O&apos;; font-size:12pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Online resources</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Users forum</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>http://sourceforge.net/apps/phpbb/lmms/</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Online manual</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>http://lmms.sourceforge.net/wiki/NewManual</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Wiki</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>http://lmms.sourceforge.net/wiki/</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

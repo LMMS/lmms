@@ -1,5 +1,22 @@
 CHANGES IN FLTK 1.3.0
 
+	- Managing all Widget flags in a single location now (STR #2161)
+	- Fixed all color related call to Fl_Color type (STR #2208)
+	- File chooser preview now recognizes utf8 encoded 
+	  text files (STR #2218)
+	- Empty functions in Fluid no longer create an
+	  implementation (STR #2259)
+	- Fixed Fluid dependency on X11 (STR #2261)
+	- Updated the bundled libpng to v1.2.40 (released Sep. 10, 2009)
+	- Fixed Fl_Choice contrast with light-on-dark settings (STR #2219)
+	- Fixed X server "lock", if a modal dialog window is opened
+	  while a menu is active (STR #1986)
+	- Updated mirror sites in documentation (STR #2220)
+	- Setting a default font for Xft (STR #2216)
+	- Temporarily limited builds to 32-bit on OX S to stay
+	  compatible to Snow Leopard
+	- Fixed Windows compile bug with "#define USE_COLORMAP 0"
+	  (STR #2241)
 	- Fixed glibc 2.10 compiler problems (Fedora 11 and others)
 	  with scandir() and strchr() (STR #2222)
 	- Corrected const methods of Fl_Text_{Buffer|Display|Selection}
@@ -27,7 +44,6 @@ CHANGES IN FLTK 1.3.0
 	- Added drop box to utf8 test that will show the utf8 encoding
 	  for the first dropped character
 	- Restructured the unittest application
-	- Updated the bundled libpng to v1.2.35 (released 18 Feb. 2009)
 	- Fl_Preferences.H now doesn't include windows.h any more
 	  (Windows only, STR #2173).
 	- Fl_Window::draw() now doesn't reset its x/y-coordinates to 0

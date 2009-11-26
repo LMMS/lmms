@@ -30,31 +30,29 @@
 /**EQ Effect*/
 class EQ:public Effect
 {
-public:
-    EQ(const int &insertion_,REALTYPE *efxoutl_,REALTYPE *efxoutr_);
-    ~EQ();
-    void out(REALTYPE *smpsl,REALTYPE *smpr);
-    void setpreset(unsigned char npreset);
-    void changepar(const int &npar,const unsigned char &value);
-    unsigned char getpar(const int &npar)const;
-    void cleanup();
-    REALTYPE getfreqresponse(REALTYPE freq);
-private:
-    //Parameters
-    unsigned char Pvolume;/**<Volume*/
+    public:
+        EQ(const int &insertion_, REALTYPE *efxoutl_, REALTYPE *efxoutr_);
+        ~EQ();
+        void out(REALTYPE *smpsl, REALTYPE *smpr);
+        void setpreset(unsigned char npreset);
+        void changepar(const int &npar, const unsigned char &value);
+        unsigned char getpar(const int &npar) const;
+        void cleanup();
+        REALTYPE getfreqresponse(REALTYPE freq);
+    private:
+        //Parameters
+        unsigned char Pvolume; /**<Volume*/
 
-    void setvolume(const unsigned char &Pvolume);
+        void setvolume(const unsigned char &Pvolume);
 
-    struct {
-        //parameters
-        unsigned char Ptype,Pfreq,Pgain,Pq,Pstages;
-        //internal values
-        AnalogFilter *l,*r;
-    }filter[MAX_EQ_BANDS];
-
+        struct {
+            //parameters
+            unsigned char Ptype, Pfreq, Pgain, Pq, Pstages;
+            //internal values
+            AnalogFilter *l, *r;
+        } filter[MAX_EQ_BANDS];
 };
 
 
 #endif
-
 

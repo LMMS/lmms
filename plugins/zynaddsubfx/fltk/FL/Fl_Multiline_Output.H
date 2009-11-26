@@ -1,5 +1,5 @@
 //
-// "$Id: Fl_Multiline_Output.H 6614 2009-01-01 16:11:32Z matt $"
+// "$Id: Fl_Multiline_Output.H 6889 2009-09-19 22:09:00Z greg.ercolano $"
 //
 // Multi line output header file for the Fast Light Tool Kit (FLTK).
 //
@@ -37,6 +37,14 @@
   This widget is a subclass of Fl_Output that displays multiple
   lines of text. It also displays tab characters as whitespace to the
   next column.
+  <P>
+  Note that this widget does not support scrollbars, or per-character
+  color control.
+  <P>
+  If you are presenting large amounts of read-only text 
+  and need scrollbars, or full color control of characters,
+  then use Fl_Text_Display. If you want to display HTML text,
+  use Fl_Help_View.
 */
 class Fl_Multiline_Output : public Fl_Output {
 public:
@@ -52,5 +60,5 @@ public:
 #endif
 
 //
-// End of "$Id: Fl_Multiline_Output.H 6614 2009-01-01 16:11:32Z matt $".
+// End of "$Id: Fl_Multiline_Output.H 6889 2009-09-19 22:09:00Z greg.ercolano $".
 //

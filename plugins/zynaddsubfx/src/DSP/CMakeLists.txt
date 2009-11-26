@@ -4,6 +4,7 @@ set(zynaddsubfx_dsp_SRCS
 	Filter.cpp
 	FormantFilter.cpp
 	SVFilter.cpp
+	Unison.cpp
 )
 
 add_library(zynaddsubfx_dsp STATIC
