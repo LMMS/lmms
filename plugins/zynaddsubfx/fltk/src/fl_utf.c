@@ -1,5 +1,8 @@
-/* This is the utf.c file from fltk2 adapted for use in my fltk1.1 port */
-
+/*
+ * "$Id$"
+ *
+ * This is the utf.c file from fltk2 adapted for use in my fltk1.1 port
+ */
 /* Copyright 2006-2009 by Bill Spitzak and others.
  *
  * This library is free software; you can redistribute it and/or
@@ -855,3 +858,7 @@ int fl_utf8test(const char* src, unsigned srclen) {
 }
 
 /** @} */
+
+/*
+ * End of "$Id$".
+ */

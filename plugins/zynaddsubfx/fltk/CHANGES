@@ -1,5 +1,6 @@
 CHANGES IN FLTK 1.3.0
 
+	- Added template to generate new projects with Xcode.
 	- Managing all Widget flags in a single location now (STR #2161)
 	- Fixed all color related call to Fl_Color type (STR #2208)
 	- File chooser preview now recognizes utf8 encoded 

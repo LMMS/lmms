@@ -1,4 +1,5 @@
-// "$Id: $"
+//
+// "$Id$"
 //
 // Unicode to UTF-8 conversion functions.
 //
@@ -822,6 +823,5 @@ void fl_make_path_for_file( const char *path )
 /** @} */
 
 //
-// End of "$Id: $".
+// End of "$Id$".
 //
-

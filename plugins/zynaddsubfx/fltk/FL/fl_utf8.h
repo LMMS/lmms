@@ -1,4 +1,4 @@
-/* "$Id: $"
+/* "$Id$"
  *
  * Author: Jean-Marc Lienher ( http://oksid.ch )
  * Copyright 2000-2009 by O'ksi'D.
@@ -246,5 +246,5 @@ FL_EXPORT char fl_make_path( const char *path );
 #endif /* _HAVE_FL_UTF8_HDR_ */
 
 /*
- * End of "$Id: $".
+ * End of "$Id$".
  */

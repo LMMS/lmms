@@ -98,7 +98,7 @@ public:
   /**
     Returns the increment for normal step buttons.
    */
-  double step() {return Fl_Valuator::step();}
+  double step() const {return Fl_Valuator::step();}
 
   /** Gets the text font */
   Fl_Font textfont() const {return textfont_;}
