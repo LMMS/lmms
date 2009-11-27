@@ -34,20 +34,45 @@
 #include "ResourceItem.h"
 
 
+/*! \brief The ResourceDB class organizes and caches ResourceItems.
+ *
+ * ResourceItem sets are organized in the ResourceDB::ItemHashMap. This
+ * allows fast lookup of ResourceItems by hash string. ResourceItems are added
+ * and removed by a ResourceProvider.
+ *
+ * The ResourceItem array can be cached to a file and restored later. This is
+ * essential as otherwise e.g. the LocalResourceProvider would have to re-read
+ * all directories and files and recompute hash strings based on file contents.
+ *
+ * One can also descend the hierarchical ResourceItem tree by starting from
+ * ResourceDB::topLevelNode().
+ */
+
 class EXPORT ResourceDB : public QObject
 {
 	Q_OBJECT
 public:
+	/*! A QHash instantiation used for storing ResourceItems and allow lookup
+	 * by hash string */
 	typedef QHash<QString, ResourceItem *> ItemHashMap;
 
 
-	ResourceDB( ResourceProvider * _provider );
+	/*! \brief Constructs a ResourceDB object.
+	* \param provider The ResourceProvider that will manage ResourceItems in this DB
+	*/
+	ResourceDB( ResourceProvider * provider );
 	~ResourceDB();
 
+	/*! \brief Initializes ResourceDB object, i.e. restore cache and update itself via the ResourceProvider. */
 	void init();
 
-	void load( const QString & _file );
-	void save( const QString & _file );
+	/*! \brief Dumps all ResourceItems with their relations to a file.
+	 * \param file The filename to save data to */
+	void load( const QString & file );
+
+	/*! \brief Restores ResourceItems with their relations from a file.
+	 * \param file The filename to load data from */
+	void save( const QString & file );
 
 	inline ResourceProvider * provider()
 	{
@@ -69,21 +94,31 @@ public:
 		return &m_topLevelNode;
 	}
 
-	// similiar to items()[_hash] but faster and returns NULL if not found
-	const ResourceItem * itemByHash( const QString & _hash ) const;
+	/*! \brief Looks up a ResourceItem by hash string - similiar to items()[hash]
+	 * but faster and returns NULL if not found.
+	 * \param hash The hash string that is searched for
+	 * \return A const pointer to the matching ResourceItem */
+	const ResourceItem * itemByHash( const QString & hash ) const;
 
-	// return a list of ResourceItems who somehow match the given keywords
-	ResourceItemList matchItems( const QStringList & _keyWords );
+	/*! \brief Return a list of ResourceItems which somehow match the given keywords.
+	 * \param keywords A list of keywords that are searched for
+	 * \return A ResourceItemList which the result */
+	ResourceItemList matchItems( const QStringList & keywords );
 
-	// return an item which matches a resource desceibed in _item as
-	// good as possible
-	const ResourceItem * nearestMatch( const ResourceItem & _item );
+	/*! \brief Returns a ResourceItem which matches a given ResourceItem best.
+	 * \param item A ResourceItem to search the best match for
+	 * \return A const pointer to the best marching ResourceItem in the DB */
+	const ResourceItem * nearestMatch( const ResourceItem & item );
 
-	// add given item to DB
-	void addItem( ResourceItem * _newItem );
+	/*! \brief Adds given ResourceItem to DB.
+	 * \param newItem The ResourceItem to be added */
+	void addItem( ResourceItem * newItem );
 
-	void recursiveRemoveItems( ResourceItem::Relation * parent,
-					bool removeTopLevelParent = true );
+	/*! \brief Remove items recursively starting from a certain ResourceItem::Relation
+	 * \param parent The parent relation to start from with removing
+	 * \param removeParent A boolean which specifies whether to also remove the parent item */
+	void removeItemsRecursively( ResourceItem::Relation * parent,
+									bool removeParent = true );
 
 
 private:
@@ -140,9 +175,12 @@ private:
 
 
 signals:
+	/*! \brief Forwarded signal of ResourceProvider::itemsChanged() */
 	void itemsChanged();
-	void directoryItemAdded( const QString & _path );
-	void directoryItemRemoved( const QString & _path );
+	/*! \brief Emitted whenever a ResourceItem of type ResourceItem::TypeDirectory is added */
+	void directoryItemAdded( const QString & path );
+	/*! \brief Emitted whenever a ResourceItem of type ResourceItem::TypeDirectory is removed */
+	void directoryItemRemoved( const QString & path );
 
 } ;
 
