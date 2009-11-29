@@ -28,7 +28,7 @@
 #include <QtCore/QString>
 #include <QtCore/QMutex>
 
-#include "mixer.h"
+#include "Mixer.h"
 
 class EffectChain;
 
@@ -140,7 +140,7 @@ private:
 	EffectChain * m_effects;
 
 
-	friend class mixer;
+	friend class Mixer;
 	friend class MixerWorkerThread;
 
 } ;

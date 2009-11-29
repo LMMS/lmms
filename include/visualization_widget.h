@@ -29,7 +29,7 @@
 #include <QtGui/QWidget>
 #include <QtGui/QPixmap>
 
-#include "mixer.h"
+#include "Mixer.h"
 
 
 class visualizationWidget : public QWidget

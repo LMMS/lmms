@@ -1,5 +1,5 @@
 /*
- * AudioDevice.h - base-class for audio-devices, used by LMMS-mixer
+ * AudioBackend.h - base-class for audio-devices, used by LMMS-mixer
  *
  * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -26,37 +26,31 @@
 #define _AUDIO_DEVICE_H
 
 #include <QtCore/QPair>
-#include <QtCore/QMutex>
 #include <QtCore/QThread>
 
-#include "mixer.h"
+#include "Mixer.h"
 #include "tab_widget.h"
 
 
 class AudioPort;
 
-
-class AudioDevice
+/*! \brief The AudioBackend class is the base class for all kinds of AudioBackends.
+ *
+ * All classes derived from AudioBackend receive audio data so they can output
+ * it.
+ */
+class AudioBackend
 {
 public:
-	AudioDevice( const ch_cnt_t _channels, mixer * _mixer );
-	virtual ~AudioDevice();
+	/*! \brief Constructs an AudioBackend object for the given AudioOutputContext. */
+	AudioBackend( const ch_cnt_t _channels, AudioOutputContext * context );
+	virtual ~AudioBackend();
 
-	inline void lock()
-	{
-		m_devMutex.lock();
-	}
-
-	inline void unlock()
-	{
-		m_devMutex.unlock();
-	}
-
-
-	// if audio-driver supports ports, classes inherting AudioPort
-	// (e.g. channel-tracks) can register themselves for making
-	// audio-driver able to collect their individual output and provide
-	// them at a specific port - currently only supported by JACK
+	/*! If the audio backend supports ports, classes creating an AudioPort
+	 * (e.g. InstrumentTrack) can register themselves for making
+	 * audio backend able to collect their individual output and provide
+	 * them at a specific port - currently only supported by JACK
+	 */
 	virtual void registerPort( AudioPort * _port );
 	virtual void unregisterPort( AudioPort * _port );
 	virtual void renamePort( AudioPort * _port );
@@ -77,11 +71,14 @@ public:
 		return m_channels;
 	}
 
-	void processNextBuffer();
+	/*! \brief Fetches one buffer and writes it to output device.
+	 *
+	 * \return Number of frames processed
+	 */
+	int processNextBuffer();
 
 	virtual void startProcessing()
 	{
-		m_inProcess = true;
 	}
 
 	virtual void stopProcessing();
@@ -115,41 +112,47 @@ public:
 	} ;
 
 
+	/*! \brief Returns const pointer to AudioOutputContext this AudioBackend acts for. */
+	const AudioOutputContext * outputContext() const
+	{
+		return m_context;
+	}
+
+	/*! \brief Returns const pointer to Mixer this AudioBackend acts for. */
+	const Mixer * mixer() const;
+
 
 protected:
-	// subclasses can re-implement this for being used in conjunction with
-	// processNextBuffer()
+	/*! \brief Writes given buffer to actual device.
+	 *
+	 * Subclasses can reimplement this for being used in conjunction with
+	 * processNextBuffer()
+	 */
 	virtual void writeBuffer( const sampleFrameA * /* _buf*/,
 						const fpp_t /*_frames*/,
 						const float /*_master_gain*/ )
 	{
 	}
 
-	// called by according driver for fetching new sound-data
-	fpp_t getNextBuffer( sampleFrameA * _ab );
+	/*! \brief Called by according backend for fetching new audio data. */
+	int getNextBuffer( sampleFrameA * _ab );
 
-	// clear given signed-int-16-buffer
+	/*! \brief Clears given signed-int-16-buffer. */
 	void clearS16Buffer( intSampleFrameA * _outbuf, const fpp_t _frames );
-
-	// resample given buffer from samplerate _src_sr to samplerate _dst_sr
-	void resample( const sampleFrameA * _src,
-					const fpp_t _frames,
-					sampleFrameA * _dst,
-					const sample_rate_t _src_sr,
-					const sample_rate_t _dst_sr );
 
 	inline void setSampleRate( const sample_rate_t _new_sr )
 	{
 		m_sampleRate = _new_sr;
 	}
 
-	mixer * getMixer()
-	{
-		return m_mixer;
-	}
-
 	bool hqAudio() const;
 
+	AudioOutputContext * outputContext()
+	{
+		return m_context;
+	}
+
+	Mixer * mixer();
 
 
 protected:
@@ -157,15 +160,9 @@ protected:
 
 
 private:
+	AudioOutputContext * m_context;
 	sample_rate_t m_sampleRate;
 	ch_cnt_t m_channels;
-	mixer * m_mixer;
-	bool m_inProcess;
-
-	QMutex m_devMutex;
-
-	SRC_DATA m_srcData;
-	SRC_STATE * m_srcState;
 
 	sampleFrameA * m_buffer;
 

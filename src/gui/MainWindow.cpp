@@ -56,7 +56,7 @@
 #include "plugin_browser.h"
 #include "SideBar.h"
 #include "config_mgr.h"
-#include "mixer.h"
+#include "Mixer.h"
 #include "project_notes.h"
 #include "setup_dialog.h"
 #include "AudioDummy.h"
@@ -1478,9 +1478,9 @@ void MainWindow::browseHelp()
 
 void MainWindow::setHighQuality( bool _hq )
 {
-	engine::getMixer()->changeQuality( mixer::qualitySettings(
-			_hq ? mixer::qualitySettings::Mode_HighQuality :
-				mixer::qualitySettings::Mode_Draft ) );
+	/*engine::getMixer()->changeQuality( Mixer::qualitySettings(
+			_hq ? Mixer::qualitySettings::Mode_HighQuality :
+				Mixer::qualitySettings::Mode_Draft ) );*/
 }
 
 

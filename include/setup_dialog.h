@@ -29,7 +29,7 @@
 #include <QtCore/QMap>
 
 #include "lmmsconfig.h"
-#include "AudioDevice.h"
+#include "AudioBackend.h"
 #include "MidiClient.h"
 #include "MidiPort.h"
 #include "MidiPortMenu.h"
@@ -171,7 +171,7 @@ private:
 	bool m_disableChActInd;
 	bool m_manualChPiano;
 
-	typedef QMap<QString, AudioDevice::setupWidget *> AswMap;
+	typedef QMap<QString, AudioBackend::setupWidget *> AswMap;
 	typedef QMap<QString, MidiClient::setupWidget *> MswMap;
 	typedef QMap<QString, QString> trMap;
 

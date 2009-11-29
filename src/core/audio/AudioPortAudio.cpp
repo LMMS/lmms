@@ -50,7 +50,7 @@ void AudioPortAudioSetupUtil::updateChannels()
 
 
 AudioPortAudio::AudioPortAudio( bool & _success_ful, mixer * _mixer ) :
-	AudioDevice( tLimit<ch_cnt_t>(
+	AudioBackend( tLimit<ch_cnt_t>(
 		configManager::inst()->value( "audioportaudio",
 							"channels" ).toInt(),
 					DEFAULT_CHANNELS, SURROUND_CHANNELS ),
@@ -284,8 +284,6 @@ void AudioPortAudio::applyQualitySettings()
 			return;
 		}
 	}
-
-	audioDevice::applyQualitySettings();
 }
 
 int AudioPortAudio::process_callback(

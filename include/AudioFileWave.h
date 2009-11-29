@@ -1,5 +1,5 @@
 /*
- * AudioFileWave.h - AudioDevice which encodes wave-stream and writes it
+ * AudioFileWave.h - AudioBackend which encodes wave-stream and writes it
  *                   into a WAVE-file. This is used for song-export.
  *
  * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
@@ -44,7 +44,7 @@ public:
 			const bitrate_t _min_bitrate,
 			const bitrate_t _max_bitrate,
 			const int _depth,
-			mixer * _mixer );
+			AudioOutputContext * context );
 	virtual ~AudioFileWave();
 
 	static AudioFileDevice * getInst( const sample_rate_t _sample_rate,
@@ -56,13 +56,12 @@ public:
 						const bitrate_t _min_bitrate,
 						const bitrate_t _max_bitrate,
 						const int _depth,
-						mixer * _mixer )
+						AudioOutputContext * context )
 	{
 		return new AudioFileWave( _sample_rate, _channels,
 						_success_ful, _file, _use_vbr,
 						_nom_bitrate, _min_bitrate,
-							_max_bitrate, _depth,
-							_mixer );
+							_max_bitrate, _depth, context );
 	}
 
 

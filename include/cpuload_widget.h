@@ -51,7 +51,7 @@ protected slots:
 
 
 private:
-	Uint8 m_currentLoad;
+	int m_currentLoad;
 
 	QPixmap m_temp;
 	QPixmap m_background;

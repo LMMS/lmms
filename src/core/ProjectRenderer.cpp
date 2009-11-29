@@ -22,7 +22,6 @@
  *
  */
 
-
 #include <QtCore/QFile>
 #include <QTimer>
 
@@ -60,9 +59,9 @@ FileEncodeDevice __fileEncodeDevices[] =
         ".mp3", &AudioFileMp3::getInst },
 	{ ProjectRenderer::FlacFile,
 		QT_TRANSLATE_NOOP( "ProjectRenderer", "FLAC File (*.flac)" ),
-		".flac", 
+		".flac",
 #ifdef LMMS_HAVE_FLAC
-					&AudioFileFlac::getInst 
+					&AudioFileFlac::getInst
 #else
 					NULL
 #endif
@@ -77,35 +76,39 @@ FileEncodeDevice __fileEncodeDevices[] =
 const char * ProjectRenderer::EFF_ext[] = {"wav", "ogg", "mp3", "flac"};
 
 
-ProjectRenderer::ProjectRenderer( const mixer::qualitySettings & _qs,
-					const OutputSettings & _os,
-					ExportFileFormats _file_format,
-					const QString & _out_file ) :
+ProjectRenderer::ProjectRenderer(
+					const AudioOutputContext::QualitySettings & _qs,
+					const EncoderSettings & es,
+					ExportFileFormats fileFormat,
+					const QString & outFile ) :
 	QThread( engine::getMixer() ),
 	m_fileDev( NULL ),
-	m_qualitySettings( _qs ),
-	m_oldQualitySettings( engine::getMixer()->currentQualitySettings() ),
 	m_progress( 0 ),
 	m_abort( false )
 {
-	if( __fileEncodeDevices[_file_format].m_getDevInst == NULL )
+	m_context = new AudioOutputContext( engine::getMixer(),
+										NULL,
+										_qs );
+	if( __fileEncodeDevices[fileFormat].m_getDevInst == NULL )
 	{
 		return;
 	}
 
 	bool success_ful = false;
-	m_fileDev = __fileEncodeDevices[_file_format].m_getDevInst(
-				_os.samplerate, DEFAULT_CHANNELS, success_ful,
-				_out_file, _os.vbr,
-				_os.bitrate, _os.bitrate - 64, _os.bitrate + 64,
-				_os.depth == Depth_32Bit ? 32 :
-					( _os.depth == Depth_24Bit ? 24 : 16 ),
-							engine::getMixer() );
+	m_fileDev = __fileEncodeDevices[fileFormat].m_getDevInst(
+				es.samplerate, DEFAULT_CHANNELS, success_ful,
+				outFile, es.vbr,
+				es.bitrate, es.bitrate - 64, es.bitrate + 64,
+				es.depth == Depth_32Bit ? 32 :
+					( es.depth == Depth_24Bit ? 24 : 16 ),
+							m_context );
 	if( success_ful == false )
 	{
 		delete m_fileDev;
 		m_fileDev = NULL;
 	}
+
+	m_context->setAudioBackend( m_fileDev );
 
 }
 
@@ -114,6 +117,8 @@ ProjectRenderer::ProjectRenderer( const mixer::qualitySettings & _qs,
 
 ProjectRenderer::~ProjectRenderer()
 {
+	delete m_fileDev;
+	delete m_context;
 }
 
 
@@ -129,12 +134,12 @@ ProjectRenderer::ExportFileFormats ProjectRenderer::getFileFormatFromExtension(
 	{
 		if( QString( __fileEncodeDevices[idx].m_extension ) == _ext )
 		{
-			return( __fileEncodeDevices[idx].m_fileFormat );
+			return __fileEncodeDevices[idx].m_fileFormat;
 		}
 		++idx;
 	}
 
-	return( WaveFile );	// default
+	return WaveFile;	// default
 }
 
 
@@ -144,66 +149,14 @@ void ProjectRenderer::startProcessing()
 {
 	if( isReady() )
 	{
+		connect( this, SIGNAL( finished() ), this, SLOT( finishProcessing() ) );
+
 		// have to do mixer stuff with GUI-thread-affinity in order to
 		// make slots connected to sampleRateChanged()-signals being
 		// called immediately
-		engine::getMixer()->setAudioDevice( m_fileDev,
-						m_qualitySettings, false );
+		engine::mixer()->setAudioOutputContext( m_context );
 
-		start(
-#ifndef LMMS_BUILD_WIN32
-			QThread::HighPriority
-#endif
-						);
-	}
-}
-
-
-
-void ProjectRenderer::run()
-{
-#if 0
-#ifdef LMMS_BUILD_LINUX
-#ifdef LMMS_HAVE_PTHREAD_H
-	cpu_set_t mask;
-	CPU_ZERO( &mask );
-	CPU_SET( 0, &mask );
-	pthread_setaffinity_np( pthread_self(), sizeof( mask ), &mask );
-#endif
-#endif
-#endif
-
-	engine::getSong()->startExport();
-
-	song::playPos & pp = engine::getSong()->getPlayPos(
-							song::Mode_PlaySong );
-	m_progress = 0;
-	const int sl = ( engine::getSong()->length() + 1 ) * 192;
-
-	while( engine::getSong()->isExportDone() == false &&
-				engine::getSong()->isExporting() == true
-							&& !m_abort )
-	{
-		m_fileDev->processNextBuffer();
-		const int nprog = pp * 100 / sl;
-		if( m_progress != nprog )
-		{
-			m_progress = nprog;
-			emit progressChanged( m_progress );
-		}
-	}
-
-	engine::getSong()->stopExport();
-
-	const QString f = m_fileDev->outputFile();
-
-	engine::getMixer()->restoreAudioDevice();  // also deletes audio-dev
-	engine::getMixer()->changeQuality( m_oldQualitySettings );
-
-	// if the user aborted export-process, the file has to be deleted
-	if( m_abort )
-	{
-		QFile( f ).remove();
+		start();
 	}
 }
 
@@ -217,6 +170,7 @@ void ProjectRenderer::abortProcessing()
 
 
 
+
 void ProjectRenderer::updateConsoleProgress()
 {
 	const int cols = 50;
@@ -224,7 +178,8 @@ void ProjectRenderer::updateConsoleProgress()
 	char buf[80];
 	char prog[cols+1];
 
-    if( m_fileDev == NULL ){
+    if( m_fileDev == NULL )
+	{
         qWarning("Error occured. Aborting render.");
         m_consoleUpdateTimer->stop();
         delete m_consoleUpdateTimer;
@@ -246,6 +201,69 @@ void ProjectRenderer::updateConsoleProgress()
 
 	fprintf( stderr, "%s", buf );
 	fflush( stderr );
+}
+
+
+
+
+void ProjectRenderer::run()
+{
+#if 0
+#ifdef LMMS_BUILD_LINUX
+#ifdef LMMS_HAVE_PTHREAD_H
+	cpu_set_t mask;
+	CPU_ZERO( &mask );
+	CPU_SET( 0, &mask );
+	pthread_setaffinity_np( pthread_self(), sizeof( mask ), &mask );
+#endif
+#endif
+#endif
+
+	// have to lock Mixer when touching Song's state as the FIFO writer thread
+	// may call Mixer::renderNextBuffer() (which calls Song::doActions())
+	// simultaneously
+	engine::mixer()->lock();
+	engine::getSong()->startExport();
+	engine::mixer()->unlock();
+
+	song::playPos & pp = engine::getSong()->getPlayPos(
+							song::Mode_PlaySong );
+	m_progress = 0;
+	const int sl = ( engine::getSong()->length() + 1 ) * 192;
+
+	while( engine::getSong()->isExportDone() == false &&
+				engine::getSong()->isExporting() == true
+							&& !m_abort )
+	{
+		m_fileDev->processNextBuffer();
+		const int nprog = pp * 100 / sl;
+		if( m_progress != nprog )
+		{
+			m_progress = nprog;
+			emit progressChanged( m_progress );
+		}
+	}
+
+	engine::mixer()->lock();
+	engine::getSong()->stopExport();
+	engine::mixer()->unlock();
+}
+
+
+
+
+void ProjectRenderer::finishProcessing()
+{
+	const QString f = m_fileDev->outputFile();
+
+	engine::mixer()->setAudioOutputContext(
+								engine::mixer()->defaultAudioOutputContext() );
+
+	// if the user aborted export-process, the file has to be deleted
+	if( m_abort )
+	{
+		QFile( f ).remove();
+	}
 }
 
 

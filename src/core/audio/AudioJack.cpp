@@ -45,15 +45,15 @@
 
 
 
-AudioJack::AudioJack( bool & _success_ful, mixer * _mixer ) :
-	AudioDevice( tLimit<int>( configManager::inst()->value(
+AudioJack::AudioJack( bool & _success_ful, AudioOutputContext * context ) :
+	AudioBackend( tLimit<int>( configManager::inst()->value(
 					"audiojack", "channels" ).toInt(),
 					DEFAULT_CHANNELS, SURROUND_CHANNELS ),
-								_mixer ),
+								context ),
 	m_client( NULL ),
 	m_active( false ),
 	m_stopSemaphore( 1 ),
-	m_outBuf( CPU::allocFrames( getMixer()->framesPerPeriod() ) ),
+	m_outBuf( CPU::allocFrames( mixer()->framesPerPeriod() ) ),
 	m_framesDoneInCurBuf( 0 ),
 	m_framesToDoInCurBuf( 0 )
 {
@@ -210,7 +210,7 @@ void AudioJack::startProcessing()
 
 
 	// try to sync JACK's and LMMS's buffer-size
-//	jack_set_buffer_size( m_client, getMixer()->framesPerPeriod() );
+//	jack_set_buffer_size( m_client, mixer()->framesPerPeriod() );
 
 
 
@@ -255,15 +255,13 @@ void AudioJack::applyQualitySettings()
 {
 	if( hqAudio() )
 	{
-		setSampleRate( engine::getMixer()->processingSampleRate() );
+		setSampleRate( mixer()->processingSampleRate() );
 
 		if( jack_get_sample_rate( m_client ) != sampleRate() )
 		{
 			setSampleRate( jack_get_sample_rate( m_client ) );
 		}
 	}
-
-	AudioDevice::applyQualitySettings();
 }
 
 
@@ -343,7 +341,7 @@ int AudioJack::processCallback( jack_nframes_t _nframes, void * _udata )
 
 #ifdef AUDIO_PORT_SUPPORT
 	const Uint32 frames = qMin<Uint32>( _nframes,
-						getMixer()->framesPerPeriod() );
+						mixer()->framesPerPeriod() );
 	for( jackPortMap::iterator it = m_portMap.begin();
 						it != m_portMap.end(); ++it )
 	{
@@ -372,7 +370,7 @@ int AudioJack::processCallback( jack_nframes_t _nframes, void * _udata )
 						_nframes,
 						m_framesToDoInCurBuf -
 							m_framesDoneInCurBuf );
-		const float gain = getMixer()->masterGain();
+		const float gain = mixer()->masterGain();
 		for( ch_cnt_t chnl = 0; chnl < channels(); ++chnl )
 		{
 			jack_default_audio_sample_t * o = outbufs[chnl];
@@ -434,7 +432,7 @@ void AudioJack::shutdownCallback( void * _udata )
 
 
 AudioJack::setupWidget::setupWidget( QWidget * _parent ) :
-	AudioDevice::setupWidget( AudioJack::name(), _parent )
+	AudioBackend::setupWidget( AudioJack::name(), _parent )
 {
 	QString cn = configManager::inst()->value( "audiojack", "clientname" );
 	if( cn.isEmpty() )

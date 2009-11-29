@@ -25,8 +25,10 @@
 #ifndef _PLAY_HANDLE_H
 #define _PLAY_HANDLE_H
 
+#include <QtCore/QThread>
+
 #include "ThreadableJob.h"
-#include "mixer.h"
+#include "Mixer.h"
 
 class track;
 

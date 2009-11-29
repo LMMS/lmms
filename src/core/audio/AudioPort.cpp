@@ -22,8 +22,9 @@
  *
  */
 
+#include "AudioBackend.h"
+#include "AudioOutputContext.h"
 #include "AudioPort.h"
-#include "AudioDevice.h"
 #include "Cpu.h"
 #include "EffectChain.h"
 #include "FxMixer.h"
@@ -89,11 +90,13 @@ void AudioPort::setExtOutputEnabled( bool _enabled )
 		m_extOutputEnabled = _enabled;
 		if( m_extOutputEnabled )
 		{
-			engine::getMixer()->audioDev()->registerPort( this );
+			engine::mixer()->audioOutputContext()->
+										audioBackend()->registerPort( this );
 		}
 		else
 		{
-			engine::getMixer()->audioDev()->unregisterPort( this );
+			engine::mixer()->audioOutputContext()->
+										audioBackend()->unregisterPort( this );
 		}
 	}
 }
@@ -104,7 +107,7 @@ void AudioPort::setExtOutputEnabled( bool _enabled )
 void AudioPort::setName( const QString & _name )
 {
 	m_name = _name;
-	engine::getMixer()->audioDev()->renamePort( this );
+	engine::mixer()->audioOutputContext()->audioBackend()->renamePort( this );
 }
 
 

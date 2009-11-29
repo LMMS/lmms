@@ -33,7 +33,7 @@
 #include "gui_templates.h"
 #include "lcd_spinbox.h"
 #include "MidiClient.h"
-#include "mixer.h"
+#include "Mixer.h"
 #include "tooltip.h"
 
 
@@ -93,7 +93,7 @@ InstrumentMidiIOView::InstrumentMidiIOView( QWidget * _parent ) :
 			m_outputProgramSpinBox, SLOT( setEnabled( bool ) ) );
 
 
-	if( !engine::getMixer()->midiClient()->isRaw() )
+	if( !engine::mixer()->midiClient()->isRaw() )
 	{
 		m_rpBtn = new QToolButton( m_midiInputGroupBox );
 		m_rpBtn->setText( tr( "MIDI devices to receive MIDI events from" ) );

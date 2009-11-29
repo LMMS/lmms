@@ -25,7 +25,6 @@
 #include "MixerWorkerThread.h"
 #include "Cpu.h"
 #include "engine.h"
-#include "mixer.h"
 
 
 MixerWorkerThread::JobQueue MixerWorkerThread::globalJobQueue;
@@ -98,7 +97,7 @@ void MixerWorkerThread::JobQueue::wait()
 
 // implementation of worker threads
 
-MixerWorkerThread::MixerWorkerThread( mixer * _mixer ) :
+MixerWorkerThread::MixerWorkerThread( Mixer * _mixer ) :
 	QThread( _mixer ),
 	m_workingBuf( CPU::allocFrames( _mixer->framesPerPeriod() ) ),
 	m_quit( false )

@@ -146,21 +146,22 @@ void ExportProjectDialog::startBtnClicked()
 	ui->progressBar->setEnabled( true );
 
 
-	mixer::qualitySettings qs = mixer::qualitySettings(
-		static_cast<mixer::qualitySettings::Interpolation>(
-						ui->interpolationCB->currentIndex() ),
-		static_cast<mixer::qualitySettings::Oversampling>(
-						ui->oversamplingCB->currentIndex() ),
+	AudioOutputContext::QualitySettings qs =
+		AudioOutputContext::QualitySettings(
+			static_cast<AudioOutputContext::QualitySettings::Interpolation>(
+										ui->interpolationCB->currentIndex() ),
+			static_cast<AudioOutputContext::QualitySettings::Oversampling>(
+										ui->oversamplingCB->currentIndex() ),
 					ui->sampleExactControllersCB->isChecked(),
 					ui->aliasFreeOscillatorsCB->isChecked() );
 
-	ProjectRenderer::OutputSettings os = ProjectRenderer::OutputSettings(
+	ProjectRenderer::EncoderSettings es = ProjectRenderer::EncoderSettings(
 		ui->samplerateCB->currentText().section( " ", 0, 0 ).toUInt(),
 		false,
 		ui->bitrateCB->currentText().section( " ", 0, 0 ).toUInt(),
 		static_cast<ProjectRenderer::Depths>( ui->depthCB->currentIndex() ) );
 
-	m_renderer = new ProjectRenderer( qs, os, ft, m_fileName );
+	m_renderer = new ProjectRenderer( qs, es, ft, m_fileName );
 	if( m_renderer->isReady() )
 	{
 		updateTitleBar( 0 );

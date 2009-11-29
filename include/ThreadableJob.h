@@ -27,7 +27,7 @@
 
 #include <QtCore/QAtomicInt>
 
-#include "mixer.h"
+#include "Mixer.h"
 
 
 class ThreadableJob

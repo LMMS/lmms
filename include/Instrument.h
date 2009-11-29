@@ -29,7 +29,7 @@
 #include <QtGui/QWidget>
 
 #include "Plugin.h"
-#include "mixer.h"
+#include "Mixer.h"
 
 
 // forward-declarations

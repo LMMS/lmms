@@ -26,14 +26,14 @@
 
 #include "AudioSampleRecorder.h"
 #include "sample_buffer.h"
-#include "debug.h"
+#include "Cpu.h"
 
 
 
 AudioSampleRecorder::AudioSampleRecorder( const ch_cnt_t _channels,
 							bool & _success_ful,
-							mixer * _mixer ) :
-	AudioDevice( _channels, _mixer ),
+							AudioOutputContext * context ) :
+	AudioBackend( _channels, context ),
 	m_buffers()
 {
 	_success_ful = true;
@@ -46,7 +46,7 @@ AudioSampleRecorder::~AudioSampleRecorder()
 {
 	while( !m_buffers.empty() )
 	{
-		delete[] m_buffers.front().first;
+		CPU::freeFrames( m_buffers.front().first );
 		m_buffers.erase( m_buffers.begin() );
 	}
 }
@@ -72,9 +72,9 @@ void AudioSampleRecorder::createSampleBuffer( sampleBuffer * * _sample_buf )
 {
 	const f_cnt_t frames = framesRecorded();
 	// create buffer to store all recorded buffers in
-	sampleFrame * data = new sampleFrame[frames];
+	sampleFrameA * data = CPU::allocFrames( frames );
 	// make sure buffer is cleaned up properly at the end...
-	sampleFrame * data_ptr = data;
+	sampleFrameA * data_ptr = data;
 
 #ifdef LMMS_DEBUG
 	assert( data != NULL );
@@ -83,30 +83,24 @@ void AudioSampleRecorder::createSampleBuffer( sampleBuffer * * _sample_buf )
 	for( BufferList::ConstIterator it = m_buffers.begin();
 						it != m_buffers.end(); ++it )
 	{
-		memcpy( data_ptr, ( *it ).first, ( *it ).second *
-							sizeof( sampleFrame ) );
+		CPU::memCpy( data_ptr, ( *it ).first, ( *it ).second *
+							sizeof( sampleFrameA ) );
 		data_ptr += ( *it ).second;
 	}
 	// create according sample-buffer out of big buffer
 	*_sample_buf = new sampleBuffer( data, frames );
 	( *_sample_buf )->setSampleRate( sampleRate() );
-	delete[] data;
+	CPU::freeFrames( data );
 }
 
 
 
 
-void AudioSampleRecorder::writeBuffer( const surroundSampleFrame * _ab,
+void AudioSampleRecorder::writeBuffer( const sampleFrameA * srcBuf,
 					const fpp_t _frames, const float )
 {
-	sampleFrame * buf = new sampleFrame[_frames];
-	for( fpp_t frame = 0; frame < _frames; ++frame )
-	{
-		for( ch_cnt_t chnl = 0; chnl < DEFAULT_CHANNELS; ++chnl )
-		{
-			buf[frame][chnl] = _ab[frame][chnl];
-		}
-	}
+	sampleFrameA * buf = CPU::allocFrames( _frames );
+	CPU::memCpy( buf, srcBuf, _frames*sizeof( sampleFrameA ) );
 	m_buffers.push_back( qMakePair( buf, _frames ) );
 }
 

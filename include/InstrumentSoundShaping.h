@@ -25,7 +25,7 @@
 #ifndef _INSTRUMENT_SOUND_SHAPING_H
 #define _INSTRUMENT_SOUND_SHAPING_H
 
-#include "mixer.h"
+#include "Mixer.h"
 #include "ComboBoxModel.h"
 
 

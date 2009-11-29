@@ -28,12 +28,13 @@
 #include <QtGui/QHBoxLayout>
 #include <QtGui/QLabel>
 
+#include "AudioOutputContext.h"
+#include "AudioBackend.h"
 #include "LadspaSubPluginFeatures.h"
-#include "AudioDevice.h"
 #include "engine.h"
 #include "ladspa_2_lmms.h"
 #include "LadspaBase.h"
-#include "mixer.h"
+#include "Mixer.h"
 
 
 LadspaSubPluginFeatures::LadspaSubPluginFeatures( Plugin::PluginTypes _type ) :
@@ -142,7 +143,7 @@ void LadspaSubPluginFeatures::listSubPluginKeys(
 						it != plugins.end(); ++it )
 	{
 		if( lm->getDescription( ( *it ).second )->inputChannels <= 
-				  engine::getMixer()->audioDev()->channels() )
+				  engine::mixer()->audioOutputContext()->audioBackend()->channels() )
 		{
 			_kl.push_back( ladspaKeyToSubPluginKey( _desc, ( *it ).first, ( *it ).second ) );
 		}

@@ -39,7 +39,6 @@
 #include "tab_button.h"
 #include "tab_widget.h"
 #include "gui_templates.h"
-#include "mixer.h"
 #include "ProjectJournal.h"
 #include "config_mgr.h"
 #include "embed.h"

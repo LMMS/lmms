@@ -28,7 +28,7 @@
 #include <QtCore/QAtomicPointer>
 #include <QtCore/QThread>
 
-#include "mixer.h"
+#include "Mixer.h"
 
 
 class MixerWorkerThread : public QThread
@@ -69,7 +69,7 @@ public:
 	} ;
 
 
-	MixerWorkerThread( mixer * _mixer );
+	MixerWorkerThread( Mixer * _mixer );
 	virtual ~MixerWorkerThread();
 
 	virtual void quit();
