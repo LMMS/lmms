@@ -79,9 +79,9 @@ const char * ProjectRenderer::EFF_ext[] = {"wav", "ogg", "mp3", "flac"};
 
 ProjectRenderer::ProjectRenderer(
 					const AudioOutputContext::QualitySettings & _qs,
-					const OutputSettings & _os,
-					ExportFileFormats _file_format,
-					const QString & _out_file ) :
+					const EncoderSettings & es,
+					ExportFileFormats fileFormat,
+					const QString & outFile ) :
 	QThread( engine::getMixer() ),
 	m_fileDev( NULL ),
 	m_progress( 0 ),
@@ -90,18 +90,18 @@ ProjectRenderer::ProjectRenderer(
 	m_context = new AudioOutputContext( engine::getMixer(),
 										NULL,
 										_qs );
-	if( __fileEncodeDevices[_file_format].m_getDevInst == NULL )
+	if( __fileEncodeDevices[fileFormat].m_getDevInst == NULL )
 	{
 		return;
 	}
 
 	bool success_ful = false;
-	m_fileDev = __fileEncodeDevices[_file_format].m_getDevInst(
-				_os.samplerate, DEFAULT_CHANNELS, success_ful,
-				_out_file, _os.vbr,
-				_os.bitrate, _os.bitrate - 64, _os.bitrate + 64,
-				_os.depth == Depth_32Bit ? 32 :
-					( _os.depth == Depth_24Bit ? 24 : 16 ),
+	m_fileDev = __fileEncodeDevices[fileFormat].m_getDevInst(
+				es.samplerate, DEFAULT_CHANNELS, success_ful,
+				outFile, es.vbr,
+				es.bitrate, es.bitrate - 64, es.bitrate + 64,
+				es.depth == Depth_32Bit ? 32 :
+					( es.depth == Depth_24Bit ? 24 : 16 ),
 							m_context );
 	if( success_ful == false )
 	{
@@ -119,6 +119,7 @@ ProjectRenderer::ProjectRenderer(
 ProjectRenderer::~ProjectRenderer()
 {
 	delete m_fileDev;
+	delete m_context;
 }
 
 
@@ -182,7 +183,8 @@ void ProjectRenderer::updateConsoleProgress()
 	char buf[80];
 	char prog[cols+1];
 
-    if( m_fileDev == NULL ){
+    if( m_fileDev == NULL )
+	{
         qWarning("Error occured. Aborting render.");
         m_consoleUpdateTimer->stop();
         delete m_consoleUpdateTimer;

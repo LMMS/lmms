@@ -22,7 +22,6 @@
  *
  */
 
-
 #include <QtCore/QFileInfo>
 #include <QtCore/QLocale>
 #include <QtCore/QProcess>
@@ -128,8 +127,8 @@ int main( int argc, char * * argv )
 
 	AudioOutputContext::QualitySettings qs(
 					AudioOutputContext::QualitySettings::Preset_HighQuality );
-	ProjectRenderer::OutputSettings os( 44100, false, 160,
-						ProjectRenderer::Depth_16Bit );
+	ProjectRenderer::EncoderSettings es( 44100, false, 160,
+											ProjectRenderer::Depth_16Bit );
 	ProjectRenderer::ExportFileFormats eff = ProjectRenderer::WaveFile;
 
 
@@ -251,7 +250,7 @@ int main( int argc, char * * argv )
 			sample_rate_t sr = QString( argv[i + 1] ).toUInt();
 			if( sr >= 44100 && sr <= 192000 )
 			{
-				os.samplerate = sr;
+				es.samplerate = sr;
 			}
 			else
 			{
@@ -268,7 +267,7 @@ int main( int argc, char * * argv )
 			int br = QString( argv[i + 1] ).toUInt();
 			if( br >= 64 && br <= 384 )
 			{
-				os.bitrate = br;
+				es.bitrate = br;
 			}
 			else
 			{
@@ -515,7 +514,7 @@ int main( int argc, char * * argv )
 		if( !render_out.isEmpty() )
 		{
 			// create renderer
-			ProjectRenderer * r = new ProjectRenderer( qs, os, eff,
+			ProjectRenderer * r = new ProjectRenderer( qs, es, eff,
 				render_out + QString( ProjectRenderer::EFF_ext[eff] ) );
 			QCoreApplication::instance()->connect( r,
 					SIGNAL( finished() ), SLOT( quit() ) );
