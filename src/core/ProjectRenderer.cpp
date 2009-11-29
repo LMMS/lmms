@@ -59,9 +59,9 @@ FileEncodeDevice __fileEncodeDevices[] =
         ".mp3", &AudioFileMp3::getInst },
 	{ ProjectRenderer::FlacFile,
 		QT_TRANSLATE_NOOP( "ProjectRenderer", "FLAC File (*.flac)" ),
-		".flac", 
+		".flac",
 #ifdef LMMS_HAVE_FLAC
-					&AudioFileFlac::getInst 
+					&AudioFileFlac::getInst
 #else
 					NULL
 #endif
@@ -219,7 +219,12 @@ void ProjectRenderer::run()
 #endif
 #endif
 
+	// have to lock Mixer when touching Song's state as the FIFO writer thread
+	// may call Mixer::renderNextBuffer() (which calls Song::doActions())
+	// simultaneously
+	engine::mixer()->lock();
 	engine::getSong()->startExport();
+	engine::mixer()->unlock();
 
 	song::playPos & pp = engine::getSong()->getPlayPos(
 							song::Mode_PlaySong );
@@ -239,7 +244,9 @@ void ProjectRenderer::run()
 		}
 	}
 
+	engine::mixer()->lock();
 	engine::getSong()->stopExport();
+	engine::mixer()->unlock();
 }
 
 

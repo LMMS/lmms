@@ -495,8 +495,7 @@ sampleFrameA * Mixer::renderNextBuffer()
 	MicroTimer timer;
 	static song::playPos last_metro_pos = -1;
 
-	song::playPos p = engine::getSong()->getPlayPos(
-						song::Mode_PlayPattern );
+	song::playPos p = engine::getSong()->getPlayPos( song::Mode_PlayPattern );
 	if( engine::getSong()->playMode() == song::Mode_PlayPattern &&
 		engine::getPianoRoll()->isRecording() == true &&
 		p != last_metro_pos && p.getTicks() %
