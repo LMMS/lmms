@@ -146,11 +146,12 @@ void ExportProjectDialog::startBtnClicked()
 	ui->progressBar->setEnabled( true );
 
 
-	mixer::qualitySettings qs = mixer::qualitySettings(
-		static_cast<mixer::qualitySettings::Interpolation>(
-						ui->interpolationCB->currentIndex() ),
-		static_cast<mixer::qualitySettings::Oversampling>(
-						ui->oversamplingCB->currentIndex() ),
+	AudioOutputContext::QualitySettings qs =
+		AudioOutputContext::QualitySettings(
+			static_cast<AudioOutputContext::QualitySettings::Interpolation>(
+										ui->interpolationCB->currentIndex() ),
+			static_cast<AudioOutputContext::QualitySettings::Oversampling>(
+										ui->oversamplingCB->currentIndex() ),
 					ui->sampleExactControllersCB->isChecked(),
 					ui->aliasFreeOscillatorsCB->isChecked() );
 

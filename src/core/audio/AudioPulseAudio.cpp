@@ -46,11 +46,11 @@ static void stream_write_callback(pa_stream *s, size_t length, void *userdata)
 
 
 
-AudioPulseAudio::AudioPulseAudio( bool & _success_ful, mixer * _mixer ) :
-	AudioDevice( tLimit<ch_cnt_t>(
+AudioPulseAudio::AudioPulseAudio( bool & _success_ful, AudioOutputContext * context ) :
+	AudioBackend( tLimit<ch_cnt_t>(
 		configManager::inst()->value( "audiopa", "channels" ).toInt(),
 					DEFAULT_CHANNELS, SURROUND_CHANNELS ),
-								_mixer ),
+								context ),
 	m_s( NULL ),
 	m_quit( false ),
 	m_convertEndian( false )
@@ -119,11 +119,9 @@ void AudioPulseAudio::applyQualitySettings()
 {
 	if( hqAudio() )
 	{
-//		setSampleRate( engine::getMixer()->processingSampleRate() );
+//		setSampleRate( mixer()->processingSampleRate() );
 
 	}
-
-	AudioDevice::applyQualitySettings();
 }
 
 
@@ -139,12 +137,12 @@ static void stream_state_callback( pa_stream *s, void * userdata )
 			break;
 
 		case PA_STREAM_READY:
-			qDebug( "Stream successfully created\n" );
+			qDebug( "Stream successfully created" );
 			break;
 
 		case PA_STREAM_FAILED:
 		default:
-			qCritical( "Stream errror: %s\n",
+			qCritical( "Stream errror: %s",
 					pa_strerror(pa_context_errno(
 						pa_stream_get_context( s ) ) ) );
 	}
@@ -166,7 +164,7 @@ static void context_state_callback(pa_context *c, void *userdata)
 		case PA_CONTEXT_READY:
 		{
 			pa_cvolume cv;
-			qDebug( "Connection established.\n" );
+			qDebug( "Connection established." );
 			_this->m_s = pa_stream_new( c, "lmms", &_this->m_sampleSpec,  NULL);
 			pa_stream_set_state_callback( _this->m_s, stream_state_callback, _this );
 			pa_stream_set_write_callback( _this->m_s, stream_write_callback, _this );
@@ -181,7 +179,8 @@ static void context_state_callback(pa_context *c, void *userdata)
 			buffer_attr.minreq = (uint32_t)(-1);
 			buffer_attr.fragsize = (uint32_t)(-1);
 
-			double latency = (double)( engine::getMixer()->framesPerPeriod() ) /
+			double latency = (double)( ( (const AudioPulseAudio *) _this )->
+											mixer()->framesPerPeriod() ) /
 													(double)_this->sampleRate();
 
 			// ask PulseAudio for the desired latency (which might not be approved)
@@ -201,7 +200,7 @@ static void context_state_callback(pa_context *c, void *userdata)
 
 		case PA_CONTEXT_FAILED:
 		default:
-			qCritical( "Connection failure: %s\n", pa_strerror( pa_context_errno( c ) ) );
+			qCritical( "Connection failure: %s", pa_strerror( pa_context_errno( c ) ) );
 	}
 }
 
@@ -213,7 +212,7 @@ void AudioPulseAudio::run()
 	pa_mainloop * mainLoop = pa_mainloop_new();
 	if( !mainLoop )
 	{
-		qCritical( "pa_mainloop_new() failed.\n" );
+		qCritical( "pa_mainloop_new() failed." );
 		return;
 	}
 	pa_mainloop_api * mainloop_api = pa_mainloop_get_api( mainLoop );
@@ -250,7 +249,7 @@ void AudioPulseAudio::run()
 
 void AudioPulseAudio::streamWriteCallback( pa_stream *s, size_t length )
 {
-	const fpp_t fpp = getMixer()->framesPerPeriod();
+	const fpp_t fpp = mixer()->framesPerPeriod();
 	sampleFrameA * temp = CPU::allocFrames( fpp );
 	Sint16 * pcmbuf = (Sint16*)CPU::memAlloc( fpp * channels() *
 							sizeof(Sint16) );
@@ -267,7 +266,7 @@ void AudioPulseAudio::streamWriteCallback( pa_stream *s, size_t length )
 		int bytes = CPU::convertToS16( temp,
 						(intSampleFrameA *) pcmbuf,
 						frames,
-						getMixer()->masterGain(),
+						mixer()->masterGain(),
 						m_convertEndian );
 		if( bytes > 0 )
 		{
@@ -285,7 +284,7 @@ void AudioPulseAudio::streamWriteCallback( pa_stream *s, size_t length )
 
 
 AudioPulseAudio::setupWidget::setupWidget( QWidget * _parent ) :
-	AudioDevice::setupWidget( AudioPulseAudio::name(), _parent )
+	AudioBackend::setupWidget( AudioPulseAudio::name(), _parent )
 {
 	m_device = new QLineEdit( AudioPulseAudio::probeDevice(), this );
 	m_device->setGeometry( 10, 20, 160, 20 );

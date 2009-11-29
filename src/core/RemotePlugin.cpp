@@ -29,7 +29,7 @@
 #endif
 
 #include "RemotePlugin.h"
-#include "mixer.h"
+#include "Mixer.h"
 #include "engine.h"
 #include "config_mgr.h"
 

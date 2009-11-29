@@ -33,6 +33,7 @@
 #include <QtGui/QPushButton>
 #include <QtAlgorithms>
 
+#include "AudioOutputContext.h"
 #include "pattern.h"
 #include "InstrumentTrack.h"
 #include "templates.h"
@@ -735,15 +736,14 @@ patternFreezeThread::~patternFreezeThread()
 
 void patternFreezeThread::run()
 {
-	// create and install audio-sample-recorder
+	AudioOutputContext context( engine::mixer(), NULL,
+			engine::mixer()->defaultAudioOutputContext()->qualitySettings() );
+
+	// create and install AudioSampleRecorder
 	bool b;
-	// we cannot create local copy, because at a later stage
-	// mixer::restoreAudioDevice(...) deletes old audio-dev and thus
-	// AudioSampleRecorder would be destroyed two times...
-	AudioSampleRecorder * freeze_recorder = new AudioSampleRecorder(
-							DEFAULT_CHANNELS, b,
-							engine::getMixer() );
-	engine::getMixer()->setAudioDevice( freeze_recorder );
+	AudioSampleRecorder freezeRecorder( DEFAULT_CHANNELS, b, &context );
+	context.setAudioBackend( &freezeRecorder );
+	engine::mixer()->setAudioOutputContext( &context );
 
 	// prepare stuff for playing correct things later
 	engine::getSong()->playPattern( m_pattern, false );
@@ -761,7 +761,7 @@ void patternFreezeThread::run()
 	while( ppp < m_pattern->length() &&
 					m_pattern->m_freezeAborted == false )
 	{
-		freeze_recorder->processNextBuffer();
+		freezeRecorder.processNextBuffer();
 		m_statusDlg->setProgress( ppp * 100 / m_pattern->length() );
 	}
 	m_statusDlg->setProgress( 100 );
@@ -769,7 +769,7 @@ void patternFreezeThread::run()
 	while( engine::getMixer()->hasPlayHandles() &&
 					m_pattern->m_freezeAborted == false )
 	{
-		freeze_recorder->processNextBuffer();
+		freezeRecorder.processNextBuffer();
 	}
 
 
@@ -782,12 +782,13 @@ void patternFreezeThread::run()
 	// create final sample-buffer if freezing was successful
 	if( m_pattern->m_freezeAborted == false )
 	{
-		freeze_recorder->createSampleBuffer(
+		freezeRecorder.createSampleBuffer(
 						&m_pattern->m_frozenPattern );
 	}
 
 	// restore original audio-device
-	engine::getMixer()->restoreAudioDevice();
+	engine::mixer()->setAudioOutputContext(
+								engine::mixer()->defaultAudioOutputContext() );
 
 	m_statusDlg->setProgress( -1 );	// we're finished
 

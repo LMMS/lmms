@@ -126,7 +126,8 @@ int main( int argc, char * * argv )
 					new QApplication( argc, argv ) ;
 
 
-	mixer::qualitySettings qs( mixer::qualitySettings::Mode_HighQuality );
+	AudioOutputContext::QualitySettings qs(
+					AudioOutputContext::QualitySettings::Preset_HighQuality );
 	ProjectRenderer::OutputSettings os( 44100, false, 160,
 						ProjectRenderer::Depth_16Bit );
 	ProjectRenderer::ExportFileFormats eff = ProjectRenderer::WaveFile;
@@ -284,19 +285,23 @@ int main( int argc, char * * argv )
 			const QString ip = QString( argv[i + 1] );
 			if( ip == "linear" )
 			{
-		qs.interpolation = mixer::qualitySettings::Interpolation_Linear;
+				qs.setInterpolation( AudioOutputContext::QualitySettings::
+													Interpolation_Linear );
 			}
 			else if( ip == "sincfastest" )
 			{
-		qs.interpolation = mixer::qualitySettings::Interpolation_SincFastest;
+				qs.setInterpolation( AudioOutputContext::QualitySettings::
+													Interpolation_SincFastest );
 			}
 			else if( ip == "sincmedium" )
 			{
-		qs.interpolation = mixer::qualitySettings::Interpolation_SincMedium;
+				qs.setInterpolation( AudioOutputContext::QualitySettings::
+													Interpolation_SincMedium );
 			}
 			else if( ip == "sincbest" )
 			{
-		qs.interpolation = mixer::qualitySettings::Interpolation_SincBest;
+				qs.setInterpolation( AudioOutputContext::QualitySettings::
+													Interpolation_SincBest );
 			}
 			else
 			{
@@ -314,21 +319,25 @@ int main( int argc, char * * argv )
 			switch( o )
 			{
 				case 1:
-		qs.oversampling = mixer::qualitySettings::Oversampling_None;
-		break;
+					qs.setOversampling( AudioOutputContext::QualitySettings::
+															Oversampling_None );
+					break;
 				case 2:
-		qs.oversampling = mixer::qualitySettings::Oversampling_2x;
-		break;
+					qs.setOversampling( AudioOutputContext::QualitySettings::
+															Oversampling_2x );
+					break;
 				case 4:
-		qs.oversampling = mixer::qualitySettings::Oversampling_4x;
-		break;
+					qs.setOversampling( AudioOutputContext::QualitySettings::
+															Oversampling_4x );
+					break;
 				case 8:
-		qs.oversampling = mixer::qualitySettings::Oversampling_8x;
-		break;
+					qs.setOversampling( AudioOutputContext::QualitySettings::
+															Oversampling_8x );
+					break;
 				default:
-				printf( "\nInvalid oversampling %s.\n\n"
+					printf( "\nInvalid oversampling %s.\n\n"
 	"Try \"%s --help\" for more information.\n\n", argv[i + 1], argv[0] );
-				return( EXIT_FAILURE );
+					return EXIT_FAILURE;
 			}
 			++i;
 		}

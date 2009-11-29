@@ -37,7 +37,6 @@
 #include "InstrumentView.h"
 #include "led_checkbox.h"
 #include "knob.h"
-#include "mixer.h"
 
 class lb302SynthView;
 class notePlayHandle;

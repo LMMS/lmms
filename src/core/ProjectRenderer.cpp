@@ -77,17 +77,19 @@ FileEncodeDevice __fileEncodeDevices[] =
 const char * ProjectRenderer::EFF_ext[] = {"wav", "ogg", "mp3", "flac"};
 
 
-ProjectRenderer::ProjectRenderer( const mixer::qualitySettings & _qs,
+ProjectRenderer::ProjectRenderer(
+					const AudioOutputContext::QualitySettings & _qs,
 					const OutputSettings & _os,
 					ExportFileFormats _file_format,
 					const QString & _out_file ) :
 	QThread( engine::getMixer() ),
 	m_fileDev( NULL ),
-	m_qualitySettings( _qs ),
-	m_oldQualitySettings( engine::getMixer()->currentQualitySettings() ),
 	m_progress( 0 ),
 	m_abort( false )
 {
+	m_context = new AudioOutputContext( engine::getMixer(),
+										NULL,
+										_qs );
 	if( __fileEncodeDevices[_file_format].m_getDevInst == NULL )
 	{
 		return;
@@ -100,12 +102,14 @@ ProjectRenderer::ProjectRenderer( const mixer::qualitySettings & _qs,
 				_os.bitrate, _os.bitrate - 64, _os.bitrate + 64,
 				_os.depth == Depth_32Bit ? 32 :
 					( _os.depth == Depth_24Bit ? 24 : 16 ),
-							engine::getMixer() );
+							m_context );
 	if( success_ful == false )
 	{
 		delete m_fileDev;
 		m_fileDev = NULL;
 	}
+
+	m_context->setAudioBackend( m_fileDev );
 
 }
 
@@ -114,6 +118,7 @@ ProjectRenderer::ProjectRenderer( const mixer::qualitySettings & _qs,
 
 ProjectRenderer::~ProjectRenderer()
 {
+	delete m_fileDev;
 }
 
 
@@ -129,12 +134,12 @@ ProjectRenderer::ExportFileFormats ProjectRenderer::getFileFormatFromExtension(
 	{
 		if( QString( __fileEncodeDevices[idx].m_extension ) == _ext )
 		{
-			return( __fileEncodeDevices[idx].m_fileFormat );
+			return __fileEncodeDevices[idx].m_fileFormat;
 		}
 		++idx;
 	}
 
-	return( WaveFile );	// default
+	return WaveFile;	// default
 }
 
 
@@ -144,11 +149,12 @@ void ProjectRenderer::startProcessing()
 {
 	if( isReady() )
 	{
+		connect( this, SIGNAL( finished() ), this, SLOT( finishProcessing() ) );
+
 		// have to do mixer stuff with GUI-thread-affinity in order to
 		// make slots connected to sampleRateChanged()-signals being
 		// called immediately
-		engine::getMixer()->setAudioDevice( m_fileDev,
-						m_qualitySettings, false );
+		engine::mixer()->setAudioOutputContext( m_context );
 
 		start(
 #ifndef LMMS_BUILD_WIN32
@@ -157,6 +163,49 @@ void ProjectRenderer::startProcessing()
 						);
 	}
 }
+
+
+
+
+void ProjectRenderer::abortProcessing()
+{
+	m_abort = true;
+}
+
+
+
+
+void ProjectRenderer::updateConsoleProgress()
+{
+	const int cols = 50;
+	static int rot = 0;
+	char buf[80];
+	char prog[cols+1];
+
+    if( m_fileDev == NULL ){
+        qWarning("Error occured. Aborting render.");
+        m_consoleUpdateTimer->stop();
+        delete m_consoleUpdateTimer;
+        // TODO: kill the program. I can't figure out how to do it...
+        return;
+    }
+
+	for( int i = 0; i < cols; ++i )
+	{
+		prog[i] = ( i*100/cols <= m_progress ? '-' : ' ' );
+	}
+	prog[cols] = 0;
+
+	const char * activity = (const char *) "|/-\\";
+	memset( buf, 0, sizeof( buf ) );
+	sprintf( buf, "\r|%s|    %3d%%   %c  ", prog, m_progress,
+							activity[rot] );
+	rot = ( rot+1 ) % 4;
+
+	fprintf( stderr, "%s", buf );
+	fflush( stderr );
+}
+
 
 
 
@@ -194,58 +243,23 @@ void ProjectRenderer::run()
 	}
 
 	engine::getSong()->stopExport();
+}
 
+
+
+
+void ProjectRenderer::finishProcessing()
+{
 	const QString f = m_fileDev->outputFile();
 
-	engine::getMixer()->restoreAudioDevice();  // also deletes audio-dev
-	engine::getMixer()->changeQuality( m_oldQualitySettings );
+	engine::mixer()->setAudioOutputContext(
+								engine::mixer()->defaultAudioOutputContext() );
 
 	// if the user aborted export-process, the file has to be deleted
 	if( m_abort )
 	{
 		QFile( f ).remove();
 	}
-}
-
-
-
-
-void ProjectRenderer::abortProcessing()
-{
-	m_abort = true;
-}
-
-
-
-void ProjectRenderer::updateConsoleProgress()
-{
-	const int cols = 50;
-	static int rot = 0;
-	char buf[80];
-	char prog[cols+1];
-
-    if( m_fileDev == NULL ){
-        qWarning("Error occured. Aborting render.");
-        m_consoleUpdateTimer->stop();
-        delete m_consoleUpdateTimer;
-        // TODO: kill the program. I can't figure out how to do it...
-        return;
-    }
-
-	for( int i = 0; i < cols; ++i )
-	{
-		prog[i] = ( i*100/cols <= m_progress ? '-' : ' ' );
-	}
-	prog[cols] = 0;
-
-	const char * activity = (const char *) "|/-\\";
-	memset( buf, 0, sizeof( buf ) );
-	sprintf( buf, "\r|%s|    %3d%%   %c  ", prog, m_progress,
-							activity[rot] );
-	rot = ( rot+1 ) % 4;
-
-	fprintf( stderr, "%s", buf );
-	fflush( stderr );
 }
 
 

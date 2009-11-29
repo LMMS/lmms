@@ -26,7 +26,7 @@
 #include "vibrating_string.h"
 #include "templates.h"
 #include "interpolation.h"
-#include "mixer.h"
+#include "Mixer.h"
 #include "engine.h"
 
 
@@ -42,7 +42,7 @@ vibratingString::vibratingString(	float _pitch,
 					float _detune,
 					bool _state ) :
 	m_oversample( 2 * _oversample / (int)( _sample_rate /
-				engine::getMixer()->baseSampleRate() ) ),
+				engine::mixer()->baseSampleRate() ) ),
 	m_randomize( _randomize ),
 	m_stringLoss( 1.0f - _string_loss ),
 	m_state( 0.1f )

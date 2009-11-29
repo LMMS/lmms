@@ -26,6 +26,7 @@
 #define _PROJECT_RENDERER_H
 
 #include "AudioFileDevice.h"
+#include "AudioOutputContext.h"
 #include "lmmsconfig.h"
 
 class QTimer;
@@ -71,7 +72,7 @@ public:
 	} ;
 
 
-	ProjectRenderer( const mixer::qualitySettings & _qs,
+	ProjectRenderer( const AudioOutputContext::QualitySettings & _qs,
 				const OutputSettings & _os,
 				ExportFileFormats _file_format,
 				const QString & _out_file );
@@ -101,12 +102,15 @@ signals:
 	void progressChanged( int );
 
 
+private slots:
+	void finishProcessing();
+
+
 private:
 	virtual void run();
 
 	AudioFileDevice * m_fileDev;
-	mixer::qualitySettings m_qualitySettings;
-	mixer::qualitySettings m_oldQualitySettings;
+	AudioOutputContext * m_context;
 
 	volatile int m_progress;
 	volatile bool m_abort;

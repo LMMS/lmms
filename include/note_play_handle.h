@@ -28,7 +28,7 @@
 #define _NOTE_PLAY_HANDLE_H
 
 #include "lmmsconfig.h"
-#include "mixer.h"
+#include "Mixer.h"
 #include "note.h"
 #include "engine.h"
 #include "track.h"

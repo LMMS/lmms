@@ -33,7 +33,7 @@
 #include "embed.h"
 #include "engine.h"
 #include "gui_templates.h"
-#include "mixer.h"
+#include "Mixer.h"
 #include "rename_dialog.h"
 #include "song.h"
 #include "song_editor.h"

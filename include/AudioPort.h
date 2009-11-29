@@ -29,7 +29,7 @@
 #include <QtCore/QMutex>
 #include <QtCore/QMutexLocker>
 
-#include "mixer.h"
+#include "Mixer.h"
 
 class EffectChain;
 
@@ -134,7 +134,7 @@ private:
 	EffectChain * m_effects;
 
 
-	friend class mixer;
+	friend class Mixer;
 	friend class MixerWorkerThread;
 
 } ;

@@ -25,16 +25,16 @@
 #ifndef _AUDIO_DUMMY_H
 #define _AUDIO_DUMMY_H
 
-#include "AudioDevice.h"
+#include "AudioBackend.h"
 #include "Cpu.h"
 #include "MicroTimer.h"
 
 
-class AudioDummy : public AudioDevice, public QThread
+class AudioDummy : public AudioBackend, public QThread
 {
 public:
-	AudioDummy( bool & _success_ful, mixer * _mixer ) :
-		AudioDevice( DEFAULT_CHANNELS, _mixer )
+	AudioDummy( bool & _success_ful, AudioOutputContext * context ) :
+		AudioBackend( DEFAULT_CHANNELS, context )
 	{
 		_success_ful = true;
 	}
@@ -50,11 +50,11 @@ public:
 	}
 
 
-	class setupWidget : public AudioDevice::setupWidget
+	class setupWidget : public AudioBackend::setupWidget
 	{
 	public:
 		setupWidget( QWidget * _parent ) :
-			AudioDevice::setupWidget( AudioDummy::name(), _parent )
+			AudioBackend::setupWidget( AudioDummy::name(), _parent )
 		{
 		}
 
@@ -93,27 +93,25 @@ private:
 	virtual void run()
 	{
 		MicroTimer timer;
+		sampleFrameA * buf = CPU::allocFrames( mixer()->framesPerPeriod() );
 		while( true )
 		{
 			timer.reset();
-			surroundSampleFrame * b =
-						getMixer()->nextBuffer();
-			if( !b )
+			int frames = getNextBuffer( buf );
+			if( frames == 0 )
 			{
 				break;
 			}
-			CPU::freeFrames( b );
 
 			const Sint32 microseconds = static_cast<Sint32>(
-					getMixer()->framesPerPeriod() *
-					1000000.0f /
-				getMixer()->processingSampleRate() -
-							timer.elapsed() );
+					mixer()->framesPerPeriod() * 1000000.0f /
+						mixer()->processingSampleRate() - timer.elapsed() );
 			if( microseconds > 0 )
 			{
 				usleep( microseconds );
 			}
 		}
+		CPU::freeFrames( buf );
 	}
 
 } ;

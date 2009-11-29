@@ -29,7 +29,6 @@
 #include <QtCore/QMutex>
 #include <QtGui/QWidget>
 
-#include "mixer.h"
 #include "JournallingObject.h"
 #include "communication.h"
 

@@ -29,16 +29,16 @@
 #include <QtCore/QList>
 #include <QtCore/QPair>
 
-#include "AudioDevice.h"
+#include "AudioBackend.h"
 
 class sampleBuffer;
 
 
-class AudioSampleRecorder : public AudioDevice
+class AudioSampleRecorder : public AudioBackend
 {
 public:
 	AudioSampleRecorder( const ch_cnt_t _channels, bool & _success_ful,
-							mixer * _mixer );
+							AudioOutputContext * context );
 	virtual ~AudioSampleRecorder();
 
 	f_cnt_t framesRecorded() const;
@@ -46,11 +46,11 @@ public:
 
 
 private:
-	virtual void writeBuffer( const surroundSampleFrame * _ab,
+	virtual void writeBuffer( const sampleFrameA * _ab,
 						const fpp_t _frames,
 						const float _master_gain );
 
-	typedef QList<QPair<sampleFrame *, fpp_t> > BufferList;
+	typedef QList<QPair<sampleFrameA *, fpp_t> > BufferList;
 	BufferList m_buffers;
 
 } ;

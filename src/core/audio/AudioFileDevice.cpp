@@ -39,8 +39,8 @@ AudioFileDevice::AudioFileDevice( const sample_rate_t _sample_rate,
 					const bitrate_t _min_bitrate,
 					const bitrate_t _max_bitrate,
 					const int _depth,
-					mixer * _mixer ) :
-	AudioDevice( _channels, _mixer ),
+					AudioOutputContext * context ) :
+	AudioBackend( _channels, context ),
 	m_outputFile( _file ),
 	m_useVbr( _use_vbr ),
 	m_nomBitrate( _nom_bitrate ),

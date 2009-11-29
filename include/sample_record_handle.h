@@ -30,7 +30,7 @@
 #include <QtCore/QPair>
 #include <qobject.h>
 
-#include "mixer.h"
+#include "Mixer.h"
 #include "sample_buffer.h"
 
 class bbTrack;

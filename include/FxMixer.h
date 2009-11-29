@@ -26,7 +26,7 @@
 #define _FX_MIXER_H
 
 #include "Model.h"
-#include "mixer.h"
+#include "Mixer.h"
 #include "EffectChain.h"
 #include "JournallingObject.h"
 

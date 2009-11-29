@@ -28,10 +28,10 @@
 
 #include <QtCore/QFile>
 
-#include "AudioDevice.h"
+#include "AudioBackend.h"
 
 
-class AudioFileDevice : public AudioDevice
+class AudioFileDevice : public AudioBackend
 {
 public:
 	AudioFileDevice( const sample_rate_t _sample_rate,
@@ -41,7 +41,7 @@ public:
 				const bitrate_t _min_bitrate,
 				const bitrate_t _max_bitrate,
 				const int _depth,
-				mixer * _mixer );
+				AudioOutputContext * context );
 	virtual ~AudioFileDevice();
 
 	QString outputFile() const
@@ -108,7 +108,7 @@ typedef AudioFileDevice * ( * AudioFileDeviceInstantiaton )
 						const bitrate_t _min_bitrate,
 						const bitrate_t _max_bitrate,
 						const int _depth,
-						mixer * _mixer );
+						AudioOutputContext * mixer );
 
 
 #endif

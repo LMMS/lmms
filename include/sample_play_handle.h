@@ -26,7 +26,7 @@
 #ifndef _SAMPLE_PLAY_HANDLE_H
 #define _SAMPLE_PLAY_HANDLE_H
 
-#include "mixer.h"
+#include "Mixer.h"
 #include "sample_buffer.h"
 #include "AutomatableModel.h"
 

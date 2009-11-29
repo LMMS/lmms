@@ -29,17 +29,17 @@
 
 #ifdef LMMS_HAVE_OSS
 
-#include "AudioDevice.h"
+#include "AudioBackend.h"
 
 
 class lcdSpinBox;
 class QLineEdit;
 
 
-class AudioOss : public AudioDevice, public QThread
+class AudioOss : public AudioBackend, public QThread
 {
 public:
-	AudioOss( bool & _success_ful, mixer * _mixer );
+	AudioOss( bool & _success_ful, AudioOutputContext * context );
 	virtual ~AudioOss();
 
 	inline static QString name()
@@ -50,7 +50,7 @@ public:
 	static QString probeDevice();
 
 
-	class setupWidget : public AudioDevice::setupWidget
+	class setupWidget : public AudioBackend::setupWidget
 	{
 	public:
 		setupWidget( QWidget * _parent );
