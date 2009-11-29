@@ -22,7 +22,6 @@
  *
  */
 
-
 #include <QtCore/QFile>
 #include <QTimer>
 
@@ -157,11 +156,7 @@ void ProjectRenderer::startProcessing()
 		// called immediately
 		engine::mixer()->setAudioOutputContext( m_context );
 
-		start(
-#ifndef LMMS_BUILD_WIN32
-			QThread::HighPriority
-#endif
-						);
+		start();
 	}
 }
 
