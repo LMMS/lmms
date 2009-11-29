@@ -492,7 +492,11 @@ void knob::mouseMoveEvent( QMouseEvent * _me )
 
 void knob::mouseReleaseEvent( QMouseEvent * /* _me*/ )
 {
-	model()->addJournalEntryFromOldToCurVal();
+	AutomatableModel * thisModel = model();
+	if( thisModel )
+	{
+		thisModel->addJournalEntryFromOldToCurVal();
+	}
 
 	m_buttonPressed = false;
 

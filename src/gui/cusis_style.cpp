@@ -881,7 +881,7 @@ int CusisStyle::pixelMetric( PixelMetric _metric, const QStyleOption * _option,
 
 
 void CusisStyle::drawFxLine( QPainter * _painter, const QWidget *_fxLine,
-    const QString & _name, bool _active )
+	const QString & _name, bool _active, bool _sendToThis )
 {
 	int width = _fxLine->rect().width();
 	int height = _fxLine->rect().height();

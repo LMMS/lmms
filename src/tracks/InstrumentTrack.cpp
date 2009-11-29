@@ -103,13 +103,14 @@ InstrumentTrack::InstrumentTrack( trackContainer * _tc ) :
 							this, tr( "Panning" ) ),
 	m_pitchModel( 0, -100, 100, 1, this, tr( "Pitch" ) ),
 	m_pitchRangeModel( 1, 1, 24, this, tr( "Pitch range" ) ),
-	m_effectChannelModel( 0, 0, NumFxChannels, this, tr( "FX channel" ) ),
+	m_effectChannelModel( 0, 0, 0, this, tr( "FX channel" ) ), // change this so it's a combo box, all the channels and then new.
 	m_instrument( NULL ),
 	m_soundShaping( this ),
 	m_arpeggiator( this ),
 	m_chordCreator( this ),
 	m_piano( this )
 {
+	m_effectChannelModel.setRange( 0, engine::fxMixer()->numChannels()-1, 1);
 	connect( baseNoteModel(), SIGNAL( dataChanged() ),
 			this, SLOT( updateBaseNote() ) );
 	connect( &m_pitchModel, SIGNAL( dataChanged() ),

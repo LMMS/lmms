@@ -279,7 +279,7 @@ int ClassicStyle::pixelMetric( PixelMetric _metric,
 
 
 void ClassicStyle::drawFxLine( QPainter * _painter, const QWidget *_fxLine,
-				const QString & _name, bool _active )
+				const QString & _name, bool _active, bool _sendToThis )
 {
 	int width = _fxLine->rect().width();
 	int height = _fxLine->rect().height();
@@ -293,10 +293,18 @@ void ClassicStyle::drawFxLine( QPainter * _painter, const QWidget *_fxLine,
 	p->setPen( QColor( 20, 24, 32 ) );
 	p->drawRect( 0, 0, width-1, height-1 );
 
+	// draw the mixer send background
+	if( _sendToThis )
+	{
+		p->drawPixmap(2, 0, 28, 56,
+					  embed::getIconPixmap("send_bg_arrow", 28, 56));
+	}
+
+	// draw the channel name
 	p->rotate( -90 );
 	p->setPen( _active ? QColor( 0, 255, 0 ) : Qt::white );
 	p->setFont( pointSizeF( _fxLine->font(), 7.5f ) );
-	p->drawText( -90, 20, _name );
+	p->drawText( -145, 20, _name );
 }
 
 void ClassicStyle::drawTrackContentBackground(QPainter * _painter,

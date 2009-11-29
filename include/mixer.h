@@ -62,10 +62,10 @@ const Keys BaseKey = Key_A;
 const Octaves BaseOctave = DefaultOctave;
 
 
-#include "play_handle.h"
-
-
 class MixerWorkerThread;
+
+#include "ThreadableJob.h"
+#include "play_handle.h"
 
 
 class EXPORT mixer : public QObject
@@ -433,7 +433,6 @@ private:
 	int m_cpuLoad;
 	QVector<MixerWorkerThread *> m_workers;
 	int m_numWorkers;
-	QWaitCondition m_queueReadyWaitCond;
 
 
 	PlayHandleList m_playHandles;
@@ -461,9 +460,7 @@ private:
 
 
 	friend class engine;
-	friend class MixerWorkerThread;
 
 } ;
-
 
 #endif

@@ -26,59 +26,91 @@
 #define _FX_MIXER_VIEW_H
 
 #include <QtGui/QWidget>
+#include <QtGui/QHBoxLayout>
+#include <QtGui/QScrollArea>
 
+#include "FxLine.h"
 #include "FxMixer.h"
 #include "ModelView.h"
+#include "engine.h"
+#include "fader.h"
+#include "pixmap_button.h"
+#include "tooltip.h"
+#include "embed.h"
+#include "EffectRackView.h"
 
-class QStackedLayout;
 class QButtonGroup;
-class fader;
 class FxLine;
-class EffectRackView;
-class pixmapButton;
-
 
 class FxMixerView : public QWidget, public ModelView,
 					public SerializingObjectHook
 {
 	Q_OBJECT
 public:
+	struct FxChannelView
+	{
+		FxChannelView(QWidget * _parent, FxMixerView * _mv, int _chIndex );
+
+		FxLine * m_fxLine;
+		pixmapButton * m_muteBtn;
+		fader * m_fader;
+	};
+
+
 	FxMixerView();
 	virtual ~FxMixerView();
+
+	virtual void keyPressEvent(QKeyEvent * e);
 
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _this );
 	virtual void loadSettings( const QDomElement & _this );
 
-	FxLine * currentFxLine()
+	inline FxLine * currentFxLine()
 	{
 		return m_currentFxLine;
 	}
+
+	inline FxChannelView * channelView(int index)
+	{
+		return m_fxChannelViews[index];
+	}
+
 	void setCurrentFxLine( FxLine * _line );
 	void setCurrentFxLine( int _line );
 
 	void clear();
 
 
+	// display the send button and knob correctly
+	void updateFxLine(int index);
+
+	// notify the view that an fx channel was deleted
+	void deleteChannel(int index);
+
+	// move the channel to the left or right
+	void moveChannelLeft(int index);
+	void moveChannelRight(int index);
+
+	// make sure the display syncs up with the fx mixer.
+	// useful for loading projects
+	void refreshDisplay();
+
 private slots:
 	void updateFaders();
-
+	void addNewChannel();
 
 private:
-	struct FxChannelView
-	{
-		FxLine * m_fxLine;
-		EffectRackView * m_rackView;
-		pixmapButton * m_muteBtn;
-		fader * m_fader;
-	} ;
 
-	FxChannelView m_fxChannelViews[NumFxChannels+1];
+	QVector<FxChannelView *> m_fxChannelViews;
 
-	QStackedLayout * m_fxRacksLayout;
-	QStackedLayout * m_fxLineBanks;
-	QButtonGroup * m_bankButtons;
 	FxLine * m_currentFxLine;
 
+	QScrollArea * channelArea;
+	QHBoxLayout * chLayout;
+	QWidget * m_channelAreaWidget;
+	EffectRackView * m_rackView;
+
+	void updateMaxChannelSelector();
 } ;
 
 #endif

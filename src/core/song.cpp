@@ -904,6 +904,26 @@ void song::loadProject( const QString & _file_name )
 						firstChildElement( "track" ) );
 	}
 	QDomNode node = mmp.content().firstChild();
+
+	// walk through and fix up the mixer
+	while( !node.isNull() )
+	{
+		if( node.nodeName() == engine::fxMixer()->nodeName() )
+		{
+			engine::fxMixer()->restoreState( node.toElement() );
+
+			if( engine::hasGUI() )
+			{
+				// refresh FxMixerView
+				engine::fxMixerView()->refreshDisplay();
+			}
+		}
+
+		node = node.nextSibling();
+	}
+
+	node = mmp.content().firstChild();
+
 	while( !node.isNull() )
 	{
 		if( node.isElement() )
@@ -916,10 +936,6 @@ void song::loadProject( const QString & _file_name )
 			else if( node.nodeName() == "controllers" )
 			{
 				restoreControllerStates( node.toElement() );
-			}
-			else if( node.nodeName() == engine::fxMixer()->nodeName() )
-			{
-				engine::fxMixer()->restoreState( node.toElement() );
 			}
 			else if( engine::hasGUI() )
 			{
@@ -972,7 +988,6 @@ void song::loadProject( const QString & _file_name )
 
 	// resolve all IDs so that autoModels are automated
 	automationPattern::resolveAllIDs();
-
 
 	engine::getMixer()->unlock();
 
