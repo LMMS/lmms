@@ -22,6 +22,7 @@
  *
  */
 
+#include <QtCore/QDir>
 #include <QtCore/QFileInfo>
 #include <QtCore/QLocale>
 #include <QtCore/QProcess>
@@ -457,6 +458,13 @@ int main( int argc, char * * argv )
 		// srandom() calls in their init procedure
 		srand( getpid() + time( 0 ) );
 
+		// recover a file?
+		QString recoveryFile = QDir(configManager::inst()->workingDir()).absoluteFilePath("recover.mmp");
+		if( QFileInfo(recoveryFile).exists() )
+		{
+			file_to_load = recoveryFile;
+		}
+
 		// we try to load given file
 		if( !file_to_load.isEmpty() )
 		{
@@ -531,7 +539,7 @@ int main( int argc, char * * argv )
 		}
 		else
 		{
-			engine::getSong()->saveProjectAs( file_to_save );
+			engine::getSong()->saveProjectFile( file_to_save );
 			return( 0 );
 		}
 	}

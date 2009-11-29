@@ -61,10 +61,11 @@ const Keys BaseKey = Key_A;
 const Octaves BaseOctave = DefaultOctave;
 
 
+class MixerWorkerThread;
+
+#include "ThreadableJob.h"
 #include "play_handle.h"
 
-
-class MixerWorkerThread;
 
 /*! \brief The Mixer class is responsible for processing and rendering audio chunks. */
 class EXPORT Mixer : public QObject
@@ -321,9 +322,7 @@ private:
 
 
 	friend class engine;
-	friend class MixerWorkerThread;
 
 } ;
-
 
 #endif

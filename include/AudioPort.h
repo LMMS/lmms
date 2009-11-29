@@ -27,13 +27,12 @@
 
 #include <QtCore/QString>
 #include <QtCore/QMutex>
-#include <QtCore/QMutexLocker>
 
 #include "Mixer.h"
 
 class EffectChain;
 
-class AudioPort
+class AudioPort : public ThreadableJob
 {
 public:
 	AudioPort( const QString & _name, bool _has_effect_chain = true );
@@ -108,6 +107,13 @@ public:
 
 
 	bool processEffects();
+
+	// ThreadableJob stuff
+	virtual void doProcessing( sampleFrame * );
+	virtual bool requiresProcessing() const
+	{
+		return true;
+	}
 
 
 	enum bufferUsages

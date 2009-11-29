@@ -22,12 +22,13 @@
  *
  */
 
-#include "AudioPort.h"
 #include "AudioBackend.h"
 #include "AudioOutputContext.h"
-#include "EffectChain.h"
-#include "engine.h"
+#include "AudioPort.h"
 #include "Cpu.h"
+#include "EffectChain.h"
+#include "FxMixer.h"
+#include "engine.h"
 
 
 AudioPort::AudioPort( const QString & _name, bool _has_effect_chain ) :
@@ -125,4 +126,16 @@ bool AudioPort::processEffects()
 	return false;
 }
 
+
+
+
+void AudioPort::doProcessing( sampleFrame * )
+{
+	const bool me = processEffects();
+	if( me || m_bufferUsage != NoUsage )
+	{
+		engine::fxMixer()->mixToChannel( firstBuffer(), nextFxChannel() );
+		nextPeriod();
+	}
+}
 

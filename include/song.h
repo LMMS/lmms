@@ -151,9 +151,10 @@ public:
 	// file management
 	void createNewProject();
 	void createNewProjectFromTemplate( const QString & _template );
-	void loadProject( const QString & _file_name );
-	bool saveProject();
-	bool saveProjectAs( const QString & _file_name );
+	void loadProject( const QString & _filename );
+	bool guiSaveProject();
+	bool guiSaveProjectAs( const QString & _filename );
+    bool saveProjectFile( const QString & _filename );
 	inline const QString & projectFileName() const
 	{
 		return m_fileName;
