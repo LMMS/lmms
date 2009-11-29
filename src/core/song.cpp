@@ -1009,10 +1009,8 @@ void song::loadProject( const QString & _file_name )
 }
 
 
-
-
-// save current song
-bool song::saveProject()
+// only save current song as _filename and do nothing else
+bool song::saveProjectFile( const QString & _filename )
 {
 	multimediaProject mmp( multimediaProject::SongProject );
 
@@ -1020,7 +1018,6 @@ bool song::saveProject()
 	m_timeSigModel.saveSettings( mmp, mmp.head(), "timesig" );
 	m_masterVolumeModel.saveSettings( mmp, mmp.head(), "mastervol" );
 	m_masterPitchModel.saveSettings( mmp, mmp.head(), "masterpitch" );
-
 
 	saveState( mmp, mmp.content() );
 
@@ -1039,8 +1036,17 @@ bool song::saveProject()
 
 	saveControllerStates( mmp, mmp.content() );
 
+    return mmp.writeFile( _filename );
+}
+
+
+
+// save current song and update the gui
+bool song::guiSaveProject()
+{
+	multimediaProject mmp( multimediaProject::SongProject );
 	m_fileName = mmp.nameWithExtension( m_fileName );
-	if( mmp.writeFile( m_fileName ) == true && engine::hasGUI() )
+	if( saveProjectFile( m_fileName ) && engine::hasGUI() )
 	{
 		textFloat::displayMessage( tr( "Project saved" ),
 					tr( "The project %1 is now saved."
@@ -1067,12 +1073,12 @@ bool song::saveProject()
 
 
 // save current song in given filename
-bool song::saveProjectAs( const QString & _file_name )
+bool song::guiSaveProjectAs( const QString & _file_name )
 {
 	QString o = m_oldFileName;
 	m_oldFileName = m_fileName;
 	m_fileName = _file_name;
-	if( saveProject() == false )
+	if( guiSaveProject() == false )
 	{
 		m_fileName = m_oldFileName;
 		m_oldFileName = o;
