@@ -729,6 +729,8 @@ void song::clearProject()
 	}
 
 	engine::getMixer()->lock();
+	engine::fxMixer()->clear();
+
 	if( engine::getBBEditor() )
 	{
 		engine::getBBEditor()->clearAllTracks();
@@ -737,15 +739,18 @@ void song::clearProject()
 	{
 		engine::getSongEditor()->clearAllTracks();
 	}
+
+	// depends on the fxMixer being cleared
 	if( engine::fxMixerView() )
 	{
 		engine::fxMixerView()->clear();
 	}
+
 	QCoreApplication::sendPostedEvents();
 	engine::getBBTrackContainer()->clearAllTracks();
 	clearAllTracks();
 
-	engine::fxMixer()->clear();
+
 
 	if( engine::getAutomationEditor() )
 	{
