@@ -30,7 +30,7 @@
 
 #include "embed.h"
 #include "engine.h"
-#include "mixer.h"
+#include "Mixer.h"
 
 
 lv2PortDialog::lv2PortDialog( const lv2_key_t & _key )
