@@ -27,7 +27,7 @@
 #include "EnvelopeAndLfoParameters.h"
 #include "debug.h"
 #include "engine.h"
-#include "mixer.h"
+#include "Mixer.h"
 #include "mmp.h"
 #include "Oscillator.h"
 

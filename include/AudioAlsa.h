@@ -34,17 +34,17 @@
 
 #include <alsa/asoundlib.h>
 
-#include "AudioDevice.h"
+#include "AudioBackend.h"
 
 
 class lcdSpinBox;
 class QComboBox;
 
 
-class AudioAlsa : public AudioDevice, public QThread
+class AudioAlsa : public AudioBackend, public QThread
 {
 public:
-	AudioAlsa( bool & _success_ful, mixer * _mixer );
+	AudioAlsa( bool & _success_ful, AudioOutputContext * context );
 	virtual ~AudioAlsa();
 
 	inline static QString name()
@@ -56,7 +56,7 @@ public:
 	static QString probeDevice();
 	
 
-	class setupWidget : public AudioDevice::setupWidget
+	class setupWidget : public AudioBackend::setupWidget
 	{
 	public:
 		setupWidget( QWidget * _parent );

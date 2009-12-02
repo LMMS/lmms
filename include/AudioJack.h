@@ -31,22 +31,22 @@
 #include <jack/jack.h>
 #endif
 
-#include <QtCore/QVector>
-#include <QtCore/QList>
 #include <QtCore/QMap>
+#include <QtCore/QSemaphore>
+#include <QtCore/QVector>
 
-#include "AudioDevice.h"
+#include "AudioBackend.h"
 
 
 class QLineEdit;
 class lcdSpinBox;
 
 
-class AudioJack : public QObject, public AudioDevice
+class AudioJack : public QObject, public AudioBackend
 {
 	Q_OBJECT
 public:
-	AudioJack( bool & _success_ful, mixer * _mixer );
+	AudioJack( bool & _success_ful, AudioOutputContext * context );
 	virtual ~AudioJack();
 
 	inline static QString name()
@@ -56,7 +56,7 @@ public:
 	}
 
 
-	class setupWidget : public AudioDevice::setupWidget
+	class setupWidget : public AudioBackend::setupWidget
 	{
 	public:
 		setupWidget( QWidget * _parent );

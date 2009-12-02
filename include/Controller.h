@@ -23,13 +23,13 @@
  *
  */
 
-
 #ifndef _CONTROLLER_H
 #define _CONTROLLER_H
 
 #include "engine.h"
-#include "mixer.h"
+#include "Mixer.h"
 #include "Model.h"
+//#include "AudioOutputContext.h"
 #include "JournallingObject.h"
 
 class ControllerDialog;
@@ -64,9 +64,9 @@ public:
 
 	inline bool isSampleExact() const
 	{
-		return m_sampleExact ||
-			engine::getMixer()->currentQualitySettings().
-							sampleExactControllers;
+		return m_sampleExact /*||
+			engine::mixer()->audioOutputContext()->
+				qualitySettings().sampleExactControllers()*/;
 	}
 
 	void setSampleExact( bool _exact )
@@ -76,7 +76,7 @@ public:
 
 	inline ControllerTypes type() const
 	{
-		return( m_type );
+		return m_type;
 	}
 
 	// return whether this controller updates models frequently - used for
@@ -85,17 +85,17 @@ public:
 	{
 		switch( m_type )
 		{
-			case LfoController: return( true );
-			case PeakController: return( true );
+			case LfoController: return true;
+			case PeakController: return true;
 			default:
 				break;
 		}
-		return( false );
+		return false;
 	}
 
 	virtual const QString & name() const
 	{
-		return( m_name );
+		return m_name;
 	}
 
 

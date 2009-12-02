@@ -56,6 +56,9 @@ typedef void (*BufApplyGainFunc)( sampleFrameA * RP _dst,
 typedef void (*BufMixFunc)( sampleFrameA * RP _dst,
 						const sampleFrameA * RP _src,
 								int _frames );
+typedef void (*BufMixCoeffFunc)( sampleFrameA * RP _dst,
+						const sampleFrameA * RP _src,
+						float _coeff, int _frames );
 typedef void (*BufMixLRCoeffFunc)( sampleFrameA * RP _dst,
 						const sampleFrameA * RP _src,
 						float _left, float _right,
@@ -81,6 +84,7 @@ extern MemCpyFunc memCpy;
 extern MemClearFunc memClear;
 extern BufApplyGainFunc bufApplyGain;
 extern BufMixFunc bufMix;
+extern BufMixCoeffFunc bufMixCoeff;
 extern BufMixLRCoeffFunc bufMixLRCoeff;
 extern UnalignedBufMixLRCoeffFunc unalignedBufMixLRCoeff;
 extern BufWetDryMixFunc bufWetDryMix;

@@ -41,7 +41,7 @@ class FxMixer;
 class FxMixerView;
 class ProjectJournal;
 class MainWindow;
-class mixer;
+class Mixer;
 class pianoRoll;
 class projectNotes;
 class ResourceDB;
@@ -75,7 +75,12 @@ public:
 	}
 
 	// core
-	static mixer * getMixer()
+	static Mixer * getMixer()
+	{
+		return s_mixer;
+	}
+
+	static Mixer * mixer()
 	{
 		return s_mixer;
 	}
@@ -207,7 +212,7 @@ private:
 	static float s_framesPerTick;
 
 	// core
-	static mixer * s_mixer;
+	static Mixer * s_mixer;
 	static FxMixer * s_fxMixer;
 	static song * s_song;
 	static ResourceDB * s_workingDirResourceDB;

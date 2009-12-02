@@ -29,7 +29,6 @@
 #include "Plugin.h"
 #include "embed.h"
 #include "engine.h"
-#include "mixer.h"
 #include "config_mgr.h"
 #include "DummyPlugin.h"
 #include "AutomatableModel.h"

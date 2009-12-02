@@ -1,5 +1,5 @@
 /*
- * mixer.h - audio-device-independent mixer for LMMS
+ * Mixer.h - Mixer for audio processing and rendering
  *
  * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -39,19 +39,18 @@
 
 
 #include <QtCore/QMutex>
-#include <QtCore/QThread>
 #include <QtCore/QVector>
 #include <QtCore/QWaitCondition>
 
 
 #include "lmms_basics.h"
 #include "note.h"
-#include "fifo_buffer.h"
 
 
-class AudioDevice;
-class MidiClient;
+class AudioBackend;
+class AudioOutputContext;
 class AudioPort;
+class MidiClient;
 
 
 const fpp_t DEFAULT_BUFFER_SIZE = 256;
@@ -62,110 +61,17 @@ const Keys BaseKey = Key_A;
 const Octaves BaseOctave = DefaultOctave;
 
 
+class MixerWorkerThread;
+
+#include "ThreadableJob.h"
 #include "play_handle.h"
 
 
-class MixerWorkerThread;
-
-
-class EXPORT mixer : public QObject
+/*! \brief The Mixer class is responsible for processing and rendering audio chunks. */
+class EXPORT Mixer : public QObject
 {
 	Q_OBJECT
 public:
-	struct qualitySettings
-	{
-		enum Mode
-		{
-			Mode_Draft,
-			Mode_HighQuality,
-			Mode_FinalMix
-		} ;
-
-		enum Interpolation
-		{
-			Interpolation_Linear,
-			Interpolation_SincFastest,
-			Interpolation_SincMedium,
-			Interpolation_SincBest
-		} ; 
-
-		enum Oversampling
-		{
-			Oversampling_None,
-			Oversampling_2x,
-			Oversampling_4x,
-			Oversampling_8x
-		} ;
-
-		Interpolation interpolation;
-		Oversampling oversampling;
-		bool sampleExactControllers;
-		bool aliasFreeOscillators;
-
-		qualitySettings( Mode _m )
-		{
-			switch( _m )
-			{
-				case Mode_Draft:
-					interpolation = Interpolation_Linear;
-					oversampling = Oversampling_None;
-					sampleExactControllers = false;
-					aliasFreeOscillators = false;
-					break;
-				case Mode_HighQuality:
-					interpolation =
-						Interpolation_SincFastest;
-					oversampling = Oversampling_2x;
-					sampleExactControllers = true;
-					aliasFreeOscillators = false;
-					break;
-				case Mode_FinalMix:
-					interpolation = Interpolation_SincBest;
-					oversampling = Oversampling_8x;
-					sampleExactControllers = true;
-					aliasFreeOscillators = true;
-					break;
-			}
-		}
-
-		qualitySettings( Interpolation _i, Oversampling _o, bool _sec,
-								bool _afo ) :
-			interpolation( _i ),
-			oversampling( _o ),
-			sampleExactControllers( _sec ),
-			aliasFreeOscillators( _afo )
-		{
-		}
-
-		int sampleRateMultiplier() const
-		{
-			switch( oversampling )
-			{
-				case Oversampling_None: return 1;
-				case Oversampling_2x: return 2;
-				case Oversampling_4x: return 4;
-				case Oversampling_8x: return 8;
-			}
-			return 1;
-		}
-
-		int libsrcInterpolation() const
-		{
-			switch( interpolation )
-			{
-				case Interpolation_Linear:
-					return SRC_ZERO_ORDER_HOLD;
-				case Interpolation_SincFastest:
-					return SRC_SINC_FASTEST;
-				case Interpolation_SincMedium:
-					return SRC_SINC_MEDIUM_QUALITY;
-				case Interpolation_SincBest:
-					return SRC_SINC_BEST_QUALITY;
-			}
-			return SRC_LINEAR;
-		}
-	} ;
-
 	void initDevices();
 	void clear();
 
@@ -176,16 +82,20 @@ public:
 		return m_audioDevName;
 	}
 
-	void setAudioDevice( AudioDevice * _dev );
-	void setAudioDevice( AudioDevice * _dev,
-				const struct qualitySettings & _qs,
-							bool _needs_fifo );
-	void restoreAudioDevice();
-	inline AudioDevice * audioDev()
+	/*! \brief Sets a specific AudioOutputContext to be the active context. */
+	void setAudioOutputContext( AudioOutputContext * context );
+	const AudioOutputContext * audioOutputContext() const
 	{
-		return m_audioDev;
+		return m_audioOutputContext;
 	}
-
+	AudioOutputContext * audioOutputContext()
+	{
+		return m_audioOutputContext;
+	}
+	AudioOutputContext * defaultAudioOutputContext()
+	{
+		return m_defaultAudioOutputContext;
+	}
 
 	// audio-port-stuff
 	inline void addAudioPort( AudioPort * _port )
@@ -246,7 +156,7 @@ public:
 		return m_framesPerPeriod;
 	}
 
-	inline const surroundSampleFrame * currentReadBuffer() const
+	inline const sampleFrameA * currentReadBuffer() const
 	{
 		return m_readBuf;
 	}
@@ -255,11 +165,6 @@ public:
 	inline int cpuLoad() const
 	{
 		return m_cpuLoad;
-	}
-
-	const qualitySettings & currentQualitySettings() const
-	{
-		return m_qualitySettings;
 	}
 
 
@@ -325,11 +230,6 @@ public:
 	static void clearAudioBuffer( sampleFrame * _ab,
 						const f_cnt_t _frames,
 						const f_cnt_t _offset = 0 );
-#ifndef LMMS_DISABLE_SURROUND
-	static void clearAudioBuffer( surroundSampleFrame * _ab,
-						const f_cnt_t _frames,
-						const f_cnt_t _offset = 0 );
-#endif
 
 	static float peakValueLeft( sampleFrame * _ab, const f_cnt_t _frames );
 	static float peakValueRight( sampleFrame * _ab, const f_cnt_t _frames );
@@ -337,13 +237,8 @@ public:
 
 	bool criticalXRuns() const;
 
-	inline bool hasFifoWriter() const
-	{
-		return m_fifoWriter != NULL;
-	}
-
 	void pushInputFrames( sampleFrame * _ab, const f_cnt_t _frames );
-	
+
 	inline const sampleFrame * inputBuffer()
 	{
 		return m_inputBuffer[ m_inputBufferRead ];
@@ -354,54 +249,25 @@ public:
 		return m_inputBufferFrames[ m_inputBufferRead ];
 	}
 
-	inline surroundSampleFrame * nextBuffer()
-	{
-		return hasFifoWriter() ? m_fifo->read() : renderNextBuffer();
-	}
-
-	void changeQuality( const struct qualitySettings & _qs );
+	/*! \brief Processes and renders next chunk of audio. */
+	sampleFrameA * renderNextBuffer();
 
 
 signals:
-	void qualitySettingsChanged();
 	void sampleRateChanged();
 	void nextAudioBuffer();
 
 
 private:
-	typedef fifoBuffer<surroundSampleFrame *> fifo;
+	Mixer();
+	virtual ~Mixer();
 
-	class fifoWriter : public QThread
-	{
-	public:
-		fifoWriter( mixer * _mixer, fifo * _fifo );
-
-		void finish();
-
-
-	private:
-		mixer * m_mixer;
-		fifo * m_fifo;
-		volatile bool m_writing;
-
-		virtual void run();
-
-	} ;
-
-
-	mixer();
-	virtual ~mixer();
-
-	void startProcessing( bool _needs_fifo = true );
+	void startProcessing();
 	void stopProcessing();
 
 
-	AudioDevice * tryAudioDevices();
+	AudioBackend * tryAudioBackends();
 	MidiClient * tryMidiClients();
-
-
-	surroundSampleFrame * renderNextBuffer();
-
 
 
 	QVector<AudioPort *> m_audioPorts;
@@ -415,21 +281,21 @@ private:
 	f_cnt_t m_inputBufferSize[2];
 	int m_inputBufferRead;
 	int m_inputBufferWrite;
-	
-	surroundSampleFrame * m_readBuf;
-	surroundSampleFrame * m_writeBuf;
-	
-	QVector<surroundSampleFrame *> m_bufferPool;
+
+	sampleFrameA * m_readBuf;
+	sampleFrameA * m_writeBuf;
+
+	QVector<sampleFrameA *> m_bufferPool;
 	int m_readBuffer;
 	int m_writeBuffer;
 	int m_poolDepth;
 
-	surroundSampleFrame m_maxClip;
-	surroundSampleFrame m_previousSample;
+	sampleFrame m_maxClip;
+	sampleFrame m_previousSample;
 	fpp_t m_halfStart[SURROUND_CHANNELS];
 	bool m_oldBuffer[SURROUND_CHANNELS];
 	bool m_newBuffer[SURROUND_CHANNELS];
-	
+
 	int m_cpuLoad;
 	QVector<MixerWorkerThread *> m_workers;
 	int m_numWorkers;
@@ -439,12 +305,11 @@ private:
 	PlayHandleList m_playHandles;
 	ConstPlayHandleList m_playHandlesToRemove;
 
-	struct qualitySettings m_qualitySettings;
 	float m_masterGain;
 
 
-	AudioDevice * m_audioDev;
-	AudioDevice * m_oldAudioDev;
+	AudioOutputContext * m_audioOutputContext;
+	AudioOutputContext * m_defaultAudioOutputContext;
 	QString m_audioDevName;
 
 
@@ -456,14 +321,8 @@ private:
 	QMutex m_inputFramesMutex;
 
 
-	fifo * m_fifo;
-	fifoWriter * m_fifoWriter;
-
-
 	friend class engine;
-	friend class MixerWorkerThread;
 
 } ;
-
 
 #endif

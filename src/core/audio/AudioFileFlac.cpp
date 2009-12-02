@@ -37,9 +37,9 @@ AudioFileFlac::AudioFileFlac( const sample_rate_t _sample_rate,
 	const ch_cnt_t _channels, bool & _success_ful, const QString & _file,
 	const bool _use_vbr, const bitrate_t _nom_bitrate,
 	const bitrate_t _min_bitrate, const bitrate_t _max_bitrate,
-	const int _depth, mixer * _mixer ) :
+	const int _depth, AudioOutputContext * context ) :
 	AudioFileDevice( _sample_rate, _channels, _file, _use_vbr, _nom_bitrate,
-		_min_bitrate, _max_bitrate, _depth, _mixer )
+		_min_bitrate, _max_bitrate, _depth, context )
 {
 	_success_ful = startEncoding();
 }

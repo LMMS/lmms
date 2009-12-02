@@ -26,14 +26,14 @@
 #define _PLAY_HANDLE_H
 
 #include <QtCore/QThread>
-#include <QtCore/QVector>
 
-#include "lmms_basics.h"
+#include "ThreadableJob.h"
+#include "Mixer.h"
 
 class track;
 
 
-class playHandle
+class playHandle : public ThreadableJob
 {
 public:
 	enum Types
@@ -69,6 +69,17 @@ public:
 	inline Type type() const
 	{
 		return m_type;
+	}
+
+	// required for ThreadableJob
+	virtual void doProcessing( sampleFrame * _working_buffer )
+	{
+		play( _working_buffer );
+	}
+
+	virtual bool requiresProcessing() const
+	{
+		return !done();
 	}
 
 	virtual void play( sampleFrame * _working_buffer ) = 0;

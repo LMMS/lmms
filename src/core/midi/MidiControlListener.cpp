@@ -30,7 +30,6 @@
 #include <QtXml/QDomNodeList>
 
 #include "MidiControlListener.h"
-#include "mixer.h"
 #include "MidiClient.h"
 #include "MidiPort.h"
 #include "engine.h"

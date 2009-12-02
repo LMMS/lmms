@@ -29,7 +29,6 @@
 
 #include "song.h"
 #include "engine.h"
-#include "mixer.h"
 #include "MidiClient.h"
 #include "MidiController.h"
 #include "automation_recorder.h"
