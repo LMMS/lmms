@@ -26,6 +26,7 @@
 #define _MAIN_WINDOW_H
 
 #include <QtCore/QBasicTimer>
+#include <QtCore/QTimer>
 #include <QtCore/QList>
 #include <QtGui/QMainWindow>
 #include <QtGui/QWhatsThis>
@@ -125,6 +126,7 @@ public slots:
 	bool saveProject();
 	bool saveProjectAs();
 	void showSettingsDialog();
+	void showPreferencesDialog();
 	void aboutLMMS();
 	void help();
 	void toggleAutomationEditorWin();
@@ -207,6 +209,7 @@ private:
 	QList<PluginView *> m_tools;
 
 	QBasicTimer m_updateTimer;
+	QTimer m_autoSaveTimer;
 
 	ResourceBrowser * m_resourceBrowser;
 
@@ -242,6 +245,8 @@ private slots:
 	void record();
 	void playAndRecord();
 	void stop();
+
+	void autoSave();
 
 signals:
 	void periodicUpdate();

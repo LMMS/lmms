@@ -29,6 +29,7 @@
 #include "visualization_widget.h"
 #include "gui_templates.h"
 #include "MainWindow.h"
+#include "Mixer.h"
 #include "embed.h"
 #include "engine.h"
 #include "tooltip.h"
@@ -40,16 +41,16 @@ visualizationWidget::visualizationWidget( const QPixmap & _bg, QWidget * _p,
 						visualizationTypes _vtype ) :
 	QWidget( _p ),
 	s_background( _bg ),
-	m_points( new QPointF[engine::getMixer()->framesPerPeriod()] ),
+	m_points( new QPointF[engine::mixer()->framesPerPeriod()] ),
 	m_active( false )
 {
 	setFixedSize( s_background.width(), s_background.height() );
 	setAttribute( Qt::WA_OpaquePaintEvent, true );
 
-	const fpp_t frames = engine::getMixer()->framesPerPeriod();
+	const fpp_t frames = engine::mixer()->framesPerPeriod();
 	m_buffer = new sampleFrame[frames];
 
-	engine::getMixer()->clearAudioBuffer( m_buffer, frames );
+	engine::mixer()->clearAudioBuffer( m_buffer, frames );
 
 
 	toolTip::add( this, tr( "click to enable/disable visualization of "
@@ -72,12 +73,11 @@ void visualizationWidget::updateAudioBuffer()
 {
 	if( !engine::getSong()->isExporting() )
 	{
-		engine::getMixer()->lock();
-		const surroundSampleFrame * c = engine::getMixer()->
-							currentReadBuffer();
-		const fpp_t fpp = engine::getMixer()->framesPerPeriod();
+		engine::mixer()->lock();
+		const surroundSampleFrame * c = engine::mixer()->currentReadBuffer();
+		const fpp_t fpp = engine::mixer()->framesPerPeriod();
 		memcpy( m_buffer, c, sizeof( surroundSampleFrame ) * fpp );
-		engine::getMixer()->unlock();
+		engine::mixer()->unlock();
 	}
 }
 
@@ -92,7 +92,7 @@ void visualizationWidget::setActive( bool _active )
 		connect( engine::mainWindow(),
 					SIGNAL( periodicUpdate() ),
 					this, SLOT( update() ) );
-		connect( engine::getMixer(),
+		connect( engine::mixer(),
 					SIGNAL( nextAudioBuffer() ),
 				this, SLOT( updateAudioBuffer() ) );
 	}
@@ -101,7 +101,7 @@ void visualizationWidget::setActive( bool _active )
 		disconnect( engine::mainWindow(),
 					SIGNAL( periodicUpdate() ),
 					this, SLOT( update() ) );
-		disconnect( engine::getMixer(),
+		disconnect( engine::mixer(),
 					SIGNAL( nextAudioBuffer() ),
 				this, SLOT( updateAudioBuffer() ) );
 		// we have to update (remove last waves),
@@ -121,7 +121,7 @@ void visualizationWidget::paintEvent( QPaintEvent * )
 
 	if( m_active && !engine::getSong()->isExporting() )
 	{
-		float master_output = engine::getMixer()->masterGain();
+		float master_output = engine::mixer()->masterGain();
 		int w = width()-4;
 		const float half_h = -( height() - 6 ) / 3.0 * master_output - 1;
 		int x_base = 2;
@@ -131,10 +131,10 @@ void visualizationWidget::paintEvent( QPaintEvent * )
 
 
 		const fpp_t frames =
-				engine::getMixer()->framesPerPeriod();
+				engine::mixer()->framesPerPeriod();
 		const float max_level = qMax<float>(
-				mixer::peakValueLeft( m_buffer, frames ),
-				mixer::peakValueRight( m_buffer, frames ) );
+				Mixer::peakValueLeft( m_buffer, frames ),
+				Mixer::peakValueRight( m_buffer, frames ) );
 
 		// and set color according to that...
 		LmmsStyle::ColorRole levelColor;
@@ -165,7 +165,7 @@ void visualizationWidget::paintEvent( QPaintEvent * )
 			{
 				m_points[frame] = QPointF(
 					x_base + (float) frame * xd,
-					y_base + ( mixer::clip(
+					y_base + ( Mixer::clip(
 						m_buffer[frame][ch] ) *
 								half_h ) );
 			}

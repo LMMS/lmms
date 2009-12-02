@@ -23,11 +23,11 @@
  *
  */
 
-
 #include <QtXml/QDomElement>
 
 #include <cstdio>
 
+#include "AudioOutputContext.h"
 #include "Effect.h"
 #include "engine.h"
 #include "DummyEffect.h"
@@ -168,8 +168,8 @@ void Effect::reinitSRC()
 		}
 		int error;
 		if( ( m_srcState[i] = src_new(
-			engine::getMixer()->currentQualitySettings().
-							libsrcInterpolation(),
+					engine::mixer()->audioOutputContext()->
+						qualitySettings().libsrcInterpolation(),
 					DEFAULT_CHANNELS, &error ) ) == NULL )
 		{
 			fprintf( stderr, "Error: src_new() failed in effect.cpp!\n" );

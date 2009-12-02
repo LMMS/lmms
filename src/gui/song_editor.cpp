@@ -35,6 +35,7 @@
 
 #include <math.h>
 
+#include "AudioOutputContext.h"
 #include "song_editor.h"
 #include "combobox.h"
 #include "embed.h"
@@ -43,7 +44,7 @@
 #include "timeline.h"
 #include "tool_button.h"
 #include "tooltip.h"
-#include "AudioDevice.h"
+#include "AudioBackend.h"
 #include "piano_roll.h"
 
 
@@ -130,7 +131,7 @@ songEditor::songEditor( song * _song, songEditor * & _engine_ptr ) :
 	m_recordButton->setDisabled( true );
 	
 	// disable record buttons if capturing is not supported
-	if( !engine::getMixer()->audioDev()->supportsCapture() )
+	if( !engine::mixer()->audioOutputContext()->audioBackend()->supportsCapture() )
 	{
 		m_recordButton->setDisabled( true );
 		m_recordAccompanyButton->setDisabled( true );

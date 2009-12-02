@@ -2,7 +2,8 @@
  * ladspa_port_dialog.cpp - dialog to test a LADSPA plugin
  *
  * Copyright (c) 2006-2008 Danny McRae <khjklujn/at/users.sourceforge.net>
- * 
+ * Copyright (c) 2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -22,7 +23,6 @@
  *
  */
 
-
 #include "ladspa_port_dialog.h"
 
 #include <QtGui/QLayout>
@@ -31,7 +31,7 @@
 #include "embed.h"
 #include "engine.h"
 #include "ladspa_2_lmms.h"
-#include "mixer.h"
+#include "Mixer.h"
 
 
 ladspaPortDialog::ladspaPortDialog( const ladspa_key_t & _key )
@@ -95,11 +95,11 @@ ladspaPortDialog::ladspaPortDialog( const ladspa_key_t & _key )
 		{
 			if( min != NOHINT )
 			{
-				min *= engine::getMixer()->processingSampleRate();
+				min *= engine::mixer()->processingSampleRate();
 			}
 			if( max != NOHINT )
 			{
-				max *= engine::getMixer()->processingSampleRate();
+				max *= engine::mixer()->processingSampleRate();
 			}
 		}
 

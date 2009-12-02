@@ -26,31 +26,46 @@
 #define _FX_MIXER_H
 
 #include "Model.h"
-#include "mixer.h"
+#include "Mixer.h"
 #include "EffectChain.h"
 #include "JournallingObject.h"
 
 
-const int NumFxChannels = 64;
 
 
-struct FxChannel
+class FxChannel : public ThreadableJob
 {
-	FxChannel( Model * _parent );
-	~FxChannel();
+	public:
+		FxChannel( Model * _parent );
+		~FxChannel();
 
-	EffectChain m_fxChain;
-	bool m_used;
-	bool m_stillRunning;
-	float m_peakLeft;
-	float m_peakRight;
-	sampleFrame * m_buffer;
-	BoolModel m_muteModel;
-	FloatModel m_volumeModel;
-	QString m_name;
-	QMutex m_lock;
+		EffectChain m_fxChain;
 
-} ;
+		// set to true if any effect in the channel is enabled and running
+		bool m_stillRunning;
+
+		float m_peakLeft;
+		float m_peakRight;
+		sampleFrame * m_buffer;
+		BoolModel m_muteModel;
+		FloatModel m_volumeModel;
+		QString m_name;
+		QMutex m_lock;
+		int m_channelIndex; // what channel index are we
+		bool m_queued; // are we queued up for rendering yet?
+
+		// pointers to other channels that this one sends to
+		QVector<fx_ch_t> m_sends;
+		QVector<FloatModel *> m_sendAmount;
+
+		// pointers to other channels that send to this one
+		QVector<fx_ch_t> m_receives;
+
+		virtual bool requiresProcessing() const { return true; }
+
+	private:
+		virtual void doProcessing( sampleFrame * _working_buffer );
+};
 
 
 
@@ -61,13 +76,9 @@ public:
 	virtual ~FxMixer();
 
 	void mixToChannel( const sampleFrame * _buf, fx_ch_t _ch );
-	void processChannel( fx_ch_t _ch, sampleFrame * _buf = NULL );
 
 	void prepareMasterMix();
 	void masterMix( sampleFrame * _buf );
-
-
-	void clear();
 
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
 	virtual void loadSettings( const QDomElement & _this );
@@ -79,17 +90,55 @@ public:
 
 	FxChannel * effectChannel( int _ch )
 	{
-		if( _ch >= 0 && _ch <= NumFxChannels )
-		{
-			return m_fxChannels[_ch];
-		}
-		return NULL;
+		return m_fxChannels[_ch];
 	}
 
+	// make the output of channel fromChannel go to the input of channel toChannel
+	// it is safe to call even if the send already exists
+	void createChannelSend(fx_ch_t fromChannel, fx_ch_t toChannel,
+						   float amount = 1.0f);
+
+	// delete the connection made by createChannelSend
+	void deleteChannelSend(fx_ch_t fromChannel, fx_ch_t toChannel);
+
+	// determine if adding a send from sendFrom to
+	// sendTo would result in an infinite mixer loop.
+	bool isInfiniteLoop(fx_ch_t fromChannel, fx_ch_t toChannel);
+
+	// return the FloatModel of fromChannel sending its output to the input of
+	// toChannel. NULL if there is no send.
+	FloatModel * channelSendModel(fx_ch_t fromChannel, fx_ch_t toChannel);
+
+	// add a new channel to the Fx Mixer.
+	// returns the index of the channel that was just added
+	int createChannel();
+
+	// delete a channel from the FX mixer.
+	void deleteChannel(int index);
+
+	// delete all the mixer channels except master and remove all effects
+	void clear();
+
+	// re-arrange channels
+	void moveChannelLeft(int index);
+	void moveChannelRight(int index);
+
+	// reset a channel's name, fx, sends, etc
+	void clearChannel(fx_ch_t channelIndex);
+
+	inline fx_ch_t numChannels() const
+	{
+		return m_fxChannels.size();
+	}
 
 private:
-	FxChannel * m_fxChannels[NumFxChannels+1];	// +1 = master
+	// the fx channels in the mixer. index 0 is always master.
+	QVector<FxChannel *> m_fxChannels;
 
+	// make sure we have at least num channels
+	void allocateChannelsTo(int num);
+
+	void addChannelLeaf( int _ch, sampleFrame * _buf );
 
 	friend class mixerWorkerThread;
 	friend class FxMixerView;

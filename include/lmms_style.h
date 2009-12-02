@@ -91,7 +91,7 @@ public:
 
 
 	virtual void drawFxLine(QPainter * _painter, const QWidget *_fxLine,
-			const QString & _name, bool _active) = 0;
+			const QString & _name, bool _active, bool _sendToThis) = 0;
 
 	virtual void drawTrackContentBackground(QPainter * _painter,
 			const QSize & _size, const int _pixelsPerTact) = 0;

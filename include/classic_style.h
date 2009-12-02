@@ -59,7 +59,7 @@ public:
 // LMMS Stuff
 
 	virtual void drawFxLine(QPainter * _painter, const QWidget *_fxLine,
-			const QString & _name, bool _active);
+			const QString & _name, bool _active, bool _sendToThis);
 
 	virtual void drawTrackContentBackground(QPainter * _painter,
 			const QSize & _size, const int _pixelsPerTact);

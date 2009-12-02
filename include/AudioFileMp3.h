@@ -44,7 +44,7 @@ public:
 			const bitrate_t _min_bitrate,
 			const bitrate_t _max_bitrate,
 			const int _depth,
-			mixer * _mixer );
+			AudioOutputContext * context );
 	virtual ~AudioFileMp3();
 
 	static AudioFileDevice * getInst( const sample_rate_t _sample_rate,
@@ -56,13 +56,12 @@ public:
 						const bitrate_t _min_bitrate,
 						const bitrate_t _max_bitrate,
 						const int _depth,
-						mixer * _mixer )
+						AudioOutputContext * context )
 	{
 		return new AudioFileMp3( _sample_rate, _channels,
 						_success_ful, _file, _use_vbr,
 						_nom_bitrate, _min_bitrate,
-							_max_bitrate, _depth,
-							_mixer );
+							_max_bitrate, _depth, context );
 	}
 
 

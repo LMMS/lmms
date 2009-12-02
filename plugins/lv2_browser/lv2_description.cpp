@@ -33,9 +33,10 @@
 #include <QtGui/QVBoxLayout>
 
 
-#include "AudioDevice.h"
+#include "AudioBackend.h"
+#include "AudioOutputContext.h"
+#include "Mixer.h"
 #include "engine.h"
-#include "mixer.h"
 
 
 
@@ -81,7 +82,7 @@ lv2Description::lv2Description( QWidget * _parent,
 		if( description->type == _type  &&
      (
       _type != VALID ||
-      description->inputChannels <= engine::getMixer()->audioDev()->channels()
+      description->inputChannels <= engine::mixer()->audioOutputContext()->audioBackend()->channels()
      )
     )
 		{

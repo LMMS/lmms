@@ -31,17 +31,17 @@
 
 #include <pulse/pulseaudio.h>
 
-#include "AudioDevice.h"
+#include "AudioBackend.h"
 
 
 class lcdSpinBox;
 class QLineEdit;
 
 
-class AudioPulseAudio : public AudioDevice, public QThread
+class AudioPulseAudio : public AudioBackend, public QThread
 {
 public:
-	AudioPulseAudio( bool & _success_ful, mixer * _mixer );
+	AudioPulseAudio( bool & _success_ful, AudioOutputContext * context );
 	virtual ~AudioPulseAudio();
 
 	inline static QString name()
@@ -52,7 +52,7 @@ public:
 	static QString probeDevice();
 
 
-	class setupWidget : public AudioDevice::setupWidget
+	class setupWidget : public AudioBackend::setupWidget
 	{
 	public:
 		setupWidget( QWidget * _parent );
@@ -79,6 +79,7 @@ private:
 	virtual void applyQualitySettings();
 	virtual void run();
 
+	volatile bool m_quit;
 
 	bool m_convertEndian;
 

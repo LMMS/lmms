@@ -729,6 +729,8 @@ void song::clearProject()
 	}
 
 	engine::getMixer()->lock();
+	engine::fxMixer()->clear();
+
 	if( engine::getBBEditor() )
 	{
 		engine::getBBEditor()->clearAllTracks();
@@ -737,15 +739,18 @@ void song::clearProject()
 	{
 		engine::getSongEditor()->clearAllTracks();
 	}
+
+	// depends on the fxMixer being cleared
 	if( engine::fxMixerView() )
 	{
 		engine::fxMixerView()->clear();
 	}
+
 	QCoreApplication::sendPostedEvents();
 	engine::getBBTrackContainer()->clearAllTracks();
 	clearAllTracks();
 
-	engine::fxMixer()->clear();
+
 
 	if( engine::getAutomationEditor() )
 	{
@@ -904,6 +909,26 @@ void song::loadProject( const QString & _file_name )
 						firstChildElement( "track" ) );
 	}
 	QDomNode node = mmp.content().firstChild();
+
+	// walk through and fix up the mixer
+	while( !node.isNull() )
+	{
+		if( node.nodeName() == engine::fxMixer()->nodeName() )
+		{
+			engine::fxMixer()->restoreState( node.toElement() );
+
+			if( engine::hasGUI() )
+			{
+				// refresh FxMixerView
+				engine::fxMixerView()->refreshDisplay();
+			}
+		}
+
+		node = node.nextSibling();
+	}
+
+	node = mmp.content().firstChild();
+
 	while( !node.isNull() )
 	{
 		if( node.isElement() )
@@ -916,10 +941,6 @@ void song::loadProject( const QString & _file_name )
 			else if( node.nodeName() == "controllers" )
 			{
 				restoreControllerStates( node.toElement() );
-			}
-			else if( node.nodeName() == engine::fxMixer()->nodeName() )
-			{
-				engine::fxMixer()->restoreState( node.toElement() );
 			}
 			else if( engine::hasGUI() )
 			{
@@ -973,7 +994,6 @@ void song::loadProject( const QString & _file_name )
 	// resolve all IDs so that autoModels are automated
 	automationPattern::resolveAllIDs();
 
-
 	engine::getMixer()->unlock();
 
 	configManager::inst()->addRecentlyOpenedProject( _file_name );
@@ -994,10 +1014,8 @@ void song::loadProject( const QString & _file_name )
 }
 
 
-
-
-// save current song
-bool song::saveProject()
+// only save current song as _filename and do nothing else
+bool song::saveProjectFile( const QString & _filename )
 {
 	multimediaProject mmp( multimediaProject::SongProject );
 
@@ -1005,7 +1023,6 @@ bool song::saveProject()
 	m_timeSigModel.saveSettings( mmp, mmp.head(), "timesig" );
 	m_masterVolumeModel.saveSettings( mmp, mmp.head(), "mastervol" );
 	m_masterPitchModel.saveSettings( mmp, mmp.head(), "masterpitch" );
-
 
 	saveState( mmp, mmp.content() );
 
@@ -1024,8 +1041,17 @@ bool song::saveProject()
 
 	saveControllerStates( mmp, mmp.content() );
 
+    return mmp.writeFile( _filename );
+}
+
+
+
+// save current song and update the gui
+bool song::guiSaveProject()
+{
+	multimediaProject mmp( multimediaProject::SongProject );
 	m_fileName = mmp.nameWithExtension( m_fileName );
-	if( mmp.writeFile( m_fileName ) == true && engine::hasGUI() )
+	if( saveProjectFile( m_fileName ) && engine::hasGUI() )
 	{
 		textFloat::displayMessage( tr( "Project saved" ),
 					tr( "The project %1 is now saved."
@@ -1052,12 +1078,12 @@ bool song::saveProject()
 
 
 // save current song in given filename
-bool song::saveProjectAs( const QString & _file_name )
+bool song::guiSaveProjectAs( const QString & _file_name )
 {
 	QString o = m_oldFileName;
 	m_oldFileName = m_fileName;
 	m_fileName = _file_name;
-	if( saveProject() == false )
+	if( guiSaveProject() == false )
 	{
 		m_fileName = m_oldFileName;
 		m_oldFileName = o;

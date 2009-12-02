@@ -278,7 +278,7 @@ qDebug() << "read dir" << d.canonicalPath();
 		{
 			ResourceItem::Relation * item = *it;
 			it = curParent->children().erase( it );
-			database()->recursiveRemoveItems( item );
+			database()->removeItemsRecursively( item );
 		}
 		else
 		{

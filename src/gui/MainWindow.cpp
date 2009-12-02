@@ -51,11 +51,12 @@
 #include "engine.h"
 #include "FxMixerView.h"
 #include "AboutDialog.h"
+#include "PreferencesDialog.h"
 #include "ControllerRackView.h"
 #include "plugin_browser.h"
 #include "SideBar.h"
 #include "config_mgr.h"
-#include "mixer.h"
+#include "Mixer.h"
 #include "project_notes.h"
 #include "setup_dialog.h"
 #include "AudioDummy.h"
@@ -83,7 +84,8 @@ MainWindow::MainWindow() :
 	m_workspace( NULL ),
 	m_templatesMenu( NULL ),
 	m_recentlyOpenedProjectsMenu( NULL ),
-	m_toolsMenu( NULL )
+	m_toolsMenu( NULL ),
+	m_autoSaveTimer( this )
 {
 	setAttribute( Qt::WA_DeleteOnClose );
 
@@ -152,6 +154,10 @@ MainWindow::MainWindow() :
 	vbox->addWidget( w );
 
 	m_updateTimer.start( 1000 / 20, this );	// 20 fps
+
+	// connect auto save
+	connect(&m_autoSaveTimer, SIGNAL(timeout()), this, SLOT(autoSave()));
+	m_autoSaveTimer.start(1000 * 60); // 1 minute
 
 	m_welcomeScreen = new WelcomeScreen( this );
 	m_welcomeScreen->setVisible( false );
@@ -257,6 +263,10 @@ void MainWindow::finalize()
 	edit_menu->addAction( embed::getIconPixmap( "setup_general" ),
 					tr( "Settings" ),
 					this, SLOT( showSettingsDialog() ) );
+	edit_menu->addSeparator();
+	edit_menu->addAction( embed::getIconPixmap( "setup_general" ),
+					tr( "Preferences (premature dialog)" ),
+					this, SLOT( showPreferencesDialog() ) );
 
 
 	m_toolsMenu = new QMenu( this );
@@ -1002,7 +1012,7 @@ bool MainWindow::saveProject()
 	}
 	else
 	{
-		engine::getSong()->saveProject();
+		engine::getSong()->guiSaveProject();
 	}
 	return true;
 }
@@ -1031,7 +1041,7 @@ bool MainWindow::saveProjectAs()
 	if( sfd.exec () == QFileDialog::Accepted &&
 		!sfd.selectedFiles().isEmpty() && sfd.selectedFiles()[0] != "" )
 	{
-		engine::getSong()->saveProjectAs(
+		engine::getSong()->guiSaveProjectAs(
 						sfd.selectedFiles()[0] );
 		return true;
 	}
@@ -1045,6 +1055,14 @@ void MainWindow::showSettingsDialog()
 {
 	setupDialog sd;
 	sd.exec();
+}
+
+
+
+
+void MainWindow::showPreferencesDialog()
+{
+	PreferencesDialog().exec();
 }
 
 
@@ -1182,6 +1200,9 @@ void MainWindow::closeEvent( QCloseEvent * _ce )
 {
 	if( mayChangeProject() )
 	{
+		// delete recovery file
+		QDir working(configManager::inst()->workingDir());
+		working.remove("recover.mmp");
 		_ce->accept();
 	}
 	else
@@ -1387,7 +1408,7 @@ void MainWindow::keyReleaseEvent( QKeyEvent * _ke )
 
 
 
-void MainWindow::timerEvent( QTimerEvent * )
+void MainWindow::timerEvent( QTimerEvent * _te)
 {
 	emit periodicUpdate();
 }
@@ -1457,9 +1478,9 @@ void MainWindow::browseHelp()
 
 void MainWindow::setHighQuality( bool _hq )
 {
-	engine::getMixer()->changeQuality( mixer::qualitySettings(
-			_hq ? mixer::qualitySettings::Mode_HighQuality :
-				mixer::qualitySettings::Mode_Draft ) );
+	/*engine::getMixer()->changeQuality( Mixer::qualitySettings(
+			_hq ? Mixer::qualitySettings::Mode_HighQuality :
+				Mixer::qualitySettings::Mode_Draft ) );*/
 }
 
 
@@ -1555,6 +1576,13 @@ void MainWindow::toggleRecordAutomation( bool _recording )
 	engine::getAutomationRecorder()->setRecording( _recording );
 }
 
+
+
+void MainWindow::autoSave()
+{
+	QDir work(configManager::inst()->workingDir());
+	engine::getSong()->saveProjectFile(work.absoluteFilePath("recover.mmp"));
+}
 
 
 #include "moc_MainWindow.cxx"

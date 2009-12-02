@@ -31,6 +31,6 @@
 
 #include <limits>
 
-#include "mixer.h"
+#include "Mixer.h"
 
 #endif

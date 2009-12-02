@@ -2,6 +2,7 @@
  * ladspa_description.cpp - LADSPA plugin description
  *
  * Copyright (c) 2007 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
+ * Copyright (c) 2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -30,10 +31,11 @@
 #include <QtGui/QScrollArea>
 #include <QtGui/QVBoxLayout>
 
-#include "AudioDevice.h"
+#include "AudioBackend.h"
+#include "AudioOutputContext.h"
 #include "engine.h"
 #include "ladspa_2_lmms.h"
-#include "mixer.h"
+#include "Mixer.h"
 
 
 
@@ -73,8 +75,8 @@ ladspaDescription::ladspaDescription( QWidget * _parent,
 		    it != plugins.end(); it++ )
 	{
 		if( _type != VALID || 
-			manager->getDescription( ( *it ).second )->inputChannels
-				<= engine::getMixer()->audioDev()->channels() )
+			manager->getDescription( ( *it ).second )->inputChannels <=
+				engine::mixer()->audioOutputContext()->audioBackend()->channels() )
 		{ 
 			pluginNames.push_back( ( *it ).first );
 			m_pluginKeys.push_back( ( *it ).second );
