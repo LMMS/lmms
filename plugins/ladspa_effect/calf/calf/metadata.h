@@ -204,7 +204,7 @@ struct equalizer5band_metadata: public plugin_metadata<equalizer5band_metadata>
     // and potentially making inlining and optimization harder for the compiler
     enum { param_lp_active = 0xDEADBEEF, param_hp_active, param_hp_mode, param_lp_mode, param_hp_freq, param_lp_freq };
     enum { PeakBands = 3, first_graph_param = param_ls_active, last_graph_param = param_p3_q };
-    PLUGIN_NAME_ID_LABEL("equalizer5band", "equalizer5band", "Equalizer 5 Band")
+    PLUGIN_NAME_ID_LABEL("equalizer5band", "eq5", "Equalizer 5 Band")
 };
 /// Markus's 8-band EQ - metadata
 struct equalizer8band_metadata: public plugin_metadata<equalizer8band_metadata>
@@ -222,7 +222,7 @@ struct equalizer8band_metadata: public plugin_metadata<equalizer8band_metadata>
            param_p4_active, param_p4_level, param_p4_freq, param_p4_q,
            param_count };
     enum { PeakBands = 4, first_graph_param = param_hp_active, last_graph_param = param_p4_q };
-    PLUGIN_NAME_ID_LABEL("equalizer8band", "equalizer8band", "Equalizer 8 Band")
+    PLUGIN_NAME_ID_LABEL("equalizer8band", "eq8", "Equalizer 8 Band")
 };
 /// Markus's 12-band EQ - metadata
 struct equalizer12band_metadata: public plugin_metadata<equalizer12band_metadata>
@@ -244,7 +244,7 @@ struct equalizer12band_metadata: public plugin_metadata<equalizer12band_metadata
            param_p8_active, param_p8_level, param_p8_freq, param_p8_q,
            param_count };
     enum { PeakBands = 8, first_graph_param = param_hp_active, last_graph_param = param_p8_q };
-    PLUGIN_NAME_ID_LABEL("equalizer12band", "equalizer12band", "Equalizer 12 Band")
+    PLUGIN_NAME_ID_LABEL("equalizer12band", "eq12", "Equalizer 12 Band")
 };
 
 /// Markus's Pulsator - metadata
