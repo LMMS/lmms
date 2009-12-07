@@ -232,6 +232,9 @@ public:
 	trackContentWidget( trackView * _parent );
 	virtual ~trackContentWidget();
 
+	/*! \brief Updates the background tile pixmap. */
+	void updateBackground();
+
 	void addTCOView( trackContentObjectView * _tcov );
 	void removeTCOView( trackContentObjectView * _tcov );
 	void removeTCOView( int _tco_num )
