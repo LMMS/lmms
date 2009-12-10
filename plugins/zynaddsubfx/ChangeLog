@@ -972,4 +972,5 @@
 10 Dec 2009 (Mark McCurry)
 	    - Separated out Presets and arrayed Presets to reduce warnings from
 	      the Wextra flag
+	    - Minor change to Filter_ and FormantFilter to reduce unwanted warnings
 

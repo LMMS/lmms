@@ -38,6 +38,7 @@ class FormantFilter:public Filter_
         void setfreq(REALTYPE frequency);
         void setfreq_and_q(REALTYPE frequency, REALTYPE q_);
         void setq(REALTYPE q_);
+        void setgain(REALTYPE dBgain);
 
         void cleanup();
     private:
