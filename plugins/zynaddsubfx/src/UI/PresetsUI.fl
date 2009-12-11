@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0105 
+version 1.0107 
 header_name {.h} 
 code_name {.cc}
 decl {\#include <FL/fl_ask.H>} {public
@@ -9,6 +9,9 @@ decl {\#include <stdio.h>} {public
 } 
 
 decl {\#include <stdlib.h>} {public
+} 
+
+decl {\#include "../Params/PresetsArray.h"} {selected
 } 
 
 decl {\#include "../Params/Presets.h"} {public
@@ -96,7 +99,7 @@ if (strlen(tmp)>0) {
 }else{
 	pastepbutton->activate();
 	deletepbutton->activate();
-};} selected
+};}
         xywh {10 25 245 320} type Hold
       }
       Fl_Button pastepbutton {
@@ -171,11 +174,15 @@ if (but) {
    };} {}
   }
   Function {copy(Presets *p,int n)} {} {
-    code {p->setelement(n);
+    code {PresetsArray *pre = dynamic_cast<PresetsArray *>(p);
+if(pre)
+    pre->setelement(n);
 copy(p);} {}
   }
   Function {paste(Presets *p,PresetsUI_ *pui,int n)} {} {
-    code {p->setelement(n);
+    code {PresetsArray *pre = dynamic_cast<PresetsArray *>(p);
+if(pre)
+    pre->setelement(n);
 paste(p,pui);} {}
   }
   Function {rescan()} {} {

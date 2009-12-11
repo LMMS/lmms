@@ -1,7 +1,7 @@
 /*
   ZynAddSubFX - a software synthesizer
 
-  Presets.h - Presets and Clipboard management
+  PresetsArray.h - PresetsArray and Clipboard management
   Copyright (C) 2002-2005 Nasca Octavian Paul
   Author: Nasca Octavian Paul
 
@@ -20,28 +20,27 @@
 
 */
 
-#ifndef PRESETS_H
-#define PRESETS_H
+#ifndef PRESETSARRAY_H
+#define PRESETSARRAY_H
 
 #include "../Misc/XMLwrapper.h"
 
-#include "PresetsStore.h"
+#include "Presets.h"
 
-/**Presets and Clipboard management*/
-class Presets
+/**PresetsArray and Clipboard management*/
+class PresetsArray : public Presets
 {
-    friend class PresetsArray;
     public:
-        Presets();
-        virtual ~Presets();
+        PresetsArray();
+        virtual ~PresetsArray();
 
-        virtual void copy(const char *name); /**<if name==NULL, the clipboard is used*/
-        virtual void paste(int npreset); //npreset==0 for clipboard
-        virtual bool checkclipboardtype();
+        void copy(const char *name); /**<if name==NULL, the clipboard is used*/
+        void paste(int npreset); //npreset==0 for clipboard
+        bool checkclipboardtype();
         void deletepreset(int npreset);
 
         char type[MAX_PRESETTYPE_SIZE];
-        //void setelement(int n);
+        void setelement(int n);
 
         void rescanforpresets();
 
@@ -51,6 +50,10 @@ class Presets
         virtual void add2XML(XMLwrapper *xml)    = 0;
         virtual void getfromXML(XMLwrapper *xml) = 0;
         virtual void defaults() = 0;
+        virtual void add2XMLsection(XMLwrapper *xml, int n)    = 0;
+        virtual void getfromXMLsection(XMLwrapper *xml, int n) = 0; 
+        virtual void defaults(int n) = 0;
+        int nelement;
 };
 
 #endif

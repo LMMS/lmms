@@ -27,7 +27,8 @@
 
 FilterParams::FilterParams(unsigned char Ptype_,
                            unsigned char Pfreq_,
-                           unsigned char Pq_):Presets()
+                           unsigned char Pq_)
+    : PresetsArray()
 {
     setpresettype("Pfilter");
     Dtype   = Ptype_;
