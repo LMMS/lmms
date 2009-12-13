@@ -124,7 +124,7 @@ protected:
       \param[in] w, h size of the widget in pixels
       \param[in] label optional text for the widget label
    */
-  Fl_Widget(int x, int y, int w, int h, Fl_CString label=0L);
+  Fl_Widget(int x, int y, int w, int h, const char *label=0L);
 
   /** Internal use only. Use position(int,int), size(int,int) or resize(int,int,int,int) instead. */
   void x(int v) {x_ = v;}
@@ -400,7 +400,7 @@ public:
 
   /** Gets the current label text.
       \return a pointer to the current label text
-      \see label(Fl_CString), copy_label(Fl_CString)
+      \see label(const char *), copy_label(const char *)
    */
   const char* label() const {return label_.value;}
 
@@ -426,10 +426,10 @@ public:
       \param[in] new_label the new label text
       \see label()
    */
-  void copy_label(Fl_CString new_label);
+  void copy_label(const char *new_label);
 
   /** Shortcut to set the label text and type in one call.
-      \see label(FL_CString), labeltype(Fl_Labeltype)
+      \see label(const char *), labeltype(Fl_Labeltype)
    */
   void label(Fl_Labeltype a, const char* b) {label_.type = a; label_.value = b;}
 
@@ -842,7 +842,7 @@ public:
   /** Internal use only. */
   int test_shortcut();
   /** Internal use only. */
-  static Fl_Shortcut label_shortcut(const char *t);
+  static unsigned int label_shortcut(const char *t);
   /** Internal use only. */
   static int test_shortcut(const char*);
 

@@ -235,7 +235,7 @@ int Fl_Menu_Item::add(
    ^ - Control
   \endverbatim
   Text shortcuts are converted to integer shortcut by calling 
-  Fl_Shortcut fl_old_shortcut(const char*).
+  unsigned int fl_old_shortcut(const char*).
 
   \par callback
   The callback to invoke when this menu item is selected. 

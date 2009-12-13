@@ -60,6 +60,33 @@ static int fl_free_font = FL_FREE_FONT;
 
 Fl_Font Fl::set_fonts(const char* xstarname) {
 #pragma unused ( xstarname )
+#if defined(__APPLE_COCOA__) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_5
+if(CTFontCreateWithFontDescriptor != NULL) {
+  int value[1] = {1};
+  CFDictionaryRef dict = CFDictionaryCreate(NULL, (const void **)kCTFontCollectionRemoveDuplicatesOption, 
+											(const void **)&value, 1, NULL, NULL);
+  CTFontCollectionRef fcref = CTFontCollectionCreateFromAvailableFonts(dict);
+  CFRelease(dict);
+  CFArrayRef arrayref = CTFontCollectionCreateMatchingFontDescriptors(fcref);
+  CFRelease(fcref);
+  CFIndex count = CFArrayGetCount(arrayref);
+  CFIndex i;
+  for (i = 0; i < count; i++) {
+	CTFontDescriptorRef fdesc = (CTFontDescriptorRef)CFArrayGetValueAtIndex(arrayref, i);
+	CTFontRef font = CTFontCreateWithFontDescriptor(fdesc, 0., NULL);
+	CFStringRef cfname = CTFontCopyPostScriptName(font);
+	CFRelease(font);
+	static char fname[100];
+	CFStringGetCString(cfname, fname, sizeof(fname), kCFStringEncodingUTF8);
+	CFRelease(cfname);
+	Fl::set_font((Fl_Font)(fl_free_font++), strdup(fname));
+	}
+  CFRelease(arrayref);
+  return (Fl_Font)fl_free_font;
+}
+else {
+#endif
+#if ! __LP64__
 #if defined(OLD__APPLE_QUARTZ__)
   ATSFontIterator it;
   ATSFontIteratorCreate(kATSFontContextGlobal, 0L, 0L, kATSOptionFlagsUnRestrictedScope, &it);  
@@ -114,6 +141,10 @@ Fl_Font Fl::set_fonts(const char* xstarname) {
   }
   free(oFontIDs);
   return (Fl_Font)fl_free_font;
+#endif //OLD__APPLE_QUARTZ__
+#endif //__LP64__
+#if defined(__APPLE_COCOA__) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_5
+  }
 #endif
 }
 

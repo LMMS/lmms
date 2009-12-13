@@ -67,6 +67,9 @@ public:
 #  elif defined(__APPLE_QUARTZ__)
   FL_EXPORT Fl_Font_Descriptor(const char* fontname, Fl_Fontsize size);
   ATSUTextLayout layout;
+#if defined(__APPLE_COCOA__) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_5
+  CTFontRef fontref;
+#endif
   ATSUStyle style;
   short ascent, descent, q_width;
 //  short width[256];

@@ -134,6 +134,113 @@ void Fl_Window::cursor(Fl_Cursor c, Fl_Color c1, Fl_Color c2) {
 # error "Either __LITTLE_ENDIAN__ or __BIG_ENDIAN__ must be defined"
 #endif
 
+#ifdef __APPLE_COCOA__
+extern void *MACSetCursor(Fl_Cursor c);
+extern Fl_Offscreen fl_create_offscreen_with_alpha(int w, int h);
+
+
+CGContextRef CreateHelpImage(void)
+{
+  int w = 20, h = 20;
+  Fl_Offscreen off = fl_create_offscreen_with_alpha(w, h);
+  fl_begin_offscreen(off);
+  CGContextSetRGBFillColor( (CGContextRef)off, 0,0,0,0);
+  fl_rectf(0,0,w,h);
+  fl_color(FL_BLACK);
+  fl_font(FL_COURIER_BOLD, 20);
+  fl_draw("?", 1, h-1);
+  fl_end_offscreen();
+  return (CGContextRef)off;
+}
+
+CGContextRef CreateNoneImage(void)
+{
+  int w = 20, h = 20;
+  Fl_Offscreen off = fl_create_offscreen_with_alpha(w, h);
+  fl_begin_offscreen(off);
+  CGContextSetRGBFillColor( (CGContextRef)off, 0,0,0,0);
+  fl_rectf(0,0,w,h);
+  fl_end_offscreen();
+  return (CGContextRef)off;
+}
+
+CGContextRef CreateWatchImage(void)
+{
+  int w, h, r = 5;
+  w = 2*r+6;
+  h = 4*r;
+  Fl_Offscreen off = fl_create_offscreen_with_alpha(w, h);
+  fl_begin_offscreen(off);
+  CGContextSetRGBFillColor( (CGContextRef)off, 0,0,0,0);
+  fl_rectf(0,0,w,h);
+  CGContextTranslateCTM( (CGContextRef)off, w/2, h/2);
+  fl_color(FL_WHITE);
+  fl_circle(0, 0, r+1);
+  fl_color(FL_BLACK);
+  fl_rectf(-r*0.7, -r*1.7, 1.4*r, 3.4*r);
+  fl_rectf(r-1, -1, 3, 3);
+  fl_color(FL_WHITE);
+  fl_pie(-r, -r, 2*r, 2*r, 0, 360);
+  fl_color(FL_BLACK);
+  fl_circle(0,0,r);
+  fl_xyline(0, 0, -r*.7);
+  fl_xyline(0, 0, 0, -r*.7);
+  fl_end_offscreen();
+  return (CGContextRef)off;
+}
+
+CGContextRef CreateNESWImage(void)
+{
+  int c = 7, r = 2*c;
+  int w = r, h = r;
+  Fl_Offscreen off = fl_create_offscreen_with_alpha(w, h);
+  fl_begin_offscreen(off);
+  CGContextSetRGBFillColor( (CGContextRef)off, 0,0,0,0);
+  fl_rectf(0,0,w,h);
+  CGContextTranslateCTM( (CGContextRef)off, 0, h);
+  CGContextScaleCTM( (CGContextRef)off, 1, -1);
+  fl_color(FL_BLACK);
+  fl_polygon(0, 0, c, 0, 0, c);
+  fl_polygon(r, r, r, r-c, r-c, r);
+  fl_line_style(FL_SOLID, 2, 0);
+  fl_line(0,1, r,r+1);
+  fl_line_style(FL_SOLID, 0, 0);
+  fl_end_offscreen();
+  return (CGContextRef)off;
+}
+
+CGContextRef CreateNWSEImage(void)
+{
+  int c = 7, r = 2*c;
+  int w = r, h = r;
+  Fl_Offscreen off = fl_create_offscreen_with_alpha(w, h);
+  fl_begin_offscreen(off);
+  CGContextSetRGBFillColor( (CGContextRef)off, 0,0,0,0);
+  fl_rectf(0,0,w,h);
+  CGContextTranslateCTM( (CGContextRef)off, 0, h);
+  CGContextScaleCTM( (CGContextRef)off, 1, -1);
+  fl_color(FL_BLACK);
+  fl_polygon(r-1, 0, r-1, c, r-1-c, 0);
+  fl_polygon(-1, r, c-1, r, -1, r-c);
+  fl_line_style(FL_SOLID, 2, 0);
+  fl_line(r-1,1, -1,r+1);
+  fl_line_style(FL_SOLID, 0, 0);
+  fl_end_offscreen();
+  return (CGContextRef)off;
+}
+
+void Fl_Window::cursor(Fl_Cursor c, Fl_Color, Fl_Color) {
+  if (c == FL_CURSOR_DEFAULT) {
+    c = cursor_default;
+  }
+  void *cursor = MACSetCursor( c );
+  if (i) {
+	  i->cursor = cursor;
+  }
+}
+
+#else
+
 static Cursor crsrHAND =
 {
   { E(0x0600), E(0x0900), E(0x0900), E(0x0900), E(0x09C0), E(0x0938), E(0x6926), E(0x9805),
@@ -214,7 +321,7 @@ void Fl_Window::cursor(Fl_Cursor c, Fl_Color, Fl_Color) {
     c = cursor_default;
   }
   CursHandle icrsr = fl_default_cursor;
-  switch (c) {
+	switch (c) {
   case FL_CURSOR_CROSS:  icrsr = GetCursor( crossCursor ); break;
   case FL_CURSOR_WAIT:   icrsr = GetCursor( watchCursor ); break;
   case FL_CURSOR_INSERT: icrsr = GetCursor( iBeamCursor ); break;
@@ -245,6 +352,8 @@ void Fl_Window::cursor(Fl_Cursor c, Fl_Color, Fl_Color) {
     }
   }
 }
+
+#endif //__APPLE_COCOA__
 
 #else
 

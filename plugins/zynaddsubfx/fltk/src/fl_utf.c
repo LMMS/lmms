@@ -49,7 +49,7 @@
    \c NULL, only the length of the utf-8 sequence is calculated
    \return length of the sequence in bytes
    */
-  /* FL_EXPORT int fl_unichar_to_utf8(Fl_Char uc, char *text); */
+  /* FL_EXPORT int fl_unichar_to_utf8(unsigned int uc, char *text); */
   
   /** @} */  
   
@@ -63,7 +63,7 @@
    \param[in] uc Unicode character
    \return length of the sequence in bytes
    */
-  /* FL_EXPORT int fl_utf8_size(Fl_Char uc); */
+  /* FL_EXPORT int fl_utf8_size(unsigned int uc); */
   
   /** @} */  
 #endif /* 0 */

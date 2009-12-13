@@ -61,6 +61,12 @@
 #include "flstring.h"
 #include <stdio.h>
 #include <ctype.h>
+#include <stdarg.h>
+
+#ifdef __APPLE_COCOA__
+extern void *MACMenuOrItemOperation(const char *operation, ...);
+#define MenuHandle void *
+#endif
 
 typedef const Fl_Menu_Item *pFl_Menu_Item;
 
@@ -69,7 +75,9 @@ typedef const Fl_Menu_Item *pFl_Menu_Item;
  * Skip all '&' which would mark the shortcut in FLTK
  * Skip all Mac control characters ('(', '<', ';', '^', '!' )
  */
-static void catMenuText( const char *src, char *dst )
+
+#ifndef __APPLE_COCOA__
+ static void catMenuText( const char *src, char *dst )
 {
   char c;
   while ( *dst ) 
@@ -88,6 +96,7 @@ static void catMenuText( const char *src, char *dst )
  * append a marker to identify the menu font style
  * <B, I, U, O, and S
  */
+
 static void catMenuFont( const Fl_Menu_Item *m, char *dst )
 {
   if ( !m->labeltype_ && !m->labelfont_ ) 
@@ -110,11 +119,11 @@ static void catMenuFont( const Fl_Menu_Item *m, char *dst )
       strcat( dst, "<S" );
   //else if ( m->labeltype_ == FL_SYMBOL_LABEL )
       ; // not supported
-}
+} 
 
 /**
  * append a marker to identify the menu shortcut
- * <B, I, U, O, and S
+ * <B, I, U, O, and S 
 enum {
   kMenuNoModifiers = 0,
   kMenuShiftModifier = (1 << 0),
@@ -122,7 +131,9 @@ enum {
   kMenuControlModifier = (1 << 2),
   kMenuNoCommandModifier = (1 << 3)
 }; 
- */
+*/
+#endif
+ 
 static void setMenuShortcut( MenuHandle mh, int miCnt, const Fl_Menu_Item *m )
 {
   if ( !m->shortcut_ ) 
@@ -135,6 +146,11 @@ static void setMenuShortcut( MenuHandle mh, int miCnt, const Fl_Menu_Item *m )
   if ( !isalnum( key ) )
     return;
   
+#ifdef __APPLE_COCOA__
+  void *menuItem = MACMenuOrItemOperation("itemAtIndex", mh, miCnt);
+  MACMenuOrItemOperation("setKeyEquivalent", menuItem, m->shortcut_ & 0xff );
+  MACMenuOrItemOperation("setKeyEquivalentModifierMask", menuItem, m->shortcut_ );
+#else
   long macMod = kMenuNoCommandModifier;
   if ( m->shortcut_ & FL_META ) macMod = kMenuNoModifiers;
   if ( m->shortcut_ & FL_SHIFT || isupper(key) ) macMod |= kMenuShiftModifier;
@@ -144,7 +160,9 @@ static void setMenuShortcut( MenuHandle mh, int miCnt, const Fl_Menu_Item *m )
   //SetMenuItemKeyGlyph( mh, miCnt, key );
   SetItemCmd( mh, miCnt, toupper(key) );
   SetMenuItemModifiers( mh, miCnt, macMod );
+#endif
 }
+
 
 #if 0
 // this function needs to be verified before we compile it back in.
@@ -166,15 +184,160 @@ static void catMenuShortcut( const Fl_Menu_Item *m, char *dst )
 }
 #endif
 
+
 static void setMenuFlags( MenuHandle mh, int miCnt, const Fl_Menu_Item *m )
 {
   if ( m->flags & FL_MENU_TOGGLE )
   {
-    SetItemMark( mh, miCnt, ( m->flags & FL_MENU_VALUE ) ? 0x12 : 0 );
+#ifdef __APPLE_COCOA__
+	void *menuItem = MACMenuOrItemOperation("itemAtIndex", mh, miCnt);
+	MACMenuOrItemOperation("setState", menuItem, m->flags & FL_MENU_VALUE );
+#else
+	SetItemMark( mh, miCnt, ( m->flags & FL_MENU_VALUE ) ? 0x12 : 0 );
+#endif
   }
-  else if ( m->flags & FL_MENU_RADIO )
-    SetItemMark( mh, miCnt, ( m->flags & FL_MENU_VALUE ) ? 0x13 : 0 );
+  else if ( m->flags & FL_MENU_RADIO ) {
+#ifndef __APPLE_COCOA__
+	SetItemMark( mh, miCnt, ( m->flags & FL_MENU_VALUE ) ? 0x13 : 0 );
+#endif	
+  }
 }
+
+
+#ifdef __APPLE_COCOA__
+
+/**
+ * create a sub menu for a specific menu handle
+ */
+static void createSubMenu( void * mh, pFl_Menu_Item &mm )
+{
+  void *submenu;
+  int miCnt, flags;
+  
+  void *menuItem;
+  submenu = MACMenuOrItemOperation("initWithTitle", mm->text);
+  int cnt;
+  MACMenuOrItemOperation("numberOfItems", mh, &cnt);
+  cnt--;
+  menuItem = MACMenuOrItemOperation("itemAtIndex", mh, cnt);
+  MACMenuOrItemOperation("setSubmenu", menuItem, submenu);
+  if ( mm->flags & FL_MENU_INACTIVE ) {
+    MACMenuOrItemOperation("setEnabled", menuItem, 0);
+  }
+  mm++;
+  
+  while ( mm->text )
+  {
+    int flRank = mm - fl_sys_menu_bar->Fl_Menu_::menu();
+    MACMenuOrItemOperation("addNewItem", submenu, flRank, &miCnt);
+    setMenuFlags( submenu, miCnt, mm );
+    setMenuShortcut( submenu, miCnt, mm );
+    if ( mm->flags & FL_MENU_INACTIVE ) {
+      void *item = MACMenuOrItemOperation("itemAtIndex", submenu, miCnt);
+      MACMenuOrItemOperation("setEnabled", item, 0);
+    }
+    flags = mm->flags;
+    if ( mm->flags & FL_SUBMENU )
+    {
+      createSubMenu( submenu, mm );
+    }
+    else if ( mm->flags & FL_SUBMENU_POINTER )
+    {
+      const Fl_Menu_Item *smm = (Fl_Menu_Item*)mm->user_data_;
+      createSubMenu( submenu, smm );
+    }
+    if ( flags & FL_MENU_DIVIDER ) {
+      MACMenuOrItemOperation("addSeparatorItem", submenu);
+      }
+    mm++;
+  }
+}
+ 
+
+static void convertToMenuBar(const Fl_Menu_Item *mm)
+//convert a complete Fl_Menu_Item array into a series of menus in the top menu bar
+//ALL PREVIOUS SYSTEM MENUS, EXCEPT APPLICATION MENU, ARE REPLACED BY THE NEW DATA
+{
+  int count;//first, delete all existing system menus
+  MACMenuOrItemOperation("numberOfItems", fl_system_menu, &count);
+  for(int i = count - 1; i > 0; i--) {
+	  MACMenuOrItemOperation("removeItem", fl_system_menu, i);
+  }
+  //now convert FLTK stuff into MacOS menus
+  for (;;)
+  {
+    if ( !mm || !mm->text )
+      break;
+    char visible = mm->visible() ? 1 : 0;
+    int flRank = mm - fl_sys_menu_bar->Fl_Menu_::menu();
+    MACMenuOrItemOperation("addNewItem", fl_system_menu, flRank, NULL);
+		
+    if ( mm->flags & FL_SUBMENU )
+      createSubMenu( fl_system_menu, mm );
+    else if ( mm->flags & FL_SUBMENU_POINTER ) {
+      const Fl_Menu_Item *smm = (Fl_Menu_Item*)mm->user_data_;
+      createSubMenu( fl_system_menu, smm );
+    }
+    if ( visible ) {
+      //      InsertMenu( mh, 0 );
+    }
+    mm++;
+  }
+}
+
+/**
+ * create a system menu bar using the given list of menu structs
+ *
+ * \author Matthias Melcher
+ *
+ * @param m list of Fl_Menu_Item
+ */
+void Fl_Sys_Menu_Bar::menu(const Fl_Menu_Item *m) 
+{
+  fl_open_display();
+  Fl_Menu_Bar::menu( m );
+  convertToMenuBar(m);
+}
+
+/**
+ * Adds to the system menu bar a new menu item, with a title string, shortcut int,
+ * callback, argument to the callback, and flags.
+ *
+ * @see Fl_Menu_::add(const char* label, int shortcut, Fl_Callback *cb, void *user_data, int flags) 
+ */
+int Fl_Sys_Menu_Bar::add(const char* label, int shortcut, Fl_Callback *cb, void *user_data, int flags)
+{
+  fl_open_display();
+  int rank = Fl_Menu_::add(label, shortcut, cb, user_data, flags);
+  convertToMenuBar(Fl_Menu_::menu());
+  return rank;
+}
+
+/**
+ * remove an item from the system menu bar
+ *
+ * @param rank		the rank of the item to remove
+ */
+void Fl_Sys_Menu_Bar::remove(int rank)
+{
+  Fl_Menu_::remove(rank);
+  convertToMenuBar(Fl_Menu_::menu());
+}
+
+
+/**
+ * rename an item from the system menu bar
+ *
+ * @param rank		the rank of the item to rename
+ * @param name		the new item name as a UTF8 string
+ */
+void Fl_Sys_Menu_Bar::replace(int rank, const char *name)
+{
+  MACMenuOrItemOperation("renameItem", rank, name);
+  fl_sys_menu_bar->Fl_Menu_::replace(rank, name);
+}
+
+#else
 
 static void catMenuFlags( const Fl_Menu_Item *m, char *dst )
 {
@@ -184,7 +347,7 @@ static void catMenuFlags( const Fl_Menu_Item *m, char *dst )
     strcat( dst, "(" );
 }
 
-/**
+ /**
  * create a sub menu for a specific menu handle
  */
 static void createSubMenu( MenuHandle mh, int &cnt, pFl_Menu_Item &mm )
@@ -229,7 +392,7 @@ static void createSubMenu( MenuHandle mh, int &cnt, pFl_Menu_Item &mm )
   }
   InsertMenu( mh, -1 );
 }
- 
+
 
 /**
  * create a system menu bar using the given list of menu structs
@@ -243,9 +406,9 @@ void Fl_Sys_Menu_Bar::menu(const Fl_Menu_Item *m)
   fl_open_display();
   Fl_Menu_Bar::menu( m );
   fl_sys_menu_bar = this;
-
+  
   char buf[255];
-
+  
   int cnt = 1; // first menu is no 2. no 1 is the Apple Menu
   const Fl_Menu_Item *mm = m;
   for (;;)
@@ -276,6 +439,8 @@ void Fl_Sys_Menu_Bar::menu(const Fl_Menu_Item *m)
   DrawMenuBar();
 }
 
+#endif //__APPLE_COCOA__
+
 /*
 const Fl_Menu_Item* Fl_Sys_Menu_Bar::picked(const Fl_Menu_Item* v) {
   Fl_menu_Item *ret = Fl_Menu_Bar::picked( v );
@@ -290,42 +455,31 @@ const Fl_Menu_Item* Fl_Sys_Menu_Bar::picked(const Fl_Menu_Item* v) {
 */
 
 void Fl_Sys_Menu_Bar::draw() {
-/* -- nothing to do, system should take care of this
-  draw_box();
-  if (!menu() || !menu()->text) return;
-  const Fl_Menu_Item* m;
-  int X = x()+6;
-  for (m=menu(); m->text; m = m->next()) {
-    int W = m->measure(0,this) + 16;
-    m->draw(X, y(), W, h(), this);
-    X += W;
-  }
-  */
 }
 
 /*
-int Fl_Menu_Bar::handle(int event) {
-  const Fl_Menu_Item* v;
-  if (menu() && menu()->text) switch (event) {
-  case FL_ENTER:
-  case FL_LEAVE:
-    return 1;
-  case FL_PUSH:
-    v = 0;
-  J1:
-    v = menu()->pulldown(x(), y(), w(), h(), v, this, 0, 1);
-    picked(v);
-    return 1;
-  case FL_SHORTCUT:
-    if (visible_r()) {
-      v = menu()->find_shortcut();
-      if (v && v->submenu()) goto J1;
-    }
-    return test_shortcut() != 0;
-  }
-  return 0;
-}
-*/
+ int Fl_Menu_Bar::handle(int event) {
+ const Fl_Menu_Item* v;
+ if (menu() && menu()->text) switch (event) {
+ case FL_ENTER:
+ case FL_LEAVE:
+ return 1;
+ case FL_PUSH:
+ v = 0;
+ J1:
+ v = menu()->pulldown(x(), y(), w(), h(), v, this, 0, 1);
+ picked(v);
+ return 1;
+ case FL_SHORTCUT:
+ if (visible_r()) {
+ v = menu()->find_shortcut();
+ if (v && v->submenu()) goto J1;
+ }
+ return test_shortcut() != 0;
+ }
+ return 0;
+ }
+ */
 
 #endif /* __APPLE__ */
 

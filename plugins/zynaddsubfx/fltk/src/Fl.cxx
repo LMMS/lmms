@@ -40,6 +40,10 @@
 #include <stdlib.h>
 #include "flstring.h"
 
+#if defined(__APPLE__) && defined(__APPLE_COCOA__)
+#import <Cocoa/Cocoa.h>
+#endif
+
 #ifdef DEBUG
 #  include <stdio.h>
 #endif // DEBUG
@@ -406,10 +410,17 @@ double Fl::wait(double time_to_wait) {
     // the idle function may turn off idle, we can then wait:
     if (idle) time_to_wait = 0.0;
   }
+#ifdef __APPLE_COCOA__
+  NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+#endif
   flush();
   if (idle && !in_idle) // 'idle' may have been set within flush()
     time_to_wait = 0.0;
-  return fl_wait(time_to_wait);
+  double retval = fl_wait(time_to_wait);
+#ifdef __APPLE_COCOA__
+  [pool release];
+#endif
+  return retval;
 
 #else
 
@@ -586,12 +597,13 @@ Fl_Window* fl_find(Window xid) {
   Fl_X *window;
   for (Fl_X **pp = &Fl_X::first; (window = *pp); pp = &window->next)
 #if defined(WIN32) || defined(USE_X11)
-   if (window->xid == xid) {
+   if (window->xid == xid) 
 #elif defined(__APPLE_QUARTZ__)
-    if (window->xid == xid && !window->w->window()) {
+   if (window->xid == xid && !window->w->window()) 
 #else
 # error unsupported platform
 #endif // __APPLE__
+	{
       if (window != Fl_X::first && !Fl::modal()) {
 	// make this window be first to speed up searches
 	// this is not done if modal is true to avoid messing up modal stack
@@ -1278,7 +1290,11 @@ int Fl_Window::handle(int ev)
 #if defined(USE_X11) || defined(WIN32)
         XMapWindow(fl_display, fl_xid(this)); // extra map calls are harmless
 #elif defined(__APPLE_QUARTZ__)
-        MacMapWindow(this, fl_xid(this));
+#ifdef __APPLE_COCOA__
+		MacMapWindow(this, i->xid);
+#else
+		MacMapWindow(this, fl_xid(this));
+#endif
 #else
 # error unsupported platform
 #endif // __APPLE__
@@ -1300,7 +1316,11 @@ int Fl_Window::handle(int ev)
 #if defined(USE_X11) || defined(WIN32)
 	XUnmapWindow(fl_display, fl_xid(this));
 #elif defined(__APPLE_QUARTZ__)
+#ifdef __APPLE_COCOA__
+	MacUnmapWindow(this, i->xid);
+#else
 	MacUnmapWindow(this, fl_xid(this));
+#endif
 #else
 # error platform unsupported
 #endif
@@ -1453,10 +1473,22 @@ void Fl_Widget::damage(uchar fl, int X, int Y, int W, int H) {
       CombineRgn(i->region, i->region, R, RGN_OR);
       XDestroyRegion(R);
 #elif defined(__APPLE_QUARTZ__)
-      Fl_Region R = NewRgn();
-      SetRectRgn(R, X, Y, X+W, Y+H);
-      UnionRgn(R, i->region, i->region);
-      DisposeRgn(R);
+#ifdef __APPLE_COCOA__
+	  CGRect arg = CGRectMake(X,Y,W - 1,H - 1);
+	  int j;//don't add a rectangle totally inside the Fl_Region
+	  for(j = 0; j < i->region->count; j++) {
+		if(CGRectContainsRect(i->region->rects[j], arg)) break;
+		}
+	  if( j >= i->region->count) {
+		i->region->rects = (CGRect*)realloc(i->region->rects, (++(i->region->count)) * sizeof(CGRect));
+		i->region->rects[i->region->count - 1] = arg;
+		}
+#else
+	Fl_Region R = NewRgn();
+	SetRectRgn(R, X, Y, X+W, Y+H);
+	UnionRgn(R, i->region, i->region);
+	DisposeRgn(R);
+#endif
 #else
 # error unsupported platform
 #endif
@@ -1480,7 +1512,11 @@ void Fl_Window::flush() {
 #ifdef WIN32
 #  include "Fl_win32.cxx"
 #elif defined(__APPLE__)
+#ifdef __APPLE_COCOA__
+#  include "Fl_cocoa.mm"
+#else
 #  include "Fl_mac.cxx"
+#endif
 #endif
 
 //

@@ -31,6 +31,7 @@
 // equivalent (but totally different) crap for MSWindows is in Fl_win32.cxx
 #include "config.h"
 #include <FL/Fl.H>
+#include <FL/x.H>
 #include <FL/Fl_Window.H>
 #include <stdlib.h>
 #include "flstring.h"
@@ -125,6 +126,10 @@ void Fl_Window::draw() {
     int i;
     for (i=dx; i<12; i++) {
       fl_color(c[i&3]);
+#ifdef __APPLE_COCOA__
+	  extern CGContextRef fl_gc;
+	  if(fl_gc)
+#endif
       fl_line(x1--, y1, x2, y2--);
     }
   }

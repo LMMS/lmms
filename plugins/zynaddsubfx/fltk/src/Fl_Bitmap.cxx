@@ -325,7 +325,11 @@ Fl_Bitmap::~Fl_Bitmap() {
 
 void Fl_Bitmap::uncache() {
   if (id) {
+#if defined(__APPLE__) && defined(__APPLE_COCOA__)
+    fl_delete_bitmask((Fl_Bitmask)id);
+#else
     fl_delete_bitmask((Fl_Offscreen)id);
+#endif
     id = 0;
   }
 }

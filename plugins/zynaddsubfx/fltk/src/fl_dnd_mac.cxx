@@ -46,6 +46,11 @@ extern int fl_selection_length;
  */
 int Fl::dnd()
 {
+#ifdef __APPLE_COCOA__
+  extern int MACpreparedrag(void);
+  return MACpreparedrag();
+#else
+
   OSErr result;
   DragReference dragRef;
   result = NewDrag( &dragRef );
@@ -82,6 +87,7 @@ int Fl::dnd()
   DisposeRgn( region );
   DisposeDrag( dragRef );
   return true;
+#endif //__APPLE_COCOA__
 }
   
 

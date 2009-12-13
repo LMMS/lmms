@@ -107,7 +107,11 @@ static void screen_init() {
 #elif defined(__APPLE__)
 XRectangle screens[16];
 
+extern int MACscreen_init(XRectangle screens[]);
 static void screen_init() {
+#ifdef __APPLE_COCOA__
+	num_screens = MACscreen_init(screens);
+#else
   GDHandle gd;
 
   for (gd = GetDeviceList(), num_screens = 0; gd; gd = GetNextDevice(gd)) {
@@ -120,6 +124,7 @@ static void screen_init() {
     num_screens ++;
     if (num_screens >= 16) break;
   }
+#endif
 }
 #elif HAVE_XINERAMA
 #  include <X11/extensions/Xinerama.h>

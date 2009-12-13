@@ -40,7 +40,7 @@
 float fl_quartz_line_width_ = 1.0f;
 static enum CGLineCap fl_quartz_line_cap_ = kCGLineCapButt;
 static enum CGLineJoin fl_quartz_line_join_ = kCGLineJoinMiter;
-static float *fl_quartz_line_pattern = 0;
+static CGFloat *fl_quartz_line_pattern = 0;
 static int fl_quartz_line_pattern_size = 0;
 void fl_quartz_restore_line_style_() {
   CGContextSetLineWidth(fl_gc, fl_quartz_line_width_);
@@ -145,9 +145,9 @@ void fl_line_style(int style, int width, char* dashes) {
   fl_quartz_line_cap_ = Cap[(style>>8)&3];
   fl_quartz_line_join_ = Join[(style>>12)&3];
   char *d = dashes; 
-  static float pattern[16];
+  static CGFloat pattern[16];
   if (d && *d) {
-    float *p = pattern;
+	CGFloat *p = pattern;
     while (*d) { *p++ = (float)*d++; }
     fl_quartz_line_pattern = pattern;
     fl_quartz_line_pattern_size = d-dashes;
@@ -162,7 +162,7 @@ void fl_line_style(int style, int width, char* dashes) {
       dash = char(3*width);
       dot = gap = char(width);
     }
-    float *p = pattern;
+	CGFloat *p = pattern;
     switch (style & 0xff) {
     case FL_DASH:       *p++ = dash; *p++ = gap; break;
     case FL_DOT:        *p++ = dot; *p++ = gap; break;
@@ -172,7 +172,8 @@ void fl_line_style(int style, int width, char* dashes) {
     fl_quartz_line_pattern_size = p-pattern;
     fl_quartz_line_pattern = pattern;
   } else {
-    fl_quartz_line_pattern = 0; fl_quartz_line_pattern_size = 0;
+    fl_quartz_line_pattern = 0; 
+		fl_quartz_line_pattern_size = 0;
   }
   fl_quartz_restore_line_style_();
 #else

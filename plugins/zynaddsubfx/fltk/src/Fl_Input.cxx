@@ -57,6 +57,7 @@ void Fl_Input::draw() {
 int Fl_Input::shift_position(int p) {
   return position(p, Fl::event_state(FL_SHIFT) ? mark() : p);
 }
+
 int Fl_Input::shift_up_down_position(int p) {
   return up_down_position(p, Fl::event_state(FL_SHIFT));
 }
@@ -108,7 +109,7 @@ int Fl_Input::handle_key() {
         // the following line is not a true memory leak because the array is only
         // allocated once if required, and automatically freed when the program quits
         char *chars = (char*)malloc(len+1);
-        legal_fp_chars = chars;
+	legal_fp_chars = chars;
         strcpy(chars, standard_fp_chars);
         if (lc) {
           if (lc->decimal_point) strcat(chars, lc->decimal_point);
@@ -126,11 +127,11 @@ int Fl_Input::handle_key() {
           || (ascii >= '0' && ascii <= '9') 
           || (ip==1 && index(0)=='0' && (ascii=='x' || ascii == 'X')) 
           || (ip>1 && index(0)=='0' && (index(1)=='x'||index(1)=='X')
-             && (ascii>='A'&& ascii<='F' || ascii>='a'&& ascii<='f')) 
+              && (ascii>='A'&& ascii<='F' || ascii>='a'&& ascii<='f')) 
           || input_type()==FL_FLOAT_INPUT && ascii && strchr(legal_fp_chars, ascii)) 
       {
-        if (readonly()) fl_beep();
-        else replace(position(), mark(), &ascii, 1);
+	if (readonly()) fl_beep();
+	else replace(position(), mark(), &ascii, 1);
       }
       return 1;
     }
@@ -138,7 +139,7 @@ int Fl_Input::handle_key() {
     if (del || Fl::event_length()) {
       if (readonly()) fl_beep();
       else replace(position(), del ? position()-del : mark(),
-                   Fl::event_text(), Fl::event_length());
+	           Fl::event_text(), Fl::event_length());
     }
     return 1;
   }
@@ -213,8 +214,8 @@ int Fl_Input::handle_key() {
     case FL_Page_Up:
 #ifdef __APPLE__
       if (mods==0) { // scroll text one page
-        // OS X scrolls the view, but does not move the cursor
-        // Fl_Input has no scroll control, so instead we move the cursor by one page
+                     // OS X scrolls the view, but does not move the cursor
+                     // Fl_Input has no scroll control, so instead we move the cursor by one page
         repeat_num = linesPerPage();
         ascii = ctrl('P');
       } else if (mods==FL_ALT) { // move cursor one page
@@ -231,8 +232,8 @@ int Fl_Input::handle_key() {
       if (mods==0) { // line up
         ascii = ctrl('P');
       } else if (mods==FL_CTRL) { // scroll text down one page
-        // OS X scrolls the view, but does not move the cursor
-        // Fl_Input has no scroll control, so instead we move the cursor by one page
+                                  // OS X scrolls the view, but does not move the cursor
+                                  // Fl_Input has no scroll control, so instead we move the cursor by one page
         repeat_num = linesPerPage();
         ascii = ctrl('P');
       } else if (mods==FL_ALT) { // line start and up
@@ -248,7 +249,7 @@ int Fl_Input::handle_key() {
       if (mods==0) { // line up
         ascii = ctrl('P');
       } else if (mods==FL_CTRL) { // scroll text down one line
-        // Fl_Input has no scroll control, so instead we move the cursor by one page
+                                  // Fl_Input has no scroll control, so instead we move the cursor by one page
         ascii = ctrl('P');
       } else return 1;
 #endif
@@ -256,8 +257,8 @@ int Fl_Input::handle_key() {
     case FL_Page_Down:
 #ifdef __APPLE__
       if (mods==0) { // scroll text one page
-        // OS X scrolls the view, but does not move the cursor
-        // Fl_Input has no scroll control, so instead we move the cursor by one page
+                     // OS X scrolls the view, but does not move the cursor
+                     // Fl_Input has no scroll control, so instead we move the cursor by one page
         repeat_num = linesPerPage();
         ascii = ctrl('N');
       } else if (mods==FL_ALT) { // move cursor one page
@@ -291,7 +292,7 @@ int Fl_Input::handle_key() {
       if (mods==0) { // line down
         ascii = ctrl('N');
       } else if (mods==FL_CTRL) { // scroll text up one line
-        // Fl_Input has no scroll control, so instead we move the cursor by one page
+                                  // Fl_Input has no scroll control, so instead we move the cursor by one page
         ascii = ctrl('N');
       } else return 1;
 #endif
@@ -299,8 +300,8 @@ int Fl_Input::handle_key() {
     case FL_Home:
 #ifdef __APPLE__
       if (mods==0) { // scroll display to the top
-        // OS X scrolls the view, but does not move the cursor
-        // Fl_Input has no scroll control, so instead we move the cursor by one page
+                     // OS X scrolls the view, but does not move the cursor
+                     // Fl_Input has no scroll control, so instead we move the cursor by one page
         shift_position(0);
         return 1;
       } else return 1;
@@ -316,8 +317,8 @@ int Fl_Input::handle_key() {
     case FL_End:
 #ifdef __APPLE__
       if (mods==0) { // scroll display to the bottom
-        // OS X scrolls the view, but does not move the cursor
-        // Fl_Input has no scroll control, so instead we move the cursor by one page
+                     // OS X scrolls the view, but does not move the cursor
+                     // Fl_Input has no scroll control, so instead we move the cursor by one page
         shift_position(size());
         return 1; 
       } else return 1;
@@ -483,170 +484,170 @@ int Fl_Input::handle(int event) {
   static int dnd_save_position, dnd_save_mark, drag_start = -1, newpos;
   static Fl_Widget *dnd_save_focus;
   switch (event) {
-  case FL_FOCUS:
-    switch (Fl::event_key()) {
-    case FL_Right:
-      position(0);
-      break;
-    case FL_Left:
-      position(size());
-      break;
-    case FL_Down:
-      up_down_position(0);
-      break;
-    case FL_Up:
-      up_down_position(line_start(size()));
-      break;
-    case FL_Tab:
-    case 0xfe20: // XK_ISO_Left_Tab
-      position(size(),0);
-      break;
-    default:
-      position(position(),mark());// turns off the saved up/down arrow position
-      break;
-    }
-    break;
-
-  case FL_KEYBOARD:
-    if (Fl::event_key() == FL_Tab && mark() != position()) {
-      // Set the current cursor position to the end of the selection...
-      if (mark() > position())
-        position(mark());
-      else
-        position(position());
-      return (1);
-    } else {
-      if (active_r() && window() && this == Fl::belowmouse()) 
-        window()->cursor(FL_CURSOR_NONE);
-      return handle_key();
-    }
-
-  case FL_PUSH:
-    if (Fl::dnd_text_ops()) {
-      int oldpos = position(), oldmark = mark();
-      Fl_Boxtype b = box();
-      Fl_Input_::handle_mouse(
-	x()+Fl::box_dx(b), y()+Fl::box_dy(b),
-	w()-Fl::box_dw(b), h()-Fl::box_dh(b), 0);
-      newpos = position(); 
-      position( oldpos, oldmark );
-      if (Fl::focus()==this && !Fl::event_state(FL_SHIFT) && input_type()!=FL_SECRET_INPUT &&
-	  (newpos >= mark() && newpos < position() ||
-	  newpos >= position() && newpos < mark())) {
-	// user clicked in the selection, may be trying to drag
-	drag_start = newpos;
-	return 1;
+    case FL_FOCUS:
+      switch (Fl::event_key()) {
+        case FL_Right:
+          position(0);
+          break;
+        case FL_Left:
+          position(size());
+          break;
+        case FL_Down:
+          up_down_position(0);
+          break;
+        case FL_Up:
+          up_down_position(line_start(size()));
+          break;
+        case FL_Tab:
+        case 0xfe20: // XK_ISO_Left_Tab
+          position(size(),0);
+          break;
+        default:
+          position(position(),mark());// turns off the saved up/down arrow position
+          break;
       }
-      drag_start = -1;
-    }
-
-    if (Fl::focus() != this) {
-      Fl::focus(this);
-      handle(FL_FOCUS);
-    }
-    break;
-
-  case FL_DRAG:
-    if (Fl::dnd_text_ops()) {
-      if (drag_start >= 0) {
-	if (Fl::event_is_click()) return 1; // debounce the mouse
-	// save the position because sometimes we don't get DND_ENTER:
-	dnd_save_position = position();
-	dnd_save_mark = mark();
-	// drag the data:
-	copy(0); Fl::dnd();
-	return 1;
+      break;
+      
+    case FL_KEYBOARD:
+      if (Fl::event_key() == FL_Tab && mark() != position()) {
+        // Set the current cursor position to the end of the selection...
+        if (mark() > position())
+          position(mark());
+        else
+          position(position());
+        return (1);
+      } else {
+        if (active_r() && window() && this == Fl::belowmouse()) 
+          window()->cursor(FL_CURSOR_NONE);
+        return handle_key();
       }
-    }
-    break;
-
-  case FL_RELEASE:
-    if (Fl::event_button() == 2) {
-      Fl::event_is_click(0); // stop double click from picking a word
-      Fl::paste(*this, 0);
-    } else if (!Fl::event_is_click()) {
-      // copy drag-selected text to the clipboard.
-      copy(0);
-    } else if (Fl::event_is_click() && drag_start >= 0) {
-      // user clicked in the field and wants to reset the cursor position...
-      position(drag_start, drag_start);
-      drag_start = -1;
-    } else if (Fl::event_clicks()) {
-      // user double or triple clicked to select word or whole text
-      copy(0);
-    }
-
-    // For output widgets, do the callback so the app knows the user
-    // did something with the mouse...
-    if (readonly()) do_callback();
-
-    return 1;
-
-  case FL_DND_ENTER:
-    Fl::belowmouse(this); // send the leave events first
-    dnd_save_position = position();
-    dnd_save_mark = mark();
-    dnd_save_focus = Fl::focus();
-    if (dnd_save_focus != this) {
-      Fl::focus(this);
-      handle(FL_FOCUS);
-    }
-    // fall through:
-  case FL_DND_DRAG: 
-    //int p = mouse_position(X, Y, W, H);
+      
+    case FL_PUSH:
+      if (Fl::dnd_text_ops()) {
+        int oldpos = position(), oldmark = mark();
+        Fl_Boxtype b = box();
+        Fl_Input_::handle_mouse(
+                                x()+Fl::box_dx(b), y()+Fl::box_dy(b),
+                                w()-Fl::box_dw(b), h()-Fl::box_dh(b), 0);
+        newpos = position(); 
+        position( oldpos, oldmark );
+        if (Fl::focus()==this && !Fl::event_state(FL_SHIFT) && input_type()!=FL_SECRET_INPUT &&
+            (newpos >= mark() && newpos < position() ||
+             newpos >= position() && newpos < mark())) {
+              // user clicked in the selection, may be trying to drag
+              drag_start = newpos;
+              return 1;
+            }
+        drag_start = -1;
+      }
+      
+      if (Fl::focus() != this) {
+        Fl::focus(this);
+        handle(FL_FOCUS);
+      }
+      break;
+      
+    case FL_DRAG:
+      if (Fl::dnd_text_ops()) {
+        if (drag_start >= 0) {
+          if (Fl::event_is_click()) return 1; // debounce the mouse
+                                              // save the position because sometimes we don't get DND_ENTER:
+          dnd_save_position = position();
+          dnd_save_mark = mark();
+          // drag the data:
+          copy(0); Fl::dnd();
+          return 1;
+        }
+      }
+      break;
+      
+    case FL_RELEASE:
+      if (Fl::event_button() == 2) {
+        Fl::event_is_click(0); // stop double click from picking a word
+        Fl::paste(*this, 0);
+      } else if (!Fl::event_is_click()) {
+        // copy drag-selected text to the clipboard.
+        copy(0);
+      } else if (Fl::event_is_click() && drag_start >= 0) {
+        // user clicked in the field and wants to reset the cursor position...
+        position(drag_start, drag_start);
+        drag_start = -1;
+      } else if (Fl::event_clicks()) {
+        // user double or triple clicked to select word or whole text
+        copy(0);
+      }
+      
+      // For output widgets, do the callback so the app knows the user
+      // did something with the mouse...
+      if (readonly()) do_callback();
+      
+      return 1;
+      
+    case FL_DND_ENTER:
+      Fl::belowmouse(this); // send the leave events first
+      dnd_save_position = position();
+      dnd_save_mark = mark();
+      dnd_save_focus = Fl::focus();
+      if (dnd_save_focus != this) {
+        Fl::focus(this);
+        handle(FL_FOCUS);
+      }
+      // fall through:
+    case FL_DND_DRAG: 
+      //int p = mouse_position(X, Y, W, H);
 #if DND_OUT_XXXX
-    if (Fl::focus()==this && (p>=dnd_save_position && p<=dnd_save_mark ||
-		      p>=dnd_save_mark && p<=dnd_save_position)) {
-      position(dnd_save_position, dnd_save_mark);
-      return 0;
-    }
+      if (Fl::focus()==this && (p>=dnd_save_position && p<=dnd_save_mark ||
+                                p>=dnd_save_mark && p<=dnd_save_position)) {
+        position(dnd_save_position, dnd_save_mark);
+        return 0;
+      }
 #endif
     {
       Fl_Boxtype b = box();
       Fl_Input_::handle_mouse(
-	x()+Fl::box_dx(b), y()+Fl::box_dy(b),
-	w()-Fl::box_dw(b), h()-Fl::box_dh(b), 0);
+                              x()+Fl::box_dx(b), y()+Fl::box_dy(b),
+                              w()-Fl::box_dw(b), h()-Fl::box_dh(b), 0);
     }
-    return 1;
-
-  case FL_DND_LEAVE:
-    position(dnd_save_position, dnd_save_mark);
+      return 1;
+      
+    case FL_DND_LEAVE:
+      position(dnd_save_position, dnd_save_mark);
 #if DND_OUT_XXXX
-    if (!focused())
+      if (!focused())
 #endif
-    if (dnd_save_focus != this) {
-      Fl::focus(dnd_save_focus);
-      handle(FL_UNFOCUS);
-    }
-    return 1;
-
-  case FL_DND_RELEASE:
-    take_focus();
-    return 1;
-
-/* TODO: this will scroll the area, but stop if the cursor would become invisible.
-         That clipping happens in drawtext(). Do we change the clipping or should 
-         we move the cursor (ouch)?
-  case FL_MOUSEWHEEL:
-    if (Fl::e_dy > 0) {
-      yscroll( yscroll() - Fl::e_dy*15 );
-    } else if (Fl::e_dy < 0) {
-      yscroll( yscroll() - Fl::e_dy*15 );
-    }
-    return 1;
-*/
-
+        if (dnd_save_focus != this) {
+          Fl::focus(dnd_save_focus);
+          handle(FL_UNFOCUS);
+        }
+      return 1;
+      
+    case FL_DND_RELEASE:
+      take_focus();
+      return 1;
+      
+      /* TODO: this will scroll the area, but stop if the cursor would become invisible.
+       That clipping happens in drawtext(). Do we change the clipping or should 
+       we move the cursor (ouch)?
+       case FL_MOUSEWHEEL:
+       if (Fl::e_dy > 0) {
+       yscroll( yscroll() - Fl::e_dy*15 );
+       } else if (Fl::e_dy < 0) {
+       yscroll( yscroll() - Fl::e_dy*15 );
+       }
+       return 1;
+       */
+      
   }
   Fl_Boxtype b = box();
   return Fl_Input_::handletext(event,
-	x()+Fl::box_dx(b), y()+Fl::box_dy(b),
-	w()-Fl::box_dw(b), h()-Fl::box_dh(b));
+                               x()+Fl::box_dx(b), y()+Fl::box_dy(b),
+                               w()-Fl::box_dw(b), h()-Fl::box_dh(b));
 }
 
 /**
-  Creates a new Fl_Input widget using the given position, size,
-  and label string. The default boxtype is FL_DOWN_BOX.
-*/
+ Creates a new Fl_Input widget using the given position, size,
+ and label string. The default boxtype is FL_DOWN_BOX.
+ */
 Fl_Input::Fl_Input(int X, int Y, int W, int H, const char *l)
 : Fl_Input_(X, Y, W, H, l) {
 }

@@ -12,7 +12,7 @@ CORE DEVELOPERS
     The following people do the day-to-day development of FLTK:
 
 	Fabien Costantini (fabien67@users.sf.net)
-        Craig P. Earls
+	Craig P. Earls
 	Curtis Edwards (trilec@users.sourceforge.net)
 	Gustavo Hime (hime@users.sourceforge.net)
 	Talbot Hughes
@@ -21,7 +21,7 @@ CORE DEVELOPERS
 	James Dean Palmer (jamespalmer@users.sourceforge.net)
 	Vincent Penne (vincentp@users.sourceforge.net)
 	Bill Spitzak (spitzak@users.sourceforge.net)
-        Michael Sweet (easysw@users.sourceforge.net)
+	Michael Sweet (easysw@users.sourceforge.net)
 	Carl Thompson (clip@users.sourceforge.net)
 	Nafees Bin Zafar (nafees@users.sourceforge.net)
 
@@ -39,6 +39,7 @@ OTHER CONTRIBUTORS
 	Yuri Fedorchenko
 	George Garvey
 	Duncan Gibson
+	Manolo Gouy
 	Mikael Hultgren
 	Stuart Levy
 	Howard Lightstone
@@ -47,9 +48,10 @@ OTHER CONTRIBUTORS
 	Alexander Rabi
 	James Roth
 	Albrecht Schlosser
-        Andrea Suatoni
+	Andrea Suatoni
 	Paul Sydney
 	Aaron Ucko
 	Emanuele Vicentini
+	Josef Vitu
 	Jim Wilson
 	Ken Yarnall

@@ -1247,7 +1247,7 @@ int Fl_Input_::linesPerPage() {
   \param [in] i index into the value field
   \return the character at index \p i
 */
-Fl_Char Fl_Input_::index(int i) const 
+unsigned int Fl_Input_::index(int i) const 
 {
   int len = 0;
   return fl_utf8decode(value_+i, value_+size_, &len);

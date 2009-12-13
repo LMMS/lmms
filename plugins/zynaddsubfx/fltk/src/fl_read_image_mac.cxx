@@ -26,9 +26,9 @@
 //
 
 #include <config.h>
-
-// warning: this function is only implemented in Quickdraw. The function
-//          below may not work If FLTK is compiled with Quartz enabled
+#ifdef __APPLE_COCOA__
+extern unsigned char *MACbitmapFromRectOfWindow(Fl_Window *win, int x, int y, int w, int h, int *bytesPerPixel);
+#endif
 
 //
 // 'fl_read_image()' - Read an image from the current window.
@@ -41,6 +41,29 @@ fl_read_image(uchar *p,		// I - Pixel buffer or NULL to allocate
 	      int   w,		// I - Width of area to read
 	      int   h,		// I - Height of area to read
 	      int   alpha) {	// I - Alpha value for image (0 for none)
+#if defined(__APPLE_COCOA__)
+  Fl_Window *window = Fl_Window::current();
+  while(window->window()) window = window->window();
+  int delta;
+  uchar *base = MACbitmapFromRectOfWindow(window,x,y,w,h,&delta);
+  int rowBytes = delta*w;
+  // Allocate the image data array as needed...
+  int d = alpha ? 4 : 3;
+  if (!p) p = new uchar[w * h * d];
+  // Initialize the default colors/alpha in the whole image...
+  memset(p, alpha, w * h * d);
+  // Copy the image from the off-screen buffer to the memory buffer.
+  int           idx, idy;	// Current X & Y in image
+  uchar *pdst, *psrc;
+  for (idy = 0, pdst = p; idy < h; idy ++) {
+		for (idx = 0, psrc = base + idy * rowBytes; idx < w; idx ++, psrc += delta, pdst += d) {
+/*R*/   pdst[0] = psrc[0];
+/*G*/   pdst[1] = psrc[1];
+/*B*/   pdst[2] = psrc[2];
+		}
+	}
+delete base;
+#else
   Rect		src,		// Source rectangle
 		dst;		// Destination rectangle
   GWorldPtr	osbuffer;	// Temporary off-screen buffer for copy
@@ -128,7 +151,8 @@ fl_read_image(uchar *p,		// I - Pixel buffer or NULL to allocate
   DisposeGWorld(osbuffer);
 
   SetPort(srcPort);
-  return p;
+#endif
+return p;
 }
 
 

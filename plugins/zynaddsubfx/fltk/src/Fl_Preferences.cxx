@@ -870,6 +870,16 @@ Fl_Preferences::RootNode::RootNode( Fl_Preferences *prefs, Root root, const char
            "/%s/%s.prefs", vendor, application);
   for (char *s = filename; *s; s++) if (*s == '\\') *s = '/';
 #elif defined ( __APPLE__ )
+#ifdef __APPLE_COCOA__
+  switch (root) {
+    case SYSTEM:
+      strcpy(filename, "/Library/Preferences");
+      break;
+    case USER:
+	  sprintf(filename, "%s/Library/Preferences", fl_getenv("HOME"));
+      break;
+  }
+#else
   FSSpec spec = { 0 };
   FSRef ref;
   OSErr err = fnfErr;
@@ -885,6 +895,7 @@ Fl_Preferences::RootNode::RootNode( Fl_Preferences *prefs, Root root, const char
   }
   FSpMakeFSRef( &spec, &ref );
   FSRefMakePath( &ref, (UInt8*)filename, FL_PATH_MAX );
+#endif
   snprintf(filename + strlen(filename), sizeof(filename) - strlen(filename),
            "/%s/%s.prefs", vendor, application );
 #else

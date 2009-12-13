@@ -33,6 +33,8 @@ extern unsigned fl_utf8toUtf16(const char* src, unsigned srclen, unsigned short*
 // if no font has been selected yet by the user, get one.
 #define check_default_font() {if (!fl_fontsize) fl_font(0, 12);}
 
+static const CGAffineTransform font_mx = { 1, 0, 0, -1, 0, 0 };
+
 Fl_Font_Descriptor::Fl_Font_Descriptor(const char* name, Fl_Fontsize Size) {
   next = 0;
 #  if HAVE_GL
@@ -43,13 +45,39 @@ Fl_Font_Descriptor::Fl_Font_Descriptor(const char* name, Fl_Fontsize Size) {
     // OpenGL needs those for its font handling
   q_name = strdup(name);
   size = Size;
+  minsize = maxsize = Size;
+#if defined(__APPLE_COCOA__) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_5
+if(CTFontCreateWithName != NULL) {
+  CFStringRef str = CFStringCreateWithCString(NULL, name, kCFStringEncodingUTF8);
+  fontref = CTFontCreateWithName(str, size, NULL);
+  CGGlyph glyph[2];
+  const UniChar A[2]={'W','.'};
+  CTFontGetGlyphsForCharacters(fontref, A, glyph, 2);
+  CGSize advances[2];
+  double w;
+  CTFontGetAdvancesForGlyphs(fontref, kCTFontHorizontalOrientation, glyph, advances, 2);
+  w = advances[0].width;
+  if( abs(advances[0].width - advances[1].width) < 1E-2 ) {//this is a fixed-width font
+	//slightly rescale fixed-width fonts so the character width has an integral value
+	CFRelease(fontref);
+	CGFloat fsize = size / ( w/floor(w + 0.5) );
+	fontref = CTFontCreateWithName(str, fsize, NULL);
+	w = CTFontGetAdvancesForGlyphs(fontref, kCTFontHorizontalOrientation, glyph, NULL, 1);
+  }
+  CFRelease(str);
+  ascent = (short)(CTFontGetAscent(fontref) + 0.5);
+  descent = (short)(CTFontGetDescent(fontref) + 0.5);
+  q_width = w + 0.5;
+  }
+else {
+#endif
+#if ! __LP64__
   OSStatus err;
     // fill our structure with a few default values
   ascent = Size*3/4;
   descent = Size-ascent;
   q_width = Size*2/3;
-  minsize = maxsize = Size;
-    // now use ATS to get the actual Glyph size information
+	// now use ATS to get the actual Glyph size information
 	// say that our passed-in name is encoded as UTF-8, since this works for plain ASCII names too...
   CFStringRef cfname = CFStringCreateWithCString(0L, name, kCFStringEncodingUTF8);
   ATSFontRef font = ATSFontFindFromName(cfname, kATSOptionFlagsDefault);
@@ -112,6 +140,10 @@ Fl_Font_Descriptor::Fl_Font_Descriptor(const char* name, Fl_Fontsize Size) {
   // cause ATSU to find a suitable font to render any chars the current font can't do...
   ATSUSetTransientFontMatching (layout, true);
 # endif
+#endif//__LP64__
+#if defined(__APPLE_COCOA__) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_5
+  }
+#endif
 }
 
 Fl_Font_Descriptor* fl_fontsize = 0L;
@@ -132,8 +164,12 @@ Fl_Font_Descriptor::~Fl_Font_Descriptor() {
 #endif
   */
   if (this == fl_fontsize) fl_fontsize = 0;
-  ATSUDisposeTextLayout(layout);
-  ATSUDisposeStyle(style);
+#if defined(__APPLE_COCOA__) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_5
+  if(CTFontCreateWithName != NULL)  CFRelease(fontref);
+#else
+	/*  ATSUDisposeTextLayout(layout);
+  ATSUDisposeStyle(style); */
+#endif
 }
 
 ////////////////////////////////////////////////////////////////
@@ -235,7 +271,25 @@ double fl_width(const UniChar* txt, int n) {
     if (!fl_fontsize)
       return 8*n; // user must select a font first!
   }
-      OSStatus err;
+#if defined(__APPLE_COCOA__) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_5
+if(CTFontCreateWithName != NULL) {
+  CTFontRef fontref = fl_fontsize->fontref;
+  CFStringRef str = CFStringCreateWithBytes(NULL, (const UInt8*)txt, n * sizeof(UniChar), kCFStringEncodingUTF16, false);
+  CFAttributedStringRef astr = CFAttributedStringCreate(NULL, str, NULL);
+  CFMutableAttributedStringRef mastr = CFAttributedStringCreateMutableCopy(NULL, 0, astr);
+  CFRelease(astr);
+  CFAttributedStringSetAttribute(mastr, CFRangeMake(0, CFStringGetLength(str)), kCTFontAttributeName, fontref);
+  CFRelease(str);
+  CTLineRef ctline = CTLineCreateWithAttributedString(mastr);
+  CFRelease(mastr);
+  double retval = CTLineGetTypographicBounds(ctline, NULL, NULL, NULL);
+  CFRelease(ctline);
+  return retval;
+  }
+else {
+#endif
+#if ! __LP64__
+	OSStatus err;
   Fixed bBefore, bAfter, bAscent, bDescent;
   ATSUTextLayout layout;
   ByteCount iSize;
@@ -256,6 +310,10 @@ double fl_width(const UniChar* txt, int n) {
   // If err is OK then return length, else return 0. Or something...
   int len = FixedToInt(bAfter);
   return len;
+#endif
+#if defined(__APPLE_COCOA__) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_5
+  }
+#endif
 }
 
 double fl_width(const char* txt, int n) {
@@ -281,6 +339,30 @@ void fl_text_extents(const UniChar* txt, int n, int &dx, int &dy, int &w, int &h
       h = 8.0;
       return;
   }
+#if defined(__APPLE_COCOA__) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_5
+if(CTFontCreateWithName != NULL) {
+  CTFontRef fontref = fl_fontsize->fontref;
+  CFStringRef str16 = CFStringCreateWithBytes(NULL, (const UInt8*)txt, n *sizeof(UniChar), kCFStringEncodingUTF16, false);
+  CFAttributedStringRef astr = CFAttributedStringCreate(NULL, str16, NULL);
+  CFMutableAttributedStringRef mastr = CFAttributedStringCreateMutableCopy(NULL, 0, astr);
+  CFRelease(astr);
+  CFAttributedStringSetAttribute(mastr, CFRangeMake(0, CFStringGetLength(str16)), kCTFontAttributeName, fontref);
+  CFRelease(str16);
+  CTLineRef ctline = CTLineCreateWithAttributedString(mastr);
+  CFRelease(mastr);
+  CGContextSetTextPosition(fl_gc, 0, 0);
+  CGContextSetShouldAntialias(fl_gc, true);
+  CGRect rect = CTLineGetImageBounds(ctline, fl_gc);
+  CGContextSetShouldAntialias(fl_gc, false);
+  CFRelease(ctline);
+  dx = floor(rect.origin.x + 0.5);
+  dy = floor(- rect.origin.y - rect.size.height + 0.5);
+  w = rect.size.width + 0.5;
+  h = rect.size.height + 0.5;
+  }
+else {
+#endif
+#if ! __LP64__
   OSStatus err;
   ATSUTextLayout layout;
   ByteCount iSize;
@@ -304,6 +386,10 @@ void fl_text_extents(const UniChar* txt, int n, int &dx, int &dy, int &w, int &h
   dx = bbox.left;
   dy = -bbox.bottom;
 //printf("r: %d l: %d t: %d b: %d w: %d h: %d\n", bbox.right, bbox.left, bbox.top, bbox.bottom, w, h);
+#endif
+#if defined(__APPLE_COCOA__) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_5
+  }
+#endif
   return;
 } // fl_text_extents
 
@@ -320,13 +406,76 @@ void fl_draw(const char* str, int n, int x, int y) {
   fl_draw(str, n, (float)x-0.0f, (float)y-0.5f);
 }
 
+
+#if defined(__APPLE_COCOA__)
+static unsigned fl_cmap[256] = {
+#include "fl_cmap.h" // this is a file produced by "cmap.cxx":
+};
+CGColorRef flcolortocgcolor(Fl_Color i)
+{
+  int index;
+  uchar r, g, b;
+  if (i & 0xFFFFFF00) {
+    // translate rgb colors into color index
+    r = i>>24;
+    g = i>>16;
+    b = i>> 8;
+  } else {
+    // translate index into rgb:
+    index = i;
+    unsigned c = fl_cmap[i];
+    r = c>>24;
+    g = c>>16;
+    b = c>> 8;
+  }
+  CGFloat components[4] = {r/255.0f, g/255.0f, b/255.0f, 1.};
+#if defined(__APPLE_COCOA__) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_4
+  return CGColorCreate(CGColorSpaceCreateWithName(kCGColorSpaceGenericRGB), components);
+#else
+  return CGColorCreate(CGColorSpaceCreateWithName(kCGColorSpaceUserRGB), components);
+#endif
+}
+#endif
+
 void fl_draw(const char *str, int n, float x, float y) {
-  OSStatus err;
-    // convert to UTF-16 first
-  UniChar *uniStr = mac_Utf8_to_Utf16(str, n, &n);
   
   // avoid a crash if no font has been selected by user yet !
   check_default_font();
+  // convert to UTF-16 first
+  UniChar *uniStr = mac_Utf8_to_Utf16(str, n, &n);
+#if defined(__APPLE_COCOA__) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_5
+  if(CTFontCreateWithName != NULL) {
+    CFStringRef keys[2];
+    CFTypeRef values[2];  
+    CFStringRef str16 = CFStringCreateWithBytes(NULL, (const UInt8*)uniStr, n * sizeof(UniChar), kCFStringEncodingUTF16, false);
+    CGColorRef color = flcolortocgcolor(fl_color());
+    keys[0] = kCTFontAttributeName;
+    keys[1] = kCTForegroundColorAttributeName;
+    values[0] = fl_fontsize->fontref;
+    values[1] = color;
+    CFDictionaryRef attributes = CFDictionaryCreate(kCFAllocatorDefault,
+						    (const void**)&keys,
+						    (const void**)&values,
+						    2,
+						    &kCFTypeDictionaryKeyCallBacks,
+						    &kCFTypeDictionaryValueCallBacks);
+    CFAttributedStringRef mastr = CFAttributedStringCreate(kCFAllocatorDefault, str16, attributes);
+    CFRelease(str16);
+    CFRelease(attributes);
+    CFRelease(color);
+    CTLineRef ctline = CTLineCreateWithAttributedString(mastr);
+    CFRelease(mastr);
+    CGContextSetTextMatrix(fl_gc, font_mx);
+    CGContextSetTextPosition(fl_gc, x, y);
+    CGContextSetShouldAntialias(fl_gc, true);
+    CTLineDraw(ctline, fl_gc);
+    CGContextSetShouldAntialias(fl_gc, false);
+    CFRelease(ctline);
+  }
+  else {
+#endif
+#if ! __LP64__
+  OSStatus err;
   // now collect our ATSU resources
   ATSUTextLayout layout = fl_fontsize->layout;
 
@@ -336,12 +485,29 @@ void fl_draw(const char *str, int n, float x, float y) {
   ATSUSetLayoutControls(layout, 1, &iTag, &iSize, &iValuePtr);
 
   err = ATSUSetTextPointerLocation(layout, uniStr, kATSUFromTextBeginning, n, n);
+#if defined(__APPLE_COCOA__)
+  CGContextSetShouldAntialias(fl_gc, true);
+#endif
   err = ATSUDrawText(layout, kATSUFromTextBeginning, n, FloatToFixed(x), FloatToFixed(y));
+#if defined(__APPLE_COCOA__)
+  CGContextSetShouldAntialias(fl_gc, false);
+#endif
+#endif
+#if defined(__APPLE_COCOA__) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_5
+  }
+#endif
 }
 
 void fl_draw(int angle, const char *str, int n, int x, int y) {
+#if defined(__APPLE_COCOA__)
+  CGContextSaveGState(fl_gc);
+  CGContextTranslateCTM(fl_gc, x, y);
+  CGContextRotateCTM(fl_gc, - angle*(M_PI/180) );
+  fl_draw(str, n, (float)0., (float)0.);
+  CGContextRestoreGState(fl_gc);
+#else
   OSStatus err;
-    // convert to UTF-16 first
+  // convert to UTF-16 first
   UniChar *uniStr = mac_Utf8_to_Utf16(str, n, &n);
   
   // avoid a crash if no font has been selected by user yet !
@@ -360,10 +526,14 @@ void fl_draw(int angle, const char *str, int n, int x, int y) {
   //restore layout baseline
   ang = IntToFixed(0);
   ATSUSetLayoutControls(layout, 2, iTag, iSize, aAttr);
+#endif
 }
 
 void fl_rtl_draw(const char* c, int n, int x, int y) {
-// I guess with ATSU the thing to do is force the layout mode to RTL and let ATSU draw the text...
+#if defined(__APPLE_COCOA__)
+  fl_draw(c, n, x - fl_width(c, n), y); //to check;
+#else
+  // I guess with ATSU the thing to do is force the layout mode to RTL and let ATSU draw the text...
   double offs = fl_width(c, n);
   OSStatus err;
   // convert to UTF-16 first
@@ -379,6 +549,7 @@ void fl_rtl_draw(const char* c, int n, int x, int y) {
 
   err = ATSUSetTextPointerLocation(layout, uniStr, kATSUFromTextBeginning, n, n);
   err = ATSUDrawText(layout, kATSUFromTextBeginning, n, FloatToFixed(x-offs), FloatToFixed(y));
+#endif
 }
 
 //

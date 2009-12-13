@@ -88,13 +88,6 @@ int Fl::arg(int argc, char **argv, int &i) {
   if (s[0] != '-' || s[1] == '-' || !s[1]) {return_i = 1; return 0;}
   s++; // point after the dash
 
-#ifdef __APPLE__
-  if (!strncmp(s, "psn", 3)) {
-    // Skip process serial number...
-    i++;
-  }
-  else
-#endif // __APPLE__
   if (fl_match(s, "iconic")) {
     fl_show_iconic = 1;
     i++;

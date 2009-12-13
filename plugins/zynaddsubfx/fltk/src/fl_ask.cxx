@@ -273,7 +273,8 @@ void fl_beep(int type) {
   switch (type) {
     case FL_BEEP_DEFAULT :
     case FL_BEEP_ERROR :
-      SysBeep(30);
+//      SysBeep(30);
+			AlertSoundPlay();
       break;
     default :
       break;

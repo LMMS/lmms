@@ -229,13 +229,21 @@ void fl_end_points() {
 #elif defined(WIN32)
   for (int i=0; i<n; i++) SetPixel(fl_gc, p[i].x, p[i].y, fl_RGB());
 #elif defined(__APPLE_QUARTZ__)
+#ifdef __APPLE_COCOA__
+  if (fl_quartz_line_width_ > 1.5f) CGContextSetShouldAntialias(fl_gc, true);
+#else
   if (fl_quartz_line_width_==1.0f) CGContextSetShouldAntialias(fl_gc, false);
+#endif
   for (int i=0; i<n; i++) { 
     CGContextMoveToPoint(fl_gc, p[i].x, p[i].y);
     CGContextAddLineToPoint(fl_gc, p[i].x, p[i].y);
     CGContextStrokePath(fl_gc);
   }
-  if (fl_quartz_line_width_==1.0f) CGContextSetShouldAntialias(fl_gc, false);
+#ifdef __APPLE_COCOA__
+  if (fl_quartz_line_width_ > 1.5f) CGContextSetShouldAntialias(fl_gc, false);
+#else
+  if (fl_quartz_line_width_==1.0f) CGContextSetShouldAntialias(fl_gc, true);
+#endif
 #else
 # error unsupported platform
 #endif
@@ -255,10 +263,16 @@ void fl_end_line() {
   if (n>1) Polyline(fl_gc, p, n);
 #elif defined(__APPLE_QUARTZ__)
   if (n<=1) return;
+#ifdef __APPLE_COCOA__
+  CGContextSetShouldAntialias(fl_gc, true);
+#endif
   CGContextMoveToPoint(fl_gc, p[0].x, p[0].y);
   for (int i=1; i<n; i++)
     CGContextAddLineToPoint(fl_gc, p[i].x, p[i].y);
   CGContextStrokePath(fl_gc);
+#ifdef __APPLE_COCOA__
+  CGContextSetShouldAntialias(fl_gc, false);
+#endif
 #else
 # error unsupported platform
 #endif
@@ -295,11 +309,17 @@ void fl_end_polygon() {
   }
 #elif defined(__APPLE_QUARTZ__)
   if (n<=1) return;
+#ifdef __APPLE_COCOA__
+  CGContextSetShouldAntialias(fl_gc, true);
+#endif
   CGContextMoveToPoint(fl_gc, p[0].x, p[0].y);
   for (int i=1; i<n; i++) 
     CGContextAddLineToPoint(fl_gc, p[i].x, p[i].y);
   CGContextClosePath(fl_gc);
   CGContextFillPath(fl_gc);
+#ifdef __APPLE_COCOA__
+  CGContextSetShouldAntialias(fl_gc, false);
+#endif
 #else
 # error unsupported platform
 #endif
@@ -370,11 +390,17 @@ void fl_end_complex_polygon() {
   }
 #elif defined(__APPLE_QUARTZ__)
   if (n<=1) return;
+#ifdef __APPLE_COCOA__
+  CGContextSetShouldAntialias(fl_gc, true);
+#endif
   CGContextMoveToPoint(fl_gc, p[0].x, p[0].y);
   for (int i=1; i<n; i++)
     CGContextAddLineToPoint(fl_gc, p[i].x, p[i].y);
   CGContextClosePath(fl_gc);
   CGContextFillPath(fl_gc);
+#ifdef __APPLE_COCOA__
+  CGContextSetShouldAntialias(fl_gc, false);
+#endif
 #else
 # error unsupported platform
 #endif
@@ -412,8 +438,15 @@ void fl_circle(double x, double y,double r) {
     Arc(fl_gc, llx, lly, llx+w, lly+h, 0,0, 0,0); 
 #elif defined(__APPLE_QUARTZ__)
   // Quartz warning : circle won't scale to current matrix!
-  CGContextAddArc(fl_gc, xt, yt, (w+h)*0.25f, 0, 2.0f*M_PI, 1);
+//last argument must be 0 (counterclockwise) or it draws nothing under __LP64__ !!!!
+#ifdef __APPLE_COCOA__
+  CGContextSetShouldAntialias(fl_gc, true);
+#endif
+  CGContextAddArc(fl_gc, xt, yt, (w+h)*0.25f, 0, 2.0f*M_PI, 0);
   (what == POLYGON ? CGContextFillPath : CGContextStrokePath)(fl_gc);
+#ifdef __APPLE_COCOA__
+  CGContextSetShouldAntialias(fl_gc, false);
+#endif
 #else
 # error unsupported platform
 #endif

@@ -26,6 +26,7 @@
 //
 
 #include <FL/Fl.H>
+#include <FL/x.H>
 
 //
 // MRS: Uncomment the following define to get the original (pre-1.1.2)
@@ -38,6 +39,15 @@
 
 #ifdef __APPLE__
 
+#ifdef __APPLE_COCOA__
+
+static const char* const compose_pairs =
+"  ! % # $ y=| & : c a <<~ - r _ * +-2 3 ' u p . , 1 o >>141234? "//00A0 ...
+"`A'A^A~A:A*AAE,C`E'E^E:E`I'I^I:I-D~N`O'O^O~O:Ox O/`U'U^U:U'YTHss" //00C0 ...
+"`a'a^a~a:a*aae,c`e'e^e:e`i'i^i:i-d~n`o'o^o~o:o-:o/`u'u^u:u'yth:y";//00E0 ...
+
+#else
+
 static const char* const compose_pairs =
 ":A*A,C'E~N:O:U'a`a^a:a~a*a,c'e`e"
 "^e:e'i`i^i:i~n'o`o^o:o~o'u`u^u:u"
@@ -47,6 +57,8 @@ static const char* const compose_pairs =
 "- --''``\"'\"`:-^V:y:Y//E=< > fifl"
 "++..,,_\"%%^A^E'A:E`E'I^I:I`I'O^O"
 "mc`O'U^U`U||^ ~^_ u . * , ~-; v ";
+
+#endif
 
 #else
 

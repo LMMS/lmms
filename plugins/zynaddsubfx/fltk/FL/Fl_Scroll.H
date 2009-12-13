@@ -36,7 +36,7 @@
 
 /**
   This container widget lets you maneuver around a set of widgets much
-  larger than your window. If the child widgets are larger than the size
+  larger than your window.  If the child widgets are larger than the size
   of this object then scrollbars will appear so that you can scroll over
   to them:
   \image html Fl_Scroll.gif
@@ -73,8 +73,8 @@
   considered. The flags in hscrollbar however are ignored.
 
   This widget can also be used to pan around a single child widget
-  "canvas". This child widget should be of your own class, with a 
-  draw() method that draws the contents. The scrolling is done by
+  "canvas".  This child widget should be of your own class, with a 
+  draw() method that draws the contents.  The scrolling is done by
   changing the x() and y() of the widget, so this child
   must use the x() and y() to position its drawing.
   To speed up drawing it should test fl_push_clip().
@@ -86,7 +86,7 @@
   of individually-openable panels.
 
   Fluid lets you create these, but you can only lay out objects that
-  fit inside the Fl_Scroll without scrolling. Be sure to leave
+  fit inside the Fl_Scroll without scrolling.  Be sure to leave
   space for the scrollbars, as Fluid won't show these either.
 
   <I>You cannot use Fl_Window as a child of this since the
