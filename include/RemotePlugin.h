@@ -284,7 +284,7 @@ public:
 	// recursive lock
 	inline void lock()
 	{
-		if( !isInvalid() && ++m_lockDepth == 1 )
+		if( likely( !isInvalid() && ++m_lockDepth == 1 ) )
 		{
 #ifdef USE_QT_SEMAPHORES
 			m_dataSem.acquire();
@@ -297,9 +297,9 @@ public:
 	// recursive unlock
 	inline void unlock()
 	{
-		if( m_lockDepth > 0 )
+		if( likely( m_lockDepth > 0 ) )
 		{
-			if( --m_lockDepth == 0 )
+			if( likely( --m_lockDepth == 0 ) )
 			{
 #ifdef USE_QT_SEMAPHORES
 				m_dataSem.release();
@@ -313,7 +313,7 @@ public:
 	// wait until message-semaphore is available
 	inline void waitForMessage()
 	{
-		if( !isInvalid() )
+		if( likely( !isInvalid() ) )
 		{
 #ifdef USE_QT_SEMAPHORES
 			m_messageSem.acquire();
@@ -372,7 +372,7 @@ public:
 
 	inline bool messagesLeft()
 	{
-		if( isInvalid() )
+		if( unlikely( isInvalid() ) )
 		{
 			return false;
 		}
@@ -748,7 +748,7 @@ public:
 
 	inline void lock()
 	{
-		if( !isInvalid() )
+		if( likely( !isInvalid() ) )
 		{
 			m_commMutex.lock();
 		}
@@ -756,7 +756,7 @@ public:
 
 	inline void unlock()
 	{
-		if( !isInvalid() )
+		if( likely( !isInvalid() ) )
 		{
 			m_commMutex.unlock();
 		}

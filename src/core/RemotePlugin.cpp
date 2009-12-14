@@ -150,7 +150,7 @@ bool RemotePlugin::process( const sampleFrame * _in_buf,
 {
 	const fpp_t frames = engine::getMixer()->framesPerPeriod();
 
-	if( m_failed || !isRunning() )
+	if( unlikely( m_failed || !isRunning() ) )
 	{
 		if( _out_buf != NULL )
 		{
@@ -160,7 +160,7 @@ bool RemotePlugin::process( const sampleFrame * _in_buf,
 		return false;
 	}
 
-	if( m_shm == NULL )
+	if( unlikely( m_shm == NULL ) )
 	{
 		// m_shm being zero means we didn't initialize everything so
 		// far so process one message each time (and hope we get
@@ -227,8 +227,7 @@ bool RemotePlugin::process( const sampleFrame * _in_buf,
 	waitForMessage( IdProcessingDone );
 	unlock();
 
-	const ch_cnt_t outputs = qMin<ch_cnt_t>( m_outputCount,
-							DEFAULT_CHANNELS );
+	const ch_cnt_t outputs = qMin<ch_cnt_t>( m_outputCount, DEFAULT_CHANNELS );
 	if( m_splitChannels )
 	{
 		for( ch_cnt_t ch = 0; ch < outputs; ++ch )
@@ -328,7 +327,7 @@ void RemotePlugin::resizeSharedProcessingMemory()
 bool RemotePlugin::processMessage( const message & _m )
 {
 	lock();
-	message reply_message( _m.id );
+	message replyMessage( _m.id );
 	bool reply = false;
 	switch( _m.id )
 	{
@@ -341,12 +340,12 @@ bool RemotePlugin::processMessage( const message & _m )
 
 		case IdSampleRateInformation:
 			reply = true;
-			reply_message.addInt( engine::getMixer()->processingSampleRate() );
+			replyMessage.addInt( engine::getMixer()->processingSampleRate() );
 			break;
 
 		case IdBufferSizeInformation:
 			reply = true;
-			reply_message.addInt( engine::getMixer()->framesPerPeriod() );
+			replyMessage.addInt( engine::getMixer()->framesPerPeriod() );
 			break;
 
 		case IdChangeInputCount:
@@ -371,7 +370,7 @@ bool RemotePlugin::processMessage( const message & _m )
 	}
 	if( reply )
 	{
-		sendMessage( reply_message );
+		sendMessage( replyMessage );
 	}
 	unlock();
 
