@@ -36,6 +36,7 @@
 #include <cassert>
 
 #ifdef LMMS_BUILD_WIN32
+#include <windows.h>
 #define USE_QT_SEMAPHORES
 #define USE_QT_SHMEM
 #endif
@@ -966,6 +967,11 @@ RemotePluginBase::message RemotePluginBase::waitForMessage(
 		{
 			QCoreApplication::processEvents(
 				QEventLoop::ExcludeUserInputEvents, 50 );
+#ifdef LMMS_BUILD_WIN32
+			Sleep( 5 );
+#else
+			usleep( 5 * 1000 );
+#endif
 			continue;
 		}
 #endif
