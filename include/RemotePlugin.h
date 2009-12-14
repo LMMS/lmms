@@ -922,14 +922,13 @@ RemotePluginBase::~RemotePluginBase()
 
 void RemotePluginBase::sendMessage( const message & _m )
 {
+	const int n = _m.data.size();
 	m_out->lock();
 	m_out->writeInt( _m.id );
-	m_out->writeInt( _m.data.size() );
-	int j = 0;
-	for( unsigned int i = 0; i < _m.data.size(); ++i )
+	m_out->writeInt( n );
+	for( unsigned int i = 0; i < n; ++i )
 	{
 		m_out->writeString( _m.data[i] );
-		j += _m.data[i].size();
 	}
 	m_out->unlock();
 	m_out->messageSent();
