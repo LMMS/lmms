@@ -617,16 +617,16 @@ public:
 
 
 	message waitForMessage( const message & _m,
-						bool _busy_waiting = false );
+							bool _busyWaiting = false );
 
-	inline message fetchAndProcessNextMessage()
+	message fetchAndProcessNextMessage()
 	{
 		message m = receiveMessage();
 		processMessage( m );
 		return m;
 	}
 
-	inline void fetchAndProcessAllMessages()
+	void fetchAndProcessAllMessages()
 	{
 		while( messagesLeft() )
 		{
@@ -708,10 +708,9 @@ public:
 #endif
 	}
 
-	inline void waitForInitDone( bool _busy_waiting = true )
+	inline void waitForInitDone( bool _busyWaiting = true )
 	{
-		m_failed = waitForMessage( IdInitDone,
-					_busy_waiting ).id != IdInitDone;
+		m_failed = waitForMessage( IdInitDone, _busyWaiting ).id != IdInitDone;
 	}
 
 	virtual bool processMessage( const message & _m );
@@ -1028,7 +1027,7 @@ RemotePluginClient::~RemotePluginClient()
 
 bool RemotePluginClient::processMessage( const message & _m )
 {
-	message reply_message( _m.id );
+	message replyMessage( _m.id );
 	bool reply = false;
 	switch( _m.id )
 	{
@@ -1060,7 +1059,7 @@ bool RemotePluginClient::processMessage( const message & _m )
 
 		case IdStartProcessing:
 			doProcessing();
-			reply_message.id = IdProcessingDone;
+			replyMessage.id = IdProcessingDone;
 			reply = true;
 			break;
 
@@ -1078,7 +1077,7 @@ bool RemotePluginClient::processMessage( const message & _m )
 	}
 	if( reply )
 	{
-		sendMessage( reply_message );
+		sendMessage( replyMessage );
 	}
 
 	return true;
