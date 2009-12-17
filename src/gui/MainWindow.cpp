@@ -548,6 +548,8 @@ void MainWindow::resetWindowTitle( void )
 
 bool MainWindow::mayChangeProject( void )
 {
+	engine::getSong()->stop();
+
 	if( !engine::getSong()->isModified() )
 	{
 		return( TRUE );
