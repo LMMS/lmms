@@ -348,6 +348,11 @@ void VestigeInstrumentView::openPlugin( void )
 		engine::getMixer()->lock();
 		m_vi->loadFile( ofd.selectedFiles()[0] );
 		engine::getMixer()->unlock();
+		if( m_vi->m_plugin && m_vi->m_plugin->pluginWidget() )
+		{
+			m_vi->m_plugin->pluginWidget()->setWindowIcon(
+									PLUGIN_NAME::getIconPixmap( "logo" ) );
+		}
 	}
 }
 
