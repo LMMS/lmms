@@ -211,6 +211,30 @@ void configManager::setValue( const QString & _class,
 
 
 
+#ifdef LMMS_BUILD_WIN32
+#include <QtCore/QLibrary>
+#include <shlobj.h>
+
+// taken from qt-win-opensource-src-4.2.2/src/corelib/io/qsettings.cpp
+static QString windowsConfigPath( int _type )
+{
+	QString result;
+
+	QLibrary library( "shell32" );
+	typedef BOOL( WINAPI* GetSpecialFolderPath )( HWND, char *, int, BOOL );
+	GetSpecialFolderPath SHGetSpecialFolderPath = (GetSpecialFolderPath)
+	library.resolve( "SHGetSpecialFolderPathA" );
+	if( SHGetSpecialFolderPath )
+	{
+		char path[MAX_PATH];
+		SHGetSpecialFolderPath( 0, path, _type, false );
+		result = QString::fromLocal8Bit( path );
+	}
+	return result;
+}
+#endif
+
+
 
 void configManager::loadConfigFile()
 {
@@ -294,27 +318,35 @@ void configManager::loadConfigFile()
 	}
 
 
-	if( m_vstDir == "" || m_vstDir == QDir::separator() )
+	if( m_vstDir.isEmpty() || m_vstDir == QDir::separator() ||
+			!QDir( m_vstDir ).exists() )
 	{
+#ifdef LMMS_BUILD_WIN32
+		m_vstDir = windowsConfigPath( CSIDL_PROGRAM_FILES ) +
+											QDir::separator() + "VstPlugins";
+#else
 		m_vstDir = ensureTrailingSlash( QDir::home().absolutePath() );
+#endif
 	}
 
-	if( m_flDir == "" || m_flDir == QDir::separator() )
+	if( m_flDir.isEmpty() || m_flDir == QDir::separator() )
 	{
 		m_flDir = ensureTrailingSlash( QDir::home().absolutePath() );
 	}
 
-	if( m_ladDir == "" || m_ladDir == QDir::separator() )
+	if( m_ladDir.isEmpty() || m_ladDir == QDir::separator() ||
+			( !m_ladDir.contains( ':' ) && !QDir( m_ladDir ).exists() ) )
 	{
 #ifdef LMMS_BUILD_WIN32
 		m_ladDir = m_pluginDir + "ladspa" + QDir::separator();
 #else
-		m_ladDir = QString(LIB_DIR) + "/ladspa/";
+		m_ladDir = QString( LIB_DIR ) + "/ladspa/";
 #endif
 	}
 
 #ifdef LMMS_HAVE_STK
-	if( m_stkDir == "" || m_stkDir == QDir::separator() )
+	if( m_stkDir.isEmpty() || m_stkDir == QDir::separator() ||
+			!QDir( m_stkDir ).exists() )
 	{
 #ifdef LMMS_BUILD_WIN32
 		m_stkDir = m_dataDir + "stk/rawwaves/";
