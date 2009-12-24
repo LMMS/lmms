@@ -450,7 +450,7 @@ IF(LMMS_BUILD_WIN32)
 	IF(LMMS_BUILD_WIN64)
 		INSTALL(FILES /opt/mingw64/bin/QtCore4.dll /opt/mingw64/bin/QtGui4.dll /opt/mingw64/bin/QtXml4.dll /opt/mingw64/bin/libsndfile-1.dll /opt/mingw64/bin/libvorbis-0.dll /opt/mingw64/bin/libvorbisenc-2.dll /opt/mingw64/bin/libvorbisfile-3.dll /opt/mingw64/bin/libogg-0.dll /opt/mingw64/bin/libfluidsynth-1.dll /opt/mingw64/bin/libfftw3f-3.dll /opt/mingw64/bin/SDL.dll DESTINATION .)
 	ELSE(LMMS_BUILD_WIN64)
-		INSTALL(FILES /opt/mingw32/bin/QtCore4.dll /opt/mingw32/bin/QtGui4.dll /opt/mingw32/bin/QtXml4.dll /opt/mingw32/bin/libz.dll /opt/mingw32/bin/libsndfile-1.dll /opt/mingw32/bin/libvorbis-0.dll /opt/mingw32/bin/libvorbisenc-2.dll /opt/mingw32/bin/libvorbisfile-3.dll /opt/mingw32/bin/libogg-0.dll /opt/mingw32/bin/libfluidsynth-1.dll /opt/mingw32/bin/libfftw3f-3.dll /opt/mingw32/bin/SDL.dll /opt/mingw32/i586-pc-mingw32/bin/mingwm10.dll DESTINATION .)
+		INSTALL(FILES /opt/mingw32/bin/QtCore4.dll /opt/mingw32/bin/QtGui4.dll /opt/mingw32/bin/QtXml4.dll /opt/mingw32/bin/libz.dll /opt/mingw32/bin/libsndfile-1.dll /opt/mingw32/bin/libFLAC-8.dll /opt/mingw32/bin/libvorbis-0.dll /opt/mingw32/bin/libvorbisenc-2.dll /opt/mingw32/bin/libvorbisfile-3.dll /opt/mingw32/bin/libogg-0.dll /opt/mingw32/bin/libfluidsynth-1.dll /opt/mingw32/bin/libfftw3f-3.dll /opt/mingw32/bin/SDL.dll /opt/mingw32/i586-pc-mingw32/bin/mingwm10.dll DESTINATION .)
 	ENDIF(LMMS_BUILD_WIN64)
 
 ELSE(LMMS_BUILD_WIN32)
