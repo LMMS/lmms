@@ -241,7 +241,7 @@ void vibed::loadSettings( const QDomElement & _this )
 			float * shp = 0;
 			base64::decode( _this.attribute( "graph" +
 						QString::number( i ) ),
-						(char * *) &shp,
+						&shp,
 						&size );
 			// TODO: check whether size == 128 * sizeof( float ),
 			// otherwise me might and up in a segfault

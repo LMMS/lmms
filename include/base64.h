@@ -2,8 +2,8 @@
  * base64.h - namespace base64 with methods for encoding/decoding binary data
  *            to/from base64
  *
- * Copyright (c) 2006-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ * Copyright (c) 2006-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -23,7 +23,6 @@
  *
  */
 
-
 #ifndef _BASE64_H
 #define _BASE64_H
 
@@ -40,11 +39,12 @@ namespace base64
 		_dst = QByteArray( _data, _size ).toBase64();
 	}
 
-	inline void decode( const QString & _b64, char * * _data, int * _size )
+	template<class T>
+	inline void decode( const QString & _b64, T * * _data, int * _size )
 	{
-		QByteArray data = QByteArray::fromBase64( _b64.toAscii() );
+		QByteArray data = QByteArray::fromBase64( _b64.toUtf8() );
 		*_size = data.size();
-		*_data = new char[*_size];
+		*_data = new T[*_size / sizeof(T)];
 		memcpy( *_data, data.constData(), *_size );
 	}
 	// deprecated!!
