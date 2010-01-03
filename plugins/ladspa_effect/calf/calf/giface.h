@@ -26,6 +26,7 @@
 #include <pthread.h>
 #include <exception>
 #include <string>
+#include <complex>
 #include "primitives.h"
 #include "preset.h"
 
@@ -306,6 +307,10 @@ struct plugin_metadata_iface
     virtual int get_input_count()=0;
     /// @return number of audio outputs
     virtual int get_output_count()=0;
+    /// @return number of optional inputs
+    virtual int get_inputs_optional()=0;
+    /// @return number of optional outputs
+    virtual int get_outputs_optional()=0;
     /// @return true if plugin can work in hard-realtime conditions
     virtual bool is_rt_capable()=0;
     /// @return true if plugin has MIDI input
@@ -489,6 +494,8 @@ public:
     const char *get_label() { return Metadata::impl_get_label(); } 
     int get_input_count() { return Metadata::in_count; }
     int get_output_count() { return Metadata::out_count; }
+    int get_inputs_optional() { return Metadata::ins_optional; }
+    int get_outputs_optional() { return Metadata::outs_optional; }
     int get_param_count() { return Metadata::param_count; }
     bool get_midi() { return Metadata::support_midi; }
     bool requires_midi() { return Metadata::require_midi; }
@@ -528,6 +535,8 @@ public:
     const char *get_label() { return impl->get_label(); } 
     int get_input_count() { return impl->get_input_count(); }
     int get_output_count() { return impl->get_output_count(); }
+    int get_inputs_optional() { return impl->get_inputs_optional(); }
+    int get_outputs_optional() { return impl->get_outputs_optional(); }
     int get_param_count() { return impl->get_param_count(); }
     bool get_midi() { return impl->get_midi(); }
     bool requires_midi() { return impl->requires_midi(); }
@@ -555,8 +564,36 @@ public:
     static const char *impl_get_id() { return id; } \
     static const char *impl_get_label() { return label; } \
     
-
 extern const char *calf_copyright_info;
+
+bool get_freq_gridline(int subindex, float &pos, bool &vertical, std::string &legend, cairo_iface *context, bool use_frequencies = true);
+    
+/// convert amplitude value to normalized grid-ish value (0dB = 0.5, 30dB = 1.0, -30 dB = 0.0, -60dB = -0.5, -90dB = -1.0)
+static inline float dB_grid(float amp)
+{
+    return log(amp) * (1.0 / log(256.0)) + 0.4;
+}
+
+template<class Fx>
+static bool get_graph(Fx &fx, int subindex, float *data, int points)
+{
+    for (int i = 0; i < points; i++)
+    {
+        typedef std::complex<double> cfloat;
+        double freq = 20.0 * pow (20000.0 / 20.0, i * 1.0 / points);
+        data[i] = dB_grid(fx.freq_gain(subindex, freq, fx.srate));
+    }
+    return true;
+}
+
+/// convert normalized grid-ish value back to amplitude value
+static inline float dB_grid_inv(float pos)
+{
+    return pow(256.0, pos - 0.4);
+}
+
+/// set drawing color based on channel index (0 or 1)
+void set_channel_color(cairo_iface *context, int channel);
 
 };
 

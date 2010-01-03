@@ -69,6 +69,11 @@ std::string xml_escape(const std::string &src)
     return dest;
 }
 
+std::string to_xml_attr(const std::string &key, const std::string &value)
+{
+    return " " + key + "=\"" + xml_escape(value) + "\"";
+}
+
 std::string load_file(const std::string &src)
 {
     std::string str;
