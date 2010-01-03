@@ -31,87 +31,6 @@
 using namespace dsp;
 using namespace calf_plugins;
 
-/// convert amplitude value to normalized grid-ish value (0dB = 0.5, 30dB = 1.0, -30 dB = 0.0, -60dB = -0.5, -90dB = -1.0)
-static inline float dB_grid(float amp)
-{
-    return log(amp) * (1.0 / log(256.0)) + 0.4;
-}
-
-template<class Fx>
-static bool get_graph(Fx &fx, int subindex, float *data, int points)
-{
-    for (int i = 0; i < points; i++)
-    {
-        typedef std::complex<double> cfloat;
-        double freq = 20.0 * pow (20000.0 / 20.0, i * 1.0 / points);
-        data[i] = dB_grid(fx.freq_gain(subindex, freq, fx.srate));
-    }
-    return true;
-}
-
-/// convert normalized grid-ish value back to amplitude value
-static inline float dB_grid_inv(float pos)
-{
-    return pow(256.0, pos - 0.4);
-}
-
-static void set_channel_color(cairo_iface *context, int channel)
-{
-    if (channel & 1)
-        context->set_source_rgba(0.35, 0.4, 0.2, 1);
-    else
-        context->set_source_rgba(0.35, 0.4, 0.2, 0.5);
-    context->set_line_width(1.5);
-}
-
-static bool get_freq_gridline(int subindex, float &pos, bool &vertical, std::string &legend, cairo_iface *context, bool use_frequencies = true)
-{
-    if (subindex < 0 )
-	return false;
-    if (use_frequencies)
-    {
-        if (subindex < 28)
-        {
-            vertical = true;
-            if (subindex == 9) legend = "100 Hz";
-            if (subindex == 18) legend = "1 kHz";
-            if (subindex == 27) legend = "10 kHz";
-            float freq = 100;
-            if (subindex < 9)
-                freq = 10 * (subindex + 1);
-            else if (subindex < 18)
-                freq = 100 * (subindex - 9 + 1);
-            else if (subindex < 27)
-                freq = 1000 * (subindex - 18 + 1);
-            else
-                freq = 10000 * (subindex - 27 + 1);
-            pos = log(freq / 20.0) / log(1000);
-            if (!legend.empty())
-                context->set_source_rgba(0, 0, 0, 0.2);
-            else
-                context->set_source_rgba(0, 0, 0, 0.1);
-            return true;
-        }
-        subindex -= 28;
-    }
-    if (subindex >= 32)
-        return false;
-    float gain = 16.0 / (1 << subindex);
-    pos = dB_grid(gain);
-    if (pos < -1)
-        return false;
-    if (subindex != 4)
-        context->set_source_rgba(0, 0, 0, subindex & 1 ? 0.1 : 0.2);
-    if (!(subindex & 1))
-    {
-        std::stringstream ss;
-        ss << (24 - 6 * subindex) << " dB";
-        legend = ss.str();
-    }
-    vertical = false;
-    return true;
-}
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 bool frequency_response_line_graph::get_gridline(int index, int subindex, float &pos, bool &vertical, std::string &legend, cairo_iface *context)
@@ -424,218 +343,6 @@ float multichorus_audio_module::freq_gain(int subindex, float freq, float srate)
         return *params[par_amount] * left.post.freq_gain(freq, srate);
     return (subindex ? right : left).freq_gain(freq, srate);                
 }
-
-///////////////////////////////////////////////////////////////////////////////////////////////
-
-compressor_audio_module::compressor_audio_module()
-{
-    is_active = false;
-    srate = 0;
-    last_generation = 0;
-}
-
-void compressor_audio_module::activate()
-{
-    is_active = true;
-    linSlope = 0.f;
-    peak = 0.f;
-    clip = 0.f;
-}
-
-void compressor_audio_module::deactivate()
-{
-    is_active = false;
-}
-
-void compressor_audio_module::set_sample_rate(uint32_t sr)
-{
-    srate = sr;
-    awL.set(sr);
-    awR.set(sr);
-}
-
-bool compressor_audio_module::get_graph(int index, int subindex, float *data, int points, cairo_iface *context)
-{ 
-    if (!is_active)
-        return false;
-    if (subindex > 1) // 1
-        return false;
-    for (int i = 0; i < points; i++)
-    {
-        float input = dB_grid_inv(-1.0 + i * 2.0 / (points - 1));
-        float output = output_level(input);
-        if (subindex == 0)
-            data[i] = dB_grid(input);
-        else
-            data[i] = dB_grid(output); 
-    }
-    if (subindex == (*params[param_bypass] > 0.5f ? 1 : 0))
-        context->set_source_rgba(0.35, 0.4, 0.2, 0.3);
-    else {
-        context->set_source_rgba(0.35, 0.4, 0.2, 1);
-        context->set_line_width(2);
-    }
-    return true;
-}
-
-bool compressor_audio_module::get_dot(int index, int subindex, float &x, float &y, int &size, cairo_iface *context)
-{
-    if (!is_active)
-        return false;
-    if (!subindex)
-    {
-        bool rms = *params[param_detection] == 0;
-        float det = rms ? sqrt(detected) : detected;
-        x = 0.5 + 0.5 * dB_grid(det);
-        y = dB_grid(*params[param_bypass] > 0.5f ? det : output_level(det));
-        return *params[param_bypass] > 0.5f ? false : true;
-    }
-    return false;
-}
-
-bool compressor_audio_module::get_gridline(int index, int subindex, float &pos, bool &vertical, std::string &legend, cairo_iface *context)
-{
-    bool tmp;
-    vertical = (subindex & 1) != 0;
-    bool result = get_freq_gridline(subindex >> 1, pos, tmp, legend, context, false);
-    if (result && vertical) {
-        if ((subindex & 4) && !legend.empty()) {
-            legend = "";
-        }
-        else {
-            size_t pos = legend.find(" dB");
-            if (pos != std::string::npos)
-                legend.erase(pos);
-        }
-        pos = 0.5 + 0.5 * pos;
-    }
-    return result;
-}
-
-// In case of doubt: this function is written by Thor. I just moved it to this file, damaging
-// the output of "git annotate" in the process.
-uint32_t compressor_audio_module::process(uint32_t offset, uint32_t numsamples, uint32_t inputs_mask, uint32_t outputs_mask)
-{
-    bool bypass = *params[param_bypass] > 0.5f;
-    
-    if(bypass) {
-        numsamples += offset;
-        while(offset < numsamples) {
-            outs[0][offset] = ins[0][offset];
-            outs[1][offset] = ins[1][offset];
-            ++offset;
-        }
-
-        if(params[param_compression] != NULL) {
-            *params[param_compression] = 1.f;
-        }
-
-        if(params[param_clip] != NULL) {
-            *params[param_clip] = 0.f;
-        }
-
-        if(params[param_peak] != NULL) {
-            *params[param_peak] = 0.f;
-        }
-  
-        return inputs_mask;
-    }
-
-    bool rms = *params[param_detection] == 0;
-    bool average = *params[param_stereo_link] == 0;
-    int aweighting = fastf2i_drm(*params[param_aweighting]);
-    float linThreshold = *params[param_threshold];
-    ratio = *params[param_ratio];
-    float attack = *params[param_attack];
-    float attack_coeff = std::min(1.f, 1.f / (attack * srate / 4000.f));
-    float release = *params[param_release];
-    float release_coeff = std::min(1.f, 1.f / (release * srate / 4000.f));
-    makeup = *params[param_makeup];
-    knee = *params[param_knee];
-
-    float linKneeSqrt = sqrt(knee);
-    linKneeStart = linThreshold / linKneeSqrt;
-    adjKneeStart = linKneeStart*linKneeStart;
-    float linKneeStop = linThreshold * linKneeSqrt;
-    
-    threshold = log(linThreshold);
-    kneeStart = log(linKneeStart);
-    kneeStop = log(linKneeStop);
-    compressedKneeStop = (kneeStop - threshold) / ratio + threshold;
-    
-    if (aweighting >= 2)
-    {
-        bpL.set_highshelf_rbj(5000, 0.707, 10 << (aweighting - 2), srate);
-        bpR.copy_coeffs(bpL);
-        bpL.sanitize();
-        bpR.sanitize();
-    }
-
-    numsamples += offset;
-    
-    float compression = 1.f;
-    peak = 0.f;
-    clip -= std::min(clip, numsamples);
-
-    while(offset < numsamples) {
-        float left = ins[0][offset] * *params[param_input];
-        float right = ins[1][offset] * *params[param_input];
-        
-        if(aweighting == 1) {
-            left = awL.process(left);
-            right = awR.process(right);
-        }
-        else if(aweighting >= 2) {
-            left = bpL.process(left);
-            right = bpR.process(right);
-        }
-        
-        float absample = average ? (fabs(left) + fabs(right)) * 0.5f : std::max(fabs(left), fabs(right));
-        if(rms) absample *= absample;
-        
-        linSlope += (absample - linSlope) * (absample > linSlope ? attack_coeff : release_coeff);
-        
-        float gain = 1.f;
-
-        if(linSlope > 0.f) {
-            gain = output_gain(linSlope, rms);
-        }
-
-        compression = gain;
-        gain *= makeup;
-
-        float outL = ins[0][offset] * gain * *params[param_input];
-        float outR = ins[1][offset] * gain * *params[param_input];
-        
-        outs[0][offset] = outL;
-        outs[1][offset] = outR;
-        
-        ++offset;
-        
-        float maxLR = std::max(fabs(outL), fabs(outR));
-        if(maxLR > peak)
-            peak = maxLR;
-        
-        if(peak > 1.f) clip = srate >> 3; /* blink clip LED for 125 ms */
-    }
-    
-    detected = linSlope;
-    
-    if(params[param_compression] != NULL) {
-        *params[param_compression] = compression;
-    }
-
-    if(params[param_clip] != NULL) {
-        *params[param_clip] = clip;
-    }
-
-    if(params[param_peak] != NULL) {
-        *params[param_peak] = peak;
-    }
-
-    return inputs_mask;
-}
-
 
 /// Multibandcompressor by Markus Schmidt
 ///
@@ -1048,6 +755,161 @@ int multibandcompressor_audio_module::get_changed_offsets(int index, int generat
             break;
     }
     return 0;
+}
+
+/// Compressor originally by Thor
+///
+/// This module provides Thor's original compressor without any sidechain or weighting
+///////////////////////////////////////////////////////////////////////////////////////////////
+
+compressor_audio_module::compressor_audio_module()
+{
+    is_active = false;
+    srate = 0;
+    last_generation = 0;
+}
+
+void compressor_audio_module::activate()
+{
+    is_active = true;
+    // set all filters and strips
+    compressor.activate();
+    params_changed();
+    meter_in = 0.f;
+    meter_out = 0.f;
+    clip_in = 0.f;
+    clip_out = 0.f;
+}
+void compressor_audio_module::deactivate()
+{
+    is_active = false;
+    compressor.deactivate();
+}
+
+void compressor_audio_module::params_changed()
+{
+    compressor.set_params(*params[param_attack], *params[param_release], *params[param_threshold], *params[param_ratio], *params[param_knee], *params[param_makeup], *params[param_detection], *params[param_stereo_link], *params[param_bypass], 0.f);
+}
+
+void compressor_audio_module::set_sample_rate(uint32_t sr)
+{
+    srate = sr;
+    compressor.set_sample_rate(srate);
+}
+
+uint32_t compressor_audio_module::process(uint32_t offset, uint32_t numsamples, uint32_t inputs_mask, uint32_t outputs_mask)
+{
+    bool bypass = *params[param_bypass] > 0.5f;
+    numsamples += offset;
+    if(bypass) {
+        // everything bypassed
+        while(offset < numsamples) {
+            outs[0][offset] = ins[0][offset];
+            outs[1][offset] = ins[1][offset];
+            ++offset;
+        }
+        // displays, too
+        clip_in    = 0.f;
+        clip_out   = 0.f;
+        meter_in   = 0.f;
+        meter_out  = 0.f;
+    } else {
+        // process
+        
+        clip_in    -= std::min(clip_in,  numsamples);
+        clip_out   -= std::min(clip_out,  numsamples);
+        
+        while(offset < numsamples) {
+            // cycle through samples
+            float outL = 0.f;
+            float outR = 0.f;
+            float inL = ins[0][offset];
+            float inR = ins[1][offset];
+            // in level
+            inR *= *params[param_level_in];
+            inL *= *params[param_level_in];
+            
+            float leftAC = inL;
+            float rightAC = inR;
+            float leftSC = inL;
+            float rightSC = inR;
+            
+            compressor.process(leftAC, rightAC, leftSC, rightSC);
+            
+            outL = leftAC;
+            outR = rightAC;
+            
+            // send to output
+            outs[0][offset] = outL;
+            outs[1][offset] = outR;
+            
+            // clip LED's
+            if(std::max(fabs(inL), fabs(inR)) > 1.f) {
+                clip_in   = srate >> 3;
+            }
+            if(std::max(fabs(outL), fabs(outR)) > 1.f) {
+                clip_out  = srate >> 3;
+            }
+            // rise up out meter
+            meter_in = std::max(fabs(inL), fabs(inR));;
+            meter_out = std::max(fabs(outL), fabs(outR));;
+            
+            // next sample
+            ++offset;
+        } // cycle trough samples
+    }
+    // draw meters
+    if(params[param_clip_in] != NULL) {
+        *params[param_clip_in] = clip_in;
+    }
+    if(params[param_clip_out] != NULL) {
+        *params[param_clip_out] = clip_out;
+    }
+    if(params[param_meter_in] != NULL) {
+        *params[param_meter_in] = meter_in;
+    }
+    if(params[param_meter_out] != NULL) {
+        *params[param_meter_out] = meter_out;
+    }
+    // draw strip meter
+    if(bypass > 0.5f) {
+        if(params[param_compression] != NULL) {
+            *params[param_compression] = 1.0f;
+        }
+    } else {
+        if(params[param_compression] != NULL) {
+            *params[param_compression] = compressor.get_comp_level();
+        }
+    }
+    // whatever has to be returned x)
+    return outputs_mask;
+}
+bool compressor_audio_module::get_graph(int index, int subindex, float *data, int points, cairo_iface *context)
+{
+    if (!is_active)
+        return false;
+    return compressor.get_graph(subindex, data, points, context);
+}
+
+bool compressor_audio_module::get_dot(int index, int subindex, float &x, float &y, int &size, cairo_iface *context)
+{
+    if (!is_active)
+        return false;
+    return compressor.get_dot(subindex, x, y, size, context);
+}
+
+bool compressor_audio_module::get_gridline(int index, int subindex, float &pos, bool &vertical, std::string &legend, cairo_iface *context)
+{
+    if (!is_active)
+        return false;
+    return compressor.get_gridline(subindex, pos, vertical, legend, context);
+}
+
+int compressor_audio_module::get_changed_offsets(int index, int generation, int &subindex_graph, int &subindex_dot, int &subindex_gridline)
+{
+    if (!is_active)
+        return false;
+    return compressor.get_changed_offsets(generation, subindex_graph, subindex_dot, subindex_gridline);
 }
 
 /// Sidecain Compressor by Markus Schmidt
@@ -1867,131 +1729,144 @@ int gain_reduction_audio_module::get_changed_offsets(int generation, int &subind
 /// of different chained filters.
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
-equalizer12band_audio_module::equalizer12band_audio_module()
+template<class BaseClass, bool has_lphp>
+equalizerNband_audio_module<BaseClass, has_lphp>::equalizerNband_audio_module()
 {
     is_active = false;
     srate = 0;
     last_generation = 0;
-    clip_inL    = 0.f;
-    clip_inR    = 0.f;
-    clip_outL   = 0.f;
-    clip_outR   = 0.f;
-    meter_inL  = 0.f;
-    meter_inR  = 0.f;
-    meter_outL = 0.f;
-    meter_outR = 0.f;
+    clip_inL = clip_inR = clip_outL = clip_outR  = 0.f;
+    meter_inL = meter_inR = meter_outL = meter_outR = 0.f;
 }
 
-void equalizer12band_audio_module::activate()
+template<class BaseClass, bool has_lphp>
+void equalizerNband_audio_module<BaseClass, has_lphp>::activate()
 {
     is_active = true;
     // set all filters
     params_changed();
 }
-void equalizer12band_audio_module::deactivate()
+
+template<class BaseClass, bool has_lphp>
+void equalizerNband_audio_module<BaseClass, has_lphp>::deactivate()
 {
     is_active = false;
 }
 
-void equalizer12band_audio_module::params_changed()
+static inline void copy_lphp(biquad_d2<float> filters[3][2])
+{
+    for (int i = 0; i < 3; i++)
+        for (int j = 0; j < 2; j++)
+            if (i || j)
+                filters[i][j].copy_coeffs(filters[0][0]);
+}
+
+template<class BaseClass, bool has_lphp>
+void equalizerNband_audio_module<BaseClass, has_lphp>::params_changed()
 {
     // set the params of all filters
-    if(*params[param_hp_freq] != hp_freq_old) {
-        hpL[0].set_hp_rbj(*params[param_hp_freq], 0.707, (float)srate, 1.0);
-        hpL[1].copy_coeffs(hpL[0]);
-        hpL[2].copy_coeffs(hpL[0]);
-        hpR[0].copy_coeffs(hpL[0]);
-        hpR[1].copy_coeffs(hpL[0]);
-        hpR[2].copy_coeffs(hpL[0]);
-        hp_freq_old = *params[param_hp_freq];
+    
+    // lp/hp first (if available)
+    if (has_lphp)
+    {
+        hp_mode = (CalfEqMode)(int)*params[AM::param_hp_mode];
+        lp_mode = (CalfEqMode)(int)*params[AM::param_lp_mode];
+
+        float hpfreq = *params[AM::param_hp_freq], lpfreq = *params[AM::param_lp_freq];
+        
+        if(hpfreq != hp_freq_old) {
+            hp[0][0].set_hp_rbj(hpfreq, 0.707, (float)srate, 1.0);
+            copy_lphp(hp);
+            hp_freq_old = hpfreq;
+        }
+        if(lpfreq != lp_freq_old) {
+            lp[0][0].set_lp_rbj(lpfreq, 0.707, (float)srate, 1.0);
+            copy_lphp(lp);
+            lp_freq_old = lpfreq;
+        }
     }
-    if(*params[param_lp_freq] != lp_freq_old) {
-        lpL[0].set_lp_rbj(*params[param_lp_freq], 0.707, (float)srate, 1.0);
-        lpL[1].copy_coeffs(lpL[0]);
-        lpL[2].copy_coeffs(lpL[0]);
-        lpR[0].copy_coeffs(lpL[0]);
-        lpR[1].copy_coeffs(lpL[0]);
-        lpR[2].copy_coeffs(lpL[0]);
-        lp_freq_old = *params[param_lp_freq];
-    }
-    if(*params[param_ls_freq] != ls_freq_old or *params[param_ls_level] != ls_level_old) {
-        lsL.set_lowshelf_rbj(*params[param_ls_freq], 0.707, *params[param_ls_level], (float)srate);
+    
+    // then shelves
+    float hsfreq = *params[AM::param_hs_freq], hslevel = *params[AM::param_hs_level];
+    float lsfreq = *params[AM::param_ls_freq], lslevel = *params[AM::param_ls_level];
+    
+    if(lsfreq != ls_freq_old or lslevel != ls_level_old) {
+        lsL.set_lowshelf_rbj(lsfreq, 0.707, lslevel, (float)srate);
         lsR.copy_coeffs(lsL);
-        ls_level_old = *params[param_ls_level];
-        ls_freq_old = *params[param_ls_freq];
+        ls_level_old = lslevel;
+        ls_freq_old = lsfreq;
     }
-    if(*params[param_hs_freq] != hs_freq_old or *params[param_hs_level] != hs_level_old) {
-        hsL.set_highshelf_rbj(*params[param_hs_freq], 0.707, *params[param_hs_level], (float)srate);
+    if(hsfreq != hs_freq_old or hslevel != hs_level_old) {
+        hsL.set_highshelf_rbj(hsfreq, 0.707, hslevel, (float)srate);
         hsR.copy_coeffs(hsL);
-        hs_level_old = *params[param_hs_level];
-        hs_freq_old = *params[param_hs_freq];
+        hs_level_old = hslevel;
+        hs_freq_old = hsfreq;
     }
-    if(*params[param_p1_freq] != p_freq_old[0] or *params[param_p1_level] != p_level_old[0] or *params[param_p1_q] != p_q_old[0]) {
-        pL[0].set_peakeq_rbj((float)*params[param_p1_freq], *params[param_p1_q], *params[param_p1_level], (float)srate);
-        pR[0].copy_coeffs(pL[0]);
-        p_freq_old[0] = *params[param_p1_freq];
-        p_level_old[0] = *params[param_p1_level];
-        p_q_old[0] = *params[param_p1_q];
-    }
-    if(*params[param_p2_freq] != p_freq_old[1] or *params[param_p2_level] != p_level_old[1] or *params[param_p2_q] != p_q_old[1]) {
-        pL[1].set_peakeq_rbj((float)*params[param_p2_freq], *params[param_p2_q], *params[param_p2_level], (float)srate);
-        pR[1].copy_coeffs(pL[1]);
-        p_freq_old[1] = *params[param_p2_freq];
-        p_level_old[1] = *params[param_p2_level];
-        p_q_old[1] = *params[param_p2_q];
-    }
-    if(*params[param_p3_freq] != p_freq_old[2] or *params[param_p3_level] != p_level_old[2] or *params[param_p3_q] != p_q_old[2]) {
-        pL[2].set_peakeq_rbj((float)*params[param_p3_freq], *params[param_p3_q], *params[param_p3_level], (float)srate);
-        pR[2].copy_coeffs(pL[2]);
-        p_freq_old[2] = *params[param_p3_freq];
-        p_level_old[2] = *params[param_p3_level];
-        p_q_old[2] = *params[param_p3_q];
-    }
-    if(*params[param_p4_freq] != p_freq_old[3] or *params[param_p4_level] != p_level_old[3] or *params[param_p4_q] != p_q_old[3]) {
-        pL[3].set_peakeq_rbj((float)*params[param_p4_freq], *params[param_p4_q], *params[param_p4_level], (float)srate);
-        pR[3].copy_coeffs(pL[3]);
-        p_freq_old[3] = *params[param_p4_freq];
-        p_level_old[3] = *params[param_p4_level];
-        p_q_old[3] = *params[param_p4_q];
-    }
-    if(*params[param_p5_freq] != p_freq_old[4] or *params[param_p5_level] != p_level_old[4] or *params[param_p5_q] != p_q_old[4]) {
-        pL[4].set_peakeq_rbj((float)*params[param_p5_freq], *params[param_p5_q], *params[param_p5_level], (float)srate);
-        pR[4].copy_coeffs(pL[4]);
-        p_freq_old[4] = *params[param_p5_freq];
-        p_level_old[4] = *params[param_p5_level];
-        p_q_old[4] = *params[param_p5_q];
-    }
-    if(*params[param_p6_freq] != p_freq_old[5] or *params[param_p6_level] != p_level_old[5] or *params[param_p6_q] != p_q_old[5]) {
-        pL[5].set_peakeq_rbj((float)*params[param_p6_freq], *params[param_p6_q], *params[param_p6_level], (float)srate);
-        pR[5].copy_coeffs(pL[5]);
-        p_freq_old[5] = *params[param_p6_freq];
-        p_level_old[5] = *params[param_p6_level];
-        p_q_old[5] = *params[param_p6_q];
-    }
-    if(*params[param_p7_freq] != p_freq_old[6] or *params[param_p7_level] != p_level_old[6] or *params[param_p7_q] != p_q_old[6]) {
-        pL[6].set_peakeq_rbj((float)*params[param_p7_freq], *params[param_p7_q], *params[param_p7_level], (float)srate);
-        pR[6].copy_coeffs(pL[6]);
-        p_freq_old[6] = *params[param_p7_freq];
-        p_level_old[6] = *params[param_p7_level];
-        p_q_old[6] = *params[param_p7_q];
-    }
-    if(*params[param_p8_freq] != p_freq_old[7] or *params[param_p8_level] != p_level_old[7] or *params[param_p8_q] != p_q_old[7]) {
-        pL[7].set_peakeq_rbj((float)*params[param_p8_freq], *params[param_p8_q], *params[param_p8_level], (float)srate);
-        pR[7].copy_coeffs(pL[7]);
-        p_freq_old[7] = *params[param_p8_freq];
-        p_level_old[7] = *params[param_p8_level];
-        p_q_old[7] = *params[param_p8_q];
+    for (int i = 0; i < AM::PeakBands; i++)
+    {
+        int offset = i * params_per_band;
+        float freq = *params[AM::param_p1_freq + offset];
+        float level = *params[AM::param_p1_level + offset];
+        float q = *params[AM::param_p1_q + offset];
+        if(freq != p_freq_old[i] or level != p_level_old[i] or q != p_q_old[i]) {
+            pL[i].set_peakeq_rbj(freq, q, level, (float)srate);
+            pR[i].copy_coeffs(pL[i]);
+            p_freq_old[i] = freq;
+            p_level_old[i] = level;
+            p_q_old[i] = q;
+        }
     }
 }
 
-void equalizer12band_audio_module::set_sample_rate(uint32_t sr)
+template<class BaseClass, bool has_lphp>
+inline void equalizerNband_audio_module<BaseClass, has_lphp>::process_hplp(float &left, float &right)
 {
-    srate = sr;
+    if (!has_lphp)
+        return;
+    if (*params[AM::param_lp_active] > 0.f)
+    {
+        switch(lp_mode)
+        {
+            case MODE12DB:
+                left = lp[0][0].process(left);
+                right = lp[0][1].process(right);
+                break;
+            case MODE24DB:
+                left = lp[1][0].process(lp[0][0].process(left));
+                right = lp[1][1].process(lp[0][1].process(right));
+                break;
+            case MODE36DB:
+                left = lp[2][0].process(lp[1][0].process(lp[0][0].process(left)));
+                right = lp[2][1].process(lp[1][1].process(lp[0][1].process(right)));
+                break;
+        }
+    }
+    if (*params[AM::param_hp_active] > 0.f)
+    {
+        switch(hp_mode)
+        {
+            case MODE12DB:
+                left = hp[0][0].process(left);
+                right = hp[0][1].process(right);
+                break;
+            case MODE24DB:
+                left = hp[1][0].process(hp[0][0].process(left));
+                right = hp[1][1].process(hp[0][1].process(right));
+                break;
+            case MODE36DB:
+                left = hp[2][0].process(hp[1][0].process(hp[0][0].process(left)));
+                right = hp[2][1].process(hp[1][1].process(hp[0][1].process(right)));
+                break;
+        }
+    }
 }
 
-uint32_t equalizer12band_audio_module::process(uint32_t offset, uint32_t numsamples, uint32_t inputs_mask, uint32_t outputs_mask)
+#define SET_IF_CONNECTED(param) if (params[AM::param_##param] != NULL) *params[AM::param_##param] = param;
+
+template<class BaseClass, bool has_lphp>
+uint32_t equalizerNband_audio_module<BaseClass, has_lphp>::process(uint32_t offset, uint32_t numsamples, uint32_t inputs_mask, uint32_t outputs_mask)
 {
-    bool bypass = *params[param_bypass] > 0.5f;
+    bool bypass = *params[AM::param_bypass] > 0.f;
     numsamples += offset;
     if(bypass) {
         // everything bypassed
@@ -2001,14 +1876,8 @@ uint32_t equalizer12band_audio_module::process(uint32_t offset, uint32_t numsamp
             ++offset;
         }
         // displays, too
-        clip_inL    = 0.f;
-        clip_inR    = 0.f;
-        clip_outL   = 0.f;
-        clip_outR   = 0.f;
-        meter_inL  = 0.f;
-        meter_inR  = 0.f;
-        meter_outL = 0.f;
-        meter_outR = 0.f;
+        clip_inL = clip_inR = clip_outL = clip_outR = 0.f;
+        meter_inL = meter_inR = meter_outL = meter_outR = 0.f;
     } else {
         
         clip_inL    -= std::min(clip_inL,  numsamples);
@@ -2028,88 +1897,32 @@ uint32_t equalizer12band_audio_module::process(uint32_t offset, uint32_t numsamp
             float inL = ins[0][offset];
             float inR = ins[1][offset];
             // in level
-            inR *= *params[param_level_in];
-            inL *= *params[param_level_in];
+            inR *= *params[AM::param_level_in];
+            inL *= *params[AM::param_level_in];
             
             float procL = inL;
             float procR = inR;
             
             // all filters in chain
-            if(*params[param_hp_active] > 0.f) {
-                switch((int)*params[param_hp_mode]) {
-                    case MODE12DB:
-                        procL = hpL[0].process(procL);
-                        procR = hpR[0].process(procR);
-                        break;
-                    case MODE24DB:
-                        procL = hpL[1].process(hpL[0].process(procL));
-                        procR = hpR[1].process(hpR[0].process(procR));
-                        break;
-                    case MODE36DB:
-                        procL = hpL[2].process(hpL[1].process(hpL[0].process(procL)));
-                        procR = hpR[2].process(hpR[1].process(hpR[0].process(procR)));
-                        break;
-                }
-            }
-            if(*params[param_lp_active] > 0.f) {
-                switch((int)*params[param_lp_mode]) {
-                    case MODE12DB:
-                        procL = lpL[0].process(procL);
-                        procR = lpR[0].process(procR);
-                        break;
-                    case MODE24DB:
-                        procL = lpL[1].process(lpL[0].process(procL));
-                        procR = lpR[1].process(lpR[0].process(procR));
-                        break;
-                    case MODE36DB:
-                        procL = lpL[2].process(lpL[1].process(lpL[0].process(procL)));
-                        procR = lpR[2].process(lpR[1].process(lpR[0].process(procR)));
-                        break;
-                }
-            }
-            if(*params[param_ls_active] > 0.f) {
+            process_hplp(procL, procR);
+            if(*params[AM::param_ls_active] > 0.f) {
                 procL = lsL.process(procL);
                 procR = lsR.process(procR);
             }
-            if(*params[param_hs_active] > 0.f) {
+            if(*params[AM::param_hs_active] > 0.f) {
                 procL = hsL.process(procL);
                 procR = hsR.process(procR);
             }
-            if(*params[param_p1_active] > 0.f) {
-                procL = pL[0].process(procL);
-                procR = pR[0].process(procR);
-            }
-            if(*params[param_p2_active] > 0.f) {
-                procL = pL[1].process(procL);
-                procR = pR[1].process(procR);
-            }
-            if(*params[param_p3_active] > 0.f) {
-                procL = pL[2].process(procL);
-                procR = pR[2].process(procR);
-            }
-            if(*params[param_p4_active] > 0.f) {
-                procL = pL[3].process(procL);
-                procR = pR[3].process(procR);
-            }
-            if(*params[param_p5_active] > 0.f) {
-                procL = pL[4].process(procL);
-                procR = pR[4].process(procR);
-            }
-            if(*params[param_p6_active] > 0.f) {
-                procL = pL[5].process(procL);
-                procR = pR[5].process(procR);
-            }
-            if(*params[param_p7_active] > 0.f) {
-                procL = pL[6].process(procL);
-                procR = pR[6].process(procR);
-            }
-            if(*params[param_p8_active] > 0.f) {
-                procL = pL[7].process(procL);
-                procR = pR[7].process(procR);
+            for (int i = 0; i < AM::PeakBands; i++)
+            {
+                if(*params[AM::param_p1_active + i * params_per_band] > 0.f) {
+                    procL = pL[i].process(procL);
+                    procR = pR[i].process(procR);
+                }
             }
             
-            outL = procL * *params[param_level_out];
-            outR = procR * *params[param_level_out];
+            outL = procL * *params[AM::param_level_out];
+            outR = procR * *params[AM::param_level_out];
             
             // send to output
             outs[0][offset] = outL;
@@ -2147,59 +1960,47 @@ uint32_t equalizer12band_audio_module::process(uint32_t offset, uint32_t numsamp
         } // cycle trough samples
         // clean up
         for(int i = 0; i < 3; ++i) {
-            hpL[i].sanitize();
-            hpR[i].sanitize();
-            lpL[i].sanitize();
-            lpR[i].sanitize();
+            hp[i][0].sanitize();
+            hp[i][1].sanitize();
+            lp[i][0].sanitize();
+            lp[i][1].sanitize();
         }
         lsL.sanitize();
         hsR.sanitize();
-        for(int i = 0; i < 8; ++i) {
+        for(int i = 0; i < AM::PeakBands; ++i) {
             pL[i].sanitize();
             pR[i].sanitize();
         }
     }
     // draw meters
-    if(params[param_clip_inL] != NULL) {
-        *params[param_clip_inL] = clip_inL;
-    }
-    if(params[param_clip_inR] != NULL) {
-        *params[param_clip_inR] = clip_inR;
-    }
-    if(params[param_clip_outL] != NULL) {
-        *params[param_clip_outL] = clip_outL;
-    }
-    if(params[param_clip_outR] != NULL) {
-        *params[param_clip_outR] = clip_outR;
-    }
-    
-    if(params[param_meter_inL] != NULL) {
-        *params[param_meter_inL] = meter_inL;
-    }
-    if(params[param_meter_inR] != NULL) {
-        *params[param_meter_inR] = meter_inR;
-    }
-    if(params[param_meter_outL] != NULL) {
-        *params[param_meter_outL] = meter_outL;
-    }
-    if(params[param_meter_outR] != NULL) {
-        *params[param_meter_outR] = meter_outR;
-    }
+    SET_IF_CONNECTED(clip_inL)
+    SET_IF_CONNECTED(clip_inR)
+    SET_IF_CONNECTED(clip_outL)
+    SET_IF_CONNECTED(clip_outR)
+    SET_IF_CONNECTED(meter_inL)
+    SET_IF_CONNECTED(meter_inR)
+    SET_IF_CONNECTED(meter_outL)
+    SET_IF_CONNECTED(meter_outR)
     // whatever has to be returned x)
     return outputs_mask;
 }
-bool equalizer12band_audio_module::get_graph(int index, int subindex, float *data, int points, cairo_iface *context)
+
+#undef SET_IF_CONNECTED
+
+template<class BaseClass, bool has_lphp>
+bool equalizerNband_audio_module<BaseClass, has_lphp>::get_graph(int index, int subindex, float *data, int points, cairo_iface *context)
 {
     if (!is_active)
         return false;
-    if (index == param_p1_freq && !subindex) {
+    if (index == AM::param_p1_freq && !subindex) {
         context->set_line_width(1.5);
         return ::get_graph(*this, subindex, data, points);
     }
     return false;
 }
 
-bool equalizer12band_audio_module::get_gridline(int index, int subindex, float &pos, bool &vertical, std::string &legend, cairo_iface *context)
+template<class BaseClass, bool has_lphp>
+bool equalizerNband_audio_module<BaseClass, has_lphp>::get_gridline(int index, int subindex, float &pos, bool &vertical, std::string &legend, cairo_iface *context)
 {
     if (!is_active) {
         return false;
@@ -2208,95 +2009,22 @@ bool equalizer12band_audio_module::get_gridline(int index, int subindex, float &
     }
 }
 
-int equalizer12band_audio_module::get_changed_offsets(int index, int generation, int &subindex_graph, int &subindex_dot, int &subindex_gridline)
+template<class BaseClass, bool has_lphp>
+int equalizerNband_audio_module<BaseClass, has_lphp>::get_changed_offsets(int index, int generation, int &subindex_graph, int &subindex_dot, int &subindex_gridline)
 {
     if (!is_active) {
         return false;
     } else {
-        if (*params[param_hp_freq] != hp_freq_old1
-            or *params[param_hp_mode] != hp_mode_old1
-            or *params[param_lp_freq] != lp_freq_old1
-            or *params[param_lp_mode] != lp_mode_old1
-            
-            or *params[param_ls_freq] != ls_freq_old1
-            or *params[param_ls_level] != ls_level_old1
-            or *params[param_hs_freq] != hs_freq_old1
-            or *params[param_hs_level] != hs_level_old1
-            
-            or *params[param_p1_freq] != p_freq_old1[0]
-            or *params[param_p1_level] != p_level_old1[0]
-            or *params[param_p1_q] != p_q_old1[0]
-            
-            or *params[param_p2_freq] != p_freq_old1[1]
-            or *params[param_p2_level] != p_level_old1[1]
-            or *params[param_p2_q] != p_q_old1[1]
-                        
-            or *params[param_p3_freq] != p_freq_old1[2]
-            or *params[param_p3_level] != p_level_old1[2]
-            or *params[param_p3_q] != p_q_old1[2]
-            
-            or *params[param_p4_freq] != p_freq_old1[3]
-            or *params[param_p4_level] != p_level_old1[3]
-            or *params[param_p4_q] != p_q_old1[3]
-            
-            or *params[param_p5_freq] != p_freq_old1[4]
-            or *params[param_p5_level] != p_level_old1[4]
-            or *params[param_p5_q] != p_q_old1[4]
-            
-            or *params[param_p6_freq] != p_freq_old1[5]
-            or *params[param_p6_level] != p_level_old1[5]
-            or *params[param_p6_q] != p_q_old1[5]
-            
-            or *params[param_p7_freq] != p_freq_old1[6]
-            or *params[param_p7_level] != p_level_old1[6]
-            or *params[param_p7_q] != p_q_old1[6]
-            
-            or *params[param_p8_freq] != p_freq_old1[7]
-            or *params[param_p8_level] != p_level_old1[7]
-            or *params[param_p8_q] != p_q_old1[7])
+        bool changed = false;
+        for (int i = 0; i < graph_param_count && !changed; i++)
         {
-            
-            hp_freq_old1 = *params[param_hp_freq];
-            hp_mode_old1 = *params[param_hp_mode];
-            lp_freq_old1 = *params[param_lp_freq];
-            lp_mode_old1 = *params[param_lp_mode];
-            
-            ls_freq_old1 = *params[param_ls_freq];
-            ls_level_old1 = *params[param_ls_level];
-            hs_freq_old1 = *params[param_hs_freq];
-            hs_level_old1 = *params[param_hs_level];
-            
-            p_freq_old1[0] = *params[param_p1_freq];
-            p_level_old1[0] = *params[param_p1_level];
-            p_q_old1[0] = *params[param_p1_q];
-            
-            p_freq_old1[1] = *params[param_p2_freq];
-            p_level_old1[1] = *params[param_p2_level];
-            p_q_old1[1] = *params[param_p2_q];
-            
-            p_freq_old1[2] = *params[param_p3_freq];
-            p_level_old1[2] = *params[param_p3_level];
-            p_q_old1[2] = *params[param_p3_q];
-            
-            p_freq_old1[3] = *params[param_p4_freq];
-            p_level_old1[3] = *params[param_p4_level];
-            p_q_old1[3] = *params[param_p4_q];
-            
-            p_freq_old1[4] = *params[param_p5_freq];
-            p_level_old1[4] = *params[param_p5_level];
-            p_q_old1[4] = *params[param_p5_q];
-            
-            p_freq_old1[5] = *params[param_p6_freq];
-            p_level_old1[5] = *params[param_p6_level];
-            p_q_old1[5] = *params[param_p6_q];
-            
-            p_freq_old1[6] = *params[param_p7_freq];
-            p_level_old1[6] = *params[param_p7_level];
-            p_q_old1[6] = *params[param_p7_q];
-            
-            p_freq_old1[7] = *params[param_p8_freq];
-            p_level_old1[7] = *params[param_p8_level];
-            p_q_old1[7] = *params[param_p8_q];
+            if (*params[AM::first_graph_param + i] != old_params_for_graph[i])
+                changed = true;
+        }
+        if (changed)
+        {
+            for (int i = 0; i < graph_param_count; i++)
+                old_params_for_graph[i] = *params[AM::first_graph_param + i];
             
             last_generation++;
             subindex_graph = 0;
@@ -2314,17 +2042,169 @@ int equalizer12band_audio_module::get_changed_offsets(int index, int generation,
     return false;
 }
 
-/// Equalizer 8 Band by Markus Schmidt
+static inline float adjusted_lphp_gain(float **params, int param_active, int param_mode, biquad_d2<float> filter, float freq, float srate)
+{
+    if(*params[param_active] > 0.f) {
+        float gain = filter.freq_gain(freq, srate);
+        switch((int)*params[param_mode]) {
+            case MODE12DB:
+                return gain;
+            case MODE24DB:
+                return gain * gain;
+            case MODE36DB:
+                return gain * gain * gain;
+        }
+    }
+    return 1;
+}
+
+template<class BaseClass, bool use_hplp>
+float equalizerNband_audio_module<BaseClass, use_hplp>::freq_gain(int index, double freq, uint32_t sr)
+{
+    float ret = 1.f;
+    if (use_hplp)
+    {
+        ret *= adjusted_lphp_gain(params, AM::param_hp_active, AM::param_hp_mode, hp[0][0], freq, (float)sr);
+        ret *= adjusted_lphp_gain(params, AM::param_lp_active, AM::param_lp_mode, lp[0][0], freq, (float)sr);
+    }
+    ret *= (*params[AM::param_ls_active] > 0.f) ? lsL.freq_gain(freq, sr) : 1;
+    ret *= (*params[AM::param_hs_active] > 0.f) ? hsL.freq_gain(freq, sr) : 1;
+    for (int i = 0; i < PeakBands; i++)
+        ret *= (*params[AM::param_p1_active + i * params_per_band] > 0.f) ? pL[i].freq_gain(freq, (float)sr) : 1;
+    return ret;
+}
+
+template class equalizerNband_audio_module<equalizer5band_metadata, false>;
+template class equalizerNband_audio_module<equalizer8band_metadata, true>;
+template class equalizerNband_audio_module<equalizer12band_metadata, true>;
+
+/// LFO module by Markus
+/// This module provides simple LFO's (sine=0, triangle=1, square=2, saw_up=3, saw_down=4)
+/// get_value() returns a value between -1 and 1
+////////////////////////////////////////////////////////////////////////////////
+lfo_audio_module::lfo_audio_module()
+{
+    is_active       = false;
+    phase = 0.f;
+}
+
+void lfo_audio_module::activate()
+{
+    is_active = true;
+    phase = 0.f;
+}
+
+void lfo_audio_module::deactivate()
+{
+    is_active = false;
+}
+
+float lfo_audio_module::get_value()
+{
+    return get_value_from_phase(phase, offset) * amount;
+}
+
+float lfo_audio_module::get_value_from_phase(float ph, float off)
+{
+    float val = 0.f;
+    float phs = ph + off;
+    if (phs >= 1.0)
+        phs = fmod(phs, 1.f);
+    switch (mode) {
+        default:
+        case 0:
+            // sine
+            val = sin((phs * 360.f) * M_PI / 180);
+            break;
+        case 1:
+            // triangle
+            if(phs > 0.75)
+                val = (phs - 0.75) * 4 - 1;
+            else if(phs > 0.5)
+                val = (phs - 0.5) * 4 * -1;
+            else if(phs > 0.25)
+                val = 1 - (phs - 0.25) * 4;
+            else
+                val = phs * 4;
+            break;
+        case 2:
+            // square
+            val = (phs < 0.5) ? -1 : +1;
+            break;
+        case 3:
+            // saw up
+                val = phs * 2.f - 1;
+            break;
+        case 4:
+            // saw down
+            val = 1 - phs * 2.f;
+            break;
+    }
+    return val;
+}
+
+void lfo_audio_module::advance(uint32_t count)
+{
+    //this function walks from 0.f to 1.f and starts all over again
+    phase += count * freq * (1.0 / srate);
+    if (phase >= 1.0)
+        phase = fmod(phase, 1.f);
+}
+
+void lfo_audio_module::set_phase(float ph)
+{
+    //set the phase from outsinde
+    phase = fabs(ph);
+    if (phase >= 1.0)
+        phase = fmod(phase, 1.f);
+}
+
+void lfo_audio_module::set_params(float f, int m, float o, uint32_t sr, float a)
+{
+    // freq: a value in Hz
+    // mode: sine=0, triangle=1, square=2, saw_up=3, saw_down=4
+    // offset: value between 0.f and 1.f to offset the lfo in time
+    freq = f;
+    mode = m;
+    offset = o;
+    srate = sr;
+    amount = a;
+}
+
+bool lfo_audio_module::get_graph(float *data, int points, cairo_iface *context)
+{
+    if (!is_active)
+        return false;
+    for (int i = 0; i < points; i++) {
+        float ph = (float)i / (float)points;
+        data[i] = get_value_from_phase(ph, offset) * amount;
+    }
+    return true;
+}
+
+bool lfo_audio_module::get_dot(float &x, float &y, int &size, cairo_iface *context)
+{
+    if (!is_active)
+        return false;
+    float phs = phase + offset;
+    if (phs >= 1.0)
+        phs = fmod(phs, 1.f);
+    x = phase;
+    y = get_value_from_phase(phase, offset) * amount;
+    return true;
+}
+
+/// Pulsator by Markus Schmidt
 ///
-/// This module is based on Krzysztof's filters. It provides a couple
-/// of different chained filters.
+/// This module provides a couple
+/// of different LFO's for modulating the level of a signal.
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
-equalizer8band_audio_module::equalizer8band_audio_module()
+pulsator_audio_module::pulsator_audio_module()
 {
     is_active = false;
     srate = 0;
-    last_generation = 0;
+//    last_generation = 0;
     clip_inL    = 0.f;
     clip_inR    = 0.f;
     clip_outL   = 0.f;
@@ -2335,92 +2215,44 @@ equalizer8band_audio_module::equalizer8band_audio_module()
     meter_outR = 0.f;
 }
 
-void equalizer8band_audio_module::activate()
+void pulsator_audio_module::activate()
 {
     is_active = true;
-    // set all filters
+    lfoL.activate();
+    lfoR.activate();
     params_changed();
 }
-void equalizer8band_audio_module::deactivate()
+void pulsator_audio_module::deactivate()
 {
     is_active = false;
+    lfoL.deactivate();
+    lfoR.deactivate();
 }
 
-void equalizer8band_audio_module::params_changed()
+void pulsator_audio_module::params_changed()
 {
-    // set the params of all filters
-    if(*params[param_hp_freq] != hp_freq_old) {
-        hpL[0].set_hp_rbj(*params[param_hp_freq], 0.707, (float)srate, 1.0);
-        hpL[1].copy_coeffs(hpL[0]);
-        hpL[2].copy_coeffs(hpL[0]);
-        hpR[0].copy_coeffs(hpL[0]);
-        hpR[1].copy_coeffs(hpL[0]);
-        hpR[2].copy_coeffs(hpL[0]);
-        hp_freq_old = *params[param_hp_freq];
-    }
-    if(*params[param_lp_freq] != lp_freq_old) {
-        lpL[0].set_lp_rbj(*params[param_lp_freq], 0.707, (float)srate, 1.0);
-        lpL[1].copy_coeffs(lpL[0]);
-        lpL[2].copy_coeffs(lpL[0]);
-        lpR[0].copy_coeffs(lpL[0]);
-        lpR[1].copy_coeffs(lpL[0]);
-        lpR[2].copy_coeffs(lpL[0]);
-        lp_freq_old = *params[param_lp_freq];
-    }
-    if(*params[param_ls_freq] != ls_freq_old or *params[param_ls_level] != ls_level_old) {
-        lsL.set_lowshelf_rbj(*params[param_ls_freq], 0.707, *params[param_ls_level], (float)srate);
-        lsR.copy_coeffs(lsL);
-        ls_level_old = *params[param_ls_level];
-        ls_freq_old = *params[param_ls_freq];
-    }
-    if(*params[param_hs_freq] != hs_freq_old or *params[param_hs_level] != hs_level_old) {
-        hsL.set_highshelf_rbj(*params[param_hs_freq], 0.707, *params[param_hs_level], (float)srate);
-        hsR.copy_coeffs(hsL);
-        hs_level_old = *params[param_hs_level];
-        hs_freq_old = *params[param_hs_freq];
-    }
-    if(*params[param_p1_freq] != p_freq_old[0] or *params[param_p1_level] != p_level_old[0] or *params[param_p1_q] != p_q_old[0]) {
-        pL[0].set_peakeq_rbj((float)*params[param_p1_freq], *params[param_p1_q], *params[param_p1_level], (float)srate);
-        pR[0].copy_coeffs(pL[0]);
-        p_freq_old[0] = *params[param_p1_freq];
-        p_level_old[0] = *params[param_p1_level];
-        p_q_old[0] = *params[param_p1_q];
-    }
-    if(*params[param_p2_freq] != p_freq_old[1] or *params[param_p2_level] != p_level_old[1] or *params[param_p2_q] != p_q_old[1]) {
-        pL[1].set_peakeq_rbj((float)*params[param_p2_freq], *params[param_p2_q], *params[param_p2_level], (float)srate);
-        pR[1].copy_coeffs(pL[1]);
-        p_freq_old[1] = *params[param_p2_freq];
-        p_level_old[1] = *params[param_p2_level];
-        p_q_old[1] = *params[param_p2_q];
-    }
-    if(*params[param_p3_freq] != p_freq_old[2] or *params[param_p3_level] != p_level_old[2] or *params[param_p3_q] != p_q_old[2]) {
-        pL[2].set_peakeq_rbj((float)*params[param_p3_freq], *params[param_p3_q], *params[param_p3_level], (float)srate);
-        pR[2].copy_coeffs(pL[2]);
-        p_freq_old[2] = *params[param_p3_freq];
-        p_level_old[2] = *params[param_p3_level];
-        p_q_old[2] = *params[param_p3_q];
-    }
-    if(*params[param_p4_freq] != p_freq_old[3] or *params[param_p4_level] != p_level_old[3] or *params[param_p4_q] != p_q_old[3]) {
-        pL[3].set_peakeq_rbj((float)*params[param_p4_freq], *params[param_p4_q], *params[param_p4_level], (float)srate);
-        pR[3].copy_coeffs(pL[3]);
-        p_freq_old[3] = *params[param_p4_freq];
-        p_level_old[3] = *params[param_p4_level];
-        p_q_old[3] = *params[param_p4_q];
+    lfoL.set_params(*params[param_freq], *params[param_mode], 0.f, srate, *params[param_amount]);
+    lfoR.set_params(*params[param_freq], *params[param_mode], *params[param_offset], srate, *params[param_amount]);
+    clear_reset = false;
+    if (*params[param_reset] >= 0.5) {
+        clear_reset = true;
+        lfoL.set_phase(0.f);
+        lfoR.set_phase(0.f);
     }
 }
 
-void equalizer8band_audio_module::set_sample_rate(uint32_t sr)
+void pulsator_audio_module::set_sample_rate(uint32_t sr)
 {
     srate = sr;
 }
 
-uint32_t equalizer8band_audio_module::process(uint32_t offset, uint32_t numsamples, uint32_t inputs_mask, uint32_t outputs_mask)
+uint32_t pulsator_audio_module::process(uint32_t offset, uint32_t numsamples, uint32_t inputs_mask, uint32_t outputs_mask)
 {
     bool bypass = *params[param_bypass] > 0.5f;
-    numsamples += offset;
+    uint32_t samples = numsamples + offset;
     if(bypass) {
         // everything bypassed
-        while(offset < numsamples) {
+        while(offset < samples) {
             outs[0][offset] = ins[0][offset];
             outs[1][offset] = ins[1][offset];
             ++offset;
@@ -2434,6 +2266,11 @@ uint32_t equalizer8band_audio_module::process(uint32_t offset, uint32_t numsampl
         meter_inR  = 0.f;
         meter_outL = 0.f;
         meter_outR = 0.f;
+        
+        // LFO's should go on
+        lfoL.advance(numsamples);
+        lfoR.advance(numsamples);
+        
     } else {
         
         clip_inL    -= std::min(clip_inL,  numsamples);
@@ -2446,7 +2283,7 @@ uint32_t equalizer8band_audio_module::process(uint32_t offset, uint32_t numsampl
         meter_outR = 0.f;
         
         // process
-        while(offset < numsamples) {
+        while(offset < samples) {
             // cycle through samples
             float outL = 0.f;
             float outR = 0.f;
@@ -2456,69 +2293,21 @@ uint32_t equalizer8band_audio_module::process(uint32_t offset, uint32_t numsampl
             inR *= *params[param_level_in];
             inL *= *params[param_level_in];
             
+            if(*params[param_mono] > 0.5) {
+                inL = (inL + inR) * 0.5;
+                inR = inL;
+            }
             float procL = inL;
             float procR = inR;
             
-            // all filters in chain
-            if(*params[param_hp_active] > 0.f) {
-                switch((int)*params[param_hp_mode]) {
-                    case MODE12DB:
-                        procL = hpL[0].process(procL);
-                        procR = hpR[0].process(procR);
-                        break;
-                    case MODE24DB:
-                        procL = hpL[1].process(hpL[0].process(procL));
-                        procR = hpR[1].process(hpR[0].process(procR));
-                        break;
-                    case MODE36DB:
-                        procL = hpL[2].process(hpL[1].process(hpL[0].process(procL)));
-                        procR = hpR[2].process(hpR[1].process(hpR[0].process(procR)));
-                        break;
-                }
-            }
-            if(*params[param_lp_active] > 0.f) {
-                switch((int)*params[param_lp_mode]) {
-                    case MODE12DB:
-                        procL = lpL[0].process(procL);
-                        procR = lpR[0].process(procR);
-                        break;
-                    case MODE24DB:
-                        procL = lpL[1].process(lpL[0].process(procL));
-                        procR = lpR[1].process(lpR[0].process(procR));
-                        break;
-                    case MODE36DB:
-                        procL = lpL[2].process(lpL[1].process(lpL[0].process(procL)));
-                        procR = lpR[2].process(lpR[1].process(lpR[0].process(procR)));
-                        break;
-                }
-            }
-            if(*params[param_ls_active] > 0.f) {
-                procL = lsL.process(procL);
-                procR = lsR.process(procR);
-            }
-            if(*params[param_hs_active] > 0.f) {
-                procL = hsL.process(procL);
-                procR = hsR.process(procR);
-            }
-            if(*params[param_p1_active] > 0.f) {
-                procL = pL[0].process(procL);
-                procR = pR[0].process(procR);
-            }
-            if(*params[param_p2_active] > 0.f) {
-                procL = pL[1].process(procL);
-                procR = pR[1].process(procR);
-            }
-            if(*params[param_p3_active] > 0.f) {
-                procL = pL[2].process(procL);
-                procR = pR[2].process(procR);
-            }
-            if(*params[param_p4_active] > 0.f) {
-                procL = pL[3].process(procL);
-                procR = pR[3].process(procR);
-            }
+            procL *= (lfoL.get_value() * 0.5 + *params[param_amount] / 2);
+            procR *= (lfoR.get_value() * 0.5 + *params[param_amount] / 2);
             
-            outL = procL * *params[param_level_out];
-            outR = procR * *params[param_level_out];
+            outL = procL + inL * (1 - *params[param_amount]);
+            outR = procR + inR * (1 - *params[param_amount]);
+            
+            outL *=  *params[param_level_out];
+            outR *=  *params[param_level_out];
             
             // send to output
             outs[0][offset] = outL;
@@ -2553,20 +2342,11 @@ uint32_t equalizer8band_audio_module::process(uint32_t offset, uint32_t numsampl
             
             // next sample
             ++offset;
+            
+            // advance lfo's
+            lfoL.advance(1);
+            lfoR.advance(1);
         } // cycle trough samples
-        // clean up
-        for(int i = 0; i < 3; ++i) {
-            hpL[i].sanitize();
-            hpR[i].sanitize();
-            lpL[i].sanitize();
-            lpR[i].sanitize();
-        }
-        lsL.sanitize();
-        hsR.sanitize();
-        for(int i = 0; i < 4; ++i) {
-            pL[i].sanitize();
-            pR[i].sanitize();
-        }
     }
     // draw meters
     if(params[param_clip_inL] != NULL) {
@@ -2597,355 +2377,46 @@ uint32_t equalizer8band_audio_module::process(uint32_t offset, uint32_t numsampl
     // whatever has to be returned x)
     return outputs_mask;
 }
-bool equalizer8band_audio_module::get_graph(int index, int subindex, float *data, int points, cairo_iface *context)
+bool pulsator_audio_module::get_graph(int index, int subindex, float *data, int points, cairo_iface *context)
 {
-    if (!is_active)
+    if (!is_active) {
         return false;
-    if (index == param_p1_freq && !subindex) {
-        context->set_line_width(1.5);
-        return ::get_graph(*this, subindex, data, points);
+    } else if(index == param_freq) {
+        if(subindex == 0) {
+            context->set_source_rgba(0.35, 0.4, 0.2, 1);
+            return lfoL.get_graph(data, points, context);
+        }
+        if(subindex == 1) {
+            context->set_source_rgba(0.35, 0.4, 0.2, 0.5);
+            return lfoR.get_graph(data, points, context);
+        }
     }
     return false;
 }
-
-bool equalizer8band_audio_module::get_gridline(int index, int subindex, float &pos, bool &vertical, std::string &legend, cairo_iface *context)
+bool pulsator_audio_module::get_dot(int index, int subindex, float &x, float &y, int &size, cairo_iface *context)
 {
     if (!is_active) {
         return false;
-    } else {
-        return get_freq_gridline(subindex, pos, vertical, legend, context);
-    }
-}
-
-int equalizer8band_audio_module::get_changed_offsets(int index, int generation, int &subindex_graph, int &subindex_dot, int &subindex_gridline)
-{
-    if (!is_active) {
+    } else if(index == param_freq) {
+        if(subindex == 0) {
+            context->set_source_rgba(0.35, 0.4, 0.2, 1);
+            return lfoL.get_dot(x, y, size, context);
+        }
+        if(subindex == 1) {
+            context->set_source_rgba(0.35, 0.4, 0.2, 0.5);
+            return lfoR.get_dot(x, y, size, context);
+        }
         return false;
-    } else {
-        if (*params[param_hp_freq] != hp_freq_old1
-            or *params[param_hp_mode] != hp_mode_old1
-            or *params[param_lp_freq] != lp_freq_old1
-            or *params[param_lp_mode] != lp_mode_old1
-            
-            or *params[param_ls_freq] != ls_freq_old1
-            or *params[param_ls_level] != ls_level_old1
-            or *params[param_hs_freq] != hs_freq_old1
-            or *params[param_hs_level] != hs_level_old1
-            
-            or *params[param_p1_freq] != p_freq_old1[0]
-            or *params[param_p1_level] != p_level_old1[0]
-            or *params[param_p1_q] != p_q_old1[0]
-            
-            or *params[param_p2_freq] != p_freq_old1[1]
-            or *params[param_p2_level] != p_level_old1[1]
-            or *params[param_p2_q] != p_q_old1[1]
-                        
-            or *params[param_p3_freq] != p_freq_old1[2]
-            or *params[param_p3_level] != p_level_old1[2]
-            or *params[param_p3_q] != p_q_old1[2]
-            
-            or *params[param_p4_freq] != p_freq_old1[3]
-            or *params[param_p4_level] != p_level_old1[3]
-            or *params[param_p4_q] != p_q_old1[3])
-        {
-            
-            hp_freq_old1 = *params[param_hp_freq];
-            hp_mode_old1 = *params[param_hp_mode];
-            lp_freq_old1 = *params[param_lp_freq];
-            lp_mode_old1 = *params[param_lp_mode];
-            
-            ls_freq_old1 = *params[param_ls_freq];
-            ls_level_old1 = *params[param_ls_level];
-            hs_freq_old1 = *params[param_hs_freq];
-            hs_level_old1 = *params[param_hs_level];
-            
-            p_freq_old1[0] = *params[param_p1_freq];
-            p_level_old1[0] = *params[param_p1_level];
-            p_q_old1[0] = *params[param_p1_q];
-            
-            p_freq_old1[1] = *params[param_p2_freq];
-            p_level_old1[1] = *params[param_p2_level];
-            p_q_old1[1] = *params[param_p2_q];
-            
-            p_freq_old1[2] = *params[param_p3_freq];
-            p_level_old1[2] = *params[param_p3_level];
-            p_q_old1[2] = *params[param_p3_q];
-            
-            p_freq_old1[3] = *params[param_p4_freq];
-            p_level_old1[3] = *params[param_p4_level];
-            p_q_old1[3] = *params[param_p4_q];
-            
-            last_generation++;
-            subindex_graph = 0;
-            subindex_dot = INT_MAX;
-            subindex_gridline = INT_MAX;
-        }
-        else {
-            subindex_graph = 0;
-            subindex_dot = subindex_gridline = generation ? INT_MAX : 0;
-        }
-        if (generation == last_calculated_generation)
-            subindex_graph = INT_MAX;
-        return last_generation;
     }
     return false;
 }
-
-/// Equalizer 5 Band by Markus Schmidt
-///
-/// This module is based on Krzysztof's filters. It provides a couple
-/// of different chained filters.
-///////////////////////////////////////////////////////////////////////////////////////////////
-
-equalizer5band_audio_module::equalizer5band_audio_module()
+bool pulsator_audio_module::get_gridline(int index, int subindex, float &pos, bool &vertical, std::string &legend, cairo_iface *context)
 {
-    is_active = false;
-    srate = 0;
-    last_generation = 0;
-    clip_in    = 0.f;
-    clip_out   = 0.f;
-    meter_in  = 0.f;
-    meter_out = 0.f;
-}
-
-void equalizer5band_audio_module::activate()
-{
-    is_active = true;
-    // set all filters
-    params_changed();
-}
-void equalizer5band_audio_module::deactivate()
-{
-    is_active = false;
-}
-
-void equalizer5band_audio_module::params_changed()
-{
-    // set the params of all filters
-    if(*params[param_ls_freq] != ls_freq_old or *params[param_ls_level] != ls_level_old) {
-        lsL.set_lowshelf_rbj(*params[param_ls_freq], 0.707, *params[param_ls_level], (float)srate);
-        lsR.copy_coeffs(lsL);
-        ls_level_old = *params[param_ls_level];
-        ls_freq_old = *params[param_ls_freq];
-    }
-    if(*params[param_hs_freq] != hs_freq_old or *params[param_hs_level] != hs_level_old) {
-        hsL.set_highshelf_rbj(*params[param_hs_freq], 0.707, *params[param_hs_level], (float)srate);
-        hsR.copy_coeffs(hsL);
-        hs_level_old = *params[param_hs_level];
-        hs_freq_old = *params[param_hs_freq];
-    }
-    if(*params[param_p1_freq] != p_freq_old[0] or *params[param_p1_level] != p_level_old[0] or *params[param_p1_q] != p_q_old[0]) {
-        pL[0].set_peakeq_rbj((float)*params[param_p1_freq], *params[param_p1_q], *params[param_p1_level], (float)srate);
-        pR[0].copy_coeffs(pL[0]);
-        p_freq_old[0] = *params[param_p1_freq];
-        p_level_old[0] = *params[param_p1_level];
-        p_q_old[0] = *params[param_p1_q];
-    }
-    if(*params[param_p2_freq] != p_freq_old[1] or *params[param_p2_level] != p_level_old[1] or *params[param_p2_q] != p_q_old[1]) {
-        pL[1].set_peakeq_rbj((float)*params[param_p2_freq], *params[param_p2_q], *params[param_p2_level], (float)srate);
-        pR[1].copy_coeffs(pL[1]);
-        p_freq_old[1] = *params[param_p2_freq];
-        p_level_old[1] = *params[param_p2_level];
-        p_q_old[1] = *params[param_p2_q];
-    }
-    if(*params[param_p3_freq] != p_freq_old[2] or *params[param_p3_level] != p_level_old[2] or *params[param_p3_q] != p_q_old[2]) {
-        pL[2].set_peakeq_rbj((float)*params[param_p3_freq], *params[param_p3_q], *params[param_p3_level], (float)srate);
-        pR[2].copy_coeffs(pL[2]);
-        p_freq_old[2] = *params[param_p3_freq];
-        p_level_old[2] = *params[param_p3_level];
-        p_q_old[2] = *params[param_p3_q];
-    }
-}
-
-void equalizer5band_audio_module::set_sample_rate(uint32_t sr)
-{
-    srate = sr;
-}
-
-uint32_t equalizer5band_audio_module::process(uint32_t offset, uint32_t numsamples, uint32_t inputs_mask, uint32_t outputs_mask)
-{
-    bool bypass = *params[param_bypass] > 0.5f;
-    numsamples += offset;
-    if(bypass) {
-        // everything bypassed
-        while(offset < numsamples) {
-            outs[0][offset] = ins[0][offset];
-            outs[1][offset] = ins[1][offset];
-            ++offset;
-        }
-        // displays, too
-        clip_in    = 0.f;
-        clip_out   = 0.f;
-        meter_in  = 0.f;
-        meter_out = 0.f;
-    } else {
-        
-        clip_in    -= std::min(clip_in,  numsamples);
-        clip_out   -= std::min(clip_out, numsamples);
-        meter_in = 0.f;
-        meter_out = 0.f;
-        
-        // process
-        while(offset < numsamples) {
-            // cycle through samples
-            float outL = 0.f;
-            float outR = 0.f;
-            float inL = ins[0][offset];
-            float inR = ins[1][offset];
-            // in level
-            inR *= *params[param_level_in];
-            inL *= *params[param_level_in];
-            
-            float procL = inL;
-            float procR = inR;
-            
-            // all filters in chain
-            if(*params[param_ls_active] > 0.f) {
-                procL = lsL.process(procL);
-                procR = lsR.process(procR);
-            }
-            if(*params[param_hs_active] > 0.f) {
-                procL = hsL.process(procL);
-                procR = hsR.process(procR);
-            }
-            if(*params[param_p1_active] > 0.f) {
-                procL = pL[0].process(procL);
-                procR = pR[0].process(procR);
-            }
-            if(*params[param_p2_active] > 0.f) {
-                procL = pL[1].process(procL);
-                procR = pR[1].process(procR);
-            }
-            if(*params[param_p3_active] > 0.f) {
-                procL = pL[2].process(procL);
-                procR = pR[2].process(procR);
-            }
-            
-            outL = procL * *params[param_level_out];
-            outR = procR * *params[param_level_out];
-            
-            // send to output
-            outs[0][offset] = outL;
-            outs[1][offset] = outR;
-            
-            // clip LED's
-            float maxIn = std::max(fabs(inL), fabs(inR));
-            float maxOut = std::max(fabs(outL), fabs(outR));
-            
-            if(maxIn > 1.f) {
-                clip_in  = srate >> 3;
-            }
-            if(maxOut > 1.f) {
-                clip_out = srate >> 3;
-            }
-            // set up in / out meters
-            if(maxIn > meter_in) {
-                meter_in = maxIn;
-            }
-            if(maxOut > meter_out) {
-                meter_out = maxOut;
-            }
-            
-            // next sample
-            ++offset;
-        } // cycle trough samples
-        // clean up
-        lsL.sanitize();
-        hsR.sanitize();
-        for(int i = 0; i < 3; ++i) {
-            pL[i].sanitize();
-            pR[i].sanitize();
-        }
-    }
-    // draw meters
-    if(params[param_clip_in] != NULL) {
-        *params[param_clip_in] = clip_in;
-    }
-    if(params[param_clip_out] != NULL) {
-        *params[param_clip_out] = clip_out;
-    }
-    
-    if(params[param_meter_in] != NULL) {
-        *params[param_meter_in] = meter_in;
-    }
-    if(params[param_meter_out] != NULL) {
-        *params[param_meter_out] = meter_out;
-    }
-    // whatever has to be returned x)
-    return outputs_mask;
-}
-bool equalizer5band_audio_module::get_graph(int index, int subindex, float *data, int points, cairo_iface *context)
-{
-    if (!is_active)
-        return false;
-    if (index == param_p1_freq && !subindex) {
-        context->set_line_width(1.5);
-        return ::get_graph(*this, subindex, data, points);
-    }
-    return false;
-}
-
-bool equalizer5band_audio_module::get_gridline(int index, int subindex, float &pos, bool &vertical, std::string &legend, cairo_iface *context)
-{
-    if (!is_active) {
-        return false;
-    } else {
-        return get_freq_gridline(subindex, pos, vertical, legend, context);
-    }
-}
-
-int equalizer5band_audio_module::get_changed_offsets(int index, int generation, int &subindex_graph, int &subindex_dot, int &subindex_gridline)
-{
-    if (!is_active) {
-        return false;
-    } else {
-        if (*params[param_ls_freq] != ls_freq_old1
-            or *params[param_ls_level] != ls_level_old1
-            or *params[param_hs_freq] != hs_freq_old1
-            or *params[param_hs_level] != hs_level_old1
-            
-            or *params[param_p1_freq] != p_freq_old1[0]
-            or *params[param_p1_level] != p_level_old1[0]
-            or *params[param_p1_q] != p_q_old1[0]
-            
-            or *params[param_p2_freq] != p_freq_old1[1]
-            or *params[param_p2_level] != p_level_old1[1]
-            or *params[param_p2_q] != p_q_old1[1]
-                        
-            or *params[param_p3_freq] != p_freq_old1[2]
-            or *params[param_p3_level] != p_level_old1[2]
-            or *params[param_p3_q] != p_q_old1[2])
-        {
-            
-            ls_freq_old1 = *params[param_ls_freq];
-            ls_level_old1 = *params[param_ls_level];
-            hs_freq_old1 = *params[param_hs_freq];
-            hs_level_old1 = *params[param_hs_level];
-            
-            p_freq_old1[0] = *params[param_p1_freq];
-            p_level_old1[0] = *params[param_p1_level];
-            p_q_old1[0] = *params[param_p1_q];
-            
-            p_freq_old1[1] = *params[param_p2_freq];
-            p_level_old1[1] = *params[param_p2_level];
-            p_q_old1[1] = *params[param_p2_q];
-            
-            p_freq_old1[2] = *params[param_p3_freq];
-            p_level_old1[2] = *params[param_p3_level];
-            p_q_old1[2] = *params[param_p3_q];
-            
-            last_generation++;
-            subindex_graph = 0;
-            subindex_dot = INT_MAX;
-            subindex_gridline = INT_MAX;
-        }
-        else {
-            subindex_graph = 0;
-            subindex_dot = subindex_gridline = generation ? INT_MAX : 0;
-        }
-        if (generation == last_calculated_generation)
-            subindex_graph = INT_MAX;
-        return last_generation;
+   if (index == param_freq && !subindex)
+    {
+        pos = 0;
+        vertical = false;
+        return true;
     }
     return false;
 }

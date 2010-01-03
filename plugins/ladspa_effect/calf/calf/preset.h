@@ -89,6 +89,26 @@ typedef std::vector<plugin_preset> preset_vector;
 /// A single list of presets (usually there are two - @see get_builtin_presets(), get_user_presets() )
 struct preset_list
 {
+    /// Plugin list item
+    struct plugin_snapshot
+    {
+        /// Preset offset
+        int preset_offset;
+        /// Plugin type
+        std::string type;
+        /// Instance name
+        std::string instance_name;
+        /// Index of the first input port
+        int input_index;
+        /// Index of the first output port
+        int output_index;
+        /// Index of the first MIDI port
+        int midi_index;
+        
+        /// Reset to initial values
+        void reset();
+    };
+    
     /// Parser states
     enum parser_state
     {
@@ -97,24 +117,33 @@ struct preset_list
         PRESET, ///< Inside preset definition
         VALUE, ///< Inside (empty) param tag
         VAR, ///< Inside (non-empty) var tag
+        PLUGIN, ///< Inside plugin element (calfjackhost snapshots only)
+        RACK, ///< Inside rack element (calfjackhost snapshots only)
     } state;
 
     /// Contained presets (usually for all plugins)
     preset_vector presets;
     /// Temporary preset used during parsing process
     plugin_preset parser_preset;
+    /// Temporary plugin desc used during parsing process
+    plugin_snapshot parser_plugin;
     /// Preset number counters for DSSI (currently broken)
     std::map<std::string, int> last_preset_ids;
     /// The key used in current <var name="key"> tag (for state == VAR)
     std::string current_key;
+    /// The file is loaded in rack mode (and rack/plugin elements are expected)
+    bool rack_mode;
+    /// List of plugin states for rack mode
+    std::vector<plugin_snapshot> plugins;
 
     /// Return the name of the built-in or user-defined preset file
     static std::string get_preset_filename(bool builtin);
     /// Load default preset list (built-in or user-defined)
     bool load_defaults(bool builtin);
-    void parse(const std::string &data);
+    /// Load preset list from an in-memory XML string
+    void parse(const std::string &data, bool in_rack_mode);
     /// Load preset list from XML file
-    void load(const char *filename);
+    void load(const char *filename, bool in_rack_mode);
     /// Save preset list as XML file
     void save(const char *filename);
     /// Append or replace a preset (replaces a preset with the same plugin and preset name)

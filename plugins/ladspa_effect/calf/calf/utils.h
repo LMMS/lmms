@@ -147,6 +147,9 @@ extern std::string f2s(double value);
 /// float-to-string-that-doesn't-resemble-an-int
 extern std::string ff2s(double value);
 
+/// Encode a key-value pair as XML attribute
+std::string to_xml_attr(const std::string &key, const std::string &value);
+
 /// Escape a string to be used in XML file
 std::string xml_escape(const std::string &src);
 
