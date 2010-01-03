@@ -41,64 +41,137 @@ class notePlayHandle;
 class track;
 
 
+/*! \brief Provides a standard interface for all instrument plugins.
+ *
+ * All instrument plugins have to derive from this class and implement the
+ * according virtual methods (see below). An instrument is instantiated by an
+ * InstrumentTrack.
+ *
+ * Instrument plugins can operate in two modes: process audio per note or
+ * process audio per Mixer period (one continuous audio stream).
+ * For the latter one, the instrument has to create an InstrumentPlayHandle
+ * for itself and re-implement #play( sampleFrame * ). When processing audio
+ * per note, overload the #playNote( notePlayHandle *, sampleFrame * ) and
+ * #deleteNotePluginData( notePlayHandle * ).
+ */
 class EXPORT Instrument : public Plugin
 {
 public:
-	Instrument( InstrumentTrack * _instrument_track,
-					const Descriptor * _descriptor );
+	/*! \brief Constructs an Instrument object.
+	 *
+	 * The constructor for Instrument objects.
+	 * \param instrumentTrack The InstrumentTrack this Instrument belongs to.
+	 * \param descriptor A Plugin::Descriptor holding information about the
+	 * instrument plugin.
+	 */
+	Instrument( InstrumentTrack * instrumentTrack,
+					const Descriptor * descriptor );
 	virtual ~Instrument();
 
-	// --------------------------------------------------------------------
-	// functions that can/should be re-implemented:
-	// --------------------------------------------------------------------
+	/*! \brief Generates audio data for the next mixer period.
+	 *
+	 * If the instrument only generates one continuous audio stream (i.e. is
+	 * not capable of generating individual audio streams for each active
+	 * note), it has to overload this method, generate the audio data (should
+	 * use working buffer to improve cache hit rate and eliminate memory
+	 * de-/allocations) and finally call InstrumentTrack::processAudioBuffer()
+	 * and pass NULL for the last parameter.
+	 *
+	 * \param workingBuf A buffer the instrument should operate on (data in it
+	 * is not used after this function returns).
+	 */
+	virtual void play( sampleFrame * workingBuffer );
 
-	// if the plugin doesn't play each note, it can create an instrument-
-	// play-handle and re-implement this method, so that it mixes its
-	// output buffer only once per mixer-period
-	virtual void play( sampleFrame * _working_buffer );
-
-	// to be implemented by actual plugin
-	virtual void playNote( notePlayHandle * /* _note_to_play */,
-					sampleFrame * /* _working_buf */ )
+	/*! \brief Generates audio data for the given NotePlayHandle.
+	 *
+	 * When generating audio data per-note (recommended), the instrument has
+	 * to do this in an overloaded version of this method. It can allocate
+	 * note-specific data objects (sound generators, generator settings etc.)
+	 * in the given NotePlayHandle if NotePlayHandle::totalFramesPlayed()==0.
+	 * Store this data in NotePlayHandle::m_pluginData. See the
+	 * deleteNotePluginData() method below for information how to free the
+	 * allocated data.
+	 * Like play(), call Instrument::processAudioBuffer() after sound data
+	 * has been generated and pass the NotePlayHandle as last parameter.
+	 *
+	 * \param noteToPlay A NotePlayHandle handle for the note to play
+	 * \param workingBuf A buffer the instrument should operate on (data in it
+	 * is not used after this function returns).
+	 */
+	virtual void playNote( notePlayHandle * noteToPlay,
+					sampleFrame * workingBuf )
 	{
+		Q_UNUSED(noteToPlay)
+		Q_UNUSED(workingBuf)
 	}
-		
-	// needed for deleting plugin-specific-data of a note - plugin has to
-	// cast void-ptr so that the plugin-data is deleted properly
-	// (call of dtor if it's a class etc.)
-	virtual void deleteNotePluginData( notePlayHandle * _note_to_play );
 
-	// Get number of sample-frames that should be used when playing beat
-	// (note with unspecified length)
-	// Per default this function returns 0. In this case, channel is using
-	// the length of the longest envelope (if one active).
-	virtual f_cnt_t beatLen( notePlayHandle * _n ) const;
+	/*! \brief Deletes data allocated for playing a certain note.
+	 *
+	 * In Instrument::playNote() an instrument usually allocates data for each
+	 * note to store current state and or generator objects. After a note has
+	 * finished playing, this method is called to free the data that was
+	 * allocated for playing this note. Plugin has to cast
+	 * NotePlayHandle::m_pluginData to according type and delete it.
+	 */
+	virtual void deleteNotePluginData( notePlayHandle * noteToPlay );
+
+	/*! \brief Returns number of frames for notes with unspecified length.
+	 *
+	 * When playing a note with unspecified length (e.g. a step in the
+	 * BB-Editor), the sequencer core somehow has to determine for how long
+	 * to play this note. Plugins can overload this method in order to specify
+	 * the length of such notes (in frames). A sampler for example would return
+	 * the length of the loaded sample at the according pitch.
+	 * Per default this method returns 0 which means the InstrumentTrack will
+	 * look for the longest active envelope and use that value. Otherwise the
+	 * note will not be played.
+	 *
+	 * \param notePlayHandle A NotePlayHandle describing the concerned note.
+	 */
+	virtual f_cnt_t beatLen( notePlayHandle * n ) const;
 
 
-	// some instruments need a certain number of release-frames even
-	// if no envelope is active - such instruments can re-implement this
-	// method for returning how many frames they at least like to have for
-	// release
+	/*! \brief Returns number of desired release frames for this instrument.
+	 *
+	 * Some instruments need a certain number of release frames even
+	 * if no envelope is active - such instruments can re-implement this
+	 * method for returning how many frames they at least like to have for
+	 * release.
+	 */
 	virtual f_cnt_t desiredReleaseFrames() const
 	{
 		return 0;
 	}
 
-	// return false if instrument is not bendable
+	/*! \brief Returns whether instrument is bendable.
+	 *
+	 * This is particularly important for instruments that do not supporting
+	 * pitch bending. If the overloaded function returns false, the pitch bend
+	 * knob will be hidden in InstrumentTrackWindow.
+	 */
 	inline virtual bool isBendable() const
 	{
 		return true;
 	}
 
-	// return true if instruments reacts to MIDI events passed to
-	// handleMidiEvent() rather than playNote() & Co
+	/*! \brief Returns true if instrument if instrument is MIDI based.
+	 *
+	 * Instruments should return true here if they react to MIDI events passed
+	 * to handleMidiEvent() rather than playNote() & Co.
+	 */
 	inline virtual bool isMidiBased() const
 	{
 		return false;
 	}
 
-	// sub-classes can re-implement this for receiving all incoming
-	// MIDI-events
+	/*! \brief Allows to handle given MidiEvent.
+	 *
+	 * Subclasses can re-implement this for receiving all incoming MIDI events.
+	 *
+	 * \param midiEvent The MIDI event just received
+	 * \param midiTime An optional offset for the MIDI event within current
+	 * mixer period (e.g. NoteOn at frame X).
+	 */
 	inline virtual bool handleMidiEvent( const midiEvent &, const midiTime & )
 	{
 		return false;
@@ -106,17 +179,25 @@ public:
 
 	virtual QString fullDisplayName() const;
 
-	// --------------------------------------------------------------------
-	// provided functions:
-	// --------------------------------------------------------------------
+	/*! \brief Instantiates instrument plugin with given name.
+	 *
+	 * Tries to instantiate instrument plugin with given name from available
+	 * plugin files.
+	 *
+	 * \param pluginName The internal identifier for the plugin
+	 * \param instrumentTrack The InstrumentTrack the new instrument should
+	 * belong to.
+	 *
+	 * \return Pointer to instantiated instrument plugin or NULL on failure.
+	 */
+	static Instrument * instantiate( const QString & pluginName,
+									InstrumentTrack * instrumentTrack );
 
-	// instantiate instrument-plugin with given name or return NULL
-	// on failure
-	static Instrument * instantiate( const QString & _plugin_name,
-									InstrumentTrack * _instrument_track );
-
+	/*! \brief Returns whether this instance belongs to given track. */
 	virtual bool isFromTrack( const track * _track ) const;
 
+	/*! \brief Returns whether the InstrumentTrack this instrument is attached
+	 * to is muted. */
 	bool isMuted() const;
 
 
@@ -126,10 +207,14 @@ protected:
 		return m_instrumentTrack;
 	}
 
-	// instruments may use this to apply a soft fade out at the end of
-	// notes - method does this only if really less or equal
-	// desiredReleaseFrames() frames are left
-	void applyRelease( sampleFrame * buf, const notePlayHandle * _n );
+	/*! \brief Internal helper method to apply a release on given buffer.
+	 *
+	 * Instrument plugins may use this to apply a soft fade-out at the end of
+	 * a note. Please note that this is only done if the number of frames
+	 * returned by NotePlayHandle::framesLeft() is equal or below the number
+	 * of frames returned by Instrument::desiredReleaseFrames().
+	 */
+	void applyRelease( sampleFrame * buf, const notePlayHandle * n );
 
 
 private:
