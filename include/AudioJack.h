@@ -109,6 +109,7 @@ private:
 	f_cnt_t m_framesToDoInCurBuf;
 
 
+#ifdef AUDIO_PORT_SUPPORT
 	struct StereoPort
 	{
 		jack_port_t * ports[2];
@@ -116,6 +117,7 @@ private:
 
 	typedef QMap<AudioPort *, StereoPort> JackPortMap;
 	JackPortMap m_portMap;
+#endif
 #endif
 
 signals:

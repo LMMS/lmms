@@ -75,10 +75,12 @@ AudioJack::~AudioJack()
 {
 	m_stopSemaphore.release();
 
+#ifdef AUDIO_PORT_SUPPORT
 	while( m_portMap.size() )
 	{
 		unregisterPort( m_portMap.begin().key() );
 	}
+#endif
 
 	if( m_client != NULL )
 	{
@@ -342,7 +344,7 @@ int AudioJack::processCallback( jack_nframes_t _nframes, void * _udata )
 #ifdef AUDIO_PORT_SUPPORT
 	const Uint32 frames = qMin<Uint32>( _nframes,
 						mixer()->framesPerPeriod() );
-	for( jackPortMap::iterator it = m_portMap.begin();
+	for( JackPortMap::Iterator it = m_portMap.begin();
 						it != m_portMap.end(); ++it )
 	{
 		for( ch_cnt_t ch = 0; ch < channels(); ++ch )
