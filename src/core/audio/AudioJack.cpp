@@ -74,10 +74,12 @@ AudioJack::~AudioJack()
 {
 	m_stopSemaphore.release();
 
+#ifdef AUDIO_PORT_SUPPORT
 	while( m_portMap.size() )
 	{
 		unregisterPort( m_portMap.begin().key() );
 	}
+#endif
 
 	if( m_client != NULL )
 	{
