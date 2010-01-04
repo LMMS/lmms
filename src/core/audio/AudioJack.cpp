@@ -53,6 +53,7 @@ AudioJack::AudioJack( bool & _success_ful, AudioOutputContext * context ) :
 	m_client( NULL ),
 	m_active( false ),
 	m_stopSemaphore( 1 ),
+	m_tempOutBufs( new jack_default_audio_sample_t *[channels()] ),
 	m_outBuf( CPU::allocFrames( mixer()->framesPerPeriod() ) ),
 	m_framesDoneInCurBuf( 0 ),
 	m_framesToDoInCurBuf( 0 )
@@ -66,6 +67,7 @@ AudioJack::AudioJack( bool & _success_ful, AudioOutputContext * context ) :
 				this, SLOT( restartAfterZombified() ),
 				Qt::QueuedConnection );
 	}
+
 }
 
 
@@ -90,6 +92,8 @@ AudioJack::~AudioJack()
 		}
 		jack_client_close( m_client );
 	}
+
+	delete[] m_tempOutBufs;
 
 	CPU::freeFrames( m_outBuf );
 
@@ -332,13 +336,11 @@ void AudioJack::renamePort( AudioPort * _port )
 
 int AudioJack::processCallback( jack_nframes_t _nframes, void * _udata )
 {
-	QVector<jack_default_audio_sample_t *> outbufs( channels(), NULL );
-	ch_cnt_t chnl = 0;
-	for( QVector<jack_default_audio_sample_t *>::iterator it =
-			outbufs.begin(); it != outbufs.end(); ++it, ++chnl )
+	for( int c = 0; c < channels(); ++c )
 	{
-		*it = (jack_default_audio_sample_t *) jack_port_get_buffer(
-						m_outputPorts[chnl], _nframes );
+		m_tempOutBufs[c] =
+			(jack_default_audio_sample_t *) jack_port_get_buffer(
+												m_outputPorts[c], _nframes );
 	}
 
 #ifdef AUDIO_PORT_SUPPORT
@@ -373,15 +375,12 @@ int AudioJack::processCallback( jack_nframes_t _nframes, void * _udata )
 						m_framesToDoInCurBuf -
 							m_framesDoneInCurBuf );
 		const float gain = mixer()->masterGain();
-		for( ch_cnt_t chnl = 0; chnl < channels(); ++chnl )
+		for( int c = 0; c < channels(); ++c )
 		{
-			jack_default_audio_sample_t * o = outbufs[chnl];
-			for( jack_nframes_t frame = 0; frame < todo;
-							++frame )
+			jack_default_audio_sample_t * o = m_tempOutBufs[c];
+			for( jack_nframes_t frame = 0; frame < todo; ++frame )
 			{
-				o[done+frame] =
-					m_outBuf[m_framesDoneInCurBuf+
-						frame][chnl] * gain;
+				o[done+frame] = m_outBuf[m_framesDoneInCurBuf+frame][c] * gain;
 			}
 		}
 		done += todo;
@@ -400,9 +399,9 @@ int AudioJack::processCallback( jack_nframes_t _nframes, void * _udata )
 
 	if( m_stopped == true )
 	{
-		for( ch_cnt_t ch = 0; ch < channels(); ++ch )
+		for( int c = 0; c < channels(); ++c )
 		{
-			jack_default_audio_sample_t * b = outbufs[ch] + done;
+			jack_default_audio_sample_t * b = m_tempOutBufs[c] + done;
 			memset( b, 0, sizeof( *b ) * ( _nframes - done ) );
 		}
 	}
