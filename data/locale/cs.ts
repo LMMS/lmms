@@ -1575,7 +1575,7 @@ Přesvědčte se prosím, že máte právo zápisu do tohoto souboru a příslu�
         <translation type="unfinished">CÍL</translation>
     </message>
     <message>
-        <source>These tabs contain envelopes. They&apos;re very important for modifying a sound, in that they are almost always neccessary for substractive synthesis. For example if you have a volume envelope, you can set when the sound should have a specific volume. If you want to create some soft strings then your sound has to fade in and out very softly. This can be done by setting large attack and release times. It&apos;s the same for other envelope targets like panning, cutoff frequency for the used filter and so on. Just monkey around with it! You can really make cool sounds out of a saw-wave with just some envelopes...!</source>
+        <source>These tabs contain envelopes. They&apos;re very important for modifying a sound, in that they are almost always necessary for substractive synthesis. For example if you have a volume envelope, you can set when the sound should have a specific volume. If you want to create some soft strings then your sound has to fade in and out very softly. This can be done by setting large attack and release times. It&apos;s the same for other envelope targets like panning, cutoff frequency for the used filter and so on. Just monkey around with it! You can really make cool sounds out of a saw-wave with just some envelopes...!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3290,7 +3290,7 @@ p, li { white-space: pre-wrap; }
         <translation>Klikněte zde, pokud chcete aktivovat režim mazání. V tomto režimu lze mazat jednotlivé hodnoty. Pro aktivaci můžete využít též klávesové zkratky Shift+E.</translation>
     </message>
     <message>
-        <source>Click here and select-mode will be activated. In this mode you can select values. This is neccessary if you want to cut, copy, paste, delete, or move values. You can also press &apos;Shift+S&apos; on your keyboard to activate this mode.</source>
+        <source>Click here and select-mode will be activated. In this mode you can select values. This is necessary if you want to cut, copy, paste, delete, or move values. You can also press &apos;Shift+S&apos; on your keyboard to activate this mode.</source>
         <translation>Klikněte zde, pokud chcete aktivovat režim výběru. Tento režimu umožňuje hodnoty vybírat a je nezbytný jestliže hodnoty chcete vyjmout, kopírovat, vložit, smazat nebo přesunout. Pro aktivaci můžete využít též klávesové zkratky Shift+S.</translation>
     </message>
     <message>
@@ -6290,7 +6290,7 @@ Jestliže tento plugin funguje v Linuxu v jiném VST softwaru, kontaktujte pros�
         <translation type="unfinished">Struna</translation>
     </message>
     <message>
-        <source>The String selector is used to choose which string the controls are editting.  A Vibed instrument can contain up to nine independently vibrating strings.  The LED in the lower right corner of the waveform editor indicates whether the selected string is active.</source>
+        <source>The String selector is used to choose which string the controls are editing.  A Vibed instrument can contain up to nine independently vibrating strings.  The LED in the lower right corner of the waveform editor indicates whether the selected string is active.</source>
         <translation type="unfinished">Volič strun se užívá k výběru struny, které bude upravována. Nástroj Vibed může obsahovat maximálně devět nezávisle vibrujících strun. LED v pravém dolním rohu editoru tvaru vlny indikuje zda je vybraná struna aktivní.</translation>
     </message>
     <message>

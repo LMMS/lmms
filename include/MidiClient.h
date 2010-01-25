@@ -172,7 +172,7 @@ private:
 						const MidiPort * _port );
 
 	// small helper function returning length of a certain event - this
-	// is neccessary for parsing raw-MIDI-data
+	// is necessary for parsing raw-MIDI-data
 	static Uint8 eventLength( const Uint8 _event );
 
 

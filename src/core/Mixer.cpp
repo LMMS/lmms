@@ -393,7 +393,7 @@ sampleFrameA * Mixer::renderNextBuffer()
 
 
 
-// removes all play-handles. this is neccessary, when the song is stopped ->
+// removes all play-handles. this is necessary, when the song is stopped ->
 // all remaining notes etc. would be played until their end
 void Mixer::clear()
 {

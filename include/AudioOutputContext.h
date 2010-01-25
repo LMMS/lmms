@@ -193,7 +193,7 @@ public:
 	 *
 	 * When working with buffer sizes greater than the default buffer size, one
 	 * big output buffer is still splitted into smaller chunks. This is
-	 * especially neccessary for automation which takes place once a buffer
+	 * especially necessary for automation which takes place once a buffer
 	 * period. Transitions would be anything else but smooth when adjusting a
 	 * control just 20 times per second. BufferFifo handles the queueing of
 	 * rendered buffers. */

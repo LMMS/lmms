@@ -59,7 +59,7 @@ Plugin::Descriptor PLUGIN_EXPORT lv2browser_plugin_descriptor =
 } ;
 
 
-// neccessary for getting instance out of shared lib
+// necessary for getting instance out of shared lib
 Plugin * PLUGIN_EXPORT lmms_plugin_main( Model * _parent, void * _data )
 {
 	return  new lv2Browser;

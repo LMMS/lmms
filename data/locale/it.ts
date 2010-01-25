@@ -1587,7 +1587,7 @@ Assicurarsi di avere i permessi in scrittura per il file e la directory contenen
         <translation type="unfinished">SCOPO</translation>
     </message>
     <message>
-        <source>These tabs contain envelopes. They&apos;re very important for modifying a sound, in that they are almost always neccessary for substractive synthesis. For example if you have a volume envelope, you can set when the sound should have a specific volume. If you want to create some soft strings then your sound has to fade in and out very softly. This can be done by setting large attack and release times. It&apos;s the same for other envelope targets like panning, cutoff frequency for the used filter and so on. Just monkey around with it! You can really make cool sounds out of a saw-wave with just some envelopes...!</source>
+        <source>These tabs contain envelopes. They&apos;re very important for modifying a sound, in that they are almost always necessary for substractive synthesis. For example if you have a volume envelope, you can set when the sound should have a specific volume. If you want to create some soft strings then your sound has to fade in and out very softly. This can be done by setting large attack and release times. It&apos;s the same for other envelope targets like panning, cutoff frequency for the used filter and so on. Just monkey around with it! You can really make cool sounds out of a saw-wave with just some envelopes...!</source>
         <translation type="unfinished">Queste schede contengono envelopes. Sono molto importanti per modificare i suoni, senza contare che sono quasi sempre necessarie per la sintesi sottrattiva. Per esempio se si usa un envelope per il volume, si può impostare quando un suono avrà un certo volume. Si potrebbero voler creare archi dal suono morbido, allora il suono deve iniziare e finire in modo molto morbido; ciò si ottiene impostando tempi di attacco e di rilascio ampi. Lo stesso vale per le altre funzioni degli envelope, come il panning, la frequenza di taglio dei filtri e così via. Bisogna semplicemente giocarci un po&apos;! Si possono ottenere suoni veramente interessanti a partire da un&apos;onda a dente di sega usando soltanto qualche envelope...!</translation>
     </message>
     <message>
@@ -3302,7 +3302,7 @@ p, li { white-space: pre-wrap; }
         <translation>Cliccando qui si attiva la modalità cancellazione. In questa modalità è possibile cancellare singoli valori. Questa modalità si attiva anche premendo la combinazione di tasti &apos;Shift+E&apos;.</translation>
     </message>
     <message>
-        <source>Click here and select-mode will be activated. In this mode you can select values. This is neccessary if you want to cut, copy, paste, delete, or move values. You can also press &apos;Shift+S&apos; on your keyboard to activate this mode.</source>
+        <source>Click here and select-mode will be activated. In this mode you can select values. This is necessary if you want to cut, copy, paste, delete, or move values. You can also press &apos;Shift+S&apos; on your keyboard to activate this mode.</source>
         <translation>Cliccando qui si attiva la modalità selezione. In questa modalità è possibile selezionare i valori. Questo è necessario per tagliare, copiare, incollare o spostare valori. Questa modalità si attiva anche premendo la combinazione di tasti &apos;Shift+S&apos;.</translation>
     </message>
     <message>
@@ -6375,7 +6375,7 @@ Il LED nell&apos;angolo in basso a destra sull&apos;editor della forma d&apos;on
         <translation>Corda</translation>
     </message>
     <message>
-        <source>The String selector is used to choose which string the controls are editting.  A Vibed instrument can contain up to nine independently vibrating strings.  The LED in the lower right corner of the waveform editor indicates whether the selected string is active.</source>
+        <source>The String selector is used to choose which string the controls are editing.  A Vibed instrument can contain up to nine independently vibrating strings.  The LED in the lower right corner of the waveform editor indicates whether the selected string is active.</source>
         <translation>Il selettore della Corda serve per scegliere su quale corda hanno effetto i controlli. Uno strumento Vibed può contenere fino a nove corde che indipendenti. Il LED nell&apos;angolo in basso a destra dell&apos;editor della forma d&apos;onda indica se la corda è attiva.</translation>
     </message>
     <message>

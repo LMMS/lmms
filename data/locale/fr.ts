@@ -1575,7 +1575,7 @@ Assurez-vous d&apos;avoir les droits d&apos;accès en écriture au fichier et au
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>These tabs contain envelopes. They&apos;re very important for modifying a sound, in that they are almost always neccessary for substractive synthesis. For example if you have a volume envelope, you can set when the sound should have a specific volume. If you want to create some soft strings then your sound has to fade in and out very softly. This can be done by setting large attack and release times. It&apos;s the same for other envelope targets like panning, cutoff frequency for the used filter and so on. Just monkey around with it! You can really make cool sounds out of a saw-wave with just some envelopes...!</source>
+        <source>These tabs contain envelopes. They&apos;re very important for modifying a sound, in that they are almost always necessary for substractive synthesis. For example if you have a volume envelope, you can set when the sound should have a specific volume. If you want to create some soft strings then your sound has to fade in and out very softly. This can be done by setting large attack and release times. It&apos;s the same for other envelope targets like panning, cutoff frequency for the used filter and so on. Just monkey around with it! You can really make cool sounds out of a saw-wave with just some envelopes...!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3286,7 +3286,7 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Click here and select-mode will be activated. In this mode you can select values. This is neccessary if you want to cut, copy, paste, delete, or move values. You can also press &apos;Shift+S&apos; on your keyboard to activate this mode.</source>
+        <source>Click here and select-mode will be activated. In this mode you can select values. This is necessary if you want to cut, copy, paste, delete, or move values. You can also press &apos;Shift+S&apos; on your keyboard to activate this mode.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -6324,7 +6324,7 @@ The LED in the lower right corner of the waveform editor determines whether the 
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>The String selector is used to choose which string the controls are editting.  A Vibed instrument can contain up to nine independently vibrating strings.  The LED in the lower right corner of the waveform editor indicates whether the selected string is active.</source>
+        <source>The String selector is used to choose which string the controls are editing.  A Vibed instrument can contain up to nine independently vibrating strings.  The LED in the lower right corner of the waveform editor indicates whether the selected string is active.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

@@ -1,5 +1,5 @@
 /*
- * track.cpp - implementation of classes concerning tracks -> neccessary for
+ * track.cpp - implementation of classes concerning tracks -> necessary for
  *             all track-like objects (beat/bassline, sample-track...)
  *
  * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>

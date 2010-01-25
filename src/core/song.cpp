@@ -339,7 +339,7 @@ void song::processNextBuffer()
 		return;
 	}
 
-	// check for looping-mode and act if neccessary
+	// check for looping-mode and act if necessary
 	timeLine * tl = m_playPos[m_playMode].m_timeLine;
 	bool check_loop = tl != NULL && m_exporting == false &&
 				tl->loopPointsEnabled() &&

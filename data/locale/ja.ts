@@ -1588,7 +1588,7 @@ Please make sure you have write-permission to the file and the directory contain
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>These tabs contain envelopes. They&apos;re very important for modifying a sound, in that they are almost always neccessary for substractive synthesis. For example if you have a volume envelope, you can set when the sound should have a specific volume. If you want to create some soft strings then your sound has to fade in and out very softly. This can be done by setting large attack and release times. It&apos;s the same for other envelope targets like panning, cutoff frequency for the used filter and so on. Just monkey around with it! You can really make cool sounds out of a saw-wave with just some envelopes...!</source>
+        <source>These tabs contain envelopes. They&apos;re very important for modifying a sound, in that they are almost always necessary for substractive synthesis. For example if you have a volume envelope, you can set when the sound should have a specific volume. If you want to create some soft strings then your sound has to fade in and out very softly. This can be done by setting large attack and release times. It&apos;s the same for other envelope targets like panning, cutoff frequency for the used filter and so on. Just monkey around with it! You can really make cool sounds out of a saw-wave with just some envelopes...!</source>
         <translation type="unfinished">これらのタブにはエンペロープが含まれてます。エンベロープは音を変更するの大変重要です。エンベロープはサブストラクティブな合成をするときはほとんどいつも必要です。たとえばボリウムエンベロープの場合、音が決まった音量になる時間をセットできます。ソフトストリングを作りたいならフェードインフェードアウトを非常にソフトにする必要があります。それはアタックタイムとリリースタイムを長くすることで実現できます。パンニング、フィルターのカットオフ周波数といったほかのエンベロープを制御できるものについても事情はいっしょです。これでちょっと遊んでみてください!　のこぎり歯にいくつかのエンベロープを使うだけで実にクールなサウンドを作ることこできます。</translation>
     </message>
     <message>
@@ -3306,7 +3306,7 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished">クリックすると消去モードをONにします。消去モードではひとつの値を消去できます。 &apos;Shift+E&apos; をおしても消去モードをONにできます。</translation>
     </message>
     <message>
-        <source>Click here and select-mode will be activated. In this mode you can select values. This is neccessary if you want to cut, copy, paste, delete, or move values. You can also press &apos;Shift+S&apos; on your keyboard to activate this mode.</source>
+        <source>Click here and select-mode will be activated. In this mode you can select values. This is necessary if you want to cut, copy, paste, delete, or move values. You can also press &apos;Shift+S&apos; on your keyboard to activate this mode.</source>
         <translation type="unfinished">クリックすると選択モードをONにします。選択モードではいくつかの値を選択できます。このモードはいくつかの値をカット・コピー・ペースト・消去・移動するときに必要です。 &apos;Shift+S&apos; をおしても選択ーモードをONにできます。</translation>
     </message>
     <message>
@@ -6377,7 +6377,7 @@ The LED in the lower right corner of the waveform editor determines whether the 
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>The String selector is used to choose which string the controls are editting.  A Vibed instrument can contain up to nine independently vibrating strings.  The LED in the lower right corner of the waveform editor indicates whether the selected string is active.</source>
+        <source>The String selector is used to choose which string the controls are editing.  A Vibed instrument can contain up to nine independently vibrating strings.  The LED in the lower right corner of the waveform editor indicates whether the selected string is active.</source>
         <translation type="unfinished">ストリングセレクタはコントローラーが編集しているストリングを選ぶのにつかいます。Vibed 楽器は 9本までの独立した振動してるストリングを含んでいます。波形エディタの右下すみのLEDはどのストリングがアクティブかを示しています。</translation>
     </message>
     <message>

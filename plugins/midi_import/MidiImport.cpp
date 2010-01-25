@@ -569,7 +569,7 @@ void MidiImport::error()
 extern "C"
 {
 
-// neccessary for getting instance out of shared lib
+// necessary for getting instance out of shared lib
 Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, void * _data )
 {
 	return new MidiImport( QString::fromUtf8(

@@ -35,7 +35,7 @@ class LFOParams:public Presets
                   char PLFOtype_,
                   char Prandomness_,
                   char Pdelay_,
-                  char Pcontinous,
+                  char Pcontinuous,
                   char fel_);
         ~LFOParams();
 
@@ -52,11 +52,11 @@ class LFOParams:public Presets
         unsigned char Prandomness; /**<randomness (0=off)*/
         unsigned char Pfreqrand; /**<frequency randomness (0=off)*/
         unsigned char Pdelay; /**<delay (0=off)*/
-        unsigned char Pcontinous; /**<1 if LFO is continous*/
+        unsigned char Pcontinuous; /**<1 if LFO is continuous*/
         unsigned char Pstretch; /**<how the LFO is "stretched" according the note frequency (64=no stretch)*/
 
         int fel; //what kind is the LFO (0 - frequency, 1 - amplitude, 2 - filter)
-        static int time; //is used by Pcontinous parameter
+        static int time; //is used by Pcontinuous parameter
     private:
         /* Default parameters */
         unsigned char Dfreq;
@@ -65,7 +65,7 @@ class LFOParams:public Presets
         unsigned char DLFOtype;
         unsigned char Drandomness;
         unsigned char Ddelay;
-        unsigned char Dcontinous;
+        unsigned char Dcontinuous;
 };
 
 #endif

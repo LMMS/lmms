@@ -1172,7 +1172,7 @@
 	made 0.4.0 release
 
 	* CMakeLists.txt:
-	- include all neccessary DLLs in win64 build
+	- include all necessary DLLs in win64 build
 	- fix versioning for CPack if no VERSION_SUFFIX is set
 
 	* plugins/sid/sid_instrument.cpp:
@@ -1787,7 +1787,7 @@
 	* src/core/sample_record_handle.cpp:
 	* src/tracks/instrument_track.cpp:
 	removed obsolete instrument-parallelization support as this is handled
-	much better by worker threads and adds unneccessary complexity
+	much better by worker threads and adds unnecessary complexity
 
 	* cmake/modules/FindPCHSupport.cmake:
 	* INSTALL:
@@ -2594,7 +2594,7 @@
 	* src/gui/track_container_view.cpp:
 	* src/core/track.cpp:
 	disabled undo/redo of track/TCO addition/removal as not mature yet and
-	causes unneccessary crashes (closes #2014439, #2100407)
+	causes unnecessary crashes (closes #2014439, #2100407)
 
 	* data/projects/cool_songs/Skiessi-TurningPoint.mmpz:
 	* data/projects/cool_songs/Skiessi-RandomProjectNumber14253.mmpz:
@@ -3360,7 +3360,7 @@
 	fixed messages
 
 	* src/core/config_mgr.cpp:
-	add trailing slashes to paths where neccessary (closes #2056353)
+	add trailing slashes to paths where necessary (closes #2056353)
 
 	* data/locale/de.qm:
 	* data/locale/de.ts:
@@ -13082,7 +13082,7 @@
 	double-clicking them
 
 	* src/tracks/pattern.cpp:
-	when loading pattern, check type afterwards and correct if neccessary
+	when loading pattern, check type afterwards and correct if necessary
 
 2006-10-09	Mikael Freeman <mikael/dot/freeman/at/mac/dot/se>
 
@@ -13794,7 +13794,7 @@
 
 	* Makefile.cvs:
 	small makefile to be run before configure for creating/copying all
-	neccessary files
+	necessary files
 
 	* config.sub:
 	* config.guess:
@@ -14955,7 +14955,7 @@
 	- in vibed::loadSettings():
 	  - simplified loading of wave-shape
 	  - delete base64-decoded data at the end
-	- commented out code in destructor as it is not neccessary - to be
+	- commented out code in destructor as it is not necessary - to be
 	  removed someday
 
 	* include/base64.h:
@@ -15454,7 +15454,7 @@
 	* src/widgets/automatable_button.cpp:
 	* src/widgets/knob.cpp:
 	added second template-parameter to automatableObject which specifies
-	the type to be used for internal calculations (neccessary for working
+	the type to be used for internal calculations (necessary for working
 	undo/redo-implementation for bool-objects like buttons)
 
 	* include/led_checkbox.h:
@@ -15985,7 +15985,7 @@
 
 	* include/pattern.h:
 	* src/tracks/pattern.cpp:
-	only repaint if neccessary, otherwise just paint the pixmap we painted
+	only repaint if necessary, otherwise just paint the pixmap we painted
 	before
 
 	* include/bb_editor.h:
@@ -16326,7 +16326,7 @@
 	
 	* include/tool_button.h:
 	* src/widgets/tool_button.cpp:
-	catch toggle-signals to emit clicked()-signal which is neccessary if a
+	catch toggle-signals to emit clicked()-signal which is necessary if a
 	button is checked using setChecked()-method and not by the user -
 	fixes some bugs with piano-roll
 
@@ -16513,7 +16513,7 @@
 	classify files with extension "flac" as samples
 
 	* src/widgets/tab_widget.cpp:
-	hide all other tabs when changing active tab - neccessary for working
+	hide all other tabs when changing active tab - necessary for working
 	with Qt 4.1
 
 2005-12-20	Danny McRae	<khjklujn/at/yahoo/dot/com>
@@ -16721,7 +16721,7 @@
 	* include/timeline.h:
 	* src/core/timeline.cpp:
 	use timer for periodically screen-updates - locking QApplication-mutex
-	isn't neccessary anymore which makes LMMS not to hang when creating
+	isn't necessary anymore which makes LMMS not to hang when creating
 	new song while playing etc.
 
 	* src/core/piano_roll.cpp:
@@ -16930,7 +16930,7 @@
 
 	* include/qxembed.h:
 	* src/widgets/qxembed.cpp:
-	added QXEmbed-widget which is neccessary for embedding VST-plugin
+	added QXEmbed-widget which is necessary for embedding VST-plugin
 
 2005-11-27	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
@@ -16998,7 +16998,7 @@
 
 	* include/midi_client.h:
 	- added method applyPortMode() for making MIDI-subsystem able to get
-	  known of port-mode changes which is neccessary if they have REAL
+	  known of port-mode changes which is necessary if they have REAL
 	  ports like ALSA-seq. has
 	- renamed validatePortName() to applyPortName() and made it non-pure
 	  virtual
@@ -17518,7 +17518,7 @@
 
 	* src/core/track_container.cpp:
 	added parameter _complete_update to trackContainer::realignTracks()
-	to be able to hide and show all tracks which is neccessary e.g.
+	to be able to hide and show all tracks which is necessary e.g.
 	after having changed pixels-per-tact-property -> zooming in song-editor
 	works now well
 
@@ -17665,7 +17665,7 @@
 
 	* src/lib/mmp.cpp:
 	if saving preset, check whether file-name contains suffix ".cs.xml"
-	and add it if neccessary
+	and add it if necessary
 
 	* include/midi_alsa_raw.h:
 	* src/midi/midi_alsa_raw.cpp:
@@ -18325,7 +18325,7 @@
 	logo originally had been made with Inkscape 0.39)
 
 	* src/widgets/project_notes.cpp:
-	removed unneccessary name-strings for QActions
+	removed unnecessary name-strings for QActions
 
 	* resources/project_notes.png:
 	replaced 16x16-icon with 22x22-icon to provide big enough icon for
@@ -18387,7 +18387,7 @@
 	  performed at the moment and introduced m_action, indicating
 	  one of the actions defined in (also new) enum editActions
 	- replaced m_startTone and m_startOctave with one variable m_startKey,
-	  which makes a lot of code unneccessary
+	  which makes a lot of code unnecessary
 	- rewrote loops using note-vectors to use iterators instead of
 	  indices and vector::size()
 	- renamed m_evolutionHeight to m_notesEditHeight
