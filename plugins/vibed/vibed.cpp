@@ -543,7 +543,7 @@ vibedView::vibedView( Instrument * _instrument,
 	m_stringSelector->setAccessibleName( tr( "String" ) );
 	m_stringSelector->setWhatsThis( tr(
 "The String selector is used to choose which string the controls are "
-"editting.  A Vibed instrument can contain up to nine independently "
+"editing.  A Vibed instrument can contain up to nine independently "
 "vibrating strings.  The LED in the lower right corner of the "
 "waveform editor indicates whether the selected string is active." ) );
 
@@ -779,7 +779,7 @@ void vibedView::displayHelp()
 extern "C"
 {
 
-// neccessary for getting instance out of shared lib
+// necessary for getting instance out of shared lib
 Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, void * _data )
 {
 	return( new vibed( static_cast<InstrumentTrack *>( _data ) ) );

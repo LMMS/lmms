@@ -1101,7 +1101,7 @@ void sf2InstrumentView::showPatchDialog()
 extern "C"
 {
 
-// neccessary for getting instance out of shared lib
+// necessary for getting instance out of shared lib
 Plugin * lmms_plugin_main( Model *, void * _data )
 {
 	return new sf2Instrument( static_cast<InstrumentTrack *>( _data ) );

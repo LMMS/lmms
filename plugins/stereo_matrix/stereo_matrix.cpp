@@ -112,7 +112,7 @@ bool stereoMatrixEffect::processAudioBuffer( sampleFrame * _buf,
 extern "C"
 {
 
-// neccessary for getting instance out of shared lib
+// necessary for getting instance out of shared lib
 Plugin * PLUGIN_EXPORT lmms_plugin_main( Model * _parent, void * _data )
 {
 	return( new stereoMatrixEffect( _parent,

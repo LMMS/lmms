@@ -654,7 +654,7 @@ malletsSynth::malletsSynth( const StkFloat _pitch,
 extern "C"
 {
 
-// neccessary for getting instance out of shared lib
+// necessary for getting instance out of shared lib
 Plugin * lmms_plugin_main( Model *, void * _data )
 {
 	return new malletsInstrument( static_cast<InstrumentTrack *>( _data ) );

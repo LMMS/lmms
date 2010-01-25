@@ -139,7 +139,7 @@ void AutomatableModel::loadSettings( const QDomElement & _this,
 			p->loadSettings( node.toElement() );
 			setValue( p->valueAt( 0 ) );
 			// in older projects we sometimes have odd automations
-			// with just one value in - eliminate if neccessary
+			// with just one value in - eliminate if necessary
 			if( !p->hasAutomation() )
 			{
 				delete p;

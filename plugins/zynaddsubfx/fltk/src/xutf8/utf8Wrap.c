@@ -284,7 +284,7 @@ load_fonts(Display 	   *dpy,
 }
 
 /*********************************************************************/
-/** Creates an array of XFontStruct acording to the comma separated  **/
+/** Creates an array of XFontStruct according to the comma separated  **/
 /** list of fonts. XLoad all fonts.				    **/
 /*********************************************************************/
 XUtf8FontStruct *

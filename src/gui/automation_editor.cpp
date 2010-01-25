@@ -223,7 +223,7 @@ automationEditor::automationEditor() :
 			"'Shift+E' on your keyboard to activate this mode." ) );
 	m_selectButton->setWhatsThis(
 		tr( "Click here and select-mode will be activated. In this "
-			"mode you can select values. This is neccessary "
+			"mode you can select values. This is necessary "
 			"if you want to cut, copy, paste, delete, or move "
 			"values. You can also press 'Shift+S' on your keyboard "
 			"to activate this mode." ) );

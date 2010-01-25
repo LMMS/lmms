@@ -115,7 +115,7 @@ int MIDIFile::parsemidifile(MIDIEvents *me_)
     }
 
     printf("\n\nCURRENT File position is = 0x%x\n", midifilek);
-    printf("\nMIDI file succesfully parsed.\n");
+    printf("\nMIDI file successfully parsed.\n");
 //    printf("\n0x%x\n",getbyte());
 
     this->me = NULL;

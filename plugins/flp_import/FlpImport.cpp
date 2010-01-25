@@ -1871,7 +1871,7 @@ void FlpImport::processPluginParams( FL_Channel * _ch )
 extern "C"
 {
 
-// neccessary for getting instance out of shared lib
+// necessary for getting instance out of shared lib
 Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, void * _data )
 {
 	return new FlpImport( QString::fromUtf8(

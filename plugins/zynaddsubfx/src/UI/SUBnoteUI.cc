@@ -513,7 +513,7 @@ Fl_Double_Window* SUBnoteUI::make_window() {
         o->value(pars->Pfixedfreq);
       } // Fl_Check_Button* hz440
       { WidgetPDial* o = fixedfreqetdial = new WidgetPDial(610, 45, 15, 15, "Eq.T.");
-        fixedfreqetdial->tooltip("How the frequency varies acording to the keyboard (leftmost for fixed frequen\
+        fixedfreqetdial->tooltip("How the frequency varies according to the keyboard (leftmost for fixed frequen\
 cy)");
         fixedfreqetdial->box(FL_ROUND_UP_BOX);
         fixedfreqetdial->color(FL_BACKGROUND_COLOR);

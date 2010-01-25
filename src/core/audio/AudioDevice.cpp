@@ -89,7 +89,7 @@ fpp_t AudioDevice::getNextBuffer( surroundSampleFrame * _ab )
 	// make sure, no other thread is accessing device
 	lock();
 
-	// resample if neccessary
+	// resample if necessary
 	if( getMixer()->processingSampleRate() != m_sampleRate )
 	{
 		resample( b, frames, _ab, getMixer()->processingSampleRate(),
