@@ -300,7 +300,7 @@ calf_plugins::plugin_registry &calf_plugins::plugin_registry::instance()
     return registry;
 }
 
-plugin_metadata_iface *calf_plugins::plugin_registry::get_by_uri(const char *plugin_uri)
+const plugin_metadata_iface *calf_plugins::plugin_registry::get_by_uri(const char *plugin_uri)
 {
     static const char prefix[] = "http://calf.sourceforge.net/plugins/";
     if (strncmp(plugin_uri, prefix, sizeof(prefix) - 1))

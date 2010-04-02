@@ -388,7 +388,7 @@ public:
     static plugin_registry &instance();
 
     const plugin_vector &get_all() { return plugins; }
-    plugin_metadata_iface *get_by_uri(const char *URI);
+    const plugin_metadata_iface *get_by_uri(const char *URI);
 };
 
 /// Get a list of all "small" (module) plugins
@@ -539,9 +539,9 @@ public:
 class plugin_metadata_proxy: public virtual plugin_metadata_iface
 {
 public:
-    plugin_metadata_iface *impl;
+    const plugin_metadata_iface *impl;
 public:
-    plugin_metadata_proxy(plugin_metadata_iface *_impl) { impl = _impl; }
+    plugin_metadata_proxy(const plugin_metadata_iface *_impl) { impl = _impl; }
     const char *get_name() const { return impl->get_name(); } 
     const char *get_id() const { return impl->get_id(); } 
     const char *get_label() const { return impl->get_label(); } 
