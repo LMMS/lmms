@@ -377,6 +377,7 @@ struct plugin_ctl_iface: public virtual plugin_metadata_iface
 
 struct plugin_list_info_iface;
 
+/// A class to retrieve and query the list of Calf plugins
 class plugin_registry
 {
 public:
@@ -385,9 +386,12 @@ private:
     plugin_vector plugins;
     plugin_registry();
 public:
+    /// Get the singleton object.
     static plugin_registry &instance();
 
+    /// Get all plugin metadata objects
     const plugin_vector &get_all() { return plugins; }
+    /// Get single plugin metadata object by URI
     const plugin_metadata_iface *get_by_uri(const char *URI);
 };
 
