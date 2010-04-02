@@ -292,6 +292,30 @@ void calf_plugins::set_channel_color(cairo_iface *context, int channel)
     context->set_line_width(1.5);
 }
 
+///////////////////////////////////////////////////////////////////////////////////////
+
+calf_plugins::plugin_registry &calf_plugins::plugin_registry::instance()
+{
+    static calf_plugins::plugin_registry registry;
+    return registry;
+}
+
+plugin_metadata_iface *calf_plugins::plugin_registry::get_by_uri(const char *plugin_uri)
+{
+    static const char prefix[] = "http://calf.sourceforge.net/plugins/";
+    if (strncmp(plugin_uri, prefix, sizeof(prefix) - 1))
+        return NULL;
+    const char *label = plugin_uri + sizeof(prefix) - 1;
+    for (unsigned int i = 0; i < plugins.size(); i++)
+    {
+        if (!strcmp(plugins[i]->get_plugin_info().label, label))
+            return plugins[i];
+    }    
+    return NULL;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////
+
 #if USE_DSSI
 struct osc_cairo_control: public cairo_iface
 {

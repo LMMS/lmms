@@ -168,17 +168,17 @@ struct line_graph_iface
     /// @param context cairo context to adjust (for multicolour graphs etc.)
     /// @retval true graph data was returned; subindex+1 graph may or may not be available
     /// @retval false graph data was not returned; subindex+1 graph does not exist either
-    virtual bool get_graph(int index, int subindex, float *data, int points, cairo_iface *context) { return false; }
+    virtual bool get_graph(int index, int subindex, float *data, int points, cairo_iface *context) const { return false; }
 
     /// Obtain subindex'th dot of parameter 'index'
     /// @param index parameter/dot number (usually tied to particular plugin control port)
     /// @param subindex dot number (there may be multiple dots graphs for one parameter)
-    virtual bool get_dot(int index, int subindex, float &x, float &y, int &size, cairo_iface *context) { return false; }
+    virtual bool get_dot(int index, int subindex, float &x, float &y, int &size, cairo_iface *context) const { return false; }
     
     /// Obtain subindex'th dot of parameter 'index'
     /// @param index parameter/dot number (usually tied to particular plugin control port)
     /// @param subindex dot number (there may be multiple dots graphs for one parameter)
-    virtual bool get_gridline(int index, int subindex, float &pos, bool &vertical, std::string &legend, cairo_iface *context) { return false; }
+    virtual bool get_gridline(int index, int subindex, float &pos, bool &vertical, std::string &legend, cairo_iface *context) const { return false; }
     
     /// Obtain subindex'th static graph of parameter index (static graphs are only dependent on parameter value, not plugin state)
     /// @param index parameter/graph number (usually tied to particular plugin control port)
@@ -189,7 +189,7 @@ struct line_graph_iface
     /// @param context cairo context to adjust (for multicolour graphs etc.)
     /// @retval true graph data was returned; subindex+1 graph may or may not be available
     /// @retval false graph data was not returned; subindex+1 graph does not exist either
-    virtual bool get_static_graph(int index, int subindex, float value, float *data, int points, cairo_iface *context) { return false; }
+    virtual bool get_static_graph(int index, int subindex, float value, float *data, int points, cairo_iface *context) const { return false; }
     
     /// Return which graphs need to be redrawn and which can be cached for later reuse
     /// @param index Parameter/graph number (usually tied to particular plugin control port)
@@ -198,7 +198,7 @@ struct line_graph_iface
     /// @param subindex_dot First dot that has to be redrawn
     /// @param subindex_gridline First gridline/legend that has to be redrawn
     /// @retval Current generation (to pass when calling the function next time); if different than passed generation value, call the function again to retrieve which graph offsets should be put into cache
-    virtual int get_changed_offsets(int index, int generation, int &subindex_graph, int &subindex_dot, int &subindex_gridline) { subindex_graph = subindex_dot = subindex_gridline = 0; return 0; }
+    virtual int get_changed_offsets(int index, int generation, int &subindex_graph, int &subindex_dot, int &subindex_gridline) const { subindex_graph = subindex_dot = subindex_gridline = 0; return 0; }
     
     /// Standard destructor to make compiler happy
     virtual ~line_graph_iface() {}
@@ -229,22 +229,22 @@ struct table_column_info
 struct table_edit_iface
 {
     /// retrieve the table layout for specific parameter
-    virtual const table_column_info *get_table_columns(int param) = 0;
+    virtual const table_column_info *get_table_columns(int param) const = 0;
 
     /// return the current number of rows
-    virtual uint32_t get_table_rows(int param) = 0;
+    virtual uint32_t get_table_rows(int param) const = 0;
     
     /// retrieve data item from the plugin
-    virtual std::string get_cell(int param, int row, int column) { return calf_utils::i2s(row)+":"+calf_utils::i2s(column); }
+    virtual std::string get_cell(int param, int row, int column) const { return calf_utils::i2s(row)+":"+calf_utils::i2s(column); }
 
     /// set data item to the plugin
-    virtual void set_cell(int param, int row, int column, const std::string &src, std::string &error) { error.clear(); }
+    virtual void set_cell(int param, int row, int column, const std::string &src, std::string &error) const { error.clear(); }
     
     /// return a line graph interface for a specific parameter/column (unused for now)
-    virtual line_graph_iface *get_graph_iface(int param, int column) { return NULL; }
+    virtual const line_graph_iface *get_graph_iface(int param, int column) const { return NULL; }
     
     /// return an editor name for a specific grid cell (unused for now - I don't even know how editors be implemented)
-    virtual const char *get_cell_editor(int param, int column) { return NULL; }
+    virtual const char *get_cell_editor(int param, int column) const { return NULL; }
     
     virtual ~table_edit_iface() {}
 };
@@ -294,53 +294,53 @@ struct ladspa_plugin_info
 struct plugin_metadata_iface
 {
     /// @return plugin long name
-    virtual const char *get_name() = 0;
+    virtual const char *get_name() const = 0;
     /// @return plugin LV2 label
-    virtual const char *get_id() = 0;
+    virtual const char *get_id() const = 0;
     /// @return plugin human-readable label
-    virtual const char *get_label() = 0;
+    virtual const char *get_label() const = 0;
     /// @return total number of parameters
-    virtual int get_param_count() = 0;
+    virtual int get_param_count() const = 0;
     /// Return custom XML
-    virtual const char *get_gui_xml() = 0;
+    virtual const char *get_gui_xml() const = 0;
     /// @return number of audio inputs
-    virtual int get_input_count()=0;
+    virtual int get_input_count() const =0;
     /// @return number of audio outputs
-    virtual int get_output_count()=0;
+    virtual int get_output_count() const =0;
     /// @return number of optional inputs
-    virtual int get_inputs_optional()=0;
+    virtual int get_inputs_optional() const =0;
     /// @return number of optional outputs
-    virtual int get_outputs_optional()=0;
+    virtual int get_outputs_optional() const =0;
     /// @return true if plugin can work in hard-realtime conditions
-    virtual bool is_rt_capable()=0;
+    virtual bool is_rt_capable() const =0;
     /// @return true if plugin has MIDI input
-    virtual bool get_midi()=0;
+    virtual bool get_midi() const =0;
     /// @return true if plugin has MIDI input
-    virtual bool requires_midi()=0;
+    virtual bool requires_midi() const =0;
     /// @return port offset of first control (parameter) port (= number of audio inputs + number of audio outputs in all existing plugins as for 1 Aug 2008)
-    virtual int get_param_port_offset() = 0;
+    virtual int get_param_port_offset() const  = 0;
     /// @return line_graph_iface if any
-    virtual line_graph_iface *get_line_graph_iface() = 0;
+    virtual const line_graph_iface *get_line_graph_iface() const = 0;
     /// @return table_edit_iface if any
-    virtual table_edit_iface *get_table_edit_iface() = 0;
+    virtual const table_edit_iface *get_table_edit_iface() const = 0;
     /// @return NULL-terminated list of menu commands
-    virtual plugin_command_info *get_commands() { return NULL; }
+    virtual plugin_command_info *get_commands() const { return NULL; }
     /// @return description structure for given parameter
-    virtual parameter_properties *get_param_props(int param_no) = 0;
+    virtual parameter_properties *get_param_props(int param_no) const = 0;
     /// @return retrieve names of audio ports (@note control ports are named in parameter_properties, not here)
-    virtual const char **get_port_names() = 0;
+    virtual const char **get_port_names() const = 0;
     /// @return description structure for the plugin
-    virtual const ladspa_plugin_info &get_plugin_info() = 0;
+    virtual const ladspa_plugin_info &get_plugin_info() const = 0;
     /// is a given parameter a control voltage?
-    virtual bool is_cv(int param_no) = 0;
+    virtual bool is_cv(int param_no) const = 0;
     /// is the given parameter non-interpolated?
-    virtual bool is_noisy(int param_no) = 0;
+    virtual bool is_noisy(int param_no) const = 0;
     /// does the plugin require message context? (or DSSI configure) may be slow
-    virtual bool requires_message_context() = 0;
+    virtual bool requires_message_context() const = 0;
     /// does the plugin require string port extension? (or DSSI configure) may be slow
-    virtual bool requires_string_ports() = 0;
+    virtual bool requires_string_ports() const = 0;
     /// add all message context parameter numbers to the ports vector
-    virtual void get_message_context_parameters(std::vector<int> &ports) = 0;
+    virtual void get_message_context_parameters(std::vector<int> &ports) const = 0;
 
     /// Do-nothing destructor to silence compiler warning
     virtual ~plugin_metadata_iface() {}
@@ -377,8 +377,20 @@ struct plugin_ctl_iface: public virtual plugin_metadata_iface
 
 struct plugin_list_info_iface;
 
-/// Get a list of all "large" (effect/synthesizer) plugins
-extern void get_all_plugins(std::vector<plugin_metadata_iface *> &plugins);
+class plugin_registry
+{
+public:
+    typedef std::vector<plugin_metadata_iface *> plugin_vector;    
+private:
+    plugin_vector plugins;
+    plugin_registry();
+public:
+    static plugin_registry &instance();
+
+    const plugin_vector &get_all() { return plugins; }
+    plugin_metadata_iface *get_by_uri(const char *URI);
+};
+
 /// Get a list of all "small" (module) plugins
 extern void get_all_small_plugins(plugin_list_info_iface *plii);
 /// Load and strdup a text file with GUI definition
@@ -489,30 +501,30 @@ public:
     // These below are stock implementations based on enums and static members in Metadata classes
     // they may be overridden to provide more interesting functionality
 
-    const char *get_name() { return Metadata::impl_get_name(); } 
-    const char *get_id() { return Metadata::impl_get_id(); } 
-    const char *get_label() { return Metadata::impl_get_label(); } 
-    int get_input_count() { return Metadata::in_count; }
-    int get_output_count() { return Metadata::out_count; }
-    int get_inputs_optional() { return Metadata::ins_optional; }
-    int get_outputs_optional() { return Metadata::outs_optional; }
-    int get_param_count() { return Metadata::param_count; }
-    bool get_midi() { return Metadata::support_midi; }
-    bool requires_midi() { return Metadata::require_midi; }
-    bool is_rt_capable() { return Metadata::rt_capable; }
-    line_graph_iface *get_line_graph_iface() { return dynamic_cast<line_graph_iface *>(this); }    
-    table_edit_iface *get_table_edit_iface() { return dynamic_cast<table_edit_iface *>(this); }    
-    int get_param_port_offset()  { return Metadata::in_count + Metadata::out_count; }
-    const char *get_gui_xml() { static const char *data_ptr = calf_plugins::load_gui_xml(get_id()); return data_ptr; }
-    plugin_command_info *get_commands() { return NULL; }
-    parameter_properties *get_param_props(int param_no) { return &param_props[param_no]; }
-    const char **get_port_names() { return port_names; }
-    bool is_cv(int param_no) { return true; }
-    bool is_noisy(int param_no) { return false; }
-    const ladspa_plugin_info &get_plugin_info() { return plugin_info; }
-    bool requires_message_context() { return check_for_message_context_ports(param_props, Metadata::param_count); }
-    bool requires_string_ports() { return check_for_string_ports(param_props, Metadata::param_count); }
-    void get_message_context_parameters(std::vector<int> &ports) {
+    const char *get_name() const { return Metadata::impl_get_name(); } 
+    const char *get_id() const { return Metadata::impl_get_id(); } 
+    const char *get_label() const { return Metadata::impl_get_label(); } 
+    int get_input_count() const { return Metadata::in_count; }
+    int get_output_count() const { return Metadata::out_count; }
+    int get_inputs_optional() const { return Metadata::ins_optional; }
+    int get_outputs_optional() const { return Metadata::outs_optional; }
+    int get_param_count() const { return Metadata::param_count; }
+    bool get_midi() const { return Metadata::support_midi; }
+    bool requires_midi() const { return Metadata::require_midi; }
+    bool is_rt_capable() const { return Metadata::rt_capable; }
+    const line_graph_iface *get_line_graph_iface() const { return dynamic_cast<const line_graph_iface *>(this); }    
+    const table_edit_iface *get_table_edit_iface() const { return dynamic_cast<const table_edit_iface *>(this); }    
+    int get_param_port_offset()  const { return Metadata::in_count + Metadata::out_count; }
+    const char *get_gui_xml() const { static const char *data_ptr = calf_plugins::load_gui_xml(get_id()); return data_ptr; }
+    plugin_command_info *get_commands() const { return NULL; }
+    parameter_properties *get_param_props(int param_no) const { return &param_props[param_no]; }
+    const char **get_port_names() const { return port_names; }
+    bool is_cv(int param_no) const { return true; }
+    bool is_noisy(int param_no) const { return false; }
+    const ladspa_plugin_info &get_plugin_info() const { return plugin_info; }
+    bool requires_message_context() const { return check_for_message_context_ports(param_props, Metadata::param_count); }
+    bool requires_string_ports() const { return check_for_string_ports(param_props, Metadata::param_count); }
+    void get_message_context_parameters(std::vector<int> &ports) const {
         for (int i = 0; i < get_param_count(); ++i) {
             if (get_param_props(i)->flags & PF_PROP_MSGCONTEXT)
                 ports.push_back(i);
@@ -530,30 +542,30 @@ public:
     plugin_metadata_iface *impl;
 public:
     plugin_metadata_proxy(plugin_metadata_iface *_impl) { impl = _impl; }
-    const char *get_name() { return impl->get_name(); } 
-    const char *get_id() { return impl->get_id(); } 
-    const char *get_label() { return impl->get_label(); } 
-    int get_input_count() { return impl->get_input_count(); }
-    int get_output_count() { return impl->get_output_count(); }
-    int get_inputs_optional() { return impl->get_inputs_optional(); }
-    int get_outputs_optional() { return impl->get_outputs_optional(); }
-    int get_param_count() { return impl->get_param_count(); }
-    bool get_midi() { return impl->get_midi(); }
-    bool requires_midi() { return impl->requires_midi(); }
-    bool is_rt_capable() { return impl->is_rt_capable(); }
-    line_graph_iface *get_line_graph_iface() { return impl->get_line_graph_iface(); }    
-    table_edit_iface *get_table_edit_iface() { return impl->get_table_edit_iface(); }    
-    int get_param_port_offset()  { return impl->get_param_port_offset(); }
-    const char *get_gui_xml() { return impl->get_gui_xml(); }
-    plugin_command_info *get_commands() { return impl->get_commands(); }
-    parameter_properties *get_param_props(int param_no) { return impl->get_param_props(param_no); }
-    const char **get_port_names() { return impl->get_port_names(); }
-    bool is_cv(int param_no) { return impl->is_cv(param_no); }
-    bool is_noisy(int param_no) { return impl->is_noisy(param_no); }
-    const ladspa_plugin_info &get_plugin_info() { return impl->get_plugin_info(); }
-    bool requires_message_context() { return impl->requires_message_context(); }
-    bool requires_string_ports() { return impl->requires_string_ports(); }
-    void get_message_context_parameters(std::vector<int> &ports) { impl->get_message_context_parameters(ports); }
+    const char *get_name() const { return impl->get_name(); } 
+    const char *get_id() const { return impl->get_id(); } 
+    const char *get_label() const { return impl->get_label(); } 
+    int get_input_count() const { return impl->get_input_count(); }
+    int get_output_count() const { return impl->get_output_count(); }
+    int get_inputs_optional() const { return impl->get_inputs_optional(); }
+    int get_outputs_optional() const { return impl->get_outputs_optional(); }
+    int get_param_count() const { return impl->get_param_count(); }
+    bool get_midi() const { return impl->get_midi(); }
+    bool requires_midi() const { return impl->requires_midi(); }
+    bool is_rt_capable() const { return impl->is_rt_capable(); }
+    const line_graph_iface *get_line_graph_iface() const { return impl->get_line_graph_iface(); }    
+    const table_edit_iface *get_table_edit_iface() const { return impl->get_table_edit_iface(); }    
+    int get_param_port_offset() const { return impl->get_param_port_offset(); }
+    const char *get_gui_xml() const { return impl->get_gui_xml(); }
+    plugin_command_info *get_commands() const { return impl->get_commands(); }
+    parameter_properties *get_param_props(int param_no) const { return impl->get_param_props(param_no); }
+    const char **get_port_names() const { return impl->get_port_names(); }
+    bool is_cv(int param_no) const { return impl->is_cv(param_no); }
+    bool is_noisy(int param_no) const { return impl->is_noisy(param_no); }
+    const ladspa_plugin_info &get_plugin_info() const { return impl->get_plugin_info(); }
+    bool requires_message_context() const { return impl->requires_message_context(); }
+    bool requires_string_ports() const { return impl->requires_string_ports(); }
+    void get_message_context_parameters(std::vector<int> &ports) const { impl->get_message_context_parameters(ports); }
 };
 
 #define CALF_PORT_NAMES(name) template<> const char *::plugin_metadata<name##_metadata>::port_names[]

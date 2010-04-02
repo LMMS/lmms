@@ -65,8 +65,8 @@ public:
 class frequency_response_line_graph: public line_graph_iface 
 {
 public:
-    bool get_gridline(int index, int subindex, float &pos, bool &vertical, std::string &legend, cairo_iface *context);
-    virtual int get_changed_offsets(int index, int generation, int &subindex_graph, int &subindex_dot, int &subindex_gridline);
+    bool get_gridline(int index, int subindex, float &pos, bool &vertical, std::string &legend, cairo_iface *context) const;
+    virtual int get_changed_offsets(int index, int generation, int &subindex_graph, int &subindex_dot, int &subindex_gridline) const;
 };
 
 class flanger_audio_module: public audio_module<flanger_metadata>, public frequency_response_line_graph
@@ -126,8 +126,8 @@ public:
         right.process(outs[1] + offset, ins[1] + offset, nsamples);
         return outputs_mask; // XXXKF allow some delay after input going blank
     }
-    bool get_graph(int index, int subindex, float *data, int points, cairo_iface *context);
-    float freq_gain(int subindex, float freq, float srate);
+    bool get_graph(int index, int subindex, float *data, int points, cairo_iface *context) const;
+    float freq_gain(int subindex, float freq, float srate) const;
 };
 
 class phaser_audio_module: public audio_module<phaser_metadata>, public frequency_response_line_graph
@@ -189,9 +189,9 @@ public:
         right.process(outs[1] + offset, ins[1] + offset, nsamples);
         return outputs_mask; // XXXKF allow some delay after input going blank
     }
-    bool get_graph(int index, int subindex, float *data, int points, cairo_iface *context);
-    bool get_gridline(int index, int subindex, float &pos, bool &vertical, std::string &legend, cairo_iface *context);
-    float freq_gain(int subindex, float freq, float srate);
+    bool get_graph(int index, int subindex, float *data, int points, cairo_iface *context) const;
+    bool get_gridline(int index, int subindex, float &pos, bool &vertical, std::string &legend, cairo_iface *context) const;
+    float freq_gain(int subindex, float freq, float srate) const;
 };
 
 class reverb_audio_module: public audio_module<reverb_metadata>
@@ -571,74 +571,6 @@ public:
     virtual void control_change(int ctl, int val);
 };
 
-/// Compose two filters in series
-template<class F1, class F2>
-class filter_compose {
-public:
-    typedef std::complex<float> cfloat;
-    F1 f1;
-    F2 f2;
-public:
-    float process(float value) {
-        return f2.process(f1.process(value));
-    }
-    
-    cfloat h_z(const cfloat &z) {
-        return f1.h_z(z) * f2.h_z(z);
-    }
-    
-    /// Return the filter's gain at frequency freq
-    /// @param freq   Frequency to look up
-    /// @param sr     Filter sample rate (used to convert frequency to angular frequency)
-    float freq_gain(float freq, float sr)
-    {
-        typedef std::complex<double> cfloat;
-        freq *= 2.0 * M_PI / sr;
-        cfloat z = 1.0 / exp(cfloat(0.0, freq));
-        
-        return std::abs(h_z(z));
-    }
-    
-    void sanitize() {
-        f1.sanitize();
-        f2.sanitize();
-    }
-};
-
-/// Compose two filters in parallel
-template<class F1, class F2>
-class filter_sum {
-public:
-    typedef std::complex<double> cfloat;
-    F1 f1;
-    F2 f2;
-public:
-    float process(float value) {
-        return f2.process(value) + f1.process(value);
-    }
-    
-    inline cfloat h_z(const cfloat &z) {
-        return f1.h_z(z) + f2.h_z(z);
-    }
-    
-    /// Return the filter's gain at frequency freq
-    /// @param freq   Frequency to look up
-    /// @param sr     Filter sample rate (used to convert frequency to angular frequency)
-    float freq_gain(float freq, float sr)
-    {
-        typedef std::complex<double> cfloat;
-        freq *= 2.0 * M_PI / sr;
-        cfloat z = 1.0 / exp(cfloat(0.0, freq));
-        
-        return std::abs(h_z(z));
-    }
-    
-    void sanitize() {
-        f1.sanitize();
-        f2.sanitize();
-    }
-};
-
 template<typename FilterClass, typename Metadata>
 class filter_module_with_inertia: public FilterClass
 {
@@ -652,7 +584,7 @@ public:
     inertia<exponential_ramp> inertia_cutoff, inertia_resonance, inertia_gain;
     once_per_n timer;
     bool is_active;    
-    volatile int last_generation, last_calculated_generation;
+    mutable volatile int last_generation, last_calculated_generation;
     
     filter_module_with_inertia()
     : inertia_cutoff(exponential_ramp(128), 20)
@@ -749,7 +681,7 @@ class filter_audio_module:
     public filter_module_with_inertia<biquad_filter_module, filter_metadata>, 
     public frequency_response_line_graph
 {
-    float old_cutoff, old_resonance, old_mode;
+    mutable float old_cutoff, old_resonance, old_mode;
 public:    
     filter_audio_module()
     {
@@ -778,8 +710,8 @@ public:
         inertia_filter_module::deactivate();
     }
     
-    bool get_graph(int index, int subindex, float *data, int points, cairo_iface *context);
-    int get_changed_offsets(int index, int generation, int &subindex_graph, int &subindex_dot, int &subindex_gridline);
+    bool get_graph(int index, int subindex, float *data, int points, cairo_iface *context) const;
+    int get_changed_offsets(int index, int generation, int &subindex_graph, int &subindex_dot, int &subindex_gridline) const;
 };
 
 /// A multitap stereo chorus thing - processing
@@ -840,10 +772,10 @@ public:
     void activate();
     void deactivate();
     void set_sample_rate(uint32_t sr);
-    bool get_graph(int index, int subindex, float *data, int points, cairo_iface *context);
-    float freq_gain(int subindex, float freq, float srate);
-    bool get_dot(int index, int subindex, float &x, float &y, int &size, cairo_iface *context);
-    bool get_gridline(int index, int subindex, float &pos, bool &vertical, std::string &legend, cairo_iface *context);
+    bool get_graph(int index, int subindex, float *data, int points, cairo_iface *context) const;
+    float freq_gain(int subindex, float freq, float srate) const;
+    bool get_dot(int index, int subindex, float &x, float &y, int &size, cairo_iface *context) const;
+    bool get_gridline(int index, int subindex, float &pos, bool &vertical, std::string &legend, cairo_iface *context) const;
 };
 
 class gain_reduction_audio_module {
@@ -851,12 +783,12 @@ private:
     float linSlope, detected, kneeSqrt, kneeStart, linKneeStart, kneeStop;
     float compressedKneeStop, adjKneeStart, thres;
     float attack, release, threshold, ratio, knee, makeup, detection, stereo_link, bypass, mute, meter_out, meter_comp;
-    float old_threshold, old_ratio, old_knee, old_makeup, old_bypass, old_mute, old_detection, old_stereo_link;
-    int last_generation;
+    mutable float old_threshold, old_ratio, old_knee, old_makeup, old_bypass, old_mute, old_detection, old_stereo_link;
+    mutable volatile int last_generation;
     uint32_t srate;
     bool is_active;
-    inline float output_level(float slope);
-    inline float output_gain(float linSlope, bool rms);
+    inline float output_level(float slope) const;
+    inline float output_gain(float linSlope, bool rms) const;
 public:
     gain_reduction_audio_module();
     void set_params(float att, float rel, float thr, float rat, float kn, float mak, float det, float stl, float byp, float mu);
@@ -867,10 +799,10 @@ public:
     void set_sample_rate(uint32_t sr);
     float get_output_level();
     float get_comp_level();
-    virtual bool get_graph(int subindex, float *data, int points, cairo_iface *context);
-    virtual bool get_dot(int subindex, float &x, float &y, int &size, cairo_iface *context);
-    virtual bool get_gridline(int subindex, float &pos, bool &vertical, std::string &legend, cairo_iface *context);
-    virtual int  get_changed_offsets(int generation, int &subindex_graph, int &subindex_dot, int &subindex_gridline);
+    virtual bool get_graph(int subindex, float *data, int points, cairo_iface *context) const;
+    virtual bool get_dot(int subindex, float &x, float &y, int &size, cairo_iface *context) const;
+    virtual bool get_gridline(int subindex, float &pos, bool &vertical, std::string &legend, cairo_iface *context) const;
+    virtual int  get_changed_offsets(int generation, int &subindex_graph, int &subindex_dot, int &subindex_gridline) const;
 };
 
 /// Compressor by Thor
@@ -886,17 +818,17 @@ public:
     float *params[param_count];
     uint32_t srate;
     bool is_active;
-    volatile int last_generation, last_calculated_generation;
+    mutable volatile int last_generation, last_calculated_generation;
     compressor_audio_module();
     void activate();
     void deactivate();
     void params_changed();
     void set_sample_rate(uint32_t sr);
     uint32_t process(uint32_t offset, uint32_t numsamples, uint32_t inputs_mask, uint32_t outputs_mask);
-    bool get_graph(int index, int subindex, float *data, int points, cairo_iface *context);
-    bool get_dot(int index, int subindex, float &x, float &y, int &size, cairo_iface *context);
-    bool get_gridline(int index, int subindex, float &pos, bool &vertical, std::string &legend, cairo_iface *context);
-    int  get_changed_offsets(int index, int generation, int &subindex_graph, int &subindex_dot, int &subindex_gridline);
+    bool get_graph(int index, int subindex, float *data, int points, cairo_iface *context) const;
+    bool get_dot(int index, int subindex, float &x, float &y, int &size, cairo_iface *context) const;
+    bool get_gridline(int index, int subindex, float &pos, bool &vertical, std::string &legend, cairo_iface *context) const;
+    int  get_changed_offsets(int index, int generation, int &subindex_graph, int &subindex_dot, int &subindex_gridline) const;
 };
 
 /// Sidecain Compressor by Markus Schmidt (based on Thor's compressor and Krzysztof's filters)
@@ -914,9 +846,10 @@ private:
         BANDPASS_1,
         BANDPASS_2
     };
-    float f1_freq_old, f2_freq_old, f1_level_old, f2_level_old;
-    float f1_freq_old1, f2_freq_old1, f1_level_old1, f2_level_old1;
-    CalfScModes sc_mode, sc_mode_old, sc_mode_old1;
+    mutable float f1_freq_old, f2_freq_old, f1_level_old, f2_level_old;
+    mutable float f1_freq_old1, f2_freq_old1, f1_level_old1, f2_level_old1;
+    CalfScModes sc_mode;
+    mutable CalfScModes sc_mode_old, sc_mode_old1;
     float f1_active, f2_active;
     uint32_t clip_in, clip_out;
     float meter_in, meter_out;
@@ -929,12 +862,12 @@ public:
     float *params[param_count];
     uint32_t srate;
     bool is_active;
-    volatile int last_generation, last_calculated_generation;
+    mutable volatile int last_generation, last_calculated_generation;
     sidechaincompressor_audio_module();
     void activate();
     void deactivate();
     void params_changed();
-    inline cfloat h_z(const cfloat &z) {
+    inline cfloat h_z(const cfloat &z) const {
         switch (sc_mode) {
             default:
             case WIDEBAND:
@@ -958,7 +891,7 @@ public:
         }
                 
     }
-    float freq_gain(int index, double freq, uint32_t sr)
+    float freq_gain(int index, double freq, uint32_t sr) const
     {
         typedef std::complex<double> cfloat;
         freq *= 2.0 * M_PI / sr;
@@ -968,10 +901,10 @@ public:
     }
     void set_sample_rate(uint32_t sr);
     uint32_t process(uint32_t offset, uint32_t numsamples, uint32_t inputs_mask, uint32_t outputs_mask);
-    bool get_graph(int index, int subindex, float *data, int points, cairo_iface *context);
-    bool get_dot(int index, int subindex, float &x, float &y, int &size, cairo_iface *context);
-    bool get_gridline(int index, int subindex, float &pos, bool &vertical, std::string &legend, cairo_iface *context);
-    int  get_changed_offsets(int index, int generation, int &subindex_graph, int &subindex_dot, int &subindex_gridline);
+    bool get_graph(int index, int subindex, float *data, int points, cairo_iface *context) const;
+    bool get_dot(int index, int subindex, float &x, float &y, int &size, cairo_iface *context) const;
+    bool get_gridline(int index, int subindex, float &pos, bool &vertical, std::string &legend, cairo_iface *context) const;
+    int  get_changed_offsets(int index, int generation, int &subindex_graph, int &subindex_dot, int &subindex_gridline) const;
 };
 
 /// Multibandcompressor by Markus Schmidt
@@ -996,10 +929,10 @@ public:
     void params_changed();
     uint32_t process(uint32_t offset, uint32_t numsamples, uint32_t inputs_mask, uint32_t outputs_mask);
     void set_sample_rate(uint32_t sr);
-    virtual bool get_graph(int index, int subindex, float *data, int points, cairo_iface *context);
-    virtual bool get_dot(int index, int subindex, float &x, float &y, int &size, cairo_iface *context);
-    virtual bool get_gridline(int index, int subindex, float &pos, bool &vertical, std::string &legend, cairo_iface *context);
-    virtual int  get_changed_offsets(int index, int generation, int &subindex_graph, int &subindex_dot, int &subindex_gridline);
+    virtual bool get_graph(int index, int subindex, float *data, int points, cairo_iface *context) const;
+    virtual bool get_dot(int index, int subindex, float &x, float &y, int &size, cairo_iface *context) const;
+    virtual bool get_gridline(int index, int subindex, float &pos, bool &vertical, std::string &legend, cairo_iface *context) const;
+    virtual int  get_changed_offsets(int index, int generation, int &subindex_graph, int &subindex_dot, int &subindex_gridline) const;
 };
 
 /// Deesser by Markus Schmidt (based on Thor's compressor and Krzysztof's filters)
@@ -1009,8 +942,8 @@ private:
         WIDE,
         SPLIT
     };
-    float f1_freq_old, f2_freq_old, f1_level_old, f2_level_old, f2_q_old;
-    float f1_freq_old1, f2_freq_old1, f1_level_old1, f2_level_old1, f2_q_old1;
+    mutable float f1_freq_old, f2_freq_old, f1_level_old, f2_level_old, f2_q_old;
+    mutable float f1_freq_old1, f2_freq_old1, f1_level_old1, f2_level_old1, f2_q_old1;
     uint32_t detected_led;
     float detected, clip_out;
     uint32_t clip_led;
@@ -1022,20 +955,20 @@ public:
     float *params[param_count];
     uint32_t srate;
     bool is_active;
-    volatile int last_generation, last_calculated_generation;
+    mutable volatile int last_generation, last_calculated_generation;
     deesser_audio_module();
     void activate();
     void deactivate();
     void params_changed();
-    float freq_gain(int index, double freq, uint32_t sr)
+    float freq_gain(int index, double freq, uint32_t sr) const
     {
         return hpL.freq_gain(freq, sr) * pL.freq_gain(freq, sr);
     }
     void set_sample_rate(uint32_t sr);
     uint32_t process(uint32_t offset, uint32_t numsamples, uint32_t inputs_mask, uint32_t outputs_mask);
-    bool get_graph(int index, int subindex, float *data, int points, cairo_iface *context);
-    bool get_gridline(int index, int subindex, float &pos, bool &vertical, std::string &legend, cairo_iface *context);
-    int  get_changed_offsets(int index, int generation, int &subindex_graph, int &subindex_dot, int &subindex_gridline);
+    bool get_graph(int index, int subindex, float *data, int points, cairo_iface *context) const;
+    bool get_gridline(int index, int subindex, float &pos, bool &vertical, std::string &legend, cairo_iface *context) const;
+    int  get_changed_offsets(int index, int generation, int &subindex_graph, int &subindex_dot, int &subindex_gridline) const;
 };
 
 /// Equalizer N Band by Markus Schmidt (based on Krzysztof's filters)
@@ -1054,7 +987,7 @@ private:
     float ls_level_old, ls_freq_old;
     float hs_level_old, hs_freq_old;
     float p_level_old[PeakBands], p_freq_old[PeakBands], p_q_old[PeakBands];
-    float old_params_for_graph[graph_param_count];
+    mutable float old_params_for_graph[graph_param_count];
     uint32_t clip_inL, clip_outL, clip_inR, clip_outR;
     float meter_inL, meter_outL, meter_inR, meter_outR;
     CalfEqMode hp_mode, lp_mode;
@@ -1070,21 +1003,21 @@ public:
     float *params[param_count];
     uint32_t srate;
     bool is_active;
-    volatile int last_generation, last_calculated_generation;
+    mutable volatile int last_generation, last_calculated_generation;
     equalizerNband_audio_module();
     void activate();
     void deactivate();
 
     void params_changed();
-    float freq_gain(int index, double freq, uint32_t sr);
+    float freq_gain(int index, double freq, uint32_t sr) const;
     void set_sample_rate(uint32_t sr)
     {
         srate = sr;
     }
     uint32_t process(uint32_t offset, uint32_t numsamples, uint32_t inputs_mask, uint32_t outputs_mask);
-    bool get_graph(int index, int subindex, float *data, int points, cairo_iface *context);
-    bool get_gridline(int index, int subindex, float &pos, bool &vertical, std::string &legend, cairo_iface *context);
-    int  get_changed_offsets(int index, int generation, int &subindex_graph, int &subindex_dot, int &subindex_gridline);
+    bool get_graph(int index, int subindex, float *data, int points, cairo_iface *context) const;
+    bool get_gridline(int index, int subindex, float &pos, bool &vertical, std::string &legend, cairo_iface *context) const;
+    int  get_changed_offsets(int index, int generation, int &subindex_graph, int &subindex_dot, int &subindex_gridline) const;
 };
 
 typedef equalizerNband_audio_module<equalizer5band_metadata, false> equalizer5band_audio_module;
@@ -1106,9 +1039,9 @@ public:
     void set_phase(float ph);
     void activate();
     void deactivate();
-    float get_value_from_phase(float ph, float off);
-    virtual bool get_graph(float *data, int points, cairo_iface *context);
-    virtual bool get_dot(float &x, float &y, int &size, cairo_iface *context);
+    float get_value_from_phase(float ph, float off) const;
+    virtual bool get_graph(float *data, int points, cairo_iface *context) const;
+    virtual bool get_dot(float &x, float &y, int &size, cairo_iface *context) const;
 };
 
 /// Pulsator by Markus Schmidt
@@ -1139,9 +1072,9 @@ public:
         }
     }
     uint32_t process(uint32_t offset, uint32_t numsamples, uint32_t inputs_mask, uint32_t outputs_mask);
-    bool get_graph(int index, int subindex, float *data, int points, cairo_iface *context);
-    bool get_dot(int index, int subindex, float &x, float &y, int &size, cairo_iface *context);
-    bool get_gridline(int index, int subindex, float &pos, bool &vertical, std::string &legend, cairo_iface *context);
+    bool get_graph(int index, int subindex, float *data, int points, cairo_iface *context) const;
+    bool get_dot(int index, int subindex, float &x, float &y, int &size, cairo_iface *context) const;
+    bool get_gridline(int index, int subindex, float &pos, bool &vertical, std::string &legend, cairo_iface *context) const;
 };
 
 /// Filterclavier --- MIDI controlled filter by Hans Baier
@@ -1229,7 +1162,7 @@ public:
         }
     }
 
-    bool get_graph(int index, int subindex, float *data, int points, cairo_iface *context);
+    bool get_graph(int index, int subindex, float *data, int points, cairo_iface *context) const;
     
 private:
     void adjust_gain_according_to_filter_mode(int velocity) {
