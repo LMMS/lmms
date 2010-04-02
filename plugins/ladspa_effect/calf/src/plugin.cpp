@@ -22,7 +22,6 @@
 #include <calf/lv2wrap.h>
 #include <calf/modules.h>
 #include <calf/modules_dev.h>
-#include <calf/modules_small.h>
 
 using namespace calf_plugins;
 
@@ -61,11 +60,7 @@ const LV2_Descriptor *lv2_descriptor(uint32_t index)
 {
     #define PER_MODULE_ITEM(name, isSynth, jackname) if (!(index--)) return &lv2_wrapper<name##_audio_module>::get().descriptor;
     #include <calf/modulelist.h>
-#ifdef ENABLE_EXPERIMENTAL
-    return lv2_small_descriptor(index);
-#else
     return NULL;
-#endif
 }
 
 };
