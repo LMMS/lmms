@@ -395,8 +395,6 @@ public:
     const plugin_metadata_iface *get_by_uri(const char *URI);
 };
 
-/// Get a list of all "small" (module) plugins
-extern void get_all_small_plugins(plugin_list_info_iface *plii);
 /// Load and strdup a text file with GUI definition
 extern const char *load_gui_xml(const std::string &plugin_id);
 
