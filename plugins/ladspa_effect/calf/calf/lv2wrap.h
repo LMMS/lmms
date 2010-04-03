@@ -96,28 +96,28 @@ struct lv2_instance: public plugin_ctl_iface, public progress_report_iface, publ
     virtual const char *get_gui_xml() {
         return Module::get_gui_xml();
     }
-    virtual line_graph_iface *get_line_graph_iface()
+    virtual const line_graph_iface *get_line_graph_iface() const
     {
-        return dynamic_cast<line_graph_iface *>(this);
+        return dynamic_cast<const line_graph_iface *>(this);
     }
     virtual bool activate_preset(int bank, int program) { 
         return false;
     }
-    virtual const char *get_name()
+    virtual const char *get_name() const
     {
         return Module::get_name();
     }
-    virtual const char *get_id()
+    virtual const char *get_id() const
     {
         return Module::get_id();
     }
-    virtual const char *get_label()
+    virtual const char *get_label() const
     {
         return Module::get_label();
     }
-    virtual int get_input_count() { return Module::in_count; }
-    virtual int get_output_count() { return Module::out_count; }
-    virtual bool get_midi() { return Module::support_midi; }
+    virtual int get_input_count() const { return Module::in_count; }
+    virtual int get_output_count() const { return Module::out_count; }
+    virtual bool get_midi() const { return Module::support_midi; }
     virtual float get_level(unsigned int port) { return 0.f; }
     virtual void execute(int cmd_no) {
         Module::execute(cmd_no);

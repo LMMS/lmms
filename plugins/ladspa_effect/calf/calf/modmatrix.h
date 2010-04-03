@@ -84,10 +84,10 @@ protected:
 
     mod_matrix(dsp::modulation_entry *_matrix, unsigned int _rows, const char **_src_names, const char **_dest_names);
 public:
-    virtual const table_column_info *get_table_columns(int param);
-    virtual uint32_t get_table_rows(int param);
-    virtual std::string get_cell(int param, int row, int column);
-    virtual void set_cell(int param, int row, int column, const std::string &src, std::string &error);
+    virtual const table_column_info *get_table_columns(int param) const;
+    virtual uint32_t get_table_rows(int param) const;
+    virtual std::string get_cell(int param, int row, int column) const;
+    virtual void set_cell(int param, int row, int column, const std::string &src, std::string &error) const;
 
     /// Process modulation matrix, calculate outputs from inputs
     inline void calculate_modmatrix(float *moddest, int moddest_count, float *modsrc)

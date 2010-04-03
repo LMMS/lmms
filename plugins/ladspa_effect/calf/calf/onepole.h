@@ -144,7 +144,7 @@ public:
         return out;
     }
     
-    inline bool empty() {
+    inline bool empty() const {
         return y1 == 0;
     }
     
@@ -171,7 +171,7 @@ public:
     /// Return the filter's gain at frequency freq
     /// @param freq   Frequency to look up
     /// @param sr     Filter sample rate (used to convert frequency to angular frequency)
-    float freq_gain(float freq, float sr)
+    float freq_gain(float freq, float sr) const
     {
         freq *= 2.0 * M_PI / sr;
         cfloat z = 1.0 / exp(cfloat(0.0, freq));
@@ -181,7 +181,7 @@ public:
     
     /// Return H(z) the filter's gain at frequency freq
     /// @param z   Z variable (e^jw)
-    cfloat h_z(const cfloat &z)
+    cfloat h_z(const cfloat &z) const
     {
         return (cfloat(a0) + double(a1) * z) / (cfloat(1.0) + double(b1) * z);
     }

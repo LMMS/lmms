@@ -99,9 +99,9 @@ struct ladspa_instance: public Module, public plugin_ctl_iface
     virtual const char *get_gui_xml() {
         return Module::get_gui_xml();
     }
-    virtual line_graph_iface *get_line_graph_iface()
+    virtual const line_graph_iface *get_line_graph_iface() const
     {
-        return dynamic_cast<line_graph_iface *>(this);
+        return dynamic_cast<const line_graph_iface *>(this);
     }
     virtual bool activate_preset(int bank, int program) { 
         return false;
