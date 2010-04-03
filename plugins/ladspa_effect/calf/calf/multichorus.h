@@ -80,7 +80,7 @@ public:
         voice_depth = (unsigned int)((1U << 30) * 1.0 * scaling);
     }
     /// Get LFO value for given voice, returns a values in range of [-65536, 65535] (or close)
-    inline int get_value(uint32_t voice) {
+    inline int get_value(uint32_t voice) const {
         // find this voice's phase (= phase + voice * 360 degrees / number of voices)
         chorus_phase voice_phase = phase + vphase * (int)voice;
         // find table offset
@@ -178,7 +178,7 @@ public:
         }
         post.sanitize();
     }
-    float freq_gain(float freq, float sr)
+    float freq_gain(float freq, float sr) const
     {
         typedef std::complex<double> cfloat;
         freq *= 2.0 * M_PI / sr;

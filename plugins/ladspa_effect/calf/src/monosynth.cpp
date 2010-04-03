@@ -204,7 +204,7 @@ void monosynth_audio_module::precalculate_waves(progress_report_iface *reporter)
     
 }
 
-bool monosynth_audio_module::get_graph(int index, int subindex, float *data, int points, cairo_iface *context)
+bool monosynth_audio_module::get_graph(int index, int subindex, float *data, int points, cairo_iface *context) const
 {
     monosynth_audio_module::precalculate_waves(NULL);
     // printf("get_graph %d %p %d wave1=%d wave2=%d\n", index, data, points, wave1, wave2);
@@ -239,7 +239,7 @@ bool monosynth_audio_module::get_graph(int index, int subindex, float *data, int
             typedef complex<double> cfloat;
             double freq = 20.0 * pow (20000.0 / 20.0, i * 1.0 / points);
             
-            dsp::biquad_d1_lerp<float> &f = subindex ? filter2 : filter;
+            const dsp::biquad_d1_lerp<float> &f = subindex ? filter2 : filter;
             float level = f.freq_gain(freq, srate);
             if (!is_stereo_filter())
                 level *= filter2.freq_gain(freq, srate);

@@ -305,7 +305,7 @@ public:
     /// Return the filter's gain at frequency freq
     /// @param freq   Frequency to look up
     /// @param sr     Filter sample rate (used to convert frequency to angular frequency)
-    float freq_gain(float freq, float sr)
+    float freq_gain(float freq, float sr) const
     {
         typedef std::complex<double> cfloat;
         freq *= 2.0 * M_PI / sr;
@@ -316,7 +316,7 @@ public:
     
     /// Return H(z) the filter's gain at frequency freq
     /// @param z   Z variable (e^jw)
-    cfloat h_z(const cfloat &z)
+    cfloat h_z(const cfloat &z) const
     {
         
         return (cfloat(a0) + double(a1) * z + double(a2) * z*z) / (cfloat(1.0) + double(b1) * z + double(b2) * z*z);
@@ -396,7 +396,7 @@ struct biquad_d1: public biquad_coeffs<Coeff>
         dsp::zero(x2);
         dsp::zero(y2);
     }
-    inline bool empty() {
+    inline bool empty() const {
         return (y1 == 0.f && y2 == 0.f);
     }
     
@@ -448,7 +448,7 @@ struct biquad_d2: public biquad_coeffs<Coeff>
     }
 
     /// Is the filter state completely silent? (i.e. set to 0 by sanitize function)
-    inline bool empty() {
+    inline bool empty() const {
         return (w1 == 0.f && w2 == 0.f);
     }
     
@@ -575,6 +575,74 @@ struct biquad_d1_lerp: public biquad_coeffs<Coeff>
     
 };
     
+/// Compose two filters in series
+template<class F1, class F2>
+class filter_compose {
+public:
+    typedef std::complex<float> cfloat;
+    F1 f1;
+    F2 f2;
+public:
+    float process(float value) {
+        return f2.process(f1.process(value));
+    }
+    
+    inline cfloat h_z(const cfloat &z) const {
+        return f1.h_z(z) * f2.h_z(z);
+    }
+    
+    /// Return the filter's gain at frequency freq
+    /// @param freq   Frequency to look up
+    /// @param sr     Filter sample rate (used to convert frequency to angular frequency)
+    float freq_gain(float freq, float sr) const
+    {
+        typedef std::complex<double> cfloat;
+        freq *= 2.0 * M_PI / sr;
+        cfloat z = 1.0 / exp(cfloat(0.0, freq));
+        
+        return std::abs(h_z(z));
+    }
+    
+    void sanitize() {
+        f1.sanitize();
+        f2.sanitize();
+    }
+};
+
+/// Compose two filters in parallel
+template<class F1, class F2>
+class filter_sum {
+public:
+    typedef std::complex<double> cfloat;
+    F1 f1;
+    F2 f2;
+public:
+    float process(float value) {
+        return f2.process(value) + f1.process(value);
+    }
+    
+    inline cfloat h_z(const cfloat &z) const {
+        return f1.h_z(z) + f2.h_z(z);
+    }
+    
+    /// Return the filter's gain at frequency freq
+    /// @param freq   Frequency to look up
+    /// @param sr     Filter sample rate (used to convert frequency to angular frequency)
+    float freq_gain(float freq, float sr) const
+    {
+        typedef std::complex<double> cfloat;
+        freq *= 2.0 * M_PI / sr;
+        cfloat z = 1.0 / exp(cfloat(0.0, freq));
+        
+        return std::abs(h_z(z));
+    }
+    
+    void sanitize() {
+        f1.sanitize();
+        f2.sanitize();
+    }
+};
+
 };
 
 #endif

@@ -889,7 +889,7 @@ CALF_PORT_PROPS(wavetable) = {
 
 ////////////////////////////////////////////////////////////////////////////
 
-void calf_plugins::get_all_plugins(std::vector<plugin_metadata_iface *> &plugins)
+calf_plugins::plugin_registry::plugin_registry()
 {
     #define PER_MODULE_ITEM(name, isSynth, jackname) plugins.push_back(new name##_metadata);
     #define PER_SMALL_MODULE_ITEM(...)

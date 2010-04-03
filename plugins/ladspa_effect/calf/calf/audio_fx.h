@@ -53,21 +53,21 @@ protected:
     gain_smoothing gs_wet, gs_dry;
 public:
     fixed_point<unsigned int, 20> phase, dphase;
-    float get_rate() {
+    float get_rate() const {
         return rate;
     }
     void set_rate(float rate) {
         this->rate = rate;
         dphase = rate/sample_rate*4096;        
     }
-    float get_wet() {
+    float get_wet() const {
         return wet;
     }
     void set_wet(float wet) {
         this->wet = wet;
         gs_wet.set_inertia(wet);
     }
-    float get_dry() {
+    float get_dry() const {
         return dry;
     }
     void set_dry(float dry) {
@@ -115,13 +115,13 @@ public:
         stages = 0;
         set_stages(6);
     }
-    float get_base_frq() {
+    float get_base_frq() const {
         return base_frq;
     }
     void set_base_frq(float _base_frq) {
         base_frq = _base_frq;
     }
-    int get_stages() {
+    int get_stages() const {
         return stages;
     }
     void set_stages(int _stages) {
@@ -135,13 +135,13 @@ public:
         }
         stages = _stages;
     }
-    float get_mod_depth() {
+    float get_mod_depth() const {
         return mod_depth;
     }
     void set_mod_depth(float _mod_depth) {
         mod_depth = _mod_depth;
     }
-    float get_fb() {
+    float get_fb() const {
         return fb;
     }
     void set_fb(float fb) {
@@ -196,7 +196,7 @@ public:
             *buf_out++ = sdry + swet;
         }
     }
-    float freq_gain(float freq, float sr)
+    float freq_gain(float freq, float sr) const
     {
         typedef std::complex<double> cfloat;
         freq *= 2.0 * M_PI / sr;
@@ -225,14 +225,14 @@ protected:
     float min_delay, mod_depth;
     sine_table<int, 4096, 65536> sine;
 public:
-    float get_min_delay() {
+    float get_min_delay() const {
         return min_delay;
     }
     void set_min_delay(float min_delay) {
         this->min_delay = min_delay;
         this->min_delay_samples = (int)(min_delay * 65536.0 * sample_rate);
     }
-    float get_mod_depth() {
+    float get_mod_depth() const {
         return mod_depth;
     }
     void set_mod_depth(float mod_depth) {
@@ -319,7 +319,7 @@ public:
         set_rate(get_rate());
         set_min_delay(get_min_delay());
     }
-    float get_fb() {
+    float get_fb() const {
         return fb;
     }
     void set_fb(float fb) {
@@ -386,7 +386,7 @@ public:
         }
         last_delay_pos = delay_pos;
     }
-    float freq_gain(float freq, float sr)
+    float freq_gain(float freq, float sr) const
     {
         typedef std::complex<double> cfloat;
         freq *= 2.0 * M_PI / sr;
@@ -504,7 +504,7 @@ public:
             rdec[i]=exp(-float(tr[i] >> 16) / fDec);
         }
     }
-    float get_time() {
+    float get_time() const {
         return time;
     }
     void set_time(float time) {
@@ -512,14 +512,14 @@ public:
         // fb = pow(1.0f/4096.0f, (float)(1700/(time*sr)));
         fb = 1.0 - 0.3 / (time * sr / 44100.0);
     }
-    float get_type() {
+    float get_type() const {
         return type;
     }
     void set_type(int type) {
         this->type = type;
         update_times();
     }
-    float get_diffusion() {
+    float get_diffusion() const {
         return diffusion;
     }
     void set_diffusion(float diffusion) {
@@ -531,7 +531,7 @@ public:
         this->diffusion = diffusion;
         update_times();
     }
-    float get_fb()
+    float get_fb() const
     {
         return this->fb;
     }
@@ -539,7 +539,7 @@ public:
     {
         this->fb = fb;
     }
-    float get_cutoff() {
+    float get_cutoff() const {
         return cutoff;
     }
     void set_cutoff(float cutoff) {
@@ -604,7 +604,7 @@ public:
     virtual void  filter_activate() = 0;
     virtual void  sanitize() = 0;
     virtual int   process_channel(uint16_t channel_no, float *in, float *out, uint32_t numsamples, int inmask) = 0;
-    virtual float freq_gain(int subindex, float freq, float srate) = 0;
+    virtual float freq_gain(int subindex, float freq, float srate) const = 0;
 
     virtual ~filter_module_iface() {}
 };
@@ -730,7 +730,7 @@ public:
         return filter[order - 1].empty() ? 0 : inmask;
     }
     
-    float freq_gain(int subindex, float freq, float srate)
+    float freq_gain(int subindex, float freq, float srate) const
     {
         float level = 1.0;
         for (int j = 0; j < order; j++)
