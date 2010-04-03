@@ -792,6 +792,7 @@ private:
 public:
     gain_reduction_audio_module();
     void set_params(float att, float rel, float thr, float rat, float kn, float mak, float det, float stl, float byp, float mu);
+    void update_curve();
     void process(float &left, float &right, float det_left = NULL, float det_right = NULL);
     void activate();
     void deactivate();
@@ -910,6 +911,7 @@ public:
 /// Multibandcompressor by Markus Schmidt
 class multibandcompressor_audio_module: public audio_module<multibandcompressor_metadata>, public line_graph_iface {
 private:
+    typedef multibandcompressor_audio_module AM;
     static const int strips = 4;
     bool mute[strips];
     uint32_t clip_inL, clip_inR, clip_outL, clip_outR;
@@ -929,6 +931,7 @@ public:
     void params_changed();
     uint32_t process(uint32_t offset, uint32_t numsamples, uint32_t inputs_mask, uint32_t outputs_mask);
     void set_sample_rate(uint32_t sr);
+    const gain_reduction_audio_module *get_strip_by_param_index(int index) const;
     virtual bool get_graph(int index, int subindex, float *data, int points, cairo_iface *context) const;
     virtual bool get_dot(int index, int subindex, float &x, float &y, int &size, cairo_iface *context) const;
     virtual bool get_gridline(int index, int subindex, float &pos, bool &vertical, std::string &legend, cairo_iface *context) const;
