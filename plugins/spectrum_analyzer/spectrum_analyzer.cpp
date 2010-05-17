@@ -1,8 +1,8 @@
 /*
  * spectrum_analyzer.cpp - spectrum analyzer plugin
  *
- * Copyright (c) 2008-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ * Copyright (c) 2008-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -80,6 +80,11 @@ bool spectrumAnalyzer::processAudioBuffer( sampleFrame * _buf,
 	if( !isEnabled() || !isRunning () )
 	{
 		return( false );
+	}
+
+	if( !m_saControls.isViewVisible() )
+	{
+		return true;
 	}
 
 	fpp_t f = 0;
