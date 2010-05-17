@@ -636,6 +636,7 @@ void sf2Instrument::playNote( notePlayHandle * _n, sampleFrame * )
 
 	SF2PluginData * pluginData = static_cast<SF2PluginData *>(
 							_n->m_pluginData );
+#ifdef SOMEONE_FIXED_PER_NOTE_PANNING
 	if( pluginData->fluidVoice &&
 			pluginData->lastPanning != _n->getPanning() )
 	{
@@ -650,6 +651,7 @@ void sf2Instrument::playNote( notePlayHandle * _n, sampleFrame * )
 
 		pluginData->lastPanning = _n->getPanning();
 	}
+#endif
 
 	const float currentVelocity = _n->volumeLevel( tfp ) * 127;
 	if( pluginData->fluidVoice &&
