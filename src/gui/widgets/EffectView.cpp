@@ -2,7 +2,7 @@
  * effect_view.cpp - view-component for an effect
  *
  * Copyright (c) 2006-2007 Danny McRae <khjklujn/at/users.sourceforge.net>
- * Copyright (c) 2007-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2007-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -47,8 +47,7 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 	PluginView( _model, _parent ),
 	m_bg( embed::getIconPixmap( "effect_plugin" ) ),
 	m_subWindow( NULL ),
-	m_controlView( NULL ),
-	m_show( true )
+	m_controlView( NULL )
 {
 	setFixedSize( 210, 60 );
 
@@ -162,16 +161,16 @@ void EffectView::editControls()
 {
 	if( m_subWindow )
 	{
-		if( m_show )
+		if( !effect()->controls()->isViewVisible() )
 		{
 			m_subWindow->show();
 			m_subWindow->raise();
-			m_show = false;
+			effect()->controls()->setViewVisible( true );
 		}
 		else
 		{
 			m_subWindow->hide();
-			m_show = true;
+			effect()->controls()->setViewVisible( false );
 		}
 	}
 }
@@ -217,7 +216,7 @@ void EffectView::closeEffects()
 	{
 		m_subWindow->hide();
 	}
-	m_show = true;
+	effect()->controls()->setViewVisible( false );
 }
 
 
