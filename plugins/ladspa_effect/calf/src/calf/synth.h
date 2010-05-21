@@ -19,14 +19,16 @@
  * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, 
  * Boston, MA 02111-1307, USA.
  */
-#ifndef __CALF_SYNTH_H
-#define __CALF_SYNTH_H
+#ifndef CALF_SYNTH_H
+#define CALF_SYNTH_H
 
+#include <assert.h>
+#include <math.h>
+#include <memory.h>
+#include <stdint.h>
+#include <bitset>
 #include <list>
 #include <stack>
-#include <bitset>
-#include "primitives.h"
-#include "audio_fx.h"
 
 namespace dsp {
 

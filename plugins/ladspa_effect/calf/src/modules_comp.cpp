@@ -1,7 +1,7 @@
-/* Calf DSP Library
- * Example audio modules - DSP code
+/* Calf DSP plugin pack
+ * Compression related plugins
  *
- * Copyright (C) 2001-2008 Krzysztof Foltman
+ * Copyright (C) 2001-2010 Krzysztof Foltman, Markus Schmidt, Thor Harald Johansen and others
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -18,333 +18,15 @@
  * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, 
  * Boston, MA  02110-1301  USA
  */
-#include <assert.h>
 #include <limits.h>
 #include <memory.h>
-#if USE_JACK
-#include <jack/jack.h>
-#endif
 #include <calf/giface.h>
-#include <calf/modules.h>
-#include <calf/modules_dev.h>
+#include <calf/modules_comp.h>
 
 using namespace dsp;
 using namespace calf_plugins;
 
 #define SET_IF_CONNECTED(name) if (params[AM::param_##name] != NULL) *params[AM::param_##name] = name;
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-bool frequency_response_line_graph::get_gridline(int index, int subindex, float &pos, bool &vertical, std::string &legend, cairo_iface *context) const
-{ 
-    return get_freq_gridline(subindex, pos, vertical, legend, context);
-}
-
-int frequency_response_line_graph::get_changed_offsets(int index, int generation, int &subindex_graph, int &subindex_dot, int &subindex_gridline) const
-{
-    subindex_graph = 0;
-    subindex_dot = 0;
-    subindex_gridline = generation ? INT_MAX : 0;
-    return 1;
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-void flanger_audio_module::activate() {
-    left.reset();
-    right.reset();
-    last_r_phase = *params[par_stereo] * (1.f / 360.f);
-    left.reset_phase(0.f);
-    right.reset_phase(last_r_phase);
-    is_active = true;
-}
-
-void flanger_audio_module::set_sample_rate(uint32_t sr) {
-    srate = sr;
-    left.setup(sr);
-    right.setup(sr);
-}
-
-void flanger_audio_module::deactivate() {
-    is_active = false;
-}
-
-bool flanger_audio_module::get_graph(int index, int subindex, float *data, int points, cairo_iface *context) const
-{
-    if (!is_active)
-        return false;
-    if (index == par_delay && subindex < 2) 
-    {
-        set_channel_color(context, subindex);
-        return ::get_graph(*this, subindex, data, points);
-    }
-    return false;
-}
-
-float flanger_audio_module::freq_gain(int subindex, float freq, float srate) const
-{
-    return (subindex ? right : left).freq_gain(freq, srate);                
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////
-
-void phaser_audio_module::set_sample_rate(uint32_t sr)
-{
-    srate = sr;
-    left.setup(sr);
-    right.setup(sr);
-}
-
-void phaser_audio_module::activate()
-{
-    is_active = true;
-    left.reset();
-    right.reset();
-    last_r_phase = *params[par_stereo] * (1.f / 360.f);
-    left.reset_phase(0.f);
-    right.reset_phase(last_r_phase);
-}
-
-void phaser_audio_module::deactivate()
-{
-    is_active = false;
-}
-
-bool phaser_audio_module::get_graph(int index, int subindex, float *data, int points, cairo_iface *context) const
-{
-    if (!is_active)
-        return false;
-    if (subindex < 2) 
-    {
-        set_channel_color(context, subindex);
-        return ::get_graph(*this, subindex, data, points);
-    }
-    return false;
-}
-
-float phaser_audio_module::freq_gain(int subindex, float freq, float srate) const
-{
-    return (subindex ? right : left).freq_gain(freq, srate);                
-}
-
-bool phaser_audio_module::get_gridline(int index, int subindex, float &pos, bool &vertical, std::string &legend, cairo_iface *context) const
-{
-    return get_freq_gridline(subindex, pos, vertical, legend, context);
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////
-
-void reverb_audio_module::activate()
-{
-    reverb.reset();
-}
-
-void reverb_audio_module::deactivate()
-{
-}
-
-void reverb_audio_module::set_sample_rate(uint32_t sr)
-{
-    srate = sr;
-    reverb.setup(sr);
-    amount.set_sample_rate(sr);
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////
-
-bool filter_audio_module::get_graph(int index, int subindex, float *data, int points, cairo_iface *context) const
-{
-    if (!is_active)
-        return false;
-    if (index == par_cutoff && !subindex) {
-        context->set_line_width(1.5);
-        return ::get_graph(*this, subindex, data, points);
-    }
-    return false;
-}
-
-int filter_audio_module::get_changed_offsets(int index, int generation, int &subindex_graph, int &subindex_dot, int &subindex_gridline) const
-{
-    if (fabs(inertia_cutoff.get_last() - old_cutoff) + 100 * fabs(inertia_resonance.get_last() - old_resonance) + fabs(*params[par_mode] - old_mode) > 0.1f)
-    {
-        old_cutoff = inertia_cutoff.get_last();
-        old_resonance = inertia_resonance.get_last();
-        old_mode = *params[par_mode];
-        last_generation++;
-        subindex_graph = 0;
-        subindex_dot = INT_MAX;
-        subindex_gridline = INT_MAX;
-    }
-    else {
-        subindex_graph = 0;
-        subindex_dot = subindex_gridline = generation ? INT_MAX : 0;
-    }
-    if (generation == last_calculated_generation)
-        subindex_graph = INT_MAX;
-    return last_generation;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////
-
-bool filterclavier_audio_module::get_graph(int index, int subindex, float *data, int points, cairo_iface *context) const
-{
-    if (!is_active || index != par_mode) {
-        return false;
-    }
-    if (!subindex) {
-        context->set_line_width(1.5);
-        return ::get_graph(*this, subindex, data, points);
-    }
-    return false;
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////
-
-rotary_speaker_audio_module::rotary_speaker_audio_module()
-{
-    mwhl_value = hold_value = 0.f;
-    phase_h = phase_l = 0.f;
-    aspeed_l = 1.f;
-    aspeed_h = 1.f;
-    dspeed = 0.f;
-}    
-
-void rotary_speaker_audio_module::set_sample_rate(uint32_t sr)
-{
-    srate = sr;
-    setup();
-}
-
-void rotary_speaker_audio_module::setup()
-{
-    crossover1l.set_lp_rbj(800.f, 0.7, (float)srate);
-    crossover1r.set_lp_rbj(800.f, 0.7, (float)srate);
-    crossover2l.set_hp_rbj(800.f, 0.7, (float)srate);
-    crossover2r.set_hp_rbj(800.f, 0.7, (float)srate);
-}
-
-void rotary_speaker_audio_module::activate()
-{
-    phase_h = phase_l = 0.f;
-    maspeed_h = maspeed_l = 0.f;
-    setup();
-}
-
-void rotary_speaker_audio_module::deactivate()
-{
-}
-
-void rotary_speaker_audio_module::control_change(int ctl, int val)
-{
-    if (vibrato_mode == 3 && ctl == 64)
-    {
-        hold_value = val / 127.f;
-        set_vibrato();
-        return;
-    }
-    if (vibrato_mode == 4 && ctl == 1)
-    {
-        mwhl_value = val / 127.f;
-        set_vibrato();
-        return;
-    }
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////
-
-void multichorus_audio_module::activate()
-{
-    is_active = true;
-    params_changed();
-}
-
-void multichorus_audio_module::deactivate()
-{
-    is_active = false;
-}
-
-void multichorus_audio_module::set_sample_rate(uint32_t sr) {
-    srate = sr;
-    left.setup(sr);
-    right.setup(sr);
-}
-
-bool multichorus_audio_module::get_graph(int index, int subindex, float *data, int points, cairo_iface *context) const
-{
-    if (!is_active)
-        return false;
-    int nvoices = (int)*params[par_voices];
-    if (index == par_delay && subindex < 3) 
-    {
-        if (subindex < 2)
-            set_channel_color(context, subindex);
-        else {
-            context->set_source_rgba(0.35, 0.4, 0.2);
-            context->set_line_width(1.0);
-        }
-        return ::get_graph(*this, subindex, data, points);
-    }
-    if (index == par_rate && subindex < nvoices) {
-        const sine_multi_lfo<float, 8> &lfo = left.lfo;
-        for (int i = 0; i < points; i++) {
-            float phase = i * 2 * M_PI / points;
-            // original -65536 to 65535 value
-            float orig = subindex * lfo.voice_offset + ((lfo.voice_depth >> (30-13)) * 65536.0 * (0.95 * sin(phase) + 1)/ 8192.0) - 65536;
-            // scale to -1..1
-            data[i] = orig / 65536.0;
-        }
-        return true;
-    }
-    return false;
-}
-
-bool multichorus_audio_module::get_dot(int index, int subindex, float &x, float &y, int &size, cairo_iface *context) const
-{
-    int voice = subindex >> 1;
-    int nvoices = (int)*params[par_voices];
-    if ((index != par_rate && index != par_depth) || voice >= nvoices)
-        return false;
-
-    float unit = (1 - *params[par_overlap]);
-    float scw = 1 + unit * (nvoices - 1);
-    set_channel_color(context, subindex);
-    const sine_multi_lfo<float, 8> &lfo = (subindex & 1 ? right : left).lfo;
-    if (index == par_rate)
-    {
-        x = (double)(lfo.phase + lfo.vphase * voice) / 4096.0;
-        y = 0.95 * sin(x * 2 * M_PI);
-        y = (voice * unit + (y + 1) / 2) / scw * 2 - 1;
-    }
-    else
-    {
-        double ph = (double)(lfo.phase + lfo.vphase * voice) / 4096.0;
-        x = 0.5 + 0.5 * sin(ph * 2 * M_PI);
-        y = subindex & 1 ? -0.75 : 0.75;
-        x = (voice * unit + x) / scw;
-    }
-    return true;
-}
-
-bool multichorus_audio_module::get_gridline(int index, int subindex, float &pos, bool &vertical, std::string &legend, cairo_iface *context) const
-{
-    if (index == par_rate && !subindex)
-    {
-        pos = 0;
-        vertical = false;
-        return true;
-    }
-    if (index == par_delay)
-        return get_freq_gridline(subindex, pos, vertical, legend, context);
-    return false;
-}
-
-float multichorus_audio_module::freq_gain(int subindex, float freq, float srate) const
-{
-    if (subindex == 2)
-        return *params[par_amount] * left.post.freq_gain(freq, srate);
-    return (subindex ? right : left).freq_gain(freq, srate);                
-}
 
 /// Multibandcompressor by Markus Schmidt
 ///
@@ -733,6 +415,8 @@ uint32_t compressor_audio_module::process(uint32_t offset, uint32_t numsamples, 
         clip_in    -= std::min(clip_in,  numsamples);
         clip_out   -= std::min(clip_out,  numsamples);
         
+        compressor.update_curve();        
+        
         while(offset < numsamples) {
             // cycle through samples
             float outL = 0.f;
@@ -745,10 +429,8 @@ uint32_t compressor_audio_module::process(uint32_t offset, uint32_t numsamples, 
             
             float leftAC = inL;
             float rightAC = inR;
-            float leftSC = inL;
-            float rightSC = inR;
             
-            compressor.process(leftAC, rightAC, leftSC, rightSC);
+            compressor.process(leftAC, rightAC);
             
             outL = leftAC;
             outR = rightAC;
@@ -773,18 +455,10 @@ uint32_t compressor_audio_module::process(uint32_t offset, uint32_t numsamples, 
         } // cycle trough samples
     }
     // draw meters
-    if(params[param_clip_in] != NULL) {
-        *params[param_clip_in] = clip_in;
-    }
-    if(params[param_clip_out] != NULL) {
-        *params[param_clip_out] = clip_out;
-    }
-    if(params[param_meter_in] != NULL) {
-        *params[param_meter_in] = meter_in;
-    }
-    if(params[param_meter_out] != NULL) {
-        *params[param_meter_out] = meter_out;
-    }
+    SET_IF_CONNECTED(clip_in)
+    SET_IF_CONNECTED(clip_out)
+    SET_IF_CONNECTED(meter_in)
+    SET_IF_CONNECTED(meter_out)
     // draw strip meter
     if(bypass > 0.5f) {
         if(params[param_compression] != NULL) {
@@ -855,6 +529,40 @@ void sidechaincompressor_audio_module::deactivate()
 {
     is_active = false;
     compressor.deactivate();
+}
+
+sidechaincompressor_audio_module::cfloat sidechaincompressor_audio_module::h_z(const cfloat &z) const
+{
+    switch (sc_mode) {
+        default:
+        case WIDEBAND:
+            return false;
+            break;
+        case DEESSER_WIDE:
+        case DERUMBLER_WIDE:
+        case WEIGHTED_1:
+        case WEIGHTED_2:
+        case WEIGHTED_3:
+        case BANDPASS_2:
+            return f1L.h_z(z) * f2L.h_z(z);
+            break;
+        case DEESSER_SPLIT:
+            return f2L.h_z(z);
+            break;
+        case DERUMBLER_SPLIT:
+        case BANDPASS_1:
+            return f1L.h_z(z);
+            break;
+    }            
+}
+
+float sidechaincompressor_audio_module::freq_gain(int index, double freq, uint32_t sr) const
+{
+    typedef std::complex<double> cfloat;
+    freq *= 2.0 * M_PI / sr;
+    cfloat z = 1.0 / exp(cfloat(0.0, freq));
+    
+    return std::abs(h_z(z));
 }
 
 void sidechaincompressor_audio_module::params_changed()
@@ -991,6 +699,7 @@ uint32_t sidechaincompressor_audio_module::process(uint32_t offset, uint32_t num
         
         clip_in    -= std::min(clip_in,  numsamples);
         clip_out   -= std::min(clip_out,  numsamples);
+        compressor.update_curve();        
         
         while(offset < numsamples) {
             // cycle through samples
@@ -1013,7 +722,7 @@ uint32_t sidechaincompressor_audio_module::process(uint32_t offset, uint32_t num
             switch ((int)*params[param_sc_mode]) {
                 default:
                 case WIDEBAND:
-                    compressor.process(leftAC, rightAC, leftSC, rightSC);
+                    compressor.process(leftAC, rightAC);
                     break;
                 case DEESSER_WIDE:
                 case DERUMBLER_WIDE:
@@ -1025,14 +734,14 @@ uint32_t sidechaincompressor_audio_module::process(uint32_t offset, uint32_t num
                     rightSC = f2R.process(f1R.process(rightSC));
                     leftMC = leftSC;
                     rightMC = rightSC;
-                    compressor.process(leftAC, rightAC, leftSC, rightSC);
+                    compressor.process(leftAC, rightAC, &leftSC, &rightSC);
                     break;
                 case DEESSER_SPLIT:
                     leftSC = f2L.process(leftSC);
                     rightSC = f2R.process(rightSC);
                     leftMC = leftSC;
                     rightMC = rightSC;
-                    compressor.process(leftSC, rightSC, leftSC, rightSC);
+                    compressor.process(leftSC, rightSC, &leftSC, &rightSC);
                     leftAC = f1L.process(leftAC);
                     rightAC = f1R.process(rightAC);
                     leftAC += leftSC;
@@ -1043,7 +752,7 @@ uint32_t sidechaincompressor_audio_module::process(uint32_t offset, uint32_t num
                     rightSC = f1R.process(rightSC);
                     leftMC = leftSC;
                     rightMC = rightSC;
-                    compressor.process(leftSC, rightSC, leftSC, rightSC);
+                    compressor.process(leftSC, rightSC);
                     leftAC = f2L.process(leftAC);
                     rightAC = f2R.process(rightAC);
                     leftAC += leftSC;
@@ -1054,7 +763,7 @@ uint32_t sidechaincompressor_audio_module::process(uint32_t offset, uint32_t num
                     rightSC = f1R.process(rightSC);
                     leftMC = leftSC;
                     rightMC = rightSC;
-                    compressor.process(leftAC, rightAC, leftSC, rightSC);
+                    compressor.process(leftAC, rightAC, &leftSC, &rightSC);
                     break;
             }
             
@@ -1091,18 +800,10 @@ uint32_t sidechaincompressor_audio_module::process(uint32_t offset, uint32_t num
             
     }
     // draw meters
-    if(params[param_clip_in] != NULL) {
-        *params[param_clip_in] = clip_in;
-    }
-    if(params[param_clip_out] != NULL) {
-        *params[param_clip_out] = clip_out;
-    }
-    if(params[param_meter_in] != NULL) {
-        *params[param_meter_in] = meter_in;
-    }
-    if(params[param_meter_out] != NULL) {
-        *params[param_meter_out] = meter_out;
-    }
+    SET_IF_CONNECTED(clip_in)
+    SET_IF_CONNECTED(clip_out)
+    SET_IF_CONNECTED(meter_in)
+    SET_IF_CONNECTED(meter_out)
     // draw strip meter
     if(bypass > 0.5f) {
         if(params[param_compression] != NULL) {
@@ -1266,6 +967,7 @@ uint32_t deesser_audio_module::process(uint32_t offset, uint32_t numsamples, uin
         
         detected_led -= std::min(detected_led,  numsamples);
         clip_led   -= std::min(clip_led,  numsamples);
+        compressor.update_curve();        
         
         while(offset < numsamples) {
             // cycle through samples
@@ -1292,14 +994,14 @@ uint32_t deesser_audio_module::process(uint32_t offset, uint32_t numsamples, uin
             switch ((int)*params[param_mode]) {
                 default:
                 case WIDE:
-                    compressor.process(leftAC, rightAC, leftSC, rightSC);
+                    compressor.process(leftAC, rightAC, &leftSC, &rightSC);
                     break;
                 case SPLIT:
                     hpL.sanitize();
                     hpR.sanitize();
                     leftRC = hpL.process(leftRC);
                     rightRC = hpR.process(rightRC);
-                    compressor.process(leftRC, rightRC, leftSC, rightSC);
+                    compressor.process(leftRC, rightRC, &leftSC, &rightSC);
                     leftAC = lpL.process(leftAC);
                     rightAC = lpR.process(rightAC);
                     leftAC += leftRC;
@@ -1460,13 +1162,13 @@ void gain_reduction_audio_module::update_curve()
     compressedKneeStop = (kneeStop - thres) / ratio + thres;
 }
 
-void gain_reduction_audio_module::process(float &left, float &right, float det_left, float det_right)
+void gain_reduction_audio_module::process(float &left, float &right, const float *det_left, const float *det_right)
 {
     if(!det_left) {
-        det_left = left;
+        det_left = &left;
     }
     if(!det_right) {
-        det_right = right;
+        det_right = &right;
     }
     float gain = 1.f;
     if(bypass < 0.5f) {
@@ -1476,9 +1178,8 @@ void gain_reduction_audio_module::process(float &left, float &right, float det_l
         bool average = stereo_link == 0;
         float attack_coeff = std::min(1.f, 1.f / (attack * srate / 4000.f));
         float release_coeff = std::min(1.f, 1.f / (release * srate / 4000.f));
-        update_curve();
         
-        float absample = average ? (fabs(det_left) + fabs(det_right)) * 0.5f : std::max(fabs(det_left), fabs(det_right));
+        float absample = average ? (fabs(*det_left) + fabs(*det_right)) * 0.5f : std::max(fabs(*det_left), fabs(*det_right));
         if(rms) absample *= absample;
             
         linSlope += (absample - linSlope) * (absample > linSlope ? attack_coeff : release_coeff);
@@ -1642,701 +1343,250 @@ int gain_reduction_audio_module::get_changed_offsets(int generation, int &subind
     return last_generation;
 }
 
-/// Equalizer 12 Band by Markus Schmidt
-///
-/// This module is based on Krzysztof's filters. It provides a couple
-/// of different chained filters.
+
+
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
-template<class BaseClass, bool has_lphp>
-equalizerNband_audio_module<BaseClass, has_lphp>::equalizerNband_audio_module()
+gate_audio_module::gate_audio_module()
 {
     is_active = false;
     srate = 0;
     last_generation = 0;
-    clip_inL = clip_inR = clip_outL = clip_outR  = 0.f;
-    meter_inL = meter_inR = meter_outL = meter_outR = 0.f;
 }
 
-template<class BaseClass, bool has_lphp>
-void equalizerNband_audio_module<BaseClass, has_lphp>::activate()
+void gate_audio_module::activate()
 {
     is_active = true;
-    // set all filters
-    params_changed();
+    linSlope = 0.f;
+    peak = 0.f;
+    clip = 0.f;
 }
 
-template<class BaseClass, bool has_lphp>
-void equalizerNband_audio_module<BaseClass, has_lphp>::deactivate()
+void gate_audio_module::deactivate()
 {
     is_active = false;
 }
 
-static inline void copy_lphp(biquad_d2<float> filters[3][2])
+void gate_audio_module::set_sample_rate(uint32_t sr)
 {
-    for (int i = 0; i < 3; i++)
-        for (int j = 0; j < 2; j++)
-            if (i || j)
-                filters[i][j].copy_coeffs(filters[0][0]);
+    srate = sr;
+    awL.set(sr);
+    awR.set(sr);
 }
 
-template<class BaseClass, bool has_lphp>
-void equalizerNband_audio_module<BaseClass, has_lphp>::params_changed()
-{
-    // set the params of all filters
-    
-    // lp/hp first (if available)
-    if (has_lphp)
-    {
-        hp_mode = (CalfEqMode)(int)*params[AM::param_hp_mode];
-        lp_mode = (CalfEqMode)(int)*params[AM::param_lp_mode];
-
-        float hpfreq = *params[AM::param_hp_freq], lpfreq = *params[AM::param_lp_freq];
-        
-        if(hpfreq != hp_freq_old) {
-            hp[0][0].set_hp_rbj(hpfreq, 0.707, (float)srate, 1.0);
-            copy_lphp(hp);
-            hp_freq_old = hpfreq;
-        }
-        if(lpfreq != lp_freq_old) {
-            lp[0][0].set_lp_rbj(lpfreq, 0.707, (float)srate, 1.0);
-            copy_lphp(lp);
-            lp_freq_old = lpfreq;
-        }
-    }
-    
-    // then shelves
-    float hsfreq = *params[AM::param_hs_freq], hslevel = *params[AM::param_hs_level];
-    float lsfreq = *params[AM::param_ls_freq], lslevel = *params[AM::param_ls_level];
-    
-    if(lsfreq != ls_freq_old or lslevel != ls_level_old) {
-        lsL.set_lowshelf_rbj(lsfreq, 0.707, lslevel, (float)srate);
-        lsR.copy_coeffs(lsL);
-        ls_level_old = lslevel;
-        ls_freq_old = lsfreq;
-    }
-    if(hsfreq != hs_freq_old or hslevel != hs_level_old) {
-        hsL.set_highshelf_rbj(hsfreq, 0.707, hslevel, (float)srate);
-        hsR.copy_coeffs(hsL);
-        hs_level_old = hslevel;
-        hs_freq_old = hsfreq;
-    }
-    for (int i = 0; i < AM::PeakBands; i++)
-    {
-        int offset = i * params_per_band;
-        float freq = *params[AM::param_p1_freq + offset];
-        float level = *params[AM::param_p1_level + offset];
-        float q = *params[AM::param_p1_q + offset];
-        if(freq != p_freq_old[i] or level != p_level_old[i] or q != p_q_old[i]) {
-            pL[i].set_peakeq_rbj(freq, q, level, (float)srate);
-            pR[i].copy_coeffs(pL[i]);
-            p_freq_old[i] = freq;
-            p_level_old[i] = level;
-            p_q_old[i] = q;
-        }
-    }
-}
-
-template<class BaseClass, bool has_lphp>
-inline void equalizerNband_audio_module<BaseClass, has_lphp>::process_hplp(float &left, float &right)
-{
-    if (!has_lphp)
-        return;
-    if (*params[AM::param_lp_active] > 0.f)
-    {
-        switch(lp_mode)
-        {
-            case MODE12DB:
-                left = lp[0][0].process(left);
-                right = lp[0][1].process(right);
-                break;
-            case MODE24DB:
-                left = lp[1][0].process(lp[0][0].process(left));
-                right = lp[1][1].process(lp[0][1].process(right));
-                break;
-            case MODE36DB:
-                left = lp[2][0].process(lp[1][0].process(lp[0][0].process(left)));
-                right = lp[2][1].process(lp[1][1].process(lp[0][1].process(right)));
-                break;
-        }
-    }
-    if (*params[AM::param_hp_active] > 0.f)
-    {
-        switch(hp_mode)
-        {
-            case MODE12DB:
-                left = hp[0][0].process(left);
-                right = hp[0][1].process(right);
-                break;
-            case MODE24DB:
-                left = hp[1][0].process(hp[0][0].process(left));
-                right = hp[1][1].process(hp[0][1].process(right));
-                break;
-            case MODE36DB:
-                left = hp[2][0].process(hp[1][0].process(hp[0][0].process(left)));
-                right = hp[2][1].process(hp[1][1].process(hp[0][1].process(right)));
-                break;
-        }
-    }
-}
-
-template<class BaseClass, bool has_lphp>
-uint32_t equalizerNband_audio_module<BaseClass, has_lphp>::process(uint32_t offset, uint32_t numsamples, uint32_t inputs_mask, uint32_t outputs_mask)
-{
-    bool bypass = *params[AM::param_bypass] > 0.f;
-    numsamples += offset;
-    if(bypass) {
-        // everything bypassed
-        while(offset < numsamples) {
-            outs[0][offset] = ins[0][offset];
-            outs[1][offset] = ins[1][offset];
-            ++offset;
-        }
-        // displays, too
-        clip_inL = clip_inR = clip_outL = clip_outR = 0.f;
-        meter_inL = meter_inR = meter_outL = meter_outR = 0.f;
-    } else {
-        
-        clip_inL    -= std::min(clip_inL,  numsamples);
-        clip_inR    -= std::min(clip_inR,  numsamples);
-        clip_outL   -= std::min(clip_outL, numsamples);
-        clip_outR   -= std::min(clip_outR, numsamples);
-        meter_inL = 0.f;
-        meter_inR = 0.f;
-        meter_outL = 0.f;
-        meter_outR = 0.f;
-        
-        // process
-        while(offset < numsamples) {
-            // cycle through samples
-            float outL = 0.f;
-            float outR = 0.f;
-            float inL = ins[0][offset];
-            float inR = ins[1][offset];
-            // in level
-            inR *= *params[AM::param_level_in];
-            inL *= *params[AM::param_level_in];
-            
-            float procL = inL;
-            float procR = inR;
-            
-            // all filters in chain
-            process_hplp(procL, procR);
-            if(*params[AM::param_ls_active] > 0.f) {
-                procL = lsL.process(procL);
-                procR = lsR.process(procR);
-            }
-            if(*params[AM::param_hs_active] > 0.f) {
-                procL = hsL.process(procL);
-                procR = hsR.process(procR);
-            }
-            for (int i = 0; i < AM::PeakBands; i++)
-            {
-                if(*params[AM::param_p1_active + i * params_per_band] > 0.f) {
-                    procL = pL[i].process(procL);
-                    procR = pR[i].process(procR);
-                }
-            }
-            
-            outL = procL * *params[AM::param_level_out];
-            outR = procR * *params[AM::param_level_out];
-            
-            // send to output
-            outs[0][offset] = outL;
-            outs[1][offset] = outR;
-            
-            // clip LED's
-            if(inL > 1.f) {
-                clip_inL  = srate >> 3;
-            }
-            if(inR > 1.f) {
-                clip_inR  = srate >> 3;
-            }
-            if(outL > 1.f) {
-                clip_outL = srate >> 3;
-            }
-            if(outR > 1.f) {
-                clip_outR = srate >> 3;
-            }
-            // set up in / out meters
-            if(inL > meter_inL) {
-                meter_inL = inL;
-            }
-            if(inR > meter_inR) {
-                meter_inR = inR;
-            }
-            if(outL > meter_outL) {
-                meter_outL = outL;
-            }
-            if(outR > meter_outR) {
-                meter_outR = outR;
-            }
-            
-            // next sample
-            ++offset;
-        } // cycle trough samples
-        // clean up
-        for(int i = 0; i < 3; ++i) {
-            hp[i][0].sanitize();
-            hp[i][1].sanitize();
-            lp[i][0].sanitize();
-            lp[i][1].sanitize();
-        }
-        lsL.sanitize();
-        hsR.sanitize();
-        for(int i = 0; i < AM::PeakBands; ++i) {
-            pL[i].sanitize();
-            pR[i].sanitize();
-        }
-    }
-    // draw meters
-    SET_IF_CONNECTED(clip_inL)
-    SET_IF_CONNECTED(clip_inR)
-    SET_IF_CONNECTED(clip_outL)
-    SET_IF_CONNECTED(clip_outR)
-    SET_IF_CONNECTED(meter_inL)
-    SET_IF_CONNECTED(meter_inR)
-    SET_IF_CONNECTED(meter_outL)
-    SET_IF_CONNECTED(meter_outR)
-    // whatever has to be returned x)
-    return outputs_mask;
-}
-
-#undef SET_IF_CONNECTED
-
-template<class BaseClass, bool has_lphp>
-bool equalizerNband_audio_module<BaseClass, has_lphp>::get_graph(int index, int subindex, float *data, int points, cairo_iface *context) const
+bool gate_audio_module::get_graph(int index, int subindex, float *data, int points, cairo_iface *context) const
 {
     if (!is_active)
         return false;
-    if (index == AM::param_p1_freq && !subindex) {
+    if (subindex > 1) // 1
+        return false;
+    for (int i = 0; i < points; i++)
+    {
+        float input = dB_grid_inv(-1.0 + i * 2.0 / (points - 1));
+        float output = output_level(input);
+        if (subindex == 0)
+            data[i] = dB_grid(input);
+        else
+            data[i] = dB_grid(output);
+    }
+    if (subindex == (*params[param_bypass] > 0.f ? 1 : 0))
+        context->set_source_rgba(0.35, 0.4, 0.2, 0.3);
+    else {
+        context->set_source_rgba(0.35, 0.4, 0.2, 1);
         context->set_line_width(1.5);
-        return ::get_graph(*this, subindex, data, points);
+    }
+    return true;
+}
+
+bool gate_audio_module::get_dot(int index, int subindex, float &x, float &y, int &size, cairo_iface *context) const
+{
+    if (!is_active)
+        return false;
+    if (!subindex)
+    {
+        bool rms = *params[param_detection] == 0;
+        float det = rms ? sqrt(detected) : detected;
+        x = 0.5 + 0.5 * dB_grid(det);
+        y = dB_grid(*params[param_bypass] > 0.f ? det : output_level(det));
+        return *params[param_bypass] > 0.f ? false : true;
     }
     return false;
 }
 
-template<class BaseClass, bool has_lphp>
-bool equalizerNband_audio_module<BaseClass, has_lphp>::get_gridline(int index, int subindex, float &pos, bool &vertical, std::string &legend, cairo_iface *context) const
+bool gate_audio_module::get_gridline(int index, int subindex, float &pos, bool &vertical, std::string &legend, cairo_iface *context) const
 {
-    if (!is_active) {
-        return false;
-    } else {
-        return get_freq_gridline(subindex, pos, vertical, legend, context);
-    }
-}
-
-template<class BaseClass, bool has_lphp>
-int equalizerNband_audio_module<BaseClass, has_lphp>::get_changed_offsets(int index, int generation, int &subindex_graph, int &subindex_dot, int &subindex_gridline) const
-{
-    if (!is_active) {
-        return false;
-    } else {
-        bool changed = false;
-        for (int i = 0; i < graph_param_count && !changed; i++)
-        {
-            if (*params[AM::first_graph_param + i] != old_params_for_graph[i])
-                changed = true;
-        }
-        if (changed)
-        {
-            for (int i = 0; i < graph_param_count; i++)
-                old_params_for_graph[i] = *params[AM::first_graph_param + i];
-            
-            last_generation++;
-            subindex_graph = 0;
-            subindex_dot = INT_MAX;
-            subindex_gridline = INT_MAX;
+    bool tmp;
+    vertical = (subindex & 1) != 0;
+    bool result = get_freq_gridline(subindex >> 1, pos, tmp, legend, context, false);
+    if (result && vertical) {
+        if ((subindex & 4) && !legend.empty()) {
+            legend = "";
         }
         else {
-            subindex_graph = 0;
-            subindex_dot = subindex_gridline = generation ? INT_MAX : 0;
+            size_t pos = legend.find(" dB");
+            if (pos != std::string::npos)
+                legend.erase(pos);
         }
-        if (generation == last_calculated_generation)
-            subindex_graph = INT_MAX;
-        return last_generation;
+        pos = 0.5 + 0.5 * pos;
     }
-    return false;
+    return result;
 }
 
-static inline float adjusted_lphp_gain(const float *const *params, int param_active, int param_mode, const biquad_d2<float> &filter, float freq, float srate)
+uint32_t gate_audio_module::process(uint32_t offset, uint32_t numsamples, uint32_t inputs_mask, uint32_t outputs_mask)
 {
-    if(*params[param_active] > 0.f) {
-        float gain = filter.freq_gain(freq, srate);
-        switch((int)*params[param_mode]) {
-            case MODE12DB:
-                return gain;
-            case MODE24DB:
-                return gain * gain;
-            case MODE36DB:
-                return gain * gain * gain;
-        }
-    }
-    return 1;
-}
+    bool bypass = *params[param_bypass] > 0.f;
 
-template<class BaseClass, bool use_hplp>
-float equalizerNband_audio_module<BaseClass, use_hplp>::freq_gain(int index, double freq, uint32_t sr) const
-{
-    float ret = 1.f;
-    if (use_hplp)
-    {
-        ret *= adjusted_lphp_gain(params, AM::param_hp_active, AM::param_hp_mode, hp[0][0], freq, (float)sr);
-        ret *= adjusted_lphp_gain(params, AM::param_lp_active, AM::param_lp_mode, lp[0][0], freq, (float)sr);
-    }
-    ret *= (*params[AM::param_ls_active] > 0.f) ? lsL.freq_gain(freq, sr) : 1;
-    ret *= (*params[AM::param_hs_active] > 0.f) ? hsL.freq_gain(freq, sr) : 1;
-    for (int i = 0; i < PeakBands; i++)
-        ret *= (*params[AM::param_p1_active + i * params_per_band] > 0.f) ? pL[i].freq_gain(freq, (float)sr) : 1;
-    return ret;
-}
-
-template class equalizerNband_audio_module<equalizer5band_metadata, false>;
-template class equalizerNband_audio_module<equalizer8band_metadata, true>;
-template class equalizerNband_audio_module<equalizer12band_metadata, true>;
-
-/// LFO module by Markus
-/// This module provides simple LFO's (sine=0, triangle=1, square=2, saw_up=3, saw_down=4)
-/// get_value() returns a value between -1 and 1
-////////////////////////////////////////////////////////////////////////////////
-lfo_audio_module::lfo_audio_module()
-{
-    is_active       = false;
-    phase = 0.f;
-}
-
-void lfo_audio_module::activate()
-{
-    is_active = true;
-    phase = 0.f;
-}
-
-void lfo_audio_module::deactivate()
-{
-    is_active = false;
-}
-
-float lfo_audio_module::get_value()
-{
-    return get_value_from_phase(phase, offset) * amount;
-}
-
-float lfo_audio_module::get_value_from_phase(float ph, float off) const
-{
-    float val = 0.f;
-    float phs = ph + off;
-    if (phs >= 1.0)
-        phs = fmod(phs, 1.f);
-    switch (mode) {
-        default:
-        case 0:
-            // sine
-            val = sin((phs * 360.f) * M_PI / 180);
-            break;
-        case 1:
-            // triangle
-            if(phs > 0.75)
-                val = (phs - 0.75) * 4 - 1;
-            else if(phs > 0.5)
-                val = (phs - 0.5) * 4 * -1;
-            else if(phs > 0.25)
-                val = 1 - (phs - 0.25) * 4;
-            else
-                val = phs * 4;
-            break;
-        case 2:
-            // square
-            val = (phs < 0.5) ? -1 : +1;
-            break;
-        case 3:
-            // saw up
-                val = phs * 2.f - 1;
-            break;
-        case 4:
-            // saw down
-            val = 1 - phs * 2.f;
-            break;
-    }
-    return val;
-}
-
-void lfo_audio_module::advance(uint32_t count)
-{
-    //this function walks from 0.f to 1.f and starts all over again
-    phase += count * freq * (1.0 / srate);
-    if (phase >= 1.0)
-        phase = fmod(phase, 1.f);
-}
-
-void lfo_audio_module::set_phase(float ph)
-{
-    //set the phase from outsinde
-    phase = fabs(ph);
-    if (phase >= 1.0)
-        phase = fmod(phase, 1.f);
-}
-
-void lfo_audio_module::set_params(float f, int m, float o, uint32_t sr, float a)
-{
-    // freq: a value in Hz
-    // mode: sine=0, triangle=1, square=2, saw_up=3, saw_down=4
-    // offset: value between 0.f and 1.f to offset the lfo in time
-    freq = f;
-    mode = m;
-    offset = o;
-    srate = sr;
-    amount = a;
-}
-
-bool lfo_audio_module::get_graph(float *data, int points, cairo_iface *context) const
-{
-    if (!is_active)
-        return false;
-    for (int i = 0; i < points; i++) {
-        float ph = (float)i / (float)points;
-        data[i] = get_value_from_phase(ph, offset) * amount;
-    }
-    return true;
-}
-
-bool lfo_audio_module::get_dot(float &x, float &y, int &size, cairo_iface *context) const
-{
-    if (!is_active)
-        return false;
-    float phs = phase + offset;
-    if (phs >= 1.0)
-        phs = fmod(phs, 1.f);
-    x = phase;
-    y = get_value_from_phase(phase, offset) * amount;
-    return true;
-}
-
-/// Pulsator by Markus Schmidt
-///
-/// This module provides a couple
-/// of different LFO's for modulating the level of a signal.
-///////////////////////////////////////////////////////////////////////////////////////////////
-
-pulsator_audio_module::pulsator_audio_module()
-{
-    is_active = false;
-    srate = 0;
-//    last_generation = 0;
-    clip_inL    = 0.f;
-    clip_inR    = 0.f;
-    clip_outL   = 0.f;
-    clip_outR   = 0.f;
-    meter_inL  = 0.f;
-    meter_inR  = 0.f;
-    meter_outL = 0.f;
-    meter_outR = 0.f;
-}
-
-void pulsator_audio_module::activate()
-{
-    is_active = true;
-    lfoL.activate();
-    lfoR.activate();
-    params_changed();
-}
-void pulsator_audio_module::deactivate()
-{
-    is_active = false;
-    lfoL.deactivate();
-    lfoR.deactivate();
-}
-
-void pulsator_audio_module::params_changed()
-{
-    lfoL.set_params(*params[param_freq], *params[param_mode], 0.f, srate, *params[param_amount]);
-    lfoR.set_params(*params[param_freq], *params[param_mode], *params[param_offset], srate, *params[param_amount]);
-    clear_reset = false;
-    if (*params[param_reset] >= 0.5) {
-        clear_reset = true;
-        lfoL.set_phase(0.f);
-        lfoR.set_phase(0.f);
-    }
-}
-
-void pulsator_audio_module::set_sample_rate(uint32_t sr)
-{
-    srate = sr;
-}
-
-uint32_t pulsator_audio_module::process(uint32_t offset, uint32_t numsamples, uint32_t inputs_mask, uint32_t outputs_mask)
-{
-    bool bypass = *params[param_bypass] > 0.5f;
-    uint32_t samples = numsamples + offset;
     if(bypass) {
-        // everything bypassed
-        while(offset < samples) {
-            outs[0][offset] = ins[0][offset];
-            outs[1][offset] = ins[1][offset];
-            ++offset;
-        }
-        // displays, too
-        clip_inL    = 0.f;
-        clip_inR    = 0.f;
-        clip_outL   = 0.f;
-        clip_outR   = 0.f;
-        meter_inL  = 0.f;
-        meter_inR  = 0.f;
-        meter_outL = 0.f;
-        meter_outR = 0.f;
-        
-        // LFO's should go on
-        lfoL.advance(numsamples);
-        lfoR.advance(numsamples);
-        
-    } else {
-        
-        clip_inL    -= std::min(clip_inL,  numsamples);
-        clip_inR    -= std::min(clip_inR,  numsamples);
-        clip_outL   -= std::min(clip_outL, numsamples);
-        clip_outR   -= std::min(clip_outR, numsamples);
-        meter_inL = 0.f;
-        meter_inR = 0.f;
-        meter_outL = 0.f;
-        meter_outR = 0.f;
-        
-        // process
-        while(offset < samples) {
-            // cycle through samples
-            float outL = 0.f;
-            float outR = 0.f;
-            float inL = ins[0][offset];
-            float inR = ins[1][offset];
-            // in level
-            inR *= *params[param_level_in];
-            inL *= *params[param_level_in];
-            
-            if(*params[param_mono] > 0.5) {
-                inL = (inL + inR) * 0.5;
-                inR = inL;
-            }
-            float procL = inL;
-            float procR = inR;
-            
-            procL *= (lfoL.get_value() * 0.5 + *params[param_amount] / 2);
-            procR *= (lfoR.get_value() * 0.5 + *params[param_amount] / 2);
-            
-            outL = procL + inL * (1 - *params[param_amount]);
-            outR = procR + inR * (1 - *params[param_amount]);
-            
-            outL *=  *params[param_level_out];
-            outR *=  *params[param_level_out];
-            
-            // send to output
-            outs[0][offset] = outL;
-            outs[1][offset] = outR;
-            
-            // clip LED's
-            if(inL > 1.f) {
-                clip_inL  = srate >> 3;
-            }
-            if(inR > 1.f) {
-                clip_inR  = srate >> 3;
-            }
-            if(outL > 1.f) {
-                clip_outL = srate >> 3;
-            }
-            if(outR > 1.f) {
-                clip_outR = srate >> 3;
-            }
-            // set up in / out meters
-            if(inL > meter_inL) {
-                meter_inL = inL;
-            }
-            if(inR > meter_inR) {
-                meter_inR = inR;
-            }
-            if(outL > meter_outL) {
-                meter_outL = outL;
-            }
-            if(outR > meter_outR) {
-                meter_outR = outR;
-            }
-            
-            // next sample
-            ++offset;
-            
-            // advance lfo's
-            lfoL.advance(1);
-            lfoR.advance(1);
-        } // cycle trough samples
-    }
-    // draw meters
-    if(params[param_clip_inL] != NULL) {
-        *params[param_clip_inL] = clip_inL;
-    }
-    if(params[param_clip_inR] != NULL) {
-        *params[param_clip_inR] = clip_inR;
-    }
-    if(params[param_clip_outL] != NULL) {
-        *params[param_clip_outL] = clip_outL;
-    }
-    if(params[param_clip_outR] != NULL) {
-        *params[param_clip_outR] = clip_outR;
-    }
-    
-    if(params[param_meter_inL] != NULL) {
-        *params[param_meter_inL] = meter_inL;
-    }
-    if(params[param_meter_inR] != NULL) {
-        *params[param_meter_inR] = meter_inR;
-    }
-    if(params[param_meter_outL] != NULL) {
-        *params[param_meter_outL] = meter_outL;
-    }
-    if(params[param_meter_outR] != NULL) {
-        *params[param_meter_outR] = meter_outR;
-    }
-    // whatever has to be returned x)
-    return outputs_mask;
-}
+        int count = numsamples * sizeof(float);
+        memcpy(outs[0], ins[0], count);
+        memcpy(outs[1], ins[1], count);
 
-bool pulsator_audio_module::get_graph(int index, int subindex, float *data, int points, cairo_iface *context) const
-{
-    if (!is_active) {
-        return false;
-    } else if(index == param_freq) {
-        if(subindex == 0) {
-            context->set_source_rgba(0.35, 0.4, 0.2, 1);
-            return lfoL.get_graph(data, points, context);
+        if(params[param_gating] != NULL) {
+            *params[param_gating] = 1.f;
         }
-        if(subindex == 1) {
-            context->set_source_rgba(0.35, 0.4, 0.2, 0.5);
-            return lfoR.get_graph(data, points, context);
-        }
-    }
-    return false;
-}
 
-bool pulsator_audio_module::get_dot(int index, int subindex, float &x, float &y, int &size, cairo_iface *context) const
-{
-    if (!is_active) {
-        return false;
-    } else if(index == param_freq) {
-        if(subindex == 0) {
-            context->set_source_rgba(0.35, 0.4, 0.2, 1);
-            return lfoL.get_dot(x, y, size, context);
+        if(params[param_clip] != NULL) {
+            *params[param_clip] = 0.f;
         }
-        if(subindex == 1) {
-            context->set_source_rgba(0.35, 0.4, 0.2, 0.5);
-            return lfoR.get_dot(x, y, size, context);
-        }
-        return false;
-    }
-    return false;
-}
 
-bool pulsator_audio_module::get_gridline(int index, int subindex, float &pos, bool &vertical, std::string &legend, cairo_iface *context) const
-{
-   if (index == param_freq && !subindex)
+        if(params[param_peak] != NULL) {
+            *params[param_peak] = 0.f;
+        }
+
+        return inputs_mask;
+    }
+
+    bool rms = *params[param_detection] == 0;
+    bool average = *params[param_stereo_link] == 0;
+    int aweighting = fastf2i_drm(*params[param_aweighting]);
+    float linThreshold = *params[param_threshold];
+    if (rms)
+        linThreshold = linThreshold * linThreshold;
+    ratio = *params[param_ratio];
+    float attack = *params[param_attack];
+    float attack_coeff = std::min(1.f, 1.f / (attack * srate / 4000.f));
+    float release = *params[param_release];
+    float release_coeff = std::min(1.f, 1.f / (release * srate / 4000.f));
+    makeup = *params[param_makeup];
+    knee = *params[param_knee];
+
+    range = *params[param_range];
+
+    float linKneeSqrt = sqrt(knee);
+    linKneeStart = linThreshold / linKneeSqrt;
+    adjKneeStart = linKneeStart*linKneeStart;
+    linKneeStop = linThreshold * linKneeSqrt;
+
+    threshold = log(linThreshold);
+    kneeStart = log(linKneeStart);
+    kneeStop = log(linKneeStop);
+    compressedKneeStop = (kneeStop - threshold) / ratio + threshold;
+
+    if (aweighting >= 2)
     {
-        pos = 0;
-        vertical = false;
-        return true;
+        bpL.set_highshelf_rbj(5000, 0.707, 10 << (aweighting - 2), srate);
+        bpR.copy_coeffs(bpL);
+        bpL.sanitize();
+        bpR.sanitize();
     }
-    return false;
+
+    numsamples += offset;
+
+    float gating = 1.f;
+
+    peak -= peak * 5.f * numsamples / srate;
+
+    clip -= std::min(clip, numsamples);
+    float left;
+    float right;
+
+    while(offset < numsamples) {
+        if(*params[param_trigger]) {
+	    left = ins[2][offset];  // Use sidechain to trigger input
+	    right = left;           // (mono sidechain)
+	} else {
+	    left = ins[0][offset];
+            right = ins[1][offset];
+        }
+
+        if(aweighting == 1) {
+            left = awL.process(left);
+            right = awR.process(right);
+        }
+        else if(aweighting >= 2) {
+            left = bpL.process(left);
+            right = bpR.process(right);
+        }
+
+        float absample = average ? (fabs(left) + fabs(right)) * 0.5f : std::max(fabs(left), fabs(right));
+        if(rms) absample *= absample;
+
+        linSlope += (absample - linSlope) * (absample > linSlope ? attack_coeff : release_coeff);
+
+        float gain = 1.f;
+
+        if(linSlope > 0.f) {
+            gain = output_gain(linSlope, rms);
+        }
+
+        gating = gain;
+        gain *= makeup;
+
+        float outL = ins[0][offset] * gain;
+        float outR = ins[1][offset] * gain;
+
+        outs[0][offset] = outL;
+        outs[1][offset] = outR;
+
+        ++offset;
+
+        float maxLR = std::max(fabs(outL), fabs(outR));
+
+        if(maxLR > 1.f) clip = srate >> 3; /* blink clip LED for 125 ms */
+
+        if(maxLR > peak) {
+            peak = maxLR;
+        }
+    }
+
+    detected = linSlope;
+
+    if(params[param_gating] != NULL) {
+        *params[param_gating] = gating;
+    }
+
+    if(params[param_clip] != NULL) {
+        *params[param_clip] = clip;
+    }
+
+    if(params[param_peak] != NULL) {
+        *params[param_peak] = peak;
+    }
+
+    return inputs_mask;
+}
+
+int gate_audio_module::get_changed_offsets(int generation, int &subindex_graph, int &subindex_dot, int &subindex_gridline) const
+{
+    subindex_graph = 0;
+    subindex_dot = 0;
+    subindex_gridline = generation ? INT_MAX : 0;
+
+    if (fabs(range-old_range) + fabs(threshold-old_threshold) + fabs(ratio - old_ratio) + fabs(knee - old_knee) + fabs( makeup - old_makeup) + fabs( *params[param_bypass] - old_bypass) > 0.01f)
+    {
+        old_range = range;
+        old_threshold = threshold;
+        old_ratio = ratio;
+        old_knee = knee;
+        old_makeup = makeup;
+        old_bypass = *params[param_bypass];
+        old_trigger = *params[param_trigger];
+        old_mono = *params[param_mono];
+        last_generation++;
+    }
+        old_trigger = *params[param_trigger];
+
+    if (generation == last_generation)
+        subindex_graph = 2;
+    return last_generation;
 }

@@ -18,15 +18,10 @@
  * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, 
  * Boston, MA  02110-1301  USA
  */
+#include <config.h>
 
-#include <assert.h>
-#include <memory.h>
-#include <complex>
-#if USE_JACK
-#include <jack/jack.h>
-#endif
 #include <calf/giface.h>
-#include <calf/modules_synths.h>
+#include <calf/organ.h>
 #include <iostream>
 
 using namespace std;
@@ -35,7 +30,50 @@ using namespace calf_plugins;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-bool organ_audio_module::get_graph(int index, int subindex, float *data, int points, cairo_iface *context)
+organ_audio_module::organ_audio_module()
+: drawbar_organ(&par_values)
+{
+    var_map_curve = "2\n0 1\n1 1\n"; // XXXKF hacky bugfix
+}
+
+void organ_audio_module::activate()
+{
+    setup(srate);
+    panic_flag = false;
+}
+
+void organ_audio_module::post_instantiate()
+{
+    dsp::organ_voice_base::precalculate_waves(progress_report);
+}
+
+
+uint32_t organ_audio_module::process(uint32_t offset, uint32_t nsamples, uint32_t inputs_mask, uint32_t outputs_mask)
+{
+    float *o[2] = { outs[0] + offset, outs[1] + offset };
+    if (panic_flag)
+    {
+        control_change(120, 0); // stop all sounds
+        control_change(121, 0); // reset all controllers
+        panic_flag = false;
+    }
+    render_separate(o, nsamples);
+    return 3;
+}
+
+void organ_audio_module::params_changed() {
+    for (int i = 0; i < param_count - var_count; i++)
+        ((float *)&par_values)[i] = *params[i];
+
+    unsigned int old_poly = polyphony_limit;
+    polyphony_limit = dsp::clip(dsp::fastf2i_drm(*params[par_polyphony]), 1, 32);
+    if (polyphony_limit < old_poly)
+        trim_voices();
+    
+    update_params();
+}
+
+bool organ_audio_module::get_graph(int index, int subindex, float *data, int points, cairo_iface *context) const
 {
     if (index == par_master) {
         organ_voice_base::precalculate_waves(progress_report);
@@ -73,6 +111,13 @@ bool organ_audio_module::get_graph(int index, int subindex, float *data, int poi
     }
     return false;
 }
+
+uint32_t organ_audio_module::message_run(const void *valid_inputs, void *output_ports)
+{ 
+    // silence a default printf (which is kind of a warning about unhandled message_run)
+    return 0;
+}
+
 
 ////////////////////////////////////////////////////////////////////////////
 
@@ -192,6 +237,12 @@ static void padsynth(bandlimiter<ORGAN_WAVE_BITS> blSrc, bandlimiter<ORGAN_BIG_W
 
 #define LARGE_WAVEFORM_PROGRESS() do { if (reporter) { progress += 100; reporter->report_progress(floor(progress / totalwaves), "Precalculating large waveforms"); } } while(0)
 
+void organ_voice_base::update_pitch()
+{
+    float phase = dsp::midi_note_to_phase(note, 100 * parameters->global_transpose + parameters->global_detune, sample_rate_ref);
+    dpphase.set((long int) (phase * parameters->percussion_harmonic * parameters->pitch_bend));
+    moddphase.set((long int) (phase * parameters->percussion_fm_harmonic * parameters->pitch_bend));
+}
 
 void organ_voice_base::precalculate_waves(progress_report_iface *reporter)
 {
@@ -502,6 +553,17 @@ void organ_voice_base::render_percussion_to(float (*buf)[2], int nsamples)
     }
 }
 
+void organ_voice_base::perc_reset()
+{
+    pphase = 0;
+    modphase = 0;
+    dpphase = 0;
+    moddphase = 0;
+    note = -1;
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+
 void organ_vibrato::reset()
 {
     for (int i = 0; i < VibratoSize; i++)
@@ -548,6 +610,8 @@ void organ_vibrato::process(organ_parameters *parameters, float (*data)[2], unsi
         }
     }
 }
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void organ_voice::update_pitch()
 {
@@ -730,7 +794,63 @@ void organ_voice::render_block() {
     
     if (use_percussion())
         render_percussion_to(output_buffer, BlockSize);
+
 }
+
+void organ_voice::note_on(int note, int vel)
+{
+    stolen = false;
+    finishing = false;
+    perc_released = false;
+    released = false;
+    reset();
+    this->note = note;
+    const float sf = 0.001f;
+    for (int i = 0; i < EnvCount; i++)
+    {
+        organ_parameters::organ_env_parameters &p = parameters->envs[i];
+        envs[i].set(sf * p.attack, sf * p.decay, p.sustain, sf * p.release, sample_rate / BlockSize);
+        envs[i].note_on();
+    }
+    update_pitch();
+    velocity = vel * 1.0 / 127.0;
+    amp.set(1.0f);
+    perc_note_on(note, vel);
+}
+
+void organ_voice::note_off(int /* vel */)
+{
+    // reset age to 0 (because decay will turn from exponential to linear, necessary because of error cumulation prevention)
+    perc_released = true;
+    if (pamp.get_active())
+    {
+        pamp.reinit();
+    }
+    rel_age_const = pamp.get() * ((1.0/44100.0)/0.03);
+    for (int i = 0; i < EnvCount; i++)
+        envs[i].note_off();
+}
+
+void organ_voice::steal()
+{
+    perc_released = true;
+    finishing = true;
+    stolen = true;
+}
+
+void organ_voice::reset()
+{
+    inertia_pitchbend.ramp.set_length(sample_rate / (BlockSize * 30)); // 1/30s    
+    vibrato.reset();
+    phase = 0;
+    for (int i = 0; i < FilterCount; i++)
+    {
+        filterL[i].reset();
+        filterR[i].reset();
+    }
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
 void drawbar_organ::update_params()
 {
@@ -743,6 +863,42 @@ void drawbar_organ::update_params()
     }
     double dphase = dsp::midi_note_to_phase((int)parameters->foldover, 0, sample_rate);
     parameters->foldvalue = (int)(dphase);
+}
+
+dsp::voice *drawbar_organ::alloc_voice()
+{
+    block_voice<organ_voice> *v = new block_voice<organ_voice>();
+    v->parameters = parameters;
+    return v;
+}
+
+void drawbar_organ::percussion_note_on(int note, int vel)
+{
+    percussion.perc_note_on(note, vel);
+}
+
+void drawbar_organ::setup(int sr)
+{
+    basic_synth::setup(sr);
+    percussion.setup(sr);
+    parameters->cutoff = 0;
+    params_changed();
+    global_vibrato.reset();
+}
+
+bool drawbar_organ::check_percussion() { 
+    switch(dsp::fastf2i_drm(parameters->percussion_trigger))
+    {        
+        case organ_voice_base::perctrig_first:
+            return active_voices.empty();
+        case organ_voice_base::perctrig_each: 
+        default:
+            return true;
+        case organ_voice_base::perctrig_eachplus:
+            return !percussion.get_noticable();
+        case organ_voice_base::perctrig_polyphonic:
+            return false;
+    }
 }
 
 void drawbar_organ::pitch_bend(int amt)

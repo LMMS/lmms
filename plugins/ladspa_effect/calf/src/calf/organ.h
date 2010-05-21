@@ -22,9 +22,11 @@
 #ifndef __CALF_ORGAN_H
 #define __CALF_ORGAN_H
 
-#include "synth.h"
+#include "audio_fx.h"
 #include "envelope.h"
 #include "metadata.h"
+#include "osc.h"
+#include "synth.h"
 
 #define ORGAN_KEYTRACK_POINTS 4
 
@@ -133,7 +135,6 @@ protected:
     static small_wave_family (*waves)[wave_count_small];
     static big_wave_family (*big_waves)[wave_count_big];
 
-    // dsp::sine_table<float, ORGAN_WAVE_SIZE, 1> sine_wave;
     int note;
     dsp::decay amp;
     /// percussion FM carrier amplitude envelope
@@ -165,24 +166,12 @@ public:
         return (*big_waves)[wave];
     }
     static void precalculate_waves(calf_plugins::progress_report_iface *reporter);
-    void update_pitch()
-    {
-        float phase = dsp::midi_note_to_phase(note, 100 * parameters->global_transpose + parameters->global_detune, sample_rate_ref);
-        dpphase.set((long int) (phase * parameters->percussion_harmonic * parameters->pitch_bend));
-        moddphase.set((long int) (phase * parameters->percussion_fm_harmonic * parameters->pitch_bend));
-    }
+    void update_pitch();
     // this doesn't really have a voice interface
     void render_percussion_to(float (*buf)[2], int nsamples);
     void perc_note_on(int note, int vel);
     void perc_note_off(int note, int vel);
-    void perc_reset()
-    {
-        pphase = 0;
-        modphase = 0;
-        dpphase = 0;
-        moddphase = 0;
-        note = -1;
-    }
+    void perc_reset();
 };
 
 class organ_vibrato
@@ -224,57 +213,11 @@ public:
         inertia_pitchbend.set_now(1);
     }
 
-    void reset() {
-        inertia_pitchbend.ramp.set_length(sample_rate / (BlockSize * 30)); // 1/30s    
-        vibrato.reset();
-        phase = 0;
-        for (int i = 0; i < FilterCount; i++)
-        {
-            filterL[i].reset();
-            filterR[i].reset();
-        }
-    }
-
-    void note_on(int note, int vel) {
-        stolen = false;
-        finishing = false;
-        perc_released = false;
-        released = false;
-        reset();
-        this->note = note;
-        const float sf = 0.001f;
-        for (int i = 0; i < EnvCount; i++)
-        {
-            organ_parameters::organ_env_parameters &p = parameters->envs[i];
-            envs[i].set(sf * p.attack, sf * p.decay, p.sustain, sf * p.release, sample_rate / BlockSize);
-            envs[i].note_on();
-        }
-        update_pitch();
-        velocity = vel * 1.0 / 127.0;
-        amp.set(1.0f);
-        perc_note_on(note, vel);
-    }
-
-    void note_off(int /* vel */) {
-        // reset age to 0 (because decay will turn from exponential to linear, necessary because of error cumulation prevention)
-        perc_released = true;
-        if (pamp.get_active())
-        {
-            pamp.reinit();
-        }
-        rel_age_const = pamp.get() * ((1.0/44100.0)/0.03);
-        for (int i = 0; i < EnvCount; i++)
-            envs[i].note_off();
-    }
-
+    void reset();
+    void note_on(int note, int vel);
+    void note_off(int /* vel */);
     virtual float get_priority() { return stolen ? 20000 : (perc_released ? 1 : (sostenuto ? 200 : 100)); }
-    
-    virtual void steal() {
-        perc_released = true;
-        finishing = true;
-        stolen = true;
-    }
-
+    virtual void steal();
     void render_block();
     
     virtual int get_current_note() {
@@ -325,48 +268,63 @@ struct drawbar_organ: public dsp::basic_synth, public calf_plugins::organ_enums 
     , percussion(_parameters) {
     }
     void render_separate(float *output[], int nsamples);
-    dsp::voice *alloc_voice() {
-        block_voice<organ_voice> *v = new block_voice<organ_voice>();
-        v->parameters = parameters;
-        return v;
-    }
-    virtual void percussion_note_on(int note, int vel) {
-        percussion.perc_note_on(note, vel);
-    }
+    dsp::voice *alloc_voice();
+    virtual void percussion_note_on(int note, int vel);
     virtual void params_changed() = 0;
-    virtual void setup(int sr) {
-        basic_synth::setup(sr);
-        percussion.setup(sr);
-        parameters->cutoff = 0;
-        params_changed();
-        global_vibrato.reset();
-    }
+    virtual void setup(int sr);
     void update_params();
     void control_change(int controller, int value)
     {
-#if 0
-        if (controller == 11)
-        {
-            parameters->cutoff = value / 64.0 - 1;
-        }
-#endif
         dsp::basic_synth::control_change(controller, value);
     }
     void pitch_bend(int amt);
-    virtual bool check_percussion() { 
-        switch(dsp::fastf2i_drm(parameters->percussion_trigger))
-        {        
-            case organ_voice_base::perctrig_first:
-                return active_voices.empty();
-            case organ_voice_base::perctrig_each: 
-            default:
-                return true;
-            case organ_voice_base::perctrig_eachplus:
-                return !percussion.get_noticable();
-            case organ_voice_base::perctrig_polyphonic:
-                return false;
-        }
+    virtual bool check_percussion();
+};
+
+};
+
+namespace calf_plugins {
+
+struct organ_audio_module: public audio_module<organ_metadata>, public dsp::drawbar_organ, public line_graph_iface
+{
+public:
+    using drawbar_organ::note_on;
+    using drawbar_organ::note_off;
+    using drawbar_organ::control_change;
+    enum { param_count = drawbar_organ::param_count};
+    dsp::organ_parameters par_values;
+    uint32_t srate;
+    bool panic_flag;
+    /// Value for configure variable map_curve
+    std::string var_map_curve;
+
+    organ_audio_module();
+    
+    void post_instantiate();
+
+    void set_sample_rate(uint32_t sr) {
+        srate = sr;
     }
+    void params_changed();
+
+    void activate();
+    void deactivate();
+    uint32_t process(uint32_t offset, uint32_t nsamples, uint32_t inputs_mask, uint32_t outputs_mask);
+    /// No CV inputs for now
+    bool is_cv(int param_no) { return false; }
+    /// Practically all the stuff here is noisy
+    bool is_noisy(int param_no) { return true; }
+    void execute(int cmd_no);
+    bool get_graph(int index, int subindex, float *data, int points, cairo_iface *context) const;
+    char *configure(const char *key, const char *value);
+    void send_configures(send_configure_iface *);
+    uint32_t message_run(const void *valid_inputs, void *output_ports);
+public:
+    // overrides
+    virtual void note_on(int note, int velocity) { dsp::drawbar_organ::note_on(note, velocity); }
+    virtual void note_off(int note, int velocity) { dsp::drawbar_organ::note_off(note, velocity); }
+    virtual void control_change(int controller, int value) { dsp::drawbar_organ::control_change(controller, value); }
+    virtual void pitch_bend(int value) { dsp::drawbar_organ::pitch_bend(value); }
 };
 
 };

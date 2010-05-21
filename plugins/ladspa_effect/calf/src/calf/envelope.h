@@ -197,6 +197,14 @@ public:
     {
         return old_value + (value - old_value) * pos;
     }
+    inline float get_amp_value()
+    {
+        if (state == RELEASE && sustain > 0 && value < sustain)
+        {
+            return value * value * value / (sustain * sustain);
+        }
+        return value;
+    }
 };
 
 };
