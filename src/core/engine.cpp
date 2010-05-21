@@ -1,7 +1,7 @@
 /*
  * engine.cpp - implementation of LMMS' engine-system
  *
- * Copyright (c) 2006-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -153,45 +153,32 @@ void engine::destroy()
 
 	s_mixer->stopProcessing();
 
-	delete s_projectNotes;
-	s_projectNotes = NULL;
-	delete s_songEditor;
-	s_songEditor = NULL;
-	delete s_bbEditor;
-	s_bbEditor = NULL;
-	delete s_pianoRoll;
-	s_pianoRoll = NULL;
-	delete s_automationEditor;
-	s_automationEditor = NULL;
-
-	delete s_fxMixerView;
-	s_fxMixerView = NULL;
+	deleteHelper( &s_projectNotes );
+	deleteHelper( &s_songEditor );
+	deleteHelper( &s_bbEditor );
+	deleteHelper( &s_pianoRoll );
+	deleteHelper( &s_automationEditor );
+	deleteHelper( &s_fxMixerView );
 
 	InstrumentTrackView::cleanupWindowPool();
 
 	s_song->clearProject();
-	delete s_bbTrackContainer;
-	s_bbTrackContainer = NULL;
-	delete s_dummyTC;
-	s_dummyTC = NULL;
 
-	delete s_mixer;
-	s_mixer = NULL;
-	delete s_fxMixer;
-	s_fxMixer = NULL;
+	deleteHelper( &s_bbTrackContainer );
+	deleteHelper( &s_dummyTC );
 
-	delete s_ladspaManager;
+	deleteHelper( &s_mixer );
+	deleteHelper( &s_fxMixer );
+
+	deleteHelper( &s_ladspaManager );
 
 	//delete configManager::inst();
-	delete s_projectJournal;
-	s_projectJournal = NULL;
+	deleteHelper( &s_projectJournal );
+
 	s_mainWindow = NULL;
 
-	delete s_song;
-	s_song = NULL;
-
-	delete s_automationRecorder;
-	s_automationRecorder = NULL;
+	deleteHelper( &s_song );
+	deleteHelper( &s_automationRecorder );
 
 	delete s_mergedResourceDB->provider();
 	s_mergedResourceDB = NULL;
