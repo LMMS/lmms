@@ -1,8 +1,8 @@
 /*
  * EffectControls.h - model for effect-controls
  *
- * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ * Copyright (c) 2008-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -38,7 +38,8 @@ public:
 	EffectControls( Effect * _eff ) :
 		JournallingObject(),
 		Model( _eff ),
-		m_effect( _eff )
+		m_effect( _eff ),
+		m_viewVisible( false )
 	{
 	}
 
@@ -50,6 +51,16 @@ public:
 	virtual EffectControlDialog * createView() = 0;
 
 
+	void setViewVisible( bool _visible )
+	{
+		m_viewVisible = _visible;
+	}
+
+	bool isViewVisible() const
+	{
+		return m_viewVisible;
+	}
+
 	Effect * effect()
 	{
 		return m_effect;
@@ -58,6 +69,7 @@ public:
 
 private:
 	Effect * m_effect;
+	bool m_viewVisible;
 
 } ;
 

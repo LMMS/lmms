@@ -69,7 +69,7 @@ class FxChannel : public ThreadableJob
 
 
 
-class FxMixer : public JournallingObject, public Model
+class EXPORT FxMixer : public JournallingObject, public Model
 {
 public:
 	FxMixer();

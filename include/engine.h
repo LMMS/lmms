@@ -1,7 +1,7 @@
 /*
  * engine.h - engine-system of LMMS
  *
- * Copyright (c) 2006-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -207,6 +207,16 @@ public:
 	}
 
 private:
+	// small helper function which sets the pointer to NULL before actually deleting
+	// the object it refers to
+	template<class T>
+	static inline void deleteHelper( T * * ptr )
+	{
+		T * tmp = *ptr;
+		*ptr = NULL;
+		delete tmp;
+	}
+
 	static bool s_hasGUI;
 	static bool s_suppressMessages;
 	static float s_framesPerTick;

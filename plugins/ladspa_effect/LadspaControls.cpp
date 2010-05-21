@@ -1,8 +1,8 @@
 /*
- * LadspaControls.cpp - model for LADSPA-plugin controls
+ * LadspaControls.cpp - model for LADSPA plugin controls
  *
- * Copyright (c) 2008-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ * Copyright (c) 2008-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -22,7 +22,6 @@
  *
  */
 
-
 #include <QtXml/QDomElement>
 
 #include "LadspaEffect.h"
@@ -35,6 +34,10 @@ LadspaControls::LadspaControls( LadspaEffect * _eff ) :
 	m_noLink( false ),
 	m_stereoLinkModel( true, this )
 {
+
+	connect( &m_stereoLinkModel, SIGNAL( dataChanged() ),
+				this, SLOT( updateLinkStatesFromGlobal() ) );
+
 	multi_proc_t controls = m_effect->getPortControls();
 	m_controlCount = controls.count();
 
@@ -163,7 +166,7 @@ void LadspaControls::linkPort( Uint16 _port, bool _state )
 
 
 
-void LadspaControls::updateChannelLinkState()
+void LadspaControls::updateLinkStatesFromGlobal()
 {
 	if( m_stereoLinkModel.value() )
 	{
@@ -183,10 +186,10 @@ void LadspaControls::updateChannelLinkState()
 			m_controls[0][port]->setLink( false );
 		}
 	}
-	else
-	{
-		m_noLink = false;
-	}
+
+	// if global channel link state has changed, always ignore link
+	// status of individual ports in the future
+	m_noLink = false;
 }
 
 

@@ -1,7 +1,7 @@
 /*
- * song.cpp - root of the model-tree
+ * song.cpp - root of the model tree
  *
- * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -301,7 +301,7 @@ void song::processNextBuffer()
 			// at song-start we have to reset the LFOs
 			if( m_playPos[Mode_PlaySong] == 0 )
 			{
-				EnvelopeAndLfoParameters::resetLfo();
+				EnvelopeAndLfoParameters::instances()->reset();
 			}
 			break;
 
