@@ -1,7 +1,7 @@
 /* Calf DSP Library
- * Module wrapper methods.
+ * Implementation of various helpers for the plugin interface.
  *
- * Copyright (C) 2001-2007 Krzysztof Foltman
+ * Copyright (C) 2001-2010 Krzysztof Foltman
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -18,10 +18,12 @@
  * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, 
  * Boston, MA  02110-1301  USA
  */
-#include <assert.h>
-#include <memory.h>
+#include <config.h>
+#include <limits.h>
 #include <calf/giface.h>
-#include <stdio.h>
+#include <calf/osctlnet.h>
+#include <calf/utils.h>
+
 using namespace std;
 using namespace calf_utils;
 using namespace calf_plugins;
@@ -187,10 +189,10 @@ std::string parameter_properties::to_string(float value) const
 }
 
 void calf_plugins::plugin_ctl_iface::clear_preset() {
-    int param_count = get_param_count();
+    int param_count = get_metadata_iface()->get_param_count();
     for (int i=0; i < param_count; i++)
     {
-        parameter_properties &pp = *get_param_props(i);
+        const parameter_properties &pp = *get_metadata_iface()->get_param_props(i);
         if ((pp.flags & PF_TYPEMASK) == PF_STRING)
         {
             configure(pp.short_name, pp.choices ? pp.choices[0] : "");
@@ -213,7 +215,7 @@ const char *calf_plugins::load_gui_xml(const std::string &plugin_id)
 #endif
 }
 
-bool calf_plugins::check_for_message_context_ports(parameter_properties *parameters, int count)
+bool calf_plugins::check_for_message_context_ports(const parameter_properties *parameters, int count)
 {
     for (int i = count - 1; i >= 0; i--)
     {
@@ -223,7 +225,7 @@ bool calf_plugins::check_for_message_context_ports(parameter_properties *paramet
     return false;
 }
 
-bool calf_plugins::check_for_string_ports(parameter_properties *parameters, int count)
+bool calf_plugins::check_for_string_ports(const parameter_properties *parameters, int count)
 {
     for (int i = count - 1; i >= 0; i--)
     {
@@ -292,6 +294,21 @@ void calf_plugins::set_channel_color(cairo_iface *context, int channel)
     context->set_line_width(1.5);
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+bool frequency_response_line_graph::get_gridline(int index, int subindex, float &pos, bool &vertical, std::string &legend, cairo_iface *context) const
+{ 
+    return get_freq_gridline(subindex, pos, vertical, legend, context);
+}
+
+int frequency_response_line_graph::get_changed_offsets(int index, int generation, int &subindex_graph, int &subindex_dot, int &subindex_gridline) const
+{
+    subindex_graph = 0;
+    subindex_dot = 0;
+    subindex_gridline = generation ? INT_MAX : 0;
+    return 1;
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////
 
 calf_plugins::plugin_registry &calf_plugins::plugin_registry::instance()
@@ -314,9 +331,27 @@ const plugin_metadata_iface *calf_plugins::plugin_registry::get_by_uri(const cha
     return NULL;
 }
 
+const plugin_metadata_iface *calf_plugins::plugin_registry::get_by_id(const char *id, bool case_sensitive)
+{
+    typedef int (*comparator)(const char *, const char *);
+    comparator comp = case_sensitive ? strcmp : strcasecmp;
+    for (unsigned int i = 0; i < plugins.size(); i++)
+    {
+        if (!comp(plugins[i]->get_id(), id))
+            return plugins[i];
+    }
+    return NULL;
+}
 ///////////////////////////////////////////////////////////////////////////////////////
 
-#if USE_DSSI
+std::string table_edit_iface::get_cell(int param, int row, int column) const
+{
+    return calf_utils::i2s(row)+":"+calf_utils::i2s(column);
+}
+
+///////////////////////////////////////////////////////////////////////////////////////
+
+#if USE_EXEC_GUI
 struct osc_cairo_control: public cairo_iface
 {
     osctl::osc_inline_typed_strstream &os;
@@ -332,9 +367,8 @@ struct osc_cairo_control: public cairo_iface
     }
 };
 
-static void send_graph_via_osc(osctl::osc_client &client, const std::string &address, line_graph_iface *graph, std::vector<int> &params)
+static void serialize_graphs(osctl::osc_inline_typed_strstream &os, const line_graph_iface *graph, std::vector<int> &params)
 {
-    osctl::osc_inline_typed_strstream os;
     osc_cairo_control cairoctl(os);
     for (size_t i = 0; i < params.size(); i++)
     {
@@ -376,15 +410,26 @@ static void send_graph_via_osc(osctl::osc_client &client, const std::string &add
         os << (uint32_t)LGI_END_ITEM;
     }
     os << (uint32_t)LGI_END;
-    client.send(address, os);
 }
 
-calf_plugins::dssi_feedback_sender::dssi_feedback_sender(const char *URI, line_graph_iface *_graph, calf_plugins::parameter_properties *props, int num_params)
+calf_plugins::dssi_feedback_sender::dssi_feedback_sender(const char *URI, const line_graph_iface *_graph)
 {
     graph = _graph;
+    is_client_shared = false;
     client = new osctl::osc_client;
     client->bind("0.0.0.0", 0);
     client->set_url(URI);
+}
+
+calf_plugins::dssi_feedback_sender::dssi_feedback_sender(osctl::osc_client *_client, const line_graph_iface *_graph)
+{
+    graph = _graph;
+    client = _client;
+    is_client_shared = true;
+}
+
+void calf_plugins::dssi_feedback_sender::add_graphs(const calf_plugins::parameter_properties *props, int num_params)
+{
     for (int i = 0; i < num_params; i++)
     {
         if (props[i].flags & PF_PROP_GRAPH)
@@ -394,14 +439,18 @@ calf_plugins::dssi_feedback_sender::dssi_feedback_sender(const char *URI, line_g
 
 void calf_plugins::dssi_feedback_sender::update()
 {
-    send_graph_via_osc(*client, "/lineGraph", graph, indices);
+    if (graph)
+    {
+        osctl::osc_inline_typed_strstream os;
+        serialize_graphs(os, graph, indices);
+        client->send("/lineGraph", os);
+    }
 }
 
 calf_plugins::dssi_feedback_sender::~dssi_feedback_sender()
 {
-    // this would not be received by GUI's main loop because it's already been terminated
-    // client->send("/iQuit");
-    delete client;
+    if (!is_client_shared)
+        delete client;
 }
 
 #endif

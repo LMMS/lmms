@@ -93,12 +93,13 @@ public:
 };
 
 /// Exception-safe temporary assignment
-template<class T>
+template<class T, class Tref = T&>
 class scope_assign
 {
-    T &data, old_value;
+    Tref data;
+    T old_value;
 public:
-    scope_assign(T &_data, T new_value)
+    scope_assign(Tref _data, T new_value)
     : data(_data), old_value(_data)
     {
         data = new_value;
@@ -124,8 +125,8 @@ struct file_exception: public std::exception
     const char *text;
     std::string message, filename, container;
 public:
-    file_exception(const std::string &f) : message(strerror(errno)), filename(f), container(filename + ":" + message) { text = container.c_str(); }
-    file_exception(const std::string &f, const std::string &t) : message(t), filename(f), container(filename + ":" + message) { text = container.c_str(); }
+    file_exception(const std::string &f);
+    file_exception(const std::string &f, const std::string &t);
     virtual const char *what() const throw () { return text; }
     virtual ~file_exception() throw () {}
 };
