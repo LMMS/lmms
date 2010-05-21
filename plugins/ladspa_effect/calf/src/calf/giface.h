@@ -1,7 +1,7 @@
 /* Calf DSP Library
  * Common plugin interface definitions (shared between LADSPA/LV2/DSSI/standalone).
  *
- * Copyright (C) 2007 Krzysztof Foltman
+ * Copyright (C) 2007-2010 Krzysztof Foltman
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -18,17 +18,15 @@
  * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, 
  * Boston, MA 02111-1307, USA.
  */
-#ifndef __CALF_GIFACE_H
-#define __CALF_GIFACE_H
+#ifndef CALF_GIFACE_H
+#define CALF_GIFACE_H
 
-#include <stdint.h>
-#include <stdlib.h>
-#include <pthread.h>
+#include <config.h>
+#include "primitives.h"
+#include <complex>
 #include <exception>
 #include <string>
-#include <complex>
-#include "primitives.h"
-#include "preset.h"
+#include <vector>
 
 namespace osctl {
     struct osc_client;
@@ -235,7 +233,7 @@ struct table_edit_iface
     virtual uint32_t get_table_rows(int param) const = 0;
     
     /// retrieve data item from the plugin
-    virtual std::string get_cell(int param, int row, int column) const { return calf_utils::i2s(row)+":"+calf_utils::i2s(column); }
+    virtual std::string get_cell(int param, int row, int column) const;
 
     /// set data item to the plugin
     virtual void set_cell(int param, int row, int column, const std::string &src, std::string &error) const { error.clear(); }
@@ -319,14 +317,12 @@ struct plugin_metadata_iface
     virtual bool requires_midi() const =0;
     /// @return port offset of first control (parameter) port (= number of audio inputs + number of audio outputs in all existing plugins as for 1 Aug 2008)
     virtual int get_param_port_offset() const  = 0;
-    /// @return line_graph_iface if any
-    virtual const line_graph_iface *get_line_graph_iface() const = 0;
     /// @return table_edit_iface if any
     virtual const table_edit_iface *get_table_edit_iface() const = 0;
     /// @return NULL-terminated list of menu commands
     virtual plugin_command_info *get_commands() const { return NULL; }
     /// @return description structure for given parameter
-    virtual parameter_properties *get_param_props(int param_no) const = 0;
+    virtual const parameter_properties *get_param_props(int param_no) const = 0;
     /// @return retrieve names of audio ports (@note control ports are named in parameter_properties, not here)
     virtual const char **get_port_names() const = 0;
     /// @return description structure for the plugin
@@ -347,7 +343,7 @@ struct plugin_metadata_iface
 };
 
 /// Interface for host-GUI-plugin interaction (should be really split in two, but ... meh)
-struct plugin_ctl_iface: public virtual plugin_metadata_iface
+struct plugin_ctl_iface
 {
     /// @return value of given parameter
     virtual float get_param_value(int param_no) = 0;
@@ -360,7 +356,7 @@ struct plugin_ctl_iface: public virtual plugin_metadata_iface
     /// Execute menu command with given number
     virtual void execute(int cmd_no)=0;
     /// Set a configure variable on a plugin
-    virtual char *configure(const char *key, const char *value) { return NULL; }
+    virtual char *configure(const char *key, const char *value) = 0;
     /// Send all configure variables set within a plugin to given destination (which may be limited to only those that plugin understands)
     virtual void send_configures(send_configure_iface *)=0;
     /// Restore all state (parameters and configure vars) to default values - implemented in giface.cpp
@@ -370,7 +366,11 @@ struct plugin_ctl_iface: public virtual plugin_metadata_iface
     virtual bool blobcall(const char *command, const std::string &request, std::string &result) { result = "Call not supported"; return false; }
     /// Update status variables changed since last_serial
     /// @return new last_serial
-    virtual int send_status_updates(send_updates_iface *sui, int last_serial) { return last_serial; }
+    virtual int send_status_updates(send_updates_iface *sui, int last_serial) = 0;
+    /// Return metadata object
+    virtual const plugin_metadata_iface *get_metadata_iface() const = 0;
+    /// @return line_graph_iface if any
+    virtual const line_graph_iface *get_line_graph_iface() const = 0;
     /// Do-nothing destructor to silence compiler warning
     virtual ~plugin_ctl_iface() {}
 };
@@ -381,7 +381,7 @@ struct plugin_list_info_iface;
 class plugin_registry
 {
 public:
-    typedef std::vector<plugin_metadata_iface *> plugin_vector;    
+    typedef std::vector<const plugin_metadata_iface *> plugin_vector;
 private:
     plugin_vector plugins;
     plugin_registry();
@@ -393,71 +393,169 @@ public:
     const plugin_vector &get_all() { return plugins; }
     /// Get single plugin metadata object by URI
     const plugin_metadata_iface *get_by_uri(const char *URI);
+    /// Get single plugin metadata object by URI
+    const plugin_metadata_iface *get_by_id(const char *id, bool case_sensitive = false);
 };
 
 /// Load and strdup a text file with GUI definition
 extern const char *load_gui_xml(const std::string &plugin_id);
 
-/// Empty implementations for plugin functions. Note, that functions aren't virtual, because they're called via the particular
-/// subclass (flanger_audio_module etc) via template wrappers (ladspa_wrapper<> etc), not via base class pointer/reference
+/// Interface to audio processing plugins (the real things, not only metadata)
+struct audio_module_iface
+{
+    /// Handle MIDI Note On
+    virtual void note_on(int note, int velocity) = 0;
+    /// Handle MIDI Note Off
+    virtual void note_off(int note, int velocity) = 0;
+    /// Handle MIDI Program Change
+    virtual void program_change(int program) = 0;
+    /// Handle MIDI Control Change
+    virtual void control_change(int controller, int value) = 0;
+    /// Handle MIDI Pitch Bend
+    /// @param value pitch bend value (-8192 to 8191, defined as in MIDI ie. 8191 = 200 ct by default)
+    virtual void pitch_bend(int value) = 0;
+    /// Handle MIDI Channel Pressure
+    /// @param value channel pressure (0 to 127)
+    virtual void channel_pressure(int value) = 0;
+    /// Called when params are changed (before processing)
+    virtual void params_changed() = 0;
+    /// LADSPA-esque activate function, except it is called after ports are connected, not before
+    virtual void activate() = 0;
+    /// LADSPA-esque deactivate function
+    virtual void deactivate() = 0;
+    /// Set sample rate for the plugin
+    virtual void set_sample_rate(uint32_t sr) = 0;
+    /// Execute menu command with given number
+    virtual void execute(int cmd_no) = 0;
+    /// DSSI configure call
+    virtual char *configure(const char *key, const char *value) = 0;
+    /// Send all understood configure vars (none by default)
+    virtual void send_configures(send_configure_iface *sci) = 0;
+    /// Send all supported status vars (none by default)
+    virtual int send_status_updates(send_updates_iface *sui, int last_serial) = 0;
+    /// Reset parameter values for epp:trigger type parameters (ones activated by oneshot push button instead of check box)
+    virtual void params_reset() = 0;
+    /// Called after instantiating (after all the feature pointers are set - including interfaces like progress_report_iface)
+    virtual void post_instantiate() = 0;
+    /// Return the arrays of port buffer pointers
+    virtual void get_port_arrays(float **&ins_ptrs, float **&outs_ptrs, float **&params_ptrs) = 0;
+    /// Return metadata object
+    virtual const plugin_metadata_iface *get_metadata_iface() const = 0;
+    /// Set the progress report interface to communicate progress to
+    virtual void set_progress_report_iface(progress_report_iface *iface) = 0;
+    /// Clear a part of output buffers that have 0s at mask
+    virtual void process_slice(uint32_t offset, uint32_t end) = 0;
+    /// The audio processing loop
+    virtual uint32_t process(uint32_t offset, uint32_t numsamples, uint32_t inputs_mask, uint32_t outputs_mask) = 0;
+    /// Message port processing function
+    virtual uint32_t message_run(const void *valid_ports, void *output_ports) = 0;
+    /// @return line_graph_iface if any
+    virtual const line_graph_iface *get_line_graph_iface() const = 0;
+    virtual ~audio_module_iface() {}
+};
+
+/// Empty implementations for plugin functions.
 template<class Metadata>
-class audio_module: public Metadata
+class audio_module: public Metadata, public audio_module_iface
 {
 public:
     typedef Metadata metadata_type;
+    using Metadata::in_count;
+    using Metadata::out_count;
+    using Metadata::param_count;
+    float *ins[Metadata::in_count]; 
+    float *outs[Metadata::out_count];
+    float *params[Metadata::param_count];
 
     progress_report_iface *progress_report;
 
     audio_module() {
         progress_report = NULL;
+        memset(ins, 0, sizeof(ins));
+        memset(outs, 0, sizeof(outs));
+        memset(params, 0, sizeof(params));
     }
 
     /// Handle MIDI Note On
-    inline void note_on(int note, int velocity) {}
+    void note_on(int note, int velocity) {}
     /// Handle MIDI Note Off
-    inline void note_off(int note, int velocity) {}
+    void note_off(int note, int velocity) {}
     /// Handle MIDI Program Change
-    inline void program_change(int program) {}
+    void program_change(int program) {}
     /// Handle MIDI Control Change
-    inline void control_change(int controller, int value) {}
+    void control_change(int controller, int value) {}
     /// Handle MIDI Pitch Bend
     /// @param value pitch bend value (-8192 to 8191, defined as in MIDI ie. 8191 = 200 ct by default)
-    inline void pitch_bend(int value) {}
+    void pitch_bend(int value) {}
     /// Handle MIDI Channel Pressure
     /// @param value channel pressure (0 to 127)
-    inline void channel_pressure(int value) {}
+    void channel_pressure(int value) {}
     /// Called when params are changed (before processing)
-    inline void params_changed() {}
+    void params_changed() {}
     /// LADSPA-esque activate function, except it is called after ports are connected, not before
-    inline void activate() {}
+    void activate() {}
     /// LADSPA-esque deactivate function
-    inline void deactivate() {}
+    void deactivate() {}
     /// Set sample rate for the plugin
-    inline void set_sample_rate(uint32_t sr) { }
+    void set_sample_rate(uint32_t sr) { }
     /// Execute menu command with given number
-    inline void execute(int cmd_no) {}
+    void execute(int cmd_no) {}
     /// DSSI configure call
     virtual char *configure(const char *key, const char *value) { return NULL; }
     /// Send all understood configure vars (none by default)
-    inline void send_configures(send_configure_iface *sci) {}
+    void send_configures(send_configure_iface *sci) {}
     /// Send all supported status vars (none by default)
-    inline int send_status_updates(send_updates_iface *sui, int last_serial) { return last_serial; }
+    int send_status_updates(send_updates_iface *sui, int last_serial) { return last_serial; }
     /// Reset parameter values for epp:trigger type parameters (ones activated by oneshot push button instead of check box)
-    inline void params_reset() {}
+    void params_reset() {}
     /// Called after instantiating (after all the feature pointers are set - including interfaces like progress_report_iface)
-    inline void post_instantiate() {}
+    void post_instantiate() {}
     /// Handle 'message context' port message
     /// @arg output_ports pointer to bit array of output port "changed" flags, note that 0 = first audio input, not first parameter (use input_count + output_count)
-    inline uint32_t message_run(const void *valid_ports, void *output_ports) { 
+    uint32_t message_run(const void *valid_ports, void *output_ports) { 
         fprintf(stderr, "ERROR: message run not implemented\n");
         return 0;
     }
+    /// Return the array of input port pointers
+    virtual void get_port_arrays(float **&ins_ptrs, float **&outs_ptrs, float **&params_ptrs)
+    {
+        ins_ptrs = ins;
+        outs_ptrs = outs;
+        params_ptrs = params;
+    }
+    /// Return metadata object
+    virtual const plugin_metadata_iface *get_metadata_iface() const { return this; }
+    /// Set the progress report interface to communicate progress to
+    virtual void set_progress_report_iface(progress_report_iface *iface) { progress_report = iface; }
+
+    /// utility function: zero port values if mask is 0
+    inline void zero_by_mask(uint32_t mask, uint32_t offset, uint32_t nsamples)
+    {
+        for (int i=0; i<Metadata::out_count; i++) {
+            if ((mask & (1 << i)) == 0) {
+                dsp::zero(outs[i] + offset, nsamples);
+            }
+        }
+    }
+    /// utility function: call process, and if it returned zeros in output masks, zero out the relevant output port buffers
+    void process_slice(uint32_t offset, uint32_t end)
+    {
+        while(offset < end)
+        {
+            uint32_t newend = std::min(offset + MAX_SAMPLE_RUN, end);
+            uint32_t out_mask = process(offset, newend - offset, -1, -1);
+            zero_by_mask(out_mask, offset, newend - offset);
+            offset = newend;
+        }
+    }
+    /// @return line_graph_iface if any
+    virtual const line_graph_iface *get_line_graph_iface() const { return dynamic_cast<const line_graph_iface *>(this); }
 };
 
-extern bool check_for_message_context_ports(parameter_properties *parameters, int count);
-extern bool check_for_string_ports(parameter_properties *parameters, int count);
+extern bool check_for_message_context_ports(const parameter_properties *parameters, int count);
+extern bool check_for_string_ports(const parameter_properties *parameters, int count);
 
-#if USE_DSSI
+#if USE_EXEC_GUI || USE_DSSI
 
 enum line_graph_item
 {
@@ -476,16 +574,19 @@ struct dssi_feedback_sender
 {
     /// OSC client object used to send updates
     osctl::osc_client *client;
-    /// Background thread handle
-    pthread_t bg_thread;
+    /// Is client shared with something else?
+    bool is_client_shared;
     /// Quit flag (used to terminate the thread)
     bool quit;
     /// Indices of graphs to send
     std::vector<int> indices;
     /// Source for the graph data (interface to marshal)
-    calf_plugins::line_graph_iface *graph;
+    const calf_plugins::line_graph_iface *graph;
     
-    dssi_feedback_sender(const char *URI, line_graph_iface *_graph, calf_plugins::parameter_properties *props, int num_params);
+    /// Create using a new client
+    dssi_feedback_sender(const char *URI, const line_graph_iface *_graph);
+    dssi_feedback_sender(osctl::osc_client *_client, const line_graph_iface *_graph);
+    void add_graphs(const calf_plugins::parameter_properties *props, int num_params);
     void update();
     ~dssi_feedback_sender();
 };
@@ -493,12 +594,13 @@ struct dssi_feedback_sender
 
 /// Metadata base class template, to provide default versions of interface functions
 template<class Metadata>
-class plugin_metadata: public virtual plugin_metadata_iface
+class plugin_metadata: public plugin_metadata_iface
 {    
 public:
     static const char *port_names[];
     static parameter_properties param_props[];
     static ladspa_plugin_info plugin_info;
+    typedef plugin_metadata<Metadata> metadata_class;
 
     // These below are stock implementations based on enums and static members in Metadata classes
     // they may be overridden to provide more interesting functionality
@@ -514,12 +616,11 @@ public:
     bool get_midi() const { return Metadata::support_midi; }
     bool requires_midi() const { return Metadata::require_midi; }
     bool is_rt_capable() const { return Metadata::rt_capable; }
-    const line_graph_iface *get_line_graph_iface() const { return dynamic_cast<const line_graph_iface *>(this); }    
     const table_edit_iface *get_table_edit_iface() const { return dynamic_cast<const table_edit_iface *>(this); }    
     int get_param_port_offset()  const { return Metadata::in_count + Metadata::out_count; }
     const char *get_gui_xml() const { static const char *data_ptr = calf_plugins::load_gui_xml(get_id()); return data_ptr; }
     plugin_command_info *get_commands() const { return NULL; }
-    parameter_properties *get_param_props(int param_no) const { return &param_props[param_no]; }
+    const parameter_properties *get_param_props(int param_no) const { return &param_props[param_no]; }
     const char **get_port_names() const { return port_names; }
     bool is_cv(int param_no) const { return true; }
     bool is_noisy(int param_no) const { return false; }
@@ -532,42 +633,6 @@ public:
                 ports.push_back(i);
         }
     }
-};
-
-/// A class for delegating metadata implementation to a "remote" metadata class.
-/// Used for GUI wrappers that cannot have a dependency on actual classes,
-/// and which instead take an "external" metadata object pointer, obtained
-/// through get_all_plugins.
-class plugin_metadata_proxy: public virtual plugin_metadata_iface
-{
-public:
-    const plugin_metadata_iface *impl;
-public:
-    plugin_metadata_proxy(const plugin_metadata_iface *_impl) { impl = _impl; }
-    const char *get_name() const { return impl->get_name(); } 
-    const char *get_id() const { return impl->get_id(); } 
-    const char *get_label() const { return impl->get_label(); } 
-    int get_input_count() const { return impl->get_input_count(); }
-    int get_output_count() const { return impl->get_output_count(); }
-    int get_inputs_optional() const { return impl->get_inputs_optional(); }
-    int get_outputs_optional() const { return impl->get_outputs_optional(); }
-    int get_param_count() const { return impl->get_param_count(); }
-    bool get_midi() const { return impl->get_midi(); }
-    bool requires_midi() const { return impl->requires_midi(); }
-    bool is_rt_capable() const { return impl->is_rt_capable(); }
-    const line_graph_iface *get_line_graph_iface() const { return impl->get_line_graph_iface(); }    
-    const table_edit_iface *get_table_edit_iface() const { return impl->get_table_edit_iface(); }    
-    int get_param_port_offset() const { return impl->get_param_port_offset(); }
-    const char *get_gui_xml() const { return impl->get_gui_xml(); }
-    plugin_command_info *get_commands() const { return impl->get_commands(); }
-    parameter_properties *get_param_props(int param_no) const { return impl->get_param_props(param_no); }
-    const char **get_port_names() const { return impl->get_port_names(); }
-    bool is_cv(int param_no) const { return impl->is_cv(param_no); }
-    bool is_noisy(int param_no) const { return impl->is_noisy(param_no); }
-    const ladspa_plugin_info &get_plugin_info() const { return impl->get_plugin_info(); }
-    bool requires_message_context() const { return impl->requires_message_context(); }
-    bool requires_string_ports() const { return impl->requires_string_ports(); }
-    void get_message_context_parameters(std::vector<int> &ports) const { impl->get_message_context_parameters(ports); }
 };
 
 #define CALF_PORT_NAMES(name) template<> const char *::plugin_metadata<name##_metadata>::port_names[]
@@ -606,8 +671,23 @@ static inline float dB_grid_inv(float pos)
     return pow(256.0, pos - 0.4);
 }
 
+/// Line graph interface implementation for frequency response graphs
+class frequency_response_line_graph: public line_graph_iface 
+{
+public:
+    bool get_gridline(int index, int subindex, float &pos, bool &vertical, std::string &legend, cairo_iface *context) const;
+    virtual int get_changed_offsets(int index, int generation, int &subindex_graph, int &subindex_dot, int &subindex_gridline) const;
+};
+
 /// set drawing color based on channel index (0 or 1)
 void set_channel_color(cairo_iface *context, int channel);
+
+struct preset_access_iface
+{
+    virtual void store_preset() = 0;
+    virtual void activate_preset(int preset, bool builtin) = 0;
+    virtual ~preset_access_iface() {} 
+};
 
 };
 

@@ -18,12 +18,6 @@
  * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, 
  * Boston, MA  02110-1301  USA
  */
-#include <assert.h>
-#include <memory.h>
-#if USE_JACK
-#include <jack/jack.h>
-#endif
-#include <calf/giface.h>
 #include <calf/synth.h>
 
 using namespace dsp;
@@ -176,8 +170,6 @@ void basic_synth::control_change(int ctl, int val)
         }
     }
     if (ctl == 123 || ctl == 120) { // all notes off, all sounds off
-        vector<int> notes;
-        notes.reserve(128);
         if (ctl == 120) { // for "all sounds off", automatically release hold and sostenuto pedal
             control_change(66, 0);
             control_change(64, 0);

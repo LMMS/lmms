@@ -293,6 +293,11 @@ template<class Buffer, class TypeBuffer>
 inline osc_stream<Buffer, TypeBuffer> &
 operator <<(osc_stream<Buffer, TypeBuffer> &s, uint32_t val)
 {
+#if 0
+    val = htonl(val);
+    s.write(&val, 4);
+    s.write_type(osc_i32);
+#endif
     return s;
 }
 
@@ -300,6 +305,10 @@ template<class Buffer, class TypeBuffer>
 inline osc_stream<Buffer, TypeBuffer> &
 operator >>(osc_stream<Buffer, TypeBuffer> &s, uint32_t &val)
 {
+#if 0
+    s.read(&val, 4);
+    val = htonl(val);
+#endif
     return s;
 }
 
@@ -307,6 +316,10 @@ template<class Buffer, class TypeBuffer>
 inline osc_stream<Buffer, TypeBuffer> &
 operator >>(osc_stream<Buffer, TypeBuffer> &s, int32_t &val)
 {
+#if 0
+    s.read(&val, 4);
+    val = htonl(val);
+#endif
     return s;
 }
 
@@ -314,6 +327,11 @@ template<class Buffer, class TypeBuffer>
 inline osc_stream<Buffer, TypeBuffer> &
 operator <<(osc_stream<Buffer, TypeBuffer> &s, float val)
 {
+    union { float v; uint32_t i; } val2;
+    val2.v = val;
+    val2.i = htonl(val2.i);
+    s.write(&val2.i, 4);
+    s.write_type(osc_f32);
     return s;
 }
 
@@ -321,6 +339,10 @@ template<class Buffer, class TypeBuffer>
 inline osc_stream<Buffer, TypeBuffer> &
 operator >>(osc_stream<Buffer, TypeBuffer> &s, float &val)
 {
+    union { float v; uint32_t i; } val2;
+    s.read(&val2.i, 4);
+    val2.i = htonl(val2.i);
+    val = val2.v;
     return s;
 }
 
@@ -358,6 +380,21 @@ template<class Buffer, class TypeBuffer, class DestBuffer>
 inline osc_stream<Buffer, TypeBuffer> &
 read_buffer_from_osc_stream(osc_stream<Buffer, TypeBuffer> &s, DestBuffer &buf)
 {
+#if 0
+    uint32_t nlen = 0;
+    s.read(&nlen, 4);
+    uint32_t len = htonl(nlen);
+    // write length in network order
+    for (uint32_t i = 0; i < len; i += 1024)
+    {
+        uint8_t tmp[1024];
+        uint32_t part = std::min((uint32_t)1024, len - i);
+        s.read(tmp, part);
+        buf.write(tmp, part);
+    }
+    // pad
+    s.read(&nlen, 4 - (len & 3));
+#endif
     return s;
 }
 
@@ -365,6 +402,21 @@ template<class Buffer, class TypeBuffer, class SrcBuffer>
 inline osc_stream<Buffer, TypeBuffer> &
 write_buffer_to_osc_stream(osc_stream<Buffer, TypeBuffer> &s, SrcBuffer &buf)
 {
+#if 0
+    uint32_t len = buf.read_left();
+    uint32_t nlen = ntohl(len);
+    s.write(&nlen, 4);
+    // write length in network order
+    for (uint32_t i = 0; i < len; i += 1024)
+    {
+        uint8_t tmp[1024];
+        uint32_t part = std::min((uint32_t)1024, len - i);
+        buf.read(tmp, part);
+        s.write(tmp, part);
+    }
+    s.pad();
+    s.write_type(osc_blob);
+#endif
     return s;
 }
 
@@ -397,7 +449,7 @@ operator <<(osc_stream<Buffer, TypeBuffer> &s, string_buffer &str)
 }
 
 // XXXKF: I don't support reading binary blobs yet
-#if 0
+
 struct osc_net_bad_address: public std::exception
 {
     std::string addr, error_msg;
@@ -426,12 +478,19 @@ struct osc_net_exception: public std::exception
     
 struct osc_net_dns_exception: public std::exception
 {
+#if 0
     int net_errno;
     std::string command, error_msg;
+    osc_net_dns_exception(const char *cmd, int _errno = h_errno)
+    {
+        command = cmd;
+        net_errno = _errno;
+        error_msg = "OSC error in "+command+": "+hstrerror(_errno);
+    }
     virtual const char *what() const throw() { return error_msg.c_str(); }
     virtual ~osc_net_dns_exception() throw () {}
-};
 #endif
+};
     
 template<class OscStream>
 struct osc_message_sink

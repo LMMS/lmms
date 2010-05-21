@@ -70,7 +70,7 @@ struct reverb_metadata: public plugin_metadata<reverb_metadata>
 
 struct vintage_delay_metadata: public plugin_metadata<vintage_delay_metadata>
 {
-    enum { par_bpm, par_divide, par_time_l, par_time_r, par_feedback, par_amount, par_mixmode, par_medium, par_dryamount, param_count };
+    enum { par_bpm, par_divide, par_time_l, par_time_r, par_feedback, par_amount, par_mixmode, par_medium, par_dryamount, par_width, param_count };
     enum { in_count = 2, out_count = 2, ins_optional = 0, outs_optional = 0, rt_capable = true, support_midi = false, require_midi = false };
     PLUGIN_NAME_ID_LABEL("vintage_delay", "vintagedelay", "Vintage Delay")
 };
@@ -103,9 +103,15 @@ struct monosynth_metadata: public plugin_metadata<monosynth_metadata>
 {
     enum { wave_saw, wave_sqr, wave_pulse, wave_sine, wave_triangle, wave_varistep, wave_skewsaw, wave_skewsqr, wave_test1, wave_test2, wave_test3, wave_test4, wave_test5, wave_test6, wave_test7, wave_test8, wave_count };
     enum { flt_lp12, flt_lp24, flt_2lp12, flt_hp12, flt_lpbr, flt_hpbr, flt_bp6, flt_2bp6 };
-    enum { par_wave1, par_wave2, par_pw1, par_pw2, par_detune, par_osc2xpose, par_oscmode, par_oscmix, par_filtertype, par_cutoff, par_resonance, par_cutoffsep, par_envmod, par_envtores, par_envtoamp, par_attack, par_decay, par_sustain, par_fade, par_release, 
+    enum { par_wave1, par_wave2, par_pw1, par_pw2, par_detune, par_osc2xpose, par_oscmode, par_oscmix, par_filtertype, par_cutoff, par_resonance, par_cutoffsep, par_env1tocutoff, par_env1tores, par_env1toamp, 
+        par_env1attack, par_env1decay, par_env1sustain, par_env1fade, par_env1release, 
         par_keyfollow, par_legato, par_portamento, par_vel2filter, par_vel2amp, par_master, par_pwhlrange, 
         par_lforate, par_lfodelay, par_lfofilter, par_lfopitch, par_lfopw, par_mwhl_lfo, par_scaledetune,
+        par_env2tocutoff, par_env2tores, par_env2toamp, 
+        par_env2attack, par_env2decay, par_env2sustain, par_env2fade, par_env2release, 
+        par_stretch1,
+        par_lfo1trig, par_lfo2trig,
+        par_lfo2rate, par_lfo2delay,
         param_count };
     enum { in_count = 0, out_count = 2, ins_optional = 0, outs_optional = 0, support_midi = true, require_midi = true, rt_capable = true };
     enum { step_size = 64, step_shift = 6 };
@@ -115,7 +121,9 @@ struct monosynth_metadata: public plugin_metadata<monosynth_metadata>
         modsrc_pressure,
         modsrc_modwheel,
         modsrc_env1,
+        modsrc_env2,
         modsrc_lfo1,
+        modsrc_lfo2,
         modsrc_count,
     };
     enum {
@@ -128,6 +136,7 @@ struct monosynth_metadata: public plugin_metadata<monosynth_metadata>
         moddest_o2detune,
         moddest_o1pw,
         moddest_o2pw,
+        moddest_o1stretch,
         moddest_count,
     };
     PLUGIN_NAME_ID_LABEL("monosynth", "monosynth", "Monosynth")
@@ -257,6 +266,44 @@ struct pulsator_metadata: public plugin_metadata<pulsator_metadata>
     PLUGIN_NAME_ID_LABEL("pulsator", "pulsator", "Pulsator")
 };
 
+/// Markus's Saturator - metadata
+struct saturator_metadata: public plugin_metadata<saturator_metadata>
+{
+    enum { in_count = 2, out_count = 2, ins_optional = 1, outs_optional = 1, support_midi = false, require_midi = false, rt_capable = true };
+    enum { param_bypass, param_level_in, param_level_out, param_mix, param_meter_in,
+           param_meter_out, param_clip_in, param_clip_out, param_drive, param_blend, param_meter_drive,
+           param_lp_pre_freq, param_hp_pre_freq, param_lp_post_freq, param_hp_post_freq,
+           param_p_freq, param_p_level, param_p_q, param_count };
+    PLUGIN_NAME_ID_LABEL("saturator", "saturator", "Saturator")
+};
+/// Markus's Exciter - metadata
+struct exciter_metadata: public plugin_metadata<exciter_metadata>
+{
+    enum { in_count = 2, out_count = 2, ins_optional = 1, outs_optional = 1, support_midi = false, require_midi = false, rt_capable = true };
+    enum { param_bypass, param_level_in, param_level_out, param_amount, param_meter_in,
+           param_meter_out, param_clip_in, param_clip_out, param_drive, param_blend, param_meter_drive,
+           param_freq, param_listen, param_count };
+    PLUGIN_NAME_ID_LABEL("exciter", "exciter", "Exciter")
+};
+/// Markus's Bass Enhancer - metadata
+struct bassenhancer_metadata: public plugin_metadata<bassenhancer_metadata>
+{
+    enum { in_count = 2, out_count = 2, ins_optional = 1, outs_optional = 1, support_midi = false, require_midi = false, rt_capable = true };
+    enum { param_bypass, param_level_in, param_level_out, param_amount, param_meter_in,
+           param_meter_out, param_clip_in, param_clip_out, param_drive, param_blend, param_meter_drive,
+           param_freq, param_listen, param_count };
+    PLUGIN_NAME_ID_LABEL("bassenhancer", "bassenhancer", "Bass Enhancer")
+};
+
+/// Damien's gate - metadata
+struct gate_metadata: public plugin_metadata<gate_metadata>
+{
+    enum { in_count = 3, out_count = 2, ins_optional = 1, outs_optional = 0, support_midi = false, require_midi = false, rt_capable = true };
+    enum { param_threshold, param_ratio, param_attack, param_release, param_makeup, param_knee, param_detection, param_stereo_link, param_aweighting, param_gating, param_peak, param_clip, param_bypass, param_range, param_mono, param_trigger, // param_freq, param_bw,
+        param_count };
+    PLUGIN_NAME_ID_LABEL("gate", "gate", "Gate")
+};
+
 /// Organ - enums for parameter IDs etc. (this mess is caused by organ split between plugin and generic class - which was
 /// a bad design decision and should be sorted out some day) XXXKF @todo
 struct organ_enums
@@ -346,16 +393,14 @@ struct organ_metadata: public organ_enums, public plugin_metadata<organ_metadata
     enum { in_count = 0, out_count = 2, ins_optional = 0, outs_optional = 0, support_midi = true, require_midi = true, rt_capable = true };
     PLUGIN_NAME_ID_LABEL("organ", "organ", "Organ")
     plugin_command_info *get_commands();
-    const char **get_default_configure_vars();
 };
 
 /// FluidSynth - metadata
 struct fluidsynth_metadata: public plugin_metadata<fluidsynth_metadata>
 {
-    enum { par_master, par_soundfont, par_interpolation, par_reverb, par_chorus, param_count };
+    enum { par_master, par_interpolation, par_reverb, par_chorus, par_soundfont, par_preset_key_set, param_count };
     enum { in_count = 0, out_count = 2, ins_optional = 0, outs_optional = 0, support_midi = true, require_midi = true, rt_capable = false };
     PLUGIN_NAME_ID_LABEL("fluidsynth", "fluidsynth", "Fluidsynth")
-    const char **get_default_configure_vars();
 };
     
 /// Wavetable - metadata

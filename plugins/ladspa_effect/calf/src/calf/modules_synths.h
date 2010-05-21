@@ -21,7 +21,6 @@
 #ifndef __CALF_MODULES_SYNTHS_H
 #define __CALF_MODULES_SYNTHS_H
 
-#include <assert.h>
 #include "biquad.h"
 #include "onepole.h"
 #include "audio_fx.h"
@@ -29,8 +28,8 @@
 #include "osc.h"
 #include "synth.h"
 #include "envelope.h"
-#include "organ.h"
 #include "modmatrix.h"
+#include "metadata.h"
 
 namespace calf_plugins {
 
@@ -42,13 +41,10 @@ class monosynth_audio_module: public audio_module<monosynth_metadata>, public li
 {
 public:
     enum { mod_matrix_slots = 10 };
-    float *ins[in_count]; 
-    float *outs[out_count];
-    float *params[param_count];
     uint32_t srate, crate;
     static dsp::waveform_family<MONOSYNTH_WAVE_BITS> *waves;
     dsp::waveform_oscillator<MONOSYNTH_WAVE_BITS> osc1, osc2;
-    dsp::triangle_lfo lfo;
+    dsp::triangle_lfo lfo1, lfo2;
     bool running, stopping, gate, force_fadeout;
     int last_key;
     
@@ -66,16 +62,20 @@ public:
     /// Last used waveform number - OSC2
     int prev_wave2;
     int filter_type, last_filter_type;
-    float freq, start_freq, target_freq, cutoff, decay_factor, fgain, fgain_delta, separation;
+    float freq, start_freq, target_freq, cutoff, fgain, fgain_delta, separation;
     float detune, xpose, xfade, ampctl, fltctl, queue_vel;
-    float odcr, porta_time, lfo_bend, lfo_clock, last_lfov, modwheel_value;
+    float odcr, porta_time, lfo_bend, lfo1_clock, lfo2_clock, modwheel_value;
+    /// Delay counter for LFOs
+    float lfo_clock;
     /// Last value of phase shift for pulse width emulation for OSC1
     int32_t last_pwshift1;
     /// Last value of phase shift for pulse width emulation for OSC2
     int32_t last_pwshift2;
+    /// Last value of stretch for osc sync emulation for OSC1
+    int32_t last_stretch1;
     int queue_note_on, stop_count, modwheel_value_int;
     int legato;
-    dsp::adsr envelope;
+    dsp::adsr envelope1, envelope2;
     dsp::keystack stack;
     dsp::gain_smoothing master;
     /// Smoothed cutoff value
@@ -147,82 +147,6 @@ public:
     void calculate_step();
     /// Main processing function
     uint32_t process(uint32_t offset, uint32_t nsamples, uint32_t inputs_mask, uint32_t outputs_mask);
-};
-
-struct organ_audio_module: public audio_module<organ_metadata>, public dsp::drawbar_organ, public line_graph_iface
-{
-public:
-    using drawbar_organ::note_on;
-    using drawbar_organ::note_off;
-    using drawbar_organ::control_change;
-    enum { param_count = drawbar_organ::param_count};
-    float *ins[in_count]; 
-    float *outs[out_count];
-    float *params[param_count];
-    dsp::organ_parameters par_values;
-    uint32_t srate;
-    bool panic_flag;
-    /// Value for configure variable map_curve
-    std::string var_map_curve;
-
-    organ_audio_module()
-    : drawbar_organ(&par_values)
-    {
-        var_map_curve = "2\n0 1\n1 1\n"; // XXXKF hacky bugfix
-    }
-    
-    void post_instantiate()
-    {
-        dsp::organ_voice_base::precalculate_waves(progress_report);
-    }
-
-    void set_sample_rate(uint32_t sr) {
-        srate = sr;
-    }
-    void params_changed() {
-        for (int i = 0; i < param_count - var_count; i++)
-            ((float *)&par_values)[i] = *params[i];
-
-        unsigned int old_poly = polyphony_limit;
-        polyphony_limit = dsp::clip(dsp::fastf2i_drm(*params[par_polyphony]), 1, 32);
-        if (polyphony_limit < old_poly)
-            trim_voices();
-        
-        update_params();
-    }
-    inline void pitch_bend(int amt)
-    {
-        drawbar_organ::pitch_bend(amt);
-    }
-    void activate() {
-        setup(srate);
-        panic_flag = false;
-    }
-    void deactivate();
-    uint32_t process(uint32_t offset, uint32_t nsamples, uint32_t inputs_mask, uint32_t outputs_mask) {
-        float *o[2] = { outs[0] + offset, outs[1] + offset };
-        if (panic_flag)
-        {
-            control_change(120, 0); // stop all sounds
-            control_change(121, 0); // reset all controllers
-            panic_flag = false;
-        }
-        render_separate(o, nsamples);
-        return 3;
-    }
-    /// No CV inputs for now
-    bool is_cv(int param_no) { return false; }
-    /// Practically all the stuff here is noisy
-    bool is_noisy(int param_no) { return true; }
-    void execute(int cmd_no);
-    bool get_graph(int index, int subindex, float *data, int points, cairo_iface *context);
-    
-    char *configure(const char *key, const char *value);
-    void send_configures(send_configure_iface *);
-    uint32_t message_run(const void *valid_inputs, void *output_ports) { 
-        // silence a default printf (which is kind of a warning about unhandled message_run)
-        return 0;
-    }
 };
 
 };

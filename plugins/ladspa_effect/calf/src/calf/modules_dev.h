@@ -22,7 +22,6 @@
 #define __CALF_MODULES_DEV_H
 
 #include <calf/metadata.h>
-#include <calf/modules.h>
 
 #if ENABLE_EXPERIMENTAL
 #include <fluidsynth.h>
@@ -35,11 +34,6 @@ namespace calf_plugins {
 /// Tiny wrapper for fluidsynth
 class fluidsynth_audio_module: public audio_module<fluidsynth_metadata>
 {
-public:
-    float *ins[in_count]; 
-    float *outs[out_count];
-    float *params[param_count];
-
 protected:
     /// Current sample rate
     uint32_t srate;

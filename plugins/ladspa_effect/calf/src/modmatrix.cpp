@@ -18,9 +18,10 @@
  * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, 
  * Boston, MA  02110-1301  USA
  */
-#include <assert.h>
-#include <sstream>
 #include <calf/modmatrix.h>
+#include <calf/utils.h>
+#include <memory.h>
+#include <sstream>
 
 using namespace std;
 using namespace dsp;

@@ -22,10 +22,6 @@
 #define __CALF_PRESET_H
 
 #include <vector>
-#include <string>
-#include <map>
-#include <sstream>
-#include <ostream>
 #include <string.h>
 #include "utils.h"
 
