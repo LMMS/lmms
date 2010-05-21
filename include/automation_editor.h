@@ -23,10 +23,10 @@
  *
  */
 
-
 #ifndef _AUTOMATION_EDITOR_H
 #define _AUTOMATION_EDITOR_H
 
+#include <QtCore/QMutex>
 #include <QtGui/QWidget>
 
 #include "lmms_basics.h"
@@ -75,6 +75,7 @@ public:
 
 public slots:
 	void update();
+	void updateAfterPatternChange();
 
 
 protected:
@@ -187,6 +188,7 @@ private:
 	ComboBoxModel m_zoomingYModel;
 	ComboBoxModel m_quantizeModel;
 
+	QMutex m_patternMutex;
 	automationPattern * m_pattern;
 	float m_minLevel;
 	float m_maxLevel;
@@ -239,6 +241,7 @@ private:
 
 
 signals:
+	void currentPatternChanged();
 	void positionChanged( const midiTime & );
 
 } ;
