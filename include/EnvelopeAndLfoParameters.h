@@ -1,7 +1,7 @@
 /*
  * EnvelopeAndLfoParameters.h - class EnvelopeAndLfoParameters
  *
- * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -22,7 +22,6 @@
  *
  */
 
-
 #ifndef _ENVELOPE_AND_LFO_PARAMETERS_H
 #define _ENVELOPE_AND_LFO_PARAMETERS_H
 
@@ -35,11 +34,39 @@
 #include "lmms_basics.h"
 
 
-
 class EXPORT EnvelopeAndLfoParameters : public Model, public JournallingObject
 {
 	Q_OBJECT
 public:
+	class LfoInstances
+	{
+	public:
+		LfoInstances()
+		{
+		}
+
+		~LfoInstances()
+		{
+		}
+
+		inline bool isEmpty() const
+		{
+			return m_lfos.isEmpty();
+		}
+
+		void trigger();
+		void reset();
+
+		void add( EnvelopeAndLfoParameters * lfo );
+		void remove( EnvelopeAndLfoParameters * lfo );
+
+	private:
+		QMutex m_lfoListMutex;
+		typedef QList<EnvelopeAndLfoParameters *> LfoList;
+		LfoList m_lfos;
+
+	} ;
+
 	EnvelopeAndLfoParameters( float _value_for_zero_amount,
 							Model * _parent );
 	virtual ~EnvelopeAndLfoParameters();
@@ -49,8 +76,10 @@ public:
 		return ( ( _val < 0 ) ? -_val : _val ) * _val;
 	}
 
-	static void triggerLfo();
-	static void resetLfo();
+	static LfoInstances * instances()
+	{
+		return s_lfoInstances;
+	}
 
 	void fillLevel( float * _buf, f_cnt_t _frame,
 				const f_cnt_t _release_begin,
@@ -89,8 +118,7 @@ protected:
 
 
 private:
-	static QVector<EnvelopeAndLfoParameters *> s_EaLParametersInstances;
-
+	static LfoInstances * s_lfoInstances;
 	bool m_used;
 
 

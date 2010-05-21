@@ -1,8 +1,8 @@
 /*
  * mixer.cpp - audio-device-independent mixer for LMMS
  *
- * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ * Copyright (c) 2004-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -21,7 +21,6 @@
  * Boston, MA 02110-1301 USA.
  *
  */
-
 
 #include <math.h>
 
@@ -664,7 +663,7 @@ const surroundSampleFrame * mixer::renderNextBuffer()
 	emit nextAudioBuffer();
 
 	// and trigger LFOs
-	EnvelopeAndLfoParameters::triggerLfo();
+	EnvelopeAndLfoParameters::instances()->trigger();
 	Controller::triggerFrameCounter();
 
 	const float new_cpu_load = timer.elapsed() / 10000.0f *
