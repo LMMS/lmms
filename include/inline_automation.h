@@ -1,8 +1,8 @@
 /*
  * inline_automation.h - class for automating something "inline"
  *
- * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ * Copyright (c) 2008-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -21,7 +21,6 @@
  * Boston, MA 02110-1301 USA.
  *
  */
-
 
 #ifndef _INLINE_AUTOMATION_H
 #define _INLINE_AUTOMATION_H
@@ -44,7 +43,7 @@ public:
 	{
 		if( m_autoPattern )
 		{
-			m_autoPattern->deleteLater();
+			delete m_autoPattern;
 		}
 	}
 
@@ -65,7 +64,7 @@ public:
 			m_autoPattern = new automationPattern( NULL );
 			m_autoPattern->addObject( this );
 		}
-		return( m_autoPattern );
+		return m_autoPattern;
 	}
 
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
