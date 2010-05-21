@@ -1,8 +1,8 @@
 /*
  * EnvelopeAndLfoParameters.cpp - class EnvelopeAndLfoParameters
  *
- * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ * Copyright (c) 2004-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -38,7 +38,53 @@ extern const float SECS_PER_ENV_SEGMENT = 5.0f;
 extern const float SECS_PER_LFO_OSCILLATION = 20.0f;
 
 
-QVector<EnvelopeAndLfoParameters *> EnvelopeAndLfoParameters::s_EaLParametersInstances;
+EnvelopeAndLfoParameters::LfoInstances * EnvelopeAndLfoParameters::s_lfoInstances = NULL;
+
+
+void EnvelopeAndLfoParameters::LfoInstances::trigger()
+{
+	QMutexLocker m( &m_lfoListMutex );
+	for( LfoList::Iterator it = m_lfos.begin();
+							it != m_lfos.end(); ++it )
+	{
+		( *it )->m_lfoFrame +=
+				engine::getMixer()->framesPerPeriod();
+		( *it )->m_bad_lfoShapeData = true;
+	}
+}
+
+
+
+
+void EnvelopeAndLfoParameters::LfoInstances::reset()
+{
+	QMutexLocker m( &m_lfoListMutex );
+	for( LfoList::Iterator it = m_lfos.begin();
+							it != m_lfos.end(); ++it )
+	{
+		( *it )->m_lfoFrame = 0;
+		( *it )->m_bad_lfoShapeData = true;
+	}
+}
+
+
+
+void EnvelopeAndLfoParameters::LfoInstances::add( EnvelopeAndLfoParameters * lfo )
+{
+	QMutexLocker m( &m_lfoListMutex );
+	m_lfos.append( lfo );
+}
+
+
+
+
+void EnvelopeAndLfoParameters::LfoInstances::remove( EnvelopeAndLfoParameters * lfo )
+{
+	QMutexLocker m( &m_lfoListMutex );
+	m_lfos.removeAll( lfo );
+}
+
+
 
 
 
@@ -70,7 +116,12 @@ EnvelopeAndLfoParameters::EnvelopeAndLfoParameters(
 	m_lfoAmountIsZero( false ),
 	m_lfoShapeData( NULL )
 {
-	s_EaLParametersInstances.push_back( this );
+	if( s_lfoInstances == NULL )
+	{
+		s_lfoInstances = new LfoInstances();
+	}
+
+	instances()->add( this );
 
 	connect( &m_predelayModel, SIGNAL( dataChanged() ),
 			this, SLOT( updateSampleVars() ) );
@@ -133,10 +184,12 @@ EnvelopeAndLfoParameters::~EnvelopeAndLfoParameters()
 	delete[] m_rEnv;
 	delete[] m_lfoShapeData;
 
-	QVector<EnvelopeAndLfoParameters *> & v = s_EaLParametersInstances;
-	if( qFind( v.begin(), v.end(), this ) != v.end() )
+	instances()->remove( this );
+
+	if( instances()->isEmpty() )
 	{
-		v.erase( qFind( v.begin(), v.end(), this ) );
+		delete instances();
+		s_lfoInstances = NULL;
 	}
 }
 
@@ -182,35 +235,6 @@ void EnvelopeAndLfoParameters::updateLfoShapeData()
 		m_lfoShapeData[offset] = lfoShapeSample( offset );
 	}
 	m_bad_lfoShapeData = false;
-}
-
-
-
-
-void EnvelopeAndLfoParameters::triggerLfo()
-{
-	QVector<EnvelopeAndLfoParameters *> & v = s_EaLParametersInstances;
-	for( QVector<EnvelopeAndLfoParameters *>::iterator it = v.begin();
-							it != v.end(); ++it )
-	{
-		( *it )->m_lfoFrame +=
-				engine::getMixer()->framesPerPeriod();
-		( *it )->m_bad_lfoShapeData = true;
-	}
-}
-
-
-
-
-void EnvelopeAndLfoParameters::resetLfo()
-{
-	QVector<EnvelopeAndLfoParameters *> & v = s_EaLParametersInstances;
-	for( QVector<EnvelopeAndLfoParameters *>::iterator it = v.begin();
-							it != v.end(); ++it )
-	{
-		( *it )->m_lfoFrame = 0;
-		( *it )->m_bad_lfoShapeData = true;
-	}
 }
 
 
