@@ -207,6 +207,74 @@ public:
     }
 };
 
+/// Simple linear fade out for note tails
+struct fadeout
+{
+    float value;
+    float step, step_orig;
+    bool done, undoing;
+    
+    fadeout(int steps = 256)
+    {
+        step_orig = (float)(1.f / steps);
+        value = 1.f;
+        reset();
+    }
+    
+    /// Prepare fade out
+    void reset()
+    {
+        value = 1.f;
+        step = -step_orig;
+        done = false;
+        undoing = false;
+    }
+    
+    /// Fade back in with double speed (to prevent click on note restart)
+    void undo()
+    {
+        step = step_orig;
+        done = false;
+        undoing = true;
+    }
+    
+    /// Reset if fully faded out; fade back in if in the middle of fading out
+    void reset_soft()
+    {
+        if (value <= 0.f || value >= 1.f)
+            reset();
+        else
+            undo();
+    }
+    
+    void process(float *buffer, int len)
+    {
+        int i = 0;
+        if (!done)
+        {
+            for (; value > 0 && value <= 1.0 && i < len; i++)
+            {
+                buffer[i] *= value;
+                value += step;
+            }
+            if (value <= 0 || value > 1)
+                done = true;
+        }
+        if (done && value <= 0)
+        {
+            while (i < len)
+                buffer[i++] = 0.f;
+        }
+        if (done && undoing && value >= 1)
+        {
+            undoing = false;
+            done = false;
+            // prepare for the next fade-out
+            value = 1.f;
+        }
+    }
+};
+
 };
 
 #endif

@@ -45,14 +45,22 @@ public:
     static dsp::waveform_family<MONOSYNTH_WAVE_BITS> *waves;
     dsp::waveform_oscillator<MONOSYNTH_WAVE_BITS> osc1, osc2;
     dsp::triangle_lfo lfo1, lfo2;
-    bool running, stopping, gate, force_fadeout;
+    dsp::biquad_d1_lerp<float> filter, filter2;
+    /// The step code is producing non-zero values
+    bool running;
+    /// This is the last non-zero buffer (set on calculate_step after fadeout is complete, the next calculate_step will zero running)
+    bool stopping;
+    /// A key is kept pressed
+    bool gate;
+    /// All notes off fadeout
+    bool force_fadeout;
+    /// Last triggered note
     int last_key;
     
+    /// Output buffers, used to ensure updates are done every step_size regardless of process buffer size
     float buffer[step_size], buffer2[step_size];
+    /// Read position within the buffers, on each '0' the buffers are being filled with new data by calculate_step
     uint32_t output_pos;
-    dsp::onepole<float> phaseshifter;
-    dsp::biquad_d1_lerp<float> filter;
-    dsp::biquad_d1_lerp<float> filter2;
     /// Waveform number - OSC1
     int wave1;
     /// Waveform number - OSC2
@@ -61,10 +69,15 @@ public:
     int prev_wave1;
     /// Last used waveform number - OSC2
     int prev_wave2;
-    int filter_type, last_filter_type;
+    /// Filter type
+    int filter_type;
+    /// Filter type on the last calculate_step
+    int last_filter_type;
     float freq, start_freq, target_freq, cutoff, fgain, fgain_delta, separation;
-    float detune, xpose, xfade, ampctl, fltctl, queue_vel;
-    float odcr, porta_time, lfo_bend, lfo1_clock, lfo2_clock, modwheel_value;
+    float detune, xpose, xfade, ampctl, fltctl;
+    float odcr, porta_time, lfo_bend;
+    /// Modulation wheel position (0.f-1.f)
+    float modwheel_value;
     /// Delay counter for LFOs
     float lfo_clock;
     /// Last value of phase shift for pulse width emulation for OSC1
@@ -73,11 +86,23 @@ public:
     int32_t last_pwshift2;
     /// Last value of stretch for osc sync emulation for OSC1
     int32_t last_stretch1;
-    int queue_note_on, stop_count, modwheel_value_int;
+    /// Next note to play on the next calculate_step
+    int queue_note_on;
+    /// Velocity of the next note to play
+    float queue_vel;
+    /// Integer value for modwheel (0-16383, read from CC1 - MSBs and CC33 - LSBs)
+    int modwheel_value_int;
+    /// Legato mode (bitmask)
     int legato;
+    /// Envelope Generators
     dsp::adsr envelope1, envelope2;
     dsp::keystack stack;
+    /// Smoothing for master volume
     dsp::gain_smoothing master;
+    /// Fadeout for buffer 1
+    dsp::fadeout fadeout;
+    /// Fadeout for buffer 2
+    dsp::fadeout fadeout2;
     /// Smoothed cutoff value
     dsp::inertia<dsp::exponential_ramp> inertia_cutoff;
     /// Smoothed pitch bend value
@@ -145,6 +170,8 @@ public:
     bool is_noisy(int param_no) const { return param_no != par_cutoff; }
     /// Calculate control signals and produce step_size samples of output.
     void calculate_step();
+    /// Apply anti-click'n'pop fadeout (used at the end of the sound)
+    void apply_fadeout();
     /// Main processing function
     uint32_t process(uint32_t offset, uint32_t nsamples, uint32_t inputs_mask, uint32_t outputs_mask);
 };
