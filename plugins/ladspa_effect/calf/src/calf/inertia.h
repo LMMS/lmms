@@ -245,7 +245,7 @@ public:
     }
     void set_sample_rate(int sr)
     {
-        ramp = linear_ramp(sr / 441);
+        ramp = linear_ramp(sr / 100);
     }
     // to change param, use set_inertia(value)
     // to read param, use get()

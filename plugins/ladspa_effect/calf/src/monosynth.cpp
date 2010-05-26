@@ -65,7 +65,6 @@ void monosynth_audio_module::activate() {
     running = false;
     output_pos = 0;
     queue_note_on = -1;
-    stop_count = 0;
     inertia_pitchbend.set_now(1.f);
     lfo_bend = 1.0;
     modwheel_value = 0.f;
@@ -329,9 +328,8 @@ void monosynth_audio_module::calculate_buffer_stereo()
     for (uint32_t i = 0; i < step_size; i++) 
     {
         float wave1 = buffer[i] * fgain;
-        float wave2 = phaseshifter.process_ap(wave1);
         buffer[i] = fgain * filter.process(wave1);
-        buffer2[i] = fgain * filter2.process(wave2);
+        buffer2[i] = fgain * filter2.process(wave1);
         fgain += fgain_delta;
     }
 }
@@ -349,7 +347,8 @@ void monosynth_audio_module::lookup_waveforms()
 void monosynth_audio_module::delayed_note_on()
 {
     force_fadeout = false;
-    stop_count = 0;
+    fadeout.reset_soft();
+    fadeout2.reset_soft();
     porta_time = 0.f;
     start_freq = freq;
     target_freq = freq = 440 * pow(2.0, (queue_note_on - 69) / 12.0);
@@ -358,9 +357,11 @@ void monosynth_audio_module::delayed_note_on()
     fltctl = 1.0 + (queue_vel - 1.0) * *params[par_vel2filter];
     set_frequency();
     lookup_waveforms();
+    bool starting = false;
 
     if (!running)
     {
+        starting = true;
         if (legato >= 2)
             porta_time = -1.f;
         last_xfade = xfade;
@@ -369,15 +370,9 @@ void monosynth_audio_module::delayed_note_on()
         filter.reset();
         filter2.reset();
         if (*params[par_lfo1trig] <= 0)
-        {
             lfo1.reset();
-            lfo1_clock = 0.f;
-        }
         if (*params[par_lfo2trig] <= 0)
-        {
             lfo2.reset();
-            lfo2_clock = 0.f;
-        }
         switch((int)*params[par_oscmode])
         {
         case 1:
@@ -401,22 +396,20 @@ void monosynth_audio_module::delayed_note_on()
         default:
             break;
         }
-        envelope1.note_on();
-        envelope2.note_on();
         running = true;
     }
     if (legato >= 2 && !gate)
         porta_time = -1.f;
     gate = true;
     stopping = false;
-    if (!(legato & 1) || (envelope1.released() && envelope2.released())) {
+    if (starting || !(legato & 1) || envelope1.released())
         envelope1.note_on();
+    if (starting || !(legato & 1) || envelope2.released())
         envelope2.note_on();
-    }
     envelope1.advance();
     envelope2.advance();
     queue_note_on = -1;
-    float modsrc[modsrc_count] = { 1, velocity, inertia_pressure.get_last(), modwheel_value, 0, 0.5+0.5*lfo1.last, 0.5+0.5*lfo2.last};
+    float modsrc[modsrc_count] = { 1, velocity, inertia_pressure.get_last(), modwheel_value, envelope1.value, envelope2.value, 0.5+0.5*lfo1.last, 0.5+0.5*lfo2.last};
     calculate_modmatrix(moddest, moddest_count, modsrc);
 }
 
@@ -424,25 +417,25 @@ void monosynth_audio_module::set_sample_rate(uint32_t sr) {
     srate = sr;
     crate = sr / step_size;
     odcr = (float)(1.0 / crate);
-    phaseshifter.set_ap(1000.f, sr);
     fgain = 0.f;
     fgain_delta = 0.f;
     inertia_cutoff.ramp.set_length(crate / 30); // 1/30s    
     inertia_pitchbend.ramp.set_length(crate / 30); // 1/30s    
+    master.set_sample_rate(sr);
 }
 
 void monosynth_audio_module::calculate_step()
 {
     if (queue_note_on != -1)
         delayed_note_on();
-    else if (stopping)
+    else
+    if (stopping || !running)
     {
         running = false;
-        dsp::zero(buffer, step_size);
-        if (is_stereo_filter())
-            dsp::zero(buffer2, step_size);
         envelope1.advance();
         envelope2.advance();
+        lfo1.get();
+        lfo2.get();
         return;
     }
     lfo1.set_freq(*params[par_lforate], crate);
@@ -543,9 +536,9 @@ void monosynth_audio_module::calculate_step()
     float e2a1 = *params[par_env1toamp];
     float e2a2 = *params[par_env2toamp];
     if (e2a1 > 0.f)
-        newfgain *= 1.0 - (1.0 - aenv1) * e2a1;
+        newfgain *= aenv1;
     if (e2a2 > 0.f)
-        newfgain *= 1.0 - (1.0 - aenv2) * e2a2;
+        newfgain *= aenv2;
     if (moddest[moddest_attenuation] != 0.f)
         newfgain *= dsp::clip<float>(1 - moddest[moddest_attenuation] * moddest[moddest_attenuation], 0.f, 1.f);
     fgain_delta = (newfgain - fgain) * (1.0 / step_size);
@@ -569,18 +562,42 @@ void monosynth_audio_module::calculate_step()
         calculate_buffer_stereo();
         break;
     }
-    bool no_amp_env = *params[par_env1toamp] <= 0.f && *params[par_env2toamp] <= 0.f;
-    if ((envelope1.state == adsr::STOP && envelope2.state == adsr::STOP && !gate) || force_fadeout || (envelope1.state == adsr::RELEASE && no_amp_env) || (envelope2.state == adsr::RELEASE && no_amp_env))
+    apply_fadeout();
+}
+
+void monosynth_audio_module::apply_fadeout()
+{
+    if (fadeout.undoing)
     {
-        enum { ramp = step_size * 4 };
-        for (int i = 0; i < step_size; i++)
-            buffer[i] *= (ramp - i - stop_count) * (1.0f / ramp);
+        fadeout.process(buffer2, step_size);
         if (is_stereo_filter())
-            for (int i = 0; i < step_size; i++)
-                buffer2[i] *= (ramp - i - stop_count) * (1.0f / ramp);
-        stop_count += step_size;
-        if (stop_count >= ramp)
-            stopping = true;
+            fadeout2.process(buffer2, step_size);
+    }
+    else
+    {
+        // stop the sound if the amplitude envelope is not running (if there's any)
+        bool aenv1_on = *params[par_env1toamp] > 0.f, aenv2_on = *params[par_env2toamp] > 0.f;
+        
+        bool do_fadeout = force_fadeout;
+        
+        // if there's no amplitude envelope at all, the fadeout starts at key release
+        if (!aenv1_on && !aenv2_on && !gate)
+            do_fadeout = true;
+        // if ENV1 modulates amplitude, the fadeout will start on ENV1 end too
+        if (aenv1_on && envelope1.state == adsr::STOP)
+            do_fadeout = true;
+        // if ENV2 modulates amplitude, the fadeout will start on ENV2 end too
+        if (aenv2_on && envelope2.state == adsr::STOP)
+            do_fadeout = true;
+        
+        if (do_fadeout || fadeout.undoing || fadeout2.undoing)
+        {
+            fadeout.process(buffer, step_size);
+            if (is_stereo_filter())
+                fadeout2.process(buffer2, step_size);
+            if (fadeout.done)
+                stopping = true;
+        }
     }
 }
 
@@ -695,38 +712,33 @@ void monosynth_audio_module::params_changed()
 
 uint32_t monosynth_audio_module::process(uint32_t offset, uint32_t nsamples, uint32_t inputs_mask, uint32_t outputs_mask)
 {
-    if (!running && queue_note_on == -1) {
-        for (uint32_t i = 0; i < nsamples / step_size; i++)
-        {
-            envelope1.advance();
-            envelope2.advance();
-        }
-        return 0;
-    }
     uint32_t op = offset;
     uint32_t op_end = offset + nsamples;
+    int had_data = 0;
     while(op < op_end) {
-        if (output_pos == 0) {
-            if (running || queue_note_on != -1)
-                calculate_step();
-            else {
-                envelope1.advance();
-                envelope2.advance();
-                dsp::zero(buffer, step_size);
-            }
-        }
+        if (output_pos == 0) 
+            calculate_step();
         if(op < op_end) {
             uint32_t ip = output_pos;
             uint32_t len = std::min(step_size - output_pos, op_end - op);
-            if (is_stereo_filter())
-                for(uint32_t i = 0 ; i < len; i++) {
-                    float vol = master.get();
-                    outs[0][op + i] = buffer[ip + i] * vol,
-                    outs[1][op + i] = buffer2[ip + i] * vol;
-                }
-            else
-                for(uint32_t i = 0 ; i < len; i++)
-                    outs[0][op + i] = outs[1][op + i] = buffer[ip + i] * master.get();
+            if (running)
+            {
+                had_data = 3;
+                if (is_stereo_filter())
+                    for(uint32_t i = 0 ; i < len; i++) {
+                        float vol = master.get();
+                        outs[0][op + i] = buffer[ip + i] * vol;
+                        outs[1][op + i] = buffer2[ip + i] * vol;
+                    }
+                else
+                    for(uint32_t i = 0 ; i < len; i++)
+                        outs[0][op + i] = outs[1][op + i] = buffer[ip + i] * master.get();
+            }
+            else 
+            {
+                dsp::zero(&outs[0][op], len);
+                dsp::zero(&outs[1][op], len);
+            }
             op += len;
             output_pos += len;
             if (output_pos == step_size)
@@ -734,6 +746,6 @@ uint32_t monosynth_audio_module::process(uint32_t offset, uint32_t nsamples, uin
         }
     }
         
-    return 3;
+    return had_data;
 }
 
