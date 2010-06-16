@@ -209,10 +209,10 @@ const char *calf_plugins::load_gui_xml(const std::string &plugin_id)
         return strdup(calf_utils::load_file((std::string(PKGLIBDIR) + "/gui-" + plugin_id + ".xml").c_str()).c_str());
     }
     catch(file_exception e)
+#endif
     {
         return NULL;
     }
-#endif
 }
 
 bool calf_plugins::check_for_message_context_ports(const parameter_properties *parameters, int count)
