@@ -25,7 +25,7 @@ SET(LIBRARY_OUTPUT_PATH "${FLTK_BINARY_DIR}/bin" CACHE INTERNAL
 OPTION(BUILD_SHARED_LIBS "Build FLTK as a shared library" OFF)
 
 # Search for modules in the FLTK source dir first
-SET(CMAKE_MODULE_PATH "${FLTK_SOURCE_DIR}/CMake")
+SET(CMAKE_MODULE_PATH ${FLTK_SOURCE_DIR}/CMake ${CMAKE_MODULE_PATH})
 
 #-----------------------------------------------------------------------------
 # Test for some required system information.
