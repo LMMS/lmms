@@ -222,12 +222,24 @@ bool monosynth_audio_module::get_graph(int index, int subindex, float *data, int
         if (wave == wave_sqr)
             wave = wave_saw;
         float *waveform = waves[wave].original;
+        float rnd_start = 1 - *params[par_window1] * 0.5f;
+        float scl = rnd_start < 1.0 ? 1.f / (1 - rnd_start) : 0.f;
         for (int i = 0; i < points; i++)
         {
             int pos = i * S / points;
+            float r = 1;
             if (index == par_wave1)
+            {
+                float ph = i * 1.0 / points;
+                if (ph < 0.5f)
+                    ph = 1.f - ph;
+                ph = (ph - rnd_start) * scl;
+                if (ph < 0)
+                    ph = 0;
+                r = 1.0 - ph * ph;
                 pos = int(pos * 1.0 * last_stretch1 / 65536.0 ) % S;
-            data[i] = (sign * waveform[pos] + waveform[(pos + shift) & (S - 1)]) / (sign == -1 ? 1 : 2);
+            }
+            data[i] = r * (sign * waveform[pos] + waveform[(pos + shift) & (S - 1)]) / (sign == -1 ? 1 : 2);
         }
         return true;
     }
@@ -281,10 +293,20 @@ void monosynth_audio_module::calculate_buffer_oscs(float lfo1)
     float cur_xfade = last_xfade;
     float xfade_step = (new_xfade - cur_xfade) * (1.0 / step_size);
     
+    float rnd_start = 1 - *params[par_window1] * 0.5f;
+    float scl = rnd_start < 1.0 ? 1.f / (1 - rnd_start) : 0.f;
+    
     for (uint32_t i = 0; i < step_size; i++) 
     {
         //buffer[i] = lerp(osc1.get_phaseshifted(shift1, mix1), osc2.get_phaseshifted(shift2, mix2), cur_xfade);
-        buffer[i] = lerp(osc1.get_phasedist(stretch1, shift1, mix1), osc2.get_phaseshifted(shift2, mix2), cur_xfade);
+        float o1phase = osc1.phase / (65536.0 * 65536.0);
+        if (o1phase < 0.5)
+            o1phase = 1 - o1phase;
+        o1phase = (o1phase - rnd_start) * scl;
+        if (o1phase < 0)
+            o1phase = 0;
+        float r = 1.0 - o1phase * o1phase;
+        buffer[i] = lerp(r * osc1.get_phasedist(stretch1, shift1, mix1), osc2.get_phaseshifted(shift2, mix2), cur_xfade);
         osc1.advance();
         osc2.advance();
         shift1 += shift_delta1;
@@ -436,6 +458,9 @@ void monosynth_audio_module::calculate_step()
         envelope2.advance();
         lfo1.get();
         lfo2.get();
+        float modsrc[modsrc_count] = { 1, velocity, inertia_pressure.get_last(), modwheel_value, envelope1.value, envelope2.value, 0.5+0.5*lfo1.last, 0.5+0.5*lfo2.last};
+        calculate_modmatrix(moddest, moddest_count, modsrc);
+        last_stretch1 = (int32_t)(65536 * dsp::clip(*params[par_stretch1] + 0.01f * moddest[moddest_o1stretch], 1.f, 16.f));
         return;
     }
     lfo1.set_freq(*params[par_lforate], crate);

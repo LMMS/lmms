@@ -703,7 +703,8 @@ CALF_PORT_PROPS(monosynth) = {
     { 0,     -10000,10000,   21, PF_FLOAT | PF_SCALE_LINEAR | PF_CTL_FADER | PF_UNIT_MSEC, NULL, "adsr2_f", "EG2 Fade" },
     { 50,       10,20000,     0, PF_FLOAT | PF_SCALE_LOG | PF_CTL_FADER | PF_UNIT_MSEC, NULL, "adsr2_r", "Release" },
 
-    { 1,          1,   16,    0, PF_FLOAT | PF_SCALE_PERC | PF_CTL_KNOB, NULL, "o1_stretch", "Osc1 Stretch" },
+    { 1,          1,   16,    0, PF_FLOAT | PF_SCALE_LOG | PF_UNIT_COEF | PF_CTL_KNOB, NULL, "o1_stretch", "Osc1 Stretch" },
+    { 0,          0,    1,    0, PF_FLOAT | PF_SCALE_PERC | PF_CTL_KNOB, NULL, "o1_window", "Osc1 Window" },
 
     { 0,          0,    1,    0, PF_ENUM | PF_CTL_COMBO, monosynth_lfotrig_names, "lfo1_trig", "LFO1 Trigger Mode" },
     { 0,          0,    1,    0, PF_ENUM | PF_CTL_COMBO, monosynth_lfotrig_names, "lfo2_trig", "LFO2 Trigger Mode" },
