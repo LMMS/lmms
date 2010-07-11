@@ -185,7 +185,7 @@ CALF_PORT_PROPS(rotary_speaker) = {
     { 0,           0,           1,     0,  PF_FLOAT | PF_CTL_LED | PF_PROP_OUTPUT | PF_PROP_OPTIONAL, NULL, "meter_h", "High rotor" },
 };
 
-CALF_PLUGIN_INFO(rotary_speaker) = { 0x8483, "RotarySpeaker", "Calf Rotary Speaker", "Krzysztof Foltman", calf_plugins::calf_copyright_info, "SimulationPlugin" };
+CALF_PLUGIN_INFO(rotary_speaker) = { 0x8483, "RotarySpeaker", "Calf Rotary Speaker", "Krzysztof Foltman", calf_plugins::calf_copyright_info, "SimulatorPlugin" };
 
 ////////////////////////////////////////////////////////////////////////////
 
