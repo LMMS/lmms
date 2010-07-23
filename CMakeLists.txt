@@ -359,8 +359,8 @@ CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/lmms.rc.in ${CMAKE_BINARY_DIR}/lmms.rc)
 
 # set compiler flags
 #SET(CMAKE_BUILD_TYPE relwithdebug)
-SET(CMAKE_C_FLAGS "-O2 -g -Wall -ftree-vectorize ${CMAKE_C_FLAGS}")
-SET(CMAKE_CXX_FLAGS "-O2 -g -fno-exceptions -Wall -ftree-vectorize ${CMAKE_CXX_FLAGS}")
+SET(CMAKE_C_FLAGS "-O2 -g -Wall ${CMAKE_C_FLAGS}")
+SET(CMAKE_CXX_FLAGS "-O2 -g -fno-exceptions -Wall ${CMAKE_CXX_FLAGS}")
 #SET(CMAKE_C_FLAGS_${CMAKE_BUILD_TYPE} "${CMAKE_C_FLAGS}")
 #SET(CMAKE_CXX_FLAGS_${CMAKE_BUILD_TYPE} "${CMAKE_CXX_FLAGS}")
 
