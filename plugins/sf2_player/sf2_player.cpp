@@ -2,7 +2,7 @@
  * sf2_player.cpp - a soundfont2 player using fluidSynth
  *
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail/dot/com>
- * Copyright (c) 2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2009-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -48,7 +48,7 @@
 extern "C"
 {
 
-Plugin::Descriptor sf2player_plugin_descriptor =
+Plugin::Descriptor PLUGIN_EXPORT sf2player_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"Sf2 Player",
@@ -1104,7 +1104,7 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-Plugin * lmms_plugin_main( Model *, void * _data )
+Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, void * _data )
 {
 	return new sf2Instrument( static_cast<InstrumentTrack *>( _data ) );
 }

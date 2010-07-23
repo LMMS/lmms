@@ -47,7 +47,7 @@
 extern "C"
 {
 
-Plugin::Descriptor vestige_plugin_descriptor =
+Plugin::Descriptor PLUGIN_EXPORT vestige_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"VeSTige",
@@ -482,7 +482,7 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-Plugin * lmms_plugin_main( Model *, void * _data )
+Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, void * _data )
 {
 	return new vestigeInstrument( static_cast<InstrumentTrack *>( _data ) );
 }
