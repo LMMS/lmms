@@ -456,11 +456,21 @@ void bbTrack::loadTrackSpecificSettings( const QDomElement & _this )
 		engine::getBBTrackContainer()->createTCOsForBB( dst );
 		trackContainer::trackList tl =
 					engine::getBBTrackContainer()->tracks();
+		// copy TCOs of all tracks from source BB (at bar "src") to destination
+		// TCOs (which are created if they do not exist yet)
 		for( trackContainer::trackList::iterator it = tl.begin();
 							it != tl.end(); ++it )
 		{
 			( *it )->getTCO( src )->copy();
-			( *it )->getTCO( dst )->paste();
+
+			trackContentObject * d = ( *it )->getTCO( dst );
+			// important: remember position of destination TCO as pasting
+			// settings from source TCO will also restore the position of
+			// source TCO
+			const midiTime pos = d->startPosition();
+			d->paste();
+			// and move back to where it belongs!
+			d->movePosition( pos );
 		}
 	}
 	else
