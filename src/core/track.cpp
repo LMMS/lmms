@@ -249,7 +249,9 @@ void trackContentObject::paste()
 {
 	if( Clipboard::getContent( nodeName() ) != NULL )
 	{
+		const midiTime pos = startPosition();
 		restoreState( *( Clipboard::getContent( nodeName() ) ) );
+		movePosition( pos );
 	}
 }
 
