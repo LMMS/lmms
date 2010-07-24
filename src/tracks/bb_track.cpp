@@ -472,6 +472,8 @@ void bbTrack::loadTrackSpecificSettings( const QDomElement & _this )
 			// and move back to where it belongs!
 			d->movePosition( pos );
 		}
+		setName( tr( "Clone of %1" ).arg(
+					_this.parentNode().toElement().attribute( "name" ) ) );
 	}
 	else
 	{
