@@ -462,15 +462,7 @@ void bbTrack::loadTrackSpecificSettings( const QDomElement & _this )
 							it != tl.end(); ++it )
 		{
 			( *it )->getTCO( src )->copy();
-
-			trackContentObject * d = ( *it )->getTCO( dst );
-			// important: remember position of destination TCO as pasting
-			// settings from source TCO will also restore the position of
-			// source TCO
-			const midiTime pos = d->startPosition();
-			d->paste();
-			// and move back to where it belongs!
-			d->movePosition( pos );
+			( *it )->getTCO( dst )->paste();
 		}
 		setName( tr( "Clone of %1" ).arg(
 					_this.parentNode().toElement().attribute( "name" ) ) );
