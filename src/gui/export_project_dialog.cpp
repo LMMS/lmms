@@ -42,12 +42,34 @@ exportProjectDialog::exportProjectDialog( const QString & _file_name,
 	setWindowTitle( tr( "Export project to %1" ).arg( 
 					QFileInfo( _file_name ).fileName() ) );
 
+	// get the extension of the chosen file
+	QStringList parts = _file_name.split( '.' );
+	QString fileExt;
+	if( parts.size() > 0 )
+	{
+		fileExt = "." + parts[parts.size()-1];
+	}
+
+	int cbIndex = 0;
 	for( int i = 0; i < ProjectRenderer::NumFileFormats; ++i )
 	{
 		if( __fileEncodeDevices[i].m_getDevInst != NULL )
 		{
+			// get the extension of this format
+			QString renderExt = __fileEncodeDevices[i].m_extension;
+
+			// add to combo box
 			fileFormatCB->addItem( ProjectRenderer::tr(
 				__fileEncodeDevices[i].m_description ) );
+
+			// if this is our extension, select it
+			if( QString::compare( renderExt, fileExt,
+									Qt::CaseInsensitive ) == 0 )
+			{
+				fileFormatCB->setCurrentIndex( cbIndex );
+			}
+
+			cbIndex++;
 		}
 	}
 
