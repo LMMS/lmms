@@ -109,7 +109,7 @@ struct monosynth_metadata: public plugin_metadata<monosynth_metadata>
         par_lforate, par_lfodelay, par_lfofilter, par_lfopitch, par_lfopw, par_mwhl_lfo, par_scaledetune,
         par_env2tocutoff, par_env2tores, par_env2toamp, 
         par_env2attack, par_env2decay, par_env2sustain, par_env2fade, par_env2release, 
-        par_stretch1,
+        par_stretch1, par_window1,
         par_lfo1trig, par_lfo2trig,
         par_lfo2rate, par_lfo2delay,
         param_count };
