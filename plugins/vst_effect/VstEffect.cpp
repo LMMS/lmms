@@ -1,7 +1,7 @@
 /*
  * VstEffect.cpp - class for handling VST effect plugins
  *
- * Copyright (c) 2006-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -35,7 +35,7 @@
 extern "C"
 {
 
-Plugin::Descriptor vsteffect_plugin_descriptor =
+Plugin::Descriptor PLUGIN_EXPORT vsteffect_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"VST Effect",
@@ -174,8 +174,8 @@ void VstEffect::closePlugin()
 extern "C"
 {
 
-// neccessary for getting instance out of shared lib
-Plugin * lmms_plugin_main( Model * _parent, void * _data )
+// necessary for getting instance out of shared lib
+Plugin * PLUGIN_EXPORT lmms_plugin_main( Model * _parent, void * _data )
 {
 	return new VstEffect( _parent,
 		static_cast<const Plugin::Descriptor::SubPluginFeatures::Key *>(

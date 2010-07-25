@@ -119,10 +119,10 @@ hide();
             xywh {70 70 100 20} labelfont 1 labelsize 10
           }
         }
-        Fl_Check_Button continous {
+        Fl_Check_Button continuous {
           label {C.}
-          callback {pars->Pcontinous=(int)o->value();}
-          tooltip {Continous LFO} xywh {165 35 15 15} down_box DOWN_BOX labelsize 10 align 2
+          callback {pars->Pcontinuous=(int)o->value();}
+          tooltip {Continuous LFO} xywh {165 35 15 15} down_box DOWN_BOX labelsize 10 align 2
         }
         Fl_Dial freqrand {
           label {F.R.}
@@ -154,7 +154,7 @@ hide();
 intensity->value(pars->Pintensity);
 startphase->value(pars->Pstartphase);
 delay->value(pars->Pdelay);
-continous->value(pars->Pcontinous);
+continuous->value(pars->Pcontinuous);
 stretch->value(pars->Pstretch);
 randomness->value(pars->Prandomness);
 freqrand->value(pars->Pfreqrand);

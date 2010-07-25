@@ -421,10 +421,10 @@ class MasterUI {} {
       callback {\#ifdef VSTAUDIOOUT
 fl_alert("ZynAddSubFX could not be closed this way, because it's a VST plugin. Please use the host aplication to close it.");
 \#else
-if (fl_choice("Exit and leave the unsaved data?","No","Yes",NULL)) {
+//if (fl_choice("Exit and leave the unsaved data?","No","Yes",NULL)) {
     config.save();
     *exitprogram=1;
-};
+//};
 \#endif}
       xywh {31 206 390 465} type Double hide xclass zynaddsubfx
     } {
@@ -1076,10 +1076,10 @@ updatepanel();}
       callback {\#ifdef VSTAUDIOOUT
 fl_alert("ZynAddSubFX could not be closed this way, because it's a VST plugin. Please use the host aplication to close it.");
 \#else
-if (fl_choice("Exit and leave the unsaved data?","No","Yes",NULL)) {
+//if (fl_choice("Exit and leave the unsaved data?","No","Yes",NULL)) {
 	config.save();
 	*exitprogram=1;
-};
+//};
 \#endif}
       xywh {400 405 600 335} type Double hide
     } {
@@ -1636,6 +1636,9 @@ configui=new ConfigUI();
 sequi=new SeqUI(master);
 
 make_window();
+\#ifdef OS_WINDOWS
+masterwindow->icon((char *)LoadIcon(GetModuleHandle(NULL), "zynaddsubfx_icon"));
+\#endif
 presetsui=new PresetsUI();
 setfilelabel(NULL);
 swapefftype=0;

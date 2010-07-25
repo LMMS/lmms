@@ -2,7 +2,7 @@
  * sf2_player.cpp - a soundfont2 player using fluidSynth
  *
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail/dot/com>
- * Copyright (c) 2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2009-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -53,7 +53,7 @@ static const char * __supportedExts[] =
 extern "C"
 {
 
-Plugin::Descriptor sf2player_plugin_descriptor =
+Plugin::Descriptor PLUGIN_EXPORT sf2player_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"Sf2 Player",
@@ -636,6 +636,7 @@ void sf2Instrument::playNote( notePlayHandle * _n, sampleFrame * )
 
 	SF2PluginData * pluginData = static_cast<SF2PluginData *>(
 							_n->m_pluginData );
+#ifdef SOMEONE_FIXED_PER_NOTE_PANNING
 	if( pluginData->fluidVoice &&
 			pluginData->lastPanning != _n->getPanning() )
 	{
@@ -650,6 +651,7 @@ void sf2Instrument::playNote( notePlayHandle * _n, sampleFrame * )
 
 		pluginData->lastPanning = _n->getPanning();
 	}
+#endif
 
 	const float currentVelocity = _n->volumeLevel( tfp ) * 127;
 	if( pluginData->fluidVoice &&
@@ -1106,8 +1108,8 @@ void sf2InstrumentView::showPatchDialog()
 extern "C"
 {
 
-// neccessary for getting instance out of shared lib
-Plugin * lmms_plugin_main( Model *, void * _data )
+// necessary for getting instance out of shared lib
+Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, void * _data )
 {
 	return new sf2Instrument( static_cast<InstrumentTrack *>( _data ) );
 }

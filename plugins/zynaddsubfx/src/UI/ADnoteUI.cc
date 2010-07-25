@@ -1050,7 +1050,7 @@ Fl_Group* ADvoiceUI::make_window() {
             o->value(pars->VoicePar[nvoice].Pfixedfreq);
           } // Fl_Check_Button* o
           { WidgetPDial* o = fixedfreqetdial = new WidgetPDial(405, 255, 15, 15, "Eq.T.");
-            fixedfreqetdial->tooltip("How the frequency varies acording to the keyboard (leftmost for fixed frequen\
+            fixedfreqetdial->tooltip("How the frequency varies according to the keyboard (leftmost for fixed frequen\
 cy)");
             fixedfreqetdial->box(FL_ROUND_UP_BOX);
             fixedfreqetdial->color(FL_BACKGROUND_COLOR);

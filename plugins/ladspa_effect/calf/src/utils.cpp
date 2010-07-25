@@ -17,10 +17,10 @@
  * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, 
  * Boston, MA  02110-1301  USA
  */
-#include <stdio.h>
-#include <assert.h>
+#include <config.h>
 #include <calf/osctl.h>
 #include <calf/utils.h>
+#include <stdio.h>
 #include <sstream>
 
 using namespace std;
@@ -67,6 +67,11 @@ std::string xml_escape(const std::string &src)
             dest += src[i];
     }
     return dest;
+}
+
+std::string to_xml_attr(const std::string &key, const std::string &value)
+{
+    return " " + key + "=\"" + xml_escape(value) + "\"";
 }
 
 std::string load_file(const std::string &src)
@@ -127,6 +132,24 @@ std::string indent(const std::string &src, const std::string &indent)
     if (pos < src.length())
         dest += indent + src.substr(pos);
     return dest;
+}
+
+//////////////////////////////////////////////////////////////////////////////////
+
+file_exception::file_exception(const std::string &f)
+: message(strerror(errno))
+, filename(f)
+, container(filename + ":" + message)
+{ 
+    text = container.c_str();
+}
+
+file_exception::file_exception(const std::string &f, const std::string &t)
+: message(t)
+, filename(f)
+, container(filename + ":" + message)
+{
+    text = container.c_str();
 }
 
 }

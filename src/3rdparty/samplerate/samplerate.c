@@ -26,7 +26,7 @@
 #include	<stdlib.h>
 #include	<string.h>
 
-#include	"config.h"
+#include	"src_config.h"
 
 #include	"samplerate.h"
 #include	"float_cast.h"

@@ -94,7 +94,7 @@
               Programul incepe sa fie controlabil de Interfata
 02 Aug 2002 - Inlaturat o eroare stupida care facea ca sa se seteze valorile EnvelopeParams la -1 (scria din Master:: prea mult)
 03 Aug 2002 - Terminata interfata pentru ADnoteParameters.GlobalPars
-	      Adaugat inca un parametru la lfo (continous LFO) care faca ca LFO-ul sa nu inceapa la fiecare NoteOn
+	      Adaugat inca un parametru la lfo (continuous LFO) care faca ca LFO-ul sa nu inceapa la fiecare NoteOn
               Corectat doua erori la ...[nvoice].AmpEnvelope  si ...[nvoice].FreqEnvelope
 	      Scrisa interfata pentru ADnoteParameters.VoicePars (fara FM+OSCIL...)
 04 Aug 2002 - Scrisa interfata cu FM (fara Oscil)
@@ -680,8 +680,8 @@
 	    - Corectata eroare care facea ca sa nu mearga MIDI
             - LANSAT PE INTERNET - VERSIUNEA (2.0.0pre2 VST)
 --------------------------------------------------------------------------------------------------
-13 Aug 2004 - Inceput sa scriu modurile continous si discrete la PADnote
-14 Aug 2004 - Terminat modul continous la PADnote
+13 Aug 2004 - Inceput sa scriu modurile continuous si discrete la PADnote
+14 Aug 2004 - Terminat modul continuous la PADnote
 	    - Corectata o mica eroare la OscilGen care facea daca adaptive harmonics e activ si phase randomness>0 sa rezulte si aleatorism in amplitudinile armonicelor
 	    - Inceput sa scriu Presets/Clipboard (Clipboardul, in stadiu actual va putea copia doar parametrii folositi si nu cei dezactivati)
 	    - Merge partial partea de Copy in clipboard

@@ -44,11 +44,11 @@ AutomatableModel::AutomatableModel( DataType _type,
 						const QString & _display_name,
 						bool _default_constructed ) :
 	Model( _parent, _display_name, _default_constructed ),
-	m_minValue( _min ),
-	m_maxValue( _max ),
 	m_dataType( _type ),
 	m_value( _val ),
 	m_initValue( _val ),
+	m_minValue( _min ),
+	m_maxValue( _max ),
 	m_step( _step ),
 	m_range( _max - _min ),
 	m_journalEntryReady( false ),
@@ -145,7 +145,7 @@ void AutomatableModel::loadSettings( const QDomElement & _this,
 			p->loadSettings( node.toElement() );
 			setValue( p->valueAt( 0 ) );
 			// in older projects we sometimes have odd automations
-			// with just one value in - eliminate if neccessary
+			// with just one value in - eliminate if necessary
 			if( !p->hasAutomation() )
 			{
 				delete p;

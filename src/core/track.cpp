@@ -1,9 +1,9 @@
 /*
- * track.cpp - implementation of classes concerning tracks -> neccessary for
+ * track.cpp - implementation of classes concerning tracks -> necessary for
  *             all track-like objects (beat/bassline, sample-track...)
  *
- * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ * Copyright (c) 2004-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -249,7 +249,9 @@ void trackContentObject::paste()
 {
 	if( Clipboard::getContent( nodeName() ) != NULL )
 	{
+		const midiTime pos = startPosition();
 		restoreState( *( Clipboard::getContent( nodeName() ) ) );
+		movePosition( pos );
 	}
 }
 
@@ -1764,8 +1766,11 @@ void track::removeTCO( trackContentObject * _tco )
 	{
 		m_trackContentObjects.erase( it );
 		emit trackContentObjectRemoved( _tco );
-		engine::getSong()->updateLength();
-		engine::getSong()->setModified();
+		if( engine::getSong() )
+		{
+			engine::getSong()->updateLength();
+			engine::getSong()->setModified();
+		}
 	}
 }
 

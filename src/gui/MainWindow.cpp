@@ -823,6 +823,8 @@ void MainWindow::resetWindowTitle()
 
 bool MainWindow::mayChangeProject()
 {
+	engine::getSong()->stop();
+
 	if( !engine::getSong()->isModified() )
 	{
 		return true;
@@ -833,17 +835,17 @@ bool MainWindow::mayChangeProject()
 					"last saving. Do you want to save it "
 								"now?" ),
 				QMessageBox::Question,
-				QMessageBox::Yes,
-				QMessageBox::No,
+				QMessageBox::Save,
+				QMessageBox::Discard,
 				QMessageBox::Cancel,
 				this );
 	int answer = mb.exec();
 
-	if( answer == QMessageBox::Yes )
+	if( answer == QMessageBox::Save )
 	{
 		return saveProject();
 	}
-	else if( answer == QMessageBox::No )
+	else if( answer == QMessageBox::Discard )
 	{
 		return true;
 	}

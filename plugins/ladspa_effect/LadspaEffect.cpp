@@ -577,7 +577,7 @@ sample_rate_t LadspaEffect::maxSamplerate( const QString & _name )
 extern "C"
 {
 
-// neccessary for getting instance out of shared lib
+// necessary for getting instance out of shared lib
 Plugin * PLUGIN_EXPORT lmms_plugin_main( Model * _parent, void * _data )
 {
 	return new LadspaEffect( _parent,

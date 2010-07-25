@@ -1,7 +1,7 @@
 /*
  * RemoteZynAddSubFx.cpp - ZynAddSubFx-embedding plugin
  *
- * Copyright (c) 2008-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -23,6 +23,10 @@
  */
 
 #include <lmmsconfig.h>
+#ifdef LMMS_BUILD_WIN32
+#include <winsock2.h>
+#endif
+
 #include <queue>
 
 #define BUILD_REMOTE_PLUGIN_CLIENT
@@ -130,10 +134,20 @@ public:
 		LocalZynAddSubFx::processAudio( _out );
 	}
 
-	static void * guiThread( void * _arg );
+	static void * guiThread( void * _arg )
+	{
+		RemoteZynAddSubFx * _this =
+					static_cast<RemoteZynAddSubFx *>( _arg );
+
+		_this->guiThread();
+
+		return NULL;
+	}
 
 
 private:
+	void guiThread();
+
 	const int m_guiSleepTime;
 
 	pthread_t m_guiThreadHandle;
@@ -145,33 +159,38 @@ private:
 
 
 
-void * RemoteZynAddSubFx::guiThread( void * _arg )
+
+void RemoteZynAddSubFx::guiThread()
 {
-	int e;
+	int exitProgram;
 	MasterUI * ui = NULL;
 
-	RemoteZynAddSubFx * _this = static_cast<RemoteZynAddSubFx *>( _arg );
-	Master * master = _this->m_master;
-
-	while( !_this->m_guiExit )
+	while( !m_guiExit )
 	{
 		if( ui )
 		{
-			Fl::wait( _this->m_guiSleepTime / 1000.0 );
+			Fl::wait( m_guiSleepTime / 1000.0 );
 		}
 		else
 		{
 #ifdef LMMS_BUILD_WIN32
-			Sleep( _this->m_guiSleepTime );
+			Sleep( m_guiSleepTime );
 #else
-			usleep( _this->m_guiSleepTime*1000 );
+			usleep( m_guiSleepTime*1000 );
 #endif
 		}
-		pthread_mutex_lock( &_this->m_guiMutex );
-		while( _this->m_guiMessages.size() )
+		if( exitProgram == 1 )
 		{
-			RemotePluginClient::message m = _this->m_guiMessages.front();
-			_this->m_guiMessages.pop();
+			pthread_mutex_lock( &m_master->mutex );
+			sendMessage( IdHideUI );
+			exitProgram = 0;
+			pthread_mutex_unlock( &m_master->mutex );
+		}
+		pthread_mutex_lock( &m_guiMutex );
+		while( m_guiMessages.size() )
+		{
+			RemotePluginClient::message m = m_guiMessages.front();
+			m_guiMessages.pop();
 			switch( m.id )
 			{
 				case IdShowUI:
@@ -179,44 +198,28 @@ void * RemoteZynAddSubFx::guiThread( void * _arg )
 					if( !ui )
 					{
 						Fl::scheme( "plastic" );
-						ui = new MasterUI( master, &e );
+						ui = new MasterUI( m_master, &exitProgram );
 					}
 					ui->showUI();
 					ui->refresh_master_ui();
 					break;
 
-				case IdHideUI:
-					if( !ui ) break;
-					switch( config.cfg.UserInterfaceMode )
-					{
-						case 0:
-							ui->selectuiwindow->hide();
-							break;
-						case 1:
-							ui->masterwindow->hide();
-							break;
-						case 2:
-							ui->simplemasterwindow->hide();
-							break;
-					}
-					break;
-
 				case IdLoadSettingsFromFile:
 				{
-					_this->LocalZynAddSubFx::loadXML( m.getString() );
+					LocalZynAddSubFx::loadXML( m.getString() );
 					if( ui )
 					{
 						ui->refresh_master_ui();
 					}
-					pthread_mutex_lock( &master->mutex );
-					_this->sendMessage( IdLoadSettingsFromFile );
-					pthread_mutex_unlock( &master->mutex );
+					pthread_mutex_lock( &m_master->mutex );
+					sendMessage( IdLoadSettingsFromFile );
+					pthread_mutex_unlock( &m_master->mutex );
 					break;
 				}
 
 				case IdLoadPresetFromFile:
 				{
-					_this->LocalZynAddSubFx::loadPreset( m.getString(), ui ?
+					LocalZynAddSubFx::loadPreset( m.getString(), ui ?
 											ui->npartcounter->value()-1 : 0 );
 					if( ui )
 					{
@@ -224,9 +227,9 @@ void * RemoteZynAddSubFx::guiThread( void * _arg )
 						ui->updatepanel();
 						ui->refresh_master_ui();
 					}
-					pthread_mutex_lock( &master->mutex );
-					_this->sendMessage( IdLoadPresetFromFile );
-					pthread_mutex_unlock( &master->mutex );
+					pthread_mutex_lock( &m_master->mutex );
+					sendMessage( IdLoadPresetFromFile );
+					pthread_mutex_unlock( &m_master->mutex );
 					break;
 				}
 
@@ -234,13 +237,11 @@ void * RemoteZynAddSubFx::guiThread( void * _arg )
 					break;
 			}
 		}
-		pthread_mutex_unlock( &_this->m_guiMutex );
+		pthread_mutex_unlock( &m_guiMutex );
 	}
 	Fl::flush();
 
 	delete ui;
-
-	return NULL;
 }
 
 

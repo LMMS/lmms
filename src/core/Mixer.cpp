@@ -1,7 +1,7 @@
 /*
  * Mixer.cpp - Mixer for audio processing and rendering
  *
- * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -379,7 +379,7 @@ sampleFrameA * Mixer::renderNextBuffer()
 	emit nextAudioBuffer();
 
 	// and trigger LFOs
-	EnvelopeAndLfoParameters::triggerLfo();
+	EnvelopeAndLfoParameters::instances()->trigger();
 	Controller::triggerFrameCounter();
 
 	const float new_cpu_load = timer.elapsed() / 10000.0f *
@@ -393,7 +393,7 @@ sampleFrameA * Mixer::renderNextBuffer()
 
 
 
-// removes all play-handles. this is neccessary, when the song is stopped ->
+// removes all play-handles. this is necessary, when the song is stopped ->
 // all remaining notes etc. would be played until their end
 void Mixer::clear()
 {

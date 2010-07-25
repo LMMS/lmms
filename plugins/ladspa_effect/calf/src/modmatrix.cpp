@@ -18,9 +18,10 @@
  * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, 
  * Boston, MA  02110-1301  USA
  */
-#include <assert.h>
-#include <sstream>
 #include <calf/modmatrix.h>
+#include <calf/utils.h>
+#include <memory.h>
+#include <sstream>
 
 using namespace std;
 using namespace dsp;
@@ -59,17 +60,17 @@ mod_matrix::mod_matrix(modulation_entry *_matrix, unsigned int _rows, const char
         matrix[i].reset();
 }
 
-const table_column_info *mod_matrix::get_table_columns(int param)
+const table_column_info *mod_matrix::get_table_columns(int param) const
 {
     return table_columns;
 }
 
-uint32_t mod_matrix::get_table_rows(int param)
+uint32_t mod_matrix::get_table_rows(int param) const
 {
     return matrix_rows;
 }
 
-std::string mod_matrix::get_cell(int param, int row, int column)
+std::string mod_matrix::get_cell(int param, int row, int column) const
 {
     assert(row >= 0 && row < (int)matrix_rows);
     modulation_entry &slot = matrix[row];
@@ -90,7 +91,7 @@ std::string mod_matrix::get_cell(int param, int row, int column)
     }
 }
     
-void mod_matrix::set_cell(int param, int row, int column, const std::string &src, std::string &error)
+void mod_matrix::set_cell(int param, int row, int column, const std::string &src, std::string &error) const
 {
     assert(row >= 0 && row < (int)matrix_rows);
     modulation_entry &slot = matrix[row];

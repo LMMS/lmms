@@ -18,12 +18,6 @@
  * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, 
  * Boston, MA  02110-1301  USA
  */
-#include <assert.h>
-#include <memory.h>
-#include <complex>
-#if USE_JACK
-#include <jack/jack.h>
-#endif
 #include <calf/giface.h>
 #include <calf/modules_synths.h>
 
@@ -38,8 +32,10 @@ static const char *monosynth_mod_src_names[] = {
     "Velocity",
     "Pressure",
     "ModWheel",
-    "Envelope",
-    "LFO",
+    "Envelope 1",
+    "Envelope 2",
+    "LFO 1",
+    "LFO 2",
     NULL
 };
 
@@ -53,6 +49,7 @@ static const char *monosynth_mod_dest_names[] = {
     "O2: Detune [ct]",
     "O1: PW (%)",
     "O2: PW (%)",
+    "O1: Stretch",
     NULL
 };
 
@@ -68,7 +65,6 @@ void monosynth_audio_module::activate() {
     running = false;
     output_pos = 0;
     queue_note_on = -1;
-    stop_count = 0;
     inertia_pitchbend.set_now(1.f);
     lfo_bend = 1.0;
     modwheel_value = 0.f;
@@ -79,6 +75,7 @@ void monosynth_audio_module::activate() {
     filter2.reset();
     stack.clear();
     last_pwshift1 = last_pwshift2 = 0;
+    last_stretch1 = 65536;
 }
 
 waveform_family<MONOSYNTH_WAVE_BITS> *monosynth_audio_module::waves;
@@ -204,7 +201,7 @@ void monosynth_audio_module::precalculate_waves(progress_report_iface *reporter)
     
 }
 
-bool monosynth_audio_module::get_graph(int index, int subindex, float *data, int points, cairo_iface *context)
+bool monosynth_audio_module::get_graph(int index, int subindex, float *data, int points, cairo_iface *context) const
 {
     monosynth_audio_module::precalculate_waves(NULL);
     // printf("get_graph %d %p %d wave1=%d wave2=%d\n", index, data, points, wave1, wave2);
@@ -225,8 +222,25 @@ bool monosynth_audio_module::get_graph(int index, int subindex, float *data, int
         if (wave == wave_sqr)
             wave = wave_saw;
         float *waveform = waves[wave].original;
+        float rnd_start = 1 - *params[par_window1] * 0.5f;
+        float scl = rnd_start < 1.0 ? 1.f / (1 - rnd_start) : 0.f;
         for (int i = 0; i < points; i++)
-            data[i] = (sign * waveform[i * S / points] + waveform[(i * S / points + shift) & (S - 1)]) / (sign == -1 ? 1 : 2);
+        {
+            int pos = i * S / points;
+            float r = 1;
+            if (index == par_wave1)
+            {
+                float ph = i * 1.0 / points;
+                if (ph < 0.5f)
+                    ph = 1.f - ph;
+                ph = (ph - rnd_start) * scl;
+                if (ph < 0)
+                    ph = 0;
+                r = 1.0 - ph * ph;
+                pos = int(pos * 1.0 * last_stretch1 / 65536.0 ) % S;
+            }
+            data[i] = r * (sign * waveform[pos] + waveform[(pos + shift) & (S - 1)]) / (sign == -1 ? 1 : 2);
+        }
         return true;
     }
     if (index == par_filtertype) {
@@ -239,7 +253,7 @@ bool monosynth_audio_module::get_graph(int index, int subindex, float *data, int
             typedef complex<double> cfloat;
             double freq = 20.0 * pow (20000.0 / 20.0, i * 1.0 / points);
             
-            dsp::biquad_d1_lerp<float> &f = subindex ? filter2 : filter;
+            const dsp::biquad_d1_lerp<float> &f = subindex ? filter2 : filter;
             float level = f.freq_gain(freq, srate);
             if (!is_stereo_filter())
                 level *= filter2.freq_gain(freq, srate);
@@ -252,19 +266,24 @@ bool monosynth_audio_module::get_graph(int index, int subindex, float *data, int
     return get_static_graph(index, subindex, *params[index], data, points, context);
 }
 
-void monosynth_audio_module::calculate_buffer_oscs(float lfo)
+void monosynth_audio_module::calculate_buffer_oscs(float lfo1)
 {
     int flag1 = (wave1 == wave_sqr);
     int flag2 = (wave2 == wave_sqr);
+    
     int32_t shift1 = last_pwshift1;
     int32_t shift2 = last_pwshift2;
-    int32_t shift_target1 = (int32_t)(0x78000000 * dsp::clip11(*params[par_pw1] + lfo * *params[par_lfopw] + 0.01f * moddest[moddest_o1pw]));
-    int32_t shift_target2 = (int32_t)(0x78000000 * dsp::clip11(*params[par_pw2] + lfo * *params[par_lfopw] + 0.01f * moddest[moddest_o2pw]));
+    int32_t stretch1 = last_stretch1;
+    int32_t shift_target1 = (int32_t)(0x78000000 * dsp::clip11(*params[par_pw1] + lfo1 * *params[par_lfopw] + 0.01f * moddest[moddest_o1pw]));
+    int32_t shift_target2 = (int32_t)(0x78000000 * dsp::clip11(*params[par_pw2] + lfo1 * *params[par_lfopw] + 0.01f * moddest[moddest_o2pw]));
+    int32_t stretch_target1 = (int32_t)(65536 * dsp::clip(*params[par_stretch1] + 0.01f * moddest[moddest_o1stretch], 1.f, 16.f));
     int32_t shift_delta1 = ((shift_target1 >> 1) - (last_pwshift1 >> 1)) >> (step_shift - 1);
     int32_t shift_delta2 = ((shift_target2 >> 1) - (last_pwshift2 >> 1)) >> (step_shift - 1);
-    last_lfov = lfo;
+    int32_t stretch_delta1 = ((stretch_target1 >> 1) - (last_stretch1 >> 1)) >> (step_shift - 1);
     last_pwshift1 = shift_target1;
     last_pwshift2 = shift_target2;
+    last_stretch1 = stretch_target1;
+    lookup_waveforms();
     
     shift1 += (flag1 << 31);
     shift2 += (flag2 << 31);
@@ -274,14 +293,25 @@ void monosynth_audio_module::calculate_buffer_oscs(float lfo)
     float cur_xfade = last_xfade;
     float xfade_step = (new_xfade - cur_xfade) * (1.0 / step_size);
     
+    float rnd_start = 1 - *params[par_window1] * 0.5f;
+    float scl = rnd_start < 1.0 ? 1.f / (1 - rnd_start) : 0.f;
+    
     for (uint32_t i = 0; i < step_size; i++) 
     {
-        float osc1val = osc1.get_phaseshifted(shift1, mix1);
-        float osc2val = osc2.get_phaseshifted(shift2, mix2);
-        float wave = osc1val + (osc2val - osc1val) * cur_xfade;
-        buffer[i] = wave;
+        //buffer[i] = lerp(osc1.get_phaseshifted(shift1, mix1), osc2.get_phaseshifted(shift2, mix2), cur_xfade);
+        float o1phase = osc1.phase / (65536.0 * 65536.0);
+        if (o1phase < 0.5)
+            o1phase = 1 - o1phase;
+        o1phase = (o1phase - rnd_start) * scl;
+        if (o1phase < 0)
+            o1phase = 0;
+        float r = 1.0 - o1phase * o1phase;
+        buffer[i] = lerp(r * osc1.get_phasedist(stretch1, shift1, mix1), osc2.get_phaseshifted(shift2, mix2), cur_xfade);
+        osc1.advance();
+        osc2.advance();
         shift1 += shift_delta1;
         shift2 += shift_delta2;
+        stretch1 += stretch_delta1;
         cur_xfade += xfade_step;
     }
     last_xfade = new_xfade;
@@ -320,16 +350,15 @@ void monosynth_audio_module::calculate_buffer_stereo()
     for (uint32_t i = 0; i < step_size; i++) 
     {
         float wave1 = buffer[i] * fgain;
-        float wave2 = phaseshifter.process_ap(wave1);
         buffer[i] = fgain * filter.process(wave1);
-        buffer2[i] = fgain * filter2.process(wave2);
+        buffer2[i] = fgain * filter2.process(wave1);
         fgain += fgain_delta;
     }
 }
 
 void monosynth_audio_module::lookup_waveforms()
 {
-    osc1.waveform = waves[wave1 == wave_sqr ? wave_saw : wave1].get_level(osc1.phasedelta);
+    osc1.waveform = waves[wave1 == wave_sqr ? wave_saw : wave1].get_level((uint32_t)(((uint64_t)osc1.phasedelta) * last_stretch1 >> 16));
     osc2.waveform = waves[wave2 == wave_sqr ? wave_saw : wave2].get_level(osc2.phasedelta);    
     if (!osc1.waveform) osc1.waveform = silence;
     if (!osc2.waveform) osc2.waveform = silence;
@@ -340,7 +369,8 @@ void monosynth_audio_module::lookup_waveforms()
 void monosynth_audio_module::delayed_note_on()
 {
     force_fadeout = false;
-    stop_count = 0;
+    fadeout.reset_soft();
+    fadeout2.reset_soft();
     porta_time = 0.f;
     start_freq = freq;
     target_freq = freq = 440 * pow(2.0, (queue_note_on - 69) / 12.0);
@@ -349,10 +379,11 @@ void monosynth_audio_module::delayed_note_on()
     fltctl = 1.0 + (queue_vel - 1.0) * *params[par_vel2filter];
     set_frequency();
     lookup_waveforms();
-    lfo_clock = 0.f;
+    bool starting = false;
 
     if (!running)
     {
+        starting = true;
         if (legato >= 2)
             porta_time = -1.f;
         last_xfade = xfade;
@@ -360,7 +391,10 @@ void monosynth_audio_module::delayed_note_on()
         osc2.reset();
         filter.reset();
         filter2.reset();
-        lfo.reset();
+        if (*params[par_lfo1trig] <= 0)
+            lfo1.reset();
+        if (*params[par_lfo2trig] <= 0)
+            lfo2.reset();
         switch((int)*params[par_oscmode])
         {
         case 1:
@@ -384,19 +418,20 @@ void monosynth_audio_module::delayed_note_on()
         default:
             break;
         }
-        envelope.note_on();
         running = true;
     }
     if (legato >= 2 && !gate)
         porta_time = -1.f;
     gate = true;
     stopping = false;
-    if (!(legato & 1) || envelope.released()) {
-        envelope.note_on();
-    }
-    envelope.advance();
+    if (starting || !(legato & 1) || envelope1.released())
+        envelope1.note_on();
+    if (starting || !(legato & 1) || envelope2.released())
+        envelope2.note_on();
+    envelope1.advance();
+    envelope2.advance();
     queue_note_on = -1;
-    float modsrc[modsrc_count] = { 1, velocity, inertia_pressure.get_last(), modwheel_value, 0, 0.5+0.5*last_lfov};
+    float modsrc[modsrc_count] = { 1, velocity, inertia_pressure.get_last(), modwheel_value, envelope1.value, envelope2.value, 0.5+0.5*lfo1.last, 0.5+0.5*lfo2.last};
     calculate_modmatrix(moddest, moddest_count, modsrc);
 }
 
@@ -404,27 +439,32 @@ void monosynth_audio_module::set_sample_rate(uint32_t sr) {
     srate = sr;
     crate = sr / step_size;
     odcr = (float)(1.0 / crate);
-    phaseshifter.set_ap(1000.f, sr);
     fgain = 0.f;
     fgain_delta = 0.f;
     inertia_cutoff.ramp.set_length(crate / 30); // 1/30s    
     inertia_pitchbend.ramp.set_length(crate / 30); // 1/30s    
+    master.set_sample_rate(sr);
 }
 
 void monosynth_audio_module::calculate_step()
 {
     if (queue_note_on != -1)
         delayed_note_on();
-    else if (stopping)
+    else
+    if (stopping || !running)
     {
         running = false;
-        dsp::zero(buffer, step_size);
-        if (is_stereo_filter())
-            dsp::zero(buffer2, step_size);
-        envelope.advance();
+        envelope1.advance();
+        envelope2.advance();
+        lfo1.get();
+        lfo2.get();
+        float modsrc[modsrc_count] = { 1, velocity, inertia_pressure.get_last(), modwheel_value, envelope1.value, envelope2.value, 0.5+0.5*lfo1.last, 0.5+0.5*lfo2.last};
+        calculate_modmatrix(moddest, moddest_count, modsrc);
+        last_stretch1 = (int32_t)(65536 * dsp::clip(*params[par_stretch1] + 0.01f * moddest[moddest_o1stretch], 1.f, 16.f));
         return;
     }
-    lfo.set_freq(*params[par_lforate], crate);
+    lfo1.set_freq(*params[par_lforate], crate);
+    lfo2.set_freq(*params[par_lfo2rate], crate);
     float porta_total_time = *params[par_portamento] * 0.001f;
     
     if (porta_total_time >= 0.00101f && porta_time >= 0) {
@@ -439,30 +479,34 @@ void monosynth_audio_module::calculate_step()
             porta_time += odcr;
         }
     }
-    float lfov = lfo.get() * std::min(1.0f, lfo_clock / *params[par_lfodelay]);
-    lfov = lfov * dsp::lerp(1.f, modwheel_value, *params[par_mwhl_lfo]);
+    float lfov1 = lfo1.get() * std::min(1.0f, lfo_clock / *params[par_lfodelay]);
+    lfov1 = lfov1 * dsp::lerp(1.f, modwheel_value, *params[par_mwhl_lfo]);
+    float lfov2 = lfo2.get() * std::min(1.0f, lfo_clock / *params[par_lfo2delay]);
     lfo_clock += odcr;
     if (fabs(*params[par_lfopitch]) > small_value<float>())
-        lfo_bend = pow(2.0f, *params[par_lfopitch] * lfov * (1.f / 1200.0f));
+        lfo_bend = pow(2.0f, *params[par_lfopitch] * lfov1 * (1.f / 1200.0f));
     inertia_pitchbend.step();
     set_frequency();
-    envelope.advance();
-    float env = envelope.value;
+    envelope1.advance();
+    envelope2.advance();
+    float env1 = envelope1.value, env2 = envelope2.value;
+    float aenv1 = envelope1.get_amp_value(), aenv2 = envelope2.get_amp_value();
     
     // mod matrix
     // this should be optimized heavily; I think I'll do it when MIDI in Ardour 3 gets stable :>
-    float modsrc[modsrc_count] = { 1, velocity, inertia_pressure.get(), modwheel_value, env, 0.5+0.5*lfov};
+    float modsrc[modsrc_count] = { 1, velocity, inertia_pressure.get(), modwheel_value, env1, env2, 0.5+0.5*lfov1, 0.5+0.5*lfov2};
     calculate_modmatrix(moddest, moddest_count, modsrc);
     
     inertia_cutoff.set_inertia(*params[par_cutoff]);
-    cutoff = inertia_cutoff.get() * pow(2.0f, (lfov * *params[par_lfofilter] + env * fltctl * *params[par_envmod] + moddest[moddest_cutoff]) * (1.f / 1200.f));
+    cutoff = inertia_cutoff.get() * pow(2.0f, (lfov1 * *params[par_lfofilter] + env1 * fltctl * *params[par_env1tocutoff] + env2 * fltctl * *params[par_env2tocutoff] + moddest[moddest_cutoff]) * (1.f / 1200.f));
     if (*params[par_keyfollow] > 0.01f)
         cutoff *= pow(freq / 264.f, *params[par_keyfollow]);
     cutoff = dsp::clip(cutoff , 10.f, 18000.f);
     float resonance = *params[par_resonance];
-    float e2r = *params[par_envtores];
-    float e2a = *params[par_envtoamp];
-    resonance = resonance * (1 - e2r) + (0.7 + (resonance - 0.7) * env * env) * e2r + moddest[moddest_resonance];
+    float e2r1 = *params[par_env1tores];
+    resonance = resonance * (1 - e2r1) + (0.7 + (resonance - 0.7) * env1 * env1) * e2r1;
+    float e2r2 = *params[par_env2tores];
+    resonance = resonance * (1 - e2r2) + (0.7 + (resonance - 0.7) * env2 * env2) * e2r2 + moddest[moddest_resonance];
     float cutoff2 = dsp::clip(cutoff * separation, 10.f, 18000.f);
     float newfgain = 0.f;
     if (filter_type != last_filter_type)
@@ -514,13 +558,18 @@ void monosynth_audio_module::calculate_step()
         newfgain = ampctl;        
         break;
     }
-    float aenv = env;
-    if (*params[par_envtoamp] > 0.f)
-        newfgain *= 1.0 - (1.0 - aenv) * e2a;
+    float e2a1 = *params[par_env1toamp];
+    float e2a2 = *params[par_env2toamp];
+    if (e2a1 > 0.f)
+        newfgain *= aenv1;
+    if (e2a2 > 0.f)
+        newfgain *= aenv2;
     if (moddest[moddest_attenuation] != 0.f)
         newfgain *= dsp::clip<float>(1 - moddest[moddest_attenuation] * moddest[moddest_attenuation], 0.f, 1.f);
     fgain_delta = (newfgain - fgain) * (1.0 / step_size);
-    calculate_buffer_oscs(lfov);
+    calculate_buffer_oscs(lfov1);
+    lfo1.last = lfov1;
+    lfo2.last = lfov2;
     switch(filter_type)
     {
     case flt_lp24:
@@ -538,17 +587,42 @@ void monosynth_audio_module::calculate_step()
         calculate_buffer_stereo();
         break;
     }
-    if ((envelope.state == adsr::STOP && !gate) || force_fadeout || (envelope.state == adsr::RELEASE && *params[par_envtoamp] <= 0.f))
+    apply_fadeout();
+}
+
+void monosynth_audio_module::apply_fadeout()
+{
+    if (fadeout.undoing)
     {
-        enum { ramp = step_size * 4 };
-        for (int i = 0; i < step_size; i++)
-            buffer[i] *= (ramp - i - stop_count) * (1.0f / ramp);
+        fadeout.process(buffer2, step_size);
         if (is_stereo_filter())
-            for (int i = 0; i < step_size; i++)
-                buffer2[i] *= (ramp - i - stop_count) * (1.0f / ramp);
-        stop_count += step_size;
-        if (stop_count >= ramp)
-            stopping = true;
+            fadeout2.process(buffer2, step_size);
+    }
+    else
+    {
+        // stop the sound if the amplitude envelope is not running (if there's any)
+        bool aenv1_on = *params[par_env1toamp] > 0.f, aenv2_on = *params[par_env2toamp] > 0.f;
+        
+        bool do_fadeout = force_fadeout;
+        
+        // if there's no amplitude envelope at all, the fadeout starts at key release
+        if (!aenv1_on && !aenv2_on && !gate)
+            do_fadeout = true;
+        // if ENV1 modulates amplitude, the fadeout will start on ENV1 end too
+        if (aenv1_on && envelope1.state == adsr::STOP)
+            do_fadeout = true;
+        // if ENV2 modulates amplitude, the fadeout will start on ENV2 end too
+        if (aenv2_on && envelope2.state == adsr::STOP)
+            do_fadeout = true;
+        
+        if (do_fadeout || fadeout.undoing || fadeout2.undoing)
+        {
+            fadeout.process(buffer, step_size);
+            if (is_stereo_filter())
+                fadeout2.process(buffer2, step_size);
+            if (fadeout.done)
+                stopping = true;
+        }
     }
 }
 
@@ -573,14 +647,16 @@ void monosynth_audio_module::note_off(int note, int vel)
             porta_time = 0;
             set_frequency();
             if (!(legato & 1)) {
-                envelope.note_on();
+                envelope1.note_on();
+                envelope2.note_on();
                 stopping = false;
                 running = true;
             }
             return;
         }
         gate = false;
-        envelope.note_off();
+        envelope1.note_off();
+        envelope2.note_off();
     }
 }
 
@@ -607,7 +683,8 @@ void monosynth_audio_module::control_change(int controller, int value)
         case 123: // all notes off
             gate = false;
             queue_note_on = -1;
-            envelope.note_off();
+            envelope1.note_off();
+            envelope2.note_off();
             stack.clear();
             break;
     }
@@ -618,7 +695,8 @@ void monosynth_audio_module::deactivate()
     gate = false;
     running = false;
     stopping = false;
-    envelope.reset();
+    envelope1.reset();
+    envelope2.reset();
     stack.clear();
 }
 
@@ -640,9 +718,9 @@ void monosynth_audio_module::set_frequency()
 void monosynth_audio_module::params_changed()
 {
     float sf = 0.001f;
-    envelope.set(*params[par_attack] * sf, *params[par_decay] * sf, std::min(0.999f, *params[par_sustain]), *params[par_release] * sf, srate / step_size, *params[par_fade] * sf);
+    envelope1.set(*params[par_env1attack] * sf, *params[par_env1decay] * sf, std::min(0.999f, *params[par_env1sustain]), *params[par_env1release] * sf, srate / step_size, *params[par_env1fade] * sf);
+    envelope2.set(*params[par_env2attack] * sf, *params[par_env2decay] * sf, std::min(0.999f, *params[par_env2sustain]), *params[par_env2release] * sf, srate / step_size, *params[par_env2fade] * sf);
     filter_type = dsp::fastf2i_drm(*params[par_filtertype]);
-    decay_factor = odcr * 1000.0 / *params[par_decay];
     separation = pow(2.0, *params[par_cutoffsep] / 1200.0);
     wave1 = dsp::clip(dsp::fastf2i_drm(*params[par_wave1]), 0, (int)wave_count - 1);
     wave2 = dsp::clip(dsp::fastf2i_drm(*params[par_wave2]), 0, (int)wave_count - 1);
@@ -659,34 +737,33 @@ void monosynth_audio_module::params_changed()
 
 uint32_t monosynth_audio_module::process(uint32_t offset, uint32_t nsamples, uint32_t inputs_mask, uint32_t outputs_mask)
 {
-    if (!running && queue_note_on == -1) {
-        for (uint32_t i = 0; i < nsamples / step_size; i++)
-            envelope.advance();
-        return 0;
-    }
     uint32_t op = offset;
     uint32_t op_end = offset + nsamples;
+    int had_data = 0;
     while(op < op_end) {
-        if (output_pos == 0) {
-            if (running || queue_note_on != -1)
-                calculate_step();
-            else {
-                envelope.advance();
-                dsp::zero(buffer, step_size);
-            }
-        }
+        if (output_pos == 0) 
+            calculate_step();
         if(op < op_end) {
             uint32_t ip = output_pos;
             uint32_t len = std::min(step_size - output_pos, op_end - op);
-            if (is_stereo_filter())
-                for(uint32_t i = 0 ; i < len; i++) {
-                    float vol = master.get();
-                    outs[0][op + i] = buffer[ip + i] * vol,
-                    outs[1][op + i] = buffer2[ip + i] * vol;
-                }
-            else
-                for(uint32_t i = 0 ; i < len; i++)
-                    outs[0][op + i] = outs[1][op + i] = buffer[ip + i] * master.get();
+            if (running)
+            {
+                had_data = 3;
+                if (is_stereo_filter())
+                    for(uint32_t i = 0 ; i < len; i++) {
+                        float vol = master.get();
+                        outs[0][op + i] = buffer[ip + i] * vol;
+                        outs[1][op + i] = buffer2[ip + i] * vol;
+                    }
+                else
+                    for(uint32_t i = 0 ; i < len; i++)
+                        outs[0][op + i] = outs[1][op + i] = buffer[ip + i] * master.get();
+            }
+            else 
+            {
+                dsp::zero(&outs[0][op], len);
+                dsp::zero(&outs[1][op], len);
+            }
             op += len;
             output_pos += len;
             if (output_pos == step_size)
@@ -694,6 +771,6 @@ uint32_t monosynth_audio_module::process(uint32_t offset, uint32_t nsamples, uin
         }
     }
         
-    return 3;
+    return had_data;
 }
 

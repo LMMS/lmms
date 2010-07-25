@@ -433,10 +433,10 @@ void MasterUI::cb_masterwindow_i(Fl_Double_Window*, void*) {
   #ifdef VSTAUDIOOUT
 fl_alert("ZynAddSubFX could not be closed this way, because it's a VST plugin. Please use the host aplication to close it.");
 #else
-if (fl_choice("Exit and leave the unsaved data?","No","Yes",NULL)) {
+//if (fl_choice("Exit and leave the unsaved data?","No","Yes",NULL)) {
     config.save();
     *exitprogram=1;
-};
+//};
 #endif
 }
 void MasterUI::cb_masterwindow(Fl_Double_Window* o, void* v) {
@@ -996,10 +996,10 @@ void MasterUI::cb_simplemasterwindow_i(Fl_Double_Window*, void*) {
   #ifdef VSTAUDIOOUT
 fl_alert("ZynAddSubFX could not be closed this way, because it's a VST plugin. Please use the host aplication to close it.");
 #else
-if (fl_choice("Exit and leave the unsaved data?","No","Yes",NULL)) {
+//if (fl_choice("Exit and leave the unsaved data?","No","Yes",NULL)) {
 	config.save();
 	*exitprogram=1;
-};
+//};
 #endif
 }
 void MasterUI::cb_simplemasterwindow(Fl_Double_Window* o, void* v) {
@@ -2331,6 +2331,9 @@ configui=new ConfigUI();
 sequi=new SeqUI(master);
 
 make_window();
+#ifdef OS_WINDOWS
+masterwindow->icon((char *)LoadIcon(GetModuleHandle(NULL), "zynaddsubfx_icon"));
+#endif
 presetsui=new PresetsUI();
 setfilelabel(NULL);
 swapefftype=0;

@@ -456,12 +456,16 @@ void bbTrack::loadTrackSpecificSettings( const QDomElement & _this )
 		engine::getBBTrackContainer()->createTCOsForBB( dst );
 		trackContainer::trackList tl =
 					engine::getBBTrackContainer()->tracks();
+		// copy TCOs of all tracks from source BB (at bar "src") to destination
+		// TCOs (which are created if they do not exist yet)
 		for( trackContainer::trackList::iterator it = tl.begin();
 							it != tl.end(); ++it )
 		{
 			( *it )->getTCO( src )->copy();
 			( *it )->getTCO( dst )->paste();
 		}
+		setName( tr( "Clone of %1" ).arg(
+					_this.parentNode().toElement().attribute( "name" ) ) );
 	}
 	else
 	{

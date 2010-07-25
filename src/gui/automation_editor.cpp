@@ -24,9 +24,7 @@
  *
  */
 
-
 #include "automation_editor.h"
-
 
 #include <QtGui/QApplication>
 #include <QtGui/QButtonGroup>
@@ -77,6 +75,7 @@ automationEditor::automationEditor() :
 	m_zoomingXModel(),
 	m_zoomingYModel(),
 	m_quantizeModel(),
+	m_patternMutex( QMutex::Recursive ),
 	m_pattern( NULL ),
 	m_minLevel( 0 ),
 	m_maxLevel( 0 ),
@@ -94,6 +93,10 @@ automationEditor::automationEditor() :
 	m_editMode( ModeDraw ),
 	m_scrollBack( false )
 {
+	connect( this, SIGNAL( currentPatternChanged() ),
+				this, SLOT( updateAfterPatternChange() ),
+				Qt::QueuedConnection );
+
 	// init pixmaps
 	if( s_toolDraw == NULL )
 	{
@@ -223,7 +226,7 @@ automationEditor::automationEditor() :
 			"'Shift+E' on your keyboard to activate this mode." ) );
 	m_selectButton->setWhatsThis(
 		tr( "Click here and select-mode will be activated. In this "
-			"mode you can select values. This is neccessary "
+			"mode you can select values. This is necessary "
 			"if you want to cut, copy, paste, delete, or move "
 			"values. You can also press 'Shift+S' on your keyboard "
 			"to activate this mode." ) );
@@ -373,6 +376,8 @@ automationEditor::automationEditor() :
 
 automationEditor::~automationEditor()
 {
+	m_zoomingXModel.disconnect();
+	m_zoomingYModel.disconnect();
 }
 
 
@@ -380,10 +385,39 @@ automationEditor::~automationEditor()
 
 void automationEditor::setCurrentPattern( automationPattern * _new_pattern )
 {
+	m_patternMutex.lock();
 	m_pattern = _new_pattern;
+	m_patternMutex.unlock();
+
+	emit currentPatternChanged();
+}
+
+
+
+
+void automationEditor::saveSettings( QDomDocument & _doc, QDomElement & _this )
+{
+	MainWindow::saveWidgetState( this, _this );
+}
+
+
+
+
+void automationEditor::loadSettings( const QDomElement & _this )
+{
+	MainWindow::restoreWidgetState( this, _this );
+}
+
+
+
+
+void automationEditor::updateAfterPatternChange()
+{
+	QMutexLocker m( &m_patternMutex );
+
 	m_currentPosition = 0;
 
-	if( validPattern() == false )
+	if( !validPattern() )
 	{
 		setWindowTitle( tr( "Automation Editor - no pattern" ) );
 		m_minLevel = m_maxLevel = m_scrollLevel = 0;
@@ -401,8 +435,7 @@ void automationEditor::setCurrentPattern( automationPattern * _new_pattern )
 	// of levels and so on...)
 	resizeEvent( NULL );
 
-	setWindowTitle( tr( "Automation Editor - %1" ).arg(
-							m_pattern->name() ) );
+	setWindowTitle( tr( "Automation Editor - %1" ).arg( m_pattern->name() ) );
 
 	update();
 }
@@ -410,17 +443,16 @@ void automationEditor::setCurrentPattern( automationPattern * _new_pattern )
 
 
 
-void automationEditor::saveSettings( QDomDocument & _doc, QDomElement & _this )
+void automationEditor::update()
 {
-	MainWindow::saveWidgetState( this, _this );
-}
+	QWidget::update();
 
-
-
-
-void automationEditor::loadSettings( const QDomElement & _this )
-{
-	MainWindow::restoreWidgetState( this, _this );
+	QMutexLocker m( &m_patternMutex );
+	// Note detuning?
+	if( m_pattern && !m_pattern->getTrack() )
+	{
+		engine::getPianoRoll()->update();
+	}
 }
 
 
@@ -684,7 +716,8 @@ void automationEditor::drawLine( int _x0, float _y0, int _x1, float _y1 )
 
 void automationEditor::mousePressEvent( QMouseEvent * _me )
 {
-	if( validPattern() == false )
+	QMutexLocker m( &m_patternMutex );
+	if( !validPattern() )
 	{
 		return;
 	}
@@ -847,7 +880,8 @@ void automationEditor::mouseReleaseEvent( QMouseEvent * _me )
 
 void automationEditor::mouseMoveEvent( QMouseEvent * _me )
 {
-	if( validPattern() == false )
+	QMutexLocker m( &m_patternMutex );
+	if( !validPattern() )
 	{
 		update();
 		return;
@@ -1221,6 +1255,8 @@ inline void automationEditor::drawCross( QPainter & _p )
 
 void automationEditor::paintEvent( QPaintEvent * _pe )
 {
+	QMutexLocker m( &m_patternMutex );
+
 	QStyleOption opt;
 	opt.initFrom( this );
 	QPainter p( this );
@@ -1242,7 +1278,7 @@ void automationEditor::paintEvent( QPaintEvent * _pe )
 	Qt::Alignment text_flags =
 		(Qt::Alignment)( Qt::AlignRight | Qt::AlignVCenter );
 
-	if( m_pattern )
+	if( validPattern() )
 	{
 		if( m_y_auto )
 		{
@@ -1391,7 +1427,7 @@ void automationEditor::paintEvent( QPaintEvent * _pe )
 		qSwap<float>( selLevel_start, selLevel_end );
 	}
 
-	if( validPattern() == true )
+	if( validPattern() )
 	{
 		timeMap & time_map = m_pattern->getTimeMap();
 		timeMap::iterator it = time_map.begin();
@@ -1528,7 +1564,7 @@ void automationEditor::paintEvent( QPaintEvent * _pe )
 	p.drawRect( x + ValuesWidth, y, w, h );
 
 	// TODO: Get this out of paint event
-	int l = ( validPattern() == true )? (int) m_pattern->length() : 0;
+	int l = validPattern() ? (int) m_pattern->length() : 0;
 
 	// reset scroll-range
 	if( m_leftRightScroll->maximum() != l )
@@ -1537,7 +1573,7 @@ void automationEditor::paintEvent( QPaintEvent * _pe )
 		m_leftRightScroll->setPageStep( l );
 	}
 
-	if( validPattern() == true )
+	if( validPattern() )
 	{
 		drawCross( p );
 	}
@@ -1666,7 +1702,9 @@ float automationEditor::getLevel( int _y )
 
 inline bool automationEditor::inBBEditor()
 {
-	return( m_pattern->getTrack()->getTrackContainer()
+	QMutexLocker m( &m_patternMutex );
+	return( validPattern() &&
+				m_pattern->getTrack()->getTrackContainer()
 					== engine::getBBTrackContainer() );
 }
 
@@ -1675,7 +1713,9 @@ inline bool automationEditor::inBBEditor()
 
 void automationEditor::play()
 {
-	if( validPattern() == false )
+	QMutexLocker m( &m_patternMutex );
+
+	if( !validPattern() )
 	{
 		return;
 	}
@@ -1749,6 +1789,8 @@ void automationEditor::play()
 
 void automationEditor::stop()
 {
+	QMutexLocker m( &m_patternMutex );
+
 	if( !validPattern() )
 	{
 		return;
@@ -1832,7 +1874,8 @@ void automationEditor::moveButtonToggled()
 
 void automationEditor::selectAll()
 {
-	if( validPattern() == false )
+	QMutexLocker m( &m_patternMutex );
+	if( !validPattern() )
 	{
 		return;
 	}
@@ -1870,7 +1913,8 @@ void automationEditor::selectAll()
 // returns vector with pointers to all selected values
 void automationEditor::getSelectedValues( timeMap & _selected_values )
 {
-	if( validPattern() == false )
+	QMutexLocker m( &m_patternMutex );
+	if( !validPattern() )
 	{
 		return;
 	}
@@ -1938,7 +1982,8 @@ void automationEditor::copySelectedValues()
 
 void automationEditor::cutSelectedValues()
 {
-	if( validPattern() == false )
+	QMutexLocker m( &m_patternMutex );
+	if( !validPattern() )
 	{
 		return;
 	}
@@ -1969,12 +2014,8 @@ void automationEditor::cutSelectedValues()
 
 void automationEditor::pasteValues()
 {
-	if( validPattern() == false )
-	{
-		return;
-	}
-
-	if( !m_valuesToCopy.isEmpty() )
+	QMutexLocker m( &m_patternMutex );
+	if( validPattern() && !m_valuesToCopy.isEmpty() )
 	{
 		for( timeMap::iterator it = m_valuesToCopy.begin();
 					it != m_valuesToCopy.end(); ++it )
@@ -1996,7 +2037,8 @@ void automationEditor::pasteValues()
 
 void automationEditor::deleteSelectedValues()
 {
-	if( validPattern() == false )
+	QMutexLocker m( &m_patternMutex );
+	if( !validPattern() )
 	{
 		return;
 	}
@@ -2134,19 +2176,6 @@ void automationEditor::updateTopBottomLevels()
 	{
 		m_bottomLevel = m_minLevel;
 		m_topLevel = m_maxLevel;
-	}
-}
-
-
-
-
-void automationEditor::update()
-{
-	QWidget::update();
-	// Note detuning?
-	if( m_pattern && !m_pattern->getTrack() )
-	{
-		engine::getPianoRoll()->update();
 	}
 }
 

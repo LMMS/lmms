@@ -2,7 +2,8 @@
  * mallets.cpp - tuned instruments that one would bang upon
  *
  * Copyright (c) 2006-2008 Danny McRae <khjklujn/at/users.sourceforge.net>
- * 
+ * Copyright (c) 2009-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -41,7 +42,7 @@
 extern "C"
 {
 
-Plugin::Descriptor malletsstk_plugin_descriptor =
+Plugin::Descriptor PLUGIN_EXPORT malletsstk_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"Mallets",
@@ -654,8 +655,8 @@ malletsSynth::malletsSynth( const StkFloat _pitch,
 extern "C"
 {
 
-// neccessary for getting instance out of shared lib
-Plugin * lmms_plugin_main( Model *, void * _data )
+// necessary for getting instance out of shared lib
+Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, void * _data )
 {
 	return new malletsInstrument( static_cast<InstrumentTrack *>( _data ) );
 }

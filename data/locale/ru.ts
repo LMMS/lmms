@@ -1588,7 +1588,7 @@ Please make sure you have write-permission to the file and the directory contain
         <translation type="unfinished">ХАРАКТЕРИСТИКА</translation>
     </message>
     <message>
-        <source>These tabs contain envelopes. They&apos;re very important for modifying a sound, in that they are almost always neccessary for substractive synthesis. For example if you have a volume envelope, you can set when the sound should have a specific volume. If you want to create some soft strings then your sound has to fade in and out very softly. This can be done by setting large attack and release times. It&apos;s the same for other envelope targets like panning, cutoff frequency for the used filter and so on. Just monkey around with it! You can really make cool sounds out of a saw-wave with just some envelopes...!</source>
+        <source>These tabs contain envelopes. They&apos;re very important for modifying a sound, in that they are almost always necessary for substractive synthesis. For example if you have a volume envelope, you can set when the sound should have a specific volume. If you want to create some soft strings then your sound has to fade in and out very softly. This can be done by setting large attack and release times. It&apos;s the same for other envelope targets like panning, cutoff frequency for the used filter and so on. Just monkey around with it! You can really make cool sounds out of a saw-wave with just some envelopes...!</source>
         <translation type="unfinished">Эта вкладка позволяет вам настроить обложки. Они очень важны для настройки звучания.
 Например, с помощью обложки громкости вы можете задать зависимость громкости звучания от времени. Если вам понадобится эмулировать мягкие струнные, просто задайте большие времена нарастания и исчезновения звука. С помощью обложек и низкочастотного генератора (LFO) вы в несколько щелчков мыши сможете создать просто невероятные звуки!</translation>
     </message>
@@ -3307,7 +3307,7 @@ p, li { white-space: pre-wrap; }
 Для включения этого режима можно использовать комбинацию клавиш Shift+E.</translation>
     </message>
     <message>
-        <source>Click here and select-mode will be activated. In this mode you can select values. This is neccessary if you want to cut, copy, paste, delete, or move values. You can also press &apos;Shift+S&apos; on your keyboard to activate this mode.</source>
+        <source>Click here and select-mode will be activated. In this mode you can select values. This is necessary if you want to cut, copy, paste, delete, or move values. You can also press &apos;Shift+S&apos; on your keyboard to activate this mode.</source>
         <translation>При нажатии на эту кнопку активируется режим выбора нот. В этом режиме вы можете выбирать ноты для последующих действий. Это необходимо, если вы хотите вырезать, копировать, вставлять или перемещать сразу несколько нот.
 Для включения этого режима можно использовать комбинацию клавиш Shift+S.</translation>
     </message>
@@ -6387,7 +6387,7 @@ The LED in the lower right corner of the waveform editor determines whether the 
         <translation>Струна</translation>
     </message>
     <message>
-        <source>The String selector is used to choose which string the controls are editting.  A Vibed instrument can contain up to nine independently vibrating strings.  The LED in the lower right corner of the waveform editor indicates whether the selected string is active.</source>
+        <source>The String selector is used to choose which string the controls are editing.  A Vibed instrument can contain up to nine independently vibrating strings.  The LED in the lower right corner of the waveform editor indicates whether the selected string is active.</source>
         <translation>Переключатель струн позволяет выбрать струну, чьи свойства редактируются. Инструмент Vibed содержит до девяти независимо звучащих струн, индикатор в левом нижнем углу показывает, активна ли текущая струна (т. е. будет ли она слышна).</translation>
     </message>
     <message>

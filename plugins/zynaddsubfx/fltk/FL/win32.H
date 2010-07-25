@@ -34,6 +34,7 @@
 #  error "Never use <FL/win32.H> directly; include <FL/x.H> instead."
 #endif // !Fl_X_H
 
+#include <winsock2.h>
 #include <windows.h>
 // In some of the distributions, the gcc header files are missing some stuff:
 #ifndef LPMINMAXINFO

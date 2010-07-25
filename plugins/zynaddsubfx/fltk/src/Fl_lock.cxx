@@ -187,6 +187,7 @@ int Fl::awake(Fl_Awake_Handler func, void *data) {
     See also: \ref advanced_multithreading
 */
 #ifdef WIN32
+#  include <winsock2.h>
 #  include <windows.h>
 #  include <process.h>
 #  include <FL/x.H>

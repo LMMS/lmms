@@ -265,7 +265,7 @@ void MidiClientRaw::processOutEvent( const midiEvent & _me,
 							const midiTime & ,
 							const MidiPort * _port )
 {
-	// TODO: also evaluate _time and queue event if neccessary
+	// TODO: also evaluate _time and queue event if necessary
 	switch( _me.m_type )
 	{
 		case MidiNoteOn:

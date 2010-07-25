@@ -2,7 +2,7 @@
  * vst_base.cpp - VST-base-code to be used by any LMMS plugins dealing with VST-
  *                plugins
  *
- * Copyright (c) 2006-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -31,7 +31,7 @@
 extern "C"
 {
 
-Plugin::Descriptor vstbase_plugin_descriptor =
+Plugin::Descriptor PLUGIN_EXPORT vstbase_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"VST Base",

@@ -58,7 +58,7 @@ InstrumentSoundShapingView::InstrumentSoundShapingView( QWidget * _parent ) :
 	m_targetsTabWidget->setWhatsThis(
 		tr( "These tabs contain envelopes. They're very important for "
 			"modifying a sound, in that they are almost "
-			"always neccessary for substractive synthesis. For "
+			"always necessary for substractive synthesis. For "
 			"example if you have a volume envelope, you can set "
 			"when the sound should have a specific volume. "
 			"If you want to create some soft strings then your "

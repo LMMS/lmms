@@ -516,7 +516,7 @@ void PADnoteUI::cb_spectrummode(Fl_Choice* o, void* v) {
 Fl_Menu_Item PADnoteUI::menu_spectrummode[] = {
  {"Bandwidth", 0,  0, 0, 0, FL_NORMAL_LABEL, 1, 11, 0},
  {"Discrete", 0,  0, 0, 0, FL_NORMAL_LABEL, 1, 11, 0},
- {"Continous", 0,  0, 0, 0, FL_NORMAL_LABEL, 1, 11, 0},
+ {"Continuous", 0,  0, 0, 0, FL_NORMAL_LABEL, 1, 11, 0},
  {0,0,0,0,0,0,0,0,0}
 };
 
@@ -1149,7 +1149,7 @@ Fl_Double_Window* PADnoteUI::make_window() {
             o->value(pars->Pfixedfreq);
           } // Fl_Check_Button* hz440
           { WidgetPDial* o = fixedfreqetdial = new WidgetPDial(420, 295, 15, 15, "Eq.T.");
-            fixedfreqetdial->tooltip("How the frequency varies acording to the keyboard (leftmost for fixed frequen\
+            fixedfreqetdial->tooltip("How the frequency varies according to the keyboard (leftmost for fixed frequen\
 cy)");
             fixedfreqetdial->box(FL_ROUND_UP_BOX);
             fixedfreqetdial->color(FL_BACKGROUND_COLOR);

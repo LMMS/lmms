@@ -1,7 +1,7 @@
-/* Calf DSP Library
- * Example audio modules - parameters and LADSPA wrapper instantiation
+/* Calf DSP plugin pack
+ * Assorted plugins
  *
- * Copyright (C) 2001-2008 Krzysztof Foltman
+ * Copyright (C) 2001-2010 Krzysztof Foltman, Markus Schmidt, Thor Harald Johansen
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -18,929 +18,428 @@
  * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, 
  * Boston, MA  02110-1301  USA
  */
-#include <assert.h>
+#include <limits.h>
 #include <memory.h>
-#if USE_JACK
-#include <jack/jack.h>
-#endif
 #include <calf/giface.h>
-#include <calf/metadata.h>
-#include <calf/audio_fx.h>
+#include <calf/modules.h>
+#include <calf/modules_dev.h>
 
 using namespace dsp;
 using namespace calf_plugins;
 
-const char *calf_plugins::calf_copyright_info = "(C) 2001-2008 Krzysztof Foltman, license: LGPL";
+#define SET_IF_CONNECTED(name) if (params[AM::param_##name] != NULL) *params[AM::param_##name] = name;
 
-////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////
 
-CALF_PORT_NAMES(flanger) = {"In L", "In R", "Out L", "Out R"};
-
-CALF_PORT_PROPS(flanger) = {
-    { 0.1,      0.1, 10,    0, PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_MSEC | PF_PROP_GRAPH, NULL, "min_delay", "Min delay" },
-    { 0.5,      0.1, 10,    0, PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_MSEC, NULL, "mod_depth", "Mod depth" },
-    { 0.25,    0.01, 20,    0, PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_HZ, NULL, "mod_rate", "Mod rate" },
-    { 0.90,   -0.99, 0.99,  0, PF_FLOAT | PF_SCALE_PERC | PF_CTL_KNOB | PF_UNIT_COEF, NULL, "feedback", "Feedback" },
-    { 0,          0, 360,   9, PF_FLOAT | PF_SCALE_LINEAR | PF_CTL_KNOB | PF_UNIT_DEG, NULL, "stereo", "Stereo phase" },
-    { 0,          0, 1,     2, PF_BOOL | PF_CTL_BUTTON , NULL, "reset", "Reset" },
-    { 1,          0, 4,     0, PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_COEF | PF_PROP_NOBOUNDS, NULL, "amount", "Amount" },
-    { 1.0,        0, 4,     0, PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_COEF | PF_PROP_NOBOUNDS, NULL, "dry", "Dry Amount" },
-};
-
-CALF_PLUGIN_INFO(flanger) = { 0x847d, "Flanger", "Calf Flanger", "Krzysztof Foltman", calf_plugins::calf_copyright_info, "FlangerPlugin" };
-
-////////////////////////////////////////////////////////////////////////////
-
-CALF_PORT_NAMES(phaser) = {"In L", "In R", "Out L", "Out R"};
-
-CALF_PORT_PROPS(phaser) = {
-    { 1000,      20, 20000, 0, PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_HZ | PF_PROP_GRAPH, NULL, "base_freq", "Center Freq" },
-    { 4000,       0, 10800,  0, PF_FLOAT | PF_SCALE_LINEAR | PF_CTL_KNOB | PF_UNIT_CENTS, NULL, "mod_depth", "Mod depth" },
-    { 0.25,    0.01, 20,    0, PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_HZ, NULL, "mod_rate", "Mod rate" },
-    { 0.25,   -0.99, 0.99,  0, PF_FLOAT | PF_SCALE_PERC | PF_CTL_KNOB | PF_UNIT_COEF, NULL, "feedback", "Feedback" },
-    { 6,          1, 12,   12, PF_INT | PF_SCALE_LINEAR | PF_CTL_KNOB, NULL, "stages", "# Stages" },
-    { 180,        0, 360,   9, PF_FLOAT | PF_SCALE_LINEAR | PF_CTL_KNOB | PF_UNIT_DEG, NULL, "stereo", "Stereo phase" },
-    { 0,          0, 1,     2, PF_BOOL | PF_CTL_BUTTON , NULL, "reset", "Reset" },
-    { 1,          0, 4,     0, PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_COEF | PF_PROP_NOBOUNDS, NULL, "amount", "Amount" },
-    { 1.0,        0, 4,     0, PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_COEF | PF_PROP_NOBOUNDS, NULL, "dry", "Dry Amount" },
-};
-
-CALF_PLUGIN_INFO(phaser) = { 0x8484, "Phaser", "Calf Phaser", "Krzysztof Foltman", calf_plugins::calf_copyright_info, "PhaserPlugin" };
-
-////////////////////////////////////////////////////////////////////////////
-
-CALF_PORT_NAMES(reverb) = {"In L", "In R", "Out L", "Out R"};
-
-const char *reverb_room_sizes[] = { "Small", "Medium", "Large", "Tunnel-like", "Large/smooth", "Experimental" };
-
-CALF_PORT_PROPS(reverb) = {
-    { 0,           0,           1,     0,  PF_FLOAT | PF_CTL_LED | PF_PROP_OUTPUT | PF_PROP_OPTIONAL, NULL, "clip", "0dB" },
-    { 0,           0,           1,     0,  PF_FLOAT | PF_SCALE_GAIN | PF_CTL_METER | PF_CTLO_LABEL | PF_UNIT_DB | PF_PROP_OUTPUT | PF_PROP_OPTIONAL, NULL, "meter_wet", "Wet amount" },
-    { 0,           0,           1,     0,  PF_FLOAT | PF_SCALE_GAIN | PF_CTL_METER | PF_CTLO_LABEL | PF_UNIT_DB | PF_PROP_OUTPUT | PF_PROP_OPTIONAL, NULL, "meter_out", "Output" },
-    { 1.5,      0.4, 15.0,    0, PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_SEC, NULL, "decay_time", "Decay time" },
-    { 5000,    2000,20000,    0, PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_HZ, NULL, "hf_damp", "High Frq Damp" },
-    { 2,          0,    5,    0, PF_ENUM | PF_CTL_COMBO , reverb_room_sizes, "room_size", "Room size", },
-    { 0.5,        0,    1,    0, PF_FLOAT | PF_CTL_KNOB | PF_SCALE_PERC, NULL, "diffusion", "Diffusion" },
-    { 0.25,       0,    2,    0, PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_COEF | PF_PROP_NOBOUNDS, NULL, "amount", "Wet Amount" },
-    { 1.0,        0,    2,    0, PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_COEF | PF_PROP_NOBOUNDS, NULL, "dry", "Dry Amount" },
-    { 0,          0,   50,    0, PF_FLOAT | PF_SCALE_LINEAR | PF_CTL_KNOB | PF_UNIT_MSEC, NULL, "predelay", "Pre Delay" },
-    { 300,       20, 20000, 0, PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_HZ, NULL, "bass_cut", "Bass Cut" },
-    { 5000,      20, 20000, 0, PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_HZ, NULL, "treble_cut", "Treble Cut" },
-};
-
-CALF_PLUGIN_INFO(reverb) = { 0x847e, "Reverb", "Calf Reverb", "Krzysztof Foltman", calf_plugins::calf_copyright_info, "ReverbPlugin" };
-
-////////////////////////////////////////////////////////////////////////////
-
-CALF_PORT_NAMES(filter) = {"In L", "In R", "Out L", "Out R"};
-
-const char *filter_choices[] = {
-    "12dB/oct Lowpass",
-    "24dB/oct Lowpass",
-    "36dB/oct Lowpass",
-    "12dB/oct Highpass",
-    "24dB/oct Highpass",
-    "36dB/oct Highpass",
-    "6dB/oct Bandpass",
-    "12dB/oct Bandpass",
-    "18dB/oct Bandpass",
-    "6dB/oct Bandreject",
-    "12dB/oct Bandreject",
-    "18dB/oct Bandreject",
-};
-
-CALF_PORT_PROPS(filter) = {
-    { 2000,      10,20000,    0, PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_HZ | PF_PROP_GRAPH, NULL, "freq", "Frequency" },
-    { 0.707,  0.707,   32,    0, PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_COEF, NULL, "res", "Resonance" },
-    { biquad_filter_module::mode_12db_lp,
-      biquad_filter_module::mode_12db_lp,
-      biquad_filter_module::mode_count - 1,
-                                1,  PF_ENUM | PF_CTL_COMBO, filter_choices, "mode", "Mode" },
-    { 20,         5,  100,    20, PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_MSEC, NULL, "inertia", "Inertia"},
-};
-
-CALF_PLUGIN_INFO(filter) = { 0x847f, "Filter", "Calf Filter", "Krzysztof Foltman", calf_plugins::calf_copyright_info, "FilterPlugin" };
-
-////////////////////////////////////////////////////////////////////////////
-
-CALF_PORT_NAMES(filterclavier) = {"In L", "In R", "Out L", "Out R"};
-
-CALF_PORT_PROPS(filterclavier) = {
-    { 0,        -48,   48, 48*2+1, PF_INT   | PF_SCALE_LINEAR | PF_CTL_KNOB | PF_UNIT_SEMITONES, NULL, "transpose", "Transpose" },
-    { 0,       -100,  100,      0, PF_INT   | PF_SCALE_LINEAR | PF_CTL_KNOB | PF_UNIT_CENTS, NULL, "detune", "Detune" },
-    { 32,     0.707,   32,      0, PF_FLOAT | PF_SCALE_GAIN   | PF_CTL_KNOB | PF_UNIT_COEF, NULL, "maxres", "Max. Resonance" },    
-    { biquad_filter_module::mode_6db_bp, 
-      biquad_filter_module::mode_12db_lp,
-      biquad_filter_module::mode_count - 1,
-                                1, PF_ENUM  | PF_CTL_COMBO | PF_PROP_GRAPH, filter_choices, "mode", "Mode" },
-    { 20,         1,  2000,    20, PF_FLOAT | PF_SCALE_LOG    | PF_CTL_KNOB | PF_UNIT_MSEC, NULL, "inertia", "Portamento time"}
-};
-
-CALF_PLUGIN_INFO(filterclavier) = { 0x849f, "Filterclavier", "Calf Filterclavier", "Krzysztof Foltman / Hans Baier", calf_plugins::calf_copyright_info, "FilterclavierPlugin" };
-
-////////////////////////////////////////////////////////////////////////////
-
-CALF_PORT_NAMES(vintage_delay) = {"In L", "In R", "Out L", "Out R"};
-
-const char *vintage_delay_mixmodes[] = {
-    "Stereo",
-    "Ping-Pong",
-};
-
-const char *vintage_delay_fbmodes[] = {
-    "Plain",
-    "Tape",
-    "Old Tape",
-};
-
-CALF_PORT_PROPS(vintage_delay) = {
-    { 120,      30,    300,   1, PF_FLOAT | PF_SCALE_LINEAR | PF_CTL_KNOB | PF_UNIT_BPM, NULL, "bpm", "Tempo" },
-    {  4,        1,    16,    1, PF_INT | PF_SCALE_LINEAR | PF_CTL_FADER, NULL, "subdiv", "Subdivide"},
-    {  3,        1,    16,    1, PF_INT | PF_SCALE_LINEAR | PF_CTL_FADER, NULL, "time_l", "Time L"},
-    {  5,        1,    16,    1, PF_INT | PF_SCALE_LINEAR | PF_CTL_FADER, NULL, "time_r", "Time R"},
-    { 0.5,       0,    1,     0, PF_FLOAT | PF_SCALE_PERC | PF_CTL_KNOB, NULL, "feedback", "Feedback" },
-    { 0.25,      0,    4,   100, PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_COEF, NULL, "amount", "Amount" },
-    { 1,         0,    1,     0, PF_ENUM | PF_CTL_COMBO, vintage_delay_mixmodes, "mix_mode", "Mix mode" },
-    { 1,         0,    2,     0, PF_ENUM | PF_CTL_COMBO, vintage_delay_fbmodes, "medium", "Medium" },
-    { 1.0,       0,    4,     0, PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_COEF | PF_PROP_NOBOUNDS, NULL, "dry", "Dry Amount" },
-};
-
-CALF_PLUGIN_INFO(vintage_delay) = { 0x8482, "VintageDelay", "Calf Vintage Delay", "Krzysztof Foltman", calf_plugins::calf_copyright_info, "DelayPlugin" };
-
-////////////////////////////////////////////////////////////////////////////
-
-CALF_PORT_NAMES(rotary_speaker) = {"In L", "In R", "Out L", "Out R"};
-
-const char *rotary_speaker_speed_names[] = { "Off", "Chorale", "Tremolo", "HoldPedal", "ModWheel", "Manual" };
-
-CALF_PORT_PROPS(rotary_speaker) = {
-    { 5,         0,  5, 1.01, PF_ENUM | PF_CTL_COMBO, rotary_speaker_speed_names, "vib_speed", "Speed Mode" },
-    { 0.5,        0,    1,    0, PF_FLOAT | PF_CTL_KNOB | PF_SCALE_PERC, NULL, "spacing", "Tap Spacing" },
-    { 0.5,        0,    1,    0, PF_FLOAT | PF_CTL_KNOB | PF_SCALE_PERC, NULL, "shift", "Tap Offset" },
-    { 0.10,       0,    1,    0, PF_FLOAT | PF_CTL_KNOB | PF_SCALE_PERC, NULL, "mod_depth", "Mod Depth" },
-    { 36,       10,   600,    0, PF_FLOAT | PF_CTL_KNOB | PF_SCALE_LOG | PF_UNIT_RPM, NULL, "treble_speed", "Treble Motor" },
-    { 30,      10,   600,    0, PF_FLOAT | PF_CTL_KNOB | PF_SCALE_LOG | PF_UNIT_RPM, NULL, "bass_speed", "Bass Motor" },
-    { 0.7,        0,    1,  101, PF_FLOAT | PF_CTL_KNOB | PF_SCALE_PERC, NULL, "mic_distance", "Mic Distance" },
-    { 0.3,        0,    1,  101, PF_FLOAT | PF_CTL_KNOB | PF_SCALE_PERC, NULL, "reflection", "Reflection" },
-    { 0,           0,           1,     0,  PF_FLOAT | PF_CTL_LED | PF_PROP_OUTPUT | PF_PROP_OPTIONAL, NULL, "meter_l", "Low rotor" },
-    { 0,           0,           1,     0,  PF_FLOAT | PF_CTL_LED | PF_PROP_OUTPUT | PF_PROP_OPTIONAL, NULL, "meter_h", "High rotor" },
-};
-
-CALF_PLUGIN_INFO(rotary_speaker) = { 0x8483, "RotarySpeaker", "Calf Rotary Speaker", "Krzysztof Foltman", calf_plugins::calf_copyright_info, "SimulationPlugin" };
-
-////////////////////////////////////////////////////////////////////////////
-
-CALF_PORT_NAMES(multichorus) = {"In L", "In R", "Out L", "Out R"};
-
-CALF_PORT_PROPS(multichorus) = {
-    { 5,        0.1,  10,   0, PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_MSEC | PF_PROP_GRAPH, NULL, "min_delay", "Min delay" },
-    { 6,        0.1,  10,   0, PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_MSEC| PF_PROP_GRAPH, NULL, "mod_depth", "Mod depth" },
-    { 0.5,     0.01,  20,   0, PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_HZ| PF_PROP_GRAPH, NULL, "mod_rate", "Modulation rate" },
-    { 180,        0, 360,  91, PF_FLOAT | PF_SCALE_LINEAR | PF_CTL_KNOB | PF_UNIT_DEG, NULL, "stereo", "Stereo phase" },
-    { 4,          1,   8,   8, PF_INT | PF_SCALE_LINEAR | PF_CTL_FADER, NULL, "voices", "Voices"},
-    { 64,         0, 360,  91, PF_FLOAT | PF_SCALE_LINEAR | PF_CTL_KNOB | PF_UNIT_DEG, NULL, "vphase", "Inter-voice phase" },
-    { 2,          0,   4,   0, PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_COEF | PF_PROP_NOBOUNDS, NULL, "amount", "Amount" },
-    { 1.0,        0,   4,     0, PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_COEF | PF_PROP_NOBOUNDS, NULL, "dry", "Dry Amount" },
-    { 100,       10,20000,    0, PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_HZ | PF_PROP_GRAPH, NULL, "freq", "Center Frq 1" },
-    { 5000,      10,20000,    0, PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_HZ | PF_PROP_GRAPH, NULL, "freq2", "Center Frq 2" },
-    { 0.125,  0.125,   8,    0, PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_COEF, NULL, "q", "Q" },
-    { 1,          0,    1,     0, PF_FLOAT | PF_SCALE_PERC | PF_CTL_KNOB, NULL, "overlap", "Overlap" },
-};
-
-CALF_PLUGIN_INFO(multichorus) = { 0x8501, "MultiChorus", "Calf MultiChorus", "Krzysztof Foltman", calf_plugins::calf_copyright_info, "ChorusPlugin" };
-
-////////////////////////////////////////////////////////////////////////////
-
-CALF_PORT_NAMES(compressor) = {"In L", "In R", "Out L", "Out R"};
-
-const char *compressor_detection_names[] = { "RMS", "Peak" };
-const char *compressor_stereo_link_names[] = { "Average", "Maximum" };
-const char *compressor_weighting_names[] = { "Normal", "A-weighted", "Deesser (low)", "Deesser (med)", "Deesser (high)" };
-
-CALF_PORT_PROPS(compressor) = {
-    { 0.125,      0.000976563, 1,    0, PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_DB, NULL, "threshold", "Threshold" },
-    { 2,      1, 20,  21, PF_FLOAT | PF_SCALE_LOG_INF | PF_CTL_KNOB | PF_UNIT_COEF, NULL, "ratio", "Ratio" },
-    { 20,     0.01, 2000, 0, PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_MSEC, NULL, "attack", "Attack" },
-    { 250,    0.01, 2000, 0, PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_MSEC, NULL, "release", "Release" },
-    { 2,      1, 64,   0, PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_DB, NULL, "makeup", "Makeup Gain" },
-    { 2.828427125,      1,  8,   0, PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_DB, NULL, "knee", "Knee" },
-    { 0,      0,  1,   0, PF_ENUM | PF_CTL_COMBO, compressor_detection_names, "detection", "Detection" },
-    { 0,      0,  1,   0, PF_ENUM | PF_CTL_COMBO, compressor_stereo_link_names, "stereo_link", "Stereo Link" },
-    { 0,      0,  4,   0, PF_ENUM | PF_CTL_COMBO, compressor_weighting_names, "aweighting", "Weighting" },
-    { 0, 0.03125, 1,    0, PF_FLOAT | PF_SCALE_GAIN | PF_CTL_METER | PF_CTLO_LABEL | PF_CTLO_REVERSE | PF_UNIT_DB | PF_PROP_OUTPUT | PF_PROP_OPTIONAL| PF_PROP_GRAPH, NULL, "compression", "Compression" },
-    { 0,      0,  1,    0, PF_FLOAT | PF_SCALE_GAIN | PF_CTL_METER | PF_CTLO_LABEL | PF_UNIT_DB | PF_PROP_OUTPUT | PF_PROP_OPTIONAL, NULL, "peak", "Peak Output" },
-    { 0,      0,  1,    0, PF_FLOAT | PF_CTL_LED | PF_PROP_OUTPUT | PF_PROP_OPTIONAL, NULL, "clip", "0dB" },
-    { 0,      0,  1,    0, PF_BOOL | PF_CTL_TOGGLE, NULL, "bypass", "Bypass" },
-    { 1,           0,           64,    0,  PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_COEF | PF_PROP_NOBOUNDS, NULL, "input", "Input" },
-    // { 2000,      10,20000,    0, PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_HZ | PF_PROP_GRAPH, NULL, "deess_freq", "Frequency" },
-    // { 0.707,  0.707,   32,    0, PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_COEF, NULL, "deess_res", "Q" },
-};
-
-CALF_PLUGIN_INFO(compressor) = { 0x8502, "Compressor", "Calf Compressor", "Thor Harald Johansen", calf_plugins::calf_copyright_info, "CompressorPlugin" };
-
-////////////////////////////////////////////////////////////////////////////
-
-CALF_PORT_NAMES(sidechaincompressor) = {"In L", "In R", "Out L", "Out R"};
-
-const char *sidechaincompressor_detection_names[] = { "RMS", "Peak" };
-const char *sidechaincompressor_stereo_link_names[] = { "Average", "Maximum" };
-const char *sidechaincompressor_mode_names[] = {"Wideband (F1:off / F2:off)",
-                                                "Deesser wide (F1:Bell / F2:HP)",
-                                                "Deesser split (F1:off / F2:HP)",
-                                                "Derumbler wide (F1:LP / F2:Bell)",
-                                                "Derumbler split (F1:LP / F2:off)",
-                                                "Weighted #1 (F1:Shelf / F2:Shelf)",
-                                                "Weighted #2 (F1:Shelf / F2:Bell)",
-                                                "Weighted #3 (F1:Bell / F2:Shelf)",
-                                                "Bandpass #1 (F1:BP / F2:off)",
-                                                "Bandpass #2 (F1:HP / F2:LP)"};
-const char *sidechaincompressor_filter_choices[] = { "12dB", "24dB", "36dB"};
-
-
-CALF_PORT_PROPS(sidechaincompressor) = {
-    { 0,      0,  1,    0, PF_BOOL | PF_CTL_TOGGLE, NULL, "bypass", "Bypass" },
-    { 1,           0,           64,    0,  PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_COEF | PF_PROP_NOBOUNDS, NULL, "level_in", "Input" },
-    { 0,      0,  1,    0, PF_FLOAT | PF_SCALE_GAIN | PF_CTL_METER | PF_CTLO_LABEL | PF_UNIT_DB | PF_PROP_OUTPUT | PF_PROP_OPTIONAL, NULL, "meter_in", "Input" },
-    { 0,      0,  1,    0, PF_FLOAT | PF_SCALE_GAIN | PF_CTL_METER | PF_CTLO_LABEL | PF_UNIT_DB | PF_PROP_OUTPUT | PF_PROP_OPTIONAL, NULL, "meter_out", "Output" },
-    { 0,      0,  1,    0, PF_BOOL | PF_CTL_LED | PF_PROP_OUTPUT | PF_PROP_OPTIONAL, NULL, "clip_in", "0dB" },
-    { 0,      0,  1,    0, PF_BOOL | PF_CTL_LED | PF_PROP_OUTPUT | PF_PROP_OPTIONAL, NULL, "clip_out", "0dB" },
-    { 0.125,      0.000976563, 1,    0, PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_DB, NULL, "threshold", "Threshold" },
-    { 2,      1, 20,  21, PF_FLOAT | PF_SCALE_LOG_INF | PF_CTL_KNOB | PF_UNIT_COEF, NULL, "ratio", "Ratio" },
-    { 20,     0.01, 2000, 0, PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_MSEC, NULL, "attack", "Attack" },
-    { 250,    0.01, 2000, 0, PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_MSEC, NULL, "release", "Release" },
-    { 2,      1, 64,    0, PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_DB, NULL, "makeup", "Makeup Gain" },
-    { 2.828427125,      1,  8,   0, PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_DB, NULL, "knee", "Knee" },
-    { 0,      0,  1,    0, PF_ENUM | PF_CTL_COMBO, sidechaincompressor_detection_names, "detection", "Detection" },
-    { 0,      0,  1,    0, PF_ENUM | PF_CTL_COMBO, sidechaincompressor_stereo_link_names, "stereo_link", "Stereo Link" },
-    { 0, 0.03125, 1,    0, PF_FLOAT | PF_SCALE_GAIN | PF_CTL_METER | PF_CTLO_LABEL | PF_CTLO_REVERSE | PF_UNIT_DB | PF_PROP_OUTPUT | PF_PROP_OPTIONAL| PF_PROP_GRAPH, NULL, "compression", "Gain Reduction" },
-    { 0,      0,  9,    0, PF_ENUM | PF_CTL_COMBO, sidechaincompressor_mode_names, "sc_mode", "Sidechain Mode" },
-    { 250,    10,18000, 0, PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_HZ | PF_PROP_GRAPH, NULL, "f1_freq", "Freq" },
-    { 4500,   10,18000, 0, PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_HZ, NULL, "f2_freq", "Freq" },
-    { 1,      0.0625,  16, 0, PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_DB, NULL, "f1_level", "Level" },
-    { 1,      0.0625,  16, 0, PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_DB, NULL, "f2_level", "Level" },
-    { 0,      0,  1,    0, PF_BOOL | PF_CTL_TOGGLE, NULL, "sc_listen", "S/C-Listen" },
-    { 0,      0,  1,    0, PF_BOOL | PF_CTL_LED | PF_PROP_OUTPUT | PF_PROP_OPTIONAL, NULL, "f1_active", "active" },
-    { 0,      0,  1,    0, PF_BOOL | PF_CTL_LED | PF_PROP_OUTPUT | PF_PROP_OPTIONAL, NULL, "f2_active", "active" },
-};
-
-CALF_PLUGIN_INFO(sidechaincompressor) = { 0x8502, "Sidechaincompressor", "Calf Sidechain Compressor", "Markus Schmidt / Thor Harald Johansen", calf_plugins::calf_copyright_info, "CompressorPlugin" };
-
-////////////////////////////////////////////////////////////////////////////
-
-CALF_PORT_NAMES(multibandcompressor) = {"In L", "In R", "Out L", "Out R"};
-
-const char *multibandcompressor_detection_names[] = { "RMS", "Peak" };
-
-CALF_PORT_PROPS(multibandcompressor) = {
-    { 0,           0,           1,     0,  PF_BOOL | PF_CTL_TOGGLE, NULL, "bypass", "Bypass" },
-    { 1,           0,           64,    0,  PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_COEF | PF_PROP_NOBOUNDS, NULL, "level_in", "Input" },
-    { 1,           0,           64,    0,  PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_COEF | PF_PROP_NOBOUNDS, NULL, "level_out", "Output" },
-    { 0,           0,           1,     0,  PF_FLOAT | PF_SCALE_GAIN | PF_CTL_METER | PF_CTLO_LABEL | PF_UNIT_DB | PF_PROP_OUTPUT | PF_PROP_OPTIONAL, NULL, "meter_inL", "Input L" },
-    { 0,           0,           1,     0,  PF_FLOAT | PF_SCALE_GAIN | PF_CTL_METER | PF_CTLO_LABEL | PF_UNIT_DB | PF_PROP_OUTPUT | PF_PROP_OPTIONAL, NULL, "meter_inR", "Input R" },
-    { 0,           0,           1,     0,  PF_FLOAT | PF_SCALE_GAIN | PF_CTL_METER | PF_CTLO_LABEL | PF_UNIT_DB | PF_PROP_OUTPUT | PF_PROP_OPTIONAL, NULL, "meter_outL", "Output L" },
-    { 0,           0,           1,     0,  PF_FLOAT | PF_SCALE_GAIN | PF_CTL_METER | PF_CTLO_LABEL | PF_UNIT_DB | PF_PROP_OUTPUT | PF_PROP_OPTIONAL, NULL, "meter_outR", "Output R" },
-    { 0,           0,           1,     0,  PF_FLOAT | PF_CTL_LED | PF_PROP_OUTPUT | PF_PROP_OPTIONAL, NULL, "clip_inL", "0dB" },
-    { 0,           0,           1,     0,  PF_FLOAT | PF_CTL_LED | PF_PROP_OUTPUT | PF_PROP_OPTIONAL, NULL, "clip_inR", "0dB" },
-    { 0,           0,           1,     0,  PF_FLOAT | PF_CTL_LED | PF_PROP_OUTPUT | PF_PROP_OPTIONAL, NULL, "clip_outL", "0dB" },
-    { 0,           0,           1,     0,  PF_FLOAT | PF_CTL_LED | PF_PROP_OUTPUT | PF_PROP_OPTIONAL, NULL, "clip_outR", "0dB" },
-    
-    { 100,         10,          20000, 0,  PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_HZ | PF_PROP_GRAPH, NULL, "freq0", "Split 1/2" },
-    { 1000,        10,          20000, 0,  PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_HZ | PF_PROP_GRAPH, NULL, "freq1", "Split 2/3" },
-    { 6000,        10,          20000, 0,  PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_HZ | PF_PROP_GRAPH, NULL, "freq2", "Split 3/4" },
-    
-    { -0.17,      -0.5,         0.5,   0,  PF_FLOAT | PF_SCALE_LINEAR | PF_CTL_KNOB | PF_UNIT_COEF | PF_PROP_GRAPH, NULL, "sep0", "S" },
-    { -0.17,      -0.5,         0.5,   0,  PF_FLOAT | PF_SCALE_LINEAR | PF_CTL_KNOB | PF_UNIT_COEF | PF_PROP_GRAPH, NULL, "sep1", "S" },
-    { -0.17,      -0.5,         0.5,   0,  PF_FLOAT | PF_SCALE_LINEAR | PF_CTL_KNOB | PF_UNIT_COEF | PF_PROP_GRAPH, NULL, "sep2", "S" },
-    
-    { 0.895025,    0.25,        4,     0,  PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_DB | PF_PROP_GRAPH, NULL, "q0", "Q" },
-    { 0.895025,    0.25,        4,     0,  PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_DB | PF_PROP_GRAPH, NULL, "q1", "Q" },
-    { 0.895025,    0.25,        4,     0,  PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_DB | PF_PROP_GRAPH, NULL, "q2", "Q" },
-    
-    
-    { 0.0625,      0.000976563, 1,     0,  PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_DB, NULL, "threshold0", "Threshold" },
-    { 3,           1,           20,    21, PF_FLOAT | PF_SCALE_LOG_INF | PF_CTL_KNOB | PF_UNIT_COEF, NULL, "ratio0", "Ratio" },
-    { 50,          0.01,        2000,  0,  PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_MSEC, NULL, "attack0", "Attack" },
-    { 100,         0.01,        2000,  0,  PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_MSEC, NULL, "release0", "Release" },
-    { 2,           1,           64,    0,  PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_DB, NULL, "makeup0", "Makeup" },
-    { 2.828427125, 1,           8,     0,  PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_DB, NULL, "knee0", "Knee" },
-    { 1,           0,           1,     0,  PF_ENUM | PF_CTL_COMBO, multibandcompressor_detection_names, "detection0", "Detection" },
-    { 1,           0.03125,     1,     0,  PF_FLOAT | PF_SCALE_GAIN | PF_CTL_METER | PF_CTLO_LABEL | PF_CTLO_REVERSE | PF_UNIT_DB | PF_PROP_OUTPUT | PF_PROP_OPTIONAL| PF_PROP_GRAPH, NULL, "compression0", "Gain Reduction" },
-    { 0,           0,           1,     0,  PF_FLOAT | PF_SCALE_GAIN | PF_CTL_METER | PF_CTLO_LABEL | PF_UNIT_DB | PF_PROP_OUTPUT | PF_PROP_OPTIONAL, NULL, "output0", "Output" },
-    { 1,           0,           1,     0,  PF_BOOL | PF_CTL_TOGGLE, NULL, "bypass0", "Bypass" },
-    { 0,           0,           1,     0,  PF_BOOL | PF_CTL_TOGGLE, NULL, "mute0", "Mute" },
-    
-    
-    { 0.03125,     0.000976563, 1,     0,  PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_DB, NULL, "threshold1", "Threshold" },
-    { 3,           1,           20,    21, PF_FLOAT | PF_SCALE_LOG_INF | PF_CTL_KNOB | PF_UNIT_COEF, NULL, "ratio1", "Ratio" },
-    { 25,          0.01,        2000,  0,  PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_MSEC, NULL, "attack1", "Attack" },
-    { 50,          0.01,        2000,  0,  PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_MSEC, NULL, "release1", "Release" },
-    { 2,           1,           64,    0,  PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_DB, NULL, "makeup1", "Makeup" },
-    { 2.828427125, 1,           8,     0,  PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_DB, NULL, "knee1", "Knee" },
-    { 1,           0,           1,     0,  PF_ENUM | PF_CTL_COMBO, multibandcompressor_detection_names, "detection1", "Detection" },
-    { 1,           0.03125,     1,     0,  PF_FLOAT | PF_SCALE_GAIN | PF_CTL_METER | PF_CTLO_LABEL | PF_CTLO_REVERSE | PF_UNIT_DB | PF_PROP_OUTPUT | PF_PROP_OPTIONAL| PF_PROP_GRAPH, NULL, "compression1", "Gain Reduction" },
-    { 0,           0,           1,     0,  PF_FLOAT | PF_SCALE_GAIN | PF_CTL_METER | PF_CTLO_LABEL | PF_UNIT_DB | PF_PROP_OUTPUT | PF_PROP_OPTIONAL, NULL, "output1", "Output" },
-    { 1,           0,           1,     0,  PF_BOOL | PF_CTL_TOGGLE, NULL, "bypass1", "Bypass" },
-    { 0,           0,           1,     0,  PF_BOOL | PF_CTL_TOGGLE, NULL, "mute1", "Mute" },
-    
-    
-    { 0.015625,    0.000976563, 1,     0,  PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_DB, NULL, "threshold2", "Threshold" },
-    { 3,           1,           20,    21, PF_FLOAT | PF_SCALE_LOG_INF | PF_CTL_KNOB | PF_UNIT_COEF, NULL, "ratio2", "Ratio" },
-    { 12.5,        0.01,        2000,  0,  PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_MSEC, NULL, "attack2", "Attack" },
-    { 25,          0.01,        2000,  0,  PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_MSEC, NULL, "release2", "Release" },
-    { 2,           1,           64,    0,  PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_DB, NULL, "makeup2", "Makeup" },
-    { 2.828427125, 1,           8,     0,  PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_DB, NULL, "knee2", "Knee" },
-    { 1,           0,           1,     0,  PF_ENUM | PF_CTL_COMBO, multibandcompressor_detection_names, "detection2", "Detection" },
-    { 1,           0.03125,     1,     0,  PF_FLOAT | PF_SCALE_GAIN | PF_CTL_METER | PF_CTLO_LABEL | PF_CTLO_REVERSE | PF_UNIT_DB | PF_PROP_OUTPUT | PF_PROP_OPTIONAL| PF_PROP_GRAPH, NULL, "compression2", "Gain Reduction" },
-    { 0,           0,           1,     0,  PF_FLOAT | PF_SCALE_GAIN | PF_CTL_METER | PF_CTLO_LABEL | PF_UNIT_DB | PF_PROP_OUTPUT | PF_PROP_OPTIONAL, NULL, "output2", "Output" },
-    { 1,           0,           1,     0,  PF_BOOL | PF_CTL_TOGGLE, NULL, "bypass2", "Bypass" },
-    { 0,           0,           1,     0,  PF_BOOL | PF_CTL_TOGGLE, NULL, "mute2", "Mute" },
-    
-    
-    { 0.0078125,   0.000976563, 1,     0,  PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_DB, NULL, "threshold3", "Threshold" },
-    { 3,           1,           20,    21, PF_FLOAT | PF_SCALE_LOG_INF | PF_CTL_KNOB | PF_UNIT_COEF, NULL, "ratio3", "Ratio" },
-    { 6.25,        0.01,        2000,  0,  PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_MSEC, NULL, "attack3", "Attack" },
-    { 12.5,        0.01,        2000,  0,  PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_MSEC, NULL, "release3", "Release" },
-    { 2,           1,           64,    0,  PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_DB, NULL, "makeup3", "Makeup" },
-    { 2.828427125, 1,           8,     0,  PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_DB, NULL, "knee3", "Knee" },
-    { 1,           0,           1,     0,  PF_ENUM | PF_CTL_COMBO, multibandcompressor_detection_names, "detection3", "Detection" },
-    { 1,           0.03125,     1,     0,  PF_FLOAT | PF_SCALE_GAIN | PF_CTL_METER | PF_CTLO_LABEL | PF_CTLO_REVERSE | PF_UNIT_DB | PF_PROP_OUTPUT | PF_PROP_OPTIONAL| PF_PROP_GRAPH, NULL, "compression3", "Gain Reduction" },
-    { 0,           0,           1,     0,  PF_FLOAT | PF_SCALE_GAIN | PF_CTL_METER | PF_CTLO_LABEL | PF_UNIT_DB | PF_PROP_OUTPUT | PF_PROP_OPTIONAL, NULL, "output3", "Output" },
-    { 1,           0,           1,     0,  PF_BOOL | PF_CTL_TOGGLE, NULL, "bypass3", "Bypass" },
-    { 0,           0,           1,     0,  PF_BOOL | PF_CTL_TOGGLE, NULL, "mute3", "Mute" },
-};
-
-CALF_PLUGIN_INFO(multibandcompressor) = { 0x8502, "Multibandcompressor", "Calf Multiband Compressor", "Markus Schmidt / Thor Harald Johansen", calf_plugins::calf_copyright_info, "CompressorPlugin" };
-
-////////////////////////////////////////////////////////////////////////////
-
-CALF_PORT_NAMES(deesser) = {"In L", "In R", "Out L", "Out R"};
-
-const char *deesser_detection_names[] = { "RMS", "Peak" };
-const char *deesser_mode_names[] = { "Wide", "Split" };
-
-
-CALF_PORT_PROPS(deesser) = {
-    { 0,      0,  1,    0, PF_BOOL | PF_CTL_TOGGLE, NULL, "bypass", "Bypass" },
-    { 0,      0,  1,    0, PF_FLOAT | PF_SCALE_GAIN | PF_CTL_METER | PF_CTLO_LABEL | PF_UNIT_DB | PF_PROP_OUTPUT | PF_PROP_OPTIONAL, NULL, "detected", "Detected" },
-    { 0, 0.03125, 1,    0, PF_FLOAT | PF_SCALE_GAIN | PF_CTL_METER | PF_CTLO_LABEL | PF_CTLO_REVERSE | PF_UNIT_DB | PF_PROP_OUTPUT | PF_PROP_OPTIONAL| PF_PROP_GRAPH, NULL, "compression", "Gain Reduction" },
-    { 0,      0,  1,    0, PF_BOOL | PF_CTL_LED | PF_PROP_OUTPUT | PF_PROP_OPTIONAL, NULL, "detected_led", "Active" },
-    { 0,      0,  1,    0, PF_BOOL | PF_CTL_LED | PF_PROP_OUTPUT | PF_PROP_OPTIONAL, NULL, "clip_out", "Out" },
-    { 0,      0,  1,    0, PF_ENUM | PF_CTL_COMBO, deesser_detection_names, "detection", "Detection" },
-    { 0,      0,  1,    0, PF_ENUM | PF_CTL_COMBO, deesser_mode_names, "mode", "Mode" },
-    { 0.125,  0.000976563, 1,    0, PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_DB, NULL, "threshold", "Threshold" },
-    { 3,      1, 20,  21, PF_FLOAT | PF_SCALE_LOG_INF | PF_CTL_KNOB | PF_UNIT_COEF, NULL, "ratio", "Ratio" },
-    { 15,     1, 100,   1, PF_INT | PF_SCALE_LINEAR | PF_CTL_KNOB | PF_UNIT_COEF, NULL, "laxity", "Laxity" },
-    { 1,      1, 64,    0, PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_DB, NULL, "makeup", "Makeup" },
-
-    { 6000,   10,   18000, 0, PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_HZ | PF_PROP_GRAPH, NULL, "f1_freq", "Split" },
-    { 4500,   10,   18000, 0, PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_HZ, NULL, "f2_freq", "Peak" },
-    { 1,      0.0625,  16, 0, PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_DB, NULL, "f1_level", "Gain" },
-    { 4,      0.0625,  16, 0, PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_DB, NULL, "f2_level", "Level" },
-    { 1,      0.1,     100,1, PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_COEF, NULL, "f2_q", "Peak Q" },
-    { 0,      0,  1,    0, PF_BOOL | PF_CTL_TOGGLE, NULL, "sc_listen", "S/C-Listen" },
-};
-
-CALF_PLUGIN_INFO(deesser) = { 0x8502, "Deesser", "Calf Deesser", "Markus Schmidt / Thor Harald Johansen", calf_plugins::calf_copyright_info, "CompressorPlugin" };
-
-////////////////////////////////////////////////////////////////////////////
-
-CALF_PORT_NAMES(equalizer5band) = {"In L", "In R", "Out L", "Out R"};
-
-CALF_PORT_PROPS(equalizer5band) = {
-    { 0,           0,           1,     0,  PF_BOOL | PF_CTL_TOGGLE, NULL, "bypass", "Bypass" },
-    { 1,           0,           64,    0,  PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_COEF | PF_PROP_NOBOUNDS, NULL, "level_in", "Input" },
-    { 1,           0,           64,    0,  PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_COEF | PF_PROP_NOBOUNDS, NULL, "level_out", "Output" },
-    { 0,           0,           1,     0,  PF_FLOAT | PF_SCALE_GAIN | PF_CTL_METER | PF_CTLO_LABEL | PF_UNIT_DB | PF_PROP_OUTPUT | PF_PROP_OPTIONAL, NULL, "meter_in", "Input" },
-    { 0,           0,           1,     0,  PF_FLOAT | PF_SCALE_GAIN | PF_CTL_METER | PF_CTLO_LABEL | PF_UNIT_DB | PF_PROP_OUTPUT | PF_PROP_OPTIONAL, NULL, "meter_out", "Output" },
-    { 0,           0,           1,     0,  PF_FLOAT | PF_CTL_LED | PF_PROP_OUTPUT | PF_PROP_OPTIONAL, NULL, "clip_in", "0dB" },
-    { 0,           0,           1,     0,  PF_FLOAT | PF_CTL_LED | PF_PROP_OUTPUT | PF_PROP_OPTIONAL, NULL, "clip_out", "0dB" },
-
-    { 0,           0,           1,     0,  PF_BOOL | PF_CTL_TOGGLE, NULL, "ls_active", "active" },
-    { 1,           0.015625,    64,    0,  PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_DB, NULL, "ls_level", "Level" },
-    { 200,         10,          20000, 0,  PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_HZ, NULL, "ls_freq", "Freq" },
-    
-    { 0,           0,           1,     0,  PF_BOOL | PF_CTL_TOGGLE, NULL, "hs_active", "active" },
-    { 1,           0.015625,    64,    0,  PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_DB, NULL, "hs_level", "Level" },
-    { 4000,        10,          20000, 0,  PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_HZ, NULL, "hs_freq", "Freq" },
-    
-    { 0,           0,           1,     0,  PF_BOOL | PF_CTL_TOGGLE, NULL, "p1_active", "active" },
-    { 1,           0.015625,    64,    0,  PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_DB, NULL, "p1_level", "Level 1" },
-    { 250,         10,          20000, 0,  PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_HZ | PF_PROP_GRAPH, NULL, "p1_freq", "Freq 1" },
-    { 1,           0.1,         100,   1,  PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_COEF, NULL, "p1_q", "Q 1" },
-    { 0,           0,           1,     0,  PF_BOOL | PF_CTL_TOGGLE, NULL, "p2_active", "active" },
-    { 1,           0.015625,    64,    0,  PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_DB, NULL, "p2_level", "Level 2" },
-    { 1000,        10,          20000, 0,  PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_HZ, NULL, "p2_freq", "Freq 2" },
-    { 1,           0.1,         100,   1,  PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_COEF, NULL, "p2_q", "Q 2" },
-    { 0,           0,           1,     0,  PF_BOOL | PF_CTL_TOGGLE, NULL, "p3_active", "active" },
-    { 1,           0.015625,    64,    0,  PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_DB, NULL, "p3_level", "Level 3" },
-    { 2500,        10,          20000, 0,  PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_HZ, NULL, "p3_freq", "Freq 3" },
-    { 1,           0.1,         100,   1,  PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_COEF, NULL, "p3_q", "Q 3" },
-};
-
-CALF_PLUGIN_INFO(equalizer5band) = { 0x8501, "Equalizer5Band", "Calf Equalizer 5 Band", "Markus Schmidt", calf_plugins::calf_copyright_info, "EqualizerPlugin" };
-
-//////////////////////////////////////////////////////////////////////////////
-
-CALF_PORT_NAMES(equalizer8band) = {"In L", "In R", "Out L", "Out R"};
-const char *rolloff_mode_names[] = {"12dB", "24dB", "36dB"};
-
-CALF_PORT_PROPS(equalizer8band) = {
-    { 0,           0,           1,     0,  PF_BOOL | PF_CTL_TOGGLE, NULL, "bypass", "Bypass" },
-    { 1,           0,           64,    0,  PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_COEF | PF_PROP_NOBOUNDS, NULL, "level_in", "Input" },
-    { 1,           0,           64,    0,  PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_COEF | PF_PROP_NOBOUNDS, NULL, "level_out", "Output" },
-    { 0,           0,           1,     0,  PF_FLOAT | PF_SCALE_GAIN | PF_CTL_METER | PF_CTLO_LABEL | PF_UNIT_DB | PF_PROP_OUTPUT | PF_PROP_OPTIONAL, NULL, "meter_inL", "L" },
-    { 0,           0,           1,     0,  PF_FLOAT | PF_SCALE_GAIN | PF_CTL_METER | PF_CTLO_LABEL | PF_UNIT_DB | PF_PROP_OUTPUT | PF_PROP_OPTIONAL, NULL, "meter_inR", "R" },
-    { 0,           0,           1,     0,  PF_FLOAT | PF_SCALE_GAIN | PF_CTL_METER | PF_CTLO_LABEL | PF_UNIT_DB | PF_PROP_OUTPUT | PF_PROP_OPTIONAL, NULL, "meter_outL", "L" },
-    { 0,           0,           1,     0,  PF_FLOAT | PF_SCALE_GAIN | PF_CTL_METER | PF_CTLO_LABEL | PF_UNIT_DB | PF_PROP_OUTPUT | PF_PROP_OPTIONAL, NULL, "meter_outR", "R" },
-    { 0,           0,           1,     0,  PF_FLOAT | PF_CTL_LED | PF_PROP_OUTPUT | PF_PROP_OPTIONAL, NULL, "clip_inL", "0dB" },
-    { 0,           0,           1,     0,  PF_FLOAT | PF_CTL_LED | PF_PROP_OUTPUT | PF_PROP_OPTIONAL, NULL, "clip_inR", "0dB" },
-    { 0,           0,           1,     0,  PF_FLOAT | PF_CTL_LED | PF_PROP_OUTPUT | PF_PROP_OPTIONAL, NULL, "clip_outL", "0dB" },
-    { 0,           0,           1,     0,  PF_FLOAT | PF_CTL_LED | PF_PROP_OUTPUT | PF_PROP_OPTIONAL, NULL, "clip_outR", "0dB" },
-
-    { 0,           0,           1,     0,  PF_BOOL | PF_CTL_TOGGLE, NULL, "hp_active", "active" },
-    { 30,          10,          20000, 0,  PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_HZ, NULL, "hp_freq", "Freq" },
-    { 1,           0,           2,     0,  PF_ENUM | PF_CTL_COMBO, rolloff_mode_names, "hp_mode", "Mode" },
-    
-    { 0,           0,           1,     0,  PF_BOOL | PF_CTL_TOGGLE, NULL, "lp_active", "active" },
-    { 18000,       10,          20000, 0,  PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_HZ, NULL, "lp_freq", "Freq" },
-    { 1,           0,           2,     0,  PF_ENUM | PF_CTL_COMBO, rolloff_mode_names, "lp_mode", "Mode" },
-    
-    { 0,           0,           1,     0,  PF_BOOL | PF_CTL_TOGGLE, NULL, "ls_active", "active" },
-    { 1,           0.015625,    64,    0,  PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_DB, NULL, "ls_level", "Level" },
-    { 200,         10,          20000, 0,  PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_HZ, NULL, "ls_freq", "Freq" },
-    
-    { 0,           0,           1,     0,  PF_BOOL | PF_CTL_TOGGLE, NULL, "hs_active", "active" },
-    { 1,           0.015625,    64,    0,  PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_DB, NULL, "hs_level", "Level" },
-    { 4000,        10,          20000, 0,  PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_HZ, NULL, "hs_freq", "Freq" },
-    
-    { 0,           0,           1,     0,  PF_BOOL | PF_CTL_TOGGLE, NULL, "p1_active", "active" },
-    { 1,           0.015625,    64,    0,  PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_DB, NULL, "p1_level", "Level 1" },
-    { 250,         10,          20000, 0,  PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_HZ | PF_PROP_GRAPH, NULL, "p1_freq", "Freq 1" },
-    { 1,           0.1,         100,   1,  PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_COEF, NULL, "p1_q", "Q 1" },
-    { 0,           0,           1,     0,  PF_BOOL | PF_CTL_TOGGLE, NULL, "p2_active", "active" },
-    { 1,           0.015625,    64,    0,  PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_DB, NULL, "p2_level", "Level 2" },
-    { 1000,        10,          20000, 0,  PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_HZ, NULL, "p2_freq", "Freq 2" },
-    { 1,           0.1,         100,   1,  PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_COEF, NULL, "p2_q", "Q 2" },
-    { 0,           0,           1,     0,  PF_BOOL | PF_CTL_TOGGLE, NULL, "p3_active", "active" },
-    { 1,           0.015625,    64,    0,  PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_DB, NULL, "p3_level", "Level 3" },
-    { 2500,        10,          20000, 0,  PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_HZ, NULL, "p3_freq", "Freq 3" },
-    { 1,           0.1,         100,   1,  PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_COEF, NULL, "p3_q", "Q 3" },
-    { 0,           0,           1,     0,  PF_BOOL | PF_CTL_TOGGLE, NULL, "p4_active", "active" },
-    { 1,           0.015625,    64,    0,  PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_DB, NULL, "p4_level", "Level 4" },
-    { 5000,        10,          20000, 0,  PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_HZ, NULL, "p4_freq", "Freq 4" },
-    { 1,           0.1,         100,   1,  PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_COEF, NULL, "p4_q", "Q 4" },
-};
-
-CALF_PLUGIN_INFO(equalizer8band) = { 0x8501, "Equalizer8Band", "Calf Equalizer 8 Band", "Markus Schmidt", calf_plugins::calf_copyright_info, "EqualizerPlugin" };
-
-////////////////////////////////////////////////////////////////////////////
-
-CALF_PORT_NAMES(equalizer12band) = {"In L", "In R", "Out L", "Out R"};
-
-CALF_PORT_PROPS(equalizer12band) = {
-    { 0,           0,           1,     0,  PF_BOOL | PF_CTL_TOGGLE, NULL, "bypass", "Bypass" },
-    { 1,           0,           64,    0,  PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_COEF | PF_PROP_NOBOUNDS, NULL, "level_in", "Input" },
-    { 1,           0,           64,    0,  PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_COEF | PF_PROP_NOBOUNDS, NULL, "level_out", "Output" },
-    { 0,           0,           1,     0,  PF_FLOAT | PF_SCALE_GAIN | PF_CTL_METER | PF_CTLO_LABEL | PF_UNIT_DB | PF_PROP_OUTPUT | PF_PROP_OPTIONAL, NULL, "meter_inL", "L" },
-    { 0,           0,           1,     0,  PF_FLOAT | PF_SCALE_GAIN | PF_CTL_METER | PF_CTLO_LABEL | PF_UNIT_DB | PF_PROP_OUTPUT | PF_PROP_OPTIONAL, NULL, "meter_inR", "R" },
-    { 0,           0,           1,     0,  PF_FLOAT | PF_SCALE_GAIN | PF_CTL_METER | PF_CTLO_LABEL | PF_UNIT_DB | PF_PROP_OUTPUT | PF_PROP_OPTIONAL, NULL, "meter_outL", "L" },
-    { 0,           0,           1,     0,  PF_FLOAT | PF_SCALE_GAIN | PF_CTL_METER | PF_CTLO_LABEL | PF_UNIT_DB | PF_PROP_OUTPUT | PF_PROP_OPTIONAL, NULL, "meter_outR", "R" },
-    { 0,           0,           1,     0,  PF_FLOAT | PF_CTL_LED | PF_PROP_OUTPUT | PF_PROP_OPTIONAL, NULL, "clip_inL", "0dB" },
-    { 0,           0,           1,     0,  PF_FLOAT | PF_CTL_LED | PF_PROP_OUTPUT | PF_PROP_OPTIONAL, NULL, "clip_inR", "0dB" },
-    { 0,           0,           1,     0,  PF_FLOAT | PF_CTL_LED | PF_PROP_OUTPUT | PF_PROP_OPTIONAL, NULL, "clip_outL", "0dB" },
-    { 0,           0,           1,     0,  PF_FLOAT | PF_CTL_LED | PF_PROP_OUTPUT | PF_PROP_OPTIONAL, NULL, "clip_outR", "0dB" },
-
-    { 0,           0,           1,     0,  PF_BOOL | PF_CTL_TOGGLE, NULL, "hp_active", "active" },
-    { 30,          10,          20000, 0,  PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_HZ, NULL, "hp_freq", "Freq" },
-    { 1,           0,           2,     0,  PF_ENUM | PF_CTL_COMBO, rolloff_mode_names, "hp_mode", "Mode" },
-    
-    { 0,           0,           1,     0,  PF_BOOL | PF_CTL_TOGGLE, NULL, "lp_active", "active" },
-    { 18000,       10,          20000, 0,  PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_HZ, NULL, "lp_freq", "Freq" },
-    { 1,           0,           2,     0,  PF_ENUM | PF_CTL_COMBO, rolloff_mode_names, "lp_mode", "Mode" },
-    
-    { 0,           0,           1,     0,  PF_BOOL | PF_CTL_TOGGLE, NULL, "ls_active", "active" },
-    { 1,           0.015625,    64,    0,  PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_DB, NULL, "ls_level", "Level" },
-    { 200,         10,          20000, 0,  PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_HZ, NULL, "ls_freq", "Freq" },
-    
-    { 0,           0,           1,     0,  PF_BOOL | PF_CTL_TOGGLE, NULL, "hs_active", "active" },
-    { 1,           0.015625,    64,    0,  PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_DB, NULL, "hs_level", "Level" },
-    { 4000,        10,          20000, 0,  PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_HZ, NULL, "hs_freq", "Freq" },
-    
-    { 0,           0,           1,     0,  PF_BOOL | PF_CTL_TOGGLE, NULL, "p1_active", "active" },
-    { 1,           0.015625,    64,    0,  PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_DB, NULL, "p1_level", "Level 1" },
-    { 60,          10,          20000, 0,  PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_HZ | PF_PROP_GRAPH, NULL, "p1_freq", "Freq 1" },
-    { 1,           0.1,         100,   1,  PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_COEF, NULL, "p1_q", "Q 1" },
-    { 0,           0,           1,     0,  PF_BOOL | PF_CTL_TOGGLE, NULL, "p2_active", "active" },
-    { 1,           0.015625,    64,    0,  PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_DB, NULL, "p2_level", "Level 2" },
-    { 120,         10,          20000, 0,  PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_HZ, NULL, "p2_freq", "Freq 2" },
-    { 1,           0.1,         100,   1,  PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_COEF, NULL, "p2_q", "Q 2" },
-    { 0,           0,           1,     0,  PF_BOOL | PF_CTL_TOGGLE, NULL, "p3_active", "active" },
-    { 1,           0.015625,    64,    0,  PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_DB, NULL, "p3_level", "Level 3" },
-    { 250,         10,          20000, 0,  PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_HZ, NULL, "p3_freq", "Freq 3" },
-    { 1,           0.1,         100,   1,  PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_COEF, NULL, "p3_q", "Q 3" },
-    { 0,           0,           1,     0,  PF_BOOL | PF_CTL_TOGGLE, NULL, "p4_active", "active" },
-    { 1,           0.015625,    64,    0,  PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_DB, NULL, "p4_level", "Level 4" },
-    { 500,         10,          20000, 0,  PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_HZ, NULL, "p4_freq", "Freq 4" },
-    { 1,           0.1,         100,   1,  PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_COEF, NULL, "p4_q", "Q 4" },
-    { 0,           0,           1,     0,  PF_BOOL | PF_CTL_TOGGLE, NULL, "p5_active", "active" },
-    { 1,           0.015625,    64,    0,  PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_DB, NULL, "p5_level", "Level 5" },
-    { 1000,        10,          20000, 0,  PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_HZ, NULL, "p5_freq", "Freq 5" },
-    { 1,           0.1,         100,   1,  PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_COEF, NULL, "p5_q", "Q 5" },
-    { 0,           0,           1,     0,  PF_BOOL | PF_CTL_TOGGLE, NULL, "p6_active", "active" },
-    { 1,           0.015625,    64,    0,  PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_DB, NULL, "p6_level", "Level 6" },
-    { 2500,        10,          20000, 0,  PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_HZ, NULL, "p6_freq", "Freq 6" },
-    { 1,           0.1,         100,   1,  PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_COEF, NULL, "p6_q", "Q 6" },
-    { 0,           0,           1,     0,  PF_BOOL | PF_CTL_TOGGLE, NULL, "p7_active", "active" },
-    { 1,           0.015625,    64,    0,  PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_DB, NULL, "p7_level", "Level 7" },
-    { 4000,        10,          20000, 0,  PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_HZ, NULL, "p7_freq", "Freq 7" },
-    { 1,           0.1,         100,   1,  PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_COEF, NULL, "p7_q", "Q 7" },
-    { 0,           0,           1,     0,  PF_BOOL | PF_CTL_TOGGLE, NULL, "p8_active", "active" },
-    { 1,           0.015625,    64,    0,  PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_DB, NULL, "p8_level", "Level 8" },
-    { 6000,        10,          20000, 0,  PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_HZ, NULL, "p8_freq", "Freq 8" },
-    { 1,           0.1,         100,   1,  PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_COEF, NULL, "p8_q", "Q 8" },
-};
-
-CALF_PLUGIN_INFO(equalizer12band) = { 0x8501, "Equalizer12Band", "Calf Equalizer 12 Band", "Markus Schmidt", calf_plugins::calf_copyright_info, "EqualizerPlugin" };
-
-////////////////////////////////////////////////////////////////////////////
-
-////////////////////////////////////////////////////////////////////////////
-
-CALF_PORT_NAMES(monosynth) = {
-    "Out L", "Out R", 
-};
-
-const char *monosynth_waveform_names[] = { "Sawtooth", "Square", "Pulse", "Sine", "Triangle", "Varistep", "Skewed Saw", "Skewed Square", 
-    "Smooth Brass", "Bass", "Dark FM", "Multiwave", "Bell FM", "Dark Pad", "DCO Saw", "DCO Maze" };
-const char *monosynth_mode_names[] = { "0 : 0", "0 : 180", "0 : 90", "90 : 90", "90 : 270", "Random" };
-const char *monosynth_legato_names[] = { "Retrig", "Legato", "Fng Retrig", "Fng Legato" };
-
-const char *monosynth_filter_choices[] = {
-    "12dB/oct Lowpass",
-    "24dB/oct Lowpass",
-    "2x12dB/oct Lowpass",
-    "12dB/oct Highpass",
-    "Lowpass+Notch",
-    "Highpass+Notch",
-    "6dB/oct Bandpass",
-    "2x6dB/oct Bandpass",
-};
-
-CALF_PLUGIN_INFO(monosynth) = { 0x8480, "Monosynth", "Calf Monosynth", "Krzysztof Foltman", calf_plugins::calf_copyright_info, "SynthesizerPlugin" };
-
-CALF_PORT_PROPS(monosynth) = {
-    { monosynth_metadata::wave_saw,         0, monosynth_metadata::wave_count - 1, 1, PF_ENUM | PF_CTL_COMBO | PF_PROP_GRAPH, monosynth_waveform_names, "o1_wave", "Osc1 Wave" },
-    { monosynth_metadata::wave_sqr,         0, monosynth_metadata::wave_count - 1, 1, PF_ENUM | PF_CTL_COMBO | PF_PROP_GRAPH, monosynth_waveform_names, "o2_wave", "Osc2 Wave" },
-    
-    { 0,         -1,    1,  0.1, PF_FLOAT | PF_SCALE_PERC | PF_CTL_KNOB, NULL, "o1_pw", "Osc1 PW" },
-    { 0,         -1,    1,  0.1, PF_FLOAT | PF_SCALE_PERC | PF_CTL_KNOB, NULL, "o2_pw", "Osc2 PW" },
-    
-    { 10,         0,  100,    0, PF_FLOAT | PF_SCALE_LINEAR | PF_CTL_KNOB | PF_UNIT_CENTS, NULL, "o12_detune", "O1<>2 Detune" },
-    { 12,       -24,   24,    0, PF_INT | PF_SCALE_LINEAR | PF_CTL_KNOB | PF_UNIT_SEMITONES, NULL, "o2_xpose", "Osc 2 transpose" },
-    { 0,          0,    5,    0, PF_ENUM | PF_CTL_COMBO, monosynth_mode_names, "phase_mode", "Phase mode" },
-    { 0.5,        0,    1,    0, PF_FLOAT | PF_SCALE_PERC, NULL, "o12_mix", "O1<>2 Mix" },
-    { 1,          0,    7,    0, PF_ENUM | PF_CTL_COMBO | PF_PROP_GRAPH, monosynth_filter_choices, "filter", "Filter" },
-    { 33,        10,16000,    0, PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_HZ, NULL, "cutoff", "Cutoff" },
-    { 2,        0.7,    8,    0, PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB, NULL, "res", "Resonance" },
-    { 0,      -2400, 2400,    0, PF_FLOAT | PF_SCALE_LINEAR | PF_CTL_KNOB | PF_UNIT_CENTS, NULL, "filter_sep", "Separation" },
-    { 8000,  -10800,10800,    0, PF_FLOAT | PF_SCALE_LINEAR | PF_CTL_KNOB | PF_UNIT_CENTS, NULL, "env2cutoff", "Env->Cutoff" },
-    { 1,          0,    1,    0, PF_FLOAT | PF_SCALE_PERC | PF_CTL_KNOB, NULL, "env2res", "Env->Res" },
-    { 1,          0,    1,    0, PF_FLOAT | PF_SCALE_PERC | PF_CTL_KNOB, NULL, "env2amp", "Env->Amp" },
-    
-    { 1,          1,20000,    0, PF_FLOAT | PF_SCALE_LOG | PF_CTL_FADER | PF_UNIT_MSEC, NULL, "adsr_a", "Attack" },
-    { 350,       10,20000,    0, PF_FLOAT | PF_SCALE_LOG | PF_CTL_FADER | PF_UNIT_MSEC, NULL, "adsr_d", "Decay" },
-    { 0.5,        0,    1,    0, PF_FLOAT | PF_SCALE_PERC, NULL, "adsr_s", "Sustain" },
-    { 0,     -10000,10000,   21, PF_FLOAT | PF_SCALE_LINEAR | PF_CTL_FADER | PF_UNIT_MSEC, NULL, "adsr_f", "Fade" },
-    { 50,       10,20000,     0, PF_FLOAT | PF_SCALE_LOG | PF_CTL_FADER | PF_UNIT_MSEC, NULL, "adsr_r", "Release" },
-    
-    { 0,          0,    2,    0, PF_FLOAT | PF_SCALE_PERC, NULL, "key_follow", "Key Follow" },
-    { 0,          0,    3,    0, PF_ENUM | PF_CTL_COMBO, monosynth_legato_names, "legato", "Legato Mode" },
-    { 1,          1, 2000,    0, PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_MSEC, NULL, "portamento", "Portamento" },
-    
-    { 0.5,        0,    1,  0.1, PF_FLOAT | PF_SCALE_PERC | PF_CTL_KNOB, NULL, "vel2filter", "Vel->Filter" },
-    { 0,          0,    1,  0.1, PF_FLOAT | PF_SCALE_PERC | PF_CTL_KNOB, NULL, "vel2amp", "Vel->Amp" },
-
-    { 0.5,         0,   1, 100, PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_PROP_OUTPUT_GAIN, NULL, "master", "Volume" },
-
-    { 200,         0, 2400,   25, PF_FLOAT | PF_SCALE_LINEAR | PF_CTL_KNOB | PF_UNIT_CENTS, NULL, "pbend_range", "PBend Range" },
-
-    { 5,       0.01, 20,    0, PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_HZ, NULL, "lfo_rate", "LFO Rate" },
-    { 0.5,      0.1,  5,    0, PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_SEC, NULL, "lfo_delay", "LFO Delay" },
-    { 0,      -4800, 4800,  0, PF_FLOAT | PF_SCALE_LINEAR | PF_CTL_KNOB | PF_UNIT_CENTS, NULL, "lfo2filter", "LFO->Filter" },
-    { 100,        0, 1200,  0, PF_FLOAT | PF_SCALE_QUAD | PF_CTL_KNOB | PF_UNIT_CENTS, NULL, "lfo2pitch", "LFO->Pitch" },
-    { 0,          0,    1,  0.1, PF_FLOAT | PF_SCALE_PERC | PF_CTL_KNOB, NULL, "lfo2pw", "LFO->PW" },
-    { 1,          0,    1,  0.1, PF_FLOAT | PF_SCALE_PERC | PF_CTL_KNOB, NULL, "mwhl2lfo", "ModWheel->LFO" },
-
-    { 1,          0,    1,    0, PF_FLOAT | PF_SCALE_PERC | PF_CTL_KNOB, NULL, "scale_detune", "Scale Detune" },
-};
-
-////////////////////////////////////////////////////////////////////////////
-
-CALF_PLUGIN_INFO(organ) = { 0x8481, "Organ", "Calf Organ", "Krzysztof Foltman", calf_plugins::calf_copyright_info, "SynthesizerPlugin" };
-
-const char **organ_metadata::get_default_configure_vars()
+void reverb_audio_module::activate()
 {
-    static const char *data[] = { "map_curve", "2\n0 1\n1 1\n", NULL };
-    return data;
+    reverb.reset();
 }
 
-plugin_command_info *organ_metadata::get_commands()
+void reverb_audio_module::deactivate()
 {
-    static plugin_command_info cmds[] = {
-        { "cmd_panic", "Panic!", "Stop all sounds and reset all controllers" },
-        { NULL }
-    };
-    return cmds;
 }
 
-CALF_PORT_NAMES(organ) = {"Out L", "Out R"};
-
-const char *organ_percussion_trigger_names[] = { "First note", "Each note", "Each, no retrig", "Polyphonic" };
-
-const char *organ_wave_names[] = { 
-    "Sin", 
-    "S0", "S00", "S000", 
-    "SSaw", "SSqr", "SPls", 
-    "Saw", "Sqr", "Pls", 
-    "S(", "Sq(", "S+", "Clvg", 
-    "Bell", "Bell2", 
-    "W1", "W2", "W3", "W4", "W5", "W6", "W7", "W8", "W9",
-    "DSaw", "DSqr", "DPls",
-    "P:SynStr","P:WideStr","P:Sine","P:Bell","P:Space","P:Voice","P:Hiss","P:Chant",
-};
-
-const char *organ_routing_names[] = { "Out", "Flt 1", "Flt 2"  };
-
-const char *organ_ampctl_names[] = { "None", "Direct", "Flt 1", "Flt 2", "All"  };
-
-const char *organ_vibrato_mode_names[] = { "None", "Direct", "Flt 1", "Flt 2", "Voice", "Global"  };
-
-const char *organ_filter_type_names[] = { "12dB/oct LP", "12dB/oct HP" };
-
-const char *organ_filter_send_names[] = { "Output", "Filter 2" };
-
-const char *organ_init_map_curve = "2\n0 1\n1 1\n";
-
-CALF_PORT_PROPS(organ) = {
-    { 8,       0,  8, 80, PF_FLOAT | PF_SCALE_LINEAR | PF_CTL_FADER, NULL, "l1", "16'" },
-    { 8,       0,  8, 80, PF_FLOAT | PF_SCALE_LINEAR | PF_CTL_FADER, NULL, "l2", "5 1/3'" },
-    { 8,       0,  8, 80, PF_FLOAT | PF_SCALE_LINEAR | PF_CTL_FADER, NULL, "l3", "8'" },
-    { 0,       0,  8, 80, PF_FLOAT | PF_SCALE_LINEAR | PF_CTL_FADER, NULL, "l4", "4'" },
-    { 0,       0,  8, 80, PF_FLOAT | PF_SCALE_LINEAR | PF_CTL_FADER, NULL, "l5", "2 2/3'" },
-    { 0,       0,  8, 80, PF_FLOAT | PF_SCALE_LINEAR | PF_CTL_FADER, NULL, "l6", "2'" },
-    { 0,       0,  8, 80, PF_FLOAT | PF_SCALE_LINEAR | PF_CTL_FADER, NULL, "l7", "1 3/5'" },
-    { 0,       0,  8, 80, PF_FLOAT | PF_SCALE_LINEAR | PF_CTL_FADER, NULL, "l8", "1 1/3'" },
-    { 8,       0,  8, 80, PF_FLOAT | PF_SCALE_LINEAR | PF_CTL_FADER, NULL, "l9", "1'" },
-
-    { 1,       1, 32, 32, PF_INT | PF_SCALE_LINEAR | PF_CTL_KNOB, NULL, "f1", "Freq 1" },
-    { 3,       1, 32, 32, PF_INT | PF_SCALE_LINEAR | PF_CTL_KNOB, NULL, "f2", "Freq 2" },
-    { 2,       1, 32, 32, PF_INT | PF_SCALE_LINEAR | PF_CTL_KNOB, NULL, "f3", "Freq 3" },
-    { 4,       1, 32, 32, PF_INT | PF_SCALE_LINEAR | PF_CTL_KNOB, NULL, "f4", "Freq 4" },
-    { 6,       1, 32, 32, PF_INT | PF_SCALE_LINEAR | PF_CTL_KNOB, NULL, "f5", "Freq 5" },
-    { 8,       1, 32, 32, PF_INT | PF_SCALE_LINEAR | PF_CTL_KNOB, NULL, "f6", "Freq 6" },
-    { 10,      1, 32, 32, PF_INT | PF_SCALE_LINEAR | PF_CTL_KNOB, NULL, "f7", "Freq 7" },
-    { 12,      1, 32, 32, PF_INT | PF_SCALE_LINEAR | PF_CTL_KNOB, NULL, "f8", "Freq 8" },
-    { 16,      1, 32, 32, PF_INT | PF_SCALE_LINEAR | PF_CTL_KNOB, NULL, "f9", "Freq 9" },
-
-    { 0,       0,  organ_enums::wave_count - 1, 0, PF_ENUM | PF_SCALE_LINEAR | PF_CTL_COMBO, organ_wave_names, "w1", "Wave 1" },
-    { 0,       0,  organ_enums::wave_count - 1, 0, PF_ENUM | PF_SCALE_LINEAR | PF_CTL_COMBO, organ_wave_names, "w2", "Wave 2" },
-    { 0,       0,  organ_enums::wave_count - 1, 0, PF_ENUM | PF_SCALE_LINEAR | PF_CTL_COMBO, organ_wave_names, "w3", "Wave 3" },
-    { 0,       0,  organ_enums::wave_count - 1, 0, PF_ENUM | PF_SCALE_LINEAR | PF_CTL_COMBO, organ_wave_names, "w4", "Wave 4" },
-    { 0,       0,  organ_enums::wave_count - 1, 0, PF_ENUM | PF_SCALE_LINEAR | PF_CTL_COMBO, organ_wave_names, "w5", "Wave 5" },
-    { 0,       0,  organ_enums::wave_count - 1, 0, PF_ENUM | PF_SCALE_LINEAR | PF_CTL_COMBO, organ_wave_names, "w6", "Wave 6" },
-    { 0,       0,  organ_enums::wave_count - 1, 0, PF_ENUM | PF_SCALE_LINEAR | PF_CTL_COMBO, organ_wave_names, "w7", "Wave 7" },
-    { 0,       0,  organ_enums::wave_count - 1, 0, PF_ENUM | PF_SCALE_LINEAR | PF_CTL_COMBO, organ_wave_names, "w8", "Wave 8" },
-    { 0,       0,  organ_enums::wave_count - 1, 0, PF_ENUM | PF_SCALE_LINEAR | PF_CTL_COMBO, organ_wave_names, "w9", "Wave 9" },
-
-    { 0,    -100,100, 401, PF_FLOAT | PF_SCALE_LINEAR | PF_CTL_KNOB | PF_UNIT_CENTS, NULL, "detune1", "Detune 1" },
-    { 0,    -100,100, 401, PF_FLOAT | PF_SCALE_LINEAR | PF_CTL_KNOB | PF_UNIT_CENTS, NULL, "detune2", "Detune 2" },
-    { 0,    -100,100, 401, PF_FLOAT | PF_SCALE_LINEAR | PF_CTL_KNOB | PF_UNIT_CENTS, NULL, "detune3", "Detune 3" },
-    { 0,    -100,100, 401, PF_FLOAT | PF_SCALE_LINEAR | PF_CTL_KNOB | PF_UNIT_CENTS, NULL, "detune4", "Detune 4" },
-    { 0,    -100,100, 401, PF_FLOAT | PF_SCALE_LINEAR | PF_CTL_KNOB | PF_UNIT_CENTS, NULL, "detune5", "Detune 5" },
-    { 0,    -100,100, 401, PF_FLOAT | PF_SCALE_LINEAR | PF_CTL_KNOB | PF_UNIT_CENTS, NULL, "detune6", "Detune 6" },
-    { 0,    -100,100, 401, PF_FLOAT | PF_SCALE_LINEAR | PF_CTL_KNOB | PF_UNIT_CENTS, NULL, "detune7", "Detune 7" },
-    { 0,    -100,100, 401, PF_FLOAT | PF_SCALE_LINEAR | PF_CTL_KNOB | PF_UNIT_CENTS, NULL, "detune8", "Detune 8" },
-    { 0,    -100,100, 401, PF_FLOAT | PF_SCALE_LINEAR | PF_CTL_KNOB | PF_UNIT_CENTS, NULL, "detune9", "Detune 9" },
-
-    { 0,       0,360, 361, PF_FLOAT | PF_SCALE_LINEAR | PF_CTL_KNOB | PF_UNIT_DEG, NULL, "phase1", "Phase 1" },
-    { 0,       0,360, 361, PF_FLOAT | PF_SCALE_LINEAR | PF_CTL_KNOB | PF_UNIT_DEG, NULL, "phase2", "Phase 2" },
-    { 0,       0,360, 361, PF_FLOAT | PF_SCALE_LINEAR | PF_CTL_KNOB | PF_UNIT_DEG, NULL, "phase3", "Phase 3" },
-    { 0,       0,360, 361, PF_FLOAT | PF_SCALE_LINEAR | PF_CTL_KNOB | PF_UNIT_DEG, NULL, "phase4", "Phase 4" },
-    { 0,       0,360, 361, PF_FLOAT | PF_SCALE_LINEAR | PF_CTL_KNOB | PF_UNIT_DEG, NULL, "phase5", "Phase 5" },
-    { 0,       0,360, 361, PF_FLOAT | PF_SCALE_LINEAR | PF_CTL_KNOB | PF_UNIT_DEG, NULL, "phase6", "Phase 6" },
-    { 0,       0,360, 361, PF_FLOAT | PF_SCALE_LINEAR | PF_CTL_KNOB | PF_UNIT_DEG, NULL, "phase7", "Phase 7" },
-    { 0,       0,360, 361, PF_FLOAT | PF_SCALE_LINEAR | PF_CTL_KNOB | PF_UNIT_DEG, NULL, "phase8", "Phase 8" },
-    { 0,       0,360, 361, PF_FLOAT | PF_SCALE_LINEAR | PF_CTL_KNOB | PF_UNIT_DEG, NULL, "phase9", "Phase 9" },
-
-    { 0,      -1,  1, 201, PF_FLOAT | PF_SCALE_PERC | PF_CTL_KNOB, NULL, "pan1", "Pan 1" },
-    { 0,      -1,  1, 201, PF_FLOAT | PF_SCALE_PERC | PF_CTL_KNOB, NULL, "pan2", "Pan 2" },
-    { 0,      -1,  1, 201, PF_FLOAT | PF_SCALE_PERC | PF_CTL_KNOB, NULL, "pan3", "Pan 3" },
-    { 0,      -1,  1, 201, PF_FLOAT | PF_SCALE_PERC | PF_CTL_KNOB, NULL, "pan4", "Pan 4" },
-    { 0,      -1,  1, 201, PF_FLOAT | PF_SCALE_PERC | PF_CTL_KNOB, NULL, "pan5", "Pan 5" },
-    { 0,      -1,  1, 201, PF_FLOAT | PF_SCALE_PERC | PF_CTL_KNOB, NULL, "pan6", "Pan 6" },
-    { 0,      -1,  1, 201, PF_FLOAT | PF_SCALE_PERC | PF_CTL_KNOB, NULL, "pan7", "Pan 7" },
-    { 0,      -1,  1, 201, PF_FLOAT | PF_SCALE_PERC | PF_CTL_KNOB, NULL, "pan8", "Pan 8" },
-    { 0,      -1,  1, 201, PF_FLOAT | PF_SCALE_PERC | PF_CTL_KNOB, NULL, "pan9", "Pan 9" },
-
-    { 0,       0,  2, 0, PF_ENUM | PF_SCALE_LINEAR | PF_CTL_COMBO, organ_routing_names, "routing1", "Routing 1" },
-    { 0,       0,  2, 0, PF_ENUM | PF_SCALE_LINEAR | PF_CTL_COMBO, organ_routing_names, "routing2", "Routing 2" },
-    { 0,       0,  2, 0, PF_ENUM | PF_SCALE_LINEAR | PF_CTL_COMBO, organ_routing_names, "routing3", "Routing 3" },
-    { 0,       0,  2, 0, PF_ENUM | PF_SCALE_LINEAR | PF_CTL_COMBO, organ_routing_names, "routing4", "Routing 4" },
-    { 0,       0,  2, 0, PF_ENUM | PF_SCALE_LINEAR | PF_CTL_COMBO, organ_routing_names, "routing5", "Routing 5" },
-    { 0,       0,  2, 0, PF_ENUM | PF_SCALE_LINEAR | PF_CTL_COMBO, organ_routing_names, "routing6", "Routing 6" },
-    { 0,       0,  2, 0, PF_ENUM | PF_SCALE_LINEAR | PF_CTL_COMBO, organ_routing_names, "routing7", "Routing 7" },
-    { 0,       0,  2, 0, PF_ENUM | PF_SCALE_LINEAR | PF_CTL_COMBO, organ_routing_names, "routing8", "Routing 8" },
-    { 0,       0,  2, 0, PF_ENUM | PF_SCALE_LINEAR | PF_CTL_COMBO, organ_routing_names, "routing9", "Routing 9" },
-
-    { 96,      0,  127, 128, PF_INT | PF_CTL_KNOB | PF_UNIT_NOTE, NULL, "foldnote", "Foldover" },
-    
-    { 200,         10,  3000, 100, PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_MSEC, NULL, "perc_decay", "P: Carrier Decay" },
-    { 0.25,      0,  1, 100, PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB, NULL, "perc_level", "P: Level" },
-    { 0,         0,  organ_enums::wave_count_small - 1, 1, PF_ENUM | PF_CTL_COMBO, organ_wave_names, "perc_waveform", "P: Carrier Wave" },
-    { 6,      1, 32, 32, PF_INT | PF_SCALE_LINEAR | PF_CTL_KNOB, NULL, "perc_harmonic", "P: Carrier Frq" },
-    { 0,          0,    1,    0, PF_FLOAT | PF_SCALE_PERC, NULL, "perc_vel2amp", "P: Vel->Amp" },
-    
-    { 200,         10,  3000, 100, PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_MSEC, NULL, "perc_fm_decay", "P: Modulator Decay" },
-    { 0,          0,    4,    0, PF_FLOAT | PF_SCALE_PERC, NULL, "perc_fm_depth", "P: FM Depth" },
-    { 0,         0,  organ_enums::wave_count_small - 1, 1, PF_ENUM | PF_CTL_COMBO, organ_wave_names, "perc_fm_waveform", "P: Modulator Wave" },
-    { 6,      1, 32, 32, PF_INT | PF_SCALE_LINEAR | PF_CTL_KNOB, NULL, "perc_fm_harmonic", "P: Modulator Frq" },
-    { 0,          0,    1,    0, PF_FLOAT | PF_SCALE_PERC, NULL, "perc_vel2fm", "P: Vel->FM" },
-    
-    { 0,         0,  organ_enums::perctrig_count - 1, 0, PF_ENUM | PF_CTL_COMBO, organ_percussion_trigger_names, "perc_trigger", "P: Trigger" },
-    { 90,      0,360, 361, PF_FLOAT | PF_SCALE_LINEAR | PF_CTL_KNOB | PF_UNIT_DEG, NULL, "perc_stereo", "P: Stereo Phase" },
-
-    { 0,         0,  1, 0, PF_ENUM | PF_CTL_COMBO, organ_filter_send_names, "filter_chain", "Filter 1 To" },
-    { 0,         0,  1, 0, PF_ENUM | PF_CTL_COMBO, organ_filter_type_names, "filter1_type", "Filter 1 Type" },
-    { 0.1,         0,  1, 100, PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_PROP_OUTPUT_GAIN | PF_PROP_GRAPH, NULL, "master", "Volume" },
-    
-    { 2000,   20, 20000, 100, PF_FLOAT | PF_SCALE_LOG | PF_UNIT_HZ | PF_CTL_KNOB, NULL, "f1_cutoff", "F1 Cutoff" },
-    { 2,        0.7,    8,    0, PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB, NULL, "f1_res", "F1 Res" },
-    { 8000,  -10800,10800,    0, PF_FLOAT | PF_SCALE_LINEAR | PF_CTL_KNOB | PF_UNIT_CENTS, NULL, "f1_env1", "F1 Env1" },
-    { 0,     -10800,10800,    0, PF_FLOAT | PF_SCALE_LINEAR | PF_CTL_KNOB | PF_UNIT_CENTS, NULL, "f1_env2", "F1 Env2" },
-    { 0,     -10800,10800,    0, PF_FLOAT | PF_SCALE_LINEAR | PF_CTL_KNOB | PF_UNIT_CENTS, NULL, "f1_env3", "F1 Env3" },
-    { 0,          0,    2,    0, PF_FLOAT | PF_SCALE_PERC, NULL, "f1_keyf", "F1 KeyFollow" },
-
-    { 2000,   20, 20000, 100, PF_FLOAT | PF_SCALE_LOG | PF_UNIT_HZ | PF_CTL_KNOB, NULL, "f2_cutoff", "F2 Cutoff" },
-    { 2,        0.7,    8,    0, PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB, NULL, "f2_res", "F2 Res" },
-    { 0,     -10800,10800,    0, PF_FLOAT | PF_SCALE_LINEAR | PF_CTL_KNOB | PF_UNIT_CENTS, NULL, "f2_env1", "F2 Env1" },
-    { 8000,  -10800,10800,    0, PF_FLOAT | PF_SCALE_LINEAR | PF_CTL_KNOB | PF_UNIT_CENTS, NULL, "f2_env2", "F2 Env2" },
-    { 0,     -10800,10800,    0, PF_FLOAT | PF_SCALE_LINEAR | PF_CTL_KNOB | PF_UNIT_CENTS, NULL, "f2_env3", "F2 Env3" },
-    { 0,          0,    2,    0, PF_FLOAT | PF_SCALE_PERC, NULL, "f2_keyf", "F2 KeyFollow" },
-
-    { 1,          1,20000,    0, PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_MSEC, NULL, "adsr_a", "EG1 Attack" },
-    { 350,       10,20000,    0, PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_MSEC, NULL, "adsr_d", "EG1 Decay" },
-    { 0.5,        0,    1,    0, PF_FLOAT | PF_SCALE_PERC, NULL, "adsr_s", "EG1 Sustain" },
-    { 50,       10,20000,     0, PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_MSEC, NULL, "adsr_r", "EG1 Release" },
-    { 0,          0,    1,    0, PF_FLOAT | PF_SCALE_PERC, NULL, "adsr_v", "EG1 VelMod" },
-    { 0,  0, organ_enums::ampctl_count - 1,
-                              0, PF_INT | PF_CTL_COMBO, organ_ampctl_names, "eg1_amp_ctl", "EG1 To Amp"},
-
-    { 1,          1,20000,    0, PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_MSEC, NULL, "adsr2_a", "EG2 Attack" },
-    { 350,       10,20000,    0, PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_MSEC, NULL, "adsr2_d", "EG2 Decay" },
-    { 0.5,        0,    1,    0, PF_FLOAT | PF_SCALE_PERC, NULL, "adsr2_s", "EG2 Sustain" },
-    { 50,       10,20000,     0, PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_MSEC, NULL, "adsr2_r", "EG2 Release" },
-    { 0,          0,    1,    0, PF_FLOAT | PF_SCALE_PERC, NULL, "adsr2_v", "EG2 VelMod" },
-    { 0,  0, organ_enums::ampctl_count - 1,
-                              0, PF_INT | PF_CTL_COMBO, organ_ampctl_names, "eg2_amp_ctl", "EG2 To Amp"},
-
-    { 1,          1,20000,    0, PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_MSEC, NULL, "adsr3_a", "EG3 Attack" },
-    { 350,       10,20000,    0, PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_MSEC, NULL, "adsr3_d", "EG3 Decay" },
-    { 0.5,        0,    1,    0, PF_FLOAT | PF_SCALE_PERC, NULL, "adsr3_s", "EG3 Sustain" },
-    { 50,       10,20000,     0, PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_MSEC, NULL, "adsr3_r", "EG3 Release" },
-    { 0,          0,    1,    0, PF_FLOAT | PF_SCALE_PERC, NULL, "adsr3_v", "EG3 VelMod" },
-    { 0,  0, organ_enums::ampctl_count - 1,
-                              0, PF_INT | PF_CTL_COMBO, organ_ampctl_names, "eg3_amp_ctl", "EG3 To Amp"},
-
-    { 6.6,     0.01,   80,    0, PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_HZ, NULL, "vib_rate", "Vib Rate" },
-    { 0.5,        0,    1,    0, PF_FLOAT | PF_SCALE_PERC | PF_CTL_KNOB , NULL, "vib_amt", "Vib Mod Amt" },
-    { 0.5,        0,    1,    0, PF_FLOAT | PF_SCALE_PERC | PF_CTL_KNOB , NULL, "vib_wet", "Vib Wet" },
-    { 180,        0,  360,    0, PF_FLOAT | PF_SCALE_LINEAR | PF_CTL_KNOB | PF_UNIT_DEG, NULL, "vib_phase", "Vib Stereo" },
-    { organ_enums::lfomode_global,        0,  organ_enums::lfomode_count - 1,    0, PF_ENUM | PF_CTL_COMBO, organ_vibrato_mode_names, "vib_mode", "Vib Mode" },
-//    { 0,  0, organ_enums::ampctl_count - 1,
-//                              0, PF_INT | PF_CTL_COMBO, organ_ampctl_names, "vel_amp_ctl", "Vel To Amp"},
-
-    { -12,        -24, 24,   49, PF_INT | PF_SCALE_LINEAR | PF_CTL_KNOB | PF_UNIT_SEMITONES, NULL, "transpose", "Transpose" },
-    { 0,       -100,  100,  201, PF_FLOAT | PF_SCALE_LINEAR | PF_CTL_KNOB | PF_UNIT_CENTS, NULL, "detune", "Detune" },
-
-    { 16,         1,   32,   32, PF_INT | PF_SCALE_LINEAR | PF_CTL_KNOB, NULL, "polyphony", "Polyphony" },
-    
-    { 1,          0,    1,    0, PF_BOOL | PF_CTL_TOGGLE, NULL, "quad_env", "Quadratic AmpEnv" },
-
-    { 200,        0, 2400,   25, PF_FLOAT | PF_SCALE_LINEAR | PF_CTL_KNOB | PF_UNIT_CENTS, NULL, "pbend_range", "PBend Range" },
-    
-    { 80,       20, 20000, 0, PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_HZ, NULL, "bass_freq", "Bass Freq" },
-    { 1,        0.1, 10,     0, PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_COEF | PF_PROP_NOBOUNDS, NULL, "bass_gain", "Bass Gain" },
-    { 12000,     20, 20000, 0, PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_HZ, NULL, "treble_freq", "Treble Freq" },
-    { 1,        0.1, 10,     0, PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_COEF | PF_PROP_NOBOUNDS, NULL, "treble_gain", "Treble Gain" },
-
-    { 0,          0,    0,    0, PF_STRING | PF_PROP_MSGCONTEXT, &organ_init_map_curve, "map_curve", "Key mapping curve" },
-};
-
-////////////////////////////////////////////////////////////////////////////
-
-const char *fluidsynth_init_soundfont = "";
-
-const char *fluidsynth_interpolation_names[] = { "None (zero-hold)", "Linear", "Cubic", "7-point" };
-
-CALF_PORT_NAMES(fluidsynth) = {
-    "Out L", "Out R", 
-};
-
-CALF_PLUGIN_INFO(fluidsynth) = { 0x8700, "Fluidsynth", "Calf Fluidsynth", "FluidSynth Team / Krzysztof Foltman", calf_plugins::calf_copyright_info, "SynthesizerPlugin" };
-
-CALF_PORT_PROPS(fluidsynth) = {
-    { 0.5,         0,   1, 100, PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_PROP_OUTPUT_GAIN, NULL, "master", "Volume" },
-    { 0,          0,    0,    0, PF_STRING | PF_PROP_MSGCONTEXT, &fluidsynth_init_soundfont, "soundfont", "Soundfont" },
-    { 2,          0,    3,    0, PF_ENUM | PF_CTL_COMBO, fluidsynth_interpolation_names, "interpolation", "Interpolation" },
-    { 1,          0,    1,    0, PF_BOOL | PF_CTL_TOGGLE, NULL, "reverb", "Reverb" },
-    { 1,          0,    1,    0, PF_BOOL | PF_CTL_TOGGLE, NULL, "chorus", "Chorus" },
-};
-
-////////////////////////////////////////////////////////////////////////////
-
-const char *wavetable_names[] = { 
-    "Shiny1",
-    "Shiny2",
-    "Rezo",
-    "Metal",
-    "Bell",
-    "Blah",
-    "Pluck",
-    "Stretch",
-    "Stretch 2",
-    "Hard Sync",
-    "Hard Sync 2",
-    "Soft Sync",
-    "Bell 2",
-    "Bell 3",
-    "Tine",
-    "Tine 2",
-    "Clav",
-    "Clav 2",
-    "Gtr",
-    "Gtr 2",
-    "Gtr 3",
-    "Gtr 4",
-    "Gtr 5",
-    "Reed",
-    "Reed 2",
-    "Silver",
-    "Brass",
-    "Multi",
-    "Multi 2",
-};
-
-const char *wavetable_init_soundfont = "";
-
-CALF_PORT_NAMES(wavetable) = {
-    "Out L", "Out R", 
-};
-
-CALF_PLUGIN_INFO(wavetable) = { 0x8701, "Wavetable", "Calf Wavetable", "Krzysztof Foltman", calf_plugins::calf_copyright_info, "SynthesizerPlugin" };
-
-CALF_PORT_PROPS(wavetable) = {
-    { wavetable_metadata::wt_count - 1,       0,  wavetable_metadata::wt_count - 1, 0, PF_ENUM | PF_SCALE_LINEAR | PF_CTL_COMBO, wavetable_names, "o1wave", "Osc1 Wave" },
-    { 0.2,     -1,      1,  0, PF_FLOAT | PF_SCALE_PERC | PF_CTL_KNOB | PF_UNIT_COEF, NULL, "o1offset", "Osc1 Ctl"},
-    { 0,        -48,   48, 48*2+1, PF_INT   | PF_SCALE_LINEAR | PF_CTL_KNOB | PF_UNIT_SEMITONES, NULL, "o1trans", "Osc1 Transpose" },
-    { 6,       -100,  100,      0, PF_INT   | PF_SCALE_LINEAR | PF_CTL_KNOB | PF_UNIT_CENTS, NULL, "o1detune", "Osc1 Detune" },
-    { 0.1,      0,   1,     0, PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_COEF | PF_PROP_NOBOUNDS, NULL, "o1level", "Osc1 Level" },
-
-    { 0,       0,  wavetable_metadata::wt_count - 1, 0, PF_ENUM | PF_SCALE_LINEAR | PF_CTL_COMBO, wavetable_names, "o2wave", "Osc2 Wave" },
-    { 0.4,     -1,      1,  0, PF_FLOAT | PF_SCALE_PERC | PF_CTL_KNOB | PF_UNIT_COEF, NULL, "o2offset", "Osc2 Ctl"},
-    { 0,        -48,   48, 48*2+1, PF_INT   | PF_SCALE_LINEAR | PF_CTL_KNOB | PF_UNIT_SEMITONES, NULL, "o2trans", "Osc2 Transpose" },
-    { -6,     -100,  100,      0, PF_INT   | PF_SCALE_LINEAR | PF_CTL_KNOB | PF_UNIT_CENTS, NULL, "o2detune", "Osc2 Detune" },
-    { 0,        0,   1,     0, PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_COEF | PF_PROP_NOBOUNDS, NULL, "o2level", "Osc2 Level" },
-
-    { 1,          1,20000,    0, PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_MSEC, NULL, "adsr_a", "EG1 Attack" },
-    { 350,       10,20000,    0, PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_MSEC, NULL, "adsr_d", "EG1 Decay" },
-    { 0.5,        0,    1,    0, PF_FLOAT | PF_SCALE_PERC, NULL, "adsr_s", "EG1 Sustain" },
-    { 0,     -10000,10000,   21, PF_FLOAT | PF_SCALE_LINEAR | PF_CTL_KNOB | PF_UNIT_MSEC, NULL, "adsr_f", "EG1 Fade" },
-    { 50,       10,20000,     0, PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_MSEC, NULL, "adsr_r", "EG1 Release" },
-    { 1,          0,    1,    0, PF_FLOAT | PF_SCALE_PERC, NULL, "adsr_v", "EG1 VelMod" },
-
-    { 1,          1,20000,    0, PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_MSEC, NULL, "adsr2_a", "EG2 Attack" },
-    { 350,       10,20000,    0, PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_MSEC, NULL, "adsr2_d", "EG2 Decay" },
-    { 0.5,        0,    1,    0, PF_FLOAT | PF_SCALE_PERC, NULL, "adsr2_s", "EG2 Sustain" },
-    { 0,     -10000,10000,   21, PF_FLOAT | PF_SCALE_LINEAR | PF_CTL_KNOB | PF_UNIT_MSEC, NULL, "adsr2_f", "EG2 Fade" },
-    { 50,       10,20000,     0, PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_MSEC, NULL, "adsr2_r", "EG2 Release" },
-    { 1,          0,    1,    0, PF_FLOAT | PF_SCALE_PERC, NULL, "adsr2_v", "EG2 VelMod" },
-
-    { 1,          1,20000,    0, PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_MSEC, NULL, "adsr3_a", "EG3 Attack" },
-    { 350,       10,20000,    0, PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_MSEC, NULL, "adsr3_d", "EG3 Decay" },
-    { 0.5,        0,    1,    0, PF_FLOAT | PF_SCALE_PERC, NULL, "adsr3_s", "EG3 Sustain" },
-    { 0,     -10000,10000,   21, PF_FLOAT | PF_SCALE_LINEAR | PF_CTL_KNOB | PF_UNIT_MSEC, NULL, "adsr3_f", "EG3 Fade" },
-    { 50,       10, 20000,    0, PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_MSEC, NULL, "adsr3_r", "EG3 Release" },
-    { 0,          0,    1,    0, PF_FLOAT | PF_SCALE_PERC, NULL, "adsr3_v", "EG3 VelMod" },
-
-    { 200,        0, 2400,   25, PF_FLOAT | PF_SCALE_LINEAR | PF_CTL_KNOB | PF_UNIT_CENTS, NULL, "pbend_range", "PBend Range" },
-};
-
-////////////////////////////////////////////////////////////////////////////
-
-void calf_plugins::get_all_plugins(std::vector<plugin_metadata_iface *> &plugins)
+void reverb_audio_module::set_sample_rate(uint32_t sr)
 {
-    #define PER_MODULE_ITEM(name, isSynth, jackname) plugins.push_back(new name##_metadata);
-    #define PER_SMALL_MODULE_ITEM(...)
-    #include <calf/modulelist.h>
+    srate = sr;
+    reverb.setup(sr);
+    amount.set_sample_rate(sr);
+}
+
+void reverb_audio_module::params_changed()
+{
+    reverb.set_type_and_diffusion(fastf2i_drm(*params[par_roomsize]), *params[par_diffusion]);
+    reverb.set_time(*params[par_decay]);
+    reverb.set_cutoff(*params[par_hfdamp]);
+    amount.set_inertia(*params[par_amount]);
+    dryamount.set_inertia(*params[par_dry]);
+    left_lo.set_lp(dsp::clip(*params[par_treblecut], 20.f, (float)(srate * 0.49f)), srate);
+    left_hi.set_hp(dsp::clip(*params[par_basscut], 20.f, (float)(srate * 0.49f)), srate);
+    right_lo.copy_coeffs(left_lo);
+    right_hi.copy_coeffs(left_hi);
+    predelay_amt = (int) (srate * (*params[par_predelay]) * (1.0f / 1000.0f) + 1);
+}
+
+uint32_t reverb_audio_module::process(uint32_t offset, uint32_t numsamples, uint32_t inputs_mask, uint32_t outputs_mask)
+{
+    numsamples += offset;
+    clip   -= std::min(clip, numsamples);
+    for (uint32_t i = offset; i < numsamples; i++) {
+        float dry = dryamount.get();
+        float wet = amount.get();
+        stereo_sample<float> s(ins[0][i], ins[1][i]);
+        stereo_sample<float> s2 = pre_delay.process(s, predelay_amt);
+        
+        float rl = s2.left, rr = s2.right;
+        rl = left_lo.process(left_hi.process(rl));
+        rr = right_lo.process(right_hi.process(rr));
+        reverb.process(rl, rr);
+        outs[0][i] = dry*s.left + wet*rl;
+        outs[1][i] = dry*s.right + wet*rr;
+        meter_wet = std::max(fabs(wet*rl), fabs(wet*rr));
+        meter_out = std::max(fabs(outs[0][i]), fabs(outs[1][i]));
+        if(outs[0][i] > 1.f or outs[1][i] > 1.f) {
+            clip = srate >> 3;
+        }
+    }
+    reverb.extra_sanitize();
+    left_lo.sanitize();
+    left_hi.sanitize();
+    right_lo.sanitize();
+    right_hi.sanitize();
+    if(params[par_meter_wet] != NULL) {
+        *params[par_meter_wet] = meter_wet;
+    }
+    if(params[par_meter_out] != NULL) {
+        *params[par_meter_out] = meter_out;
+    }
+    if(params[par_clip] != NULL) {
+        *params[par_clip] = clip;
+    }
+    return outputs_mask;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+
+vintage_delay_audio_module::vintage_delay_audio_module()
+{
+    old_medium = -1;
+    for (int i = 0; i < MAX_DELAY; i++) {
+        buffers[0][i] = 0.f;
+        buffers[1][i] = 0.f;
+    }
+}
+
+void vintage_delay_audio_module::params_changed()
+{
+    float unit = 60.0 * srate / (*params[par_bpm] * *params[par_divide]);
+    deltime_l = dsp::fastf2i_drm(unit * *params[par_time_l]);
+    deltime_r = dsp::fastf2i_drm(unit * *params[par_time_r]);
+    int deltime_fb = deltime_l + deltime_r;
+    float fb = *params[par_feedback];
+    dry.set_inertia(*params[par_dryamount]);
+    mixmode = dsp::fastf2i_drm(*params[par_mixmode]);
+    medium = dsp::fastf2i_drm(*params[par_medium]);
+    switch(mixmode)
+    {
+    case MIXMODE_STEREO:
+        fb_left.set_inertia(fb);
+        fb_right.set_inertia(pow(fb, *params[par_time_r] / *params[par_time_l]));
+        amt_left.set_inertia(*params[par_amount]);
+        amt_right.set_inertia(*params[par_amount]);
+        break;
+    case MIXMODE_PINGPONG:
+        fb_left.set_inertia(fb);
+        fb_right.set_inertia(fb);
+        amt_left.set_inertia(*params[par_amount]);
+        amt_right.set_inertia(*params[par_amount]);
+        break;
+    case MIXMODE_LR:
+        fb_left.set_inertia(fb);
+        fb_right.set_inertia(fb);
+        amt_left.set_inertia(*params[par_amount]);                                          // L is straight 'amount'
+        amt_right.set_inertia(*params[par_amount] * pow(fb, 1.0 * deltime_r / deltime_fb)); // R is amount with feedback based dampening as if it ran through R/FB*100% of delay line's dampening
+        // deltime_l <<< deltime_r -> pow() = fb -> full delay line worth of dampening
+        // deltime_l >>> deltime_r -> pow() = 1 -> no dampening
+        break;
+    case MIXMODE_RL:
+        fb_left.set_inertia(fb);
+        fb_right.set_inertia(fb);
+        amt_left.set_inertia(*params[par_amount] * pow(fb, 1.0 * deltime_l / deltime_fb));
+        amt_right.set_inertia(*params[par_amount]);
+        break;
+    }
+    chmix.set_inertia((1 - *params[par_width]) * 0.5);
+    if (medium != old_medium)
+        calc_filters();
+}
+
+void vintage_delay_audio_module::activate()
+{
+    bufptr = 0;
+    age = 0;
+}
+
+void vintage_delay_audio_module::deactivate()
+{
+}
+
+void vintage_delay_audio_module::set_sample_rate(uint32_t sr)
+{
+    srate = sr;
+    old_medium = -1;
+    amt_left.set_sample_rate(sr); amt_right.set_sample_rate(sr);
+    fb_left.set_sample_rate(sr); fb_right.set_sample_rate(sr);
+}
+
+void vintage_delay_audio_module::calc_filters()
+{
+    // parameters are heavily influenced by gordonjcp and his tape delay unit
+    // although, don't blame him if it sounds bad - I've messed with them too :)
+    biquad_left[0].set_lp_rbj(6000, 0.707, srate);
+    biquad_left[1].set_bp_rbj(4500, 0.250, srate);
+    biquad_right[0].copy_coeffs(biquad_left[0]);
+    biquad_right[1].copy_coeffs(biquad_left[1]);
+}
+
+/// Single delay line with feedback at the same tap
+static inline void delayline_impl(int age, int deltime, float dry_value, const float &delayed_value, float &out, float &del, gain_smoothing &amt, gain_smoothing &fb)
+{
+    // if the buffer hasn't been cleared yet (after activation), pretend we've read zeros
+    if (age <= deltime) {
+        out = 0;
+        amt.step();
+        fb.step();
+    }
+    else
+    {
+        float delayed = delayed_value; // avoid dereferencing the pointer in 'then' branch of the if()
+        dsp::sanitize(delayed);
+        out = delayed * amt.get();
+        del = dry_value + delayed * fb.get();
+    }
+}
+
+/// Single delay line with tap output
+static inline void delayline2_impl(int age, int deltime, float dry_value, const float &delayed_value, const float &delayed_value_for_fb, float &out, float &del, gain_smoothing &amt, gain_smoothing &fb)
+{
+    if (age <= deltime) {
+        out = 0;
+        amt.step();
+        fb.step();
+    }
+    else
+    {
+        out = delayed_value * amt.get();
+        del = dry_value + delayed_value_for_fb * fb.get();
+        dsp::sanitize(out);
+        dsp::sanitize(del);
+    }
+}
+
+static inline void delay_mix(float dry_left, float dry_right, float &out_left, float &out_right, float dry, float chmix)
+{
+    float tmp_left = lerp(out_left, out_right, chmix);
+    float tmp_right = lerp(out_right, out_left, chmix);
+    out_left = dry_left * dry + tmp_left;
+    out_right = dry_right * dry + tmp_right;
+}
+
+uint32_t vintage_delay_audio_module::process(uint32_t offset, uint32_t numsamples, uint32_t inputs_mask, uint32_t outputs_mask)
+{
+    uint32_t ostate = 3; // XXXKF optimize!
+    uint32_t end = offset + numsamples;
+    int orig_bufptr = bufptr;
+    float out_left, out_right, del_left, del_right;
+    
+    switch(mixmode)
+    {
+        case MIXMODE_STEREO:
+        case MIXMODE_PINGPONG:
+        {
+            int v = mixmode == MIXMODE_PINGPONG ? 1 : 0;
+            for(uint32_t i = offset; i < end; i++)
+            {                
+                delayline_impl(age, deltime_l, ins[0][i], buffers[v][(bufptr - deltime_l) & ADDR_MASK], out_left, del_left, amt_left, fb_left);
+                delayline_impl(age, deltime_r, ins[1][i], buffers[1 - v][(bufptr - deltime_r) & ADDR_MASK], out_right, del_right, amt_right, fb_right);
+                delay_mix(ins[0][i], ins[1][i], out_left, out_right, dry.get(), chmix.get());
+                
+                age++;
+                outs[0][i] = out_left; outs[1][i] = out_right; buffers[0][bufptr] = del_left; buffers[1][bufptr] = del_right;
+                bufptr = (bufptr + 1) & (MAX_DELAY - 1);
+            }
+        }
+        break;
+        
+        case MIXMODE_LR:
+        case MIXMODE_RL:
+        {
+            int v = mixmode == MIXMODE_RL ? 1 : 0;
+            int deltime_fb = deltime_l + deltime_r;
+            int deltime_l_corr = mixmode == MIXMODE_RL ? deltime_fb : deltime_l;
+            int deltime_r_corr = mixmode == MIXMODE_LR ? deltime_fb : deltime_r;
+            
+            for(uint32_t i = offset; i < end; i++)
+            {
+                delayline2_impl(age, deltime_l, ins[0][i], buffers[v][(bufptr - deltime_l_corr) & ADDR_MASK], buffers[v][(bufptr - deltime_fb) & ADDR_MASK], out_left, del_left, amt_left, fb_left);
+                delayline2_impl(age, deltime_r, ins[1][i], buffers[1 - v][(bufptr - deltime_r_corr) & ADDR_MASK], buffers[1-v][(bufptr - deltime_fb) & ADDR_MASK], out_right, del_right, amt_right, fb_right);
+                delay_mix(ins[0][i], ins[1][i], out_left, out_right, dry.get(), chmix.get());
+                
+                age++;
+                outs[0][i] = out_left; outs[1][i] = out_right; buffers[0][bufptr] = del_left; buffers[1][bufptr] = del_right;
+                bufptr = (bufptr + 1) & (MAX_DELAY - 1);
+            }
+        }
+    }
+    if (age >= MAX_DELAY)
+        age = MAX_DELAY;
+    if (medium > 0) {
+        bufptr = orig_bufptr;
+        if (medium == 2)
+        {
+            for(uint32_t i = offset; i < end; i++)
+            {
+                buffers[0][bufptr] = biquad_left[0].process_lp(biquad_left[1].process(buffers[0][bufptr]));
+                buffers[1][bufptr] = biquad_right[0].process_lp(biquad_right[1].process(buffers[1][bufptr]));
+                bufptr = (bufptr + 1) & (MAX_DELAY - 1);
+            }
+            biquad_left[0].sanitize();biquad_right[0].sanitize();
+        } else {
+            for(uint32_t i = offset; i < end; i++)
+            {
+                buffers[0][bufptr] = biquad_left[1].process(buffers[0][bufptr]);
+                buffers[1][bufptr] = biquad_right[1].process(buffers[1][bufptr]);
+                bufptr = (bufptr + 1) & (MAX_DELAY - 1);
+            }
+        }
+        biquad_left[1].sanitize();biquad_right[1].sanitize();
+        
+    }
+    return ostate;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+
+bool filter_audio_module::get_graph(int index, int subindex, float *data, int points, cairo_iface *context) const
+{
+    if (!is_active)
+        return false;
+    if (index == par_cutoff && !subindex) {
+        context->set_line_width(1.5);
+        return ::get_graph(*this, subindex, data, points);
+    }
+    return false;
+}
+
+int filter_audio_module::get_changed_offsets(int index, int generation, int &subindex_graph, int &subindex_dot, int &subindex_gridline) const
+{
+    if (fabs(inertia_cutoff.get_last() - old_cutoff) + 100 * fabs(inertia_resonance.get_last() - old_resonance) + fabs(*params[par_mode] - old_mode) > 0.1f)
+    {
+        old_cutoff = inertia_cutoff.get_last();
+        old_resonance = inertia_resonance.get_last();
+        old_mode = *params[par_mode];
+        last_generation++;
+        subindex_graph = 0;
+        subindex_dot = INT_MAX;
+        subindex_gridline = INT_MAX;
+    }
+    else {
+        subindex_graph = 0;
+        subindex_dot = subindex_gridline = generation ? INT_MAX : 0;
+    }
+    if (generation == last_calculated_generation)
+        subindex_graph = INT_MAX;
+    return last_generation;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+
+filterclavier_audio_module::filterclavier_audio_module() 
+: filter_module_with_inertia<biquad_filter_module, filterclavier_metadata>(ins, outs, params)
+, min_gain(1.0)
+, max_gain(32.0)
+, last_note(-1)
+, last_velocity(-1)
+{
+}
+    
+void filterclavier_audio_module::params_changed()
+{ 
+    inertia_filter_module::inertia_cutoff.set_inertia(
+        note_to_hz(last_note + *params[par_transpose], *params[par_detune]));
+    
+    float min_resonance = param_props[par_max_resonance].min;
+     inertia_filter_module::inertia_resonance.set_inertia( 
+             (float(last_velocity) / 127.0)
+             // 0.001: see below
+             * (*params[par_max_resonance] - min_resonance + 0.001)
+             + min_resonance);
+         
+    adjust_gain_according_to_filter_mode(last_velocity);
+    
+    inertia_filter_module::calculate_filter(); 
+}
+
+void filterclavier_audio_module::activate()
+{
+    inertia_filter_module::activate();
+}
+
+void filterclavier_audio_module::set_sample_rate(uint32_t sr)
+{
+    inertia_filter_module::set_sample_rate(sr);
+}
+
+void filterclavier_audio_module::deactivate()
+{
+    inertia_filter_module::deactivate();
+}
+
+
+void filterclavier_audio_module::note_on(int note, int vel)
+{
+    last_note     = note;
+    last_velocity = vel;
+    inertia_filter_module::inertia_cutoff.set_inertia(
+            note_to_hz(note + *params[par_transpose], *params[par_detune]));
+
+    float min_resonance = param_props[par_max_resonance].min;
+    inertia_filter_module::inertia_resonance.set_inertia( 
+            (float(vel) / 127.0) 
+            // 0.001: if the difference is equal to zero (which happens
+            // when the max_resonance knom is at minimum position
+            // then the filter gain doesnt seem to snap to zero on most note offs
+            * (*params[par_max_resonance] - min_resonance + 0.001) 
+            + min_resonance);
+    
+    adjust_gain_according_to_filter_mode(vel);
+    
+    inertia_filter_module::calculate_filter();
+}
+
+void filterclavier_audio_module::note_off(int note, int vel)
+{
+    if (note == last_note) {
+        inertia_filter_module::inertia_resonance.set_inertia(param_props[par_max_resonance].min);
+        inertia_filter_module::inertia_gain.set_inertia(min_gain);
+        inertia_filter_module::calculate_filter();
+        last_velocity = 0;
+    }
+}
+
+void filterclavier_audio_module::adjust_gain_according_to_filter_mode(int velocity)
+{
+    int   mode = dsp::fastf2i_drm(*params[par_mode]);
+    
+    // for bandpasses: boost gain for velocities > 0
+    if ( (mode_6db_bp <= mode) && (mode <= mode_18db_bp) ) {
+        // gain for velocity 0:   1.0
+        // gain for velocity 127: 32.0
+        float mode_max_gain = max_gain;
+        // max_gain is right for mode_6db_bp
+        if (mode == mode_12db_bp)
+            mode_max_gain /= 6.0;
+        if (mode == mode_18db_bp)
+            mode_max_gain /= 10.5;
+        
+        inertia_filter_module::inertia_gain.set_now(
+                (float(velocity) / 127.0) * (mode_max_gain - min_gain) + min_gain);
+    } else {
+        inertia_filter_module::inertia_gain.set_now(min_gain);
+    }
+}
+
+bool filterclavier_audio_module::get_graph(int index, int subindex, float *data, int points, cairo_iface *context) const
+{
+    if (!is_active || index != par_mode) {
+        return false;
+    }
+    if (!subindex) {
+        context->set_line_width(1.5);
+        return ::get_graph(*this, subindex, data, points);
+    }
+    return false;
 }
 

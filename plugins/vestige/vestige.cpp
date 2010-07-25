@@ -51,7 +51,7 @@ static const char * __supportedExts[] =
 extern "C"
 {
 
-Plugin::Descriptor vestige_plugin_descriptor =
+Plugin::Descriptor PLUGIN_EXPORT vestige_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"VeSTige",
@@ -360,6 +360,11 @@ void VestigeInstrumentView::openPlugin()
 		engine::getMixer()->lock();
 		m_vi->loadFile( ofd.selectedFiles()[0] );
 		engine::getMixer()->unlock();
+		if( m_vi->m_plugin && m_vi->m_plugin->pluginWidget() )
+		{
+			m_vi->m_plugin->pluginWidget()->setWindowIcon(
+									PLUGIN_NAME::getIconPixmap( "logo" ) );
+		}
 	}
 }
 
@@ -448,8 +453,8 @@ void VestigeInstrumentView::paintEvent( QPaintEvent * )
 extern "C"
 {
 
-// neccessary for getting instance out of shared lib
-Plugin * lmms_plugin_main( Model *, void * _data )
+// necessary for getting instance out of shared lib
+Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, void * _data )
 {
 	return new vestigeInstrument( static_cast<InstrumentTrack *>( _data ) );
 }
