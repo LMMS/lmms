@@ -1072,9 +1072,12 @@ bool RemotePluginClient::processMessage( const message & _m )
 			break;
 
 		default:
-			fprintf( stderr, "undefined message: %d\n",
-							(int) _m.id );
+		{
+			char buf[64];
+			sprintf( buf, "undefined message: %d\n", (int) _m.id );
+			debugMessage( buf );
 			break;
+		}
 	}
 	if( reply )
 	{
@@ -1097,7 +1100,7 @@ void RemotePluginClient::setShmKey( key_t _key, int _size )
 	}
 	else
 	{
-		fprintf( stderr, "failed getting shared memory\n" );
+		debugMessage( "failed getting shared memory\n" );
 	}
 #else
 	if( m_shm != NULL )
@@ -1115,7 +1118,7 @@ void RemotePluginClient::setShmKey( key_t _key, int _size )
 	int shm_id = shmget( _key, _size, 0 );
 	if( shm_id == -1 )
 	{
-		fprintf( stderr, "failed getting shared memory\n" );
+		debugMessage( "failed getting shared memory\n" );
 	}
 	else
 	{
@@ -1134,6 +1137,10 @@ void RemotePluginClient::doProcessing()
 		process( (sampleFrame *)( m_inputCount > 0 ? m_shm : NULL ),
 				(sampleFrame *)( m_shm +
 					( m_inputCount*m_bufferSize ) ) );
+	}
+	else
+	{
+		debugMessage( "doProcessing(): have no shared memory!\n" );
 	}
 }
 

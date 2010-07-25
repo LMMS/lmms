@@ -1,7 +1,7 @@
 /*
  * LocalZynAddSubFx.cpp - local implementation of ZynAddSubFx plugin
  *
- * Copyright (c) 2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2009-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -163,6 +163,18 @@ void LocalZynAddSubFx::setPresetDir( const std::string & _dir )
 	}
 }
 
+
+
+
+void LocalZynAddSubFx::setLmmsWorkingDir( const std::string & _dir )
+{
+	if( config.workingDir != NULL )
+	{
+		free( config.workingDir );
+	}
+	config.workingDir = strdup( _dir.c_str() );
+	config.init();
+}
 
 
 

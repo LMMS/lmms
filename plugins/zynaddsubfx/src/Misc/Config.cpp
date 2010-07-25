@@ -32,7 +32,8 @@
 #include "Config.h"
 #include "XMLwrapper.h"
 
-Config::Config()
+Config::Config() :
+	workingDir( NULL )
 {}
 void Config::init()
 {
@@ -392,10 +393,17 @@ void Config::saveConfig(const char *filename)
 void Config::getConfigFileName(char *name, int namesize)
 {
     name[0] = 0;
+	if( workingDir != NULL )
+	{
+		snprintf(name, namesize, "%s%s", workingDir, ".zynaddsubfxXML.cfg");
+	}
+	else
+	{
 #ifdef OS_LINUX
     snprintf(name, namesize, "%s%s", getenv("HOME"), "/.zynaddsubfxXML.cfg");
 #else
     snprintf(name, namesize, "%s", "zynaddsubfxXML.cfg");
 #endif
+	}
 }
 
