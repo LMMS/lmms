@@ -2,9 +2,5 @@ SET(MINGW_PREFIX /opt/mingw32)
 
 SET(CMAKE_SYSTEM_PROCESSOR i686)
 
-SET(CMAKE_C_FLAGS "-march=i686 -mtune=generic")
-SET(CMAKE_CXX_FLAGS ${CMAKE_C_FLAGS})
-
-
 INCLUDE(MinGWCrossCompile)
 

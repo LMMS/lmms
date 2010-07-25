@@ -1,4 +1,6 @@
 MINGW=/opt/mingw32
 export PATH=$PATH:$MINGW/bin
+export CFLAGS="-march=pentium3 -mtune=generic -mpreferred-stack-boundary=5 -fno-tree-vectorize"
+export CXXFLAGS="$CFLAGS"
 cmake .. -DCMAKE_TOOLCHAIN_FILE=../cmake/modules/Win32Toolchain.cmake -DCMAKE_MODULE_PATH=`pwd`/../cmake/modules/
 
