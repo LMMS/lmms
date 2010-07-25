@@ -44,6 +44,7 @@ public:
 	void loadPreset( const std::string & _filename, int _part = 0 );
 
 	void setPresetDir( const std::string & _dir );
+	void setLmmsWorkingDir( const std::string & _dir );
 
 	void processMidiEvent( const midiEvent & _e );
 
