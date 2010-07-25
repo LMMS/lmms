@@ -45,7 +45,7 @@
 **		long int lrint  (double x) ;
 */
 
-#include "config.h"
+#include "src_config.h"
 
 /*
 **	The presence of the required functions are detected during the configure
