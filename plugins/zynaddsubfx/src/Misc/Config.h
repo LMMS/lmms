@@ -52,6 +52,8 @@ class Config
         int winwavemax, winmidimax; //number of wave/midi devices on Windows
         int maxstringsize;
 
+		char * workingDir;
+
         struct winmidionedevice {
             char *name;
         };

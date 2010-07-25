@@ -115,6 +115,10 @@ public:
 				LocalZynAddSubFx::setPresetDir( _m.getString() );
 				break;
 
+			case IdZasfLmmsWorkingDirectory:
+				LocalZynAddSubFx::setLmmsWorkingDir( _m.getString() );
+				break;
+
 			default:
 				return RemotePluginClient::processMessage( _m );
 		}

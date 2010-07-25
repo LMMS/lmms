@@ -1,7 +1,7 @@
 /*
  * ZynAddSubFx.cpp - ZynAddSubxFX-embedding plugin
  *
- * Copyright (c) 2008-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -322,6 +322,11 @@ void ZynAddSubFxInstrument::initPlugin()
 					QSTR_TO_STDSTR(
 						QString( configManager::inst()->factoryPresetsDir() +
 								QDir::separator() + "ZynAddSubFX" ) ) ) );
+		m_remotePlugin->sendMessage(
+			RemotePlugin::message( IdZasfLmmsWorkingDirectory ).
+				addString(
+					QSTR_TO_STDSTR(
+						QString( configManager::inst()->workingDir() ) ) ) );
 		m_remotePlugin->showUI();
 		m_remotePlugin->unlock();
 	}
