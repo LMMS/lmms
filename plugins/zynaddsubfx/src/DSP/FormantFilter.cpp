@@ -1,7 +1,7 @@
 /*
   ZynAddSubFX - a software synthesizer
 
-  FormantFilter.C - formant filters
+  FormantFilter.cpp - formant filters
   Copyright (C) 2002-2005 Nasca Octavian Paul
   Author: Nasca Octavian Paul
 

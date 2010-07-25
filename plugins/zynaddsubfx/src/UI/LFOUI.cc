@@ -57,11 +57,11 @@ Fl_Menu_Item LFOUI::menu_LFOtype[] = {
  {0,0,0,0,0,0,0,0,0}
 };
 
-void LFOUI::cb_continuous_i(Fl_Check_Button* o, void*) {
-  pars->Pcontinuous=(int)o->value();
+void LFOUI::cb_continous_i(Fl_Check_Button* o, void*) {
+  pars->Pcontinous=(int)o->value();
 }
-void LFOUI::cb_continuous(Fl_Check_Button* o, void* v) {
-  ((LFOUI*)(o->parent()->parent()->user_data()))->cb_continuous_i(o,v);
+void LFOUI::cb_continous(Fl_Check_Button* o, void* v) {
+  ((LFOUI*)(o->parent()->parent()->user_data()))->cb_continous_i(o,v);
 }
 
 void LFOUI::cb_freqrand_i(WidgetPDial* o, void*) {
@@ -203,13 +203,13 @@ Fl_Group* LFOUI::make_window() {
         LFOtype->align(Fl_Align(FL_ALIGN_BOTTOM));
         LFOtype->menu(menu_LFOtype);
       } // Fl_Choice* LFOtype
-      { continuous = new Fl_Check_Button(165, 35, 15, 15, "C.");
-        continuous->tooltip("Continuous LFO");
-        continuous->down_box(FL_DOWN_BOX);
-        continuous->labelsize(10);
-        continuous->callback((Fl_Callback*)cb_continuous);
-        continuous->align(Fl_Align(FL_ALIGN_BOTTOM));
-      } // Fl_Check_Button* continuous
+      { continous = new Fl_Check_Button(165, 35, 15, 15, "C.");
+        continous->tooltip("Continous LFO");
+        continous->down_box(FL_DOWN_BOX);
+        continous->labelsize(10);
+        continous->callback((Fl_Callback*)cb_continous);
+        continous->align(Fl_Align(FL_ALIGN_BOTTOM));
+      } // Fl_Check_Button* continous
       { freqrand = new WidgetPDial(205, 7, 20, 20, "F.R.");
         freqrand->tooltip("LFO Frequency Randomness");
         freqrand->box(FL_ROUND_UP_BOX);
@@ -268,7 +268,7 @@ void LFOUI::refresh() {
 intensity->value(pars->Pintensity);
 startphase->value(pars->Pstartphase);
 delay->value(pars->Pdelay);
-continuous->value(pars->Pcontinuous);
+continous->value(pars->Pcontinous);
 stretch->value(pars->Pstretch);
 randomness->value(pars->Prandomness);
 freqrand->value(pars->Pfreqrand);

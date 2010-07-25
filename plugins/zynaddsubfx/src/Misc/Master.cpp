@@ -1,7 +1,7 @@
 /*
   ZynAddSubFX - a software synthesizer
 
-  Master.C - It sends Midi Messages to Parts, receives samples from parts,
+  Master.cpp - It sends Midi Messages to Parts, receives samples from parts,
              process them with system/insertion effects and mix them
   Copyright (C) 2002-2005 Nasca Octavian Paul
   Author: Nasca Octavian Paul

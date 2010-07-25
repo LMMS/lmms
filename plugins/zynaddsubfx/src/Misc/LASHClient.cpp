@@ -1,7 +1,7 @@
 /*
   ZynAddSubFX - a software synthesizer
 
-  LASHClient.C - LASH support
+  LASHClient.cpp - LASH support
   Copyright (C) 2006-2009 Lars Luthman
   Author: Lars Luthman
 

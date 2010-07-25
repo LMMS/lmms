@@ -1,7 +1,7 @@
 /*
   ZynAddSubFX - a software synthesizer
 
-  NULLMidiIn.C - a dummy Midi port
+  NULLMidiIn.cpp - a dummy Midi port
   Copyright (C) 2002-2005 Nasca Octavian Paul
   Author: Nasca Octavian Paul
 

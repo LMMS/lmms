@@ -1,7 +1,7 @@
 /*
   ZynAddSubFX - a software synthesizer
 
-  Util.C - Miscellaneous functions
+  Util.cpp - Miscellaneous functions
   Copyright (C) 2002-2005 Nasca Octavian Paul
   Author: Nasca Octavian Paul
 
@@ -112,4 +112,19 @@ bool fileexists(const char *filename)
 
     return false;
 }
+
+void invSignal(REALTYPE *sig, size_t len)
+{
+    for(int i = 0; i < len; i++)
+        sig[i] *= -1.0f;
+}
+
+void crossover(REALTYPE &a, REALTYPE &b, REALTYPE crossover)
+{
+    REALTYPE tmpa = a;
+    REALTYPE tmpb = b;
+    a = tmpa * (1.0 - crossover) + tmpb * crossover;
+    b = tmpb * (1.0 - crossover) + tmpa * crossover;
+}
+
 

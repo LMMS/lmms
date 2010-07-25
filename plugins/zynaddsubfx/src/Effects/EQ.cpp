@@ -1,7 +1,7 @@
 /*
   ZynAddSubFX - a software synthesizer
 
-  EQ.C - EQ effect
+  EQ.cpp - EQ effect
   Copyright (C) 2002-2005 Nasca Octavian Paul
   Author: Nasca Octavian Paul
 
@@ -45,9 +45,6 @@ EQ::EQ(const int &insertion_, REALTYPE *efxoutl_, REALTYPE *efxoutr_)
 EQ::~EQ()
 {}
 
-/*
- * Cleanup the effect
- */
 void EQ::cleanup()
 {
     for(int i = 0; i < MAX_EQ_BANDS; i++) {
@@ -56,17 +53,12 @@ void EQ::cleanup()
     }
 }
 
-
-
-/*
- * Effect output
- */
-void EQ::out(REALTYPE *smpsl, REALTYPE *smpsr)
+void EQ::out(const Stereo<float *> &smp)
 {
     int i;
     for(i = 0; i < SOUND_BUFFER_SIZE; i++) {
-        efxoutl[i] = smpsl[i] * volume;
-        efxoutr[i] = smpsr[i] * volume;
+        efxoutl[i] = smp.l[i] * volume;
+        efxoutr[i] = smp.r[i] * volume;
     }
 
     for(i = 0; i < MAX_EQ_BANDS; i++) {
@@ -81,7 +73,7 @@ void EQ::out(REALTYPE *smpsl, REALTYPE *smpsr)
 /*
  * Parameter control
  */
-void EQ::setvolume(const unsigned char &Pvolume)
+void EQ::setvolume(unsigned char Pvolume)
 {
     this->Pvolume = Pvolume;
 
@@ -113,7 +105,7 @@ void EQ::setpreset(unsigned char npreset)
 }
 
 
-void EQ::changepar(const int &npar, const unsigned char &value)
+void EQ::changepar(int npar, unsigned char value)
 {
     switch(npar) {
     case 0:
@@ -167,7 +159,7 @@ void EQ::changepar(const int &npar, const unsigned char &value)
     }
 }
 
-unsigned char EQ::getpar(const int &npar) const
+unsigned char EQ::getpar(int npar) const
 {
     switch(npar) {
     case 0:

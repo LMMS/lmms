@@ -11,8 +11,7 @@ decl {\#include <stdio.h>} {public
 decl {\#include <stdlib.h>} {public
 } 
 
-decl {\#include "../Params/PresetsArray.h"} {selected
-} 
+decl {\#include "../Params/PresetsArray.h"} {} 
 
 decl {\#include "../Params/Presets.h"} {public
 } 
@@ -190,12 +189,14 @@ paste(p,pui);} {}
 pastebrowse->clear();
 p->rescanforpresets();
 
-for (int i=0;i<MAX_PRESETS;i++){
-   char *name=presetsstore.presets[i].name;
-   if (name==NULL) break;
-   copybrowse->add(name);
-   pastebrowse->add(name);
-};} {}
+for (int i=0;i<presetsstore.presets.size();i++){
+   std::string name=presetsstore.presets[i].name;
+   if(name.empty())
+       continue;
+   copybrowse->add(name.c_str());
+   pastebrowse->add(name.c_str());
+};} {selected
+    }
   }
   decl {Presets *p;} {public
   }

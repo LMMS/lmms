@@ -261,11 +261,12 @@ void PresetsUI::rescan() {
 pastebrowse->clear();
 p->rescanforpresets();
 
-for (int i=0;i<MAX_PRESETS;i++){
-   char *name=presetsstore.presets[i].name;
-   if (name==NULL) break;
-   copybrowse->add(name);
-   pastebrowse->add(name);
+for (int i=0;i<presetsstore.presets.size();i++){
+   std::string name=presetsstore.presets[i].name;
+   if(name.empty())
+       continue;
+   copybrowse->add(name.c_str());
+   pastebrowse->add(name.c_str());
 };
 }
 PresetsUI *presetsui; 

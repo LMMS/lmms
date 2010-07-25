@@ -1,7 +1,7 @@
 /*
   ZynAddSubFX - a software synthesizer
 
-  Controller.C - (Midi) Controllers implementation
+  Controller.cpp - (Midi) Controllers implementation
   Copyright (C) 2002-2005 Nasca Octavian Paul
   Author: Nasca Octavian Paul
 

@@ -1,7 +1,7 @@
 /*
   ZynAddSubFX - a software synthesizer
 
-  ALSAMidiIn.C - Midi input for ALSA (this creates an ALSA virtual port)
+  ALSAMidiIn.cpp - Midi input for ALSA (this creates an ALSA virtual port)
   Copyright (C) 2002-2005 Nasca Octavian Paul
   Author: Nasca Octavian Paul
 

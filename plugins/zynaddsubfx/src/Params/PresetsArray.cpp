@@ -1,7 +1,7 @@
 /*
   ZynAddSubFX - a software synthesizer
 
-  PresetsArray.C - PresetsArray and Clipboard management
+  PresetsArray.cpp - PresetsArray and Clipboard management
   Copyright (C) 2002-2005 Nasca Octavian Paul
   Author: Nasca Octavian Paul
 

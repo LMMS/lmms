@@ -37,7 +37,6 @@
 #include "../Params/FilterParams.h"
 #include "../Params/Presets.h"
 
-
 /**Effect manager, an interface betwen the program and effects*/
 class EffectMgr:public Presets
 {

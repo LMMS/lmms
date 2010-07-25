@@ -42,6 +42,10 @@ extern REALTYPE *denormalkillbuf; /**<the buffer to add noise in order to avoid 
 
 extern Config config;
 
+void invSignal(REALTYPE *sig, size_t len);
+
+void crossover(REALTYPE &a, REALTYPE &b, REALTYPE crossover);
+
 template<class T>
 std::string stringFrom(T x)
 {
@@ -58,6 +62,12 @@ T stringTo(const char *x)
     T ans;
     ss >> ans;
     return ans;
+}
+
+template <class T>
+T limit(T val, T min, T max)
+{
+    return (val < min ? min : (val > max ? max : val));
 }
 
 #endif

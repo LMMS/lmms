@@ -251,6 +251,12 @@ private:
   void cb_phaserp3_i(WidgetPDial*, void*);
   static void cb_phaserp3(WidgetPDial*, void*);
 public:
+  Fl_Choice *phaserp4;
+private:
+  void cb_phaserp4_i(Fl_Choice*, void*);
+  static void cb_phaserp4(Fl_Choice*, void*);
+  static Fl_Menu_Item menu_phaserp4[];
+public:
   WidgetPDial *phaserp5;
 private:
   void cb_phaserp5_i(WidgetPDial*, void*);
@@ -266,6 +272,11 @@ private:
   void cb_phaserp7_i(WidgetPDial*, void*);
   static void cb_phaserp7(WidgetPDial*, void*);
 public:
+  Fl_Counter *phaserp8;
+private:
+  void cb_phaserp8_i(Fl_Counter*, void*);
+  static void cb_phaserp8(Fl_Counter*, void*);
+public:
   WidgetPDial *phaserp9;
 private:
   void cb_phaserp9_i(WidgetPDial*, void*);
@@ -276,21 +287,25 @@ private:
   void cb_phaserp10_i(Fl_Check_Button*, void*);
   static void cb_phaserp10(Fl_Check_Button*, void*);
 public:
-  Fl_Choice *phaserp4;
-private:
-  void cb_phaserp4_i(Fl_Choice*, void*);
-  static void cb_phaserp4(Fl_Choice*, void*);
-  static Fl_Menu_Item menu_phaserp4[];
-public:
-  Fl_Counter *phaserp8;
-private:
-  void cb_phaserp8_i(Fl_Counter*, void*);
-  static void cb_phaserp8(Fl_Counter*, void*);
-public:
   WidgetPDial *phaserp11;
 private:
   void cb_phaserp11_i(WidgetPDial*, void*);
   static void cb_phaserp11(WidgetPDial*, void*);
+public:
+  Fl_Check_Button *phaserp12;
+private:
+  void cb_phaserp12_i(Fl_Check_Button*, void*);
+  static void cb_phaserp12(Fl_Check_Button*, void*);
+public:
+  WidgetPDial *phaserp13;
+private:
+  void cb_phaserp13_i(WidgetPDial*, void*);
+  static void cb_phaserp13(WidgetPDial*, void*);
+public:
+  Fl_Check_Button *phaserp14;
+private:
+  void cb_phaserp14_i(Fl_Check_Button*, void*);
+  static void cb_phaserp14(Fl_Check_Button*, void*);
 public:
   Fl_Group* make_alienwah_window();
   Fl_Group *effalienwahwindow;

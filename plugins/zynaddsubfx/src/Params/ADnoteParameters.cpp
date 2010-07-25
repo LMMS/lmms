@@ -1,7 +1,7 @@
 /*
   ZynAddSubFX - a software synthesizer
 
-  ADnoteParameters.C - Parameters for ADnote (ADsynth)
+  ADnoteParameters.cpp - Parameters for ADnote (ADsynth)
   Copyright (C) 2002-2005 Nasca Octavian Paul
   Author: Nasca Octavian Paul
 

@@ -1,7 +1,7 @@
 /*
   ZynAddSubFX - a software synthesizer
 
-  JACKaudiooutput.C - Audio output for JACK
+  JACKaudiooutput.cpp - Audio output for JACK
   Copyright (C) 2002 Nasca Octavian Paul
   Author: Nasca Octavian Paul
 

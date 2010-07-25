@@ -1,7 +1,7 @@
 /*
   ZynAddSubFX - a software synthesizer
 
-  OSSMidiIn.C - Midi input for Open Sound System
+  OSSMidiIn.cpp - Midi input for Open Sound System
   Copyright (C) 2002-2005 Nasca Octavian Paul
   Author: Nasca Octavian Paul
 

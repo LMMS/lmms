@@ -1,7 +1,7 @@
 /*
   ZynAddSubFX - a software synthesizer
 
-  MIDIEvents.C - It stores the midi events from midi file or sequencer
+  MIDIEvents.cpp - It stores the midi events from midi file or sequencer
   Copyright (C) 2003-2005 Nasca Octavian Paul
   Author: Nasca Octavian Paul
 

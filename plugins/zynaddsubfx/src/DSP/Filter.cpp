@@ -1,7 +1,7 @@
 /*
   ZynAddSubFX - a software synthesizer
 
-  Filter.C - Filters, uses analog,formant,etc. filters
+  Filter.cpp - Filters, uses analog,formant,etc. filters
   Copyright (C) 2002-2005 Nasca Octavian Paul
   Author: Nasca Octavian Paul
 

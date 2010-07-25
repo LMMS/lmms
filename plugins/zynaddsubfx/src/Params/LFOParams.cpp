@@ -1,7 +1,7 @@
 /*
   ZynAddSubFX - a software synthesizer
 
-  LFOParams.C - Parameters for LFO
+  LFOParams.cpp - Parameters for LFO
   Copyright (C) 2002-2005 Nasca Octavian Paul
   Author: Nasca Octavian Paul
 
@@ -33,7 +33,7 @@ LFOParams::LFOParams(char Pfreq_,
                      char PLFOtype_,
                      char Prandomness_,
                      char Pdelay_,
-                     char Pcontinuous_,
+                     char Pcontinous_,
                      char fel_):Presets()
 {
     switch(fel_) {
@@ -53,7 +53,7 @@ LFOParams::LFOParams(char Pfreq_,
     DLFOtype    = PLFOtype_;
     Drandomness = Prandomness_;
     Ddelay      = Pdelay_;
-    Dcontinuous  = Pcontinuous_;
+    Dcontinous  = Pcontinous_;
     fel  = fel_;
     time = 0;
 
@@ -71,7 +71,7 @@ void LFOParams::defaults()
     PLFOtype    = DLFOtype;
     Prandomness = Drandomness;
     Pdelay      = Ddelay;
-    Pcontinuous  = Dcontinuous;
+    Pcontinous  = Dcontinous;
     Pfreqrand   = 0;
     Pstretch    = 64;
 }
@@ -87,7 +87,7 @@ void LFOParams::add2XML(XMLwrapper *xml)
     xml->addpar("randomness_frequency", Pfreqrand);
     xml->addpar("delay", Pdelay);
     xml->addpar("stretch", Pstretch);
-    xml->addparbool("continuous", Pcontinuous);
+    xml->addparbool("continous", Pcontinous);
 }
 
 void LFOParams::getfromXML(XMLwrapper *xml)
@@ -100,6 +100,6 @@ void LFOParams::getfromXML(XMLwrapper *xml)
     Pfreqrand   = xml->getpar127("randomness_frequency", Pfreqrand);
     Pdelay      = xml->getpar127("delay", Pdelay);
     Pstretch    = xml->getpar127("stretch", Pstretch);
-    Pcontinuous  = xml->getparbool("continuous", Pcontinuous);
+    Pcontinous  = xml->getparbool("continous", Pcontinous);
 }
 

@@ -1,7 +1,7 @@
 /*
   ZynAddSubFX - a software synthesizer
 
-  FilterParams.C - Parameters for filter
+  FilterParams.cpp - Parameters for filter
   Copyright (C) 2002-2005 Nasca Octavian Paul
   Author: Nasca Octavian Paul
 
