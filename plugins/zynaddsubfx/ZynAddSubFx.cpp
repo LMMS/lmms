@@ -315,16 +315,16 @@ void ZynAddSubFxInstrument::initPlugin()
 		m_remotePlugin->waitForInitDone( false );
 
 		m_remotePlugin->sendMessage(
+			RemotePlugin::message( IdZasfLmmsWorkingDirectory ).
+				addString(
+					QSTR_TO_STDSTR(
+						QString( configManager::inst()->workingDir() ) ) ) );
+		m_remotePlugin->sendMessage(
 			RemotePlugin::message( IdZasfPresetDirectory ).
 				addString(
 					QSTR_TO_STDSTR(
 						QString( configManager::inst()->factoryPresetsDir() +
 								QDir::separator() + "ZynAddSubFX" ) ) ) );
-		m_remotePlugin->sendMessage(
-			RemotePlugin::message( IdZasfLmmsWorkingDirectory ).
-				addString(
-					QSTR_TO_STDSTR(
-						QString( configManager::inst()->workingDir() ) ) ) );
 		m_remotePlugin->showUI();
 		m_remotePlugin->unlock();
 	}
