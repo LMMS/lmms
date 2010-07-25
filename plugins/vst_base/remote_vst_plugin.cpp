@@ -104,7 +104,7 @@ class RemoteVstPlugin;
 
 RemoteVstPlugin * __plugin = NULL;
 
-DWORD __GuiThreadID = NULL;
+DWORD __GuiThreadID = 0;
 
 
 
