@@ -426,7 +426,7 @@ IF(NOT LMMS_HAVE_SAMPLERATE)
 		${CMAKE_SOURCE_DIR}/src/3rdparty/samplerate/mid_qual_coeffs.h
 		${CMAKE_SOURCE_DIR}/src/3rdparty/samplerate/fastest_coeffs.h
 		${CMAKE_SOURCE_DIR}/src/3rdparty/samplerate/common.h
-		${CMAKE_SOURCE_DIR}/src/3rdparty/samplerate/config.h
+		${CMAKE_SOURCE_DIR}/src/3rdparty/samplerate/src_config.h
 		${CMAKE_SOURCE_DIR}/src/3rdparty/samplerate/float_cast.h
 		${CMAKE_SOURCE_DIR}/src/3rdparty/samplerate/src_zoh.c
 		${CMAKE_SOURCE_DIR}/src/3rdparty/samplerate/src_linear.c)
