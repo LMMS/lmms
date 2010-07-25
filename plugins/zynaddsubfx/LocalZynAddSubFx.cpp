@@ -49,10 +49,9 @@ LocalZynAddSubFx::LocalZynAddSubFx()
 		pthread_win32_thread_attach_np();
 #endif
 
-		config.init();
-		OSCIL_SIZE = config.cfg.OscilSize;
+		initConfig();
 
-		config.cfg.GzipCompression = 0;
+		OSCIL_SIZE = config.cfg.OscilSize;
 
 		srand( time( NULL ) );
 		denormalkillbuf = new REALTYPE[SOUND_BUFFER_SIZE];
@@ -78,6 +77,16 @@ LocalZynAddSubFx::~LocalZynAddSubFx()
 	{
 		delete[] denormalkillbuf;
 	}
+}
+
+
+
+
+void LocalZynAddSubFx::initConfig()
+{
+	config.init();
+
+	config.cfg.GzipCompression = 0;
 }
 
 
@@ -173,7 +182,8 @@ void LocalZynAddSubFx::setLmmsWorkingDir( const std::string & _dir )
 		free( config.workingDir );
 	}
 	config.workingDir = strdup( _dir.c_str() );
-	config.init();
+
+	initConfig();
 }
 
 
