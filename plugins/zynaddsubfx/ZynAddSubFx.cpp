@@ -64,6 +64,39 @@ Plugin::Descriptor PLUGIN_EXPORT zynaddsubfx_plugin_descriptor =
 
 
 
+ZynAddSubFxRemotePlugin::ZynAddSubFxRemotePlugin() :
+	QObject(),
+	RemotePlugin( "RemoteZynAddSubFx", false )
+{
+}
+
+
+
+
+ZynAddSubFxRemotePlugin::~ZynAddSubFxRemotePlugin()
+{
+}
+
+
+
+bool ZynAddSubFxRemotePlugin::processMessage( const message & _m )
+{
+	switch( _m.id )
+	{
+		case IdHideUI:
+			emit clickedCloseButton();
+			return true;
+		default:
+			break;
+	}
+
+	return RemotePlugin::processMessage( _m );
+}
+
+
+
+
+
 ZynAddSubFxInstrument::ZynAddSubFxInstrument(
 									InstrumentTrack * _instrumentTrack ) :
 	Instrument( _instrumentTrack, &zynaddsubfx_plugin_descriptor ),
@@ -279,7 +312,7 @@ void ZynAddSubFxInstrument::initPlugin()
 
 	if( m_hasGUI )
 	{
-		m_remotePlugin = new RemotePlugin( "RemoteZynAddSubFx", false );
+		m_remotePlugin = new ZynAddSubFxRemotePlugin();
 		m_remotePlugin->lock();
 		m_remotePlugin->waitForInitDone( false );
 
@@ -402,6 +435,12 @@ void ZynAddSubFxView::toggleUI()
 	ZynAddSubFxInstrument * model = castModel<ZynAddSubFxInstrument>();
 	model->m_hasGUI = m_toggleUIButton->isChecked();
 	model->reloadPlugin();
+
+	if( model->m_remotePlugin )
+	{
+		connect( model->m_remotePlugin, SIGNAL( clickedCloseButton() ),
+					m_toggleUIButton, SLOT( toggle() ) );
+	}
 }
 
 

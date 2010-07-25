@@ -39,6 +39,24 @@ class ZynAddSubFxView;
 class notePlayHandle;
 
 
+
+class ZynAddSubFxRemotePlugin : public QObject, public RemotePlugin
+{
+	Q_OBJECT
+public:
+	ZynAddSubFxRemotePlugin();
+	virtual ~ZynAddSubFxRemotePlugin();
+
+	virtual bool processMessage( const message & _m );
+
+
+signals:
+	void clickedCloseButton();
+
+} ;
+
+
+
 class ZynAddSubFxInstrument : public Instrument
 {
 	Q_OBJECT
@@ -77,7 +95,7 @@ private:
 	bool m_hasGUI;
 	QMutex m_pluginMutex;
 	LocalZynAddSubFx * m_plugin;
-	RemotePlugin * m_remotePlugin;
+	ZynAddSubFxRemotePlugin * m_remotePlugin;
 	friend class ZynAddSubFxView;
 
 
