@@ -356,6 +356,7 @@ ENDIF(NOT LMMS_HAVE_SAMPLERATE)
 
 CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/lmmsconfig.h.in ${CMAKE_BINARY_DIR}/lmmsconfig.h)
 CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/lmms.rc.in ${CMAKE_BINARY_DIR}/lmms.rc)
+CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/plugins/zynaddsubfx/zynaddsubfx.rc.in ${CMAKE_BINARY_DIR}/plugins/zynaddsubfx/zynaddsubfx.rc)
 
 # set compiler flags
 #SET(CMAKE_BUILD_TYPE relwithdebug)

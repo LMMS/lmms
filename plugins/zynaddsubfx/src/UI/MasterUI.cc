@@ -2331,6 +2331,9 @@ configui=new ConfigUI();
 sequi=new SeqUI(master);
 
 make_window();
+#ifdef OS_WINDOWS
+masterwindow->icon((char *)LoadIcon(GetModuleHandle(NULL), "zynaddsubfx_icon"));
+#endif
 presetsui=new PresetsUI();
 setfilelabel(NULL);
 swapefftype=0;
