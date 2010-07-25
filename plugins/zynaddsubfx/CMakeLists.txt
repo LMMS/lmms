@@ -73,7 +73,6 @@ add_subdirectory(src/Effects)
 add_subdirectory(src/Params)
 add_subdirectory(src/DSP)
 add_subdirectory(src/Samples)
-add_subdirectory(src/Tests)
 
 ADD_LIBRARY(ZynAddSubFxCore SHARED LocalZynAddSubFx.cpp)
 TARGET_LINK_LIBRARIES(ZynAddSubFxCore ${ZASF_CORE_LIBS} ${FFTW3F_LIBRARIES} ${QT_LIBRARIES} -lz -lpthread)
