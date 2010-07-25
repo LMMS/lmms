@@ -158,9 +158,11 @@ void ZynAddSubFxInstrument::saveSettings( QDomDocument & _doc,
 		m_pluginMutex.unlock();
 		QByteArray a = tf.readAll();
 		QDomDocument doc( "mydoc" );
-		doc.setContent( a );
-		QDomNode n = _doc.importNode( doc.documentElement(), true );
-		_this.appendChild( n );
+		if( doc.setContent( a ) )
+		{
+			QDomNode n = _doc.importNode( doc.documentElement(), true );
+			_this.appendChild( n );
+		}
 	}
 }
 
