@@ -33,17 +33,17 @@ class EQ:public Effect
     public:
         EQ(const int &insertion_, REALTYPE *efxoutl_, REALTYPE *efxoutr_);
         ~EQ();
-        void out(REALTYPE *smpsl, REALTYPE *smpr);
+        void out(const Stereo<float *> &smp);
         void setpreset(unsigned char npreset);
-        void changepar(const int &npar, const unsigned char &value);
-        unsigned char getpar(const int &npar) const;
+        void changepar(int npar, unsigned char value);
+        unsigned char getpar(int npar) const;
         void cleanup();
         REALTYPE getfreqresponse(REALTYPE freq);
     private:
         //Parameters
         unsigned char Pvolume; /**<Volume*/
 
-        void setvolume(const unsigned char &Pvolume);
+        void setvolume(unsigned char Pvolume);
 
         struct {
             //parameters

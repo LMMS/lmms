@@ -1,5 +1,5 @@
 //
-// "$Id: fl_font_xft.cxx 6862 2009-09-13 10:15:42Z matt $"
+// "$Id: fl_font_xft.cxx 7652 2010-06-21 15:49:45Z manolo $"
 //
 // Xft font code for the Fast Light Tool Kit (FLTK).
 //
@@ -94,8 +94,7 @@ Fl_Fontdesc* fl_fonts = built_in_table;
 Fl_Font fl_font_ = 0;
 Fl_Fontsize fl_size_ = 0;
 int fl_angle_ = 0; // internal for rotating text support
-//XFontStruct* fl_xfont = 0;
-XUtf8FontStruct* fl_xfont = 0;
+Fl_XFont_On_Demand fl_xfont;
 void *fl_xftfont = 0;
 //const char* fl_encoding_ = "iso8859-1";
 const char* fl_encoding_ = "iso10646-1";
@@ -134,7 +133,7 @@ void fl_font(Fl_Font fnum, Fl_Fontsize size, int angle) {
   fl_xftfont = (void*)f->font;
 }
 
-void fl_font(Fl_Font fnum, Fl_Fontsize size) {
+void Fl_Graphics_Driver::font(Fl_Font fnum, Fl_Fontsize size) {
   fl_font(fnum,size,0);
 }
 
@@ -374,17 +373,16 @@ void fl_text_extents(const char *c, int n, int &dx, int &dy, int &w, int &h) {
 } // fl_text_extents
 
 
-#if HAVE_GL
-/* This code is used by opengl to get a bitmapped font. The original XFT-1 code
- * used XFT's "core" fonts methods to load an XFT font that was actually a
- * X-bitmap font, that could then be readily used with GL.
- * But XFT-2 does not provide that ability, and there is no easy method to use
- * an XFT font directly with GL. So...
+/* This code is used (mainly by opengl) to get a bitmapped font. The
+ * original XFT-1 code used XFT's "core" fonts methods to load an XFT
+ * font that was actually a X-bitmap font, that could then be readily
+ * used with GL.  But XFT-2 does not provide that ability, and there
+ * is no easy method to use an XFT font directly with GL. So...
 */
 
 #  if XFT_MAJOR > 1
 // This function attempts, on XFT2 systems, to find a suitable "core" Xfont
-// for GL to use, since we dont have an XglUseXftFont(...) function.
+// for GL or other bitmap font needs (we dont have an XglUseXftFont(...) function.)
 // There's probably a better way to do this. I can't believe it is this hard...
 // Anyway... This code attempts to make an XLFD out of the fltk-style font
 // name it is passed, then tries to load that font. Surprisingly, this quite
@@ -394,8 +392,8 @@ void fl_text_extents(const char *c, int n, int &dx, int &dy, int &w, int &h) {
 // If this code fails to load the requested font, it falls back through a
 // series of tried 'n tested alternatives, ultimately resorting to what the
 // original fltk code did.
-// NOTE: On my test boxes (FC6, FC7, FC8, ubuntu8.04) this works well for the 
-//       fltk "built-in" font names.
+// NOTE: On my test boxes (FC6, FC7, FC8, ubuntu8.04, 9.04, 9.10) this works 
+//       well for the fltk "built-in" font names.
 static XFontStruct* load_xfont_for_xft2(void) {
   XFontStruct* xgl_font = 0;
   int size = fl_size_;
@@ -483,7 +481,11 @@ XFontStruct* fl_xxfont() {
   return xftfont->u.core.font;
 #  endif // XFT_MAJOR > 1
 }
-#endif // HAVE_GL
+
+XFontStruct* Fl_XFont_On_Demand::value() {
+  if (!ptr) ptr = fl_xxfont();
+  return ptr;
+}
 
 #if USE_OVERLAY
 // Currently Xft does not work with colormapped visuals, so this probably
@@ -497,7 +499,7 @@ extern XVisualInfo* fl_overlay_visual;
 // still exists in an XftDraw structure. It would be nice if this is not
 // true, a lot of junk is needed to try to stop this:
 
-static XftDraw* draw;
+static XftDraw* draw_;
 static Window draw_window;
 #if USE_OVERLAY
 static XftDraw* draw_overlay;
@@ -506,36 +508,36 @@ static Window draw_overlay_window;
 
 void fl_destroy_xft_draw(Window id) {
   if (id == draw_window)
-    XftDrawChange(draw, draw_window = fl_message_window);
+    XftDrawChange(draw_, draw_window = fl_message_window);
 #if USE_OVERLAY
   if (id == draw_overlay_window)
     XftDrawChange(draw_overlay, draw_overlay_window = fl_message_window);
 #endif
 }
 
-void fl_draw(const char *str, int n, int x, int y) {
+void Fl_Graphics_Driver::draw(const char *str, int n, int x, int y) {
   if ( !current_font ) {
     fl_font(FL_HELVETICA, 14);
   }
 #if USE_OVERLAY
-  XftDraw*& draw = fl_overlay ? draw_overlay : ::draw;
+  XftDraw*& draw_ = fl_overlay ? draw_overlay : ::draw_;
   if (fl_overlay) {
-    if (!draw)
-      draw = XftDrawCreate(fl_display, draw_overlay_window = fl_window,
+    if (!draw_)
+      draw_ = XftDrawCreate(fl_display, draw_overlay_window = fl_window,
 			   fl_overlay_visual->visual, fl_overlay_colormap);
     else //if (draw_overlay_window != fl_window)
-      XftDrawChange(draw, draw_overlay_window = fl_window);
+      XftDrawChange(draw_, draw_overlay_window = fl_window);
   } else
 #endif
-  if (!draw)
-    draw = XftDrawCreate(fl_display, draw_window = fl_window,
+  if (!draw_)
+    draw_ = XftDrawCreate(fl_display, draw_window = fl_window,
 			 fl_visual->visual, fl_colormap);
   else //if (draw_window != fl_window)
-    XftDrawChange(draw, draw_window = fl_window);
+    XftDrawChange(draw_, draw_window = fl_window);
 
   Region region = fl_clip_region();
   if (region && XEmptyRegion(region)) return;
-  XftDrawSetClip(draw, region);
+  XftDrawSetClip(draw_, region);
 
   // Use fltk's color allocator, copy the results to match what
   // XftCollorAllocValue returns:
@@ -547,10 +549,10 @@ void fl_draw(const char *str, int n, int x, int y) {
   color.color.blue  = ((int)b)*0x101;
   color.color.alpha = 0xffff;
 
-  XftDrawStringUtf8(draw, &color, current_font, x, y, (XftChar8 *)str, n);
+  XftDrawStringUtf8(draw_, &color, current_font, x, y, (XftChar8 *)str, n);
 }
 
-void fl_draw(int angle, const char *str, int n, int x, int y) {
+void Fl_Graphics_Driver::draw(int angle, const char *str, int n, int x, int y) {
   fl_font(fl_font_, fl_size_, angle);
   fl_draw(str, n, (int)x, (int)y);
   fl_font(fl_font_, fl_size_);
@@ -562,24 +564,24 @@ void fl_draw(const char* str, int n, float x, float y) {
 
 static void fl_drawUCS4(const FcChar32 *str, int n, int x, int y) {
 #if USE_OVERLAY
-  XftDraw*& draw = fl_overlay ? draw_overlay : ::draw;
+  XftDraw*& draw_ = fl_overlay ? draw_overlay : ::draw_;
   if (fl_overlay) {
-    if (!draw)
-      draw = XftDrawCreate(fl_display, draw_overlay_window = fl_window,
+    if (!draw_)
+      draw_ = XftDrawCreate(fl_display, draw_overlay_window = fl_window,
 			   fl_overlay_visual->visual, fl_overlay_colormap);
     else //if (draw_overlay_window != fl_window)
-      XftDrawChange(draw, draw_overlay_window = fl_window);
+      XftDrawChange(draw_, draw_overlay_window = fl_window);
   } else
 #endif
-  if (!draw)
-    draw = XftDrawCreate(fl_display, draw_window = fl_window,
+  if (!draw_)
+    draw_ = XftDrawCreate(fl_display, draw_window = fl_window,
 			 fl_visual->visual, fl_colormap);
   else //if (draw_window != fl_window)
-    XftDrawChange(draw, draw_window = fl_window);
+    XftDrawChange(draw_, draw_window = fl_window);
 
   Region region = fl_clip_region();
   if (region && XEmptyRegion(region)) return;
-  XftDrawSetClip(draw, region);
+  XftDrawSetClip(draw_, region);
 
   // Use fltk's color allocator, copy the results to match what
   // XftCollorAllocValue returns:
@@ -591,11 +593,11 @@ static void fl_drawUCS4(const FcChar32 *str, int n, int x, int y) {
   color.color.blue  = ((int)b)*0x101;
   color.color.alpha = 0xffff;
 
-  XftDrawString32(draw, &color, current_font, x, y, (FcChar32 *)str, n);
+  XftDrawString32(draw_, &color, current_font, x, y, (FcChar32 *)str, n);
 }
 
 
-void fl_rtl_draw(const char* c, int n, int x, int y) {
+void Fl_Graphics_Driver::rtl_draw(const char* c, int n, int x, int y) {
 
 #if defined(__GNUC__)
 #warning Need to improve this XFT right to left draw function
@@ -635,5 +637,5 @@ void fl_rtl_draw(const char* c, int n, int x, int y) {
 #endif
 
 //
-// End of "$Id: fl_font_xft.cxx 6862 2009-09-13 10:15:42Z matt $"
+// End of "$Id: fl_font_xft.cxx 7652 2010-06-21 15:49:45Z manolo $"
 //

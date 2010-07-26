@@ -1,5 +1,5 @@
 //
-// "$Id: filename_ext.cxx 6641 2009-01-20 11:10:29Z fabien $"
+// "$Id: filename_ext.cxx 6986 2010-01-01 18:30:49Z greg.ercolano $"
 //
 // Filename extension routines for the Fast Light Tool Kit (FLTK).
 //
@@ -29,8 +29,14 @@
 
 #include <FL/filename.H>
 
-/**
-   Gets the extensions of a filename
+/** Gets the extensions of a filename.
+   \code
+   #include <FL/filename.H>
+   [..]
+   const char *out;
+   out = fl_filename_ext("/some/path/foo.txt");        // result: ".txt"
+   out = fl_filename_ext("/some/path/foo");            // result: NULL
+   \endcode
    \param[in] buf the filename to be parsed
    \return a pointer to the extension (including '.') if any or NULL otherwise
  */
@@ -48,5 +54,5 @@ const char *fl_filename_ext(const char *buf) {
 }
 
 //
-// End of "$Id: filename_ext.cxx 6641 2009-01-20 11:10:29Z fabien $".
+// End of "$Id: filename_ext.cxx 6986 2010-01-01 18:30:49Z greg.ercolano $".
 //

@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0107 
+version 1.0110 
 header_name {.h} 
 code_name {.cc}
 decl {//Copyright (c) 2002-2009 Nasca Octavian Paul} {} 
@@ -414,8 +414,7 @@ panellistitemgroup->redraw();} {}
 } 
 
 class MasterUI {} {
-  Function {make_window()} {selected
-  } {
+  Function {make_window()} {} {
     Fl_Window masterwindow {
       label zynaddsubfx
       callback {\#ifdef VSTAUDIOOUT
@@ -426,7 +425,7 @@ fl_alert("ZynAddSubFX could not be closed this way, because it's a VST plugin. P
     *exitprogram=1;
 //};
 \#endif}
-      xywh {31 206 390 465} type Double hide xclass zynaddsubfx
+      xywh {585 104 390 465} type Double xclass zynaddsubfx visible
     } {
       Fl_Menu_Bar mastermenu {
         xywh {-5 0 690 25}
@@ -689,7 +688,7 @@ pthread_mutex_unlock(&master->mutex);}
         xywh {0 80 390 160}
       } {
         Fl_Group {} {
-          label {System Effects} open
+          label {System Effects}
           xywh {0 100 390 140} box ENGRAVED_FRAME labeltype EMBOSSED_LABEL labelsize 15 align 25
         } {
           Fl_Counter syseffnocounter {
@@ -1305,7 +1304,7 @@ o->redraw();}
         } {
           Fl_Group {} {
             label {System Effects}
-            xywh {345 55 245 155} box ENGRAVED_FRAME labelfont 1 labelsize 12 align 18
+            xywh {345 55 245 155} box ENGRAVED_FRAME labelfont 1 labelsize 12 align 18 hide
           } {
             Fl_Counter simplesyseffnocounter {
               label {Sys.Effect No.}
@@ -1387,7 +1386,7 @@ pthread_mutex_unlock(&master->mutex);}
           }
           Fl_Group {} {
             label {Insertion Effects}
-            xywh {345 55 245 155} box ENGRAVED_FRAME labelfont 1 labelsize 12 align 18 hide
+            xywh {345 55 245 155} box ENGRAVED_FRAME labelfont 1 labelsize 12 align 18
           } {
             Fl_Counter simpleinseffnocounter {
               label {Ins.Effect No.}
@@ -1415,7 +1414,7 @@ if (master->Pinsparts[ninseff]!=-1) {
 master->insefx[ninseff]->changeeffect((int) o->value());
 pthread_mutex_unlock(&master->mutex);
 simpleinseffectui->refresh(master->insefx[ninseff]);
-simpleinseffectui->show();}
+simpleinseffectui->show();} selected
               xywh {515 80 70 15} down_box BORDER_BOX labelsize 10 align 5
               code0 {o->value(master->insefx[ninseff]->geteffect());}
               code1 {if (master->Pinsparts[ninseff]== -1) o->deactivate();}

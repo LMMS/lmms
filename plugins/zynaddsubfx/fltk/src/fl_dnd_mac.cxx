@@ -1,5 +1,5 @@
 //
-// "$Id: fl_dnd_mac.cxx 6755 2009-04-12 13:48:03Z matt $"
+// "$Id: fl_dnd_mac.cxx 7563 2010-04-28 03:15:47Z greg.ercolano $"
 //
 // Drag & Drop code for the Fast Light Tool Kit (FLTK).
 //
@@ -20,7 +20,9 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
 // USA.
 //
-// Please report all bugs and problems to "fltk-bugs@fltk.org
+// Please report all bugs and problems on the following page:
+//
+//     http://www.fltk.org/str.php
 
 // This file contains MacOS-specific code for fltk which is always linked
 // in.  Search other files for "__APPLE__" or filenames ending in _mac.cxx
@@ -46,45 +48,11 @@ extern int fl_selection_length;
  */
 int Fl::dnd()
 {
-  OSErr result;
-  DragReference dragRef;
-  result = NewDrag( &dragRef );
-  if ( result != noErr ) return false;
-  
-  result = AddDragItemFlavor( dragRef, 1, 'utf8', fl_selection_buffer, fl_selection_length, 0 );
-  if ( result != noErr ) { DisposeDrag( dragRef ); return false; }
-  
-  Point mp;
-  GetMouse(&mp);
-  LocalToGlobal( &mp );
-  RgnHandle region = NewRgn();
-  SetRectRgn( region, mp.h-10, mp.v-10, mp.h+10, mp.v+10 );
-  RgnHandle r2 = NewRgn();
-  SetRectRgn( r2, mp.h-8, mp.v-8, mp.h+8, mp.v+8 );
-  DiffRgn( region, r2, region );
-  DisposeRgn( r2 );
-
-  EventRecord event;
-  ConvertEventRefToEventRecord( fl_os_event, &event );
-  result = TrackDrag( dragRef, &event, region );
-
-  Fl_Widget *w = Fl::pushed();
-  if ( w )
-  {
-    int old_event = Fl::e_number;
-    w->handle(Fl::e_number = FL_RELEASE);
-    Fl::e_number = old_event;
-    Fl::pushed( 0 );
-  }
-
-  if ( result != noErr ) { DisposeRgn( region ); DisposeDrag( dragRef ); return false; }
-  
-  DisposeRgn( region );
-  DisposeDrag( dragRef );
-  return true;
+  extern int MACpreparedrag(void);
+  return MACpreparedrag();
 }
   
 
 //
-// End of "$Id: fl_dnd_mac.cxx 6755 2009-04-12 13:48:03Z matt $".
+// End of "$Id: fl_dnd_mac.cxx 7563 2010-04-28 03:15:47Z greg.ercolano $".
 //

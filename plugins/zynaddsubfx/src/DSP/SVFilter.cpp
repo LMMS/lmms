@@ -1,7 +1,7 @@
 /*
   ZynAddSubFX - a software synthesizer
 
-  SVFilter.C - Several state-variable filters
+  SVFilter.cpp - Several state-variable filters
   Copyright (C) 2002-2005 Nasca Octavian Paul
   Author: Nasca Octavian Paul
 

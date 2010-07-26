@@ -1,5 +1,5 @@
 //
-// "$Id: x.H 6614 2009-01-01 16:11:32Z matt $"
+// "$Id: x.H 7671 2010-07-09 17:31:33Z manolo $"
 //
 // X11 header file for the Fast Light Tool Kit (FLTK).
 //
@@ -65,11 +65,35 @@ extern FL_EXPORT int fl_screen;
 extern FL_EXPORT XVisualInfo *fl_visual;
 extern FL_EXPORT Colormap fl_colormap;
 
+// access to core fonts:
+// This class provides a "smart pointer" that returns a pointer to an XFontStruct.
+// The global variable fl_xfont can be called wherever a bitmap "core" font is
+// needed, e.g. when rendering to a GL context under X11.
+// With Xlib / X11 fonts, fl_xfont will return the current selected font.
+// With XFT / X11 fonts, fl_xfont will attempt to return the bitmap "core" font most
+// similar to (usually the same as) the current XFT font.
+class Fl_XFont_On_Demand
+{
+public:
+  Fl_XFont_On_Demand(XFontStruct* p = NULL) : ptr(p) { }
+  Fl_XFont_On_Demand& operator=(const Fl_XFont_On_Demand& x)
+    { ptr = x.ptr;  return *this; }
+  Fl_XFont_On_Demand& operator=(XFontStruct* p)
+    { ptr = p;  return *this; }
+  XFontStruct* value();
+  operator XFontStruct*() { return value(); }
+  XFontStruct& operator*() { return *value(); }
+  XFontStruct* operator->() { return value(); }
+  bool operator==(const Fl_XFont_On_Demand& x) { return ptr == x.ptr; }
+  bool operator!=(const Fl_XFont_On_Demand& x) { return ptr != x.ptr; }
+private:
+  XFontStruct *ptr;
+};
+extern FL_EXPORT Fl_XFont_On_Demand fl_xfont;
+
 // drawing functions:
 extern FL_EXPORT GC fl_gc;
 extern FL_EXPORT Window fl_window;
-//extern FL_EXPORT XFontStruct* fl_xfont;
-extern FL_EXPORT XUtf8FontStruct* fl_xfont;
 extern FL_EXPORT void *fl_xftfont;
 FL_EXPORT ulong fl_xpixel(Fl_Color i);
 FL_EXPORT ulong fl_xpixel(uchar r, uchar g, uchar b);
@@ -86,16 +110,20 @@ extern FL_EXPORT ulong fl_event_time;
 
 // off-screen pixmaps: create, destroy, draw into, copy to window:
 typedef ulong Fl_Offscreen;
-#define fl_create_offscreen(w,h) \
-  XCreatePixmap(fl_display, fl_window, w, h, fl_visual->depth)
+#   define fl_create_offscreen(w,h) \
+  XCreatePixmap(fl_display, \
+	      (fl_surface->type() == Fl_Display_Device::device_type ? \
+	      fl_window : fl_xid(Fl::first_window()) ) , \
+	      w, h, fl_visual->depth)
 // begin/end are macros that save the old state in local variables:
 #    define fl_begin_offscreen(pixmap) \
-  Window _sw=fl_window; fl_window=pixmap; fl_push_no_clip()
+  Window _sw=fl_window; fl_window=pixmap; \
+  Fl_Surface_Device *_ss = fl_surface; fl_display_device->set_current(); \
+  fl_push_no_clip()
 #    define fl_end_offscreen() \
-  fl_pop_clip(); fl_window = _sw
+  fl_pop_clip(); fl_window = _sw; _ss->set_current()
 
-#    define fl_copy_offscreen(x,y,w,h,pixmap,srcx,srcy) \
-  XCopyArea(fl_display, pixmap, fl_window, fl_gc, srcx, srcy, w, h, x, y)
+extern void fl_copy_offscreen(int x, int y, int w, int h, Fl_Offscreen pixmap, int srcx, int srcy);
 #    define fl_delete_offscreen(pixmap) XFreePixmap(fl_display, pixmap)
 
 // Bitmap masks
@@ -145,5 +173,5 @@ extern FL_EXPORT int fl_parse_color(const char* p, uchar& r, uchar& g, uchar& b)
 #endif
 
 //
-// End of "$Id: x.H 6614 2009-01-01 16:11:32Z matt $".
+// End of "$Id: x.H 7671 2010-07-09 17:31:33Z manolo $".
 //

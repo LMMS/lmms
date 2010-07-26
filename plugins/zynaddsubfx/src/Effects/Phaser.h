@@ -3,7 +3,11 @@
 
   Phaser.h - Phaser effect
   Copyright (C) 2002-2005 Nasca Octavian Paul
+  Copyright (C) 2009-2010 Ryan Billing
+  Copyright (C) 2010-2010 Mark McCurry
   Author: Nasca Octavian Paul
+          Ryan Billing
+          Mark McCurry
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of version 2 of the GNU General Public License
@@ -23,53 +27,77 @@
 #ifndef PHASER_H
 #define PHASER_H
 #include "../globals.h"
-#include "../Misc/Stereo.h"
-#include "../Samples/AuSample.h"
 #include "Effect.h"
 #include "EffectLFO.h"
 
 #define MAX_PHASER_STAGES 12
-/**Phaser Effect*/
+
 class Phaser:public Effect
 {
     public:
-        Phaser(const int &insetion_, REALTYPE *efxoutl_, REALTYPE *efxoutr_);
+        Phaser(const int &insertion_, REALTYPE *efxoutl_, REALTYPE *efxoutr_);
         ~Phaser();
-        void out(REALTYPE *smpsl, REALTYPE *smpsr);
+        void out(const Stereo<REALTYPE *> &input);
         void setpreset(unsigned char npreset);
-        void changepar(const int &npar, const unsigned char &value);
-        unsigned char getpar(const int &npar) const;
+        void changepar(int npar, unsigned char value);
+        unsigned char getpar(int npar) const;
         void cleanup();
-        void setdryonly();
 
     private:
-        //Parametrii Phaser
-        EffectLFO     lfo; /**<lfo-ul Phaser*/
-        unsigned char Pvolume;
+        //Phaser parameters
+        EffectLFO lfo;              //Phaser modulator
+        unsigned char Pvolume;      //Used to set wet/dry mix
         unsigned char Ppanning;
-        unsigned char Pdepth; /**<the depth of the Phaser*/
-        unsigned char Pfb; /**<feedback*/
-        unsigned char Plrcross; /**<feedback*/
-        unsigned char Pstages;
-        unsigned char Poutsub; /**<if I wish to substract the output instead of the adding it*/
+        unsigned char Pdistortion;  //Model distortion added by FET element
+        unsigned char Pdepth;       //Depth of phaser sweep
+        unsigned char Pwidth;       //Phaser width (LFO amplitude)
+        unsigned char Pfb;          //feedback
+        unsigned char Poffset;      //Model mismatch between variable resistors
+        unsigned char Plrcross;     //crossover
+        unsigned char Pstages;      //Number of first-order All-Pass stages
+        unsigned char Poutsub;      //if I wish to subtract the output instead of adding
         unsigned char Pphase;
+        unsigned char Phyper;       //lfo^2 -- converts tri into hyper-sine
+        unsigned char Pbarber;      //Enable parber pole phasing
+        unsigned char Panalog;
 
-        //Control Parametrii
-        void setvolume(const unsigned char &Pvolume);
-        void setpanning(const unsigned char &Ppanning);
-        void setdepth(const unsigned char &Pdepth);
-        void setfb(const unsigned char &Pfb);
-        void setlrcross(const unsigned char &Plrcross);
-        void setstages(const unsigned char &Pstages);
-        void setphase(const unsigned char &Pphase);
+        //Control parameters
+        void setvolume(unsigned char Pvolume);
+        void setpanning(unsigned char Ppanning);
+        void setdepth(unsigned char Pdepth);
+        void setfb(unsigned char Pfb);
+        void setdistortion(unsigned char Pdistortion);
+        void setwidth(unsigned char Pwidth);
+        void setoffset(unsigned char Poffset);
+        void setlrcross(unsigned char Plrcross);
+        void setstages(unsigned char Pstages);
+        void setphase(unsigned char Pphase);
 
-        //Internal Values
-        //int insertion; //inherited from Effect
-        REALTYPE panning, fb, depth, lrcross, fbl, fbr, phase;
-        //REALTYPE *oldl,*oldr;
-        Stereo<AuSample> old;
-        //REALTYPE oldlgain,oldrgain;
-        Stereo<REALTYPE> oldgain;
+        //Internal Variables
+        bool barber; //Barber pole phasing flag
+        REALTYPE distortion, width, offsetpct;
+        REALTYPE panning, feedback, depth, lrcross, phase;
+        Stereo<REALTYPE *> old, xn1, yn1;
+        Stereo<REALTYPE> diff, oldgain, fb;
+        REALTYPE invperiod;
+        REALTYPE offset[12];
+        
+        float mis;
+        float Rmin;     // 3N5457 typical on resistance at Vgs = 0
+        float Rmax;     // Resistor parallel to FET
+        float Rmx;      // Rmin/Rmax to avoid division in loop
+        float Rconst;   // Handle parallel resistor relationship
+        float C;        // Capacitor
+        float CFs;      // A constant derived from capacitor and resistor relationships
+
+        void analog_setup();
+        void AnalogPhase(const Stereo<REALTYPE *> &input);
+        //analog case
+        REALTYPE applyPhase(REALTYPE x, REALTYPE g, REALTYPE fb,
+                            REALTYPE &hpf, REALTYPE *yn1, REALTYPE *xn1);
+
+        void normalPhase(const Stereo<REALTYPE *> &input);
+        REALTYPE applyPhase(REALTYPE x, REALTYPE g, REALTYPE *old);
 };
 
 #endif

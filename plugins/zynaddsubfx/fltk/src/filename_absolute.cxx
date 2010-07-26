@@ -1,5 +1,5 @@
 //
-// "$Id: filename_absolute.cxx 6691 2009-03-15 21:16:34Z AlbrechtS $"
+// "$Id: filename_absolute.cxx 6986 2010-01-01 18:30:49Z greg.ercolano $"
 //
 // Filename expansion routines for the Fast Light Tool Kit (FLTK).
 //
@@ -48,12 +48,19 @@ inline int isdirsep(char c) {return c=='/' || c=='\\';}
 #define isdirsep(c) ((c)=='/')
 #endif
 
-/**
- * Makes a filename absolute from a relative filename.
- * \param[out] to resulting absolute filename
- * \param[in]  tolen size of the absolute filename buffer 
- * \param[in]  from relative filename
- * \return 0 if no change, non zero otherwise
+/** Makes a filename absolute from a relative filename.
+    \code
+    #include <FL/filename.H>
+    [..]
+    chdir("/var/tmp");
+    fl_filename_absolute(out, sizeof(out), "foo.txt");         // out="/var/tmp/foo.txt"
+    fl_filename_absolute(out, sizeof(out), "./foo.txt");       // out="/var/tmp/foo.txt"
+    fl_filename_absolute(out, sizeof(out), "../log/messages"); // out="/var/log/messages"
+    \endcode
+    \param[out] to resulting absolute filename
+    \param[in]  tolen size of the absolute filename buffer 
+    \param[in]  from relative filename
+    \return 0 if no change, non zero otherwise
  */
 int fl_filename_absolute(char *to, int tolen, const char *from) {
   if (isdirsep(*from) || *from == '|'
@@ -108,12 +115,23 @@ int fl_filename_absolute(char *to, int tolen, const char *from) {
   return 1;
 }
 
-/**
- * Makes a filename relative to the current working directory.
- * \param[out] to resulting relative filename
- * \param[in]  tolen size of the relative filename buffer 
- * \param[in]  from absolute filename
- * \return 0 if no change, non zero otherwise
+/** Makes a filename relative to the current working directory.
+    \code
+    #include <FL/filename.H>
+    [..]
+    chdir("/var/tmp/somedir");       // set cwd to /var/tmp/somedir
+    [..]
+    char out[1024];
+    fl_filename_relative(out, sizeof(out), "/var/tmp/somedir/foo.txt");  // out="foo.txt",    return=1
+    fl_filename_relative(out, sizeof(out), "/var/tmp/foo.txt");          // out="../foo.txt", return=1
+    fl_filename_relative(out, sizeof(out), "foo.txt");                   // out="foo.txt",    return=0 (no change)
+    fl_filename_relative(out, sizeof(out), "./foo.txt");                 // out="./foo.txt",  return=0 (no change)
+    fl_filename_relative(out, sizeof(out), "../foo.txt");                // out="../foo.txt", return=0 (no change)
+    \endcode
+    \param[out] to resulting relative filename
+    \param[in]  tolen size of the relative filename buffer 
+    \param[in]  from absolute filename
+    \return 0 if no change, non zero otherwise
  */
 int					// O - 0 if no change, 1 if changed
 fl_filename_relative(char       *to,	// O - Relative filename
@@ -214,5 +232,5 @@ fl_filename_relative(char       *to,	// O - Relative filename
 
 
 //
-// End of "$Id: filename_absolute.cxx 6691 2009-03-15 21:16:34Z AlbrechtS $".
+// End of "$Id: filename_absolute.cxx 6986 2010-01-01 18:30:49Z greg.ercolano $".
 //

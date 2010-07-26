@@ -25,7 +25,7 @@
 #include "../globals.h"
 #include "Effect.h"
 #include "EffectLFO.h"
-#include "../Samples/AuSample.h"
+#include "../Samples/Sample.h"
 #include "../Misc/Stereo.h"
 
 #define MAX_CHORUS_DELAY 250.0 //ms
@@ -37,8 +37,7 @@ class Chorus:public Effect
         Chorus(const int &insetion_, REALTYPE *efxoutl_, REALTYPE *efxoutr_);
         /**Destructor*/
         ~Chorus();
-        void out(REALTYPE *smpsl, REALTYPE *smpsr);
-        void out(const Stereo<AuSample> &input);
+        void out(const Stereo<float *> &input);
         void setpreset(unsigned char npreset);
         /**
          * Sets the value of the chosen variable
@@ -58,7 +57,7 @@ class Chorus:public Effect
          * @param npar number of chosen parameter
          * @param value the new value
          */
-        void changepar(const int &npar, const unsigned char &value);
+        void changepar(int npar, unsigned char value);
         /**
          * Gets the value of the chosen variable
          *
@@ -77,7 +76,7 @@ class Chorus:public Effect
          * @param npar number of chosen parameter
          * @return the value of the parameter
          */
-        unsigned char getpar(const int &npar) const;
+        unsigned char getpar(int npar) const;
         void cleanup();
 
     private:
@@ -94,19 +93,18 @@ class Chorus:public Effect
 
 
         //Parameter Controls
-        void setvolume(const unsigned char &Pvolume);
-        void setpanning(const unsigned char &Ppanning);
-        void setdepth(const unsigned char &Pdepth);
-        void setdelay(const unsigned char &Pdelay);
-        void setfb(const unsigned char &Pfb);
-        void setlrcross(const unsigned char &Plrcross);
+        void setvolume(unsigned char Pvolume);
+        void setpanning(unsigned char Ppanning);
+        void setdepth(unsigned char Pdepth);
+        void setdelay(unsigned char Pdelay);
+        void setfb(unsigned char Pfb);
+        void setlrcross(unsigned char Plrcross);
 
         //Internal Values
         REALTYPE depth, delay, fb, lrcross, panning;
         REALTYPE dl1, dl2, dr1, dr2, lfol, lfor;
         int      maxdelay;
-        Stereo<AuSample> delaySample;
-        //REALTYPE *delayl,*delayr;
+        Stereo<Sample> delaySample;
         int dlk, drk, dlhi, dlhi2;
         REALTYPE getdelay(REALTYPE xlfo);
         REALTYPE dllo, mdel;

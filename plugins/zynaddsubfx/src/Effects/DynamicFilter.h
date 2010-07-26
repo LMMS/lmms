@@ -33,11 +33,11 @@ class DynamicFilter:public Effect
     public:
         DynamicFilter(int insetion_, REALTYPE *efxoutl_, REALTYPE *efxoutr_);
         ~DynamicFilter();
-        void out(REALTYPE *smpsl, REALTYPE *smpsr);
+        void out(const Stereo<float *> &smp);
 
         void setpreset(unsigned char npreset);
-        void changepar(const int &npar, const unsigned char &value);
-        unsigned char getpar(const int &npar) const;
+        void changepar(int npar, unsigned char value);
+        unsigned char getpar(int npar) const;
         void cleanup();
 
 //	void setdryonly();
@@ -53,10 +53,10 @@ class DynamicFilter:public Effect
         unsigned char Pampsmooth; //how smooth the input amplitude changes the filter
 
         //Parameter Control
-        void setvolume(const unsigned char &Pvolume);
-        void setpanning(const unsigned char &Ppanning);
-        void setdepth(const unsigned char &Pdepth);
-        void setampsns(const unsigned char &Pampsns);
+        void setvolume(unsigned char Pvolume);
+        void setpanning(unsigned char Ppanning);
+        void setdepth(unsigned char Pdepth);
+        void setampsns(unsigned char Pampsns);
 
         void reinitfilter();
 

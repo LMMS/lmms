@@ -138,7 +138,7 @@ if ((event==FL_PUSH)||(event==FL_DRAG)||(event==FL_RELEASE)){
        };
    };
 
-   if (((event==FL_PUSH)||(event==FL_DRAG))&&
+   if ((kpos!=-1)&&((event==FL_PUSH)||(event==FL_DRAG))&&
        (Fl::event_shift()==0)) {
         presskey(kpos,1,1);
    };

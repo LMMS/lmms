@@ -1,5 +1,5 @@
 //
-// "$Id: Fl_Browser_.cxx 6737 2009-04-02 06:44:34Z greg.ercolano $"
+// "$Id: Fl_Browser_.cxx 7115 2010-02-20 17:40:07Z AlbrechtS $"
 //
 // Base Browser widget class for the Fast Light Tool Kit (FLTK).
 //
@@ -678,11 +678,15 @@ int Fl_Browser_::deselect(int docallbacks) {
 int Fl_Browser_::select_only(void* item, int docallbacks) {
   if (!item) return deselect(docallbacks);
   int change = 0;
+  Fl_Widget_Tracker wp(this);
   if (type() == FL_MULTI_BROWSER) {
-    for (void* p = item_first(); p; p = item_next(p))
+    for (void* p = item_first(); p; p = item_next(p)) {
       if (p != item) change |= select(p, 0, docallbacks);
+      if (wp.deleted()) return change;
+    }
   }
   change |= select(item, 1, docallbacks);
+  if (wp.deleted()) return change;
   display(item);
   return change;
 }
@@ -693,6 +697,20 @@ int Fl_Browser_::select_only(void* item, int docallbacks) {
   \returns 1 if event was processed, 0 if not.
 */
 int Fl_Browser_::handle(int event) {
+
+  // NOTE:
+  // We use Fl_Widget_Tracker to test if the user has deleted
+  // this widget in a callback. Callbacks can be called by:
+  //  - do_callback()
+  //  - select()
+  //  - select_only()
+  //  - deselect()
+  // Thus we must test wp.deleted() after each of these calls,
+  // unless we return directly after one of these.
+  // If wp.deleted() is true, we return 1 because we used the event.
+
+  Fl_Widget_Tracker wp(this);
+
   // must do shortcuts first or the scrollbar will get them...
   if (event == FL_ENTER || event == FL_LEAVE) return 1;
   if (event == FL_KEYBOARD && type() >= FL_HOLD_BROWSER) {
@@ -706,8 +724,12 @@ int Fl_Browser_::handle(int event) {
             if (item_height(l)>0) {select_only(l, when()); break;}
             return 1;
         case FL_Up:
-          while ((l = item_prev(l))) if (item_height(l)>0) {
-            select_only(l, when()); break;}
+          while ((l = item_prev(l))) {
+	    if (item_height(l)>0) {
+	      select_only(l, when());
+	      break; // no need to test wp (return 1)
+	    }
+	  }
           return 1;
         } 
       } else  {
@@ -715,6 +737,7 @@ int Fl_Browser_::handle(int event) {
         case FL_Enter:
         case FL_KP_Enter:
           select_only(l, when() & ~FL_WHEN_ENTER_KEY);
+	  if (wp.deleted()) return 1;
 	  if (when() & FL_WHEN_ENTER_KEY) {
 	    set_changed();
 	    do_callback();
@@ -728,6 +751,7 @@ int Fl_Browser_::handle(int event) {
           while ((l = item_next(l))) {
             if (Fl::event_state(FL_SHIFT|FL_CTRL))
               select(l, l1 ? item_selected(l1) : 1, when());
+	    if (wp.deleted()) return 1;
             if (item_height(l)>0) goto J1;
           }
           return 1;
@@ -735,6 +759,7 @@ int Fl_Browser_::handle(int event) {
           while ((l = item_prev(l))) {
             if (Fl::event_state(FL_SHIFT|FL_CTRL))
               select(l, l1 ? item_selected(l1) : 1, when());
+	    if (wp.deleted()) return 1;
             if (item_height(l)>0) goto J1;
           }
           return 1;
@@ -749,6 +774,8 @@ J1:
   }
   
   if (Fl_Group::handle(event)) return 1;
+  if (wp.deleted()) return 1;
+
   int X, Y, W, H; bbox(X, Y, W, H);
   int my;
 // NOTE:
@@ -784,9 +811,11 @@ J1:
       ;
     else if (type() != FL_MULTI_BROWSER) {
       change = select_only(find_item(my), 0);
+      if (wp.deleted()) return 1;
       if (change && (when() & FL_WHEN_CHANGED)) {
 	set_changed();
 	do_callback();
+	if (wp.deleted()) return 1;
       }
     } else {
       void* l = find_item(my);
@@ -796,9 +825,11 @@ J1:
 	if (l) {
 	  whichway = !item_selected(l);
 	  change = select(l, whichway, 0);
+	  if (wp.deleted()) return 1;
 	  if (change && (when() & FL_WHEN_CHANGED)) {
 	    set_changed();
 	    do_callback();
+	    if (wp.deleted()) return 1;
 	  }
 	}
       } else if (Fl::event_state(FL_SHIFT)) { // extend selection:
@@ -814,23 +845,29 @@ J1:
 	  if (!m) {down = 0; break;}
 	}}
 	if (down) {
-	  for (void* m = selection_; m != l; m = item_next(m))
+	  for (void* m = selection_; m != l; m = item_next(m)) {
 	    select(m, whichway, when() & FL_WHEN_CHANGED);
+	    if (wp.deleted()) return 1;
+	  }
 	} else {
 	  void* e = selection_;
 	  for (void* m = item_next(l); m; m = item_next(m)) {
 	    select(m, whichway, when() & FL_WHEN_CHANGED);
+	    if (wp.deleted()) return 1;
 	    if (m == e) break;
 	  }
 	}
 	// do the clicked item last so the select box is around it:
 	change = 1;
 	if (l) select(l, whichway, when() & FL_WHEN_CHANGED);
+	if (wp.deleted()) return 1;
       } else { // select only this item
 	change = select_only(l, 0);
+	if (wp.deleted()) return 1;
 	if (change && (when() & FL_WHEN_CHANGED)) {
 	  set_changed();
 	  do_callback();
+	  if (wp.deleted()) return 1;
 	}
       }
     }
@@ -863,10 +900,12 @@ J1:
       for (; t && t != b; t = item_next(t)) {
 	char change_t;
 	change_t = select(t, whichway, 0);
+	if (wp.deleted()) return 1;
 	change |= change_t;
 	if (change_t && (when() & FL_WHEN_CHANGED)) {
 	  set_changed();
 	  do_callback();
+	  if (wp.deleted()) return 1;
 	}
       }
       if (l) selection_ = l;
@@ -877,12 +916,16 @@ J1:
 	find_item(my);
       change = (l != l1);
       select_only(l, when() & FL_WHEN_CHANGED);
+      if (wp.deleted()) return 1;
     }
     py = my;
     return 1;
   case FL_RELEASE:
     if (type() == FL_SELECT_BROWSER) {
-      void* t = selection_; deselect(); selection_ = t;
+      void* t = selection_;
+      deselect();
+      if (wp.deleted()) return 1;
+      selection_ = t;
     }
     if (change) {
       set_changed();
@@ -890,7 +933,8 @@ J1:
     } else {
       if (when() & FL_WHEN_NOT_CHANGED) do_callback();
     }
-    
+    if (wp.deleted()) return 1;
+
     // double click calls the callback: (like Enter Key)
     if (Fl::event_clicks() && (when() & FL_WHEN_ENTER_KEY)) {
       set_changed();
@@ -962,7 +1006,7 @@ void Fl_Browser_::sort(int flags) {
     a = item_next(a);
     n++;
   }
-  for (i=n-1; i>0; i--) {
+  for (i=n; i>0; i--) {
     char swapped = 0;
     a = item_first();
     b = item_next(a);
@@ -981,6 +1025,7 @@ void Fl_Browser_::sort(int flags) {
           swapped = 1;
         }
       }
+      if (!c) break;
       b = c; a = item_prev(b);
     }
     if (!swapped)
@@ -1058,5 +1103,5 @@ void Fl_Browser_::item_select(void *item, int val) {}
 int Fl_Browser_::item_selected(void* item) const { return item==selection_ ? 1 : 0; }
 
 //
-// End of "$Id: Fl_Browser_.cxx 6737 2009-04-02 06:44:34Z greg.ercolano $".
+// End of "$Id: Fl_Browser_.cxx 7115 2010-02-20 17:40:07Z AlbrechtS $".
 //

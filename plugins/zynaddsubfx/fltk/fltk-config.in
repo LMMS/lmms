@@ -232,19 +232,19 @@ fi
 
 # Calculate needed libraries
 LDSTATIC="$libdir/libfltk.a $LDLIBS"
-LDLIBS="-lfltk$SHAREDSUFFIX"
+LDLIBS="-lfltk$SHAREDSUFFIX $LDLIBS"
 
 if test x$use_forms = xyes; then
     LDLIBS="-lfltk_forms$SHAREDSUFFIX $LDLIBS"
     LDSTATIC="$libdir/libfltk_forms.a $LDSTATIC"
 fi
 if test x$use_gl = xyes; then
-    LDLIBS="-lfltk_gl$SHAREDSUFFIX $LDLIBS"
+    LDLIBS="-lfltk_gl$SHAREDSUFFIX @GLLIB@ $LDLIBS"
     LDSTATIC="$libdir/libfltk_gl.a @GLLIB@ $LDSTATIC"
 fi
 if test x$use_images = xyes; then
-    LDLIBS="-lfltk_images$SHAREDSUFFIX $LDLIBS"
-    LDSTATIC="$libdir/libfltk_images.a $IMAGELIBS $LDSTATIC"
+    LDLIBS="-lfltk_images$SHAREDSUFFIX $IMAGELIBS $LDLIBS"
+    LDSTATIC="$libdir/libfltk_images.a $STATICIMAGELIBS $LDSTATIC"
 fi
 
 if test x$use_cairo = xyes; then

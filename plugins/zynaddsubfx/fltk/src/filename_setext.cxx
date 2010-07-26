@@ -1,5 +1,5 @@
 //
-// "$Id: filename_setext.cxx 6716 2009-03-24 01:40:44Z fabien $"
+// "$Id: filename_setext.cxx 6986 2010-01-01 18:30:49Z greg.ercolano $"
 //
 // Filename extension routines for the Fast Light Tool Kit (FLTK).
 //
@@ -26,14 +26,24 @@
 //
 
 // Replace .ext with new extension
-// If no . in name, append new extension
-// If new extension is null, act like it is ""
 
 #include <FL/filename.H>
 #include "flstring.h"
 
 /**
-   Replaces the extension in \p buf of max. size \p buflen with the extension in \p ext. 
+   Replaces the extension in \p buf of max.<br>
+   size \p buflen with the extension in \p ext.<br>
+   If there's no '.' in \p buf, \p ext is appended.<br>
+   If \p ext is NULL, behaves as if it were an empty string ("").
+
+   \b Example
+   \code
+   #include <FL/filename.H>
+   [..]
+   char buf[1024] = "/path/myfile.cxx";
+   fl_filename_setext(buf, sizeof(buf), ".txt");      // buf[] becomes "/path/myfile.txt"
+   \endcode
+
    \return buf itself for calling convenience.
 */
 char *fl_filename_setext(char *buf, int buflen, const char *ext) {
@@ -46,5 +56,5 @@ char *fl_filename_setext(char *buf, int buflen, const char *ext) {
 
 
 //
-// End of "$Id: filename_setext.cxx 6716 2009-03-24 01:40:44Z fabien $".
+// End of "$Id: filename_setext.cxx 6986 2010-01-01 18:30:49Z greg.ercolano $".
 //

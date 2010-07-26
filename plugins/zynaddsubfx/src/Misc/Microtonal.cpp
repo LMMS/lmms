@@ -1,7 +1,7 @@
 /*
   ZynAddSubFX - a software synthesizer
 
-  Microtonal.C - Tuning settings and microtonal capabilities
+  Microtonal.cpp - Tuning settings and microtonal capabilities
   Copyright (C) 2002-2005 Nasca Octavian Paul
   Author: Nasca Octavian Paul
 

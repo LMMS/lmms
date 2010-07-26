@@ -1,5 +1,5 @@
 //
-// "$Id: Fl_get_system_colors.cxx 6616 2009-01-01 21:28:26Z matt $"
+// "$Id: Fl_get_system_colors.cxx 7352 2010-03-29 10:47:11Z matt $"
 //
 // System color support for the Fast Light Tool Kit (FLTK).
 //
@@ -36,10 +36,6 @@
 #include <FL/Fl_Pixmap.H>
 #include <FL/Fl_Tiled_Image.H>
 #include "tile.xpm"
-
-#if defined(__APPLE__) && defined(__MWERKS__)
-extern "C" int putenv(const char*);
-#endif // __APPLE__ && __MWERKS__
 
 #if defined(WIN32) && !defined(__CYGWIN__) && !defined(__WATCOMC__)
 // Visual C++ 2005 incorrectly displays a warning about the use of POSIX APIs
@@ -426,5 +422,5 @@ int Fl::reload_scheme() {
 
 
 //
-// End of "$Id: Fl_get_system_colors.cxx 6616 2009-01-01 21:28:26Z matt $".
+// End of "$Id: Fl_get_system_colors.cxx 7352 2010-03-29 10:47:11Z matt $".
 //

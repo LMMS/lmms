@@ -1,7 +1,7 @@
 /*
   ZynAddSubFX - a software synthesizer
 
-  AnalogFilter.C - Several analog filters (lowpass, highpass...)
+  AnalogFilter.cpp - Several analog filters (lowpass, highpass...)
   Copyright (C) 2002-2005 Nasca Octavian Paul
   Author: Nasca Octavian Paul
 

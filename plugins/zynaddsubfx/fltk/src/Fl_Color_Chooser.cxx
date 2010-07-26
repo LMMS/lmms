@@ -1,5 +1,5 @@
 //
-// "$Id: Fl_Color_Chooser.cxx 6616 2009-01-01 21:28:26Z matt $"
+// "$Id: Fl_Color_Chooser.cxx 7347 2010-03-27 16:35:14Z AlbrechtS $"
 //
 // Color chooser for the Fast Light Tool Kit (FLTK).
 //
@@ -123,7 +123,7 @@ void Fl_Color_Chooser::set_valuators() {
     gvalue.range(0,1); gvalue.step(1,1000); gvalue.value(g_);
     bvalue.range(0,1); bvalue.step(1,1000); bvalue.value(b_);
     break;
-  case M_BYTE:
+  case M_BYTE: /* FALLTHROUGH */
   case M_HEX:
     rvalue.range(0,255); rvalue.step(1); rvalue.value(int(255*r_+.5));
     gvalue.range(0,255); gvalue.step(1); gvalue.value(int(255*g_+.5));
@@ -233,7 +233,7 @@ int Flcc_HueBox::handle(int e) {
     if (Fl::event_state(FL_CTRL)) H = ih;
     if (c->hsv(H, S, c->value())) c->do_callback();
     } return 1;
-  case FL_FOCUS :
+  case FL_FOCUS : /* FALLTHROUGH */
   case FL_UNFOCUS :
     if (Fl::visible_focus()) {
       redraw();
@@ -354,7 +354,7 @@ int Flcc_ValueBox::handle(int e) {
     if (fabs(Yf-iv)<(3*1.0/h())) Yf = iv;
     if (c->hsv(c->hue(),c->saturation(),Yf)) c->do_callback();
     } return 1;
-  case FL_FOCUS :
+  case FL_FOCUS : /* FALLTHROUGH */
   case FL_UNFOCUS :
     if (Fl::visible_focus()) {
       redraw();
@@ -516,7 +516,7 @@ void ColorChip::draw() {
 	   h()-Fl::box_dh(box()),r,g,b);
 }
 
-static void chooser_cb(Fl_Object* o, void* vv) {
+static void chooser_cb(Fl_Widget* o, void* vv) {
   Fl_Color_Chooser* c = (Fl_Color_Chooser*)o;
   ColorChip* v = (ColorChip*)vv;
   v->r = uchar(255*c->r()+.5);
@@ -527,6 +527,27 @@ static void chooser_cb(Fl_Object* o, void* vv) {
 
 extern const char* fl_ok;
 extern const char* fl_cancel;
+
+// fl_color_chooser's callback for ok_button (below)
+//  [in] o is a pointer to okay_button (below) 
+//  [in] p is a pointer to an int to receive the return value (1)
+// closes the fl_color_chooser window
+static void cc_ok_cb (Fl_Widget *o, void *p) {
+  *((int *)p) = 1; // set return value
+  o->window()->hide();
+}
+
+// fl_color_chooser's callback for cancel_button and window close
+//  [in] o is a pointer to cancel_button (below) _or_ the dialog window
+//  [in] p is a pointer to an int to receive the return value (0)
+// closes the fl_color_chooser window
+static void cc_cancel_cb (Fl_Widget *o, void *p) {
+  *((int *)p) = 0; // set return value
+  if (o->window()) // cancel button
+    o->window()->hide();
+  else // window close
+    o->hide();
+}
 
 /** \addtogroup  group_comdlg 
     @{ */
@@ -541,15 +562,19 @@ extern const char* fl_cancel;
   \relates Fl_Color_Chooser
  */
 int fl_color_chooser(const char* name, double& r, double& g, double& b) {
+  int ret = 0;
   Fl_Window window(215,200,name);
+  window.callback(cc_cancel_cb,&ret);
   Fl_Color_Chooser chooser(10, 10, 195, 115);
   ColorChip ok_color(10, 130, 95, 25);
   Fl_Return_Button ok_button(10, 165, 95, 25, fl_ok);
+  ok_button.callback(cc_ok_cb,&ret);
   ColorChip cancel_color(110, 130, 95, 25);
   cancel_color.r = uchar(255*r+.5); ok_color.r = cancel_color.r;
   ok_color.g = cancel_color.g = uchar(255*g+.5);
   ok_color.b = cancel_color.b = uchar(255*b+.5);
   Fl_Button cancel_button(110, 165, 95, 25, fl_cancel);
+  cancel_button.callback(cc_cancel_cb,&ret);
   window.resizable(chooser);
   chooser.rgb(r,g,b);
   chooser.callback(chooser_cb, &ok_color);
@@ -557,21 +582,13 @@ int fl_color_chooser(const char* name, double& r, double& g, double& b) {
   window.set_modal();
   window.hotspot(window);
   window.show();
-  while (window.shown()) {
-    Fl::wait();
-    for (;;) {
-      Fl_Widget* o = Fl::readqueue();
-      if (!o) break;
-      if (o == &ok_button) {
-	r = chooser.r();
-	g = chooser.g();
-	b = chooser.b();
-	return 1;
-      }
-      if (o == &window || o == &cancel_button) return 0;
-    }
+  while (window.shown()) Fl::wait();
+  if (ret) { // ok_button or Enter
+    r = chooser.r();
+    g = chooser.g();
+    b = chooser.b();
   }
-  return 0;
+  return ret;
 }
 
 /**
@@ -598,5 +615,5 @@ int fl_color_chooser(const char* name, uchar& r, uchar& g, uchar& b) {
 }
 /** @} */
 //
-// End of "$Id: Fl_Color_Chooser.cxx 6616 2009-01-01 21:28:26Z matt $".
+// End of "$Id: Fl_Color_Chooser.cxx 7347 2010-03-27 16:35:14Z AlbrechtS $".
 //

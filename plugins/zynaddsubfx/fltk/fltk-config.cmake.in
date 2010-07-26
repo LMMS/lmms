@@ -1,0 +1,388 @@
+#!/bin/sh
+#
+# "$Id: fltk-config.in 6614 2009-01-01 16:11:32Z matt $"
+#
+# FLTK configuration utility.
+#
+# Copyright 2000-2009 by Bill Spitzak and others.
+# Original version Copyright 2000 by James Dean Palmer
+# Adapted by Vincent Penne and Michael Sweet
+#
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Library General Public
+# License as published by the Free Software Foundation; either
+# version 2 of the License, or (at your option) any later version.
+#
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Library General Public License for more details.
+#
+# You should have received a copy of the GNU Library General Public
+# License along with this library; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
+# USA.
+#
+# Please report all bugs and problems on the following page:
+#
+#      http://www.fltk.org/str.php
+#
+
+MAJOR_VERSION=@FLTK_VERSION_MAJOR@
+MINOR_VERSION=@FLTK_VERSION_MINOR@
+PATCH_VERSION=@FLTK_VERSION_PATCH@
+VERSION=@FLTK_VERSION_FULL@
+APIVERSION=@FLTK_VERSION@
+
+### BEGIN fltk-config
+selfdir=`dirname "$0"`
+
+prefix=@CMAKE_INSTALL_PREFIX@
+exec_prefix=${prefix}
+exec_prefix_set=no
+bindir=@PREFIX_BIN@
+includedir=@CPREFIX_INCLUDE@
+libdir=@PREFIX_LIB@
+srcdir=.
+
+# compiler names
+CC="@CC@"
+CXX="@CXX@"
+
+# flags for C++ compiler:
+ARCHFLAGS="@OPTION_ARCHFLAGS@"
+CFLAGS="@C_FLAGS@"
+CXXFLAGS="@CAIROFLAGS@@C_FLAGS@"
+LDFLAGS="@LDFLAGS@"
+LDLIBS="@LD_LIBS@"
+OPTIM="@OPTION_OPTIM@"
+CAIROFLAGS="@CAIROFLAGS@"
+
+# Check for local invocation, and update paths accordingly...
+if test -f "$selfdir/FL/Fl_Window.H"; then
+	bindir="$selfdir/fluid"
+	includedir="$selfdir"
+	libdir="$selfdir/lib"
+
+	if test -f "$libdir/libfltk_jpeg.a"; then
+		CFLAGS="-I$includedir/jpeg $CFLAGS"
+		CXXFLAGS="-I$includedir/jpeg $CXXFLAGS"
+	fi
+
+	if test -f "$libdir/libfltk_z.a"; then
+		CFLAGS="-I$includedir/zlib $CFLAGS"
+		CXXFLAGS="-I$includedir/zlib $CXXFLAGS"
+	fi
+
+	if test -f "$libdir/libfltk_png.a"; then
+		CFLAGS="-I$includedir/png $CFLAGS"
+		CXXFLAGS="-I$includedir/png $CXXFLAGS"
+	fi
+fi
+
+if test -d $includedir/FL/images; then
+	CFLAGS="-I$includedir/FL/images $CFLAGS"
+	CXXFLAGS="-I$includedir/FL/images $CXXFLAGS"
+fi
+
+if test -f "$libdir/libfltk_cairo.a"; then
+	CFLAGS="$CAIROFLAGS $CFLAGS"
+	CXXFLAGS="$CAIROFLAGS $CXXFLAGS"
+fi
+
+# libraries to link with:
+LIBNAME="@LIBNAME@"
+DSONAME="@DSONAME@"
+DSOLINK="@DSOLINK@"
+IMAGELIBS="@IMAGELIBS@"
+STATICIMAGELIBS="@STATICIMAGELIBS@"
+CAIROLIBS="@CAIROLIBS@"
+SHAREDSUFFIX="@SHAREDSUFFIX@"
+
+usage ()
+{
+    echo "Usage: fltk-config [OPTIONS]
+Options:
+	[--version]
+	[--api-version]
+
+Options telling what we are doing:
+	[--use-gl]        use GL
+	[--use-images]    use extra image formats (PNG, JPEG)
+	[--use-glut]      use glut compatibility layer
+	[--use-forms]     use forms compatibility layer
+	[--use-cairo]     use cairo graphics lib
+
+Options telling what information we request:
+	[--cc]            return C compiler used to compile FLTK
+	[--cxx]           return C++ compiler used to compile FLTK
+	[--optim]         return compiler optimization used to compile FLTK
+	[--cflags]        return flags to compile C using FLTK
+	[--cxxflags]      return flags to compile C++ using FLTK
+	[--ldflags]       return flags to link against FLTK
+	[--ldstaticflags] return flags to link against static FLTK library
+                                          even if there are DSOs installed
+	[--libs]          return FLTK libraries full path for dependencies
+
+Options to compile and link an application:
+	[-g]              compile the program with debugging information
+	[-Dname[=value]]  compile the program with the given define
+	[--compile program.cxx]
+        [--post program]  prepare the program for desktop use
+"
+    exit $1
+}
+
+if test $# -eq 0; then
+    usage 1
+fi
+
+no_plugins=no
+compile=
+post=
+debug=
+
+# Parse command line options
+while test $# -gt 0
+do
+    case "$1" in
+	-*=*)
+	    optarg=`echo "$1" | sed 's/[-_a-zA-Z0-9]*=//'`
+	    ;;
+	*)
+	    optarg=
+	    ;;
+    esac
+
+    case $1 in
+	--version)
+	    echo $VERSION
+	    ;;
+	--api-version)
+	    echo $APIVERSION
+	    ;;
+	--cc)
+	    echo $CC
+	    ;;
+	--cxx)
+	    echo $CXX
+	    ;;
+	--optim)
+	    echo_optim=yes
+	    ;;
+	--use-gl | --use-glut)
+	    use_gl=yes
+	    ;;
+	--use-forms)
+	    use_forms=yes
+	    ;;
+	--use-images)
+	    use_images=yes
+	    ;;
+	--use-cairo)
+	    use_cairo=yes
+	    ;;
+	--cflags)
+	    echo_cflags=yes
+	    ;;
+	--cxxflags)
+	    echo_cxxflags=yes
+	    ;;
+	--ldflags)
+	    echo_ldflags=yes
+	    ;;
+	--ldstaticflags)
+	    echo_ldstaticflags=yes
+	    ;;
+	--libs)
+	    echo_libs=yes
+	    ;;
+	-g)
+	    debug=-g
+	    ;;
+	-D*)
+	    CXXFLAGS="$CXXFLAGS $1"
+	    ;;
+	--compile)
+	    compile="$2"
+	    shift
+	    ;;
+	--post)
+	    post="$2"
+	    shift
+	    ;;
+	*)
+	    echo_help=yes
+	    ;;
+    esac
+    shift
+done
+
+if test "$includedir" != /usr/include; then
+    includes=-I$includedir
+else
+    includes=
+fi
+
+if test "$libdir" != /usr/lib -a "$libdir" != /usr/lib32; then
+    libs=-L$libdir
+else
+    libs=
+fi
+
+# Calculate needed libraries
+LDSTATIC="$libdir/libfltk.a $LDLIBS"
+LDLIBS="-lfltk$SHAREDSUFFIX $LDLIBS"
+
+if test x$use_forms = xyes; then
+    LDLIBS="-lfltk_forms$SHAREDSUFFIX $LDLIBS"
+    LDSTATIC="$libdir/libfltk_forms.a $LDSTATIC"
+fi
+if test x$use_gl = xyes; then
+    LDLIBS="-lfltk_gl$SHAREDSUFFIX @GLLIB@ $LDLIBS"
+    LDSTATIC="$libdir/libfltk_gl.a @GLLIB@ $LDSTATIC"
+fi
+if test x$use_images = xyes; then
+    LDLIBS="-lfltk_images$SHAREDSUFFIX $IMAGELIBS $LDLIBS"
+    LDSTATIC="$libdir/libfltk_images.a $STATICIMAGELIBS $LDSTATIC"
+fi
+
+if test x$use_cairo = xyes; then
+    LDLIBS="-lfltk_cairo$SHAREDSUFFIX $CAIROLIBS $LDLIBS"
+    LDSTATIC="$libdir/libfltk_cairo.a $CAIROLIBS $LDSTATIC"
+fi
+
+LDLIBS="$DSOLINK $LDFLAGS $libs $LDLIBS"
+LDSTATIC="$LDFLAGS $LDSTATIC"
+
+# Answer to user requests
+if test -n "$echo_help"; then
+    usage 1
+fi
+
+if test -n "$compile"; then
+    case "$compile" in
+        *.cxx)
+            prog="`basename \"$compile\" .cxx`"
+	    ;;
+        *.cpp)
+            prog="`basename \"$compile\" .cpp`"
+	    ;;
+        *.cc)
+            prog="`basename \"$compile\" .cc`"
+	    ;;
+        *.C)
+            prog="`basename \"$compile\" .C`"
+	    ;;
+	*)
+	    echo "ERROR: Unknown/bad C++ source file extension on \"$compile\"!"
+	    exit 1
+	    ;;
+    esac
+
+    post="$prog"
+
+    echo $CXX $ARCHFLAGS $includes $CXXFLAGS $debug -o "'$prog'" "'$compile'" $LDSTATIC
+    $CXX $ARCHFLAGS $includes $CXXFLAGS $debug -o "$prog" "$compile" $LDSTATIC || exit 1
+fi
+
+if test -n "$post"; then
+    case "`uname`" in
+	Darwin)
+	    echo Creating "'$post.app'" bundle for desktop...
+	    id=`echo $post | tr ' ' '_'`
+
+	    # Make the bundle directory and move the executable there
+	    rm -rf "$post.app/Contents/MacOS"
+	    mkdir -p "$post.app/Contents/MacOS"
+	    mv "$post" "$post.app/Contents/MacOS"
+
+	    # Make a shell script that runs the bundled executable
+	    echo "#!/bin/sh" >"$post"
+	    echo 'dir="`dirname '"'"'$0'"'"'`"' >>"$post"
+	    echo 'exec "$dir/'"$post.app/Contents/MacOS/$post"'" "$@"' >>"$post"
+	    chmod +x "$post"
+
+	    # Make the simplest Info.plist needed for an application
+	    cat >"$post.app/Contents/Info.plist" <<EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<plist version="0.9">
+    <dict>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleExecutable</key>
+	<string>$post</string>
+	<key>CFBundleIdentifier</key>
+	<string>org.fltk.$id</string>
+	<key>CFBundleName</key>
+	<string>$post</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+    </dict>
+</plist>
+EOF
+	    ;;
+    esac
+fi
+
+if test "$echo_cflags" = "yes"; then
+    echo $includes $CFLAGS
+fi
+
+if test "$echo_cxxflags" = "yes"; then
+    echo $includes $CXXFLAGS
+fi
+
+if test "$echo_optim" = "yes"; then
+    echo $OPTIM
+fi
+
+if test "$echo_ldflags" = "yes"; then
+    my_libs=
+    libdirs=$libs
+
+    for i in $LDLIBS ; do
+	if test $i != -L$libdir ; then
+	    if test -z "$my_libs" ; then
+		my_libs="$i"
+	    else
+		my_libs="$my_libs $i"
+	    fi
+	fi
+    done
+    echo $libdirs $my_libs
+fi
+
+if test "$echo_ldstaticflags" = "yes"; then
+    echo $LDSTATIC
+fi
+
+if test "$echo_libs" = "yes"; then
+    echo $libdir/libfltk.a
+
+    if test x$use_forms = xyes; then
+        echo $libdir/libfltk_forms.a
+    fi
+
+    if test x$use_gl = xyes; then
+        echo $libdir/libfltk_gl.a
+    fi
+
+    if test x$use_cairo = xyes; then
+        echo $libdir/libfltk_cairo.a
+    fi
+
+    if test x$use_images = xyes; then
+        echo $libdir/libfltk_images.a
+
+        for lib in fltk_jpeg fltk_png fltk_z; do
+            if test -f $libdir/lib$lib.a; then
+                echo $libdir/lib$lib.a
+            fi
+	done
+    fi
+fi
+
+#
+# End of "$Id: fltk-config.in 6614 2009-01-01 16:11:32Z matt $".
+#

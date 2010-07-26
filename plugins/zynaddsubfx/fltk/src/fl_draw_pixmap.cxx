@@ -1,5 +1,5 @@
 //
-// "$Id: fl_draw_pixmap.cxx 6689 2009-03-15 19:38:13Z engelsman $"
+// "$Id: fl_draw_pixmap.cxx 7659 2010-07-01 13:21:32Z manolo $"
 //
 // Pixmap drawing code for the Fast Light Tool Kit (FLTK).
 //
@@ -139,8 +139,6 @@ struct pixmap_data {
   };
 };
 
-#  ifndef __APPLE_QUARTZ__
-
 // callback for 1 byte per pixel:
 static void cb1(void*v, int x, int y, int w, uchar* buf) {
   pixmap_data& d = *(pixmap_data*)v;
@@ -160,8 +158,6 @@ static void cb2(void*v, int x, int y, int w, uchar* buf) {
   }
 }
 
-#  endif  // !__APPLE_QUARTZ__
-
 #endif // U64 else U32
 
 uchar **fl_mask_bitmap; // if non-zero, create bitmap and store pointer here
@@ -179,6 +175,40 @@ int fl_draw_pixmap(/*const*/ char* const* data, int x,int y,Fl_Color bg) {
   return fl_draw_pixmap((const char*const*)data,x,y,bg);
 }
 
+#ifdef WIN32
+// to compute an unused color to be used for the pixmap background
+FL_EXPORT UINT win_pixmap_bg_color; // the RGB() of the pixmap background color
+static int color_count; // # of non-transparent colors used in pixmap
+static uchar *used_colors; // used_colors[3*i+j] j=0,1,2 are the RGB values of the ith used color
+
+static void make_unused_color(uchar &r, uchar &g, uchar &b)
+// makes an RGB triplet different from all the colors used in the pixmap
+// and compute win_pixmap_bg_color from this triplet
+{
+  int i;
+  r = 2; g = 3; b = 4;
+  while (1) {
+    for ( i = 0; i < color_count; i++) {
+      if(used_colors[3*i] == r && used_colors[3*i+1] == g && used_colors[3*i+2] == b) break;
+      }
+    if (i >= color_count) {
+      free(used_colors);
+      win_pixmap_bg_color = RGB(r, g, b);
+      return;
+      }
+    if (r < 255) r++;
+    else {
+      r = 0;
+      if (g < 255) g++;
+      else {
+	g = 0;
+	b++;
+	}
+      }
+    }
+}
+#endif
+
 /**
   Draw XPM image data, with the top-left corner at the given position.
   \see fl_draw_pixmap(char* const* data, int x, int y, Fl_Color bg)
@@ -188,6 +218,11 @@ int fl_draw_pixmap(const char*const* cdata, int x, int y, Fl_Color bg) {
   if (!fl_measure_pixmap(cdata, d.w, d.h)) return 0;
   const uchar*const* data = (const uchar*const*)(cdata+1);
   int transparent_index = -1;
+  uchar *transparent_c = (uchar *)0; // such that transparent_c[0,1,2] are the RGB of the transparent color
+#ifdef WIN32
+  color_count = 0;
+  used_colors = (uchar *)malloc(abs(ncolors)*3*sizeof(uchar));
+#endif
 
   if (ncolors < 0) {	// FLTK (non standard) compressed colormap
     ncolors = -ncolors;
@@ -204,6 +239,7 @@ int fl_draw_pixmap(const char*const* cdata, int x, int y, Fl_Color bg) {
 #endif
       transparent_index = ' ';
       Fl::get_color(bg, c[0], c[1], c[2]); c[3] = 0;
+      transparent_c = c;
       p += 4;
       ncolors--;
     }
@@ -215,6 +251,12 @@ int fl_draw_pixmap(const char*const* cdata, int x, int y, Fl_Color bg) {
 #  if WORDS_BIGENDIAN
       c += 4;
 #  endif
+#endif
+#ifdef WIN32
+      used_colors[3*color_count] = *p;
+      used_colors[3*color_count+1] = *(p+1);
+      used_colors[3*color_count+2] = *(p+2);
+      color_count++;
 #endif
       *c++ = *p++;
       *c++ = *p++;
@@ -266,7 +308,16 @@ int fl_draw_pixmap(const char*const* cdata, int x, int y, Fl_Color bg) {
 #ifdef __APPLE_QUARTZ__
       c[3] = 255;
 #endif
-      if (!fl_parse_color((const char*)p, c[0], c[1], c[2])) {
+      int parse = fl_parse_color((const char*)p, c[0], c[1], c[2]);
+      if (parse) {
+#ifdef WIN32
+	used_colors[3*color_count] = c[0];
+	used_colors[3*color_count+1] = c[1];
+	used_colors[3*color_count+2] = c[2];
+	color_count++;
+#endif
+	}
+      else {
         // assume "None" or "#transparent" for any errors
 	// "bg" should be transparent...
 	Fl::get_color(bg, c[0], c[1], c[2]);
@@ -274,12 +325,55 @@ int fl_draw_pixmap(const char*const* cdata, int x, int y, Fl_Color bg) {
         c[3] = 0;
 #endif
 	transparent_index = ind;
+	transparent_c = c;
       }
     }
   }
   d.data = data;
-
-#ifndef __APPLE_QUARTZ__
+#ifdef WIN32
+  if (transparent_c) {
+    make_unused_color(transparent_c[0], transparent_c[1], transparent_c[2]);
+  }
+  else {
+    uchar r, g, b;
+    make_unused_color(r, g, b);
+  }
+#endif
+  
+#ifdef  __APPLE_QUARTZ__
+  if (fl_graphics_driver->type() == Fl_Quartz_Graphics_Driver::device_type ) {
+    bool transparent = (transparent_index>=0);
+    transparent = true;
+    U32 *array = new U32[d.w * d.h], *q = array;
+    for (int Y = 0; Y < d.h; Y++) {
+      const uchar* p = data[Y];
+      if (chars_per_pixel <= 1) {
+	for (int X = 0; X < d.w; X++) {
+	  *q++ = d.colors[*p++];
+	}
+      } else {
+	for (int X = 0; X < d.w; X++) {
+	  U32* colors = (U32*)d.byte1[*p++];
+	  *q++ = colors[*p++];
+	}
+      }
+    }
+    CGColorSpaceRef lut = CGColorSpaceCreateDeviceRGB();
+    CGDataProviderRef src = CGDataProviderCreateWithData( 0L, array, d.w * d.h * 4, 0L);
+    CGImageRef img = CGImageCreate(d.w, d.h, 8, 4*8, 4*d.w,
+				   lut, transparent?kCGImageAlphaLast:kCGImageAlphaNoneSkipLast,
+				   src, 0L, false, kCGRenderingIntentDefault);
+    CGColorSpaceRelease(lut);
+    CGDataProviderRelease(src);
+    CGRect rect = { { x, y} , { d.w, d.h } };
+    Fl_X::q_begin_image(rect, 0, 0, d.w, d.h);
+    CGContextDrawImage(fl_gc, rect, img);
+    Fl_X::q_end_image();
+    CGImageRelease(img);
+    delete array;
+    }
+  else {
+#endif // __APPLE_QUARTZ__
 
   // build the mask bitmap used by Fl_Pixmap:
   if (fl_mask_bitmap && transparent_index >= 0) {
@@ -322,45 +416,14 @@ int fl_draw_pixmap(const char*const* cdata, int x, int y, Fl_Color bg) {
   }
 
   fl_draw_image(chars_per_pixel==1 ? cb1 : cb2, &d, x, y, d.w, d.h, 4);
-
-#else // __APPLE_QUARTZ__
-
-  bool transparent = (transparent_index>=0);
-  transparent = true;
-  U32 *array = new U32[d.w * d.h], *q = array;
-  for (int Y = 0; Y < d.h; Y++) {
-    const uchar* p = data[Y];
-    if (chars_per_pixel <= 1) {
-      for (int X = 0; X < d.w; X++) {
-        *q++ = d.colors[*p++];
-      }
-    } else {
-      for (int X = 0; X < d.w; X++) {
-        U32* colors = d.byte1[*p++];
-        *q++ = colors[*p++];
-      }
+#ifdef __APPLE_QUARTZ__
     }
-  }
-  CGColorSpaceRef lut = CGColorSpaceCreateDeviceRGB();
-  CGDataProviderRef src = CGDataProviderCreateWithData( 0L, array, d.w * d.h * 4, 0L);
-  CGImageRef img = CGImageCreate(d.w, d.h, 8, 4*8, 4*d.w,
-        lut, transparent?kCGImageAlphaLast:kCGImageAlphaNoneSkipLast,
-        src, 0L, false, kCGRenderingIntentDefault);
-  CGColorSpaceRelease(lut);
-  CGDataProviderRelease(src);
-  CGRect rect = { { x, y} , { d.w, d.h } };
-  Fl_X::q_begin_image(rect, 0, 0, d.w, d.h);
-  CGContextDrawImage(fl_gc, rect, img);
-  Fl_X::q_end_image();
-  CGImageRelease(img);
-  delete array;
-
-#endif // !__APPLE_QUARTZ__
+#endif
 
   if (chars_per_pixel > 1) for (int i = 0; i < 256; i++) delete[] d.byte1[i];
   return 1;
 }
 
 //
-// End of "$Id: fl_draw_pixmap.cxx 6689 2009-03-15 19:38:13Z engelsman $".
+// End of "$Id: fl_draw_pixmap.cxx 7659 2010-07-01 13:21:32Z manolo $".
 //

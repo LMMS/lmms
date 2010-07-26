@@ -1,7 +1,7 @@
 /*
   ZynAddSubFX - a software synthesizer
 
-  Alienwah.C - "AlienWah" effect
+  Alienwah.cpp - "AlienWah" effect
   Copyright (C) 2002-2005 Nasca Octavian Paul
   Author: Nasca Octavian Paul
 
@@ -46,7 +46,7 @@ Alienwah::~Alienwah()
 /*
  * Apply the effect
  */
-void Alienwah::out(REALTYPE *smpsl, REALTYPE *smpsr)
+void Alienwah::out(const Stereo<float *> &smp)
 {
     REALTYPE lfol, lfor; //Left/Right LFOs
     complex<REALTYPE> clfol, clfor, out, tmp;
@@ -67,7 +67,7 @@ void Alienwah::out(REALTYPE *smpsl, REALTYPE *smpsr)
         tmp = clfol * x + oldclfol * x1;
 
         out = tmp * oldl[oldk];
-        out.real() += (1 - fabs(fb)) * smpsr[i] * (1.0 - panning);
+        out.real() += (1 - fabs(fb)) * smp.l[i] * (1.0 - panning);
 
         oldl[oldk]  = out;
         REALTYPE l = out.real() * 10.0 * (fb + 0.1);
@@ -76,7 +76,7 @@ void Alienwah::out(REALTYPE *smpsl, REALTYPE *smpsr)
         tmp = clfor * x + oldclfor * x1;
 
         out = tmp * oldr[oldk];
-        out.real() += (1 - fabs(fb)) * smpsr[i] * (1.0 - panning);
+        out.real() += (1 - fabs(fb)) * smp.r[i] * (1.0 - panning);
 
         oldr[oldk]  = out;
         REALTYPE r = out.real() * 10.0 * (fb + 0.1);
@@ -110,13 +110,13 @@ void Alienwah::cleanup()
  * Parameter control
  */
 
-void Alienwah::setdepth(const unsigned char &Pdepth)
+void Alienwah::setdepth(unsigned char Pdepth)
 {
     this->Pdepth = Pdepth;
     depth = (Pdepth / 127.0);
 }
 
-void Alienwah::setfb(const unsigned char &Pfb)
+void Alienwah::setfb(unsigned char Pfb)
 {
     this->Pfb = Pfb;
     fb = fabs((Pfb - 64.0) / 64.1);
@@ -127,7 +127,7 @@ void Alienwah::setfb(const unsigned char &Pfb)
         fb = -fb;
 }
 
-void Alienwah::setvolume(const unsigned char &Pvolume)
+void Alienwah::setvolume(unsigned char Pvolume)
 {
     this->Pvolume = Pvolume;
     outvolume     = Pvolume / 127.0;
@@ -137,25 +137,25 @@ void Alienwah::setvolume(const unsigned char &Pvolume)
         volume = outvolume;
 }
 
-void Alienwah::setpanning(const unsigned char &Ppanning)
+void Alienwah::setpanning(unsigned char Ppanning)
 {
     this->Ppanning = Ppanning;
     panning = Ppanning / 127.0;
 }
 
-void Alienwah::setlrcross(const unsigned char &Plrcross)
+void Alienwah::setlrcross(unsigned char Plrcross)
 {
     this->Plrcross = Plrcross;
     lrcross = Plrcross / 127.0;
 }
 
-void Alienwah::setphase(const unsigned char &Pphase)
+void Alienwah::setphase(unsigned char Pphase)
 {
     this->Pphase = Pphase;
     phase = (Pphase - 64.0) / 64.0 * PI;
 }
 
-void Alienwah::setdelay(const unsigned char &Pdelay)
+void Alienwah::setdelay(unsigned char Pdelay)
 {
     if(oldl != NULL)
         delete [] oldl;
@@ -190,12 +190,12 @@ void Alienwah::setpreset(unsigned char npreset)
     for(int n = 0; n < PRESET_SIZE; n++)
         changepar(n, presets[npreset][n]);
     if(insertion == 0)
-        changepar(0, presets[npreset][0] / 2);           //lower the volume if this is system effect
+        changepar(0, presets[npreset][0] / 2); //lower the volume if this is system effect
     Ppreset = npreset;
 }
 
 
-void Alienwah::changepar(const int &npar, const unsigned char &value)
+void Alienwah::changepar(int npar, unsigned char value)
 {
     switch(npar) {
     case 0:
@@ -238,7 +238,7 @@ void Alienwah::changepar(const int &npar, const unsigned char &value)
     }
 }
 
-unsigned char Alienwah::getpar(const int &npar) const
+unsigned char Alienwah::getpar(int npar) const
 {
     switch(npar) {
     case 0:

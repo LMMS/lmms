@@ -1,5 +1,5 @@
 //
-// "$Id: filename_expand.cxx 6641 2009-01-20 11:10:29Z fabien $"
+// "$Id: filename_expand.cxx 6986 2010-01-01 18:30:49Z greg.ercolano $"
 //
 // Filename expansion routines for the Fast Light Tool Kit (FLTK).
 //
@@ -47,12 +47,27 @@ static inline int isdirsep(char c) {return c=='/' || c=='\\';}
 #define isdirsep(c) ((c)=='/')
 #endif
 
-/**
- * Expands a filename coontaining shell variables.
- * \param[out] to resulting expanded filename
- * \param[in]  tolen size of the expanded filename buffer 
- * \param[in]  from filename containing shell variables
- * \return 0 if no change, non zero otherwise
+/** Expands a filename containing shell variables and tilde (~).
+    Currently handles these variants:
+    \code
+    "~username"               // if 'username' does not exist, result will be unchanged
+    "~/file"
+    "$VARNAME"                // does NOT handle ${VARNAME}
+    \endcode
+
+    \b Examples:
+    \code
+    #include <FL/filename.H>
+    [..]
+    putenv("TMPDIR=/var/tmp");
+    fl_filename_expand(out, sizeof(out), "~fred/.cshrc");     // out="/usr/fred/.cshrc"
+    fl_filename_expand(out, sizeof(out), "~/.cshrc");         // out="/usr/<yourname>/.cshrc"
+    fl_filename_expand(out, sizeof(out), "$TMPDIR/foo.txt");  // out="/var/tmp/foo.txt"
+    \endcode
+    \param[out] to resulting expanded filename
+    \param[in]  tolen size of the expanded filename buffer 
+    \param[in]  from filename containing shell variables
+    \return 0 if no change, non zero otherwise
  */
 int fl_filename_expand(char *to,int tolen, const char *from) {
 
@@ -115,5 +130,5 @@ int fl_filename_expand(char *to,int tolen, const char *from) {
 
 
 //
-// End of "$Id: filename_expand.cxx 6641 2009-01-20 11:10:29Z fabien $".
+// End of "$Id: filename_expand.cxx 6986 2010-01-01 18:30:49Z greg.ercolano $".
 //

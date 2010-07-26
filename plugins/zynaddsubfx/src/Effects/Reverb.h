@@ -40,12 +40,12 @@ class Reverb:public Effect
     public:
         Reverb(const int &insertion_, REALTYPE *efxoutl_, REALTYPE *efxoutr_);
         ~Reverb();
-        void out(REALTYPE *smps_l, REALTYPE *smps_r);
+        void out(const Stereo<float *> &smp);
         void cleanup();
 
         void setpreset(unsigned char npreset);
-        void changepar(const int &npar, const unsigned char &value);
-        unsigned char getpar(const int &npar) const;
+        void changepar(int npar, unsigned char value);
+        unsigned char getpar(int npar) const;
 
     private:
         //Parametrii
@@ -90,17 +90,17 @@ class Reverb:public Effect
         unsigned char Pbandwidth;
 
         //parameter control
-        void setvolume(const unsigned char &Pvolume);
-        void setpan(const unsigned char &Ppan);
-        void settime(const unsigned char &Ptime);
+        void setvolume(unsigned char Pvolume);
+        void setpan(unsigned char Ppan);
+        void settime(unsigned char Ptime);
         void setlohidamp(unsigned char Plohidamp);
-        void setidelay(const unsigned char &Pidelay);
-        void setidelayfb(const unsigned char &Pidelayfb);
-        void sethpf(const unsigned char &Phpf);
-        void setlpf(const unsigned char &Plpf);
+        void setidelay(unsigned char Pidelay);
+        void setidelayfb(unsigned char Pidelayfb);
+        void sethpf(unsigned char Phpf);
+        void setlpf(unsigned char Plpf);
         void settype(unsigned char Ptype);
-        void setroomsize(const unsigned char &Proomsize);
-        void setbandwidth(const unsigned char &Pbandwidth);
+        void setroomsize(unsigned char Proomsize);
+        void setbandwidth(unsigned char Pbandwidth);
 
         REALTYPE pan, erbalance;
         //Parameters

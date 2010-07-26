@@ -1,7 +1,7 @@
 /*
   ZynAddSubFX - a software synthesizer
 
-  PresetsStore.C - Presets and Clipboard store
+  PresetsStore.cpp - Presets and Clipboard store
   Copyright (C) 2002-2005 Nasca Octavian Paul
   Author: Nasca Octavian Paul
 
@@ -20,11 +20,12 @@
 
 */
 
+#include <string>
+#include <vector>
 #include "../Misc/XMLwrapper.h"
 #include "../Misc/Config.h"
 
 #define MAX_PRESETTYPE_SIZE 30
-#define MAX_PRESETS 1000
 
 class PresetsStore
 {
@@ -35,20 +36,23 @@ class PresetsStore
         //Clipboard stuff
         void copyclipboard(XMLwrapper *xml, char *type);
         bool pasteclipboard(XMLwrapper *xml);
-        bool checkclipboardtype(char *type);
+        bool checkclipboardtype(const char *type);
 
         //presets stuff
-        void copypreset(XMLwrapper *xml, char *type, const char *name);
+        void copypreset(XMLwrapper *xml, char *type, std::string name);
         bool pastepreset(XMLwrapper *xml, int npreset);
         void deletepreset(int npreset);
 
         struct presetstruct {
-            char *file;
-            char *name;
+            presetstruct(std::string _file, std::string _name)
+                :file(_file),name(_name){};
+            bool operator<(const presetstruct &b) const;
+            std::string file;
+            std::string name;
         };
-        presetstruct presets[MAX_PRESETS];
+        std::vector<presetstruct> presets;
 
-        void rescanforpresets(char *type);
+        void rescanforpresets(const std::string type);
 
     private:
         struct {

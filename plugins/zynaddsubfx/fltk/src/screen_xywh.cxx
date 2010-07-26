@@ -1,5 +1,5 @@
 //
-// "$Id: screen_xywh.cxx 6716 2009-03-24 01:40:44Z fabien $"
+// "$Id: screen_xywh.cxx 7351 2010-03-29 10:35:00Z matt $"
 //
 // Screen/monitor bounding box API for the Fast Light Tool Kit (FLTK).
 //
@@ -107,19 +107,9 @@ static void screen_init() {
 #elif defined(__APPLE__)
 XRectangle screens[16];
 
+extern int MACscreen_init(XRectangle screens[]);
 static void screen_init() {
-  GDHandle gd;
-
-  for (gd = GetDeviceList(), num_screens = 0; gd; gd = GetNextDevice(gd)) {
-    GDPtr gp = *gd;
-    screens[num_screens].x      = gp->gdRect.left;
-    screens[num_screens].y      = gp->gdRect.top;
-    screens[num_screens].width  = gp->gdRect.right - gp->gdRect.left;
-    screens[num_screens].height = gp->gdRect.bottom - gp->gdRect.top;
-
-    num_screens ++;
-    if (num_screens >= 16) break;
-  }
+  num_screens = MACscreen_init(screens);
 }
 #elif HAVE_XINERAMA
 #  include <X11/extensions/Xinerama.h>
@@ -264,5 +254,5 @@ void Fl::screen_xywh(int &X, int &Y, int &W, int &H, int n) {
 
 
 //
-// End of "$Id: screen_xywh.cxx 6716 2009-03-24 01:40:44Z fabien $".
+// End of "$Id: screen_xywh.cxx 7351 2010-03-29 10:35:00Z matt $".
 //

@@ -1,5 +1,5 @@
 //
-// "$Id: Fl_Scrollbar.cxx 6683 2009-03-14 11:46:43Z engelsman $"
+// "$Id: Fl_Scrollbar.cxx 7161 2010-02-26 20:44:35Z matt $"
 //
 // Scroll bar widget for the Fast Light Tool Kit (FLTK).
 //
@@ -36,23 +36,32 @@
 #define REPEAT .05
 
 void Fl_Scrollbar::increment_cb() {
-  int ls = maximum()>=minimum() ? linesize_ : -linesize_;
+  char inv = maximum()<minimum();
+  int ls = inv ? -linesize_ : linesize_;
   int i;
   switch (pushed_) {
-  case 1:
-    i = -ls;
-    break;
-  default:
-    i =  ls;
-    break;
-  case 5:
-    i = -int((maximum()-minimum())*slider_size()/(1.0-slider_size())) + ls;
-    if (i > -ls) i = -ls;
-    break;
-  case 6:
-    i =  int((maximum()-minimum())*slider_size()/(1.0-slider_size())) - ls;
-    if (i < ls) i = ls;
-    break;
+    case 1: // clicked on arrow left
+      i = -ls;
+      break;
+    default: // clicked on arrow right
+      i =  ls;
+      break;
+    case 5: // clicked into the box next to the slider on the left
+      i = -(int((maximum()-minimum())*slider_size()/(1.0-slider_size())));
+      if (inv) {
+        if (i<-ls) i = -ls;
+      } else {
+        if (i>-ls) i = -ls; // err
+      }
+      break;
+    case 6: // clicked into the box next to the slider on the right
+      i = (int((maximum()-minimum())*slider_size()/(1.0-slider_size())));
+      if (inv) {
+        if (i>ls) i = ls;
+      } else {
+        if (i<ls) i = ls; // err
+      }
+      break;
   }
   handle_drag(clamp(value() + i));
 }
@@ -133,11 +142,13 @@ int Fl_Scrollbar::handle(int event) {
   case FL_MOUSEWHEEL :
     if (horizontal()) {
       if (Fl::e_dx==0) return 0;
-      handle_drag(clamp(value() + linesize_ * Fl::e_dx));
+      int ls = maximum()>=minimum() ? linesize_ : -linesize_;
+      handle_drag(clamp(value() + ls * Fl::e_dx));
       return 1;
     } else {
       if (Fl::e_dy==0) return 0;
-      handle_drag(clamp(value() + linesize_ * Fl::e_dy));
+      int ls = maximum()>=minimum() ? linesize_ : -linesize_;
+      handle_drag(clamp(value() + ls * Fl::e_dy));
       return 1;
     }
   case FL_SHORTCUT:
@@ -277,5 +288,5 @@ Fl_Scrollbar::~Fl_Scrollbar() {
 
 
 //
-// End of "$Id: Fl_Scrollbar.cxx 6683 2009-03-14 11:46:43Z engelsman $".
+// End of "$Id: Fl_Scrollbar.cxx 7161 2010-02-26 20:44:35Z matt $".
 //

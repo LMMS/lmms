@@ -1,7 +1,7 @@
 /*
   ZynAddSubFX - a software synthesizer
 
-  VSTaudiooutput.C - Audio output for VST
+  VSTaudiooutput.cpp - Audio output for VST
   Copyright (C) 2002 Nasca Octavian Paul
   Author: Nasca Octavian Paul
 
@@ -22,7 +22,7 @@
 #include <string.h>
 #include "VSTaudiooutput.h"
 
-//the constructor and the destructor are defined in main.C
+//the constructor and the destructor are defined in main.cpp
 
 void VSTSynth::process(float **inputs, float **outputs, long sampleframes)
 {

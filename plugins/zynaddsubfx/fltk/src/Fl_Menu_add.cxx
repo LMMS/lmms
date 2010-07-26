@@ -1,5 +1,5 @@
 //
-// "$Id: Fl_Menu_add.cxx 6878 2009-09-17 22:12:24Z matt $"
+// "$Id: Fl_Menu_add.cxx 7519 2010-04-16 19:50:40Z greg.ercolano $"
 //
 // Menu utilities for the Fast Light Tool Kit (FLTK).
 //
@@ -53,11 +53,12 @@ extern Fl_Menu_* fl_menu_array_owner; // in Fl_Menu_.cxx
 
 // Insert a single Fl_Menu_Item into an array of size at offset n,
 // if this is local_array it will be reallocated if needed.
-static Fl_Menu_Item* insert(
-  Fl_Menu_Item* array, int size,
-  int n,
-  const char *text,
-  int flags
+static Fl_Menu_Item* array_insert(
+  Fl_Menu_Item* array,  // array to modify
+  int size,             // size of array
+  int n,                // index of new insert position
+  const char *text,     // text of new item (copy is made)
+  int flags             // flags for new item
 ) {
   if (array == local_array && size >= local_array_alloc) {
     local_array_alloc = 2*size;
@@ -107,6 +108,27 @@ int Fl_Menu_Item::add(
   void *data,
   int myflags
 ) {
+  return(insert(-1,mytext,sc,cb,data,myflags));		// -1: append
+}
+
+/** Inserts an item at position \p index.
+    
+    If \p index is -1, the item is added the same way as Fl_Menu_Item::add().
+
+    If 'mytext' contains any un-escaped front slashes (/), it's assumed 
+    a menu pathname is being specified, and the value of \p index 
+    will be ignored.
+
+    In all other aspects, the behavior of insert() is the same as add().
+*/
+int Fl_Menu_Item::insert(
+  int index,
+  const char *mytext,
+  int sc,
+  Fl_Callback *cb,	
+  void *data,
+  int myflags
+) {
   Fl_Menu_Item *array = this;
   Fl_Menu_Item *m = this;
   const char *p;
@@ -133,17 +155,18 @@ int Fl_Menu_Item::add(
 
     item = buf;
     if (*p != '/') break; /* not a menu title */
-    mytext = p+1;	/* point at item title */
+    index = -1;           /* any submenu specified overrides insert position */
+    mytext = p+1;         /* point at item title */
 
     /* find a matching menu title: */
     for (; m->text; m = m->next())
       if (m->flags&FL_SUBMENU && !compare(item, m->text)) break;
 
     if (!m->text) { /* create a new menu */
-      int n = m-array;
-      array = insert(array, msize, n, item, FL_SUBMENU|flags1);
+      int n = (index==-1) ? m-array : index;
+      array = array_insert(array, msize, n, item, FL_SUBMENU|flags1);
       msize++;
-      array = insert(array, msize, n+1, 0, 0);
+      array = array_insert(array, msize, n+1, 0, 0);
       msize++;
       m = array+n;
     }
@@ -156,11 +179,11 @@ int Fl_Menu_Item::add(
     if (!(m->flags&FL_SUBMENU) && !compare(m->text,item)) break;
 
   if (!m->text) {	/* add a new menu item */
-    int n = m-array;
-    array = insert(array, msize, n, item, myflags|flags1);
+    int n = (index==-1) ? m-array : index;
+    array = array_insert(array, msize, n, item, myflags|flags1);
     msize++;
     if (myflags & FL_SUBMENU) { // add submenu delimiter
-      array = insert(array, msize, n+1, 0, 0);
+      array = array_insert(array, msize, n+1, 0, 0);
       msize++;
     }
     m = array+n;
@@ -179,17 +202,21 @@ int Fl_Menu_Item::add(
 /**
   Adds a new menu item.
   
-  \param[in] label The text label for the menu item.
+  \param[in] label    The text label for the menu item.
   \param[in] shortcut Optional keyboard shortcut that can be an int or string; (FL_CTRL+'a') or "^a". Default 0 if none.
   \param[in] callback Optional callback invoked when user clicks the item. Default 0 if none.
   \param[in] userdata Optional user data passed as an argument to the callback. Default 0 if none.
-  \param[in] flags Optional flags that control the type of menu item; see below. Default is 0 for none.
-  \returns The index into the menu() array, where the entry was added.
+  \param[in] flags    Optional flags that control the type of menu item; see below. Default is 0 for none.
+  \returns            The index into the menu() array, where the entry was added.
   
   \par Description
   If the menu array was directly set with menu(x), then copy() is done 
   to make a private array.
   \par 
+  Since this method can change the internal menu array, any menu item
+  pointers or indecies the application may have cached can become stale,
+  and should be recalculated/refreshed.
+  \par
   A menu item's callback must not add() items to its parent menu during the callback.
 
   <B>Detailed Description of Parameters</B>
@@ -219,23 +246,32 @@ int Fl_Menu_Item::add(
   \par 
   This parameter is optional, and defaults to 0 to indicate no shortcut.
   \par
-  Shortcut can be 0L, or either a modifier/key combination (for example
-  FL_CTRL+'A') or a string describing the shortcut in one of two ways:
+  The shortcut can either be a raw integer value (eg. FL_CTRL+'A')
+  or a string (eg. "^c" or "^97").
+  \par
+  Raw integer shortcuts can be a combination of keyboard chars (eg. 'A')
+  and optional keyboard modifiers (see Fl::event_state(), e.g. FL_SHIFT, etc).
+  \par
+  String shortcuts can be specified in one of two ways:
+  \par
   \verbatim
    [#+^]<ascii_value>    e.g. "97", "^97", "+97", "#97"
    [#+^]<ascii_char>     e.g. "a", "^a", "+a", "#a"
   \endverbatim
+  \par
   ..where \<ascii_value\> is a decimal value representing an
-  ascii character (eg. 97 is the ascii for 'a'), and the optional
+  ascii character (eg. 97 is the ascii code for 'a'), and the optional
   prefixes enhance the value that follows. Multiple prefixes must
   appear in the above order.
+  \par
   \verbatim
    # - Alt
    + - Shift
    ^ - Control
   \endverbatim
-  Text shortcuts are converted to integer shortcut by calling 
-  Fl_Shortcut fl_old_shortcut(const char*).
+  \par
+  Internally, the text shortcuts are converted to integer values using
+  fl_old_shortcut(const char*).
 
   \par callback
   The callback to invoke when this menu item is selected. 
@@ -264,8 +300,52 @@ int Fl_Menu_Item::add(
       FL_MENU_DIVIDER      // Creates divider line below this item. Also ends a group of radio buttons.
   \endcode
 
+  \todo Raw integer shortcut needs examples. 
+        Dependent on responses to http://fltk.org/newsgroups.php?gfltk.development+v:10086 and results of STR#2344
  */
 int Fl_Menu_::add(const char *label,int shortcut,Fl_Callback *callback,void *userdata,int flags) {
+  return(insert(-1,label,shortcut,callback,userdata,flags));	// -1: append
+}
+
+/**
+  Inserts a new menu item at the specified \p index position.
+
+  If \p index is -1, the menu item is appended; same behavior as add().
+
+  To properly insert a menu item, \p label must be the name of the item (eg. "Quit"),
+  and not a 'menu pathname' (eg. "File/Quit").  If a menu pathname is specified, 
+  the value of \p index is \em ignored, the new item's position defined by the pathname.
+  
+  For more details, see add(). Except for the \p index parameter, add()
+  has more detailed information on parameters and behavior, and is
+  functionally equivalent.
+
+  \param[in] index    The menu array's index position where the new item
+                      is inserted. If -1, behavior is the same as add().
+  \param[in] label    The text label for the menu item. If the label 
+                      is a menu pathname, \p index is ignored, and the pathname
+		      indicates the position of the new item.
+  \param[in] shortcut Optional keyboard shortcut. Can be an int (FL_CTRL+'a')
+                      or a string ("^a"). Default is 0.
+  \param[in] callback Optional callback invoked when user clicks the item.
+                      Default 0 if none.
+  \param[in] userdata Optional user data passed as an argument to the callback.
+                      Default 0 if none.
+  \param[in] flags    Optional flags that control the type of menu item; 
+                      see add() for more info. Default is 0 for none.
+  \returns            The index into the menu() array, where the entry was added.
+
+  \see                add()
+
+ */
+int Fl_Menu_::insert(
+  int index,
+  const char *label,
+  int shortcut,
+  Fl_Callback *callback,
+  void *userdata,
+  int flags
+) {
   // make this widget own the local array:
   if (this != fl_menu_array_owner) {
     if (fl_menu_array_owner) {
@@ -299,7 +379,7 @@ int Fl_Menu_::add(const char *label,int shortcut,Fl_Callback *callback,void *use
     }
     fl_menu_array_owner = this;
   }
-  int r = menu_->add(label,shortcut,callback,userdata,flags);
+  int r = menu_->insert(index,label,shortcut,callback,userdata,flags);
   // if it rellocated array we must fix the pointer:
   int value_offset = value_-menu_;
   menu_ = local_array; // in case it reallocated it
@@ -374,5 +454,5 @@ void Fl_Menu_::remove(int i) {
 }
 
 //
-// End of "$Id: Fl_Menu_add.cxx 6878 2009-09-17 22:12:24Z matt $".
+// End of "$Id: Fl_Menu_add.cxx 7519 2010-04-16 19:50:40Z greg.ercolano $".
 //

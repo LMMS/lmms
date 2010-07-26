@@ -1,5 +1,5 @@
 /*
- * "$Id: fl_call_main.c 6680 2009-03-14 02:11:31Z greg.ercolano $"
+ * "$Id: fl_call_main.c 7352 2010-03-29 10:47:11Z matt $"
  *
  * Copyright 1998-2009 by Bill Spitzak and others.
  *
@@ -51,11 +51,7 @@
 #  include <windows.h>
 #  include <stdio.h>
 #  include <stdlib.h>
-#include <FL/fl_utf8.h>
-
-#  ifdef __MWERKS__
-#   include <crtl.h>
-#  endif
+#  include <FL/fl_utf8.h>
 
 extern int main(int, char *[]);
 
@@ -142,6 +138,6 @@ static void dummy(void) {}
 #endif /* WIN32 && !FL_DLL && !__GNUC__ */
 
 /*
- * End of "$Id: fl_call_main.c 6680 2009-03-14 02:11:31Z greg.ercolano $".
+ * End of "$Id: fl_call_main.c 7352 2010-03-29 10:47:11Z matt $".
  */
 

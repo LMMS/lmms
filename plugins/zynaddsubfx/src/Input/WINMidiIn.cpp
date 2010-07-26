@@ -1,7 +1,7 @@
 /*
   ZynAddSubFX - a software synthesizer
 
-  WINMidiIn.C - Midi input for Windows
+  WINMidiIn.cpp - Midi input for Windows
   Copyright (C) 2002-2005 Nasca Octavian Paul
   Author: Nasca Octavian Paul
 

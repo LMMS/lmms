@@ -35,6 +35,8 @@ public:
 	LocalZynAddSubFx();
 	~LocalZynAddSubFx();
 
+	void initConfig();
+
 	void setSampleRate( int _sampleRate );
 	void setBufferSize( int _bufferSize );
 

@@ -1,5 +1,5 @@
 /*
- * "$Id: flstring.h 6680 2009-03-14 02:11:31Z greg.ercolano $"
+ * "$Id: flstring.h 7352 2010-03-29 10:47:11Z matt $"
  *
  * Common string header file for the Fast Light Tool Kit (FLTK).
  *
@@ -68,18 +68,6 @@
 extern "C" {
 #  endif /* __cplusplus */
 
-/*
- * MetroWerks' CodeWarrior put thes "non-standard" functions in
- * <extras.h> which unfortunatly does not play well otherwise
- * when included - to be resolved...
- */
-
-#  if defined(__APPLE__) && defined(__MWERKS__) && defined(_MSL_USING_MW_C_HEADERS)
-int strcasecmp(const char*,const char*);
-int strncasecmp(const char*,const char*,int);
-char *strdup(const char*);
-#  endif
-
 FL_EXPORT extern int fl_snprintf(char *, size_t, const char *, ...);
 #  if !HAVE_SNPRINTF
 #    define snprintf fl_snprintf
@@ -112,5 +100,5 @@ FL_EXPORT extern size_t fl_strlcpy(char *, const char *, size_t);
 
 
 /*
- * End of "$Id: flstring.h 6680 2009-03-14 02:11:31Z greg.ercolano $".
+ * End of "$Id: flstring.h 7352 2010-03-29 10:47:11Z matt $".
  */

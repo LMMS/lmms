@@ -1,7 +1,7 @@
 /*
   ZynAddSubFX - a software synthesizer
 
-  EffectMgr.C - Effect manager, an interface betwen the program and effects
+  EffectMgr.cpp - Effect manager, an interface betwen the program and effects
   Copyright (C) 2002-2005 Nasca Octavian Paul
   Author: Nasca Octavian Paul
 
@@ -21,6 +21,8 @@
 */
 
 #include "EffectMgr.h"
+#include <iostream>
+using namespace std;
 
 EffectMgr::EffectMgr(int insertion_, pthread_mutex_t *mutex_)
     :insertion(insertion_),

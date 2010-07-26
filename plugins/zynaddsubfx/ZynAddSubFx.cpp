@@ -152,17 +152,12 @@ void ZynAddSubFxInstrument::saveSettings( QDomDocument & _doc,
 		}
 		m_pluginMutex.unlock();
 		QByteArray a = tf.readAll();
-		// remove first blank line
-		a.remove( 0,
-#ifdef LMMS_BUILD_WIN32
-				2
-#else
-				1
-#endif
-					);
 		QDomDocument doc( "mydoc" );
-		doc.setContent( a );
-		_this.appendChild( doc.documentElement() );
+		if( doc.setContent( a ) )
+		{
+			QDomNode n = _doc.importNode( doc.documentElement(), true );
+			_this.appendChild( n );
+		}
 	}
 }
 
@@ -183,7 +178,6 @@ void ZynAddSubFxInstrument::loadSettings( const QDomElement & _this )
 	if( tf.open() )
 	{
 		QByteArray a = doc.toString( 0 ).toUtf8();
-		a.prepend( "<?xml version=\"1.0\"?>\n" );
 		tf.write( a );
 		tf.flush();
 
@@ -317,16 +311,16 @@ void ZynAddSubFxInstrument::initPlugin()
 		m_remotePlugin->waitForInitDone( false );
 
 		m_remotePlugin->sendMessage(
+			RemotePlugin::message( IdZasfLmmsWorkingDirectory ).
+				addString(
+					QSTR_TO_STDSTR(
+						QString( configManager::inst()->workingDir() ) ) ) );
+		m_remotePlugin->sendMessage(
 			RemotePlugin::message( IdZasfPresetDirectory ).
 				addString(
 					QSTR_TO_STDSTR(
 						QString( configManager::inst()->factoryPresetsDir() +
 								QDir::separator() + "ZynAddSubFX" ) ) ) );
-		m_remotePlugin->sendMessage(
-			RemotePlugin::message( IdZasfLmmsWorkingDirectory ).
-				addString(
-					QSTR_TO_STDSTR(
-						QString( configManager::inst()->workingDir() ) ) ) );
 		m_remotePlugin->showUI();
 		m_remotePlugin->unlock();
 	}

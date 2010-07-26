@@ -1,5 +1,5 @@
 //
-// "$Id: Fl_Text_Display.cxx 6909 2009-09-28 14:41:43Z matt $"
+// "$Id: Fl_Text_Display.cxx 7527 2010-04-18 14:33:33Z engelsman $"
 //
 // Copyright 2001-2009 by Bill Spitzak and others.
 // Original code Copyright Mark Edel.  Permission to distribute under
@@ -223,132 +223,8 @@ void Fl_Text_Display::highlight_data(Fl_Text_Buffer *styleBuffer,
   mHighlightCBArg = cbArg;
 
   mStyleBuffer->canUndo(0);
-#if 0
-  // FIXME: this is in nedit code -- is it needed?	
-    /* Call TextDSetFont to combine font information from style table and
-       primary font, adjust font-related parameters, and then redisplay */
-    TextDSetFont(textD, textD->fontStruct);
-#endif
   damage(FL_DAMAGE_EXPOSE);
 }
-
-#if 0
-  // FIXME: this is in nedit code -- is it needed?	
-/**
-   Change the (non highlight) font
-*/
-void TextDSetFont(textDisp *textD, XFontStruct *fontStruct) {
-    Display *display = XtDisplay(textD->w);
-    int i, maxAscent = fontStruct->ascent, maxDescent = fontStruct->descent;
-    int width, height, fontWidth;
-    Pixel bgPixel, fgPixel, selectFGPixel, selectBGPixel;
-    Pixel highlightFGPixel, highlightBGPixel;
-    XGCValues values;
-    XFontStruct *styleFont;
-    
-    /* If font size changes, cursor will be redrawn in a new position */
-    blankCursorProtrusions(textD);
-    
-    /* If there is a (syntax highlighting) style table in use, find the new
-       maximum font height for this text display */
-    for (i=0; i<textD->nStyles; i++) {
-    	styleFont = textD->styleTable[i].font;
-	if (styleFont != NULL && styleFont->ascent > maxAscent)
-    	    maxAscent = styleFont->ascent;
-    	if (styleFont != NULL && styleFont->descent > maxDescent)
-    	    maxDescent = styleFont->descent;
-    }
-    textD->ascent = maxAscent;
-    textD->descent = maxDescent;
-    
-    /* If all of the current fonts are fixed and match in width, compute */
-    fontWidth = fontStruct->max_bounds.width;
-    if (fontWidth != fontStruct->min_bounds.width)
-	fontWidth = -1;
-    else {
-	for (i=0; i<textD->nStyles; i++) {
-    	    styleFont = textD->styleTable[i].font;
-	    if (styleFont != NULL && (styleFont->max_bounds.width != fontWidth ||
-		    styleFont->max_bounds.width != styleFont->min_bounds.width))
-		fontWidth = -1;
-	}
-    }
-    textD->fixedFontWidth = fontWidth;
-    
-    /* Don't let the height dip below one line, or bad things can happen */
-    if (textD->height < maxAscent + maxDescent)
-        textD->height = maxAscent + maxDescent;
-
-    /* Change the font.  In most cases, this means re-allocating the
-       affected GCs (they are shared with other widgets, and if the primary
-       font changes, must be re-allocated to change it). Unfortunately,
-       this requres recovering all of the colors from the existing GCs */
-    textD->fontStruct = fontStruct;
-    XGetGCValues(display, textD->gc, GCForeground|GCBackground, &values);
-    fgPixel = values.foreground;
-    bgPixel = values.background;
-    XGetGCValues(display, textD->selectGC, GCForeground|GCBackground, &values);
-    selectFGPixel = values.foreground;
-    selectBGPixel = values.background;
-    XGetGCValues(display, textD->highlightGC,GCForeground|GCBackground,&values);
-    highlightFGPixel = values.foreground;
-    highlightBGPixel = values.background;
-    releaseGC(textD->w, textD->gc);
-    releaseGC(textD->w, textD->selectGC);
-    releaseGC(textD->w, textD->highlightGC);
-    releaseGC(textD->w, textD->selectBGGC);
-    releaseGC(textD->w, textD->highlightBGGC);
-    if (textD->lineNumGC != NULL)
-	releaseGC(textD->w, textD->lineNumGC);
-    textD->lineNumGC = NULL;
-    allocateFixedFontGCs(textD, fontStruct, bgPixel, fgPixel, selectFGPixel,
-	    selectBGPixel, highlightFGPixel, highlightBGPixel);
-    XSetFont(display, textD->styleGC, fontStruct->fid);
-    
-    /* Do a full resize to force recalculation of font related parameters */
-    width = textD->width;
-    height = textD->height;
-    textD->width = textD->height = 0;
-    TextDResize(textD, width, height);
-    
-    /* Redisplay */
-    TextDRedisplayRect(textD, textD->left, textD->top, textD->width,
-    	    textD->height);
-    
-    /* Clean up line number area in case spacing has changed */
-    draw_line_numbers(textD, True);
-}
-
-int TextDMinFontWidth(textDisp *textD, Boolean considerStyles) {
-    int fontWidth = textD->fontStruct->max_bounds.width;
-    int i;
-
-    if (considerStyles) {
-        for (i = 0; i < textD->nStyles; ++i) {
-            int thisWidth = (textD->styleTable[i].font)->min_bounds.width;
-            if (thisWidth < fontWidth) {
-                fontWidth = thisWidth;
-            }
-        }
-    }
-    return(fontWidth);
-}
-
-int TextDMaxFontWidth(textDisp *textD, Boolean considerStyles) {
-    int fontWidth = textD->fontStruct->max_bounds.width;
-    int i;
-
-    if (considerStyles) {
-        for (i = 0; i < textD->nStyles; ++i) {
-            int thisWidth = (textD->styleTable[i].font)->max_bounds.width;
-            if (thisWidth > fontWidth) {
-                fontWidth = thisWidth;
-            }
-        }
-    }
-    return(fontWidth);
-}
-#endif
 
 int Fl_Text_Display::longest_vline() const {
   int longest = 0;
@@ -550,6 +426,7 @@ void Fl_Text_Display::draw_text( int left, int top, int width, int height ) {
 void Fl_Text_Display::redisplay_range(int startpos, int endpos) {
   int ok = 0;
   while (!ok && startpos > 0) {
+    // FIXME: character is ucs-4
     char c = buffer()->character( startpos );
     if (!((c & 0x80) && !(c & 0x40))) {
       ok = 1;
@@ -558,6 +435,7 @@ void Fl_Text_Display::redisplay_range(int startpos, int endpos) {
     }
   }
   while (!ok && endpos < buffer()->length()) {
+    // FIXME: character is ucs-4
     char c = buffer()->character( endpos );
     if (!((c & 0x80) && !(c & 0x40))) {
       ok = 1;
@@ -753,7 +631,7 @@ void Fl_Text_Display::overstrike(const char* text) {
   startIndent = mBuffer->count_displayed_characters( lineStart, startPos );
   indent = startIndent;
   for ( c = text; *c != '\0'; c++ )
-    indent += Fl_Text_Buffer::character_width( *c, indent, buf->tab_distance(), buf->null_substitution_character() );
+    indent += Fl_Text_Buffer::character_width( c, indent, buf->tab_distance() );
   endIndent = indent;
 
   /* find which characters to remove, and if necessary generate additional
@@ -762,10 +640,12 @@ void Fl_Text_Display::overstrike(const char* text) {
   for ( p = startPos; ; p++ ) {
     if ( p == buf->length() )
       break;
+    // FIXME: character is ucs-4
     ch = buf->character( p );
     if ( ch == '\n' )
       break;
-    indent += Fl_Text_Buffer::character_width( ch, indent, buf->tab_distance(), buf->null_substitution_character() );
+    const char *s = buf->address(p);
+    indent += Fl_Text_Buffer::character_width(s, indent, buf->tab_distance() ); // FIXME: not unicode
     if ( indent == endIndent ) {
       p++;
       break;
@@ -846,18 +726,12 @@ int Fl_Text_Display::position_to_xy( int pos, int* X, int* Y ) const {
      to "pos" to calculate the X coordinate */
   xStep = text_area.x - mHorizOffset;
   outIndex = 0;
-  for ( charIndex = 0; charIndex < lineLen && charIndex < pos - lineStartPos; charIndex++ ) {
-    charLen = Fl_Text_Buffer::expand_character( lineStr[ charIndex ], outIndex, expandedChar,
-              mBuffer->tab_distance(), mBuffer->null_substitution_character() );
-    if (charLen > 1 && (lineStr[ charIndex ] & 0x80)) {
-      int i, ii = 0;;
-      i = fl_utf8len(lineStr[ charIndex ]);
-      while (i > 1) {
-        i--;
-        ii++;
-        expandedChar[ii] = lineStr[ charIndex + ii];
-      }
-    }
+  for (charIndex = 0; 
+       charIndex < lineLen && charIndex < pos - lineStartPos; 
+       charIndex += fl_utf8len(lineStr[charIndex]) ) 
+  {
+    charLen = Fl_Text_Buffer::expand_character( lineStr+charIndex, outIndex, expandedChar,
+              mBuffer->tab_distance());
     charStyle = position_style( lineStartPos, lineLen, charIndex,
                                 outIndex );
     xStep += string_width( expandedChar, charLen, charStyle );
@@ -909,6 +783,7 @@ int Fl_Text_Display::in_selection( int X, int Y ) const {
   Fl_Text_Buffer *buf = mBuffer;
   int ok = 0;
   while (!ok) {
+    // FIXME: character is ucs-4
     char c = buffer()->character( pos );
     if (!((c & 0x80) && !(c & 0x40))) {
       ok = 1;
@@ -1024,6 +899,7 @@ int Fl_Text_Display::move_right() {
     return 0;
   insert_position( mCursorPos + 1 );
     int pos = insert_position();
+    // FIXME: character is ucs-4
     char c = buffer()->character( pos );
     if (!((c & 0x80) && !(c & 0x40))) ok = 1;
   }
@@ -1037,6 +913,7 @@ int Fl_Text_Display::move_left() {
     return 0;
   insert_position( mCursorPos - 1 );
     int pos = insert_position();
+    // FIXME: character is ucs-4
     char c = buffer()->character( pos );
     if (!((c & 0x80) && !(c & 0x40))) ok = 1;
   }
@@ -1077,6 +954,7 @@ int Fl_Text_Display::move_up() {
  int ok = 0;
   while (!ok) {
     int pos = insert_position();
+    // FIXME: character is ucs-4
     char c = buffer()->character( pos );
     if (!((c & 0x80) && !(c & 0x40))) {
       ok = 1;
@@ -1113,6 +991,7 @@ int Fl_Text_Display::move_down() {
   int ok = 0;
   while (!ok) {
     int pos = insert_position();
+    // FIXME: character is ucs-4
     char c = buffer()->character( pos );
     if (!((c & 0x80) && !(c & 0x40))) {
       ok = 1;
@@ -1262,9 +1141,11 @@ static inline int fl_isseparator(int c) {
 /**   Moves the current insert position right one word.*/
 void Fl_Text_Display::next_word() {
   int pos = insert_position();
+  // FIXME: character is ucs-4
   while (pos < buffer()->length() && !fl_isseparator(buffer()->character(pos))) {
     pos++;
   }
+  // FIXME: character is ucs-4
   while (pos < buffer()->length() && fl_isseparator(buffer()->character(pos))) {
     pos++;
   }
@@ -1277,12 +1158,15 @@ void Fl_Text_Display::previous_word() {
   int pos = insert_position();
   if (pos==0) return;
   pos--;
+  // FIXME: character is ucs-4
   while (pos && fl_isseparator(buffer()->character(pos))) {
     pos--;
   }
+  // FIXME: character is ucs-4
   while (pos && !fl_isseparator(buffer()->character(pos))) {
     pos--;
   }
+  // FIXME: character is ucs-4
   if (fl_isseparator(buffer()->character(pos))) pos++;
 
   insert_position( pos );
@@ -1599,20 +1483,10 @@ void Fl_Text_Display::draw_vline(int visLineNum, int leftClip, int rightClip,
      that character */
   X = text_area.x - mHorizOffset;
   outIndex = 0;
-  for ( charIndex = 0; ; charIndex++ ) {
+  for ( charIndex = 0; ; charIndex += lineStr ? fl_utf8len(lineStr[charIndex]) : 1 ) {
     charLen = charIndex >= lineLen ? 1 :
-              Fl_Text_Buffer::expand_character( lineStr[ charIndex ], outIndex,
-                                                expandedChar, buf->tab_distance(), buf->null_substitution_character() );
-    if (charIndex < lineLen && charLen > 1 && (lineStr[ charIndex ] & 0x80)) {
-      int i, ii = 0;;
-      i = fl_utf8len(lineStr[ charIndex ]);
-      while (i > 1) {
-        i--;
-        ii++;
-        expandedChar[ii] = lineStr[ charIndex + ii];
-      }
-    }
-
+              Fl_Text_Buffer::expand_character( lineStr+charIndex, outIndex,
+                                                expandedChar, buf->tab_distance());
     style = position_style( lineStartPos, lineLen, charIndex,
                             outIndex + dispIndexOffset );
     charWidth = charIndex >= lineLen ? stdCharWidth :
@@ -1637,22 +1511,16 @@ void Fl_Text_Display::draw_vline(int visLineNum, int leftClip, int rightClip,
   outPtr = outStr;
   outIndex = outStartIndex;
   X = startX;
-  for ( charIndex = startIndex; charIndex < rightCharIndex; charIndex++ ) {
+  for (charIndex = startIndex; 
+       charIndex < rightCharIndex; 
+       charIndex += lineStr ? fl_utf8len(lineStr[charIndex]) : 1 ) 
+  {
     charLen = charIndex >= lineLen ? 1 :
-              Fl_Text_Buffer::expand_character( lineStr[ charIndex ], outIndex, expandedChar,
-                                                buf->tab_distance(), buf->null_substitution_character() );
-    if (charIndex < lineLen && charLen > 1 && (lineStr[ charIndex ] & 0x80)) {
-      int i, ii = 0;;
-      i = fl_utf8len(lineStr[ charIndex ]);
-      while (i > 1) {
-        i--;
-        ii++;
-        expandedChar[ii] = lineStr[ charIndex + ii];
-      }
-    }
+              Fl_Text_Buffer::expand_character( lineStr+charIndex, outIndex, expandedChar,
+                                                buf->tab_distance());
     charStyle = position_style( lineStartPos, lineLen, charIndex,
                                 outIndex + dispIndexOffset );
-    for ( i = 0; i < charLen; i++ ) {
+    for ( i = 0; i < charLen; i++ ) { // FIXME: this rips apart the utf-8 sequneces
       if ( i != 0 && charIndex < lineLen && lineStr[ charIndex ] == '\t' )
         charStyle = position_style( lineStartPos, lineLen,
                                     charIndex, outIndex + dispIndexOffset );
@@ -1667,6 +1535,7 @@ void Fl_Text_Display::draw_vline(int visLineNum, int leftClip, int rightClip,
         int l = 1;
         if (*outPtr & 0x80) {
           l = fl_utf8len(*outPtr);
+          if (l<=0) l = 1;
         }
         charWidth = string_width( &expandedChar[ i ], l, charStyle );
       } else
@@ -1684,22 +1553,16 @@ void Fl_Text_Display::draw_vline(int visLineNum, int leftClip, int rightClip,
   outPtr = outStr;
   outIndex = outStartIndex;
   X = startX;
-  for ( charIndex = startIndex; charIndex < rightCharIndex; charIndex++ ) {
+  for (charIndex = startIndex; 
+       charIndex < rightCharIndex; 
+       charIndex += lineStr ? fl_utf8len(lineStr[charIndex]) : 0) 
+  {
     charLen = charIndex >= lineLen ? 1 :
-              Fl_Text_Buffer::expand_character( lineStr[ charIndex ], outIndex, expandedChar,
-                                                buf->tab_distance(), buf->null_substitution_character() );
-    if (charIndex < lineLen && charLen > 1 && (lineStr[ charIndex ] & 0x80)) {
-      int i, ii = 0;;
-      i = fl_utf8len(lineStr[ charIndex ]);
-      while (i > 1) {
-        i--;
-        ii++;
-        expandedChar[ii] = lineStr[ charIndex + ii];
-      }
-    }
+              Fl_Text_Buffer::expand_character( lineStr+charIndex, outIndex, expandedChar,
+                                                buf->tab_distance());
     charStyle = position_style( lineStartPos, lineLen, charIndex,
                                 outIndex + dispIndexOffset );
-    for ( i = 0; i < charLen; i++ ) {
+    for ( i = 0; i < charLen; i++ ) { // FIXME: this rips apart the utf-8 sequneces
       if ( i != 0 && charIndex < lineLen && lineStr[ charIndex ] == '\t' )
         charStyle = position_style( lineStartPos, lineLen,
                                     charIndex, outIndex + dispIndexOffset );
@@ -1714,6 +1577,7 @@ void Fl_Text_Display::draw_vline(int visLineNum, int leftClip, int rightClip,
         int l = 1;
         if (*outPtr & 0x80) {
           l = fl_utf8len(*outPtr);
+          if (l<=0) l = 1;
         }
         charWidth = string_width( &expandedChar[ i ], l, charStyle );
       } else
@@ -1772,7 +1636,6 @@ void Fl_Text_Display::draw_string( int style, int X, int Y, int toX,
     clear_rect( style, X, Y, toX - X, mMaxsize );
     return;
   }
-
   /* Set font, color, and gc depending on style.  For normal text, GCs
      for normal drawing, or drawing within a Fl_Text_Selection or highlight are
      pre-allocated and pre-configured.  For syntax highlighting, GCs are
@@ -1970,10 +1833,12 @@ int Fl_Text_Display::position_style( int lineStartPos,
   if ( lineIndex >= lineLen )
     style = FILL_MASK;
   else if ( styleBuf != NULL ) {
+    // FIXME: character is ucs-4
     style = ( unsigned char ) styleBuf->character( pos );
     if (style == mUnfinishedStyle && mUnfinishedHighlightCB) {
         /* encountered "unfinished" style, trigger parsing */
         (mUnfinishedHighlightCB)( pos, mHighlightCBArg);
+        // FIXME: character is ucs-4
         style = (unsigned char) styleBuf->character( pos);
     }
   }
@@ -2045,18 +1910,12 @@ int Fl_Text_Display::xy_to_position( int X, int Y, int posType ) const {
      to find the character position corresponding to the X coordinate */
   xStep = text_area.x - mHorizOffset;
   outIndex = 0;
-  for ( charIndex = 0; charIndex < lineLen; charIndex++ ) {
-    charLen = Fl_Text_Buffer::expand_character( lineStr[ charIndex ], outIndex, expandedChar,
-              mBuffer->tab_distance(), mBuffer->null_substitution_character() );
-    if (charLen > 1 && (lineStr[ charIndex ] & 0x80)) {
-      int i, ii = 0;;
-      i = fl_utf8len(lineStr[ charIndex ]);
-      while (i > 1) {
-        i--;
-        ii++;
-        expandedChar[ii] = lineStr[ charIndex + ii];
-      }
-    }
+  for (charIndex = 0;
+       charIndex < lineLen;
+       charIndex += fl_utf8len(lineStr[charIndex]) ) 
+  {
+    charLen = Fl_Text_Buffer::expand_character( lineStr+charIndex, outIndex, expandedChar,
+              mBuffer->tab_distance());
     charStyle = position_style( lineStart, lineLen, charIndex, outIndex );
     charWidth = string_width( expandedChar, charLen, charStyle );
     if ( X < xStep + ( posType == CURSOR_POS ? charWidth / 2 : charWidth ) ) {
@@ -2500,6 +2359,7 @@ int Fl_Text_Display::measure_vline( int visLineNum ) const {
     for ( i = 0; i < lineLen; i++ ) {
       len = mBuffer->expand_character( lineStartPos + i,
                                        charCount, expandedChar );
+      // FIXME: character is ucs-4
       style = ( unsigned char ) mStyleBuffer->character(
                 lineStartPos + i ) - 'A';
 
@@ -2608,6 +2468,7 @@ void Fl_Text_Display::find_wrap_range(const char *deletedText, int pos,
     	    lineStart = retPos;
     	nLines++;
     	if (lineStart > pos + nInserted &&
+            // FIXME: character is ucs-4
     	    	buf->character(lineStart-1) == '\n') {
     	    countTo = lineStart;
     	    *modRangeEnd = lineStart;
@@ -2753,6 +2614,7 @@ void Fl_Text_Display::measure_deleted_lines(int pos, int nDeleted) {
     	    lineStart = retPos;
     	nLines++;
     	if (lineStart > pos + nDeleted &&
+            // FIXME: character is ucs-4
     	    	buf->character(lineStart-1) == '\n') {
     	    break;
     	}
@@ -2800,7 +2662,6 @@ void Fl_Text_Display::wrapped_line_counter(Fl_Text_Buffer *buf, int startPos,
 	 bool countPixels;
     int nLines = 0, tabDist = buffer()->tab_distance();
     unsigned char c;
-    char nullSubsChar = buffer()->null_substitution_character();
     
     /* If the font is fixed, or there's a wrap margin set, it's more efficient
        to measure in columns, than to count pixels.  Determine if we can count
@@ -2831,6 +2692,7 @@ void Fl_Text_Display::wrapped_line_counter(Fl_Text_Buffer *buf, int startPos,
     colNum = 0;
     width = 0;
     for (p=lineStart; p<buf->length(); p++) {
+      // FIXME: character is ucs-4
     	c = (unsigned char)buf->character(p);
 
     	/* If the character was a newline, count the line and start over,
@@ -2855,9 +2717,10 @@ void Fl_Text_Display::wrapped_line_counter(Fl_Text_Buffer *buf, int startPos,
     	    colNum = 0;
     	    width = 0;
     	} else {
-    	    colNum += Fl_Text_Buffer::character_width(c, colNum, tabDist, nullSubsChar);
+          const char *s = buf->address(p);
+          colNum += Fl_Text_Buffer::character_width(s, colNum, tabDist); // FIXME: unicode
     	    if (countPixels)
-    	    	width += measure_proportional_character(c, colNum, p+styleBufOffset);
+    	    	width += measure_proportional_character(s, colNum, p+styleBufOffset);
     	}
 
     	/* If character exceeded wrap margin, find the break point
@@ -2865,6 +2728,7 @@ void Fl_Text_Display::wrapped_line_counter(Fl_Text_Buffer *buf, int startPos,
     	if (colNum > wrapMargin || width > maxWidth) {
     	    foundBreak = false;
     	    for (b=p; b>=lineStart; b--) {
+              // FIXME: character is ucs-4
     	    	c = (unsigned char)buf->character(b);
     	    	if (c == '\t' || c == ' ') {
     	    	    newLineStart = b + 1;
@@ -2873,7 +2737,8 @@ void Fl_Text_Display::wrapped_line_counter(Fl_Text_Buffer *buf, int startPos,
     	    	    	width = 0;
     	    	    	for (i=b+1; i<p+1; i++) {
     	    	    	    width += measure_proportional_character(
-				    buf->character(i), colNum, 
+                                                                    // FIXME: character is ucs-4
+				    buf->address(i), colNum, 
 				    i+styleBufOffset);
     	    	    	    colNum++;
     	    	    	}
@@ -2885,9 +2750,10 @@ void Fl_Text_Display::wrapped_line_counter(Fl_Text_Buffer *buf, int startPos,
     	    }
     	    if (!foundBreak) { /* no whitespace, just break at margin */
     	    	newLineStart = max(p, lineStart+1);
-    	    	colNum = Fl_Text_Buffer::character_width(c, colNum, tabDist, nullSubsChar);
+              const char *s = buf->address(b);
+              colNum = Fl_Text_Buffer::character_width(s, colNum, tabDist); // FIXME: unicode
     	    	if (countPixels)
-   	    	    width = measure_proportional_character(c, colNum, p+styleBufOffset);
+   	    	    width = measure_proportional_character(s, colNum, p+styleBufOffset);
     	    }
     	    if (p >= maxPos) {
     		*retPos = maxPos;
@@ -2919,9 +2785,9 @@ void Fl_Text_Display::wrapped_line_counter(Fl_Text_Buffer *buf, int startPos,
 }
 
 /**
-   Measure the width in pixels of a character "c" at a particular column
-   "colNum" and buffer position "pos".  This is for measuring characters in
-   proportional or mixed-width highlighting fonts.
+   Measure the width in pixels of the first character of string "s" at a
+   particular column "colNum" and buffer position "pos".  This is for measuring
+   characters in proportional or mixed-width highlighting fonts.
 **
    A note about proportional and mixed-width fonts: the mixed width and
    proportional font code in nedit does not get much use in general editing,
@@ -2932,20 +2798,22 @@ void Fl_Text_Display::wrapped_line_counter(Fl_Text_Buffer *buf, int startPos,
    insertion/deletion, though static display and wrapping and resizing
    should now be solid because they are now used for online help display.
 */
-int Fl_Text_Display::measure_proportional_character(char c, int colNum, int pos) const {
+
+int Fl_Text_Display::measure_proportional_character(const char *s, int colNum, int pos) const {
     int charLen, style;
     char expChar[ FL_TEXT_MAX_EXP_CHAR_LEN ];
     Fl_Text_Buffer *styleBuf = mStyleBuffer;
     
-    charLen = Fl_Text_Buffer::expand_character(c, colNum, expChar, 
-	    buffer()->tab_distance(), buffer()->null_substitution_character());
+  charLen = Fl_Text_Buffer::expand_character(s, colNum, expChar, buffer()->tab_distance()); // FIXME: unicode
     if (styleBuf == 0) {
 	style = 0;
     } else {
+      // FIXME: character is ucs-4
 	style = (unsigned char)styleBuf->character(pos);
 	if (style == mUnfinishedStyle && mUnfinishedHighlightCB) {
     	    /* encountered "unfinished" style, trigger parsing */
     	    (mUnfinishedHighlightCB)(pos, mHighlightCBArg);
+          // FIXME: character is ucs-4
     	    style = (unsigned char)styleBuf->character(pos);
 	}
     }
@@ -3002,6 +2870,7 @@ int Fl_Text_Display::wrap_uses_character(int lineEndPos) const {
     if (!mContinuousWrap || lineEndPos == buffer()->length())
     	return 1;
     
+  // FIXME: character is ucs-4
     c = buffer()->character(lineEndPos);
     return c == '\n' || ((c == '\t' || c == ' ') &&
     	    lineEndPos + 1 != buffer()->length());
@@ -3281,6 +3150,7 @@ int Fl_Text_Display::handle(int event) {
         int pos = xy_to_position(Fl::event_x(), Fl::event_y(), CURSOR_POS);
         int ok = 0;
         while (!ok) {
+          // FIXME: character is ucs-4
           char c = buffer()->character( pos );
           if (!((c & 0x80) && !(c & 0x40))) {
             ok = 1;
@@ -3346,6 +3216,7 @@ int Fl_Text_Display::handle(int event) {
           pos = xy_to_position(X, Y, CURSOR_POS);
          int ok = 0;
           while (!ok) {
+            // FIXME: character is ucs-4
             char c = buffer()->character( pos );
             if (!((c & 0x80) && !(c & 0x40))) {
               ok = 1;
@@ -3439,5 +3310,5 @@ int Fl_Text_Display::handle(int event) {
 
 
 //
-// End of "$Id: Fl_Text_Display.cxx 6909 2009-09-28 14:41:43Z matt $".
+// End of "$Id: Fl_Text_Display.cxx 7527 2010-04-18 14:33:33Z engelsman $".
 //

@@ -1,7 +1,7 @@
 /*
   ZynAddSubFX - a software synthesizer
 
-  PAaudiooutput.C - Audio output for PortAudio
+  PAaudiooutput.cpp - Audio output for PortAudio
   Copyright (C) 2002 Nasca Octavian Paul
   Author: Nasca Octavian Paul
 

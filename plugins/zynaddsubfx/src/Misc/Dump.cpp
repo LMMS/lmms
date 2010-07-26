@@ -1,7 +1,7 @@
 /*
   ZynAddSubFX - a software synthesizer
 
-  Dump.C - It dumps the notes to a text file
+  Dump.cpp - It dumps the notes to a text file
 
   Copyright (C) 2002-2005 Nasca Octavian Paul
   Author: Nasca Octavian Paul

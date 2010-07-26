@@ -1,7 +1,7 @@
 /*
   ZynAddSubFX - a software synthesizer
 
-  MIDIFile.C - MIDI file loader
+  MIDIFile.cpp - MIDI file loader
   Copyright (C) 2003-2005 Nasca Octavian Paul
   Author: Nasca Octavian Paul
 
@@ -101,7 +101,7 @@ int MIDIFile::parsemidifile(MIDIEvents *me_)
     }
     else    //SMPTE (frames/second and ticks/frame)
         printf(
-            "ERROR:in MIDIFile.C::parsemidifile() - SMPTE not implemented yet.");
+            "ERROR:in MIDIFile.cpp::parsemidifile() - SMPTE not implemented yet.");
     ;
 
     if(ntracks >= NUM_MIDI_TRACKS)
@@ -115,7 +115,7 @@ int MIDIFile::parsemidifile(MIDIEvents *me_)
     }
 
     printf("\n\nCURRENT File position is = 0x%x\n", midifilek);
-    printf("\nMIDI file successfully parsed.\n");
+    printf("\nMIDI file succesfully parsed.\n");
 //    printf("\n0x%x\n",getbyte());
 
     this->me = NULL;

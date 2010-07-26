@@ -1,5 +1,5 @@
 //
-// "$Id: Fl_add_idle.cxx 6616 2009-01-01 21:28:26Z matt $"
+// "$Id: Fl_add_idle.cxx 7334 2010-03-25 14:37:46Z AlbrechtS $"
 //
 // Idle routine support for the Fast Light Tool Kit (FLTK).
 //
@@ -66,7 +66,7 @@ static void call_idle() {
 
   FLTK will not recursively call the idle callback.
 */
-void Fl::add_idle(void (*cb)(void*), void* data) {
+void Fl::add_idle(Fl_Idle_Handler cb, void* data) {
   idle_cb* p = freelist;
   if (p) freelist = p->next;
   else p = new idle_cb;
@@ -86,7 +86,7 @@ void Fl::add_idle(void (*cb)(void*), void* data) {
 /**
   Returns true if the specified idle callback is currently installed.
 */
-int Fl::has_idle(void (*cb)(void*), void* data) {
+int Fl::has_idle(Fl_Idle_Handler cb, void* data) {
   idle_cb* p = first;
   if (!p) return 0;
   for (;; p = p->next) {
@@ -98,7 +98,7 @@ int Fl::has_idle(void (*cb)(void*), void* data) {
 /**
   Removes the specified idle callback, if it is installed.
 */
-void Fl::remove_idle(void (*cb)(void*), void* data) {
+void Fl::remove_idle(Fl_Idle_Handler cb, void* data) {
   idle_cb* p = first;
   if (!p) return;
   idle_cb* l = last;
@@ -119,5 +119,5 @@ void Fl::remove_idle(void (*cb)(void*), void* data) {
 }
 
 //
-// End of "$Id: Fl_add_idle.cxx 6616 2009-01-01 21:28:26Z matt $".
+// End of "$Id: Fl_add_idle.cxx 7334 2010-03-25 14:37:46Z AlbrechtS $".
 //

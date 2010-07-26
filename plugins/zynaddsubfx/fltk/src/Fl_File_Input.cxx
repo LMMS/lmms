@@ -1,5 +1,5 @@
 //
-// "$Id: Fl_File_Input.cxx 6758 2009-04-13 07:32:01Z matt $"
+// "$Id: Fl_File_Input.cxx 7115 2010-02-20 17:40:07Z AlbrechtS $"
 //
 // File_Input header file for the Fast Light Tool Kit (FLTK).
 //
@@ -215,9 +215,12 @@ Fl_File_Input::handle(int event) 		// I - Event
         return Fl_Input::handle(event);
 
     default :
-      if (Fl_Input::handle(event)) {
-	damage(FL_DAMAGE_BAR);
-	return 1;
+      { Fl_Widget_Tracker wp(this);
+	if (Fl_Input::handle(event)) {
+	  if (wp.exists())
+	    damage(FL_DAMAGE_BAR);
+	  return 1;
+	}
       }
       return 0;
   }
@@ -290,5 +293,5 @@ Fl_File_Input::handle_button(int event)		// I - Event
 
 
 //
-// End of "$Id: Fl_File_Input.cxx 6758 2009-04-13 07:32:01Z matt $".
+// End of "$Id: Fl_File_Input.cxx 7115 2010-02-20 17:40:07Z AlbrechtS $".
 //

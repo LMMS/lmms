@@ -1,7 +1,7 @@
 /*
   ZynAddSubFX - a software synthesizer
 
-  OscilGen.C - Waveform generator for ADnote
+  OscilGen.cpp - Waveform generator for ADnote
   Copyright (C) 2002-2005 Nasca Octavian Paul
   Author: Nasca Octavian Paul
 

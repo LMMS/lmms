@@ -1,4 +1,4 @@
-/* "$Id: $"
+/* "$Id: fl_utf8.h 7551 2010-04-20 21:43:31Z engelsman $"
  *
  * Author: Jean-Marc Lienher ( http://oksid.ch )
  * Copyright 2000-2009 by O'ksi'D.
@@ -38,8 +38,8 @@
 #ifndef _HAVE_FL_UTF8_HDR_
 #define _HAVE_FL_UTF8_HDR_
 
-#include "FL/Fl_Export.H"
-#include "FL/fl_types.h"
+#include "Fl_Export.H"
+#include "fl_types.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -141,6 +141,15 @@ FL_EXPORT int fl_utf8locale();
  * NOTE: The value returned is not simply boolean - it contains information about the probable
  * type of the src text. */
 FL_EXPORT int fl_utf8test(const char *src, unsigned len);
+
+/* XX: return width of "raw" ucs character in columns.
+ * for internal use only */
+FL_EXPORT int fl_wcwidth_(unsigned int ucs);
+
+/* XX: return width of utf-8 character string in columns.
+ * NOTE: this may also do C1 control character (0x80 to 0x9f) to CP1252 mapping,
+ * depending on original build options */
+FL_EXPORT int fl_wcwidth(const char *src);
 
 /* OD: Return true if the character is non-spacing */
 FL_EXPORT unsigned int fl_nonspacing(unsigned int ucs);
@@ -246,5 +255,5 @@ FL_EXPORT char fl_make_path( const char *path );
 #endif /* _HAVE_FL_UTF8_HDR_ */
 
 /*
- * End of "$Id: $".
+ * End of "$Id: fl_utf8.h 7551 2010-04-20 21:43:31Z engelsman $".
  */

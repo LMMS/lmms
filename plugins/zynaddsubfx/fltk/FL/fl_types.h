@@ -1,5 +1,5 @@
 /*
- * "$Id: fl_types.h 6299 2008-09-18 19:09:34Z fabien $"
+ * "$Id: fl_types.h 6942 2009-11-18 12:22:51Z AlbrechtS $"
  *
  * Simple "C"-style types for the Fast Light Tool Kit (FLTK).
  *
@@ -62,5 +62,5 @@ typedef unsigned int Fl_Char;
 #endif
 
 /*
- * End of "$Id: fl_types.h 6299 2008-09-18 19:09:34Z fabien $".
+ * End of "$Id: fl_types.h 6942 2009-11-18 12:22:51Z AlbrechtS $".
  */

@@ -1,5 +1,5 @@
 //
-// "$Id: Fl_Font.H 6779 2009-04-24 09:28:30Z yuri $"
+// "$Id: Fl_Font.H 7351 2010-03-29 10:35:00Z matt $"
 //
 // Font definitions for the Fast Light Tool Kit (FLTK).
 //
@@ -58,15 +58,12 @@ public:
   TEXTMETRIC metr;
   int angle;
   FL_EXPORT Fl_Font_Descriptor(const char* fontname, Fl_Fontsize size);
-#  elif defined(__APPLE_QD__)
-  FL_EXPORT Fl_Font_Descriptor(const char* fontname, Fl_Fontsize size);
-  short font, face, size;
-  short ascent, descent;
-  short width[256];
-  bool knowMetrics;
 #  elif defined(__APPLE_QUARTZ__)
   FL_EXPORT Fl_Font_Descriptor(const char* fontname, Fl_Fontsize size);
   ATSUTextLayout layout;
+#     if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_5
+  CTFontRef fontref;
+#     endif
   ATSUStyle style;
   short ascent, descent, q_width;
 //  short width[256];
@@ -118,5 +115,5 @@ FL_EXPORT char *fl_find_fontsize(char *name);
 #endif
 
 //
-// End of "$Id: Fl_Font.H 6779 2009-04-24 09:28:30Z yuri $".
+// End of "$Id: Fl_Font.H 7351 2010-03-29 10:35:00Z matt $".
 //

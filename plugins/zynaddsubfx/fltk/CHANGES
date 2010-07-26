@@ -1,5 +1,50 @@
 CHANGES IN FLTK 1.3.0
 
+	- Fixed X11/XDBE double buffering (STR #2152, #2197)
+	- Added new label and image alignments (STR #2269)
+	- Added documentation for event delivery (STR #1983)
+	- Fixed menu and tooltip window animation bug under X11 (compiz)
+	  by setting an appropriate window type (STR #2082)
+	- redesigned CMake files (STR #2317).
+	- Fixed max. fd calculation, if USE_POLL is enabled (STR #2324)
+	- Fixed clipping for offscreen rendering (OSX, STR #2330)
+	- Added printing support (Fl_Printer class and friends) for native
+	  printing on Windows and Mac OS X, PostScript printing on X11
+	  with CUPS or lp, and PostScript file output on all platforms
+	- Added basic Fl_Device abstraction layer for all drawing functions
+	- Fixed possibility of wrong flags() in Fl_Window::iconlabel()
+	  (STR #2161)
+	- Fixed Scrollbar events when max is less than min (STR #2283)
+	- Added argument-less constructor in Fuid Widget Class
+	- Fixed menu item counting issue in Fluid (STR #2322)
+	- Added Fl_Menu_::find_item by callback
+	- Removed redundant Fl_Group casts
+	- Added indexing to Fl_Preferences
+	- Integrated default menu into Demo test app
+	- Added automated Xcode IDE file generation to Fluid
+	- Fixed lost top item in Fluid's tree browser (STR #2233)
+	- Fixed crash in test/Editor when freeing buffer 
+	  too soon (STR #2294) 
+	- Fixed Fl_Preferences Cygwin wide character bug (STR #2164)
+	- Fixed sorting in Fl_Browser - last item would not 
+	  be sorted (STR #2300)
+	- Fixed window levels in OS X Cocoa (STR #2316)
+	- Added jpeg support to Fluid image() element
+	- Added loading jpeg images from memory
+	- Added binary data type to Fluid
+	- File chosser preview would hang if a device was choosen
+	- Replaced _WIN32 symbols that had come with UTF-8 and the
+	  new Fl_Table widget with WIN32
+	- Fixed a buffer overflow in fl_utf8from_mb() (STR #2279)
+	- Fixed a Windows GDI leak when testing alpha blending capabilities
+	- Fixed a name conflict with new (VS 2008 Express) winsock2.h
+	  versions and another conflict that produced compile errors
+	  with VS 2008 Express (STR #2301)
+	- Widgets now remove stale entries from the default callback
+	  queue when they are deleted (STR #2302)
+	- Moved OS X code base to the more moder Cocoa toolkit thanks
+	  to the awesome work of Manolo Gouy (STR #2221)
+	- Added template to generate new projects with Xcode.
 	- Managing all Widget flags in a single location now (STR #2161)
 	- Fixed all color related call to Fl_Color type (STR #2208)
 	- File chooser preview now recognizes utf8 encoded 
@@ -113,6 +158,9 @@ CHANGES IN FLTK 1.3.0
 	- hide() and show() methods are now virtual from Fl_Widget,
 	  was only virtual since Fl_Window derived classes before.
 	  So now widget->hide() will work if widget is a window.
+        - New widgets: Fl_Tree, Fl_Table, Fl_Native_File_Chooser
+        - added Fl_Menu_ methods: insert(), find_index(), clear_submenu()
+	- Bug reports/enhancements now refer to the STR form http://www.fltk.org/str.php
 
 CHANGES IN FLTK 1.1.9
 

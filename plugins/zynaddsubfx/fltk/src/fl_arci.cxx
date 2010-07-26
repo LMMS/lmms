@@ -1,5 +1,5 @@
 //
-// "$Id: fl_arci.cxx 6716 2009-03-24 01:40:44Z fabien $"
+// "$Id: fl_arci.cxx 7617 2010-05-27 17:20:18Z manolo $"
 //
 // Arc (integer) drawing functions for the Fast Light Tool Kit (FLTK).
 //
@@ -47,29 +47,7 @@
 #endif
 #include <config.h>
 
-/**
-  Draw ellipse sections using integer coordinates.
-  
-  These functions match the rather limited circle drawing code provided by X
-  and WIN32. The advantage over using fl_arc with floating point coordinates
-  is that they are faster because they often use the hardware, and they draw
-  much nicer small circles, since the small sizes are often hard-coded bitmaps.
-
-  If a complete circle is drawn it will fit inside the passed bounding box.
-  The two angles are measured in degrees counterclockwise from 3 o'clock and
-  are the starting and ending angle of the arc, \p a2 must be greater or equal
-  to \p a1.
-
-  fl_arc() draws a series of lines to approximate the arc. Notice that the
-  integer version of fl_arc() has a different number of arguments than the
-  double version fl_arc(double x, double y, double r, double start, double a)
-
-  \param[in] x,y,w,h bounding box of complete circle
-  \param[in] a1,a2 start and end angles of arc measured in degrees
-             counter-clockwise from 3 o'clock. \p a2 must be greater
-	     than or equal to \p a1.
-*/
-void fl_arc(int x,int y,int w,int h,double a1,double a2) {
+void Fl_Graphics_Driver::arc(int x,int y,int w,int h,double a1,double a2) {
   if (w <= 0 || h <= 0) return;
 
 #if defined(USE_X11)
@@ -86,6 +64,7 @@ void fl_arc(int x,int y,int w,int h,double a1,double a2) {
 #elif defined(__APPLE_QUARTZ__)
   a1 = (-a1)/180.0f*M_PI; a2 = (-a2)/180.0f*M_PI;
   float cx = x + 0.5f*w - 0.5f, cy = y + 0.5f*h - 0.5f;
+  CGContextSetShouldAntialias(fl_gc, true);
   if (w!=h) {
     CGContextSaveGState(fl_gc);
     CGContextTranslateCTM(fl_gc, cx, cy);
@@ -97,24 +76,13 @@ void fl_arc(int x,int y,int w,int h,double a1,double a2) {
     CGContextAddArc(fl_gc, cx, cy, r, a1, a2, 1);
   }
   CGContextStrokePath(fl_gc);
+  CGContextSetShouldAntialias(fl_gc, false);
 #else
 # error unsupported platform
 #endif
 }
 
-/**
-  Draw filled ellipse sections using integer coordinates.
-  
-  Like fl_arc(), but fl_pie() draws a filled-in pie slice.
-  This slice may extend outside the line drawn by fl_arc();
-  to avoid this use w - 1 and h - 1.
-
-  \param[in] x,y,w,h bounding box of complete circle
-  \param[in] a1,a2 start and end angles of arc measured in degrees
-             counter-clockwise from 3 o'clock. \p a2 must be greater
-	     than or equal to \p a1.
-*/
-void fl_pie(int x,int y,int w,int h,double a1,double a2) {
+void Fl_Graphics_Driver::pie(int x,int y,int w,int h,double a1,double a2) {
   if (w <= 0 || h <= 0) return;
 
 #if defined(USE_X11)
@@ -136,6 +104,7 @@ void fl_pie(int x,int y,int w,int h,double a1,double a2) {
 #elif defined(__APPLE_QUARTZ__)
   a1 = (-a1)/180.0f*M_PI; a2 = (-a2)/180.0f*M_PI;
   float cx = x + 0.5f*w - 0.5f, cy = y + 0.5f*h - 0.5f;
+  CGContextSetShouldAntialias(fl_gc, true);
   if (w!=h) {
     CGContextSaveGState(fl_gc);
     CGContextTranslateCTM(fl_gc, cx, cy);
@@ -151,11 +120,12 @@ void fl_pie(int x,int y,int w,int h,double a1,double a2) {
     CGContextClosePath(fl_gc);
   }
   CGContextFillPath(fl_gc);
+  CGContextSetShouldAntialias(fl_gc, false);
 #else
 # error unsupported platform
 #endif
 }
 
 //
-// End of "$Id: fl_arci.cxx 6716 2009-03-24 01:40:44Z fabien $".
+// End of "$Id: fl_arci.cxx 7617 2010-05-27 17:20:18Z manolo $".
 //

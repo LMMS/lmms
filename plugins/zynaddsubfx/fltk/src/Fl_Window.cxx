@@ -1,5 +1,5 @@
 //
-// "$Id: Fl_Window.cxx 6905 2009-09-27 12:06:35Z matt $"
+// "$Id: Fl_Window.cxx 7357 2010-03-29 14:10:54Z matt $"
 //
 // Window widget class for the Fast Light Tool Kit (FLTK).
 //
@@ -31,6 +31,7 @@
 // equivalent (but totally different) crap for MSWindows is in Fl_win32.cxx
 #include "config.h"
 #include <FL/Fl.H>
+#include <FL/x.H>
 #include <FL/Fl_Window.H>
 #include <stdlib.h>
 #include "flstring.h"
@@ -110,7 +111,10 @@ void Fl_Window::draw() {
   draw_children();
 
 #ifdef __APPLE_QUARTZ__
-  if (!parent() && resizable() && (!size_range_set || minh!=maxh || minw!=maxw)) {
+  // on OS X, windows have no frame. To resize a window, we drag the lower right
+  // corner. This code draws a little ribbed triangle for dragging.
+  extern CGContextRef fl_gc;
+  if (fl_gc && !parent() && resizable() && (!size_range_set || minh!=maxh || minw!=maxw)) {
     int dx = Fl::box_dw(box())-Fl::box_dx(box());
     int dy = Fl::box_dh(box())-Fl::box_dy(box());
     if (dx<=0) dx = 1;
@@ -151,9 +155,7 @@ void Fl_Window::copy_label(const char *a) {
 
 
 void Fl_Window::iconlabel(const char *iname) {
-  unsigned saveflags = flags();
   label(label(), iname);
-  set_flag(saveflags);
 }
 
 // the Fl::atclose pointer is provided for back compatibility.  You
@@ -178,5 +180,5 @@ Fl_Window *Fl_Window::current() {
 
 
 //
-// End of "$Id: Fl_Window.cxx 6905 2009-09-27 12:06:35Z matt $".
+// End of "$Id: Fl_Window.cxx 7357 2010-03-29 14:10:54Z matt $".
 //

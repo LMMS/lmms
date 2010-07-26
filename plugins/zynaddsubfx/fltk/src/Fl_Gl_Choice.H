@@ -1,5 +1,5 @@
 //
-// "$Id: Fl_Gl_Choice.H 6616 2009-01-01 21:28:26Z matt $"
+// "$Id: Fl_Gl_Choice.H 7564 2010-04-28 07:21:41Z greg.ercolano $"
 //
 // OpenGL definitions for the Fast Light Tool Kit (FLTK).
 //
@@ -20,7 +20,9 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
 // USA.
 //
-// Please report all bugs and problems to "fltk-bugs@easysw.com".
+// Please report all bugs and problems on the following page:
+//
+//     http://www.fltk.org/str.php
 //
 
 // Internal interface to set up OpenGL.
@@ -57,10 +59,6 @@
 #ifdef WIN32
 #  include <FL/gl.h>
 #  define GLContext HGLRC
-#elif defined(__APPLE_QD__)
-#  include <OpenGL/gl.h>
-#  include <AGL/agl.h>
-#  define GLContext AGLContext
 #elif defined(__APPLE_QUARTZ__)
 // warning: the Quartz version should probably use Core GL (CGL) instead of AGL
 #  include <OpenGL/gl.h>
@@ -80,8 +78,6 @@ public:
 #ifdef WIN32
   int pixelformat;	// the visual to use
   PIXELFORMATDESCRIPTOR pfd; // some wgl calls need this thing
-#elif defined(__APPLE_QD__)
-  AGLPixelFormat pixelformat;
 #elif defined(__APPLE_QUARTZ__)
   // warning: the Quartz version should probably use Core GL (CGL) instead of AGL
   AGLPixelFormat pixelformat;
@@ -98,10 +94,6 @@ public:
 class Fl_Window;
 
 #ifdef WIN32
-
-GLContext fl_create_gl_context(Fl_Window*, const Fl_Gl_Choice*, int layer=0);
-
-#elif defined(__APPLE_QD__)
 
 GLContext fl_create_gl_context(Fl_Window*, const Fl_Gl_Choice*, int layer=0);
 
@@ -128,5 +120,5 @@ void fl_delete_gl_context(GLContext);
 #endif
 
 //
-// End of "$Id: Fl_Gl_Choice.H 6616 2009-01-01 21:28:26Z matt $".
+// End of "$Id: Fl_Gl_Choice.H 7564 2010-04-28 07:21:41Z greg.ercolano $".
 //
