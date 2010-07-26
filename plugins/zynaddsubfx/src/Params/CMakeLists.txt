@@ -6,6 +6,7 @@ set(zynaddsubfx_params_SRCS
 	LFOParams.cpp
 	PADnoteParameters.cpp
 	Presets.cpp
+	PresetsArray.cpp
 	PresetsStore.cpp
 	SUBnoteParameters.cpp
 

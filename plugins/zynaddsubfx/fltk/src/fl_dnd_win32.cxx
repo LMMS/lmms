@@ -1,5 +1,5 @@
 //
-// "$Id: fl_dnd_win32.cxx 6616 2009-01-01 21:28:26Z matt $"
+// "$Id: fl_dnd_win32.cxx 7563 2010-04-28 03:15:47Z greg.ercolano $"
 //
 // Drag & Drop code for the Fast Light Tool Kit (FLTK).
 //
@@ -20,7 +20,9 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
 // USA.
 //
-// Please report all bugs and problems to "fltk-bugs@fltk.org
+// Please report all bugs and problems on the following page:
+//
+//     http://www.fltk.org/str.php
 
 // This file contains win32-specific code for fltk which is always linked
 // in.  Search other files for "WIN32" or filenames ending in _win32.cxx
@@ -527,5 +529,5 @@ int Fl::dnd()
 
 
 //
-// End of "$Id: fl_dnd_win32.cxx 6616 2009-01-01 21:28:26Z matt $".
+// End of "$Id: fl_dnd_win32.cxx 7563 2010-04-28 03:15:47Z greg.ercolano $".
 //

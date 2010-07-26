@@ -1,7 +1,7 @@
 /*
   ZynAddSubFX - a software synthesizer
 
-  Recorder.C - Records sound to a file
+  Recorder.cpp - Records sound to a file
   Copyright (C) 2002-2005 Nasca Octavian Paul
   Author: Nasca Octavian Paul
 

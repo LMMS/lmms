@@ -1,5 +1,5 @@
 //
-// "$Id: Fl.H 6903 2009-09-27 11:09:03Z matt $"
+// "$Id: Fl.H 7334 2010-03-25 14:37:46Z AlbrechtS $"
 //
 // Main header file for the Fast Light Tool Kit (FLTK).
 //
@@ -52,20 +52,59 @@ class Fl_Window;
 class Fl_Image;
 struct Fl_Label;
 
+
+/** \defgroup  callback_functions Callback function typedefs
+    \brief Typedefs for callback or handler functions passed as function parameters.
+
+    FLTK uses callback functions as parameters for some function calls, e.g. to
+    set up global event handlers (Fl::add_handler()), to add a timeout handler
+    (Fl::add_timeout()), and many more.
+
+    The typedefs defined in this group describe the function parameters used to set
+    up or clear the callback functions and should also be referenced to define the
+    callback function to handle such events in the user's code.
+
+    \see Fl::add_handler(), Fl::add_timeout(), Fl::repeat_timeout(),
+	 Fl::remove_timeout() and others
+  @{ */
+
 /** signature of some label drawing functions passed as parameters */
-typedef void (Fl_Label_Draw_F)(const Fl_Label*, int,int,int,int, Fl_Align);
+typedef void (Fl_Label_Draw_F)(const Fl_Label *label, int x, int y, int w, int h, Fl_Align align);
 
 /** signature of some label measurement functions passed as parameters */
-typedef void (Fl_Label_Measure_F)(const Fl_Label*, int&, int&);
+typedef void (Fl_Label_Measure_F)(const Fl_Label *label, int &width, int &height);
 
 /** signature of some box drawing functions passed as parameters */
-typedef void (Fl_Box_Draw_F)(int,int,int,int, Fl_Color);
+typedef void (Fl_Box_Draw_F)(int x, int y, int w, int h, Fl_Color color);
 
 /** signature of some timeout callback functions passed as parameters */
-typedef void (*Fl_Timeout_Handler)(void*);
+typedef void (*Fl_Timeout_Handler)(void *data);
 
 /** signature of some wakeup callback functions passed as parameters */
-typedef void (*Fl_Awake_Handler)(void*);
+typedef void (*Fl_Awake_Handler)(void *data);
+
+/** signature of add_idle callback functions passed as parameters */
+typedef void (*Fl_Idle_Handler)(void *data);
+
+/** signature of set_idle callback functions passed as parameters */
+typedef void (*Fl_Old_Idle_Handler)();
+
+/** signature of add_fd functions passed as parameters */
+typedef void (*Fl_FD_Handler)(int fd, void *data);
+
+/** signature of add_handler functions passed as parameters */
+typedef int (*Fl_Event_Handler)(int event);
+
+/** signature of set_abort functions passed as parameters */
+typedef void (*Fl_Abort_Handler)(const char *format,...);
+
+/** signature of set_atclose functions passed as parameters */
+typedef void (*Fl_Atclose_Handler)(Fl_Window *window, void *data);
+
+/** signature of args functions passed as parameters */
+typedef int (*Fl_Args_Handler)(int argc, char **argv, int &i);
+
+/** @} */ /* group callback_functions */
 
 /**
   The Fl is the FLTK global (static) containing
@@ -138,7 +177,7 @@ public:
 
   // argument parsers:
   static int arg(int, char**, int&);
-  static int args(int, char**, int&, int (*)(int,char**,int&) = 0);
+  static int args(int, char**, int&, Fl_Args_Handler ah = 0);
   static void args(int, char**);
   /**
     Usage string displayed if Fl::args() detects an invalid argument.
@@ -232,7 +271,7 @@ public:
      }
   \endcode
   */
-  static void repeat_timeout(double t, Fl_Timeout_Handler,void* = 0); // platform dependent
+  static void repeat_timeout(double t, Fl_Timeout_Handler, void* = 0); // platform dependent
   static int  has_timeout(Fl_Timeout_Handler, void* = 0);
   static void remove_timeout(Fl_Timeout_Handler, void* = 0);
   static void add_check(Fl_Timeout_Handler, void* = 0);
@@ -257,17 +296,17 @@ public:
     devices, pipes, sockets, etc.). Due to limitations in Microsoft Windows,
     WIN32 applications can only monitor sockets.
   */
-  static void add_fd(int fd, int when, void (*cb)(int,void*),void* =0); // platform dependent
-  /** See void add_fd(int fd, int when, void (*cb)(int,void*),void* =0) */
-  static void add_fd(int fd, void (*cb)(int, void*), void* = 0); // platform dependent
+  static void add_fd(int fd, int when, Fl_FD_Handler cb, void* = 0); // platform dependent
+  /** See void add_fd(int fd, int when, Fl_FD_Handler cb, void* = 0) */
+  static void add_fd(int fd, Fl_FD_Handler cb, void* = 0); // platform dependent
   /** Removes a file descriptor handler. */
   static void remove_fd(int, int when); // platform dependent
   /** Removes a file descriptor handler. */
   static void remove_fd(int); // platform dependent
 
-  static void add_idle(void (*cb)(void*), void* data = 0);
-  static int  has_idle(void (*cb)(void*), void* data = 0);
-  static void remove_idle(void (*cb)(void*), void* data = 0);
+  static void add_idle(Fl_Idle_Handler cb, void* data = 0);
+  static int  has_idle(Fl_Idle_Handler cb, void* data = 0);
+  static void remove_idle(Fl_Idle_Handler cb, void* data = 0);
   /** If true then flush() will do something. */
   static int damage() {return damage_;}
   static void redraw();
@@ -603,8 +642,8 @@ public:
   /** Gets the current Fl::focus() widget. \sa Fl::focus(Fl_Widget*) */
   static Fl_Widget* focus()	{return focus_;}
   static void focus(Fl_Widget*);
-  static void add_handler(int (*h)(int));
-  static void remove_handler(int (*h)(int));
+  static void add_handler(Fl_Event_Handler h);
+  static void remove_handler(Fl_Event_Handler h);
   /** @} */
 
   /** \defgroup  fl_clipboard  Selection & Clipboard functions
@@ -764,13 +803,13 @@ public:
   /** \addtogroup fl_windows 
     @{ */
   /** For back compatibility, sets the void Fl::fatal handler callback */
-  static void set_abort(void (*f)(const char*,...)) {fatal = f;}
+  static void set_abort(Fl_Abort_Handler f) {fatal = f;}
   static void (*atclose)(Fl_Window*,void*);
   static void default_atclose(Fl_Window*,void*);
   /** For back compatibility, sets the Fl::atclose handler callback. You
       can now simply change the callback for the window instead.
       \see Fl_Window::callback(Fl_Callback*) */
-  static void set_atclose(void (*f)(Fl_Window*,void*)) {atclose = f;}
+  static void set_atclose(Fl_Atclose_Handler f) {atclose = f;}
   /**   @} */
 
   /** \addtogroup fl_events 
@@ -779,6 +818,8 @@ public:
   static int event_shift() {return e_state&FL_SHIFT;}
   /** Returns non-zero if the Control key is pressed. */
   static int event_ctrl() {return e_state&FL_CTRL;}
+  /** Returns non-zero if the FL_COMMAND key is pressed, either FL_CTRL or on OSX FL_META. */
+  static int event_command() {return e_state&FL_COMMAND;}
   /** Returns non-zero if the Alt key is pressed. */
   static int event_alt() {return e_state&FL_ALT;}
   /**
@@ -812,7 +853,7 @@ public:
 
     \deprecated This method is obsolete - use the add_idle() method instead.
   */
-  static void set_idle(void (*cb)()) {idle = cb;}
+  static void set_idle(Fl_Old_Idle_Handler cb) {idle = cb;}
   /** See Fl_Window* grab() */
   static void grab(Fl_Window&win) {grab(&win);}
   /** Releases the current grabbed window, equals grab(0).
@@ -1042,5 +1083,5 @@ public:
 #endif // !Fl_H
 
 //
-// End of "$Id: Fl.H 6903 2009-09-27 11:09:03Z matt $".
+// End of "$Id: Fl.H 7334 2010-03-25 14:37:46Z AlbrechtS $".
 //

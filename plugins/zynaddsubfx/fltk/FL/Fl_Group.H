@@ -1,5 +1,5 @@
 //
-// "$Id: Fl_Group.H 6907 2009-09-28 14:34:52Z matt $"
+// "$Id: Fl_Group.H 7280 2010-03-16 22:51:31Z matt $"
 //
 // Group header file for the Fast Light Tool Kit (FLTK).
 //
@@ -176,6 +176,14 @@ public:
   */
   unsigned int clip_children() { return (flags() & CLIP_CHILDREN) != 0; }
 
+  /** Returns an Fl_Group pointer if this widget is an Fl_Group.
+  
+      \retval NULL if this widget is not derived from Fl_Group.
+      \note This method is provided to avoid dynamic_cast.
+      \todo More documentation ...
+   */
+  virtual Fl_Group* as_group() { return this; }
+
   // back compatibility functions:
 
   /**
@@ -222,5 +230,5 @@ public:
 #endif
 
 //
-// End of "$Id: Fl_Group.H 6907 2009-09-28 14:34:52Z matt $".
+// End of "$Id: Fl_Group.H 7280 2010-03-16 22:51:31Z matt $".
 //

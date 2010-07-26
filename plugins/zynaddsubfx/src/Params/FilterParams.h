@@ -25,9 +25,9 @@
 
 #include "../globals.h"
 #include "../Misc/XMLwrapper.h"
-#include "Presets.h"
+#include "PresetsArray.h"
 
-class FilterParams:public Presets
+class FilterParams : public PresetsArray
 {
     public:
         FilterParams(unsigned char Ptype_,

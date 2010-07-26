@@ -1,5 +1,5 @@
 //
-// "$Id: Fl_Double_Window.cxx 6616 2009-01-01 21:28:26Z matt $"
+// "$Id: Fl_Double_Window.cxx 7671 2010-07-09 17:31:33Z manolo $"
 //
 // Double-buffered window code for the Fast Light Tool Kit (FLTK).
 //
@@ -28,6 +28,7 @@
 #include <config.h>
 #include <FL/Fl.H>
 #include <FL/Fl_Double_Window.H>
+#include <FL/Fl_Printer.H>
 #include <FL/x.H>
 #include <FL/fl_draw.H>
 
@@ -64,7 +65,27 @@ void Fl_Double_Window::show() {
   Fl_Window::show();
 }
 
+static void fl_copy_offscreen_to_display(int x, int y, int w, int h, Fl_Offscreen pixmap, int srcx, int srcy);
+
+void fl_copy_offscreen(int x, int y, int w, int h, Fl_Offscreen pixmap, int srcx, int srcy) {
+  if( fl_graphics_driver == fl_display_device->driver()) {
+    fl_copy_offscreen_to_display(x, y, w, h, pixmap, srcx, srcy);
+  }
+  else { // when copy is not to the display
+    fl_begin_offscreen(pixmap);
+    uchar *img = fl_read_image(NULL, srcx, srcy, w, h, 0);
+    fl_end_offscreen();
+    fl_draw_image(img, x, y, w, h, 3, 0);
+    delete img;
+  }
+}
+
 #if defined(USE_X11)
+
+static void fl_copy_offscreen_to_display(int x, int y, int w, int h, Fl_Offscreen pixmap, int srcx, int srcy) {
+    XCopyArea(fl_display, pixmap, fl_window, fl_gc, srcx, srcy, w, h, x, y);
+}
+
 
 // maybe someone feels inclined to implement alpha blending on X11?
 char fl_can_do_alpha_blending() {
@@ -100,10 +121,9 @@ char fl_can_do_alpha_blending() {
   fl_alpha_blend = (fl_alpha_blend_func)GetProcAddress(hMod, "AlphaBlend");
   // give up if we can't find it (Win95)
   if (!fl_alpha_blend) return 0;
-  // we have the  call, but does our display support alpha blending?
-  HDC dc = 0L;//fl_gc;
-  // get the current or the desktop's device context
-  if (!dc) dc = GetDC(0L);
+  // we have the call, but does our display support alpha blending?
+  // get the desktop's device context
+  HDC dc = GetDC(0L);
   if (!dc) return 0;
   // check the device capabilities flags. However GetDeviceCaps
   // does not return anything useful, so we have to do it manually:
@@ -117,8 +137,8 @@ char fl_can_do_alpha_blending() {
   RestoreDC(new_gc, save);
   DeleteDC(new_gc);
   DeleteObject(bm);
+  ReleaseDC(0L, dc);
 
-  if (!fl_gc) ReleaseDC(0L, dc);
   if (alpha_ok) can_do = 1;
   return can_do;
 }
@@ -134,7 +154,7 @@ HDC fl_makeDC(HBITMAP bitmap) {
   return new_gc;
 }
 
-void fl_copy_offscreen(int x,int y,int w,int h,HBITMAP bitmap,int srcx,int srcy) {
+static void fl_copy_offscreen_to_display(int x,int y,int w,int h,HBITMAP bitmap,int srcx,int srcy) {
   HDC new_gc = CreateCompatibleDC(fl_gc);
   int save = SaveDC(new_gc);
   SelectObject(new_gc, bitmap);
@@ -149,11 +169,15 @@ void fl_copy_offscreen_with_alpha(int x,int y,int w,int h,HBITMAP bitmap,int src
   SelectObject(new_gc, bitmap);
   BOOL alpha_ok = 0;
   // first try to alpha blend
-  if (fl_can_do_alpha_blending())
+  // if to printer, always try alpha_blend
+  int to_display = Fl_Surface_Device::surface()->type() == Fl_Display_Device::device_type; // true iff display output
+  if ( (to_display && fl_can_do_alpha_blending()) || Fl_Surface_Device::surface()->type() == Fl_Printer::device_type) {
     alpha_ok = fl_alpha_blend(fl_gc, x, y, w, h, new_gc, srcx, srcy, w, h, blendfunc);
-  // if that failed (it shouldn,t), still copy the bitmap over, but now alpha is 1
-  if (!alpha_ok)
+    }
+  // if that failed (it shouldn't), still copy the bitmap over, but now alpha is 1
+  if (!alpha_ok) {
     BitBlt(fl_gc, x, y, w, h, new_gc, srcx, srcy, SRCCOPY);
+    }
   RestoreDC(new_gc, save);
   DeleteDC(new_gc);
 }
@@ -184,14 +208,24 @@ Fl_Offscreen fl_create_offscreen_with_alpha(int w, int h) {
   return (Fl_Offscreen)ctx;
 }
 
-void fl_copy_offscreen(int x,int y,int w,int h,Fl_Offscreen osrc,int srcx,int srcy) {
+static void bmProviderRelease (void *src, const void *data, size_t size)
+{
+  CFIndex count = CFGetRetainCount(src);
+  CFRelease(src);
+  if(count == 1) free((void*)data);
+}
+
+static void fl_copy_offscreen_to_display(int x,int y,int w,int h,Fl_Offscreen osrc,int srcx,int srcy) {
   CGContextRef src = (CGContextRef)osrc;
   void *data = CGBitmapContextGetData(src);
   int sw = CGBitmapContextGetWidth(src);
   int sh = CGBitmapContextGetHeight(src);
   CGImageAlphaInfo alpha = CGBitmapContextGetAlphaInfo(src);
   CGColorSpaceRef lut = CGColorSpaceCreateDeviceRGB();
-  CGDataProviderRef src_bytes = CGDataProviderCreateWithData( 0L, data, sw*sh*4, 0L);
+  // when output goes to a Quartz printercontext, release of the bitmap must be
+  // delayed after the end of the print page
+  CFRetain(src);
+  CGDataProviderRef src_bytes = CGDataProviderCreateWithData( src, data, sw*sh*4, bmProviderRelease);
   CGImageRef img = CGImageCreate( sw, sh, 8, 4*8, 4*sw, lut, alpha,
     src_bytes, 0L, false, kCGRenderingIntentDefault);
   // fl_push_clip();
@@ -207,17 +241,20 @@ void fl_copy_offscreen(int x,int y,int w,int h,Fl_Offscreen osrc,int srcx,int sr
 void fl_delete_offscreen(Fl_Offscreen ctx) {
   if (!ctx) return;
   void *data = CGBitmapContextGetData((CGContextRef)ctx);
+  CFIndex count = CFGetRetainCount(ctx);
   CGContextRelease((CGContextRef)ctx);
-  if (!data) return;
-  free(data);
+  if(count == 1) free(data);
 }
 
 const int stack_max = 16;
 static int stack_ix = 0;
 static CGContextRef stack_gc[stack_max];
 static Window stack_window[stack_max];
+static Fl_Surface_Device *_ss;
 
 void fl_begin_offscreen(Fl_Offscreen ctx) {
+  _ss = fl_surface; 
+  fl_display_device->set_current();
   if (stack_ix<stack_max) {
     stack_gc[stack_ix] = fl_gc;
     stack_window[stack_ix] = fl_window;
@@ -227,14 +264,13 @@ void fl_begin_offscreen(Fl_Offscreen ctx) {
 
   fl_gc = (CGContextRef)ctx;
   fl_window = 0;
-  //fl_push_no_clip();
   CGContextSaveGState(fl_gc);
-  Fl_X::q_fill_context();
+  fl_push_no_clip();
 }
 
 void fl_end_offscreen() {
   Fl_X::q_release_context();
-  //fl_pop_clip();
+  fl_pop_clip();
   if (stack_ix>0)
     stack_ix--;
   else
@@ -243,6 +279,7 @@ void fl_end_offscreen() {
     fl_gc = stack_gc[stack_ix];
     fl_window = stack_window[stack_ix];
   }
+  _ss->set_current();
 }
 
 extern void fl_restore_clip();
@@ -289,7 +326,7 @@ void Fl_Double_Window::flush(int eraseoverlay) {
   }
 #if USE_XDBE
   if (use_xdbe) {
-    if (myi->backbuffer_bad) {
+    if (myi->backbuffer_bad || eraseoverlay) {
       // Make sure we do a complete redraw...
       if (myi->region) {XDestroyRegion(myi->region); myi->region = 0;}
       clear_damage(FL_DAMAGE_ALL);
@@ -353,7 +390,15 @@ void Fl_Double_Window::resize(int X,int Y,int W,int H) {
   int oh = h();
   Fl_Window::resize(X,Y,W,H);
 #if USE_XDBE
-  if (use_xdbe) return;
+  if (use_xdbe) {
+    Fl_X* myi = Fl_X::i(this);
+    if (myi && myi->other_xid && (ow < w() || oh < h())) {
+      // STR #2152: Deallocate the back buffer to force creation of a new one.
+      XdbeDeallocateBackBufferName(fl_display,myi->other_xid);
+      myi->other_xid = 0;
+    }
+    return;
+  }
 #endif
   Fl_X* myi = Fl_X::i(this);
   if (myi && myi->other_xid && (ow != w() || oh != h())) {
@@ -383,5 +428,5 @@ Fl_Double_Window::~Fl_Double_Window() {
 }
 
 //
-// End of "$Id: Fl_Double_Window.cxx 6616 2009-01-01 21:28:26Z matt $".
+// End of "$Id: Fl_Double_Window.cxx 7671 2010-07-09 17:31:33Z manolo $".
 //

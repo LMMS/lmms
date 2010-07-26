@@ -1,5 +1,5 @@
 //
-// "$Id: Fl_Overlay_Window.cxx 6616 2009-01-01 21:28:26Z matt $"
+// "$Id: Fl_Overlay_Window.cxx 7636 2010-06-09 08:36:25Z AlbrechtS $"
 //
 // Overlay window code for the Fast Light Tool Kit (FLTK).
 //
@@ -61,7 +61,7 @@ void Fl_Overlay_Window::flush() {
     return;
   }
 #endif
-  int erase_overlay = (damage()&FL_DAMAGE_OVERLAY);
+  int erase_overlay = (damage()&FL_DAMAGE_OVERLAY) | (overlay_ == this);
   clear_damage((uchar)(damage()&~FL_DAMAGE_OVERLAY));
   Fl_Double_Window::flush(erase_overlay);
   if (overlay_ == this) draw_overlay();
@@ -172,5 +172,5 @@ void Fl_Overlay_Window::redraw_overlay() {
 #endif
 
 //
-// End of "$Id: Fl_Overlay_Window.cxx 6616 2009-01-01 21:28:26Z matt $".
+// End of "$Id: Fl_Overlay_Window.cxx 7636 2010-06-09 08:36:25Z AlbrechtS $".
 //

@@ -1,5 +1,5 @@
 /*
- * "$Id: configh.cmake.in 6614 2009-01-01 16:11:32Z matt $"
+ * "$Id: configh.cmake.in 7563 2010-04-28 03:15:47Z greg.ercolano $"
  *
  * Configuration file for the Fast Light Tool Kit (FLTK).
  * @configure_input@
@@ -21,15 +21,17 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
  * USA.
  *
- * Please report all bugs and problems to "fltk-bugs@fltk.org".
+ * Please report all bugs and problems on the following page:
+ *
+ *     http://www.fltk.org/str.php
  */
 
 /*
  * Where to find files...
  */
 
-#define FLTK_DATADIR	"@FLTK_DATADIR@"
-#define FLTK_DOCDIR	"@FLTK_DOCDIR@"
+#define FLTK_DATADIR	"@PREFIX_DATA@"
+#define FLTK_DOCDIR	"@PREFIX_DOC@"
 
 /*
  * BORDER_WIDTH:
@@ -47,8 +49,6 @@
 
 #define BORDER_WIDTH 2
 
-#cmakedefine USE_X11 1
-
 /*
  * HAVE_GL:
  *
@@ -56,7 +56,7 @@
  * OpenGL, and FLTK will be smaller.
  */
 
-#define HAVE_GL @HAVE_GL@
+#cmakedefine01 HAVE_GL
 
 /*
  * HAVE_GL_GLU_H:
@@ -65,7 +65,15 @@
  * (many broken Mesa RPMs do not...)
  */
 
-#cmakedefine HAVE_GL_GLU_H @HAVE_GL_GLU_H@
+#cmakedefine01 HAVE_GL_GLU_H
+
+/*
+ * HAVE_GLXGETPROCADDRESSARB:
+ *
+ * Do you have the OpenGL glXGetProcAddressARB() function?
+ */
+
+#cmakedefine HAVE_GLXGETPROCADDRESSARB
 
 /*
  * USE_COLORMAP:
@@ -77,24 +85,28 @@
 #define USE_COLORMAP 1
 
 /*
+ * HAVE_XINERAMA
+ *
+ * Do we have the Xinerama library to support multi-head displays?
+ */
+
+#cmakedefine01 HAVE_XINERAMA
+
+/*
  * USE_XFT
  *
  * Use the new Xft library to draw anti-aliased text.
  */
 
-#cmakedefine FOUND_XFT
-#ifdef FOUND_XFT
-#define USE_XFT 1
-#else
-#define USE_XFT 0
-#endif
+#cmakedefine01 USE_XFT
+
 /*
  * HAVE_XDBE:
  *
  * Do we have the X double-buffer extension?
  */
 
-#define HAVE_XDBE 0
+#cmakedefine01 HAVE_XDBE
 
 /*
  * USE_XDBE:
@@ -114,19 +126,20 @@
  * other operating systems.
  */
 
-#cmakedefine FLTK_APPLE
-#ifdef FLTK_APPLE
-  #cmakedefine FLTK_QUARTZ
-  #ifdef FLTK_QUARTZ
-    #define USE_QUARTZ 1
-    #define __APPLE_QUARTZ__
-    #undef __APPLE_QD__
-  #else
-    #define USE_QUARTZ 0
-    #undef __APPLE_QUARTZ__
-    #define __APPLE_QD__
-  #endif
-#endif
+#cmakedefine USE_QUARTZ
+#cmakedefine __APPLE_QUARTZ__ @__APPLE_QUARTZ__@
+#cmakedefine __APPLE_COCOA__ @__APPLE_COCOA__@
+#cmakedefine __APPLE_QD__ @__APPLE_QD__@
+
+
+/*
+ * USE_X11
+ *
+ * Should we use X11 for the current platform
+ *
+ */
+
+#cmakedefine USE_X11 @USE_X11@
 
 /*
  * HAVE_OVERLAY:
@@ -154,7 +167,7 @@
  * Byte order of your machine: 1 = big-endian, 0 = little-endian.
  */
 
-#define WORDS_BIGENDIAN 0
+#define WORDS_BIGENDIAN @WORDS_BIGENDIAN@
 
 /*
  * U16, U32, U64:
@@ -168,7 +181,8 @@
 #cmakedefine U64 @U64@
 
 /*
- * HAVE_DIRENT_H, HAVE_SYS_NDIR_H, HAVE_SYS_DIR_H, HAVE_NDIR_H, HAVE_SCANDIR:
+ * HAVE_DIRENT_H, HAVE_SYS_NDIR_H, HAVE_SYS_DIR_H, HAVE_NDIR_H,
+ * HAVE_SCANDIR, HAVE_SCANDIR_POSIX:
  *
  * Where is <dirent.h> (used only by fl_file_chooser and scandir).
  */
@@ -178,6 +192,7 @@
 #cmakedefine HAVE_SYS_DIR_H @HAVE_SYS_DIR_H@
 #cmakedefine HAVE_NDIR_H @HAVE_NDIR_H@
 #cmakedefine HAVE_SCANDIR @HAVE_SCANDIR@
+#cmakedefine HAVE_SCANDIR_POSIX @HAVE_SCANDIR_POSIX@
 
 /*
  * Possibly missing sprintf-style functions:
@@ -196,7 +211,7 @@
 #cmakedefine HAVE_STRLCPY @HAVE_STRLCPY@
 
 /*
- * 'locale' functions
+ * Do we have POSIX locale support?
  */
 
 #cmakedefine HAVE_LOCALE_H @HAVE_LOCALE_H@
@@ -208,7 +223,7 @@
  * Whether or not select() call has its own header file.
  */
 
-#cmakedefine HAVE_SYS_SELECT_H @HAVE_SYS_SELECT_H@
+#cmakedefine01 HAVE_SYS_SELECT_H
 
 /*
  * HAVE_SYS_STDTYPES_H:
@@ -224,7 +239,7 @@
  * Use the poll() call provided on Linux and Irix instead of select()
  */
 
-#define USE_POLL 0
+#cmakedefine01 USE_POLL
 
 /*
  * Do we have various image libraries?
@@ -233,6 +248,23 @@
 #cmakedefine HAVE_LIBPNG @HAVE_LIBPNG@
 #cmakedefine HAVE_LIBZ @HAVE_LIBZ@
 #cmakedefine HAVE_LIBJPEG @HAVE_LIBJPEG@
+
+/*
+ * USE_CAIRO
+ *
+ * Do we have the cairo library available and want extended cairo use in fltk ?
+ * will implies to link cairo.lib in all fltk based apps.
+ */
+
+#cmakedefine USE_CAIRO @USE_CAIRO@
+
+/*
+ * HAVE_CAIRO
+ *
+ * Do we have the cairo library available?
+ */
+
+#cmakedefine HAVE_CAIRO @HAVE_CAIRO@
 
 /*
  * Which header file do we include for libpng?
@@ -252,20 +284,45 @@
  * Do we have POSIX threading?
  */
 
-#cmakedefine CMAKE_USE_PTHREADS
-#ifdef CMAKE_USE_PTHREADS
-#define HAVE_PTHREAD 1
-#else
-#define HAVE_PTHREAD 0
-#endif
-
-#cmakedefine CMAKE_HAVE_PTHREAD_H
-#ifdef CMAKE_HAVE_PTHREAD_H
-#define HAVE_PTHREAD_H 1
-#else
-#define HAVE_PTHREAD_H 0
-#endif
+#cmakedefine HAVE_PTHREAD @HAVE_PTHREAD@
+#cmakedefine01 HAVE_PTHREAD_H
 
 /*
- * End of "$Id: configh.cmake.in 6614 2009-01-01 16:11:32Z matt $".
+ * Do we have the ALSA library?
+ */
+
+#cmakedefine HAVE_ALSA_ASOUNDLIB_H @HAVE_ALSA_ASOUNDLIB_H@
+/*
+ * Do we have the long long type?
+ */
+
+#cmakedefine HAVE_LONG_LONG @HAVE_LONG_LONG@
+
+#ifdef HAVE_LONG_LONG
+#  define FLTK_LLFMT	"%lld"
+#  define FLTK_LLCAST	(long long)
+#else
+#  define FLTK_LLFMT	"%ld"
+#  define FLTK_LLCAST	(long)
+#endif /* HAVE_LONG_LONG */
+
+/*
+ * Do we have the strtoll() function?
+ */
+
+#cmakedefine HAVE_STRTOLL @HAVE_STRTOLL@
+
+#ifndef HAVE_STRTOLL
+#  define strtoll(nptr,endptr,base) strtol((nptr), (endptr), (base))
+#endif /* !HAVE_STRTOLL */
+
+/*
+ * Do we have the dlsym() function and header?
+ */
+
+#cmakedefine HAVE_DLFCN_H @HAVE_DLFCN_H@
+#cmakedefine HAVE_DLSYM @HAVE_DLSYM@
+
+/*
+ * End of "$Id: configh.cmake.in 7563 2010-04-28 03:15:47Z greg.ercolano $".
  */

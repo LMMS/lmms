@@ -1,6 +1,4 @@
 set(zynaddsubfx_samples_SRCS
-	AuSample.cpp
-	FqSample.cpp
 	Sample.cpp
 )
 

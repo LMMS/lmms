@@ -1,7 +1,7 @@
 /*
   ZynAddSubFX - a software synthesizer
 
-  PADnoteParameters.C - Parameters for PADnote (PADsynth)
+  PADnoteParameters.cpp - Parameters for PADnote (PADsynth)
   Copyright (C) 2002-2005 Nasca Octavian Paul
   Author: Nasca Octavian Paul
 

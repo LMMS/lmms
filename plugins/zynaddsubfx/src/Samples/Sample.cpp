@@ -1,7 +1,7 @@
 /*
   ZynAddSubFX - a software synthesizer
 
-  Sample.C - Object for storing information on samples
+  Sample.cpp - Object for storing information on samples
   Copyright (C) 2009-2009 Mark McCurry
   Author: Mark McCurry
 
@@ -19,8 +19,13 @@
   Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 */
 #include <cmath>
+#include <cstring>//for memcpy/memset
+#include <iostream>
 #include "Sample.h"
 
+using namespace std;
+
+#warning TODO Think about renaming Sample to Frame
 /**\TODO start using pointer math here as these will be Frequency called
  * functions throughout the code*/
 Sample::Sample(const Sample &smp)
@@ -90,6 +95,74 @@ bool Sample::operator==(const Sample &smp) const
         if(this->buffer[i] != smp.buffer[i])
             return false;
     return true;
+}
+
+/**
+ * Linear point estimation
+ * @param ya Y of point a
+ * @param yb Y of point b
+ * @param xt X of test point
+ * @param xa X of point a
+ * @param xb X of point b
+ * @return estimated Y of test point
+ */
+inline float linearEstimate(float ya, float yb, float xt, int xa = 0, int xb = 1)
+{
+    if(xa == xb)
+        return ya;
+
+    return (yb-ya) * (xt-xa)/(xb-xa) + ya;
+}
+
+void Sample::resize(unsigned int nsize)
+{
+    if(bufferSize == nsize)
+        return;
+    else {//resampling occurs here
+        float ratio = (nsize * 1.0) / (bufferSize * 1.0);
+
+        int    nBufferSize = nsize;
+        float *nBuffer     = new float[nBufferSize];
+
+        //take care of edge cases
+        *nBuffer = *buffer;
+        *(nBuffer+nBufferSize-1) = *(buffer+bufferSize-1);
+
+        //addition is done to avoid 0 edge case
+        for(int i = 1; i < nBufferSize - 1; ++i)
+        {
+            float left  = floor(i/ratio);
+            float right = ceil((i+1)/ratio);
+            float test  = i/ratio;
+            if(left > bufferSize - 1)
+                left = bufferSize - 1;
+            if(right > bufferSize - 1)
+                right = bufferSize - 1;
+            if(left > test)
+                test = left;
+            nBuffer[i] = linearEstimate(buffer[(int)left],
+                                        buffer[(int)right],
+                                        test, (int)left, (int)right);
+        }
+
+        //put the new data in
+        delete[] buffer;
+        buffer     = nBuffer;
+        bufferSize = nBufferSize;
+    }
+}
+
+void Sample::append(const Sample &smp)
+{
+    int nbufferSize = bufferSize + smp.bufferSize;
+    float *nbuffer  = new float[nbufferSize];
+
+    memcpy(nbuffer, buffer, bufferSize * sizeof(float));
+    memcpy(nbuffer + bufferSize, smp.buffer, smp.bufferSize * sizeof(float));
+    delete buffer;
+
+    buffer     = nbuffer;
+    bufferSize = nbufferSize;
 }
 
 REALTYPE Sample::max() const

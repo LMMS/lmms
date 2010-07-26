@@ -1,7 +1,7 @@
 /*
   ZynAddSubFX - a software synthesizer
 
-  EnvelopeParams.C - Parameters for Envelope
+  EnvelopeParams.cpp - Parameters for Envelope
   Copyright (C) 2002-2005 Nasca Octavian Paul
   Author: Nasca Octavian Paul
 

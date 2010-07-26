@@ -52,7 +52,7 @@ class PADnoteParameters:public Presets
 
         //parameters
 
-        //the mode: 0 - bandwidth, 1 - discrete (bandwidth=0), 2 - continuous
+        //the mode: 0 - bandwidth, 1 - discrete (bandwidth=0), 2 - continous
         //the harmonic profile is used only on mode 0
         unsigned char Pmode;
 

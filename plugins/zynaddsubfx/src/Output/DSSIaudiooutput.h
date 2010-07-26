@@ -26,34 +26,86 @@
 
 #include "../globals.h"
 #include "../Misc/Master.h"
-#include "../UI/MasterUI.h"
 
 #include <dssi.h>
 #include <ladspa.h>
+#include <vector>
 
-/*
-class VSTSynth:public AudioEffectX{
-    public:
-    VSTSynth (audioMasterCallback audioMaster);
-    ~VSTSynth();
+class DSSIaudiooutput
+{
+public:
+    //
+    // Static stubs for LADSPA member functions
+    //
+    static void stub_connectPort(LADSPA_Handle instance, unsigned long port, LADSPA_Data * data);
+    static void stub_activate(LADSPA_Handle instance);
+    static void stub_run(LADSPA_Handle instance, unsigned long sample_count);
+    static void stub_deactivate(LADSPA_Handle Instance);
+    static void stub_cleanup(LADSPA_Handle instance);
 
-    virtual void process (float **inputs, float **outputs, long sampleframes);
-    virtual void processReplacing (float **inputs, float **outputs, long sampleframes);
-    virtual long processEvents(VstEvents *events);//this is used for Midi input
-    virtual long int canDo(char *txt);
-    virtual bool getVendorString(char *txt);
-    virtual bool getProductString(char *txt);
-    virtual void resume();
+    //
+    // Static stubs for DSSI member functions
+    //
+    static const DSSI_Program_Descriptor* stub_getProgram (LADSPA_Handle instance, unsigned long Index);
+    static void stub_selectProgram(LADSPA_Handle instance, unsigned long bank, unsigned long program);
+    static int stub_getMidiControllerForPort(LADSPA_Handle instance, unsigned long port);
+    static void stub_runSynth(LADSPA_Handle instance, unsigned long sample_count,
+                      snd_seq_event_t *events, unsigned long event_count);
 
-    virtual long getChunk(void** data,bool isPreset=false);
-    virtual void setChunk(void *data,long size,bool isPreset=false);
+    /*
+     * LADSPA member functions
+     */
+    static LADSPA_Handle instantiate(const LADSPA_Descriptor * descriptor, unsigned long s_rate);
+    void connectPort(unsigned long port, LADSPA_Data * data);
+    void activate();
+    void run(unsigned long sample_count);
+    void deactivate();
+    void cleanup();
+    static const LADSPA_Descriptor* getLadspaDescriptor(unsigned long index);
 
-    MasterUI *ui;
-    int Pexitprogram;
+    /*
+     * DSSI member functions
+     */
+    const DSSI_Program_Descriptor* getProgram (unsigned long Index);
+    void selectProgram(unsigned long bank, unsigned long program);
+    int getMidiControllerForPort(unsigned long port);
+    void runSynth(unsigned long sample_count, snd_seq_event_t *events, unsigned long event_count);
+    static const DSSI_Descriptor* getDssiDescriptor(unsigned long index);
 
-        Master *vmaster;
-    pthread_t thr;
+    struct ProgramDescriptor
+    {
+        unsigned long bank;
+        unsigned long program;
+        string name;
+        ProgramDescriptor(unsigned long _bank, unsigned long _program, char* _name);
+    };
+
+private:
+
+    DSSIaudiooutput(unsigned long sampleRate);
+    ~DSSIaudiooutput();
+    static DSSI_Descriptor* initDssiDescriptor();
+    static DSSIaudiooutput* getInstance(LADSPA_Handle instance);
+    void initBanks();
+    bool mapNextBank();
+
+    LADSPA_Data *outl;
+    LADSPA_Data *outr;
+    long sampleRate;
+    Master* master;
+    static DSSI_Descriptor* dssiDescriptor;
+    static string bankDirNames[];
+    static
+    vector <ProgramDescriptor> programMap;
+
+    /**
+     * Flag controlling the list of bank directories
+     */
+    bool banksInited;
+
+    static
+    long bankNoToMap;
 };
-*/
+
 #endif
 

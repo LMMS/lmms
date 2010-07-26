@@ -1,5 +1,5 @@
 //
-// "$Id: Fl_File_Chooser2.cxx 6899 2009-09-23 21:32:23Z matt $"
+// "$Id: Fl_File_Chooser2.cxx 7672 2010-07-10 09:44:45Z matt $"
 //
 // More Fl_File_Chooser routines.
 //
@@ -304,6 +304,9 @@
 
   /** \fn void * Fl_File_Chooser::user_data() const
     Gets the file chooser user data d */
+
+  /** \fn Fl_File_Browser* Fl_File_Chooser::browser()
+   returns a pointer to the underlying Fl_File_Browser object */
 // *** END OF OUT OF SOURCE DOC ***
 
 // Contents:
@@ -858,7 +861,7 @@ Fl_File_Chooser::fileNameCB()
       }
     } else {
       // File doesn't exist, so beep at and alert the user...
-      fl_alert(existing_file_label);
+      fl_alert("%s",existing_file_label);
     }
   }
   else if (Fl::event_key() != FL_Delete &&
@@ -1028,6 +1031,8 @@ Fl_File_Chooser::filter(const char *p)		// I - Pattern(s)
   if (!allfiles) showChoice->add(all_files_label);
 
   showChoice->add(custom_filter_label);
+  
+  // TODO: add a menu item to switch hidden files on and off
 
   showChoice->value(0);
   showChoiceCB();
@@ -1046,7 +1051,7 @@ Fl_File_Chooser::newdir()
 
 
   // Get a directory name from the user
-  if ((dir = fl_input(new_directory_label, NULL)) == NULL)
+  if ((dir = fl_input("%s", NULL, new_directory_label)) == NULL)
     return;
 
   // Make it relative to the current directory as needed...
@@ -1213,7 +1218,7 @@ Fl_File_Chooser::showChoiceCB()
   item = showChoice->text(showChoice->value());
 
   if (strcmp(item, custom_filter_label) == 0) {
-    if ((item = fl_input(custom_filter_label, pattern_)) != NULL) {
+    if ((item = fl_input("%s", pattern_, custom_filter_label)) != NULL) {
       strlcpy(pattern_, item, sizeof(pattern_));
 
       quote_pathname(temp, item, sizeof(temp));
@@ -1284,24 +1289,48 @@ void
 Fl_File_Chooser::update_preview()
 {
   const char		*filename;	// Current filename
-  Fl_Shared_Image	*image,		// New image
+  const char            *newlabel = 0;  // New label text
+  Fl_Shared_Image	*image = 0,     // New image
 			*oldimage;	// Old image
   int			pbw, pbh;	// Width and height of preview box
   int			w, h;		// Width and height of preview image
+  int                   set = 0;        // Set this flag as soon as a decent preview is found
 
 
   if (!previewButton->value()) return;
 
-  if ((filename = value()) == NULL || fl_filename_isdir(filename)) image = NULL;
-  else {
-    window->cursor(FL_CURSOR_WAIT);
-    Fl::check();
-
-    image = Fl_Shared_Image::get(filename);
-
-    if (image) {
-      window->cursor(FL_CURSOR_DEFAULT);
-      Fl::check();
+  filename = value();
+  if (filename == NULL) {
+    // no file name at all, so we have an empty preview
+    set = 1;
+  } else if (fl_filename_isdir(filename)) {
+    // filename is a directory, show a folder icon
+    newlabel = "@fileopen";
+    set = 1;
+  } else {
+    struct stat s;
+    if (fl_stat(filename, &s)==0) {
+      if ((s.st_mode&S_IFMT)!=S_IFREG) {
+        // this is no regular file, probably some kind of device
+        newlabel = "@-3refresh"; // a cross
+        set = 1;
+      } else if (s.st_size==0) {
+        // this file is emty
+        newlabel = "<empty file>";
+        set = 1;
+      } else {
+        // if this file is an image, try to load it
+        window->cursor(FL_CURSOR_WAIT);
+        Fl::check();
+        
+        image = Fl_Shared_Image::get(filename);
+        
+        if (image) {
+          window->cursor(FL_CURSOR_DEFAULT);
+          Fl::check();
+          set = 1;
+        }
+      }
     }
   }
 
@@ -1311,7 +1340,7 @@ Fl_File_Chooser::update_preview()
 
   previewBox->image(0);
 
-  if (!image) {
+  if (!set) {
     FILE	*fp;
     int		bytes;
     char	*ptr;
@@ -1368,7 +1397,7 @@ Fl_File_Chooser::update_preview()
       // Non-printable file, just show a big ?...
       previewBox->label(filename ? "?" : 0);
       previewBox->align(FL_ALIGN_CLIP);
-      previewBox->labelsize(100);
+      previewBox->labelsize(75);
       previewBox->labelfont(FL_HELVETICA);
     } else {
       // Show the first 1k of text...
@@ -1382,7 +1411,7 @@ Fl_File_Chooser::update_preview()
       previewBox->labelsize(size);
       previewBox->labelfont(FL_COURIER);
     }
-  } else {
+  } else if (image) {
     pbw = previewBox->w() - 20;
     pbh = previewBox->h() - 20;
 
@@ -1405,6 +1434,11 @@ Fl_File_Chooser::update_preview()
 
     previewBox->align(FL_ALIGN_CLIP);
     previewBox->label(0);
+  } else if (newlabel) {
+    previewBox->label(newlabel);
+    previewBox->align(FL_ALIGN_CLIP);
+    previewBox->labelsize(newlabel[0]=='@'?75:12);
+    previewBox->labelfont(FL_HELVETICA);
   }
 
   previewBox->redraw();
@@ -1616,5 +1650,5 @@ unquote_pathname(char       *dst,	// O - Destination string
 
 
 //
-// End of "$Id: Fl_File_Chooser2.cxx 6899 2009-09-23 21:32:23Z matt $".
+// End of "$Id: Fl_File_Chooser2.cxx 7672 2010-07-10 09:44:45Z matt $".
 //

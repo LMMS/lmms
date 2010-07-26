@@ -22,6 +22,9 @@
 
 */
 
+#if 1
+#include "QtXmlWrapper.h"
+#else
 #include <mxml.h>
 #include <string>
 #ifndef REALTYPE
@@ -269,4 +272,4 @@ class XMLwrapper
 };
 
 #endif
-
+#endif

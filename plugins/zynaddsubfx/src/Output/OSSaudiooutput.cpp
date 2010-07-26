@@ -1,7 +1,7 @@
 /*
   ZynAddSubFX - a software synthesizer
 
-  OSSaudiooutput.C - Audio output for Open Sound System
+  OSSaudiooutput.cpp - Audio output for Open Sound System
   Copyright (C) 2002-2005 Nasca Octavian Paul
   Author: Nasca Octavian Paul
 

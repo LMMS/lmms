@@ -1,7 +1,7 @@
 /*
   ZynAddSubFX - a software synthesizer
 
-  SUBnoteParameters.C - Parameters for SUBnote (SUBsynth)
+  SUBnoteParameters.cpp - Parameters for SUBnote (SUBsynth)
   Copyright (C) 2002-2005 Nasca Octavian Paul
   Author: Nasca Octavian Paul
 

@@ -1,5 +1,5 @@
 //
-// "$Id: Fl_Text_Editor.cxx 6894 2009-09-20 21:55:21Z greg.ercolano $"
+// "$Id: Fl_Text_Editor.cxx 7462 2010-04-06 23:00:56Z matt $"
 //
 // Copyright 2001-2009 by Bill Spitzak and others.
 // Original code Copyright Mark Edel.  Permission to distribute under
@@ -254,6 +254,7 @@ int Fl_Text_Editor::kf_ignore(int, Fl_Text_Editor*) {
 int Fl_Text_Editor::kf_backspace(int, Fl_Text_Editor* e) {
   if (!e->buffer()->selected() && e->move_left()) {
     int l = 1;
+    // FIXME: character is ucs-4
     char c = e->buffer()->character(e->insert_position());
     if (c & 0x80 && c & 0x40) {
       l = fl_utf8len(c);
@@ -449,6 +450,7 @@ int Fl_Text_Editor::kf_insert(int, Fl_Text_Editor* e) {
 int Fl_Text_Editor::kf_delete(int, Fl_Text_Editor* e) {
   if (!e->buffer()->selected()) {
     int l = 1;
+    // FIXME: character is ucs-4
     char c = e->buffer()->character(e->insert_position());
     if (c & 0x80 && c & 0x40) {
       l = fl_utf8len(c);
@@ -614,5 +616,5 @@ int Fl_Text_Editor::handle(int event) {
 }
 
 //
-// End of "$Id: Fl_Text_Editor.cxx 6894 2009-09-20 21:55:21Z greg.ercolano $".
+// End of "$Id: Fl_Text_Editor.cxx 7462 2010-04-06 23:00:56Z matt $".
 //

@@ -1,7 +1,7 @@
 /*
   ZynAddSubFX - a software synthesizer
 
-  XMLwrapper.C - XML wrapper
+  XMLwrapper.cpp - XML wrapper
   Copyright (C) 2003-2005 Nasca Octavian Paul
   Copyright (C) 2009-2009 Mark McCurry
   Author: Nasca Octavian Paul

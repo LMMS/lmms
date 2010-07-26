@@ -1,5 +1,5 @@
 //
-// "$Id: Fl_arg.cxx 6813 2009-07-01 07:32:14Z AlbrechtS $"
+// "$Id: Fl_arg.cxx 7334 2010-03-25 14:37:46Z AlbrechtS $"
 //
 // Optional argument initialization code for the Fast Light Tool Kit (FLTK).
 //
@@ -88,13 +88,6 @@ int Fl::arg(int argc, char **argv, int &i) {
   if (s[0] != '-' || s[1] == '-' || !s[1]) {return_i = 1; return 0;}
   s++; // point after the dash
 
-#ifdef __APPLE__
-  if (!strncmp(s, "psn", 3)) {
-    // Skip process serial number...
-    i++;
-  }
-  else
-#endif // __APPLE__
   if (fl_match(s, "iconic")) {
     fl_show_iconic = 1;
     i++;
@@ -284,7 +277,7 @@ int Fl::arg(int argc, char **argv, int &i) {
   Fl::help pointer.
 */
 
-int Fl::args(int argc, char** argv, int& i, int (*cb)(int,char**,int&)) {
+int Fl::args(int argc, char** argv, int& i, Fl_Args_Handler cb) {
   arg_called = 1;
   i = 1; // skip argv[0]
   while (i < argc) {
@@ -538,5 +531,5 @@ int XParseGeometry(const char* string, int* x, int* y,
 #endif // ifdef WIN32
 
 //
-// End of "$Id: Fl_arg.cxx 6813 2009-07-01 07:32:14Z AlbrechtS $".
+// End of "$Id: Fl_arg.cxx 7334 2010-03-25 14:37:46Z AlbrechtS $".
 //

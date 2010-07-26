@@ -828,6 +828,8 @@
 	    - Codul de recorder wav a fost rescris
 	    - Adaugata functia de export la sample-urile din PADsynth
 
+*  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *
+
 20 Feb 2009 (Mark McCurry)
 	    - Made several functions accept 'constant char' over 'char' to
 	      prevent warnings
@@ -957,3 +959,18 @@
 
 09 Oct 2009 (Mark McCurry)
 	    - Restylized codebase with uncrustify
+
+28 Oct 2009 (Paul Nasca)
+	    - Disable "bw" control on Reverb when Bandwidth mode is not enabled
+
+18 Nov 2009 (Mark McCurry)
+	    - Fixed segfault in VirKeyBoard
+
+02 Dec 2009 (Paul Nasca)
+		- Fixed a small typo on Virtual Keyboard
+
+10 Dec 2009 (Mark McCurry)
+	    - Separated out Presets and arrayed Presets to reduce warnings from
+	      the Wextra flag
+	    - Minor change to Filter_ and FormantFilter to reduce unwanted warnings
+

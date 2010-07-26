@@ -1,5 +1,5 @@
 //
-// "$Id: math.h 6614 2009-01-01 16:11:32Z matt $"
+// "$Id: math.h 7504 2010-04-14 20:17:44Z matt $"
 //
 // Math header file for the Fast Light Tool Kit (FLTK).
 //
@@ -25,19 +25,18 @@
 //     http://www.fltk.org/str.php
 //
 
+// Xcode on OS X includes files by recursing down into directories.
+// This code catches the cycle and directly includes the required file.
+#ifdef fl_math_h_cyclic_include 
+#  include "/usr/include/math.h"
+#endif
+
 #ifndef fl_math_h
 #  define fl_math_h
 
-// Apple's ProjectBuilder has the nasty habit of including recursively
-// down the file tree. To avoid re-including <FL/math.h> we must 
-// directly include the systems math file. (Plus, I could not find a 
-// predefined macro for ProjectBuilder builds, so we have to define it 
-// in the project)
-#  if defined(__APPLE__) && defined(__PROJECTBUILDER__)
-#    include "/usr/include/math.h"
-#  else
-#    include <math.h>
-#  endif
+#  define fl_math_h_cyclic_include 
+#  include <math.h>
+#  undef fl_math_h_cyclic_include 
 
 #  ifdef __EMX__
 #    include <float.h>
@@ -68,5 +67,5 @@ inline double copysign(double a, double b) {return b<0 ? -a : a;}
 
 
 //
-// End of "$Id: math.h 6614 2009-01-01 16:11:32Z matt $".
+// End of "$Id: math.h 7504 2010-04-14 20:17:44Z matt $".
 //

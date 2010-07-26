@@ -1,5 +1,5 @@
 //
-// "$Id: fl_ask.cxx 6869 2009-09-13 21:57:46Z AlbrechtS $"
+// "$Id: fl_ask.cxx 7370 2010-03-30 19:44:50Z AlbrechtS $"
 //
 // Standard dialog functions for the Fast Light Tool Kit (FLTK).
 //
@@ -47,16 +47,29 @@
 #include <FL/x.H>
 #include <FL/fl_draw.H>
 
+#ifdef __APPLE__
+# if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_5
+#  include <AudioToolbox/AudioServices.h>
+# endif
+#endif
+
 static Fl_Window *message_form;
 static Fl_Box *message;
 static Fl_Box *icon;
 static Fl_Button *button[3];
 static Fl_Input *input;
+static int ret_val;
 static const char *iconlabel = "?";
 Fl_Font fl_message_font_ = FL_HELVETICA;
 Fl_Fontsize fl_message_size_ = 14;
 
 static char avoidRecursion = 0;
+
+// sets the global return value (ret_val) and closes the window
+static void button_cb(Fl_Widget *bt, void *val) {
+  ret_val = (int)(long)val;
+  message_form->hide();
+}
 
 static Fl_Window *makeform() {
  if (message_form) {
@@ -81,13 +94,16 @@ static Fl_Window *makeform() {
   o->color(FL_WHITE);
   o->labelcolor(FL_BLUE);
  }
- button[0] = new Fl_Button(310, 70, 90, 23);
+ // create the buttons (right to left)
+ for (int b=0, x=310; b<3; b++, x -= 100) {
+   if (b==1)
+     button[b] = new Fl_Return_Button(x, 70, 90, 23);
+   else
+     button[b] = new Fl_Button(x, 70, 90, 23);
+   button[b]->align(FL_ALIGN_INSIDE|FL_ALIGN_WRAP);
+   button[b]->callback(button_cb,(void *)b);
+ }
  button[0]->shortcut(FL_Escape);
- button[0]->align(FL_ALIGN_INSIDE|FL_ALIGN_WRAP);
- button[1] = new Fl_Return_Button(210, 70, 90, 23);
- button[1]->align(FL_ALIGN_INSIDE|FL_ALIGN_WRAP);
- button[2] = new Fl_Button(110, 70, 90, 23);
- button[2]->align(FL_ALIGN_INSIDE|FL_ALIGN_WRAP);
  w->resizable(new Fl_Box(60,10,110-60,27));
  w->end();
  w->set_modal();
@@ -212,31 +228,22 @@ static int innards(const char* fmt, va_list ap,
   else
     button[0]->shortcut(FL_Escape);
 
-  message_form->show();
-  // deactivate Fl::grab(), because it is incompatible with Fl::readqueue()
+  // deactivate Fl::grab(), because it is incompatible with modal windows
   Fl_Window* g = Fl::grab();
   if (g) Fl::grab(0);
-  int r = 0;
-  for (;;) {
-    Fl_Widget *o = Fl::readqueue();
-    if (!o) Fl::wait();
-    else if (o == button[0]) {r = 0; break;}
-    else if (o == button[1]) {r = 1; break;}
-    else if (o == button[2]) {r = 2; break;}
-    else if (o == message_form) {r = 0; break;}
-  }
+  message_form->show();
+  while (message_form->shown()) Fl::wait();
   if (g) // regrab the previous popup menu, if there was one
     Fl::grab(g);
-  message_form->hide();
   icon->label(prev_icon_label);
 
   avoidRecursion = 0;
-  return r;
+  return ret_val;
 }
 
  /** \addtogroup group_comdlg
     @{ */
- 
+
 // pointers you can use to change FLTK to a foreign language:
 const char* fl_no = "No";        ///< string pointer used in common dialogs, you can change it to a foreign language
 const char* fl_yes= "Yes";       ///< string pointer used in common dialogs, you can change it to a foreign language
@@ -273,7 +280,26 @@ void fl_beep(int type) {
   switch (type) {
     case FL_BEEP_DEFAULT :
     case FL_BEEP_ERROR :
-      SysBeep(30);
+      // How Apple is not any better than Microsoft:
+      /* MacOS 8 */   // SysBeep(30);
+      /* OS X 10.1 */ // AlertSoundPlay();
+      /* OS X 10.5 */ // AudioServicesPlayAlertSound(kUserPreferredAlert);
+      /* OS X 10.6 */ // AudioServicesPlayAlertSound(kSystemSoundID_UserPreferredAlert);
+# if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_5
+      if (AudioServicesPlayAlertSound!=0L)
+#   if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6
+        AudioServicesPlayAlertSound(kSystemSoundID_UserPreferredAlert);
+#   else
+        AudioServicesPlayAlertSound(kUserPreferredAlert);
+#   endif
+      else
+# endif
+#if MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_5
+        AlertSoundPlay();
+#else
+    {
+    }
+#endif
       break;
     default :
       break;
@@ -460,5 +486,5 @@ const char *fl_password(const char *fmt, const char *defstr, ...) {
 /** @} */
 
 //
-// End of "$Id: fl_ask.cxx 6869 2009-09-13 21:57:46Z AlbrechtS $".
+// End of "$Id: fl_ask.cxx 7370 2010-03-30 19:44:50Z AlbrechtS $".
 //

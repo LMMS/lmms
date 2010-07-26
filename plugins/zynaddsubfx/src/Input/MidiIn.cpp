@@ -1,7 +1,7 @@
 /*
   ZynAddSubFX - a software synthesizer
 
-  MidiIn.C - This class is inherited by all the Midi input classes
+  MidiIn.cpp - This class is inherited by all the Midi input classes
   Copyright (C) 2002-2005 Nasca Octavian Paul
   Author: Nasca Octavian Paul
 

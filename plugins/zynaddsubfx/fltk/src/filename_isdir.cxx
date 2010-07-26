@@ -1,5 +1,5 @@
 //
-// "$Id: filename_isdir.cxx 6641 2009-01-20 11:10:29Z fabien $"
+// "$Id: filename_isdir.cxx 6986 2010-01-01 18:30:49Z greg.ercolano $"
 //
 // Directory detection routines for the Fast Light Tool Kit (FLTK).
 //
@@ -48,7 +48,13 @@ int _fl_filename_isdir_quick(const char* n) {
 }
 
 /**
-   Determines if a file exists and is a directory from its filename
+   Determines if a file exists and is a directory from its filename.
+   \code
+   #include <FL/filename.H>
+   [..]
+   fl_filename_isdir("/etc");		// returns non-zero
+   fl_filename_isdir("/etc/hosts");	// returns 0
+   \endcode
    \param[in] n the filename to parse
    \return non zero if file exists and is a directory, zero otherwise
 */
@@ -93,5 +99,5 @@ int fl_filename_isdir(const char* n) {
 }
 
 //
-// End of "$Id: filename_isdir.cxx 6641 2009-01-20 11:10:29Z fabien $".
+// End of "$Id: filename_isdir.cxx 6986 2010-01-01 18:30:49Z greg.ercolano $".
 //

@@ -1,7 +1,7 @@
 /*
   ZynAddSubFX - a software synthesizer
 
-  Part.C - Part implementation
+  Part.cpp - Part implementation
   Copyright (C) 2002-2005 Nasca Octavian Paul
   Author: Nasca Octavian Paul
 
@@ -249,7 +249,7 @@ void Part::NoteOn(unsigned char note,
         if(Ppolymode != 0) {
             fprintf(
                 stderr,
-                "ZynAddSubFX WARNING: Poly and Legato modes are both On, that should not happen ! ... Disabling Legato mode ! - (Part.C::NoteOn(..))\n");
+                "ZynAddSubFX WARNING: Poly and Legato modes are both On, that should not happen ! ... Disabling Legato mode ! - (Part.cpp::NoteOn(..))\n");
             Plegatomode = 0;
         }
         else {
@@ -293,7 +293,7 @@ void Part::NoteOn(unsigned char note,
         //test
         fprintf(stderr,
                 "%s",
-                "NOTES TOO MANY (> POLIPHONY) - (Part.C::NoteOn(..))\n");
+                "NOTES TOO MANY (> POLIPHONY) - (Part.cpp::NoteOn(..))\n");
     else {
         //start the note
         partnote[pos].status = KEY_PLAYING;

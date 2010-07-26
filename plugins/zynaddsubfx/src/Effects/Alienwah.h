@@ -46,11 +46,11 @@ class Alienwah:public Effect
                  REALTYPE *const efxoutl_,
                  REALTYPE *const efxoutr_);
         ~Alienwah();
-        void out(REALTYPE *const smpsl, REALTYPE *const smpsr);
+        void out(const Stereo<float *> &smp);
 
         void setpreset(unsigned char npreset);
-        void changepar(const int &npar, const unsigned char &value);
-        unsigned char getpar(const int &npar) const;
+        void changepar(int npar, unsigned char value);
+        unsigned char getpar(int npar) const;
         void cleanup();
 
     private:
@@ -66,13 +66,13 @@ class Alienwah:public Effect
 
 
         //Control Parameters
-        void setvolume(const unsigned char &Pvolume);
-        void setpanning(const unsigned char &Ppanning);
-        void setdepth(const unsigned char &Pdepth);
-        void setfb(const unsigned char &Pfb);
-        void setlrcross(const unsigned char &Plrcross);
-        void setdelay(const unsigned char &Pdelay);
-        void setphase(const unsigned char &Pphase);
+        void setvolume(unsigned char Pvolume);
+        void setpanning(unsigned char Ppanning);
+        void setdepth(unsigned char Pdepth);
+        void setfb(unsigned char Pfb);
+        void setlrcross(unsigned char Plrcross);
+        void setdelay(unsigned char Pdelay);
+        void setphase(unsigned char Pphase);
 
         //Internal Values
         REALTYPE panning, fb, depth, lrcross, phase;

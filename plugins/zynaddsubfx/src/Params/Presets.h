@@ -30,17 +30,18 @@
 /**Presets and Clipboard management*/
 class Presets
 {
+    friend class PresetsArray;
     public:
         Presets();
         virtual ~Presets();
 
-        void copy(const char *name); /**<if name==NULL, the clipboard is used*/
-        void paste(int npreset); //npreset==0 for clipboard
-        bool checkclipboardtype();
+        virtual void copy(const char *name); /**<if name==NULL, the clipboard is used*/
+        virtual void paste(int npreset); //npreset==0 for clipboard
+        virtual bool checkclipboardtype();
         void deletepreset(int npreset);
 
         char type[MAX_PRESETTYPE_SIZE];
-        void setelement(int n);
+        //void setelement(int n);
 
         void rescanforpresets();
 
@@ -50,10 +51,6 @@ class Presets
         virtual void add2XML(XMLwrapper *xml)    = 0;
         virtual void getfromXML(XMLwrapper *xml) = 0;
         virtual void defaults() = 0;
-        virtual void add2XMLsection(XMLwrapper *xml, int n) {}
-        virtual void getfromXMLsection(XMLwrapper *xml, int n) {}
-        virtual void defaults(int n) {}
-        int nelement;
 };
 
 #endif

@@ -1,7 +1,7 @@
 /*
   ZynAddSubFX - a software synthesizer
 
-  ADnoteParameters.C - Parameters for ADnote (ADsynth)
+  ADnoteParameters.cpp - Parameters for ADnote (ADsynth)
   Copyright (C) 2002-2005 Nasca Octavian Paul
   Author: Nasca Octavian Paul
 
@@ -28,7 +28,8 @@
 int ADnote_unison_sizes[] =
 {1, 2, 3, 4, 5, 6, 8, 10, 12, 15, 20, 25, 30, 40, 50, 0};
 
-ADnoteParameters::ADnoteParameters(FFTwrapper *fft_):Presets()
+ADnoteParameters::ADnoteParameters(FFTwrapper *fft_)
+    :PresetsArray()
 {
     setpresettype("Padsyth");
     fft = fft_;

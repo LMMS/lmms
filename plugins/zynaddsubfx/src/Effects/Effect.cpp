@@ -1,7 +1,7 @@
 /*
   ZynAddSubFX - a software synthesizer
 
-  Effect.C - this class is inherited by the all effects(Reverb, Echo, ..)
+  Effect.cpp - this class is inherited by the all effects(Reverb, Echo, ..)
   Copyright (C) 2002-2005 Nasca Octavian Paul
   Author: Nasca Octavian Paul
 
@@ -22,10 +22,15 @@
 
 #include "Effect.h"
 
-
 Effect::Effect(bool insertion_, REALTYPE *const efxoutl_,
                REALTYPE *const efxoutr_, FilterParams *filterpars_,
                const unsigned char &Ppreset_)
     :Ppreset(Ppreset_), efxoutl(efxoutl_), efxoutr(efxoutr_),
-      filterpars(filterpars_), insertion(insertion_) {}
+      filterpars(filterpars_), insertion(insertion_) 
+{}
+
+void Effect::out(REALTYPE *const smpsl, REALTYPE *const smpsr)
+{
+    out(Stereo<float *>(smpsl,smpsr));
+};
 

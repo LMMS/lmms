@@ -1,5 +1,5 @@
 //
-// "$Id: Fl_Counter.H 6902 2009-09-27 11:06:56Z matt $"
+// "$Id: Fl_Counter.H 6939 2009-11-17 14:45:36Z matt $"
 //
 // Counter header file for the Fast Light Tool Kit (FLTK).
 //
@@ -98,7 +98,7 @@ public:
   /**
     Returns the increment for normal step buttons.
    */
-  double step() {return Fl_Valuator::step();}
+  double step() const {return Fl_Valuator::step();}
 
   /** Gets the text font */
   Fl_Font textfont() const {return textfont_;}
@@ -120,5 +120,5 @@ public:
 #endif
 
 //
-// End of "$Id: Fl_Counter.H 6902 2009-09-27 11:06:56Z matt $".
+// End of "$Id: Fl_Counter.H 6939 2009-11-17 14:45:36Z matt $".
 //

@@ -1,7 +1,7 @@
 /*
   ZynAddSubFX - a software synthesizer
 
-  FormantFilter.C - formant filters
+  FormantFilter.cpp - formant filters
   Copyright (C) 2002-2005 Nasca Octavian Paul
   Author: Nasca Octavian Paul
 
@@ -190,6 +190,10 @@ void FormantFilter::setq(REALTYPE q_)
     for(int i = 0; i < numformants; i++)
         formant[i]->setq(Qfactor * currentformants[i].q);
 }
+
+void FormantFilter::setgain(REALTYPE dBgain)
+{}
+
 
 void FormantFilter::setfreq_and_q(REALTYPE frequency, REALTYPE q_)
 {

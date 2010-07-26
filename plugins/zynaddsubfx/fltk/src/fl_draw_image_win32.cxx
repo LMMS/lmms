@@ -1,5 +1,5 @@
 //
-// "$Id: fl_draw_image_win32.cxx 6844 2009-08-24 19:55:29Z AlbrechtS $"
+// "$Id: fl_draw_image_win32.cxx 7617 2010-05-27 17:20:18Z manolo $"
 //
 // WIN32 image drawing code for the Fast Light Tool Kit (FLTK).
 //
@@ -46,6 +46,7 @@
 
 #include <config.h>
 #include <FL/Fl.H>
+#include <FL/Fl_Printer.H>
 #include <FL/fl_draw.H>
 #include <FL/x.H>
 
@@ -254,21 +255,36 @@ static void innards(const uchar *buf, int X, int Y, int W, int H,
         }            
       }
     }
-    SetDIBitsToDevice(fl_gc, x, y+j-k, w, k, 0, 0, 0, k,
-		      (LPSTR)((uchar*)buffer+(blocking-k)*linesize),
-		      &bmi,
+    if(Fl_Surface_Device::surface()->type() == Fl_Printer::device_type) {
+      // if print context, device and logical units are not equal, so SetDIBitsToDevice
+      // does not do the expected job, whereas StretchDIBits does it.
+      StretchDIBits(fl_gc, x, y+j-k, w, k, 0, 0, w, k,
+		    (LPSTR)((uchar*)buffer+(blocking-k)*linesize),
+		    &bmi,
 #if USE_COLORMAP
-		      indexed ? DIB_PAL_COLORS : DIB_RGB_COLORS
+		    indexed ? DIB_PAL_COLORS : DIB_RGB_COLORS
 #else
-		      DIB_RGB_COLORS
+		    DIB_RGB_COLORS
 #endif
-		      );
+		    , SRCCOPY );
+    }
+    else {
+      SetDIBitsToDevice(fl_gc, x, y+j-k, w, k, 0, 0, 0, k,
+			(LPSTR)((uchar*)buffer+(blocking-k)*linesize),
+			&bmi,
+#if USE_COLORMAP
+			indexed ? DIB_PAL_COLORS : DIB_RGB_COLORS
+#else
+			DIB_RGB_COLORS
+#endif
+			);
+      }
   }
 }
 
 static int fl_abs(int v) { return v<0 ? -v : v; }
 
-void fl_draw_image(const uchar* buf, int x, int y, int w, int h, int d, int l){
+void Fl_Graphics_Driver::draw_image(const uchar* buf, int x, int y, int w, int h, int d, int l){
   if (fl_abs(d)&FL_IMAGE_WITH_ALPHA) {
     d ^= FL_IMAGE_WITH_ALPHA;
     innards(buf,x,y,w,h,d,l,fl_abs(d),0,0);
@@ -277,7 +293,7 @@ void fl_draw_image(const uchar* buf, int x, int y, int w, int h, int d, int l){
   }
 }
 
-void fl_draw_image(Fl_Draw_Image_Cb cb, void* data,
+void Fl_Graphics_Driver::draw_image(Fl_Draw_Image_Cb cb, void* data,
 		   int x, int y, int w, int h,int d) {
   if (fl_abs(d)&FL_IMAGE_WITH_ALPHA) {
     d ^= FL_IMAGE_WITH_ALPHA;
@@ -287,7 +303,7 @@ void fl_draw_image(Fl_Draw_Image_Cb cb, void* data,
   }
 }
 
-void fl_draw_image_mono(const uchar* buf, int x, int y, int w, int h, int d, int l){
+void Fl_Graphics_Driver::draw_image_mono(const uchar* buf, int x, int y, int w, int h, int d, int l){
   if (fl_abs(d)&FL_IMAGE_WITH_ALPHA) {
     d ^= FL_IMAGE_WITH_ALPHA;
     innards(buf,x,y,w,h,d,l,1,0,0);
@@ -296,7 +312,7 @@ void fl_draw_image_mono(const uchar* buf, int x, int y, int w, int h, int d, int
   }
 }
 
-void fl_draw_image_mono(Fl_Draw_Image_Cb cb, void* data,
+void Fl_Graphics_Driver::draw_image_mono(Fl_Draw_Image_Cb cb, void* data,
 		   int x, int y, int w, int h,int d) {
   if (fl_abs(d)&FL_IMAGE_WITH_ALPHA) {
     d ^= FL_IMAGE_WITH_ALPHA;
@@ -321,5 +337,5 @@ void fl_rectf(int x, int y, int w, int h, uchar r, uchar g, uchar b) {
 }
 
 //
-// End of "$Id: fl_draw_image_win32.cxx 6844 2009-08-24 19:55:29Z AlbrechtS $".
+// End of "$Id: fl_draw_image_win32.cxx 7617 2010-05-27 17:20:18Z manolo $".
 //

@@ -1,7 +1,7 @@
 /*
   ZynAddSubFX - a software synthesizer
 
-  Distorsion.C - Distorsion effect
+  Distorsion.cpp - Distorsion effect
   Copyright (C) 2002-2005 Nasca Octavian Paul
   Author: Nasca Octavian Paul
 
@@ -260,7 +260,7 @@ void Distorsion::applyfilters(REALTYPE *efxoutl, REALTYPE *efxoutr)
 /*
  * Effect output
  */
-void Distorsion::out(REALTYPE *smpsl, REALTYPE *smpsr)
+void Distorsion::out(const Stereo<float *> &smp)
 {
     int      i;
     REALTYPE l, r, lout, rout;
@@ -271,14 +271,14 @@ void Distorsion::out(REALTYPE *smpsl, REALTYPE *smpsr)
 
     if(Pstereo != 0) { //Stereo
         for(i = 0; i < SOUND_BUFFER_SIZE; i++) {
-            efxoutl[i] = smpsl[i] * inputvol * panning;
-            efxoutr[i] = smpsr[i] * inputvol * (1.0 - panning);
+            efxoutl[i] = smp.l[i] * inputvol * panning;
+            efxoutr[i] = smp.r[i] * inputvol * (1.0 - panning);
         }
     }
     else {
         for(i = 0; i < SOUND_BUFFER_SIZE; i++)
             efxoutl[i] =
-                (smpsl[i] * panning + smpsr[i] * (1.0 - panning)) * inputvol;
+                (smp.l[i] * panning + smp.r[i] * (1.0 - panning)) * inputvol;
         ;
     }
 
@@ -315,7 +315,7 @@ void Distorsion::out(REALTYPE *smpsl, REALTYPE *smpsr)
 /*
  * Parameter control
  */
-void Distorsion::setvolume(const unsigned char &Pvolume)
+void Distorsion::setvolume(unsigned char Pvolume)
 {
     this->Pvolume = Pvolume;
 
@@ -330,20 +330,20 @@ void Distorsion::setvolume(const unsigned char &Pvolume)
         cleanup();
 }
 
-void Distorsion::setpanning(const unsigned char &Ppanning)
+void Distorsion::setpanning(unsigned char Ppanning)
 {
     this->Ppanning = Ppanning;
     panning = (Ppanning + 0.5) / 127.0;
 }
 
 
-void Distorsion::setlrcross(const unsigned char &Plrcross)
+void Distorsion::setlrcross(unsigned char Plrcross)
 {
     this->Plrcross = Plrcross;
     lrcross = Plrcross / 127.0 * 1.0;
 }
 
-void Distorsion::setlpf(const unsigned char &Plpf)
+void Distorsion::setlpf(unsigned char Plpf)
 {
     this->Plpf = Plpf;
     REALTYPE fr = exp(pow(Plpf / 127.0, 0.5) * log(25000.0)) + 40;
@@ -351,7 +351,7 @@ void Distorsion::setlpf(const unsigned char &Plpf)
     lpfr->setfreq(fr);
 }
 
-void Distorsion::sethpf(const unsigned char &Phpf)
+void Distorsion::sethpf(unsigned char Phpf)
 {
     this->Phpf = Phpf;
     REALTYPE fr = exp(pow(Phpf / 127.0, 0.5) * log(25000.0)) + 20.0;
@@ -391,7 +391,7 @@ void Distorsion::setpreset(unsigned char npreset)
 }
 
 
-void Distorsion::changepar(const int &npar, const unsigned char &value)
+void Distorsion::changepar(int npar, unsigned char value)
 {
     switch(npar) {
     case 0:
@@ -439,7 +439,7 @@ void Distorsion::changepar(const int &npar, const unsigned char &value)
     }
 }
 
-unsigned char Distorsion::getpar(const int &npar) const
+unsigned char Distorsion::getpar(int npar) const
 {
     switch(npar) {
     case 0:

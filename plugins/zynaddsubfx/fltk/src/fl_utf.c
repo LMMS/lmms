@@ -1,5 +1,8 @@
-/* This is the utf.c file from fltk2 adapted for use in my fltk1.1 port */
-
+/*
+ * "$Id: fl_utf.c 7609 2010-05-17 20:03:47Z engelsman $"
+ *
+ * This is the utf.c file from fltk2 adapted for use in my fltk1.1 port
+ */
 /* Copyright 2006-2009 by Bill Spitzak and others.
  *
  * This library is free software; you can redistribute it and/or
@@ -46,7 +49,7 @@
    \c NULL, only the length of the utf-8 sequence is calculated
    \return length of the sequence in bytes
    */
-  /* FL_EXPORT int fl_unichar_to_utf8(Fl_Char uc, char *text); */
+  /* FL_EXPORT int fl_unichar_to_utf8(unsigned int uc, char *text); */
   
   /** @} */  
   
@@ -60,22 +63,22 @@
    \param[in] uc Unicode character
    \return length of the sequence in bytes
    */
-  /* FL_EXPORT int fl_utf8_size(Fl_Char uc); */
+  /* FL_EXPORT int fl_utf8_size(unsigned int uc); */
   
   /** @} */  
 #endif /* 0 */
   
-/* Set to 1 to turn bad UTF8 bytes into ISO-8859-1. If this is to zero
+/*!Set to 1 to turn bad UTF8 bytes into ISO-8859-1. If this is to zero
    they are instead turned into the Unicode REPLACEMENT CHARACTER, of
    value 0xfffd.
-   If this is on fl_utf8decode will correctly map most (perhaps all)
+   If this is on fl_utf8decode() will correctly map most (perhaps all)
    human-readable text that is in ISO-8859-1. This may allow you
    to completely ignore character sets in your code because virtually
    everything is either ISO-8859-1 or UTF-8.
 */
 #define ERRORS_TO_ISO8859_1 1
 
-/* Set to 1 to turn bad UTF8 bytes in the 0x80-0x9f range into the
+/*!Set to 1 to turn bad UTF8 bytes in the 0x80-0x9f range into the
    Unicode index for Microsoft's CP1252 character set. You should
    also set ERRORS_TO_ISO8859_1. With this a huge amount of more
    available text (such as all web pages) are correctly converted
@@ -83,7 +86,7 @@
 */
 #define ERRORS_TO_CP1252 1
 
-/* A number of Unicode code points are in fact illegal and should not
+/*!A number of Unicode code points are in fact illegal and should not
    be produced by a UTF-8 converter. Turn this on will replace the
    bytes in those encodings with errors. If you do this then converting
    arbitrary 16-bit data to UTF-8 and then back is not an identity,
@@ -283,7 +286,7 @@ int fl_utf8bytes(unsigned ucs) {
     return 2;
   } else if (ucs < 0x010000U) {
     return 3;
-  } else if (ucs < 0x10ffffU) {
+  } else if (ucs <= 0x10ffffU) {
     return 4;
   } else {
     return 3; /* length of the illegal character encoding */
@@ -319,7 +322,7 @@ int fl_utf8encode(unsigned ucs, char* buf) {
     buf[1] = 0x80 | ((ucs >> 6) & 0x3F);
     buf[2] = 0x80 | (ucs & 0x3F);
     return 3;
-  } else if (ucs < 0x0010ffffU) {
+  } else if (ucs <= 0x0010ffffU) {
     buf[0] = 0xf0 | (ucs >> 18);
     buf[1] = 0x80 | ((ucs >> 12) & 0x3F);
     buf[2] = 0x80 | ((ucs >> 6) & 0x3F);
@@ -412,7 +415,7 @@ unsigned fl_utf8toUtf16(const char* src, unsigned srclen,
 unsigned fl_utf8towc(const char* src, unsigned srclen,
 		  wchar_t* dst, unsigned dstlen)
 {
-#ifdef _WIN32
+#ifdef WIN32
 	return fl_utf8toUtf16(src, srclen, (unsigned short*)dst, dstlen);
 #else
   const char* p = src;
@@ -538,7 +541,7 @@ unsigned fl_utf8fromwc(char* dst, unsigned dstlen,
       if (count+2 >= dstlen) {dst[count] = 0; count += 2; break;}
       dst[count++] = 0xc0 | (ucs >> 6);
       dst[count++] = 0x80 | (ucs & 0x3F);
-#ifdef _WIN32
+#ifdef WIN32
     } else if (ucs >= 0xd800 && ucs <= 0xdbff && i < srclen &&
 	       src[i] >= 0xdc00 && src[i] <= 0xdfff) {
       /* surrogate pair */
@@ -558,7 +561,7 @@ unsigned fl_utf8fromwc(char* dst, unsigned dstlen,
       dst[count++] = 0x80 | ((ucs >> 6) & 0x3F);
       dst[count++] = 0x80 | (ucs & 0x3F);
     } else {
-#ifndef _WIN32
+#ifndef WIN32
     J1:
 #endif
       /* all others are 3 bytes: */
@@ -575,7 +578,7 @@ unsigned fl_utf8fromwc(char* dst, unsigned dstlen,
       count++;
     } else if (ucs < 0x800U) { /* 2 bytes */
       count += 2;
-#ifdef _WIN32
+#ifdef WIN32
     } else if (ucs >= 0xd800 && ucs <= 0xdbff && i < srclen-1 &&
 	       src[i+1] >= 0xdc00 && src[i+1] <= 0xdfff) {
       /* surrogate pair */
@@ -641,7 +644,7 @@ unsigned fl_utf8froma(char* dst, unsigned dstlen,
   return count;
 }
 
-#ifdef _WIN32
+#ifdef WIN32
 # include <windows.h>
 #endif
 
@@ -660,7 +663,7 @@ unsigned fl_utf8froma(char* dst, unsigned dstlen,
 int fl_utf8locale(void) {
   static int ret = 2;
   if (ret == 2) {
-#ifdef _WIN32
+#ifdef WIN32
     ret = GetACP() == CP_UTF8;
 #else
     char* s;
@@ -696,7 +699,7 @@ unsigned fl_utf8to_mb(const char* src, unsigned srclen,
 		  char* dst, unsigned dstlen)
 {
   if (!fl_utf8locale()) {
-#ifdef _WIN32
+#ifdef WIN32
     wchar_t lbuf[1024];
     wchar_t* buf = lbuf;
     unsigned length = fl_utf8towc(src, srclen, buf, 1024);
@@ -772,14 +775,13 @@ unsigned fl_utf8from_mb(char* dst, unsigned dstlen,
 		    const char* src, unsigned srclen)
 {
   if (!fl_utf8locale()) {
-#ifdef _WIN32
+#ifdef WIN32
     wchar_t lbuf[1024];
     wchar_t* buf = lbuf;
     unsigned length;
     unsigned ret;
-    length =
-      MultiByteToWideChar(GetACP(), 0, src, srclen, buf, 1024);
-    if (length >= 1024) {
+    length = MultiByteToWideChar(GetACP(), 0, src, srclen, buf, 1024);
+    if ((length == 0)&&(GetLastError()==ERROR_INSUFFICIENT_BUFFER)) {
       length = MultiByteToWideChar(GetACP(), 0, src, srclen, 0, 0);
       buf = (wchar_t*)(malloc(length*sizeof(wchar_t)));
       MultiByteToWideChar(GetACP(), 0, src, srclen, buf, length);
@@ -795,7 +797,7 @@ unsigned fl_utf8from_mb(char* dst, unsigned dstlen,
     length = mbstowcs(buf, src, 1024);
     if (length >= 1024) {
       length = mbstowcs(0, src, 0)+1;
-      buf = (wchar_t*)(malloc(length*sizeof(unsigned short)));
+      buf = (wchar_t*)(malloc(length*sizeof(wchar_t)));
       mbstowcs(buf, src, length);
     }
     if (length >= 0) {
@@ -854,4 +856,54 @@ int fl_utf8test(const char* src, unsigned srclen) {
   return ret;
 }
 
+/* forward declare mk_wcwidth() as static so the name is not visible.
+ */
+ static int mk_wcwidth(unsigned int ucs);
+
+ /* include the c source directly so it's contents are only visible here
+  */
+#include "xutf8/mk_wcwidth.c"
+
+/** wrapper to adapt Markus Kuhn's implementation of wcwidth() for FLTK
+    \param [in] ucs Unicode character value
+    \returns width of character in columns
+
+    See http://www.cl.cam.ac.uk/~mgk25/ucs/wcwidth.c for Markus Kuhn's
+    original implementation of wcwidth() and wcswidth()
+    (defined in IEEE Std 1002.1-2001) for Unicode.
+
+    \b WARNING: this function returns widths for "raw" Unicode characters.
+    It does not even try to map C1 control characters (0x80 to 0x9F) to
+    CP1252, and C0/C1 control characters and DEL will return -1.
+    You are advised to use fl_width(const char* src) instead.
+ */
+int fl_wcwidth_(unsigned int ucs) {
+  return mk_wcwidth(ucs);
+}
+
+/** extended wrapper around  fl_wcwidth_(unsigned int ucs) function.
+    \param[in] src pointer to start of UTF-8 byte sequence
+    \returns width of character in columns
+
+    Depending on build options, this function may map C1 control
+    characters (0x80 to 0x9f) to CP1252, and return the width of
+    that character instead. This is not the same behaviour as
+    fl_wcwidth_(unsigned int ucs) .
+
+    Note that other control characters and DEL will still return -1,
+    so if you want different behaviour, you need to test for those
+    characters before calling fl_wcwidth(), and handle them separately.
+ */
+int fl_wcwidth(const char* src) {
+  int len = fl_utf8len(*src);
+  int ret = 0;
+  unsigned int ucs = fl_utf8decode(src, src+len, &ret);
+  int width = fl_wcwidth_(ucs);
+  return width;
+}
+
 /** @} */
+
+/*
+ * End of "$Id: fl_utf.c 7609 2010-05-17 20:03:47Z engelsman $".
+ */

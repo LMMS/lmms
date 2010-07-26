@@ -1,7 +1,7 @@
 /*
   ZynAddSubFX - a software synthesizer
 
-  FilterParams.C - Parameters for filter
+  FilterParams.cpp - Parameters for filter
   Copyright (C) 2002-2005 Nasca Octavian Paul
   Author: Nasca Octavian Paul
 
@@ -27,7 +27,8 @@
 
 FilterParams::FilterParams(unsigned char Ptype_,
                            unsigned char Pfreq_,
-                           unsigned char Pq_):Presets()
+                           unsigned char Pq_)
+    : PresetsArray()
 {
     setpresettype("Pfilter");
     Dtype   = Ptype_;

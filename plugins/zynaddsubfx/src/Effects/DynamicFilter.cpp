@@ -1,7 +1,7 @@
 /*
   ZynAddSubFX - a software synthesizer
 
-  DynamicFilter.C - "WahWah" effect and others
+  DynamicFilter.cpp - "WahWah" effect and others
   Copyright (C) 2002-2005 Nasca Octavian Paul
   Author: Nasca Octavian Paul
 
@@ -46,7 +46,7 @@ DynamicFilter::~DynamicFilter()
 /*
  * Apply the effect
  */
-void DynamicFilter::out(REALTYPE *smpsl, REALTYPE *smpsr)
+void DynamicFilter::out(const Stereo<float *> &smp)
 {
     int i;
     if(filterpars->changed) {
@@ -62,10 +62,10 @@ void DynamicFilter::out(REALTYPE *smpsl, REALTYPE *smpsr)
     REALTYPE q    = filterpars->getq();
 
     for(i = 0; i < SOUND_BUFFER_SIZE; i++) {
-        efxoutl[i] = smpsl[i];
-        efxoutr[i] = smpsr[i];
+        efxoutl[i] = smp.l[i];
+        efxoutr[i] = smp.r[i];
 
-        REALTYPE x = (fabs(smpsl[i]) + fabs(smpsr[i])) * 0.5;
+        REALTYPE x = (fabs(smp.l[i]) + fabs(smp.l[i])) * 0.5;
         ms1 = ms1 * (1.0 - ampsmooth) + x * ampsmooth + 1e-10;
     }
 
@@ -110,14 +110,14 @@ void DynamicFilter::cleanup()
  * Parameter control
  */
 
-void DynamicFilter::setdepth(const unsigned char &Pdepth)
+void DynamicFilter::setdepth(unsigned char Pdepth)
 {
     this->Pdepth = Pdepth;
     depth = pow((Pdepth / 127.0), 2.0);
 }
 
 
-void DynamicFilter::setvolume(const unsigned char &Pvolume)
+void DynamicFilter::setvolume(unsigned char Pvolume)
 {
     this->Pvolume = Pvolume;
     outvolume     = Pvolume / 127.0;
@@ -127,14 +127,14 @@ void DynamicFilter::setvolume(const unsigned char &Pvolume)
         volume = outvolume;
 }
 
-void DynamicFilter::setpanning(const unsigned char &Ppanning)
+void DynamicFilter::setpanning(unsigned char Ppanning)
 {
     this->Ppanning = Ppanning;
     panning = Ppanning / 127.0;
 }
 
 
-void DynamicFilter::setampsns(const unsigned char &Pampsns)
+void DynamicFilter::setampsns(unsigned char Pampsns)
 {
     ampsns = pow(Pampsns / 127.0, 2.5) * 10.0;
     if(Pampsnsinv != 0)
@@ -270,7 +270,7 @@ void DynamicFilter::setpreset(unsigned char npreset)
 }
 
 
-void DynamicFilter::changepar(const int &npar, const unsigned char &value)
+void DynamicFilter::changepar(int npar, unsigned char value)
 {
     switch(npar) {
     case 0:
@@ -312,7 +312,7 @@ void DynamicFilter::changepar(const int &npar, const unsigned char &value)
     }
 }
 
-unsigned char DynamicFilter::getpar(const int &npar) const
+unsigned char DynamicFilter::getpar(int npar) const
 {
     switch(npar) {
     case 0:

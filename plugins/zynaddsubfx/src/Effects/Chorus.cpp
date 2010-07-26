@@ -1,7 +1,7 @@
 /*
   ZynAddSubFX - a software synthesizer
 
-  Chorus.C - Chorus and Flange effects
+  Chorus.cpp - Chorus and Flange effects
   Copyright (C) 2002-2005 Nasca Octavian Paul
   Author: Nasca Octavian Paul
 
@@ -35,9 +35,6 @@ Chorus::Chorus(const int &insertion_,
 {
     dlk = 0;
     drk = 0;
-    //maxdelay=(int)(MAX_CHORUS_DELAY/1000.0*SAMPLE_RATE);
-    //delayl=new REALTYPE[maxdelay];
-    //delayr=new REALTYPE[maxdelay];
 
     setpreset(Ppreset);
 
@@ -65,24 +62,13 @@ REALTYPE Chorus::getdelay(REALTYPE xlfo)
     if((result + 0.5) >= maxdelay) {
         cerr
         <<
-        "WARNING: Chorus.C::getdelay(..) too big delay (see setdelay and setdepth funcs.)\n";
+        "WARNING: Chorus.cpp::getdelay(..) too big delay (see setdelay and setdepth funcs.)\n";
         result = maxdelay - 1.0;
     }
     return result;
 }
 
-/*
- * Apply the effect
- */
-void Chorus::out(REALTYPE *smpsl, REALTYPE *smpsr)
-{
-    const Stereo<AuSample> input(AuSample(SOUND_BUFFER_SIZE, smpsl), AuSample(
-                                     SOUND_BUFFER_SIZE,
-                                     smpsr));
-    out(input);
-}
-
-void Chorus::out(const Stereo<AuSample> &input)
+void Chorus::out(const Stereo<float *> &input)
 {
     const REALTYPE one = 1.0;
     dl1 = dl2;
@@ -92,14 +78,14 @@ void Chorus::out(const Stereo<AuSample> &input)
     dl2 = getdelay(lfol);
     dr2 = getdelay(lfor);
 
-    for(int i = 0; i < input.l().size(); i++) {
-        REALTYPE inl = input.l()[i];
-        REALTYPE inr = input.r()[i];
+    for(int i = 0; i < SOUND_BUFFER_SIZE; i++) {
+        REALTYPE inl = input.l[i];
+        REALTYPE inr = input.r[i];
         //LRcross
         Stereo<REALTYPE> tmpc(inl, inr);
         //REALTYPE r=inr;
-        inl = tmpc.l() * (1.0 - lrcross) + tmpc.r() * lrcross;
-        inr = tmpc.r() * (1.0 - lrcross) + tmpc.l() * lrcross;
+        inl = tmpc.l * (1.0 - lrcross) + tmpc.r * lrcross;
+        inr = tmpc.r * (1.0 - lrcross) + tmpc.l * lrcross;
 
         //Left channel
 
@@ -114,9 +100,9 @@ void Chorus::out(const Stereo<AuSample> &input)
 
         dlhi2      = (dlhi - 1 + maxdelay) % maxdelay;
         dllo       = 1.0 - fmod(tmp, one);
-        efxoutl[i] = delaySample.l()[dlhi2] * dllo + delaySample.l()[dlhi]
+        efxoutl[i] = delaySample.l[dlhi2] * dllo + delaySample.l[dlhi]
                      * (1.0 - dllo);
-        delaySample.l()[dlk] = inl + efxoutl[i] * fb;
+        delaySample.l[dlk] = inl + efxoutl[i] * fb;
 
         //Right channel
 
@@ -131,20 +117,20 @@ void Chorus::out(const Stereo<AuSample> &input)
 
         dlhi2      = (dlhi - 1 + maxdelay) % maxdelay;
         dllo       = 1.0 - fmod(tmp, one);
-        efxoutr[i] = delaySample.r()[dlhi2] * dllo + delaySample.r()[dlhi]
+        efxoutr[i] = delaySample.r[dlhi2] * dllo + delaySample.r[dlhi]
                      * (1.0 - dllo);
-        delaySample.r()[dlk] = inr + efxoutr[i] * fb;
+        delaySample.r[dlk] = inr + efxoutr[i] * fb;
     }
 
     if(Poutsub != 0)
-        for(int i = 0; i < input.l().size(); i++) {
+        for(int i = 0; i < SOUND_BUFFER_SIZE; i++) {
             efxoutl[i] *= -1.0;
             efxoutr[i] *= -1.0;
         }
     ;
 
 
-    for(int i = 0; i < input.l().size(); i++) {
+    for(int i = 0; i < SOUND_BUFFER_SIZE; i++) {
         efxoutl[i] *= panning;
         efxoutr[i] *= (1.0 - panning);
     }
@@ -155,31 +141,31 @@ void Chorus::out(const Stereo<AuSample> &input)
  */
 void Chorus::cleanup()
 {
-    delaySample.l().clear();
-    delaySample.r().clear();
+    delaySample.l.clear();
+    delaySample.r.clear();
 }
 
 /*
  * Parameter control
  */
-void Chorus::setdepth(const unsigned char &Pdepth)
+void Chorus::setdepth(unsigned char Pdepth)
 {
     this->Pdepth = Pdepth;
     depth = (pow(8.0, (Pdepth / 127.0) * 2.0) - 1.0) / 1000.0; //seconds
 }
 
-void Chorus::setdelay(const unsigned char &Pdelay)
+void Chorus::setdelay(unsigned char Pdelay)
 {
     this->Pdelay = Pdelay;
     delay = (pow(10.0, (Pdelay / 127.0) * 2.0) - 1.0) / 1000.0; //seconds
 }
 
-void Chorus::setfb(const unsigned char &Pfb)
+void Chorus::setfb(unsigned char Pfb)
 {
     this->Pfb = Pfb;
     fb = (Pfb - 64.0) / 64.1;
 }
-void Chorus::setvolume(const unsigned char &Pvolume)
+void Chorus::setvolume(unsigned char Pvolume)
 {
     this->Pvolume = Pvolume;
     outvolume     = Pvolume / 127.0;
@@ -189,13 +175,13 @@ void Chorus::setvolume(const unsigned char &Pvolume)
         volume = outvolume;
 }
 
-void Chorus::setpanning(const unsigned char &Ppanning)
+void Chorus::setpanning(unsigned char Ppanning)
 {
     this->Ppanning = Ppanning;
     panning = Ppanning / 127.0;
 }
 
-void Chorus::setlrcross(const unsigned char &Plrcross)
+void Chorus::setlrcross(unsigned char Plrcross)
 {
     this->Plrcross = Plrcross;
     lrcross = Plrcross / 127.0;
@@ -236,7 +222,7 @@ void Chorus::setpreset(unsigned char npreset)
 }
 
 
-void Chorus::changepar(const int &npar, const unsigned char &value)
+void Chorus::changepar(int npar, unsigned char value)
 {
     switch(npar) {
     case 0:
@@ -288,7 +274,7 @@ void Chorus::changepar(const int &npar, const unsigned char &value)
     }
 }
 
-unsigned char Chorus::getpar(const int &npar) const
+unsigned char Chorus::getpar(int npar) const
 {
     switch(npar) {
     case 0:

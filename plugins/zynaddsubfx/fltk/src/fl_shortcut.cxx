@@ -1,5 +1,5 @@
 //
-// "$Id: fl_shortcut.cxx 6878 2009-09-17 22:12:24Z matt $"
+// "$Id: fl_shortcut.cxx 7496 2010-04-13 21:08:06Z greg.ercolano $"
 //
 // Shortcut support routines for the Fast Light Tool Kit (FLTK).
 //
@@ -58,11 +58,11 @@
     be confused with 
     Fl_Widget::test_shortcut().
 */
-int Fl::test_shortcut(Fl_Shortcut shortcut) {
+int Fl::test_shortcut(unsigned int shortcut) {
   if (!shortcut) return 0;
 
-  Fl_Char v = shortcut & FL_KEY_MASK;
-  if (fl_tolower(v)!=v) {
+  unsigned int v = shortcut & FL_KEY_MASK;
+  if (((unsigned)fl_tolower(v))!=v) {
     shortcut |= FL_SHIFT;
   }
 
@@ -74,13 +74,13 @@ int Fl::test_shortcut(Fl_Shortcut shortcut) {
   // these three must always be correct:
   if (mismatch&(FL_META|FL_ALT|FL_CTRL)) return 0;
 
-  Fl_Char key = shortcut & FL_KEY_MASK;
+  unsigned int key = shortcut & FL_KEY_MASK;
 
   // if shift is also correct, check for exactly equal keysyms:
-  if (!(mismatch&(FL_SHIFT)) && key == Fl::event_key()) return 1;
+  if (!(mismatch&(FL_SHIFT)) && key == (unsigned)Fl::event_key()) return 1;
 
   // try matching utf8, ignore shift:
-  Fl_Char firstChar = fl_utf8decode(Fl::event_text(), Fl::event_text()+Fl::event_length(), 0);
+  unsigned int firstChar = fl_utf8decode(Fl::event_text(), Fl::event_text()+Fl::event_length(), 0);
   if (key==firstChar) return 1;
 
   // kludge so that Ctrl+'_' works (as opposed to Ctrl+'^_'):
@@ -90,7 +90,7 @@ int Fl::test_shortcut(Fl_Shortcut shortcut) {
 }
 
 // This table must be in numeric order by fltk (X) keysym number:
-struct Keyname {int key; const char* name;};
+struct Keyname {unsigned int key; const char* name;};
 #if defined(WIN32)
 static Keyname table[] = {
   {' ', "Space"},
@@ -129,36 +129,36 @@ static Keyname table[] = {
 static Keyname table[] = {
                                  // v - this column contains utf8 characters
   {' ', "Space"},
-  {FL_BackSpace,"\xe2\x8c\xab"}, // ⌫  erase to the left
-  {FL_Tab,	"\xe2\x87\xa5"}, // ⇥  rightwards arrow to bar
-  {0xff0b,      "\xe2\x8c\xa6"}, // ⌦  erase to the right
-  {FL_Enter,	"\xe2\x86\xa9"}, // ↩  leftwards arrow with hook
+  {FL_BackSpace,"\xe2\x8c\xab"}, // erase to the left
+  {FL_Tab,	"\xe2\x87\xa5"}, // rightwards arrow to bar
+  {0xff0b,      "\xe2\x8c\xa6"}, // erase to the right
+  {FL_Enter,	"\xe2\x86\xa9"}, // leftwards arrow with hook
   {FL_Pause,	"Pause"},
   {FL_Scroll_Lock, "Scroll_Lock"},
   {FL_Escape,	"\xe2\x90\x9b"},
-  {FL_Home,	"\xe2\x86\x96"}, // ↖  north west arrow
-  {FL_Left,	"\xe2\x86\x90"}, // ←  leftwards arrow
-  {FL_Up,	"\xe2\x86\x91"}, // ↑  upwards arrow
-  {FL_Right,	"\xe2\x86\x92"}, // →  rightwards arrow
-  {FL_Down,	"\xe2\x86\x93"}, // ↓  downwards arrow
-  {FL_Page_Up,	"\xe2\x87\x9e"}, // ⇞  upwards arrow with double stroke
-  {FL_Page_Down,"\xe2\x87\x9f"}, // ⇟  downward arrow with double stroke
-  {FL_End,	"\xe2\x86\x98"}, // ↘  south east arrow
+  {FL_Home,	"\xe2\x86\x96"}, // north west arrow
+  {FL_Left,	"\xe2\x86\x90"}, // leftwards arrow
+  {FL_Up,	"\xe2\x86\x91"}, // upwards arrow
+  {FL_Right,	"\xe2\x86\x92"}, // rightwards arrow
+  {FL_Down,	"\xe2\x86\x93"}, // downwards arrow
+  {FL_Page_Up,	"\xe2\x87\x9e"}, // upwards arrow with double stroke
+  {FL_Page_Down,"\xe2\x87\x9f"}, // downward arrow with double stroke
+  {FL_End,	"\xe2\x86\x98"}, // south east arrow
   {FL_Print,	"Print"},
   {FL_Insert,	"Insert"},
   {FL_Menu,	"Menu"},
   {FL_Num_Lock,	"Num_Lock"},
-  {FL_KP_Enter,	"\xe2\x8c\xa4"}, // ⌤ up arrow head between two horizontal bars
+  {FL_KP_Enter,	"\xe2\x8c\xa4"}, // up arrow head between two horizontal bars
   {FL_Shift_L,	"Shift_L"},
   {FL_Shift_R,	"Shift_R"},
   {FL_Control_L,"Control_L"},
   {FL_Control_R,"Control_R"},
-  {FL_Caps_Lock,"\xe2\x87\xaa"}, // ⇪  upwards white arrow from bar
+  {FL_Caps_Lock,"\xe2\x87\xaa"}, // upwards white arrow from bar
   {FL_Meta_L,	"Meta_L"},
   {FL_Meta_R,	"Meta_R"},
   {FL_Alt_L,	"Alt_L"},
   {FL_Alt_R,	"Alt_R"},
-  {FL_Delete,	"\xe2\x8c\xa7"}  // ⌧  x in a rectangle box
+  {FL_Delete,	"\xe2\x8c\xa7"}  // x in a rectangle box
 };
 #endif
 
@@ -174,7 +174,7 @@ static Keyname table[] = {
   \param [in] shortcut the integer value containing the ascii charcter or extended keystroke plus modifiers
   \return a pointer to a static buffer containing human readable text for the shortcut
   */
-const char* fl_shortcut_label(Fl_Shortcut shortcut) {
+const char* fl_shortcut_label(unsigned int shortcut) {
   return fl_shortcut_label(shortcut, 0L);
 }
 
@@ -184,24 +184,24 @@ const char* fl_shortcut_label(Fl_Shortcut shortcut) {
   \param [in] shortcut the integer value containing the ascii charcter or extended keystroke plus modifiers
   \param [in] eom if this pointer is set, it will receive a pointer to the end of the modifier text
   \return a pointer to a static buffer containing human readable text for the shortcut
-  \see fl_shortcut_label(Fl_Shortcut shortcut)
+  \see fl_shortcut_label(unsigned int shortcut)
   */
-const char* fl_shortcut_label(Fl_Shortcut shortcut, const char **eom) {
+const char* fl_shortcut_label(unsigned int shortcut, const char **eom) {
   static char buf[20];
   char *p = buf;
   if (eom) *eom = p;
   if (!shortcut) {*p = 0; return buf;}
   // fix upper case shortcuts
-  Fl_Char v = shortcut & FL_KEY_MASK;
-  if (fl_tolower(v)!=v) {
+  unsigned int v = shortcut & FL_KEY_MASK;
+  if (((unsigned)fl_tolower(v))!=v) {
     shortcut |= FL_SHIFT;
   }
 #ifdef __APPLE__
   //                        this column contains utf8 characters - v
-  if (shortcut & FL_SHIFT) {strcpy(p,"\xe2\x87\xa7"); p += 3;}  // ⇧  upwards white arrow
-  if (shortcut & FL_CTRL)  {strcpy(p,"\xe2\x8c\x83"); p += 3;}  // ⌃  up arrowhead
-  if (shortcut & FL_ALT)   {strcpy(p,"\xe2\x8e\x87"); p += 3;}  // ⎇  alternative key symbol
-  if (shortcut & FL_META)  {strcpy(p,"\xe2\x8c\x98"); p += 3;}  // ⌘  place of interest sign
+  if (shortcut & FL_SHIFT) {strcpy(p,"\xe2\x87\xa7"); p += 3;}  // upwards white arrow
+  if (shortcut & FL_CTRL)  {strcpy(p,"\xe2\x8c\x83"); p += 3;}  // up arrowhead
+  if (shortcut & FL_ALT)   {strcpy(p,"\xe2\x8c\xa5"); p += 3;}  // alternative key symbol
+  if (shortcut & FL_META)  {strcpy(p,"\xe2\x8c\x98"); p += 3;}  // place of interest sign
 #else
   if (shortcut & FL_META) {strcpy(p,"Meta+"); p += 5;}
   if (shortcut & FL_ALT) {strcpy(p,"Alt+"); p += 4;}
@@ -209,7 +209,7 @@ const char* fl_shortcut_label(Fl_Shortcut shortcut, const char **eom) {
   if (shortcut & FL_CTRL) {strcpy(p,"Ctrl+"); p += 5;}
 #endif // __APPLE__
   if (eom) *eom = p;
-  Fl_Char key = shortcut & FL_KEY_MASK;
+  unsigned int key = shortcut & FL_KEY_MASK;
 #if defined(WIN32) || defined(__APPLE__) // if not X
   if (key >= FL_F && key <= FL_F_Last) {
     *p++ = 'F';
@@ -269,10 +269,20 @@ const char* fl_shortcut_label(Fl_Shortcut shortcut, const char **eom) {
 #include <stdlib.h>
 /**
   Emulation of XForms named shortcuts.
+
+  Converts ascii shortcut specifications (eg. "^c") 
+  into the FLTK integer equivalent (eg. FL_CTRL+'c')
+
+  These ascii characters are used to specify the various keyboard modifier keys:
+  \verbatim
+   # - Alt
+   + - Shift
+   ^ - Control
+  \endverbatim
 */
-Fl_Shortcut fl_old_shortcut(const char* s) {
+unsigned int fl_old_shortcut(const char* s) {
   if (!s || !*s) return 0;
-  Fl_Shortcut n = 0;
+  unsigned int n = 0;
   if (*s == '#') {n |= FL_ALT; s++;}
   if (*s == '+') {n |= FL_SHIFT; s++;}
   if (*s == '^') {n |= FL_CTRL; s++;}
@@ -282,14 +292,14 @@ Fl_Shortcut fl_old_shortcut(const char* s) {
 
 // Tests for &x shortcuts in button labels:
 
-Fl_Shortcut Fl_Widget::label_shortcut(const char *t) {
+unsigned int Fl_Widget::label_shortcut(const char *t) {
   if (!t) return 0;
   for (;;) {
     if (*t==0) return 0;
     if (*t=='&') {
-      Fl_Shortcut s = fl_utf8decode(t+1, 0, 0);
+      unsigned int s = fl_utf8decode(t+1, 0, 0);
       if (s==0) return 0;
-      else if (s==(Fl_Char)'&') t++;
+      else if (s==(unsigned int)'&') t++;
       else return s;
     }
     t++;
@@ -302,7 +312,7 @@ int Fl_Widget::test_shortcut(const char *t) {
   if (Fl::event_state(FL_ALT)==0) return 0;
   #endif
   if (!t) return 0;
-  Fl_Shortcut c = fl_utf8decode(Fl::event_text(), Fl::event_text()+Fl::event_length(), 0);
+  unsigned int c = fl_utf8decode(Fl::event_text(), Fl::event_text()+Fl::event_length(), 0);
   if (!c) return 0;
   if (c == label_shortcut(t))
     return 1;
@@ -315,5 +325,5 @@ int Fl_Widget::test_shortcut() {
 }
 
 //
-// End of "$Id: fl_shortcut.cxx 6878 2009-09-17 22:12:24Z matt $".
+// End of "$Id: fl_shortcut.cxx 7496 2010-04-13 21:08:06Z greg.ercolano $".
 //

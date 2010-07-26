@@ -1,7 +1,7 @@
 /*
   ZynAddSubFX - a software synthesizer
 
-  LFO.C - LFO implementation
+  LFO.cpp - LFO implementation
   Copyright (C) 2002-2005 Nasca Octavian Paul
   Author: Nasca Octavian Paul
 
@@ -38,7 +38,7 @@ LFO::LFO(LFOParams *lfopars, REALTYPE basefreq)
         (pow(2, lfopars->Pfreq * 10.0) - 1.0) / 12.0 * lfostretch;
     incx = fabs(lfofreq) * (REALTYPE)SOUND_BUFFER_SIZE / (REALTYPE)SAMPLE_RATE;
 
-    if(lfopars->Pcontinuous == 0) {
+    if(lfopars->Pcontinous == 0) {
         if(lfopars->Pstartphase == 0)
             x = RND;
         else

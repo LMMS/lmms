@@ -1,5 +1,5 @@
 //
-// "$Id: Fl_Menu_.H 6902 2009-09-27 11:06:56Z matt $"
+// "$Id: Fl_Menu_.H 7517 2010-04-16 17:55:45Z greg.ercolano $"
 //
 // Menu base class header file for the Fast Light Tool Kit (FLTK).
 //
@@ -52,7 +52,7 @@ class FL_EXPORT Fl_Menu_ : public Fl_Widget {
 
 protected:
 
-  uchar alloc;
+  uchar alloc;			// flag indicates if menu_ is a dynamic copy (=1) or not (=0)
   uchar down_box_;
   Fl_Font textfont_;
   Fl_Fontsize textsize_;
@@ -65,6 +65,10 @@ public:
   int item_pathname(char *name, int namelen, const Fl_Menu_Item *finditem=0) const;
   const Fl_Menu_Item* picked(const Fl_Menu_Item*);
   const Fl_Menu_Item* find_item(const char *name);
+  const Fl_Menu_Item* find_item(Fl_Callback*);
+  int find_index(const char *name) const;
+  int find_index(const Fl_Menu_Item *item) const;
+  int find_index(Fl_Callback *cb) const;
 
   const Fl_Menu_Item* test_shortcut() {return picked(menu()->test_shortcut());}
   void global();
@@ -76,14 +80,21 @@ public:
   const Fl_Menu_Item *menu() const {return menu_;}
   void menu(const Fl_Menu_Item *m);
   void copy(const Fl_Menu_Item *m, void* user_data = 0);
+  int insert(int index, const char*, int shortcut, Fl_Callback*, void* = 0, int = 0);
   int  add(const char*, int shortcut, Fl_Callback*, void* = 0, int = 0);
-  /** See int Fl_Menu_::add(const char* label, int shortcut, Fl_Callback*, void *user_data=0, int flags=0)*/
+  /** See int Fl_Menu_::add(const char* label, int shortcut, Fl_Callback*, void *user_data=0, int flags=0) */
   int  add(const char* a, const char* b, Fl_Callback* c, void* d = 0, int e = 0) {
-      return add(a,fl_old_shortcut(b),c,d,e);}
+      return add(a,fl_old_shortcut(b),c,d,e);
+  }
+  /** See int Fl_Menu_::insert(const char* label, int shortcut, Fl_Callback*, void *user_data=0, int flags=0) */
+  int insert(int index, const char* a, const char* b, Fl_Callback* c, void* d = 0, int e = 0) {
+      return insert(index,a,fl_old_shortcut(b),c,d,e);
+  }
   int  add(const char *);
   int  size() const ;
   void size(int W, int H) { Fl_Widget::size(W, H); }
   void clear();
+  int clear_submenu(int index);
   void replace(int,const char *);
   void remove(int);
  /** Changes the shortcut of item i to n.  */
@@ -142,5 +153,5 @@ public:
 #endif
 
 //
-// End of "$Id: Fl_Menu_.H 6902 2009-09-27 11:06:56Z matt $".
+// End of "$Id: Fl_Menu_.H 7517 2010-04-16 17:55:45Z greg.ercolano $".
 //

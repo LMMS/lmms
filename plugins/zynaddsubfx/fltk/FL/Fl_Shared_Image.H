@@ -1,5 +1,5 @@
 //
-// "$Id: Fl_Shared_Image.H 6614 2009-01-01 16:11:32Z matt $"
+// "$Id: Fl_Shared_Image.H 7505 2010-04-14 20:47:34Z manolo $"
 //
 // Shared image header file for the Fast Light Tool Kit (FLTK).
 //
@@ -25,8 +25,8 @@
 //     http://www.fltk.org/str.php
 //
 
-/* \file
-   Fl_Shared_Image class . */
+/** \file
+   Fl_Shared_Image class. */
 
 #ifndef Fl_Shared_Image_H
 #  define Fl_Shared_Image_H
@@ -106,5 +106,5 @@ FL_EXPORT extern void fl_register_images();
 #endif // !Fl_Shared_Image_H
 
 //
-// End of "$Id: Fl_Shared_Image.H 6614 2009-01-01 16:11:32Z matt $"
+// End of "$Id: Fl_Shared_Image.H 7505 2010-04-14 20:47:34Z manolo $"
 //

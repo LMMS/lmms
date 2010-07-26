@@ -1,5 +1,5 @@
 //
-// "$Id: Fl_Input_Choice.H 6614 2009-01-01 16:11:32Z matt $"
+// "$Id: Fl_Input_Choice.H 7115 2010-02-20 17:40:07Z AlbrechtS $"
 //
 // An input/chooser widget.
 //            ______________  ____
@@ -76,6 +76,7 @@ class Fl_Input_Choice : public Fl_Group {
 
   static void menu_cb(Fl_Widget*, void *data) { 
     Fl_Input_Choice *o=(Fl_Input_Choice *)data;
+    Fl_Widget_Tracker wp(o);
     const Fl_Menu_Item *item = o->menubutton()->mvalue();
     if (item && item->flags & (FL_SUBMENU|FL_SUBMENU_POINTER)) return;	// ignore submenus
     if (!strcmp(o->inp_->value(), o->menu_->text()))
@@ -92,6 +93,8 @@ class Fl_Input_Choice : public Fl_Group {
       if (o->when() & (FL_WHEN_CHANGED|FL_WHEN_RELEASE))
 	o->do_callback();
     }
+    
+    if (wp.deleted()) return;
 
     if (o->callback() != default_callback)
     {
@@ -102,6 +105,7 @@ class Fl_Input_Choice : public Fl_Group {
 
   static void inp_cb(Fl_Widget*, void *data) { 
     Fl_Input_Choice *o=(Fl_Input_Choice *)data;
+    Fl_Widget_Tracker wp(o);
     if (o->inp_->changed()) {
       o->Fl_Widget::set_changed();
       if (o->when() & (FL_WHEN_CHANGED|FL_WHEN_RELEASE))
@@ -111,6 +115,8 @@ class Fl_Input_Choice : public Fl_Group {
       if (o->when() & FL_WHEN_NOT_CHANGED)
 	o->do_callback();
     }
+    
+    if (wp.deleted()) return;
 
     if (o->callback() != default_callback)
       o->Fl_Widget::clear_changed();
@@ -212,5 +218,5 @@ public:
 #endif // !Fl_Input_Choice_H
 
 //
-// End of "$Id: Fl_Input_Choice.H 6614 2009-01-01 16:11:32Z matt $".
+// End of "$Id: Fl_Input_Choice.H 7115 2010-02-20 17:40:07Z AlbrechtS $".
 //

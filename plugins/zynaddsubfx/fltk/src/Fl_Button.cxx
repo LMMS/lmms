@@ -1,5 +1,5 @@
 //
-// "$Id: Fl_Button.cxx 6616 2009-01-01 21:28:26Z matt $"
+// "$Id: Fl_Button.cxx 7476 2010-04-09 22:18:05Z matt $"
 //
 // Button widget for the Fast Light Tool Kit (FLTK).
 //
@@ -60,7 +60,7 @@ int Fl_Button::value(int v) {
  */
 void Fl_Button::setonly() { // set this radio button on, turn others off
   value(1);
-  Fl_Group* g = (Fl_Group*)parent();
+  Fl_Group* g = parent();
   Fl_Widget*const* a = g->array();
   for (int i = g->children(); i--;) {
     Fl_Widget* o = *a++;
@@ -72,6 +72,7 @@ void Fl_Button::draw() {
   if (type() == FL_HIDDEN_BUTTON) return;
   Fl_Color col = value() ? selection_color() : color();
   draw_box(value() ? (down_box()?down_box():fl_down(box())) : box(), col);
+  draw_backdrop();
   if (labeltype() == FL_NORMAL_LABEL && value()) {
     Fl_Color c = labelcolor();
     labelcolor(fl_contrast(c, col));
@@ -84,7 +85,7 @@ void Fl_Button::draw() {
 int Fl_Button::handle(int event) {
   int newval;
   switch (event) {
-  case FL_ENTER:
+  case FL_ENTER: /* FALLTHROUGH */
   case FL_LEAVE:
 //  if ((value_?selection_color():color())==FL_GRAY) redraw();
     return 1;
@@ -117,7 +118,11 @@ int Fl_Button::handle(int event) {
     else {
       value(oldval);
       set_changed();
-      if (when() & FL_WHEN_CHANGED) do_callback();
+      if (when() & FL_WHEN_CHANGED) {
+	Fl_Widget_Tracker wp(this);
+        do_callback();
+        if (wp.deleted()) return 1;
+      }
     }
     if (when() & FL_WHEN_RELEASE) do_callback();
     return 1;
@@ -139,7 +144,7 @@ int Fl_Button::handle(int event) {
 	  do_callback();
     } else if (when() & FL_WHEN_RELEASE) do_callback();
     return 1;
-  case FL_FOCUS :
+  case FL_FOCUS : /* FALLTHROUGH */
   case FL_UNFOCUS :
     if (Fl::visible_focus()) {
       if (box() == FL_NO_BOX) {
@@ -156,6 +161,7 @@ int Fl_Button::handle(int event) {
     if (Fl::focus() == this && Fl::event_key() == ' ' &&
         !(Fl::event_state() & (FL_SHIFT | FL_CTRL | FL_ALT | FL_META))) {
       set_changed();
+      Fl_Widget_Tracker wp(this);
       if (type() == FL_RADIO_BUTTON && !value_) {
 	setonly();
 	if (when() & FL_WHEN_CHANGED) do_callback();
@@ -163,6 +169,7 @@ int Fl_Button::handle(int event) {
 	value(!value());
 	if (when() & FL_WHEN_CHANGED) do_callback();
       }
+      if (wp.deleted()) return 1;
       if (when() & FL_WHEN_RELEASE) do_callback();
       return 1;
     }
@@ -186,5 +193,5 @@ Fl_Button::Fl_Button(int X, int Y, int W, int H, const char *L)
 }
 
 //
-// End of "$Id: Fl_Button.cxx 6616 2009-01-01 21:28:26Z matt $".
+// End of "$Id: Fl_Button.cxx 7476 2010-04-09 22:18:05Z matt $".
 //

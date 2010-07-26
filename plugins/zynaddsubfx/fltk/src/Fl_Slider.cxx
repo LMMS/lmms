@@ -1,5 +1,5 @@
 //
-// "$Id: Fl_Slider.cxx 6683 2009-03-14 11:46:43Z engelsman $"
+// "$Id: Fl_Slider.cxx 7115 2010-02-20 17:40:07Z AlbrechtS $"
 //
 // Slider widget for the Fast Light Tool Kit (FLTK).
 //
@@ -222,10 +222,14 @@ void Fl_Slider::draw() {
 }
 
 int Fl_Slider::handle(int event, int X, int Y, int W, int H) {
+  // Fl_Widget_Tracker wp(this);
   switch (event) {
-  case FL_PUSH:
+  case FL_PUSH: {
+    Fl_Widget_Tracker wp(this);
     if (!Fl::event_inside(X, Y, W, H)) return 0;
     handle_push();
+    if (wp.deleted()) return 1; }
+    // fall through ...
   case FL_DRAG: {
 
     double val;
@@ -293,34 +297,44 @@ int Fl_Slider::handle(int event, int X, int Y, int W, int H) {
   case FL_RELEASE:
     handle_release();
     return 1;
-  case FL_KEYBOARD :
-    switch (Fl::event_key()) {
-      case FL_Up:
-        if (horizontal()) return 0;
-        handle_push();
-	handle_drag(clamp(increment(value(),-1)));
-	handle_release();
-	return 1;
-      case FL_Down:
-        if (horizontal()) return 0;
-        handle_push();
-	handle_drag(clamp(increment(value(),1)));
-	handle_release();
-	return 1;
-      case FL_Left:
-        if (!horizontal()) return 0;
-        handle_push();
-	handle_drag(clamp(increment(value(),-1)));
-	handle_release();
-	return 1;
-      case FL_Right:
-        if (!horizontal()) return 0;
-        handle_push();
-	handle_drag(clamp(increment(value(),1)));
-	handle_release();
-	return 1;
-      default:
-        return 0;
+  case FL_KEYBOARD:
+    { Fl_Widget_Tracker wp(this);
+      switch (Fl::event_key()) {
+	case FL_Up:
+	  if (horizontal()) return 0;
+	  handle_push();
+	  if (wp.deleted()) return 1;
+	  handle_drag(clamp(increment(value(),-1)));
+	  if (wp.deleted()) return 1;
+	  handle_release();
+	  return 1;
+	case FL_Down:
+	  if (horizontal()) return 0;
+	  handle_push();
+	  if (wp.deleted()) return 1;
+	  handle_drag(clamp(increment(value(),1)));
+	  if (wp.deleted()) return 1;
+	  handle_release();
+	  return 1;
+	case FL_Left:
+	  if (!horizontal()) return 0;
+	  handle_push();
+	  if (wp.deleted()) return 1;
+	  handle_drag(clamp(increment(value(),-1)));
+	  if (wp.deleted()) return 1;
+	  handle_release();
+	  return 1;
+	case FL_Right:
+	  if (!horizontal()) return 0;
+	  handle_push();
+	  if (wp.deleted()) return 1;
+	  handle_drag(clamp(increment(value(),1)));
+	  if (wp.deleted()) return 1;
+	  handle_release();
+	  return 1;
+	default:
+	  return 0;
+      }
     }
     // break not required because of switch...
   case FL_FOCUS :
@@ -351,5 +365,5 @@ int Fl_Slider::handle(int event) {
 }
 
 //
-// End of "$Id: Fl_Slider.cxx 6683 2009-03-14 11:46:43Z engelsman $".
+// End of "$Id: Fl_Slider.cxx 7115 2010-02-20 17:40:07Z AlbrechtS $".
 //

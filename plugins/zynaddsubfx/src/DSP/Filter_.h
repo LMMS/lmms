@@ -33,7 +33,7 @@ class Filter_
         virtual void setfreq(REALTYPE frequency) = 0;
         virtual void setfreq_and_q(REALTYPE frequency, REALTYPE q_) = 0;
         virtual void setq(REALTYPE q_) = 0;
-        virtual void setgain(REALTYPE dBgain) {}
+        virtual void setgain(REALTYPE dBgain) = 0;
         REALTYPE outgain;
     private:
 };

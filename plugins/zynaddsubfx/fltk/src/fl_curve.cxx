@@ -1,5 +1,5 @@
 //
-// "$Id: fl_curve.cxx 6616 2009-01-01 21:28:26Z matt $"
+// "$Id: fl_curve.cxx 7617 2010-05-27 17:20:18Z manolo $"
 //
 // Bezier curve functions for the Fast Light Tool Kit (FLTK).
 //
@@ -38,15 +38,7 @@
 #include <FL/fl_draw.H>
 #include <math.h>
 
-/**
-  Add a series of points on a Bezier curve to the path.
-  The curve ends (and two of the points) are at X0,Y0 and X3,Y3.
-  \param[in] X0,Y0 curve start point
-  \param[in] X1,Y1 curve control point
-  \param[in] X2,Y2 curve control point
-  \param[in] X3,Y3 curve end point
-*/
-void fl_curve(double X0, double Y0,
+void Fl_Graphics_Driver::curve(double X0, double Y0,
 	      double X1, double Y1,
 	      double X2, double Y2,
 	      double X3, double Y3) {
@@ -114,5 +106,5 @@ void fl_curve(double X0, double Y0,
 }
 
 //
-// End of "$Id: fl_curve.cxx 6616 2009-01-01 21:28:26Z matt $".
+// End of "$Id: fl_curve.cxx 7617 2010-05-27 17:20:18Z manolo $".
 //

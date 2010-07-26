@@ -1,5 +1,5 @@
 //
-// "$Id: fl_set_fonts_mac.cxx 6616 2009-01-01 21:28:26Z matt $"
+// "$Id: fl_set_fonts_mac.cxx 7351 2010-03-29 10:35:00Z matt $"
 //
 // MacOS font utilities for the Fast Light Tool Kit (FLTK).
 //
@@ -60,26 +60,37 @@ static int fl_free_font = FL_FREE_FONT;
 
 Fl_Font Fl::set_fonts(const char* xstarname) {
 #pragma unused ( xstarname )
-#if defined(OLD__APPLE_QUARTZ__)
-  ATSFontIterator it;
-  ATSFontIteratorCreate(kATSFontContextGlobal, 0L, 0L, kATSOptionFlagsUnRestrictedScope, &it);  
-  for (;;) {
-    ATSFontRef font;
-    CFStringRef fname = 0;
-    OSStatus err = ATSFontIteratorNext(it, &font);
-    if (err!=noErr) break;
-    ATSFontGetName(font, kATSOptionFlagsDefault, &fname);
-    char buf[1024];
-    CFStringGetCString(fname, buf, 1024, kCFStringEncodingUTF8);
-    int i;
-    for (i=0; i<FL_FREE_FONT; i++) // skip if one of our built-in fonts
-      if (!strcmp(Fl::get_font_name((Fl_Font)i),buf)) break;
-    if ( i < FL_FREE_FONT ) continue;
-    Fl::set_font((Fl_Font)(fl_free_font++), strdup((char*)buf));
-  }
-  ATSFontIteratorRelease(&it);
+#if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_5
+static SInt32 MACsystemVersion = 0;
+if(MACsystemVersion == 0) Gestalt(gestaltSystemVersion, &MACsystemVersion);
+if(MACsystemVersion >= 0x1050) {
+//if(CTFontCreateWithFontDescriptor != NULL) {// CTFontCreateWithFontDescriptor != NULL on 10.4 also!
+  int value[1] = {1};
+  CFDictionaryRef dict = CFDictionaryCreate(NULL, 
+					    (const void **)kCTFontCollectionRemoveDuplicatesOption, 
+					    (const void **)&value, 1, NULL, NULL);
+  CTFontCollectionRef fcref = CTFontCollectionCreateFromAvailableFonts(dict);
+  CFRelease(dict);
+  CFArrayRef arrayref = CTFontCollectionCreateMatchingFontDescriptors(fcref);
+  CFRelease(fcref);
+  CFIndex count = CFArrayGetCount(arrayref);
+  CFIndex i;
+  for (i = 0; i < count; i++) {
+	CTFontDescriptorRef fdesc = (CTFontDescriptorRef)CFArrayGetValueAtIndex(arrayref, i);
+	CTFontRef font = CTFontCreateWithFontDescriptor(fdesc, 0., NULL);
+	CFStringRef cfname = CTFontCopyPostScriptName(font);
+	CFRelease(font);
+	static char fname[100];
+	CFStringGetCString(cfname, fname, sizeof(fname), kCFStringEncodingUTF8);
+	CFRelease(cfname);
+	Fl::set_font((Fl_Font)(fl_free_font++), strdup(fname));
+	}
+  CFRelease(arrayref);
   return (Fl_Font)fl_free_font;
-#else
+}
+else {
+#endif
+#if ! __LP64__
   ItemCount oFontCount, oCountAgain;
   ATSUFontID *oFontIDs;
   // How many fonts?
@@ -114,7 +125,11 @@ Fl_Font Fl::set_fonts(const char* xstarname) {
   }
   free(oFontIDs);
   return (Fl_Font)fl_free_font;
+#endif //__LP64__
+#if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_5
+  }
 #endif
+  return 0; // FIXME: I do not understand the shuffeling of the above ifdef's and why they are here!
 }
 
 static int array[128];
@@ -132,5 +147,5 @@ int Fl::get_font_sizes(Fl_Font fnum, int*& sizep) {
 }
 
 //
-// End of "$Id: fl_set_fonts_mac.cxx 6616 2009-01-01 21:28:26Z matt $".
+// End of "$Id: fl_set_fonts_mac.cxx 7351 2010-03-29 10:35:00Z matt $".
 //

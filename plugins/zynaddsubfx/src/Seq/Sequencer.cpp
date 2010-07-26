@@ -1,7 +1,7 @@
 /*
   ZynAddSubFX - a software synthesizer
 
-  Sequencer.C - The Sequencer
+  Sequencer.cpp - The Sequencer
   Copyright (C) 2003-2005 Nasca Octavian Paul
   Author: Nasca Octavian Paul
 

@@ -1,7 +1,7 @@
 /*
   ZynAddSubFX - a software synthesizer
 
-  EffectLFO.C - Stereo LFO used by some effects
+  EffectLFO.cpp - Stereo LFO used by some effects
   Copyright (C) 2002-2005 Nasca Octavian Paul
   Author: Nasca Octavian Paul
 

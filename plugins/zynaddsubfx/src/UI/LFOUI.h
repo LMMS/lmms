@@ -56,10 +56,10 @@ private:
   static void cb_LFOtype(Fl_Choice*, void*);
   static Fl_Menu_Item menu_LFOtype[];
 public:
-  Fl_Check_Button *continuous;
+  Fl_Check_Button *continous;
 private:
-  void cb_continuous_i(Fl_Check_Button*, void*);
-  static void cb_continuous(Fl_Check_Button*, void*);
+  void cb_continous_i(Fl_Check_Button*, void*);
+  static void cb_continous(Fl_Check_Button*, void*);
 public:
   WidgetPDial *freqrand;
 private:

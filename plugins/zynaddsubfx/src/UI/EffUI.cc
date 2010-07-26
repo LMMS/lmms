@@ -146,6 +146,8 @@ Fl_Menu_Item EffUI::menu_revp[] = {
 
 void EffUI::cb_revp10_i(Fl_Choice* o, void*) {
   eff->seteffectpar(10,(int) o->value());
+if (eff->geteffectpar(10)==2) revp12->activate();
+	else revp12->deactivate();
 }
 void EffUI::cb_revp10(Fl_Choice* o, void* v) {
   ((EffUI*)(o->parent()->user_data()))->cb_revp10_i(o,v);
@@ -435,6 +437,12 @@ Fl_Menu_Item EffUI::menu_phaserp[] = {
  {"Phaser 4", 0,  0, 0, 0, FL_NORMAL_LABEL, 1, 10, 7},
  {"Phaser 5", 0,  0, 0, 0, FL_NORMAL_LABEL, 1, 10, 7},
  {"Phaser 6", 0,  0, 0, 0, FL_NORMAL_LABEL, 1, 10, 7},
+ {"APhaser 1", 0,  0, 0, 0, FL_NORMAL_LABEL, 1, 10, 7},
+ {"APhaser 2", 0,  0, 0, 0, FL_NORMAL_LABEL, 1, 10, 7},
+ {"APhaser 3", 0,  0, 0, 0, FL_NORMAL_LABEL, 1, 10, 7},
+ {"APhaser 4", 0,  0, 0, 0, FL_NORMAL_LABEL, 1, 10, 7},
+ {"APhaser 5", 0,  0, 0, 0, FL_NORMAL_LABEL, 1, 10, 7},
+ {"APhaser 6", 0,  0, 0, 0, FL_NORMAL_LABEL, 1, 10, 7},
  {0,0,0,0,0,0,0,0,0}
 };
 
@@ -466,6 +474,19 @@ void EffUI::cb_phaserp3(WidgetPDial* o, void* v) {
   ((EffUI*)(o->parent()->user_data()))->cb_phaserp3_i(o,v);
 }
 
+void EffUI::cb_phaserp4_i(Fl_Choice* o, void*) {
+  eff->seteffectpar(4,(int) o->value());
+}
+void EffUI::cb_phaserp4(Fl_Choice* o, void* v) {
+  ((EffUI*)(o->parent()->user_data()))->cb_phaserp4_i(o,v);
+}
+
+Fl_Menu_Item EffUI::menu_phaserp4[] = {
+ {"SIN", 0,  0, 0, 0, FL_NORMAL_LABEL, 1, 10, 0},
+ {"TRI", 0,  0, 0, 0, FL_NORMAL_LABEL, 1, 10, 0},
+ {0,0,0,0,0,0,0,0,0}
+};
+
 void EffUI::cb_phaserp5_i(WidgetPDial* o, void*) {
   eff->seteffectpar(5,(int) o->value());
 }
@@ -487,6 +508,13 @@ void EffUI::cb_phaserp7(WidgetPDial* o, void* v) {
   ((EffUI*)(o->parent()->user_data()))->cb_phaserp7_i(o,v);
 }
 
+void EffUI::cb_phaserp8_i(Fl_Counter* o, void*) {
+  eff->seteffectpar(8,(int) o->value());
+}
+void EffUI::cb_phaserp8(Fl_Counter* o, void* v) {
+  ((EffUI*)(o->parent()->user_data()))->cb_phaserp8_i(o,v);
+}
+
 void EffUI::cb_phaserp9_i(WidgetPDial* o, void*) {
   eff->seteffectpar(9,(int) o->value());
 }
@@ -501,31 +529,32 @@ void EffUI::cb_phaserp10(Fl_Check_Button* o, void* v) {
   ((EffUI*)(o->parent()->user_data()))->cb_phaserp10_i(o,v);
 }
 
-void EffUI::cb_phaserp4_i(Fl_Choice* o, void*) {
-  eff->seteffectpar(4,(int) o->value());
-}
-void EffUI::cb_phaserp4(Fl_Choice* o, void* v) {
-  ((EffUI*)(o->parent()->user_data()))->cb_phaserp4_i(o,v);
-}
-
-Fl_Menu_Item EffUI::menu_phaserp4[] = {
- {"SINE", 0,  0, 0, 0, FL_NORMAL_LABEL, 1, 10, 0},
- {"TRI", 0,  0, 0, 0, FL_NORMAL_LABEL, 1, 10, 0},
- {0,0,0,0,0,0,0,0,0}
-};
-
-void EffUI::cb_phaserp8_i(Fl_Counter* o, void*) {
-  eff->seteffectpar(8,(int) o->value());
-}
-void EffUI::cb_phaserp8(Fl_Counter* o, void* v) {
-  ((EffUI*)(o->parent()->user_data()))->cb_phaserp8_i(o,v);
-}
-
 void EffUI::cb_phaserp11_i(WidgetPDial* o, void*) {
   eff->seteffectpar(11,(int) o->value());
 }
 void EffUI::cb_phaserp11(WidgetPDial* o, void* v) {
   ((EffUI*)(o->parent()->user_data()))->cb_phaserp11_i(o,v);
+}
+
+void EffUI::cb_phaserp12_i(Fl_Check_Button* o, void*) {
+  eff->seteffectpar(12,(int) o->value());
+}
+void EffUI::cb_phaserp12(Fl_Check_Button* o, void* v) {
+  ((EffUI*)(o->parent()->user_data()))->cb_phaserp12_i(o,v);
+}
+
+void EffUI::cb_phaserp13_i(WidgetPDial* o, void*) {
+  eff->seteffectpar(13,(int) o->value());
+}
+void EffUI::cb_phaserp13(WidgetPDial* o, void* v) {
+  ((EffUI*)(o->parent()->user_data()))->cb_phaserp13_i(o,v);
+}
+
+void EffUI::cb_phaserp14_i(Fl_Check_Button* o, void*) {
+  eff->seteffectpar(14,(int) o->value());
+}
+void EffUI::cb_phaserp14(Fl_Check_Button* o, void* v) {
+  ((EffUI*)(o->parent()->user_data()))->cb_phaserp14_i(o,v);
 }
 
 void EffUI::cb_awp_i(Fl_Choice* o, void*) {
@@ -1104,7 +1133,7 @@ Fl_Group* EffUI::make_reverb_window() {
       revp4->align(Fl_Align(FL_ALIGN_BOTTOM));
       revp4->when(FL_WHEN_CHANGED);
     } // WidgetPDial* revp4
-    { revp12 = new WidgetPDial(200, 40, 30, 30, "bw");
+    { WidgetPDial* o = revp12 = new WidgetPDial(200, 40, 30, 30, "bw");
       revp12->box(FL_ROUND_UP_BOX);
       revp12->color(FL_BACKGROUND_COLOR);
       revp12->selection_color(FL_INACTIVE_COLOR);
@@ -1116,6 +1145,8 @@ Fl_Group* EffUI::make_reverb_window() {
       revp12->callback((Fl_Callback*)cb_revp12);
       revp12->align(Fl_Align(FL_ALIGN_BOTTOM));
       revp12->when(FL_WHEN_RELEASE);
+      revp12->deactivate();
+      if (eff->geteffectpar(10)==2) o->activate();
     } // WidgetPDial* revp12
     { revp6 = new WidgetPDial(235, 40, 30, 30, "E/R");
       revp6->box(FL_ROUND_UP_BOX);
@@ -1531,7 +1562,7 @@ Fl_Group* EffUI::make_phaser_window() {
     effphaserwindow->user_data((void*)(this));
     effphaserwindow->align(Fl_Align(FL_ALIGN_TOP));
     effphaserwindow->when(FL_WHEN_RELEASE);
-    { phaserp = new Fl_Choice(10, 15, 90, 15, "Preset");
+    { phaserp = new Fl_Choice(10, 15, 100, 15, "Preset");
       phaserp->down_box(FL_BORDER_BOX);
       phaserp->color((Fl_Color)14);
       phaserp->selection_color(FL_FOREGROUND_COLOR);
@@ -1578,7 +1609,7 @@ Fl_Group* EffUI::make_phaser_window() {
       phaserp1->align(Fl_Align(FL_ALIGN_BOTTOM));
       phaserp1->when(FL_WHEN_CHANGED);
     } // WidgetPDial* phaserp1
-    { phaserp2 = new WidgetPDial(85, 40, 30, 30, "Freq");
+    { phaserp2 = new WidgetPDial(85, 45, 25, 25, "Freq");
       phaserp2->tooltip("LFO frequency");
       phaserp2->box(FL_ROUND_UP_BOX);
       phaserp2->color(FL_BACKGROUND_COLOR);
@@ -1592,7 +1623,7 @@ Fl_Group* EffUI::make_phaser_window() {
       phaserp2->align(Fl_Align(FL_ALIGN_BOTTOM));
       phaserp2->when(FL_WHEN_CHANGED);
     } // WidgetPDial* phaserp2
-    { phaserp3 = new WidgetPDial(120, 40, 30, 30, "Rnd");
+    { phaserp3 = new WidgetPDial(120, 45, 25, 25, "Rnd");
       phaserp3->tooltip("LFO randomness");
       phaserp3->box(FL_ROUND_UP_BOX);
       phaserp3->color(FL_BACKGROUND_COLOR);
@@ -1606,7 +1637,17 @@ Fl_Group* EffUI::make_phaser_window() {
       phaserp3->align(Fl_Align(FL_ALIGN_BOTTOM));
       phaserp3->when(FL_WHEN_RELEASE);
     } // WidgetPDial* phaserp3
-    { phaserp5 = new WidgetPDial(200, 40, 30, 30, "St.df");
+    { phaserp4 = new Fl_Choice(245, 55, 40, 15, "LFO");
+      phaserp4->tooltip("LFO function");
+      phaserp4->down_box(FL_BORDER_BOX);
+      phaserp4->labelfont(1);
+      phaserp4->labelsize(10);
+      phaserp4->textsize(8);
+      phaserp4->callback((Fl_Callback*)cb_phaserp4);
+      phaserp4->align(Fl_Align(130));
+      phaserp4->menu(menu_phaserp4);
+    } // Fl_Choice* phaserp4
+    { phaserp5 = new WidgetPDial(155, 45, 25, 25, "St.df");
       phaserp5->tooltip("Left/Right Channel Phase Shift");
       phaserp5->box(FL_ROUND_UP_BOX);
       phaserp5->color(FL_BACKGROUND_COLOR);
@@ -1620,21 +1661,21 @@ Fl_Group* EffUI::make_phaser_window() {
       phaserp5->align(Fl_Align(FL_ALIGN_BOTTOM));
       phaserp5->when(FL_WHEN_CHANGED);
     } // WidgetPDial* phaserp5
-    { phaserp6 = new WidgetPDial(235, 40, 30, 30, "Dpth");
+    { phaserp6 = new WidgetPDial(120, 5, 25, 25, "Dpth");
       phaserp6->tooltip("LFO Depth");
       phaserp6->box(FL_ROUND_UP_BOX);
       phaserp6->color(FL_BACKGROUND_COLOR);
       phaserp6->selection_color(FL_INACTIVE_COLOR);
       phaserp6->labeltype(FL_NORMAL_LABEL);
       phaserp6->labelfont(1);
-      phaserp6->labelsize(11);
+      phaserp6->labelsize(10);
       phaserp6->labelcolor(FL_FOREGROUND_COLOR);
       phaserp6->maximum(127);
       phaserp6->callback((Fl_Callback*)cb_phaserp6);
       phaserp6->align(Fl_Align(FL_ALIGN_BOTTOM));
       phaserp6->when(FL_WHEN_CHANGED);
     } // WidgetPDial* phaserp6
-    { phaserp7 = new WidgetPDial(270, 40, 30, 30, "Fb");
+    { phaserp7 = new WidgetPDial(185, 45, 25, 25, "Fb");
       phaserp7->tooltip("Feedback");
       phaserp7->box(FL_ROUND_UP_BOX);
       phaserp7->color(FL_BACKGROUND_COLOR);
@@ -1648,7 +1689,17 @@ Fl_Group* EffUI::make_phaser_window() {
       phaserp7->align(Fl_Align(FL_ALIGN_BOTTOM));
       phaserp7->when(FL_WHEN_CHANGED);
     } // WidgetPDial* phaserp7
-    { phaserp9 = new WidgetPDial(345, 40, 30, 30, "L/R");
+    { Fl_Counter* o = phaserp8 = new Fl_Counter(290, 55, 35, 15, "Stages");
+      phaserp8->type(1);
+      phaserp8->labelfont(1);
+      phaserp8->labelsize(11);
+      phaserp8->minimum(0);
+      phaserp8->maximum(127);
+      phaserp8->step(1);
+      phaserp8->callback((Fl_Callback*)cb_phaserp8);
+      o->range(1,MAX_PHASER_STAGES);
+    } // Fl_Counter* phaserp8
+    { phaserp9 = new WidgetPDial(215, 45, 25, 25, "L/R");
       phaserp9->tooltip("Channel Routing");
       phaserp9->box(FL_ROUND_UP_BOX);
       phaserp9->color(FL_BACKGROUND_COLOR);
@@ -1662,7 +1713,7 @@ Fl_Group* EffUI::make_phaser_window() {
       phaserp9->align(Fl_Align(FL_ALIGN_BOTTOM));
       phaserp9->when(FL_WHEN_CHANGED);
     } // WidgetPDial* phaserp9
-    { phaserp10 = new Fl_Check_Button(185, 10, 74, 20, "Substract");
+    { phaserp10 = new Fl_Check_Button(200, 10, 74, 20, "Substract");
       phaserp10->tooltip("inverts output");
       phaserp10->box(FL_THIN_UP_BOX);
       phaserp10->down_box(FL_DOWN_BOX);
@@ -1671,27 +1722,7 @@ Fl_Group* EffUI::make_phaser_window() {
       phaserp10->labelsize(10);
       phaserp10->callback((Fl_Callback*)cb_phaserp10);
     } // Fl_Check_Button* phaserp10
-    { phaserp4 = new Fl_Choice(155, 50, 40, 15, "LFO type");
-      phaserp4->tooltip("LFO function");
-      phaserp4->down_box(FL_BORDER_BOX);
-      phaserp4->labelfont(1);
-      phaserp4->labelsize(10);
-      phaserp4->textsize(8);
-      phaserp4->callback((Fl_Callback*)cb_phaserp4);
-      phaserp4->align(Fl_Align(130));
-      phaserp4->menu(menu_phaserp4);
-    } // Fl_Choice* phaserp4
-    { Fl_Counter* o = phaserp8 = new Fl_Counter(305, 55, 35, 15, "Stages");
-      phaserp8->type(1);
-      phaserp8->labelfont(1);
-      phaserp8->labelsize(11);
-      phaserp8->minimum(0);
-      phaserp8->maximum(127);
-      phaserp8->step(1);
-      phaserp8->callback((Fl_Callback*)cb_phaserp8);
-      o->range(1,MAX_PHASER_STAGES);
-    } // Fl_Counter* phaserp8
-    { phaserp11 = new WidgetPDial(155, 10, 25, 25, "Phase");
+    { phaserp11 = new WidgetPDial(155, 5, 25, 25, "Phase");
       phaserp11->box(FL_ROUND_UP_BOX);
       phaserp11->color(FL_BACKGROUND_COLOR);
       phaserp11->selection_color(FL_INACTIVE_COLOR);
@@ -1704,6 +1735,29 @@ Fl_Group* EffUI::make_phaser_window() {
       phaserp11->align(Fl_Align(FL_ALIGN_BOTTOM));
       phaserp11->when(FL_WHEN_CHANGED);
     } // WidgetPDial* phaserp11
+    { phaserp12 = new Fl_Check_Button(245, 35, 55, 15, "hyp.");
+      phaserp12->tooltip("hyper");
+      phaserp12->down_box(FL_DOWN_BOX);
+      phaserp12->callback((Fl_Callback*)cb_phaserp12);
+    } // Fl_Check_Button* phaserp12
+    { phaserp13 = new WidgetPDial(340, 50, 25, 25, "dist");
+      phaserp13->tooltip("Distortion");
+      phaserp13->box(FL_ROUND_UP_BOX);
+      phaserp13->color(FL_BACKGROUND_COLOR);
+      phaserp13->selection_color(FL_INACTIVE_COLOR);
+      phaserp13->labeltype(FL_NORMAL_LABEL);
+      phaserp13->labelfont(1);
+      phaserp13->labelsize(11);
+      phaserp13->labelcolor(FL_FOREGROUND_COLOR);
+      phaserp13->maximum(127);
+      phaserp13->callback((Fl_Callback*)cb_phaserp13);
+      phaserp13->align(Fl_Align(FL_ALIGN_BOTTOM));
+      phaserp13->when(FL_WHEN_CHANGED);
+    } // WidgetPDial* phaserp13
+    { phaserp14 = new Fl_Check_Button(305, 35, 70, 15, "Analog");
+      phaserp14->down_box(FL_DOWN_BOX);
+      phaserp14->callback((Fl_Callback*)cb_phaserp14);
+    } // Fl_Check_Button* phaserp14
     effphaserwindow->end();
   } // Fl_Group* effphaserwindow
   return effphaserwindow;
@@ -2500,6 +2554,9 @@ switch(eff->geteffect()){
 	phaserp9->value(eff->geteffectpar(9));
 	phaserp10->value(eff->geteffectpar(10));
 	phaserp11->value(eff->geteffectpar(11));
+	phaserp12->value(eff->geteffectpar(12));
+	phaserp13->value(eff->geteffectpar(13));
+	phaserp14->value(eff->geteffectpar(14));
 	effphaserwindow->show();
         break; 
      case 5:

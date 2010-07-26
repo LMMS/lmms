@@ -1,7 +1,7 @@
 /*
   ZynAddSubFX - a software synthesizer
 
-  ADnote.C - The "additive" synthesizer
+  ADnote.cpp - The "additive" synthesizer
   Copyright (C) 2002-2005 Nasca Octavian Paul
   Author: Nasca Octavian Paul
 
@@ -408,8 +408,7 @@ ADnote::ADnote(ADnoteParameters *pars,
     tmpwave_unison = new REALTYPE *[max_unison];
     for(int k = 0; k < max_unison; k++) {
         tmpwave_unison[k] = new REALTYPE[SOUND_BUFFER_SIZE];
-        for(int i = 0; i < SOUND_BUFFER_SIZE; i++)
-            tmpwave_unison[k][i] = 0.0;
+        memset(tmpwave_unison[k], 0, SOUND_BUFFER_SIZE * sizeof(REALTYPE));
     }
 
     initparameters();
@@ -775,7 +774,7 @@ void ADnote::KillVoice(int nvoice)
 
     if(NoteVoicePar[nvoice].VoiceOut != NULL)
         memset(NoteVoicePar[nvoice].VoiceOut, 0, SOUND_BUFFER_SIZE
-               * sizeof(REALTYPE));                                                    //do not delete, yet: perhaps is used by another voice
+                * sizeof(REALTYPE));//do not delete, yet: perhaps is used by another voice
 
     NoteVoicePar[nvoice].Enabled = OFF;
 }
@@ -1010,8 +1009,7 @@ void ADnote::initparameters()
             }
         ;
         if(NoteVoicePar[nvoice].VoiceOut != NULL)
-            for(i = 0; i < SOUND_BUFFER_SIZE; i++)
-                NoteVoicePar[nvoice].VoiceOut[i] = 0.0;
+            memset(NoteVoicePar[nvoice].VoiceOut, 0, SOUND_BUFFER_SIZE * sizeof(REALTYPE));
     }
 }
 
@@ -1469,8 +1467,8 @@ inline void ADnote::ComputeVoiceOscillatorFrequencyModulation(int nvoice,
         //if I use VoiceOut[] as modulator
         for(int k = 0; k < unison_size[nvoice]; k++) {
             REALTYPE *tw = tmpwave_unison[k];
-            for(i = 0; i < SOUND_BUFFER_SIZE; i++)
-                tw[i] = NoteVoicePar[NoteVoicePar[nvoice].FMVoice].VoiceOut[i];
+            memcpy(tw, NoteVoicePar[NoteVoicePar[nvoice].FMVoice].VoiceOut,
+                    SOUND_BUFFER_SIZE * sizeof(REALTYPE));
         }
     }
     else {
@@ -1654,11 +1652,9 @@ int ADnote::noteout(REALTYPE *outl, REALTYPE *outr)
 
 
         //mix subvoices into voice
-        for(i = 0; i < SOUND_BUFFER_SIZE; i++)
-            tmpwavel[i] = 0.0;
+        memset(tmpwavel, 0, SOUND_BUFFER_SIZE * sizeof(REALTYPE));
         if(stereo)
-            for(i = 0; i < SOUND_BUFFER_SIZE; i++)
-                tmpwaver[i] = 0.0;
+            memset(tmpwaver, 0, SOUND_BUFFER_SIZE * sizeof(REALTYPE));
         for(int k = 0; k < unison_size[nvoice]; k++) {
             REALTYPE *tw = tmpwave_unison[k];
             if(stereo) {
@@ -1825,11 +1821,10 @@ int ADnote::noteout(REALTYPE *outl, REALTYPE *outr)
     //Processing Global parameters
     NoteGlobalPar.GlobalFilterL->filterout(&outl[0]);
 
-    if(stereo == 0)
-        for(i = 0; i < SOUND_BUFFER_SIZE; i++) { //set the right channel=left channel
-            outr[i]    = outl[i];
-            bypassr[i] = bypassl[i];
-        }
+    if(stereo == 0) { //set the right channel=left channel
+        memcpy(outr, outl, SOUND_BUFFER_SIZE * sizeof(REALTYPE));
+        memcpy(bypassr, bypassl, SOUND_BUFFER_SIZE * sizeof(REALTYPE));
+    }
     else
         NoteGlobalPar.GlobalFilterR->filterout(&outr[0]);
 
@@ -1876,7 +1871,7 @@ int ADnote::noteout(REALTYPE *outl, REALTYPE *outr)
     if(Legato.silent)    // Silencer
         if(Legato.msg != LM_FadeIn) {
             memset(outl, 0, SOUND_BUFFER_SIZE * sizeof(REALTYPE));
-            memset(outl, 0, SOUND_BUFFER_SIZE * sizeof(REALTYPE));
+            memset(outr, 0, SOUND_BUFFER_SIZE * sizeof(REALTYPE));
         }
     switch(Legato.msg) {
     case LM_CatchUp:  // Continue the catch-up...

@@ -1,7 +1,7 @@
 /*
   ZynAddSubFX - a software synthesizer
 
-  Stereo.C - Object for storing a pair of objects
+  Stereo.cpp - Object for storing a pair of objects
   Copyright (C) 2009-2009 Mark McCurry
   Author: Mark McCurry
 
@@ -21,18 +21,19 @@
 
 template<class T>
 Stereo<T>::Stereo(const T &left, const T &right)
-    :leftChannel(left), rightChannel(right)
+    :l(left), r(right)
 {}
 
 template<class T>
 Stereo<T>::Stereo(const T &val)
-    :leftChannel(val), rightChannel(val)
+    :l(val), r(val)
 {}
 
 template<class T>
-void Stereo<T>::operator=(const Stereo<T> &nstr)
+Stereo<T> &Stereo<T>::operator=(const Stereo<T> &nstr)
 {
-    leftChannel  = nstr.leftChannel;
-    rightChannel = nstr.rightChannel;
+    l = nstr.l;
+    r = nstr.r;
+    return *this;
 }
 

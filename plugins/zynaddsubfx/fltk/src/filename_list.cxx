@@ -1,5 +1,5 @@
 //
-// "$Id: filename_list.cxx 6833 2009-07-23 22:51:56Z AlbrechtS $"
+// "$Id: filename_list.cxx 6986 2010-01-01 18:30:49Z greg.ercolano $"
 //
 // Filename list routines for the Fast Light Tool Kit (FLTK).
 //
@@ -58,6 +58,12 @@ int fl_casealphasort(struct dirent **a, struct dirent **b) {
    The number of entries is given as a return value. 
    If there is an error reading the directory a number less than zero is returned, 
    and errno has the reason; errno does not work under WIN32. 
+
+   \b Include:
+   \code
+   #include <FL/filename.H>
+   \endcode
+
    \param[in] d the name of the directory to list.  It does not matter if it has a trailing slash.
    \param[out] list table containing the resulting directory listing
    \param[in] sort sorting functor:
@@ -77,7 +83,7 @@ int fl_filename_list(const char *d, dirent ***list,
                      Fl_File_Sort_F *sort) {
 #ifndef HAVE_SCANDIR
   int n = scandir(d, list, 0, sort);
-#elif defined(__hpux) || defined(__CYGWIN__) || (__GLIBC__ >= 2 && __GLIBC_MINOR__ >= 10 )
+#elif defined(HAVE_SCANDIR_POSIX)
   // HP-UX, Cygwin and POSIX (2008) define the comparison function like this:
   int n = scandir(d, list, 0, (int(*)(const dirent **, const dirent **))sort);
 #elif defined(__osf__)
@@ -126,5 +132,5 @@ int fl_filename_list(const char *d, dirent ***list,
 }
 
 //
-// End of "$Id: filename_list.cxx 6833 2009-07-23 22:51:56Z AlbrechtS $".
+// End of "$Id: filename_list.cxx 6986 2010-01-01 18:30:49Z greg.ercolano $".
 //
