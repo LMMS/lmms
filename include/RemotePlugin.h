@@ -36,6 +36,7 @@
 #include <cassert>
 
 #ifdef LMMS_BUILD_WIN32
+#include <windows.h>
 #define USE_QT_SEMAPHORES
 #define USE_QT_SHMEM
 #endif
@@ -284,7 +285,7 @@ public:
 	// recursive lock
 	inline void lock()
 	{
-		if( !isInvalid() && ++m_lockDepth == 1 )
+		if( likely( !isInvalid() && ++m_lockDepth == 1 ) )
 		{
 #ifdef USE_QT_SEMAPHORES
 			m_dataSem.acquire();
@@ -297,9 +298,9 @@ public:
 	// recursive unlock
 	inline void unlock()
 	{
-		if( m_lockDepth > 0 )
+		if( likely( m_lockDepth > 0 ) )
 		{
-			if( --m_lockDepth == 0 )
+			if( likely( --m_lockDepth == 0 ) )
 			{
 #ifdef USE_QT_SEMAPHORES
 				m_dataSem.release();
@@ -313,7 +314,7 @@ public:
 	// wait until message-semaphore is available
 	inline void waitForMessage()
 	{
-		if( !isInvalid() )
+		if( likely( !isInvalid() ) )
 		{
 #ifdef USE_QT_SEMAPHORES
 			m_messageSem.acquire();
@@ -372,7 +373,7 @@ public:
 
 	inline bool messagesLeft()
 	{
-		if( isInvalid() )
+		if( unlikely( isInvalid() ) )
 		{
 			return false;
 		}
@@ -547,7 +548,7 @@ public:
 
 		message & addInt( int _i )
 		{
-			char buf[128];
+			char buf[64];
 			buf[0] = 0;
 			sprintf( buf, "%d", _i );
 			data.push_back( std::string( buf ) );
@@ -556,7 +557,7 @@ public:
 
 		message & addFloat( float _f )
 		{
-			char buf[128];
+			char buf[64];
 			buf[0] = 0;
 			sprintf( buf, "%f", _f );
 			data.push_back( std::string( buf ) );
@@ -617,16 +618,16 @@ public:
 
 
 	message waitForMessage( const message & _m,
-						bool _busy_waiting = false );
+							bool _busyWaiting = false );
 
-	inline message fetchAndProcessNextMessage()
+	message fetchAndProcessNextMessage()
 	{
 		message m = receiveMessage();
 		processMessage( m );
 		return m;
 	}
 
-	inline void fetchAndProcessAllMessages()
+	void fetchAndProcessAllMessages()
 	{
 		while( messagesLeft() )
 		{
@@ -708,10 +709,9 @@ public:
 #endif
 	}
 
-	inline void waitForInitDone( bool _busy_waiting = true )
+	inline void waitForInitDone( bool _busyWaiting = true )
 	{
-		m_failed = waitForMessage( IdInitDone,
-					_busy_waiting ).id != IdInitDone;
+		m_failed = waitForMessage( IdInitDone, _busyWaiting ).id != IdInitDone;
 	}
 
 	virtual bool processMessage( const message & _m );
@@ -748,7 +748,7 @@ public:
 
 	inline void lock()
 	{
-		if( !isInvalid() )
+		if( likely( !isInvalid() ) )
 		{
 			m_commMutex.lock();
 		}
@@ -756,7 +756,7 @@ public:
 
 	inline void unlock()
 	{
-		if( !isInvalid() )
+		if( likely( !isInvalid() ) )
 		{
 			m_commMutex.unlock();
 		}
@@ -923,14 +923,13 @@ RemotePluginBase::~RemotePluginBase()
 
 void RemotePluginBase::sendMessage( const message & _m )
 {
+	const int n = _m.data.size();
 	m_out->lock();
 	m_out->writeInt( _m.id );
-	m_out->writeInt( _m.data.size() );
-	int j = 0;
-	for( unsigned int i = 0; i < _m.data.size(); ++i )
+	m_out->writeInt( n );
+	for( unsigned int i = 0; i < n; ++i )
 	{
 		m_out->writeString( _m.data[i] );
-		j += _m.data[i].size();
 	}
 	m_out->unlock();
 	m_out->messageSent();
@@ -968,6 +967,11 @@ RemotePluginBase::message RemotePluginBase::waitForMessage(
 		{
 			QCoreApplication::processEvents(
 				QEventLoop::ExcludeUserInputEvents, 50 );
+#ifdef LMMS_BUILD_WIN32
+			Sleep( 5 );
+#else
+			usleep( 5 * 1000 );
+#endif
 			continue;
 		}
 #endif
@@ -1028,7 +1032,7 @@ RemotePluginClient::~RemotePluginClient()
 
 bool RemotePluginClient::processMessage( const message & _m )
 {
-	message reply_message( _m.id );
+	message replyMessage( _m.id );
 	bool reply = false;
 	switch( _m.id )
 	{
@@ -1060,7 +1064,7 @@ bool RemotePluginClient::processMessage( const message & _m )
 
 		case IdStartProcessing:
 			doProcessing();
-			reply_message.id = IdProcessingDone;
+			replyMessage.id = IdProcessingDone;
 			reply = true;
 			break;
 
@@ -1081,7 +1085,7 @@ bool RemotePluginClient::processMessage( const message & _m )
 	}
 	if( reply )
 	{
-		sendMessage( reply_message );
+		sendMessage( replyMessage );
 	}
 
 	return true;
