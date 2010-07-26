@@ -42,11 +42,6 @@ ENDIF(VERSION_SUFFIX)
 
 INCLUDE(DetectMachine)
 
-IF(LMMS_HOST_X86_64)
-	SET(STRIP /opt/mingw64/bin/x86_64-pc-mingw32-strip)
-ELSE(LMMS_HOST_X86_64)
-	SET(STRIP /opt/mingw32/bin/i586-pc-mingw32-strip)
-ENDIF(LMMS_HOST_X86_64)
 
 OPTION(WANT_ALSA	"Include ALSA (Advanced Linux Sound Architecture) support" ON)
 OPTION(WANT_CALF	"Include CALF LADSPA plugins" ON)
@@ -514,11 +509,6 @@ ENDIF(LMMS_HOST_X86 OR LMMS_HOST_X86_64)
 
 IF(WIN32)
 	SET(WINRC "${CMAKE_BINARY_DIR}/lmmsrc.obj")
-	IF(LMMS_HOST_X86_64)
-		SET(WINDRES /opt/mingw64/bin/x86_64-pc-mingw32-windres)
-	ELSE(LMMS_HOST_X86_64)
-		SET(WINDRES /opt/mingw32/bin/i586-pc-mingw32-windres)
-	ENDIF(LMMS_HOST_X86_64)
 	ADD_CUSTOM_COMMAND(OUTPUT ${WINRC}
 				COMMAND ${WINDRES}
 					-I${CMAKE_SOURCE_DIR}
@@ -556,11 +546,23 @@ IF(LMMS_BUILD_WIN32)
 	ADD_CUSTOM_COMMAND(TARGET lmms POST_BUILD COMMAND ${STRIP} ${CMAKE_BINARY_DIR}/lmms.exe)
 
 	INSTALL(TARGETS lmms RUNTIME DESTINATION .)
-	IF(LMMS_BUILD_WIN64)
-		INSTALL(FILES /opt/mingw64/bin/QtCore4.dll /opt/mingw64/bin/QtGui4.dll /opt/mingw64/bin/QtXml4.dll /opt/mingw64/bin/QtNetwork4.dll /opt/mingw64/bin/libsndfile-1.dll /opt/mingw64/bin/libvorbis-0.dll /opt/mingw64/bin/libvorbisenc-2.dll /opt/mingw64/bin/libvorbisfile-3.dll /opt/mingw64/bin/libogg-0.dll /opt/mingw64/bin/libfluidsynth-1.dll /opt/mingw64/bin/libfftw3f-3.dll /opt/mingw64/bin/SDL.dll DESTINATION .)
-	ELSE(LMMS_BUILD_WIN64)
-		INSTALL(FILES /opt/mingw32/bin/QtCore4.dll /opt/mingw32/bin/QtGui4.dll /opt/mingw32/bin/QtXml4.dll /opt/mingw32/bin/QtNetwork4.dll /opt/mingw32/bin/libz.dll /opt/mingw32/bin/libsndfile-1.dll /opt/mingw32/bin/libvorbis-0.dll /opt/mingw32/bin/libvorbisenc-2.dll /opt/mingw32/bin/libvorbisfile-3.dll /opt/mingw32/bin/libogg-0.dll /opt/mingw32/bin/libfluidsynth-1.dll /opt/mingw32/bin/libfftw3f-3.dll /opt/mingw32/bin/SDL.dll /opt/mingw32/i586-mingw32/bin/mingwm10.dll DESTINATION .)
-	ENDIF(LMMS_BUILD_WIN64)
+	INSTALL(FILES
+					${MINGW_PREFIX}/bin/QtCore4.dll
+					${MINGW_PREFIX}/bin/QtGui4.dll
+					${MINGW_PREFIX}/bin/QtXml4.dll
+					${MINGW_PREFIX}/bin/QtNetwork4.dll
+					${MINGW_PREFIX}/bin/libsndfile-1.dll
+					${MINGW_PREFIX}/bin/libvorbis-0.dll
+					${MINGW_PREFIX}/bin/libvorbisenc-2.dll
+					${MINGW_PREFIX}/bin/libvorbisfile-3.dll
+					${MINGW_PREFIX}/bin/libogg-0.dll
+					${MINGW_PREFIX}/bin/libfluidsynth-1.dll
+					${MINGW_PREFIX}/bin/libfftw3f-3.dll
+					${MINGW_PREFIX}/bin/libFLAC-8.dll
+					${MINGW_PREFIX}/bin/SDL.dll
+					${MINGW_PREFIX}/bin/libglib-2.0-0.dll
+					${MINGW_PREFIX}/bin/libgthread-2.0-0.dll
+				DESTINATION .)
 
 ELSE(LMMS_BUILD_WIN32)
 	IF(NOT LMMS_BUILD_APPLE)
@@ -666,7 +668,7 @@ ADD_CUSTOM_TARGET(win32-pkg
 			COMMAND cp /opt/mingw32/i586-pc-mingw32/bin/mingwm10.dll tmp/lmms
 			COMMAND cp -L ${CMAKE_SOURCE_DIR}/COPYING tmp/lmms/LICENSE.TXT
 			COMMAND cp -L ${CMAKE_SOURCE_DIR}/README tmp/lmms/README.TXT
-			COMMAND /opt/mingw32/bin/i586-pc-mingw32-strip tmp/lmms/lmms.exe tmp/lmms/plugins/*.dll tmp/lmms/plugins/ladspa/*.dll
+			COMMAND ${STRIP} tmp/lmms/lmms.exe tmp/lmms/plugins/*.dll tmp/lmms/plugins/ladspa/*.dll
 			COMMAND mv tmp/lmms tmp/lmms-${VERSION}
 			COMMAND cd tmp && zip -r -9 ../lmms-${VERSION}-bin-win32.zip lmms-${VERSION}/*
 			COMMAND rm -rf tmp

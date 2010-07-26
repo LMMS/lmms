@@ -1,44 +1,10 @@
 SET(MINGW_PREFIX /opt/mingw32)
 
-# this one is important
-SET(CMAKE_SYSTEM_NAME Windows)
-#this one not so much
-SET(CMAKE_SYSTEM_VERSION 1)
-
 SET(CMAKE_SYSTEM_PROCESSOR i686)
-SET(CMAKE_INSTALL_PREFIX ${MINGW_PREFIX})
-
-
-# specify the cross compiler
-SET(CMAKE_C_COMPILER   ${MINGW_PREFIX}/bin/i586-pc-mingw32-gcc)
-SET(CMAKE_CXX_COMPILER ${MINGW_PREFIX}/bin/i586-pc-mingw32-g++)
-
-# where is the target environment 
-SET(CMAKE_FIND_ROOT_PATH  /opt/mingw32)
-
-SET(QT_BINARY_DIR   ${MINGW_PREFIX}/bin)
-SET(QT_LIBRARY_DIR  ${MINGW_PREFIX}/lib)
-SET(QT_QTCORE_LIBRARY   ${MINGW_PREFIX}/lib/libQtCore4.a)
-SET(QT_INCLUDE_DIR ${MINGW_PREFIX}/include/qt4)
-SET(QT_HEADERS_DIR ${MINGW_PREFIX}/include/qt4)
-SET(QT_QTCORE_INCLUDE_DIR ${MINGW_PREFIX}/include/qt4/QtCore)
-SET(QT_MKSPECS_DIR  ${MINGW_PREFIX}/share/qt4/mkspecs)
-SET(QT_MOC_EXECUTABLE  ${QT_BINARY_DIR}/moc.exe)
-SET(QT_RCC_EXECUTABLE  ${QT_BINARY_DIR}/rcc.exe)
-SET(QT_QMAKE_EXECUTABLE  /usr/bin/qmake)
-SET(QT_UIC_EXECUTABLE  ${QT_BINARY_DIR}/uic.exe)
-
-# search for programs in the build host directories
-SET(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
-# for libraries and headers in the target directories
-SET(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
-SET(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
-
-SET(PKG_CONFIG_EXECUTABLE ${MINGW_PREFIX}/bin/pkg-config)
 
 SET(CMAKE_C_FLAGS "-march=i686 -mtune=generic")
 SET(CMAKE_CXX_FLAGS ${CMAKE_C_FLAGS})
 
-INCLUDE_DIRECTORIES(${MINGW_PREFIX}/include)
-LINK_DIRECTORIES(${MINGW_PREFIX}/lib ${MINGW_PREFIX}/bin)
+
+INCLUDE(MinGWCrossCompile)
 
