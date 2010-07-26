@@ -235,6 +235,7 @@ l 0000 root sys $includedir/FL/Enumerations.h Enumerations.H
 l 0000 root sys $includedir/FL/Fl.h Fl.H
 l 0000 root sys $includedir/FL/Fl_Adjuster.h Fl_Adjuster.H
 l 0000 root sys $includedir/FL/Fl_Bitmap.h Fl_Bitmap.H
+l 0000 root sys $includedir/FL/Fl_BMP_Image.h Fl_BMP_Image.H
 l 0000 root sys $includedir/FL/Fl_Box.h Fl_Box.H
 l 0000 root sys $includedir/FL/Fl_Browser.h Fl_Browser.H
 l 0000 root sys $includedir/FL/Fl_Browser_.h Fl_Browser_.H
@@ -257,6 +258,8 @@ l 0000 root sys $includedir/FL/Fl_Float_Input.h Fl_Float_Input.H
 l 0000 root sys $includedir/FL/Fl_FormsBitmap.h Fl_FormsBitmap.H
 l 0000 root sys $includedir/FL/Fl_FormsPixmap.h Fl_FormsPixmap.H
 l 0000 root sys $includedir/FL/Fl_Free.h Fl_Free.H
+l 0000 root sys $includedir/FL/Fl_GIF_Image.h Fl_GIF_Image.H
+l 0000 root sys $includedir/FL/Fl_Gl_Window.h Fl_Gl_Window.H
 l 0000 root sys $includedir/FL/Fl_Group.h Fl_Group.H
 l 0000 root sys $includedir/FL/Fl_Help_Dialog.h Fl_Help_Dialog.H
 l 0000 root sys $includedir/FL/Fl_Help_View.h Fl_Help_View.H
@@ -266,6 +269,7 @@ l 0000 root sys $includedir/FL/Fl_Hor_Nice_Slider.h Fl_Hor_Nice_Slider.H
 l 0000 root sys $includedir/FL/Fl_Hor_Slider.h Fl_Hor_Slider.H
 l 0000 root sys $includedir/FL/Fl_Hor_Value_Slider.h Fl_Hor_Value_Slider.H
 l 0000 root sys $includedir/FL/Fl_Image.h Fl_Image.H
+l 0000 root sys $includedir/FL/Fl_JPEG_Image.h Fl_JPEG_Image.H
 l 0000 root sys $includedir/FL/Fl_Input.h Fl_Input.H
 l 0000 root sys $includedir/FL/Fl_Input_.h Fl_Input_.H
 l 0000 root sys $includedir/FL/Fl_Input_Choice.h Fl_Input_Choice.H
@@ -288,6 +292,8 @@ l 0000 root sys $includedir/FL/Fl_Output.h Fl_Output.H
 l 0000 root sys $includedir/FL/Fl_Overlay_Window.h Fl_Overlay_Window.H
 l 0000 root sys $includedir/FL/Fl_Pack.h Fl_Pack.H
 l 0000 root sys $includedir/FL/Fl_Pixmap.h Fl_Pixmap.H
+l 0000 root sys $includedir/FL/Fl_PNG_Image.h Fl_PNG_Image.H
+l 0000 root sys $includedir/FL/Fl_PNM_Image.h Fl_PNM_Image.H
 l 0000 root sys $includedir/FL/Fl_Positioner.h Fl_Positioner.H
 l 0000 root sys $includedir/FL/Fl_Progress.h Fl_Progress.H
 l 0000 root sys $includedir/FL/Fl_Radio_Button.h Fl_Radio_Button.H
@@ -329,6 +335,9 @@ l 0000 root sys $includedir/FL/fl_file_chooser.H Fl_File_Chooser.H
 l 0000 root sys $includedir/FL/fl_message.h fl_message.H
 l 0000 root sys $includedir/FL/fl_show_colormap.h fl_show_colormap.H
 l 0000 root sys $includedir/FL/fl_show_input.h fl_show_input.H
+l 0000 root sys $includedir/FL/forms.h forms.H
+l 0000 root sys $includedir/FL/gl_draw.h gl_draw.H
+l 0000 root sys $includedir/FL/glut.h glut.H
 l 0000 root sys $includedir/FL/win32.h win32.H
 l 0000 root sys $includedir/FL/x.h x.H
 %system all

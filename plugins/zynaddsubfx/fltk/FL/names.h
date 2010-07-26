@@ -1,5 +1,5 @@
 //
-// "$Id: names.h 6731 2009-03-31 22:41:10Z greg.ercolano $"
+// "$Id: names.h 7159 2010-02-26 18:10:54Z greg.ercolano $"
 //
 // Event names header file for the Fast Light Tool Kit (FLTK).
 //
@@ -30,6 +30,25 @@
 #ifndef FL_NAMES_H
 #define FL_NAMES_H
 
+/** \defgroup fl_events Events handling functions
+    @{
+ */
+
+/**
+  This is an array of event names you can use to convert event numbers into names.
+
+  The array gets defined inline wherever your '\#include <FL/names.h>' appears.
+
+  \b Example:
+  \code
+  #include <FL/names.h>		// array will be defined here
+  int MyClass::handle(int e) {
+      printf("Event was %s (%d)\n", fl_eventnames[e], e);
+      // ..resulting output might be e.g. "Event was FL_PUSH (1)"..
+      [..]
+  }
+  \endcode
+ */
 const char * const fl_eventnames[] =
 {
   "FL_NO_EVENT",
@@ -58,6 +77,23 @@ const char * const fl_eventnames[] =
   "FL_DND_RELEASE",
 };
 
+/**
+  This is an array of font names you can use to convert font numbers into names.
+
+  The array gets defined inline wherever your '\#include <FL/names.h>' appears.
+
+  \b Example:
+  \code
+  #include <FL/names.h>		// array will be defined here
+  int MyClass::my_callback(Fl_Widget *w, void*) {
+      int fnum = w->labelfont();
+      // Resulting output might be e.g. "Label's font is FL_HELVETICA (0)"
+      printf("Label's font is %s (%d)\n", fl_fontnames[fnum], fnum);
+      // ..resulting output might be e.g. "Label's font is FL_HELVETICA (0)"..
+      [..]
+  }
+  \endcode
+ */
 const char * const fl_fontnames[] =
 {
   "FL_HELVETICA",
@@ -78,8 +114,10 @@ const char * const fl_fontnames[] =
   "FL_ZAPF_DINGBATS",
 };
 
+/** @} */
+
 #endif /* FL_NAMES_H */
 
 //
-// End of "$Id: names.h 6731 2009-03-31 22:41:10Z greg.ercolano $".
+// End of "$Id: names.h 7159 2010-02-26 18:10:54Z greg.ercolano $".
 //

@@ -1,5 +1,5 @@
 //
-// "$Id: Fl_x.cxx 6905 2009-09-27 12:06:35Z matt $"
+// "$Id: Fl_x.cxx 7659 2010-07-01 13:21:32Z manolo $"
 //
 // X specific code for the Fast Light Tool Kit (FLTK).
 //
@@ -50,6 +50,12 @@
 #  include <X11/Xmd.h>
 #  include <X11/Xlocale.h>
 #  include <X11/Xlib.h>
+
+static Fl_Xlib_Graphics_Driver fl_xlib_driver;
+static Fl_Display_Device fl_xlib_display(&fl_xlib_driver);
+FL_EXPORT Fl_Display_Device *fl_display_device = (Fl_Display_Device*)&fl_xlib_display; // does not change
+FL_EXPORT Fl_Graphics_Driver *fl_graphics_driver = (Fl_Graphics_Driver*)&fl_xlib_driver; // the current target device of graphics operations
+FL_EXPORT Fl_Surface_Device *fl_surface = (Fl_Surface_Device*)fl_display_device; // the current target surface of graphics operations
 
 ////////////////////////////////////////////////////////////////
 // interface to poll/select call:
@@ -132,7 +138,9 @@ void Fl::add_fd(int n, void (*cb)(int, void*), void* v) {
 
 void Fl::remove_fd(int n, int events) {
   int i,j;
+# if !USE_POLL
   maxfd = -1; // recalculate maxfd on the fly
+# endif
   for (i=j=0; i<nfds; i++) {
 #  if USE_POLL
     if (pollfds[i].fd == n) {
@@ -146,8 +154,8 @@ void Fl::remove_fd(int n, int events) {
       if (!e) continue; // if no events left, delete this fd
       fd[i].events = e;
     }
-#  endif
     if (fd[i].fd > maxfd) maxfd = fd[i].fd;
+#  endif
     // move it down in the array if necessary:
     if (j<i) {
       fd[j] = fd[i];
@@ -1582,6 +1590,13 @@ void Fl_X::make_xid(Fl_Window* win, XVisualInfo *visual, Colormap colormap)
     XFree(hints);
   }
 
+  // set the window type for menu and tooltip windows to avoid animations (compiz)
+  if (win->menu_window() || win->tooltip_window()) {
+    Atom net_wm_type = XInternAtom(fl_display, "_NET_WM_WINDOW_TYPE", False);
+    Atom net_wm_type_kind = XInternAtom(fl_display, "_NET_WM_WINDOW_TYPE_MENU", False);
+    XChangeProperty(fl_display, xp->xid, net_wm_type, XA_ATOM, 32, PropModeReplace, (unsigned char*)&net_wm_type_kind, 1);
+  }
+
   XMapWindow(fl_display, xp->xid);
   if (showit) {
     win->set_visible();
@@ -1731,6 +1746,10 @@ void Fl_Window::show() {
   } else {
     XMapRaised(fl_display, i->xid);
   }
+#ifdef USE_PRINT_BUTTON
+void preparePrintFront(void);
+preparePrintFront();
+#endif
 }
 
 Window fl_window;
@@ -1753,8 +1772,62 @@ void Fl_Window::make_current() {
 
 }
 
+#ifdef USE_PRINT_BUTTON
+// to test the Fl_Printer class creating a "Print front window" button in a separate window
+// contains also preparePrintFront call above
+#include <FL/Fl_Printer.H>
+#include <FL/Fl_Button.H>
+void printFront(Fl_Widget *o, void *data)
+{
+  Fl_Printer printer;
+  o->window()->hide();
+  Fl_Window *win = Fl::first_window();
+  if(!win) return;
+  int w, h;
+  if( printer.start_job(1) ) { o->window()->show(); return; }
+  if( printer.start_page() ) { o->window()->show(); return; }
+  printer.printable_rect(&w,&h);
+  // scale the printer device so that the window fits on the page
+  float scale = 1;
+  if (win->w() > w || win->h() > h) {
+    scale = (float)w/win->w();
+    if ((float)h/win->h() < scale) scale = (float)h/win->h();
+    printer.scale(scale, scale);
+  }
+
+// #define ROTATE 20.0
+#ifdef ROTATE
+  printer.scale(scale * 0.8, scale * 0.8);
+  printer.printable_rect(&w, &h);
+  printer.origin(w/2, h/2 );
+  printer.rotate(ROTATE);
+  printer.print_widget( win, - win->w()/2, - win->h()/2 );
+  //printer.print_window_part( win, 0,0, win->w(), win->h(), - win->w()/2, - win->h()/2 );
+#else
+  printer.print_widget( win );
+  //printer.print_window_part( win, 0,0,win->w(), win->h() );
+#endif
+
+  printer.end_page();
+  printer.end_job();
+  o->window()->show();
+}
+
+void preparePrintFront(void)
+{
+  static int first=1;
+  if(!first) return;
+  first=0;
+  static Fl_Window w(0,0,150,30);
+  static Fl_Button b(0,0,w.w(),w.h(), "Print front window");
+  b.callback(printFront);
+  w.end();
+  w.show();
+}
+#endif // USE_PRINT_BUTTON
+
 #endif
 
 //
-// End of "$Id: Fl_x.cxx 6905 2009-09-27 12:06:35Z matt $".
+// End of "$Id: Fl_x.cxx 7659 2010-07-01 13:21:32Z manolo $".
 //

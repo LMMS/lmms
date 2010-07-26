@@ -1,6 +1,6 @@
 README.win32 - Building FLTK under Windows
 ------------------------------------------
-Last Update: May 2007 for release 1.1.8
+Last Update: July 2010 for release 1.3.x
 
 INTRODUCTION
 
@@ -10,24 +10,30 @@ INTRODUCTION
     the GNU-like build configurations in the "makefiles"
     subdirectory.
 
+    FLTK 1.3 and later is officially supported on Windows
+    (2000,) 2003, XP, and later.  Older Windows versions are
+    not officially supported, but may still work.  The main
+    reason is that the OS version needs to support UTF-8.
+    FLTK 1.3 is known to work on Windows 7 and Vista.
+
     FLTK currently supports the following development
     environments on the Windows platform:
 
-	- Microsoft Visual C++ 6.0, VC2005 and VC.NET using the
-	  supplied workspace and project files.  Be sure to get
-	  your service packs!
+	- Free Microsoft Visual C++ 2008 Express and Visual
+	  C++ 2010 Express using the supplied workspace and
+	  project files. Older and the commercial versions can
+	  be used as well, if they can open the project files.
+	  Be sure to get your service packs!
 
-	- Borland C++ Builder 5 and 6 using the supplied IDE
-	  files. These files are not as actively maintained as
-	  the VC and GNU versions, so may not work for you.
+	  The project files can be found in the ide/ directory.
+	  Please read ide/README.IDE for more info about this.
 
-	- Watcom. There is a partial solution for the Watcom
-	  toolchain. It is no longer actively maintained.
+	- GNU toolsets (Cygwin or MinGW) hosted on Windows.
 
-	- GNU toolsets (Cygwin or MinGW) hosted on Windows
-	  9x/2000/NT/XP.
+	- Watcom.  There is a partial solution for the Watcom
+	  toolchain.  It is no longer actively maintained.
 
-    This remainder of this document gives a brief overview of
+    The remainder of this document gives a brief overview of
     compiling and using FLTK with the Cygwin and MinGW compiler
     toolkits.  Both toolkits provide a build environment based
     around the GNU C/C++ compiler. Further information is
@@ -50,13 +56,18 @@ INTRODUCTION
     the Cygwin DLL (compiled and linked with the "-mno-cygwin"
     option) may be released under any license freely.
 
+    Note: Since December 2009, there is a new gcc 4.x compiler
+    that doesn't support the -mno-cygwin option anymore. You
+    must use the older gcc-3 compiler instead.
+
+
     The MinGW distribution (Minimalist GNU for Windows) provides
     a similar toolset but geared solely towards native Windows
     development without the Unix-like POSIX library.  The lack of
     any libraries under the GPL or any other restrictive license
     means that programs built with the MinGW environment may
     always be released under any license freely. MinGW also
-    supplies a  Unix-like build environment for Windows,
+    supplies a Unix-like build environment for Windows,
     including MSYS (a Bourne-compatible shell) and the standard
     Unix file utilities (ls, cat, grep, etc.)
 
@@ -178,7 +189,7 @@ WHY DOES A CONSOLE WINDOW APPEAR WHEN I RUN MY PROGRAM
     (Note: A special case of this exists if running a MinGW
     application from the command line of an MSYS shell, when an
     application is able to write to stdout, even if compiled with
-    "-mwindows".)
+    "-mwindows".  The same applies to Cygwin.)
 
 
 HOW DO I GET OPENGL TO WORK?
@@ -193,14 +204,4 @@ HOW DO I GET OPENGL TO WORK?
         #define HAVE_GL 1
 
     will change this to compile and link in OpenGL.
-
-
-
-
-
-
-
-
-
-
 

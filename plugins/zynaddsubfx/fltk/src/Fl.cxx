@@ -1,5 +1,5 @@
 //
-// "$Id: Fl.cxx 6836 2009-07-25 12:56:16Z AlbrechtS $"
+// "$Id: Fl.cxx 7354 2010-03-29 11:07:29Z matt $"
 //
 // Main event handling code for the Fast Light Tool Kit (FLTK).
 //
@@ -40,13 +40,13 @@
 #include <stdlib.h>
 #include "flstring.h"
 
-#if defined(__APPLE__) && defined(__APPLE_COCOA__)
+#if defined(__APPLE__)
 #import <Cocoa/Cocoa.h>
 #endif
 
-#ifdef DEBUG
+#if defined(DEBUG) || defined(DEBUG_WATCH)
 #  include <stdio.h>
-#endif // DEBUG
+#endif // DEBUG || DEBUG_WATCH
 
 #ifdef WIN32
 #  include <ole2.h>
@@ -410,16 +410,12 @@ double Fl::wait(double time_to_wait) {
     // the idle function may turn off idle, we can then wait:
     if (idle) time_to_wait = 0.0;
   }
-#ifdef __APPLE_COCOA__
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-#endif
   flush();
   if (idle && !in_idle) // 'idle' may have been set within flush()
     time_to_wait = 0.0;
   double retval = fl_wait(time_to_wait);
-#ifdef __APPLE_COCOA__
   [pool release];
-#endif
   return retval;
 
 #else
@@ -716,7 +712,7 @@ static handler_link *handlers = 0;
     zero from its handle() method.  Exactly which  ones may change
     in future versions, however.
 */
-void Fl::add_handler(int (*ha)(int)) {
+void Fl::add_handler(Fl_Event_Handler ha) {
   handler_link *l = new handler_link;
   l->handle = ha;
   l->next = handlers;
@@ -726,7 +722,7 @@ void Fl::add_handler(int (*ha)(int)) {
 /**
   Removes a previously added event handler.
 */
-void Fl::remove_handler(int (*ha)(int)) {
+void Fl::remove_handler(Fl_Event_Handler ha) {
   handler_link *l, *p;
 
   // Search for the handler in the list...
@@ -1290,11 +1286,7 @@ int Fl_Window::handle(int ev)
 #if defined(USE_X11) || defined(WIN32)
         XMapWindow(fl_display, fl_xid(this)); // extra map calls are harmless
 #elif defined(__APPLE_QUARTZ__)
-#ifdef __APPLE_COCOA__
-		MacMapWindow(this, i->xid);
-#else
-		MacMapWindow(this, fl_xid(this));
-#endif
+        MacMapWindow(this, i->xid);
 #else
 # error unsupported platform
 #endif // __APPLE__
@@ -1316,11 +1308,7 @@ int Fl_Window::handle(int ev)
 #if defined(USE_X11) || defined(WIN32)
 	XUnmapWindow(fl_display, fl_xid(this));
 #elif defined(__APPLE_QUARTZ__)
-#ifdef __APPLE_COCOA__
 	MacUnmapWindow(this, i->xid);
-#else
-	MacUnmapWindow(this, fl_xid(this));
-#endif
 #else
 # error platform unsupported
 #endif
@@ -1473,22 +1461,15 @@ void Fl_Widget::damage(uchar fl, int X, int Y, int W, int H) {
       CombineRgn(i->region, i->region, R, RGN_OR);
       XDestroyRegion(R);
 #elif defined(__APPLE_QUARTZ__)
-#ifdef __APPLE_COCOA__
-	  CGRect arg = CGRectMake(X,Y,W - 1,H - 1);
-	  int j;//don't add a rectangle totally inside the Fl_Region
-	  for(j = 0; j < i->region->count; j++) {
-		if(CGRectContainsRect(i->region->rects[j], arg)) break;
-		}
-	  if( j >= i->region->count) {
-		i->region->rects = (CGRect*)realloc(i->region->rects, (++(i->region->count)) * sizeof(CGRect));
-		i->region->rects[i->region->count - 1] = arg;
-		}
-#else
-	Fl_Region R = NewRgn();
-	SetRectRgn(R, X, Y, X+W, Y+H);
-	UnionRgn(R, i->region, i->region);
-	DisposeRgn(R);
-#endif
+      CGRect arg = fl_cgrectmake_cocoa(X, Y, W, H);
+      int j; // don't add a rectangle totally inside the Fl_Region
+      for(j = 0; j < i->region->count; j++) {
+        if(CGRectContainsRect(i->region->rects[j], arg)) break;
+      }
+      if( j >= i->region->count) {
+        i->region->rects = (CGRect*)realloc(i->region->rects, (++(i->region->count)) * sizeof(CGRect));
+        i->region->rects[i->region->count - 1] = arg;
+      }
 #else
 # error unsupported platform
 #endif
@@ -1512,11 +1493,7 @@ void Fl_Window::flush() {
 #ifdef WIN32
 #  include "Fl_win32.cxx"
 #elif defined(__APPLE__)
-#ifdef __APPLE_COCOA__
 #  include "Fl_cocoa.mm"
-#else
-#  include "Fl_mac.cxx"
-#endif
 #endif
 
 //
@@ -1648,11 +1625,11 @@ void Fl::watch_widget_pointer(Fl_Widget *&w)
     widget_watch = (Fl_Widget***)realloc(widget_watch, sizeof(Fl_Widget**)*max_widget_watch);
   }
   widget_watch[num_widget_watch++] = wp;
-#ifdef DEBUG
+#ifdef DEBUG_WATCH
   printf ("\nwatch_widget_pointer:   (%d/%d) %8p => %8p\n",
     num_widget_watch,num_widget_watch,wp,*wp);
   fflush(stdout);
-#endif // DEBUG
+#endif // DEBUG_WATCH
 }
 
 /**
@@ -1674,18 +1651,18 @@ void Fl::release_widget_pointer(Fl_Widget *&w)
       if (j<i) widget_watch[j] = widget_watch[i]; // fill gap
       j++;
     }
-#ifdef DEBUG
+#ifdef DEBUG_WATCH
     else { // found widget pointer
       printf ("release_widget_pointer: (%d/%d) %8p => %8p\n",
 	i+1,num_widget_watch,wp,*wp);
     }
-#endif //DEBUG
+#endif //DEBUG_WATCH
   }
   num_widget_watch = j;
-#ifdef DEBUG
+#ifdef DEBUG_WATCH
   printf ("                        num_widget_watch = %d\n\n",num_widget_watch);
   fflush(stdout);
-#endif // DEBUG
+#endif // DEBUG_WATCH
   return;
 }
 /**
@@ -1735,5 +1712,5 @@ Fl_Widget_Tracker::~Fl_Widget_Tracker() {
 }
 
 //
-// End of "$Id: Fl.cxx 6836 2009-07-25 12:56:16Z AlbrechtS $".
+// End of "$Id: Fl.cxx 7354 2010-03-29 11:07:29Z matt $".
 //

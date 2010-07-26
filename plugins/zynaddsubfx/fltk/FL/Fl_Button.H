@@ -1,5 +1,5 @@
 //
-// "$Id: Fl_Button.H 6878 2009-09-17 22:12:24Z matt $"
+// "$Id: Fl_Button.H 7499 2010-04-14 08:07:53Z manolo $"
 //
 // Button header file for the Fast Light Tool Kit (FLTK).
 //
@@ -44,9 +44,7 @@
 				         are set to zero.*/
 #define FL_HIDDEN_BUTTON	3   ///< for Forms compatibility
 
-#ifndef FL_DOXYGEN
 extern FL_EXPORT Fl_Shortcut fl_old_shortcut(const char*);
-#endif
 
 /**
   \class Fl_Button
@@ -172,5 +170,5 @@ public:
 #endif
 
 //
-// End of "$Id: Fl_Button.H 6878 2009-09-17 22:12:24Z matt $".
+// End of "$Id: Fl_Button.H 7499 2010-04-14 08:07:53Z manolo $".
 //

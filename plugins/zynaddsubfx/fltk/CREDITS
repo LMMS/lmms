@@ -3,8 +3,10 @@ CREDITS - Fast Light Tool Kit (FLTK) Version 1.3.0
 
     This file lists the people responsible for the toolkit you
     are now using.  If you've looking for your name in lights
-    but we've forgotten you here, please send an email to
-    "fltk-bugs@fltk.org" and we'll update this file accordingly.
+    but we've forgotten you here, please use the report on the
+    following page, and we'll update this file accordingly:
+
+        http://www.fltk.org/str.php
 
 
 CORE DEVELOPERS
@@ -49,6 +51,7 @@ OTHER CONTRIBUTORS
 	James Roth
 	Albrecht Schlosser
 	Andrea Suatoni
+	Michael Surette
 	Paul Sydney
 	Aaron Ucko
 	Emanuele Vicentini

@@ -1,5 +1,5 @@
 //
-// "$Id: fl_color_mac.cxx 6616 2009-01-01 21:28:26Z matt $"
+// "$Id: fl_color_mac.cxx 7617 2010-05-27 17:20:18Z manolo $"
 //
 // MacOS color functions for the Fast Light Tool Kit (FLTK).
 //
@@ -49,7 +49,7 @@ Fl_XMap* fl_current_xmap;
 
 Fl_Color fl_color_;
 
-void fl_color(Fl_Color i) {
+void Fl_Graphics_Driver::color(Fl_Color i) {
   fl_color_ = i;
   int index;
   uchar r, g, b;
@@ -66,29 +66,21 @@ void fl_color(Fl_Color i) {
     g = c>>16;
     b = c>> 8;
   }
-#if defined(__APPLE_QUARTZ__)
   if (!fl_gc) return; // no context yet? We will assign the color later.
   float fr = r/255.0f;
   float fg = g/255.0f;
   float fb = b/255.0f;
   CGContextSetRGBFillColor(fl_gc, fr, fg, fb, 1.0f);
   CGContextSetRGBStrokeColor(fl_gc, fr, fg, fb, 1.0f);
-#else
-#  error : neither Quickdraw nor Quartz defined
-#endif
 }
 
-void fl_color(uchar r, uchar g, uchar b) {
+void Fl_Graphics_Driver::color(uchar r, uchar g, uchar b) {
   fl_color_ = fl_rgb_color(r, g, b);
-#if defined(__APPLE_QUARTZ__)
   float fr = r/255.0f;
   float fg = g/255.0f;
   float fb = b/255.0f;
   CGContextSetRGBFillColor(fl_gc, fr, fg, fb, 1.0f);
   CGContextSetRGBStrokeColor(fl_gc, fr, fg, fb, 1.0f);
-#else
-#  error : Quartz not defined
-#endif
 }
 
 void Fl::set_color(Fl_Color i, unsigned c) {
@@ -98,5 +90,5 @@ void Fl::set_color(Fl_Color i, unsigned c) {
 }
 
 //
-// End of "$Id: fl_color_mac.cxx 6616 2009-01-01 21:28:26Z matt $".
+// End of "$Id: fl_color_mac.cxx 7617 2010-05-27 17:20:18Z manolo $".
 //

@@ -1,5 +1,5 @@
 //
-// "$Id: Fl_win32.cxx 6905 2009-09-27 12:06:35Z matt $"
+// "$Id: Fl_win32.cxx 7659 2010-07-01 13:21:32Z manolo $"
 //
 // WIN32-specific code for the Fast Light Tool Kit (FLTK).
 //
@@ -95,17 +95,22 @@
   for async mode proper operation, not mentioning the side effects...
 */
 
+static Fl_GDI_Graphics_Driver fl_gdi_driver;
+static Fl_Display_Device fl_gdi_display(&fl_gdi_driver);
+FL_EXPORT Fl_Display_Device *fl_display_device = (Fl_Display_Device*)&fl_gdi_display; // does not change
+FL_EXPORT Fl_Graphics_Driver *fl_graphics_driver = (Fl_Graphics_Driver*)&fl_gdi_driver; // the current target driver of graphics operations
+FL_EXPORT Fl_Surface_Device *fl_surface = (Fl_Surface_Device*)fl_display_device; // the current target surface of graphics operations
+
 // dynamic wsock dll handling api:
 #if defined(__CYGWIN__) && !defined(SOCKET)
 # define SOCKET int
 #endif
 typedef int (WINAPI* fl_wsk_select_f)(int, fd_set*, fd_set*, fd_set*, const struct timeval*);
 typedef int (WINAPI* fl_wsk_fd_is_set_f)(SOCKET, fd_set *);
-typedef int (WINAPI* fl_wsk_async_select_f)(SOCKET,HWND,u_int,long);
+
 static HMODULE s_wsock_mod = 0;
 static fl_wsk_select_f s_wsock_select=0;
 static fl_wsk_fd_is_set_f fl_wsk_fd_is_set=0;
-static fl_wsk_async_select_f fl_wsk_async_select=0;
 
 static HMODULE get_wsock_mod() {
   if (!s_wsock_mod) {
@@ -114,7 +119,6 @@ static HMODULE get_wsock_mod() {
       Fl::fatal("FLTK Lib Error: %s file not found! Please check your winsock dll accessibility.\n",WSCK_DLL_NAME);
     s_wsock_select = (fl_wsk_select_f) GetProcAddress(s_wsock_mod, "select");
     fl_wsk_fd_is_set = (fl_wsk_fd_is_set_f) GetProcAddress(s_wsock_mod, "__WSAFDIsSet");
-    fl_wsk_async_select = (fl_wsk_async_select_f) GetProcAddress(s_wsock_mod, "WSAAsyncSelect");
   }
   return s_wsock_mod;
 }
@@ -229,13 +233,17 @@ static Fl_Window *track_mouse_win=0;	// current TrackMouseEvent() window
 //
 // Microsoft provides the Berkeley select() call and an asynchronous
 // select function that sends a WIN32 message when the select condition
-// exists...
+// exists. However, we don't try to use the asynchronous WSAAsyncSelect()
+// any more for good reasons (see above).
+//
+// A.S. Dec 2009: We got reports that current winsock2.h files define
+// POLLIN, POLLOUT, and POLLERR with conflicting values WRT what we
+// used before (STR #2301).  Therefore we must not use these values
+// for our internal purposes, but use FL_READ, FL_WRITE, and
+// FL_EXCEPT, as defined for use in Fl::add_fd().
+//
 static int maxfd = 0;
 static fd_set fdsets[3];
-
-# define POLLIN 1
-# define POLLOUT 4
-# define POLLERR 8
 
 #if !defined(__GNUC__) || __GNUC__ >= 3
 extern IDropTarget *flIDropTarget;
@@ -292,14 +300,14 @@ void Fl::add_fd(int n, int events, void (*cb)(int, void*), void *v) {
   fd[i].cb = cb;
   fd[i].arg = v;
 
-  if (events & POLLIN) FD_SET((unsigned)n, &fdsets[0]);
-  if (events & POLLOUT) FD_SET((unsigned)n, &fdsets[1]);
-  if (events & POLLERR) FD_SET((unsigned)n, &fdsets[2]);
+  if (events & FL_READ) FD_SET((unsigned)n, &fdsets[0]);
+  if (events & FL_WRITE) FD_SET((unsigned)n, &fdsets[1]);
+  if (events & FL_EXCEPT) FD_SET((unsigned)n, &fdsets[2]);
   if (n > maxfd) maxfd = n;
 }
 
 void Fl::add_fd(int fd, void (*cb)(int, void*), void* v) {
-  Fl::add_fd(fd, POLLIN, cb, v);
+  Fl::add_fd(fd, FL_READ, cb, v);
 }
 
 void Fl::remove_fd(int n, int events) {
@@ -318,9 +326,9 @@ void Fl::remove_fd(int n, int events) {
   }
   nfds = j;
 
-  if (events & POLLIN) FD_CLR(unsigned(n), &fdsets[0]);
-  if (events & POLLOUT) FD_CLR(unsigned(n), &fdsets[1]);
-  if (events & POLLERR) FD_CLR(unsigned(n), &fdsets[2]);
+  if (events & FL_READ) FD_CLR(unsigned(n), &fdsets[0]);
+  if (events & FL_WRITE) FD_CLR(unsigned(n), &fdsets[1]);
+  if (events & FL_EXCEPT) FD_CLR(unsigned(n), &fdsets[2]);
 }
 
 void Fl::remove_fd(int n) {
@@ -374,9 +382,9 @@ int fl_wait(double time_to_wait) {
       for (int i = 0; i < nfds; i ++) {
 	SOCKET f = fd[i].fd;
 	short revents = 0;
-	if (fl_wsk_fd_is_set(f, &fdt[0])) revents |= POLLIN;
-	if (fl_wsk_fd_is_set(f, &fdt[1])) revents |= POLLOUT;
-	if (fl_wsk_fd_is_set(f, &fdt[2])) revents |= POLLERR;
+	if (fl_wsk_fd_is_set(f, &fdt[0])) revents |= FL_READ;
+	if (fl_wsk_fd_is_set(f, &fdt[1])) revents |= FL_WRITE;
+	if (fl_wsk_fd_is_set(f, &fdt[2])) revents |= FL_EXCEPT;
 	if (fd[i].events & revents) fd[i].cb(f, fd[i].arg);
       }
       time_to_wait = 0.0; // just peek for any messages
@@ -1292,7 +1300,7 @@ void Fl_Window::resize(int X,int Y,int W,int H) {
   int resize_from_program = (this != resize_bug_fix);
   if (!resize_from_program) resize_bug_fix = 0;
   if (X != x() || Y != y()) {
-    set_flag(FORCE_POSITION);
+    force_position(1);
   } else {
     if (!is_a_resize) return;
     flags |= SWP_NOMOVE;
@@ -1474,7 +1482,7 @@ Fl_X* Fl_X::make(Fl_Window* w) {
       wp += 2*bx;
       hp += 2*by+bt;
     }
-    if (!(w->flags() & Fl_Widget::FORCE_POSITION)) {
+    if (!w->force_position()) {
       xp = yp = CW_USEDEFAULT;
     } else {
       if (!Fl::grab()) {
@@ -1775,6 +1783,10 @@ void Fl_Window::show() {
     if (!fl_capture) BringWindowToTop(i->xid);
     //ShowWindow(i->xid,fl_capture?SW_SHOWNOACTIVATE:SW_RESTORE);
   }
+#ifdef USE_PRINT_BUTTON
+void preparePrintFront(void);
+preparePrintFront();
+#endif
 }
 
 Fl_Window *Fl_Window::current_;
@@ -1913,8 +1925,69 @@ void fl_cleanup_dc_list(void) {          // clean up the list
     t = win_DC_list;
   } while(t);
 }
+
+Fl_Region XRectangleRegion(int x, int y, int w, int h) {
+  if (Fl_Surface_Device::surface()->type() == Fl_Display_Device::device_type) return CreateRectRgn(x,y,x+w,y+h);
+  // because rotation may apply, the rectangle becomes a polygon in device coords
+  POINT pt[4] = { {x, y}, {x + w, y}, {x + w, y + h}, {x, y + h} };
+  LPtoDP(fl_gc, pt, 4);
+  return CreatePolygonRgn(pt, 4, ALTERNATE);
+}
+
+#ifdef USE_PRINT_BUTTON
+// to test the Fl_Printer class creating a "Print front window" button in a separate window
+// contains also preparePrintFront call above
+#include <FL/Fl_Printer.H>
+#include <FL/Fl_Button.H>
+void printFront(Fl_Widget *o, void *data)
+{
+  Fl_Printer printer;
+  o->window()->hide();
+  Fl_Window *win = Fl::first_window();
+  if(!win) return;
+  int w, h;
+  if( printer.start_job(1) ) { o->window()->show(); return; }
+  if( printer.start_page() ) { o->window()->show(); return; }
+  printer.printable_rect(&w,&h);
+  // scale the printer device so that the window fits on the page
+  float scale = 1;
+  if (win->w() > w || win->h() > h) {
+    scale = (float)w/win->w();
+    if ((float)h/win->h() < scale) scale = (float)h/win->h();
+    printer.scale(scale, scale);
+  }
+// #define ROTATE 20.0
+#ifdef ROTATE
+  printer.scale(scale * 0.8, scale * 0.8);
+  printer.printable_rect(&w, &h);
+  printer.origin(w/2, h/2 );
+  printer.rotate(ROTATE);
+  printer.print_widget( win, - win->w()/2, - win->h()/2 );
+  //printer.print_window_part( win, 0,0, win->w(), win->h(), - win->w()/2, - win->h()/2 );
+#else
+  printer.print_widget( win );
+  //printer.print_window_part( win, 0,0, win->w(), win->h() );
+#endif
+  printer.end_page();
+  printer.end_job();
+  o->window()->show();
+}
+
+void preparePrintFront(void)
+{
+  static BOOL first=TRUE;
+  if(!first) return;
+  first=FALSE;
+  static Fl_Window w(0,0,120,30);
+  static Fl_Button b(0,0,w.w(),w.h(), "Print front window");
+  b.callback(printFront);
+  w.end();
+  w.show();
+}
+#endif // USE_PRINT_BUTTON
+
 #endif // FL_DOXYGEN
 
 //
-// End of "$Id: Fl_win32.cxx 6905 2009-09-27 12:06:35Z matt $".
+// End of "$Id: Fl_win32.cxx 7659 2010-07-01 13:21:32Z manolo $".
 //

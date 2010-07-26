@@ -1,5 +1,5 @@
 //
-// "$Id: Fl_mac.cxx 6905 2009-09-27 12:06:35Z matt $"
+// "$Id: Fl_mac.cxx 7351 2010-03-29 10:35:00Z matt $"
 //
 // MacOS specific code for the Fast Light Tool Kit (FLTK).
 //
@@ -44,7 +44,7 @@
 //          Quartz calls in the near future.
 
 // FIXME moving away from Carbon, I am replacing the Scrap manager calls with Pasteboard
-//       calls that support utf8 encoding. As soon as these unction haven proven working
+//       calls that support utf8 encoding. As soon as these function haven proven working
 //       the Scrap manager calls should be removed
 #define USE_PASTEBOARD 1
 
@@ -2442,10 +2442,8 @@ void Fl_Window::resize(int X,int Y,int W,int H) {
  */
 void Fl_Window::make_current() 
 {
-#ifdef __APPLE_QUARTZ__
   OSStatus err;
   Fl_X::q_release_context();
-#endif
   if ( !fl_window_region )
     fl_window_region = NewRgn();
   fl_window = i->xid;
@@ -2479,29 +2477,26 @@ void Fl_Window::make_current()
     DisposeRgn( r );
   }
  
-#ifdef __APPLE_QUARTZ__
   err = QDBeginCGContext(GetWindowPort(i->xid), &i->gc);
   if (err!=noErr) 
     fprintf(stderr, "Error %d in QDBeginCGContext\n", (int)err);
   fl_gc = i->gc;
   CGContextSaveGState(fl_gc);
   Fl_X::q_fill_context();
-#if defined(USE_CAIRO) && defined (__APPLE_QUARTZ__)
+#if defined(USE_CAIRO)
    if (Fl::cairo_autolink_context()) Fl::cairo_make_current(this); // capture gc changes automatically to update the cairo context adequately
 #endif
 
-#endif
   fl_clip_region( 0 );
   SetPortClipRegion( GetWindowPort(i->xid), fl_window_region );
 
-#if defined(__APPLE_QUARTZ__) && defined(USE_CAIRO)
+#if defined(USE_CAIRO)
   // update the cairo_t context
   if (Fl::cairo_autolink_context()) Fl::cairo_make_current(this);
 #endif
 }
 
 // helper function to manage the current CGContext fl_gc
-#ifdef __APPLE_QUARTZ__
 extern Fl_Color fl_color_;
 extern class Fl_Font_Descriptor *fl_fontsize;
 extern void fl_font(class Fl_Font_Descriptor*);
@@ -2545,7 +2540,7 @@ void Fl_X::q_release_context(Fl_X *x) {
       fprintf(stderr, "Error %d in QDEndCGContext\n", (int)err);
   }
   fl_gc = 0;
-#if defined(USE_CAIRO) && defined (__APPLE_QUARTZ__)
+#if defined(USE_CAIRO)
   if (Fl::cairo_autolink_context()) Fl::cairo_make_current((Fl_Window*) 0); // capture gc changes automatically to update the cairo context adequately
 #endif
 }
@@ -2568,8 +2563,6 @@ void Fl_X::q_begin_image(CGRect &rect, int cx, int cy, int w, int h) {
 void Fl_X::q_end_image() {
   CGContextRestoreGState(fl_gc);
 }
-
-#endif
 
 ////////////////////////////////////////////////////////////////
 // Copy & Paste fltk implementation.
@@ -2873,5 +2866,5 @@ void MacUnmapWindow(Fl_Window *w, WindowPtr p) {
 #endif // FL_DOXYGEN
 
 //
-// End of "$Id: Fl_mac.cxx 6905 2009-09-27 12:06:35Z matt $".
+// End of "$Id: Fl_mac.cxx 7351 2010-03-29 10:35:00Z matt $".
 //

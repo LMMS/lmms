@@ -1,5 +1,5 @@
 //
-// "$Id: Fl_Help_View.H 6743 2009-04-07 17:33:22Z AlbrechtS $"
+// "$Id: Fl_Help_View.H 7139 2010-02-23 15:55:22Z greg.ercolano $"
 //
 // Help Viewer widget definitions.
 //
@@ -147,6 +147,66 @@ struct Fl_Help_Target
   The Fl_Help_View widget displays HTML text. Most HTML 2.0
   elements are supported, as well as a primitive implementation of tables.
   GIF, JPEG, and PNG images are displayed inline.
+
+  Supported HTML tags:
+     - A: HREF/NAME
+     - B
+     - BODY: BGCOLOR/TEXT/LINK
+     - BR
+     - CENTER
+     - CODE
+     - DD
+     - DL
+     - DT
+     - EM
+     - FONT: COLOR/SIZE/FACE=(helvetica/arial/sans/times/serif/symbol/courier)
+     - H1/H2/H3/H4/H5/H6
+     - HEAD
+     - HR
+     - I
+     - IMG: SRC/WIDTH/HEIGHT/ALT
+     - KBD
+     - LI
+     - OL
+     - P
+     - PRE
+     - STRONG
+     - TABLE: TH/TD/TR/BORDER/BGCOLOR/COLSPAN/ALIGN=CENTER|RIGHT|LEFT
+     - TITLE
+     - TT
+     - U
+     - UL
+     - VAR
+
+  Supported color names:
+     - black,red,green,yellow,blue,magenta,fuchsia,cyan,aqua,white,gray,grey,lime,maroon,navy,olive,purple,silver,teal.
+
+  Supported urls:
+     - Internal: file:
+     - External: http: ftp: https: ipp: mailto: news:
+
+  Quoted char names:
+     - Aacute aacute Acirc acirc acute AElig aelig Agrave agrave amp Aring aring Atilde atilde Auml auml
+     - brvbar bull
+     - Ccedil ccedil cedil cent copy curren
+     - deg divide
+     - Eacute eacute Ecirc ecirc Egrave egrave ETH eth Euml euml euro
+     - frac12 frac14 frac34
+     - gt
+     - Iacute iacute Icirc icirc iexcl Igrave igrave iquest Iuml iuml
+     - laquo lt
+     - macr micro middot
+     - nbsp not Ntilde ntilde
+     - Oacute oacute Ocirc ocirc Ograve ograve ordf ordm Oslash oslash Otilde otilde Ouml ouml
+     - para premil plusmn pound
+     - quot
+     - raquo reg
+     - sect shy sup1 sup2 sup3 szlig
+     - THORN thorn times trade
+     - Uacute uacute Ucirc ucirc Ugrave ugrave uml Uuml uuml
+     - Yacute yacute
+     - yen Yuml yuml
+
 */
 class FL_EXPORT Fl_Help_View : public Fl_Group	// Help viewer widget
 {
@@ -334,5 +394,5 @@ public:
 #endif // !Fl_Help_View_H
 
 //
-// End of "$Id: Fl_Help_View.H 6743 2009-04-07 17:33:22Z AlbrechtS $".
+// End of "$Id: Fl_Help_View.H 7139 2010-02-23 15:55:22Z greg.ercolano $".
 //

@@ -1,5 +1,5 @@
 //
-// "$Id: Fl_Preferences.H 6770 2009-04-18 18:52:59Z matt $"
+// "$Id: Fl_Preferences.H 7672 2010-07-10 09:44:45Z matt $"
 //
 // Preferences .
 //
@@ -57,11 +57,11 @@
    yet exist.
    
    Entries can be of any length. However, the size of each
-   preferences file should be kept under 100k for performance
+   preferences file should be kept small for performance
    reasons. One application can have multiple preferences files.
    Extensive binary data however should be stored in separate
    files: see getUserdataPath().
-
+ 
    \note Starting with FLTK 1.3, preference databases are expected to 
    be in utf8 encoding. Previous databases were stored in the 
    current chracter set or code page which renders them incompatible
@@ -79,22 +79,57 @@ public:
     SYSTEM=0,   ///< Preferences are used system-wide
     USER        ///< Preferences apply only to the current user
   };
+  
+  /**
+   Every Fl_Preferences-Group has a uniqe ID.
+   
+   ID's can be retrieved from an Fl_Preferences-Group and can then be used
+   to create more Fl_Preference references to the same data set, as long as the 
+   database remains open.
+   */
+  typedef void *ID;
+  
+  static const char *newUUID();
 
   Fl_Preferences( Root root, const char *vendor, const char *application );
   Fl_Preferences( const char *path, const char *vendor, const char *application );
   Fl_Preferences( Fl_Preferences &parent, const char *group );
-  Fl_Preferences( Fl_Preferences*, const char *group );
+  Fl_Preferences( Fl_Preferences *parent, const char *group );
+  Fl_Preferences( Fl_Preferences &parent, int groupIndex );
+  Fl_Preferences( Fl_Preferences *parent, int groupIndex );
+  Fl_Preferences(const Fl_Preferences&);
+  Fl_Preferences( ID id );
   ~Fl_Preferences();
+  
+  /** Return an ID that can later be reused to open more references to this dataset.
+   */
+  ID id() { return (ID)node; }
+  
+  /** Remove the group with this ID from a database.
+   */
+  static char remove(ID id_) { return ((Node*)id_)->remove(); }
 
+  /** Return the name of this entry.
+   */
+  const char *name() { return node->name(); }
+  
+  /** Return the the full path to this entry.
+   */
+  const char *path() { return node->path(); }
+  
   int groups();
   const char *group( int num_group );
   char groupExists( const char *key );
   char deleteGroup( const char *group );
+  char deleteAllGroups();
 
   int entries();
   const char *entry( int index );
   char entryExists( const char *key );
   char deleteEntry( const char *entry );
+  char deleteAllEntries();
+  
+  char clear();
 
   char set( const char *entry, int value );
   char set( const char *entry, float value );
@@ -120,6 +155,8 @@ public:
 
   // char export( const char *filename, Type fileFormat );
   // char import( const char *filename );
+  
+  // char copyTo(class Fl_Tree*); // deprecated, use Fl_Tree::load(Fl_Preferences&)
 
   /**
      'Name' provides a simple method to create numerical or more complex 
@@ -157,30 +194,54 @@ public:
 
 private:
 
-  // make the following functions unavailable
-  Fl_Preferences(); 
-  Fl_Preferences(const Fl_Preferences&); 
+  Fl_Preferences() : node(0), rootNode(0) { }
   Fl_Preferences &operator=(const Fl_Preferences&);
 
   static char nameBuffer[128];
+  static char uuidBuffer[40];
+  static Fl_Preferences *runtimePrefs;
 
+  class RootNode;
+  
   class FL_EXPORT Node // a node contains a list to all its entries 
   {          // and all means to manage the tree structure
-    Node *child_, *next_, *parent_;
+    Node *child_, *next_;
+    union { // these two are mutually exclusive
+      Node *parent_;    // top_ bit clear
+      RootNode *root_;  // top_ bit set
+    };
     char *path_;
-    char dirty_;
+    Entry *entry_;
+    int nEntry_, NEntry_;
+    unsigned char dirty_:1;
+    unsigned char top_:1;
+    unsigned char indexed_:1;
+    // indexing routines
+    Node **index_;
+    int nIndex_, NIndex_;
+    void createIndex();
+    void updateIndex();
+    void deleteIndex();
+  public:
+    static int lastEntrySet;
   public:
     Node( const char *path );
     ~Node();
     // node methods
     int write( FILE *f );
+    const char *name();
+    const char *path() { return path_; }
     Node *find( const char *path );
     Node *search( const char *path, int offset=0 );
+    Node *childNode( int ix );
     Node *addChild( const char *path );
     void setParent( Node *parent );
-    Node *parent() { return parent_; }
+    Node *parent() { return top_?0L:parent_; }
+    void setRoot(RootNode *r) { root_ = r; top_ = 1; }
+    RootNode *findRoot();
     char remove();
     char dirty();
+    void deleteAllChildren();
     // entry methods
     int nChildren();
     const char *child( int ix );
@@ -190,10 +251,9 @@ private:
     const char *get( const char *name );
     int getEntry( const char *name );
     char deleteEntry( const char *name );
-    // public values
-    Entry *entry;
-    int nEntry, NEntry;
-    static int lastEntrySet;
+    void deleteAllEntries();
+    int nEntry() { return nEntry_; }
+    Entry &entry(int i) { return entry_[i]; }
   };
   friend class Node;
 
@@ -205,6 +265,7 @@ private:
   public:
     RootNode( Fl_Preferences *, Root root, const char *vendor, const char *application );
     RootNode( Fl_Preferences *, const char *path, const char *vendor, const char *application );
+    RootNode( Fl_Preferences * );
     ~RootNode();
     int read();
     int write();
@@ -212,14 +273,15 @@ private:
   };
   friend class RootNode;
 
+protected:
+  
   Node *node;
   RootNode *rootNode;
-  
 };
 
 
 #endif // !Fl_Preferences_H
 
 //
-// End of "$Id: Fl_Preferences.H 6770 2009-04-18 18:52:59Z matt $".
+// End of "$Id: Fl_Preferences.H 7672 2010-07-10 09:44:45Z matt $".
 //

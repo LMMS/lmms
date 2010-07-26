@@ -1,5 +1,5 @@
 //
-// "$Id: fl_font_mac.cxx 6779 2009-04-24 09:28:30Z yuri $"
+// "$Id: fl_font_mac.cxx 7659 2010-07-01 13:21:32Z manolo $"
 //
 // MacOS font selection routines for the Fast Light Tool Kit (FLTK).
 //
@@ -34,6 +34,7 @@ extern unsigned fl_utf8toUtf16(const char* src, unsigned srclen, unsigned short*
 #define check_default_font() {if (!fl_fontsize) fl_font(0, 12);}
 
 static const CGAffineTransform font_mx = { 1, 0, 0, -1, 0, 0 };
+static SInt32 MACsystemVersion = 0;
 
 Fl_Font_Descriptor::Fl_Font_Descriptor(const char* name, Fl_Fontsize Size) {
   next = 0;
@@ -46,8 +47,10 @@ Fl_Font_Descriptor::Fl_Font_Descriptor(const char* name, Fl_Fontsize Size) {
   q_name = strdup(name);
   size = Size;
   minsize = maxsize = Size;
-#if defined(__APPLE_COCOA__) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_5
-if(CTFontCreateWithName != NULL) {
+#if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_5
+  if(MACsystemVersion == 0) Gestalt(gestaltSystemVersion, &MACsystemVersion);
+
+if(MACsystemVersion >= 0x1050) {//unfortunately, CTFontCreateWithName != NULL on 10.4 also!
   CFStringRef str = CFStringCreateWithCString(NULL, name, kCFStringEncodingUTF8);
   fontref = CTFontCreateWithName(str, size, NULL);
   CGGlyph glyph[2];
@@ -58,11 +61,11 @@ if(CTFontCreateWithName != NULL) {
   CTFontGetAdvancesForGlyphs(fontref, kCTFontHorizontalOrientation, glyph, advances, 2);
   w = advances[0].width;
   if( abs(advances[0].width - advances[1].width) < 1E-2 ) {//this is a fixed-width font
-	//slightly rescale fixed-width fonts so the character width has an integral value
-	CFRelease(fontref);
-	CGFloat fsize = size / ( w/floor(w + 0.5) );
-	fontref = CTFontCreateWithName(str, fsize, NULL);
-	w = CTFontGetAdvancesForGlyphs(fontref, kCTFontHorizontalOrientation, glyph, NULL, 1);
+    //slightly rescale fixed-width fonts so the character width has an integral value
+    CFRelease(fontref);
+    CGFloat fsize = size / ( w/floor(w + 0.5) );
+    fontref = CTFontCreateWithName(str, fsize, NULL);
+    w = CTFontGetAdvancesForGlyphs(fontref, kCTFontHorizontalOrientation, glyph, NULL, 1);
   }
   CFRelease(str);
   ascent = (short)(CTFontGetAscent(fontref) + 0.5);
@@ -141,7 +144,7 @@ else {
   ATSUSetTransientFontMatching (layout, true);
 # endif
 #endif//__LP64__
-#if defined(__APPLE_COCOA__) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_5
+#if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_5
   }
 #endif
 }
@@ -164,8 +167,8 @@ Fl_Font_Descriptor::~Fl_Font_Descriptor() {
 #endif
   */
   if (this == fl_fontsize) fl_fontsize = 0;
-#if defined(__APPLE_COCOA__) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_5
-  if(CTFontCreateWithName != NULL)  CFRelease(fontref);
+#if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_5
+  if(MACsystemVersion >= 0x1050)  CFRelease(fontref);
 #else
 	/*  ATSUDisposeTextLayout(layout);
   ATSUDisposeStyle(style); */
@@ -214,11 +217,7 @@ Fl_Fontdesc* fl_fonts = built_in_table;
 
 void fl_font(Fl_Font_Descriptor* s) {
   fl_fontsize = s;
-#if defined(__APPLE_QUARTZ__)
   // we will use fl_fontsize later to access the required style and layout
-#else
-# error : need to defined either Quartz or Quickdraw
-#endif
 }
 
 static Fl_Font_Descriptor* find(Fl_Font fnum, Fl_Fontsize size) {
@@ -240,7 +239,7 @@ Fl_Font fl_font_ = 0;
 Fl_Fontsize fl_size_ = 0;
 
 
-void fl_font(Fl_Font fnum, Fl_Fontsize size) {
+void Fl_Graphics_Driver::font(Fl_Font fnum, Fl_Fontsize size) {
   if (fnum==-1) {
     fl_font_ = 0; 
     fl_size_ = 0;
@@ -271,8 +270,8 @@ double fl_width(const UniChar* txt, int n) {
     if (!fl_fontsize)
       return 8*n; // user must select a font first!
   }
-#if defined(__APPLE_COCOA__) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_5
-if(CTFontCreateWithName != NULL) {
+#if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_5
+if(MACsystemVersion >= 0x1050) {
   CTFontRef fontref = fl_fontsize->fontref;
   CFStringRef str = CFStringCreateWithBytes(NULL, (const UInt8*)txt, n * sizeof(UniChar), kCFStringEncodingUTF16, false);
   CFAttributedStringRef astr = CFAttributedStringCreate(NULL, str, NULL);
@@ -311,9 +310,10 @@ else {
   int len = FixedToInt(bAfter);
   return len;
 #endif
-#if defined(__APPLE_COCOA__) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_5
+#if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_5
   }
 #endif
+  return 0; // FIXME: I do not understand the shuffeling of the above ifdef's and why they are here!
 }
 
 double fl_width(const char* txt, int n) {
@@ -339,8 +339,8 @@ void fl_text_extents(const UniChar* txt, int n, int &dx, int &dy, int &w, int &h
       h = 8.0;
       return;
   }
-#if defined(__APPLE_COCOA__) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_5
-if(CTFontCreateWithName != NULL) {
+#if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_5
+if(MACsystemVersion >= 0x1050) {
   CTFontRef fontref = fl_fontsize->fontref;
   CFStringRef str16 = CFStringCreateWithBytes(NULL, (const UInt8*)txt, n *sizeof(UniChar), kCFStringEncodingUTF16, false);
   CFAttributedStringRef astr = CFAttributedStringCreate(NULL, str16, NULL);
@@ -387,7 +387,7 @@ else {
   dy = -bbox.bottom;
 //printf("r: %d l: %d t: %d b: %d w: %d h: %d\n", bbox.right, bbox.left, bbox.top, bbox.bottom, w, h);
 #endif
-#if defined(__APPLE_COCOA__) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_5
+#if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_5
   }
 #endif
   return;
@@ -402,49 +402,39 @@ void fl_text_extents(const char *c, int n, int &dx, int &dy, int &w, int &h) {
 
 void fl_draw(const char *str, int n, float x, float y);
 
-void fl_draw(const char* str, int n, int x, int y) {
-  fl_draw(str, n, (float)x-0.0f, (float)y-0.5f);
+void Fl_Graphics_Driver::draw(const char* str, int n, int x, int y) {
+  fl_draw(str, n, (float)x-0.0f, (float)y+0.5f);
 }
 
 
-#if defined(__APPLE_COCOA__)
-static unsigned fl_cmap[256] = {
-#include "fl_cmap.h" // this is a file produced by "cmap.cxx":
-};
-CGColorRef flcolortocgcolor(Fl_Color i)
+static CGColorRef flcolortocgcolor(Fl_Color i)
 {
-  int index;
   uchar r, g, b;
-  if (i & 0xFFFFFF00) {
-    // translate rgb colors into color index
-    r = i>>24;
-    g = i>>16;
-    b = i>> 8;
-  } else {
-    // translate index into rgb:
-    index = i;
-    unsigned c = fl_cmap[i];
-    r = c>>24;
-    g = c>>16;
-    b = c>> 8;
-  }
+  Fl::get_color(i, r, g, b);
   CGFloat components[4] = {r/255.0f, g/255.0f, b/255.0f, 1.};
-#if defined(__APPLE_COCOA__) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_4
-  return CGColorCreate(CGColorSpaceCreateWithName(kCGColorSpaceGenericRGB), components);
+  static CGColorSpaceRef cspace = NULL;
+  if(cspace == NULL) {
+#if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_4
+    cspace = CGColorSpaceCreateWithName(kCGColorSpaceGenericRGB);
 #else
-  return CGColorCreate(CGColorSpaceCreateWithName(kCGColorSpaceUserRGB), components);
+    cspace = CGColorSpaceCreateWithName(kCGColorSpaceUserRGB);
 #endif
+    }
+  return CGColorCreate(cspace, components);
 }
-#endif
 
 void fl_draw(const char *str, int n, float x, float y) {
   
+  if(fl_graphics_driver->type() != Fl_Quartz_Graphics_Driver::device_type) {
+    fl_graphics_driver->draw(str, n, (int)x, (int)y );
+    return;
+    }
   // avoid a crash if no font has been selected by user yet !
   check_default_font();
   // convert to UTF-16 first
   UniChar *uniStr = mac_Utf8_to_Utf16(str, n, &n);
-#if defined(__APPLE_COCOA__) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_5
-  if(CTFontCreateWithName != NULL) {
+#if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_5
+  if(MACsystemVersion >= 0x1050) {
     CFStringRef keys[2];
     CFTypeRef values[2];  
     CFStringRef str16 = CFStringCreateWithBytes(NULL, (const UInt8*)uniStr, n * sizeof(UniChar), kCFStringEncodingUTF16, false);
@@ -485,73 +475,27 @@ void fl_draw(const char *str, int n, float x, float y) {
   ATSUSetLayoutControls(layout, 1, &iTag, &iSize, &iValuePtr);
 
   err = ATSUSetTextPointerLocation(layout, uniStr, kATSUFromTextBeginning, n, n);
-#if defined(__APPLE_COCOA__)
   CGContextSetShouldAntialias(fl_gc, true);
-#endif
   err = ATSUDrawText(layout, kATSUFromTextBeginning, n, FloatToFixed(x), FloatToFixed(y));
-#if defined(__APPLE_COCOA__)
   CGContextSetShouldAntialias(fl_gc, false);
 #endif
-#endif
-#if defined(__APPLE_COCOA__) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_5
+#if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_5
   }
 #endif
 }
 
-void fl_draw(int angle, const char *str, int n, int x, int y) {
-#if defined(__APPLE_COCOA__)
+void Fl_Graphics_Driver::draw(int angle, const char *str, int n, int x, int y) {
   CGContextSaveGState(fl_gc);
   CGContextTranslateCTM(fl_gc, x, y);
   CGContextRotateCTM(fl_gc, - angle*(M_PI/180) );
   fl_draw(str, n, (float)0., (float)0.);
   CGContextRestoreGState(fl_gc);
-#else
-  OSStatus err;
-  // convert to UTF-16 first
-  UniChar *uniStr = mac_Utf8_to_Utf16(str, n, &n);
-  
-  // avoid a crash if no font has been selected by user yet !
-  check_default_font();
-  // now collect our ATSU resources
-  ATSUTextLayout layout = fl_fontsize->layout;
-
-  Fixed ang = IntToFixed(-angle);
-  ByteCount iSize[] = {sizeof(Fixed), sizeof(CGContextRef)};
-  ATSUAttributeTag iTag[] = {kATSULineRotationTag, kATSUCGContextTag};
-  ATSUAttributeValuePtr aAttr[] = { &ang,  &fl_gc};
-  ATSUSetLayoutControls(layout, 2, iTag, iSize, aAttr);
-
-  err = ATSUSetTextPointerLocation(layout, uniStr, kATSUFromTextBeginning, n, n);
-  err = ATSUDrawText(layout, kATSUFromTextBeginning, n, FloatToFixed(x), FloatToFixed(y));
-  //restore layout baseline
-  ang = IntToFixed(0);
-  ATSUSetLayoutControls(layout, 2, iTag, iSize, aAttr);
-#endif
 }
 
-void fl_rtl_draw(const char* c, int n, int x, int y) {
-#if defined(__APPLE_COCOA__)
-  fl_draw(c, n, x - fl_width(c, n), y); //to check;
-#else
-  // I guess with ATSU the thing to do is force the layout mode to RTL and let ATSU draw the text...
-  double offs = fl_width(c, n);
-  OSStatus err;
-  // convert to UTF-16 first
-  UniChar *uniStr = mac_Utf8_to_Utf16(c, n, &n);
-  // now collect our ATSU resources
-  ATSUTextLayout layout = fl_fontsize->layout;
-  // reverse the layout direction
-  ATSUAttributeTag llo = kATSURightToLeftBaseDirection; // layout option
-  ByteCount iSize[] = {sizeof(ATSUAttributeTag), sizeof(CGContextRef)};
-  ATSUAttributeTag iTag[] = {kATSULineDirectionTag, kATSUCGContextTag};
-  ATSUAttributeValuePtr aAttr[] = { &llo,  &fl_gc};
-  ATSUSetLayoutControls (layout, 2, iTag, iSize, aAttr );
-
-  err = ATSUSetTextPointerLocation(layout, uniStr, kATSUFromTextBeginning, n, n);
-  err = ATSUDrawText(layout, kATSUFromTextBeginning, n, FloatToFixed(x-offs), FloatToFixed(y));
-#endif
+void Fl_Graphics_Driver::rtl_draw(const char* c, int n, int x, int y) {
+  draw(c, n, x - fl_width(c, n), y);
 }
 
 //
-// End of "$Id: fl_font_mac.cxx 6779 2009-04-24 09:28:30Z yuri $".
+// End of "$Id: fl_font_mac.cxx 7659 2010-07-01 13:21:32Z manolo $".
 //

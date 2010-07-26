@@ -1,5 +1,5 @@
 //
-// "$Id: fl_boxtype.cxx 6902 2009-09-27 11:06:56Z matt $"
+// "$Id: fl_boxtype.cxx 7469 2010-04-07 23:17:33Z matt $"
 //
 // Box drawing code for the Fast Light Tool Kit (FLTK).
 //
@@ -399,14 +399,19 @@ void fl_draw_box(Fl_Boxtype t, int x, int y, int w, int h, Fl_Color c) {
 //extern Fl_Widget *fl_boxcheat; // hack set by Fl_Window.cxx
 /** Draws the widget box according its box style */
 void Fl_Widget::draw_box() const {
-  int t = box_;
-  if (!t) return;
-//   if (this == fl_boxcheat) {
-//     fl_boxcheat = 0;
-//     if (t == FL_FLAT_BOX) return;
-//     t += 2; // convert box to frame
-//   }
-  draw_box((Fl_Boxtype)t, x_, y_, w_, h_, color_);
+  if (box_) draw_box((Fl_Boxtype)box_, x_, y_, w_, h_, color_);
+  draw_backdrop();
+}
+/** If FL_ALIGN_IMAGE_BACKDROP is set, the image or deimage will be drawn */
+void Fl_Widget::draw_backdrop() const {
+  if (align() & FL_ALIGN_IMAGE_BACKDROP) {
+    const Fl_Image *img = image();
+    // if there is no image, we will not draw the deimage either
+    if (img && deimage() && !active_r())
+      img = deimage();
+    if (img) 
+      ((Fl_Image*)img)->draw(x_+(w_-img->w())/2, y_+(h_-img->h())/2);
+  }
 }
 /** Draws a box of type t, of color c at the widget's position and size. */
 void Fl_Widget::draw_box(Fl_Boxtype t, Fl_Color c) const {
@@ -420,5 +425,5 @@ void Fl_Widget::draw_box(Fl_Boxtype t, int X, int Y, int W, int H, Fl_Color c) c
 }
 
 //
-// End of "$Id: fl_boxtype.cxx 6902 2009-09-27 11:06:56Z matt $".
+// End of "$Id: fl_boxtype.cxx 7469 2010-04-07 23:17:33Z matt $".
 //

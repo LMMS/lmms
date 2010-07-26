@@ -1,5 +1,5 @@
 //
-// "$Id: filename_match.cxx 6716 2009-03-24 01:40:44Z fabien $"
+// "$Id: filename_match.cxx 7162 2010-02-26 21:10:46Z matt $"
 //
 // Pattern matching routines for the Fast Light Tool Kit (FLTK).
 //
@@ -40,6 +40,12 @@
     - {X|Y|Z} or {X,Y,Z} matches any one of the subexpressions literally.
     - \\x quotes the character x so it has no special meaning.
     - x all other characters must be matched exactly.
+
+    \b Include:
+    \code
+    #include <FL/filename.H>
+    \endcode
+
     \param[in] s the string to check for a match
     \param[in] p the string pattern 
     \return non zero if the string matches the pattern
@@ -108,6 +114,7 @@ int fl_filename_match(const char *s, const char *p) {
 
     case '\\':	// quote next character
       if (*p) p++;
+      /* FALLTHROUGH */
     default:
       if (tolower(*s) != tolower(*(p-1))) return 0;
       s++;
@@ -117,5 +124,5 @@ int fl_filename_match(const char *s, const char *p) {
 }
 
 //
-// End of "$Id: filename_match.cxx 6716 2009-03-24 01:40:44Z fabien $".
+// End of "$Id: filename_match.cxx 7162 2010-02-26 21:10:46Z matt $".
 //

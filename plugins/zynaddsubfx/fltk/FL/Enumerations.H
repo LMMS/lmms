@@ -1,5 +1,5 @@
 //
-// "$Id: Enumerations.H 6902 2009-09-27 11:06:56Z matt $"
+// "$Id: Enumerations.H 7476 2010-04-09 22:18:05Z matt $"
 //
 // Enumerations for the Fast Light Tool Kit (FLTK).
 //
@@ -618,6 +618,27 @@ extern Fl_Labeltype FL_EXPORT fl_define_FL_EMBOSSED_LABEL();
  *  inside the widget.
  *
  *  Flags can be or'd to achieve a combination of alignments.
+ *
+ *  Outside alignments:
+ *  \code
+ *             TOP_LEFT        TOP       TOP_RIGHT
+ *     LEFT_TOP+---------------------------------+RIGHT_TOP
+ *             |                                 |
+ *         LEFT|                                 |RIGHT
+ *             |                                 |
+ *  LEFT_BOTTOM+---------------------------------+RIGHT_BOTTOM
+ *             BOTTOM_RIGHT   BOTTOM   BOTTOM_LEFT
+ *
+ *  Inside alignments:
+ *  \code
+ *             +---------------------------------+
+ *             |TOP_LEFT       TOP      TOP_RIGHT|
+ *             |                                 |
+ *             |LEFT                        RIGHT|
+ *             |                                 |
+ *             |BOTTOM_RIGHT  BOTTOM  BOTTOM_LEFT|
+ *             +---------------------------------+
+ *  \endcode
  *  \see #FL_ALIGN_CENTER, etc.
  */
 typedef unsigned Fl_Align;
@@ -637,23 +658,32 @@ const Fl_Align FL_ALIGN_RIGHT		= (Fl_Align)8;
   /** Draw the label inside of the widget. */
 const Fl_Align FL_ALIGN_INSIDE		= (Fl_Align)16;
   /** If the label contains an image, draw the text on top of the image. */
-const Fl_Align FL_ALIGN_TEXT_OVER_IMAGE	= (Fl_Align)32;
+const Fl_Align FL_ALIGN_TEXT_OVER_IMAGE	= (Fl_Align)0x0020;
   /** If the label contains an image, draw the text below the image. */
-const Fl_Align FL_ALIGN_IMAGE_OVER_TEXT	= (Fl_Align)0;
+const Fl_Align FL_ALIGN_IMAGE_OVER_TEXT	= (Fl_Align)0x0000;
   /** All parts of the label that are lager than the widget will not be drawn . */
 const Fl_Align FL_ALIGN_CLIP		= (Fl_Align)64;
   /** Wrap text that does not fit the width of the widget. */
 const Fl_Align FL_ALIGN_WRAP		= (Fl_Align)128;
+  /** If the label contains an image, draw the text to the right of the image. */
+const Fl_Align FL_ALIGN_IMAGE_NEXT_TO_TEXT = (Fl_Align)0x0100;
+  /** If the label contains an image, draw the text to the left of the image. */
+const Fl_Align FL_ALIGN_TEXT_NEXT_TO_IMAGE = (Fl_Align)0x0120;
+/** If the label contains an image, draw the image or deimage in the backgroup. */
+const Fl_Align FL_ALIGN_IMAGE_BACKDROP  = (Fl_Align)0x0200;
 const Fl_Align FL_ALIGN_TOP_LEFT	= FL_ALIGN_TOP | FL_ALIGN_LEFT;
 const Fl_Align FL_ALIGN_TOP_RIGHT	= FL_ALIGN_TOP | FL_ALIGN_RIGHT;
 const Fl_Align FL_ALIGN_BOTTOM_LEFT	= FL_ALIGN_BOTTOM | FL_ALIGN_LEFT;
 const Fl_Align FL_ALIGN_BOTTOM_RIGHT	= FL_ALIGN_BOTTOM | FL_ALIGN_RIGHT;
-const Fl_Align FL_ALIGN_LEFT_TOP	= FL_ALIGN_TOP_LEFT;
-const Fl_Align FL_ALIGN_RIGHT_TOP	= FL_ALIGN_TOP_RIGHT;
-const Fl_Align FL_ALIGN_LEFT_BOTTOM	= FL_ALIGN_BOTTOM_LEFT;
-const Fl_Align FL_ALIGN_RIGHT_BOTTOM	= FL_ALIGN_BOTTOM_RIGHT;
+const Fl_Align FL_ALIGN_LEFT_TOP	= 0x0007; // magic value
+const Fl_Align FL_ALIGN_RIGHT_TOP	= 0x000b; // magic value
+const Fl_Align FL_ALIGN_LEFT_BOTTOM	= 0x000d; // magic value
+const Fl_Align FL_ALIGN_RIGHT_BOTTOM	= 0x000e; // magic value
 const Fl_Align FL_ALIGN_NOWRAP		= (Fl_Align)0; // for back compatability
+const Fl_Align FL_ALIGN_POSITION_MASK   = 0x000f; // left, right, top, bottom
+const Fl_Align FL_ALIGN_IMAGE_MASK      = 0x0320; // l/r, t/b, backdrop
 /*@}*/
+
 
 /** \name Font Numbers */
 /*@{*/
@@ -886,5 +916,5 @@ enum Fl_Damage {
 #endif
 
 //
-// End of "$Id: Enumerations.H 6902 2009-09-27 11:06:56Z matt $".
+// End of "$Id: Enumerations.H 7476 2010-04-09 22:18:05Z matt $".
 //

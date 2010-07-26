@@ -1,5 +1,5 @@
 //
-// "$Id: Fl_Bitmap.H 6614 2009-01-01 16:11:32Z matt $"
+// "$Id: Fl_Bitmap.H 7617 2010-05-27 17:20:18Z manolo $"
 //
 // Bitmap header file for the Fast Light Tool Kit (FLTK).
 //
@@ -40,25 +40,34 @@ struct Fl_Menu_Item;
   (bitmap) images. Images are drawn using the current color.
 */
 class FL_EXPORT Fl_Bitmap : public Fl_Image {
-  public:
+  friend class Fl_Quartz_Graphics_Driver;
+  friend class Fl_GDI_Graphics_Driver;
+  friend class Fl_Xlib_Graphics_Driver;
+public:
 
   /** pointer to raw bitmap data */
   const uchar *array;
   /** Non-zero if array points to bitmap data allocated internally */
   int alloc_array;
+  
+  private:
+
 #if defined(__APPLE__) || defined(WIN32)
   /** for internal use */
-  void *id;
+  void *id_;
 #else
   /** for internal use */
-  unsigned id;
+  unsigned id_;
 #endif // __APPLE__ || WIN32
+
+  public:
+
   /** The constructors create a new bitmap from the specified bitmap data */
   Fl_Bitmap(const uchar *bits, int W, int H) :
-    Fl_Image(W,H,0), array(bits), alloc_array(0), id(0) {data((const char **)&array, 1);}
+    Fl_Image(W,H,0), array(bits), alloc_array(0), id_(0) {data((const char **)&array, 1);}
   /** The constructors create a new bitmap from the specified bitmap data */
   Fl_Bitmap(const char *bits, int W, int H) :
-    Fl_Image(W,H,0), array((const uchar *)bits), alloc_array(0), id(0) {data((const char **)&array, 1);}
+    Fl_Image(W,H,0), array((const uchar *)bits), alloc_array(0), id_(0) {data((const char **)&array, 1);}
   virtual ~Fl_Bitmap();
   virtual Fl_Image *copy(int W, int H);
   Fl_Image *copy() { return copy(w(), h()); }
@@ -72,5 +81,5 @@ class FL_EXPORT Fl_Bitmap : public Fl_Image {
 #endif
 
 //
-// End of "$Id: Fl_Bitmap.H 6614 2009-01-01 16:11:32Z matt $".
+// End of "$Id: Fl_Bitmap.H 7617 2010-05-27 17:20:18Z manolo $".
 //

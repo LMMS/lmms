@@ -1,5 +1,5 @@
 //
-// "$Id: Fl_Menu.cxx 6841 2009-08-03 06:26:32Z AlbrechtS $"
+// "$Id: Fl_Menu.cxx 7151 2010-02-26 13:28:36Z matt $"
 //
 // Menu code for the Fast Light Tool Kit (FLTK).
 //
@@ -330,12 +330,24 @@ menuwindow::menuwindow(const Fl_Menu_Item* m, int X, int Y, int Wp, int Hp,
     if (hh+LEADING>itemheight) itemheight = hh+LEADING;
     if (m->flags&(FL_SUBMENU|FL_SUBMENU_POINTER)) w1 += 14;
     if (w1 > W) W = w1;
+    // calculate the maximum width of all shortcuts
     if (m->shortcut_) {
+      // s is a pointerto the utf8 string for the entire shortcut
+      // k points only to the key part (minus the modifier keys)
       const char *k, *s = fl_shortcut_label(m->shortcut_, &k);
-      w1 = int(fl_width(s, k-s));
-      if (w1 > hotModsw) hotModsw = w1;
-      w1 = int(fl_width(k))+4;
-      if (w1 > hotKeysw) hotKeysw = w1;
+      if (fl_utf_nb_char((const unsigned char*)k, strlen(k))<=4) {
+        // a regular shortcut has a right-justified modifier followed by a left-justified key
+        w1 = int(fl_width(s, k-s));
+        if (w1 > hotModsw) hotModsw = w1;
+        w1 = int(fl_width(k))+4;
+        if (w1 > hotKeysw) hotKeysw = w1;
+      } else {
+        // a shortcut with a long modifier is right-justified to the menu
+        w1 = int(fl_width(s))+4;
+        if (w1 > (hotModsw+hotKeysw)) {
+          hotModsw = w1-hotKeysw;
+        }
+      }
     }
     if (m->labelcolor_ || Fl::scheme() || m->labeltype_ > FL_NO_LABEL) clear_overlay();
   }
@@ -446,9 +458,15 @@ void menuwindow::drawentry(const Fl_Menu_Item* m, int n, int eraseit) {
     fl_font(f, m->labelsize_ ? m->labelsize_ :
                    button ? button->textsize() : FL_NORMAL_SIZE);
     const char *k, *s = fl_shortcut_label(m->shortcut_, &k);
-    char buf[32]; strcpy(buf, s); buf[k-s] = 0;
-    fl_draw(buf, xx, yy, ww-shortcutWidth, hh, FL_ALIGN_RIGHT);
-    fl_draw(  k, xx+ww-shortcutWidth, yy, shortcutWidth, hh, FL_ALIGN_LEFT);
+    if (fl_utf_nb_char((const unsigned char*)k, strlen(k))<=4) {
+      // righ-align the modifiers and left-align the key
+      char buf[32]; strcpy(buf, s); buf[k-s] = 0;
+      fl_draw(buf, xx, yy, ww-shortcutWidth, hh, FL_ALIGN_RIGHT);
+      fl_draw(  k, xx+ww-shortcutWidth, yy, shortcutWidth, hh, FL_ALIGN_LEFT);
+    } else {
+      // right-align to the menu
+      fl_draw(s, xx, yy, ww-4, hh, FL_ALIGN_RIGHT);
+    }
   }
 
   if (m->flags & FL_MENU_DIVIDER) {
@@ -1014,5 +1032,5 @@ const Fl_Menu_Item* Fl_Menu_Item::test_shortcut() const {
 }
 
 //
-// End of "$Id: Fl_Menu.cxx 6841 2009-08-03 06:26:32Z AlbrechtS $".
+// End of "$Id: Fl_Menu.cxx 7151 2010-02-26 13:28:36Z matt $".
 //

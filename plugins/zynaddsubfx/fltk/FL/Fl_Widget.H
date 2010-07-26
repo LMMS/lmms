@@ -1,5 +1,5 @@
 //
-// "$Id: Fl_Widget.H 6912 2009-10-02 19:08:55Z matt $"
+// "$Id: Fl_Widget.H 7661 2010-07-01 15:01:49Z manolo $"
 //
 // Widget header file for the Fast Light Tool Kit (FLTK).
 //
@@ -25,7 +25,7 @@
 //     http://www.fltk.org/str.php
 //
 
-/* \file
+/** \file
    Fl_Widget, Fl_Label classes . */
 
 #ifndef Fl_Widget_H
@@ -47,7 +47,6 @@ typedef void (Fl_Callback0)(Fl_Widget*);
 /** Callback type definition passing the widget and a long data value */
 typedef void (Fl_Callback1)(Fl_Widget*, long);
 
-
 /** This struct stores all information for a text or mixed graphics label.
 
     \todo For FLTK 1.3, the Fl_Label type will become a widget by itself. That way
@@ -62,14 +61,17 @@ struct FL_EXPORT Fl_Label {
   Fl_Image* image;
   /** optional image for a deactivated label */
   Fl_Image* deimage;
-  /** type of label. \see Fl_Labeltype */
-  uchar type;
   /** label font used in text */
   Fl_Font font;
   /** size of label font */
   Fl_Fontsize size;
   /** text color */
   Fl_Color color;
+  /** alignment of label */
+  Fl_Align align_;
+  /** type of label. \see Fl_Labeltype */
+  uchar type;
+
   /** Draws the label aligned to the given box */
   void draw(int,int,int,int, Fl_Align) const ;
   void measure(int &w, int &h) const ;
@@ -102,7 +104,6 @@ class FL_EXPORT Fl_Widget {
   uchar type_;
   uchar damage_;
   uchar box_;
-  Fl_Align align_:8;
   uchar when_;
 
   const char *tooltip_;
@@ -169,6 +170,7 @@ protected:
   void draw_box() const;
   void draw_box(Fl_Boxtype t, Fl_Color c) const;
   void draw_box(Fl_Boxtype t, int x,int y,int w,int h, Fl_Color c) const;
+  void draw_backdrop() const;
   /** draws a focus rectangle around the widget */
   void draw_focus() {draw_focus(box(),x(),y(),w(),h());}
   void draw_focus(Fl_Boxtype t, int x,int y,int w,int h) const;
@@ -329,7 +331,7 @@ public:
 	    Fl_Align is (typedef'd to be) "unsigned" (int), but Fl_Widget's
 	    "align_" member variable is a bit field of 8 bits only !
    */
-  Fl_Align align() const {return align_;}
+  Fl_Align align() const {return label_.align_;}
 
   /** Sets the label alignment.
       This controls how the label is displayed next to or inside the widget. 
@@ -338,7 +340,7 @@ public:
       \param[in] alignment new label alignment
       \see align(), Fl_Align
    */
-  void align(Fl_Align alignment) {align_ = alignment;}
+  void align(Fl_Align alignment) {label_.align_ = alignment;}
 
   /** Gets the box type of the widget.
       \return the current box type
@@ -496,6 +498,7 @@ public:
       \return the current image
    */
   Fl_Image* image() {return label_.image;}
+  const Fl_Image* image() const {return label_.image;}
 
   /** Sets the image to use as part of the widget label.
       This image is used when drawing the widget in the active state.
@@ -514,6 +517,7 @@ public:
       \return the current image for the deactivated widget
    */
   Fl_Image* deimage() {return label_.deimage;}
+  const Fl_Image* deimage() const {return label_.deimage;}
 
   /** Sets the image to use as part of the widget label.  
       This image is used when drawing the widget in the inactive state.
@@ -923,6 +927,29 @@ public:
    */
   Fl_Window* window() const ;
 
+  /** Returns an Fl_Group pointer if this widget is an Fl_Group.
+  
+      \retval NULL if this widget is not derived from Fl_Group.
+      \note This method is provided to avoid dynamic_cast.
+      \todo More documentation ...
+   */
+  virtual Fl_Group* as_group() {return 0;}
+
+  /** Returns an Fl_Window pointer if this widget is an Fl_Window.
+   
+   \retval NULL if this widget is not derived from Fl_Window.
+   \note This method is provided to avoid dynamic_cast.
+   \todo More documentation ...
+   */
+  virtual Fl_Window* as_window() {return 0;}
+  
+  /** Returns an Fl_Gl_Window pointer if this widget is an Fl_Gl_Window.   
+   \retval NULL if this widget is not derived from Fl_Gl_Window.
+   \note This method is provided to avoid dynamic_cast.
+   \todo More documentation ...
+   */
+  virtual class Fl_Gl_Window* as_gl_window() {return 0;}
+  
   /** For back compatibility only.
       \deprecated Use selection_color() instead.
   */
@@ -944,5 +971,5 @@ public:
 #endif
 
 //
-// End of "$Id: Fl_Widget.H 6912 2009-10-02 19:08:55Z matt $".
+// End of "$Id: Fl_Widget.H 7661 2010-07-01 15:01:49Z manolo $".
 //

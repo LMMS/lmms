@@ -1,5 +1,5 @@
 //
-// "$Id: win32.H 6614 2009-01-01 16:11:32Z matt $"
+// "$Id: win32.H 7671 2010-07-09 17:31:33Z manolo $"
 //
 // WIN32 header file for the Fast Light Tool Kit (FLTK).
 //
@@ -34,7 +34,6 @@
 #  error "Never use <FL/win32.H> directly; include <FL/x.H> instead."
 #endif // !Fl_X_H
 
-#include <winsock2.h>
 #include <windows.h>
 // In some of the distributions, the gcc header files are missing some stuff:
 #ifndef LPMINMAXINFO
@@ -46,15 +45,15 @@
 #define VK_APPS 0x5D
 #endif
 
+#include <FL/Fl_Device.H>
+
 // some random X equivalents
 typedef HWND Window;
 typedef POINT XPoint;
 struct XRectangle {int x, y, width, height;};
 typedef HRGN Fl_Region;
 FL_EXPORT void fl_clip_region(Fl_Region);
-inline Fl_Region XRectangleRegion(int x, int y, int w, int h) {
-    return CreateRectRgn(x,y,x+w,y+h);
-}
+extern Fl_Region XRectangleRegion(int x, int y, int w, int h);
 inline void XDestroyRegion(Fl_Region r) {DeleteObject(r);}
 inline void XClipBox(Fl_Region r,XRectangle* rect) {
     RECT win_rect; GetRgnBox(r,&win_rect);
@@ -122,16 +121,19 @@ extern FL_EXPORT void fl_save_dc( HWND w, HDC dc);
 
 // off-screen pixmaps: create, destroy, draw into, copy to window
 typedef HBITMAP Fl_Offscreen;
-#define fl_create_offscreen(w, h) CreateCompatibleBitmap(fl_gc, w, h)
+#define fl_create_offscreen(w, h) \
+  CreateCompatibleBitmap( (fl_gc ? fl_gc : fl_GetDC(0) ) , w, h)
 
 extern FL_EXPORT HDC fl_makeDC(HBITMAP);
 
 # define fl_begin_offscreen(b) \
    HDC _sgc=fl_gc; Window _sw=fl_window; \
+   Fl_Surface_Device *_ss = fl_surface; fl_display_device->set_current(); \
    fl_gc=fl_makeDC(b); int _savedc = SaveDC(fl_gc); fl_window=(HWND)b; fl_push_no_clip()
 
 # define fl_end_offscreen() \
-   fl_pop_clip(); RestoreDC(fl_gc, _savedc); DeleteDC(fl_gc); fl_window=_sw; fl_gc = _sgc
+   fl_pop_clip(); RestoreDC(fl_gc, _savedc); DeleteDC(fl_gc); _ss->set_current(); fl_window=_sw; fl_gc = _sgc
+   
 
 FL_EXPORT void fl_copy_offscreen(int x,int y,int w,int h,HBITMAP pixmap,int srcx,int srcy);
 FL_EXPORT void fl_copy_offscreen_with_alpha(int x,int y,int w,int h,HBITMAP pixmap,int srcx,int srcy);
@@ -150,5 +152,5 @@ inline void fl_open_callback(void (*)(const char *)) {}
 extern FL_EXPORT int fl_parse_color(const char* p, uchar& r, uchar& g, uchar& b);
 #endif // FL_DOXYGEN
 //
-// End of "$Id: win32.H 6614 2009-01-01 16:11:32Z matt $".
+// End of "$Id: win32.H 7671 2010-07-09 17:31:33Z manolo $".
 //

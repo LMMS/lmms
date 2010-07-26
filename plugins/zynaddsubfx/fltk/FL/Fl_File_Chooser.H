@@ -1,5 +1,5 @@
 //
-// "$Id: Fl_File_Chooser.H 6678 2009-03-13 23:36:09Z AlbrechtS $"
+// "$Id: Fl_File_Chooser.H 7007 2010-01-14 23:08:06Z greg.ercolano $"
 //
 // Fl_File_Chooser dialog for the Fast Light Tool Kit (FLTK).
 //
@@ -222,6 +222,7 @@ private:
   Fl_Widget* ext_group; 
 public:
   Fl_Widget* add_extra(Fl_Widget* gr);
+  Fl_File_Browser *browser(void) {return fileList; };
 };
 FL_EXPORT char *fl_dir_chooser(const char *message,const char *fname,int relative=0);
 FL_EXPORT char *fl_file_chooser(const char *message,const char *pat,const char *fname,int relative=0);
@@ -230,5 +231,5 @@ FL_EXPORT void fl_file_chooser_ok_label(const char*l);
 #endif
 
 //
-// End of "$Id: Fl_File_Chooser.H 6678 2009-03-13 23:36:09Z AlbrechtS $".
+// End of "$Id: Fl_File_Chooser.H 7007 2010-01-14 23:08:06Z greg.ercolano $".
 //

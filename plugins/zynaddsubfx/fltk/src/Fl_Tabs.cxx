@@ -1,5 +1,5 @@
 //
-// "$Id: Fl_Tabs.cxx 6616 2009-01-01 21:28:26Z matt $"
+// "$Id: Fl_Tabs.cxx 7162 2010-02-26 21:10:46Z matt $"
 //
 // Tab widget for the Fast Light Tool Kit (FLTK).
 //
@@ -151,6 +151,7 @@ int Fl_Tabs::handle(int event) {
     } else {
       if (Fl::event_y() < y()+h()+H) return Fl_Group::handle(event);
     }}
+    /* FALLTHROUGH */
   case FL_DRAG:
   case FL_RELEASE:
     o = which(Fl::event_x(), Fl::event_y());
@@ -161,8 +162,10 @@ int Fl_Tabs::handle(int event) {
         redraw_tabs();
       }
       if (o && value(o)) {
+        Fl_Widget_Tracker wp(o);
         set_changed();
 	do_callback();
+	if (wp.deleted()) return 1;
       }
       Fl_Tooltip::current(o);
     } else {
@@ -423,5 +426,5 @@ Fl_Tabs::Fl_Tabs(int X,int Y,int W, int H, const char *l) :
 }
 
 //
-// End of "$Id: Fl_Tabs.cxx 6616 2009-01-01 21:28:26Z matt $".
+// End of "$Id: Fl_Tabs.cxx 7162 2010-02-26 21:10:46Z matt $".
 //

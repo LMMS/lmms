@@ -1,5 +1,5 @@
 //
-// "$Id: Fl_Image.cxx 6804 2009-06-29 07:44:25Z AlbrechtS $"
+// "$Id: Fl_Image.cxx 7659 2010-07-01 13:21:32Z manolo $"
 //
 // Image drawing code for the Fast Light Tool Kit (FLTK).
 //
@@ -180,19 +180,19 @@ Fl_RGB_Image::~Fl_RGB_Image() {
 
 void Fl_RGB_Image::uncache() {
 #ifdef __APPLE_QUARTZ__
-  if (id) {
-    CGImageRelease((CGImageRef)id);
-    id = 0;
+  if (id_) {
+    CGImageRelease((CGImageRef)id_);
+    id_ = 0;
   }
 #else
-  if (id) {
-    fl_delete_offscreen((Fl_Offscreen)id);
-    id = 0;
+  if (id_) {
+    fl_delete_offscreen((Fl_Offscreen)id_);
+    id_ = 0;
   }
 
-  if (mask) {
-    fl_delete_bitmask((Fl_Bitmask)mask);
-    mask = 0;
+  if (mask_) {
+    fl_delete_bitmask((Fl_Bitmask)mask_);
+    mask_ = 0;
   }
 #endif
 }
@@ -375,7 +375,7 @@ void Fl_RGB_Image::desaturate() {
   d(new_d);
 }
 
-#if !defined(WIN32) && !USE_QUARTZ
+#if !defined(WIN32) && !defined(__APPLE_QUARTZ__)
 // Composite an image with alpha on systems that don't have accelerated
 // alpha compositing...
 static void alpha_blend(Fl_RGB_Image *img, int X, int Y, int W, int H, int cx, int cy) {
@@ -431,114 +431,149 @@ static void alpha_blend(Fl_RGB_Image *img, int X, int Y, int W, int H, int cx, i
 
   delete[] dst;
 }
-#endif // !WIN32 && !USE_QUARTZ
+#endif // !WIN32 && !__APPLE_QUARTZ__
 
 void Fl_RGB_Image::draw(int XP, int YP, int WP, int HP, int cx, int cy) {
-  // Don't draw an empty image...
-  if (!d() || !array) {
-    draw_empty(XP, YP);
-    return;
-  }
+  fl_graphics_driver->draw(this, XP, YP, WP, HP, cx, cy);
+}
 
+static int start(Fl_RGB_Image *img, int XP, int YP, int WP, int HP, int w, int h, int &cx, int &cy, 
+		 int &X, int &Y, int &W, int &H)
+{
   // account for current clip region (faster on Irix):
-  int X,Y,W,H; fl_clip_box(XP,YP,WP,HP,X,Y,W,H);
+  fl_clip_box(XP,YP,WP,HP,X,Y,W,H);
   cx += X-XP; cy += Y-YP;
   // clip the box down to the size of image, quit if empty:
   if (cx < 0) {W += cx; X -= cx; cx = 0;}
-  if (cx+W > w()) W = w()-cx;
-  if (W <= 0) return;
+  if (cx+W > w) W = w-cx;
+  if (W <= 0) return 1;
   if (cy < 0) {H += cy; Y -= cy; cy = 0;}
-  if (cy+H > h()) H = h()-cy;
-  if (H <= 0) return;
-  if (!id) {
-#ifdef __APPLE_QUARTZ__
+  if (cy+H > h) H = h-cy;
+  if (H <= 0) return 1;
+  return 0;
+}
+
+#ifdef __APPLE__
+void Fl_Quartz_Graphics_Driver::draw(Fl_RGB_Image *img, int XP, int YP, int WP, int HP, int cx, int cy) {
+  int X, Y, W, H;
+  // Don't draw an empty image...
+  if (!img->d() || !img->array) {
+    img->draw_empty(XP, YP);
+    return;
+  }
+  if (start(img, XP, YP, WP, HP, img->w(), img->h(), cx, cy, X, Y, W, H)) {
+    return;
+  }
+  if (!img->id_) {
     CGColorSpaceRef lut = 0;
-    if (d()<=2)
+    if (img->d()<=2)
       lut = CGColorSpaceCreateDeviceGray();
     else
       lut = CGColorSpaceCreateDeviceRGB();
-    CGDataProviderRef src = CGDataProviderCreateWithData( 0L, array, w()*h()*d(), 0L);
-    id = CGImageCreate( w(), h(), 8, d()*8, ld()?ld():w()*d(),
-        lut, (d()&1)?kCGImageAlphaNone:kCGImageAlphaLast,
-        src, 0L, false, kCGRenderingIntentDefault);
+    CGDataProviderRef src = CGDataProviderCreateWithData( 0L, img->array, img->w()*img->h()*img->d(), 0L);
+    img->id_ = CGImageCreate( img->w(), img->h(), 8, img->d()*8, img->ld()?img->ld():img->w()*img->d(),
+			lut, (img->d()&1)?kCGImageAlphaNone:kCGImageAlphaLast,
+			src, 0L, false, kCGRenderingIntentDefault);
     CGColorSpaceRelease(lut);
     CGDataProviderRelease(src);
+  }
+  if (img->id_ && fl_gc) {
+    CGRect rect = { { X, Y }, { W, H } };
+    Fl_X::q_begin_image(rect, cx, cy, img->w(), img->h());
+    CGContextDrawImage(fl_gc, rect, (CGImageRef)img->id_);
+    Fl_X::q_end_image();
+  }
+}
+
 #elif defined(WIN32)
-    id = fl_create_offscreen(w(), h());
-    if ((d() == 2 || d() == 4) && fl_can_do_alpha_blending()) {
-      fl_begin_offscreen((Fl_Offscreen)id);
-      fl_draw_image(array, 0, 0, w(), h(), d()|FL_IMAGE_WITH_ALPHA, ld());
+void Fl_GDI_Graphics_Driver::draw(Fl_RGB_Image *img, int XP, int YP, int WP, int HP, int cx, int cy) {
+  int X, Y, W, H;
+  // Don't draw an empty image...
+  if (!img->d() || !img->array) {
+    img->draw_empty(XP, YP);
+    return;
+  }
+  if (start(img, XP, YP, WP, HP, img->w(), img->h(), cx, cy, X, Y, W, H)) {
+    return;
+  }
+  if (!img->id_) {
+    img->id_ = fl_create_offscreen(img->w(), img->h());
+    if ((img->d() == 2 || img->d() == 4) && fl_can_do_alpha_blending()) {
+      fl_begin_offscreen((Fl_Offscreen)img->id_);
+      fl_draw_image(img->array, 0, 0, img->w(), img->h(), img->d()|FL_IMAGE_WITH_ALPHA, img->ld());
       fl_end_offscreen();
     } else {
-      fl_begin_offscreen((Fl_Offscreen)id);
-      fl_draw_image(array, 0, 0, w(), h(), d(), ld());
+      fl_begin_offscreen((Fl_Offscreen)img->id_);
+      fl_draw_image(img->array, 0, 0, img->w(), img->h(), img->d(), img->ld());
       fl_end_offscreen();
-      if (d() == 2 || d() == 4) {
-        mask = fl_create_alphamask(w(), h(), d(), ld(), array);
+      if (img->d() == 2 || img->d() == 4) {
+        img->mask_ = fl_create_alphamask(img->w(), img->h(), img->d(), img->ld(), img->array);
       }
     }
+  }
+  if (img->mask_) {
+    HDC new_gc = CreateCompatibleDC(fl_gc);
+    int save = SaveDC(new_gc);
+    SelectObject(new_gc, (void*)img->mask_);
+    BitBlt(fl_gc, X, Y, W, H, new_gc, cx, cy, SRCAND);
+    SelectObject(new_gc, (void*)img->id_);
+    BitBlt(fl_gc, X, Y, W, H, new_gc, cx, cy, SRCPAINT);
+    RestoreDC(new_gc,save);
+    DeleteDC(new_gc);
+  } else if (img->d()==2 || img->d()==4) {
+    fl_copy_offscreen_with_alpha(X, Y, W, H, (Fl_Offscreen)img->id_, cx, cy);
+  } else {
+    fl_copy_offscreen(X, Y, W, H, (Fl_Offscreen)img->id_, cx, cy);
+  }
+}
+
 #else
-    if (d() == 1 || d() == 3) {
-      id = fl_create_offscreen(w(), h());
-      fl_begin_offscreen((Fl_Offscreen)id);
-      fl_draw_image(array, 0, 0, w(), h(), d(), ld());
+void Fl_Xlib_Graphics_Driver::draw(Fl_RGB_Image *img, int XP, int YP, int WP, int HP, int cx, int cy) {
+  int X, Y, W, H;
+  // Don't draw an empty image...
+  if (!img->d() || !img->array) {
+    img->draw_empty(XP, YP);
+    return;
+  }
+  if (start(img, XP, YP, WP, HP, img->w(), img->h(), cx, cy, X, Y, W, H)) {
+    return;
+  }
+  if (!img->id_) {
+    if (img->d() == 1 || img->d() == 3) {
+      img->id_ = fl_create_offscreen(img->w(), img->h());
+      fl_begin_offscreen((Fl_Offscreen)img->id_);
+      fl_draw_image(img->array, 0, 0, img->w(), img->h(), img->d(), img->ld());
       fl_end_offscreen();
     }
-#endif
   }
-
-#if defined(USE_X11)
-  if (id) {
-    if (mask) {
+  if (img->id_) {
+    if (img->mask_) {
       // I can't figure out how to combine a mask with existing region,
       // so cut the image down to a clipped rectangle:
       int nx, ny; fl_clip_box(X,Y,W,H,nx,ny,W,H);
       cx += nx-X; X = nx;
       cy += ny-Y; Y = ny;
       // make X use the bitmap as a mask:
-      XSetClipMask(fl_display, fl_gc, mask);
-      int ox = X-cx; if (ox < 0) ox += w();
-      int oy = Y-cy; if (oy < 0) oy += h();
+      XSetClipMask(fl_display, fl_gc, img->mask_);
+      int ox = X-cx; if (ox < 0) ox += img->w();
+      int oy = Y-cy; if (oy < 0) oy += img->h();
       XSetClipOrigin(fl_display, fl_gc, X-cx, Y-cy);
     }
-
-    fl_copy_offscreen(X, Y, W, H, id, cx, cy);
-
-    if (mask) {
+    
+    fl_copy_offscreen(X, Y, W, H, img->id_, cx, cy);
+    
+    if (img->mask_) {
       // put the old clip region back
       XSetClipOrigin(fl_display, fl_gc, 0, 0);
       fl_restore_clip();
     }
   } else {
     // Composite image with alpha manually each time...
-    alpha_blend(this, X, Y, W, H, cx, cy);
+    alpha_blend(img, X, Y, W, H, cx, cy);
   }
-#elif defined(WIN32)
-  if (mask) {
-    HDC new_gc = CreateCompatibleDC(fl_gc);
-    int save = SaveDC(new_gc);
-    SelectObject(new_gc, (void*)mask);
-    BitBlt(fl_gc, X, Y, W, H, new_gc, cx, cy, SRCAND);
-    SelectObject(new_gc, (void*)id);
-    BitBlt(fl_gc, X, Y, W, H, new_gc, cx, cy, SRCPAINT);
-    RestoreDC(new_gc,save);
-    DeleteDC(new_gc);
-  } else if (d()==2 || d()==4) {
-    fl_copy_offscreen_with_alpha(X, Y, W, H, (Fl_Offscreen)id, cx, cy);
-  } else {
-    fl_copy_offscreen(X, Y, W, H, (Fl_Offscreen)id, cx, cy);
-  }
-#elif defined(__APPLE_QUARTZ__)
-  if (id && fl_gc) {
-    CGRect rect = { { X, Y }, { W, H } };
-    Fl_X::q_begin_image(rect, cx, cy, w(), h());
-    CGContextDrawImage(fl_gc, rect, (CGImageRef)id);
-    Fl_X::q_end_image();
-  }
-#else
-# error unsupported platform
-#endif
 }
+
+#endif
 
 void Fl_RGB_Image::label(Fl_Widget* widget) {
   widget->image(this);
@@ -551,5 +586,5 @@ void Fl_RGB_Image::label(Fl_Menu_Item* m) {
 
 
 //
-// End of "$Id: Fl_Image.cxx 6804 2009-06-29 07:44:25Z AlbrechtS $".
+// End of "$Id: Fl_Image.cxx 7659 2010-07-01 13:21:32Z manolo $".
 //

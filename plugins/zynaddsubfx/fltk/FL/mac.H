@@ -1,5 +1,5 @@
 //
-// "$Id: mac.H 6614 2009-01-01 16:11:32Z matt $"
+// "$Id: mac.H 7663 2010-07-01 16:51:28Z manolo $"
 //
 // Mac header file for the Fast Light Tool Kit (FLTK).
 //
@@ -38,7 +38,6 @@
 #include <Carbon/Carbon.h>
 #include <config.h>
 
-#ifdef __APPLE_COCOA__
 #ifndef MAC_OS_X_VERSION_10_3
 #define MAC_OS_X_VERSION_10_3 1030
 #endif
@@ -54,7 +53,6 @@
 #ifndef MAC_OS_X_VERSION_MAX_ALLOWED
 #define MAC_OS_X_VERSION_MAX_ALLOWED MAC_OS_X_VERSION_10_3
 #endif
-#endif //__APPLE_COCOA__
 
 #ifndef CGFLOAT_DEFINED //appears with 10.5 in CGBase.h
 #if defined(__LP64__) && __LP64__
@@ -62,7 +60,7 @@ typedef double CGFloat;
 #else
 typedef float CGFloat;
 #endif
-#endif //CGFLOAT_DEFINED
+#endif // CGFLOAT_DEFINED
 
 
 // Now make some fixes to the headers...
@@ -72,18 +70,18 @@ typedef float CGFloat;
 struct XPoint { int x, y; };
 struct XRectangle {int x, y, width, height;};
 
-#ifdef __APPLE_COCOA__
-
-typedef void *Window; //this is really a pter to the subclass FLWindow of NSWindow
-typedef struct flCocoaRegion{
+typedef void *Window; // this is really a pter to the subclass FLWindow of NSWindow
+typedef struct flCocoaRegion {
   int count;
   CGRect *rects;
 } *Fl_Region;  // a region is the union of a series of rectangles
+extern CGRect fl_cgrectmake_cocoa(int x, int y, int w, int h);
+
 inline Fl_Region XRectangleRegion(int x, int y, int w, int h) {
   Fl_Region R = (Fl_Region)malloc(sizeof(*R));
   R->count = 1;
   R->rects = (CGRect *)malloc(sizeof(CGRect));
-  *(R->rects) = CGRectMake(x, y, w - 1, h - 1);
+  *(R->rects) = fl_cgrectmake_cocoa(x, y, w, h);
   return R;
 }
 inline void XDestroyRegion(Fl_Region r) {
@@ -96,25 +94,6 @@ extern void *fl_default_cursor;
 extern void *fl_system_menu;
 typedef CGContextRef Fl_Offscreen;
 typedef CGImageRef Fl_Bitmask;
-
-#else
-
-typedef WindowRef Window;
-typedef RgnHandle Fl_Region;
-inline Fl_Region XRectangleRegion(int x, int y, int w, int h) {
-  Fl_Region R = NewRgn();
-  SetRectRgn(R, x, y, x+w, y+h);
-  return R;
-}
-inline void XDestroyRegion(Fl_Region r) {
-  DisposeRgn(r);
-}
-extern CursHandle fl_default_cursor;
-extern Handle fl_system_menu;
-typedef GWorldPtr Fl_Offscreen;
-typedef GWorldPtr Fl_Bitmask; // Carbon requires a 1-bit GWorld instead of a BitMap
-
-#endif
 
 void fl_clip_region(Fl_Region);
 
@@ -133,11 +112,7 @@ public:
   Fl_X *next;              // linked tree to support subwindows
   Fl_X *xidChildren, *xidNext; // more subwindow tree
   int wait_for_expose;
-#ifdef __APPLE_COCOA__
   void *cursor;			  // is really NSCursor*
-#else
-  CursHandle cursor;
-#endif
   static Fl_X* first;
   static Fl_X* i(const Fl_Window* w) {return w->i;}
   static int fake_X_wm(const Fl_Window*,int&,int&,int&,int&,int&);
@@ -145,10 +120,6 @@ public:
   void flush();
   // Quartz additions:
   CGContextRef gc;                 // graphics context (NULL when using QD)
-#ifndef __APPLE_COCOA__
-  static ATSUTextLayout atsu_layout; // windows share a global font
-  static ATSUStyle      atsu_style;
-#endif
   static void q_fill_context();    // fill a Quartz context with current FLTK state
   static void q_clear_clipping();  // remove all clipping from a Quartz context
   static void q_release_context(Fl_X *x=0); // free all resources associated with fl_gc
@@ -156,21 +127,14 @@ public:
   static void q_end_image();
 };
 
-#ifdef __APPLE_COCOA__
 extern void MacDestroyWindow(Fl_Window*,void *);
 extern void MacMapWindow(Fl_Window*,void *);
 extern void MacUnmapWindow(Fl_Window*,void *);
 extern WindowRef MACwindowRef(Fl_Window *w);
 extern Fl_Region MacRectRegionIntersect(Fl_Region current, int x,int y,int w, int h);
 extern void MacCollapseWindow(Window w);
-#else
-extern void MacDestroyWindow(Fl_Window*,WindowPtr);
-extern void MacMapWindow(Fl_Window*,WindowPtr);
-extern void MacUnmapWindow(Fl_Window*,WindowPtr);
-#endif
 
 extern int MacUnlinkWindow(Fl_X*,Fl_X*start=0L);
-extern void fl_open_callback(void (*cb)(const char *));
 
 inline Window fl_xid(const Fl_Window*w) 
 {
@@ -201,12 +165,30 @@ extern FL_EXPORT void fl_delete_bitmask(Fl_Bitmask bm);
 
 extern void fl_open_display();
 
-// Register a function for opening files via the finder...
-extern void fl_open_callback(void (*cb)(const char *));
-
 extern FL_EXPORT int fl_parse_color(const char* p, uchar& r, uchar& g, uchar& b);
 #endif // FL_DOXYGEN
+
+/** \defgroup group_macosx Mac OS X-specific functions
+ @{ */
+
+/** @brief Register a function called for each file dropped onto an application icon 
+ * \note  \#include <FL/x.H>
+ */
+extern void fl_open_callback(void (*cb)(const char *));
+
+/** 
+ * \brief Attaches a callback to the "About myprog" item of the system application menu.
+ * \note  \#include <FL/x.H>
+ *
+ * \param cb   a callback that will be called by "About myprog" menu item
+ *		   with NULL 1st argument.
+ * \param user_data   a pointer transmitted as 2nd argument to the callback.
+ * \param shortcut    optional shortcut to attach to the "About myprog" menu item (e.g., FL_META+'a')
+ */
+extern void fl_mac_set_about( Fl_Callback *cb, void *user_data, int shortcut = 0);
+/** @} */
+
 //
-// End of "$Id: mac.H 6614 2009-01-01 16:11:32Z matt $".
+// End of "$Id: mac.H 7663 2010-07-01 16:51:28Z manolo $".
 //
 

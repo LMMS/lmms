@@ -1,5 +1,5 @@
 //
-// "$Id: fl_show_colormap.cxx 6616 2009-01-01 21:28:26Z matt $"
+// "$Id: fl_show_colormap.cxx 7147 2010-02-25 23:29:42Z matt $"
 //
 // Colormap color selection dialog for the Fast Light Tool Kit (FLTK).
 //
@@ -82,7 +82,7 @@ void ColorMenu::draw() {
 }
 
 int ColorMenu::handle(int e) {
-  int c = which;
+  Fl_Color c = which;
   switch (e) {
   case FL_PUSH:
   case FL_DRAG: {
@@ -158,5 +158,5 @@ Fl_Color fl_show_colormap(Fl_Color oldcol) {
 }
 
 //
-// End of "$Id: fl_show_colormap.cxx 6616 2009-01-01 21:28:26Z matt $".
+// End of "$Id: fl_show_colormap.cxx 7147 2010-02-25 23:29:42Z matt $".
 //

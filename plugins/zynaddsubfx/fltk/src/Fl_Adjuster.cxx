@@ -1,5 +1,5 @@
 //
-// "$Id: Fl_Adjuster.cxx 6616 2009-01-01 21:28:26Z matt $"
+// "$Id: Fl_Adjuster.cxx 7115 2010-02-20 17:40:07Z AlbrechtS $"
 //
 // Adjuster widget for the Fast Light Tool Kit (FLTK).
 //
@@ -69,6 +69,7 @@ int Fl_Adjuster::handle(int event) {
   double v;
   int delta;
   int mx = Fl::event_x();
+  // Fl_Widget_Tracker wp(this);
   switch (event) {
     case FL_PUSH:
       if (Fl::visible_focus()) Fl::focus(this);
@@ -77,7 +78,10 @@ int Fl_Adjuster::handle(int event) {
 	drag = 3*(mx-x())/w() + 1;
       else
 	drag = 3-3*(Fl::event_y()-y()-1)/h();
-      handle_push();
+      { Fl_Widget_Tracker wp(this);
+	handle_push();
+	if (wp.deleted()) return 1;
+      }
       redraw();
       return 1;
     case FL_DRAG:
@@ -98,9 +102,9 @@ int Fl_Adjuster::handle(int event) {
 	  delta = 0;
       }
       switch (drag) {
-      case 3: v = increment(previous_value(), delta); break;
-      case 2: v = increment(previous_value(), delta*10); break;
-      default:v = increment(previous_value(), delta*100); break;
+	case 3: v = increment(previous_value(), delta); break;
+	case 2: v = increment(previous_value(), delta*10); break;
+	default:v = increment(previous_value(), delta*100); break;
       }
       handle_drag(soft() ? softclamp(v) : clamp(v));
       return 1;
@@ -109,11 +113,13 @@ int Fl_Adjuster::handle(int event) {
 	if (Fl::event_state()&0xF0000) delta = -10;
 	else delta = 10;
 	switch (drag) {
-	case 3: v = increment(previous_value(), delta); break;
-	case 2: v = increment(previous_value(), delta*10); break;
-	default:v = increment(previous_value(), delta*100); break;
+	  case 3: v = increment(previous_value(), delta); break;
+	  case 2: v = increment(previous_value(), delta*10); break;
+	  default:v = increment(previous_value(), delta*100); break;
 	}
+	Fl_Widget_Tracker wp(this);
 	handle_drag(soft() ? softclamp(v) : clamp(v));
+	if (wp.deleted()) return 1;
       }
       drag = 0;
       redraw();
@@ -172,5 +178,5 @@ Fl_Adjuster::Fl_Adjuster(int X, int Y, int W, int H, const char* l)
 }
 
 //
-// End of "$Id: Fl_Adjuster.cxx 6616 2009-01-01 21:28:26Z matt $".
+// End of "$Id: Fl_Adjuster.cxx 7115 2010-02-20 17:40:07Z AlbrechtS $".
 //

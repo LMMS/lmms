@@ -10,9 +10,11 @@ exceptions:
        a specific platform do not constitute a modified or
        derivative work.
 
-       The authors do request that such modifications be
-       contributed to the FLTK project - send all
-       contributions to "fltk-bugs@fltk.org".
+      The authors do request that such modifications be
+      contributed to the FLTK project - send all contributions
+      through the "Software Trouble Report" on the following page:
+ 
+           http://www.fltk.org/str.php
 
     2. Widgets that are subclassed from FLTK widgets do not
        constitute a derivative work.
