@@ -36,6 +36,7 @@
 #include <sys/types.h>
 #include "flstring.h"
 #ifdef WIN32
+#include <stdint.h>
 #  include <windows.h>
 #  include <shellapi.h>
 #else
@@ -124,7 +125,7 @@ fl_open_uri(const char *uri, char *msg, int msglen) {
 #ifdef WIN32
   if (msg) snprintf(msg, msglen, "open %s", uri);
 
-  return (int)ShellExecute(HWND_DESKTOP, "open", uri, NULL, NULL, SW_SHOW) > 32;
+  return (intptr_t)ShellExecute(HWND_DESKTOP, "open", uri, NULL, NULL, SW_SHOW) > 32;
 
 #elif defined(__APPLE__)
   char	*argv[3];			// Command-line arguments

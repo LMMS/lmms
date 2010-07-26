@@ -241,7 +241,7 @@ struct FL_EXPORT Fl_Menu_Item {
     and casting the long to a void* and may not be
     portable to some machines.
   */
-  long argument() const {return (long)user_data_;}
+  intptr_t argument() const {return (intptr_t)user_data_;}
   /**
     For convenience you can also define the callback as taking a long
     argument.  This is implemented by casting this to a Fl_Callback

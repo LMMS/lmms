@@ -37,6 +37,9 @@
 #define PREFETCH_READ(x)	PREFETCH_RW(x,0)
 #define PREFETCH_WRITE(x)	PREFETCH_RW(x,1)
 
+/* workaround for conflicting declarations in GCC and MinGW headers */
+#define _aligned_malloc __aligned_malloc
+#define _aligned_free __aligned_free
 
 #ifdef X86_OPTIMIZATIONS
 

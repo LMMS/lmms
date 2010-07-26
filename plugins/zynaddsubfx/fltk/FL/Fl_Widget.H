@@ -31,6 +31,8 @@
 #ifndef Fl_Widget_H
 #define Fl_Widget_H
 
+#include <stdint.h>
+
 #include "Enumerations.H"
 
 class Fl_Widget;
@@ -596,7 +598,7 @@ public:
 
   /** Gets the current user data (long) argument that is passed to the callback function.
    */
-  long argument() const {return (long)user_data_;}
+  intptr_t argument() const {return (intptr_t)user_data_;}
 
   /** Sets the current user data (long) argument that is passed to the callback function.
       \todo The user data value must be implemented using a \em union to avoid 
