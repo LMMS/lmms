@@ -1,7 +1,7 @@
 /*
  * text_float.cpp - class textFloat, a floating text-label
  *
- * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -22,7 +22,6 @@
  *
  */
 
-
 #include <QtCore/QTimer>
 #include <QtGui/QPainter>
 
@@ -35,8 +34,8 @@
 
 textFloat::textFloat() :
 	QWidget( engine::mainWindow(), Qt::ToolTip ),
-	m_title( "" ),
-	m_text( "" ),
+	m_title(),
+	m_text(),
 	m_pixmap()
 {
 	resize( 20, 20 );
@@ -137,9 +136,9 @@ void textFloat::paintEvent( QPaintEvent * _pe )
 	p.drawRect( 0, 0, rect().right(), rect().bottom() );
 
 	// small message?
-	if( m_title == "" )
+	if( m_title.isEmpty() )
 	{
-		p.drawText( 2, 10, m_text );
+		p.drawText( 2, p.fontMetrics().height()-2, m_text );
 	}
 	else
 	{
@@ -172,7 +171,7 @@ void textFloat::updateSize()
 {
 	QFontMetrics metrics( pointSize<8>( font() ) );
 	QRect textBound = metrics.boundingRect( m_text );
-	if( m_title != "" )
+	if( !m_title.isEmpty() )
 	{
 		QFont f = pointSize<8>( font() );
 		f.setBold( true );
@@ -181,13 +180,13 @@ void textFloat::updateSize()
 		{
 			textBound.setWidth( title_w );
 		}
-		textBound.setHeight( textBound.height() * 2 + 14 );
+		textBound.setHeight( textBound.height() * 2 + 8 );
 	}
 	if( m_pixmap.isNull() == false )
 	{
 		textBound.setWidth( textBound.width() + m_pixmap.width() + 10 );
 	}
-	resize( textBound.width() + 5, textBound.height()*3/4+2 );
+	resize( textBound.width() + 5, textBound.height()+2 );
 	//move( QPoint( parentWidget()->width() + 5, 5 ) );
 	update();
 }
