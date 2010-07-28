@@ -137,7 +137,7 @@ const char *Fl_Preferences::newUUID()
     b[5] = (unsigned char)(r>>8);
     b[6] = (unsigned char)(r>>16);
     b[7] = (unsigned char)(r>>24);
-    unsigned int a = (unsigned int)&t; // four more bytes
+    unsigned int a = (unsigned int)(intptr_t)&t; // four more bytes
     b[8] = (unsigned char)a;
     b[9] = (unsigned char)(a>>8);
     b[10] = (unsigned char)(a>>16);

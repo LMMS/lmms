@@ -1,4 +1,6 @@
 MINGW=/opt/mingw64
 export PATH=$PATH:$MINGW/bin
+export CFLAGS="-fno-tree-vectorize"
+export CXXFLAGS="$CFLAGS"
 cmake .. -DCMAKE_TOOLCHAIN_FILE=../cmake/modules/Win64Toolchain.cmake -DCMAKE_MODULE_PATH=`pwd`/../cmake/modules/
 
