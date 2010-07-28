@@ -27,12 +27,14 @@
 #include <Qt/QtXml>
 #include <QtCore/QTemporaryFile>
 #include <QtGui/QDropEvent>
+#include <QtGui/QGridLayout>
 #include <QtGui/QPushButton>
 
 #include "ResourceFileMapper.h"
 
 #include "ZynAddSubFx.h"
 #include "engine.h"
+#include "knob.h"
 #include "mmp.h"
 #include "InstrumentPlayHandle.h"
 #include "InstrumentTrack.h"
@@ -107,9 +109,24 @@ ZynAddSubFxInstrument::ZynAddSubFxInstrument(
 	Instrument( _instrumentTrack, &zynaddsubfx_plugin_descriptor ),
 	m_hasGUI( false ),
 	m_plugin( NULL ),
-	m_remotePlugin( NULL )
+	m_remotePlugin( NULL ),
+	m_portamentoModel( 0, 0, 127, 1, this, tr( "Portamento" ) ),
+	m_filterFreqModel( 64, 0, 127, 1, this, tr( "Filter Frequency" ) ),
+	m_filterQModel( 64, 0, 127, 1, this, tr( "Filter Cutoff" ) ),
+	m_bandwidthModel( 64, 0, 127, 1, this, tr( "Bandwidth" ) ),
+	m_fmGainModel( 127, 0, 127, 1, this, tr( "FM Gain" ) ),
+	m_resCenterFreqModel( 64, 0, 127, 1, this, tr( "Resonance Center Frequency" ) ),
+	m_resBandwidthModel( 64, 0, 127, 1, this, tr( "Resonance Bandwidth" ) )
 {
 	initPlugin();
+
+	connect( &m_portamentoModel, SIGNAL( dataChanged() ), this, SLOT( updatePortamento() ) );
+	connect( &m_filterFreqModel, SIGNAL( dataChanged() ), this, SLOT( updateFilterFreq() ) );
+	connect( &m_filterQModel, SIGNAL( dataChanged() ), this, SLOT( updateFilterQ() ) );
+	connect( &m_bandwidthModel, SIGNAL( dataChanged() ), this, SLOT( updateBandwidth() ) );
+	connect( &m_fmGainModel, SIGNAL( dataChanged() ), this, SLOT( updateFmGain() ) );
+	connect( &m_resCenterFreqModel, SIGNAL( dataChanged() ), this, SLOT( updateResCenterFreq() ) );
+	connect( &m_resBandwidthModel, SIGNAL( dataChanged() ), this, SLOT( updateResBandwidth() ) );
 
 	// now we need a play-handle which cares for calling play()
 	InstrumentPlayHandle * iph = new InstrumentPlayHandle( this );
@@ -264,7 +281,7 @@ void ZynAddSubFxInstrument::play( sampleFrame * _buf )
 
 
 bool ZynAddSubFxInstrument::handleMidiEvent( const midiEvent & _me,
-                                                const midiTime & _time )
+												const midiTime & _time )
 {
 	if( !isMuted() )
 	{
@@ -298,6 +315,24 @@ void ZynAddSubFxInstrument::reloadPlugin()
 	// and load the settings again
 	loadSettings( m.content() );
 }
+
+
+
+
+#define GEN_CC_SLOT(slotname,midictl,modelname)						\
+			void ZynAddSubFxInstrument::slotname()					\
+			{														\
+				sendControlChange( midictl, modelname.value() );	\
+			}
+
+
+GEN_CC_SLOT(updatePortamento,C_portamento,m_portamentoModel);
+GEN_CC_SLOT(updateFilterFreq,C_filtercutoff,m_filterFreqModel);
+GEN_CC_SLOT(updateFilterQ,C_filterq,m_filterQModel);
+GEN_CC_SLOT(updateBandwidth,C_bandwidth,m_bandwidthModel);
+GEN_CC_SLOT(updateFmGain,C_fmamp,m_fmGainModel);
+GEN_CC_SLOT(updateResCenterFreq,C_resonance_center,m_resCenterFreqModel);
+GEN_CC_SLOT(updateResBandwidth,C_resonance_bandwidth,m_resBandwidthModel);
 
 
 
@@ -342,6 +377,14 @@ void ZynAddSubFxInstrument::initPlugin()
 
 
 
+void ZynAddSubFxInstrument::sendControlChange( MidiControllers midiCtl, float value )
+{
+	handleMidiEvent( midiEvent( MidiControlChange, 0, midiCtl, (int) value ),
+						midiTime() );
+}
+
+
+
 PluginView * ZynAddSubFxInstrument::instantiateView( QWidget * _parent )
 {
 	return new ZynAddSubFxView( this, _parent );
@@ -362,10 +405,42 @@ ZynAddSubFxView::ZynAddSubFxView( Instrument * _instrument, QWidget * _parent ) 
 								"artwork" ) );
 	setPalette( pal );
 
+	QGridLayout * l = new QGridLayout( this );
+	l->setContentsMargins( 20, 80, 10, 10 );
+	l->setVerticalSpacing( 16 );
+	l->setHorizontalSpacing( 10 );
+
+	m_portamento = new knob( knobBright_26, this );
+	m_portamento->setHintText( tr( "Portamento:" ) + "", "" );
+	m_portamento->setLabel( tr( "PORT" ) );
+
+	m_filterFreq = new knob( knobBright_26, this );
+	m_filterFreq->setHintText( tr( "Filter Frequency:" ) + "", "" );
+	m_filterFreq->setLabel( tr( "FREQ" ) );
+
+	m_filterQ = new knob( knobBright_26, this );
+	m_filterQ->setHintText( tr( "Filter Cutoff:" ) + "", "" );
+	m_filterQ->setLabel( tr( "CUT" ) );
+
+	m_bandwidth = new knob( knobBright_26, this );
+	m_bandwidth->setHintText( tr( "Bandwidth:" ) + "", "" );
+	m_bandwidth->setLabel( tr( "BW" ) );
+
+	m_fmGain = new knob( knobBright_26, this );
+	m_fmGain->setHintText( tr( "FM Gain:" ) + "", "" );
+	m_fmGain->setLabel( tr( "FM GAIN" ) );
+
+	m_resCenterFreq = new knob( knobBright_26, this );
+	m_resCenterFreq->setHintText( tr( "Resonance center frequency:" ) + "", "" );
+	m_resCenterFreq->setLabel( tr( "RES CF" ) );
+
+	m_resBandwidth = new knob( knobBright_26, this );
+	m_resBandwidth->setHintText( tr( "Resonance bandwidth:" ) + "", "" );
+	m_resBandwidth->setLabel( tr( "RES BW" ) );
+
 	m_toggleUIButton = new QPushButton( tr( "Show GUI" ), this );
 	m_toggleUIButton->setCheckable( true );
 	m_toggleUIButton->setChecked( false );
-	m_toggleUIButton->setGeometry( 45, 80, 160, 24 );
 	m_toggleUIButton->setIcon( embed::getIconPixmap( "zoom" ) );
 	m_toggleUIButton->setFont( pointSize<8>( m_toggleUIButton->font() ) );
 	connect( m_toggleUIButton, SIGNAL( toggled( bool ) ), this,
@@ -373,7 +448,20 @@ ZynAddSubFxView::ZynAddSubFxView( Instrument * _instrument, QWidget * _parent ) 
 	m_toggleUIButton->setWhatsThis(
 		tr( "Click here to show or hide the graphical user interface "
 			"(GUI) of ZynAddSubFX." ) );
+
+	l->addWidget( m_toggleUIButton, 0, 0, 1, 4 );
+	l->setRowStretch( 1, 5 );
+	l->addWidget( m_portamento, 2, 0 );
+	l->addWidget( m_filterFreq, 2, 1 );
+	l->addWidget( m_filterQ, 2, 2 );
+	l->addWidget( m_bandwidth, 2, 3 );
+	l->addWidget( m_fmGain, 3, 0 );
+	l->addWidget( m_resCenterFreq, 3, 1 );
+	l->addWidget( m_resBandwidth, 3, 2 );
+	l->setRowStretch( 4, 10 );
+	l->setColumnStretch( 4, 10 );
 }
+
 
 
 
@@ -387,6 +475,17 @@ ZynAddSubFxView::~ZynAddSubFxView()
 
 void ZynAddSubFxView::modelChanged()
 {
+	ZynAddSubFxInstrument * m = castModel<ZynAddSubFxInstrument>();
+
+	// set models for controller knobs
+	m_portamento->setModel( &m->m_portamentoModel );
+	m_filterFreq->setModel( &m->m_filterFreqModel );
+	m_filterQ->setModel( &m->m_filterQModel );
+	m_bandwidth->setModel( &m->m_bandwidthModel );
+	m_fmGain->setModel( &m->m_fmGainModel );
+	m_resCenterFreq->setModel( &m->m_resCenterFreqModel );
+	m_resBandwidth->setModel( &m->m_resBandwidthModel );
+
 	toggleUI();
 }
 
