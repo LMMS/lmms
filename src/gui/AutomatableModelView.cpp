@@ -1,8 +1,8 @@
 /*
- * automatable_model_view.cpp - implementation of AutomatableModelView
+ * AutomatableModelView.cpp - implementation of AutomatableModelView
  *
- * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ * Copyright (c) 2008-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -21,7 +21,6 @@
  * Boston, MA 02110-1301 USA.
  *
  */
-
 
 #include <QtGui/QMenu>
 #include <QtGui/QMouseEvent>
@@ -69,6 +68,7 @@ void AutomatableModelView::addDefaultActions( QMenu * _menu )
 						_model->initValue<float>() ) ).
 				arg( m_unit ),
 					_model, SLOT( reset() ) );
+
 	_menu->addSeparator();
 	_menu->addAction( embed::getIconPixmap( "edit_copy" ),
 			AutomatableModel::tr( "&Copy value (%1%2)" ).
@@ -90,6 +90,14 @@ void AutomatableModelView::addDefaultActions( QMenu * _menu )
 					amvSlots,
 					SLOT( editSongGlobalAutomation() ) );
 	_menu->addSeparator();
+
+	if( _model->hasLinkedModels() )
+	{
+		_menu->addAction( embed::getIconPixmap( "edit-delete" ),
+							AutomatableModel::tr( "Remove all linked controls" ),
+							amvSlots, SLOT( unlinkAllModels() ) );
+		_menu->addSeparator();
+	}
 
 	QString controllerTxt;
 	if( _model->getControllerConnection() )
@@ -254,6 +262,15 @@ void AutomatableModelViewSlots::editSongGlobalAutomation()
 {
 	automationPattern::globalAutomationPattern( amv->modelUntyped() )->
 						openInAutomationEditor();
+}
+
+
+
+
+void AutomatableModelViewSlots::unlinkAllModels()
+{
+	AutomatableModel * m = amv->modelUntyped();
+	m->unlinkAllModels();
 }
 
 

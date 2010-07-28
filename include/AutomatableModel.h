@@ -1,7 +1,7 @@
 /*
  * AutomatableModel.h - declaration of class AutomatableModel
  *
- * Copyright (c) 2007-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2007-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -180,6 +180,8 @@ public:
 	static void unlinkModels( AutomatableModel * _m1,
 						AutomatableModel * _m2 );
 
+	void unlinkAllModels( );
+
 	virtual void saveSettings( QDomDocument & _doc,
 					QDomElement & _this,
 				const QString & _name = QString( "value" ) );
@@ -210,6 +212,8 @@ public:
 
 	inline bool armed(){ return m_armed; }
 	inline void setArmed( bool _armed ){ m_armed = _armed; }
+
+	inline bool hasLinkedModels() { return m_hasLinkedModels; }
 
 
 public slots:
@@ -289,7 +293,7 @@ class FloatModel : public AutomatableModel
 public:
 	FloatModel( float _val = 0, float _min = 0, float _max = 0,
 			float _step = 0, ::Model * _parent = NULL,
-			const QString & _display_name  = QString(),
+			const QString & _display_name = QString(),
 			bool _default_constructed = false ) :
 		AutomatableModel( Float, _val, _min, _max, _step,
 				_parent, _display_name, _default_constructed )
@@ -306,7 +310,7 @@ class IntModel : public AutomatableModel
 public:
 	IntModel( int _val = 0, int _min = 0, int _max = 0,
 			::Model * _parent = NULL,
-			const QString & _display_name  = QString(),
+			const QString & _display_name = QString(),
 			bool _default_constructed = false ) :
 		AutomatableModel( Integer, _val, _min, _max, 1,
 				_parent, _display_name, _default_constructed )
@@ -322,7 +326,7 @@ class BoolModel : public AutomatableModel
 {
 public:
 	BoolModel( const bool _val = false, ::Model * _parent = NULL,
-				const QString & _display_name  = QString(),
+				const QString & _display_name = QString(),
 				bool _default_constructed = false ) : 
 		AutomatableModel( Bool, _val, false, true, 1,
 				_parent, _display_name, _default_constructed )

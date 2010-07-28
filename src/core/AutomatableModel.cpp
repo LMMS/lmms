@@ -1,7 +1,7 @@
 /*
  * AutomatableModel.cpp - some implementations of AutomatableModel-class
  *
- * Copyright (c) 2008-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -248,7 +248,7 @@ void AutomatableModel::setAutomatedValue( const float _value )
 void AutomatableModel::setRange( const float _min, const float _max,
 							const float _step )
 {
-        if( ( m_maxValue != _max ) || ( m_minValue != _min ) )
+	if( ( m_maxValue != _max ) || ( m_minValue != _min ) )
 	{
 		m_minValue = _min;
 		m_maxValue = _max;
@@ -418,6 +418,20 @@ void AutomatableModel::unlinkModels( AutomatableModel * _model1,
 {
 	_model1->unlinkModel( _model2 );
 	_model2->unlinkModel( _model1 );
+}
+
+
+
+
+void AutomatableModel::unlinkAllModels()
+
+{
+	AutomatableModel * _model;
+	foreach( _model, m_linkedModels )
+	{
+		unlinkModels( this, _model );
+	}
+	m_hasLinkedModels = false;
 }
 
 
