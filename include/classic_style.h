@@ -26,11 +26,13 @@
 #ifndef _CLASSIC_STYLE_H
 #define _CLASSIC_STYLE_H
 
-#include <QtGui/QPlastiqueStyle>
+#include <QtGui/QStyle>
+
 #include "lmms_style.h"
 
 
-class ClassicStyle : public QPlastiqueStyle, public LmmsStyle
+template<class BaseStyle>
+class ClassicStyle : public BaseStyle, public LmmsStyle
 {
 public:
 	ClassicStyle();
@@ -43,16 +45,18 @@ public:
 	virtual QPalette standardPalette() const;
 
 	virtual void drawComplexControl(
-				ComplexControl control,
+				QStyle::ComplexControl control,
 				const QStyleOptionComplex * option,
 					QPainter *painter,
 						const QWidget *widget ) const;
-	virtual void drawPrimitive( PrimitiveElement element,
+	virtual void drawPrimitive(
+					QStyle::PrimitiveElement element,
 					const QStyleOption *option,
 					QPainter *painter,
 					const QWidget *widget = 0 ) const;
 
-	virtual int pixelMetric( PixelMetric metric,
+	virtual int pixelMetric(
+					QStyle::PixelMetric metric,
 					const QStyleOption * option = 0,
 					const QWidget * widget = 0 ) const;
 
@@ -69,11 +73,14 @@ public:
 	virtual void drawTrackContentObject( QPainter * _painter, const trackContentObject * _model,
 			const LmmsStyleOptionTCO * _options );
 
-	private:
+private:
 	QImage colorizeXpm( const char * const * xpm, const QBrush & fill ) const;
 
 	QColor colors[LmmsStyle::NumColorRoles];
 
 };
+
+
+QPair<QStyle *, LmmsStyle *> classicStyleSpecializationForBaseStyle( QStyle * baseStyle );
 
 #endif

@@ -41,8 +41,10 @@
 
 
 
-ClassicStyle::ClassicStyle() :
-	QPlastiqueStyle(), LmmsStyle()
+template<class BaseStyle>
+ClassicStyle<BaseStyle>::ClassicStyle() :
+	BaseStyle(),
+	LmmsStyle()
 {
 	QFile file( "resources:style.css" );
 	file.open( QIODevice::ReadOnly );
@@ -81,16 +83,18 @@ ClassicStyle::ClassicStyle() :
 
 
 
-QColor ClassicStyle::color( LmmsStyle::ColorRole _role ) const
+template<class BaseStyle>
+QColor ClassicStyle<BaseStyle>::color( LmmsStyle::ColorRole _role ) const
 {
 	return colors[_role];
 }
 
 
 
-QPalette ClassicStyle::standardPalette() const
+template<class BaseStyle>
+QPalette ClassicStyle<BaseStyle>::standardPalette() const
 {
-	QPalette pal = QPlastiqueStyle::standardPalette();
+	QPalette pal = BaseStyle::standardPalette();
 	pal.setColor( QPalette::Background, QColor( 72, 76, 88 ) );
 	pal.setColor( QPalette::WindowText, QColor( 240, 240, 240 ) );
 	pal.setColor( QPalette::Base, QColor( 128, 128, 128 ) );
@@ -107,13 +111,15 @@ QPalette ClassicStyle::standardPalette() const
 
 
 
-void ClassicStyle::drawComplexControl( ComplexControl control,
+template<class BaseStyle>
+void ClassicStyle<BaseStyle>::drawComplexControl(
+				QStyle::ComplexControl control,
 				const QStyleOptionComplex * option,
 				QPainter *painter,
 				const QWidget *widget ) const
 {
 	// fix broken titlebar styling on win32
-	if( control == CC_TitleBar )
+	if( control == QStyle::CC_TitleBar )
 	{
 		const QStyleOptionTitleBar * titleBar =
 			qstyleoption_cast<const QStyleOptionTitleBar *>(option );
@@ -122,23 +128,25 @@ void ClassicStyle::drawComplexControl( ComplexControl control,
 			QStyleOptionTitleBar so( *titleBar );
 			so.palette = standardPalette();
 			so.palette.setColor( QPalette::HighlightedText,
-				( titleBar->titleBarState & State_Active ) ?
+				( titleBar->titleBarState & QStyle::State_Active ) ?
 					QColor( 255, 255, 255 ) :
 						QColor( 192, 192, 192 ) );
 			so.palette.setColor( QPalette::Text,
 							QColor( 64, 64, 64 ) );
-			QPlastiqueStyle::drawComplexControl( control, &so,
+			BaseStyle::drawComplexControl( control, &so,
 							painter, widget );
 			return;
 		}
 	}
-	QPlastiqueStyle::drawComplexControl( control, option, painter, widget );
+	BaseStyle::drawComplexControl( control, option, painter, widget );
 }
 
 
 
 
-void ClassicStyle::drawPrimitive( PrimitiveElement element,
+template<class BaseStyle>
+void ClassicStyle<BaseStyle>::drawPrimitive(
+				QStyle::PrimitiveElement element,
 				const QStyleOption *option,
 				QPainter *painter,
 				const QWidget *widget ) const
@@ -244,13 +252,15 @@ void ClassicStyle::drawPrimitive( PrimitiveElement element,
 	}
 	else
 	{
-		QPlastiqueStyle::drawPrimitive( element, option, painter, widget );
+		BaseStyle::drawPrimitive( element, option, painter, widget );
 	}
 
 }
 
 
-int ClassicStyle::pixelMetric( PixelMetric _metric,
+template<class BaseStyle>
+int ClassicStyle<BaseStyle>::pixelMetric(
+				QStyle::PixelMetric _metric,
 				const QStyleOption * _option,
 				const QWidget * _widget ) const
 {
@@ -272,13 +282,14 @@ int ClassicStyle::pixelMetric( PixelMetric _metric,
 			return 24;
 
 		default:
-			return QPlastiqueStyle::pixelMetric(
+			return BaseStyle::pixelMetric(
 					_metric, _option, _widget );
 	}
 }
 
 
-void ClassicStyle::drawFxLine( QPainter * _painter, const QWidget *_fxLine,
+template<class BaseStyle>
+void ClassicStyle<BaseStyle>::drawFxLine( QPainter * _painter, const QWidget *_fxLine,
 				const QString & _name, bool _active, bool _sendToThis )
 {
 	int width = _fxLine->rect().width();
@@ -307,7 +318,10 @@ void ClassicStyle::drawFxLine( QPainter * _painter, const QWidget *_fxLine,
 	p->drawText( -145, 20, _name );
 }
 
-void ClassicStyle::drawTrackContentBackground(QPainter * _painter,
+
+
+template<class BaseStyle>
+void ClassicStyle<BaseStyle>::drawTrackContentBackground(QPainter * _painter,
         const QSize & _size, const int _pixelsPerTact)
 {
     const int w = _size.width();
@@ -348,7 +362,8 @@ void ClassicStyle::drawTrackContentBackground(QPainter * _painter,
 
 
 
-void ClassicStyle::drawTrackContentObject( QPainter * _painter,
+template<class BaseStyle>
+void ClassicStyle<BaseStyle>::drawTrackContentObject( QPainter * _painter,
 		const trackContentObject * _model, const LmmsStyleOptionTCO * _option )
 {
 	QRectF rc = _option->rect.adjusted( 0, 2, 0, -2 );
@@ -610,4 +625,48 @@ void ClassicStyle::drawTrackContentObject( QPainter * _painter,
 	}
 	_painter->setRenderHint( QPainter::Antialiasing, true );
 }
+
+
+
+
+#include <QtGui/QPlastiqueStyle>
+#ifdef LMMS_BUILD_LINUX
+#include <QtGui/QCleanlooksStyle>
+#include <QtGui/QGtkStyle>
+#endif
+#ifdef LMMS_BUILD_APPLE
+#include <QtGui/QMacStyle>
+#endif
+#ifdef LMMS_BUILD_WIN32
+#include <QtGui/QWindowsXPStyle>
+#include <QtGui/QWindowsVistaStyle>
+#endif
+
+
+QPair<QStyle *, LmmsStyle *> classicStyleSpecializationForBaseStyle( QStyle * baseStyle )
+{
+#define CHECK_AND_INSTANTIATE_STYLE(s)					\
+	if( qobject_cast<s *>( baseStyle ) )				\
+	{													\
+		ClassicStyle<s> * style = new ClassicStyle<s>;	\
+		return qMakePair<QStyle *, LmmsStyle *>( style, style );\
+	}
+
+#ifdef LMMS_BUILD_LINUX
+	CHECK_AND_INSTANTIATE_STYLE(QCleanlooksStyle);
+	CHECK_AND_INSTANTIATE_STYLE(QGtkStyle);
+#endif
+#ifdef LMMS_BUILD_APPLE
+	CHECK_AND_INSTANTIATE_STYLE(QMacStyle);
+#endif
+#ifdef LMMS_BUILD_WIN32
+	CHECK_AND_INSTANTIATE_STYLE(QWindowsXPStyle);
+	CHECK_AND_INSTANTIATE_STYLE(QWindowsVistaStyle);
+#endif
+
+	typedef QPlastiqueStyle DefaultBaseStyle;
+	ClassicStyle<DefaultBaseStyle> * style = new ClassicStyle<DefaultBaseStyle>;
+	return qMakePair<QStyle *, LmmsStyle *>( style, style );
+}
+
 
