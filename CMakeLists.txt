@@ -453,6 +453,7 @@ IF(LMMS_BUILD_WIN32)
 					${MINGW_PREFIX}/bin/SDL.dll
 					${MINGW_PREFIX}/bin/libglib-2.0-0.dll
 					${MINGW_PREFIX}/bin/libgthread-2.0-0.dll
+					${MINGW_PREFIX}/bin/zlib1.dll
 				DESTINATION .)
 
 ELSE(LMMS_BUILD_WIN32)
