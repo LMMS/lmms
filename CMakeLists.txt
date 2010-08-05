@@ -653,8 +653,8 @@ IF(VERSION_SUFFIX)
 ENDIF(VERSION_SUFFIX)
 SET(CPACK_PACKAGE_INSTALL_DIRECTORY "LMMS ${VERSION}")
 IF(WIN32)
-SET(CPACK_PACKAGE_ICON "${CMAKE_SOURCE_DIR}/data\\\\nsis_branding.bmp")
-SET(CPACK_NSIS_MUI_ICON "${CMAKE_SOURCE_DIR}/data\\\\lmms.ico")
+SET(CPACK_PACKAGE_ICON "${CMAKE_SOURCE_DIR}/data/nsis_branding.bmp")
+SET(CPACK_NSIS_MUI_ICON "${CMAKE_SOURCE_DIR}/data/lmms.ico")
 SET(CPACK_NSIS_INSTALLED_ICON_NAME "lmms.exe")
 SET(CPACK_NSIS_DISPLAY_NAME "Linux MultiMedia Studio (LMMS)")
 SET(CPACK_NSIS_HELP_LINK "http:\\\\\\\\lmms.sourceforge.net")
@@ -662,10 +662,26 @@ SET(CPACK_NSIS_URL_INFO_ABOUT "http:\\\\\\\\lmms.sourceforge.net")
 SET(CPACK_NSIS_CONTACT "lmms-devel@lists.sourceforge.net")
 SET(CPACK_PACKAGE_EXECUTABLES "lmms.exe;Linux MultiMedia Studio")
 SET(CPACK_NSIS_MENU_LINKS "lmms.exe;Linux MultiMedia Studio")
+SET(CPACK_NSIS_DEFINES "!include ${CMAKE_SOURCE_DIR}/cmake/nsis/FileAssociation.nsh")
+SET(CPACK_PACKAGE_FILE_NAME "lmms-${VERSION}-win32")
+SET(CPACK_NSIS_EXTRA_INSTALL_COMMANDS "
+  \\\${registerExtension} \\\"$INSTDIR\\\\lmms.exe\\\" \\\".mmp\\\" \\\"LMMS Project\\\"
+  \\\${registerExtension} \\\"$INSTDIR\\\\lmms.exe\\\" \\\".mmpz\\\" \\\"LMMS Project (compressed)\\\"
+  ")
+SET(CPACK_NSIS_EXTRA_UNINSTALL_COMMANDS "
+  \\\${unregisterExtension} \\\".mmp\\\" \\\"LMMS Project\\\"
+  \\\${unregisterExtension} \\\".mmpz\\\" \\\"LMMS Project (compressed)\\\"
+  ")
 ELSE(WIN32)
 SET(CPACK_STRIP_FILES "bin/lmms;${PLUGIN_DIR}/*.so")
 SET(CPACK_PACKAGE_EXECUTABLES "lmms" "LMMS binary")
 ENDIF(WIN32)
+
+IF(WIN64)
+	SET(CPACK_PACKAGE_FILE_NAME "lmms-${VERSION}-win64")
+	SET(CPACK_NSIS_DEFINES "${CPACK_NSIS_DEFINES}
+		InstallDir \\\"\\\$PROGRAMFILES64\\\\${CPACK_PACKAGE_INSTALL_DIRECTORY}\\\"")
+ENDIF(WIN64)
 
 SET(MACOSX_BUNDLE_ICON_FILE "${CMAKE_SOURCE_DIR}/data/themes/default/icon.png")
 SET(MACOSX_BUNDLE_GUI_IDENTIFIER "LMMS")
@@ -673,7 +689,7 @@ SET(MACOSX_BUNDLE_LONG_VERSION_STRING "${VERSION}")
 SET(MACOSX_BUNDLE_BUNDLE_NAME "Linux MultiMedia Studio")
 SET(MACOSX_BUNDLE_SHORT_VERSION_STRING "${VERSION}")
 SET(MACOSX_BUNDLE_BUNDLE_VERSION "${VERSION}")
-SET(MACOSX_BUNDLE_COPYRIGHT "Tobias Doerffel, 2008")
+SET(MACOSX_BUNDLE_COPYRIGHT "Tobias Doerffel, 2008-2010")
 
 SET(CPACK_SOURCE_GENERATOR "TBZ2")
 SET(CPACK_SOURCE_PACKAGE_FILE_NAME "lmms-${VERSION}")
