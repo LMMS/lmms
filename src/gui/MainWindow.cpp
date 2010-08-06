@@ -3,7 +3,7 @@
 /*
  * main_window.cpp - implementation of LMMS-main-window
  *
- * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -46,6 +46,8 @@
 #include "embed.h"
 #include "engine.h"
 #include "FxMixerView.h" 
+#include "InstrumentTrack.h"
+#include "PianoView.h"
 #include "about_dialog.h"
 #include "ControllerRackView.h"
 #include "file_browser.h"
@@ -928,7 +930,15 @@ void MainWindow::keyPressEvent( QKeyEvent * _ke )
 		case Qt::Key_Shift: m_keyMods.m_shift = TRUE; break;
 		case Qt::Key_Alt: m_keyMods.m_alt = TRUE; break;
 		default:
-			QMainWindow::keyPressEvent( _ke );
+			if( InstrumentTrackView::topLevelInstrumentTrackWindow() )
+			{
+				InstrumentTrackView::topLevelInstrumentTrackWindow()->
+					pianoView()->keyPressEvent( _ke );
+			}
+			if( !_ke->isAccepted() )
+			{
+				QMainWindow::keyPressEvent( _ke );
+			}
 	}
 }
 
@@ -943,7 +953,15 @@ void MainWindow::keyReleaseEvent( QKeyEvent * _ke )
 		case Qt::Key_Shift: m_keyMods.m_shift = FALSE; break;
 		case Qt::Key_Alt: m_keyMods.m_alt = FALSE; break;
 		default:
-			QMainWindow::keyReleaseEvent( _ke );
+			if( InstrumentTrackView::topLevelInstrumentTrackWindow() )
+			{
+				InstrumentTrackView::topLevelInstrumentTrackWindow()->
+					pianoView()->keyReleaseEvent( _ke );
+			}
+			if( !_ke->isAccepted() )
+			{
+				QMainWindow::keyReleaseEvent( _ke );
+			}
 	}
 }
 

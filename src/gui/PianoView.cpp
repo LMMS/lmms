@@ -2,7 +2,7 @@
  * Piano.cpp - implementation of piano-widget used in instrument-track-window
  *             for testing + according model class
  *
- * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -644,6 +644,7 @@ void PianoView::keyPressEvent( QKeyEvent * _ke )
 		if( m_piano != NULL )
 		{
 			m_piano->handleKeyPress( key_num );
+			_ke->accept();
 			update();
 		}
 	}
@@ -671,6 +672,7 @@ void PianoView::keyReleaseEvent( QKeyEvent * _ke )
 		if( m_piano != NULL )
 		{
 			m_piano->handleKeyRelease( key_num );
+			_ke->accept();
 			update();
 		}
 	}

@@ -1,7 +1,7 @@
 /*
  * setup_dialog.cpp - dialog for setting up LMMS
  *
- * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -111,7 +111,9 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 	m_disableChActInd( configManager::inst()->value( "ui",
 				"disablechannelactivityindicators" ).toInt() ),
 	m_manualChPiano( configManager::inst()->value( "ui",
-					"manualchannelpiano" ).toInt() )
+					"manualchannelpiano" ).toInt() ),
+	m_oneInstrumentTrackWindow( configManager::inst()->value( "ui",
+					"oneinstrumenttrackwindow" ).toInt() )
 {
 	setWindowIcon( embed::getIconPixmap( "setup_general" ) );
 	setWindowTitle( tr( "Setup LMMS" ) );
@@ -180,7 +182,7 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 
 
 	tabWidget * misc_tw = new tabWidget( tr( "MISC" ), general );
-	misc_tw->setFixedHeight( 120 );
+	misc_tw->setFixedHeight( 138 );
 
 	ledCheckBox * enable_tooltips = new ledCheckBox(
 							tr( "Enable tooltips" ),
@@ -216,10 +218,18 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 	connect( mmpz, SIGNAL( toggled( bool ) ),
 					this, SLOT( toggleMMPZ( bool ) ) );
 
+	ledCheckBox * oneitw = new ledCheckBox(
+				tr( "One instrument track window mode" ),
+								misc_tw );
+	oneitw->move( 10, 90 );
+	oneitw->setChecked( m_oneInstrumentTrackWindow );
+	connect( oneitw, SIGNAL( toggled( bool ) ),
+				this, SLOT( toggleOneInstrumentTrackWindow( bool ) ) );
+
 	ledCheckBox * hqaudio = new ledCheckBox(
 				tr( "HQ-mode for output audio-device" ),
 								misc_tw );
-	hqaudio->move( 10, 90 );
+	hqaudio->move( 10, 108 );
 	hqaudio->setChecked( m_hqAudioDev );
 	connect( hqaudio, SIGNAL( toggled( bool ) ),
 				this, SLOT( toggleHQAudioDev( bool ) ) );
@@ -729,6 +739,8 @@ void setupDialog::accept()
 					QString::number( m_disableChActInd ) );
 	configManager::inst()->setValue( "ui", "manualchannelpiano",
 					QString::number( m_manualChPiano ) );
+	configManager::inst()->setValue( "ui", "oneinstrumenttrackwindow",
+					QString::number( m_oneInstrumentTrackWindow ) );
 
 	configManager::inst()->setWorkingDir( m_workingDir );
 	configManager::inst()->setVSTDir( m_vstDir );
@@ -879,6 +891,15 @@ void setupDialog::toggleDisableChActInd( bool _disabled )
 void setupDialog::toggleManualChPiano( bool _enabled )
 {
 	m_manualChPiano = _enabled;
+}
+
+
+
+
+
+void setupDialog::toggleOneInstrumentTrackWindow( bool _enabled )
+{
+	m_oneInstrumentTrackWindow = _enabled;
 }
 
 

@@ -123,7 +123,7 @@ void engine::destroy()
 	deleteHelper( &s_fxMixerView );
 
 	presetPreviewPlayHandle::cleanup();
-	InstrumentTrackView::cleanupWindowPool();
+	InstrumentTrackView::cleanupWindowCache();
 
 	s_song->clearProject();
 

@@ -2,7 +2,7 @@
  * AutomationEditor.cpp - implementation of AutomationEditor which is used for
  *                        actual setting of dynamic values
  *
- * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2006-2008 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
@@ -517,37 +517,35 @@ void AutomationEditor::keyPressEvent( QKeyEvent * _ke )
 		case Qt::Key_Up:
 			m_topBottomScroll->setValue(
 					m_topBottomScroll->value() - 1 );
+			_ke->accept();
 			break;
 
 		case Qt::Key_Down:
 			m_topBottomScroll->setValue(
 					m_topBottomScroll->value() + 1 );
+			_ke->accept();
 			break;
 
 		case Qt::Key_Left:
-		{
 			if( ( m_timeLine->pos() -= 16 ) < 0 )
 			{
 				m_timeLine->pos().setTicks( 0 );
 			}
 			m_timeLine->updatePosition();
+			_ke->accept();
 			break;
-		}
+
 		case Qt::Key_Right:
-		{
 			m_timeLine->pos() += 16;
 			m_timeLine->updatePosition();
+			_ke->accept();
 			break;
-		}
 
 		case Qt::Key_C:
 			if( _ke->modifiers() & Qt::ControlModifier )
 			{
 				copySelectedValues();
-			}
-			else
-			{
-				_ke->ignore();
+				_ke->accept();
 			}
 			break;
 
@@ -555,10 +553,7 @@ void AutomationEditor::keyPressEvent( QKeyEvent * _ke )
 			if( _ke->modifiers() & Qt::ControlModifier )
 			{
 				cutSelectedValues();
-			}
-			else
-			{
-				_ke->ignore();
+				_ke->accept();
 			}
 			break;
 
@@ -566,10 +561,7 @@ void AutomationEditor::keyPressEvent( QKeyEvent * _ke )
 			if( _ke->modifiers() & Qt::ControlModifier )
 			{
 				pasteValues();
-			}
-			else
-			{
-				_ke->ignore();
+				_ke->accept();
 			}
 			break;
 
@@ -579,10 +571,7 @@ void AutomationEditor::keyPressEvent( QKeyEvent * _ke )
 				m_selectButton->setChecked( TRUE );
 				selectAll();
 				update();
-			}
-			else
-			{
-				_ke->ignore();
+				_ke->accept();
 			}
 			break;
 
@@ -590,10 +579,7 @@ void AutomationEditor::keyPressEvent( QKeyEvent * _ke )
 			if( _ke->modifiers() & Qt::ShiftModifier )
 			{
 				m_drawButton->setChecked( TRUE );
-			}
-			else
-			{
-				_ke->ignore();
+				_ke->accept();
 			}
 			break;
 
@@ -601,10 +587,7 @@ void AutomationEditor::keyPressEvent( QKeyEvent * _ke )
 			if( _ke->modifiers() & Qt::ShiftModifier )
 			{
 				m_eraseButton->setChecked( TRUE );
-			}
-			else
-			{
-				_ke->ignore();
+				_ke->accept();
 			}
 			break;
 
@@ -612,10 +595,7 @@ void AutomationEditor::keyPressEvent( QKeyEvent * _ke )
 			if( _ke->modifiers() & Qt::ShiftModifier )
 			{
 				m_selectButton->setChecked( TRUE );
-			}
-			else
-			{
-				_ke->ignore();
+				_ke->accept();
 			}
 			break;
 
@@ -623,15 +603,13 @@ void AutomationEditor::keyPressEvent( QKeyEvent * _ke )
 			if( _ke->modifiers() & Qt::ShiftModifier )
 			{
 				m_moveButton->setChecked( TRUE );
-			}
-			else
-			{
-				_ke->ignore();
+				_ke->accept();
 			}
 			break;
 
 		case Qt::Key_Delete:
 			deleteSelectedValues();
+			_ke->accept();
 			break;
 
 		case Qt::Key_Space:
@@ -643,15 +621,16 @@ void AutomationEditor::keyPressEvent( QKeyEvent * _ke )
 			{
 				play();
 			}
+			_ke->accept();
 			break;
 
 		case Qt::Key_Home:
 			m_timeLine->pos().setTicks( 0 );
 			m_timeLine->updatePosition();
+			_ke->accept();
 			break;
 
 		default:
-			_ke->ignore();
 			break;
 	}
 }
