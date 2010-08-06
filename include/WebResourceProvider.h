@@ -1,7 +1,7 @@
 /*
  * WebResourceProvider.h - header file for WebResourceProvider
  *
- * Copyright (c) 2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2009-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -35,6 +35,15 @@
 class QBuffer;
 class QNetworkReply;
 
+
+/*! \brief The WebResourceProvider class provides a ResourceProvider
+ * implementation which serves data from the internet (currently
+ * specific to LSP only).
+ *
+ * Most of this class is network management code (quite highlevel thanks to
+ * QtNetwork though). Besides that it translates web resource index files into
+ * a ResourceDB and fetches files by given hash.
+ */
 
 class WebResourceProvider : public ResourceProvider
 {

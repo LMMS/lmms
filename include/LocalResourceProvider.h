@@ -1,7 +1,7 @@
 /*
  * LocalResourceProvider.h - header file for LocalResourceProvider
  *
- * Copyright (c) 2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2009-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -31,6 +31,15 @@
 #include "ResourceProvider.h"
 #include "ResourceItem.h"
 
+
+/*! \brief The LocalResourceProvider class provides a ResourceProvider
+ * implementation which serves data from local files.
+ *
+ * This class crawls a given directory and provides a ResourceDB with all
+ * retrieved information inside. Additionally it monitors all (sub-)directories
+ * for changes and immediately updates the database. #fetchData() simply reads
+ * the according local file.
+ */
 
 class EXPORT LocalResourceProvider : public ResourceProvider
 {

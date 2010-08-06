@@ -1,7 +1,7 @@
 /*
  * UnifiedResourceProvider.h - header file for UnifiedResourceProvider
  *
- * Copyright (c) 2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2009-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -28,6 +28,14 @@
 #include "ResourceProvider.h"
 #include "ResourceItem.h"
 
+
+/*! \brief The UnifiedResourceProvider class merges a given set of ResourceDB's
+ * into one ResourceDB.
+ *
+ * This provider usually is used as the top level provider whose database
+ * contains all available resources (various local directories and various
+ * online catalogues).
+ */
 
 class UnifiedResourceProvider : public ResourceProvider
 {
