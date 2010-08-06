@@ -160,7 +160,7 @@ void engine::destroy()
 	deleteHelper( &s_automationEditor );
 	deleteHelper( &s_fxMixerView );
 
-	InstrumentTrackView::cleanupWindowPool();
+	InstrumentTrackView::cleanupWindowCache();
 
 	s_song->clearProject();
 

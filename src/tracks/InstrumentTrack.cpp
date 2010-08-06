@@ -2,7 +2,7 @@
  * InstrumentTrack.cpp - implementation of instrument-track-class
  *                        (window + data-structures)
  *
- * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -26,6 +26,7 @@
 #include <QtCore/QDir>
 #include <QtCore/QFile>
 #include <QtCore/QQueue>
+#include <QtCore/QStack>
 #include <QtGui/QApplication>
 #include <QtGui/QCloseEvent>
 #include <QtGui/QFileDialog>
@@ -874,7 +875,8 @@ Instrument * InstrumentTrack::loadInstrument( const QString & _plugin_name )
 // #### ITV:
 
 
-QQueue<InstrumentTrackWindow *> InstrumentTrackView::s_windows;
+QQueue<InstrumentTrackWindow *> InstrumentTrackView::s_windowCache;
+QStack<InstrumentTrackWindow *> InstrumentTrackView::s_windowStack;
 
 
 
@@ -992,16 +994,26 @@ void InstrumentTrackView::freeInstrumentTrackWindow()
 {
 	if( m_window != NULL )
 	{
+		if( qFind( s_windowStack.begin(), s_windowStack.end(), m_window ) !=
+														s_windowStack.end() )
+		{
+			s_windowStack.erase(
+				qFind( s_windowStack.begin(), s_windowStack.end(), m_window ) );
+		}
 		m_lastPos = m_window->parentWidget()->pos();
-		if( s_windows.count() < INSTRUMENT_WINDOW_CACHE_SIZE )
+
+		if( configManager::inst()->value( "ui",
+									"oneinstrumenttrackwindow" ).toInt() ||
+						s_windowCache.count() < INSTRUMENT_WINDOW_CACHE_SIZE )
 		{
 			model()->setHook( NULL );
+			m_window->setInstrumentTrackView( NULL );
 			m_window->parentWidget()->hide();
 			m_window->setModel(
 				engine::dummyTrackContainer()->
 						dummyInstrumentTrack() );
 			m_window->updateInstrumentView();
-			s_windows.enqueue( m_window );
+			s_windowCache << m_window;
 		}
 		else
 		{
@@ -1015,11 +1027,11 @@ void InstrumentTrackView::freeInstrumentTrackWindow()
 
 
 
-void InstrumentTrackView::cleanupWindowPool()
+void InstrumentTrackView::cleanupWindowCache()
 {
-	while( s_windows.count() )
+	while( !s_windowCache.isEmpty() )
 	{
-		delete s_windows.dequeue();
+		delete s_windowCache.dequeue();
 	}
 }
 
@@ -1031,16 +1043,21 @@ InstrumentTrackWindow * InstrumentTrackView::getInstrumentTrackWindow()
 	if( m_window != NULL )
 	{
 	}
-	else if( !s_windows.isEmpty() )
+	else if( !s_windowCache.isEmpty() )
 	{
-		m_window = s_windows.dequeue();
+		m_window = s_windowCache.dequeue();
 		
 		m_window->setInstrumentTrackView( this );
 		m_window->setModel( model() );
 		m_window->updateInstrumentView();
 		model()->setHook( m_window );
 
-		if( m_lastPos.x() > 0 || m_lastPos.y() > 0 )
+		if( configManager::inst()->value( "ui",
+										"oneinstrumenttrackwindow" ).toInt() )
+		{
+			s_windowCache << m_window;
+		}
+		else if( m_lastPos.x() > 0 || m_lastPos.y() > 0 )
 		{
 			m_window->parentWidget()->move( m_lastPos );
 		}
@@ -1048,6 +1065,12 @@ InstrumentTrackWindow * InstrumentTrackView::getInstrumentTrackWindow()
 	else
 	{
 		m_window = new InstrumentTrackWindow( this );
+		if( configManager::inst()->value( "ui",
+										"oneinstrumenttrackwindow" ).toInt() )
+		{
+			// first time, an InstrumentTrackWindow is opened
+			s_windowCache << m_window;
+		}
 	}
 		
 	return m_window;
@@ -1079,11 +1102,22 @@ void InstrumentTrackView::dropEvent( QDropEvent * _de )
 
 void InstrumentTrackView::toggleInstrumentWindow( bool _on )
 {
-	getInstrumentTrackWindow()->toggleVisibility( _on );
+	InstrumentTrackWindow * w = getInstrumentTrackWindow();
+	w->toggleVisibility( _on );
 	
 	if( !_on )
 	{
 		freeInstrumentTrackWindow();
+	}
+	else
+	{
+		if( qFind( s_windowStack.begin(), s_windowStack.end(), w ) !=
+														s_windowStack.end() )
+		{
+			s_windowStack.erase(
+					qFind( s_windowStack.begin(), s_windowStack.end(), w ) );
+		}
+		s_windowStack.push( w );
 	}
 }
 
@@ -1163,6 +1197,8 @@ protected:
 	}
 
 } ;
+
+
 
 
 
@@ -1270,7 +1306,7 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	m_tabWidget->addTab( m_midiView, tr( "MIDI" ), 4 );
 
 	// setup piano-widget
-	m_pianoView= new PianoView( this );
+	m_pianoView = new PianoView( this );
 
 	vlayout->addWidget( m_generalSettingsWidget );
 	vlayout->addWidget( m_tabWidget );
@@ -1300,12 +1336,27 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 
 InstrumentTrackWindow::~InstrumentTrackWindow()
 {
+	InstrumentTrackView::s_windowCache.removeAll( this );
+
 	delete m_instrumentView;
+
 	if( engine::mainWindow()->workspace() )
 	{
 		parentWidget()->hide();
 		parentWidget()->deleteLater();
 	}
+}
+
+
+
+
+void InstrumentTrackWindow::setInstrumentTrackView( InstrumentTrackView * _tv )
+{
+	if( m_itv && _tv )
+	{
+		m_itv->m_tlb->setChecked( false );
+	}
+	m_itv = _tv;
 }
 
 

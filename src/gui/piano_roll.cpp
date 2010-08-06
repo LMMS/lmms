@@ -2,7 +2,7 @@
  * piano_roll.cpp - implementation of piano-roll which is used for actual
  *                  writing of melodies
  *
- * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2008 Andrew Kelley <superjoe30/at/gmail/dot/com>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
@@ -908,6 +908,7 @@ void pianoRoll::keyPressEvent( QKeyEvent * _ke )
 		{
 			m_pattern->instrumentTrack()->
 				pianoModel()->handleKeyPress( key_num );
+			_ke->accept();
 		}
 	}
 
@@ -938,7 +939,9 @@ void pianoRoll::keyPressEvent( QKeyEvent * _ke )
 							Qt::AltModifier );
 				}
 			}
+			_ke->accept();
 			break;
+
 		case Qt::Key_Down:
 			if( _ke->modifiers() & Qt::ControlModifier 
 			   && m_action == ActionNone )
@@ -964,10 +967,10 @@ void pianoRoll::keyPressEvent( QKeyEvent * _ke )
 							Qt::AltModifier );
 				}
 			}
+			_ke->accept();
 			break;
 
 		case Qt::Key_Left:
-		{
 			if( _ke->modifiers() & Qt::ControlModifier &&
 							m_action == ActionNone )
 			{
@@ -1005,10 +1008,10 @@ void pianoRoll::keyPressEvent( QKeyEvent * _ke )
 				}				
 				
 			}
+			_ke->accept();
 			break;
-		}
+
 		case Qt::Key_Right:
-		{
 			if( _ke->modifiers() & Qt::ControlModifier 
 			   && m_action == ActionNone)
 			{
@@ -1043,103 +1046,78 @@ void pianoRoll::keyPressEvent( QKeyEvent * _ke )
 				}				
 				
 			}
-			
-			
+			_ke->accept();
 			break;
-		}
 
 		case Qt::Key_C:
 			if( _ke->modifiers() & Qt::ControlModifier )
 			{
+				_ke->accept();
 				copySelectedNotes();
-			}
-			else
-			{
-				_ke->ignore();
 			}
 			break;
 
 		case Qt::Key_X:
 			if( _ke->modifiers() & Qt::ControlModifier )
 			{
+				_ke->accept();
 				cutSelectedNotes();
-			}
-			else
-			{
-				_ke->ignore();
 			}
 			break;
 
 		case Qt::Key_V:
 			if( _ke->modifiers() & Qt::ControlModifier )
 			{
+				_ke->accept();
 				pasteNotes();
-			}
-			else
-			{
-				_ke->ignore();
 			}
 			break;
 
 		case Qt::Key_A:
 			if( _ke->modifiers() & Qt::ControlModifier )
 			{
+				_ke->accept();
 				m_selectButton->setChecked( true );
 				selectAll();
 				update();
-			}
-			else
-			{
-				_ke->ignore();
 			}
 			break;
 
 		case Qt::Key_D:
 			if( _ke->modifiers() & Qt::ShiftModifier )
 			{
+				_ke->accept();
 				m_drawButton->setChecked( true );
-			}
-			else
-			{
-				_ke->ignore();
 			}
 			break;
 
 		case Qt::Key_E:
 			if( _ke->modifiers() & Qt::ShiftModifier )
 			{
+				_ke->accept();
 				m_eraseButton->setChecked( true );
-			}
-			else
-			{
-				_ke->ignore();
 			}
 			break;
 
 		case Qt::Key_S:
 			if( _ke->modifiers() & Qt::ShiftModifier )
 			{
+				_ke->accept();
 				m_selectButton->setChecked( true );
-			}
-			else
-			{
-				_ke->ignore();
 			}
 			break;
 			
 		case Qt::Key_T:
 			if( _ke->modifiers() & Qt::ShiftModifier )
 			{
+				_ke->accept();
 				m_detuneButton->setChecked( true );
-			}
-			else
-			{
-				_ke->ignore();
 			}
 			break;
 			
 		case Qt::Key_Delete:
 			deleteSelectedNotes();
+			_ke->accept();
 			break;
 
 		case Qt::Key_Space:
@@ -1151,11 +1129,13 @@ void pianoRoll::keyPressEvent( QKeyEvent * _ke )
 			{
 				play();
 			}
+			_ke->accept();
 			break;
 
 		case Qt::Key_Home:
 			m_timeLine->pos().setTicks( 0 );
 			m_timeLine->updatePosition();
+			_ke->accept();
 			break;
 
 		case Qt::Key_0:
@@ -1175,11 +1155,13 @@ void pianoRoll::keyPressEvent( QKeyEvent * _ke )
 			if( _ke->modifiers() & 
 				( Qt::ControlModifier | Qt::KeypadModifier ) )
 			{
-					m_noteLenModel.setValue( len );
+				m_noteLenModel.setValue( len );
+				_ke->accept();
 			}
 			else if( _ke->modifiers() & Qt::AltModifier )
 			{
-					m_quantizeModel.setValue( len );
+				m_quantizeModel.setValue( len );
+				_ke->accept();
 			}
 			break;
 		}
@@ -1192,10 +1174,11 @@ void pianoRoll::keyPressEvent( QKeyEvent * _ke )
 				QApplication::changeOverrideCursor(
 												   QCursor( Qt::ArrowCursor ) );
 				update();
+				_ke->accept();
 			}
 			break;
+
 		default:
-			_ke->ignore();
 			break;
 	}
 }
@@ -1214,6 +1197,7 @@ void pianoRoll::keyReleaseEvent( QKeyEvent * _ke )
 		{
 			m_pattern->instrumentTrack()->
 				pianoModel()->handleKeyRelease( key_num );
+			_ke->accept();
 		}
 	}
 	switch( _ke->key() )
@@ -1225,7 +1209,6 @@ void pianoRoll::keyReleaseEvent( QKeyEvent * _ke )
 			update();
 			break;
 	}
-	_ke->ignore();
 }
 
 

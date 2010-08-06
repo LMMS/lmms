@@ -1,7 +1,7 @@
 /*
  * setup_dialog.h - dialog for setting up LMMS
  *
- * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -115,6 +115,7 @@ private slots:
 
 	void toggleDisableChActInd( bool _disabled );
 	void toggleManualChPiano( bool _enabled );
+	void toggleOneInstrumentTrackWindow( bool _enabled );
 
 	void toggleMCLEnabled( bool _enabled );
 	void toggleMCLControlKey( bool _enabled );
@@ -170,6 +171,7 @@ private:
 
 	bool m_disableChActInd;
 	bool m_manualChPiano;
+	bool m_oneInstrumentTrackWindow;
 
 	typedef QMap<QString, AudioBackend::setupWidget *> AswMap;
 	typedef QMap<QString, MidiClient::setupWidget *> MswMap;

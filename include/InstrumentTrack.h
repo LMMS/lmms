@@ -2,7 +2,7 @@
  * InstrumentTrack.h - declaration of class InstrumentTrack, a track + window
  *                     which holds an instrument-plugin
  *
- * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -41,6 +41,7 @@
 
 class QLineEdit;
 template<class T> class QQueue;
+template<class T> class QStack;
 class ArpeggiatorView;
 class ChordCreatorView;
 class EffectRackView;
@@ -259,6 +260,10 @@ public:
 		return castModel<InstrumentTrack>();
 	}
 
+	static InstrumentTrackWindow * topLevelInstrumentTrackWindow()
+	{
+		return s_windowStack.isEmpty() ? NULL : s_windowStack.top();
+	}
 
 	QMenu * midiMenu()
 	{
@@ -267,7 +272,7 @@ public:
 
 	void freeInstrumentTrackWindow();
 
-	static void cleanupWindowPool();
+	static void cleanupWindowCache();
 
 
 protected:
@@ -288,7 +293,8 @@ private slots:
 private:
 	InstrumentTrackWindow * m_window;
 
-	static QQueue<InstrumentTrackWindow *> s_windows;
+	static QQueue<InstrumentTrackWindow *> s_windowCache;
+	static QStack<InstrumentTrackWindow *> s_windowStack;
 
 	// widgets in track-settings-widget
 	trackLabelButton * m_tlb;
@@ -335,9 +341,11 @@ public:
 		return castModel<InstrumentTrack>();
 	}
 
-	void setInstrumentTrackView( InstrumentTrackView * _tv )
+	void setInstrumentTrackView( InstrumentTrackView * _tv );
+
+	PianoView * pianoView()
 	{
-		m_itv = _tv;
+		return m_pianoView;
 	}
 
 	static void dragEnterEventGeneric( QDragEnterEvent * _dee );

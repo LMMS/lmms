@@ -1,7 +1,7 @@
 /*
  * PianoView.h - declaration of PianoView, an interactive piano/keyboard-widget
  *
- * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -43,10 +43,13 @@ public:
 	static int getKeyFromKeyEvent( QKeyEvent * _ke );
 
 
-protected:
-	virtual void modelChanged();
+public:
 	virtual void keyPressEvent( QKeyEvent * ke );
 	virtual void keyReleaseEvent( QKeyEvent * ke );
+
+
+protected:
+	virtual void modelChanged();
 	virtual void contextMenuEvent( QContextMenuEvent * _me );
 	virtual void paintEvent( QPaintEvent * );
 	virtual void mousePressEvent( QMouseEvent * me );
