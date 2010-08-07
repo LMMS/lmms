@@ -43,13 +43,10 @@ bbEditor::bbEditor( bbTrackContainer * _tc ) :
 {
 	// create toolbar
 	m_toolBar = new QWidget;
+	m_toolBar->setObjectName( "toolbar" );
 	m_toolBar->setFixedHeight( 32 );
 	m_toolBar->move( 0, 0 );
 	m_toolBar->setAutoFillBackground( true );
-	QPalette pal;
-	pal.setBrush( m_toolBar->backgroundRole(),
-					embed::getIconPixmap( "toolbar_bg" ) );
-	m_toolBar->setPalette( pal );
 	static_cast<QVBoxLayout *>( layout() )->insertWidget( 0, m_toolBar );
 
 	QHBoxLayout * tb_layout = new QHBoxLayout( m_toolBar );

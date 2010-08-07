@@ -26,16 +26,14 @@
 #ifndef _CLASSIC_STYLE_H
 #define _CLASSIC_STYLE_H
 
-#include <QtGui/QStyle>
+#include <QtGui/QProxyStyle>
 
 #include "lmms_style.h"
 
-
-template<class BaseStyle>
-class ClassicStyle : public BaseStyle, public LmmsStyle
+class ClassicStyle : public QProxyStyle, public LmmsStyle
 {
 public:
-	ClassicStyle();
+	ClassicStyle( QStyle *style = 0 );
 	virtual ~ClassicStyle()
 	{
 	}
@@ -80,7 +78,5 @@ private:
 
 };
 
-
-QPair<QStyle *, LmmsStyle *> classicStyleSpecializationForBaseStyle( QStyle * baseStyle );
 
 #endif

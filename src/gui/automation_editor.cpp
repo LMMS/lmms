@@ -133,13 +133,10 @@ automationEditor::automationEditor() :
 
 
 	m_toolBar = new QWidget( this );
+	m_toolBar->setObjectName( "toolbar" );
 	m_toolBar->setFixedHeight( 32 );
 	m_toolBar->move( 0, 0 );
 	m_toolBar->setAutoFillBackground( true );
-	QPalette pal;
-	pal.setBrush( m_toolBar->backgroundRole(),
-					embed::getIconPixmap( "toolbar_bg" ) );
-	m_toolBar->setPalette( pal );
 
 	QHBoxLayout * tb_layout = new QHBoxLayout( m_toolBar );
 	tb_layout->setMargin( 0 );

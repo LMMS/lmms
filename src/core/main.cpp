@@ -411,11 +411,9 @@ int main( int argc, char * * argv )
 			engine::setLmmsStyle( style );
 		}
 		else {
-			QPair<QStyle *, LmmsStyle *> style =
-				classicStyleSpecializationForBaseStyle(
-					QApplication::style() );
-			QApplication::setStyle( style.first );
-			engine::setLmmsStyle( style.second );
+			ClassicStyle * style = new ClassicStyle();
+			QApplication::setStyle( style );
+			engine::setLmmsStyle( style );
 		}
 
 		// END TODO

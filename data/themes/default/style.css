@@ -128,10 +128,8 @@ nameLabel, effectLabel, sf2InstrumentView > QLabel, QComboBox {
 }
 
 
-QWidget#mainToolbar {
-	background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop: 0 #66728c, stop: 1.0 #38404e);
-}
-
+QWidget#mainToolbar,
+QWidget#toolbar,
 QToolBar {
 	background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop: 0 #66728c, stop: 1.0 #38404e);
 }
@@ -145,21 +143,21 @@ QToolButton, toolButton {
 	color: white;
 }
 
-QToolButton:hover {
+QToolButton:hover, toolButton:hover {
 	background: rgba(255,255,255,96);
 	border-radius: 3px;
 	border: 1px solid rgba(0,0,0,255);
 	color: black;
 }
 
-QToolButton:pressed {
+QToolButton:pressed, toolButton:pressed {
 	background: rgba(192,192,192,96);
 	padding: 3px 0px 0px 3px;
 	border-radius: 3px;
 	border: 1px solid rgba(255,255,255,64);
 }
 
-QToolButton:checked {
+QToolButton:checked, toolButton:checked {
 	background: rgba(233,239,255,96);
 	border-radius: 3px;
 	border: 1px solid black;

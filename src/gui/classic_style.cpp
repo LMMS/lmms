@@ -41,9 +41,8 @@
 
 
 
-template<class BaseStyle>
-ClassicStyle<BaseStyle>::ClassicStyle() :
-	BaseStyle(),
+ClassicStyle::ClassicStyle(QStyle *style) :
+	QProxyStyle(style),
 	LmmsStyle()
 {
 	QFile file( "resources:style.css" );
@@ -83,18 +82,16 @@ ClassicStyle<BaseStyle>::ClassicStyle() :
 
 
 
-template<class BaseStyle>
-QColor ClassicStyle<BaseStyle>::color( LmmsStyle::ColorRole _role ) const
+QColor ClassicStyle::color( LmmsStyle::ColorRole _role ) const
 {
 	return colors[_role];
 }
 
 
 
-template<class BaseStyle>
-QPalette ClassicStyle<BaseStyle>::standardPalette() const
+QPalette ClassicStyle::standardPalette() const
 {
-	QPalette pal = BaseStyle::standardPalette();
+	QPalette pal = QProxyStyle::standardPalette();
 	pal.setColor( QPalette::Background, QColor( 72, 76, 88 ) );
 	pal.setColor( QPalette::WindowText, QColor( 240, 240, 240 ) );
 	pal.setColor( QPalette::Base, QColor( 128, 128, 128 ) );
@@ -111,8 +108,7 @@ QPalette ClassicStyle<BaseStyle>::standardPalette() const
 
 
 
-template<class BaseStyle>
-void ClassicStyle<BaseStyle>::drawComplexControl(
+void ClassicStyle::drawComplexControl(
 				QStyle::ComplexControl control,
 				const QStyleOptionComplex * option,
 				QPainter *painter,
@@ -133,19 +129,17 @@ void ClassicStyle<BaseStyle>::drawComplexControl(
 						QColor( 192, 192, 192 ) );
 			so.palette.setColor( QPalette::Text,
 							QColor( 64, 64, 64 ) );
-			BaseStyle::drawComplexControl( control, &so,
+			QProxyStyle::drawComplexControl( control, &so,
 							painter, widget );
 			return;
 		}
 	}
-	BaseStyle::drawComplexControl( control, option, painter, widget );
+	QProxyStyle::drawComplexControl( control, option, painter, widget );
 }
 
 
 
-
-template<class BaseStyle>
-void ClassicStyle<BaseStyle>::drawPrimitive(
+void ClassicStyle::drawPrimitive(
 				QStyle::PrimitiveElement element,
 				const QStyleOption *option,
 				QPainter *painter,
@@ -252,14 +246,14 @@ void ClassicStyle<BaseStyle>::drawPrimitive(
 	}
 	else
 	{
-		BaseStyle::drawPrimitive( element, option, painter, widget );
+		QProxyStyle::drawPrimitive( element, option, painter, widget );
 	}
 
 }
 
 
-template<class BaseStyle>
-int ClassicStyle<BaseStyle>::pixelMetric(
+
+int ClassicStyle::pixelMetric(
 				QStyle::PixelMetric _metric,
 				const QStyleOption * _option,
 				const QWidget * _widget ) const
@@ -282,14 +276,13 @@ int ClassicStyle<BaseStyle>::pixelMetric(
 			return 24;
 
 		default:
-			return BaseStyle::pixelMetric(
+			return QProxyStyle::pixelMetric(
 					_metric, _option, _widget );
 	}
 }
 
 
-template<class BaseStyle>
-void ClassicStyle<BaseStyle>::drawFxLine( QPainter * _painter, const QWidget *_fxLine,
+void ClassicStyle::drawFxLine( QPainter * _painter, const QWidget *_fxLine,
 				const QString & _name, bool _active, bool _sendToThis )
 {
 	int width = _fxLine->rect().width();
@@ -320,8 +313,7 @@ void ClassicStyle<BaseStyle>::drawFxLine( QPainter * _painter, const QWidget *_f
 
 
 
-template<class BaseStyle>
-void ClassicStyle<BaseStyle>::drawTrackContentBackground(QPainter * _painter,
+void ClassicStyle::drawTrackContentBackground(QPainter * _painter,
         const QSize & _size, const int _pixelsPerTact)
 {
     const int w = _size.width();
@@ -362,8 +354,7 @@ void ClassicStyle<BaseStyle>::drawTrackContentBackground(QPainter * _painter,
 
 
 
-template<class BaseStyle>
-void ClassicStyle<BaseStyle>::drawTrackContentObject( QPainter * _painter,
+void ClassicStyle::drawTrackContentObject( QPainter * _painter,
 		const trackContentObject * _model, const LmmsStyleOptionTCO * _option )
 {
 	QRectF rc = _option->rect.adjusted( 0, 2, 0, -2 );
@@ -625,48 +616,4 @@ void ClassicStyle<BaseStyle>::drawTrackContentObject( QPainter * _painter,
 	}
 	_painter->setRenderHint( QPainter::Antialiasing, true );
 }
-
-
-
-
-#include <QtGui/QPlastiqueStyle>
-#ifdef LMMS_BUILD_LINUX
-#include <QtGui/QCleanlooksStyle>
-#include <QtGui/QGtkStyle>
-#endif
-#ifdef LMMS_BUILD_APPLE
-#include <QtGui/QMacStyle>
-#endif
-#ifdef LMMS_BUILD_WIN32
-#include <QtGui/QWindowsXPStyle>
-#include <QtGui/QWindowsVistaStyle>
-#endif
-
-
-QPair<QStyle *, LmmsStyle *> classicStyleSpecializationForBaseStyle( QStyle * baseStyle )
-{
-#define CHECK_AND_INSTANTIATE_STYLE(s)					\
-	if( qobject_cast<s *>( baseStyle ) )				\
-	{													\
-		ClassicStyle<s> * style = new ClassicStyle<s>;	\
-		return qMakePair<QStyle *, LmmsStyle *>( style, style );\
-	}
-
-#ifdef LMMS_BUILD_LINUX
-	CHECK_AND_INSTANTIATE_STYLE(QCleanlooksStyle);
-	CHECK_AND_INSTANTIATE_STYLE(QGtkStyle);
-#endif
-#ifdef LMMS_BUILD_APPLE
-	CHECK_AND_INSTANTIATE_STYLE(QMacStyle);
-#endif
-#ifdef LMMS_BUILD_WIN32
-	CHECK_AND_INSTANTIATE_STYLE(QWindowsXPStyle);
-	CHECK_AND_INSTANTIATE_STYLE(QWindowsVistaStyle);
-#endif
-
-	typedef QPlastiqueStyle DefaultBaseStyle;
-	ClassicStyle<DefaultBaseStyle> * style = new ClassicStyle<DefaultBaseStyle>;
-	return qMakePair<QStyle *, LmmsStyle *>( style, style );
-}
-
 

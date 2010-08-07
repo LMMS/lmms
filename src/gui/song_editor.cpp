@@ -98,12 +98,9 @@ songEditor::songEditor( song * _song, songEditor * & _engine_ptr ) :
 
 	// create own toolbar
 	m_toolBar = new QWidget( this );
+	m_toolBar->setObjectName( "toolbar" );
 	m_toolBar->setFixedHeight( 32 );
 	m_toolBar->setAutoFillBackground( true );
-	QPalette pal;
-	pal.setBrush( m_toolBar->backgroundRole(), 
-				embed::getIconPixmap( "toolbar_bg" ) );
-	m_toolBar->setPalette( pal );
 
 	static_cast<QVBoxLayout *>( layout() )->insertWidget( 0, m_toolBar );
 	static_cast<QVBoxLayout *>( layout() )->insertWidget( 1, m_timeLine );
