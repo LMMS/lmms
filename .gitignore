@@ -1,3 +1,4 @@
 tags
-*.swp
+*.sw?
 build/
+target/
