@@ -216,7 +216,7 @@ IF(WANT_STK)
 	ELSE(STK_FOUND)
 		SET(STK_INCLUDE_DIR "")
 		SET(STATUS_STK "not found, please install libstk0-dev (or similiar) "
-			"if you require the Vibed Instrument")
+			"if you require the Mallets instrument")
 	ENDIF(STK_FOUND)
 ENDIF(WANT_STK)
 
