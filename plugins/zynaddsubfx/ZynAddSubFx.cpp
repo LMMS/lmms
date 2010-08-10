@@ -149,6 +149,14 @@ ZynAddSubFxInstrument::~ZynAddSubFxInstrument()
 void ZynAddSubFxInstrument::saveSettings( QDomDocument & _doc,
 	                             QDomElement & _this )
 {
+	m_portamentoModel.saveSettings( _doc, _this, "portamento" );
+	m_filterFreqModel.saveSettings( _doc, _this, "filterfreq" );
+	m_filterQModel.saveSettings( _doc, _this, "filtercut" );
+	m_bandwidthModel.saveSettings( _doc, _this, "bandwidth" );
+	m_fmGainModel.saveSettings( _doc, _this, "fmgain" );
+	m_resCenterFreqModel.saveSettings( _doc, _this, "rescenterfreq" );
+	m_resBandwidthModel.saveSettings( _doc, _this, "resbandwidth" );
+
 	QTemporaryFile tf;
 	if( tf.open() )
 	{
@@ -187,6 +195,14 @@ void ZynAddSubFxInstrument::loadSettings( const QDomElement & _this )
 	{
 		return;
 	}
+
+	m_portamentoModel.loadSettings( _this, "portamento" );
+	m_filterFreqModel.loadSettings( _this, "filterfreq" );
+	m_filterQModel.loadSettings( _this, "filtercut" );
+	m_bandwidthModel.loadSettings( _this, "bandwidth" );
+	m_fmGainModel.loadSettings( _this, "fmgain" );
+	m_resCenterFreqModel.loadSettings( _this, "rescenterfreq" );
+	m_resBandwidthModel.loadSettings( _this, "resbandwidth" );
 
 	QDomDocument doc;
 	doc.appendChild( doc.importNode( _this.firstChild(), true ) );
