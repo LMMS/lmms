@@ -409,6 +409,7 @@ void trackContainerView::dropEvent( QDropEvent * _de )
 		InstrumentTrack * it = dynamic_cast<InstrumentTrack *>(
 				track::create( track::InstrumentTrack,
 								m_tc ) );
+		it->setSimpleSerializing();
 		it->loadSettings( mmp.content().toElement() );
 		//it->toggledInstrumentTrackButton( true );
 		_de->accept();
