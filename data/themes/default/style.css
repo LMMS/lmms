@@ -13,10 +13,15 @@ automationEditor {
 }
 
 
+
 QToolTip {
-	background: rgb(224,224,224);
-	color: black;
+	border-radius: 4px;
+	background: qlineargradient(spread:reflect, x1:0.5, y1:0.5, x2:0.5, y2:0, stop:0 rgba(0, 0, 0, 255), stop:1 rgba(50, 50, 50, 220));
+	opacity: 175;
+	border: 1.5px solid rgba(0,0,0,255);
+	color: #00ff00;
 }
+
 
 QMenu {
 	border:1px solid black;
