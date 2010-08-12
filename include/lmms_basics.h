@@ -128,6 +128,13 @@ const ch_cnt_t SURROUND_CHANNELS =
 #endif
 
 
+#ifdef LMMS_BUILD_WIN32
+#define PATH_SEPERATOR = ';';
+#else
+#define PATH_SEPERATOR = ':';
+#endif
+
+
 
 typedef sample_t sampleFrame[DEFAULT_CHANNELS];
 typedef sample_t surroundSampleFrame[SURROUND_CHANNELS];
