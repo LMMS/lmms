@@ -119,6 +119,13 @@ inline bool typeInfo<float>::isEqual( float _x, float _y )
 #endif
 
 
+#ifdef LMMS_BUILD_WIN32
+#define PATH_SEPERATOR = ';';
+#else
+#define PATH_SEPERATOR = ':';
+#endif
+
+
 #define DEFAULT_CHANNELS 2
 #define LMMS_DISABLE_SURROUND
 #ifdef LMMS_DISABLE_SURROUND
