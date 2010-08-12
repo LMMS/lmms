@@ -38,7 +38,7 @@
 ladspaManager::ladspaManager()
 {
 	QStringList ladspaDirectories = QString( getenv( "LADSPA_PATH" ) ).
-								split( PATH_SEPERATOR );
+								split( LADSPA_PATH_SEPERATOR );
 	ladspaDirectories += configManager::inst()->ladspaDir().split( ',' );
 
 	ladspaDirectories.push_back( configManager::inst()->pluginDir() + "ladspa" );

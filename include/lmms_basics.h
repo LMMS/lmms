@@ -120,9 +120,9 @@ inline bool typeInfo<float>::isEqual( float _x, float _y )
 
 
 #ifdef LMMS_BUILD_WIN32
-#define PATH_SEPERATOR = ';';
+#define LADSPA_PATH_SEPERATOR ';'
 #else
-#define PATH_SEPERATOR = ':';
+#define LADSPA_PATH_SEPERATOR ':'
 #endif
 
 
