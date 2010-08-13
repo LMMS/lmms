@@ -2,7 +2,7 @@
  * sample_track.h - class sampleTrack, a track which provides arrangement of
  *                  samples
  *
- * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -165,6 +165,14 @@ public:
 
 public slots:
 	void showEffects();
+
+
+protected:
+	void modelChanged();
+	virtual QString nodeName() const
+	{
+		return "SampleTrackView";
+	}
 
 
 private:

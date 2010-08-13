@@ -2,7 +2,7 @@
  * sample_track.cpp - implementation of class sampleTrack, a track which
  *                    provides arrangement of samples
  *
- * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -531,6 +531,8 @@ sampleTrackView::sampleTrackView( sampleTrack * _t, trackContainerView * _tcv ) 
 	m_effWindow->layout()->setSizeConstraint( QLayout::SetFixedSize );
  	m_effWindow->setWindowTitle( _t->name() );
 	m_effWindow->hide();
+
+	setModel( _t );
 }
 
 
@@ -559,7 +561,15 @@ void sampleTrackView::showEffects()
 
 
 
+void sampleTrackView::modelChanged()
+{
+	sampleTrack * st = castModel<sampleTrack>();
+	m_volumeKnob->setModel( &st->m_volumeModel );
+
+	trackView::modelChanged();
+}
+
+
 
 #include "moc_sample_track.cxx"
-
 
