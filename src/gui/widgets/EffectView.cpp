@@ -1,5 +1,5 @@
 /*
- * effect_view.cpp - view-component for an effect
+ * EffectView.cpp - view-component for an effect
  *
  * Copyright (c) 2006-2007 Danny McRae <khjklujn/at/users.sourceforge.net>
  * Copyright (c) 2007-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
@@ -50,8 +50,6 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 	m_controlView( NULL )
 {
 	setFixedSize( 210, 60 );
-
-	setAttribute( Qt::WA_OpaquePaintEvent, true );
 
 	m_bypass = new ledCheckBox( "", this );
 	m_bypass->move( 3, 3 );
