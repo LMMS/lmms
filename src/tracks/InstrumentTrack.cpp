@@ -1368,8 +1368,8 @@ void InstrumentTrackWindow::modelChanged()
 
 	m_nameLineEdit->setText( m_track->name() );
 
-	disconnect( m_track, SIGNAL( nameChanged() ) );
-	disconnect( m_track, SIGNAL( instrumentChanged() ) );
+	m_track->disconnect( SIGNAL( nameChanged() ), this );
+	m_track->disconnect( SIGNAL( instrumentChanged() ), this );
 
 	connect( m_track, SIGNAL( nameChanged() ),
 			this, SLOT( updateName() ) );
