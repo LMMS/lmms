@@ -5,6 +5,7 @@
  *              loading project
  *
  * Copyright (c) 2008 Paul Giblock <pgllama/at/gmail.com>
+ * Copyright (c) 2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -80,7 +81,17 @@ public:
 
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _this );
 	virtual void loadSettings( const QDomElement & _this );
-	virtual QString nodeName() const;
+
+	static inline const QString classNodeName()
+	{
+		return "connection";
+	}
+
+	virtual QString nodeName() const
+	{
+		return classNodeName();
+	}
+
 
 public slots:
 	void deleteConnection();

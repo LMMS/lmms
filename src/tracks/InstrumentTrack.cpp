@@ -47,6 +47,7 @@
 #include "automation_pattern.h"
 #include "bb_track.h"
 #include "config_mgr.h"
+#include "ControllerConnection.h"
 #include "debug.h"
 #include "EffectChain.h"
 #include "EffectRackView.h"
@@ -828,9 +829,8 @@ void InstrumentTrack::loadTrackSpecificSettings( const QDomElement & _this )
 			// compat code - if node-name doesn't match any known
 			// one, we assume that it is an instrument-plugin
 			// which we'll try to load
-			else if( node.nodeName() != "connection" &&
-					automationPattern::classNodeName() !=
-							node.nodeName() &&
+			else if( automationPattern::classNodeName() != node.nodeName() &&
+					ControllerConnection::classNodeName() != node.nodeName() &&
 					!node.toElement().hasAttribute( "id" ) )
 			{
 				delete m_instrument;

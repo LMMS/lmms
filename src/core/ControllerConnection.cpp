@@ -3,6 +3,7 @@
  *            which handles the link between AutomatableModels and controllers
  *
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail.com>
+ * Copyright (c) 2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -207,12 +208,6 @@ void ControllerConnection::deleteConnection()
 	delete this;
 }
 
-QString ControllerConnection::nodeName() const
-{
-	return( "connection" );
-}
-
 
 #include "moc_ControllerConnection.cxx"
-
 
