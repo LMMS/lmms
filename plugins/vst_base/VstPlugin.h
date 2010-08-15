@@ -1,7 +1,7 @@
 /*
  * VstPlugin.h - declaration of VstPlugin class
  *
- * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -25,8 +25,9 @@
 #ifndef _VST_PLUGIN_H
 #define _VST_PLUGIN_H
 
-#include <QtCore/QString>
 #include <QtCore/QMutex>
+#include <QtCore/QPointer>
+#include <QtCore/QString>
 #include <QtGui/QWidget>
 
 #include "JournallingObject.h"
@@ -106,7 +107,7 @@ private:
 	QByteArray saveChunk();
 
 	QString m_plugin;
-	QWidget * m_pluginWidget;
+	QPointer<QWidget> m_pluginWidget;
 	int m_pluginWindowID;
 	QSize m_pluginGeometry;
 
