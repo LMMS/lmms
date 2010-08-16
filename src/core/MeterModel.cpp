@@ -1,7 +1,7 @@
 /*
  * MeterModel.cpp - model for meter specification
  *
- * Copyright (c) 2008-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -24,6 +24,7 @@
 
 
 #include "MeterModel.h"
+#include "AutomationPattern.h"
 
 
 MeterModel::MeterModel( ::Model * _parent ) :
@@ -51,6 +52,9 @@ void MeterModel::reset()
 {
 	m_numeratorModel.setValue( 4 );
 	m_denominatorModel.setValue( 4 );
+
+	AutomationPattern::globalAutomationPattern( &m_numeratorModel )->clear();
+	AutomationPattern::globalAutomationPattern( &m_denominatorModel )->clear();
 }
 
 
