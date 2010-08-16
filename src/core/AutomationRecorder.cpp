@@ -1,11 +1,11 @@
 /*
- * automation_recorder.cpp - declaration of class AutomationRecorder 
+ * AutomationRecorder.cpp - declaration of class AutomationRecorder
  *						which handles the dataChanged event of every
  * 						AutomatableModel and records it if automation
  *						recording is on.
  *
- * Copyright (c) 2009-2009 Andrew Kelley <superjoe30/at/gmail.com>
- * 
+ * Copyright (c) 2009-2010 Andrew Kelley <superjoe30/at/gmail.com>
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -25,7 +25,7 @@
  *
  */
 
-#include "automation_recorder.h"
+#include "AutomationRecorder.h"
 #include "Controller.h"
 #include "song.h"
 
@@ -38,7 +38,7 @@ AutomationRecorder::AutomationRecorder() :
 
 AutomationRecorder::~AutomationRecorder()
 {
-} 
+}
 
 void AutomationRecorder::modelDataEvent( AutomatableModel * _model )
 {
@@ -52,13 +52,13 @@ void AutomationRecorder::modelDataEvent( AutomatableModel * _model )
 		midiTime & song_pos = s->getPlayPos( song::Mode_PlaySong );
 
 		/*
-		// if the tick is within an existing automation TCO 
-		// for the automatable model that this controller controls 
+		// if the tick is within an existing automation TCO
+		// for the automatable model that this controller controls
 		track * inside_track = NULL;
 		for( int i=0; i < s->trackList.size(); ++i){
 			track * t = s->trackList.at(i);
 			if( t->type == track::AutomationTrack &&
-				song_pos >= t->startPosition() && 
+				song_pos >= t->startPosition() &&
 				song_pos <= t->endPosition() )
 			{
 				inside_track = t;
@@ -90,7 +90,7 @@ void AutomationRecorder::modelDataEvent( AutomatableModel * _model )
 			data.pat->changeLength( song_pos - data.pat->startPosition() );
 			// now draw a line from the last one to this one
 			// TODO: make it smooth (draw line instead of insert value)
-			data.pat->putValue( 
+			data.pat->putValue(
 				song_pos - data.pat->startPosition(), val, false );
 
 		}
@@ -101,13 +101,13 @@ void AutomationRecorder::modelDataEvent( AutomatableModel * _model )
 
 			// create a new automation track in the song
 			engine::getMixer()->lock();
-			data.auto_track = (automationTrack *)
+			data.auto_track = (AutomationTrack *)
 				track::create( track::AutomationTrack, engine::getSong() );
 			engine::getMixer()->unlock();
 			
 			// put a tco in the automation track which contains the automation
 			// turn the tco into an automation pattern
-			data.pat = dynamic_cast<automationPattern *>( 
+			data.pat = dynamic_cast<AutomationPattern *>(
 				data.auto_track->createTCO( song_pos ) );
 			data.pat->movePosition( song_pos );
 
@@ -115,7 +115,7 @@ void AutomationRecorder::modelDataEvent( AutomatableModel * _model )
 			data.pat->addObject( _model );
 
 			// add first value TODO: make sure this is absolute
-			data.pat->putValue( 
+			data.pat->putValue(
 				song_pos - data.pat->startPosition(), val, false );
 			
 			// insert into map
@@ -123,7 +123,7 @@ void AutomationRecorder::modelDataEvent( AutomatableModel * _model )
 			m_clips.insert(_model, data);
 		}
 	}
-} 
+}
 
 void AutomationRecorder::initRecord()
 {
@@ -131,5 +131,5 @@ void AutomationRecorder::initRecord()
 	m_clips.clear();
 }
 
-#include "moc_automation_recorder.cxx"
+#include "moc_AutomationRecorder.cxx"
 

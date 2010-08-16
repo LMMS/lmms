@@ -48,7 +48,7 @@ QMdiArea {
 	background-image: url(resources:background_artwork.png);
 }
 
-automationEditor {
+AutomationEditor {
 	background-color: rgb(0, 0, 0);
 }
 

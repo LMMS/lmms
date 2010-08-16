@@ -1,10 +1,10 @@
 /*
- * automation_track.cpp - automationTrack handles automation of objects without
- *                        a track
+ * AutomationTrack.cpp - AutomationTrack handles automation of objects without
+ *                       a track
  *
- * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2006-2008 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
- * 
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -24,9 +24,8 @@
  *
  */
 
-
-#include "automation_track.h"
-#include "automation_pattern.h"
+#include "AutomationTrack.h"
+#include "AutomationPattern.h"
 #include "engine.h"
 #include "embed.h"
 #include "ProjectJournal.h"
@@ -35,8 +34,8 @@
 #include "track_label_button.h"
 
 
-automationTrack::automationTrack( trackContainer * _tc, bool _hidden ) :
-	track( _hidden ? HiddenAutomationTrack : AutomationTrack, _tc )
+AutomationTrack::AutomationTrack( trackContainer * _tc, bool _hidden ) :
+	track( _hidden ? HiddenAutomationTrack : track::AutomationTrack, _tc )
 {
 	setName( tr( "Automation track" ) );
 }
@@ -44,14 +43,14 @@ automationTrack::automationTrack( trackContainer * _tc, bool _hidden ) :
 
 
 
-automationTrack::~automationTrack()
+AutomationTrack::~AutomationTrack()
 {
 }
 
 
 
 
-bool automationTrack::play( const midiTime & _start, const fpp_t _frames,
+bool AutomationTrack::play( const midiTime & _start, const fpp_t _frames,
 				const f_cnt_t _frame_base, Sint16 _tco_num )
 {
 	if( isMuted() )
@@ -73,8 +72,7 @@ bool automationTrack::play( const midiTime & _start, const fpp_t _frames,
 
 	for( tcoVector::iterator it = tcos.begin(); it != tcos.end(); ++it )
 	{
-		automationPattern * p =
-				dynamic_cast<automationPattern *>( *it );
+		AutomationPattern * p = dynamic_cast<AutomationPattern *>( *it );
 		if( p == NULL || ( *it )->isMuted() )
 		{
 			continue;
@@ -92,23 +90,23 @@ bool automationTrack::play( const midiTime & _start, const fpp_t _frames,
 
 
 
-trackView * automationTrack::createView( trackContainerView * _tcv )
+trackView * AutomationTrack::createView( trackContainerView * _tcv )
 {
-	return new automationTrackView( this, _tcv );
+	return new AutomationTrackView( this, _tcv );
 }
 
 
 
 
-trackContentObject * automationTrack::createTCO( const midiTime & )
+trackContentObject * AutomationTrack::createTCO( const midiTime & )
 {
-	return new automationPattern( this );
+	return new AutomationPattern( this );
 }
 
 
 
 
-void automationTrack::saveTrackSpecificSettings( QDomDocument & _doc,
+void AutomationTrack::saveTrackSpecificSettings( QDomDocument & _doc,
 							QDomElement & _this )
 {
 }
@@ -116,7 +114,7 @@ void automationTrack::saveTrackSpecificSettings( QDomDocument & _doc,
 
 
 
-void automationTrack::loadTrackSpecificSettings( const QDomElement & _this )
+void AutomationTrack::loadTrackSpecificSettings( const QDomElement & _this )
 {
 	// just in case something somehow wrent wrong...
 	if( type() == HiddenAutomationTrack )
@@ -129,7 +127,7 @@ void automationTrack::loadTrackSpecificSettings( const QDomElement & _this )
 
 
 
-automationTrackView::automationTrackView( automationTrack * _at,
+AutomationTrackView::AutomationTrackView( AutomationTrack * _at,
 						trackContainerView * _tcv ) :
 	trackView( _at, _tcv )
 {
@@ -145,14 +143,14 @@ automationTrackView::automationTrackView( automationTrack * _at,
 
 
 
-automationTrackView::~automationTrackView()
+AutomationTrackView::~AutomationTrackView()
 {
 }
 
 
 
 
-void automationTrackView::dragEnterEvent( QDragEnterEvent * _dee )
+void AutomationTrackView::dragEnterEvent( QDragEnterEvent * _dee )
 {
 	stringPairDrag::processDragEnterEvent( _dee, "automatable_model" );
 }
@@ -160,7 +158,7 @@ void automationTrackView::dragEnterEvent( QDragEnterEvent * _dee )
 
 
 
-void automationTrackView::dropEvent( QDropEvent * _de )
+void AutomationTrackView::dropEvent( QDropEvent * _de )
 {
 	QString type = stringPairDrag::decodeKey( _de );
 	QString val = stringPairDrag::decodeValue( _de );
@@ -185,8 +183,7 @@ void automationTrackView::dropEvent( QDropEvent * _de )
 			}
 
 			trackContentObject * tco = getTrack()->createTCO( pos );
-			automationPattern * pat =
-				dynamic_cast<automationPattern *>( tco );
+			AutomationPattern * pat = dynamic_cast<AutomationPattern *>( tco );
 			pat->addObject( mod );
 			pat->movePosition( pos );
 		}

@@ -31,7 +31,7 @@
 
 #include "FlpImport.h"
 #include "note_play_handle.h"
-#include "automation_pattern.h"
+#include "AutomationPattern.h"
 #include "basic_filters.h"
 #include "bb_track.h"
 #include "bb_track_container.h"
@@ -1774,7 +1774,7 @@ if( scale )
 	value = m->minValue<float>() + value *
 				( m->maxValue<float>() - m->minValue<float>() );
 }
-automationPattern * p = automationPattern::globalAutomationPattern( m );
+AutomationPattern * p = AutomationPattern::globalAutomationPattern( m );
 p->putValue( jt->pos, value, false );
 			}
 		}

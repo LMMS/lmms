@@ -1,6 +1,6 @@
 /*
- * automation_editor.h - declaration of class automationEditor which is a window
- *                       where you can edit dynamic values in an easy way
+ * AutomationEditor.h - declaration of class AutomationEditor which is a window
+ *                      where you can edit dynamic values in an easy way
  *
  * Copyright (c) 2008-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2006-2008 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
@@ -33,7 +33,7 @@
 #include "lmms_basics.h"
 #include "JournallingObject.h"
 #include "midi_time.h"
-#include "automation_pattern.h"
+#include "AutomationPattern.h"
 #include "ComboBoxModel.h"
 
 
@@ -47,13 +47,13 @@ class timeLine;
 class toolButton;
 
 
-class automationEditor : public QWidget, public JournallingObject
+class AutomationEditor : public QWidget, public JournallingObject
 {
 	Q_OBJECT
 public:
-	void setCurrentPattern( automationPattern * _new_pattern );
+	void setCurrentPattern( AutomationPattern * _new_pattern );
 
-	inline const automationPattern * currentPattern() const
+	inline const AutomationPattern * currentPattern() const
 	{
 		return m_pattern;
 	}
@@ -80,7 +80,7 @@ public slots:
 
 
 protected:
-	typedef automationPattern::timeMap timeMap;
+	typedef AutomationPattern::timeMap timeMap;
 
 	virtual void closeEvent( QCloseEvent * _ce );
 	virtual void keyPressEvent( QKeyEvent * _ke );
@@ -158,9 +158,9 @@ private:
 	static const int ValuesWidth = 64;
 
 
-	automationEditor();
-	automationEditor( const automationEditor & );
-	virtual ~automationEditor();
+	AutomationEditor();
+	AutomationEditor( const AutomationEditor & );
+	virtual ~AutomationEditor();
 
 
 	static QPixmap * s_toolDraw;
@@ -192,7 +192,7 @@ private:
 	ComboBoxModel m_quantizeModel;
 
 	QMutex m_patternMutex;
-	automationPattern * m_pattern;
+	AutomationPattern * m_pattern;
 	float m_minLevel;
 	float m_maxLevel;
 	float m_step;

@@ -26,8 +26,8 @@
 #include <QtXml/QDomDocument>
 
 #include "engine.h"
-#include "automation_editor.h"
-#include "automation_recorder.h"
+#include "AutomationEditor.h"
+#include "AutomationRecorder.h"
 #include "bb_editor.h"
 #include "bb_track_container.h"
 #include "config_mgr.h"
@@ -66,7 +66,7 @@ ResourceDB * engine::s_workingDirResourceDB = NULL;
 ResourceDB * engine::s_webResourceDB = NULL;
 ResourceDB * engine::s_mergedResourceDB = NULL;
 songEditor * engine::s_songEditor = NULL;
-automationEditor * engine::s_automationEditor = NULL;
+AutomationEditor * engine::s_automationEditor = NULL;
 AutomationRecorder * engine::s_automationRecorder = NULL;
 bbEditor * engine::s_bbEditor = NULL;
 pianoRoll * engine::s_pianoRoll = NULL;
@@ -134,7 +134,7 @@ void engine::init( const bool _has_gui )
 		s_projectNotes = new projectNotes;
 		s_bbEditor = new bbEditor( s_bbTrackContainer );
 		s_pianoRoll = new pianoRoll;
-		s_automationEditor = new automationEditor;
+		s_automationEditor = new AutomationEditor;
 
 		s_mainWindow->finalize();
 	}

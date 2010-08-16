@@ -1,11 +1,11 @@
 /*
- * automation_recorder.h - declaration of class AutomationRecorder 
+ * AutomationRecorder.h - declaration of class AutomationRecorder
  *						which accepts a controllerEvent call from midi
  * 						controllers and creates automation TCOs if automation
  *						recording is on.
  *
- * Copyright (c) 2009-2009 Andrew Kelley <superjoe30/at/gmail.com>
- * 
+ * Copyright (c) 2009-2010 Andrew Kelley <superjoe30/at/gmail.com>
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -25,28 +25,27 @@
  *
  */
 
-
 #ifndef _AUTOMATION_RECORDER_H
 #define _AUTOMATION_RECORDER_H
 
 #include <QObject>
 
-#include "automation_track.h"
-#include "automation_pattern.h"
+#include "AutomationTrack.h"
+#include "AutomationPattern.h"
 
 
 class AutomationRecorder : public QObject
 {
 	Q_OBJECT
 public:
-	typedef struct 
+	typedef struct
 	{
 		// during this recording, have we seen this controller change?
-		bool seen; 
+		bool seen;
 		// the track that contains the tco
-		automationTrack* auto_track;
+		AutomationTrack* auto_track;
 		// the tco that we're putting this automation in
-		automationPattern* pat;
+		AutomationPattern* pat;
 	} ClipData;
 	typedef QMap<const AutomatableModel *, ClipData> AutoClipMap;
 

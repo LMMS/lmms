@@ -2,7 +2,7 @@
  * note_play_handle.h - declaration of class notePlayHandle which is needed
  *                      by LMMS-Play-Engine
  *
- * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -203,7 +203,7 @@ private:
 	class baseDetuning
 	{
 	public:
-		baseDetuning( detuningHelper * _detuning );
+		baseDetuning( DetuningHelper * _detuning );
 
 		void setValue( float _val )
 		{
@@ -217,7 +217,7 @@ private:
 
 
 	private:
-		detuningHelper * m_detuning;
+		DetuningHelper * m_detuning;
 		float m_value;
 
 	} ;

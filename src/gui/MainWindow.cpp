@@ -44,7 +44,7 @@
 #include "MainWindow.h"
 #include "bb_editor.h"
 #include "song_editor.h"
-#include "automation_recorder.h"
+#include "AutomationRecorder.h"
 #include "song.h"
 #include "piano_roll.h"
 #include "embed.h"
@@ -66,7 +66,7 @@
 #include "ToolPluginView.h"
 #include "tool_button.h"
 #include "ProjectJournal.h"
-#include "automation_editor.h"
+#include "AutomationEditor.h"
 #include "templates.h"
 #include "lcd_spinbox.h"
 #include "tooltip.h"
@@ -1154,7 +1154,7 @@ void MainWindow::togglePianoRollWin()
 
 void MainWindow::toggleAutomationEditorWin()
 {
-	toggleWindow( engine::getAutomationEditor() );
+	toggleWindow( engine::automationEditor() );
 }
 
 
@@ -1593,7 +1593,7 @@ void MainWindow::masterPitchReleased()
 
 void MainWindow::toggleRecordAutomation( bool _recording )
 {
-	engine::getAutomationRecorder()->setRecording( _recording );
+	engine::automationRecorder()->setRecording( _recording );
 }
 
 

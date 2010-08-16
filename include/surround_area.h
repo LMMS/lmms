@@ -69,8 +69,8 @@ public:
 		m_posY.addJournalEntryFromOldToCurVal();
 	}
 
-//	automationPattern * automationPatternX();
-//	automationPattern * automationPatternY();
+//	AutomationPattern * automationPatternX();
+//	AutomationPattern * automationPatternY();
 
 
 private:

@@ -1,8 +1,8 @@
 /*
- * automation_pattern_view.h - declaration of class automationPatternView
+ * AutomationPatternView.h - declaration of class AutomationPatternView
  *
- * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ * Copyright (c) 2008-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -22,21 +22,20 @@
  *
  */
 
-
 #ifndef _AUTOMATION_PATTERN_VIEW_H
 #define _AUTOMATION_PATTERN_VIEW_H
 
 #include "track.h"
 
-class automationPattern;
+class AutomationPattern;
 
 
-class automationPatternView : public trackContentObjectView
+class AutomationPatternView : public trackContentObjectView
 {
 	Q_OBJECT
 public:
-	automationPatternView( automationPattern * _pat, trackView * _parent );
-	virtual ~automationPatternView();
+	AutomationPatternView( AutomationPattern * _pat, trackView * _parent );
+	virtual ~AutomationPatternView();
 
 
 public slots:
@@ -63,7 +62,7 @@ protected:
 
 
 private:
-	automationPattern * m_pat;
+	AutomationPattern * m_pat;
 	QPixmap m_paintPixmap;
 	bool m_needsUpdate;
 

@@ -34,8 +34,8 @@
 #include "MidiImport.h"
 #include "track_container.h"
 #include "InstrumentTrack.h"
-#include "automation_track.h"
-#include "automation_pattern.h"
+#include "AutomationTrack.h"
+#include "AutomationPattern.h"
 #include "config_mgr.h"
 #include "pattern.h"
 #include "Instrument.h"
@@ -152,15 +152,15 @@ public:
 		lastPos( 0 )
 	{ }
 	
-	automationTrack * at;
-	automationPattern * ap;
+	AutomationTrack * at;
+	AutomationPattern * ap;
 	midiTime lastPos;
 	
 	smfMidiCC & create( trackContainer * _tc )
 	{
 		if( !at )
 		{
-			at = dynamic_cast<automationTrack *>(
+			at = dynamic_cast<AutomationTrack *>(
 					track::create( track::AutomationTrack, _tc ) );
 		}
 		return *this;
@@ -180,7 +180,7 @@ public:
 		if( !ap || time > lastPos + DefaultTicksPerTact )
 		{
 			midiTime pPos = midiTime( time.getTact(), 0 );
-			ap = dynamic_cast<automationPattern*>(
+			ap = dynamic_cast<AutomationPattern*>(
 				at->createTCO(0) );
 			ap->movePosition( pPos );
 		}
@@ -293,10 +293,10 @@ bool MidiImport::readSMF( trackContainer * _tc )
 	smfMidiChannel chs[256];
 
 	MeterModel & timeSigMM = engine::getSong()->getTimeSigModel();
-	automationPattern * timeSigNumeratorPat = 
-		automationPattern::globalAutomationPattern( &timeSigMM.numeratorModel() );
-	automationPattern * timeSigDenominatorPat = 
-		automationPattern::globalAutomationPattern( &timeSigMM.denominatorModel() );
+	AutomationPattern * timeSigNumeratorPat = 
+		AutomationPattern::globalAutomationPattern( &timeSigMM.numeratorModel() );
+	AutomationPattern * timeSigDenominatorPat = 
+		AutomationPattern::globalAutomationPattern( &timeSigMM.denominatorModel() );
 	
 	// TODO: adjust these to Time.Sig changes
 	double beatsPerTact = 4; 
@@ -324,7 +324,7 @@ bool MidiImport::readSMF( trackContainer * _tc )
 	pd.setValue( 2 );
 
 	// Tempo stuff
-	automationPattern * tap = _tc->tempoAutomationPattern();
+	AutomationPattern * tap = _tc->tempoAutomationPattern();
 	if( tap )
 	{
 		tap->clear();

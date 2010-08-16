@@ -32,7 +32,7 @@
 #include "export.h"
 #include "lmms_style.h"
 
-class automationEditor;
+class AutomationEditor;
 class AutomationRecorder;
 class bbEditor;
 class bbTrackContainer;
@@ -151,12 +151,12 @@ public:
 		return s_projectNotes;
 	}
 
-	static automationEditor * getAutomationEditor()
+	static AutomationEditor * automationEditor()
 	{
 		return s_automationEditor;
 	}
 
-	static AutomationRecorder * getAutomationRecorder()
+	static AutomationRecorder * automationRecorder()
 	{
 		return s_automationRecorder;
 	}
@@ -238,7 +238,7 @@ private:
 	static MainWindow * s_mainWindow;
 	static FxMixerView * s_fxMixerView;
 	static songEditor * s_songEditor;
-	static automationEditor * s_automationEditor;
+	static AutomationEditor * s_automationEditor;
 	static AutomationRecorder * s_automationRecorder;
 	static bbEditor * s_bbEditor;
 	static pianoRoll * s_pianoRoll;

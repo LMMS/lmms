@@ -1,8 +1,8 @@
 /*
- * automation_pattern.h - declaration of class automationPattern, which contains
- *                        all information about an automation pattern
+ * AutomationPattern.h - declaration of class AutomationPattern, which contains
+ *                       all information about an automation pattern
  *
- * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2006-2008 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
@@ -24,7 +24,6 @@
  *
  */
 
-
 #ifndef _AUTOMATION_PATTERN_H
 #define _AUTOMATION_PATTERN_H
 
@@ -33,21 +32,21 @@
 #include "track.h"
 
 
-class automationTrack;
+class AutomationTrack;
 class midiTime;
 
 
 
-class EXPORT automationPattern : public trackContentObject
+class EXPORT AutomationPattern : public trackContentObject
 {
 	Q_OBJECT
 public:
 	typedef QMap<int, float> timeMap;
 	typedef QVector<QPointer<AutomatableModel> > objectVector;
 
-	automationPattern( automationTrack * _auto_track );
-	automationPattern( const automationPattern & _pat_to_copy );
-	virtual ~automationPattern();
+	AutomationPattern( AutomationTrack * _auto_track );
+	AutomationPattern( const AutomationPattern & _pat_to_copy );
+	virtual ~AutomationPattern();
 
 	void addObject( AutomatableModel * _obj, bool _search_dup = true );
 
@@ -99,8 +98,7 @@ public:
 
 
 	static bool isAutomated( const AutomatableModel * _m );
-	static automationPattern * globalAutomationPattern(
-							AutomatableModel * _m );
+	static AutomationPattern * globalAutomationPattern( AutomatableModel * _m );
 	static void resolveAllIDs();
 
 
@@ -111,14 +109,14 @@ public slots:
 
 
 private:
-	automationTrack * m_autoTrack;
+	AutomationTrack * m_autoTrack;
 	QVector<jo_id_t> m_idsToResolve;
 	objectVector m_objects;
 	timeMap m_timeMap;	// actual values
 	bool m_hasAutomation;
 
 
-	friend class automationPatternView;
+	friend class AutomationPatternView;
 
 } ;
 

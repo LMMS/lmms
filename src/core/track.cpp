@@ -47,8 +47,8 @@
 #include <QtGui/QStyleOption>
 
 
-#include "automation_pattern.h"
-#include "automation_track.h"
+#include "AutomationPattern.h"
+#include "AutomationTrack.h"
 #include "bb_editor.h"
 #include "bb_track.h"
 #include "bb_track_container.h"
@@ -494,7 +494,7 @@ void trackContentObjectView::dropEvent( QDropEvent * _de )
 		midiTime pos = m_tco->startPosition();
 		m_tco->restoreState( mmp.content().firstChild().toElement() );
  		m_tco->movePosition( pos );
-		automationPattern::resolveAllIDs();
+		AutomationPattern::resolveAllIDs();
 		_de->accept();
 	}
 }
@@ -1087,7 +1087,7 @@ void trackContentWidget::dropEvent( QDropEvent * _de )
 		tco->restoreState( mmp.content().firstChild().toElement() );
 		tco->movePosition( pos );
 
-		automationPattern::resolveAllIDs();
+		AutomationPattern::resolveAllIDs();
 
 		_de->accept();
 	}
@@ -1562,9 +1562,9 @@ track * track::create( TrackTypes _tt, trackContainer * _tc )
 		case SampleTrack: t = new sampleTrack( _tc ); break;
 //		case EVENT_TRACK:
 //		case VIDEO_TRACK:
-		case AutomationTrack: t = new automationTrack( _tc ); break;
+		case AutomationTrack: t = new ::AutomationTrack( _tc ); break;
 		case HiddenAutomationTrack:
-				t = new automationTrack( _tc, true ); break;
+						t = new ::AutomationTrack( _tc, true ); break;
 		default: break;
 	}
 

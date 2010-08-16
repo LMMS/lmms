@@ -31,9 +31,9 @@
 #include <math.h>
 
 #include "song.h"
-#include "automation_track.h"
-#include "automation_editor.h"
-#include "automation_recorder.h"
+#include "AutomationTrack.h"
+#include "AutomationEditor.h"
+#include "AutomationRecorder.h"
 #include "bb_editor.h"
 #include "bb_track.h"
 #include "bb_track_container.h"
@@ -69,7 +69,7 @@ tick_t midiTime::s_ticksPerTact = DefaultTicksPerTact;
 
 song::song() :
 	trackContainer(),
-	m_globalAutomationTrack( dynamic_cast<automationTrack *>(
+	m_globalAutomationTrack( dynamic_cast<AutomationTrack *>(
 				track::create( track::HiddenAutomationTrack,
 								this ) ) ),
 	m_tempoModel( DefaultTempo, MinTempo, MaxTempo, this, tr( "Tempo" ) ),
@@ -596,7 +596,7 @@ void song::stop()
 {
 	m_actions.push_back( ActionStop );
 
-	engine::getAutomationRecorder()->initRecord();
+	engine::automationRecorder()->initRecord();
 }
 
 
@@ -711,9 +711,9 @@ bpm_t song::getTempo()
 
 
 
-automationPattern * song::tempoAutomationPattern()
+AutomationPattern * song::tempoAutomationPattern()
 {
-	return automationPattern::globalAutomationPattern( &m_tempoModel );
+	return AutomationPattern::globalAutomationPattern( &m_tempoModel );
 }
 
 
@@ -752,14 +752,15 @@ void song::clearProject()
 
 
 
-	if( engine::getAutomationEditor() )
+	if( engine::automationEditor() )
 	{
-		engine::getAutomationEditor()->setCurrentPattern( NULL );
+		engine::automationEditor()->setCurrentPattern( NULL );
 	}
-	automationPattern::globalAutomationPattern( &m_tempoModel )->clear();
-	automationPattern::globalAutomationPattern( &m_masterVolumeModel )->
+
+	AutomationPattern::globalAutomationPattern( &m_tempoModel )->clear();
+	AutomationPattern::globalAutomationPattern( &m_masterVolumeModel )->
 									clear();
-	automationPattern::globalAutomationPattern( &m_masterPitchModel )->
+	AutomationPattern::globalAutomationPattern( &m_masterPitchModel )->
 									clear();
 
 	engine::getMixer()->unlock();
@@ -957,10 +958,10 @@ void song::loadProject( const QString & _file_name )
 							node.toElement() );
 				}
 				else if( node.nodeName() ==
-					engine::getAutomationEditor()->
+					engine::automationEditor()->
 								nodeName() )
 				{
-					engine::getAutomationEditor()->
+					engine::automationEditor()->
 						restoreState( node.toElement() );
 				}
 				else if( node.nodeName() ==
@@ -992,7 +993,7 @@ void song::loadProject( const QString & _file_name )
 	ControllerConnection::finalizeConnections();
 
 	// resolve all IDs so that autoModels are automated
-	automationPattern::resolveAllIDs();
+	AutomationPattern::resolveAllIDs();
 
 	engine::getMixer()->unlock();
 
@@ -1032,7 +1033,7 @@ bool song::saveProjectFile( const QString & _filename )
 	{
 		engine::getControllerRackView()->saveState( mmp, mmp.content() );
 		engine::getPianoRoll()->saveState( mmp, mmp.content() );
-		engine::getAutomationEditor()->saveState( mmp, mmp.content() );
+		engine::automationEditor()->saveState( mmp, mmp.content() );
 		engine::getProjectNotes()->
 			SerializingObject::saveState( mmp, mmp.content() );
 		m_playPos[Mode_PlaySong].m_timeLine->saveState(

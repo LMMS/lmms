@@ -1,8 +1,8 @@
 /*
- * automation_pattern_view.cpp - implementation of view for automationPattern
+ * AutomationPatternView.cpp - implementation of view for AutomationPattern
  *
- * Copyright (c) 2008-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ * Copyright (c) 2008-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -22,14 +22,13 @@
  *
  */
 
-
 #include <QtGui/QMouseEvent>
 #include <QtGui/QPainter>
 #include <QtGui/QMenu>
 
-#include "automation_pattern_view.h"
-#include "automation_editor.h"
-#include "automation_pattern.h"
+#include "AutomationPatternView.h"
+#include "AutomationEditor.h"
+#include "AutomationPattern.h"
 #include "embed.h"
 #include "engine.h"
 #include "gui_templates.h"
@@ -40,7 +39,7 @@
 
 
 
-automationPatternView::automationPatternView( automationPattern * _pattern,
+AutomationPatternView::AutomationPatternView( AutomationPattern * _pattern,
 						trackView * _parent ) :
 	trackContentObjectView( _pattern, _parent ),
 	m_pat( _pattern ),
@@ -61,7 +60,7 @@ automationPatternView::automationPatternView( automationPattern * _pattern,
 
 
 
-automationPatternView::~automationPatternView()
+AutomationPatternView::~AutomationPatternView()
 {
 }
 
@@ -69,7 +68,7 @@ automationPatternView::~automationPatternView()
 
 
 
-void automationPatternView::update()
+void AutomationPatternView::update()
 {
 	m_needsUpdate = true;
 	if( fixedTCOs() )
@@ -82,7 +81,7 @@ void automationPatternView::update()
 
 
 
-void automationPatternView::resetName()
+void AutomationPatternView::resetName()
 {
 	m_pat->setName( QString::null );
 }
@@ -90,7 +89,7 @@ void automationPatternView::resetName()
 
 
 
-void automationPatternView::changeName()
+void AutomationPatternView::changeName()
 {
 	QString s = m_pat->name();
 	renameDialog rename_dlg( s );
@@ -102,7 +101,7 @@ void automationPatternView::changeName()
 
 
 
-void automationPatternView::disconnectObject( QAction * _a )
+void AutomationPatternView::disconnectObject( QAction * _a )
 {
 	JournallingObject * j = engine::projectJournal()->
 				journallingObject( _a->data().toInt() );
@@ -118,7 +117,7 @@ void automationPatternView::disconnectObject( QAction * _a )
 
 
 
-void automationPatternView::constructContextMenu( QMenu * _cm )
+void AutomationPatternView::constructContextMenu( QMenu * _cm )
 {
 	QAction * a = new QAction( embed::getIconPixmap( "automation" ),
 				tr( "Open in Automation editor" ), _cm );
@@ -143,7 +142,7 @@ void automationPatternView::constructContextMenu( QMenu * _cm )
 		_cm->addSeparator();
 		QMenu * m = new QMenu( tr( "%1 Connections" ).
 				arg( m_pat->m_objects.count() ), _cm );
-		for( automationPattern::objectVector::iterator it =
+		for( AutomationPattern::objectVector::iterator it =
 						m_pat->m_objects.begin();
 					it != m_pat->m_objects.end(); ++it )
 		{
@@ -166,7 +165,7 @@ void automationPatternView::constructContextMenu( QMenu * _cm )
 
 
 
-void automationPatternView::mouseDoubleClickEvent( QMouseEvent * _me )
+void AutomationPatternView::mouseDoubleClickEvent( QMouseEvent * _me )
 {
 	if( _me->button() != Qt::LeftButton )
 	{
@@ -179,7 +178,7 @@ void automationPatternView::mouseDoubleClickEvent( QMouseEvent * _me )
 
 
 
-void automationPatternView::paintEvent( QPaintEvent * )
+void AutomationPatternView::paintEvent( QPaintEvent * )
 {
 	if( m_needsUpdate == false )
 	{
@@ -247,7 +246,7 @@ void automationPatternView::paintEvent( QPaintEvent * )
 		p.setRenderHint( QPainter::Antialiasing, true );
 	}
 
-	for( automationPattern::timeMap::const_iterator it =
+	for( AutomationPattern::timeMap::const_iterator it =
 						m_pat->getTimeMap().begin();
 					it != m_pat->getTimeMap().end(); ++it )
 	{
@@ -296,7 +295,7 @@ void automationPatternView::paintEvent( QPaintEvent * )
 
 
 
-void automationPatternView::dragEnterEvent( QDragEnterEvent * _dee )
+void AutomationPatternView::dragEnterEvent( QDragEnterEvent * _dee )
 {
 	stringPairDrag::processDragEnterEvent( _dee, "automatable_model" );
 	if( !_dee->isAccepted() )
@@ -308,7 +307,7 @@ void automationPatternView::dragEnterEvent( QDragEnterEvent * _dee )
 
 
 
-void automationPatternView::dropEvent( QDropEvent * _de )
+void AutomationPatternView::dropEvent( QDropEvent * _de )
 {
 	QString type = stringPairDrag::decodeKey( _de );
 	QString val = stringPairDrag::decodeValue( _de );
@@ -323,12 +322,10 @@ void automationPatternView::dropEvent( QDropEvent * _de )
 		}
 		update();
 
-		if( engine::getAutomationEditor() &&
-			engine::getAutomationEditor()->currentPattern() ==
-									m_pat )
+		if( engine::automationEditor() &&
+			engine::automationEditor()->currentPattern() == m_pat )
 		{
-			engine::getAutomationEditor()->setCurrentPattern(
-									m_pat );
+			engine::automationEditor()->setCurrentPattern( m_pat );
 		}
 	}
 	else
@@ -340,5 +337,5 @@ void automationPatternView::dropEvent( QDropEvent * _de )
 
 
 
-#include "moc_automation_pattern_view.cxx"
+#include "moc_AutomationPatternView.cxx"
 

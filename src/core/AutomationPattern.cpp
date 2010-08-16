@@ -1,10 +1,10 @@
 /*
- * automation_pattern.cpp - implementation of class automationPattern which
- *                          holds dynamic values
+ * AutomationPattern.cpp - implementation of class AutomationPattern which
+ *                         holds dynamic values
  *
- * Copyright (c) 2008-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2006-2008 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
- * 
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -24,22 +24,21 @@
  *
  */
 
-
 #include <QtXml/QDomElement>
 #include <QtGui/QMouseEvent>
 #include <QtGui/QPainter>
 
-#include "automation_pattern.h"
-#include "automation_pattern_view.h"
-#include "automation_editor.h"
-#include "automation_track.h"
+#include "AutomationPattern.h"
+#include "AutomationPatternView.h"
+#include "AutomationEditor.h"
+#include "AutomationTrack.h"
 #include "ProjectJournal.h"
 #include "bb_track_container.h"
 #include "song.h"
 
 
 
-automationPattern::automationPattern( automationTrack * _auto_track ) :
+AutomationPattern::AutomationPattern( AutomationTrack * _auto_track ) :
 	trackContentObject( _auto_track ),
 	m_autoTrack( _auto_track ),
 	m_objects(),
@@ -52,7 +51,7 @@ automationPattern::automationPattern( automationTrack * _auto_track ) :
 
 
 
-automationPattern::automationPattern( const automationPattern & _pat_to_copy ) :
+AutomationPattern::AutomationPattern( const AutomationPattern & _pat_to_copy ) :
 	trackContentObject( _pat_to_copy.m_autoTrack ),
 	m_autoTrack( _pat_to_copy.m_autoTrack ),
 	m_objects( _pat_to_copy.m_objects ),
@@ -68,19 +67,19 @@ automationPattern::automationPattern( const automationPattern & _pat_to_copy ) :
 
 
 
-automationPattern::~automationPattern()
+AutomationPattern::~AutomationPattern()
 {
-	if( engine::getAutomationEditor() &&
-		engine::getAutomationEditor()->currentPattern() == this )
+	if( engine::automationEditor() &&
+		engine::automationEditor()->currentPattern() == this )
 	{
-		engine::getAutomationEditor()->setCurrentPattern( NULL );
+		engine::automationEditor()->setCurrentPattern( NULL );
 	}
 }
 
 
 
 
-void automationPattern::addObject( AutomatableModel * _obj, bool _search_dup )
+void AutomationPattern::addObject( AutomatableModel * _obj, bool _search_dup )
 {
 	bool addIt = true;
 
@@ -117,7 +116,7 @@ void automationPattern::addObject( AutomatableModel * _obj, bool _search_dup )
 
 
 
-const AutomatableModel * automationPattern::firstObject() const
+const AutomatableModel * AutomationPattern::firstObject() const
 {
 	AutomatableModel * m;
 	if( !m_objects.isEmpty() && ( m = m_objects.first() ) != NULL )
@@ -134,7 +133,7 @@ const AutomatableModel * automationPattern::firstObject() const
 
 
 //TODO: Improve this
-midiTime automationPattern::length() const
+midiTime AutomationPattern::length() const
 {
 	tick_t max_length = 0;
 
@@ -149,11 +148,11 @@ midiTime automationPattern::length() const
 
 
 
-midiTime automationPattern::putValue( const midiTime & _time,
+midiTime AutomationPattern::putValue( const midiTime & _time,
 	const float _value, const bool _quant_pos )
 {
-	midiTime newTime = _quant_pos && engine::getAutomationEditor() ?
-		note::quantized( _time, engine::getAutomationEditor()->quantization() )
+	midiTime newTime = _quant_pos && engine::automationEditor() ?
+		note::quantized( _time, engine::automationEditor()->quantization() )
 		: _time;
 
 	m_timeMap[newTime] = _value;
@@ -194,7 +193,7 @@ midiTime automationPattern::putValue( const midiTime & _time,
 
 
 
-void automationPattern::removeValue( const midiTime & _time )
+void AutomationPattern::removeValue( const midiTime & _time )
 {
 	if( _time != 0 )
 	{
@@ -236,7 +235,7 @@ void automationPattern::removeValue( const midiTime & _time )
 
 
 
-float automationPattern::valueAt( const midiTime & _time ) const
+float AutomationPattern::valueAt( const midiTime & _time ) const
 {
 	if( m_timeMap.isEmpty() )
 	{
@@ -251,7 +250,7 @@ float automationPattern::valueAt( const midiTime & _time ) const
 
 
 
-void automationPattern::saveSettings( QDomDocument & _doc, QDomElement & _this )
+void AutomationPattern::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
 	_this.setAttribute( "pos", startPosition() );
 	_this.setAttribute( "len", trackContentObject::length() );
@@ -281,7 +280,7 @@ void automationPattern::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 
 
-void automationPattern::loadSettings( const QDomElement & _this )
+void AutomationPattern::loadSettings( const QDomElement & _this )
 {
 	clear();
 
@@ -330,7 +329,7 @@ void automationPattern::loadSettings( const QDomElement & _this )
 
 
 
-const QString automationPattern::name() const
+const QString AutomationPattern::name() const
 {
 	if( !trackContentObject::name().isEmpty() )
 	{
@@ -346,7 +345,7 @@ const QString automationPattern::name() const
 
 
 
-void automationPattern::processMidiTime( const midiTime & _time )
+void AutomationPattern::processMidiTime( const midiTime & _time )
 {
 	if( _time >= 0 && m_hasAutomation )
 	{
@@ -367,16 +366,16 @@ void automationPattern::processMidiTime( const midiTime & _time )
 
 
 
-trackContentObjectView * automationPattern::createView( trackView * _tv )
+trackContentObjectView * AutomationPattern::createView( trackView * _tv )
 {
-	return new automationPatternView( this, _tv );
+	return new AutomationPatternView( this, _tv );
 }
 
 
 
 
 
-bool automationPattern::isAutomated( const AutomatableModel * _m )
+bool AutomationPattern::isAutomated( const AutomatableModel * _m )
 {
 	trackContainer::trackList l = engine::getSong()->tracks() +
 				engine::getBBTrackContainer()->tracks();
@@ -391,9 +390,8 @@ bool automationPattern::isAutomated( const AutomatableModel * _m )
 			for( track::tcoVector::const_iterator j = v.begin();
 							j != v.end(); ++j )
 			{
-				const automationPattern * a =
-					dynamic_cast<const
-						automationPattern *>( *j );
+				const AutomationPattern * a =
+								dynamic_cast<const AutomationPattern *>( *j );
 				if( a && a->m_hasAutomation )
 				{
 	for( objectVector::const_iterator k = a->m_objects.begin();
@@ -415,19 +413,18 @@ bool automationPattern::isAutomated( const AutomatableModel * _m )
 
 
 
-automationPattern * automationPattern::globalAutomationPattern(
+AutomationPattern * AutomationPattern::globalAutomationPattern(
 							AutomatableModel * _m )
 {
-	automationTrack * t = engine::getSong()->globalAutomationTrack();
+	AutomationTrack * t = engine::getSong()->globalAutomationTrack();
 	track::tcoVector v = t->getTCOs();
 	for( track::tcoVector::const_iterator j = v.begin(); j != v.end(); ++j )
 	{
-		automationPattern * a = dynamic_cast<automationPattern *>( *j );
+		AutomationPattern * a = dynamic_cast<AutomationPattern *>( *j );
 		if( a )
 		{
-			for( objectVector::const_iterator k =
-							a->m_objects.begin();
-						k != a->m_objects.end(); ++k )
+			for( objectVector::const_iterator k = a->m_objects.begin();
+												k != a->m_objects.end(); ++k )
 			{
 				if( *k == _m )
 				{
@@ -437,7 +434,7 @@ automationPattern * automationPattern::globalAutomationPattern(
 		}
 	}
 
-	automationPattern * a = new automationPattern( t );
+	AutomationPattern * a = new AutomationPattern( t );
 	a->addObject( _m, false );
 	return a;
 }
@@ -445,7 +442,7 @@ automationPattern * automationPattern::globalAutomationPattern(
 
 
 
-void automationPattern::resolveAllIDs()
+void AutomationPattern::resolveAllIDs()
 {
 	trackContainer::trackList l = engine::getSong()->tracks() +
 				engine::getBBTrackContainer()->tracks();
@@ -460,8 +457,7 @@ void automationPattern::resolveAllIDs()
 			for( track::tcoVector::iterator j = v.begin();
 							j != v.end(); ++j )
 			{
-				automationPattern * a =
-					dynamic_cast<automationPattern *>( *j );
+				AutomationPattern * a = dynamic_cast<AutomationPattern *>( *j );
 				if( a )
 				{
 	for( QVector<jo_id_t>::Iterator k = a->m_idsToResolve.begin();
@@ -485,33 +481,33 @@ void automationPattern::resolveAllIDs()
 
 
 
-void automationPattern::clear()
+void AutomationPattern::clear()
 {
 	const float val = firstObject()->value<float>();
 	m_timeMap.clear();
 	putValue( 0, val );
 
-	if( engine::getAutomationEditor() &&
-		engine::getAutomationEditor()->currentPattern() == this )
+	if( engine::automationEditor() &&
+		engine::automationEditor()->currentPattern() == this )
 	{
-		engine::getAutomationEditor()->update();
+		engine::automationEditor()->update();
 	}
 }
 
 
 
 
-void automationPattern::openInAutomationEditor()
+void AutomationPattern::openInAutomationEditor()
 {
-	engine::getAutomationEditor()->setCurrentPattern( this );
-	engine::getAutomationEditor()->parentWidget()->show();
-	engine::getAutomationEditor()->setFocus();
+	engine::automationEditor()->setCurrentPattern( this );
+	engine::automationEditor()->parentWidget()->show();
+	engine::automationEditor()->setFocus();
 }
 
 
 
 
-void automationPattern::objectDestroyed( jo_id_t _id )
+void AutomationPattern::objectDestroyed( jo_id_t _id )
 {
 	// TODO: distict between temporary removal (e.g. LADSPA controls
 	// when switching samplerate) and real deletions because in the latter
@@ -523,6 +519,6 @@ void automationPattern::objectDestroyed( jo_id_t _id )
 
 
 
-#include "moc_automation_pattern.cxx"
+#include "moc_AutomationPattern.cxx"
 
 /* vim: set tw=0 noexpandtab: */

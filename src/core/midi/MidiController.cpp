@@ -31,7 +31,7 @@
 #include "engine.h"
 #include "MidiClient.h"
 #include "MidiController.h"
-#include "automation_recorder.h"
+#include "AutomationRecorder.h"
 
 
 MidiController::MidiController( Model * _parent ) :

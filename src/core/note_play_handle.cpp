@@ -2,7 +2,7 @@
  * note_play_handle.cpp - implementation of class notePlayHandle, part of
  *                        rendering engine
  *
- * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -26,7 +26,7 @@
 #include "note_play_handle.h"
 #include "basic_filters.h"
 #include "config_mgr.h"
-#include "detuning_helper.h"
+#include "DetuningHelper.h"
 #include "InstrumentSoundShaping.h"
 #include "InstrumentTrack.h"
 #include "MidiPort.h"
@@ -34,9 +34,9 @@
 
 
 inline notePlayHandle::baseDetuning::baseDetuning(
-						detuningHelper * _detuning ) :
+						DetuningHelper * _detuning ) :
 	m_detuning( _detuning ),
-	m_value( m_detuning->getAutomationPattern()->valueAt( 0 ) )
+	m_value( m_detuning->automationPattern()->valueAt( 0 ) )
 {
 }
 
@@ -490,7 +490,7 @@ void notePlayHandle::processMidiTime( const midiTime & _time )
 {
 	if( _time >= pos() )
 	{
-		const float v = detuning()->getAutomationPattern()->
+		const float v = detuning()->automationPattern()->
 						valueAt( _time - pos() );
 		if( !typeInfo<float>::isEqual( v, m_baseDetuning->value() ) )
 		{

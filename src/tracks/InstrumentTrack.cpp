@@ -44,7 +44,7 @@
 
 #include "InstrumentTrack.h"
 #include "AudioPort.h"
-#include "automation_pattern.h"
+#include "AutomationPattern.h"
 #include "bb_track.h"
 #include "config_mgr.h"
 #include "ControllerConnection.h"
@@ -829,7 +829,7 @@ void InstrumentTrack::loadTrackSpecificSettings( const QDomElement & _this )
 			// compat code - if node-name doesn't match any known
 			// one, we assume that it is an instrument-plugin
 			// which we'll try to load
-			else if( automationPattern::classNodeName() != node.nodeName() &&
+			else if( AutomationPattern::classNodeName() != node.nodeName() &&
 					ControllerConnection::classNodeName() != node.nodeName() &&
 					!node.toElement().hasAttribute( "id" ) )
 			{
