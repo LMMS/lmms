@@ -2,6 +2,7 @@
  * ControllerRackView.cpp - view for song's controllers
  *
  * Copyright (c) 2008-2009 Paul Giblock <drfaygo/at/gmail.com>
+ * Copyright (c) 2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -21,7 +22,6 @@
  * Boston, MA 02110-1301 USA.
  *
  */
-
 
 #include <QtGui/QApplication>
 #include <QtGui/QLayout>
@@ -173,6 +173,10 @@ void ControllerRackView::addController()
 
 	engine::getSong()->addController( new LfoController( engine::getSong() ) );
 	update();
+
+	// fix bug which always made ControllerRackView loose focus when adding
+	// new controller
+	setFocus();
 }
 
 
