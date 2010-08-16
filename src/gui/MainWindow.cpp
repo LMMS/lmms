@@ -60,7 +60,7 @@
 #include "ToolPlugin.h"
 #include "tool_button.h"
 #include "ProjectJournal.h"
-#include "automation_editor.h"
+#include "AutomationEditor.h"
 #include "templates.h"
 
 
@@ -856,7 +856,7 @@ void MainWindow::togglePianoRollWin( void )
 
 void MainWindow::toggleAutomationEditorWin( void )
 {
-	toggleWindow( engine::getAutomationEditor() );
+	toggleWindow( engine::automationEditor() );
 }
 
 

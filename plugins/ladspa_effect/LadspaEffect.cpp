@@ -2,7 +2,7 @@
  * LadspaEffect.cpp - class for processing LADSPA effects
  *
  * Copyright (c) 2006-2008 Danny McRae <khjklujn/at/users.sourceforge.net>
- * Copyright (c) 2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2009-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -35,7 +35,7 @@
 #include "LadspaSubPluginFeatures.h"
 #include "mixer.h"
 #include "EffectChain.h"
-#include "automation_pattern.h"
+#include "AutomationPattern.h"
 #include "ControllerConnection.h"
 
 #include "embed.cpp"
@@ -122,10 +122,10 @@ void LadspaEffect::changeSampleRate()
 
 	// the IDs of re-created controls have been saved and now need to be
 	// resolved again
-	automationPattern::resolveAllIDs();
+	AutomationPattern::resolveAllIDs();
 
 	// make sure, connections are ok
-        ControllerConnection::finalizeConnections();
+	ControllerConnection::finalizeConnections();
 }
 
 
@@ -485,7 +485,7 @@ void LadspaEffect::pluginInstantiation()
 		{
 			port_desc_t * pp = m_ports.at( proc ).at( port );
 			if( !manager->connectPort( m_key,
-			     			m_handles[proc],
+						m_handles[proc],
 						port,
 						pp->buffer ) )
 			{

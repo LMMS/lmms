@@ -2,8 +2,8 @@
  * note.h - declaration of class note which contains all informations about a
  *          note + definitions of several constants and enums
  *
- * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ * Copyright (c) 2004-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -23,7 +23,6 @@
  *
  */
 
-
 #ifndef _NOTE_H
 #define _NOTE_H
 
@@ -34,7 +33,7 @@
 #include "midi_time.h"
 #include "SerializingObject.h"
 
-class detuningHelper;
+class DetuningHelper;
 
 
 enum Keys
@@ -87,7 +86,7 @@ public:
 		int key = DefaultKey,
 		volume_t _volume = DefaultVolume,
 		panning_t _panning = DefaultPanning,
-		detuningHelper * _detuning = NULL );
+		DetuningHelper * _detuning = NULL );
 	note( const note & _note );
 	virtual ~note();
 	
@@ -194,7 +193,7 @@ public:
 
 	static midiTime quantized( const midiTime & _m, const int _q_grid );
 
-	detuningHelper * detuning() const
+	DetuningHelper * detuning() const
 	{
 		return m_detuning;
 	}
@@ -236,7 +235,7 @@ private:
 	panning_t m_panning;
 	midiTime m_length;
 	midiTime m_pos;
-	detuningHelper * m_detuning;
+	DetuningHelper * m_detuning;
 
 	void createDetuning();
 

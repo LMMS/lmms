@@ -34,7 +34,7 @@
 #include "MeterModel.h"
 
 
-class automationTrack;
+class AutomationTrack;
 class pattern;
 class timeLine;
 
@@ -141,9 +141,9 @@ public:
 
 
 	bpm_t getTempo();
-	virtual automationPattern * tempoAutomationPattern();
+	virtual AutomationPattern * tempoAutomationPattern();
 
-	automationTrack * globalAutomationTrack()
+	AutomationTrack * globalAutomationTrack()
 	{
 		return m_globalAutomationTrack;
 	}
@@ -262,7 +262,7 @@ private:
 	void restoreControllerStates( const QDomElement & _this );
 
 
-	automationTrack * m_globalAutomationTrack;
+	AutomationTrack * m_globalAutomationTrack;
 
 	IntModel m_tempoModel;
 	MeterModel m_timeSigModel;

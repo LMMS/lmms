@@ -1,8 +1,8 @@
 /*
- * inline_automation.cpp - class for automating something "inline"
+ * InlineAutomation.cpp - class for automating something "inline"
  *
- * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ * Copyright (c) 2008-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -22,21 +22,20 @@
  *
  */
 
-
 #include <QtXml/QDomElement>
 
-#include "inline_automation.h"
+#include "InlineAutomation.h"
 
 
-void inlineAutomation::saveSettings( QDomDocument & _doc,
+void InlineAutomation::saveSettings( QDomDocument & _doc,
 							QDomElement & _parent )
 {
 	if( hasAutomation() )
 	{
 		QDomElement ap = _doc.createElement(
-					automationPattern::classNodeName() );
+					AutomationPattern::classNodeName() );
 		QDomElement v = _doc.createElement( nodeName() );
-		getAutomationPattern()->saveSettings( _doc, v );
+		automationPattern()->saveSettings( _doc, v );
 		ap.appendChild( v );
 		_parent.appendChild( ap );
 	}
@@ -45,15 +44,15 @@ void inlineAutomation::saveSettings( QDomDocument & _doc,
 
 
 
-void inlineAutomation::loadSettings( const QDomElement & _this )
+void InlineAutomation::loadSettings( const QDomElement & _this )
 {
-	QDomNode node = _this.namedItem( automationPattern::classNodeName() );
+	QDomNode node = _this.namedItem( AutomationPattern::classNodeName() );
 	if( node.isElement() )
 	{
 		node = node.namedItem( nodeName() );
 		if( node.isElement() )
 		{
-			getAutomationPattern()->loadSettings(
+			automationPattern()->loadSettings(
 							node.toElement() );
 		}
 	}

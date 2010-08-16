@@ -32,7 +32,7 @@
 #include "JournallingObject.h"
 
 
-class automationPattern;
+class AutomationPattern;
 class InstrumentTrack;
 class trackContainerView;
 
@@ -51,7 +51,7 @@ public:
 	virtual void loadSettings( const QDomElement & _this );
 
 
-	virtual automationPattern * tempoAutomationPattern()
+	virtual AutomationPattern * tempoAutomationPattern()
 	{
 		return NULL;
 	}

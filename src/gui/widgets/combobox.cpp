@@ -1,8 +1,9 @@
 /*
  * combobox.cpp - implementation of LMMS-combobox
  *
- * Copyright (c) 2006-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ * Copyright (c) 2006-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2009 Paul Giblock <pgib/at/users.sourceforge.net>
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -33,7 +34,6 @@
 #include <QtGui/QPixmap>
 #include <QtGui/QStyleOptionFrame>
 
-#include "automation_pattern.h"
 #include "caption_menu.h"
 #include "engine.h"
 #include "embed.h"

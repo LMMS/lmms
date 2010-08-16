@@ -2,8 +2,8 @@
  * detuning_helper.h - detuning automation helper
  *
  * Copyright (c) 2007 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
- * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ * Copyright (c) 2008-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -23,38 +23,37 @@
  *
  */
 
-
 #ifndef _DETUNING_HELPER_H
 #define _DETUNING_HELPER_H
 
-#include "inline_automation.h"
+#include "InlineAutomation.h"
 
 
-class detuningHelper : public inlineAutomation
+class DetuningHelper : public InlineAutomation
 {
 public:
-	detuningHelper() :
-		inlineAutomation()
+	DetuningHelper() :
+		InlineAutomation()
 	{
 	}
 
-	virtual ~detuningHelper()
+	virtual ~DetuningHelper()
 	{
 	}
 
 	virtual float defaultValue() const
 	{
-		return( 0 );
+		return 0;
 	}
 
 	virtual QString displayName() const
 	{
-		return( tr( "Note detuning" ) );
+		return tr( "Note detuning" );
 	}
 
 	inline virtual QString nodeName() const
 	{
-		return( "detuning" );
+		return "detuning";
 	}
 
 } ;

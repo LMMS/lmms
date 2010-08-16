@@ -1,6 +1,6 @@
 /*
- * automation_editor.cpp - implementation of automationEditor which is used for
- *                         actual setting of dynamic values
+ * AutomationEditor.cpp - implementation of AutomationEditor which is used for
+ *                        actual setting of dynamic values
  *
  * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2006-2008 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
@@ -24,7 +24,7 @@
  *
  */
 
-#include "automation_editor.h"
+#include "AutomationEditor.h"
 
 #include <QtGui/QApplication>
 #include <QtGui/QButtonGroup>
@@ -64,13 +64,13 @@
 
 
 
-QPixmap * automationEditor::s_toolDraw = NULL;
-QPixmap * automationEditor::s_toolErase = NULL;
-QPixmap * automationEditor::s_toolSelect = NULL;
-QPixmap * automationEditor::s_toolMove = NULL;
+QPixmap * AutomationEditor::s_toolDraw = NULL;
+QPixmap * AutomationEditor::s_toolErase = NULL;
+QPixmap * AutomationEditor::s_toolSelect = NULL;
+QPixmap * AutomationEditor::s_toolMove = NULL;
 
 
-automationEditor::automationEditor() :
+AutomationEditor::AutomationEditor() :
 	QWidget(),
 	m_zoomingXModel(),
 	m_zoomingYModel(),
@@ -376,7 +376,7 @@ automationEditor::automationEditor() :
 
 
 
-automationEditor::~automationEditor()
+AutomationEditor::~AutomationEditor()
 {
 	m_zoomingXModel.disconnect();
 	m_zoomingYModel.disconnect();
@@ -385,7 +385,7 @@ automationEditor::~automationEditor()
 
 
 
-void automationEditor::setCurrentPattern( automationPattern * _new_pattern )
+void AutomationEditor::setCurrentPattern( AutomationPattern * _new_pattern )
 {
 	m_patternMutex.lock();
 	m_pattern = _new_pattern;
@@ -397,7 +397,7 @@ void automationEditor::setCurrentPattern( automationPattern * _new_pattern )
 
 
 
-void automationEditor::saveSettings( QDomDocument & _doc, QDomElement & _this )
+void AutomationEditor::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
 	MainWindow::saveWidgetState( this, _this );
 }
@@ -405,7 +405,7 @@ void automationEditor::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 
 
-void automationEditor::loadSettings( const QDomElement & _this )
+void AutomationEditor::loadSettings( const QDomElement & _this )
 {
 	MainWindow::restoreWidgetState( this, _this );
 }
@@ -413,7 +413,7 @@ void automationEditor::loadSettings( const QDomElement & _this )
 
 
 
-void automationEditor::updateAfterPatternChange()
+void AutomationEditor::updateAfterPatternChange()
 {
 	QMutexLocker m( &m_patternMutex );
 
@@ -445,7 +445,7 @@ void automationEditor::updateAfterPatternChange()
 
 
 
-void automationEditor::update()
+void AutomationEditor::update()
 {
 	QWidget::update();
 
@@ -460,7 +460,7 @@ void automationEditor::update()
 
 
 
-inline void automationEditor::drawValueRect( QPainter & _p,
+inline void AutomationEditor::drawValueRect( QPainter & _p,
 						int _x, int _y,
 						int _width, int _height,
 						const bool _is_selected )
@@ -482,7 +482,7 @@ inline void automationEditor::drawValueRect( QPainter & _p,
 
 
 
-void automationEditor::removeSelection()
+void AutomationEditor::removeSelection()
 {
 	m_selectStartTick = 0;
 	m_selectedTick = 0;
@@ -493,7 +493,7 @@ void automationEditor::removeSelection()
 
 
 
-void automationEditor::closeEvent( QCloseEvent * _ce )
+void AutomationEditor::closeEvent( QCloseEvent * _ce )
 {
 	QApplication::restoreOverrideCursor();
 	if( parentWidget() )
@@ -510,7 +510,7 @@ void automationEditor::closeEvent( QCloseEvent * _ce )
 
 
 
-void automationEditor::keyPressEvent( QKeyEvent * _ke )
+void AutomationEditor::keyPressEvent( QKeyEvent * _ke )
 {
 	switch( _ke->key() )
 	{
@@ -659,7 +659,7 @@ void automationEditor::keyPressEvent( QKeyEvent * _ke )
 
 
 
-void automationEditor::leaveEvent( QEvent * _e )
+void AutomationEditor::leaveEvent( QEvent * _e )
 {
 	while( QApplication::overrideCursor() != NULL )
 	{
@@ -670,7 +670,7 @@ void automationEditor::leaveEvent( QEvent * _e )
 }
 
 
-void automationEditor::drawLine( int _x0, float _y0, int _x1, float _y1 )
+void AutomationEditor::drawLine( int _x0, float _y0, int _x1, float _y1 )
 {
 	int deltax = qRound( qAbs<float>( _x1 - _x0 ) );
 	float deltay = qAbs<float>( _y1 - _y0 );
@@ -721,7 +721,7 @@ void automationEditor::drawLine( int _x0, float _y0, int _x1, float _y1 )
 
 
 
-void automationEditor::mousePressEvent( QMouseEvent * _me )
+void AutomationEditor::mousePressEvent( QMouseEvent * _me )
 {
 	QMutexLocker m( &m_patternMutex );
 	if( !validPattern() )
@@ -872,7 +872,7 @@ void automationEditor::mousePressEvent( QMouseEvent * _me )
 
 
 
-void automationEditor::mouseReleaseEvent( QMouseEvent * _me )
+void AutomationEditor::mouseReleaseEvent( QMouseEvent * _me )
 {
 	m_action = NONE;
 
@@ -885,7 +885,7 @@ void automationEditor::mouseReleaseEvent( QMouseEvent * _me )
 
 
 
-void automationEditor::mouseMoveEvent( QMouseEvent * _me )
+void AutomationEditor::mouseMoveEvent( QMouseEvent * _me )
 {
 	QMutexLocker m( &m_patternMutex );
 	if( !validPattern() )
@@ -1240,7 +1240,7 @@ void automationEditor::mouseMoveEvent( QMouseEvent * _me )
 
 
 
-inline void automationEditor::drawCross( QPainter & _p )
+inline void AutomationEditor::drawCross( QPainter & _p )
 {
 	QPoint mouse_pos = mapFromGlobal( QCursor::pos() );
 	float level = getLevel( mouse_pos.y() );
@@ -1260,7 +1260,7 @@ inline void automationEditor::drawCross( QPainter & _p )
 
 
 
-void automationEditor::paintEvent( QPaintEvent * _pe )
+void AutomationEditor::paintEvent( QPaintEvent * _pe )
 {
 	QMutexLocker m( &m_patternMutex );
 
@@ -1601,7 +1601,7 @@ void automationEditor::paintEvent( QPaintEvent * _pe )
 
 
 // responsible for moving/resizing scrollbars after window-resizing
-void automationEditor::resizeEvent( QResizeEvent * )
+void AutomationEditor::resizeEvent( QResizeEvent * )
 {
 	m_leftRightScroll->setGeometry( VALUES_WIDTH, height() - SCROLLBAR_SIZE,
 							width() - VALUES_WIDTH,
@@ -1643,7 +1643,7 @@ void automationEditor::resizeEvent( QResizeEvent * )
 
 
 
-void automationEditor::wheelEvent( QWheelEvent * _we )
+void AutomationEditor::wheelEvent( QWheelEvent * _we )
 {
 	_we->accept();
 	if( _we->modifiers() & Qt::ControlModifier )
@@ -1682,7 +1682,7 @@ void automationEditor::wheelEvent( QWheelEvent * _we )
 
 
 
-float automationEditor::getLevel( int _y )
+float AutomationEditor::getLevel( int _y )
 {
 	int level_line_y = height() - SCROLLBAR_SIZE - 1;
 	// pressed level
@@ -1706,7 +1706,7 @@ float automationEditor::getLevel( int _y )
 
 
 
-inline bool automationEditor::inBBEditor()
+inline bool AutomationEditor::inBBEditor()
 {
 	QMutexLocker m( &m_patternMutex );
 	return( validPattern() &&
@@ -1717,7 +1717,7 @@ inline bool automationEditor::inBBEditor()
 
 
 
-void automationEditor::play()
+void AutomationEditor::play()
 {
 	QMutexLocker m( &m_patternMutex );
 
@@ -1793,7 +1793,7 @@ void automationEditor::play()
 
 
 
-void automationEditor::stop()
+void AutomationEditor::stop()
 {
 	QMutexLocker m( &m_patternMutex );
 
@@ -1817,7 +1817,7 @@ void automationEditor::stop()
 
 
 
-void automationEditor::horScrolled( int _new_pos )
+void AutomationEditor::horScrolled( int _new_pos )
 {
 	m_currentPosition = _new_pos;
 	emit positionChanged( m_currentPosition );
@@ -1827,7 +1827,7 @@ void automationEditor::horScrolled( int _new_pos )
 
 
 
-void automationEditor::verScrolled( int _new_pos )
+void AutomationEditor::verScrolled( int _new_pos )
 {
 	m_scrollLevel = _new_pos;
 	updateTopBottomLevels();
@@ -1837,7 +1837,7 @@ void automationEditor::verScrolled( int _new_pos )
 
 
 
-void automationEditor::drawButtonToggled()
+void AutomationEditor::drawButtonToggled()
 {
 	m_editMode = DRAW;
 	removeSelection();
@@ -1847,7 +1847,7 @@ void automationEditor::drawButtonToggled()
 
 
 
-void automationEditor::eraseButtonToggled()
+void AutomationEditor::eraseButtonToggled()
 {
 	m_editMode = ERASE;
 	removeSelection();
@@ -1857,7 +1857,7 @@ void automationEditor::eraseButtonToggled()
 
 
 
-void automationEditor::selectButtonToggled()
+void AutomationEditor::selectButtonToggled()
 {
 	m_editMode = SELECT;
 	removeSelection();
@@ -1867,7 +1867,7 @@ void automationEditor::selectButtonToggled()
 
 
 
-void automationEditor::moveButtonToggled()
+void AutomationEditor::moveButtonToggled()
 {
 	m_editMode = MOVE;
 	m_selValuesForMove.clear();
@@ -1878,7 +1878,7 @@ void automationEditor::moveButtonToggled()
 
 
 
-void automationEditor::selectAll()
+void AutomationEditor::selectAll()
 {
 	QMutexLocker m( &m_patternMutex );
 	if( !validPattern() )
@@ -1917,7 +1917,7 @@ void automationEditor::selectAll()
 
 
 // returns vector with pointers to all selected values
-void automationEditor::getSelectedValues( timeMap & _selected_values )
+void AutomationEditor::getSelectedValues( timeMap & _selected_values )
 {
 	QMutexLocker m( &m_patternMutex );
 	if( !validPattern() )
@@ -1962,7 +1962,7 @@ void automationEditor::getSelectedValues( timeMap & _selected_values )
 
 
 
-void automationEditor::copySelectedValues()
+void AutomationEditor::copySelectedValues()
 {
 	m_valuesToCopy.clear();
 
@@ -1986,7 +1986,7 @@ void automationEditor::copySelectedValues()
 
 
 
-void automationEditor::cutSelectedValues()
+void AutomationEditor::cutSelectedValues()
 {
 	QMutexLocker m( &m_patternMutex );
 	if( !validPattern() )
@@ -2018,7 +2018,7 @@ void automationEditor::cutSelectedValues()
 
 
 
-void automationEditor::pasteValues()
+void AutomationEditor::pasteValues()
 {
 	QMutexLocker m( &m_patternMutex );
 	if( validPattern() && !m_valuesToCopy.isEmpty() )
@@ -2041,7 +2041,7 @@ void automationEditor::pasteValues()
 
 
 
-void automationEditor::deleteSelectedValues()
+void AutomationEditor::deleteSelectedValues()
 {
 	QMutexLocker m( &m_patternMutex );
 	if( !validPattern() )
@@ -2071,7 +2071,7 @@ void automationEditor::deleteSelectedValues()
 
 
 
-void automationEditor::updatePosition( const midiTime & _t )
+void AutomationEditor::updatePosition( const midiTime & _t )
 {
 	if( ( engine::getSong()->isPlaying() &&
 			engine::getSong()->playMode() ==
@@ -2098,7 +2098,7 @@ void automationEditor::updatePosition( const midiTime & _t )
 
 
 
-void automationEditor::zoomingXChanged()
+void AutomationEditor::zoomingXChanged()
 {
 	const QString & zfac = m_zoomingXModel.currentText();
 	m_ppt = zfac.left( zfac.length() - 1 ).toInt() * DEFAULT_PPT / 100;
@@ -2112,7 +2112,7 @@ void automationEditor::zoomingXChanged()
 
 
 
-void automationEditor::zoomingYChanged()
+void AutomationEditor::zoomingYChanged()
 {
 	const QString & zfac = m_zoomingYModel.currentText();
 	m_y_auto = zfac == "Auto";
@@ -2130,7 +2130,7 @@ void automationEditor::zoomingYChanged()
 
 
 
-int automationEditor::quantization() const
+int AutomationEditor::quantization() const
 {
 	return( DefaultTicksPerTact /
 		m_quantizeComboBox->model()->currentText().right(
@@ -2141,7 +2141,7 @@ int automationEditor::quantization() const
 
 
 
-void automationEditor::updateTopBottomLevels()
+void AutomationEditor::updateTopBottomLevels()
 {
 	if( m_y_auto )
 	{
@@ -2188,6 +2188,6 @@ void automationEditor::updateTopBottomLevels()
 
 
 
-#include "moc_automation_editor.cxx"
+#include "moc_AutomationEditor.cxx"
 
 

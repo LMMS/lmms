@@ -26,7 +26,7 @@
 
 
 #include "engine.h"
-#include "automation_editor.h"
+#include "AutomationEditor.h"
 #include "bb_editor.h"
 #include "bb_track_container.h"
 #include "config_mgr.h"
@@ -57,7 +57,7 @@ MainWindow * engine::s_mainWindow = NULL;
 bbTrackContainer * engine::s_bbTrackContainer = NULL;
 song * engine::s_song = NULL;
 songEditor * engine::s_songEditor = NULL;
-automationEditor * engine::s_automationEditor = NULL;
+AutomationEditor * engine::s_automationEditor = NULL;
 bbEditor * engine::s_bbEditor = NULL;
 pianoRoll * engine::s_pianoRoll = NULL;
 projectNotes * engine::s_projectNotes = NULL;
@@ -97,7 +97,7 @@ void engine::init( const bool _has_gui )
 		s_projectNotes = new projectNotes;
 		s_bbEditor = new bbEditor( s_bbTrackContainer );
 		s_pianoRoll = new pianoRoll;
-		s_automationEditor = new automationEditor;
+		s_automationEditor = new AutomationEditor;
 
 		s_mainWindow->finalize();
 	}

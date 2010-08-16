@@ -28,7 +28,7 @@
 #include <math.h>
 
 #include "note.h"
-#include "detuning_helper.h"
+#include "DetuningHelper.h"
 #include "templates.h"
 
 
@@ -37,7 +37,7 @@
 
 note::note( const midiTime & _length, const midiTime & _pos,
 		int _key, volume_t _volume, panning_t _panning,
-						detuningHelper * _detuning ) :
+						DetuningHelper * _detuning ) :
 	m_selected( false ),
 	m_oldKey( tLimit( _key, 0, NumKeys ) ),
 	m_oldPos( _pos ),
@@ -261,7 +261,7 @@ void note::redoStep( journalEntry & _je )
 
 void note::editDetuningPattern()
 {
-	m_detuning->getAutomationPattern()->openInAutomationEditor();
+	m_detuning->automationPattern()->openInAutomationEditor();
 }
 
 
@@ -269,8 +269,8 @@ void note::editDetuningPattern()
 
 void note::createDetuning()
 {
-	m_detuning = new detuningHelper;
-	(void) m_detuning->getAutomationPattern();
+	m_detuning = new DetuningHelper;
+	(void) m_detuning->automationPattern();
 	m_detuning->setRange( -MaxDetuning, MaxDetuning, 0.1f );
 }
 

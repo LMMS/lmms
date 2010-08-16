@@ -49,7 +49,7 @@
 #include "Clipboard.h"
 #include "combobox.h"
 #include "debug.h"
-#include "detuning_helper.h"
+#include "DetuningHelper.h"
 #include "embed.h"
 #include "gui_templates.h"
 #include "InstrumentTrack.h"
@@ -68,7 +68,7 @@
 #include "tooltip.h"
 
 
-typedef automationPattern::timeMap timeMap;
+typedef AutomationPattern::timeMap timeMap;
 
 
 extern Keys whiteKeys[];	// defined in piano_widget.cpp
@@ -721,7 +721,7 @@ inline void pianoRoll::drawDetuningInfo( QPainter & _p, note * _n, int _x,
 	int middle_y = _y + KEY_LINE_HEIGHT / 2;
 	_p.setPen( QColor( 0xFF, 0xDF, 0x20 ) );
 
-	timeMap & map = _n->detuning()->getAutomationPattern()->getTimeMap();
+	timeMap & map = _n->detuning()->automationPattern()->getTimeMap();
 	for( timeMap::ConstIterator it = map.begin(); it != map.end(); ++it )
 	{
 		Sint32 pos_ticks = it.key();

@@ -1,5 +1,5 @@
 /*
- * inline_automation.h - class for automating something "inline"
+ * InlineAutomation.h - class for automating something "inline"
  *
  * Copyright (c) 2008-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -25,21 +25,21 @@
 #ifndef _INLINE_AUTOMATION_H
 #define _INLINE_AUTOMATION_H
 
-#include "automation_pattern.h"
+#include "AutomationPattern.h"
 #include "shared_object.h"
 
 
-class inlineAutomation : public FloatModel, public sharedObject
+class InlineAutomation : public FloatModel, public sharedObject
 {
 public:
-	inlineAutomation() :
+	InlineAutomation() :
 		FloatModel(),
 		sharedObject(),
 		m_autoPattern( NULL )
 	{
 	}
 
-	virtual ~inlineAutomation()
+	virtual ~InlineAutomation()
 	{
 		if( m_autoPattern )
 		{
@@ -57,11 +57,11 @@ public:
 							defaultValue() );
 	}
 
-	automationPattern * getAutomationPattern()
+	AutomationPattern * automationPattern()
 	{
 		if( m_autoPattern == NULL )
 		{
-			m_autoPattern = new automationPattern( NULL );
+			m_autoPattern = new AutomationPattern( NULL );
 			m_autoPattern->addObject( this );
 		}
 		return m_autoPattern;
@@ -72,7 +72,7 @@ public:
 
 
 private:
-	automationPattern * m_autoPattern;
+	AutomationPattern * m_autoPattern;
 
 } ;
 

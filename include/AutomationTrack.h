@@ -1,10 +1,10 @@
 /*
- * automation_track.h - declaration of class automationTrack, which handles
- *                      automation of objects without a track
+ * AutomationTrack.h - declaration of class AutomationTrack, which handles
+ *                     automation of objects without a track
  *
- * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2006-2008 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
- * 
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -24,18 +24,17 @@
  *
  */
 
-
 #ifndef _AUTOMATION_TRACK_H
 #define _AUTOMATION_TRACK_H
 
 #include "track.h"
 
 
-class automationTrack : public track
+class AutomationTrack : public track
 {
 public:
-	automationTrack( trackContainer * _tc, bool _hidden = false );
-	virtual ~automationTrack();
+	AutomationTrack( trackContainer * _tc, bool _hidden = false );
+	virtual ~AutomationTrack();
 
 	virtual bool play( const midiTime & _start, const fpp_t _frames,
 						const f_cnt_t _frame_base,
@@ -43,7 +42,7 @@ public:
 
 	virtual QString nodeName() const
 	{
-		return( "automationtrack" );
+		return "automationtrack";
 	}
 
 	virtual trackView * createView( trackContainerView * );
@@ -54,17 +53,17 @@ public:
 	virtual void loadTrackSpecificSettings( const QDomElement & _this );
 
 private:
-	friend class automationTrackView;
+	friend class AutomationTrackView;
 
 } ;
 
 
 
-class automationTrackView : public trackView
+class AutomationTrackView : public trackView
 {
 public:
-	automationTrackView( automationTrack * _at, trackContainerView * _tcv );
-	virtual ~automationTrackView();
+	AutomationTrackView( AutomationTrack * _at, trackContainerView * _tcv );
+	virtual ~AutomationTrackView();
 
 	virtual void dragEnterEvent( QDragEnterEvent * _dee );
 	virtual void dropEvent( QDropEvent * _de );

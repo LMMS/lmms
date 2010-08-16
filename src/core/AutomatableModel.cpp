@@ -25,7 +25,7 @@
 #include <QtXml/QDomElement>
 
 #include "AutomatableModel.h"
-#include "automation_pattern.h"
+#include "AutomationPattern.h"
 #include "ControllerConnection.h"
 
 
@@ -81,7 +81,7 @@ AutomatableModel::~AutomatableModel()
 
 bool AutomatableModel::isAutomated() const
 {
-	return automationPattern::isAutomated( this );
+	return AutomationPattern::isAutomated( this );
 }
 
 
@@ -128,13 +128,13 @@ void AutomatableModel::loadSettings( const QDomElement & _this,
 						const QString & _name )
 {
 	// compat code
-	QDomNode node = _this.namedItem( automationPattern::classNodeName() );
+	QDomNode node = _this.namedItem( AutomationPattern::classNodeName() );
 	if( node.isElement() )
 	{
 		node = node.namedItem( _name );
 		if( node.isElement() )
 		{
-			automationPattern * p = automationPattern::
+			AutomationPattern * p = AutomationPattern::
 						globalAutomationPattern( this );
 			p->loadSettings( node.toElement() );
 			setValue( p->valueAt( 0 ) );
