@@ -757,6 +757,11 @@ void song::clearProject()
 		engine::automationEditor()->setCurrentPattern( NULL );
 	}
 
+	m_tempoModel.reset();
+	m_masterVolumeModel.reset();
+	m_masterPitchModel.reset();
+	m_timeSigModel.reset();
+
 	AutomationPattern::globalAutomationPattern( &m_tempoModel )->clear();
 	AutomationPattern::globalAutomationPattern( &m_masterVolumeModel )->
 									clear();
