@@ -1414,9 +1414,7 @@ inline void ADnote::ComputeVoiceOscillatorRingModulation(int nvoice)
                                             i,
                                             SOUND_BUFFER_SIZE);
                 int FMVoice = NoteVoicePar[nvoice].FMVoice;
-                for(i = 0; i < SOUND_BUFFER_SIZE; i++)
-                    tw[i] *=
-                        (1.0 - amp) + amp * NoteVoicePar[FMVoice].VoiceOut[i];
+                tw[i] *= (1.0 - amp) + amp * NoteVoicePar[FMVoice].VoiceOut[i];
             }
         }
     }
