@@ -2002,7 +2002,7 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 			{
 				if( ( *it )->pos().getTicks() >= ticks_start 
 					&& ( *it )->pos().getTicks() <= ticks_end
-					&& ( *it )->length().getTicks() > 0
+					&& ( *it )->length().getTicks() != 0
 					&& ( ( *it )->isSelected() || ! use_selection ) )
 				{
 					m_pattern->dataChanged();
