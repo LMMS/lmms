@@ -1177,14 +1177,10 @@ void pianoRoll::keyPressEvent( QKeyEvent * _ke )
 		}
 
 		case Qt::Key_Control:
-			if( m_editMode != ModeSelect )
-			{
-				m_ctrlMode = m_editMode;
-				m_editMode = ModeSelect;
-				QApplication::changeOverrideCursor(
-												   QCursor( Qt::ArrowCursor ) );
-				update();
-			}
+			m_ctrlMode = m_editMode;
+			m_editMode = ModeSelect;
+			QApplication::changeOverrideCursor( Qt::ArrowCursor );
+			update();
 			break;
 		default:
 			_ke->ignore();
