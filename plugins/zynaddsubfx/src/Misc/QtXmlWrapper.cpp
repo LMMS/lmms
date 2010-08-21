@@ -279,16 +279,10 @@ int QtXmlWrapper::loadXMLfile(const std::string &filename)
 	}
 
 	QByteArray b( xmldata );
-	if( b[0] != '<' )
+	while( !b.isEmpty() && b[0] != '<' )
 	{
 		// remove first blank line
-		b.remove( 0,
-#ifdef LMMS_BUILD_WIN32
-			2
-#else
-			1
-#endif
-		);
+		b.remove( 0, 1 );
 	}
 
 	if( !d->m_doc.setContent( b ) )
