@@ -1,7 +1,7 @@
 /*
  * sample_buffer.cpp - container-class sampleBuffer
  *
- * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -184,7 +184,8 @@ void sampleBuffer::update( bool _keep_settings )
 		sample_rate_t samplerate = engine::getMixer()->baseSampleRate();
 		m_frames = 0;
 
-		if( QFileInfo( file ).size() > 100*1024*1024 )
+		const QFileInfo fileInfo( file );
+		if( fileInfo.size() > 100*1024*1024 )
 		{
 			qWarning( "refusing to load sample files bigger "
 								"than 100 MB" );
@@ -192,6 +193,15 @@ void sampleBuffer::update( bool _keep_settings )
 		else
 		{
 
+#ifdef LMMS_HAVE_OGGVORBIS
+		// workaround for a bug in libsndfile or our libsndfile decoder
+		// causing some OGG files to be distorted -> try with OGG Vorbis
+		// decoder first if filename extension matches "ogg"
+		if( m_frames == 0 && fileInfo.suffix() == "ogg" )
+		{
+			m_frames = decodeSampleOGGVorbis( f, buf, channels, samplerate );
+		}
+#endif
 		if( m_frames == 0 )
 		{
 			m_frames = decodeSampleSF( f, buf, channels,
