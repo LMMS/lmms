@@ -33,6 +33,8 @@
 namespace calf_plugins {
 
 /// Not a true _audio_module style class, just pretends to be one!
+/// Main gain reduction routine by Thor called by various audio modules
+
 class gain_reduction_audio_module
 {
 private:
@@ -56,6 +58,35 @@ public:
     void set_sample_rate(uint32_t sr);
     float get_output_level();
     float get_comp_level();
+    bool get_graph(int subindex, float *data, int points, cairo_iface *context) const;
+    bool get_dot(int subindex, float &x, float &y, int &size, cairo_iface *context) const;
+    bool get_gridline(int subindex, float &pos, bool &vertical, std::string &legend, cairo_iface *context) const;
+    int  get_changed_offsets(int generation, int &subindex_graph, int &subindex_dot, int &subindex_gridline) const;
+};
+
+/// Not a true _audio_module style class, just pretends to be one!
+/// Main gate routine by Damien called by various audio modules
+class expander_audio_module {
+private:
+    float linSlope, peak, detected, kneeSqrt, kneeStart, linKneeStart, kneeStop, linKneeStop;
+    float compressedKneeStop, adjKneeStart, range, thres, attack_coeff, release_coeff;
+    float attack, release, threshold, ratio, knee, makeup, detection, stereo_link, bypass, mute, meter_out, meter_gate;
+    mutable float old_threshold, old_ratio, old_knee, old_makeup, old_bypass, old_range, old_trigger, old_mute, old_detection, old_stereo_link;
+    mutable volatile int last_generation;
+    inline float output_level(float slope) const;
+    inline float output_gain(float linSlope, bool rms) const;
+public:
+    uint32_t srate;
+    bool is_active;
+    expander_audio_module();
+    void set_params(float att, float rel, float thr, float rat, float kn, float mak, float det, float stl, float byp, float mu, float ran);
+    void update_curve();
+    void process(float &left, float &right, const float *det_left = NULL, const float *det_right = NULL);
+    void activate();
+    void deactivate();
+    void set_sample_rate(uint32_t sr);
+    float get_output_level();
+    float get_expander_level();
     bool get_graph(int subindex, float *data, int points, cairo_iface *context) const;
     bool get_dot(int subindex, float &x, float &y, int &size, cairo_iface *context) const;
     bool get_gridline(int subindex, float &pos, bool &vertical, std::string &legend, cairo_iface *context) const;
@@ -130,7 +161,7 @@ public:
     int  get_changed_offsets(int index, int generation, int &subindex_graph, int &subindex_dot, int &subindex_gridline) const;
 };
 
-/// Multibandcompressor by Markus Schmidt
+/// Multibandcompressor by Markus Schmidt (based on Thor's compressor and Krzysztof's filters)
 class multibandcompressor_audio_module: public audio_module<multibandcompressor_metadata>, public line_graph_iface {
 private:
     typedef multibandcompressor_audio_module AM;
@@ -190,59 +221,73 @@ public:
     int  get_changed_offsets(int index, int generation, int &subindex_graph, int &subindex_dot, int &subindex_gridline) const;
 };
 
-
-class gate_audio_module: public audio_module<gate_metadata>, public line_graph_iface {
+/// Gate by Damien
+class gate_audio_module: public audio_module<gate_metadata>, public line_graph_iface  {
 private:
-    float linSlope, peak, detected, kneeSqrt, kneeStart, linKneeStart, kneeStop, linKneeStop, threshold, ratio, knee, makeup, compressedKneeStop, adjKneeStart, range;
-    mutable float old_threshold, old_ratio, old_knee, old_makeup, old_bypass, old_range, old_trigger, old_mono;
-    mutable volatile int last_generation;
-    uint32_t clip;
-    dsp::aweighter awL, awR;
-    dsp::biquad_d2<float> bpL, bpR;
+    typedef gate_audio_module AM;
+    uint32_t clip_in, clip_out;
+    float meter_in, meter_out;
+    expander_audio_module gate;
 public:
+    typedef std::complex<double> cfloat;
     uint32_t srate;
     bool is_active;
+    mutable volatile int last_generation, last_calculated_generation;
     gate_audio_module();
     void activate();
     void deactivate();
-    uint32_t process(uint32_t offset, uint32_t numsamples, uint32_t inputs_mask, uint32_t outputs_mask);
-
-    inline float output_level(float slope) const {
-        bool rms = *params[param_detection] == 0;
-        return slope * output_gain(rms ? slope*slope : slope, rms) * makeup;
-    }
-
-    inline float output_gain(float linSlope, bool rms) const {
-        if(linSlope < linKneeStop) {
-            float slope = log(linSlope);
-
-            //float tratio = rms ? sqrt(ratio) : ratio;
-            float tratio = ratio;
-            float gain = 0.f;
-            float delta = 0.f;
-	    if(IS_FAKE_INFINITY(ratio))
-	        tratio = 1000.f;
-            gain = (slope-threshold) * tratio + threshold;
-            delta = tratio;
-
-            if(knee > 1.f && slope > kneeStart ) {
-		gain = dsp::hermite_interpolation(slope, kneeStart, kneeStop, ((kneeStart - threshold) * tratio  + threshold), kneeStop, delta,1.f);
-	    }
-	    return std::max(range, expf(gain-slope));
-	}
-
-
-        return 1.f;
-    }
-
+    void params_changed();
     void set_sample_rate(uint32_t sr);
-
-    virtual bool get_graph(int index, int subindex, float *data, int points, cairo_iface *context) const;
-    virtual bool get_dot(int index, int subindex, float &x, float &y, int &size, cairo_iface *context) const;
-    virtual bool get_gridline(int index, int subindex, float &pos, bool &vertical, std::string &legend, cairo_iface *context) const;
-    virtual int  get_changed_offsets(int generation, int &subindex_graph, int &subindex_dot, int &subindex_gridline) const;
+    uint32_t process(uint32_t offset, uint32_t numsamples, uint32_t inputs_mask, uint32_t outputs_mask);
+    bool get_graph(int index, int subindex, float *data, int points, cairo_iface *context) const;
+    bool get_dot(int index, int subindex, float &x, float &y, int &size, cairo_iface *context) const;
+    bool get_gridline(int index, int subindex, float &pos, bool &vertical, std::string &legend, cairo_iface *context) const;
+    int  get_changed_offsets(int index, int generation, int &subindex_graph, int &subindex_dot, int &subindex_gridline) const;
 };
 
+/// Sidecain Gate by Markus Schmidt (based on Damiens's gate and Krzysztof's filters)
+class sidechaingate_audio_module: public audio_module<sidechaingate_metadata>, public frequency_response_line_graph  {
+private:
+    typedef sidechaingate_audio_module AM;
+    enum CalfScModes {
+        WIDEBAND,
+        HIGHGATE_WIDE,
+        HIGHGATE_SPLIT,
+        LOWGATE_WIDE,
+        LOWGATE_SPLIT,
+        WEIGHTED_1,
+        WEIGHTED_2,
+        WEIGHTED_3,
+        BANDPASS_1,
+        BANDPASS_2
+    };
+    mutable float f1_freq_old, f2_freq_old, f1_level_old, f2_level_old;
+    mutable float f1_freq_old1, f2_freq_old1, f1_level_old1, f2_level_old1;
+    CalfScModes sc_mode;
+    mutable CalfScModes sc_mode_old, sc_mode_old1;
+    float f1_active, f2_active;
+    uint32_t clip_in, clip_out;
+    float meter_in, meter_out;
+    expander_audio_module gate;
+    dsp::biquad_d2<float> f1L, f1R, f2L, f2R;
+public:
+    typedef std::complex<double> cfloat;
+    uint32_t srate;
+    bool is_active;
+    mutable volatile int last_generation, last_calculated_generation;
+    sidechaingate_audio_module();
+    void activate();
+    void deactivate();
+    void params_changed();
+    cfloat h_z(const cfloat &z) const;
+    float freq_gain(int index, double freq, uint32_t sr) const;
+    void set_sample_rate(uint32_t sr);
+    uint32_t process(uint32_t offset, uint32_t numsamples, uint32_t inputs_mask, uint32_t outputs_mask);
+    bool get_graph(int index, int subindex, float *data, int points, cairo_iface *context) const;
+    bool get_dot(int index, int subindex, float &x, float &y, int &size, cairo_iface *context) const;
+    bool get_gridline(int index, int subindex, float &pos, bool &vertical, std::string &legend, cairo_iface *context) const;
+    int  get_changed_offsets(int index, int generation, int &subindex_graph, int &subindex_dot, int &subindex_gridline) const;
+};
 
 };
 
