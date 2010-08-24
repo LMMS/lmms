@@ -1118,6 +1118,540 @@ int deesser_audio_module::get_changed_offsets(int index, int generation, int &su
     return false;
 }
 
+/// Gate originally by Damien
+///
+/// This module provides Damien's original expander based on Thor's compressor
+/// without any weighting
+///////////////////////////////////////////////////////////////////////////////////////////////
+
+gate_audio_module::gate_audio_module()
+{
+    is_active = false;
+    srate = 0;
+    last_generation = 0;
+}
+
+void gate_audio_module::activate()
+{
+    is_active = true;
+    // set all filters and strips
+    gate.activate();
+    params_changed();
+    meter_in = 0.f;
+    meter_out = 0.f;
+    clip_in = 0.f;
+    clip_out = 0.f;
+}
+void gate_audio_module::deactivate()
+{
+    is_active = false;
+    gate.deactivate();
+}
+
+void gate_audio_module::params_changed()
+{
+    gate.set_params(*params[param_attack], *params[param_release], *params[param_threshold], *params[param_ratio], *params[param_knee], *params[param_makeup], *params[param_detection], *params[param_stereo_link], *params[param_bypass], 0.f, *params[param_range]);
+}
+
+void gate_audio_module::set_sample_rate(uint32_t sr)
+{
+    srate = sr;
+    gate.set_sample_rate(srate);
+}
+
+uint32_t gate_audio_module::process(uint32_t offset, uint32_t numsamples, uint32_t inputs_mask, uint32_t outputs_mask)
+{
+    bool bypass = *params[param_bypass] > 0.5f;
+    numsamples += offset;
+    if(bypass) {
+        // everything bypassed
+        while(offset < numsamples) {
+            outs[0][offset] = ins[0][offset];
+            outs[1][offset] = ins[1][offset];
+            ++offset;
+        }
+        // displays, too
+        clip_in    = 0.f;
+        clip_out   = 0.f;
+        meter_in   = 0.f;
+        meter_out  = 0.f;
+    } else {
+        // process
+        clip_in    -= std::min(clip_in,  numsamples);
+        clip_out   -= std::min(clip_out,  numsamples);
+        
+        gate.update_curve();
+        
+        while(offset < numsamples) {
+            // cycle through samples
+            float outL = 0.f;
+            float outR = 0.f;
+            float inL = ins[0][offset];
+            float inR = ins[1][offset];
+            // in level
+            inR *= *params[param_level_in];
+            inL *= *params[param_level_in];
+            
+            float leftAC = inL;
+            float rightAC = inR;
+            
+            gate.process(leftAC, rightAC);
+            
+            outL = leftAC;
+            outR = rightAC;
+            
+            // send to output
+            outs[0][offset] = outL;
+            outs[1][offset] = outR;
+            
+            // clip LED's
+            if(std::max(fabs(inL), fabs(inR)) > 1.f) {
+                clip_in   = srate >> 3;
+            }
+            if(std::max(fabs(outL), fabs(outR)) > 1.f) {
+                clip_out  = srate >> 3;
+            }
+            // rise up out meter
+            meter_in = std::max(fabs(inL), fabs(inR));;
+            meter_out = std::max(fabs(outL), fabs(outR));;
+            
+            // next sample
+            ++offset;
+        } // cycle trough samples
+    }
+    // draw meters
+    SET_IF_CONNECTED(clip_in)
+    SET_IF_CONNECTED(clip_out)
+    SET_IF_CONNECTED(meter_in)
+    SET_IF_CONNECTED(meter_out)
+    // draw strip meter
+    if(bypass > 0.5f) {
+        if(params[param_gating] != NULL) {
+            *params[param_gating] = 1.0f;
+        }
+    } else {
+        if(params[param_gating] != NULL) {
+            *params[param_gating] = gate.get_expander_level();
+        }
+    }
+    // whatever has to be returned x)
+    return outputs_mask;
+}
+bool gate_audio_module::get_graph(int index, int subindex, float *data, int points, cairo_iface *context) const
+{
+    if (!is_active)
+        return false;
+    return gate.get_graph(subindex, data, points, context);
+}
+
+bool gate_audio_module::get_dot(int index, int subindex, float &x, float &y, int &size, cairo_iface *context) const
+{
+    if (!is_active)
+        return false;
+    return gate.get_dot(subindex, x, y, size, context);
+}
+
+bool gate_audio_module::get_gridline(int index, int subindex, float &pos, bool &vertical, std::string &legend, cairo_iface *context) const
+{
+    if (!is_active)
+        return false;
+    return gate.get_gridline(subindex, pos, vertical, legend, context);
+}
+
+int gate_audio_module::get_changed_offsets(int index, int generation, int &subindex_graph, int &subindex_dot, int &subindex_gridline) const
+{
+    if (!is_active)
+        return false;
+    return gate.get_changed_offsets(generation, subindex_graph, subindex_dot, subindex_gridline);
+}
+
+/// Sidecain Gate by Markus Schmidt
+///
+/// This module splits the signal in a sidechain- and a process signal.
+/// The sidechain is processed through Krzystofs filters and gates
+/// the process signal via Damiens's gating routine afterwards.
+///////////////////////////////////////////////////////////////////////////////////////////////
+
+sidechaingate_audio_module::sidechaingate_audio_module()
+{
+    is_active = false;
+    srate = 0;
+    last_generation = 0;
+}
+
+void sidechaingate_audio_module::activate()
+{
+    is_active = true;
+    // set all filters and strips
+    gate.activate();
+    params_changed();
+    meter_in = 0.f;
+    meter_out = 0.f;
+    clip_in = 0.f;
+    clip_out = 0.f;
+}
+void sidechaingate_audio_module::deactivate()
+{
+    is_active = false;
+    gate.deactivate();
+}
+
+sidechaingate_audio_module::cfloat sidechaingate_audio_module::h_z(const cfloat &z) const
+{
+    switch (sc_mode) {
+        default:
+        case WIDEBAND:
+            return false;
+            break;
+        case HIGHGATE_WIDE:
+        case LOWGATE_WIDE:
+        case WEIGHTED_1:
+        case WEIGHTED_2:
+        case WEIGHTED_3:
+        case BANDPASS_2:
+            return f1L.h_z(z) * f2L.h_z(z);
+            break;
+        case HIGHGATE_SPLIT:
+            return f2L.h_z(z);
+            break;
+        case LOWGATE_SPLIT:
+        case BANDPASS_1:
+            return f1L.h_z(z);
+            break;
+    }            
+}
+
+float sidechaingate_audio_module::freq_gain(int index, double freq, uint32_t sr) const
+{
+    typedef std::complex<double> cfloat;
+    freq *= 2.0 * M_PI / sr;
+    cfloat z = 1.0 / exp(cfloat(0.0, freq));
+    
+    return std::abs(h_z(z));
+}
+
+void sidechaingate_audio_module::params_changed()
+{
+    // set the params of all filters
+    if(*params[param_f1_freq] != f1_freq_old or *params[param_f1_level] != f1_level_old
+        or *params[param_f2_freq] != f2_freq_old or *params[param_f2_level] != f2_level_old
+        or *params[param_sc_mode] != sc_mode) {
+        float q = 0.707;
+        switch ((int)*params[param_sc_mode]) {
+            default:
+            case WIDEBAND:
+                f1L.set_hp_rbj((float)*params[param_f1_freq], q, (float)srate, *params[param_f1_level]);
+                f1R.copy_coeffs(f1L);
+                f2L.set_lp_rbj((float)*params[param_f2_freq], q, (float)srate, *params[param_f2_level]);
+                f2R.copy_coeffs(f2L);
+                f1_active = 0.f;
+                f2_active = 0.f;
+                break;
+            case HIGHGATE_WIDE:
+                f1L.set_peakeq_rbj((float)*params[param_f1_freq], q, *params[param_f1_level], (float)srate);
+                f1R.copy_coeffs(f1L);
+                f2L.set_hp_rbj((float)*params[param_f2_freq], q, (float)srate, *params[param_f2_level]);
+                f2R.copy_coeffs(f2L);
+                f1_active = 0.5f;
+                f2_active = 1.f;
+                break;
+            case HIGHGATE_SPLIT:
+                f1L.set_lp_rbj((float)*params[param_f2_freq] * (1 + 0.17), q, (float)srate);
+                f1R.copy_coeffs(f1L);
+                f2L.set_hp_rbj((float)*params[param_f2_freq] * (1 - 0.17), q, (float)srate, *params[param_f2_level]);
+                f2R.copy_coeffs(f2L);
+                f1_active = 0.f;
+                f2_active = 1.f;
+                break;
+            case LOWGATE_WIDE:
+                f1L.set_lp_rbj((float)*params[param_f1_freq], q, (float)srate, *params[param_f1_level]);
+                f1R.copy_coeffs(f1L);
+                f2L.set_peakeq_rbj((float)*params[param_f2_freq], q, *params[param_f2_level], (float)srate);
+                f2R.copy_coeffs(f2L);
+                f1_active = 1.f;
+                f2_active = 0.5f;
+                break;
+            case LOWGATE_SPLIT:
+                f1L.set_lp_rbj((float)*params[param_f1_freq] * (1 + 0.17), q, (float)srate, *params[param_f1_level]);
+                f1R.copy_coeffs(f1L);
+                f2L.set_hp_rbj((float)*params[param_f1_freq] * (1 - 0.17), q, (float)srate);
+                f2R.copy_coeffs(f2L);
+                f1_active = 1.f;
+                f2_active = 0.f;
+                break;
+            case WEIGHTED_1:
+                f1L.set_lowshelf_rbj((float)*params[param_f1_freq], q, *params[param_f1_level], (float)srate);
+                f1R.copy_coeffs(f1L);
+                f2L.set_highshelf_rbj((float)*params[param_f2_freq], q, *params[param_f2_level], (float)srate);
+                f2R.copy_coeffs(f2L);
+                f1_active = 0.5f;
+                f2_active = 0.5f;
+                break;
+            case WEIGHTED_2:
+                f1L.set_lowshelf_rbj((float)*params[param_f1_freq], q, *params[param_f1_level], (float)srate);
+                f1R.copy_coeffs(f1L);
+                f2L.set_peakeq_rbj((float)*params[param_f2_freq], q, *params[param_f2_level], (float)srate);
+                f2R.copy_coeffs(f2L);
+                f1_active = 0.5f;
+                f2_active = 0.5f;
+                break;
+            case WEIGHTED_3:
+                f1L.set_peakeq_rbj((float)*params[param_f1_freq], q, *params[param_f1_level], (float)srate);
+                f1R.copy_coeffs(f1L);
+                f2L.set_highshelf_rbj((float)*params[param_f2_freq], q, *params[param_f2_level], (float)srate);
+                f2R.copy_coeffs(f2L);
+                f1_active = 0.5f;
+                f2_active = 0.5f;
+                break;
+            case BANDPASS_1:
+                f1L.set_bp_rbj((float)*params[param_f1_freq], q, (float)srate, *params[param_f1_level]);
+                f1R.copy_coeffs(f1L);
+                f2L.set_hp_rbj((float)*params[param_f2_freq], q, *params[param_f2_level], (float)srate);
+                f2R.copy_coeffs(f2L);
+                f1_active = 1.f;
+                f2_active = 0.f;
+                break;
+            case BANDPASS_2:
+                f1L.set_hp_rbj((float)*params[param_f1_freq], q, (float)srate, *params[param_f1_level]);
+                f1R.copy_coeffs(f1L);
+                f2L.set_lp_rbj((float)*params[param_f2_freq], q, (float)srate, *params[param_f2_level]);
+                f2R.copy_coeffs(f2L);
+                f1_active = 1.f;
+                f2_active = 1.f;
+                break;
+        }
+        f1_freq_old = *params[param_f1_freq];
+        f1_level_old = *params[param_f1_level];
+        f2_freq_old = *params[param_f2_freq];
+        f2_level_old = *params[param_f2_level];
+        sc_mode = (CalfScModes)*params[param_sc_mode];
+    }
+    // light LED's
+    if(params[param_f1_active] != NULL) {
+        *params[param_f1_active] = f1_active;
+    }
+    if(params[param_f2_active] != NULL) {
+        *params[param_f2_active] = f2_active;
+    }
+    // and set the expander module
+    gate.set_params(*params[param_attack], *params[param_release], *params[param_threshold], *params[param_ratio], *params[param_knee], *params[param_makeup], *params[param_detection], *params[param_stereo_link], *params[param_bypass], 0.f, *params[param_range]);
+}
+
+void sidechaingate_audio_module::set_sample_rate(uint32_t sr)
+{
+    srate = sr;
+    gate.set_sample_rate(srate);
+}
+
+uint32_t sidechaingate_audio_module::process(uint32_t offset, uint32_t numsamples, uint32_t inputs_mask, uint32_t outputs_mask)
+{
+    bool bypass = *params[param_bypass] > 0.5f;
+    numsamples += offset;
+    if(bypass) {
+        // everything bypassed
+        while(offset < numsamples) {
+            outs[0][offset] = ins[0][offset];
+            outs[1][offset] = ins[1][offset];
+            ++offset;
+        }
+        // displays, too
+        clip_in    = 0.f;
+        clip_out   = 0.f;
+        meter_in   = 0.f;
+        meter_out  = 0.f;
+    } else {
+        // process
+        
+        clip_in    -= std::min(clip_in,  numsamples);
+        clip_out   -= std::min(clip_out,  numsamples);
+        gate.update_curve();
+        
+        while(offset < numsamples) {
+            // cycle through samples
+            float outL = 0.f;
+            float outR = 0.f;
+            float inL = ins[0][offset];
+            float inR = ins[1][offset];
+            // in level
+            inR *= *params[param_level_in];
+            inL *= *params[param_level_in];
+            
+            
+            float leftAC = inL;
+            float rightAC = inR;
+            float leftSC = inL;
+            float rightSC = inR;
+            float leftMC = inL;
+            float rightMC = inR;
+            
+            switch ((int)*params[param_sc_mode]) {
+                default:
+                case WIDEBAND:
+                    gate.process(leftAC, rightAC);
+                    break;
+                case HIGHGATE_WIDE:
+                case LOWGATE_WIDE:
+                case WEIGHTED_1:
+                case WEIGHTED_2:
+                case WEIGHTED_3:
+                case BANDPASS_2:
+                    leftSC = f2L.process(f1L.process(leftSC));
+                    rightSC = f2R.process(f1R.process(rightSC));
+                    leftMC = leftSC;
+                    rightMC = rightSC;
+                    gate.process(leftAC, rightAC, &leftSC, &rightSC);
+                    break;
+                case HIGHGATE_SPLIT:
+                    leftSC = f2L.process(leftSC);
+                    rightSC = f2R.process(rightSC);
+                    leftMC = leftSC;
+                    rightMC = rightSC;
+                    gate.process(leftSC, rightSC, &leftSC, &rightSC);
+                    leftAC = f1L.process(leftAC);
+                    rightAC = f1R.process(rightAC);
+                    leftAC += leftSC;
+                    rightAC += rightSC;
+                    break;
+                case LOWGATE_SPLIT:
+                    leftSC = f1L.process(leftSC);
+                    rightSC = f1R.process(rightSC);
+                    leftMC = leftSC;
+                    rightMC = rightSC;
+                    gate.process(leftSC, rightSC);
+                    leftAC = f2L.process(leftAC);
+                    rightAC = f2R.process(rightAC);
+                    leftAC += leftSC;
+                    rightAC += rightSC;
+                    break;
+                case BANDPASS_1:
+                    leftSC = f1L.process(leftSC);
+                    rightSC = f1R.process(rightSC);
+                    leftMC = leftSC;
+                    rightMC = rightSC;
+                    gate.process(leftAC, rightAC, &leftSC, &rightSC);
+                    break;
+            }
+            
+            if(*params[param_sc_listen] > 0.f) {
+                outL = leftMC;
+                outR = rightMC;
+            } else {
+                outL = leftAC;
+                outR = rightAC;
+            }
+            
+            // send to output
+            outs[0][offset] = outL;
+            outs[1][offset] = outR;
+            
+            // clip LED's
+            if(std::max(fabs(inL), fabs(inR)) > 1.f) {
+                clip_in   = srate >> 3;
+            }
+            if(std::max(fabs(outL), fabs(outR)) > 1.f) {
+                clip_out  = srate >> 3;
+            }
+            // rise up out meter
+            meter_in = std::max(fabs(inL), fabs(inR));;
+            meter_out = std::max(fabs(outL), fabs(outR));;
+            
+            // next sample
+            ++offset;
+        } // cycle trough samples
+        f1L.sanitize();
+        f1R.sanitize();
+        f2L.sanitize();
+        f2R.sanitize();
+            
+    }
+    // draw meters
+    SET_IF_CONNECTED(clip_in)
+    SET_IF_CONNECTED(clip_out)
+    SET_IF_CONNECTED(meter_in)
+    SET_IF_CONNECTED(meter_out)
+    // draw strip meter
+    if(bypass > 0.5f) {
+        if(params[param_gating] != NULL) {
+            *params[param_gating] = 1.0f;
+        }
+    } else {
+        if(params[param_gating] != NULL) {
+            *params[param_gating] = gate.get_expander_level();
+        }
+    }
+    // whatever has to be returned x)
+    return outputs_mask;
+}
+bool sidechaingate_audio_module::get_graph(int index, int subindex, float *data, int points, cairo_iface *context) const
+{
+    if (!is_active)
+        return false;
+    if (index == param_f1_freq && !subindex) {
+        context->set_line_width(1.5);
+        return ::get_graph(*this, subindex, data, points);
+    } else if(index == param_gating) {
+        return gate.get_graph(subindex, data, points, context);
+    }
+    return false;
+}
+
+bool sidechaingate_audio_module::get_dot(int index, int subindex, float &x, float &y, int &size, cairo_iface *context) const
+{
+    if (!is_active)
+        return false;
+    if (index == param_gating) {
+        return gate.get_dot(subindex, x, y, size, context);
+    }
+    return false;
+}
+
+bool sidechaingate_audio_module::get_gridline(int index, int subindex, float &pos, bool &vertical, std::string &legend, cairo_iface *context) const
+{
+    if (!is_active)
+        return false;
+    if (index == param_gating) {
+        return gate.get_gridline(subindex, pos, vertical, legend, context);
+    } else {
+        return get_freq_gridline(subindex, pos, vertical, legend, context);
+    }
+//    return false;
+}
+
+int sidechaingate_audio_module::get_changed_offsets(int index, int generation, int &subindex_graph, int &subindex_dot, int &subindex_gridline) const
+{
+    if (!is_active)
+        return false;
+    if(index == param_gating) {
+        return gate.get_changed_offsets(generation, subindex_graph, subindex_dot, subindex_gridline);
+    } else {
+        //  (fabs(inertia_cutoff.get_last() - old_cutoff) + 100 * fabs(inertia_resonance.get_last() - old_resonance) + fabs(*params[par_mode] - old_mode) > 0.1f)
+        if (*params[param_f1_freq] != f1_freq_old1
+            or *params[param_f2_freq] != f2_freq_old1
+            or *params[param_f1_level] != f1_level_old1
+            or *params[param_f2_level] != f2_level_old1
+            or *params[param_sc_mode] !=sc_mode_old1)
+        {
+            f1_freq_old1 = *params[param_f1_freq];
+            f2_freq_old1 = *params[param_f2_freq];
+            f1_level_old1 = *params[param_f1_level];
+            f2_level_old1 = *params[param_f2_level];
+            sc_mode_old1 = (CalfScModes)*params[param_sc_mode];
+            last_generation++;
+            subindex_graph = 0;
+            subindex_dot = INT_MAX;
+            subindex_gridline = INT_MAX;
+        }
+        else {
+            subindex_graph = 0;
+            subindex_dot = subindex_gridline = generation ? INT_MAX : 0;
+        }
+        if (generation == last_calculated_generation)
+            subindex_graph = INT_MAX;
+        return last_generation;
+    }
+    return false;
+}
+
 /// Gain reduction module by Thor
 /// All functions of this module are originally written
 /// by Thor, while some features have been stripped (mainly stereo linking
@@ -1127,6 +1661,7 @@ int deesser_audio_module::get_changed_offsets(int index, int generation, int &su
 gain_reduction_audio_module::gain_reduction_audio_module()
 {
     is_active       = false;
+    srate           = 0;
     last_generation = 0;
 }
 
@@ -1170,7 +1705,6 @@ void gain_reduction_audio_module::process(float &left, float &right, const float
     if(!det_right) {
         det_right = &right;
     }
-    float gain = 1.f;
     if(bypass < 0.5f) {
         // this routine is mainly copied from thor's compressor module
         // greatest sounding compressor I've heard!
@@ -1183,7 +1717,7 @@ void gain_reduction_audio_module::process(float &left, float &right, const float
         if(rms) absample *= absample;
             
         linSlope += (absample - linSlope) * (absample > linSlope ? attack_coeff : release_coeff);
-        
+        float gain = 1.f;
         if(linSlope > 0.f) {
             gain = output_gain(linSlope, rms);
         }
@@ -1344,37 +1878,143 @@ int gain_reduction_audio_module::get_changed_offsets(int generation, int &subind
 }
 
 
-
-///////////////////////////////////////////////////////////////////////////////////////////////
-
-gate_audio_module::gate_audio_module()
+/// Gate module by Damien
+/// All functions of this module are originally written
+/// by Damien, while some features have been stripped (mainly stereo linking
+/// and frequency correction as implemented in Sidechain Gate above)
+/// To save some CPU.
+////////////////////////////////////////////////////////////////////////////////
+expander_audio_module::expander_audio_module()
 {
-    is_active = false;
-    srate = 0;
+    is_active       = false;
+    srate           = 0;
     last_generation = 0;
 }
 
-void gate_audio_module::activate()
+void expander_audio_module::activate()
 {
     is_active = true;
-    linSlope = 0.f;
-    peak = 0.f;
-    clip = 0.f;
+    linSlope   = 0.f;
+    meter_out  = 0.f;
+    meter_gate = 1.f;
+    float l, r;
+    l = r = 0.f;
+    float byp = bypass;
+    bypass = 0.0;
+    process(l, r);
+    bypass = byp;
 }
 
-void gate_audio_module::deactivate()
+void expander_audio_module::deactivate()
 {
     is_active = false;
 }
 
-void gate_audio_module::set_sample_rate(uint32_t sr)
+void expander_audio_module::update_curve()
 {
-    srate = sr;
-    awL.set(sr);
-    awR.set(sr);
+    bool rms = detection == 0;
+    float linThreshold = threshold;
+    if (rms)
+        linThreshold = linThreshold * linThreshold;
+    attack_coeff = std::min(1.f, 1.f / (attack * srate / 4000.f));
+    release_coeff = std::min(1.f, 1.f / (release * srate / 4000.f));
+    float linKneeSqrt = sqrt(knee);
+    linKneeStart = linThreshold / linKneeSqrt;
+    adjKneeStart = linKneeStart*linKneeStart;
+    linKneeStop = linThreshold * linKneeSqrt;
+    thres = log(linThreshold);
+    kneeStart = log(linKneeStart);
+    kneeStop = log(linKneeStop);
+    compressedKneeStop = (kneeStop - thres) / ratio + thres;
 }
 
-bool gate_audio_module::get_graph(int index, int subindex, float *data, int points, cairo_iface *context) const
+void expander_audio_module::process(float &left, float &right, const float *det_left, const float *det_right)
+{
+    if(!det_left) {
+        det_left = &left;
+    }
+    if(!det_right) {
+        det_right = &right;
+    }
+    if(bypass < 0.5f) {
+        // this routine is mainly copied from Damien's expander module based on Thor's compressor
+        bool rms = detection == 0;
+        bool average = stereo_link == 0;
+        float absample = average ? (fabs(*det_left) + fabs(*det_right)) * 0.5f : std::max(fabs(*det_left), fabs(*det_right));
+        if(rms) absample *= absample;
+            
+        linSlope += (absample - linSlope) * (absample > linSlope ? attack_coeff : release_coeff);
+        float gain = 1.f;
+        if(linSlope > 0.f) {
+            gain = output_gain(linSlope, rms);
+        }
+        left *= gain * makeup;
+        right *= gain * makeup;
+        meter_out = std::max(fabs(left), fabs(right));
+        meter_gate = gain;
+        detected = linSlope;
+    }
+}
+
+float expander_audio_module::output_level(float slope) const {
+    bool rms = detection == 0;
+    return slope * output_gain(rms ? slope*slope : slope, rms) * makeup;
+}
+
+float expander_audio_module::output_gain(float linSlope, bool rms) const {
+    //this calculation is also Damiens's work based on Thor's compressor
+    if(linSlope < linKneeStop) {
+        float slope = log(linSlope);
+        //float tratio = rms ? sqrt(ratio) : ratio;
+        float tratio = ratio;
+        float gain = 0.f;
+        float delta = 0.f;
+        if(IS_FAKE_INFINITY(ratio))
+            tratio = 1000.f;
+        gain = (slope-thres) * tratio + thres;
+        delta = tratio;
+
+        if(knee > 1.f && slope > kneeStart ) {
+            gain = dsp::hermite_interpolation(slope, kneeStart, kneeStop, ((kneeStart - thres) * tratio  + thres), kneeStop, delta,1.f);
+        }
+        return std::max(range, expf(gain-slope));
+    }
+    return 1.f;
+}
+
+void expander_audio_module::set_sample_rate(uint32_t sr)
+{
+    srate = sr;
+}
+void expander_audio_module::set_params(float att, float rel, float thr, float rat, float kn, float mak, float det, float stl, float byp, float mu, float ran)
+{
+    // set all params
+    attack          = att;
+    release         = rel;
+    threshold       = thr;
+    ratio           = rat;
+    knee            = kn;
+    makeup          = mak;
+    detection       = det;
+    stereo_link     = stl;
+    bypass          = byp;
+    mute            = mu;
+    range           = ran;
+    if(mute > 0.f) {
+        meter_out  = 0.f;
+        meter_gate = 1.f;
+    }
+}
+float expander_audio_module::get_output_level() {
+    // returns output level (max(left, right))
+    return meter_out;
+}
+float expander_audio_module::get_expander_level() {
+    // returns amount of gating
+    return meter_gate;
+}
+
+bool expander_audio_module::get_graph(int subindex, float *data, int points, cairo_iface *context) const
 {
     if (!is_active)
         return false;
@@ -1383,13 +2023,14 @@ bool gate_audio_module::get_graph(int index, int subindex, float *data, int poin
     for (int i = 0; i < points; i++)
     {
         float input = dB_grid_inv(-1.0 + i * 2.0 / (points - 1));
-        float output = output_level(input);
         if (subindex == 0)
             data[i] = dB_grid(input);
-        else
+        else {
+            float output = output_level(input);
             data[i] = dB_grid(output);
+        }
     }
-    if (subindex == (*params[param_bypass] > 0.f ? 1 : 0))
+    if (subindex == (bypass > 0.5f ? 1 : 0) or mute > 0.1f)
         context->set_source_rgba(0.35, 0.4, 0.2, 0.3);
     else {
         context->set_source_rgba(0.35, 0.4, 0.2, 1);
@@ -1398,22 +2039,26 @@ bool gate_audio_module::get_graph(int index, int subindex, float *data, int poin
     return true;
 }
 
-bool gate_audio_module::get_dot(int index, int subindex, float &x, float &y, int &size, cairo_iface *context) const
+bool expander_audio_module::get_dot(int subindex, float &x, float &y, int &size, cairo_iface *context) const
 {
     if (!is_active)
         return false;
     if (!subindex)
     {
-        bool rms = *params[param_detection] == 0;
-        float det = rms ? sqrt(detected) : detected;
-        x = 0.5 + 0.5 * dB_grid(det);
-        y = dB_grid(*params[param_bypass] > 0.f ? det : output_level(det));
-        return *params[param_bypass] > 0.f ? false : true;
+        if(bypass > 0.5f or mute > 0.f) {
+            return false;
+        } else {
+            bool rms = detection == 0;
+            float det = rms ? sqrt(detected) : detected;
+            x = 0.5 + 0.5 * dB_grid(det);
+            y = dB_grid(bypass > 0.5f or mute > 0.f ? det : output_level(det));
+            return true;
+        }
     }
     return false;
 }
 
-bool gate_audio_module::get_gridline(int index, int subindex, float &pos, bool &vertical, std::string &legend, cairo_iface *context) const
+bool expander_audio_module::get_gridline(int subindex, float &pos, bool &vertical, std::string &legend, cairo_iface *context) const
 {
     bool tmp;
     vertical = (subindex & 1) != 0;
@@ -1432,161 +2077,26 @@ bool gate_audio_module::get_gridline(int index, int subindex, float &pos, bool &
     return result;
 }
 
-uint32_t gate_audio_module::process(uint32_t offset, uint32_t numsamples, uint32_t inputs_mask, uint32_t outputs_mask)
-{
-    bool bypass = *params[param_bypass] > 0.f;
-
-    if(bypass) {
-        int count = numsamples * sizeof(float);
-        memcpy(outs[0], ins[0], count);
-        memcpy(outs[1], ins[1], count);
-
-        if(params[param_gating] != NULL) {
-            *params[param_gating] = 1.f;
-        }
-
-        if(params[param_clip] != NULL) {
-            *params[param_clip] = 0.f;
-        }
-
-        if(params[param_peak] != NULL) {
-            *params[param_peak] = 0.f;
-        }
-
-        return inputs_mask;
-    }
-
-    bool rms = *params[param_detection] == 0;
-    bool average = *params[param_stereo_link] == 0;
-    int aweighting = fastf2i_drm(*params[param_aweighting]);
-    float linThreshold = *params[param_threshold];
-    if (rms)
-        linThreshold = linThreshold * linThreshold;
-    ratio = *params[param_ratio];
-    float attack = *params[param_attack];
-    float attack_coeff = std::min(1.f, 1.f / (attack * srate / 4000.f));
-    float release = *params[param_release];
-    float release_coeff = std::min(1.f, 1.f / (release * srate / 4000.f));
-    makeup = *params[param_makeup];
-    knee = *params[param_knee];
-
-    range = *params[param_range];
-
-    float linKneeSqrt = sqrt(knee);
-    linKneeStart = linThreshold / linKneeSqrt;
-    adjKneeStart = linKneeStart*linKneeStart;
-    linKneeStop = linThreshold * linKneeSqrt;
-
-    threshold = log(linThreshold);
-    kneeStart = log(linKneeStart);
-    kneeStop = log(linKneeStop);
-    compressedKneeStop = (kneeStop - threshold) / ratio + threshold;
-
-    if (aweighting >= 2)
-    {
-        bpL.set_highshelf_rbj(5000, 0.707, 10 << (aweighting - 2), srate);
-        bpR.copy_coeffs(bpL);
-        bpL.sanitize();
-        bpR.sanitize();
-    }
-
-    numsamples += offset;
-
-    float gating = 1.f;
-
-    peak -= peak * 5.f * numsamples / srate;
-
-    clip -= std::min(clip, numsamples);
-    float left;
-    float right;
-
-    while(offset < numsamples) {
-        if(*params[param_trigger]) {
-	    left = ins[2][offset];  // Use sidechain to trigger input
-	    right = left;           // (mono sidechain)
-	} else {
-	    left = ins[0][offset];
-            right = ins[1][offset];
-        }
-
-        if(aweighting == 1) {
-            left = awL.process(left);
-            right = awR.process(right);
-        }
-        else if(aweighting >= 2) {
-            left = bpL.process(left);
-            right = bpR.process(right);
-        }
-
-        float absample = average ? (fabs(left) + fabs(right)) * 0.5f : std::max(fabs(left), fabs(right));
-        if(rms) absample *= absample;
-
-        linSlope += (absample - linSlope) * (absample > linSlope ? attack_coeff : release_coeff);
-
-        float gain = 1.f;
-
-        if(linSlope > 0.f) {
-            gain = output_gain(linSlope, rms);
-        }
-
-        gating = gain;
-        gain *= makeup;
-
-        float outL = ins[0][offset] * gain;
-        float outR = ins[1][offset] * gain;
-
-        outs[0][offset] = outL;
-        outs[1][offset] = outR;
-
-        ++offset;
-
-        float maxLR = std::max(fabs(outL), fabs(outR));
-
-        if(maxLR > 1.f) clip = srate >> 3; /* blink clip LED for 125 ms */
-
-        if(maxLR > peak) {
-            peak = maxLR;
-        }
-    }
-
-    detected = linSlope;
-
-    if(params[param_gating] != NULL) {
-        *params[param_gating] = gating;
-    }
-
-    if(params[param_clip] != NULL) {
-        *params[param_clip] = clip;
-    }
-
-    if(params[param_peak] != NULL) {
-        *params[param_peak] = peak;
-    }
-
-    return inputs_mask;
-}
-
-int gate_audio_module::get_changed_offsets(int generation, int &subindex_graph, int &subindex_dot, int &subindex_gridline) const
+int expander_audio_module::get_changed_offsets(int generation, int &subindex_graph, int &subindex_dot, int &subindex_gridline) const
 {
     subindex_graph = 0;
     subindex_dot = 0;
     subindex_gridline = generation ? INT_MAX : 0;
 
-    if (fabs(range-old_range) + fabs(threshold-old_threshold) + fabs(ratio - old_ratio) + fabs(knee - old_knee) + fabs( makeup - old_makeup) + fabs( *params[param_bypass] - old_bypass) > 0.01f)
+    if (fabs(range-old_range) + fabs(threshold-old_threshold) + fabs(ratio - old_ratio) + fabs(knee - old_knee) + fabs(makeup - old_makeup) + fabs(detection - old_detection) + fabs(bypass - old_bypass) + fabs(mute - old_mute) > 0.000001f)
     {
-        old_range = range;
+        old_range     = range;
         old_threshold = threshold;
-        old_ratio = ratio;
-        old_knee = knee;
-        old_makeup = makeup;
-        old_bypass = *params[param_bypass];
-        old_trigger = *params[param_trigger];
-        old_mono = *params[param_mono];
+        old_ratio     = ratio;
+        old_knee      = knee;
+        old_makeup    = makeup;
+        old_detection = detection;
+        old_bypass    = bypass;
+        old_mute      = mute;
         last_generation++;
     }
-        old_trigger = *params[param_trigger];
-
     if (generation == last_generation)
         subindex_graph = 2;
     return last_generation;
 }
+
