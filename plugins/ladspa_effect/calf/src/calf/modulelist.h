@@ -13,6 +13,8 @@
     PER_MODULE_ITEM(sidechaincompressor, false, "sidechaincompressor")
     PER_MODULE_ITEM(multibandcompressor, false, "multibandcompressor")
     PER_MODULE_ITEM(deesser, false, "deesser")
+    PER_MODULE_ITEM(gate, false, "gate")
+    PER_MODULE_ITEM(sidechaingate, false, "sidechaingate")
     PER_MODULE_ITEM(pulsator, false, "pulsator")
     PER_MODULE_ITEM(equalizer5band, false, "eq5")
     PER_MODULE_ITEM(equalizer8band, false, "eq8")
@@ -20,7 +22,6 @@
     PER_MODULE_ITEM(saturator, false, "saturator")
     PER_MODULE_ITEM(exciter, false, "exciter")
     PER_MODULE_ITEM(bassenhancer, false, "bassenhancer")
-    PER_MODULE_ITEM(gate, false, "gate")
 #ifdef ENABLE_EXPERIMENTAL
     PER_MODULE_ITEM(fluidsynth, true, "fluidsynth")
     PER_MODULE_ITEM(wavetable, true, "wavetable")

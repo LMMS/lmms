@@ -400,6 +400,83 @@ CALF_PORT_PROPS(deesser) = {
 CALF_PLUGIN_INFO(deesser) = { 0x8515, "Deesser", "Calf Deesser", "Markus Schmidt / Thor Harald Johansen", calf_plugins::calf_copyright_info, "CompressorPlugin" };
 
 ////////////////////////////////////////////////////////////////////////////
+
+CALF_PORT_NAMES(gate) = {"In L", "In R", "Out L", "Out R"};
+
+const char *gate_detection_names[] = { "RMS", "Peak" };
+const char *gate_stereo_link_names[] = { "Average", "Maximum" };
+
+CALF_PORT_PROPS(gate) = {
+    { 0,      0,  1,    0, PF_BOOL | PF_CTL_TOGGLE, NULL, "bypass", "Bypass" },
+    { 1,           0,           64,    0,  PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_COEF | PF_PROP_NOBOUNDS, NULL, "level_in", "Input" },
+    { 0,      0,  1,    0, PF_FLOAT | PF_SCALE_GAIN | PF_CTL_METER | PF_CTLO_LABEL | PF_UNIT_DB | PF_PROP_OUTPUT | PF_PROP_OPTIONAL, NULL, "meter_in", "Input" },
+    { 0,      0,  1,    0, PF_FLOAT | PF_SCALE_GAIN | PF_CTL_METER | PF_CTLO_LABEL | PF_UNIT_DB | PF_PROP_OUTPUT | PF_PROP_OPTIONAL, NULL, "meter_out", "Output" },
+    { 0,      0,  1,    0, PF_BOOL | PF_CTL_LED | PF_PROP_OUTPUT | PF_PROP_OPTIONAL, NULL, "clip_in", "0dB-In" },
+    { 0,      0,  1,    0, PF_BOOL | PF_CTL_LED | PF_PROP_OUTPUT | PF_PROP_OPTIONAL, NULL, "clip_out", "0dB-Out" },
+    { 0.06125,   0.000015849, 1, 0, PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_DB, NULL, "range", "Max Gain Reduction" },
+    { 0.125,      0.000976563, 1,    0, PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_DB, NULL, "threshold", "Threshold" },
+    { 2,      1, 20,  21, PF_FLOAT | PF_SCALE_LOG_INF | PF_CTL_KNOB | PF_UNIT_COEF, NULL, "ratio", "Ratio" },
+    { 20,     0.01, 2000, 0, PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_MSEC, NULL, "attack", "Attack" },
+    { 250,    0.01, 2000, 0, PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_MSEC, NULL, "release", "Release" },
+    { 1,      1, 64,    0, PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_DB, NULL, "makeup", "Makeup Gain" },
+    { 2.828427125,      1,  8,   0, PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_DB, NULL, "knee", "Knee" },
+    { 0,      0,  1,    0, PF_ENUM | PF_CTL_COMBO, gate_detection_names, "detection", "Detection" },
+    { 0,      0,  1,    0, PF_ENUM | PF_CTL_COMBO, gate_stereo_link_names, "stereo_link", "Stereo Link" },
+    { 0, 0.03125, 1,    0, PF_FLOAT | PF_SCALE_GAIN | PF_CTL_METER | PF_CTLO_LABEL | PF_CTLO_REVERSE | PF_UNIT_DB | PF_PROP_OUTPUT | PF_PROP_OPTIONAL| PF_PROP_GRAPH, NULL, "gating", "Gating" },
+};
+
+CALF_PLUGIN_INFO(gate) = { 0x8503, "Gate", "Calf Gate", "Damien Zammit / Thor Harald Johansen", calf_plugins::calf_copyright_info, "ExpanderPlugin" };
+
+////////////////////////////////////////////////////////////////////////////
+
+CALF_PORT_NAMES(sidechaingate) = {"In L", "In R", "Out L", "Out R"};
+
+const char *sidechaingate_detection_names[] = { "RMS", "Peak" };
+const char *sidechaingate_stereo_link_names[] = { "Average", "Maximum" };
+const char *sidechaingate_mode_names[] = {"Wideband (F1:off / F2:off)",
+                                                "High gate wide (F1:Bell / F2:HP)",
+                                                "High gate split (F1:off / F2:HP)",
+                                                "Low Gate wide (F1:LP / F2:Bell)",
+                                                "Low gate split (F1:LP / F2:off)",
+                                                "Weighted #1 (F1:Shelf / F2:Shelf)",
+                                                "Weighted #2 (F1:Shelf / F2:Bell)",
+                                                "Weighted #3 (F1:Bell / F2:Shelf)",
+                                                "Bandpass #1 (F1:BP / F2:off)",
+                                                "Bandpass #2 (F1:HP / F2:LP)"};
+const char *sidechaingate_filter_choices[] = { "12dB", "24dB", "36dB"};
+
+
+CALF_PORT_PROPS(sidechaingate) = {
+    { 0,      0,  1,    0, PF_BOOL | PF_CTL_TOGGLE, NULL, "bypass", "Bypass" },
+    { 1,           0,           64,    0,  PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_COEF | PF_PROP_NOBOUNDS, NULL, "level_in", "Input" },
+    { 0,      0,  1,    0, PF_FLOAT | PF_SCALE_GAIN | PF_CTL_METER | PF_CTLO_LABEL | PF_UNIT_DB | PF_PROP_OUTPUT | PF_PROP_OPTIONAL, NULL, "meter_in", "Input" },
+    { 0,      0,  1,    0, PF_FLOAT | PF_SCALE_GAIN | PF_CTL_METER | PF_CTLO_LABEL | PF_UNIT_DB | PF_PROP_OUTPUT | PF_PROP_OPTIONAL, NULL, "meter_out", "Output" },
+    { 0,      0,  1,    0, PF_BOOL | PF_CTL_LED | PF_PROP_OUTPUT | PF_PROP_OPTIONAL, NULL, "clip_in", "0dB-In" },
+    { 0,      0,  1,    0, PF_BOOL | PF_CTL_LED | PF_PROP_OUTPUT | PF_PROP_OPTIONAL, NULL, "clip_out", "0dB-Out" },
+    { 0.06125,   0.000015849, 1, 0, PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_DB, NULL, "range", "Max Gain Reduction" },
+    { 0.125,      0.000976563, 1,    0, PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_DB, NULL, "threshold", "Threshold" },
+    { 2,      1, 20,  21, PF_FLOAT | PF_SCALE_LOG_INF | PF_CTL_KNOB | PF_UNIT_COEF, NULL, "ratio", "Ratio" },
+    { 20,     0.01, 2000, 0, PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_MSEC, NULL, "attack", "Attack" },
+    { 250,    0.01, 2000, 0, PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_MSEC, NULL, "release", "Release" },
+    { 1,      1, 64,    0, PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_DB, NULL, "makeup", "Makeup Gain" },
+    { 2.828427125,      1,  8,   0, PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_DB, NULL, "knee", "Knee" },
+    { 0,      0,  1,    0, PF_ENUM | PF_CTL_COMBO, sidechaingate_detection_names, "detection", "Detection" },
+    { 0,      0,  1,    0, PF_ENUM | PF_CTL_COMBO, sidechaingate_stereo_link_names, "stereo_link", "Stereo Link" },
+    { 0, 0.03125, 1,    0, PF_FLOAT | PF_SCALE_GAIN | PF_CTL_METER | PF_CTLO_LABEL | PF_CTLO_REVERSE | PF_UNIT_DB | PF_PROP_OUTPUT | PF_PROP_OPTIONAL| PF_PROP_GRAPH, NULL, "gating", "Gating" },
+    { 0,      0,  9,    0, PF_ENUM | PF_CTL_COMBO, sidechaingate_mode_names, "sc_mode", "Sidechain Mode" },
+    { 250,    10,18000, 0, PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_HZ | PF_PROP_GRAPH, NULL, "f1_freq", "F1 Freq" },
+    { 4500,   10,18000, 0, PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_HZ, NULL, "f2_freq", "F2 Freq" },
+    { 1,      0.0625,  16, 0, PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_DB, NULL, "f1_level", "F1 Level" },
+    { 1,      0.0625,  16, 0, PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_DB, NULL, "f2_level", "F2 Level" },
+    { 0,      0,  1,    0, PF_BOOL | PF_CTL_TOGGLE, NULL, "sc_listen", "S/C-Listen" },
+    { 0,      0,  1,    0, PF_BOOL | PF_CTL_LED | PF_PROP_OUTPUT | PF_PROP_OPTIONAL, NULL, "f1_active", "F1 Active" },
+    { 0,      0,  1,    0, PF_BOOL | PF_CTL_LED | PF_PROP_OUTPUT | PF_PROP_OPTIONAL, NULL, "f2_active", "F2 Active" },
+};
+
+CALF_PLUGIN_INFO(sidechaingate) = { 0x8504, "Sidechaingate", "Calf Sidechain Gate", "Markus Schmidt / Damien Zammit / Thor Harald Johansen", calf_plugins::calf_copyright_info, "ExpanderPlugin" };
+
+
+////////////////////////////////////////////////////////////////////////////
 // A few macros to make 
 
 #define BYPASS_AND_LEVEL_PARAMS \
@@ -591,37 +668,6 @@ CALF_PORT_PROPS(bassenhancer) = {
 };
 
 CALF_PLUGIN_INFO(bassenhancer) = { 0x8532, "BassEnhancer", "Calf Bass Enhancer", "Markus Schmidt / Krzysztof Foltman", calf_plugins::calf_copyright_info, "DistortionPlugin" };
-
-
-////////////////////////////////////////////////////////////////////////////
-
-CALF_PORT_NAMES(gate) = {"In L", "In R", "In Trigger", "Out L", "Out R"};
-
-const char *gate_detection_names[] = { "RMS", "Peak" };
-const char *gate_stereo_link_names[] = { "Average", "Maximum" };
-const char *gate_weighting_names[] = { "Normal", "A-weighted", "Deesser (low)", "Deesser (med)", "Deesser (high)" };
-
-CALF_PORT_PROPS(gate) = {
-    { 0.125,      0.000976563, 1,    0, PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_DB, NULL, "threshold", "Threshold" },
-    { 2,      1, 20,  21, PF_FLOAT | PF_SCALE_LOG_INF | PF_CTL_KNOB | PF_UNIT_COEF, NULL, "ratio", "Ratio" },
-    { 20,     1, 2000, 0, PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_MSEC, NULL, "attack", "Attack" },
-    { 250,    1, 2000, 0, PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_MSEC, NULL, "release", "Release" },
-    { 1,      1, 64,   0, PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_DB, NULL, "makeup", "Makeup Gain" },
-    { 2.828427125,      1,  8,   0, PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_DB, NULL, "knee", "Knee" },
-    { 0,      0,  1,   0, PF_ENUM | PF_CTL_COMBO, gate_detection_names, "detection", "Detection" },
-    { 0,      0,  1,   0, PF_ENUM | PF_CTL_COMBO, gate_stereo_link_names, "stereo_link", "Stereo Link" },
-    { 0,      0,  4,   0, PF_ENUM | PF_CTL_COMBO, gate_weighting_names, "aweighting", "Weighting" },
-    { 0, 0.03125, 1,    0, PF_FLOAT | PF_SCALE_GAIN | PF_CTL_METER | PF_CTLO_LABEL | PF_UNIT_DB | PF_PROP_OUTPUT | PF_PROP_OPTIONAL| PF_PROP_GRAPH, NULL, "gating", "Gating" },
-    { 0,      0,  1,    0, PF_FLOAT | PF_SCALE_GAIN | PF_CTL_METER | PF_CTLO_LABEL | PF_UNIT_DB | PF_PROP_OUTPUT | PF_PROP_OPTIONAL, NULL, "peak", "Peak Output" },
-    { 0,      0,  1,    0, PF_BOOL | PF_CTL_LED | PF_PROP_OUTPUT | PF_PROP_OPTIONAL, NULL, "clip", "0dBFS" },
-    { 0,      0,  1,    0, PF_BOOL | PF_CTL_TOGGLE, NULL, "bypass", "Bypass" },
-    { 0.01,   0.000015849, 1, 0, PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_DB, NULL, "range", "Max Gain Reduction" },
-    { 0,      0,  1,    0, PF_BOOL | PF_CTL_TOGGLE, NULL, "mono", "Mono (L only)" },
-    { 0,      0,  1,    0, PF_BOOL | PF_CTL_TOGGLE, NULL, "trigger", "Sidechain (Mono In)" },
-
-};
-
-CALF_PLUGIN_INFO(gate) = { 0x8503, "Gate", "Calf Gate", "Damien Zammit / Thor Harald Johansen", calf_plugins::calf_copyright_info, "ExpanderPlugin" };
 
 ////////////////////////////////////////////////////////////////////////////
 
