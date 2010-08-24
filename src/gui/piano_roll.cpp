@@ -1331,10 +1331,10 @@ void pianoRoll::mousePressEvent( QMouseEvent * _me )
 			const NoteVector & notes = m_pattern->notes();
 
 			// will be our iterator in the following loop
-			NoteVector::ConstIterator it = notes.begin();
+			NoteVector::ConstIterator it = notes.begin()+notes.size()-1;
 
 			// loop through whole note-vector...
-			while( it != notes.end() )
+			for( int i = 0; i < notes.size(); ++i )
 			{
 				midiTime len = ( *it )->length();
 				if( len < 0 )
@@ -1360,7 +1360,7 @@ void pianoRoll::mousePressEvent( QMouseEvent * _me )
 				{
 					break;
 				}
-				++it;
+				--it;
 			}
 
 			// first check whether the user clicked in note-edit-
@@ -1378,10 +1378,9 @@ void pianoRoll::mousePressEvent( QMouseEvent * _me )
 				note * created_new_note = NULL;
 				// did it reach end of vector because
 				// there's no note??
-				if( it == notes.end() )
+				if( it == notes.begin()-1 )
 				{
-					m_pattern->setType(
-						pattern::MelodyPattern );
+					m_pattern->setType( pattern::MelodyPattern );
 
 					// then set new note
 					
@@ -1537,10 +1536,7 @@ void pianoRoll::mousePressEvent( QMouseEvent * _me )
 					// play the note
 					testPlayNote( m_currentNote );
 				}
-				
-				
-				
-				
+
 				engine::getSong()->setModified();
 			}
 			else if( ( _me->buttons() == Qt::RightButton &&
@@ -1549,7 +1545,7 @@ void pianoRoll::mousePressEvent( QMouseEvent * _me )
 			{
 				// erase single note
 				m_mouseDownRight = true;
-				if( it != notes.end() )
+				if( it != notes.begin()-1 )
 				{
 					if( ( *it )->length() > 0 )
 					{
@@ -1997,36 +1993,37 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 			
 			// loop through vector
 			bool use_selection = isSelection();
-			NoteVector::ConstIterator it = notes.begin();
-			while( it != notes.end() )
+			NoteVector::ConstIterator it = notes.begin()+notes.size()-1;
+			for( int i = 0; i < notes.size(); ++i )
 			{
-				if( ( *it )->pos().getTicks() >= ticks_start 
-					&& ( *it )->pos().getTicks() <= ticks_end
-					&& ( *it )->length().getTicks() != 0
-					&& ( ( *it )->isSelected() || ! use_selection ) )
+				note * n = *it;
+				if( n->pos().getTicks() >= ticks_start 
+					&& n->pos().getTicks() <= ticks_end
+					&& n->length().getTicks() != 0
+					&& ( n->selected() || ! use_selection ) )
 				{
 					m_pattern->dataChanged();
 					
 					// play the note so that the user can tell how loud it is
 					// and where it is panned
-					testPlayNote( *it );
+					testPlayNote( n );
 					
 					if( m_noteEditMode == NoteEditVolume )
 					{
-						( *it )->setVolume( vol );
+						n->setVolume( vol );
 						m_pattern->instrumentTrack()->processInEvent(
 							midiEvent( 
 							  MidiKeyPressure, 
 							  0, 
-							  ( *it )->key(), 
+							  n->key(), 
 							  vol * 127 / 100),
 									midiTime() );
 					}
 					else if( m_noteEditMode == NoteEditPanning )
 					{
-						( *it )->setPanning( pan );
+						n->setPanning( pan );
 						midiEvent evt( MidiMetaEvent, 0, 
-									  ( *it )->key(), panningToMidi( pan ) );
+										  n->key(), panningToMidi( pan ) );
 						evt.m_metaEvent = MidiNotePanning;
 						m_pattern->instrumentTrack()->processInEvent(
 									evt, midiTime() );
@@ -2034,18 +2031,18 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 				}
 				else
 				{
-					if( ( *it )->isPlaying() )
+					if( n->isPlaying() )
 					{
 						// mouse not over this note, stop playing it.
 						m_pattern->instrumentTrack()->processInEvent(
 							midiEvent( MidiNoteOff, 0,
-							( *it )->key(), 0 ), midiTime() );
+										n->key(), 0 ), midiTime() );
 						
-						( *it )->setIsPlaying( false );
+						n->setIsPlaying( false );
 					}
 				}
 				
-				++it;
+				--it;
 
 			}
 		}
@@ -2061,10 +2058,10 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 			const NoteVector & notes = m_pattern->notes();
 
 			// will be our iterator in the following loop
-			NoteVector::ConstIterator it = notes.begin();
+			NoteVector::ConstIterator it = notes.begin()+notes.size()-1;
 
 			// loop through whole note-vector...
-			while( it != notes.end() )
+			for( int i = 0; i < notes.size(); ++i )
 			{
 				// and check whether the cursor is over an
 				// existing note
@@ -2076,12 +2073,12 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 				{
 					break;
 				}
-				++it;
+				--it;
 			}
 
 			// did it reach end of vector because there's
 			// no note??
-			if( it != notes.end() )
+			if( it != notes.begin()-1 )
 			{
 				// cursor at the "tail" of the note?
 				if( ( *it )->length() > 0 &&
@@ -3577,10 +3574,11 @@ note * pianoRoll::noteUnderMouse()
 			midiTime::ticksPerTact() / m_ppt + m_currentPosition;
 
 	// will be our iterator in the following loop
-	NoteVector::ConstIterator it = notes.begin();
+	NoteVector::ConstIterator it = notes.begin()+notes.size()-1;
 
 	// loop through whole note-vector...
-	while( it != notes.end() )
+	int i;
+	for( i = 0; i < notes.size(); ++i )
 	{
 		// and check whether the cursor is over an
 		// existing note
@@ -3590,7 +3588,12 @@ note * pianoRoll::noteUnderMouse()
 		{
 			break;
 		}
-		++it;
+		--it;
+	}
+
+	if( i == notes.size() )
+	{
+		return NULL;
 	}
 
 	return *it;
