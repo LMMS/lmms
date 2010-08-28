@@ -512,6 +512,11 @@ sidechaincompressor_audio_module::sidechaincompressor_audio_module()
     is_active = false;
     srate = 0;
     last_generation = 0;
+    f1_freq_old1  = 0.f;
+    f2_freq_old1  = 0.f;
+    f1_level_old1 = 0.f;
+    f2_level_old1 = 0.f;
+    sc_mode_old1  = WIDEBAND;
 }
 
 void sidechaincompressor_audio_module::activate()
@@ -899,6 +904,11 @@ deesser_audio_module::deesser_audio_module()
     is_active = false;
     srate = 0;
     last_generation = 0;
+    f1_freq_old1  = 0.f;
+    f2_freq_old1  = 0.f;
+    f1_level_old1 = 0.f;
+    f2_level_old1 = 0.f;
+    f2_q_old1     = 0.f;
 }
 
 void deesser_audio_module::activate()
@@ -1668,6 +1678,13 @@ gain_reduction_audio_module::gain_reduction_audio_module()
     is_active       = false;
     srate           = 0;
     last_generation = 0;
+    old_threshold   = 0.f;
+    old_ratio       = 0.f;
+    old_knee        = 0.f;
+    old_makeup      = 0.f;
+    old_detection   = 0.f;
+    old_bypass      = 0.f;
+    old_mute        = 0.f;
 }
 
 void gain_reduction_audio_module::activate()
