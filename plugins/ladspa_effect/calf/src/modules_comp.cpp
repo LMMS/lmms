@@ -1277,6 +1277,11 @@ sidechaingate_audio_module::sidechaingate_audio_module()
     is_active = false;
     srate = 0;
     last_generation = 0;
+    
+    f1_freq_old = f2_freq_old = f1_level_old = f2_level_old = 0;
+    f1_freq_old1 = f2_freq_old1 = f1_level_old1 = f2_level_old1 = 0;
+    sc_mode_old = sc_mode_old1 = WIDEBAND; // doesn't matter as long as it's sane
+    
 }
 
 void sidechaingate_audio_module::activate()
@@ -1889,6 +1894,17 @@ expander_audio_module::expander_audio_module()
     is_active       = false;
     srate           = 0;
     last_generation = 0;
+    
+    old_range     = 0.f;
+    old_threshold = 0.f;
+    old_ratio     = 0.f;
+    old_knee      = 0.f;
+    old_makeup    = 0.f;
+    old_detection = 0.f;
+    old_bypass    = 0.f;
+    old_mute      = 0.f;
+    old_trigger   = 0.f;
+    old_stereo_link = 0.f;
 }
 
 void expander_audio_module::activate()
