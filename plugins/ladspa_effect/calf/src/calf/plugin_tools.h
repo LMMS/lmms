@@ -72,6 +72,11 @@ public:
                 *params[Metadata::param_clip_out] = vumeter_out.clip > 0 ? 1.f : 0.f;
         }
     }
+    void bypassed(float *const *params, unsigned int nsamples)
+    {
+        reset();
+        process(params, NULL, NULL, 0, nsamples);
+    }
 };
 
 };

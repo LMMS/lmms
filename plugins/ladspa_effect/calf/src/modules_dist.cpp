@@ -137,8 +137,7 @@ uint32_t saturator_audio_module::process(uint32_t offset, uint32_t numsamples, u
             }
             ++offset;
         }
-        meters.reset();
-        meters.process(params, NULL, NULL, 0, 0);
+        meters.bypassed(params, orig_numsamples);
     } else {
         meter_drive = 0.f;
         float in_avg[2] = {0.f, 0.f};
@@ -327,8 +326,7 @@ uint32_t exciter_audio_module::process(uint32_t offset, uint32_t numsamples, uin
             }
             ++offset;
         }
-        meters.reset();
-        meters.process(params, NULL, NULL, 0, 0);
+        meters.bypassed(params, orig_numsamples);
         // displays, too
         meter_drive = 0.f;
     } else {
@@ -515,8 +513,7 @@ uint32_t bassenhancer_audio_module::process(uint32_t offset, uint32_t numsamples
             ++offset;
         }
         // displays, too
-        meters.reset();
-        meters.process(params, NULL, NULL, 0, 0);
+        meters.bypassed(params, orig_numsamples);
         meter_drive = 0.f;
     } else {
         meter_drive = 0.f;

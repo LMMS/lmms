@@ -363,6 +363,7 @@ compressor_audio_module::compressor_audio_module()
     is_active = false;
     srate = 0;
     last_generation = 0;
+    meters.reset();
 }
 
 void compressor_audio_module::activate()
@@ -371,10 +372,7 @@ void compressor_audio_module::activate()
     // set all filters and strips
     compressor.activate();
     params_changed();
-    meter_in = 0.f;
-    meter_out = 0.f;
-    clip_in = 0.f;
-    clip_out = 0.f;
+    meters.reset();
 }
 void compressor_audio_module::deactivate()
 {
@@ -395,6 +393,8 @@ void compressor_audio_module::set_sample_rate(uint32_t sr)
 
 uint32_t compressor_audio_module::process(uint32_t offset, uint32_t numsamples, uint32_t inputs_mask, uint32_t outputs_mask)
 {
+    uint32_t orig_offset = offset;
+    uint32_t orig_numsamples = numsamples;
     bool bypass = *params[param_bypass] > 0.5f;
     numsamples += offset;
     if(bypass) {
@@ -405,15 +405,9 @@ uint32_t compressor_audio_module::process(uint32_t offset, uint32_t numsamples, 
             ++offset;
         }
         // displays, too
-        clip_in    = 0.f;
-        clip_out   = 0.f;
-        meter_in   = 0.f;
-        meter_out  = 0.f;
+        meters.bypassed(params, orig_numsamples);
     } else {
         // process
-        
-        clip_in    -= std::min(clip_in,  numsamples);
-        clip_out   -= std::min(clip_out,  numsamples);
         
         compressor.update_curve();        
         
@@ -439,26 +433,11 @@ uint32_t compressor_audio_module::process(uint32_t offset, uint32_t numsamples, 
             outs[0][offset] = outL;
             outs[1][offset] = outR;
             
-            // clip LED's
-            if(std::max(fabs(inL), fabs(inR)) > 1.f) {
-                clip_in   = srate >> 3;
-            }
-            if(std::max(fabs(outL), fabs(outR)) > 1.f) {
-                clip_out  = srate >> 3;
-            }
-            // rise up out meter
-            meter_in = std::max(fabs(inL), fabs(inR));;
-            meter_out = std::max(fabs(outL), fabs(outR));;
-            
             // next sample
             ++offset;
         } // cycle trough samples
+        meters.process(params, ins, outs, orig_offset, orig_numsamples);
     }
-    // draw meters
-    SET_IF_CONNECTED(clip_in)
-    SET_IF_CONNECTED(clip_out)
-    SET_IF_CONNECTED(meter_in)
-    SET_IF_CONNECTED(meter_out)
     // draw strip meter
     if(bypass > 0.5f) {
         if(params[param_compression] != NULL) {
@@ -517,6 +496,7 @@ sidechaincompressor_audio_module::sidechaincompressor_audio_module()
     f1_level_old1 = 0.f;
     f2_level_old1 = 0.f;
     sc_mode_old1  = WIDEBAND;
+    meters.reset();
 }
 
 void sidechaincompressor_audio_module::activate()
@@ -525,10 +505,7 @@ void sidechaincompressor_audio_module::activate()
     // set all filters and strips
     compressor.activate();
     params_changed();
-    meter_in = 0.f;
-    meter_out = 0.f;
-    clip_in = 0.f;
-    clip_out = 0.f;
+    meters.reset();
 }
 void sidechaincompressor_audio_module::deactivate()
 {
@@ -685,6 +662,8 @@ void sidechaincompressor_audio_module::set_sample_rate(uint32_t sr)
 
 uint32_t sidechaincompressor_audio_module::process(uint32_t offset, uint32_t numsamples, uint32_t inputs_mask, uint32_t outputs_mask)
 {
+    uint32_t orig_offset = offset;
+    uint32_t orig_numsamples = numsamples;
     bool bypass = *params[param_bypass] > 0.5f;
     numsamples += offset;
     if(bypass) {
@@ -695,15 +674,10 @@ uint32_t sidechaincompressor_audio_module::process(uint32_t offset, uint32_t num
             ++offset;
         }
         // displays, too
-        clip_in    = 0.f;
-        clip_out   = 0.f;
-        meter_in   = 0.f;
-        meter_out  = 0.f;
+        meters.bypassed(params, orig_numsamples);
     } else {
         // process
         
-        clip_in    -= std::min(clip_in,  numsamples);
-        clip_out   -= std::min(clip_out,  numsamples);
         compressor.update_curve();        
         
         while(offset < numsamples) {
@@ -783,32 +757,16 @@ uint32_t sidechaincompressor_audio_module::process(uint32_t offset, uint32_t num
             // send to output
             outs[0][offset] = outL;
             outs[1][offset] = outR;
-            
-            // clip LED's
-            if(std::max(fabs(inL), fabs(inR)) > 1.f) {
-                clip_in   = srate >> 3;
-            }
-            if(std::max(fabs(outL), fabs(outR)) > 1.f) {
-                clip_out  = srate >> 3;
-            }
-            // rise up out meter
-            meter_in = std::max(fabs(inL), fabs(inR));;
-            meter_out = std::max(fabs(outL), fabs(outR));;
-            
+                        
             // next sample
             ++offset;
         } // cycle trough samples
+        meters.process(params, ins, outs, orig_offset, orig_numsamples);
         f1L.sanitize();
         f1R.sanitize();
         f2L.sanitize();
         f2R.sanitize();
-            
     }
-    // draw meters
-    SET_IF_CONNECTED(clip_in)
-    SET_IF_CONNECTED(clip_out)
-    SET_IF_CONNECTED(meter_in)
-    SET_IF_CONNECTED(meter_out)
     // draw strip meter
     if(bypass > 0.5f) {
         if(params[param_compression] != NULL) {
@@ -1139,6 +1097,7 @@ gate_audio_module::gate_audio_module()
     is_active = false;
     srate = 0;
     last_generation = 0;
+    meters.reset();
 }
 
 void gate_audio_module::activate()
@@ -1147,10 +1106,7 @@ void gate_audio_module::activate()
     // set all filters and strips
     gate.activate();
     params_changed();
-    meter_in = 0.f;
-    meter_out = 0.f;
-    clip_in = 0.f;
-    clip_out = 0.f;
+    meters.reset();
 }
 void gate_audio_module::deactivate()
 {
@@ -1171,6 +1127,8 @@ void gate_audio_module::set_sample_rate(uint32_t sr)
 
 uint32_t gate_audio_module::process(uint32_t offset, uint32_t numsamples, uint32_t inputs_mask, uint32_t outputs_mask)
 {
+    uint32_t orig_offset = offset;
+    uint32_t orig_numsamples = numsamples;
     bool bypass = *params[param_bypass] > 0.5f;
     numsamples += offset;
     if(bypass) {
@@ -1181,15 +1139,9 @@ uint32_t gate_audio_module::process(uint32_t offset, uint32_t numsamples, uint32
             ++offset;
         }
         // displays, too
-        clip_in    = 0.f;
-        clip_out   = 0.f;
-        meter_in   = 0.f;
-        meter_out  = 0.f;
+        meters.bypassed(params, orig_numsamples);
     } else {
         // process
-        clip_in    -= std::min(clip_in,  numsamples);
-        clip_out   -= std::min(clip_out,  numsamples);
-        
         gate.update_curve();
         
         while(offset < numsamples) {
@@ -1214,26 +1166,11 @@ uint32_t gate_audio_module::process(uint32_t offset, uint32_t numsamples, uint32
             outs[0][offset] = outL;
             outs[1][offset] = outR;
             
-            // clip LED's
-            if(std::max(fabs(inL), fabs(inR)) > 1.f) {
-                clip_in   = srate >> 3;
-            }
-            if(std::max(fabs(outL), fabs(outR)) > 1.f) {
-                clip_out  = srate >> 3;
-            }
-            // rise up out meter
-            meter_in = std::max(fabs(inL), fabs(inR));;
-            meter_out = std::max(fabs(outL), fabs(outR));;
-            
             // next sample
             ++offset;
         } // cycle trough samples
+        meters.process(params, ins, outs, orig_offset, orig_numsamples);
     }
-    // draw meters
-    SET_IF_CONNECTED(clip_in)
-    SET_IF_CONNECTED(clip_out)
-    SET_IF_CONNECTED(meter_in)
-    SET_IF_CONNECTED(meter_out)
     // draw strip meter
     if(bypass > 0.5f) {
         if(params[param_gating] != NULL) {
@@ -1291,7 +1228,7 @@ sidechaingate_audio_module::sidechaingate_audio_module()
     f1_freq_old = f2_freq_old = f1_level_old = f2_level_old = 0;
     f1_freq_old1 = f2_freq_old1 = f1_level_old1 = f2_level_old1 = 0;
     sc_mode_old = sc_mode_old1 = WIDEBAND; // doesn't matter as long as it's sane
-    
+    meters.reset();
 }
 
 void sidechaingate_audio_module::activate()
@@ -1300,10 +1237,7 @@ void sidechaingate_audio_module::activate()
     // set all filters and strips
     gate.activate();
     params_changed();
-    meter_in = 0.f;
-    meter_out = 0.f;
-    clip_in = 0.f;
-    clip_out = 0.f;
+    meters.reset();
 }
 void sidechaingate_audio_module::deactivate()
 {
@@ -1460,6 +1394,8 @@ void sidechaingate_audio_module::set_sample_rate(uint32_t sr)
 
 uint32_t sidechaingate_audio_module::process(uint32_t offset, uint32_t numsamples, uint32_t inputs_mask, uint32_t outputs_mask)
 {
+    uint32_t orig_offset = offset;
+    uint32_t orig_numsamples = numsamples;
     bool bypass = *params[param_bypass] > 0.5f;
     numsamples += offset;
     if(bypass) {
@@ -1470,15 +1406,10 @@ uint32_t sidechaingate_audio_module::process(uint32_t offset, uint32_t numsample
             ++offset;
         }
         // displays, too
-        clip_in    = 0.f;
-        clip_out   = 0.f;
-        meter_in   = 0.f;
-        meter_out  = 0.f;
+        meters.bypassed(params, orig_offset);
     } else {
         // process
         
-        clip_in    -= std::min(clip_in,  numsamples);
-        clip_out   -= std::min(clip_out,  numsamples);
         gate.update_curve();
         
         while(offset < numsamples) {
@@ -1559,31 +1490,16 @@ uint32_t sidechaingate_audio_module::process(uint32_t offset, uint32_t numsample
             outs[0][offset] = outL;
             outs[1][offset] = outR;
             
-            // clip LED's
-            if(std::max(fabs(inL), fabs(inR)) > 1.f) {
-                clip_in   = srate >> 3;
-            }
-            if(std::max(fabs(outL), fabs(outR)) > 1.f) {
-                clip_out  = srate >> 3;
-            }
-            // rise up out meter
-            meter_in = std::max(fabs(inL), fabs(inR));;
-            meter_out = std::max(fabs(outL), fabs(outR));;
-            
             // next sample
             ++offset;
         } // cycle trough samples
+        meters.process(params, ins, outs, orig_offset, orig_numsamples);
         f1L.sanitize();
         f1R.sanitize();
         f2L.sanitize();
         f2R.sanitize();
             
     }
-    // draw meters
-    SET_IF_CONNECTED(clip_in)
-    SET_IF_CONNECTED(clip_out)
-    SET_IF_CONNECTED(meter_in)
-    SET_IF_CONNECTED(meter_out)
     // draw strip meter
     if(bypass > 0.5f) {
         if(params[param_gating] != NULL) {
