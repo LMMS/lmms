@@ -38,10 +38,6 @@ saturator_audio_module::saturator_audio_module()
 {
     is_active = false;
     srate = 0;
-    clip_in    = 0.f;
-    clip_out   = 0.f;
-    meter_in  = 0.f;
-    meter_out = 0.f;
     meter_drive = 0.f;
 }
 
@@ -50,6 +46,8 @@ void saturator_audio_module::activate()
     is_active = true;
     // set all filters
     params_changed();
+    meters.reset();
+    meter_drive = 0.f;
 }
 void saturator_audio_module::deactivate()
 {
@@ -120,6 +118,8 @@ void saturator_audio_module::set_sample_rate(uint32_t sr)
 uint32_t saturator_audio_module::process(uint32_t offset, uint32_t numsamples, uint32_t inputs_mask, uint32_t outputs_mask)
 {
     bool bypass = *params[param_bypass] > 0.5f;
+    uint32_t orig_offset = offset;
+    uint32_t orig_numsamples = numsamples;
     numsamples += offset;
     if(bypass) {
         // everything bypassed
@@ -137,18 +137,9 @@ uint32_t saturator_audio_module::process(uint32_t offset, uint32_t numsamples, u
             }
             ++offset;
         }
-        // displays, too
-        clip_in    = 0.f;
-        clip_out   = 0.f;
-        meter_in  = 0.f;
-        meter_out = 0.f;
-        meter_drive = 0.f;
+        meters.reset();
+        meters.process(params, NULL, NULL, 0, 0);
     } else {
-        
-        clip_in    -= std::min(clip_in,  numsamples);
-        clip_out   -= std::min(clip_out, numsamples);
-        meter_in = 0.f;
-        meter_out = 0.f;
         meter_drive = 0.f;
         float in_avg[2] = {0.f, 0.f};
         float out_avg[2] = {0.f, 0.f};
@@ -157,7 +148,6 @@ uint32_t saturator_audio_module::process(uint32_t offset, uint32_t numsamples, u
         while(offset < numsamples) {
             // cycle through samples
             float out[2], in[2] = {0.f, 0.f};
-            float maxIn, maxOut = 0.f;
             int c = 0;
             
             if(in_count > 1 && out_count > 1) {
@@ -177,6 +167,8 @@ uint32_t saturator_audio_module::process(uint32_t offset, uint32_t numsamples, u
             float proc[2];
             proc[0] = in[0] * *params[param_level_in];
             proc[1] = in[1] * *params[param_level_in];
+            
+            float onedivlevelin = 1.0 / *params[param_level_in];
             
             for (int i = 0; i < c; ++i) {
                 // all pre filters in chain
@@ -200,7 +192,7 @@ uint32_t saturator_audio_module::process(uint32_t offset, uint32_t numsamples, u
                 proc[i] = hp[i][2].process(hp[i][3].process(proc[i]));
                 
                 //subtract gain
-                 proc[i] /= *params[param_level_in];
+                proc[i] *= onedivlevelin;
             }
             
             if(in_count > 1 && out_count > 1) {
@@ -209,42 +201,23 @@ uint32_t saturator_audio_module::process(uint32_t offset, uint32_t numsamples, u
                 outs[0][offset] = out[0];
                 out[1] = ((proc[1] * *params[param_mix]) + in[1] * (1 - *params[param_mix])) * *params[param_level_out];
                 outs[1][offset] = out[1];
-                maxIn = std::max(fabs(in[0]), fabs(in[1]));
-                maxOut = std::max(fabs(out[0]), fabs(out[1]));
             } else if(out_count > 1) {
                 // mono -> pseudo stereo
                 out[0] = ((proc[0] * *params[param_mix]) + in[0] * (1 - *params[param_mix])) * *params[param_level_out];
                 outs[0][offset] = out[0];
                 out[1] = out[0];
                 outs[1][offset] = out[1];
-                maxOut = fabs(out[0]);
-                maxIn = fabs(in[0]);
             } else {
                 // stereo -> mono
                 // or full mono
                 out[0] = ((proc[0] * *params[param_mix]) + in[0] * (1 - *params[param_mix])) * *params[param_level_out];
                 outs[0][offset] = out[0];
-                maxIn = fabs(in[0]);
-                maxOut = fabs(out[0]);
             }
-            
-            if(maxIn > 1.f) {
-                clip_in  = srate >> 3;
-            }
-            if(maxOut > 1.f) {
-                clip_out = srate >> 3;
-            }
-            // set up in / out meters
-            if(maxIn > meter_in) {
-                meter_in = maxIn;
-            }
-            if(maxOut > meter_out) {
-                meter_out = maxOut;
-            }
-            
+                        
             // next sample
             ++offset;
         } // cycle trough samples
+        meters.process(params, ins, outs, orig_offset, orig_numsamples);
         
         tube_avg = (sqrt(std::max(out_avg[0], out_avg[1])) / numsamples) - (sqrt(std::max(in_avg[0], in_avg[1])) / numsamples);
         meter_drive = (5.0f * fabs(tube_avg) * (float(*params[param_blend]) + 30.0f));
@@ -270,19 +243,6 @@ uint32_t saturator_audio_module::process(uint32_t offset, uint32_t numsamples, u
         p[1].sanitize();
     }
     // draw meters
-    if(params[param_clip_in] != NULL) {
-        *params[param_clip_in] = clip_in;
-    }
-    if(params[param_clip_out] != NULL) {
-        *params[param_clip_out] = clip_out;
-    }
-    
-    if(params[param_meter_in] != NULL) {
-        *params[param_meter_in] = meter_in;
-    }
-    if(params[param_meter_out] != NULL) {
-        *params[param_meter_out] = meter_out;
-    }
     if(params[param_meter_drive] != NULL) {
         *params[param_meter_drive] = meter_drive;
     }
@@ -300,10 +260,6 @@ exciter_audio_module::exciter_audio_module()
 {
     is_active = false;
     srate = 0;
-    clip_in    = 0.f;
-    clip_out   = 0.f;
-    meter_in  = 0.f;
-    meter_out = 0.f;
     meter_drive = 0.f;
 }
 
@@ -351,6 +307,8 @@ void exciter_audio_module::set_sample_rate(uint32_t sr)
 
 uint32_t exciter_audio_module::process(uint32_t offset, uint32_t numsamples, uint32_t inputs_mask, uint32_t outputs_mask)
 {
+    uint32_t orig_offset = offset;
+    uint32_t orig_numsamples = numsamples;
     bool bypass = *params[param_bypass] > 0.5f;
     numsamples += offset;
     if(bypass) {
@@ -369,25 +327,19 @@ uint32_t exciter_audio_module::process(uint32_t offset, uint32_t numsamples, uin
             }
             ++offset;
         }
+        meters.reset();
+        meters.process(params, NULL, NULL, 0, 0);
         // displays, too
-        clip_in    = 0.f;
-        clip_out   = 0.f;
-        meter_in  = 0.f;
-        meter_out = 0.f;
         meter_drive = 0.f;
     } else {
         
-        clip_in    -= std::min(clip_in,  numsamples);
-        clip_out   -= std::min(clip_out, numsamples);
-        meter_in = 0.f;
-        meter_out = 0.f;
         meter_drive = 0.f;
         
         // process
         while(offset < numsamples) {
             // cycle through samples
             float out[2], in[2] = {0.f, 0.f};
-            float maxIn, maxOut, maxDrive = 0.f;
+            float maxDrive = 0.f;
             int c = 0;
             
             if(in_count > 1 && out_count > 1) {
@@ -434,8 +386,6 @@ uint32_t exciter_audio_module::process(uint32_t offset, uint32_t numsamples, uin
                 else
                     out[1] = (proc[1] * *params[param_amount] + in[1]) * *params[param_level_out];
                 outs[1][offset] = out[1];
-                maxIn = std::max(fabs(in[0]), fabs(in[1]));
-                maxOut = std::max(fabs(out[0]), fabs(out[1]));
                 maxDrive = std::max(dist[0].get_distortion_level() * *params[param_amount],
                                             dist[1].get_distortion_level() * *params[param_amount]);
             } else if(out_count > 1) {
@@ -447,8 +397,6 @@ uint32_t exciter_audio_module::process(uint32_t offset, uint32_t numsamples, uin
                 outs[0][offset] = out[0];
                 out[1] = out[0];
                 outs[1][offset] = out[1];
-                maxOut = fabs(out[0]);
-                maxIn = fabs(in[0]);
                 maxDrive = dist[0].get_distortion_level() * *params[param_amount];
             } else {
                 // stereo -> mono
@@ -458,24 +406,10 @@ uint32_t exciter_audio_module::process(uint32_t offset, uint32_t numsamples, uin
                 else
                     out[0] = (proc[0] * *params[param_amount] + in[0]) * *params[param_level_out];
                 outs[0][offset] = out[0];
-                maxIn = fabs(in[0]);
-                maxOut = fabs(out[0]);
                 maxDrive = dist[0].get_distortion_level() * *params[param_amount];
             }
             
-            if(maxIn > 1.f) {
-                clip_in  = srate >> 3;
-            }
-            if(maxOut > 1.f) {
-                clip_out = srate >> 3;
-            }
             // set up in / out meters
-            if(maxIn > meter_in) {
-                meter_in = maxIn;
-            }
-            if(maxOut > meter_out) {
-                meter_out = maxOut;
-            }
             if(maxDrive > meter_drive) {
                 meter_drive = maxDrive;
             }
@@ -483,6 +417,7 @@ uint32_t exciter_audio_module::process(uint32_t offset, uint32_t numsamples, uin
             // next sample
             ++offset;
         } // cycle trough samples
+        meters.process(params, ins, outs, orig_offset, orig_numsamples);
         // clean up
         hp[0][0].sanitize();
         hp[1][0].sanitize();
@@ -494,19 +429,6 @@ uint32_t exciter_audio_module::process(uint32_t offset, uint32_t numsamples, uin
         hp[1][3].sanitize();
     }
     // draw meters
-    if(params[param_clip_in] != NULL) {
-        *params[param_clip_in] = clip_in;
-    }
-    if(params[param_clip_out] != NULL) {
-        *params[param_clip_out] = clip_out;
-    }
-    
-    if(params[param_meter_in] != NULL) {
-        *params[param_meter_in] = meter_in;
-    }
-    if(params[param_meter_out] != NULL) {
-        *params[param_meter_out] = meter_out;
-    }
     if(params[param_meter_drive] != NULL) {
         *params[param_meter_drive] = meter_drive;
     }
@@ -524,16 +446,14 @@ bassenhancer_audio_module::bassenhancer_audio_module()
 {
     is_active = false;
     srate = 0;
-    clip_in    = 0.f;
-    clip_out   = 0.f;
-    meter_in  = 0.f;
-    meter_out = 0.f;
+    meters.reset();
     meter_drive = 0.f;
 }
 
 void bassenhancer_audio_module::activate()
 {
     is_active = true;
+    meters.reset();
     // set all filters
     params_changed();
 }
@@ -575,6 +495,8 @@ void bassenhancer_audio_module::set_sample_rate(uint32_t sr)
 uint32_t bassenhancer_audio_module::process(uint32_t offset, uint32_t numsamples, uint32_t inputs_mask, uint32_t outputs_mask)
 {
     bool bypass = *params[param_bypass] > 0.5f;
+    uint32_t orig_offset = offset;
+    uint32_t orig_numsamples = numsamples;
     numsamples += offset;
     if(bypass) {
         // everything bypassed
@@ -593,24 +515,17 @@ uint32_t bassenhancer_audio_module::process(uint32_t offset, uint32_t numsamples
             ++offset;
         }
         // displays, too
-        clip_in    = 0.f;
-        clip_out   = 0.f;
-        meter_in  = 0.f;
-        meter_out = 0.f;
+        meters.reset();
+        meters.process(params, NULL, NULL, 0, 0);
         meter_drive = 0.f;
     } else {
-        
-        clip_in    -= std::min(clip_in,  numsamples);
-        clip_out   -= std::min(clip_out, numsamples);
-        meter_in = 0.f;
-        meter_out = 0.f;
         meter_drive = 0.f;
         
         // process
         while(offset < numsamples) {
             // cycle through samples
             float out[2], in[2] = {0.f, 0.f};
-            float maxIn, maxOut, maxDrive = 0.f;
+            float maxDrive = 0.f;
             int c = 0;
             
             if(in_count > 1 && out_count > 1) {
@@ -657,8 +572,6 @@ uint32_t bassenhancer_audio_module::process(uint32_t offset, uint32_t numsamples
                 else
                     out[1] = (proc[1] * *params[param_amount] + in[1]) * *params[param_level_out];
                 outs[1][offset] = out[1];
-                maxIn = std::max(fabs(in[0]), fabs(in[1]));
-                maxOut = std::max(fabs(out[0]), fabs(out[1]));
                 maxDrive = std::max(dist[0].get_distortion_level() * *params[param_amount],
                                             dist[1].get_distortion_level() * *params[param_amount]);
             } else if(out_count > 1) {
@@ -670,8 +583,6 @@ uint32_t bassenhancer_audio_module::process(uint32_t offset, uint32_t numsamples
                 outs[0][offset] = out[0];
                 out[1] = out[0];
                 outs[1][offset] = out[1];
-                maxOut = fabs(out[0]);
-                maxIn = fabs(in[0]);
                 maxDrive = dist[0].get_distortion_level() * *params[param_amount];
             } else {
                 // stereo -> mono
@@ -681,24 +592,10 @@ uint32_t bassenhancer_audio_module::process(uint32_t offset, uint32_t numsamples
                 else
                     out[0] = (proc[0] * *params[param_amount] + in[0]) * *params[param_level_out];
                 outs[0][offset] = out[0];
-                maxIn = fabs(in[0]);
-                maxOut = fabs(out[0]);
                 maxDrive = dist[0].get_distortion_level() * *params[param_amount];
             }
             
-            if(maxIn > 1.f) {
-                clip_in  = srate >> 3;
-            }
-            if(maxOut > 1.f) {
-                clip_out = srate >> 3;
-            }
             // set up in / out meters
-            if(maxIn > meter_in) {
-                meter_in = maxIn;
-            }
-            if(maxOut > meter_out) {
-                meter_out = maxOut;
-            }
             if(maxDrive > meter_drive) {
                 meter_drive = maxDrive;
             }
@@ -706,6 +603,7 @@ uint32_t bassenhancer_audio_module::process(uint32_t offset, uint32_t numsamples
             // next sample
             ++offset;
         } // cycle trough samples
+        meters.process(params, ins, outs, orig_offset, orig_numsamples);
         // clean up
         lp[0][0].sanitize();
         lp[1][0].sanitize();
@@ -717,19 +615,6 @@ uint32_t bassenhancer_audio_module::process(uint32_t offset, uint32_t numsamples
         lp[1][3].sanitize();
     }
     // draw meters
-    if(params[param_clip_in] != NULL) {
-        *params[param_clip_in] = clip_in;
-    }
-    if(params[param_clip_out] != NULL) {
-        *params[param_clip_out] = clip_out;
-    }
-    
-    if(params[param_meter_in] != NULL) {
-        *params[param_meter_in] = meter_in;
-    }
-    if(params[param_meter_out] != NULL) {
-        *params[param_meter_out] = meter_out;
-    }
     if(params[param_meter_drive] != NULL) {
         *params[param_meter_drive] = meter_drive;
     }
