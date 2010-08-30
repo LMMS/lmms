@@ -34,7 +34,7 @@
 #include "bb_track_container.h"
 
 
-FxChannel::FxChannel( Model * _parent ) :
+FxChannel::FxChannel( int idx, Model * _parent ) :
 	m_fxChain( NULL ),
 	m_stillRunning( false ),
 	m_peakLeft( 0.0f ),
@@ -44,6 +44,7 @@ FxChannel::FxChannel( Model * _parent ) :
 	m_volumeModel( 1.0, 0.0, 2.0, 0.01, _parent ),
 	m_name(),
 	m_lock(),
+	m_channelIndex( idx ),
 	m_queued( false )
 {
 	engine::getMixer()->clearAudioBuffer( m_buffer,
@@ -57,6 +58,7 @@ FxChannel::~FxChannel()
 {
 	CPU::freeFrames( m_buffer );
 }
+
 
 
 
@@ -74,59 +76,46 @@ void FxChannel::doProcessing( sampleFrame * _buf )
 	// <tobydox> this improves cache hit rate
 	_buf = m_buffer;
 
-	if( ! m_muteModel.value() )
-	{
-		// do mixer sends. loop through the channels that send to this one
-		for( int i = 0; i < m_receives.size(); ++i)
-		{
-			fx_ch_t senderIndex = m_receives[i];
-			FxChannel * sender = fxm->effectChannel(senderIndex);
+	// SMF: OK, due to the fact, that the data from the audio-tracks has been
+	//			written into our buffer already, all which needs to be done at this
+	//			stage is to process inter-channel sends. I really don't like the idea
+	//			of using threads for this -- it just doesn't make any sense and wastes
+	//			cpu-cylces... so I just go through every child of this channel and
+	//			call the acc. doProcessing() directly.
 
-			// mix it with this one
-			float amt = fxm->channelSendModel(senderIndex,
-											  m_channelIndex)->value();
+	if( m_muteModel.value() == false )
+	{
+		// OK, we are not muted, so we go recursively through all the channels
+		// which send to us (our children)...
+		foreach( fx_ch_t senderIndex, m_receives )
+		{
+			FxChannel * sender = fxm->effectChannel( senderIndex );
+
+			// wait for the sender job - either it's just been queued yet,
+			// then ThreadableJob::process() will process it now within this
+			// thread - otherwise it has been is is being processed by another
+			// thread and we just have to wait for it to finish
+			while( sender->state() != ThreadableJob::Done )
+			{
+				sender->process();
+			}
+
+			// get the send level...
+			const float amt =
+				fxm->channelSendModel( senderIndex, m_channelIndex )->value();
+
+			// mix it's output with this one's output
 			CPU::bufMixCoeff( _buf, sender->m_buffer,
 								sender->m_volumeModel.value() * amt, fpp );
 		}
-
-		const float v = m_volumeModel.value();
-
-		m_fxChain.startRunning();
-		m_stillRunning = m_fxChain.processAudioBuffer( _buf, fpp );
-		m_peakLeft = engine::getMixer()->peakValueLeft( _buf, fpp ) * v;
-		m_peakRight = engine::getMixer()->peakValueRight( _buf, fpp ) * v;
-	}
-	else
-	{
-		m_peakLeft = m_peakRight = 0.0f;
 	}
 
-	m_state = ThreadableJob::Done;
+	const float v = m_volumeModel.value();
 
-	// check if any of its parents are now able to be processed
-	for(int i=0; i<m_sends.size(); ++i)
-	{
-		// if parent.unstarted and every parent.leaf.done:
-		FxChannel * parent = fxm->effectChannel(m_sends[i]);
-		if( parent->state() == ThreadableJob::Unstarted )
-		{
-			bool everyLeafDone = true;
-			for( int j=0; j<parent->m_receives.size(); ++j )
-			{
-				if( fxm->effectChannel( parent->m_receives[j] )->state() !=
-														ThreadableJob::Done )
-				{
-					everyLeafDone = false;
-					break;
-				}
-			}
-			if( everyLeafDone )
-			{
-				MixerWorkerThread::addJob(parent);
-			}
-		}
-	}
-
+	m_fxChain.startRunning();
+	m_stillRunning = m_fxChain.processAudioBuffer( _buf, fpp );
+	m_peakLeft = engine::getMixer()->peakValueLeft( _buf, fpp ) * v;
+	m_peakRight = engine::getMixer()->peakValueRight( _buf, fpp ) * v;
 }
 
 
@@ -158,12 +147,12 @@ FxMixer::~FxMixer()
 
 int FxMixer::createChannel()
 {
+	const int index = m_fxChannels.size();
 	// create new channel
-	m_fxChannels.push_back(new FxChannel( this ));
+	m_fxChannels.push_back( new FxChannel( index, this ) );
 
 	// reset channel state
-	int index = m_fxChannels.size() - 1;
-	clearChannel(index);
+	clearChannel( index );
 
 	return index;
 }
@@ -355,7 +344,7 @@ void FxMixer::deleteChannelSend(fx_ch_t fromChannel, fx_ch_t toChannel)
 {
 	// delete the send
 	FxChannel * from = m_fxChannels[fromChannel];
-	FxChannel * to   = m_fxChannels[toChannel];
+	FxChannel * to	 = m_fxChannels[toChannel];
 
 	// find and delete the send entry
 	for(int i=0; i<from->m_sends.size(); ++i) {
@@ -418,6 +407,15 @@ FloatModel * FxMixer::channelSendModel(fx_ch_t fromChannel, fx_ch_t toChannel)
 
 void FxMixer::mixToChannel( const sampleFrame * _buf, fx_ch_t _ch )
 {
+	// SMF: it seems like here the track-channels are mixed in... but from where
+	//			is this called and when and why...?!?
+	//
+	//			OK, found it (git grep is your friend...): This is the next part,
+	//			where there is a mix between push and pull model inside the core, as
+	//			the audio-tracks *push* their data into the fx-channels hopefully just
+	//			before the Mixer-Channels are processed... Sorry to say this: but this
+	//			took me senseless hours to find out and is silly, too...
+
 	if( m_fxChannels[_ch]->m_muteModel.value() == false )
 	{
 		m_fxChannels[_ch]->m_lock.lock();
@@ -442,28 +440,20 @@ void FxMixer::addChannelLeaf( int _ch, sampleFrame * _buf )
 {
 	FxChannel * thisCh = m_fxChannels[_ch];
 
-	// remember what channel number we are, 'cause we need it later
-	thisCh->m_channelIndex = _ch;
-
 	// if we're muted or this channel is seen already, discount it
 	if( thisCh->m_muteModel.value() || thisCh->m_queued )
+	{
 		return;
-
-	int numDeps = thisCh->m_receives.size();
-	if( numDeps > 0 )
-	{
-		for(int i=0; i<numDeps; ++i)
-		{
-			addChannelLeaf( thisCh->m_receives[i], _buf );
-		}
-	}
-	else
-	{
-		// add this channel to job list
-		thisCh->m_queued = true;
-		MixerWorkerThread::addJob( thisCh );
 	}
 
+	foreach( const int senderIndex, thisCh->m_receives )
+	{
+		addChannelLeaf( senderIndex, _buf );
+	}
+
+	// add this channel to job list
+	thisCh->m_queued = true;
+	MixerWorkerThread::addJob( thisCh );
 }
 
 
@@ -482,15 +472,10 @@ void FxMixer::masterMix( sampleFrame * _buf )
 	{
 		MixerWorkerThread::startAndWaitForJobs();
 	}
-
-	memcpy( _buf, m_fxChannels[0]->m_buffer, sizeof( sampleFrame ) * fpp );
+	//m_fxChannels[0]->doProcessing( NULL );
 
 	const float v = m_fxChannels[0]->m_volumeModel.value();
-	for( f_cnt_t f = 0; f < engine::getMixer()->framesPerPeriod(); ++f )
-	{
-		_buf[f][0] *= v;
-		_buf[f][1] *= v;
-	}
+	CPU::bufMixCoeff( _buf, m_fxChannels[0]->m_buffer, v, fpp );
 
 	m_fxChannels[0]->m_peakLeft *= engine::getMixer()->masterGain();
 	m_fxChannels[0]->m_peakRight *= engine::getMixer()->masterGain();

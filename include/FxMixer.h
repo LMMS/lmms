@@ -36,7 +36,7 @@
 class FxChannel : public ThreadableJob
 {
 	public:
-		FxChannel( Model * _parent );
+		FxChannel( int idx, Model * _parent );
 		~FxChannel();
 
 		EffectChain m_fxChain;

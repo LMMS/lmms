@@ -62,7 +62,7 @@ public:
 		m_state = Queued;
 	}
 
-	void process( sampleFrame * _working_buffer )
+	void process( sampleFrame * _working_buffer = NULL )
 	{
 		if( m_state.testAndSetOrdered( Queued, InProgress ) )
 		{
