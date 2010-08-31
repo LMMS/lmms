@@ -29,7 +29,6 @@
 #include "giface.h"
 #include "metadata.h"
 #include "loudness.h"
-#include "primitives.h"
 
 namespace calf_plugins {
 
