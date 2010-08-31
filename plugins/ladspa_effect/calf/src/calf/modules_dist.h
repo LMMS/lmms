@@ -28,6 +28,7 @@
 #include "audio_fx.h"
 #include "giface.h"
 #include "metadata.h"
+#include "plugin_tools.h"
 
 namespace calf_plugins {
 
@@ -37,8 +38,8 @@ private:
     float hp_pre_freq_old, lp_pre_freq_old;
     float hp_post_freq_old, lp_post_freq_old;
     float p_level_old, p_freq_old, p_q_old;
-    uint32_t clip_in, clip_out;
-    float meter_in, meter_out, meter_drive;
+    stereo_in_out_metering<saturator_metadata> meters;
+    float meter_drive;
     dsp::biquad_d2<float> lp[2][4], hp[2][4];
     dsp::biquad_d2<float> p[2];
     dsp::tap_distortion dist[2];
@@ -57,8 +58,8 @@ public:
 class exciter_audio_module: public audio_module<exciter_metadata> {
 private:
     float freq_old;
-    uint32_t clip_in, clip_out;
-    float meter_in, meter_out, meter_drive;
+    stereo_in_out_metering<exciter_metadata> meters;
+    float meter_drive;
     dsp::biquad_d2<float> hp[2][4];
     dsp::tap_distortion dist[2];
 public:
@@ -76,8 +77,8 @@ public:
 class bassenhancer_audio_module: public audio_module<bassenhancer_metadata> {
 private:
     float freq_old;
-    uint32_t clip_in, clip_out;
-    float meter_in, meter_out, meter_drive;
+    stereo_in_out_metering<exciter_metadata> meters;
+    float meter_drive;
     dsp::biquad_d2<float> lp[2][4];
     dsp::tap_distortion dist[2];
 public:

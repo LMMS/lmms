@@ -29,6 +29,7 @@
 #include "giface.h"
 #include "loudness.h"
 #include "metadata.h"
+#include "plugin_tools.h"
 
 namespace calf_plugins {
 
@@ -97,8 +98,7 @@ public:
 class compressor_audio_module: public audio_module<compressor_metadata>, public line_graph_iface  {
 private:
     typedef compressor_audio_module AM;
-    uint32_t clip_in, clip_out;
-    float meter_in, meter_out;
+    stereo_in_out_metering<compressor_metadata> meters;
     gain_reduction_audio_module compressor;
 public:
     typedef std::complex<double> cfloat;
@@ -138,8 +138,7 @@ private:
     CalfScModes sc_mode;
     mutable CalfScModes sc_mode_old, sc_mode_old1;
     float f1_active, f2_active;
-    uint32_t clip_in, clip_out;
-    float meter_in, meter_out;
+    stereo_in_out_metering<sidechaincompressor_metadata> meters;
     gain_reduction_audio_module compressor;
     dsp::biquad_d2<float> f1L, f1R, f2L, f2R;
 public:
@@ -225,8 +224,7 @@ public:
 class gate_audio_module: public audio_module<gate_metadata>, public line_graph_iface  {
 private:
     typedef gate_audio_module AM;
-    uint32_t clip_in, clip_out;
-    float meter_in, meter_out;
+    stereo_in_out_metering<gate_metadata> meters;
     expander_audio_module gate;
 public:
     typedef std::complex<double> cfloat;
@@ -266,8 +264,7 @@ private:
     CalfScModes sc_mode;
     mutable CalfScModes sc_mode_old, sc_mode_old1;
     float f1_active, f2_active;
-    uint32_t clip_in, clip_out;
-    float meter_in, meter_out;
+    stereo_in_out_metering<sidechaingate_metadata> meters;
     expander_audio_module gate;
     dsp::biquad_d2<float> f1L, f1R, f2L, f2R;
 public:
