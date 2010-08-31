@@ -40,6 +40,7 @@ class LocalZynAddSubFx;
 class ZynAddSubFxView;
 class notePlayHandle;
 class knob;
+class ledCheckBox;
 
 
 class ZynAddSubFxRemotePlugin : public QObject, public RemotePlugin
@@ -115,6 +116,7 @@ private:
 	FloatModel m_fmGainModel;
 	FloatModel m_resCenterFreqModel;
 	FloatModel m_resBandwidthModel;
+	BoolModel m_forwardMidiCcModel;
 
 	friend class ZynAddSubFxView;
 
@@ -145,6 +147,7 @@ private:
 	knob * m_fmGain;
 	knob * m_resCenterFreq;
 	knob * m_resBandwidth;
+	ledCheckBox * m_forwardMidiCC;
 
 
 private slots:
