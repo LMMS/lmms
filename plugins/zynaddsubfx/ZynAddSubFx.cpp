@@ -293,19 +293,22 @@ void ZynAddSubFxInstrument::play( sampleFrame * _buf )
 bool ZynAddSubFxInstrument::handleMidiEvent( const midiEvent & _me,
 												const midiTime & _time )
 {
-	if( !isMuted() )
+	// do not send NoteOn events if muted
+	if( _me.type() == MidiNoteOn && isMuted() )
 	{
-		m_pluginMutex.lock();
-		if( m_remotePlugin )
-		{
-			m_remotePlugin->processMidiEvent( _me, 0 );
-		}
-		else
-		{
-			m_plugin->processMidiEvent( _me );
-		}
-		m_pluginMutex.unlock();
+		return true;
 	}
+
+	m_pluginMutex.lock();
+	if( m_remotePlugin )
+	{
+		m_remotePlugin->processMidiEvent( _me, 0 );
+	}
+	else
+	{
+		m_plugin->processMidiEvent( _me );
+	}
+	m_pluginMutex.unlock();
 
 	return true;
 }
