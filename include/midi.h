@@ -1,7 +1,7 @@
 /*
  * midi.h - constants, structs etc. concerning MIDI
  *
- * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -126,6 +126,11 @@ struct midiEvent
 		m_sysExData( _copy.m_sysExData ),
 		m_sourcePort( _copy.m_sourcePort )
 	{
+	}
+
+	inline MidiEventTypes type() const
+	{
+		return m_type;
 	}
 
 	inline int channel() const
