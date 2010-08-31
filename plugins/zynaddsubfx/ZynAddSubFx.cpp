@@ -33,6 +33,7 @@
 #include "ZynAddSubFx.h"
 #include "engine.h"
 #include "knob.h"
+#include "led_checkbox.h"
 #include "mmp.h"
 #include "InstrumentPlayHandle.h"
 #include "InstrumentTrack.h"
@@ -111,7 +112,8 @@ ZynAddSubFxInstrument::ZynAddSubFxInstrument(
 	m_bandwidthModel( 64, 0, 127, 1, this, tr( "Bandwidth" ) ),
 	m_fmGainModel( 127, 0, 127, 1, this, tr( "FM Gain" ) ),
 	m_resCenterFreqModel( 64, 0, 127, 1, this, tr( "Resonance Center Frequency" ) ),
-	m_resBandwidthModel( 64, 0, 127, 1, this, tr( "Resonance Bandwidth" ) )
+	m_resBandwidthModel( 64, 0, 127, 1, this, tr( "Resonance Bandwidth" ) ),
+	m_forwardMidiCcModel( true, this, tr( "Forward MIDI Control Change Events" ) )
 {
 	initPlugin();
 
@@ -147,7 +149,7 @@ ZynAddSubFxInstrument::~ZynAddSubFxInstrument()
 
 
 void ZynAddSubFxInstrument::saveSettings( QDomDocument & _doc,
-	                             QDomElement & _this )
+											QDomElement & _this )
 {
 	m_portamentoModel.saveSettings( _doc, _this, "portamento" );
 	m_filterFreqModel.saveSettings( _doc, _this, "filterfreq" );
@@ -156,6 +158,7 @@ void ZynAddSubFxInstrument::saveSettings( QDomDocument & _doc,
 	m_fmGainModel.saveSettings( _doc, _this, "fmgain" );
 	m_resCenterFreqModel.saveSettings( _doc, _this, "rescenterfreq" );
 	m_resBandwidthModel.saveSettings( _doc, _this, "resbandwidth" );
+	m_forwardMidiCcModel.saveSettings( _doc, _this, "forwardmidicc" );
 
 	QTemporaryFile tf;
 	if( tf.open() )
@@ -203,6 +206,7 @@ void ZynAddSubFxInstrument::loadSettings( const QDomElement & _this )
 	m_fmGainModel.loadSettings( _this, "fmgain" );
 	m_resCenterFreqModel.loadSettings( _this, "rescenterfreq" );
 	m_resBandwidthModel.loadSettings( _this, "resbandwidth" );
+	m_forwardMidiCcModel.loadSettings( _this, "forwardmidicc" );
 
 	QDomDocument doc;
 	doc.appendChild( doc.importNode( _this.firstChild(), true ) );
@@ -295,6 +299,14 @@ bool ZynAddSubFxInstrument::handleMidiEvent( const midiEvent & _me,
 {
 	// do not send NoteOn events if muted
 	if( _me.type() == MidiNoteOn && isMuted() )
+	{
+		return true;
+	}
+	// do not forward external MIDI Control Change events if the according
+	// LED is not checked
+	else if( _me.type() == MidiControlChange &&
+				_me.sourcePort() != this &&
+				m_forwardMidiCcModel.value() == false )
 	{
 		return true;
 	}
@@ -392,7 +404,7 @@ void ZynAddSubFxInstrument::initPlugin()
 
 void ZynAddSubFxInstrument::sendControlChange( MidiControllers midiCtl, float value )
 {
-	handleMidiEvent( midiEvent( MidiControlChange, 0, midiCtl, (int) value ),
+	handleMidiEvent( midiEvent( MidiControlChange, 0, midiCtl, (int) value, this ),
 						midiTime() );
 }
 
@@ -451,6 +463,8 @@ ZynAddSubFxView::ZynAddSubFxView( Instrument * _instrument, QWidget * _parent ) 
 	m_resBandwidth->setHintText( tr( "Resonance bandwidth:" ) + "", "" );
 	m_resBandwidth->setLabel( tr( "RES BW" ) );
 
+	m_forwardMidiCC = new ledCheckBox( tr( "Forward MIDI Control Changes" ), this );
+
 	m_toggleUIButton = new QPushButton( tr( "Show GUI" ), this );
 	m_toggleUIButton->setCheckable( true );
 	m_toggleUIButton->setChecked( false );
@@ -471,7 +485,9 @@ ZynAddSubFxView::ZynAddSubFxView( Instrument * _instrument, QWidget * _parent ) 
 	l->addWidget( m_fmGain, 3, 0 );
 	l->addWidget( m_resCenterFreq, 3, 1 );
 	l->addWidget( m_resBandwidth, 3, 2 );
-	l->setRowStretch( 4, 10 );
+	l->addWidget( m_forwardMidiCC, 4, 0, 1, 4 );
+
+	l->setRowStretch( 5, 10 );
 	l->setColumnStretch( 4, 10 );
 
 	setAcceptDrops( true );
@@ -540,6 +556,8 @@ void ZynAddSubFxView::modelChanged()
 	m_fmGain->setModel( &m->m_fmGainModel );
 	m_resCenterFreq->setModel( &m->m_resCenterFreqModel );
 	m_resBandwidth->setModel( &m->m_resBandwidthModel );
+
+	m_forwardMidiCC->setModel( &m->m_forwardMidiCcModel );
 
 	toggleUI();
 }
