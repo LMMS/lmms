@@ -214,7 +214,13 @@ void ZynAddSubFxInstrument::loadSettings( const QDomElement & _this )
 	m_forwardMidiCcModel.loadSettings( _this, "forwardmidicc" );
 
 	QDomDocument doc;
-	doc.appendChild( doc.importNode( _this.firstChild(), true ) );
+	QDomElement data = _this.firstChildElement( "ZynAddSubFX-data" );
+	if( data.isNull() )
+	{
+		data = _this.firstChildElement();
+	}
+	doc.appendChild( doc.importNode( data, true ) );
+
 	QTemporaryFile tf;
 	tf.setAutoRemove( false );
 	if( tf.open() )
