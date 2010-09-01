@@ -1,8 +1,9 @@
 /*
- * PianoView.cpp - implementation of piano widget used in instrument-track-window
+ * Piano.cpp - implementation of piano-widget used in instrument-track-window
+ *             for testing + according model class
  *
  * Copyright (c) 2004-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- *
+ * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -22,7 +23,7 @@
  *
  */
 
-/** \file PianoView.cpp
+/** \file piano.cpp
  *  \brief A piano keyboard to play notes on in the instrument plugin window.
  */
 
@@ -722,9 +723,6 @@ void PianoView::focusOutEvent( QFocusEvent * )
 			m_piano->m_pressedKeys[i] = false;
 		}
 	}
-
-	m_piano->m_instrumentTrack->silenceAllNotes();
-
 	update();
 }
 
