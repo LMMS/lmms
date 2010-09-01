@@ -713,13 +713,10 @@ void PianoView::focusOutEvent( QFocusEvent * )
 	// hang otherwise
 	for( int i = 0; i < NumKeys; ++i )
 	{
-		if( m_piano->m_pressedKeys[i] == true )
-		{
-			m_piano->m_midiEvProc->processInEvent(
+		m_piano->m_midiEvProc->processInEvent(
 					midiEvent( MidiNoteOff, 0, i, 0 ),
 								midiTime() );
-			m_piano->m_pressedKeys[i] = false;
-		}
+		m_piano->m_pressedKeys[i] = false;
 	}
 	update();
 }
