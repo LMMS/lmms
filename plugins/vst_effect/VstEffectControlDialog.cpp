@@ -51,7 +51,8 @@ VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 		connect( btn, SIGNAL( toggled( bool ) ),
 					m_pluginWidget, SLOT( setVisible( bool ) ) );
 	}
-#elif LMMS_BUILD_WIN32
+#endif
+#ifdef LMMS_BUILD_WIN32
 	_ctl->m_effect->m_plugin->showEditor( this );
 	QWidget * w = _ctl->m_effect->m_plugin->pluginWidget( false );
 	if( w )
