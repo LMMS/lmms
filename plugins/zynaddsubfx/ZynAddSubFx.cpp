@@ -108,7 +108,7 @@ ZynAddSubFxInstrument::ZynAddSubFxInstrument(
 	m_remotePlugin( NULL ),
 	m_portamentoModel( 0, 0, 127, 1, this, tr( "Portamento" ) ),
 	m_filterFreqModel( 64, 0, 127, 1, this, tr( "Filter Frequency" ) ),
-	m_filterQModel( 64, 0, 127, 1, this, tr( "Filter Cutoff" ) ),
+	m_filterQModel( 64, 0, 127, 1, this, tr( "Filter Resonance" ) ),
 	m_bandwidthModel( 64, 0, 127, 1, this, tr( "Bandwidth" ) ),
 	m_fmGainModel( 127, 0, 127, 1, this, tr( "FM Gain" ) ),
 	m_resCenterFreqModel( 64, 0, 127, 1, this, tr( "Resonance Center Frequency" ) ),
@@ -153,7 +153,7 @@ void ZynAddSubFxInstrument::saveSettings( QDomDocument & _doc,
 {
 	m_portamentoModel.saveSettings( _doc, _this, "portamento" );
 	m_filterFreqModel.saveSettings( _doc, _this, "filterfreq" );
-	m_filterQModel.saveSettings( _doc, _this, "filtercut" );
+	m_filterQModel.saveSettings( _doc, _this, "filterq" );
 	m_bandwidthModel.saveSettings( _doc, _this, "bandwidth" );
 	m_fmGainModel.saveSettings( _doc, _this, "fmgain" );
 	m_resCenterFreqModel.saveSettings( _doc, _this, "rescenterfreq" );
@@ -201,7 +201,7 @@ void ZynAddSubFxInstrument::loadSettings( const QDomElement & _this )
 
 	m_portamentoModel.loadSettings( _this, "portamento" );
 	m_filterFreqModel.loadSettings( _this, "filterfreq" );
-	m_filterQModel.loadSettings( _this, "filtercut" );
+	m_filterQModel.loadSettings( _this, "filterq" );
 	m_bandwidthModel.loadSettings( _this, "bandwidth" );
 	m_fmGainModel.loadSettings( _this, "fmgain" );
 	m_resCenterFreqModel.loadSettings( _this, "rescenterfreq" );
@@ -450,8 +450,8 @@ ZynAddSubFxView::ZynAddSubFxView( Instrument * _instrument, QWidget * _parent ) 
 	m_filterFreq->setLabel( tr( "FREQ" ) );
 
 	m_filterQ = new knob( knobBright_26, this );
-	m_filterQ->setHintText( tr( "Filter Cutoff:" ) + "", "" );
-	m_filterQ->setLabel( tr( "CUT" ) );
+	m_filterQ->setHintText( tr( "Filter Resonance:" ) + "", "" );
+	m_filterQ->setLabel( tr( "RES" ) );
 
 	m_bandwidth = new knob( knobBright_26, this );
 	m_bandwidth->setHintText( tr( "Bandwidth:" ) + "", "" );
