@@ -158,6 +158,18 @@ void ZynAddSubFxInstrument::saveSettings( QDomDocument & _doc,
 	m_fmGainModel.saveSettings( _doc, _this, "fmgain" );
 	m_resCenterFreqModel.saveSettings( _doc, _this, "rescenterfreq" );
 	m_resBandwidthModel.saveSettings( _doc, _this, "resbandwidth" );
+
+	QString modifiedControllers;
+	for( QMap<int, bool>::ConstIterator it = m_modifiedControllers.begin();
+									it != m_modifiedControllers.end(); ++it )
+	{
+		if( it.value() )
+		{
+			modifiedControllers += QString( "%1," ).arg( it.key() );
+		}
+	}
+	_this.setAttribute( "modifiedcontrollers", modifiedControllers );
+
 	m_forwardMidiCcModel.saveSettings( _doc, _this, "forwardmidicc" );
 
 	QTemporaryFile tf;
@@ -242,6 +254,27 @@ void ZynAddSubFxInstrument::loadSettings( const QDomElement & _this )
 		}
 		m_pluginMutex.unlock();
 
+		m_modifiedControllers.clear();
+		foreach( const QString & c,
+						_this.attribute( "modifiedcontrollers" ).split( ',' ) )
+		{
+			if( !c.isEmpty() )
+			{
+				switch( c.toInt() )
+				{
+					case C_portamento: updatePortamento(); break;
+					case C_filtercutoff: updateFilterFreq(); break;
+					case C_filterq: updateFilterQ(); break;
+					case C_bandwidth: updateBandwidth(); break;
+					case C_fmamp: updateFmGain(); break;
+					case C_resonance_center: updateResCenterFreq(); break;
+					case C_resonance_bandwidth: updateResBandwidth(); break;
+					default:
+						break;
+				}
+			}
+		}
+
 		emit settingsChanged();
 	}
 }
@@ -266,6 +299,8 @@ void ZynAddSubFxInstrument::loadFile( const QString & _file )
 		m_plugin->loadPreset( fn );
 		m_pluginMutex.unlock();
 	}
+
+	m_modifiedControllers.clear();
 
 	emit settingsChanged();
 }
@@ -354,6 +389,7 @@ void ZynAddSubFxInstrument::reloadPlugin()
 			void ZynAddSubFxInstrument::slotname()					\
 			{														\
 				sendControlChange( midictl, modelname.value() );	\
+				m_modifiedControllers[midictl] = true;				\
 			}
 
 

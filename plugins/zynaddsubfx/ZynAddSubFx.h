@@ -25,6 +25,7 @@
 #ifndef _ZYNADDSUBFX_H
 #define _ZYNADDSUBFX_H
 
+#include <QtCore/QMap>
 #include <QtCore/QMutex>
 
 #include "AutomatableModel.h"
@@ -118,6 +119,8 @@ private:
 	FloatModel m_resBandwidthModel;
 	BoolModel m_forwardMidiCcModel;
 
+	QMap<int, bool> m_modifiedControllers;
+
 	friend class ZynAddSubFxView;
 
 
@@ -159,7 +162,6 @@ private slots:
 	void toggleUI();
 
 } ;
-
 
 
 #endif
