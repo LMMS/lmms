@@ -1,7 +1,7 @@
 /*
  * VstEffectControlDialog.cpp - dialog for displaying VST-effect GUI
  *
- * Copyright (c) 2006-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -24,6 +24,7 @@
 
 #include <QtGui/QLayout>
 #include <QtGui/QMdiArea>
+#include <QtGui/QPushButton>
 
 #include "VstEffectControlDialog.h"
 #include "VstEffect.h"
@@ -31,12 +32,26 @@
 
 
 VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
-	EffectControlDialog( _ctl )
+	EffectControlDialog( _ctl ),
+	m_pluginWidget( NULL )
 {
 	QVBoxLayout * l = new QVBoxLayout( this );
 	l->setMargin( 0 );
 	l->setSpacing( 0 );
 
+#ifdef LMMS_BUILD_LINUX
+	_ctl->m_effect->m_plugin->showEditor();
+	m_pluginWidget = _ctl->m_effect->m_plugin->pluginWidget();
+	if( m_pluginWidget )
+	{
+		setWindowTitle( m_pluginWidget->windowTitle() );
+		QPushButton * btn = new QPushButton( tr( "Show/hide VST FX GUI" ) );
+		btn->setCheckable( true );
+		l->addWidget( btn );
+		connect( btn, SIGNAL( toggled( bool ) ),
+					m_pluginWidget, SLOT( setVisible( bool ) ) );
+	}
+#elif LMMS_BUILD_WIN32
 	_ctl->m_effect->m_plugin->showEditor( this );
 	QWidget * w = _ctl->m_effect->m_plugin->pluginWidget( false );
 	if( w )
@@ -44,6 +59,7 @@ VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 		setWindowTitle( w->windowTitle() );
 		l->addWidget( w );
 	}
+#endif
 }
 
 
@@ -51,6 +67,7 @@ VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 
 VstEffectControlDialog::~VstEffectControlDialog()
 {
+	delete m_pluginWidget;
 }
 
 

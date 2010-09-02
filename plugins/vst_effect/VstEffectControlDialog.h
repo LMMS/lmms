@@ -1,8 +1,8 @@
 /*
  * VstEffectControlDialog.h - dialog for displaying GUI of VST-effect-plugin
  *
- * Copyright (c) 2006-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ * Copyright (c) 2006-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -36,6 +36,9 @@ class VstEffectControlDialog : public EffectControlDialog
 public:
 	VstEffectControlDialog( VstEffectControls * _controls );
 	virtual ~VstEffectControlDialog();
+
+private:
+	QWidget * m_pluginWidget;
 
 } ;
 
