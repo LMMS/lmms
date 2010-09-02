@@ -565,7 +565,7 @@ void ZynAddSubFxView::modelChanged()
 
 	m_forwardMidiCC->setModel( &m->m_forwardMidiCcModel );
 
-	toggleUI();
+	m_toggleUIButton->setChecked( m->m_hasGUI );
 }
 
 
@@ -574,13 +574,16 @@ void ZynAddSubFxView::modelChanged()
 void ZynAddSubFxView::toggleUI()
 {
 	ZynAddSubFxInstrument * model = castModel<ZynAddSubFxInstrument>();
-	model->m_hasGUI = m_toggleUIButton->isChecked();
-	model->reloadPlugin();
-
-	if( model->m_remotePlugin )
+	if( model->m_hasGUI != m_toggleUIButton->isChecked() )
 	{
-		connect( model->m_remotePlugin, SIGNAL( clickedCloseButton() ),
-					m_toggleUIButton, SLOT( toggle() ) );
+		model->m_hasGUI = m_toggleUIButton->isChecked();
+		model->reloadPlugin();
+
+		if( model->m_remotePlugin )
+		{
+			connect( model->m_remotePlugin, SIGNAL( clickedCloseButton() ),
+						m_toggleUIButton, SLOT( toggle() ) );
+		}
 	}
 }
 
