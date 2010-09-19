@@ -108,7 +108,7 @@ struct lv2_instance: public plugin_ctl_iface, public progress_report_iface
             int ppn = pn + ofs;
             if ((pp.flags & PF_TYPEMASK) == PF_STRING && (vi[ppn >> 3] & (1 << (ppn & 7)))
                 && (((LV2_String_Data *)params[pn])->flags & LV2_STRING_DATA_CHANGED_FLAG)) {
-                printf("Calling configure on %s\n", pp.short_name);
+                // printf("Calling configure on %s\n", pp.short_name);
                 configure(pp.short_name, ((LV2_String_Data *)params[pn])->data);
             }
         }
