@@ -17,7 +17,6 @@ extern "C" {
     The plugin should always expose this feature as optional.
 */
 #define LV2_PERSIST_URI "http://paniq.org/lv2/persist"
-
    
 /*
     Causes the host to store a binary blob in a map.
@@ -28,22 +27,23 @@ extern "C" {
     the binary blob to be stored. 'size' is the size of the binary blob in
     bytes.
     
-    The host must store a copy of the blob under the provided key in a map 
-    until returning from the save() call.
+    The host is expected store a copy of the blob under the provided key.
     
-    A size of 0 indicates that value points to a zero-terminated string.
+    A 'size' of 0 is valid. The host may choose to store nothing.
+    
+    A 'size' of -1 indicates that 'value' points to a zero-terminated string.
     This is a convenience function which requires the host to calculate the
-    length as strlen(value)+1.
+    size from strlen(value)+1.
 */
 typedef void (*LV2_Persist_Store_Function)(void *callback_data, const char *key, 
-                                           const void *value, size_t size);
+                                           const void *value, ssize_t size);
 
 /*
     Causes the host to retrieve a binary blob from the map.
     
     A callback provided by the host to LV2_Persist.restore(). 'callback_data'
     must be the callback_data argument passed to restore(). 'key' is a private
-    string or UI under which a blob has been previously stored.
+    string or URI under which a blob has been previously stored.
     
     When the blob could be successfully retrieved, retrieve() must return
     a pointer to the blob and set 'size' to the length of value in bytes.
@@ -91,7 +91,7 @@ struct LV2_Persist {
     
         The map on which save() operates must always be empty before
         the first call to store(). The plugin is expected to store all
-        blobs of interests.
+        blobs of interest.
     
         The callback data pointer and store function may not be used
         beyond the scope of save().

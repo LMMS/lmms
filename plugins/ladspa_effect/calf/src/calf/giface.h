@@ -28,6 +28,8 @@
 #include <string>
 #include <vector>
 
+// #define USE_PERSIST_EXTENSION 1
+
 namespace osctl {
     struct osc_client;
 }
@@ -299,6 +301,8 @@ struct plugin_metadata_iface
     virtual const char *get_label() const = 0;
     /// @return total number of parameters
     virtual int get_param_count() const = 0;
+    /// @return total number of parameters that aren't configure variables
+    virtual int get_nonstring_param_count() const = 0;
     /// Return custom XML
     virtual const char *get_gui_xml() const = 0;
     /// @return number of audio inputs
@@ -632,6 +636,12 @@ public:
             if (get_param_props(i)->flags & PF_PROP_MSGCONTEXT)
                 ports.push_back(i);
         }
+    }
+    int get_nonstring_param_count() const {
+        int i = Metadata::param_count;
+        while(i > 0 && (param_props[i - 1].flags & PF_TYPEMASK) == PF_STRING)
+            i--;
+        return i;
     }
 };
 
