@@ -90,6 +90,27 @@ struct vumeter
     }
 };
 
+struct dual_vumeter
+{
+    vumeter left, right;
+    
+    inline void update_stereo(const float *src1, const float *src2, unsigned int len)
+    {
+        left.update_stereo(src1, NULL, len);
+        right.update_stereo(NULL, src2, len);
+    }
+    inline void update_zeros(unsigned int len)
+    {
+        left.update_zeros(len);
+        right.update_zeros(len);
+    }
+    inline void reset()
+    {
+        left.reset();
+        right.reset();
+    }
+};
+
 };
 
 #endif

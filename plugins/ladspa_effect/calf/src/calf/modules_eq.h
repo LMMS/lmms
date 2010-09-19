@@ -28,6 +28,7 @@
 #include "audio_fx.h"
 #include "giface.h"
 #include "metadata.h"
+#include "plugin_tools.h"
 
 namespace calf_plugins {
 
@@ -51,8 +52,7 @@ private:
     float hs_level_old, hs_freq_old;
     float p_level_old[PeakBands], p_freq_old[PeakBands], p_q_old[PeakBands];
     mutable float old_params_for_graph[graph_param_count];
-    uint32_t clip_inL, clip_outL, clip_inR, clip_outR;
-    float meter_inL, meter_outL, meter_inR, meter_outR;
+    dual_in_out_metering<BaseClass> meters;
     CalfEqMode hp_mode, lp_mode;
     dsp::biquad_d2<float> hp[3][2], lp[3][2];
     dsp::biquad_d2<float> lsL, lsR, hsL, hsR;

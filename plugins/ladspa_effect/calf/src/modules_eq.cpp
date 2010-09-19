@@ -26,8 +26,6 @@
 using namespace dsp;
 using namespace calf_plugins;
 
-#define SET_IF_CONNECTED(name) if (params[AM::param_##name] != NULL) *params[AM::param_##name] = name;
-
 /// Equalizer 12 Band by Markus Schmidt
 ///
 /// This module is based on Krzysztof's filters. It provides a couple
@@ -40,8 +38,6 @@ equalizerNband_audio_module<BaseClass, has_lphp>::equalizerNband_audio_module()
     is_active = false;
     srate = 0;
     last_generation = 0;
-    clip_inL = clip_inR = clip_outL = clip_outR  = 0.f;
-    meter_inL = meter_inR = meter_outL = meter_outR = 0.f;
 }
 
 template<class BaseClass, bool has_lphp>
@@ -50,6 +46,7 @@ void equalizerNband_audio_module<BaseClass, has_lphp>::activate()
     is_active = true;
     // set all filters
     params_changed();
+    meters.reset();
 }
 
 template<class BaseClass, bool has_lphp>
@@ -170,6 +167,8 @@ template<class BaseClass, bool has_lphp>
 uint32_t equalizerNband_audio_module<BaseClass, has_lphp>::process(uint32_t offset, uint32_t numsamples, uint32_t inputs_mask, uint32_t outputs_mask)
 {
     bool bypass = *params[AM::param_bypass] > 0.f;
+    uint32_t orig_offset = offset;
+    uint32_t orig_numsamples = numsamples;
     numsamples += offset;
     if(bypass) {
         // everything bypassed
@@ -179,19 +178,8 @@ uint32_t equalizerNband_audio_module<BaseClass, has_lphp>::process(uint32_t offs
             ++offset;
         }
         // displays, too
-        clip_inL = clip_inR = clip_outL = clip_outR = 0.f;
-        meter_inL = meter_inR = meter_outL = meter_outR = 0.f;
+        meters.bypassed(params, orig_numsamples);
     } else {
-        
-        clip_inL    -= std::min(clip_inL,  numsamples);
-        clip_inR    -= std::min(clip_inR,  numsamples);
-        clip_outL   -= std::min(clip_outL, numsamples);
-        clip_outR   -= std::min(clip_outR, numsamples);
-        meter_inL = 0.f;
-        meter_inR = 0.f;
-        meter_outL = 0.f;
-        meter_outR = 0.f;
-        
         // process
         while(offset < numsamples) {
             // cycle through samples
@@ -230,37 +218,11 @@ uint32_t equalizerNband_audio_module<BaseClass, has_lphp>::process(uint32_t offs
             // send to output
             outs[0][offset] = outL;
             outs[1][offset] = outR;
-            
-            // clip LED's
-            if(inL > 1.f) {
-                clip_inL  = srate >> 3;
-            }
-            if(inR > 1.f) {
-                clip_inR  = srate >> 3;
-            }
-            if(outL > 1.f) {
-                clip_outL = srate >> 3;
-            }
-            if(outR > 1.f) {
-                clip_outR = srate >> 3;
-            }
-            // set up in / out meters
-            if(inL > meter_inL) {
-                meter_inL = inL;
-            }
-            if(inR > meter_inR) {
-                meter_inR = inR;
-            }
-            if(outL > meter_outL) {
-                meter_outL = outL;
-            }
-            if(outR > meter_outR) {
-                meter_outR = outR;
-            }
-            
+                        
             // next sample
             ++offset;
         } // cycle trough samples
+        meters.process(params, ins, outs, orig_offset, orig_numsamples);
         // clean up
         for(int i = 0; i < 3; ++i) {
             hp[i][0].sanitize();
@@ -275,15 +237,6 @@ uint32_t equalizerNband_audio_module<BaseClass, has_lphp>::process(uint32_t offs
             pR[i].sanitize();
         }
     }
-    // draw meters
-    SET_IF_CONNECTED(clip_inL)
-    SET_IF_CONNECTED(clip_inR)
-    SET_IF_CONNECTED(clip_outL)
-    SET_IF_CONNECTED(clip_outR)
-    SET_IF_CONNECTED(meter_inL)
-    SET_IF_CONNECTED(meter_inR)
-    SET_IF_CONNECTED(meter_outL)
-    SET_IF_CONNECTED(meter_outR)
     // whatever has to be returned x)
     return outputs_mask;
 }

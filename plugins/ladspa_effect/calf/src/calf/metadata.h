@@ -25,6 +25,9 @@
 
 #include "giface.h"
 
+#define MONO_VU_METER_PARAMS param_meter_in, param_meter_out, param_clip_in, param_clip_out
+#define STEREO_VU_METER_PARAMS param_meter_inL, param_meter_inR, param_meter_outL, param_meter_outR, param_clip_inL, param_clip_inR, param_clip_outL, param_clip_outR
+
 namespace calf_plugins {
 
 struct flanger_metadata: public plugin_metadata<flanger_metadata>
@@ -147,7 +150,7 @@ struct monosynth_metadata: public plugin_metadata<monosynth_metadata>
 struct compressor_metadata: public plugin_metadata<compressor_metadata>
 {
     enum { in_count = 2, out_count = 2, ins_optional = 0, outs_optional = 0, support_midi = false, require_midi = false, rt_capable = true };
-    enum { param_bypass, param_level_in, param_meter_in, param_meter_out, param_clip_in, param_clip_out,
+    enum { param_bypass, param_level_in, MONO_VU_METER_PARAMS,
            param_threshold, param_ratio, param_attack, param_release, param_makeup, param_knee, param_detection, param_stereo_link, param_compression, 
            param_count };
     PLUGIN_NAME_ID_LABEL("compressor", "compressor", "Compressor")
@@ -157,7 +160,7 @@ struct compressor_metadata: public plugin_metadata<compressor_metadata>
 struct sidechaincompressor_metadata: public plugin_metadata<sidechaincompressor_metadata>
 {
     enum { in_count = 2, out_count = 2, ins_optional = 0, outs_optional = 0, support_midi = false, require_midi = false, rt_capable = true };
-    enum { param_bypass, param_level_in, param_meter_in, param_meter_out, param_clip_in, param_clip_out,
+    enum { param_bypass, param_level_in, MONO_VU_METER_PARAMS,
            param_threshold, param_ratio, param_attack, param_release, param_makeup, param_knee, param_detection, param_stereo_link, param_compression, 
            param_sc_mode, param_f1_freq, param_f2_freq, param_f1_level, param_f2_level,
            param_sc_listen, param_f1_active, param_f2_active, param_count };
@@ -168,8 +171,8 @@ struct sidechaincompressor_metadata: public plugin_metadata<sidechaincompressor_
 struct multibandcompressor_metadata: public plugin_metadata<multibandcompressor_metadata>
 {
     enum { in_count = 2, out_count = 2, ins_optional = 0, outs_optional = 0, support_midi = false, require_midi = false, rt_capable = true };
-    enum { param_bypass, param_level_in, param_level_out, param_meter_inL, param_meter_inR,
-           param_meter_outL, param_meter_outR, param_clip_inL, param_clip_inR, param_clip_outL, param_clip_outR,
+    enum { param_bypass, param_level_in, param_level_out, 
+           STEREO_VU_METER_PARAMS,
            param_freq0, param_freq1, param_freq2,
            param_sep0, param_sep1, param_sep2,
            param_q0, param_q1, param_q2,
@@ -202,7 +205,7 @@ struct deesser_metadata: public plugin_metadata<deesser_metadata>
 struct gate_metadata: public plugin_metadata<gate_metadata>
 {
     enum { in_count = 2, out_count = 2, ins_optional = 0, outs_optional = 0, support_midi = false, require_midi = false, rt_capable = true };
-    enum { param_bypass, param_level_in, param_meter_in, param_meter_out, param_clip_in, param_clip_out,
+    enum { param_bypass, param_level_in, MONO_VU_METER_PARAMS,
            param_range, param_threshold, param_ratio, param_attack, param_release, param_makeup, param_knee, param_detection, param_stereo_link, param_gating, 
            param_count };
     PLUGIN_NAME_ID_LABEL("gate", "gate", "Gate")
@@ -212,7 +215,7 @@ struct gate_metadata: public plugin_metadata<gate_metadata>
 struct sidechaingate_metadata: public plugin_metadata<sidechaingate_metadata>
 {
     enum { in_count = 2, out_count = 2, ins_optional = 0, outs_optional = 0, support_midi = false, require_midi = false, rt_capable = true };
-    enum { param_bypass, param_level_in, param_meter_in, param_meter_out, param_clip_in, param_clip_out,
+    enum { param_bypass, param_level_in, MONO_VU_METER_PARAMS,
            param_range, param_threshold, param_ratio, param_attack, param_release, param_makeup, param_knee, param_detection, param_stereo_link, param_gating, 
            param_sc_mode, param_f1_freq, param_f2_freq, param_f1_level, param_f2_level,
            param_sc_listen, param_f1_active, param_f2_active, param_count };
@@ -223,8 +226,7 @@ struct sidechaingate_metadata: public plugin_metadata<sidechaingate_metadata>
 struct equalizer5band_metadata: public plugin_metadata<equalizer5band_metadata>
 {
     enum { in_count = 2, out_count = 2, ins_optional = 0, outs_optional = 0, support_midi = false, require_midi = false, rt_capable = true };
-    enum { param_bypass, param_level_in, param_level_out, param_meter_inL, param_meter_inR,
-           param_meter_outL, param_meter_outR, param_clip_inL, param_clip_outL, param_clip_inR, param_clip_outR,
+    enum { param_bypass, param_level_in, param_level_out, STEREO_VU_METER_PARAMS,
            param_ls_active, param_ls_level, param_ls_freq,
            param_hs_active, param_hs_level, param_hs_freq,
            param_p1_active, param_p1_level, param_p1_freq, param_p1_q,
@@ -241,8 +243,8 @@ struct equalizer5band_metadata: public plugin_metadata<equalizer5band_metadata>
 struct equalizer8band_metadata: public plugin_metadata<equalizer8band_metadata>
 {
     enum { in_count = 2, out_count = 2, ins_optional = 0, outs_optional = 0, support_midi = false, require_midi = false, rt_capable = true };
-    enum { param_bypass, param_level_in, param_level_out, param_meter_inL, param_meter_inR,
-           param_meter_outL, param_meter_outR, param_clip_inL, param_clip_inR, param_clip_outL, param_clip_outR,
+    enum { param_bypass, param_level_in, param_level_out, 
+           STEREO_VU_METER_PARAMS,
            param_hp_active, param_hp_freq, param_hp_mode,
            param_lp_active, param_lp_freq, param_lp_mode,
            param_ls_active, param_ls_level, param_ls_freq,
@@ -259,8 +261,8 @@ struct equalizer8band_metadata: public plugin_metadata<equalizer8band_metadata>
 struct equalizer12band_metadata: public plugin_metadata<equalizer12band_metadata>
 {
     enum { in_count = 2, out_count = 2, ins_optional = 0, outs_optional = 0, support_midi = false, require_midi = false, rt_capable = true };
-    enum { param_bypass, param_level_in, param_level_out, param_meter_inL, param_meter_inR,
-           param_meter_outL, param_meter_outR, param_clip_inL, param_clip_inR, param_clip_outL, param_clip_outR,
+    enum { param_bypass, param_level_in, param_level_out, 
+           STEREO_VU_METER_PARAMS,
            param_hp_active, param_hp_freq, param_hp_mode,
            param_lp_active, param_lp_freq, param_lp_mode,
            param_ls_active, param_ls_level, param_ls_freq,
@@ -282,8 +284,7 @@ struct equalizer12band_metadata: public plugin_metadata<equalizer12band_metadata
 struct pulsator_metadata: public plugin_metadata<pulsator_metadata>
 {
     enum { in_count = 2, out_count = 2, ins_optional = 0, outs_optional = 0, support_midi = false, require_midi = false, rt_capable = true };
-    enum { param_bypass, param_level_in, param_level_out, param_meter_inL, param_meter_inR,
-           param_meter_outL, param_meter_outR, param_clip_inL, param_clip_inR, param_clip_outL, param_clip_outR,
+    enum { param_bypass, param_level_in, param_level_out, STEREO_VU_METER_PARAMS,
            param_mode, param_freq, param_amount, param_offset, param_mono, param_reset, param_count };
     PLUGIN_NAME_ID_LABEL("pulsator", "pulsator", "Pulsator")
 };
@@ -292,8 +293,7 @@ struct pulsator_metadata: public plugin_metadata<pulsator_metadata>
 struct saturator_metadata: public plugin_metadata<saturator_metadata>
 {
     enum { in_count = 2, out_count = 2, ins_optional = 1, outs_optional = 1, support_midi = false, require_midi = false, rt_capable = true };
-    enum { param_bypass, param_level_in, param_level_out, param_mix, param_meter_in,
-           param_meter_out, param_clip_in, param_clip_out, param_drive, param_blend, param_meter_drive,
+    enum { param_bypass, param_level_in, param_level_out, param_mix, MONO_VU_METER_PARAMS, param_drive, param_blend, param_meter_drive,
            param_lp_pre_freq, param_hp_pre_freq, param_lp_post_freq, param_hp_post_freq,
            param_p_freq, param_p_level, param_p_q, param_count };
     PLUGIN_NAME_ID_LABEL("saturator", "saturator", "Saturator")
@@ -302,8 +302,7 @@ struct saturator_metadata: public plugin_metadata<saturator_metadata>
 struct exciter_metadata: public plugin_metadata<exciter_metadata>
 {
     enum { in_count = 2, out_count = 2, ins_optional = 1, outs_optional = 1, support_midi = false, require_midi = false, rt_capable = true };
-    enum { param_bypass, param_level_in, param_level_out, param_amount, param_meter_in,
-           param_meter_out, param_clip_in, param_clip_out, param_drive, param_blend, param_meter_drive,
+    enum { param_bypass, param_level_in, param_level_out, param_amount, MONO_VU_METER_PARAMS, param_drive, param_blend, param_meter_drive,
            param_freq, param_listen, param_count };
     PLUGIN_NAME_ID_LABEL("exciter", "exciter", "Exciter")
 };
@@ -311,8 +310,7 @@ struct exciter_metadata: public plugin_metadata<exciter_metadata>
 struct bassenhancer_metadata: public plugin_metadata<bassenhancer_metadata>
 {
     enum { in_count = 2, out_count = 2, ins_optional = 1, outs_optional = 1, support_midi = false, require_midi = false, rt_capable = true };
-    enum { param_bypass, param_level_in, param_level_out, param_amount, param_meter_in,
-           param_meter_out, param_clip_in, param_clip_out, param_drive, param_blend, param_meter_drive,
+    enum { param_bypass, param_level_in, param_level_out, param_amount, MONO_VU_METER_PARAMS, param_drive, param_blend, param_meter_drive,
            param_freq, param_listen, param_count };
     PLUGIN_NAME_ID_LABEL("bassenhancer", "bassenhancer", "Bass Enhancer")
 };
