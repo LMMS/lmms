@@ -403,7 +403,10 @@ struct organ_metadata: public organ_enums, public plugin_metadata<organ_metadata
 {
     enum { in_count = 0, out_count = 2, ins_optional = 0, outs_optional = 0, support_midi = true, require_midi = true, rt_capable = true };
     PLUGIN_NAME_ID_LABEL("organ", "organ", "Organ")
+    
+public:
     plugin_command_info *get_commands();
+    const char *const *get_configure_vars() const;
 };
 
 /// FluidSynth - metadata
@@ -412,6 +415,9 @@ struct fluidsynth_metadata: public plugin_metadata<fluidsynth_metadata>
     enum { par_master, par_interpolation, par_reverb, par_chorus, par_soundfont, par_preset_key_set, param_count };
     enum { in_count = 0, out_count = 2, ins_optional = 0, outs_optional = 0, support_midi = true, require_midi = true, rt_capable = false };
     PLUGIN_NAME_ID_LABEL("fluidsynth", "fluidsynth", "Fluidsynth")
+
+public:
+    const char *const *get_configure_vars() const;
 };
     
 /// Wavetable - metadata

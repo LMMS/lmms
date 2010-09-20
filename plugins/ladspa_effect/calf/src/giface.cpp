@@ -150,8 +150,6 @@ std::string parameter_properties::to_string(float value) const
     }
     switch(flags & PF_TYPEMASK)
     {
-    case PF_STRING:
-        return "N/A";
     case PF_INT:
     case PF_BOOL:
     case PF_ENUM:
@@ -190,16 +188,14 @@ std::string parameter_properties::to_string(float value) const
 
 void calf_plugins::plugin_ctl_iface::clear_preset() {
     int param_count = get_metadata_iface()->get_param_count();
-    for (int i=0; i < param_count; i++)
+    for (int i = 0; i < param_count; i++)
     {
         const parameter_properties &pp = *get_metadata_iface()->get_param_props(i);
-        if ((pp.flags & PF_TYPEMASK) == PF_STRING)
-        {
-            configure(pp.short_name, pp.choices ? pp.choices[0] : "");
-        }
-        else
-            set_param_value(i, pp.def_value);
+        set_param_value(i, pp.def_value);
     }
+    const char *const *vars = get_metadata_iface()->get_configure_vars();
+    for (int i = 0; vars[i]; i++)
+        configure(vars[i], NULL);
 }
 
 const char *calf_plugins::load_gui_xml(const std::string &plugin_id)
@@ -209,32 +205,10 @@ const char *calf_plugins::load_gui_xml(const std::string &plugin_id)
         return strdup(calf_utils::load_file((std::string(PKGLIBDIR) + "/gui-" + plugin_id + ".xml").c_str()).c_str());
     }
     catch(file_exception e)
-#endif
     {
         return NULL;
     }
-}
-
-bool calf_plugins::check_for_message_context_ports(const parameter_properties *parameters, int count)
-{
-    for (int i = count - 1; i >= 0; i--)
-    {
-        if (parameters[i].flags & PF_PROP_MSGCONTEXT)
-            return true;
-    }
-    return false;
-}
-
-bool calf_plugins::check_for_string_ports(const parameter_properties *parameters, int count)
-{
-    for (int i = count - 1; i >= 0; i--)
-    {
-        if ((parameters[i].flags & PF_TYPEMASK) == PF_STRING)
-            return true;
-        if ((parameters[i].flags & PF_TYPEMASK) < PF_STRING)
-            return false;
-    }
-    return false;
+#endif
 }
 
 bool calf_plugins::get_freq_gridline(int subindex, float &pos, bool &vertical, std::string &legend, cairo_iface *context, bool use_frequencies)

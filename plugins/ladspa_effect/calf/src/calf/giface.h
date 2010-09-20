@@ -28,8 +28,6 @@
 #include <string>
 #include <vector>
 
-// #define USE_PERSIST_EXTENSION 1
-
 namespace osctl {
     struct osc_client;
 }
@@ -49,7 +47,6 @@ enum parameter_flags
   PF_BOOL = 0x0002,  ///< bool value (usually >=0.5f is treated as TRUE, which is inconsistent with LV2 etc. which treats anything >0 as TRUE)
   PF_ENUM = 0x0003,  ///< enum value (min, min+1, ..., max, only guaranteed to work when min = 0)
   PF_ENUM_MULTI = 0x0004, ///< SET / multiple-choice
-  PF_STRING = 0x0005, ///< see: http://lv2plug.in/docs/index.php?title=String_port
   
   PF_SCALEMASK = 0xF0, ///< bit mask for scale
   PF_SCALE_DEFAULT = 0x00, ///< no scale given
@@ -84,7 +81,6 @@ enum parameter_flags
   PF_PROP_OUTPUT    = 0x080000, ///< output port
   PF_PROP_OPTIONAL  = 0x100000, ///< connection optional
   PF_PROP_GRAPH     = 0x200000, ///< add graph
-  PF_PROP_MSGCONTEXT= 0x400000, ///< message context
   
   PF_UNITMASK     = 0xFF000000,  ///< bit mask for units   \todo reduce to use only 5 bits
   PF_UNIT_DB      = 0x01000000,  ///< decibels
@@ -301,8 +297,6 @@ struct plugin_metadata_iface
     virtual const char *get_label() const = 0;
     /// @return total number of parameters
     virtual int get_param_count() const = 0;
-    /// @return total number of parameters that aren't configure variables
-    virtual int get_nonstring_param_count() const = 0;
     /// Return custom XML
     virtual const char *get_gui_xml() const = 0;
     /// @return number of audio inputs
@@ -335,12 +329,10 @@ struct plugin_metadata_iface
     virtual bool is_cv(int param_no) const = 0;
     /// is the given parameter non-interpolated?
     virtual bool is_noisy(int param_no) const = 0;
-    /// does the plugin require message context? (or DSSI configure) may be slow
-    virtual bool requires_message_context() const = 0;
     /// does the plugin require string port extension? (or DSSI configure) may be slow
-    virtual bool requires_string_ports() const = 0;
-    /// add all message context parameter numbers to the ports vector
-    virtual void get_message_context_parameters(std::vector<int> &ports) const = 0;
+    virtual bool requires_configure() const = 0;
+    /// obtain array of names of configure variables (or NULL is none needed)
+    virtual const char *const *get_configure_vars() const { return NULL; }
 
     /// Do-nothing destructor to silence compiler warning
     virtual ~plugin_metadata_iface() {}
@@ -431,7 +423,7 @@ struct audio_module_iface
     virtual void set_sample_rate(uint32_t sr) = 0;
     /// Execute menu command with given number
     virtual void execute(int cmd_no) = 0;
-    /// DSSI configure call
+    /// DSSI configure call, value = NULL = reset to default
     virtual char *configure(const char *key, const char *value) = 0;
     /// Send all understood configure vars (none by default)
     virtual void send_configures(send_configure_iface *sci) = 0;
@@ -556,9 +548,6 @@ public:
     virtual const line_graph_iface *get_line_graph_iface() const { return dynamic_cast<const line_graph_iface *>(this); }
 };
 
-extern bool check_for_message_context_ports(const parameter_properties *parameters, int count);
-extern bool check_for_string_ports(const parameter_properties *parameters, int count);
-
 #if USE_EXEC_GUI || USE_DSSI
 
 enum line_graph_item
@@ -629,20 +618,7 @@ public:
     bool is_cv(int param_no) const { return true; }
     bool is_noisy(int param_no) const { return false; }
     const ladspa_plugin_info &get_plugin_info() const { return plugin_info; }
-    bool requires_message_context() const { return check_for_message_context_ports(param_props, Metadata::param_count); }
-    bool requires_string_ports() const { return check_for_string_ports(param_props, Metadata::param_count); }
-    void get_message_context_parameters(std::vector<int> &ports) const {
-        for (int i = 0; i < get_param_count(); ++i) {
-            if (get_param_props(i)->flags & PF_PROP_MSGCONTEXT)
-                ports.push_back(i);
-        }
-    }
-    int get_nonstring_param_count() const {
-        int i = Metadata::param_count;
-        while(i > 0 && (param_props[i - 1].flags & PF_TYPEMASK) == PF_STRING)
-            i--;
-        return i;
-    }
+    bool requires_configure() const { return false; }
 };
 
 #define CALF_PORT_NAMES(name) template<> const char *::plugin_metadata<name##_metadata>::port_names[]

@@ -28,11 +28,9 @@
 #include <lv2.h>
 #include <calf/giface.h>
 #include <calf/lv2-midiport.h>
-#include <calf/lv2_contexts.h>
 #include <calf/lv2_event.h>
 #include <calf/lv2_persist.h>
 #include <calf/lv2_progress.h>
-#include <calf/lv2_string_port.h>
 #include <calf/lv2_uri_map.h>
 #include <string.h>
 
@@ -49,7 +47,6 @@ struct lv2_instance: public plugin_ctl_iface, public progress_report_iface
     LV2_URI_Map_Feature *uri_map;
     LV2_Event_Feature *event_feature;
     uint32_t midi_event_type;
-    std::vector<int> message_params;
     LV2_Progress *progress_report_feature;
     float **ins, **outs, **params;
     int out_count;
@@ -59,13 +56,8 @@ struct lv2_instance: public plugin_ctl_iface, public progress_report_iface
         module = _module;
         module->get_port_arrays(ins, outs, params);
         metadata = module->get_metadata_iface();
-        metadata->get_message_context_parameters(message_params);
         out_count = metadata->get_output_count();
-#if USE_PERSIST_EXTENSION
-        real_param_count = metadata->get_nonstring_param_count();
-#else
         real_param_count = metadata->get_param_count();
-#endif
         
         uri_map = NULL;
         midi_data = NULL;
@@ -75,7 +67,6 @@ struct lv2_instance: public plugin_ctl_iface, public progress_report_iface
 
         srate_to_set = 44100;
         set_srate = true;
-        // printf("message params %d\n", (int)message_params.size());
     }
     /// This, and not Module::post_instantiate, is actually called by lv2_wrapper class
     void post_instantiate()
@@ -98,43 +89,24 @@ struct lv2_instance: public plugin_ctl_iface, public progress_report_iface
     void send_configures(send_configure_iface *sci) { 
         module->send_configures(sci);
     }
-    uint32_t impl_message_run(const void *valid_inputs, void *output_ports) {
-        uint8_t *vi = (uint8_t *)valid_inputs;
-        int ofs = metadata->get_param_port_offset();
-        for (unsigned int i = 0; i < message_params.size(); i++)
-        {
-            int pn = message_params[i];
-            const parameter_properties &pp = *metadata->get_param_props(pn);
-            int ppn = pn + ofs;
-            if ((pp.flags & PF_TYPEMASK) == PF_STRING && (vi[ppn >> 3] & (1 << (ppn & 7)))
-                && (((LV2_String_Data *)params[pn])->flags & LV2_STRING_DATA_CHANGED_FLAG)) {
-                // printf("Calling configure on %s\n", pp.short_name);
-                configure(pp.short_name, ((LV2_String_Data *)params[pn])->data);
-            }
-        }
-        return module->message_run(valid_inputs, output_ports);
-    }
-#if USE_PERSIST_EXTENSION
     void impl_restore(LV2_Persist_Retrieve_Function retrieve, void *callback_data)
     {
-        for (unsigned int i = 0; i < message_params.size(); i++)
+        const char *const *vars = module->get_metadata_iface()->get_configure_vars();
+        if (!vars)
+            return;
+        for (unsigned int i = 0; vars[i]; i++)
         {
-            int pn = message_params[i];
-            const parameter_properties &pp = *metadata->get_param_props(pn);
-            if ((pp.flags & PF_TYPEMASK) == PF_STRING) {
-                size_t len = 0;
-                const void *ptr = (*retrieve)(callback_data, pp.short_name, &len);
-                if (ptr)
-                {
-                    printf("Calling configure on %s\n", pp.short_name);
-                    configure(pp.short_name, std::string((const char *)ptr, len).c_str());
-                }
-                else
-                    configure(pp.short_name, pp.choices[0]);
+            size_t len = 0;
+            const void *ptr = (*retrieve)(callback_data, vars[i], &len);
+            if (ptr)
+            {
+                printf("Calling configure on %s\n", vars[i]);
+                configure(vars[i], std::string((const char *)ptr, len).c_str());
             }
+            else
+                configure(vars[i], NULL);
         }
     }
-#endif
     char *configure(const char *key, const char *value) { 
         // disambiguation - the plugin_ctl_iface version is just a stub, so don't use it
         return module->configure(key, value);
@@ -204,7 +176,6 @@ struct lv2_wrapper
     typedef lv2_instance instance;
     static LV2_Descriptor descriptor;
     static LV2_Calf_Descriptor calf_descriptor;
-    static LV2MessageContext message_context;
     static LV2_Persist persist;
     std::string uri;
     
@@ -220,13 +191,9 @@ struct lv2_wrapper
         descriptor.deactivate = cb_deactivate;
         descriptor.cleanup = cb_cleanup;
         descriptor.extension_data = cb_ext_data;
-#if USE_PERSIST_EXTENSION
         persist.save = cb_persist_save;
         persist.restore = cb_persist_restore;
-#endif
         calf_descriptor.get_pci = cb_get_pci;
-        message_context.message_connect_port = cb_connect;
-        message_context.message_run = cb_message_run;
     }
 
     static void cb_connect(LV2_Handle Instance, uint32_t port, void *DataLocation)
@@ -235,11 +202,7 @@ struct lv2_wrapper
         const plugin_metadata_iface *md = mod->metadata;
         unsigned long ins = md->get_input_count();
         unsigned long outs = md->get_output_count();
-#if USE_PERSIST_EXTENSION
-        unsigned long params = md->get_nonstring_param_count();
-#else
         unsigned long params = md->get_param_count();
-#endif
         if (port < ins)
             mod->ins[port] = (float *)DataLocation;
         else if (port < ins + outs)
@@ -299,11 +262,6 @@ struct lv2_wrapper
         return static_cast<plugin_ctl_iface *>(Instance);
     }
 
-    static uint32_t cb_message_run(LV2_Handle Instance, const void *valid_inputs, void *outputs_written)
-    {
-        instance *mod = (instance *)Instance;
-        return mod->impl_message_run(valid_inputs, outputs_written);
-    }
     static void cb_run(LV2_Handle Instance, uint32_t SampleCount)
     {
         instance *const inst = (instance *)Instance;
@@ -330,15 +288,10 @@ struct lv2_wrapper
     {
         if (!strcmp(URI, "http://foltman.com/ns/calf-plugin-instance"))
             return &calf_descriptor;
-        if (!strcmp(URI, LV2_CONTEXT_MESSAGE))
-            return &message_context;
-#if USE_PERSIST_EXTENSION
         if (!strcmp(URI, LV2_PERSIST_URI))
             return &persist;
-#endif
         return NULL;
     }
-#if USE_PERSIST_EXTENSION
     static void cb_persist_save(LV2_Handle Instance, LV2_Persist_Store_Function store, void *callback_data)
     {
         instance *const inst = (instance *)Instance;
@@ -362,7 +315,6 @@ struct lv2_wrapper
         instance *const inst = (instance *)Instance;
         inst->impl_restore(retrieve, callback_data);
     }
-#endif
     
     static lv2_wrapper &get() { 
         static lv2_wrapper *instance = new lv2_wrapper;

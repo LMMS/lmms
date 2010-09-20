@@ -88,7 +88,7 @@ struct ladspa_plugin_metadata_set
     std::vector<DSSI_Program_Descriptor> *preset_descs;
 #endif
     
-    int input_count, output_count, param_count, real_param_count;
+    int input_count, output_count, param_count;
     const plugin_metadata_iface *metadata;
     
     ladspa_plugin_metadata_set();

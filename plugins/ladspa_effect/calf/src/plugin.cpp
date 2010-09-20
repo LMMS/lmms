@@ -58,7 +58,7 @@ ladspa_instance::ladspa_instance(audio_module_iface *_module, ladspa_plugin_meta
 float ladspa_instance::get_param_value(int param_no)
 {
     // XXXKF hack
-    if (param_no >= ladspa->real_param_count)
+    if (param_no >= ladspa->param_count)
         return 0;
     return *params[param_no];
 }
@@ -66,7 +66,7 @@ float ladspa_instance::get_param_value(int param_no)
 void ladspa_instance::set_param_value(int param_no, float value)
 {
     // XXXKF hack
-    if (param_no >= ladspa->real_param_count)
+    if (param_no >= ladspa->param_count)
         return;
     *params[param_no] = value;
 }
@@ -231,7 +231,7 @@ static void cb_connect(LADSPA_Handle Instance, unsigned long port, LADSPA_Data *
     
     int first_out = mod->ladspa->input_count;
     int first_param = first_out + mod->ladspa->output_count;
-    int ladspa_port_count = first_param + mod->ladspa->real_param_count;
+    int ladspa_port_count = first_param + mod->ladspa->param_count;
     
     if ((int)port < first_out)
         mod->ins[port] = DataLocation;
@@ -292,7 +292,7 @@ static void cb_select_program(LADSPA_Handle Instance, unsigned long Bank, unsign
     unsigned int no = (Bank << 7) + Program - 1;
     // printf("no = %d presets = %p:%d\n", no, presets, presets->size());
     if (no == -1U) {
-        int rpc = ladspa->real_param_count;
+        int rpc = ladspa->param_count;
         for (int i =0 ; i < rpc; i++)
             *mod->params[i] = mod->metadata->get_param_props(i)->def_value;
         return;
@@ -328,9 +328,6 @@ void ladspa_plugin_metadata_set::prepare(const plugin_metadata_iface *md, LADSPA
     input_count = md->get_input_count();
     output_count = md->get_output_count();
     param_count = md->get_param_count(); // XXXKF ladspa_instance<Module>::real_param_count();
-    real_param_count = 0;
-    while(real_param_count < md->get_param_count() && (metadata->get_param_props(real_param_count)->flags & PF_TYPEMASK) < PF_STRING)
-        real_param_count++;
     
     const ladspa_plugin_info &plugin_info = md->get_plugin_info();
     descriptor.UniqueID = plugin_info.unique_id;
@@ -339,7 +336,7 @@ void ladspa_plugin_metadata_set::prepare(const plugin_metadata_iface *md, LADSPA
     descriptor.Maker = plugin_info.maker;
     descriptor.Copyright = plugin_info.copyright;
     descriptor.Properties = md->is_rt_capable() ? LADSPA_PROPERTY_HARD_RT_CAPABLE : 0;
-    descriptor.PortCount = input_count + output_count + real_param_count;
+    descriptor.PortCount = input_count + output_count + param_count;
     descriptor.PortNames = new char *[descriptor.PortCount];
     descriptor.PortDescriptors = new LADSPA_PortDescriptor[descriptor.PortCount];
     descriptor.PortRangeHints = new LADSPA_PortRangeHint[descriptor.PortCount];
@@ -352,7 +349,7 @@ void ladspa_plugin_metadata_set::prepare(const plugin_metadata_iface *md, LADSPA
         prh.HintDescriptor = 0;
         ((const char **)descriptor.PortNames)[i] = md->get_port_names()[i];
     }
-    for (; i < input_count + output_count + real_param_count; i++)
+    for (; i < input_count + output_count + param_count; i++)
     {
         LADSPA_PortRangeHint &prh = ((LADSPA_PortRangeHint *)descriptor.PortRangeHints)[i];
         const parameter_properties &pp = *md->get_param_props(i - input_count - output_count);
@@ -484,10 +481,7 @@ ladspa_plugin_metadata_set::~ladspa_plugin_metadata_set()
 // instantiate descriptor templates
 template<class Module> LV2_Descriptor calf_plugins::lv2_wrapper<Module>::descriptor;
 template<class Module> LV2_Calf_Descriptor calf_plugins::lv2_wrapper<Module>::calf_descriptor;
-template<class Module> LV2MessageContext calf_plugins::lv2_wrapper<Module>::message_context;
-#if USE_PERSIST_EXTENSION
 template<class Module> LV2_Persist calf_plugins::lv2_wrapper<Module>::persist;
-#endif
 
 extern "C" {
 
