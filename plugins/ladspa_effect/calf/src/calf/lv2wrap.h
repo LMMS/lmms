@@ -27,7 +27,6 @@
 #include <vector>
 #include <lv2.h>
 #include <calf/giface.h>
-#include <calf/lv2-midiport.h>
 #include <calf/lv2_event.h>
 #include <calf/lv2_persist.h>
 #include <calf/lv2_progress.h>
@@ -42,7 +41,6 @@ struct lv2_instance: public plugin_ctl_iface, public progress_report_iface
     audio_module_iface *module;
     bool set_srate;
     int srate_to_set;
-    LV2_MIDI *midi_data;
     LV2_Event_Buffer *event_data;
     LV2_URI_Map_Feature *uri_map;
     LV2_Event_Feature *event_feature;
@@ -60,7 +58,6 @@ struct lv2_instance: public plugin_ctl_iface, public progress_report_iface
         real_param_count = metadata->get_param_count();
         
         uri_map = NULL;
-        midi_data = NULL;
         event_data = NULL;
         progress_report_feature = NULL;
         midi_event_type = 0xFFFFFFFF;
