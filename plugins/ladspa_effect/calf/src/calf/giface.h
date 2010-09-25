@@ -315,8 +315,6 @@ struct plugin_metadata_iface
     virtual bool requires_midi() const =0;
     /// @return port offset of first control (parameter) port (= number of audio inputs + number of audio outputs in all existing plugins as for 1 Aug 2008)
     virtual int get_param_port_offset() const  = 0;
-    /// @return table_edit_iface if any
-    virtual const table_edit_iface *get_table_edit_iface() const = 0;
     /// @return NULL-terminated list of menu commands
     virtual plugin_command_info *get_commands() const { return NULL; }
     /// @return description structure for given parameter
@@ -367,6 +365,8 @@ struct plugin_ctl_iface
     virtual const plugin_metadata_iface *get_metadata_iface() const = 0;
     /// @return line_graph_iface if any
     virtual const line_graph_iface *get_line_graph_iface() const = 0;
+    /// @return table_edit_iface if any
+    virtual const table_edit_iface *get_table_edit_iface() const = 0;
     /// Do-nothing destructor to silence compiler warning
     virtual ~plugin_ctl_iface() {}
 };
@@ -447,6 +447,8 @@ struct audio_module_iface
     virtual uint32_t message_run(const void *valid_ports, void *output_ports) = 0;
     /// @return line_graph_iface if any
     virtual const line_graph_iface *get_line_graph_iface() const = 0;
+    /// @return table_edit_iface if any
+    virtual const table_edit_iface *get_table_edit_iface() const = 0;
     virtual ~audio_module_iface() {}
 };
 
@@ -546,6 +548,7 @@ public:
     }
     /// @return line_graph_iface if any
     virtual const line_graph_iface *get_line_graph_iface() const { return dynamic_cast<const line_graph_iface *>(this); }
+    virtual const table_edit_iface *get_table_edit_iface() const { return dynamic_cast<const table_edit_iface *>(this); }    
 };
 
 #if USE_EXEC_GUI || USE_DSSI
@@ -609,7 +612,6 @@ public:
     bool get_midi() const { return Metadata::support_midi; }
     bool requires_midi() const { return Metadata::require_midi; }
     bool is_rt_capable() const { return Metadata::rt_capable; }
-    const table_edit_iface *get_table_edit_iface() const { return dynamic_cast<const table_edit_iface *>(this); }    
     int get_param_port_offset()  const { return Metadata::in_count + Metadata::out_count; }
     const char *get_gui_xml() const { static const char *data_ptr = calf_plugins::load_gui_xml(get_id()); return data_ptr; }
     plugin_command_info *get_commands() const { return NULL; }
