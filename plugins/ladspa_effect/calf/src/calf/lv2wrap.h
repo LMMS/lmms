@@ -160,7 +160,7 @@ struct lv2_instance: public plugin_ctl_iface, public progress_report_iface
     }
     virtual const plugin_metadata_iface *get_metadata_iface() const { return metadata; }
     virtual const line_graph_iface *get_line_graph_iface() const { return module->get_line_graph_iface(); }
-    virtual const table_edit_iface *get_table_edit_iface() const { return module->get_table_edit_iface(); }
+    virtual table_edit_iface *get_table_edit_iface(const char *key) { return module->get_table_edit_iface(key); }
     virtual int send_status_updates(send_updates_iface *sui, int last_serial) { return module->send_status_updates(sui, last_serial); }
 };
 

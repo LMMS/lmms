@@ -225,22 +225,22 @@ struct table_column_info
 struct table_edit_iface
 {
     /// retrieve the table layout for specific parameter
-    virtual const table_column_info *get_table_columns(int param) const = 0;
+    virtual const table_column_info *get_table_columns() const = 0;
 
     /// return the current number of rows
-    virtual uint32_t get_table_rows(int param) const = 0;
+    virtual uint32_t get_table_rows() const = 0;
     
     /// retrieve data item from the plugin
-    virtual std::string get_cell(int param, int row, int column) const;
+    virtual std::string get_cell(int row, int column) const;
 
     /// set data item to the plugin
-    virtual void set_cell(int param, int row, int column, const std::string &src, std::string &error) const { error.clear(); }
+    virtual void set_cell(int row, int column, const std::string &src, std::string &error) { error.clear(); }
     
     /// return a line graph interface for a specific parameter/column (unused for now)
-    virtual const line_graph_iface *get_graph_iface(int param, int column) const { return NULL; }
+    virtual const line_graph_iface *get_graph_iface(int column) const { return NULL; }
     
     /// return an editor name for a specific grid cell (unused for now - I don't even know how editors be implemented)
-    virtual const char *get_cell_editor(int param, int column) const { return NULL; }
+    virtual const char *get_cell_editor(int column) const { return NULL; }
     
     virtual ~table_edit_iface() {}
 };
@@ -366,7 +366,7 @@ struct plugin_ctl_iface
     /// @return line_graph_iface if any
     virtual const line_graph_iface *get_line_graph_iface() const = 0;
     /// @return table_edit_iface if any
-    virtual const table_edit_iface *get_table_edit_iface() const = 0;
+    virtual table_edit_iface *get_table_edit_iface(const char *key) = 0;
     /// Do-nothing destructor to silence compiler warning
     virtual ~plugin_ctl_iface() {}
 };
@@ -447,8 +447,8 @@ struct audio_module_iface
     virtual uint32_t message_run(const void *valid_ports, void *output_ports) = 0;
     /// @return line_graph_iface if any
     virtual const line_graph_iface *get_line_graph_iface() const = 0;
-    /// @return table_edit_iface if any
-    virtual const table_edit_iface *get_table_edit_iface() const = 0;
+    /// @return table_edit_iface if any for given parameter
+    virtual table_edit_iface *get_table_edit_iface(const char *key) = 0;
     virtual ~audio_module_iface() {}
 };
 
@@ -548,7 +548,8 @@ public:
     }
     /// @return line_graph_iface if any
     virtual const line_graph_iface *get_line_graph_iface() const { return dynamic_cast<const line_graph_iface *>(this); }
-    virtual const table_edit_iface *get_table_edit_iface() const { return dynamic_cast<const table_edit_iface *>(this); }    
+    virtual table_edit_iface *get_table_edit_iface(const char *key) { const char *key_us = get_table_edit_iface_key(); return (key_us && !strcmp(key, key_us)) ? dynamic_cast<table_edit_iface *>(this) : NULL; }
+    virtual const char *get_table_edit_iface_key() const { return NULL; }
 };
 
 #if USE_EXEC_GUI || USE_DSSI
@@ -676,6 +677,28 @@ struct preset_access_iface
     virtual void activate_preset(int preset, bool builtin) = 0;
     virtual ~preset_access_iface() {} 
 };
+
+#if USE_EXEC_GUI
+class table_via_configure: public table_edit_iface
+{
+protected:
+    typedef std::pair<int, int> coord;
+    std::vector<table_column_info> columns;
+    std::map<coord, std::string> values;
+    int rows;
+public:
+    table_via_configure();
+    void configure(const char *key, const char *value);
+    
+    virtual const table_column_info *get_table_columns() const;
+    virtual uint32_t get_table_rows() const;
+    virtual std::string get_cell(int row, int column) const;
+    virtual void set_cell(int row, int column, const std::string &src, std::string &error);
+    virtual const line_graph_iface *get_graph_iface(int column) const;
+    virtual const char *get_cell_editor(int column) const;
+    virtual ~table_via_configure();
+};
+#endif
 
 };
 

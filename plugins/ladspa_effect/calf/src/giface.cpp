@@ -194,8 +194,11 @@ void calf_plugins::plugin_ctl_iface::clear_preset() {
         set_param_value(i, pp.def_value);
     }
     const char *const *vars = get_metadata_iface()->get_configure_vars();
-    for (int i = 0; vars[i]; i++)
-        configure(vars[i], NULL);
+    if (vars)
+    {
+        for (int i = 0; vars[i]; i++)
+            configure(vars[i], NULL);
+    }
 }
 
 const char *calf_plugins::load_gui_xml(const std::string &plugin_id)
@@ -205,10 +208,10 @@ const char *calf_plugins::load_gui_xml(const std::string &plugin_id)
         return strdup(calf_utils::load_file((std::string(PKGLIBDIR) + "/gui-" + plugin_id + ".xml").c_str()).c_str());
     }
     catch(file_exception e)
+#endif
     {
         return NULL;
     }
-#endif
 }
 
 bool calf_plugins::get_freq_gridline(int subindex, float &pos, bool &vertical, std::string &legend, cairo_iface *context, bool use_frequencies)
@@ -318,7 +321,7 @@ const plugin_metadata_iface *calf_plugins::plugin_registry::get_by_id(const char
 }
 ///////////////////////////////////////////////////////////////////////////////////////
 
-std::string table_edit_iface::get_cell(int param, int row, int column) const
+std::string table_edit_iface::get_cell(int row, int column) const
 {
     return calf_utils::i2s(row)+":"+calf_utils::i2s(column);
 }
@@ -425,6 +428,54 @@ calf_plugins::dssi_feedback_sender::~dssi_feedback_sender()
 {
     if (!is_client_shared)
         delete client;
+}
+
+table_via_configure::table_via_configure()
+{
+    rows = 0;
+}
+
+const table_column_info *table_via_configure::get_table_columns() const
+{
+    return &columns[0];
+}
+
+uint32_t table_via_configure::get_table_rows() const
+{
+    return rows;
+}
+
+string table_via_configure::get_cell(int row, int column) const
+{
+    if (row >= rows)
+        return string();
+    coord c = make_pair(row, column);
+    std::map<coord, std::string>::const_iterator i = values.find(c);
+    if (i == values.end())
+        return std::string();
+    else
+        return i->second;
+}
+
+void table_via_configure::set_cell(int row, int column, const std::string &src, std::string &error)
+{
+    coord c = make_pair(row, column);
+    values[c] = src;
+    error = "";
+}
+
+const line_graph_iface *table_via_configure::get_graph_iface(int column) const
+{
+    return NULL;
+}
+
+const char *table_via_configure::get_cell_editor(int column) const
+{
+    return NULL;
+}
+
+table_via_configure::~table_via_configure()
+{
 }
 
 #endif
