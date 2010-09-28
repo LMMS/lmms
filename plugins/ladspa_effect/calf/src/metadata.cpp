@@ -950,9 +950,13 @@ CALF_PORT_PROPS(organ) = {
     { 1,        0.1, 10,     0, PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_COEF | PF_PROP_NOBOUNDS, NULL, "bass_gain", "Bass Gain" },
     { 12000,     20, 20000, 0, PF_FLOAT | PF_SCALE_LOG | PF_CTL_KNOB | PF_UNIT_HZ, NULL, "treble_freq", "Treble Freq" },
     { 1,        0.1, 10,     0, PF_FLOAT | PF_SCALE_GAIN | PF_CTL_KNOB | PF_UNIT_COEF | PF_PROP_NOBOUNDS, NULL, "treble_gain", "Treble Gain" },
-
-    { 0,          0,    0,    0, PF_STRING | PF_PROP_MSGCONTEXT, &organ_init_map_curve, "map_curve", "Key mapping curve" },
 };
+
+const char *const *organ_metadata::get_configure_vars() const
+{
+    static const char *names[] = {"map_curve", NULL};
+    return names;
+}
 
 ////////////////////////////////////////////////////////////////////////////
 
@@ -972,9 +976,13 @@ CALF_PORT_PROPS(fluidsynth) = {
     { 2,          0,    3,    0, PF_ENUM | PF_CTL_COMBO, fluidsynth_interpolation_names, "interpolation", "Interpolation" },
     { 1,          0,    1,    0, PF_BOOL | PF_CTL_TOGGLE, NULL, "reverb", "Reverb" },
     { 1,          0,    1,    0, PF_BOOL | PF_CTL_TOGGLE, NULL, "chorus", "Chorus" },
-    { 0,          0,    0,    0, PF_STRING | PF_PROP_MSGCONTEXT, &fluidsynth_init_soundfont, "soundfont", "Soundfont" },
-    { 0,          0,    0,    0, PF_STRING | PF_PROP_MSGCONTEXT, &fluidsynth_init_presetkeyset, "preset_key_set", "Set Preset" },
 };
+
+const char *const *fluidsynth_metadata::get_configure_vars() const
+{
+    static const char *names[] = {"soundfont", "preset_key_set", NULL};
+    return names;
+}
 
 ////////////////////////////////////////////////////////////////////////////
 

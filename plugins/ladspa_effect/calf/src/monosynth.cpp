@@ -76,6 +76,7 @@ void monosynth_audio_module::activate() {
     stack.clear();
     last_pwshift1 = last_pwshift2 = 0;
     last_stretch1 = 65536;
+    queue_note_on_and_off = false;
 }
 
 waveform_family<MONOSYNTH_WAVE_BITS> *monosynth_audio_module::waves;
@@ -433,6 +434,12 @@ void monosynth_audio_module::delayed_note_on()
     queue_note_on = -1;
     float modsrc[modsrc_count] = { 1, velocity, inertia_pressure.get_last(), modwheel_value, envelope1.value, envelope2.value, 0.5+0.5*lfo1.last, 0.5+0.5*lfo2.last};
     calculate_modmatrix(moddest, moddest_count, modsrc);
+        
+    if (queue_note_on_and_off)
+    {
+        end_note();
+        queue_note_on_and_off = false;
+    }
 }
 
 void monosynth_audio_module::set_sample_rate(uint32_t sr) {
@@ -629,6 +636,7 @@ void monosynth_audio_module::apply_fadeout()
 void monosynth_audio_module::note_on(int note, int vel)
 {
     queue_note_on = note;
+    queue_note_on_and_off = false;
     last_key = note;
     queue_vel = vel / 127.f;
     stack.push(note);
@@ -637,27 +645,38 @@ void monosynth_audio_module::note_on(int note, int vel)
 void monosynth_audio_module::note_off(int note, int vel)
 {
     stack.pop(note);
+    if (note == queue_note_on)
+    {
+        queue_note_on_and_off = true;
+        return;
+    }
     // If releasing the currently played note, try to get another one from note stack.
     if (note == last_key) {
-        if (stack.count())
-        {
-            last_key = note = stack.nth(stack.count() - 1);
-            start_freq = freq;
-            target_freq = freq = dsp::note_to_hz(note);
-            porta_time = 0;
-            set_frequency();
-            if (!(legato & 1)) {
-                envelope1.note_on();
-                envelope2.note_on();
-                stopping = false;
-                running = true;
-            }
-            return;
-        }
-        gate = false;
-        envelope1.note_off();
-        envelope2.note_off();
+        end_note();
     }
+}
+
+void monosynth_audio_module::end_note()
+{
+    if (stack.count())
+    {
+        int note;
+        last_key = note = stack.nth(stack.count() - 1);
+        start_freq = freq;
+        target_freq = freq = dsp::note_to_hz(note);
+        porta_time = 0;
+        set_frequency();
+        if (!(legato & 1)) {
+            envelope1.note_on();
+            envelope2.note_on();
+            stopping = false;
+            running = true;
+        }
+        return;
+    }
+    gate = false;
+    envelope1.note_off();
+    envelope2.note_off();
 }
 
 void monosynth_audio_module::channel_pressure(int value)

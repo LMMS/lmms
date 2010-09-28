@@ -28,12 +28,12 @@
 
 namespace calf_plugins {
 
-/// Base class for universal stereo level metering
-struct stereo_in_out_metering_base
+template<class Meter>
+struct in_out_metering_base
 {
-    dsp::vumeter vumeter_in, vumeter_out;
-    
-    stereo_in_out_metering_base()
+    typedef Meter meter;
+    meter vumeter_in, vumeter_out;
+    in_out_metering_base()
     {
         reset();
     }
@@ -44,9 +44,9 @@ struct stereo_in_out_metering_base
     }
 };
     
-/// Universal stereo level metering for a specific plugin
+/// Universal single stereo level metering for a specific plugin
 template<class Metadata>
-class stereo_in_out_metering: public stereo_in_out_metering_base
+class stereo_in_out_metering: public in_out_metering_base<dsp::vumeter>
 {
 public:
     inline void process(float *const *params, const float *const *inputs, const float *const *outputs, unsigned int offset, unsigned int nsamples)
@@ -70,6 +70,49 @@ public:
                 *params[Metadata::param_meter_out] = vumeter_out.level;
             if (params[Metadata::param_clip_out])
                 *params[Metadata::param_clip_out] = vumeter_out.clip > 0 ? 1.f : 0.f;
+        }
+    }
+    void bypassed(float *const *params, unsigned int nsamples)
+    {
+        reset();
+        process(params, NULL, NULL, 0, nsamples);
+    }
+};
+
+/// Universal dual level metering for a specific plugin
+template<class Metadata>
+class dual_in_out_metering: public in_out_metering_base<dsp::dual_vumeter>
+{
+public:
+    inline void process(float *const *params, const float *const *inputs, const float *const *outputs, unsigned int offset, unsigned int nsamples)
+    {
+        if (params[Metadata::param_meter_inL] || params[Metadata::param_clip_inL] || params[Metadata::param_meter_inR] || params[Metadata::param_clip_inR]) {
+            if (inputs)
+                vumeter_in.update_stereo(inputs[0] ? inputs[0] + offset : NULL, inputs[1] ? inputs[1] + offset : NULL, nsamples);
+            else
+                vumeter_in.update_zeros(nsamples);
+            if (params[Metadata::param_meter_inL])
+                *params[Metadata::param_meter_inL] = vumeter_in.left.level;
+            if (params[Metadata::param_meter_inR])
+                *params[Metadata::param_meter_inR] = vumeter_in.right.level;
+            if (params[Metadata::param_clip_inL])
+                *params[Metadata::param_clip_inL] = vumeter_in.left.clip > 0 ? 1.f : 0.f;
+            if (params[Metadata::param_clip_inR])
+                *params[Metadata::param_clip_inR] = vumeter_in.right.clip > 0 ? 1.f : 0.f;
+        }
+        if (params[Metadata::param_meter_outL] || params[Metadata::param_clip_outL] || params[Metadata::param_meter_outR] || params[Metadata::param_clip_outR]) {
+            if (outputs)
+                vumeter_out.update_stereo(outputs[0] ? outputs[0] + offset : NULL, outputs[1] ? outputs[1] + offset : NULL, nsamples);
+            else
+                vumeter_out.update_zeros(nsamples);
+            if (params[Metadata::param_meter_outL])
+                *params[Metadata::param_meter_outL] = vumeter_out.left.level;
+            if (params[Metadata::param_meter_outR])
+                *params[Metadata::param_meter_outR] = vumeter_out.right.level;
+            if (params[Metadata::param_clip_outL])
+                *params[Metadata::param_clip_outL] = vumeter_out.left.clip > 0 ? 1.f : 0.f;
+            if (params[Metadata::param_clip_outR])
+                *params[Metadata::param_clip_outR] = vumeter_out.right.clip > 0 ? 1.f : 0.f;
         }
     }
     void bypassed(float *const *params, unsigned int nsamples)

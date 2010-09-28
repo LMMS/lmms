@@ -60,17 +60,17 @@ mod_matrix::mod_matrix(modulation_entry *_matrix, unsigned int _rows, const char
         matrix[i].reset();
 }
 
-const table_column_info *mod_matrix::get_table_columns(int param) const
+const table_column_info *mod_matrix::get_table_columns() const
 {
     return table_columns;
 }
 
-uint32_t mod_matrix::get_table_rows(int param) const
+uint32_t mod_matrix::get_table_rows() const
 {
     return matrix_rows;
 }
 
-std::string mod_matrix::get_cell(int param, int row, int column) const
+std::string mod_matrix::get_cell(int row, int column) const
 {
     assert(row >= 0 && row < (int)matrix_rows);
     modulation_entry &slot = matrix[row];
@@ -91,7 +91,7 @@ std::string mod_matrix::get_cell(int param, int row, int column) const
     }
 }
     
-void mod_matrix::set_cell(int param, int row, int column, const std::string &src, std::string &error) const
+void mod_matrix::set_cell(int row, int column, const std::string &src, std::string &error)
 {
     assert(row >= 0 && row < (int)matrix_rows);
     modulation_entry &slot = matrix[row];

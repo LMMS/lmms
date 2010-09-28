@@ -26,8 +26,6 @@
 using namespace dsp;
 using namespace calf_plugins;
 
-#define SET_IF_CONNECTED(name) if (params[AM::param_##name] != NULL) *params[AM::param_##name] = name;
-
 /// Saturator Band by Markus Schmidt
 ///
 /// This module is based on Krzysztof's filters and Tom Szilagyi's distortion routine.

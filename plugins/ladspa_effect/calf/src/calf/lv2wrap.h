@@ -27,11 +27,9 @@
 #include <vector>
 #include <lv2.h>
 #include <calf/giface.h>
-#include <calf/lv2-midiport.h>
-#include <calf/lv2_contexts.h>
 #include <calf/lv2_event.h>
+#include <calf/lv2_persist.h>
 #include <calf/lv2_progress.h>
-#include <calf/lv2_string_port.h>
 #include <calf/lv2_uri_map.h>
 #include <string.h>
 
@@ -43,32 +41,29 @@ struct lv2_instance: public plugin_ctl_iface, public progress_report_iface
     audio_module_iface *module;
     bool set_srate;
     int srate_to_set;
-    LV2_MIDI *midi_data;
     LV2_Event_Buffer *event_data;
     LV2_URI_Map_Feature *uri_map;
     LV2_Event_Feature *event_feature;
     uint32_t midi_event_type;
-    std::vector<int> message_params;
     LV2_Progress *progress_report_feature;
     float **ins, **outs, **params;
     int out_count;
+    int real_param_count;
     lv2_instance(audio_module_iface *_module)
     {
         module = _module;
         module->get_port_arrays(ins, outs, params);
         metadata = module->get_metadata_iface();
-        metadata->get_message_context_parameters(message_params);
         out_count = metadata->get_output_count();
+        real_param_count = metadata->get_param_count();
         
         uri_map = NULL;
-        midi_data = NULL;
         event_data = NULL;
         progress_report_feature = NULL;
         midi_event_type = 0xFFFFFFFF;
 
         srate_to_set = 44100;
         set_srate = true;
-        // printf("message params %d\n", (int)message_params.size());
     }
     /// This, and not Module::post_instantiate, is actually called by lv2_wrapper class
     void post_instantiate()
@@ -91,21 +86,23 @@ struct lv2_instance: public plugin_ctl_iface, public progress_report_iface
     void send_configures(send_configure_iface *sci) { 
         module->send_configures(sci);
     }
-    uint32_t impl_message_run(const void *valid_inputs, void *output_ports) {
-        uint8_t *vi = (uint8_t *)valid_inputs;
-        int ofs = metadata->get_param_port_offset();
-        for (unsigned int i = 0; i < message_params.size(); i++)
+    void impl_restore(LV2_Persist_Retrieve_Function retrieve, void *callback_data)
+    {
+        const char *const *vars = module->get_metadata_iface()->get_configure_vars();
+        if (!vars)
+            return;
+        for (unsigned int i = 0; vars[i]; i++)
         {
-            int pn = message_params[i];
-            const parameter_properties &pp = *metadata->get_param_props(pn);
-            int ppn = pn + ofs;
-            if ((pp.flags & PF_TYPEMASK) == PF_STRING && (vi[ppn >> 3] & (1 << (ppn & 7)))
-                && (((LV2_String_Data *)params[pn])->flags & LV2_STRING_DATA_CHANGED_FLAG)) {
-                printf("Calling configure on %s\n", pp.short_name);
-                configure(pp.short_name, ((LV2_String_Data *)params[pn])->data);
+            size_t len = 0;
+            const void *ptr = (*retrieve)(callback_data, vars[i], &len);
+            if (ptr)
+            {
+                printf("Calling configure on %s\n", vars[i]);
+                configure(vars[i], std::string((const char *)ptr, len).c_str());
             }
+            else
+                configure(vars[i], NULL);
         }
-        return module->message_run(valid_inputs, output_ports);
     }
     char *configure(const char *key, const char *value) { 
         // disambiguation - the plugin_ctl_iface version is just a stub, so don't use it
@@ -150,19 +147,20 @@ struct lv2_instance: public plugin_ctl_iface, public progress_report_iface
     virtual float get_param_value(int param_no)
     {
         // XXXKF hack
-        if (param_no >= metadata->get_param_count())
+        if (param_no >= real_param_count)
             return 0;
         return (*params)[param_no];
     }
     virtual void set_param_value(int param_no, float value)
     {
         // XXXKF hack
-        if (param_no >= metadata->get_param_count())
+        if (param_no >= real_param_count)
             return;
         *params[param_no] = value;
     }
     virtual const plugin_metadata_iface *get_metadata_iface() const { return metadata; }
     virtual const line_graph_iface *get_line_graph_iface() const { return module->get_line_graph_iface(); }
+    virtual table_edit_iface *get_table_edit_iface(const char *key) { return module->get_table_edit_iface(key); }
     virtual int send_status_updates(send_updates_iface *sui, int last_serial) { return module->send_status_updates(sui, last_serial); }
 };
 
@@ -176,7 +174,7 @@ struct lv2_wrapper
     typedef lv2_instance instance;
     static LV2_Descriptor descriptor;
     static LV2_Calf_Descriptor calf_descriptor;
-    static LV2MessageContext message_context;
+    static LV2_Persist persist;
     std::string uri;
     
     lv2_wrapper()
@@ -191,12 +189,13 @@ struct lv2_wrapper
         descriptor.deactivate = cb_deactivate;
         descriptor.cleanup = cb_cleanup;
         descriptor.extension_data = cb_ext_data;
+        persist.save = cb_persist_save;
+        persist.restore = cb_persist_restore;
         calf_descriptor.get_pci = cb_get_pci;
-        message_context.message_connect_port = cb_connect;
-        message_context.message_run = cb_message_run;
     }
 
-    static void cb_connect(LV2_Handle Instance, uint32_t port, void *DataLocation) {
+    static void cb_connect(LV2_Handle Instance, uint32_t port, void *DataLocation)
+    {
         instance *const mod = (instance *)Instance;
         const plugin_metadata_iface *md = mod->metadata;
         unsigned long ins = md->get_input_count();
@@ -215,12 +214,14 @@ struct lv2_wrapper
         }
     }
 
-    static void cb_activate(LV2_Handle Instance) {
+    static void cb_activate(LV2_Handle Instance)
+    {
         instance *const mod = (instance *)Instance;
         mod->set_srate = true;
     }
     
-    static void cb_deactivate(LV2_Handle Instance) {
+    static void cb_deactivate(LV2_Handle Instance)
+    {
         instance *const mod = (instance *)Instance;
         mod->module->deactivate();
     }
@@ -259,11 +260,8 @@ struct lv2_wrapper
         return static_cast<plugin_ctl_iface *>(Instance);
     }
 
-    static uint32_t cb_message_run(LV2_Handle Instance, const void *valid_inputs, void *outputs_written) {
-        instance *mod = (instance *)Instance;
-        return mod->impl_message_run(valid_inputs, outputs_written);
-    }
-    static void cb_run(LV2_Handle Instance, uint32_t SampleCount) {
+    static void cb_run(LV2_Handle Instance, uint32_t SampleCount)
+    {
         instance *const inst = (instance *)Instance;
         audio_module_iface *mod = inst->module;
         if (inst->set_srate) {
@@ -279,20 +277,46 @@ struct lv2_wrapper
         }
         inst->module->process_slice(offset, SampleCount);
     }
-    static void cb_cleanup(LV2_Handle Instance) {
+    static void cb_cleanup(LV2_Handle Instance)
+    {
         instance *const mod = (instance *)Instance;
         delete mod;
     }
-    static const void *cb_ext_data(const char *URI) {
+    static const void *cb_ext_data(const char *URI)
+    {
         if (!strcmp(URI, "http://foltman.com/ns/calf-plugin-instance"))
             return &calf_descriptor;
-        if (!strcmp(URI, LV2_CONTEXT_MESSAGE))
-            return &message_context;
+        if (!strcmp(URI, LV2_PERSIST_URI))
+            return &persist;
         return NULL;
     }
+    static void cb_persist_save(LV2_Handle Instance, LV2_Persist_Store_Function store, void *callback_data)
+    {
+        instance *const inst = (instance *)Instance;
+        struct store_state: public send_configure_iface
+        {
+            LV2_Persist_Store_Function store;
+            void *callback_data;
+            
+            virtual void send_configure(const char *key, const char *value)
+            {
+                (*store)(callback_data, key, value, strlen(value));
+            }
+        };
+        store_state s;
+        s.store = store;
+        s.callback_data = callback_data;
+        inst->send_configures(&s);
+    }
+    static void cb_persist_restore(LV2_Handle Instance, LV2_Persist_Retrieve_Function retrieve, void *callback_data)
+    {
+        instance *const inst = (instance *)Instance;
+        inst->impl_restore(retrieve, callback_data);
+    }
+    
     static lv2_wrapper &get() { 
-        static lv2_wrapper instance;
-        return instance;
+        static lv2_wrapper *instance = new lv2_wrapper;
+        return *instance;
     }
 };
 
