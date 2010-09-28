@@ -47,7 +47,6 @@ enum parameter_flags
   PF_BOOL = 0x0002,  ///< bool value (usually >=0.5f is treated as TRUE, which is inconsistent with LV2 etc. which treats anything >0 as TRUE)
   PF_ENUM = 0x0003,  ///< enum value (min, min+1, ..., max, only guaranteed to work when min = 0)
   PF_ENUM_MULTI = 0x0004, ///< SET / multiple-choice
-  PF_STRING = 0x0005, ///< see: http://lv2plug.in/docs/index.php?title=String_port
   
   PF_SCALEMASK = 0xF0, ///< bit mask for scale
   PF_SCALE_DEFAULT = 0x00, ///< no scale given
@@ -82,7 +81,6 @@ enum parameter_flags
   PF_PROP_OUTPUT    = 0x080000, ///< output port
   PF_PROP_OPTIONAL  = 0x100000, ///< connection optional
   PF_PROP_GRAPH     = 0x200000, ///< add graph
-  PF_PROP_MSGCONTEXT= 0x400000, ///< message context
   
   PF_UNITMASK     = 0xFF000000,  ///< bit mask for units   \todo reduce to use only 5 bits
   PF_UNIT_DB      = 0x01000000,  ///< decibels
@@ -227,22 +225,22 @@ struct table_column_info
 struct table_edit_iface
 {
     /// retrieve the table layout for specific parameter
-    virtual const table_column_info *get_table_columns(int param) const = 0;
+    virtual const table_column_info *get_table_columns() const = 0;
 
     /// return the current number of rows
-    virtual uint32_t get_table_rows(int param) const = 0;
+    virtual uint32_t get_table_rows() const = 0;
     
     /// retrieve data item from the plugin
-    virtual std::string get_cell(int param, int row, int column) const;
+    virtual std::string get_cell(int row, int column) const;
 
     /// set data item to the plugin
-    virtual void set_cell(int param, int row, int column, const std::string &src, std::string &error) const { error.clear(); }
+    virtual void set_cell(int row, int column, const std::string &src, std::string &error) { error.clear(); }
     
     /// return a line graph interface for a specific parameter/column (unused for now)
-    virtual const line_graph_iface *get_graph_iface(int param, int column) const { return NULL; }
+    virtual const line_graph_iface *get_graph_iface(int column) const { return NULL; }
     
     /// return an editor name for a specific grid cell (unused for now - I don't even know how editors be implemented)
-    virtual const char *get_cell_editor(int param, int column) const { return NULL; }
+    virtual const char *get_cell_editor(int column) const { return NULL; }
     
     virtual ~table_edit_iface() {}
 };
@@ -317,8 +315,6 @@ struct plugin_metadata_iface
     virtual bool requires_midi() const =0;
     /// @return port offset of first control (parameter) port (= number of audio inputs + number of audio outputs in all existing plugins as for 1 Aug 2008)
     virtual int get_param_port_offset() const  = 0;
-    /// @return table_edit_iface if any
-    virtual const table_edit_iface *get_table_edit_iface() const = 0;
     /// @return NULL-terminated list of menu commands
     virtual plugin_command_info *get_commands() const { return NULL; }
     /// @return description structure for given parameter
@@ -331,12 +327,10 @@ struct plugin_metadata_iface
     virtual bool is_cv(int param_no) const = 0;
     /// is the given parameter non-interpolated?
     virtual bool is_noisy(int param_no) const = 0;
-    /// does the plugin require message context? (or DSSI configure) may be slow
-    virtual bool requires_message_context() const = 0;
     /// does the plugin require string port extension? (or DSSI configure) may be slow
-    virtual bool requires_string_ports() const = 0;
-    /// add all message context parameter numbers to the ports vector
-    virtual void get_message_context_parameters(std::vector<int> &ports) const = 0;
+    virtual bool requires_configure() const = 0;
+    /// obtain array of names of configure variables (or NULL is none needed)
+    virtual const char *const *get_configure_vars() const { return NULL; }
 
     /// Do-nothing destructor to silence compiler warning
     virtual ~plugin_metadata_iface() {}
@@ -371,6 +365,8 @@ struct plugin_ctl_iface
     virtual const plugin_metadata_iface *get_metadata_iface() const = 0;
     /// @return line_graph_iface if any
     virtual const line_graph_iface *get_line_graph_iface() const = 0;
+    /// @return table_edit_iface if any
+    virtual table_edit_iface *get_table_edit_iface(const char *key) = 0;
     /// Do-nothing destructor to silence compiler warning
     virtual ~plugin_ctl_iface() {}
 };
@@ -427,7 +423,7 @@ struct audio_module_iface
     virtual void set_sample_rate(uint32_t sr) = 0;
     /// Execute menu command with given number
     virtual void execute(int cmd_no) = 0;
-    /// DSSI configure call
+    /// DSSI configure call, value = NULL = reset to default
     virtual char *configure(const char *key, const char *value) = 0;
     /// Send all understood configure vars (none by default)
     virtual void send_configures(send_configure_iface *sci) = 0;
@@ -451,6 +447,8 @@ struct audio_module_iface
     virtual uint32_t message_run(const void *valid_ports, void *output_ports) = 0;
     /// @return line_graph_iface if any
     virtual const line_graph_iface *get_line_graph_iface() const = 0;
+    /// @return table_edit_iface if any for given parameter
+    virtual table_edit_iface *get_table_edit_iface(const char *key) = 0;
     virtual ~audio_module_iface() {}
 };
 
@@ -550,10 +548,9 @@ public:
     }
     /// @return line_graph_iface if any
     virtual const line_graph_iface *get_line_graph_iface() const { return dynamic_cast<const line_graph_iface *>(this); }
+    virtual table_edit_iface *get_table_edit_iface(const char *key) { const char *key_us = get_table_edit_iface_key(); return (key_us && !strcmp(key, key_us)) ? dynamic_cast<table_edit_iface *>(this) : NULL; }
+    virtual const char *get_table_edit_iface_key() const { return NULL; }
 };
-
-extern bool check_for_message_context_ports(const parameter_properties *parameters, int count);
-extern bool check_for_string_ports(const parameter_properties *parameters, int count);
 
 #if USE_EXEC_GUI || USE_DSSI
 
@@ -616,7 +613,6 @@ public:
     bool get_midi() const { return Metadata::support_midi; }
     bool requires_midi() const { return Metadata::require_midi; }
     bool is_rt_capable() const { return Metadata::rt_capable; }
-    const table_edit_iface *get_table_edit_iface() const { return dynamic_cast<const table_edit_iface *>(this); }    
     int get_param_port_offset()  const { return Metadata::in_count + Metadata::out_count; }
     const char *get_gui_xml() const { static const char *data_ptr = calf_plugins::load_gui_xml(get_id()); return data_ptr; }
     plugin_command_info *get_commands() const { return NULL; }
@@ -625,14 +621,7 @@ public:
     bool is_cv(int param_no) const { return true; }
     bool is_noisy(int param_no) const { return false; }
     const ladspa_plugin_info &get_plugin_info() const { return plugin_info; }
-    bool requires_message_context() const { return check_for_message_context_ports(param_props, Metadata::param_count); }
-    bool requires_string_ports() const { return check_for_string_ports(param_props, Metadata::param_count); }
-    void get_message_context_parameters(std::vector<int> &ports) const {
-        for (int i = 0; i < get_param_count(); ++i) {
-            if (get_param_props(i)->flags & PF_PROP_MSGCONTEXT)
-                ports.push_back(i);
-        }
-    }
+    bool requires_configure() const { return false; }
 };
 
 #define CALF_PORT_NAMES(name) template<> const char *::plugin_metadata<name##_metadata>::port_names[]
@@ -688,6 +677,28 @@ struct preset_access_iface
     virtual void activate_preset(int preset, bool builtin) = 0;
     virtual ~preset_access_iface() {} 
 };
+
+#if USE_EXEC_GUI
+class table_via_configure: public table_edit_iface
+{
+protected:
+    typedef std::pair<int, int> coord;
+    std::vector<table_column_info> columns;
+    std::map<coord, std::string> values;
+    int rows;
+public:
+    table_via_configure();
+    void configure(const char *key, const char *value);
+    
+    virtual const table_column_info *get_table_columns() const;
+    virtual uint32_t get_table_rows() const;
+    virtual std::string get_cell(int row, int column) const;
+    virtual void set_cell(int row, int column, const std::string &src, std::string &error);
+    virtual const line_graph_iface *get_graph_iface(int column) const;
+    virtual const char *get_cell_editor(int column) const;
+    virtual ~table_via_configure();
+};
+#endif
 
 };
 

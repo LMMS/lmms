@@ -950,6 +950,8 @@ char *organ_audio_module::configure(const char *key, const char *value)
 {
     if (!strcmp(key, "map_curve"))
     {
+        if (!value)
+            value = "2\n0 1\n1 1\n";
         var_map_curve = value;
         stringstream ss(value);
         int i = 0;

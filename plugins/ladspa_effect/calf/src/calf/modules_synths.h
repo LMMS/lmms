@@ -88,6 +88,8 @@ public:
     int32_t last_stretch1;
     /// Next note to play on the next calculate_step
     int queue_note_on;
+    /// Whether the queued note has been already released
+    bool queue_note_on_and_off;
     /// Velocity of the next note to play
     float queue_vel;
     /// Integer value for modwheel (0-16383, read from CC1 - MSBs and CC33 - LSBs)
@@ -122,6 +124,8 @@ public:
     static void precalculate_waves(progress_report_iface *reporter);
     void set_sample_rate(uint32_t sr);
     void delayed_note_on();
+    /// Release a note (physically), called from note-off handler or when note-off has been scheduled after note-on (very short queued note)
+    void end_note();
     /// Handle MIDI Note On message (does not immediately trigger a note, as it must start on
     /// boundary of step_size samples).
     void note_on(int note, int vel);
