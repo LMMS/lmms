@@ -28,6 +28,7 @@
 #include <QtGui/QMenu>
 #include <QtGui/QLayout>
 #include <QtGui/QMdiArea>
+#include <QtGui/QMdiSubWindow>
 #include <QtGui/QPainter>
 #include <QtGui/QPushButton>
 
@@ -525,8 +526,7 @@ sampleTrackView::sampleTrackView( sampleTrack * _t, trackContainerView * _tcv ) 
 	m_effectRack = new EffectRackView( _t->audioPort()->effects() );
 	m_effectRack->setFixedSize( 240, 242 );
 
-	engine::mainWindow()->workspace()->addSubWindow( m_effectRack );
-	m_effWindow = m_effectRack->parentWidget();
+	m_effWindow = engine::mainWindow()->workspace()->addSubWindow( m_effectRack );
 	m_effWindow->setAttribute( Qt::WA_DeleteOnClose, false );
 	m_effWindow->layout()->setSizeConstraint( QLayout::SetFixedSize );
  	m_effWindow->setWindowTitle( _t->name() );
@@ -550,6 +550,7 @@ void sampleTrackView::showEffects()
 {
 	if( m_effWindow->isHidden() )
 	{
+		m_effectRack->show();
 		m_effWindow->show();
 		m_effWindow->raise();
 	}
