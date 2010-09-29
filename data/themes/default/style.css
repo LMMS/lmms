@@ -185,6 +185,10 @@ timeLine {
 	font-size: 8px;
 }
 
+QTreeView {
+	alternate-background-color: rgb(108,108,108);
+}
+
 /* Plugins */
 
 TripleOscillatorView knob {
