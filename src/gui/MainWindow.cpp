@@ -930,15 +930,18 @@ void MainWindow::keyPressEvent( QKeyEvent * _ke )
 		case Qt::Key_Shift: m_keyMods.m_shift = TRUE; break;
 		case Qt::Key_Alt: m_keyMods.m_alt = TRUE; break;
 		default:
-			if( InstrumentTrackView::topLevelInstrumentTrackWindow() )
+		{
+			InstrumentTrackWindow * w =
+						InstrumentTrackView::topLevelInstrumentTrackWindow();
+			if( w )
 			{
-				InstrumentTrackView::topLevelInstrumentTrackWindow()->
-					pianoView()->keyPressEvent( _ke );
+				w->pianoView()->keyPressEvent( _ke );
 			}
 			if( !_ke->isAccepted() )
 			{
 				QMainWindow::keyPressEvent( _ke );
 			}
+		}
 	}
 }
 

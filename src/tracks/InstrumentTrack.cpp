@@ -26,7 +26,6 @@
 #include <QtCore/QDir>
 #include <QtCore/QFile>
 #include <QtCore/QQueue>
-#include <QtCore/QStack>
 #include <QtGui/QApplication>
 #include <QtGui/QCloseEvent>
 #include <QtGui/QFileDialog>
@@ -861,7 +860,6 @@ Instrument * InstrumentTrack::loadInstrument( const QString & _plugin_name )
 
 
 QQueue<InstrumentTrackWindow *> InstrumentTrackView::s_windowCache;
-QStack<InstrumentTrackWindow *> InstrumentTrackView::s_windowStack;
 
 
 
@@ -972,6 +970,24 @@ InstrumentTrackView::~InstrumentTrackView()
 
 
 
+InstrumentTrackWindow * InstrumentTrackView::topLevelInstrumentTrackWindow()
+{
+	InstrumentTrackWindow * w = NULL;
+	foreach( QMdiSubWindow * sw,
+				engine::mainWindow()->workspace()->subWindowList(
+											QMdiArea::ActivationHistoryOrder ) )
+	{
+		if( sw->isVisible() && sw->widget()->inherits( "InstrumentTrackWindow" ) )
+		{
+			w = qobject_cast<InstrumentTrackWindow *>( sw->widget() );
+		}
+	}
+
+	return w;
+}
+
+
+
 // TODO: Add windows to free list on freeInstrumentTrackWindow. 
 // But, don't NULL m_window or disconnect signals.  This will allow windows 
 // that are being show/hidden frequently to stay connected.
@@ -979,12 +995,6 @@ void InstrumentTrackView::freeInstrumentTrackWindow()
 {
 	if( m_window != NULL )
 	{
-		if( qFind( s_windowStack.begin(), s_windowStack.end(), m_window ) !=
-														s_windowStack.end() )
-		{
-			s_windowStack.erase(
-				qFind( s_windowStack.begin(), s_windowStack.end(), m_window ) );
-		}
 		m_lastPos = m_window->parentWidget()->pos();
 
 		if( configManager::inst()->value( "ui",
@@ -1087,22 +1097,11 @@ void InstrumentTrackView::dropEvent( QDropEvent * _de )
 
 void InstrumentTrackView::toggleInstrumentWindow( bool _on )
 {
-	InstrumentTrackWindow * w = getInstrumentTrackWindow();
-	w->toggleVisibility( _on );
+	getInstrumentTrackWindow()->toggleVisibility( _on );
 	
 	if( !_on )
 	{
 		freeInstrumentTrackWindow();
-	}
-	else
-	{
-		if( qFind( s_windowStack.begin(), s_windowStack.end(), w ) !=
-														s_windowStack.end() )
-		{
-			s_windowStack.erase(
-					qFind( s_windowStack.begin(), s_windowStack.end(), w ) );
-		}
-		s_windowStack.push( w );
 	}
 }
 

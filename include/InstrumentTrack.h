@@ -41,7 +41,6 @@
 
 class QLineEdit;
 template<class T> class QQueue;
-template<class T> class QStack;
 class ArpeggiatorView;
 class ChordCreatorView;
 class EffectRackView;
@@ -259,10 +258,7 @@ public:
 		return castModel<InstrumentTrack>();
 	}
 
-	static InstrumentTrackWindow * topLevelInstrumentTrackWindow()
-	{
-		return s_windowStack.isEmpty() ? NULL : s_windowStack.top();
-	}
+	static InstrumentTrackWindow * topLevelInstrumentTrackWindow();
 
 	QMenu * midiMenu()
 	{
@@ -293,7 +289,6 @@ private:
 	InstrumentTrackWindow * m_window;
 
 	static QQueue<InstrumentTrackWindow *> s_windowCache;
-	static QStack<InstrumentTrackWindow *> s_windowStack;
 
 	// widgets in track-settings-widget
 	trackLabelButton * m_tlb;
