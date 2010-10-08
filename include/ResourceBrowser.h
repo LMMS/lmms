@@ -1,7 +1,7 @@
 /*
  * ResourceBrowser.h - header file for ResourceBrowser
  *
- * Copyright (c) 2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2009-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -21,7 +21,6 @@
  * Boston, MA 02110-1301 USA.
  *
  */
-
 
 #ifndef _RESOURCE_BROWSER_H
 #define _RESOURCE_BROWSER_H
@@ -53,7 +52,7 @@ private slots:
 	void stopPreview();
 	void triggerDefaultAction( const QModelIndex & _idx );
 	void updateFilterStatus();
-	void manageDirectories();
+	void manageLocations();
 
 	void currentChanged( const QModelIndex &, const QModelIndex & );
 

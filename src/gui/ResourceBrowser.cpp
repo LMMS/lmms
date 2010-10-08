@@ -1,7 +1,7 @@
 /*
  * ResourceBrowser.cpp - implementation of ResourceBrowser
  *
- * Copyright (c) 2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2009-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -35,6 +35,7 @@
 #include "ResourceTreeView.h"
 #include "engine.h"
 #include "embed.h"
+#include "ManageResourceLocationsDialog.h"
 #include "MainWindow.h"
 #include "Piano.h"
 #include "PianoView.h"
@@ -133,7 +134,7 @@ ResourceBrowser::ResourceBrowser( QWidget * _parent ) :
 
 	QPushButton * manageButton = new QPushButton( tr( "Manage locations" ) );
 	connect( manageButton, SIGNAL( clicked() ),
-			this, SLOT( manageDirectories() ) );
+			this, SLOT( manageLocations() ) );
 
 	QPushButton * pianoButton = new QPushButton( tr( "Show piano" ) );
 	pianoButton->setCheckable( true );
@@ -357,8 +358,9 @@ void ResourceBrowser::updateFilterStatus()
 
 
 
-void ResourceBrowser::manageDirectories()
+void ResourceBrowser::manageLocations()
 {
+	ManageResourceLocationsDialog().exec();
 }
 
 
