@@ -42,6 +42,11 @@ struct in_out_metering_base
         vumeter_in.reset();
         vumeter_out.reset();
     }
+    void set_sample_rate(double sample_rate)
+    {
+        vumeter_in.set_falloff(0.f, sample_rate);
+        vumeter_out.copy_falloff(vumeter_in);
+    }
 };
     
 /// Universal single stereo level metering for a specific plugin
