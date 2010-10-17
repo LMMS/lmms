@@ -21,6 +21,8 @@
 #ifndef __CALF_VUMETER_H
 #define __CALF_VUMETER_H
 
+#include <math.h>
+
 namespace dsp {
 
 /// Peak meter class
@@ -46,6 +48,24 @@ struct vumeter
     {
         level = 0;
         clip = 0;
+    }
+    
+    /// Set falloff so that the meter falls 20dB in time_20dB seconds, assuming sample rate of sample_rate
+    /// @arg time_20dB time for the meter to move by 20dB (default 300ms if <= 0)
+    void set_falloff(double time_20dB, double sample_rate)
+    {
+        if (time_20dB <= 0)
+            time_20dB = 0.3;
+        // 20dB = 10x +/- --> 0.1 = pow(falloff, sample_rate * time_20dB) = exp(sample_rate * ln(falloff))
+        // ln(0.1) = sample_rate * ln(falloff)
+        falloff = pow(0.1, 1 / (sample_rate * time_20dB));
+        clip_falloff = falloff;
+    }
+    /// Copy falloff from another object
+    void copy_falloff(const vumeter &src)
+    {
+        falloff = src.falloff;
+        clip_falloff = src.clip_falloff;
     }
     
     /// Update peak meter based on input signal
@@ -109,6 +129,17 @@ struct dual_vumeter
         left.reset();
         right.reset();
     }
+    inline void set_falloff(double time_20dB, double sample_rate)
+    {
+        left.set_falloff(time_20dB, sample_rate);
+        right.copy_falloff(left);
+    }
+    inline void copy_falloff(const dual_vumeter &src)
+    {
+        left.copy_falloff(src.left);
+        right.copy_falloff(src.right);
+    }
+
 };
 
 };
