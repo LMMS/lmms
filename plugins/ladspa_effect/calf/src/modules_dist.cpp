@@ -111,6 +111,7 @@ void saturator_audio_module::set_sample_rate(uint32_t sr)
     dist[0].set_sample_rate(sr);
     if(in_count > 1 && out_count > 1)
         dist[1].set_sample_rate(sr);
+    meters.set_sample_rate(srate);
 }
 
 uint32_t saturator_audio_module::process(uint32_t offset, uint32_t numsamples, uint32_t inputs_mask, uint32_t outputs_mask)
@@ -300,6 +301,7 @@ void exciter_audio_module::set_sample_rate(uint32_t sr)
     dist[0].set_sample_rate(sr);
     if(in_count > 1 && out_count > 1)
         dist[1].set_sample_rate(sr);
+    meters.set_sample_rate(srate);
 }
 
 uint32_t exciter_audio_module::process(uint32_t offset, uint32_t numsamples, uint32_t inputs_mask, uint32_t outputs_mask)
@@ -486,6 +488,7 @@ void bassenhancer_audio_module::set_sample_rate(uint32_t sr)
     dist[0].set_sample_rate(sr);
     if(in_count > 1 && out_count > 1)
         dist[1].set_sample_rate(sr);
+    meters.set_sample_rate(srate);
 }
 
 uint32_t bassenhancer_audio_module::process(uint32_t offset, uint32_t numsamples, uint32_t inputs_mask, uint32_t outputs_mask)

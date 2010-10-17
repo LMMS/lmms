@@ -389,6 +389,7 @@ void compressor_audio_module::set_sample_rate(uint32_t sr)
 {
     srate = sr;
     compressor.set_sample_rate(srate);
+    meters.set_sample_rate(srate);
 }
 
 uint32_t compressor_audio_module::process(uint32_t offset, uint32_t numsamples, uint32_t inputs_mask, uint32_t outputs_mask)
@@ -658,6 +659,7 @@ void sidechaincompressor_audio_module::set_sample_rate(uint32_t sr)
 {
     srate = sr;
     compressor.set_sample_rate(srate);
+    meters.set_sample_rate(srate);
 }
 
 uint32_t sidechaincompressor_audio_module::process(uint32_t offset, uint32_t numsamples, uint32_t inputs_mask, uint32_t outputs_mask)
@@ -1123,6 +1125,7 @@ void gate_audio_module::set_sample_rate(uint32_t sr)
 {
     srate = sr;
     gate.set_sample_rate(srate);
+    meters.set_sample_rate(srate);
 }
 
 uint32_t gate_audio_module::process(uint32_t offset, uint32_t numsamples, uint32_t inputs_mask, uint32_t outputs_mask)
@@ -1390,6 +1393,7 @@ void sidechaingate_audio_module::set_sample_rate(uint32_t sr)
 {
     srate = sr;
     gate.set_sample_rate(srate);
+    meters.set_sample_rate(srate);
 }
 
 uint32_t sidechaingate_audio_module::process(uint32_t offset, uint32_t numsamples, uint32_t inputs_mask, uint32_t outputs_mask)
