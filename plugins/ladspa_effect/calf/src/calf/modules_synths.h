@@ -178,6 +178,8 @@ public:
     void apply_fadeout();
     /// Main processing function
     uint32_t process(uint32_t offset, uint32_t nsamples, uint32_t inputs_mask, uint32_t outputs_mask);
+    /// Lookup of table edit interface
+    virtual table_edit_iface *get_table_edit_iface(const char *key) { if (!strcmp(key, "mod_matrix")) return static_cast<mod_matrix *>(this); else return NULL; }
 };
 
 };
