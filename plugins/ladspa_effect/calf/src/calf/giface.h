@@ -636,7 +636,7 @@ extern const char *calf_copyright_info;
 
 bool get_freq_gridline(int subindex, float &pos, bool &vertical, std::string &legend, cairo_iface *context, bool use_frequencies = true, float res = 256, float ofs = 0.4);
     
-/// convert amplitude value to normalized grid-ish value (0dB = 0.5, 30dB = 1.0, -30 dB = 0.0, -60dB = -0.5, -90dB = -1.0)
+/// convert amplitude value to normalized grid-ish value
 static inline float dB_grid(float amp, float res = 256, float ofs = 0.4)
 {
     return log(amp) * (1.0 / log(res)) + ofs;
