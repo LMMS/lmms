@@ -350,9 +350,6 @@ struct organ_enums
         par_treblegain,
         param_count
     };
-    enum {
-        var_count = 1
-    };
     enum organ_waveform { 
         wave_sine, 
         wave_sinepl1, wave_sinepl2, wave_sinepl3,
@@ -411,7 +408,7 @@ public:
 /// FluidSynth - metadata
 struct fluidsynth_metadata: public plugin_metadata<fluidsynth_metadata>
 {
-    enum { par_master, par_interpolation, par_reverb, par_chorus, par_soundfont, par_preset_key_set, param_count };
+    enum { par_master, par_interpolation, par_reverb, par_chorus, param_count };
     enum { in_count = 0, out_count = 2, ins_optional = 0, outs_optional = 0, support_midi = true, require_midi = true, rt_capable = false };
     PLUGIN_NAME_ID_LABEL("fluidsynth", "fluidsynth", "Fluidsynth")
 
