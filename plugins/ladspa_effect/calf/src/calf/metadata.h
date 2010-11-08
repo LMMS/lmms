@@ -348,7 +348,6 @@ struct organ_enums
         par_bassgain,
         par_treblefreq,
         par_treblegain,
-        par_var_mapcurve,
         param_count
     };
     enum {

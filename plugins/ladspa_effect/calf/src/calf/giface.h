@@ -625,7 +625,7 @@ public:
 };
 
 #define CALF_PORT_NAMES(name) template<> const char *::plugin_metadata<name##_metadata>::port_names[]
-#define CALF_PORT_PROPS(name) template<> parameter_properties plugin_metadata<name##_metadata>::param_props[]
+#define CALF_PORT_PROPS(name) template<> parameter_properties plugin_metadata<name##_metadata>::param_props[name##_metadata::param_count + 1]
 #define CALF_PLUGIN_INFO(name) template<> calf_plugins::ladspa_plugin_info plugin_metadata<name##_metadata>::plugin_info
 #define PLUGIN_NAME_ID_LABEL(name, id, label) \
     static const char *impl_get_name() { return name; } \
