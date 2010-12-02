@@ -777,6 +777,37 @@ CALF_PORT_PROPS(monosynth) = {
     {}
 };
 
+static const char *monosynth_mod_src_names[] = {
+    "None", 
+    "Velocity",
+    "Pressure",
+    "ModWheel",
+    "Envelope 1",
+    "Envelope 2",
+    "LFO 1",
+    "LFO 2",
+    NULL
+};
+
+static const char *monosynth_mod_dest_names[] = {
+    "None",
+    "Attenuation",
+    "Osc Mix Ratio (%)",
+    "Cutoff [ct]",
+    "Resonance",
+    "O1: Detune [ct]",
+    "O2: Detune [ct]",
+    "O1: PW (%)",
+    "O2: PW (%)",
+    "O1: Stretch",
+    NULL
+};
+
+monosynth_metadata::monosynth_metadata()
+: mm_metadata(mod_matrix_slots, monosynth_mod_src_names, monosynth_mod_dest_names)
+{
+}
+
 ////////////////////////////////////////////////////////////////////////////
 
 CALF_PLUGIN_INFO(organ) = { 0x8481, "Organ", "Calf Organ", "Krzysztof Foltman", calf_plugins::calf_copyright_info, "SynthesizerPlugin" };
@@ -1037,7 +1068,29 @@ const char *wavetable_names[] = {
     "Multi 2",
 };
 
-const char *wavetable_init_soundfont = "";
+static const char *wavetable_mod_src_names[] = {
+    "None", 
+    "Velocity",
+    "Pressure",
+    "ModWheel",
+    "Env 1",
+    "Env 2",
+    "Env 3",
+    NULL
+};
+
+static const char *wavetable_mod_dest_names[] = {
+    "None",
+    "Attenuation",
+    "Osc Mix Ratio (%)",
+    "Cutoff [ct]",
+    "Resonance",
+    "O1: Shift (%)",
+    "O2: Shift (%)",
+    "O1: Detune [ct]",
+    "O2: Detune [ct]",
+    NULL
+};
 
 CALF_PORT_NAMES(wavetable) = {
     "Out L", "Out R", 
@@ -1082,6 +1135,11 @@ CALF_PORT_PROPS(wavetable) = {
     { 200,        0, 2400,   25, PF_FLOAT | PF_SCALE_LINEAR | PF_CTL_KNOB | PF_UNIT_CENTS, NULL, "pbend_range", "PBend Range" },
     {}
 };
+
+wavetable_metadata::wavetable_metadata()
+: mm_metadata(mod_matrix_slots, wavetable_mod_src_names, wavetable_mod_dest_names)
+{
+}
 
 ////////////////////////////////////////////////////////////////////////////
 

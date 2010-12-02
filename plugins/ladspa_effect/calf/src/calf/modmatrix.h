@@ -25,26 +25,13 @@
 
 namespace dsp {
 
-/// Mapping modes
-enum mapping_mode {
-    map_positive, ///< 0..100%
-    map_bipolar, ///< -100%..100%
-    map_negative, ///< -100%..0%
-    map_squared, ///< x^2
-    map_squared_bipolar, ///< x^2 scaled to -100%..100%
-    map_antisquared, ///< 1-(1-x)^2 scaled to 0..100%
-    map_antisquared_bipolar, ///< 1-(1-x)^2 scaled to -100..100%
-    map_parabola, ///< inverted parabola (peaks at 0.5, then decreases to 0)
-    map_type_count
-};
-
 /// Single entry in modulation matrix
 struct modulation_entry
 {
     /// Mapped source
     int src1;
     /// Source mapping mode
-    mapping_mode mapping;
+    calf_plugins::mod_matrix_metadata::mapping_mode mapping;
     /// Unmapped modulating source
     int src2;
     /// Modulation amount
@@ -60,7 +47,7 @@ struct modulation_entry
     void reset() {
         src1 = 0;
         src2 = 0;
-        mapping = map_positive;
+        mapping = calf_plugins::mod_matrix_metadata::map_positive;
         amount = 0.f;
         dest = 0;
     }
@@ -70,24 +57,17 @@ struct modulation_entry
 
 namespace calf_plugins {
 
-class mod_matrix: public table_edit_iface
+class mod_matrix_impl
 {
 protected:
-    /// Polynomials for different scaling modes (1, x, x^2)
-    static const float scaling_coeffs[dsp::map_type_count][3];
-    /// Column descriptions for table widget
-    table_column_info table_columns[6];
-    
     dsp::modulation_entry *matrix;
+    mod_matrix_metadata *metadata;
     unsigned int matrix_rows;
-    const char **mod_src_names, **mod_dest_names;
+    /// Polynomials for different scaling modes (1, x, x^2)
+    static const float scaling_coeffs[calf_plugins::mod_matrix_metadata::map_type_count][3];
 
-    mod_matrix(dsp::modulation_entry *_matrix, unsigned int _rows, const char **_src_names, const char **_dest_names);
 public:
-    virtual const table_column_info *get_table_columns() const;
-    virtual uint32_t get_table_rows() const;
-    virtual std::string get_cell(int row, int column) const;
-    virtual void set_cell(int row, int column, const std::string &src, std::string &error);
+    mod_matrix_impl(dsp::modulation_entry *_matrix, calf_plugins::mod_matrix_metadata *_metadata);
 
     /// Process modulation matrix, calculate outputs from inputs
     inline void calculate_modmatrix(float *moddest, int moddest_count, float *modsrc)
@@ -105,8 +85,14 @@ public:
             }
         }
     }
-};
+    void send_configures(send_configure_iface *);
+    char *configure(const char *key, const char *value);
     
+private:
+    std::string get_cell(int row, int column) const;
+    void set_cell(int row, int column, const std::string &src, std::string &error);
+};
+
 };
 
 #endif

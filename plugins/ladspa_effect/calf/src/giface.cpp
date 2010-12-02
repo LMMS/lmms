@@ -214,7 +214,7 @@ const char *calf_plugins::load_gui_xml(const std::string &plugin_id)
     }
 }
 
-bool calf_plugins::get_freq_gridline(int subindex, float &pos, bool &vertical, std::string &legend, cairo_iface *context, bool use_frequencies)
+bool calf_plugins::get_freq_gridline(int subindex, float &pos, bool &vertical, std::string &legend, cairo_iface *context, bool use_frequencies, float res, float ofs)
 {
     if (subindex < 0 )
 	return false;
@@ -247,7 +247,7 @@ bool calf_plugins::get_freq_gridline(int subindex, float &pos, bool &vertical, s
     if (subindex >= 32)
         return false;
     float gain = 16.0 / (1 << subindex);
-    pos = dB_grid(gain);
+    pos = dB_grid(gain, res, ofs);
     if (pos < -1)
         return false;
     if (subindex != 4)
@@ -319,11 +319,67 @@ const plugin_metadata_iface *calf_plugins::plugin_registry::get_by_id(const char
     }
     return NULL;
 }
+
 ///////////////////////////////////////////////////////////////////////////////////////
 
-std::string table_edit_iface::get_cell(int row, int column) const
+bool calf_plugins::parse_table_key(const char *key, const char *prefix, bool &is_rows, int &row, int &column)
 {
-    return calf_utils::i2s(row)+":"+calf_utils::i2s(column);
+    is_rows = false;
+    row = -1;
+    column = -1;
+    if (0 != strncmp(key, prefix, strlen(prefix)))
+        return false;
+    
+    key += strlen(prefix);
+    
+    if (!strcmp(key, "rows"))
+    {
+        is_rows = true;
+        return true;
+    }
+    
+    const char *comma = strchr(key, ',');
+    if (comma)
+    {
+        row = atoi(string(key, comma - key).c_str());
+        column = atoi(comma + 1);
+        return true;
+    }
+    
+    printf("Unknown key %s under prefix %s", key, prefix);
+    
+    return false;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////
+
+const char *mod_mapping_names[] = { "0..1", "-1..1", "-1..0", "x^2", "2x^2-1", "ASqr", "ASqrBip", "Para", NULL };
+
+mod_matrix_metadata::mod_matrix_metadata(unsigned int _rows, const char **_src_names, const char **_dest_names)
+: mod_src_names(_src_names)
+, mod_dest_names(_dest_names)
+, matrix_rows(_rows)
+{
+    table_column_info tci[6] = {
+        { "Source", TCT_ENUM, 0, 0, 0, mod_src_names },
+        { "Mapping", TCT_ENUM, 0, 0, 0, mod_mapping_names },
+        { "Modulator", TCT_ENUM, 0, 0, 0, mod_src_names },
+        { "Amount", TCT_FLOAT, 0, 1, 1, NULL},
+        { "Destination", TCT_ENUM, 0, 0, 0, mod_dest_names  },
+        { NULL }
+    };
+    assert(sizeof(table_columns) == sizeof(tci));
+    memcpy(table_columns, tci, sizeof(table_columns));
+}
+
+const table_column_info *mod_matrix_metadata::get_table_columns() const
+{
+    return table_columns;
+}
+
+uint32_t mod_matrix_metadata::get_table_rows() const
+{
+    return matrix_rows;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -433,45 +489,6 @@ calf_plugins::dssi_feedback_sender::~dssi_feedback_sender()
 table_via_configure::table_via_configure()
 {
     rows = 0;
-}
-
-const table_column_info *table_via_configure::get_table_columns() const
-{
-    return &columns[0];
-}
-
-uint32_t table_via_configure::get_table_rows() const
-{
-    return rows;
-}
-
-string table_via_configure::get_cell(int row, int column) const
-{
-    if (row >= rows)
-        return string();
-    coord c = make_pair(row, column);
-    std::map<coord, std::string>::const_iterator i = values.find(c);
-    if (i == values.end())
-        return std::string();
-    else
-        return i->second;
-}
-
-void table_via_configure::set_cell(int row, int column, const std::string &src, std::string &error)
-{
-    coord c = make_pair(row, column);
-    values[c] = src;
-    error = "";
-}
-
-const line_graph_iface *table_via_configure::get_graph_iface(int column) const
-{
-    return NULL;
-}
-
-const char *table_via_configure::get_cell_editor(int column) const
-{
-    return NULL;
 }
 
 table_via_configure::~table_via_configure()

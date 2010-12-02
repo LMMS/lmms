@@ -37,10 +37,9 @@ namespace calf_plugins {
     
 /// Monosynth-in-making. Parameters may change at any point, so don't make songs with it!
 /// It lacks inertia for parameters, even for those that really need it.
-class monosynth_audio_module: public audio_module<monosynth_metadata>, public line_graph_iface, public mod_matrix
+class monosynth_audio_module: public audio_module<monosynth_metadata>, public line_graph_iface, public mod_matrix_impl
 {
 public:
-    enum { mod_matrix_slots = 10 };
     uint32_t srate, crate;
     static dsp::waveform_family<MONOSYNTH_WAVE_BITS> *waves;
     dsp::waveform_oscillator<MONOSYNTH_WAVE_BITS> osc1, osc2;
@@ -178,8 +177,9 @@ public:
     void apply_fadeout();
     /// Main processing function
     uint32_t process(uint32_t offset, uint32_t nsamples, uint32_t inputs_mask, uint32_t outputs_mask);
-    /// Lookup of table edit interface
-    virtual table_edit_iface *get_table_edit_iface(const char *key) { if (!strcmp(key, "mod_matrix")) return static_cast<mod_matrix *>(this); else return NULL; }
+    /// Send all configure variables set within a plugin to given destination (which may be limited to only those that plugin understands)
+    virtual void send_configures(send_configure_iface *sci) { return mod_matrix_impl::send_configures(sci); }
+    virtual char *configure(const char *key, const char *value) { return mod_matrix_impl::configure(key, value); }
 };
 
 };

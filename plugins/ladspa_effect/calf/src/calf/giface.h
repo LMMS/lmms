@@ -222,27 +222,15 @@ struct table_column_info
 };
 
 /// 'has string parameters containing tabular data' interface
-struct table_edit_iface
+struct table_metadata_iface
 {
     /// retrieve the table layout for specific parameter
     virtual const table_column_info *get_table_columns() const = 0;
 
-    /// return the current number of rows
+    /// return the fixed number of rows, or 0 if the number of rows is variable
     virtual uint32_t get_table_rows() const = 0;
     
-    /// retrieve data item from the plugin
-    virtual std::string get_cell(int row, int column) const;
-
-    /// set data item to the plugin
-    virtual void set_cell(int row, int column, const std::string &src, std::string &error) { error.clear(); }
-    
-    /// return a line graph interface for a specific parameter/column (unused for now)
-    virtual const line_graph_iface *get_graph_iface(int column) const { return NULL; }
-    
-    /// return an editor name for a specific grid cell (unused for now - I don't even know how editors be implemented)
-    virtual const char *get_cell_editor(int column) const { return NULL; }
-    
-    virtual ~table_edit_iface() {}
+    virtual ~table_metadata_iface() {}
 };
 
 /// 'may receive configure variables' interface
@@ -331,6 +319,8 @@ struct plugin_metadata_iface
     virtual bool requires_configure() const = 0;
     /// obtain array of names of configure variables (or NULL is none needed)
     virtual const char *const *get_configure_vars() const { return NULL; }
+    /// @return table_metadata_iface if any
+    virtual const table_metadata_iface *get_table_metadata_iface(const char *key) const { return NULL; }
 
     /// Do-nothing destructor to silence compiler warning
     virtual ~plugin_metadata_iface() {}
@@ -365,8 +355,6 @@ struct plugin_ctl_iface
     virtual const plugin_metadata_iface *get_metadata_iface() const = 0;
     /// @return line_graph_iface if any
     virtual const line_graph_iface *get_line_graph_iface() const = 0;
-    /// @return table_edit_iface if any
-    virtual table_edit_iface *get_table_edit_iface(const char *key) = 0;
     /// Do-nothing destructor to silence compiler warning
     virtual ~plugin_ctl_iface() {}
 };
@@ -447,8 +435,6 @@ struct audio_module_iface
     virtual uint32_t message_run(const void *valid_ports, void *output_ports) = 0;
     /// @return line_graph_iface if any
     virtual const line_graph_iface *get_line_graph_iface() const = 0;
-    /// @return table_edit_iface if any for given parameter
-    virtual table_edit_iface *get_table_edit_iface(const char *key) = 0;
     virtual ~audio_module_iface() {}
 };
 
@@ -548,8 +534,6 @@ public:
     }
     /// @return line_graph_iface if any
     virtual const line_graph_iface *get_line_graph_iface() const { return dynamic_cast<const line_graph_iface *>(this); }
-    virtual table_edit_iface *get_table_edit_iface(const char *key) { const char *key_us = get_table_edit_iface_key(); return (key_us && !strcmp(key, key_us)) ? dynamic_cast<table_edit_iface *>(this) : NULL; }
-    virtual const char *get_table_edit_iface_key() const { return NULL; }
 };
 
 #if USE_EXEC_GUI || USE_DSSI
@@ -678,8 +662,46 @@ struct preset_access_iface
     virtual ~preset_access_iface() {} 
 };
 
+/// Implementation of table_metadata_iface providing metadata for mod matrices
+class mod_matrix_metadata: public table_metadata_iface
+{
+public:
+    /// Mapping modes
+    enum mapping_mode {
+        map_positive, ///< 0..100%
+        map_bipolar, ///< -100%..100%
+        map_negative, ///< -100%..0%
+        map_squared, ///< x^2
+        map_squared_bipolar, ///< x^2 scaled to -100%..100%
+        map_antisquared, ///< 1-(1-x)^2 scaled to 0..100%
+        map_antisquared_bipolar, ///< 1-(1-x)^2 scaled to -100..100%
+        map_parabola, ///< inverted parabola (peaks at 0.5, then decreases to 0)
+        map_type_count
+    };
+    const char **mod_src_names, **mod_dest_names;
+
+    mod_matrix_metadata(unsigned int _rows, const char **_src_names, const char **_dest_names);
+    virtual const table_column_info *get_table_columns() const;
+    virtual uint32_t get_table_rows() const;
+
+protected:
+    /// Column descriptions for table widget
+    table_column_info table_columns[6];
+    
+    unsigned int matrix_rows;
+};
+
+/// Check if a given key is either prefix + rows or prefix + i2s(row) + "," + i2s(column)
+/// @arg key key to parse
+/// @arg prefix table prefix (e.g. "modmatrix:")
+/// @arg is_rows[out] set to true if key == prefix + "rows"
+/// @arg row[out] if key is of a form: prefix + row + "," + i2s(column), returns row, otherwise returns -1
+/// @arg column[out] if key is of a form: prefix + row + "," + i2s(column), returns row, otherwise returns -1
+/// @retval true if this is one of the recognized string forms
+extern bool parse_table_key(const char *key, const char *prefix, bool &is_rows, int &row, int &column);
+
 #if USE_EXEC_GUI
-class table_via_configure: public table_edit_iface
+class table_via_configure
 {
 protected:
     typedef std::pair<int, int> coord;
@@ -689,13 +711,6 @@ protected:
 public:
     table_via_configure();
     void configure(const char *key, const char *value);
-    
-    virtual const table_column_info *get_table_columns() const;
-    virtual uint32_t get_table_rows() const;
-    virtual std::string get_cell(int row, int column) const;
-    virtual void set_cell(int row, int column, const std::string &src, std::string &error);
-    virtual const line_graph_iface *get_graph_iface(int column) const;
-    virtual const char *get_cell_editor(int column) const;
     virtual ~table_via_configure();
 };
 #endif
