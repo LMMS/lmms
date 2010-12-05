@@ -328,7 +328,7 @@ void MidiWinMM::openDevices()
 		MIDIOUTCAPS c;
 		midiOutGetDevCaps( i, &c, sizeof( c ) );
 		HMIDIOUT hm = 0;
-		MMRESULT res = midiOutOpen( &hm, i, NULL, NULL, CALLBACK_NULL );
+		MMRESULT res = midiOutOpen( &hm, i, 0, 0, CALLBACK_NULL );
 		if( res == MMSYSERR_NOERROR )
 		{
 			m_outputDevices[hm] = qstrdup( c.szPname );
