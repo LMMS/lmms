@@ -26,10 +26,18 @@
 using namespace std;
 using namespace dsp;
 using namespace calf_plugins;
+using namespace calf_utils;
 
-const char *mod_mapping_names[] = { "0..1", "-1..1", "-1..0", "x^2", "2x^2-1", "ASqr", "ASqrBip", "Para", NULL };
+mod_matrix_impl::mod_matrix_impl(dsp::modulation_entry *_matrix, mod_matrix_metadata *_metadata)
+: matrix(_matrix)
+, metadata(_metadata)
+{
+    matrix_rows = metadata->get_table_rows();
+    for (unsigned int i = 0; i < matrix_rows; i++)
+        matrix[i].reset();
+}
 
-const float mod_matrix::scaling_coeffs[dsp::map_type_count][3] = {
+const float mod_matrix_impl::scaling_coeffs[mod_matrix_metadata::map_type_count][3] = {
     { 0, 1, 0 },
     { -1, 2, 0 },
     { -1, 1, 0 },
@@ -40,66 +48,33 @@ const float mod_matrix::scaling_coeffs[dsp::map_type_count][3] = {
     { 0, 4, -4 },
 };
 
-mod_matrix::mod_matrix(modulation_entry *_matrix, unsigned int _rows, const char **_src_names, const char **_dest_names)
-: matrix(_matrix)
-, matrix_rows(_rows)
-, mod_src_names(_src_names)
-, mod_dest_names(_dest_names)
-{
-    table_column_info tci[6] = {
-        { "Source", TCT_ENUM, 0, 0, 0, mod_src_names },
-        { "Mapping", TCT_ENUM, 0, 0, 0, mod_mapping_names },
-        { "Modulator", TCT_ENUM, 0, 0, 0, mod_src_names },
-        { "Amount", TCT_FLOAT, 0, 1, 1, NULL},
-        { "Destination", TCT_ENUM, 0, 0, 0, mod_dest_names  },
-        { NULL }
-    };
-    assert(sizeof(table_columns) == sizeof(tci));
-    memcpy(table_columns, tci, sizeof(table_columns));
-    for (unsigned int i = 0; i < matrix_rows; i++)
-        matrix[i].reset();
-}
-
-const table_column_info *mod_matrix::get_table_columns() const
-{
-    return table_columns;
-}
-
-uint32_t mod_matrix::get_table_rows() const
-{
-    return matrix_rows;
-}
-
-std::string mod_matrix::get_cell(int row, int column) const
+std::string mod_matrix_impl::get_cell(int row, int column) const
 {
     assert(row >= 0 && row < (int)matrix_rows);
     modulation_entry &slot = matrix[row];
+    const char **arr = metadata->get_table_columns()[column].values;
     switch(column) {
         case 0: // source 1
-            return mod_src_names[slot.src1];
+            return arr[slot.src1];
         case 1: // mapping mode
-            return mod_mapping_names[slot.mapping];
+            return arr[slot.mapping];
         case 2: // source 2
-            return mod_src_names[slot.src2];
+            return arr[slot.src2];
         case 3: // amount
             return calf_utils::f2s(slot.amount);
         case 4: // destination
-            return mod_dest_names[slot.dest];
+            return arr[slot.dest];
         default: 
             assert(0);
             return "";
     }
 }
     
-void mod_matrix::set_cell(int row, int column, const std::string &src, std::string &error)
+void mod_matrix_impl::set_cell(int row, int column, const std::string &src, std::string &error)
 {
     assert(row >= 0 && row < (int)matrix_rows);
     modulation_entry &slot = matrix[row];
-    const char **arr = mod_src_names;
-    if (column == 1) 
-        arr = mod_mapping_names;
-    if (column == 4) 
-        arr = mod_dest_names;
+    const char **arr = metadata->get_table_columns()[column].values;
     switch(column) {
         case 0:
         case 1:
@@ -113,7 +88,7 @@ void mod_matrix::set_cell(int row, int column, const std::string &src, std::stri
                     if (column == 0)
                         slot.src1 = i;
                     else if (column == 1)
-                        slot.mapping = (mapping_mode)i;
+                        slot.mapping = (mod_matrix_metadata::mapping_mode)i;
                     else if (column == 2)
                         slot.src2 = i;
                     else if (column == 4)
@@ -135,3 +110,33 @@ void mod_matrix::set_cell(int row, int column, const std::string &src, std::stri
     }
 }
 
+void mod_matrix_impl::send_configures(send_configure_iface *sci)
+{
+    for (int i = 0; i < (int)matrix_rows; i++)
+    {
+        for (int j = 0; j < 5; j++)
+        {
+            string key = "mod_matrix:" + i2s(i) + "," + i2s(j);
+            sci->send_configure(key.c_str(), get_cell(i, j).c_str());
+        }
+    }
+}
+
+char *mod_matrix_impl::configure(const char *key, const char *value)
+{
+    bool is_rows;
+    int row, column;
+    if (!parse_table_key(key, "mod_matrix:", is_rows, row, column))
+        return NULL;
+    if (is_rows)
+        return strdup("Unexpected key");
+    
+    if (row != -1 && column != -1)
+    {
+        string error;
+        set_cell(row, column, value, error);
+        if (!error.empty())
+            return strdup(error.c_str());
+    }
+    return NULL;
+}

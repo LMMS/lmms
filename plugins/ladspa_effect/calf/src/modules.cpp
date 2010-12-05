@@ -189,6 +189,7 @@ static inline void delayline_impl(int age, int deltime, float dry_value, const f
     // if the buffer hasn't been cleared yet (after activation), pretend we've read zeros
     if (age <= deltime) {
         out = 0;
+        del = dry_value;
         amt.step();
         fb.step();
     }
@@ -206,6 +207,7 @@ static inline void delayline2_impl(int age, int deltime, float dry_value, const 
 {
     if (age <= deltime) {
         out = 0;
+        del = dry_value;
         amt.step();
         fb.step();
     }

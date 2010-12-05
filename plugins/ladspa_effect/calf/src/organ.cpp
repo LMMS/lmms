@@ -62,7 +62,7 @@ uint32_t organ_audio_module::process(uint32_t offset, uint32_t nsamples, uint32_
 }
 
 void organ_audio_module::params_changed() {
-    for (int i = 0; i < param_count - var_count; i++)
+    for (int i = 0; i < param_count; i++)
         ((float *)&par_values)[i] = *params[i];
 
     unsigned int old_poly = polyphony_limit;

@@ -118,6 +118,7 @@ struct monosynth_metadata: public plugin_metadata<monosynth_metadata>
         param_count };
     enum { in_count = 0, out_count = 2, ins_optional = 0, outs_optional = 0, support_midi = true, require_midi = true, rt_capable = true };
     enum { step_size = 64, step_shift = 6 };
+    enum { mod_matrix_slots = 10 };
     enum {
         modsrc_none,
         modsrc_velocity,
@@ -143,6 +144,12 @@ struct monosynth_metadata: public plugin_metadata<monosynth_metadata>
         moddest_count,
     };
     PLUGIN_NAME_ID_LABEL("monosynth", "monosynth", "Monosynth")
+    
+    mod_matrix_metadata mm_metadata;
+    
+    monosynth_metadata();
+    /// Lookup of table edit interface
+    virtual const table_metadata_iface *get_table_metadata_iface(const char *key) const { if (!strcmp(key, "mod_matrix")) return &mm_metadata; else return NULL; }
 };
 
 /// Thor's compressor - metadata
@@ -348,11 +355,7 @@ struct organ_enums
         par_bassgain,
         par_treblefreq,
         par_treblegain,
-        par_var_mapcurve,
         param_count
-    };
-    enum {
-        var_count = 1
     };
     enum organ_waveform { 
         wave_sine, 
@@ -412,7 +415,7 @@ public:
 /// FluidSynth - metadata
 struct fluidsynth_metadata: public plugin_metadata<fluidsynth_metadata>
 {
-    enum { par_master, par_interpolation, par_reverb, par_chorus, par_soundfont, par_preset_key_set, param_count };
+    enum { par_master, par_interpolation, par_reverb, par_chorus, param_count };
     enum { in_count = 0, out_count = 2, ins_optional = 0, outs_optional = 0, support_midi = true, require_midi = true, rt_capable = false };
     PLUGIN_NAME_ID_LABEL("fluidsynth", "fluidsynth", "Fluidsynth")
 
@@ -486,8 +489,14 @@ struct wavetable_metadata: public plugin_metadata<wavetable_metadata>
         par_pwhlrange, 
         param_count };
     enum { in_count = 0, out_count = 2, ins_optional = 0, outs_optional = 0, support_midi = true, require_midi = true, rt_capable = true };
+    enum { mod_matrix_slots = 10 };
     enum { step_size = 64 };
     PLUGIN_NAME_ID_LABEL("wavetable", "wavetable", "Wavetable")
+    mod_matrix_metadata mm_metadata;
+    
+    wavetable_metadata();
+    /// Lookup of table edit interface
+    virtual const table_metadata_iface *get_table_metadata_iface(const char *key) const { if (!strcmp(key, "mod_matrix")) return &mm_metadata; else return NULL; }
 };
     
 };
