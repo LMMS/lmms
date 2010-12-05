@@ -248,7 +248,7 @@ bool equalizerNband_audio_module<BaseClass, has_lphp>::get_graph(int index, int 
         return false;
     if (index == AM::param_p1_freq && !subindex) {
         context->set_line_width(1.5);
-        return ::get_graph(*this, subindex, data, points);
+        return ::get_graph(*this, subindex, data, points, 32, 0);
     }
     return false;
 }
@@ -259,7 +259,7 @@ bool equalizerNband_audio_module<BaseClass, has_lphp>::get_gridline(int index, i
     if (!is_active) {
         return false;
     } else {
-        return get_freq_gridline(subindex, pos, vertical, legend, context);
+        return get_freq_gridline(subindex, pos, vertical, legend, context, true, 32, 0);
     }
 }
 

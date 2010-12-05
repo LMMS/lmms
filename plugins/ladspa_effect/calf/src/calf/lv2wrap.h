@@ -28,7 +28,7 @@
 #include <lv2.h>
 #include <calf/giface.h>
 #include <calf/lv2_event.h>
-#include <calf/lv2_persist.h>
+#include <calf/lv2_persist2.h>
 #include <calf/lv2_progress.h>
 #include <calf/lv2_uri_map.h>
 #include <string.h>
@@ -91,11 +91,15 @@ struct lv2_instance: public plugin_ctl_iface, public progress_report_iface
         const char *const *vars = module->get_metadata_iface()->get_configure_vars();
         if (!vars)
             return;
+        assert(uri_map);
+        uint32_t string_type = uri_map->uri_to_id(uri_map, NULL, "http://lv2plug.in/ns/ext/atom#String");
+        assert(string_type);
         for (unsigned int i = 0; vars[i]; i++)
         {
             size_t len = 0;
-            const void *ptr = (*retrieve)(callback_data, vars[i], &len);
-            if (ptr)
+            uint32_t type = 0;
+            const void *ptr = (*retrieve)(callback_data, vars[i], &len, &type);
+            if (ptr && type == string_type)
             {
                 printf("Calling configure on %s\n", vars[i]);
                 configure(vars[i], std::string((const char *)ptr, len).c_str());
@@ -160,7 +164,6 @@ struct lv2_instance: public plugin_ctl_iface, public progress_report_iface
     }
     virtual const plugin_metadata_iface *get_metadata_iface() const { return metadata; }
     virtual const line_graph_iface *get_line_graph_iface() const { return module->get_line_graph_iface(); }
-    virtual table_edit_iface *get_table_edit_iface(const char *key) { return module->get_table_edit_iface(key); }
     virtual int send_status_updates(send_updates_iface *sui, int last_serial) { return module->send_status_updates(sui, last_serial); }
 };
 
@@ -297,15 +300,20 @@ struct lv2_wrapper
         {
             LV2_Persist_Store_Function store;
             void *callback_data;
+            uint32_t string_data_type;
             
             virtual void send_configure(const char *key, const char *value)
             {
-                (*store)(callback_data, key, value, strlen(value));
+                (*store)(callback_data, key, value, strlen(value) + 1, string_data_type);
             }
         };
+        // A host that supports a Persist extension should support an URI map extension as well.
+        assert(inst->uri_map);
         store_state s;
         s.store = store;
         s.callback_data = callback_data;
+        s.string_data_type = inst->uri_map->uri_to_id(inst->uri_map, NULL, "http://lv2plug.in/ns/ext/atom#String");
+
         inst->send_configures(&s);
     }
     static void cb_persist_restore(LV2_Handle Instance, LV2_Persist_Retrieve_Function retrieve, void *callback_data)

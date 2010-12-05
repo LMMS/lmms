@@ -116,7 +116,7 @@ void ladspa_instance::run_synth(unsigned long SampleCount, snd_seq_event_t *Even
 
 char *ladspa_instance::configure(const char *key, const char *value)
 {
-#if USE_DSSI
+#if USE_DSSI_GUI
     if (!strcmp(key, "OSC:FEEDBACK_URI"))
     {
         const line_graph_iface *lgi = dynamic_cast<const line_graph_iface *>(metadata);

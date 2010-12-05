@@ -27,34 +27,8 @@ using namespace std;
 
 float silence[4097];
 
-static const char *monosynth_mod_src_names[] = {
-    "None", 
-    "Velocity",
-    "Pressure",
-    "ModWheel",
-    "Envelope 1",
-    "Envelope 2",
-    "LFO 1",
-    "LFO 2",
-    NULL
-};
-
-static const char *monosynth_mod_dest_names[] = {
-    "None",
-    "Attenuation",
-    "Osc Mix Ratio (%)",
-    "Cutoff [ct]",
-    "Resonance",
-    "O1: Detune [ct]",
-    "O2: Detune [ct]",
-    "O1: PW (%)",
-    "O2: PW (%)",
-    "O1: Stretch",
-    NULL
-};
-
 monosynth_audio_module::monosynth_audio_module()
-: mod_matrix(mod_matrix_data, mod_matrix_slots, monosynth_mod_src_names, monosynth_mod_dest_names)
+: mod_matrix_impl(mod_matrix_data, &mm_metadata)
 , inertia_cutoff(1)
 , inertia_pitchbend(1)
 , inertia_pressure(64)
