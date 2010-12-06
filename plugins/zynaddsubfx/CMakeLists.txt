@@ -105,7 +105,7 @@ ADD_DEPENDENCIES(RemoteZynAddSubFx ZynAddSubFxCore)
 
 # link system libraries when on win32
 IF(LMMS_BUILD_WIN32)
-	TARGET_LINK_LIBRARIES(RemoteZynAddSubFx ${QT_LIBRARIES} -lole32 -luuid -lcomctl32 -lgdi32)
+	TARGET_LINK_LIBRARIES(RemoteZynAddSubFx ${QT_LIBRARIES} -lole32 -luuid -lcomctl32 -lgdi32 -lws2_32)
 ENDIF(LMMS_BUILD_WIN32)
 
 # FLTK needs X
