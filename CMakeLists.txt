@@ -455,7 +455,7 @@ IF(LMMS_BUILD_WIN32)
 					${MINGW_PREFIX}/bin/libvorbisenc-2.dll
 					${MINGW_PREFIX}/bin/libvorbisfile-3.dll
 					${MINGW_PREFIX}/bin/libogg-0.dll
-					${MINGW_PREFIX}/bin/libfluidsynth-1.dll
+					${MINGW_PREFIX}/bin/libfluidsynth.dll
 					${MINGW_PREFIX}/bin/libfftw3f-3.dll
 					${MINGW_PREFIX}/bin/libFLAC-8.dll
 					${MINGW_PREFIX}/bin/SDL.dll
