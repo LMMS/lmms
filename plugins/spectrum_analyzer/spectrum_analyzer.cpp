@@ -56,6 +56,8 @@ spectrumAnalyzer::spectrumAnalyzer( Model * _parent,
 	m_framesFilledUp( 0 ),
 	m_energy( 0 )
 {
+	memset( m_buffer, 0, sizeof( m_buffer ) );
+
 	m_specBuf = (fftwf_complex *) fftwf_malloc( ( FFT_BUFFER_SIZE + 1 ) *
 						sizeof( fftwf_complex ) );
 	m_fftPlan = fftwf_plan_dft_r2c_1d( FFT_BUFFER_SIZE*2, m_buffer,
