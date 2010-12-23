@@ -927,7 +927,7 @@ void RemotePluginBase::sendMessage( const message & _m )
 	m_out->lock();
 	m_out->writeInt( _m.id );
 	m_out->writeInt( n );
-	for( unsigned int i = 0; i < n; ++i )
+	for( int i = 0; i < n; ++i )
 	{
 		m_out->writeString( _m.data[i] );
 	}
