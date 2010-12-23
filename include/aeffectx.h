@@ -167,7 +167,7 @@ public:
 	// 00
 	int numEvents;
 	// 04
-	int reserved;
+	void *reserved;
 	// 08
 	VstEvent * events[];
 
@@ -203,7 +203,7 @@ public:
 	// 00-03
 	int magic;
 	// dispatcher 04-07
-	int (* dispatcher)( AEffect * , int , int , int , void * , float );
+	intptr_t (* dispatcher)( AEffect * , int , int , intptr_t, void * , float );
 	// process, quite sure 08-0b
 	void (* process)( AEffect * , float * * , float * * , int );
 	// setParameter 0c-0f
@@ -221,15 +221,16 @@ public:
 	// flags 24-27
 	int flags;
 	// Fill somewhere 28-2b
-	RemoteVstPlugin * user;
+	void *ptr1;
+	void *ptr2;
 	// Zeroes 2c-2f 30-33 34-37 38-3b
-	char empty3[4 + 4 + 4 + 4];
+	char empty3[4 + 4 + 4];
 	// 1.0f 3c-3f
 	float unkown_float;
 	// An object? pointer 40-43
-	char empty4[4];
+	void *ptr3;
 	// Zeroes 44-47
-	char empty5[4];
+	void *user;
 	// Id 48-4b
 	int32_t uniqueID;
 	// Don't know 4c-4f
@@ -268,13 +269,7 @@ public:
 
 
 
-
-typedef long int (* audioMasterCallback)( AEffect * , long int , long int ,
-						long int , void * , float );
-// we don't use it, may be noise
-#define VSTCALLBACK
-
-
+typedef intptr_t (* audioMasterCallback)( AEffect * , int32_t, int32_t, intptr_t, void * , float );
 
 
 #endif

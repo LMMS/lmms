@@ -77,9 +77,6 @@
 
 #define OLD_VST_SDK
 
-#define VstInt32 long int
-#define VstIntPtr long int
-
 struct ERect
 {
     short top;
@@ -228,8 +225,8 @@ private:
 	} ;
 
 	// callback used by plugin for being able to communicate with it's host
-	static VstIntPtr hostCallback( AEffect * _effect, VstInt32 _opcode,
-					VstInt32 _index, VstIntPtr _value,
+	static intptr_t hostCallback( AEffect * _effect, int32_t _opcode,
+					int32_t _index, intptr_t _value,
 					void * _ptr, float _opt );
 
 
@@ -886,8 +883,8 @@ void RemoteVstPlugin::updateInOutCount()
  * - audioMasterGetDirectory: return either VST-plugin-dir or LMMS-workingdir
  * - audioMasterOpenFileSelector: show QFileDialog?
  */
-VstIntPtr RemoteVstPlugin::hostCallback( AEffect * _effect, VstInt32 _opcode,
-					VstInt32 _index, VstIntPtr _value,
+intptr_t RemoteVstPlugin::hostCallback( AEffect * _effect, int32_t _opcode,
+					int32_t _index, intptr_t _value,
 						void * _ptr, float _opt )
 {
 	static VstTimeInfo _timeInfo;
