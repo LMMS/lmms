@@ -43,6 +43,8 @@ public:
 	VstPlugin( const QString & _plugin );
 	virtual ~VstPlugin();
 
+	void tryLoad( const QString &remoteVstPluginExecutable );
+
 	virtual bool processMessage( const message & _m );
 
 	inline bool hasEditor() const
@@ -111,6 +113,8 @@ private:
 	QPointer<QWidget> m_pluginWidget;
 	int m_pluginWindowID;
 	QSize m_pluginGeometry;
+
+	bool m_badDllFormat;
 
 	QString m_name;
 	Sint32 m_version;

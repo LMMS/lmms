@@ -1,7 +1,7 @@
 /*
  * RemotePlugin.h - base class providing RPC like mechanisms
  *
- * Copyright (c) 2008-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -602,6 +602,14 @@ public:
 	RemotePluginBase( shmFifo * _in, shmFifo * _out );
 	virtual ~RemotePluginBase();
 
+	void reset( shmFifo *in, shmFifo *out )
+	{
+		delete m_in;
+		delete m_out;
+		m_in = in;
+		m_out = out;
+	}
+
 	void sendMessage( const message & _m );
 	message receiveMessage();
 
@@ -695,8 +703,7 @@ private:
 class EXPORT RemotePlugin : public RemotePluginBase
 {
 public:
-	RemotePlugin( const QString & _plugin_executable,
-					bool _wait_for_init_done = true );
+	RemotePlugin();
 	virtual ~RemotePlugin();
 
 	inline bool isRunning()
@@ -708,10 +715,11 @@ public:
 #endif
 	}
 
-	inline void waitForInitDone( bool _busy_waiting = true )
+	bool init( const QString &pluginExecutable, bool waitForInitDoneMsg );
+
+	inline void waitForInitDone( bool _busyWaiting = true )
 	{
-		m_failed = waitForMessage( IdInitDone,
-					_busy_waiting ).id != IdInitDone;
+		m_failed = waitForMessage( IdInitDone, _busyWaiting ).id != IdInitDone;
 	}
 
 	virtual bool processMessage( const message & _m );

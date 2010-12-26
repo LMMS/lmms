@@ -69,8 +69,9 @@ Plugin::Descriptor PLUGIN_EXPORT zynaddsubfx_plugin_descriptor =
 
 ZynAddSubFxRemotePlugin::ZynAddSubFxRemotePlugin() :
 	QObject(),
-	RemotePlugin( "RemoteZynAddSubFx", false )
+	RemotePlugin()
 {
+	init( "RemoteZynAddSubFx", false );
 }
 
 

@@ -1,7 +1,7 @@
 /*
  * RemotePlugin.cpp - base class providing RPC like mechanisms
  *
- * Copyright (c) 2008-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -68,10 +68,10 @@ void ProcessWatcher::run()
 
 
 
-RemotePlugin::RemotePlugin( const QString & _plugin_executable,
-						bool _wait_for_init_done ) :
+RemotePlugin::RemotePlugin() :
 	RemotePluginBase( new shmFifo(), new shmFifo() ),
 	m_failed( true ),
+	m_process(),
 	m_watcher( this ),
 	m_commMutex( QMutex::Recursive ),
 	m_splitChannels( false ),
@@ -85,29 +85,6 @@ RemotePlugin::RemotePlugin( const QString & _plugin_executable,
 	m_inputCount( DEFAULT_CHANNELS ),
 	m_outputCount( DEFAULT_CHANNELS )
 {
-	lock();
-	QString exec = configManager::inst()->pluginDir() +
-					QDir::separator() + _plugin_executable;
-	QStringList args;
-	// swap in and out for bidirectional communication
-	args << QString::number( out()->shmKey() );
-	args << QString::number( in()->shmKey() );
-	m_process.setProcessChannelMode( QProcess::MergedChannels );
-#ifndef DEBUG_REMOTE_PLUGIN
-	m_process.start( exec, args );
-
-	m_watcher.start( QThread::LowestPriority );
-#else
-	qDebug() << exec << args;
-#endif
-
-	resizeSharedProcessingMemory();
-
-	if( _wait_for_init_done )
-	{
-		waitForInitDone();
-	}
-	unlock();
 }
 
 
@@ -141,6 +118,43 @@ RemotePlugin::~RemotePlugin()
 	}
 }
 
+
+
+
+bool RemotePlugin::init( const QString &pluginExecutable,
+							bool waitForInitDoneMsg )
+{
+	lock();
+	if( m_failed )
+	{
+		reset( new shmFifo(), new shmFifo() );
+		m_failed = false;
+	}
+	QString exec = configManager::inst()->pluginDir() +
+					QDir::separator() + pluginExecutable;
+
+	QStringList args;
+	// swap in and out for bidirectional communication
+	args << QString::number( out()->shmKey() );
+	args << QString::number( in()->shmKey() );
+#ifndef DEBUG_REMOTE_PLUGIN
+	m_process.setProcessChannelMode( QProcess::ForwardedChannels );
+	m_process.start( exec, args );
+	m_watcher.start( QThread::LowestPriority );
+#else
+	qDebug() << exec << args;
+#endif
+
+	resizeSharedProcessingMemory();
+
+	if( waitForInitDoneMsg )
+	{
+		waitForInitDone();
+	}
+	unlock();
+
+	return failed();
+}
 
 
 
