@@ -1,8 +1,8 @@
 /*
- * remote_vst_plugin.cpp - LMMS VST Support Layer (RemotePlugin client)
+ * RemoteVstPlugin.cpp - LMMS VST Support Layer (RemotePlugin client)
  *
- * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ * Copyright (c) 2005-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * Code partly taken from (X)FST:
@@ -76,9 +76,6 @@
 #if kVstVersion < 2400
 
 #define OLD_VST_SDK
-
-#define VstInt32 long int
-#define VstIntPtr long int
 
 struct ERect
 {
@@ -228,8 +225,8 @@ private:
 	} ;
 
 	// callback used by plugin for being able to communicate with it's host
-	static VstIntPtr hostCallback( AEffect * _effect, VstInt32 _opcode,
-					VstInt32 _index, VstIntPtr _value,
+	static intptr_t hostCallback( AEffect * _effect, int32_t _opcode,
+					int32_t _index, intptr_t _value,
 					void * _ptr, float _opt );
 
 
@@ -481,8 +478,7 @@ void RemoteVstPlugin::initEditor()
 
 #ifdef LMMS_BUILD_LINUX
 	m_window = CreateWindowEx( 0, "LVSL", m_shortName.c_str(),
-			       ( WS_OVERLAPPEDWINDOW | WS_THICKFRAME ) &
-					 		~WS_MAXIMIZEBOX,
+			       ( WS_OVERLAPPEDWINDOW | WS_THICKFRAME ) & ~WS_MAXIMIZEBOX,
 			       0, 0, 10, 10, NULL, NULL, hInst, NULL );
 
 #else
@@ -528,6 +524,11 @@ bool RemoteVstPlugin::load( const std::string & _plugin_file )
 {
 	if( ( m_libInst = LoadLibrary( _plugin_file.c_str() ) ) == NULL )
 	{
+		// give VstPlugin class a chance to start 32 bit version of RemoteVstPlugin
+		if( GetLastError() == ERROR_BAD_EXE_FORMAT )
+		{
+			sendMessage( IdVstBadDllFormat );
+		}
 		return false;
 	}
 
@@ -882,8 +883,8 @@ void RemoteVstPlugin::updateInOutCount()
  * - audioMasterGetDirectory: return either VST-plugin-dir or LMMS-workingdir
  * - audioMasterOpenFileSelector: show QFileDialog?
  */
-VstIntPtr RemoteVstPlugin::hostCallback( AEffect * _effect, VstInt32 _opcode,
-					VstInt32 _index, VstIntPtr _value,
+intptr_t RemoteVstPlugin::hostCallback( AEffect * _effect, int32_t _opcode,
+					int32_t _index, intptr_t _value,
 						void * _ptr, float _opt )
 {
 	static VstTimeInfo _timeInfo;
@@ -911,21 +912,21 @@ VstIntPtr RemoteVstPlugin::hostCallback( AEffect * _effect, VstInt32 _opcode,
 			SHOW_CALLBACK( "amc: audioMasterVersion\n" );
 			return 2300;
 
-		case audioMasterCurrentId:	
+		case audioMasterCurrentId:
 			SHOW_CALLBACK( "amc: audioMasterCurrentId\n" );
 			// returns the unique id of a plug that's currently
 			// loading
 			return 0;
-		
+
 		case audioMasterIdle:
 			SHOW_CALLBACK ("amc: audioMasterIdle\n" );
 			// call application idle routine (this will
-			// call effEditIdle for all open editors too) 
+			// call effEditIdle for all open editors too)
 			PostThreadMessage( __GuiThreadID,
 						WM_USER, GiveIdle, 0 );
 			return 0;
 
-		case audioMasterPinConnected:		
+		case audioMasterPinConnected:
 			SHOW_CALLBACK( "amc: audioMasterPinConnected\n" );
 			// inquire if an input or output is beeing connected;
 			// index enumerates input or output counting from zero:
@@ -989,7 +990,7 @@ VstIntPtr RemoteVstPlugin::hostCallback( AEffect * _effect, VstInt32 _opcode,
 							"Parameters\n" );
 			return 5000;
 
-		case audioMasterGetParameterQuantization:	
+		case audioMasterGetParameterQuantization:
 			SHOW_CALLBACK( "amc: audioMasterGetParameter\n"
 							"Quantization\n" );
 			// returns the integer value for +1.0 representation,
@@ -1044,7 +1045,7 @@ VstIntPtr RemoteVstPlugin::hostCallback( AEffect * _effect, VstInt32 _opcode,
 			// TODO
 			// returns platform specific ptr
 			return 0;
-		
+
 		case audioMasterCloseWindow:
 			SHOW_CALLBACK( "amc: audioMasterCloseWindow\n" );
 			// TODO
@@ -1156,7 +1157,7 @@ VstIntPtr RemoteVstPlugin::hostCallback( AEffect * _effect, VstInt32 _opcode,
 			SHOW_CALLBACK( "amc: audioMasterVendorSpecific\n" );
 			// no definition, vendor specific handling
 			return 0;
-		
+
 		case audioMasterCanDo:
 			SHOW_CALLBACK( "amc: audioMasterCanDo\n" );
 			return !strcmp( (char *) _ptr, "sendVstEvents" ) ||
@@ -1173,7 +1174,7 @@ VstIntPtr RemoteVstPlugin::hostCallback( AEffect * _effect, VstInt32 _opcode,
 			SHOW_CALLBACK( "amc: audioMasterGetDirectory\n" );
 			// get plug directory, FSSpec on MAC, else char*
 			return 0;
-		
+
 		case audioMasterUpdateDisplay:
 			SHOW_CALLBACK( "amc: audioMasterUpdateDisplay\n" );
 			// something has changed, update 'multi-fx' display
@@ -1184,7 +1185,7 @@ VstIntPtr RemoteVstPlugin::hostCallback( AEffect * _effect, VstInt32 _opcode,
 #if kVstVersion > 2
 		case audioMasterBeginEdit:
 			SHOW_CALLBACK( "amc: audioMasterBeginEdit\n" );
-			// begin of automation session (when mouse down),	
+			// begin of automation session (when mouse down),
 			// parameter index in <index>
 			return 0;
 

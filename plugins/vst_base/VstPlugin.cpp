@@ -78,16 +78,48 @@ public:
 VstPlugin::VstPlugin( const QString & _plugin ) :
 	QObject(),
 	JournallingObject(),
-	RemotePlugin( "remote_vst_plugin", false ),
+	RemotePlugin(),
 	m_plugin( _plugin ),
 	m_pluginWidget( NULL ),
 	m_pluginWindowID( 0 ),
+	m_badDllFormat( false ),
 	m_name(),
 	m_version( 0 ),
 	m_vendorString(),
 	m_productString()
 {
 	setSplittedChannels( true );
+
+	tryLoad( "RemoteVstPlugin" );
+#ifdef LMMS_BUILD_WIN64
+	if( m_badDllFormat )
+	{
+		m_badDllFormat = false;
+		tryLoad( "32/RemoteVstPlugin32" );
+	}
+#endif
+
+	setTempo( engine::getSong()->getTempo() );
+
+	connect( engine::getSong(), SIGNAL( tempoChanged( bpm_t ) ),
+			this, SLOT( setTempo( bpm_t ) ) );
+	connect( engine::getMixer(), SIGNAL( sampleRateChanged() ),
+				this, SLOT( updateSampleRate() ) );
+}
+
+
+
+
+VstPlugin::~VstPlugin()
+{
+}
+
+
+
+
+void VstPlugin::tryLoad( const QString &remoteVstPluginExecutable )
+{
+	init( remoteVstPluginExecutable, false );
 
 	lock();
 #ifdef LMMS_BUILD_WIN32
@@ -138,7 +170,7 @@ VstPlugin::VstPlugin( const QString & _plugin ) :
 	unlock();
 
 #ifdef LMMS_BUILD_WIN32
-	if( m_pluginWindowID )
+	if( !failed() && m_pluginWindowID )
 	{
 		target->setFixedSize( m_pluginGeometry );
 		vstSubWin * sw = new vstSubWin(
@@ -152,20 +184,6 @@ VstPlugin::VstPlugin( const QString & _plugin ) :
 		delete helper;
 	}
 #endif
-
-	setTempo( engine::getSong()->getTempo() );
-
-	connect( engine::getSong(), SIGNAL( tempoChanged( bpm_t ) ),
-			this, SLOT( setTempo( bpm_t ) ) );
-	connect( engine::getMixer(), SIGNAL( sampleRateChanged() ),
-				this, SLOT( updateSampleRate() ) );
-}
-
-
-
-
-VstPlugin::~VstPlugin()
-{
 }
 
 
@@ -355,6 +373,10 @@ bool VstPlugin::processMessage( const message & _m )
 {
 	switch( _m.id )
 	{
+		case IdVstBadDllFormat:
+			m_badDllFormat = true;
+			break;
+
 		case IdVstPluginWindowID:
 			m_pluginWindowID = _m.getInt();
 			break;
