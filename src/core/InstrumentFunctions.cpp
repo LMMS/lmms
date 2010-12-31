@@ -1,7 +1,7 @@
 /*
  * InstrumentFunctions.cpp - models for instrument-function-tab
  *
- * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -167,7 +167,7 @@ void ChordCreator::processNote( notePlayHandle * _n )
 	// at the same time we only add sub-notes if nothing of the note was
 	// played yet, because otherwise we would add chord-subnotes every
 	// time an audio-buffer is rendered...
-	if( ( ( _n->isBaseNote() &&
+	if( ( ( _n->isTopNote() &&
 		_n->instrumentTrack()->isArpeggiatorEnabled() == false ) ||
 						_n->isPartOfArpeggio() ) &&
 				_n->totalFramesPlayed() == 0 &&
@@ -288,7 +288,7 @@ Arpeggiator::~Arpeggiator()
 void Arpeggiator::processNote( notePlayHandle * _n )
 {
 	const int base_note_key = _n->key();
-	if( _n->isBaseNote() == false ||
+	if( _n->isTopNote() == false ||
 			!m_arpEnabledModel.value() ||
 			( _n->released() && _n->releaseFramesDone() >=
 					_n->actualReleaseFramesToDo() ) )

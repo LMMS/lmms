@@ -88,12 +88,12 @@ public:
 	void playNote( notePlayHandle * _n, sampleFrame * _working_buffer );
 
 	QString instrumentName() const;
-	inline const Instrument * instrument() const
+	const Instrument *instrument() const
 	{
 		return m_instrument;
 	}
 
-	inline Instrument * instrument()
+	Instrument *instrument()
 	{
 		return m_instrument;
 	}
@@ -108,7 +108,7 @@ public:
 	int masterKey( int _midi_key ) const;
 
 	// translate pitch to midi-pitch [0,16383]
-	inline int midiPitch() const
+	int midiPitch() const
 	{
 		return (int)( ( m_pitchModel.value()+100 ) * 16383 ) / 200;
 	}
@@ -135,22 +135,27 @@ public:
 	// load instrument whose name matches given one
 	Instrument * loadInstrument( const QString & _instrument_name );
 
-	inline AudioPort * audioPort()
+	AudioPort * audioPort()
 	{
 		return &m_audioPort;
 	}
 
-	inline MidiPort * midiPort()
+	MidiPort * midiPort()
 	{
 		return &m_midiPort;
 	}
 
-	IntModel * baseNoteModel()
+	const IntModel *baseNoteModel() const
 	{
 		return &m_baseNoteModel;
 	}
 
-	Piano * getPiano()
+	IntModel *baseNoteModel()
+	{
+		return &m_baseNoteModel;
+	}
+
+	Piano *pianoModel()
 	{
 		return &m_piano;
 	}

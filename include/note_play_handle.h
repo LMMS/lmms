@@ -57,11 +57,12 @@ public:
 
 	virtual void setVolume( const volume_t _volume = DefaultVolume );
 
-	int getMidiVelocity() const;
+	int midiVelocity() const;
+	int midiKey() const;
 
 	const float & frequency() const
 	{
-		return( m_frequency );
+		return m_frequency;
 	}
 
 	void updateFrequency();
@@ -69,22 +70,22 @@ public:
 	// returns frequency without pitch-wheel influence
 	float unpitchedFrequency() const
 	{
-		return( m_unpitchedFrequency );
+		return m_unpitchedFrequency;
 	}
 
 	virtual void play( sampleFrame * _working_buffer );
 
 	virtual inline bool done() const
 	{
-		return( m_released && framesLeft() <= 0 );
+		return m_released && framesLeft() <= 0;
 	}
 
 	f_cnt_t framesLeft() const;
 
 	inline fpp_t framesLeftForCurrentPeriod() const
 	{
-		return( (fpp_t) qMin<f_cnt_t>( framesLeft(),
-				engine::getMixer()->framesPerPeriod() ) );
+		return (fpp_t) qMin<f_cnt_t>( framesLeft(),
+										engine::getMixer()->framesPerPeriod() );
 	}
 
 
@@ -95,12 +96,12 @@ public:
 
 	inline f_cnt_t framesBeforeRelease() const
 	{
-		return( m_framesBeforeRelease );
+		return m_framesBeforeRelease;
 	}
 
 	inline f_cnt_t releaseFramesDone() const
 	{
-		return( m_releaseFramesDone );
+		return m_releaseFramesDone;
 	}
 
 	f_cnt_t actualReleaseFramesToDo() const;
@@ -109,7 +110,7 @@ public:
 	// returns total numbers of frames to play
 	inline f_cnt_t frames() const
 	{
-		return( m_frames );
+		return m_frames;
 	}
 
 	void setFrames( const f_cnt_t _frames );
@@ -117,34 +118,39 @@ public:
 	// returns whether note was released
 	inline bool released() const
 	{
-		return( m_released );
+		return m_released;
 	}
 
 	// returns total numbers of played frames
 	inline f_cnt_t totalFramesPlayed() const
 	{
-		return( m_totalFramesPlayed );
+		return m_totalFramesPlayed;
 	}
 
 	// returns volume-level at frame _frame (envelope/LFO)
 	float volumeLevel( const f_cnt_t _frame );
 
 	// returns instrument-track this note-play-handle plays
-	inline InstrumentTrack * instrumentTrack()
+	const InstrumentTrack *instrumentTrack() const
 	{
 		return m_instrumentTrack;
 	}
 
-	// returns whether note is a base-note, e.g. is not part of an arpeggio
-	// or a chord
-	inline bool isBaseNote() const
+	InstrumentTrack *instrumentTrack()
 	{
-		return( m_baseNote );
+		return m_instrumentTrack;
+	}
+
+	// returns whether note is a top note, e.g. is not part of an arpeggio
+	// or a chord
+	inline bool isTopNote() const
+	{
+		return m_topNote;
 	}
 
 	inline bool isPartOfArpeggio() const
 	{
-		return( m_partOfArpeggio );
+		return m_partOfArpeggio;
 	}
 
 	inline void setPartOfArpeggio( const bool _on )
@@ -157,7 +163,7 @@ public:
 
 	inline bool isMuted() const
 	{
-		return( m_muted );
+		return m_muted;
 	}
 
 	void mute();
@@ -176,7 +182,7 @@ public:
 
 	inline bool bbTrackMuted()
 	{
-		return( m_bbTrack && m_bbTrack->isMuted() );
+		return m_bbTrack && m_bbTrack->isMuted();
 	}
 	void setBBTrack( track * _bb_track )
 	{
@@ -189,7 +195,7 @@ public:
 #ifdef LMMS_SINGERBOT_SUPPORT
 	int patternIndex()
 	{
-		return( m_patternIndex );
+		return m_patternIndex;
 	}
 
 	void setPatternIndex( int _i )
@@ -200,19 +206,19 @@ public:
 
 
 private:
-	class baseDetuning
+	class BaseDetuning
 	{
 	public:
-		baseDetuning( DetuningHelper * _detuning );
+		BaseDetuning( DetuningHelper *detuning );
 
-		void setValue( float _val )
+		void setValue( float val )
 		{
-			m_value = _val;
+			m_value = val;
 		}
 
 		float value() const
 		{
-			return( m_value );
+			return m_value;
 		}
 
 
@@ -223,38 +229,40 @@ private:
 	} ;
 
 	InstrumentTrack * m_instrumentTrack;	// needed for calling
-					// InstrumentTrack::playNote
-	f_cnt_t m_frames;		// total frames to play
-	f_cnt_t m_totalFramesPlayed;	// total frame-counter - used for
-					// figuring out whether a whole note
-					// has been played
-	f_cnt_t m_framesBeforeRelease;	// number of frames after which note
-					// is released
-	f_cnt_t m_releaseFramesToDo;	// total numbers of frames to be
-					// played after release
-	f_cnt_t m_releaseFramesDone;	// number of frames done after
-					// release of note
-	NotePlayHandleList m_subNotes;	// used for chords and arpeggios
-	volatile bool m_released;	// indicates whether note is released
-	bool m_baseNote;		// indicates whether note is a
-					// base-note (i.e. no sub-note)
-	bool m_partOfArpeggio;		// indicates whether note is part of
-					// an arpeggio (either base-note or
-					// sub-note)
-	bool m_muted;			// indicates whether note is muted
-	track * m_bbTrack;		// related BB track
+											// InstrumentTrack::playNote
+	f_cnt_t m_frames;						// total frames to play
+	f_cnt_t m_totalFramesPlayed;			// total frame-counter - used for
+											// figuring out whether a whole note
+											// has been played
+	f_cnt_t m_framesBeforeRelease;			// number of frames after which note
+											// is released
+	f_cnt_t m_releaseFramesToDo;			// total numbers of frames to be
+											// played after release
+	f_cnt_t m_releaseFramesDone;			// number of frames done after
+											// release of note
+	NotePlayHandleList m_subNotes;			// used for chords and arpeggios
+	volatile bool m_released;				// indicates whether note is released
+	bool m_topNote;							// indicates whether note is a
+											// base-note (i.e. no sub-note)
+	bool m_partOfArpeggio;					// indicates whether note is part of
+											// an arpeggio (either base-note or
+											// sub-note)
+	bool m_muted;							// indicates whether note is muted
+	track * m_bbTrack;						// related BB track
 #ifdef LMMS_SINGERBOT_SUPPORT
-	int m_patternIndex;		// position among relevant notes
+	int m_patternIndex;						// position among relevant notes
 #endif
 
 	// tempo reaction
-	bpm_t m_origTempo;		// original tempo
-	f_cnt_t m_origFrames;		// original m_frames
+	bpm_t m_origTempo;						// original tempo
+	f_cnt_t m_origFrames;					// original m_frames
+
+	int m_origBaseNote;
 
 	float m_frequency;
 	float m_unpitchedFrequency;
 
-	baseDetuning * m_baseDetuning;
+	BaseDetuning * m_baseDetuning;
 
 } ;
 

@@ -898,8 +898,8 @@ void pianoRoll::keyPressEvent( QKeyEvent * _ke )
 
 		if( _ke->isAutoRepeat() == false && key_num > -1 )
 		{
-			m_pattern->instrumentTrack()->
-				getPiano()->handleKeyPress( key_num );
+			m_pattern->instrumentTrack()->pianoModel()->
+													handleKeyPress( key_num );
 			_ke->accept();
 		}
 	}
@@ -1182,8 +1182,8 @@ void pianoRoll::keyReleaseEvent( QKeyEvent * _ke )
 
 		if( _ke->isAutoRepeat() == false && key_num > -1 )
 		{
-			m_pattern->instrumentTrack()->
-				getPiano()->handleKeyRelease( key_num );
+			m_pattern->instrumentTrack()->pianoModel()->
+													handleKeyRelease( key_num );
 			_ke->accept();
 		}
 	}
