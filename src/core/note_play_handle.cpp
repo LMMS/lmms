@@ -33,9 +33,8 @@
 #include "song.h"
 
 
-inline notePlayHandle::baseDetuning::baseDetuning(
-						DetuningHelper * _detuning ) :
-	m_detuning( _detuning ),
+notePlayHandle::BaseDetuning::BaseDetuning( DetuningHelper *detuning ) :
+	m_detuning( detuning ),
 	m_value( m_detuning->automationPattern()->valueAt( 0 ) )
 {
 }
@@ -49,7 +48,7 @@ notePlayHandle::notePlayHandle( InstrumentTrack * _it,
 						const f_cnt_t _offset,
 						const f_cnt_t _frames,
 						const note & _n,
-						notePlayHandle * _parent,
+						notePlayHandle *parent,
 						const bool _part_of_arp ) :
 	playHandle( NotePlayHandle, _offset ),
 	note( _n.length(), _n.pos(), _n.key(),
@@ -63,34 +62,34 @@ notePlayHandle::notePlayHandle( InstrumentTrack * _it,
 	m_releaseFramesToDo( 0 ),
 	m_releaseFramesDone( 0 ),
 	m_released( false ),
-	m_baseNote( _parent == NULL  ),
+	m_topNote( parent == NULL  ),
 	m_partOfArpeggio( _part_of_arp ),
 	m_muted( false ),
 	m_bbTrack( NULL ),
 #ifdef LMMS_SINGERBOT_SUPPORT
 	m_patternIndex( 0 ),
 #endif
-	m_origTempo( engine::getSong()->getTempo() )
+	m_origTempo( engine::getSong()->getTempo() ),
+	m_origBaseNote( instrumentTrack()->baseNoteModel()->value() )
 {
-	if( m_baseNote )
+	if( isTopNote() )
 	{
-		m_baseDetuning = new baseDetuning( detuning() );
+		m_baseDetuning = new BaseDetuning( detuning() );
 		m_instrumentTrack->m_processHandles.push_back( this );
 	}
 	else
 	{
-		m_baseDetuning = _parent->m_baseDetuning;
+		m_baseDetuning = parent->m_baseDetuning;
 
-		_parent->m_subNotes.push_back( this );
+		parent->m_subNotes.push_back( this );
 		// if there was an arp-note added and parent is a base-note
 		// we set arp-note-flag for indicating that parent is an
 		// arpeggio-base-note
-		_parent->m_partOfArpeggio = isPartOfArpeggio() &&
-							_parent->isBaseNote();
+		parent->m_partOfArpeggio = isPartOfArpeggio() && parent->isTopNote();
 
-		m_bbTrack = _parent->m_bbTrack;
+		m_bbTrack = parent->m_bbTrack;
 #ifdef LMMS_SINGERBOT_SUPPORT
-		m_patternIndex = _parent->m_patternIndex;
+		m_patternIndex = parent->m_patternIndex;
 #endif
 	}
 
@@ -99,12 +98,12 @@ notePlayHandle::notePlayHandle( InstrumentTrack * _it,
 	setFrames( _frames );
 
 
-	if( !isBaseNote() || !instrumentTrack()->isArpeggiatorEnabled() )
+	if( !isTopNote() || !instrumentTrack()->isArpeggiatorEnabled() )
 	{
 		// send MIDI-note-on-event
 		m_instrumentTrack->processOutEvent( midiEvent( MidiNoteOn,
 			m_instrumentTrack->midiPort()->realOutputChannel(),
-			key(), getMidiVelocity() ),
+			midiKey(), midiVelocity() ),
 				midiTime::fromFrames( offset(),
 						engine::framesPerTick() ) );
 	}
@@ -117,7 +116,7 @@ notePlayHandle::~notePlayHandle()
 {
 	noteOff( 0 );
 
-	if( m_baseNote )
+	if( isTopNote() )
 	{
 		delete m_baseDetuning;
 		m_instrumentTrack->m_processHandles.removeAll( this );
@@ -151,14 +150,14 @@ void notePlayHandle::setVolume( const volume_t _volume )
 	note::setVolume( _volume );
 	m_instrumentTrack->processOutEvent( midiEvent( MidiKeyPressure,
 			m_instrumentTrack->midiPort()->realOutputChannel(),
-						key(), getMidiVelocity() ), 0 );
+						midiKey(), midiVelocity() ), 0 );
 	
 }
 
 
 
 
-int notePlayHandle::getMidiVelocity() const
+int notePlayHandle::midiVelocity() const
 {
 	int vel = getVolume();
 	if( m_instrumentTrack->getVolume() < DefaultVolume )
@@ -166,6 +165,14 @@ int notePlayHandle::getMidiVelocity() const
 		vel = ( vel * m_instrumentTrack->getVolume() ) / DefaultVolume;
 	}
 	return qMin( MidiMaxVelocity, vel * MidiMaxVelocity / DefaultVolume );
+}
+
+
+
+
+int notePlayHandle::midiKey() const
+{
+	return key() - m_origBaseNote + instrumentTrack()->baseNoteModel()->value();
 }
 
 
@@ -324,12 +331,12 @@ void notePlayHandle::noteOff( const f_cnt_t _s )
 	m_releaseFramesToDo = qMax<f_cnt_t>( 0, // 10,
 			m_instrumentTrack->m_soundShaping.releaseFrames() );
 
-	if( !isBaseNote() || !instrumentTrack()->isArpeggiatorEnabled() )
+	if( !isTopNote() || !instrumentTrack()->isArpeggiatorEnabled() )
 	{
 		// send MIDI-note-off-event
 		m_instrumentTrack->processOutEvent( midiEvent( MidiNoteOff,
 			m_instrumentTrack->midiPort()->realOutputChannel(),
-								key(), 0 ),
+								midiKey(), 0 ),
 			midiTime::fromFrames( m_framesBeforeRelease,
 						engine::framesPerTick() ) );
 	}
@@ -372,8 +379,8 @@ float notePlayHandle::volumeLevel( const f_cnt_t _frame )
 
 bool notePlayHandle::isArpeggioBaseNote() const
 {
-	return isBaseNote() && ( m_partOfArpeggio ||
-			m_instrumentTrack->isArpeggiatorEnabled() );
+	return isTopNote() && ( m_partOfArpeggio ||
+								m_instrumentTrack->isArpeggiatorEnabled() );
 }
 
 
@@ -456,8 +463,9 @@ bool notePlayHandle::operator==( const notePlayHandle & _nph ) const
 			offset() == _nph.offset() &&
 			m_totalFramesPlayed == _nph.m_totalFramesPlayed &&
 			m_released == _nph.m_released &&
-			m_baseNote == _nph.m_baseNote &&
+			m_topNote == _nph.m_topNote &&
 			m_partOfArpeggio == _nph.m_partOfArpeggio &&
+			m_origBaseNote == _nph.m_origBaseNote &&
 			m_muted == _nph.m_muted;
 }
 
