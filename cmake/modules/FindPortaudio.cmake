@@ -17,37 +17,8 @@ if (PORTAUDIO_LIBRARIES AND PORTAUDIO_INCLUDE_DIRS)
   # in cache already
   set(PORTAUDIO_FOUND TRUE)
 else (PORTAUDIO_LIBRARIES AND PORTAUDIO_INCLUDE_DIRS)
-  find_path(PORTAUDIO_INCLUDE_DIR
-    NAMES
-      portaudio.h
-    PATHS
-      /usr/include
-      /usr/local/include
-      /opt/local/include
-      /sw/include
-  )
-
-  find_library(PORTAUDIO_LIBRARY
-    NAMES
-      portaudio
-    PATHS
-      /usr/lib
-      /usr/local/lib
-      /opt/local/lib
-      /sw/lib
-  )
-
-  set(PORTAUDIO_INCLUDE_DIRS
-    ${PORTAUDIO_INCLUDE_DIR}
-  )
-  set(PORTAUDIO_LIBRARIES
-    ${PORTAUDIO_LIBRARY}
-)
-
-  if (PORTAUDIO_INCLUDE_DIRS AND PORTAUDIO_LIBRARIES)
-     set(PORTAUDIO_FOUND TRUE)
-  endif (PORTAUDIO_INCLUDE_DIRS AND PORTAUDIO_LIBRARIES)
-
+   include(FindPkgConfig)
+   pkg_check_modules(PORTAUDIO portaudio-2.0)
   if (PORTAUDIO_FOUND)
     if (NOT Portaudio_FIND_QUIETLY)
       message(STATUS "Found Portaudio: ${PORTAUDIO_LIBRARIES}")
