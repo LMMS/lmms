@@ -994,7 +994,7 @@ void organ_audio_module::deactivate()
 
 void drawbar_organ::render_separate(float *output[], int nsamples)
 {
-    float buf[4096][2];
+    float buf[MAX_SAMPLE_RUN][2];
     dsp::zero(&buf[0][0], 2 * nsamples);
     basic_synth::render_to(buf, nsamples);
     if (dsp::fastf2i_drm(parameters->lfo_mode) == organ_voice_base::lfomode_global)

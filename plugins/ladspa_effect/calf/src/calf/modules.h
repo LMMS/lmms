@@ -230,8 +230,8 @@ public:
     void deactivate();
   
     /// MIDI control
-    virtual void note_on(int note, int vel);
-    virtual void note_off(int note, int vel);
+    virtual void note_on(int channel, int note, int vel);
+    virtual void note_off(int channel, int note, int vel);
     
     bool get_graph(int index, int subindex, float *data, int points, cairo_iface *context) const;
     

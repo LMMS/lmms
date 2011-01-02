@@ -1,3 +1,53 @@
+Version 0.0.60.0 (unreleased)
++ Awesome new bitmap-based GUI by Markus Schmidt
++ New plugins by Markus Schmidt:
+  * several EQs (5, 8, 12 bands)
+  * new compressors (sidechain, multiband, deesser)
+  * new distortion plugins (based on code by Tom Szilagyi)
+  * amplitude modulator plugin (pulsator)
++ New experimental plugin - a simple wrapper for Fluidsynth
++ JACK host: save/load of sessions
++ Vintage Delay: fix another reinitialisation bug that caused, 
+  noise bursts on enable/disable, add Width and LR/RL modes
++ many improvements to Monosynth:
+  * modulation matrix (not compatible with all plugin standards yet)
+  * PWM in both oscillators
+  * stretch (pseudo-hard-sync) for oscillator 1
+  * detune scaling (depending on pitch)
+  * second envelope
++ envelopes now have an extra stage called 'Fade': when enabled,
+  it replaces Sustain with either ramp down to 0% or ramp up to 100%
++ more options in the build system (LASH use can now be disabled)
++ support for LADISH level 1 in calfjackhost (SIGUSR1-triggered Save)
++ uses more recent LV2 extensions (external UI, persist and others)
++ many bugfixes
+- removed small plugins - if anyone's interested, please use the old code
+  in some new project
+
+Version 0.0.18.6
+
++ LADSPA: do not delete singletons after .so is unloaded
++ Rotary speaker: fix spelling of plugin class
+
+Version 0.0.18.5
+
++ Vintage Delay: clear buffer on startup and reactivation
++ GUI: fix dodgy icons
++ JACK host: fix a problem with numeric variant of -M option and the new
+  versions of JACK
+
+Version 0.0.18.4
+
++ Framework: gcc-4.4 compilation fix (Orcan Ogetbil)
+
+Version 0.0.18.3
+
++ Framework: do not use x86 assembler code on non-x86 platforms
++ Monosynth, Organ: fix serious audio quality issues
++ Monosynth: implement inertia for cutoff knob and pitch bend, make
+  pitch bend range adjustable
++ Organ: fix polyphony limit bug
+
 Version 0.0.18.2
 
 + Organ: fix voice stealing of released notes, sort out GUI, add quadratic

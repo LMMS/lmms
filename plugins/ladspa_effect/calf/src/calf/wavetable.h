@@ -149,10 +149,13 @@ public:
         inertia_pitchbend.ramp.set_length(crate / 30); // 1/30s    
         inertia_pressure.ramp.set_length(crate / 30); // 1/30s - XXXKF monosynth needs that too
     }
+    virtual void note_on(int /*channel*/, int note, int velocity) { dsp::basic_synth::note_on(note, velocity); }
+    virtual void note_off(int /*channel*/, int note, int velocity) { dsp::basic_synth::note_off(note, velocity); }
+    virtual void control_change(int /*channel*/, int controller, int value) { dsp::basic_synth::control_change(controller, value); }
     /// Handle MIDI Channel Pressure
-    void channel_pressure(int value);
+    virtual void channel_pressure(int channel, int value);
     /// Handle pitch bend message.
-    inline void pitch_bend(int value)
+    virtual void pitch_bend(int channel, int value)
     {
         inertia_pitchbend.set_inertia(pow(2.0, (value * *params[par_pwhlrange]) / (1200.0 * 8192.0)));
     }

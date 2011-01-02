@@ -134,6 +134,17 @@ char *mod_matrix_impl::configure(const char *key, const char *value)
     if (row != -1 && column != -1)
     {
         string error;
+        string value_text;
+        if (value == NULL)
+        {
+            const table_column_info &ci = metadata->get_table_columns()[column];
+            if (ci.type == TCT_ENUM)
+                value_text = ci.values[(int)ci.def_value];
+            else
+            if (ci.type == TCT_FLOAT)
+                value_text = f2s(ci.def_value);
+            value = value_text.c_str();
+        }
         set_cell(row, column, value, error);
         if (!error.empty())
             return strdup(error.c_str());

@@ -127,20 +127,20 @@ public:
     void end_note();
     /// Handle MIDI Note On message (does not immediately trigger a note, as it must start on
     /// boundary of step_size samples).
-    void note_on(int note, int vel);
+    void note_on(int channel, int note, int vel);
     /// Handle MIDI Note Off message
-    void note_off(int note, int vel);
+    void note_off(int channel, int note, int vel);
     /// Handle MIDI Channel Pressure
-    void channel_pressure(int value);
+    void channel_pressure(int channel, int value);
     /// Handle pitch bend message.
-    inline void pitch_bend(int value)
+    inline void pitch_bend(int /*channel*/, int value)
     {
         inertia_pitchbend.set_inertia(pow(2.0, (value * *params[par_pwhlrange]) / (1200.0 * 8192.0)));
     }
     /// Update oscillator frequency based on base frequency, detune amount, pitch bend scaling factor and sample rate.
     void set_frequency();
     /// Handle control change messages.
-    void control_change(int controller, int value);
+    void control_change(int channel, int controller, int value);
     /// Update variables from control ports.
     void params_changed();
     void activate();

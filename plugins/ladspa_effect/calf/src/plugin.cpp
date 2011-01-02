@@ -189,22 +189,22 @@ void ladspa_instance::process_dssi_event(snd_seq_event_t &event)
 {
     switch(event.type) {
         case SND_SEQ_EVENT_NOTEON:
-            module->note_on(event.data.note.note, event.data.note.velocity);
+            module->note_on(event.data.note.channel, event.data.note.note, event.data.note.velocity);
             break;
         case SND_SEQ_EVENT_NOTEOFF:
-            module->note_off(event.data.note.note, event.data.note.velocity);
+            module->note_off(event.data.note.channel, event.data.note.note, event.data.note.velocity);
             break;
         case SND_SEQ_EVENT_PGMCHANGE:
-            module->program_change(event.data.control.value);
+            module->program_change(event.data.control.channel, event.data.control.value);
             break;
         case SND_SEQ_EVENT_CONTROLLER:
-            module->control_change(event.data.control.param, event.data.control.value);
+            module->control_change(event.data.control.channel, event.data.control.param, event.data.control.value);
             break;
         case SND_SEQ_EVENT_PITCHBEND:
-            module->pitch_bend(event.data.control.value);
+            module->pitch_bend(event.data.control.channel, event.data.control.value);
             break;
         case SND_SEQ_EVENT_CHANPRESS:
-            module->channel_pressure(event.data.control.value);
+            module->channel_pressure(event.data.control.channel, event.data.control.value);
             break;
     }
 }

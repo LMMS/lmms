@@ -69,18 +69,18 @@ public:
     void post_instantiate();
     void set_sample_rate(uint32_t sr) { srate = sr; }
     /// Handle MIDI Note On message (by sending it to fluidsynth)
-    void note_on(int note, int vel);
+    void note_on(int channel, int note, int vel);
     /// Handle MIDI Note Off message (by sending it to fluidsynth)
-    void note_off(int note, int vel);
+    void note_off(int channel, int note, int vel);
     /// Handle pitch bend message.
-    inline void pitch_bend(int value)
+    inline void pitch_bend(int channel, int value)
     {
         fluid_synth_pitch_bend(synth, 0, value + 0x2000);
     }
     /// Handle control change messages.
-    void control_change(int controller, int value);
+    void control_change(int channel, int controller, int value);
     /// Handle program change messages.
-    void program_change(int program);
+    void program_change(int channel, int program);
 
     /// Update variables from control ports.
     void params_changed() {

@@ -231,7 +231,7 @@ void rotary_speaker_audio_module::deactivate()
 {
 }
 
-void rotary_speaker_audio_module::control_change(int ctl, int val)
+void rotary_speaker_audio_module::control_change(int /*channel*/, int ctl, int val)
 {
     if (vibrato_mode == 3 && ctl == 64)
     {

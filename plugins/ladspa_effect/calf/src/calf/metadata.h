@@ -150,6 +150,7 @@ struct monosynth_metadata: public plugin_metadata<monosynth_metadata>
     monosynth_metadata();
     /// Lookup of table edit interface
     virtual const table_metadata_iface *get_table_metadata_iface(const char *key) const { if (!strcmp(key, "mod_matrix")) return &mm_metadata; else return NULL; }
+    const char *const *get_configure_vars() const;
 };
 
 /// Thor's compressor - metadata

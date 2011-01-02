@@ -380,7 +380,7 @@ void filterclavier_audio_module::deactivate()
 }
 
 
-void filterclavier_audio_module::note_on(int note, int vel)
+void filterclavier_audio_module::note_on(int channel, int note, int vel)
 {
     last_note     = note;
     last_velocity = vel;
@@ -401,7 +401,7 @@ void filterclavier_audio_module::note_on(int note, int vel)
     inertia_filter_module::calculate_filter();
 }
 
-void filterclavier_audio_module::note_off(int note, int vel)
+void filterclavier_audio_module::note_off(int channel, int note, int vel)
 {
     if (note == last_note) {
         inertia_filter_module::inertia_resonance.set_inertia(param_props[par_max_resonance].min);
