@@ -22,6 +22,7 @@
 #define __CALF_MODMATRIX_H
  
 #include "giface.h"
+#include <stdio.h>
 
 namespace dsp {
 
@@ -87,6 +88,32 @@ public:
     }
     void send_configures(send_configure_iface *);
     char *configure(const char *key, const char *value);
+    
+    /// Return a list of configure variables used by the modulation matrix
+    template<int rows>
+    static const char **get_configure_vars()
+    {
+        static std::vector<std::string> names_vector;
+        static const char *names[rows * 5 + 1];
+        
+        if (names[0] == NULL)
+        {
+            for (int i = 0; i < rows; i++)
+            {
+                for (int j = 0; j < 5; j++)
+                {
+                    char buf[40];
+                    sprintf(buf, "mod_matrix:%d,%d", i, j);
+                    names_vector.push_back(buf);
+                }
+            }
+            for (size_t i = 0; i < names_vector.size(); i++)
+                names[i] = names_vector[i].c_str();
+            names[names_vector.size()] = NULL;
+        }
+        
+        return names;
+    }
     
 private:
     std::string get_cell(int row, int column) const;

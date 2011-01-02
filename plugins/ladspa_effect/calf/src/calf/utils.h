@@ -65,16 +65,22 @@ public:
     }
 };
 
-/// Exception-safe mutex lock
-class ptlock
+class ptlock_base
 {
+protected:
     ptmutex &mutex;
     bool locked;
+
+    ptlock_base(ptmutex &_m)
+    : mutex(_m)
+    , locked(false)
+    {
+    }
     
 public:
-    ptlock(ptmutex &_m) : mutex(_m), locked(true)
+    bool is_locked()
     {
-        mutex.lock();
+        return locked;
     }
     void unlock()
     {
@@ -85,10 +91,30 @@ public:
     {
         locked = false;
     }
-    ~ptlock()
+    ~ptlock_base()
     {
         if (locked)
             mutex.unlock();
+    }
+};
+
+/// Exception-safe mutex lock
+class ptlock: public ptlock_base
+{
+public:
+    ptlock(ptmutex &_m) : ptlock_base(_m)
+    {
+        locked = mutex.lock();
+    }
+};
+
+/// Exception-safe polling mutex lock
+class pttrylock: public ptlock_base
+{
+public:
+    pttrylock(ptmutex &_m) : ptlock_base(_m)
+    {
+        locked = mutex.trylock();
     }
 };
 

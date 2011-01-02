@@ -544,7 +544,7 @@ wavetable_audio_module::wavetable_audio_module()
     }
 }
 
-void wavetable_audio_module::channel_pressure(int value)
+void wavetable_audio_module::channel_pressure(int /*channel*/, int value)
 {
     inertia_pressure.set_inertia(value * (1.0 / 127.0));
 }

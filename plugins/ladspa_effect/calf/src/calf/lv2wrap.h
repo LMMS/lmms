@@ -99,8 +99,10 @@ struct lv2_instance: public plugin_ctl_iface, public progress_report_iface
             size_t len = 0;
             uint32_t type = 0;
             const void *ptr = (*retrieve)(callback_data, vars[i], &len, &type);
-            if (ptr && type == string_type)
+            if (ptr)
             {
+                if (type != string_type)
+                    fprintf(stderr, "Warning: type is %d, expected %d\n", (int)type, (int)string_type);
                 printf("Calling configure on %s\n", vars[i]);
                 configure(vars[i], std::string((const char *)ptr, len).c_str());
             }
@@ -130,14 +132,15 @@ struct lv2_instance: public plugin_ctl_iface, public progress_report_iface
             if (item->type == midi_event_type) 
             {
                 // printf("Midi message %x %x %x %x %d\n", item->data[0], item->data[1], item->data[2], item->data[3], item->size);
+                int channel = item->data[0] & 15;
                 switch(item->data[0] >> 4)
                 {
-                case 8: module->note_off(item->data[1], item->data[2]); break;
-                case 9: module->note_on(item->data[1], item->data[2]); break;
-                case 11: module->control_change(item->data[1], item->data[2]); break;
-                case 12: module->program_change(item->data[1]); break;
-                case 13: module->channel_pressure(item->data[1]); break;
-                case 14: module->pitch_bend(item->data[1] + 128 * item->data[2] - 8192); break;
+                case 8: module->note_off(channel, item->data[1], item->data[2]); break;
+                case 9: module->note_on(channel, item->data[1], item->data[2]); break;
+                case 11: module->control_change(channel, item->data[1], item->data[2]); break;
+                case 12: module->program_change(channel, item->data[1]); break;
+                case 13: module->channel_pressure(channel, item->data[1]); break;
+                case 14: module->pitch_bend(channel, item->data[1] + 128 * item->data[2] - 8192); break;
                 }
             }
             else

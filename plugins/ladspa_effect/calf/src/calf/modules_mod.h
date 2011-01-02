@@ -128,7 +128,7 @@ public:
     /// Increase or decrease aspeed towards raspeed, with required negative and positive rate
     bool incr_towards(float &aspeed, float raspeed, float delta_decc, float delta_acc);
     uint32_t process(uint32_t offset, uint32_t nsamples, uint32_t inputs_mask, uint32_t outputs_mask);
-    virtual void control_change(int ctl, int val);
+    virtual void control_change(int channel, int ctl, int val);
 };
 
 /// A multitap stereo chorus thing

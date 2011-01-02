@@ -607,7 +607,7 @@ void monosynth_audio_module::apply_fadeout()
     }
 }
 
-void monosynth_audio_module::note_on(int note, int vel)
+void monosynth_audio_module::note_on(int /*channel*/, int note, int vel)
 {
     queue_note_on = note;
     queue_note_on_and_off = false;
@@ -616,7 +616,7 @@ void monosynth_audio_module::note_on(int note, int vel)
     stack.push(note);
 }
 
-void monosynth_audio_module::note_off(int note, int vel)
+void monosynth_audio_module::note_off(int /*channel*/, int note, int vel)
 {
     stack.pop(note);
     if (note == queue_note_on)
@@ -653,12 +653,12 @@ void monosynth_audio_module::end_note()
     envelope2.note_off();
 }
 
-void monosynth_audio_module::channel_pressure(int value)
+void monosynth_audio_module::channel_pressure(int /*channel*/, int value)
 {
     inertia_pressure.set_inertia(value * (1.0 / 127.0));
 }
 
-void monosynth_audio_module::control_change(int controller, int value)
+void monosynth_audio_module::control_change(int /*channel*/, int controller, int value)
 {
     switch(controller)
     {

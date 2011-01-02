@@ -388,19 +388,19 @@ extern const char *load_gui_xml(const std::string &plugin_id);
 struct audio_module_iface
 {
     /// Handle MIDI Note On
-    virtual void note_on(int note, int velocity) = 0;
+    virtual void note_on(int channel, int note, int velocity) = 0;
     /// Handle MIDI Note Off
-    virtual void note_off(int note, int velocity) = 0;
+    virtual void note_off(int channel, int note, int velocity) = 0;
     /// Handle MIDI Program Change
-    virtual void program_change(int program) = 0;
+    virtual void program_change(int channel, int program) = 0;
     /// Handle MIDI Control Change
-    virtual void control_change(int controller, int value) = 0;
+    virtual void control_change(int channel, int controller, int value) = 0;
     /// Handle MIDI Pitch Bend
     /// @param value pitch bend value (-8192 to 8191, defined as in MIDI ie. 8191 = 200 ct by default)
-    virtual void pitch_bend(int value) = 0;
+    virtual void pitch_bend(int channel, int value) = 0;
     /// Handle MIDI Channel Pressure
     /// @param value channel pressure (0 to 127)
-    virtual void channel_pressure(int value) = 0;
+    virtual void channel_pressure(int channel, int value) = 0;
     /// Called when params are changed (before processing)
     virtual void params_changed() = 0;
     /// LADSPA-esque activate function, except it is called after ports are connected, not before
@@ -427,9 +427,9 @@ struct audio_module_iface
     virtual const plugin_metadata_iface *get_metadata_iface() const = 0;
     /// Set the progress report interface to communicate progress to
     virtual void set_progress_report_iface(progress_report_iface *iface) = 0;
-    /// Clear a part of output buffers that have 0s at mask
-    virtual void process_slice(uint32_t offset, uint32_t end) = 0;
-    /// The audio processing loop
+    /// Clear a part of output buffers that have 0s at mask; subdivide the buffer so that no runs > MAX_SAMPLE_RUN are fed to process function
+    virtual uint32_t process_slice(uint32_t offset, uint32_t end) = 0;
+    /// The audio processing loop; assumes numsamples <= MAX_SAMPLE_RUN, for larger buffers, call process_slice
     virtual uint32_t process(uint32_t offset, uint32_t numsamples, uint32_t inputs_mask, uint32_t outputs_mask) = 0;
     /// Message port processing function
     virtual uint32_t message_run(const void *valid_ports, void *output_ports) = 0;
@@ -461,19 +461,19 @@ public:
     }
 
     /// Handle MIDI Note On
-    void note_on(int note, int velocity) {}
+    void note_on(int channel, int note, int velocity) {}
     /// Handle MIDI Note Off
-    void note_off(int note, int velocity) {}
+    void note_off(int channel, int note, int velocity) {}
     /// Handle MIDI Program Change
-    void program_change(int program) {}
+    void program_change(int channel, int program) {}
     /// Handle MIDI Control Change
-    void control_change(int controller, int value) {}
+    void control_change(int channel, int controller, int value) {}
     /// Handle MIDI Pitch Bend
     /// @param value pitch bend value (-8192 to 8191, defined as in MIDI ie. 8191 = 200 ct by default)
-    void pitch_bend(int value) {}
+    void pitch_bend(int channel, int value) {}
     /// Handle MIDI Channel Pressure
     /// @param value channel pressure (0 to 127)
-    void channel_pressure(int value) {}
+    void channel_pressure(int channel, int value) {}
     /// Called when params are changed (before processing)
     void params_changed() {}
     /// LADSPA-esque activate function, except it is called after ports are connected, not before
@@ -522,15 +522,18 @@ public:
         }
     }
     /// utility function: call process, and if it returned zeros in output masks, zero out the relevant output port buffers
-    void process_slice(uint32_t offset, uint32_t end)
+    uint32_t process_slice(uint32_t offset, uint32_t end)
     {
+        uint32_t total_out_mask = 0;
         while(offset < end)
         {
             uint32_t newend = std::min(offset + MAX_SAMPLE_RUN, end);
             uint32_t out_mask = process(offset, newend - offset, -1, -1);
+            total_out_mask |= out_mask;
             zero_by_mask(out_mask, offset, newend - offset);
             offset = newend;
         }
+        return total_out_mask;
     }
     /// @return line_graph_iface if any
     virtual const line_graph_iface *get_line_graph_iface() const { return dynamic_cast<const line_graph_iface *>(this); }

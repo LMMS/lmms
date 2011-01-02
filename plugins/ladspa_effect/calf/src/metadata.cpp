@@ -22,6 +22,7 @@
 #include <calf/giface.h>
 #include <calf/metadata.h>
 #include <calf/audio_fx.h>
+#include <calf/modmatrix.h>
 
 using namespace dsp;
 using namespace calf_plugins;
@@ -806,6 +807,11 @@ static const char *monosynth_mod_dest_names[] = {
 monosynth_metadata::monosynth_metadata()
 : mm_metadata(mod_matrix_slots, monosynth_mod_src_names, monosynth_mod_dest_names)
 {
+}
+
+const char *const *monosynth_metadata::get_configure_vars() const
+{
+    return mod_matrix_impl::get_configure_vars<mod_matrix_slots>();
 }
 
 ////////////////////////////////////////////////////////////////////////////
