@@ -2,6 +2,7 @@
  * AudioPortAudio.h - device-class that performs PCM-output via PortAudio
  *
  * Copyright (c) 2008 Csaba Hruska <csaba.hruska/at/gmail.com>
+ * Copyright (c) 2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -26,6 +27,7 @@
 #define _AUDIO_PORTAUDIO_H
 
 #include <QtCore/QObject>
+#include <QtCore/QSemaphore>
 
 #include "lmmsconfig.h"
 #include "ComboBoxModel.h"
@@ -63,7 +65,7 @@ class lcdSpinBox;
 class AudioPortAudio : public AudioBackend
 {
 public:
-	AudioPortAudio( bool & _success_ful, mixer * _mixer );
+	AudioPortAudio( bool & _success_ful, AudioOutputContext *context );
 	virtual ~AudioPortAudio();
 
 	inline static QString name()
