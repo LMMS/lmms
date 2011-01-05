@@ -22,6 +22,7 @@
  *
  */
 
+#include <QtCore/QTimeLine>
 #include <QtGui/QAction>
 #include <QtGui/QButtonGroup>
 #include <QtGui/QKeyEvent>
@@ -649,6 +650,28 @@ void songEditor::updateScrollBar( int _len )
 
 
 
+static inline void animateScroll( QScrollBar *scrollBar, int newVal )
+{
+	// do smooth scroll animation using QTimeLine
+	QTimeLine *t = scrollBar->findChild<QTimeLine *>();
+	if( t == NULL )
+	{
+		t = new QTimeLine( 600, scrollBar );
+		t->setFrameRange( scrollBar->value(), newVal );
+		t->connect( t, SIGNAL( finished() ), SLOT( deleteLater() ) );
+
+		scrollBar->connect( t, SIGNAL( frameChanged( int ) ), SLOT( setValue( int ) ) );
+
+		t->start();
+	}
+	else
+	{
+		// smooth scrolling is still active, therefore just update the end frame
+		t->setEndFrame( newVal );
+	}
+}
+
+
 void songEditor::updatePosition( const midiTime & _t )
 {
 	if( ( m_s->isPlaying() && m_s->m_playMode == song::Mode_PlaySong 
@@ -656,11 +679,12 @@ void songEditor::updatePosition( const midiTime & _t )
 							m_scrollBack == true )
 	{
 		const int w = width() - DEFAULT_SETTINGS_WIDGET_WIDTH
-							- TRACK_OP_WIDTH;
+							- TRACK_OP_WIDTH
+							- 32;	// rough estimation for width of right scrollbar
 		if( _t > m_currentPosition + w * midiTime::ticksPerTact() /
 							pixelsPerTact() )
 		{
-			m_leftRightScroll->setValue( _t.getTact() );
+			animateScroll( m_leftRightScroll, _t.getTact() );
 		}
 		else if( _t < m_currentPosition )
 		{
@@ -668,7 +692,7 @@ void songEditor::updatePosition( const midiTime & _t )
 				(int)( _t - w * midiTime::ticksPerTact() /
 							pixelsPerTact() ),
 									0 );
-			m_leftRightScroll->setValue( t.getTact() );
+			animateScroll( m_leftRightScroll, t.getTact() );
 		}
 		m_scrollBack = false;
 	}
