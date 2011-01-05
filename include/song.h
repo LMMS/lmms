@@ -1,7 +1,7 @@
 /*
  * song.h - class song - the root of the model-tree
  *
- * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2011 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -21,7 +21,6 @@
  * Boston, MA 02110-1301 USA.
  *
  */
-
 
 #ifndef _SONG_H
 #define _SONG_H
@@ -317,6 +316,7 @@ private:
 	friend class ControllerRackView;
 
 signals:
+	void projectLoaded();
 	void lengthChanged( int _tacts );
 	void tempoChanged( bpm_t _new_bpm );
 	void timeSignatureChanged( int _old_ticks_per_tact,

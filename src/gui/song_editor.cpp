@@ -1,7 +1,7 @@
 /*
  * song_editor.cpp - basic window for song-editing
  *
- * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2011 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -28,6 +28,7 @@
 #include <QtGui/QLabel>
 #include <QtGui/QLayout>
 #include <QtGui/QMdiArea>
+#include <QtGui/QMdiSubWindow>
 #include <QtGui/QPainter>
 #include <QtGui/QScrollBar>
 #include <QtGui/QToolBar>
@@ -95,6 +96,10 @@ songEditor::songEditor( song * _song, songEditor * & _engine_ptr ) :
 
 	m_positionLine = new positionLine( this );
 
+
+	// let's get notified when loading a project
+	connect( m_s, SIGNAL( projectLoaded() ),
+				this, SLOT( adjustUiAfterProjectLoad() ) );
 
 	// create own toolbar
 	m_toolBar = new QWidget( this );
@@ -474,6 +479,22 @@ void songEditor::zoomingChanged()
 	m_s->m_playPos[song::Mode_PlaySong].m_timeLine->
 					setPixelsPerTact( pixelsPerTact() );
 	realignTracks();
+}
+
+
+
+
+void songEditor::adjustUiAfterProjectLoad()
+{
+	//if( isMaximized() )
+	{
+		// make sure to bring us to front as the song editor is the central
+		// widget in a song and when just opening a song in order to listen to
+		// it, it's very annyoing to manually bring up the song editor each time
+		engine::mainWindow()->workspace()->setActiveSubWindow(
+				qobject_cast<QMdiSubWindow *>( parentWidget() ) );
+	}
+	scrolled( 0 );
 }
 
 

@@ -1,7 +1,7 @@
 /*
  * song.cpp - root of the model tree
  *
- * Copyright (c) 2004-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2011 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -1006,16 +1006,14 @@ void song::loadProject( const QString & _file_name )
 
 	engine::projectJournal()->setJournalling( true );
 
+	emit projectLoaded();
+
 	m_loadingProject = false;
 	m_modified = false;
 
 	if( engine::mainWindow() )
 	{
 		engine::mainWindow()->resetWindowTitle();
-	}
-	if( engine::getSongEditor() )
-	{
-		engine::getSongEditor()->scrolled( 0 );
 	}
 }
 
