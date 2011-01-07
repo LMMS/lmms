@@ -2,6 +2,7 @@
  * patman.cpp - a GUS-compatible patch instrument plugin
  *
  * Copyright (c) 2007-2008 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
+ * Copyright (c) 2009-2011 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -303,7 +304,7 @@ patmanInstrument::LoadErrors patmanInstrument::loadPatch(
 				short sample;
 				if ( fread( &sample, 2, 1, fd ) != 1 )
 				{
-					delete wave_samples;
+					delete[] wave_samples;
 					fclose( fd );
 					return( LoadIO );
 				}
@@ -327,7 +328,7 @@ patmanInstrument::LoadErrors patmanInstrument::loadPatch(
 				char sample;
 				if ( fread( &sample, 1, 1, fd ) != 1 )
 				{
-					delete wave_samples;
+					delete[] wave_samples;
 					fclose( fd );
 					return( LoadIO );
 				}

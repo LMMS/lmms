@@ -3,8 +3,8 @@
 /*
  * main_window.cpp - implementation of LMMS-main-window
  *
- * Copyright (c) 2004-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ * Copyright (c) 2004-2011 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -477,9 +477,7 @@ void MainWindow::finalize( void )
 	m_toolBarLayout->addWidget( fx_mixer_window, 1, 5 );
 	m_toolBarLayout->addWidget( project_notes_window, 1, 6 );
 	m_toolBarLayout->addWidget( controllers_window, 1, 7 );
-	m_toolBarLayout->addWidget( controllers_window, 1, 7 );
 	m_toolBarLayout->setColumnStretch( 100, 1 );
-
 
 	// setup-dialog opened before?
 	if( !configManager::inst()->value( "app", "configured" ).toInt() )

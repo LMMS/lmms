@@ -2,7 +2,7 @@
  * InstrumentTrack.cpp - implementation of instrument-track-class
  *                        (window + data-structures)
  *
- * Copyright (c) 2004-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2011 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -632,7 +632,7 @@ bool InstrumentTrack::play( const midiTime & _start,
 		// get all notes from the given pattern...
 		const NoteVector & notes = p->notes();
 		// ...and set our index to zero
-		NoteVector::ConstIterator it = notes.begin();
+		NoteVector::ConstIterator nit = notes.begin();
 #if LMMS_SINGERBOT_SUPPORT
 		int note_idx = 0;
 #endif
@@ -644,21 +644,21 @@ bool InstrumentTrack::play( const midiTime & _start,
 		if( cur_start > 0 )
 		{
 			// skip notes which are posated before start-tact
-			while( it != notes.end() && ( *it )->pos() < cur_start )
+			while( nit != notes.end() && ( *nit )->pos() < cur_start )
 			{
 #if LMMS_SINGERBOT_SUPPORT
-				if( ( *it )->length() != 0 )
+				if( ( *nit )->length() != 0 )
 				{
 					++note_idx;
 				}
 #endif
-				++it;
+				++nit;
 			}
 		}
 
 		note * cur_note;
-		while( it != notes.end() &&
-					( cur_note = *it )->pos() == cur_start )
+		while( nit != notes.end() &&
+					( cur_note = *nit )->pos() == cur_start )
 		{
 			if( cur_note->length() != 0 )
 			{
@@ -681,7 +681,7 @@ bool InstrumentTrack::play( const midiTime & _start,
 				++note_idx;
 #endif
 			}
-			++it;
+			++nit;
 		}
 	}
 	return played_a_note;

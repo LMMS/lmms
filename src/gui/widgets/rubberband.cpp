@@ -2,7 +2,7 @@
  * rubberband.cpp - rubberband - either own implementation for Qt3 or wrapper
  *                               for Qt4
  *
- * Copyright (c) 2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2011 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -51,7 +51,7 @@ QVector<selectableObject *> rubberBand::selectedObjects() const
 	{
 		if( ( *it )->isSelected() == false )
 		{
-			so.erase( it );
+			it = so.erase( it );
 		}
 		else
 		{
