@@ -1040,7 +1040,7 @@ void OscilGen::adaptiveharmonicpostprocess(REALTYPE *f, int size)
         }
     }
 
-    delete (inf);
+    delete[] inf;
 }
 
 

@@ -1,7 +1,7 @@
 /*
  * MainWindow.cpp - implementation of LMMS' main window
  *
- * Copyright (c) 2004-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2011 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -480,7 +480,6 @@ void MainWindow::finalize()
 	gridButtons_layout->addWidget( automation_editor_window, 1, 4 );
 	gridButtons_layout->addWidget( fx_mixer_window, 1, 5 );
 	gridButtons_layout->addWidget( project_notes_window, 1, 6 );
-	gridButtons_layout->addWidget( controllers_window, 1, 7 );
 	gridButtons_layout->addWidget( controllers_window, 1, 7 );
 	gridButtons_layout->setColumnStretch( 100, 1 );
 

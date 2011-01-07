@@ -2,7 +2,7 @@
  * EffectRackView.cpp - view for effectChain model
  *
  * Copyright (c) 2006-2007 Danny McRae <khjklujn@netscape.net>
- * Copyright (c) 2008-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2011 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -188,7 +188,7 @@ void EffectRackView::update()
 							view_map[i] == false )
 		{
 			delete m_effectViews[i];
-			m_effectViews.erase( it );
+			it = m_effectViews.erase( it );
 		}
 		else
 		{
