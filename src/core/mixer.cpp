@@ -1,7 +1,7 @@
 /*
  * mixer.cpp - audio-device-independent mixer for LMMS
  *
- * Copyright (c) 2004-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2011 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -417,6 +417,11 @@ mixer::~mixer()
 	}
 
 	aligned_free( m_workingBuf );
+
+	for( int i = 0; i < 2; ++i )
+	{
+		delete[] m_inputBuffer[i];
+	}
 }
 
 
