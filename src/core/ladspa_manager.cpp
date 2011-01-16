@@ -3,6 +3,7 @@
  *                      of ladspa plugins
  *
  * Copyright (c) 2005-2008 Danny McRae <khjklujn@netscape.net>
+ * Copyright (c) 2011 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -23,7 +24,7 @@
  *
  */
 
-
+#include <QtCore/QDebug>
 #include <QtCore/QDir>
 #include <QtCore/QFileInfo>
 #include <QtCore/QLibrary>
@@ -82,6 +83,10 @@ ladspaManager::ladspaManager()
 					addPlugins( descriptorFunction,
 							f.fileName() );
 				}
+			}
+			else
+			{
+				qWarning() << plugin_lib.errorString();
 			}
 		}
 	}
