@@ -133,7 +133,7 @@ sf2Instrument::sf2Instrument( InstrumentTrack * _instrument_track ) :
 	InstrumentPlayHandle * iph = new InstrumentPlayHandle( this );
 	engine::mixer()->addPlayHandle( iph );
 
-	//loadFile( configManager::inst()->defaultSoundfont() );
+	loadFile( configManager::inst()->defaultSoundfont() );
 
 	updateSampleRate();
 	updateReverbOn();
