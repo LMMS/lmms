@@ -83,6 +83,11 @@ bool bbTrackContainer::play( midiTime _start, fpp_t _frames,
 
 void bbTrackContainer::updateAfterTrackAdd()
 {
+	if( numOfBBs() == 0 && !engine::getSong()->isLoadingProject() )
+	{
+		engine::getSong()->addBBTrack();
+	}
+
 	// make sure, new track(s) have TCOs for every beat/bassline
 	for( int i = 0; i < qMax<int>( 1, numOfBBs() ); ++i )
 	{
