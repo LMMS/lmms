@@ -2,6 +2,7 @@
  * ControllerView.cpp - view-component for an controller
  *
  * Copyright (c) 2008-2009 Paul Giblock <drfaygo/at/gmail.com>
+ * Copyright (c) 2011 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -52,8 +53,6 @@ ControllerView::ControllerView( Controller * _model, QWidget * _parent ) :
 {
 	setFixedSize( 210, 32 );
 
-	setAttribute( Qt::WA_OpaquePaintEvent, TRUE );
-
 	QPushButton * ctls_btn = new QPushButton( tr( "Controls" ), this );
 	
 	QFont f = ctls_btn->font();
@@ -68,7 +67,6 @@ ControllerView::ControllerView( Controller * _model, QWidget * _parent ) :
                 m_controllerDlg );
 	
 	Qt::WindowFlags flags = m_subWindow->windowFlags();
-	flags |= Qt::MSWindowsFixedSizeDialogHint;
 	flags &= ~Qt::WindowMaximizeButtonHint;
 	m_subWindow->setWindowFlags( flags );
 	m_subWindow->setFixedSize( m_subWindow->size() );
