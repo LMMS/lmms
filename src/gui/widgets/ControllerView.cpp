@@ -2,6 +2,7 @@
  * ControllerView.cpp - view-component for an controller
  *
  * Copyright (c) 2008-2009 Paul Giblock <drfaygo/at/gmail.com>
+ * Copyright (c) 2011 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -64,7 +65,6 @@ ControllerView::ControllerView( Controller * _model, QWidget * _parent ) :
 	m_subWindow = engine::mainWindow()->workspace()->addSubWindow( m_controllerDlg );
 
 	Qt::WindowFlags flags = m_subWindow->windowFlags();
-	flags |= Qt::MSWindowsFixedSizeDialogHint;
 	flags &= ~Qt::WindowMaximizeButtonHint;
 	m_subWindow->setWindowFlags( flags );
 	m_subWindow->setFixedSize( m_subWindow->size() );
