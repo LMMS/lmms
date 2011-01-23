@@ -2,7 +2,7 @@
  * ControllerRackView.cpp - view for song's controllers
  *
  * Copyright (c) 2008-2009 Paul Giblock <drfaygo/at/gmail.com>
- * Copyright (c) 2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2010-2011 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -82,9 +82,6 @@ ControllerRackView::ControllerRackView( ) :
 	flags &= ~Qt::WindowMaximizeButtonHint;
 	subWin->setWindowFlags( flags );
 	
-
-	subWin->layout()->setSizeConstraint( QLayout::SetMaximumSize );
-
 	parentWidget()->setAttribute( Qt::WA_DeleteOnClose, false );
 	parentWidget()->move( 880, 310 );
 }
