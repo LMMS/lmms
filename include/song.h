@@ -219,11 +219,12 @@ public slots:
 
 	void clearProject();
 
+	void addBBTrack();
+
 
 private slots:
 	void insertBar();
 	void removeBar();
-	void addBBTrack();
 	void addSampleTrack();
 	void addAutomationTrack();
 
