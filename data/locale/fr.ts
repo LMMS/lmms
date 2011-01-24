@@ -4543,7 +4543,7 @@ utilisez la molette de la souris pour régler le volume d&apos;un pas</translati
         <translation>Greffons d&apos;instrument</translation>
     </message>
     <message>
-        <source>Incomplete monophonic immitation tb303</source>
+        <source>Incomplete monophonic imitation tb303</source>
         <translation>Imitation incomplète de TB303 monophonique</translation>
     </message>
     <message>

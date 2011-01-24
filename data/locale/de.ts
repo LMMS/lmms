@@ -4453,7 +4453,7 @@ Lautstärke eines Steps kann mit Mausrad geändert werden</translation>
         <translation>Plugin um beliebige VST-Effekte in LMMS nutzen zu können.</translation>
     </message>
     <message>
-        <source>Incomplete monophonic immitation tb303</source>
+        <source>Incomplete monophonic imitation tb303</source>
         <translation>Unvollständiger monophonischer TB303-Klon</translation>
     </message>
     <message>

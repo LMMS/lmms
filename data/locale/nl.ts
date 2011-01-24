@@ -4437,7 +4437,7 @@ volume van de steps is met het muiswiel te veranderen</translation>
         <translation>Filter voor importeren van FL Studio Projecten in LMMS</translation>
     </message>
     <message>
-        <source>Incomplete monophonic immitation tb303</source>
+        <source>Incomplete monophonic imitation tb303</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
