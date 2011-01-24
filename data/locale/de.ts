@@ -6133,7 +6133,7 @@ Sie sollten diese Datei mit Hilfe anderer Software in ein von LMMS unterstützes
     </message>
     <message>
         <source>Actions for this track</source>
-        <translation>Aktionen für dise Spur</translation>
+        <translation>Aktionen für diese Spur</translation>
     </message>
     <message>
         <source>Mute</source>
