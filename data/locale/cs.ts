@@ -4943,7 +4943,7 @@ k nastavení zesílení kroku použijte kolečko myši</translation>
         <translation>VST host pro užití VST(i) pluginů v LMMS</translation>
     </message>
     <message>
-        <source>Incomplete monophonic immitation tb303</source>
+        <source>Incomplete monophonic imitation tb303</source>
         <translation>Nekompletní monofonní imitace tb303</translation>
     </message>
     <message>

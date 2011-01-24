@@ -4959,7 +4959,7 @@ la rotellina del mouse impostare il volume delle note</translation>
         <translation>Plugin per manipolare liberamente un&apos;uscita stereo</translation>
     </message>
     <message>
-        <source>Incomplete monophonic immitation tb303</source>
+        <source>Incomplete monophonic imitation tb303</source>
         <translation>Imitazione monofonica del tb303 incompleta</translation>
     </message>
     <message>

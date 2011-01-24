@@ -81,7 +81,7 @@ Plugin::Descriptor PLUGIN_EXPORT lb302_plugin_descriptor =
 	STRINGIFY( PLUGIN_NAME ),
 	"LB302",
 	QT_TRANSLATE_NOOP( "pluginBrowser",
-			"Incomplete monophonic immitation tb303" ),
+			"Incomplete monophonic imitation tb303" ),
 	"Paul Giblock <pgib/at/users.sf.net>",
 	0x0100,
 	Plugin::Instrument,

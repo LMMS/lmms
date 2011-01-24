@@ -4877,7 +4877,7 @@ use mouse wheel to set volume of a step</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Incomplete monophonic immitation tb303</source>
+        <source>Incomplete monophonic imitation tb303</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

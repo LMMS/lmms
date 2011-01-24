@@ -4880,7 +4880,7 @@ use mouse wheel to set volume of a step</source>
         <translation>기기 플러그인</translation>
     </message>
     <message>
-        <source>Incomplete monophonic immitation tb303</source>
+        <source>Incomplete monophonic imitation tb303</source>
         <translation></translation>
     </message>
     <message>

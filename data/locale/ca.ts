@@ -4950,7 +4950,7 @@ usa la roda del ratolí per a ajustar el volum d&apos;un pas</translation>
         <translation>Llista connectors LADSPA instal·lats</translation>
     </message>
     <message>
-        <source>Incomplete monophonic immitation tb303</source>
+        <source>Incomplete monophonic imitation tb303</source>
         <translation>Imitació monofònica incompleta tb303</translation>
     </message>
     <message>

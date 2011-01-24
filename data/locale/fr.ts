@@ -4878,8 +4878,8 @@ use mouse wheel to set volume of a step</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Incomplete monophonic immitation tb303</source>
-        <translation type="unfinished"></translation>
+        <source>Incomplete monophonic imitation tb303</source>
+        <translation>Imitation incomplète de TB303 monophonique</translation>
     </message>
     <message>
         <source>Plugin for freely manipulating stereo output</source>
