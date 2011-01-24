@@ -5,39 +5,35 @@
     <name>AboutDialog</name>
     <message>
         <source>About LMMS</source>
-        <translation type="unfinished"></translation>
+        <translation>Über LMMS</translation>
     </message>
     <message>
         <source>LMMS (Linux MultiMedia Studio)</source>
-        <translation type="unfinished"></translation>
+        <translation>LMMS (Linux MultiMedia Studio)</translation>
     </message>
     <message>
         <source>Version %1 (%2/%3, Qt %4, %5)</source>
-        <translation type="unfinished"></translation>
+        <translation>Version %1 (%2/%3, Qt %4, %5)</translation>
     </message>
     <message>
         <source>About</source>
-        <translation type="unfinished">Über</translation>
+        <translation>Über</translation>
     </message>
     <message>
         <source>LMMS - easy music production for everyone</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Copyright (c) 2004-2008, LMMS developers</source>
-        <translation type="unfinished"></translation>
+        <translation>LMMS - Musikproduktion für jedermann</translation>
     </message>
     <message>
         <source>http://lmms.sourceforge.net</source>
-        <translation type="unfinished"></translation>
+        <translation>http://lmms.sourceforge.net</translation>
     </message>
     <message>
         <source>Authors</source>
-        <translation type="unfinished"></translation>
+        <translation>Autoren</translation>
     </message>
     <message>
         <source>Translation</source>
-        <translation type="unfinished"></translation>
+        <translation>Übersetzung</translation>
     </message>
     <message>
         <source>Current language not translated (or native English).
@@ -47,6 +43,10 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>License</source>
+        <translation>Lizenz</translation>
+    </message>
+    <message>
+        <source>Copyright (c) 2004-2010, LMMS developers</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -289,10 +289,6 @@ If you&apos;re interested in translating LMMS in another language or want to imp
         <source>DEVICE</source>
         <translation>GERÄT</translation>
     </message>
-    <message>
-        <source>CHANNELS</source>
-        <translation>KANÄLE</translation>
-    </message>
 </context>
 <context>
     <name>AudioPulseAudio::setupWidget</name>
@@ -349,6 +345,146 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     <message>
         <source>Connect to controller...</source>
         <translation>Mit Controller verbinden...</translation>
+    </message>
+</context>
+<context>
+    <name>AutomationEditor</name>
+    <message>
+        <source>Play/pause current pattern (Space)</source>
+        <translation>Aktuellen Pattern abspielen/pausieren (Leertaste)</translation>
+    </message>
+    <message>
+        <source>Stop playing of current pattern (Space)</source>
+        <translation>Abspielen des aktuellen Patterns stoppen (Leertaste)</translation>
+    </message>
+    <message>
+        <source>Click here if you want to play the current pattern. This is useful while editing it.  The pattern is automatically looped when the end is reached.</source>
+        <translation>Klicken Sie hier, wenn Sie den aktuellen Pattern spielen wollen. Das ist nützlich beim Bearbeiten. Der Pattern wird automatisch wiederholt, wenn das Ende erreicht ist.</translation>
+    </message>
+    <message>
+        <source>Click here if you want to stop playing of the current pattern.</source>
+        <translation>Klicken Sie hier, wenn Sie das Abspielen des aktuellen Patterns stoppen wollen.</translation>
+    </message>
+    <message>
+        <source>Draw mode (Shift+D)</source>
+        <translation>Zeichnen-Modus (Umschalt+D)</translation>
+    </message>
+    <message>
+        <source>Erase mode (Shift+E)</source>
+        <translation>Radier-Modus (Umschalt+E)</translation>
+    </message>
+    <message>
+        <source>Select mode (Shift+S)</source>
+        <translation>Auswahl-Modus (Umschalt+S)</translation>
+    </message>
+    <message>
+        <source>Move selection mode (Shift+M)</source>
+        <translation>Auswahl-Verschieben-Modus (Umschalt+M)</translation>
+    </message>
+    <message>
+        <source>Click here and draw-mode will be activated. In this mode you can add and move single values.  This is the default mode which is used most of the time.  You can also press &apos;Shift+D&apos; on your keyboard to activate this mode.</source>
+        <translation>Klicken Sie hier, um den Zeichnen-Modus zu aktivieren. In diesem Modus können Sie einzelne Werte hinzufügen und verschieben. Das ist der Standard-Modus, der meistens benutzt wird. Sie können auch &apos;Umschalt+D&apos; auf Ihrer Tastatur drücken, um in diesen Modus zu gelangen.</translation>
+    </message>
+    <message>
+        <source>Click here and erase-mode will be activated. In this mode you can erase single values. You can also press &apos;Shift+E&apos; on your keyboard to activate this mode.</source>
+        <translation>Klicken Sie hier, um den Radier-Modus zu aktivieren. In diesem Modus können Sie einzelne Werte löschen. Sie können auch &apos;Umschalt+E&apos; auf Ihrer Tastatur drücken, um diesen Modus zu aktivieren.</translation>
+    </message>
+    <message>
+        <source>Click here and select-mode will be activated. In this mode you can select values. This is necessary if you want to cut, copy, paste, delete, or move values. You can also press &apos;Shift+S&apos; on your keyboard to activate this mode.</source>
+        <translation>Klicken Sie hier, um den Auswahl-Modus zu aktivieren. In diesem Modus können Sie Werte markieren. Das ist nötig, wenn Sie (mehrere) Werte ausschneiden, kopieren, einfügen, löschen oder verschieben wollen. Sie können auch &apos;Umschalt+S&apos; auf Ihrer Tastatur drücken, um diesen Modus zu aktivieren.</translation>
+    </message>
+    <message>
+        <source>If you click here, move-mode will be activated. In this mode you can move the values you selected in select-mode. You can also press &apos;Shift+M&apos; on your keyboard to activate this mode.</source>
+        <translation>Wenn Sie hier klicken, wird der Auswahl-Verschieben-Modus aktiviert. In diesem Modus können Sie die markierten Werte verschieben. Sie können auch &apos;Umschalt+M&apos; auf Ihrer Tastatur drücken, um diesen Modus zu aktivieren.</translation>
+    </message>
+    <message>
+        <source>Cut selected values (Ctrl+X)</source>
+        <translation>Ausgewählte Werte ausschneiden (Strg+X)</translation>
+    </message>
+    <message>
+        <source>Copy selected values (Ctrl+C)</source>
+        <translation>Ausgewählte Werte kopieren (Strg+C)</translation>
+    </message>
+    <message>
+        <source>Paste values from clipboard (Ctrl+V)</source>
+        <translation>Werte aus Zwischenablage einfügen (Strg+V)</translation>
+    </message>
+    <message>
+        <source>Click here and selected values will be cut into the clipboard.  You can paste them anywhere in any pattern by clicking on the paste button.</source>
+        <translation>Klicken Sie hier, um die markierten Werte auszuschneiden und in die Zwischenablage zu kopieren. Sie können diese dann überall, auch in einem anderen Pattern, wieder einfügen, indem Sie auf den Einfügen-Button klicken.</translation>
+    </message>
+    <message>
+        <source>Click here and selected values will be copied into the clipboard.  You can paste them anywhere in any pattern by clicking on the paste button.</source>
+        <translation>Klicken Sie hier, um die markierten Werte in die Zwischenablage zu kopieren. Sie können  diese dann überall, auch in einem anderen Pattern, wieder einfügen, indem Sie auf den Einfügen-Button klicken.</translation>
+    </message>
+    <message>
+        <source>Click here and the values from the clipboard will be pasted at the first visible measure.</source>
+        <translation>Klicken Sie hier, um die Werte in der Zwischenablage im ersten sichtbaren Takt einzufügen.</translation>
+    </message>
+    <message>
+        <source>Automation Editor - no pattern</source>
+        <translation>Automation-Editor - Kein Pattern</translation>
+    </message>
+    <message>
+        <source>Automation Editor - %1</source>
+        <translation>Automation-Editor - %1</translation>
+    </message>
+    <message>
+        <source>Please open an automation pattern with the context menu of a control!</source>
+        <translation>Bitte öffnen Sie einen Automation-Pattern mit Hilfe des Kontextmenüs eines Steuerelements!</translation>
+    </message>
+    <message>
+        <source>Values copied</source>
+        <translation>Werte kopiert</translation>
+    </message>
+    <message>
+        <source>All selected values were copied to the clipboard.</source>
+        <translation>Alle ausgewählten Werte wurden in die Zwischenablage kopiert.</translation>
+    </message>
+</context>
+<context>
+    <name>AutomationPattern</name>
+    <message>
+        <source>Drag a control while pressing &lt;Ctrl&gt;</source>
+        <translation>Ein Steuerelement mit &lt;Strg&gt; hier her ziehen</translation>
+    </message>
+</context>
+<context>
+    <name>AutomationPatternView</name>
+    <message>
+        <source>double-click to open this pattern in automation editor</source>
+        <translation>Doppelklick, um diesen Pattern im Automation-Editor zu öffnen</translation>
+    </message>
+    <message>
+        <source>Open in Automation editor</source>
+        <translation>Im Automation-Editor öffnen</translation>
+    </message>
+    <message>
+        <source>Clear</source>
+        <translation>Zurücksetzen</translation>
+    </message>
+    <message>
+        <source>Reset name</source>
+        <translation>Name zurücksetzen</translation>
+    </message>
+    <message>
+        <source>Change name</source>
+        <translation>Name ändern</translation>
+    </message>
+    <message>
+        <source>%1 Connections</source>
+        <translation>%1 Verbindungen</translation>
+    </message>
+    <message>
+        <source>Disconnect &quot;%1&quot;</source>
+        <translation>&quot;%1&quot; trennen</translation>
+    </message>
+</context>
+<context>
+    <name>AutomationTrack</name>
+    <message>
+        <source>Automation track</source>
+        <translation>Automation-Spur</translation>
     </message>
 </context>
 <context>
@@ -886,11 +1022,11 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     <name>EffectSelectDialog</name>
     <message>
         <source>Add effect</source>
-        <translation type="unfinished">Effekt hinzufügen</translation>
+        <translation>Effekt hinzufügen</translation>
     </message>
     <message>
         <source>Plugin description</source>
-        <translation type="unfinished"></translation>
+        <translation>Pluginbeschreibung</translation>
     </message>
 </context>
 <context>
@@ -1214,143 +1350,143 @@ Right clicking will bring up a context menu where you can change the order in wh
     <name>ExportProjectDialog</name>
     <message>
         <source>Export project</source>
-        <translation type="unfinished"></translation>
+        <translation>Projekt exportieren</translation>
     </message>
     <message>
         <source>Output</source>
-        <translation type="unfinished">Ausgang</translation>
+        <translation>Ausgabe</translation>
     </message>
     <message>
         <source>File format:</source>
-        <translation type="unfinished"></translation>
+        <translation>Dateiformat:</translation>
     </message>
     <message>
         <source>Samplerate:</source>
-        <translation type="unfinished"></translation>
+        <translation>Abtastrate:</translation>
     </message>
     <message>
         <source>44100 Hz</source>
-        <translation type="unfinished"></translation>
+        <translation>44100 Hz</translation>
     </message>
     <message>
         <source>48000 Hz</source>
-        <translation type="unfinished"></translation>
+        <translation>48000 Hz</translation>
     </message>
     <message>
         <source>88200 Hz</source>
-        <translation type="unfinished"></translation>
+        <translation>88200 Hz</translation>
     </message>
     <message>
         <source>96000 Hz</source>
-        <translation type="unfinished"></translation>
+        <translation>96000 Hz</translation>
     </message>
     <message>
         <source>192000 Hz</source>
-        <translation type="unfinished"></translation>
+        <translation>192000 Hz</translation>
     </message>
     <message>
         <source>Bitrate:</source>
-        <translation type="unfinished"></translation>
+        <translation>Bitrate:</translation>
     </message>
     <message>
         <source>64 KBit/s</source>
-        <translation type="unfinished"></translation>
+        <translation>64 KBit/s</translation>
     </message>
     <message>
         <source>128 KBit/s</source>
-        <translation type="unfinished"></translation>
+        <translation>128 KBit/s</translation>
     </message>
     <message>
         <source>160 KBit/s</source>
-        <translation type="unfinished"></translation>
+        <translation>160 KBit/s</translation>
     </message>
     <message>
         <source>192 KBit/s</source>
-        <translation type="unfinished"></translation>
+        <translation>192 KBit/s</translation>
     </message>
     <message>
         <source>256 KBit/s</source>
-        <translation type="unfinished"></translation>
+        <translation>256 KBit/s</translation>
     </message>
     <message>
         <source>320 KBit/s</source>
-        <translation type="unfinished"></translation>
+        <translation>320 KBit/s</translation>
     </message>
     <message>
         <source>Depth:</source>
-        <translation type="unfinished"></translation>
+        <translation>Genauigkeit:</translation>
     </message>
     <message>
         <source>16 Bit Integer</source>
-        <translation type="unfinished"></translation>
+        <translation>16 Bit Ganzzahlen</translation>
     </message>
     <message>
         <source>32 Bit Float</source>
-        <translation type="unfinished"></translation>
+        <translation>32-Bit-Gleitkommazahlen</translation>
     </message>
     <message>
         <source>Please note that not all of the parameters above apply for all file formats.</source>
-        <translation type="unfinished"></translation>
+        <translation>Bitte beachten Sie, dass nicht alle der obigen Parameter für alle Dateiformate relevant sind.</translation>
     </message>
     <message>
         <source>Quality settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Qualitätseinstellungen</translation>
     </message>
     <message>
         <source>Interpolation:</source>
-        <translation type="unfinished"></translation>
+        <translation>Interpolation:</translation>
     </message>
     <message>
         <source>Zero Order Hold</source>
-        <translation type="unfinished"></translation>
+        <translation>Zero Order Hold</translation>
     </message>
     <message>
         <source>Sinc Fastest</source>
-        <translation type="unfinished"></translation>
+        <translation>Sinc - am schnellsten</translation>
     </message>
     <message>
         <source>Sinc Medium (recommended)</source>
-        <translation type="unfinished"></translation>
+        <translation>Sinc - Normal (empfohlen)</translation>
     </message>
     <message>
         <source>Sinc Best (very slow!)</source>
-        <translation type="unfinished"></translation>
+        <translation>Sinc - am besten (sehr langsam!)</translation>
     </message>
     <message>
         <source>Oversampling (use with care!):</source>
-        <translation type="unfinished"></translation>
+        <translation>Überabtastung (oversampling) (mit Vorsicht nutzen!):</translation>
     </message>
     <message>
         <source>1x (None)</source>
-        <translation type="unfinished"></translation>
+        <translation>1x (keine)</translation>
     </message>
     <message>
         <source>2x</source>
-        <translation type="unfinished"></translation>
+        <translation>2x</translation>
     </message>
     <message>
         <source>4x</source>
-        <translation type="unfinished"></translation>
+        <translation>4x</translation>
     </message>
     <message>
         <source>8x</source>
-        <translation type="unfinished"></translation>
+        <translation>8x</translation>
     </message>
     <message>
         <source>Sample-exact controllers</source>
-        <translation type="unfinished"></translation>
+        <translation>Sample-genaue Controller</translation>
     </message>
     <message>
         <source>Alias-free oscillators</source>
-        <translation type="unfinished"></translation>
+        <translation>Alias-freie Oszillatoren</translation>
     </message>
     <message>
         <source>Start</source>
-        <translation type="unfinished"></translation>
+        <translation>Start</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Abbrechen</translation>
+        <translation>Abbrechen</translation>
     </message>
 </context>
 <context>
@@ -1380,7 +1516,7 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>FX Fader %1</source>
-        <translation type="unfinished"></translation>
+        <translation>FX-Schieber %1</translation>
     </message>
     <message>
         <source>Mute</source>
@@ -1702,7 +1838,7 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>Save current channel settings in a preset-file</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktuelle Instrumenteinstellungen in einer Presetdatei speichern</translation>
     </message>
 </context>
 <context>
@@ -1796,7 +1932,7 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>Base amount:</source>
-        <translation type="unfinished"></translation>
+        <translation>Grundstärke:</translation>
     </message>
     <message>
         <source>todo</source>
@@ -1828,7 +1964,7 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>PHS</source>
-        <translation type="unfinished"></translation>
+        <translation>PHS</translation>
     </message>
     <message>
         <source>Phase offset:</source>
@@ -2342,7 +2478,7 @@ Bitte besuchen Sie http://lmms.sf.net/wiki für Dokumentationen über LMMS.</tra
     </message>
     <message>
         <source>Base amount:</source>
-        <translation type="unfinished"></translation>
+        <translation>Grundstärke:</translation>
     </message>
     <message>
         <source>AMT</source>
@@ -2357,8 +2493,16 @@ Bitte besuchen Sie http://lmms.sf.net/wiki für Dokumentationen über LMMS.</tra
         <translation>DECAY</translation>
     </message>
     <message>
-        <source>Release decay (not implemented):</source>
-        <translation type="unfinished"></translation>
+        <source>ATTACK</source>
+        <translation>ATTACK</translation>
+    </message>
+    <message>
+        <source>Attack:</source>
+        <translation>Anschwellzeit (attack):</translation>
+    </message>
+    <message>
+        <source>Release:</source>
+        <translation>Ausklingzeit (release):</translation>
     </message>
 </context>
 <context>
@@ -2376,8 +2520,12 @@ Bitte besuchen Sie http://lmms.sf.net/wiki für Dokumentationen über LMMS.</tra
         <translation>Ausgang stummschalten</translation>
     </message>
     <message>
-        <source>Release decay</source>
-        <translation type="unfinished"></translation>
+        <source>Attack</source>
+        <translation>Anschwellzeit (attack)</translation>
+    </message>
+    <message>
+        <source>Release</source>
+        <translation>Ausklingzeit (release)</translation>
     </message>
 </context>
 <context>
@@ -2732,6 +2880,13 @@ Grund: &quot;%2&quot;</translation>
     </message>
 </context>
 <context>
+    <name>VstEffectControlDialog</name>
+    <message>
+        <source>Show/hide VST FX GUI</source>
+        <translation>VST-Effekt-GUI anzeigen/verbergen</translation>
+    </message>
+</context>
+<context>
     <name>VstPlugin</name>
     <message>
         <source>Loading plugin</source>
@@ -2753,6 +2908,41 @@ Wenn es mit anderer VST-Software unter Linux funktioniert, kontaktieren Sie bitt
     </message>
 </context>
 <context>
+    <name>ZynAddSubFxInstrument</name>
+    <message>
+        <source>Portamento</source>
+        <translation>Portamento</translation>
+    </message>
+    <message>
+        <source>Filter Frequency</source>
+        <translation>Filterfrequenz</translation>
+    </message>
+    <message>
+        <source>Filter Resonance</source>
+        <translation>Filterresonanz</translation>
+    </message>
+    <message>
+        <source>Bandwidth</source>
+        <translation>Bandbreite</translation>
+    </message>
+    <message>
+        <source>FM Gain</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Resonance Center Frequency</source>
+        <translation>Zentrale Resonanzfrequenz</translation>
+    </message>
+    <message>
+        <source>Resonance Bandwidth</source>
+        <translation>Resonanzbandbreite</translation>
+    </message>
+    <message>
+        <source>Forward MIDI Control Change Events</source>
+        <translation>MIDI-Control-Change-Ereignisse weiterleiten</translation>
+    </message>
+</context>
+<context>
     <name>ZynAddSubFxView</name>
     <message>
         <source>Show GUI</source>
@@ -2761,6 +2951,66 @@ Wenn es mit anderer VST-Software unter Linux funktioniert, kontaktieren Sie bitt
     <message>
         <source>Click here to show or hide the graphical user interface (GUI) of ZynAddSubFX.</source>
         <translation>Klicken Sie hier, um die grafische Oberfläche von ZynAddSubFX anzuzeigen bzw. auszublenden.</translation>
+    </message>
+    <message>
+        <source>Portamento:</source>
+        <translation>Portamento:</translation>
+    </message>
+    <message>
+        <source>PORT</source>
+        <translation>PORT</translation>
+    </message>
+    <message>
+        <source>Filter Frequency:</source>
+        <translation>Filterfrequenz:</translation>
+    </message>
+    <message>
+        <source>FREQ</source>
+        <translation>FREQ</translation>
+    </message>
+    <message>
+        <source>Filter Resonance:</source>
+        <translation>Filterresonanz:</translation>
+    </message>
+    <message>
+        <source>RES</source>
+        <translation>RES</translation>
+    </message>
+    <message>
+        <source>Bandwidth:</source>
+        <translation>Bandbreite:</translation>
+    </message>
+    <message>
+        <source>BW</source>
+        <translation>BW</translation>
+    </message>
+    <message>
+        <source>FM Gain:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>FM GAIN</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Resonance center frequency:</source>
+        <translation>Zentrale Resonanzfrequenz:</translation>
+    </message>
+    <message>
+        <source>RES CF</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Resonance bandwidth:</source>
+        <translation>Resonanzbandbreite:</translation>
+    </message>
+    <message>
+        <source>RES BW</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Forward MIDI Control Changes</source>
+        <translation>MIDI-Control-Änderungen weiterleiten</translation>
     </message>
 </context>
 <context>
@@ -2784,146 +3034,6 @@ Wenn es mit anderer VST-Software unter Linux funktioniert, kontaktieren Sie bitt
     <message>
         <source>Loop</source>
         <translation>Wiederholen</translation>
-    </message>
-</context>
-<context>
-    <name>automationEditor</name>
-    <message>
-        <source>Play/pause current pattern (Space)</source>
-        <translation>Aktuellen Pattern abspielen/pausieren (Leertaste)</translation>
-    </message>
-    <message>
-        <source>Stop playing of current pattern (Space)</source>
-        <translation>Abspielen des aktuellen Patterns stoppen (Leertaste)</translation>
-    </message>
-    <message>
-        <source>Cut selected values (Ctrl+X)</source>
-        <translation>Ausgewählte Werte ausschneiden (Strg+X)</translation>
-    </message>
-    <message>
-        <source>Copy selected values (Ctrl+C)</source>
-        <translation>Ausgewählte Werte kopieren (Strg+C)</translation>
-    </message>
-    <message>
-        <source>Paste values from clipboard (Ctrl+V)</source>
-        <translation>Werte aus Zwischenablage einfügen (Strg+V)</translation>
-    </message>
-    <message>
-        <source>Automation Editor - no pattern</source>
-        <translation>Automation-Editor - Kein Pattern</translation>
-    </message>
-    <message>
-        <source>Automation Editor - %1</source>
-        <translation>Automation-Editor - %1</translation>
-    </message>
-    <message>
-        <source>Please open an automation pattern with the context menu of a control!</source>
-        <translation>Bitte öffnen Sie einen Automation-Pattern mit Hilfe des Kontextmenüs eines Steuerelements!</translation>
-    </message>
-    <message>
-        <source>Values copied</source>
-        <translation>Werte kopiert</translation>
-    </message>
-    <message>
-        <source>All selected values were copied to the clipboard.</source>
-        <translation>Alle ausgewählten Werte wurden in die Zwischenablage kopiert.</translation>
-    </message>
-    <message>
-        <source>Draw mode (Shift+D)</source>
-        <translation>Zeichnen-Modus (Umschalt+D)</translation>
-    </message>
-    <message>
-        <source>Erase mode (Shift+E)</source>
-        <translation>Radier-Modus (Umschalt+E)</translation>
-    </message>
-    <message>
-        <source>Select mode (Shift+S)</source>
-        <translation>Auswahl-Modus (Umschalt+S)</translation>
-    </message>
-    <message>
-        <source>Move selection mode (Shift+M)</source>
-        <translation>Auswahl-Verschieben-Modus (Umschalt+M)</translation>
-    </message>
-    <message>
-        <source>If you click here, move-mode will be activated. In this mode you can move the values you selected in select-mode. You can also press &apos;Shift+M&apos; on your keyboard to activate this mode.</source>
-        <translation>Wenn Sie hier klicken, wird der Auswahl-Verschieben-Modus aktiviert. In diesem Modus können Sie die markierten Werte verschieben. Sie können auch &apos;Umschalt+M&apos; auf Ihrer Tastatur drücken, um diesen Modus zu aktivieren.</translation>
-    </message>
-    <message>
-        <source>Click here if you want to play the current pattern. This is useful while editing it.  The pattern is automatically looped when the end is reached.</source>
-        <translation>Klicken Sie hier, wenn Sie den aktuellen Pattern spielen wollen. Das ist nützlich beim Bearbeiten. Der Pattern wird automatisch wiederholt, wenn das Ende erreicht ist.</translation>
-    </message>
-    <message>
-        <source>Click here if you want to stop playing of the current pattern.</source>
-        <translation>Klicken Sie hier, wenn Sie das Abspielen des aktuellen Patterns stoppen wollen.</translation>
-    </message>
-    <message>
-        <source>Click here and draw-mode will be activated. In this mode you can add and move single values.  This is the default mode which is used most of the time.  You can also press &apos;Shift+D&apos; on your keyboard to activate this mode.</source>
-        <translation>Klicken Sie hier, um den Zeichnen-Modus zu aktivieren. In diesem Modus können Sie einzelne Werte hinzufügen und verschieben. Das ist der Standard-Modus, der meistens benutzt wird. Sie können auch &apos;Umschalt+D&apos; auf Ihrer Tastatur drücken, um in diesen Modus zu gelangen.</translation>
-    </message>
-    <message>
-        <source>Click here and erase-mode will be activated. In this mode you can erase single values. You can also press &apos;Shift+E&apos; on your keyboard to activate this mode.</source>
-        <translation>Klicken Sie hier, um den Radier-Modus zu aktivieren. In diesem Modus können Sie einzelne Werte löschen. Sie können auch &apos;Umschalt+E&apos; auf Ihrer Tastatur drücken, um diesen Modus zu aktivieren.</translation>
-    </message>
-    <message>
-        <source>Click here and select-mode will be activated. In this mode you can select values. This is necessary if you want to cut, copy, paste, delete, or move values. You can also press &apos;Shift+S&apos; on your keyboard to activate this mode.</source>
-        <translation>Klicken Sie hier, um den Auswahl-Modus zu aktivieren. In diesem Modus können Sie Werte markieren. Das ist nötig, wenn Sie (mehrere) Werte ausschneiden, kopieren, einfügen, löschen oder verschieben wollen. Sie können auch &apos;Umschalt+S&apos; auf Ihrer Tastatur drücken, um diesen Modus zu aktivieren.</translation>
-    </message>
-    <message>
-        <source>Click here and selected values will be cut into the clipboard.  You can paste them anywhere in any pattern by clicking on the paste button.</source>
-        <translation>Klicken Sie hier, um die markierten Werte auszuschneiden und in die Zwischenablage zu kopieren. Sie können diese dann überall, auch in einem anderen Pattern, wieder einfügen, indem Sie auf den Einfügen-Button klicken.</translation>
-    </message>
-    <message>
-        <source>Click here and selected values will be copied into the clipboard.  You can paste them anywhere in any pattern by clicking on the paste button.</source>
-        <translation>Klicken Sie hier, um die markierten Werte in die Zwischenablage zu kopieren. Sie können  diese dann überall, auch in einem anderen Pattern, wieder einfügen, indem Sie auf den Einfügen-Button klicken.</translation>
-    </message>
-    <message>
-        <source>Click here and the values from the clipboard will be pasted at the first visible measure.</source>
-        <translation>Klicken Sie hier, um die Werte in der Zwischenablage im ersten sichtbaren Takt einzufügen.</translation>
-    </message>
-</context>
-<context>
-    <name>automationPattern</name>
-    <message>
-        <source>Drag a control while pressing &lt;Ctrl&gt;</source>
-        <translation>Ein Steuerelement mit &lt;Strg&gt; hier her ziehen</translation>
-    </message>
-</context>
-<context>
-    <name>automationPatternView</name>
-    <message>
-        <source>double-click to open this pattern in automation editor</source>
-        <translation>Doppelklick, um diesen Pattern im Automation-Editor zu öffnen</translation>
-    </message>
-    <message>
-        <source>Open in Automation editor</source>
-        <translation>Im Automation-Editor öffnen</translation>
-    </message>
-    <message>
-        <source>Clear</source>
-        <translation>Zurücksetzen</translation>
-    </message>
-    <message>
-        <source>Reset name</source>
-        <translation>Name zurücksetzen</translation>
-    </message>
-    <message>
-        <source>Change name</source>
-        <translation>Name ändern</translation>
-    </message>
-    <message>
-        <source>Disconnect &quot;%1&quot;</source>
-        <translation>&quot;%1&quot; trennen</translation>
-    </message>
-    <message>
-        <source>%1 Connections</source>
-        <translation>%1 Verbindungen</translation>
-    </message>
-</context>
-<context>
-    <name>automationTrack</name>
-    <message>
-        <source>Automation track</source>
-        <translation>Automation-Spur</translation>
     </message>
 </context>
 <context>
@@ -3023,6 +3133,10 @@ Wenn es mit anderer VST-Software unter Linux funktioniert, kontaktieren Sie bitt
     <message>
         <source>Beat/Bassline %1</source>
         <translation>Beat/Bassline %1</translation>
+    </message>
+    <message>
+        <source>Clone of %1</source>
+        <translation>Klon von %1</translation>
     </message>
 </context>
 <context>
@@ -3133,7 +3247,7 @@ Bitte stellen Sie sicher, dass Sie Schreibrechte auf diese Datei und das Verzeic
     </message>
     <message>
         <source>Export project to %1</source>
-        <translation type="unfinished">Projekt nach %1 exportieren</translation>
+        <translation>Projekt nach %1 exportieren</translation>
     </message>
 </context>
 <context>
@@ -4375,7 +4489,7 @@ Lautstärke eines Steps kann mit Mausrad geändert werden</translation>
     </message>
     <message>
         <source>Note Volume</source>
-        <translation type="unfinished"></translation>
+        <translation>Notenlautstärke</translation>
     </message>
     <message>
         <source>Note Panning</source>
@@ -4925,6 +5039,10 @@ Latenz: %2 ms</translation>
         <source>Choose background artwork</source>
         <translation>Hintergrundbild wählen</translation>
     </message>
+    <message>
+        <source>One instrument track window mode</source>
+        <translation>Instrumente im Ein-Fenster-Modus</translation>
+    </message>
 </context>
 <context>
     <name>sf2Instrument</name>
@@ -5143,7 +5261,7 @@ Latenz: %2 ms</translation>
     </message>
     <message>
         <source>Coarse:</source>
-        <translation type="unfinished"></translation>
+        <translation>Grob:</translation>
     </message>
     <message>
         <source>Pulse Wave</source>
@@ -5348,7 +5466,7 @@ Bitte stellen Sie sicher, dass Sie Schreibrechte auf diese Datei besitzen und ve
     <message>
         <source>Could not open file %1. You probably have no permissions to read this file.
  Please make sure to have at least read permissions to the file and try again.</source>
-        <translation type="unfinished"></translation>
+        <translation>Konnte die Datei %1 nicht öffnen. Sie sind wahrscheinlich nicht berechtigt, diese Datei zu lesen. Bitte stellen Sie sicher, dass Sie wenigstens Leserechte auf diese Datei besitzen und versuchen es erneut.</translation>
     </message>
     <message>
         <source>Error in file</source>
