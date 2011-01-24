@@ -24,10 +24,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Copyright (c) 2004-2008, LMMS developers</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>http://lmms.sourceforge.net</source>
         <translation type="unfinished"></translation>
     </message>
@@ -47,6 +43,10 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>License</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Copyright (c) 2004-2010, LMMS developers</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -289,10 +289,6 @@ If you&apos;re interested in translating LMMS in another language or want to imp
         <source>DEVICE</source>
         <translation type="unfinished">УСТРОЙСТВО</translation>
     </message>
-    <message>
-        <source>CHANNELS</source>
-        <translation type="unfinished">ЧИСЛО КАНАЛОВ</translation>
-    </message>
 </context>
 <context>
     <name>AudioPulseAudio::setupWidget</name>
@@ -349,6 +345,150 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     <message>
         <source>Connect to controller...</source>
         <translation type="unfinished">Соединить с контроллером...</translation>
+    </message>
+</context>
+<context>
+    <name>AutomationEditor</name>
+    <message>
+        <source>Play/pause current pattern (Space)</source>
+        <translation type="unfinished">Воспроизведение ткущего шаблона/пауза (Пробел)</translation>
+    </message>
+    <message>
+        <source>Stop playing of current pattern (Space)</source>
+        <translation type="unfinished">Остановить воспроизвдение шаблона (Пробел)</translation>
+    </message>
+    <message>
+        <source>Click here if you want to play the current pattern. This is useful while editing it.  The pattern is automatically looped when the end is reached.</source>
+        <translation type="unfinished">Нажмите здесь чтобы проиграть текущий шаблон. Это может пригодиться при его редактировании. Шаблон автоматически повторяется при достижении конца.</translation>
+    </message>
+    <message>
+        <source>Click here if you want to stop playing of the current pattern.</source>
+        <translation type="unfinished">Нажмите здесь, если вы хотите приостановить/продолжить воспроизведение текущего шаблона.</translation>
+    </message>
+    <message>
+        <source>Draw mode (Shift+D)</source>
+        <translation type="unfinished">Режим рисования (Shift+D)</translation>
+    </message>
+    <message>
+        <source>Erase mode (Shift+E)</source>
+        <translation type="unfinished">Режим стирания нот (Shift+E)</translation>
+    </message>
+    <message>
+        <source>Select mode (Shift+S)</source>
+        <translation type="unfinished">Режим выбора нот (Shift+S)</translation>
+    </message>
+    <message>
+        <source>Move selection mode (Shift+M)</source>
+        <translation type="unfinished">Режим перемещения  выбранных нот (Shift+M)</translation>
+    </message>
+    <message>
+        <source>Click here and draw-mode will be activated. In this mode you can add and move single values.  This is the default mode which is used most of the time.  You can also press &apos;Shift+D&apos; on your keyboard to activate this mode.</source>
+        <translation type="unfinished">При нажатии на эту кнопку активируется режим рисования нот, который является режимом по умолчанию и используется большую часть времени. В этом режиме вы можете добавлять/перемещать и изменять длительность одиночных нот.
+Для включения этого режима можно использовать комбинацию клавиш Shift+D.</translation>
+    </message>
+    <message>
+        <source>Click here and erase-mode will be activated. In this mode you can erase single values. You can also press &apos;Shift+E&apos; on your keyboard to activate this mode.</source>
+        <translation type="unfinished">При нажатии на эту кнопку активируется режим стирания. В этом режиме вы можете стирать ноты по одной.
+Для включения этого режима можно использовать комбинацию клавиш Shift+E.</translation>
+    </message>
+    <message>
+        <source>Click here and select-mode will be activated. In this mode you can select values. This is necessary if you want to cut, copy, paste, delete, or move values. You can also press &apos;Shift+S&apos; on your keyboard to activate this mode.</source>
+        <translation type="unfinished">При нажатии на эту кнопку активируется режим выбора нот. В этом режиме вы можете выбирать ноты для последующих действий. Это необходимо, если вы хотите вырезать, копировать, вставлять или перемещать сразу несколько нот.
+Для включения этого режима можно использовать комбинацию клавиш Shift+S.</translation>
+    </message>
+    <message>
+        <source>If you click here, move-mode will be activated. In this mode you can move the values you selected in select-mode. You can also press &apos;Shift+M&apos; on your keyboard to activate this mode.</source>
+        <translation type="unfinished">При нажатии на эту кнопку активируется режим перемещения. В этом режиме вы можете перемещать выбранные ранее (в режиме выбора) ноты.
+Для включения этого режима можно использовать комбинацию клавиш Shift+E.</translation>
+    </message>
+    <message>
+        <source>Cut selected values (Ctrl+X)</source>
+        <translation type="unfinished">Вырезать выбранные ноты (Ctrl+X)</translation>
+    </message>
+    <message>
+        <source>Copy selected values (Ctrl+C)</source>
+        <translation type="unfinished">Копировать выбранные ноты в буфер (Ctrl+C)</translation>
+    </message>
+    <message>
+        <source>Paste values from clipboard (Ctrl+V)</source>
+        <translation type="unfinished">Вставить значения из буфера (Ctrl+V)</translation>
+    </message>
+    <message>
+        <source>Click here and selected values will be cut into the clipboard.  You can paste them anywhere in any pattern by clicking on the paste button.</source>
+        <translation type="unfinished">При нажатии на эту кнопку выделеные ноты будут перемещены в буфер. Позже вы можете вставить их в любое место любого шаблона с помощью кнопки &quot;Вставить&quot;.</translation>
+    </message>
+    <message>
+        <source>Click here and selected values will be copied into the clipboard.  You can paste them anywhere in any pattern by clicking on the paste button.</source>
+        <translation type="unfinished">При нажатии на эту кнопку выделеные ноты будут скопированы в буфер. Позже вы можете вставить их в любое место любого шаблона с помощью кнопки &quot;Вставить&quot;.</translation>
+    </message>
+    <message>
+        <source>Click here and the values from the clipboard will be pasted at the first visible measure.</source>
+        <translation type="unfinished">При нажатии на эту кнопку ноты из буфера будут вставлены в превый видимый такт.</translation>
+    </message>
+    <message>
+        <source>Automation Editor - no pattern</source>
+        <translation type="unfinished">Редактор временных зависимостей — нет шаблона</translation>
+    </message>
+    <message>
+        <source>Automation Editor - %1</source>
+        <translation type="unfinished">Редактор временных зависимостей — %1</translation>
+    </message>
+    <message>
+        <source>Please open an automation pattern with the context menu of a control!</source>
+        <translation type="unfinished">Открывайте редатор временных зависимостей через контекстное меню регулятора!</translation>
+    </message>
+    <message>
+        <source>Values copied</source>
+        <translation type="unfinished">Значения скопированы</translation>
+    </message>
+    <message>
+        <source>All selected values were copied to the clipboard.</source>
+        <translation type="unfinished">Выбранные значения скопированы в буфер обмена.</translation>
+    </message>
+</context>
+<context>
+    <name>AutomationPattern</name>
+    <message>
+        <source>Drag a control while pressing &lt;Ctrl&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>AutomationPatternView</name>
+    <message>
+        <source>double-click to open this pattern in automation editor</source>
+        <translation type="unfinished">Дважды щёлкните мышью чтобы настроить зависимость от времени для этого шаблона</translation>
+    </message>
+    <message>
+        <source>Open in Automation editor</source>
+        <translation type="unfinished">Настройка зависимости от времени</translation>
+    </message>
+    <message>
+        <source>Clear</source>
+        <translation type="unfinished">Очистить</translation>
+    </message>
+    <message>
+        <source>Reset name</source>
+        <translation type="unfinished">Сбросить название</translation>
+    </message>
+    <message>
+        <source>Change name</source>
+        <translation type="unfinished">Переименовать</translation>
+    </message>
+    <message>
+        <source>%1 Connections</source>
+        <translation type="unfinished">Соединения %1</translation>
+    </message>
+    <message>
+        <source>Disconnect &quot;%1&quot;</source>
+        <translation type="unfinished">Отсоединить «%1»</translation>
+    </message>
+</context>
+<context>
+    <name>AutomationTrack</name>
+    <message>
+        <source>Automation track</source>
+        <translation type="unfinished">Дорожка автоматизации</translation>
     </message>
 </context>
 <context>
@@ -2371,8 +2511,16 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
         <translation type="unfinished">СПАД</translation>
     </message>
     <message>
-        <source>Release decay (not implemented):</source>
+        <source>ATTACK</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Attack:</source>
+        <translation type="unfinished">Длительность нарастания:</translation>
+    </message>
+    <message>
+        <source>Release:</source>
+        <translation type="unfinished">Длительность исчезновения:</translation>
     </message>
 </context>
 <context>
@@ -2390,8 +2538,12 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
         <translation type="unfinished">Заглушить</translation>
     </message>
     <message>
-        <source>Release decay</source>
-        <translation type="unfinished"></translation>
+        <source>Attack</source>
+        <translation type="unfinished">Длительность нарастания</translation>
+    </message>
+    <message>
+        <source>Release</source>
+        <translation type="unfinished">Длительность исчезновения</translation>
     </message>
 </context>
 <context>
@@ -2746,6 +2898,13 @@ Reason: &quot;%2&quot;</source>
     </message>
 </context>
 <context>
+    <name>VstEffectControlDialog</name>
+    <message>
+        <source>Show/hide VST FX GUI</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>VstPlugin</name>
     <message>
         <source>Loading plugin</source>
@@ -2767,6 +2926,41 @@ If it runs with other VST-software under Linux, please contact an LMMS-developer
     </message>
 </context>
 <context>
+    <name>ZynAddSubFxInstrument</name>
+    <message>
+        <source>Portamento</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Filter Frequency</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Filter Resonance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bandwidth</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>FM Gain</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Resonance Center Frequency</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Resonance Bandwidth</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Forward MIDI Control Change Events</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>ZynAddSubFxView</name>
     <message>
         <source>Show GUI</source>
@@ -2774,6 +2968,66 @@ If it runs with other VST-software under Linux, please contact an LMMS-developer
     </message>
     <message>
         <source>Click here to show or hide the graphical user interface (GUI) of ZynAddSubFX.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Portamento:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PORT</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Filter Frequency:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>FREQ</source>
+        <translation type="unfinished">ЧАСТ</translation>
+    </message>
+    <message>
+        <source>Filter Resonance:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>RES</source>
+        <translation type="unfinished">УСИЛ</translation>
+    </message>
+    <message>
+        <source>Bandwidth:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>BW</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>FM Gain:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>FM GAIN</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Resonance center frequency:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>RES CF</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Resonance bandwidth:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>RES BW</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Forward MIDI Control Changes</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2798,150 +3052,6 @@ If it runs with other VST-software under Linux, please contact an LMMS-developer
     <message>
         <source>Loop</source>
         <translation>Повторять</translation>
-    </message>
-</context>
-<context>
-    <name>automationEditor</name>
-    <message>
-        <source>Play/pause current pattern (Space)</source>
-        <translation>Воспроизведение ткущего шаблона/пауза (Пробел)</translation>
-    </message>
-    <message>
-        <source>Stop playing of current pattern (Space)</source>
-        <translation>Остановить воспроизвдение шаблона (Пробел)</translation>
-    </message>
-    <message>
-        <source>Draw mode (Shift+D)</source>
-        <translation>Режим рисования (Shift+D)</translation>
-    </message>
-    <message>
-        <source>Erase mode (Shift+E)</source>
-        <translation>Режим стирания нот (Shift+E)</translation>
-    </message>
-    <message>
-        <source>Select mode (Shift+S)</source>
-        <translation>Режим выбора нот (Shift+S)</translation>
-    </message>
-    <message>
-        <source>Move selection mode (Shift+M)</source>
-        <translation>Режим перемещения  выбранных нот (Shift+M)</translation>
-    </message>
-    <message>
-        <source>If you click here, move-mode will be activated. In this mode you can move the values you selected in select-mode. You can also press &apos;Shift+M&apos; on your keyboard to activate this mode.</source>
-        <translation>При нажатии на эту кнопку активируется режим перемещения. В этом режиме вы можете перемещать выбранные ранее (в режиме выбора) ноты.
-Для включения этого режима можно использовать комбинацию клавиш Shift+E.</translation>
-    </message>
-    <message>
-        <source>Cut selected values (Ctrl+X)</source>
-        <translation>Вырезать выбранные ноты (Ctrl+X)</translation>
-    </message>
-    <message>
-        <source>Copy selected values (Ctrl+C)</source>
-        <translation>Копировать выбранные ноты в буфер (Ctrl+C)</translation>
-    </message>
-    <message>
-        <source>Paste values from clipboard (Ctrl+V)</source>
-        <translation>Вставить значения из буфера (Ctrl+V)</translation>
-    </message>
-    <message>
-        <source>Automation Editor - no pattern</source>
-        <translation>Редактор временных зависимостей — нет шаблона</translation>
-    </message>
-    <message>
-        <source>Automation Editor - %1</source>
-        <translation>Редактор временных зависимостей — %1</translation>
-    </message>
-    <message>
-        <source>Please open an automation pattern with the context menu of a control!</source>
-        <translation>Открывайте редатор временных зависимостей через контекстное меню регулятора!</translation>
-    </message>
-    <message>
-        <source>Values copied</source>
-        <translation>Значения скопированы</translation>
-    </message>
-    <message>
-        <source>All selected values were copied to the clipboard.</source>
-        <translation>Выбранные значения скопированы в буфер обмена.</translation>
-    </message>
-    <message>
-        <source>Click here if you want to play the current pattern. This is useful while editing it.  The pattern is automatically looped when the end is reached.</source>
-        <translation>Нажмите здесь чтобы проиграть текущий шаблон. Это может пригодиться при его редактировании. Шаблон автоматически повторяется при достижении конца.</translation>
-    </message>
-    <message>
-        <source>Click here if you want to stop playing of the current pattern.</source>
-        <translation>Нажмите здесь, если вы хотите приостановить/продолжить воспроизведение текущего шаблона.</translation>
-    </message>
-    <message>
-        <source>Click here and draw-mode will be activated. In this mode you can add and move single values.  This is the default mode which is used most of the time.  You can also press &apos;Shift+D&apos; on your keyboard to activate this mode.</source>
-        <translation>При нажатии на эту кнопку активируется режим рисования нот, который является режимом по умолчанию и используется большую часть времени. В этом режиме вы можете добавлять/перемещать и изменять длительность одиночных нот.
-Для включения этого режима можно использовать комбинацию клавиш Shift+D.</translation>
-    </message>
-    <message>
-        <source>Click here and erase-mode will be activated. In this mode you can erase single values. You can also press &apos;Shift+E&apos; on your keyboard to activate this mode.</source>
-        <translation>При нажатии на эту кнопку активируется режим стирания. В этом режиме вы можете стирать ноты по одной.
-Для включения этого режима можно использовать комбинацию клавиш Shift+E.</translation>
-    </message>
-    <message>
-        <source>Click here and select-mode will be activated. In this mode you can select values. This is necessary if you want to cut, copy, paste, delete, or move values. You can also press &apos;Shift+S&apos; on your keyboard to activate this mode.</source>
-        <translation>При нажатии на эту кнопку активируется режим выбора нот. В этом режиме вы можете выбирать ноты для последующих действий. Это необходимо, если вы хотите вырезать, копировать, вставлять или перемещать сразу несколько нот.
-Для включения этого режима можно использовать комбинацию клавиш Shift+S.</translation>
-    </message>
-    <message>
-        <source>Click here and selected values will be cut into the clipboard.  You can paste them anywhere in any pattern by clicking on the paste button.</source>
-        <translation>При нажатии на эту кнопку выделеные ноты будут перемещены в буфер. Позже вы можете вставить их в любое место любого шаблона с помощью кнопки &quot;Вставить&quot;.</translation>
-    </message>
-    <message>
-        <source>Click here and selected values will be copied into the clipboard.  You can paste them anywhere in any pattern by clicking on the paste button.</source>
-        <translation>При нажатии на эту кнопку выделеные ноты будут скопированы в буфер. Позже вы можете вставить их в любое место любого шаблона с помощью кнопки &quot;Вставить&quot;.</translation>
-    </message>
-    <message>
-        <source>Click here and the values from the clipboard will be pasted at the first visible measure.</source>
-        <translation>При нажатии на эту кнопку ноты из буфера будут вставлены в превый видимый такт.</translation>
-    </message>
-</context>
-<context>
-    <name>automationPattern</name>
-    <message>
-        <source>Drag a control while pressing &lt;Ctrl&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>automationPatternView</name>
-    <message>
-        <source>double-click to open this pattern in automation editor</source>
-        <translation>Дважды щёлкните мышью чтобы настроить зависимость от времени для этого шаблона</translation>
-    </message>
-    <message>
-        <source>Open in Automation editor</source>
-        <translation>Настройка зависимости от времени</translation>
-    </message>
-    <message>
-        <source>Clear</source>
-        <translation>Очистить</translation>
-    </message>
-    <message>
-        <source>Reset name</source>
-        <translation>Сбросить название</translation>
-    </message>
-    <message>
-        <source>Change name</source>
-        <translation>Переименовать</translation>
-    </message>
-    <message>
-        <source>%1 Connections</source>
-        <translation>Соединения %1</translation>
-    </message>
-    <message>
-        <source>Disconnect &quot;%1&quot;</source>
-        <translation>Отсоединить «%1»</translation>
-    </message>
-</context>
-<context>
-    <name>automationTrack</name>
-    <message>
-        <source>Automation track</source>
-        <translation>Дорожка автоматизации</translation>
     </message>
 </context>
 <context>
@@ -3041,6 +3151,10 @@ If it runs with other VST-software under Linux, please contact an LMMS-developer
     <message>
         <source>Beat/Bassline %1</source>
         <translation>Лейтмотив %1</translation>
+    </message>
+    <message>
+        <source>Clone of %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4953,6 +5067,10 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>Choose background artwork</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>One instrument track window mode</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

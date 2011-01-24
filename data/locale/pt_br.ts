@@ -24,10 +24,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Copyright (c) 2004-2008, LMMS developers</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>http://lmms.sourceforge.net</source>
         <translation type="unfinished"></translation>
     </message>
@@ -47,6 +43,10 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>License</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Copyright (c) 2004-2010, LMMS developers</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -289,10 +289,6 @@ If you&apos;re interested in translating LMMS in another language or want to imp
         <source>DEVICE</source>
         <translation type="unfinished">DISPOSITIVO</translation>
     </message>
-    <message>
-        <source>CHANNELS</source>
-        <translation type="unfinished">CANAIS</translation>
-    </message>
 </context>
 <context>
     <name>AudioPulseAudio::setupWidget</name>
@@ -348,6 +344,146 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>Connect to controller...</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>AutomationEditor</name>
+    <message>
+        <source>Play/pause current pattern (Space)</source>
+        <translation type="unfinished">Tocar/pausar padrão atual (Espaço)</translation>
+    </message>
+    <message>
+        <source>Stop playing of current pattern (Space)</source>
+        <translation type="unfinished">Parar de tocar o padrão atual (Espaço)</translation>
+    </message>
+    <message>
+        <source>Click here if you want to play the current pattern. This is useful while editing it.  The pattern is automatically looped when the end is reached.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here if you want to stop playing of the current pattern.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Draw mode (Shift+D)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Erase mode (Shift+E)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select mode (Shift+S)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Move selection mode (Shift+M)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here and draw-mode will be activated. In this mode you can add and move single values.  This is the default mode which is used most of the time.  You can also press &apos;Shift+D&apos; on your keyboard to activate this mode.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here and erase-mode will be activated. In this mode you can erase single values. You can also press &apos;Shift+E&apos; on your keyboard to activate this mode.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here and select-mode will be activated. In this mode you can select values. This is necessary if you want to cut, copy, paste, delete, or move values. You can also press &apos;Shift+S&apos; on your keyboard to activate this mode.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If you click here, move-mode will be activated. In this mode you can move the values you selected in select-mode. You can also press &apos;Shift+M&apos; on your keyboard to activate this mode.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cut selected values (Ctrl+X)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Copy selected values (Ctrl+C)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Paste values from clipboard (Ctrl+V)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here and selected values will be cut into the clipboard.  You can paste them anywhere in any pattern by clicking on the paste button.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here and selected values will be copied into the clipboard.  You can paste them anywhere in any pattern by clicking on the paste button.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here and the values from the clipboard will be pasted at the first visible measure.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Automation Editor - no pattern</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Automation Editor - %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please open an automation pattern with the context menu of a control!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Values copied</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All selected values were copied to the clipboard.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>AutomationPattern</name>
+    <message>
+        <source>Drag a control while pressing &lt;Ctrl&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>AutomationPatternView</name>
+    <message>
+        <source>double-click to open this pattern in automation editor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open in Automation editor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clear</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reset name</source>
+        <translation type="unfinished">Restaurar nome</translation>
+    </message>
+    <message>
+        <source>Change name</source>
+        <translation type="unfinished">Mudar nome</translation>
+    </message>
+    <message>
+        <source>%1 Connections</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Disconnect &quot;%1&quot;</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>AutomationTrack</name>
+    <message>
+        <source>Automation track</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2355,8 +2491,16 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Release decay (not implemented):</source>
+        <source>ATTACK</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Attack:</source>
+        <translation type="unfinished">Ataque:</translation>
+    </message>
+    <message>
+        <source>Release:</source>
+        <translation type="unfinished">Libera:</translation>
     </message>
 </context>
 <context>
@@ -2374,7 +2518,11 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Release decay</source>
+        <source>Attack</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Release</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2729,6 +2877,13 @@ Reason: &quot;%2&quot;</source>
     </message>
 </context>
 <context>
+    <name>VstEffectControlDialog</name>
+    <message>
+        <source>Show/hide VST FX GUI</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>VstPlugin</name>
     <message>
         <source>Loading plugin</source>
@@ -2750,6 +2905,41 @@ Se ele rodar com outro programa VST no Linux, por favor entre em contato com um 
     </message>
 </context>
 <context>
+    <name>ZynAddSubFxInstrument</name>
+    <message>
+        <source>Portamento</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Filter Frequency</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Filter Resonance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bandwidth</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>FM Gain</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Resonance Center Frequency</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Resonance Bandwidth</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Forward MIDI Control Change Events</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>ZynAddSubFxView</name>
     <message>
         <source>Show GUI</source>
@@ -2757,6 +2947,66 @@ Se ele rodar com outro programa VST no Linux, por favor entre em contato com um 
     </message>
     <message>
         <source>Click here to show or hide the graphical user interface (GUI) of ZynAddSubFX.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Portamento:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PORT</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Filter Frequency:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>FREQ</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Filter Resonance:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>RES</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bandwidth:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>BW</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>FM Gain:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>FM GAIN</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Resonance center frequency:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>RES CF</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Resonance bandwidth:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>RES BW</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Forward MIDI Control Changes</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2780,146 +3030,6 @@ Se ele rodar com outro programa VST no Linux, por favor entre em contato com um 
     </message>
     <message>
         <source>Loop</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>automationEditor</name>
-    <message>
-        <source>Play/pause current pattern (Space)</source>
-        <translation type="unfinished">Tocar/pausar padrão atual (Espaço)</translation>
-    </message>
-    <message>
-        <source>Stop playing of current pattern (Space)</source>
-        <translation type="unfinished">Parar de tocar o padrão atual (Espaço)</translation>
-    </message>
-    <message>
-        <source>Draw mode (Shift+D)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Erase mode (Shift+E)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Select mode (Shift+S)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Move selection mode (Shift+M)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>If you click here, move-mode will be activated. In this mode you can move the values you selected in select-mode. You can also press &apos;Shift+M&apos; on your keyboard to activate this mode.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Cut selected values (Ctrl+X)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Copy selected values (Ctrl+C)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Paste values from clipboard (Ctrl+V)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Automation Editor - no pattern</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Automation Editor - %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Please open an automation pattern with the context menu of a control!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Values copied</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>All selected values were copied to the clipboard.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Click here if you want to play the current pattern. This is useful while editing it.  The pattern is automatically looped when the end is reached.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Click here if you want to stop playing of the current pattern.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Click here and draw-mode will be activated. In this mode you can add and move single values.  This is the default mode which is used most of the time.  You can also press &apos;Shift+D&apos; on your keyboard to activate this mode.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Click here and erase-mode will be activated. In this mode you can erase single values. You can also press &apos;Shift+E&apos; on your keyboard to activate this mode.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Click here and select-mode will be activated. In this mode you can select values. This is necessary if you want to cut, copy, paste, delete, or move values. You can also press &apos;Shift+S&apos; on your keyboard to activate this mode.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Click here and selected values will be cut into the clipboard.  You can paste them anywhere in any pattern by clicking on the paste button.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Click here and selected values will be copied into the clipboard.  You can paste them anywhere in any pattern by clicking on the paste button.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Click here and the values from the clipboard will be pasted at the first visible measure.</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>automationPattern</name>
-    <message>
-        <source>Drag a control while pressing &lt;Ctrl&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>automationPatternView</name>
-    <message>
-        <source>double-click to open this pattern in automation editor</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Open in Automation editor</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Clear</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Reset name</source>
-        <translation type="unfinished">Restaurar nome</translation>
-    </message>
-    <message>
-        <source>Change name</source>
-        <translation type="unfinished">Mudar nome</translation>
-    </message>
-    <message>
-        <source>Disconnect &quot;%1&quot;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>%1 Connections</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>automationTrack</name>
-    <message>
-        <source>Automation track</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3020,6 +3130,10 @@ Se ele rodar com outro programa VST no Linux, por favor entre em contato com um 
     <message>
         <source>Beat/Bassline %1</source>
         <translation>Batida/Baixo %1</translation>
+    </message>
+    <message>
+        <source>Clone of %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4917,6 +5031,10 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>Choose background artwork</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>One instrument track window mode</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -24,10 +24,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Copyright (c) 2004-2008, LMMS developers</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>http://lmms.sourceforge.net</source>
         <translation type="unfinished"></translation>
     </message>
@@ -47,6 +43,10 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>License</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Copyright (c) 2004-2010, LMMS developers</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -289,10 +289,6 @@ If you&apos;re interested in translating LMMS in another language or want to imp
         <source>DEVICE</source>
         <translation type="unfinished">기기</translation>
     </message>
-    <message>
-        <source>CHANNELS</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>AudioPulseAudio::setupWidget</name>
@@ -349,6 +345,146 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     <message>
         <source>Connect to controller...</source>
         <translation type="unfinished">제어기에 연결</translation>
+    </message>
+</context>
+<context>
+    <name>AutomationEditor</name>
+    <message>
+        <source>Play/pause current pattern (Space)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stop playing of current pattern (Space)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here if you want to play the current pattern. This is useful while editing it.  The pattern is automatically looped when the end is reached.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here if you want to stop playing of the current pattern.</source>
+        <translation type="unfinished">현재 패턴의 재생을 중지하려면 여기를 누르세요</translation>
+    </message>
+    <message>
+        <source>Draw mode (Shift+D)</source>
+        <translation type="unfinished">그리기 모드 (Shift+D)</translation>
+    </message>
+    <message>
+        <source>Erase mode (Shift+E)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select mode (Shift+S)</source>
+        <translation type="unfinished">선택 모드 (Shift+S)</translation>
+    </message>
+    <message>
+        <source>Move selection mode (Shift+M)</source>
+        <translation type="unfinished">선택 모드 이동 (Shift+M)</translation>
+    </message>
+    <message>
+        <source>Click here and draw-mode will be activated. In this mode you can add and move single values.  This is the default mode which is used most of the time.  You can also press &apos;Shift+D&apos; on your keyboard to activate this mode.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here and erase-mode will be activated. In this mode you can erase single values. You can also press &apos;Shift+E&apos; on your keyboard to activate this mode.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here and select-mode will be activated. In this mode you can select values. This is necessary if you want to cut, copy, paste, delete, or move values. You can also press &apos;Shift+S&apos; on your keyboard to activate this mode.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If you click here, move-mode will be activated. In this mode you can move the values you selected in select-mode. You can also press &apos;Shift+M&apos; on your keyboard to activate this mode.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cut selected values (Ctrl+X)</source>
+        <translation type="unfinished">선택된 값 잘라내기 (Ctrl+X)</translation>
+    </message>
+    <message>
+        <source>Copy selected values (Ctrl+C)</source>
+        <translation type="unfinished">선택된 값 복사 (Ctrl+C)</translation>
+    </message>
+    <message>
+        <source>Paste values from clipboard (Ctrl+V)</source>
+        <translation type="unfinished">클립보드에서 값 붙여넣기 (Ctrl+V)</translation>
+    </message>
+    <message>
+        <source>Click here and selected values will be cut into the clipboard.  You can paste them anywhere in any pattern by clicking on the paste button.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here and selected values will be copied into the clipboard.  You can paste them anywhere in any pattern by clicking on the paste button.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here and the values from the clipboard will be pasted at the first visible measure.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Automation Editor - no pattern</source>
+        <translation type="unfinished">자동화 편집기 - 패턴 없음</translation>
+    </message>
+    <message>
+        <source>Automation Editor - %1</source>
+        <translation type="unfinished">자동화 편집기 - %1</translation>
+    </message>
+    <message>
+        <source>Please open an automation pattern with the context menu of a control!</source>
+        <translation type="unfinished">제어 문맥 메뉴를 가진 자동화 패턴으로 열어주세요!</translation>
+    </message>
+    <message>
+        <source>Values copied</source>
+        <translation type="unfinished">복사된 값</translation>
+    </message>
+    <message>
+        <source>All selected values were copied to the clipboard.</source>
+        <translation type="unfinished">전체 선택된 값을 클립보드로 복사했습니다.</translation>
+    </message>
+</context>
+<context>
+    <name>AutomationPattern</name>
+    <message>
+        <source>Drag a control while pressing &lt;Ctrl&gt;</source>
+        <translation type="unfinished">&lt;Ctrl&gt; 누르는 동안 제어를 끌기</translation>
+    </message>
+</context>
+<context>
+    <name>AutomationPatternView</name>
+    <message>
+        <source>double-click to open this pattern in automation editor</source>
+        <translation type="unfinished">자동화 편집기에서 이 패턴을 열기위하여 이중 클릭</translation>
+    </message>
+    <message>
+        <source>Open in Automation editor</source>
+        <translation type="unfinished">자동화 편집기에서 열기</translation>
+    </message>
+    <message>
+        <source>Clear</source>
+        <translation type="unfinished">제거</translation>
+    </message>
+    <message>
+        <source>Reset name</source>
+        <translation type="unfinished">이름 초기화</translation>
+    </message>
+    <message>
+        <source>Change name</source>
+        <translation type="unfinished">이름 변경</translation>
+    </message>
+    <message>
+        <source>%1 Connections</source>
+        <translation type="unfinished">%1 연결</translation>
+    </message>
+    <message>
+        <source>Disconnect &quot;%1&quot;</source>
+        <translation type="unfinished">연결해제  &quot;%1&quot;</translation>
+    </message>
+</context>
+<context>
+    <name>AutomationTrack</name>
+    <message>
+        <source>Automation track</source>
+        <translation type="unfinished">자동화 트랙</translation>
     </message>
 </context>
 <context>
@@ -2356,7 +2492,15 @@ LMMS 문서는 http://lmms.sf.net/wiki를 방문하세요.</translation>
         <translation type="unfinished">감쇄</translation>
     </message>
     <message>
-        <source>Release decay (not implemented):</source>
+        <source>ATTACK</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Attack:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Release:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2375,7 +2519,11 @@ LMMS 문서는 http://lmms.sf.net/wiki를 방문하세요.</translation>
         <translation type="unfinished">무음 출력</translation>
     </message>
     <message>
-        <source>Release decay</source>
+        <source>Attack</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Release</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2731,6 +2879,13 @@ Reason: &quot;%2&quot;</source>
     </message>
 </context>
 <context>
+    <name>VstEffectControlDialog</name>
+    <message>
+        <source>Show/hide VST FX GUI</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>VstPlugin</name>
     <message>
         <source>Loading plugin</source>
@@ -2751,6 +2906,41 @@ If it runs with other VST-software under Linux, please contact an LMMS-developer
     </message>
 </context>
 <context>
+    <name>ZynAddSubFxInstrument</name>
+    <message>
+        <source>Portamento</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Filter Frequency</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Filter Resonance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bandwidth</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>FM Gain</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Resonance Center Frequency</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Resonance Bandwidth</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Forward MIDI Control Change Events</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>ZynAddSubFxView</name>
     <message>
         <source>Show GUI</source>
@@ -2758,6 +2948,66 @@ If it runs with other VST-software under Linux, please contact an LMMS-developer
     </message>
     <message>
         <source>Click here to show or hide the graphical user interface (GUI) of ZynAddSubFX.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Portamento:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PORT</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Filter Frequency:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>FREQ</source>
+        <translation type="unfinished">주파수</translation>
+    </message>
+    <message>
+        <source>Filter Resonance:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>RES</source>
+        <translation type="unfinished">해상도</translation>
+    </message>
+    <message>
+        <source>Bandwidth:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>BW</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>FM Gain:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>FM GAIN</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Resonance center frequency:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>RES CF</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Resonance bandwidth:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>RES BW</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Forward MIDI Control Changes</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2782,146 +3032,6 @@ If it runs with other VST-software under Linux, please contact an LMMS-developer
     <message>
         <source>Loop</source>
         <translation>반복</translation>
-    </message>
-</context>
-<context>
-    <name>automationEditor</name>
-    <message>
-        <source>Play/pause current pattern (Space)</source>
-        <translation>현재 패턴 재생/정지 (Space)</translation>
-    </message>
-    <message>
-        <source>Stop playing of current pattern (Space)</source>
-        <translation>현재 패턴 재생 정지 (Space)</translation>
-    </message>
-    <message>
-        <source>Draw mode (Shift+D)</source>
-        <translation>그리기 모드 (Shift+D)</translation>
-    </message>
-    <message>
-        <source>Erase mode (Shift+E)</source>
-        <translation>제거 모드 (Shift+E)</translation>
-    </message>
-    <message>
-        <source>Select mode (Shift+S)</source>
-        <translation>선택 모드 (Shift+S)</translation>
-    </message>
-    <message>
-        <source>Move selection mode (Shift+M)</source>
-        <translation>선택 모드 이동 (Shift+M)</translation>
-    </message>
-    <message>
-        <source>If you click here, move-mode will be activated. In this mode you can move the values you selected in select-mode. You can also press &apos;Shift+M&apos; on your keyboard to activate this mode.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Cut selected values (Ctrl+X)</source>
-        <translation>선택된 값 잘라내기 (Ctrl+X)</translation>
-    </message>
-    <message>
-        <source>Copy selected values (Ctrl+C)</source>
-        <translation>선택된 값 복사 (Ctrl+C)</translation>
-    </message>
-    <message>
-        <source>Paste values from clipboard (Ctrl+V)</source>
-        <translation>클립보드에서 값 붙여넣기 (Ctrl+V)</translation>
-    </message>
-    <message>
-        <source>Automation Editor - no pattern</source>
-        <translation>자동화 편집기 - 패턴 없음</translation>
-    </message>
-    <message>
-        <source>Automation Editor - %1</source>
-        <translation>자동화 편집기 - %1</translation>
-    </message>
-    <message>
-        <source>Please open an automation pattern with the context menu of a control!</source>
-        <translation>제어 문맥 메뉴를 가진 자동화 패턴으로 열어주세요!</translation>
-    </message>
-    <message>
-        <source>Values copied</source>
-        <translation>복사된 값</translation>
-    </message>
-    <message>
-        <source>All selected values were copied to the clipboard.</source>
-        <translation>전체 선택된 값을 클립보드로 복사했습니다.</translation>
-    </message>
-    <message>
-        <source>Click here if you want to play the current pattern. This is useful while editing it.  The pattern is automatically looped when the end is reached.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Click here if you want to stop playing of the current pattern.</source>
-        <translation>현재 패턴의 재생을 중지하려면 여기를 누르세요</translation>
-    </message>
-    <message>
-        <source>Click here and draw-mode will be activated. In this mode you can add and move single values.  This is the default mode which is used most of the time.  You can also press &apos;Shift+D&apos; on your keyboard to activate this mode.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Click here and erase-mode will be activated. In this mode you can erase single values. You can also press &apos;Shift+E&apos; on your keyboard to activate this mode.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Click here and select-mode will be activated. In this mode you can select values. This is necessary if you want to cut, copy, paste, delete, or move values. You can also press &apos;Shift+S&apos; on your keyboard to activate this mode.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Click here and selected values will be cut into the clipboard.  You can paste them anywhere in any pattern by clicking on the paste button.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Click here and selected values will be copied into the clipboard.  You can paste them anywhere in any pattern by clicking on the paste button.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Click here and the values from the clipboard will be pasted at the first visible measure.</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
-    <name>automationPattern</name>
-    <message>
-        <source>Drag a control while pressing &lt;Ctrl&gt;</source>
-        <translation>&lt;Ctrl&gt; 누르는 동안 제어를 끌기</translation>
-    </message>
-</context>
-<context>
-    <name>automationPatternView</name>
-    <message>
-        <source>double-click to open this pattern in automation editor</source>
-        <translation>자동화 편집기에서 이 패턴을 열기위하여 이중 클릭</translation>
-    </message>
-    <message>
-        <source>Open in Automation editor</source>
-        <translation>자동화 편집기에서 열기</translation>
-    </message>
-    <message>
-        <source>Clear</source>
-        <translation>제거</translation>
-    </message>
-    <message>
-        <source>Reset name</source>
-        <translation>이름 초기화</translation>
-    </message>
-    <message>
-        <source>Change name</source>
-        <translation>이름 변경</translation>
-    </message>
-    <message>
-        <source>Disconnect &quot;%1&quot;</source>
-        <translation>연결해제  &quot;%1&quot;</translation>
-    </message>
-    <message>
-        <source>%1 Connections</source>
-        <translation>%1 연결</translation>
-    </message>
-</context>
-<context>
-    <name>automationTrack</name>
-    <message>
-        <source>Automation track</source>
-        <translation>자동화 트랙</translation>
     </message>
 </context>
 <context>
@@ -3021,6 +3131,10 @@ If it runs with other VST-software under Linux, please contact an LMMS-developer
     <message>
         <source>Beat/Bassline %1</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Clone of %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4921,6 +5035,10 @@ Latency: %2 ms</source>
     <message>
         <source>Choose background artwork</source>
         <translation>배경 아트워크 선택</translation>
+    </message>
+    <message>
+        <source>One instrument track window mode</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

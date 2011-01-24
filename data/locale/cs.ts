@@ -24,10 +24,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Copyright (c) 2004-2008, LMMS developers</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>http://lmms.sourceforge.net</source>
         <translation type="unfinished"></translation>
     </message>
@@ -47,6 +43,10 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>License</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Copyright (c) 2004-2010, LMMS developers</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -289,10 +289,6 @@ If you&apos;re interested in translating LMMS in another language or want to imp
         <source>DEVICE</source>
         <translation type="unfinished">ZAŘÍZENÍ</translation>
     </message>
-    <message>
-        <source>CHANNELS</source>
-        <translation type="unfinished">KANÁLY</translation>
-    </message>
 </context>
 <context>
     <name>AudioPulseAudio::setupWidget</name>
@@ -349,6 +345,146 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     <message>
         <source>Connect to controller...</source>
         <translation type="unfinished">Připojit ke kontroléru...</translation>
+    </message>
+</context>
+<context>
+    <name>AutomationEditor</name>
+    <message>
+        <source>Play/pause current pattern (Space)</source>
+        <translation type="unfinished">Přehrát nebo pozastavit přehrávání aktuálního patternu (mezerník)</translation>
+    </message>
+    <message>
+        <source>Stop playing of current pattern (Space)</source>
+        <translation type="unfinished">Zastavit přehrávání aktuálního patternu (mezerník)</translation>
+    </message>
+    <message>
+        <source>Click here if you want to play the current pattern. This is useful while editing it.  The pattern is automatically looped when the end is reached.</source>
+        <translation type="unfinished">Klikněte zde, pokud chcete přehrát aktuální pattern. To je šikovné při editaci neboť pattern je automaticky přehráván ve smyčce.</translation>
+    </message>
+    <message>
+        <source>Click here if you want to stop playing of the current pattern.</source>
+        <translation type="unfinished">Klikněte zde, pokud chcete zastavit přehrávání aktuálního patternu.</translation>
+    </message>
+    <message>
+        <source>Draw mode (Shift+D)</source>
+        <translation type="unfinished">Režim kreslení (Shift+D)</translation>
+    </message>
+    <message>
+        <source>Erase mode (Shift+E)</source>
+        <translation type="unfinished">Režim mazání (Shift+E)</translation>
+    </message>
+    <message>
+        <source>Select mode (Shift+S)</source>
+        <translation type="unfinished">Režim výběru (Shift+S)</translation>
+    </message>
+    <message>
+        <source>Move selection mode (Shift+M)</source>
+        <translation type="unfinished">Režim přesunu výběrů (Shift+M)</translation>
+    </message>
+    <message>
+        <source>Click here and draw-mode will be activated. In this mode you can add and move single values.  This is the default mode which is used most of the time.  You can also press &apos;Shift+D&apos; on your keyboard to activate this mode.</source>
+        <translation type="unfinished">Klikněte zde, pokud chcete aktivovat režim kreslení. V tomto výchozím a nejčastěji užívaném režimu lze přidávat a přesunovat jednotlivé hodnoty. Pro aktivaci můžete využít též klávesové zkratky Shift+D.</translation>
+    </message>
+    <message>
+        <source>Click here and erase-mode will be activated. In this mode you can erase single values. You can also press &apos;Shift+E&apos; on your keyboard to activate this mode.</source>
+        <translation type="unfinished">Klikněte zde, pokud chcete aktivovat režim mazání. V tomto režimu lze mazat jednotlivé hodnoty. Pro aktivaci můžete využít též klávesové zkratky Shift+E.</translation>
+    </message>
+    <message>
+        <source>Click here and select-mode will be activated. In this mode you can select values. This is necessary if you want to cut, copy, paste, delete, or move values. You can also press &apos;Shift+S&apos; on your keyboard to activate this mode.</source>
+        <translation type="unfinished">Klikněte zde, pokud chcete aktivovat režim výběru. Tento režimu umožňuje hodnoty vybírat a je nezbytný jestliže hodnoty chcete vyjmout, kopírovat, vložit, smazat nebo přesunout. Pro aktivaci můžete využít též klávesové zkratky Shift+S.</translation>
+    </message>
+    <message>
+        <source>If you click here, move-mode will be activated. In this mode you can move the values you selected in select-mode. You can also press &apos;Shift+M&apos; on your keyboard to activate this mode.</source>
+        <translation type="unfinished">Klikněte zde pokud chcete aktivovat režim přesunu výběrů. V tomto režimu lze přesouvat hodnoty, které byly označeny v režimu výběru. Pro aktivaci můžete využít též klávesové zkratky &apos;Shift+M&apos;.</translation>
+    </message>
+    <message>
+        <source>Cut selected values (Ctrl+X)</source>
+        <translation type="unfinished">Vyjmout označené hodnoty (Ctrl+X)</translation>
+    </message>
+    <message>
+        <source>Copy selected values (Ctrl+C)</source>
+        <translation type="unfinished">Kopírovat označené hodnoty (Ctrl+C)</translation>
+    </message>
+    <message>
+        <source>Paste values from clipboard (Ctrl+V)</source>
+        <translation type="unfinished">Vložit hodnoty ze schránky (Ctrl+V)</translation>
+    </message>
+    <message>
+        <source>Click here and selected values will be cut into the clipboard.  You can paste them anywhere in any pattern by clicking on the paste button.</source>
+        <translation type="unfinished">Klikněte zde, pokud chcete označené hodnoty vyjmout a uložit do schránky. Vložit je pak můžete kdekoliv v libovolném patternu pomocí tlačítka Vložit.</translation>
+    </message>
+    <message>
+        <source>Click here and selected values will be copied into the clipboard.  You can paste them anywhere in any pattern by clicking on the paste button.</source>
+        <translation type="unfinished">Klikněte zde, pokud chcete označené hodnoty zkopírovat do schránky. Vložit je pak můžete kdekoliv v libovolného patternu pomocí tlačítka Vložit.</translation>
+    </message>
+    <message>
+        <source>Click here and the values from the clipboard will be pasted at the first visible measure.</source>
+        <translation type="unfinished">Kliknete-li zde, budou hodnoty ze schránky vloženy do prvního viditelného taktu.</translation>
+    </message>
+    <message>
+        <source>Automation Editor - no pattern</source>
+        <translation type="unfinished">Automatizační editor - žádný pattern</translation>
+    </message>
+    <message>
+        <source>Automation Editor - %1</source>
+        <translation type="unfinished">Automatizační editor - %1</translation>
+    </message>
+    <message>
+        <source>Please open an automation pattern with the context menu of a control!</source>
+        <translation type="unfinished">Otevřete prosím automatizační pattern pomocí kontextového menu ovládání!</translation>
+    </message>
+    <message>
+        <source>Values copied</source>
+        <translation type="unfinished">Hodnoty zkopírovány</translation>
+    </message>
+    <message>
+        <source>All selected values were copied to the clipboard.</source>
+        <translation type="unfinished">Všechny označené hodnoty byly zkopírovány do schránky.</translation>
+    </message>
+</context>
+<context>
+    <name>AutomationPattern</name>
+    <message>
+        <source>Drag a control while pressing &lt;Ctrl&gt;</source>
+        <translation type="unfinished">Ovladač táhni při stisknutém &lt;CTRL&gt;</translation>
+    </message>
+</context>
+<context>
+    <name>AutomationPatternView</name>
+    <message>
+        <source>double-click to open this pattern in automation editor</source>
+        <translation type="unfinished">dvojklikem otevřít tento pattern v automatizačním editoru</translation>
+    </message>
+    <message>
+        <source>Open in Automation editor</source>
+        <translation type="unfinished">Otevřít v automatizačním editoru</translation>
+    </message>
+    <message>
+        <source>Clear</source>
+        <translation type="unfinished">Vyčistit</translation>
+    </message>
+    <message>
+        <source>Reset name</source>
+        <translation type="unfinished">Resetovat jméno</translation>
+    </message>
+    <message>
+        <source>Change name</source>
+        <translation type="unfinished">Změnit jméno</translation>
+    </message>
+    <message>
+        <source>%1 Connections</source>
+        <translation type="unfinished">%1 Připojení</translation>
+    </message>
+    <message>
+        <source>Disconnect &quot;%1&quot;</source>
+        <translation type="unfinished">Odpojit &quot;%1&quot;</translation>
+    </message>
+</context>
+<context>
+    <name>AutomationTrack</name>
+    <message>
+        <source>Automation track</source>
+        <translation type="unfinished">Automatizační stopa</translation>
     </message>
 </context>
 <context>
@@ -2357,7 +2493,15 @@ Navštivte prosím stránku s dokumentací k LMMS na adrese http://lmms.sf.net/w
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Release decay (not implemented):</source>
+        <source>ATTACK</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Attack:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Release:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2376,7 +2520,11 @@ Navštivte prosím stránku s dokumentací k LMMS na adrese http://lmms.sf.net/w
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Release decay</source>
+        <source>Attack</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Release</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2732,6 +2880,13 @@ Důvod: &quot;%2&quot;</translation>
     </message>
 </context>
 <context>
+    <name>VstEffectControlDialog</name>
+    <message>
+        <source>Show/hide VST FX GUI</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>VstPlugin</name>
     <message>
         <source>Loading plugin</source>
@@ -2753,6 +2908,41 @@ Jestliže tento plugin funguje v Linuxu v jiném VST softwaru, kontaktujte pros�
     </message>
 </context>
 <context>
+    <name>ZynAddSubFxInstrument</name>
+    <message>
+        <source>Portamento</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Filter Frequency</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Filter Resonance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bandwidth</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>FM Gain</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Resonance Center Frequency</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Resonance Bandwidth</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Forward MIDI Control Change Events</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>ZynAddSubFxView</name>
     <message>
         <source>Show GUI</source>
@@ -2760,6 +2950,66 @@ Jestliže tento plugin funguje v Linuxu v jiném VST softwaru, kontaktujte pros�
     </message>
     <message>
         <source>Click here to show or hide the graphical user interface (GUI) of ZynAddSubFX.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Portamento:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PORT</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Filter Frequency:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>FREQ</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Filter Resonance:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>RES</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bandwidth:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>BW</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>FM Gain:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>FM GAIN</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Resonance center frequency:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>RES CF</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Resonance bandwidth:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>RES BW</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Forward MIDI Control Changes</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2784,146 +3034,6 @@ Jestliže tento plugin funguje v Linuxu v jiném VST softwaru, kontaktujte pros�
     <message>
         <source>End of sample</source>
         <translation>Konec samplu</translation>
-    </message>
-</context>
-<context>
-    <name>automationEditor</name>
-    <message>
-        <source>Play/pause current pattern (Space)</source>
-        <translation>Přehrát nebo pozastavit přehrávání aktuálního patternu (mezerník)</translation>
-    </message>
-    <message>
-        <source>Stop playing of current pattern (Space)</source>
-        <translation>Zastavit přehrávání aktuálního patternu (mezerník)</translation>
-    </message>
-    <message>
-        <source>Draw mode (Shift+D)</source>
-        <translation>Režim kreslení (Shift+D)</translation>
-    </message>
-    <message>
-        <source>Erase mode (Shift+E)</source>
-        <translation>Režim mazání (Shift+E)</translation>
-    </message>
-    <message>
-        <source>Select mode (Shift+S)</source>
-        <translation>Režim výběru (Shift+S)</translation>
-    </message>
-    <message>
-        <source>Move selection mode (Shift+M)</source>
-        <translation>Režim přesunu výběrů (Shift+M)</translation>
-    </message>
-    <message>
-        <source>If you click here, move-mode will be activated. In this mode you can move the values you selected in select-mode. You can also press &apos;Shift+M&apos; on your keyboard to activate this mode.</source>
-        <translation>Klikněte zde pokud chcete aktivovat režim přesunu výběrů. V tomto režimu lze přesouvat hodnoty, které byly označeny v režimu výběru. Pro aktivaci můžete využít též klávesové zkratky &apos;Shift+M&apos;.</translation>
-    </message>
-    <message>
-        <source>Cut selected values (Ctrl+X)</source>
-        <translation>Vyjmout označené hodnoty (Ctrl+X)</translation>
-    </message>
-    <message>
-        <source>Copy selected values (Ctrl+C)</source>
-        <translation>Kopírovat označené hodnoty (Ctrl+C)</translation>
-    </message>
-    <message>
-        <source>Paste values from clipboard (Ctrl+V)</source>
-        <translation>Vložit hodnoty ze schránky (Ctrl+V)</translation>
-    </message>
-    <message>
-        <source>Automation Editor - no pattern</source>
-        <translation>Automatizační editor - žádný pattern</translation>
-    </message>
-    <message>
-        <source>Automation Editor - %1</source>
-        <translation>Automatizační editor - %1</translation>
-    </message>
-    <message>
-        <source>Please open an automation pattern with the context menu of a control!</source>
-        <translation>Otevřete prosím automatizační pattern pomocí kontextového menu ovládání!</translation>
-    </message>
-    <message>
-        <source>Values copied</source>
-        <translation>Hodnoty zkopírovány</translation>
-    </message>
-    <message>
-        <source>All selected values were copied to the clipboard.</source>
-        <translation>Všechny označené hodnoty byly zkopírovány do schránky.</translation>
-    </message>
-    <message>
-        <source>Click here if you want to play the current pattern. This is useful while editing it.  The pattern is automatically looped when the end is reached.</source>
-        <translation>Klikněte zde, pokud chcete přehrát aktuální pattern. To je šikovné při editaci neboť pattern je automaticky přehráván ve smyčce.</translation>
-    </message>
-    <message>
-        <source>Click here if you want to stop playing of the current pattern.</source>
-        <translation>Klikněte zde, pokud chcete zastavit přehrávání aktuálního patternu.</translation>
-    </message>
-    <message>
-        <source>Click here and draw-mode will be activated. In this mode you can add and move single values.  This is the default mode which is used most of the time.  You can also press &apos;Shift+D&apos; on your keyboard to activate this mode.</source>
-        <translation>Klikněte zde, pokud chcete aktivovat režim kreslení. V tomto výchozím a nejčastěji užívaném režimu lze přidávat a přesunovat jednotlivé hodnoty. Pro aktivaci můžete využít též klávesové zkratky Shift+D.</translation>
-    </message>
-    <message>
-        <source>Click here and erase-mode will be activated. In this mode you can erase single values. You can also press &apos;Shift+E&apos; on your keyboard to activate this mode.</source>
-        <translation>Klikněte zde, pokud chcete aktivovat režim mazání. V tomto režimu lze mazat jednotlivé hodnoty. Pro aktivaci můžete využít též klávesové zkratky Shift+E.</translation>
-    </message>
-    <message>
-        <source>Click here and select-mode will be activated. In this mode you can select values. This is necessary if you want to cut, copy, paste, delete, or move values. You can also press &apos;Shift+S&apos; on your keyboard to activate this mode.</source>
-        <translation>Klikněte zde, pokud chcete aktivovat režim výběru. Tento režimu umožňuje hodnoty vybírat a je nezbytný jestliže hodnoty chcete vyjmout, kopírovat, vložit, smazat nebo přesunout. Pro aktivaci můžete využít též klávesové zkratky Shift+S.</translation>
-    </message>
-    <message>
-        <source>Click here and selected values will be cut into the clipboard.  You can paste them anywhere in any pattern by clicking on the paste button.</source>
-        <translation>Klikněte zde, pokud chcete označené hodnoty vyjmout a uložit do schránky. Vložit je pak můžete kdekoliv v libovolném patternu pomocí tlačítka Vložit.</translation>
-    </message>
-    <message>
-        <source>Click here and selected values will be copied into the clipboard.  You can paste them anywhere in any pattern by clicking on the paste button.</source>
-        <translation>Klikněte zde, pokud chcete označené hodnoty zkopírovat do schránky. Vložit je pak můžete kdekoliv v libovolného patternu pomocí tlačítka Vložit.</translation>
-    </message>
-    <message>
-        <source>Click here and the values from the clipboard will be pasted at the first visible measure.</source>
-        <translation>Kliknete-li zde, budou hodnoty ze schránky vloženy do prvního viditelného taktu.</translation>
-    </message>
-</context>
-<context>
-    <name>automationPattern</name>
-    <message>
-        <source>Drag a control while pressing &lt;Ctrl&gt;</source>
-        <translation>Ovladač táhni při stisknutém &lt;CTRL&gt;</translation>
-    </message>
-</context>
-<context>
-    <name>automationPatternView</name>
-    <message>
-        <source>double-click to open this pattern in automation editor</source>
-        <translation>dvojklikem otevřít tento pattern v automatizačním editoru</translation>
-    </message>
-    <message>
-        <source>Open in Automation editor</source>
-        <translation>Otevřít v automatizačním editoru</translation>
-    </message>
-    <message>
-        <source>Clear</source>
-        <translation>Vyčistit</translation>
-    </message>
-    <message>
-        <source>Reset name</source>
-        <translation>Resetovat jméno</translation>
-    </message>
-    <message>
-        <source>Change name</source>
-        <translation>Změnit jméno</translation>
-    </message>
-    <message>
-        <source>Disconnect &quot;%1&quot;</source>
-        <translation>Odpojit &quot;%1&quot;</translation>
-    </message>
-    <message>
-        <source>%1 Connections</source>
-        <translation>%1 Připojení</translation>
-    </message>
-</context>
-<context>
-    <name>automationTrack</name>
-    <message>
-        <source>Automation track</source>
-        <translation>Automatizační stopa</translation>
     </message>
 </context>
 <context>
@@ -3023,6 +3133,10 @@ Jestliže tento plugin funguje v Linuxu v jiném VST softwaru, kontaktujte pros�
     <message>
         <source>Beat/Bassline %1</source>
         <translation>Beat/Bassline %1</translation>
+    </message>
+    <message>
+        <source>Clone of %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4935,6 +5049,10 @@ Zpoždění %2 ms</translation>
     <message>
         <source>Choose background artwork</source>
         <translation>Vyberte obrázek na pozadí</translation>
+    </message>
+    <message>
+        <source>One instrument track window mode</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

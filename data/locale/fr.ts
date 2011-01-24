@@ -289,10 +289,6 @@ If you&apos;re interested in translating LMMS in another language or want to imp
         <source>DEVICE</source>
         <translation>PÉRIPHÉRIQUE</translation>
     </message>
-    <message>
-        <source>CHANNELS</source>
-        <translation>CANAUX</translation>
-    </message>
 </context>
 <context>
     <name>AudioPulseAudio::setupWidget</name>
@@ -2509,8 +2505,16 @@ Veuillez visiter http://lmms.sf.net/wiki pour la documentation de LMMS.</transla
         <translation>DECAY</translation>
     </message>
     <message>
-        <source>Release decay (not implemented):</source>
-        <translation>Descente du relâchement (non implémenté) :</translation>
+        <source>ATTACK</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Attack:</source>
+        <translation type="unfinished">Attaque :</translation>
+    </message>
+    <message>
+        <source>Release:</source>
+        <translation type="unfinished">Relâchement :</translation>
     </message>
 </context>
 <context>
@@ -2528,8 +2532,12 @@ Veuillez visiter http://lmms.sf.net/wiki pour la documentation de LMMS.</transla
         <translation>Couper la sortie</translation>
     </message>
     <message>
-        <source>Release decay</source>
-        <translation>Descente du relâchement</translation>
+        <source>Attack</source>
+        <translation type="unfinished">Attaque</translation>
+    </message>
+    <message>
+        <source>Release</source>
+        <translation type="unfinished">Relâchement</translation>
     </message>
 </context>
 <context>
