@@ -1,7 +1,7 @@
 /*
  * AudioPulseAudio.cpp - device-class which implements PulseAudio-output
  *
- * Copyright (c) 2008-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2011 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -164,7 +164,6 @@ static void context_state_callback(pa_context *c, void *userdata)
 
 		case PA_CONTEXT_READY:
 		{
-			pa_cvolume cv;
 			qDebug( "Connection established.\n" );
 			_this->m_s = pa_stream_new( c, "lmms", &_this->m_sampleSpec,  NULL);
 			pa_stream_set_state_callback( _this->m_s, stream_state_callback, _this );
@@ -189,8 +188,7 @@ static void context_state_callback(pa_context *c, void *userdata)
 
 			pa_stream_connect_playback( _this->m_s, NULL, &buffer_attr,
 										PA_STREAM_ADJUST_LATENCY,
-										pa_cvolume_set( &cv, _this->m_sampleSpec.channels,
-															PA_VOLUME_NORM ),
+										NULL,	// volume
 										NULL );
 			break;
 		}
