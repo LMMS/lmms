@@ -82,6 +82,7 @@ struct organ_parameters {
     float lfo_wet;
     float lfo_phase;
     float lfo_mode;
+    float lfo_type;
     
     float global_transpose;
     float global_detune;
@@ -174,6 +175,7 @@ public:
     void perc_reset();
 };
 
+/// A simple (and bad) simulation of scanner vibrato based on a series of modulated allpass filters
 class organ_vibrato
 {
 protected:
@@ -181,6 +183,31 @@ protected:
     float vibrato_x1[VibratoSize][2], vibrato_y1[VibratoSize][2];
     float lfo_phase;
     dsp::onepole<float> vibrato[2];
+public:
+    void reset();
+    void process(organ_parameters *parameters, float (*data)[2], unsigned int len, float sample_rate);
+};
+
+/// A more sophisticated simulation of scanner vibrato. Simulates a line box
+/// and an interpolating scanner. The line box is a series of 18 2nd order
+/// lowpass filters with cutoff frequency ~4kHz, with loss compensation.
+/// The interpolating scanner uses linear interpolation to "slide" between
+/// selected outputs of the line box.
+///
+/// @note
+/// This is a true CPU hog, and it should be optimised some day.
+/// @note
+/// The line box is mono. 36 lowpass filters might be an overkill.
+/// @note 
+/// See also: http://www.jhaible.de/interpolating_scanner_and_scanvib/jh_interpolating_scanner_and_scanvib.html
+/// (though it's a very loose adaptation of that version)
+class scanner_vibrato
+{
+protected:
+    enum { ScannerSize = 18 };
+    float lfo_phase;
+    dsp::biquad_d2<float> scanner[ScannerSize];
+    organ_vibrato legacy;
 public:
     void reset();
     void process(organ_parameters *parameters, float (*data)[2], unsigned int len, float sample_rate);
@@ -197,7 +224,7 @@ protected:
     dsp::biquad_d1<float> filterL[2], filterR[2];
     adsr envs[EnvCount];
     dsp::inertia<dsp::linear_ramp> expression;
-    organ_vibrato vibrato;
+    scanner_vibrato vibrato;
     float velocity;
     bool perc_released;
     /// The envelopes have ended and the voice is in final fadeout stage
@@ -260,7 +287,7 @@ public:
 struct drawbar_organ: public dsp::basic_synth, public calf_plugins::organ_enums {
     organ_parameters *parameters;
     percussion_voice percussion;
-    organ_vibrato global_vibrato;
+    scanner_vibrato global_vibrato;
     two_band_eq eq_l, eq_r;
     
      drawbar_organ(organ_parameters *_parameters)

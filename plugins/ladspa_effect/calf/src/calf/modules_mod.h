@@ -91,7 +91,7 @@ public:
     /// Current phases and phase deltas for bass and treble rotors
     uint32_t phase_l, dphase_l, phase_h, dphase_h;
     dsp::simple_delay<1024, float> delay;
-    dsp::biquad_d2<float> crossover1l, crossover1r, crossover2l, crossover2r;
+    dsp::biquad_d2<float> crossover1l, crossover1r, crossover2l, crossover2r, damper1l, damper1r;
     dsp::simple_delay<8, float> phaseshift;
     uint32_t srate;
     int vibrato_mode;

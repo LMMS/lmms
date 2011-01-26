@@ -81,7 +81,7 @@ struct vintage_delay_metadata: public plugin_metadata<vintage_delay_metadata>
 struct rotary_speaker_metadata: public plugin_metadata<rotary_speaker_metadata>
 {
 public:
-    enum { par_speed, par_spacing, par_shift, par_moddepth, par_treblespeed, par_bassspeed, par_micdistance, par_reflection, par_meter_l, par_meter_h, param_count };
+    enum { par_speed, par_spacing, par_shift, par_moddepth, par_treblespeed, par_bassspeed, par_micdistance, par_reflection, par_am_depth, par_test, par_meter_l, par_meter_h, param_count };
     enum { in_count = 2, out_count = 2, ins_optional = 0, outs_optional = 0, support_midi = true, require_midi = false, rt_capable = true };
     PLUGIN_NAME_ID_LABEL("rotary_speaker", "rotaryspeaker", "Rotary Speaker")
 };
@@ -347,7 +347,7 @@ struct organ_enums
         par_eg1attack, par_eg1decay, par_eg1sustain, par_eg1release, par_eg1velscl, par_eg1ampctl, 
         par_eg2attack, par_eg2decay, par_eg2sustain, par_eg2release, par_eg2velscl, par_eg2ampctl, 
         par_eg3attack, par_eg3decay, par_eg3sustain, par_eg3release, par_eg3velscl, par_eg3ampctl, 
-        par_lforate, par_lfoamt, par_lfowet, par_lfophase, par_lfomode,
+        par_lforate, par_lfoamt, par_lfowet, par_lfophase, par_lfomode, par_lfotype,
         par_transpose, par_detune,
         par_polyphony,
         par_quadenv,
@@ -383,6 +383,14 @@ struct organ_enums
         ampctl_f2,
         ampctl_all,
         ampctl_count
+    };
+    enum { 
+        lfotype_allpass = 0,
+        lfotype_cv1,
+        lfotype_cv2,
+        lfotype_cv3,
+        lfotype_cvfull,
+        lfotype_count
     };
     enum { 
         lfomode_off = 0,

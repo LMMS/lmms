@@ -321,14 +321,27 @@ inline bool rotary_speaker_audio_module::incr_towards(float &aspeed, float raspe
 
 uint32_t rotary_speaker_audio_module::process(uint32_t offset, uint32_t nsamples, uint32_t inputs_mask, uint32_t outputs_mask)
 {
+    if (true)
+    {
+        crossover2l.set_bp_rbj(2000.f, 0.7, (float)srate);
+        crossover2r.copy_coeffs(crossover2l);
+        damper1l.set_bp_rbj(1000.f*pow(4.0, *params[par_test]), 0.7, (float)srate);
+        damper1r.copy_coeffs(damper1l);
+    }
+    else
+    {
+        crossover2l.set_hp_rbj(800.f, 0.7, (float)srate);
+        crossover2r.copy_coeffs(crossover2l);
+    }
     int shift = (int)(300000 * (*params[par_shift])), pdelta = (int)(300000 * (*params[par_spacing]));
     int md = (int)(100 * (*params[par_moddepth]));
     float mix = 0.5 * (1.0 - *params[par_micdistance]);
     float mix2 = *params[par_reflection];
     float mix3 = mix2 * mix2;
+    float am_depth = *params[par_am_depth];
     for (unsigned int i = 0; i < nsamples; i++) {
         float in_l = ins[0][i + offset], in_r = ins[1][i + offset];
-        float in_mono = 0.5f * (in_l + in_r);
+        float in_mono = atan(0.5f * (in_l + in_r));
         
         int xl = pseudo_sine_scl(phase_l), yl = pseudo_sine_scl(phase_l + 0x40000000);
         int xh = pseudo_sine_scl(phase_h), yh = pseudo_sine_scl(phase_h + 0x40000000);
@@ -337,11 +350,13 @@ uint32_t rotary_speaker_audio_module::process(uint32_t offset, uint32_t nsamples
         meter_h = xh;
         // float out_hi_l = in_mono - delay.get_interp_1616(shift + md * xh) + delay.get_interp_1616(shift + md * 65536 + pdelta - md * yh) - delay.get_interp_1616(shift + md * 65536 + pdelta + pdelta - md * xh);
         // float out_hi_r = in_mono + delay.get_interp_1616(shift + md * 65536 - md * yh) - delay.get_interp_1616(shift + pdelta + md * xh) + delay.get_interp_1616(shift + pdelta + pdelta + md * yh);
-        float out_hi_l = in_mono + delay.get_interp_1616(shift + md * xh) - mix2 * delay.get_interp_1616(shift + md * 65536 + pdelta - md * yh) + mix3 * delay.get_interp_1616(shift + md * 65536 + pdelta + pdelta - md * xh);
-        float out_hi_r = in_mono + delay.get_interp_1616(shift + md * 65536 - md * yh) - mix2 * delay.get_interp_1616(shift + pdelta + md * xh) + mix3 * delay.get_interp_1616(shift + pdelta + pdelta + md * yh);
+        float fm_hi_l = delay.get_interp_1616(shift + md * xh) - mix2 * delay.get_interp_1616(shift + md * 65536 + pdelta - md * yh) + mix3 * delay.get_interp_1616(shift + md * 65536 + pdelta + pdelta - md * xh);
+        float fm_hi_r = delay.get_interp_1616(shift + md * 65536 - md * yh) - mix2 * delay.get_interp_1616(shift + pdelta + md * xh) + mix3 * delay.get_interp_1616(shift + pdelta + pdelta + md * yh);
+        float out_hi_l = lerp(in_mono, damper1l.process(fm_hi_l), lerp(0.5, xh * 1.0 / 65536.0, am_depth));
+        float out_hi_r = lerp(in_mono, damper1r.process(fm_hi_r), lerp(0.5, yh * 1.0 / 65536.0, am_depth));
 
-        float out_lo_l = in_mono + delay.get_interp_1616(shift + md * xl); // + delay.get_interp_1616(shift + md * 65536 + pdelta - md * yl);
-        float out_lo_r = in_mono + delay.get_interp_1616(shift + md * yl); // - delay.get_interp_1616(shift + pdelta + md * yl);
+        float out_lo_l = lerp(in_mono, delay.get_interp_1616(shift + (md * xl >> 2)), lerp(0.5, yl * 1.0 / 65536.0, am_depth)); // + delay.get_interp_1616(shift + md * 65536 + pdelta - md * yl);
+        float out_lo_r = lerp(in_mono, delay.get_interp_1616(shift + (md * yl >> 2)), lerp(0.5, xl * 1.0 / 65536.0, am_depth)); // + delay.get_interp_1616(shift + md * 65536 + pdelta - md * yl);
         
         out_hi_l = crossover2l.process(out_hi_l); // sanitize(out_hi_l);
         out_hi_r = crossover2r.process(out_hi_r); // sanitize(out_hi_r);
@@ -354,8 +369,8 @@ uint32_t rotary_speaker_audio_module::process(uint32_t offset, uint32_t nsamples
         float mic_l = out_l + mix * (out_r - out_l);
         float mic_r = out_r + mix * (out_l - out_r);
         
-        outs[0][i + offset] = mic_l * 0.5f;
-        outs[1][i + offset] = mic_r * 0.5f;
+        outs[0][i + offset] = mic_l;
+        outs[1][i + offset] = mic_r;
         delay.put(in_mono);
         phase_l += dphase_l;
         phase_h += dphase_h;
@@ -364,6 +379,8 @@ uint32_t rotary_speaker_audio_module::process(uint32_t offset, uint32_t nsamples
     crossover1r.sanitize();
     crossover2l.sanitize();
     crossover2r.sanitize();
+    damper1l.sanitize();
+    damper1r.sanitize();
     float delta = nsamples * 1.0 / srate;
     if (vibrato_mode == 5)
         update_speed_manual(delta);

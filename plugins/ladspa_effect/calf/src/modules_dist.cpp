@@ -333,6 +333,8 @@ uint32_t exciter_audio_module::process(uint32_t offset, uint32_t numsamples, uin
         
         meter_drive = 0.f;
         
+        float in2out = *params[param_listen] > 0.f ? 0.f : 1.f;
+        
         // process
         while(offset < numsamples) {
             // cycle through samples
@@ -371,40 +373,25 @@ uint32_t exciter_audio_module::process(uint32_t offset, uint32_t numsamples, uin
                 // all post filters in chain
                 proc[i] = hp[i][2].process(hp[i][3].process(proc[i]));
             }
+            maxDrive = dist[0].get_distortion_level() * *params[param_amount];
             
             if(in_count > 1 && out_count > 1) {
+                maxDrive = std::max(maxDrive, dist[1].get_distortion_level() * *params[param_amount]);
                 // full stereo
-                if(*params[param_listen] > 0.f)
-                    out[0] = proc[0] * *params[param_amount] * *params[param_level_out];
-                else
-                    out[0] = (proc[0] * *params[param_amount] + in[0]) * *params[param_level_out];
+                out[0] = (proc[0] * *params[param_amount] + in2out * in[0]) * *params[param_level_out];
+                out[1] = (proc[1] * *params[param_amount] + in2out * in[1]) * *params[param_level_out];
                 outs[0][offset] = out[0];
-                if(*params[param_listen] > 0.f)
-                    out[1] = proc[1] * *params[param_amount] * *params[param_level_out];
-                else
-                    out[1] = (proc[1] * *params[param_amount] + in[1]) * *params[param_level_out];
                 outs[1][offset] = out[1];
-                maxDrive = std::max(dist[0].get_distortion_level() * *params[param_amount],
-                                            dist[1].get_distortion_level() * *params[param_amount]);
             } else if(out_count > 1) {
                 // mono -> pseudo stereo
-                if(*params[param_listen] > 0.f)
-                    out[0] = proc[0] * *params[param_amount] * *params[param_level_out];
-                else
-                    out[0] = (proc[0] * *params[param_amount] + in[0]) * *params[param_level_out];
+                out[1] = out[0] = (proc[0] * *params[param_amount] + in2out * in[0]) * *params[param_level_out];
                 outs[0][offset] = out[0];
-                out[1] = out[0];
                 outs[1][offset] = out[1];
-                maxDrive = dist[0].get_distortion_level() * *params[param_amount];
             } else {
                 // stereo -> mono
                 // or full mono
-                if(*params[param_listen] > 0.f)
-                    out[0] = proc[0] * *params[param_amount] * *params[param_level_out];
-                else
-                    out[0] = (proc[0] * *params[param_amount] + in[0]) * *params[param_level_out];
+                out[0] = (proc[0] * *params[param_amount] + in2out * in[0]) * *params[param_level_out];
                 outs[0][offset] = out[0];
-                maxDrive = dist[0].get_distortion_level() * *params[param_amount];
             }
             
             // set up in / out meters

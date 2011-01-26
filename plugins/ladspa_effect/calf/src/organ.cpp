@@ -611,6 +611,85 @@ void organ_vibrato::process(organ_parameters *parameters, float (*data)[2], unsi
     }
 }
 
+void scanner_vibrato::reset()
+{
+    legacy.reset();
+    for (int i = 0; i < ScannerSize; i++)
+        scanner[i].reset();
+    lfo_phase = 0.f;
+}
+
+void scanner_vibrato::process(organ_parameters *parameters, float (*data)[2], unsigned int len, float sample_rate)
+{
+    if (!len)
+        return;
+    
+    int vtype = (int)parameters->lfo_type;
+    if (!vtype || vtype > organ_enums::lfotype_cvfull)
+    {
+        legacy.process(parameters, data, len, sample_rate);
+        return;
+    }
+    
+    // I bet the original components of the line box had some tolerance,
+    // hence two different values of cutoff frequency
+    scanner[0].set_lp_rbj(4000, 0.707, sample_rate);
+    scanner[1].set_lp_rbj(4200, 0.707, sample_rate);
+    for (int t = 2; t < ScannerSize; t ++)
+    {
+        scanner[t].copy_coeffs(scanner[t & 1]);
+    }
+    
+    float lfo_phase2 = lfo_phase + parameters->lfo_phase * (1.0 / 360.0);
+    if (lfo_phase2 >= 1.0)
+        lfo_phase2 -= 1.0;
+    float vib_wet = parameters->lfo_wet;
+    float dphase = parameters->lfo_rate / sample_rate;
+    static const int v1[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 8, 8 };
+    static const int v2[] = { 0, 1, 2, 4, 6, 8, 9, 10, 12 };
+    static const int v3[] = { 0, 1, 3, 6, 11, 12, 15, 17, 18, 18, 18 };
+    static const int vfull[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 18 };
+    static const int *vtypes[] = { NULL, v1, v2, v3, vfull };
+    const int *vib = vtypes[vtype];
+    
+    float vibamt = 8 * parameters->lfo_amt;
+    if (vtype == organ_enums::lfotype_cvfull)
+        vibamt = 17 * parameters->lfo_amt;
+    for (unsigned int i = 0; i < len; i++)
+    {
+        float line[ScannerSize + 1];
+        float v0 = (data[i][0] + data[i][1]) * 0.5;
+        
+        line[0] = v0;
+        for (int t = 0; t < ScannerSize; t++)
+            line[t + 1] = scanner[t].process(line[t]) * 1.03;
+        
+        float lfo1 = lfo_phase < 0.5 ? 2 * lfo_phase : 2 - 2 * lfo_phase;
+        float lfo2 = lfo_phase2 < 0.5 ? 2 * lfo_phase2 : 2 - 2 * lfo_phase2;
+        
+        float pos = vibamt * lfo1;
+        int ipos = (int)pos;
+        float vl = lerp(line[vib[ipos]], line[vib[ipos + 1]], pos - ipos);
+        
+        pos = vibamt * lfo2;
+        ipos = (int)pos;
+        float vr = lerp(line[vib[ipos]], line[vib[ipos + 1]], pos - ipos);
+        
+        lfo_phase += dphase;
+        if (lfo_phase >= 1.0)
+            lfo_phase -= 1.0;
+        lfo_phase2 += dphase;
+        if (lfo_phase2 >= 1.0)
+            lfo_phase2 -= 1.0;
+        
+        data[i][0] += (vl - v0) * vib_wet;
+        data[i][1] += (vr - v0) * vib_wet;
+    }
+    for (int t = 0; t < ScannerSize; t++)
+    {
+        scanner[t].sanitize();
+    }
+}
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void organ_voice::update_pitch()
