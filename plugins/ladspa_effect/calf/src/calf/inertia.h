@@ -35,6 +35,7 @@ public:
     linear_ramp(int _ramp_len) {
         ramp_len = _ramp_len;
         mul = (float)(1.0f / ramp_len);
+        delta = 0.f;
     }
     /// Change ramp length
     inline void set_length(int _ramp_len) {
@@ -71,6 +72,7 @@ public:
     exponential_ramp(int _ramp_len) {
         ramp_len = _ramp_len;
         root = (float)(1.0f / ramp_len);
+        delta = 1.0;
     }
     inline void set_length(int _ramp_len) {
         ramp_len = _ramp_len;
