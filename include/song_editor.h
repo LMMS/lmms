@@ -129,6 +129,7 @@ private:
 	positionLine * m_positionLine;
 
 	bool m_scrollBack;
+	bool m_smoothScroll;
 
 } ;
 

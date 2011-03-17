@@ -112,6 +112,7 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 				"disablechannelactivityindicators" ).toInt() ),
 	m_manualChPiano( configManager::inst()->value( "ui",
 					"manualchannelpiano" ).toInt() ),
+	m_smoothScroll( configManager::inst()->value( "ui", "smoothscroll" ).toInt() ),
 	m_oneInstrumentTrackWindow( configManager::inst()->value( "ui",
 					"oneinstrumenttrackwindow" ).toInt() )
 {
@@ -453,7 +454,7 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 	tabWidget * ui_fx_tw = new tabWidget( tr( "UI effects vs. "
 						"performance" ).toUpper(),
 								performance );
-	ui_fx_tw->setFixedHeight( 70 );
+	ui_fx_tw->setFixedHeight( 90 );
 
 	ledCheckBox * disable_ch_act_ind = new ledCheckBox(
 				tr( "Disable channel activity indicators" ),
@@ -471,6 +472,13 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 	manual_ch_piano->setChecked( m_manualChPiano );
 	connect( manual_ch_piano, SIGNAL( toggled( bool ) ),
 				this, SLOT( toggleManualChPiano( bool ) ) );
+
+	ledCheckBox * smoothScroll = new ledCheckBox(
+			tr( "Smooth scroll in Song Editor" ), ui_fx_tw );
+	smoothScroll->move( 10, 60 );
+	smoothScroll->setChecked( m_smoothScroll );
+	connect( smoothScroll, SIGNAL( toggled( bool ) ),
+				this, SLOT( toggleSmoothScroll( bool ) ) );
 
 
 
@@ -739,6 +747,8 @@ void setupDialog::accept()
 					QString::number( m_disableChActInd ) );
 	configManager::inst()->setValue( "ui", "manualchannelpiano",
 					QString::number( m_manualChPiano ) );
+	configManager::inst()->setValue( "ui", "smoothscroll",
+					QString::number( m_smoothScroll ) );
 	configManager::inst()->setValue( "ui", "oneinstrumenttrackwindow",
 					QString::number( m_oneInstrumentTrackWindow ) );
 
@@ -891,6 +901,15 @@ void setupDialog::toggleDisableChActInd( bool _disabled )
 void setupDialog::toggleManualChPiano( bool _enabled )
 {
 	m_manualChPiano = _enabled;
+}
+
+
+
+
+
+void setupDialog::toggleSmoothScroll( bool _enabled )
+{
+	m_smoothScroll = _enabled;
 }
 
 

@@ -38,6 +38,7 @@
 #include "song_editor.h"
 #include "automatable_slider.h"
 #include "combobox.h"
+#include "config_mgr.h"
 #include "cpuload_widget.h"
 #include "embed.h"
 #include "lcd_spinbox.h"
@@ -76,7 +77,8 @@ void positionLine::paintEvent( QPaintEvent * _pe )
 songEditor::songEditor( song * _song, songEditor * & _engine_ptr ) :
 	trackContainerView( _song ),
 	m_s( _song ),
-	m_scrollBack( false )
+	m_scrollBack( false ),
+	m_smoothScroll( configManager::inst()->value( "ui", "smoothscroll" ).toInt() )
 {
 	_engine_ptr = this;
 
@@ -650,24 +652,31 @@ void songEditor::updateScrollBar( int _len )
 
 
 
-static inline void animateScroll( QScrollBar *scrollBar, int newVal )
+static inline void animateScroll( QScrollBar *scrollBar, int newVal, bool smoothScroll )
 {
-	// do smooth scroll animation using QTimeLine
-	QTimeLine *t = scrollBar->findChild<QTimeLine *>();
-	if( t == NULL )
+	if( smoothScroll == false )
 	{
-		t = new QTimeLine( 600, scrollBar );
-		t->setFrameRange( scrollBar->value(), newVal );
-		t->connect( t, SIGNAL( finished() ), SLOT( deleteLater() ) );
-
-		scrollBar->connect( t, SIGNAL( frameChanged( int ) ), SLOT( setValue( int ) ) );
-
-		t->start();
+		scrollBar->setValue( newVal );
 	}
 	else
 	{
-		// smooth scrolling is still active, therefore just update the end frame
-		t->setEndFrame( newVal );
+		// do smooth scroll animation using QTimeLine
+		QTimeLine *t = scrollBar->findChild<QTimeLine *>();
+		if( t == NULL )
+		{
+			t = new QTimeLine( 600, scrollBar );
+			t->setFrameRange( scrollBar->value(), newVal );
+			t->connect( t, SIGNAL( finished() ), SLOT( deleteLater() ) );
+
+			scrollBar->connect( t, SIGNAL( frameChanged( int ) ), SLOT( setValue( int ) ) );
+
+			t->start();
+		}
+		else
+		{
+			// smooth scrolling is still active, therefore just update the end frame
+			t->setEndFrame( newVal );
+		}
 	}
 }
 
@@ -684,7 +693,7 @@ void songEditor::updatePosition( const midiTime & _t )
 		if( _t > m_currentPosition + w * midiTime::ticksPerTact() /
 							pixelsPerTact() )
 		{
-			animateScroll( m_leftRightScroll, _t.getTact() );
+			animateScroll( m_leftRightScroll, _t.getTact(), m_smoothScroll );
 		}
 		else if( _t < m_currentPosition )
 		{
@@ -692,7 +701,7 @@ void songEditor::updatePosition( const midiTime & _t )
 				(int)( _t - w * midiTime::ticksPerTact() /
 							pixelsPerTact() ),
 									0 );
-			animateScroll( m_leftRightScroll, t.getTact() );
+			animateScroll( m_leftRightScroll, t.getTact(), m_smoothScroll );
 		}
 		m_scrollBack = false;
 	}
