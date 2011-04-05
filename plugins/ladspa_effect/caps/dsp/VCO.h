@@ -1,7 +1,7 @@
 /*
   dsp/VCO.h
 
-	Copyright 2004 Tim Goetze <tim@quitte.de>
+	Copyright 2004, 2010 Tim Goetze <tim@quitte.de>
 
 	oscillators for triangle/sawtooth/square waves, and a combination
 	for detuning and hard sync.
@@ -74,7 +74,7 @@ class TriSaw
 		inline float get()
 			{
 				phase += inc;
-				
+
 				/* the good thing is that tri is always > .5, which implies
 				 * that this first conditional is true more often than not. */
 				if (phase <= tri)
@@ -151,13 +151,14 @@ class TriSawSquare
 				st2 = s * tri;
 			}
 
-		/* advance and return 1 sample. a pity we need so many conditionals,
-		 * seeing that this is run at 352 k.
+		/* advance and return 1 sample. 
+		 * many branching instructions but on this intel chip faster than
+		 * a version using floor() to keep the phase within [0..1].
 		 */
 		inline float get()
 			{
 				phase += inc;
-				
+
 				if (phase <= tri)
 					first_half:
 					/* raw version:

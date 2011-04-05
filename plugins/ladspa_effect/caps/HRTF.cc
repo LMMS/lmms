@@ -71,13 +71,13 @@ template <sample_func_t F>
 void
 HRTF::one_cycle (int frames)
 {
-	d_sample * s = ports[0];
+	sample_t * s = ports[0];
 
 	int p = (int) getport(1);
 	if (p != pan) set_pan (p);
 
-	d_sample * dl = ports[2];
-	d_sample * dr = ports[3];
+	sample_t * dl = ports[2];
+	sample_t * dr = ports[3];
 
 	double l, r;
 

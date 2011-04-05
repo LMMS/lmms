@@ -35,7 +35,7 @@ namespace DSP {
 /* sample sinc() with step size omega into s[], centered around s + n / 2 */
 
 inline void
-sinc (double omega, d_sample * s, int n)
+sinc (double omega, sample_t * s, int n)
 {
 	/* initial phase */
 	double phi = (n / 2) * -omega;

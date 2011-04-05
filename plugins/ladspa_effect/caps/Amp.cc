@@ -84,15 +84,15 @@ template <sample_func_t F, int OVERSAMPLE>
 void
 AmpIII::one_cycle (int frames)
 {
-	d_sample * s = ports[0];
+	sample_t * s = ports[0];
 	
-	d_sample gain = getport(1);
-	d_sample temp = getport(2) * tube.scale;
+	sample_t gain = getport(1);
+	sample_t temp = getport(2) * tube.scale;
 	
 	drive = getport(3) * .5; 
 	i_drive = 1 / (1 - drive);
 	
-	d_sample * d = ports[4];
+	sample_t * d = ports[4];
 	
 	*ports[5] = OVERSAMPLE;
 
@@ -109,7 +109,7 @@ AmpIII::one_cycle (int frames)
 
 	for (int i = 0; i < frames; ++i)
 	{
-		register d_sample a = s[i];
+		register sample_t a = s[i];
 
 		a = g * tube.transfer (a * temp);
 		a = filter.process (a + normal);
@@ -200,17 +200,17 @@ AmpIV::one_cycle (int frames)
 {
 	double one_over_n = frames > 0 ? 1. / frames : 1;
 
-	d_sample * s = ports[0];
+	sample_t * s = ports[0];
 	
-	d_sample gain = getport(1);
-	d_sample temp = getport(2) * tube.scale;
+	sample_t gain = getport(1);
+	sample_t temp = getport(2) * tube.scale;
 
 	tone.start_cycle (ports + 3, one_over_n);
 	
 	drive = getport(7) * .5; 
 	i_drive = 1 / (1 - drive);
 	
-	d_sample * d = ports[8];
+	sample_t * d = ports[8];
 	
 	*ports[9] = OVERSAMPLE;
 
@@ -226,7 +226,7 @@ AmpIV::one_cycle (int frames)
 
 	for (int i = 0; i < frames; ++i)
 	{
-		register d_sample a = s[i] + normal;
+		register sample_t a = s[i] + normal;
 
 		a = g * tube.transfer (a * temp);
 		a = tone.process (a);
@@ -337,9 +337,9 @@ template <sample_func_t F, int OVERSAMPLE>
 void
 AmpV::one_cycle (int frames)
 {
-	d_sample * s = ports[0];
+	sample_t * s = ports[0];
 	
-	d_sample gain = getport(1);
+	sample_t gain = getport(1);
 
 	if (*ports[2] != cut)
 	{
@@ -359,10 +359,10 @@ AmpV::one_cycle (int frames)
 	i_drive = 1 / (1 - drive);
 	
 	#define MAX_WATTS port_info[5].range.UpperBound
-	d_sample sag = (MAX_WATTS - getport(5)) / MAX_WATTS;
+	sample_t sag = (MAX_WATTS - getport(5)) / MAX_WATTS;
 	sag = .6 * sag * sag;
 		
-	d_sample * d = ports[6]; 
+	sample_t * d = ports[6]; 
 	
 	*ports[7] = OVERSAMPLE;
 
@@ -382,8 +382,8 @@ AmpV::one_cycle (int frames)
 
 	for (int i = 0; i < frames; ++i)
 	{
-		register d_sample a = s[i];
-		register d_sample v = 3 - supply;
+		register sample_t a = s[i];
+		register sample_t v = 3 - supply;
 		/* alternative curve: v = v * v * .1 + .1; */
 		v = v * v * .06 + .46;
 
@@ -503,18 +503,18 @@ template <sample_func_t F, int OVERSAMPLE>
 void
 AmpVTS::one_cycle (int frames)
 {
-	d_sample * s = ports[0];
+	sample_t * s = ports[0];
 
 	tonestack.start_cycle (ports + 1, 2);
-	d_sample gain = getport(2);
+	sample_t gain = getport(2);
 
 	drive = getport(6) * .5; 
 	i_drive = 1 / (1 - drive);
 	
-	d_sample sag = 1 - max (0.0001, min (1, getport(7)));
+	sample_t sag = 1 - max (0.0001, min (1, getport(7)));
 	sag = .6 * sag * sag; /* map to log space makes slider better */
 		
-	d_sample * d = ports[8]; 
+	sample_t * d = ports[8]; 
 	
 	*ports[9] = OVERSAMPLE;
 

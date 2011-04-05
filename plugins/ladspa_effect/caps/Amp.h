@@ -49,7 +49,7 @@ class AmpStub
 	public:
 		DSP::TwelveAX7_3 tube;
 		
-		d_sample drive, i_drive;
+		sample_t drive, i_drive;
 
 		struct {
 			/* gain (remember current setting and fade to port setting in run) */
@@ -78,7 +78,7 @@ class AmpStub
 		
 		void init (bool adjust_downsampler = false);
 
-		inline d_sample power_transfer (d_sample a)
+		inline sample_t power_transfer (sample_t a)
 			{
 				return i_drive * (a - drive * fabs (a) * a);
 			}
@@ -98,7 +98,7 @@ class PreampIII
 	public:
 		static PortInfo port_info[];
 
-		d_sample adding_gain;
+		sample_t adding_gain;
 
 		void init();
 		void activate()
@@ -136,7 +136,7 @@ class AmpIII
 	public:
 		static PortInfo port_info[];
 
-		d_sample adding_gain;
+		sample_t adding_gain;
 
 		void init();
 		void activate()
@@ -169,16 +169,16 @@ PreampBand;
 class ToneControls 
 {
 	public:
-		d_sample eq_gain[4];
+		sample_t eq_gain[4];
 		DSP::Eq<4> eq;
 		static PreampBand bands[4];
 		
 	public:
 		void init (double _fs);
-		void activate (d_sample **);
+		void activate (sample_t **);
 
 		inline void 
-		start_cycle (d_sample ** ports, double one_over_n)
+		start_cycle (sample_t ** ports, double one_over_n)
 			{
 				for (int i = 0; i < 4; ++i)
 				{
@@ -198,7 +198,7 @@ class ToneControls
 		double get_band_gain (int i, double g);
 		void set_band_gain (int i, float g);
 
-		inline d_sample process (d_sample x)
+		inline sample_t process (sample_t x)
 			{
 				return eq.process (x);
 			}
@@ -218,7 +218,7 @@ class PreampIV
 	public:
 		static PortInfo port_info[];
 
-		d_sample adding_gain;
+		sample_t adding_gain;
 
 		void init();
 		void activate();
@@ -248,7 +248,7 @@ class AmpIV
 	public:
 		static PortInfo port_info[];
 
-		d_sample adding_gain;
+		sample_t adding_gain;
 
 		void init();
 		void activate()
@@ -284,16 +284,16 @@ class AmpV
 
 		DSP::BiQuad filter[3];
 		
-		d_sample cut, tone;
+		sample_t cut, tone;
 
 		/* supply voltage sag */
-		d_sample supply;
+		sample_t supply;
 		DSP::BiQuad power_cap[2];
 		
 	public:
 		static PortInfo port_info[];
 
-		d_sample adding_gain;
+		sample_t adding_gain;
 
 		void init();
 		void activate()
@@ -336,16 +336,16 @@ class AmpVTS
 		template <sample_func_t F, int OVERSAMPLE>
 			void one_cycle (int frames);
 
-		d_sample cut, tone;
+		sample_t cut, tone;
 
 		/* supply voltage sag */
-		d_sample supply;
+		sample_t supply;
 		DSP::BiQuad power_cap[2];
 		
 	public:
 		static PortInfo port_info[];
 
-		d_sample adding_gain;
+		sample_t adding_gain;
 
 		void init();
 		void activate()

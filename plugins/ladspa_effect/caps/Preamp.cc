@@ -42,10 +42,10 @@ template <sample_func_t F, int OVERSAMPLE>
 void
 PreampIII::one_cycle (int frames)
 {
-	d_sample * s = ports[0];
-	d_sample gain = getport(1);
-	d_sample temp = getport(2) * tube.scale;
-	d_sample * d = ports[3];
+	sample_t * s = ports[0];
+	sample_t gain = getport(1);
+	sample_t temp = getport(2) * tube.scale;
+	sample_t * d = ports[3];
 	*ports[4] = OVERSAMPLE;
 
 	double g = current.g;
@@ -62,7 +62,7 @@ PreampIII::one_cycle (int frames)
 
 	for (int i = 0; i < frames; ++i)
 	{
-		register d_sample a = s[i] + normal;
+		register sample_t a = s[i] + normal;
 
 		a = g * tube.transfer (a * temp);
 		a = filter.process (a);
@@ -145,13 +145,13 @@ PreampIV::one_cycle (int frames)
 {
 	double one_over_n = frames > 0 ? 1. / frames : 1;
 
-	d_sample * s = ports[0];
-	d_sample gain = getport(1);
-	d_sample temp = getport(2) * tube.scale;
+	sample_t * s = ports[0];
+	sample_t gain = getport(1);
+	sample_t temp = getport(2) * tube.scale;
 
 	tone.start_cycle (ports + 3, one_over_n);
 
-	d_sample * d = ports[7];
+	sample_t * d = ports[7];
 	*ports[8] = OVERSAMPLE;
 
 	double g = current.g;
@@ -166,7 +166,7 @@ PreampIV::one_cycle (int frames)
 
 	for (int i = 0; i < frames; ++i)
 	{
-		register d_sample a = tone.process (s[i] + normal);
+		register sample_t a = tone.process (s[i] + normal);
 
 		a = g * tube.transfer (a * temp);
 

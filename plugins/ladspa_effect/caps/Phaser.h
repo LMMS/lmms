@@ -36,7 +36,7 @@
 class PhaserAP
 {
 	public:
-		d_sample a, m;
+		sample_t a, m;
 		
 		PhaserAP() 
 		{ 
@@ -48,9 +48,9 @@ class PhaserAP
 			a = (1 - delay) / (1 + delay);
 		}
 
-		d_sample process (d_sample x)
+		sample_t process (sample_t x)
 		{
-			register d_sample y = -a * x + m;
+			register sample_t y = -a * x + m;
 			m = a * y + x;
 
 			return y;
@@ -64,8 +64,8 @@ class PhaserI
 		PhaserAP ap[6];
 		DSP::Sine lfo;
 
-		d_sample rate;
-		d_sample y0;
+		sample_t rate;
+		sample_t y0;
 
 		struct {
 			double bottom, range;
@@ -117,8 +117,8 @@ class PhaserII
 		PhaserAP ap[6];
 		DSP::Lorenz lorenz;
 
-		d_sample rate;
-		d_sample y0;
+		sample_t rate;
+		sample_t y0;
 
 		struct {
 			double bottom, range;

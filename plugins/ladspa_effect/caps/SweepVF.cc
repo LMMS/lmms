@@ -54,7 +54,7 @@ template <sample_func_t F>
 void
 SweepVFI::one_cycle (int frames)
 {
-	d_sample * s = ports[0];
+	sample_t * s = ports[0];
 
 	int blocks = frames / BLOCK_SIZE;
 	if (frames & (BLOCK_SIZE - 1))
@@ -69,7 +69,7 @@ SweepVFI::one_cycle (int frames)
 
 	lorenz.set_rate (getport(7));
 
-	d_sample * d = ports[8];
+	sample_t * d = ports[8];
 
 	while (frames)
 	{
@@ -183,7 +183,7 @@ template <sample_func_t F>
 void
 SweepVFII::one_cycle (int frames)
 {
-	d_sample * s = ports[0];
+	sample_t * s = ports[0];
 
 	int blocks = frames / BLOCK_SIZE;
 	if (frames & (BLOCK_SIZE - 1))
@@ -199,7 +199,7 @@ SweepVFII::one_cycle (int frames)
 	lorenz1.set_rate (getport(7));
 	lorenz2.set_rate (getport(11));
 
-	d_sample * d = ports[12];
+	sample_t * d = ports[12];
 
 	while (frames)
 	{
@@ -354,7 +354,7 @@ template <sample_func_t F>
 void
 AutoWah::one_cycle (int frames)
 {
-	d_sample * s = ports[0];
+	sample_t * s = ports[0];
 
 	int blocks = frames / BLOCK_SIZE;
 	if (frames & (BLOCK_SIZE - 1))
@@ -367,7 +367,7 @@ AutoWah::one_cycle (int frames)
 
 	double scale = getport(3);
 
-	d_sample * d = ports[4];
+	sample_t * d = ports[4];
 
 	while (frames)
 	{
@@ -389,7 +389,7 @@ AutoWah::one_cycle (int frames)
 		
 		for (int i = 0; i < n; ++i)
 		{
-			d_sample x = s[i] + normal;
+			sample_t x = s[i] + normal;
 			/* A stacked SVF in bandpass mode is rather quiet, which is
 			 * compensated here */
 			F (d, i, 2 * svf.process (x), adding_gain);

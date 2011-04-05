@@ -37,7 +37,7 @@ template <sample_func_t F>
 void
 PhaserI::one_cycle (int frames)
 {
-	d_sample * s = ports[0];
+	sample_t * s = ports[0];
 
 	if (rate != *ports[1])
 	{
@@ -49,7 +49,7 @@ PhaserI::one_cycle (int frames)
 	double spread = 1 + getport(3);
 	double fb = getport(4);
 
-	d_sample * dst = ports[5];
+	sample_t * dst = ports[5];
 
 	while (frames)
 	{
@@ -67,8 +67,8 @@ PhaserI::one_cycle (int frames)
 		
 		for (int i = 0; i < n; ++i)
 		{
-			d_sample x = s[i];
-			d_sample y = x + y0 * fb + normal;
+			sample_t x = s[i];
+			sample_t y = x + y0 * fb + normal;
 
 			for (int j = 5; j >= 0; --j)
 				y = ap[j].process (y);
@@ -138,7 +138,7 @@ template <sample_func_t F>
 void
 PhaserII::one_cycle (int frames)
 {
-	d_sample * s = ports[0];
+	sample_t * s = ports[0];
 
 	lorenz.set_rate (getport(1) * .08);
 
@@ -146,7 +146,7 @@ PhaserII::one_cycle (int frames)
 	double spread = 1 + getport(3);
 	double fb = getport(4);
 
-	d_sample * dst = ports[5];
+	sample_t * dst = ports[5];
 
 	while (frames)
 	{
@@ -164,8 +164,8 @@ PhaserII::one_cycle (int frames)
 		
 		for (int i = 0; i < n; ++i)
 		{
-			d_sample x = s[i];
-			d_sample y = x + y0 * fb + normal;
+			sample_t x = s[i];
+			sample_t y = x + y0 * fb + normal;
 
 			for (int j = 5; j >= 0; --j)
 				y = ap[j].process (y);

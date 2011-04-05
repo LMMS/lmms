@@ -37,7 +37,7 @@ class Eq
 : public Plugin
 {
 	public:
-		d_sample gain[10];
+		sample_t gain[10];
 		DSP::Eq<10> eq;
 
 		int block;
@@ -67,7 +67,7 @@ class Eq2x2
 : public Plugin
 {
 	public:
-		d_sample gain[10];
+		sample_t gain[10];
 		DSP::Eq<10> eq[2];
 
 		template <sample_func_t F>

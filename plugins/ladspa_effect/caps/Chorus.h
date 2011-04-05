@@ -41,7 +41,7 @@ class ChorusStub
 : public Plugin
 {
 	public:
-		d_sample time, width, rate;
+		sample_t time, width, rate;
 };
 
 class ChorusI
@@ -92,8 +92,8 @@ class StereoChorusI
 : public ChorusStub
 {
 	public:
-		d_sample rate;
-		d_sample phase;
+		sample_t rate;
+		sample_t phase;
 
 		DSP::Delay delay;
 
@@ -161,14 +161,14 @@ class FracTap
 				f2.init (.001, frandom());
 			}
 		
-		void set_rate (d_sample r)
+		void set_rate (sample_t r)
 			{
 				f1.set_rate (r * FRACTAL_RATE);
 				f2.set_rate (3.3 * r * FRACTAL_RATE);
 			}
 
 		/* t = time, w = width, should inline nicely */
-		d_sample get (DSP::Delay & d, double t, double w)
+		sample_t get (DSP::Delay & d, double t, double w)
 			{
 				double m = lp.process (f1.get() + .3 * f2.get());
 				return d.get_cubic (t + w * m);
@@ -190,7 +190,7 @@ class ChorusII
 		template <sample_func_t>
 			void one_cycle (int frames);
 	
-		void set_rate (d_sample r)
+		void set_rate (sample_t r)
 			{
 				rate = r;
 				for (int i = 0; i < Taps; ++i)
@@ -237,8 +237,8 @@ class StereoChorusII
 : public ChorusStub
 {
 	public:
-		d_sample rate;
-		d_sample phase;
+		sample_t rate;
+		sample_t phase;
 
 		DSP::Delay delay;
 
@@ -251,7 +251,7 @@ class StereoChorusII
 		template <sample_func_t>
 		void one_cycle (int frames);
 	
-		void set_rate (d_sample r)
+		void set_rate (sample_t r)
 			{
 				rate = r;
 				left.fractal.set_rate (rate * FRACTAL_RATE);
@@ -262,7 +262,7 @@ class StereoChorusII
 
 	public:
 		static PortInfo port_info [];
-		d_sample adding_gain;
+		sample_t adding_gain;
 
 		void init()
 			{

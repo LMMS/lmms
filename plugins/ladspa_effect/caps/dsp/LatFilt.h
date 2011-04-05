@@ -70,7 +70,7 @@ class LatFilt
 				vcoef[ORDER] = 0;
 		}
 
-		d_sample process (d_sample s) {
+		sample_t process (sample_t s) {
 				double tmp;
 
 				int i = ORDER-1;
@@ -85,7 +85,7 @@ class LatFilt
 				state[0] = tmp;
 				y = y + vcoef[0]*tmp;
 
-				return (d_sample) y;
+				return (sample_t) y;
 		}
 
 		inline void set_vi(double coef, int i) {

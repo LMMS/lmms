@@ -66,7 +66,7 @@ class Roessler
 					get();
 			}
 
-		d_sample get()
+		sample_t get()
 			{
 				int J = I ^ 1;
 

@@ -41,7 +41,7 @@ class Scape
 : public Plugin
 {
 	public:
-		d_sample time, fb;
+		sample_t time, fb;
 		double period;
 
 		DSP::Lorenz lfo[2];

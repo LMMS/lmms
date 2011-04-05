@@ -1,7 +1,7 @@
 /*
 	Roessler.h
 	
-	Copyright 2004-5 Tim Goetze <tim@quitte.de>
+	Copyright 2004-11 Tim Goetze <tim@quitte.de>
 	
 	http://quitte.de/dsp/
 
@@ -34,7 +34,7 @@ class Roessler
 : public Plugin
 {
 	public:
-		d_sample h, gain;
+		sample_t h, gain;
 
 		DSP::Roessler roessler;
 
@@ -44,10 +44,11 @@ class Roessler
 	public:
 		static PortInfo port_info [];
 
-		d_sample adding_gain;
+		sample_t adding_gain;
 
 		void init();
-		void activate() {}
+		void activate()
+			{ gain = getport(4); }
 
 		void run (int n)
 			{

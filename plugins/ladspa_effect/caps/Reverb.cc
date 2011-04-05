@@ -89,7 +89,7 @@ JVRev::init()
 }
 
 void
-JVRev::set_t60 (d_sample t)
+JVRev::set_t60 (sample_t t)
 {
 	t60 = t;
 
@@ -118,19 +118,19 @@ template <sample_func_t F>
 void
 JVRev::one_cycle (int frames)
 {
-	d_sample * s = ports[0];
+	sample_t * s = ports[0];
 
 	if (t60 != *ports[1])
 		set_t60 (getport(1));
 
 	double wet = getport(2), dry = 1 - wet;
 	
-	d_sample * dl = ports[3];
-	d_sample * dr = ports[4];
+	sample_t * dl = ports[3];
+	sample_t * dr = ports[4];
 
 	for (int i = 0; i < frames; ++i)
 	{
-		d_sample x = s[i], a = x + normal;
+		sample_t x = s[i], a = x + normal;
 
 		x *= dry;
 
@@ -140,7 +140,7 @@ JVRev::one_cycle (int frames)
 		a = allpass[2].process (a, -apc);
 
 		/* tank */
-		d_sample t = 0;
+		sample_t t = 0;
 		a -= normal;
 
 		for (int j = 0; j < 4; ++j)
@@ -254,7 +254,7 @@ PlateStub::init()
 }
 
 inline void
-PlateStub::process (d_sample x, d_sample decay, d_sample * _xl, d_sample * _xr)
+PlateStub::process (sample_t x, sample_t decay, sample_t * _xl, sample_t * _xr)
 {
 	x = input.bandwidth.process (x);
 	
@@ -267,8 +267,8 @@ PlateStub::process (d_sample x, d_sample decay, d_sample * _xl, d_sample * _xr)
 	x = input.lattice[3].process (x, indiff2);
 
 	/* summation point */
-	register d_sample xl = x + decay * tank.delay[3].get();
-	register d_sample xr = x + decay * tank.delay[1].get();
+	register sample_t xl = x + decay * tank.delay[3].get();
+	register sample_t xr = x + decay * tank.delay[1].get();
 
 	/* lh */
 	xl = tank.mlattice[0].process (xl, dediff1);
@@ -311,20 +311,20 @@ template <sample_func_t F>
 void
 Plate::one_cycle (int frames)
 {
-	d_sample * s = ports[0];
+	sample_t * s = ports[0];
 
 	input.bandwidth.set (exp (-M_PI * (1. - getport(1))));
 
-	d_sample decay = getport(2);
+	sample_t decay = getport(2);
 
 	double damp = exp (-M_PI * getport(3));
 	tank.damping[0].set (damp);
 	tank.damping[1].set (damp);
 
-	d_sample blend = getport(4), dry = 1 - blend;
+	sample_t blend = getport(4), dry = 1 - blend;
 
-	d_sample * dl = ports[5];
-	d_sample * dr = ports[6];
+	sample_t * dl = ports[5];
+	sample_t * dr = ports[6];
 
 	/* the modulated lattices interpolate, which needs truncated float */
 	DSP::FPTruncateMode _truncate;
@@ -332,9 +332,9 @@ Plate::one_cycle (int frames)
 	for (int i = 0; i < frames; ++i)
 	{
 		normal = -normal;
-		d_sample x = s[i] + normal;
+		sample_t x = s[i] + normal;
 
-		d_sample xl, xr;
+		sample_t xl, xr;
 
 		PlateStub::process (x, decay, &xl, &xr);
 
@@ -402,21 +402,21 @@ template <sample_func_t F>
 void
 Plate2x2::one_cycle (int frames)
 {
-	d_sample * sl = ports[0];
-	d_sample * sr = ports[1];
+	sample_t * sl = ports[0];
+	sample_t * sr = ports[1];
 
 	input.bandwidth.set (exp (-M_PI * (1. - getport(2))));
 
-	d_sample decay = getport(3);
+	sample_t decay = getport(3);
 
 	double damp = exp (-M_PI * getport(4));
 	tank.damping[0].set (damp);
 	tank.damping[1].set (damp);
 
-	d_sample blend = getport(5), dry = 1 - blend;
+	sample_t blend = getport(5), dry = 1 - blend;
 
-	d_sample * dl = ports[6];
-	d_sample * dr = ports[7];
+	sample_t * dl = ports[6];
+	sample_t * dr = ports[7];
 
 	/* the modulated lattices interpolate, which needs truncated float */
 	DSP::FPTruncateMode _truncate;
@@ -424,9 +424,9 @@ Plate2x2::one_cycle (int frames)
 	for (int i = 0; i < frames; ++i)
 	{
 		normal = -normal;
-		d_sample x = (sl[i] + sr[i] + normal) * .5;
+		sample_t x = (sl[i] + sr[i] + normal) * .5;
 
-		d_sample xl, xr;
+		sample_t xl, xr;
 		PlateStub::process (x, decay, &xl, &xr);
 
 		xl = blend * xl + dry * sl[i];

@@ -35,10 +35,10 @@ template <sample_func_t F>
 void
 Compress::one_cycle (int frames)
 {
-	d_sample * s = ports[0];
+	sample_t * s = ports[0];
 
-	d_sample range = DSP::db2lin (getport(1)); 
-	d_sample ratio = (*ports[2] - 1) / getport(2);
+	sample_t range = DSP::db2lin (getport(1)); 
+	sample_t ratio = (*ports[2] - 1) / getport(2);
 
 	/* sc1 has lookup tables here, and they're only 40 % used (400 ms/1 s). 
 	 * thus, sc1's attack/release controls are a bit coarse due to truncation 
@@ -54,16 +54,16 @@ Compress::one_cycle (int frames)
 	double ga = exp (-1 / (fs * getport(3))); 
 	double gr = exp (-1 / (fs * getport(4)));
 
-	d_sample threshold = getport(5);
-	d_sample knee = getport(6);
+	sample_t threshold = getport(5);
+	sample_t knee = getport(6);
 
-	d_sample * d = ports[7];
+	sample_t * d = ports[7];
 
-	d_sample knee0 = DSP::db2lin (threshold - knee);
-	d_sample knee1 = DSP::db2lin (threshold + knee);
+	sample_t knee0 = DSP::db2lin (threshold - knee);
+	sample_t knee1 = DSP::db2lin (threshold + knee);
 
-	d_sample ef_a = ga * .25;
-	d_sample ef_ai = 1 - ef_a;
+	sample_t ef_a = ga * .25;
+	sample_t ef_ai = 1 - ef_a;
 	
 	for (int i = 0; i < frames; ++i)
 	{

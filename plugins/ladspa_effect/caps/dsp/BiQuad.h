@@ -34,21 +34,24 @@ class BiQuad
 {
 	public:
 		/* coefficients */
-		d_sample a[3], b[3];
+		sample_t a[3], b[3];
 
 		/* history */
 		int h;
-		d_sample x[2], y[2];
+		sample_t x[2], y[2];
 
 		BiQuad()
 			{
-				/* initialize to unity */
-				a[0] = 1;
-				a[1] = a[2] = b[0] = b[1] = b[2] = 0;
-
+				unity();
 				reset();
 			}
 		
+		void unity()
+			{
+				a[0] = 1;
+				a[1] = a[2] = b[0] = b[1] = b[2] = 0;
+			}
+
 		void copy (BiQuad & bq)
 			{
 				for (int i = 0; i < 3; ++i)
@@ -72,11 +75,11 @@ class BiQuad
 						y[i] = 0;
 			}
 
-		inline d_sample process (d_sample s)
+		inline sample_t process (sample_t s)
 			{
 				register int z = h;
 
-				register d_sample r = s * a[0];
+				register sample_t r = s * a[0];
 				
 				r += a[1] * x[z];
 				r += b[1] * y[z];
@@ -96,11 +99,11 @@ class BiQuad
 		/* Following are additional methods for using the biquad to filter an
 		 * upsampled signal with 0 padding -- some terms reduce to 0 in this
 		 * case */
-		inline d_sample process_0_1()
+		inline sample_t process_0_1()
 			{
 				register int z = h;
 
-				register d_sample r = 0;
+				register sample_t r = 0;
 				
 				r += a[1] * x[z];
 				r += b[1] * y[z];
@@ -117,11 +120,11 @@ class BiQuad
 				return r;
 			}
 
-		inline d_sample process_0_2()
+		inline sample_t process_0_2()
 			{
 				register int z = h;
 
-				register d_sample r = 0;
+				register sample_t r = 0;
 				
 				r += b[1] * y[z];
 
@@ -137,11 +140,11 @@ class BiQuad
 				return r;
 			}
 
-		inline d_sample process_0_3()
+		inline sample_t process_0_3()
 			{
 				register int z = h;
 
-				register d_sample r = 0;
+				register sample_t r = 0;
 				
 				r += b[1] * y[z];
 

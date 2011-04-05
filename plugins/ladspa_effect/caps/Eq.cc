@@ -70,7 +70,7 @@ template <sample_func_t F>
 void
 Eq::one_cycle (int frames)
 {
-	d_sample * s = ports[0];
+	sample_t * s = ports[0];
 
 	/* evaluate band gain changes and compute recursion factor to prevent
 	 * zipper noise */
@@ -78,7 +78,7 @@ Eq::one_cycle (int frames)
 
 	for (int i = 0; i < 10; ++i)
 	{
-		d_sample g = getport (1 + i);
+		sample_t g = getport (1 + i);
 		if (g == gain[i])
 		{
 			/* no gain factoring */
@@ -91,11 +91,11 @@ Eq::one_cycle (int frames)
 		eq.gf[i] = pow (want / eq.gain[i], one_over_n);
 	}
 
-	d_sample * d = ports[11];
+	sample_t * d = ports[11];
 
 	for (int i = 0; i < frames; ++i)
 	{
-		d_sample x = s[i];
+		sample_t x = s[i];
 		x = eq.process (x);
 		F (d, i, x, adding_gain);
 	}
@@ -230,13 +230,13 @@ Eq2x2::one_cycle (int frames)
 
 	for (int c = 0; c < 2; ++c)
 	{
-		d_sample 
+		sample_t 
 			* s = ports[c],
 			* d = ports[12 + c];
 
 		for (int i = 0; i < frames; ++i)
 		{
-			d_sample x = s[i];
+			sample_t x = s[i];
 			x = eq[c].process (x);
 			F (d, i, x, adding_gain);
 		}

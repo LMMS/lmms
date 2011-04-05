@@ -76,13 +76,13 @@ template <sample_func_t F>
 void
 ToneStack::one_cycle (int frames)
 {
-	d_sample * s = ports[0];
+	sample_t * s = ports[0];
 	tonestack.start_cycle (ports + 1);
-	d_sample * d = ports[5];
+	sample_t * d = ports[5];
 
 	for (int i = 0; i < frames; ++i) 
 	{
-		register d_sample a = s[i];
+		register sample_t a = s[i];
 		a = tonestack.process (a + normal);
 		F (d, i, a, adding_gain);
 	}
@@ -140,13 +140,13 @@ template <sample_func_t F>
 void
 ToneStackLT::one_cycle (int frames)
 {
-	d_sample * s = ports[0];
+	sample_t * s = ports[0];
 	tonestack.updatecoefs (ports + 1);
-	d_sample * d = ports[4];
+	sample_t * d = ports[4];
 
 	for (int i = 0; i < frames; ++i) 
 	{
-		register d_sample a = s[i];
+		register sample_t a = s[i];
 		a = tonestack.process (a + normal);
 		F (d, i, a, adding_gain);
 	}

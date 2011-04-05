@@ -1,12 +1,12 @@
 /*
 	Descriptor.h
 	
-	Copyright 2004-9 Tim Goetze <tim@quitte.de>
+	Copyright 2004-10 Tim Goetze <tim@quitte.de>
 	
 	http://quitte.de/dsp/
 
 	Creating a LADSPA_Descriptor for a CAPS plugin via a C++ template,
-	saves us a virtual function call compared to the usual method used
+	saving a virtual function call compared to the usual method used
 	for C++ plugins in a C context.
 
 	Descriptor<P> expects P to declare some common methods, like init(),
@@ -130,7 +130,7 @@ class Descriptor
 				LADSPA_PortRangeHint * ranges = ((Descriptor *) d)->ranges;
 				plugin->ranges = ranges;
 
-				plugin->ports = new d_sample * [n];
+				plugin->ports = new sample_t * [n];
 
 				/* connect to lower bound as a safety measure */
 				for (int i = 0; i < n; ++i)
@@ -159,7 +159,7 @@ class Descriptor
 				 * plugin's activate() method for the first run() after
 				 * the host called in here.
 				 * 
-				 * It's simplest way to prevent a parameter smoothing sweep
+				 * It's the simplest way to prevent a parameter smoothing sweep
 				 * in the first audio block after activation.
 				plugin->activate();
 				 */

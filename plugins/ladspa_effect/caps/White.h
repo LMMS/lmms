@@ -34,7 +34,7 @@ class White
 : public Plugin
 {
 	public:
-		d_sample gain;
+		sample_t gain;
 
 		DSP::White white;
 
@@ -46,9 +46,7 @@ class White
 
 		void init() {}
 		void activate()
-			{ 
-				gain = .5;
-			}
+			{ gain = getport(0); }
 
 		void run (int n)
 			{

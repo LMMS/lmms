@@ -61,7 +61,7 @@ template <sample_func_t F>
 void
 Scape::one_cycle (int frames)
 {
-	d_sample * s = ports[0];
+	sample_t * s = ports[0];
 
 	// double one_over_n = 1 / (double) frames;
 
@@ -76,8 +76,8 @@ Scape::one_cycle (int frames)
 	dry = dry * dry;
 	double blend = getport(5);
 
-	d_sample * dl = ports[6];
-	d_sample * dr = ports[7];
+	sample_t * dl = ports[6];
+	sample_t * dr = ports[7];
 
 	DSP::FPTruncateMode truncate;
 
@@ -116,10 +116,10 @@ Scape::one_cycle (int frames)
 		/* sample loop */
 		for (int i = 0; i < n; ++i)
 		{
-			d_sample x = s[i] + normal;
+			sample_t x = s[i] + normal;
 
-			d_sample x1 = delay.get_at (t1);
-			d_sample x2 = delay.get_at (t2);
+			sample_t x1 = delay.get_at (t1);
+			sample_t x2 = delay.get_at (t2);
 
 			delay.put (x + fb * x1 + normal);
 			x = dry * x + .2 * svf[0].process (x) + .6 * svf[3].process(x);
@@ -130,7 +130,7 @@ Scape::one_cycle (int frames)
 			x1 = hipass[1].process (x1);
 			x2 = hipass[2].process (x2);
 
-			d_sample x1l, x1r, x2l, x2r;
+			sample_t x1l, x1r, x2l, x2r;
 			x1l = fabs (lfo[0].get());
 			x1r = 1 - x1l;
 			x2r = fabs (lfo[1].get());

@@ -1,7 +1,7 @@
 /*
 	Sin.h
 	
-	Copyright 2004-5 Tim Goetze <tim@quitte.de>
+	Copyright 2004-11 Tim Goetze <tim@quitte.de>
 	
 	http://quitte.de/dsp/
 
@@ -34,7 +34,7 @@ class Sin
 : public Plugin
 {
 	public:
-		d_sample f, gain;
+		sample_t f, gain;
 
 		DSP::Sine sin;
 
@@ -45,7 +45,8 @@ class Sin
 		static PortInfo port_info [];
 
 		void init();
-		void activate() {}
+		void activate() 
+			{ gain = getport(1); }
 
 		void run (int n)
 			{

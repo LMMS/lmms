@@ -8,6 +8,8 @@
 	an oversampled triangle/saw/square oscillator, and a combination of two
 	such oscillators with hard sync.
 
+	TODO: optimize for phase clamping like this:
+			phi -= floor (phi);
 */
 /*
 	This program is free software; you can redistribute it and/or
@@ -63,7 +65,7 @@ VCOs::one_cycle (int frames)
 	double g = (gain == *ports[3]) ? 
 		1 : pow (getport(3) / gain, 1. / (double) frames);
 
-	d_sample * d = ports[4];
+	sample_t * d = ports[4];
 
 	for (int i = 0; i < frames; ++i)
 	{
@@ -160,7 +162,7 @@ VCOd::one_cycle (int frames)
 	double g = (gain == *ports[8]) ? 
 		1 : pow (getport(8) / gain, 1. / (double) frames);
 
-	d_sample * d = ports[9];
+	sample_t * d = ports[9];
 
 	for (int i = 0; i < frames; ++i)
 	{

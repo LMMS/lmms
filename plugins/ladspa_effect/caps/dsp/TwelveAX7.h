@@ -31,7 +31,7 @@ namespace DSP {
 	
 #include "r12ax7.h"
 
-typedef d_sample tube_sample;
+typedef sample_t tube_sample;
 
 /* this is the original tube model from caps < 0.1.9 or preamp.so, put
  * back into use in 0.1.11; the replacement (below) is too strong in 

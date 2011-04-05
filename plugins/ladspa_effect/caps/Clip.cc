@@ -62,8 +62,8 @@ Clip::init()
 		up.c[i] *= s;
 }
 
-inline d_sample
-Clip::clip (d_sample a)
+inline sample_t
+Clip::clip (sample_t a)
 {
 	if (a < threshold[0])
 		return threshold[0];
@@ -76,7 +76,7 @@ template <sample_func_t F>
 void
 Clip::one_cycle (int frames)
 {
-	d_sample * s = ports[0];
+	sample_t * s = ports[0];
 
 	double g = getport (1);
 	double gf;
@@ -85,16 +85,16 @@ Clip::one_cycle (int frames)
 	else
 	{
 		gain_db = g;
-		d_sample g = DSP::db2lin (gain_db);
+		sample_t g = DSP::db2lin (gain_db);
 		gf = pow (g / gain, 1 / (double) frames);
 	}
 
-	d_sample * d = ports[2];
+	sample_t * d = ports[2];
 	*ports[3] = OVERSAMPLE;
 
 	for (int i = 0; i < frames; ++i)
 	{
-		register d_sample a = gain * s[i];
+		register sample_t a = gain * s[i];
 
 		a = down.process (clip (up.upsample (a)));
 
