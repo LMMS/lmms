@@ -1,7 +1,7 @@
 /*
 	Lorenz.cc
 	
-	Copyright 2002-7 Tim Goetze <tim@quitte.de>
+	Copyright 2002-11 Tim Goetze <tim@quitte.de>
 	
 	http://quitte.de/dsp/
 
@@ -48,9 +48,9 @@ Lorenz::one_cycle (int frames)
 	double g = (gain == *ports[4]) ? 
 		1 : pow (getport(4) / gain, 1. / (double) frames);
 
-	d_sample * d = ports[5];
+	sample_t * d = ports[5];
 
-	d_sample x, sx = getport(1), sy = getport(2), sz = getport(3);
+	sample_t x, sx = getport(1), sy = getport(2), sz = getport(3);
 	
 	for (int i = 0; i < frames; ++i)
 	{
@@ -73,7 +73,7 @@ Lorenz::port_info [] =
 	{
 		"h",
 		INPUT | CONTROL,
-		{BOUNDED, 0, 1}
+		{BOUNDED | DEFAULT_LOW, 0, 1}
 	}, {
 		"x",
 		INPUT | CONTROL,

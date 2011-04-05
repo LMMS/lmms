@@ -37,9 +37,9 @@ class Clip
 : public Plugin
 {
 	public:
-		d_sample gain, gain_db;
+		sample_t gain, gain_db;
 
-		d_sample threshold[2];
+		sample_t threshold[2];
 
 		enum {
 			OVERSAMPLE = 8,
@@ -53,7 +53,7 @@ class Clip
 		template <sample_func_t F>
 			void one_cycle (int frames);
 
-		inline d_sample clip (d_sample x);
+		inline sample_t clip (sample_t x);
 
 	public:
 		static PortInfo port_info[];

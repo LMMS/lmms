@@ -33,7 +33,7 @@ namespace DSP {
 class OnePoleLP
 {
 	public:
-		d_sample a0, b1, y1;
+		sample_t a0, b1, y1;
 
 		OnePoleLP (double d = 1.)
 			{
@@ -53,11 +53,11 @@ class OnePoleLP
 
 		inline void set (double d)
 			{
-				a0 = (d_sample) d;
-				b1 = (d_sample) 1. - d;
+				a0 = (sample_t) d;
+				b1 = (sample_t) 1. - d;
 			}
 
-		inline d_sample process (d_sample x)
+		inline sample_t process (sample_t x)
 			{
 				return y1 = a0 * x + b1 * y1;
 			}
@@ -79,7 +79,7 @@ class OnePoleLP
 class OnePoleHP
 {
 	public:
-		d_sample a0, a1, b1, x1, y1;
+		sample_t a0, a1, b1, x1, y1;
 
 		OnePoleHP (double d = 1.)
 			{
@@ -94,12 +94,12 @@ class OnePoleHP
 
 		inline void set (double d)
 			{
-				a0 = (d_sample) ((1. + d) / 2.);
-				a1 = (d_sample) ((1. + d) / -2.);
+				a0 = (sample_t) ((1. + d) / 2.);
+				a1 = (sample_t) ((1. + d) / -2.);
 				b1 = d;
 			}
 
-		inline d_sample process (d_sample x)
+		inline sample_t process (sample_t x)
 			{
 				y1 = a0 * x + a1 * x1 + b1 * y1;
 				x1 = x;

@@ -40,7 +40,7 @@ class VCOs
 : public Plugin
 {
 	public:
-		d_sample f, gain;
+		sample_t f, gain;
 
 		/* ok to just change these as you please, 4/32 works ok, sortof. */
 		enum {
@@ -89,7 +89,7 @@ class VCOd
 {
 	public:
 		double fs;
-		d_sample f, gain;
+		sample_t f, gain;
 
 		/* ok to just change these as you please, 4/32 works ok, sortof. */
 		enum {

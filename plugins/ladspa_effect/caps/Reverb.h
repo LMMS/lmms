@@ -59,10 +59,10 @@ class Lattice
 : public DSP::Delay
 {
 	public:
-		inline d_sample 
-		process (d_sample x, double d)
+		inline sample_t 
+		process (sample_t x, double d)
 			{
-				d_sample y = get();
+				sample_t y = get();
 				x -= d * y;
 				put (x);
 				return d * x + y;
@@ -76,8 +76,8 @@ class JVComb
 	public:
 		float c;
 		
-		inline d_sample 
-		process (d_sample x)
+		inline sample_t 
+		process (sample_t x)
 			{
 				x += c * get();
 				put (x);
@@ -90,7 +90,7 @@ class JVRev
 {
 	public:
 		static int default_length[9];
-		d_sample t60;
+		sample_t t60;
 
 		Lattice allpass [3];
 		JVComb comb[4];
@@ -104,7 +104,7 @@ class JVRev
 
 		int length [9];
 
-		void set_t60 (d_sample t);
+		void set_t60 (sample_t t);
 
 	public:
 		static PortInfo port_info [];
@@ -147,11 +147,11 @@ class ModLattice
 				tap.reset();
 			}
 
-		inline d_sample
-		process (d_sample x, double d)
+		inline sample_t
+		process (sample_t x, double d)
 			{
 				/* TODO: try all-pass interpolation */
-				d_sample y = delay.get_at (n0 + width * lfo.get());
+				sample_t y = delay.get_at (n0 + width * lfo.get());
 				x += d * y;
 				delay.put (x);
 				return y - d * x; /* note sign */
@@ -162,9 +162,9 @@ class PlateStub
 : public Plugin
 {
 	public:
-		d_sample f_lfo;
+		sample_t f_lfo;
 
-		d_sample indiff1, indiff2, dediff1, dediff2;
+		sample_t indiff1, indiff2, dediff1, dediff2;
 		
 		struct {
 			DSP::OnePoleLP bandwidth;
@@ -202,8 +202,8 @@ class PlateStub
 				tank.mlattice[1].lfo.set_f (1.2, fs, .5 * M_PI);
 			}
 
-		inline void process (d_sample x, d_sample decay, 
-					d_sample * xl, d_sample * xr);
+		inline void process (sample_t x, sample_t decay, 
+					sample_t * xl, sample_t * xr);
 };
 
 /* /////////////////////////////////////////////////////////////////////// */

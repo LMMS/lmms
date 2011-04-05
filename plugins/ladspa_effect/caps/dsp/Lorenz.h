@@ -70,7 +70,7 @@ class Lorenz
 				h = _h;
 			}
 
-		d_sample get()
+		sample_t get()
 			{
 				step();
 				return .5 * get_y() + get_z();

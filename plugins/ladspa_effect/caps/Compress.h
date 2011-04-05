@@ -36,10 +36,10 @@ class Compress
 {
 	public:
 		double fs;
-		d_sample f;
+		sample_t f;
 
 		DSP::RMS rms;
-		d_sample sum, amp, env, gain, gain_t;
+		sample_t sum, amp, env, gain, gain_t;
 
 		int count;
 

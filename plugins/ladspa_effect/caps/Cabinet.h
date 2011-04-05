@@ -57,7 +57,7 @@ class CabinetI
 : public Plugin
 {
 	public:
-		d_sample gain;
+		sample_t gain;
 		static Model16 models [];
 
 		int model;
@@ -95,7 +95,7 @@ class CabinetII
 : public Plugin
 {
 	public:
-		d_sample gain;
+		sample_t gain;
 
 		static Model32 models44100 [];
 		static Model32 models48000 [];
@@ -116,7 +116,7 @@ class CabinetII
 	public:
 		static PortInfo port_info [];
 
-		d_sample adding_gain;
+		sample_t adding_gain;
 
 		void init();
 		void activate();

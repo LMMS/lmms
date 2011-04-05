@@ -1,7 +1,7 @@
 /*
 	Lorenz.h
 	
-	Copyright 2004-5 Tim Goetze <tim@quitte.de>
+	Copyright 2004-11 Tim Goetze <tim@quitte.de>
 	
 	http://quitte.de/dsp/
 
@@ -34,7 +34,7 @@ class Lorenz
 : public Plugin
 {
 	public:
-		d_sample h, gain;
+		sample_t h, gain;
 
 		DSP::Lorenz lorenz;
 
@@ -45,7 +45,8 @@ class Lorenz
 		static PortInfo port_info [];
 
 		void init();
-		void activate() {}
+		void activate() 
+			{ gain = getport(4); }
 
 		void run (int n)
 			{

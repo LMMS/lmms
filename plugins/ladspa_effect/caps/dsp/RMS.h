@@ -33,7 +33,7 @@ namespace DSP {
 class RMS
 {
 	protected:
-		d_sample buffer[64];
+		sample_t buffer[64];
 		int write;
 
 	public:
@@ -52,20 +52,20 @@ class RMS
 			}
 
 		/* caution: pass in the *squared* sample value */
-		void store (d_sample x)
+		void store (sample_t x)
 			{
 				sum -= buffer[write];
 				sum += (buffer[write] = x);
 				write = (write + 1) & 63;
 			}
 
-		d_sample process (d_sample x)
+		sample_t process (sample_t x)
 			{
 				store (x);
 				return rms();
 			}
 
-		d_sample rms()
+		sample_t rms()
 			{
 				/* fabs it before sqrt, just in case ... */
 				return sqrt (fabs (sum) / 64);

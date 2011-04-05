@@ -46,10 +46,10 @@ void
 ClickStub::one_cycle (int frames)
 {
 	bpm = getport(0);
-	d_sample gain = getport(1) * *ports[1];
+	sample_t gain = getport(1) * *ports[1];
 	lp.set (1 - *ports[2]);
 	
-	d_sample * d = ports[3];
+	sample_t * d = ports[3];
 
 	while (frames)
 	{
@@ -67,7 +67,7 @@ ClickStub::one_cycle (int frames)
 
 			for (int i = 0; i < n; ++i)
 			{
-				d_sample x = gain * wave [played + i] + normal;
+				sample_t x = gain * wave [played + i] + normal;
 				F (d, i, lp.process (x), adding_gain);
 				normal = -normal;
 			}

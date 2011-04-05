@@ -47,7 +47,7 @@ Sin::one_cycle (int frames)
 	double g = (gain == *ports[1]) ? 
 		1 : pow (getport(1) / gain, 1. / (double) frames);
 
-	d_sample * d = ports[2];
+	sample_t * d = ports[2];
 
 	for (int i = 0; i < frames; ++i)
 	{

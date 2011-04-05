@@ -34,7 +34,7 @@ template <sample_func_t F>
 void
 ChorusI::one_cycle (int frames)
 {
-	d_sample * s = ports[0];
+	sample_t * s = ports[0];
 
 	double one_over_n = 1 / (double) frames;
 	double ms = .001 * fs;
@@ -56,13 +56,13 @@ ChorusI::one_cycle (int frames)
 	double ff = getport(5);
 	double fb = getport(6);
 
-	d_sample * d = ports[7];
+	sample_t * d = ports[7];
 
 	DSP::FPTruncateMode truncate;
 
 	for (int i = 0; i < frames; ++i)
 	{
-		d_sample x = s[i];
+		sample_t x = s[i];
 
 		/* truncate the feedback tap to integer, better quality for less
 		 * cycles (just a bit of zipper when changing 't', but it does sound
@@ -153,7 +153,7 @@ template <sample_func_t F>
 void
 StereoChorusI::one_cycle (int frames)
 {
-	d_sample * s = ports[0];
+	sample_t * s = ports[0];
 
 	double one_over_n = 1 / (double) frames;
 	double ms = .001 * fs;
@@ -181,8 +181,8 @@ StereoChorusI::one_cycle (int frames)
 	double ff = getport(6);
 	double fb = getport(7);
 
-	d_sample * dl = ports[8];
-	d_sample * dr = ports[9];
+	sample_t * dl = ports[8];
+	sample_t * dr = ports[9];
 
 	/* to go sure (on i386) that the fistp instruction does the right thing 
 	 * when looking up fractional sample indices */
@@ -190,7 +190,7 @@ StereoChorusI::one_cycle (int frames)
 
 	for (int i = 0; i < frames; ++i)
 	{
-		d_sample x = s[i];
+		sample_t x = s[i];
 
 		/* truncate the feedback tap to integer, better quality for less
 		 * cycles (just a bit of zipper when changing 't', but it does sound
@@ -201,8 +201,8 @@ StereoChorusI::one_cycle (int frames)
 
 		delay.put (x + normal);
 
-		d_sample l = blend * x + ff * delay.get_cubic (t + w * left.lfo.get());
-		d_sample r = blend * x + ff * delay.get_cubic (t + w * right.lfo.get());
+		sample_t l = blend * x + ff * delay.get_cubic (t + w * left.lfo.get());
+		sample_t r = blend * x + ff * delay.get_cubic (t + w * right.lfo.get());
 
 		F (dl, i, l, adding_gain);
 		F (dr, i, r, adding_gain);
@@ -281,7 +281,7 @@ template <sample_func_t F>
 void
 ChorusII::one_cycle (int frames)
 {
-	d_sample * s = ports[0];
+	sample_t * s = ports[0];
 
 	double one_over_n = 1 / (double) frames;
 	double ms = .001 * fs;
@@ -303,13 +303,13 @@ ChorusII::one_cycle (int frames)
 	double ff = getport(5);
 	double fb = getport(6);
 
-	d_sample * d = ports[7];
+	sample_t * d = ports[7];
 
 	DSP::FPTruncateMode truncate;
 
 	for (int i = 0; i < frames; ++i)
 	{
-		d_sample x = s[i];
+		sample_t x = s[i];
 
 		x -= fb * delay.get_cubic (t);
 
@@ -389,7 +389,7 @@ template <sample_func_t F>
 void
 StereoChorusII::one_cycle (int frames)
 {
-	d_sample * s = ports[0];
+	sample_t * s = ports[0];
 
 	double one_over_n = 1 / (double) frames;
 	double ms = .001 * fs;
@@ -410,8 +410,8 @@ StereoChorusII::one_cycle (int frames)
 	double ff = getport(5);
 	double fb = getport(6);
 
-	d_sample * dl = ports[7];
-	d_sample * dr = ports[8];
+	sample_t * dl = ports[7];
+	sample_t * dr = ports[8];
 
 	/* to go sure (on i386) that the fistp instruction does the right thing 
 	 * when looking up fractional sample indices */
@@ -419,7 +419,7 @@ StereoChorusII::one_cycle (int frames)
 
 	for (int i = 0; i < frames; ++i)
 	{
-		d_sample x = s[i];
+		sample_t x = s[i];
 
 		/* truncate the feedback tap to integer, better quality for less
 		 * cycles (just a bit of zipper when changing 't', but it does sound
@@ -432,9 +432,9 @@ StereoChorusII::one_cycle (int frames)
 
 		double m;
 		m = left.lfo_lp.process (left.fractal.get());
-		d_sample l = blend * x + ff * delay.get_cubic (t + w * m);
+		sample_t l = blend * x + ff * delay.get_cubic (t + w * m);
 		m = right.lfo_lp.process (right.fractal.get());
-		d_sample r = blend * x + ff * delay.get_cubic (t + w * m);
+		sample_t r = blend * x + ff * delay.get_cubic (t + w * m);
 
 		F (dl, i, l, adding_gain);
 		F (dr, i, r, adding_gain);

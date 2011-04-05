@@ -1,7 +1,7 @@
 /*
 	dsp/windows.h
 	
-	Copyright 2004-9 Tim Goetze <tim@quitte.de>
+	Copyright 2004-11 Tim Goetze <tim@quitte.de>
 	
 	http://quitte.de/dsp/
 
@@ -31,27 +31,26 @@
 namespace DSP {
 	
 /* prototypes for window value application ... */
-typedef void (*window_sample_func_t) (d_sample &, d_sample);
+typedef void (*window_sample_func_t) (sample_t &, sample_t);
 
 /* ... which go as template parameters for the window calculation below */
 inline void
-store_sample (d_sample & d, d_sample s)
+store_sample (sample_t & d, sample_t s)
 {
 	d = s;
 }
 
 inline void
-apply_window (d_sample &d, d_sample s)
+apply_window (sample_t &d, sample_t s)
 {
 	d *= s;
 }
 
 template <window_sample_func_t F>
 void
-hanning (d_sample * s, int n)
+hanning (sample_t * s, int n)
 {
-	/* TODO: speed up by using DSP::Sine */
-
+	/* could speed up by using DSP::Sine but we rarely use this window */
 	for (int i = 0; i < n; ++i)
 	{
 		register double f = (double) i / n - 1;
@@ -61,7 +60,7 @@ hanning (d_sample * s, int n)
 
 template <window_sample_func_t F>
 void
-blackman (d_sample * s, int n)
+blackman (sample_t * s, int n)
 {
 	register float w = n;
 
@@ -79,7 +78,7 @@ blackman (d_sample * s, int n)
 
 template <window_sample_func_t F>
 void
-blackman_harris (d_sample * s, int n)
+blackman_harris (sample_t * s, int n)
 {
 	register double w1 = 2.f * M_PI / (n - 1);
 	register double w2 = 2.f * w1;
@@ -138,7 +137,7 @@ besseli (double x)
 
 template <window_sample_func_t F>
 void
-kaiser (d_sample * s, int n, double beta)
+kaiser (sample_t * s, int n, double beta)
 {
 	double bb = besseli (beta);
 	int si = 0;

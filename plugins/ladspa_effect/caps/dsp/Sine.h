@@ -34,8 +34,8 @@ class Sine
 {
 	protected:
 		int z;
-		d_float y[2];
-		d_float b;
+		double y[2];
+		double b;
 
 	public:
 		Sine()

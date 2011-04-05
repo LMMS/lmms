@@ -1,7 +1,7 @@
 /*
 	Roessler.cc
 	
-	Copyright 2002-7 Tim Goetze <tim@quitte.de>
+	Copyright 2002-11 Tim Goetze <tim@quitte.de>
 	
 	http://quitte.de/dsp/
 
@@ -48,9 +48,9 @@ Roessler::one_cycle (int frames)
 	double g = (gain == getport(4)) ? 
 		1 : pow (getport(4) / gain, 1. / (double) frames);
 
-	d_sample * d = ports[5];
+	sample_t * d = ports[5];
 
-	d_sample x,
+	sample_t x,
 			sx = .043 * getport(1), 
 			sy = .051 * getport(2), 
 			sz = .018 * getport(3);
@@ -79,7 +79,7 @@ Roessler::port_info [] =
 	{
 		"h",
 		INPUT | CONTROL,
-		{BOUNDED, 0, 1}
+		{BOUNDED | DEFAULT_LOW, 0, 1}
 	}, {
 		"x",
 		INPUT | CONTROL,

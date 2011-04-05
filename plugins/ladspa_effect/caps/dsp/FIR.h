@@ -1,7 +1,7 @@
 /*
 	dsp/FIR.h
 	
-	Copyright 2003-4 Tim Goetze <tim@quitte.de>
+	Copyright 2003-10 Tim Goetze <tim@quitte.de>
 	
 	http://quitte.de/dsp/
 
@@ -32,9 +32,9 @@
 
 namespace DSP {
 	
-/* brute-force FIR filter with downsampling method. 
+/* brute-force FIR filter with downsampling method (decimating). 
  *
- * CAVEAT: constructing it from another FIR makes the filter use that very 
+ * CAVEAT: constructing it from another FIR makes the filter share the other's 
  * kernel data set. IOW, the other FIR must be valid throughout the lifetime 
  * of this instance.
  */
@@ -45,7 +45,7 @@ class FIR
 		int n, m;
 		
 		/* coefficients, history */
-		d_sample * c, * x;
+		sample_t * c, * x;
 		bool borrowed_kernel;
 
 		/* history index */
@@ -63,7 +63,7 @@ class FIR
 				init (fir.n);
 			}
 
-		FIR (int n, d_sample * kernel)
+		FIR (int n, sample_t * kernel)
 			{
 				c = 0;
 				init (n);
@@ -82,18 +82,16 @@ class FIR
 				n = N;
 
 				/* keeping history size a power of 2 makes it possible to wrap the
-				 * history pointer by binary & instead of %, saving huge amounts of
-				 * cpu cycles.
-				 */
+				 * history pointer by & instead of %, saving a few cpu cycles. */
 				m = next_power_of_2 (n);
 
 				if (c)
 					borrowed_kernel = true;
 				else
 					borrowed_kernel = false,
-					c = (d_sample *) malloc (n * sizeof (d_sample));
+					c = (sample_t *) malloc (n * sizeof (sample_t));
 
-				x = (d_sample *) malloc (m * sizeof (d_sample));
+				x = (sample_t *) malloc (m * sizeof (sample_t));
 
 				m -= 1;
 
@@ -103,11 +101,11 @@ class FIR
 		void reset()
 			{
 				h = 0;
-				memset (x, 0, n * sizeof (d_sample));
+				memset (x, 0, n * sizeof (sample_t));
 			}
 		
 		/* TODO: write an SSE-enabled version */
-		inline d_sample process (d_sample s)
+		inline sample_t process (sample_t s)
 			{
 				x[h] = s;
 				
@@ -126,7 +124,7 @@ class FIR
 		 * a FIRUpsampler instead.
 		 */
 		template <int Z, int OVER>
-		inline d_sample upsample (d_sample s)
+		inline sample_t upsample (sample_t s)
 			{
 				x[h] = s;
 				
@@ -144,7 +142,7 @@ class FIR
 			}
 
 		/* used in downsampling */
-		inline void store (d_sample s)
+		inline void store (sample_t s)
 			{
 				x[h] = s;
 				h = (h + 1) & m;
@@ -169,7 +167,7 @@ class FIRUpsampler
 		int over;
 		
 		/* coefficients, history */
-		d_sample * c, * x;
+		sample_t * c, * x;
 
 		/* history index */
 		int h; 
@@ -184,7 +182,7 @@ class FIRUpsampler
 			{
 				c = x = 0;
 				init (fir.n, _over);
-				memcpy (c, fir.c, n * sizeof (d_sample));
+				memcpy (c, fir.c, n * sizeof (sample_t));
 			}
 
 		~FIRUpsampler()
@@ -206,8 +204,8 @@ class FIRUpsampler
 				 */
 				m = next_power_of_2 ((n + over - 1) / over);
 
-				c = (d_sample *) malloc (n * sizeof (d_sample));
-				x = (d_sample *) malloc (m * sizeof (d_sample));
+				c = (sample_t *) malloc (n * sizeof (sample_t));
+				x = (sample_t *) malloc (m * sizeof (sample_t));
 
 				m -= 1;
 
@@ -217,11 +215,11 @@ class FIRUpsampler
 		void reset()
 			{
 				h = 0;
-				memset (x, 0, (m + 1) * sizeof (d_sample));
+				memset (x, 0, (m + 1) * sizeof (sample_t));
 			}
 		
 		/* upsample the given sample */
-		inline d_sample upsample (d_sample s)
+		inline sample_t upsample (sample_t s)
 			{
 				x[h] = s;
 				
@@ -236,11 +234,10 @@ class FIRUpsampler
 			}
 
 		/* upsample a zero sample (interleaving), Z being the time, in samples,
-		 * since the last non-0 sample.
-		 */
-		inline d_sample pad (int Z)
+		 * since the last non-0 sample. */
+		inline sample_t pad (int Z)
 			{
-				d_sample s = 0;
+				sample_t s = 0;
 
 				for (int z = h - 1; Z < n; --z, Z += over)
 					s += c[Z] * x[z & m];

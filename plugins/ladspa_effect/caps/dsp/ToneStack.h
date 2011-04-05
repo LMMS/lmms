@@ -92,13 +92,13 @@ class ToneStack
 				c = 2 * _fs;
 			}
 
-		void activate (d_sample ** ports)
+		void activate (sample_t ** ports)
 			{
 				filter.reset();
 			}
 
 		/* pass in pointer to ports and relative index of first eq band control */
-		void start_cycle (d_sample ** ports, int bassindex = 1)
+		void start_cycle (sample_t ** ports, int bassindex = 1)
 		{
 			int m = clamp<int> ((int) *ports[0], 0, n_presets - 1);
 			if (m != model)
@@ -151,7 +151,7 @@ class ToneStack
 				filter.reset();
 			}
 
-		inline void updatecoefs (d_sample ** ports) 
+		inline void updatecoefs (sample_t ** ports) 
 			{
 				/* range checks on input */
 				double b = clamp<double> (*ports[0], 0, 1);
@@ -185,7 +185,7 @@ class ToneStack
 			} 
 
 		// actualy do the DFII filtering, one sample at a time
-		inline d_sample process (d_sample x)
+		inline sample_t process (sample_t x)
 			{
 				return filter.process (x);
 			}
@@ -224,7 +224,7 @@ class ToneStackLT
 		void init (double _fs)
 			{ }
 
-		void activate (d_sample ** ports)
+		void activate (sample_t ** ports)
 			{
 				filter.reset();
 			}
@@ -237,7 +237,7 @@ class ToneStackLT
 				bp = blah;
 		}
 
-		void updatecoefs (d_sample ** ports)
+		void updatecoefs (sample_t ** ports)
 			{
 				double b = min (Steps - 1, max (*ports[0] * (Steps - 1), 0));
 				double m = min (Steps - 1, max (*ports[1] * (Steps - 1), 0));
@@ -258,7 +258,7 @@ class ToneStackLT
 			}
 
 		// actualy do the DFII filtering, one sample at a time
-		inline d_sample process (d_sample x)
+		inline sample_t process (sample_t x)
 			{
 				return filter.process (x);
 			}

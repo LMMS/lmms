@@ -49,7 +49,7 @@ class SweepVFI
 		double fs;
 
 		/* svf parameters */
-		d_sample f, Q;
+		sample_t f, Q;
 
 		/* needs to be a power of two */
 		enum {
@@ -84,7 +84,7 @@ class SweepVFII
 {
 	public:
 		/* svf parameters */
-		d_sample f, Q;
+		sample_t f, Q;
 
 		/* needs to be a power of two */
 		enum {
@@ -124,7 +124,7 @@ class AutoWah
 		double fs;
 
 		/* svf parameters */
-		d_sample f, Q;
+		sample_t f, Q;
 
 		/* needs to be a power of two */
 		enum {

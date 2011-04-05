@@ -62,7 +62,7 @@ ToneControls::set_band_gain (int i, float g)
 }
 
 void
-ToneControls::activate (d_sample ** ports)
+ToneControls::activate (sample_t ** ports)
 {
 	for (int i = 0; i < 4; ++i)
 		set_band_gain (i, *ports[i]);

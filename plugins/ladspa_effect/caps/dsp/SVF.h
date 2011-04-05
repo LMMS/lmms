@@ -80,11 +80,11 @@ class SVF
 {
 	protected:
 		/* loop parameters */
-		d_sample f, q, qnorm;
+		sample_t f, q, qnorm;
 		
 		/* outputs (peak and notch left out) */
-		d_sample lo, band, hi;
-		d_sample * out;
+		sample_t lo, band, hi;
+		sample_t * out;
 
 	public:
 		/* the type of filtering to do. */
@@ -125,13 +125,13 @@ class SVF
 					out = &hi;
 			}
 
-		void one_cycle (d_sample * s, int frames)
+		void one_cycle (sample_t * s, int frames)
 			{
 				for (int i = 0; i < frames; ++i)
 					s[i] = process (s[i]);
 			}
 
-		d_sample process (d_sample x)
+		sample_t process (sample_t x)
 			{
 				x = qnorm * x;
 
@@ -176,7 +176,7 @@ class StackedSVF
 					svf[i].set_f_Q (f, Q);
 			}
 
-		d_sample process (d_sample x)
+		sample_t process (sample_t x)
 			{
 				for (int i = 0; i < STACKED; ++i)
 					x = svf[i].process (x);

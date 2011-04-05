@@ -1,11 +1,12 @@
 /*
 	Pan.cc
 	
-	Copyright 2002-7 Tim Goetze <tim@quitte.de>
+	Copyright 2002-11 Tim Goetze <tim@quitte.de>
 	
 	http://quitte.de/dsp/
 
-	panorama with width control
+	panorama with width control, 
+	stereo image width reduction
 
 */
 /*
@@ -41,11 +42,11 @@ Pan::activate()
 { 
 	delay.reset();
 	tap.reset (400 / fs);
-	set_pan (*ports[1]);
+	set_pan (getport (1));
 }
 
 inline void
-Pan::set_pan (d_sample p)
+Pan::set_pan (sample_t p)
 {
 	pan = p;
 	
@@ -59,13 +60,13 @@ template <sample_func_t F>
 void
 Pan::one_cycle (int frames)
 {
-	d_sample * s = ports[0];
+	sample_t * s = ports[0];
 
 	if (pan != *ports[1])
 		set_pan (getport(1));
 
-	d_sample g = getport(2);
-	d_sample 
+	sample_t g = getport(2);
+	sample_t 
 		width_l = g * gain_r,
 		width_r = g * gain_l;
 
@@ -73,10 +74,10 @@ Pan::one_cycle (int frames)
 	
 	bool mono = getport(4);
 
-	d_sample * dl = ports[5];
-	d_sample * dr = ports[6];
+	sample_t * dl = ports[5];
+	sample_t * dr = ports[6];
 
-	d_sample x, xt;
+	sample_t x, xt;
 
 	if (mono) for (int i = 0; i < frames; ++i)
 	{
@@ -93,7 +94,7 @@ Pan::one_cycle (int frames)
 		
 		normal = -normal;
 	}
-	else for (int i = 0; i < frames; ++i)
+	else /* stereo */ for (int i = 0; i < frames; ++i)
 	{
 		x = s[i];
 
@@ -154,6 +155,95 @@ Descriptor<Pan>::setup()
 	Name = CAPS "Pan - Pan and width";
 	Maker = "Tim Goetze <tim@quitte.de>";
 	Copyright = "GPL, 2004-7";
+
+	/* fill port info and vtable */
+	autogen();
+}
+
+/* //////////////////////////////////////////////////////////////////////// */
+
+void
+Narrower::init()
+{
+}
+
+void
+Narrower::activate()
+{ 
+}
+
+template <sample_func_t F>
+void
+Narrower::one_cycle (int frames)
+{
+	sample_t * sl = ports[0];
+	sample_t * sr = ports[1];
+
+	if (strength != *ports[2])
+		strength = *ports[2];
+
+	sample_t * dl = ports[3];
+	sample_t * dr = ports[4];
+
+	double xl, xr, m;
+	double dry = 1 - strength, wet = strength;
+
+	for (int i = 0; i < frames; ++i)
+	{
+		xl = sl[i];
+		xr = sr[i];
+		
+		m = wet * (xl + xr) * .5;
+		
+		xl *= dry;
+		xr *= dry;
+		
+		xl += m;
+		xr += m;
+
+		F (dl, i, xl, adding_gain);
+		F (dr, i, xr, adding_gain);
+	}
+}
+
+/* //////////////////////////////////////////////////////////////////////// */
+
+PortInfo
+Narrower::port_info [] =
+{
+	{
+		"in:l",
+		INPUT | AUDIO,
+		{0}
+	}, {
+		"in:r",
+		INPUT | AUDIO,
+		{0}
+	}, {
+		"strength",
+		INPUT | CONTROL,
+		{BOUNDED | DEFAULT_LOW, 0, 1}
+	}, {
+		"out:l",
+		OUTPUT | AUDIO,
+		{0}
+	}, {
+		"out:r",
+		OUTPUT | AUDIO,
+		{0}
+	}
+};
+
+template <> void
+Descriptor<Narrower>::setup()
+{
+	UniqueID = 2595;
+	Label = "Narrower";
+	Properties = HARD_RT;
+
+	Name = CAPS "Narrower - Stereo image width reduction";
+	Maker = "Tim Goetze <tim@quitte.de>";
+	Copyright = "GPL, 2011";
 
 	/* fill port info and vtable */
 	autogen();

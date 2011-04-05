@@ -94,21 +94,20 @@ typedef struct {
 	LADSPA_PortRangeHint range;
 } PortInfo;
 
-typedef LADSPA_Data d_sample;
-typedef double d_float;
+typedef LADSPA_Data sample_t;
 typedef unsigned long ulong;
 
 /* flavours for sample store functions run() and run_adding() */
-typedef void (*sample_func_t) (d_sample *, int, d_sample, d_sample);
+typedef void (*sample_func_t) (sample_t *, int, sample_t, sample_t);
 
 inline void
-store_func (d_sample * s, int i, d_sample x, d_sample gain)
+store_func (sample_t * s, int i, sample_t x, sample_t gain)
 {
 	s[i] = x;
 }
 
 inline void
-adding_func (d_sample * s, int i, d_sample x, d_sample gain)
+adding_func (sample_t * s, int i, sample_t x, sample_t gain)
 {
 	s[i] += gain * x;
 }
@@ -175,24 +174,24 @@ class Plugin {
 		double adding_gain; /* for run_adding() */
 
 		int first_run; /* 1st block after activate(), do no parameter smoothing */
-		d_sample normal; /* renormal constant */
+		sample_t normal; /* renormal constant */
 
-		d_sample ** ports;
+		sample_t ** ports;
 		LADSPA_PortRangeHint * ranges; /* for getport() below */
 
 	public:
 		/* get port value, mapping inf or nan to 0 */
-		inline d_sample getport_unclamped (int i)
+		inline sample_t getport_unclamped (int i)
 			{
-				d_sample v = *ports[i];
+				sample_t v = *ports[i];
 				return (isinf (v) || isnan(v)) ? 0 : v;
 			}
 
 		/* get port value and clamp to port range */
-		inline d_sample getport (int i)
+		inline sample_t getport (int i)
 			{
 				LADSPA_PortRangeHint & r = ranges[i];
-				d_sample v = getport_unclamped (i);
+				sample_t v = getport_unclamped (i);
 				return clamp (v, r.LowerBound, r.UpperBound);
 			}
 };

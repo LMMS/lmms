@@ -48,30 +48,30 @@ class White
 				b = (uint32) (f * (float) 0x1fff7777);
 			}
 		
-		d_sample abs()
+		sample_t abs()
 			{
 				return fabs (get());
 			}
 
 		/* 32-bit version */
-		d_sample get()
+		sample_t get()
 			{
 #				define BIT(y) ((b << (31 - y)) & 0x80000000)
 
 				b = ((BIT (28) ^ BIT (27) ^ BIT (1) ^ BIT (0))) | (b >> 1);
-				return (4.6566128730773926e-10 * (d_sample) b) - 1;
+				return (4.6566128730773926e-10 * (sample_t) b) - 1;
 
 #				undef BIT
 			}
 
 		/* 31-bit version, at least 6 instructions less / sample. probably only
 		 * pays off on a processor not providing a decent binary shift. */
-		d_sample get_31()
+		sample_t get_31()
 			{
 #				define BIT(y) ((b << (30 - y)) & 0x40000000)
 
 				b = ((BIT (3) ^ BIT (0))) | (b >> 1);
-				return (9.3132257461547852e-10 * (d_sample) b) - 1;
+				return (9.3132257461547852e-10 * (sample_t) b) - 1;
 
 #				undef BIT
 			}

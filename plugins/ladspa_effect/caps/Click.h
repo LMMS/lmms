@@ -35,7 +35,7 @@ class ClickStub
 : public Plugin
 {
 	public:
-		d_sample bpm;
+		sample_t bpm;
 
 		float * wave;
 		int N; /* number of samples in wave */

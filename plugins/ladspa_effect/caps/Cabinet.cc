@@ -101,21 +101,22 @@ void
 CabinetI::activate()
 {
 	switch_model ((int) getport(1));
+	gain = models[model].gain * DSP::db2lin (getport(2));
 }
 
 template <sample_func_t F>
 void
 CabinetI::one_cycle (int frames)
 {
-	d_sample * s = ports[0];
+	sample_t * s = ports[0];
 
 	int m = (int) getport (1);
 	if (m != model) switch_model (m);
 
-	d_sample g = models[model].gain * DSP::db2lin (getport(2));
+	sample_t g = models[model].gain * DSP::db2lin (getport(2));
 	double gf = pow (g / gain, 1 / (double) frames);
 
-	d_sample * d = ports[3];
+	sample_t * d = ports[3];
 
 	for (int i = 0; i < frames; ++i)
 	{
@@ -227,15 +228,14 @@ template <sample_func_t F>
 void
 CabinetII::one_cycle (int frames)
 {
-	d_sample * s = ports[0];
+	sample_t * s = ports[0];
 
 	int m = (int) getport (1);
 	if (m != model) switch_model (m);
 
-	d_sample g = models[model].gain * DSP::db2lin (getport(2));
+	sample_t g = models[model].gain * DSP::db2lin (getport(2));
 	double gf = pow (g / gain, 1 / (double) frames);
-
-	d_sample * d = ports[3];
+	sample_t * d = ports[3];
 
 	for (int i = 0; i < frames; ++i)
 	{

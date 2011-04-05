@@ -62,7 +62,7 @@ class TDFII
 		/* per-band recursion:
 		 * 	y = 2 * (a * (x - x[-2]) + c * y[-1] - b * y[-2]) 
 		 */
-		d_sample process (d_sample s)
+		sample_t process (sample_t s)
 			{
 				double y = h[0] + b[0] * s;
 
@@ -71,7 +71,7 @@ class TDFII
 
 				h[Order - 1] = b[Order] * s - a[Order] * y;
 
-				return (d_sample) y;
+				return (sample_t) y;
 			}
 };
 

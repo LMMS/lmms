@@ -1,13 +1,13 @@
 /*
   interface.cc
 
-	Copyright 2004-9 Tim Goetze <tim@quitte.de>
+	Copyright 2004-11 Tim Goetze <tim@quitte.de>
 	
 	http://quitte.de/dsp/
 
 	LADSPA descriptor factory, host interface.
 
- */
+*/
 /*
 	This program is free software; you can redistribute it and/or
 	modify it under the terms of the GNU General Public License
@@ -23,6 +23,10 @@
 	along with this program; if not, write to the Free Software
 	Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 	02111-1307, USA or point your web browser to http://www.gnu.org.
+*/
+/*
+	LADSPA ID ranges 1761 - 1800 and 2581 - 2660 
+	(2541 - 2580 donated to artemio@kdemail.net)
 */
 
 #include <sys/time.h>
@@ -51,7 +55,7 @@
 
 #include "Descriptor.h"
 
-#define N 38 
+#define N 39 
 static DescriptorStub * descriptors [N];
 
 /*static inline void
@@ -74,6 +78,7 @@ void _init()
 	*d++ = new Descriptor<Eq2x2>();
 	*d++ = new Descriptor<Compress>();
 	*d++ = new Descriptor<Pan>();
+	*d++ = new Descriptor<Narrower>();
 
 	*d++ = new Descriptor<PreampIII>();
 	*d++ = new Descriptor<PreampIV>();

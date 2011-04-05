@@ -1,0 +1,447 @@
+<?xml version='1.0' encoding='ISO-8859-1'?>
+<!-- 
+
+	caps.rdf
+
+	Metadata for the CAPS Audio Plugin Suite
+
+	Automatically generated based on work done by 
+		Paul Winkler,
+		Pete Leigh and 
+		Tim Goetze.
+
+	Welcome to the Dept. of Redundancy Dept. Dept. Dept.
+
+ -->
+<!DOCTYPE rdf:RDF 
+	[
+		<!ENTITY rdf 'http://www.w3.org/1999/02/22-rdf-syntax-ns#'>
+		<!ENTITY rdfs 'http://www.w3.org/2000/01/rdf-schema#'>
+		<!ENTITY dc 'http://purl.org/dc/elements/1.1/'>
+		<!ENTITY ladspa 'http://ladspa.org/ontology#'>
+	]
+>
+<rdf:RDF 
+	xmlns:rdf="&rdf;"
+	xmlns:rdfs="&rdfs;"
+	xmlns:dc="&dc;"
+	xmlns:ladspa="&ladspa;"
+> 
+
+	<!-- CabinetI -->
+	<ladspa:SimulatorPlugin 
+			rdf:about='http://ladspa.org/ontology#1766'> 
+    <ladspa:hasPort>
+      <ladspa:InputControlPort 
+					rdf:about="&ladspa;1766.1" 
+					ladspa:hasLabel="model">
+        <ladspa:hasScale>
+          <ladspa:Scale> 
+            <ladspa:hasPoint>
+              <ladspa:Point 
+								rdf:value="0" 
+								ladspa:hasLabel="none" />
+						</ladspa:hasPoint> 
+            <ladspa:hasPoint>
+              <ladspa:Point 
+								rdf:value="1" 
+								ladspa:hasLabel="Unmatched off-axis" />
+						</ladspa:hasPoint> 
+            <ladspa:hasPoint>
+              <ladspa:Point 
+								rdf:value="2" 
+								ladspa:hasLabel="Unmatched on-axis" />
+						</ladspa:hasPoint> 
+            <ladspa:hasPoint>
+              <ladspa:Point 
+								rdf:value="3" 
+								ladspa:hasLabel="Supertramp" />
+						</ladspa:hasPoint> 
+            <ladspa:hasPoint>
+              <ladspa:Point 
+								rdf:value="4" 
+								ladspa:hasLabel="Little Wing 68" />
+						</ladspa:hasPoint> 
+            <ladspa:hasPoint>
+              <ladspa:Point 
+								rdf:value="5" 
+								ladspa:hasLabel="Martial" />
+						</ladspa:hasPoint> 
+            <ladspa:hasPoint>
+              <ladspa:Point 
+								rdf:value="6" 
+								ladspa:hasLabel="Mesa" />
+						</ladspa:hasPoint> 
+            <ladspa:hasPoint>
+              <ladspa:Point 
+								rdf:value="7" 
+								ladspa:hasLabel="Pro Jr" />
+						</ladspa:hasPoint> 
+					</ladspa:Scale>
+        </ladspa:hasScale>
+      </ladspa:InputControlPort>
+    </ladspa:hasPort> 
+	</ladspa:SimulatorPlugin> 
+
+	<!-- ChorusI -->
+	<ladspa:ChorusPlugin 
+			rdf:about='http://ladspa.org/ontology#1767'> 
+	</ladspa:ChorusPlugin> 
+
+	<!-- StereoChorusI -->
+	<ladspa:ChorusPlugin 
+			rdf:about='http://ladspa.org/ontology#1768'> 
+	</ladspa:ChorusPlugin> 
+
+	<!-- Click -->
+	<ladspa:TimePlugin 
+			rdf:about='http://ladspa.org/ontology#1769'> 
+	</ladspa:TimePlugin> 
+
+	<!-- CEO -->
+	<ladspa:OscillatorPlugin 
+			rdf:about='http://ladspa.org/ontology#1770'> 
+	</ladspa:OscillatorPlugin> 
+
+	<!-- Clip -->
+	<ladspa:DistortionPlugin 
+			rdf:about='http://ladspa.org/ontology#1771'> 
+	</ladspa:DistortionPlugin> 
+
+	<!-- Compress -->
+	<ladspa:CompressorPlugin 
+			rdf:about='http://ladspa.org/ontology#1772'> 
+	</ladspa:CompressorPlugin> 
+
+	<!-- Eq -->
+	<ladspa:EQPlugin 
+			rdf:about='http://ladspa.org/ontology#1773'> 
+	</ladspa:EQPlugin> 
+
+	<!-- Lorenz -->
+	<ladspa:GeneratorPlugin 
+			rdf:about='http://ladspa.org/ontology#1774'> 
+	</ladspa:GeneratorPlugin> 
+
+	<!-- PhaserI -->
+	<ladspa:PhaserPlugin 
+			rdf:about='http://ladspa.org/ontology#1775'> 
+	</ladspa:PhaserPlugin> 
+
+	<!-- PreampIII -->
+	<ladspa:SimulatorPlugin 
+			rdf:about='http://ladspa.org/ontology#1776'> 
+	</ladspa:SimulatorPlugin> 
+
+	<!-- PreampIV -->
+	<ladspa:SimulatorPlugin 
+			rdf:about='http://ladspa.org/ontology#1777'> 
+	</ladspa:SimulatorPlugin> 
+
+	<!-- JVRev -->
+	<ladspa:ReverbPlugin 
+			rdf:about='http://ladspa.org/ontology#1778'> 
+	</ladspa:ReverbPlugin> 
+
+	<!-- Plate -->
+	<ladspa:ReverbPlugin 
+			rdf:about='http://ladspa.org/ontology#1779'> 
+	</ladspa:ReverbPlugin> 
+
+	<!-- Roessler -->
+	<ladspa:GeneratorPlugin 
+			rdf:about='http://ladspa.org/ontology#1780'> 
+	</ladspa:GeneratorPlugin> 
+
+	<!-- Sin -->
+	<ladspa:OscillatorPlugin 
+			rdf:about='http://ladspa.org/ontology#1781'> 
+	</ladspa:OscillatorPlugin> 
+
+	<!-- SweepVFI -->
+	<ladspa:FilterPlugin 
+			rdf:about='http://ladspa.org/ontology#1782'> 
+    <ladspa:hasPort>
+      <ladspa:InputControlPort 
+					rdf:about="&ladspa;1782.3" 
+					ladspa:hasLabel="model">
+        <ladspa:hasScale>
+          <ladspa:Scale> 
+            <ladspa:hasPoint>
+              <ladspa:Point 
+								rdf:value="0" 
+								ladspa:hasLabel="low pass" />
+						</ladspa:hasPoint> 
+            <ladspa:hasPoint>
+              <ladspa:Point 
+								rdf:value="1" 
+								ladspa:hasLabel="band pass" />
+						</ladspa:hasPoint> 
+					</ladspa:Scale>
+        </ladspa:hasScale>
+      </ladspa:InputControlPort>
+    </ladspa:hasPort> 
+	</ladspa:FilterPlugin> 
+
+	<!-- VCOs -->
+	<ladspa:OscillatorPlugin 
+			rdf:about='http://ladspa.org/ontology#1783'> 
+	</ladspa:OscillatorPlugin> 
+
+	<!-- VCOd -->
+	<ladspa:OscillatorPlugin 
+			rdf:about='http://ladspa.org/ontology#1784'> 
+	</ladspa:OscillatorPlugin> 
+
+	<!-- White -->
+	<ladspa:GeneratorPlugin 
+			rdf:about='http://ladspa.org/ontology#1785'> 
+	</ladspa:GeneratorPlugin> 
+
+	<!-- AmpIII -->
+	<ladspa:SimulatorPlugin 
+			rdf:about='http://ladspa.org/ontology#1786'> 
+	</ladspa:SimulatorPlugin> 
+
+	<!-- HRTF -->
+	<ladspa:SimulatorPlugin 
+			rdf:about='http://ladspa.org/ontology#1787'> 
+	</ladspa:SimulatorPlugin> 
+
+	<!-- Pan -->
+	<ladspa:DelayPlugin 
+			rdf:about='http://ladspa.org/ontology#1788'> 
+	</ladspa:DelayPlugin> 
+
+	<!-- AmpIV -->
+	<ladspa:SimulatorPlugin 
+			rdf:about='http://ladspa.org/ontology#1794'> 
+	</ladspa:SimulatorPlugin> 
+
+	<!-- Plate2x2 -->
+	<ladspa:ReverbPlugin 
+			rdf:about='http://ladspa.org/ontology#1795'> 
+	</ladspa:ReverbPlugin> 
+
+	<!-- CabinetII -->
+	<ladspa:SimulatorPlugin 
+			rdf:about='http://ladspa.org/ontology#2581'> 
+    <ladspa:hasPort>
+      <ladspa:InputControlPort 
+					rdf:about="&ladspa;2581.1" 
+					ladspa:hasLabel="model">
+        <ladspa:hasScale>
+          <ladspa:Scale> 
+            <ladspa:hasPoint>
+              <ladspa:Point 
+								rdf:value="0" 
+								ladspa:hasLabel="none" />
+						</ladspa:hasPoint> 
+            <ladspa:hasPoint>
+              <ladspa:Point 
+								rdf:value="1" 
+								ladspa:hasLabel="Unmatched off-axis" />
+						</ladspa:hasPoint> 
+            <ladspa:hasPoint>
+              <ladspa:Point 
+								rdf:value="2" 
+								ladspa:hasLabel="Unmatched on-axis" />
+						</ladspa:hasPoint> 
+            <ladspa:hasPoint>
+              <ladspa:Point 
+								rdf:value="3" 
+								ladspa:hasLabel="Supertramp" />
+						</ladspa:hasPoint> 
+            <ladspa:hasPoint>
+              <ladspa:Point 
+								rdf:value="4" 
+								ladspa:hasLabel="Little Wing 68" />
+						</ladspa:hasPoint> 
+            <ladspa:hasPoint>
+              <ladspa:Point 
+								rdf:value="5" 
+								ladspa:hasLabel="Martial" />
+						</ladspa:hasPoint> 
+            <ladspa:hasPoint>
+              <ladspa:Point 
+								rdf:value="6" 
+								ladspa:hasLabel="Mesa" />
+						</ladspa:hasPoint> 
+            <ladspa:hasPoint>
+              <ladspa:Point 
+								rdf:value="7" 
+								ladspa:hasLabel="Pro Jr" />
+						</ladspa:hasPoint> 
+					</ladspa:Scale>
+        </ladspa:hasScale>
+      </ladspa:InputControlPort>
+    </ladspa:hasPort> 
+	</ladspa:SimulatorPlugin> 
+
+	<!-- SweepVFII -->
+	<ladspa:FilterPlugin 
+			rdf:about='http://ladspa.org/ontology#2582'> 
+    <ladspa:hasPort>
+      <ladspa:InputControlPort 
+					rdf:about="&ladspa;2582.3" 
+					ladspa:hasLabel="model">
+        <ladspa:hasScale>
+          <ladspa:Scale> 
+            <ladspa:hasPoint>
+              <ladspa:Point 
+								rdf:value="0" 
+								ladspa:hasLabel="low pass" />
+						</ladspa:hasPoint> 
+            <ladspa:hasPoint>
+              <ladspa:Point 
+								rdf:value="1" 
+								ladspa:hasLabel="band pass" />
+						</ladspa:hasPoint> 
+					</ladspa:Scale>
+        </ladspa:hasScale>
+      </ladspa:InputControlPort>
+    </ladspa:hasPort> 
+	</ladspa:FilterPlugin> 
+
+	<!-- ChorusII -->
+	<ladspa:ChorusPlugin 
+			rdf:about='http://ladspa.org/ontology#2583'> 
+	</ladspa:ChorusPlugin> 
+
+	<!-- StereoChorusII -->
+	<ladspa:ChorusPlugin 
+			rdf:about='http://ladspa.org/ontology#2584'> 
+	</ladspa:ChorusPlugin> 
+
+	<!-- Dirac -->
+	<ladspa:GeneratorPlugin 
+			rdf:about='http://ladspa.org/ontology#2585'> 
+	</ladspa:GeneratorPlugin> 
+
+	<!-- PhaserII -->
+	<ladspa:PhaserPlugin 
+			rdf:about='http://ladspa.org/ontology#2586'> 
+	</ladspa:PhaserPlugin> 
+
+	<!-- AmpV -->
+	<ladspa:SimulatorPlugin 
+			rdf:about='http://ladspa.org/ontology#2587'> 
+	</ladspa:SimulatorPlugin> 
+
+	<!-- Scape -->
+	<ladspa:DelayPlugin 
+			rdf:about='http://ladspa.org/ontology#2588'> 
+	</ladspa:DelayPlugin> 
+
+	<!-- ToneStack -->
+	<ladspa:SimulatorPlugin 
+			rdf:about='http://ladspa.org/ontology#2589'> 
+    <ladspa:hasPort>
+      <ladspa:InputControlPort 
+					rdf:about="&ladspa;2589.1" 
+					ladspa:hasLabel="model">
+        <ladspa:hasScale>
+          <ladspa:Scale> 
+            <ladspa:hasPoint>
+              <ladspa:Point 
+								rdf:value="0" 
+								ladspa:hasLabel="'59 Bassman" />
+						</ladspa:hasPoint> 
+            <ladspa:hasPoint>
+              <ladspa:Point 
+								rdf:value="1" 
+								ladspa:hasLabel="'69 Twin Reverb" />
+						</ladspa:hasPoint> 
+            <ladspa:hasPoint>
+              <ladspa:Point 
+								rdf:value="2" 
+								ladspa:hasLabel="'64 Princeton" />
+						</ladspa:hasPoint> 
+            <ladspa:hasPoint>
+              <ladspa:Point 
+								rdf:value="3" 
+								ladspa:hasLabel="'59/'81 JCM 800" />
+						</ladspa:hasPoint> 
+            <ladspa:hasPoint>
+              <ladspa:Point 
+								rdf:value="4" 
+								ladspa:hasLabel="'78 Club &amp; Country" />
+						</ladspa:hasPoint> 
+            <ladspa:hasPoint>
+              <ladspa:Point 
+								rdf:value="5" 
+								ladspa:hasLabel="'59/'86 AC-30 of sorts" />
+						</ladspa:hasPoint> 
+					</ladspa:Scale>
+        </ladspa:hasScale>
+      </ladspa:InputControlPort>
+    </ladspa:hasPort> 
+	</ladspa:SimulatorPlugin> 
+
+	<!-- ToneStackLT -->
+	<ladspa:SimulatorPlugin 
+			rdf:about='http://ladspa.org/ontology#2590'> 
+	</ladspa:SimulatorPlugin> 
+
+	<!-- AmpVTS -->
+	<ladspa:SimulatorPlugin 
+			rdf:about='http://ladspa.org/ontology#2592'> 
+    <ladspa:hasPort>
+      <ladspa:InputControlPort 
+					rdf:about="&ladspa;2592.1" 
+					ladspa:hasLabel="model">
+        <ladspa:hasScale>
+          <ladspa:Scale> 
+            <ladspa:hasPoint>
+              <ladspa:Point 
+								rdf:value="0" 
+								ladspa:hasLabel="'59 Bassman" />
+						</ladspa:hasPoint> 
+            <ladspa:hasPoint>
+              <ladspa:Point 
+								rdf:value="1" 
+								ladspa:hasLabel="'69 Twin Reverb" />
+						</ladspa:hasPoint> 
+            <ladspa:hasPoint>
+              <ladspa:Point 
+								rdf:value="2" 
+								ladspa:hasLabel="'64 Princeton" />
+						</ladspa:hasPoint> 
+            <ladspa:hasPoint>
+              <ladspa:Point 
+								rdf:value="3" 
+								ladspa:hasLabel="'59/'81 JCM 800" />
+						</ladspa:hasPoint> 
+            <ladspa:hasPoint>
+              <ladspa:Point 
+								rdf:value="4" 
+								ladspa:hasLabel="'78 Club &amp; Country" />
+						</ladspa:hasPoint> 
+            <ladspa:hasPoint>
+              <ladspa:Point 
+								rdf:value="5" 
+								ladspa:hasLabel="'59/'86 AC-30 of sorts" />
+						</ladspa:hasPoint> 
+					</ladspa:Scale>
+        </ladspa:hasScale>
+      </ladspa:InputControlPort>
+    </ladspa:hasPort> 
+	</ladspa:SimulatorPlugin> 
+
+	<!-- AutoWah -->
+	<ladspa:FilterPlugin 
+			rdf:about='http://ladspa.org/ontology#2593'> 
+	</ladspa:FilterPlugin> 
+
+	<!-- Eq2x2 -->
+	<ladspa:EQPlugin 
+			rdf:about='http://ladspa.org/ontology#2594'> 
+	</ladspa:EQPlugin> 
+
+	<!-- Narrower -->
+	<ladspa:FilterPlugin 
+			rdf:about='http://ladspa.org/ontology#2595'> 
+	</ladspa:FilterPlugin> 
+
+	<!-- Goodbye, Dept. of Redundancy Dept. Dept. Dept. -->
+</rdf:RDF>
