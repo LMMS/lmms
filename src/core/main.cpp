@@ -34,6 +34,7 @@
 #include <QtGui/QApplication>
 #include <QtGui/QBitmap>
 #include <QtGui/QDesktopWidget>
+#include <QtGui/QMessageBox>
 #include <QtGui/QPainter>
 #include <QtGui/QSplashScreen>
 
@@ -417,7 +418,11 @@ int main( int argc, char * * argv )
 
 		// recover a file?
 		QString recoveryFile = QDir(configManager::inst()->workingDir()).absoluteFilePath("recover.mmp");
-		if( QFileInfo(recoveryFile).exists() )
+		if( QFileInfo(recoveryFile).exists() &&
+			QMessageBox::question( engine::mainWindow(), MainWindow::tr( "Project recovery" ),
+						MainWindow::tr( "It looks like the last session did not end properly. "
+										"Do you want to recover the project of this session?" ),
+						QMessageBox::Yes | QMessageBox::No ) == QMessageBox::Yes )
 		{
 			file_to_load = recoveryFile;
 		}
