@@ -113,7 +113,8 @@ protected:
 
 	int getKey( int _y ) const;
 	static inline void drawNoteRect( QPainter & _p, int _x, int _y,
-					int  _width, note * _n );
+					int  _width, note * _n,
+					bool isFromOtherTrack = false);
 	void removeSelection();
 	void selectAll();
 	void getSelectedNotes( NoteVector & _selected_notes );
@@ -135,6 +136,8 @@ protected slots:
 	void cutSelectedNotes();
 	void pasteNotes();
 	void deleteSelectedNotes();
+
+	void showNotesFromOtherTracks();
 
 	void updatePosition( const midiTime & _t );
 	void updatePositionAccompany( const midiTime & _t );
@@ -239,6 +242,8 @@ private:
 	toolButton * m_copyButton;
 	toolButton * m_pasteButton;
 
+	toolButton * m_showOtherTracksButton;
+
 	comboBox * m_zoomingComboBox;
 	comboBox * m_quantizeComboBox;
 	comboBox * m_noteLenComboBox;
@@ -256,6 +261,8 @@ private:
 	midiTime m_currentPosition;
 	bool m_recording;
 	QList<note> m_recordingNotes;
+
+	bool m_showOtherTracks;
 
 	note * m_currentNote;
 	Actions m_action;

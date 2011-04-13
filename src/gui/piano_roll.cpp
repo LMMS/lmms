@@ -145,6 +145,7 @@ pianoRoll::pianoRoll() :
 	m_pattern( NULL ),
 	m_currentPosition(),
 	m_recording( false ),
+	m_showOtherTracks(false),
 	m_currentNote( NULL ),
 	m_action( ActionNone ),
 	m_noteEditMode( NoteEditVolume ),
@@ -373,6 +374,10 @@ pianoRoll::pianoRoll() :
 		    "notes from one to another. You can also press "
 		    "'Shift+T' on your keyboard to activate this mode." ) );
 
+	m_showOtherTracksButton = new toolButton( embed::getIconPixmap( "note" ),
+		    tr( "Show/Hide notes from other tacks" ),
+		    this, SLOT( showNotesFromOtherTracks() ), m_toolBar );
+
 	m_cutButton = new toolButton( embed::getIconPixmap( "edit_cut" ),
 					tr( "Cut selected notes (Ctrl+X)" ),
 					this, SLOT( cutSelectedNotes() ),
@@ -481,6 +486,7 @@ pianoRoll::pianoRoll() :
 	tb_layout->addWidget( m_selectButton );
 	tb_layout->addWidget( m_detuneButton );
 	tb_layout->addSpacing( 10 );
+	tb_layout->addWidget( m_showOtherTracksButton );
 	tb_layout->addWidget( m_cutButton );
 	tb_layout->addWidget( m_copyButton );
 	tb_layout->addWidget( m_pasteButton );
@@ -631,11 +637,13 @@ void pianoRoll::loadSettings( const QDomElement & _this )
 
 
 inline void pianoRoll::drawNoteRect( QPainter & _p, int _x, int _y,
-					int _width, note * _n )
+					int _width, note * _n, bool isFromOtherTrack)
 {
 	++_x;
 	++_y;
 	_width -= 2;
+
+	int otherTrackAlpha = 64;
 
 	if( _width <= 0 )
 	{
@@ -660,7 +668,13 @@ inline void pianoRoll::drawNoteRect( QPainter & _p, int _x, int _y,
 	if( _n->length() < 0 )
 	{
 		//step note
-		col = engine::getLmmsStyle()->color( LmmsStyle::PianoRollStepNote );
+		col = engine::getLmmsStyle()->color( LmmsStyle::PianoRollStepNote);
+		_p.fillRect( _x, _y, _width, KeyLineHeight - 2, col );
+	}
+	else if(isFromOtherTrack)
+	{
+		//col.setRgb(255, 255, 255);
+		col.setAlpha(otherTrackAlpha);
 		_p.fillRect( _x, _y, _width, KeyLineHeight - 2, col );
 	}
 	else if( _n->isSelected() )
@@ -705,16 +719,19 @@ inline void pianoRoll::drawNoteRect( QPainter & _p, int _x, int _y,
 	
 	// that little tab thing on the end hinting at the user
 	// to resize the note
-	_p.setPen( defaultNoteColor.lighter( 200 ) );
-	if( _width > 2 )
+	if(!isFromOtherTrack)
 	{
-		_p.drawLine( _x + _width - 3, _y + 2, _x + _width - 3,
-						_y + KeyLineHeight - 4 );
+	    _p.setPen( defaultNoteColor.lighter( 200 ) );
+	    if( _width > 2 )
+	    {
+		    _p.drawLine( _x + _width - 3, _y + 2, _x + _width - 3,
+						    _y + KeyLineHeight - 4 );
+	    }
+	    _p.drawLine( _x + _width - 1, _y + 2, _x + _width - 1,
+						    _y + KeyLineHeight - 4 );
+	    _p.drawLine( _x + _width - 2, _y + 2, _x + _width - 2,
+						    _y + KeyLineHeight - 4 );
 	}
-	_p.drawLine( _x + _width - 1, _y + 2, _x + _width - 1,
-						_y + KeyLineHeight - 4 );
-	_p.drawLine( _x + _width - 2, _y + 2, _x + _width - 2,
-						_y + KeyLineHeight - 4 );
 }
 
 
@@ -2686,6 +2703,57 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 
 		const NoteVector & notes = m_pattern->notes();
 
+		QVector<NoteVector> noteVectors;
+
+		//get all the notes at the same position
+		if(m_showOtherTracks && m_pattern->getTrack()->type() == track::InstrumentTrack)
+		{
+		    trackContainer *tc;
+		    //if(and m_pattern->getTrack()->getTrackContainer()->nodeName()=="bbtrackcontainer")
+		    tc = m_pattern->getTrack()->getTrackContainer();
+
+		    track::tcoVector tcos;
+		    trackContainer::trackList trks;
+
+		    bool areBB = (tc->nodeName()=="bbtrackcontainer");
+		    if(areBB)
+		    {
+			//if I understand correctly, a bbTrackContainer contains
+			//one instrument per track and the different beats are stored as
+			//TCOs inside each unique instrument track
+			//thus to display the notes I loop over all tracks inside the bbTrackContainer
+			//and get the TCOs having the index of the current BB
+			//is there a simpler way?
+			bbTrackContainer *bbtc = dynamic_cast<bbTrackContainer*>(tc);
+			int cbb = bbtc->currentBB();
+			trks = bbtc->tracks();
+			for(trackContainer::trackList::ConstIterator t = trks.begin(); t!=trks.end(); t++)
+			{
+			    if((*t)->type()==track::InstrumentTrack)
+			    {
+				pattern *p = dynamic_cast<pattern*>((*t)->getTCO(cbb));
+				noteVectors.push_back(p->notes());
+			    }
+			}
+		    }
+		    else
+		    {
+			trks = tc->tracks();
+			for(trackContainer::trackList::ConstIterator t = trks.begin(); t!= trks.end(); t++)
+			{
+			    if((*t)->type() == track::InstrumentTrack && (*t)->id() != m_pattern->getTrack()->id())
+			    {
+				(*t)->getTCOsInRange(tcos,m_pattern->startPosition(),m_pattern->endPosition());
+				for(track::tcoVector::ConstIterator tco = tcos.begin(); tco!=tcos.end(); tco++)
+				{
+				    pattern *p = dynamic_cast<pattern*>(*tco);
+				    noteVectors.push_back(p->notes());
+				}
+			    }
+			}
+		    }
+		}
+
 		const int visible_keys = ( keyAreaBottom()-keyAreaTop() ) /
 							KeyLineHeight + 2;
 	
@@ -2698,9 +2766,15 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 	
 		QPolygon editHandles;
 
-		for( NoteVector::ConstIterator it = notes.begin();
-						it != notes.end(); ++it )
+		noteVectors.push_back(notes);
+
+		for(QVector<NoteVector>::Iterator niter = noteVectors.begin();
+		    niter!= noteVectors.end(); niter++)
+		    for( NoteVector::ConstIterator it = niter->begin();
+						    it != niter->end(); ++it )
 		{
+			bool isFromOtherTrack = (niter!=noteVectors.end()-1);
+
 			Sint32 len_ticks = ( *it )->length();
 
 			if( len_ticks == 0 )
@@ -2735,12 +2809,16 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 				// note
 				drawNoteRect( p, x + WhiteKeyWidth,
 						y_base - key * KeyLineHeight,
-								note_width, *it );
+								note_width, *it, isFromOtherTrack);
 			}
 			
 			// draw note editing stuff
 			int editHandleTop = 0;
-			if( m_noteEditMode == NoteEditVolume )
+			if(isFromOtherTrack)
+			{
+			    //do nothing
+			}
+			else if( m_noteEditMode == NoteEditVolume )
 			{
 				QColor color = engine::getLmmsStyle()->color(
 						( *it )->isSelected() ?
@@ -3074,6 +3152,22 @@ void pianoRoll::stop()
 	m_scrollBack = true;
 }
 
+
+
+void pianoRoll::showNotesFromOtherTracks()
+{
+    if( m_showOtherTracks )
+    {
+		m_showOtherTracks = false;
+		m_showOtherTracksButton->setIcon(embed::getIconPixmap( "note_half" ));
+    }
+    else
+    {
+		m_showOtherTracks = true;
+		m_showOtherTracksButton->setIcon(embed::getIconPixmap( "note" ));
+    }
+    update();
+}
 
 
 
