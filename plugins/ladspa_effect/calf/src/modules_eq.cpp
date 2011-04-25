@@ -38,6 +38,15 @@ equalizerNband_audio_module<BaseClass, has_lphp>::equalizerNband_audio_module()
     is_active = false;
     srate = 0;
     last_generation = 0;
+    hp_freq_old = lp_freq_old = 0;
+    hs_freq_old = ls_freq_old = 0;
+    hs_level_old = ls_level_old = 0;
+    for (int i = 0; i < AM::PeakBands; i++)
+    {
+        p_freq_old[i] = 0;
+        p_level_old[i] = 0;
+        p_q_old[i] = 0;
+    }
 }
 
 template<class BaseClass, bool has_lphp>
