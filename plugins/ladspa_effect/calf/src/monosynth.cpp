@@ -722,7 +722,8 @@ void monosynth_audio_module::params_changed()
     xfade = *params[par_oscmix];
     legato = dsp::fastf2i_drm(*params[par_legato]);
     master.set_inertia(*params[par_master]);
-    set_frequency();
+    if (running)
+        set_frequency();
     if (wave1 != prev_wave1 || wave2 != prev_wave2)
         lookup_waveforms();
 }
