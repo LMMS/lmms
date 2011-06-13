@@ -243,6 +243,8 @@ ProjectRenderer* exportProjectDialog::prepRender()
 			bitrateCB->currentText().section(" ", 0, 0).toUInt(),
 			static_cast<ProjectRenderer::Depths>( depthCB->currentIndex() ) );
 
+	engine::getSong()->setExportLoop( exportLoopCB->isChecked() );
+
 	ProjectRenderer* renderer = new ProjectRenderer( qs, os, m_ft, m_fileName );
 
 	m_renderers.push_back(renderer);

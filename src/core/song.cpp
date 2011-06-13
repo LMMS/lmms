@@ -1,7 +1,7 @@
 /*
  * song.cpp - root of the model tree
  *
- * Copyright (c) 2004-2011 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2012 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -80,6 +80,7 @@ song::song() :
 	m_modified( false ),
 	m_recording( false ),
 	m_exporting( false ),
+	m_exportLoop( false ),
 	m_playing( false ),
 	m_paused( false ),
 	m_loadingProject( false ),
@@ -645,6 +646,7 @@ void song::stopExport()
 {
 	stop();
 	m_exporting = false;
+	m_exportLoop = false;
 }
 
 

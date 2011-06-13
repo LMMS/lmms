@@ -1,7 +1,7 @@
 /*
  * song.h - class song - the root of the model-tree
  *
- * Copyright (c) 2004-2011 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2012 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -111,6 +111,11 @@ public:
 		return m_exporting;
 	}
 
+	inline void setExportLoop( bool exportLoop )
+	{
+		m_exportLoop = exportLoop;
+	}
+
 	inline bool isRecording() const
 	{
 		return m_recording;
@@ -120,8 +125,16 @@ public:
 
 	inline bool isExportDone() const
 	{
-		return m_exporting == true &&
-			m_playPos[Mode_PlaySong].getTact() >= length() + 1;
+		if ( m_exportLoop )
+		{
+			return m_exporting == true &&
+				m_playPos[Mode_PlaySong].getTact() >= length();
+		}
+		else
+		{
+			return m_exporting == true &&
+				m_playPos[Mode_PlaySong].getTact() >= length() + 1;
+		}
 	}
 
 	inline PlayModes playMode() const
@@ -283,6 +296,7 @@ private:
 
 	volatile bool m_recording;
 	volatile bool m_exporting;
+	volatile bool m_exportLoop;
 	volatile bool m_playing;
 	volatile bool m_paused;
 
