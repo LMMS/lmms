@@ -82,6 +82,7 @@ song::song() :
 	m_modified( false ),
 	m_recording( false ),
 	m_exporting( false ),
+	m_export_loop( false ),
 	m_playing( false ),
 	m_paused( false ),
 	m_loadingProject( false ),
@@ -638,6 +639,7 @@ void song::stopExport()
 {
 	stop();
 	m_exporting = false;
+	m_export_loop = false;
 }
 
 

@@ -27,6 +27,7 @@
 
 #include "ExportProjectDialog.h"
 #include "engine.h"
+#include "song.h"
 #include "MainWindow.h"
 #include "ProjectRenderer.h"
 #include "ui_ExportProjectDialog.h"
@@ -160,6 +161,8 @@ void ExportProjectDialog::startBtnClicked()
 		false,
 		ui->bitrateCB->currentText().section( " ", 0, 0 ).toUInt(),
 		static_cast<ProjectRenderer::Depths>( ui->depthCB->currentIndex() ) );
+
+	engine::getSong()->setExportLoop( ui->exportLoopCB->isChecked() );
 
 	m_renderer = new ProjectRenderer( qs, es, ft, m_fileName );
 	if( m_renderer->isReady() )

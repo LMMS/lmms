@@ -109,6 +109,11 @@ public:
 		return m_exporting;
 	}
 
+	inline void setExportLoop(bool export_loop)
+	{
+		m_export_loop = export_loop;
+	}
+
 	inline bool isRecording() const
 	{
 		return m_recording;
@@ -118,8 +123,16 @@ public:
 
 	inline bool isExportDone() const
 	{
-		return m_exporting == true &&
-			m_playPos[Mode_PlaySong].getTact() >= length() + 1;
+		if ( m_export_loop )
+		{
+			return m_exporting == true &&
+				m_playPos[Mode_PlaySong].getTact() >= length();
+		}
+		else
+		{
+			return m_exporting == true &&
+				m_playPos[Mode_PlaySong].getTact() >= length() + 1;
+		}
 	}
 
 	inline PlayModes playMode() const
@@ -284,6 +297,7 @@ private:
 
 	volatile bool m_recording;
 	volatile bool m_exporting;
+	volatile bool m_export_loop;
 	volatile bool m_playing;
 	volatile bool m_paused;
 
