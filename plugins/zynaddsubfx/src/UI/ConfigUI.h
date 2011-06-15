@@ -15,7 +15,7 @@ extern Dump dump;
 #include <FL/Fl_Tabs.H>
 #include <FL/Fl_Group.H>
 #include <FL/Fl_Choice.H>
-#include <FL/Fl_Input.H>
+#include <FL/Fl_Int_Input.H>
 #include <FL/Fl_Light_Button.H>
 #include <FL/Fl_Box.H>
 #include <FL/Fl_File_Input.H>
@@ -35,12 +35,12 @@ private:
   static void cb_(Fl_Choice*, void*);
   static Fl_Menu_Item menu_[];
 public:
-  Fl_Input *samplerateinput;
+  Fl_Int_Input *samplerateinput;
 private:
-  void cb_samplerateinput_i(Fl_Input*, void*);
-  static void cb_samplerateinput(Fl_Input*, void*);
-  void cb_Buffer_i(Fl_Input*, void*);
-  static void cb_Buffer(Fl_Input*, void*);
+  void cb_samplerateinput_i(Fl_Int_Input*, void*);
+  static void cb_samplerateinput(Fl_Int_Input*, void*);
+  void cb_Buffer_i(Fl_Int_Input*, void*);
+  static void cb_Buffer(Fl_Int_Input*, void*);
   void cb_Swap_i(Fl_Light_Button*, void*);
   static void cb_Swap(Fl_Light_Button*, void*);
   void cb_OscilSize_i(Fl_Choice*, void*);
