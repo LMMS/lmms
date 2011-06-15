@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_File_Chooser.cxx 6616 2009-01-01 21:28:26Z matt $"
+// "$Id: Fl_File_Chooser.cxx 8786 2011-06-07 11:41:36Z manolo $"
 //
 // Fl_File_Chooser dialog for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2009 by Bill Spitzak and others.
+// Copyright 1998-2011 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -86,6 +86,13 @@ void Fl_File_Chooser::cb_previewButton_i(Fl_Check_Button*, void*) {
 }
 void Fl_File_Chooser::cb_previewButton(Fl_Check_Button* o, void* v) {
   ((Fl_File_Chooser*)(o->parent()->parent()->parent()->user_data()))->cb_previewButton_i(o,v);
+}
+
+void Fl_File_Chooser::cb_showHiddenButton_i(Fl_Check_Button*, void*) {
+  showHidden(showHiddenButton->value());
+}
+void Fl_File_Chooser::cb_showHiddenButton(Fl_Check_Button* o, void* v) {
+  ((Fl_File_Chooser*)(o->parent()->parent()->parent()->user_data()))->cb_showHiddenButton_i(o,v);
 }
 
 void Fl_File_Chooser::cb_fileName_i(Fl_File_Input*, void*) {
@@ -208,6 +215,11 @@ Fl_File_Chooser::Fl_File_Chooser(const char *d, const char *p, int t, const char
           previewButton->callback((Fl_Callback*)cb_previewButton);
           previewButton->label(preview_label);
         } // Fl_Check_Button* previewButton
+        { showHiddenButton = new Fl_Check_Button(115, 275, 165, 20, "Show hidden files");
+          showHiddenButton->down_box(FL_DOWN_BOX);
+          showHiddenButton->callback((Fl_Callback*)cb_showHiddenButton);
+          showHiddenButton->label(hidden_label);
+        } // Fl_Check_Button* showHiddenButton
         { Fl_Box* o = new Fl_Box(115, 275, 365, 20);
           Fl_Group::current()->resizable(o);
         } // Fl_Box* o
@@ -286,31 +298,31 @@ Fl_File_Chooser::Fl_File_Chooser(const char *d, const char *p, int t, const char
     favWindow->end();
   } // Fl_Double_Window* favWindow
   callback_ = 0;
-data_ = 0;
-directory_[0] = 0;
-window->size_range(window->w(), window->h(), Fl::w(), Fl::h());
-type(t);
-filter(p);
-update_favorites();
-value(d);
-type(t);
-int e;
-prefs_.get("preview", e, 1);
-preview(e);
-Fl_Group::current(prev_current);
+  data_ = 0;
+  directory_[0] = 0;
+  window->size_range(window->w(), window->h(), Fl::w(), Fl::h());
+  type(t);
+  filter(p);
+  update_favorites();
+  value(d);
+  type(t);
+  int e;
+  prefs_.get("preview", e, 1);
+  preview(e);
+  Fl_Group::current(prev_current);
   ext_group=(Fl_Widget*)0;
 }
 
 Fl_File_Chooser::~Fl_File_Chooser() {
   Fl::remove_timeout((Fl_Timeout_Handler)previewCB, this);
-if(ext_group)window->remove(ext_group);
-delete window;
-delete favWindow;
+  if(ext_group)window->remove(ext_group);
+  delete window;
+  delete favWindow;
 }
 
 void Fl_File_Chooser::callback(void (*cb)(Fl_File_Chooser *, void *), void *d ) {
   callback_ = cb;
-data_     = d;
+  data_     = d;
 }
 
 void Fl_File_Chooser::color(Fl_Color c) {
@@ -335,7 +347,7 @@ int Fl_File_Chooser::filter_value() {
 
 void Fl_File_Chooser::filter_value(int f) {
   showChoice->value(f);
-showChoiceCB();
+  showChoiceCB();
 }
 
 void Fl_File_Chooser::hide() {
@@ -360,25 +372,15 @@ const char * Fl_File_Chooser::label() {
 
 void Fl_File_Chooser::ok_label(const char *l) {
   okButton->label(l);
-int w=0, h=0;
-okButton->measure_label(w, h);
-okButton->resize(cancelButton->x() - 50 - w, cancelButton->y(),
-                 w + 40, 25);
-okButton->parent()->init_sizes();
+  int w=0, h=0;
+  okButton->measure_label(w, h);
+  okButton->resize(cancelButton->x() - 50 - w, cancelButton->y(),
+                   w + 40, 25);
+  okButton->parent()->init_sizes();
 }
 
 const char * Fl_File_Chooser::ok_label() {
   return (okButton->label());
-}
-
-void Fl_File_Chooser::show() {
-  window->hotspot(fileList);
-window->show();
-Fl::flush();
-fl_cursor(FL_CURSOR_WAIT);
-rescan_keep_filename();
-fl_cursor(FL_CURSOR_DEFAULT);
-fileName->take_focus();
 }
 
 int Fl_File_Chooser::shown() {
@@ -411,18 +413,18 @@ Fl_Fontsize Fl_File_Chooser::textsize() {
 
 void Fl_File_Chooser::type(int t) {
   type_ = t;
-if (t & MULTI)
-  fileList->type(FL_MULTI_BROWSER);
-else
-  fileList->type(FL_HOLD_BROWSER);
-if (t & CREATE)
-  newButton->activate();
-else
-  newButton->deactivate();
-if (t & DIRECTORY)
-  fileList->filetype(Fl_File_Browser::DIRECTORIES);
-else
-  fileList->filetype(Fl_File_Browser::FILES);
+  if (t & MULTI)
+    fileList->type(FL_MULTI_BROWSER);
+  else
+    fileList->type(FL_HOLD_BROWSER);
+  if (t & CREATE)
+    newButton->activate();
+  else
+    newButton->deactivate();
+  if (t & DIRECTORY)
+    fileList->filetype(Fl_File_Browser::DIRECTORIES);
+  else
+    fileList->filetype(Fl_File_Browser::FILES);
 }
 
 int Fl_File_Chooser::type() {
@@ -445,29 +447,29 @@ Fl_Widget* Fl_File_Chooser::add_extra(Fl_Widget* gr) {
   Fl_Widget* ret=ext_group;
   if (gr==ext_group) {
     return ret;
-      }
-      if (ext_group) {
-        int sh=ext_group->h()+4;
-Fl_Widget* svres=window->resizable();
-window->resizable(NULL);
-window->size(window->w(),window->h()-sh);
-window->remove(ext_group);
-ext_group=NULL;
-window->resizable(svres);
-          }
-          if (gr) {
-            int nh=window->h()+gr->h()+4;
-Fl_Widget* svres=window->resizable();
-window->resizable(NULL);
-window->size(window->w(),nh);
-gr->position(2,okButton->y()+okButton->h()+2);
-window->add(gr);
-ext_group=gr;
-window->resizable(svres);
-              }
-              return ret;
+  }
+  if (ext_group) {
+    int sh=ext_group->h()+4;
+    Fl_Widget* svres=window->resizable();
+    window->resizable(NULL);
+    window->size(window->w(),window->h()-sh);
+    window->remove(ext_group);
+    ext_group=NULL;
+    window->resizable(svres);
+  }
+  if (gr) {
+    int nh=window->h()+gr->h()+4;
+    Fl_Widget* svres=window->resizable();
+    window->resizable(NULL);
+    window->size(window->w(),nh);
+    gr->position(2,okButton->y()+okButton->h()+2);
+    window->add(gr);
+    ext_group=gr;
+    window->resizable(svres);
+  }
+  return ret;
 }
 
 //
-// End of "$Id: Fl_File_Chooser.cxx 6616 2009-01-01 21:28:26Z matt $".
+// End of "$Id: Fl_File_Chooser.cxx 8786 2011-06-07 11:41:36Z manolo $".
 //

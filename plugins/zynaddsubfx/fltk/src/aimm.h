@@ -1,9 +1,9 @@
 //
-// "$Id: aimm.h 6943 2009-11-18 12:43:21Z AlbrechtS $"
+// "$Id: aimm.h 7913 2010-11-29 18:18:27Z greg.ercolano $"
 //
 // Standard dialog header file for the UTF-8 Fast Light Tool Kit (FLTK-UTF8).
 //
-// Copyright 2009 by Bill Spitzak and others.
+// Copyright 2009-2010 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -427,5 +427,5 @@ extern "C" __declspec(dllimport) long __stdcall CoCreateInstance(const GUID & rc
 #endif
 
 //
-// End of "$Id: aimm.h 6943 2009-11-18 12:43:21Z AlbrechtS $".
+// End of "$Id: aimm.h 7913 2010-11-29 18:18:27Z greg.ercolano $".
 //

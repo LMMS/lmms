@@ -1,12 +1,12 @@
 //
-// "$Id: fl_plastic.cxx 6616 2009-01-01 21:28:26Z matt $"
+// "$Id: fl_plastic.cxx 7903 2010-11-28 21:06:39Z matt $"
 //
 // "Plastic" drawing routines for the Fast Light Tool Kit (FLTK).
 //
 // These box types provide a cross between Aqua and KDE buttons; kindof
 // like translucent plastic buttons...
 //
-// Copyright 2001-2009 by Michael Sweet.
+// Copyright 2001-2010 by Michael Sweet.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -87,13 +87,13 @@ static void frame_rect(int x, int y, int w, int h, const char *c, Fl_Color bc) {
   {
     // Draw lines around the perimeter of the button, 4 colors per
     // circuit.
-    fl_color(shade_color(g[*c++], bc));
+    fl_color(shade_color(g[(int)*c++], bc));
     fl_line(x, y + h + b, x + w - 1, y + h + b, x + w + b - 1, y + h);
-    fl_color(shade_color(g[*c++], bc));
+    fl_color(shade_color(g[(int)*c++], bc));
     fl_line(x + w + b - 1, y + h, x + w + b - 1, y, x + w - 1, y - b);
-    fl_color(shade_color(g[*c++], bc));
+    fl_color(shade_color(g[(int)*c++], bc));
     fl_line(x + w - 1, y - b, x, y - b, x - b, y);
-    fl_color(shade_color(g[*c++], bc));
+    fl_color(shade_color(g[(int)*c++], bc));
     fl_line(x - b, y, x - b, y + h, x, y + h + b);
   }
 }
@@ -106,45 +106,45 @@ static void frame_round(int x, int y, int w, int h, const char *c, Fl_Color bc) 
   if (w==h) {
     for (; b > 1; b --, x ++, y ++, w -= 2, h -= 2)
     {
-      fl_color(shade_color(g[*c++], bc));
+      fl_color(shade_color(g[(int)*c++], bc));
       fl_arc(x, y, w, h, 45.0, 135.0);
-      fl_color(shade_color(g[*c++], bc));
+      fl_color(shade_color(g[(int)*c++], bc));
       fl_arc(x, y, w, h, 315.0, 405.0);
-      fl_color(shade_color(g[*c++], bc));
+      fl_color(shade_color(g[(int)*c++], bc));
       fl_arc(x, y, w, h, 225.0, 315.0);
-      fl_color(shade_color(g[*c++], bc));
+      fl_color(shade_color(g[(int)*c++], bc));
       fl_arc(x, y, w, h, 135.0, 225.0);
     }
   } else if (w>h) {
     int d = h/2;
     for (; b > 1; d--, b --, x ++, y ++, w -= 2, h -= 2)
     {
-      fl_color(shade_color(g[*c++], bc));
+      fl_color(shade_color(g[(int)*c++], bc));
       fl_arc(x, y, h, h, 90.0, 135.0);
       fl_xyline(x+d, y, x+w-d);
       fl_arc(x+w-h, y, h, h, 45.0, 90.0);
-      fl_color(shade_color(g[*c++], bc));
+      fl_color(shade_color(g[(int)*c++], bc));
       fl_arc(x+w-h, y, h, h, 315.0, 405.0);
-      fl_color(shade_color(g[*c++], bc));
+      fl_color(shade_color(g[(int)*c++], bc));
       fl_arc(x+w-h, y, h, h, 270.0, 315.0);
       fl_xyline(x+d, y+h-1, x+w-d);
       fl_arc(x, y, h, h, 225.0, 270.0);
-      fl_color(shade_color(g[*c++], bc));
+      fl_color(shade_color(g[(int)*c++], bc));
       fl_arc(x, y, h, h, 135.0, 225.0);
     }
   } else if (w<h) {
     int d = w/2;
     for (; b > 1; d--, b --, x ++, y ++, w -= 2, h -= 2)
     {
-      fl_color(shade_color(g[*c++], bc));
+      fl_color(shade_color(g[(int)*c++], bc));
       fl_arc(x, y, w, w, 45.0, 135.0);
-      fl_color(shade_color(g[*c++], bc));
+      fl_color(shade_color(g[(int)*c++], bc));
       fl_arc(x, y, w, w, 0.0, 45.0);
       fl_yxline(x+w-1, y+d, y+h-d);
       fl_arc(x, y+h-w, w, w, 315.0, 360.0);
-      fl_color(shade_color(g[*c++], bc));
+      fl_color(shade_color(g[(int)*c++], bc));
       fl_arc(x, y+h-w, w, w, 225.0, 315.0);
-      fl_color(shade_color(g[*c++], bc));
+      fl_color(shade_color(g[(int)*c++], bc));
       fl_arc(x, y+h-w, w, w, 180.0, 225.0);
       fl_yxline(x, y+d, y+h-d);
       fl_arc(x, y, w, w, 135.0, 180.0);
@@ -166,7 +166,7 @@ static void shade_rect(int x, int y, int w, int h, const char *c, Fl_Color bc) {
 
     for (i = 0, j = 0; j < chalf; i ++, j += cstep) {
       // Draw the top line and points...
-      fl_color(shade_color(g[c[i]], bc));
+      fl_color(shade_color(g[(int)c[i]], bc));
       fl_xyline(x + 1, y + i, x + w - 2);
 
       fl_color(shade_color(g[c[i] - 2], bc));
@@ -174,7 +174,7 @@ static void shade_rect(int x, int y, int w, int h, const char *c, Fl_Color bc) {
       fl_point(x + w - 1, y + i + 1);
 
       // Draw the bottom line and points...
-      fl_color(shade_color(g[c[clen - i]], bc));
+      fl_color(shade_color(g[(int)c[clen - i]], bc));
       fl_xyline(x + 1, y + h - i, x + w - 2);
 
       fl_color(shade_color(g[c[clen - i] - 2], bc));
@@ -185,7 +185,7 @@ static void shade_rect(int x, int y, int w, int h, const char *c, Fl_Color bc) {
     // Draw the interior and sides...
     i = chalf / cstep;
 
-    fl_color(shade_color(g[c[chalf]], bc));
+    fl_color(shade_color(g[(int)c[chalf]], bc));
     fl_rectf(x + 1, y + i, w - 2, h - 2 * i + 1);
 
     fl_color(shade_color(g[c[chalf] - 2], bc));
@@ -197,7 +197,7 @@ static void shade_rect(int x, int y, int w, int h, const char *c, Fl_Color bc) {
 
     for (i = 0, j = 0; j < chalf; i ++, j += cstep) {
       // Draw the left line and points...
-      fl_color(shade_color(g[c[i]], bc));
+      fl_color(shade_color(g[(int)c[i]], bc));
       fl_yxline(x + i, y + 1, y + h - 1);
 
       fl_color(shade_color(g[c[i] - 2], bc));
@@ -205,7 +205,7 @@ static void shade_rect(int x, int y, int w, int h, const char *c, Fl_Color bc) {
       fl_point(x + i + 1, y + h);
 
       // Draw the right line and points...
-      fl_color(shade_color(g[c[clen - i]], bc));
+      fl_color(shade_color(g[(int)c[clen - i]], bc));
       fl_yxline(x + w - 1 - i, y + 1, y + h - 1);
 
       fl_color(shade_color(g[c[clen - i] - 2], bc));
@@ -216,7 +216,7 @@ static void shade_rect(int x, int y, int w, int h, const char *c, Fl_Color bc) {
     // Draw the interior, top, and bottom...
     i = chalf / cstep;
 
-    fl_color(shade_color(g[c[chalf]], bc));
+    fl_color(shade_color(g[(int)c[chalf]], bc));
     fl_rectf(x + i, y + 1, w - 2 * i, h - 1);
 
     fl_color(shade_color(g[c[chalf] - 2], bc));
@@ -236,20 +236,20 @@ static void shade_round(int x, int y, int w, int h, const char *c, Fl_Color bc) 
     const int na = 8;
     for (i=0; i<chalf; i++, d--, x++, y++, w-=2, h-=2)
     {
-      fl_color(shade_color(g[c[i]], bc));
+      fl_color(shade_color(g[(int)c[i]], bc));
       fl_pie(x, y, h, h, 90.0, 135.0+i*na);
       fl_xyline(x+d, y, x+w-d);
       fl_pie(x+w-h, y, h, h, 45.0+i*na, 90.0);
-      fl_color(shade_color(g[c[i] - 2], bc));
+      fl_color(shade_color(g[(int)c[i] - 2], bc));
       fl_pie(x+w-h, y, h, h, 315.0+i*na, 405.0+i*na);
-      fl_color(shade_color(g[c[clen - i]], bc));
+      fl_color(shade_color(g[(int)c[clen - i]], bc));
       fl_pie(x+w-h, y, h, h, 270.0, 315.0+i*na);
       fl_xyline(x+d, y+h-1, x+w-d);
       fl_pie(x, y, h, h, 225.0+i*na, 270.0);
-      fl_color(shade_color(g[c[clen - i] - 2], bc));
+      fl_color(shade_color(g[c[(int)clen - i] - 2], bc));
       fl_pie(x, y, h, h, 135.0+i*na, 225.0+i*na);
     }
-    fl_color(shade_color(g[c[chalf]], bc));
+    fl_color(shade_color(g[(int)c[chalf]], bc));
     fl_rectf(x+d, y, w-h+1, h+1);
     fl_pie(x, y, h, h, 90.0, 270.0);
     fl_pie(x+w-h, y, h, h, 270.0, 90.0);
@@ -258,20 +258,20 @@ static void shade_round(int x, int y, int w, int h, const char *c, Fl_Color bc) 
     const int na = 8;
     for (i=0; i<chalf; i++, d--, x++, y++, w-=2, h-=2)
     {
-      fl_color(shade_color(g[c[i]], bc));
+      fl_color(shade_color(g[(int)c[i]], bc));
       fl_pie(x, y, w, w, 45.0+i*na, 135.0+i*na);
       fl_color(shade_color(g[c[i] - 2], bc));
       fl_pie(x, y, w, w, 0.0, 45.0+i*na);
       fl_yxline(x+w-1, y+d, y+h-d);
       fl_pie(x, y+h-w, w, w, 315.0+i*na, 360.0);
-      fl_color(shade_color(g[c[clen - i]], bc));
+      fl_color(shade_color(g[(int)c[clen - i]], bc));
       fl_pie(x, y+h-w, w, w, 225.0+i*na, 315.0+i*na);
       fl_color(shade_color(g[c[clen - i] - 2], bc));
       fl_pie(x, y+h-w, w, w, 180.0, 225.0+i*na);
       fl_yxline(x, y+d, y+h-d);
       fl_pie(x, y, w, w, 135.0+i*na, 180.0);
     }
-    fl_color(shade_color(g[c[chalf]], bc));
+    fl_color(shade_color(g[(int)c[chalf]], bc));
     fl_rectf(x, y+d, w+1, h-w+1);
     fl_pie(x, y, w, w, 0.0, 180.0);
     fl_pie(x, y+h-w, w, w, 180.0, 360.0);
@@ -377,5 +377,5 @@ Fl_Boxtype fl_define_FL_PLASTIC_UP_BOX() {
 
 
 //
-// End of "$Id: fl_plastic.cxx 6616 2009-01-01 21:28:26Z matt $".
+// End of "$Id: fl_plastic.cxx 7903 2010-11-28 21:06:39Z matt $".
 //

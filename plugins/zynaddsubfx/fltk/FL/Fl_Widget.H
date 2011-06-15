@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Widget.H 7661 2010-07-01 15:01:49Z manolo $"
+// "$Id: Fl_Widget.H 8623 2011-04-24 17:09:41Z AlbrechtS $"
 //
 // Widget header file for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2009 by Bill Spitzak and others.
+// Copyright 1998-2010 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -31,9 +31,23 @@
 #ifndef Fl_Widget_H
 #define Fl_Widget_H
 
-#include <stdint.h>
-
 #include "Enumerations.H"
+
+/**
+  \todo	typedef's fl_intptr_t and fl_uintptr_t should be documented.
+*/
+#ifdef _WIN64
+#ifdef __GNUC__
+#include <stdint.h>
+#else
+#include <stddef.h>  // M$VC
+#endif
+typedef intptr_t fl_intptr_t;
+typedef uintptr_t fl_uintptr_t;
+#else
+typedef long fl_intptr_t;
+typedef unsigned long fl_uintptr_t;
+#endif
 
 class Fl_Widget;
 class Fl_Window;
@@ -148,11 +162,11 @@ protected:
   */
   enum {
         INACTIVE        = 1<<0,   ///< the widget can't receive focus, and is disabled but potentially visible
-        INVISIBLE       = 1<<1,   ///< the widget is not drawn but can receive events
+        INVISIBLE       = 1<<1,   ///< the widget is not drawn, but can receive a few special events
         OUTPUT          = 1<<2,   ///< for output only
         NOBORDER        = 1<<3,   ///< don't draw a decoration (Fl_Window)
         FORCE_POSITION  = 1<<4,   ///< don't let the window manager position the window (Fl_Window)
-        NON_MODAL       = 1<<5,   ///< thisis a hovering toolbar window (Fl_Window)
+        NON_MODAL       = 1<<5,   ///< this is a hovering toolbar window (Fl_Window)
         SHORTCUT_LABEL  = 1<<6,   ///< the label contains a shortcut we need to draw
         CHANGED         = 1<<7,   ///< the widget value changed
         OVERRIDE        = 1<<8,   ///< position window on top (Fl_Window)
@@ -163,7 +177,8 @@ protected:
         TOOLTIP_WINDOW  = 1<<13,  ///< a temporary popup, transparent to events, and dismissed easily (Fl_Window)
         MODAL           = 1<<14,  ///< a window blocking input to all other winows (Fl_Window)
         NO_OVERLAY      = 1<<15,  ///< window not using a hardware overlay plane (Fl_Menu_Window)
-        GROUP_RELATIVE  = 1<<16,  ///< position this idget relative to the parent group, not to the window
+        GROUP_RELATIVE  = 1<<16,  ///< position this widget relative to the parent group, not to the window
+        COPIED_TOOLTIP  = 1<<17,  ///< the widget tooltip is internally copied, its destruction is handled by the widget
         // (space for more flags)
         USERFLAG3       = 1<<29,  ///< reserved for 3rd party extensions
         USERFLAG2       = 1<<30,  ///< reserved for 3rd party extensions
@@ -325,13 +340,6 @@ public:
 
       \return label alignment
       \see label(), align(Fl_Align), Fl_Align
-      \todo This function should not take uchar as an argument. 
-            Apart from the fact that uchar is too short with only 8 bits, 
-	    it does not provide type safety (in which case we don't need 
-	    to declare Fl_Align an enum to begin with).
-	    *NOTE* The current (FLTK 1.3) implementation (Dec 2008) is such that
-	    Fl_Align is (typedef'd to be) "unsigned" (int), but Fl_Widget's
-	    "align_" member variable is a bit field of 8 bits only !
    */
   Fl_Align align() const {return label_.align_;}
 
@@ -535,22 +543,12 @@ public:
 
   /** Gets the current tooltip text.
       \return a pointer to the tooltip text or NULL
+      \see tooltip(const char*), copy_tooltip(const char*)
    */
   const char *tooltip() const {return tooltip_;}
 
-  /** Sets the current tooltip text. 
-      Sets a string of text to display in a popup tooltip window when the user 
-      hovers the mouse over the widget. The string is <I>not</I> copied, so 
-      make sure any formatted string is stored in a static, global, 
-      or allocated buffer.
-
-      If no tooltip is set, the tooltip of the parent is inherited. Setting a 
-      tooltip for a group and setting no tooltip for a child will show the 
-      group's tooltip instead. To avoid this behavior, you can set the child's 
-      tooltip to an empty string ("").
-      \param[in] t new tooltip
-   */
-  void tooltip(const char *t);
+  void tooltip(const char *text);		// see Fl_Tooltip
+  void copy_tooltip(const char *text);		// see Fl_Tooltip
 
   /** Gets the current callback function for the widget.
       Each widget has a single callback.
@@ -598,11 +596,11 @@ public:
 
   /** Gets the current user data (long) argument that is passed to the callback function.
    */
-  intptr_t argument() const {return (intptr_t)user_data_;}
+  long argument() const {return (long)(fl_intptr_t)user_data_;}
 
   /** Sets the current user data (long) argument that is passed to the callback function.
-      \todo The user data value must be implemented using a \em union to avoid 
-      64 bit machine incompatibilities.
+      \todo The user data value must be implemented using \em intptr_t or similar
+      to avoid 64-bit machine incompatibilities.
    */
   void argument(long v) {user_data_ = (void*)v;}
 
@@ -662,14 +660,17 @@ public:
   int visible_r() const;
 
   /** Makes a widget visible.
-      An invisible widget never gets redrawn and does not get events.  
-      The visible() method returns true if the widget is set to be  
-      visible. The visible_r() method returns true if the widget and 
-      all of its parents are visible. A widget is only visible if 
-      visible() is true on it <I>and all of its parents</I>. 
 
-      Changing it will send FL_SHOW or FL_HIDE events to 
-      the widget. <I>Do not change it if the parent is not visible, as this 
+      An invisible widget never gets redrawn and does not get keyboard
+      or mouse events, but can receive a few other events like FL_SHOW.
+
+      The visible() method returns true if the widget is set to be
+      visible. The visible_r() method returns true if the widget and
+      all of its parents are visible. A widget is only visible if
+      visible() is true on it <I>and all of its parents</I>.
+
+      Changing it will send FL_SHOW or FL_HIDE events to the widget.
+      <I>Do not change it if the parent is not visible, as this
       will send false FL_SHOW or FL_HIDE events to the widget</I>.
       redraw() is called if necessary on this or the parent.
 
@@ -722,7 +723,7 @@ public:
 
       Changing this value will send FL_DEACTIVATE to the widget if 
       active_r() is true.
-    
+
       Currently you cannot deactivate Fl_Window widgets.
 
       \see activate(), active(), active_r()
@@ -750,10 +751,10 @@ public:
   void clear_output() {flags_ &= ~OUTPUT;}
 
   /** Returns if the widget is able to take events.
-      This is the same as (active() && !output()
-      && visible()) but is faster.
+      This is the same as (active() && !output() && visible())
+      but is faster.
       \retval 0 if the widget takes no events
-   */ 
+   */
   unsigned int takesevents() const {return !(flags_&(INACTIVE|INVISIBLE|OUTPUT));}
 
   /** 
@@ -845,12 +846,12 @@ public:
   // Documentation and implementation in Fl_Widget.cxx
   void do_callback(Fl_Widget* o,void* arg=0);
 
-  /** Internal use only. */
+  /* Internal use only. */
   int test_shortcut();
-  /** Internal use only. */
+  /* Internal use only. */
   static unsigned int label_shortcut(const char *t);
-  /** Internal use only. */
-  static int test_shortcut(const char*);
+  /* Internal use only. */
+  static int test_shortcut(const char*, const bool require_alt = false);
 
   /** Checks if w is a child of this widget.
       \param[in] w potential child widget
@@ -920,7 +921,7 @@ public:
   /** Sets width ww and height hh accordingly with the label size.
       Labels with images will return w() and h() of the image.
    */
-  void measure_label(int& ww, int& hh) {label_.measure(ww, hh);}
+  void measure_label(int& ww, int& hh) const {label_.measure(ww, hh);}
 
   /** Returns a pointer to the primary Fl_Window widget.
       \retval  NULL if no window is associated with this widget.  
@@ -930,25 +931,53 @@ public:
   Fl_Window* window() const ;
 
   /** Returns an Fl_Group pointer if this widget is an Fl_Group.
-  
+
+      Use this method if you have a widget (pointer) and need to
+      know whether this widget is derived from Fl_Group. If it returns
+      non-NULL, then the widget in question is derived from Fl_Group,
+      and you can use the returned pointer to access its children
+      or other Fl_Group-specific methods.
+      
+      Example:
+      \code
+      void my_callback (Fl_Widget *w, void *) {
+        Fl_Group *g = w->as_group();
+	if (g)
+	  printf ("This group has %d children\n",g->children());
+	else
+	  printf ("This widget is not a group!\n");
+      }
+      \endcode
+
       \retval NULL if this widget is not derived from Fl_Group.
       \note This method is provided to avoid dynamic_cast.
-      \todo More documentation ...
+      \see Fl_Widget::as_window(), Fl_Widget::as_gl_window()
    */
   virtual Fl_Group* as_group() {return 0;}
 
   /** Returns an Fl_Window pointer if this widget is an Fl_Window.
-   
-   \retval NULL if this widget is not derived from Fl_Window.
-   \note This method is provided to avoid dynamic_cast.
-   \todo More documentation ...
+
+      Use this method if you have a widget (pointer) and need to
+      know whether this widget is derived from Fl_Window. If it returns
+      non-NULL, then the widget in question is derived from Fl_Window,
+      and you can use the returned pointer to access its children
+      or other Fl_Window-specific methods.
+
+      \retval NULL if this widget is not derived from Fl_Window.
+      \note This method is provided to avoid dynamic_cast.
+      \see Fl_Widget::as_group(), Fl_Widget::as_gl_window()
    */
   virtual Fl_Window* as_window() {return 0;}
-  
-  /** Returns an Fl_Gl_Window pointer if this widget is an Fl_Gl_Window.   
-   \retval NULL if this widget is not derived from Fl_Gl_Window.
-   \note This method is provided to avoid dynamic_cast.
-   \todo More documentation ...
+
+  /** Returns an Fl_Gl_Window pointer if this widget is an Fl_Gl_Window.
+
+      Use this method if you have a widget (pointer) and need to
+      know whether this widget is derived from Fl_Gl_Window. If it returns
+      non-NULL, then the widget in question is derived from Fl_Gl_Window.
+
+      \retval NULL if this widget is not derived from Fl_Gl_Window.
+      \note This method is provided to avoid dynamic_cast.
+      \see Fl_Widget::as_group(), Fl_Widget::as_window()
    */
   virtual class Fl_Gl_Window* as_gl_window() {return 0;}
   
@@ -973,5 +1002,5 @@ public:
 #endif
 
 //
-// End of "$Id: Fl_Widget.H 7661 2010-07-01 15:01:49Z manolo $".
+// End of "$Id: Fl_Widget.H 8623 2011-04-24 17:09:41Z AlbrechtS $".
 //

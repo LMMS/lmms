@@ -3,7 +3,7 @@
 /*
  * GB2312.1980-0
  */
-
+#ifdef NEED_TOWC
 static const unsigned short gb2312_2uni_page21[831] = {
   /* 0x21 */
   0x3000, 0x3001, 0x3002, 0x30fb, 0x02c9, 0x02c7, 0x00a8, 0x3003,
@@ -1088,7 +1088,9 @@ gb2312_mbtowc (conv_t conv, ucs4_t *pwc, const unsigned char *s, int n)
   }
   return RET_ILSEQ;
 }
+#endif /* NEED_TOWC */
 
+#ifdef NEED_TOMB
 static const unsigned short gb2312_2charset[7445] = {
   0x2168, 0x216c, 0x2127, 0x2163, 0x2140, 0x2141, 0x2824, 0x2822,
   0x2828, 0x2826, 0x283a, 0x282c, 0x282a, 0x2830, 0x282e, 0x2142,
@@ -2551,3 +2553,4 @@ gb2312_wctomb (conv_t conv, unsigned char *r, ucs4_t wc, int n)
   }
   return RET_TOOSMALL;
 }
+#endif /* NEED_TOMB */

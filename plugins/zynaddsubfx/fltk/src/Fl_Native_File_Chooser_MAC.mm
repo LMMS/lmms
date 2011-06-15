@@ -1,8 +1,8 @@
-// "$Id: Fl_Native_File_Chooser_MAC.cxx 7354 2010-03-29 11:07:29Z matt $"
+// "$Id: Fl_Native_File_Chooser_MAC.mm 8784 2011-06-06 12:11:04Z manolo $"
 //
 // FLTK native OS file chooser widget
 //
-// Copyright 1998-2005 by Bill Spitzak and others.
+// Copyright 1998-2010 by Bill Spitzak and others.
 // Copyright 2004 Greg Ercolano.
 //
 // This library is free software; you can redistribute it and/or
@@ -30,7 +30,7 @@
 //        Possibly 'preset_file' could be used to select the filename.
 //
 
-#ifndef FL_DOXYGEN		// PREVENT DOXYGEN'S USE OF THIS FILE
+#ifdef __APPLE__
 
 #include "Fl_Native_File_Chooser_common.cxx"		// strnew/strfree/strapp/chrcat
 #include <libgen.h>		// dirname(3)
@@ -40,6 +40,7 @@
 
 #include <FL/Fl.H>
 #include <FL/Fl_Native_File_Chooser.H>
+#include <FL/Fl_File_Chooser.H>
 #include <FL/filename.H>
 
 // FREE PATHNAMES ARRAY, IF IT HAS ANY CONTENTS
@@ -332,8 +333,20 @@ void Fl_Native_File_Chooser::preset_file(const char* val) {
 // PRESET FILE
 //     Returned value can be NULL if none set.
 //
-const char* Fl_Native_File_Chooser::preset_file() {
+const char* Fl_Native_File_Chooser::preset_file() const {
   return(_preset_file);
+}
+
+void Fl_Native_File_Chooser::filter_value(int val) {
+  _filt_value = val;
+}
+
+int Fl_Native_File_Chooser::filter_value() const {
+  return(_filt_value);
+}
+
+int Fl_Native_File_Chooser::filters() const {
+  return(_filt_total);
 }
 
 #import <Cocoa/Cocoa.h>
@@ -360,18 +373,45 @@ int Fl_Native_File_Chooser::get_saveas_basename(void) {
 // SET THE TYPE OF BROWSER
 void Fl_Native_File_Chooser::type(int val) {
   _btype = val;
-  switch (_btype) {
-    case BROWSE_FILE:
-    case BROWSE_MULTI_FILE:
-    case BROWSE_DIRECTORY:
-    case BROWSE_MULTI_DIRECTORY:
-      _panel =  [NSOpenPanel openPanel];
-      break;	  
-    case BROWSE_SAVE_DIRECTORY:
-    case BROWSE_SAVE_FILE:
-      _panel =  [NSSavePanel savePanel];
-      break;
-  }
+}
+
+/* Input
+ filter=  "C files\t*.{c,h}\nText files\t*.txt\n"
+ patterns[0] = "*.{c,h}"
+ patterns[1] = "*.txt"
+ count = 2
+ Return:
+ "C files (*.{c,h})\nText files (*.txt)\n"
+ */
+static char *prepareMacFilter(int count, const char *filter, char **patterns) {
+  int rank = 0, l = 0;
+  for (int i = 0; i < count; i++) {
+    l += strlen(patterns[i]) + 3;
+    }
+  const char *p = filter;
+  char *q; q = new char[strlen(p) + l + 1];
+  const char *r, *s;
+  char *t;
+  t = q;
+  do {	// copy to t what is in filter removing what is between \t and \n, if any
+    r = strchr(p, '\n');
+    if (!r) r = p + strlen(p);
+    s = strchr(p, '\t');
+    if (s && s < r) { 
+      memcpy(q, p, s - p); 
+      q += s - p; 
+      if (rank < count) { sprintf(q, " (%s)", patterns[rank]); q += strlen(q); }
+    }
+    else { 
+      memcpy(q, p, r - p); 
+      q += r - p; 
+    }
+    rank++;
+    *(q++) = '\n'; 
+    if (*p) p = r + 1;
+  } while(*p);
+  *q = 0;
+  return t;
 }
   
 @interface FLopenDelegate : NSObject 
@@ -425,9 +465,9 @@ static NSPopUpButton *createPopupAccessory(NSSavePanel *panel, const char *filte
   NSPopUpButton *popup;
   NSRect rectview = NSMakeRect(5, 5, 350, 30 );
   NSView *view = [[[NSView alloc] initWithFrame:rectview] autorelease];
-  NSRect rectbox = NSMakeRect(0, 3, 50, 1 );
+  NSRect rectbox = NSMakeRect(0, 3, 140, 20 );
   NSBox *box = [[[NSBox alloc] initWithFrame:rectbox] autorelease];
-  NSRect rectpop = NSMakeRect(60, 0, 250, 30 );
+  NSRect rectpop = NSMakeRect(105, 0, 246, 30 );
   popup = [[[NSPopUpButton alloc ] initWithFrame:rectpop pullsDown:NO] autorelease];
   [view addSubview:box];
   [view addSubview:popup];
@@ -438,9 +478,14 @@ static NSPopUpButton *createPopupAccessory(NSSavePanel *panel, const char *filte
   NSFont *font = [NSFont controlContentFontOfSize:NSRegularControlSize];
   [box setTitleFont:font];
   [box sizeToFit];
+  // horizontally move box to fit the locale-dependent width of its title
+  NSRect r=[box frame];
+  NSPoint o = r.origin;
+  o.x = rectpop.origin.x - r.size.width + 15;
+  [box setFrameOrigin:o];
   CFStringRef tab = CFSTR("\n");
   CFStringRef tmp_cfs;
-  tmp_cfs = CFStringCreateWithCString(NULL, filter, kCFStringEncodingASCII);
+  tmp_cfs = CFStringCreateWithCString(NULL, filter, kCFStringEncodingUTF8);
   CFArrayRef array = CFStringCreateArrayBySeparatingStrings(NULL, tmp_cfs, tab);
   CFRelease(tmp_cfs);
   CFRelease(tab);
@@ -469,6 +514,18 @@ int Fl_Native_File_Chooser::post() {
   }
   NSAutoreleasePool *localPool;
   localPool = [[NSAutoreleasePool alloc] init];
+  switch (_btype) {
+    case BROWSE_FILE:
+    case BROWSE_MULTI_FILE:
+    case BROWSE_DIRECTORY:
+    case BROWSE_MULTI_DIRECTORY:
+      _panel =  [NSOpenPanel openPanel];
+      break;	  
+    case BROWSE_SAVE_DIRECTORY:
+    case BROWSE_SAVE_FILE:
+      _panel =  [NSSavePanel savePanel];
+      break;
+  }
   int retval;
   NSString *nstitle = [NSString stringWithUTF8String: (_title ? _title : "No Title")];
   [(NSSavePanel*)_panel setTitle:nstitle];
@@ -478,6 +535,7 @@ int Fl_Native_File_Chooser::post() {
       break;
     case BROWSE_MULTI_DIRECTORY:
       [(NSOpenPanel*)_panel setAllowsMultipleSelection:YES];
+      /* FALLTHROUGH */
     case BROWSE_DIRECTORY:
       [(NSOpenPanel*)_panel setCanChooseDirectories:YES];
       break;
@@ -490,23 +548,11 @@ int Fl_Native_File_Chooser::post() {
   if ( [(NSSavePanel*)_panel isKindOfClass:[NSOpenPanel class]] ) {
     NSPopUpButton *popup = nil;
     if (_filt_total) {
-      char *p; p = _filter;
-      char *q; q = new char[strlen(p) + 1];
-      char *r, *s, *t;
-      t = q;
-      do {	// copy to t what is in _filter removing what is between \t and \n, if any
-	r = strchr(p, '\n');
-	if (!r) r = p + strlen(p) - 1;
-	s = strchr(p, '\t');
-	if (s && s < r) { memcpy(q, p, s - p); q += s - p; *(q++) = '\n'; }
-	else { memcpy(q, p, r - p + 1); q += r - p + 1; }
-	*q = 0;
-	p = r + 1;
-      } while(*p);
-      popup = createPopupAccessory((NSSavePanel*)_panel, t, "Enable:", 0);
-      delete t;
+      char *t = prepareMacFilter(_filt_total, _filter, _filt_patt);
+      popup = createPopupAccessory((NSSavePanel*)_panel, t, Fl_File_Chooser::show_label, 0);
+      delete[] t;
       [[popup menu] addItem:[NSMenuItem separatorItem]];
-      [popup addItemWithTitle:@"All Documents"];
+      [popup addItemWithTitle:[[NSString alloc] initWithUTF8String:Fl_File_Chooser::all_files_label]];
       [popup setAction:@selector(validateVisibleColumns)];
       [popup setTarget:(NSObject*)_panel];
       static FLopenDelegate *openDelegate = nil;
@@ -548,6 +594,7 @@ int Fl_Native_File_Chooser::post() {
     NSString *fname = nil;
     NSString *preset = nil;
     NSPopUpButton *popup = nil;
+    [(NSSavePanel*)_panel setAllowsOtherFileTypes:YES];
     if ( !(_options & SAVEAS_CONFIRM) ) {
       static FLsaveDelegate *saveDelegate = nil;
       if (saveDelegate == nil)saveDelegate = [[FLsaveDelegate alloc] init]; // not to be ever freed
@@ -562,7 +609,9 @@ int Fl_Native_File_Chooser::post() {
     }
     if (_directory && !dir) dir = [[NSString alloc] initWithUTF8String:_directory];
     if (_filt_total) {
-      popup = createPopupAccessory((NSSavePanel*)_panel, _filter, "Format:", _filt_value);
+      char *t = prepareMacFilter(_filt_total, _filter, _filt_patt);
+      popup = createPopupAccessory((NSSavePanel*)_panel, t, [[(NSSavePanel*)_panel nameFieldLabel] UTF8String], _filt_value);
+      delete[] t;
     }
     retval = [(NSSavePanel*)_panel runModalForDirectory:dir file:fname];
     if (_filt_total) {
@@ -576,8 +625,8 @@ int Fl_Native_File_Chooser::post() {
   return (retval == NSOKButton ? 0 : 1);
 }
 
-#endif /*!FL_DOXYGEN*/
+#endif // __APPLE__
 
 //
-// End of "$Id: Fl_Native_File_Chooser_MAC.cxx 7354 2010-03-29 11:07:29Z matt $".
+// End of "$Id: Fl_Native_File_Chooser_MAC.mm 8784 2011-06-06 12:11:04Z manolo $".
 //

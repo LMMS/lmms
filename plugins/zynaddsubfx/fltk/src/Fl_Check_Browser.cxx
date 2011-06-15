@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Check_Browser.cxx 6616 2009-01-01 21:28:26Z matt $"
+// "$Id: Fl_Check_Browser.cxx 8354 2011-02-01 15:41:04Z manolo $"
 //
 // Fl_Check_Browser header file for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2009 by Bill Spitzak and others.
+// Copyright 1998-2010 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -166,15 +166,18 @@ int Fl_Check_Browser::item_selected(void *v) const {
 	return i->selected;
 }
 /**
-    Add a new unchecked line to the end of the browser.  The text is copied
-    using the strdup() function.  It may also be NULL to make
-    a blank line.  The second form can set the item checked.
+ Add a new unchecked line to the end of the browser.  
+ \see add(char *s, int b)
 */
 int Fl_Check_Browser::add(char *s) {
 	return (add(s, 0));
 }
 
-/** See int Fl_Check_Browser::add(char *s) */
+/** 
+ Add a new line to the end of the browser.  The text is copied
+ using the strdup() function.  It may also be NULL to make
+ a blank line.  It can set the item checked if \p b is not 0.
+ */
 int Fl_Check_Browser::add(char *s, int b) {
 	cb_item *p = (cb_item *)malloc(sizeof(cb_item));
 	p->next = 0;
@@ -322,5 +325,5 @@ int Fl_Check_Browser::handle(int event) {
 }
 
 //
-// End of "$Id: Fl_Check_Browser.cxx 6616 2009-01-01 21:28:26Z matt $".
+// End of "$Id: Fl_Check_Browser.cxx 8354 2011-02-01 15:41:04Z manolo $".
 //

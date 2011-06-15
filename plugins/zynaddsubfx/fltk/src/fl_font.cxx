@@ -1,9 +1,9 @@
 //
-// "$Id: fl_font.cxx 6779 2009-04-24 09:28:30Z yuri $"
+// "$Id: fl_font.cxx 8722 2011-05-23 16:06:13Z ianmacarthur $"
 //
 // Font selection code for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2009 by Bill Spitzak and others.
+// Copyright 1998-2010 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -26,14 +26,20 @@
 //
 
 #ifdef WIN32
-#ifndef WIN32_LEAN_AND_MEAN
-# define WIN32_LEAN_AND_MEAN
-#endif
+# ifndef WIN32_LEAN_AND_MEAN
+#  define WIN32_LEAN_AND_MEAN
+# endif
 /* We require Windows 2000 features such as GetGlyphIndices */
 # if !defined(WINVER) || (WINVER < 0x0500)
+#  ifdef WINVER
+#   undef WINVER
+#  endif
 #  define WINVER 0x0500
 # endif
 # if !defined(_WIN32_WINNT) || (_WIN32_WINNT < 0x0500)
+#  ifdef _WIN32_WINNT
+#   undef _WIN32_WINNT
+#  endif
 #  define _WIN32_WINNT 0x0500
 # endif
 #endif
@@ -81,11 +87,13 @@ void fl_text_extents(const char *c, int &dx, int &dy, int &w, int &h) {
 } // fl_text_extents
 
 
-#if !USE_XFT && !__APPLE__
 void fl_draw(const char* str, int l, float x, float y) {
+#ifdef __APPLE__
+  fl_graphics_driver->draw(str, l, x, y);
+#else
   fl_draw(str, l, (int)x, (int)y);
-}
 #endif
+}
 //
-// End of "$Id: fl_font.cxx 6779 2009-04-24 09:28:30Z yuri $".
+// End of "$Id: fl_font.cxx 8722 2011-05-23 16:06:13Z ianmacarthur $".
 //

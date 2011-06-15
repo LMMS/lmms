@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Group.H 7280 2010-03-16 22:51:31Z matt $"
+// "$Id: Fl_Group.H 8157 2011-01-01 14:01:53Z AlbrechtS $"
 //
 // Group header file for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2009 by Bill Spitzak and others.
+// Copyright 1998-2010 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -106,6 +106,7 @@ public:
     widget if \p before is not in the group.
   */
   void insert(Fl_Widget& o, Fl_Widget* before) {insert(o,find(before));}
+  void remove(int index);
   void remove(Fl_Widget&);
   /**
     Removes the widget \p o from the group.
@@ -127,13 +128,13 @@ public:
 
     In these examples the gray area is the resizable:
 
-    \image html resizebox1.gif
+    \image html resizebox1.png
     
-    \image html resizebox2.gif
+    \image html resizebox2.png
     
-    \image latex resizebox1.eps "before resize"  width=4cm
+    \image latex resizebox1.png "before resize"  width=4cm
     
-    \image latex resizebox2.eps "after resize"   width=4cm
+    \image latex resizebox2.png "after resize"   width=4cm
 
     The resizable may be set to the group itself, in which case all the
     contents are resized. This is the default value for Fl_Group,
@@ -176,12 +177,7 @@ public:
   */
   unsigned int clip_children() { return (flags() & CLIP_CHILDREN) != 0; }
 
-  /** Returns an Fl_Group pointer if this widget is an Fl_Group.
-  
-      \retval NULL if this widget is not derived from Fl_Group.
-      \note This method is provided to avoid dynamic_cast.
-      \todo More documentation ...
-   */
+  // Note: Doxygen docs in Fl_Widget.H to avoid redundancy.
   virtual Fl_Group* as_group() { return this; }
 
   // back compatibility functions:
@@ -230,5 +226,5 @@ public:
 #endif
 
 //
-// End of "$Id: Fl_Group.H 7280 2010-03-16 22:51:31Z matt $".
+// End of "$Id: Fl_Group.H 8157 2011-01-01 14:01:53Z AlbrechtS $".
 //

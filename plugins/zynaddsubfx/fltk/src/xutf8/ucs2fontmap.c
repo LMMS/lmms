@@ -36,7 +36,8 @@ typedef struct {
   unsigned short used;
 } Summary16;
 
-
+#define NEED_TOMB /* indicates what part of these include files is needed here (avoid compilation warnings) */
+#include "lcUniConv/cp936ext.h"
 #include "lcUniConv/big5.h"
 #include "lcUniConv/gb2312.h"
 #include "lcUniConv/iso8859_10.h"
@@ -295,11 +296,16 @@ int ucs2fontmap(char *s, unsigned int ucs, int enc) {
       return 24;
     } 
     break;
+  case 26: /* gbk/cp936ext */
+    if (cp936ext_wctomb(NULL, (unsigned char*)s, ucs, 2) > 0) {
+      return 26;
+    }
+    break;
   default:
     break;
   };
   return -1;
-};
+}
 
 /*const*/
 int encoding_number(const char *enc) {
@@ -363,9 +369,11 @@ int encoding_number(const char *enc) {
     return 24;
   } else if (!strcmp(enc, "iso8859-11")) {
     return 25;
+  } else if (!strcmp(enc, "gbk-0") || !strcmp(enc, "cp936") || !strcmp(enc, "gbk")) {
+    return 26;
   };
   return -1;
-};
+}
 
 /*
  * End of "$Id$".

@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Browser_.cxx 7115 2010-02-20 17:40:07Z AlbrechtS $"
+// "$Id: Fl_Browser_.cxx 7903 2010-11-28 21:06:39Z matt $"
 //
 // Base Browser widget class for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2009 by Bill Spitzak and others.
+// Copyright 1998-2010 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -1103,5 +1103,5 @@ void Fl_Browser_::item_select(void *item, int val) {}
 int Fl_Browser_::item_selected(void* item) const { return item==selection_ ? 1 : 0; }
 
 //
-// End of "$Id: Fl_Browser_.cxx 7115 2010-02-20 17:40:07Z AlbrechtS $".
+// End of "$Id: Fl_Browser_.cxx 7903 2010-11-28 21:06:39Z matt $".
 //

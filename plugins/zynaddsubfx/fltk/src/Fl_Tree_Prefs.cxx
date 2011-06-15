@@ -1,5 +1,5 @@
 //
-// "$Id: Fl_Tree_Prefs.cxx 7672 2010-07-10 09:44:45Z matt $"
+// "$Id: Fl_Tree_Prefs.cxx 8340 2011-01-30 20:22:06Z greg.ercolano $"
 //
 
 #include <FL/Fl.H>
@@ -12,7 +12,7 @@
 //////////////////////
 //
 // Fl_Tree -- This file is part of the Fl_Tree widget for FLTK
-// Copyright (C) 2009 by Greg Ercolano.
+// Copyright (C) 2009-2010 by Greg Ercolano.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -136,10 +136,8 @@ Fl_Tree_Prefs::Fl_Tree_Prefs() {
   _usericonmarginleft     = 3;
   _labelmarginleft        = 3;
   _linespacing            = 0;
-  _fgcolor                = FL_BLACK;
-  _bgcolor                = FL_WHITE;
-  _selectcolor            = FL_DARK_BLUE;
-  _inactivecolor          = FL_GRAY;
+  _labelfgcolor           = FL_BLACK;
+  _labelbgcolor           = FL_WHITE;
   _connectorcolor         = Fl_Color(43);
 #ifdef __APPLE__
   _connectorstyle         = FL_TREE_CONNECTOR_NONE;
@@ -166,5 +164,5 @@ Fl_Tree_Prefs::Fl_Tree_Prefs() {
 }
 
 //
-// End of "$Id: Fl_Tree_Prefs.cxx 7672 2010-07-10 09:44:45Z matt $".
+// End of "$Id: Fl_Tree_Prefs.cxx 8340 2011-01-30 20:22:06Z greg.ercolano $".
 //

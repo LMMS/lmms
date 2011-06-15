@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_File_Chooser2.cxx 7672 2010-07-10 09:44:45Z matt $"
+// "$Id: Fl_File_Chooser2.cxx 8785 2011-06-06 16:11:22Z manolo $"
 //
 // More Fl_File_Chooser routines.
 //
-// Copyright 1999-2009 by Michael Sweet.
+// Copyright 1999-2011 by Michael Sweet.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -34,7 +34,7 @@
   dialog that supports various selection modes.
   
   \image html Fl_File_Chooser.jpg 
-  \image latex  Fl_File_Chooser.eps "Fl_File_Chooser" width=12cm
+  \image latex  Fl_File_Chooser.jpg "Fl_File_Chooser" width=12cm
   
   The Fl_File_Chooser class also exports several static values
   that may be used to localize or customize the appearance of all file chooser
@@ -74,7 +74,11 @@
   	<TD>"My Computer" (WIN32)<BR>
   	"File Systems" (all others)</TD>
   </TR>
-  <TR>
+ <TR>
+	<TD>hidden_label</TD>
+	<TD>"Show hidden files:"</TD>
+ </TR>
+ <TR>
   	<TD>manage_favorites_label</TD>
   	<TD>"Manage Favorites"</TD>
   </TR>
@@ -98,7 +102,7 @@
   	<TD>show_label</TD>
   	<TD>"Show:"</TD>
   </TR>
-  <TR>
+ <TR>
   	<TD>sort</TD>
   	<TD>fl_numericsort</TD>
   </TR>
@@ -165,19 +169,19 @@
   Destroys the widget and frees all memory used by it.*/
 
 /** \fn void Fl_File_Chooser::color(Fl_Color c)
-  Sets or gets the background color of the Fl_File_Browser list.*/
+  Sets the background color of the Fl_File_Browser list.*/
 
 /** \fn Fl_Color Fl_File_Chooser::color()
-  Sets or gets the background color of the Fl_File_Browser list.*/
+  Gets the background color of the Fl_File_Browser list.*/
 
 /** \fn int Fl_File_Chooser::count()
   Returns the number of selected files.*/
 
 /** \fn void Fl_File_Chooser::directory(const char *pathname)
-  Sets or gets the current directory.*/
+  Sets the current directory.*/
 
 /** \fn const char *Fl_File_Chooser::directory()
-  Sets or gets the current directory.*/
+  Gets the current directory.*/
 
 /** \fn void Fl_File_Chooser::filter(const char *pattern)
   Sets or gets the current filename filter patterns. The filter
@@ -195,36 +199,36 @@
   See void filter(const char *pattern)*/
 
 /** \fn void Fl_File_Chooser::filter_value(int f)
-  Sets or gets the current filename filter selection.*/
+  Sets the current filename filter selection.*/
 
 /** \fn int Fl_File_Chooser::filter_value()
-  Sets or gets the current filename filter selection.*/
+  Gets the current filename filter selection.*/
 
 /** \fn void Fl_File_Chooser::hide()
   Hides the Fl_File_Chooser window.*/
 
 /** \fn void Fl_File_Chooser::iconsize(uchar s)
-  Sets or gets the size of the icons in the Fl_File_Browser.  By
+  Sets the size of the icons in the Fl_File_Browser.  By
   default the icon size is set to 1.5 times the textsize().
 */
 
 /** \fn uchar Fl_File_Chooser::iconsize()
-  Sets or gets the size of the icons in the Fl_File_Browser.  By
+  Gets the size of the icons in the Fl_File_Browser.  By
   default the icon size is set to 1.5 times the textsize().
 */
 
 /** \fn void Fl_File_Chooser::label(const char *l)
-  Sets or gets the title bar text for the Fl_File_Chooser.*/
+  Sets the title bar text for the Fl_File_Chooser.*/
 
 /** \fn const char *Fl_File_Chooser::label()
-  Sets or gets the title bar text for the Fl_File_Chooser.*/
+  Gets the title bar text for the Fl_File_Chooser.*/
 
 /** \fn void Fl_File_Chooser::ok_label(const char *l)
-  Sets or gets the label for the "ok" button in the Fl_File_Chooser.
+  Sets the label for the "ok" button in the Fl_File_Chooser.
 */
 
 /** \fn const char *Fl_File_Chooser::ok_label()
-  Sets or gets the label for the "ok" button in the Fl_File_Chooser.
+  Gets the label for the "ok" button in the Fl_File_Chooser.
 */
 
 /** \fn int Fl_File_Chooser::preview() const
@@ -237,48 +241,48 @@
   Shows the Fl_File_Chooser window.*/
 
 /** \fn void Fl_File_Chooser::textcolor(Fl_Color c)
-  Sets or gets the current Fl_File_Browser text color.*/
+  Sets the current Fl_File_Browser text color.*/
 
 /** \fn Fl_Color Fl_File_Chooser::textcolor()
-  Sets or gets the current Fl_File_Browser text color.*/
+  Gets the current Fl_File_Browser text color.*/
 
 /** \fn void Fl_File_Chooser::textfont(Fl_Font f)
-  Sets or gets the current Fl_File_Browser text font.*/
+  Sets the current Fl_File_Browser text font.*/
 
 /** \fn Fl_Font Fl_File_Chooser::textfont()
-  Sets or gets the current Fl_File_Browser text font.*/
+  Gets the current Fl_File_Browser text font.*/
 
 /** \fn void Fl_File_Chooser::textsize(Fl_Fontsize s)
-  Sets or gets the current Fl_File_Browser text size.*/
+  Sets the current Fl_File_Browser text size.*/
 
 /** \fn Fl_Fontsize Fl_File_Chooser::textsize()
-  Sets or gets the current Fl_File_Browser text size.*/
+  Gets the current Fl_File_Browser text size.*/
 
 /** \fn void Fl_File_Chooser::type(int t)
-  Sets or gets the current type of Fl_File_Chooser.*/
+  Sets the current type of Fl_File_Chooser.*/
 
 /** \fn int Fl_File_Chooser::type()
-  Sets or gets the current type of Fl_File_Chooser.*/
+  Gets the current type of Fl_File_Chooser.*/
 
-/** \fn const char *Fl_File_Chooser::value(const char *pathname)
-  Sets or gets the current value of the selected file.
-  
-  In the second form, \p file is a \c 1-based index into a list of
-  file names. The number of selected files is returned by
-  Fl_File_Chooser::count().
-  
-  This sample code loops through all selected files:
-  \code
-  // Get list of filenames user selected from a MULTI chooser
-  for ( int t=1; t<=chooser->count(); t++ ) {
-     const char *filename = chooser->value(t);
-     ...
-  }
-  \endcode
+/** \fn void Fl_File_Chooser::value(const char *pathname)
+  Sets the current value of the selected file.
 */
 
-/** \fn const char *Fl_File_Chooser::value(int file)
-  See const char *value(const char *pathname)*/
+/** \fn const char *Fl_File_Chooser::value(int f)
+ Gets the current value of the selected file(s).
+ \p f is a \c 1-based index into a list of
+ file names. The number of selected files is returned by
+ Fl_File_Chooser::count().
+ 
+ This sample code loops through all selected files:
+ \code
+ // Get list of filenames user selected from a MULTI chooser
+ for ( int t=1; t<=chooser->count(); t++ ) {
+ const char *filename = chooser->value(t);
+ ...
+ }
+ \endcode
+ */
 
 /** \fn int Fl_File_Chooser::visible()
   Returns 1 if the Fl_File_Chooser window is visible.*/
@@ -343,6 +347,7 @@
 #include <FL/fl_ask.H>
 #include <FL/x.H>
 #include <FL/Fl_Shared_Image.H>
+#include <FL/fl_draw.H>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -392,6 +397,7 @@ const char	*Fl_File_Chooser::new_directory_tooltip = "Create a new directory.";
 const char	*Fl_File_Chooser::preview_label = "Preview";
 const char	*Fl_File_Chooser::save_label = "Save";
 const char	*Fl_File_Chooser::show_label = "Show:";
+const char      *Fl_File_Chooser::hidden_label = "Show hidden files";
 Fl_File_Sort_F	*Fl_File_Chooser::sort = fl_numericsort;
 
 
@@ -460,7 +466,7 @@ Fl_File_Chooser::directory(const char *d)// I - Directory to change to
 #ifdef WIN32
   // See if the filename contains backslashes...
   char	*slash;				// Pointer to slashes
-  char	fixpath[1024];			// Path with slashes converted
+  char	fixpath[FL_PATH_MAX];			// Path with slashes converted
   if (strchr(d, '\\')) {
     // Convert backslashes to slashes...
     strlcpy(fixpath, d, sizeof(fixpath));
@@ -524,8 +530,8 @@ void
 Fl_File_Chooser::favoritesButtonCB()
 {
   int		v;			// Current selection
-  char		pathname[1024],		// Pathname
-		menuname[2048];		// Menu name
+  char		pathname[FL_PATH_MAX],		// Pathname
+		menuname[FL_PATH_MAX];		// Menu name
 
 
   v = favoritesButton->value();
@@ -691,7 +697,7 @@ void
 Fl_File_Chooser::fileListCB()
 {
   char	*filename,			// New filename
-	pathname[1024];			// Full pathname to file
+	pathname[FL_PATH_MAX];			// Full pathname to file
 
 
   filename = (char *)fileList->text(fileList->value());
@@ -727,6 +733,7 @@ Fl_File_Chooser::fileListCB()
     {
       // Hide the window - picked the file...
       window->hide();
+      if (callback_) (*callback_)(this, data_);
     }
   }
   else
@@ -791,8 +798,8 @@ Fl_File_Chooser::fileNameCB()
 {
   char		*filename,	// New filename
 		*slash,		// Pointer to trailing slash
-		pathname[1024],	// Full pathname to file
-		matchname[256];	// Matching filename
+		pathname[FL_PATH_MAX],	// Full pathname to file
+		matchname[FL_PATH_MAX];	// Matching filename
   int		i,		// Looping var
 		min_match,	// Minimum number of matching chars
 		max_match,	// Maximum number of matching chars
@@ -841,8 +848,8 @@ Fl_File_Chooser::fileNameCB()
     // Enter pressed - select or change directory...
 #if (defined(WIN32) && ! defined(__CYGWIN__)) || defined(__EMX__)
     if ((isalpha(pathname[0] & 255) && pathname[1] == ':' && !pathname[2]) ||
-        _fl_filename_isdir_quick(pathname) &&
-	compare_dirnames(pathname, directory_)) {
+        (_fl_filename_isdir_quick(pathname) &&
+	 compare_dirnames(pathname, directory_))) {
 #else
     if (_fl_filename_isdir_quick(pathname) &&
 	compare_dirnames(pathname, directory_)) {
@@ -889,7 +896,7 @@ Fl_File_Chooser::fileNameCB()
       directory(pathname);
 
       if (filename[0]) {
-	char tempname[1024];
+	char tempname[FL_PATH_MAX];
 
 	snprintf(tempname, sizeof(tempname), "%s/%s", directory_, filename);
 	fileName->value(tempname);
@@ -1000,7 +1007,7 @@ Fl_File_Chooser::filter(const char *p)		// I - Pattern(s)
 		*start,				// Start of pattern
 		*end;				// End of pattern
   int		allfiles;			// Do we have a "*" pattern?
-  char		temp[1024];			// Temporary pattern string
+  char		temp[FL_PATH_MAX];			// Temporary pattern string
 
 
   // Make sure we have a pattern...
@@ -1032,8 +1039,6 @@ Fl_File_Chooser::filter(const char *p)		// I - Pattern(s)
 
   showChoice->add(custom_filter_label);
   
-  // TODO: add a menu item to switch hidden files on and off
-
   showChoice->value(0);
   showChoiceCB();
 }
@@ -1047,7 +1052,7 @@ void
 Fl_File_Chooser::newdir()
 {
   const char	*dir;		// New directory name
-  char		pathname[1024];	// Full path of directory
+  char		pathname[FL_PATH_MAX];	// Full path of directory
 
 
   // Get a directory name from the user
@@ -1128,7 +1133,7 @@ Fl_File_Chooser::previewCB(Fl_File_Chooser *fc) {	// I - File chooser
 void
 Fl_File_Chooser::rescan()
 {
-  char	pathname[1024];		// New pathname for filename field
+  char	pathname[FL_PATH_MAX];		// New pathname for filename field
 
 
   // Clear the current filename
@@ -1146,7 +1151,9 @@ Fl_File_Chooser::rescan()
 
   // Build the file list...
   fileList->load(directory_, sort);
-
+#ifndef WIN32	
+  if (!showHiddenButton->value()) remove_hidden_files();
+#endif
   // Update the preview box...
   update_preview();
 }
@@ -1166,12 +1173,14 @@ void Fl_File_Chooser::rescan_keep_filename()
   }
 
   int   i;
-  char	pathname[1024];		// New pathname for filename field
+  char	pathname[FL_PATH_MAX];		// New pathname for filename field
   strlcpy(pathname, fn, sizeof(pathname));
 
   // Build the file list...
   fileList->load(directory_, sort);
-
+#ifndef WIN32	
+  if (!showHiddenButton->value()) remove_hidden_files();
+#endif
   // Update the preview box...
   update_preview();
 
@@ -1212,7 +1221,7 @@ Fl_File_Chooser::showChoiceCB()
   const char	*item,			// Selected item
 		*patstart;		// Start of pattern
   char		*patend;		// End of pattern
-  char		temp[1024];		// Temporary string for pattern
+  char		temp[FL_PATH_MAX];		// Temporary string for pattern
 
 
   item = showChoice->text(showChoice->value());
@@ -1249,7 +1258,7 @@ void
 Fl_File_Chooser::update_favorites()
 {
   int		i;			// Looping var
-  char		pathname[1024],		// Pathname
+  char		pathname[FL_PATH_MAX],		// Pathname
 		menuname[2048];		// Menu name
   const char	*home;			// Home directory
 
@@ -1295,7 +1304,6 @@ Fl_File_Chooser::update_preview()
   int			pbw, pbh;	// Width and height of preview box
   int			w, h;		// Width and height of preview image
   int                   set = 0;        // Set this flag as soon as a decent preview is found
-
 
   if (!previewButton->value()) return;
 
@@ -1345,7 +1353,7 @@ Fl_File_Chooser::update_preview()
     int		bytes;
     char	*ptr;
 
-    if (filename) fp = fopen(filename, "rb");
+    if (filename) fp = fl_fopen(filename, "rb");
     else fp = NULL;
 
     if (fp != NULL) {
@@ -1403,7 +1411,7 @@ Fl_File_Chooser::update_preview()
       // Show the first 1k of text...
       int size = previewBox->h() / 20;
       if (size < 6) size = 6;
-      else if (size > 14) size = 14;
+      else if (size > FL_NORMAL_SIZE) size = FL_NORMAL_SIZE;
 
       previewBox->label(preview_text_);
       previewBox->align((Fl_Align)(FL_ALIGN_CLIP | FL_ALIGN_INSIDE |
@@ -1455,7 +1463,7 @@ Fl_File_Chooser::value(int f)	// I - File number
   int		i;		// Looping var
   int		fcount;		// Number of selected files
   const char	*name;		// Current filename
-  static char	pathname[1024];	// Filename + directory
+  static char	pathname[FL_PATH_MAX];	// Filename + directory
 
 
   name = fileName->value();
@@ -1502,7 +1510,7 @@ Fl_File_Chooser::value(const char *filename)
   int	i,				// Looping var
   	fcount;				// Number of items in list
   char	*slash;				// Directory separator
-  char	pathname[1024];			// Local copy of filename
+  char	pathname[FL_PATH_MAX];		// Local copy of filename
 
 
 //  printf("Fl_File_Chooser::value(\"%s\")\n", filename == NULL ? "(null)" : filename);
@@ -1518,7 +1526,7 @@ Fl_File_Chooser::value(const char *filename)
 
 #ifdef WIN32
   // See if the filename contains backslashes...
-  char	fixpath[1024];			// Path with slashes converted
+  char	fixpath[FL_PATH_MAX];			// Path with slashes converted
   if (strchr(filename, '\\')) {
     // Convert backslashes to slashes...
     strlcpy(fixpath, filename, sizeof(fixpath));
@@ -1569,8 +1577,42 @@ Fl_File_Chooser::value(const char *filename)
       break;
     }
 }
+  
+void Fl_File_Chooser::show()
+{
+  window->hotspot(fileList);
+  window->show();
+  Fl::flush();
+  fl_cursor(FL_CURSOR_WAIT);
+  rescan_keep_filename();
+  fl_cursor(FL_CURSOR_DEFAULT);
+  fileName->take_focus();
+#ifdef WIN32
+  showHiddenButton->hide();
+#endif
+}
 
+void Fl_File_Chooser::showHidden(int value)
+{
+  if (value) {
+    fileList->load(directory());
+  } else {
+    remove_hidden_files();
+    fileList->redraw();
+  }
+}
+  
+void Fl_File_Chooser::remove_hidden_files()
+{
+  int count = fileList->size();
+  for(int num = count; num >= 1; num--) {
+    const char *p = fileList->text(num);
+    if (*p == '.' && strcmp(p, "../") != 0) fileList->remove(num);
+  }
+  fileList->topline(1);
+}
 
+  
 //
 // 'compare_dirnames()' - Compare two directory names.
 //
@@ -1650,5 +1692,5 @@ unquote_pathname(char       *dst,	// O - Destination string
 
 
 //
-// End of "$Id: Fl_File_Chooser2.cxx 7672 2010-07-10 09:44:45Z matt $".
+// End of "$Id: Fl_File_Chooser2.cxx 8785 2011-06-06 16:11:22Z manolo $".
 //

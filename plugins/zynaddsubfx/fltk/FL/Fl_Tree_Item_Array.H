@@ -1,11 +1,13 @@
 //
-// "$Id: Fl_Tree_Item_Array.H 6956 2009-12-08 08:06:44Z greg.ercolano $"
+// "$Id: Fl_Tree_Item_Array.H 7903 2010-11-28 21:06:39Z matt $"
 //
 
 #ifndef _FL_TREE_ITEM_ARRAY_H
 #define _FL_TREE_ITEM_ARRAY_H
 
-class Fl_Tree_Item;		// forward decl must *precede* first doxygen comment block
+#include "Fl_Export.H"
+
+class FL_EXPORT Fl_Tree_Item;	// forward decl must *precede* first doxygen comment block
 				// or doxygen will not document our class..
 
 //////////////////////////
@@ -13,7 +15,7 @@ class Fl_Tree_Item;		// forward decl must *precede* first doxygen comment block
 //////////////////////////
 //
 // Fl_Tree -- This file is part of the Fl_Tree widget for FLTK
-// Copyright (C) 2009 by Greg Ercolano.
+// Copyright (C) 2009-2010 by Greg Ercolano.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -46,7 +48,7 @@ class Fl_Tree_Item;		// forward decl must *precede* first doxygen comment block
 /// (unless otherwise noted).
 ///
 
-class Fl_Tree_Item_Array {
+class FL_EXPORT Fl_Tree_Item_Array {
   Fl_Tree_Item **_items;	// items array
   int _total;			// #items in array
   int _size;			// #items *allocated* for array
@@ -84,5 +86,5 @@ public:
 #endif /*_FL_TREE_ITEM_ARRAY_H*/
 
 //
-// End of "$Id: Fl_Tree_Item_Array.H 6956 2009-12-08 08:06:44Z greg.ercolano $".
+// End of "$Id: Fl_Tree_Item_Array.H 7903 2010-11-28 21:06:39Z matt $".
 //

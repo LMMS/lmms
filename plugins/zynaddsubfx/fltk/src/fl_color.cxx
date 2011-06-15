@@ -1,9 +1,9 @@
 //
-// "$Id: fl_color.cxx 7617 2010-05-27 17:20:18Z manolo $"
+// "$Id: fl_color.cxx 8384 2011-02-06 12:32:23Z manolo $"
 //
 // Color functions for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2009 by Bill Spitzak and others.
+// Copyright 1998-2010 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -124,22 +124,19 @@ Fl_XColor fl_xmap[1][256];
 #    define fl_overlay 0
 #  endif
 
-/** Current color for drawing operations */
-Fl_Color fl_color_;
-
-void Fl_Graphics_Driver::color(Fl_Color i) {
+void Fl_Xlib_Graphics_Driver::color(Fl_Color i) {
   if (i & 0xffffff00) {
     unsigned rgb = (unsigned)i;
     fl_color((uchar)(rgb >> 24), (uchar)(rgb >> 16), (uchar)(rgb >> 8));
   } else {
-    fl_color_ = i;
+    Fl_Graphics_Driver::color(i);
     if(!fl_gc) return; // don't get a default gc if current window is not yet created/valid
     XSetForeground(fl_display, fl_gc, fl_xpixel(i));
   }
 }
 
-void Fl_Graphics_Driver::color(uchar r,uchar g,uchar b) {
-  fl_color_ = fl_rgb_color(r, g, b);
+void Fl_Xlib_Graphics_Driver::color(uchar r,uchar g,uchar b) {
+  Fl_Graphics_Driver::color( fl_rgb_color(r, g, b) );
   if(!fl_gc) return; // don't get a default gc if current window is not yet created/valid
   XSetForeground(fl_display, fl_gc, fl_xpixel(r,g,b));
 }
@@ -202,7 +199,7 @@ static inline uchar realcolor(uchar color, uchar mask) {
   }
   return result;
 #  else
-  return (color&mask) | (~mask)&(mask>>1);
+  return (color&mask) | ( (~mask)&(mask>>1) );
 #  endif
 }
 
@@ -361,14 +358,12 @@ void Fl::set_color(Fl_Color i, unsigned c) {
 
 #endif // end of X-specific code
 /**
-    Returns the RGB value(s) for the given FLTK color index. The
-    first form returns the RGB values packed in a 32-bit unsigned
+    Returns the RGB value(s) for the given FLTK color index.
+    
+    This form returns the RGB values packed in a 32-bit unsigned
     integer with the red value in the upper 8 bits, the green value
     in the next 8 bits, and the blue value in bits 8-15.  The lower
     8 bits will always be 0.
-    
-    The second form returns the red, green, and blue values
-    separately in referenced variables.
 */
 unsigned Fl::get_color(Fl_Color i) {
   if (i & 0xffffff00) return (i);
@@ -383,7 +378,14 @@ void Fl::set_color(Fl_Color i, uchar red, uchar green, uchar blue) {
   Fl::set_color((Fl_Color)(i & 255),
 	((unsigned)red<<24)+((unsigned)green<<16)+((unsigned)blue<<8));
 }
-/** See unsigned get_color(Fl_Color c) */
+/**
+    Returns the RGB value(s) for the given FLTK color index. 
+    
+    This form returns the red, green, and blue values
+    separately in referenced variables.
+
+    See also unsigned get_color(Fl_Color c)
+ */
 void Fl::get_color(Fl_Color i, uchar &red, uchar &green, uchar &blue) {
   unsigned c;
 
@@ -465,5 +467,5 @@ Fl_Color fl_contrast(Fl_Color fg, Fl_Color bg) {
    @}
 */
 //
-// End of "$Id: fl_color.cxx 7617 2010-05-27 17:20:18Z manolo $".
+// End of "$Id: fl_color.cxx 8384 2011-02-06 12:32:23Z manolo $".
 //

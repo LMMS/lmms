@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Tile.H 6614 2009-01-01 16:11:32Z matt $"
+// "$Id: Fl_Tile.H 7981 2010-12-08 23:53:04Z greg.ercolano $"
 //
 // Tile header file for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2009 by Bill Spitzak and others.
+// Copyright 1998-2010 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -37,8 +37,8 @@
   The Fl_Tile class lets you resize the children by dragging
   the border between them:
   
-  <P ALIGN=CENTER>\image html Fl_Tile.gif </P> 
-  \image latex  Fl_Tile.eps "Fl_Tile" width=4cm
+  <P ALIGN=CENTER>\image html Fl_Tile.png </P> 
+  \image latex  Fl_Tile.png "Fl_Tile" width=4cm
   
   <P>For the tiling to work correctly, the children of an 
   Fl_Tile must cover the entire area of the widget, but not
@@ -98,5 +98,5 @@ public:
 #endif
 
 //
-// End of "$Id: Fl_Tile.H 6614 2009-01-01 16:11:32Z matt $".
+// End of "$Id: Fl_Tile.H 7981 2010-12-08 23:53:04Z greg.ercolano $".
 //

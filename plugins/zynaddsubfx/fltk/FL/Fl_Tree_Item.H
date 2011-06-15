@@ -1,5 +1,5 @@
 //
-// "$Id: Fl_Tree_Item.H 6957 2009-12-08 08:39:31Z greg.ercolano $"
+// "$Id: Fl_Tree_Item.H 8340 2011-01-30 20:22:06Z greg.ercolano $"
 //
 
 #ifndef FL_TREE_ITEM_H
@@ -18,7 +18,7 @@
 //////////////////////
 //
 // Fl_Tree -- This file is part of the Fl_Tree widget for FLTK
-// Copyright (C) 2009 by Greg Ercolano.
+// Copyright (C) 2009-2010 by Greg Ercolano.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -56,10 +56,10 @@
 /// When you make changes to items, you'll need to tell the tree to redraw()
 /// for the changes to show up.
 ///
-class Fl_Tree_Item {
+class FL_EXPORT Fl_Tree_Item {
   const char             *_label;		// label (memory managed)
-  int                     _labelfont;		// label's font face
-  int                     _labelsize;		// label's font size
+  Fl_Font                 _labelfont;		// label's font face
+  Fl_Fontsize             _labelsize;		// label's font size
   Fl_Color                _labelfgcolor;	// label's fg color
   Fl_Color                _labelbgcolor;	// label's bg color
   char                    _open;		// item is open?
@@ -83,7 +83,11 @@ public:
   Fl_Tree_Item(const Fl_Tree_Prefs &prefs);	// CTOR
   ~Fl_Tree_Item();				// DTOR
   Fl_Tree_Item(const Fl_Tree_Item *o);		// COPY CTOR
-  void draw(int X, int &Y, int W, Fl_Widget *tree, const Fl_Tree_Prefs &prefs, int lastchild=1);
+  int x() const { return(_xywh[0]); }
+  int y() const { return(_xywh[1]); }
+  int w() const { return(_xywh[2]); }
+  int h() const { return(_xywh[3]); }
+  void draw(int X, int &Y, int W, Fl_Widget *tree, Fl_Tree_Item *itemfocus, const Fl_Tree_Prefs &prefs, int lastchild=1);
   void show_self(const char *indent = "") const;
   void label(const char *val);
   const char *label() const;
@@ -95,19 +99,19 @@ public:
   inline void* user_data() const { return _userdata; }
   
   /// Set item's label font face.
-  void labelfont(int val) {
+  void labelfont(Fl_Font val) {
     _labelfont = val; 
   }
   /// Get item's label font face.
-  int labelfont() const {
+  Fl_Font labelfont() const {
     return(_labelfont);
   }
   /// Set item's label font size.
-  void labelsize(int val) {
+  void labelsize(Fl_Fontsize val) {
     _labelsize = val; 
   }
   /// Get item's label font size.
-  int labelsize() const {
+  Fl_Fontsize labelsize() const {
     return(_labelsize);
   }
   /// Set item's label foreground text color.
@@ -163,8 +167,10 @@ public:
   void clear_children();
   void swap_children(int ax, int bx);
   int swap_children(Fl_Tree_Item *a, Fl_Tree_Item *b);
-  const Fl_Tree_Item *find_item(char **arr) const;
-  Fl_Tree_Item *find_item(char **arr);
+  const Fl_Tree_Item *find_child_item(char **arr) const;	// const
+        Fl_Tree_Item *find_child_item(char **arr);		// non-const
+  const Fl_Tree_Item *find_item(char **arr) const;		// const
+        Fl_Tree_Item *find_item(char **arr);			// non-const
   //////////////////
   // Adding items
   //////////////////
@@ -175,12 +181,16 @@ public:
   int depth() const;
   Fl_Tree_Item *prev();
   Fl_Tree_Item *next();
+  Fl_Tree_Item *next_sibling();
+  Fl_Tree_Item *prev_sibling();
+  Fl_Tree_Item *next_displayed(Fl_Tree_Prefs &prefs);
+  Fl_Tree_Item *prev_displayed(Fl_Tree_Prefs &prefs);
   
-  /// Return the parent for this item.
+  /// Return the parent for this item. Returns NULL if we are the root.
   Fl_Tree_Item *parent() {
     return(_parent);
   }
-  /// Return the const parent for this item.
+  /// Return the const parent for this item. Returns NULL if we are the root.
   const Fl_Tree_Item *parent() const {
     return(_parent);
   }
@@ -293,6 +303,12 @@ public:
   char is_active() const {
     return(_active);
   }
+  /// See if the item is visible.
+  int visible() const {
+    return(_visible ? 1 : 0);
+  }
+  int visible_r() const;
+
   /// Set the user icon's image. '0' will disable.
   void usericon(Fl_Image *val) {
     _usericon = val;
@@ -317,5 +333,5 @@ public:
 #endif /*FL_TREE_ITEM_H*/
 
 //
-// End of "$Id: Fl_Tree_Item.H 6957 2009-12-08 08:39:31Z greg.ercolano $".
+// End of "$Id: Fl_Tree_Item.H 8340 2011-01-30 20:22:06Z greg.ercolano $".
 //

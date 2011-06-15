@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Scroll.H 6951 2009-12-06 22:21:55Z matt $"
+// "$Id: Fl_Scroll.H 7981 2010-12-08 23:53:04Z greg.ercolano $"
 //
 // Scroll header file for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2009 by Bill Spitzak and others.
+// Copyright 1998-2010 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -39,8 +39,8 @@
   larger than your window.  If the child widgets are larger than the size
   of this object then scrollbars will appear so that you can scroll over
   to them:
-  \image html Fl_Scroll.gif
-  \image latex  Fl_Scroll.eps "Fl_Scroll" width=4cm
+  \image html Fl_Scroll.png
+  \image latex  Fl_Scroll.png "Fl_Scroll" width=4cm
 
   If all of the child widgets are packed together into a solid
   rectangle then you want to set box() to FL_NO_BOX or
@@ -195,5 +195,5 @@ public:
 #endif
 
 //
-// End of "$Id: Fl_Scroll.H 6951 2009-12-06 22:21:55Z matt $".
+// End of "$Id: Fl_Scroll.H 7981 2010-12-08 23:53:04Z greg.ercolano $".
 //

@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Device.cxx 7659 2010-07-01 13:21:32Z manolo $"
+// "$Id: Fl_Device.cxx 8504 2011-03-04 16:48:10Z manolo $"
 //
 // implementation of Fl_Device class for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 2010 by Bill Spitzak and others.
+// Copyright 2010-2011 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -29,18 +29,18 @@
 #include <FL/Fl_Device.H>
 #include <FL/Fl_Image.H>
 
-const char *Fl_Device::device_type = "Fl_Device";
-const char *Fl_Surface_Device::device_type = "Fl_Surface_Device";
-const char *Fl_Display_Device::device_type = "Fl_Display_Device";
-const char *Fl_Graphics_Driver::device_type = "Fl_Graphics_Driver";
+const char *Fl_Device::class_id = "Fl_Device";
+const char *Fl_Surface_Device::class_id = "Fl_Surface_Device";
+const char *Fl_Display_Device::class_id = "Fl_Display_Device";
+const char *Fl_Graphics_Driver::class_id = "Fl_Graphics_Driver";
 #if defined(__APPLE__) || defined(FL_DOXYGEN)
-const char *Fl_Quartz_Graphics_Driver::device_type = "Fl_Quartz_Graphics_Driver";
+const char *Fl_Quartz_Graphics_Driver::class_id = "Fl_Quartz_Graphics_Driver";
 #endif
 #if defined(WIN32) || defined(FL_DOXYGEN)
-const char *Fl_GDI_Graphics_Driver::device_type = "Fl_GDI_Graphics_Driver";
+const char *Fl_GDI_Graphics_Driver::class_id = "Fl_GDI_Graphics_Driver";
 #endif
 #if !(defined(__APPLE__) || defined(WIN32))
-const char *Fl_Xlib_Graphics_Driver::device_type = "Fl_Xlib_Graphics_Driver";
+const char *Fl_Xlib_Graphics_Driver::class_id = "Fl_Xlib_Graphics_Driver";
 #endif
 
 
@@ -48,9 +48,43 @@ const char *Fl_Xlib_Graphics_Driver::device_type = "Fl_Xlib_Graphics_Driver";
 void Fl_Surface_Device::set_current(void)
 {
   fl_graphics_driver = _driver;
-  fl_surface = this;
+  _surface = this;
 }
 
+const Fl_Graphics_Driver::matrix Fl_Graphics_Driver::m0 = {1, 0, 0, 1, 0, 0};
+
+Fl_Graphics_Driver::Fl_Graphics_Driver() {
+  font_ = 0;
+  size_ = 0;
+  sptr=0; rstackptr=0; 
+  fl_clip_state_number=0;
+  m = m0; 
+  fl_matrix = &m; 
+  p = (XPOINT *)0;
+  font_descriptor_ = NULL;
+};
+
+void Fl_Graphics_Driver::text_extents(const char*t, int n, int& dx, int& dy, int& w, int& h)
+{
+  w = (int)width(t, n);
+  h = - height();
+  dx = 0;
+  dy = descent();
+}
+
+Fl_Display_Device::Fl_Display_Device(Fl_Graphics_Driver *graphics_driver) : Fl_Surface_Device( graphics_driver) {
+#ifdef __APPLE__
+  SInt32 versionMajor = 0;
+  SInt32 versionMinor = 0;
+  SInt32 versionBugFix = 0;
+  Gestalt( gestaltSystemVersionMajor, &versionMajor );
+  Gestalt( gestaltSystemVersionMinor, &versionMinor );
+  Gestalt( gestaltSystemVersionBugFix, &versionBugFix );
+  fl_mac_os_version = versionMajor * 10000 + versionMinor * 100 + versionBugFix;
+#endif
+};
+
+
 //
-// End of "$Id: Fl_Device.cxx 7659 2010-07-01 13:21:32Z manolo $".
+// End of "$Id: Fl_Device.cxx 8504 2011-03-04 16:48:10Z manolo $".
 //

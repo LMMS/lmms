@@ -3,7 +3,7 @@
 /*
  * KSC5601.1987-0
  */
-
+#ifdef NEED_TOWC
 static const unsigned short ksc5601_2uni_page21[1115] = {
   /* 0x21 */
   0x3000, 0x3001, 0x3002, 0x00b7, 0x2025, 0x2026, 0x00a8, 0x3003,
@@ -1198,7 +1198,9 @@ ksc5601_mbtowc (conv_t conv, ucs4_t *pwc, const unsigned char *s, int n)
   }
   return RET_ILSEQ;
 }
+#endif /* NEED_TOWC */
 
+#ifdef NEED_TOMB
 static const unsigned short ksc5601_2charset[8224] = {
   0x222e, 0x2234, 0x2157, 0x2127, 0x2823, 0x2129, 0x2146, 0x213e,
   0x2977, 0x2978, 0x2225, 0x2252, 0x2124, 0x222c, 0x2976, 0x282c,
@@ -3001,3 +3003,4 @@ ksc5601_wctomb (conv_t conv, unsigned char *r, ucs4_t wc, int n)
   }
   return RET_TOOSMALL;
 }
+#endif /* NEED_TOMB */

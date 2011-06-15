@@ -1,9 +1,9 @@
 //
-// "$Id: fl_font_xft.cxx 7652 2010-06-21 15:49:45Z manolo $"
+// "$Id: fl_font_xft.cxx 8442 2011-02-18 13:39:48Z manolo $"
 //
 // Xft font code for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 2001-2009 Bill Spitzak and others.
+// Copyright 2001-2011 Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -69,6 +69,7 @@
 
 // The predefined fonts that FLTK has:
 static Fl_Fontdesc built_in_table[] = {
+#if 1
 {" sans"},
 {"Bsans"},
 {"Isans"},
@@ -84,47 +85,55 @@ static Fl_Fontdesc built_in_table[] = {
 {" symbol"},
 {" screen"},
 {"Bscreen"},
-{" dingbats"},
+{" zapf dingbats"},
+#else
+{" helvetica"},
+{"Bhelvetica"},
+{"Ihelvetica"},
+{"Phelvetica"},
+{" courier"},
+{"Bcourier"},
+{"Icourier"},
+{"Pcourier"},
+{" times"},
+{"Btimes"},
+{"Itimes"},
+{"Ptimes"},
+{" symbol"},
+{" lucidatypewriter"},
+{"Blucidatypewriter"},
+{" zapf dingbats"},
+#endif
 };
 
 Fl_Fontdesc* fl_fonts = built_in_table;
 
-#define current_font (fl_fontsize->font)
-
-Fl_Font fl_font_ = 0;
-Fl_Fontsize fl_size_ = 0;
-int fl_angle_ = 0; // internal for rotating text support
 Fl_XFont_On_Demand fl_xfont;
 void *fl_xftfont = 0;
 //const char* fl_encoding_ = "iso8859-1";
 const char* fl_encoding_ = "iso10646-1";
-Fl_Font_Descriptor* fl_fontsize = 0;
 
-
-
-void fl_font(Fl_Font fnum, Fl_Fontsize size, int angle) {
+static void fl_xft_font(Fl_Xlib_Graphics_Driver *driver, Fl_Font fnum, Fl_Fontsize size, int angle) {
   if (fnum==-1) { // special case to stop font caching
-    fl_font_ = 0; fl_size_ = 0; fl_angle_ = 0;
+    driver->Fl_Graphics_Driver::font(0, 0);
     return;
   }
-  if (fnum == fl_font_ && size == fl_size_ && angle == fl_angle_
-      && fl_fontsize)
-//      && !strcasecmp(fl_fontsize->encoding, fl_encoding_))
+  Fl_Font_Descriptor* f = driver->font_descriptor();
+  if (fnum == driver->Fl_Graphics_Driver::font() && size == driver->size() && f && f->angle == angle)
     return;
-  fl_font_ = fnum; fl_size_ = size; fl_angle_ = angle;
+  driver->Fl_Graphics_Driver::font(fnum, size);
   Fl_Fontdesc *font = fl_fonts + fnum;
-  Fl_Font_Descriptor* f;
   // search the fontsizes we have generated already
   for (f = font->first; f; f = f->next) {
     if (f->size == size && f->angle == angle)// && !strcasecmp(f->encoding, fl_encoding_))
       break;
   }
   if (!f) {
-    f = new Fl_Font_Descriptor(font->name);
+    f = new Fl_Font_Descriptor(font->name, size, angle);
     f->next = font->first;
     font->first = f;
   }
-  fl_fontsize = f;
+  driver->font_descriptor(f);
 #if XFT_MAJOR < 2
   fl_xfont    = f->font->u.core.font;
 #else
@@ -133,11 +142,11 @@ void fl_font(Fl_Font fnum, Fl_Fontsize size, int angle) {
   fl_xftfont = (void*)f->font;
 }
 
-void Fl_Graphics_Driver::font(Fl_Font fnum, Fl_Fontsize size) {
-  fl_font(fnum,size,0);
+void Fl_Xlib_Graphics_Driver::font(Fl_Font fnum, Fl_Fontsize size) {
+  fl_xft_font(this,fnum,size,0);
 }
 
-static XftFont* fontopen(const char* name, bool core, int angle) {
+static XftFont* fontopen(const char* name, Fl_Fontsize size, bool core, int angle) {
   // Check: does it look like we have been passed an old-school XLFD fontname?
   bool is_xlfd = false;
   int hyphen_count = 0;
@@ -214,14 +223,14 @@ static XftFont* fontopen(const char* name, bool core, int angle) {
     // Construct a match pattern for the font we want...
     XftPatternAddInteger(fnt_pat, XFT_WEIGHT, weight);
     XftPatternAddInteger(fnt_pat, XFT_SLANT, slant);
-    XftPatternAddDouble (fnt_pat, XFT_PIXEL_SIZE, (double)fl_size_);
+    XftPatternAddDouble (fnt_pat, XFT_PIXEL_SIZE, (double)size);
     XftPatternAddString (fnt_pat, XFT_ENCODING, fl_encoding_);
 
-    // rotate font if fl_angle_!=0
-    if (fl_angle_ !=0) {
+    // rotate font if angle!=0
+    if (angle !=0) {
       XftMatrix m;
       XftMatrixInit(&m);
-      XftMatrixRotate(&m,cos(M_PI*fl_angle_/180.),sin(M_PI*fl_angle_/180.));
+      XftMatrixRotate(&m,cos(M_PI*angle/180.),sin(M_PI*angle/180.));
       XftPatternAddMatrix (fnt_pat, XFT_MATRIX,&m);
     }
 
@@ -270,6 +279,20 @@ static XftFont* fontopen(const char* name, bool core, int angle) {
     free(picked_name);
 #endif
 
+    if (!match_pat) {
+      // last chance, just open any font in the right size
+      the_font = XftFontOpen (fl_display, fl_screen,
+                        XFT_FAMILY, XftTypeString, "sans",
+                        XFT_SIZE, XftTypeDouble, (double)size,
+                        NULL);
+      XftPatternDestroy(fnt_pat);
+      if (!the_font) {
+        Fl::error("Unable to find fonts. Check your FontConfig configuration.\n");
+        exit(1);
+      }
+      return the_font;
+    }
+
     // open the matched font
     the_font = XftFontOpenPattern(fl_display, match_pat);
 
@@ -310,61 +333,95 @@ puts("Font Opened"); fflush(stdout);
   }
 } // end of fontopen
 
-Fl_Font_Descriptor::Fl_Font_Descriptor(const char* name) {
+Fl_Font_Descriptor::Fl_Font_Descriptor(const char* name, Fl_Fontsize fsize, int fangle) {
 //  encoding = fl_encoding_;
-  size = fl_size_;
-  angle = fl_angle_;
+  size = fsize;
+  angle = fangle;
 #if HAVE_GL
   listbase = 0;
 #endif // HAVE_GL
-  font = fontopen(name, false, angle);
+  font = fontopen(name, fsize, false, angle);
 }
 
 Fl_Font_Descriptor::~Fl_Font_Descriptor() {
-  if (this == fl_fontsize) fl_fontsize = 0;
+  if (this == fl_graphics_driver->font_descriptor()) fl_graphics_driver->font_descriptor(NULL);
 //  XftFontClose(fl_display, font);
 }
 
-int fl_height() {
-  if (current_font) return current_font->ascent + current_font->descent;
+/* decodes the input UTF-8 string into a series of wchar_t characters.
+ n is set upon return to the number of characters.
+ Don't deallocate the returned memory.
+ */
+static const wchar_t *utf8reformat(const char *str, int& n)
+{
+  static const wchar_t empty[] = {0};
+  static wchar_t *buffer;
+  static int lbuf = 0;
+  int newn;
+  if (n == 0) return empty;
+  newn = fl_utf8towc(str, n, (wchar_t*)buffer, lbuf);
+  if (newn >= lbuf) {
+    lbuf = newn + 100;
+    if (buffer) free(buffer);
+    buffer = (wchar_t*)malloc(lbuf * sizeof(wchar_t));
+    n = fl_utf8towc(str, n, (wchar_t*)buffer, lbuf);
+  } else {
+    n = newn;
+  }
+  return buffer;
+}
+
+static void utf8extents(Fl_Font_Descriptor *desc, const char *str, int n, XGlyphInfo *extents)
+{
+  memset(extents, 0, sizeof(XGlyphInfo));
+  const wchar_t *buffer = utf8reformat(str, n);
+#ifdef __CYGWIN__
+    XftTextExtents16(fl_display, desc->font, (XftChar16 *)buffer, n, extents);
+#else
+    XftTextExtents32(fl_display, desc->font, (XftChar32 *)buffer, n, extents);
+#endif
+}
+
+int Fl_Xlib_Graphics_Driver::height() {
+  if (font_descriptor()) return font_descriptor()->font->ascent + font_descriptor()->font->descent;
   else return -1;
 }
 
-int fl_descent() {
-  if (current_font) return current_font->descent;
+int Fl_Xlib_Graphics_Driver::descent() {
+  if (font_descriptor()) return font_descriptor()->font->descent;
   else return -1;
 }
 
-double fl_width(const char *str, int n) {
-  if (!current_font) return -1.0;
+double Fl_Xlib_Graphics_Driver::width(const char* str, int n) {
+  if (!font_descriptor()) return -1.0;
   XGlyphInfo i;
-  XftTextExtentsUtf8(fl_display, current_font, (XftChar8 *)str, n, &i);
+  utf8extents(font_descriptor(), str, n, &i);
   return i.xOff;
 }
 
-double fl_width(uchar c) {
-  return fl_width((const char *)(&c), 1);
-}
+/*double fl_width(uchar c) {
+  return fl_graphics_driver->width((const char *)(&c), 1);
+}*/
 
-double fl_width(FcChar32 *str, int n) {
-  if (!current_font) return -1.0;
+static double fl_xft_width(Fl_Font_Descriptor *desc, FcChar32 *str, int n) {
+  if (!desc) return -1.0;
   XGlyphInfo i;
-  XftTextExtents32(fl_display, current_font, str, n, &i);
+  XftTextExtents32(fl_display, desc->font, str, n, &i);
   return i.xOff;
 }
 
-double fl_width(unsigned int c) {
-  return fl_width((FcChar32 *)(&c), 1);
+double Fl_Xlib_Graphics_Driver::width(unsigned int c) {
+  return fl_xft_width(font_descriptor(), (FcChar32 *)(&c), 1);
 }
 
-void fl_text_extents(const char *c, int n, int &dx, int &dy, int &w, int &h) {
-  if (!current_font) {
+void Fl_Xlib_Graphics_Driver::text_extents(const char *c, int n, int &dx, int &dy, int &w, int &h) {
+  if (!font_descriptor()) {
     w = h = 0;
     dx = dy = 0;
     return;
   }
   XGlyphInfo gi;
-  XftTextExtentsUtf8(fl_display, current_font, (XftChar8 *)c, n, &gi);
+  utf8extents(font_descriptor(), c, n, &gi);
 
   w = gi.width;
   h = gi.height;
@@ -394,49 +451,54 @@ void fl_text_extents(const char *c, int n, int &dx, int &dy, int &w, int &h) {
 // original fltk code did.
 // NOTE: On my test boxes (FC6, FC7, FC8, ubuntu8.04, 9.04, 9.10) this works 
 //       well for the fltk "built-in" font names.
-static XFontStruct* load_xfont_for_xft2(void) {
+static XFontStruct* load_xfont_for_xft2(Fl_Graphics_Driver *driver) {
   XFontStruct* xgl_font = 0;
-  int size = fl_size_;
+  int size = driver->size();
+  int fnum = driver->font();
   const char *wt_med = "medium";
   const char *wt_bold = "bold";
-  char *weight = (char *)wt_med; // no specifc weight requested - accept any
+  const char *weight = wt_med; // no specifc weight requested - accept any
   char slant = 'r';   // regular non-italic by default
   char xlfd[128];     // we will put our synthetic XLFD in here
-  char *pc = strdup(fl_fonts[fl_font_].name); // what font were we asked for?
-  char *name = pc;    // keep a handle to the original name for freeing later
+  char *pc = strdup(fl_fonts[fnum].name); // what font were we asked for?
+  const char *name = pc;    // keep a handle to the original name for freeing later
   // Parse the "fltk-name" of the font
   switch (*name++) {
-  case 'I': slant = 'i'; break;     // italic
-  case 'P': slant = 'i';            // bold-italic (falls-through)
-  case 'B': weight = (char*)wt_bold; break; // bold
-  case ' ': break;                  // regular
-  default: name--;                  // no prefix, restore name
-  }
-
-  // map generic Xft names to customary XLFD faces
-  if (!strcmp(name, "sans")) {
-    name = "helvetica";
-  } else if (!strcmp(name, "mono")) {
-    name = "courier";
-  } else if (!strcmp(name, "serif")) {
-    name = "times";
-  } else if (!strcmp(name, "screen")) {
-    name = "lucidatypewriter";
-  } else if (!strcmp(name, "dingbats")) {
-    name = "zapf dingbats";
+  case 'I': slant = 'i'; break;       // italic
+  case 'P': slant = 'i';              // bold-italic (falls-through)
+  case 'B': weight = wt_bold; break;  // bold
+  case ' ': break;                    // regular
+  default: name--;                    // no prefix, restore name
   }
 
   // first, we do a query with no prefered size, to see if the font exists at all
-  snprintf(xlfd, 128, "-*-*%s*-%s-%c-*--*-*-*-*-*-*-*-*", name, weight, slant); // make up xlfd style name
+  snprintf(xlfd, 128, "-*-%s-%s-%c-*--*-*-*-*-*-*-*-*", name, weight, slant); // make up xlfd style name
   xgl_font = XLoadQueryFont(fl_display, xlfd);
   if(xgl_font) { // the face exists, but can we get it in a suitable size?
     XFreeFont(fl_display, xgl_font); // release the non-sized version
-    snprintf(xlfd, 128, "-*-*%s*-%s-%c-*--*-%d-*-*-*-*-*-*", name, weight, slant, (size*10));
+    snprintf(xlfd, 128, "-*-%s-%s-%c-*--*-%d-*-*-*-*-*-*", name, weight, slant, (size*10));
     xgl_font = XLoadQueryFont(fl_display, xlfd); // attempt to load the font at the right size
   }
 //puts(xlfd);
-  free(pc); // release our copy of the font name
 
+  // try alternative names
+  if (!xgl_font) {
+    if (!strcmp(name, "sans")) {
+      name = "helvetica";
+    } else if (!strcmp(name, "mono")) {
+      name = "courier";
+    } else if (!strcmp(name, "serif")) {
+      name = "times";
+    } else if (!strcmp(name, "screen")) {
+      name = "lucidatypewriter";
+    } else if (!strcmp(name, "dingbats")) {
+      name = "zapf dingbats";
+    }
+    snprintf(xlfd, 128, "-*-*%s*-%s-%c-*--*-%d-*-*-*-*-*-*", name, weight, slant, (size*10));
+    xgl_font = XLoadQueryFont(fl_display, xlfd);
+  }  
+  free(pc); // release our copy of the font name
+  
   // if we have nothing loaded, try a generic proportional font
   if(!xgl_font) {
     snprintf(xlfd, 128, "-*-helvetica-*-%c-*--*-%d-*-*-*-*-*-*", slant, (size*10));
@@ -457,7 +519,7 @@ static XFontStruct* load_xfont_for_xft2(void) {
 } // end of load_xfont_for_xft2
 #  endif
 
-XFontStruct* fl_xxfont() {
+static XFontStruct* fl_xxfont(Fl_Graphics_Driver *driver) {
 #  if XFT_MAJOR > 1
   // kludge! XFT 2 and later does not provide core fonts for us to use with GL
   // try to load a bitmap X font instead
@@ -465,25 +527,27 @@ XFontStruct* fl_xxfont() {
   static int glsize = 0;
   static int glfont = -1;
   // Do we need to load a new font?
-  if ((!xgl_font) || (glsize != fl_size_) || (glfont != fl_font_)) {
+  if ((!xgl_font) || (glsize != driver->size()) || (glfont != driver->font())) {
     // create a dummy XLFD for some font of the appropriate size...
     if (xgl_font) XFreeFont(fl_display, xgl_font); // font already loaded, free it - this *might* be a Bad Idea
-    glsize = fl_size_; // record current font size
-    glfont = fl_font_; // and face
-    xgl_font = load_xfont_for_xft2();
+    glsize = driver->size(); // record current font size
+    glfont = driver->font(); // and face
+    xgl_font = load_xfont_for_xft2(driver);
   }
   return xgl_font;
 #  else // XFT-1 provides a means to load a "core" font directly
-  if (current_font->core) return current_font->u.core.font; // is the current font a "core" font? If so, use it.
+  if (driver->font_descriptor()->font->core) {
+    return driver->font_descriptor()->font->u.core.font; // is the current font a "core" font? If so, use it.
+    }
   static XftFont* xftfont;
   if (xftfont) XftFontClose (fl_display, xftfont);
-  xftfont = fontopen(fl_fonts[fl_font_].name, true); // else request XFT to load a suitable "core" font instead.
+  xftfont = fontopen(fl_fonts[driver->font()].name, driver->size(), true, 0); // else request XFT to load a suitable "core" font instead.
   return xftfont->u.core.font;
 #  endif // XFT_MAJOR > 1
 }
 
 XFontStruct* Fl_XFont_On_Demand::value() {
-  if (!ptr) ptr = fl_xxfont();
+  if (!ptr) ptr = fl_xxfont(fl_graphics_driver);
   return ptr;
 }
 
@@ -515,9 +579,9 @@ void fl_destroy_xft_draw(Window id) {
 #endif
 }
 
-void Fl_Graphics_Driver::draw(const char *str, int n, int x, int y) {
-  if ( !current_font ) {
-    fl_font(FL_HELVETICA, 14);
+void Fl_Xlib_Graphics_Driver::draw(const char *str, int n, int x, int y) {
+  if ( !this->font_descriptor() ) {
+    this->font(FL_HELVETICA, FL_NORMAL_SIZE);
   }
 #if USE_OVERLAY
   XftDraw*& draw_ = fl_overlay ? draw_overlay : ::draw_;
@@ -542,27 +606,28 @@ void Fl_Graphics_Driver::draw(const char *str, int n, int x, int y) {
   // Use fltk's color allocator, copy the results to match what
   // XftCollorAllocValue returns:
   XftColor color;
-  color.pixel = fl_xpixel(fl_color_);
-  uchar r,g,b; Fl::get_color(fl_color_, r,g,b);
+  color.pixel = fl_xpixel(Fl_Graphics_Driver::color());
+  uchar r,g,b; Fl::get_color(Fl_Graphics_Driver::color(), r,g,b);
   color.color.red   = ((int)r)*0x101;
   color.color.green = ((int)g)*0x101;
   color.color.blue  = ((int)b)*0x101;
   color.color.alpha = 0xffff;
-
-  XftDrawStringUtf8(draw_, &color, current_font, x, y, (XftChar8 *)str, n);
+  
+  const wchar_t *buffer = utf8reformat(str, n);
+#ifdef __CYGWIN__
+  XftDrawString16(draw_, &color, font_descriptor()->font, x, y, (XftChar16 *)buffer, n);
+#else
+  XftDrawString32(draw_, &color, font_descriptor()->font, x, y, (XftChar32 *)buffer, n);
+#endif
 }
 
-void Fl_Graphics_Driver::draw(int angle, const char *str, int n, int x, int y) {
-  fl_font(fl_font_, fl_size_, angle);
-  fl_draw(str, n, (int)x, (int)y);
-  fl_font(fl_font_, fl_size_);
+void Fl_Xlib_Graphics_Driver::draw(int angle, const char *str, int n, int x, int y) {
+  fl_xft_font(this, this->Fl_Graphics_Driver::font(), this->size(), angle);
+  this->draw(str, n, (int)x, (int)y);
+  fl_xft_font(this, this->Fl_Graphics_Driver::font(), this->size(), 0);
 }
 
-void fl_draw(const char* str, int n, float x, float y) {
-  fl_draw(str, n, (int)x, (int)y);
-}
-
-static void fl_drawUCS4(const FcChar32 *str, int n, int x, int y) {
+static void fl_drawUCS4(Fl_Graphics_Driver *driver, const FcChar32 *str, int n, int x, int y) {
 #if USE_OVERLAY
   XftDraw*& draw_ = fl_overlay ? draw_overlay : ::draw_;
   if (fl_overlay) {
@@ -586,21 +651,21 @@ static void fl_drawUCS4(const FcChar32 *str, int n, int x, int y) {
   // Use fltk's color allocator, copy the results to match what
   // XftCollorAllocValue returns:
   XftColor color;
-  color.pixel = fl_xpixel(fl_color_);
-  uchar r,g,b; Fl::get_color(fl_color_, r,g,b);
+  color.pixel = fl_xpixel(driver->color());
+  uchar r,g,b; Fl::get_color(driver->color(), r,g,b);
   color.color.red   = ((int)r)*0x101;
   color.color.green = ((int)g)*0x101;
   color.color.blue  = ((int)b)*0x101;
   color.color.alpha = 0xffff;
 
-  XftDrawString32(draw_, &color, current_font, x, y, (FcChar32 *)str, n);
+  XftDrawString32(draw_, &color, driver->font_descriptor()->font, x, y, (FcChar32 *)str, n);
 }
 
 
-void Fl_Graphics_Driver::rtl_draw(const char* c, int n, int x, int y) {
+void Fl_Xlib_Graphics_Driver::rtl_draw(const char* c, int n, int x, int y) {
 
 #if defined(__GNUC__)
-#warning Need to improve this XFT right to left draw function
+// FIXME: warning Need to improve this XFT right to left draw function
 #endif /*__GNUC__*/
 
 // This actually draws LtoR, but aligned to R edge with the glyph order reversed...
@@ -629,13 +694,13 @@ void Fl_Graphics_Driver::rtl_draw(const char* c, int n, int x, int y) {
     out = out - 1;
   }
   // Now we have a UCS4 version of the input text, reversed, in ucs_txt
-  int offs = (int)fl_width(ucs_txt, n);
-  fl_drawUCS4(ucs_txt, n, (x-offs), y);
+  int offs = (int)fl_xft_width(font_descriptor(), ucs_txt, n);
+  fl_drawUCS4(this, ucs_txt, n, (x-offs), y);
 
   delete[] ucs_txt;
 }
 #endif
 
 //
-// End of "$Id: fl_font_xft.cxx 7652 2010-06-21 15:49:45Z manolo $"
+// End of "$Id: fl_font_xft.cxx 8442 2011-02-18 13:39:48Z manolo $"
 //

@@ -1,9 +1,9 @@
 //
-// "$Id: fl_dnd.cxx 6616 2009-01-01 21:28:26Z matt $"
+// "$Id: fl_dnd.cxx 8055 2010-12-18 22:31:01Z manolo $"
 //
 // Drag & Drop code for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2009 by Bill Spitzak and others.
+// Copyright 1998-2010 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -28,11 +28,11 @@
 #ifdef WIN32
 #  include "fl_dnd_win32.cxx"
 #elif defined(__APPLE__)
-#  include "fl_dnd_mac.cxx"
+//#  include "fl_dnd_mac.cxx"
 #else
 #  include "fl_dnd_x.cxx"
 #endif
 
 //
-// End of "$Id: fl_dnd.cxx 6616 2009-01-01 21:28:26Z matt $".
+// End of "$Id: fl_dnd.cxx 8055 2010-12-18 22:31:01Z manolo $".
 //

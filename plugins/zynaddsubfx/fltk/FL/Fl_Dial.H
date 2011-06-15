@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Dial.H 6614 2009-01-01 16:11:32Z matt $"
+// "$Id: Fl_Dial.H 7981 2010-12-08 23:53:04Z greg.ercolano $"
 //
 // Dial header file for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2009 by Bill Spitzak and others.
+// Copyright 1998-2010 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -43,8 +43,8 @@
 /**
   The Fl_Dial widget provides a circular dial to control a
   single floating point value.
-  <P ALIGN=CENTER>\image html dial.gif 
-  \image latex dial.eps "Fl_Dial" width=4cm
+  <P ALIGN=CENTER>\image html dial.png 
+  \image latex dial.png "Fl_Dial" width=4cm
   Use type() to set the type of the dial to:
   <UL>
   <LI>FL_NORMAL_DIAL - Draws a normal dial with a knob. </LI>
@@ -93,5 +93,5 @@ public:
 #endif
 
 //
-// End of "$Id: Fl_Dial.H 6614 2009-01-01 16:11:32Z matt $".
+// End of "$Id: Fl_Dial.H 7981 2010-12-08 23:53:04Z greg.ercolano $".
 //

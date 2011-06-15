@@ -1,9 +1,9 @@
 //
-// "$Id: fl_rect.cxx 7617 2010-05-27 17:20:18Z manolo $"
+// "$Id: fl_rect.cxx 8630 2011-05-01 12:45:29Z AlbrechtS $"
 //
 // Rectangle drawing routines for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2009 by Bill Spitzak and others.
+// Copyright 1998-2010 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -42,16 +42,134 @@
 #include <FL/fl_draw.H>
 #include <FL/x.H>
 
+// fl_line_width_ must contain the absolute value of the current
+// line width to be used for X11 clipping (see below).
+// This is defined in src/fl_line_style.cxx
+extern int fl_line_width_;
+
 #ifdef __APPLE_QUARTZ__
 extern float fl_quartz_line_width_;
-#define USINGQUARTZPRINTER  (Fl_Surface_Device::surface()->type() == Fl_Printer::device_type)
+#define USINGQUARTZPRINTER  (Fl_Surface_Device::surface()->class_name() == Fl_Printer::class_id)
 #endif
+
+#ifdef USE_X11
+
+#ifndef SHRT_MAX
+#define SHRT_MAX (32767)
+#endif
+
+/*
+  We need to check some coordinates for areas for clipping before we
+  use X functions, because X can't handle coordinates outside the 16-bit
+  range. Since all windows use relative coordinates > 0, we do also
+  check for negative values. X11 only, see also STR #2304.
+  
+  Note that this is only necessary for large objects, where only a
+  part of the object is visible. The draw() functions (e.g. box
+  drawing) must be clipped correctly. This is usually only a matter
+  for large container widgets. The individual child widgets will be
+  clipped completely.
+
+  We define the usable X coordinate space as [ -LW : SHRT_MAX - LW ]
+  where LW = current line width for drawing. This is done so that
+  horizontal and vertical line drawing works correctly, even in real
+  border cases, e.g. drawing a rectangle slightly outside the top left
+  window corner, but with a line width so that a part of the line should
+  be visible (in this case 2 of 5 pixels):
+
+    fl_line_style (FL_SOLID,5);	// line width = 5
+    fl_rect (-1,-1,100,100);	// top/left: 2 pixels visible
+  
+  In this example case, no clipping would be done, because X can
+  handle it and clip unneeded pixels.
+  
+  Note that we must also take care of the case where fl_line_width_
+  is zero (maybe unitialized). If this is the case, we assume a line
+  width of 1.
+
+  Todo: Arbitrary line drawings (e.g. polygons) and clip regions
+  are not yet done.
+
+  Note:
+
+  We could use max. screen coordinates instead of SHRT_MAX, but that
+  would need more work and would probably be slower. We assume that
+  all window coordinates are >= 0 and that no window extends up to
+  32767 - LW (where LW = current line width). Thus it is safe to clip
+  all coordinates to this range before calling X functions. If this
+  is not true, then clip_to_short() and clip_x() must be redefined.
+
+  It would be somewhat easier if we had fl_clip_w and fl_clip_h, as
+  defined in FLTK 2.0 (for the upper clipping bounds)...
+*/
+
+/*
+  clip_to_short() returns 1, if the area is invisible (clipped),
+  because ...
+
+    (a) w or h are <= 0		i.e. nothing is visible
+    (b) x+w or y+h are < kmin	i.e. left of or above visible area
+    (c) x or y are > kmax	i.e. right of or below visible area
+
+  kmin and kmax are the minimal and maximal X coordinate values,
+  as defined above. In this case x, y, w, and h are not changed.
+
+  It returns 0, if the area is potentially visible and X can handle
+  clipping. x, y, w, and h may have been adjusted to fit into the
+  X coordinate space.
+
+  Use this for clipping rectangles, as used in fl_rect() and
+  fl_rectf().
+*/
+
+static int clip_to_short(int &x, int &y, int &w, int &h) {
+
+  int lw = (fl_line_width_ > 0) ? fl_line_width_ : 1;
+  int kmin = -lw;
+  int kmax = SHRT_MAX - lw;
+
+  if (w <= 0 || h <= 0) return 1;		// (a)
+  if (x+w < kmin || y+h < kmin) return 1;	// (b)
+  if (x > kmax || y > kmax) return 1;		// (c)
+
+  if (x < kmin) { w -= (kmin-x); x = kmin; }
+  if (y < kmin) { h -= (kmin-y); y = kmin; }
+  if (x+w > kmax) w = kmax - x;
+  if (y+h > kmax) h = kmax - y;
+
+  return 0;
+}
+
+/*
+  clip_x() returns a coordinate value clipped to the 16-bit coordinate
+  space (see above). This can be used to draw horizontal and vertical
+  lines that can be handled by X11. Each single coordinate value can
+  be clipped individually, and the result can be used directly, e.g.
+  in fl_xyline() and fl_yxline(). Note that this can't be used for
+  arbitrary lines (not horizontal or vertical).
+*/
+static int clip_x (int x) {
+
+  int lw = (fl_line_width_ > 0) ? fl_line_width_ : 1;
+  int kmin = -lw;
+  int kmax = SHRT_MAX - lw;
+
+  if (x < kmin)
+    x = kmin;
+  else if (x > kmax)
+    x = kmax;
+  return x;
+}
+
+#endif	// USE_X11
+
 
 void Fl_Graphics_Driver::rect(int x, int y, int w, int h) {
 
   if (w<=0 || h<=0) return;
 #if defined(USE_X11)
-  XDrawRectangle(fl_display, fl_window, fl_gc, x, y, w-1, h-1);
+  if (!clip_to_short(x, y, w, h))
+    XDrawRectangle(fl_display, fl_window, fl_gc, x, y, w-1, h-1);
 #elif defined(WIN32)
   MoveToEx(fl_gc, x, y, 0L); 
   LineTo(fl_gc, x+w-1, y);
@@ -59,10 +177,10 @@ void Fl_Graphics_Driver::rect(int x, int y, int w, int h) {
   LineTo(fl_gc, x, y+h-1);
   LineTo(fl_gc, x, y);
 #elif defined(__APPLE_QUARTZ__)
-  if (USINGQUARTZPRINTER || fl_quartz_line_width_ > 1.5f) CGContextSetShouldAntialias(fl_gc, true);
+  if ( (!USINGQUARTZPRINTER) && fl_quartz_line_width_ > 1.5f) CGContextSetShouldAntialias(fl_gc, true);
   CGRect rect = CGRectMake(x, y, w-1, h-1);
   CGContextStrokeRect(fl_gc, rect);
-  if (USINGQUARTZPRINTER || fl_quartz_line_width_ > 1.5f) CGContextSetShouldAntialias(fl_gc, false);
+  if ( (!USINGQUARTZPRINTER) && fl_quartz_line_width_ > 1.5f) CGContextSetShouldAntialias(fl_gc, false);
 #else
 # error unsupported platform
 #endif
@@ -71,17 +189,22 @@ void Fl_Graphics_Driver::rect(int x, int y, int w, int h) {
 void Fl_Graphics_Driver::rectf(int x, int y, int w, int h) {
   if (w<=0 || h<=0) return;
 #if defined(USE_X11)
-  if (w && h) XFillRectangle(fl_display, fl_window, fl_gc, x, y, w, h);
+  if (!clip_to_short(x, y, w, h))
+    XFillRectangle(fl_display, fl_window, fl_gc, x, y, w, h);
 #elif defined(WIN32)
   RECT rect;
   rect.left = x; rect.top = y;  
   rect.right = x + w; rect.bottom = y + h;
   FillRect(fl_gc, &rect, fl_brush());
 #elif defined(__APPLE_QUARTZ__)
-  if (USINGQUARTZPRINTER || fl_quartz_line_width_ > 1.5f) CGContextSetShouldAntialias(fl_gc, true);
-  CGRect rect = CGRectMake(x, y, w-1, h-1);
+  CGFloat delta_size =  0.9;
+  CGFloat delta_ori = 0;
+  if (USINGQUARTZPRINTER) {
+    delta_size = 0;
+    delta_ori = 0.5;
+    }
+  CGRect  rect = CGRectMake(x - delta_ori, y - delta_ori, w - delta_size , h - delta_size);
   CGContextFillRect(fl_gc, rect);
-  if (USINGQUARTZPRINTER || fl_quartz_line_width_ > 1.5f) CGContextSetShouldAntialias(fl_gc, false);
 #else
 # error unsupported platform
 #endif
@@ -89,7 +212,7 @@ void Fl_Graphics_Driver::rectf(int x, int y, int w, int h) {
 
 void Fl_Graphics_Driver::xyline(int x, int y, int x1) {
 #if defined(USE_X11)
-  XDrawLine(fl_display, fl_window, fl_gc, x, y, x1, y);
+  XDrawLine(fl_display, fl_window, fl_gc, clip_x(x), clip_x(y), clip_x(x1), clip_x(y));
 #elif defined(WIN32)
   MoveToEx(fl_gc, x, y, 0L); LineTo(fl_gc, x1+1, y);
 #elif defined(__APPLE_QUARTZ__)
@@ -106,8 +229,8 @@ void Fl_Graphics_Driver::xyline(int x, int y, int x1) {
 void Fl_Graphics_Driver::xyline(int x, int y, int x1, int y2) {
 #if defined (USE_X11)
   XPoint p[3];
-  p[0].x = x;  p[0].y = p[1].y = y;
-  p[1].x = p[2].x = x1; p[2].y = y2;
+  p[0].x = clip_x(x);  p[0].y = p[1].y = clip_x(y);
+  p[1].x = p[2].x = clip_x(x1); p[2].y = clip_x(y2);
   XDrawLines(fl_display, fl_window, fl_gc, p, 3, 0);
 #elif defined(WIN32)
   if (y2 < y) y2--;
@@ -130,9 +253,9 @@ void Fl_Graphics_Driver::xyline(int x, int y, int x1, int y2) {
 void Fl_Graphics_Driver::xyline(int x, int y, int x1, int y2, int x3) {
 #if defined(USE_X11)
   XPoint p[4];
-  p[0].x = x;  p[0].y = p[1].y = y;
-  p[1].x = p[2].x = x1; p[2].y = p[3].y = y2;
-  p[3].x = x3;
+  p[0].x = clip_x(x);  p[0].y = p[1].y = clip_x(y);
+  p[1].x = p[2].x = clip_x(x1); p[2].y = p[3].y = clip_x(y2);
+  p[3].x = clip_x(x3);
   XDrawLines(fl_display, fl_window, fl_gc, p, 4, 0);
 #elif defined(WIN32)
   if(x3 < x1) x3--;
@@ -156,7 +279,7 @@ void Fl_Graphics_Driver::xyline(int x, int y, int x1, int y2, int x3) {
 
 void Fl_Graphics_Driver::yxline(int x, int y, int y1) {
 #if defined(USE_X11)
-  XDrawLine(fl_display, fl_window, fl_gc, x, y, x, y1);
+  XDrawLine(fl_display, fl_window, fl_gc, clip_x(x), clip_x(y), clip_x(x), clip_x(y1));
 #elif defined(WIN32)
   if (y1 < y) y1--;
   else y1++;
@@ -175,8 +298,8 @@ void Fl_Graphics_Driver::yxline(int x, int y, int y1) {
 void Fl_Graphics_Driver::yxline(int x, int y, int y1, int x2) {
 #if defined(USE_X11)
   XPoint p[3];
-  p[0].x = p[1].x = x;  p[0].y = y;
-  p[1].y = p[2].y = y1; p[2].x = x2;
+  p[0].x = p[1].x = clip_x(x);  p[0].y = clip_x(y);
+  p[1].y = p[2].y = clip_x(y1); p[2].x = clip_x(x2);
   XDrawLines(fl_display, fl_window, fl_gc, p, 3, 0);
 #elif defined(WIN32)
   if (x2 > x) x2++;
@@ -199,9 +322,9 @@ void Fl_Graphics_Driver::yxline(int x, int y, int y1, int x2) {
 void Fl_Graphics_Driver::yxline(int x, int y, int y1, int x2, int y3) {
 #if defined(USE_X11)
   XPoint p[4];
-  p[0].x = p[1].x = x;  p[0].y = y;
-  p[1].y = p[2].y = y1; p[2].x = p[3].x = x2;
-  p[3].y = y3;
+  p[0].x = p[1].x = clip_x(x);  p[0].y = clip_x(y);
+  p[1].y = p[2].y = clip_x(y1); p[2].x = p[3].x = clip_x(x2);
+  p[3].y = clip_x(y3);
   XDrawLines(fl_display, fl_window, fl_gc, p, 4, 0);
 #elif defined(WIN32)
   if(y3<y1) y3--;
@@ -378,15 +501,11 @@ void Fl_Graphics_Driver::polygon(int x, int y, int x1, int y1, int x2, int y2, i
 
 void Fl_Graphics_Driver::point(int x, int y) {
 #if defined(USE_X11)
-  XDrawPoint(fl_display, fl_window, fl_gc, x, y);
+  XDrawPoint(fl_display, fl_window, fl_gc, clip_x(x), clip_x(y));
 #elif defined(WIN32)
   SetPixel(fl_gc, x, y, fl_RGB());
 #elif defined(__APPLE_QUARTZ__)
-  if (fl_quartz_line_width_ > 1.5f) CGContextSetShouldAntialias(fl_gc, true);
-  CGContextMoveToPoint(fl_gc, x-.5, y); // Quartz needs a line that is one pixel long, or it will not draw anything
-  CGContextAddLineToPoint(fl_gc, x+.5, y);
-  CGContextStrokePath(fl_gc);
-  if (fl_quartz_line_width_ > 1.5f) CGContextSetShouldAntialias(fl_gc, false);
+  CGContextFillRect(fl_gc, CGRectMake(x - 0.5, y - 0.5, 1, 1) );
 #else
 # error unsupported platform
 #endif
@@ -394,17 +513,12 @@ void Fl_Graphics_Driver::point(int x, int y) {
 
 ////////////////////////////////////////////////////////////////
 
-#define STACK_SIZE 10
-#define STACK_MAX (STACK_SIZE - 1)
-static Fl_Region rstack[STACK_SIZE];
-static int rstackptr=0;
-int fl_clip_state_number=0; // used by gl_begin.cxx to update GL clip
-
 #if !defined(WIN32) && !defined(__APPLE__)
 // Missing X call: (is this the fastest way to init a 1-rectangle region?)
 // MSWindows equivalent exists, implemented inline in win32.H
 Fl_Region XRectangleRegion(int x, int y, int w, int h) {
   XRectangle R;
+  clip_to_short(x, y, w, h);
   R.x = x; R.y = y; R.width = w; R.height = h;
   Fl_Region r = XCreateRegion();
   XUnionRectWithRegion(&R, r, r);
@@ -412,7 +526,7 @@ Fl_Region XRectangleRegion(int x, int y, int w, int h) {
 }
 #endif
 
-void fl_restore_clip() {
+void Fl_Graphics_Driver::restore_clip() {
   fl_clip_state_number++;
   Fl_Region r = rstack[rstackptr];
 #if defined(USE_X11)
@@ -440,14 +554,14 @@ void fl_restore_clip() {
 #endif
 }
 
-void fl_clip_region(Fl_Region r) {
+void Fl_Graphics_Driver::clip_region(Fl_Region r) {
   Fl_Region oldr = rstack[rstackptr];
   if (oldr) XDestroyRegion(oldr);
   rstack[rstackptr] = r;
   fl_restore_clip();
 }
 
-Fl_Region fl_clip_region() {
+Fl_Region Fl_Graphics_Driver::clip_region() {
   return rstack[rstackptr];
 }
 
@@ -466,7 +580,7 @@ void Fl_Graphics_Driver::push_clip(int x, int y, int w, int h) {
       CombineRgn(r,r,current,RGN_AND);
 #elif defined(__APPLE_QUARTZ__)
       XDestroyRegion(r);
-      r = MacRectRegionIntersect(current, x,y,w,h);
+      r = Fl_X::intersect_region_and_rect(current, x,y,w,h);
 #else
 # error unsupported platform
 #endif
@@ -482,14 +596,14 @@ void Fl_Graphics_Driver::push_clip(int x, int y, int w, int h) {
 # error unsupported platform
 #endif
   }
-  if (rstackptr < STACK_MAX) rstack[++rstackptr] = r;
+  if (rstackptr < region_stack_max) rstack[++rstackptr] = r;
   else Fl::warning("fl_push_clip: clip stack overflow!\n");
   fl_restore_clip();
 }
 
 // make there be no clip (used by fl_begin_offscreen() only!)
 void Fl_Graphics_Driver::push_no_clip() {
-  if (rstackptr < STACK_MAX) rstack[++rstackptr] = 0;
+  if (rstackptr < region_stack_max) rstack[++rstackptr] = 0;
   else Fl::warning("fl_push_no_clip: clip stack overflow!\n");
   fl_restore_clip();
 }
@@ -506,26 +620,26 @@ void Fl_Graphics_Driver::pop_clip() {
 int Fl_Graphics_Driver::not_clipped(int x, int y, int w, int h) {
   if (x+w <= 0 || y+h <= 0) return 0;
   Fl_Region r = rstack[rstackptr];
-#if defined (USE_X11)
-  return r ? XRectInRegion(r, x, y, w, h) : 1;
-#elif defined(WIN32)
   if (!r) return 1;
+#if defined (USE_X11)
+  // get rid of coordinates outside the 16-bit range the X calls take.
+  if (clip_to_short(x,y,w,h)) return 0;	// clipped
+  return XRectInRegion(r, x, y, w, h);
+#elif defined(WIN32)
   RECT rect;
-  if (Fl_Surface_Device::surface()->type() == Fl_Printer::device_type) { // in case of print context, convert coords from logical to device
+  if (Fl_Surface_Device::surface()->class_name() == Fl_Printer::class_id) { // in case of print context, convert coords from logical to device
     POINT pt[2] = { {x, y}, {x + w, y + h} };
     LPtoDP(fl_gc, pt, 2);
     rect.left = pt[0].x; rect.top = pt[0].y; rect.right = pt[1].x; rect.bottom = pt[1].y;
-    }
-  else {
+  } else {
     rect.left = x; rect.top = y; rect.right = x+w; rect.bottom = y+h;
-    }
+  }
   return RectInRegion(r,&rect);
 #elif defined(__APPLE_QUARTZ__)
-  if (!r) return 1;
   CGRect arg = fl_cgrectmake_cocoa(x, y, w, h);
-  for(int i = 0; i < r->count; i++) {
+  for (int i = 0; i < r->count; i++) {
     CGRect test = CGRectIntersection(r->rects[i], arg);
-    if( ! CGRectIsEmpty(test)) return 1;
+    if (!CGRectIsEmpty(test)) return 1;
   }
   return 0;
 #else
@@ -573,7 +687,7 @@ int Fl_Graphics_Driver::clip_box(int x, int y, int w, int h, int& X, int& Y, int
   } else {	// partial intersection
     RECT rect;
     GetRgnBox(temp, &rect);
-    if(Fl_Surface_Device::surface()->type() == Fl_Printer::device_type) { // if print context, convert coords from device to logical
+    if(Fl_Surface_Device::surface()->class_name() == Fl_Printer::class_id) { // if print context, convert coords from device to logical
       POINT pt[2] = { {rect.left, rect.top}, {rect.right, rect.bottom} };
       DPtoLP(fl_gc, pt, 2);
       X = pt[0].x; Y = pt[0].y; W = pt[1].x - X; H = pt[1].y - Y;
@@ -597,10 +711,10 @@ int Fl_Graphics_Driver::clip_box(int x, int y, int w, int h, int& X, int& Y, int
       else u = CGRectUnion(u, test);
     }
   }
-  X = u.origin.x;
-  Y = u.origin.y;
-  W = u.size.width + 1;
-  H = u.size.height + 1;
+  X = int(u.origin.x);
+  Y = int(u.origin.y);
+  W = int(u.size.width + 1);
+  H = int(u.size.height + 1);
   if(CGRectIsEmpty(u)) W = H = 0;
   return ! CGRectEqualToRect(arg, u);
 #else
@@ -609,5 +723,5 @@ int Fl_Graphics_Driver::clip_box(int x, int y, int w, int h, int& X, int& Y, int
 }
 
 //
-// End of "$Id: fl_rect.cxx 7617 2010-05-27 17:20:18Z manolo $".
+// End of "$Id: fl_rect.cxx 8630 2011-05-01 12:45:29Z AlbrechtS $".
 //

@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Overlay_Window.cxx 7636 2010-06-09 08:36:25Z AlbrechtS $"
+// "$Id: Fl_Overlay_Window.cxx 8198 2011-01-06 10:24:58Z manolo $"
 //
 // Overlay window code for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2009 by Bill Spitzak and others.
+// Copyright 1998-2010 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -135,7 +135,7 @@ void _Fl_Overlay::flush() {
 	  gc = XCreateGC(fl_display, fl_xid(this), 0, 0);
   }
   fl_gc = gc;
-#if defined(USE_CAIRO)
+#if defined(FLTK_USE_CAIRO)
       if (Fl::cairo_autolink_context()) Fl::cairo_make_current(this); // capture gc changes automatically to update the cairo context adequately
 #endif
   fl_overlay = 1;
@@ -172,5 +172,5 @@ void Fl_Overlay_Window::redraw_overlay() {
 #endif
 
 //
-// End of "$Id: Fl_Overlay_Window.cxx 7636 2010-06-09 08:36:25Z AlbrechtS $".
+// End of "$Id: Fl_Overlay_Window.cxx 8198 2011-01-06 10:24:58Z manolo $".
 //

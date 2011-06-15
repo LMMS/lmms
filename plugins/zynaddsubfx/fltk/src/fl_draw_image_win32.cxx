@@ -1,9 +1,9 @@
 //
-// "$Id: fl_draw_image_win32.cxx 7617 2010-05-27 17:20:18Z manolo $"
+// "$Id: fl_draw_image_win32.cxx 8294 2011-01-20 12:55:50Z manolo $"
 //
 // WIN32 image drawing code for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2009 by Bill Spitzak and others.
+// Copyright 1998-2010 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -174,13 +174,14 @@ static void innards(const uchar *buf, int X, int Y, int W, int H,
   int linesize = (pixelsize*w+3)&~3;
   
   static U32* buffer;
+  static long buffer_size;
   int blocking = h;
   {int size = linesize*h;
-  if (size > MAXBUFFER) {
+  // when printing, don't limit buffer size not to get a crash in StretchDIBits
+  if (size > MAXBUFFER && Fl_Surface_Device::surface()->class_name() != Fl_Printer::class_id) {
     size = MAXBUFFER;
     blocking = MAXBUFFER/linesize;
   }
-  static long buffer_size;
   if (size > buffer_size) {
     delete[] buffer;
     buffer_size = size;
@@ -255,7 +256,7 @@ static void innards(const uchar *buf, int X, int Y, int W, int H,
         }            
       }
     }
-    if(Fl_Surface_Device::surface()->type() == Fl_Printer::device_type) {
+    if(Fl_Surface_Device::surface()->class_name() == Fl_Printer::class_id) {
       // if print context, device and logical units are not equal, so SetDIBitsToDevice
       // does not do the expected job, whereas StretchDIBits does it.
       StretchDIBits(fl_gc, x, y+j-k, w, k, 0, 0, w, k,
@@ -267,6 +268,9 @@ static void innards(const uchar *buf, int X, int Y, int W, int H,
 		    DIB_RGB_COLORS
 #endif
 		    , SRCCOPY );
+      delete[] buffer;
+      buffer = NULL;
+      buffer_size = 0;
     }
     else {
       SetDIBitsToDevice(fl_gc, x, y+j-k, w, k, 0, 0, 0, k,
@@ -284,7 +288,7 @@ static void innards(const uchar *buf, int X, int Y, int W, int H,
 
 static int fl_abs(int v) { return v<0 ? -v : v; }
 
-void Fl_Graphics_Driver::draw_image(const uchar* buf, int x, int y, int w, int h, int d, int l){
+void Fl_GDI_Graphics_Driver::draw_image(const uchar* buf, int x, int y, int w, int h, int d, int l){
   if (fl_abs(d)&FL_IMAGE_WITH_ALPHA) {
     d ^= FL_IMAGE_WITH_ALPHA;
     innards(buf,x,y,w,h,d,l,fl_abs(d),0,0);
@@ -293,7 +297,7 @@ void Fl_Graphics_Driver::draw_image(const uchar* buf, int x, int y, int w, int h
   }
 }
 
-void Fl_Graphics_Driver::draw_image(Fl_Draw_Image_Cb cb, void* data,
+void Fl_GDI_Graphics_Driver::draw_image(Fl_Draw_Image_Cb cb, void* data,
 		   int x, int y, int w, int h,int d) {
   if (fl_abs(d)&FL_IMAGE_WITH_ALPHA) {
     d ^= FL_IMAGE_WITH_ALPHA;
@@ -303,7 +307,7 @@ void Fl_Graphics_Driver::draw_image(Fl_Draw_Image_Cb cb, void* data,
   }
 }
 
-void Fl_Graphics_Driver::draw_image_mono(const uchar* buf, int x, int y, int w, int h, int d, int l){
+void Fl_GDI_Graphics_Driver::draw_image_mono(const uchar* buf, int x, int y, int w, int h, int d, int l){
   if (fl_abs(d)&FL_IMAGE_WITH_ALPHA) {
     d ^= FL_IMAGE_WITH_ALPHA;
     innards(buf,x,y,w,h,d,l,1,0,0);
@@ -312,7 +316,7 @@ void Fl_Graphics_Driver::draw_image_mono(const uchar* buf, int x, int y, int w, 
   }
 }
 
-void Fl_Graphics_Driver::draw_image_mono(Fl_Draw_Image_Cb cb, void* data,
+void Fl_GDI_Graphics_Driver::draw_image_mono(Fl_Draw_Image_Cb cb, void* data,
 		   int x, int y, int w, int h,int d) {
   if (fl_abs(d)&FL_IMAGE_WITH_ALPHA) {
     d ^= FL_IMAGE_WITH_ALPHA;
@@ -337,5 +341,5 @@ void fl_rectf(int x, int y, int w, int h, uchar r, uchar g, uchar b) {
 }
 
 //
-// End of "$Id: fl_draw_image_win32.cxx 7617 2010-05-27 17:20:18Z manolo $".
+// End of "$Id: fl_draw_image_win32.cxx 8294 2011-01-20 12:55:50Z manolo $".
 //

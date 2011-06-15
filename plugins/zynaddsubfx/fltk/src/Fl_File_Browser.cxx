@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_File_Browser.cxx 7352 2010-03-29 10:47:11Z matt $"
+// "$Id: Fl_File_Browser.cxx 8063 2010-12-19 21:20:10Z matt $"
 //
 // Fl_File_Browser routines.
 //
-// Copyright 1999-2009 by Michael Sweet.
+// Copyright 1999-2010 by Michael Sweet.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -536,7 +536,7 @@ Fl_File_Browser::load(const char     *directory,// I - Directory to load
     // UNIX code uses /etc/fstab or similar...
     //
     FILE	*mtab;		// /etc/mtab or /etc/mnttab file
-    char	line[1024];	// Input line
+    char	line[FL_PATH_MAX];	// Input line
 
     //
     // Open the file that contains a list of mounted filesystems...
@@ -639,5 +639,5 @@ Fl_File_Browser::filter(const char *pattern)	// I - Pattern string
 
 
 //
-// End of "$Id: Fl_File_Browser.cxx 7352 2010-03-29 10:47:11Z matt $".
+// End of "$Id: Fl_File_Browser.cxx 8063 2010-12-19 21:20:10Z matt $".
 //

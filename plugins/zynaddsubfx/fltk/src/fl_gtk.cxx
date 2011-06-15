@@ -1,12 +1,12 @@
 //
-// "$Id: fl_gtk.cxx 6616 2009-01-01 21:28:26Z matt $"
+// "$Id: fl_gtk.cxx 7903 2010-11-28 21:06:39Z matt $"
 //
 // "GTK" drawing routines for the Fast Light Tool Kit (FLTK).
 //
 // These box types provide a GTK+ look, based on Red Hat's Bluecurve
 // theme...
 //
-// Copyright 2006-2009 by Michael Sweet.
+// Copyright 2006-2010 by Michael Sweet.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -300,5 +300,5 @@ Fl_Boxtype fl_define_FL_GTK_UP_BOX() {
 
 
 //
-// End of "$Id: fl_gtk.cxx 6616 2009-01-01 21:28:26Z matt $".
+// End of "$Id: fl_gtk.cxx 7903 2010-11-28 21:06:39Z matt $".
 //

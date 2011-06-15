@@ -1,5 +1,5 @@
 //
-// "$Id: Fl_Table_Row.H 6942 2009-11-18 12:22:51Z AlbrechtS $"
+// "$Id: Fl_Table_Row.H 8301 2011-01-22 22:40:11Z AlbrechtS $"
 //
 
 #ifndef _FL_TABLE_ROW_H
@@ -37,12 +37,10 @@
 /**
  A table with row selection capabilities.
  
- This class implements a simple table of rows and columns that specializes in 
- the selection of rows. This widget is similar in behavior to a "mail subject 
- browser", similar to that found in mozilla, netscape and outlook mail browsers.
- 
- Most methods of importance will be found in the Fl_Table widget, such as 
- Fl_Table::rows() and Fl_Table::cols().
+ This class implements a simple table with the ability to select
+ rows.  This widget is similar to an Fl_Browser with columns.  Most
+ methods of importance will be found in the Fl_Table widget, such
+ as Fl_Table::rows() and Fl_Table::cols().
  
  To be useful it must be subclassed and at minimum the draw_cell()
  method must be overridden to provide the content of the cells. This widget
@@ -53,7 +51,7 @@
  clicked by the user.  You control when events are generated based on
  the values you supply for Fl_Table::when().
  */
-class Fl_Table_Row : public Fl_Table {
+class FL_EXPORT Fl_Table_Row : public Fl_Table {
 public:
   enum TableRowSelectMode {
     SELECT_NONE,		// no selection allowed
@@ -62,7 +60,7 @@ public:
   }; 
 private:
   // An STL-ish vector without templates
-  class CharVector {
+  class FL_EXPORT CharVector {
     char *arr;
     int _size;
     void init() {
@@ -209,5 +207,5 @@ public:
 #endif /*_FL_TABLE_ROW_H*/
 
 //
-// End of "$Id: Fl_Table_Row.H 6942 2009-11-18 12:22:51Z AlbrechtS $".
+// End of "$Id: Fl_Table_Row.H 8301 2011-01-22 22:40:11Z AlbrechtS $".
 //

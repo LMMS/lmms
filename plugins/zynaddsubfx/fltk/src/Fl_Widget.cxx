@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Widget.cxx 7321 2010-03-23 17:37:51Z AlbrechtS $"
+// "$Id: Fl_Widget.cxx 7940 2010-12-02 17:58:58Z greg.ercolano $"
 //
 // Base widget class for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2009 by Bill Spitzak and others.
+// Copyright 1998-2010 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -168,6 +168,7 @@ extern void fl_throw_focus(Fl_Widget*); // in Fl_x.cxx
 Fl_Widget::~Fl_Widget() {
   Fl::clear_widget_pointer(this);
   if (flags() & COPIED_LABEL) free((void *)(label_.value));
+  if (flags() & COPIED_TOOLTIP) free((void *)(tooltip_));
   // remove from parent group
   if (parent_) parent_->remove(this);
 #ifdef DEBUG_DELETE
@@ -340,5 +341,5 @@ Fl_Widget::do_callback(Fl_Widget* o,void* arg) {
 }
 
 //
-// End of "$Id: Fl_Widget.cxx 7321 2010-03-23 17:37:51Z AlbrechtS $".
+// End of "$Id: Fl_Widget.cxx 7940 2010-12-02 17:58:58Z greg.ercolano $".
 //

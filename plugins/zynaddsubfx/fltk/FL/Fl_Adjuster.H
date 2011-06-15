@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Adjuster.H 6614 2009-01-01 16:11:32Z matt $"
+// "$Id: Fl_Adjuster.H 7981 2010-12-08 23:53:04Z greg.ercolano $"
 //
 // Adjuster widget header file for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2009 by Bill Spitzak and others.
+// Copyright 1998-2010 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -40,8 +40,8 @@
 /**
   The Fl_Adjuster widget was stolen from Prisms, and has proven
   to be very useful for values that need a large dynamic range.
-  \image html adjuster1.gif 
-  \image latex adjuster1.eps "Fl_Adjuster" width=4cm
+  \image html adjuster1.png 
+  \image latex adjuster1.png "Fl_Adjuster" width=4cm
   <P>When you  press a button and drag to the right the value increases.
   When you drag  to the left it decreases.  The largest button adjusts by
   100 *  step(), the next by 10 * step() and that
@@ -78,5 +78,5 @@ public:
 #endif
 
 //
-// End of "$Id: Fl_Adjuster.H 6614 2009-01-01 16:11:32Z matt $".
+// End of "$Id: Fl_Adjuster.H 7981 2010-12-08 23:53:04Z greg.ercolano $".
 //

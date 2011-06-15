@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Positioner.H 6614 2009-01-01 16:11:32Z matt $"
+// "$Id: Fl_Positioner.H 7981 2010-12-08 23:53:04Z greg.ercolano $"
 //
 // Positioner header file for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2009 by Bill Spitzak and others.
+// Copyright 1998-2010 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -40,8 +40,8 @@
   It would be useful if this could be put atop another widget so that the
   crosshairs are on top, but this is not implemented.  The color of the
   crosshairs is selection_color().
-  <P ALIGN=CENTER>\image html  positioner.gif </P> 
-  \image latex  positioner.eps " Fl_Positioner" width=4cm
+  <P ALIGN=CENTER>\image html  positioner.png </P> 
+  \image latex  positioner.png " Fl_Positioner" width=4cm
 */
 class FL_EXPORT Fl_Positioner : public Fl_Widget {
 
@@ -99,5 +99,5 @@ public:
 #endif
 
 //
-// End of "$Id: Fl_Positioner.H 6614 2009-01-01 16:11:32Z matt $".
+// End of "$Id: Fl_Positioner.H 7981 2010-12-08 23:53:04Z greg.ercolano $".
 //

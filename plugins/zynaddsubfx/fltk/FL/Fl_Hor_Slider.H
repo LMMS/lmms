@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Hor_Slider.H 6614 2009-01-01 16:11:32Z matt $"
+// "$Id: Fl_Hor_Slider.H 8726 2011-05-23 18:32:47Z AlbrechtS $"
 //
 // Horizontal slider header file for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2009 by Bill Spitzak and others.
+// Copyright 1998-2011 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -33,14 +33,28 @@
 
 #include "Fl_Slider.H"
 
-class Fl_Hor_Slider : public Fl_Slider {
+/** Horizontal Slider class.
+
+  \see class Fl_Slider.
+*/
+class FL_EXPORT Fl_Hor_Slider : public Fl_Slider {
 public:
-    Fl_Hor_Slider(int X,int Y,int W,int H,const char *l=0)
-	: Fl_Slider(X,Y,W,H,l) {type(FL_HOR_SLIDER);}
+
+  /**
+    Creates a new Fl_Hor_Slider widget using the given position,
+    size, and label string.
+  */
+
+#if defined(FL_DLL)	// implementation in src/Fl_Slider.cxx
+  Fl_Hor_Slider(int X,int Y,int W,int H,const char *l=0);
+#else
+  Fl_Hor_Slider(int X,int Y,int W,int H,const char *l=0)
+    : Fl_Slider(X,Y,W,H,l) { type(FL_HOR_SLIDER); }
+#endif
 };
 
 #endif
 
 //
-// End of "$Id: Fl_Hor_Slider.H 6614 2009-01-01 16:11:32Z matt $".
+// End of "$Id: Fl_Hor_Slider.H 8726 2011-05-23 18:32:47Z AlbrechtS $".
 //

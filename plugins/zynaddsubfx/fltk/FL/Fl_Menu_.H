@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Menu_.H 7517 2010-04-16 17:55:45Z greg.ercolano $"
+// "$Id: Fl_Menu_.H 7903 2010-11-28 21:06:39Z matt $"
 //
 // Menu base class header file for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2009 by Bill Spitzak and others.
+// Copyright 1998-2010 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -70,6 +70,17 @@ public:
   int find_index(const Fl_Menu_Item *item) const;
   int find_index(Fl_Callback *cb) const;
 
+  /**
+    Returns the menu item with the entered shortcut (key value).
+
+    This searches the complete menu() for a shortcut that matches the
+    entered key value.  It must be called for a FL_KEYBOARD or FL_SHORTCUT
+    event.
+
+    If a match is found, the menu's callback will be called.
+
+    \return matched Fl_Menu_Item or NULL.
+  */
   const Fl_Menu_Item* test_shortcut() {return picked(menu()->test_shortcut());}
   void global();
 
@@ -116,9 +127,9 @@ public:
     the new value is different than the old one.
   */
   int value(int i) {return value(menu_+i);}
-  /** Returns the title of the last item chosen, or of item i.  */
+  /** Returns the title of the last item chosen.  */
   const char *text() const {return value_ ? value_->text : 0;}
-  /** Returns the title of the last item chosen, or of item i.  */
+  /** Returns the title of item i.  */
   const char *text(int i) const {return menu_[i].text;}
 
   /** Gets the current font of menu item labels.  */
@@ -153,5 +164,5 @@ public:
 #endif
 
 //
-// End of "$Id: Fl_Menu_.H 7517 2010-04-16 17:55:45Z greg.ercolano $".
+// End of "$Id: Fl_Menu_.H 7903 2010-11-28 21:06:39Z matt $".
 //

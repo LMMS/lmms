@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Image.cxx 7659 2010-07-01 13:21:32Z manolo $"
+// "$Id: Fl_Image.cxx 8611 2011-04-20 14:01:04Z AlbrechtS $"
 //
 // Image drawing code for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2009 by Bill Spitzak and others.
+// Copyright 1998-2010 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -379,8 +379,10 @@ void Fl_RGB_Image::desaturate() {
 // Composite an image with alpha on systems that don't have accelerated
 // alpha compositing...
 static void alpha_blend(Fl_RGB_Image *img, int X, int Y, int W, int H, int cx, int cy) {
-  uchar *srcptr = (uchar*)img->array + img->d() * (img->w() * cy + cx);
-  int srcskip = img->d() * (img->w() - W);
+  int ld = img->ld();
+  if (ld == 0) ld = img->w() * img->d();
+  uchar *srcptr = (uchar*)img->array + cy * ld + cx * img->d();
+  int srcskip = ld - img->d() * W;
 
   uchar *dst = new uchar[W * H * 3];
   uchar *dstptr = dst;
@@ -392,7 +394,6 @@ static void alpha_blend(Fl_RGB_Image *img, int X, int Y, int W, int H, int cx, i
 
   if (img->d() == 2) {
     // Composite grayscale + alpha over RGB...
-    // Composite RGBA over RGB...
     for (int y = H; y > 0; y--, srcptr+=srcskip)
       for (int x = W; x > 0; x--) {
 	srcg = *srcptr++;
@@ -586,5 +587,5 @@ void Fl_RGB_Image::label(Fl_Menu_Item* m) {
 
 
 //
-// End of "$Id: Fl_Image.cxx 7659 2010-07-01 13:21:32Z manolo $".
+// End of "$Id: Fl_Image.cxx 8611 2011-04-20 14:01:04Z AlbrechtS $".
 //

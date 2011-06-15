@@ -1,5 +1,5 @@
 //
-// "$Id: Fl_Tree_Item.cxx 7672 2010-07-10 09:44:45Z matt $"
+// "$Id: Fl_Tree_Item.cxx 8589 2011-04-14 13:15:13Z manolo $"
 //
 
 #include <stdio.h>
@@ -14,7 +14,7 @@
 //////////////////////
 //
 // Fl_Tree -- This file is part of the Fl_Tree widget for FLTK
-// Copyright (C) 2009 by Greg Ercolano.
+// Copyright (C) 2009-2010 by Greg Ercolano.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -44,8 +44,8 @@ Fl_Tree_Item::Fl_Tree_Item(const Fl_Tree_Prefs &prefs) {
   _label        = 0;
   _labelfont    = prefs.labelfont();
   _labelsize    = prefs.labelsize();
-  _labelfgcolor = prefs.fgcolor();
-  _labelbgcolor = prefs.bgcolor();
+  _labelfgcolor = prefs.labelfgcolor();
+  _labelbgcolor = prefs.labelbgcolor();
   _widget       = 0;
   _open         = 1;
   _visible      = 1;
@@ -165,12 +165,12 @@ int Fl_Tree_Item::find_child(const char *name) {
   return(-1);
 }
 
-/// Find item by descending array of names.
+/// Find child item by descending array of names. Does not include self in search.
 /// Only Fl_Tree should need this method.
 ///
 /// \returns item, or 0 if not found
 ///
-const Fl_Tree_Item *Fl_Tree_Item::find_item(char **arr) const {
+const Fl_Tree_Item *Fl_Tree_Item::find_child_item(char **arr) const {
   for ( int t=0; t<children(); t++ ) {
     if ( child(t)->label() ) {
       if ( strcmp(child(t)->label(), *arr) == 0 ) {	// match?
@@ -185,12 +185,12 @@ const Fl_Tree_Item *Fl_Tree_Item::find_item(char **arr) const {
   return(0);
 }
 
-/// Find item by by descending array of names.
-/// Only Fl_Tree should need this method.
+/// Find child item by descending array of names. Does not include self in search.
+/// Only Fl_Tree should need this method. Use Fl_Tree::find_item() instead.
 ///
 /// \returns item, or 0 if not found
 ///
-Fl_Tree_Item *Fl_Tree_Item::find_item(char **arr) {
+Fl_Tree_Item *Fl_Tree_Item::find_child_item(char **arr) {
   for ( int t=0; t<children(); t++ ) {
     if ( child(t)->label() ) {
       if ( strcmp(child(t)->label(), *arr) == 0 ) {	// match?
@@ -201,6 +201,40 @@ Fl_Tree_Item *Fl_Tree_Item::find_item(char **arr) {
         }
       }
     }
+  }
+  return(0);
+}
+
+/// Find item by descending array of \p names. Includes self in search.
+/// Only Fl_Tree should need this method. Use Fl_Tree::find_item() instead.
+///
+/// \returns item, or 0 if not found
+///
+const Fl_Tree_Item *Fl_Tree_Item::find_item(char **names) const {
+  if ( label() && strcmp(label(), *names) == 0 ) {	// match self?
+    if ( *(names+1) == 0 ) {				// end of names,
+      return(this);					// found ourself.
+    }
+  }
+  if ( children() ) {					// check children..
+    return(find_child_item(names));
+  }
+  return(0);
+}
+
+/// Find item by descending array of \p names. Includes self in search.
+/// Only Fl_Tree should need this method.
+///
+/// \returns item, or 0 if not found
+///
+Fl_Tree_Item *Fl_Tree_Item::find_item(char **names) {
+  if ( label() && strcmp(label(), *names) == 0 ) {	// match self?
+    if ( *(names+1) == 0 ) {				// end of names,
+      return(this);					// found ourself.
+    }
+  }
+  if ( children() ) {					// check children..
+    return(find_child_item(names));
   }
   return(0);
 }
@@ -265,7 +299,7 @@ Fl_Tree_Item *Fl_Tree_Item::add(const Fl_Tree_Prefs &prefs, const char *new_labe
 ///
 Fl_Tree_Item *Fl_Tree_Item::add(const Fl_Tree_Prefs &prefs, char **arr) {
   int t = find_child(*arr);
-  Fl_Tree_Item *item;
+  Fl_Tree_Item *item = 0;
   if ( t == -1 ) {
     item = (Fl_Tree_Item*)add(prefs, *arr);
   } else {
@@ -416,7 +450,7 @@ void Fl_Tree_Item::draw_vertical_connector(int x, int y1, int y2, const Fl_Tree_
 
 /// Find the item that the last event was over.
 ///
-///    Returns the item if its visible, and mouse is over it.
+///    Returns the item if it is visible, and mouse is over it.
 ///    Works even if widget deactivated.
 ///    Use event_on_collapse_icon() to determine if collapse button was pressed.
 ///
@@ -446,7 +480,7 @@ const Fl_Tree_Item *Fl_Tree_Item::find_clicked(const Fl_Tree_Prefs &prefs) const
 /// Non-const version of the above.
 /// Find the item that the last event was over.
 ///
-///    Returns the item if its visible, and mouse is over it.
+///    Returns the item if it is visible, and mouse is over it.
 ///    Works even if widget deactivated.
 ///    Use event_on_collapse_icon() to determine if collapse button was pressed.
 ///
@@ -473,8 +507,49 @@ Fl_Tree_Item *Fl_Tree_Item::find_clicked(const Fl_Tree_Prefs &prefs) {
   return(0);
 }
 
+static void draw_item_focus(Fl_Boxtype B, Fl_Color C, int X, int Y, int W, int H) {
+  if (!Fl::visible_focus()) return;
+  switch (B) {
+    case FL_DOWN_BOX:
+    case FL_DOWN_FRAME:
+    case FL_THIN_DOWN_BOX:
+    case FL_THIN_DOWN_FRAME:
+      X ++;
+      Y ++;
+    default:
+      break;
+  }
+  fl_color(fl_contrast(FL_BLACK, C));
+
+#if defined(USE_X11) || defined(__APPLE_QUARTZ__)
+  fl_line_style(FL_DOT);
+  fl_rect(X + Fl::box_dx(B), Y + Fl::box_dy(B),
+          W - Fl::box_dw(B) - 1, H - Fl::box_dh(B) - 1);
+  fl_line_style(FL_SOLID);
+#else
+  // Some platforms don't implement dotted line style, so draw
+  // every other pixel around the focus area...
+  //
+  // Also, QuickDraw (MacOS) does not support line styles specifically,
+  // and the hack we use in fl_line_style() will not draw horizontal lines
+  // on odd-numbered rows...
+  int i, xx, yy;
+
+  X += Fl::box_dx(B);
+  Y += Fl::box_dy(B);
+  W -= Fl::box_dw(B) + 2;
+  H -= Fl::box_dh(B) + 2;
+
+  for (xx = 0, i = 1; xx < W; xx ++, i ++) if (i & 1) fl_point(X + xx, Y);
+  for (yy = 0; yy < H; yy ++, i ++) if (i & 1) fl_point(X + W, Y + yy);
+  for (xx = W; xx > 0; xx --, i ++) if (i & 1) fl_point(X + xx, Y + H);
+  for (yy = H; yy > 0; yy --, i ++) if (i & 1) fl_point(X, Y + yy);
+#endif
+}
+
 /// Draw this item and its children.
-void Fl_Tree_Item::draw(int X, int &Y, int W, Fl_Widget *tree, 
+void Fl_Tree_Item::draw(int X, int &Y, int W, Fl_Widget *tree,
+			Fl_Tree_Item *itemfocus,
                         const Fl_Tree_Prefs &prefs, int lastchild) {
   if ( ! _visible ) return; 
   fl_font(_labelfont, _labelsize);
@@ -487,12 +562,12 @@ void Fl_Tree_Item::draw(int X, int &Y, int W, Fl_Widget *tree,
     W += prefs.openicon()->w();
   }
   // Colors, fonts
-  Fl_Color fg = _selected ? prefs.bgcolor()     : _labelfgcolor;
-  Fl_Color bg = _selected ? prefs.selectcolor() : _labelbgcolor;
-  if ( ! _active ) {
-    fg = fl_inactive(fg);
-    if ( _selected ) bg = fl_inactive(bg);
-  }
+  Fl_Color fg = _selected ? fl_contrast(_labelfgcolor, tree->selection_color())
+                          : _active ? _labelfgcolor 
+			            : fl_inactive(_labelfgcolor);
+  Fl_Color bg = _selected ? _active ? tree->selection_color() 
+                                    : fl_inactive(tree->selection_color())
+                          : _labelbgcolor;
   // Update the xywh of this item
   _xywh[0] = X;
   _xywh[1] = Y;
@@ -598,6 +673,10 @@ void Fl_Tree_Item::draw(int X, int &Y, int W, Fl_Widget *tree,
         fl_draw(_label, X+useroff, Y+H-fl_descent()-1);
       }
     }
+    if ( this == itemfocus && Fl::visible_focus() && Fl::focus() == tree) {
+      // Draw focus box around this item
+      draw_item_focus(FL_NO_BOX,bg,bx+1,by+1,bw-1,bh-1);
+    }
     Y += H;
   }			// end drawthis
   // Draw children
@@ -608,7 +687,7 @@ void Fl_Tree_Item::draw(int X, int &Y, int W, Fl_Widget *tree,
     int child_y_start = Y;
     for ( int t=0; t<children(); t++ ) {
       int lastchild = ((t+1)==children()) ? 1 : 0;
-      _children[t]->draw(child_x, Y, child_w, tree, prefs, lastchild);
+      _children[t]->draw(child_x, Y, child_w, tree, itemfocus, prefs, lastchild);
     }
     if ( has_children() && is_open() ) {
       Y += prefs.openchild_marginbottom();		// offset below open child tree
@@ -736,6 +815,115 @@ Fl_Tree_Item *Fl_Tree_Item::prev() {
   return(p);
 }
 
+/// Return this item's next sibling.
+///
+/// Moves to the next item below us at the same level (sibling).
+/// Use this to move down the tree without moving deeper into the tree,
+/// effectively skipping over this item's children/descendents.
+/// 
+/// \returns item's next sibling, or 0 if none.
+///
+Fl_Tree_Item *Fl_Tree_Item::next_sibling() {
+  if ( !parent() ) return(0);			// No parent (root)? We have no siblings
+  int index = parent()->find_child(this);	// find our position in parent's child() array
+  if ( index == -1 ) return(0);			// parent doesn't know us? weird
+  if ( (index+1) < parent()->children() )	// is there a next child?
+    return(parent()->child(index+1));		// return next child if there's one below us
+  return(0);					// no siblings below us
+}
+
+/// Return this item's previous sibling.
+///
+/// Moves to the previous item above us at the same level (sibling).
+/// Use this to move up the tree without moving deeper into the tree.
+/// 
+/// \returns This item's previous sibling, or 0 if none.
+///
+Fl_Tree_Item *Fl_Tree_Item::prev_sibling() {
+  if ( !parent() ) return(0);				// No parent (root)? We have no siblings
+  int index = parent()->find_child(this);		// find next position up in parent's child() array
+  if ( index == -1 ) return(0);				// parent doesn't know us? weird
+  if ( index > 0 ) return(parent()->child(index-1));	// return previous child if there's one above us
+  return(0);						// no siblings above us
+}
+
+/// Return the next visible item. (If this item has children and is closed, children are skipped)
+///
+/// This method can be used to walk the tree forward, skipping items
+/// that are not currently visible to the user.
+/// 
+/// \returns the next visible item below us, or 0 if there's no more items.
+///
+Fl_Tree_Item *Fl_Tree_Item::next_displayed(Fl_Tree_Prefs &prefs) {
+  Fl_Tree_Item *c = this;
+  while ( c ) {
+    if ( c->is_root() && !prefs.showroot() ) {		// on root and can't show it?
+      c = c->next();					// skip ahead, try again
+      continue;
+    }
+    if ( c->has_children() && c->is_close() ) {		// item has children and: invisible or closed?
+      // Skip children, take next sibling. If none, try parent's sibling, repeat
+      while ( c ) {
+	Fl_Tree_Item *sib = c->next_sibling();		// get sibling
+	if ( sib ) { c = sib; break; }			// Found? let outer loop test it
+	c = c->parent();				// No sibling? move up tree, try parent's sibling
+      }
+    } else {						// has children and isn't closed, or no children
+      c = c->next();					// use normal 'next'
+    }
+    if ( !c ) return(0);				// no more? done
+    // Check all parents to be sure none are closed.
+    // If closed, move up to that level and repeat until sure none are closed.
+    Fl_Tree_Item *p = c->parent();
+    while (1) {
+      if ( !p || p->is_root() ) return(c);		// hit top? then we're displayed, return c
+      if ( p->is_close() ) c = p;			// found closed parent? make it current
+      p = p->parent();					// continue up tree
+    }
+    if ( c && c->visible() ) return(c);			// item visible? return it
+  }
+  return(0);						// hit end: no more items
+}
+
+/// Return the previous visible item. (If this item above us has children and is closed, its children are skipped)
+///
+/// This method can be used to walk the tree backward, 
+/// skipping items that are not currently visible to the user.
+/// 
+/// \returns the previous visible item above us, or 0 if there's no more items.
+///
+Fl_Tree_Item *Fl_Tree_Item::prev_displayed(Fl_Tree_Prefs &prefs) {
+  Fl_Tree_Item *c = this;
+  while ( c ) {
+    c = c->prev();					// previous item
+    if ( !c ) break;					// no more items? done
+    if ( c->is_root() )					// root
+      return((prefs.showroot()&&c->visible()) ? c : 0);	// return root if visible
+    if ( !c->visible() ) continue;			// item not visible? skip
+    // Check all parents to be sure none are closed.
+    // If closed, move up to that level and repeat until sure none are closed.
+    Fl_Tree_Item *p = c->parent();
+    while (1) {
+      if ( !p || p->is_root() ) return(c);		// hit top? then we're displayed, return c
+      if ( p->is_close() ) c = p;			// found closed parent? make it current
+      p = p->parent();					// continue up tree
+    }
+  }
+  return(0);						// hit end: no more items
+}
+
+/// Returns if item and all its parents are visible.
+/// Also takes into consideration if any parent is close()ed.
+/// \returns
+///    1 -- item and its parents are visible/open()
+///    0 -- item (or parents) invisible or close()ed.
+///
+int Fl_Tree_Item::visible_r() const {
+  for (const Fl_Tree_Item *p=this; p; p=p->parent())	// move up through parents
+    if (!p->visible() || p->is_close()) return(0);	// any parent not visible or closed?
+  return(1);
+}
+
 //
-// End of "$Id: Fl_Tree_Item.cxx 7672 2010-07-10 09:44:45Z matt $".
+// End of "$Id: Fl_Tree_Item.cxx 8589 2011-04-14 13:15:13Z manolo $".
 //

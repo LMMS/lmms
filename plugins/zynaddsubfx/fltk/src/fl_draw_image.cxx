@@ -1,9 +1,9 @@
 //
-// "$Id: fl_draw_image.cxx 7617 2010-05-27 17:20:18Z manolo $"
+// "$Id: fl_draw_image.cxx 8731 2011-05-23 21:05:22Z AlbrechtS $"
 //
 // Image drawing routines for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2009 by Bill Spitzak and others.
+// Copyright 1998-2010 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -297,13 +297,15 @@ static void rrr_converter(const uchar *from, uchar *to, int w, int delta) {
 #    if WORDS_BIGENDIAN
 #      define INNARDS32(f) \
   U64 *t = (U64*)to; \
-  int w1 = (w+1)/2; \
-  for (; w1--; from += delta) {U64 i = f; from += delta; *t++ = (i<<32)|(f);}
+  int w1 = w/2; \
+  for (; w1--; from += delta) {U64 i = f; from += delta; *t++ = (i<<32)|(f);} \
+  if (w&1) *t++ = (U64)(f)<<32;
 #    else
 #      define INNARDS32(f) \
   U64 *t = (U64*)to; \
-  int w1 = (w+1)/2; \
-  for (; w1--; from += delta) {U64 i=f; from+= delta; *t++ = ((U64)(f)<<32)|i;}
+  int w1 = w/2; \
+  for (; w1--; from += delta) {U64 i = f; from += delta; *t++ = ((U64)(f)<<32)|i;} \
+  if (w&1) *t++ = (U64)(f);
 #    endif
 #  else
 #    define STORETYPE U32
@@ -543,17 +545,17 @@ static void innards(const uchar *buf, int X, int Y, int W, int H,
   }
 }
 
-void Fl_Graphics_Driver::draw_image(const uchar* buf, int x, int y, int w, int h, int d, int l){
+void Fl_Xlib_Graphics_Driver::draw_image(const uchar* buf, int x, int y, int w, int h, int d, int l){
   innards(buf,x,y,w,h,d,l,(d<3&&d>-3),0,0);
 }
-void Fl_Graphics_Driver::draw_image(Fl_Draw_Image_Cb cb, void* data,
+void Fl_Xlib_Graphics_Driver::draw_image(Fl_Draw_Image_Cb cb, void* data,
 		   int x, int y, int w, int h,int d) {
   innards(0,x,y,w,h,d,0,(d<3&&d>-3),cb,data);
 }
-void Fl_Graphics_Driver::draw_image_mono(const uchar* buf, int x, int y, int w, int h, int d, int l){
+void Fl_Xlib_Graphics_Driver::draw_image_mono(const uchar* buf, int x, int y, int w, int h, int d, int l){
   innards(buf,x,y,w,h,d,l,1,0,0);
 }
-void Fl_Graphics_Driver::draw_image_mono(Fl_Draw_Image_Cb cb, void* data,
+void Fl_Xlib_Graphics_Driver::draw_image_mono(Fl_Draw_Image_Cb cb, void* data,
 		   int x, int y, int w, int h,int d) {
   innards(0,x,y,w,h,d,0,1,cb,data);
 }
@@ -572,5 +574,5 @@ void fl_rectf(int x, int y, int w, int h, uchar r, uchar g, uchar b) {
 #endif
 
 //
-// End of "$Id: fl_draw_image.cxx 7617 2010-05-27 17:20:18Z manolo $".
+// End of "$Id: fl_draw_image.cxx 8731 2011-05-23 21:05:22Z AlbrechtS $".
 //

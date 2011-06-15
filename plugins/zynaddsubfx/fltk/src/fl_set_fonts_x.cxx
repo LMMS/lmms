@@ -1,9 +1,9 @@
 //
-// "$Id: fl_set_fonts_x.cxx 6712 2009-03-22 19:21:34Z AlbrechtS $"
+// "$Id: fl_set_fonts_x.cxx 8037 2010-12-15 13:54:34Z manolo $"
 //
 // X11 font utilities for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2009 by Bill Spitzak and others.
+// Copyright 1998-2010 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -260,7 +260,7 @@ static int to_canonical(char *to, const char *from, size_t tolen) {
 static unsigned int fl_free_font = FL_FREE_FONT;
 
 Fl_Font Fl::set_fonts(const char* xstarname) {
-  if (fl_free_font > FL_FREE_FONT) // already been here
+  if (fl_free_font > (unsigned)FL_FREE_FONT) // already been here
     return (Fl_Font)fl_free_font;
   fl_open_display();
   int xlistsize;
@@ -346,5 +346,5 @@ int Fl::get_font_sizes(Fl_Font fnum, int*& sizep) {
 }
 
 //
-// End of "$Id: fl_set_fonts_x.cxx 6712 2009-03-22 19:21:34Z AlbrechtS $".
+// End of "$Id: fl_set_fonts_x.cxx 8037 2010-12-15 13:54:34Z manolo $".
 //

@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Check_Button.H 6614 2009-01-01 16:11:32Z matt $"
+// "$Id: Fl_Check_Button.H 7981 2010-12-08 23:53:04Z greg.ercolano $"
 //
 // Check button header file for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2009 by Bill Spitzak and others.
+// Copyright 1998-2010 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -37,8 +37,8 @@
   \class Fl_Check_Button
   \brief A button with an "checkmark" to show its status.
 
-  \image html Fl_Check_Button.gif
-  \image latex Fl_Check_Button.eps  "Fl_Check_Button" width=4cm
+  \image html Fl_Check_Button.png
+  \image latex Fl_Check_Button.png  "Fl_Check_Button" width=4cm
   Buttons generate callbacks when they are clicked by the user. You control
   exactly when and how by changing the values for type() and when().
 
@@ -56,5 +56,5 @@ public:
 #endif
 
 //
-// End of "$Id: Fl_Check_Button.H 6614 2009-01-01 16:11:32Z matt $".
+// End of "$Id: Fl_Check_Button.H 7981 2010-12-08 23:53:04Z greg.ercolano $".
 //

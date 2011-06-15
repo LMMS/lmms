@@ -1,9 +1,9 @@
 //
-// "$Id: fl_color_mac.cxx 7617 2010-05-27 17:20:18Z manolo $"
+// "$Id: fl_color_mac.cxx 8384 2011-02-06 12:32:23Z manolo $"
 //
 // MacOS color functions for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2009 by Bill Spitzak and others.
+// Copyright 1998-2010 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -47,10 +47,8 @@ Fl_XMap fl_xmap[256];
 
 Fl_XMap* fl_current_xmap;
 
-Fl_Color fl_color_;
-
-void Fl_Graphics_Driver::color(Fl_Color i) {
-  fl_color_ = i;
+void Fl_Quartz_Graphics_Driver::color(Fl_Color i) {
+  Fl_Graphics_Driver::color(i);
   int index;
   uchar r, g, b;
   if (i & 0xFFFFFF00) {
@@ -74,8 +72,8 @@ void Fl_Graphics_Driver::color(Fl_Color i) {
   CGContextSetRGBStrokeColor(fl_gc, fr, fg, fb, 1.0f);
 }
 
-void Fl_Graphics_Driver::color(uchar r, uchar g, uchar b) {
-  fl_color_ = fl_rgb_color(r, g, b);
+void Fl_Quartz_Graphics_Driver::color(uchar r, uchar g, uchar b) {
+  Fl_Graphics_Driver::color( fl_rgb_color(r, g, b) );
   float fr = r/255.0f;
   float fg = g/255.0f;
   float fb = b/255.0f;
@@ -90,5 +88,5 @@ void Fl::set_color(Fl_Color i, unsigned c) {
 }
 
 //
-// End of "$Id: fl_color_mac.cxx 7617 2010-05-27 17:20:18Z manolo $".
+// End of "$Id: fl_color_mac.cxx 8384 2011-02-06 12:32:23Z manolo $".
 //

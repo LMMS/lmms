@@ -1,9 +1,9 @@
 //
-// "$Id: fl_round_box.cxx 6616 2009-01-01 21:28:26Z matt $"
+// "$Id: fl_round_box.cxx 8630 2011-05-01 12:45:29Z AlbrechtS $"
 //
 // Round box drawing routines for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2009 by Bill Spitzak and others.
+// Copyright 1998-2010 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -35,7 +35,7 @@
 // A compiler from a certain very large software company will not compile
 // the function pointer assignment due to the name conflict with fl_arc.
 // This function is to fix that:
-void fl_arc_i(int x,int y,int w,int h,double a1,double a2) {
+static void fl_arc_i(int x,int y,int w,int h,double a1,double a2) {
   fl_arc(x,y,w,h,a1,a2);
 }
 
@@ -52,6 +52,7 @@ static void draw(int which, int x,int y,int w,int h, int inset, Fl_Color color)
   int d = w <= h ? w : h;
   if (d <= 1) return;
   fl_color(color);
+  fl_line_style(0,1);
   void (*f)(int,int,int,int,double,double);
   f = (which==FILL) ? fl_pie : fl_arc_i;
   if (which >= CLOSED) {
@@ -78,6 +79,7 @@ static void draw(int which, int x,int y,int w,int h, int inset, Fl_Color color)
       if (which != LOWER_RIGHT) fl_xyline(x+d/2-1, y, x+w-d/2+1);
     }
   }
+  fl_line_style(0);
 }
 
 extern uchar* fl_gray_ramp();
@@ -118,5 +120,5 @@ Fl_Boxtype fl_define_FL_ROUND_UP_BOX() {
 }
 
 //
-// End of "$Id: fl_round_box.cxx 6616 2009-01-01 21:28:26Z matt $".
+// End of "$Id: fl_round_box.cxx 8630 2011-05-01 12:45:29Z AlbrechtS $".
 //

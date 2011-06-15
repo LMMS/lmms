@@ -1,9 +1,9 @@
 //
-// "$Id: fl_font_win32.cxx 7652 2010-06-21 15:49:45Z manolo $"
+// "$Id: fl_font_win32.cxx 8644 2011-05-10 15:37:05Z ianmacarthur $"
 //
 // WIN32 font selection routines for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2009 by Bill Spitzak and others.
+// Copyright 1998-2011 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -30,7 +30,7 @@
 static int fl_angle_ = 0;
 
 #ifndef FL_DOXYGEN
-Fl_Font_Descriptor::Fl_Font_Descriptor(const char* name, Fl_Fontsize size) {
+Fl_Font_Descriptor::Fl_Font_Descriptor(const char* name, Fl_Fontsize fsize) {
   int weight = FW_NORMAL;
   int italic = 0;
   switch (*name++) {
@@ -41,7 +41,7 @@ Fl_Font_Descriptor::Fl_Font_Descriptor(const char* name, Fl_Fontsize size) {
   default: name--;
   }
   fid = CreateFont(
-    -size, // negative makes it use "char size"
+    -fsize, // negative makes it use "char size"
     0,	            // logical average character width
     fl_angle_*10,	            // angle of escapement
     fl_angle_*10,	            // base-line orientation angle
@@ -69,10 +69,8 @@ Fl_Font_Descriptor::Fl_Font_Descriptor(const char* name, Fl_Fontsize size) {
   listbase = 0;
   for (i = 0; i < 64; i++) glok[i] = 0;
 #endif
-  minsize = maxsize = size;
+  size = fsize;
 }
-
-Fl_Font_Descriptor* fl_fontsize;
 
 Fl_Font_Descriptor::~Fl_Font_Descriptor() {
 #if HAVE_GL
@@ -86,7 +84,7 @@ Fl_Font_Descriptor::~Fl_Font_Descriptor() {
 //  glDeleteLists(listbase+base,size);
 // }
 #endif
-  if (this == fl_fontsize) fl_fontsize = 0;
+  if (this == fl_graphics_driver->font_descriptor()) fl_graphics_driver->font_descriptor(NULL);
   DeleteObject(fid);
   int i;
   for (i = 0; i < 64; i++) free(width[i]);
@@ -122,7 +120,7 @@ static Fl_Font_Descriptor* find(Fl_Font fnum, Fl_Fontsize size, int angle) {
   if (!s->name) s = fl_fonts; // use 0 if fnum undefined
   Fl_Font_Descriptor* f;
   for (f = s->first; f; f = f->next)
-    if (f->minsize <= size && f->maxsize >= size && f->angle == angle) return f;
+    if (f->size == size && f->angle == angle) return f;
   f = new Fl_Font_Descriptor(s->name, size);
   f->next = s->first;
   s->first = f;
@@ -132,65 +130,88 @@ static Fl_Font_Descriptor* find(Fl_Font fnum, Fl_Fontsize size, int angle) {
 ////////////////////////////////////////////////////////////////
 // Public interface:
 
-Fl_Font fl_font_ = 0;
-Fl_Fontsize fl_size_ = 0;
-//static HDC font_gc;
-
-void fl_font(Fl_Font fnum, Fl_Fontsize size, int angle) {
+static void fl_font(Fl_Graphics_Driver *driver, Fl_Font fnum, Fl_Fontsize size, int angle) {
   if (fnum==-1) { // just make sure that we will load a new font next time
-    fl_font_ = 0; fl_size_ = 0; fl_angle_ = 0;
+    fl_angle_ = 0;
+    driver->Fl_Graphics_Driver::font(0, 0);
     return;
   }
-  if (fnum == fl_font_ && size == fl_size_ && angle == fl_angle_) return;
-  fl_font_ = fnum; fl_size_ = size; fl_angle_ = angle;
-  fl_fontsize = find(fnum, size, angle);
+  if (fnum == driver->Fl_Graphics_Driver::font() && size == driver->size() && angle == fl_angle_) return;
+  fl_angle_ = angle;
+  driver->Fl_Graphics_Driver::font(fnum, size);
+  driver->font_descriptor( find(fnum, size, angle) );
 }
 
-void Fl_Graphics_Driver::font(Fl_Font fnum, Fl_Fontsize size) {
-  fl_font(fnum, size, 0);
+void Fl_GDI_Graphics_Driver::font(Fl_Font fnum, Fl_Fontsize size) {
+  fl_font(this, fnum, size, 0);
 }
 
-int fl_height() {
+int Fl_GDI_Graphics_Driver::height() {
+  Fl_Font_Descriptor *fl_fontsize = font_descriptor();
   if (fl_fontsize) return (fl_fontsize->metr.tmAscent + fl_fontsize->metr.tmDescent);
   else return -1;
 }
 
-int fl_descent() {
+int Fl_GDI_Graphics_Driver::descent() {
+  Fl_Font_Descriptor *fl_fontsize = font_descriptor();
   if (fl_fontsize) return fl_fontsize->metr.tmDescent;
   else return -1;
 }
 
 // Unicode string buffer
-static xchar *wstr = NULL;
+static unsigned short *wstr = NULL;
 static int wstr_len    = 0;
 
 
-double fl_width(const char* c, int n) {
+double Fl_GDI_Graphics_Driver::width(const char* c, int n) {
   int i = 0;
-  if (!fl_fontsize) return -1.0;
+  if (!font_descriptor()) return -1.0;
   double w = 0.0;
   char *end = (char *)&c[n];
   while (i < n) {
     unsigned int ucs;
-//  int l = fl_utf2ucs((const unsigned char*)c + i, n - i, &ucs);
     int l;
     ucs = fl_utf8decode((const char*)(c + i), end, &l);
 //  if (l < 1) l = 1;
     i += l;
     if (!fl_nonspacing(ucs)) {
-      w += fl_width(ucs);
+      w += width(ucs);
     }
   }
   return w;
 }
 
-double fl_width(unsigned int c) {
+double Fl_GDI_Graphics_Driver::width(unsigned int c) {
+  Fl_Font_Descriptor *fl_fontsize = font_descriptor();
   unsigned int r;
+  SIZE s;
+  // Special Case Handling of Unicode points over U+FFFF.
+  // The logic (below) computes a lookup table for char widths
+  // on-the-fly, but the table only covers codepoints up to
+  // U+FFFF, which covers the basic multilingual plane, but
+  // not any higher plane, or glyphs that require surrogate-pairs
+  // to encode them in WinXX, which is UTF16.
+  // This code assumes that these glyphs are rarely used and simply
+  // measures them explicitly if they occur - This will be slow...
+  if(c > 0x0000FFFF) { // UTF16 surrogate pair is needed
+    if (!fl_gc) { // We have no valid gc, so nothing to measure - bail out
+      return 0.0;
+    }
+    int cc; // cell count
+    unsigned short u16[4]; // Array for UTF16 representation of c
+    // Creates a UTF16 string from a UCS code point.
+    cc = fl_ucs_to_Utf16(c, u16, 4);
+    // Make sure the current font is selected before we make the measurement
+    SelectObject(fl_gc, fl_fontsize->fid);
+    // measure the glyph width
+    GetTextExtentPoint32W(fl_gc, (WCHAR*)u16, cc, &s);
+    return (double)s.cx;
+  }
+  // else - this falls through to the lookup-table for glyph widths
+  // in the basic multilingual plane
   r = (c & 0xFC00) >> 10;
   if (!fl_fontsize->width[r]) {
-    SelectObject(fl_gc, fl_fontsize->fid);
     fl_fontsize->width[r] = (int*) malloc(sizeof(int) * 0x0400);
-    SIZE s;
     unsigned short i = 0, ii = r * 0x400;
     // The following code makes a best effort attempt to obtain a valid fl_gc.
     // If no fl_gc is available at the time we call fl_width(), then we first
@@ -201,12 +222,13 @@ double fl_width(unsigned int c) {
     HDC gc = fl_gc;
     HWND hWnd = 0;
     if (!gc) { // We have no valid gc, try and obtain one
-	// Use our first fltk window, or fallback to using the screen via GetDC(NULL)
-	hWnd = Fl::first_window() ? fl_xid(Fl::first_window()) : NULL;
-	gc = GetDC(hWnd);
+      // Use our first fltk window, or fallback to using the screen via GetDC(NULL)
+      hWnd = Fl::first_window() ? fl_xid(Fl::first_window()) : NULL;
+      gc = GetDC(hWnd);
     }
     if (!gc)
 	Fl::fatal("Invalid graphic context: fl_width() failed because no valid HDC was found!");
+    SelectObject(gc, fl_fontsize->fid);
     for (; i < 0x400; i++) {
       GetTextExtentPoint32W(gc, (WCHAR*)&ii, 1, &s);
       fl_fontsize->width[r][i] = s.cx;
@@ -250,24 +272,29 @@ static void on_printer_extents_update(int &dx, int &dy, int &w, int &h)
 
 // if printer context, extents shd be converted to logical coords
 #define EXTENTS_UPDATE(x,y,w,h) \
-  if (Fl_Surface_Device::surface()->type() == Fl_Printer::device_type) { on_printer_extents_update(x,y,w,h); }
+  if (Fl_Surface_Device::surface()->class_name() == Fl_Printer::class_id) { on_printer_extents_update(x,y,w,h); }
 
-static unsigned short *ext_buff = NULL; // UTF-16 converted version of input UTF-8 string
-static unsigned wc_len = 0; // current string buffer dimension
-static WORD *gi = NULL; // glyph indices array
 // Function to determine the extent of the "inked" area of the glyphs in a string
-void fl_text_extents(const char *c, int n, int &dx, int &dy, int &w, int &h) {
-  if (!fl_fontsize) {
+void Fl_GDI_Graphics_Driver::text_extents(const char *c, int n, int &dx, int &dy, int &w, int &h) {
+
+  Fl_Font_Descriptor *fl_fontsize = font_descriptor();
+  if (!fl_fontsize) { // no valid font, nothing to measure
     w = 0; h = 0;
     dx = dy = 0;
     return;
   }
-  static const MAT2 matrix = { { 0, 1 }, { 0, 0 }, { 0, 0 }, { 0, 1 } };
+
+  static unsigned short *ext_buff = NULL; // UTF-16 converted version of input UTF-8 string
+  static WORD  *w_buff = NULL; // glyph indices array
+  static unsigned wc_len = 0;  // current string buffer dimensions
+  static const MAT2 matrix = { { 0, 1 }, { 0, 0 }, { 0, 0 }, { 0, 1 } }; // identity mat for GetGlyphOutlineW
   GLYPHMETRICS metrics;
   int maxw = 0, maxh = 0, dh;
   int minx = 0, miny = -999999;
   unsigned len = 0, idx = 0;
   HWND hWnd = 0;
+  HDC gc = fl_gc; // local copy of current gc - make a copy in case we change it...
+  int has_surrogates; // will be set if the string contains surrogate pairs
 
   // Have we loaded the GetGlyphIndicesW function yet?
   if (have_loaded_GetGlyphIndices == 0) {
@@ -278,43 +305,69 @@ void fl_text_extents(const char *c, int n, int &dx, int &dy, int &w, int &h) {
 
   // The following code makes a best effort attempt to obtain a valid fl_gc.
   // See description in fl_width() above for an explanation.
-  if (!fl_gc) { // We have no valid gc, try and obtain one
-	// Use our first fltk window, or fallback to using the screen via GetDC(NULL)
-	hWnd = Fl::first_window() ? fl_xid(Fl::first_window()) : NULL;
-	fl_gc = GetDC(hWnd);
+  if (!gc) { // We have no valid gc, try and obtain one
+    // Use our first fltk window, or fallback to using the screen via GetDC(NULL)
+    hWnd = Fl::first_window() ? fl_xid(Fl::first_window()) : NULL;
+    gc = GetDC(hWnd);
   }
-  if (!fl_gc)goto exit_error; // no valid gc, attempt to use fallback measure
+  if (!gc) goto exit_error; // no valid gc, attempt to use fallback measure
 
   // now convert the string to WCHAR and measure it
   len = fl_utf8toUtf16(c, n, ext_buff, wc_len);
   if(len >= wc_len) {
     if(ext_buff) {delete [] ext_buff;}
-    if(gi) {delete [] gi;}
-	wc_len = len + 64;
+    if(w_buff) {delete [] w_buff;}
+    wc_len = len + 64;
     ext_buff = new unsigned short[wc_len];
-	gi = new WORD[wc_len];
+    w_buff = new WORD[wc_len];
     len = fl_utf8toUtf16(c, n, ext_buff, wc_len);
   }
-  SelectObject(fl_gc, fl_fontsize->fid);
+  SelectObject(gc, fl_fontsize->fid);
 
-  if (fl_GetGlyphIndices(fl_gc, (WCHAR*)ext_buff, len, gi, 0) == GDI_ERROR) {
-    // some error occured here - just return fl_measure values?
-    goto exit_error;
+  // Are there surrogate-pairs in this string? If so GetGlyphIndicesW will fail
+  // since it can only handle the BMP range.
+  // We ideally want to use GetGlyphIndicesW, as it is the Right Thing, but it
+  // only works for the BMP, so we leverage GetCharacterPlacementW instead, which
+  // is not ideal, but works adequately well, and does handle surrogate pairs.
+  has_surrogates = 0;
+  for(unsigned ll = 0; ll < len; ll++) {
+    if((ext_buff[ll] >= 0xD800) && (ext_buff[ll] < 0xE000)) {
+      has_surrogates = -1;
+      break;
+    }
+  }
+  if (has_surrogates) {
+    // GetGlyphIndices will not work - use GetCharacterPlacementW() instead
+    GCP_RESULTSW gcp_res;
+    memset(w_buff, 0, (sizeof(WORD) * wc_len));
+    memset(&gcp_res, 0, sizeof(GCP_RESULTSW));
+    gcp_res.lpGlyphs = (LPWSTR)w_buff;
+    gcp_res.nGlyphs = wc_len;
+    gcp_res.lStructSize = sizeof(gcp_res);
+
+    DWORD dr = GetCharacterPlacementW(gc, (WCHAR*)ext_buff, len, 0, &gcp_res, GCP_GLYPHSHAPE);
+    if(dr) {
+      len = gcp_res.nGlyphs;
+    } else goto exit_error;
+  } else {
+    if (fl_GetGlyphIndices(gc, (WCHAR*)ext_buff, len, w_buff, GGI_MARK_NONEXISTING_GLYPHS) == GDI_ERROR) {
+      // some error occured here - just return fl_measure values
+      goto exit_error;
+    }
   }
 
   // now we have the glyph array we measure each glyph in turn...
   for(idx = 0; idx < len; idx++){
-    if (GetGlyphOutlineW (fl_gc, gi[idx], GGO_METRICS | GGO_GLYPH_INDEX,
-					      &metrics, 0, NULL, &matrix) == GDI_ERROR) {
-                    goto exit_error;
+    if (GetGlyphOutlineW (gc, w_buff[idx], GGO_METRICS | GGO_GLYPH_INDEX,
+                          &metrics, 0, NULL, &matrix) == GDI_ERROR) {
+      goto exit_error;
     }
     maxw += metrics.gmCellIncX;
-	if(idx == 0) minx = metrics.gmptGlyphOrigin.x;
+    if(idx == 0) minx = metrics.gmptGlyphOrigin.x;
     dh = metrics.gmBlackBoxY - metrics.gmptGlyphOrigin.y;
-	if(dh > maxh) maxh = dh;
-	if(miny < metrics.gmptGlyphOrigin.y) miny = metrics.gmptGlyphOrigin.y;
+    if(dh > maxh) maxh = dh;
+    if(miny < metrics.gmptGlyphOrigin.y) miny = metrics.gmptGlyphOrigin.y;
   }
-
   // for the last cell, we only want the bounding X-extent, not the glyphs increment step
   maxw = maxw - metrics.gmCellIncX + metrics.gmBlackBoxX + metrics.gmptGlyphOrigin.x;
   w = maxw - minx;
@@ -326,86 +379,59 @@ void fl_text_extents(const char *c, int n, int &dx, int &dy, int &w, int &h) {
 
 exit_error:
   // some error here - just return fl_measure values
-  w = (int)fl_width(c, n);
-  h = fl_height();
+  w = (int)width(c, n);
+  h = height();
   dx = 0;
-  dy = fl_descent() - h;
+  dy = descent() - h;
   EXTENTS_UPDATE(dx, dy, w, h);
   return;
 } // fl_text_extents
 
-void Fl_Graphics_Driver::draw(const char* str, int n, int x, int y) {
-  int i = 0;
-  int lx = 0;
-  char *end = (char *)&str[n];
+void Fl_GDI_Graphics_Driver::draw(const char* str, int n, int x, int y) {
   COLORREF oldColor = SetTextColor(fl_gc, fl_RGB());
-   SelectObject(fl_gc, fl_fontsize->fid);
-  while (i < n) {
-    unsigned int u;
-	unsigned int u1;
-    unsigned short ucs;
-//  int l = fl_utf2ucs((const unsigned char*)str + i, n - i, &u);
-    int l;
-    u = fl_utf8decode((const char*)(str + i), end, &l);
-    if (u1 = fl_nonspacing(u)) {
-      x -= lx;
-	  u = u1;
-    } else {
-      lx = (int) fl_width(u);
-    }
-    ucs = u;
-    if (l < 1) l = 1;
-    i += l;
-    TextOutW(fl_gc, x, y, (WCHAR*)&ucs, 1);
-    x += lx;
-  }
-  SetTextColor(fl_gc, oldColor);
-}
-
-void Fl_Graphics_Driver::draw(int angle, const char* str, int n, int x, int y) {
-  fl_font(fl_font_, fl_size_, angle);
-//  fl_draw(str, n, (int)x, (int)y);
-  int i = 0, i2=0;
-  char *end = (char *)&str[n];
-  COLORREF oldColor = SetTextColor(fl_gc, fl_RGB());
-  SelectObject(fl_gc, fl_fontsize->fid);
-  //unsigned short ucs[n]; //only GCC, but not MSVC
-  unsigned short* ucs = new unsigned short[n];
-  while (i < n) {
-    unsigned int u;
-    int l;
-    u = fl_utf8decode((const char*)(str + i), end, &l);
-    ucs[i2] = u;
-    if (l < 1) l = 1;
-    i += l;
-    ++i2;
-  }
-  TextOutW(fl_gc, x, y, (WCHAR*)ucs, i2);
-  delete[] ucs;
-  SetTextColor(fl_gc, oldColor);
-  fl_font(fl_font_, fl_size_);
-}
-
-void Fl_Graphics_Driver::rtl_draw(const char* c, int n, int x, int y) {
-  int wn;
-  int i = 0;
-  int lx = 0;
-//  if (n > wstr_len) {
-//    wstr = (xchar*) realloc(wstr, sizeof(xchar) * (n + 1));
-//    wstr_len = n;
-//  }
-//wn = fl_utf2unicode((const unsigned char *)c, n, wstr);
-  wn = fl_utf8toUtf16(c, n, (unsigned short*)wstr, wstr_len);
+  SelectObject(fl_gc, font_descriptor()->fid);
+  int wn = fl_utf8toUtf16(str, n, wstr, wstr_len);
   if(wn >= wstr_len) {
-    wstr = (xchar*) realloc(wstr, sizeof(xchar) * (wn + 1));
+    wstr = (unsigned short*) realloc(wstr, sizeof(unsigned short) * (wn + 1));
     wstr_len = wn + 1;
-    wn = fl_utf8toUtf16(c, n, (unsigned short*)wstr, wstr_len);
+    wn = fl_utf8toUtf16(str, n, wstr, wstr_len);
+  }
+  TextOutW(fl_gc, x, y, (WCHAR*)wstr, wn);
+  SetTextColor(fl_gc, oldColor); // restore initial state
+}
+
+void Fl_GDI_Graphics_Driver::draw(int angle, const char* str, int n, int x, int y) {
+  fl_font(this, Fl_Graphics_Driver::font(), size(), angle);
+  int wn = 0; // count of UTF16 cells to render full string
+  COLORREF oldColor = SetTextColor(fl_gc, fl_RGB());
+  SelectObject(fl_gc, font_descriptor()->fid);
+  wn = fl_utf8toUtf16(str, n, wstr, wstr_len);
+  if(wn >= wstr_len) { // Array too small
+    wstr = (unsigned short*) realloc(wstr, sizeof(unsigned short) * (wn + 1));
+    wstr_len = wn + 1;
+    wn = fl_utf8toUtf16(str, n, wstr, wstr_len); // respin the translation
+  }
+  TextOutW(fl_gc, x, y, (WCHAR*)wstr, wn);
+  SetTextColor(fl_gc, oldColor);
+  fl_font(this, Fl_Graphics_Driver::font(), size(), 0);
+}
+
+void Fl_GDI_Graphics_Driver::rtl_draw(const char* c, int n, int x, int y) {
+  int wn;
+  wn = fl_utf8toUtf16(c, n, wstr, wstr_len);
+  if(wn >= wstr_len) {
+    wstr = (unsigned short*) realloc(wstr, sizeof(unsigned short) * (wn + 1));
+    wstr_len = wn + 1;
+    wn = fl_utf8toUtf16(c, n, wstr, wstr_len);
   }
 
   COLORREF oldColor = SetTextColor(fl_gc, fl_RGB());
-  SelectObject(fl_gc, fl_fontsize->fid);
-  while (i < wn) {
-    lx = (int) fl_width(wstr[i]);
+  SelectObject(fl_gc, font_descriptor()->fid);
+#ifdef RTL_CHAR_BY_CHAR
+  int i = 0;
+  int lx = 0;
+  while (i < wn) { // output char by char is very bad for Arabic but coherent with fl_width()
+    lx = (int) width(wstr[i]);
     x -= lx;
     TextOutW(fl_gc, x, y, (WCHAR*)wstr + i, 1);
     if (fl_nonspacing(wstr[i])) {
@@ -413,9 +439,14 @@ void Fl_Graphics_Driver::rtl_draw(const char* c, int n, int x, int y) {
     }
     i++;
   }
+#else
+  UINT old_align = SetTextAlign(fl_gc, TA_RIGHT | TA_RTLREADING);
+  TextOutW(fl_gc, x, y - height() + descent(), (WCHAR*)wstr, wn);
+  SetTextAlign(fl_gc, old_align);
+#endif
   SetTextColor(fl_gc, oldColor);
 }
 #endif
 //
-// End of "$Id: fl_font_win32.cxx 7652 2010-06-21 15:49:45Z manolo $".
+// End of "$Id: fl_font_win32.cxx 8644 2011-05-10 15:37:05Z ianmacarthur $".
 //

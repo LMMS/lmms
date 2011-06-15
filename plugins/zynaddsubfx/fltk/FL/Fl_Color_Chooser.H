@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Color_Chooser.H 6614 2009-01-01 16:11:32Z matt $"
+// "$Id: Fl_Color_Chooser.H 7981 2010-12-08 23:53:04Z greg.ercolano $"
 //
 // Color chooser header file for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2009 by Bill Spitzak and others.
+// Copyright 1998-2010 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -84,7 +84,7 @@ public:
   \brief The Fl_Color_Chooser widget provides a standard RGB color chooser.
 
   \image html fl_color_chooser.jpg
-  \image latex fl_color_chooser.eps "fl_color_chooser()" width=5cm
+  \image latex fl_color_chooser.jpg "fl_color_chooser()" width=5cm
 
   You can place any number of the widgets into a panel of your own design.
   The diagram shows the widget as part of a color chooser dialog created by
@@ -127,9 +127,19 @@ class FL_EXPORT Fl_Color_Chooser : public Fl_Group {
   static void rgb_cb(Fl_Widget*, void*);
   static void mode_cb(Fl_Widget*, void*);
 public:
-  /** Returns which Fl_Color_Chooser variant is currently active */
+  
+  /** 
+   Returns which Fl_Color_Chooser variant is currently active 
+   \return color modes are rgb(0), byte(1), hex(2), or hsv(3)   
+   */
   int mode() {return choice.value();}
-
+  
+  /** 
+   Set which Fl_Color_Chooser variant is currently active 
+   \param[in] newMode color modes are rgb(0), byte(1), hex(2), or hsv(3)   
+   */
+  void mode(int newMode);
+  
   /**
     Returns the current hue.
     0 <= hue < 6. Zero is red, one is yellow, two is green, etc.
@@ -179,11 +189,11 @@ public:
   Fl_Color_Chooser(int X, int Y, int W, int H, const char *L = 0);
 };
 
-FL_EXPORT int fl_color_chooser(const char* name, double& r, double& g, double& b);
-FL_EXPORT int fl_color_chooser(const char* name, uchar& r, uchar& g, uchar& b);
+FL_EXPORT int fl_color_chooser(const char* name, double& r, double& g, double& b, int m=-1);
+FL_EXPORT int fl_color_chooser(const char* name, uchar& r, uchar& g, uchar& b, int m=-1);
 
 #endif
 
 //
-// End of "$Id: Fl_Color_Chooser.H 6614 2009-01-01 16:11:32Z matt $".
+// End of "$Id: Fl_Color_Chooser.H 7981 2010-12-08 23:53:04Z greg.ercolano $".
 //

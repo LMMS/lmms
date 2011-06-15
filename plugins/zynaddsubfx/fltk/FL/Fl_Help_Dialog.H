@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Help_Dialog.H 6614 2009-01-01 16:11:32Z matt $"
+// "$Id: Fl_Help_Dialog.H 8063 2010-12-19 21:20:10Z matt $"
 //
 // Fl_Help_Dialog dialog for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2009 by Bill Spitzak and others.
+// Copyright 1998-2010 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -43,8 +43,8 @@
 class FL_EXPORT Fl_Help_Dialog {
   int index_; 
   int max_; 
-  int line_[100]; 
-  char file_[100][256]; 
+  int line_[100];                 // FIXME: we must remove those static numbers
+  char file_[100][FL_PATH_MAX];   // FIXME: we must remove those static numbers
   int find_pos_; 
 public:
   Fl_Help_Dialog();
@@ -91,5 +91,5 @@ public:
 #endif
 
 //
-// End of "$Id: Fl_Help_Dialog.H 6614 2009-01-01 16:11:32Z matt $".
+// End of "$Id: Fl_Help_Dialog.H 8063 2010-12-19 21:20:10Z matt $".
 //

@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Browser.H 6850 2009-09-07 02:25:51Z greg.ercolano $"
+// "$Id: Fl_Browser.H 8623 2011-04-24 17:09:41Z AlbrechtS $"
 //
 // Browser header file for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2009 by Bill Spitzak and others.
+// Copyright 1998-2011 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -28,7 +28,7 @@
 /* \file
    Fl_Browser widget . */
 
-// Forms-compatable browser.  Probably useful for other
+// Forms-compatible browser.  Probably useful for other
 // lists of textual data.  Notice that the line numbers
 // start from 1, and 0 means "no line".
 
@@ -320,5 +320,5 @@ public:
 #endif
 
 //
-// End of "$Id: Fl_Browser.H 6850 2009-09-07 02:25:51Z greg.ercolano $".
+// End of "$Id: Fl_Browser.H 8623 2011-04-24 17:09:41Z AlbrechtS $".
 //

@@ -1,9 +1,9 @@
 //
-// "$Id: fl_labeltype.cxx 6616 2009-01-01 21:28:26Z matt $"
+// "$Id: fl_labeltype.cxx 7903 2010-11-28 21:06:39Z matt $"
 //
 // Label drawing routines for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2009 by Bill Spitzak and others.
+// Copyright 1998-2010 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -140,5 +140,5 @@ void Fl_Widget::draw_label(int X, int Y, int W, int H, Fl_Align a) const {
 #include <FL/Fl_Input_.H>
 
 //
-// End of "$Id: fl_labeltype.cxx 6616 2009-01-01 21:28:26Z matt $".
+// End of "$Id: fl_labeltype.cxx 7903 2010-11-28 21:06:39Z matt $".
 //

@@ -1,9 +1,9 @@
 //
-// "$Id: fl_dnd_x.cxx 6616 2009-01-01 21:28:26Z matt $"
+// "$Id: fl_dnd_x.cxx 7992 2010-12-09 21:52:07Z manolo $"
 //
 // Drag & Drop code for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2009 by Bill Spitzak and others.
+// Copyright 1998-2010 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -43,6 +43,7 @@ extern Atom fl_XdndActionCopy;
 extern Atom fl_XdndFinished;
 //extern Atom fl_XdndProxy;
 extern Atom fl_XdndURIList;
+extern Atom fl_XaUtf8String;
 
 extern char fl_i_own_selection[2];
 extern char *fl_selection_buffer[2];
@@ -87,7 +88,7 @@ static int local_handle(int event, Fl_Window* window) {
 
 int Fl::dnd() {
   Fl_Window *source_fl_win = Fl::first_window();
-  Fl::first_window()->cursor((Fl_Cursor)21);
+  Fl::first_window()->cursor(FL_CURSOR_MOVE);
   Window source_window = fl_xid(Fl::first_window());
   fl_local_grab = grabfunc;
   Window target_window = 0;
@@ -149,7 +150,7 @@ int Fl::dnd() {
         } else {
 	  // Send plain text...
 	  fl_sendClientMessage(target_window, fl_XdndEnter, source_window,
-			       dndversion<<24, XA_STRING, 0, 0);
+			       dndversion<<24, fl_XaUtf8String, 0, 0);
 	}
       }
     }
@@ -197,5 +198,5 @@ int Fl::dnd() {
 
 
 //
-// End of "$Id: fl_dnd_x.cxx 6616 2009-01-01 21:28:26Z matt $".
+// End of "$Id: fl_dnd_x.cxx 7992 2010-12-09 21:52:07Z manolo $".
 //

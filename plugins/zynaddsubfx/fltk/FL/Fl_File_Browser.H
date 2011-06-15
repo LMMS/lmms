@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_File_Browser.H 6614 2009-01-01 16:11:32Z matt $"
+// "$Id: Fl_File_Browser.H 8306 2011-01-24 17:04:22Z matt $"
 //
 // FileBrowser definitions.
 //
-// Copyright 1999-2009 by Michael Sweet.
+// Copyright 1999-2010 by Michael Sweet.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -45,8 +45,8 @@
 //
 
 /** The Fl_File_Browser widget displays a list of filenames, optionally with file-specific icons. */
-class FL_EXPORT Fl_File_Browser : public Fl_Browser
-{
+class FL_EXPORT Fl_File_Browser : public Fl_Browser {
+  
   int		filetype_;
   const char	*directory_;
   uchar		iconsize_;
@@ -116,5 +116,5 @@ public:
 #endif // !_Fl_File_Browser_H_
 
 //
-// End of "$Id: Fl_File_Browser.H 6614 2009-01-01 16:11:32Z matt $".
+// End of "$Id: Fl_File_Browser.H 8306 2011-01-24 17:04:22Z matt $".
 //

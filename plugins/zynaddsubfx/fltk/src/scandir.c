@@ -21,7 +21,6 @@ USA.  */
 #else
 
 #  include "flstring.h"
-#  include <FL/fl_utf8.h>
 
 #  if !HAVE_SCANDIR
 #    include <stdlib.h>
@@ -50,7 +49,7 @@ fl_scandir(const char *dir, struct dirent ***namelist,
 	   int (*select)(struct dirent *),
 	   int (*compar)(struct dirent **, struct dirent **))
 {
-  DIR *dp = opendir (fl_utf2mbcs(dir));
+  DIR *dp = opendir (dir);
   struct dirent **v = NULL;
   size_t vsize = 0, i;
   struct dirent *d;
@@ -121,5 +120,5 @@ fl_scandir(const char *dir, struct dirent ***namelist,
 #endif
 
 /*
- * End of "$Id: scandir.c 6311 2008-09-19 17:40:20Z matt $".
+ * End of "$Id: scandir.c 8192 2011-01-05 16:50:10Z manolo $".
  */

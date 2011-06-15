@@ -1,9 +1,9 @@
 //
-// "$Id: fl_color_win32.cxx 7617 2010-05-27 17:20:18Z manolo $"
+// "$Id: fl_color_win32.cxx 8384 2011-02-06 12:32:23Z manolo $"
 //
 // WIN32 color functions for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2009 by Bill Spitzak and others.
+// Copyright 1998-2010 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -92,14 +92,12 @@ static void set_xmap(Fl_XMap& xmap, COLORREF c) {
   xmap.brush = -1;
 }
 
-Fl_Color fl_color_;
-
-void Fl_Graphics_Driver::color(Fl_Color i) {
+void Fl_GDI_Graphics_Driver::color(Fl_Color i) {
   if (i & 0xffffff00) {
     unsigned rgb = (unsigned)i;
     fl_color((uchar)(rgb >> 24), (uchar)(rgb >> 16), (uchar)(rgb >> 8));
   } else {
-    fl_color_ = i;
+    Fl_Graphics_Driver::color(i);
     Fl_XMap &xmap = fl_xmap[i];
     if (!xmap.pen) {
 #if USE_COLORMAP
@@ -118,10 +116,10 @@ void Fl_Graphics_Driver::color(Fl_Color i) {
   }
 }
 
-void Fl_Graphics_Driver::color(uchar r, uchar g, uchar b) {
+void Fl_GDI_Graphics_Driver::color(uchar r, uchar g, uchar b) {
   static Fl_XMap xmap;
   COLORREF c = RGB(r,g,b);
-  fl_color_ = fl_rgb_color(r, g, b);
+  Fl_Graphics_Driver::color( fl_rgb_color(r, g, b) );
   if (!xmap.pen || c != xmap.rgb) {
     clear_xmap(xmap);
     set_xmap(xmap, c);
@@ -250,5 +248,5 @@ fl_select_palette(void)
 #endif
 
 //
-// End of "$Id: fl_color_win32.cxx 7617 2010-05-27 17:20:18Z manolo $".
+// End of "$Id: fl_color_win32.cxx 8384 2011-02-06 12:32:23Z manolo $".
 //

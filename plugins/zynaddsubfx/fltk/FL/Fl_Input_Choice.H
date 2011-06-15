@@ -1,5 +1,5 @@
 //
-// "$Id: Fl_Input_Choice.H 7115 2010-02-20 17:40:07Z AlbrechtS $"
+// "$Id: Fl_Input_Choice.H 8022 2010-12-12 23:21:03Z AlbrechtS $"
 //
 // An input/chooser widget.
 //            ______________  ____
@@ -7,7 +7,7 @@
 //           | input area   || \/ |
 //           |______________||____|
 //
-// Copyright 1998-2009 by Bill Spitzak and others.
+// Copyright 1998-2010 by Bill Spitzak and others.
 // Copyright 2004 by Greg Ercolano.
 //
 // This library is free software; you can redistribute it and/or
@@ -56,7 +56,7 @@
   widgets directly, using the menubutton()
   and input() accessor methods.
 */
-class Fl_Input_Choice : public Fl_Group {
+class FL_EXPORT Fl_Input_Choice : public Fl_Group {
   // Private class to handle slightly 'special' behavior of menu button
   class InputMenuButton : public Fl_Menu_Button {
     void draw() {
@@ -218,5 +218,5 @@ public:
 #endif // !Fl_Input_Choice_H
 
 //
-// End of "$Id: Fl_Input_Choice.H 7115 2010-02-20 17:40:07Z AlbrechtS $".
+// End of "$Id: Fl_Input_Choice.H 8022 2010-12-12 23:21:03Z AlbrechtS $".
 //

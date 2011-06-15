@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Tooltip.cxx 6902 2009-09-27 11:06:56Z matt $"
+// "$Id: Fl_Tooltip.cxx 8788 2011-06-08 14:35:22Z matt $"
 //
 // Tooltip source file for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2009 by Bill Spitzak and others.
+// Copyright 1998-2011 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -30,16 +30,16 @@
 #include <FL/Fl_Menu_Window.H>
 
 #include <stdio.h>
+#include <string.h>	// strdup()
 
 float		Fl_Tooltip::delay_ = 1.0f;
 float		Fl_Tooltip::hoverdelay_ = 0.2f;
-int		Fl_Tooltip::enabled_ = 1;
 Fl_Color	Fl_Tooltip::color_ = fl_color_cube(FL_NUM_RED - 1,
 		                                   FL_NUM_GREEN - 1,
 						   FL_NUM_BLUE - 2);
 Fl_Color	Fl_Tooltip::textcolor_ = FL_BLACK;
 Fl_Font         Fl_Tooltip::font_ = FL_HELVETICA;
-Fl_Fontsize    Fl_Tooltip::size_ = FL_NORMAL_SIZE;
+Fl_Fontsize     Fl_Tooltip::size_ = -1;
 
 #define MAX_WIDTH 400
 
@@ -59,13 +59,23 @@ public:
   void layout();
   /** Shows the tooltip windows only if a tooltip text is available. */
   void show() {
-    if (tip) Fl_Menu_Window::show();
+    if (!tip) return;
+    
+    Fl_Menu_Window::show();
   }
 };
 
 Fl_Widget* Fl_Tooltip::widget_ = 0;
 static Fl_TooltipBox *window = 0;
 static int Y,H;
+
+#ifdef __APPLE__
+// returns the unique tooltip window
+Fl_Window *Fl_Tooltip::current_window(void)
+{
+  return (Fl_Window*)window;
+}
+#endif
 
 void Fl_TooltipBox::layout() {
   fl_font(Fl_Tooltip::font(), Fl_Tooltip::size());
@@ -124,15 +134,20 @@ static void tooltip_timeout(void*) {
   if (!tip || !*tip) {
     if (window) window->hide();
   } else {
-    //if (Fl::grab()) return;
-    if (!window) window = new Fl_TooltipBox;
-    // this cast bypasses the normal Fl_Window label() code:
-    ((Fl_Widget*)window)->label(tip);
-    window->layout();
-    window->redraw();
-//    printf("tooltip_timeout: Showing window %p with tooltip \"%s\"...\n",
-//           window, tip ? tip : "(null)");
-    window->show();
+    int condition = 1;
+#if !(defined(__APPLE__) || defined(WIN32))
+    condition = (Fl::grab() == NULL);
+#endif
+    if ( condition ) {
+      if (!window) window = new Fl_TooltipBox;
+      // this cast bypasses the normal Fl_Window label() code:
+      ((Fl_Widget*)window)->label(tip);
+      window->layout();
+      window->redraw();
+  //    printf("tooltip_timeout: Showing window %p with tooltip \"%s\"...\n",
+  //           window, tip ? tip : "(null)");
+      window->show();
+    }
   }
 
   Fl::remove_timeout(recent_timeout);
@@ -141,8 +156,8 @@ static void tooltip_timeout(void*) {
 }
 
 /**
-   This method is called when the mouse pointer enters a  widget.
-   <P>If this widget or one of it's parents has a tooltip, enter it. This
+   This method is called when the mouse pointer enters a widget.
+   <P>If this widget or one of its parents has a tooltip, enter it. This
    will do nothing if this is the current widget (even if the mouse moved
    out so an exit() was done and then moved back in). If no tooltip can
    be found do Fl_Tooltip::exit_(). If you don't want this behavior (for instance
@@ -267,16 +282,70 @@ void Fl_Tooltip::enter_area(Fl_Widget* wid, int x,int y,int w,int h, const char*
 #endif // DEBUG
 }
 
-void Fl_Widget::tooltip(const char *tt) {
+void Fl_Tooltip::set_enter_exit_once_() {
   static char beenhere = 0;
   if (!beenhere) {
     beenhere          = 1;
     Fl_Tooltip::enter = Fl_Tooltip::enter_;
     Fl_Tooltip::exit  = Fl_Tooltip::exit_;
   }
-  tooltip_ = tt;
+}
+
+/**
+  Sets the current tooltip text. 
+
+  Sets a string of text to display in a popup tooltip window when the user 
+  hovers the mouse over the widget. The string is <I>not</I> copied, so 
+  make sure any formatted string is stored in a static, global, 
+  or allocated buffer. If you want a copy made and managed for you,
+  use the copy_tooltip() method, which will manage the tooltip string
+  automatically.
+
+  If no tooltip is set, the tooltip of the parent is inherited. Setting a 
+  tooltip for a group and setting no tooltip for a child will show the 
+  group's tooltip instead. To avoid this behavior, you can set the child's 
+  tooltip to an empty string ("").
+  \param[in] text New tooltip text (no copy is made)
+  \see copy_tooltip(const char*), tooltip()
+*/
+void Fl_Widget::tooltip(const char *text) {
+  Fl_Tooltip::set_enter_exit_once_();
+  if (flags() & COPIED_TOOLTIP) {
+    // reassigning a copied tooltip remains the same copied tooltip
+    if (tooltip_ == text) return;
+    free((void*)(tooltip_));            // free maintained copy
+    clear_flag(COPIED_TOOLTIP);         // disable copy flag (WE don't make copies)
+  }
+  tooltip_ = text;
+}
+
+/**
+  Sets the current tooltip text. 
+  Unlike tooltip(), this method allocates a copy of the tooltip 
+  string instead of using the original string pointer.
+
+  The internal copy will automatically be freed whenever you assign
+  a new tooltip or when the widget is destroyed.
+
+  If no tooltip is set, the tooltip of the parent is inherited. Setting a 
+  tooltip for a group and setting no tooltip for a child will show the 
+  group's tooltip instead. To avoid this behavior, you can set the child's 
+  tooltip to an empty string ("").
+  \param[in] text New tooltip text (an internal copy is made and managed)
+  \see tooltip(const char*), tooltip()
+*/
+void Fl_Widget::copy_tooltip(const char *text) {
+  Fl_Tooltip::set_enter_exit_once_();
+  if (flags() & COPIED_TOOLTIP) free((void *)(tooltip_));
+  if (text) {
+    set_flag(COPIED_TOOLTIP);
+    tooltip_ = strdup(text);
+  } else {
+    clear_flag(COPIED_TOOLTIP);
+    tooltip_ = (char *)0;
+  }
 }
 
 //
-// End of "$Id: Fl_Tooltip.cxx 6902 2009-09-27 11:06:56Z matt $".
+// End of "$Id: Fl_Tooltip.cxx 8788 2011-06-08 14:35:22Z matt $".
 //

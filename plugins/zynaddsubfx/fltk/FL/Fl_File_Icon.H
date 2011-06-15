@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_File_Icon.H 6614 2009-01-01 16:11:32Z matt $"
+// "$Id: Fl_File_Icon.H 8306 2011-01-24 17:04:22Z matt $"
 //
 // Fl_File_Icon definitions.
 //
-// Copyright 1999-2009 by Michael Sweet.
+// Copyright 1999-2010 by Michael Sweet.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -53,8 +53,8 @@
   The Fl_File_Icon class manages icon images that can be used 
   as labels in other widgets and as icons in the FileBrowser widget.
 */
-class FL_EXPORT Fl_File_Icon			//// Icon data
-{
+class FL_EXPORT Fl_File_Icon {			//// Icon data
+
   static Fl_File_Icon *first_;	// Pointer to first icon/filetype
   Fl_File_Icon	*next_;		// Pointer to next icon/filetype
   const char	*pattern_;	// Pattern string
@@ -164,5 +164,5 @@ class FL_EXPORT Fl_File_Icon			//// Icon data
 #endif // !_Fl_Fl_File_Icon_H_
 
 //
-// End of "$Id: Fl_File_Icon.H 6614 2009-01-01 16:11:32Z matt $".
+// End of "$Id: Fl_File_Icon.H 8306 2011-01-24 17:04:22Z matt $".
 //

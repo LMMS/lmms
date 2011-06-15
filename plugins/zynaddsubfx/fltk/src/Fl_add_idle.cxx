@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_add_idle.cxx 7334 2010-03-25 14:37:46Z AlbrechtS $"
+// "$Id: Fl_add_idle.cxx 7903 2010-11-28 21:06:39Z matt $"
 //
 // Idle routine support for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2009 by Bill Spitzak and others.
+// Copyright 1998-2010 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -119,5 +119,5 @@ void Fl::remove_idle(Fl_Idle_Handler cb, void* data) {
 }
 
 //
-// End of "$Id: Fl_add_idle.cxx 7334 2010-03-25 14:37:46Z AlbrechtS $".
+// End of "$Id: Fl_add_idle.cxx 7903 2010-11-28 21:06:39Z matt $".
 //

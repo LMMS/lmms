@@ -1,5 +1,5 @@
 //
-// "$Id: Fl_GDI_Printer.cxx 7659 2010-07-01 13:21:32Z manolo $"
+// "$Id: Fl_GDI_Printer.cxx 8467 2011-02-23 14:36:18Z manolo $"
 //
 // Support for WIN32 printing for the Fast Light Tool Kit (FLTK).
 //
@@ -34,13 +34,12 @@
 
 extern HWND fl_window;
 
-Fl_Printer::Fl_System_Printer(void) : Fl_Paged_Device() {
+Fl_System_Printer::Fl_System_Printer(void) : Fl_Paged_Device() {
   hPr = NULL;
-  type_ = device_type;
-  driver(fl_graphics_driver);
+  driver(Fl_Display_Device::display_device()->driver());
 }
 
-Fl_Printer::~Fl_System_Printer(void) {
+Fl_System_Printer::~Fl_System_Printer(void) {
   if (hPr) end_job();
 }
 
@@ -61,7 +60,7 @@ static void WIN_SetupPrinterDeviceContext(HDC prHDC)
 }
 
 
-int Fl_Printer::start_job (int pagecount, int *frompage, int *topage)
+int Fl_System_Printer::start_job (int pagecount, int *frompage, int *topage)
 // returns 0 iff OK
 {
   DWORD       commdlgerr;
@@ -116,7 +115,7 @@ int Fl_Printer::start_job (int pagecount, int *frompage, int *topage)
   return err;
 }
 
-void Fl_Printer::end_job (void)
+void Fl_System_Printer::end_job (void)
 {
   Fl_Display_Device::display_device()->set_current();
   if (hPr != NULL) {
@@ -137,7 +136,7 @@ void Fl_Printer::end_job (void)
   hPr = NULL;
 }
 
-void Fl_Printer::absolute_printable_rect(int *x, int *y, int *w, int *h)
+void Fl_System_Printer::absolute_printable_rect(int *x, int *y, int *w, int *h)
 {
   POINT         physPageSize;
   POINT         pixelsPerInch;
@@ -163,7 +162,7 @@ void Fl_Printer::absolute_printable_rect(int *x, int *y, int *w, int *h)
   origin(x_offset, y_offset);
 }
 
-void Fl_Printer::margins(int *left, int *top, int *right, int *bottom)
+void Fl_System_Printer::margins(int *left, int *top, int *right, int *bottom)
 {
   int x, y, w, h;
   absolute_printable_rect(&x, &y, &w, &h);
@@ -173,14 +172,14 @@ void Fl_Printer::margins(int *left, int *top, int *right, int *bottom)
   if (bottom) *bottom = y;
 }
 
-int Fl_Printer::printable_rect(int *w, int *h)
+int Fl_System_Printer::printable_rect(int *w, int *h)
 {
   int x, y;
   absolute_printable_rect(&x, &y, w, h);
   return 0;
 }
 
-int Fl_Printer::start_page (void)
+int Fl_System_Printer::start_page (void)
 {
   int  rsult, w, h;
   
@@ -194,29 +193,29 @@ int Fl_Printer::start_page (void)
     }
     printable_rect(&w, &h);
     origin(0, 0);
-    image_list_ = NULL;
     fl_clip_region(0);
     gc = (void *)fl_gc;
   }
   return rsult;
 }
 
-void Fl_Printer::origin (int deltax, int deltay)
+void Fl_System_Printer::origin (int deltax, int deltay)
 {
   SetWindowOrgEx(fl_gc, - left_margin - deltax, - top_margin - deltay, NULL);
   x_offset = deltax;
   y_offset = deltay;
 }
 
-void Fl_Printer::scale (float scalex, float scaley)
+void Fl_System_Printer::scale (float scalex, float scaley)
 {
+  if (scaley == 0.) scaley = scalex;
   int w, h;
   SetWindowExtEx(fl_gc, (int)(720 / scalex + 0.5), (int)(720 / scaley + 0.5), NULL);
   printable_rect(&w, &h);
   origin(0, 0);
 }
 
-void Fl_Printer::rotate (float rot_angle)
+void Fl_System_Printer::rotate (float rot_angle)
 {
   XFORM mat;
   float angle;
@@ -229,7 +228,7 @@ void Fl_Printer::rotate (float rot_angle)
   SetWorldTransform(fl_gc, &mat);
 }
 
-int Fl_Printer::end_page (void)
+int Fl_System_Printer::end_page (void)
 {
   int  rsult;
   
@@ -261,7 +260,7 @@ static void do_translate(int x, int y)
   ModifyWorldTransform(fl_gc, &tr, MWT_LEFTMULTIPLY);
 }
 
-void Fl_Printer::translate (int x, int y)
+void Fl_System_Printer::translate (int x, int y)
 {
   do_translate(x, y);
   if (translate_stack_depth < translate_stack_max) {
@@ -271,7 +270,7 @@ void Fl_Printer::translate (int x, int y)
     }
 }
 
-void Fl_Printer::untranslate (void)
+void Fl_System_Printer::untranslate (void)
 {
   if (translate_stack_depth > 0) {
     translate_stack_depth--;
@@ -282,5 +281,5 @@ void Fl_Printer::untranslate (void)
 #endif // WIN32
 
 //
-// End of "$Id: Fl_GDI_Printer.cxx 7659 2010-07-01 13:21:32Z manolo $".
+// End of "$Id: Fl_GDI_Printer.cxx 8467 2011-02-23 14:36:18Z manolo $".
 //

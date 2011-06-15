@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Button.cxx 7476 2010-04-09 22:18:05Z matt $"
+// "$Id: Fl_Button.cxx 7903 2010-11-28 21:06:39Z matt $"
 //
 // Button widget for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2009 by Bill Spitzak and others.
+// Copyright 1998-2010 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -29,6 +29,10 @@
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Group.H>
 #include <FL/Fl_Window.H>
+
+
+Fl_Widget_Tracker *Fl_Button::key_release_tracker = 0;
+
 
 // There are a lot of subclasses, named Fl_*_Button.  Some of
 // them are implemented by setting the type() value and testing it
@@ -128,22 +132,9 @@ int Fl_Button::handle(int event) {
     return 1;
   case FL_SHORTCUT:
     if (!(shortcut() ?
-	  Fl::test_shortcut(shortcut()) : test_shortcut())) return 0;
-    
+	  Fl::test_shortcut(shortcut()) : test_shortcut())) return 0;    
     if (Fl::visible_focus() && handle(FL_FOCUS)) Fl::focus(this);
-
-    if (type() == FL_RADIO_BUTTON && !value_) {
-      setonly();
-      set_changed();
-      if (when() & (FL_WHEN_CHANGED|FL_WHEN_RELEASE) ) 
-	  do_callback();
-    } else if (type() == FL_TOGGLE_BUTTON) {
-      value(!value());
-      set_changed();
-      if (when() & (FL_WHEN_CHANGED|FL_WHEN_RELEASE)) 
-	  do_callback();
-    } else if (when() & FL_WHEN_RELEASE) do_callback();
-    return 1;
+    goto triggered_by_keyboard;
   case FL_FOCUS : /* FALLTHROUGH */
   case FL_UNFOCUS :
     if (Fl::visible_focus()) {
@@ -161,6 +152,7 @@ int Fl_Button::handle(int event) {
     if (Fl::focus() == this && Fl::event_key() == ' ' &&
         !(Fl::event_state() & (FL_SHIFT | FL_CTRL | FL_ALT | FL_META))) {
       set_changed();
+    triggered_by_keyboard:
       Fl_Widget_Tracker wp(this);
       if (type() == FL_RADIO_BUTTON && !value_) {
 	setonly();
@@ -168,6 +160,8 @@ int Fl_Button::handle(int event) {
       } else if (type() == FL_TOGGLE_BUTTON) {
 	value(!value());
 	if (when() & FL_WHEN_CHANGED) do_callback();
+      } else {
+        simulate_key_action();
       }
       if (wp.deleted()) return 1;
       if (when() & FL_WHEN_RELEASE) do_callback();
@@ -176,6 +170,33 @@ int Fl_Button::handle(int event) {
   default:
     return 0;
   }
+}
+
+void Fl_Button::simulate_key_action()
+{
+  if (key_release_tracker) {
+    Fl::remove_timeout(key_release_timeout, key_release_tracker);
+    key_release_timeout(key_release_tracker);
+  }
+  value(1); 
+  redraw();
+  key_release_tracker = new Fl_Widget_Tracker(this);
+  Fl::add_timeout(0.15, key_release_timeout, key_release_tracker);
+}
+
+void Fl_Button::key_release_timeout(void *d)
+{
+  Fl_Widget_Tracker *wt = (Fl_Widget_Tracker*)d;
+  if (!wt)
+    return;
+  if (wt==key_release_tracker) 
+    key_release_tracker = 0L;
+  Fl_Button *btn = (Fl_Button*)wt->widget();
+  if (btn) {
+    btn->value(0);
+    btn->redraw();
+  }
+  delete wt;
 }
 
 /**
@@ -193,5 +214,5 @@ Fl_Button::Fl_Button(int X, int Y, int W, int H, const char *L)
 }
 
 //
-// End of "$Id: Fl_Button.cxx 7476 2010-04-09 22:18:05Z matt $".
+// End of "$Id: Fl_Button.cxx 7903 2010-11-28 21:06:39Z matt $".
 //
