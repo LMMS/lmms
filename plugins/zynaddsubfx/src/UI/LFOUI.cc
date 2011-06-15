@@ -98,8 +98,8 @@ LFOUI::LFOUI(int x,int y, int w, int h, const char *label):Fl_Group(x,y,w,h,labe
 
 LFOUI::~LFOUI() {
   lfoui->hide();
-hide();
-//delete (lfoui);
+  hide();
+  //delete (lfoui);
 }
 
 Fl_Group* LFOUI::make_window() {
@@ -265,25 +265,25 @@ Fl_Group* LFOUI::make_window() {
 
 void LFOUI::refresh() {
   freq->value(pars->Pfreq);
-intensity->value(pars->Pintensity);
-startphase->value(pars->Pstartphase);
-delay->value(pars->Pdelay);
-continous->value(pars->Pcontinous);
-stretch->value(pars->Pstretch);
-randomness->value(pars->Prandomness);
-freqrand->value(pars->Pfreqrand);
-LFOtype->value(pars->PLFOtype);
+  intensity->value(pars->Pintensity);
+  startphase->value(pars->Pstartphase);
+  delay->value(pars->Pdelay);
+  continous->value(pars->Pcontinous);
+  stretch->value(pars->Pstretch);
+  randomness->value(pars->Prandomness);
+  freqrand->value(pars->Pfreqrand);
+  LFOtype->value(pars->PLFOtype);
 }
 
 void LFOUI::init(LFOParams *lfopars_) {
   pars=lfopars_;
-
-make_window();
-end();
-
-refresh();
-
-lfoui->resize(this->x(),this->y(),this->w(),this->h());
-
-lfoparamswindow->label(this->label());
+  
+  make_window();
+  end();
+  
+  refresh();
+  
+  lfoui->resize(this->x(),this->y(),this->w(),this->h());
+  
+  lfoparamswindow->label(this->label());
 }

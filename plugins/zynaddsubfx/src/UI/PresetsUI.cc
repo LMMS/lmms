@@ -4,9 +4,11 @@
 #include "../Params/PresetsArray.h"
 
 void PresetsUI_::refresh() {
+  ;
 }
 
 PresetsUI_::~PresetsUI_() {
+  ;
 }
 
 void PresetsUI::cb_copybrowse_i(Fl_Browser* o, void*) {
@@ -113,12 +115,12 @@ void PresetsUI::cb_deletepbutton(Fl_Button* o, void* v) {
 
 PresetsUI::PresetsUI() {
   p=NULL;
-make_window();
+  make_window();
 }
 
 PresetsUI::~PresetsUI() {
   copywin->hide();delete(copywin);
-pastewin->hide();delete(pastewin);
+  pastewin->hide();delete(pastewin);
 }
 
 Fl_Double_Window* PresetsUI::make_window() {
@@ -207,66 +209,66 @@ Fl_Double_Window* PresetsUI::make_window() {
 
 void PresetsUI::copy(Presets *p) {
   copybutton->activate();
-copypbutton->deactivate();
-
-
-this->p=p;
-this->pui=NULL;
-bool but=(Fl::event_button()!=FL_LEFT_MOUSE);
-presetname->cut(0,presetname->maximum_size());
-
-if (but) p->copy(NULL);
-   else {
-        rescan();
-	copytypetext->label(&p->type[1]);
-	copywin->show();
-   };
+  copypbutton->deactivate();
+  
+  
+  this->p=p;
+  this->pui=NULL;
+  bool but=(Fl::event_button()!=FL_LEFT_MOUSE);
+  presetname->cut(0,presetname->maximum_size());
+  
+  if (but) p->copy(NULL);
+     else {
+          rescan();
+  	copytypetext->label(&p->type[1]);
+  	copywin->show();
+     };
 }
 
 void PresetsUI::paste(Presets *p,PresetsUI_ *pui) {
   this->p=p;
-this->pui=pui;
-bool but=(Fl::event_button()!=FL_LEFT_MOUSE);
-pastepbutton->deactivate();
-deletepbutton->deactivate();
-
-if (but) {
-	p->paste(0);
-	pui->refresh();
-} else {
-        rescan();
-	pastetypetext->label(&p->type[1]);
-	if (p->checkclipboardtype()) pastebutton->activate();
-		else pastebutton->deactivate();
-	pastewin->show();
-   };
+  this->pui=pui;
+  bool but=(Fl::event_button()!=FL_LEFT_MOUSE);
+  pastepbutton->deactivate();
+  deletepbutton->deactivate();
+  
+  if (but) {
+  	p->paste(0);
+  	pui->refresh();
+  } else {
+          rescan();
+  	pastetypetext->label(&p->type[1]);
+  	if (p->checkclipboardtype()) pastebutton->activate();
+  		else pastebutton->deactivate();
+  	pastewin->show();
+     };
 }
 
 void PresetsUI::copy(Presets *p,int n) {
   PresetsArray *pre = dynamic_cast<PresetsArray *>(p);
-if(pre)
-    pre->setelement(n);
-copy(p);
+  if(pre)
+      pre->setelement(n);
+  copy(p);
 }
 
 void PresetsUI::paste(Presets *p,PresetsUI_ *pui,int n) {
   PresetsArray *pre = dynamic_cast<PresetsArray *>(p);
-if(pre)
-    pre->setelement(n);
-paste(p,pui);
+  if(pre)
+      pre->setelement(n);
+  paste(p,pui);
 }
 
 void PresetsUI::rescan() {
   copybrowse->clear();
-pastebrowse->clear();
-p->rescanforpresets();
-
-for (int i=0;i<presetsstore.presets.size();i++){
-   std::string name=presetsstore.presets[i].name;
-   if(name.empty())
-       continue;
-   copybrowse->add(name.c_str());
-   pastebrowse->add(name.c_str());
-};
+  pastebrowse->clear();
+  p->rescanforpresets();
+  
+  for (int i=0;i<presetsstore.presets.size();i++){
+     std::string name=presetsstore.presets[i].name;
+     if(name.empty())
+         continue;
+     copybrowse->add(name.c_str());
+     pastebrowse->add(name.c_str());
+  };
 }
 PresetsUI *presetsui; 

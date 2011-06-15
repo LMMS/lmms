@@ -6,15 +6,15 @@
 
 EnvelopeFreeEdit::EnvelopeFreeEdit(int x,int y, int w, int h, const char *label):Fl_Box(x,y,w,h,label) {
   env=NULL;
-pair=NULL;
+  pair=NULL;
 }
 
 void EnvelopeFreeEdit::init(EnvelopeParams *env_) {
   env=env_;
-oldx=-1;
-currentpoint=-1;
-cpx=0;
-lastpoint=-1;
+  oldx=-1;
+  currentpoint=-1;
+  cpx=0;
+  lastpoint=-1;
 }
 
 void EnvelopeFreeEdit::setpair(Fl_Box *pair_) {
@@ -23,137 +23,137 @@ void EnvelopeFreeEdit::setpair(Fl_Box *pair_) {
 
 int EnvelopeFreeEdit::getpointx(int n) {
   int lx=w()-10;
-int npoints=env->Penvpoints;
-
-float  sum=0;
-for (int i=1;i<npoints;i++) sum+=env->getdt(i)+1;
-
-float sumbefore=0;//the sum of all points before the computed point
-for (int i=1;i<=n;i++) sumbefore+=env->getdt(i)+1;
-
-return((int) (sumbefore/(REALTYPE) sum*lx));
+  int npoints=env->Penvpoints;
+  
+  float  sum=0;
+  for (int i=1;i<npoints;i++) sum+=env->getdt(i)+1;
+  
+  float sumbefore=0;//the sum of all points before the computed point
+  for (int i=1;i<=n;i++) sumbefore+=env->getdt(i)+1;
+  
+  return((int) (sumbefore/(REALTYPE) sum*lx));
 }
 
 int EnvelopeFreeEdit::getpointy(int n) {
   int ly=h()-10;
-
-return((int) ((1.0-env->Penvval[n]/127.0)*ly));
+  
+  return((int) ((1.0-env->Penvval[n]/127.0)*ly));
 }
 
 int EnvelopeFreeEdit::getnearest(int x,int y) {
   x-=5;y-=5;
-
-int nearestpoint=0;
-int nearestval=1000000;//a big value
-for (int i=0;i<env->Penvpoints;i++){
-   int distance=abs(x-getpointx(i))+abs(y-getpointy(i));
-   if (distance<nearestval) {
-     nearestpoint=i;
-     nearestval=distance;  
-   };
-};
-return(nearestpoint);
+  
+  int nearestpoint=0;
+  int nearestval=1000000;//a big value
+  for (int i=0;i<env->Penvpoints;i++){
+     int distance=abs(x-getpointx(i))+abs(y-getpointy(i));
+     if (distance<nearestval) {
+       nearestpoint=i;
+       nearestval=distance;  
+     };
+  };
+  return(nearestpoint);
 }
 
 void EnvelopeFreeEdit::draw() {
   int ox=x(),oy=y(),lx=w(),ly=h();
-if (env->Pfreemode==0) env->converttofree();
-int npoints=env->Penvpoints;
-
-if (active_r()) fl_color(FL_BLACK);
-    else fl_color(90,90,90);
-if (!active_r()) currentpoint=-1;
-
-fl_rectf(ox,oy,lx,ly);
-
-ox+=5;oy+=5;lx-=10;ly-=10;
-
-//draw the lines
-fl_color(FL_GRAY);
-
-fl_line_style(FL_SOLID);
-fl_line(ox+2,oy+ly/2,ox+lx-2,oy+ly/2);
-
-//draws the evelope points and lines
-Fl_Color alb=FL_WHITE;
-if (!active_r()) alb=fl_rgb_color(180,180,180);
-fl_color(alb);
-int oldxx=0,xx=0,oldyy=0,yy=getpointy(0);
-fl_rectf(ox-3,oy+yy-3,6,6);
-for (int i=1;i<npoints;i++){
-    oldxx=xx;oldyy=yy;
-    xx=getpointx(i);yy=getpointy(i);
-    if (i==currentpoint) fl_color(FL_RED);
-        else fl_color(alb);
-    fl_line(ox+oldxx,oy+oldyy,ox+xx,oy+yy);
-    fl_rectf(ox+xx-3,oy+yy-3,6,6);
-};
-
-//draw the last moved point point (if exists)
-if (lastpoint>=0){
-    fl_color(FL_CYAN);
-    fl_rectf(ox+getpointx(lastpoint)-5,oy+getpointy(lastpoint)-5,10,10);
-};
-
-//draw the sustain position
-if (env->Penvsustain>0){
-    fl_color(FL_YELLOW);
-    xx=getpointx(env->Penvsustain);
-    fl_line(ox+xx,oy+0,ox+xx,oy+ly);
-};
-
-//Show the envelope duration and the current line duration
-fl_font(FL_HELVETICA|FL_BOLD,10);
-float time=0.0;
-if (currentpoint<=0){
-   fl_color(alb);
-   for (int i=1;i<npoints;i++) time+=env->getdt(i);
-} else {
-   fl_color(255,0,0);
-   time=env->getdt(currentpoint);
-};
-char tmpstr[20];
-if (time<1000.0) snprintf((char *)&tmpstr,20,"%.1fms",time);
-     else snprintf((char *)&tmpstr,20,"%.2fs",time/1000.0);
-fl_draw(tmpstr,ox+lx-20,oy+ly-10,20,10,FL_ALIGN_RIGHT,NULL,0);
+  if (env->Pfreemode==0) env->converttofree();
+  int npoints=env->Penvpoints;
+  
+  if (active_r()) fl_color(FL_BLACK);
+      else fl_color(90,90,90);
+  if (!active_r()) currentpoint=-1;
+  
+  fl_rectf(ox,oy,lx,ly);
+  
+  ox+=5;oy+=5;lx-=10;ly-=10;
+  
+  //draw the lines
+  fl_color(FL_GRAY);
+  
+  fl_line_style(FL_SOLID);
+  fl_line(ox+2,oy+ly/2,ox+lx-2,oy+ly/2);
+  
+  //draws the evelope points and lines
+  Fl_Color alb=FL_WHITE;
+  if (!active_r()) alb=fl_rgb_color(180,180,180);
+  fl_color(alb);
+  int oldxx=0,xx=0,oldyy=0,yy=getpointy(0);
+  fl_rectf(ox-3,oy+yy-3,6,6);
+  for (int i=1;i<npoints;i++){
+      oldxx=xx;oldyy=yy;
+      xx=getpointx(i);yy=getpointy(i);
+      if (i==currentpoint) fl_color(FL_RED);
+          else fl_color(alb);
+      fl_line(ox+oldxx,oy+oldyy,ox+xx,oy+yy);
+      fl_rectf(ox+xx-3,oy+yy-3,6,6);
+  };
+  
+  //draw the last moved point point (if exists)
+  if (lastpoint>=0){
+      fl_color(FL_CYAN);
+      fl_rectf(ox+getpointx(lastpoint)-5,oy+getpointy(lastpoint)-5,10,10);
+  };
+  
+  //draw the sustain position
+  if (env->Penvsustain>0){
+      fl_color(FL_YELLOW);
+      xx=getpointx(env->Penvsustain);
+      fl_line(ox+xx,oy+0,ox+xx,oy+ly);
+  };
+  
+  //Show the envelope duration and the current line duration
+  fl_font(FL_HELVETICA|FL_BOLD,10);
+  float time=0.0;
+  if (currentpoint<=0){
+     fl_color(alb);
+     for (int i=1;i<npoints;i++) time+=env->getdt(i);
+  } else {
+     fl_color(255,0,0);
+     time=env->getdt(currentpoint);
+  };
+  char tmpstr[20];
+  if (time<1000.0) snprintf((char *)&tmpstr,20,"%.1fms",time);
+       else snprintf((char *)&tmpstr,20,"%.2fs",time/1000.0);
+  fl_draw(tmpstr,ox+lx-20,oy+ly-10,20,10,FL_ALIGN_RIGHT,NULL,0);
 }
 
 int EnvelopeFreeEdit::handle(int event) {
   int x_=Fl::event_x()-x();
-int y_=Fl::event_y()-y();
-
-if (event==FL_PUSH) {
-  currentpoint=getnearest(x_,y_);
-  cpx=x_;
-  cpdt=env->Penvdt[currentpoint];
-  lastpoint=currentpoint;
-  redraw();
-  if (pair!=NULL) pair->redraw();
-};
-
-if (event==FL_RELEASE){
-  currentpoint=-1;
-  redraw();
-  if (pair!=NULL) pair->redraw();
-};
-
-if ((event==FL_DRAG)&&(currentpoint>=0)){
-  int ny=127-(int) (y_*127.0/h());
-  if (ny<0) ny=0;if (ny>127) ny=127;
-  env->Penvval[currentpoint]=ny;
-
-  int dx=(int)((x_-cpx)*0.1);
-  int newdt=cpdt+dx;
-  if (newdt<0) newdt=0;if (newdt>127) newdt=127;
-  if (currentpoint!=0) env->Penvdt[currentpoint]=newdt;
-     else env->Penvdt[currentpoint]=0;
-
-  redraw();
-  if (pair!=NULL) pair->redraw();
-};
-
-
-return(1);
+  int y_=Fl::event_y()-y();
+  
+  if (event==FL_PUSH) {
+    currentpoint=getnearest(x_,y_);
+    cpx=x_;
+    cpdt=env->Penvdt[currentpoint];
+    lastpoint=currentpoint;
+    redraw();
+    if (pair!=NULL) pair->redraw();
+  };
+  
+  if (event==FL_RELEASE){
+    currentpoint=-1;
+    redraw();
+    if (pair!=NULL) pair->redraw();
+  };
+  
+  if ((event==FL_DRAG)&&(currentpoint>=0)){
+    int ny=127-(int) (y_*127.0/h());
+    if (ny<0) ny=0;if (ny>127) ny=127;
+    env->Penvval[currentpoint]=ny;
+  
+    int dx=(int)((x_-cpx)*0.1);
+    int newdt=cpdt+dx;
+    if (newdt<0) newdt=0;if (newdt>127) newdt=127;
+    if (currentpoint!=0) env->Penvdt[currentpoint]=newdt;
+       else env->Penvdt[currentpoint]=0;
+  
+    redraw();
+    if (pair!=NULL) pair->redraw();
+  };
+  
+  
+  return(1);
 }
 
 void EnvelopeUI::cb_addpoint_i(Fl_Button*, void*) {
@@ -594,19 +594,19 @@ void EnvelopeUI::cb_P5(Fl_Button* o, void* v) {
 
 EnvelopeUI::EnvelopeUI(int x,int y, int w, int h, const char *label):Fl_Group(x,y,w,h,label) {
   env=NULL;
-freemodeeditwindow=NULL;
-envADSR=NULL;
-envASR=NULL;
-envADSRfilter=NULL;
-envASRbw=NULL;
-envfree=NULL;
+  freemodeeditwindow=NULL;
+  envADSR=NULL;
+  envASR=NULL;
+  envADSRfilter=NULL;
+  envASRbw=NULL;
+  envfree=NULL;
 }
 
 EnvelopeUI::~EnvelopeUI() {
   envwindow->hide();
-hide();
-freemodeeditwindow->hide();
-delete (freemodeeditwindow);
+  hide();
+  freemodeeditwindow->hide();
+  delete (freemodeeditwindow);
 }
 
 Fl_Double_Window* EnvelopeUI::make_freemode_edit_window() {
@@ -1356,170 +1356,170 @@ Fl_Group* EnvelopeUI::make_free_window() {
 
 void EnvelopeUI::init(EnvelopeParams *env_) {
   env=env_;
-make_ADSR_window();
-make_ASR_window();
-make_ADSRfilter_window();
-make_ASRbw_window();
-make_free_window();
-
-make_freemode_edit_window();
-
-envwindow=NULL;
-if (env->Envmode==3) envfreegroup->label("Frequency Envelope");
-if (env->Envmode==4) envfreegroup->label("Filter Envelope");
-if (env->Envmode==5) envfreegroup->label("Bandwidth Envelope");
-
-freemodeeditwindow->label(this->label());
-
-
-freeeditsmall->setpair(freeedit);
-freeedit->setpair(freeeditsmall);
-
-
-refresh();
+  make_ADSR_window();
+  make_ASR_window();
+  make_ADSRfilter_window();
+  make_ASRbw_window();
+  make_free_window();
+  
+  make_freemode_edit_window();
+  
+  envwindow=NULL;
+  if (env->Envmode==3) envfreegroup->label("Frequency Envelope");
+  if (env->Envmode==4) envfreegroup->label("Filter Envelope");
+  if (env->Envmode==5) envfreegroup->label("Bandwidth Envelope");
+  
+  freemodeeditwindow->label(this->label());
+  
+  
+  freeeditsmall->setpair(freeedit);
+  freeedit->setpair(freeeditsmall);
+  
+  
+  refresh();
 }
 
 void EnvelopeUI::reinit() {
   if (env->Pfreemode!=0){
-  int answer=fl_choice("Disable the free mode of the Envelope?","No","Yes",NULL);
-  if (env->Pfreemode!=0) freemodebutton->value(1);
-          else freemodebutton->value(0);
-  if (answer==0) return;
-};
-
-if (env->Pfreemode==0) env->Pfreemode=1;
-     else env->Pfreemode=0;
-
-hide();
-int winx=freemodeeditwindow->x();
-int winy=freemodeeditwindow->y();
-
-freemodeeditwindow->hide();
-
-envwindow->hide();
-Fl_Group *par=envwindow->parent();
-par->hide();
-
-
-refresh();
-envwindow->show();
-par->redraw();
-
-par->show();
-show();
-freemodeeditwindow->position(winx,winy);
-freemodeeditwindow->show();
-
-if (env->Pfreemode!=0) {
-	freemodebutton->value(1);
-	addpoint->show();
-	deletepoint->show();
-	forcedreleasecheck->show();
-}else{
-	freemodebutton->value(0);
-	addpoint->hide();
-	deletepoint->hide();
-	forcedreleasecheck->hide();
-};
+    int answer=fl_choice("Disable the free mode of the Envelope?","No","Yes",NULL);
+    if (env->Pfreemode!=0) freemodebutton->value(1);
+            else freemodebutton->value(0);
+    if (answer==0) return;
+  };
+  
+  if (env->Pfreemode==0) env->Pfreemode=1;
+       else env->Pfreemode=0;
+  
+  hide();
+  int winx=freemodeeditwindow->x();
+  int winy=freemodeeditwindow->y();
+  
+  freemodeeditwindow->hide();
+  
+  envwindow->hide();
+  Fl_Group *par=envwindow->parent();
+  par->hide();
+  
+  
+  refresh();
+  envwindow->show();
+  par->redraw();
+  
+  par->show();
+  show();
+  freemodeeditwindow->position(winx,winy);
+  freemodeeditwindow->show();
+  
+  if (env->Pfreemode!=0) {
+  	freemodebutton->value(1);
+  	addpoint->show();
+  	deletepoint->show();
+  	forcedreleasecheck->show();
+  }else{
+  	freemodebutton->value(0);
+  	addpoint->hide();
+  	deletepoint->hide();
+  	forcedreleasecheck->hide();
+  };
 }
 
 void EnvelopeUI::refresh() {
   freemodebutton->value(env->Pfreemode);
-
-sustaincounter->value(env->Penvsustain);
-if (env->Pfreemode==0) sustaincounter->hide();
-	else sustaincounter->show();
-sustaincounter->maximum(env->Penvpoints-2);
-
-envstretchdial->value(env->Penvstretch);
-if (env->Pfreemode==0) envstretchdial->hide();
-	else envstretchdial->show();
-
-linearenvelopecheck->value(env->Plinearenvelope);
-if ((env->Pfreemode==0)||(env->Envmode>2)) linearenvelopecheck->hide();
-	else linearenvelopecheck->show();
-
-forcedreleasecheck->value(env->Pforcedrelease);
-if (env->Pfreemode==0) forcedreleasecheck->hide();
-
-freeedit->redraw();
-
-
-if (env->Pfreemode==0){
-   switch(env->Envmode){
-         case(1):
-         case(2):
-		e1adt->value(env->PA_dt);
-		e1ddt->value(env->PD_dt);
-		e1sval->value(env->PS_val);
-		e1rdt->value(env->PR_dt);
-		e1envstretch->value(env->Penvstretch);
-		e1linearenvelope->value(env->Plinearenvelope);
-		e1forcedrelease->value(env->Pforcedrelease);
-         break;
-         case(3):
-		e2aval->value(env->PA_val);
-		e2adt->value(env->PA_dt);
-		e2rdt->value(env->PR_dt);
-		e2rval->value(env->PR_val);
-		e2envstretch->value(env->Penvstretch);
-		e2forcedrelease->value(env->Pforcedrelease);
-         break; 
-         case(4):
-		e3aval->value(env->PA_val);
-		e3adt->value(env->PA_dt);
-		e3dval->value(env->PD_val);
-		e3ddt->value(env->PD_dt);
-		e3rdt->value(env->PR_dt);
-		e3rval->value(env->PR_val);
-		e3envstretch->value(env->Penvstretch);
-		e3forcedrelease->value(env->Pforcedrelease);
-         break; 
-         case(5):
-		e4aval->value(env->PA_val);
-		e4adt->value(env->PA_dt);
-		e4rdt->value(env->PR_dt);
-		e4rval->value(env->PR_val);
-		e4envstretch->value(env->Penvstretch);
-		e4forcedrelease->value(env->Pforcedrelease);
-         break;
-         default:
-         break; 
-   };
-}else{
-       envfree->redraw();
-};
-
-
-envADSR->hide();
-envASR->hide();
-envADSRfilter->hide();
-envASRbw->hide();
-envfree->hide();
-
-if (env->Pfreemode==0){
-   switch(env->Envmode){
-         case(1):
-         case(2):
-           envwindow=envADSR;
-         break;
-         case(3):
-           envwindow=envASR;
-         break; 
-         case(4):
-           envwindow=envADSRfilter;
-         break; 
-         case(5):
-          envwindow=envASRbw;
-         break;
-         default:
-         break; 
-   };
-}else{
-   envwindow=envfree;
-};
-
-envwindow->resize(this->x(),this->y(),this->w(),this->h());
-
-envwindow->show();
+  
+  sustaincounter->value(env->Penvsustain);
+  if (env->Pfreemode==0) sustaincounter->hide();
+  	else sustaincounter->show();
+  sustaincounter->maximum(env->Penvpoints-2);
+  
+  envstretchdial->value(env->Penvstretch);
+  if (env->Pfreemode==0) envstretchdial->hide();
+  	else envstretchdial->show();
+  
+  linearenvelopecheck->value(env->Plinearenvelope);
+  if ((env->Pfreemode==0)||(env->Envmode>2)) linearenvelopecheck->hide();
+  	else linearenvelopecheck->show();
+  
+  forcedreleasecheck->value(env->Pforcedrelease);
+  if (env->Pfreemode==0) forcedreleasecheck->hide();
+  
+  freeedit->redraw();
+  
+  
+  if (env->Pfreemode==0){
+     switch(env->Envmode){
+           case(1):
+           case(2):
+  		e1adt->value(env->PA_dt);
+  		e1ddt->value(env->PD_dt);
+  		e1sval->value(env->PS_val);
+  		e1rdt->value(env->PR_dt);
+  		e1envstretch->value(env->Penvstretch);
+  		e1linearenvelope->value(env->Plinearenvelope);
+  		e1forcedrelease->value(env->Pforcedrelease);
+           break;
+           case(3):
+  		e2aval->value(env->PA_val);
+  		e2adt->value(env->PA_dt);
+  		e2rdt->value(env->PR_dt);
+  		e2rval->value(env->PR_val);
+  		e2envstretch->value(env->Penvstretch);
+  		e2forcedrelease->value(env->Pforcedrelease);
+           break; 
+           case(4):
+  		e3aval->value(env->PA_val);
+  		e3adt->value(env->PA_dt);
+  		e3dval->value(env->PD_val);
+  		e3ddt->value(env->PD_dt);
+  		e3rdt->value(env->PR_dt);
+  		e3rval->value(env->PR_val);
+  		e3envstretch->value(env->Penvstretch);
+  		e3forcedrelease->value(env->Pforcedrelease);
+           break; 
+           case(5):
+  		e4aval->value(env->PA_val);
+  		e4adt->value(env->PA_dt);
+  		e4rdt->value(env->PR_dt);
+  		e4rval->value(env->PR_val);
+  		e4envstretch->value(env->Penvstretch);
+  		e4forcedrelease->value(env->Pforcedrelease);
+           break;
+           default:
+           break; 
+     };
+  }else{
+         envfree->redraw();
+  };
+  
+  
+  envADSR->hide();
+  envASR->hide();
+  envADSRfilter->hide();
+  envASRbw->hide();
+  envfree->hide();
+  
+  if (env->Pfreemode==0){
+     switch(env->Envmode){
+           case(1):
+           case(2):
+             envwindow=envADSR;
+           break;
+           case(3):
+             envwindow=envASR;
+           break; 
+           case(4):
+             envwindow=envADSRfilter;
+           break; 
+           case(5):
+            envwindow=envASRbw;
+           break;
+           default:
+           break; 
+     };
+  }else{
+     envwindow=envfree;
+  };
+  
+  envwindow->resize(this->x(),this->y(),this->w(),this->h());
+  
+  envwindow->show();
 }

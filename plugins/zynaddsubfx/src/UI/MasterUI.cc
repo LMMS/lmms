@@ -6,167 +6,167 @@
 
 VUMeter::VUMeter(int x,int y, int w, int h, const char *label):Fl_Box(x,y,w,h,label) {
   master=NULL;
-npart=-1;
+  npart=-1;
 }
 
 void VUMeter::init(Master *master_,int part_) {
   //the "part_" parameters sets the part (if it is >=0), else it sets the master
-master=master_;
-label(NULL);
-npart=part_;
-olddbl=0.0;
-olddbr=0.0;
-oldrmsdbl=0.0;
-oldrmsdbr=0.0;
+  master=master_;
+  label(NULL);
+  npart=part_;
+  olddbl=0.0;
+  olddbr=0.0;
+  oldrmsdbl=0.0;
+  oldrmsdbr=0.0;
 }
 
 void VUMeter::draw_master() {
   #define MIN_DB (-48)
-
-int ox=x(); int oy=y(); int lx=w(); int ly=h();
-
-pthread_mutex_lock(&master->mutex);
-REALTYPE dbl=rap2dB(master->vuoutpeakl);
-REALTYPE dbr=rap2dB(master->vuoutpeakr);
-REALTYPE rmsdbl=rap2dB(master->vurmspeakl);
-REALTYPE rmsdbr=rap2dB(master->vurmspeakr);
-REALTYPE maxdbl=rap2dB(master->vumaxoutpeakl);
-REALTYPE maxdbr=rap2dB(master->vumaxoutpeakr);
-int clipped=master->vuclipped;
-pthread_mutex_unlock(&master->mutex);
-
-dbl=(MIN_DB-dbl)/MIN_DB; 
-if (dbl<0.0) dbl=0.0;
-  else if (dbl>1.0)dbl=1.0;
-
-dbr=(MIN_DB-dbr)/MIN_DB; 
-if (dbr<0.0) dbr=0.0;
-  else if (dbr>1.0) dbr=1.0; 
-
-dbl=dbl*0.4+olddbl*0.6;
-dbr=dbr*0.4+olddbr*0.6;
-
-olddbl=dbl;
-olddbr=dbr;
-
-#define VULENX (lx-35)
-#define VULENY (ly/2-3)
-
-dbl*=VULENX;dbr*=VULENX;
-
-int idbl=(int) dbl;
-int idbr=(int) dbr;
-
-//compute RMS - start
-rmsdbl=(MIN_DB-rmsdbl)/MIN_DB; 
-if (rmsdbl<0.0) rmsdbl=0.0;
-  else if (rmsdbl>1.0) rmsdbl=1.0;
-
-rmsdbr=(MIN_DB-rmsdbr)/MIN_DB; 
-if (rmsdbr<0.0) rmsdbr=0.0;
-  else if (rmsdbr>1.0) rmsdbr=1.0; 
-
-rmsdbl=rmsdbl*0.4+oldrmsdbl*0.6;
-rmsdbr=rmsdbr*0.4+oldrmsdbr*0.6;
-
-oldrmsdbl=rmsdbl;
-oldrmsdbr=rmsdbr;
-
-
-rmsdbl*=VULENX;rmsdbr*=VULENX;
-
-int irmsdbl=(int) rmsdbl;
-int irmsdbr=(int) rmsdbr;
-//compute RMS - end
-
-
-
-//draw the vu-meter lines
-//db
-fl_rectf(ox,oy,idbr,VULENY,0,200,255);
-fl_rectf(ox,oy+ly/2,idbl,VULENY,0,200,255);
-//black
-fl_rectf(ox+idbr,oy,VULENX-idbr,VULENY,0,0,0);
-fl_rectf(ox+idbl,oy+ly/2,VULENX-idbl,VULENY,0,0,0);
-
-//draw the scales
-REALTYPE  tmp=VULENX*1.0/MIN_DB;
-for (int i=1;i<1-MIN_DB;i++){
-   int tx=VULENX+(int) (tmp*i);
-   fl_rectf(ox+tx,oy,1,VULENY+ly/2,0,160,200);
-   if (i%5==0) fl_rectf(ox+tx,oy,1,VULENY+ly/2,0,230,240);
-   if (i%10==0) fl_rectf(ox+tx-1,oy,2,VULENY+ly/2,0,225,255);
-};
-
-//rms
-if (irmsdbr>2) fl_rectf(ox+irmsdbr-1,oy,3,VULENY,255,255,0);
-if (irmsdbl>2) fl_rectf(ox+irmsdbl-1,oy+ly/2,3,VULENY,255,255,0);
-
-
-//draw the red box if clipping has occured
-if (clipped==0) fl_rectf(ox+VULENX+2,oy+1,lx-VULENX-3,ly-4,0,0,10);
-           else fl_rectf(ox+VULENX+2,oy+1,lx-VULENX-3,ly-4,250,10,10);
-
-//draw the maxdB 
-fl_font(FL_HELVETICA|FL_BOLD,10);
-fl_color(255,255,255);
-char tmpstr[10];
-if ((maxdbl>MIN_DB-20)){
-  snprintf((char *)&tmpstr,10,"%ddB",(int)maxdbr);
-  fl_draw(tmpstr,ox+VULENX+1,oy+1,lx-VULENX-1,VULENY,FL_ALIGN_RIGHT,NULL,0);
-};
-if ((maxdbr>MIN_DB-20)){
-  snprintf((char *)&tmpstr,10,"%ddB",(int)maxdbl);
-  fl_draw(tmpstr,ox+VULENX+1,oy+ly/2+1,lx-VULENX-1,VULENY,FL_ALIGN_RIGHT,NULL,0);
-};
+  
+  int ox=x(); int oy=y(); int lx=w(); int ly=h();
+  
+  pthread_mutex_lock(&master->mutex);
+  REALTYPE dbl=rap2dB(master->vuoutpeakl);
+  REALTYPE dbr=rap2dB(master->vuoutpeakr);
+  REALTYPE rmsdbl=rap2dB(master->vurmspeakl);
+  REALTYPE rmsdbr=rap2dB(master->vurmspeakr);
+  REALTYPE maxdbl=rap2dB(master->vumaxoutpeakl);
+  REALTYPE maxdbr=rap2dB(master->vumaxoutpeakr);
+  int clipped=master->vuclipped;
+  pthread_mutex_unlock(&master->mutex);
+  
+  dbl=(MIN_DB-dbl)/MIN_DB; 
+  if (dbl<0.0) dbl=0.0;
+    else if (dbl>1.0)dbl=1.0;
+  
+  dbr=(MIN_DB-dbr)/MIN_DB; 
+  if (dbr<0.0) dbr=0.0;
+    else if (dbr>1.0) dbr=1.0; 
+  
+  dbl=dbl*0.4+olddbl*0.6;
+  dbr=dbr*0.4+olddbr*0.6;
+  
+  olddbl=dbl;
+  olddbr=dbr;
+  
+  #define VULENX (lx-35)
+  #define VULENY (ly/2-3)
+  
+  dbl*=VULENX;dbr*=VULENX;
+  
+  int idbl=(int) dbl;
+  int idbr=(int) dbr;
+  
+  //compute RMS - start
+  rmsdbl=(MIN_DB-rmsdbl)/MIN_DB; 
+  if (rmsdbl<0.0) rmsdbl=0.0;
+    else if (rmsdbl>1.0) rmsdbl=1.0;
+  
+  rmsdbr=(MIN_DB-rmsdbr)/MIN_DB; 
+  if (rmsdbr<0.0) rmsdbr=0.0;
+    else if (rmsdbr>1.0) rmsdbr=1.0; 
+  
+  rmsdbl=rmsdbl*0.4+oldrmsdbl*0.6;
+  rmsdbr=rmsdbr*0.4+oldrmsdbr*0.6;
+  
+  oldrmsdbl=rmsdbl;
+  oldrmsdbr=rmsdbr;
+  
+  
+  rmsdbl*=VULENX;rmsdbr*=VULENX;
+  
+  int irmsdbl=(int) rmsdbl;
+  int irmsdbr=(int) rmsdbr;
+  //compute RMS - end
+  
+  
+  
+  //draw the vu-meter lines
+  //db
+  fl_rectf(ox,oy,idbr,VULENY,0,200,255);
+  fl_rectf(ox,oy+ly/2,idbl,VULENY,0,200,255);
+  //black
+  fl_rectf(ox+idbr,oy,VULENX-idbr,VULENY,0,0,0);
+  fl_rectf(ox+idbl,oy+ly/2,VULENX-idbl,VULENY,0,0,0);
+  
+  //draw the scales
+  REALTYPE  tmp=VULENX*1.0/MIN_DB;
+  for (int i=1;i<1-MIN_DB;i++){
+     int tx=VULENX+(int) (tmp*i);
+     fl_rectf(ox+tx,oy,1,VULENY+ly/2,0,160,200);
+     if (i%5==0) fl_rectf(ox+tx,oy,1,VULENY+ly/2,0,230,240);
+     if (i%10==0) fl_rectf(ox+tx-1,oy,2,VULENY+ly/2,0,225,255);
+  };
+  
+  //rms
+  if (irmsdbr>2) fl_rectf(ox+irmsdbr-1,oy,3,VULENY,255,255,0);
+  if (irmsdbl>2) fl_rectf(ox+irmsdbl-1,oy+ly/2,3,VULENY,255,255,0);
+  
+  
+  //draw the red box if clipping has occured
+  if (clipped==0) fl_rectf(ox+VULENX+2,oy+1,lx-VULENX-3,ly-4,0,0,10);
+             else fl_rectf(ox+VULENX+2,oy+1,lx-VULENX-3,ly-4,250,10,10);
+  
+  //draw the maxdB 
+  fl_font(FL_HELVETICA|FL_BOLD,10);
+  fl_color(255,255,255);
+  char tmpstr[10];
+  if ((maxdbl>MIN_DB-20)){
+    snprintf((char *)&tmpstr,10,"%ddB",(int)maxdbr);
+    fl_draw(tmpstr,ox+VULENX+1,oy+1,lx-VULENX-1,VULENY,FL_ALIGN_RIGHT,NULL,0);
+  };
+  if ((maxdbr>MIN_DB-20)){
+    snprintf((char *)&tmpstr,10,"%ddB",(int)maxdbl);
+    fl_draw(tmpstr,ox+VULENX+1,oy+ly/2+1,lx-VULENX-1,VULENY,FL_ALIGN_RIGHT,NULL,0);
+  };
 }
 
 void VUMeter::draw_part() {
   #define MIN_DB (-48)
-int ox=x(); int oy=y(); int lx=w(); int ly=h();
-
-if (!active_r()){
-  pthread_mutex_lock(&master->mutex);
-   int fakedb=master->fakepeakpart[npart];
-  pthread_mutex_unlock(&master->mutex);
-  fl_rectf(ox,oy,lx,ly,140,140,140);
-  if (fakedb>0){
-    fakedb=(int)(fakedb/255.0*ly)+4;
-    fl_rectf(ox+2,oy+ly-fakedb,lx-4,fakedb,0,0,0);
+  int ox=x(); int oy=y(); int lx=w(); int ly=h();
+  
+  if (!active_r()){
+    pthread_mutex_lock(&master->mutex);
+     int fakedb=master->fakepeakpart[npart];
+    pthread_mutex_unlock(&master->mutex);
+    fl_rectf(ox,oy,lx,ly,140,140,140);
+    if (fakedb>0){
+      fakedb=(int)(fakedb/255.0*ly)+4;
+      fl_rectf(ox+2,oy+ly-fakedb,lx-4,fakedb,0,0,0);
+    };
+    
+    return;
   };
   
-  return;
-};
-
-//draw the vu lines
-pthread_mutex_lock(&master->mutex);
- REALTYPE db=rap2dB(master->vuoutpeakpart[npart]);
-pthread_mutex_unlock(&master->mutex);
-
-db=(MIN_DB-db)/MIN_DB; 
-if (db<0.0) db=0.0;
-  else if (db>1.0) db=1.0;
-
-db*=ly-2;
-
-int idb=(int) db;
-
-fl_rectf(ox,oy+ly-idb,lx,idb,0,200,255);
-fl_rectf(ox,oy,lx,ly-idb,0,0,0);
-
-
-//draw the scales
-REALTYPE  tmp=ly*1.0/MIN_DB;
- for (int i=1;i<1-MIN_DB;i++){
-    int ty=ly+(int) (tmp*i);
-    if (i%5==0) fl_rectf(ox,oy+ly-ty,lx,1,0,160,200);
-    if (i%10==0) fl_rectf(ox,oy+ly-ty,lx,1,0,230,240);
-};
+  //draw the vu lines
+  pthread_mutex_lock(&master->mutex);
+   REALTYPE db=rap2dB(master->vuoutpeakpart[npart]);
+  pthread_mutex_unlock(&master->mutex);
+  
+  db=(MIN_DB-db)/MIN_DB; 
+  if (db<0.0) db=0.0;
+    else if (db>1.0) db=1.0;
+  
+  db*=ly-2;
+  
+  int idb=(int) db;
+  
+  fl_rectf(ox,oy+ly-idb,lx,idb,0,200,255);
+  fl_rectf(ox,oy,lx,ly-idb,0,0,0);
+  
+  
+  //draw the scales
+  REALTYPE  tmp=ly*1.0/MIN_DB;
+   for (int i=1;i<1-MIN_DB;i++){
+      int ty=ly+(int) (tmp*i);
+      if (i%5==0) fl_rectf(ox,oy+ly-ty,lx,1,0,160,200);
+      if (i%10==0) fl_rectf(ox,oy+ly-ty,lx,1,0,230,240);
+  };
 }
 
 void VUMeter::draw() {
   if (npart>=0) draw_part();
-   else draw_master();
+     else draw_master();
 }
 
 void VUMeter::tickdraw(VUMeter *o) {
@@ -175,47 +175,47 @@ void VUMeter::tickdraw(VUMeter *o) {
 
 void VUMeter::tick(void *v) {
   tickdraw((VUMeter *) v);
-Fl::add_timeout(1.0/25.0,tick,v);//25 fps
+  Fl::add_timeout(1.0/25.0,tick,v);//25 fps
 }
 
 int VUMeter::handle(int event) {
   switch(event){
-   case FL_SHOW:
-             tick(this);
-             break;
-   case FL_HIDE:
-             Fl::remove_timeout(tick,this);
-             break;
-   case FL_PUSH:
-             if (npart>=0) break;
-             pthread_mutex_lock(&master->mutex);
-             master->vuresetpeaks();
-             pthread_mutex_unlock(&master->mutex);
-             break;
-};
-return(1);
+     case FL_SHOW:
+               tick(this);
+               break;
+     case FL_HIDE:
+               Fl::remove_timeout(tick,this);
+               break;
+     case FL_PUSH:
+               if (npart>=0) break;
+               pthread_mutex_lock(&master->mutex);
+               master->vuresetpeaks();
+               pthread_mutex_unlock(&master->mutex);
+               break;
+  };
+  return(1);
 }
 
 SysEffSend::SysEffSend(int x,int y, int w, int h, const char *label):WidgetPDial(x,y,w,h,label) {
   master=NULL;
-neff1=0;
-neff2=0;
+  neff1=0;
+  neff2=0;
 }
 
 void SysEffSend::init(Master *master_,int neff1_,int neff2_) {
   neff1=neff1_;
-neff2=neff2_;
-master=master_;
-minimum(0);
-maximum(127);
-step(1);
-labelfont(1);
-labelsize(10);
-align(FL_ALIGN_TOP);
-
-value(master->Psysefxsend[neff1][neff2]);
-char tmp[20];snprintf(tmp,20,"%d->%d",neff1+1,neff2+1);
-this->copy_label(tmp);
+  neff2=neff2_;
+  master=master_;
+  minimum(0);
+  maximum(127);
+  step(1);
+  labelfont(1);
+  labelsize(10);
+  align(FL_ALIGN_TOP);
+  
+  value(master->Psysefxsend[neff1][neff2]);
+  char tmp[20];snprintf(tmp,20,"%d->%d",neff1+1,neff2+1);
+  this->copy_label(tmp);
 }
 
 SysEffSend::~SysEffSend() {
@@ -224,10 +224,10 @@ SysEffSend::~SysEffSend() {
 
 int SysEffSend::handle(int event) {
   if ((event==FL_PUSH) || (event==FL_DRAG)){
-   master->setPsysefxsend(neff1,neff2,(int) value());
-};
-
-return(WidgetPDial::handle(event));
+     master->setPsysefxsend(neff1,neff2,(int) value());
+  };
+  
+  return(WidgetPDial::handle(event));
 }
 
 void Panellistitem::cb_partname_i(Fl_Button*, void*) {
@@ -391,42 +391,42 @@ Fl_Group* Panellistitem::make_window() {
 
 Panellistitem::Panellistitem(int x,int y, int w, int h, const char *label):Fl_Group(x,y,w,h,label) {
   npart=0;
-master=NULL;
-bankui=NULL;
+  master=NULL;
+  bankui=NULL;
 }
 
 void Panellistitem::init(Master *master_, int npart_,BankUI *bankui_) {
   npart=npart_;
-master=master_;
-bankui=bankui_;
-
-make_window();
-panellistitem->show();
-end();
+  master=master_;
+  bankui=bankui_;
+  
+  make_window();
+  panellistitem->show();
+  end();
 }
 
 void Panellistitem::refresh() {
   partenabled->value(master->part[npart]->Penabled);
-if (master->part[npart]->Penabled!=0) panellistitemgroup->activate();
-     else panellistitemgroup->deactivate();
-
-partvolume->value(master->part[npart]->Pvolume);
-partpanning->value(master->part[npart]->Ppanning);
-partrcv->value(master->part[npart]->Prcvchn);
-
-partname->label((char *)master->part[npart]->Pname);
-
-if ((int)bankui->cbwig->value()!=(npart+1))
-   panellistitemgroup->color(fl_rgb_color(160,160,160));
-else 
-   panellistitemgroup->color(fl_rgb_color(50,190,240));
-
-panellistitemgroup->redraw();
+  if (master->part[npart]->Penabled!=0) panellistitemgroup->activate();
+       else panellistitemgroup->deactivate();
+  
+  partvolume->value(master->part[npart]->Pvolume);
+  partpanning->value(master->part[npart]->Ppanning);
+  partrcv->value(master->part[npart]->Prcvchn);
+  
+  partname->label((char *)master->part[npart]->Pname);
+  
+  if ((int)bankui->cbwig->value()!=(npart+1))
+     panellistitemgroup->color(fl_rgb_color(160,160,160));
+  else 
+     panellistitemgroup->color(fl_rgb_color(50,190,240));
+  
+  panellistitemgroup->redraw();
 }
 
 Panellistitem::~Panellistitem() {
   panellistitem->hide();
-//delete(panellistitem);
+  //delete(panellistitem);
 }
 
 void MasterUI::cb_masterwindow_i(Fl_Double_Window*, void*) {
@@ -2295,210 +2295,210 @@ de to make simple the learning/using it.");
 
 void MasterUI::updatesendwindow() {
   for (int neff1=0;neff1<NUM_SYS_EFX;neff1++) 
-  for (int neff2=neff1+1;neff2<NUM_SYS_EFX;neff2++)
-    syseffsend[neff1][neff2]->value(master->Psysefxsend[neff1][neff2]);
+    for (int neff2=neff1+1;neff2<NUM_SYS_EFX;neff2++)
+      syseffsend[neff1][neff2]->value(master->Psysefxsend[neff1][neff2]);
 }
 
 void MasterUI::updatepanel() {
   for (int npart=0;npart<NUM_MIDI_PARTS;npart++){
-  panellistitem[npart]->refresh();
-};
+    panellistitem[npart]->refresh();
+  };
 }
 
 void MasterUI::setfilelabel(const char *filename) {
   if (filename!=NULL) snprintf(&masterwindowlabel[0],100,"%s - ZynAddSubFX",fl_filename_name(filename));
-  else snprintf(&masterwindowlabel[0],100,"%s","ZynAddSubFX");
-masterwindowlabel[99]='\0';
-masterwindow->label(&masterwindowlabel[0]);
-simplemasterwindow->label(&masterwindowlabel[0]);
+    else snprintf(&masterwindowlabel[0],100,"%s","ZynAddSubFX");
+  masterwindowlabel[99]='\0';
+  masterwindow->label(&masterwindowlabel[0]);
+  simplemasterwindow->label(&masterwindowlabel[0]);
 }
 
 MasterUI::MasterUI(Master *master_,int *exitprogram_) {
   master=master_;
-exitprogram=exitprogram_;
-ninseff=0;
-nsyseff=0;
-npart=0;
-
-for (int i=0;i<NUM_SYS_EFX;i++)
-   for (int j=0;j<NUM_SYS_EFX;j++)
-     syseffsend[i][j]=NULL;
-
-microtonalui=new MicrotonalUI(&master->microtonal);
-virkeyboard=new VirKeyboard(master);
-bankui=new BankUI(master,&npart);
-configui=new ConfigUI();
-sequi=new SeqUI(master);
-
-make_window();
-#ifdef OS_WINDOWS
-masterwindow->icon((char *)LoadIcon(GetModuleHandle(NULL), "zynaddsubfx_icon"));
-#endif
-presetsui=new PresetsUI();
-setfilelabel(NULL);
-swapefftype=0;
-simplerefresh();
+  exitprogram=exitprogram_;
+  ninseff=0;
+  nsyseff=0;
+  npart=0;
+  
+  for (int i=0;i<NUM_SYS_EFX;i++)
+     for (int j=0;j<NUM_SYS_EFX;j++)
+       syseffsend[i][j]=NULL;
+  
+  microtonalui=new MicrotonalUI(&master->microtonal);
+  virkeyboard=new VirKeyboard(master);
+  bankui=new BankUI(master,&npart);
+  configui=new ConfigUI();
+  sequi=new SeqUI(master);
+  
+  make_window();
+  #ifdef OS_WINDOWS
+  masterwindow->icon((char *)LoadIcon(GetModuleHandle(NULL), "zynaddsubfx_icon"));
+  #endif
+  presetsui=new PresetsUI();
+  setfilelabel(NULL);
+  swapefftype=0;
+  simplerefresh();
 }
 
 MasterUI::~MasterUI() {
   masterwindow->hide();
-delete masterwindow;
-simplemasterwindow->hide();
-delete simplemasterwindow;
-aboutwindow->hide();
-delete aboutwindow;
-syseffsendwindow->hide();
-delete syseffsendwindow;
-
-delete virkeyboard;
-delete microtonalui;
-delete bankui;
-delete configui;
-delete sequi;
-
-delete presetsui;
-delete panelwindow;
-delete selectuiwindow;
+  delete masterwindow;
+  simplemasterwindow->hide();
+  delete simplemasterwindow;
+  aboutwindow->hide();
+  delete aboutwindow;
+  syseffsendwindow->hide();
+  delete syseffsendwindow;
+  
+  delete virkeyboard;
+  delete microtonalui;
+  delete bankui;
+  delete configui;
+  delete sequi;
+  
+  delete presetsui;
+  delete panelwindow;
+  delete selectuiwindow;
 }
 
 void MasterUI::showUI() {
   switch (config.cfg.UserInterfaceMode){
-	case 0:selectuiwindow->show();
-	break;
-	case 1:masterwindow->show();
-	break;
-	case 2:simplemasterwindow->show();
-	break;
-};
+  	case 0:selectuiwindow->show();
+  	break;
+  	case 1:masterwindow->show();
+  	break;
+  	case 2:simplemasterwindow->show();
+  	break;
+  };
 }
 
 void MasterUI::simplerefresh() {
   partenabled->value(master->part[npart]->Penabled);
-if (master->part[npart]->Penabled!=0) simplelistitemgroup->activate();
-     else simplelistitemgroup->deactivate();
-
-partvolume->value(master->part[npart]->Pvolume);
-partpanning->value(master->part[npart]->Ppanning);
-partrcv->value(master->part[npart]->Prcvchn);
-
-if (master->part[npart]->Pname[0]!=0) partname->label((char *)master->part[npart]->Pname);
-	else partname->label("Click here to load a instrument");
-
-simplelistitemgroup->redraw();
-simplepartportamento->value(master->part[npart]->ctl.portamento.portamento);
-simpleminkcounter->value(master->part[npart]->Pminkey);
-simplemaxkcounter->value(master->part[npart]->Pmaxkey);
-
-simplepartkeyshiftcounter->value(master->part[npart]->Pkeyshift-64);
-simplesyseffsend->value(master->Psysefxvol[nsyseff][npart]);
+  if (master->part[npart]->Penabled!=0) simplelistitemgroup->activate();
+       else simplelistitemgroup->deactivate();
+  
+  partvolume->value(master->part[npart]->Pvolume);
+  partpanning->value(master->part[npart]->Ppanning);
+  partrcv->value(master->part[npart]->Prcvchn);
+  
+  if (master->part[npart]->Pname[0]!=0) partname->label((char *)master->part[npart]->Pname);
+  	else partname->label("Click here to load a instrument");
+  
+  simplelistitemgroup->redraw();
+  simplepartportamento->value(master->part[npart]->ctl.portamento.portamento);
+  simpleminkcounter->value(master->part[npart]->Pminkey);
+  simplemaxkcounter->value(master->part[npart]->Pmaxkey);
+  
+  simplepartkeyshiftcounter->value(master->part[npart]->Pkeyshift-64);
+  simplesyseffsend->value(master->Psysefxvol[nsyseff][npart]);
 }
 
 void MasterUI::do_new_master() {
   if (fl_choice("Clear *ALL* the parameters ?","No","Yes",NULL)){
-       delete microtonalui;
-
-       pthread_mutex_lock(&master->mutex);
-	master->defaults();
-       pthread_mutex_unlock(&master->mutex);
-	
-       npartcounter->value(1);
-       refresh_master_ui();
-
-};
-
-updatepanel();
+         delete microtonalui;
+  
+         pthread_mutex_lock(&master->mutex);
+  	master->defaults();
+         pthread_mutex_unlock(&master->mutex);
+  	
+         npartcounter->value(1);
+         refresh_master_ui();
+  
+  };
+  
+  updatepanel();
 }
 
 void MasterUI::do_load_master(const char* file ) {
   const char *filename;
-  if (file == NULL) {
-    filename=fl_file_chooser("Open:","({*.xmz})",NULL,0);
-    if (filename==NULL) return;
-  }
-  else {
-    filename = file;
-  }
-
-
-pthread_mutex_lock(&master->mutex);
-  //clear all parameters
-  master->defaults();
-
-  //load the data
-  int result=master->loadXML(filename);
-pthread_mutex_unlock(&master->mutex);
-master->applyparameters();
-
-npartcounter->value(1);
-refresh_master_ui();
-updatepanel();
-if (result>=0) setfilelabel(filename);
-
-
-if (result==-10) fl_alert("Error: Could not load the file\nbecause it is not a zynaddsubfx parameters file.");
-      else if (result<0) fl_alert("Error: Could not load the file.");
+    if (file == NULL) {
+      filename=fl_file_chooser("Open:","({*.xmz})",NULL,0);
+      if (filename==NULL) return;
+    }
+    else {
+      filename = file;
+    }
+  
+  
+  pthread_mutex_lock(&master->mutex);
+    //clear all parameters
+    master->defaults();
+  
+    //load the data
+    int result=master->loadXML(filename);
+  pthread_mutex_unlock(&master->mutex);
+  master->applyparameters();
+  
+  npartcounter->value(1);
+  refresh_master_ui();
+  updatepanel();
+  if (result>=0) setfilelabel(filename);
+  
+  
+  if (result==-10) fl_alert("Error: Could not load the file\nbecause it is not a zynaddsubfx parameters file.");
+        else if (result<0) fl_alert("Error: Could not load the file.");
 }
 
 void MasterUI::do_save_master(const char* file ) {
   const char *filename;
-char *tmp;
-  int result=0;
-  if (file == NULL) {
-    tmp=fl_file_chooser("Save:","({*.xmz})",NULL,0);
-    if (tmp==NULL) return;
-    tmp=fl_filename_setext(tmp,".xmz");
-    filename=tmp;
-    result=fileexists(tmp);
-    if (result) {
-      result=0;
-      if (!fl_choice("The file exists. Overwrite it?","No","Yes",NULL)) return;
-      
+  char *tmp;
+    int result=0;
+    if (file == NULL) {
+      tmp=fl_file_chooser("Save:","({*.xmz})",NULL,0);
+      if (tmp==NULL) return;
+      tmp=fl_filename_setext(tmp,".xmz");
+      filename=tmp;
+      result=fileexists(tmp);
+      if (result) {
+        result=0;
+        if (!fl_choice("The file exists. Overwrite it?","No","Yes",NULL)) return;
+        
+      }
     }
-  }
-  else {
-    filename = file;
-  }
-
-
-pthread_mutex_lock(&master->mutex);
-result=master->saveXML(filename);
-pthread_mutex_unlock(&master->mutex);
-
-if (result<0) fl_alert("Error: Could not save the file.");
-	else setfilelabel(filename);
-
-updatepanel();
+    else {
+      filename = file;
+    }
+  
+  
+  pthread_mutex_lock(&master->mutex);
+  result=master->saveXML(filename);
+  pthread_mutex_unlock(&master->mutex);
+  
+  if (result<0) fl_alert("Error: Could not save the file.");
+  	else setfilelabel(filename);
+  
+  updatepanel();
 }
 
 void MasterUI::refresh_master_ui() {
   ninseff=0;
-nsyseff=0;
-npart=0;
-
-//the Master UI
-npartcounter->do_callback();
-syseffnocounter->do_callback();
-inseffnocounter->do_callback();
-masterkeyshiftcounter->value(master->Pkeyshift-64);
-mastervolumedial->value(master->Pvolume);    
-globalfinedetuneslider->value(master->microtonal.Pglobalfinedetune);   
-microtonalui=new MicrotonalUI(&master->microtonal);
-nrpnbutton->value(master->ctl.NRPN.receive);
-updatesendwindow();
-updatepanel();
-
-//the simle MasterUI
-simplenpartcounter->value(1);
-simplesyseffnocounter->value(1);
-simpleinseffnocounter->value(1);
-simplenpartcounter->do_callback();
-simplesyseffnocounter->do_callback();
-simpleinseffnocounter->do_callback();
-simplemasterkeyshiftcounter->value(master->Pkeyshift-64);
-simplemastervolumedial->value(master->Pvolume);    
-simpleglobalfinedetuneslider->value(master->microtonal.Pglobalfinedetune);
-virkeys->midich=master->part[npart]->Prcvchn;
-
-simplerefresh();
-bankui->hide();
+  nsyseff=0;
+  npart=0;
+  
+  //the Master UI
+  npartcounter->do_callback();
+  syseffnocounter->do_callback();
+  inseffnocounter->do_callback();
+  masterkeyshiftcounter->value(master->Pkeyshift-64);
+  mastervolumedial->value(master->Pvolume);    
+  globalfinedetuneslider->value(master->microtonal.Pglobalfinedetune);   
+  microtonalui=new MicrotonalUI(&master->microtonal);
+  nrpnbutton->value(master->ctl.NRPN.receive);
+  updatesendwindow();
+  updatepanel();
+  
+  //the simle MasterUI
+  simplenpartcounter->value(1);
+  simplesyseffnocounter->value(1);
+  simpleinseffnocounter->value(1);
+  simplenpartcounter->do_callback();
+  simplesyseffnocounter->do_callback();
+  simpleinseffnocounter->do_callback();
+  simplemasterkeyshiftcounter->value(master->Pkeyshift-64);
+  simplemastervolumedial->value(master->Pvolume);    
+  simpleglobalfinedetuneslider->value(master->microtonal.Pglobalfinedetune);
+  virkeys->midich=master->part[npart]->Prcvchn;
+  
+  simplerefresh();
+  bankui->hide();
 }

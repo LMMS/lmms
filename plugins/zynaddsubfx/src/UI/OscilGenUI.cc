@@ -14,174 +14,175 @@ OscilSpectrum::OscilSpectrum(int x,int y, int w, int h, const char *label):Fl_Bo
 
 void OscilSpectrum::init(OscilGen *oscil_,int oscbase_,Master *master_) {
   oscil=oscil_;
-oscbase=oscbase_;
-master=master_;
+  oscbase=oscbase_;
+  master=master_;
 }
 
 void OscilSpectrum::draw() {
   int ox=x(),oy=y(),lx=w(),ly=h(),i;
-const int maxdb=60;//must be multiple of 10
-int GX=2;
-int n=lx/GX-1;
-if (n>OSCIL_SIZE/2) n=OSCIL_SIZE/2;
-
-REALTYPE x;
-REALTYPE* spc=new REALTYPE[n];
-for (i=0;i<n;i++) spc[i]=0.0;
-
-pthread_mutex_lock(&master->mutex);
-if (oscbase==0) oscil->getspectrum(n,spc,0);
-    else oscil->getspectrum(n,spc,1);
-pthread_mutex_unlock(&master->mutex);
-
-//normalize
-REALTYPE max=0;
-for (i=0;i<n;i++){
-   x=fabs(spc[i]);
-   if (max<x) max=x;
-}
-if (max<0.000001) max=1.0;
-max=max*1.05;
-
-//draw
-
-if (this->active_r()) fl_color(this->parent()->selection_color());
-    else fl_color(this->parent()->color());
-fl_line_style(FL_DOT);
-
-for (i=1;i<maxdb/10;i++){
-  int ky=(int)((REALTYPE)i*ly*10.0/maxdb)/2;
-  ky*=2;
-  fl_line(ox,oy+ky-1,ox+lx-2,oy+ky-1);
-};
-
-for (i=2;i<n;i++){
-    int tmp=i*GX-2;
-    if (i%10==1) fl_line_style(0);
-       else fl_line_style(FL_DOT);
-    fl_line(ox+tmp,oy+2,ox+tmp,oy+ly-2);
-}
-
-if (this->active_r()) fl_color(this->parent()->labelcolor());
-    else fl_color(this->parent()->color());
-fl_line_style(0);
-
-//draws the spectrum
-for (i=0;i<n;i++){
-   int tmp=i*GX+2;
-   x=spc[i]/max;
-   
-   if (x>dB2rap(-maxdb)) x=rap2dB(x)/maxdb+1;
-       else x=0;
-
-   int val=(int) ((ly-2)*x);
-   if (val>0) fl_line(ox+tmp,oy+ly-2-val,ox+tmp,oy+ly-2);
-}
-delete [] spc;
+  const int maxdb=60;//must be multiple of 10
+  int GX=2;
+  int n=lx/GX-1;
+  if (n>OSCIL_SIZE/2) n=OSCIL_SIZE/2;
+  
+  REALTYPE x;
+  REALTYPE* spc=new REALTYPE[n];
+  for (i=0;i<n;i++) spc[i]=0.0;
+  
+  pthread_mutex_lock(&master->mutex);
+  if (oscbase==0) oscil->getspectrum(n,spc,0);
+      else oscil->getspectrum(n,spc,1);
+  pthread_mutex_unlock(&master->mutex);
+  
+  //normalize
+  REALTYPE max=0;
+  for (i=0;i<n;i++){
+     x=fabs(spc[i]);
+     if (max<x) max=x;
+  }
+  if (max<0.000001) max=1.0;
+  max=max*1.05;
+  
+  //draw
+  
+  if (this->active_r()) fl_color(this->parent()->selection_color());
+      else fl_color(this->parent()->color());
+  fl_line_style(FL_DOT);
+  
+  for (i=1;i<maxdb/10;i++){
+    int ky=(int)((REALTYPE)i*ly*10.0/maxdb)/2;
+    ky*=2;
+    fl_line(ox,oy+ky-1,ox+lx-2,oy+ky-1);
+  };
+  
+  for (i=2;i<n;i++){
+      int tmp=i*GX-2;
+      if (i%10==1) fl_line_style(0);
+         else fl_line_style(FL_DOT);
+      fl_line(ox+tmp,oy+2,ox+tmp,oy+ly-2);
+  }
+  
+  if (this->active_r()) fl_color(this->parent()->labelcolor());
+      else fl_color(this->parent()->color());
+  fl_line_style(0);
+  
+  //draws the spectrum
+  for (i=0;i<n;i++){
+     int tmp=i*GX+2;
+     x=spc[i]/max;
+     
+     if (x>dB2rap(-maxdb)) x=rap2dB(x)/maxdb+1;
+         else x=0;
+  
+     int val=(int) ((ly-2)*x);
+     if (val>0) fl_line(ox+tmp,oy+ly-2-val,ox+tmp,oy+ly-2);
+  }
+  delete [] spc;
 }
 
 PSlider::PSlider(int x,int y, int w, int h, const char *label):Fl_Slider(x,y,w,h,label) {
+  ;
 }
 
 int PSlider::handle(int event) {
   int X=x(),Y=y(),W=w(),H=h();
-
-if ((!Fl::event_buttons())|| (event==0)||(Fl::event_shift()==0)) return(Fl_Slider::handle(event));
-
-if (!Fl::event_inside(X,Y,W,H)) {
-	if (event==FL_DRAG){
-		Fl_Slider::handle(FL_RELEASE);
-		Fl_Slider::handle(FL_LEAVE);
-		deactivate();
-		activate();
-		return(1);	
-	}else{
-		return(Fl_Slider::handle(event));
-	};
-} else {
-	//Fl_Slider::handle(FL_FOCUS);
-	Fl_Slider::handle(FL_PUSH);
-};
-
-return(1);
+  
+  if ((!Fl::event_buttons())|| (event==0)||(Fl::event_shift()==0)) return(Fl_Slider::handle(event));
+  
+  if (!Fl::event_inside(X,Y,W,H)) {
+  	if (event==FL_DRAG){
+  		Fl_Slider::handle(FL_RELEASE);
+  		Fl_Slider::handle(FL_LEAVE);
+  		deactivate();
+  		activate();
+  		return(1);	
+  	}else{
+  		return(Fl_Slider::handle(event));
+  	};
+  } else {
+  	//Fl_Slider::handle(FL_FOCUS);
+  	Fl_Slider::handle(FL_PUSH);
+  };
+  
+  return(1);
 }
 
 Oscilloscope::Oscilloscope(int x,int y, int w, int h, const char *label):Fl_Box(x,y,w,h,label) {
   oscil=NULL;
-phase=64;
-oscbase=0;
+  phase=64;
+  oscbase=0;
 }
 
 void Oscilloscope::init(OscilGen *oscil_,Master *master_) {
   oscil=oscil_;
-master=master_;
+  master=master_;
 }
 
 void Oscilloscope::init(OscilGen *oscil_,int oscbase_,Master *master_) {
   oscil=oscil_;
-oscbase=oscbase_;
-master=master_;
+  oscbase=oscbase_;
+  master=master_;
 }
 
 void Oscilloscope::init(OscilGen *oscil_,int oscbase_,int phase_,Master *master_) {
   oscil=oscil_;
-oscbase=oscbase_;
-phase=phase_;
-master=master_;
+  oscbase=oscbase_;
+  phase=phase_;
+  master=master_;
 }
 
 void Oscilloscope::draw() {
   int ox=x(),oy=y(),lx=w(),ly=h()-1,i;
-REALTYPE smps[OSCIL_SIZE];
-pthread_mutex_lock(&master->mutex);
-if (oscbase==0) oscil->get(smps,-1.0);
-    else oscil->getcurrentbasefunction(smps);
-pthread_mutex_unlock(&master->mutex);
-
-if (damage()!=1){
- fl_color(0,0,0);
- fl_rectf(ox,oy,lx,ly);
-};
-
-//normalize
-REALTYPE max=0;
-for (i=0;i<OSCIL_SIZE;i++)
-   if (max<fabs(smps[i])) max=fabs(smps[i]);
-//fprintf(stderr,"%.4f\n",max);
-if (max<0.00001) max=1.0;
-max=-max*1.05;
-
-//draw
-fl_line_style(FL_DASH);
-if (this->active_r()) fl_color(this->parent()->labelcolor());
-    else fl_color(this->parent()->color());
-int GX=16;if (lx<GX*3) GX=-1;
-for (i=1;i<GX;i++){
-   int tmp=(int)(lx/(REALTYPE)GX*i);
-   fl_line(ox+tmp,oy+2,ox+tmp,oy+ly-2);
-};
-int GY=8;if (ly<GY*3) GY=-1;
-for (i=1;i<GY;i++){
-   int tmp=(int)(ly/(REALTYPE)GY*i);
-   fl_line(ox+2,oy+tmp,ox+lx-2,oy+tmp);
-};
-
-//draw the function
-fl_line_style(0,1);
-fl_line(ox+2,oy+ly/2,ox+lx-2,oy+ly/2);
-if (this->active_r()) fl_color(this->parent()->selection_color());
-    else fl_color(this->parent()->labelcolor());
-int lw=1;
-//if ((lx<135)||(ly<135)) lw=1;
-fl_line_style(0,lw);
-int ph=(int)((phase-64.0)/128.0*OSCIL_SIZE+OSCIL_SIZE);
-for (i=1;i<lx;i++){
-   int k1=(int)((REALTYPE)OSCIL_SIZE*(i-1)/lx)+ph;
-   int k2=(int)((REALTYPE)OSCIL_SIZE*i/lx)+ph;
-   REALTYPE y1=smps[k1%OSCIL_SIZE]/max;
-   REALTYPE y2=smps[k2%OSCIL_SIZE]/max;
-   fl_line(i-1+ox,(int)(y1*ly/2.0)+oy+ly/2,i+ox,(int)(y2*ly/2.0)+oy+ly/2);
-};
+  REALTYPE smps[OSCIL_SIZE];
+  pthread_mutex_lock(&master->mutex);
+  if (oscbase==0) oscil->get(smps,-1.0);
+      else oscil->getcurrentbasefunction(smps);
+  pthread_mutex_unlock(&master->mutex);
+  
+  if (damage()!=1){
+   fl_color(0,0,0);
+   fl_rectf(ox,oy,lx,ly);
+  };
+  
+  //normalize
+  REALTYPE max=0;
+  for (i=0;i<OSCIL_SIZE;i++)
+     if (max<fabs(smps[i])) max=fabs(smps[i]);
+  //fprintf(stderr,"%.4f\n",max);
+  if (max<0.00001) max=1.0;
+  max=-max*1.05;
+  
+  //draw
+  fl_line_style(FL_DASH);
+  if (this->active_r()) fl_color(this->parent()->labelcolor());
+      else fl_color(this->parent()->color());
+  int GX=16;if (lx<GX*3) GX=-1;
+  for (i=1;i<GX;i++){
+     int tmp=(int)(lx/(REALTYPE)GX*i);
+     fl_line(ox+tmp,oy+2,ox+tmp,oy+ly-2);
+  };
+  int GY=8;if (ly<GY*3) GY=-1;
+  for (i=1;i<GY;i++){
+     int tmp=(int)(ly/(REALTYPE)GY*i);
+     fl_line(ox+2,oy+tmp,ox+lx-2,oy+tmp);
+  };
+  
+  //draw the function
+  fl_line_style(0,1);
+  fl_line(ox+2,oy+ly/2,ox+lx-2,oy+ly/2);
+  if (this->active_r()) fl_color(this->parent()->selection_color());
+      else fl_color(this->parent()->labelcolor());
+  int lw=1;
+  //if ((lx<135)||(ly<135)) lw=1;
+  fl_line_style(0,lw);
+  int ph=(int)((phase-64.0)/128.0*OSCIL_SIZE+OSCIL_SIZE);
+  for (i=1;i<lx;i++){
+     int k1=(int)((REALTYPE)OSCIL_SIZE*(i-1)/lx)+ph;
+     int k2=(int)((REALTYPE)OSCIL_SIZE*i/lx)+ph;
+     REALTYPE y1=smps[k1%OSCIL_SIZE]/max;
+     REALTYPE y2=smps[k2%OSCIL_SIZE]/max;
+     fl_line(i-1+ox,(int)(y1*ly/2.0)+oy+ly/2,i+ox,(int)(y2*ly/2.0)+oy+ly/2);
+  };
 }
 
 void Oscilharmonic::cb_mag_i(PSlider* o, void*) {
@@ -308,36 +309,36 @@ Fl_Group* Oscilharmonic::make_window() {
 
 Oscilharmonic::Oscilharmonic(int x,int y, int w, int h, const char *label):Fl_Group(x,y,w,h,label) {
   n=0;
-oscil=NULL;
-display=NULL;
-applybutton=NULL;
-cbwidget=NULL;
+  oscil=NULL;
+  display=NULL;
+  applybutton=NULL;
+  cbwidget=NULL;
 }
 
 void Oscilharmonic::init(OscilGen *oscil_,int n_,Fl_Group *display_,Fl_Widget *oldosc_,Fl_Widget *cbwidget_,Fl_Widget *applybutton_, Master *master_) {
   oscil=oscil_;
-n=n_;
-display=display_;
-master=master_;
-oldosc=oldosc_;
-cbwidget=cbwidget_;
-applybutton=applybutton_;
-make_window();
-end();
-harmonic->show();
+  n=n_;
+  display=display_;
+  master=master_;
+  oldosc=oldosc_;
+  cbwidget=cbwidget_;
+  applybutton=applybutton_;
+  make_window();
+  end();
+  harmonic->show();
 }
 
 void Oscilharmonic::refresh() {
   mag->value(127-oscil->Phmag[n]);
-phase->value(oscil->Phphase[n]);
-
-if (oscil->Phmag[n]==64) mag->selection_color(0);
-    else mag->selection_color(222);
+  phase->value(oscil->Phphase[n]);
+  
+  if (oscil->Phmag[n]==64) mag->selection_color(0);
+      else mag->selection_color(222);
 }
 
 Oscilharmonic::~Oscilharmonic() {
   harmonic->hide();
-//delete(harmonic);
+  //delete(harmonic);
 }
 
 void OscilEditor::cb_applybutton_i(Fl_Button*, void*) {
@@ -1330,80 +1331,80 @@ Fl_Double_Window* OscilEditor::make_window() {
 
 OscilEditor::OscilEditor(OscilGen *oscil_,Fl_Widget *oldosc_,Fl_Widget *cbwidget_,Fl_Widget *cbapplywidget_,Master *master_) {
   oscil=oscil_;
-oldosc=oldosc_;
-cbwidget=cbwidget_;
-cbapplywidget=cbapplywidget_;
-master=master_;
-
-make_window();
-
-refresh();
-osceditUI->show();
+  oldosc=oldosc_;
+  cbwidget=cbwidget_;
+  cbapplywidget=cbapplywidget_;
+  master=master_;
+  
+  make_window();
+  
+  refresh();
+  osceditUI->show();
 }
 
 OscilEditor::~OscilEditor() {
   osceditUI->hide();
-//for (int i=0;i<MAX_AD_HARMONICS;i++) delete (h[i]);
-delete (osceditUI);
+  //for (int i=0;i<MAX_AD_HARMONICS;i++) delete (h[i]);
+  delete (osceditUI);
 }
 
 void OscilEditor::refresh() {
   magtype->value(oscil->Phmagtype);
-rndslider->value(oscil->Prand-64);
-
-hrndtype->value(oscil->Pamprandtype);
-hrnddial->value(oscil->Pamprandpower);
-
-bftype->value(oscil->Pcurrentbasefunc);
-bfparval->value(oscil->Pbasefuncpar-64);
-bfslider->value(oscil->Pbasefuncpar-64);
-
-bfmodtype->value(oscil->Pbasefuncmodulation);
-bfmodpar1->value(oscil->Pbasefuncmodulationpar1);
-bfmodpar2->value(oscil->Pbasefuncmodulationpar2);
-bfmodpar3->value(oscil->Pbasefuncmodulationpar3);
-
-wshbutton->value(oscil->Pwaveshapingfunction);
-wsparval->value(oscil->Pwaveshaping-64);
-wshpar->value(oscil->Pwaveshaping-64);
-
-fltbutton->value(oscil->Pfiltertype);
-filtervalue1->value(oscil->Pfilterpar1);
-filtervalue2->value(oscil->Pfilterpar2);
-filterpref->value(oscil->Pfilterbeforews);
-
-modtype->value(oscil->Pmodulation);
-modpar1->value(oscil->Pmodulationpar1);
-modpar2->value(oscil->Pmodulationpar2);
-modpar3->value(oscil->Pmodulationpar3);
-
-sabutton->value(oscil->Psatype);
-sadjpar->value(oscil->Psapar);
-
-harmonicshiftcounter->value(oscil->Pharmonicshift);
-harmonicshiftpre->value(oscil->Pharmonicshiftfirst);
-
-adhrtype->value(oscil->Padaptiveharmonics);
-adhrbf->value(oscil->Padaptiveharmonicsbasefreq);
-adhrpow->value(oscil->Padaptiveharmonicspower);
-adhrtype->value(oscil->Padaptiveharmonicspar);
-
-for (int i=0;i<MAX_AD_HARMONICS;i++) h[i]->refresh();
-
-pthread_mutex_lock(&master->mutex);
- oscil->prepare();
-pthread_mutex_unlock(&master->mutex);
-
-basefuncdisplaygroup->redraw();
-redrawoscil();
+  rndslider->value(oscil->Prand-64);
+  
+  hrndtype->value(oscil->Pamprandtype);
+  hrnddial->value(oscil->Pamprandpower);
+  
+  bftype->value(oscil->Pcurrentbasefunc);
+  bfparval->value(oscil->Pbasefuncpar-64);
+  bfslider->value(oscil->Pbasefuncpar-64);
+  
+  bfmodtype->value(oscil->Pbasefuncmodulation);
+  bfmodpar1->value(oscil->Pbasefuncmodulationpar1);
+  bfmodpar2->value(oscil->Pbasefuncmodulationpar2);
+  bfmodpar3->value(oscil->Pbasefuncmodulationpar3);
+  
+  wshbutton->value(oscil->Pwaveshapingfunction);
+  wsparval->value(oscil->Pwaveshaping-64);
+  wshpar->value(oscil->Pwaveshaping-64);
+  
+  fltbutton->value(oscil->Pfiltertype);
+  filtervalue1->value(oscil->Pfilterpar1);
+  filtervalue2->value(oscil->Pfilterpar2);
+  filterpref->value(oscil->Pfilterbeforews);
+  
+  modtype->value(oscil->Pmodulation);
+  modpar1->value(oscil->Pmodulationpar1);
+  modpar2->value(oscil->Pmodulationpar2);
+  modpar3->value(oscil->Pmodulationpar3);
+  
+  sabutton->value(oscil->Psatype);
+  sadjpar->value(oscil->Psapar);
+  
+  harmonicshiftcounter->value(oscil->Pharmonicshift);
+  harmonicshiftpre->value(oscil->Pharmonicshiftfirst);
+  
+  adhrtype->value(oscil->Padaptiveharmonics);
+  adhrbf->value(oscil->Padaptiveharmonicsbasefreq);
+  adhrpow->value(oscil->Padaptiveharmonicspower);
+  adhrtype->value(oscil->Padaptiveharmonicspar);
+  
+  for (int i=0;i<MAX_AD_HARMONICS;i++) h[i]->refresh();
+  
+  pthread_mutex_lock(&master->mutex);
+   oscil->prepare();
+  pthread_mutex_unlock(&master->mutex);
+  
+  basefuncdisplaygroup->redraw();
+  redrawoscil();
 }
 
 void OscilEditor::redrawoscil() {
   oscildisplaygroup->redraw();
-oldosc->redraw();
-if (cbwidget!=NULL) {
-      cbwidget->do_callback();
-      applybutton->color(FL_RED);
-      applybutton->redraw();
-};
+  oldosc->redraw();
+  if (cbwidget!=NULL) {
+        cbwidget->do_callback();
+        applybutton->color(FL_RED);
+        applybutton->redraw();
+  };
 }

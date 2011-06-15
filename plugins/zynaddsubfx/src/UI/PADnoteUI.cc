@@ -12,63 +12,63 @@ PADnoteHarmonicProfile::PADnoteHarmonicProfile(int x,int y, int w, int h, const 
 
 void PADnoteHarmonicProfile::init(PADnoteParameters *pars,Master *master_) {
   master=master_;
-this->pars=pars;
+  this->pars=pars;
 }
 
 void PADnoteHarmonicProfile::draw() {
   int ox=x(),oy=y(),lx=w(),ly=h();
-if (!visible()) return;
-REALTYPE smps[lx];
-
-REALTYPE realbw=pars->getprofile(smps,lx);
-bool active=active_r();
-
-//draw the equivalent bandwidth
-if (active) fl_color(220,220,220);
- else fl_color(160,165,165);
-fl_line_style(0);
-int rbw=(int)(realbw*(lx-1.0)/2.0);
-for (int i=lx/2-rbw;i<(lx/2+rbw);i++) fl_line(ox+i,oy,ox+i,oy+ly-1);
-
-fl_line_style(0);
-if (active) fl_color(200,200,200);
- else  fl_color(160,160,160);
-for (int i=1;i<10;i++){
-	int kx=(int)(lx/10.0*i);
-	fl_line(ox+kx,oy,ox+kx,oy+ly-1);
-};
-for (int i=1;i<5;i++){
-	int ky=(int)(ly/5.0*i);
-	fl_line(ox,oy+ly-ky,ox+lx,oy+ly-ky-1);
-};
-
-
-fl_color(120,120,120);
-fl_line_style(FL_DOT);
-fl_line(ox+lx/2,oy,ox+lx/2,oy+ly);
-
-//draw the graph
-fl_line_style(0);
-int old=0;
-for (int i=0;i<lx;i++){
-   int val=(int) ((ly-2)*smps[i]);
-   if (active) fl_color(180,210,240);
-      else fl_color(150,150,155);
-   fl_line(ox+i,oy+ly-1,ox+i,oy+ly-1-val);
-   if (active) fl_color(0,0,100);
-       else fl_color(150,150,150);
-   if (i>0) fl_line(ox+i-1,oy+ly-2-old,ox+i,oy+ly-2-val);
-   old=val;   
-};
-
-
-fl_line_style(FL_DASH);
-if (active) fl_color(0,100,220);
-    else fl_color(150,160,170);
-fl_line(ox+lx/2-rbw,oy,ox+lx/2-rbw,oy+ly-1);
-fl_line(ox+lx/2+rbw,oy,ox+lx/2+rbw,oy+ly-1);
-
-fl_line_style(0);
+  if (!visible()) return;
+  REALTYPE smps[lx];
+  
+  REALTYPE realbw=pars->getprofile(smps,lx);
+  bool active=active_r();
+  
+  //draw the equivalent bandwidth
+  if (active) fl_color(220,220,220);
+   else fl_color(160,165,165);
+  fl_line_style(0);
+  int rbw=(int)(realbw*(lx-1.0)/2.0);
+  for (int i=lx/2-rbw;i<(lx/2+rbw);i++) fl_line(ox+i,oy,ox+i,oy+ly-1);
+  
+  fl_line_style(0);
+  if (active) fl_color(200,200,200);
+   else  fl_color(160,160,160);
+  for (int i=1;i<10;i++){
+  	int kx=(int)(lx/10.0*i);
+  	fl_line(ox+kx,oy,ox+kx,oy+ly-1);
+  };
+  for (int i=1;i<5;i++){
+  	int ky=(int)(ly/5.0*i);
+  	fl_line(ox,oy+ly-ky,ox+lx,oy+ly-ky-1);
+  };
+  
+  
+  fl_color(120,120,120);
+  fl_line_style(FL_DOT);
+  fl_line(ox+lx/2,oy,ox+lx/2,oy+ly);
+  
+  //draw the graph
+  fl_line_style(0);
+  int old=0;
+  for (int i=0;i<lx;i++){
+     int val=(int) ((ly-2)*smps[i]);
+     if (active) fl_color(180,210,240);
+        else fl_color(150,150,155);
+     fl_line(ox+i,oy+ly-1,ox+i,oy+ly-1-val);
+     if (active) fl_color(0,0,100);
+         else fl_color(150,150,150);
+     if (i>0) fl_line(ox+i-1,oy+ly-2-old,ox+i,oy+ly-2-val);
+     old=val;   
+  };
+  
+  
+  fl_line_style(FL_DASH);
+  if (active) fl_color(0,100,220);
+      else fl_color(150,160,170);
+  fl_line(ox+lx/2-rbw,oy,ox+lx/2-rbw,oy+ly-1);
+  fl_line(ox+lx/2+rbw,oy,ox+lx/2+rbw,oy+ly-1);
+  
+  fl_line_style(0);
 }
 
 PADnoteOvertonePosition::PADnoteOvertonePosition(int x,int y, int w, int h, const char *label):Fl_Box(x,y,w,h,label) {
@@ -77,89 +77,89 @@ PADnoteOvertonePosition::PADnoteOvertonePosition(int x,int y, int w, int h, cons
 
 void PADnoteOvertonePosition::init(PADnoteParameters *pars,Master *master_) {
   master=master_;
-this->pars=pars;
+  this->pars=pars;
 }
 
 void PADnoteOvertonePosition::draw() {
   if (!visible()) return;
-const int maxdb=60;
-
-int ox=x(),oy=y(),lx=w(),ly=h();
-const int maxharmonic=64;
-
-
-for (int i=1;i<maxharmonic;i++){
-	fl_color(200,200,200);
-	fl_line_style(FL_DOT);
-	if (i%5==0) fl_line_style(0);
-	if (i%10==0) fl_color(160,160,160);
-	int kx=(int)(lx/(REALTYPE)maxharmonic*i);
-	fl_line(ox+kx,oy,ox+kx,oy+ly);
-};
-
-
-
-int n=OSCIL_SIZE/2;
-REALTYPE spc[n];
-for (int i=0;i<n;i++) spc[i]=0.0;
-
-pthread_mutex_lock(&master->mutex);
-pars->oscilgen->getspectrum(n,spc,0);
-pthread_mutex_unlock(&master->mutex);
-
-
-//normalize
-REALTYPE max=0;
-for (int i=0;i<n;i++){
-   REALTYPE x=fabs(spc[i]);
-   if (max<x) max=x;
-}
-if (max<0.000001) max=1.0;
-max=max*1.05;
-
-REALTYPE spectrum[lx];
-for (int i=0;i<lx;i++) spectrum[i]=0;
-
-
-for (int i=1;i<n;i++){
-	REALTYPE nhr=pars->getNhr(i);
-	int kx=(int)(lx/(REALTYPE)maxharmonic*nhr);
-	if ((kx<0)||(kx>lx)) continue;
-
-        spectrum[kx]=spc[i-1]/max+1e-9;
-
-};
-
-fl_color(180,0,0);
-fl_line_style(0);
-
-if (pars->Pmode==2){
-   int old=0;
-   for (int i=1;i<lx;i++){
-	if ((spectrum[i]>1e-10)||(i==(lx-1))){
-		int delta=i-old;
-		REALTYPE val1=spectrum[old];
-		REALTYPE val2=spectrum[i];
-
-		REALTYPE idelta=1.0/delta;
-		for (int j=0;j<delta;j++){
-			REALTYPE x=idelta*j;
-			spectrum[old+j]=val1*(1.0-x)+val2*x;
-		};
-		old=i;
-	};
-      
-   };
-};
-
-for (int i=0;i<lx;i++){
-	REALTYPE x=spectrum[i];
-        if (x>dB2rap(-maxdb)) x=rap2dB(x)/maxdb+1;
-             else continue;
-       	int yy=(int)(x*ly);
-	fl_line(ox+i,oy+ly-1-yy,ox+i,oy+ly-1);
-      
-};
+  const int maxdb=60;
+  
+  int ox=x(),oy=y(),lx=w(),ly=h();
+  const int maxharmonic=64;
+  
+  
+  for (int i=1;i<maxharmonic;i++){
+  	fl_color(200,200,200);
+  	fl_line_style(FL_DOT);
+  	if (i%5==0) fl_line_style(0);
+  	if (i%10==0) fl_color(160,160,160);
+  	int kx=(int)(lx/(REALTYPE)maxharmonic*i);
+  	fl_line(ox+kx,oy,ox+kx,oy+ly);
+  };
+  
+  
+  
+  int n=OSCIL_SIZE/2;
+  REALTYPE spc[n];
+  for (int i=0;i<n;i++) spc[i]=0.0;
+  
+  pthread_mutex_lock(&master->mutex);
+  pars->oscilgen->getspectrum(n,spc,0);
+  pthread_mutex_unlock(&master->mutex);
+  
+  
+  //normalize
+  REALTYPE max=0;
+  for (int i=0;i<n;i++){
+     REALTYPE x=fabs(spc[i]);
+     if (max<x) max=x;
+  }
+  if (max<0.000001) max=1.0;
+  max=max*1.05;
+  
+  REALTYPE spectrum[lx];
+  for (int i=0;i<lx;i++) spectrum[i]=0;
+  
+  
+  for (int i=1;i<n;i++){
+  	REALTYPE nhr=pars->getNhr(i);
+  	int kx=(int)(lx/(REALTYPE)maxharmonic*nhr);
+  	if ((kx<0)||(kx>lx)) continue;
+  
+          spectrum[kx]=spc[i-1]/max+1e-9;
+  
+  };
+  
+  fl_color(180,0,0);
+  fl_line_style(0);
+  
+  if (pars->Pmode==2){
+     int old=0;
+     for (int i=1;i<lx;i++){
+  	if ((spectrum[i]>1e-10)||(i==(lx-1))){
+  		int delta=i-old;
+  		REALTYPE val1=spectrum[old];
+  		REALTYPE val2=spectrum[i];
+  
+  		REALTYPE idelta=1.0/delta;
+  		for (int j=0;j<delta;j++){
+  			REALTYPE x=idelta*j;
+  			spectrum[old+j]=val1*(1.0-x)+val2*x;
+  		};
+  		old=i;
+  	};
+        
+     };
+  };
+  
+  for (int i=0;i<lx;i++){
+  	REALTYPE x=spectrum[i];
+          if (x>dB2rap(-maxdb)) x=rap2dB(x)/maxdb+1;
+               else continue;
+         	int yy=(int)(x*ly);
+  	fl_line(ox+i,oy+ly-1-yy,ox+i,oy+ly-1);
+        
+  };
 }
 
 void PADnoteUI::cb__i(Fl_Tabs* o, void*) {
@@ -690,10 +690,10 @@ void PADnoteUI::cb_export(Fl_Button* o, void* v) {
 
 PADnoteUI::PADnoteUI(PADnoteParameters *parameters,Master *master_) {
   pars=parameters;
-master=master_;
-oscui=NULL;
-resui=new ResonanceUI(pars->resonance);
-make_window();
+  master=master_;
+  oscui=NULL;
+  resui=new ResonanceUI(pars->resonance);
+  make_window();
 }
 
 Fl_Double_Window* PADnoteUI::make_window() {
@@ -1403,102 +1403,102 @@ cy)");
 
 void PADnoteUI::refresh() {
   volume->value(pars->PVolume);
-vsns->value(pars->PAmpVelocityScaleFunction);
-pan->value(pars->PPanning);
-
-stereo->value(pars->PStereo);
-
-
-pstr->value(pars->PPunchStrength);
-pt->value(pars->PPunchTime);
-pstc->value(pars->PPunchStretch);
-pvel->value(pars->PPunchVelocitySensing);
-
-detunevalueoutput->value(getdetune(pars->PDetuneType,0,pars->PDetune));
-detune->value(pars->PDetune-8192);
-
-int k=pars->PCoarseDetune/1024;if (k>=8) k-=16;
-octave->value(k);
-
-detunetype->value(pars->PDetuneType-1);
-k=pars->PCoarseDetune%1024;if (k>=512) k-=1024;
-coarsedet->value(k);
-
-hz440->value(pars->Pfixedfreq);
-fixedfreqetdial->value(pars->PfixedfreqET);
-
-amplfo->refresh();
-freqlfo->refresh();
-filterlfo->refresh();
-
-ampenv->refresh();
-freqenv->refresh();
-filterenv->refresh();
-filterui->refresh();
-
-
-/* harmonic structure parametrs */
-
-resui->refresh();
-if (oscui!=NULL) oscui->refresh();
-
-hpbasetype->value(pars->Php.base.type);
-hpbasepar1->value(pars->Php.base.par1);
-hpfreqmult->value(pars->Php.freqmult);
-
-hpmpar1->value(pars->Php.modulator.par1);
-hpmfreq->value(pars->Php.modulator.freq);
-hpwidth->value(pars->Php.width);
-
-hponehalf->value(pars->Php.onehalf);
-hpamptype->value(pars->Php.amp.type);
-hpampmode->value(pars->Php.amp.mode);
-hpamppar1->value(pars->Php.amp.par1);
-hpamppar2->value(pars->Php.amp.par2);
-hpautoscale->value(pars->Php.autoscale);
-
-bwdial->value(pars->Pbandwidth);
-if (pars->Pmode==0){
-   bwprofilegroup->activate();
-   bwdial->activate();
-   bwcents->activate();
-   hprofile->activate();
-   hprofile->color(54);
-   bwscale->activate();
-} else {
-   bwprofilegroup->deactivate();
-   bwdial->deactivate();
-   bwcents->deactivate();
-   hprofile->deactivate();
-   hprofile->color(48);
-   bwscale->activate();
-};
-
-spectrummode->value(pars->Pmode);
-
-qbasenote->value(pars->Pquality.basenote);
-qsmpoct->value(pars->Pquality.smpoct);
-qoct->value(pars->Pquality.oct);
-qsamplesize->value(pars->Pquality.samplesize);
-
-hrpostype->value(pars->Phrpos.type);
-hrpospar1->value(pars->Phrpos.par1);
-hrpospar2->value(pars->Phrpos.par2);
-hrpospar3->value(pars->Phrpos.par3);
-
-hprofile->redraw();
-overtonepos->redraw();
-
-osc->redraw();
-pars->applyparameters(true);
-applybutton->color(FL_GRAY);
-applybutton->parent()->redraw();
+  vsns->value(pars->PAmpVelocityScaleFunction);
+  pan->value(pars->PPanning);
+  
+  stereo->value(pars->PStereo);
+  
+  
+  pstr->value(pars->PPunchStrength);
+  pt->value(pars->PPunchTime);
+  pstc->value(pars->PPunchStretch);
+  pvel->value(pars->PPunchVelocitySensing);
+  
+  detunevalueoutput->value(getdetune(pars->PDetuneType,0,pars->PDetune));
+  detune->value(pars->PDetune-8192);
+  
+  int k=pars->PCoarseDetune/1024;if (k>=8) k-=16;
+  octave->value(k);
+  
+  detunetype->value(pars->PDetuneType-1);
+  k=pars->PCoarseDetune%1024;if (k>=512) k-=1024;
+  coarsedet->value(k);
+  
+  hz440->value(pars->Pfixedfreq);
+  fixedfreqetdial->value(pars->PfixedfreqET);
+  
+  amplfo->refresh();
+  freqlfo->refresh();
+  filterlfo->refresh();
+  
+  ampenv->refresh();
+  freqenv->refresh();
+  filterenv->refresh();
+  filterui->refresh();
+  
+  
+  /* harmonic structure parametrs */
+  
+  resui->refresh();
+  if (oscui!=NULL) oscui->refresh();
+  
+  hpbasetype->value(pars->Php.base.type);
+  hpbasepar1->value(pars->Php.base.par1);
+  hpfreqmult->value(pars->Php.freqmult);
+  
+  hpmpar1->value(pars->Php.modulator.par1);
+  hpmfreq->value(pars->Php.modulator.freq);
+  hpwidth->value(pars->Php.width);
+  
+  hponehalf->value(pars->Php.onehalf);
+  hpamptype->value(pars->Php.amp.type);
+  hpampmode->value(pars->Php.amp.mode);
+  hpamppar1->value(pars->Php.amp.par1);
+  hpamppar2->value(pars->Php.amp.par2);
+  hpautoscale->value(pars->Php.autoscale);
+  
+  bwdial->value(pars->Pbandwidth);
+  if (pars->Pmode==0){
+     bwprofilegroup->activate();
+     bwdial->activate();
+     bwcents->activate();
+     hprofile->activate();
+     hprofile->color(54);
+     bwscale->activate();
+  } else {
+     bwprofilegroup->deactivate();
+     bwdial->deactivate();
+     bwcents->deactivate();
+     hprofile->deactivate();
+     hprofile->color(48);
+     bwscale->activate();
+  };
+  
+  spectrummode->value(pars->Pmode);
+  
+  qbasenote->value(pars->Pquality.basenote);
+  qsmpoct->value(pars->Pquality.smpoct);
+  qoct->value(pars->Pquality.oct);
+  qsamplesize->value(pars->Pquality.samplesize);
+  
+  hrpostype->value(pars->Phrpos.type);
+  hrpospar1->value(pars->Phrpos.par1);
+  hrpospar2->value(pars->Phrpos.par2);
+  hrpospar3->value(pars->Phrpos.par3);
+  
+  hprofile->redraw();
+  overtonepos->redraw();
+  
+  osc->redraw();
+  pars->applyparameters(true);
+  applybutton->color(FL_GRAY);
+  applybutton->parent()->redraw();
 }
 
 PADnoteUI::~PADnoteUI() {
   delete(oscui);
-delete(resui);
-
-padnotewindow->hide();
-delete(padnotewindow);
+  delete(resui);
+  
+  padnotewindow->hide();
+  delete(padnotewindow);
 }

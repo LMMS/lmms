@@ -89,8 +89,8 @@ Fl_Double_Window* SeqUI::make_window() {
 
 SeqUI::SeqUI(Master *master_) {
   master=master_;
-
-make_window();
+  
+  make_window();
 }
 
 void SeqUI::show() {

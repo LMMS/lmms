@@ -406,43 +406,43 @@ pings\"");
 
 void MicrotonalUI::updateTuningsInput() {
   char *tmpbuf=new char[100];
-
-tuningsinput->cut(0,tuningsinput->maximum_size());
-
-for (int i=0;i<microtonal->getoctavesize();i++){
-   if (i!=0) tuningsinput->insert("\n");
-   microtonal->tuningtoline(i,tmpbuf,100);
-   tuningsinput->insert(tmpbuf);
-};
-
-delete []tmpbuf;
+  
+  tuningsinput->cut(0,tuningsinput->maximum_size());
+  
+  for (int i=0;i<microtonal->getoctavesize();i++){
+     if (i!=0) tuningsinput->insert("\n");
+     microtonal->tuningtoline(i,tmpbuf,100);
+     tuningsinput->insert(tmpbuf);
+  };
+  
+  delete []tmpbuf;
 }
 
 void MicrotonalUI::updateMappingInput() {
   char *tmpbuf=new char[100];
-
-mappinginput->cut(0,tuningsinput->maximum_size());
-
-for (int i=0;i<microtonal->Pmapsize;i++){
-   if (i!=0) mappinginput->insert("\n");
-   if ((microtonal->Pmapping[i])==-1)
-        snprintf(tmpbuf,100,"x");
-   else snprintf(tmpbuf,100,"%d",microtonal->Pmapping[i]);
-   mappinginput->insert(tmpbuf);
-};
-
-delete []tmpbuf;
+  
+  mappinginput->cut(0,tuningsinput->maximum_size());
+  
+  for (int i=0;i<microtonal->Pmapsize;i++){
+     if (i!=0) mappinginput->insert("\n");
+     if ((microtonal->Pmapping[i])==-1)
+          snprintf(tmpbuf,100,"x");
+     else snprintf(tmpbuf,100,"%d",microtonal->Pmapping[i]);
+     mappinginput->insert(tmpbuf);
+  };
+  
+  delete []tmpbuf;
 }
 
 MicrotonalUI::MicrotonalUI(Microtonal *microtonal_) {
   microtonal=microtonal_;
-
-make_window();
+  
+  make_window();
 }
 
 MicrotonalUI::~MicrotonalUI() {
   microtonaluiwindow->hide();
-delete(microtonaluiwindow);
+  delete(microtonaluiwindow);
 }
 
 void MicrotonalUI::show() {
@@ -451,13 +451,13 @@ void MicrotonalUI::show() {
 
 void MicrotonalUI::apply() {
   int err=microtonal->texttotunings(tuningsinput->value());
-if (err>=0) fl_alert("Parse Error: The input may contain only numbers (like 232.59)\n or divisions (like 121/64).");
-if (err==-2) fl_alert("Parse Error: The input is empty.");
-octavesizeoutput->do_callback();
-
-microtonal->texttomapping(mappinginput->value());
-mapsizeoutput->do_callback();
-anotecounter->do_callback();
-
-//applybutton->color(FL_GRAY);
+  if (err>=0) fl_alert("Parse Error: The input may contain only numbers (like 232.59)\n or divisions (like 121/64).");
+  if (err==-2) fl_alert("Parse Error: The input is empty.");
+  octavesizeoutput->do_callback();
+  
+  microtonal->texttomapping(mappinginput->value());
+  mapsizeoutput->do_callback();
+  anotecounter->do_callback();
+  
+  //applybutton->color(FL_GRAY);
 }

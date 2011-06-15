@@ -37,19 +37,19 @@ Fl_Menu_Item ConfigUI::menu_[] = {
  {0,0,0,0,0,0,0,0,0}
 };
 
-void ConfigUI::cb_samplerateinput_i(Fl_Input* o, void*) {
+void ConfigUI::cb_samplerateinput_i(Fl_Int_Input* o, void*) {
   char *tmp;
 config.cfg.SampleRate=strtoul(o->value(),&tmp,10);
 }
-void ConfigUI::cb_samplerateinput(Fl_Input* o, void* v) {
+void ConfigUI::cb_samplerateinput(Fl_Int_Input* o, void* v) {
   ((ConfigUI*)(o->parent()->parent()->parent()->parent()->user_data()))->cb_samplerateinput_i(o,v);
 }
 
-void ConfigUI::cb_Buffer_i(Fl_Input* o, void*) {
+void ConfigUI::cb_Buffer_i(Fl_Int_Input* o, void*) {
   char *tmp;
 config.cfg.SoundBufferSize=strtoul(o->value(),&tmp,10);
 }
-void ConfigUI::cb_Buffer(Fl_Input* o, void* v) {
+void ConfigUI::cb_Buffer(Fl_Int_Input* o, void* v) {
   ((ConfigUI*)(o->parent()->parent()->parent()->user_data()))->cb_Buffer_i(o,v);
 }
 
@@ -266,16 +266,16 @@ Fl_Double_Window* ConfigUI::make_window() {
             o->menu(menu_);
             o->value(getsamplerateorder());
           } // Fl_Choice* o
-          { Fl_Input* o = samplerateinput = new Fl_Input(115, 50, 60, 20);
+          { Fl_Int_Input* o = samplerateinput = new Fl_Int_Input(115, 50, 60, 20);
             samplerateinput->type(2);
             samplerateinput->textfont(1);
             samplerateinput->callback((Fl_Callback*)cb_samplerateinput);
             setsamplerateinput();
             if (getsamplerateorder()!=0) o->deactivate();
-          } // Fl_Input* samplerateinput
+          } // Fl_Int_Input* samplerateinput
           o->end();
         } // Fl_Group* o
-        { Fl_Input* o = new Fl_Input(190, 45, 60, 20, "Buffer Size");
+        { Fl_Int_Input* o = new Fl_Int_Input(190, 45, 60, 20, "Buffer Size");
           o->tooltip("Internal Sound Buffer Size (samples)");
           o->type(2);
           o->labelsize(11);
@@ -285,7 +285,7 @@ Fl_Double_Window* ConfigUI::make_window() {
           char *tmpbuf=new char[100];o->cut(0,o->maximum_size());
           snprintf(tmpbuf,100,"%d",config.cfg.SoundBufferSize);o->insert(tmpbuf);
           delete []tmpbuf;
-        } // Fl_Input* o
+        } // Fl_Int_Input* o
         { Fl_Light_Button* o = new Fl_Light_Button(20, 80, 85, 20, "Swap Stereo ");
           o->box(FL_THIN_UP_BOX);
           o->labelsize(10);
@@ -475,86 +475,86 @@ system, etc..)");
 
 ConfigUI::ConfigUI() {
   make_window();
-readbankcfg();
-readpresetcfg();
+  readbankcfg();
+  readpresetcfg();
 }
 
 void ConfigUI::activatebutton_rootdir(bool active) {
   if (active) {
-	removerootdirbutton->activate();
-	makedefaultrootdirbutton->activate();
-}else{
-	removerootdirbutton->deactivate();
-	makedefaultrootdirbutton->deactivate();
-};
+  	removerootdirbutton->activate();
+  	makedefaultrootdirbutton->activate();
+  }else{
+  	removerootdirbutton->deactivate();
+  	makedefaultrootdirbutton->deactivate();
+  };
 }
 
 void ConfigUI::activatebutton_presetdir(bool active) {
   if (active) {
-	removepresetbutton->activate();
-	makedefaultpresetbutton->activate();
-}else{
-	removepresetbutton->deactivate();
-	makedefaultpresetbutton->deactivate();
-};
+  	removepresetbutton->activate();
+  	makedefaultpresetbutton->activate();
+  }else{
+  	removepresetbutton->deactivate();
+  	makedefaultpresetbutton->deactivate();
+  };
 }
 
 void ConfigUI::readbankcfg() {
   rootsbrowse->clear();
-
-for (int i=0;i<MAX_BANK_ROOT_DIRS;i++){
-  if (config.cfg.bankRootDirList[i]!=NULL) rootsbrowse->add(config.cfg.bankRootDirList[i]);
-};
+  
+  for (int i=0;i<MAX_BANK_ROOT_DIRS;i++){
+    if (config.cfg.bankRootDirList[i]!=NULL) rootsbrowse->add(config.cfg.bankRootDirList[i]);
+  };
 }
 
 void ConfigUI::writebankcfg() {
   config.clearbankrootdirlist();
-
-for (int n=0;n<rootsbrowse->size();n++){ 
-     config.cfg.bankRootDirList[n]=new char [MAX_STRING_SIZE];
-     strncpy(config.cfg.bankRootDirList[n],rootsbrowse->text(n+1),MAX_STRING_SIZE);
-};
+  
+  for (int n=0;n<rootsbrowse->size();n++){ 
+       config.cfg.bankRootDirList[n]=new char [MAX_STRING_SIZE];
+       strncpy(config.cfg.bankRootDirList[n],rootsbrowse->text(n+1),MAX_STRING_SIZE);
+  };
 }
 
 void ConfigUI::readpresetcfg() {
   presetbrowse->clear();
-
-for (int i=0;i<MAX_BANK_ROOT_DIRS;i++){
-  if (config.cfg.presetsDirList[i]!=NULL) presetbrowse->add(config.cfg.presetsDirList[i]);
-};
+  
+  for (int i=0;i<MAX_BANK_ROOT_DIRS;i++){
+    if (config.cfg.presetsDirList[i]!=NULL) presetbrowse->add(config.cfg.presetsDirList[i]);
+  };
 }
 
 void ConfigUI::writepresetcfg() {
   config.clearpresetsdirlist();
-
-for (int n=0;n<presetbrowse->size();n++){ 
-     config.cfg.presetsDirList[n]=new char [MAX_STRING_SIZE];
-     strncpy(config.cfg.presetsDirList[n],presetbrowse->text(n+1),MAX_STRING_SIZE);
-};
+  
+  for (int n=0;n<presetbrowse->size();n++){ 
+       config.cfg.presetsDirList[n]=new char [MAX_STRING_SIZE];
+       strncpy(config.cfg.presetsDirList[n],presetbrowse->text(n+1),MAX_STRING_SIZE);
+  };
 }
 
 int ConfigUI::getsamplerateorder() {
   int smpr=config.cfg.SampleRate;
-int order=0;
-switch(smpr){
-   case 16000:order=1;break;
-   case 22050:order=2;break;
-   case 32000:order=3;break;
-   case 44100:order=4;break;
-   case 48000:order=5;break;
-   case 88200:order=6;break;
-   case 96000:order=7;break;
-   default:order=0;break;
-};
-return(order);
+  int order=0;
+  switch(smpr){
+     case 16000:order=1;break;
+     case 22050:order=2;break;
+     case 32000:order=3;break;
+     case 44100:order=4;break;
+     case 48000:order=5;break;
+     case 88200:order=6;break;
+     case 96000:order=7;break;
+     default:order=0;break;
+  };
+  return(order);
 }
 
 void ConfigUI::setsamplerateinput() {
   char *tmpbuf=new char[100];
-samplerateinput->cut(0,samplerateinput->maximum_size());
-snprintf(tmpbuf,100,"%d",config.cfg.SampleRate);
-samplerateinput->insert(tmpbuf);
-delete []tmpbuf;
+  samplerateinput->cut(0,samplerateinput->maximum_size());
+  snprintf(tmpbuf,100,"%d",config.cfg.SampleRate);
+  samplerateinput->insert(tmpbuf);
+  delete []tmpbuf;
 }
 
 void ConfigUI::show() {

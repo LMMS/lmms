@@ -19,175 +19,175 @@ VirKeys::VirKeys(int x,int y, int w, int h, const char *label):Fl_Box(x,y,w,h,la
 
 void VirKeys::init(Master *master_) {
   master=master_;
-for (int i=0;i<N_OCT*12+1;i++) pressed[i]=0;
-midich=0;
-midivel=100;
-midioct=2;
-
-keyoct1=3;
-keyoct2=2;
-rndvelocity=0;
+  for (int i=0;i<N_OCT*12+1;i++) pressed[i]=0;
+  midich=0;
+  midivel=100;
+  midioct=2;
+  
+  keyoct1=3;
+  keyoct2=2;
+  rndvelocity=0;
 }
 
 void VirKeys::draw() {
   int ox=x(),oy=y(),lx=w(),ly=h()-1,i;
-
-if (damage()!=1){
- fl_color(250,240,230);
- fl_rectf(ox,oy,lx,ly);
-
- fl_color(FL_BLACK);
- fl_line(ox,oy,ox+lx,oy);
- fl_line(ox,oy+ly,ox+lx,oy+ly);
- for (i=0;i<N_OCT*7+1;i++){
-   fl_line(ox+i*SIZE_WHITE,oy,ox+i*SIZE_WHITE,oy+ly);
-   int ik=i%7;
-   if ((ik==1)||(ik==2)||(ik==4)||(ik==5)||(ik==6)) 
-     fl_rectf(ox+i*SIZE_WHITE-SIZE_BLACK/2,oy,
-              SIZE_BLACK+1,ly*3/5);
- };
-};
-
-
-for (i=0;i<N_OCT*12;i++){
-  // if (pressed[i]==0) continue;
-
-   int noct=i/12;
-   int kv=keyspos[i%12];
-
-   if (kv>=0){//white keys
-     if (pressed[i]==0) fl_color(250,240,230);
-        else fl_color(FL_BLUE);
-     fl_rectf(ox+(kv+7*noct)*SIZE_WHITE+3,oy+ly*3/5+2,
-       SIZE_WHITE-4,ly*2/5-3);
-   } else {//black keys
-     kv=keyspos[(i+1)%12];
-     if (pressed[i]==0) fl_color(FL_BLACK);
-        else fl_color(FL_BLUE);
-     fl_rectf(ox+(kv+7*noct)*SIZE_WHITE-SIZE_BLACK/2+2,oy+2,
-              SIZE_BLACK-3,ly*3/5-5);
+  
+  if (damage()!=1){
+   fl_color(250,240,230);
+   fl_rectf(ox,oy,lx,ly);
+  
+   fl_color(FL_BLACK);
+   fl_line(ox,oy,ox+lx,oy);
+   fl_line(ox,oy+ly,ox+lx,oy+ly);
+   for (i=0;i<N_OCT*7+1;i++){
+     fl_line(ox+i*SIZE_WHITE,oy,ox+i*SIZE_WHITE,oy+ly);
+     int ik=i%7;
+     if ((ik==1)||(ik==2)||(ik==4)||(ik==5)||(ik==6)) 
+       fl_rectf(ox+i*SIZE_WHITE-SIZE_BLACK/2,oy,
+                SIZE_BLACK+1,ly*3/5);
    };
-};
+  };
+  
+  
+  for (i=0;i<N_OCT*12;i++){
+    // if (pressed[i]==0) continue;
+  
+     int noct=i/12;
+     int kv=keyspos[i%12];
+  
+     if (kv>=0){//white keys
+       if (pressed[i]==0) fl_color(250,240,230);
+          else fl_color(FL_BLUE);
+       fl_rectf(ox+(kv+7*noct)*SIZE_WHITE+3,oy+ly*3/5+2,
+         SIZE_WHITE-4,ly*2/5-3);
+     } else {//black keys
+       kv=keyspos[(i+1)%12];
+       if (pressed[i]==0) fl_color(FL_BLACK);
+          else fl_color(FL_BLUE);
+       fl_rectf(ox+(kv+7*noct)*SIZE_WHITE-SIZE_BLACK/2+2,oy+2,
+                SIZE_BLACK-3,ly*3/5-5);
+     };
+  };
 }
 
 int VirKeys::handle(int event) {
   int i;
-int ly=h();
-int x_=Fl::event_x()-x();
-int y_=Fl::event_y()-y();
-if ( (x_<0)&&(x_>w()) && (y_<0)&&(y_>h())){
-  return(0);
-};
-
-
-if ((event==FL_PUSH)||(event==FL_DRAG)||(event==FL_RELEASE)){
-   int kpos=-1;
+  int ly=h();
+  int x_=Fl::event_x()-x();
+  int y_=Fl::event_y()-y();
+  if ( (x_<0)&&(x_>w()) && (y_<0)&&(y_>h())){
+    return(0);
+  };
   
-   if (y_>ly*3/5){//white keys
-       int pos=x_/SIZE_WHITE;
-       if (pos<0) return(1);
-       for (i=0;i<12;i++) {
-          if (pos%7==keyspos[i]) {
-             kpos=pos/7*12+i;
-             break;
-          };
-       };
-   } else {//black keys
-       int pos=(x_+SIZE_WHITE/2)/SIZE_WHITE;
-       if (pos<0) return(1);
-       for (i=1;i<12;i++) {
-          if (pos%7==-keyspos[i]) {
-             kpos=pos/7*12+i;
-             break;
-          };
-       };
-   };
-
-   if ((kpos!=-1)&&((event==FL_PUSH)||(event==FL_DRAG))&&
-       (Fl::event_shift()==0)) {
-        presskey(kpos,1,1);
-   };
-
-   if ((event==FL_PUSH)&&(Fl::event_shift()!=0)) {
-       if (pressed[kpos]==0) presskey(kpos,0,1);
-          else relasekey(kpos,1);
-   };
-   if ((event==FL_RELEASE)&&(Fl::event_shift()==0))
-        relaseallkeys(1);
-   take_focus();
-};
-
-
-const int *keysoct1=keysoct1qwerty;
-const int *keysoct2=keysoct2qwerty;
-
-if (config.cfg.VirKeybLayout==2) {
-	keysoct1=keysoct1dw;
-	keysoct2=keysoct2dw;
-}else if (config.cfg.VirKeybLayout==3) {
-	keysoct1=keysoct1qwertz;
-	keysoct2=keysoct2qwertz;
-}else if (config.cfg.VirKeybLayout==4) {
-	keysoct1=keysoct1az;
-	keysoct2=keysoct2az;
-};
-
-if ((event==FL_KEYDOWN)||(event==FL_KEYUP)){
-   int key=Fl::event_key();
-   int kpos=-1;
-   for (i=0;keysoct1[i]!=0;i++) if (key==keysoct1[i]) kpos=i+12*keyoct1;
-   for (i=0;keysoct2[i]!=0;i++) if (key==keysoct2[i]) kpos=i+12*keyoct2;
-
-
-
-
-   if (kpos==-1) return(0);
-   if ((event==FL_KEYUP) && (Fl::event_key(key)==0) && (Fl::get_key(key)!=0)) return(0);
-   if (event==FL_KEYDOWN) presskey(kpos,0,2);
-      else relasekey(kpos,2);
-};
-
-return(1);
+  
+  if ((event==FL_PUSH)||(event==FL_DRAG)||(event==FL_RELEASE)){
+     int kpos=-1;
+    
+     if (y_>ly*3/5){//white keys
+         int pos=x_/SIZE_WHITE;
+         if (pos<0) return(1);
+         for (i=0;i<12;i++) {
+            if (pos%7==keyspos[i]) {
+               kpos=pos/7*12+i;
+               break;
+            };
+         };
+     } else {//black keys
+         int pos=(x_+SIZE_WHITE/2)/SIZE_WHITE;
+         if (pos<0) return(1);
+         for (i=1;i<12;i++) {
+            if (pos%7==-keyspos[i]) {
+               kpos=pos/7*12+i;
+               break;
+            };
+         };
+     };
+  
+     if ((kpos!=-1)&&((event==FL_PUSH)||(event==FL_DRAG))&&
+         (Fl::event_shift()==0)) {
+          presskey(kpos,1,1);
+     };
+  
+     if ((event==FL_PUSH)&&(Fl::event_shift()!=0)) {
+         if (pressed[kpos]==0) presskey(kpos,0,1);
+            else relasekey(kpos,1);
+     };
+     if ((event==FL_RELEASE)&&(Fl::event_shift()==0))
+          relaseallkeys(1);
+     take_focus();
+  };
+  
+  
+  const int *keysoct1=keysoct1qwerty;
+  const int *keysoct2=keysoct2qwerty;
+  
+  if (config.cfg.VirKeybLayout==2) {
+  	keysoct1=keysoct1dw;
+  	keysoct2=keysoct2dw;
+  }else if (config.cfg.VirKeybLayout==3) {
+  	keysoct1=keysoct1qwertz;
+  	keysoct2=keysoct2qwertz;
+  }else if (config.cfg.VirKeybLayout==4) {
+  	keysoct1=keysoct1az;
+  	keysoct2=keysoct2az;
+  };
+  
+  if ((event==FL_KEYDOWN)||(event==FL_KEYUP)){
+     int key=Fl::event_key();
+     int kpos=-1;
+     for (i=0;keysoct1[i]!=0;i++) if (key==keysoct1[i]) kpos=i+12*keyoct1;
+     for (i=0;keysoct2[i]!=0;i++) if (key==keysoct2[i]) kpos=i+12*keyoct2;
+  
+  
+  
+  
+     if (kpos==-1) return(0);
+     if ((event==FL_KEYUP) && (Fl::event_key(key)==0) && (Fl::get_key(key)!=0)) return(0);
+     if (event==FL_KEYDOWN) presskey(kpos,0,2);
+        else relasekey(kpos,2);
+  };
+  
+  return(1);
 }
 
 void VirKeys::presskey(int nk,int exclusive,int type) {
   //Exclusive means that multiple keys can be pressed at once
-//when the user uses the shift key
-if (nk>=N_OCT*12) return;
-if ((nk<0)&&(exclusive==0)) {
-  relaseallkeys(type);
-  return;
-};
-if (nk<0) return;
-if (pressed[nk]!=0) return;//the key is already pressed
-
-if (exclusive!=0) relaseallkeys(type);
-pressed[nk]=type;
-
-damage(1);
-float vel=midivel;
-if (rndvelocity!=0){
-  vel=midivel*(127.0-rndvelocity)/127.0+RND*rndvelocity;
-};
-
-pthread_mutex_lock(&master->mutex);
- master->NoteOn(midich,nk+midioct*12,(int)vel);
-pthread_mutex_unlock(&master->mutex);
+  //when the user uses the shift key
+  if (nk>=N_OCT*12) return;
+  if ((nk<0)&&(exclusive==0)) {
+    relaseallkeys(type);
+    return;
+  };
+  if (nk<0) return;
+  if (pressed[nk]!=0) return;//the key is already pressed
+  
+  if (exclusive!=0) relaseallkeys(type);
+  pressed[nk]=type;
+  
+  damage(1);
+  float vel=midivel;
+  if (rndvelocity!=0){
+    vel=midivel*(127.0-rndvelocity)/127.0+RND*rndvelocity;
+  };
+  
+  pthread_mutex_lock(&master->mutex);
+   master->NoteOn(midich,nk+midioct*12,(int)vel);
+  pthread_mutex_unlock(&master->mutex);
 }
 
 void VirKeys::relasekey(int nk,int type) {
   if ((nk<0)||(nk>=N_OCT*12)) return;
-if (pressed[nk]==0) return;//the key is not pressed
-if ((type!=0)&&(pressed[nk]!=type)) return;
-
-pressed[nk]=0;
-
-
-damage(1);
-
-pthread_mutex_lock(&master->mutex);
- master->NoteOff(midich,nk+12*midioct);
-pthread_mutex_unlock(&master->mutex);
+  if (pressed[nk]==0) return;//the key is not pressed
+  if ((type!=0)&&(pressed[nk]!=type)) return;
+  
+  pressed[nk]=0;
+  
+  
+  damage(1);
+  
+  pthread_mutex_lock(&master->mutex);
+   master->NoteOff(midich,nk+12*midioct);
+  pthread_mutex_unlock(&master->mutex);
 }
 
 void VirKeys::relaseallkeys(int type) {
@@ -482,8 +482,8 @@ Fl_Double_Window* VirKeyboard::make_window() {
 
 VirKeyboard::VirKeyboard(Master *master_) {
   master=master_;
-midictl=75;
-make_window();
+  midictl=75;
+  make_window();
 }
 
 VirKeyboard::~VirKeyboard() {

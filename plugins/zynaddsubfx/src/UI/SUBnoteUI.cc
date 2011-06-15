@@ -89,22 +89,22 @@ SUBnoteharmonic::SUBnoteharmonic(int x,int y, int w, int h, const char *label):F
 
 void SUBnoteharmonic::init(SUBnoteParameters *pars_,int n_) {
   pars=pars_;
-n=n_;
-make_window();
-harmonic->show();
-end();
+  n=n_;
+  make_window();
+  harmonic->show();
+  end();
 }
 
 void SUBnoteharmonic::refresh() {
   mag->value(127-pars->Phmag[n]);
-if (pars->Phmag[n]==0) mag->selection_color(0);
-bw->value(127-pars->Phrelbw[n]);
+  if (pars->Phmag[n]==0) mag->selection_color(0);
+  bw->value(127-pars->Phrelbw[n]);
 }
 
 SUBnoteharmonic::~SUBnoteharmonic() {
   harmonic->hide();
-hide();
-//delete(harmonic);
+  hide();
+  //delete(harmonic);
 }
 
 void SUBnoteUI::cb_Close_i(Fl_Button*, void*) {
@@ -672,64 +672,64 @@ cy)");
 
 void SUBnoteUI::refresh() {
   for (int i=0;i<MAX_SUB_HARMONICS;i++) h[i]->refresh();
-vol->value(pars->PVolume);
-vsns->value(pars->PAmpVelocityScaleFunction);
-pan->value(pars->PPanning);
-
-
-bandwidth->value(pars->Pbandwidth);
-bwidthscale->value(pars->Pbwscale-64);
-bwee->value(pars->PBandWidthEnvelopeEnabled);
-if (pars->PBandWidthEnvelopeEnabled==0) bandwidthenvelopegroup->deactivate();
-    else bandwidthenvelopegroup->activate();
-bwee->show();
-bandwidthsettingsui->redraw();
-
-detunevalueoutput->value(getdetune(pars->PDetuneType,0,pars->PDetune));
-freqee->value(pars->PFreqEnvelopeEnabled);
-if (pars->PFreqEnvelopeEnabled==0) freqenvelopegroup->deactivate();
-    else freqenvelopegroup->activate();
-freqee->show();
-freqsettingsui->redraw();
-
-detune->value(pars->PDetune-8192);
-hz440->value(pars->Pfixedfreq);
-
-fixedfreqetdial->value(pars->PfixedfreqET);
-
-int k=pars->PCoarseDetune/1024;if (k>=8) k-=16;
-octave->value(k);
-
-detunetype->value(pars->PDetuneType-1);
-
-k=pars->PCoarseDetune%1024;if (k>=512) k-=1024;
-coarsedet->value(k);
-
-filtere->value(pars->PGlobalFilterEnabled);
-if (pars->PGlobalFilterEnabled==0) globalfiltergroup->deactivate();
-    else globalfiltergroup->activate();
-filtere->show();
-globalfiltergroup->redraw();
-
-stereo->value(pars->Pstereo);
-filterstages->value(pars->Pnumstages);
-magtype->value(pars->Phmagtype);
-start->value(pars->Pstart);
-
-ampenv->refresh();
-bandwidthenvelopegroup->refresh();
-freqenvelopegroup->refresh();
-filterui->refresh();
-filterenv->refresh();
+  vol->value(pars->PVolume);
+  vsns->value(pars->PAmpVelocityScaleFunction);
+  pan->value(pars->PPanning);
+  
+  
+  bandwidth->value(pars->Pbandwidth);
+  bwidthscale->value(pars->Pbwscale-64);
+  bwee->value(pars->PBandWidthEnvelopeEnabled);
+  if (pars->PBandWidthEnvelopeEnabled==0) bandwidthenvelopegroup->deactivate();
+      else bandwidthenvelopegroup->activate();
+  bwee->show();
+  bandwidthsettingsui->redraw();
+  
+  detunevalueoutput->value(getdetune(pars->PDetuneType,0,pars->PDetune));
+  freqee->value(pars->PFreqEnvelopeEnabled);
+  if (pars->PFreqEnvelopeEnabled==0) freqenvelopegroup->deactivate();
+      else freqenvelopegroup->activate();
+  freqee->show();
+  freqsettingsui->redraw();
+  
+  detune->value(pars->PDetune-8192);
+  hz440->value(pars->Pfixedfreq);
+  
+  fixedfreqetdial->value(pars->PfixedfreqET);
+  
+  int k=pars->PCoarseDetune/1024;if (k>=8) k-=16;
+  octave->value(k);
+  
+  detunetype->value(pars->PDetuneType-1);
+  
+  k=pars->PCoarseDetune%1024;if (k>=512) k-=1024;
+  coarsedet->value(k);
+  
+  filtere->value(pars->PGlobalFilterEnabled);
+  if (pars->PGlobalFilterEnabled==0) globalfiltergroup->deactivate();
+      else globalfiltergroup->activate();
+  filtere->show();
+  globalfiltergroup->redraw();
+  
+  stereo->value(pars->Pstereo);
+  filterstages->value(pars->Pnumstages);
+  magtype->value(pars->Phmagtype);
+  start->value(pars->Pstart);
+  
+  ampenv->refresh();
+  bandwidthenvelopegroup->refresh();
+  freqenvelopegroup->refresh();
+  filterui->refresh();
+  filterenv->refresh();
 }
 
 SUBnoteUI::SUBnoteUI(SUBnoteParameters *parameters) {
   pars=parameters;
-make_window();
+  make_window();
 }
 
 SUBnoteUI::~SUBnoteUI() {
   //for (int i=0;i<MAX_SUB_HARMONICS;i++) delete (h[i]);
-SUBparameters->hide();
-delete(SUBparameters);
+  SUBparameters->hide();
+  delete(SUBparameters);
 }

@@ -47,22 +47,22 @@ Fl_Group* PartSysEffSend::make_window() {
 
 PartSysEffSend::PartSysEffSend(int x,int y, int w, int h, const char *label):Fl_Group(x,y,w,h,label) {
   master=NULL;
-neff=0;
-npart=0;
+  neff=0;
+  npart=0;
 }
 
 void PartSysEffSend::init(Master *master_,int npart_,int neff_) {
   npart=npart_;
-neff=neff_;
-master=master_;
-make_window();
-syseffsend->show();
-end();
+  neff=neff_;
+  master=master_;
+  make_window();
+  syseffsend->show();
+  end();
 }
 
 PartSysEffSend::~PartSysEffSend() {
   syseffsend->hide();
-//delete(syseffsend);
+  //delete(syseffsend);
 }
 
 void PartUI_::showparameters(int kititem,int engine) {
@@ -344,42 +344,42 @@ Fl_Group* PartKitItem::make_window() {
 
 PartKitItem::PartKitItem(int x,int y, int w, int h, const char *label):Fl_Group(x,y,w,h,label) {
   n=0;
-part=NULL;
+  part=NULL;
 }
 
 void PartKitItem::refresh() {
   enabledcheck->value(part->kit[n].Penabled);
-if (part->kit[n].Penabled==0) partkititemgroup->deactivate();
-else partkititemgroup->activate();
-
-mutedcheck->value(part->kit[n].Pmuted);
-labelbutton->label((char *)part->kit[n].Pname);
-minkcounter->value(part->kit[n].Pminkey);
-maxkcounter->value(part->kit[n].Pmaxkey);
-adcheck->value(part->kit[n].Padenabled);
-adcheck->do_callback();
-subcheck->value(part->kit[n].Psubenabled);
-subcheck->do_callback();
-
-sendtoeffect->value(part->kit[n].Psendtoparteffect+1);
-if (part->kit[n].Psendtoparteffect==127) sendtoeffect->value(0);
-
-this->redraw();
+  if (part->kit[n].Penabled==0) partkititemgroup->deactivate();
+  else partkititemgroup->activate();
+  
+  mutedcheck->value(part->kit[n].Pmuted);
+  labelbutton->label((char *)part->kit[n].Pname);
+  minkcounter->value(part->kit[n].Pminkey);
+  maxkcounter->value(part->kit[n].Pmaxkey);
+  adcheck->value(part->kit[n].Padenabled);
+  adcheck->do_callback();
+  subcheck->value(part->kit[n].Psubenabled);
+  subcheck->do_callback();
+  
+  sendtoeffect->value(part->kit[n].Psendtoparteffect+1);
+  if (part->kit[n].Psendtoparteffect==127) sendtoeffect->value(0);
+  
+  this->redraw();
 }
 
 void PartKitItem::init(Part *part_,int n_,Master *master_,PartUI_ *partui_) {
   part=part_;
-n=n_;
-partui=partui_;
-master=master_;
-make_window();
-//partkititem->show();
-end();
+  n=n_;
+  partui=partui_;
+  master=master_;
+  make_window();
+  //partkititem->show();
+  end();
 }
 
 PartKitItem::~PartKitItem() {
   partkititem->hide();
-//delete(partkititem);
+  //delete(partkititem);
 }
 
 void PartUI::cb_Pan_i(WidgetPDial* o, void*) {
@@ -1784,97 +1784,97 @@ cents)");
 
 PartUI::PartUI(int x,int y, int w, int h, const char *label):Fl_Group(x,y,w,h,label) {
   part=NULL;
-adnoteui=NULL;
-subnoteui=NULL;
-padnoteui=NULL;
-lastkititem=-1;
+  adnoteui=NULL;
+  subnoteui=NULL;
+  padnoteui=NULL;
+  lastkititem=-1;
 }
 
 void PartUI::init(Part *part_,Master *master_,int npart_,BankUI *bankui_) {
   bankui=bankui_;
-part=part_;
-npart=npart_;
-master=master_;
-ninseff=0;
-
-make_window();
-partgroup->position(this->parent()->x()+2,this->parent()->y()+2);
-partgroup->show();
-end();
-
-
-//if (config.ui.showinstrumentinfo!=0) instrumenteditwindow->show();
-
-int klimits[]={1,2,3,4,5,6,7,8,9,10,15,20,30,50,100,0};
-
-keylimitlist->add("OFF");
-int k=0;
-int val=-1;
-char tmp[10];
-while (klimits[k]!=0){
-	sprintf(tmp,"%d",klimits[k]);
-	keylimitlist->add(tmp);
-	if ((val==-1)){
-		if (klimits[k]>part->Pkeylimit) val=k;
-	};
-	k++;
-};
-
-if (val==-1) val=k;
-keylimitlist->value(val);
+  part=part_;
+  npart=npart_;
+  master=master_;
+  ninseff=0;
+  
+  make_window();
+  partgroup->position(this->parent()->x()+2,this->parent()->y()+2);
+  partgroup->show();
+  end();
+  
+  
+  //if (config.ui.showinstrumentinfo!=0) instrumenteditwindow->show();
+  
+  int klimits[]={1,2,3,4,5,6,7,8,9,10,15,20,30,50,100,0};
+  
+  keylimitlist->add("OFF");
+  int k=0;
+  int val=-1;
+  char tmp[10];
+  while (klimits[k]!=0){
+  	sprintf(tmp,"%d",klimits[k]);
+  	keylimitlist->add(tmp);
+  	if ((val==-1)){
+  		if (klimits[k]>part->Pkeylimit) val=k;
+  	};
+  	k++;
+  };
+  
+  if (val==-1) val=k;
+  keylimitlist->value(val);
 }
 
 void PartUI::showparameters(int kititem,int engine) {
   if (engine==-1){//this is used if I want to clear the engine from the part
-   if (kititem==lastkititem) kititem=-1;
-         else kititem=lastkititem;
-};
-
-if (kititem!=lastkititem){
-    if (adnoteui!=NULL) delete (adnoteui);
-    if (subnoteui!=NULL) delete (subnoteui);   
-    if (padnoteui!=NULL) delete (padnoteui);
-    adnoteui=NULL;subnoteui=NULL;padnoteui=NULL;
-    lastkititem=kititem;
-
-    if (kititem>=NUM_KIT_ITEMS) return;//bad kit item
-    if (kititem<0) return;
-
-    if (part->kit[kititem].adpars!=NULL) 
-      adnoteui=new ADnoteUI(part->kit[kititem].adpars,master);
-
-    if (part->kit[kititem].subpars!=NULL) 
-       subnoteui=new SUBnoteUI(part->kit[kititem].subpars);
-
-    if (part->kit[kititem].padpars!=NULL) 
-      padnoteui=new PADnoteUI(part->kit[kititem].padpars,master);
-
-};
-
-
-
-if ((engine==0)&&(adnoteui!=NULL)) adnoteui->ADnoteGlobalParameters->show();
-if ((engine==1)&&(subnoteui!=NULL)) subnoteui->SUBparameters->show();
-if ((engine==2)&&(adnoteui!=NULL)) padnoteui->padnotewindow->show();
+     if (kititem==lastkititem) kititem=-1;
+           else kititem=lastkititem;
+  };
+  
+  if (kititem!=lastkititem){
+      if (adnoteui!=NULL) delete (adnoteui);
+      if (subnoteui!=NULL) delete (subnoteui);   
+      if (padnoteui!=NULL) delete (padnoteui);
+      adnoteui=NULL;subnoteui=NULL;padnoteui=NULL;
+      lastkititem=kititem;
+  
+      if (kititem>=NUM_KIT_ITEMS) return;//bad kit item
+      if (kititem<0) return;
+  
+      if (part->kit[kititem].adpars!=NULL) 
+        adnoteui=new ADnoteUI(part->kit[kititem].adpars,master);
+  
+      if (part->kit[kititem].subpars!=NULL) 
+         subnoteui=new SUBnoteUI(part->kit[kititem].subpars);
+  
+      if (part->kit[kititem].padpars!=NULL) 
+        padnoteui=new PADnoteUI(part->kit[kititem].padpars,master);
+  
+  };
+  
+  
+  
+  if ((engine==0)&&(adnoteui!=NULL)) adnoteui->ADnoteGlobalParameters->show();
+  if ((engine==1)&&(subnoteui!=NULL)) subnoteui->SUBparameters->show();
+  if ((engine==2)&&(adnoteui!=NULL)) padnoteui->padnotewindow->show();
 }
 
 PartUI::~PartUI() {
   if (adnoteui!=NULL) delete (adnoteui);
-if (subnoteui!=NULL) delete (subnoteui);
-if (padnoteui!=NULL) delete (padnoteui);
-
-partgroup->hide();
-//delete(partgroup);
-
-ctlwindow->hide();
-delete(ctlwindow);
-
-partfx->hide();
-delete(partfx);
-
-instrumentkitlist->hide();
-delete(instrumentkitlist);
-
-instrumenteditwindow->hide();
-delete(instrumenteditwindow);
+  if (subnoteui!=NULL) delete (subnoteui);
+  if (padnoteui!=NULL) delete (padnoteui);
+  
+  partgroup->hide();
+  //delete(partgroup);
+  
+  ctlwindow->hide();
+  delete(ctlwindow);
+  
+  partfx->hide();
+  delete(partfx);
+  
+  instrumentkitlist->hide();
+  delete(instrumentkitlist);
+  
+  instrumenteditwindow->hide();
+  delete(instrumenteditwindow);
 }
