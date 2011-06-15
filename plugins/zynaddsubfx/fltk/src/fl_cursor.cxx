@@ -1,9 +1,9 @@
 //
-// "$Id: fl_cursor.cxx 7351 2010-03-29 10:35:00Z matt $"
+// "$Id: fl_cursor.cxx 8055 2010-12-18 22:31:01Z manolo $"
 //
 // Mouse cursor support for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2009 by Bill Spitzak and others.
+// Copyright 1998-2010 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -134,11 +134,10 @@ void Fl_Window::cursor(Fl_Cursor c, Fl_Color c1, Fl_Color c2) {
 # error "Either __LITTLE_ENDIAN__ or __BIG_ENDIAN__ must be defined"
 #endif
 
-extern void *MACSetCursor(Fl_Cursor c);
 extern Fl_Offscreen fl_create_offscreen_with_alpha(int w, int h);
 
 
-CGContextRef CreateHelpImage(void)
+CGContextRef Fl_X::help_cursor_image(void)
 {
   int w = 20, h = 20;
   Fl_Offscreen off = fl_create_offscreen_with_alpha(w, h);
@@ -152,7 +151,7 @@ CGContextRef CreateHelpImage(void)
   return (CGContextRef)off;
 }
 
-CGContextRef CreateNoneImage(void)
+CGContextRef Fl_X::none_cursor_image(void)
 {
   int w = 20, h = 20;
   Fl_Offscreen off = fl_create_offscreen_with_alpha(w, h);
@@ -163,7 +162,7 @@ CGContextRef CreateNoneImage(void)
   return (CGContextRef)off;
 }
 
-CGContextRef CreateWatchImage(void)
+CGContextRef Fl_X::watch_cursor_image(void)
 {
   int w, h, r = 5;
   w = 2*r+6;
@@ -176,19 +175,19 @@ CGContextRef CreateWatchImage(void)
   fl_color(FL_WHITE);
   fl_circle(0, 0, r+1);
   fl_color(FL_BLACK);
-  fl_rectf(-r*0.7, -r*1.7, 1.4*r, 3.4*r);
+  fl_rectf(int(-r*0.7), int(-r*1.7), int(1.4*r), int(3.4*r));
   fl_rectf(r-1, -1, 3, 3);
   fl_color(FL_WHITE);
   fl_pie(-r, -r, 2*r, 2*r, 0, 360);
   fl_color(FL_BLACK);
   fl_circle(0,0,r);
-  fl_xyline(0, 0, -r*.7);
-  fl_xyline(0, 0, 0, -r*.7);
+  fl_xyline(0, 0, int(-r*.7));
+  fl_xyline(0, 0, 0, int(-r*.7));
   fl_end_offscreen();
   return (CGContextRef)off;
 }
 
-CGContextRef CreateNESWImage(void)
+CGContextRef Fl_X::nesw_cursor_image(void)
 {
   int c = 7, r = 2*c;
   int w = r, h = r;
@@ -208,7 +207,7 @@ CGContextRef CreateNESWImage(void)
   return (CGContextRef)off;
 }
 
-CGContextRef CreateNWSEImage(void)
+CGContextRef Fl_X::nwse_cursor_image(void)
 {
   int c = 7, r = 2*c;
   int w = r, h = r;
@@ -232,10 +231,7 @@ void Fl_Window::cursor(Fl_Cursor c, Fl_Color, Fl_Color) {
   if (c == FL_CURSOR_DEFAULT) {
     c = cursor_default;
   }
-  void *cursor = MACSetCursor( c );
-  if (i) {
-	  i->cursor = cursor;
-  }
+  if (i) i->set_cursor(c);
 }
 
 #else
@@ -333,5 +329,5 @@ void Fl_Window::cursor(Fl_Cursor c, Fl_Color fg, Fl_Color bg) {
 #endif
 
 //
-// End of "$Id: fl_cursor.cxx 7351 2010-03-29 10:35:00Z matt $".
+// End of "$Id: fl_cursor.cxx 8055 2010-12-18 22:31:01Z manolo $".
 //

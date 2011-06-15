@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Menu_add.cxx 7519 2010-04-16 19:50:40Z greg.ercolano $"
+// "$Id: Fl_Menu_add.cxx 8110 2010-12-23 08:02:52Z manolo $"
 //
 // Menu utilities for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2009 by Bill Spitzak and others.
+// Copyright 1998-2010 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -51,6 +51,8 @@ extern Fl_Menu_* fl_menu_array_owner; // in Fl_Menu_.cxx
 // above pointers to detect if the array belongs to an Fl_Menu_
 // widget, and if so it reallocates as necessary.
 
+
+
 // Insert a single Fl_Menu_Item into an array of size at offset n,
 // if this is local_array it will be reallocated if needed.
 static Fl_Menu_Item* array_insert(
@@ -81,6 +83,8 @@ static Fl_Menu_Item* array_insert(
   return array;
 }
 
+
+
 // Comparison that does not care about deleted '&' signs:
 static int compare(const char* a, const char* b) {
   for (;;) {
@@ -97,6 +101,8 @@ static int compare(const char* a, const char* b) {
   }
 }
 
+
+
 /** Adds an item.  The text is split at '/' characters to automatically
    produce submenus (actually a totally unnecessary feature as you can
    now add submenu titles directly by setting SUBMENU in the flags):
@@ -111,15 +117,26 @@ int Fl_Menu_Item::add(
   return(insert(-1,mytext,sc,cb,data,myflags));		// -1: append
 }
 
-/** Inserts an item at position \p index.
+
+
+/** 
+ Inserts an item at position \p index.
     
-    If \p index is -1, the item is added the same way as Fl_Menu_Item::add().
+ If \p index is -1, the item is added the same way as Fl_Menu_Item::add().
 
-    If 'mytext' contains any un-escaped front slashes (/), it's assumed 
-    a menu pathname is being specified, and the value of \p index 
-    will be ignored.
+ If 'mytext' contains any un-escaped front slashes (/), it's assumed 
+ a menu pathname is being specified, and the value of \p index 
+ will be ignored.
 
-    In all other aspects, the behavior of insert() is the same as add().
+ In all other aspects, the behavior of insert() is the same as add().
+ 
+ \param index insert new items here
+ \param mytext new label string, details see above
+ \param sc keyboard shortcut for new item
+ \param cb callback function for new item
+ \param data user data for new item
+ \param myflags menu flags as described in FL_Menu_Item
+ \returns the index into the menu() array, where the entry was added
 */
 int Fl_Menu_Item::insert(
   int index,
@@ -199,6 +216,8 @@ int Fl_Menu_Item::insert(
   return m-array;
 }
 
+
+
 /**
   Adds a new menu item.
   
@@ -251,6 +270,8 @@ int Fl_Menu_Item::insert(
   \par
   Raw integer shortcuts can be a combination of keyboard chars (eg. 'A')
   and optional keyboard modifiers (see Fl::event_state(), e.g. FL_SHIFT, etc).
+  In addition, FL_COMMAND can be used to denote FL_META under Mac OS X and
+  FL_CTRL under other platforms.
   \par
   String shortcuts can be specified in one of two ways:
   \par
@@ -262,7 +283,7 @@ int Fl_Menu_Item::insert(
   ..where \<ascii_value\> is a decimal value representing an
   ascii character (eg. 97 is the ascii code for 'a'), and the optional
   prefixes enhance the value that follows. Multiple prefixes must
-  appear in the above order.
+  appear in the order below.
   \par
   \verbatim
    # - Alt
@@ -306,6 +327,8 @@ int Fl_Menu_Item::insert(
 int Fl_Menu_::add(const char *label,int shortcut,Fl_Callback *callback,void *userdata,int flags) {
   return(insert(-1,label,shortcut,callback,userdata,flags));	// -1: append
 }
+
+
 
 /**
   Inserts a new menu item at the specified \p index position.
@@ -387,6 +410,8 @@ int Fl_Menu_::insert(
   return r;
 }
 
+
+
 /**
   This is a Forms (and SGI GL library) compatible add function, it
   adds many menu items, with '|' separating the menu items, and tab
@@ -399,6 +424,9 @@ int Fl_Menu_::insert(
   same special characters as described for the long version of add().
 
   No items must be added to a menu during a callback to the same menu.
+ 
+  \param str string containing multiple menu labels as described above
+  \returns the index into the menu() array, where the entry was added
 */
 int Fl_Menu_::add(const char *str) {
   char buf[1024];
@@ -417,10 +445,15 @@ int Fl_Menu_::add(const char *str) {
   return r;
 }
 
+
+
 /**
   Changes the text of item \p i.  This is the only way to get
   slash into an add()'ed menu item.  If the menu array was directly set
   with menu(x) then copy() is done to make a private array.
+ 
+  \param i index into menu array
+  \param str new label for menu item at index i
 */
 void Fl_Menu_::replace(int i, const char *str) {
   if (i<0 || i>=size()) return;
@@ -431,11 +464,16 @@ void Fl_Menu_::replace(int i, const char *str) {
   }
   menu_[i].text = str;
 }
+
+
+
 /**
   Deletes item \p i from the menu.  If the menu array was directly
   set with menu(x) then copy() is done to make a private array.
   
   No items must be removed from a menu during a callback to the same menu.
+ 
+  \param i index into menu array
 */
 void Fl_Menu_::remove(int i) {
   int n = size();
@@ -454,5 +492,5 @@ void Fl_Menu_::remove(int i) {
 }
 
 //
-// End of "$Id: Fl_Menu_add.cxx 7519 2010-04-16 19:50:40Z greg.ercolano $".
+// End of "$Id: Fl_Menu_add.cxx 8110 2010-12-23 08:02:52Z manolo $".
 //

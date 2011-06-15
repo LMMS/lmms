@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Scroll.cxx 7039 2010-02-07 21:14:35Z AlbrechtS $"
+// "$Id: Fl_Scroll.cxx 8591 2011-04-14 13:21:12Z manolo $"
 //
 // Scroll widget for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2009 by Bill Spitzak and others.
+// Copyright 1998-2010 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -32,13 +32,16 @@
 
 /** Clear all but the scrollbars... */
 void Fl_Scroll::clear() {
-  for (int i=children() - 1; i >= 0; i --) {
-    Fl_Widget* o = child(i);
-    if (o != &hscrollbar && o != &scrollbar) {
-      remove(o);
-      delete o;
-    }
-  }
+  // Note: the scrollbars are removed from the group before calling
+  // Fl_Group::clear() to take advantage of the optimized widget removal
+  // and deletion. Finally they are added to Fl_Scroll's group again. This
+  // is MUCH faster than removing the widgets one by one (STR #2409).
+
+  remove(scrollbar);
+  remove(hscrollbar);
+  Fl_Group::clear();
+  add(hscrollbar);
+  add(scrollbar);
 }
 
 /** Insure the scrollbars are the last children */
@@ -345,9 +348,9 @@ void Fl_Scroll::resize(int X, int Y, int W, int H) {
     o->position(o->x()+dx, o->y()+dy);
   }
   if (dw==0 && dh==0) {
-    char pad = (scrollbar.visible() && hscrollbar.visible());
-    char al = (scrollbar.align()&FL_ALIGN_LEFT!=0);
-    char at = (scrollbar.align()&FL_ALIGN_TOP!=0);
+    char pad = ( scrollbar.visible() && hscrollbar.visible() );
+    char al = ( (scrollbar.align() & FL_ALIGN_LEFT) != 0 );
+    char at = ( (scrollbar.align() & FL_ALIGN_TOP)  !=0 );
     scrollbar.position(al?X:X+W-scrollbar.w(), (at&&pad)?Y+hscrollbar.h():Y);
     hscrollbar.position((al&&pad)?X+scrollbar.w():X, at?Y:Y+H-hscrollbar.h());
   } else {
@@ -388,7 +391,7 @@ void Fl_Scroll::scrollbar_cb(Fl_Widget* o, void*) {
   <P>The destructor <I>also deletes all the children</I>. This allows a
   whole tree to be deleted at once, without having to keep a pointer to
   all the children in the user code. A kludge has been done so the 
-  Fl_Scroll and all of it's children can be automatic (local)
+  Fl_Scroll and all of its children can be automatic (local)
   variables, but you must declare the Fl_Scroll<I>first</I>, so
   that it is destroyed last.
 */
@@ -413,5 +416,5 @@ int Fl_Scroll::handle(int event) {
 }
 
 //
-// End of "$Id: Fl_Scroll.cxx 7039 2010-02-07 21:14:35Z AlbrechtS $".
+// End of "$Id: Fl_Scroll.cxx 8591 2011-04-14 13:21:12Z manolo $".
 //

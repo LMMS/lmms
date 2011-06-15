@@ -1,9 +1,9 @@
 //
-// "$Id: fl_dnd_win32.cxx 7563 2010-04-28 03:15:47Z greg.ercolano $"
+// "$Id: fl_dnd_win32.cxx 8028 2010-12-14 19:46:55Z AlbrechtS $"
 //
 // Drag & Drop code for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2009 by Bill Spitzak and others.
+// Copyright 1998-2010 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -41,8 +41,6 @@
 #if defined(__CYGWIN__)
 #include <sys/time.h>
 #include <unistd.h>
-#else
-#include <winsock2.h>
 #endif
 
 extern char *fl_selection_buffer[2];
@@ -53,9 +51,6 @@ extern char *fl_locale2utf8(const char *s, UINT codepage = 0);
 extern unsigned int fl_codepage;
 
 Fl_Window *fl_dnd_target_window = 0;
-
-// All of the following code requires GCC 3.x or a non-GNU compiler...
-#if !defined(__GNUC__) || __GNUC__ >= 3
 
 #include <ole2.h>
 #include <shellapi.h>
@@ -177,6 +172,15 @@ public:
     HWND hwnd = fl_xid( (Fl_Window*)w );
     if (fillCurrentDragData(data)) {
       int old_event = Fl::e_number;
+      char *a, *b;
+      a = b = currDragData;
+      while (*a) { // strip the CRLF pairs
+	if (*a == '\r' && a[1] == '\n') a++;
+	else *b++ = *a++;
+      }
+      *b = 0;
+      Fl::e_text = currDragData;
+      Fl::e_length = b - currDragData;
       Fl::belowmouse()->handle(Fl::e_number = FL_PASTE); // e_text will be invalid after this call
       Fl::e_number = old_event;
       SetForegroundWindow( hwnd );
@@ -210,20 +214,53 @@ private:
 
     // clear currDrag* for a new drag event
     clearCurrentDragData();
-
-    // fill currDrag* with ASCII data, if available
+    
+    currDragRef = data;
+    // fill currDrag* with UTF-8 data, if available
     FORMATETC fmt = { 0 };
     STGMEDIUM medium = { 0 };
     fmt.tymed = TYMED_HGLOBAL;
     fmt.dwAspect = DVASPECT_CONTENT;
     fmt.lindex = -1;
-    fmt.cfFormat = CF_TEXT;
-    // if it is ASCII text, return a copy of it
+    fmt.cfFormat = CF_UNICODETEXT;
+    // if it is UNICODE text, return a UTF-8-converted copy of it
     if ( data->GetData( &fmt, &medium )==S_OK )
     {
       void *stuff = GlobalLock( medium.hGlobal );
-      Fl::e_length = strlen((char*)stuff);
-      Fl::e_text = strdup((char*)stuff);
+      unsigned srclen = 0;
+      const wchar_t *wstuff = (const wchar_t *)stuff;
+      while (*wstuff++) srclen++;
+      wstuff = (const wchar_t *)stuff;
+      unsigned utf8len = fl_utf8fromwc(NULL, 0, wstuff, srclen);
+      currDragSize = utf8len;
+      currDragData = (char*)malloc(utf8len + 1);
+      fl_utf8fromwc(currDragData, currDragSize+1, wstuff, srclen+1); // include null-byte
+      GlobalUnlock( medium.hGlobal );
+      ReleaseStgMedium( &medium );
+      currDragResult = 1;
+      return currDragResult;
+    }
+    fmt.cfFormat = CF_TEXT;
+    // if it is CP1252 text, return a UTF-8-converted copy of it
+    if ( data->GetData( &fmt, &medium )==S_OK )
+    {
+      int len;
+      char *p, *q, *last;
+      unsigned u;
+      void *stuff = GlobalLock( medium.hGlobal );
+      currDragData = (char*)malloc(3 * strlen((char*)stuff) + 10);
+      p = (char*)stuff; 
+      last = p + strlen(p);
+      q = currDragData;
+      while (p < last) {
+	u = fl_utf8decode(p, last, &len);
+	p += len;
+	len = fl_utf8encode(u, q);
+	q += len;
+	}
+      *q = 0;
+      currDragSize = q - currDragData;
+      currDragData = (char*)realloc(currDragData, currDragSize + 1);
       GlobalUnlock( medium.hGlobal );
       ReleaseStgMedium( &medium );
       currDragResult = 1;
@@ -253,10 +290,10 @@ private:
         }
          *dst=0;
 
-        Fl::e_text = (char*) malloc(nn * 5 + 1);
+        currDragData = (char*) malloc(nn * 5 + 1);
 //      Fl::e_length = fl_unicode2utf(bu, nn, Fl::e_text);
-        Fl::e_length = fl_utf8fromwc(Fl::e_text, (nn*5+1), bu, nn);
-        Fl::e_text[Fl::e_length] = 0;
+        currDragSize = fl_utf8fromwc(currDragData, (nn*5+1), bu, nn);
+        currDragData[currDragSize] = 0;
         free(bu);
 
 //    Fl::belowmouse()->handle(FL_DROP);
@@ -378,7 +415,7 @@ public:
     n = 0;
   }
 
-  ~FLEnum(void) {
+  virtual ~FLEnum(void) {
     n = 0;
   }
 };
@@ -413,16 +450,16 @@ public:
       delete this;
     return nTemp;
   }
-  // GetData currently allows ASCII text through Global Memory only
+  // GetData currently allows UNICODE text through Global Memory only
   HRESULT STDMETHODCALLTYPE GetData( FORMATETC *pformatetcIn, STGMEDIUM *pmedium ) {
     if ((pformatetcIn->dwAspect & DVASPECT_CONTENT) &&
         (pformatetcIn->tymed & TYMED_HGLOBAL) &&
-        (pformatetcIn->cfFormat == CF_TEXT))
+        (pformatetcIn->cfFormat == CF_UNICODETEXT))
     {
-      HGLOBAL gh = GlobalAlloc( GHND, fl_selection_length[0]+1 );
+      int utf16_len = fl_utf8toUtf16(fl_selection_buffer[0], fl_selection_length[0], 0, 0);
+      HGLOBAL gh = GlobalAlloc( GHND, utf16_len * 2 + 2 );
       char *pMem = (char*)GlobalLock( gh );
-      memmove( pMem, fl_selection_buffer[0], fl_selection_length[0] );
-      pMem[ fl_selection_length[0] ] = 0;
+      fl_utf8toUtf16(fl_selection_buffer[0], fl_selection_length[0], (unsigned short*)pMem, utf16_len + 1);
 //      HGLOBAL gh = GlobalAlloc( GHND| GMEM_SHARE,
 //                            (fl_selection_length[0]+4) * sizeof(short)
 //                            + sizeof(DROPFILES));
@@ -464,7 +501,7 @@ public:
   {
     if ((pformatetc->dwAspect & DVASPECT_CONTENT) &&
         (pformatetc->tymed & TYMED_HGLOBAL) &&
-        (pformatetc->cfFormat == CF_TEXT))
+        (pformatetc->cfFormat == CF_UNICODETEXT))
       return S_OK;
     return DV_E_FORMATETC;
   }
@@ -486,13 +523,6 @@ public:
 };
 
 
-/**
-   Drag and drop whatever is in the cut-copy-paste buffer.
-
-   Create a selection first using:
-
-     Fl::copy(const char *stuff, int len, 0)
-*/
 int Fl::dnd()
 {
   DWORD dropEffect;
@@ -519,15 +549,7 @@ int Fl::dnd()
   if ( ret==DRAGDROP_S_DROP ) return 1; // or DD_S_CANCEL
   return 0;
 }
-#else
-int Fl::dnd()
-{
-  // Always indicate DnD failed when using GCC < 3...
-  return 1;
-}
-#endif // !__GNUC__ || __GNUC__ >= 3
-
 
 //
-// End of "$Id: fl_dnd_win32.cxx 7563 2010-04-28 03:15:47Z greg.ercolano $".
+// End of "$Id: fl_dnd_win32.cxx 8028 2010-12-14 19:46:55Z AlbrechtS $".
 //

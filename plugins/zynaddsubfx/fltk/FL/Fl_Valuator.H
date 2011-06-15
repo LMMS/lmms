@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Valuator.H 6614 2009-01-01 16:11:32Z matt $"
+// "$Id: Fl_Valuator.H 7981 2010-12-08 23:53:04Z greg.ercolano $"
 //
 // Valuator header file for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2009 by Bill Spitzak and others.
+// Copyright 1998-2010 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -44,8 +44,8 @@
   and provides a consistent interface to set the value, range, and step,
   and insures that callbacks are done the same for every object.
   <P>There are probably more of these classes in FLTK than any others:
-  <P ALIGN=CENTER>\image html  valuators.gif</P> 
-  \image latex   valuators.eps "Valuators derived from Fl_Valuators" width=10cm
+  <P ALIGN=CENTER>\image html  valuators.png</P> 
+  \image latex   valuators.png "Valuators derived from Fl_Valuators" width=10cm
   <P>In the above diagram each box surrounds an actual subclass.  These
   are further differentiated by setting the type() of the widget t
   o the symbolic value labeling the widget.  
@@ -140,5 +140,5 @@ public:
 #endif
 
 //
-// End of "$Id: Fl_Valuator.H 6614 2009-01-01 16:11:32Z matt $".
+// End of "$Id: Fl_Valuator.H 7981 2010-12-08 23:53:04Z greg.ercolano $".
 //

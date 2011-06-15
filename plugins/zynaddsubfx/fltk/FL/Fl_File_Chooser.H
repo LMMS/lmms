@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_File_Chooser.H 7007 2010-01-14 23:08:06Z greg.ercolano $"
+// "$Id: Fl_File_Chooser.H 8786 2011-06-07 11:41:36Z manolo $"
 //
 // Fl_File_Chooser dialog for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2009 by Bill Spitzak and others.
+// Copyright 1998-2011 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -54,8 +54,8 @@ private:
   static Fl_Preferences prefs_; 
   void (*callback_)(Fl_File_Chooser*, void *); 
   void *data_; 
-  char directory_[1024]; 
-  char pattern_[1024]; 
+  char directory_[FL_PATH_MAX]; 
+  char pattern_[FL_PATH_MAX]; 
   char preview_text_[2048]; 
   int type_; 
   void favoritesButtonCB(); 
@@ -95,6 +95,11 @@ public:
 private:
   void cb_previewButton_i(Fl_Check_Button*, void*);
   static void cb_previewButton(Fl_Check_Button*, void*);
+public:
+  Fl_Check_Button *showHiddenButton;
+private:
+  void cb_showHiddenButton_i(Fl_Check_Button*, void*);
+  static void cb_showHiddenButton(Fl_Check_Button*, void*);
   Fl_File_Input *fileName;
   void cb_fileName_i(Fl_File_Input*, void*);
   static void cb_fileName(Fl_File_Input*, void*);
@@ -144,9 +149,13 @@ public:
   const char * ok_label();
   void preview(int e); 
   int preview() const { return previewButton->value(); }; 
+private:
+  void showHidden(int e); 
+  void remove_hidden_files(); 
+public:
   void rescan(); 
   void rescan_keep_filename(); 
-  void show();
+  void show(); 
   int shown();
   void textcolor(Fl_Color c);
   Fl_Color textcolor();
@@ -214,6 +223,10 @@ public:
   */
   static const char *show_label; 
   /**
+     [standard text may be customized at run-time]
+  */
+  static const char *hidden_label; 
+  /**
      the sort function that is used when loading
      the contents of a directory.
   */
@@ -222,7 +235,6 @@ private:
   Fl_Widget* ext_group; 
 public:
   Fl_Widget* add_extra(Fl_Widget* gr);
-  Fl_File_Browser *browser(void) {return fileList; };
 };
 FL_EXPORT char *fl_dir_chooser(const char *message,const char *fname,int relative=0);
 FL_EXPORT char *fl_file_chooser(const char *message,const char *pat,const char *fname,int relative=0);
@@ -231,5 +243,5 @@ FL_EXPORT void fl_file_chooser_ok_label(const char*l);
 #endif
 
 //
-// End of "$Id: Fl_File_Chooser.H 7007 2010-01-14 23:08:06Z greg.ercolano $".
+// End of "$Id: Fl_File_Chooser.H 8786 2011-06-07 11:41:36Z manolo $".
 //

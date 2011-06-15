@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_x.cxx 7659 2010-07-01 13:21:32Z manolo $"
+// "$Id: Fl_x.cxx 8764 2011-05-30 16:47:48Z manolo $"
 //
 // X specific code for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2009 by Bill Spitzak and others.
+// Copyright 1998-2011 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -42,6 +42,7 @@
 #  include <FL/fl_utf8.h>
 #  include <FL/Fl_Tooltip.H>
 #  include <FL/fl_draw.H>
+#  include <FL/Fl_Paged_Device.H>
 #  include <stdio.h>
 #  include <stdlib.h>
 #  include "flstring.h"
@@ -50,12 +51,13 @@
 #  include <X11/Xmd.h>
 #  include <X11/Xlocale.h>
 #  include <X11/Xlib.h>
+#  include <X11/keysym.h>
 
 static Fl_Xlib_Graphics_Driver fl_xlib_driver;
 static Fl_Display_Device fl_xlib_display(&fl_xlib_driver);
-FL_EXPORT Fl_Display_Device *fl_display_device = (Fl_Display_Device*)&fl_xlib_display; // does not change
 FL_EXPORT Fl_Graphics_Driver *fl_graphics_driver = (Fl_Graphics_Driver*)&fl_xlib_driver; // the current target device of graphics operations
-FL_EXPORT Fl_Surface_Device *fl_surface = (Fl_Surface_Device*)fl_display_device; // the current target surface of graphics operations
+Fl_Surface_Device* Fl_Surface_Device::_surface = (Fl_Surface_Device*)&fl_xlib_display; // the current target surface of graphics operations
+Fl_Display_Device *Fl_Display_Device::_display = &fl_xlib_display;// the platform display
 
 ////////////////////////////////////////////////////////////////
 // interface to poll/select call:
@@ -278,6 +280,17 @@ int fl_ready() {
 #  endif
 }
 
+// replace \r\n by \n
+static void convert_crlf(unsigned char *string, long& len) {
+  unsigned char *a, *b;
+  a = b = string;
+  while (*a) {
+    if (*a == '\r' && a[1] == '\n') { a++; len--; }
+    else *b++ = *a++;
+  }
+  *b = 0;
+}
+
 ////////////////////////////////////////////////////////////////
 
 Display *fl_display;
@@ -307,8 +320,22 @@ Atom fl_XdndActionCopy;
 Atom fl_XdndFinished;
 //Atom fl_XdndProxy;
 Atom fl_XdndURIList;
+Atom fl_Xatextplainutf;
+Atom fl_Xatextplain;
+static Atom fl_XaText;
+Atom fl_XaCompoundText;
 Atom fl_XaUtf8String;
 Atom fl_XaTextUriList;
+Atom fl_NET_WM_NAME;			// utf8 aware window label
+Atom fl_NET_WM_ICON_NAME;		// utf8 aware window icon name
+
+/*
+  X defines 32-bit-entities to have a format value of max. 32,
+  although sizeof(atom) can be 8 (64 bits) on a 64-bit OS.
+  See also fl_open_display() for sizeof(atom) < 4.
+  Used for XChangeProperty (see STR #2419).
+*/
+static int atom_bits = 32;
 
 static void fd_callback(int,void *) {
   do_queued_events();
@@ -338,7 +365,6 @@ void fl_new_ic()
   XVaNestedList status_attr = NULL;
   static XFontSet fs = NULL;
   char *fnt;
-  bool must_free_fnt = true;
   char **missing_list;
   int missing_count;
   char *def_string;
@@ -350,21 +376,22 @@ void fl_new_ic()
 #if USE_XFT
 
 #if defined(__GNUC__)
-#warning XFT support here
+// FIXME: warning XFT support here
 #endif /*__GNUC__*/
 
   if (!fs) {
-    fnt = NULL;//fl_get_font_xfld(0, 14);
-    if (!fnt) {fnt = "-misc-fixed-*";must_free_fnt=false;}
+    fnt = (char*)"-misc-fixed-*";
     fs = XCreateFontSet(fl_display, fnt, &missing_list,
                         &missing_count, &def_string);
   }
 #else
   if (!fs) {
+    bool must_free_fnt = true;
     fnt = fl_get_font_xfld(0, 14);
-    if (!fnt) {fnt = "-misc-fixed-*";must_free_fnt=false;}
+    if (!fnt) {fnt = (char*)"-misc-fixed-*";must_free_fnt=false;}
     fs = XCreateFontSet(fl_display, fnt, &missing_list,
                         &missing_count, &def_string);
+    if (must_free_fnt) free(fnt);
   }
 #endif
   preedit_attr = XVaCreateNestedList(0,
@@ -465,16 +492,16 @@ void fl_set_spot(int font, int size, int X, int Y, int W, int H, Fl_Window *win)
 #if USE_XFT
 
 #if defined(__GNUC__)
-#warning XFT support here
+// FIXME: warning XFT support here
 #endif /*__GNUC__*/
 
     fnt = NULL; // fl_get_font_xfld(font, size);
-    if (!fnt) {fnt = "-misc-fixed-*";must_free_fnt=false;}
+    if (!fnt) {fnt = (char*)"-misc-fixed-*";must_free_fnt=false;}
     fs = XCreateFontSet(fl_display, fnt, &missing_list,
                         &missing_count, &def_string);
 #else
     fnt = fl_get_font_xfld(font, size);
-    if (!fnt) {fnt = "-misc-fixed-*";must_free_fnt=false;}
+    if (!fnt) {fnt = (char*)"-misc-fixed-*";must_free_fnt=false;}
     fs = XCreateFontSet(fl_display, fnt, &missing_list,
                         &missing_count, &def_string);
 #endif
@@ -509,8 +536,10 @@ void fl_set_status(int x, int y, int w, int h)
   XFree(status_attr);
 }
 
-void fl_init_xim()
-{
+void fl_init_xim() {
+  static int xim_warning = 2;
+  if (xim_warning > 0) xim_warning--;
+
   //XIMStyle *style;
   XIMStyles *xim_styles;
   if (!fl_display) return;
@@ -524,26 +553,33 @@ void fl_init_xim()
     XGetIMValues (fl_xim_im, XNQueryInputStyle,
                   &xim_styles, NULL, NULL);
   } else {
-    Fl::warning("XOpenIM() failed\n");
+    if (xim_warning)
+      Fl::warning("XOpenIM() failed");
+    // if xim_styles is allocated, free it now
+    if (xim_styles) XFree(xim_styles);
     return;
   }
 
   if (xim_styles && xim_styles->count_styles) {
     fl_new_ic();
    } else {
-     Fl::warning("No XIM style found\n");
+     if (xim_warning)
+       Fl::warning("No XIM style found");
      XCloseIM(fl_xim_im);
      fl_xim_im = NULL;
+     // if xim_styles is allocated, free it now
+     if (xim_styles) XFree(xim_styles);
      return;
   }
   if (!fl_xim_ic) {
-    Fl::warning("XCreateIC() failed\n");
+    if (xim_warning)
+      Fl::warning("XCreateIC() failed");
     XCloseIM(fl_xim_im);
-    XFree(xim_styles);
     fl_xim_im = NULL;
   }
+  // if xim_styles is still allocated, free it now
+  if(xim_styles) XFree(xim_styles);
 }
-
 
 void fl_open_display() {
   if (fl_display) return;
@@ -581,8 +617,17 @@ void fl_open_display(Display* d) {
   //fl_XdndProxy        = XInternAtom(d, "XdndProxy",           0);
   fl_XdndEnter          = XInternAtom(d, "XdndEnter",           0);
   fl_XdndURIList        = XInternAtom(d, "text/uri-list",       0);
+  fl_Xatextplainutf     = XInternAtom(d, "text/plain;charset=UTF-8",0);
+  fl_Xatextplain        = XInternAtom(d, "text/plain",          0);
+  fl_XaText             = XInternAtom(d, "TEXT",                0);
+  fl_XaCompoundText     = XInternAtom(d, "COMPOUND_TEXT",       0);
   fl_XaUtf8String       = XInternAtom(d, "UTF8_STRING",         0);
   fl_XaTextUriList      = XInternAtom(d, "text/uri-list",       0);
+  fl_NET_WM_NAME        = XInternAtom(d, "_NET_WM_NAME",        0);
+  fl_NET_WM_ICON_NAME   = XInternAtom(d, "_NET_WM_ICON_NAME",   0);
+
+  if (sizeof(Atom) < 4)
+    atom_bits = sizeof(Atom) * 8;
 
   Fl::add_fd(ConnectionNumber(d), POLLIN, fd_callback);
 
@@ -693,7 +738,7 @@ void Fl::paste(Fl_Widget &receiver, int clipboard) {
   // otherwise get the window server to return it:
   fl_selection_requestor = &receiver;
   Atom property = clipboard ? CLIPBOARD : XA_PRIMARY;
-  XConvertSelection(fl_display, property, fl_XaUtf8String, property,
+  XConvertSelection(fl_display, property, TARGETS, property,
                     fl_xid(Fl::first_window()), fl_event_time);
 }
 
@@ -793,12 +838,32 @@ static Fl_Window* resize_bug_fix;
 static char unknown[] = "<unknown>";
 const int unknown_len = 10;
 
+extern "C" {
+
+static int xerror = 0;
+
+static int ignoreXEvents(Display *display, XErrorEvent *event) {
+  xerror = 1;
+  return 0;
+}
+
+static XErrorHandler catchXExceptions() {
+  xerror = 0;
+  return ignoreXEvents;
+}
+
+static int wasXExceptionRaised() {
+  return xerror;
+}
+
+}
+
+
 int fl_handle(const XEvent& thisevent)
 {
   XEvent xevent = thisevent;
   fl_xevent = &thisevent;
   Window xid = xevent.xany.window;
-  int filtered = 0;
   static Window xim_win = 0;
 
   if (fl_xim_ic && xevent.type == DestroyNotify &&
@@ -857,10 +922,8 @@ int fl_handle(const XEvent& thisevent)
 #endif
   }
 
-  filtered = XFilterEvent((XEvent *)&xevent, 0);
-  if (filtered) {
-    return 1;
-  }
+  if ( XFilterEvent((XEvent *)&xevent, 0) )
+      return(1);
 
   switch (xevent.type) {
 
@@ -882,23 +945,48 @@ int fl_handle(const XEvent& thisevent)
       // bugs in X servers, or maybe to avoid an extra round-trip to
       // get the property length.  I copy this here:
       Atom actual; int format; unsigned long count, remaining;
-      unsigned char* portion;
+      unsigned char* portion = NULL;
       if (XGetWindowProperty(fl_display,
                              fl_xevent->xselection.requestor,
                              fl_xevent->xselection.property,
                              bytesread/4, 65536, 1, 0,
                              &actual, &format, &count, &remaining,
                              &portion)) break; // quit on error
-      if (bytesread) { // append to the accumulated buffer
-        buffer = (unsigned char*)realloc(buffer, bytesread+count*format/8+remaining);
-        memcpy(buffer+bytesread, portion, count*format/8);
-        XFree(portion);
-      } else {  // Use the first section without moving the memory:
-        buffer = portion;
+      if (actual == TARGETS || actual == XA_ATOM) {
+	Atom type = XA_STRING;
+	for (unsigned i = 0; i<count; i++) {
+	  Atom t = ((Atom*)portion)[i];
+	    if (t == fl_Xatextplainutf ||
+		  t == fl_Xatextplain ||
+		  t == fl_XaUtf8String) {type = t; break;}
+	    // rest are only used if no utf-8 available:
+	    if (t == fl_XaText ||
+		  t == fl_XaTextUriList ||
+		  t == fl_XaCompoundText) type = t;
+	}
+	XFree(portion);
+	Atom property = xevent.xselection.property;
+	XConvertSelection(fl_display, property, type, property,
+	      fl_xid(Fl::first_window()),
+	      fl_event_time);
+	return true;
       }
-      bytesread += count*format/8;
-      buffer[bytesread] = 0;
+      // Make sure we got something sane...
+      if ((portion == NULL) || (format != 8) || (count == 0)) {
+	if (portion) XFree(portion);
+        return true;
+	}
+      buffer = (unsigned char*)realloc(buffer, bytesread+count+remaining+1);
+      memcpy(buffer+bytesread, portion, count);
+      XFree(portion);
+      bytesread += count;
+      // Cannot trust data to be null terminated
+      buffer[bytesread] = '\0';
       if (!remaining) break;
+    }
+    if (buffer) {
+      buffer[bytesread] = 0;
+      convert_crlf(buffer, bytesread);
     }
     Fl::e_text = buffer ? (char*)buffer : (char *)"";
     Fl::e_length = bytesread;
@@ -932,14 +1020,25 @@ int fl_handle(const XEvent& thisevent)
     e.time = fl_xevent->xselectionrequest.time;
     e.property = fl_xevent->xselectionrequest.property;
     if (e.target == TARGETS) {
-      Atom a = fl_XaUtf8String; //XA_STRING;
+      Atom a[3] = {fl_XaUtf8String, XA_STRING, fl_XaText};
       XChangeProperty(fl_display, e.requestor, e.property,
-                      XA_ATOM, sizeof(Atom)*8, 0, (unsigned char*)&a, 1);
+                      XA_ATOM, atom_bits, 0, (unsigned char*)a, 3);
     } else if (/*e.target == XA_STRING &&*/ fl_selection_length[clipboard]) {
-      XChangeProperty(fl_display, e.requestor, e.property,
-                      e.target, 8, 0,
-                      (unsigned char *)fl_selection_buffer[clipboard],
-                      fl_selection_length[clipboard]);
+    if (e.target == fl_XaUtf8String ||
+	     e.target == XA_STRING ||
+	     e.target == fl_XaCompoundText ||
+	     e.target == fl_XaText ||
+	     e.target == fl_Xatextplain ||
+	     e.target == fl_Xatextplainutf) {
+	// clobber the target type, this seems to make some applications
+	// behave that insist on asking for XA_TEXT instead of UTF8_STRING
+	// Does not change XA_STRING as that breaks xclipboard.
+	if (e.target != XA_STRING) e.target = fl_XaUtf8String;
+	XChangeProperty(fl_display, e.requestor, e.property,
+			 e.target, 8, 0,
+			 (unsigned char *)fl_selection_buffer[clipboard],
+			 fl_selection_length[clipboard]);
+      }
     } else {
 //    char* x = XGetAtomName(fl_display,e.target);
 //    fprintf(stderr,"selection request of %s\n",x);
@@ -970,6 +1069,19 @@ int fl_handle(const XEvent& thisevent)
 
   if (window) switch (xevent.type) {
 
+    case DestroyNotify: { // an X11 window was closed externally from the program
+      Fl::handle(FL_CLOSE, window);
+      Fl_X* X = Fl_X::i(window);
+      if (X) { // indicates the FLTK window was not closed
+	X->xid = (Window)0; // indicates the X11 window was already destroyed
+	window->hide();
+	int oldx = window->x(), oldy = window->y();
+	window->position(0, 0);
+	window->position(oldx, oldy);
+	window->show(); // recreate the X11 window in support of the FLTK window
+	}
+      return 1;
+    }
   case ClientMessage: {
     Atom message = fl_xevent->xclient.message_type;
     const long* data = fl_xevent->xclient.data.l;
@@ -1133,33 +1245,30 @@ int fl_handle(const XEvent& thisevent)
       int len = 0;
 
       if (fl_xim_ic) {
-        if (!filtered) {
-          Status status;
-          len = XUtf8LookupString(fl_xim_ic, (XKeyPressedEvent *)&xevent.xkey,
-                               buffer, buffer_len, &keysym, &status);
+	Status status;
+	len = XUtf8LookupString(fl_xim_ic, (XKeyPressedEvent *)&xevent.xkey,
+			     buffer, buffer_len, &keysym, &status);
 
-          while (status == XBufferOverflow && buffer_len < 50000) {
-            buffer_len = buffer_len * 5 + 1;
-            buffer = (char*)realloc(buffer, buffer_len);
-            len = XUtf8LookupString(fl_xim_ic, (XKeyPressedEvent *)&xevent.xkey,
-                               buffer, buffer_len, &keysym, &status);
-          }
-        } else {
+	while (status == XBufferOverflow && buffer_len < 50000) {
+	  buffer_len = buffer_len * 5 + 1;
+	  buffer = (char*)realloc(buffer, buffer_len);
+	  len = XUtf8LookupString(fl_xim_ic, (XKeyPressedEvent *)&xevent.xkey,
+			     buffer, buffer_len, &keysym, &status);
+	}
+	keysym = XKeycodeToKeysym(fl_display, keycode, 0);
+      } else {
+        //static XComposeStatus compose;
+        len = XLookupString((XKeyEvent*)&(xevent.xkey),
+                             buffer, buffer_len, &keysym, 0/*&compose*/);
+        if (keysym && keysym < 0x400) { // a character in latin-1,2,3,4 sets
+          // force it to type a character (not sure if this ever is needed):
+          // if (!len) {buffer[0] = char(keysym); len = 1;}
+          len = fl_utf8encode(XKeysymToUcs(keysym), buffer);
+          if (len < 1) len = 1;
+          // ignore all effects of shift on the keysyms, which makes it a lot
+          // easier to program shortcuts and is Windoze-compatible:
           keysym = XKeycodeToKeysym(fl_display, keycode, 0);
         }
-      } else {
-      //static XComposeStatus compose;
-      len = XLookupString((XKeyEvent*)&(xevent.xkey),
-                             buffer, buffer_len, &keysym, 0/*&compose*/);
-      if (keysym && keysym < 0x400) { // a character in latin-1,2,3,4 sets
-        // force it to type a character (not sure if this ever is needed):
-        // if (!len) {buffer[0] = char(keysym); len = 1;}
-        len = fl_utf8encode(XKeysymToUcs(keysym), buffer);
-        if (len < 1) len = 1;
-        // ignore all effects of shift on the keysyms, which makes it a lot
-        // easier to program shortcuts and is Windoze-compatable:
-        keysym = XKeycodeToKeysym(fl_display, keycode, 0);
-      }
       }
       // MRS: Can't use Fl::event_state(FL_CTRL) since the state is not
       //      set until set_event_xy() is called later...
@@ -1172,21 +1281,21 @@ int fl_handle(const XEvent& thisevent)
       // down, probably due to some back compatibility problem. Fortunately
       // we can detect this because the repeating KeyPress event is in
       // the queue, get it and execute it instead:
-      
+
       // Bool XkbSetDetectableAutorepeat ( display, detectable, supported_rtrn )
       // Display * display ;
       // Bool detectable ;
       // Bool * supported_rtrn ;
-      // ...would be the easy way to corrct this isuue. Unfortunatly, this call is also 
+      // ...would be the easy way to corrct this isuue. Unfortunatly, this call is also
       // broken on many Unix distros including Ubuntu and Solaris (as of Dec 2009)
 
-      // Bogus KeyUp events are generated by repeated KeyDown events. One 
+      // Bogus KeyUp events are generated by repeated KeyDown events. One
       // neccessary condition is an identical key event pending right after
       // the bogus KeyUp.
       // The new code introduced Dec 2009 differs in that it only check the very
       // next event in the queue, not the entire queue of events.
       // This function wrongly detects a repeat key if a software keyboard
-      // sends a burst of events containing two consecutive equal keys. However, 
+      // sends a burst of events containing two consecutive equal keys. However,
       // in every non-gaming situation, this is no problem because both KeyPress
       // events will cause the expected behavior.
       XEvent peekevent;
@@ -1200,7 +1309,7 @@ int fl_handle(const XEvent& thisevent)
           goto KEYPRESS;
         }
       }
-      
+
       event = FL_KEYUP;
       fl_key_vector[keycode/8] &= ~(1 << (keycode%8));
       // keyup events just get the unshifted keysym:
@@ -1225,6 +1334,72 @@ int fl_handle(const XEvent& thisevent)
       else if (keysym == FL_BackSpace) got_backspace = 1;
     }
 #  endif
+    // For the first few years, there wasn't a good consensus on what the
+    // Windows keys should be mapped to for X11. So we need to help out a
+    // bit and map all variants to the same FLTK key...
+    switch (keysym) {
+	case XK_Meta_L:
+	case XK_Hyper_L:
+	case XK_Super_L:
+	  keysym = FL_Meta_L;
+	  break;
+	case XK_Meta_R:
+	case XK_Hyper_R:
+	case XK_Super_R:
+	  keysym = FL_Meta_R;
+	  break;
+      }
+    // Convert the multimedia keys to safer, portable values
+    switch (keysym) { // XF names come from X11/XF86keysym.h
+      case 0x1008FF11: // XF86XK_AudioLowerVolume:
+	keysym = FL_Volume_Down;
+	break;
+      case 0x1008FF12: // XF86XK_AudioMute:
+	keysym = FL_Volume_Mute;
+	break;
+      case 0x1008FF13: // XF86XK_AudioRaiseVolume:
+	keysym = FL_Volume_Up;
+	break;
+      case 0x1008FF14: // XF86XK_AudioPlay:
+	keysym = FL_Media_Play;
+	break;
+      case 0x1008FF15: // XF86XK_AudioStop:
+	keysym = FL_Media_Stop;
+	break;
+      case 0x1008FF16: // XF86XK_AudioPrev:
+	keysym = FL_Media_Prev;
+	break;
+      case 0x1008FF17: // XF86XK_AudioNext:
+	keysym = FL_Media_Next;
+	break;
+      case 0x1008FF18: // XF86XK_HomePage:
+	keysym = FL_Home_Page;
+	break;
+      case 0x1008FF19: // XF86XK_Mail:
+	keysym = FL_Mail;
+	break;
+      case 0x1008FF1B: // XF86XK_Search:
+	keysym = FL_Search;
+	break;
+      case 0x1008FF26: // XF86XK_Back:
+	keysym = FL_Back;
+	break;
+      case 0x1008FF27: // XF86XK_Forward:
+	keysym = FL_Forward;
+	break;
+      case 0x1008FF28: // XF86XK_Stop:
+	keysym = FL_Stop;
+	break;
+      case 0x1008FF29: // XF86XK_Refresh:
+	keysym = FL_Refresh;
+	break;
+      case 0x1008FF2F: // XF86XK_Sleep:
+	keysym = FL_Sleep;
+	break;
+      case 0x1008FF30: // XF86XK_Favorites:
+	keysym = FL_Favorites;
+	break;
+    }
     // We have to get rid of the XK_KP_function keys, because they are
     // not produced on Windoze and thus case statements tend not to check
     // for them.  There are 15 of these in the range 0xff91 ... 0xff9f
@@ -1254,6 +1429,10 @@ int fl_handle(const XEvent& thisevent)
       Fl::e_original_keysym = (int)keysym;
     }
     Fl::e_keysym = int(keysym);
+
+    // replace XK_ISO_Left_Tab (Shift-TAB) with FL_Tab (modifier flags are set correctly by X11)
+    if (Fl::e_keysym == 0xfe20) Fl::e_keysym = FL_Tab;
+
     set_event_xy();
     Fl::e_is_click = 0;
     break;}
@@ -1311,6 +1490,12 @@ int fl_handle(const XEvent& thisevent)
 
     fl_xmousewin = window;
     in_a_window = true;
+    { XIMStyles *xim_styles = NULL;
+      if(!fl_xim_im || XGetIMValues(fl_xim_im, XNQueryInputStyle, &xim_styles, NULL, NULL)) {
+	fl_init_xim();
+      }
+      if (xim_styles) XFree(xim_styles);
+    }
     break;
 
   case LeaveNotify:
@@ -1351,16 +1536,22 @@ int fl_handle(const XEvent& thisevent)
     int xpos, ypos;
     Window junk;
 
+    // on some systems, the ReparentNotify event is not handled as we would expect.
+    XErrorHandler oldHandler = XSetErrorHandler(catchXExceptions());
+
     //ReparentNotify gives the new position of the window relative to
     //the new parent. FLTK cares about the position on the root window.
     XTranslateCoordinates(fl_display, xevent.xreparent.parent,
                           XRootWindow(fl_display, fl_screen),
                           xevent.xreparent.x, xevent.xreparent.y,
                           &xpos, &ypos, &junk);
+    XSetErrorHandler(oldHandler);
 
     // tell Fl_Window about it and set flag to prevent echoing:
-    resize_bug_fix = window;
-    window->position(xpos, ypos);
+    if ( !wasXExceptionRaised() ) {
+      resize_bug_fix = window;
+      window->position(xpos, ypos);
+    }
     break;
     }
   }
@@ -1373,13 +1564,14 @@ int fl_handle(const XEvent& thisevent)
 void Fl_Window::resize(int X,int Y,int W,int H) {
   int is_a_move = (X != x() || Y != y());
   int is_a_resize = (W != w() || H != h());
+  int is_a_enlarge = (W > w() || H > h());
   int resize_from_program = (this != resize_bug_fix);
   if (!resize_from_program) resize_bug_fix = 0;
   if (is_a_move && resize_from_program) set_flag(FORCE_POSITION);
   else if (!is_a_resize && !is_a_move) return;
   if (is_a_resize) {
     Fl_Group::resize(X,Y,W,H);
-    if (shown()) {redraw(); i->wait_for_expose = 1;}
+    if (shown()) {redraw(); if(is_a_enlarge) i->wait_for_expose = 1;}
   } else {
     x(X); y(Y);
   }
@@ -1559,7 +1751,7 @@ void Fl_X::make_xid(Fl_Window* win, XVisualInfo *visual, Colormap colormap)
       XSetTransientForHint(fl_display, xp->xid, fl_xid(wp));
       if (!wp->visible()) showit = 0; // guess that wm will not show it
     }
-   
+
     // Make sure that borderless windows do not show in the task bar
     if (!win->border()) {
       Atom net_wm_state = XInternAtom (fl_display, "_NET_WM_STATE", 0);
@@ -1704,11 +1896,13 @@ void Fl_Window::label(const char *name,const char *iname) {
   iconlabel_ = iname;
   if (shown() && !parent()) {
     if (!name) name = "";
-    XChangeProperty(fl_display, i->xid, XA_WM_NAME,
-                    fl_XaUtf8String, 8, 0, (uchar*)name, strlen(name));
+    int namelen = strlen(name);
     if (!iname) iname = fl_filename_name(name);
-    XChangeProperty(fl_display, i->xid, XA_WM_ICON_NAME,
-                    fl_XaUtf8String, 8, 0, (uchar*)iname, strlen(iname));
+    int inamelen = strlen(iname);
+    XChangeProperty(fl_display, i->xid, fl_NET_WM_NAME,      fl_XaUtf8String, 8, 0, (uchar*)name,  namelen);	// utf8
+    XChangeProperty(fl_display, i->xid, XA_WM_NAME,          XA_STRING,       8, 0, (uchar*)name,  namelen);	// non-utf8
+    XChangeProperty(fl_display, i->xid, fl_NET_WM_ICON_NAME, fl_XaUtf8String, 8, 0, (uchar*)iname, inamelen);	// utf8
+    XChangeProperty(fl_display, i->xid, XA_WM_ICON_NAME,     XA_STRING,       8, 0, (uchar*)iname, inamelen);	// non-utf8
   }
 }
 
@@ -1725,7 +1919,7 @@ void Fl_Window::label(const char *name,const char *iname) {
 // contents are restored to the area, but this assumes the area
 // is cleared to background color.  So this is disabled in this version.
 // Fl_Window *fl_boxcheat;
-static inline int can_boxcheat(uchar b) {return (b==1 || (b&2) && b<=15);}
+static inline int can_boxcheat(uchar b) {return (b==1 || ((b&2) && b<=15));}
 
 void Fl_Window::show() {
   image(Fl::scheme_bg_);
@@ -1765,11 +1959,97 @@ void Fl_Window::make_current() {
   current_ = this;
   fl_clip_region(0);
 
-#ifdef USE_CAIRO
+#ifdef FLTK_USE_CAIRO
   // update the cairo_t context
   if (Fl::cairo_autolink_context()) Fl::cairo_make_current(this);
 #endif
+}
 
+Window fl_xid_(const Fl_Window *w) {
+  Fl_X *temp = Fl_X::i(w);
+  return temp ? temp->xid : 0;
+}
+
+static void decorated_win_size(Fl_Window *win, int &w, int &h)
+{
+  w = win->w();
+  h = win->h();
+  if (!win->shown() || win->parent() || !win->border() || !win->visible()) return;
+  Window root, parent, *children;
+  unsigned n = 0;
+  Status status = XQueryTree(fl_display, Fl_X::i(win)->xid, &root, &parent, &children, &n); 
+  if (status != 0 && n) XFree(children);
+  // when compiz is used, root and parent are the same window 
+  // and I don't know where to find the window decoration
+  if (status == 0 || root == parent) return; 
+  XWindowAttributes attributes;
+  XGetWindowAttributes(fl_display, parent, &attributes);
+  w = attributes.width;
+  h = attributes.height;
+}
+
+int Fl_Window::decorated_h()
+{
+  int w, h;
+  decorated_win_size(this, w, h);
+  return h;
+}
+
+int Fl_Window::decorated_w()
+{
+  int w, h;
+  decorated_win_size(this, w, h);
+  return w;
+}
+
+void Fl_Paged_Device::print_window(Fl_Window *win, int x_offset, int y_offset)
+{
+  if (!win->shown() || win->parent() || !win->border() || !win->visible()) {
+    this->print_widget(win, x_offset, y_offset);
+    return;
+  }
+  Fl_Display_Device::display_device()->set_current();
+  win->show();
+  Fl::check();
+  win->make_current();
+  Window root, parent, *children, child_win, from;
+  unsigned n = 0;
+  int bx, bt, do_it;
+  from = fl_window;
+  do_it = (XQueryTree(fl_display, fl_window, &root, &parent, &children, &n) != 0 && 
+	   XTranslateCoordinates(fl_display, fl_window, parent, 0, 0, &bx, &bt, &child_win) == True);
+  if (n) XFree(children);
+  // hack to bypass STR #2648: when compiz is used, root and parent are the same window 
+  // and I don't know where to find the window decoration
+  if (do_it && root == parent) do_it = 0; 
+  if (!do_it) {
+    this->set_current();
+    this->print_widget(win, x_offset, y_offset);
+    return;
+  }
+  fl_window = parent;
+  uchar *top_image = 0, *left_image = 0, *right_image = 0, *bottom_image = 0;
+  top_image = fl_read_image(NULL, 0, 0, - (win->w() + 2 * bx), bt);
+  if (bx) {
+    left_image = fl_read_image(NULL, 0, bt, -bx, win->h() + bx);
+    right_image = fl_read_image(NULL, win->w() + bx, bt, -bx, win->h() + bx);
+    bottom_image = fl_read_image(NULL, 0, bt + win->h(), -(win->w() + 2*bx), bx);
+  }
+  fl_window = from;
+  this->set_current();
+  if (top_image) {
+    fl_draw_image(top_image, x_offset, y_offset, win->w() + 2 * bx, bt, 3);
+    delete[] top_image;
+  }
+  if (bx) {
+    if (left_image) fl_draw_image(left_image, x_offset, y_offset + bt, bx, win->h() + bx, 3);
+    if (right_image) fl_draw_image(right_image, x_offset + win->w() + bx, y_offset + bt, bx, win->h() + bx, 3);
+    if (bottom_image) fl_draw_image(bottom_image, x_offset, y_offset + bt + win->h(), win->w() + 2*bx, bx, 3);
+    if (left_image) delete[] left_image;
+    if (right_image) delete[] right_image;
+    if (bottom_image) delete[] bottom_image;
+  }
+  this->print_widget( win, x_offset + bx, y_offset + bt );
 }
 
 #ifdef USE_PRINT_BUTTON
@@ -1789,9 +2069,11 @@ void printFront(Fl_Widget *o, void *data)
   printer.printable_rect(&w,&h);
   // scale the printer device so that the window fits on the page
   float scale = 1;
-  if (win->w() > w || win->h() > h) {
-    scale = (float)w/win->w();
-    if ((float)h/win->h() < scale) scale = (float)h/win->h();
+  int ww = win->decorated_w();
+  int wh = win->decorated_h();
+  if (ww > w || wh > h) {
+    scale = (float)w/ww;
+    if ((float)h/wh < scale) scale = (float)h/wh;
     printer.scale(scale, scale);
   }
 
@@ -1803,9 +2085,8 @@ void printFront(Fl_Widget *o, void *data)
   printer.rotate(ROTATE);
   printer.print_widget( win, - win->w()/2, - win->h()/2 );
   //printer.print_window_part( win, 0,0, win->w(), win->h(), - win->w()/2, - win->h()/2 );
-#else
-  printer.print_widget( win );
-  //printer.print_window_part( win, 0,0,win->w(), win->h() );
+#else  
+  printer.print_window(win);
 #endif
 
   printer.end_page();
@@ -1829,5 +2110,5 @@ void preparePrintFront(void)
 #endif
 
 //
-// End of "$Id: Fl_x.cxx 7659 2010-07-01 13:21:32Z manolo $".
+// End of "$Id: Fl_x.cxx 8764 2011-05-30 16:47:48Z manolo $".
 //

@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Bitmap.cxx 7659 2010-07-01 13:21:32Z manolo $"
+// "$Id: Fl_Bitmap.cxx 8360 2011-02-02 12:42:47Z manolo $"
 //
 // Bitmap drawing routines for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2009 by Bill Spitzak and others.
+// Copyright 1998-2010 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -304,13 +304,13 @@ void Fl_GDI_Graphics_Driver::draw(Fl_Bitmap *bm, int XP, int YP, int WP, int HP,
   HDC tempdc;
   int save;
   BOOL use_print_algo = false;
-  if (fl_surface->type() == Fl_Printer::device_type) {
+  if (Fl_Surface_Device::surface()->class_name() == Fl_Printer::class_id) {
     static HMODULE hMod = NULL;
     if (!hMod) {
       hMod = LoadLibrary("MSIMG32.DLL");
       if (hMod) fl_TransparentBlt = (fl_transp_func)GetProcAddress(hMod, "TransparentBlt");
     }
-    if (hMod) use_print_algo = true;
+    if (fl_TransparentBlt) use_print_algo = true;
   }
   if (use_print_algo) { // algorithm for bitmap output to Fl_GDI_Printer
     Fl_Offscreen tmp_id = fl_create_offscreen(W, H);
@@ -478,5 +478,5 @@ Fl_Image *Fl_Bitmap::copy(int W, int H) {
 
 
 //
-// End of "$Id: Fl_Bitmap.cxx 7659 2010-07-01 13:21:32Z manolo $".
+// End of "$Id: Fl_Bitmap.cxx 8360 2011-02-02 12:42:47Z manolo $".
 //

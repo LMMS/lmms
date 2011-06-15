@@ -1,9 +1,9 @@
 //
-// "$Id: fl_font_x.cxx 7652 2010-06-21 15:49:45Z manolo $"
+// "$Id: fl_font_x.cxx 8446 2011-02-19 18:03:43Z manolo $"
 //
 // Standard X11 font selection code for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2009 by Bill Spitzak and others.
+// Copyright 1998-2011 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -38,7 +38,6 @@ Fl_Font_Descriptor::Fl_Font_Descriptor(const char* name) {
 #  endif
 }
 
-Fl_Font_Descriptor* fl_fontsize;
 Fl_XFont_On_Demand fl_xfont;
 
 Fl_Font_Descriptor::~Fl_Font_Descriptor() {
@@ -53,8 +52,8 @@ Fl_Font_Descriptor::~Fl_Font_Descriptor() {
 //  glDeleteLists(listbase+base,size);
 // }
 #  endif
-  if (this == fl_fontsize) {
-    fl_fontsize = 0;
+  if (this == fl_graphics_driver->font_descriptor()) {
+    fl_graphics_driver->font_descriptor(NULL);
     fl_xfont = 0;
   }
   XFreeUtf8FontStruct(fl_display, font);
@@ -87,8 +86,6 @@ Fl_Fontdesc* fl_fonts = built_in_table;
 
 #define MAXSIZE 32767
 
-#define current_font (fl_fontsize->font)
-
 // return dash number N, or pointer to ending null if none:
 const char* fl_font_word(const char* p, int n) {
   while (*p) {if (*p=='-') {if (!--n) break;} p++;}
@@ -111,7 +108,8 @@ char* fl_find_fontsize(char* name) {
   return r;
 }
 
-const char* fl_encoding = "iso8859-1";
+//const char* fl_encoding = "iso8859-1";
+const char* fl_encoding = "iso10646-1";
 
 // return true if this matches fl_encoding:
 int fl_correct_encoding(const char* name) {
@@ -160,8 +158,8 @@ static const char *find_best_font(const char *fname, int size) {
       name = namebuffer;
       ptsize = size;
     } else if (!ptsize ||	// no fonts yet
-	       thissize < ptsize && ptsize > size || // current font too big
-	       thissize > ptsize && thissize <= size // current too small
+	       (thissize < ptsize && ptsize > size) || // current font too big
+	       (thissize > ptsize && thissize <= size) // current too small
       ) {
       name = thisname;
       ptsize = thissize;
@@ -243,13 +241,12 @@ static Fl_Font_Descriptor* find(int fnum, int size) {
   if (!s->name) s = fl_fonts; // use font 0 if still undefined
   Fl_Font_Descriptor* f;
   for (f = s->first; f; f = f->next)
-    if (f->minsize <= size && f->maxsize >= size) return f;
+    if (f->size == size) return f;
   fl_open_display();
 
   name = put_font_size(s->name, size);
   f = new Fl_Font_Descriptor(name);
-  f->minsize = size;
-  f->maxsize = size;
+  f->size = size;
   f->next = s->first;
   s->first = f;
   free(name);
@@ -260,8 +257,6 @@ static Fl_Font_Descriptor* find(int fnum, int size) {
 ////////////////////////////////////////////////////////////////
 // Public interface:
 
-Fl_Font fl_font_ = 0;
-Fl_Fontsize fl_size_ = 0;
 void *fl_xftfont = 0;
 static GC font_gc;
 
@@ -269,80 +264,81 @@ XFontStruct* Fl_XFont_On_Demand::value() {
   return ptr;
 }
 
-void Fl_Graphics_Driver::font(Fl_Font fnum, Fl_Fontsize size) {
+void Fl_Xlib_Graphics_Driver::font(Fl_Font fnum, Fl_Fontsize size) {
   if (fnum==-1) {
-    fl_font_ = 0; fl_size_ = 0;
+    Fl_Graphics_Driver::font(0, 0);
     return;
   }
-  if (fnum == fl_font_ && size == fl_size_) return;
-  fl_font_ = fnum; fl_size_ = size;
+  if (fnum == Fl_Graphics_Driver::font() && size == Fl_Graphics_Driver::size()) return;
+  Fl_Graphics_Driver::font(fnum, size);
   Fl_Font_Descriptor* f = find(fnum, size);
-  if (f != fl_fontsize) {
-    fl_fontsize = f;
-    fl_xfont = current_font->fonts[0];
+  if (f != this->font_descriptor()) {
+    this->font_descriptor(f);
+    fl_xfont = f->font->fonts[0];
     font_gc = 0;
   }
 }
 
-int fl_height() {
-  if (current_font) return (current_font->ascent + current_font->descent);
+int Fl_Xlib_Graphics_Driver::height() {
+  if (font_descriptor()) return font_descriptor()->font->ascent + font_descriptor()->font->descent;
   else return -1;
 }
 
-int fl_descent() {
-  if (current_font) return current_font->descent;
+int Fl_Xlib_Graphics_Driver::descent() {
+  if (font_descriptor()) return font_descriptor()->font->descent;
   else return -1;
 }
 
-double fl_width(const char* c, int n) {
-  if (current_font) return (double) XUtf8TextWidth(current_font, c, n);
+double Fl_Xlib_Graphics_Driver::width(const char* c, int n) {
+  if (font_descriptor()) return (double) XUtf8TextWidth(font_descriptor()->font, c, n);
   else return -1;
 }
 
-double fl_width(unsigned int c) {
-  if (current_font) return (double) XUtf8UcsWidth(current_font, c);
+double Fl_Xlib_Graphics_Driver::width(unsigned int c) {
+  if (font_descriptor()) return (double) XUtf8UcsWidth(font_descriptor()->font, c);
   else return -1;
 }
 
-
-void fl_text_extents(const char *c, int n, int &dx, int &dy, int &W, int &H) {
-
-#if defined(__GNUC__)
-#warning fl_text_extents is only a test stub in Xlib build at present
-#endif /*__GNUC__*/
-
-  W = 0; H = 0;
-  fl_measure(c, W, H, 0);
-  dx = 0;
-  dy = fl_descent() - H;
-} // fl_text_extents
-
-
-void Fl_Graphics_Driver::draw(const char* c, int n, int x, int y) {
+void Fl_Xlib_Graphics_Driver::text_extents(const char *c, int n, int &dx, int &dy, int &W, int &H) {
   if (font_gc != fl_gc) {
-    if (!current_font) fl_font(FL_HELVETICA, 14);
+    if (!font_descriptor()) font(FL_HELVETICA, FL_NORMAL_SIZE);
     font_gc = fl_gc;
-    XSetFont(fl_display, fl_gc, current_font->fid);
+    XSetFont(fl_display, fl_gc, font_descriptor()->font->fid);
   }
-//  XDrawString(fl_display, fl_window, fl_gc, x, y, c, n);
-  XUtf8DrawString(fl_display, fl_window, current_font, fl_gc, x, y, c, n);
-}
-void Fl_Graphics_Driver::draw(int angle, const char *str, int n, int x, int y) {
-  fprintf(stderr,"ROTATING TEXT NOT IMPLIMENTED\n");
-  fl_draw(str, n, (int)x, (int)y);
-}
-//void fl_draw(const char* str, int n, float x, float y) {
-//  fl_draw(str, n, (int)x, (int)y);
-//}
+  int xx, yy, ww, hh;
+  xx = yy = ww = hh = 0;
+  if (fl_gc) XUtf8_measure_extents(fl_display, fl_window, font_descriptor()->font, fl_gc, &xx, &yy, &ww, &hh, c, n);
 
-void Fl_Graphics_Driver::rtl_draw(const char* c, int n, int x, int y) {
+  W = ww; H = hh; dx = xx; dy = yy;
+// This is the safe but mostly wrong thing we used to do...
+//  W = 0; H = 0;
+//  fl_measure(c, W, H, 0);
+//  dx = 0;
+//  dy = fl_descent() - H;
+}
+
+void Fl_Xlib_Graphics_Driver::draw(const char* c, int n, int x, int y) {
   if (font_gc != fl_gc) {
-    if (!current_font) fl_font(FL_HELVETICA, 12);
+    if (!font_descriptor()) this->font(FL_HELVETICA, FL_NORMAL_SIZE);
+    font_gc = fl_gc;
+    XSetFont(fl_display, fl_gc, font_descriptor()->font->fid);
+  }
+  if (fl_gc) XUtf8DrawString(fl_display, fl_window, font_descriptor()->font, fl_gc, x, y, c, n);
+}
+
+void Fl_Xlib_Graphics_Driver::draw(int angle, const char *str, int n, int x, int y) {
+  fprintf(stderr,"ROTATING TEXT NOT IMPLEMENTED\n");
+  this->draw(str, n, (int)x, (int)y);
+}
+
+void Fl_Xlib_Graphics_Driver::rtl_draw(const char* c, int n, int x, int y) {
+  if (font_gc != fl_gc) {
+    if (!font_descriptor()) this->font(FL_HELVETICA, FL_NORMAL_SIZE);
     font_gc = fl_gc;
   }
-  XUtf8DrawRtlString(fl_display, fl_window, current_font, fl_gc, x, y, c, n);
+  if (fl_gc) XUtf8DrawRtlString(fl_display, fl_window, font_descriptor()->font, fl_gc, x, y, c, n);
 }
 #endif // FL_DOXYGEN
 //
-// End of "$Id: fl_font_x.cxx 7652 2010-06-21 15:49:45Z manolo $".
+// End of "$Id: fl_font_x.cxx 8446 2011-02-19 18:03:43Z manolo $".
 //

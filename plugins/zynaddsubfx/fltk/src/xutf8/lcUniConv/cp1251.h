@@ -3,6 +3,7 @@
 /*
  * CP1251
  */
+#ifdef NEED_TOWC
 
 static const unsigned short cp1251_2uni[128] = {
   /* 0x80 */
@@ -48,7 +49,9 @@ cp1251_mbtowc (conv_t conv, ucs4_t *pwc, const unsigned char *s, int n)
   }
   return RET_ILSEQ;
 }
+#endif /* NEED_TOWC */
 
+#ifdef  NEED_TOMB
 static const unsigned char cp1251_page00[32] = {
   0xa0, 0x00, 0x00, 0x00, 0xa4, 0x00, 0xa6, 0xa7, /* 0xa0-0xa7 */
   0x00, 0xa9, 0x00, 0xab, 0xac, 0xad, 0xae, 0x00, /* 0xa8-0xaf */
@@ -111,3 +114,4 @@ cp1251_wctomb (conv_t conv, unsigned char *r, ucs4_t wc, int n)
   }
   return RET_ILSEQ;
 }
+#endif /* NEED_TOMB */

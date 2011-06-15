@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Input_.cxx 7672 2010-07-10 09:44:45Z matt $"
+// "$Id: Fl_Input_.cxx 8413 2011-02-11 16:37:06Z manolo $"
 //
 // Common input widget routines for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2009 by Bill Spitzak and others.
+// Copyright 1998-2010 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -37,6 +37,12 @@
 #include <ctype.h>
 
 #define MAXBUF 1024
+#if defined(USE_X11) && !USE_XFT
+const int secret_char = '*'; // asterisk to hide secret input
+#else
+const int secret_char = 0x2022; // bullet to hide secret input
+#endif
+static int l_secret;
 
 extern void fl_draw(const char*, int, float, float);
 
@@ -67,7 +73,10 @@ const char* Fl_Input_::expand(const char* p, char* buf) const {
 
   if (input_type()==FL_SECRET_INPUT) {
     while (o<e && p < value_+size_) {
-      if (fl_utf8len((char)p[0]) >= 1) *o++ = '*';
+      if (fl_utf8len((char)p[0]) >= 1) {
+	l_secret = fl_utf8encode(secret_char, o);
+	o += l_secret;
+      }
       p++;
     }
 
@@ -124,10 +133,12 @@ double Fl_Input_::expandpos(
 ) const {
   int n = 0;
   int chr = 0;
+  int l;
   if (input_type()==FL_SECRET_INPUT) {
     while (p<e) {
-      if (fl_utf8len((char)p[0]) >= 1) n++;
-      p++;
+      l = fl_utf8len((char)p[0]);
+      if (l >= 1) n += l_secret;
+      p += l;
     }
   } else while (p<e) {
     int c = *p & 255;
@@ -358,6 +369,8 @@ void Fl_Input_::drawtext(int X, int Y, int W, int H) {
     if (Fl::focus() == this && selstart == selend &&
 	position() >= p-value() && position() <= e-value()) {
       fl_color(cursor_color());
+      // cursor position may need to be recomputed (see STR #2486)
+      curx = int(expandpos(p, value()+position(), buf, 0)+.5);
       if (readonly()) {
         fl_line((int)(xpos+curx-2.5f), Y+ypos+height-1,
 	        (int)(xpos+curx+0.5f), Y+ypos+height-4,
@@ -844,7 +857,7 @@ int Fl_Input_::replace(int b, int e, const char* text, int ilen) {
 */
 int Fl_Input_::undo() {
   was_up_down = 0;
-  if (undowidget != this || !undocut && !undoinsert) return 0;
+  if ( undowidget != this || (!undocut && !undoinsert) ) return 0;
 
   int ilen = undocut;
   int xlen = undoinsert;
@@ -1057,6 +1070,7 @@ Fl_Input_::Fl_Input_(int X, int Y, int W, int H, const char* l)
   maximum_size_ = 32767;
   shortcut_ = 0;
   set_flag(SHORTCUT_LABEL);
+  tab_nav(1);
 }
 
 /**
@@ -1254,5 +1268,5 @@ unsigned int Fl_Input_::index(int i) const
 }
 
 //
-// End of "$Id: Fl_Input_.cxx 7672 2010-07-10 09:44:45Z matt $".
+// End of "$Id: Fl_Input_.cxx 8413 2011-02-11 16:37:06Z manolo $".
 //

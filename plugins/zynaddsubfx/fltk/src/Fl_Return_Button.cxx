@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Return_Button.cxx 6616 2009-01-01 21:28:26Z matt $"
+// "$Id: Fl_Return_Button.cxx 7903 2010-11-28 21:06:39Z matt $"
 //
 // Return button widget for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2009 by Bill Spitzak and others.
+// Copyright 1998-2010 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -61,6 +61,7 @@ void Fl_Return_Button::draw() {
 int Fl_Return_Button::handle(int event) {
   if (event == FL_SHORTCUT &&
       (Fl::event_key() == FL_Enter || Fl::event_key() == FL_KP_Enter)) {
+    simulate_key_action();
     do_callback();
     return 1;
   } else
@@ -68,5 +69,5 @@ int Fl_Return_Button::handle(int event) {
 }
 
 //
-// End of "$Id: Fl_Return_Button.cxx 6616 2009-01-01 21:28:26Z matt $".
+// End of "$Id: Fl_Return_Button.cxx 7903 2010-11-28 21:06:39Z matt $".
 //

@@ -1,8 +1,8 @@
-// "$Id: Fl_Native_File_Chooser_WIN32.cxx 7312 2010-03-21 22:55:18Z fabien $"
+// "$Id: Fl_Native_File_Chooser_WIN32.cxx 8454 2011-02-20 21:46:11Z manolo $"
 //
 // FLTK native OS file chooser widget
 //
-// Copyright 1998-2005 by Bill Spitzak and others.
+// Copyright 1998-2010 by Bill Spitzak and others.
 // Copyright 2004 Greg Ercolano.
 // API changes + filter improvements by Nathan Vander Wilt 2005
 //
@@ -47,7 +47,10 @@ char *wchartoutf8(LPCWSTR in);  //MG
 #define RBRACKET_CHR	']'
 #define MAXFILTERS	80
 
+void fl_OleInitialize();	// in Fl.cxx (Windows only)
+
 // STATIC: PRINT WINDOWS 'DOUBLE NULL' STRING (DEBUG)
+#ifdef DEBUG
 static void dnullprint(char *wp) {
   if ( ! wp ) return;
   for ( int t=0; true; t++ ) {
@@ -62,6 +65,7 @@ static void dnullprint(char *wp) {
     }
   }
 }
+#endif
 
 // RETURN LENGTH OF DOUBLENULL STRING
 //    Includes single nulls in count, excludes trailing doublenull.
@@ -464,7 +468,8 @@ int CALLBACK Fl_Native_File_Chooser::Dir_CB(HWND win, UINT msg, LPARAM param, LP
 
 // SHOW DIRECTORY BROWSER
 int Fl_Native_File_Chooser::showdir() {
-  OleInitialize(NULL);		// init needed by BIF_USENEWUI
+  // initialize OLE only once
+  fl_OleInitialize();		// init needed by BIF_USENEWUI
   ClearBINF();
   clear_pathnames();
   // PARENT WINDOW
@@ -630,9 +635,9 @@ void Fl_Native_File_Chooser::add_filter(const char *name_in,	// name of filter (
   // No name? Make one..
   char name[1024];
   if ( !name_in || name_in[0] == '\0' ) {
-    sprintf(name, "%.*s Files", sizeof(name)-10, winfilter);
+    sprintf(name, "%.*s Files", int(sizeof(name)-10), winfilter);
   } else {
-    sprintf(name, "%.*s", sizeof(name)-10, name_in);
+    sprintf(name, "%.*s", int(sizeof(name)-10), name_in);
   }
   dnullcat(_parsedfilt, name);
   dnullcat(_parsedfilt, winfilter);
@@ -816,6 +821,10 @@ const char* Fl_Native_File_Chooser::preset_file() const {
   return(_preset_file);
 }
 
+int Fl_Native_File_Chooser::filters() const {
+  return(_nfilters);
+}
+
 char *wchartoutf8(LPCWSTR in)
 {
   static char *out = NULL;
@@ -847,5 +856,5 @@ LPCWSTR utf8towchar(const char *in)
 #endif /*!FL_DOXYGEN*/
 
 //
-// End of "$Id: Fl_Native_File_Chooser_WIN32.cxx 7312 2010-03-21 22:55:18Z fabien $".
+// End of "$Id: Fl_Native_File_Chooser_WIN32.cxx 8454 2011-02-20 21:46:11Z manolo $".
 //

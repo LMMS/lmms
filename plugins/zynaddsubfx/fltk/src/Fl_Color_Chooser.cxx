@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Color_Chooser.cxx 7347 2010-03-27 16:35:14Z AlbrechtS $"
+// "$Id: Fl_Color_Chooser.cxx 7981 2010-12-08 23:53:04Z greg.ercolano $"
 //
 // Color chooser for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2009 by Bill Spitzak and others.
+// Copyright 1998-2010 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -455,6 +455,13 @@ void Fl_Color_Chooser::mode_cb(Fl_Widget* o, void*) {
   c->set_valuators();
 }
 
+void Fl_Color_Chooser::mode(int newMode)
+{
+  choice.value(newMode);
+  choice.do_callback();
+}
+
+
 ////////////////////////////////////////////////////////////////
 
 /**
@@ -553,15 +560,17 @@ static void cc_cancel_cb (Fl_Widget *o, void *p) {
     @{ */
 /**
   \brief Pops up a window to let the user pick an arbitrary RGB color.
+  \note \#include <FL/Fl_Color_Chooser.H>
   \image html fl_color_chooser.jpg 
-  \image latex  fl_color_chooser.eps "fl_color_chooser" width=8cm
-  \param[in] name title label for the window
-  \param[in,out] r, g, b color components in the range 0.0 to 1.0.
+  \image latex  fl_color_chooser.jpg "fl_color_chooser" width=8cm
+  \param[in] name Title label for the window
+  \param[in,out] r, g, b Color components in the range 0.0 to 1.0.
+  \param[in] cmode Optional mode for color chooser. See mode(int). Default -1 if none (rgb mode).
   \retval 1 if user confirms the selection 
   \retval 0 if user cancels the dialog
   \relates Fl_Color_Chooser
  */
-int fl_color_chooser(const char* name, double& r, double& g, double& b) {
+int fl_color_chooser(const char* name, double& r, double& g, double& b, int cmode) {
   int ret = 0;
   Fl_Window window(215,200,name);
   window.callback(cc_cancel_cb,&ret);
@@ -578,6 +587,7 @@ int fl_color_chooser(const char* name, double& r, double& g, double& b) {
   window.resizable(chooser);
   chooser.rgb(r,g,b);
   chooser.callback(chooser_cb, &ok_color);
+  if (cmode!=-1) chooser.mode(cmode);
   window.end();
   window.set_modal();
   window.hotspot(window);
@@ -593,19 +603,21 @@ int fl_color_chooser(const char* name, double& r, double& g, double& b) {
 
 /**
   \brief Pops up a window to let the user pick an arbitrary RGB color.
+  \note \#include <FL/Fl_Color_Chooser.H>
   \image html fl_color_chooser.jpg 
-  \image latex  fl_color_chooser.eps "fl_color_chooser" width=8cm
-  \param[in] name title label for the window
-  \param[in,out] r, g, b color components in the range 0 to 255.
+  \image latex  fl_color_chooser.jpg "fl_color_chooser" width=8cm
+  \param[in] name Title label for the window
+  \param[in,out] r, g, b Color components in the range 0 to 255.
+  \param[in] cmode Optional mode for color chooser. See mode(int). Default -1 if none (rgb mode).
   \retval 1 if user confirms the selection 
   \retval 0 if user cancels the dialog
   \relates Fl_Color_Chooser
  */
-int fl_color_chooser(const char* name, uchar& r, uchar& g, uchar& b) {
+int fl_color_chooser(const char* name, uchar& r, uchar& g, uchar& b, int cmode) {
   double dr = r/255.0;
   double dg = g/255.0;
   double db = b/255.0;
-  if (fl_color_chooser(name,dr,dg,db)) {
+  if (fl_color_chooser(name,dr,dg,db,cmode)) {
     r = uchar(255*dr+.5);
     g = uchar(255*dg+.5);
     b = uchar(255*db+.5);
@@ -613,7 +625,8 @@ int fl_color_chooser(const char* name, uchar& r, uchar& g, uchar& b) {
   }
   return 0;
 }
+
 /** @} */
 //
-// End of "$Id: Fl_Color_Chooser.cxx 7347 2010-03-27 16:35:14Z AlbrechtS $".
+// End of "$Id: Fl_Color_Chooser.cxx 7981 2010-12-08 23:53:04Z greg.ercolano $".
 //

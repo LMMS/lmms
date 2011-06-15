@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Menu_Item.H 7517 2010-04-16 17:55:45Z greg.ercolano $"
+// "$Id: Fl_Menu_Item.H 7983 2010-12-09 00:04:06Z AlbrechtS $"
 //
 // Menu item header file for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2009 by Bill Spitzak and others.
+// Copyright 1998-2010 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -56,11 +56,11 @@ class Fl_Menu_;
   is used by the Fl_Menu_ class.  
   \code
   struct Fl_Menu_Item {
-   const char*	        text; // label()
+   const char*		text;     // label()
    ulong		shortcut_;
-   Fl_Callback*	        callback_;
+   Fl_Callback*		callback_;
    void*		user_data_;
-   int		        flags;
+   int			flags;
    uchar		labeltype_;
    uchar		labelfont_;
    uchar		labelsize_;
@@ -102,8 +102,8 @@ class Fl_Menu_;
   \endcode
   produces:
 
-  \image html   menu.gif
-  \image latex  menu.eps "menu" width=10cm
+  \image html   menu.png
+  \image latex  menu.png "menu" width=10cm
 
   A submenu title is identified by the bit FL_SUBMENU in the 
   flags field, and ends with a label() that is NULL.
@@ -119,12 +119,12 @@ struct FL_EXPORT Fl_Menu_Item {
   const char *text;	    ///< menu item text, returned by label()
   int shortcut_;	    ///< menu item shortcut
   Fl_Callback *callback_;   ///< menu item callback
-  void *user_data_;	    ///< menu item user_data for 3rd party apps
+  void *user_data_;	    ///< menu item user_data for the menu's callback
   int flags;		    ///< menu item flags like FL_MENU_TOGGLE, FL_MENU_RADIO
   uchar labeltype_;	    ///< how the menu item text looks like
   Fl_Font labelfont_;	    ///< which font for this menu item text
   Fl_Fontsize labelsize_;   ///< size of menu item text
-  Fl_Color labelcolor_;	    ///< menu item text color 
+  Fl_Color labelcolor_;	    ///< menu item text color
 
   // advance N items, skipping submenus:
   const Fl_Menu_Item *next(int=1) const;
@@ -148,7 +148,7 @@ struct FL_EXPORT Fl_Menu_Item {
     Returns the title of the item.
     A NULL here indicates the end of the menu (or of a submenu).
     A '&' in the item will print an underscore under the next letter,
-    and if the menu is popped up that letter will be a "shortcut" to pick 
+    and if the menu is popped up that letter will be a "shortcut" to pick
     that item.  To get a real '&' put two in a row.
   */
   const char* label() const {return text;}
@@ -160,6 +160,7 @@ struct FL_EXPORT Fl_Menu_Item {
   void label(Fl_Labeltype a,const char* b) {labeltype_ = a; text = b;}
 
   /**
+    Returns the menu item's labeltype.
     A labeltype identifies a routine that draws the label of the
     widget.  This can be used for special effects such as emboss, or to use
     the label() pointer as another form of data such as a bitmap.
@@ -168,6 +169,7 @@ struct FL_EXPORT Fl_Menu_Item {
   Fl_Labeltype labeltype() const {return (Fl_Labeltype)labeltype_;}
 
   /**
+    Sets the menu item's labeltype.
     A labeltype identifies a routine that draws the label of the
     widget.  This can be used for special effects such as emboss, or to use
     the label() pointer as another form of data such as a bitmap.
@@ -176,77 +178,100 @@ struct FL_EXPORT Fl_Menu_Item {
   void labeltype(Fl_Labeltype a) {labeltype_ = a;}
 
   /**
+    Gets the menu item's label color.
     This color is passed to the labeltype routine, and is typically the
     color of the label text.  This defaults to FL_BLACK.  If this
-    color is not black fltk will <I>not</I> use overlay bitplanes to draw
+    color is not black fltk will \b not use overlay bitplanes to draw
     the menu - this is so that images put in the menu draw correctly.
   */
   Fl_Color labelcolor() const {return labelcolor_;}
 
-  /** See Fl_Color Fl_Menu_Item::labelcolor() const */
+  /**
+    Sets the menu item's label color.
+    \see Fl_Color Fl_Menu_Item::labelcolor() const
+  */
   void labelcolor(Fl_Color a) {labelcolor_ = a;}
   /**
-    Fonts are identified by small 8-bit indexes into a table. See the 
+    Gets the menu item's label font.
+    Fonts are identified by small 8-bit indexes into a table. See the
     enumeration list for predefined fonts. The default value is a
     Helvetica font. The function Fl::set_font() can define new fonts.
   */
   Fl_Font labelfont() const {return labelfont_;}
 
   /**
-    Fonts are identified by small 8-bit indexes into a table. See the 
+    Sets the menu item's label font.
+    Fonts are identified by small 8-bit indexes into a table. See the
     enumeration list for predefined fonts. The default value is a
     Helvetica font.  The function Fl::set_font() can define new fonts.
   */
   void labelfont(Fl_Font a) {labelfont_ = a;}
 
-  /** Gets the label font pixel size/height.*/
+  /** Gets the label font pixel size/height. */
   Fl_Fontsize labelsize() const {return labelsize_;}
 
   /** Sets the label font pixel size/height.*/
   void labelsize(Fl_Fontsize a) {labelsize_ = a;}
 
   /**
-     Each item has space for a callback function and an argument for that
-     function. Due to back compatibility, the Fl_Menu_Item itself
-     is not passed to the callback, instead you have to get it by calling 
-     ((Fl_Menu_*)w)->mvalue() where w is the widget argument.
+    Returns the callback function that is set for the menu item.
+    Each item has space for a callback function and an argument for that
+    function. Due to back compatibility, the Fl_Menu_Item itself
+    is not passed to the callback, instead you have to get it by calling
+    ((Fl_Menu_*)w)->mvalue() where w is the widget argument.
   */
   Fl_Callback_p callback() const {return callback_;}
 
-  /** See Fl_Callback_p Fl_MenuItem::callback() const */
+  /**
+    Sets the menu item's callback function and userdata() argument.
+    \see Fl_Callback_p Fl_MenuItem::callback() const
+  */
   void callback(Fl_Callback* c, void* p) {callback_=c; user_data_=p;}
 
-  /** See Fl_Callback_p Fl_MenuItem::callback() const */
+  /**
+    Sets the menu item's callback function.
+    This method does not set the userdata() argument.
+    \see Fl_Callback_p Fl_MenuItem::callback() const
+   */
   void callback(Fl_Callback* c) {callback_=c;}
 
-  /** See Fl_Callback_p Fl_MenuItem::callback() const */
+  /**
+    Sets the menu item's callback function.
+    This method does not set the userdata() argument.
+    \see Fl_Callback_p Fl_MenuItem::callback() const
+   */
   void callback(Fl_Callback0*c) {callback_=(Fl_Callback*)c;}
 
-  /** See Fl_Callback_p Fl_MenuItem::callback() const */
+  /**
+    Sets the menu item's callback function and userdata() argument.
+    This method does not set the userdata() argument.
+    The argument \p is cast to void* and stored as the userdata()
+    for the menu item's callback function.
+    \see Fl_Callback_p Fl_MenuItem::callback() const
+   */
   void callback(Fl_Callback1*c, long p=0) {callback_=(Fl_Callback*)c; user_data_=(void*)p;}
 
   /**
-    Get or set the user_data argument that is sent to the
-    callback function.
+    Gets the user_data() argument that is sent to the callback function.
   */
   void* user_data() const {return user_data_;}
   /**
-    Get or set the user_data argument that is sent to the
-    callback function.
+    Sets the user_data() argument that is sent to the callback function.
   */
   void user_data(void* v) {user_data_ = v;}
   /**
+    Gets the user_data() argument that is sent to the callback function.
     For convenience you can also define the callback as taking a long
-    argument.  This is implemented by casting this to a Fl_Callback
-    and casting the long to a void* and may not be
-    portable to some machines.
+    argument.  This method casts the stored userdata() argument to long
+    and returns it as a \e long value.
   */
-  intptr_t argument() const {return (intptr_t)user_data_;}
+  long argument() const {return (long)(fl_intptr_t)user_data_;}
   /**
+    Sets the user_data() argument that is sent to the callback function.
     For convenience you can also define the callback as taking a long
-    argument.  This is implemented by casting this to a Fl_Callback
-    and casting the long to a void* and may not be
-    portable to some machines.
+    argument.  This method casts the given argument \p v to void*
+    and stores it in the menu item's userdata() member.
+    This may not be portable to some machines.
   */
   void argument(long v) {user_data_ = (void*)v;}
 
@@ -278,15 +303,15 @@ struct FL_EXPORT Fl_Menu_Item {
   */
   int submenu() const {return flags&(FL_SUBMENU|FL_SUBMENU_POINTER);}
   /**
-    Returns true if a checkbox will be drawn next to this item.  This is
-    true if FL_MENU_TOGGLE or FL_MENU_RADIO is set in the flags.
+    Returns true if a checkbox will be drawn next to this item.
+    This is true if FL_MENU_TOGGLE or FL_MENU_RADIO is set in the flags.
   */
   int checkbox() const {return flags&FL_MENU_TOGGLE;}
   /**
-    Returns true if this item is a radio item.  When a radio button is
-    selected all "adjacent" radio buttons are turned off.  A set of radio
-    items is delimited by an item that has radio() false, or by an
-    item with FL_MENU_DIVIDER turned on.
+    Returns true if this item is a radio item.
+    When a radio button is selected all "adjacent" radio buttons are
+    turned off.  A set of radio items is delimited by an item that has
+    radio() false, or by an item with FL_MENU_DIVIDER turned on.
   */
   int radio() const {return flags&FL_MENU_RADIO;}
   /** Returns the current value of the check or radio item. */
@@ -349,29 +374,28 @@ struct FL_EXPORT Fl_Menu_Item {
     const Fl_Menu_Item* title = 0,
     int menubar=0) const;
   const Fl_Menu_Item* test_shortcut() const;
-  const Fl_Menu_Item* find_shortcut(int *ip=0) const;
+  const Fl_Menu_Item* find_shortcut(int *ip=0, const bool require_alt = false) const;
 
   /**
-    Calls the Fl_Menu_Item item's callback, and provides the 
-    Fl_Widget argument (and optionally overrides the user_data()
-    argument). You must first check that callback() is non-zero
-    before calling this.
+    Calls the Fl_Menu_Item item's callback, and provides the Fl_Widget argument.
+    The callback is called with the stored user_data() as its second argument.
+    You must first check that callback() is non-zero before calling this.
   */
   void do_callback(Fl_Widget* o) const {callback_(o, user_data_);}
 
   /**
-    Calls the Fl_Menu_Item item's callback, and provides the 
-    Fl_Widget argument (and optionally overrides the user_data()
-    argument). You must first check that callback() is non-zero
-    before calling this.
+    Calls the Fl_Menu_Item item's callback, and provides the Fl_Widget argument.
+    This call overrides the callback's second argument with the given value \p arg.
+    You must first check that callback() is non-zero before calling this.
   */
   void do_callback(Fl_Widget* o,void* arg) const {callback_(o, arg);}
 
   /**
-    Calls the Fl_Menu_Item item's callback, and provides the 
-    Fl_Widget argument (and optionally overrides the user_data()
-    argument).  You must first check that callback() is non-zero
-    before calling this.
+    Calls the Fl_Menu_Item item's callback, and provides the Fl_Widget argument.
+    This call overrides the callback's second argument with the
+    given value \p arg. long \p arg is cast to void* when calling
+    the callback.
+    You must first check that callback() is non-zero before calling this.
   */
   void do_callback(Fl_Widget* o,long arg) const {callback_(o, (void*)arg);}
 
@@ -415,5 +439,5 @@ enum {	// back-compatibility enum:
 #endif
 
 //
-// End of "$Id: Fl_Menu_Item.H 7517 2010-04-16 17:55:45Z greg.ercolano $".
+// End of "$Id: Fl_Menu_Item.H 7983 2010-12-09 00:04:06Z AlbrechtS $".
 //

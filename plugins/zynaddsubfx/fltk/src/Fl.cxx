@@ -1,9 +1,9 @@
 //
-// "$Id: Fl.cxx 7354 2010-03-29 11:07:29Z matt $"
+// "$Id: Fl.cxx 8723 2011-05-23 16:49:02Z manolo $"
 //
 // Main event handling code for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2009 by Bill Spitzak and others.
+// Copyright 1998-2010 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -27,22 +27,42 @@
 
 
 // warning: the Apple Quartz version still uses some Quickdraw calls,
-//          mostly to get around the single active context in QD and 
+//          mostly to get around the single active context in QD and
 //          to implement clipping. This should be changed into pure
 //          Quartz calls in the near future.
-#include "config.h"
+#include <config.h>
+
+/* We require Windows 2000 features (e.g. VK definitions) */
+#if defined(WIN32)
+# if !defined(WINVER) || (WINVER < 0x0500)
+#  ifdef WINVER
+#   undef WINVER
+#  endif
+#  define WINVER 0x0500
+# endif
+# if !defined(_WIN32_WINNT) || (_WIN32_WINNT < 0x0500)
+#  ifdef _WIN32_WINNT
+#   undef _WIN32_WINNT
+#  endif
+#  define _WIN32_WINNT 0x0500
+# endif
+#endif
+
+// recent versions of MinGW warn: "Please include winsock2.h before windows.h",
+// hence we must include winsock2.h before FL/Fl.H (A.S. Dec. 2010, IMM May 2011)
+#if defined(WIN32) && !defined(__CYGWIN__)
+#  include <winsock2.h>
+#endif
+
 #include <FL/Fl.H>
 #include <FL/Fl_Window.H>
-#include <FL/x.H>
 #include <FL/Fl_Tooltip.H>
+#include <FL/x.H>
+
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include "flstring.h"
-
-#if defined(__APPLE__)
-#import <Cocoa/Cocoa.h>
-#endif
 
 #if defined(DEBUG) || defined(DEBUG_WATCH)
 #  include <stdio.h>
@@ -55,11 +75,22 @@ HBRUSH fl_brush_action(int action);
 void fl_cleanup_pens(void);
 void fl_release_dc(HWND,HDC);
 void fl_cleanup_dc_list(void);
+#elif defined(__APPLE__)
+extern double fl_mac_flush_and_wait(double time_to_wait, char in_idle);
 #endif // WIN32
 
 //
 // Globals...
 //
+#if defined(__APPLE__) || defined(FL_DOXYGEN)
+const char *Fl_Mac_App_Menu::about = "About ";
+const char *Fl_Mac_App_Menu::print = "Print Front Window";
+const char *Fl_Mac_App_Menu::services = "Services";
+const char *Fl_Mac_App_Menu::hide = "Hide ";
+const char *Fl_Mac_App_Menu::hide_others = "Hide Others";
+const char *Fl_Mac_App_Menu::show = "Show All";
+const char *Fl_Mac_App_Menu::quit = "Quit ";
+#endif // __APPLE__
 #ifndef FL_DOXYGEN
 Fl_Widget	*Fl::belowmouse_,
 		*Fl::pushed_,
@@ -82,8 +113,12 @@ int		Fl::damage_,
 
 char		*Fl::e_text = (char *)"";
 int		Fl::e_length;
-int		Fl::visible_focus_ = 1,
-		Fl::dnd_text_ops_ = 1;
+
+Fl_Event_Dispatch Fl::e_dispatch = 0;
+
+unsigned char   Fl::options_[] = { 0, 0 };
+unsigned char   Fl::options_read_ = 0;
+
 
 Fl_Window *fl_xfocus;	// which window X thinks has focus
 Fl_Window *fl_xmousewin;// which window X thinks has FL_ENTER
@@ -106,7 +141,7 @@ Fl::version() {
 }
 
 /**
-  Gets the default scrollbar size used by 
+  Gets the default scrollbar size used by
   Fl_Browser_,
   Fl_Help_View,
   Fl_Scroll, and
@@ -130,12 +165,19 @@ void Fl::scrollbar_size(int W) {
 }
 
 
-/**
-    Returns whether or not the mouse event is inside the given rectangle.
-    Returns non-zero if the current event_x and event_y
-    put it inside the widget or inside an arbitrary bounding box.  You
-    should always call this rather than doing your own comparison so you
-    are consistent about edge effects.
+/** Returns whether or not the mouse event is inside the given rectangle.
+
+    Returns non-zero if the current Fl::event_x() and Fl::event_y()
+    put it inside the given arbitrary bounding box.
+
+    You should always call this rather than doing your own comparison
+    so you are consistent about edge effects.
+
+    To find out, whether the event is inside a child widget of the
+    current window, you can use Fl::event_inside(const Fl_Widget *).
+
+    \param[in] xx,yy,ww,hh	bounding box
+    \return			non-zero, if mouse event is inside
 */
 int Fl::event_inside(int xx,int yy,int ww,int hh) /*const*/ {
   int mx = e_x - xx;
@@ -143,11 +185,32 @@ int Fl::event_inside(int xx,int yy,int ww,int hh) /*const*/ {
   return (mx >= 0 && mx < ww && my >= 0 && my < hh);
 }
 
-/** Returns whether or not the mouse event is inside the given widget.
-    Returns non-zero if the current event_x and event_y
-    put it inside the widget or inside an arbitrary bounding box.  You
-    should always call this rather than doing your own comparison so you
-    are consistent about edge effects.
+/** Returns whether or not the mouse event is inside a given child widget.
+
+    Returns non-zero if the current Fl::event_x() and Fl::event_y()
+    put it inside the given child widget's bounding box.
+
+    This method can only be used to check whether the mouse event is
+    inside a \b child widget of the window that handles the event, and
+    there must not be an intermediate subwindow (i.e. the widget must
+    not be inside a subwindow of the current window). However, it is
+    valid if the widget is inside a nested Fl_Group.
+
+    You must not use it with the window itself as the \p o argument
+    in a window's handle() method.
+
+    \note The mentioned restrictions are necessary, because this method
+    does not transform coordinates of child widgets, and thus the given
+    widget \p o must be within the \e same window that is handling the
+    current event. Otherwise the results are undefined.
+
+    You should always call this rather than doing your own comparison
+    so you are consistent about edge effects.
+
+    \see Fl::event_inside(int, int, int, int)
+
+    \param[in] o	child widget to be tested
+    \return		non-zero, if mouse event is inside the widget
 */
 int Fl::event_inside(const Fl_Widget *o) /*const*/ {
   int mx = e_x - o->x();
@@ -162,11 +225,11 @@ int Fl::event_inside(const Fl_Widget *o) /*const*/ {
 
 #ifdef WIN32
 
-/// implementation in Fl_win32.cxx
+// implementation in Fl_win32.cxx
 
 #elif defined(__APPLE__)
 
-/// implementation in Fl_mac.cxx
+// implementation in Fl_mac.cxx
 
 #else
 
@@ -175,10 +238,12 @@ int Fl::event_inside(const Fl_Widget *o) /*const*/ {
 //
 
 
-////////////////////////////////////////////////////////////////
-// Timeouts are stored in a sorted list, so only the first one needs
-// to be checked to see if any should be called.
-  
+////////////////////////////////////////////////////////////////////////
+// Timeouts are stored in a sorted list (*first_timeout), so only the
+// first one needs to be checked to see if any should be called.
+// Allocated, but unused (free) Timeout structs are stored in another
+// linked list (*free_timeout).
+
 struct Timeout {
   double time;
   void (*cb)(void*);
@@ -186,14 +251,13 @@ struct Timeout {
   Timeout* next;
 };
 static Timeout* first_timeout, *free_timeout;
-static int first_timeout_count, free_timeout_count;
 
 #include <sys/time.h>
 
 // I avoid the overhead of getting the current time when we have no
 // timeouts by setting this flag instead of getting the time.
 // In this case calling elapse_timeouts() does nothing, but records
-// the current time, and the next call will actualy elapse time.
+// the current time, and the next call will actually elapse time.
 static char reset_clock = 1;
 
 static void elapse_timeouts() {
@@ -227,7 +291,6 @@ void Fl::repeat_timeout(double time, Fl_Timeout_Handler cb, void *argp) {
   Timeout* t = free_timeout;
   if (t) {
       free_timeout = t->next;
-      --free_timeout_count;
   } else {
       t = new Timeout;
   }
@@ -235,7 +298,7 @@ void Fl::repeat_timeout(double time, Fl_Timeout_Handler cb, void *argp) {
   t->cb = cb;
   t->arg = argp;
   // insert-sort the new timeout:
-  Timeout** p = &first_timeout; 
+  Timeout** p = &first_timeout;
   while (*p && (*p)->time <= time) p = &((*p)->next);
   t->next = *p;
   *p = t;
@@ -253,10 +316,11 @@ int Fl::has_timeout(Fl_Timeout_Handler cb, void *argp) {
 /**
   Removes a timeout callback. It is harmless to remove a timeout
   callback that no longer exists.
+
+  \note	This version removes all matching timeouts, not just the first one.
+	This may change in the future.
 */
 void Fl::remove_timeout(Fl_Timeout_Handler cb, void *argp) {
-  // This version removes all matching timeouts, not just the first one.
-  // This may change in the future.
   for (Timeout** p = &first_timeout; *p;) {
     Timeout* t = *p;
     if (t->cb == cb && (t->arg == argp || !argp)) {
@@ -275,7 +339,7 @@ void Fl::remove_timeout(Fl_Timeout_Handler cb, void *argp) {
 // Checks are just stored in a list. They are called in the reverse
 // order that they were added (this may change in the future).
 // This is a bit messy because I want to allow checks to be added,
-// removed, and have wait() called from inside them, to do this
+// removed, and have wait() called from inside them. To do this
 // next_check points at the next unprocessed one for the outermost
 // call to Fl::wait().
 
@@ -291,26 +355,26 @@ static Check *first_check, *next_check, *free_check;
   waits for events.  This is different than an idle callback because it
   is only called once, then FLTK calls the system and tells it not to
   return until an event happens.
-  
+
   This can be used by code that wants to monitor the
   application's state, such as to keep a display up to date. The
   advantage of using a check callback is that it is called only when no
   events are pending. If events are coming in quickly, whole blocks of
   them will be processed before this is called once. This can save
   significant time and avoid the application falling behind the events.
-  
+
   Sample code:
-  
+
   \code
   bool state_changed; // anything that changes the display turns this on
-  
+
   void callback(void*) {
    if (!state_changed) return;
    state_changed = false;
    do_expensive_calculation();
    widget-&gt;redraw();
   }
-  
+
   main() {
    Fl::add_check(callback);
    return Fl::run();
@@ -382,13 +446,13 @@ static char in_idle;
 ////////////////////////////////////////////////////////////////
 // wait/run/check/ready:
 
-void (*Fl::idle)(); // see Fl_add_idle.cxx for the add/remove functions
+void (*Fl::idle)(); // see Fl::add_idle.cxx for the add/remove functions
 
 extern int fl_ready(); // in Fl_<platform>.cxx
 extern int fl_wait(double time); // in Fl_<platform>.cxx
 
 /**
-  See int wait()
+  See int Fl::wait()
 */
 double Fl::wait(double time_to_wait) {
   // delete all widgets that were listed during callbacks
@@ -410,13 +474,7 @@ double Fl::wait(double time_to_wait) {
     // the idle function may turn off idle, we can then wait:
     if (idle) time_to_wait = 0.0;
   }
-  NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-  flush();
-  if (idle && !in_idle) // 'idle' may have been set within flush()
-    time_to_wait = 0.0;
-  double retval = fl_wait(time_to_wait);
-  [pool release];
-  return retval;
+  return fl_mac_flush_and_wait(time_to_wait, in_idle);
 
 #else
 
@@ -433,8 +491,6 @@ double Fl::wait(double time_to_wait) {
       first_timeout = t->next;
       t->next = free_timeout;
       free_timeout = t;
-      ++free_timeout_count;
-      --first_timeout_count;
       // Now it is safe for the callback to do add_timeout:
       cb(argp);
     }
@@ -484,13 +540,35 @@ int Fl::run() {
 }
 
 #ifdef WIN32
+
+// Function to initialize COM/OLE for usage. This must be done only once.
+// We define a flag to register whether we called it:
+static char oleInitialized = 0;
+
+// This calls the Windows function OleInitialize() exactly once.
+void fl_OleInitialize() {
+  if (!oleInitialized) {
+    OleInitialize(0L);
+    oleInitialized = 1;
+  }
+}
+
+// This calls the Windows function OleUninitialize() only, if
+// OleInitialize has been called before.
+void fl_OleUninitialize() {
+  if (oleInitialized) {
+    OleUninitialize();
+    oleInitialized = 0;
+  }
+}
+
 class Fl_Win32_At_Exit {
 public:
   Fl_Win32_At_Exit() { }
   ~Fl_Win32_At_Exit() {
     fl_free_fonts();        // do some WIN32 cleanup
     fl_cleanup_pens();
-    OleUninitialize();
+    fl_OleUninitialize();
     fl_brush_action(1);
     fl_cleanup_dc_list();
   }
@@ -505,24 +583,23 @@ static Fl_Win32_At_Exit win32_at_exit;
   repeatedly to "run" your program.  You can also check what happened
   each time after this returns, which is quite useful for managing
   program state.
-  
+
   What this really does is call all idle callbacks, all elapsed
   timeouts, call Fl::flush() to get the screen to update, and
   then wait some time (zero if there are idle callbacks, the shortest of
   all pending timeouts, or infinity), for any events from the user or
   any Fl::add_fd() callbacks.  It then handles the events and
   calls the callbacks and then returns.
-  
-  The return value of the first form is non-zero if there are
-  any visible windows - this may change in future versions of
-  FLTK.
-  
-  The second form waits a maximum of <i>time</i>
-  seconds.  <i>It can return much sooner if something happens.</i>
-  
+
+  The return value of Fl::wait() is non-zero if there are any
+  visible windows - this may change in future versions of FLTK.
+
+  Fl::wait(time) waits a maximum of \e time seconds.
+  <i>It can return much sooner if something happens.</i>
+
   The return value is positive if an event or fd happens before the
   time elapsed.  It is zero if nothing happens (on Win32 this will only
-  return zero if <i>time</i> is zero).  It is negative if an error
+  return zero if \e time is zero).  It is negative if an error
   occurs (this will happen on UNIX if a signal happens).
 */
 int Fl::wait() {
@@ -534,7 +611,7 @@ int Fl::wait() {
 /**
   Same as Fl::wait(0).  Calling this during a big calculation
   will keep the screen up to date and the interface responsive:
-  
+
   \code
   while (!calculation_done()) {
   calculate();
@@ -542,8 +619,8 @@ int Fl::wait() {
   if (user_hit_abort_button()) break;
   }
   \endcode
-  
-  The returns non-zero if any windows are displayed, and 0 if no
+
+  This returns non-zero if any windows are displayed, and 0 if no
   windows are displayed (this is likely to change in future versions of
   FLTK).
 */
@@ -558,15 +635,15 @@ int Fl::check() {
   program is in a state where such callbacks are illegal.  This returns
   true if Fl::check() would do anything (it will continue to
   return true until you call Fl::check() or Fl::wait()).
-  
+
   \code
   while (!calculation_done()) {
-  calculate();
-  if (Fl::ready()) {
-    do_expensive_cleanup();
-    Fl::check();
-    if (user_hit_abort_button()) break;
-  }
+    calculate();
+    if (Fl::ready()) {
+      do_expensive_cleanup();
+      Fl::check();
+      if (user_hit_abort_button()) break;
+    }
   }
   \endcode
 */
@@ -593,9 +670,9 @@ Fl_Window* fl_find(Window xid) {
   Fl_X *window;
   for (Fl_X **pp = &Fl_X::first; (window = *pp); pp = &window->next)
 #if defined(WIN32) || defined(USE_X11)
-   if (window->xid == xid) 
+   if (window->xid == xid)
 #elif defined(__APPLE_QUARTZ__)
-   if (window->xid == xid && !window->w->window()) 
+   if (window->xid == xid && !window->w->window())
 #else
 # error unsupported platform
 #endif // __APPLE__
@@ -616,13 +693,6 @@ Fl_Window* fl_find(Window xid) {
   Returns the first top-level window in the list of shown() windows.  If
   a modal() window is shown this is the top-most modal window, otherwise
   it is the most recent window to get an event.
-  
-  The second form sets the window that is returned by
-  first_window.  The window is removed from wherever it is in the
-  list and inserted at the top.  This is not done if Fl::modal()
-  is on or if the window is not shown(). Because the first window
-  is used to set the "parent" of modal windows, this is often
-  useful.
 */
 Fl_Window* Fl::first_window() {
   Fl_X* i = Fl_X::first;
@@ -630,8 +700,9 @@ Fl_Window* Fl::first_window() {
 }
 
 /**
-  Returns the next top-level window in the list of shown() windows.  You can
-  use this call to iterate through all the windows that are shown().
+  Returns the next top-level window in the list of shown() windows.
+  You can use this call to iterate through all the windows that are shown().
+  \param[in] window	must be shown and not NULL
 */
 Fl_Window* Fl::next_window(const Fl_Window* window) {
   Fl_X* i = Fl_X::i(window)->next;
@@ -639,11 +710,16 @@ Fl_Window* Fl::next_window(const Fl_Window* window) {
 }
 
 /**
-  See Fl_Window* first_window()
-*/
+ Sets the window that is returned by first_window().
+ The window is removed from wherever it is in the
+ list and inserted at the top.  This is not done if Fl::modal()
+ is on or if the window is not shown(). Because the first window
+ is used to set the "parent" of modal windows, this is often
+ useful.
+ */
 void Fl::first_window(Fl_Window* window) {
   if (!window || !window->shown()) return;
-  fl_find(fl_xid(window));
+  fl_find( Fl_X::i(window)->xid );
 }
 
 /**
@@ -656,7 +732,7 @@ void Fl::redraw() {
 /**
   Causes all the windows that need it to be redrawn and graphics forced
   out through the pipes.
-  
+
   This is what wait() does before looking for events.
 
   Note: in multi-threaded applications you should only call Fl::flush()
@@ -688,29 +764,37 @@ void Fl::flush() {
 #endif
 }
 
+
 ////////////////////////////////////////////////////////////////
 // Event handlers:
+
 
 struct handler_link {
   int (*handle)(int);
   handler_link *next;
 };
 
+
 static handler_link *handlers = 0;
+
 
 /**
   Install a function to parse unrecognized events.  If FLTK cannot
   figure out what to do with an event, it calls each of these functions
   (most recent first) until one of them returns non-zero.  If none of
-  them returns non zero then the event is ignored.  Events that cause
+  them returns non-zero then the event is ignored.  Events that cause
   this to be called are:
-  
-  - FL_SHORTCUT events that are not recognized by any  widget.
+
+  - FL_SHORTCUT events that are not recognized by any widget.
     This lets you provide global shortcut keys.
   - System events that FLTK does not recognize.  See fl_xevent.
-  - \e Some other events when the widget FLTK selected  returns
-    zero from its handle() method.  Exactly which  ones may change
+  - \e Some other events when the widget FLTK selected returns
+    zero from its handle() method.  Exactly which ones may change
     in future versions, however.
+
+ \see Fl::remove_handler(Fl_Event_Handler)
+ \see Fl::event_dispatch(Fl_Event_Dispatch d)
+ \see Fl::handle(int, Fl_Window*)
 */
 void Fl::add_handler(Fl_Event_Handler ha) {
   handler_link *l = new handler_link;
@@ -719,8 +803,10 @@ void Fl::add_handler(Fl_Event_Handler ha) {
   handlers = l;
 }
 
+
 /**
-  Removes a previously added event handler.
+ Removes a previously added event handler.
+ \see Fl::handle(int, Fl_Window*)
 */
 void Fl::remove_handler(Fl_Event_Handler ha) {
   handler_link *l, *p;
@@ -752,15 +838,15 @@ Fl_Widget* fl_oldfocus; // kludge for Fl_Group...
 
 /**
     Sets the widget that will receive FL_KEYBOARD events.
-    
+
     If you change Fl::focus(), the previous widget and all
     parents (that don't contain the new widget) are sent FL_UNFOCUS
     events.  Changing the focus does \e not send FL_FOCUS to
     this or any widget, because sending FL_FOCUS is supposed to
     \e test if the widget wants the focus (by it returning non-zero from
     handle()).
-    
-    \sa Fl_Widget::take_focus()
+
+    \see Fl_Widget::take_focus()
 */
 void Fl::focus(Fl_Widget *o) {
   if (o && !o->visible_focus()) return;
@@ -772,9 +858,18 @@ void Fl::focus(Fl_Widget *o) {
     // make sure that fl_xfocus is set to the top level window
     // of this widget, or fl_fix_focus will clear our focus again
     if (o) {
-      Fl_Window *win = 0, *w1 = o->window();
+      Fl_Window *win = 0, *w1 = o->as_window();
+      if (!w1) w1 = o->window();
       while (w1) { win=w1; w1=win->window(); }
-      if (win) fl_xfocus = win;
+      if (win) {
+#ifdef __APPLE__
+	if (fl_xfocus != win) {
+	  Fl_X *x = Fl_X::i(win);
+	  if (x) x->set_key_window();
+	  }
+#endif
+	fl_xfocus = win;
+	}
     }
     // take focus from the old focused window
     fl_oldfocus = 0;
@@ -792,16 +887,16 @@ static char dnd_flag = 0; // make 'belowmouse' send DND_LEAVE instead of LEAVE
 
 /**
     Sets the widget that is below the mouse.  This is for
-    highlighting buttons.  It is not used to send FL_PUSH or 
+    highlighting buttons.  It is not used to send FL_PUSH or
     FL_MOVE directly, for several obscure reasons, but those events
-    typically go to this widget.  This is also the first widget tried for 
+    typically go to this widget.  This is also the first widget tried for
     FL_SHORTCUT events.
-    
+
     If you change the belowmouse widget, the previous one and all
     parents (that don't contain the new widget) are sent FL_LEAVE
     events.  Changing this does \e not send FL_ENTER to this
     or any widget, because sending FL_ENTER is supposed to \e test
-    if the widget wants the mouse (by it returning non-zero from 
+    if the widget wants the mouse (by it returning non-zero from
     handle()).
 */
 void Fl::belowmouse(Fl_Widget *o) {
@@ -819,15 +914,15 @@ void Fl::belowmouse(Fl_Widget *o) {
 }
 
 /**
-    Sets the widget that is being pushed. FL_DRAG or 
+    Sets the widget that is being pushed. FL_DRAG or
     FL_RELEASE (and any more FL_PUSH) events will be sent to
     this widget.
-    
+
     If you change the pushed widget, the previous one and all parents
     (that don't contain the new widget) are sent FL_RELEASE
     events.  Changing this does \e not send FL_PUSH to this
     or any widget, because sending FL_PUSH is supposed to \e test
-    if the widget wants the mouse (by it returning non-zero from 
+    if the widget wants the mouse (by it returning non-zero from
     handle()).
 */
  void Fl::pushed(Fl_Widget *o) {
@@ -895,11 +990,11 @@ void fl_fix_focus() {
   }
 }
 
-#ifndef WIN32
+#if !(defined(WIN32) || defined(__APPLE__))
 extern Fl_Widget *fl_selection_requestor; // from Fl_x.cxx
 #endif
 
-// This function is called by ~Fl_Widget() and by Fl_Widget::deactivate
+// This function is called by ~Fl_Widget() and by Fl_Widget::deactivate()
 // and by Fl_Widget::hide().  It indicates that the widget does not want
 // to receive any more events, and also removes all global variables that
 // point at the widget.
@@ -913,7 +1008,7 @@ void fl_throw_focus(Fl_Widget *o) {
 #endif // DEBUG
 
   if (o->contains(Fl::pushed())) Fl::pushed_ = 0;
-#ifndef WIN32
+#if !(defined(WIN32) || defined(__APPLE__))
   if (o->contains(fl_selection_requestor)) fl_selection_requestor = 0;
 #endif
   if (o->contains(Fl::belowmouse())) Fl::belowmouse_ = 0;
@@ -927,9 +1022,9 @@ void fl_throw_focus(Fl_Widget *o) {
 
 ////////////////////////////////////////////////////////////////
 
-// Call to->handle but first replace the mouse x/y with the correct
-// values to account for nested X windows. 'window' is the outermost
-// window the event was posted to by X:
+// Call to->handle(), but first replace the mouse x/y with the correct
+// values to account for nested windows. 'window' is the outermost
+// window the event was posted to by the system:
 static int send(int event, Fl_Widget* to, Fl_Window* window) {
   int dx, dy;
   int old_event = Fl::e_number;
@@ -950,11 +1045,98 @@ static int send(int event, Fl_Widget* to, Fl_Window* window) {
   return ret;
 }
 
-int Fl::handle(int e, Fl_Window* window)
+
 /**
-  Sends the event to a window for processing.  Returns non-zero if any
-  widget uses the event.
-*/
+ \brief Set a new event dispatch function.
+
+ The event dispatch function is called after native events are converted to
+ FLTK events, but before they are handled by FLTK. If the dispatch function
+ Fl_Event_Dispatch \p d is set, it is up to the dispatch function to call
+ Fl::handle_(int, Fl_Window*) or to ignore the event.
+
+ The dispatch function itself must return 0 if it ignored the event,
+ or non-zero if it used the event. If you call Fl::handle_(), then
+ this will return the correct value.
+
+ The event dispatch can be used to handle exceptions in FLTK events and
+ callbacks before they reach the native event handler:
+
+ \code
+ int myHandler(int e, Fl_Window *w) {
+   try {
+     return Fl::handle_(e, w);
+   } catch () {
+     ...
+   }
+ }
+
+ main() {
+   Fl::event_dispatch(myHandler);
+   ...
+   Fl::run();
+ }
+ \endcode
+
+ \param d new dispatch function, or NULL
+ \see Fl::add_handler(Fl_Event_Handler)
+ \see Fl::handle(int, Fl_Window*)
+ \see Fl::handle_(int, Fl_Window*)
+ */
+void Fl::event_dispatch(Fl_Event_Dispatch d)
+{
+  e_dispatch = d;
+}
+
+
+/**
+ \brief Return the current event dispatch function.
+ */
+Fl_Event_Dispatch Fl::event_dispatch()
+{
+  return e_dispatch;
+}
+
+
+/**
+ \brief Handle events from the window system.
+
+ This is called from the native event dispatch after native events have been
+ converted to FLTK notation. This function calls Fl::handle_(int, Fl_Window*)
+ unless the user sets a dispatch function. If a user dispatch function is set,
+ the user must make sure that Fl::handle_() is called, or the event will be
+ ignored.
+
+ \param e the event type (Fl::event_number() is not yet set)
+ \param window the window that caused this event
+ \return 0 if the event was not handled
+
+ \see Fl::add_handler(Fl_Event_Handler)
+ \see Fl::event_dispatch(Fl_Event_Dispatch)
+ */
+int Fl::handle(int e, Fl_Window* window)
+{
+  if (e_dispatch) {
+    return e_dispatch(e, window);
+  } else {
+    return handle_(e, window);
+  }
+}
+
+
+/**
+ \brief Handle events from the window system.
+
+ This function is called from the native event dispatch, unless the user sets
+ another dispatch function. In that case, the user dispatch function must
+ decide when to call Fl::handle_(int, Fl_Window*)
+
+ \param e the event type (Fl::event_number() is not yet set)
+ \param window the window that caused this event
+ \return 0 if the event was not handled
+
+ \see Fl::event_dispatch(Fl_Event_Dispatch)
+ */
+int Fl::handle_(int e, Fl_Window* window)
 {
   e_number = e;
   if (fl_local_grab) return fl_local_grab(e);
@@ -964,7 +1146,7 @@ int Fl::handle(int e, Fl_Window* window)
   switch (e) {
 
   case FL_CLOSE:
-    if (grab() || modal() && window != modal()) return 0;
+    if ( grab() || (modal() && window != modal()) ) return 0;
     wi->do_callback();
     return 1;
 
@@ -1016,9 +1198,25 @@ int Fl::handle(int e, Fl_Window* window)
     }
     if (modal() && wi != modal()) wi = 0;
     if (grab()) wi = grab();
-    {Fl_Widget* pbm = belowmouse();
-    int ret = (wi && send(e, wi, window));
-    if (pbm != belowmouse()) {
+    { int ret;
+      Fl_Widget* pbm = belowmouse();
+#ifdef __APPLE__
+      if (fl_mac_os_version < 100500) {
+        // before 10.5, mouse moved events aren't sent to borderless windows such as tooltips
+	Fl_Window *tooltip = Fl_Tooltip::current_window();
+	int inside = 0;
+	if (tooltip && tooltip->shown() ) { // check if a tooltip window is currently opened
+	  // check if mouse is inside the tooltip
+	  inside = (Fl::event_x_root() >= tooltip->x() && Fl::event_x_root() < tooltip->x() + tooltip->w() &&
+	  Fl::event_y_root() >= tooltip->y() && Fl::event_y_root() < tooltip->y() + tooltip->h() );
+	}
+	// if inside, send event to tooltip window instead of background window
+	if (inside) ret = send(e, tooltip, window);
+	else ret = (wi && send(e, wi, window));
+      } else
+#endif
+      ret = (wi && send(e, wi, window));
+   if (pbm != belowmouse()) {
 #ifdef DEBUG
       printf("Fl::handle(e=%d, window=%p);\n", e, window);
 #endif // DEBUG
@@ -1049,12 +1247,12 @@ int Fl::handle(int e, Fl_Window* window)
     return 1;
 
   case FL_KEYUP:
-    // Send the key-up to the current focus. This is not 
+    // Send the key-up to the current focus widget. This is not
     // always the same widget that received the corresponding
     // FL_KEYBOARD event because focus may have changed.
     // Sending the KEYUP to the right KEYDOWN is possible, but
-    // would require that we track the KEYDOWN for every possible 
-    // key stroke (users may hold down multiple keys!) and then 
+    // would require that we track the KEYDOWN for every possible
+    // key stroke (users may hold down multiple keys!) and then
     // make sure that the widget still exists before sending
     // a KEYUP there. I believe that the current solution is
     // "close enough".
@@ -1178,7 +1376,7 @@ void Fl_Window::hide() {
   for (; *pp != ip; pp = &(*pp)->next) if (!*pp) return;
   *pp = ip->next;
 #ifdef __APPLE__
-  MacUnlinkWindow(ip);
+  ip->unlink();
   // MacOS X manages a single pointer per application. Make sure that hiding
   // a toplevel window will not leave us with some random pointer shape, or
   // worst case, an invisible pointer
@@ -1225,7 +1423,7 @@ void Fl_Window::hide() {
       fl_release_dc(fl_window, fl_gc);
       fl_window = (HWND)-1;
       fl_gc = 0;
-# ifdef USE_CAIRO
+# ifdef FLTK_USE_CAIRO
       if (Fl::cairo_autolink_context()) Fl::cairo_make_current((Fl_Window*) 0);
 # endif
     }
@@ -1241,7 +1439,8 @@ void Fl_Window::hide() {
 # if USE_XFT
   fl_destroy_xft_draw(ip->xid);
 # endif
-  XDestroyWindow(fl_display, ip->xid);
+  // this test makes sure ip->xid has not been destroyed already
+  if (ip->xid) XDestroyWindow(fl_display, ip->xid);
 #elif defined(WIN32)
   // this little trickery seems to avoid the popup window stacking problem
   HWND p = GetForegroundWindow();
@@ -1251,11 +1450,11 @@ void Fl_Window::hide() {
   }
   XDestroyWindow(fl_display, ip->xid);
 #elif defined(__APPLE_QUARTZ__)
-  MacDestroyWindow(this, ip->xid);
+  ip->destroy();
 #else
 # error unsupported platform
 #endif
-  
+
 #ifdef WIN32
   // Try to stop the annoying "raise another program" behavior
   if (non_modal() && Fl::first_window() && Fl::first_window()->shown())
@@ -1266,6 +1465,9 @@ void Fl_Window::hide() {
 
 Fl_Window::~Fl_Window() {
   hide();
+  if (xclass_) {
+    free(xclass_);
+  }
 }
 
 // FL_SHOW and FL_HIDE are called whenever the visibility of this widget
@@ -1286,7 +1488,7 @@ int Fl_Window::handle(int ev)
 #if defined(USE_X11) || defined(WIN32)
         XMapWindow(fl_display, fl_xid(this)); // extra map calls are harmless
 #elif defined(__APPLE_QUARTZ__)
-        MacMapWindow(this, i->xid);
+	i->map();
 #else
 # error unsupported platform
 #endif // __APPLE__
@@ -1294,7 +1496,7 @@ int Fl_Window::handle(int ev)
       break;
     case FL_HIDE:
       if (shown()) {
-	// Find what really turned invisible, if is was a parent window
+	// Find what really turned invisible, if it was a parent window
 	// we do nothing.  We need to avoid unnecessary unmap calls
 	// because they cause the display to blink when the parent is
 	// remapped.  However if this or any intermediate non-window
@@ -1308,7 +1510,7 @@ int Fl_Window::handle(int ev)
 #if defined(USE_X11) || defined(WIN32)
 	XUnmapWindow(fl_display, fl_xid(this));
 #elif defined(__APPLE_QUARTZ__)
-	MacUnmapWindow(this, i->xid);
+	i->unmap();
 #else
 # error platform unsupported
 #endif
@@ -1330,7 +1532,7 @@ int Fl_Window::handle(int ev)
     NULL, without changing the actual text of the
     selection. FL_SELECTIONCLEAR is sent to the previous
     selection owner, if any.
-    
+
     <i>Copying the buffer every time the selection is changed is
     obviously wasteful, especially for large selections.  An interface will
     probably be added in a future version to allow the selection to be made
@@ -1351,14 +1553,8 @@ void Fl::selection(Fl_Widget &owner, const char* text, int len) {
   Fl::copy(text, len, 0);
 }
 
-/** Backward compatibility only:
-  Set things up so the receiver widget will be called with an  FL_PASTE event some
-  time in the future for the specified clipboard. The reciever
-  should be prepared to be called \e directly by this, or for
-  it to happen \e later, or possibly <i>not at all</i>.  This
-  allows the window system to take as long as necessary to retrieve
-  the paste buffer (or even to screw up completely) without complex
-  and error-prone synchronization code in FLTK.
+/** Backward compatibility only.
+  This calls Fl::paste(receiver, 0);
   \see Fl::paste(Fl_Widget &receiver, int clipboard)
 */
 void Fl::paste(Fl_Widget &receiver) {
@@ -1392,16 +1588,36 @@ void Fl_Widget::redraw_label() {
       W += 5; // Add a little to the size of the label to cover overflow
       H += 5;
 
-      if (align() & FL_ALIGN_BOTTOM) {
-	window()->damage(FL_DAMAGE_EXPOSE, x(), y() + h(), w(), H);
-      } else if (align() & FL_ALIGN_TOP) {
-	window()->damage(FL_DAMAGE_EXPOSE, x(), y() - H, w(), H);
-      } else if (align() & FL_ALIGN_LEFT) {
-	window()->damage(FL_DAMAGE_EXPOSE, x() - W, y(), W, h());
-      } else if (align() & FL_ALIGN_RIGHT) {
-	window()->damage(FL_DAMAGE_EXPOSE, x() + w(), y(), W, h());
-      } else {
-        window()->damage(FL_DAMAGE_ALL);
+      // FIXME:
+      // This assumes that measure() returns the correct outline, which it does
+      // not in all possible cases of alignment combinedwith image and symbols.
+      switch (align() & 0x0f) {
+        case FL_ALIGN_TOP_LEFT:
+          window()->damage(FL_DAMAGE_EXPOSE, x(), y()-H, W, H); break;
+        case FL_ALIGN_TOP:
+          window()->damage(FL_DAMAGE_EXPOSE, x()+(w()-W)/2, y()-H, W, H); break;
+        case FL_ALIGN_TOP_RIGHT:
+          window()->damage(FL_DAMAGE_EXPOSE, x()+w()-W, y()-H, W, H); break;
+        case FL_ALIGN_LEFT_TOP:
+          window()->damage(FL_DAMAGE_EXPOSE, x()-W, y(), W, H); break;
+        case FL_ALIGN_RIGHT_TOP:
+          window()->damage(FL_DAMAGE_EXPOSE, x()+w(), y(), W, H); break;
+        case FL_ALIGN_LEFT:
+          window()->damage(FL_DAMAGE_EXPOSE, x()-W, y()+(h()-H)/2, W, H); break;
+        case FL_ALIGN_RIGHT:
+          window()->damage(FL_DAMAGE_EXPOSE, x()+w(), y()+(h()-H)/2, W, H); break;
+        case FL_ALIGN_LEFT_BOTTOM:
+          window()->damage(FL_DAMAGE_EXPOSE, x()-W, y()+h()-H, W, H); break;
+        case FL_ALIGN_RIGHT_BOTTOM:
+          window()->damage(FL_DAMAGE_EXPOSE, x()+w(), y()+h()-H, W, H); break;
+        case FL_ALIGN_BOTTOM_LEFT:
+          window()->damage(FL_DAMAGE_EXPOSE, x(), y()+h(), W, H); break;
+        case FL_ALIGN_BOTTOM:
+          window()->damage(FL_DAMAGE_EXPOSE, x()+(w()-W)/2, y()+h(), W, H); break;
+        case FL_ALIGN_BOTTOM_RIGHT:
+          window()->damage(FL_DAMAGE_EXPOSE, x()+w()-W, y()+h(), W, H); break;
+        default:
+          window()->damage(FL_DAMAGE_ALL); break;
       }
     } else {
       // The label is inside the widget, so just redraw the widget itself...
@@ -1492,8 +1708,7 @@ void Fl_Window::flush() {
 
 #ifdef WIN32
 #  include "Fl_win32.cxx"
-#elif defined(__APPLE__)
-#  include "Fl_cocoa.mm"
+//#elif defined(__APPLE__)
 #endif
 
 //
@@ -1504,7 +1719,7 @@ void Fl_Window::flush() {
 static int		num_dwidgets = 0, alloc_dwidgets = 0;
 static Fl_Widget	**dwidgets = 0;
 
-/** 
+/**
   Schedules a widget for deletion at the next call to the event loop.
   Use this method to delete a widget inside a callback function.
 
@@ -1544,9 +1759,9 @@ void Fl::delete_widget(Fl_Widget *wi) {
   num_dwidgets ++;
 }
 
-/** 
+/**
     Deletes widgets previously scheduled for deletion.
-    
+
     This is for internal use only. You should never call this directly.
 
     Fl::do_widget_deletion() is called from the FLTK event loop or whenever
@@ -1570,7 +1785,7 @@ static int max_widget_watch = 0;
 
 /**
   Adds a widget pointer to the widget watch list.
-  
+
   \note Internal use only, please use class Fl_Widget_Tracker instead.
 
   This can be used, if it is possible that a widget might be deleted during
@@ -1613,7 +1828,7 @@ static int max_widget_watch = 0;
 
    \see class Fl_Widget_Tracker
 */
-void Fl::watch_widget_pointer(Fl_Widget *&w) 
+void Fl::watch_widget_pointer(Fl_Widget *&w)
 {
   Fl_Widget **wp = &w;
   int i;
@@ -1637,7 +1852,7 @@ void Fl::watch_widget_pointer(Fl_Widget *&w)
 
   This is used to remove a widget pointer that has been added to the watch list
   with Fl::watch_widget_pointer(), when it is not needed anymore.
-  
+
   \note Internal use only, please use class Fl_Widget_Tracker instead.
 
   \see Fl::watch_widget_pointer()
@@ -1681,7 +1896,7 @@ void Fl::release_widget_pointer(Fl_Widget *&w)
   \see Fl::watch_widget_pointer()
   \see class Fl_Widget_Tracker
 */
-void Fl::clear_widget_pointer(Fl_Widget const *w) 
+void Fl::clear_widget_pointer(Fl_Widget const *w)
 {
   if (w==0L) return;
   int i;
@@ -1692,13 +1907,105 @@ void Fl::clear_widget_pointer(Fl_Widget const *w)
   }
 }
 
+
+/**
+ \brief FLTK library options management.
+
+ This function needs to be documented in more detail. It can be used for more
+ optional settings, such as using a native file chooser instead of the FLTK one
+ wherever possible, disabling tooltips, disabling visible focus, disabling
+ FLTK file chooser preview, etc. .
+
+ There should be a command line option interface.
+
+ There should be an application that manages options system wide, per user, and
+ per application.
+
+ \note As of FLTK 1.3.0, options can be managed within fluid, using the menu
+ <i>Edit/Global FLTK Settings</i>.
+
+ \param opt which option
+ \return true or false
+ \see enum Fl::Fl_Option
+ \see Fl::option(Fl_Option, bool)
+
+ \since FLTK 1.3.0
+ */
+bool Fl::option(Fl_Option opt)
+{
+  if (!options_read_) {
+    int tmp;
+    { // first, read the system wide preferences
+      Fl_Preferences prefs(Fl_Preferences::SYSTEM, "fltk.org", "fltk");
+      Fl_Preferences opt_prefs(prefs, "options");
+      opt_prefs.get("ArrowFocus", tmp, 0);                      // default: off
+      options_[OPTION_ARROW_FOCUS] = tmp;
+      //opt_prefs.get("NativeFilechooser", tmp, 1);             // default: on
+      //options_[OPTION_NATIVE_FILECHOOSER] = tmp;
+      //opt_prefs.get("FilechooserPreview", tmp, 1);            // default: on
+      //options_[OPTION_FILECHOOSER_PREVIEW] = tmp;
+      opt_prefs.get("VisibleFocus", tmp, 1);                    // default: on
+      options_[OPTION_VISIBLE_FOCUS] = tmp;
+      opt_prefs.get("DNDText", tmp, 1);                         // default: on
+      options_[OPTION_DND_TEXT] = tmp;
+      opt_prefs.get("ShowTooltips", tmp, 1);                    // default: on
+      options_[OPTION_SHOW_TOOLTIPS] = tmp;
+    }
+    { // next, check the user preferences
+      // override system options only, if the option is set ( >= 0 )
+      Fl_Preferences prefs(Fl_Preferences::USER, "fltk.org", "fltk");
+      Fl_Preferences opt_prefs(prefs, "options");
+      opt_prefs.get("ArrowFocus", tmp, -1);
+      if (tmp >= 0) options_[OPTION_ARROW_FOCUS] = tmp;
+      //opt_prefs.get("NativeFilechooser", tmp, -1);
+      //if (tmp >= 0) options_[OPTION_NATIVE_FILECHOOSER] = tmp;
+      //opt_prefs.get("FilechooserPreview", tmp, -1);
+      //if (tmp >= 0) options_[OPTION_FILECHOOSER_PREVIEW] = tmp;
+      opt_prefs.get("VisibleFocus", tmp, -1);
+      if (tmp >= 0) options_[OPTION_VISIBLE_FOCUS] = tmp;
+      opt_prefs.get("DNDText", tmp, -1);
+      if (tmp >= 0) options_[OPTION_DND_TEXT] = tmp;
+      opt_prefs.get("ShowTooltips", tmp, -1);
+      if (tmp >= 0) options_[OPTION_SHOW_TOOLTIPS] = tmp;
+    }
+    { // now, if the developer has registered this app, we could as for per-application preferences
+    }
+    options_read_ = 1;
+  }
+  if (opt<0 || opt>=OPTION_LAST)
+    return false;
+  return (bool)(options_[opt]!=0);
+}
+
+/**
+ \brief Override an option while the application is running.
+
+ This function does not change any system or user settings.
+
+ \param opt which option
+ \param val set to true or false
+ \see enum Fl::Fl_Option
+ \see bool Fl::option(Fl_Option)
+ */
+void Fl::option(Fl_Option opt, bool val)
+{
+  if (opt<0 || opt>=OPTION_LAST)
+    return;
+  if (!options_read_) {
+    // first read this option, so we don't override our setting later
+    option(opt);
+  }
+  options_[opt] = val;
+}
+
+
 // Helper class Fl_Widget_Tracker
 
 /**
   The constructor adds a widget to the watch list.
 */
-Fl_Widget_Tracker::Fl_Widget_Tracker(Fl_Widget *wi) {
-
+Fl_Widget_Tracker::Fl_Widget_Tracker(Fl_Widget *wi)
+{
   wp_ = wi;
   Fl::watch_widget_pointer(wp_); // add pointer to watch list
 }
@@ -1706,11 +2013,12 @@ Fl_Widget_Tracker::Fl_Widget_Tracker(Fl_Widget *wi) {
 /**
   The destructor removes a widget from the watch list.
 */
-Fl_Widget_Tracker::~Fl_Widget_Tracker() {
-
+Fl_Widget_Tracker::~Fl_Widget_Tracker()
+{
   Fl::release_widget_pointer(wp_); // remove pointer from watch list
 }
 
+
 //
-// End of "$Id: Fl.cxx 7354 2010-03-29 11:07:29Z matt $".
+// End of "$Id: Fl.cxx 8723 2011-05-23 16:49:02Z manolo $".
 //

@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Progress.H 6614 2009-01-01 16:11:32Z matt $"
+// "$Id: Fl_Progress.H 8306 2011-01-24 17:04:22Z matt $"
 //
 // Progress bar widget definitions.
 //
-// Copyright 2000-2009 by Michael Sweet.
+// Copyright 2000-2010 by Michael Sweet.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -44,8 +44,8 @@
 /**
     Displays a progress bar for the user.
 */
-class FL_EXPORT Fl_Progress : public Fl_Widget
-{
+class FL_EXPORT Fl_Progress : public Fl_Widget {
+  
   float	value_,
 	minimum_,
 	maximum_;
@@ -77,5 +77,5 @@ class FL_EXPORT Fl_Progress : public Fl_Widget
 #endif // !_Fl_Progress_H_
 
 //
-// End of "$Id: Fl_Progress.H 6614 2009-01-01 16:11:32Z matt $".
+// End of "$Id: Fl_Progress.H 8306 2011-01-24 17:04:22Z matt $".
 //

@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_grab.cxx 7351 2010-03-29 10:35:00Z matt $"
+// "$Id: Fl_grab.cxx 8055 2010-12-18 22:31:01Z manolo $"
 //
 // Grab/release code for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2009 by Bill Spitzak and others.
+// Copyright 1998-2010 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -47,7 +47,6 @@ extern HWND fl_capture;
 #endif
 
 #ifdef __APPLE__
-extern void MACsetkeywindow(void *nsw);
 extern void *fl_capture;
 #endif
 
@@ -59,7 +58,7 @@ void Fl::grab(Fl_Window* win) {
       SetCapture(fl_capture);
 #elif defined(__APPLE__)
       fl_capture = Fl_X::i(first_window())->xid;
-      MACsetkeywindow(fl_capture);
+      Fl_X::i(first_window())->set_key_window();
 #else
       XGrabPointer(fl_display,
 		   fl_xid(first_window()),
@@ -101,5 +100,5 @@ void Fl::grab(Fl_Window* win) {
 }
 
 //
-// End of "$Id: Fl_grab.cxx 7351 2010-03-29 10:35:00Z matt $".
+// End of "$Id: Fl_grab.cxx 8055 2010-12-18 22:31:01Z manolo $".
 //

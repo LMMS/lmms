@@ -1,9 +1,9 @@
 //
-// "$Id: fl_ask.H 6614 2009-01-01 16:11:32Z matt $"
+// "$Id: fl_ask.H 8441 2011-02-18 08:52:48Z AlbrechtS $"
 //
 // Standard dialog header file for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2009 by Bill Spitzak and others.
+// Copyright 1998-2011 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -43,9 +43,6 @@ enum {
 
 #  ifdef __GNUC__
 #    define __fl_attr(x) __attribute__ (x)
-#    if __GNUC__ < 3
-#      define __deprecated__
-#    endif // __GNUC__ < 3
 #  else
 #    define __fl_attr(x)
 #  endif // __GNUC__
@@ -67,6 +64,12 @@ extern FL_EXPORT Fl_Fontsize fl_message_size_;
 inline void fl_message_font(Fl_Font f, Fl_Fontsize s) {
   fl_message_font_ = f; fl_message_size_ = s;}
 
+FL_EXPORT void fl_message_hotspot(int enable);
+FL_EXPORT int fl_message_hotspot(void);
+
+FL_EXPORT void fl_message_title(const char *title);
+FL_EXPORT void fl_message_title_default(const char *title);
+
 // pointers you can use to change FLTK to a foreign language:
 extern FL_EXPORT const char* fl_no;
 extern FL_EXPORT const char* fl_yes;
@@ -76,5 +79,5 @@ extern FL_EXPORT const char* fl_close;
 #endif // !fl_ask_H
 
 //
-// End of "$Id: fl_ask.H 6614 2009-01-01 16:11:32Z matt $".
+// End of "$Id: fl_ask.H 8441 2011-02-18 08:52:48Z AlbrechtS $".
 //

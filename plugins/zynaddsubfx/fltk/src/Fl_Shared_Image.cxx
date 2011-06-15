@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Shared_Image.cxx 6616 2009-01-01 21:28:26Z matt $"
+// "$Id: Fl_Shared_Image.cxx 8306 2011-01-24 17:04:22Z matt $"
 //
 // Shared image code for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2009 by Bill Spitzak and others.
+// Copyright 1998-2010 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -228,7 +228,7 @@ void Fl_Shared_Image::reload() {
   if (!name_) return;
 
   if ((fp = fl_fopen(name_, "rb")) != NULL) {
-    fread(header, 1, sizeof(header), fp);
+    if (fread(header, 1, sizeof(header), fp)==0) { /* ignore */ }
     fclose(fp);
   } else {
     return;
@@ -374,11 +374,24 @@ Fl_Shared_Image* Fl_Shared_Image::find(const char *n, int W, int H) {
 
 
 /** 
-  Gets a shared image, if it exists already ; it will return it.
-  If it does not exist or if it exist but with other size, 
-  then the existing image is deleted and replaced
-  by a new image from the n filename of the proper dimension.
-  If n is not a valid image filename, then get() will return NULL.
+ \brief Find or load an image that can be shared by multiple widgets.
+ 
+ Gets a shared image, if it exists already ; it will return it.
+ If it does not exist or if it exist but with other size, 
+ then the existing image is deleted and replaced
+ by a new image from the n filename of the proper dimension.
+ If n is not a valid image filename, then get() will return NULL.
+ 
+ Shared JPEG and PNG images can also be created from memory by using their 
+ named memory access constructor.
+ 
+ \param n name of the image
+ \param W, H desired size
+ 
+ \see Fl_Shared_Image::find(const char *n, int W, int H)
+ \see Fl_Shared_Image::release() 
+ \see Fl_JPEG_Image::Fl_JPEG_Image(const char *name, const unsigned char *data)
+ \see Fl_PNG_Image::Fl_PNG_Image (const char *name_png, const unsigned char *buffer, int maxsize)
 */
 Fl_Shared_Image* Fl_Shared_Image::get(const char *n, int W, int H) {
   Fl_Shared_Image	*temp;		// Image
@@ -459,5 +472,5 @@ void Fl_Shared_Image::remove_handler(Fl_Shared_Handler f) {
 
 
 //
-// End of "$Id: Fl_Shared_Image.cxx 6616 2009-01-01 21:28:26Z matt $".
+// End of "$Id: Fl_Shared_Image.cxx 8306 2011-01-24 17:04:22Z matt $".
 //

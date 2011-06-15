@@ -1,7 +1,7 @@
-/* "$Id: fl_utf8.h 7551 2010-04-20 21:43:31Z engelsman $"
+/* "$Id: fl_utf8.h 8585 2011-04-13 15:43:22Z ianmacarthur $"
  *
  * Author: Jean-Marc Lienher ( http://oksid.ch )
- * Copyright 2000-2009 by O'ksi'D.
+ * Copyright 2000-2010 by O'ksi'D.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -27,8 +27,6 @@
  * The following code is an attempt to merge the functions incorporated in FLTK2
  * with the functions provided in OksiD's fltk-1.1.6-utf8 port
  */
-
-/*** NOTE : all functions are LIMITED to 24 bits Unicode values !!! ***/
 
 /**
   \file fl_utf8.h
@@ -100,6 +98,9 @@ FL_EXPORT int fl_utf8bytes(unsigned ucs);
 /* OD: returns the byte length of the first UTF-8 char sequence (returns -1 if not valid) */
 FL_EXPORT int fl_utf8len(char c);
 
+/* OD: returns the byte length of the first UTF-8 char sequence (returns +1 if not valid) */
+FL_EXPORT int fl_utf8len1(char c);
+
 /* OD: returns the number of Unicode chars in the UTF-8 string */
 FL_EXPORT int fl_utf_nb_char(const unsigned char *buf, int len);
 
@@ -114,6 +115,9 @@ FL_EXPORT const char* fl_utf8fwd(const char* p, const char* start, const char* e
 
 /* F2: Move backward to the previous valid UTF8 sequence start */
 FL_EXPORT const char* fl_utf8back(const char* p, const char* start, const char* end);
+
+/* XX: Convert a single 32-bit Unicode value into UTF16 */
+FL_EXPORT unsigned fl_ucs_to_Utf16(const unsigned ucs, unsigned short *dst, const unsigned dstlen);
 
 /* F2: Convert a UTF8 string into UTF16 */
 FL_EXPORT unsigned fl_utf8toUtf16(const char* src, unsigned srclen, unsigned short* dst, unsigned dstlen);
@@ -255,5 +259,5 @@ FL_EXPORT char fl_make_path( const char *path );
 #endif /* _HAVE_FL_UTF8_HDR_ */
 
 /*
- * End of "$Id: fl_utf8.h 7551 2010-04-20 21:43:31Z engelsman $".
+ * End of "$Id: fl_utf8.h 8585 2011-04-13 15:43:22Z ianmacarthur $".
  */

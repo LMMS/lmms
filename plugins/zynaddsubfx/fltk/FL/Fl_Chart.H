@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Chart.H 6902 2009-09-27 11:06:56Z matt $"
+// "$Id: Fl_Chart.H 7981 2010-12-08 23:53:04Z greg.ercolano $"
 //
 // Forms chart header file for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2009 by Bill Spitzak and others.
+// Copyright 1998-2010 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -61,8 +61,8 @@ struct FL_CHART_ENTRY {
   \brief Fl_Chart displays simple charts.
   It is provided for Forms compatibility.
 
-  \image html charts.gif  
-  \image latex charts.eps  "Fl_Chart" width=10cm
+  \image html charts.png  
+  \image latex charts.png  "Fl_Chart" width=10cm
   \todo Refactor Fl_Chart::type() information.
 
   The type of an Fl_Chart object can be set using type(uchar t) to:
@@ -156,5 +156,5 @@ public:
 #endif
 
 //
-// End of "$Id: Fl_Chart.H 6902 2009-09-27 11:06:56Z matt $".
+// End of "$Id: Fl_Chart.H 7981 2010-12-08 23:53:04Z greg.ercolano $".
 //

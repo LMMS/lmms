@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Round_Button.H 6614 2009-01-01 16:11:32Z matt $"
+// "$Id: Fl_Round_Button.H 7981 2010-12-08 23:53:04Z greg.ercolano $"
 //
 // Round button header file for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2009 by Bill Spitzak and others.
+// Copyright 1998-2010 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -37,8 +37,8 @@
   Buttons generate callbacks when they are clicked by the user.  You
   control exactly when and how by changing the values for type()
   and when().
-  <P ALIGN=CENTER>\image html Fl_Round_Button.gif</P> 
-  \image latex  Fl_Round_Button.eps " Fl_Round_Button" width=4cm
+  <P ALIGN=CENTER>\image html Fl_Round_Button.png</P> 
+  \image latex  Fl_Round_Button.png " Fl_Round_Button" width=4cm
   <P>The Fl_Round_Button subclass display the "on" state by
   turning on a light, rather than drawing pushed in.  The shape of the
   "light" is initially set to FL_ROUND_DOWN_BOX.  The color of the light
@@ -53,5 +53,5 @@ public:
 #endif
 
 //
-// End of "$Id: Fl_Round_Button.H 6614 2009-01-01 16:11:32Z matt $".
+// End of "$Id: Fl_Round_Button.H 7981 2010-12-08 23:53:04Z greg.ercolano $".
 //

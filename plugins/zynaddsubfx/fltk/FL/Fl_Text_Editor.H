@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Text_Editor.H 6893 2009-09-20 19:24:24Z greg.ercolano $"
+// "$Id: Fl_Text_Editor.H 7903 2010-11-28 21:06:39Z matt $"
 //
 // Header file for Fl_Text_Editor class.
 //
-// Copyright 2001-2009 by Bill Spitzak and others.
+// Copyright 2001-2010 by Bill Spitzak and others.
 // Original code Copyright Mark Edel.  Permission to distribute under
 // the LGPL for the FLTK library granted by Mark Edel.
 //
@@ -136,6 +136,6 @@ class FL_EXPORT Fl_Text_Editor : public Fl_Text_Display {
 #endif
 
 //
-// End of "$Id: Fl_Text_Editor.H 6893 2009-09-20 19:24:24Z greg.ercolano $".
+// End of "$Id: Fl_Text_Editor.H 7903 2010-11-28 21:06:39Z matt $".
 //
 

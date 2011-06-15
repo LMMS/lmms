@@ -1,9 +1,9 @@
 //
-// "$Id: Fl.H 7334 2010-03-25 14:37:46Z AlbrechtS $"
+// "$Id: Fl.H 8724 2011-05-23 18:01:29Z manolo $"
 //
 // Main header file for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2009 by Bill Spitzak and others.
+// Copyright 1998-2010 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -25,14 +25,14 @@
 //     http://www.fltk.org/str.php
 //
 
-/* \file
+/** \file
     Fl static class.
  */
 
 #ifndef Fl_H
 #  define Fl_H
 
-#ifdef HAVE_CAIRO
+#ifdef FLTK_HAVE_CAIRO
 # include <FL/Fl_Cairo.H>
 #endif
 
@@ -54,7 +54,7 @@ struct Fl_Label;
 
 
 /** \defgroup  callback_functions Callback function typedefs
-    \brief Typedefs for callback or handler functions passed as function parameters.
+ \brief Typedefs defined in <FL/Fl.H> for callback or handler functions passed as function parameters.
 
     FLTK uses callback functions as parameters for some function calls, e.g. to
     set up global event handlers (Fl::add_handler()), to add a timeout handler
@@ -68,51 +68,56 @@ struct Fl_Label;
 	 Fl::remove_timeout() and others
   @{ */
 
-/** signature of some label drawing functions passed as parameters */
+/** Signature of some label drawing functions passed as parameters */
 typedef void (Fl_Label_Draw_F)(const Fl_Label *label, int x, int y, int w, int h, Fl_Align align);
 
-/** signature of some label measurement functions passed as parameters */
+/** Signature of some label measurement functions passed as parameters */
 typedef void (Fl_Label_Measure_F)(const Fl_Label *label, int &width, int &height);
 
-/** signature of some box drawing functions passed as parameters */
+/** Signature of some box drawing functions passed as parameters */
 typedef void (Fl_Box_Draw_F)(int x, int y, int w, int h, Fl_Color color);
 
-/** signature of some timeout callback functions passed as parameters */
+/** Signature of some timeout callback functions passed as parameters */
 typedef void (*Fl_Timeout_Handler)(void *data);
 
-/** signature of some wakeup callback functions passed as parameters */
+/** Signature of some wakeup callback functions passed as parameters */
 typedef void (*Fl_Awake_Handler)(void *data);
 
-/** signature of add_idle callback functions passed as parameters */
+/** Signature of add_idle callback functions passed as parameters */
 typedef void (*Fl_Idle_Handler)(void *data);
 
-/** signature of set_idle callback functions passed as parameters */
+/** Signature of set_idle callback functions passed as parameters */
 typedef void (*Fl_Old_Idle_Handler)();
 
-/** signature of add_fd functions passed as parameters */
+/** Signature of add_fd functions passed as parameters */
 typedef void (*Fl_FD_Handler)(int fd, void *data);
 
-/** signature of add_handler functions passed as parameters */
+/** Signature of add_handler functions passed as parameters */
 typedef int (*Fl_Event_Handler)(int event);
 
-/** signature of set_abort functions passed as parameters */
+/** Signature of set_abort functions passed as parameters */
 typedef void (*Fl_Abort_Handler)(const char *format,...);
 
-/** signature of set_atclose functions passed as parameters */
+/** Signature of set_atclose functions passed as parameters */
 typedef void (*Fl_Atclose_Handler)(Fl_Window *window, void *data);
 
-/** signature of args functions passed as parameters */
+/** Signature of args functions passed as parameters */
 typedef int (*Fl_Args_Handler)(int argc, char **argv, int &i);
+
+/** Signature of event_dispatch functions passed as parameters.
+    \see Fl::event_dispatch(Fl_Event_Dispatch) */
+typedef int (*Fl_Event_Dispatch)(int event, Fl_Window *w);
 
 /** @} */ /* group callback_functions */
 
+
 /**
-  The Fl is the FLTK global (static) containing
+  The Fl is the FLTK global (static) class containing
   state information and global methods for the current application.
 */
 class FL_EXPORT Fl {
   Fl() {}; // no constructor!
-
+  
 public: // should be private!
 #ifndef FL_DOXYGEN
   static int e_number;
@@ -128,6 +133,7 @@ public: // should be private!
   static int e_keysym;
   static char* e_text;
   static int e_length;
+  static Fl_Event_Dispatch e_dispatch;
   static Fl_Widget* belowmouse_;
   static Fl_Widget* pushed_;
   static Fl_Widget* focus_;
@@ -136,14 +142,69 @@ public: // should be private!
   static Fl_Window* modal_;
   static Fl_Window* grab_;
   static int compose_state;
-  static int visible_focus_;
-  static int dnd_text_ops_;
 #endif
   /**
     If true then flush() will do something.
   */
   static void damage(int d) {damage_ = d;}
+  
+public:
+  /** Enumerator for global FLTK options.
+      These options can be set system wide, per user, or for the running
+      application only.
+      \see Fl::option(Fl_Option, bool)
+      \see Fl::option(Fl_Option)
+  */
+  typedef enum {
+      /// When switched on, moving the text cursor beyond the start or end of
+      /// a text in a text widget will change focus to the next text widget.
+      /// When switched off, the cursor will stop at the end of the text.
+      /// Pressing Tab or Ctrl-Tab will advance the keyboard focus.
+    OPTION_ARROW_FOCUS = 0,
+      // When switched on, FLTK will use the file chooser dialog that comes 
+      // with your operating system whenever possible. When switched off, FLTK
+      // will present its own file chooser.
+      // \todo implement me
+    // OPTION_NATIVE_FILECHOOSER,
+      // When Filechooser Preview is enabled, the FLTK or native file chooser
+      // will show a preview of a selected file (if possible) before the user
+      // decides to choose the file.
+      // \todo implement me
+    //OPTION_FILECHOOSER_PREVIEW,
+      /// If visible focus is switched on, FLTK will draw a dotted rectangle 
+      /// inside the widget that will receive the next keystroke. If switched
+      /// off, no such indicator will be drawn and keyboard navigation
+      /// is disabled.
+    OPTION_VISIBLE_FOCUS,
+      /// If text drag-and-drop is enabled, the user can select and drag text
+      /// from any text widget. If disabled, no dragging is possible, however
+      /// dropping text from other applications still works.
+    OPTION_DND_TEXT,
+      /// If tooltips are enabled, hovering the mouse over a widget with a 
+      /// tooltip text will open a little tooltip window until the mouse leaves
+      /// the widget. If disabled, no tooltip is shown.
+    OPTION_SHOW_TOOLTIPS,
+      // don't change this, leave it always as the last element
+      /// For internal use only.
+    OPTION_LAST
+  } Fl_Option;
 
+private:  
+  static unsigned char options_[OPTION_LAST];
+  static unsigned char options_read_;
+  
+public:  
+  /*
+   Return a global setting for all FLTK applications, possibly overridden
+   by a setting specifically for this application.
+   */
+  static bool option(Fl_Option opt);
+  
+  /*
+   Override an option while the application is running.
+   */
+  static void option(Fl_Option opt, bool val);
+  
   /**
     The currently executing idle callback function: DO NOT USE THIS DIRECTLY!
     
@@ -176,9 +237,9 @@ public:
   static double version();
 
   // argument parsers:
-  static int arg(int, char**, int&);
-  static int args(int, char**, int&, Fl_Args_Handler ah = 0);
-  static void args(int, char**);
+  static int arg(int argc, char **argv, int& i);
+  static int args(int argc, char **argv, int& i, Fl_Args_Handler cb = 0);
+  static void args(int argc, char **argv);
   /**
     Usage string displayed if Fl::args() detects an invalid argument.
     This may be changed to point to customized text at run-time.
@@ -329,6 +390,7 @@ public:
   be messed up, but the user can probably keep working - all X protocol
   errors call this, for example. The default implementation returns after
   displaying the message.
+   \note \#include <FL/Fl.H>
   */
   static void (*warning)(const char*, ...);
   /**
@@ -343,6 +405,7 @@ public:
 
   Fl::error() means there is a recoverable error such as the inability to read
   an image file. The default implementation returns after displaying the message.
+   \note \#include <FL/Fl.H>
   */
   static void (*error)(const char*, ...);
   /**
@@ -359,12 +422,13 @@ public:
   version may be able to use longjmp or an exception to continue, as long as
   it does not call FLTK again. The default implementation exits with status 1
   after displaying the message.
+   \note \#include <FL/Fl.H>
   */
   static void (*fatal)(const char*, ...);
   /** @} */
 
   /** \defgroup  fl_windows Windows handling functions
-      Windows and standard dialogs handling
+      \brief Windows and standard dialogs handling declared in <FL/Fl.H>
     @{ */
   static Fl_Window* first_window();
   static void first_window(Fl_Window*);
@@ -380,37 +444,41 @@ public:
     called (grab() overrides this).
   */
   static Fl_Window* modal() {return modal_;}
-  /**
-    This is used when pop-up menu systems are active.
-    
-    Send all events to the passed window no matter where the pointer or
-    focus is (including in other programs). The window <I>does not have
-    to be shown()</I> , this lets the handle() method of a
-    "dummy" window override all event handling and allows you to
-    map and unmap a complex set of windows (under both X and WIN32
-    <I>some</I> window must be mapped because the system interface needs a
-    window id).
-    
-    If grab() is on it will also affect show() of windows by doing
-    system-specific operations (on X it turns on override-redirect).
-    These are designed to make menus popup reliably
-    and faster on the system.
-    
-    To turn off grabbing do Fl::grab(0).
-    
-    <I>Be careful that your program does not enter an infinite loop
-    while grab() is on.  On X this will lock up your screen!</I>
-    To avoid this potential lockup, all newer operating systems seem to 
-    limit mouse pointer grabbing to the time during which a mouse button 
-    is held down. Some OS's may not support grabbing at all.
+  /** Returns the window that currently receives all events.
+   
+   \return The window that currently receives all events,
+   or NULL if event grabbing is currently OFF.
   */
   static Fl_Window* grab() {return grab_;}
-  /** Selects the window to grab. See Fl_Window* Fl::grab() */
+  /** Selects the window to grab.  
+   This is used when pop-up menu systems are active.
+   
+   Send all events to the passed window no matter where the pointer or
+   focus is (including in other programs). The window <I>does not have
+   to be shown()</I> , this lets the handle() method of a
+   "dummy" window override all event handling and allows you to
+   map and unmap a complex set of windows (under both X and WIN32
+   <I>some</I> window must be mapped because the system interface needs a
+   window id).
+   
+   If grab() is on it will also affect show() of windows by doing
+   system-specific operations (on X it turns on override-redirect).
+   These are designed to make menus popup reliably
+   and faster on the system.
+   
+   To turn off grabbing do Fl::grab(0).
+   
+   <I>Be careful that your program does not enter an infinite loop
+   while grab() is on.  On X this will lock up your screen!</I>
+   To avoid this potential lockup, all newer operating systems seem to 
+   limit mouse pointer grabbing to the time during which a mouse button 
+   is held down. Some OS's may not support grabbing at all.
+   */
   static void grab(Fl_Window*); // platform dependent
   /** @} */
 
   /** \defgroup fl_events Events handling functions
-	Fl class events handling API
+	Fl class events handling API declared in <FL/Fl.H>
 	@{
   */
   // event information:
@@ -481,18 +549,18 @@ public:
   */
   static void event_clicks(int i) {e_clicks = i;}
   /**
-    The first form returns non-zero if the mouse has not moved far enough
-    and not enough time has passed since the last FL_PUSH or 
-    FL_KEYBOARD event for it to be considered a "drag" rather than a
-    "click".  You can test this on FL_DRAG, FL_RELEASE,
-    and FL_MOVE events.  The second form clears the value returned
-    by Fl::event_is_click().  Useful to prevent the <I>next</I>
-    click from being counted as a double-click or to make a popup menu
-    pick an item with a single click.  Don't pass non-zero to this.
+  Returns non-zero if the mouse has not moved far enough
+  and not enough time has passed since the last FL_PUSH or 
+  FL_KEYBOARD event for it to be considered a "drag" rather than a
+  "click".  You can test this on FL_DRAG, FL_RELEASE,
+  and FL_MOVE events.  
   */
   static int event_is_click()	{return e_is_click;}
   /**
-    Only i=0 works! See int event_is_click(). 
+   Clears the value returned by Fl::event_is_click().  
+   Useful to prevent the <I>next</I>
+   click from being counted as a double-click or to make a popup menu
+   pick an item with a single click.  Don't pass non-zero to this. 
   */
   static void event_is_click(int i) {e_is_click = i;}
   /**
@@ -618,19 +686,14 @@ public:
   static int event_length() {return e_length;}
 
   static int compose(int &del);
-  /**
-    If the user moves the cursor, be sure to call Fl::compose_reset().
-    The next call to Fl::compose() will start out in an initial state. In
-    particular it will not set "del" to non-zero. This call is very fast
-    so it is ok to call it many times and in many places.
-  */
-  static void compose_reset() {compose_state = 0;}
+  static void compose_reset();
   static int event_inside(int,int,int,int);
   static int event_inside(const Fl_Widget*);
   static int test_shortcut(Fl_Shortcut);
 
   // event destinations:
   static int handle(int, Fl_Window*);
+  static int handle_(int, Fl_Window*);
   /**  Gets the widget that is below the mouse. 
        \see  belowmouse(Fl_Widget*) */
   static Fl_Widget* belowmouse() {return belowmouse_;}
@@ -644,31 +707,50 @@ public:
   static void focus(Fl_Widget*);
   static void add_handler(Fl_Event_Handler h);
   static void remove_handler(Fl_Event_Handler h);
+  static void event_dispatch(Fl_Event_Dispatch d);
+  static Fl_Event_Dispatch event_dispatch();
   /** @} */
 
   /** \defgroup  fl_clipboard  Selection & Clipboard functions
-	fl global copy/cut/paste functions
+	FLTK global copy/cut/paste functions declared in <FL/Fl.H>
    @{ */
   // cut/paste:
   /**
-    Copies the data pointed to by \p stuff to the selection (0) or
-    primary (1) clipboard. The selection clipboard is used for
-    middle-mouse pastes and for drag-and-drop selections. The primary
-    clipboard is used for traditional copy/cut/paste operations.
+  Copies the data pointed to by \p stuff to the selection buffer 
+  (\p destination is 0) or
+  the clipboard (\p destination is 1); \p len is the number of relevant
+  bytes in \p stuff.
+  The selection buffer is used for
+  middle-mouse pastes and for drag-and-drop selections. The 
+  clipboard is used for traditional copy/cut/paste operations.
   */
-  static void copy(const char* stuff, int len, int clipboard = 0); // platform dependent
+  static void copy(const char* stuff, int len, int destination = 0); // platform dependent
   /**
-    Pastes the data from the selection (0) or primary (1) clipboard into receiver.  
-    The selection clipboard is used for middle-mouse pastes and for 
-    drag-and-drop selections. The primary clipboard is used for 
-    traditional copy/cut/paste operations.
+  Pastes the data from the selection buffer (\p source is 0) or the clipboard 
+  (\p source is 1) into \p receiver.  
+  Set things up so the receiver widget will be called with an FL_PASTE event some
+  time in the future with the data from the specified \p source in Fl::event_text()
+  and the number of characters in Fl::event_length().
+  The receiver
+  should be prepared to be called \e directly by this, or for
+  it to happen \e later, or possibly <i>not at all</i>.  This
+  allows the window system to take as long as necessary to retrieve
+  the paste buffer (or even to screw up completely) without complex
+  and error-prone synchronization code in FLTK.
+   
+  The selection buffer is used for middle-mouse pastes and for 
+  drag-and-drop selections. The clipboard is used for traditional 
+  copy/cut/paste operations.
   */
-  static void paste(Fl_Widget &receiver, int clipboard /*=0*/); // platform dependent
+  static void paste(Fl_Widget &receiver, int source /*=0*/); // platform dependent
   /**
-    Initiate a Drag And Drop operation. The clipboard should be
+    Initiate a Drag And Drop operation. The selection buffer should be
     filled with relevant data before calling this method. FLTK will
     then initiate the system wide drag and drop handling. Dropped data
     will be marked as <i>text</i>.
+   
+    Create a selection first using:
+    Fl::copy(const char *stuff, int len, 0)
   */
   static int dnd(); // platform dependent
 
@@ -681,16 +763,16 @@ public:
   static void paste(Fl_Widget &receiver);
 /** @} */
 /** \defgroup  fl_screen  Screen functions
-	fl global screen functions
+	fl global screen functions declared in <FL/Fl.H>
      @{ */
   // screen size:
-  /** Returns the origin of the current screen, where 0 indicates the left side of the screen. */
+  /** Returns the origin of the current screen work area, where 0 indicates the left side of the screen. */
   static int x(); // platform dependent
-  /** Returns the origin of the current screen, where 0 indicates the top edge of the screen. */
+  /** Returns the origin of the current screen work area, where 0 indicates the top edge of the screen. */
   static int y(); // platform dependent
-  /** Returns the width of the screen in pixels. */
+  /** Returns the width of the screen work area in pixels. */
   static int w(); // platform dependent
-  /** Returns the height of the screen in pixels. */
+  /** Returns the height of the screen work area in pixels. */
   static int h(); // platform dependent
 
   // multi-head support:
@@ -704,12 +786,15 @@ public:
     screen_xywh(X, Y, W, H, e_x_root, e_y_root);
   }
   static void screen_xywh(int &X, int &Y, int &W, int &H, int mx, int my);
-  static void screen_xywh(int &X, int &Y, int &W, int &H, int n);
+  static void screen_xywh(int &X, int &Y, int &W, int &H, int n); 
+  static void screen_xywh(int &X, int &Y, int &W, int &H, int mx, int my, int mw, int mh);
+  static void screen_dpi(float &h, float &v, int n=0);
 
   /**   @} */
 
   /** \defgroup  fl_attributes  Color & Font functions
-	fl global color, font functions
+	fl global color, font functions.
+   These functions are declared in <FL/Fl.H> or <FL/fl_draw.H>. 
      @{ */
  
   // color map:
@@ -718,15 +803,15 @@ public:
     Sets an entry in the fl_color index table. You can set it to any
     8-bit RGB color. The color is not allocated until fl_color(i) is used.
   */
-  static void	set_color(Fl_Color, unsigned); // platform dependent
-  static Fl_Color get_color(Fl_Color);
-  static void	get_color(Fl_Color, uchar&, uchar&, uchar&);
+  static void	set_color(Fl_Color i, unsigned c); // platform dependent
+  static unsigned get_color(Fl_Color i);
+  static void	get_color(Fl_Color i, uchar &red, uchar &green, uchar &blue);
   /**
     Frees the specified color from the colormap, if applicable.
     If overlay is non-zero then the color is freed from the
     overlay colormap.
   */
-  static void	free_color(Fl_Color, int overlay = 0); // platform dependent
+  static void	free_color(Fl_Color i, int overlay = 0); // platform dependent
 
   // fonts:
   static const char* get_font(Fl_Font);
@@ -779,7 +864,9 @@ public:
 
   /**   @} */
  /** \defgroup  fl_drawings  Drawing functions
-	fl global graphics and gui drawing functions
+  FLTK global graphics and GUI drawing functions.
+  These functions are declared in <FL/fl_draw.H>, 
+  and in <FL/x.H> for offscreen buffer-related ones.
      @{ */
   // <Hack to re-order the 'Drawing functions' group>
  /** @} */
@@ -854,11 +941,11 @@ public:
     \deprecated This method is obsolete - use the add_idle() method instead.
   */
   static void set_idle(Fl_Old_Idle_Handler cb) {idle = cb;}
-  /** See Fl_Window* grab() */
-  static void grab(Fl_Window&win) {grab(&win);}
+  /** See grab(Fl_Window*) */
+  static void grab(Fl_Window& win) {grab(&win);}
   /** Releases the current grabbed window, equals grab(0).
   \deprecated Use Fl::grab(0) instead.
-  \see Fl_Window* grab() */
+  \see grab(Fl_Window*) */
   static void release() {grab(0);}
 
   // Visible focus methods...
@@ -867,13 +954,13 @@ public:
     non-text widgets. The default mode is to enable keyboard focus
     for all widgets.
   */
-  static void visible_focus(int v) { visible_focus_ = v; }
+  static void visible_focus(int v) { option(OPTION_VISIBLE_FOCUS, (v!=0)); }
   /**
     Gets or sets the visible keyboard focus on buttons and other
     non-text widgets. The default mode is to enable keyboard focus
     for all widgets.
   */
-  static int  visible_focus() { return visible_focus_; }
+  static int  visible_focus() { return option(OPTION_VISIBLE_FOCUS); }
 
   // Drag-n-drop text operation methods...
   /**
@@ -882,20 +969,20 @@ public:
     be dragged from text fields or dragged within a text field as a
     cut/paste shortcut.
   */
-  static void dnd_text_ops(int v) { dnd_text_ops_ = v; }
+  static void dnd_text_ops(int v) { option(OPTION_DND_TEXT, (v!=0)); }
   /**
     Gets or sets whether drag and drop text operations are
     supported. This specifically affects whether selected text can
     be dragged from text fields or dragged within a text field as a
     cut/paste shortcut.
   */
-  static int  dnd_text_ops() { return dnd_text_ops_; }
+  static int  dnd_text_ops() { return option(OPTION_DND_TEXT); }
   /** \defgroup fl_multithread Multithreading support functions
-	fl multithreading support functions
+	fl multithreading support functions declared in <FL/Fl.H>
    @{ */
 
   // Multithreading support:
-  static void lock();
+  static int lock();
   static void unlock();
   static void awake(void* message = 0);
   /** See void awake(void* message=0). */
@@ -904,14 +991,14 @@ public:
     The thread_message() method returns the last message
     that was sent from a child by the awake() method.
     
-    See also: multithreading
+    See also: \ref advanced_multithreading
   */
   static void* thread_message(); // platform dependent
   /** @} */
 
   /** \defgroup fl_del_widget Safe widget deletion support functions
 
-    These functions support deletion of widgets inside callbacks.
+    These functions, declared in <FL/Fl.H>, support deletion of widgets inside callbacks.
 
     Fl::delete_widget() should be called when deleting widgets
     or complete widget trees (Fl_Group, Fl_Window, ...) inside
@@ -946,14 +1033,14 @@ public:
   static void clear_widget_pointer(Fl_Widget const *w);
   /** @} */
 
-#ifdef HAVE_CAIRO
+#ifdef FLTK_HAVE_CAIRO
   /** \defgroup group_cairo Cairo support functions and classes 
       @{ 
   */
 public:
   // Cairo support API
   static cairo_t * cairo_make_current(Fl_Window* w);
-   /** when HAVE_CAIRO is defined and cairo_autolink_context() is true, 
+   /** when FLTK_HAVE_CAIRO is defined and cairo_autolink_context() is true, 
       any current window dc is linked to a current context.
       This is not the default, because it may not be necessary
       to add cairo support to all fltk supported windows.
@@ -991,7 +1078,7 @@ private:
 public:
   /** @} */ 
 
-#endif // HAVE_CAIRO
+#endif // FLTK_HAVE_CAIRO
 
 };
 
@@ -1076,12 +1163,12 @@ public:
 };
 
  /** \defgroup  fl_unicode  Unicode and UTF-8 functions
-	fl global Unicode and UTF-8 handling functions
+	fl global Unicode and UTF-8 handling functions declared in <FL/fl_utf8.h>
      @{ */
  /** @} */
 
 #endif // !Fl_H
 
 //
-// End of "$Id: Fl.H 7334 2010-03-25 14:37:46Z AlbrechtS $".
+// End of "$Id: Fl.H 8724 2011-05-23 18:01:29Z manolo $".
 //

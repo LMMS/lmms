@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Font.H 7351 2010-03-29 10:35:00Z matt $"
+// "$Id: Fl_Font.H 8428 2011-02-15 15:47:22Z manolo $"
 //
 // Font definitions for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2009 by Bill Spitzak and others.
+// Copyright 1998-2011 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -51,6 +51,7 @@ class Fl_Font_Descriptor {
 public:
   /** linked list for this Fl_Fontdesc */
   Fl_Font_Descriptor *next;	
+  Fl_Fontsize size; /**< font size */
 #ifndef FL_DOXYGEN // don't bother with platorm dependant details in the doc. 
 #  ifdef WIN32
   HFONT fid;
@@ -63,36 +64,34 @@ public:
   ATSUTextLayout layout;
 #     if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_5
   CTFontRef fontref;
+  // the unicode span is divided in 512 blocks of 128 characters
+  float *width[512]; // array of arrays of character widths
 #     endif
   ATSUStyle style;
   short ascent, descent, q_width;
-//  short width[256];
-//  bool knowWidths;
   char *q_name;
-  int size;
 #  elif USE_XFT
   XftFont* font;
-  const char* encoding;
-  Fl_Fontsize size;
+  //const char* encoding;
   int angle;
-  FL_EXPORT Fl_Font_Descriptor(const char* xfontname);
+  FL_EXPORT Fl_Font_Descriptor(const char* xfontname, Fl_Fontsize size, int angle);
 #  else
   XUtf8FontStruct* font;	// X UTF-8 font information
   FL_EXPORT Fl_Font_Descriptor(const char* xfontname);
 #  endif
-  Fl_Fontsize minsize;		// smallest point size that should use this
-  Fl_Fontsize maxsize;		// largest point size that should use this
 #  if HAVE_GL
   unsigned int listbase;// base of display list, 0 = none
+#ifndef __APPLE_QUARTZ__
   char glok[64];
-#  endif
+#endif // __APPLE_QUARTZ__
+#  endif // HAVE_GL
 
   FL_EXPORT ~Fl_Font_Descriptor();
 
 #endif // FL_DOXYGEN
 };
 
-extern FL_EXPORT Fl_Font_Descriptor *fl_fontsize; // the currently selected one
+//extern FL_EXPORT Fl_Font_Descriptor *fl_fontsize; // the currently selected one
 
 struct Fl_Fontdesc {
   const char *name;
@@ -115,5 +114,5 @@ FL_EXPORT char *fl_find_fontsize(char *name);
 #endif
 
 //
-// End of "$Id: Fl_Font.H 7351 2010-03-29 10:35:00Z matt $".
+// End of "$Id: Fl_Font.H 8428 2011-02-15 15:47:22Z manolo $".
 //

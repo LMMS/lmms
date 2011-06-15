@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Group.cxx 7469 2010-04-07 23:17:33Z matt $"
+// "$Id: Fl_Group.cxx 8184 2011-01-04 18:28:01Z matt $"
 //
 // Group widget for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2009 by Bill Spitzak and others.
+// Copyright 1998-2010 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -89,7 +89,8 @@ void Fl_Group::end() {current_ = parent();}
 Fl_Group *Fl_Group::current() {return current_;}
 
 /**
-  See static Fl_Group *Fl_Group::current() 
+  Sets the current group.
+  \see Fl_Group::current() 
 */
 void Fl_Group::current(Fl_Group *g) {current_ = g;}
 
@@ -133,7 +134,6 @@ static int navkey() {
     break;
   case FL_Tab:
     if (!Fl::event_state(FL_SHIFT)) return FL_Right;
-  case 0xfe20: // XK_ISO_Left_Tab
     return FL_Left;
   case FL_Right:
     return FL_Right;
@@ -387,20 +387,51 @@ void Fl_Group::clear() {
   savedfocus_ = 0;
   resizable_ = this;
   init_sizes();
+
+  // we must change the Fl::pushed() widget, if it is one of
+  // the group's children. Otherwise fl_fix_focus() would send
+  // lots of events to children that are about to be deleted
+  // anyway.
+
+  Fl_Widget *pushed = Fl::pushed();	// save pushed() widget
+  if (contains(pushed)) pushed = this;	// set it to be the group, if it's a child
+  Fl::pushed(this);			// for fl_fix_focus etc.
+
   // okay, now it is safe to destroy the children:
-  while (children_) {
-    Fl_Widget* o = child(0);	// *first* child widget
-    if (o->parent() == this) {	// should always be true
-      remove(o);		// remove child widget first
-      delete o;			// then delete it
-    } else {			// this should never happen !
-#ifdef DEBUG_CLEAR
-      printf ("Fl_Group::clear() widget:%p, parent: %p != this (%p)\n",
-	      o, o->parent(), this); fflush(stdout);
-#endif // DEBUG_CLEAR
-      remove(o);		// remove it
+
+#define REVERSE_CHILDREN
+#ifdef  REVERSE_CHILDREN
+  // Reverse the order of the children. Doing this and deleting
+  // always the last child is much faster than the other way around.
+  if (children_ > 1) {
+    Fl_Widget *temp;
+    Fl_Widget **a = (Fl_Widget**)array();
+    for (int i=0,j=children_-1; i<children_/2; i++,j--) {
+      temp = a[i];
+      a[i] = a[j];
+      a[j] = temp;
     }
   }
+#endif // REVERSE_CHILDREN
+
+  while (children_) {			// delete all children
+    int idx = children_-1;		// last child's index
+    Fl_Widget* w = child(idx);		// last child widget
+    if (w->parent()==this) {		// should always be true
+      if (children_>2) {		// optimized removal
+        w->parent_ = 0;			// reset child's parent
+        children_--;			// update counter
+      } else {				// slow removal
+        remove(idx);
+      }
+      delete w;				// delete the child
+    } else {				// should never happen
+      remove(idx);			// remove it anyway
+    }
+  }
+
+  if (pushed != this) Fl::pushed(pushed); // reset pushed() widget
+
 }
 
 /**
@@ -435,7 +466,7 @@ void Fl_Group::insert(Fl_Widget &o, int index) {
       if (index > n) index--;
       if (index == n) return;
     }
-    g->remove(o);
+    g->remove(n);
   }
   o.parent_ = this;
   if (children_ == 0) { // use array pointer to point at single child
@@ -463,39 +494,53 @@ void Fl_Group::insert(Fl_Widget &o, int index) {
 void Fl_Group::add(Fl_Widget &o) {insert(o, children_);}
 
 /**
+  Removes the widget at \p index from the group but does not delete it.
+
+  This method does nothing if \p index is out of bounds.
+
+  This method differs from the clear() method in that it only affects
+  a single widget and does not delete it from memory.
+  
+  \since FLTK 1.3.0
+*/
+void Fl_Group::remove(int index) {
+  if (index < 0 || index >= children_) return;
+  Fl_Widget &o = *child(index);
+  if (&o == savedfocus_) savedfocus_ = 0;
+  if (o.parent_ == this) {	// this should always be true
+    o.parent_ = 0;
+  } 
+
+  // remove the widget from the group
+
+  children_--;
+  if (children_ == 1) { // go from 2 to 1 child
+    Fl_Widget *t = array_[!index];
+    free((void*)array_);
+    array_ = (Fl_Widget**)t;
+  } else if (children_ > 1) { // delete from array
+    for (; index < children_; index++) array_[index] = array_[index+1];
+  }
+  init_sizes();
+}
+
+/**
   Removes a widget from the group but does not delete it.
 
   This method does nothing if the widget is not a child of the group.
 
   This method differs from the clear() method in that it only affects
   a single widget and does not delete it from memory.
+  
+  \note If you have the child's index anyway, use remove(int index)
+  instead, because this doesn't need a child lookup in the group's
+  table of children. This can be much faster, if there are lots of
+  children.
 */
 void Fl_Group::remove(Fl_Widget &o) {
   if (!children_) return;
   int i = find(o);
-  if (i >= children_) return;
-  if (&o == savedfocus_) savedfocus_ = 0;
-  if (o.parent_ == this) {	// this should always be true
-    o.parent_ = 0;
-  } 
-#ifdef DEBUG_REMOVE  
-  else {			// this should never happen !
-    printf ("Fl_Group::remove(): widget %p, parent_ (%p) != this (%p)\n",
-      &o, o.parent_, this);
-  }
-#endif // DEBUG_REMOVE
-
-  // remove the widget from the group
-
-  children_--;
-  if (children_ == 1) { // go from 2 to 1 child
-    Fl_Widget *t = array_[!i];
-    free((void*)array_);
-    array_ = (Fl_Widget**)t;
-  } else if (children_ > 1) { // delete from array
-    for (; i < children_; i++) array_[i] = array_[i+1];
-  }
-  init_sizes();
+  if (i < children_) remove(i);
 }
 
 ////////////////////////////////////////////////////////////////
@@ -600,7 +645,7 @@ void Fl_Group::resize(int X, int Y, int W, int H) {
 
   Fl_Widget::resize(X,Y,W,H); // make new xywh values visible for children
 
-  if (!resizable() || dw==0 && dh==0 ) {
+  if (!resizable() || (dw==0 && dh==0) ) {
 
     if (type() < FL_WINDOW) {
       Fl_Widget*const* a = array();
@@ -740,47 +785,53 @@ void Fl_Group::draw_outside_label(const Fl_Widget& widget) const {
   // skip any labels that are inside the widget:
   if (!(widget.align()&15) || (widget.align() & FL_ALIGN_INSIDE)) return;
   // invent a box that is outside the widget:
-  int a = widget.align();
+  Fl_Align a = widget.align();
   int X = widget.x();
   int Y = widget.y();
   int W = widget.w();
   int H = widget.h();
+  int wx, wy;
+  if (const_cast<Fl_Group*>(this)->as_window()) {
+    wx = wy = 0;
+  } else {
+    wx = x(); wy = y();
+  }
   if ( (a & 0x0f) == FL_ALIGN_LEFT_TOP ) {
     a = (a &~0x0f ) | FL_ALIGN_TOP_RIGHT;
-    X = x();
+    X = wx;
     W = widget.x()-X-3;
   } else if ( (a & 0x0f) == FL_ALIGN_LEFT_BOTTOM ) {
     a = (a &~0x0f ) | FL_ALIGN_BOTTOM_RIGHT; 
-    X = x();
+    X = wx;
     W = widget.x()-X-3;
   } else if ( (a & 0x0f) == FL_ALIGN_RIGHT_TOP ) {
     a = (a &~0x0f ) | FL_ALIGN_TOP_LEFT; 
     X = X+W+3;
-    W = x()+this->w()-X;
+    W = wx+this->w()-X;
   } else if ( (a & 0x0f) == FL_ALIGN_RIGHT_BOTTOM ) {
     a = (a &~0x0f ) | FL_ALIGN_BOTTOM_LEFT; 
     X = X+W+3;
-    W = x()+this->w()-X;
+    W = wx+this->w()-X;
   } else if (a & FL_ALIGN_TOP) {
     a ^= (FL_ALIGN_BOTTOM|FL_ALIGN_TOP);
-    Y = y();
+    Y = wy;
     H = widget.y()-Y;
   } else if (a & FL_ALIGN_BOTTOM) {
     a ^= (FL_ALIGN_BOTTOM|FL_ALIGN_TOP);
     Y = Y+H;
-    H = y()+h()-Y;
+    H = wy+h()-Y;
   } else if (a & FL_ALIGN_LEFT) {
     a ^= (FL_ALIGN_LEFT|FL_ALIGN_RIGHT);
-    X = x();
+    X = wx;
     W = widget.x()-X-3;
   } else if (a & FL_ALIGN_RIGHT) {
     a ^= (FL_ALIGN_LEFT|FL_ALIGN_RIGHT);
     X = X+W+3;
-    W = x()+this->w()-X;
+    W = wx+this->w()-X;
   }
   widget.draw_label(X,Y,W,H,(Fl_Align)a);
 }
 
 //
-// End of "$Id: Fl_Group.cxx 7469 2010-04-07 23:17:33Z matt $".
+// End of "$Id: Fl_Group.cxx 8184 2011-01-04 18:28:01Z matt $".
 //

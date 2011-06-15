@@ -1,9 +1,9 @@
 //
-// "$Id: fl_draw.cxx 7502 2010-04-14 13:21:10Z manolo $"
+// "$Id: fl_draw.cxx 8763 2011-05-30 16:08:46Z manolo $"
 //
 // Label drawing code for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2009 by Bill Spitzak and others.
+// Copyright 1998-2011 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -32,7 +32,6 @@
 // Expands all unprintable characters to ^X or \nnn notation
 // Aligns them against the inside of the box.
 
-#define min(a,b) ((a)<(b)?(a):(b))
 #include <FL/fl_utf8.h>
 #include <FL/Fl.H>
 #include <FL/fl_draw.H>
@@ -193,7 +192,7 @@ void fl_draw(
   char buf[MAXBUF];
   int buflen;
   char symbol[2][255], *symptr;
-  int symwidth[2], symoffset, symtotal;
+  int symwidth[2], symoffset, symtotal, imgtotal;
 
   // count how many lines and put the last one into the buffer:
   int lines;
@@ -216,23 +215,24 @@ void fl_draw(
            *symptr++ = *str++);
       *symptr = '\0';
       if (isspace(*str)) str++;
-      symwidth[0] = min(w,h);
+      symwidth[0] = (w < h ? w : h);
     }
 
     if (str && (p = strrchr(str, '@')) != NULL && p > (str + 1) && p[-1] != '@') {
       strlcpy(symbol[1], p, sizeof(symbol[1]));
-      symwidth[1] = min(w,h);
+      symwidth[1] = (w < h ? w : h);
     }
   }
 
   symtotal = symwidth[0] + symwidth[1];
+  imgtotal = (img && (align&FL_ALIGN_IMAGE_NEXT_TO_TEXT)) ? img->w() : 0;
   
   int strw = 0;
   int strh;
 
   if (str) {
     for (p = str, lines=0; p;) {
-      e = fl_expand_text(p, buf, MAXBUF, w - symtotal, buflen, width, 
+      e = fl_expand_text(p, buf, MAXBUF, w - symtotal - imgtotal, buflen, width, 
                          align&FL_ALIGN_WRAP, draw_symbols);
       if (strw<width) strw = (int)width;
       lines++;
@@ -299,7 +299,7 @@ void fl_draw(
   if (str) {
     int desc = fl_descent();
     for (p=str; ; ypos += height) {
-      if (lines>1) e = fl_expand_text(p, buf, MAXBUF, w - symtotal, buflen, 
+      if (lines>1) e = fl_expand_text(p, buf, MAXBUF, w - symtotal - imgtotal, buflen, 
 				width, align&FL_ALIGN_WRAP, draw_symbols);
       else e = "";
 
@@ -441,7 +441,7 @@ void fl_measure(const char* str, int& w, int& h, int draw_symbols) {
 			w != 0, draw_symbols);
     if ((int)ceil(width) > W) W = (int)ceil(width);
     lines++;
-    if (!*e || (*e == '@' && draw_symbols)) break;
+    if (!*e || (*e == '@' && e[1] != '@' && draw_symbols)) break;
     p = e;
   }
 
@@ -482,5 +482,5 @@ int fl_height(int font, int size) {
 }
 
 //
-// End of "$Id: fl_draw.cxx 7502 2010-04-14 13:21:10Z manolo $".
+// End of "$Id: fl_draw.cxx 8763 2011-05-30 16:08:46Z manolo $".
 //

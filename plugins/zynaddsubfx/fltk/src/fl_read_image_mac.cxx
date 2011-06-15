@@ -1,9 +1,9 @@
 //
-// "$Id: fl_read_image_mac.cxx 7670 2010-07-09 17:29:35Z manolo $"
+// "$Id: fl_read_image_mac.cxx 8362 2011-02-02 18:39:34Z manolo $"
 //
 // WIN32 image reading routines for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2009 by Bill Spitzak and others.
+// Copyright 1998-2010 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -26,7 +26,6 @@
 //
 
 #include <config.h>
-extern unsigned char *MACbitmapFromRectOfWindow(Fl_Window *win, int x, int y, int w, int h, int *bytesPerPixel);
 
 //
 // 'fl_read_image()' - Read an image from the current window or off-screen buffer.
@@ -54,7 +53,7 @@ fl_read_image(uchar *p,		// I - Pixel buffer or NULL to allocate
   else { // reading from current window
     Fl_Window *window = Fl_Window::current();
     while(window->window()) window = window->window();
-    base = MACbitmapFromRectOfWindow(window,x,y,w,h,&delta);
+    base = Fl_X::bitmap_from_window_rect(window,x,y,w,h,&delta);
     rowBytes = delta*w;
     x = y = 0;
     }
@@ -73,11 +72,11 @@ fl_read_image(uchar *p,		// I - Pixel buffer or NULL to allocate
       pdst[2] = psrc[2];  // B
     }
   }
-  if(fl_window != NULL) delete base;
+  if(fl_window != NULL) delete[] base;
   return p;
 }
 
 
 //
-// End of "$Id: fl_read_image_mac.cxx 7670 2010-07-09 17:29:35Z manolo $".
+// End of "$Id: fl_read_image_mac.cxx 8362 2011-02-02 18:39:34Z manolo $".
 //

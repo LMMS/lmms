@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Hold_Browser.H 6614 2009-01-01 16:11:32Z matt $"
+// "$Id: Fl_Hold_Browser.H 8736 2011-05-24 20:00:56Z AlbrechtS $"
 //
 // Hold browser header file for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2009 by Bill Spitzak and others.
+// Copyright 1998-2010 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -42,7 +42,7 @@
   user releases the mouse, but you can change this with when().
   <P>See Fl_Browser for methods to add and remove lines from the browser.
 */
-class Fl_Hold_Browser : public Fl_Browser {
+class FL_EXPORT Fl_Hold_Browser : public Fl_Browser {
 public:
   /**
     Creates a new Fl_Hold_Browser widget using the given
@@ -50,12 +50,16 @@ public:
     The constructor specializes Fl_Browser() by setting the type to FL_HOLD_BROWSER.
     The destructor destroys the widget and frees all memory that has been allocated.
  */
-  Fl_Hold_Browser(int X,int Y,int W,int H,const char *l=0)
-	: Fl_Browser(X,Y,W,H,l) {type(FL_HOLD_BROWSER);}
+#if defined(FL_DLL)	// implementation in src/Fl_Browser.cxx
+  Fl_Hold_Browser(int X,int Y,int W,int H,const char *L=0);
+#else
+  Fl_Hold_Browser(int X,int Y,int W,int H,const char *L=0)
+	: Fl_Browser(X,Y,W,H,L) {type(FL_HOLD_BROWSER);}
+#endif
 };
 
 #endif
 
 //
-// End of "$Id: Fl_Hold_Browser.H 6614 2009-01-01 16:11:32Z matt $".
+// End of "$Id: Fl_Hold_Browser.H 8736 2011-05-24 20:00:56Z AlbrechtS $".
 //

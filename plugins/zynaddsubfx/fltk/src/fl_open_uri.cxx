@@ -1,5 +1,5 @@
 //
-// "$Id: fl_open_uri.cxx 6986 2010-01-01 18:30:49Z greg.ercolano $"
+// "$Id: fl_open_uri.cxx 8063 2010-12-19 21:20:10Z matt $"
 //
 // fl_open_uri() code for FLTK.
 //
@@ -7,7 +7,7 @@
 //
 //    gcc -I/fltk/dir -I/fltk/dir/src -DTEST -o fl_open_uri fl_open_uri.cxx -lfltk
 //
-// Copyright 2003-2009 by Michael R Sweet
+// Copyright 2003-2010 by Michael R Sweet
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -36,7 +36,6 @@
 #include <sys/types.h>
 #include "flstring.h"
 #ifdef WIN32
-#include <stdint.h>
 #  include <windows.h>
 #  include <shellapi.h>
 #else
@@ -58,6 +57,8 @@ static char	*path_find(const char *program, char *filename, int filesize);
 static int	run_program(const char *program, char **argv, char *msg, int msglen);
 #endif // !WIN32
 
+/** \addtogroup filenames
+ @{ */
 
 /**
  * Opens the specified Uniform Resource Identifier (URI).
@@ -125,7 +126,7 @@ fl_open_uri(const char *uri, char *msg, int msglen) {
 #ifdef WIN32
   if (msg) snprintf(msg, msglen, "open %s", uri);
 
-  return (intptr_t)ShellExecute(HWND_DESKTOP, "open", uri, NULL, NULL, SW_SHOW) > 32;
+  return (int)(ShellExecute(HWND_DESKTOP, "open", uri, NULL, NULL, SW_SHOW) > (void *)32);
 
 #elif defined(__APPLE__)
   char	*argv[3];			// Command-line arguments
@@ -151,7 +152,7 @@ fl_open_uri(const char *uri, char *msg, int msglen) {
   // BROWSER environment variables because we have no idea whether
   // we need to run the listed commands in a terminal program.
 
-  char	command[1024],			// Command to run...
+  char	command[FL_PATH_MAX],		// Command to run...
 	*argv[4],			// Command-line arguments
 	remote[1024];			// Remote-mode command...
   const char * const *commands;		// Array of commands to check...
@@ -240,6 +241,7 @@ fl_open_uri(const char *uri, char *msg, int msglen) {
 #endif // WIN32
 }
 
+/**   @} */
 
 #if !defined(WIN32) && !defined(__APPLE__)
 // Find a program in the path...
@@ -377,5 +379,5 @@ int main(int argc, char **argv) {
 
 
 //
-// End of "$Id: fl_open_uri.cxx 6986 2010-01-01 18:30:49Z greg.ercolano $".
+// End of "$Id: fl_open_uri.cxx 8063 2010-12-19 21:20:10Z matt $".
 //

@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Tooltip.H 6902 2009-09-27 11:06:56Z matt $"
+// "$Id: Fl_Tooltip.H 8405 2011-02-08 20:59:46Z manolo $"
 //
 // Tooltip header file for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2009 by Bill Spitzak and others.
+// Copyright 1998-2011 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -55,11 +55,11 @@ public:
   */
   static void hoverdelay(float f) { hoverdelay_ = f; }
   /**    Returns non-zero if tooltips are enabled.  */
-  static int enabled() { return enabled_; }
+  static int enabled() { return Fl::option(Fl::OPTION_SHOW_TOOLTIPS); }
   /**    Enables tooltips on all widgets (or disables if <i>b</i> is false).  */
-  static void enable(int b = 1) { enabled_ = b;}
+  static void enable(int b = 1) { Fl::option(Fl::OPTION_SHOW_TOOLTIPS, (b!=0));}
   /**    Same as enable(0), disables tooltips on all widgets.  */
-  static void disable() { enabled_ = 0; }
+  static void disable() { enable(0); }
   static void (*enter)(Fl_Widget* w);
   static void enter_area(Fl_Widget* w, int X, int Y, int W, int H, const char* tip);
   static void (*exit)(Fl_Widget *w);
@@ -72,7 +72,7 @@ public:
   /**    Sets the typeface for the tooltip text.  */
   static void font(Fl_Font i) { font_ = i; }
   /**    Gets the size of the tooltip text.  */
-  static Fl_Fontsize size() { return size_; }
+  static Fl_Fontsize size() { return (size_ == -1 ? FL_NORMAL_SIZE : size_); }
   /**    Sets the size of the tooltip text.  */
   static void size(Fl_Fontsize s) { size_ = s; }
   /** Gets the background color for tooltips. The default background color is a pale yellow.  */
@@ -83,18 +83,23 @@ public:
   static Fl_Color textcolor() { return textcolor_; }
   /** Sets the color of the text in the tooltip. The default is  black. */
   static void textcolor(Fl_Color c) { textcolor_ = c; }
+#ifdef __APPLE__
+  // the unique tooltip window
+  static Fl_Window* current_window(void);
+#endif
 
   // These should not be public, but Fl_Widget::tooltip() needs them...
   // fabien: made it private with only a friend function access
 private:
   friend void Fl_Widget::tooltip(const char *);
+  friend void Fl_Widget::copy_tooltip(const char *);
   static void enter_(Fl_Widget* w);
   static void exit_(Fl_Widget *w);
+  static void set_enter_exit_once_();
 
 private:
   static float delay_; //!< delay before a tooltip is shown
   static float hoverdelay_; //!< delay between tooltips
-  static int enabled_;
   static Fl_Color color_;
   static Fl_Color textcolor_;
   static Fl_Font font_;
@@ -105,5 +110,5 @@ private:
 #endif
 
 //
-// End of "$Id: Fl_Tooltip.H 6902 2009-09-27 11:06:56Z matt $".
+// End of "$Id: Fl_Tooltip.H 8405 2011-02-08 20:59:46Z manolo $".
 //

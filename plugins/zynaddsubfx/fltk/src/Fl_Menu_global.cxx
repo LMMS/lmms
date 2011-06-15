@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Menu_global.cxx 6616 2009-01-01 21:28:26Z matt $"
+// "$Id: Fl_Menu_global.cxx 7903 2010-11-28 21:06:39Z matt $"
 //
 // Global menu shortcut code for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2009 by Bill Spitzak and others.
+// Copyright 1998-2010 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -56,5 +56,5 @@ void Fl_Menu_::global() {
 }
 
 //
-// End of "$Id: Fl_Menu_global.cxx 6616 2009-01-01 21:28:26Z matt $".
+// End of "$Id: Fl_Menu_global.cxx 7903 2010-11-28 21:06:39Z matt $".
 //

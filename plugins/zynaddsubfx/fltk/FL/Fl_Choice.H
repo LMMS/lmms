@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Choice.H 6614 2009-01-01 16:11:32Z matt $"
+// "$Id: Fl_Choice.H 7981 2010-12-08 23:53:04Z greg.ercolano $"
 //
 // Choice header file for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2009 by Bill Spitzak and others.
+// Copyright 1998-2010 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -64,8 +64,8 @@
   you pick the item with the mouse.  The '\&' character in item names are
   only looked at when the menu is popped up, however.
 
-  \image html choice.gif
-  \image latex choice.eps  "Fl_Choice" width=4cm
+  \image html choice.png
+  \image latex choice.png  "Fl_Choice" width=4cm
   \todo Refactor the doxygen comments for Fl_Choice changed() documentation.
 
   \li <tt>int Fl_Widget::changed() const</tt>
@@ -104,5 +104,5 @@ public:
 #endif
 
 //
-// End of "$Id: Fl_Choice.H 6614 2009-01-01 16:11:32Z matt $".
+// End of "$Id: Fl_Choice.H 7981 2010-12-08 23:53:04Z greg.ercolano $".
 //

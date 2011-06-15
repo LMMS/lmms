@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Window.H 7280 2010-03-16 22:51:31Z matt $"
+// "$Id: Fl_Window.H 8593 2011-04-15 21:38:05Z manolo $"
 //
 // Window header file for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2009 by Bill Spitzak and others.
+// Copyright 1998-2010 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -57,11 +57,13 @@ class Fl_X;
 */
 class FL_EXPORT Fl_Window : public Fl_Group {
 
+  static char *default_xclass_;
+
   friend class Fl_X;
   Fl_X *i; // points at the system-specific stuff
 
   const char* iconlabel_;
-  const char* xclass_;
+  char* xclass_;
   const void* icon_;
   // size_range stuff:
   int minw, minh, maxw, maxh;
@@ -114,8 +116,8 @@ public:
     If Fl_Group::current() is not NULL, the window is created as a 
     subwindow of the parent window.
     
-    The first form of the constructor creates a top-level window
-    and asks the window manager to position the window. The second
+    The (w,h) form of the constructor creates a top-level window
+    and asks the window manager to position the window. The (x,y,w,h)
     form of the constructor either creates a subwindow or a
     top-level window at the specified location (x,y) , subject to window
     manager configuration. If you do not specify the position of the
@@ -135,12 +137,12 @@ public:
     change this to FL_NO_BOX. If you turn the window border off
     you may want to change this to FL_UP_BOX.
 
-    \see Fl_Window(int x, int y, int w, int h, const char* title = 0)
+    \see Fl_Window(int x, int y, int w, int h, const char* title)
   */
     Fl_Window(int w, int h, const char* title= 0);
   /** Creates a window from the given position, size and title.
 
-    \see Fl_Window::Fl_Window(int w, int h, const char *title = 0)
+    \see Fl_Window(int w, int h, const char *title)
   */
     Fl_Window(int x, int y, int w, int h, const char* title = 0);
   /**
@@ -321,29 +323,15 @@ public:
   /** Sets the icon label. */
   void iconlabel(const char*);
   /** Sets the icon label. */
-  void label(const char* label, const char* iconlabel); // platform dependent 
+  void label(const char* label, const char* iconlabel); // platform dependent
   void copy_label(const char* a);
-  /** See void Fl_Window::xclass(const char*) */
-  const char* xclass() const	{return xclass_;}
-  /**
-    A string used to tell the system what type of window this is. Mostly
-    this identifies the picture to draw in the icon. <I>Under X, this is
-    turned into a XA_WM_CLASS pair by truncating at the first
-    non-alphanumeric character and capitalizing the first character, and
-    the second one if the first is 'x'.  Thus "foo" turns into "foo, Foo",
-    and "xprog.1" turns into "xprog, XProg".</I> This only works if called <I>
-    before</I> calling show().
 
-    Under Microsoft Windows this string is used as the name of the
-    WNDCLASS structure, though it is not clear if this can have any
-    visible effect. The passed pointer is stored unchanged. The string 
-    is not copied.
-  */
-  void xclass(const char* c)	{xclass_ = c;}
-  /** Gets the current icon window target dependent data. */
-  const void* icon() const	{return icon_;}
-  /** Sets the current icon window target dependent data. */
-  void icon(const void * ic)	{icon_ = ic;}
+  static void default_xclass(const char*);
+  static const char *default_xclass();
+  const char* xclass() const;
+  void xclass(const char* c);
+  const void* icon() const;
+  void icon(const void * ic);
 
   /**
     Returns non-zero if show() has been called (but not hide()
@@ -353,14 +341,18 @@ public:
   int shown() {return i != 0;}
   /**
     Puts the window on the screen. Usually (on X) this has the side
-    effect of opening the display. The second form is used for top-level
-    windows and allows standard arguments to be parsed from the
-    command-line.
+    effect of opening the display.
 
     If the window is already shown then it is restored and raised to the
     top.  This is really convenient because your program can call show()
-    at any time, even if the window is already up.  It also means that 
+    at any time, even if the window is already up.  It also means that
     show() serves the purpose of raise() in other toolkits.
+    
+    Fl_Window::show(int argc, char **argv) is used for top-level
+    windows and allows standard arguments to be parsed from the
+    command-line.
+    
+    \see Fl_Window::show(int argc, char **argv)
   */
   virtual void show();
   /**
@@ -369,9 +361,26 @@ public:
   */
   virtual void hide();
   /**
-    See virtual void Fl_Window::show() 
+    Puts the window on the screen and parses command-line arguments.
+
+    Usually (on X) this has the side effect of opening the display.
+
+    This form should be used for top-level windows, at least for the
+    first (main) window. It allows standard arguments to be parsed
+    from the command-line. You can use \p argc and \p argv from
+    main(int argc, char **argv) for this call.
+
+    The first call also sets up some system-specific internal
+    variables like the system colors.
+
+    \todo explain which system parameters are set up.
+
+    \param argc command-line argument count, usually from main()
+    \param argv command-line argument vector, usually from main()
+
+    \see virtual void Fl_Window::show()
   */
-  void show(int, char**);
+  void show(int argc, char **argv);
   /**
     Makes the window completely fill the screen, without any window
     manager border visible.  You must use fullscreen_off() to undo
@@ -415,15 +424,9 @@ public:
   */
   void make_current();
 
-  /** Returns an Fl_Window pointer if this widget is an Fl_Window.
-  
-      \retval NULL if this widget is not derived from Fl_Window.
-      \note This method is provided to avoid dynamic_cast.
-      \todo More documentation ...
-   */
+  // Note: Doxygen docs in Fl_Widget.H to avoid redundancy.
   virtual Fl_Window* as_window() { return this; }
 
-  // for back-compatibility only:
   /**
     Changes the cursor for this window.  This always calls the system, if
     you are changing the cursor a lot you may want to keep track of how
@@ -440,11 +443,23 @@ public:
   void cursor(Fl_Cursor, Fl_Color=FL_BLACK, Fl_Color=FL_WHITE); // platform dependent
   void default_cursor(Fl_Cursor, Fl_Color=FL_BLACK, Fl_Color=FL_WHITE);
   static void default_callback(Fl_Window*, void* v);
+  
+  /** Returns the window width including any frame added by the window manager.
+   
+   Same as w() if applied to a subwindow.
+   */
+  int decorated_w();
+  /** Returns the window height including any window title bar and any frame 
+   added by the window manager.
+   
+   Same as h() if applied to a subwindow.
+   */
+  int decorated_h();
 
 };
 
 #endif
 
 //
-// End of "$Id: Fl_Window.H 7280 2010-03-16 22:51:31Z matt $".
+// End of "$Id: Fl_Window.H 8593 2011-04-15 21:38:05Z manolo $".
 //

@@ -1,9 +1,9 @@
 //
-// "$Id: fl_encoding_latin1.cxx 6616 2009-01-01 21:28:26Z matt $"
+// "$Id: fl_encoding_latin1.cxx 7903 2010-11-28 21:06:39Z matt $"
 //
 // Convert MSWindows-1252 (Latin-1) encoded text to the local encoding.
 //
-// Copyright 1998-2009 by Bill Spitzak and others.
+// Copyright 1998-2010 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -133,5 +133,5 @@ const char *fl_local_to_latin1(const char *t, int)
 #endif
 
 //
-// End of "$Id: fl_encoding_latin1.cxx 6616 2009-01-01 21:28:26Z matt $".
+// End of "$Id: fl_encoding_latin1.cxx 7903 2010-11-28 21:06:39Z matt $".
 //

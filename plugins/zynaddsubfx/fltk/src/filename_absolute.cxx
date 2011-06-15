@@ -1,9 +1,9 @@
 //
-// "$Id: filename_absolute.cxx 6986 2010-01-01 18:30:49Z greg.ercolano $"
+// "$Id: filename_absolute.cxx 8146 2010-12-31 22:13:07Z matt $"
 //
 // Filename expansion routines for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2009 by Bill Spitzak and others.
+// Copyright 1998-2010 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -121,7 +121,7 @@ int fl_filename_absolute(char *to, int tolen, const char *from) {
     [..]
     chdir("/var/tmp/somedir");       // set cwd to /var/tmp/somedir
     [..]
-    char out[1024];
+    char out[FL_PATH_MAX];
     fl_filename_relative(out, sizeof(out), "/var/tmp/somedir/foo.txt");  // out="foo.txt",    return=1
     fl_filename_relative(out, sizeof(out), "/var/tmp/foo.txt");          // out="../foo.txt", return=1
     fl_filename_relative(out, sizeof(out), "foo.txt");                   // out="foo.txt",    return=0 (no change)
@@ -136,13 +136,36 @@ int fl_filename_absolute(char *to, int tolen, const char *from) {
 int					// O - 0 if no change, 1 if changed
 fl_filename_relative(char       *to,	// O - Relative filename
                      int        tolen,	// I - Size of "to" buffer
-                     const char *from) {// I - Absolute filename
-  char		*newslash;		// Directory separator
+                     const char *from)  // I - Absolute filename
+{
+  char cwd_buf[FL_PATH_MAX];	// Current directory
+  // get the current directory and return if we can't
+  if (!fl_getcwd(cwd_buf, sizeof(cwd_buf))) {
+    strlcpy(to, from, tolen);
+    return 0;
+  }
+  return fl_filename_relative(to, tolen, from, cwd_buf);
+}
+
+
+/** Makes a filename relative to any other directory.
+ \param[out] to resulting relative filename
+ \param[in]  tolen size of the relative filename buffer 
+ \param[in]  from absolute filename
+ \param[in]  base relative to this absolute path
+ \return 0 if no change, non zero otherwise
+ */
+int					// O - 0 if no change, 1 if changed
+fl_filename_relative(char       *to,	// O - Relative filename
+                     int        tolen,	// I - Size of "to" buffer
+                     const char *from,  // I - Absolute filename
+                     const char *base) { // I - Find path relative to this path
+  
+  char          *newslash;		// Directory separator
   const char	*slash;			// Directory separator
-  char		cwd_buf[1024];		// Current directory
-  char          *cwd = cwd_buf;
-
-
+  char          *cwd = 0L, *cwd_buf = 0L;
+  if (base) cwd = cwd_buf = strdup(base);
+  
   // return if "from" is not an absolute path
 #if defined(WIN32) || defined(__EMX__)
   if (from[0] == '\0' ||
@@ -152,15 +175,23 @@ fl_filename_relative(char       *to,	// O - Relative filename
   if (from[0] == '\0' || !isdirsep(*from)) {
 #endif // WIN32 || __EMX__
     strlcpy(to, from, tolen);
+    if (cwd_buf) free(cwd_buf);
     return 0;
   }
-
-  // get the current directory and return if we can't
-  if (!fl_getcwd(cwd_buf, sizeof(cwd_buf))) {
+        
+  // return if "cwd" is not an absolute path
+#if defined(WIN32) || defined(__EMX__)
+  if (!cwd || cwd[0] == '\0' ||
+      (!isdirsep(*cwd) && !isalpha(*cwd) && cwd[1] != ':' &&
+       !isdirsep(cwd[2]))) {
+#else
+  if (!cwd || cwd[0] == '\0' || !isdirsep(*cwd)) {
+#endif // WIN32 || __EMX__
     strlcpy(to, from, tolen);
+    if (cwd_buf) free(cwd_buf);
     return 0;
   }
-
+              
 #if defined(WIN32) || defined(__EMX__)
   // convert all backslashes into forward slashes
   for (newslash = strchr(cwd, '\\'); newslash; newslash = strchr(newslash + 1, '\\'))
@@ -169,6 +200,7 @@ fl_filename_relative(char       *to,	// O - Relative filename
   // test for the exact same string and return "." if so
   if (!strcasecmp(from, cwd)) {
     strlcpy(to, ".", tolen);
+    free(cwd_buf);
     return (1);
   }
 
@@ -176,6 +208,7 @@ fl_filename_relative(char       *to,	// O - Relative filename
   if (tolower(*from & 255) != tolower(*cwd & 255)) {
     // Not the same drive...
     strlcpy(to, from, tolen);
+    free(cwd_buf);
     return 0;
   }
 
@@ -185,6 +218,7 @@ fl_filename_relative(char       *to,	// O - Relative filename
   // test for the exact same string and return "." if so
   if (!strcmp(from, cwd)) {
     strlcpy(to, ".", tolen);
+    free(cwd_buf);
     return (1);
   }
 #endif // WIN32 || __EMX__
@@ -210,6 +244,7 @@ fl_filename_relative(char       *to,	// O - Relative filename
   if (isdirsep(*slash)) slash ++;
 
   // do the same for the current dir
+  if (isdirsep(*newslash)) newslash --;
   if (*newslash != '\0')
     while (!isdirsep(*newslash) && newslash > cwd) newslash --;
 
@@ -227,10 +262,11 @@ fl_filename_relative(char       *to,	// O - Relative filename
   // finally add the differing path from "from"
   strlcat(to, slash, tolen);
 
+  free(cwd_buf);
   return 1;
 }
 
 
 //
-// End of "$Id: filename_absolute.cxx 6986 2010-01-01 18:30:49Z greg.ercolano $".
+// End of "$Id: filename_absolute.cxx 8146 2010-12-31 22:13:07Z matt $".
 //

@@ -1,9 +1,9 @@
 //
-// "$Id: print_panel.h 7263 2010-03-14 18:07:24Z AlbrechtS $"
+// "$Id: print_panel.h 7913 2010-11-29 18:18:27Z greg.ercolano $"
 //
 // Print panel for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2009 by Bill Spitzak and others.
+// Copyright 1998-2010 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -51,5 +51,5 @@ static void print_update_status();
 #endif
 
 //
-// End of "$Id: print_panel.h 7263 2010-03-14 18:07:24Z AlbrechtS $".
+// End of "$Id: print_panel.h 7913 2010-11-29 18:18:27Z greg.ercolano $".
 //

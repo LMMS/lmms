@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_RGB_Image.H 6942 2009-11-18 12:22:51Z AlbrechtS $"
+// "$Id: Fl_RGB_Image.H 7903 2010-11-28 21:06:39Z matt $"
 //
 // RGB Image header file for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2009 by Bill Spitzak and others.
+// Copyright 1998-2010 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -31,5 +31,5 @@
 #endif // !Fl_RGB_Image_H
 
 //
-// End of "$Id: Fl_RGB_Image.H 6942 2009-11-18 12:22:51Z AlbrechtS $".
+// End of "$Id: Fl_RGB_Image.H 7903 2010-11-28 21:06:39Z matt $".
 //

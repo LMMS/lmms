@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Browser.cxx 6895 2009-09-21 06:35:08Z greg.ercolano $"
+// "$Id: Fl_Browser.cxx 8736 2011-05-24 20:00:56Z AlbrechtS $"
 //
 // Browser widget for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2009 by Bill Spitzak and others.
+// Copyright 1998-2010 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -31,6 +31,12 @@
 #include "flstring.h"
 #include <stdlib.h>
 #include <math.h>
+
+#if defined(FL_DLL)	// really needed for c'tors for MS VC++ only
+#include <FL/Fl_Hold_Browser.H>
+#include <FL/Fl_Multi_Browser.H>
+#include <FL/Fl_Select_Browser.H>
+#endif
 
 // I modified this from the original Forms data to use a linked list
 // so that the number of items in the browser and size of those items
@@ -375,6 +381,7 @@ int Fl_Browser::item_height(void *item) const {
     if (hh > hmax) hmax = hh;
   } else {
     const int* i = column_widths();
+    long int dummy;
     // do each column separately as they may all set different fonts:
     for (char* str = l->txt; str && *str; str++) {
       Fl_Font font = textfont(); // default font
@@ -389,7 +396,7 @@ int Fl_Browser::item_height(void *item) const {
 	case 'i': font = (Fl_Font)(font|FL_ITALIC); break;
 	case 'f': case 't': font = FL_COURIER; break;
 	case 'B':
-	case 'C': strtol(str, &str, 10); break;// skip a color number
+	case 'C': dummy = strtol(str, &str, 10); break;// skip a color number
 	case 'F': font = (Fl_Font)strtol(str,&str,10); break;
 	case 'S': tsize = strtol(str,&str,10); break;
 	case 0: case '@': str--;
@@ -442,6 +449,7 @@ int Fl_Browser::item_width(void *item) const {
   int done = 0;
 
   while (*str == format_char_ && str[1] && str[1] != format_char_) {
+    long int dummy;
     str ++;
     switch (*str++) {
     case 'l': case 'L': tsize = 24; break;
@@ -451,7 +459,7 @@ int Fl_Browser::item_width(void *item) const {
     case 'i': font = (Fl_Font)(font|FL_ITALIC); break;
     case 'f': case 't': font = FL_COURIER; break;
     case 'B':
-    case 'C': strtol(str, &str, 10); break;// skip a color number
+    case 'C': dummy = strtol(str, &str, 10); break;// skip a color number
     case 'F': font = (Fl_Font)strtol(str, &str, 10); break;
     case 'S': tsize = strtol(str, &str, 10); break;
     case '.':
@@ -536,6 +544,7 @@ void Fl_Browser::item_draw(void* item, int X, int Y, int W, int H) const {
     //#warning FIXME This maybe needs to be more UTF8 aware now...?
     //#endif /*__GNUC__*/
     while (*str == format_char() && *++str && *str != format_char()) {
+      long int dummy;
       switch (*str++) {
       case 'l': case 'L': tsize = 24; break;
       case 'm': case 'M': tsize = 18; break;
@@ -549,7 +558,7 @@ void Fl_Browser::item_draw(void* item, int X, int Y, int W, int H) const {
 	if (!(l->flags & SELECTED)) {
 	  fl_color((Fl_Color)strtol(str, &str, 10));
 	  fl_rectf(X, Y, w1, H);
-	} else strtol(str, &str, 10);
+	} else dummy = strtol(str, &str, 10);
         break;
       case 'C':
 	lcol = (Fl_Color)strtol(str, &str, 10);
@@ -911,6 +920,30 @@ void Fl_Browser::remove_icon(int line) {
   icon(line,0);
 }
 
+/*
+  The following constructors must not be in the header file(s) if we
+  build a shared object (DLL). Instead they are defined here to force
+  the constructor (and default destructor as well) to be defined in
+  the DLL and exported (STR #2632, #2645).
+  
+  Note: if you change any of them, do the same changes in the specific
+  header file as well.  This redundant definition was chosen to enable
+  inline constructors in the header files (for static linking) as well
+  as those here for dynamic linking (Windows DLL).
+*/
+#if defined(FL_DLL)
+
+  Fl_Hold_Browser::Fl_Hold_Browser(int X,int Y,int W,int H,const char *L)
+	: Fl_Browser(X,Y,W,H,L) {type(FL_HOLD_BROWSER);}
+
+  Fl_Multi_Browser::Fl_Multi_Browser(int X,int Y,int W,int H,const char *L)
+	: Fl_Browser(X,Y,W,H,L) {type(FL_MULTI_BROWSER);}
+
+  Fl_Select_Browser::Fl_Select_Browser(int X,int Y,int W,int H,const char *L)
+	: Fl_Browser(X,Y,W,H,L) {type(FL_SELECT_BROWSER);}
+
+#endif // FL_DLL
+
 //
-// End of "$Id: Fl_Browser.cxx 6895 2009-09-21 06:35:08Z greg.ercolano $".
+// End of "$Id: Fl_Browser.cxx 8736 2011-05-24 20:00:56Z AlbrechtS $".
 //

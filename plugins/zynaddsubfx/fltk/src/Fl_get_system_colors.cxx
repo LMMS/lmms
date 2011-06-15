@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_get_system_colors.cxx 7352 2010-03-29 10:47:11Z matt $"
+// "$Id: Fl_get_system_colors.cxx 7903 2010-11-28 21:06:39Z matt $"
 //
 // System color support for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2009 by Bill Spitzak and others.
+// Copyright 1998-2010 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -422,5 +422,5 @@ int Fl::reload_scheme() {
 
 
 //
-// End of "$Id: Fl_get_system_colors.cxx 7352 2010-03-29 10:47:11Z matt $".
+// End of "$Id: Fl_get_system_colors.cxx 7903 2010-11-28 21:06:39Z matt $".
 //

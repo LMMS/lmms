@@ -25,7 +25,7 @@
 
 #if !defined(WIN32) && !defined(__APPLE__)
 
-#include "config.h"
+#include <config.h>
 #include "../../FL/Xutf8.h"
 #include <X11/X.h>
 #include <X11/Xlib.h>
@@ -52,8 +52,10 @@ typedef struct {
   unsigned short used;
 } Summary16;
 
+#define NEED_TOWC /* indicates what part of these include files is needed here (avoid compilation warnings) */
 #include "lcUniConv/big5.h"
 #include "lcUniConv/gb2312.h"
+#include "lcUniConv/cp936ext.h"
 #include "lcUniConv/jisx0201.h"
 #include "lcUniConv/jisx0208.h"
 #include "lcUniConv/jisx0212.h"
@@ -191,6 +193,43 @@ XConvertBig5ToUtf8(char* buffer_return, int len) {
 }
 
 int 
+XConvertCp936extToUtf8(char* buffer_return, int len)
+{
+  int i = 0, l = 0;
+  char *buf;
+
+  if (len < 1) return 0;
+  buf = (char*) malloc((unsigned)len);
+  memcpy(buf, buffer_return, (unsigned)len);
+
+  if (len == 1) {
+	  l += XConvertUcsToUtf8((unsigned int)buf[i], buffer_return + l);
+  }
+  while (i + 1 < len) {
+	  unsigned int ucs;
+	  unsigned char b[2];
+	  b[0] = (unsigned char) buf[i];
+	  b[1] = (unsigned char) buf[i + 1];
+	  if (cp936ext_mbtowc(NULL, &ucs, b, 2) == 2) {
+		  i += 2;
+	  } else {
+	      if ( b[0] < 0x80) {
+		    ucs = b[0];
+		}else{
+			      ucs = '?';
+		  }
+			  i++;
+		  }
+	  l += XConvertUcsToUtf8(ucs, buffer_return + l);
+  }
+  if(i + 1 == len) { 
+      l += XConvertUcsToUtf8((unsigned int)buf[i], buffer_return + l);
+  }
+  free(buf);
+  return l;
+}
+
+int 
 XConvertGb2312ToUtf8(char* buffer_return, int len) {
   int i = 0, l = 0;
   char *buf;
@@ -207,13 +246,19 @@ XConvertGb2312ToUtf8(char* buffer_return, int len) {
     unsigned char b[2];
     b[0] = (unsigned char) buf[i];
     b[1] = (unsigned char) buf[i + 1];
-    if (gb2312_mbtowc(NULL, &ucs, b, 2) == 2) {
+    if ( b[0] < 0x80 ) {
+      ucs = b[0];
+      i++;
+    } else if (gb2312_mbtowc(NULL, &ucs, b, 2) == 2) {
       i += 2;
     } else {
       ucs = '?';
       i++;
     }
     l += XConvertUcsToUtf8(ucs, buffer_return + l);
+  }
+  if (i + 1 == len) {
+    l += XConvertUcsToUtf8((unsigned int)buf[i], buffer_return + l);
   }
   free(buf);
   return l;
@@ -337,7 +382,9 @@ XConvertEucToUtf8(const char*	locale,
 		  int		len, 
 		  int		bytes_buffer) {
 
-  if (!locale/* || strstr(locale, "UTF") || strstr(locale, "utf")*/) {
+  /* if (!locale) { */
+  /* if (!locale || strstr(locale, "UTF") || strstr(locale, "utf")) { */
+  if (!locale || strstr(locale, "UTF") || strstr(locale, "utf")) {
     return len;
   }
 
@@ -345,6 +392,8 @@ XConvertEucToUtf8(const char*	locale,
     return XConvertEucJpToUtf8(buffer_return, len);
   } else if (strstr(locale, "Big5") || strstr(locale, "big5")) { /* BIG5 */
     return XConvertBig5ToUtf8(buffer_return, len);
+  } else if (strstr(locale, "GBK") || strstr(locale, "gbk")) {
+    return XConvertCp936extToUtf8(buffer_return, len);
   } else if (strstr(locale, "zh") || strstr(locale, "chinese-")) {
     if (strstr(locale, "TW") || strstr(locale, "chinese-t")) {
       if (strstr(locale, "EUC") || strstr(locale, "euc") || strstr(locale, "chinese-t")) {

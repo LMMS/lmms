@@ -1,5 +1,5 @@
 //
-// "$Id: Fl_Table_Row.cxx 6943 2009-11-18 12:43:21Z AlbrechtS $"
+// "$Id: Fl_Table_Row.cxx 7950 2010-12-05 01:22:53Z greg.ercolano $"
 //
 // Fl_Table_Row -- A row oriented table widget
 //
@@ -45,16 +45,14 @@ int Fl_Table_Row::row_selected(int row) {
 void Fl_Table_Row::type(TableRowSelectMode val) {
   _selectmode = val;
   switch ( _selectmode ) {
-    case SELECT_NONE:
-    {
+    case SELECT_NONE: {
       for ( int row=0; row<rows(); row++ ) {
         _rowselect[row] = 0;
       }
       redraw();
       break;
     }
-    case SELECT_SINGLE:
-    {
+    case SELECT_SINGLE: {
       int count = 0;
       for ( int row=0; row<rows(); row++ ) {
         if ( _rowselect[row] ) {
@@ -90,8 +88,7 @@ int Fl_Table_Row::select_row(int row, int flag) {
     case SELECT_NONE:
       return(-1);
       
-    case SELECT_SINGLE:
-    {
+    case SELECT_SINGLE: {
       int oldval;
       for ( int t=0; t<rows(); t++ ) {
         if ( t == row ) {
@@ -111,8 +108,7 @@ int Fl_Table_Row::select_row(int row, int flag) {
       break;
     }
       
-    case SELECT_MULTI:
-    {
+    case SELECT_MULTI: {
       int oldval = _rowselect[row];
       if ( flag == 2 ) { _rowselect[row] ^= 1; }
       else             { _rowselect[row] = flag; }
@@ -138,8 +134,7 @@ void Fl_Table_Row::select_all_rows(int flag) {
       if ( flag != 0 ) return;
       //FALLTHROUGH
       
-    case SELECT_MULTI:
-    {
+    case SELECT_MULTI: {
       char changed = 0;
       if ( flag == 2 ) {
         for ( int row=0; row<(int)_rowselect.size(); row++ ) {
@@ -204,8 +199,7 @@ int Fl_Table_Row::handle(int event) {
               select_row(R, 2);		// toggle
               break;
               
-            case FL_SHIFT:
-            {
+            case FL_SHIFT: {
               select_row(R, 1);
               if ( _last_row > -1 ) {
                 int srow = R, erow = _last_row;
@@ -234,8 +228,7 @@ int Fl_Table_Row::handle(int event) {
       } 
       break;
       
-    case FL_DRAG:
-    {
+    case FL_DRAG: {
       if ( _dragging_select ) {
         // Dragged off table edges? Handle scrolling
         int offtop = toy - _last_y;			// >0 if off top of table
@@ -319,5 +312,5 @@ int Fl_Table_Row::handle(int event) {
 }
 
 //
-// End of "$Id: Fl_Table_Row.cxx 6943 2009-11-18 12:43:21Z AlbrechtS $".
+// End of "$Id: Fl_Table_Row.cxx 7950 2010-12-05 01:22:53Z greg.ercolano $".
 //

@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_File_Input.cxx 7115 2010-02-20 17:40:07Z AlbrechtS $"
+// "$Id: Fl_File_Input.cxx 8063 2010-12-19 21:20:10Z matt $"
 //
 // File_Input header file for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2009 by Bill Spitzak and others.
+// Copyright 1998-2010 by Bill Spitzak and others.
 // Original version Copyright 1998 by Curtis Edwards.
 //
 // This library is free software; you can redistribute it and/or
@@ -30,6 +30,7 @@
 #include <FL/Fl_File_Input.H>
 #include <FL/Fl_Window.H>
 #include <FL/fl_draw.H>
+#include <FL/filename.H>
 #include <stdio.h>
 #include "flstring.h"
 
@@ -240,7 +241,7 @@ Fl_File_Input::handle_button(int event)		// I - Event
 		X;				// Current X position
   char		*start,				// Start of path component
 		*end;				// End of path component
-  char		newvalue[1024];			// New value
+  char		newvalue[FL_PATH_MAX];		// New value
 
 
   // Figure out which button is being pressed...
@@ -293,5 +294,5 @@ Fl_File_Input::handle_button(int event)		// I - Event
 
 
 //
-// End of "$Id: Fl_File_Input.cxx 7115 2010-02-20 17:40:07Z AlbrechtS $".
+// End of "$Id: Fl_File_Input.cxx 8063 2010-12-19 21:20:10Z matt $".
 //

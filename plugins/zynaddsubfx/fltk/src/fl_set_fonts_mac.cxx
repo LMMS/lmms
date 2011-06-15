@@ -1,9 +1,9 @@
 //
-// "$Id: fl_set_fonts_mac.cxx 7351 2010-03-29 10:35:00Z matt $"
+// "$Id: fl_set_fonts_mac.cxx 8504 2011-03-04 16:48:10Z manolo $"
 //
 // MacOS font utilities for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2009 by Bill Spitzak and others.
+// Copyright 1998-2011 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -56,14 +56,21 @@ const char* Fl::get_font_name(Fl_Font fnum, int* ap) {
   return f->fontname;
 }
 
+#if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_5
+static int name_compare(const void *a, const void *b)
+{
+  return strcmp(*(char**)a, *(char**)b);
+}
+#endif
+
 static int fl_free_font = FL_FREE_FONT;
 
 Fl_Font Fl::set_fonts(const char* xstarname) {
 #pragma unused ( xstarname )
+if (fl_free_font > FL_FREE_FONT) return (Fl_Font)fl_free_font; // if already called
+
 #if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_5
-static SInt32 MACsystemVersion = 0;
-if(MACsystemVersion == 0) Gestalt(gestaltSystemVersion, &MACsystemVersion);
-if(MACsystemVersion >= 0x1050) {
+if(fl_mac_os_version >= 100500) {
 //if(CTFontCreateWithFontDescriptor != NULL) {// CTFontCreateWithFontDescriptor != NULL on 10.4 also!
   int value[1] = {1};
   CFDictionaryRef dict = CFDictionaryCreate(NULL, 
@@ -75,17 +82,23 @@ if(MACsystemVersion >= 0x1050) {
   CFRelease(fcref);
   CFIndex count = CFArrayGetCount(arrayref);
   CFIndex i;
+  char **tabfontnames = new char*[count];
   for (i = 0; i < count; i++) {
 	CTFontDescriptorRef fdesc = (CTFontDescriptorRef)CFArrayGetValueAtIndex(arrayref, i);
 	CTFontRef font = CTFontCreateWithFontDescriptor(fdesc, 0., NULL);
-	CFStringRef cfname = CTFontCopyPostScriptName(font);
+	CFStringRef cfname = CTFontCopyFullName(font);
 	CFRelease(font);
 	static char fname[100];
 	CFStringGetCString(cfname, fname, sizeof(fname), kCFStringEncodingUTF8);
+	tabfontnames[i] = strdup(fname); // never free'ed
 	CFRelease(cfname);
-	Fl::set_font((Fl_Font)(fl_free_font++), strdup(fname));
 	}
   CFRelease(arrayref);
+  qsort(tabfontnames, count, sizeof(char*), name_compare);
+  for (i = 0; i < count; i++) {
+    Fl::set_font((Fl_Font)(fl_free_font++), tabfontnames[i]);
+    }
+  delete[] tabfontnames;
   return (Fl_Font)fl_free_font;
 }
 else {
@@ -129,7 +142,7 @@ else {
 #if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_5
   }
 #endif
-  return 0; // FIXME: I do not understand the shuffeling of the above ifdef's and why they are here!
+  return 0;
 }
 
 static int array[128];
@@ -147,5 +160,5 @@ int Fl::get_font_sizes(Fl_Font fnum, int*& sizep) {
 }
 
 //
-// End of "$Id: fl_set_fonts_mac.cxx 7351 2010-03-29 10:35:00Z matt $".
+// End of "$Id: fl_set_fonts_mac.cxx 8504 2011-03-04 16:48:10Z manolo $".
 //

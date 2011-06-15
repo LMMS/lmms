@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Pixmap.cxx 7659 2010-07-01 13:21:32Z manolo $"
+// "$Id: Fl_Pixmap.cxx 8360 2011-02-02 12:42:47Z manolo $"
 //
 // Pixmap drawing code for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2009 by Bill Spitzak and others.
+// Copyright 1998-2010 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -145,7 +145,7 @@ void Fl_GDI_Graphics_Driver::draw(Fl_Pixmap *pxm, int XP, int YP, int WP, int HP
     }
     fl_end_offscreen();
   }
-  if (fl_surface->type() == Fl_Printer::device_type) {
+  if (Fl_Surface_Device::surface()->class_name() == Fl_Printer::class_id) {
     typedef BOOL (WINAPI* fl_transp_func)  (HDC,int,int,int,int,HDC,int,int,int,int,UINT);
     static HMODULE hMod = NULL;
     static fl_transp_func fl_TransparentBlt = NULL;
@@ -153,7 +153,7 @@ void Fl_GDI_Graphics_Driver::draw(Fl_Pixmap *pxm, int XP, int YP, int WP, int HP
       hMod = LoadLibrary("MSIMG32.DLL");
       if(hMod) fl_TransparentBlt = (fl_transp_func)GetProcAddress(hMod, "TransparentBlt");
     }
-    if (hMod) {
+    if (fl_TransparentBlt) {
       Fl_Offscreen tmp_id = fl_create_offscreen(pxm->w(), pxm->h());
       fl_begin_offscreen(tmp_id);
       uchar *bitmap = 0;
@@ -559,5 +559,5 @@ void Fl_Pixmap::desaturate() {
 }
 
 //
-// End of "$Id: Fl_Pixmap.cxx 7659 2010-07-01 13:21:32Z manolo $".
+// End of "$Id: Fl_Pixmap.cxx 8360 2011-02-02 12:42:47Z manolo $".
 //

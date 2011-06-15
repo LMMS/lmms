@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Spinner.H 6614 2009-01-01 16:11:32Z matt $"
+// "$Id: Fl_Spinner.H 8339 2011-01-30 12:50:19Z ianmacarthur $"
 //
 // Spinner widget for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2009 by Bill Spitzak and others.
+// Copyright 1998-2010 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -48,8 +48,8 @@
   widget and repeat buttons. The user can either type into the
   input area or use the buttons to change the value.
 */
-class Fl_Spinner : public Fl_Group
-{
+class FL_EXPORT Fl_Spinner : public Fl_Group {
+  
   double	value_;			// Current value
   double	minimum_;		// Minimum value
   double	maximum_;		// Maximum value
@@ -233,14 +233,16 @@ class Fl_Spinner : public Fl_Group
   void		textsize(Fl_Fontsize s) {
 		  input_.textsize(s);
 		}
-  /** Sets or Gets the numeric representation in the input field.
-    Valid values are FL_INT_INPUT and FL_FLOAT_INPUT.
-    The first form also changes the format() template.
-    Setting a new spinner type via a superclass pointer will not work.
-    \note  type is not a virtual function. 
+  /** Gets the numeric representation in the input field.
+   \see Fl_Spinner::type(uchar) 
   */
   uchar		type() const { return (input_.type()); }
-  /** See uchar	Fl_Spinner::type() const */
+  /** Sets the numeric representation in the input field.
+   Valid values are FL_INT_INPUT and FL_FLOAT_INPUT.
+   Also changes the format() template.
+   Setting a new spinner type via a superclass pointer will not work.
+   \note  type is not a virtual function. 
+   */
   void		type(uchar v) { 
                   if (v==FL_FLOAT_INPUT) {
                     format("%.*f");
@@ -262,5 +264,5 @@ class Fl_Spinner : public Fl_Group
 #endif // !Fl_Spinner_H
 
 //
-// End of "$Id: Fl_Spinner.H 6614 2009-01-01 16:11:32Z matt $".
+// End of "$Id: Fl_Spinner.H 8339 2011-01-30 12:50:19Z ianmacarthur $".
 //

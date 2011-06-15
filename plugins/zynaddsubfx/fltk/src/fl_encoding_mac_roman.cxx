@@ -1,9 +1,9 @@
 //
-// "$Id: fl_encoding_mac_roman.cxx 6616 2009-01-01 21:28:26Z matt $"
+// "$Id: fl_encoding_mac_roman.cxx 7903 2010-11-28 21:06:39Z matt $"
 //
 // Convert Mac Roman encoded text to the local encoding.
 //
-// Copyright 1998-2009 by Bill Spitzak and others.
+// Copyright 1998-2010 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -130,5 +130,5 @@ const char *fl_mac_roman_to_local(const char *t, int n)
 #endif
 
 //
-// End of "$Id: fl_encoding_mac_roman.cxx 6616 2009-01-01 21:28:26Z matt $".
+// End of "$Id: fl_encoding_mac_roman.cxx 7903 2010-11-28 21:06:39Z matt $".
 //

@@ -1,9 +1,9 @@
 /*
- * "$Id: fl_utf.c 7609 2010-05-17 20:03:47Z engelsman $"
+ * "$Id: fl_utf.c 8585 2011-04-13 15:43:22Z ianmacarthur $"
  *
  * This is the utf.c file from fltk2 adapted for use in my fltk1.1 port
  */
-/* Copyright 2006-2009 by Bill Spitzak and others.
+/* Copyright 2006-2011 by Bill Spitzak and others.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -37,11 +37,11 @@
 
 
 #if 0
-  /** 
+  /**
    \defgroup fl_unichar Unicode Character Functions
    Global Functions Handling Single Unicode Characters
    @{ */
-  
+
   /**
    Converts a Unicode character into a utf-8 sequence.
    \param[in] uc Unicode character
@@ -50,24 +50,24 @@
    \return length of the sequence in bytes
    */
   /* FL_EXPORT int fl_unichar_to_utf8(unsigned int uc, char *text); */
-  
-  /** @} */  
-  
-  /** 
+
+  /** @} */
+
+  /**
    \defgroup fl_utf8 Unicode String Functions
    Global Functions Handling Unicode Text
    @{ */
-  
+
   /**
    Calculate the size of a utf-8 sequence for a Unicode character.
    \param[in] uc Unicode character
    \return length of the sequence in bytes
    */
   /* FL_EXPORT int fl_utf8_size(unsigned int uc); */
-  
-  /** @} */  
+
+  /** @} */
 #endif /* 0 */
-  
+
 /*!Set to 1 to turn bad UTF8 bytes into ISO-8859-1. If this is to zero
    they are instead turned into the Unicode REPLACEMENT CHARACTER, of
    value 0xfffd.
@@ -124,10 +124,10 @@ static unsigned short cp1252[32] = {
     unexpectedly 1 will work:
 
     \code
-    if (*p & 0x80) { // what should be a multibyte encoding
+    if (*p & 0x80) {              // what should be a multibyte encoding
       code = fl_utf8decode(p,end,&len);
-      if (len<2) code = 0xFFFD; // Turn errors into REPLACEMENT CHARACTER
-    } else { // handle the 1-byte utf8 encoding:
+      if (len<2) code = 0xFFFD;   // Turn errors into REPLACEMENT CHARACTER
+    } else {                      // handle the 1-byte utf8 encoding:
       code = *p;
       len = 1;
     }
@@ -151,7 +151,7 @@ unsigned fl_utf8decode(const char* p, const char* end, int* len)
   } else if (c < 0xc2) {
     goto FAIL;
   }
-  if (p+1 >= end || (p[1]&0xc0) != 0x80) goto FAIL;
+  if ( (end && p+1 >= end) || (p[1]&0xc0) != 0x80) goto FAIL;
   if (c < 0xe0) {
     if (len) *len = 2;
     return
@@ -173,7 +173,7 @@ unsigned fl_utf8decode(const char* p, const char* end, int* len)
 #endif
   } else if (c < 0xf0) {
   UTF8_3:
-    if (p+2 >= end || (p[2]&0xc0) != 0x80) goto FAIL;
+    if ( (end && p+2 >= end) || (p[2]&0xc0) != 0x80) goto FAIL;
     if (len) *len = 3;
     return
       ((p[0] & 0x0f) << 12) +
@@ -184,7 +184,7 @@ unsigned fl_utf8decode(const char* p, const char* end, int* len)
     goto UTF8_4;
   } else if (c < 0xf4) {
   UTF8_4:
-    if (p+3 >= end || (p[2]&0xc0) != 0x80 || (p[3]&0xc0) != 0x80) goto FAIL;
+    if ( (end && p+3 >= end) || (p[2]&0xc0) != 0x80 || (p[3]&0xc0) != 0x80) goto FAIL;
     if (len) *len = 4;
 #if STRICT_RFC3629
     /* RFC 3629 says all codes ending in fffe or ffff are illegal: */
@@ -337,7 +337,74 @@ int fl_utf8encode(unsigned ucs, char* buf) {
   }
 }
 
-/*! Convert a UTF-8 sequence into an array of wchar_t. These
+/*! Convert a single 32-bit Unicode codepoint into an array of 16-bit
+    characters. These are used by some system calls, especially on Windows.
+
+    \p ucs is the value to convert.
+
+    \p dst points at an array to write, and \p dstlen is the number of
+    locations in this array. At most \p dstlen words will be
+    written, and a 0 terminating word will be added if \p dstlen is
+    large enough. Thus this function will never overwrite the buffer
+    and will attempt return a zero-terminated string if space permits.
+    If \p dstlen is zero then \p dst can be set to NULL and no data
+    is written, but the length is returned.
+
+    The return value is the number of 16-bit words that \e would be written
+    to \p dst if it is large enough, not counting any terminating
+    zero.
+
+    If the return value is greater than \p dstlen it indicates truncation,
+    you should then allocate a new array of size return+1 and call this again.
+
+    Unicode characters in the range 0x10000 to 0x10ffff are converted to
+    "surrogate pairs" which take two words each (in UTF-16 encoding).
+    Typically, setting \p dstlen to 2 will ensure that any valid Unicode
+    value can be converted, and setting \p dstlen to 3 or more will allow
+    a NULL terminated sequence to be returned.
+*/
+unsigned fl_ucs_to_Utf16(const unsigned ucs, unsigned short *dst, const unsigned dstlen)
+{
+  /* The rule for direct conversion from UCS to UTF16 is:
+   * - if UCS >  0x0010FFFF then UCS is invalid
+   * - if UCS >= 0xD800 && UCS <= 0xDFFF UCS is invalid
+   * - if UCS <= 0x0000FFFF then U16 = UCS, len = 1
+   * - else
+   * -- U16[0] = ((UCS - 0x00010000) >> 10) & 0x3FF + 0xD800
+   * -- U16[1] = (UCS & 0x3FF) + 0xDC00
+   * -- len = 2;
+   */
+  unsigned count;        /* Count of converted UTF16 cells */
+  unsigned short u16[4]; /* Alternate buffer if dst is not set */
+  unsigned short *out;   /* points to the active buffer */
+  /* Ensure we have a valid buffer to write to */
+  if((!dstlen) || (!dst)) {
+    out = u16;
+  } else {
+    out = dst;
+  }
+  /* Convert from UCS to UTF16 */
+  if((ucs > 0x0010FFFF) || /* UCS is too large */
+  ((ucs > 0xD7FF) && (ucs < 0xE000))) { /* UCS in invalid range */
+    out[0] = 0xFFFD; /* REPLACEMENT CHARACTER */
+    count = 1;
+  } else if(ucs < 0x00010000) {
+    out[0] = (unsigned short)ucs;
+    count = 1;
+  } else if(dstlen < 2) { /* dst is too small for the result */
+    out[0] = 0xFFFD; /* REPLACEMENT CHARACTER */
+    count = 2;
+  } else {
+    out[0] = (((ucs - 0x00010000) >> 10) & 0x3FF) + 0xD800;
+    out[1] = (ucs & 0x3FF) + 0xDC00;
+    count = 2;
+  }
+  /* NULL terminate the output, if there is space */
+  if(count < dstlen) { out[count] = 0; }
+  return count;
+} /* fl_ucs_to_Utf16 */
+
+/*! Convert a UTF-8 sequence into an array of 16-bit characters. These
     are used by some system calls, especially on Windows.
 
     \p src points at the UTF-8, and \p srclen is the number of bytes to
@@ -350,7 +417,7 @@ int fl_utf8encode(unsigned ucs, char* buf) {
     zero-terminated string. If \p dstlen is zero then \p dst can be
     null and no data is written, but the length is returned.
 
-    The return value is the number of words that \e would be written
+    The return value is the number of 16-bit words that \e would be written
     to \p dst if it were long enough, not counting the terminating
     zero. If the return value is greater or equal to \p dstlen it
     indicates truncation, you can then allocate a new array of size
@@ -361,12 +428,9 @@ int fl_utf8encode(unsigned ucs, char* buf) {
     ISO-8859-1 text mistakenly identified as UTF-8 to be printed
     correctly.
 
-    Notice that sizeof(wchar_t) is 2 on Windows and is 4 on Linux
-    and most other systems. Where wchar_t is 16 bits, Unicode
-    characters in the range 0x10000 to 0x10ffff are converted to
+    Unicode characters in the range 0x10000 to 0x10ffff are converted to
     "surrogate pairs" which take two words each (this is called UTF-16
-    encoding). If wchar_t is 32 bits this rather nasty problem is
-    avoided.
+    encoding).
 */
 unsigned fl_utf8toUtf16(const char* src, unsigned srclen,
 		  unsigned short* dst, unsigned dstlen)
@@ -410,19 +474,46 @@ unsigned fl_utf8toUtf16(const char* src, unsigned srclen,
   Converts a UTF-8 string into a wide character string.
 
   This function generates 32-bit wchar_t (e.g. "ucs4" as it were) except
-  on win32 where it returns Utf16 with surrogate pairs where required.
+  on Windows where it is equivalent to fl_utf8toUtf16 and returns
+  UTF-16.
+
+  \p src points at the UTF-8, and \p srclen is the number of bytes to
+  convert.
+
+  \p dst points at an array to write, and \p dstlen is the number of
+  locations in this array. At most \p dstlen-1 wchar_t will be
+  written there, plus a 0 terminating wchar_t.
+
+  The return value is the number of wchar_t that \e would be written
+  to \p dst if it were long enough, not counting the terminating
+  zero. If the return value is greater or equal to \p dstlen it
+  indicates truncation, you can then allocate a new array of size
+  return+1 and call this again.
+
+  Notice that sizeof(wchar_t) is 2 on Windows and is 4 on Linux
+  and most other systems. Where wchar_t is 16 bits, Unicode
+  characters in the range 0x10000 to 0x10ffff are converted to
+  "surrogate pairs" which take two words each (this is called UTF-16
+  encoding). If wchar_t is 32 bits this rather nasty problem is
+  avoided.
+
+  Note that Windows includes Cygwin, i.e. compiled with Cygwin's POSIX
+  layer (cygwin1.dll, --enable-cygwin), either native (GDI) or X11.
   */
 unsigned fl_utf8towc(const char* src, unsigned srclen,
 		  wchar_t* dst, unsigned dstlen)
 {
-#ifdef WIN32
-	return fl_utf8toUtf16(src, srclen, (unsigned short*)dst, dstlen);
+#if defined(WIN32) || defined(__CYGWIN__)
+  return fl_utf8toUtf16(src, srclen, (unsigned short*)dst, dstlen);
 #else
   const char* p = src;
   const char* e = src+srclen;
   unsigned count = 0;
   if (dstlen) for (;;) {
-    if (p >= e) {dst[count] = 0; return count;}
+    if (p >= e) {
+      dst[count] = 0;
+      return count;
+    }
     if (!(*p & 0x80)) { /* ascii */
       dst[count] = *p++;
     } else {
@@ -511,7 +602,7 @@ unsigned fl_utf8toa(const char* src, unsigned srclen,
     needed.
 
     \p srclen is the number of words in \p src to convert. On Windows
-    this is not necessairly the number of characters, due to there
+    this is not necessarily the number of characters, due to there
     possibly being "surrogate pairs" in the UTF-16 encoding used.
     On Unix wchar_t is 32 bits and each location is a character.
 
@@ -541,7 +632,7 @@ unsigned fl_utf8fromwc(char* dst, unsigned dstlen,
       if (count+2 >= dstlen) {dst[count] = 0; count += 2; break;}
       dst[count++] = 0xc0 | (ucs >> 6);
       dst[count++] = 0x80 | (ucs & 0x3F);
-#ifdef WIN32
+#if defined(WIN32) || defined(__CYGWIN__)
     } else if (ucs >= 0xd800 && ucs <= 0xdbff && i < srclen &&
 	       src[i] >= 0xdc00 && src[i] <= 0xdfff) {
       /* surrogate pair */
@@ -561,7 +652,7 @@ unsigned fl_utf8fromwc(char* dst, unsigned dstlen,
       dst[count++] = 0x80 | ((ucs >> 6) & 0x3F);
       dst[count++] = 0x80 | (ucs & 0x3F);
     } else {
-#ifndef WIN32
+#if !(defined(WIN32) || defined(__CYGWIN__))
     J1:
 #endif
       /* all others are 3 bytes: */
@@ -578,7 +669,7 @@ unsigned fl_utf8fromwc(char* dst, unsigned dstlen,
       count++;
     } else if (ucs < 0x800U) { /* 2 bytes */
       count += 2;
-#ifdef WIN32
+#if defined(WIN32) || defined(__CYGWIN__)
     } else if (ucs >= 0xd800 && ucs <= 0xdbff && i < srclen-1 &&
 	       src[i+1] >= 0xdc00 && src[i+1] <= 0xdfff) {
       /* surrogate pair */
@@ -692,8 +783,6 @@ int fl_utf8locale(void) {
     needed.
 
     If fl_utf8locale() returns true then this does not change the data.
-    It is copied and truncated as necessary to
-    the destination buffer and \p srclen is always returned.
 */
 unsigned fl_utf8to_mb(const char* src, unsigned srclen,
 		  char* dst, unsigned dstlen)
@@ -747,8 +836,7 @@ unsigned fl_utf8to_mb(const char* src, unsigned srclen,
     memcpy(dst, src, srclen);
     dst[srclen] = 0;
   } else {
-    memcpy(dst, src, dstlen-1);
-    dst[dstlen-1] = 0;
+    /* Buffer insufficent or buffer query */
   }
   return srclen;
 }
@@ -765,8 +853,7 @@ unsigned fl_utf8to_mb(const char* src, unsigned srclen,
     needed.
 
     On Unix or on Windows when a UTF-8 locale is in effect, this
-    does not change the data. It is copied and truncated as necessary to
-    the destination buffer and \p srclen is always returned.
+    does not change the data.
     You may also want to check if fl_utf8test() returns non-zero, so that
     the filesystem can store filenames in UTF-8 encoding regardless of
     the locale.
@@ -813,8 +900,7 @@ unsigned fl_utf8from_mb(char* dst, unsigned dstlen,
     memcpy(dst, src, srclen);
     dst[srclen] = 0;
   } else {
-    memcpy(dst, src, dstlen-1);
-    dst[dstlen-1] = 0;
+    /* Buffer insufficent or buffer query */
   }
   return srclen;
 }
@@ -905,5 +991,5 @@ int fl_wcwidth(const char* src) {
 /** @} */
 
 /*
- * End of "$Id: fl_utf.c 7609 2010-05-17 20:03:47Z engelsman $".
+ * End of "$Id: fl_utf.c 8585 2011-04-13 15:43:22Z ianmacarthur $".
  */

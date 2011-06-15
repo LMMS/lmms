@@ -1,9 +1,9 @@
 //
-// "$Id: filename_setext.cxx 6986 2010-01-01 18:30:49Z greg.ercolano $"
+// "$Id: filename_setext.cxx 8063 2010-12-19 21:20:10Z matt $"
 //
 // Filename extension routines for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2009 by Bill Spitzak and others.
+// Copyright 1998-2010 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -40,7 +40,7 @@
    \code
    #include <FL/filename.H>
    [..]
-   char buf[1024] = "/path/myfile.cxx";
+   char buf[FL_PATH_MAX] = "/path/myfile.cxx";
    fl_filename_setext(buf, sizeof(buf), ".txt");      // buf[] becomes "/path/myfile.txt"
    \endcode
 
@@ -56,5 +56,5 @@ char *fl_filename_setext(char *buf, int buflen, const char *ext) {
 
 
 //
-// End of "$Id: filename_setext.cxx 6986 2010-01-01 18:30:49Z greg.ercolano $".
+// End of "$Id: filename_setext.cxx 8063 2010-12-19 21:20:10Z matt $".
 //

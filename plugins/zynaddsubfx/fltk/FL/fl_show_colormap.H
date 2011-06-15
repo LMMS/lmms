@@ -1,9 +1,9 @@
 //
-// "$Id: fl_show_colormap.H 6614 2009-01-01 16:11:32Z matt $"
+// "$Id: fl_show_colormap.H 8621 2011-04-23 15:46:30Z AlbrechtS $"
 //
 // Colormap picker header file for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2009 by Bill Spitzak and others.
+// Copyright 1998-2010 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -25,13 +25,34 @@
 //     http://www.fltk.org/str.php
 //
 
+/** \file
+   The fl_show_colormap() function hides the implementation classes used
+   to provide the popup window and color selection mechanism.
+*/
+
 #ifndef fl_show_colormap_H
 #define fl_show_colormap_H
 
+/* doxygen comment here to avoid exposing ColorMenu in fl_show_colormap.cxx
+*/
+
+/** \addtogroup  fl_attributes
+    @{ */
+
+/**
+  \brief Pops up a window to let the user pick a colormap entry.
+  \image html fl_show_colormap.png
+  \image latex fl_show_colormap.png "fl_show_colormap" height=10cm
+  \param[in] oldcol color to be highlighted when grid is shown.
+  \retval Fl_Color value of the chosen colormap entry.
+  \see Fl_Color_Chooser
+*/
 FL_EXPORT Fl_Color fl_show_colormap(Fl_Color oldcol);
+
+/** @} */
 
 #endif
 
 //
-// End of "$Id: fl_show_colormap.H 6614 2009-01-01 16:11:32Z matt $".
+// End of "$Id: fl_show_colormap.H 8621 2011-04-23 15:46:30Z AlbrechtS $".
 //

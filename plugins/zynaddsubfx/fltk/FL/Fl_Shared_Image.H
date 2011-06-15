@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Shared_Image.H 7505 2010-04-14 20:47:34Z manolo $"
+// "$Id: Fl_Shared_Image.H 8306 2011-01-24 17:04:22Z matt $"
 //
 // Shared image header file for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2009 by Bill Spitzak and others.
+// Copyright 1998-2010 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -47,7 +47,11 @@ typedef Fl_Image *(*Fl_Shared_Handler)(const char *name, uchar *header,
   function to support standard image formats such as BMP, GIF, JPEG, and PNG.
 */
 class FL_EXPORT Fl_Shared_Image : public Fl_Image {
-  protected:
+  
+  friend class Fl_JPEG_Image;
+  friend class Fl_PNG_Image;
+
+protected:
 
   static Fl_Shared_Image **images_;	// Shared images
   static int	num_images_;		// Number of shared images
@@ -106,5 +110,5 @@ FL_EXPORT extern void fl_register_images();
 #endif // !Fl_Shared_Image_H
 
 //
-// End of "$Id: Fl_Shared_Image.H 7505 2010-04-14 20:47:34Z manolo $"
+// End of "$Id: Fl_Shared_Image.H 8306 2011-01-24 17:04:22Z matt $"
 //

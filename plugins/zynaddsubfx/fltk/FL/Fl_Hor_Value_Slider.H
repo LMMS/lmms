@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Hor_Value_Slider.H 6614 2009-01-01 16:11:32Z matt $"
+// "$Id: Fl_Hor_Value_Slider.H 8022 2010-12-12 23:21:03Z AlbrechtS $"
 //
 // Horizontal value slider header file for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2009 by Bill Spitzak and others.
+// Copyright 1998-2010 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -33,7 +33,7 @@
 
 #include "Fl_Value_Slider.H"
 
-class Fl_Hor_Value_Slider : public Fl_Value_Slider {
+class FL_EXPORT Fl_Hor_Value_Slider : public Fl_Value_Slider {
 public:
     Fl_Hor_Value_Slider(int X,int Y,int W,int H,const char *l=0)
 	: Fl_Value_Slider(X,Y,W,H,l) {type(FL_HOR_SLIDER);}
@@ -42,5 +42,5 @@ public:
 #endif
 
 //
-// End of "$Id: Fl_Hor_Value_Slider.H 6614 2009-01-01 16:11:32Z matt $".
+// End of "$Id: Fl_Hor_Value_Slider.H 8022 2010-12-12 23:21:03Z AlbrechtS $".
 //

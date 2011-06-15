@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_lock.cxx 6787 2009-05-14 20:16:09Z engelsman $"
+// "$Id: Fl_lock.cxx 8393 2011-02-06 19:46:11Z manolo $"
 //
 // Multi-threading support code for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2009 by Bill Spitzak and others.
+// Copyright 1998-2010 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -121,11 +121,15 @@ int Fl::get_awake_handler_(Fl_Awake_Handler &func, void *&data)
   return ret;
 }
 
-//
 /**
-  Let the main thread know an update is pending
-  and have it call a specific function
-  See void awake(void* message=0). 
+ Let the main thread know an update is pending and have it call a specific function.
+ Registers a function that will be 
+ called by the main thread during the next message handling cycle. 
+ Returns 0 if the callback function was registered, 
+ and -1 if registration failed. Over a thousand awake callbacks can be
+ registered simultaneously.
+ 
+ \see Fl::awake(void* message=0)
 */
 int Fl::awake(Fl_Awake_Handler func, void *data) {
   int ret = add_awake_handler_(func, data);
@@ -135,12 +139,13 @@ int Fl::awake(Fl_Awake_Handler func, void *data) {
 
 ////////////////////////////////////////////////////////////////
 // Windows threading...
-/** \fn void Fl::lock()
+/** \fn int Fl::lock()
     The lock() method blocks the current thread until it
     can safely access FLTK widgets and data. Child threads should
     call this method prior to updating any widgets or accessing
     data. The main thread must call lock() to initialize
-    the threading support in FLTK.
+    the threading support in FLTK. lock() will return non-zero
+    if threading is not available on the platform.
     
     Child threads must call unlock() when they are done
     accessing FLTK.
@@ -150,6 +155,9 @@ int Fl::awake(Fl_Awake_Handler func, void *data) {
     Similarly, when the main thread needs to do processing, it will
     wait until all child threads have called unlock() before processing
     additional data.
+ 
+    \return 0 if threading is available on the platform; non-zero
+    otherwise.
     
     See also: \ref advanced_multithreading
 */
@@ -162,7 +170,7 @@ int Fl::awake(Fl_Awake_Handler func, void *data) {
     See also: \ref advanced_multithreading
 */
 /** \fn void Fl::awake(void* msg)
-    The awake() method sends a message pointer to the main thread, 
+    Sends a message pointer to the main thread, 
     causing any pending Fl::wait() call to 
     terminate so that the main thread can retrieve the message and any pending 
     redraws can be processed.
@@ -172,12 +180,6 @@ int Fl::awake(Fl_Awake_Handler func, void *data) {
     thousand) depth. The default message handler saves the last message which 
     can be accessed using the 
     Fl::thread_message() function.
-    
-    The second form of awake() registers a function that will be 
-    called by the main thread during the next message handling cycle. 
-    awake() will return 0 if the callback function was registered, 
-    and -1 if registration failed. Over a thousand awake callbacks can be
-    registered simultaneously.
 
     In the context of a threaded application, a call to Fl::awake() with no
     argument will trigger event loop handling in the main thread. Since
@@ -187,7 +189,6 @@ int Fl::awake(Fl_Awake_Handler func, void *data) {
     See also: \ref advanced_multithreading
 */
 #ifdef WIN32
-#  include <winsock2.h>
 #  include <windows.h>
 #  include <process.h>
 #  include <FL/x.H>
@@ -231,7 +232,7 @@ static void lock_function() {
   EnterCriticalSection(&cs);
 }
 
-void Fl::lock() {
+int Fl::lock() {
   if (!main_thread) InitializeCriticalSection(&cs);
 
   lock_function();
@@ -241,6 +242,7 @@ void Fl::lock() {
     fl_unlock_function = unlock_function;
     main_thread        = GetCurrentThreadId();
   }
+  return 0;
 }
 
 void Fl::unlock() {
@@ -305,7 +307,7 @@ static void unlock_function_rec() {
 #  endif // PTHREAD_MUTEX_RECURSIVE
 
 void Fl::awake(void* msg) {
-  write(thread_filedes[1], &msg, sizeof(void*));
+  if (write(thread_filedes[1], &msg, sizeof(void*))==0) { /* ignore */ }
 }
 
 static void* thread_message_;
@@ -316,7 +318,9 @@ void* Fl::thread_message() {
 }
 
 static void thread_awake_cb(int fd, void*) {
-  read(fd, &thread_message_, sizeof(void*));
+  if (read(fd, &thread_message_, sizeof(void*))==0) { 
+    /* This should never happen */
+  }
   Fl_Awake_Handler func;
   void *data;
   while (Fl::get_awake_handler_(func, data)==0) {
@@ -328,11 +332,13 @@ static void thread_awake_cb(int fd, void*) {
 extern void (*fl_lock_function)();
 extern void (*fl_unlock_function)();
 
-void Fl::lock() {
+int Fl::lock() {
   if (!thread_filedes[1]) {
     // Initialize thread communication pipe to let threads awake FLTK
     // from Fl::wait()
-    pipe(thread_filedes);
+    if (pipe(thread_filedes)==-1) {
+      /* this should not happen */
+    }
 
     // Make the write side of the pipe non-blocking to avoid deadlock
     // conditions (STR #1537)
@@ -361,6 +367,7 @@ void Fl::lock() {
   }
 
   fl_lock_function();
+  return 0;
 }
 
 void Fl::unlock() {
@@ -393,8 +400,19 @@ void lock_ring() {
 void Fl::awake(void*) {
 }
 
+int Fl::lock() {
+  return 1;
+}
+
+void Fl::unlock() {
+}
+
+void* Fl::thread_message() {
+  return NULL;
+}
+
 #endif // WIN32
 
 //
-// End of "$Id: Fl_lock.cxx 6787 2009-05-14 20:16:09Z engelsman $".
+// End of "$Id: Fl_lock.cxx 8393 2011-02-06 19:46:11Z manolo $".
 //

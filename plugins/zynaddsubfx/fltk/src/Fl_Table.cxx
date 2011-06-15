@@ -1,5 +1,5 @@
 //
-// "$Id: Fl_Table.cxx 7117 2010-02-20 21:14:47Z matt $"
+// "$Id: Fl_Table.cxx 7950 2010-12-05 01:22:53Z greg.ercolano $"
 //
 // Fl_Table -- A table widget
 //
@@ -424,14 +424,13 @@ void Fl_Table::_auto_drag_cb() {
   if (lx > x() + w() - 20) {
     Fl::e_x = x() + w() - 20;
     if (hscrollbar->visible())
-      ((Fl_Slider*)hscrollbar)->value(
-                                      hscrollbar->clamp(hscrollbar->value() + 30));
+      ((Fl_Slider*)hscrollbar)->value(hscrollbar->clamp(hscrollbar->value() + 30));
     hscrollbar->do_callback();
     _dragging_x = Fl::e_x - 30;
   }
   else if (lx < (x() + row_header_width())) {
     Fl::e_x = x() + row_header_width() + 1;
-    if (hscrollbar->visible())  {
+    if (hscrollbar->visible()) {
       ((Fl_Slider*)hscrollbar)->value(hscrollbar->clamp(hscrollbar->value() - 30));
     }
     hscrollbar->do_callback();
@@ -514,7 +513,7 @@ void Fl_Table::table_scrolled() {
     if ( y > voff ) { y -= row_height(row); break; }
   }
   _row_position = toprow = ( row >= _rows ) ? (row - 1) : row;
-  toprow_scrollpos = y;	// OPTIMIZATION: save for later use 
+  toprow_scrollpos = y;		// OPTIMIZATION: save for later use 
   // Find bottom row
   voff = vscrollbar->value() + tih;
   for ( ; row < _rows; row++ ) {
@@ -990,6 +989,13 @@ int Fl_Table::handle(int event) {
         case FL_Down:
           ret = move_cursor(1, 0);
           break;
+	case FL_Tab:
+	  if ( Fl::event_state() & FL_SHIFT ) {
+            ret = move_cursor(0, -1);		// shift-tab -> left
+	  } else {
+	    ret = move_cursor(0, 1);		// tab -> right
+	  }
+          break;
       }
       if (ret && Fl::focus() != this) {
         do_callback(CONTEXT_TABLE, -1, -1);
@@ -1034,6 +1040,10 @@ void Fl_Table::_redraw_cell(TableContext context, int r, int c) {
   draw_cell(context, r, c, X, Y, W, H);	// call users' function to draw it
 }
 
+/**
+ See if the cell at row \p r and column \p c is selected.
+ \returns 1 if the cell is selected, 0 if not.
+ */
 int Fl_Table::is_selected(int r, int c) {
   int s_left, s_right, s_top, s_bottom;
   
@@ -1057,29 +1067,48 @@ int Fl_Table::is_selected(int r, int c) {
   return 0;
 }
 
-void Fl_Table::get_selection(int& s_top, int& s_left, int& s_bottom, int& s_right) {
+/**
+  Gets the region of cells selected (highlighted).
+
+  \param[in] row_top   Returns the top row of selection area
+  \param[in] col_left  Returns the left column of selection area
+  \param[in] row_bot   Returns the bottom row of selection area
+  \param[in] col_right Returns the right column of selection area
+*/
+void Fl_Table::get_selection(int& row_top, int& col_left, int& row_bot, int& col_right) {
   if (select_col > current_col) {
-    s_left = current_col;
-    s_right = select_col;
+    col_left  = current_col;
+    col_right = select_col;
   } else {
-    s_right = current_col;
-    s_left = select_col;
+    col_right = current_col;
+    col_left  = select_col;
   }
   if (select_row > current_row) {
-    s_top = current_row;
-    s_bottom = select_row;
+    row_top = current_row;
+    row_bot = select_row;
   } else {
-    s_bottom = current_row;
-    s_top = select_row;
+    row_bot = current_row;
+    row_top = select_row;
   }
 }
 
-void Fl_Table::set_selection(int s_top, int s_left, int s_bottom, int s_right) {
+/**
+  Sets the region of cells to be selected (highlighted).
+
+  So for instance, set_selection(0,0,0,0) selects the top/left cell in the table.
+  And set_selection(0,0,1,1) selects the four cells in rows 0 and 1, column 0 and 1.
+
+  \param[in] row_top   Top row of selection area
+  \param[in] col_left  Left column of selection area
+  \param[in] row_bot   Bottom row of selection area
+  \param[in] col_right Right column of selection area
+*/
+void Fl_Table::set_selection(int row_top, int col_left, int row_bot, int col_right) {
   damage_zone(current_row, current_col, select_row, select_col);
-  current_col = s_left;
-  current_row = s_top;
-  select_col = s_right;
-  select_row = s_bottom;
+  current_col = col_left;
+  current_row = row_top;
+  select_col  = col_right;
+  select_row  = row_bot;
   damage_zone(current_row, current_col, select_row, select_col);
 }
 
@@ -1220,5 +1249,5 @@ void Fl_Table::draw() {
 }
 
 //
-// End of "$Id: Fl_Table.cxx 7117 2010-02-20 21:14:47Z matt $".
+// End of "$Id: Fl_Table.cxx 7950 2010-12-05 01:22:53Z greg.ercolano $".
 //

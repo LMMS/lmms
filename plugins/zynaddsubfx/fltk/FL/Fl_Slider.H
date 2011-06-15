@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Slider.H 6683 2009-03-14 11:46:43Z engelsman $"
+// "$Id: Fl_Slider.H 7981 2010-12-08 23:53:04Z greg.ercolano $"
 //
 // Slider header file for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2009 by Bill Spitzak and others.
+// Copyright 1998-2010 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -64,8 +64,8 @@
   \li FL_HOR_NICE_SLIDER - Draws a horizontal slider with  a
       nice looking control knob.
 
-  \image html  slider.gif 
-  \image latex slider.eps "Fl_Slider" width=4cm
+  \image html  slider.png 
+  \image latex slider.png "Fl_Slider" width=4cm
 */
 class FL_EXPORT Fl_Slider : public Fl_Valuator {
 
@@ -116,5 +116,5 @@ public:
 #endif
 
 //
-// End of "$Id: Fl_Slider.H 6683 2009-03-14 11:46:43Z engelsman $".
+// End of "$Id: Fl_Slider.H 7981 2010-12-08 23:53:04Z greg.ercolano $".
 //

@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Return_Button.H 6614 2009-01-01 16:11:32Z matt $"
+// "$Id: Fl_Return_Button.H 7981 2010-12-08 23:53:04Z greg.ercolano $"
 //
 // Return button header file for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2009 by Bill Spitzak and others.
+// Copyright 1998-2010 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -36,8 +36,8 @@
   The Fl_Return_Button is a subclass of Fl_Button that
   generates a callback when it is pressed or when the user presses the
   Enter key.  A carriage-return symbol is drawn next to the button label.
-  <P ALIGN=CENTER>\image html Fl_Return_Button.gif 
-  \image latex Fl_Return_Button.eps "Fl_Return_Button" width=4cm
+  <P ALIGN=CENTER>\image html Fl_Return_Button.png 
+  \image latex Fl_Return_Button.png "Fl_Return_Button" width=4cm
 */
 class FL_EXPORT Fl_Return_Button : public Fl_Button {
 protected:
@@ -56,5 +56,5 @@ public:
 #endif
 
 //
-// End of "$Id: Fl_Return_Button.H 6614 2009-01-01 16:11:32Z matt $".
+// End of "$Id: Fl_Return_Button.H 7981 2010-12-08 23:53:04Z greg.ercolano $".
 //

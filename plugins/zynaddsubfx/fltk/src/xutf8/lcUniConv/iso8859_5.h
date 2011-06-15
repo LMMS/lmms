@@ -4,6 +4,7 @@
  * ISO-8859-5
  */
 
+#ifdef NEED_TOWC
 static const unsigned short iso8859_5_2uni[96] = {
   /* 0xa0 */
   0x00a0, 0x0401, 0x0402, 0x0403, 0x0404, 0x0405, 0x0406, 0x0407,
@@ -35,7 +36,9 @@ iso8859_5_mbtowc (conv_t conv, ucs4_t *pwc, const unsigned char *s, int n)
     *pwc = (ucs4_t) iso8859_5_2uni[c-0xa0];
   return 1;
 }
+#endif /* NEED_TOWC */
 
+#ifdef  NEED_TOMB
 static const unsigned char iso8859_5_page00[16] = {
   0xa0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xfd, /* 0xa0-0xa7 */
   0x00, 0x00, 0x00, 0x00, 0x00, 0xad, 0x00, 0x00, /* 0xa8-0xaf */
@@ -75,3 +78,4 @@ iso8859_5_wctomb (conv_t conv, unsigned char *r, ucs4_t wc, int n)
   }
   return RET_ILSEQ;
 }
+#endif /* NEED_TOMB */

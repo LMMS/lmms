@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Sys_Menu_Bar.H 7518 2010-04-16 19:27:28Z manolo $"
+// "$Id: Fl_Sys_Menu_Bar.H 7903 2010-11-28 21:06:39Z matt $"
 //
 // MacOS system menu bar header file for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2009 by Bill Spitzak and others.
+// Copyright 1998-2010 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -76,5 +76,5 @@ typedef Fl_Menu_Bar Fl_Sys_Menu_Bar;
 #endif // Fl_Sys_Menu_Bar_H
 
 //
-// End of "$Id: Fl_Sys_Menu_Bar.H 7518 2010-04-16 19:27:28Z manolo $".
+// End of "$Id: Fl_Sys_Menu_Bar.H 7903 2010-11-28 21:06:39Z matt $".
 //

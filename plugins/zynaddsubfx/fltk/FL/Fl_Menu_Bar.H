@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Menu_Bar.H 6614 2009-01-01 16:11:32Z matt $"
+// "$Id: Fl_Menu_Bar.H 7981 2010-12-08 23:53:04Z greg.ercolano $"
 //
 // Menu bar header file for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2009 by Bill Spitzak and others.
+// Copyright 1998-2010 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -44,8 +44,8 @@
   top level menu defines the items in the menubar, while the submenus
   define the pull-down menus. Sub-sub menus and lower pop up to the right
   of the submenus. </P>
-  <P ALIGN=CENTER>\image html  menubar.gif</P>
-  \image latex  menubar.eps " menubar" width=12cm
+  <P ALIGN=CENTER>\image html  menubar.png</P>
+  \image latex  menubar.png " menubar" width=12cm
   <P>If there is an item in the top menu that is not a title of a
   submenu, then it acts like a "button" in the menubar.  Clicking on it
   will pick it. </P>
@@ -85,5 +85,5 @@ public:
 #endif
 
 //
-// End of "$Id: Fl_Menu_Bar.H 6614 2009-01-01 16:11:32Z matt $".
+// End of "$Id: Fl_Menu_Bar.H 7981 2010-12-08 23:53:04Z greg.ercolano $".
 //

@@ -3,7 +3,7 @@
 /*
  * BIG5
  */
-
+#ifdef NEED_TOWC
 static const unsigned short big5_2uni_pagea1[6121] = {
   /* 0xa1 */
   0x3000, 0xff0c, 0x3001, 0x3002, 0xff0e, 0x2022, 0xff1b, 0xff1a,
@@ -1880,7 +1880,9 @@ big5_mbtowc (conv_t conv, ucs4_t *pwc, const unsigned char *s, int n)
   }
   return RET_ILSEQ;
 }
+#endif /* NEED_TOWC */
 
+#ifdef  NEED_TOMB
 static const unsigned short big5_2charset[13703] = {
   0xa246, 0xa247, 0xa244, 0xa1b1, 0xa258, 0xa1d3, 0xa150, 0xa1d1,
   0xa1d2, 0xa3be, 0xa3bc, 0xa3bd, 0xa3bf, 0xa3bb, 0xa344, 0xa345,
@@ -4140,3 +4142,4 @@ big5_wctomb (conv_t conv, unsigned char *r, ucs4_t wc, int n)
   }
   return RET_TOOSMALL;
 }
+#endif /* NEED_TOMB */

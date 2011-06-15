@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Button.H 7499 2010-04-14 08:07:53Z manolo $"
+// "$Id: Fl_Button.H 7903 2010-11-28 21:06:39Z matt $"
 //
 // Button header file for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2009 by Bill Spitzak and others.
+// Copyright 1998-2010 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -45,6 +45,8 @@
 #define FL_HIDDEN_BUTTON	3   ///< for Forms compatibility
 
 extern FL_EXPORT Fl_Shortcut fl_old_shortcut(const char*);
+
+class Fl_Widget_Tracker;
 
 /**
   \class Fl_Button
@@ -88,6 +90,10 @@ class FL_EXPORT Fl_Button : public Fl_Widget {
 
 protected:
 
+  static Fl_Widget_Tracker *key_release_tracker;
+  static void key_release_timeout(void*);
+  void simulate_key_action();
+  
   virtual void draw();
 
 public:
@@ -170,5 +176,5 @@ public:
 #endif
 
 //
-// End of "$Id: Fl_Button.H 7499 2010-04-14 08:07:53Z manolo $".
+// End of "$Id: Fl_Button.H 7903 2010-11-28 21:06:39Z matt $".
 //

@@ -1,9 +1,9 @@
 //
-// "$Id: filename_list.cxx 6986 2010-01-01 18:30:49Z greg.ercolano $"
+// "$Id: filename_list.cxx 8192 2011-01-05 16:50:10Z manolo $"
 //
 // Filename list routines for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2009 by Bill Spitzak and others.
+// Copyright 1998-2010 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -28,6 +28,7 @@
 // Wrapper for scandir with const-correct function prototypes.
 
 #include <FL/filename.H>
+#include <FL/fl_utf8.h>
 #include "flstring.h"
 #include <stdlib.h>
 
@@ -37,7 +38,6 @@ extern "C" {
   int fl_scandir (const char *dir, dirent ***namelist,
 	          int (*select)(dirent *),
 	          int (*compar)(dirent **, dirent **));
-#  define scandir	fl_scandir
 #endif
 }
 
@@ -81,56 +81,126 @@ int fl_casealphasort(struct dirent **a, struct dirent **b) {
 */
 int fl_filename_list(const char *d, dirent ***list,
                      Fl_File_Sort_F *sort) {
+#if defined(WIN32) && !defined(__CYGWIN__) && !defined(HAVE_SCANDIR)
+  // For Windows we have a special scandir implementation that uses
+  // the Win32 "wide" functions for lookup, avoiding the code page mess
+  // entirely. It also fixes up the trailing '/'.
+  return fl_scandir(d, list, 0, sort);
+
+#else // WIN32
+
+  int dirlen;
+  char *dirloc;
+
+  // Assume that locale encoding is no less dense than UTF-8
+  dirlen = strlen(d);
+#ifdef __APPLE__
+  dirloc = (char *)d;
+#else
+  dirloc = (char *)malloc(dirlen + 1);
+  fl_utf8to_mb(d, dirlen, dirloc, dirlen + 1);
+#endif
+
 #ifndef HAVE_SCANDIR
-  int n = scandir(d, list, 0, sort);
-#elif defined(HAVE_SCANDIR_POSIX)
-  // HP-UX, Cygwin and POSIX (2008) define the comparison function like this:
-  int n = scandir(d, list, 0, (int(*)(const dirent **, const dirent **))sort);
+  // This version is when we define our own scandir
+  int n = fl_scandir(dirloc, list, 0, sort);
+#elif defined(HAVE_SCANDIR_POSIX) && !defined(__APPLE__)
+  // POSIX (2008) defines the comparison function like this:
+  int n = scandir(dirloc, list, 0, (int(*)(const dirent **, const dirent **))sort);
 #elif defined(__osf__)
   // OSF, DU 4.0x
-  int n = scandir(d, list, 0, (int(*)(dirent **, dirent **))sort);
+  int n = scandir(dirloc, list, 0, (int(*)(dirent **, dirent **))sort);
 #elif defined(_AIX)
   // AIX is almost standard...
-  int n = scandir(d, list, 0, (int(*)(void*, void*))sort);
-#elif !defined(__sgi)
+  int n = scandir(dirloc, list, 0, (int(*)(void*, void*))sort);
+#elif defined(__sgi)
+  int n = scandir(dirloc, list, 0, sort);
+#else
   // The vast majority of UNIX systems want the sort function to have this
   // prototype, most likely so that it can be passed to qsort without any
   // changes:
-  int n = scandir(d, list, 0, (int(*)(const void*,const void*))sort);
-#else
-  // This version is when we define our own scandir (WIN32 and perhaps
-  // some Unix systems) and apparently on IRIX:
-  int n = scandir(d, list, 0, sort);
+  int n = scandir(dirloc, list, 0, (int(*)(const void*,const void*))sort);
 #endif
 
-#if defined(WIN32) && !defined(__CYGWIN__)
-  // we did this already during fl_scandir/win32
-#else
-  // append a '/' to all filenames that are directories
-  int i, dirlen = strlen(d);
+#ifndef __APPLE__
+  free(dirloc);
+#endif
+
+  // convert every filename to utf-8, and append a '/' to all
+  // filenames that are directories
+  int i;
   char *fullname = (char*)malloc(dirlen+FL_PATH_MAX+3); // Add enough extra for two /'s and a nul
   // Use memcpy for speed since we already know the length of the string...
   memcpy(fullname, d, dirlen+1);
+
   char *name = fullname + dirlen;
-  if (name!=fullname && name[-1]!='/') *name++ = '/';
+  if (name!=fullname && name[-1]!='/')
+    *name++ = '/';
+
   for (i=0; i<n; i++) {
+    int newlen;
     dirent *de = (*list)[i];
     int len = strlen(de->d_name);
-    if (de->d_name[len-1]=='/' || len>FL_PATH_MAX) continue;
-    // Use memcpy for speed since we already know the length of the string...
-    memcpy(name, de->d_name, len+1);
-    if (fl_filename_isdir(fullname)) {
-      (*list)[i] = de = (dirent*)realloc(de, de->d_name - (char*)de + len + 2);
-      char *dst = de->d_name + len;
-      *dst++ = '/';
-      *dst = 0;
+#ifdef __APPLE__
+    newlen = len;
+#else
+    newlen = fl_utf8from_mb(NULL, 0, de->d_name, len);
+#endif
+    dirent *newde = (dirent*)malloc(de->d_name - (char*)de + newlen + 2); // Add space for a / and a nul
+
+    // Conversion to UTF-8
+    memcpy(newde, de, de->d_name - (char*)de);
+#ifdef __APPLE__
+    strcpy(newde->d_name, de->d_name);
+#else
+    fl_utf8from_mb(newde->d_name, newlen + 1, de->d_name, len);
+#endif
+
+    // Check if dir (checks done on "old" name as we need to interact with
+    // the underlying OS)
+    if (de->d_name[len-1]!='/' && len<=FL_PATH_MAX) {
+      // Use memcpy for speed since we already know the length of the string...
+      memcpy(name, de->d_name, len+1);
+      if (fl_filename_isdir(fullname)) {
+        char *dst = newde->d_name + newlen;
+        *dst++ = '/';
+        *dst = 0;
+      }
     }
+
+    free(de);
+    (*list)[i] = newde;
   }
   free(fullname);
-#endif
+
   return n;
+
+#endif // WIN32
 }
 
+/**
+ \brief Free the list of filenames that is generated by fl_filename_list().
+ 
+ Free everything that was allocated by a previous call to fl_filename_list().
+ Use the return values as parameters for this function.
+ 
+ \param[in,out] list table containing the resulting directory listing
+ \param[in] n number of entries in the list
+ */
+void fl_filename_free_list(struct dirent ***list, int n)
+{
+  if (n<0) return;
+  
+  int i;
+  for (i = 0; i < n; i ++) {
+    if ((*list)[i])
+      free((*list)[i]);
+  }  
+  free(*list);
+  *list = 0;
+}
+
+
 //
-// End of "$Id: filename_list.cxx 6986 2010-01-01 18:30:49Z greg.ercolano $".
+// End of "$Id: filename_list.cxx 8192 2011-01-05 16:50:10Z manolo $".
 //

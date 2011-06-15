@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_mac.cxx 7351 2010-03-29 10:35:00Z matt $"
+// "$Id: Fl_mac.cxx 7913 2010-11-29 18:18:27Z greg.ercolano $"
 //
 // MacOS specific code for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2009 by Bill Spitzak and others.
+// Copyright 1998-2010 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -2866,5 +2866,5 @@ void MacUnmapWindow(Fl_Window *w, WindowPtr p) {
 #endif // FL_DOXYGEN
 
 //
-// End of "$Id: Fl_mac.cxx 7351 2010-03-29 10:35:00Z matt $".
+// End of "$Id: Fl_mac.cxx 7913 2010-11-29 18:18:27Z greg.ercolano $".
 //

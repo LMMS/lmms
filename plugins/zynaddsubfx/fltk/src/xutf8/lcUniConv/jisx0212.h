@@ -3,6 +3,7 @@
 /*
  * JISX0212.1990-0
  */
+#ifdef NEED_TOWC
 
 static const unsigned short jisx0212_2uni_page22[81] = {
   /* 0x22 */
@@ -926,7 +927,9 @@ jisx0212_mbtowc (conv_t conv, ucs4_t *pwc, const unsigned char *s, int n)
   }
   return RET_ILSEQ;
 }
+#endif /* NEED_TOWC */
 
+#ifdef NEED_TOMB
 static const unsigned short jisx0212_2charset[6067] = {
   0x2237, 0x2242, 0x2270, 0x2243, 0x226d, 0x226c, 0x226e, 0x2234,
   0x2231, 0x226b, 0x2244, 0x2a22, 0x2a21, 0x2a24, 0x2a2a, 0x2a23,
@@ -2162,3 +2165,4 @@ jisx0212_wctomb (conv_t conv, unsigned char *r, ucs4_t wc, int n)
   }
   return RET_TOOSMALL;
 }
+#endif /* NEED_TOMB */

@@ -1,9 +1,9 @@
 /*
- * "$Id: scandir_win32.c 6687 2009-03-15 03:14:43Z greg.ercolano $"
+ * "$Id: scandir_win32.c 8347 2011-02-01 01:06:27Z greg.ercolano $"
  *
  * WIN32 scandir function for the Fast Light Tool Kit (FLTK).
  *
- * Copyright 1998-2009 by Bill Spitzak and others.
+ * Copyright 1998-2010 by Bill Spitzak and others.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -49,9 +49,9 @@ int fl_scandir(const char *dirname, struct dirent ***namelist,
   if (!findIn) return -1;
   strcpy(findIn, dirname);
 
-  //#if defined(__GNUC__)
-  //#warning FIXME This probably needs to be MORE UTF8 aware now
-  //#endif /*__GNUC__*/
+  /* #if defined(__GNUC__) */
+  /* #warning FIXME This probably needs to be MORE UTF8 aware now */
+  /* #endif */
   for (d = findIn; *d; d++) if (*d=='/') *d='\\';
   if ((len==0)) { strcpy(findIn, ".\\*"); }
   if ((len==2)&&findIn[1]==':'&&isalpha(findIn[0])) { *d++ = '\\'; *d = 0; }
@@ -64,8 +64,8 @@ int fl_scandir(const char *dirname, struct dirent ***namelist,
       strcpy(d, "\\*");
   }
   { /* Create a block to limit the scope while we find the initial "wide" filename */
-//	unsigned short * wbuf = (unsigned short*)malloc(sizeof(short) *(len + 10));
-//	wbuf[fl_utf2unicode(findIn, strlen(findIn), wbuf)] = 0;
+     /* unsigned short * wbuf = (unsigned short*)malloc(sizeof(short) *(len + 10)); */
+     /* wbuf[fl_utf2unicode(findIn, strlen(findIn), wbuf)] = 0; */
 	unsigned short *wbuf = NULL;
 	unsigned wlen = fl_utf8toUtf16(findIn, strlen(findIn), NULL, 0); /* Pass NULL to query length */
 	wlen++; /* add a little extra for termination etc. */
@@ -89,7 +89,7 @@ int fl_scandir(const char *dirname, struct dirent ***namelist,
 	int dstlen = l * 5 + 1;
 	selectDir=(struct dirent*)malloc(sizeof(struct dirent)+dstlen);
 
-//	l = fl_unicode2utf(findw.cFileName, l, selectDir->d_name);
+     /* l = fl_unicode2utf(findw.cFileName, l, selectDir->d_name); */
 	l = fl_utf8fromwc(selectDir->d_name, dstlen, findw.cFileName, l);
 
 	selectDir->d_name[l] = 0;
@@ -131,5 +131,5 @@ int fl_scandir(const char *dirname, struct dirent ***namelist,
 #endif
 
 /*
- * End of "$Id: scandir_win32.c 6687 2009-03-15 03:14:43Z greg.ercolano $".
+ * End of "$Id: scandir_win32.c 8347 2011-02-01 01:06:27Z greg.ercolano $".
  */

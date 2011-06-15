@@ -1,9 +1,9 @@
 //
-// "$Id: fl_ask.cxx 7370 2010-03-30 19:44:50Z AlbrechtS $"
+// "$Id: fl_ask.cxx 8616 2011-04-20 14:54:42Z AlbrechtS $"
 //
 // Standard dialog functions for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2009 by Bill Spitzak and others.
+// Copyright 1998-2011 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -47,12 +47,6 @@
 #include <FL/x.H>
 #include <FL/fl_draw.H>
 
-#ifdef __APPLE__
-# if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_5
-#  include <AudioToolbox/AudioServices.h>
-# endif
-#endif
-
 static Fl_Window *message_form;
 static Fl_Box *message;
 static Fl_Box *icon;
@@ -60,14 +54,24 @@ static Fl_Button *button[3];
 static Fl_Input *input;
 static int ret_val;
 static const char *iconlabel = "?";
+static const char *message_title_default;
 Fl_Font fl_message_font_ = FL_HELVETICA;
-Fl_Fontsize fl_message_size_ = 14;
+Fl_Fontsize fl_message_size_ = -1;
+static int enableHotspot = 1;
+#ifdef __APPLE__
+extern "C" void NSBeep(void);
+#endif
 
 static char avoidRecursion = 0;
 
-// sets the global return value (ret_val) and closes the window
-static void button_cb(Fl_Widget *bt, void *val) {
-  ret_val = (int)(intptr_t)val;
+// Sets the global return value (ret_val) and closes the window.
+// Note: this is used for the button callbacks and the window
+// callback (closing the window with the close button or menu).
+// The first argument (Fl_Widget *) can either be an Fl_Button*
+// pointer to one of the buttons or an Fl_Window* pointer to the
+// message window (message_form).
+static void button_cb(Fl_Widget *, void *val) {
+  ret_val = (fl_intptr_t)val;
   message_form->hide();
 }
 
@@ -76,12 +80,13 @@ static Fl_Window *makeform() {
    message_form->size(410,103);
    return message_form;
  }
- // make sure that the dialog does not become the child of some 
+ // make sure that the dialog does not become the child of some
  // current group
  Fl_Group *previously_current_group = Fl_Group::current();
  Fl_Group::current(0);
  // create a new top level window
- Fl_Window *w = message_form = new Fl_Window(410,103,"");
+ Fl_Window *w = message_form = new Fl_Window(410,103);
+ message_form->callback(button_cb,(void *)0);
  // w->clear_border();
  // w->box(FL_UP_BOX);
  (message = new Fl_Box(60, 25, 340, 20))
@@ -94,6 +99,7 @@ static Fl_Window *makeform() {
   o->color(FL_WHITE);
   o->labelcolor(FL_BLUE);
  }
+ w->end(); // don't add the buttons automatically
  // create the buttons (right to left)
  for (int b=0, x=310; b<3; b++, x -= 100) {
    if (b==1)
@@ -104,6 +110,10 @@ static Fl_Window *makeform() {
    button[b]->callback(button_cb,(void *)b);
  }
  button[0]->shortcut(FL_Escape);
+ // add the buttons (left to right)
+ for (int b=2; b>=0; b--)
+   w->add(button[b]);
+ w->begin();
  w->resizable(new Fl_Box(60,10,110-60,27));
  w->end();
  w->set_modal();
@@ -124,7 +134,7 @@ void resizeform() {
   int	x, w, h, max_w, max_h;
 	const int icon_size = 50;
 
-  fl_font(fl_message_font_, fl_message_size_);
+  fl_font(message->labelfont(), message->labelsize());
   message_w = message_h = 0;
   fl_measure(message->label(), message_w, message_h);
 
@@ -208,7 +218,10 @@ static int innards(const char* fmt, va_list ap,
   }
 
   message->labelfont(fl_message_font_);
-  message->labelsize(fl_message_size_);
+  if (fl_message_size_ == -1)
+    message->labelsize(FL_NORMAL_SIZE);
+  else
+    message->labelsize(fl_message_size_);
   if (b0) {button[0]->show(); button[0]->label(b0); button[1]->position(210,70);}
   else {button[0]->hide(); button[1]->position(310,70);}
   if (b1) {button[1]->show(); button[1]->label(b1);}
@@ -220,13 +233,18 @@ static int innards(const char* fmt, va_list ap,
 
   resizeform();
 
-  if (button[1]->visible() && !input->visible()) 
+  if (button[1]->visible() && !input->visible())
     button[1]->take_focus();
-  message_form->hotspot(button[0]);
+  if (enableHotspot)
+    message_form->hotspot(button[0]);
   if (b0 && Fl_Widget::label_shortcut(b0))
     button[0]->shortcut(0);
   else
     button[0]->shortcut(FL_Escape);
+
+  // set default window title, if defined and a specific title is not set
+  if (!message_form->label() && message_title_default)
+    message_form->label(message_title_default);
 
   // deactivate Fl::grab(), because it is incompatible with modal windows
   Fl_Window* g = Fl::grab();
@@ -236,6 +254,7 @@ static int innards(const char* fmt, va_list ap,
   if (g) // regrab the previous popup menu, if there was one
     Fl::grab(g);
   icon->label(prev_icon_label);
+  message_form->label(0); // reset window title
 
   avoidRecursion = 0;
   return ret_val;
@@ -244,17 +263,17 @@ static int innards(const char* fmt, va_list ap,
  /** \addtogroup group_comdlg
     @{ */
 
-// pointers you can use to change FLTK to a foreign language:
-const char* fl_no = "No";        ///< string pointer used in common dialogs, you can change it to a foreign language
-const char* fl_yes= "Yes";       ///< string pointer used in common dialogs, you can change it to a foreign language
-const char* fl_ok = "OK";        ///< string pointer used in common dialogs, you can change it to a foreign language
-const char* fl_cancel= "Cancel"; ///< string pointer used in common dialogs, you can change it to a foreign language
-const char* fl_close= "Close";   ///< string pointer used in common dialogs, you can change it to a foreign language
+// pointers you can use to change FLTK to another language:
+const char* fl_no = "No";        ///< string pointer used in common dialogs, you can change it to another language
+const char* fl_yes= "Yes";       ///< string pointer used in common dialogs, you can change it to another language
+const char* fl_ok = "OK";        ///< string pointer used in common dialogs, you can change it to another language
+const char* fl_cancel= "Cancel"; ///< string pointer used in common dialogs, you can change it to another language
+const char* fl_close= "Close";   ///< string pointer used in common dialogs, you can change it to another language
 
 // fltk functions:
-
 /**
    Emits a system beep message.
+   \note \#include <FL/fl_ask.H>
  */
 void fl_beep(int type) {
 #ifdef WIN32
@@ -280,26 +299,7 @@ void fl_beep(int type) {
   switch (type) {
     case FL_BEEP_DEFAULT :
     case FL_BEEP_ERROR :
-      // How Apple is not any better than Microsoft:
-      /* MacOS 8 */   // SysBeep(30);
-      /* OS X 10.1 */ // AlertSoundPlay();
-      /* OS X 10.5 */ // AudioServicesPlayAlertSound(kUserPreferredAlert);
-      /* OS X 10.6 */ // AudioServicesPlayAlertSound(kSystemSoundID_UserPreferredAlert);
-# if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_5
-      if (AudioServicesPlayAlertSound!=0L)
-#   if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6
-        AudioServicesPlayAlertSound(kSystemSoundID_UserPreferredAlert);
-#   else
-        AudioServicesPlayAlertSound(kUserPreferredAlert);
-#   endif
-      else
-# endif
-#if MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_5
-        AlertSoundPlay();
-#else
-    {
-    }
-#endif
+      NSBeep();
       break;
     default :
       break;
@@ -320,10 +320,13 @@ void fl_beep(int type) {
   }
 #endif // WIN32
 }
+
 /** Shows an information message dialog box.
 
    \note Common dialog boxes are application modal. No more than one common dialog box
    can be open at any time. Requests for additional dialog boxes are ignored.
+   \note \#include <FL/fl_ask.H>
+
 
    \param[in] fmt can be used as an sprintf-like format and variables for the message text
  */
@@ -346,6 +349,7 @@ void fl_message(const char *fmt, ...) {
 
    \note Common dialog boxes are application modal. No more than one common dialog box
    can be open at any time. Requests for additional dialog boxes are ignored.
+   \note \#include <FL/fl_ask.H>
 
    \param[in] fmt can be used as an sprintf-like format and variables for the message text
  */
@@ -368,6 +372,7 @@ void fl_alert(const char *fmt, ...) {
 
    \note Common dialog boxes are application modal. No more than one common dialog box
    can be open at any time. Requests for additional dialog boxes are ignored.
+   \note \#include <FL/fl_ask.H>
 
    \param[in] fmt can be used as an sprintf-like format and variables for the message text
    \retval 0 if the no button is selected or another dialog box is still open
@@ -392,7 +397,8 @@ int fl_ask(const char *fmt, ...) {
     this dialog features up to 3 customizable choice buttons
 
    \note Common dialog boxes are application modal. No more than one common dialog box
-   can be open at any time. Requests for additional dialog boxes are ignored.
+    can be open at any time. Requests for additional dialog boxes are ignored.
+   \note \#include <FL/fl_ask.H>
 
    \param[in] fmt can be used as an sprintf-like format and variables for the message text
    \param[in] b0 text label of button 0
@@ -415,10 +421,11 @@ int fl_choice(const char*fmt,const char *b0,const char *b1,const char *b2,...){
   va_end(ap);
   return r;
 }
-/** Gets the Fl_Box icon container of the current default dialog used in 
-    many common dialogs like fl_message(), fl_alert(), 
-    fl_ask(), fl_choice(), fl_input(), fl_password() 
-*/ 
+/** Gets the Fl_Box icon container of the current default dialog used in
+    many common dialogs like fl_message(), fl_alert(),
+    fl_ask(), fl_choice(), fl_input(), fl_password()
+    \note \#include <FL/fl_ask.H>
+*/
 Fl_Widget *fl_message_icon() {makeform(); return icon;}
 
 static const char* input_innards(const char* fmt, va_list ap,
@@ -440,6 +447,7 @@ static const char* input_innards(const char* fmt, va_list ap,
 
    \note Common dialog boxes are application modal. No more than one common dialog box
    can be open at any time. Requests for additional dialog boxes are ignored.
+   \note \#include <FL/fl_ask.H>
 
    \param[in] fmt can be used as an sprintf-like format and variables for the message text
    \param[in] defstr defines the default returned string if no text is entered
@@ -465,6 +473,7 @@ const char* fl_input(const char *fmt, const char *defstr, ...) {
 
    \note Common dialog boxes are application modal. No more than one common dialog box
    can be open at any time. Requests for additional dialog boxes are ignored.
+   \note \#include <FL/fl_ask.H>
 
    \param[in] fmt can be used as an sprintf-like format and variables for the message text
    \param[in] defstr defines the default returned string if no text is entered
@@ -483,8 +492,80 @@ const char *fl_password(const char *fmt, const char *defstr, ...) {
   return r;
 }
 
+/** Sets whether or not to move the common message box used in
+    many common dialogs like fl_message(), fl_alert(),
+    fl_ask(), fl_choice(), fl_input(), fl_password() to follow
+    the mouse pointer.
+
+    The default is \e enabled, so that the default button is the
+    hotspot and appears at the mouse position.
+    \note \#include <FL/fl_ask.H>
+    \param[in]	enable	non-zero enables hotspot behavior,
+			0 disables hotspot
+ */
+void fl_message_hotspot(int enable) {
+  enableHotspot = enable ? 1 : 0;
+}
+
+/** Gets whether or not to move the common message box used in
+    many common dialogs like fl_message(), fl_alert(),
+    fl_ask(), fl_choice(), fl_input(), fl_password() to follow
+    the mouse pointer.
+    \note \#include <FL/fl_ask.H>
+    \return	0 if disable, non-zero otherwise
+    \see fl_message_hotspot(int)
+ */
+int fl_message_hotspot(void) {
+  return enableHotspot;
+}
+
+/** Sets the title of the dialog window used in many common dialogs.
+
+    This window \p title will be used in the next call of one of the
+    common dialogs like fl_message(), fl_alert(), fl_ask(), fl_choice(),
+    fl_input(), fl_password().
+
+    The \p title string is copied internally, so that you can use a
+    local variable or free the string immediately after this call. It
+    applies only to the \b next call of one of the common dialogs and
+    will be reset to an empty title (the default for all dialogs) after
+    that call.
+
+    \note \#include <FL/fl_ask.H>
+    \param[in] title	window label, string copied internally
+*/
+void fl_message_title(const char *title) {
+  makeform();
+  message_form->copy_label(title);
+}
+
+/** Sets the default title of the dialog window used in many common dialogs.
+
+    This window \p title will be used in all subsequent calls of one of the
+    common dialogs like fl_message(), fl_alert(), fl_ask(), fl_choice(),
+    fl_input(), fl_password(), unless a specific title has been set
+    with fl_message_title(const char *title).
+    
+    The default is no title. You can override the default title for a
+    single dialog with fl_message_title(const char *title).
+
+    The \p title string is copied internally, so that you can use a
+    local variable or free the string immediately after this call.
+
+    \note \#include <FL/fl_ask.H>
+    \param[in] title	default window label, string copied internally
+*/
+void fl_message_title_default(const char *title) {
+  if (message_title_default) {
+    free ((void *)message_title_default);
+    message_title_default = 0;
+  }
+  if (title)
+    message_title_default = strdup(title);
+}
+
 /** @} */
 
 //
-// End of "$Id: fl_ask.cxx 7370 2010-03-30 19:44:50Z AlbrechtS $".
+// End of "$Id: fl_ask.cxx 8616 2011-04-20 14:54:42Z AlbrechtS $".
 //

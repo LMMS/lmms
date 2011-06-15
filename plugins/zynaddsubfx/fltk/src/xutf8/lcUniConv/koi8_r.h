@@ -6,6 +6,7 @@
 
 /* Specification: RFC 1489 */
 
+#ifdef NEED_TOWC
 static const unsigned short koi8_r_2uni[128] = {
   /* 0x80 */
   0x2500, 0x2502, 0x250c, 0x2510, 0x2514, 0x2518, 0x251c, 0x2524,
@@ -43,7 +44,9 @@ koi8_r_mbtowc (conv_t conv, ucs4_t *pwc, const unsigned char *s, int n)
     *pwc = (ucs4_t) koi8_r_2uni[c-0x80];
   return 1;
 }
+#endif /* NEED_TOWC */
 
+#ifdef  NEED_TOMB
 static const unsigned char koi8_r_page00[88] = {
   0x9a, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* 0xa0-0xa7 */
   0x00, 0xbf, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* 0xa8-0xaf */
@@ -133,3 +136,4 @@ koi8_r_wctomb (conv_t conv, unsigned char *r, ucs4_t wc, int n)
   }
   return RET_ILSEQ;
 }
+#endif /* NEED_TOMB */

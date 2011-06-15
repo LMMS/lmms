@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Tile.cxx 6616 2009-01-01 21:28:26Z matt $"
+// "$Id: Fl_Tile.cxx 7903 2010-11-28 21:06:39Z matt $"
 //
 // Tile widget for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2009 by Bill Spitzak and others.
+// Copyright 1998-2010 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -52,17 +52,17 @@ void Fl_Tile::position(int oix, int oiy, int newx, int newy) {
     int R = X+o->w();
     if (oix) {
       int t = p[0];
-      if (t == oix || t>oix && X<newx || t<oix && X>newx) X = newx;
+      if (t == oix || (t>oix && X<newx) || (t<oix && X>newx) ) X = newx;
       t = p[1];
-      if (t == oix || t>oix && R<newx || t<oix && R>newx) R = newx;
+      if (t == oix || (t>oix && R<newx) || (t<oix && R>newx) ) R = newx;
     }
     int Y = o->y();
     int B = Y+o->h();
     if (oiy) {
       int t = p[2];
-      if (t == oiy || t>oiy && Y<newy || t<oiy && Y>newy) Y = newy;
+      if (t == oiy || (t>oiy && Y<newy) || (t<oiy && Y>newy) ) Y = newy;
       t = p[3];
-      if (t == oiy || t>oiy && B<newy || t<oiy && B>newy) B = newy;
+      if (t == oiy || (t>oiy && B<newy) || (t<oiy && B>newy) ) B = newy;
     }
     o->damage_resize(X,Y,R-X,B-Y);
   }
@@ -210,5 +210,5 @@ int Fl_Tile::handle(int event) {
 }
 
 //
-// End of "$Id: Fl_Tile.cxx 6616 2009-01-01 21:28:26Z matt $".
+// End of "$Id: Fl_Tile.cxx 7903 2010-11-28 21:06:39Z matt $".
 //

@@ -1,9 +1,9 @@
 //
-// "$Id: Fl_Slider.cxx 7115 2010-02-20 17:40:07Z AlbrechtS $"
+// "$Id: Fl_Slider.cxx 8726 2011-05-23 18:32:47Z AlbrechtS $"
 //
 // Slider widget for the Fast Light Tool Kit (FLTK).
 //
-// Copyright 1998-2009 by Bill Spitzak and others.
+// Copyright 1998-2011 by Bill Spitzak and others.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
@@ -30,6 +30,10 @@
 #include <FL/fl_draw.H>
 #include <math.h>
 #include "flstring.h"
+
+#if defined(FL_DLL)	// really needed for c'tors for MS VC++ only
+#include <FL/Fl_Hor_Slider.H>
+#endif
 
 void Fl_Slider::_Fl_Slider() {
   slider_size_ = 0;
@@ -364,6 +368,25 @@ int Fl_Slider::handle(int event) {
 		h()-Fl::box_dh(box()));
 }
 
+/*
+  The following constructor must not be in the header file if we
+  build a shared object (DLL). Instead it is defined here to force
+  the constructor (and default destructor as well) to be defined
+  in the DLL and exported (STR #2632).
+  
+  Note: if you the ctor here, do the same changes in the specific
+  header file as well.  This redundant definition was chosen to enable
+  inline constructors in the header files (for static linking) as well
+  as the one here for dynamic linking (Windows DLL).
+*/
+
+#if defined(FL_DLL)
+
+Fl_Hor_Slider::Fl_Hor_Slider(int X,int Y,int W,int H,const char *l)
+	: Fl_Slider(X,Y,W,H,l) {type(FL_HOR_SLIDER);}
+
+#endif // FL_DLL
+
 //
-// End of "$Id: Fl_Slider.cxx 7115 2010-02-20 17:40:07Z AlbrechtS $".
+// End of "$Id: Fl_Slider.cxx 8726 2011-05-23 18:32:47Z AlbrechtS $".
 //
