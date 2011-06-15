@@ -6,116 +6,116 @@
 
 EQGraph::EQGraph(int x,int y, int w, int h, const char *label):Fl_Box(x,y,w,h,label) {
   eff=NULL;
-maxdB=30;
+  maxdB=30;
 }
 
 void EQGraph::init(EffectMgr *eff_) {
   eff=eff_;
-oldx=-1;
-khzval=-1;
+  oldx=-1;
+  khzval=-1;
 }
 
 void EQGraph::draw_freq_line(REALTYPE freq,int type) {
   fl_color(FL_GRAY);
-REALTYPE freqx=getfreqpos(freq);
-switch(type){
-  case 0:if (active_r()) fl_color(FL_WHITE);
-            else fl_color(205,205,205);
-         fl_line_style(FL_SOLID);
-         break;
-  case 1:fl_line_style(FL_DOT);break;
-  case 2:fl_line_style(FL_DASH);break;
-}; 
-
-
-if ((freqx>0.0)&&(freqx<1.0))
-   fl_line(x()+(int) (freqx*w()),y(),
-   x()+(int) (freqx*w()),y()+h());
+  REALTYPE freqx=getfreqpos(freq);
+  switch(type){
+    case 0:if (active_r()) fl_color(FL_WHITE);
+              else fl_color(205,205,205);
+           fl_line_style(FL_SOLID);
+           break;
+    case 1:fl_line_style(FL_DOT);break;
+    case 2:fl_line_style(FL_DASH);break;
+  }; 
+  
+  
+  if ((freqx>0.0)&&(freqx<1.0))
+     fl_line(x()+(int) (freqx*w()),y(),
+     x()+(int) (freqx*w()),y()+h());
 }
 
 void EQGraph::draw() {
   int ox=x(),oy=y(),lx=w(),ly=h(),i,iy,oiy;
-REALTYPE freqx;
-
-if (active_r()) fl_color(0,70,150);
-       else fl_color(80,120,160);
-fl_rectf(ox,oy,lx,ly);
-
-
-//draw the lines
-fl_color(FL_GRAY);
-
-fl_line_style(FL_SOLID);
-fl_line(ox+2,oy+ly/2,ox+lx-2,oy+ly/2);
-
-freqx=getfreqpos(1000.0);
-if ((freqx>0.0)&&(freqx<1.0))
-   fl_line(ox+(int) (freqx*lx),oy,
-    ox+(int) (freqx*lx),oy+ly);
-
-for (i=1;i<10;i++){
-   if(i==1){
-     draw_freq_line(i*100.0,0);
-     draw_freq_line(i*1000.0,0);
-   }else 
-    if (i==5){
-      draw_freq_line(i*10.0,2);
-      draw_freq_line(i*100.0,2);
-      draw_freq_line(i*1000.0,2);
-    }else{
-      draw_freq_line(i*10.0,1);
-      draw_freq_line(i*100.0,1);
-      draw_freq_line(i*1000.0,1);
-    };
-};
-
-draw_freq_line(10000.0,0);
-draw_freq_line(20000.0,1);
-
-
-fl_line_style(FL_DOT);
-int GY=6;if (ly<GY*3) GY=-1;
-for (i=1;i<GY;i++){
-   int tmp=(int)(ly/(REALTYPE)GY*i);
-   fl_line(ox+2,oy+tmp,ox+lx-2,oy+tmp);
-};
-
-
-//draw the frequency response
-if (active_r()) fl_color(FL_YELLOW);
-       else fl_color(200,200,80);
-fl_line_style(FL_SOLID);
-oiy=getresponse(ly,getfreqx(0.0));
-for (i=1;i<lx;i++){
-   REALTYPE frq=getfreqx(i/(REALTYPE) lx);
-   if (frq>SAMPLE_RATE/2) break;
-   iy=getresponse(ly,frq);
-   if ((oiy>=0) && (oiy<ly) &&
-       (iy>=0) && (iy<ly) )
-        fl_line(ox+i-1,oy+ly-oiy,ox+i,oy+ly-iy);
-   oiy=iy;
-};
+  REALTYPE freqx;
+  
+  if (active_r()) fl_color(0,70,150);
+         else fl_color(80,120,160);
+  fl_rectf(ox,oy,lx,ly);
+  
+  
+  //draw the lines
+  fl_color(FL_GRAY);
+  
+  fl_line_style(FL_SOLID);
+  fl_line(ox+2,oy+ly/2,ox+lx-2,oy+ly/2);
+  
+  freqx=getfreqpos(1000.0);
+  if ((freqx>0.0)&&(freqx<1.0))
+     fl_line(ox+(int) (freqx*lx),oy,
+      ox+(int) (freqx*lx),oy+ly);
+  
+  for (i=1;i<10;i++){
+     if(i==1){
+       draw_freq_line(i*100.0,0);
+       draw_freq_line(i*1000.0,0);
+     }else 
+      if (i==5){
+        draw_freq_line(i*10.0,2);
+        draw_freq_line(i*100.0,2);
+        draw_freq_line(i*1000.0,2);
+      }else{
+        draw_freq_line(i*10.0,1);
+        draw_freq_line(i*100.0,1);
+        draw_freq_line(i*1000.0,1);
+      };
+  };
+  
+  draw_freq_line(10000.0,0);
+  draw_freq_line(20000.0,1);
+  
+  
+  fl_line_style(FL_DOT);
+  int GY=6;if (ly<GY*3) GY=-1;
+  for (i=1;i<GY;i++){
+     int tmp=(int)(ly/(REALTYPE)GY*i);
+     fl_line(ox+2,oy+tmp,ox+lx-2,oy+tmp);
+  };
+  
+  
+  //draw the frequency response
+  if (active_r()) fl_color(FL_YELLOW);
+         else fl_color(200,200,80);
+  fl_line_style(FL_SOLID);
+  oiy=getresponse(ly,getfreqx(0.0));
+  for (i=1;i<lx;i++){
+     REALTYPE frq=getfreqx(i/(REALTYPE) lx);
+     if (frq>SAMPLE_RATE/2) break;
+     iy=getresponse(ly,frq);
+     if ((oiy>=0) && (oiy<ly) &&
+         (iy>=0) && (iy<ly) )
+          fl_line(ox+i-1,oy+ly-oiy,ox+i,oy+ly-iy);
+     oiy=iy;
+  };
 }
 
 int EQGraph::getresponse(int maxy,REALTYPE freq) {
   REALTYPE dbresp=eff->getEQfreqresponse(freq);
-int idbresp=(int) ((dbresp/maxdB+1.0)*maxy/2.0);
-
-
-//fprintf(stderr,"%.5f\n",(dbresp/maxdB+1.0)*maxy/2.0);
-
-
-return(idbresp);
+  int idbresp=(int) ((dbresp/maxdB+1.0)*maxy/2.0);
+  
+  
+  //fprintf(stderr,"%.5f\n",(dbresp/maxdB+1.0)*maxy/2.0);
+  
+  
+  return(idbresp);
 }
 
 REALTYPE EQGraph::getfreqx(REALTYPE x) {
   if (x>1.0) x=1.0;
-return(20.0*pow((REALTYPE)1000.0,x));
+  return(20.0*pow((REALTYPE)1000.0,x));
 }
 
 REALTYPE EQGraph::getfreqpos(REALTYPE freq) {
   if (freq<0.00001) freq=0.00001;
-return(log(freq/20.0)/log(1000.0));
+  return(log(freq/20.0)/log(1000.0));
 }
 
 void EffUI::cb_revp_i(Fl_Choice* o, void*) {
@@ -975,24 +975,24 @@ void EffUI::cb_Close(Fl_Button* o, void* v) {
 
 EffUI::EffUI(int x,int y, int w, int h, const char *label):Fl_Group(x,y,w,h,label) {
   eff=NULL;
-filterwindow=NULL;
+  filterwindow=NULL;
 }
 
 EffUI::~EffUI() {
   effnullwindow->hide();//delete (effnullwindow);
-effreverbwindow->hide();//delete (effreverbwindow);
-effechowindow->hide();//delete (effechowindow);
-effchoruswindow->hide();//delete (effchoruswindow);
-effphaserwindow->hide();//delete (effphaserwindow);
-effalienwahwindow->hide();//delete (effalienwahwindow);
-effdistorsionwindow->hide();//delete (effdistorsionwindow);
-effeqwindow->hide();//delete (effeqwindow);
-effdynamicfilterwindow->hide();//delete (effdynamicfilterwindow);
-
-if (filterwindow!=NULL){
-	filterwindow->hide();
-	delete(filterwindow);
-};
+  effreverbwindow->hide();//delete (effreverbwindow);
+  effechowindow->hide();//delete (effechowindow);
+  effchoruswindow->hide();//delete (effchoruswindow);
+  effphaserwindow->hide();//delete (effphaserwindow);
+  effalienwahwindow->hide();//delete (effalienwahwindow);
+  effdistorsionwindow->hide();//delete (effdistorsionwindow);
+  effeqwindow->hide();//delete (effeqwindow);
+  effdynamicfilterwindow->hide();//delete (effdynamicfilterwindow);
+  
+  if (filterwindow!=NULL){
+  	filterwindow->hide();
+  	delete(filterwindow);
+  };
 }
 
 Fl_Group* EffUI::make_null_window() {
@@ -2446,185 +2446,185 @@ Fl_Double_Window* EffUI::make_filter_window() {
 
 void EffUI::init(EffectMgr *eff_) {
   eff=eff_;
-
-make_null_window();
-make_reverb_window();
-make_echo_window();
-make_chorus_window();
-make_phaser_window();
-make_alienwah_window();
-make_distorsion_window();
-make_eq_window();
-make_dynamicfilter_window();
-
-int px=this->parent()->x();
-int py=this->parent()->y();
-
-effnullwindow->position(px,py);
-effreverbwindow->position(px,py);
-effechowindow->position(px,py);
-effchoruswindow->position(px,py);
-effphaserwindow->position(px,py);
-effalienwahwindow->position(px,py);
-effdistorsionwindow->position(px,py);
-effeqwindow->position(px,py);
-effdynamicfilterwindow->position(px,py);
-
-refresh(eff);
+  
+  make_null_window();
+  make_reverb_window();
+  make_echo_window();
+  make_chorus_window();
+  make_phaser_window();
+  make_alienwah_window();
+  make_distorsion_window();
+  make_eq_window();
+  make_dynamicfilter_window();
+  
+  int px=this->parent()->x();
+  int py=this->parent()->y();
+  
+  effnullwindow->position(px,py);
+  effreverbwindow->position(px,py);
+  effechowindow->position(px,py);
+  effchoruswindow->position(px,py);
+  effphaserwindow->position(px,py);
+  effalienwahwindow->position(px,py);
+  effdistorsionwindow->position(px,py);
+  effeqwindow->position(px,py);
+  effdynamicfilterwindow->position(px,py);
+  
+  refresh(eff);
 }
 
 void EffUI::refresh(EffectMgr *eff_) {
   eff=eff_;
-this->hide();
-
-effnullwindow->hide();
-effreverbwindow->hide();
-effechowindow->hide();
-effchoruswindow->hide();
-effphaserwindow->hide();
-effalienwahwindow->hide();
-effdistorsionwindow->hide();
-effeqwindow->hide();
-effdynamicfilterwindow->hide();
-
-eqband=0;
-
-if (filterwindow!=NULL){
-	filterwindow->hide();
-	delete(filterwindow);
-	filterwindow=NULL;
-};
-
-switch(eff->geteffect()){
-     case 1:
-	revp->value(eff->getpreset());
-	revp0->value(eff->geteffectpar(0));if (eff->insertion!=0) revp0->label("D/W");
-	revp1->value(eff->geteffectpar(1));
-	revp2->value(eff->geteffectpar(2));
-	revp3->value(eff->geteffectpar(3));
-	revp4->value(eff->geteffectpar(4));
-	//revp5->value(eff->geteffectpar(5));
-	revp6->value(eff->geteffectpar(6));
-	revp7->value(eff->geteffectpar(7));
-	revp8->value(eff->geteffectpar(8));
-	revp9->value(eff->geteffectpar(9));
-	revp10->value(eff->geteffectpar(10));
-	revp11->value(eff->geteffectpar(11));
-	revp12->value(eff->geteffectpar(12));
-            
-        effreverbwindow->show();
-        break; 
-     case 2:
-	echop->value(eff->getpreset());
-	echop0->value(eff->geteffectpar(0));if (eff->insertion!=0) echop0->label("D/W");
-	echop1->value(eff->geteffectpar(1));
-	echop2->value(eff->geteffectpar(2));
-	echop3->value(eff->geteffectpar(3));
-	echop4->value(eff->geteffectpar(4));
-	echop5->value(eff->geteffectpar(5));
-	echop6->value(eff->geteffectpar(6));
-	effechowindow->show();
-        break; 
-     case 3:
-	chorusp->value(eff->getpreset());
-	chorusp0->value(eff->geteffectpar(0));if (eff->insertion!=0) chorusp0->label("D/W");
-	chorusp1->value(eff->geteffectpar(1));
-	chorusp2->value(eff->geteffectpar(2));
-	chorusp3->value(eff->geteffectpar(3));
-	chorusp4->value(eff->geteffectpar(4));
-	chorusp5->value(eff->geteffectpar(5));
-	chorusp6->value(eff->geteffectpar(6));
-	chorusp7->value(eff->geteffectpar(7));
-	chorusp8->value(eff->geteffectpar(8));
-	chorusp9->value(eff->geteffectpar(9));
-	chorusp11->value(eff->geteffectpar(11));
-	effchoruswindow->show();
-        break; 
-     case 4:
-	phaserp->value(eff->getpreset());
-	phaserp0->value(eff->geteffectpar(0));if (eff->insertion!=0) phaserp0->label("D/W");
-	phaserp1->value(eff->geteffectpar(1));
-	phaserp2->value(eff->geteffectpar(2));
-	phaserp3->value(eff->geteffectpar(3));
-	phaserp4->value(eff->geteffectpar(4));
-	phaserp5->value(eff->geteffectpar(5));
-	phaserp6->value(eff->geteffectpar(6));
-	phaserp7->value(eff->geteffectpar(7));
-	phaserp8->value(eff->geteffectpar(8));
-	phaserp9->value(eff->geteffectpar(9));
-	phaserp10->value(eff->geteffectpar(10));
-	phaserp11->value(eff->geteffectpar(11));
-	phaserp12->value(eff->geteffectpar(12));
-	phaserp13->value(eff->geteffectpar(13));
-	phaserp14->value(eff->geteffectpar(14));
-	effphaserwindow->show();
-        break; 
-     case 5:
-	awp->value(eff->getpreset());
-	awp0->value(eff->geteffectpar(0));if (eff->insertion!=0) awp0->label("D/W");
-	awp1->value(eff->geteffectpar(1));
-	awp2->value(eff->geteffectpar(2));
-	awp3->value(eff->geteffectpar(3));
-	awp4->value(eff->geteffectpar(4));
-	awp5->value(eff->geteffectpar(5));
-	awp6->value(eff->geteffectpar(6));
-	awp7->value(eff->geteffectpar(7));
-	awp8->value(eff->geteffectpar(8));
-	awp9->value(eff->geteffectpar(9));
-	awp10->value(eff->geteffectpar(10));
-
-	effalienwahwindow->show();
-        break; 
-     case 6:
-	distp->value(eff->getpreset());
-	distp0->value(eff->geteffectpar(0));if (eff->insertion!=0) distp0->label("D/W");
-	distp1->value(eff->geteffectpar(1));
-	distp2->value(eff->geteffectpar(2));
-	distp3->value(eff->geteffectpar(3));
-	distp4->value(eff->geteffectpar(4));
-	distp5->value(eff->geteffectpar(5));
-	distp6->value(eff->geteffectpar(6));
-	distp7->value(eff->geteffectpar(7));
-	distp8->value(eff->geteffectpar(8));
-	distp9->value(eff->geteffectpar(9));
-	distp10->value(eff->geteffectpar(10));
-	effdistorsionwindow->show();
-        break;
-     case 7:eqband=0;
-	eqp0->value(eff->geteffectpar(0));
-	bandcounter->value(eqband);
-	bandcounter->do_callback();
-	typechoice->value(eff->geteffectpar(10));
-	eqgraph->redraw();
-	freqdial->value(eff->geteffectpar(11));
-	gaindial->value(eff->geteffectpar(12));
-	if (eff->geteffectpar(10)<6) gaindial->deactivate();
-	qdial->value(eff->geteffectpar(13));
-	stagescounter->value(eff->geteffectpar(14));
-        eqgraph->init(eff);
-	effeqwindow->show();
-        break;
-     case 8:make_filter_window();
-	dfp->value(eff->getpreset());
-	dfp0->value(eff->geteffectpar(0));if (eff->insertion!=0) dfp0->label("D/W");
-	dfp1->value(eff->geteffectpar(1));
-	dfp2->value(eff->geteffectpar(2));
-	dfp3->value(eff->geteffectpar(3));
-	dfp4->value(eff->geteffectpar(4));
-	dfp5->value(eff->geteffectpar(5));
-	dfp6->value(eff->geteffectpar(6));
-	dfp7->value(eff->geteffectpar(7));
-	dfp8->value(eff->geteffectpar(8));
-	dfp9->value(eff->geteffectpar(9));
-
-            
-	effdynamicfilterwindow->show();
-	break;
-    default:effnullwindow->show();
-            break; 
-};
-
-this->show();
+  this->hide();
+  
+  effnullwindow->hide();
+  effreverbwindow->hide();
+  effechowindow->hide();
+  effchoruswindow->hide();
+  effphaserwindow->hide();
+  effalienwahwindow->hide();
+  effdistorsionwindow->hide();
+  effeqwindow->hide();
+  effdynamicfilterwindow->hide();
+  
+  eqband=0;
+  
+  if (filterwindow!=NULL){
+  	filterwindow->hide();
+  	delete(filterwindow);
+  	filterwindow=NULL;
+  };
+  
+  switch(eff->geteffect()){
+       case 1:
+  	revp->value(eff->getpreset());
+  	revp0->value(eff->geteffectpar(0));if (eff->insertion!=0) revp0->label("D/W");
+  	revp1->value(eff->geteffectpar(1));
+  	revp2->value(eff->geteffectpar(2));
+  	revp3->value(eff->geteffectpar(3));
+  	revp4->value(eff->geteffectpar(4));
+  	//revp5->value(eff->geteffectpar(5));
+  	revp6->value(eff->geteffectpar(6));
+  	revp7->value(eff->geteffectpar(7));
+  	revp8->value(eff->geteffectpar(8));
+  	revp9->value(eff->geteffectpar(9));
+  	revp10->value(eff->geteffectpar(10));
+  	revp11->value(eff->geteffectpar(11));
+  	revp12->value(eff->geteffectpar(12));
+              
+          effreverbwindow->show();
+          break; 
+       case 2:
+  	echop->value(eff->getpreset());
+  	echop0->value(eff->geteffectpar(0));if (eff->insertion!=0) echop0->label("D/W");
+  	echop1->value(eff->geteffectpar(1));
+  	echop2->value(eff->geteffectpar(2));
+  	echop3->value(eff->geteffectpar(3));
+  	echop4->value(eff->geteffectpar(4));
+  	echop5->value(eff->geteffectpar(5));
+  	echop6->value(eff->geteffectpar(6));
+  	effechowindow->show();
+          break; 
+       case 3:
+  	chorusp->value(eff->getpreset());
+  	chorusp0->value(eff->geteffectpar(0));if (eff->insertion!=0) chorusp0->label("D/W");
+  	chorusp1->value(eff->geteffectpar(1));
+  	chorusp2->value(eff->geteffectpar(2));
+  	chorusp3->value(eff->geteffectpar(3));
+  	chorusp4->value(eff->geteffectpar(4));
+  	chorusp5->value(eff->geteffectpar(5));
+  	chorusp6->value(eff->geteffectpar(6));
+  	chorusp7->value(eff->geteffectpar(7));
+  	chorusp8->value(eff->geteffectpar(8));
+  	chorusp9->value(eff->geteffectpar(9));
+  	chorusp11->value(eff->geteffectpar(11));
+  	effchoruswindow->show();
+          break; 
+       case 4:
+  	phaserp->value(eff->getpreset());
+  	phaserp0->value(eff->geteffectpar(0));if (eff->insertion!=0) phaserp0->label("D/W");
+  	phaserp1->value(eff->geteffectpar(1));
+  	phaserp2->value(eff->geteffectpar(2));
+  	phaserp3->value(eff->geteffectpar(3));
+  	phaserp4->value(eff->geteffectpar(4));
+  	phaserp5->value(eff->geteffectpar(5));
+  	phaserp6->value(eff->geteffectpar(6));
+  	phaserp7->value(eff->geteffectpar(7));
+  	phaserp8->value(eff->geteffectpar(8));
+  	phaserp9->value(eff->geteffectpar(9));
+  	phaserp10->value(eff->geteffectpar(10));
+  	phaserp11->value(eff->geteffectpar(11));
+  	phaserp12->value(eff->geteffectpar(12));
+  	phaserp13->value(eff->geteffectpar(13));
+  	phaserp14->value(eff->geteffectpar(14));
+  	effphaserwindow->show();
+          break; 
+       case 5:
+  	awp->value(eff->getpreset());
+  	awp0->value(eff->geteffectpar(0));if (eff->insertion!=0) awp0->label("D/W");
+  	awp1->value(eff->geteffectpar(1));
+  	awp2->value(eff->geteffectpar(2));
+  	awp3->value(eff->geteffectpar(3));
+  	awp4->value(eff->geteffectpar(4));
+  	awp5->value(eff->geteffectpar(5));
+  	awp6->value(eff->geteffectpar(6));
+  	awp7->value(eff->geteffectpar(7));
+  	awp8->value(eff->geteffectpar(8));
+  	awp9->value(eff->geteffectpar(9));
+  	awp10->value(eff->geteffectpar(10));
+  
+  	effalienwahwindow->show();
+          break; 
+       case 6:
+  	distp->value(eff->getpreset());
+  	distp0->value(eff->geteffectpar(0));if (eff->insertion!=0) distp0->label("D/W");
+  	distp1->value(eff->geteffectpar(1));
+  	distp2->value(eff->geteffectpar(2));
+  	distp3->value(eff->geteffectpar(3));
+  	distp4->value(eff->geteffectpar(4));
+  	distp5->value(eff->geteffectpar(5));
+  	distp6->value(eff->geteffectpar(6));
+  	distp7->value(eff->geteffectpar(7));
+  	distp8->value(eff->geteffectpar(8));
+  	distp9->value(eff->geteffectpar(9));
+  	distp10->value(eff->geteffectpar(10));
+  	effdistorsionwindow->show();
+          break;
+       case 7:eqband=0;
+  	eqp0->value(eff->geteffectpar(0));
+  	bandcounter->value(eqband);
+  	bandcounter->do_callback();
+  	typechoice->value(eff->geteffectpar(10));
+  	eqgraph->redraw();
+  	freqdial->value(eff->geteffectpar(11));
+  	gaindial->value(eff->geteffectpar(12));
+  	if (eff->geteffectpar(10)<6) gaindial->deactivate();
+  	qdial->value(eff->geteffectpar(13));
+  	stagescounter->value(eff->geteffectpar(14));
+          eqgraph->init(eff);
+  	effeqwindow->show();
+          break;
+       case 8:make_filter_window();
+  	dfp->value(eff->getpreset());
+  	dfp0->value(eff->geteffectpar(0));if (eff->insertion!=0) dfp0->label("D/W");
+  	dfp1->value(eff->geteffectpar(1));
+  	dfp2->value(eff->geteffectpar(2));
+  	dfp3->value(eff->geteffectpar(3));
+  	dfp4->value(eff->geteffectpar(4));
+  	dfp5->value(eff->geteffectpar(5));
+  	dfp6->value(eff->geteffectpar(6));
+  	dfp7->value(eff->geteffectpar(7));
+  	dfp8->value(eff->geteffectpar(8));
+  	dfp9->value(eff->geteffectpar(9));
+  
+              
+  	effdynamicfilterwindow->show();
+  	break;
+      default:effnullwindow->show();
+              break; 
+  };
+  
+  this->show();
 }
 
 void EffUI::refresh() {
@@ -3113,14 +3113,14 @@ SimpleEffUI::SimpleEffUI(int x,int y, int w, int h, const char *label):Fl_Group(
 
 SimpleEffUI::~SimpleEffUI() {
   effnullwindow->hide();//delete (effnullwindow);
-effreverbwindow->hide();//delete (effreverbwindow);
-effechowindow->hide();//delete (effechowindow);
-effchoruswindow->hide();//delete (effchoruswindow);
-effphaserwindow->hide();//delete (effphaserwindow);
-effalienwahwindow->hide();//delete (effalienwahwindow);
-effdistorsionwindow->hide();//delete (effdistorsionwindow);
-effeqwindow->hide();//delete (effeqwindow);
-effdynamicfilterwindow->hide();//delete (effdynamicfilterwindow);
+  effreverbwindow->hide();//delete (effreverbwindow);
+  effechowindow->hide();//delete (effechowindow);
+  effchoruswindow->hide();//delete (effchoruswindow);
+  effphaserwindow->hide();//delete (effphaserwindow);
+  effalienwahwindow->hide();//delete (effalienwahwindow);
+  effdistorsionwindow->hide();//delete (effdistorsionwindow);
+  effeqwindow->hide();//delete (effeqwindow);
+  effdynamicfilterwindow->hide();//delete (effdynamicfilterwindow);
 }
 
 Fl_Group* SimpleEffUI::make_null_window() {
@@ -3981,131 +3981,131 @@ Fl_Group* SimpleEffUI::make_dynamicfilter_window() {
 
 void SimpleEffUI::init(EffectMgr *eff_) {
   eff=eff_;
-
-make_null_window();
-make_reverb_window();
-make_echo_window();
-make_chorus_window();
-make_phaser_window();
-make_alienwah_window();
-make_distorsion_window();
-make_eq_window();
-make_dynamicfilter_window();
-
-int px=this->parent()->x();
-int py=this->parent()->y();
-
-effnullwindow->position(px,py);
-effreverbwindow->position(px,py);
-effechowindow->position(px,py);
-effchoruswindow->position(px,py);
-effphaserwindow->position(px,py);
-effalienwahwindow->position(px,py);
-effdistorsionwindow->position(px,py);
-effeqwindow->position(px,py);
-effdynamicfilterwindow->position(px,py);
-
-refresh(eff);
+  
+  make_null_window();
+  make_reverb_window();
+  make_echo_window();
+  make_chorus_window();
+  make_phaser_window();
+  make_alienwah_window();
+  make_distorsion_window();
+  make_eq_window();
+  make_dynamicfilter_window();
+  
+  int px=this->parent()->x();
+  int py=this->parent()->y();
+  
+  effnullwindow->position(px,py);
+  effreverbwindow->position(px,py);
+  effechowindow->position(px,py);
+  effchoruswindow->position(px,py);
+  effphaserwindow->position(px,py);
+  effalienwahwindow->position(px,py);
+  effdistorsionwindow->position(px,py);
+  effeqwindow->position(px,py);
+  effdynamicfilterwindow->position(px,py);
+  
+  refresh(eff);
 }
 
 void SimpleEffUI::refresh(EffectMgr *eff_) {
   eff=eff_;
-this->hide();
-
-effnullwindow->hide();
-effreverbwindow->hide();
-effechowindow->hide();
-effchoruswindow->hide();
-effphaserwindow->hide();
-effalienwahwindow->hide();
-effdistorsionwindow->hide();
-effeqwindow->hide();
-effdynamicfilterwindow->hide();
-
-eqband=0;
-
-
-switch(eff->geteffect()){
-     case 1:
-	revp->value(eff->getpreset());
-	revp0->value(eff->geteffectpar(0));if (eff->insertion!=0) revp0->label("D/W");
-	revp2->value(eff->geteffectpar(2));
-	revp3->value(eff->geteffectpar(3));
-	revp9->value(eff->geteffectpar(9));          
-        effreverbwindow->show();
-        break; 
-     case 2:
-	echop->value(eff->getpreset());
-	echop0->value(eff->geteffectpar(0));if (eff->insertion!=0) echop0->label("D/W");
-	echop2->value(eff->geteffectpar(2));
-	echop5->value(eff->geteffectpar(5));
-	effechowindow->show();
-        break; 
-     case 3:
-	chorusp->value(eff->getpreset());
-	chorusp0->value(eff->geteffectpar(0));if (eff->insertion!=0) chorusp0->label("D/W");
-	chorusp2->value(eff->geteffectpar(2));
-	chorusp6->value(eff->geteffectpar(6));
-	chorusp7->value(eff->geteffectpar(7));
-	chorusp8->value(eff->geteffectpar(8));
-	effchoruswindow->show();
-        break; 
-     case 4:
-	phaserp->value(eff->getpreset());
-	phaserp0->value(eff->geteffectpar(0));if (eff->insertion!=0) phaserp0->label("D/W");
-	phaserp2->value(eff->geteffectpar(2));
-	phaserp5->value(eff->geteffectpar(5));
-	phaserp6->value(eff->geteffectpar(6));
-	phaserp7->value(eff->geteffectpar(7));
-	phaserp8->value(eff->geteffectpar(8));
-	effphaserwindow->show();
-        break; 
-     case 5:
-	awp->value(eff->getpreset());
-	awp0->value(eff->geteffectpar(0));if (eff->insertion!=0) awp0->label("D/W");
-	awp2->value(eff->geteffectpar(2));
-	awp6->value(eff->geteffectpar(6));
-	awp8->value(eff->geteffectpar(8));
-	effalienwahwindow->show();
-        break; 
-     case 6:
-	distp->value(eff->getpreset());
-	distp0->value(eff->geteffectpar(0));if (eff->insertion!=0) distp0->label("D/W");
-	distp3->value(eff->geteffectpar(3));
-	distp4->value(eff->geteffectpar(4));
-	distp5->value(eff->geteffectpar(5));
-	distp7->value(eff->geteffectpar(7));
-	effdistorsionwindow->show();
-        break;
-     case 7:
-	bandcounter->value(eqband);
-	bandcounter->do_callback();
-	typechoice->value(eff->geteffectpar(10));
-	eqgraph->redraw();
-	freqdial->value(eff->geteffectpar(11));
-	gaindial->value(eff->geteffectpar(12));
-	if (eff->geteffectpar(10)<6) gaindial->deactivate();
-	qdial->value(eff->geteffectpar(13));
-	stagescounter->value(eff->geteffectpar(14));
-        eqgraph->init(eff);
-	effeqwindow->show();
-        break;
-     case 8:
-	dfp->value(eff->getpreset());
-	dfp0->value(eff->geteffectpar(0));if (eff->insertion!=0) dfp0->label("D/W");
-	dfp2->value(eff->geteffectpar(2));
-	dfp6->value(eff->geteffectpar(6));
-	dfp7->value(eff->geteffectpar(7));
-	dfp9->value(eff->geteffectpar(9));
-
-            
-	effdynamicfilterwindow->show();
-	break;
-    default:effnullwindow->show();
-            break; 
-};
-
-this->show();
+  this->hide();
+  
+  effnullwindow->hide();
+  effreverbwindow->hide();
+  effechowindow->hide();
+  effchoruswindow->hide();
+  effphaserwindow->hide();
+  effalienwahwindow->hide();
+  effdistorsionwindow->hide();
+  effeqwindow->hide();
+  effdynamicfilterwindow->hide();
+  
+  eqband=0;
+  
+  
+  switch(eff->geteffect()){
+       case 1:
+  	revp->value(eff->getpreset());
+  	revp0->value(eff->geteffectpar(0));if (eff->insertion!=0) revp0->label("D/W");
+  	revp2->value(eff->geteffectpar(2));
+  	revp3->value(eff->geteffectpar(3));
+  	revp9->value(eff->geteffectpar(9));          
+          effreverbwindow->show();
+          break; 
+       case 2:
+  	echop->value(eff->getpreset());
+  	echop0->value(eff->geteffectpar(0));if (eff->insertion!=0) echop0->label("D/W");
+  	echop2->value(eff->geteffectpar(2));
+  	echop5->value(eff->geteffectpar(5));
+  	effechowindow->show();
+          break; 
+       case 3:
+  	chorusp->value(eff->getpreset());
+  	chorusp0->value(eff->geteffectpar(0));if (eff->insertion!=0) chorusp0->label("D/W");
+  	chorusp2->value(eff->geteffectpar(2));
+  	chorusp6->value(eff->geteffectpar(6));
+  	chorusp7->value(eff->geteffectpar(7));
+  	chorusp8->value(eff->geteffectpar(8));
+  	effchoruswindow->show();
+          break; 
+       case 4:
+  	phaserp->value(eff->getpreset());
+  	phaserp0->value(eff->geteffectpar(0));if (eff->insertion!=0) phaserp0->label("D/W");
+  	phaserp2->value(eff->geteffectpar(2));
+  	phaserp5->value(eff->geteffectpar(5));
+  	phaserp6->value(eff->geteffectpar(6));
+  	phaserp7->value(eff->geteffectpar(7));
+  	phaserp8->value(eff->geteffectpar(8));
+  	effphaserwindow->show();
+          break; 
+       case 5:
+  	awp->value(eff->getpreset());
+  	awp0->value(eff->geteffectpar(0));if (eff->insertion!=0) awp0->label("D/W");
+  	awp2->value(eff->geteffectpar(2));
+  	awp6->value(eff->geteffectpar(6));
+  	awp8->value(eff->geteffectpar(8));
+  	effalienwahwindow->show();
+          break; 
+       case 6:
+  	distp->value(eff->getpreset());
+  	distp0->value(eff->geteffectpar(0));if (eff->insertion!=0) distp0->label("D/W");
+  	distp3->value(eff->geteffectpar(3));
+  	distp4->value(eff->geteffectpar(4));
+  	distp5->value(eff->geteffectpar(5));
+  	distp7->value(eff->geteffectpar(7));
+  	effdistorsionwindow->show();
+          break;
+       case 7:
+  	bandcounter->value(eqband);
+  	bandcounter->do_callback();
+  	typechoice->value(eff->geteffectpar(10));
+  	eqgraph->redraw();
+  	freqdial->value(eff->geteffectpar(11));
+  	gaindial->value(eff->geteffectpar(12));
+  	if (eff->geteffectpar(10)<6) gaindial->deactivate();
+  	qdial->value(eff->geteffectpar(13));
+  	stagescounter->value(eff->geteffectpar(14));
+          eqgraph->init(eff);
+  	effeqwindow->show();
+          break;
+       case 8:
+  	dfp->value(eff->getpreset());
+  	dfp0->value(eff->geteffectpar(0));if (eff->insertion!=0) dfp0->label("D/W");
+  	dfp2->value(eff->geteffectpar(2));
+  	dfp6->value(eff->geteffectpar(6));
+  	dfp7->value(eff->geteffectpar(7));
+  	dfp9->value(eff->geteffectpar(9));
+  
+              
+  	effdynamicfilterwindow->show();
+  	break;
+      default:effnullwindow->show();
+              break; 
+  };
+  
+  this->show();
 }
 
 void SimpleEffUI::refresh() {

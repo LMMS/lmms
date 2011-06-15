@@ -10,148 +10,148 @@
 
 ResonanceGraph::ResonanceGraph(int x,int y, int w, int h, const char *label):Fl_Box(x,y,w,h,label) {
   respar=NULL;
-cbwidget=NULL;
-applybutton=NULL;
+  cbwidget=NULL;
+  applybutton=NULL;
 }
 
 void ResonanceGraph::init(Resonance *respar_,Fl_Value_Output *khzvalue_,Fl_Value_Output *dbvalue_) {
   respar=respar_;
-khzvalue=khzvalue_;
-dbvalue=dbvalue_;
-oldx=-1;
-khzval=-1;
+  khzvalue=khzvalue_;
+  dbvalue=dbvalue_;
+  oldx=-1;
+  khzval=-1;
 }
 
 void ResonanceGraph::draw_freq_line(REALTYPE freq,int type) {
   REALTYPE freqx=respar->getfreqpos(freq);
-switch(type){
-  case 0:fl_line_style(FL_SOLID);break;
-  case 1:fl_line_style(FL_DOT);break;
-  case 2:fl_line_style(FL_DASH);break;
-}; 
-
-
-if ((freqx>0.0)&&(freqx<1.0))
-   fl_line(x()+(int) (freqx*w()),y(),
-   x()+(int) (freqx*w()),y()+h());
+  switch(type){
+    case 0:fl_line_style(FL_SOLID);break;
+    case 1:fl_line_style(FL_DOT);break;
+    case 2:fl_line_style(FL_DASH);break;
+  }; 
+  
+  
+  if ((freqx>0.0)&&(freqx<1.0))
+     fl_line(x()+(int) (freqx*w()),y(),
+     x()+(int) (freqx*w()),y()+h());
 }
 
 void ResonanceGraph::draw() {
   int ox=x(),oy=y(),lx=w(),ly=h(),i,ix,iy,oiy;
-REALTYPE freqx;
-
-fl_color(FL_BLACK);
-fl_rectf(ox,oy,lx,ly);
-
-
-//draw the lines
-fl_color(FL_GRAY);
-
-fl_line_style(FL_SOLID);
-fl_line(ox+2,oy+ly/2,ox+lx-2,oy+ly/2);
-
-freqx=respar->getfreqpos(1000.0);
-if ((freqx>0.0)&&(freqx<1.0))
-   fl_line(ox+(int) (freqx*lx),oy,
-    ox+(int) (freqx*lx),oy+ly);
-
-for (i=1;i<10;i++){
-   if(i==1){
-     draw_freq_line(i*100.0,0);
-     draw_freq_line(i*1000.0,0);
-   }else 
-    if (i==5){
-      draw_freq_line(i*100.0,2);
-      draw_freq_line(i*1000.0,2);
-    }else{
-      draw_freq_line(i*100.0,1);
-      draw_freq_line(i*1000.0,1);
-    };
-};
-
-draw_freq_line(10000.0,0);
-draw_freq_line(20000.0,1);
-
-fl_line_style(FL_DOT);
-int GY=10;if (ly<GY*3) GY=-1;
-for (i=1;i<GY;i++){
-   int tmp=(int)(ly/(REALTYPE)GY*i);
-   fl_line(ox+2,oy+tmp,ox+lx-2,oy+tmp);
-};
-
-
-
-//draw the data
-fl_color(FL_RED);
-fl_line_style(FL_SOLID);
-oiy=(int)(respar->Prespoints[0]/128.0*ly);
-for (i=1;i<N_RES_POINTS;i++){
-   ix=(int)(i*1.0/N_RES_POINTS*lx);
-   iy=(int)(respar->Prespoints[i]/128.0*ly);
-   fl_line(ox+ix-1,oy+ly-oiy,ox+ix,oy+ly-iy);
-   oiy=iy;
-};
+  REALTYPE freqx;
+  
+  fl_color(FL_BLACK);
+  fl_rectf(ox,oy,lx,ly);
+  
+  
+  //draw the lines
+  fl_color(FL_GRAY);
+  
+  fl_line_style(FL_SOLID);
+  fl_line(ox+2,oy+ly/2,ox+lx-2,oy+ly/2);
+  
+  freqx=respar->getfreqpos(1000.0);
+  if ((freqx>0.0)&&(freqx<1.0))
+     fl_line(ox+(int) (freqx*lx),oy,
+      ox+(int) (freqx*lx),oy+ly);
+  
+  for (i=1;i<10;i++){
+     if(i==1){
+       draw_freq_line(i*100.0,0);
+       draw_freq_line(i*1000.0,0);
+     }else 
+      if (i==5){
+        draw_freq_line(i*100.0,2);
+        draw_freq_line(i*1000.0,2);
+      }else{
+        draw_freq_line(i*100.0,1);
+        draw_freq_line(i*1000.0,1);
+      };
+  };
+  
+  draw_freq_line(10000.0,0);
+  draw_freq_line(20000.0,1);
+  
+  fl_line_style(FL_DOT);
+  int GY=10;if (ly<GY*3) GY=-1;
+  for (i=1;i<GY;i++){
+     int tmp=(int)(ly/(REALTYPE)GY*i);
+     fl_line(ox+2,oy+tmp,ox+lx-2,oy+tmp);
+  };
+  
+  
+  
+  //draw the data
+  fl_color(FL_RED);
+  fl_line_style(FL_SOLID);
+  oiy=(int)(respar->Prespoints[0]/128.0*ly);
+  for (i=1;i<N_RES_POINTS;i++){
+     ix=(int)(i*1.0/N_RES_POINTS*lx);
+     iy=(int)(respar->Prespoints[i]/128.0*ly);
+     fl_line(ox+ix-1,oy+ly-oiy,ox+ix,oy+ly-iy);
+     oiy=iy;
+  };
 }
 
 int ResonanceGraph::handle(int event) {
   int x_=Fl::event_x()-x();
-int y_=Fl::event_y()-y();
-if ( (x_>=0)&&(x_<w()) && (y_>=0)&&(y_<h())){
-   khzvalue->value(respar->getfreqx(x_*1.0/w())/1000.0);
-   dbvalue->value((1.0-y_*2.0/h())*respar->PmaxdB);
-};
-
-if ((event==FL_PUSH)||(event==FL_DRAG)){
-  int leftbutton=1;
-  if (Fl::event_button()==FL_RIGHT_MOUSE) leftbutton=0;
-  if (x_<0) x_=0;if (y_<0) y_=0;
-  if (x_>=w()) x_=w();if (y_>=h()-1) y_=h()-1;
-
-  if ((oldx<0)||(oldx==x_)){
-    int sn=(int)(x_*1.0/w()*N_RES_POINTS);
-    int sp=127-(int)(y_*1.0/h()*127);
-    if (leftbutton!=0) respar->setpoint(sn,sp);
-        else respar->setpoint(sn,64);
-  } else {
-    int x1=oldx;
-    int x2=x_;
-    int y1=oldy;
-    int y2=y_;
-    if (oldx>x_){
-      x1=x_;y1=y_;
-      x2=oldx;y2=oldy;
-    };
-   for (int i=0;i<x2-x1;i++){
-      int sn=(int)((i+x1)*1.0/w()*N_RES_POINTS);
-      REALTYPE yy=(y2-y1)*1.0/(x2-x1)*i;
-      int sp=127-(int)((y1+yy)/h()*127);
-      if (leftbutton!=0) respar->setpoint(sn,sp);
-         else respar->setpoint(sn,64);
-    };
+  int y_=Fl::event_y()-y();
+  if ( (x_>=0)&&(x_<w()) && (y_>=0)&&(y_<h())){
+     khzvalue->value(respar->getfreqx(x_*1.0/w())/1000.0);
+     dbvalue->value((1.0-y_*2.0/h())*respar->PmaxdB);
   };
-
-  oldx=x_;oldy=y_;
-  redraw();
-};
-
-if (event==FL_RELEASE) {
-	oldx=-1;
-	if (cbwidget!=NULL) {
-		cbwidget->do_callback();
-		if (applybutton!=NULL) {
-			applybutton->color(FL_RED);
-			applybutton->redraw();
-
-		};
-	};
-};
-
-return(1);
+  
+  if ((event==FL_PUSH)||(event==FL_DRAG)){
+    int leftbutton=1;
+    if (Fl::event_button()==FL_RIGHT_MOUSE) leftbutton=0;
+    if (x_<0) x_=0;if (y_<0) y_=0;
+    if (x_>=w()) x_=w();if (y_>=h()-1) y_=h()-1;
+  
+    if ((oldx<0)||(oldx==x_)){
+      int sn=(int)(x_*1.0/w()*N_RES_POINTS);
+      int sp=127-(int)(y_*1.0/h()*127);
+      if (leftbutton!=0) respar->setpoint(sn,sp);
+          else respar->setpoint(sn,64);
+    } else {
+      int x1=oldx;
+      int x2=x_;
+      int y1=oldy;
+      int y2=y_;
+      if (oldx>x_){
+        x1=x_;y1=y_;
+        x2=oldx;y2=oldy;
+      };
+     for (int i=0;i<x2-x1;i++){
+        int sn=(int)((i+x1)*1.0/w()*N_RES_POINTS);
+        REALTYPE yy=(y2-y1)*1.0/(x2-x1)*i;
+        int sp=127-(int)((y1+yy)/h()*127);
+        if (leftbutton!=0) respar->setpoint(sn,sp);
+           else respar->setpoint(sn,64);
+      };
+    };
+  
+    oldx=x_;oldy=y_;
+    redraw();
+  };
+  
+  if (event==FL_RELEASE) {
+  	oldx=-1;
+  	if (cbwidget!=NULL) {
+  		cbwidget->do_callback();
+  		if (applybutton!=NULL) {
+  			applybutton->color(FL_RED);
+  			applybutton->redraw();
+  
+  		};
+  	};
+  };
+  
+  return(1);
 }
 
 void ResonanceGraph::setcbwidget(Fl_Widget *cbwidget,Fl_Widget *applybutton) {
   this->cbwidget=cbwidget;
-this->applybutton=applybutton;
+  this->applybutton=applybutton;
 }
 
 void ResonanceUI::cb_Close_i(Fl_Button*, void*) {
@@ -508,10 +508,10 @@ Fl_Double_Window* ResonanceUI::make_window() {
 
 ResonanceUI::ResonanceUI(Resonance *respar_) {
   respar=respar_;
-cbwidget=NULL;
-cbapplywidget=NULL;
-make_window();
-applybutton->hide();
+  cbwidget=NULL;
+  cbapplywidget=NULL;
+  make_window();
+  applybutton->hide();
 }
 
 ResonanceUI::~ResonanceUI() {
@@ -520,34 +520,34 @@ ResonanceUI::~ResonanceUI() {
 
 void ResonanceUI::redrawPADnoteApply() {
   if (cbwidget!=NULL) {
-	cbwidget->do_callback();
-	applybutton->color(FL_RED);
-	applybutton->redraw();
-};
+  	cbwidget->do_callback();
+  	applybutton->color(FL_RED);
+  	applybutton->redraw();
+  };
 }
 
 void ResonanceUI::setcbwidget(Fl_Widget *cbwidget,Fl_Widget *cbapplywidget) {
   this->cbwidget=cbwidget;
-this->cbapplywidget=cbapplywidget;
-rg->setcbwidget(cbwidget,applybutton);
-applybutton->show();
+  this->cbapplywidget=cbapplywidget;
+  rg->setcbwidget(cbwidget,applybutton);
+  applybutton->show();
 }
 
 void ResonanceUI::refresh() {
   redrawPADnoteApply();
-
-enabled->value(respar->Penabled);
-
-maxdb->value(respar->PmaxdB);
-maxdbvo->value(respar->PmaxdB);
-
-centerfreqvo->value(respar->getcenterfreq()/1000.0);
-octavesfreqvo->value(respar->getoctavesfreq());
-
-centerfreq->value(respar->Pcenterfreq);
-octavesfreq->value(respar->Poctavesfreq);
-
-p1st->value(respar->Pprotectthefundamental);
-
-rg->redraw();
+  
+  enabled->value(respar->Penabled);
+  
+  maxdb->value(respar->PmaxdB);
+  maxdbvo->value(respar->PmaxdB);
+  
+  centerfreqvo->value(respar->getcenterfreq()/1000.0);
+  octavesfreqvo->value(respar->getoctavesfreq());
+  
+  centerfreq->value(respar->Pcenterfreq);
+  octavesfreq->value(respar->Poctavesfreq);
+  
+  p1st->value(respar->Pprotectthefundamental);
+  
+  rg->redraw();
 }

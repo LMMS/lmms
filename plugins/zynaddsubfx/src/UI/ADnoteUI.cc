@@ -202,39 +202,39 @@ Fl_Group* ADvoicelistitem::make_window() {
 
 ADvoicelistitem::ADvoicelistitem(int x,int y, int w, int h, const char *label):Fl_Group(x,y,w,h,label) {
   nvoice=0;
-pars=NULL;
+  pars=NULL;
 }
 
 void ADvoicelistitem::init(ADnoteParameters *parameters,int nvoice_,Master *master_) {
   pars=parameters;
-nvoice=nvoice_;
-master=master_;
-make_window();
-ADnoteVoiceListItem->show();
-end();
+  nvoice=nvoice_;
+  master=master_;
+  make_window();
+  ADnoteVoiceListItem->show();
+  end();
 }
 
 void ADvoicelistitem::refreshlist() {
   voiceenabled->value(pars->VoicePar[nvoice].Enabled);
-voiceresonanceenabled->value(pars->VoicePar[nvoice].Presonance);
-voicevolume->value(pars->VoicePar[nvoice].PVolume);
-voicedetune->value(pars->VoicePar[nvoice].PDetune-8192);
-voicepanning->value(pars->VoicePar[nvoice].PPanning);
-voicelfofreq->value(pars->VoicePar[nvoice].FreqLfo->Pintensity);
-if (pars->VoicePar[nvoice].Pextoscil != -1) {
-  osc->init(pars->VoicePar[pars->VoicePar[nvoice].Pextoscil].OscilSmp,0,pars->VoicePar[nvoice].Poscilphase,master);
-} else 
-  osc->init(pars->VoicePar[nvoice].OscilSmp,0,pars->VoicePar[nvoice].Poscilphase,master);
-if (pars->VoicePar[nvoice].Enabled==0) voicelistitemgroup->deactivate();
-    else voicelistitemgroup->activate();
-detunevalueoutput->do_callback();
-noiselabel->do_callback();
-ADnoteVoiceListItem->redraw();
+  voiceresonanceenabled->value(pars->VoicePar[nvoice].Presonance);
+  voicevolume->value(pars->VoicePar[nvoice].PVolume);
+  voicedetune->value(pars->VoicePar[nvoice].PDetune-8192);
+  voicepanning->value(pars->VoicePar[nvoice].PPanning);
+  voicelfofreq->value(pars->VoicePar[nvoice].FreqLfo->Pintensity);
+  if (pars->VoicePar[nvoice].Pextoscil != -1) {
+    osc->init(pars->VoicePar[pars->VoicePar[nvoice].Pextoscil].OscilSmp,0,pars->VoicePar[nvoice].Poscilphase,master);
+  } else 
+    osc->init(pars->VoicePar[nvoice].OscilSmp,0,pars->VoicePar[nvoice].Poscilphase,master);
+  if (pars->VoicePar[nvoice].Enabled==0) voicelistitemgroup->deactivate();
+      else voicelistitemgroup->activate();
+  detunevalueoutput->do_callback();
+  noiselabel->do_callback();
+  ADnoteVoiceListItem->redraw();
 }
 
 ADvoicelistitem::~ADvoicelistitem() {
   ADnoteVoiceListItem->hide();
-//delete(ADnoteVoiceListItem);
+  //delete(ADnoteVoiceListItem);
 }
 
 void ADvoiceUI::cb_Enable_i(Fl_Check_Button* o, void*) {
@@ -1469,26 +1469,26 @@ cy)");
 
 ADvoiceUI::ADvoiceUI(int x,int y, int w, int h, const char *label):Fl_Group(x,y,w,h,label) {
   nvoice=0;
-pars=NULL;
-oscedit=NULL;
+  pars=NULL;
+  oscedit=NULL;
 }
 
 void ADvoiceUI::init(ADnoteParameters *parameters,int nvoice_,Master *master_) {
   pars=parameters;
-nvoice=nvoice_;
-master=master_;
-make_window();
-end();
-ADnoteVoiceParameters->show();
+  nvoice=nvoice_;
+  master=master_;
+  make_window();
+  end();
+  ADnoteVoiceParameters->show();
 }
 
 ADvoiceUI::~ADvoiceUI() {
   ADnoteVoiceParameters->hide();
-hide();
-if (oscedit!=NULL) {
-    delete(oscedit);
-};
-//delete (ADnoteVoiceParameters);
+  hide();
+  if (oscedit!=NULL) {
+      delete(oscedit);
+  };
+  //delete (ADnoteVoiceParameters);
 }
 
 void ADnoteUI::cb_octave_i(Fl_Counter* o, void*) {
@@ -2148,55 +2148,55 @@ Fl_Double_Window* ADnoteUI::make_window() {
 
 ADnoteUI::ADnoteUI(ADnoteParameters *parameters,Master *master_) {
   pars=parameters;
-master=master_;
-nvoice=0;
-resui=new ResonanceUI(pars->GlobalPar.Reson);
-make_window();
+  master=master_;
+  nvoice=0;
+  resui=new ResonanceUI(pars->GlobalPar.Reson);
+  make_window();
 }
 
 ADnoteUI::~ADnoteUI() {
   ADnoteVoiceList->hide();
-ADnoteGlobalParameters->hide();
-ADnoteVoice->hide();
-delete(ADnoteVoiceList);
-delete(ADnoteGlobalParameters);
-delete(ADnoteVoice);
-delete(resui);
+  ADnoteGlobalParameters->hide();
+  ADnoteVoice->hide();
+  delete(ADnoteVoiceList);
+  delete(ADnoteGlobalParameters);
+  delete(ADnoteVoice);
+  delete(resui);
 }
 
 void ADnoteUI::refresh() {
   volume->value(pars->GlobalPar.PVolume);
-vsns->value(pars->GlobalPar.PAmpVelocityScaleFunction);
-pan->value(pars->GlobalPar.PPanning);
-
-stereo->value(pars->GlobalPar.PStereo);
-rndgrp->value(pars->GlobalPar.Hrandgrouping);
-
-pstr->value(pars->GlobalPar.PPunchStrength);
-pt->value(pars->GlobalPar.PPunchTime);
-pstc->value(pars->GlobalPar.PPunchStretch);
-pvel->value(pars->GlobalPar.PPunchVelocitySensing);
-
-detunevalueoutput->value(getdetune(pars->GlobalPar.PDetuneType,0,pars->GlobalPar.PDetune));
-freq->value(pars->GlobalPar.PDetune-8192);
-
-int k=pars->GlobalPar.PCoarseDetune/1024;if (k>=8) k-=16;
-octave->value(k);
-
-detunetype->value(pars->GlobalPar.PDetuneType-1);
-k=pars->GlobalPar.PCoarseDetune%1024;if (k>=512) k-=1024;
-coarsedet->value(k);
-amplfo->refresh();
-freqlfo->refresh();
-filterlfo->refresh();
-
-ampenv->refresh();
-freqenv->refresh();
-filterenv->refresh();
-filterui->refresh();
-
-for (int i=0;i<NUM_VOICES;i++) voicelistitem[i]->refreshlist();
-
-resui->refresh();
-currentvoicecounter->do_callback();
+  vsns->value(pars->GlobalPar.PAmpVelocityScaleFunction);
+  pan->value(pars->GlobalPar.PPanning);
+  
+  stereo->value(pars->GlobalPar.PStereo);
+  rndgrp->value(pars->GlobalPar.Hrandgrouping);
+  
+  pstr->value(pars->GlobalPar.PPunchStrength);
+  pt->value(pars->GlobalPar.PPunchTime);
+  pstc->value(pars->GlobalPar.PPunchStretch);
+  pvel->value(pars->GlobalPar.PPunchVelocitySensing);
+  
+  detunevalueoutput->value(getdetune(pars->GlobalPar.PDetuneType,0,pars->GlobalPar.PDetune));
+  freq->value(pars->GlobalPar.PDetune-8192);
+  
+  int k=pars->GlobalPar.PCoarseDetune/1024;if (k>=8) k-=16;
+  octave->value(k);
+  
+  detunetype->value(pars->GlobalPar.PDetuneType-1);
+  k=pars->GlobalPar.PCoarseDetune%1024;if (k>=512) k-=1024;
+  coarsedet->value(k);
+  amplfo->refresh();
+  freqlfo->refresh();
+  filterlfo->refresh();
+  
+  ampenv->refresh();
+  freqenv->refresh();
+  filterenv->refresh();
+  filterui->refresh();
+  
+  for (int i=0;i<NUM_VOICES;i++) voicelistitem[i]->refreshlist();
+  
+  resui->refresh();
+  currentvoicecounter->do_callback();
 }

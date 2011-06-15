@@ -6,107 +6,107 @@
 
 FormantFilterGraph::FormantFilterGraph(int x,int y, int w, int h, const char *label):Fl_Box(x,y,w,h,label) {
   pars=NULL;
-nvowel=NULL;
-nformant=NULL;
-graphpoints=NULL;
+  nvowel=NULL;
+  nformant=NULL;
+  graphpoints=NULL;
 }
 
 void FormantFilterGraph::init(FilterParams *pars_,int *nvowel_,int *nformant_) {
   pars=pars_;
-nvowel=nvowel_;
-nformant=nformant_;
-oldx=-1;
-graphpoints=new REALTYPE [w()];
+  nvowel=nvowel_;
+  nformant=nformant_;
+  oldx=-1;
+  graphpoints=new REALTYPE [w()];
 }
 
 void FormantFilterGraph::draw_freq_line(REALTYPE freq,int type) {
   REALTYPE freqx=pars->getfreqpos(freq);
-switch(type){
-  case 0:fl_line_style(FL_SOLID);break;
-  case 1:fl_line_style(FL_DOT);break;
-  case 2:fl_line_style(FL_DASH);break;
-}; 
-
-
-if ((freqx>0.0)&&(freqx<1.0))
-   fl_line(x()+(int) (freqx*w()),y(),
-   x()+(int) (freqx*w()),y()+h());
+  switch(type){
+    case 0:fl_line_style(FL_SOLID);break;
+    case 1:fl_line_style(FL_DOT);break;
+    case 2:fl_line_style(FL_DASH);break;
+  }; 
+  
+  
+  if ((freqx>0.0)&&(freqx<1.0))
+     fl_line(x()+(int) (freqx*w()),y(),
+     x()+(int) (freqx*w()),y()+h());
 }
 
 void FormantFilterGraph::draw() {
   int maxdB=30;
-int ox=x(),oy=y(),lx=w(),ly=h(),i,oiy;
-REALTYPE freqx;
-
-fl_color(FL_BLACK);
-fl_rectf(ox,oy,lx,ly);
-
-
-//draw the lines
-fl_color(FL_GRAY);
-
-fl_line_style(FL_SOLID);
-//fl_line(ox+2,oy+ly/2,ox+lx-2,oy+ly/2);
-
-freqx=pars->getfreqpos(1000.0);
-if ((freqx>0.0)&&(freqx<1.0))
-   fl_line(ox+(int) (freqx*lx),oy,
-    ox+(int) (freqx*lx),oy+ly);
-
-for (i=1;i<10;i++){
-   if(i==1){
-     draw_freq_line(i*100.0,0);
-     draw_freq_line(i*1000.0,0);
-   }else 
-    if (i==5){
-      draw_freq_line(i*100.0,2);
-      draw_freq_line(i*1000.0,2);
-    }else{
-      draw_freq_line(i*100.0,1);
-      draw_freq_line(i*1000.0,1);
-    };
-};
-
-draw_freq_line(10000.0,0);
-draw_freq_line(20000.0,1);
-
-fl_line_style(FL_DOT);
-int GY=10;if (ly<GY*3) GY=-1;
-for (i=1;i<GY;i++){
-   int tmp=(int)(ly/(REALTYPE)GY*i);
-   fl_line(ox+2,oy+tmp,ox+lx-2,oy+tmp);
-};
-
-fl_color(FL_YELLOW);
-fl_font(FL_HELVETICA,10);
-if (*nformant<pars->Pnumformants){
-   draw_freq_line(pars->getformantfreq(pars->Pvowels[*nvowel].formants[*nformant].freq),2);
-
-//show some information (like current formant frequency,amplitude)
-   char tmpstr[20];
-
-   snprintf(tmpstr,20,"%.2f kHz",pars->getformantfreq(pars->Pvowels[*nvowel].formants[*nformant].freq)*0.001);
-   fl_draw(tmpstr,ox+1,oy+1,40,12,FL_ALIGN_LEFT,NULL,0);
-
-   snprintf(tmpstr,20,"%d dB",(int)( rap2dB(1e-9 + pars->getformantamp(pars->Pvowels[*nvowel].formants[*nformant].amp)) + pars->getgain() ));
-   fl_draw(tmpstr,ox+1,oy+15,40,12,FL_ALIGN_LEFT,NULL,0);
-
-};
-
-//draw the data
-
-fl_color(FL_RED);
-fl_line_style(FL_SOLID);
-
-pars->formantfilterH(*nvowel,lx,graphpoints);
-
-oiy=(int) ((graphpoints[0]/maxdB+1.0)*ly/2.0);
-for (i=1;i<lx;i++){
-   int iy=(int) ((graphpoints[i]/maxdB+1.0)*ly/2.0);
-   if ((iy>=0)&&(oiy>=0)&&(iy<ly)&&(oiy<lx))
-      fl_line(ox+i-1,oy+ly-oiy,ox+i,oy+ly-iy);
-   oiy=iy;
-};
+  int ox=x(),oy=y(),lx=w(),ly=h(),i,oiy;
+  REALTYPE freqx;
+  
+  fl_color(FL_BLACK);
+  fl_rectf(ox,oy,lx,ly);
+  
+  
+  //draw the lines
+  fl_color(FL_GRAY);
+  
+  fl_line_style(FL_SOLID);
+  //fl_line(ox+2,oy+ly/2,ox+lx-2,oy+ly/2);
+  
+  freqx=pars->getfreqpos(1000.0);
+  if ((freqx>0.0)&&(freqx<1.0))
+     fl_line(ox+(int) (freqx*lx),oy,
+      ox+(int) (freqx*lx),oy+ly);
+  
+  for (i=1;i<10;i++){
+     if(i==1){
+       draw_freq_line(i*100.0,0);
+       draw_freq_line(i*1000.0,0);
+     }else 
+      if (i==5){
+        draw_freq_line(i*100.0,2);
+        draw_freq_line(i*1000.0,2);
+      }else{
+        draw_freq_line(i*100.0,1);
+        draw_freq_line(i*1000.0,1);
+      };
+  };
+  
+  draw_freq_line(10000.0,0);
+  draw_freq_line(20000.0,1);
+  
+  fl_line_style(FL_DOT);
+  int GY=10;if (ly<GY*3) GY=-1;
+  for (i=1;i<GY;i++){
+     int tmp=(int)(ly/(REALTYPE)GY*i);
+     fl_line(ox+2,oy+tmp,ox+lx-2,oy+tmp);
+  };
+  
+  fl_color(FL_YELLOW);
+  fl_font(FL_HELVETICA,10);
+  if (*nformant<pars->Pnumformants){
+     draw_freq_line(pars->getformantfreq(pars->Pvowels[*nvowel].formants[*nformant].freq),2);
+  
+  //show some information (like current formant frequency,amplitude)
+     char tmpstr[20];
+  
+     snprintf(tmpstr,20,"%.2f kHz",pars->getformantfreq(pars->Pvowels[*nvowel].formants[*nformant].freq)*0.001);
+     fl_draw(tmpstr,ox+1,oy+1,40,12,FL_ALIGN_LEFT,NULL,0);
+  
+     snprintf(tmpstr,20,"%d dB",(int)( rap2dB(1e-9 + pars->getformantamp(pars->Pvowels[*nvowel].formants[*nformant].amp)) + pars->getgain() ));
+     fl_draw(tmpstr,ox+1,oy+15,40,12,FL_ALIGN_LEFT,NULL,0);
+  
+  };
+  
+  //draw the data
+  
+  fl_color(FL_RED);
+  fl_line_style(FL_SOLID);
+  
+  pars->formantfilterH(*nvowel,lx,graphpoints);
+  
+  oiy=(int) ((graphpoints[0]/maxdB+1.0)*ly/2.0);
+  for (i=1;i<lx;i++){
+     int iy=(int) ((graphpoints[i]/maxdB+1.0)*ly/2.0);
+     if ((iy>=0)&&(oiy>=0)&&(iy<ly)&&(oiy<lx))
+        fl_line(ox+i-1,oy+ly-oiy,ox+i,oy+ly-iy);
+     oiy=iy;
+  };
 }
 
 FormantFilterGraph::~FormantFilterGraph() {
@@ -409,17 +409,17 @@ void FilterUI::cb_P1(Fl_Button* o, void* v) {
 
 FilterUI::FilterUI(int x,int y, int w, int h, const char *label):Fl_Group(x,y,w,h,label) {
   pars=NULL;
-velsnsamp=NULL;
-velsns=NULL;
-nvowel=0;nformant=0;nseqpos=0;
+  velsnsamp=NULL;
+  velsns=NULL;
+  nvowel=0;nformant=0;nseqpos=0;
 }
 
 FilterUI::~FilterUI() {
   filterui->hide();
-formantparswindow->hide();
-hide();
-//delete (filterui);
-delete (formantparswindow);
+  formantparswindow->hide();
+  hide();
+  //delete (filterui);
+  delete (formantparswindow);
 }
 
 Fl_Group* FilterUI::make_window() {
@@ -875,113 +875,113 @@ Fl_Double_Window* FilterUI::make_formant_window() {
 
 void FilterUI::update_formant_window() {
   formant_freq_dial->value(pars->Pvowels[nvowel].formants[nformant].freq);
-formant_q_dial->value(pars->Pvowels[nvowel].formants[nformant].q);
-formant_amp_dial->value(pars->Pvowels[nvowel].formants[nformant].amp);
-if (nformant<pars->Pnumformants) formantparsgroup->activate();
-	else formantparsgroup->deactivate();
-
-if (nseqpos<pars->Psequencesize) vowel_counter->activate();
-	else vowel_counter->deactivate();
-
-
-vowel_counter->value(pars->Psequence[nseqpos].nvowel);
+  formant_q_dial->value(pars->Pvowels[nvowel].formants[nformant].q);
+  formant_amp_dial->value(pars->Pvowels[nvowel].formants[nformant].amp);
+  if (nformant<pars->Pnumformants) formantparsgroup->activate();
+  	else formantparsgroup->deactivate();
+  
+  if (nseqpos<pars->Psequencesize) vowel_counter->activate();
+  	else vowel_counter->deactivate();
+  
+  
+  vowel_counter->value(pars->Psequence[nseqpos].nvowel);
 }
 
 void FilterUI::refresh() {
   update_formant_window();
-formantfiltergraph->redraw();
-
-if (pars->Pcategory==0) svfiltertypechoice->value(pars->Ptype);
-if (pars->Pcategory==2) analogfiltertypechoice->value(pars->Ptype);
-
-filtertype->value(pars->Pcategory);
-
-cfreqdial->value(pars->Pfreq);
-qdial->value(pars->Pq);
-
-freqtrdial->value(pars->Pfreqtrack);
-gaindial->value(pars->Pgain);
-
-stcounter->value(pars->Pstages);
-
-int categ=pars->Pcategory;
-if ((categ==0)||(categ==2)) {
-	if (categ==0) {
-           analogfiltertypechoice->show();
-           svfiltertypechoice->hide();
-        } else {
-           svfiltertypechoice->show();
-           analogfiltertypechoice->hide();
-        };
-	editbutton->hide();
-        formantparswindow->hide();
-        cfreqdial->label("C.freq");
-} else {
-	analogfiltertypechoice->hide();
-	svfiltertypechoice->hide();
-	editbutton->show();
-        cfreqdial->label("BS.pos");
-};
-
-filterparamswindow->redraw();
+  formantfiltergraph->redraw();
+  
+  if (pars->Pcategory==0) svfiltertypechoice->value(pars->Ptype);
+  if (pars->Pcategory==2) analogfiltertypechoice->value(pars->Ptype);
+  
+  filtertype->value(pars->Pcategory);
+  
+  cfreqdial->value(pars->Pfreq);
+  qdial->value(pars->Pq);
+  
+  freqtrdial->value(pars->Pfreqtrack);
+  gaindial->value(pars->Pgain);
+  
+  stcounter->value(pars->Pstages);
+  
+  int categ=pars->Pcategory;
+  if ((categ==0)||(categ==2)) {
+  	if (categ==0) {
+             analogfiltertypechoice->show();
+             svfiltertypechoice->hide();
+          } else {
+             svfiltertypechoice->show();
+             analogfiltertypechoice->hide();
+          };
+  	editbutton->hide();
+          formantparswindow->hide();
+          cfreqdial->label("C.freq");
+  } else {
+  	analogfiltertypechoice->hide();
+  	svfiltertypechoice->hide();
+  	editbutton->show();
+          cfreqdial->label("BS.pos");
+  };
+  
+  filterparamswindow->redraw();
 }
 
 void FilterUI::init(FilterParams *filterpars_,unsigned char *velsnsamp_,unsigned char *velsns_) {
   pars=filterpars_;
-velsnsamp=velsnsamp_;
-velsns=velsns_;
-
-make_window();
-end();
-make_formant_window();
-
-
-filterui->resize(this->x(),this->y(),this->w(),this->h());
-
-
-if (velsnsamp==NULL){
-	vsnsadial->deactivate();
-	vsnsadial->value(127);
-   } else vsnsadial->value(*velsnsamp);
-
-if (velsns==NULL){
-	vsnsdial->deactivate();
-	vsnsdial->value(127);
-   } else vsnsdial->value(*velsns);
-
-switchcategory(pars->Pcategory);
-
-
-formantparswindow->label(this->label());
-
-update_formant_window();
+  velsnsamp=velsnsamp_;
+  velsns=velsns_;
+  
+  make_window();
+  end();
+  make_formant_window();
+  
+  
+  filterui->resize(this->x(),this->y(),this->w(),this->h());
+  
+  
+  if (velsnsamp==NULL){
+  	vsnsadial->deactivate();
+  	vsnsadial->value(127);
+     } else vsnsadial->value(*velsnsamp);
+  
+  if (velsns==NULL){
+  	vsnsdial->deactivate();
+  	vsnsdial->value(127);
+     } else vsnsdial->value(*velsns);
+  
+  switchcategory(pars->Pcategory);
+  
+  
+  formantparswindow->label(this->label());
+  
+  update_formant_window();
 }
 
 void FilterUI::switchcategory(int newcat) {
   if (pars->Pcategory!=newcat){
-    pars->Pgain=64;
-    gaindial->value(64);
-    analogfiltertypechoice->value(0);
-    analogfiltertypechoice->do_callback();
-    svfiltertypechoice->value(0);
-    svfiltertypechoice->do_callback();
-};
-pars->Pcategory=newcat;
-
-refresh();
+      pars->Pgain=64;
+      gaindial->value(64);
+      analogfiltertypechoice->value(0);
+      analogfiltertypechoice->do_callback();
+      svfiltertypechoice->value(0);
+      svfiltertypechoice->do_callback();
+  };
+  pars->Pcategory=newcat;
+  
+  refresh();
 }
 
 void FilterUI::use_for_dynamic_filter() {
   freqtrdial->deactivate();
-gaindial->when(0);
-
-cfknob->when(FL_WHEN_RELEASE);
-octknob->when(FL_WHEN_RELEASE);
-
-frsldial->when(0);
-wvknob->when(0);
-formant_freq_dial->when(0);
-formant_q_dial->when(0);
-formant_amp_dial->when(0);
-strchdial->when(0);
+  gaindial->when(0);
+  
+  cfknob->when(FL_WHEN_RELEASE);
+  octknob->when(FL_WHEN_RELEASE);
+  
+  frsldial->when(0);
+  wvknob->when(0);
+  formant_freq_dial->when(0);
+  formant_q_dial->when(0);
+  formant_amp_dial->when(0);
+  strchdial->when(0);
 }

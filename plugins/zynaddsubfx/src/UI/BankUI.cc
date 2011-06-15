@@ -5,58 +5,59 @@
 //License: GNU GPL version 2 or later
 
 void BankProcess_::process() {
+  ;
 }
 
 BankSlot::BankSlot(int x,int y, int w, int h, const char *label):Fl_Button(x,y,w,h,label) {
   what=NULL;
-whatslot=NULL;
-nslot=0;
-nselected=NULL;
+  whatslot=NULL;
+  nslot=0;
+  nselected=NULL;
 }
 
 int BankSlot::handle(int event) {
   if (what==NULL) return(0);
-if (Fl::event_inside(this)){
-  *what=0;*whatslot=nslot;
-  if ((event==FL_RELEASE)&&(Fl::event_button()==1))*what=1;
-  if ((event==FL_RELEASE)&&(Fl::event_button()==3))*what=2;
-  if (event==FL_PUSH) highlight=1;
-}else highlight=0;
-
-int tmp=Fl_Button::handle(event);
-if ((*what!=0) && Fl::event_inside(this)) (bp->*fnc)();
-return(tmp);
+  if (Fl::event_inside(this)){
+    *what=0;*whatslot=nslot;
+    if ((event==FL_RELEASE)&&(Fl::event_button()==1))*what=1;
+    if ((event==FL_RELEASE)&&(Fl::event_button()==3))*what=2;
+    if (event==FL_PUSH) highlight=1;
+  }else highlight=0;
+  
+  int tmp=Fl_Button::handle(event);
+  if ((*what!=0) && Fl::event_inside(this)) (bp->*fnc)();
+  return(tmp);
 }
 
 void BankSlot::init(int nslot_, int *what_, int *whatslot_,void (BankProcess_:: *fnc_)(void),BankProcess_ *bp_,Bank *bank_,int *nselected_) {
   nslot=nslot_;
-what=what_;
-whatslot=whatslot_;
-fnc=fnc_;
-bp=bp_;
-bank=bank_;
-nselected=nselected_;
-box(FL_THIN_UP_BOX);
-labelfont(0);
-labelsize(13);
-align(FL_ALIGN_LEFT|FL_ALIGN_INSIDE|FL_ALIGN_CLIP);
-
-highlight=0;
-refresh();
+  what=what_;
+  whatslot=whatslot_;
+  fnc=fnc_;
+  bp=bp_;
+  bank=bank_;
+  nselected=nselected_;
+  box(FL_THIN_UP_BOX);
+  labelfont(0);
+  labelsize(13);
+  align(FL_ALIGN_LEFT|FL_ALIGN_INSIDE|FL_ALIGN_CLIP);
+  
+  highlight=0;
+  refresh();
 }
 
 void BankSlot::refresh() {
   if (bank->emptyslot(nslot)) {
-	color(46);
-} else {
-	if (bank->isPADsynth_used(nslot)) color(26);
-		else color(51);
-};
-
-if (*nselected==nslot) color(6);
-
-
-label(bank->getnamenumbered(nslot));
+  	color(46);
+  } else {
+  	if (bank->isPADsynth_used(nslot)) color(26);
+  		else color(51);
+  };
+  
+  if (*nselected==nslot) color(6);
+  
+  
+  label(bank->getnamenumbered(nslot));
 }
 
 void BankUI::cb_Close_i(Fl_Button*, void*) {
@@ -285,23 +286,23 @@ Fl_Double_Window* BankUI::make_window() {
 
 BankUI::BankUI(Master *master_,int *npart_) {
   fnc=&BankProcess_::process;
-master=master_;
-npart=npart_;
-bank=&master_->bank;
-what=0;
-nselected=-1;
-make_window();
-mode=1;
+  master=master_;
+  npart=npart_;
+  bank=&master_->bank;
+  what=0;
+  nselected=-1;
+  make_window();
+  mode=1;
 }
 
 BankUI::~BankUI() {
   bankuiwindow->hide();
-delete(bankuiwindow);
+  delete(bankuiwindow);
 }
 
 void BankUI::show() {
   bankuiwindow->show();
-simplesetmode(config.cfg.UserInterfaceMode==2);
+  simplesetmode(config.cfg.UserInterfaceMode==2);
 }
 
 void BankUI::hide() {
@@ -310,111 +311,111 @@ void BankUI::hide() {
 
 void BankUI::init(Fl_Valuator *cbwig_) {
   cbwig=cbwig_;
-rescan_for_banks();
+  rescan_for_banks();
 }
 
 void BankUI::process() {
   int slot=this->slot;
-
-if ((what==2)&&(bank->emptyslot(slot)==0)&&(mode!=4)) {//Rename slot
-    const char *tmp=fl_input("Slot (instrument) name:",(const char *)bank->getname(slot));
-    if (tmp!=NULL) bank->setname(slot,tmp,-1);
-    bs[slot]->refresh();
-};
-
-if ((what==1)&&(mode==1)&&(!bank->emptyslot(slot))){//Reads from slot
-    pthread_mutex_lock(&master->mutex);
-     bank->loadfromslot(slot,master->part[*npart]);
-    pthread_mutex_unlock(&master->mutex);
-    master->part[*npart]->applyparameters();
-    snprintf((char *)master->part[*npart]->Pname,PART_MAX_NAME_LEN,"%s",bank->getname(slot));
-     cbwig->do_callback();
-     
-     if (config.cfg.BankUIAutoClose!=0)
-         bankuiwindow->hide();
-
-};
-
-if ((what==1)&&(mode==2)){//save(write) to slot
-     if (!bank->emptyslot(slot)){
-       if (!fl_choice("Overwrite the slot no. %d ?","No","Yes",NULL,slot+1)) goto nooverwriteslot;
+  
+  if ((what==2)&&(bank->emptyslot(slot)==0)&&(mode!=4)) {//Rename slot
+      const char *tmp=fl_input("Slot (instrument) name:",(const char *)bank->getname(slot));
+      if (tmp!=NULL) bank->setname(slot,tmp,-1);
+      bs[slot]->refresh();
+  };
+  
+  if ((what==1)&&(mode==1)&&(!bank->emptyslot(slot))){//Reads from slot
+      pthread_mutex_lock(&master->mutex);
+       bank->loadfromslot(slot,master->part[*npart]);
+      pthread_mutex_unlock(&master->mutex);
+      master->part[*npart]->applyparameters();
+      snprintf((char *)master->part[*npart]->Pname,PART_MAX_NAME_LEN,"%s",bank->getname(slot));
+       cbwig->do_callback();
+       
+       if (config.cfg.BankUIAutoClose!=0)
+           bankuiwindow->hide();
+  
+  };
+  
+  if ((what==1)&&(mode==2)){//save(write) to slot
+       if (!bank->emptyslot(slot)){
+         if (!fl_choice("Overwrite the slot no. %d ?","No","Yes",NULL,slot+1)) goto nooverwriteslot;
+        };
+         pthread_mutex_lock(&master->mutex);
+          bank->savetoslot(slot,master->part[*npart]);
+         pthread_mutex_unlock(&master->mutex);
+  
+         bs[slot]->refresh();
+         mode=1;readbutton->value(1);writebutton->value(0);
+         nooverwriteslot:;
+  };
+  
+  
+  
+  if ((what==1)&&(mode==3)&&(!bank->emptyslot(slot))){//Clears the slot
+        if (fl_choice("Clear the slot no. %d ?","No","Yes",NULL,slot+1)){
+            bank->clearslot(slot);
+            bs[slot]->refresh();
+        };
+  };
+  
+  if (mode==4){//swap
+      bool done=false;
+      if ((what==1)&&(nselected>=0)){
+           bank->swapslot(nselected,slot);
+           int ns=nselected;
+           nselected=-1;
+           bs[slot]->refresh();
+           bs[ns]->refresh();
+           done=true;
       };
-       pthread_mutex_lock(&master->mutex);
-        bank->savetoslot(slot,master->part[*npart]);
-       pthread_mutex_unlock(&master->mutex);
-
-       bs[slot]->refresh();
-       mode=1;readbutton->value(1);writebutton->value(0);
-       nooverwriteslot:;
-};
-
-
-
-if ((what==1)&&(mode==3)&&(!bank->emptyslot(slot))){//Clears the slot
-      if (fl_choice("Clear the slot no. %d ?","No","Yes",NULL,slot+1)){
-          bank->clearslot(slot);
+      if (((nselected<0)||(what==2))&&(!done)){
+          int ns=nselected;
+          nselected=slot;
+          if (ns>0) bs[ns]->refresh();
           bs[slot]->refresh();
       };
-};
-
-if (mode==4){//swap
-    bool done=false;
-    if ((what==1)&&(nselected>=0)){
-         bank->swapslot(nselected,slot);
-         int ns=nselected;
-         nselected=-1;
-         bs[slot]->refresh();
-         bs[ns]->refresh();
-         done=true;
-    };
-    if (((nselected<0)||(what==2))&&(!done)){
-        int ns=nselected;
-        nselected=slot;
-        if (ns>0) bs[ns]->refresh();
-        bs[slot]->refresh();
-    };
-};
-if (mode!=4) refreshmainwindow();
+  };
+  if (mode!=4) refreshmainwindow();
 }
 
 void BankUI::refreshmainwindow() {
   bankuiwindow->label(bank->bankfiletitle);
-mode=1;readbutton->value(1);writebutton->value(0);clearbutton->value(0);swapbutton->value(0);
-nselected=-1;
-if (bank->locked()){
-    writebutton->deactivate();
-    clearbutton->deactivate();
-    swapbutton->deactivate();
-} else {
-    writebutton->activate();
-    clearbutton->activate();
-    swapbutton->activate();
-};
-for (int i=0;i<BANK_SIZE;i++) bs[i]->refresh();
+  mode=1;readbutton->value(1);writebutton->value(0);clearbutton->value(0);swapbutton->value(0);
+  nselected=-1;
+  if (bank->locked()){
+      writebutton->deactivate();
+      clearbutton->deactivate();
+      swapbutton->deactivate();
+  } else {
+      writebutton->activate();
+      clearbutton->activate();
+      swapbutton->activate();
+  };
+  for (int i=0;i<BANK_SIZE;i++) bs[i]->refresh();
 }
 
 void BankUI::removeselection() {
   if (nselected>=0) {
-   int ns=nselected;
-   nselected=-1;
-   bs[ns]->refresh();
-};
+     int ns=nselected;
+     nselected=-1;
+     bs[ns]->refresh();
+  };
 }
 
 void BankUI::rescan_for_banks() {
   banklist->clear();
-banklist->add(" ");
-bank->rescanforbanks();
-
-for (int i=1;i<MAX_NUM_BANKS;i++) {
-    if (bank->banks[i].name!=NULL) banklist->add(bank->banks[i].name);
-};
+  banklist->add(" ");
+  bank->rescanforbanks();
+  
+  for (int i=1;i<MAX_NUM_BANKS;i++) {
+      if (bank->banks[i].name!=NULL) banklist->add(bank->banks[i].name);
+  };
 }
 
 void BankUI::simplesetmode(bool beginnerui) {
   readbutton->value(1);
-mode=1;
-removeselection();
-if (beginnerui) modeselect->hide();
-	else modeselect->show();
+  mode=1;
+  removeselection();
+  if (beginnerui) modeselect->hide();
+  	else modeselect->show();
 }
