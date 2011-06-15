@@ -129,7 +129,7 @@ delete [] spc;} {selected
 
 class PSlider {: {public Fl_Slider}
 } {
-  Function {PSlider(int x,int y, int w, int h, const char *label=0):Fl_Slider(x,y,w,h,label)} {} {}
+  Function {PSlider(int x,int y, int w, int h, const char *label=0):Fl_Slider(x,y,w,h,label)} {} {code{;}}
   Function {handle(int event)} {return_type int
   } {
     code {int X=x(),Y=y(),W=w(),H=h();

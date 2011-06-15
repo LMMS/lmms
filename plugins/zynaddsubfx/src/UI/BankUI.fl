@@ -32,7 +32,7 @@ decl {\#include "../Misc/Config.h"} {public
 
 class BankProcess_ {} {
   Function {process()} {open return_type {virtual void}
-  } {}
+  } {code{;}}
   decl {Bank *bank;} {public
   }
 } 

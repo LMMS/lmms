@@ -28,7 +28,7 @@
 #include "Presets.h"
 
 #define MAX_ENVELOPE_POINTS 40
-#define MIN_ENVELOPE_DB -40
+#define MIN_ENVELOPE_DB -400
 
 class EnvelopeParams:public Presets
 {
