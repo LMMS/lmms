@@ -183,7 +183,7 @@ REALTYPE Envelope::envout_dB()
         if(out > 0.001)
             envoutval = rap2dB(out);
         else
-            envoutval = -40.0;
+            envoutval = MIN_ENVELOPE_DB;
     }
     else
         out = dB2rap(envout());

@@ -18,9 +18,9 @@ decl {\#include "../Params/Presets.h"} {public
 
 class PresetsUI_ {} {
   Function {refresh()} {open return_type {virtual void}
-  } {}
+  } {code{;}}
   Function {~PresetsUI_()} {open return_type virtual
-  } {}
+  } {code{;}}
 } 
 
 class PresetsUI {} {
