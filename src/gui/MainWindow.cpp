@@ -1047,8 +1047,17 @@ void MainWindow::browseHelp( void )
 
 void MainWindow::autoSave()
 {
-	QDir work(configManager::inst()->workingDir());
-	engine::getSong()->saveProjectFile(work.absoluteFilePath("recover.mmp"));
+	if( !( engine::getSong()->isPlaying() ||
+			engine::getSong()->isExporting() ) )
+	{
+		QDir work(configManager::inst()->workingDir());
+		engine::getSong()->saveProjectFile(work.absoluteFilePath("recover.mmp"));
+	}
+	else
+	{
+		// try again in 10 seconds
+		QTimer::singleShot( 10*1000, this, SLOT( autoSave() ) );
+	}
 }
 
 
