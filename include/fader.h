@@ -53,6 +53,8 @@
 
 #include "AutomatableModelView.h"
 
+class textFloat;
+
 
 class fader : public QWidget, public FloatModelView
 {
@@ -75,8 +77,17 @@ private:
 	virtual void contextMenuEvent( QContextMenuEvent * _me );
 	virtual void mousePressEvent( QMouseEvent *ev );
 	virtual void mouseMoveEvent( QMouseEvent *ev );
+	virtual void mouseReleaseEvent( QMouseEvent * _me );
 	virtual void wheelEvent( QWheelEvent *ev );
 	virtual void paintEvent( QPaintEvent *ev );
+
+	inline uint knob_y() const
+	{
+		float fRange = m_model->maxValue() - m_model->minValue();
+		float realVal = m_model->value() - m_model->minValue();
+//		uint knob_y = (uint)( 116.0 - ( 86.0 * ( m_model->value() / fRange ) ) );
+		return (uint)( 116.0 - ( 86.0 * ( realVal / fRange ) ) );
+	}
 
 	FloatModel * m_model;
 
@@ -88,6 +99,10 @@ private:
 	QPixmap m_back;
 	QPixmap m_leds;
 	QPixmap m_knob;
+
+	static textFloat * s_textFloat;
+	void updateTextFloat();
+
 } ;
 
 
