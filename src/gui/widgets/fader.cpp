@@ -53,8 +53,12 @@
 #include "embed.h"
 #include "engine.h"
 #include "caption_menu.h"
+#include "config_mgr.h"
+#include "text_float.h"
 #include "MainWindow.h"
 
+
+textFloat * fader::s_textFloat = NULL;
 
 
 fader::fader( FloatModel * _model, const QString & _name, QWidget * _parent ) :
@@ -69,6 +73,10 @@ fader::fader( FloatModel * _model, const QString & _name, QWidget * _parent ) :
 	m_leds( embed::getIconPixmap( "fader_leds" ) ),
 	m_knob( embed::getIconPixmap( "fader_knob" ) )
 {
+	if( s_textFloat == NULL )
+	{
+		s_textFloat = new textFloat;
+	}
 	setAccessibleName( _name );
 	setAttribute( Qt::WA_OpaquePaintEvent, true );
 	setMinimumSize( 23, 116 );
@@ -105,6 +113,8 @@ void fader::mouseMoveEvent( QMouseEvent *ev )
 	fVal = fVal + m_model->minValue();
 
 	m_model->setValue( fVal );
+
+	updateTextFloat();
 }
 
 
@@ -115,6 +125,9 @@ void fader::mousePressEvent( QMouseEvent * _me )
 	if( _me->button() == Qt::LeftButton &&
 			! ( _me->modifiers() & Qt::ControlModifier ) )
 	{
+		updateTextFloat();
+		s_textFloat->show();
+
 		mouseMoveEvent( _me );
 		_me->accept();
 	}
@@ -125,6 +138,11 @@ void fader::mousePressEvent( QMouseEvent * _me )
 }
 
 
+
+void fader::mouseReleaseEvent( QMouseEvent * _me )
+{
+	s_textFloat->hide();
+}
 
 
 void fader::wheelEvent ( QWheelEvent *ev )
@@ -139,6 +157,8 @@ void fader::wheelEvent ( QWheelEvent *ev )
 	{
 		m_model->incValue( -5 );
 	}
+	updateTextFloat();
+	s_textFloat->setVisibilityTimeOut( 1000 );
 }
 
 
@@ -182,6 +202,19 @@ void fader::setPeak_R( float fPeak )
 	}
 }
 
+void fader::updateTextFloat()
+{
+	if( configManager::inst()->value( "app", "displaydbv" ).toInt() )
+	{
+		s_textFloat->setText( QString("Volume: %1 dBV").
+				arg( 20.0 * log10( model()->value() ), 3, 'f', 2 ) );
+	}
+	else
+	{
+		s_textFloat->setText( QString("Volume: %1 %").arg( m_model->value() * 100 ) );
+	}
+	s_textFloat->moveGlobal( this, QPoint( width() - m_knob.width() - 5, knob_y() - 46 ) );
+}
 
 
 
