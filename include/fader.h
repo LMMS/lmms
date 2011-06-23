@@ -1,7 +1,7 @@
 /*
  * fader.h - fader-widget used in FX-mixer - partly taken from Hydrogen
  *
- * Copyright (c) 2008-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2011 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -48,6 +48,7 @@
 #ifndef _FADER_H
 #define _FADER_H
 
+#include <QtCore/QTime>
 #include <QtGui/QWidget>
 #include <QtGui/QPixmap>
 
@@ -63,13 +64,10 @@ public:
 	fader( FloatModel * _model, const QString & _name, QWidget * _parent );
 	virtual ~fader();
 
-	void setMaxPeak( float _max );
-	void setMinPeak( float _min );
-
-	void setPeak_L( float peak );
+	void setPeak_L( float fPeak );
 	float getPeak_L() {	return m_fPeakValue_L;	}
 
-	void setPeak_R( float peak );
+	void setPeak_R( float fPeak );
 	float getPeak_R() {	return m_fPeakValue_R;	}
 
 
@@ -91,10 +89,17 @@ private:
 
 	FloatModel * m_model;
 
+	void setPeak( float fPeak, float &targetPeak, float &persistentPeak, QTime &lastPeakTime );
+	int calculateDisplayPeak( float fPeak );
 	float m_fPeakValue_L;
 	float m_fPeakValue_R;
-	float m_fMinPeak;
-	float m_fMaxPeak;
+	float m_persistentPeak_L;
+	float m_persistentPeak_R;
+	const float m_fMinPeak;
+	const float m_fMaxPeak;
+
+	QTime m_lastPeakTime_L;
+	QTime m_lastPeakTime_R;
 
 	QPixmap m_back;
 	QPixmap m_leds;
