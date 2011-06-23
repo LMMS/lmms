@@ -61,10 +61,11 @@ ladspaManager::ladspaManager()
 		{
 			const QFileInfo & f = *file;
 			if( !f.isFile() ||
+				 f.fileName().right( 3 ).toLower() !=
 #ifdef LMMS_BUILD_WIN32
-				 f.fileName().right( 3 ).toLower() != "dll"
+													"dll"
 #else
-				 f.fileName().right( 2 ).toLower() != "so"
+				 									".so"
 #endif
 								)
 			{
