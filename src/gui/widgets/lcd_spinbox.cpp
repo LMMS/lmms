@@ -1,7 +1,7 @@
 /*
  * lcd_spinbox.cpp - class lcdSpinBox, an improved QLCDNumber
  *
- * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2011 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2008 Paul Giblock <pgllama/at/gmail.com>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
@@ -52,7 +52,7 @@ lcdSpinBox::lcdSpinBox( int _num_digits, QWidget * _parent,
 {
 	setEnabled( true );
 
-	setAccessibleName( _name );
+	setWindowTitle( _name );
 
 	m_lcdPixmap = new QPixmap( embed::getIconPixmap( "lcd_19green" ) );
 
@@ -77,7 +77,7 @@ lcdSpinBox::lcdSpinBox( int _num_digits, const QString & _lcd_style,
 {
 	setEnabled( true );
 
-	setAccessibleName( _name );
+	setWindowTitle( _name );
 
 	// We should make a factory for these or something.
 	m_lcdPixmap = new QPixmap( embed::getIconPixmap( QString( "lcd_" +

@@ -79,7 +79,7 @@ fader::fader( FloatModel * _model, const QString & _name, QWidget * _parent ) :
 	{
 		s_textFloat = new textFloat;
 	}
-	setAccessibleName( _name );
+	setWindowTitle( _name );
 	setAttribute( Qt::WA_OpaquePaintEvent, true );
 	setMinimumSize( 23, 116 );
 	setMaximumSize( 23, 116);
@@ -98,7 +98,7 @@ fader::~fader()
 
 void fader::contextMenuEvent( QContextMenuEvent * _ev )
 {
-	captionMenu contextMenu( accessibleName() );
+	captionMenu contextMenu( windowTitle() );
 	addDefaultActions( &contextMenu );
 	contextMenu.exec( QCursor::pos() );
 	_ev->accept();

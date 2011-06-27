@@ -251,7 +251,7 @@ void nineButtonSelector::updateButton( Uint8 _new_button )
 
 void nineButtonSelector::contextMenuEvent( QContextMenuEvent * )
 {
-	captionMenu contextMenu( accessibleName() );
+	captionMenu contextMenu( windowTitle() );
 	contextMenu.addAction( embed::getIconPixmap( "help" ), tr( "&Help" ),
 			       this, SLOT( displayHelp() ) );
 	contextMenu.exec( QCursor::pos() );

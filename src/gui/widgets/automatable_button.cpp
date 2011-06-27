@@ -2,8 +2,8 @@
  * automatable_button.cpp - implementation of class automatableButton and
  *                          automatableButtonGroup
  *
- * Copyright (c) 2006-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ * Copyright (c) 2006-2011 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -22,7 +22,6 @@
  * Boston, MA 02110-1301 USA.
  *
  */
-
 
 #include "automatable_button.h"
 
@@ -43,7 +42,7 @@ automatableButton::automatableButton( QWidget * _parent,
 	BoolModelView( new BoolModel( false, NULL, _name, true ), this ),
 	m_group( NULL )
 {
-	setAccessibleName( _name );
+	setWindowTitle( _name );
 	doConnections();
 	setFocusPolicy( Qt::NoFocus );
 }
@@ -171,7 +170,7 @@ automatableButtonGroup::automatableButtonGroup( QWidget * _parent,
 	IntModelView( new IntModel( 0, 0, 0, NULL, _name, true ), this )
 {
 	hide();
-	setAccessibleName( _name );
+	setWindowTitle( _name );
 }
 
 

@@ -1,7 +1,7 @@
 /*
  * knob.cpp - powerful knob-widget
  *
- * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2011 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -71,7 +71,7 @@ knob::knob( int _knob_num, QWidget * _parent, const QString & _name ) :
 		s_textFloat = new textFloat;
 	}
 
-	setAccessibleName( _name );
+	setWindowTitle( _name );
 	
 	if( m_knobNum != knobStyled )
 	{
@@ -572,7 +572,7 @@ void knob::enterValue()
 		configManager::inst()->value( "app", "displaydbv" ).toInt() )
 	{
 		new_val = QInputDialog::getDouble(
-			this, accessibleName(),
+			this, windowTitle(),
 			tr( "Please enter a new value between "
 					"-96.0 dBV and 6.0 dBV:" ),
 				20.0 * log10( model()->value() / 100.0 ),
@@ -589,7 +589,7 @@ void knob::enterValue()
 	else
 	{
 		new_val = QInputDialog::getDouble(
-				this, accessibleName(),
+				this, windowTitle(),
 				tr( "Please enter a new value between "
 						"%1 and %2:" ).
 						arg( model()->minValue() ).

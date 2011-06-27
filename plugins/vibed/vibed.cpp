@@ -459,7 +459,7 @@ vibedView::vibedView( Instrument * _instrument,
 		21, 127,
 		this );
 
-	m_harmonic->setAccessibleName( tr( "Octave" ) );
+	m_harmonic->setWindowTitle( tr( "Octave" ) );
 	m_harmonic->setWhatsThis( tr(
 "The Octave selector is used to choose which harmonic of the note the "
 "string will ring at.  For example, '-2' means the string will ring two "
@@ -492,7 +492,7 @@ vibedView::vibedView( Instrument * _instrument,
 			this);
 
 	m_graph = new graph( this );
-	m_graph->setAccessibleName( tr( "Impulse Editor" ) );
+	m_graph->setWindowTitle( tr( "Impulse Editor" ) );
 	m_graph->setForeground( PLUGIN_NAME::getIconPixmap( "wavegraph4" ) );
 	m_graph->move( 76, 21 );
 	m_graph->resize(132, 104);
@@ -540,7 +540,7 @@ vibedView::vibedView( Instrument * _instrument,
 
 	
 	// String selector is not a part of the model
-	m_stringSelector->setAccessibleName( tr( "String" ) );
+	m_stringSelector->setWindowTitle( tr( "String" ) );
 	m_stringSelector->setWhatsThis( tr(
 "The String selector is used to choose which string the controls are "
 "editing.  A Vibed instrument can contain up to nine independently "
