@@ -9,10 +9,13 @@ cmake ../
 make
 sudo make install
 
-This way an out-of-tree build is performed. You can also run "cmake ." directly
-in the root of source-tree although this is not recommended. When performing an
-out-of-tree build after there's already an in-tree build, make sure to run
-"make distclean" before running cmake inside build-directory.
+If your system does not have "sudo", become root with your preferred mechanism
+and run the "make install" command.
+
+With the above commands an out-of-tree build is performed. You can also run
+"cmake ." directly in the root of source tree although this is not recommended.
+When performing an out-of-tree build after there's already an in-tree build,
+make sure to run "make distclean" before running cmake inside build-directory.
 
 If you want to use custom compiler flags simply set the environment variables
 CFLAGS and CXXFLAGS.
