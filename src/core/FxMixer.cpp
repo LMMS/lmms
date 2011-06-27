@@ -1,7 +1,7 @@
 /*
  * FxMixer.cpp - effect mixer for LMMS
  *
- * Copyright (c) 2008-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2011 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -112,10 +112,13 @@ void FxChannel::doProcessing( sampleFrame * _buf )
 
 	const float v = m_volumeModel.value();
 
-	m_fxChain.startRunning();
-	m_stillRunning = m_fxChain.processAudioBuffer( _buf, fpp );
-	m_peakLeft = engine::getMixer()->peakValueLeft( _buf, fpp ) * v;
-	m_peakRight = engine::getMixer()->peakValueRight( _buf, fpp ) * v;
+	if( !engine::getSong()->isFreezingPattern() )
+	{
+		m_fxChain.startRunning();
+		m_stillRunning = m_fxChain.processAudioBuffer( _buf, fpp );
+		m_peakLeft = engine::getMixer()->peakValueLeft( _buf, fpp ) * v;
+		m_peakRight = engine::getMixer()->peakValueRight( _buf, fpp ) * v;
+	}
 }
 
 

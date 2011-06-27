@@ -481,7 +481,7 @@ void ClassicStyle::drawTrackContentObject( QPainter * _painter,
 						{
 							p->setPen( color( LmmsStyle::PianoRollMutedNote ) );
 						}
-						else if( pat->frozen() )
+						else if( pat->isFrozen() )
 						{
 							p->setPen( color( LmmsStyle::PianoRollFrozenNote ) );
 						}
@@ -599,7 +599,7 @@ void ClassicStyle::drawTrackContentObject( QPainter * _painter,
 				p->drawPixmap( 3, p->fontMetrics().height() + 1,
 						embed::getIconPixmap( "muted", 16, 16 ) );
 			}
-			else if( pat->frozen() )
+			else if( pat->isFrozen() )
 			{
 				p->setBrush( QBrush() );
 				p->setPen( QColor( 0, 224, 255 ) );

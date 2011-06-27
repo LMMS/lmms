@@ -104,6 +104,8 @@ public:
 		return m_playing && m_exporting == false;
 	}
 
+	bool isFreezingPattern() const;
+
 	inline bool isExporting() const
 	{
 		return m_exporting;
