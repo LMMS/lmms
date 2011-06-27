@@ -3,7 +3,7 @@
 /*
  * FxMixer.cpp - effect mixer for LMMS
  *
- * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2011 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -119,16 +119,15 @@ void FxMixer::processChannel( fx_ch_t _ch, sampleFrame * _buf )
 			_buf = m_fxChannels[_ch]->m_buffer;
 		}
 		const fpp_t f = engine::getMixer()->framesPerPeriod();
-		m_fxChannels[_ch]->m_fxChain.startRunning();
-		m_fxChannels[_ch]->m_stillRunning =
-			m_fxChannels[_ch]->m_fxChain.processAudioBuffer(
-								_buf, f );
-		m_fxChannels[_ch]->m_peakLeft =
-			engine::getMixer()->peakValueLeft( _buf, f ) *
-				m_fxChannels[_ch]->m_volumeModel.value();
-		m_fxChannels[_ch]->m_peakRight =
-			engine::getMixer()->peakValueRight( _buf, f ) *
-				m_fxChannels[_ch]->m_volumeModel.value();
+		if( !engine::getSong()->isFreezingPattern() )
+		{
+			m_fxChannels[_ch]->m_fxChain.startRunning();
+			m_fxChannels[_ch]->m_stillRunning = m_fxChannels[_ch]->m_fxChain.processAudioBuffer( _buf, f );
+			m_fxChannels[_ch]->m_peakLeft = engine::getMixer()->peakValueLeft( _buf, f ) *
+												m_fxChannels[_ch]->m_volumeModel.value();
+			m_fxChannels[_ch]->m_peakRight = engine::getMixer()->peakValueRight( _buf, f ) *
+												m_fxChannels[_ch]->m_volumeModel.value();
+		}
 		m_fxChannels[_ch]->m_used = true;
 	}
 	else

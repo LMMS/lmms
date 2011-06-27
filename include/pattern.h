@@ -2,7 +2,7 @@
  * pattern.h - declaration of class pattern, which contains all informations
  *             about a pattern
  *
- * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2011 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -94,17 +94,17 @@ public:
 
 
 	// functions which are part of freezing-feature
-	inline bool freezing() const
+	inline bool isFreezing() const
 	{
 		return m_freezing;
 	}
 
-	inline bool frozen() const
+	inline bool isFrozen() const
 	{
 		return m_frozenPattern != NULL;
 	}
 
-	sampleBuffer * frozenPattern()
+	sampleBuffer *frozenPattern()
 	{
 		return m_frozenPattern;
 	}

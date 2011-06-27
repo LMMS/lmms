@@ -343,7 +343,7 @@ void song::processNextBuffer()
 	bool check_loop = tl != NULL && m_exporting == false &&
 				tl->loopPointsEnabled() &&
 				!( m_playMode == Mode_PlayPattern &&
-					m_patternToPlay->freezing() == true );
+					m_patternToPlay->isFreezing() == true );
 	if( check_loop )
 	{
 		if( m_playPos[m_playMode] < tl->loopBegin() ||
@@ -467,11 +467,22 @@ void song::processNextBuffer()
 
 
 
+bool song::isFreezingPattern() const
+{
+	return isPlaying() &&
+				m_playMode == Mode_PlayPattern &&
+				m_patternToPlay != NULL &&
+				m_patternToPlay->isFreezing();
+}
+
+
+
+
 bool song::realTimeTask() const
 {
 	return !( m_exporting == true || ( m_playMode == Mode_PlayPattern &&
 		  	m_patternToPlay != NULL &&
-			m_patternToPlay->freezing() == true ) );
+			m_patternToPlay->isFreezing() == true ) );
 }
 
 
