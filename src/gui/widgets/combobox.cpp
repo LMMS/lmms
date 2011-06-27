@@ -1,7 +1,7 @@
 /*
  * combobox.cpp - implementation of LMMS-combobox
  *
- * Copyright (c) 2006-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2011 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2008-2009 Paul Giblock <pgib/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
@@ -75,7 +75,7 @@ comboBox::comboBox( QWidget * _parent, const QString & _name ) :
 	connect( &m_menu, SIGNAL( triggered( QAction * ) ),
 				this, SLOT( setItem( QAction * ) ) );
 
-	setAccessibleName( _name );
+	setWindowTitle( _name );
 	doConnections();
 }
 

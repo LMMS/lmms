@@ -1,7 +1,7 @@
 /*
  * AutomatableModelView.cpp - implementation of AutomatableModelView
  *
- * Copyright (c) 2008-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2011 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -159,7 +159,6 @@ void AutomatableModelView::addDefaultActions( QMenu * _menu )
 void AutomatableModelView::setModel( Model * _model, bool _old_model_valid )
 {
 	ModelView::setModel( _model, _old_model_valid );
-	//setAccessibleName( _model->displayName();
 }
 
 

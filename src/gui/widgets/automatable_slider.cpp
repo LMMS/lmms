@@ -42,7 +42,7 @@ automatableSlider::automatableSlider( QWidget * _parent,
 	IntModelView( new IntModel( 0, 0, 0, NULL, _name, true ), this ),
 	m_showStatus( false )
 {
-	setAccessibleName( _name );
+	setWindowTitle( _name );
 
 	connect( this, SIGNAL( valueChanged( int ) ),
 					this, SLOT( changeValue( int ) ) );
