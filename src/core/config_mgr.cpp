@@ -244,7 +244,9 @@ void configManager::loadConfigFile()
 
 	if( cfg_file.open( QIODevice::ReadOnly ) )
 	{
-		if( dom_tree.setContent( &cfg_file ) )
+		QString errorString;
+		int errorLine, errorCol;
+		if( dom_tree.setContent( &cfg_file, false, &errorString, &errorLine, &errorCol ) )
 		{
 			// get the head information from the DOM
 			QDomElement root = dom_tree.documentElement();
@@ -313,6 +315,14 @@ void configManager::loadConfigFile()
 			setDefaultSoundfont( value( "paths", "defaultsf2" ) );
 		#endif
 			setBackgroundArtwork( value( "paths", "backgroundartwork" ) );
+		}
+		else
+		{
+			QMessageBox::warning( NULL, MainWindow::tr( "Configuration file" ),
+									MainWindow::tr( "Error while parsing configuration file at line %1:%2: %3" ).
+													arg( errorLine ).
+													arg( errorCol ).
+													arg( errorString ) );
 		}
 		cfg_file.close();
 	}
