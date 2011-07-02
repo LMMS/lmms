@@ -1,8 +1,8 @@
 /*
  * config_mgr.cpp - implementation of class configManager
  *
- * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ * Copyright (c) 2005-2011 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -21,7 +21,6 @@
  * Boston, MA 02110-1301 USA.
  *
  */
-
 
 #include <QtXml/QDomElement>
 #include <QtCore/QDir>
@@ -454,7 +453,7 @@ void configManager::saveConfigFile()
 		return;
 	}
 
-	outfile.write( xml.toUtf8().constData(), xml.length() );
+	outfile.write( xml.toUtf8() );
 	outfile.close();
 }
 
