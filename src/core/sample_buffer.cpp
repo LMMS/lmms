@@ -178,7 +178,11 @@ void sampleBuffer::update( bool _keep_settings )
 	else if( !m_audioFile.isEmpty() )
 	{
 		QString file = tryToMakeAbsolute( m_audioFile );
+#ifdef LMMS_BUILD_WIN32
+		char * f = qstrdup( file.toLocal8Bit().constData() );
+#else
 		char * f = qstrdup( file.toUtf8().constData() );
+#endif
 		int_sample_t * buf = NULL;
 		ch_cnt_t channels = DEFAULT_CHANNELS;
 		sample_rate_t samplerate = engine::getMixer()->baseSampleRate();
