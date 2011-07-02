@@ -1,7 +1,7 @@
 /*
  * main.cpp - just main.cpp which is starting up app...
  *
- * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2011 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -478,7 +478,15 @@ int main( int argc, char * * argv )
 			{
 				engine::mainWindow()->showMaximized();
 			}
-			engine::getSong()->loadProject( file_to_load );
+
+			if( file_to_load == recoveryFile )
+			{
+				engine::getSong()->createNewProjectFromTemplate( file_to_load );
+			}
+			else
+			{
+				engine::getSong()->loadProject( file_to_load );
+			}
 
 			// don't show welcome screen
 			engine::mainWindow()->showWelcomeScreen( false );
