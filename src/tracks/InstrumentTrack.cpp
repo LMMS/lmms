@@ -389,6 +389,7 @@ void InstrumentTrack::processOutEvent( const midiEvent & _me,
 			if( k >= 0 && k < NumKeys &&
 						--m_runningMidiNotes[k] <= 0 )
 			{
+				m_runningMidiNotes[k] = qMax( 0, m_runningMidiNotes[k] );
 				m_instrument->handleMidiEvent(
 	midiEvent( MidiNoteOff, midiPort()->realOutputChannel(), k, 0 ),
 									_time );
