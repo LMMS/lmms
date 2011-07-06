@@ -1,7 +1,7 @@
 /*
  * ComboBoxModel.h - declaration of class ComboBoxModel
  *
- * Copyright (c) 2008-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2011 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -57,9 +57,9 @@ public:
 
 	int findText( const QString & _txt ) const;
 
-	inline const QString & currentText() const
+	inline QString currentText() const
 	{
-		return m_items[value()].first;
+		return ( size() > 0 && value() < size() ) ? m_items[value()].first : QString();
 	}
 
 	inline const PixmapLoader * currentData() const
