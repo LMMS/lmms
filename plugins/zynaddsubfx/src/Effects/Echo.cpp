@@ -31,11 +31,12 @@ Echo::Echo(const int &insertion_,
            REALTYPE *const efxoutl_,
            REALTYPE *const efxoutr_)
     :Effect(insertion_, efxoutl_, efxoutr_, NULL, 0),
+		samplerate(SAMPLE_RATE),
       Pvolume(50), Ppanning(64), Pdelay(60),
       Plrdelay(100), Plrcross(100), Pfb(40), Phidamp(60),
       delayTime(1), lrdelay(0), avgDelay(0),
-      delay(new REALTYPE[(int)(MAX_DELAY * SAMPLE_RATE)],
-            new REALTYPE[(int)(MAX_DELAY * SAMPLE_RATE)]),
+      delay(new REALTYPE[(int)(MAX_DELAY * samplerate)],
+            new REALTYPE[(int)(MAX_DELAY * samplerate)]),
       old(0.0), pos(0), delta(1), ndelta(1)
 {
     initdelays();
@@ -53,8 +54,8 @@ Echo::~Echo()
  */
 void Echo::cleanup()
 {
-    memset(delay.l,0,MAX_DELAY*SAMPLE_RATE*sizeof(REALTYPE));
-    memset(delay.r,0,MAX_DELAY*SAMPLE_RATE*sizeof(REALTYPE));
+    memset(delay.l,0,MAX_DELAY*samplerate*sizeof(REALTYPE));
+    memset(delay.r,0,MAX_DELAY*samplerate*sizeof(REALTYPE));
     old = Stereo<REALTYPE>(0.0);
 }
 
@@ -75,8 +76,8 @@ void Echo::initdelays()
     //number of seconds to delay right chan
     float dr = avgDelay + lrdelay;
 
-    ndelta.l = max(1,(int) (dl * SAMPLE_RATE));
-    ndelta.r = max(1,(int) (dr * SAMPLE_RATE));
+    ndelta.l = max(1,(int) (dl * samplerate));
+    ndelta.r = max(1,(int) (dr * samplerate));
 }
 
 void Echo::out(const Stereo<float *> &input)
@@ -96,16 +97,16 @@ void Echo::out(const Stereo<float *> &input)
         rdl = input.r[i] * (1.0 - panning) - rdl * fb;
 
         //LowPass Filter
-        old.l = delay.l[(pos.l+delta.l)%(MAX_DELAY * SAMPLE_RATE)] =  ldl * hidamp + old.l * (1.0 - hidamp);
-        old.r = delay.r[(pos.r+delta.r)%(MAX_DELAY * SAMPLE_RATE)] =  rdl * hidamp + old.r * (1.0 - hidamp);
+        old.l = delay.l[(pos.l+delta.l)%(MAX_DELAY * samplerate)] =  ldl * hidamp + old.l * (1.0 - hidamp);
+        old.r = delay.r[(pos.r+delta.r)%(MAX_DELAY * samplerate)] =  rdl * hidamp + old.r * (1.0 - hidamp);
 
         //increment
         ++pos.l;// += delta.l;
         ++pos.r;// += delta.r;
 
         //ensure that pos is still in bounds
-        pos.l %= MAX_DELAY * SAMPLE_RATE;
-        pos.r %= MAX_DELAY * SAMPLE_RATE;
+        pos.l %= MAX_DELAY * samplerate;
+        pos.r %= MAX_DELAY * samplerate;
 
         //adjust delay if needed
         delta.l = (15*delta.l + ndelta.l)/16;

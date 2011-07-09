@@ -98,6 +98,8 @@ class Echo:public Effect
         /**\todo This function needs to be implemented or the  prototype should be removed*/
         void setdryonly();
     private:
+		int samplerate;
+
         //Parameters
         char     Pvolume;  /**<#1 Volume or Dry/Wetness*/
         char     Ppanning; /**<#2 Panning*/
