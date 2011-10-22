@@ -27,8 +27,15 @@
 
 #include "EffectControlDialog.h"
 
+#include <QObject>
+#include <QPainter>
+
 
 class VstEffectControls;
+class pixmapButton;
+class QPixmap;
+class QPushButton;
+class pixmapButton;
 
 
 class VstEffectControlDialog : public EffectControlDialog
@@ -37,8 +44,18 @@ public:
 	VstEffectControlDialog( VstEffectControls * _controls );
 	virtual ~VstEffectControlDialog();
 
+protected:
+	virtual void paintEvent( QPaintEvent * _pe );
+
 private:
 	QWidget * m_pluginWidget;
+
+	pixmapButton * m_openPresetButton;
+	pixmapButton * m_rolLPresetButton;
+	pixmapButton * m_rolRPresetButton;
+	pixmapButton * m_selPresetButton;
+	pixmapButton * m_managePluginButton;
+	pixmapButton * m_savePresetButton;
 
 } ;
 

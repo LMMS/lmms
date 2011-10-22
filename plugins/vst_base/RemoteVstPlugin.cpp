@@ -163,6 +163,9 @@ public:
 	// determine product-string of plugin
 	const char * pluginProductString();
 
+	// determine name of plugipn preset
+	const char * presetName();
+
 	// do a complete parameter-dump and post it
 	void getParameterDump();
 
@@ -177,6 +180,18 @@ public:
 
 	// restore settings chunk of plugin from file
 	void loadChunkFromFile( const std::string & _file, int _len );
+
+	// restore settings chunk of plugin from file
+	void loadChunkFromPresetFile( const std::string & _file );
+
+	// restore settings chunk of plugin from file
+	void rotateProgram( int _len );
+
+	// Load names VST of presets/programs
+	void loadPrograms( int _len );
+
+	// Save presets/programs
+	void savePreset( const std::string & _file );
 
 	// number of inputs
 	virtual int inputCount() const
@@ -385,6 +400,33 @@ bool RemoteVstPlugin::processMessage( const message & _m )
 			loadChunkFromFile( _m.getString( 0 ), _m.getInt( 1 ) );
 			sendMessage( IdLoadSettingsFromFile );
 			break;
+
+		case IdLoadChunkFromPresetFile:
+			loadChunkFromPresetFile( _m.getString( 0 ) );
+			sendMessage( IdLoadChunkFromPresetFile );
+			break;
+
+		case IdRotateProgram:
+			rotateProgram( _m.getInt( 0 ) );
+			sendMessage( IdRotateProgram );
+			break;
+
+		case IdLoadPrograms:
+			loadPrograms( _m.getInt( 0 ) );
+			sendMessage( IdLoadPrograms );
+			break;
+
+		case IdSavePreset:
+			savePreset( _m.getString( 0 ) );
+			sendMessage( IdSavePreset );
+			break;
+
+		case IdSetParameter:
+			m_plugin->setParameter( m_plugin, _m.getInt( 0 ), _m.getFloat( 1 ) );
+			sendMessage( IdSetParameter );
+			break;
+
+
 
 		default:
 			return RemotePluginClient::processMessage( _m );
@@ -726,19 +768,34 @@ const char * RemoteVstPlugin::pluginProductString()
 
 
 
+const char * RemoteVstPlugin::presetName()
+{
+	static char buf[32];
+	buf[0] = 0;
+
+	m_plugin->dispatcher(m_plugin, effGetProgramName, 0, 0, buf, 0);
+
+	buf[31] = 0;
+	return buf;
+}
+
+
+
 void RemoteVstPlugin::getParameterDump()
 {
-	VstParameterProperties vst_props;
-	message m( IdVstParameterDump );
-	m.addInt( m_plugin->numParams );
-	for( int i = 0; i < m_plugin->numParams; ++i )
-	{
-		pluginDispatch( effGetParameterProperties, i, 0, &vst_props );
-		m.addInt( i );
-		m.addString( vst_props.shortLabel );
-		m.addFloat( m_plugin->getParameter( m_plugin, i ) );
-	}
-	sendMessage( m );
+	char curPresName[30];
+	//VstParameterProperties vst_props;
+ 	message m( IdVstParameterDump );
+ 	m.addInt( m_plugin->numParams );
+ 	for( int i = 0; i < m_plugin->numParams; ++i )
+ 	{
+		//pluginDispatch( effGetParameterProperties, i, 0, &vst_props );
+		m_plugin->dispatcher(m_plugin, effGetParamName, i, 0, curPresName, 0);
+ 		m.addInt( i );
+		m.addString( /*vst_props.shortLabel*/curPresName );
+ 		m.addFloat( m_plugin->getParameter( m_plugin, i ) );
+ 	}
+ 	sendMessage( m );
 }
 
 
@@ -807,6 +864,257 @@ void RemoteVstPlugin::saveChunkToFile( const std::string & _file )
 			close( fd );
 		}
 	}
+}
+
+
+
+
+void RemoteVstPlugin::rotateProgram( int _len )
+{
+	int currProgram;
+	if (isInitialized() == false) return;
+	if (_len <= 1) {
+		currProgram = m_plugin->dispatcher(m_plugin, effGetProgram, 0, 0, 0, 0) + _len;
+		if (currProgram >= m_plugin->numPrograms) currProgram = m_plugin->numPrograms - 1;
+		if (currProgram < 0) currProgram = 0;
+		m_plugin->dispatcher(m_plugin, effSetProgram, 0, currProgram++, 0, 0);
+	} else {
+		m_plugin->dispatcher(m_plugin, effSetProgram, 0, _len - 2, 0, 0);
+		currProgram = _len - 1;
+	}
+
+	char presName[30];
+	sprintf( presName, " %d/%d: %s", currProgram, m_plugin->numPrograms, presetName() );
+
+	sendMessage( message( IdVstPluginPresetString ).addString( presName ) );
+}
+
+
+
+
+void RemoteVstPlugin::loadPrograms( int _len )
+{
+	char presName[4096];
+	char curProgName[30];
+	if (isInitialized() == false) return;
+	bool progNameIndexed = (m_plugin->dispatcher(m_plugin, 29, 0, -1, curProgName, 0) == 1);
+
+	if (m_plugin->numPrograms > 1) {
+		if (progNameIndexed) {
+			for (int i = 0; i< (m_plugin->numPrograms >= 256?256:m_plugin->numPrograms); i++) {
+				m_plugin->dispatcher(m_plugin, 29, i, -1, curProgName, 0);
+				if (i == 0) 	sprintf( presName, "%s", curProgName );
+				else		sprintf( presName + strlen(presName), "|%s", curProgName );
+			}
+		} else {
+			int currProgram = m_plugin->dispatcher(m_plugin, effGetProgram, 0, 0, 0, 0);
+			for (int i = 0; i< (m_plugin->numPrograms >= 256?256:m_plugin->numPrograms); i++) {
+				m_plugin->dispatcher(m_plugin, effSetProgram, 0, i, 0, 0);
+				if (i == 0) 	sprintf( presName, "%s", presetName() );
+				else		sprintf( presName + strlen(presName), "|%s", presetName() );
+			}
+			m_plugin->dispatcher(m_plugin, effSetProgram, 0, currProgram, 0, 0);
+		}
+	} else sprintf( presName, "%s", presetName() );
+
+	sendMessage( message( IdVstPluginPresetsString ).addString( presName ) );
+}
+
+
+
+
+inline unsigned int endian_swap(unsigned int& x)
+{
+    return (x>>24) | ((x<<8) & 0x00FF0000) | ((x>>8) & 0x0000FF00) | (x<<24);
+}
+
+struct sBank
+{
+	unsigned int chunkMagic;
+	unsigned int byteSize;
+	unsigned int fxMagic;
+	unsigned int version;
+	unsigned int fxID;
+	unsigned int fxVersion;
+	unsigned int numPrograms;
+	char prgName[28];
+};
+
+void RemoteVstPlugin::savePreset( const std::string & _file )
+{
+	unsigned int chunk_size = 0;
+	sBank * pBank = ( sBank* ) new char[ sizeof( sBank ) ];
+	char progName[ 128 ] = { 0 };
+	char* data = NULL;
+	const bool chunky = ( m_plugin->flags & ( 1 << 5 ) ) != 0;
+	bool isPreset = _file.substr( _file.find_last_of( "." ) + 1 )  == "fxp";
+	int presNameLen = _file.find_last_of( "/" ) + _file.find_last_of( "\\" ) + 2;
+
+	if (isPreset) {
+		for (int i = 0; i < _file.length() - 4 - presNameLen; i++) 
+			progName[i] = i < 23 ? _file[presNameLen + i] : 0;
+		m_plugin->dispatcher(m_plugin, 4, 0, 0, progName, 0);
+	} //	m_plugin->dispatcher( m_plugin, effGetProgramName, 0, 0, progName, 0.0f );
+	if ( chunky )
+		chunk_size = m_plugin->dispatcher( m_plugin, 23, isPreset, 0, &data, false );
+	else {
+		if (isPreset) {
+			chunk_size = m_plugin->numParams * sizeof( float );
+			data = new char[ chunk_size ];
+			unsigned int* toUIntArray = reinterpret_cast<unsigned int*>( data );
+			for ( int i = 0; i < m_plugin->numParams; i++ )
+			{
+				float value = m_plugin->getParameter( m_plugin, i );
+				unsigned int * pValue = ( unsigned int * ) &value;
+				toUIntArray[ i ] = endian_swap( *pValue );
+			}
+		} else chunk_size = (((m_plugin->numParams * sizeof( float )) + 56)*m_plugin->numPrograms);
+	}
+
+	pBank->chunkMagic = 0x4B6E6343;
+	pBank->byteSize = chunk_size + ( chunky ? sizeof( int ) : 0 ) + 48;
+	if (!isPreset) pBank->byteSize += 100;
+	pBank->byteSize = endian_swap( pBank->byteSize );
+	pBank->fxMagic = chunky ? 0x68435046 : 0x6B437846;
+	if (!isPreset && chunky) pBank->fxMagic = 0x68434246;
+	if (!isPreset &&!chunky) pBank->fxMagic = 0x6B427846;
+
+	pBank->version = 0x01000000;
+	unsigned int uIntToFile = (unsigned int) m_plugin->uniqueID;
+	pBank->fxID = endian_swap( uIntToFile );
+	uIntToFile = (unsigned int) pluginVersion();
+	pBank->fxVersion = endian_swap( uIntToFile );
+	uIntToFile = (unsigned int) chunky ? m_plugin->numPrograms : m_plugin->numParams;
+	if (!isPreset &&!chunky) uIntToFile = (unsigned int) m_plugin->numPrograms;
+	pBank->numPrograms = endian_swap( uIntToFile );
+
+	FILE * stream = fopen( _file.c_str(), "w" );
+	fwrite ( pBank, 1, 28, stream );
+	fwrite ( progName, 1, isPreset ? 28 : 128, stream );
+	if ( chunky ) {
+		uIntToFile = endian_swap( chunk_size );
+		fwrite ( &uIntToFile, 1, 4, stream );
+	}
+	if (pBank->fxMagic != 0x6B427846 )
+		fwrite ( data, 1, chunk_size, stream );
+	else {
+		int numPrograms = m_plugin->numPrograms;
+		int currProgram = m_plugin->dispatcher(m_plugin, effGetProgram, 0, 0, 0, 0);
+		chunk_size = (m_plugin->numParams * sizeof( float ));
+		pBank->byteSize = chunk_size + 48;
+		pBank->byteSize = endian_swap( pBank->byteSize );
+		pBank->fxMagic = 0x6B437846;
+		uIntToFile = (unsigned int) m_plugin->numParams;
+		pBank->numPrograms = endian_swap( uIntToFile );
+		data = new char[ chunk_size ];
+		unsigned int* pValue,* toUIntArray = reinterpret_cast<unsigned int*>( data );
+		float value;
+		for (int j = 0; j < numPrograms; j++) {
+			m_plugin->dispatcher(m_plugin, effSetProgram, 0, j, 0, 0);
+			m_plugin->dispatcher(m_plugin, effGetProgramName, 0, 0, pBank->prgName, 0);
+			fwrite ( pBank, 1, 56, stream );
+			for ( int i = 0; i < m_plugin->numParams; i++ )
+			{
+				value = m_plugin->getParameter( m_plugin, i );
+				pValue = ( unsigned int * ) &value;
+				toUIntArray[ i ] = endian_swap( *pValue );
+			}
+			fwrite ( data, 1, chunk_size, stream );
+		}
+		m_plugin->dispatcher(m_plugin, effSetProgram, 0, currProgram, 0, 0);
+	}
+	fclose( stream );
+
+	if ( !chunky ) 
+		delete[] data;
+	delete[] (sBank*)pBank;
+
+}
+
+
+
+
+void RemoteVstPlugin::loadChunkFromPresetFile( const std::string & _file )
+{
+	void * chunk = NULL;
+	unsigned int * pLen = new unsigned int[ 1 ];
+	unsigned int len;
+	sBank * pBank = (sBank*) new char[ sizeof( sBank ) ];
+	FILE * stream = fopen( _file.c_str(), "r" );
+	fread ( pBank, 1, 56, stream );
+        pBank->fxID = endian_swap( pBank->fxID );
+	pBank->numPrograms = endian_swap( pBank->numPrograms );
+	unsigned int toUInt;
+	float * pFloat;
+
+	if (m_plugin->uniqueID != pBank->fxID) {
+		sendMessage( message( IdVstPluginPresetString ).
+					addString( "Error: Plugin UniqID not match" ) );
+		fclose( stream );
+		delete[] (unsigned int*)pLen;
+		delete[] (sBank*)pBank;
+		return;
+	}
+
+	if( _file.substr( _file.find_last_of( "." ) + 1 ) != "fxp" )
+		fseek ( stream , 156 , SEEK_SET );
+
+	if(pBank->fxMagic != 0x6B427846) {
+		if(pBank->fxMagic != 0x6B437846) {
+			fread (pLen, 1, 4, stream);
+			chunk = new char[len = endian_swap(*pLen)];
+		} else chunk = new char[len = sizeof(float)*pBank->numPrograms];
+		fread (chunk, len, 1, stream);
+		fclose( stream );
+	}
+
+	if(_file.substr(_file.find_last_of(".") + 1) == "fxp") {
+		pBank->prgName[23] = 0;
+		m_plugin->dispatcher(m_plugin, 4, 0, 0, pBank->prgName, 0);
+		if(pBank->fxMagic != 0x6B437846)
+			m_plugin->dispatcher(m_plugin, 24, 1, len, chunk, 0);
+		else {
+			unsigned int* toUIntArray = reinterpret_cast<unsigned int*>( chunk );
+			for (int i = 0; i < pBank->numPrograms; i++ ) {
+				toUInt = endian_swap( toUIntArray[ i ] );
+				pFloat = ( float* ) &toUInt;
+				m_plugin->setParameter( m_plugin, i, *pFloat );
+			}
+		}
+	} else {
+		if(pBank->fxMagic != 0x6B427846) {
+			m_plugin->dispatcher(m_plugin, 24, 0, len, chunk, 0);
+		} else {
+			int numPrograms = pBank->numPrograms;
+			unsigned int * toUIntArray;
+			int currProgram = m_plugin->dispatcher(m_plugin, effGetProgram, 0, 0, 0, 0);
+			chunk = new char[ len = sizeof(float)*m_plugin->numParams ];
+			toUIntArray = reinterpret_cast<unsigned int *>( chunk );
+			for (int i =0; i < numPrograms; i++) {
+				fread (pBank, 1, 56, stream);
+				fread (chunk, len, 1, stream);
+				m_plugin->dispatcher(m_plugin, effSetProgram, 0, i, 0, 0);
+				pBank->prgName[23] = 0;
+				m_plugin->dispatcher(m_plugin, 4, 0, 0, pBank->prgName, 0);
+				for (int j = 0; j < m_plugin->numParams; j++ ) {
+					toUInt = endian_swap( toUIntArray[ j ] );
+					pFloat = ( float* ) &toUInt;
+					m_plugin->setParameter( m_plugin, j, *pFloat );
+				}
+			}
+			m_plugin->dispatcher(m_plugin, effSetProgram, 0, currProgram, 0, 0);
+			fclose( stream );
+		}
+	}
+	char presName[30];
+	int currProgram = m_plugin->dispatcher(m_plugin, effGetProgram, 0, 0, 0, 0) + 1;
+	sprintf( presName, " %d/%d: %s", currProgram, m_plugin->numPrograms, presetName() );
+
+	sendMessage( message( IdVstPluginPresetString ).addString( presName ) );
+
+	delete[] (unsigned int*)pLen;
+	delete[] (sBank*)pBank;
+	delete[] (char*)chunk;
 }
 
 

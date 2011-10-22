@@ -24,6 +24,7 @@
 
 #include "VstPlugin.h"
 
+#include <QtGui/QFileDialog>
 #include <QtCore/QDir>
 #include <QtCore/QFileInfo>
 #include <QtCore/QLocale>
@@ -86,7 +87,9 @@ VstPlugin::VstPlugin( const QString & _plugin ) :
 	m_name(),
 	m_version( 0 ),
 	m_vendorString(),
-	m_productString()
+	m_productString(),
+	m_presetString(),
+	m_presetsString()
 {
 	setSplittedChannels( true );
 
@@ -402,6 +405,14 @@ bool VstPlugin::processMessage( const message & _m )
 			m_productString = _m.getQString();
 			break;
 
+		case IdVstPluginPresetString:
+			m_presetString = _m.getQString();
+			break;
+
+		case IdVstPluginPresetsString:
+			m_presetsString = _m.getQString();
+			break;
+
 		case IdVstPluginUniqueID:
 			// TODO: display graphically in case of failure
 			printf("unique ID: %s\n", _m.getString().c_str() );
@@ -420,7 +431,7 @@ bool VstPlugin::processMessage( const message & _m )
 				item.value = _m.getFloat( ++p );
 	m_parameterDump["param" + QString::number( item.index )] =
 				QString::number( item.index ) + ":" +
-//					QString( item.shortLabel ) + ":" +
+/*uncomented*/				/*QString( item.shortLabel )*/ QString::fromStdString(item.shortLabel) + ":" +
 					QString::number( item.value );
 			}
 			break;
@@ -430,6 +441,93 @@ bool VstPlugin::processMessage( const message & _m )
 	}
 	return true;
 
+}
+
+
+
+
+void VstPlugin::openPreset( )
+{
+
+	QFileDialog ofd( NULL, tr( "Open Preset" ), "",
+		tr( "Vst Plugin Preset (*.fxp *.fxb)" ) );
+	ofd.setFileMode( QFileDialog::ExistingFiles );
+	if( ofd.exec () == QDialog::Accepted &&
+					!ofd.selectedFiles().isEmpty() )
+	{
+		lock();
+		sendMessage( message( IdLoadChunkFromPresetFile ).
+			addString(
+				QSTR_TO_STDSTR(
+					QDir::toNativeSeparators( ofd.selectedFiles()[0] ) ) )
+			);
+		waitForMessage( IdLoadChunkFromPresetFile );
+		unlock();
+	}
+}
+
+
+
+
+void VstPlugin::rollPreset( int step )
+{
+	lock();
+	sendMessage( message( IdRotateProgram ).
+		addInt( step ) );
+	waitForMessage( IdRotateProgram );
+	unlock();
+}
+
+
+
+
+void VstPlugin::loadPrograms( int step )
+{
+	lock();
+	sendMessage( message( IdLoadPrograms ).
+		addInt( step ) );
+	waitForMessage( IdLoadPrograms );
+	unlock();
+}
+
+
+
+
+void VstPlugin::savePreset( )
+{
+	QString presName = this->presetString() == "" ? tr(": default"): this->presetString();
+	QFileDialog sfd( NULL, tr( "Save Preset" ), presName.section(": ", 1, 1) + tr(".fxp"),
+		tr( "Vst Plugin Preset (*.fxp *.fxb)" ) );
+
+	sfd.setAcceptMode( QFileDialog::AcceptSave );
+	sfd.setFileMode( QFileDialog::AnyFile );
+	if( sfd.exec () == QDialog::Accepted &&
+				!sfd.selectedFiles().isEmpty() && sfd.selectedFiles()[0] != "" )
+	{
+		QString fns = sfd.selectedFiles()[0];
+		if ((fns.toUpper().indexOf(tr(".FXP")) == -1) && (fns.toUpper().indexOf(tr(".FXB")) == -1))
+			fns = fns + tr(".fxb");
+		else fns = fns.left(fns.length() - 4) + (fns.right( 4 )).toLower();
+		lock();
+		sendMessage( message( IdSavePreset ).
+			addString(
+				QSTR_TO_STDSTR(
+					QDir::toNativeSeparators( fns ) ) )
+			);
+		waitForMessage( IdSavePreset );
+		unlock();
+	}
+}
+
+
+
+
+void VstPlugin::setParam( int i, float f )
+{
+	lock();
+	sendMessage( message( IdSetParameter ).addInt( i ).addFloat( f ) );
+	waitForMessage( IdSetParameter );
+	unlock();
 }
 
 

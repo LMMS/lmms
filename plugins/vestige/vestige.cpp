@@ -1,7 +1,7 @@
 /*
  * vestige.cpp - instrument-plugin for hosting VST-instruments
  *
- * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2011 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -29,6 +29,8 @@
 #include <QtGui/QMessageBox>
 #include <QtGui/QPainter>
 #include <QtGui/QPushButton>
+#include <QtGui/QMdiArea>
+#include <QtGui/QMenu>
 #include <QtXml/QDomElement>
 
 #include "engine.h"
@@ -36,12 +38,14 @@
 #include "InstrumentPlayHandle.h"
 #include "InstrumentTrack.h"
 #include "VstPlugin.h"
+#include "MainWindow.h"
 #include "pixmap_button.h"
 #include "string_pair_drag.h"
 #include "text_float.h"
 #include "tooltip.h"
 
 #include "embed.cpp"
+
 
 
 extern "C"
@@ -65,12 +69,16 @@ Plugin::Descriptor PLUGIN_EXPORT vestige_plugin_descriptor =
 
 
 QPixmap * VestigeInstrumentView::s_artwork = NULL;
+QPixmap * manageVestigeInstrumentView::s_artwork = NULL;
 
 
 vestigeInstrument::vestigeInstrument( InstrumentTrack * _instrument_track ) :
 	Instrument( _instrument_track, &vestige_plugin_descriptor ),
 	m_plugin( NULL ),
-	m_pluginMutex()
+	m_pluginMutex(),
+	m_subWindow( NULL ),
+	knobFModel( NULL ),
+	vstKnobs( NULL )
 {
 	// now we need a play-handle which cares for calling play()
 	InstrumentPlayHandle * iph = new InstrumentPlayHandle( this );
@@ -96,8 +104,44 @@ void vestigeInstrument::loadSettings( const QDomElement & _this )
 	if( m_plugin != NULL )
 	{
 		m_plugin->loadSettings( _this );
+
+		const QMap<QString, QString> & dump = m_plugin->parameterDump();
+		int paramCount = (dump).size();
+		char paramStr[35];
+		vstKnobs = new knob *[paramCount];
+		knobFModel = new FloatModel *[paramCount];
+		QStringList list1;
+		QWidget * xx = new QWidget();
+		for (int i = 0; i < paramCount; i++) {
+			sprintf( paramStr, "param%d", i);
+			list1 = dump[paramStr].split(":");
+
+			vstKnobs[i] = new knob( knobBright_26, xx );
+			vstKnobs[i]->setHintText( list1.at(1) + ":", "");
+			vstKnobs[i]->setLabel( list1.at(1).left(15) );
+
+			knobFModel[i] = new FloatModel( (list1.at(2)).toFloat(), 0.0f, 1.0f, 0.01f, this, QString::number(i) );
+			knobFModel[i]->loadSettings( _this, paramStr );
+			connect( knobFModel[i], SIGNAL( dataChanged() ), this, SLOT( setParameter() ) );
+
+			vstKnobs[i]->setModel( knobFModel[i] );
+		}
 	}
 	m_pluginMutex.unlock();
+}
+
+
+
+
+void vestigeInstrument::setParameter( void )
+{
+
+	Model *action = qobject_cast<Model *>(sender());
+	int knobUNID = action->displayName().toInt();
+
+	if ( m_plugin != NULL ) {
+		m_plugin->setParam( knobUNID, knobFModel[knobUNID]->value() );
+	}
 }
 
 
@@ -110,6 +154,40 @@ void vestigeInstrument::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	if( m_plugin != NULL )
 	{
 		m_plugin->saveSettings( _doc, _this );
+		if (knobFModel != NULL) {
+			const QMap<QString, QString> & dump = m_plugin->parameterDump();
+			int paramCount = (dump).size();
+			char paramStr[35];
+			for (int i = 0; i < paramCount; i++) {
+				if (knobFModel[i]->isAutomated() || knobFModel[i]->getControllerConnection()) {
+					sprintf( paramStr, "param%d", i);
+					knobFModel[i]->saveSettings( _doc, _this, paramStr );
+				}
+
+/*				QDomElement me = _doc.createElement( paramStr );
+				me.setAttribute( "id", knobFModel[i]->id() );
+				me.setAttribute( "value", knobFModel[i]->value() );
+				_this.appendChild( me );
+
+				ControllerConnection * m_controllerConnection = knobFModel[i]->getControllerConnection();
+				if (m_controllerConnection) {
+					QDomElement controller_element;
+					QDomNode node = _this.namedItem( "connection" );
+					if( node.isElement() )
+					{
+						controller_element = node.toElement();
+					}
+					else
+					{
+						controller_element = _doc.createElement( "connection" );
+						_this.appendChild( controller_element );
+					}
+					QDomElement element = _doc.createElement( paramStr );
+					m_controllerConnection->saveSettings( _doc, element );
+					controller_element.appendChild( element );
+				}*/
+			}
+		}
 	}
 	m_pluginMutex.unlock();
 }
@@ -246,7 +324,9 @@ PluginView * vestigeInstrument::instantiateView( QWidget * _parent )
 
 VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 							QWidget * _parent ) :
-	InstrumentView( _instrument, _parent )
+	InstrumentView( _instrument, _parent ),
+	tt ( NULL ),
+	lastPosInMenu (0)
 {
 	if( s_artwork == NULL )
 	{
@@ -271,8 +351,108 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 			"clicking on this button, a file-open-dialog appears "
 			"and you can select your file." ) );
 
+	m_managePluginButton = new pixmapButton( this, "" );
+	m_managePluginButton->setCheckable( false );
+	m_managePluginButton->setCursor( Qt::PointingHandCursor );
+	m_managePluginButton->move( 220, 102 );
+	m_managePluginButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
+							"track_op_menu", 20, 20 ) );
+	m_managePluginButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
+							"track_op_menu", 20, 20 ) );
+	connect( m_managePluginButton, SIGNAL( clicked() ), this,
+						SLOT( managePlugin() ) );
+	toolTip::add( m_managePluginButton, tr( "Control VST-plugin from LMMS host" ) );
+
+	m_managePluginButton->setWhatsThis(
+		tr( "Click here, if you want to control VST-plugin from host." ) );
+
+
+	m_openPresetButton = new pixmapButton( this, "" );
+	m_openPresetButton->setCheckable( false );
+	m_openPresetButton->setCursor( Qt::PointingHandCursor );
+	m_openPresetButton->move( 224, 192 );
+	m_openPresetButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
+							"stepper-up-press" ) );
+	m_openPresetButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
+							"stepper-up" ) );
+	connect( m_openPresetButton, SIGNAL( clicked() ), this,
+						SLOT( openPreset() ) );
+	toolTip::add( m_openPresetButton, tr( "Open VST-plugin preset" ) );
+
+	m_openPresetButton->setWhatsThis(
+		tr( "Click here, if you want to open another *.fxp, *.fxb VST-plugin preset." ) );
+
+
+	m_rolLPresetButton = new pixmapButton( this, "" );
+	m_rolLPresetButton->setCheckable( false );
+	m_rolLPresetButton->setCursor( Qt::PointingHandCursor );
+	m_rolLPresetButton->move( 167, 192 );
+	m_rolLPresetButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
+							"stepper-left-press" ) );
+	m_rolLPresetButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
+							"stepper-left" ) );
+	connect( m_rolLPresetButton, SIGNAL( clicked() ), this,
+						SLOT( rolrPreset() ) );
+	toolTip::add( m_rolLPresetButton, tr( "Previous (-)" ) );
+
+	m_rolLPresetButton->setShortcut( Qt::Key_Minus );
+
+	m_rolLPresetButton->setWhatsThis(
+		tr( "Click here, if you want to switch to another VST-plugin presset program." ) );
+
+
+	m_savePresetButton = new pixmapButton( this, "" );
+	m_savePresetButton->setCheckable( false );
+	m_savePresetButton->setCursor( Qt::PointingHandCursor );
+	m_savePresetButton->move( 224, 213 );
+	m_savePresetButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
+							"project_save", 16, 16  ) );
+	m_savePresetButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
+							"project_save", 16, 16  ) );
+	connect( m_savePresetButton, SIGNAL( clicked() ), this,
+						SLOT( savePreset() ) );
+	toolTip::add( m_savePresetButton, tr( "Save preset" ) );
+
+	m_savePresetButton->setWhatsThis(
+		tr( "Click here, if you want to save current VST-plugin presset program." ) );
+
+
+	m_rolRPresetButton = new pixmapButton( this, "" );
+	m_rolRPresetButton->setCheckable( false );
+	m_rolRPresetButton->setCursor( Qt::PointingHandCursor );
+	m_rolRPresetButton->move( 186, 192 );
+	m_rolRPresetButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
+							"stepper-right-press" ) );
+	m_rolRPresetButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
+							"stepper-right" ) );
+	connect( m_rolRPresetButton, SIGNAL( clicked() ), this,
+						SLOT( rollPreset() ) );
+	toolTip::add( m_rolRPresetButton, tr( "Next (+)" ) );
+
+	m_rolRPresetButton->setShortcut( Qt::Key_Plus );
+
+	m_rolRPresetButton->setWhatsThis(
+		tr( "Click here, if you want to switch to another VST-plugin presset program." ) );
+
+
+
+	m_selPresetButton = new QPushButton( tr( "" ), this );
+	m_selPresetButton->setGeometry( 205, 192, 16, 16 );
+
+	QMenu *menu = new QMenu;
+
+	connect( menu, SIGNAL( aboutToShow() ), this, SLOT( updateMenu() ) );
+
+
+	m_selPresetButton->setIcon( PLUGIN_NAME::getIconPixmap( "stepper-down" ) );
+	m_selPresetButton->setWhatsThis(
+		tr( "Click here to select presets that are currently loaded in VST." ) );
+
+	m_selPresetButton->setMenu(menu);
+
+
 	m_toggleGUIButton = new QPushButton( tr( "Show/hide GUI" ), this );
-	m_toggleGUIButton->setGeometry( 20, 150, 200, 24 );
+	m_toggleGUIButton->setGeometry( 20, 130, 200, 24 );
 	m_toggleGUIButton->setIcon( embed::getIconPixmap( "zoom" ) );
 	m_toggleGUIButton->setFont( pointSize<8>( m_toggleGUIButton->font() ) );
 	connect( m_toggleGUIButton, SIGNAL( clicked() ), this,
@@ -283,16 +463,60 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 
 	QPushButton * note_off_all_btn = new QPushButton( tr( "Turn off all "
 							"notes" ), this );
-	note_off_all_btn->setGeometry( 20, 180, 200, 24 );
+	note_off_all_btn->setGeometry( 20, 160, 200, 24 );
 	note_off_all_btn->setIcon( embed::getIconPixmap( "state_stop" ) );
 	note_off_all_btn->setFont( pointSize<8>( note_off_all_btn->font() ) );
 	connect( note_off_all_btn, SIGNAL( clicked() ), this,
 							SLOT( noteOffAll() ) );
 
 	setAcceptDrops( true );
+	_instrument2 = _instrument;
+	_parent2 = _parent;
 }
 
 
+void VestigeInstrumentView::managePlugin( void )
+{
+	if ( m_vi->m_plugin != NULL && m_vi->m_subWindow == NULL ) {
+		tt = new manageVestigeInstrumentView( _instrument2, _parent2, m_vi);
+	} else if (m_vi->m_subWindow != NULL) {
+		m_vi->m_scrollArea->show();
+		m_vi->m_subWindow->show();
+	}
+}
+
+
+void VestigeInstrumentView::updateMenu( void )
+{
+
+	// get all presets -
+	if ( m_vi->m_plugin != NULL ) {
+		m_vi->m_plugin->loadPrograms( 1 );
+		QWidget::update();
+
+     		QString str = m_vi->m_plugin->presetsString();
+
+    		QStringList list1 = str.split("|");
+
+     		QMenu * to_menu = m_selPresetButton->menu();
+    		to_menu->clear();
+
+    		QAction *presetActions[list1.size()];
+
+     		for (int i = 0; i < list1.size(); i++) {
+			presetActions[i] = new QAction(this);
+			connect(presetActions[i], SIGNAL(triggered()), this, SLOT(selPreset()));
+
+        		presetActions[i]->setText(QString("%1. %2").arg(QString::number(i+1), list1.at(i)));
+        		presetActions[i]->setData(i);
+			if (i == lastPosInMenu) {
+        			presetActions[i]->setIcon(embed::getIconPixmap( "sample_file", 16, 16 ));
+			} else  presetActions[i]->setIcon(embed::getIconPixmap( "edit_copy", 16, 16 ));
+			to_menu->addAction( presetActions[i] );
+     		}
+
+	}
+}
 
 
 VestigeInstrumentView::~VestigeInstrumentView()
@@ -346,6 +570,12 @@ void VestigeInstrumentView::openPlugin( void )
 			return;
 		}
 		engine::getMixer()->lock();
+		
+		if (tt != NULL) {
+			delete tt;
+			tt = NULL;
+		}
+
 		m_vi->loadFile( ofd.selectedFiles()[0] );
 		engine::getMixer()->unlock();
 		if( m_vi->m_plugin && m_vi->m_plugin->pluginWidget() )
@@ -354,6 +584,87 @@ void VestigeInstrumentView::openPlugin( void )
 									PLUGIN_NAME::getIconPixmap( "logo" ) );
 		}
 	}
+}
+
+
+
+
+void VestigeInstrumentView::openPreset( void )
+{
+
+	if ( m_vi->m_plugin != NULL ) {
+		m_vi->m_plugin->openPreset( );
+    		bool converted;
+    		QString str = m_vi->m_plugin->presetString().section("/", 0, 0);
+     		if (str != "")
+   			lastPosInMenu = str.toInt(&converted, 10) - 1;
+		QWidget::update();
+	}
+
+}
+
+
+
+
+void VestigeInstrumentView::savePreset( void )
+{
+
+	if ( m_vi->m_plugin != NULL ) {
+		m_vi->m_plugin->savePreset( );
+/*    		bool converted;
+    		QString str = m_vi->m_plugin->presetString().section("/", 0, 0);
+     		if (str != "")
+   			lastPosInMenu = str.toInt(&converted, 10) - 1;
+		QWidget::update();*/
+	}
+
+}
+
+
+
+
+void VestigeInstrumentView::rollPreset( void )
+{
+
+	if ( m_vi->m_plugin != NULL ) {
+		m_vi->m_plugin->rollPreset( 1 );
+    		bool converted;
+    		QString str = m_vi->m_plugin->presetString().section("/", 0, 0);
+     		if (str != "")
+   			lastPosInMenu = str.toInt(&converted, 10) - 1;
+		QWidget::update();
+	}
+}
+
+
+
+
+void VestigeInstrumentView::rolrPreset( void )
+{
+
+	if ( m_vi->m_plugin != NULL ) {
+		m_vi->m_plugin->rollPreset( -1 );
+    		bool converted;
+    		QString str = m_vi->m_plugin->presetString().section("/", 0, 0);
+     		if (str != "")
+   			lastPosInMenu = str.toInt(&converted, 10) - 1;
+		QWidget::update();
+	}
+}
+
+
+
+
+void VestigeInstrumentView::selPreset( void )
+{
+
+     QAction *action = qobject_cast<QAction *>(sender());
+     if (action)
+         if ( m_vi->m_plugin != NULL ) {
+		lastPosInMenu = action->data().toInt();
+		m_vi->m_plugin->rollPreset( action->data().toInt() + 2 );
+		QWidget::update();
+	 }
 }
 
 
@@ -458,6 +769,7 @@ void VestigeInstrumentView::paintEvent( QPaintEvent * )
 	p.setPen( QColor( 32, 160, 54 ) );
 
 	p.drawText( 10, 100, plugin_name );
+	p.drawText( 10, 211, tr( "Preset" ) );
 
 //	m_pluginMutex.lock();
 	if( m_vi->m_plugin != NULL )
@@ -467,6 +779,7 @@ void VestigeInstrumentView::paintEvent( QPaintEvent * )
 		p.setFont( pointSize<8>( f ) );
 		p.drawText( 10, 114, tr( "by" ) + " " +
 					m_vi->m_plugin->vendorString() );
+		p.drawText( 10, 225, m_vi->m_plugin->presetString() );
 	}
 //	m_pluginMutex.unlock();
 }
@@ -474,6 +787,188 @@ void VestigeInstrumentView::paintEvent( QPaintEvent * )
 
 
 
+manageVestigeInstrumentView::manageVestigeInstrumentView( Instrument * _instrument,
+							QWidget * _parent, vestigeInstrument * m_vi2 ) :
+	InstrumentView( _instrument, _parent )
+{
+	m_vi = m_vi2;
+        m_vi->m_scrollArea = new QScrollArea( this );
+	widget = new QWidget(this);
+	l = new QGridLayout( this );
+
+	m_vi->m_subWindow = engine::mainWindow()->workspace()->addSubWindow(new QMdiSubWindow, Qt::SubWindow | 
+			Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowSystemMenuHint);
+	m_vi->m_subWindow->setSizePolicy( QSizePolicy::Fixed, QSizePolicy::Fixed );
+	m_vi->m_subWindow->setFixedSize( 960, 300);
+	m_vi->m_subWindow->setWidget(m_vi->m_scrollArea);
+	m_vi->m_subWindow->setWindowTitle(m_vi->m_plugin->name());
+	m_vi->m_subWindow->setWindowIcon( PLUGIN_NAME::getIconPixmap( "logo" ) );
+	//m_vi->m_subWindow->setAttribute(Qt::WA_DeleteOnClose);
+
+
+	l->setContentsMargins( 20, 10, 10, 10 );
+	l->setVerticalSpacing( 10 );
+	l->setHorizontalSpacing( 23 );
+
+	m_syncButton = new QPushButton( tr( "VST Sync" ), this );
+	connect( m_syncButton, SIGNAL( clicked() ), this,
+							SLOT( syncPlugin() ) );
+	m_syncButton->setWhatsThis(
+		tr( "Click here if you want to synchronize all parameters with VST plugin." ) );
+
+	l->addWidget( m_syncButton, 0, 0, 1, 2, Qt::AlignLeft );
+
+	const QMap<QString, QString> & dump = m_vi->m_plugin->parameterDump();
+	int paramCount = (dump).size();
+
+	bool isVstKnobs = true, isKnobFModel = true;
+
+	if (m_vi->vstKnobs == NULL) {
+		m_vi->vstKnobs = new knob *[paramCount];
+		isVstKnobs = false;
+	}
+	if (m_vi->knobFModel == NULL) {
+		m_vi->knobFModel = new FloatModel *[paramCount];
+		isKnobFModel = false;
+	}
+
+	char paramStr[35];
+	QStringList list1;
+
+	if (isVstKnobs == false) {
+		for (int i = 0; i < paramCount; i++) {
+			sprintf( paramStr, "param%d", i);
+    			list1 = dump[paramStr].split(":");
+
+			m_vi->vstKnobs[i] = new knob( knobBright_26, this );
+			m_vi->vstKnobs[i]->setHintText( list1.at(1) + ":", "");
+			m_vi->vstKnobs[i]->setLabel( list1.at(1).left(15) );
+
+			sprintf( paramStr, "%d", i);
+			m_vi->knobFModel[i] = new FloatModel( (list1.at(2)).toFloat(), 0.0f, 1.0f, 0.01f, 
+					castModel<vestigeInstrument>(), tr( paramStr ) );
+			connect( m_vi->knobFModel[i], SIGNAL( dataChanged() ), this, SLOT( setParameter() ) );
+			m_vi->vstKnobs[i] ->setModel( m_vi->knobFModel[i] );
+		}
+	}
+
+	int i = 0;
+	for (int lrow = 0+1; lrow < (int(paramCount / 10) + 1)+1; lrow++) {
+		for (int lcolumn = 0; lcolumn < 10; lcolumn++) {
+			if (i < paramCount)
+				l->addWidget( m_vi->vstKnobs[i], lrow, lcolumn, Qt::AlignCenter );
+			i++;
+		}
+	}
+
+	l->setRowStretch( (int(paramCount / 10) + 1), 1 );
+	l->setColumnStretch( 10, 1 );
+
+	widget->setLayout(l);
+	widget->setAutoFillBackground(true);
+
+	m_vi->m_scrollArea->setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOn );
+	m_vi->m_scrollArea->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
+	m_vi->m_scrollArea->setPalette( QApplication::palette( m_vi->m_scrollArea ) );
+	m_vi->m_scrollArea->setMinimumHeight( 64 );
+
+	m_vi->m_scrollArea->setWidget( widget );
+
+	m_vi->m_subWindow->show();
+}
+
+
+
+
+void manageVestigeInstrumentView::syncPlugin( void )
+{
+	char paramStr[35];
+	QStringList list1;
+	const QMap<QString, QString> & dump = m_vi->m_plugin->parameterDump();
+	float f;
+
+	for (int i = 0; i<(dump).size(); i++) {
+		sprintf( paramStr, "param%d", i);
+    		list1 = dump[paramStr].split(":");
+		f = (list1.at(2)).toFloat();
+		m_vi->knobFModel[i]->setValue(f);
+		m_vi->knobFModel[i]->setInitValue(f);
+	}
+}
+
+
+manageVestigeInstrumentView::~manageVestigeInstrumentView()
+{
+	delete m_vi->m_subWindow;
+	m_vi->m_subWindow = NULL;
+}
+
+
+
+
+void manageVestigeInstrumentView::modelChanged( void )
+{
+	m_vi = castModel<vestigeInstrument>();
+}
+
+
+
+void manageVestigeInstrumentView::setParameter( void )
+{
+
+	Model *action = qobject_cast<Model *>(sender());
+	int knobUNID = action->displayName().toInt();
+
+	if ( m_vi->m_plugin != NULL ) {
+		m_vi->m_plugin->setParam( knobUNID, m_vi->knobFModel[knobUNID]->value() );
+	}
+}
+
+
+
+void manageVestigeInstrumentView::dragEnterEvent( QDragEnterEvent * _dee )
+{
+	if( _dee->mimeData()->hasFormat( stringPairDrag::mimeType() ) )
+	{
+		QString txt = _dee->mimeData()->data(
+						stringPairDrag::mimeType() );
+		if( txt.section( ':', 0, 0 ) == "vstplugin" )
+		{
+			_dee->acceptProposedAction();
+		}
+		else
+		{
+			_dee->ignore();
+		}
+	}
+	else
+	{
+		_dee->ignore();
+	}
+}
+
+
+
+
+void manageVestigeInstrumentView::dropEvent( QDropEvent * _de )
+{
+	QString type = stringPairDrag::decodeKey( _de );
+	QString value = stringPairDrag::decodeValue( _de );
+	if( type == "vstplugin" )
+	{
+		m_vi->loadFile( value );
+		_de->accept();
+		return;
+	}
+	_de->ignore();
+}
+ 
+ 
+ 
+ 
+void manageVestigeInstrumentView::paintEvent( QPaintEvent * )
+{
+}
 
 
 

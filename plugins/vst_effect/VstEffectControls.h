@@ -28,6 +28,17 @@
 #include "EffectControls.h"
 #include "VstEffectControlDialog.h"
 
+#include <QtGui/QMenu>
+#include "embed.h"
+#include <QtGui/QPushButton>
+
+#include <QtGui/QMdiSubWindow>
+#include <QtGui/QScrollArea>
+#include "knob.h"
+#include <QtGui/QLayout>
+#include <QPainter>
+#include <QObject>
+
 
 class VstEffect;
 
@@ -37,9 +48,7 @@ class VstEffectControls : public EffectControls
 	Q_OBJECT
 public:
 	VstEffectControls( VstEffect * _eff );
-	virtual ~VstEffectControls()
-	{
-	}
+	virtual ~VstEffectControls();
 
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
 	virtual void loadSettings( const QDomElement & _this );
@@ -56,10 +65,70 @@ public:
 	}
 
 
+protected slots:
+	void updateMenu( void );
+	void openPlugin( void );
+	void managePlugin( void );
+	void openPreset( void );
+	void savePreset( void );
+	void rollPreset( void );
+	void rolrPreset( void );
+	void selPreset( void );
+	void setParameter( void );
+
+protected:
+	virtual void paintEvent( QPaintEvent * _pe );
+
 private:
 	VstEffect * m_effect;
 
+	QPushButton * m_selPresetButton;
+	QMenu *menu;
+
+	QMdiSubWindow * m_subWindow;
+	QScrollArea * m_scrollArea;
+	FloatModel ** knobFModel;
+	knob ** vstKnobs;
+
+	QObject * ctrHandle;
+
+	int lastPosInMenu;
+//	QLabel * m_presetLabel;
+
 	friend class VstEffectControlDialog;
+	friend class manageVSTEffectView;
+
+} ;
+
+
+
+
+class manageVSTEffectView : public QObject
+{
+	Q_OBJECT
+public:
+	manageVSTEffectView( VstEffect * _eff, VstEffectControls * m_vi );
+	virtual ~manageVSTEffectView();
+
+
+protected slots:
+	void syncPlugin( void );
+	void setParameter( void );
+
+private:
+
+//	static QPixmap * s_artwork;
+
+	VstEffectControls * m_vi2;
+
+
+	VstEffect * m_effect;
+
+
+	QWidget *widget;
+	QGridLayout * l;
+
+	QPushButton * m_syncButton;
 
 } ;
 

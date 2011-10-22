@@ -180,7 +180,7 @@ public:
 class VstParameterProperties
 {
 public:
-	float stepFloat;
+/*	float stepFloat;
 	char label[64];
 	int flags;
 	int minInteger;
@@ -189,7 +189,24 @@ public:
 	char shortLabel[8];
 	int category;
 	char categoryLabel[24];
-	char empty[128];
+	char empty[128];*/
+
+	float stepFloat;
+	float smallStepFloat;
+	float largeStepFloat;
+	char label[64];
+	unsigned int flags;
+	unsigned int minInteger;
+	unsigned int maxInteger;
+	unsigned int stepInteger;
+	unsigned int largeStepInteger;
+	char shortLabel[8];
+	unsigned short displayIndex;
+  	unsigned short category;
+  	unsigned short numParametersInCategory;
+	unsigned short reserved;
+	char categoryLabel[24];
+	char future[16];
 
 } ;
 

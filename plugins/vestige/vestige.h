@@ -1,7 +1,7 @@
 /*
  * vestige.h - instrument VeSTige for hosting VST-plugins
  *
- * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2011 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -28,11 +28,15 @@
 
 
 #include <QtCore/QMutex>
+#include <QtGui/QLayout>
+#include <QtGui/QMdiSubWindow>
+#include <QtGui/QScrollArea>
 
 #include "Instrument.h"
 #include "InstrumentView.h"
 #include "midi.h"
 #include "note.h"
+#include "knob.h"
 
 
 class QPixmap;
@@ -68,6 +72,8 @@ public:
 
 	virtual PluginView * instantiateView( QWidget * _parent );
 
+protected slots:
+	void setParameter( void );
 
 private:
 	void closePlugin( void );
@@ -79,12 +85,49 @@ private:
 	QMutex m_pluginMutex;
 
 	QString m_pluginDLL;
+	QMdiSubWindow * m_subWindow;
+	QScrollArea * m_scrollArea;
+	FloatModel ** knobFModel;
+	knob ** vstKnobs;
 
 
 	friend class VestigeInstrumentView;
+	friend class manageVestigeInstrumentView;
 
 } ;
 
+
+class manageVestigeInstrumentView : public InstrumentView
+{
+	Q_OBJECT
+public:
+	manageVestigeInstrumentView( Instrument * _instrument, QWidget * _parent, vestigeInstrument * m_vi2 );
+	virtual ~manageVestigeInstrumentView();
+
+
+protected slots:
+	void syncPlugin( void );
+	void setParameter( void );
+
+
+protected:
+	virtual void dragEnterEvent( QDragEnterEvent * _dee );
+	virtual void dropEvent( QDropEvent * _de );
+	virtual void paintEvent( QPaintEvent * _pe );
+
+
+private:
+	virtual void modelChanged( void );
+
+	static QPixmap * s_artwork;
+
+	vestigeInstrument * m_vi;
+
+	QWidget *widget;
+	QGridLayout * l;
+	QPushButton * m_syncButton;
+
+} ;
 
 
 class VestigeInstrumentView : public InstrumentView
@@ -93,10 +136,18 @@ class VestigeInstrumentView : public InstrumentView
 public:
 	VestigeInstrumentView( Instrument * _instrument, QWidget * _parent );
 	virtual ~VestigeInstrumentView();
+	manageVestigeInstrumentView * tt;
 
 
 protected slots:
+	void updateMenu( void );
 	void openPlugin( void );
+	void managePlugin( void );
+	void openPreset( void );
+	void savePreset( void );
+	void rollPreset( void );
+	void rolrPreset( void );
+	void selPreset( void );
 	void toggleGUI( void );
 	void noteOffAll( void );
 
@@ -114,8 +165,19 @@ private:
 
 	vestigeInstrument * m_vi;
 
+	int lastPosInMenu;
+
 	pixmapButton * m_openPluginButton;
+	pixmapButton * m_openPresetButton;
+	pixmapButton * m_rolLPresetButton;
+	pixmapButton * m_rolRPresetButton;
+	QPushButton * m_selPresetButton;
 	QPushButton * m_toggleGUIButton;
+	pixmapButton * m_managePluginButton;
+	pixmapButton * m_savePresetButton;
+
+	Instrument * _instrument2;
+	QWidget * _parent2;
 
 } ;
 

@@ -75,6 +75,16 @@ public:
 		return m_productString;
 	}
 
+	inline const QString & presetString() const
+	{
+		return m_presetString;
+	}
+
+	inline const QString & presetsString() const
+	{
+		return m_presetsString;
+	}
+
 	const QMap<QString, QString> & parameterDump();
 	void setParameterDump( const QMap<QString, QString> & _pdump );
 
@@ -103,6 +113,11 @@ public:
 public slots:
 	void setTempo( bpm_t _bpm );
 	void updateSampleRate();
+	void openPreset( void );
+	void rollPreset( int step );
+	void loadPrograms( int step );
+	void savePreset( void );
+	void setParam( int i, float f );
 
 
 private:
@@ -120,6 +135,8 @@ private:
 	Sint32 m_version;
 	QString m_vendorString;
 	QString m_productString;
+	QString m_presetString;
+	QString m_presetsString;
 
 	QMap<QString, QString> m_parameterDump;
 

@@ -74,6 +74,8 @@ enum VstRemoteMessageIDs
 	IdVstPluginVersion,
 	IdVstPluginVendorString,
 	IdVstPluginProductString,
+	IdVstPluginPresetString,
+	IdVstPluginPresetsString,
 	IdVstPluginUniqueID,
 	IdVstParameterCount,
 	IdVstParameterDump,
