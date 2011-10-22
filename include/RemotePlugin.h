@@ -510,6 +510,11 @@ enum RemoteMessageIDs
 	IdSaveSettingsToFile,
 	IdLoadSettingsFromString,
 	IdLoadSettingsFromFile,
+	IdLoadChunkFromPresetFile,
+	IdRotateProgram,
+	IdLoadPrograms,
+	IdSavePreset,
+	IdSetParameter,
 	IdLoadPresetFromFile,
 	IdDebugMessage,
 	IdUserBase = 64

@@ -67,6 +67,7 @@ private:
 
 	friend class VstEffectControls;
 	friend class VstEffectControlDialog;
+	friend class manageVSTEffectView;
 
 } ;
 
