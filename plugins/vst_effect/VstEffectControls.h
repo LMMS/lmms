@@ -1,7 +1,7 @@
 /*
  * VstEffectControls.h - controls for VST effect plugins
  *
- * Copyright (c) 2008-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2011 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -67,7 +67,6 @@ public:
 
 protected slots:
 	void updateMenu( void );
-	void openPlugin( void );
 	void managePlugin( void );
 	void openPreset( void );
 	void savePreset( void );
