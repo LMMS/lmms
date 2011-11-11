@@ -77,8 +77,9 @@ vestigeInstrument::vestigeInstrument( InstrumentTrack * _instrument_track ) :
 	m_plugin( NULL ),
 	m_pluginMutex(),
 	m_subWindow( NULL ),
+	vstKnobs( NULL ),
 	knobFModel( NULL ),
-	vstKnobs( NULL )
+	p_subWindow( NULL )
 {
 	// now we need a play-handle which cares for calling play()
 	InstrumentPlayHandle * iph = new InstrumentPlayHandle( this );
@@ -90,6 +91,16 @@ vestigeInstrument::vestigeInstrument( InstrumentTrack * _instrument_track ) :
 
 vestigeInstrument::~vestigeInstrument()
 {
+	if (p_subWindow != NULL) {
+		delete p_subWindow;
+		p_subWindow = NULL;
+	}
+
+	if (knobFModel != NULL) {
+		delete []knobFModel;
+		knobFModel = NULL;
+	}
+
 	engine::getMixer()->removePlayHandles( instrumentTrack() );
 	closePlugin();
 }
@@ -111,12 +122,12 @@ void vestigeInstrument::loadSettings( const QDomElement & _this )
 		vstKnobs = new knob *[paramCount];
 		knobFModel = new FloatModel *[paramCount];
 		QStringList list1;
-		QWidget * xx = new QWidget();
+		QWidget * widget = new QWidget();
 		for (int i = 0; i < paramCount; i++) {
 			sprintf( paramStr, "param%d", i);
 			list1 = dump[paramStr].split(":");
 
-			vstKnobs[i] = new knob( knobBright_26, xx );
+			vstKnobs[i] = new knob( knobBright_26, widget );
 			vstKnobs[i]->setHintText( list1.at(1) + ":", "");
 			vstKnobs[i]->setLabel( list1.at(1).left(15) );
 
@@ -318,14 +329,9 @@ PluginView * vestigeInstrument::instantiateView( QWidget * _parent )
 
 
 
-
-
-
-
 VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 							QWidget * _parent ) :
 	InstrumentView( _instrument, _parent ),
-	tt ( NULL ),
 	lastPosInMenu (0)
 {
 	if( s_artwork == NULL )
@@ -478,10 +484,15 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 void VestigeInstrumentView::managePlugin( void )
 {
 	if ( m_vi->m_plugin != NULL && m_vi->m_subWindow == NULL ) {
-		tt = new manageVestigeInstrumentView( _instrument2, _parent2, m_vi);
+		m_vi->p_subWindow = new manageVestigeInstrumentView( _instrument2, _parent2, m_vi);
 	} else if (m_vi->m_subWindow != NULL) {
-		m_vi->m_scrollArea->show();
-		m_vi->m_subWindow->show();
+		if (m_vi->m_subWindow->widget()->isVisible() == FALSE) { 
+			m_vi->m_scrollArea->show();
+			m_vi->m_subWindow->show();
+		} else {
+			m_vi->m_scrollArea->hide();
+			m_vi->m_subWindow->hide();
+		}
 	}
 }
 
@@ -526,7 +537,7 @@ VestigeInstrumentView::~VestigeInstrumentView()
 
 
 
-void VestigeInstrumentView::modelChanged( void )
+void VestigeInstrumentView::modelChanged()
 {
 	m_vi = castModel<vestigeInstrument>();
 }
@@ -534,7 +545,7 @@ void VestigeInstrumentView::modelChanged( void )
 
 
 
-void VestigeInstrumentView::openPlugin( void )
+void VestigeInstrumentView::openPlugin()
 {
 	QFileDialog ofd( NULL, tr( "Open VST-plugin" ) );
 
@@ -571,9 +582,9 @@ void VestigeInstrumentView::openPlugin( void )
 		}
 		engine::getMixer()->lock();
 		
-		if (tt != NULL) {
-			delete tt;
-			tt = NULL;
+		if (m_vi->p_subWindow != NULL) {
+			delete m_vi->p_subWindow;
+			m_vi->p_subWindow = NULL;
 		}
 
 		m_vi->loadFile( ofd.selectedFiles()[0] );
@@ -792,7 +803,7 @@ manageVestigeInstrumentView::manageVestigeInstrumentView( Instrument * _instrume
 	InstrumentView( _instrument, _parent )
 {
 	m_vi = m_vi2;
-        m_vi->m_scrollArea = new QScrollArea( this );
+	m_vi->m_scrollArea = new QScrollArea( this );
 	widget = new QWidget(this);
 	l = new QGridLayout( this );
 
@@ -821,7 +832,7 @@ manageVestigeInstrumentView::manageVestigeInstrumentView( Instrument * _instrume
 	const QMap<QString, QString> & dump = m_vi->m_plugin->parameterDump();
 	int paramCount = (dump).size();
 
-	bool isVstKnobs = true, isKnobFModel = true;
+	bool isVstKnobs = true;
 
 	if (m_vi->vstKnobs == NULL) {
 		m_vi->vstKnobs = new knob *[paramCount];
@@ -829,7 +840,6 @@ manageVestigeInstrumentView::manageVestigeInstrumentView( Instrument * _instrume
 	}
 	if (m_vi->knobFModel == NULL) {
 		m_vi->knobFModel = new FloatModel *[paramCount];
-		isKnobFModel = false;
 	}
 
 	char paramStr[35];
@@ -899,17 +909,26 @@ void manageVestigeInstrumentView::syncPlugin( void )
 
 manageVestigeInstrumentView::~manageVestigeInstrumentView()
 {
-	delete m_vi->m_subWindow;
-	m_vi->m_subWindow = NULL;
+	if (m_vi->vstKnobs != NULL) {
+		delete []m_vi->vstKnobs;
+		m_vi->vstKnobs = NULL;
+	}
+ 
+	if (m_vi->m_scrollArea != NULL) {
+		delete m_vi->m_scrollArea;
+		m_vi->m_scrollArea = NULL;
+	}
+ 
+	if ( m_vi->m_subWindow != NULL ) {
+		m_vi->m_subWindow->setAttribute(Qt::WA_DeleteOnClose);
+		m_vi->m_subWindow->close();
+ 
+		if ( m_vi->m_subWindow != NULL ) 
+			delete m_vi->m_subWindow;
+		m_vi->m_subWindow = NULL;
+	}
 }
 
-
-
-
-void manageVestigeInstrumentView::modelChanged( void )
-{
-	m_vi = castModel<vestigeInstrument>();
-}
 
 
 

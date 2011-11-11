@@ -31,7 +31,11 @@
 #include "VstEffect.h"
 
 #include "pixmap_button.h"
+#include "embed.h"
 #include "tooltip.h"
+
+#include <QObject>
+#include <QtGui/QPainter>
  
 
 VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :

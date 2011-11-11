@@ -74,12 +74,12 @@ void VstEffectControls::loadSettings( const QDomElement & _this )
 		vstKnobs = new knob *[paramCount];
 		knobFModel = new FloatModel *[paramCount];
 		QStringList list1;
-		QWidget * xx = new QWidget();
+		QWidget * widget = new QWidget();
 		for (int i = 0; i < paramCount; i++) {
 			sprintf( paramStr, "param%d", i);
 			list1 = dump[paramStr].split(":");
 
-			vstKnobs[i] = new knob( knobBright_26, xx );
+			vstKnobs[i] = new knob( knobBright_26, widget );
 			vstKnobs[i]->setHintText( list1.at(1) + ":", "");
 			vstKnobs[i]->setLabel( list1.at(1).left(15) );
 
@@ -150,8 +150,13 @@ void VstEffectControls::managePlugin( void )
 		manageVSTEffectView * tt = new manageVSTEffectView( m_effect, this);
 		ctrHandle = (QObject *)tt;
 	} else if (m_subWindow != NULL) {
-		m_scrollArea->show();
-		m_subWindow->show();
+		if (m_subWindow->widget()->isVisible() == FALSE) { 
+			m_scrollArea->show();
+			m_subWindow->show();
+		} else {
+			m_scrollArea->hide();
+			m_subWindow->hide();
+		}
 	}
 }
 

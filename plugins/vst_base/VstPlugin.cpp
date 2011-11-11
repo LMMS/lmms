@@ -89,7 +89,8 @@ VstPlugin::VstPlugin( const QString & _plugin ) :
 	m_vendorString(),
 	m_productString(),
 	m_presetString(),
-	m_presetsString()
+	m_presetsString(),
+	p_name()
 {
 	setSplittedChannels( true );
 
@@ -496,8 +497,15 @@ void VstPlugin::loadPrograms( int step )
 void VstPlugin::savePreset( )
 {
 	QString presName = this->presetString() == "" ? tr(": default"): this->presetString();
+	presName.replace(tr("\""), tr("'")); // QFileDialog unable to handle double quotes properly
+
 	QFileDialog sfd( NULL, tr( "Save Preset" ), presName.section(": ", 1, 1) + tr(".fxp"),
 		tr( "Vst Plugin Preset (*.fxp *.fxb)" ) );
+
+	if( p_name != "" ) // remember last directory
+	{
+		sfd.setDirectory( QFileInfo( p_name ).absolutePath() );
+	}
 
 	sfd.setAcceptMode( QFileDialog::AcceptSave );
 	sfd.setFileMode( QFileDialog::AnyFile );
@@ -505,6 +513,8 @@ void VstPlugin::savePreset( )
 				!sfd.selectedFiles().isEmpty() && sfd.selectedFiles()[0] != "" )
 	{
 		QString fns = sfd.selectedFiles()[0];
+		p_name = fns;
+
 		if ((fns.toUpper().indexOf(tr(".FXP")) == -1) && (fns.toUpper().indexOf(tr(".FXB")) == -1))
 			fns = fns + tr(".fxb");
 		else fns = fns.left(fns.length() - 4) + (fns.right( 4 )).toLower();
