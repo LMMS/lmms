@@ -137,6 +137,8 @@ private:
 	QString m_presetString;
 	QString m_presetsString;
 
+	QString p_name;
+
 	QMap<QString, QString> m_parameterDump;
 
 } ;

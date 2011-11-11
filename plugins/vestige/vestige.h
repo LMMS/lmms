@@ -37,6 +37,8 @@
 #include "note.h"
 #include "knob.h"
 
+#include "AutomatableModel.h"
+
 
 class QPixmap;
 class QPushButton;
@@ -87,8 +89,9 @@ private:
 	QString m_pluginDLL;
 	QMdiSubWindow * m_subWindow;
 	QScrollArea * m_scrollArea;
-	FloatModel ** knobFModel;
 	knob ** vstKnobs;
+	FloatModel ** knobFModel;
+	QObject * p_subWindow;
 
 
 	friend class VestigeInstrumentView;
@@ -136,7 +139,6 @@ class VestigeInstrumentView : public InstrumentView
 public:
 	VestigeInstrumentView( Instrument * _instrument, QWidget * _parent );
 	virtual ~VestigeInstrumentView();
-	manageVestigeInstrumentView * tt;
 
 
 protected slots:
