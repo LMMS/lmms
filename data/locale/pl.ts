@@ -17,7 +17,7 @@
     </message>
     <message>
         <source>About</source>
-        <translation>O</translation>
+        <translation>Informacje</translation>
     </message>
     <message>
         <source>LMMS - easy music production for everyone</source>
@@ -39,7 +39,9 @@
         <source>Current language not translated (or native English).
 
 If you&apos;re interested in translating LMMS in another language or want to improve existing translations, you&apos;re welcome to help us! Simply contact the maintainer!</source>
-        <translation type="unfinished">Spolszczenie LMMS, 2011XI: Radek Słowik, radek@vibender.com !</translation>
+        <translation>Spolszczenie LMMS: Radek Słowik
+
+Zauważone błędy i propozycje zmian tłumaczenia zgłoś proszę na e-mail: radek[małpka]vibender[kropka]com</translation>
     </message>
     <message>
         <source>License</source>
@@ -316,7 +318,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>&amp;Copy value (%1%2)</source>
-        <translation>&amp;Kopiuj-wartość (%1%2)</translation>
+        <translation>&amp;Kopiuj wartość (%1%2)</translation>
     </message>
     <message>
         <source>&amp;Paste value (%1%2)</source>
@@ -344,7 +346,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>Connect to controller...</source>
-        <translation>Połączony do kontrolera...</translation>
+        <translation>Podłącz do kontrolera...</translation>
     </message>
 </context>
 <context>
@@ -958,7 +960,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     <name>ControllerView</name>
     <message>
         <source>Controls</source>
-        <translation>Regulatory</translation>
+        <translation>Ustaw</translation>
     </message>
     <message>
         <source>Controllers are able to automate the value of a knob, slider, and other controls.</source>
@@ -1049,7 +1051,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>The Wet/Dry knob sets the ratio between the input signal and the effect signal that forms the output.</source>
-        <translation>Pokrętło Suchy/Mokry (Wet/Dry) określa współczynnik pomiędzy sygnałem nieprzetworzonym a sygnałem po nałożeniu efektu. Wartości dodatnie domiksowywują sygnał przetworzony w fazie a ujemne w przeciwfazie do sygnału nieprzetworzonego.</translation>
+        <translation>Pokrętło Mokry/Suchy (Wet/Dry) określa współczynnik pomiędzy sygnałem nieprzetworzonym a sygnałem po nałożeniu efektu. Wartości dodatnie domiksowywują sygnał przetworzony w fazie a ujemne w przeciwfazie do sygnału nieprzetworzonego.</translation>
     </message>
     <message>
         <source>DECAY</source>
@@ -1811,7 +1813,7 @@ Prawoklik otwiera menu kontekstowe z pomocą którego można zmienić porządek 
     </message>
     <message>
         <source>PITCH</source>
-        <translation>ODSTROJENIE</translation>
+        <translation>PITCH</translation>
     </message>
     <message>
         <source>FX channel</source>
@@ -1985,7 +1987,7 @@ Prawoklik otwiera menu kontekstowe z pomocą którego można zmienić porządek 
     </message>
     <message>
         <source>degrees</source>
-        <translation>stopnie</translation>
+        <translation> stopni(e)</translation>
     </message>
     <message>
         <source>With this knob you can set the phase offset of the LFO. That means you can move the point within an oscillation where the oscillator begins to oscillate. For example if you have a sine-wave and have a phase-offset of 180 degrees the wave will first go down. It&apos;s the same with a square-wave.</source>
@@ -2058,7 +2060,7 @@ Upewnij się, że masz prawo zapisu do tego pliku i spróbuj ponownie.</translat
     </message>
     <message>
         <source>Recently opened projects</source>
-        <translation>Ostatnio otwierane projekty</translation>
+        <translation>Ostatnie projekty</translation>
     </message>
     <message>
         <source>&amp;Save</source>
@@ -2098,7 +2100,7 @@ Upewnij się, że masz prawo zapisu do tego pliku i spróbuj ponownie.</translat
     </message>
     <message>
         <source>&amp;Tools</source>
-        <translation>Narzędzia [&amp;T]</translation>
+        <translation>&amp;Narzędzia</translation>
     </message>
     <message>
         <source>&amp;Help</source>
@@ -2118,7 +2120,7 @@ Upewnij się, że masz prawo zapisu do tego pliku i spróbuj ponownie.</translat
     </message>
     <message>
         <source>About</source>
-        <translation>O</translation>
+        <translation>O LMMS</translation>
     </message>
     <message>
         <source>Create new project</source>
@@ -2240,15 +2242,15 @@ Odwiedź witrynę http://lmms.sf.net/wiki for documentation on LMMS.</translatio
     </message>
     <message>
         <source>My projects</source>
-        <translation>Moje projekty</translation>
+        <translation>Projekty</translation>
     </message>
     <message>
         <source>My samples</source>
-        <translation>Moje sample</translation>
+        <translation>Sample</translation>
     </message>
     <message>
         <source>My presets</source>
-        <translation>Moje presety</translation>
+        <translation>Presety</translation>
     </message>
     <message>
         <source>My home</source>
@@ -2628,7 +2630,7 @@ Powód: &quot;%2&quot;</translation>
     </message>
     <message>
         <source>In Place Broken: </source>
-        <translation>Przerwany w miejscu: </translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Channels In: </source>
@@ -3277,7 +3279,7 @@ Jeśli pracuje normalnie z innym oprogramowaniem VST pod Linuksem proszę koniec
     <name>bbTrack</name>
     <message>
         <source>Beat/Bassline %1</source>
-        <translation>Linia Perkusyjna/Basowa %1</translation>
+        <translation>Perkusja/Bas %1</translation>
     </message>
     <message>
         <source>Clone of %1</source>
@@ -4703,7 +4705,7 @@ użyj kółka myszy aby ustawić głośność poszczególnych kroków</translati
     </message>
     <message>
         <source>Instrument plugins</source>
-        <translation>Wtyczki instrumentów</translation>
+        <translation>Instrumenty wtyczkowe</translation>
     </message>
     <message>
         <source>Incomplete monophonic imitation tb303</source>
@@ -4735,7 +4737,7 @@ użyj kółka myszy aby ustawić głośność poszczególnych kroków</translati
     </message>
     <message>
         <source>versatile kick- &amp; bassdrum-synthesizer</source>
-        <translation>Wszechstronny syntezator do kick&apos;u i stopy perkusyjnej</translation>
+        <translation>Wszechstronny syntezator do kick&apos;u i stopy perkusyjnej.</translation>
     </message>
     <message>
         <source>GUS-compatible patch instrument</source>
@@ -4848,7 +4850,7 @@ Te układy scalone były stosowane w komputerach Commodore 64.</translation>
     </message>
     <message>
         <source>Cu&amp;t</source>
-        <translation>Wytnij [&amp;X]</translation>
+        <translation>Wy&amp;tnij</translation>
     </message>
     <message>
         <source>Ctrl+X</source>
@@ -5020,7 +5022,7 @@ Te układy scalone były stosowane w komputerach Commodore 64.</translation>
     <name>sampleTrack</name>
     <message>
         <source>Sample track</source>
-        <translation>Ścieżka sampla</translation>
+        <translation>Ścieżka audio</translation>
     </message>
     <message>
         <source>Volume</source>
@@ -5070,7 +5072,7 @@ Te układy scalone były stosowane w komputerach Commodore 64.</translation>
     </message>
     <message>
         <source>Show restart warning after changing settings</source>
-        <translation>Pokaż ostrzeżenie o konieczności ponownego uruchomienia po zmianie parametrów</translation>
+        <translation>Ostrzeżenie o konieczności restartu po zmianie parametrów</translation>
     </message>
     <message>
         <source>Display volume as dBV </source>
