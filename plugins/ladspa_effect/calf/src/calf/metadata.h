@@ -184,14 +184,15 @@ struct multibandcompressor_metadata: public plugin_metadata<multibandcompressor_
            param_freq0, param_freq1, param_freq2,
            param_sep0, param_sep1, param_sep2,
            param_q0, param_q1, param_q2,
+           param_mode,
            param_threshold0, param_ratio0, param_attack0, param_release0, param_makeup0, param_knee0,
-           param_detection0, param_compression0, param_output0, param_bypass0, param_mute0,
+           param_detection0, param_compression0, param_output0, param_bypass0, param_solo0,
            param_threshold1, param_ratio1, param_attack1, param_release1, param_makeup1, param_knee1,
-           param_detection1, param_compression1, param_output1, param_bypass1, param_mute1,
+           param_detection1, param_compression1, param_output1, param_bypass1, param_solo1,
            param_threshold2, param_ratio2, param_attack2, param_release2, param_makeup2, param_knee2,
-           param_detection2, param_compression2, param_output2, param_bypass2, param_mute2,
+           param_detection2, param_compression2, param_output2, param_bypass2, param_solo2,
            param_threshold3, param_ratio3, param_attack3, param_release3, param_makeup3, param_knee3,
-           param_detection3, param_compression3, param_output3, param_bypass3, param_mute3,
+           param_detection3, param_compression3, param_output3, param_bypass3, param_solo3,
            param_count };
     PLUGIN_NAME_ID_LABEL("multiband_compressor", "multibandcompressor", "Multiband Compressor")
 };
@@ -228,6 +229,40 @@ struct sidechaingate_metadata: public plugin_metadata<sidechaingate_metadata>
            param_sc_mode, param_f1_freq, param_f2_freq, param_f1_level, param_f2_level,
            param_sc_listen, param_f1_active, param_f2_active, param_count };
     PLUGIN_NAME_ID_LABEL("sidechaingate", "sidechaingate", "Sidechain Gate")
+};
+
+/// Markus's limiter - metadata
+struct limiter_metadata: public plugin_metadata<limiter_metadata>
+{
+    enum { in_count = 2, out_count = 2, ins_optional = 0, outs_optional = 0, support_midi = false, require_midi = false, rt_capable = true };
+    enum { param_bypass, param_level_in, param_level_out, 
+           STEREO_VU_METER_PARAMS,
+           param_limit, param_attack, param_release,
+           param_att,
+           param_asc, param_asc_led,
+           param_count };
+    PLUGIN_NAME_ID_LABEL("limiter", "limiter", "Limiter")
+};
+
+/// Markus's multibandlimiter - metadata
+struct multibandlimiter_metadata: public plugin_metadata<multibandlimiter_metadata>
+{
+    enum { in_count = 2, out_count = 2, ins_optional = 0, outs_optional = 0, support_midi = false, require_midi = false, rt_capable = true };
+    enum { param_bypass, param_level_in, param_level_out, 
+           STEREO_VU_METER_PARAMS,
+           param_freq0, param_freq1, param_freq2,
+           param_sep0, param_sep1, param_sep2,
+           param_q0, param_q1, param_q2,
+           param_mode,
+           param_limit, param_attack, param_release, param_minrel,
+           param_att0, param_att1, param_att2, param_att3,
+           param_weight0, param_weight1, param_weight2, param_weight3, 
+           param_release0, param_release1, param_release2, param_release3,
+           param_solo0, param_solo1, param_solo2, param_solo3,
+           param_effrelease0, param_effrelease1, param_effrelease2, param_effrelease3,
+           param_asc, param_asc_led,
+           param_count };
+    PLUGIN_NAME_ID_LABEL("multiband_limiter", "multibandlimiter", "Multiband Limiter")
 };
 
 /// Markus's 5-band EQ - metadata
@@ -321,6 +356,31 @@ struct bassenhancer_metadata: public plugin_metadata<bassenhancer_metadata>
     enum { param_bypass, param_level_in, param_level_out, param_amount, MONO_VU_METER_PARAMS, param_drive, param_blend, param_meter_drive,
            param_freq, param_listen, param_count };
     PLUGIN_NAME_ID_LABEL("bassenhancer", "bassenhancer", "Bass Enhancer")
+};
+/// Markus's Mono Module - metadata
+struct stereo_metadata: public plugin_metadata<stereo_metadata>
+{
+    enum { in_count = 2, out_count = 2, ins_optional = 1, outs_optional = 1, support_midi = false, require_midi = false, rt_capable = true };
+    enum { param_bypass, param_level_in, param_level_out, 
+           STEREO_VU_METER_PARAMS, param_balance_in, param_balance_out, param_softclip, 
+           param_mute_l, param_mute_r, param_phase_l, param_phase_r,
+           param_mode, param_slev, param_sbal, param_mlev, param_mpan,
+           param_widener, param_delay,
+           param_meter_phase,
+           param_count };
+    PLUGIN_NAME_ID_LABEL("stereo", "stereo", "Stereo Tools")
+};
+/// Markus's Mono Module - metadata
+struct mono_metadata: public plugin_metadata<mono_metadata>
+{
+    enum { in_count = 1, out_count = 2, ins_optional = 1, outs_optional = 1, support_midi = false, require_midi = false, rt_capable = true };
+    enum { param_bypass, param_level_in, param_level_out, 
+           param_meter_in, param_meter_outL, param_meter_outR, param_clip_in,param_clip_outL, param_clip_outR,
+           param_balance_out, param_softclip, 
+           param_mute_l, param_mute_r, param_phase_l, param_phase_r,
+           param_delay,
+           param_count };
+    PLUGIN_NAME_ID_LABEL("mono", "mono", "Mono Input")
 };
 
 /// Organ - enums for parameter IDs etc. (this mess is caused by organ split between plugin and generic class - which was

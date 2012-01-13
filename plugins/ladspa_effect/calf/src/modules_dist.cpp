@@ -37,6 +37,12 @@ saturator_audio_module::saturator_audio_module()
     is_active = false;
     srate = 0;
     meter_drive = 0.f;
+    lp_pre_freq_old = -1;
+    hp_pre_freq_old = -1;
+    lp_post_freq_old = -1;
+    hp_post_freq_old = -1;
+    p_freq_old = -1;
+    p_level_old = -1;
 }
 
 void saturator_audio_module::activate()

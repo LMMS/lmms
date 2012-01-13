@@ -445,3 +445,353 @@ bool filterclavier_audio_module::get_graph(int index, int subindex, float *data,
     return false;
 }
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+
+stereo_audio_module::stereo_audio_module() {
+    active = false;
+    clip_inL    = 0.f;
+    clip_inR    = 0.f;
+    clip_outL   = 0.f;
+    clip_outR   = 0.f;
+    meter_inL  = 0.f;
+    meter_inR  = 0.f;
+    meter_outL = 0.f;
+    meter_outR = 0.f;
+}
+
+void stereo_audio_module::activate() {
+    active = true;
+}
+
+void stereo_audio_module::deactivate() {
+    active = false;
+}
+
+void stereo_audio_module::params_changed() {
+    float slev = 2 * *params[param_slev]; // stereo level ( -2 -> 2 )
+    float sbal = 1 + *params[param_sbal]; // stereo balance ( 0 -> 2 )
+    float mlev = 2 * *params[param_mlev]; // mono level ( -2 -> 2 )
+    float mpan = 1 + *params[param_mpan]; // mono pan ( 0 -> 2 )
+
+    switch((int)*params[param_mode])
+    {
+        case 0:
+        default:
+            //LR->LR
+            LL = (mlev * (2.f - mpan) + slev * (2.f - sbal));
+            LR = (mlev * mpan - slev * sbal);
+            RL = (mlev * (2.f - mpan) - slev * (2.f - sbal));
+            RR = (mlev * mpan + slev * sbal);
+            break;
+        case 1:
+            //LR->MS
+            LL = (2.f - mpan) * (2.f - sbal);
+            LR = mpan * (2.f - sbal) * -1;
+            RL = (2.f - mpan) * sbal;
+            RR = mpan * sbal;
+            break;
+        case 2:
+            //MS->LR
+            LL = mlev * (2.f - sbal);
+            LR = mlev * mpan;
+            RL = slev * (2.f - sbal);
+            RR = slev * sbal * -1;
+            break;
+        case 3:
+        case 4:
+        case 5:
+        case 6:
+            //LR->LL
+            LL = 0.f;
+            LR = 0.f;
+            RL = 0.f;
+            RR = 0.f;
+            break;
+    }
+}
+
+uint32_t stereo_audio_module::process(uint32_t offset, uint32_t numsamples, uint32_t inputs_mask, uint32_t outputs_mask) {
+    for(uint32_t i = offset; i < offset + numsamples; i++) {
+        if(*params[param_bypass] > 0.5) {
+            outs[0][i] = ins[0][i];
+            outs[1][i] = ins[1][i];
+            clip_inL    = 0.f;
+            clip_inR    = 0.f;
+            clip_outL   = 0.f;
+            clip_outR   = 0.f;
+            meter_inL  = 0.f;
+            meter_inR  = 0.f;
+            meter_outL = 0.f;
+            meter_outR = 0.f;
+        } else {
+            // let meters fall a bit
+            clip_inL    -= std::min(clip_inL,  numsamples);
+            clip_inR    -= std::min(clip_inR,  numsamples);
+            clip_outL   -= std::min(clip_outL, numsamples);
+            clip_outR   -= std::min(clip_outR, numsamples);
+            meter_inL = 0.f;
+            meter_inR = 0.f;
+            meter_outL = 0.f;
+            meter_outR = 0.f;
+            
+            float L = ins[0][i];
+            float R = ins[1][i];
+            
+            // levels in
+            L *= *params[param_level_in];
+            R *= *params[param_level_in];
+            
+            // balance in
+            L *= (1.f - std::max(0.f, *params[param_balance_in]));
+            R *= (1.f + std::min(0.f, *params[param_balance_in]));
+            
+            // copy / flip / mono ...
+            switch((int)*params[param_mode])
+            {
+                case 0:
+                default:
+                    // LR > LR
+                    break;
+                case 1:
+                    // LR > MS
+                    break;
+                case 2:
+                    // MS > LR
+                    break;
+                case 3:
+                    // LR > LL
+                    R = L;
+                    break;
+                case 4:
+                    // LR > RR
+                    L = R;
+                    break;
+                case 5:
+                    // LR > L+R
+                    L = (L + R) / 2;
+                    R = L;
+                    break;
+                case 6:
+                    // LR > RL
+                    float tmp = L;
+                    L = R;
+                    R = tmp;
+                    break;
+            }
+            
+            // softclip
+            if(*params[param_softclip]) {
+                int ph;
+                ph = L / fabs(L);
+                L = L > 0.63 ? ph * (0.63 + 0.36 * (1 - pow(MATH_E, (1.f / 3) * (0.63 + L * ph)))) : L;
+                ph = R / fabs(R);
+                R = R > 0.63 ? ph * (0.63 + 0.36 * (1 - pow(MATH_E, (1.f / 3) * (0.63 + R * ph)))) : R;
+            }
+            
+            // GUI stuff
+            if(L > meter_inL) meter_inL = L;
+            if(R > meter_inR) meter_inR = R;
+            if(L > 1.f) clip_inL  = srate >> 3;
+            if(R > 1.f) clip_inR  = srate >> 3;
+            
+            // mute
+            L *= (1 - floor(*params[param_mute_l] + 0.5));
+            R *= (1 - floor(*params[param_mute_r] + 0.5));
+            
+            // phase
+            L *= (2 * (1 - floor(*params[param_phase_l] + 0.5))) - 1;
+            R *= (2 * (1 - floor(*params[param_phase_r] + 0.5))) - 1;
+            
+            // LR/MS
+            L += LL*L + RL*R;
+            R += RR*R + LR*L;
+            
+            // widener
+            L += *params[param_widener] * R * -1;
+            R += *params[param_widener] * L * -1;
+            
+            // delay
+            buffer[pos]     = L;
+            buffer[pos + 1] = R;
+            
+            int nbuf = srate * (fabs(*params[param_delay]) / 1000.f);
+            nbuf -= nbuf % 2;
+            if(*params[param_delay] > 0.f) {
+                R = buffer[(pos - (int)nbuf + 1 + buffer_size) % buffer_size];
+            } else if (*params[param_delay] < 0.f) {
+                L = buffer[(pos - (int)nbuf + buffer_size)     % buffer_size];
+            }
+            
+            pos = (pos + 2) % buffer_size;
+            
+            // balance out
+            L *= (1.f - std::max(0.f, *params[param_balance_out]));
+            R *= (1.f + std::min(0.f, *params[param_balance_out]));
+            
+            // level 
+            L *= *params[param_level_out];
+            R *= *params[param_level_out];
+            
+            //output
+            outs[0][i] = L;
+            outs[1][i] = R;
+            
+            // clip LED's
+            if(L > 1.f) clip_outL = srate >> 3;
+            if(R > 1.f) clip_outR = srate >> 3;
+            if(L > meter_outL) meter_outL = L;
+            if(R > meter_outR) meter_outR = R;
+            
+            // phase meter
+            if(fabs(L) > 0.001 and fabs(R) > 0.001) {
+				meter_phase = fabs(fabs(L+R) > 0.000000001 ? sin(fabs((L-R)/(L+R))) : 0.f);
+			} else {
+				meter_phase = 0.f;
+			}
+        }
+    }
+    // draw meters
+    SET_IF_CONNECTED(clip_inL);
+    SET_IF_CONNECTED(clip_inR);
+    SET_IF_CONNECTED(clip_outL);
+    SET_IF_CONNECTED(clip_outR);
+    SET_IF_CONNECTED(meter_inL);
+    SET_IF_CONNECTED(meter_inR);
+    SET_IF_CONNECTED(meter_outL);
+    SET_IF_CONNECTED(meter_outR);
+    SET_IF_CONNECTED(meter_phase);
+    return outputs_mask;
+}
+
+void stereo_audio_module::set_sample_rate(uint32_t sr)
+{
+    srate = sr;
+    // rebuild buffer
+    buffer_size = (int)(srate * 0.05 * 2.f); // buffer size attack rate multiplied by 2 channels
+    buffer = (float*) calloc(buffer_size, sizeof(float));
+    memset(buffer, 0, buffer_size * sizeof(float)); // reset buffer to zero
+    pos = 0;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+
+mono_audio_module::mono_audio_module() {
+    active = false;
+    clip_in    = 0.f;
+    clip_outL   = 0.f;
+    clip_outR   = 0.f;
+    meter_in  = 0.f;
+    meter_outL = 0.f;
+    meter_outR = 0.f;
+}
+
+void mono_audio_module::activate() {
+    active = true;
+}
+
+void mono_audio_module::deactivate() {
+    active = false;
+}
+
+void mono_audio_module::params_changed() {
+    
+}
+
+uint32_t mono_audio_module::process(uint32_t offset, uint32_t numsamples, uint32_t inputs_mask, uint32_t outputs_mask) {
+    for(uint32_t i = offset; i < offset + numsamples; i++) {
+        if(*params[param_bypass] > 0.5) {
+            outs[0][i] = ins[0][i];
+            outs[1][i] = ins[0][i];
+            clip_in     = 0.f;
+            clip_outL   = 0.f;
+            clip_outR   = 0.f;
+            meter_in    = 0.f;
+            meter_outL  = 0.f;
+            meter_outR  = 0.f;
+        } else {
+            // let meters fall a bit
+            clip_in     -= std::min(clip_in,  numsamples);
+            clip_outL   -= std::min(clip_outL, numsamples);
+            clip_outR   -= std::min(clip_outR, numsamples);
+            meter_in     = 0.f;
+            meter_outL   = 0.f;
+            meter_outR   = 0.f;
+            
+            float L = ins[0][i];
+            
+            // levels in
+            L *= *params[param_level_in];
+            
+            // softclip
+            if(*params[param_softclip]) {
+                int ph = L / fabs(L);
+                L = L > 0.63 ? ph * (0.63 + 0.36 * (1 - pow(MATH_E, (1.f / 3) * (0.63 + L * ph)))) : L;
+            }
+            
+            // GUI stuff
+            if(L > meter_in) meter_in = L;
+            if(L > 1.f) clip_in = srate >> 3;
+            
+            float R = L;
+            
+            // mute
+            L *= (1 - floor(*params[param_mute_l] + 0.5));
+            R *= (1 - floor(*params[param_mute_r] + 0.5));
+            
+            // phase
+            L *= (2 * (1 - floor(*params[param_phase_l] + 0.5))) - 1;
+            R *= (2 * (1 - floor(*params[param_phase_r] + 0.5))) - 1;
+            
+            // delay
+            buffer[pos]     = L;
+            buffer[pos + 1] = R;
+            
+            int nbuf = srate * (fabs(*params[param_delay]) / 1000.f);
+            nbuf -= nbuf % 2;
+            if(*params[param_delay] > 0.f) {
+                R = buffer[(pos - (int)nbuf + 1 + buffer_size) % buffer_size];
+            } else if (*params[param_delay] < 0.f) {
+                L = buffer[(pos - (int)nbuf + buffer_size)     % buffer_size];
+            }
+            
+            pos = (pos + 2) % buffer_size;
+            
+            // balance out
+            L *= (1.f - std::max(0.f, *params[param_balance_out]));
+            R *= (1.f + std::min(0.f, *params[param_balance_out]));
+            
+            // level 
+            L *= *params[param_level_out];
+            R *= *params[param_level_out];
+            
+            //output
+            outs[0][i] = L;
+            outs[1][i] = R;
+            
+            // clip LED's
+            if(L > 1.f) clip_outL = srate >> 3;
+            if(R > 1.f) clip_outR = srate >> 3;
+            if(L > meter_outL) meter_outL = L;
+            if(R > meter_outR) meter_outR = R;
+        }
+    }
+    // draw meters
+    SET_IF_CONNECTED(clip_in);
+    SET_IF_CONNECTED(clip_outL);
+    SET_IF_CONNECTED(clip_outR);
+    SET_IF_CONNECTED(meter_in);
+    SET_IF_CONNECTED(meter_outL);
+    SET_IF_CONNECTED(meter_outR);
+    return outputs_mask;
+}
+
+void mono_audio_module::set_sample_rate(uint32_t sr)
+{
+    srate = sr;
+    // rebuild buffer
+    buffer_size = (int)srate * 0.05 * 2; // delay buffer size multiplied by 2 channels
+    buffer = (float*) calloc(buffer_size, sizeof(float));
+    memset(buffer, 0, buffer_size * sizeof(float)); // reset buffer to zero
+    pos = 0;
+}
