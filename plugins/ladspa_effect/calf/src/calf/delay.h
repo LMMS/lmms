@@ -92,7 +92,7 @@ struct simple_delay {
      */
     template<class U>
     inline void get_interp(U &odata, int delay, float udelay) {
-//        assert(delay >= 0 && delay < N-1);
+//        assert(delay >= 0 && delay <= N-1);
         int ppos = wrap_around<N>(pos + N - delay);
         int pppos = wrap_around<N>(ppos + N - 1);
         odata = lerp(data[ppos], data[pppos], udelay);

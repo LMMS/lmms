@@ -21,7 +21,6 @@
 #include <config.h>
 #include <limits.h>
 #include <calf/giface.h>
-#include <calf/osctlnet.h>
 #include <calf/utils.h>
 
 using namespace std;
@@ -385,106 +384,6 @@ uint32_t mod_matrix_metadata::get_table_rows() const
 ///////////////////////////////////////////////////////////////////////////////////////
 
 #if USE_EXEC_GUI
-struct osc_cairo_control: public cairo_iface
-{
-    osctl::osc_inline_typed_strstream &os;
-    
-    osc_cairo_control(osctl::osc_inline_typed_strstream &_os) : os(_os) {}
-    virtual void set_source_rgba(float r, float g, float b, float a = 1.f)
-    {
-        os << (uint32_t)LGI_SET_RGBA << r << g << b << a;
-    }
-    virtual void set_line_width(float width)
-    {
-        os << (uint32_t)LGI_SET_WIDTH << width;
-    }
-};
-
-static void serialize_graphs(osctl::osc_inline_typed_strstream &os, const line_graph_iface *graph, std::vector<int> &params)
-{
-    osc_cairo_control cairoctl(os);
-    for (size_t i = 0; i < params.size(); i++)
-    {
-        int index = params[i];
-        os << (uint32_t)LGI_GRAPH;
-        os << (uint32_t)index;
-        for (int j = 0; ; j++)
-        {
-            float data[128];
-            if (graph->get_graph(index, j, data, 128, &cairoctl))
-            {
-                os << (uint32_t)LGI_SUBGRAPH;
-                os << (uint32_t)128;
-                for (int p = 0; p < 128; p++)
-                    os << data[p];
-            }
-            else
-                break;
-        }
-        for (int j = 0; ; j++)
-        {
-            float x, y;
-            int size = 3;
-            if (graph->get_dot(index, j, x, y, size, &cairoctl))
-                os << (uint32_t)LGI_DOT << x << y << (uint32_t)size;
-            else
-                break;
-        }
-        for (int j = 0; ; j++)
-        {
-            float pos = 0;
-            bool vertical = false;
-            string legend;
-            if (graph->get_gridline(index, j, pos, vertical, legend, &cairoctl))
-                os << (uint32_t)LGI_LEGEND << pos << (uint32_t)(vertical ? 1 : 0) << legend;
-            else
-                break;
-        }
-        os << (uint32_t)LGI_END_ITEM;
-    }
-    os << (uint32_t)LGI_END;
-}
-
-calf_plugins::dssi_feedback_sender::dssi_feedback_sender(const char *URI, const line_graph_iface *_graph)
-{
-    graph = _graph;
-    is_client_shared = false;
-    client = new osctl::osc_client;
-    client->bind("0.0.0.0", 0);
-    client->set_url(URI);
-}
-
-calf_plugins::dssi_feedback_sender::dssi_feedback_sender(osctl::osc_client *_client, const line_graph_iface *_graph)
-{
-    graph = _graph;
-    client = _client;
-    is_client_shared = true;
-}
-
-void calf_plugins::dssi_feedback_sender::add_graphs(const calf_plugins::parameter_properties *props, int num_params)
-{
-    for (int i = 0; i < num_params; i++)
-    {
-        if (props[i].flags & PF_PROP_GRAPH)
-            indices.push_back(i);
-    }
-}
-
-void calf_plugins::dssi_feedback_sender::update()
-{
-    if (graph)
-    {
-        osctl::osc_inline_typed_strstream os;
-        serialize_graphs(os, graph, indices);
-        client->send("/lineGraph", os);
-    }
-}
-
-calf_plugins::dssi_feedback_sender::~dssi_feedback_sender()
-{
-    if (!is_client_shared)
-        delete client;
-}
 
 table_via_configure::table_via_configure()
 {

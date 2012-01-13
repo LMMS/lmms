@@ -28,7 +28,7 @@
 #include <lv2.h>
 #include <calf/giface.h>
 #include <calf/lv2_event.h>
-#include <calf/lv2_persist.h>
+#include <calf/lv2_state.h>
 #include <calf/lv2_progress.h>
 #include <calf/lv2_uri_map.h>
 #include <string.h>
@@ -86,17 +86,17 @@ struct lv2_instance: public plugin_ctl_iface, public progress_report_iface
     void send_configures(send_configure_iface *sci) { 
         module->send_configures(sci);
     }
-    void impl_restore(LV2_Persist_Retrieve_Function retrieve, void *callback_data)
+    void impl_restore(LV2_State_Retrieve_Function retrieve, void *callback_data)
     {
         const char *const *vars = module->get_metadata_iface()->get_configure_vars();
         if (!vars)
             return;
         assert(uri_map);
-        uint32_t string_type = uri_map->uri_to_id(uri_map, NULL, "http://lv2plug.in/ns/ext/atom#String");
+        uint32_t string_type = uri_map->uri_to_id(uri_map->callback_data, NULL, "http://lv2plug.in/ns/ext/atom#String");
         assert(string_type);
         for (unsigned int i = 0; vars[i]; i++)
         {
-            const uint32_t key   = uri_map->uri_to_id(uri_map, NULL, vars[i]);
+            const uint32_t key   = uri_map->uri_to_id(uri_map->callback_data, NULL, vars[i]);
             size_t         len   = 0;
             uint32_t       type  = 0;
             uint32_t       flags = 0;
@@ -182,7 +182,7 @@ struct lv2_wrapper
     typedef lv2_instance instance;
     static LV2_Descriptor descriptor;
     static LV2_Calf_Descriptor calf_descriptor;
-    static LV2_Persist persist;
+    static LV2_State_Interface state_iface;
     std::string uri;
     
     lv2_wrapper()
@@ -197,8 +197,8 @@ struct lv2_wrapper
         descriptor.deactivate = cb_deactivate;
         descriptor.cleanup = cb_cleanup;
         descriptor.extension_data = cb_ext_data;
-        persist.save = cb_persist_save;
-        persist.restore = cb_persist_restore;
+        state_iface.save = cb_state_save;
+        state_iface.restore = cb_state_restore;
         calf_descriptor.get_pci = cb_get_pci;
     }
 
@@ -294,16 +294,18 @@ struct lv2_wrapper
     {
         if (!strcmp(URI, "http://foltman.com/ns/calf-plugin-instance"))
             return &calf_descriptor;
-        if (!strcmp(URI, LV2_PERSIST_URI))
-            return &persist;
+        if (!strcmp(URI, LV2_STATE_INTERFACE_URI))
+            return &state_iface;
         return NULL;
     }
-    static void cb_persist_save(LV2_Handle Instance, LV2_Persist_Store_Function store, void *callback_data)
+    static void cb_state_save(LV2_Handle Instance,
+                          LV2_State_Store_Function store, LV2_State_Handle handle,
+                          uint32_t flags, const LV2_Feature *const * features)
     {
         instance *const inst = (instance *)Instance;
         struct store_state: public send_configure_iface
         {
-            LV2_Persist_Store_Function store;
+            LV2_State_Store_Function store;
             void *callback_data;
             instance *inst;
             uint32_t string_data_type;
@@ -311,24 +313,26 @@ struct lv2_wrapper
             virtual void send_configure(const char *key, const char *value)
             {
                 (*store)(callback_data,
-                         inst->uri_map->uri_to_id(inst->uri_map, NULL, key),
+                         inst->uri_map->uri_to_id(inst->uri_map->callback_data, NULL, key),
                          value,
                          strlen(value) + 1,
                          string_data_type,
-                         LV2_PERSIST_IS_POD|LV2_PERSIST_IS_PORTABLE);
+                         LV2_STATE_IS_POD|LV2_STATE_IS_PORTABLE);
             }
         };
-        // A host that supports Persist MUST support URI-Map as well.
+        // A host that supports State MUST support URI-Map as well.
         assert(inst->uri_map);
         store_state s;
         s.store = store;
-        s.callback_data = callback_data;
+        s.callback_data = handle;
         s.inst = inst;
-        s.string_data_type = inst->uri_map->uri_to_id(inst->uri_map, NULL, "http://lv2plug.in/ns/ext/atom#String");
+        s.string_data_type = inst->uri_map->uri_to_id(inst->uri_map->callback_data, NULL, "http://lv2plug.in/ns/ext/atom#String");
 
         inst->send_configures(&s);
     }
-    static void cb_persist_restore(LV2_Handle Instance, LV2_Persist_Retrieve_Function retrieve, void *callback_data)
+    static void cb_state_restore(LV2_Handle Instance,
+                                 LV2_State_Retrieve_Function retrieve, LV2_State_Handle callback_data,
+                                 uint32_t flags, const LV2_Feature *const * features)
     {
         instance *const inst = (instance *)Instance;
         inst->impl_restore(retrieve, callback_data);

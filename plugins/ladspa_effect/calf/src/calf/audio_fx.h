@@ -565,6 +565,48 @@ public:
     bool get_dot(float &x, float &y, int &size, calf_plugins::cairo_iface *context) const;
 };
 
+
+/// Lookahead Limiter by Markus Schmidt and Christian Holschuh
+class lookahead_limiter {
+private:
+public:
+    float limit, attack, release, weight;
+    float __attack;
+    uint32_t srate;
+    float att;
+    float att_max;
+    unsigned int pos;
+    unsigned int buffer_size;
+    unsigned int overall_buffer_size;
+    bool is_active;
+    bool debug;
+    bool auto_release;
+    bool asc_active;
+    float *buffer;
+    int channels;
+    float delta;
+    float _delta;
+    float peak;
+    unsigned int over_s;
+    float over_c;
+    bool use_multi;
+    unsigned int id;
+    bool _sanitize;
+    static inline void denormal(volatile float *f) {
+	    *f += 1e-18;
+	    *f -= 1e-18;
+    }
+    bool get_arc();
+    lookahead_limiter();
+    void set_multi(bool set);
+    void process(float &left, float &right, float *multi_buffer);
+    void set_sample_rate(uint32_t sr);
+    void set_params(float l, float a, float r, float weight = 1.f, bool ar = false, bool d = false);
+    float get_attenuation();
+    void activate();
+    void deactivate();
+};
+
 #if 0
 { to keep editor happy
 #endif

@@ -351,6 +351,8 @@ tap_distortion::tap_distortion()
     is_active = false;
     srate = 0;
     meter = 0.f;
+    prev_med = prev_out = 0.f;
+    drive_old = blend_old = -1.f;
 }
 
 void tap_distortion::activate()
@@ -530,3 +532,211 @@ bool simple_lfo::get_dot(float &x, float &y, int &size, cairo_iface *context) co
     return true;
 }
 
+
+/// Lookahead Limiter by Christian Holschuh and Markus Schmidt
+
+lookahead_limiter::lookahead_limiter() {
+    is_active = false;
+    channels = 2;
+    id = 0;
+    buffer_size = 0;
+    overall_buffer_size = 0;
+    att = 1.f;
+    att_max = 1.0;
+    pos = 0;
+    delta = 0.f;
+    _delta = 0.f;
+    peak = 0.f;
+    over_s = 0;
+    over_c = 1.f;
+    attack = 0.005;
+    __attack = -1;
+    use_multi = false;
+    weight = 1.f;
+    _sanitize = false;
+    auto_release = false;
+    asc_active = false;
+}
+
+void lookahead_limiter::activate()
+{
+    is_active = true;
+    pos = 0;
+    
+}
+
+void lookahead_limiter::set_multi(bool set) { use_multi = set; }
+
+void lookahead_limiter::deactivate()
+{
+    is_active = false;
+}
+
+float lookahead_limiter::get_attenuation()
+{
+    float a = att_max;
+    att_max = 1.0;
+    return a;
+}
+
+void lookahead_limiter::set_sample_rate(uint32_t sr)
+{
+    srate = sr;
+    // rebuild buffer
+    overall_buffer_size = (int)(srate * (100.f / 1000.f) * channels) + channels; // buffer size attack rate multiplied by 2 channels
+    buffer = (float*) calloc(overall_buffer_size, sizeof(float));
+    memset(buffer, 0, overall_buffer_size * sizeof(float)); // reset buffer to zero
+    pos = 0;
+}
+
+void lookahead_limiter::set_params(float l, float a, float r, float w, bool ar, bool d)
+{
+    limit = l;
+    attack = a / 1000.f;
+    release = r / 1000.f;
+    auto_release = ar;
+    debug = d;
+    weight = w;
+    //if(debug) printf("%.5f\n", release);
+    if( attack != __attack) {
+        int bs = (int)(srate * attack * channels);
+        buffer_size = bs - bs % channels; // buffer size attack rate
+        __attack = attack;
+        _sanitize = true;
+        pos = 0;
+    }
+}
+
+void lookahead_limiter::process(float &left, float &right, float * multi_buffer)
+{
+    // PROTIP: harming paying customers enough to make them develop a competing
+    // product may be considered an example of a less than sound business practice.
+
+    // write left and right to buffer
+    buffer[pos] = 0.f;
+    buffer[pos + 1] = 0.f;
+    if(!_sanitize) {
+        buffer[pos] = left;
+        buffer[pos + 1] = right;
+    }
+    
+    // are we using multiband? get the multiband coefficient
+    float multi_coeff = (use_multi) ? multi_buffer[pos] : 1.f;
+    //if(debug and pos%10 == 0) printf("%03d: %.5f\n", pos, multi_buffer[pos]);
+    
+    // input peak - impact in left or right channel?
+    peak = fabs(left) > fabs(right) ? fabs(left) : fabs(right);
+    
+    // if we have a peak in input over our limit, check if delta to reach is
+    // more important than actual delta
+    if(peak > limit * multi_coeff * weight or multi_coeff < 1.f) {
+        _delta = ((limit * multi_coeff * weight) / peak - att) / (buffer_size / channels - channels);
+        if(_delta < delta) {
+            delta = _delta;
+        }
+    }
+    
+    // switch left and right pointers to output
+    left = buffer[(pos + channels) % buffer_size];
+    right = buffer[(pos + channels + 1) % buffer_size];
+    
+    // check multiband coefficient again for output pointer
+    multi_coeff = (use_multi) ? multi_buffer[(pos + channels) % buffer_size] : 1.f;
+    
+    // output peak - impact in left or right channel?
+    peak = fabs(left) > fabs(right) ? fabs(left) : fabs(right);
+    
+    // output is over the limit?
+    // then we have to search for new delta.
+    // the idea is to calculate a delta for every peak and always use the
+    // lowest. this produces a soft transition between limiting targets without
+    // passing values above limit
+    
+    asc_active = false;
+    if(peak > limit * multi_coeff * weight) {
+        // default is to do a release
+        delta = (1.f - att) / (srate * release);
+        unsigned int j;
+        float b_sum = 0.f;
+        unsigned int b_sum_c = 0;
+        for(unsigned int i = channels; i < buffer_size; i += channels) {
+            // iterate over buffer (except input and output pointer positions)
+            // and search for maximum slope
+            j = (i + pos + channels) % buffer_size;
+            float _multi_coeff = (use_multi) ? multi_buffer[j] : 1.f;
+            float _peak = fabs(buffer[j]) > fabs(buffer[j + 1]) ? fabs(buffer[j]) : fabs(buffer[j + 1]);
+            // calculate steepness of slope
+            if(_peak > limit * _multi_coeff * weight) {
+                _delta = ((limit * _multi_coeff * weight) / _peak - att) / (i / channels);
+                // if slope is steeper, use it, fucker.
+                if(_delta < delta) {
+                    delta = _delta;
+                }
+                b_sum += _peak;
+                b_sum_c ++;
+            }
+        }
+        if(auto_release) {
+            // This is Auto-Smoothness-Control (wink wink, nudge nudge)
+            // check if releasing to average level of peaks is steeper than
+            // releasing to 1.f
+            _delta = ((limit * weight) / (float)(b_sum / b_sum_c) - att) / (srate * release);
+            asc_active = _delta < delta ? true : false;
+            delta = _delta < delta ? _delta : delta;
+        } else {
+            asc_active = false;
+        }
+    }
+    // change the attenuation level
+    att += delta;
+    // ...and calculate outpout from it
+    left *= att;
+    right *= att;
+    
+    if(_sanitize) {
+        left = 0.f;
+       right = 0.f;
+    }
+    
+    // release time seems over
+    if (att > 1.0f) {
+	    att = 1.0f;
+	    delta = 0.0f;
+	}
+
+    // security personnel pawing your values
+	if(att < 0.f) {
+	    // if this happens we're doomed!!
+	    // may happen on manually lowering attack
+	    att = 0.0000000001;
+	    delta = (1.0f - att) / (srate * release);
+	}
+	
+	if(att != 1.f and 1 - att < 0.0000000000001) {
+	    // denormalize att
+	    att = 1.f;
+	}
+	
+	if(delta != 0.f and fabs(delta) < 0.00000000000001) {
+        // denormalize delta
+	    delta = 0.f;
+	}
+	
+    // post treatment (denormal, limit)
+    denormal(&left);
+    denormal(&right);
+    
+    left = std::max(left, -limit * multi_coeff * weight);
+    left = std::min(left, limit * multi_coeff * weight);
+    right = std::max(right, -limit * multi_coeff * weight);
+    right = std::min(right, limit * multi_coeff * weight);
+    
+    att_max = (att < att_max) ? att : att_max; // store max atten for meter output
+    
+    pos = (pos + channels) % buffer_size;
+    if(pos == 0) _sanitize = false;
+}
+
+bool lookahead_limiter::get_arc() {
+    return asc_active;
+}

@@ -408,6 +408,16 @@ inline void sanitize(float &value)
 }
 
 /**
+ * Force already-denormal float value to zero
+ */
+inline void sanitize_denormal(float& value)
+{
+    if (((*(unsigned int *) &value) & 0x7f800000) == 0) {
+        value = 0;
+    }
+}
+	
+/**
  * Force "small enough" double value to zero
  */
 inline void sanitize(double &value)
