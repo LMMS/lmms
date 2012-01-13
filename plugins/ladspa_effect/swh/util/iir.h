@@ -1,7 +1,7 @@
 #ifndef IIR_H
 #define IIR_H
 
-#include "../ladspa-util.h"
+#include <ladspa-util.h>
 
 /* header file for IIR framework */
 
@@ -64,10 +64,10 @@ static inline iirf_t* init_iirf_t(iir_stage_t* gt) {
 static inline void free_iirf_t(iirf_t* iirf, iir_stage_t* gt) {
 	int i;
 	for(i=0;i<gt->availst;i++){
-		free(iirf[i].iring);
-		free(iirf[i].oring);
+		if (iirf[i].iring) free(iirf[i].iring);
+		if (iirf[i].oring) free(iirf[i].oring);
 	}
-	free(iirf);
+	if (iirf) free(iirf);
 };
 
 static inline void reset_iirf_t(iirf_t* iirf, iir_stage_t* gt, int n) {

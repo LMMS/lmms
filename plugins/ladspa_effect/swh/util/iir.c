@@ -86,9 +86,9 @@ void combine_iir_stages(int mode, iir_stage_t* gt, iir_stage_t *first, iir_stage
 void free_iir_stage(iir_stage_t *gt){
 	int i;
 	for(i=0;i<gt->availst;i++)
-		free(gt->coeff[i]);
-	free(gt->coeff);
-	free(gt);
+		if (gt->coeff[i]) free(gt->coeff[i]);
+	if (gt->coeff) free(gt->coeff);
+	if (gt) free(gt);
 }
 
 /* center: frequency already normalized between 0 and 0.5 of sampling

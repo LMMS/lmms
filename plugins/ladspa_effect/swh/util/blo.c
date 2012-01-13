@@ -58,6 +58,7 @@ blo_h_tables *blo_h_tables_new(int table_size)
 
 	snprintf(shm_path, 128, "/blo-1-%dx%dx%d.tbl", BLO_N_WAVES,
 			BLO_N_HARMONICS, table_size + BLO_TABLE_WR);
+#ifndef WIN32
 	if ((shm_fd = shm_open(shm_path, O_RDONLY, 0)) > 0) {
 		/* There is an existing SHM segment that matches what we want */
 
@@ -127,6 +128,7 @@ blo_h_tables *blo_h_tables_new(int table_size)
 				MAP_SHARED, shm_fd, 0);
 		close(shm_fd);
 	}
+#endif
 
 	/* Fallback case, can't map a SHM segment, just malloc it and suffer */
 	if (!all_tables) {
@@ -226,7 +228,9 @@ blo_h_tables *blo_h_tables_new(int table_size)
 		}
 	}
 
+#ifndef WIN32
 	msync(all_tables, all_tables_size, MS_ASYNC);
+#endif
 
 	return this;
 }
@@ -234,7 +238,9 @@ blo_h_tables *blo_h_tables_new(int table_size)
 void blo_h_tables_free(blo_h_tables *tables)
 {
 	if (tables->store_type == BLO_MMAP) {
+#ifndef WIN32
 		munmap(tables->alloc_space, tables->alloc_size);
+#endif
 	} else {
 		free(tables->alloc_space);
 	}

@@ -457,7 +457,8 @@ static void runMbeq(LADSPA_Handle instance, unsigned long sample_count) {
 	#endif
 	
 	                // Multiply the bins magnitudes by the coeficients
-	                for (i = 0; i < FFT_LENGTH/2; i++) {
+	                comp[0] *= coefs[0];
+	                for (i = 1; i < FFT_LENGTH/2; i++) {
 	                        comp[i] *= coefs[i];
 	                        comp[FFT_LENGTH-i] *= coefs[i];
 	                }
@@ -621,7 +622,8 @@ static void runAddingMbeq(LADSPA_Handle instance, unsigned long sample_count) {
 	#endif
 	
 	                // Multiply the bins magnitudes by the coeficients
-	                for (i = 0; i < FFT_LENGTH/2; i++) {
+	                comp[0] *= coefs[0];
+	                for (i = 1; i < FFT_LENGTH/2; i++) {
 	                        comp[i] *= coefs[i];
 	                        comp[FFT_LENGTH-i] *= coefs[i];
 	                }
