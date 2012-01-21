@@ -1765,7 +1765,15 @@ void pianoRoll::computeSelectedNotes(bool shift)
 				pos_ticks + len_ticks > sel_pos_start &&
 				pos_ticks < sel_pos_end )
 			{
-				( *it )->setSelected( true );
+				// remove from selection when holding shift
+				if( shift && ( *it )->selected() )
+				{
+					( *it )->setSelected(false);
+				}
+				else
+				{
+					( *it )->setSelected(true);
+				}
 			}
 		}
 	}
