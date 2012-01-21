@@ -268,6 +268,11 @@ signals:
 		return AutomatableModel::value<type>( _frameOffset );	\
 	}															\
 																\
+	inline type initValue() const								\
+	{															\
+		return AutomatableModel::initValue<type>();				\
+	}															\
+																\
 	inline type minValue() const								\
 	{															\
 		return AutomatableModel::minValue<type>();				\

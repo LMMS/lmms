@@ -558,7 +558,33 @@ void knob::wheelEvent( QWheelEvent * _we )
 
 void knob::setPosition( const QPoint & _p )
 {
-	model()->setValue( model()->value() - getValue( _p ) );
+	const float current = model()->value();
+	const float next = current - getValue( _p );
+
+	if( model()->initValue() == current )
+	{
+		// not critical but should be a property
+		static int magnet_dec = 0;
+		if( ++magnet_dec > 20 )
+		{
+			magnet_dec = 0;
+			model()->setValue( next );
+		}
+
+		return;
+	}
+
+	const bool current_sign = model()->initValue() - current < 0;
+	const bool next_sign = model()->initValue() - next < 0;
+
+	if( current_sign != next_sign )
+	{
+		model()->setValue( model()->initValue() );
+	}
+	else
+	{
+		model()->setValue( next );
+	}
 }
 
 
