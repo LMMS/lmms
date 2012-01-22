@@ -927,8 +927,8 @@ void pianoRoll::keyPressEvent( QKeyEvent * _ke )
 						m_action == ActionResizeNote )
 				{
 					dragNotes( m_lastMouseX, m_lastMouseY,
-							_ke->modifiers() &
-							Qt::AltModifier );
+							_ke->modifiers() & Qt::AltModifier,
+							_ke->modifiers() & Qt::ShiftModifier );
 				}
 			}
 			_ke->accept();
@@ -955,8 +955,8 @@ void pianoRoll::keyPressEvent( QKeyEvent * _ke )
 						m_action == ActionResizeNote )
 				{
 					dragNotes( m_lastMouseX, m_lastMouseY,
-							_ke->modifiers() &
-							Qt::AltModifier );
+							_ke->modifiers() & Qt::AltModifier,
+							_ke->modifiers() & Qt::ShiftModifier );
 				}
 			}
 			_ke->accept();
@@ -995,8 +995,8 @@ void pianoRoll::keyPressEvent( QKeyEvent * _ke )
 						m_action == ActionResizeNote )
 				{
 					dragNotes( m_lastMouseX, m_lastMouseY,
-							_ke->modifiers() &
-							Qt::AltModifier );
+							_ke->modifiers() & Qt::AltModifier,
+							_ke->modifiers() & Qt::ShiftModifier );
 				}				
 				
 			}
@@ -1033,8 +1033,8 @@ void pianoRoll::keyPressEvent( QKeyEvent * _ke )
 						m_action == ActionResizeNote )
 				{
 					dragNotes( m_lastMouseX, m_lastMouseY,
-							_ke->modifiers() &
-							Qt::AltModifier );
+							_ke->modifiers() & Qt::AltModifier,
+							_ke->modifiers() & Qt::ShiftModifier );
 				}				
 				
 			}
@@ -1944,7 +1944,12 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 				pauseTestNotes();
 			}
 			
-			dragNotes(_me->x(), _me->y(), _me->modifiers() & Qt::AltModifier);
+			dragNotes(
+				_me->x(),
+				_me->y(),
+				_me->modifiers() & Qt::AltModifier,
+				_me->modifiers() & Qt::ShiftModifier
+			);
 			
 			if( replay_note && m_action == ActionMoveNote )
 			{
@@ -2318,7 +2323,7 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 
 
 
-void pianoRoll::dragNotes( int x, int y, bool alt )
+void pianoRoll::dragNotes( int x, int y, bool alt, bool shift )
 {
 	// dragging one or more notes around
 		
@@ -2355,7 +2360,10 @@ void pianoRoll::dragNotes( int x, int y, bool alt )
 			off_key += 0 - (m_moveBoundaryBottom + off_key);
 		}
 	}
-	
+
+	int shift_offset = 0;
+	int shift_ref_pos = -1;
+
 	// get note-vector of current pattern
 	const NoteVector & notes = m_pattern->notes();
 
@@ -2363,6 +2371,19 @@ void pianoRoll::dragNotes( int x, int y, bool alt )
 	NoteVector::ConstIterator it = notes.begin();
 	while( it != notes.end() )
 	{
+		const int pos = ( *it )->pos().getTicks();
+		// when resizing a note and holding shift: shift the following
+		// notes to preserve the melody
+		if( m_action == ActionResizeNote && shift )
+		{
+			int shifted_pos = ( *it )->oldPos().getTicks() + shift_offset;
+			if( shifted_pos && pos == shift_ref_pos )
+			{
+				shifted_pos -= off_ticks;
+			}
+			( *it )->setPos( midiTime( shifted_pos ) );
+		}
+
 		if( ( *it )->selected() )
 		{
 			
@@ -2398,6 +2419,16 @@ void pianoRoll::dragNotes( int x, int y, bool alt )
 				if( ticks_new <= 0 )
 				{
 					ticks_new = 1;
+				}
+				else if( shift )
+				{
+					// when holding shift: update the offset used to shift
+					// the following notes
+					if( pos > shift_ref_pos )
+					{
+						shift_offset += off_ticks;
+						shift_ref_pos = pos;
+					}
 				}
 				( *it )->setLength( midiTime( ticks_new ) );
 				
