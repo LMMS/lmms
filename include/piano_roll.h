@@ -209,7 +209,7 @@ private:
 	inline int noteEditRight() const;
 	inline int noteEditLeft() const;
 	
-	void dragNotes( int x, int y, bool alt );
+	void dragNotes( int x, int y, bool alt, bool shift );
 		
 	static const int cm_scrollAmtHoriz = 10;
 	static const int cm_scrollAmtVert = 1;
