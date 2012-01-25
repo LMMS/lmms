@@ -63,6 +63,7 @@ knob::knob( int _knob_num, QWidget * _parent, const QString & _name ) :
 	m_volumeKnob( false ),
 	m_mouseOffset( 0.0f ),
 	m_buttonPressed( false ),
+	m_magneticDecay( 0 ),
 	m_angle( -10 ),
 	m_outerColor( NULL )
 {
@@ -563,11 +564,9 @@ void knob::setPosition( const QPoint & _p )
 
 	if( model()->initValue() == current )
 	{
-		// not critical but should be a property
-		static int magnet_dec = 0;
-		if( ++magnet_dec > 20 )
+		if( ++m_magneticDecay > 20 )
 		{
-			magnet_dec = 0;
+			m_magneticDecay = 0;
 			model()->setValue( next );
 		}
 

@@ -151,6 +151,8 @@ private:
 	QPoint m_origMousePos;
 	bool m_buttonPressed;
 
+	int m_magneticDecay;
+
 	float m_totalAngle;
 	int m_angle;
 	QImage m_cache;
