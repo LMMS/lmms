@@ -141,6 +141,7 @@ protected slots:
 	void quantizeChanged();
 		
 	void changeNoteEditMode( int i );
+	void markTone( int i );
 
 
 private:
@@ -170,6 +171,14 @@ private:
 		NoteEditCount // make sure this one is always last
 	};
 
+	enum toneMarkerAction
+	{
+		tmmeUnmarkAll,
+		tmmeMarkCurrent,
+		tmmeMarkMinorScale,
+		tmmeMarkMajorScale,
+	};
+
 	enum pianoRollKeyTypes
 	{
 		PR_WHITE_KEY_SMALL,
@@ -179,7 +188,9 @@ private:
 
 	QVector<QString> m_nemStr; // gui names of each edit mode
 	QMenu * m_noteEditMenu; // when you right click below the key area
-	QSignalMapper * m_signalMapper; // to keep track of edit mode events
+
+	QList<int> m_markedTones;
+	QMenu * m_toneMarkerMenu; // when you right click on the key area
 
 	pianoRoll();
 	pianoRoll( const pianoRoll & );

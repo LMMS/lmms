@@ -43,6 +43,7 @@
 #endif
 
 #include <math.h>
+#include <algorithm>
 
 #include "piano_roll.h"
 #include "bb_track_container.h"
@@ -137,7 +138,7 @@ const int DEFAULT_PR_PPT = KEY_LINE_HEIGHT * DefaultStepsPerTact;
 pianoRoll::pianoRoll() :
 	m_nemStr( QVector<QString>() ),
 	m_noteEditMenu( NULL ),
-	m_signalMapper( NULL ),
+	m_toneMarkerMenu( NULL ),
 	m_zoomingModel(),
 	m_quantizeModel(),
 	m_noteLenModel(),
@@ -172,19 +173,45 @@ pianoRoll::pianoRoll() :
 	m_nemStr.push_back( tr( "Note Volume" ) );
 	m_nemStr.push_back( tr( "Note Panning" ) );
 	
-	m_signalMapper = new QSignalMapper( this );
+	QSignalMapper * signalMapper = new QSignalMapper( this );
 	m_noteEditMenu = new QMenu( this );
 	m_noteEditMenu->clear();
 	for( int i=0; i<m_nemStr.size(); ++i )
 	{
 		QAction * act = new QAction( m_nemStr.at(i), this );
-		connect( act, SIGNAL(triggered()), m_signalMapper, SLOT(map()) );
-		m_signalMapper->setMapping( act, i );
+		connect( act, SIGNAL(triggered()), signalMapper, SLOT(map()) );
+		signalMapper->setMapping( act, i );
 		m_noteEditMenu->addAction( act );
 	}
-	connect( m_signalMapper, SIGNAL(mapped(int)), 
+	connect( signalMapper, SIGNAL(mapped(int)),
 			this, SLOT(changeNoteEditMode(int)) );
 	
+	signalMapper = new QSignalMapper( this );
+	m_toneMarkerMenu = new QMenu( this );
+
+	QAction * act = new QAction( tr("Mark/unmark current tone"), this );
+	connect( act, SIGNAL(triggered()), signalMapper, SLOT(map()) );
+	signalMapper->setMapping( act, static_cast<int>( tmmeMarkCurrent ) );
+	m_toneMarkerMenu->addAction( act );
+
+	act = new QAction( tr("Mark minor scale"), this );
+	connect( act, SIGNAL(triggered()), signalMapper, SLOT(map()) );
+	signalMapper->setMapping( act, static_cast<int>( tmmeMarkMinorScale ) );
+	m_toneMarkerMenu->addAction( act );
+
+	act = new QAction( tr("Mark major scale"), this );
+	connect( act, SIGNAL(triggered()), signalMapper, SLOT(map()) );
+	signalMapper->setMapping( act, static_cast<int>( tmmeMarkMajorScale ) );
+	m_toneMarkerMenu->addAction( act );
+
+	act = new QAction( tr("Unmark all"), this );
+	connect( act, SIGNAL(triggered()), signalMapper, SLOT(map()) );
+	signalMapper->setMapping( act, static_cast<int>( tmmeUnmarkAll ) );
+	m_toneMarkerMenu->addAction( act );
+
+	connect( signalMapper, SIGNAL(mapped(int)),
+			this, SLOT(markTone(int)) );
+
 	// init pixmaps
 	if( s_whiteKeySmallPm == NULL )
 	{
@@ -534,6 +561,63 @@ void pianoRoll::changeNoteEditMode( int i )
 {
 	m_noteEditMode = (noteEditMode) i;
 	repaint();
+}
+
+
+void pianoRoll::markTone( int i )
+{
+	static const int major_scale[KeysPerOctave] = {
+		1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 0, 1
+	};
+
+	static const int minor_scale[KeysPerOctave] = {
+		1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 0
+	};
+
+	const int * scale = 0;
+	const int key = getKey( mapFromGlobal( m_toneMarkerMenu->pos() ).y() );
+
+	switch( static_cast<toneMarkerAction>( i ) )
+	{
+		case tmmeUnmarkAll:
+			m_markedTones.clear();
+			break;
+		case tmmeMarkCurrent:
+		{
+			QList<int>::iterator i = qFind( m_markedTones.begin(), m_markedTones.end(), key );
+			if( i != m_markedTones.end() )
+			{
+				m_markedTones.erase( i );
+			}
+			else
+			{
+				m_markedTones.push_back( key );
+			}
+			break;
+		}
+		case tmmeMarkMinorScale:
+			scale = minor_scale;
+		case tmmeMarkMajorScale:
+			if( ! scale )
+			{
+				scale = major_scale;
+			}
+
+			for( int i = 0; i <= NumKeys; i++ )
+			{
+				if( scale[std::abs( key - i ) % KeysPerOctave] )
+				{
+					m_markedTones.push_back( i );
+				}
+			}
+			break;
+		default:
+			;
+	}
+
+	qSort( m_markedTones.begin(), m_markedTones.end(), qGreater<int>() );
+	QList<int>::iterator new_end = std::unique( m_markedTones.begin(), m_markedTones.end() );
+	m_markedTones.erase( new_end, m_markedTones.end() );
 }
 
 
@@ -1574,14 +1658,23 @@ void pianoRoll::mousePressEvent( QMouseEvent * _me )
 		}
 		else if( _me->y() < keyAreaBottom() )
 		{
-			// clicked on keyboard on the left - play note
-			m_lastKey = key_num;
-			if( ! m_recording && ! engine::getSong()->isPlaying() )
+			// clicked on keyboard on the left
+			if( _me->buttons() == Qt::RightButton )
 			{
-				int v = ( (float) x ) / ( (float) WHITE_KEY_WIDTH ) * 127;
-				m_pattern->instrumentTrack()->processInEvent(
-							midiEvent( MidiNoteOn, 0, key_num, v ),
-							midiTime() );
+				// right click, tone marker contextual menu
+				m_toneMarkerMenu->popup( mapToGlobal( QPoint( _me->x(), _me->y() ) ) );
+			}
+			else
+			{
+				// left click - play the note
+				m_lastKey = key_num;
+				if( ! m_recording && ! engine::getSong()->isPlaying() )
+				{
+					int v = ( (float) x ) / ( (float) WHITE_KEY_WIDTH ) * 127;
+					m_pattern->instrumentTrack()->processInEvent(
+								midiEvent( MidiNoteOn, 0, key_num, v ),
+								midiTime() );
+				}
 			}
 		}
 		else
@@ -2609,6 +2702,22 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 		++key;
 	}
 
+	// display note marks
+	for( int i = 0; i < m_markedTones.size(); i++ )
+	{
+		const int key_num = m_markedTones.at( i );
+		const int y = keyAreaBottom() + 5
+			- KEY_LINE_HEIGHT * ( key_num - m_startKey + 1 );
+
+		if( y > keyAreaBottom() )
+		{
+			break;
+		}
+
+		p.fillRect( WHITE_KEY_WIDTH, y,
+				width() - 10, 1,
+							QColor( 64, 64 + ( key_num % KeysPerOctave ) * 7, 96 + key_num ) );
+	}
 
 	// erase the area below the piano, because there might be keys that 
 	// should be only half-visible
