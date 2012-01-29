@@ -197,6 +197,10 @@ sampleTCOView::sampleTCOView( sampleTCO * _tco, trackView * _tv ) :
 	trackContentObjectView( _tco, _tv ),
 	m_tco( _tco )
 {
+	// update UI and tooltip
+	updateSample();
+
+	// track future changes of sampleTCO
 	connect( m_tco, SIGNAL( sampleChanged() ),
 			this, SLOT( updateSample() ) );
 }
