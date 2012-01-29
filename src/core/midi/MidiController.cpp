@@ -77,11 +77,9 @@ void MidiController::processInEvent( const midiEvent & _me,
 						const midiTime & _time )
 {
 	Uint8 controllerNum;
-	const Uint8 * bytes;
 	switch( _me.m_type )
 	{
 		case MidiControlChange:
-			bytes = _me.m_data.m_bytes;
 			controllerNum = _me.m_data.m_bytes[0] & 0x7F;
 
 			if( m_midiPort.inputController() == controllerNum + 1 &&
