@@ -2,7 +2,7 @@
  * note_play_handle.cpp - implementation of class notePlayHandle, part of
  *                        rendering engine
  *
- * Copyright (c) 2004-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2012 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -70,7 +70,11 @@ notePlayHandle::notePlayHandle( InstrumentTrack * _it,
 	m_patternIndex( 0 ),
 #endif
 	m_origTempo( engine::getSong()->getTempo() ),
-	m_origBaseNote( instrumentTrack()->baseNoteModel()->value() )
+	m_origBaseNote( instrumentTrack()->baseNoteModel()->value() ),
+	m_frequency( 0 ),
+	m_unpitchedFrequency( 0 ),
+	m_baseDetuning( NULL ),
+	m_songGlobalParentOffset( 0 )
 {
 	if( isTopNote() )
 	{
@@ -496,10 +500,10 @@ void notePlayHandle::updateFrequency()
 
 void notePlayHandle::processMidiTime( const midiTime & _time )
 {
-	if( _time >= pos() )
+	if( _time >= songGlobalParentOffset()+pos() )
 	{
 		const float v = detuning()->automationPattern()->
-						valueAt( _time - pos() );
+						valueAt( _time - songGlobalParentOffset() - pos() );
 		if( !typeInfo<float>::isEqual( v, m_baseDetuning->value() ) )
 		{
 			m_baseDetuning->setValue( v );

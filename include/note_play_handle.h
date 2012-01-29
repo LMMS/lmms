@@ -2,7 +2,7 @@
  * note_play_handle.h - declaration of class notePlayHandle which is needed
  *                      by LMMS-Play-Engine
  *
- * Copyright (c) 2004-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2012 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -192,6 +192,16 @@ public:
 	void processMidiTime( const midiTime & _time );
 	void resize( const bpm_t _new_tempo );
 
+	void setSongGlobalParentOffset( const midiTime &offset )
+	{
+		m_songGlobalParentOffset = offset;
+	}
+
+	const midiTime &songGlobalParentOffset() const
+	{
+		return m_songGlobalParentOffset;
+	}
+
 #ifdef LMMS_SINGERBOT_SUPPORT
 	int patternIndex()
 	{
@@ -263,6 +273,7 @@ private:
 	float m_unpitchedFrequency;
 
 	BaseDetuning * m_baseDetuning;
+	midiTime m_songGlobalParentOffset;
 
 } ;
 
