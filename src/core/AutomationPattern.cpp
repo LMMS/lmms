@@ -325,7 +325,7 @@ void AutomationPattern::loadSettings( const QDomElement & _this )
 		}
 	}
 
-	m_hasAutomation = m_timeMap.size() > 1;
+	m_hasAutomation = m_timeMap.size() > 0;
 	if( m_hasAutomation == false )
 	{
 		for( objectVector::iterator it = m_objects.begin();
