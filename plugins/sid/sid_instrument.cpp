@@ -158,6 +158,8 @@ void sidInstrument::saveSettings( QDomDocument & _doc,
 										_doc, _this, "sustain" + is );
 		m_voice[i]->m_releaseModel.saveSettings(
 										_doc, _this, "release" + is );
+		m_voice[i]->m_coarseModel.saveSettings(
+										_doc, _this, "coarse" + is );
 		m_voice[i]->m_waveFormModel.saveSettings(
 										_doc, _this,"waveform" + is );
 		m_voice[i]->m_syncModel.saveSettings(
@@ -196,6 +198,7 @@ void sidInstrument::loadSettings( const QDomElement & _this )
 		m_voice[i]->m_decayModel.loadSettings( _this, "decay" + is );
 		m_voice[i]->m_sustainModel.loadSettings( _this, "sustain" + is );
 		m_voice[i]->m_releaseModel.loadSettings( _this, "release" + is );
+		m_voice[i]->m_coarseModel.loadSettings( _this, "coarse" + is );
 		m_voice[i]->m_waveFormModel.loadSettings( _this, "waveform" + is );
 		m_voice[i]->m_syncModel.loadSettings( _this, "sync" + is );
 		m_voice[i]->m_ringModModel.loadSettings( _this, "ringmod" + is );
