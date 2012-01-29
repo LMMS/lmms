@@ -144,10 +144,7 @@ public:
 	void removePlayHandles( track * _track,
 		playHandle::Type _type = playHandle::NumPlayHandleTypes );
 
-	inline bool hasPlayHandles() const
-	{
-		return !m_playHandles.empty();
-	}
+	bool hasNotePlayHandles();
 
 
 	// methods providing information for other classes

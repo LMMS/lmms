@@ -582,6 +582,25 @@ void Mixer::removePlayHandles( track * _track, playHandle::Type _type )
 
 
 
+bool Mixer::hasNotePlayHandles()
+{
+	lock();
+
+	for( PlayHandleList::Iterator it = m_playHandles.begin();
+			it != m_playHandles.end(); ++it )
+	{
+		if( (*it)->type() == playHandle::NotePlayHandle )
+		{
+			unlock();
+			return true;
+		}
+	}
+
+	unlock();
+	return false;
+}
+
+
 
 AudioBackend * Mixer::tryAudioBackends()
 {
