@@ -34,6 +34,7 @@
 #include "MainWindow.h"
 #include "song.h"
 #include "tool_button.h"
+#include "config_mgr.h"
 
 
 
@@ -60,8 +61,17 @@ bbEditor::bbEditor( bbTrackContainer * _tc ) :
 	setWindowIcon( embed::getIconPixmap( "bb_track" ) );
 	setWindowTitle( tr( "Beat+Bassline Editor" ) );
 	// TODO: Use style sheet
-	setMinimumWidth( TRACK_OP_WIDTH + DEFAULT_SETTINGS_WIDGET_WIDTH
-						+ 2 * TCO_BORDER_WIDTH + 192 );
+	if( configManager::inst()->value( "ui",
+					  "compacttrackbuttons" ).toInt() )
+	{
+		setMinimumWidth( TRACK_OP_WIDTH_COMPACT + DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT
+			     + 2 * TCO_BORDER_WIDTH + 192 );
+	}
+	else
+	{
+		setMinimumWidth( TRACK_OP_WIDTH + DEFAULT_SETTINGS_WIDGET_WIDTH
+			     + 2 * TCO_BORDER_WIDTH + 192 );
+	}
 
 
 	m_playButton = new toolButton( embed::getIconPixmap( "play" ),

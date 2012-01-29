@@ -52,6 +52,7 @@
 #include "bb_editor.h"
 #include "bb_track.h"
 #include "bb_track_container.h"
+#include "config_mgr.h"
 #include "Clipboard.h"
 #include "embed.h"
 #include "engine.h"
@@ -1372,15 +1373,28 @@ trackOperationsWidget::trackOperationsWidget( trackView * _parent ) :
 	m_muteBtn->setActiveGraphic( embed::getIconPixmap( "led_off" ) );
 	m_muteBtn->setInactiveGraphic( embed::getIconPixmap( "led_green" ) );
 	m_muteBtn->setCheckable( true );
-	m_muteBtn->move( 46, 8 );
-	m_muteBtn->show();
-	toolTip::add( m_muteBtn, tr( "Mute this track" ) );
 
 	m_soloBtn = new pixmapButton( this, tr( "Solo" ) );
 	m_soloBtn->setActiveGraphic( embed::getIconPixmap( "led_red" ) );
 	m_soloBtn->setInactiveGraphic( embed::getIconPixmap( "led_off" ) );
 	m_soloBtn->setCheckable( true );
-	m_soloBtn->move( 62, 8 );
+
+	if( configManager::inst()->value( "ui",
+					  "compacttrackbuttons" ).toInt() )
+	{
+		m_muteBtn->move( 46, 0 );
+		m_soloBtn->move( 46, 16 );
+	}
+	else
+	{
+		m_muteBtn->move( 46, 8 );
+		m_soloBtn->move( 62, 8 );
+	}
+
+	m_muteBtn->show();
+	toolTip::add( m_muteBtn, tr( "Mute this track" ) );
+
+	m_soloBtn->show();
 	toolTip::add( m_soloBtn, tr( "Solo" ) );
 
 	connect( this, SIGNAL( trackRemovalScheduled( trackView * ) ),
@@ -2156,9 +2170,17 @@ trackView::~trackView()
  */
 void trackView::resizeEvent( QResizeEvent * _re )
 {
-	m_trackOperationsWidget.setFixedSize( TRACK_OP_WIDTH, height() - 1 );
-	m_trackSettingsWidget.setFixedSize( DEFAULT_SETTINGS_WIDGET_WIDTH,
-								height() - 1 );
+	if( configManager::inst()->value( "ui",
+					  "compacttrackbuttons" ).toInt() )
+	{
+		m_trackOperationsWidget.setFixedSize( TRACK_OP_WIDTH_COMPACT, height() - 1 );
+		m_trackSettingsWidget.setFixedSize( DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT, height() - 1 );
+	}
+	else
+	{
+		m_trackOperationsWidget.setFixedSize( TRACK_OP_WIDTH, height() - 1 );
+		m_trackSettingsWidget.setFixedSize( DEFAULT_SETTINGS_WIDGET_WIDTH, height() - 1 );
+	}
 	m_trackContentWidget.setFixedHeight( height() );
 }
 

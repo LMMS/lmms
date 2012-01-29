@@ -46,7 +46,7 @@
 #include "MainWindow.h"
 #include "EffectRackView.h"
 #include "track_label_button.h"
-
+#include "config_mgr.h"
 
 
 sampleTCO::sampleTCO( track * _track ) :
@@ -523,7 +523,15 @@ sampleTrackView::sampleTrackView( sampleTrack * _t, trackContainerView * _tcv ) 
 	m_volumeKnob->setVolumeKnob( true );
 	m_volumeKnob->setModel( &_t->m_volumeModel );
 	m_volumeKnob->setHintText( tr( "Channel volume:" ) + " ", "%" );
-	m_volumeKnob->move( DEFAULT_SETTINGS_WIDGET_WIDTH-2*24, 4 );
+	if( configManager::inst()->value( "ui",
+					  "compacttrackbuttons" ).toInt() )
+	{
+		m_volumeKnob->move( DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT-2*24, 4 );
+	}
+	else
+	{
+		m_volumeKnob->move( DEFAULT_SETTINGS_WIDGET_WIDTH-2*24, 4 );
+	}
 	m_volumeKnob->setLabel( tr( "VOL" ) );
 	m_volumeKnob->show();
 

@@ -894,12 +894,23 @@ InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it,
 			m_tlb, SLOT( update() ) );
 
 	// creation of widgets for track-settings-widget
+	int widgetWidth;
+	if( configManager::inst()->value( "ui",
+					  "compacttrackbuttons" ).toInt() )
+	{
+		widgetWidth = DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT;
+	}
+	else 
+	{
+		widgetWidth = DEFAULT_SETTINGS_WIDGET_WIDTH;
+	}
+
 	m_volumeKnob = new knob( knobSmall_17, getTrackSettingsWidget(),
 							tr( "Volume" ) );
 	m_volumeKnob->setVolumeKnob( true );
 	m_volumeKnob->setModel( &_it->m_volumeModel );
 	m_volumeKnob->setHintText( tr( "Volume:" ) + " ", "%" );
-	m_volumeKnob->move( DEFAULT_SETTINGS_WIDGET_WIDTH-24*2, 4 );
+	m_volumeKnob->move( widgetWidth-2*24, 4 );
 	m_volumeKnob->setLabel( tr( "VOL" ) );
 	m_volumeKnob->show();
 	m_volumeKnob->setWhatsThis( tr( volume_help ) );
@@ -908,10 +919,9 @@ InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it,
 							tr( "Panning" ) );
 	m_panningKnob->setModel( &_it->m_panningModel );
 	m_panningKnob->setHintText( tr( "Panning:" ) + " ", "%" );
-	m_panningKnob->move( DEFAULT_SETTINGS_WIDGET_WIDTH-24, 4 );
+	m_panningKnob->move( widgetWidth-24, 4 );
 	m_panningKnob->setLabel( tr( "PAN" ) );
 	m_panningKnob->show();
-
 
 	m_midiMenu = new QMenu( tr( "MIDI" ), this );
 
@@ -952,7 +962,7 @@ InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it,
 						QColor( 64, 255, 16 ),
 						getTrackSettingsWidget() );
 	m_activityIndicator->setGeometry(
-			DEFAULT_SETTINGS_WIDGET_WIDTH-2*24-11, 2, 8, 28 );
+					 widgetWidth-2*24-11, 2, 8, 28 );
 	m_activityIndicator->show();
 	connect( m_activityIndicator, SIGNAL( pressed() ),
 				this, SLOT( activityIndicatorPressed() ) );

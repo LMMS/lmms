@@ -114,7 +114,9 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 					"manualchannelpiano" ).toInt() ),
 	m_smoothScroll( configManager::inst()->value( "ui", "smoothscroll" ).toInt() ),
 	m_oneInstrumentTrackWindow( configManager::inst()->value( "ui",
-					"oneinstrumenttrackwindow" ).toInt() )
+					"oneinstrumenttrackwindow" ).toInt() ),
+	m_compactTrackButtons( configManager::inst()->value( "ui",
+					"compacttrackbuttons" ).toInt() )
 {
 	setWindowIcon( embed::getIconPixmap( "setup_general" ) );
 	setWindowTitle( tr( "Setup LMMS" ) );
@@ -183,7 +185,7 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 
 
 	tabWidget * misc_tw = new tabWidget( tr( "MISC" ), general );
-	misc_tw->setFixedHeight( 138 );
+	misc_tw->setFixedHeight( 156 );
 
 	ledCheckBox * enable_tooltips = new ledCheckBox(
 							tr( "Enable tooltips" ),
@@ -234,6 +236,14 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 	hqaudio->setChecked( m_hqAudioDev );
 	connect( hqaudio, SIGNAL( toggled( bool ) ),
 				this, SLOT( toggleHQAudioDev( bool ) ) );
+
+	ledCheckBox * compacttracks = new ledCheckBox(
+				tr( "Compact track buttons" ),
+								misc_tw );
+	compacttracks->move( 10, 126 );
+	compacttracks->setChecked( m_compactTrackButtons );
+	connect( compacttracks, SIGNAL( toggled( bool ) ),
+				this, SLOT( toggleCompactTrackButtons( bool ) ) );
 
 
 
@@ -751,6 +761,8 @@ void setupDialog::accept()
 					QString::number( m_smoothScroll ) );
 	configManager::inst()->setValue( "ui", "oneinstrumenttrackwindow",
 					QString::number( m_oneInstrumentTrackWindow ) );
+	configManager::inst()->setValue( "ui", "compacttrackbuttons",
+					QString::number( m_compactTrackButtons ) );
 
 	configManager::inst()->setWorkingDir( m_workingDir );
 	configManager::inst()->setVSTDir( m_vstDir );
@@ -910,6 +922,15 @@ void setupDialog::toggleManualChPiano( bool _enabled )
 void setupDialog::toggleSmoothScroll( bool _enabled )
 {
 	m_smoothScroll = _enabled;
+}
+
+
+
+
+
+void setupDialog::toggleCompactTrackButtons( bool _enabled )
+{
+	m_compactTrackButtons = _enabled;
 }
 
 

@@ -47,7 +47,17 @@ trackLabelButton::trackLabelButton( trackView * _tv, QWidget * _parent ) :
 	setAcceptDrops( true );
 	setCursor( QCursor( embed::getIconPixmap( "hand" ), 0, 0 ) );
 	setToolButtonStyle( Qt::ToolButtonTextBesideIcon );
-	setFixedSize( 160, 29 );
+
+	if( configManager::inst()->value( "ui",
+					  "compacttrackbuttons" ).toInt() )
+	{
+		setFixedSize( 32, 29 );
+	}
+	else
+	{
+		setFixedSize( 160, 29 );
+	}
+
 	setIconSize( QSize( 32, 32 ) );
 	setText( " " );
 
@@ -138,8 +148,16 @@ void trackLabelButton::paintEvent( QPaintEvent * _pe )
 			}
 		}
 	}
-
-	setText( m_trackView->getTrack()->displayName() );
+	if( configManager::inst()->value( "ui",
+					  "compacttrackbuttons" ).toInt() )
+	{
+		setText("");
+		setToolTip(  m_trackView->getTrack()->displayName() );
+	}
+	else
+	{
+		setText( m_trackView->getTrack()->displayName() );
+	}
 	QToolButton::paintEvent( _pe );
 }
 

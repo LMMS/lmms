@@ -52,6 +52,7 @@
 #include "visualization_widget.h"
 #include "AudioDevice.h"
 #include "piano_roll.h"
+#include "config_mgr.h"
 
 
 
@@ -89,8 +90,11 @@ songEditor::songEditor( song * _song, songEditor * & _engine_ptr ) :
 	setFocus();
 
 	// create time-line
-	m_timeLine = new timeLine( TRACK_OP_WIDTH +
-					DEFAULT_SETTINGS_WIDGET_WIDTH, 32,
+	int widgetTotal = configManager::inst()->value( "ui",
+							"compacttrackbuttons" ).toInt()==1 ?
+		DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT + TRACK_OP_WIDTH_COMPACT :
+		DEFAULT_SETTINGS_WIDGET_WIDTH + TRACK_OP_WIDTH;
+	m_timeLine = new timeLine( widgetTotal, 32,
 					pixelsPerTact(),
 					m_s->m_playPos[song::Mode_PlaySong],
 					m_currentPosition, this );
@@ -683,12 +687,24 @@ static inline void animateScroll( QScrollBar *scrollBar, int newVal, bool smooth
 
 void songEditor::updatePosition( const midiTime & _t )
 {
+	int widgetWidth, trackOpWidth;
+	if( configManager::inst()->value( "ui", "compacttrackbuttons" ).toInt() )
+	{
+		widgetWidth = DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT;
+		trackOpWidth = TRACK_OP_WIDTH_COMPACT;
+	}
+	else
+	{
+		widgetWidth = DEFAULT_SETTINGS_WIDGET_WIDTH;
+		trackOpWidth = TRACK_OP_WIDTH;
+	}
+
 	if( ( m_s->isPlaying() && m_s->m_playMode == song::Mode_PlaySong 
 		  && m_timeLine->autoScroll() == timeLine::AutoScrollEnabled) ||
 							m_scrollBack == true )
 	{
-		const int w = width() - DEFAULT_SETTINGS_WIDGET_WIDTH
-							- TRACK_OP_WIDTH
+		const int w = width() - widgetWidth
+							- trackOpWidth
 							- 32;	// rough estimation for width of right scrollbar
 		if( _t > m_currentPosition + w * midiTime::ticksPerTact() /
 							pixelsPerTact() )
@@ -708,7 +724,7 @@ void songEditor::updatePosition( const midiTime & _t )
 
 	const int x = m_s->m_playPos[song::Mode_PlaySong].m_timeLine->
 							markerX( _t ) + 8;
-	if( x >= TRACK_OP_WIDTH + DEFAULT_SETTINGS_WIDGET_WIDTH-1 )
+	if( x >= trackOpWidth + widgetWidth -1 )
 	{
 		m_positionLine->show();
 		m_positionLine->move( x, 50 );
