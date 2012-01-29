@@ -1,7 +1,7 @@
 /*
  * pattern.cpp - implementation of class pattern which holds notes
  *
- * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2012 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2005-2007 Danny McRae <khjklujn/at/yahoo.com>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
@@ -766,9 +766,12 @@ void patternFreezeThread::run()
 		m_statusDlg->setProgress( ppp * 100 / m_pattern->length() );
 	}
 	m_statusDlg->setProgress( 100 );
+
 	// render tails
-	while( engine::getMixer()->hasPlayHandles() &&
-					m_pattern->m_freezeAborted == false )
+	int count = 0;
+	while( engine::getMixer()->hasNotePlayHandles() &&
+					m_pattern->m_freezeAborted == false &&
+					++count < 2000 )
 	{
 		freeze_recorder->processNextBuffer();
 	}

@@ -240,10 +240,7 @@ public:
 
 	void removePlayHandles( track * _track );
 
-	inline bool hasPlayHandles() const
-	{
-		return !m_playHandles.empty();
-	}
+	bool hasNotePlayHandles();
 
 
 	// methods providing information for other classes

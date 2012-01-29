@@ -1,7 +1,7 @@
 /*
  * mixer.cpp - audio-device-independent mixer for LMMS
  *
- * Copyright (c) 2004-2011 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2012 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -960,6 +960,27 @@ void mixer::removePlayHandles( track * _track )
 		}
 	}
 	unlock();
+}
+
+
+
+
+bool mixer::hasNotePlayHandles()
+{
+	lock();
+
+	for( PlayHandleList::Iterator it = m_playHandles.begin();
+			it != m_playHandles.end(); ++it )
+	{
+		if( (*it)->type() == playHandle::NotePlayHandle )
+		{
+			unlock();
+			return true;
+		}
+	}
+
+	unlock();
+	return false;
 }
 
 
