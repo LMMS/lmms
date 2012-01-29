@@ -2,7 +2,7 @@
  * InstrumentTrack.cpp - implementation of instrument-track-class
  *                        (window + data-structures)
  *
- * Copyright (c) 2004-2011 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2012 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -685,6 +685,14 @@ bool InstrumentTrack::play( const midiTime & _start,
 								note_frames,
 								*cur_note );
 				note_play_handle->setBBTrack( bb_track );
+				// are we playing global song?
+				if( _tco_num < 0 )
+				{
+					// then set song-global offset of pattern in order to
+					// properly perform the note detuning
+					note_play_handle->setSongGlobalParentOffset( p->startPosition() );
+				}
+
 #if LMMS_SINGERBOT_SUPPORT
 				note_play_handle->setPatternIndex( note_idx );
 #endif
