@@ -894,7 +894,7 @@ void RemoteVstPlugin::rotateProgram( int _len )
 
 void RemoteVstPlugin::loadPrograms( int _len )
 {
-	char presName[4096];
+	char presName[1024+256*30];
 	char curProgName[30];
 	if (isInitialized() == false) return;
 	bool progNameIndexed = (m_plugin->dispatcher(m_plugin, 29, 0, -1, curProgName, 0) == 1);
@@ -1038,7 +1038,7 @@ void RemoteVstPlugin::loadChunkFromPresetFile( const std::string & _file )
 {
 	void * chunk = NULL;
 	unsigned int * pLen = new unsigned int[ 1 ];
-	unsigned int len;
+	unsigned int len = 0;
 	sBank * pBank = (sBank*) new char[ sizeof( sBank ) ];
 	FILE * stream = fopen( _file.c_str(), "r" );
 	fread ( pBank, 1, 56, stream );
