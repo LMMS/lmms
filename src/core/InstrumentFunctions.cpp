@@ -315,7 +315,7 @@ Arpeggiator::Arpeggiator( Model * _parent ) :
 	m_arpModeModel( this, tr( "Arpeggio mode" ) )
 {
 	const ChordCreator::ChordTable & chord_table = ChordCreator::ChordTable::getInstance();
-	for( int i = 0; i < chord_table[i].size(); ++i )
+	for( int i = 0; i < chord_table.size(); ++i )
 	{
 		m_arpModel.addItem( chord_table[i].getName() );
 	}
