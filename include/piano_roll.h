@@ -139,9 +139,16 @@ protected slots:
 
 	void zoomingChanged();
 	void quantizeChanged();
-		
+
+	void updateSemiToneMarkerMenu();
+
 	void changeNoteEditMode( int i );
-	void markTone( int i );
+	void markSemiTone( int i );
+
+
+signals:
+	void semiToneMarkerMenuScaleSetEnabled(bool);
+	void semiToneMarkerMenuChordSetEnabled(bool);
 
 
 private:
@@ -171,12 +178,12 @@ private:
 		NoteEditCount // make sure this one is always last
 	};
 
-	enum toneMarkerAction
+	enum semiToneMarkerAction
 	{
-		tmmeUnmarkAll,
-		tmmeMarkCurrent,
-		tmmeMarkMinorScale,
-		tmmeMarkMajorScale,
+		stmaUnmarkAll,
+		stmaMarkCurrentSemiTone,
+		stmaMarkCurrentScale,
+		stmaMarkCurrentChord,
 	};
 
 	enum pianoRollKeyTypes
@@ -189,8 +196,8 @@ private:
 	QVector<QString> m_nemStr; // gui names of each edit mode
 	QMenu * m_noteEditMenu; // when you right click below the key area
 
-	QList<int> m_markedTones;
-	QMenu * m_toneMarkerMenu; // when you right click on the key area
+	QList<int> m_markedSemiTones;
+	QMenu * m_semiToneMarkerMenu; // when you right click on the key area
 
 	pianoRoll();
 	pianoRoll( const pianoRoll & );
@@ -251,10 +258,14 @@ private:
 	comboBox * m_zoomingComboBox;
 	comboBox * m_quantizeComboBox;
 	comboBox * m_noteLenComboBox;
+	comboBox * m_scaleComboBox;
+	comboBox * m_chordComboBox;
 
 	ComboBoxModel m_zoomingModel;
 	ComboBoxModel m_quantizeModel;
 	ComboBoxModel m_noteLenModel;
+	ComboBoxModel m_scaleModel;
+	ComboBoxModel m_chordModel;
 
 
 

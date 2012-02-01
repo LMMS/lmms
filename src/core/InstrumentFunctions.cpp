@@ -33,107 +33,165 @@
 
 
 
-ChordCreator::Chord ChordCreator::s_chordTable[] =
+ChordCreator::ChordTable::Init ChordCreator::ChordTable::s_initTable[] =
 {
-	{ ChordCreator::tr( "octave" ), { 0, -1 } },
-	{ ChordCreator::tr( "Major" ), { 0, 4, 7, -1 } },
-	{ ChordCreator::tr( "Majb5" ), { 0, 4, 6, -1 } },
-	{ ChordCreator::tr( "minor" ), { 0, 3, 7, -1 } },
-	{ ChordCreator::tr( "minb5" ), { 0, 3, 6, -1 } },
-	{ ChordCreator::tr( "sus2" ), { 0, 2, 7, -1 } },
-	{ ChordCreator::tr( "sus4" ), { 0, 5, 7, -1 } },
-	{ ChordCreator::tr( "aug" ), { 0, 4, 8, -1 } },
-	{ ChordCreator::tr( "augsus4" ), { 0, 5, 8, -1 } },
-	{ ChordCreator::tr( "tri" ), { 0, 3, 6, 9, -1 } },
+	{ "octave", { 0, -1 } },
+	{ "Major" , { 0, 4, 7, -1 } },
+	{ "Majb5" , { 0, 4, 6, -1 } },
+	{ "minor" , { 0, 3, 7, -1 } },
+	{ "minb5" , { 0, 3, 6, -1 } },
+	{ "sus2" , { 0, 2, 7, -1 } },
+	{ "sus4" , { 0, 5, 7, -1 } },
+	{ "aug" , { 0, 4, 8, -1 } },
+	{ "augsus4" , { 0, 5, 8, -1 } },
+	{ "tri" , { 0, 3, 6, 9, -1 } },
 	
-	{ ChordCreator::tr( "6" ), { 0, 4, 7, 9, -1 } },
-	{ ChordCreator::tr( "6sus4" ), { 0, 5, 7, 9, -1 } },
-	{ ChordCreator::tr( "6add9" ), { 0, 4, 7, 12, -1 } },
-	{ ChordCreator::tr( "m6" ), { 0, 3, 7, 9, -1 } },
-	{ ChordCreator::tr( "m6add9" ), { 0, 3, 7, 9, 14, -1 } },
+	{ "6" , { 0, 4, 7, 9, -1 } },
+	{ "6sus4" , { 0, 5, 7, 9, -1 } },
+	{ "6add9" , { 0, 4, 7, 12, -1 } },
+	{ "m6" , { 0, 3, 7, 9, -1 } },
+	{ "m6add9" , { 0, 3, 7, 9, 14, -1 } },
 
-	{ ChordCreator::tr( "7" ), { 0, 4, 7, 10, -1 } },
-	{ ChordCreator::tr( "7sus4" ), { 0, 5, 7, 10, -1 } },
-	{ ChordCreator::tr( "7#5" ), { 0, 4, 8, 10, -1 } },
-	{ ChordCreator::tr( "7b5" ), { 0, 4, 6, 10, -1 } },
-	{ ChordCreator::tr( "7#9" ), { 0, 4, 7, 10, 13, 18, -1 } },
-	{ ChordCreator::tr( "7b9" ), { 0, 4, 7, 10, 13, 16, -1 } },
-	{ ChordCreator::tr( "7#5#9" ), { 0, 4, 8, 12, 14, 19, -1 } },
-	{ ChordCreator::tr( "7#5b9" ), { 0, 4, 8, 12, 14, 17, -1 } },
-	{ ChordCreator::tr( "7b5b9" ), { 0, 4, 6, 10, 12, 15, -1 } },
-	{ ChordCreator::tr( "7add11" ), { 0, 4, 7, 10, 17, -1 } },
-	{ ChordCreator::tr( "7add13" ), { 0, 4, 7, 10, 21, -1 } },
-	{ ChordCreator::tr( "7#11" ), { 0, 4, 7, 10, 18, -1 } },
-	{ ChordCreator::tr( "Maj7" ), { 0, 4, 7, 11, -1 } },
-	{ ChordCreator::tr( "Maj7b5" ), { 0, 4, 6, 11, -1 } },
-	{ ChordCreator::tr( "Maj7#5" ), { 0, 4, 8, 11, -1 } },
-	{ ChordCreator::tr( "Maj7#11" ), { 0, 4, 7, 11, 18, -1 } },
-	{ ChordCreator::tr( "Maj7add13" ), { 0, 4, 7, 11, 21, -1 } },
-	{ ChordCreator::tr( "m7" ), { 0, 3, 7, 10, -1 } },
-	{ ChordCreator::tr( "m7b5" ), { 0, 3, 6, 10, -1 } },
-	{ ChordCreator::tr( "m7b9" ), { 0, 3, 7, 10, 13, -1 } },
-	{ ChordCreator::tr( "m7add11" ), { 0, 3, 7, 10, 17, -1 } },
-	{ ChordCreator::tr( "m7add13" ), { 0, 3, 7, 10, 21, -1 } },
-	{ ChordCreator::tr( "m-Maj7" ), { 0, 3, 7, 11, -1 } },
-	{ ChordCreator::tr( "m-Maj7add11" ), { 0, 3, 7, 11, 17, -1 } },
-	{ ChordCreator::tr( "m-Maj7add13" ), { 0, 3, 7, 11, 21, -1 } },
+	{ "7" , { 0, 4, 7, 10, -1 } },
+	{ "7sus4" , { 0, 5, 7, 10, -1 } },
+	{ "7#5" , { 0, 4, 8, 10, -1 } },
+	{ "7b5" , { 0, 4, 6, 10, -1 } },
+	{ "7#9" , { 0, 4, 7, 10, 13, 18, -1 } },
+	{ "7b9" , { 0, 4, 7, 10, 13, 16, -1 } },
+	{ "7#5#9" , { 0, 4, 8, 12, 14, 19, -1 } },
+	{ "7#5b9" , { 0, 4, 8, 12, 14, 17, -1 } },
+	{ "7b5b9" , { 0, 4, 6, 10, 12, 15, -1 } },
+	{ "7add11" , { 0, 4, 7, 10, 17, -1 } },
+	{ "7add13" , { 0, 4, 7, 10, 21, -1 } },
+	{ "7#11" , { 0, 4, 7, 10, 18, -1 } },
+	{ "Maj7" , { 0, 4, 7, 11, -1 } },
+	{ "Maj7b5" , { 0, 4, 6, 11, -1 } },
+	{ "Maj7#5" , { 0, 4, 8, 11, -1 } },
+	{ "Maj7#11" , { 0, 4, 7, 11, 18, -1 } },
+	{ "Maj7add13" , { 0, 4, 7, 11, 21, -1 } },
+	{ "m7" , { 0, 3, 7, 10, -1 } },
+	{ "m7b5" , { 0, 3, 6, 10, -1 } },
+	{ "m7b9" , { 0, 3, 7, 10, 13, -1 } },
+	{ "m7add11" , { 0, 3, 7, 10, 17, -1 } },
+	{ "m7add13" , { 0, 3, 7, 10, 21, -1 } },
+	{ "m-Maj7" , { 0, 3, 7, 11, -1 } },
+	{ "m-Maj7add11" , { 0, 3, 7, 11, 17, -1 } },
+	{ "m-Maj7add13" , { 0, 3, 7, 11, 21, -1 } },
 
-	{ ChordCreator::tr( "9" ), { 0, 4, 7, 10, 14, -1 } },
-	{ ChordCreator::tr( "9sus4" ), { 0, 5, 7, 10, 14, -1 } },
-	{ ChordCreator::tr( "add9" ), { 0, 4, 7, 14, -1 } },
-	{ ChordCreator::tr( "9#5" ), { 0, 4, 8, 10, 14, -1 } },
-	{ ChordCreator::tr( "9b5" ), { 0, 4, 6, 10, 14, -1 } },
-	{ ChordCreator::tr( "9#11" ), { 0, 4, 7, 10, 14, 18, -1 } },
-	{ ChordCreator::tr( "9b13" ), { 0, 4, 7, 10, 14, 20, -1 } },
-	{ ChordCreator::tr( "Maj9" ), { 0, 4, 7, 11, 14, -1 } },
-	{ ChordCreator::tr( "Maj9sus4" ), { 0, 5, 7, 11, 15, -1 } },
-	{ ChordCreator::tr( "Maj9#5" ), { 0, 4, 8, 11, 14, -1 } },
-	{ ChordCreator::tr( "Maj9#11" ), { 0, 4, 7, 11, 14, 18, -1 } },
-	{ ChordCreator::tr( "m9" ), { 0, 3, 7, 10, 14, -1 } },
-	{ ChordCreator::tr( "madd9" ), { 0, 3, 7, 14, -1 } },
-	{ ChordCreator::tr( "m9b5" ), { 0, 3, 6, 10, 14, -1 } },
-	{ ChordCreator::tr( "m9-Maj7" ), { 0, 3, 7, 11, 14, -1 } },
+	{ "9" , { 0, 4, 7, 10, 14, -1 } },
+	{ "9sus4" , { 0, 5, 7, 10, 14, -1 } },
+	{ "add9" , { 0, 4, 7, 14, -1 } },
+	{ "9#5" , { 0, 4, 8, 10, 14, -1 } },
+	{ "9b5" , { 0, 4, 6, 10, 14, -1 } },
+	{ "9#11" , { 0, 4, 7, 10, 14, 18, -1 } },
+	{ "9b13" , { 0, 4, 7, 10, 14, 20, -1 } },
+	{ "Maj9" , { 0, 4, 7, 11, 14, -1 } },
+	{ "Maj9sus4" , { 0, 5, 7, 11, 15, -1 } },
+	{ "Maj9#5" , { 0, 4, 8, 11, 14, -1 } },
+	{ "Maj9#11" , { 0, 4, 7, 11, 14, 18, -1 } },
+	{ "m9" , { 0, 3, 7, 10, 14, -1 } },
+	{ "madd9" , { 0, 3, 7, 14, -1 } },
+	{ "m9b5" , { 0, 3, 6, 10, 14, -1 } },
+	{ "m9-Maj7" , { 0, 3, 7, 11, 14, -1 } },
 
-	{ ChordCreator::tr( "11" ), { 0, 4, 7, 10, 14, 17, -1 } },
-	{ ChordCreator::tr( "11b9" ), { 0, 4, 7, 10, 13, 17, -1 } },
-	{ ChordCreator::tr( "Maj11" ), { 0, 4, 7, 11, 14, 17, -1 } },
-	{ ChordCreator::tr( "m11" ), { 0, 3, 7, 10, 14, 17, -1 } },
-	{ ChordCreator::tr( "m-Maj11" ), { 0, 3, 7, 11, 14, 17, -1 } },
+	{ "11" , { 0, 4, 7, 10, 14, 17, -1 } },
+	{ "11b9" , { 0, 4, 7, 10, 13, 17, -1 } },
+	{ "Maj11" , { 0, 4, 7, 11, 14, 17, -1 } },
+	{ "m11" , { 0, 3, 7, 10, 14, 17, -1 } },
+	{ "m-Maj11" , { 0, 3, 7, 11, 14, 17, -1 } },
 
-	{ ChordCreator::tr( "13" ), { 0, 4, 7, 10, 14, 21, -1 } },
-	{ ChordCreator::tr( "13#9" ), { 0, 4, 7, 10, 15, 21, -1 } },
-	{ ChordCreator::tr( "13b9" ), { 0, 4, 7, 10, 13, 21, -1 } },
-	{ ChordCreator::tr( "13b5b9" ), { 0, 4, 6, 10, 13, 21, -1 } },
-	{ ChordCreator::tr( "Maj13" ), { 0, 4, 7, 11, 14, 21, -1 } },
-	{ ChordCreator::tr( "m13" ), { 0, 3, 7, 10, 14, 21, -1 } },
-	{ ChordCreator::tr( "m-Maj13" ), { 0, 3, 7, 11, 14, 21, -1 } },
+	{ "13" , { 0, 4, 7, 10, 14, 21, -1 } },
+	{ "13#9" , { 0, 4, 7, 10, 15, 21, -1 } },
+	{ "13b9" , { 0, 4, 7, 10, 13, 21, -1 } },
+	{ "13b5b9" , { 0, 4, 6, 10, 13, 21, -1 } },
+	{ "Maj13" , { 0, 4, 7, 11, 14, 21, -1 } },
+	{ "m13" , { 0, 3, 7, 10, 14, 21, -1 } },
+	{ "m-Maj13" , { 0, 3, 7, 11, 14, 21, -1 } },
 
-	{ ChordCreator::tr( "Major" ), { 0, 2, 4, 5, 7, 9, 11, -1 } },
-	{ ChordCreator::tr( "Harmonic minor" ), { 0, 2, 3, 5, 7, 8, 11, -1 } },
-	{ ChordCreator::tr( "Melodic minor" ), { 0, 2, 3, 5, 7, 9, 11, -1 } },
-	{ ChordCreator::tr( "Whole tone" ), { 0, 2, 4, 6, 8, 10, -1 } },
-	{ ChordCreator::tr( "Diminished" ), { 0, 2, 3, 5, 6, 8, 9, 11, -1 } },
-	{ ChordCreator::tr( "Major pentatonic" ), { 0, 2, 4, 7, 10, -1 } },
-	{ ChordCreator::tr( "Minor pentatonic" ), { 0, 3, 5, 7, 10, -1 } },
-	{ ChordCreator::tr( "Jap in sen" ), { 0, 1, 5, 7, 10, -1 } },
-	{ ChordCreator::tr( "Major bebop" ), { 0, 2, 4, 5, 7, 8, 9, 11, -1 } },
-	{ ChordCreator::tr( "Dominant bebop" ), { 0, 2, 4, 5, 7, 9, 10, 11, -1 } },
-	{ ChordCreator::tr( "Blues" ), { 0, 3, 5, 6, 7, 10, -1 } },
-	{ ChordCreator::tr( "Arabic" ), { 0, 1, 4, 5, 7, 8, 11, -1 } },
-	{ ChordCreator::tr( "Enigmatic" ), { 0, 1, 4, 6, 8, 10, 11, -1 } },
-	{ ChordCreator::tr( "Neopolitan" ), { 0, 1, 3, 5, 7, 9, 11, -1 } },
-	{ ChordCreator::tr( "Neopolitan minor" ), { 0, 1, 3, 5, 7, 9, 11, -1 } },
-	{ ChordCreator::tr( "Hungarian minor" ), { 0, 2, 3, 6, 7, 9, 11, -1 } },
-	{ ChordCreator::tr( "Dorian" ), { 0, 2, 3, 5, 7, 9, 10, -1 } },
-	{ ChordCreator::tr( "Phrygolydian" ), { 0, 1, 3, 5, 7, 8, 10, -1 } },
-	{ ChordCreator::tr( "Lydian" ), { 0, 2, 4, 6, 7, 9, 11, -1 } },
-	{ ChordCreator::tr( "Mixolydian" ), { 0, 2, 4, 5, 7, 9, 10, -1 } },
-	{ ChordCreator::tr( "Aeolian" ), { 0, 2, 3, 5, 7, 8, 10, -1 } },
-	{ ChordCreator::tr( "Locrian" ), { 0, 1, 3, 5, 6, 8, 10, -1 } },
-
-	{ "", { -1, -1 } }
-
+	{ "Major" , { 0, 2, 4, 5, 7, 9, 11, -1 } },
+	{ "Harmonic minor" , { 0, 2, 3, 5, 7, 8, 11, -1 } },
+	{ "Melodic minor" , { 0, 2, 3, 5, 7, 9, 11, -1 } },
+	{ "Whole tone" , { 0, 2, 4, 6, 8, 10, -1 } },
+	{ "Diminished" , { 0, 2, 3, 5, 6, 8, 9, 11, -1 } },
+	{ "Major pentatonic" , { 0, 2, 4, 7, 10, -1 } },
+	{ "Minor pentatonic" , { 0, 3, 5, 7, 10, -1 } },
+	{ "Jap in sen" , { 0, 1, 5, 7, 10, -1 } },
+	{ "Major bebop" , { 0, 2, 4, 5, 7, 8, 9, 11, -1 } },
+	{ "Dominant bebop" , { 0, 2, 4, 5, 7, 9, 10, 11, -1 } },
+	{ "Blues" , { 0, 3, 5, 6, 7, 10, -1 } },
+	{ "Arabic" , { 0, 1, 4, 5, 7, 8, 11, -1 } },
+	{ "Enigmatic" , { 0, 1, 4, 6, 8, 10, 11, -1 } },
+	{ "Neopolitan" , { 0, 1, 3, 5, 7, 9, 11, -1 } },
+	{ "Neopolitan minor" , { 0, 1, 3, 5, 7, 8, 11, -1 } },
+	{ "Hungarian minor" , { 0, 2, 3, 6, 7, 8, 11, -1 } },
+	{ "Dorian" , { 0, 2, 3, 5, 7, 9, 10, -1 } },
+	{ "Phrygolydian" , { 0, 1, 3, 5, 7, 8, 10, -1 } },
+	{ "Lydian" , { 0, 2, 4, 6, 7, 9, 11, -1 } },
+	{ "Mixolydian" , { 0, 2, 4, 5, 7, 9, 10, -1 } },
+	{ "Aeolian" , { 0, 2, 3, 5, 7, 8, 10, -1 } },
+	{ "Locrian" , { 0, 1, 3, 5, 6, 8, 10, -1 } },
 } ;
+
+
+
+
+ChordCreator::Chord::Chord( const char * n, const ChordSemiTones & semi_tones ) :
+	m_name( tr( n ) )
+{
+	for( m_size = 0; m_size < MAX_CHORD_POLYPHONY; m_size++ )
+	{
+		if( semi_tones[m_size] == -1 )
+		{
+			break;
+		}
+
+		m_semiTones[m_size] = semi_tones[m_size];
+	}
+}
+
+
+
+
+bool ChordCreator::Chord::hasSemiTone( Sint8 semi_tone ) const
+{
+	for( int i = 0; i < size(); ++i )
+	{
+		if( semi_tone == m_semiTones[i] )
+			return true;
+	}
+	return false;
+}
+
+
+
+
+ChordCreator::ChordTable::ChordTable() :
+	QVector<Chord>()
+{
+	for( int i = 0;
+		i < static_cast<int>( sizeof s_initTable / sizeof *s_initTable );
+		i++ )
+	{
+		push_back( Chord( s_initTable[i].m_name, s_initTable[i].m_semiTones ) );
+	}
+}
+
+
+
+
+const ChordCreator::Chord & ChordCreator::ChordTable::getByName( const QString & name, bool is_scale ) const
+{
+	for( int i = 0; i < size(); i++ )
+	{
+		if( at( i ).getName() == name && is_scale == at( i ).isScale() )
+			return at( i );
+	}
+
+	static Chord empty;
+	return empty;
+}
+
+
 
 
 ChordCreator::ChordCreator( Model * _parent ) :
@@ -142,9 +200,10 @@ ChordCreator::ChordCreator( Model * _parent ) :
 	m_chordsModel( this, tr( "Chord type" ) ),
 	m_chordRangeModel( 1.0f, 1.0f, 9.0f, 1.0f, this, tr( "Chord range" ) )
 {
-	for( int i = 0; s_chordTable[i].interval[0] != -1; ++i )
+	const ChordTable & chord_table = ChordTable::getInstance();
+	for( int i = 0; i < chord_table.size(); ++i )
 	{
-		m_chordsModel.addItem( tr( s_chordTable[i].name.toUtf8().
+		m_chordsModel.addItem( tr( chord_table[i].getName().toUtf8().
 								constData() ) );
 	}
 }
@@ -162,6 +221,7 @@ ChordCreator::~ChordCreator()
 void ChordCreator::processNote( notePlayHandle * _n )
 {
 	const int base_note_key = _n->key();
+	const ChordTable & chord_table = ChordTable::getInstance();
 	// we add chord-subnotes to note if either note is a base-note and
 	// arpeggio is not used or note is part of an arpeggio
 	// at the same time we only add sub-notes if nothing of the note was
@@ -186,13 +246,13 @@ void ChordCreator::processNote( notePlayHandle * _n )
 			// create it in the following loop, then we loop until
 			// there's a -1 in the interval-array
 			for( int i = ( octave_cnt == 0 ) ? 1 : 0;
-				s_chordTable[selected_chord].interval[i] != -1;
+				i < chord_table[selected_chord].size();
 									++i )
 			{
 				// add interval to sub-note-key
 				const int sub_note_key = sub_note_key_base +
-							(int) s_chordTable[
-						selected_chord].interval[i];
+							(int) chord_table[
+						selected_chord][i];
 				// maybe we're out of range -> let's get outta
 				// here!
 				if( sub_note_key > NumKeys )
@@ -255,11 +315,11 @@ Arpeggiator::Arpeggiator( Model * _parent ) :
 	m_arpDirectionModel( this, tr( "Arpeggio direction" ) ),
 	m_arpModeModel( this, tr( "Arpeggio mode" ) )
 {
-	for( int i = 0; ChordCreator::s_chordTable[i].interval[0] != -1; ++i )
+	const ChordCreator::ChordTable & chord_table = ChordCreator::ChordTable::getInstance();
+	for( int i = 0; i < chord_table[i].size(); ++i )
 	{
 		m_arpModel.addItem( ChordCreator::tr(
-					ChordCreator::s_chordTable[i].
-						name.toUtf8().constData() ) );
+					chord_table[i].getName().toUtf8().constData() ) );
 	}
 
 	m_arpDirectionModel.addItem( tr( "Up" ), new PixmapLoader( "arp_up" ) );
@@ -314,8 +374,8 @@ void Arpeggiator::processNote( notePlayHandle * _n )
 		}
 	}
 
-	const int cur_chord_size = ChordCreator::getChordSize(
-				ChordCreator::s_chordTable[selected_arp] );
+	const ChordCreator::ChordTable & chord_table = ChordCreator::ChordTable::getInstance();
+	const int cur_chord_size = chord_table[selected_arp].size();
 	const int range = (int)( cur_chord_size * m_arpRangeModel.value() );
 	const int total_range = range * cnphv.size();
 
@@ -401,8 +461,7 @@ void Arpeggiator::processNote( notePlayHandle * _n )
 		const int sub_note_key = base_note_key + (cur_arp_idx /
 							cur_chord_size ) *
 							KeysPerOctave +
-				ChordCreator::s_chordTable[selected_arp].
-					interval[cur_arp_idx % cur_chord_size];
+				chord_table[selected_arp][cur_arp_idx % cur_chord_size];
 
 		// range-checking
 		if( sub_note_key >= NumKeys ||

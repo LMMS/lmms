@@ -36,12 +36,17 @@ class InstrumentTrack;
 class notePlayHandle;
 
 
-const int MAX_CHORD_POLYPHONY = 10;
-
 
 class ChordCreator : public Model, public JournallingObject
 {
 	Q_OBJECT
+
+public:
+	static const int MAX_CHORD_POLYPHONY = 10;
+
+private:
+	typedef Sint8 ChordSemiTones [MAX_CHORD_POLYPHONY];
+
 public:
 	ChordCreator( Model * _parent );
 	virtual ~ChordCreator();
@@ -58,22 +63,84 @@ public:
 	}
 
 
-	static struct Chord
+	struct Chord
 	{
-		const QString name;
-		Sint8 interval[MAX_CHORD_POLYPHONY];
-	} s_chordTable[];
+	private:
+		QString m_name;
+		ChordSemiTones m_semiTones;
+		int m_size;
 
+	public:
+		Chord() : m_size( 0 ) {}
 
-	static inline int getChordSize( Chord & _c )
-	{
-		int idx = 0;
-		while( _c.interval[idx] != -1 )
+		Chord( const char * n, const ChordSemiTones & semi_tones );
+
+		int size() const
 		{
-			++idx;
+			return m_size;
 		}
-		return idx;
-	}
+
+		bool isScale() const
+		{
+			return size() > 6;
+		}
+
+		bool isEmpty() const
+		{
+			return size() == 0;
+		}
+
+		bool hasSemiTone( Sint8 semi_tone ) const;
+
+		Sint8 last() const
+		{
+			return m_semiTones[size() - 1];
+		}
+
+		const QString & getName() const
+		{
+			return m_name;
+		}
+
+		Sint8 operator [] ( int n ) const
+		{
+			return m_semiTones[n];
+		}
+	};
+
+
+	struct ChordTable : public QVector<Chord>
+	{
+	private:
+		ChordTable();
+
+		struct Init
+		{
+			const char * m_name;
+			ChordSemiTones m_semiTones;
+		};
+
+		static Init s_initTable[];
+
+	public:
+		static const ChordTable & getInstance()
+		{
+			static ChordTable inst;
+			return inst;
+		}
+
+		const Chord & getByName( const QString & name, bool is_scale = false ) const;
+
+		const Chord & getScaleByName( const QString & name ) const
+		{
+			return getByName( name, true );
+		}
+
+		const Chord & getChordByName( const QString & name ) const
+		{
+			return getByName( name, false );
+		}
+	};
 
 
 private:

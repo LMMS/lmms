@@ -138,7 +138,7 @@ const int DEFAULT_PR_PPT = KEY_LINE_HEIGHT * DefaultStepsPerTact;
 pianoRoll::pianoRoll() :
 	m_nemStr( QVector<QString>() ),
 	m_noteEditMenu( NULL ),
-	m_toneMarkerMenu( NULL ),
+	m_semiToneMarkerMenu( NULL ),
 	m_zoomingModel(),
 	m_quantizeModel(),
 	m_noteLenModel(),
@@ -187,30 +187,34 @@ pianoRoll::pianoRoll() :
 			this, SLOT(changeNoteEditMode(int)) );
 	
 	signalMapper = new QSignalMapper( this );
-	m_toneMarkerMenu = new QMenu( this );
+	m_semiToneMarkerMenu = new QMenu( this );
 
-	QAction * act = new QAction( tr("Mark/unmark current tone"), this );
+	QAction * act = new QAction( tr("Mark/unmark current semitone"), this );
 	connect( act, SIGNAL(triggered()), signalMapper, SLOT(map()) );
-	signalMapper->setMapping( act, static_cast<int>( tmmeMarkCurrent ) );
-	m_toneMarkerMenu->addAction( act );
+	signalMapper->setMapping( act, static_cast<int>( stmaMarkCurrentSemiTone ) );
+	m_semiToneMarkerMenu->addAction( act );
 
-	act = new QAction( tr("Mark minor scale"), this );
+	act = new QAction( tr("Mark current scale"), this );
+	act->setEnabled( false );
 	connect( act, SIGNAL(triggered()), signalMapper, SLOT(map()) );
-	signalMapper->setMapping( act, static_cast<int>( tmmeMarkMinorScale ) );
-	m_toneMarkerMenu->addAction( act );
+	connect( this, SIGNAL(semiToneMarkerMenuScaleSetEnabled(bool)), act, SLOT(setEnabled(bool)) );
+	signalMapper->setMapping( act, static_cast<int>( stmaMarkCurrentScale ) );
+	m_semiToneMarkerMenu->addAction( act );
 
-	act = new QAction( tr("Mark major scale"), this );
+	act = new QAction( tr("Mark current chord"), this );
+	act->setEnabled( false );
 	connect( act, SIGNAL(triggered()), signalMapper, SLOT(map()) );
-	signalMapper->setMapping( act, static_cast<int>( tmmeMarkMajorScale ) );
-	m_toneMarkerMenu->addAction( act );
+	connect( this, SIGNAL(semiToneMarkerMenuChordSetEnabled(bool)), act, SLOT(setEnabled(bool)) );
+	signalMapper->setMapping( act, static_cast<int>( stmaMarkCurrentChord ) );
+	m_semiToneMarkerMenu->addAction( act );
 
 	act = new QAction( tr("Unmark all"), this );
 	connect( act, SIGNAL(triggered()), signalMapper, SLOT(map()) );
-	signalMapper->setMapping( act, static_cast<int>( tmmeUnmarkAll ) );
-	m_toneMarkerMenu->addAction( act );
+	signalMapper->setMapping( act, static_cast<int>( stmaUnmarkAll ) );
+	m_semiToneMarkerMenu->addAction( act );
 
 	connect( signalMapper, SIGNAL(mapped(int)),
-			this, SLOT(markTone(int)) );
+			this, SLOT(markSemiTone(int)) );
 
 	// init pixmaps
 	if( s_whiteKeySmallPm == NULL )
@@ -498,6 +502,52 @@ pianoRoll::pianoRoll() :
 					this, SLOT( quantizeChanged() ) );
 
 
+	const ChordCreator::ChordTable & chord_table = ChordCreator::ChordTable::getInstance();
+
+	// setup scale-stuff
+	QLabel * scale_lbl = new QLabel( m_toolBar );
+	scale_lbl->setPixmap( embed::getIconPixmap( "scale" ) );
+
+	m_scaleModel.addItem( tr("No scale") );
+	for( int i = 0; i < chord_table.size(); ++i )
+	{
+		if( chord_table[i].isScale() )
+		{
+			m_scaleModel.addItem( chord_table[i].getName() );
+		}
+	}
+
+	m_scaleModel.setValue( 0 );
+	m_scaleComboBox = new comboBox( m_toolBar );
+	m_scaleComboBox->setModel( &m_scaleModel );
+	m_scaleComboBox->setFixedSize( 105, 22 );
+	// change can update m_semiToneMarkerMenu
+	connect( &m_scaleModel, SIGNAL( dataChanged() ),
+					this, SLOT( updateSemiToneMarkerMenu() ) );
+
+
+	// setup chord-stuff
+	QLabel * chord_lbl = new QLabel( m_toolBar );
+	chord_lbl->setPixmap( embed::getIconPixmap( "chord" ) );
+
+	m_chordModel.addItem( tr("No chord") );
+	for( int i = 0; i < chord_table.size(); ++i )
+	{
+		if( ! chord_table[i].isScale() )
+		{
+			m_chordModel.addItem( chord_table[i].getName() );
+		}
+	}
+
+	m_chordModel.setValue( 0 );
+	m_chordComboBox = new comboBox( m_toolBar );
+	m_chordComboBox->setModel( &m_chordModel );
+	m_chordComboBox->setFixedSize( 105, 22 );
+	// change can update m_semiToneMarkerMenu
+	connect( &m_chordModel, SIGNAL( dataChanged() ),
+					this, SLOT( updateSemiToneMarkerMenu() ) );
+
+
 	tb_layout->addSpacing( 5 );
 	tb_layout->addWidget( m_playButton );
 	tb_layout->addWidget( m_recordButton );
@@ -526,6 +576,14 @@ pianoRoll::pianoRoll() :
 	tb_layout->addWidget( note_len_lbl );
 	tb_layout->addSpacing( 4 );
 	tb_layout->addWidget( m_noteLenComboBox );
+	tb_layout->addSpacing( 10 );
+	tb_layout->addWidget( scale_lbl );
+	tb_layout->addSpacing( 4 );
+	tb_layout->addWidget( m_scaleComboBox );
+	tb_layout->addSpacing( 10 );
+	tb_layout->addWidget( chord_lbl );
+	tb_layout->addSpacing( 4 );
+	tb_layout->addWidget( m_chordComboBox );
 	tb_layout->addStretch();
 
 	// setup our actual window
@@ -564,60 +622,69 @@ void pianoRoll::changeNoteEditMode( int i )
 }
 
 
-void pianoRoll::markTone( int i )
+void pianoRoll::markSemiTone( int i )
 {
-	static const int major_scale[KeysPerOctave] = {
-		1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 0, 1
-	};
+	const int key = getKey( mapFromGlobal( m_semiToneMarkerMenu->pos() ).y() );
+	const ChordCreator::Chord * chord = 0;
 
-	static const int minor_scale[KeysPerOctave] = {
-		1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 0
-	};
-
-	const int * scale = 0;
-	const int key = getKey( mapFromGlobal( m_toneMarkerMenu->pos() ).y() );
-
-	switch( static_cast<toneMarkerAction>( i ) )
+	switch( static_cast<semiToneMarkerAction>( i ) )
 	{
-		case tmmeUnmarkAll:
-			m_markedTones.clear();
+		case stmaUnmarkAll:
+			m_markedSemiTones.clear();
 			break;
-		case tmmeMarkCurrent:
+		case stmaMarkCurrentSemiTone:
 		{
-			QList<int>::iterator i = qFind( m_markedTones.begin(), m_markedTones.end(), key );
-			if( i != m_markedTones.end() )
+			QList<int>::iterator i = qFind( m_markedSemiTones.begin(), m_markedSemiTones.end(), key );
+			if( i != m_markedSemiTones.end() )
 			{
-				m_markedTones.erase( i );
+				m_markedSemiTones.erase( i );
 			}
 			else
 			{
-				m_markedTones.push_back( key );
+				m_markedSemiTones.push_back( key );
 			}
 			break;
 		}
-		case tmmeMarkMinorScale:
-			scale = minor_scale;
-		case tmmeMarkMajorScale:
-			if( ! scale )
+		case stmaMarkCurrentScale:
+			chord = & ChordCreator::ChordTable::getInstance()
+					.getScaleByName( m_scaleModel.currentText() );
+		case stmaMarkCurrentChord:
+		{
+			if( ! chord )
 			{
-				scale = major_scale;
+				chord = & ChordCreator::ChordTable::getInstance()
+						.getChordByName( m_chordModel.currentText() );
 			}
 
-			for( int i = 0; i <= NumKeys; i++ )
+			if( chord->isEmpty() )
 			{
-				if( scale[std::abs( key - i ) % KeysPerOctave] )
+				break;
+			}
+			else if( chord->isScale() )
+			{
+				m_markedSemiTones.clear();
+			}
+
+			const int first = chord->isScale() ? 0 : key;
+			const int last = chord->isScale() ? NumKeys : key + chord->last();
+			const int cap = chord->isScale() ? KeysPerOctave : chord->last();
+
+			for( int i = first; i <= last; i++ )
+			{
+				if( chord->hasSemiTone( std::abs( key - i ) % cap ) )
 				{
-					m_markedTones.push_back( i );
+					m_markedSemiTones.push_back( i );
 				}
 			}
 			break;
+		}
 		default:
 			;
 	}
 
-	qSort( m_markedTones.begin(), m_markedTones.end(), qGreater<int>() );
-	QList<int>::iterator new_end = std::unique( m_markedTones.begin(), m_markedTones.end() );
-	m_markedTones.erase( new_end, m_markedTones.end() );
+	qSort( m_markedSemiTones.begin(), m_markedSemiTones.end(), qGreater<int>() );
+	QList<int>::iterator new_end = std::unique( m_markedSemiTones.begin(), m_markedSemiTones.end() );
+	m_markedSemiTones.erase( new_end, m_markedSemiTones.end() );
 }
 
 
@@ -1453,11 +1520,15 @@ void pianoRoll::mousePressEvent( QMouseEvent * _me )
 			else if( _me->button() == Qt::LeftButton &&
 							m_editMode == ModeDraw )
 			{
+				// whether this action creates new note(s) or not
+				bool is_new_note = false;
+
 				note * created_new_note = NULL;
 				// did it reach end of vector because
 				// there's no note??
 				if( it == notes.begin()-1 )
 				{
+					is_new_note = true;
 					m_pattern->setType( pattern::MelodyPattern );
 
 					// then set new note
@@ -1470,12 +1541,34 @@ void pianoRoll::mousePressEvent( QMouseEvent * _me )
 					// because live notes should still be quantized at the half.
 					midiTime note_pos( pos_ticks - ( quantization() / 2 ) );
 					midiTime note_len( newNoteLen() );
-		
+
 					note new_note( note_len, note_pos, key_num );
 					new_note.setSelected( true );
 					new_note.setPanning( m_lastNotePanning );
 					new_note.setVolume( m_lastNoteVolume );
 					created_new_note = m_pattern->addNote( new_note );
+
+					const ChordCreator::Chord & chord = ChordCreator::ChordTable::getInstance()
+						.getChordByName( m_chordModel.currentText() );
+
+					if( ! chord.isEmpty() )
+					{
+						// if a chord is selected, create following notes in chord
+						// or arpeggio mode
+						const bool arpeggio = _me->modifiers() & Qt::ShiftModifier;
+						for( int i = 1; i < chord.size(); i++ )
+						{
+							if( arpeggio )
+							{
+								note_pos += note_len;
+							}
+							note new_note( note_len, note_pos, key_num + chord[i] );
+							new_note.setSelected( true );
+							new_note.setPanning( m_lastNotePanning );
+							new_note.setVolume( m_lastNoteVolume );
+							m_pattern->addNote( new_note );
+						}
+					}
 
 					// reset it so that it can be used for
 					// ops (move, resize) after this
@@ -1579,7 +1672,7 @@ void pianoRoll::mousePressEvent( QMouseEvent * _me )
 					
 					// if they're holding shift, copy all selected notes 
 					if( //*it != created_new_note &&
-					   _me->modifiers() & Qt::ShiftModifier )
+					   ! is_new_note && _me->modifiers() & Qt::ShiftModifier )
 					{
 						// vector to hold new notes until we're through the loop
 						QVector<note> newNotes;
@@ -1662,7 +1755,7 @@ void pianoRoll::mousePressEvent( QMouseEvent * _me )
 			if( _me->buttons() == Qt::RightButton )
 			{
 				// right click, tone marker contextual menu
-				m_toneMarkerMenu->popup( mapToGlobal( QPoint( _me->x(), _me->y() ) ) );
+				m_semiToneMarkerMenu->popup( mapToGlobal( QPoint( _me->x(), _me->y() ) ) );
 			}
 			else
 			{
@@ -2703,9 +2796,9 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 	}
 
 	// display note marks
-	for( int i = 0; i < m_markedTones.size(); i++ )
+	for( int i = 0; i < m_markedSemiTones.size(); i++ )
 	{
-		const int key_num = m_markedTones.at( i );
+		const int key_num = m_markedSemiTones.at( i );
 		const int y = keyAreaBottom() + 5
 			- KEY_LINE_HEIGHT * ( key_num - m_startKey + 1 );
 
@@ -3668,6 +3761,21 @@ int pianoRoll::quantization() const
 	return DefaultTicksPerTact / m_quantizeModel.currentText().right(
 				m_quantizeModel.currentText().length() -
 								2 ).toInt();
+}
+
+
+
+
+void pianoRoll::updateSemiToneMarkerMenu()
+{
+	const ChordCreator::Chord & scale = ChordCreator::ChordTable::getInstance()
+					.getScaleByName( m_scaleModel.currentText() );
+
+	const ChordCreator::Chord & chord = ChordCreator::ChordTable::getInstance()
+					.getChordByName( m_chordModel.currentText() );
+
+	emit semiToneMarkerMenuScaleSetEnabled( ! scale.isEmpty() );
+	emit semiToneMarkerMenuChordSetEnabled( ! chord.isEmpty() );
 }
 
 
