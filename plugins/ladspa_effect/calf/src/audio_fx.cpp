@@ -15,12 +15,15 @@
  *
  * You should have received a copy of the GNU Lesser General
  * Public License along with this program; if not, write to the
- * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, 
+ * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
  * Boston, MA  02110-1301  USA
  */
 
 #include <calf/audio_fx.h>
 #include <calf/giface.h>
+#include <stdlib.h>
+#include <time.h>
+#include <math.h>
 
 using namespace calf_plugins;
 using namespace dsp;
@@ -37,7 +40,7 @@ simple_phaser::simple_phaser(int _max_stages, float *x1vals, float *y1vals)
     state = 0;
     cnt = 0;
     stages = 0;
-    set_stages(_max_stages);    
+    set_stages(_max_stages);
 }
 
 void simple_phaser::set_stages(int _stages)
@@ -74,7 +77,7 @@ void simple_phaser::control_step()
     v ^= sign;
     // triangle wave, range from 0 to INT_MAX
     double vf = (double)((v >> 16) * (1.0 / 16384.0) - 1);
-    
+
     float freq = base_frq * pow(2.0, vf * mod_depth / 1200.0);
     freq = dsp::clip<float>(freq, 10.0, 0.49 * sample_rate);
     stage1.set_ap_w(freq * (M_PI / 2.0) * odsr);
@@ -98,7 +101,7 @@ void simple_phaser::process(float *buf_out, float *buf_in, int nsamples)
         for (int j = 0; j < stages; j++)
             fd = stage1.process_ap(fd, x1[j], y1[j]);
         state = fd;
-        
+
         float sdry = in * gs_dry.get();
         float swet = fd * gs_wet.get();
         *buf_out++ = sdry + swet;
@@ -110,14 +113,14 @@ float simple_phaser::freq_gain(float freq, float sr) const
     typedef std::complex<double> cfloat;
     freq *= 2.0 * M_PI / sr;
     cfloat z = 1.0 / exp(cfloat(0.0, freq)); // z^-1
-    
+
     cfloat p = cfloat(1.0);
     cfloat stg = stage1.h_z(z);
-    
+
     for (int i = 0; i < stages; i++)
         p = p * stg;
-    
-    p = p / (cfloat(1.0) - cfloat(fb) * p);        
+
+    p = p / (cfloat(1.0) - cfloat(fb) * p);
     return std::abs(cfloat(gs_dry.get_last()) + cfloat(gs_wet.get_last()) * p);
 }
 
@@ -138,7 +141,7 @@ void biquad_filter_module::calculate_filter(float freq, float q, int mode, float
         order = mode - mode_6db_br + 1;
         left[0].set_br_rbj(freq, order * 0.1 * q, srate, gain);
     }
-    
+
     right[0].copy_coeffs(left[0]);
     for (int i = 1; i < order; i++) {
         left[i].copy_coeffs(left[0]);
@@ -168,16 +171,16 @@ int biquad_filter_module::process_channel(uint16_t channel_no, const float *in, 
     case 0:
         filter = left;
         break;
-        
+
     case 1:
         filter = right;
         break;
-    
+
     default:
         assert(false);
         return 0;
     }
-    
+
     if (inmask) {
         switch(order) {
             case 1:
@@ -288,10 +291,10 @@ void reverb::update_times()
         tl[5] = 1577 << 16, tr[5] = 1881 << 16;
         break;
     }
-    
+
     float fDec=1000 + 2400.f * diffusion;
     for (int i = 0 ; i < 6; i++) {
-        ldec[i]=exp(-float(tl[i] >> 16) / fDec), 
+        ldec[i]=exp(-float(tl[i] >> 16) / fDec),
         rdec[i]=exp(-float(tr[i] >> 16) / fDec);
     }
 }
@@ -311,11 +314,11 @@ void reverb::reset()
 void reverb::process(float &left, float &right)
 {
     unsigned int ipart = phase.ipart();
-    
+
     // the interpolated LFO might be an overkill here
     int lfo = phase.lerp_by_fract_int<int, 14, int>(sine.data[ipart], sine.data[ipart+1]) >> 2;
     phase += dphase;
-    
+
     left += old_right;
     left = apL1.process_allpass_comb_lerp16(left, tl[0] - 45*lfo, ldec[0]);
     left = apL2.process_allpass_comb_lerp16(left, tl[1] + 47*lfo, ldec[1]);
@@ -337,7 +340,7 @@ void reverb::process(float &left, float &right)
     right = apR6.process_allpass_comb_lerp16(right, tr[5] - 46*lfo, rdec[5]);
     old_right = lp_right.process(right * fb);
     sanitize(old_right);
-    
+
     left = out_left, right = out_right;
 }
 
@@ -383,7 +386,7 @@ void tap_distortion::set_params(float blend, float drive)
         an = rbdr*rbdr / sq;
         imr = 2.0f * knb + D(2.0f * kna + 4.0f * an - 1.0f);
         pwrq = 2.0f / (imr + 1.0f);
-        
+
         drive_old = drive;
         blend_old = blend;
     }
@@ -550,19 +553,25 @@ lookahead_limiter::lookahead_limiter() {
     over_s = 0;
     over_c = 1.f;
     attack = 0.005;
-    __attack = -1;
     use_multi = false;
     weight = 1.f;
     _sanitize = false;
     auto_release = false;
     asc_active = false;
+    nextiter = 0;
+    nextlen = 0;
+    asc = 0.f;
+    asc_c = 0;
+    asc_pos = -1;
+    asc_changed = false;
+    asc_coeff = 1.f;
 }
 
 void lookahead_limiter::activate()
 {
     is_active = true;
     pos = 0;
-    
+
 }
 
 void lookahead_limiter::set_multi(bool set) { use_multi = set; }
@@ -587,24 +596,41 @@ void lookahead_limiter::set_sample_rate(uint32_t sr)
     buffer = (float*) calloc(overall_buffer_size, sizeof(float));
     memset(buffer, 0, overall_buffer_size * sizeof(float)); // reset buffer to zero
     pos = 0;
+
+    nextpos = (int*) calloc(overall_buffer_size, sizeof(int));
+    nextdelta = (float*) calloc(overall_buffer_size, sizeof(float));
+    memset(nextpos, -1, overall_buffer_size * sizeof(int));
 }
 
-void lookahead_limiter::set_params(float l, float a, float r, float w, bool ar, bool d)
+void lookahead_limiter::set_params(float l, float a, float r, float w, bool ar, float arc, bool d)
 {
     limit = l;
     attack = a / 1000.f;
     release = r / 1000.f;
     auto_release = ar;
+    asc_coeff = arc;
     debug = d;
     weight = w;
-    //if(debug) printf("%.5f\n", release);
-    if( attack != __attack) {
-        int bs = (int)(srate * attack * channels);
-        buffer_size = bs - bs % channels; // buffer size attack rate
-        __attack = attack;
-        _sanitize = true;
-        pos = 0;
-    }
+}
+
+void lookahead_limiter::reset() {
+    int bs = (int)(srate * attack * channels);
+    buffer_size = bs - bs % channels; // buffer size attack rate
+    _sanitize = true;
+    pos = 0;
+    nextpos[0] = -1;
+    nextlen = 0;
+    nextiter = 0;
+    delta = 0.f;
+    att = 1.f;
+    reset_asc();
+}
+
+void lookahead_limiter::reset_asc() {
+    asc = 0.f;
+    asc_c = 0;
+    asc_pos = pos;
+    asc_changed = true;
 }
 
 void lookahead_limiter::process(float &left, float &right, float * multi_buffer)
@@ -612,131 +638,192 @@ void lookahead_limiter::process(float &left, float &right, float * multi_buffer)
     // PROTIP: harming paying customers enough to make them develop a competing
     // product may be considered an example of a less than sound business practice.
 
-    // write left and right to buffer
-    buffer[pos] = 0.f;
-    buffer[pos + 1] = 0.f;
-    if(!_sanitize) {
+    // fill lookahead buffer
+    if(_sanitize) {
+        // if we're sanitizing (zeroing) the buffer on attack time change,
+        // don't write the samples to the buffer
+        buffer[pos] = 0.f;
+        buffer[pos + 1] = 0.f;
+    } else {
         buffer[pos] = left;
         buffer[pos + 1] = right;
     }
-    
-    // are we using multiband? get the multiband coefficient
+
+    // are we using multiband? get the multiband coefficient or use 1.f
     float multi_coeff = (use_multi) ? multi_buffer[pos] : 1.f;
-    //if(debug and pos%10 == 0) printf("%03d: %.5f\n", pos, multi_buffer[pos]);
-    
-    // input peak - impact in left or right channel?
+
+    // input peak - impact higher in left or right channel?
     peak = fabs(left) > fabs(right) ? fabs(left) : fabs(right);
-    
-    // if we have a peak in input over our limit, check if delta to reach is
-    // more important than actual delta
-    if(peak > limit * multi_coeff * weight or multi_coeff < 1.f) {
-        _delta = ((limit * multi_coeff * weight) / peak - att) / (buffer_size / channels - channels);
-        if(_delta < delta) {
-            delta = _delta;
-        }
+
+    // calc the real limit including weight and multi coeff
+    float _limit = limit * multi_coeff * weight;
+
+    // add an eventually appearing peak to the asc fake buffer if asc active
+    if(auto_release and peak > _limit) {
+        asc += peak;
+        asc_c ++;
     }
-    
-    // switch left and right pointers to output
-    left = buffer[(pos + channels) % buffer_size];
-    right = buffer[(pos + channels + 1) % buffer_size];
-    
-    // check multiband coefficient again for output pointer
-    multi_coeff = (use_multi) ? multi_buffer[(pos + channels) % buffer_size] : 1.f;
-    
-    // output peak - impact in left or right channel?
-    peak = fabs(left) > fabs(right) ? fabs(left) : fabs(right);
-    
-    // output is over the limit?
-    // then we have to search for new delta.
-    // the idea is to calculate a delta for every peak and always use the
-    // lowest. this produces a soft transition between limiting targets without
-    // passing values above limit
-    
-    asc_active = false;
-    if(peak > limit * multi_coeff * weight) {
-        // default is to do a release
-        delta = (1.f - att) / (srate * release);
-        unsigned int j;
-        float b_sum = 0.f;
-        unsigned int b_sum_c = 0;
-        for(unsigned int i = channels; i < buffer_size; i += channels) {
-            // iterate over buffer (except input and output pointer positions)
-            // and search for maximum slope
-            j = (i + pos + channels) % buffer_size;
-            float _multi_coeff = (use_multi) ? multi_buffer[j] : 1.f;
-            float _peak = fabs(buffer[j]) > fabs(buffer[j + 1]) ? fabs(buffer[j]) : fabs(buffer[j + 1]);
-            // calculate steepness of slope
-            if(_peak > limit * _multi_coeff * weight) {
-                _delta = ((limit * _multi_coeff * weight) / _peak - att) / (i / channels);
-                // if slope is steeper, use it, fucker.
-                if(_delta < delta) {
-                    delta = _delta;
-                }
-                b_sum += _peak;
-                b_sum_c ++;
-            }
-        }
-        if(auto_release) {
-            // This is Auto-Smoothness-Control (wink wink, nudge nudge)
+
+    if(peak > _limit or multi_coeff < 1.0) {
+        float _multi_coeff = 1.f;
+        float _peak;
+
+        // calc the attenuation needed to reduce incoming peak
+        float _att = std::min(_limit / peak, 1.f);
+
+
+        // calc a release delta from this attenuation
+        float _rdelta = (1.0 - _att) / (srate * release);
+        if(auto_release and asc_c > 0) {
             // check if releasing to average level of peaks is steeper than
             // releasing to 1.f
-            _delta = ((limit * weight) / (float)(b_sum / b_sum_c) - att) / (srate * release);
-            asc_active = _delta < delta ? true : false;
-            delta = _delta < delta ? _delta : delta;
+            float _delta = std::max((limit * weight) / (asc_coeff * asc) * (float)asc_c - _att, 0.000001f) / (srate * release);
+            if(_delta < _rdelta) {
+                asc_active = true;
+                _rdelta = _delta;
+            }
+        }
+
+        // calc the delta for walking to incoming peak attenuation
+        float _delta = (_limit / peak - att) / buffer_size * channels;
+
+        if(_delta < delta) {
+            // is the delta more important than the actual one?
+            // if so, we can forget about all stored deltas (because they can't
+            // be more important - we already checked that earlier) and use this
+            // delta now. and we have to create a release delta in nextpos buffer
+            nextpos[0] = pos;
+            nextpos[1] = -1;
+            nextdelta[0] = _rdelta;
+            nextlen = 1;
+            nextiter = 0;
+            delta = _delta;
         } else {
-            asc_active = false;
+            // we have a peak on input its delta is less important than the
+            // actual delta. But what about the stored deltas we're following?
+            bool _found = false;
+            int i = 0;
+            for(i = nextiter; i < nextiter + nextlen; i++) {
+                // walk through our nextpos buffer
+                int j = i % buffer_size;
+                // calculate a delta for the next stored peak
+                // are we using multiband? then get the multi_coeff for the
+                // stored position
+                _multi_coeff = (use_multi) ? multi_buffer[nextpos[j]] : 1.f;
+                // is the left or the right channel on this position more
+                // important?
+                _peak = fabs(buffer[nextpos[j]]) > fabs(buffer[nextpos[j] + 1]) ? fabs(buffer[nextpos[j]]) : fabs(buffer[nextpos[j] + 1]);
+                // calc a delta to use to reach our incoming peak from the
+                // stored position
+                _delta = (_limit / peak - (limit * _multi_coeff * weight) / _peak) / (((buffer_size - nextpos[j] + pos) % buffer_size) / channels);
+                if(_delta < nextdelta[j]) {
+                    // if the buffered delta is more important than the delta
+                    // used to reach our peak from the stored position, store
+                    // the new delta at that position and stop the loop
+                    nextdelta[j] = _delta;
+                    _found = true;
+                    break;
+                }
+            }
+            if(_found) {
+                // there was something more important in the next-buffer.
+                // throw away any position and delta after the important
+                // position and add a new release delta
+                nextlen = i - nextiter + 1;
+                nextpos[(nextiter + nextlen) % buffer_size] = pos;
+                nextdelta[(nextiter + nextlen) % buffer_size] = _rdelta;
+                // set the next following position value to -1 (cleaning up the
+                // nextpos buffer)
+                nextpos[(nextiter + nextlen + 1) % buffer_size] = -1;
+                // and raise the length of our nextpos buffer for keeping the
+                // release value
+                nextlen ++;
+            }
         }
     }
+
+    // switch left and right pointers in buffer to output position
+    left = buffer[(pos + channels) % buffer_size];
+    right = buffer[(pos + channels + 1) % buffer_size];
+
+    // if a peak leaves the buffer, remove it from asc fake buffer
+    // but only if we're not sanitizing asc buffer
+    float _peak = fabs(left) > fabs(right) ? fabs(left) : fabs(right);
+    float _multi_coeff = (use_multi) ? multi_buffer[(pos + channels) % buffer_size] : 1.f;
+    if(pos == asc_pos and !asc_changed) {
+        asc_pos = -1;
+    }
+    if(auto_release and asc_pos == -1 and _peak > (limit * weight * _multi_coeff)) {
+        asc -= _peak;
+        asc_c --;
+    }
+
     // change the attenuation level
     att += delta;
+
     // ...and calculate outpout from it
     left *= att;
     right *= att;
-    
-    if(_sanitize) {
-        left = 0.f;
-       right = 0.f;
+
+    if((pos + channels) % buffer_size == nextpos[nextiter]) {
+        // if we reach a buffered position, change the actual delta and erase
+        // this (the first) element from nextpos and nextdelta buffer
+        delta = nextdelta[nextiter];
+        nextlen = (nextlen - 1) % buffer_size;
+        nextpos[nextiter] = -1;
+        nextiter = (nextiter + 1) % buffer_size;
     }
-    
-    // release time seems over
+
     if (att > 1.0f) {
-	    att = 1.0f;
-	    delta = 0.0f;
-	}
+        // release time seems over, reset attenuation and delta
+        att = 1.0f;
+        delta = 0.0f;
+    }
+
+    // main limiting party is over, let's cleanup the puke
+
+    if(_sanitize) {
+        // we're sanitizing? then send 0.f as output
+        left = 0.f;
+        right = 0.f;
+    }
 
     // security personnel pawing your values
-	if(att < 0.f) {
-	    // if this happens we're doomed!!
-	    // may happen on manually lowering attack
-	    att = 0.0000000001;
-	    delta = (1.0f - att) / (srate * release);
-	}
-	
-	if(att != 1.f and 1 - att < 0.0000000000001) {
-	    // denormalize att
-	    att = 1.f;
-	}
-	
-	if(delta != 0.f and fabs(delta) < 0.00000000000001) {
+    if(att <= 0.f) {
+        // if this happens we're doomed!!
+        // may happen on manually lowering attack
+        att = 0.0000000000001;
+        delta = (1.0f - att) / (srate * release);
+    }
+
+    if(att != 1.f and 1 - att < 0.0000000000001) {
+        // denormalize att
+        att = 1.f;
+    }
+
+    if(delta != 0.f and fabs(delta) < 0.00000000000001) {
         // denormalize delta
-	    delta = 0.f;
-	}
-	
+        delta = 0.f;
+    }
+
     // post treatment (denormal, limit)
     denormal(&left);
     denormal(&right);
-    
-    left = std::max(left, -limit * multi_coeff * weight);
-    left = std::min(left, limit * multi_coeff * weight);
-    right = std::max(right, -limit * multi_coeff * weight);
-    right = std::min(right, limit * multi_coeff * weight);
-    
-    att_max = (att < att_max) ? att : att_max; // store max atten for meter output
-    
+
+    // store max attenuation for meter output
+    att_max = (att < att_max) ? att : att_max;
+
+    // step forward in our sample ring buffer
     pos = (pos + channels) % buffer_size;
-    if(pos == 0) _sanitize = false;
+
+    // sanitizing is always done after a full cycle through the lookahead buffer
+    if(_sanitize and pos == 0) _sanitize = false;
+
+    asc_changed = false;
 }
 
-bool lookahead_limiter::get_arc() {
-    return asc_active;
+bool lookahead_limiter::get_asc() {
+    if(!asc_active) return false;
+    asc_active = false;
+    return true;
 }

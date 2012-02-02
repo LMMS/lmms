@@ -15,7 +15,7 @@
  *
  * You should have received a copy of the GNU Lesser General
  * Public License along with this program; if not, write to the
- * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, 
+ * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
  * Boston, MA 02111-1307, USA.
  */
 #ifndef CALF_MODULES_LIMIT_H
@@ -43,6 +43,9 @@ private:
 public:
     uint32_t srate;
     bool is_active;
+    float limit_old;
+    bool asc_old;
+    float attack_old;
     limiter_audio_module();
     void activate();
     void deactivate();
@@ -68,11 +71,14 @@ private:
     unsigned int pos;
     unsigned int buffer_size;
     unsigned int overall_buffer_size;
-    float __attack;
     float *buffer;
     int channels;
     float striprel[strips];
     float weight[strips];
+    float weight_old[strips];
+    float limit_old;
+    bool asc_old;
+    float attack_old;
     bool _sanitize;
 public:
     uint32_t srate;

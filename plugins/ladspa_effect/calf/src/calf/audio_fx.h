@@ -15,7 +15,7 @@
  *
  * You should have received a copy of the GNU Lesser General
  * Public License along with this program; if not, write to the
- * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, 
+ * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
  * Boston, MA  02110-1301  USA
  */
 #ifndef CALF_AUDIOFX_H
@@ -60,7 +60,7 @@ public:
     }
     void set_rate(float rate) {
         this->rate = rate;
-        dphase = rate/sample_rate*4096;        
+        dphase = rate/sample_rate*4096;
     }
     float get_wet() const {
         return wet;
@@ -118,21 +118,21 @@ public:
         return stages;
     }
     void set_stages(int _stages);
-    
+
     float get_mod_depth() const {
         return mod_depth;
     }
     void set_mod_depth(float _mod_depth) {
         mod_depth = _mod_depth;
     }
-    
+
     float get_fb() const {
         return fb;
     }
     void set_fb(float fb) {
         this->fb = fb;
     }
-    
+
     virtual void setup(int sample_rate) {
         modulation_effect::setup(sample_rate);
         reset();
@@ -181,7 +181,7 @@ class simple_chorus: public chorus_base
 {
 protected:
     simple_delay<MaxDelay,T> delay;
-public:    
+public:
     simple_chorus() {
         rate = 0.63f;
         dry = 0.5f;
@@ -206,7 +206,7 @@ public:
         for (int i=0; i<nsamples; i++) {
             phase += dphase;
             unsigned int ipart = phase.ipart();
-            
+
             float in = *buf_in++;
             int lfo = phase.lerp_by_fract_int<int, 14, int>(sine.data[ipart], sine.data[ipart+1]);
             int v = mds + (mdepth * lfo >> 6);
@@ -265,16 +265,16 @@ public:
         unsigned int ipart = this->phase.ipart();
         int lfo = phase.lerp_by_fract_int<int, 14, int>(this->sine.data[ipart], this->sine.data[ipart+1]);
         delay_pos = mds + (mdepth * lfo >> 6);
-        
+
         if (delay_pos != last_delay_pos || ramp_pos < 1024)
         {
             if (delay_pos != last_delay_pos) {
-                // we need to ramp from what the delay tap length actually was, 
+                // we need to ramp from what the delay tap length actually was,
                 // not from old (ramp_delay_pos) or desired (delay_pos) tap length
                 ramp_delay_pos = last_actual_delay_pos;
                 ramp_pos = 0;
             }
-            
+
             int64_t dp = 0;
             for (int i=0; i<nsamples; i++) {
                 float in = *buf_in++;
@@ -321,7 +321,7 @@ public:
         typedef std::complex<double> cfloat;
         freq *= 2.0 * M_PI / sr;
         cfloat z = 1.0 / exp(cfloat(0.0, freq)); // z^-1
-        
+
         float ldp = last_delay_pos / 65536.0;
         float fldp = floor(ldp);
         cfloat zn = std::pow(z, fldp); // z^-N
@@ -352,7 +352,7 @@ class reverb: public audio_effect
     float time, fb, cutoff, diffusion;
     int tl[6], tr[6];
     float ldec[6], rdec[6];
-    
+
     int sr;
 public:
     reverb()
@@ -443,17 +443,17 @@ class biquad_filter_module: public filter_module_iface
 private:
     dsp::biquad_d1<float> left[3], right[3];
     int order;
-    
-public:    
+
+public:
     uint32_t srate;
-    
-    enum { mode_12db_lp = 0, mode_24db_lp = 1, mode_36db_lp = 2, 
+
+    enum { mode_12db_lp = 0, mode_24db_lp = 1, mode_36db_lp = 2,
            mode_12db_hp = 3, mode_24db_hp = 4, mode_36db_hp = 5,
            mode_6db_bp  = 6, mode_12db_bp = 7, mode_18db_bp = 8,
            mode_6db_br  = 9, mode_12db_br = 10, mode_18db_br = 11,
            mode_count
     };
-    
+
 public:
     biquad_filter_module()
     : order(0) {}
@@ -481,14 +481,14 @@ public:
         lowcut.reset();
         highcut.reset();
     }
-    
+
     inline float process(float v)
     {
         v = dsp::lerp(lowcut.process_hp(v), v, low_gain);
         v = dsp::lerp(highcut.process_lp(v), v, high_gain);
         return v;
     }
-    
+
     inline void copy_coeffs(const two_band_eq &src)
     {
         lowcut.copy_coeffs(src.lowcut);
@@ -496,13 +496,13 @@ public:
         low_gain = src.low_gain;
         high_gain = src.high_gain;
     }
-    
+
     void sanitize()
     {
         lowcut.sanitize();
         highcut.sanitize();
     }
-    
+
     void set(float _low_freq, float _low_gain, float _high_freq, float _high_gain, float sr)
     {
         lowcut.set_hp(_low_freq, sr);
@@ -571,11 +571,10 @@ class lookahead_limiter {
 private:
 public:
     float limit, attack, release, weight;
-    float __attack;
     uint32_t srate;
-    float att;
-    float att_max;
-    unsigned int pos;
+    float att; // a coefficient the output is multiplied with
+    float att_max; // a memory for the highest attenuation - used for display
+    unsigned int pos; // where we are actually in our sample buffer
     unsigned int buffer_size;
     unsigned int overall_buffer_size;
     bool is_active;
@@ -592,16 +591,27 @@ public:
     bool use_multi;
     unsigned int id;
     bool _sanitize;
+    int nextiter;
+    int nextlen;
+    int * nextpos;
+    float * nextdelta;
+    int asc_c;
+    float asc;
+    int asc_pos;
+    bool asc_changed;
+    float asc_coeff;
     static inline void denormal(volatile float *f) {
 	    *f += 1e-18;
 	    *f -= 1e-18;
     }
-    bool get_arc();
+    void reset();
+    void reset_asc();
+    bool get_asc();
     lookahead_limiter();
     void set_multi(bool set);
     void process(float &left, float &right, float *multi_buffer);
     void set_sample_rate(uint32_t sr);
-    void set_params(float l, float a, float r, float weight = 1.f, bool ar = false, bool d = false);
+    void set_params(float l, float a, float r, float weight = 1.f, bool ar = false, float arc = 1.f, bool d = false);
     float get_attenuation();
     void activate();
     void deactivate();

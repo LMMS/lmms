@@ -15,7 +15,7 @@
  *
  * You should have received a copy of the GNU Lesser General
  * Public License along with this program; if not, write to the
- * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, 
+ * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
  * Boston, MA  02110-1301  USA
  */
 #include <limits.h>
@@ -167,7 +167,7 @@ void multibandcompressor_audio_module::set_sample_rate(uint32_t sr)
     if(params[param_compression##index] != NULL) \
         *params[param_compression##index] = 1.0; \
     if(params[param_output##index] != NULL) \
-        *params[param_output##index] = 0.0; 
+        *params[param_output##index] = 0.0;
 
 #define ACTIVE_COMPRESSION(index) \
     if(params[param_compression##index] != NULL) \
@@ -199,7 +199,7 @@ uint32_t multibandcompressor_audio_module::process(uint32_t offset, uint32_t num
         meter_outR = 0.f;
     } else {
         // process all strips
-        
+
         // let meters fall a bit
         clip_inL    -= std::min(clip_inL,  numsamples);
         clip_inR    -= std::min(clip_inR,  numsamples);
@@ -257,12 +257,12 @@ uint32_t multibandcompressor_audio_module::process(uint32_t offset, uint32_t num
                     outR += right;
                 } else {
                     // strip muted
-                    
+
                 }
-                
-                
+
+
             } // process single strip
-            
+
             // even out filters gain reduction
             // 3dB - levelled manually (based on default sep and q settings)
             switch(mode) {
@@ -275,15 +275,15 @@ uint32_t multibandcompressor_audio_module::process(uint32_t offset, uint32_t num
                     outR *= 0.88;
                     break;
             }
-            
+
             // out level
             outL *= *params[param_level_out];
             outR *= *params[param_level_out];
-            
+
             // send to output
             outs[0][offset] = outL;
             outs[1][offset] = outR;
-            
+
             // clip LED's
             if(inL > 1.f) {
                 clip_inL  = srate >> 3;
@@ -313,9 +313,9 @@ uint32_t multibandcompressor_audio_module::process(uint32_t offset, uint32_t num
             // next sample
             ++offset;
         } // cycle trough samples
-        
+
     } // process all strips (no bypass)
-    
+
     // draw meters
     SET_IF_CONNECTED(clip_inL);
     SET_IF_CONNECTED(clip_inR);
@@ -374,7 +374,7 @@ bool multibandcompressor_audio_module::get_dot(int index, int subindex, float &x
 }
 
 bool multibandcompressor_audio_module::get_gridline(int index, int subindex, float &pos, bool &vertical, std::string &legend, cairo_iface *context) const
-{ 
+{
     const gain_reduction_audio_module *m = get_strip_by_param_index(index);
     if (m)
         return m->get_gridline(subindex, pos, vertical, legend, context);
@@ -445,9 +445,9 @@ uint32_t compressor_audio_module::process(uint32_t offset, uint32_t numsamples, 
         meters.bypassed(params, orig_numsamples);
     } else {
         // process
-        
-        compressor.update_curve();        
-        
+
+        compressor.update_curve();
+
         while(offset < numsamples) {
             // cycle through samples
             float outL = 0.f;
@@ -457,19 +457,19 @@ uint32_t compressor_audio_module::process(uint32_t offset, uint32_t numsamples, 
             // in level
             inR *= *params[param_level_in];
             inL *= *params[param_level_in];
-            
+
             float leftAC = inL;
             float rightAC = inR;
-            
+
             compressor.process(leftAC, rightAC);
-            
+
             outL = leftAC;
             outR = rightAC;
-            
+
             // send to output
             outs[0][offset] = outL;
             outs[1][offset] = outR;
-            
+
             // next sample
             ++offset;
         } // cycle trough samples
@@ -556,7 +556,7 @@ void sidechaincompressor_audio_module::deactivate()
 
 sidechaincompressor_audio_module::cfloat sidechaincompressor_audio_module::h_z(const cfloat &z) const
 {
-    switch (sc_mode) {
+    switch ((CalfScModes)sc_mode) {
         default:
         case WIDEBAND:
             return false;
@@ -576,7 +576,7 @@ sidechaincompressor_audio_module::cfloat sidechaincompressor_audio_module::h_z(c
         case BANDPASS_1:
             return f1L.h_z(z);
             break;
-    }            
+    }
 }
 
 float sidechaincompressor_audio_module::freq_gain(int index, double freq, uint32_t sr) const
@@ -584,7 +584,7 @@ float sidechaincompressor_audio_module::freq_gain(int index, double freq, uint32
     typedef std::complex<double> cfloat;
     freq *= 2.0 * M_PI / sr;
     cfloat z = 1.0 / exp(cfloat(0.0, freq));
-    
+
     return std::abs(h_z(z));
 }
 
@@ -595,7 +595,7 @@ void sidechaincompressor_audio_module::params_changed()
         or *params[param_f2_freq] != f2_freq_old or *params[param_f2_level] != f2_level_old
         or *params[param_sc_mode] != sc_mode) {
         float q = 0.707;
-        switch ((int)*params[param_sc_mode]) {
+        switch ((CalfScModes)*params[param_sc_mode]) {
             default:
             case WIDEBAND:
                 f1L.set_hp_rbj((float)*params[param_f1_freq], q, (float)srate, *params[param_f1_level]);
@@ -711,17 +711,29 @@ uint32_t sidechaincompressor_audio_module::process(uint32_t offset, uint32_t num
     if(bypass) {
         // everything bypassed
         while(offset < numsamples) {
-            outs[0][offset] = ins[0][offset];
-            outs[1][offset] = ins[1][offset];
+            switch ((CalfScRoute)*params[param_sc_route]) {
+                case STEREO:
+                    outs[0][offset] = ins[0][offset];
+                    outs[1][offset] = ins[1][offset];
+                    break;
+                case RIGHT_LEFT:
+                    outs[0][offset] = ins[0][offset];
+                    outs[1][offset] = ins[0][offset];
+                    break;
+                case LEFT_RIGHT:
+                    outs[0][offset] = ins[1][offset];
+                    outs[1][offset] = ins[1][offset];
+                    break;
+            }
             ++offset;
         }
         // displays, too
         meters.bypassed(params, orig_numsamples);
     } else {
         // process
-        
-        compressor.update_curve();        
-        
+
+        compressor.update_curve();
+
         while(offset < numsamples) {
             // cycle through samples
             float outL = 0.f;
@@ -731,8 +743,7 @@ uint32_t sidechaincompressor_audio_module::process(uint32_t offset, uint32_t num
             // in level
             inR *= *params[param_level_in];
             inL *= *params[param_level_in];
-            
-            
+
             float leftAC = inL;
             float rightAC = inR;
             float leftSC = inL;
@@ -740,10 +751,42 @@ uint32_t sidechaincompressor_audio_module::process(uint32_t offset, uint32_t num
             float leftMC = inL;
             float rightMC = inR;
             
-            switch ((int)*params[param_sc_mode]) {
+            switch ((CalfScRoute)*params[param_sc_route]) {
+                case STEREO:
+                    leftAC = inL;
+                    rightAC = inR;
+                    leftSC = inL;
+                    rightSC = inR;
+                    leftMC = inL;
+                    rightMC = inR;
+                    break;
+                case RIGHT_LEFT:
+                    leftAC = inL;
+                    rightAC = inL;
+                    leftSC = inR;
+                    rightSC = inR;
+                    leftMC = inL;
+                    rightMC = inL;
+                    break;
+                case LEFT_RIGHT:
+                    leftAC = inR;
+                    rightAC = inR;
+                    leftSC = inL;
+                    rightSC = inL;
+                    leftMC = inR;
+                    rightMC = inR;
+                    break;
+            }
+            
+            leftSC  *= *params[param_sc_level];
+            rightSC *= *params[param_sc_level];
+            
+            switch ((CalfScModes)*params[param_sc_mode]) {
                 default:
                 case WIDEBAND:
-                    compressor.process(leftAC, rightAC);
+                    compressor.process(leftAC, rightAC, &leftSC, &rightSC);
+                    leftMC = leftSC;
+                    rightMC = rightSC;
                     break;
                 case DEESSER_WIDE:
                 case DERUMBLER_WIDE:
@@ -773,7 +816,7 @@ uint32_t sidechaincompressor_audio_module::process(uint32_t offset, uint32_t num
                     rightSC = f1R.process(rightSC);
                     leftMC = leftSC;
                     rightMC = rightSC;
-                    compressor.process(leftSC, rightSC);
+                    compressor.process(leftSC, rightSC, &leftSC, &rightSC);
                     leftAC = f2L.process(leftAC);
                     rightAC = f2R.process(rightAC);
                     leftAC += leftSC;
@@ -787,7 +830,7 @@ uint32_t sidechaincompressor_audio_module::process(uint32_t offset, uint32_t num
                     compressor.process(leftAC, rightAC, &leftSC, &rightSC);
                     break;
             }
-            
+
             if(*params[param_sc_listen] > 0.f) {
                 outL = leftMC;
                 outR = rightMC;
@@ -795,11 +838,11 @@ uint32_t sidechaincompressor_audio_module::process(uint32_t offset, uint32_t num
                 outL = leftAC;
                 outR = rightAC;
             }
-            
+
             // send to output
             outs[0][offset] = outL;
             outs[1][offset] = outR;
-                        
+
             // next sample
             ++offset;
         } // cycle trough samples
@@ -941,7 +984,7 @@ void deesser_audio_module::params_changed()
         or *params[param_f2_freq] != f2_freq_old or *params[param_f2_level] != f2_level_old
         or *params[param_f2_q] != f2_q_old) {
         float q = 0.707;
-        
+
         hpL.set_hp_rbj((float)*params[param_f1_freq] * (1 - 0.17), q, (float)srate, *params[param_f1_level]);
         hpR.copy_coeffs(hpL);
         lpL.set_lp_rbj((float)*params[param_f1_freq] * (1 + 0.17), q, (float)srate);
@@ -969,7 +1012,7 @@ uint32_t deesser_audio_module::process(uint32_t offset, uint32_t numsamples, uin
     bool bypass = *params[param_bypass] > 0.5f;
     numsamples += offset;
     if(bypass) {
-        // everything bypassed
+        // everything bypassed81e8da266
         while(offset < numsamples) {
             outs[0][offset] = ins[0][offset];
             outs[1][offset] = ins[1][offset];
@@ -981,19 +1024,19 @@ uint32_t deesser_audio_module::process(uint32_t offset, uint32_t numsamples, uin
         detected_led = 0.f;
     } else {
         // process
-        
+
         detected_led -= std::min(detected_led,  numsamples);
         clip_led   -= std::min(clip_led,  numsamples);
-        compressor.update_curve();        
-        
+        compressor.update_curve();
+
         while(offset < numsamples) {
             // cycle through samples
             float outL = 0.f;
             float outR = 0.f;
             float inL = ins[0][offset];
             float inR = ins[1][offset];
-            
-            
+
+
             float leftAC = inL;
             float rightAC = inR;
             float leftSC = inL;
@@ -1002,12 +1045,12 @@ uint32_t deesser_audio_module::process(uint32_t offset, uint32_t numsamples, uin
             float rightRC = inR;
             float leftMC = inL;
             float rightMC = inR;
-            
+
             leftSC = pL.process(hpL.process(leftSC));
             rightSC = pR.process(hpR.process(rightSC));
             leftMC = leftSC;
             rightMC = rightSC;
-                    
+
             switch ((int)*params[param_mode]) {
                 default:
                 case WIDE:
@@ -1025,7 +1068,7 @@ uint32_t deesser_audio_module::process(uint32_t offset, uint32_t numsamples, uin
                     rightAC += rightRC;
                     break;
             }
-            
+
             if(*params[param_sc_listen] > 0.f) {
                 outL = leftMC;
                 outR = rightMC;
@@ -1033,11 +1076,11 @@ uint32_t deesser_audio_module::process(uint32_t offset, uint32_t numsamples, uin
                 outL = leftAC;
                 outR = rightAC;
             }
-            
+
             // send to output
             outs[0][offset] = outL;
             outs[1][offset] = outR;
-            
+
             if(std::max(fabs(leftSC), fabs(rightSC)) > *params[param_threshold]) {
                 detected_led   = srate >> 3;
             }
@@ -1050,7 +1093,7 @@ uint32_t deesser_audio_module::process(uint32_t offset, uint32_t numsamples, uin
                 clip_out = std::max(fabs(outL), fabs(outR));
             }
             detected = std::max(fabs(leftMC), fabs(rightMC));
-            
+
             // next sample
             ++offset;
         } // cycle trough samples
@@ -1098,7 +1141,7 @@ bool deesser_audio_module::get_graph(int index, int subindex, float *data, int p
 bool deesser_audio_module::get_gridline(int index, int subindex, float &pos, bool &vertical, std::string &legend, cairo_iface *context) const
 {
     return get_freq_gridline(subindex, pos, vertical, legend, context);
-    
+
 //    return false;
 }
 
@@ -1193,7 +1236,7 @@ uint32_t gate_audio_module::process(uint32_t offset, uint32_t numsamples, uint32
     } else {
         // process
         gate.update_curve();
-        
+
         while(offset < numsamples) {
             // cycle through samples
             float outL = 0.f;
@@ -1203,19 +1246,19 @@ uint32_t gate_audio_module::process(uint32_t offset, uint32_t numsamples, uint32
             // in level
             inR *= *params[param_level_in];
             inL *= *params[param_level_in];
-            
+
             float leftAC = inL;
             float rightAC = inR;
-            
+
             gate.process(leftAC, rightAC);
-            
+
             outL = leftAC;
             outR = rightAC;
-            
+
             // send to output
             outs[0][offset] = outL;
             outs[1][offset] = outR;
-            
+
             // next sample
             ++offset;
         } // cycle trough samples
@@ -1274,7 +1317,7 @@ sidechaingate_audio_module::sidechaingate_audio_module()
     is_active = false;
     srate = 0;
     last_generation = 0;
-    
+
     f1_freq_old = f2_freq_old = f1_level_old = f2_level_old = 0;
     f1_freq_old1 = f2_freq_old1 = f1_level_old1 = f2_level_old1 = 0;
     sc_mode_old = sc_mode_old1 = WIDEBAND; // doesn't matter as long as it's sane
@@ -1297,7 +1340,7 @@ void sidechaingate_audio_module::deactivate()
 
 sidechaingate_audio_module::cfloat sidechaingate_audio_module::h_z(const cfloat &z) const
 {
-    switch (sc_mode) {
+    switch ((CalfScModes)sc_mode) {
         default:
         case WIDEBAND:
             return false;
@@ -1317,7 +1360,7 @@ sidechaingate_audio_module::cfloat sidechaingate_audio_module::h_z(const cfloat 
         case BANDPASS_1:
             return f1L.h_z(z);
             break;
-    }            
+    }
 }
 
 float sidechaingate_audio_module::freq_gain(int index, double freq, uint32_t sr) const
@@ -1325,7 +1368,7 @@ float sidechaingate_audio_module::freq_gain(int index, double freq, uint32_t sr)
     typedef std::complex<double> cfloat;
     freq *= 2.0 * M_PI / sr;
     cfloat z = 1.0 / exp(cfloat(0.0, freq));
-    
+
     return std::abs(h_z(z));
 }
 
@@ -1336,7 +1379,7 @@ void sidechaingate_audio_module::params_changed()
         or *params[param_f2_freq] != f2_freq_old or *params[param_f2_level] != f2_level_old
         or *params[param_sc_mode] != sc_mode) {
         float q = 0.707;
-        switch ((int)*params[param_sc_mode]) {
+        switch ((CalfScModes)*params[param_sc_mode]) {
             default:
             case WIDEBAND:
                 f1L.set_hp_rbj((float)*params[param_f1_freq], q, (float)srate, *params[param_f1_level]);
@@ -1452,6 +1495,20 @@ uint32_t sidechaingate_audio_module::process(uint32_t offset, uint32_t numsample
     if(bypass) {
         // everything bypassed
         while(offset < numsamples) {
+            switch ((CalfScRoute)*params[param_sc_route]) {
+                case STEREO:
+                    outs[0][offset] = ins[0][offset];
+                    outs[1][offset] = ins[1][offset];
+                    break;
+                case RIGHT_LEFT:
+                    outs[0][offset] = ins[0][offset];
+                    outs[1][offset] = ins[0][offset];
+                    break;
+                case LEFT_RIGHT:
+                    outs[0][offset] = ins[1][offset];
+                    outs[1][offset] = ins[1][offset];
+                    break;
+            }
             outs[0][offset] = ins[0][offset];
             outs[1][offset] = ins[1][offset];
             ++offset;
@@ -1460,9 +1517,9 @@ uint32_t sidechaingate_audio_module::process(uint32_t offset, uint32_t numsample
         meters.bypassed(params, orig_offset);
     } else {
         // process
-        
+
         gate.update_curve();
-        
+
         while(offset < numsamples) {
             // cycle through samples
             float outL = 0.f;
@@ -1473,7 +1530,6 @@ uint32_t sidechaingate_audio_module::process(uint32_t offset, uint32_t numsample
             inR *= *params[param_level_in];
             inL *= *params[param_level_in];
             
-            
             float leftAC = inL;
             float rightAC = inR;
             float leftSC = inL;
@@ -1481,10 +1537,42 @@ uint32_t sidechaingate_audio_module::process(uint32_t offset, uint32_t numsample
             float leftMC = inL;
             float rightMC = inR;
             
-            switch ((int)*params[param_sc_mode]) {
+            switch ((CalfScRoute)*params[param_sc_route]) {
+                case STEREO:
+                    leftAC = inL;
+                    rightAC = inR;
+                    leftSC = inL;
+                    rightSC = inR;
+                    leftMC = inL;
+                    rightMC = inR;
+                    break;
+                case RIGHT_LEFT:
+                    leftAC = inL;
+                    rightAC = inL;
+                    leftSC = inR;
+                    rightSC = inR;
+                    leftMC = inL;
+                    rightMC = inL;
+                    break;
+                case LEFT_RIGHT:
+                    leftAC = inR;
+                    rightAC = inR;
+                    leftSC = inL;
+                    rightSC = inL;
+                    leftMC = inR;
+                    rightMC = inR;
+                    break;
+            }
+            
+            leftSC  *= *params[param_sc_level];
+            rightSC *= *params[param_sc_level];
+            
+            switch ((CalfScModes)*params[param_sc_mode]) {
                 default:
                 case WIDEBAND:
-                    gate.process(leftAC, rightAC);
+                    gate.process(leftAC, rightAC, &leftSC, &rightSC);
+                    leftMC = leftSC;
+                    rightMC = rightSC;
                     break;
                 case HIGHGATE_WIDE:
                 case LOWGATE_WIDE:
@@ -1514,7 +1602,7 @@ uint32_t sidechaingate_audio_module::process(uint32_t offset, uint32_t numsample
                     rightSC = f1R.process(rightSC);
                     leftMC = leftSC;
                     rightMC = rightSC;
-                    gate.process(leftSC, rightSC);
+                    gate.process(leftSC, rightSC, &leftSC, &rightSC);
                     leftAC = f2L.process(leftAC);
                     rightAC = f2R.process(rightAC);
                     leftAC += leftSC;
@@ -1528,7 +1616,7 @@ uint32_t sidechaingate_audio_module::process(uint32_t offset, uint32_t numsample
                     gate.process(leftAC, rightAC, &leftSC, &rightSC);
                     break;
             }
-            
+
             if(*params[param_sc_listen] > 0.f) {
                 outL = leftMC;
                 outR = rightMC;
@@ -1536,11 +1624,11 @@ uint32_t sidechaingate_audio_module::process(uint32_t offset, uint32_t numsample
                 outL = leftAC;
                 outR = rightAC;
             }
-            
+
             // send to output
             outs[0][offset] = outL;
             outs[1][offset] = outR;
-            
+
             // next sample
             ++offset;
         } // cycle trough samples
@@ -1549,7 +1637,7 @@ uint32_t sidechaingate_audio_module::process(uint32_t offset, uint32_t numsample
         f1R.sanitize();
         f2L.sanitize();
         f2R.sanitize();
-            
+
     }
     // draw strip meter
     if(bypass > 0.5f) {
@@ -1634,6 +1722,369 @@ int sidechaingate_audio_module::get_changed_offsets(int index, int generation, i
     return false;
 }
 
+
+/// Multiband Compressor by Markus Schmidt
+///
+/// This module splits the signal in four different bands
+/// and sends them through multiple filters (implemented by
+/// Krzysztof). They are processed by a compressing routine
+/// (implemented by Thor) afterwards and summed up to the
+/// final output again.
+///////////////////////////////////////////////////////////////////////////////////////////////
+
+multibandgate_audio_module::multibandgate_audio_module()
+{
+    is_active = false;
+    srate = 0;
+    // zero all displays
+    clip_inL    = 0.f;
+    clip_inR    = 0.f;
+    clip_outL   = 0.f;
+    clip_outR   = 0.f;
+    meter_inL  = 0.f;
+    meter_inR  = 0.f;
+    meter_outL = 0.f;
+    meter_outR = 0.f;
+    for(int i = 0; i < strips - 1; i ++) {
+        freq_old[i] = -1;
+        sep_old[i] = -1;
+        q_old[i] = -1;
+    }
+    mode_old = -1;
+}
+
+void multibandgate_audio_module::activate()
+{
+    is_active = true;
+    // set all filters and strips
+    params_changed();
+    // activate all strips
+    for (int j = 0; j < strips; j ++) {
+        gate[j].activate();
+        gate[j].id = j;
+    }
+}
+
+void multibandgate_audio_module::deactivate()
+{
+    is_active = false;
+    // deactivate all strips
+    for (int j = 0; j < strips; j ++) {
+        gate[j].deactivate();
+    }
+}
+
+void multibandgate_audio_module::params_changed()
+{
+    // determine mute/solo states
+    solo[0] = *params[param_solo0] > 0.f ? true : false;
+    solo[1] = *params[param_solo1] > 0.f ? true : false;
+    solo[2] = *params[param_solo2] > 0.f ? true : false;
+    solo[3] = *params[param_solo3] > 0.f ? true : false;
+    no_solo = (*params[param_solo0] > 0.f ||
+            *params[param_solo1] > 0.f ||
+            *params[param_solo2] > 0.f ||
+            *params[param_solo3] > 0.f) ? false : true;
+    int i;
+    int j1;
+    switch(mode) {
+        case 0:
+        default:
+            j1 = 0;
+            break;
+        case 1:
+            j1 = 2;
+            break;
+    }
+    // set the params of all filters
+    if(*params[param_freq0] != freq_old[0] or *params[param_sep0] != sep_old[0] or *params[param_q0] != q_old[0] or *params[param_mode] != mode_old) {
+        lpL[0][0].set_lp_rbj((float)(*params[param_freq0] * (1 - *params[param_sep0])), *params[param_q0], (float)srate);
+        hpL[0][0].set_hp_rbj((float)(*params[param_freq0] * (1 + *params[param_sep0])), *params[param_q0], (float)srate);
+        lpR[0][0].copy_coeffs(lpL[0][0]);
+        hpR[0][0].copy_coeffs(hpL[0][0]);
+        for(i = 1; i <= j1; i++) {
+            lpL[0][i].copy_coeffs(lpL[0][0]);
+            hpL[0][i].copy_coeffs(hpL[0][0]);
+            lpR[0][i].copy_coeffs(lpL[0][0]);
+            hpR[0][i].copy_coeffs(hpL[0][0]);
+        }
+        freq_old[0] = *params[param_freq0];
+        sep_old[0]  = *params[param_sep0];
+        q_old[0]    = *params[param_q0];
+    }
+    if(*params[param_freq1] != freq_old[1] or *params[param_sep1] != sep_old[1] or *params[param_q1] != q_old[1] or *params[param_mode] != mode_old) {
+        lpL[1][0].set_lp_rbj((float)(*params[param_freq1] * (1 - *params[param_sep1])), *params[param_q1], (float)srate);
+        hpL[1][0].set_hp_rbj((float)(*params[param_freq1] * (1 + *params[param_sep1])), *params[param_q1], (float)srate);
+        lpR[1][0].copy_coeffs(lpL[1][0]);
+        hpR[1][0].copy_coeffs(hpL[1][0]);
+        for(i = 1; i <= j1; i++) {
+            lpL[1][i].copy_coeffs(lpL[1][0]);
+            hpL[1][i].copy_coeffs(hpL[1][0]);
+            lpR[1][i].copy_coeffs(lpL[1][0]);
+            hpR[1][i].copy_coeffs(hpL[1][0]);
+        }
+        freq_old[1] = *params[param_freq1];
+        sep_old[1]  = *params[param_sep1];
+        q_old[1]    = *params[param_q1];
+    }
+    if(*params[param_freq2] != freq_old[2] or *params[param_sep2] != sep_old[2] or *params[param_q2] != q_old[2] or *params[param_mode] != mode_old) {
+        lpL[2][0].set_lp_rbj((float)(*params[param_freq2] * (1 - *params[param_sep2])), *params[param_q2], (float)srate);
+        hpL[2][0].set_hp_rbj((float)(*params[param_freq2] * (1 + *params[param_sep2])), *params[param_q2], (float)srate);
+        lpR[2][0].copy_coeffs(lpL[2][0]);
+        hpR[2][0].copy_coeffs(hpL[2][0]);
+        for(i = 1; i <= j1; i++) {
+            lpL[2][i].copy_coeffs(lpL[2][0]);
+            hpL[2][i].copy_coeffs(hpL[2][0]);
+            lpR[2][i].copy_coeffs(lpL[2][0]);
+            hpR[2][i].copy_coeffs(hpL[2][0]);
+        }
+        freq_old[2] = *params[param_freq2];
+        sep_old[2]  = *params[param_sep2];
+        q_old[2]    = *params[param_q2];
+    }
+    // set the params of all strips
+    gate[0].set_params(*params[param_attack0], *params[param_release0], *params[param_threshold0], *params[param_ratio0], *params[param_knee0], *params[param_makeup0], *params[param_detection0], 1.f, *params[param_bypass0], !(solo[0] || no_solo), *params[param_range0]);
+    gate[1].set_params(*params[param_attack1], *params[param_release1], *params[param_threshold1], *params[param_ratio1], *params[param_knee1], *params[param_makeup1], *params[param_detection1], 1.f, *params[param_bypass1], !(solo[1] || no_solo), *params[param_range1]);
+    gate[2].set_params(*params[param_attack2], *params[param_release2], *params[param_threshold2], *params[param_ratio2], *params[param_knee2], *params[param_makeup2], *params[param_detection2], 1.f, *params[param_bypass2], !(solo[2] || no_solo), *params[param_range2]);
+    gate[3].set_params(*params[param_attack3], *params[param_release3], *params[param_threshold3], *params[param_ratio3], *params[param_knee3], *params[param_makeup3], *params[param_detection3], 1.f, *params[param_bypass3], !(solo[3] || no_solo), *params[param_range3]);
+}
+
+void multibandgate_audio_module::set_sample_rate(uint32_t sr)
+{
+    srate = sr;
+    // set srate of all strips
+    for (int j = 0; j < strips; j ++) {
+        gate[j].set_sample_rate(srate);
+    }
+}
+
+#define BYPASSED_GATING(index) \
+    if(params[param_gating##index] != NULL) \
+        *params[param_gating##index] = 1.0; \
+    if(params[param_output##index] != NULL) \
+        *params[param_output##index] = 0.0;
+
+#define ACTIVE_GATING(index) \
+    if(params[param_gating##index] != NULL) \
+        *params[param_gating##index] = gate[index].get_expander_level(); \
+    if(params[param_output##index] != NULL) \
+        *params[param_output##index] = gate[index].get_output_level();
+
+uint32_t multibandgate_audio_module::process(uint32_t offset, uint32_t numsamples, uint32_t inputs_mask, uint32_t outputs_mask)
+{
+    bool bypass = *params[param_bypass] > 0.5f;
+    numsamples += offset;
+    for (int i = 0; i < strips; i++)
+        gate[i].update_curve();
+    if(bypass) {
+        // everything bypassed
+        while(offset < numsamples) {
+            outs[0][offset] = ins[0][offset];
+            outs[1][offset] = ins[1][offset];
+            ++offset;
+        }
+        // displays, too
+        clip_inL    = 0.f;
+        clip_inR    = 0.f;
+        clip_outL   = 0.f;
+        clip_outR   = 0.f;
+        meter_inL  = 0.f;
+        meter_inR  = 0.f;
+        meter_outL = 0.f;
+        meter_outR = 0.f;
+    } else {
+        // process all strips
+
+        // let meters fall a bit
+        clip_inL    -= std::min(clip_inL,  numsamples);
+        clip_inR    -= std::min(clip_inR,  numsamples);
+        clip_outL   -= std::min(clip_outL, numsamples);
+        clip_outR   -= std::min(clip_outR, numsamples);
+        meter_inL = 0.f;
+        meter_inR = 0.f;
+        meter_outL = 0.f;
+        meter_outR = 0.f;
+        while(offset < numsamples) {
+            // cycle through samples
+            float inL = ins[0][offset];
+            float inR = ins[1][offset];
+            // in level
+            inR *= *params[param_level_in];
+            inL *= *params[param_level_in];
+            // out vars
+            float outL = 0.f;
+            float outR = 0.f;
+            int j1;
+            for (int i = 0; i < strips; i ++) {
+                // cycle trough strips
+                if (solo[i] || no_solo) {
+                    // strip unmuted
+                    float left  = inL;
+                    float right = inR;
+                    // send trough filters
+                    switch(mode) {
+                        case 0:
+                        default:
+                            j1 = 0;
+                            break;
+                        case 1:
+                            j1 = 2;
+                            break;
+                    }
+                    for (int j = 0; j <= j1; j++){
+                        if(i + 1 < strips) {
+                            left  = lpL[i][j].process(left);
+                            right = lpR[i][j].process(right);
+                            lpL[i][j].sanitize();
+                            lpR[i][j].sanitize();
+                        }
+                        if(i - 1 >= 0) {
+                            left  = hpL[i - 1][j].process(left);
+                            right = hpR[i - 1][j].process(right);
+                            hpL[i - 1][j].sanitize();
+                            hpR[i - 1][j].sanitize();
+                        }
+                    }
+                    // process gain reduction
+                    gate[i].process(left, right);
+                    // sum up output
+                    outL += left;
+                    outR += right;
+                } else {
+                    // strip muted
+
+                }
+
+
+            } // process single strip
+
+            // even out filters gain reduction
+            // 3dB - levelled manually (based on default sep and q settings)
+            switch(mode) {
+                case 0:
+                    outL *= 1.414213562;
+                    outR *= 1.414213562;
+                    break;
+                case 1:
+                    outL *= 0.88;
+                    outR *= 0.88;
+                    break;
+            }
+
+            // out level
+            outL *= *params[param_level_out];
+            outR *= *params[param_level_out];
+
+            // send to output
+            outs[0][offset] = outL;
+            outs[1][offset] = outR;
+
+            // clip LED's
+            if(inL > 1.f) {
+                clip_inL  = srate >> 3;
+            }
+            if(inR > 1.f) {
+                clip_inR  = srate >> 3;
+            }
+            if(outL > 1.f) {
+                clip_outL = srate >> 3;
+            }
+            if(outR > 1.f) {
+                clip_outR = srate >> 3;
+            }
+            // set up in / out meters
+            if(inL > meter_inL) {
+                meter_inL = inL;
+            }
+            if(inR > meter_inR) {
+                meter_inR = inR;
+            }
+            if(outL > meter_outL) {
+                meter_outL = outL;
+            }
+            if(outR > meter_outR) {
+                meter_outR = outR;
+            }
+            // next sample
+            ++offset;
+        } // cycle trough samples
+
+    } // process all strips (no bypass)
+
+    // draw meters
+    SET_IF_CONNECTED(clip_inL);
+    SET_IF_CONNECTED(clip_inR);
+    SET_IF_CONNECTED(clip_outL);
+    SET_IF_CONNECTED(clip_outR);
+    SET_IF_CONNECTED(meter_inL);
+    SET_IF_CONNECTED(meter_inR);
+    SET_IF_CONNECTED(meter_outL);
+    SET_IF_CONNECTED(meter_outR);
+    // draw strip meters
+    if(bypass > 0.5f) {
+        BYPASSED_GATING(0)
+        BYPASSED_GATING(1)
+        BYPASSED_GATING(2)
+        BYPASSED_GATING(3)
+    } else {
+        ACTIVE_GATING(0)
+        ACTIVE_GATING(1)
+        ACTIVE_GATING(2)
+        ACTIVE_GATING(3)
+    }
+    // whatever has to be returned x)
+    return outputs_mask;
+}
+
+const expander_audio_module *multibandgate_audio_module::get_strip_by_param_index(int index) const
+{
+    // let's handle by the corresponding strip
+    switch (index) {
+        case param_gating0:
+            return &gate[0];
+        case param_gating1:
+            return &gate[1];
+        case param_gating2:
+            return &gate[2];
+        case param_gating3:
+            return &gate[3];
+    }
+    return NULL;
+}
+
+bool multibandgate_audio_module::get_graph(int index, int subindex, float *data, int points, cairo_iface *context) const
+{
+    const expander_audio_module *m = get_strip_by_param_index(index);
+    if (m)
+        return m->get_graph(subindex, data, points, context);
+    return false;
+}
+
+bool multibandgate_audio_module::get_dot(int index, int subindex, float &x, float &y, int &size, cairo_iface *context) const
+{
+    const expander_audio_module *m = get_strip_by_param_index(index);
+    if (m)
+        return m->get_dot(subindex, x, y, size, context);
+    return false;
+}
+
+bool multibandgate_audio_module::get_gridline(int index, int subindex, float &pos, bool &vertical, std::string &legend, cairo_iface *context) const
+{
+    const expander_audio_module *m = get_strip_by_param_index(index);
+    if (m)
+        return m->get_gridline(subindex, pos, vertical, legend, context);
+    return false;
+}
+
+int multibandgate_audio_module::get_changed_offsets(int index, int generation, int &subindex_graph, int &subindex_dot, int &subindex_gridline) const
+{
+    const expander_audio_module *m = get_strip_by_param_index(index);
+    if (m)
+        return m->get_changed_offsets(generation, subindex_graph, subindex_dot, subindex_gridline);
+    return 0;
+}
+
+
 /// Gain reduction module by Thor
 /// All functions of this module are originally written
 /// by Thor, while some features have been stripped (mainly stereo linking
@@ -1712,12 +2163,12 @@ void gain_reduction_audio_module::process(float &left, float &right, const float
         bool average = (stereo_link == 0);
         float attack_coeff = std::min(1.f, 1.f / (attack * srate / 4000.f));
         float release_coeff = std::min(1.f, 1.f / (release * srate / 4000.f));
-        
+
         float absample = average ? (fabs(*det_left) + fabs(*det_right)) * 0.5f : std::max(fabs(*det_left), fabs(*det_right));
         if(rms) absample *= absample;
 
         dsp::sanitize(linSlope);
-	
+
         linSlope += (absample - linSlope) * (absample > linSlope ? attack_coeff : release_coeff);
         float gain = 1.f;
         if(linSlope > 0.f) {
@@ -1751,11 +2202,11 @@ float gain_reduction_audio_module::output_gain(float linSlope, bool rms) const {
             gain = (slope - thres) / ratio + thres;
             delta = 1.f / ratio;
         }
-        
+
         if(knee > 1.f && slope < kneeStop) {
             gain = hermite_interpolation(slope, kneeStart, kneeStop, kneeStart, compressedKneeStop, 1.f, delta);
         }
-        
+
         return exp(gain - slope);
     }
 
@@ -1967,7 +2418,7 @@ void expander_audio_module::process(float &left, float &right, const float *det_
         if(rms) absample *= absample;
 
         dsp::sanitize(linSlope);
-	
+
         linSlope += (absample - linSlope) * (absample > linSlope ? attack_coeff : release_coeff);
         float gain = 1.f;
         if(linSlope > 0.f) {
@@ -2124,4 +2575,3 @@ int expander_audio_module::get_changed_offsets(int generation, int &subindex_gra
         subindex_graph = 2;
     return last_generation;
 }
-

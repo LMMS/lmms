@@ -57,10 +57,12 @@ public:
 /// Exciter by Markus Schmidt (based on Krzysztof's filters and Tom's distortion algorythm)
 class exciter_audio_module: public audio_module<exciter_metadata> {
 private:
-    float freq_old;
+    float freq_old, ceil_old;
+    bool ceil_active_old;
     stereo_in_out_metering<exciter_metadata> meters;
     float meter_drive;
     dsp::biquad_d2<float> hp[2][4];
+    dsp::biquad_d2<float> lp[2][2];
     dsp::tap_distortion dist[2];
 public:
     uint32_t srate;
@@ -76,10 +78,12 @@ public:
 /// Bass Enhancer by Markus Schmidt (based on Krzysztof's filters and Tom's distortion algorythm)
 class bassenhancer_audio_module: public audio_module<bassenhancer_metadata> {
 private:
-    float freq_old;
+    float freq_old, floor_old;
+    bool floor_active_old;
     stereo_in_out_metering<exciter_metadata> meters;
     float meter_drive;
     dsp::biquad_d2<float> lp[2][4];
+    dsp::biquad_d2<float> hp[2][2];
     dsp::tap_distortion dist[2];
 public:
     uint32_t srate;

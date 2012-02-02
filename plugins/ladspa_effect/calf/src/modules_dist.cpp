@@ -295,6 +295,15 @@ void exciter_audio_module::params_changed()
         }
         freq_old = *params[param_freq];
     }
+    // set the params of all filters
+    if(*params[param_ceil] != ceil_old or *params[param_ceil_active] != ceil_active_old) {
+        lp[0][0].set_lp_rbj(*params[param_ceil], 0.707, (float)srate);
+        lp[0][1].copy_coeffs(lp[0][0]);
+        lp[1][0].copy_coeffs(lp[0][0]);
+        lp[1][1].copy_coeffs(lp[0][0]);
+        ceil_old = *params[param_ceil];
+        ceil_active_old = *params[param_ceil_active];
+    }
     // set distortion
     dist[0].set_params(*params[param_blend], *params[param_drive]);
     if(in_count > 1 && out_count > 1)
@@ -378,6 +387,12 @@ uint32_t exciter_audio_module::process(uint32_t offset, uint32_t numsamples, uin
 
                 // all post filters in chain
                 proc[i] = hp[i][2].process(hp[i][3].process(proc[i]));
+                
+                if(*params[param_ceil_active] > 0.5f) {
+                    // all H/P post filters in chain
+                    proc[i] = lp[i][0].process(lp[i][1].process(proc[i]));
+                    
+                }
             }
             maxDrive = dist[0].get_distortion_level() * *params[param_amount];
             
@@ -469,6 +484,15 @@ void bassenhancer_audio_module::params_changed()
         }
         freq_old = *params[param_freq];
     }
+    // set the params of all filters
+    if(*params[param_floor] != floor_old or *params[param_floor_active] != floor_active_old) {
+        hp[0][0].set_hp_rbj(*params[param_floor], 0.707, (float)srate);
+        hp[0][1].copy_coeffs(hp[0][0]);
+        hp[1][0].copy_coeffs(hp[0][0]);
+        hp[1][1].copy_coeffs(hp[0][0]);
+        floor_old = *params[param_floor];
+        floor_active_old = *params[param_floor_active];
+    }
     // set distortion
     dist[0].set_params(*params[param_blend], *params[param_drive]);
     if(in_count > 1 && out_count > 1)
@@ -549,6 +573,12 @@ uint32_t bassenhancer_audio_module::process(uint32_t offset, uint32_t numsamples
 
                 // all post filters in chain
                 proc[i] = lp[i][2].process(lp[i][3].process(proc[i]));
+                
+                if(*params[param_floor_active] > 0.5f) {
+                    // all H/P post filters in chain
+                    proc[i] = hp[i][0].process(hp[i][1].process(proc[i]));
+                    
+                }
             }
             
             if(in_count > 1 && out_count > 1) {
