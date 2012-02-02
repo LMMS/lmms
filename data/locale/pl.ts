@@ -41,6 +41,10 @@
 If you&apos;re interested in translating LMMS in another language or want to improve existing translations, you&apos;re welcome to help us! Simply contact the maintainer!</source>
         <translation>Spolszczenie LMMS: Radek Słowik
 
+Podziękowania dla:
+Marii Słowik - za wstępną korektę,
+Tomasza Gradowskiego - za cenne uwagi i sugestie zmian.
+
 Zauważone błędy i propozycje zmian tłumaczenia zgłoś proszę na e-mail: radek[małpka]vibender[kropka]com</translation>
     </message>
     <message>
@@ -976,7 +980,7 @@ Zauważone błędy i propozycje zmian tłumaczenia zgłoś proszę na e-mail: ra
     </message>
     <message>
         <source>&amp;Remove this plugin</source>
-        <translation>&amp;Usuń tą wtyczkę</translation>
+        <translation>&amp;Usuń tę wtyczkę</translation>
     </message>
     <message>
         <source>&amp;Help</source>
@@ -1119,7 +1123,7 @@ Prawoklik otwiera menu kontekstowe z pomocą którego można zmienić porządek 
     </message>
     <message>
         <source>&amp;Remove this plugin</source>
-        <translation>&amp;Usuń tą wtyczkę</translation>
+        <translation>&amp;Usuń tę wtyczkę</translation>
     </message>
     <message>
         <source>&amp;Help</source>
@@ -1648,7 +1652,7 @@ Prawoklik otwiera menu kontekstowe z pomocą którego można zmienić porządek 
     <name>InstrumentSoundShapingView</name>
     <message>
         <source>TARGET</source>
-        <translation>CEL</translation>
+        <translation>TARGET</translation>
     </message>
     <message>
         <source>These tabs contain envelopes. They&apos;re very important for modifying a sound, in that they are almost always necessary for substractive synthesis. For example if you have a volume envelope, you can set when the sound should have a specific volume. If you want to create some soft strings then your sound has to fade in and out very softly. This can be done by setting large attack and release times. It&apos;s the same for other envelope targets like panning, cutoff frequency for the used filter and so on. Just monkey around with it! You can really make cool sounds out of a saw-wave with just some envelopes...!</source>
@@ -1660,7 +1664,7 @@ Prawoklik otwiera menu kontekstowe z pomocą którego można zmienić porządek 
     </message>
     <message>
         <source>Here you can select the built-in filter you want to use for this instrument-track. Filters are very important for changing the characteristics of a sound.</source>
-        <translation>W tym miejscu możesz wybrać wbudowany filtr, który chcesz nałożyć na tą ścieżkę instrumentu. Filtry są bardzo istotne z punktu kształtowania charakterystyki dźwięku.</translation>
+        <translation>W tym miejscu możesz wybrać wbudowany filtr, który chcesz nałożyć na tę ścieżkę instrumentu. Filtry są bardzo istotne z punktu kształtowania charakterystyki dźwięku.</translation>
     </message>
     <message>
         <source>CUTOFF</source>
@@ -2148,11 +2152,11 @@ Upewnij się, że masz prawo zapisu do tego pliku i spróbuj ponownie.</translat
     </message>
     <message>
         <source>Show/hide Song-Editor</source>
-        <translation>Pokaż/ukryj Edytor Piosenki</translation>
+        <translation>Pokaż/ukryj Edytor Kompozycji</translation>
     </message>
     <message>
         <source>By pressing this button, you can show or hide the Song-Editor. With the help of the Song-Editor you can edit song-playlist and specify when which track should be played. You can also insert and move samples (e.g. rap samples) directly into the playlist.</source>
-        <translation>Poprzez naciśnięcie tego przycisku możesz pokazać lub ukryć Edytor Piosenki. Za pomocą Edytora Piosenki możesz modyfikować playlistę utworu oraz określić gdzie i kiedy ścieżki będą odtwarzane. Możesz też wstawiać sample bezpośrednio na playlistę.</translation>
+        <translation>Poprzez naciśnięcie tego przycisku możesz pokazać lub ukryć Edytor Kompozycji. Za pomocą Edytora Kompozycji możesz modyfikować playlistę utworu oraz określić gdzie i kiedy ścieżki będą odtwarzane. Możesz też wstawiać sample bezpośrednio na playlistę.</translation>
     </message>
     <message>
         <source>Show/hide Beat+Bassline Editor</source>
@@ -2669,7 +2673,7 @@ Powód: &quot;%2&quot;</translation>
     </message>
     <message>
         <source>Quarter note</source>
-        <translation>Świerćnuta</translation>
+        <translation>Ćwierćnuta</translation>
     </message>
     <message>
         <source>8th note</source>
@@ -3283,7 +3287,7 @@ Jeśli pracuje normalnie z innym oprogramowaniem VST pod Linuksem proszę koniec
     </message>
     <message>
         <source>Clone of %1</source>
-        <translation>Klonuj %1</translation>
+        <translation>Duplikat %1</translation>
     </message>
 </context>
 <context>
@@ -4016,7 +4020,7 @@ Podwójne kliknięcie na którejkolwiek wtyczce otworzy okienko z informacjami o
     </message>
     <message>
         <source>Glass</source>
-        <translation type="unfinished">Harfa Szklana</translation>
+        <translation>Harfa Szklana</translation>
     </message>
     <message>
         <source>Tibetan Bowl</source>
@@ -4241,11 +4245,11 @@ Podwójne kliknięcie na którejkolwiek wtyczce otworzy okienko z informacjami o
     <name>papuInstrument</name>
     <message>
         <source>Sweep time</source>
-        <translation type="unfinished"></translation>
+        <translation>Okres wobulacji</translation>
     </message>
     <message>
         <source>Sweep direction</source>
-        <translation type="unfinished"></translation>
+        <translation>Kierunek wobulacji</translation>
     </message>
     <message>
         <source>Sweep RtShift amount</source>
@@ -4261,11 +4265,11 @@ Podwójne kliknięcie na którejkolwiek wtyczce otworzy okienko z informacjami o
     </message>
     <message>
         <source>Volume sweep direction</source>
-        <translation type="unfinished"></translation>
+        <translation>Kierunek wobulacji głośności</translation>
     </message>
     <message>
         <source>Length of each step in sweep</source>
-        <translation type="unfinished"></translation>
+        <translation>Długość każdego kroku wobulacji</translation>
     </message>
     <message>
         <source>Channel 2 volume</source>
@@ -4336,11 +4340,11 @@ Podwójne kliknięcie na którejkolwiek wtyczce otworzy okienko z informacjami o
     <name>papuInstrumentView</name>
     <message>
         <source>Sweep Time:</source>
-        <translation type="unfinished"></translation>
+        <translation>Okres wobulacji:</translation>
     </message>
     <message>
         <source>Sweep Time</source>
-        <translation type="unfinished"></translation>
+        <translation>Okres wobulacji</translation>
     </message>
     <message>
         <source>Sweep RtShift amount:</source>
@@ -4364,11 +4368,11 @@ Podwójne kliknięcie na którejkolwiek wtyczce otworzy okienko z informacjami o
     </message>
     <message>
         <source>Length of each step in sweep:</source>
-        <translation type="unfinished"></translation>
+        <translation>Długość każdego kroku wobulacji:</translation>
     </message>
     <message>
         <source>Length of each step in sweep</source>
-        <translation type="unfinished"></translation>
+        <translation>Długość każdego kroku wobulacji</translation>
     </message>
     <message>
         <source>Wave pattern duty</source>
@@ -4432,11 +4436,11 @@ Podwójne kliknięcie na którejkolwiek wtyczce otworzy okienko z informacjami o
     </message>
     <message>
         <source>Sweep Direction</source>
-        <translation type="unfinished"></translation>
+        <translation>Kierunek wobulacji</translation>
     </message>
     <message>
         <source>Volume Sweep Direction</source>
-        <translation type="unfinished"></translation>
+        <translation>Kierunek wobulacji głośności</translation>
     </message>
     <message>
         <source>Shift Register Width</source>
@@ -5588,7 +5592,7 @@ Latencja: %2 ms</translation>
     <name>songEditor</name>
     <message>
         <source>Song-Editor</source>
-        <translation>Edytor Piosenki</translation>
+        <translation>Edytor Kompozycji</translation>
     </message>
     <message>
         <source>Play song (Space)</source>
@@ -5944,7 +5948,7 @@ Upewnij się, że masz uprawnienia do odczytu tego pliku i katalogu zawierające
     </message>
     <message>
         <source>Mute this track</source>
-        <translation>Wycisz tą ścieżkę</translation>
+        <translation>Wycisz tę ścieżkę</translation>
     </message>
     <message>
         <source>Solo</source>
@@ -5952,11 +5956,11 @@ Upewnij się, że masz uprawnienia do odczytu tego pliku i katalogu zawierające
     </message>
     <message>
         <source>Clone this track</source>
-        <translation>Klonuj tą ścieżkę</translation>
+        <translation>Klonuj tę ścieżkę</translation>
     </message>
     <message>
         <source>Remove this track</source>
-        <translation>Usuń tą ścieżkę</translation>
+        <translation>Usuń tę ścieżkę</translation>
     </message>
 </context>
 <context>
