@@ -119,7 +119,7 @@ VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 		m_rolLPresetButton->setShortcut( Qt::Key_Minus );
 
 		m_rolLPresetButton->setWhatsThis(
-			tr( "Click here, if you want to switch to another VST-plugin presset program." ) );
+			tr( "Click here, if you want to switch to another VST-plugin preset program." ) );
 
 		m_rolLPresetButton->setMinimumWidth( 16 );
 		m_rolLPresetButton->setMaximumWidth( 16 );
@@ -141,7 +141,7 @@ VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 		m_rolRPresetButton->setShortcut( Qt::Key_Plus );
 
 		m_rolRPresetButton->setWhatsThis(
-			tr( "Click here, if you want to switch to another VST-plugin presset program." ) );
+			tr( "Click here, if you want to switch to another VST-plugin preset program." ) );
 
 		m_rolRPresetButton->setMinimumWidth( 16 );
 		m_rolRPresetButton->setMaximumWidth( 16 );
@@ -179,7 +179,7 @@ VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 		toolTip::add( m_savePresetButton, tr( "Save preset" ) );
 
 		m_savePresetButton->setWhatsThis(
-			tr( "Click here, if you want to save current VST-plugin presset program." ) );
+			tr( "Click here, if you want to save current VST-plugin preset program." ) );
 
 
 		m_savePresetButton->setMinimumWidth( 21 );

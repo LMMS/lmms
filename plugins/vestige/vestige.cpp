@@ -404,7 +404,7 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 	m_rolLPresetButton->setShortcut( Qt::Key_Minus );
 
 	m_rolLPresetButton->setWhatsThis(
-		tr( "Click here, if you want to switch to another VST-plugin presset program." ) );
+		tr( "Click here, if you want to switch to another VST-plugin preset program." ) );
 
 
 	m_savePresetButton = new pixmapButton( this, "" );
@@ -420,7 +420,7 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 	toolTip::add( m_savePresetButton, tr( "Save preset" ) );
 
 	m_savePresetButton->setWhatsThis(
-		tr( "Click here, if you want to save current VST-plugin presset program." ) );
+		tr( "Click here, if you want to save current VST-plugin preset program." ) );
 
 
 	m_rolRPresetButton = new pixmapButton( this, "" );
@@ -438,7 +438,7 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 	m_rolRPresetButton->setShortcut( Qt::Key_Plus );
 
 	m_rolRPresetButton->setWhatsThis(
-		tr( "Click here, if you want to switch to another VST-plugin presset program." ) );
+		tr( "Click here, if you want to switch to another VST-plugin preset program." ) );
 
 
 
