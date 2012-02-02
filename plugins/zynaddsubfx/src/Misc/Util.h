@@ -55,6 +55,15 @@ std::string stringFrom(T x)
 }
 
 template<class T>
+std::string stringFrom(REALTYPE x)
+{
+    char buf[64];
+    sprintf( buf, "%f", x );
+    return buf;
+}
+
+
+template<class T>
 T stringTo(const char *x)
 {
     std::string str = x != NULL ? x : "0"; //should work for the basic float/int
