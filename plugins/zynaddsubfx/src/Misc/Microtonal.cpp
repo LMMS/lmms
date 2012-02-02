@@ -395,7 +395,7 @@ void Microtonal::tuningtoline(int n, char *line, int maxn)
         return;
     }
     if(octave[n].type == 1)
-        snprintf(line, maxn, "%d.%d", octave[n].x1, octave[n].x2);
+        snprintf(line, maxn, "%d.%06d", octave[n].x1, octave[n].x2);
     if(octave[n].type == 2)
         snprintf(line, maxn, "%d/%d", octave[n].x1, octave[n].x2);
 }
