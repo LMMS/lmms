@@ -39,15 +39,15 @@
         <source>Current language not translated (or native English).
 
 If you&apos;re interested in translating LMMS in another language or want to improve existing translations, you&apos;re welcome to help us! Simply contact the maintainer!</source>
-        <translation type="unfinished"></translation>
+        <translation>Deutsche Übersetzung von Tobias Doerffel.</translation>
     </message>
     <message>
         <source>License</source>
         <translation>Lizenz</translation>
     </message>
     <message>
-        <source>Copyright (c) 2004-2010, LMMS developers</source>
-        <translation type="unfinished"></translation>
+        <source>Copyright (c) 2004-2012, LMMS developers</source>
+        <translation>Copyright (c) 2004-2012, LMMS-Entwickler</translation>
     </message>
 </context>
 <context>
@@ -242,19 +242,19 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     <name>AudioJack</name>
     <message>
         <source>JACK client restarted</source>
-        <translation type="unfinished"></translation>
+        <translation>JACK-Client neugestartet</translation>
     </message>
     <message>
         <source>LMMS was kicked by JACK for some reason. Therefore the JACK backend of LMMS has been restarted. You will have to make manual connections again.</source>
-        <translation type="unfinished"></translation>
+        <translation>LMMS wurde aus irgendeinem Grund von JACK verbannt. Aus diesem Grund wurde das JACK-Backend von LMMS neu gestartet. Sie müssen manuelle Verbindungen erneut vornehmen.</translation>
     </message>
     <message>
         <source>JACK server down</source>
-        <translation type="unfinished"></translation>
+        <translation>JACK-Server nicht erreichbar</translation>
     </message>
     <message>
         <source>The JACK server seems to have been shutdown and starting a new instance failed. Therefore LMMS is unable to proceed. You should save your project and restart JACK and LMMS.</source>
-        <translation type="unfinished"></translation>
+        <translation>Der JACK-Server scheint heruntergefahren worden zu sein und es war nicht möglich, eine neue Instanz zu starten. LMMS ist daher nicht in der Lage, fortzufahren. Sie sollten Ihr Projekt speichern und JACK und LMMS neustarten.</translation>
     </message>
 </context>
 <context>
@@ -1628,6 +1628,34 @@ Right clicking will bring up a context menu where you can change the order in wh
         <source>2x LowPass</source>
         <translation>2x Tiefpass</translation>
     </message>
+    <message>
+        <source>RC LowPass 12dB</source>
+        <translation>RC-Tiefpass 12dB</translation>
+    </message>
+    <message>
+        <source>RC BandPass 12dB</source>
+        <translation>RC-Bandpass 12dB</translation>
+    </message>
+    <message>
+        <source>RC HighPass 12dB</source>
+        <translation>RC-Hochpass 12dB</translation>
+    </message>
+    <message>
+        <source>RC LowPass 24dB</source>
+        <translation>RC-Tiefpass 24dB</translation>
+    </message>
+    <message>
+        <source>RC BandPass 24dB</source>
+        <translation>RC-Bandpass 24dB</translation>
+    </message>
+    <message>
+        <source>RC HighPass 24dB</source>
+        <translation>RC-Hochpass 24dB</translation>
+    </message>
+    <message>
+        <source>Vocal Formant Filter</source>
+        <translation>Vokalformant-Filter</translation>
+    </message>
 </context>
 <context>
     <name>InstrumentSoundShapingView</name>
@@ -2249,6 +2277,22 @@ Bitte besuchen Sie http://lmms.sf.net/wiki für Dokumentationen über LMMS.</tra
         <source>Root directory</source>
         <translation>Wurzelverzeichnis</translation>
     </message>
+    <message>
+        <source>Project recovery</source>
+        <translation>Projektwiederherstellung</translation>
+    </message>
+    <message>
+        <source>It looks like the last session did not end properly. Do you want to recover the project of this session?</source>
+        <translation>Es sieht so aus, als ob die letzte Sitzung nicht ordentlich beendet wurde. Möchten Sie das Projekt dieser Sitzung wiederherstellen?</translation>
+    </message>
+    <message>
+        <source>Configuration file</source>
+        <translation>Konfigurationsdatei</translation>
+    </message>
+    <message>
+        <source>Error while parsing configuration file at line %1:%2: %3</source>
+        <translation>Fehler beim Parsen der Konfigurationsdatei in Zeile %1:%2: %3</translation>
+    </message>
 </context>
 <context>
     <name>MeterDialog</name>
@@ -2844,7 +2888,7 @@ Grund: &quot;%2&quot;</translation>
     </message>
     <message>
         <source>Click here, if you want to open another VST-plugin. After clicking on this button, a file-open-dialog appears and you can select your file.</source>
-        <translation>Klicken Sie hier, wenn Sie ein anderes VST-Plugin öffnen möchten. Nachdem Sie auf diesen Button geklickt haben, erscheint ein Datei-öffnen-Dialog und Sie können Ihre Datei wählen.</translation>
+        <translation>Klicken Sie hier, um ein anderes VST-Plugin zu öffnen. Nachdem Sie auf diesen Button geklickt haben, erscheint ein Datei-öffnen-Dialog und Sie können Ihre Datei wählen.</translation>
     </message>
     <message>
         <source>Show/hide GUI</source>
@@ -2878,12 +2922,96 @@ Grund: &quot;%2&quot;</translation>
         <source>by</source>
         <translation>von</translation>
     </message>
+    <message>
+        <source>Control VST-plugin from LMMS host</source>
+        <translation>VST-Plugin von LMMS fernsteuern</translation>
+    </message>
+    <message>
+        <source>Click here, if you want to control VST-plugin from host.</source>
+        <translation>Klicken Sie hier, um das VST-Plugin von LMMS aus fernzusteuern.</translation>
+    </message>
+    <message>
+        <source>Open VST-plugin preset</source>
+        <translation>VST-Plugin-Preset öffnen</translation>
+    </message>
+    <message>
+        <source>Click here, if you want to open another *.fxp, *.fxb VST-plugin preset.</source>
+        <translation>Klicken Sie hier, um eine andere *.fxp, *.fxb-Preset-Datei für das VST-Plugin zu laden.</translation>
+    </message>
+    <message>
+        <source>Previous (-)</source>
+        <translation>Vorheriges (-)</translation>
+    </message>
+    <message>
+        <source>Save preset</source>
+        <translation>Preset speichern</translation>
+    </message>
+    <message>
+        <source>Next (+)</source>
+        <translation>Nächstes (+)</translation>
+    </message>
+    <message>
+        <source>Click here to select presets that are currently loaded in VST.</source>
+        <translation>Klicken Sie hier, um aktuell geladene VST-Presets auszuwählen.</translation>
+    </message>
+    <message>
+        <source>Preset</source>
+        <translation>Preset</translation>
+    </message>
+    <message>
+        <source>Click here, if you want to switch to another VST-plugin preset program.</source>
+        <translation>Klicken Sie hier, um zu einem anderen VST-Plugin-Presetprogramm zu wechseln.</translation>
+    </message>
+    <message>
+        <source>Click here, if you want to save current VST-plugin preset program.</source>
+        <translation>Klicken Sie hier, um das aktuelle VST-Plugin-Presetprogramm zu speichern.</translation>
+    </message>
 </context>
 <context>
     <name>VstEffectControlDialog</name>
     <message>
         <source>Show/hide VST FX GUI</source>
         <translation>VST-Effekt-GUI anzeigen/verbergen</translation>
+    </message>
+    <message>
+        <source>Control VST-plugin from LMMS host</source>
+        <translation>VST-Plugin von LMMS fernsteuern</translation>
+    </message>
+    <message>
+        <source>Click here, if you want to control VST-plugin from host.</source>
+        <translation>Klicken Sie hier, um das VST-Plugin von LMMS aus fernzusteuern.</translation>
+    </message>
+    <message>
+        <source>Open VST-plugin preset</source>
+        <translation>VST-Plugin-Preset öffnen</translation>
+    </message>
+    <message>
+        <source>Click here, if you want to open another *.fxp, *.fxb VST-plugin preset.</source>
+        <translation>Klicken Sie hier, um eine andere *.fxp, *.fxb-Preset-Datei für das VST-Plugin zu laden.</translation>
+    </message>
+    <message>
+        <source>Previous (-)</source>
+        <translation>Vorheriges (-)</translation>
+    </message>
+    <message>
+        <source>Next (+)</source>
+        <translation>Nächstes (+)</translation>
+    </message>
+    <message>
+        <source>Click here to select presets that are currently loaded in VST.</source>
+        <translation>Klicken Sie hier, um aktuell geladene VST-Presets auszuwählen.</translation>
+    </message>
+    <message>
+        <source>Save preset</source>
+        <translation>Preset speichern</translation>
+    </message>
+    <message>
+        <source>Click here, if you want to switch to another VST-plugin preset program.</source>
+        <translation>Klicken Sie hier, um zu einem anderen VST-Plugin-Presetprogramm zu wechseln.</translation>
+    </message>
+    <message>
+        <source>Click here, if you want to save current VST-plugin preset program.</source>
+        <translation>Klicken Sie hier, um das aktuelle VST-Plugin-Presetprogramm zu speichern.</translation>
     </message>
 </context>
 <context>
@@ -2905,6 +3033,46 @@ Grund: &quot;%2&quot;</translation>
 If it runs with other VST-software under Linux, please contact an LMMS-developer!</source>
         <translation>Das VST-Plugin %1 konnte aus irgendeinem Grund nicht geladen werden.
 Wenn es mit anderer VST-Software unter Linux funktioniert, kontaktieren Sie bitte einen LMMS-Entwickler!</translation>
+    </message>
+    <message>
+        <source>Open Preset</source>
+        <translation>Preset öffnen</translation>
+    </message>
+    <message>
+        <source>Vst Plugin Preset (*.fxp *.fxb)</source>
+        <translation>VST-Plugin-Preset (*.fxp *.fxb)</translation>
+    </message>
+    <message>
+        <source>: default</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&quot;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save Preset</source>
+        <translation>Preset speichern</translation>
+    </message>
+    <message>
+        <source>.fxp</source>
+        <translation>.fxp</translation>
+    </message>
+    <message>
+        <source>.FXP</source>
+        <translation>.FXP</translation>
+    </message>
+    <message>
+        <source>.FXB</source>
+        <translation>.FXB</translation>
+    </message>
+    <message>
+        <source>.fxb</source>
+        <translation>.fxb</translation>
     </message>
 </context>
 <context>
@@ -3106,7 +3274,7 @@ Wenn es mit anderer VST-Software unter Linux funktioniert, kontaktieren Sie bitt
     </message>
     <message>
         <source>Click here to stop playing of current beat/bassline.</source>
-        <translation>Klicken Sie hier, um das Abspielen des aktuellen Beats/Bassline zu stoppen (Leertaste)</translation>
+        <translation>Klicken Sie hier, um das Abspielen des aktuellen Beats/Bassline zu stoppen (Leertaste).</translation>
     </message>
 </context>
 <context>
@@ -3628,7 +3796,7 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
     <message>
         <source>Click here for an exponential wave.</source>
-        <translation>Klick für eine Exponential-Welle</translation>
+        <translation>Klick für eine Exponential-Welle.</translation>
     </message>
     <message>
         <source>Click here for white-noise.</source>
@@ -4001,6 +4169,28 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     <message>
         <source>Vibrato:</source>
         <translation>Vibrato:</translation>
+    </message>
+</context>
+<context>
+    <name>manageVSTEffectView</name>
+    <message>
+        <source>VST Sync</source>
+        <translation>VST-Sync</translation>
+    </message>
+    <message>
+        <source>Click here if you want to synchronize all parameters with VST plugin.</source>
+        <translation>Klicken Sie hier, um alle Parameter mit dem VST-Plugin zu synchronisieren.</translation>
+    </message>
+</context>
+<context>
+    <name>manageVestigeInstrumentView</name>
+    <message>
+        <source>VST Sync</source>
+        <translation>VST-Sync</translation>
+    </message>
+    <message>
+        <source>Click here if you want to synchronize all parameters with VST plugin.</source>
+        <translation>Klicken Sie hier, um alle Parameter mit dem VST-Plugin zu synchronisieren.</translation>
     </message>
 </context>
 <context>
@@ -4489,7 +4679,7 @@ Lautstärke eines Steps kann mit Mausrad geändert werden</translation>
     </message>
     <message>
         <source>Note Volume</source>
-        <translation>Notenlautstärke</translation>
+        <translation>Noten-lautstärke</translation>
     </message>
     <message>
         <source>Note Panning</source>
@@ -4514,6 +4704,30 @@ Lautstärke eines Steps kann mit Mausrad geändert werden</translation>
     <message>
         <source>Click here and detune mode will be activated. In this mode you can click a note to open its automation detuning. You can utilize this to slide notes from one to another. You can also press &apos;Shift+T&apos; on your keyboard to activate this mode.</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mark/unmark current semitone</source>
+        <translation>Aktuellen Halbton markieren/demarkieren</translation>
+    </message>
+    <message>
+        <source>Mark current scale</source>
+        <translation>Aktuelle Tonleite markieren</translation>
+    </message>
+    <message>
+        <source>Mark current chord</source>
+        <translation>Aktuellen Akkord markieren</translation>
+    </message>
+    <message>
+        <source>Unmark all</source>
+        <translation>Alles Markierungen entfernen</translation>
+    </message>
+    <message>
+        <source>No scale</source>
+        <translation>Keine Tonleiter</translation>
+    </message>
+    <message>
+        <source>No chord</source>
+        <translation>Kein Akkord</translation>
     </message>
 </context>
 <context>
@@ -5042,6 +5256,14 @@ Latenz: %2 ms</translation>
     <message>
         <source>One instrument track window mode</source>
         <translation>Instrumente im Ein-Fenster-Modus</translation>
+    </message>
+    <message>
+        <source>Compact track buttons</source>
+        <translation>Kompakte Track-Buttons</translation>
+    </message>
+    <message>
+        <source>Smooth scroll in Song Editor</source>
+        <translation>Weiches Scrollen im Song-Editor</translation>
     </message>
 </context>
 <context>
