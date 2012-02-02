@@ -56,7 +56,7 @@ Envelope::Envelope(EnvelopeParams *envpars, REALTYPE basefreq)
 
         switch(mode) {
         case 2:
-            envval[i] = (1.0 - envpars->Penvval[i] / 127.0) * MIN_ENVELOPE_DB;
+            envval[i] = (1.0 - envpars->Penvval[i] / 127.0) * -40;
             break;
         case 3:
             envval[i] =
