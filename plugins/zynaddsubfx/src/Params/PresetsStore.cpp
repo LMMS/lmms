@@ -88,7 +88,7 @@ bool PresetsStore::presetstruct::operator<(const presetstruct &b) const
 }
 
 
-void PresetsStore::rescanforpresets(string type)
+void PresetsStore::rescanforpresets(const string &type)
 {
     //std::cout << "Scanning For Presets" << std::endl;
     //std::cout << "Of Type: " << type << std::endl;

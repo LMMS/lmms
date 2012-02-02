@@ -23,7 +23,6 @@
 #ifndef ENVELOPE_H
 #define ENVELOPE_H
 
-#include <math.h>
 #include "../globals.h"
 #include "../Params/EnvelopeParams.h"
 
@@ -33,7 +32,7 @@ class Envelope
     public:
 
         /**Constructor*/
-        Envelope(EnvelopeParams *envpars, REALTYPE basefreq);
+        Envelope(class EnvelopeParams *envpars, REALTYPE basefreq);
         /**Destructor*/
         ~Envelope();
         void relasekey();

@@ -83,10 +83,6 @@ class MIDIFile
 
         //skip some bytes
         void skipnbytes(int n);
-
-        struct {
-            double tick; //how many seconds one tick has
-        } data;
 };
 
 #endif

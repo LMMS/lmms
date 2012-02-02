@@ -248,10 +248,8 @@ void Reverb::settime(unsigned char Ptime)
 
 void Reverb::setlohidamp(unsigned char Plohidamp)
 {
-    REALTYPE x;
-
     if(Plohidamp < 64)
-        Plohidamp = 64;            //remove this when the high part from lohidamp will be added
+        Plohidamp = 64; //remove this when the high part from lohidamp will be added
 
     this->Plohidamp = Plohidamp;
     if(Plohidamp == 64) {
@@ -263,7 +261,7 @@ void Reverb::setlohidamp(unsigned char Plohidamp)
             lohidamptype = 1;
         if(Plohidamp > 64)
             lohidamptype = 2;
-        x      = fabs((REALTYPE)(Plohidamp - 64) / 64.1);
+        REALTYPE x = fabs((REALTYPE)(Plohidamp - 64) / 64.1);
         lohifb = x * x;
     }
 }
@@ -330,7 +328,7 @@ void Reverb::setlpf(unsigned char Plpf)
 void Reverb::settype(unsigned char Ptype)
 {
     const int NUM_TYPES = 3;
-    int combtunings[NUM_TYPES][REV_COMBS] = {
+    const int combtunings[NUM_TYPES][REV_COMBS] = {
         //this is unused (for random)
         {0,    0,    0,    0,    0,    0,    0,    0      },
         //Freeverb by Jezar at Dreampoint
@@ -338,7 +336,7 @@ void Reverb::settype(unsigned char Ptype)
         //Freeverb by Jezar at Dreampoint //duplicate
         {1116, 1188, 1277, 1356, 1422, 1491, 1557, 1617   }
     };
-    int aptunings[NUM_TYPES][REV_APS] = {
+    const int aptunings[NUM_TYPES][REV_APS] = {
         //this is unused (for random)
         {0,   0,   0,   0    },
         //Freeverb by Jezar at Dreampoint

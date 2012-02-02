@@ -933,7 +933,7 @@ void OscilGen::prepare()
 
 void OscilGen::adaptiveharmonic(FFTFREQS f, REALTYPE freq)
 {
-    if((Padaptiveharmonics == 0) /*||(freq<1.0)*/)
+    if(Padaptiveharmonics == 0 /*||(freq<1.0)*/)
         return;
     if(freq < 1.0)
         freq = 440.0;

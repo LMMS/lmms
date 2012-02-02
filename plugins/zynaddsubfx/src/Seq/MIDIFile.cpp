@@ -22,6 +22,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <stdint.h>
 #include "MIDIFile.h"
 
 
@@ -235,8 +236,7 @@ void MIDIFile::parsenoteoff(char ntrack, char chan, unsigned int dt)
     unsigned char note;
     note = getbyte();
 
-    unsigned char noteoff_velocity = getbyte(); //unused by zynaddsubfx
-    noteoff_velocity = 0;
+    (void) getbyte(); //Read in unused noteoff_velocity
     if(chan >= NUM_MIDI_CHANNELS)
         return;
 
@@ -346,7 +346,6 @@ void MIDIFile::clearmidifile()
     midifilesize = 0;
     midifilek    = 0;
     midieof      = false;
-    data.tick    = 0.05;
 }
 
 unsigned char MIDIFile::getbyte()
@@ -394,14 +393,13 @@ unsigned short int MIDIFile::getint16()
 unsigned int MIDIFile::getvarint32()
 {
     unsigned long result = 0;
-    unsigned char b;
-
 ///    printf("\n[start]");
 
     if((result = getbyte()) & 0x80) {
         result &= 0x7f;
+        uint8_t b;
         do {
-            b      = getbyte();
+            b = getbyte();
             result = (result << 7) + (b & 0x7f);
         } while(b & 0x80);
     }

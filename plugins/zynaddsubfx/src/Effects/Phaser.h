@@ -58,7 +58,6 @@ class Phaser:public Effect
         unsigned char Poutsub;      //if I wish to subtract the output instead of adding
         unsigned char Pphase;
         unsigned char Phyper;       //lfo^2 -- converts tri into hyper-sine
-        unsigned char Pbarber;      //Enable parber pole phasing
         unsigned char Panalog;
 
         //Control parameters

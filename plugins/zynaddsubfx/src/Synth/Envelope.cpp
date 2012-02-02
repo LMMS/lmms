@@ -20,8 +20,9 @@
 
 */
 
-#include <stdio.h>
+#include <cmath>
 #include "Envelope.h"
+#include "../Params/EnvelopeParams.h"
 
 Envelope::Envelope(EnvelopeParams *envpars, REALTYPE basefreq)
 {

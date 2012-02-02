@@ -52,7 +52,7 @@ class PresetsStore
         };
         std::vector<presetstruct> presets;
 
-        void rescanforpresets(const std::string type);
+        void rescanforpresets(const std::string &type);
 
     private:
         struct {
