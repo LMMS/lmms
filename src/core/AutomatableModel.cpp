@@ -44,8 +44,6 @@ AutomatableModel::AutomatableModel( DataType _type,
 						bool _default_constructed ) :
 	Model( _parent, _display_name, _default_constructed ),
 	m_dataType( _type ),
-	m_value( _val ),
-	m_initValue( _val ),
 	m_minValue( _min ),
 	m_maxValue( _max ),
 	m_step( _step ),
@@ -55,6 +53,7 @@ AutomatableModel::AutomatableModel( DataType _type,
 	m_hasLinkedModels( false ),
 	m_controllerConnection( NULL )
 {
+	setInitValue( _val );
 }
 
 
@@ -473,7 +472,7 @@ void AutomatableModel::unlinkControllerConnection()
 
 void AutomatableModel::setInitValue( const float _value )
 {
-	m_initValue = _value;
+	m_initValue = fittedValue( _value );
 	bool journalling = testAndSetJournalling( false );
 	setValue( _value );
 	setJournalling( journalling );
