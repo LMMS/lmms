@@ -45,7 +45,7 @@ Podziękowania dla:
 Marii Słowik - za wstępną korektę,
 Tomasza Gradowskiego - za cenne uwagi i sugestie zmian.
 
-Zauważone błędy i propozycje zmian tłumaczenia zgłoś proszę na e-mail: radek[małpka]vibender[kropka]com</translation>
+Zauważone błędy i propozycje zmian tłumaczenia proszę zgłaszać na e-mail: radek[małpka]vibender[kropka]com</translation>
     </message>
     <message>
         <source>License</source>
@@ -3432,7 +3432,7 @@ Upewnij się, że masz uprawnienia zapisu do tego pliku i katalogu w którym si�
     </message>
     <message>
         <source>--- Factory files ---</source>
-        <translation type="unfinished">--- Pliki Fabryczne ---</translation>
+        <translation>--- Pliki preinstalowane ---</translation>
     </message>
 </context>
 <context>
