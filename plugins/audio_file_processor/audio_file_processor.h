@@ -76,6 +76,10 @@ private slots:
 	void loopPointChanged();
 
 
+signals:
+	void isPlaying( f_cnt_t _frames_played );
+
+
 private:
 	typedef sampleBuffer::handleState handleState;
 
@@ -92,6 +96,9 @@ private:
 
 } ;
 
+
+
+class AudioFileProcessorWaveView;
 
 
 class AudioFileProcessorView : public InstrumentView
@@ -116,7 +123,7 @@ private:
 
 	static QPixmap * s_artwork;
 
-	QPixmap m_graph;
+	AudioFileProcessorWaveView * m_waveView;
 	knob * m_ampKnob;
 	knob * m_startKnob;
 	knob * m_endKnob;
@@ -125,6 +132,137 @@ private:
 	pixmapButton * m_loopButton;
 
 } ;
+
+
+
+class AudioFileProcessorWaveView : public QWidget
+{
+	Q_OBJECT
+protected:
+	virtual void enterEvent( QEvent * _e );
+	virtual void leaveEvent( QEvent * _e );
+	virtual void mousePressEvent( QMouseEvent * _me );
+	virtual void mouseReleaseEvent( QMouseEvent * _me );
+	virtual void mouseMoveEvent( QMouseEvent * _me );
+	virtual void wheelEvent( QWheelEvent * _we );
+	virtual void paintEvent( QPaintEvent * _pe );
+
+
+public:
+	enum knobType
+	{
+		start,
+		end,
+	} ;
+
+	class knob : public ::knob
+	{
+		const AudioFileProcessorWaveView * m_waveView;
+		const knob * m_relatedKnob;
+
+
+	public:
+		knob( QWidget * _parent ) :
+			::knob( knobStyled, _parent ),
+			m_waveView( 0 ),
+			m_relatedKnob( 0 )
+		{
+			setFixedSize( 37, 47 );
+		}
+
+		void setWaveView( const AudioFileProcessorWaveView * _wv )
+		{
+			m_waveView = _wv;
+		}
+
+		void setRelatedKnob( const knob * _knob )
+		{
+			m_relatedKnob = _knob;
+		}
+
+		void slideBy( double _v, bool _check_bound = true )
+		{
+			slideTo( model()->value() + _v, _check_bound );
+		}
+
+		void slideTo( double _v, bool _check_bound = true );
+
+
+	protected:
+		float getValue( const QPoint & _p );
+
+
+	private:
+		bool checkBound( double _v ) const;
+
+	} ;
+
+
+public slots:
+	void update()
+	{
+		updateGraph();
+		QWidget::update();
+	}
+
+	void isPlaying( f_cnt_t _frames_played );
+
+
+private:
+	static const int s_padding = 2;
+
+	enum draggingType
+	{
+		wave,
+		sample_start,
+		sample_end,
+	} ;
+
+	sampleBuffer & m_sampleBuffer;
+	QPixmap m_graph;
+	f_cnt_t m_from;
+	f_cnt_t m_to;
+	f_cnt_t m_last_from;
+	f_cnt_t m_last_to;
+	knob * m_startKnob;
+	knob * m_endKnob;
+	f_cnt_t m_startFrameX;
+	f_cnt_t m_endFrameX;
+	bool m_isDragging;
+	QPoint m_draggingLastPoint;
+	draggingType m_draggingType;
+	bool m_reversed;
+	f_cnt_t m_framesPlayed;
+
+
+public:
+	AudioFileProcessorWaveView( QWidget * _parent, int _w, int _h, sampleBuffer & _buf );
+	void setKnobs( knob * _start, knob * _end );
+
+
+private:
+	void zoom( const bool _out = false );
+	void slide( int _px );
+	void slideSamplePointByPx( knobType _point, int _px );
+	void slideSamplePointByFrames( knobType _point, f_cnt_t _frames, bool _slide_to = false );
+	void slideSampleByFrames( f_cnt_t _frames );
+
+	void slideSamplePointToFrames( knobType _point, f_cnt_t _frames )
+	{
+		slideSamplePointByFrames( _point, _frames, true );
+	}
+
+	void updateGraph();
+	void reverse();
+
+	static bool isCloseTo( int _a, int _b )
+	{
+		return qAbs( _a - _b ) < 3;
+	}
+
+} ;
+
+
 
 
 #endif
