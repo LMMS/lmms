@@ -115,6 +115,11 @@ void audioFileProcessor::playNote( notePlayHandle * _n,
 		applyRelease( _working_buffer, _n );
 		instrumentTrack()->processAudioBuffer( _working_buffer,
 								frames,_n );
+		emit isPlaying( _n->totalFramesPlayed() * _n->frequency() / m_sampleBuffer.frequency() );
+	}
+	else
+	{
+		emit isPlaying( 0 );
 	}
 }
 
@@ -260,22 +265,6 @@ void audioFileProcessor::loopPointChanged( void )
 
 
 
-
-
-
-class audioFileKnob : public knob
-{
-public:
-	audioFileKnob( QWidget * _parent ) :
-			knob( knobStyled, _parent )
-	{
-		setFixedSize( 37, 47 );
-	}
-};
-
-
-
-
 QPixmap * AudioFileProcessorView::s_artwork = NULL;
 
 
@@ -347,7 +336,7 @@ AudioFileProcessorView::AudioFileProcessorView( Instrument * _instrument,
 			"Otherwise it will be amplified up or down (your "
 			"actual sample-file isn't touched!)" ) );
 
-	m_startKnob = new audioFileKnob( this );
+	m_startKnob = new AudioFileProcessorWaveView::knob( this );
 	m_startKnob->move( 68, 108 );
 	m_startKnob->setHintText( tr( "Startpoint:" )+" ", "" );
 	m_startKnob->setWhatsThis(
@@ -357,7 +346,7 @@ AudioFileProcessorView::AudioFileProcessorView( Instrument * _instrument,
 			"which AudioFileProcessor returns if a note is longer "
 			"than the sample between the start and end-points." ) );
 
-	m_endKnob = new audioFileKnob( this );
+	m_endKnob = new AudioFileProcessorWaveView::knob( this );
 	m_endKnob->move( 119, 108 );
 	m_endKnob->setHintText( tr( "Endpoint:" )+" ", "" );
 	m_endKnob->setWhatsThis(
@@ -366,6 +355,18 @@ AudioFileProcessorView::AudioFileProcessorView( Instrument * _instrument,
 			"If you enable looping-mode, this is the point where "
 			"AudioFileProcessor returns if a note is longer than "
 			"the sample between the start and end-points." ) );
+
+	m_waveView = new AudioFileProcessorWaveView( this, 245, 75, castModel<audioFileProcessor>()->m_sampleBuffer );
+	m_waveView->move( 2, 172 );
+	m_waveView->setKnobs(
+		dynamic_cast<AudioFileProcessorWaveView::knob *>( m_startKnob ),
+		dynamic_cast<AudioFileProcessorWaveView::knob *>( m_endKnob )
+	);
+
+	connect( castModel<audioFileProcessor>(), SIGNAL( isPlaying( f_cnt_t ) ),
+			m_waveView, SLOT( isPlaying( f_cnt_t ) ) );
+
+	qRegisterMetaType<f_cnt_t>( "f_cnt_t" );
 
 	setAcceptDrops( TRUE );
 }
@@ -464,26 +465,6 @@ void AudioFileProcessorView::paintEvent( QPaintEvent * )
 
 	p.setPen( QColor( 255, 255, 255 ) );
 	p.drawText( 8, 99, file_name );
-
-	p.drawPixmap( 2, 172, m_graph );
-
-
-	p.setPen( QColor( 0xFF, 0xAA, 0x00 ) );
-	const QRect graph_rect( 4, 174, 241, 70 );
-	const f_cnt_t frames = qMax( a->m_sampleBuffer.frames(),
-						static_cast<f_cnt_t>( 1 ) );
-	const int start_frame_x = a->m_sampleBuffer.startFrame() *
-						graph_rect.width() / frames;
-	const int end_frame_x = a->m_sampleBuffer.endFrame() *
-						graph_rect.width() / frames;
-
-	p.drawLine( start_frame_x + graph_rect.x(), graph_rect.y(),
-					start_frame_x + graph_rect.x(),
-					graph_rect.height() + graph_rect.y() );
-	p.drawLine( end_frame_x + graph_rect.x(), graph_rect.y(),
-					end_frame_x + graph_rect.x(),
-					graph_rect.height() + graph_rect.y() );
-
 }
 
 
@@ -491,13 +472,7 @@ void AudioFileProcessorView::paintEvent( QPaintEvent * )
 
 void AudioFileProcessorView::sampleUpdated( void )
 {
-	m_graph = QPixmap( 245, 75 );
-	m_graph.fill( Qt::transparent );
-	QPainter p( &m_graph );
-	p.setPen( QColor( 64, 255, 160 ) );
-	castModel<audioFileProcessor>()->m_sampleBuffer.
-				visualize( p, QRect( 2, 2, m_graph.width() - 4,
-						m_graph.height() - 4 ) );
+	m_waveView->update();
 	update();
 }
 
@@ -531,6 +506,498 @@ void AudioFileProcessorView::modelChanged( void )
 	m_loopButton->setModel( &a->m_loopModel );
 	sampleUpdated();
 }
+
+
+
+
+AudioFileProcessorWaveView::AudioFileProcessorWaveView( QWidget * _parent, int _w, int _h, sampleBuffer & _buf ) :
+	QWidget( _parent ),
+	m_sampleBuffer( _buf ),
+	m_graph( QPixmap( _w - 2 * s_padding, _h - 2 * s_padding ) ),
+	m_from( 0 ),
+	m_to( m_sampleBuffer.frames() ),
+	m_last_from( 0 ),
+	m_last_to( 0 ),
+	m_startKnob( 0 ),
+	m_endKnob( 0 ),
+	m_isDragging( false ),
+	m_reversed( false ),
+	m_framesPlayed( 0 )
+{
+	setFixedSize( _w, _h );
+	setMouseTracking( true );
+
+	if( m_sampleBuffer.frames() > 1 )
+	{
+		const f_cnt_t marging = ( m_sampleBuffer.endFrame() - m_sampleBuffer.startFrame() ) * 0.1;
+		m_from = qMax( 0, m_sampleBuffer.startFrame() - marging );
+		m_to = qMin( m_sampleBuffer.endFrame() + marging, m_sampleBuffer.frames() );
+	}
+
+	update();
+}
+
+
+
+
+void AudioFileProcessorWaveView::isPlaying( f_cnt_t _frames_played )
+{
+	m_framesPlayed = _frames_played % ( m_sampleBuffer.endFrame() - m_sampleBuffer.startFrame() );
+	update();
+}
+
+
+
+
+void AudioFileProcessorWaveView::enterEvent( QEvent * _e )
+{
+	QApplication::setOverrideCursor( Qt::OpenHandCursor );
+}
+
+
+
+
+void AudioFileProcessorWaveView::leaveEvent( QEvent * _e )
+{
+	while( QApplication::overrideCursor() )
+	{
+		QApplication::restoreOverrideCursor();
+	}
+}
+
+
+
+
+void AudioFileProcessorWaveView::mousePressEvent( QMouseEvent * _me )
+{
+	m_isDragging = true;
+	m_draggingLastPoint = _me->pos();
+
+	if( isCloseTo( _me->x(), m_startFrameX ) )
+	{
+		m_draggingType = sample_start;
+	}
+	else if( isCloseTo( _me->x(), m_endFrameX ) )
+	{
+		m_draggingType = sample_end;
+	}
+	else
+	{
+		m_draggingType = wave;
+		QApplication::setOverrideCursor( Qt::ClosedHandCursor );
+	}
+}
+
+
+
+
+void AudioFileProcessorWaveView::mouseReleaseEvent( QMouseEvent * _me )
+{
+	m_isDragging = false;
+	if( m_draggingType == wave )
+	{
+		QApplication::restoreOverrideCursor();
+	}
+}
+
+
+
+
+void AudioFileProcessorWaveView::mouseMoveEvent( QMouseEvent * _me )
+{
+	if( ! m_isDragging )
+	{
+		const bool is_size_cursor =
+			QApplication::overrideCursor()->shape() == Qt::SizeHorCursor;
+
+		if( isCloseTo( _me->x(), m_startFrameX ) ||
+			isCloseTo( _me->x(), m_endFrameX ) )
+		{
+			if( ! is_size_cursor )
+			{
+				QApplication::setOverrideCursor( Qt::SizeHorCursor );
+			}
+		}
+		else if( is_size_cursor )
+		{
+			QApplication::restoreOverrideCursor();
+		}
+		return;
+	}
+
+	const int step = _me->x() - m_draggingLastPoint.x();
+	switch( m_draggingType )
+	{
+		case sample_start:
+			slideSamplePointByPx( start, step );
+			break;
+		case sample_end:
+			slideSamplePointByPx( end, step );
+			break;
+		default:
+			if( qAbs( _me->y() - m_draggingLastPoint.y() )
+				< 2 * qAbs( _me->x() - m_draggingLastPoint.x() ) )
+			{
+				slide( step );
+			}
+			else
+			{
+				zoom( _me->y() < m_draggingLastPoint.y() );
+			}
+	}
+
+	m_draggingLastPoint = _me->pos();
+	update();
+}
+
+
+
+
+void AudioFileProcessorWaveView::wheelEvent( QWheelEvent * _we )
+{
+	zoom( _we->delta() > 0 );
+	update();
+}
+
+
+
+
+void AudioFileProcessorWaveView::paintEvent( QPaintEvent * _pe )
+{
+	QPainter p( this );
+
+	p.drawPixmap( s_padding, s_padding, m_graph );
+
+	p.setPen( QColor( 0xFF, 0xFF, 0x00 ) );
+	const QRect graph_rect( s_padding, s_padding, width() - 2 * s_padding, height() - 2 * s_padding );
+	const f_cnt_t frames = m_to - m_from;
+	m_startFrameX = graph_rect.x() + ( m_sampleBuffer.startFrame() - m_from ) *
+						double( graph_rect.width() ) / frames;
+	m_endFrameX = graph_rect.x() + ( m_sampleBuffer.endFrame() - m_from ) *
+						double( graph_rect.width() ) / frames;
+
+	p.drawLine( m_startFrameX, graph_rect.y(),
+					m_startFrameX,
+					graph_rect.height() + graph_rect.y() );
+	p.drawLine( m_endFrameX, graph_rect.y(),
+					m_endFrameX,
+					graph_rect.height() + graph_rect.y() );
+
+	if( m_endFrameX - m_startFrameX > 2 )
+	{
+		p.fillRect(
+			m_startFrameX + 1,
+			graph_rect.y(),
+			m_endFrameX - m_startFrameX - 1,
+			graph_rect.height() + graph_rect.y(),
+			QColor( 255, 255, 0, 70 )
+		);
+
+		if( m_framesPlayed )
+		{
+			const int played_width_px = m_framesPlayed
+				/ double( m_sampleBuffer.endFrame() - m_sampleBuffer.startFrame() )
+				* ( m_endFrameX - m_startFrameX );
+			QLinearGradient g( m_startFrameX + 1, 0, m_startFrameX + 1 + played_width_px, 0 );
+			const QColor c( 0, 120, 255, 180 );
+			g.setColorAt( 0, Qt::transparent );
+			g.setColorAt( 0.8, c );
+			g.setColorAt( 1,  c );
+			p.fillRect(
+				m_startFrameX + 1,
+				graph_rect.y(),
+				played_width_px,
+				graph_rect.height() + graph_rect.y(),
+				g
+			);
+			p.setPen( QColor( 0, 255, 255 ) );
+			p.drawLine(
+				m_startFrameX + 1 + played_width_px,
+				graph_rect.y(),
+				m_startFrameX + 1 + played_width_px,
+				graph_rect.height() + graph_rect.y()
+			);
+			m_framesPlayed = 0;
+		}
+	}
+
+	QLinearGradient g( 0, 0, width() * 0.7, 0 );
+	const QColor c( 0, 0, 150, 180 );
+	g.setColorAt( 0, c );
+	g.setColorAt( 0.4, c );
+	g.setColorAt( 1,  Qt::transparent );
+	p.fillRect( s_padding, s_padding, m_graph.width(), 14, g );
+
+	p.setPen( QColor( 255, 255, 20 ) );
+	p.setFont( pointSize<8>( font() ) );
+
+	QString length_text;
+	const int length = m_sampleBuffer.sampleLength();
+
+	if( length > 20000 )
+	{
+		length_text = QString::number( length / 1000 ) + "s";
+	}
+	else if( length > 2000 )
+	{
+		length_text = QString::number( ( length / 100 ) / 10.0 ) + "s";
+	}
+	else
+	{
+		length_text = QString::number( length ) + "ms";
+	}
+
+	p.drawText(
+		s_padding + 2,
+		s_padding + 10,
+		tr( "Sample length:" ) + " " + length_text
+	);
+}
+
+
+
+
+void AudioFileProcessorWaveView::updateGraph()
+{
+	if( m_to == 1 )
+	{
+		m_to = m_sampleBuffer.frames() * 0.7;
+		slideSamplePointToFrames( end, m_to * 0.7 );
+	}
+
+	if( m_from > m_sampleBuffer.startFrame() )
+	{
+		m_from = m_sampleBuffer.startFrame();
+	}
+
+	if( m_to < m_sampleBuffer.endFrame() )
+	{
+		m_to = m_sampleBuffer.endFrame();
+	}
+
+	if( m_sampleBuffer.reversed() != m_reversed )
+	{
+		reverse();
+	}
+	else if( m_last_from == m_from && m_last_to == m_to )
+	{
+		return;
+	}
+
+	m_last_from = m_from;
+	m_last_to = m_to;
+
+	m_graph.fill( Qt::transparent );
+	QPainter p( &m_graph );
+	p.setPen( QColor( 64, 255, 160 ) );
+	m_sampleBuffer.visualize(
+		p,
+		QRect( 0, 0, m_graph.width(), m_graph.height() ),
+		m_from, m_to
+	);
+}
+
+
+
+
+void AudioFileProcessorWaveView::zoom( const bool _out )
+{
+	const f_cnt_t start = m_sampleBuffer.startFrame();
+	const f_cnt_t end = m_sampleBuffer.endFrame();
+	const f_cnt_t frames = m_sampleBuffer.frames();
+	const f_cnt_t d_from = start - m_from;
+	const f_cnt_t d_to = m_to - end;
+
+	const f_cnt_t step = qMax( 1, qMax( d_from, d_to ) / 10 );
+	const f_cnt_t step_from = ( _out ? - step : step );
+	const f_cnt_t step_to = ( _out ? step : - step );
+
+	const double comp_ratio = double( qMin( d_from, d_to ) )
+								/ qMax( 1, qMax( d_from, d_to ) );
+
+	f_cnt_t new_from;
+	f_cnt_t new_to;
+
+	if( ( _out && d_from < d_to ) || ( ! _out && d_to < d_from ) )
+	{
+		new_from = qBound( 0, m_from + step_from, start );
+		new_to = qBound(
+			end,
+			m_to + f_cnt_t( step_to * ( new_from == m_from ? 1 : comp_ratio ) ),
+			frames
+		);
+	}
+	else
+	{
+		new_to = qBound( end, m_to + step_to, frames );
+		new_from = qBound(
+			0,
+			m_from + f_cnt_t( step_from * ( new_to == m_to ? 1 : comp_ratio ) ),
+			start
+		);
+	}
+
+	if( double( new_to - new_from ) / m_sampleBuffer.sampleRate() > 0.05  )
+	{
+		m_from = new_from;
+		m_to = new_to;
+	}
+}
+
+
+
+
+void AudioFileProcessorWaveView::slide( int _px )
+{
+	const double fact = qAbs( double( _px ) / width() );
+	f_cnt_t step = ( m_to - m_from ) * fact;
+	if( _px > 0 )
+	{
+		step = -step;
+	}
+
+	f_cnt_t step_from = qBound( 0, m_from + step, m_sampleBuffer.frames() ) - m_from;
+	f_cnt_t step_to = qBound( m_from + 1, m_to + step, m_sampleBuffer.frames() ) - m_to;
+
+	step = qAbs( step_from ) < qAbs( step_to ) ? step_from : step_to;
+
+	m_from += step;
+	m_to += step;
+	slideSampleByFrames( step );
+}
+
+
+
+
+void AudioFileProcessorWaveView::setKnobs( knob * _start, knob * _end )
+{
+	m_startKnob = _start;
+	m_endKnob = _end;
+
+	m_startKnob->setWaveView( this );
+	m_startKnob->setRelatedKnob( m_endKnob );
+
+	m_endKnob->setWaveView( this );
+	m_endKnob->setRelatedKnob( m_startKnob );
+}
+
+
+
+
+void AudioFileProcessorWaveView::slideSamplePointByPx( knobType _point, int _px )
+{
+	slideSamplePointByFrames(
+		_point,
+		f_cnt_t( ( double( _px ) / width() ) * ( m_to - m_from ) )
+	);
+}
+
+
+
+
+void AudioFileProcessorWaveView::slideSamplePointByFrames( knobType _point, f_cnt_t _frames, bool _slide_to )
+{
+	knob * knob = _point == start ? m_startKnob : m_endKnob;
+	if( ! knob )
+	{
+		return;
+	}
+
+	const double v = double( _frames ) / m_sampleBuffer.frames();
+	if( _slide_to )
+	{
+		knob->slideTo( v );
+	}
+	else
+	{
+		knob->slideBy( v );
+	}
+}
+
+
+
+
+void AudioFileProcessorWaveView::slideSampleByFrames( f_cnt_t _frames )
+{
+	const double v = double( _frames ) / m_sampleBuffer.frames();
+	m_startKnob->slideBy( v, false );
+	m_endKnob->slideBy( v, false );
+}
+
+
+
+
+void AudioFileProcessorWaveView::reverse()
+{
+	slideSampleByFrames(
+		m_sampleBuffer.frames()
+			- m_sampleBuffer.endFrame()
+			- m_sampleBuffer.startFrame()
+	);
+
+	const f_cnt_t from = m_from;
+	m_from = m_sampleBuffer.frames() - m_to;
+	m_to = m_sampleBuffer.frames() - from;
+
+	m_reversed = ! m_reversed;
+}
+
+
+
+
+void AudioFileProcessorWaveView::knob::slideTo( double _v, bool _check_bound )
+{
+	if( _check_bound && ! checkBound( _v ) )
+	{
+		return;
+	}
+	model()->setValue( _v );
+	emit sliderMoved( model()->value() );
+}
+
+
+
+
+float AudioFileProcessorWaveView::knob::getValue( const QPoint & _p )
+{
+	const double dec_fact = ! m_waveView ? 1 :
+		double( m_waveView->m_to - m_waveView->m_from )
+			/ m_waveView->m_sampleBuffer.frames();
+	const float inc = ::knob::getValue( _p ) * dec_fact;
+	const float next = model()->value() - inc;
+
+	if( ! checkBound( next ) )
+	{
+		return 0;
+	}
+	return inc;
+}
+
+
+
+
+bool AudioFileProcessorWaveView::knob::checkBound( double _v ) const
+{
+	if( ! m_relatedKnob || ! m_waveView )
+	{
+		return true;
+	}
+
+	if( ( m_relatedKnob->model()->value() - _v > 0 ) !=
+		( m_relatedKnob->model()->value() - model()->value() > 0 ) )
+		return false;
+
+	const double d1 = qAbs( m_relatedKnob->model()->value() - model()->value() )
+		* ( m_waveView->m_sampleBuffer.frames() )
+		/ m_waveView->m_sampleBuffer.sampleRate();
+
+	const double d2 = qAbs( m_relatedKnob->model()->value() - _v )
+		* ( m_waveView->m_sampleBuffer.frames() )
+		/ m_waveView->m_sampleBuffer.sampleRate();
+
+	return d1 < d2 || d2 > 0.02;
+}
+
 
 
 
