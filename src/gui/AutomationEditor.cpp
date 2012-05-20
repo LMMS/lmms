@@ -36,6 +36,8 @@
 #include <QtGui/QScrollBar>
 #include <QtGui/QStyleOption>
 #include <QtGui/QWheelEvent>
+#include <QToolTip>
+
 
 
 #ifndef __USE_XOPEN
@@ -1234,6 +1236,10 @@ inline void AutomationEditor::drawCross( QPainter & _p )
 	_p.drawLine( VALUES_WIDTH, (int) cross_y, width(), (int) cross_y );
 	_p.drawLine( mouse_pos.x(), TOP_MARGIN, mouse_pos.x(),
 						height() - SCROLLBAR_SIZE );
+	QPoint tt_pos =  QCursor::pos();
+	tt_pos.ry() -= 64;
+	tt_pos.rx() += 32;
+	QToolTip::showText( tt_pos,QString::number( level ),this);
 }
 
 
