@@ -413,6 +413,28 @@ void AutomationEditor::loadSettings( const QDomElement & _this )
 
 
 
+void AutomationEditor::updatePlayPauseIcon()
+{
+	if( engine::getSong()->playMode() != song::Mode_PlayPattern )
+	{
+		m_playButton->setIcon( embed::getIconPixmap( "play" ) );
+	}
+	else
+	{
+		if( engine::getSong()->isPlaying() )
+		{
+			m_playButton->setIcon( embed::getIconPixmap( "pause" ) );
+		}
+		else
+		{
+			m_playButton->setIcon( embed::getIconPixmap( "play" ) );
+		}
+	}
+}
+
+
+
+
 void AutomationEditor::updateAfterPatternChange()
 {
 	QMutexLocker m( &m_patternMutex );
@@ -1712,59 +1734,30 @@ void AutomationEditor::play()
 			engine::getSong()->stop();
 			engine::getSong()->playPattern( (pattern *)
 				engine::getPianoRoll()->currentPattern() );
-			m_playButton->setIcon( embed::getIconPixmap(
-								"pause" ) );
 		}
-		else if( engine::getSong()->isPlaying() )
+		else if( engine::getSong()->isStopped() == false )
 		{
-			engine::getSong()->pause();
-			m_playButton->setIcon( embed::getIconPixmap( "play" ) );
-		}
-		else if( engine::getSong()->isPaused() )
-		{
-			engine::getSong()->resumeFromPause();
-			m_playButton->setIcon( embed::getIconPixmap(
-								"pause" ) );
+			engine::getSong()->togglePause();
 		}
 		else
 		{
-			m_playButton->setIcon( embed::getIconPixmap(
-								"pause" ) );
 			engine::getSong()->playPattern( (pattern *)
 				engine::getPianoRoll()->currentPattern() );
 		}
 	}
 	else if( inBBEditor() )
 	{
-		if( engine::getSong()->isPlaying() )
-		{
-			m_playButton->setIcon( embed::getIconPixmap( "play" ) );
-		}
-		else
-		{
-			m_playButton->setIcon( embed::getIconPixmap(
-								"pause" ) );
-		}
 		engine::getBBTrackContainer()->play();
 	}
 	else
 	{
-		if( engine::getSong()->isPlaying() )
+		if( engine::getSong()->isStopped() == true )
 		{
-			engine::getSong()->pause();
-			m_playButton->setIcon( embed::getIconPixmap( "play" ) );
-		}
-		else if( engine::getSong()->isPaused() )
-		{
-			engine::getSong()->resumeFromPause();
-			m_playButton->setIcon( embed::getIconPixmap(
-								"pause" ) );
+			engine::getSong()->playSong();
 		}
 		else
 		{
-			m_playButton->setIcon( embed::getIconPixmap(
-								"pause" ) );
-			engine::getSong()->play();
+			engine::getSong()->togglePause();
 		}
 	}
 }
@@ -1788,8 +1781,6 @@ void AutomationEditor::stop()
 	{
 		engine::getSong()->stop();
 	}
-	m_playButton->setIcon( embed::getIconPixmap( "play" ) );
-	m_playButton->update();
 	m_scrollBack = TRUE;
 }
 

@@ -183,27 +183,14 @@ void bbTrackContainer::fixIncorrectPositions()
 
 void bbTrackContainer::play()
 {
-	if( engine::getSong()->isPlaying() )
-	{
-		if( engine::getSong()->playMode() != song::Mode_PlayBB )
-		{
-			engine::getSong()->stop();
-			engine::getSong()->playBB();
-		}
-		else
-		{
-			engine::getSong()->pause();
-		}
-	}
-	else if( engine::getSong()->isPaused() )
-	{
-		engine::getSong()->resumeFromPause();
-	}
-	else
+	if( engine::getSong()->playMode() != song::Mode_PlayBB )
 	{
 		engine::getSong()->playBB();
 	}
-
+	else
+	{
+		engine::getSong()->togglePause();
+	}
 }
 
 

@@ -423,17 +423,37 @@ void songEditor::scrolled( int _new_pos )
 
 
 
-void songEditor::play()
+void songEditor::updatePlayPauseIcon()
 {
-	m_s->play();
-	engine::getPianoRoll()->stopRecording();
-	if( m_s->playMode() == song::Mode_PlaySong )
+	if( engine::getSong()->playMode() != song::Mode_PlaySong )
 	{
-		m_playButton->setIcon( embed::getIconPixmap( "pause" ) );
+		m_playButton->setIcon( embed::getIconPixmap( "play" ) );
 	}
 	else
 	{
-		m_playButton->setIcon( embed::getIconPixmap( "play" ) );
+		if( engine::getSong()->isPlaying() )
+		{
+			m_playButton->setIcon( embed::getIconPixmap( "pause" ) );
+		}
+		else
+		{
+			m_playButton->setIcon( embed::getIconPixmap( "play" ) );
+		}
+	}
+}
+
+
+
+
+void songEditor::play()
+{
+	if( engine::getSong()->playMode() != song::Mode_PlaySong )
+	{
+		engine::getSong()->playSong();
+	}
+	else
+	{
+		engine::getSong()->togglePause();
 	}
 }
 
@@ -460,7 +480,6 @@ void songEditor::stop()
 {
 	m_s->stop();
 	engine::getPianoRoll()->stopRecording();
-	m_playButton->setIcon( embed::getIconPixmap( "play" ) );
 }
 
 

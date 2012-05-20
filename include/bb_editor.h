@@ -48,6 +48,8 @@ public:
 
 	void removeBBView( int _bb );
 
+	void updatePlayPauseIcon();
+
 
 public slots:
 	void play();

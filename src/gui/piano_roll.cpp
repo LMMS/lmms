@@ -776,6 +776,28 @@ void pianoRoll::loadSettings( const QDomElement & _this )
 
 
 
+void pianoRoll::updatePlayPauseIcon()
+{
+	if( engine::getSong()->playMode() != song::Mode_PlayPattern )
+	{
+		m_playButton->setIcon( embed::getIconPixmap( "play" ) );
+	}
+	else
+	{
+		if( engine::getSong()->isPlaying() )
+		{
+			m_playButton->setIcon( embed::getIconPixmap( "pause" ) );
+		}
+		else
+		{
+			m_playButton->setIcon( embed::getIconPixmap( "play" ) );
+		}
+	}
+}
+
+
+
+
 inline void pianoRoll::drawNoteRect( QPainter & _p, int _x, int _y,
 					int _width, note * _n )
 {
@@ -3222,30 +3244,13 @@ void pianoRoll::play()
 		return;
 	}
 
-	if( engine::getSong()->isPlaying() )
+	if( engine::getSong()->playMode() != song::Mode_PlayPattern )
 	{
-		if( engine::getSong()->playMode() != song::Mode_PlayPattern )
-		{
-			engine::getSong()->stop();
-			engine::getSong()->playPattern( m_pattern );
-			m_playButton->setIcon( embed::getIconPixmap(
-								"pause" ) );
-		}
-		else
-		{
-			engine::getSong()->pause();
-			m_playButton->setIcon( embed::getIconPixmap( "play" ) );
-		}
-	}
-	else if( engine::getSong()->isPaused() )
-	{
-		engine::getSong()->resumeFromPause();
-		m_playButton->setIcon( embed::getIconPixmap( "pause" ) );
+		engine::getSong()->playPattern( m_pattern );
 	}
 	else
 	{
-		m_playButton->setIcon( embed::getIconPixmap( "pause" ) );
-		engine::getSong()->playPattern( m_pattern );
+		engine::getSong()->togglePause();
 	}
 }
 
@@ -3286,7 +3291,7 @@ void pianoRoll::recordAccompany()
 
 	if( m_pattern->getTrack()->getTrackContainer() == engine::getSong() )
 	{
-		engine::getSong()->play();
+		engine::getSong()->playSong();
 	}
 	else
 	{
@@ -3301,8 +3306,6 @@ void pianoRoll::recordAccompany()
 void pianoRoll::stop()
 {
 	engine::getSong()->stop();
-	m_playButton->setIcon( embed::getIconPixmap( "play" ) );
-	m_playButton->update();
 	m_recording = false;
 	m_scrollBack = true;
 }

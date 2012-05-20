@@ -63,6 +63,8 @@ public:
 public slots:
 	void scrolled( int _new_pos );
 
+	void updatePlayPauseIcon();
+
 
 private slots:
 	void setHighQuality( bool );

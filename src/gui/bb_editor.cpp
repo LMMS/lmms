@@ -157,35 +157,38 @@ void bbEditor::removeBBView( int _bb )
 
 
 
-void bbEditor::play()
+void bbEditor::updatePlayPauseIcon()
 {
-	if( engine::getSong()->isPlaying() )
+	if( engine::getSong()->playMode() != song::Mode_PlayBB )
 	{
-		if( engine::getSong()->playMode() != song::Mode_PlayBB )
-		{
-			engine::getSong()->stop();
-			engine::getSong()->playBB();
-			m_playButton->setIcon( embed::getIconPixmap(
-								"pause" ) );
-		}
-		else
-		{
-			engine::getSong()->pause();
-			m_playButton->setIcon( embed::getIconPixmap(
-								"play" ) );
-		}
-	}
-	else if( engine::getSong()->isPaused() )
-	{
-		engine::getSong()->resumeFromPause();
-		m_playButton->setIcon( embed::getIconPixmap( "pause" ) );
+		m_playButton->setIcon( embed::getIconPixmap( "play" ) );
 	}
 	else
 	{
-		m_playButton->setIcon( embed::getIconPixmap( "pause" ) );
+		if( engine::getSong()->isPlaying() )
+		{
+			m_playButton->setIcon( embed::getIconPixmap( "pause" ) );
+		}
+		else
+		{
+			m_playButton->setIcon( embed::getIconPixmap( "play" ) );
+		}
+	}
+}
+
+
+
+
+void bbEditor::play()
+{
+	if( engine::getSong()->playMode() != song::Mode_PlayBB )
+	{
 		engine::getSong()->playBB();
 	}
-
+	else
+	{
+		engine::getSong()->togglePause();
+	}
 }
 
 
@@ -194,8 +197,6 @@ void bbEditor::play()
 void bbEditor::stop()
 {
 	engine::getSong()->stop();
-	m_playButton->setIcon( embed::getIconPixmap( "play" ) );
-	m_playButton->update();
 }
 
 

@@ -84,7 +84,7 @@ song::song() :
 	m_playing( false ),
 	m_paused( false ),
 	m_loadingProject( false ),
-	m_playMode( Mode_PlaySong ),
+	m_playMode( Mode_None ),
 	m_length( 0 ),
 	m_trackToPlay( NULL ),
 	m_patternToPlay( NULL ),
@@ -167,115 +167,14 @@ void song::setTimeSignature()
 
 
 
-void song::doActions()
+void song::savePos()
 {
-	while( !m_actions.empty() )
+	timeLine * tl = m_playPos[m_playMode].m_timeLine;
+
+	if( tl != NULL )
 	{
-		switch( m_actions.front() )
-		{
-			case ActionStop:
-			{
-				timeLine * tl =
-					m_playPos[m_playMode].m_timeLine;
-				m_playing = false;
-				m_recording = true;
-				if( tl != NULL )
-				{
-
-		switch( tl->behaviourAtStop() )
-		{
-			case timeLine::BackToZero:
-				m_playPos[m_playMode].setTicks( 0 );
-				break;
-
-			case timeLine::BackToStart:
-				if( tl->savedPos() >= 0 )
-				{
-					m_playPos[m_playMode].setTicks(
-						tl->savedPos().getTicks() );
-					tl->savePos( -1 );
-				}
-				break;
-
-			case timeLine::KeepStopPosition:
-			default:
-				break;
-		}
-
-				}
-				else
-				{
-					m_playPos[m_playMode].setTicks( 0 );
-				}
-
-				m_playPos[m_playMode].setCurrentFrame( 0 );
-
-				// remove all note-play-handles that are active
-				engine::getMixer()->clear();
-
-				break;
-			}
-
-			case ActionPlaySong:
-				m_playMode = Mode_PlaySong;
-				m_playing = true;
-				Controller::resetFrameCounter();
-				break;
-
-			case ActionPlayTrack:
-				m_playMode = Mode_PlayTrack;
-				m_playing = true;
-				break;
-
-			case ActionPlayBB:
-				m_playMode = Mode_PlayBB;
-				m_playing = true;
-				break;
-
-			case ActionPlayPattern:
-				m_playMode = Mode_PlayPattern;
-				m_playing = true;
-				break;
-
-			case ActionPause:
-				m_playing = false;// just set the play-flag
-				m_paused = true;
-				break;
-
-			case ActionResumeFromPause:
-				m_playing = true;// just set the play-flag
-				m_paused = false;
-				break;
-		}
-
-		// a second switch for saving pos when starting to play
-		// anything (need pos for restoring it later in certain
-		// timeline-modes)
-		switch( m_actions.front() )
-		{
-			case ActionPlaySong:
-			case ActionPlayTrack:
-			case ActionPlayBB:
-			case ActionPlayPattern:
-			{
-				timeLine * tl =
-					m_playPos[m_playMode].m_timeLine;
-				if( tl != NULL )
-				{
-					tl->savePos( m_playPos[m_playMode] );
-				}
-				break;
-			}
-
-			// keep GCC happy...
-			default:
-				break;
-		}
-
-		m_actions.erase( m_actions.begin() );
-
+		tl->savePos( m_playPos[m_playMode] );
 	}
-
 }
 
 
@@ -283,8 +182,6 @@ void song::doActions()
 
 void song::processNextBuffer()
 {
-	doActions();
-
 	if( m_playing == false )
 	{
 		return;
@@ -488,24 +385,22 @@ bool song::realTimeTask() const
 
 
 
-void song::play()
+void song::playSong() 
 {
 	m_recording = false;
-	if( m_playing == true )
+
+	if( isStopped() == false )
 	{
-		if( m_playMode != Mode_PlaySong )
-		{
-			// make sure, bb-editor updates/resets it play-button
-			engine::getBBTrackContainer()->stop();
-			//pianoRoll::inst()->stop();
-		}
-		else
-		{
-			pause();
-			return;
-		}
+		stop();
 	}
-	m_actions.push_back( ActionPlaySong );
+
+	m_playMode = Mode_PlaySong;
+	m_playing = true;
+	m_paused = false;
+
+	savePos();
+
+	engine::updatePlayPauseIcons();
 }
 
 
@@ -522,7 +417,7 @@ void song::record()
 
 void song::playAndRecord()
 {
-	play();
+	playSong();
 	m_recording = true;
 }
 
@@ -531,13 +426,19 @@ void song::playAndRecord()
 
 void song::playTrack( track * _trackToPlay )
 {
-	if( m_playing == true )
+	if( isStopped() == false )
 	{
 		stop();
 	}
 	m_trackToPlay = _trackToPlay;
 
-	m_actions.push_back( ActionPlayTrack );
+	m_playMode = Mode_PlayTrack;
+	m_playing = true;
+	m_paused = false;
+
+	savePos();
+
+	engine::updatePlayPauseIcons();
 }
 
 
@@ -545,11 +446,18 @@ void song::playTrack( track * _trackToPlay )
 
 void song::playBB()
 {
-	if( m_playing == true )
+	if( isStopped() == false )
 	{
 		stop();
 	}
-	m_actions.push_back( ActionPlayBB );
+
+	m_playMode = Mode_PlayBB;
+	m_playing = true;
+	m_paused = false;
+
+	savePos();
+
+	engine::updatePlayPauseIcons();
 }
 
 
@@ -557,16 +465,24 @@ void song::playBB()
 
 void song::playPattern( pattern * _patternToPlay, bool _loop )
 {
-	if( m_playing == true )
+	if( isStopped() == false )
 	{
 		stop();
 	}
+
 	m_patternToPlay = _patternToPlay;
 	m_loopPattern = _loop;
+
 	if( m_patternToPlay != NULL )
 	{
-		m_actions.push_back( ActionPlayPattern );
+		m_playMode = Mode_PlayPattern;
+		m_playing = true;
+		m_paused = false;
 	}
+
+	savePos();
+
+	engine::updatePlayPauseIcons();
 }
 
 
@@ -602,27 +518,68 @@ void song::setPlayPos( tick_t _ticks, PlayModes _play_mode )
 
 
 
+void song::togglePause()
+{
+	if( m_paused == true )
+	{
+		m_playing = true;
+		m_paused = false;
+	}
+	else
+	{
+		m_playing = false;
+		m_paused = true;
+	}
+
+	engine::updatePlayPauseIcons();
+}
+
+
+
+
 void song::stop()
 {
-	m_actions.push_back( ActionStop );
-}
+	timeLine * tl = m_playPos[m_playMode].m_timeLine;
+	m_playing = false;
+	m_paused = false;
+	m_recording = true;
 
+	if( tl != NULL )
+	{
 
+		switch( tl->behaviourAtStop() )
+		{
+			case timeLine::BackToZero:
+				m_playPos[m_playMode].setTicks( 0 );
+				break;
 
+			case timeLine::BackToStart:
+				if( tl->savedPos() >= 0 )
+				{
+					m_playPos[m_playMode].setTicks(
+						tl->savedPos().getTicks() );
+					tl->savePos( -1 );
+				}
+				break;
 
+			case timeLine::KeepStopPosition:
+			default:
+				break;
+		}
+	}
+	else
+	{
+		m_playPos[m_playMode].setTicks( 0 );
+	}
 
+	m_playPos[m_playMode].setCurrentFrame( 0 );
 
-void song::pause()
-{
-	m_actions.push_back( ActionPause );
-}
+	// remove all note-play-handles that are active
+	engine::getMixer()->clear();
 
+	m_playMode = Mode_None;
 
-
-
-void song::resumeFromPause()
-{
-	m_actions.push_back( ActionResumeFromPause );
+	engine::updatePlayPauseIcons();
 }
 
 
@@ -631,10 +588,8 @@ void song::resumeFromPause()
 void song::startExport()
 {
 	stop();
-	doActions();
 
-	play();
-	doActions();
+	playSong();
 
 	m_exporting = true;
 }
@@ -736,6 +691,12 @@ void song::clearProject()
 		stop();
 	}
 
+	for( int i = 0; i < Mode_Count; i++ )
+	{
+		setPlayPos( 0, ( PlayModes )i );
+	}
+
+
 	engine::getMixer()->lock();
 	if( engine::getBBEditor() )
 	{
@@ -800,6 +761,7 @@ void song::createNewProject()
 {
 	QString default_template = configManager::inst()->userProjectsDir()
 						+ "templates/default.mpt";
+
 	if( QFile::exists( default_template ) )
 	{
 		createNewProjectFromTemplate( default_template );

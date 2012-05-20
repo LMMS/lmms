@@ -54,6 +54,7 @@ class EXPORT song : public trackContainer
 public:
 	enum PlayModes
 	{
+		Mode_None,
 		Mode_PlaySong,
 		Mode_PlayTrack,
 		Mode_PlayBB,
@@ -102,6 +103,11 @@ public:
 	inline bool isPlaying() const
 	{
 		return m_playing && m_exporting == false;
+	}
+
+	inline bool isStopped() const
+	{
+		return m_playing == false && m_paused == false;
 	}
 
 	bool isFreezingPattern() const;
@@ -196,15 +202,14 @@ public:
 
 
 public slots:
-	void play();
+	void playSong();
 	void record();
 	void playAndRecord();
-	void stop();
 	void playTrack( track * _trackToPlay );
 	void playBB();
 	void playPattern( pattern * _patternToPlay, bool _loop = true );
-	void pause();
-	void resumeFromPause();
+	void togglePause();
+	void stop();
 
 	void importProject();
 	void exportProject();
@@ -231,7 +236,7 @@ private slots:
 
 	void masterVolumeChanged();
 
-	void doActions();
+	void savePos();
 
 	void updateFramesPerTick();
 
@@ -294,19 +299,6 @@ private:
 	track * m_trackToPlay;
 	pattern * m_patternToPlay;
 	bool m_loopPattern;
-
-
-	enum Actions
-	{
-		ActionStop,
-		ActionPlaySong,
-		ActionPlayTrack,
-		ActionPlayBB,
-		ActionPlayPattern,
-		ActionPause,
-		ActionResumeFromPause
-	} ;
-	QVector<Actions> m_actions;
 
 
 	friend class engine;

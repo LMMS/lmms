@@ -90,6 +90,8 @@ public:
 		return "pianoroll";
 	}
 
+	void updatePlayPauseIcon();
+
 
 protected:
 	virtual void closeEvent( QCloseEvent * _ce );

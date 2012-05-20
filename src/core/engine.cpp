@@ -148,6 +148,17 @@ void engine::destroy()
 
 
 
+void engine::updatePlayPauseIcons()
+{
+	s_songEditor->updatePlayPauseIcon();
+	s_automationEditor->updatePlayPauseIcon();
+	s_bbEditor->updatePlayPauseIcon();
+	s_pianoRoll->updatePlayPauseIcon();
+}
+
+
+
+
 void engine::updateFramesPerTick()
 {
 	s_framesPerTick = s_mixer->processingSampleRate() * 60.0f * 4 /

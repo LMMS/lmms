@@ -147,6 +147,8 @@ public:
 		return s_controllerRackView;
 	}
 
+	static void updatePlayPauseIcons();
+
 	static float framesPerTick()
 	{
 		return s_framesPerTick;

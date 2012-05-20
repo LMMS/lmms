@@ -72,6 +72,8 @@ public:
 		return( "automationeditor" );
 	}
 
+	void updatePlayPauseIcon();
+
 
 public slots:
 	void update();
