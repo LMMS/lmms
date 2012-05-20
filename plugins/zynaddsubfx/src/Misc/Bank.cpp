@@ -337,9 +337,9 @@ int Bank::newbank(const char *newbankdirname)
 
     if(((bankdir[strlen(bankdir) - 1]) != '/')
        && ((bankdir[strlen(bankdir) - 1]) != '\\'))
-        strncat(bankdir, "/", MAX_STRING_SIZE);
+        strncat(bankdir, "/", MAX_STRING_SIZE - strlen(bankdir) - 1 );
     ;
-    strncat(bankdir, newbankdirname, MAX_STRING_SIZE);
+    strncat(bankdir, newbankdirname, MAX_STRING_SIZE - strlen(bankdir) - 1);
 #ifdef OS_WINDOWS
     result = mkdir(bankdir);
 #else
