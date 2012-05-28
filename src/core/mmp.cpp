@@ -166,7 +166,7 @@ QString multimediaProject::nameWithExtension( const QString & _fn ) const
 
 
 
-bool multimediaProject::writeFile( const QString & _fn )
+void multimediaProject::write( QTextStream & _strm )
 {
 	if( type() == SongProject || type() == SongProjectTemplate
 					|| type() == InstrumentTrackSettings )
@@ -174,7 +174,14 @@ bool multimediaProject::writeFile( const QString & _fn )
 		cleanMetaNodes( documentElement() );
 	}
 
+	save(_strm, 2);
+}
 
+
+
+
+bool multimediaProject::writeFile( const QString & _fn )
+{
 	QString fn = nameWithExtension( _fn );
 	QFile outfile( fn );
 	if( !outfile.open( QIODevice::WriteOnly | QIODevice::Truncate ) )
@@ -192,14 +199,18 @@ bool multimediaProject::writeFile( const QString & _fn )
 						).arg( fn ) );
 		return false;
 	}
-	QString xml = toString( 2 );
+
 	if( fn.section( '.', -1 ) == "mmpz" )
 	{
+		QString xml;
+		QTextStream ts( &xml );
+		write( ts );
 		outfile.write( qCompress( xml.toUtf8() ) );
 	}
 	else
 	{
-		QTextStream( &outfile ) << xml;
+		QTextStream ts( &outfile );
+		write( ts );
 	}
 	outfile.close();
 
