@@ -168,7 +168,8 @@ int main( int argc, char * * argv )
 	"-x, --oversampling <value>	specify oversampling\n"
 	"				possible values: 1, 2, 4, 8\n"
 	"				default: 2\n"
-	"-u, --upgrade <in> <out>	upgrade file <in> and save as <out>\n"
+	"-u, --upgrade <in> [out]	upgrade file <in> and save as <out>\n"
+	"       standard out is used if no output file is specifed\n"
 	"-d, --dump <in>			dump XML of compressed file <in>\n"
 	"-v, --version			show version information and exit.\n"
 	"-h, --help			show this usage information and exit.\n\n",
@@ -179,9 +180,15 @@ int main( int argc, char * * argv )
 						QString( argv[i] ) == "-u" ) )
 		{
 			multimediaProject mmp( QString( argv[i + 1] ) );
-			if (argc > i+1)
+			if (argc > i+2)
 			{
-				mmp.writeFile(argv[i + 2]);
+				mmp.writeFile( argv[i + 2] );
+			}
+			else
+			{
+				QTextStream ts( stdout );
+				mmp.write( ts );
+				fflush( stdout );
 			}
 			return( EXIT_SUCCESS );
 		}
