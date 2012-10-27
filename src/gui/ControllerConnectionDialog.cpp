@@ -427,7 +427,10 @@ void ControllerConnectionDialog::midiValueChanged()
 	if( m_midiAutoDetect.value() )
 	{
 		m_midiController->useDetected();
-		m_readablePorts->updateMenu();
+		if( m_readablePorts )
+		{
+			m_readablePorts->updateMenu();
+		}
 	}
 }
 
