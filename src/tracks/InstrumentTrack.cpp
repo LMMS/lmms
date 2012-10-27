@@ -1202,10 +1202,12 @@ protected:
 	{
 		engine::fxMixerView()->setCurrentFxLine( model()->value() );
 		//engine::fxMixerView()->raise();
+
+		engine::fxMixerView()->show();// show fxMixer window
+		engine::fxMixerView()->setFocus();// set focus to fxMixer window
 	}
 
 } ;
-
 
 
 
