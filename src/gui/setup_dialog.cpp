@@ -113,6 +113,7 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 	m_manualChPiano( configManager::inst()->value( "ui",
 					"manualchannelpiano" ).toInt() ),
 	m_smoothScroll( configManager::inst()->value( "ui", "smoothscroll" ).toInt() ),
+	m_disableAutoSave( configManager::inst()->value( "ui", "disableautosave" ).toInt() ),
 	m_oneInstrumentTrackWindow( configManager::inst()->value( "ui",
 					"oneinstrumenttrackwindow" ).toInt() ),
 	m_compactTrackButtons( configManager::inst()->value( "ui",
@@ -464,7 +465,7 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 	tabWidget * ui_fx_tw = new tabWidget( tr( "UI effects vs. "
 						"performance" ).toUpper(),
 								performance );
-	ui_fx_tw->setFixedHeight( 90 );
+	ui_fx_tw->setFixedHeight( 100 );
 
 	ledCheckBox * disable_ch_act_ind = new ledCheckBox(
 				tr( "Disable channel activity indicators" ),
@@ -489,6 +490,14 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 	smoothScroll->setChecked( m_smoothScroll );
 	connect( smoothScroll, SIGNAL( toggled( bool ) ),
 				this, SLOT( toggleSmoothScroll( bool ) ) );
+
+
+	ledCheckBox * autoSave = new ledCheckBox(
+			tr( "Disable auto save feature" ), ui_fx_tw );
+	autoSave->move( 10, 80 );
+	autoSave->setChecked( m_disableAutoSave );
+	connect( autoSave, SIGNAL( toggled( bool ) ),
+				this, SLOT( toggleAutoSave( bool ) ) );
 
 
 
@@ -759,6 +768,8 @@ void setupDialog::accept()
 					QString::number( m_manualChPiano ) );
 	configManager::inst()->setValue( "ui", "smoothscroll",
 					QString::number( m_smoothScroll ) );
+	configManager::inst()->setValue( "ui", "disableautosave",
+					QString::number( m_disableAutoSave ) );
 	configManager::inst()->setValue( "ui", "oneinstrumenttrackwindow",
 					QString::number( m_oneInstrumentTrackWindow ) );
 	configManager::inst()->setValue( "ui", "compacttrackbuttons",
@@ -923,6 +934,14 @@ void setupDialog::toggleSmoothScroll( bool _enabled )
 {
 	m_smoothScroll = _enabled;
 }
+
+
+
+void setupDialog::toggleAutoSave( bool _enabled )
+{
+	m_disableAutoSave = _enabled;
+}
+
 
 
 

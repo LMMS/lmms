@@ -105,6 +105,7 @@ private slots:
 	void toggleDisableChActInd( bool _disabled );
 	void toggleManualChPiano( bool _enabled );
 	void toggleSmoothScroll( bool _enabled );
+	void toggleAutoSave( bool _enabled );
 	void toggleOneInstrumentTrackWindow( bool _enabled );
 	void toggleCompactTrackButtons( bool _enabled );
 
@@ -152,6 +153,7 @@ private:
 	bool m_disableChActInd;
 	bool m_manualChPiano;
 	bool m_smoothScroll;
+	bool m_disableAutoSave;
 	bool m_oneInstrumentTrackWindow;
 	bool m_compactTrackButtons;
 

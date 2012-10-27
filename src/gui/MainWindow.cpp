@@ -184,9 +184,12 @@ MainWindow::MainWindow( void ) :
 
 	m_updateTimer.start( 1000 / 20, this );	// 20 fps
 
-	// connect auto save
-	connect(&m_autoSaveTimer, SIGNAL(timeout()), this, SLOT(autoSave()));
-	m_autoSaveTimer.start(1000 * 60); // 1 minute
+	if( !configManager::inst()->value( "ui", "disableautosave" ).toInt() )
+	{
+		// connect auto save
+		connect(&m_autoSaveTimer, SIGNAL(timeout()), this, SLOT(autoSave()));
+		m_autoSaveTimer.start(1000 * 60); // 1 minute
+	}
 }
 
 
