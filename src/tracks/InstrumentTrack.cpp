@@ -1193,6 +1193,9 @@ class fxLineLcdSpinBox : public lcdSpinBox
 		virtual void mouseDoubleClickEvent ( QMouseEvent * _me )
 		{
 			engine::fxMixerView()->setCurrentFxLine( model()->value() );
+
+			engine::fxMixerView()->show();// show fxMixer window
+			engine::fxMixerView()->setFocus();// set focus to fxMixer window
 			//engine::getFxMixerView()->raise();
 		}
 };
