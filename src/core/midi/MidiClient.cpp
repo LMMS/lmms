@@ -222,11 +222,11 @@ void MidiClientRaw::parseData( const Uint8 _c )
 				m_midiParseData.m_buffer[0] - KeysPerOctave;
 			m_midiParseData.m_midiEvent.m_data.m_param[1] =
 						m_midiParseData.m_buffer[1];
+			break;
+
 		case MidiControlChange:
-			m_midiParseData.m_midiEvent.m_data.m_param[0] =
-				m_midiParseData.m_buffer[0] - KeysPerOctave;
-			m_midiParseData.m_midiEvent.m_data.m_param[1] =
-						m_midiParseData.m_buffer[1];
+			m_midiParseData.m_midiEvent.m_data.m_param[0] = m_midiParseData.m_buffer[0];
+			m_midiParseData.m_midiEvent.m_data.m_param[1] = m_midiParseData.m_buffer[1];
 			break;
 
 		case MidiPitchBend:
