@@ -24,6 +24,8 @@
 
 #include <lmmsconfig.h>
 
+#include <unistd.h>
+
 #include "LocalZynAddSubFx.h"
 
 #include "src/Input/NULLMidiIn.h"
