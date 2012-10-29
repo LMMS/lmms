@@ -258,6 +258,12 @@ void MainWindow::finalize( void )
 					engine::getSong(),
 					SLOT( exportProject() ),
 					Qt::CTRL + Qt::Key_E );
+	project_menu->addAction( embed::getIconPixmap( "project_export" ),
+					tr( "E&xport tracks..." ),
+					engine::getSong(),
+					SLOT( exportProjectTracks() ),
+					Qt::CTRL + Qt::Key_E );
+
 	project_menu->addSeparator();
 	project_menu->addAction( embed::getIconPixmap( "exit" ), tr( "&Quit" ),
 					qApp, SLOT( closeAllWindows() ),

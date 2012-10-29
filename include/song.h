@@ -207,7 +207,8 @@ public slots:
 	void resumeFromPause();
 
 	void importProject();
-	void exportProject();
+	void exportProject(bool multiExport=false);
+	void exportProjectTracks();
 
 	void startExport();
 	void stopExport();

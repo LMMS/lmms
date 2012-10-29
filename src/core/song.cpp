@@ -60,7 +60,8 @@
 #include "templates.h"
 #include "text_float.h"
 #include "timeline.h"
-
+#include <vector>
+using namespace std;
 
 tick_t midiTime::s_ticksPerTact = DefaultTicksPerTact;
 
@@ -1136,9 +1137,12 @@ void song::restoreControllerStates( const QDomElement & _this )
 }
 
 
+void song::exportProjectTracks()
+{
+	exportProject(true);
+}
 
-
-void song::exportProject()
+void song::exportProject(bool multiExport)
 {
 	if( isEmpty() )
 	{
@@ -1151,38 +1155,51 @@ void song::exportProject()
 	}
 
 	QFileDialog efd( engine::mainWindow() );
-	efd.setFileMode( QFileDialog::AnyFile );
-	efd.setAcceptMode( QFileDialog::AcceptSave );
-	int idx = 0;
-	QStringList types;
-	while( __fileEncodeDevices[idx].m_fileFormat !=
-					ProjectRenderer::NumFileFormats )
+	if (multiExport)
 	{
-		types << tr( __fileEncodeDevices[idx].m_description );
-		++idx;
-	}
-	efd.setFilters( types );
-
-	QString base_filename;
-	if( !m_fileName.isEmpty() )
-	{
-		efd.setDirectory( QFileInfo( m_fileName ).absolutePath() );
-		base_filename = QFileInfo( m_fileName ).completeBaseName();
+		efd.setFileMode( QFileDialog::Directory);
+		efd.setWindowTitle( tr( "Select directory for writing exported tracks..." ) );
+		if( !m_fileName.isEmpty() )
+		{
+			efd.setDirectory( QFileInfo( m_fileName ).absolutePath() );
+		}
 	}
 	else
 	{
-		efd.setDirectory( configManager::inst()->userProjectsDir() );
-		base_filename = tr( "untitled" );
+		efd.setFileMode( QFileDialog::AnyFile );
+		int idx = 0;
+		QStringList types;
+		while( __fileEncodeDevices[idx].m_fileFormat !=
+						ProjectRenderer::NumFileFormats )
+		{
+			types << tr( __fileEncodeDevices[idx].m_description );
+			++idx;
+		}
+		efd.setFilters( types );
+		QString base_filename;
+		if( !m_fileName.isEmpty() )
+		{
+			efd.setDirectory( QFileInfo( m_fileName ).absolutePath() );
+			base_filename = QFileInfo( m_fileName ).completeBaseName();
+		}
+		else
+		{
+			efd.setDirectory( configManager::inst()->userProjectsDir() );
+			base_filename = tr( "untitled" );
+		}
+		efd.selectFile( base_filename + __fileEncodeDevices[0].m_extension );
+		efd.setWindowTitle( tr( "Select file for project-export..." ) );
 	}
-	efd.selectFile( base_filename + __fileEncodeDevices[0].m_extension );
-	efd.setWindowTitle( tr( "Select file for project-export..." ) );
+
+	efd.setAcceptMode( QFileDialog::AcceptSave );
+
 
 	if( efd.exec() == QDialog::Accepted &&
 		!efd.selectedFiles().isEmpty() && !efd.selectedFiles()[0].isEmpty() )
 	{
 		const QString export_file_name = efd.selectedFiles()[0];
 		exportProjectDialog epd( export_file_name,
-						engine::mainWindow() );
+						engine::mainWindow(), multiExport );
 		epd.exec();
 	}
 }

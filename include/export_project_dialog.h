@@ -28,17 +28,17 @@
 #define _EXPORT_PROJECT_DIALOG_H
 
 #include <QtGui/QDialog>
-
+#include <vector>
 #include "ui_export_project.h"
 
-class ProjectRenderer;
+#include "ProjectRenderer.h"
 
 
 class exportProjectDialog : public QDialog, public Ui::ExportProjectDialog
 {
 	Q_OBJECT
 public:
-	exportProjectDialog( const QString & _file_name, QWidget * _parent );
+	exportProjectDialog( const QString & _file_name, QWidget * _parent, bool multi_export );
 	virtual ~exportProjectDialog();
 
 
@@ -50,12 +50,20 @@ protected:
 private slots:
 	void startBtnClicked( void );
 	void updateTitleBar( int );
-
+	void render(ProjectRenderer* renderer);
+	void multi_render();
+	ProjectRenderer* prep_render();
+	void pop_render();
+    void accept();
 
 private:
 	QString m_fileName;
-	ProjectRenderer * m_renderer;
-
+	QString m_dirName;
+	std::vector<ProjectRenderer*> m_renderers;
+	bool m_multi_export;
+	std::vector<track*> m_unmuted;
+	ProjectRenderer::ExportFileFormats m_ft;
+	std::vector<track*> m_to_render_vec;
 } ;
 
 #endif
