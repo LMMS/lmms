@@ -53,6 +53,13 @@ class trackView;
 typedef QWidget trackSettingsWidget;
 
 
+/*! The minimum track height in pixels
+ *
+ * Tracks can be resized by shift-dragging anywhere inside the track
+ * display.  This sets the minimum size in pixels for a track.
+ */
+const Uint16 MINIMAL_TRACK_HEIGHT = 8;
+const Uint16 DEFAULT_TRACK_HEIGHT = 32;
 
 const int DEFAULT_SETTINGS_WIDGET_WIDTH = 224;
 const int TRACK_OP_WIDTH = 78;
@@ -428,6 +435,13 @@ public:
 
 	using Model::dataChanged;
 
+	inline int getHeight() {
+	  return ( m_height >= MINIMAL_TRACK_HEIGHT ? m_height : DEFAULT_TRACK_HEIGHT );
+	}
+	inline void setHeight( int _height ) {
+	  m_height = _height;
+	}
+
 
 public slots:
 	virtual void setName( const QString & _new_name )
@@ -443,6 +457,7 @@ private:
 	trackContainer * m_trackContainer;
 	TrackTypes m_type;
 	QString m_name;
+	int m_height;
 
 	BoolModel m_mutedModel;
 	BoolModel m_soloModel;
