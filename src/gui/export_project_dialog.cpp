@@ -30,14 +30,17 @@
 #include "song.h"
 #include "engine.h"
 #include "MainWindow.h"
+#include "bb_track_container.h"
+#include "bb_track.h"
 
+#include <iostream>
 
 exportProjectDialog::exportProjectDialog( const QString & _file_name,
 							QWidget * _parent, bool multi_export=false ) :
 	QDialog( _parent ),
 	Ui::ExportProjectDialog(),
 	m_fileName( _file_name ),
-	m_multi_export(multi_export)
+	m_multiExport(multi_export)
 {
 	setupUi( this );
 	setWindowTitle( tr( "Export project to %1" ).arg( 
@@ -85,7 +88,7 @@ exportProjectDialog::exportProjectDialog( const QString & _file_name,
 exportProjectDialog::~exportProjectDialog()
 {
 
-	for( std::vector<ProjectRenderer*>::const_iterator it = m_renderers.begin();
+	for( RenderVector::const_iterator it = m_renderers.begin();
 							it != m_renderers.end(); ++it )
 	{
 		delete (*it);
@@ -97,7 +100,7 @@ exportProjectDialog::~exportProjectDialog()
 
 void exportProjectDialog::reject()
 {
-	for( std::vector<ProjectRenderer*>::const_iterator it = m_renderers.begin();
+	for( RenderVector::const_iterator it = m_renderers.begin();
 							it != m_renderers.end(); ++it )
 	{
 		(*it)->abortProcessing();
@@ -130,7 +133,7 @@ void exportProjectDialog::accept()
 
 void exportProjectDialog::closeEvent( QCloseEvent * _ce )
 {
-	for( std::vector<ProjectRenderer*>::const_iterator it = m_renderers.begin();
+	for( RenderVector::const_iterator it = m_renderers.begin();
 							it != m_renderers.end(); ++it )
 	{
 		if( (*it)->isRunning() )
@@ -143,17 +146,21 @@ void exportProjectDialog::closeEvent( QCloseEvent * _ce )
 
 void exportProjectDialog::pop_render() {
 
-	track* render_track = m_to_render_vec.back();
-	m_to_render_vec.pop_back();
+	track* render_track = m_tracksToRender.back();
+	m_tracksToRender.pop_back();
 
-	for (std::vector<track*>::const_iterator it = m_unmuted.begin();
+	// Set must states for song tracks
+	for (TrackVector::const_iterator it = m_unmuted.begin();
 			it != m_unmuted.end(); ++it) {
-		if ((*it) == render_track) {
+		if ((*it) == render_track)
+		{
 			(*it)->setMuted(false);
-		} else {
+		} else
+		{
 			(*it)->setMuted(true);
 		}
 	}
+
 
 	// Pop next render job and start
 	ProjectRenderer* r = m_renderers.back();
@@ -165,29 +172,54 @@ void exportProjectDialog::multi_render()
 {
 	m_dirName = m_fileName;
 	QString path = QDir(m_fileName).filePath("text.txt");
-	std::string strTest = path.toStdString();
+
+	int x = 1;
 
 	const trackContainer::trackList & tl = engine::getSong()->tracks();
 
 	// Check for all unmuted tracks.  Remember list.
-	int x = 0;
 	for( trackContainer::trackList::const_iterator it = tl.begin();
 							it != tl.end(); ++it )
 	{
+		track* tk = (*it);
+		track::TrackTypes type = tk->type();
 		// Don't mute automation tracks
-		if (! (*it)->isMuted() && (*it)->nodeName() != "automationtrack")
+		if (! tk->isMuted() && (
+				type == track::InstrumentTrack ||
+				type == track::SampleTrack ))
 		{
-			m_unmuted.push_back((*it));
-			QString nextName = (*it)->name();
+			m_unmuted.push_back(tk);
+			QString nextName = tk->name();
 			nextName = nextName.remove(QRegExp("[^a-zA-Z]"));
 			QString name = QString("%1_%2.wav").arg(x++).arg(nextName);
 			m_fileName = QDir(m_dirName).filePath(name);
-			std::string strTest = m_fileName.toStdString();
+			prep_render();
+		} else if (! tk->isMuted() && type == track::BBTrack)
+		{
+			m_unmutedBB.push_back(tk);
+		}
+
+
+	}
+
+	const trackContainer::trackList t2 = engine::getBBTrackContainer()->tracks();
+	for( trackContainer::trackList::const_iterator it = t2.begin();
+							it != t2.end(); ++it )
+	{
+		track* tk = (*it);
+		if (! tk->isMuted())
+		{
+			m_unmuted.push_back(tk);
+			QString nextName = tk->name();
+			nextName = nextName.remove(QRegExp("[^a-zA-Z]"));
+			QString name = QString("%1_%2.wav").arg(x++).arg(nextName);
+			m_fileName = QDir(m_dirName).filePath(name);
 			prep_render();
 		}
 	}
 
-	m_to_render_vec = m_unmuted;
+
+	m_tracksToRender = m_unmuted;
 
 	pop_render( );
 }
@@ -257,7 +289,7 @@ void exportProjectDialog::startBtnClicked()
 
 	updateTitleBar( 0 );
 
-	if (m_multi_export==true)
+	if (m_multiExport==true)
 	{
 		multi_render();
 	}

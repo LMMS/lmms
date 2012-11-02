@@ -59,11 +59,15 @@ private slots:
 private:
 	QString m_fileName;
 	QString m_dirName;
-	std::vector<ProjectRenderer*> m_renderers;
-	bool m_multi_export;
-	std::vector<track*> m_unmuted;
+	typedef QVector<ProjectRenderer*> RenderVector;
+	RenderVector m_renderers;
+	bool m_multiExport;
+
+	typedef QVector<track*> TrackVector;
+	TrackVector m_unmuted;
+	TrackVector m_unmutedBB;
 	ProjectRenderer::ExportFileFormats m_ft;
-	std::vector<track*> m_to_render_vec;
+	TrackVector m_tracksToRender;
 } ;
 
 #endif

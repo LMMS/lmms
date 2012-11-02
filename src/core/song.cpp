@@ -60,8 +60,6 @@
 #include "templates.h"
 #include "text_float.h"
 #include "timeline.h"
-#include <vector>
-using namespace std;
 
 tick_t midiTime::s_ticksPerTact = DefaultTicksPerTact;
 
