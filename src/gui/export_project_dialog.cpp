@@ -33,7 +33,6 @@
 #include "bb_track_container.h"
 #include "bb_track.h"
 
-#include <iostream>
 
 exportProjectDialog::exportProjectDialog( const QString & _file_name,
 							QWidget * _parent, bool multi_export=false ) :
