@@ -28,7 +28,7 @@
 #define _MMP_H
 
 #include <QtXml/QDomDocument>
-#include <QTextStream>>
+#include <QTextStream>
 
 #include "export.h"
 #include "lmms_basics.h"
