@@ -1,7 +1,8 @@
 /*
  * main.cpp - just main.cpp which is starting up app...
  *
- * Copyright (c) 2004-2011 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2012 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2012      Paul Giblock    <p/at/pgiblock.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -60,6 +61,7 @@
 #include "ImportFilter.h"
 #include "MainWindow.h"
 #include "ProjectRenderer.h"
+#include "mmp.h"
 #include "song.h"
 #include "Cpu.h"
 
@@ -140,7 +142,7 @@ int main( int argc, char * * argv )
 						QString( argv[i] ) == "-v" )
 		{
 			printf( "\nLinux MultiMedia Studio %s\n\n"
-	"Copyright (c) 2004-2008 LMMS developers.\n\n"
+	"Copyright (c) 2004-2012 LMMS developers.\n\n"
 	"This program is free software; you can redistribute it and/or\n"
 	"modify it under the terms of the GNU General Public\n"
 	"License as published by the Free Software Foundation; either\n"
@@ -153,7 +155,7 @@ int main( int argc, char * * argv )
 						QString( argv[i] ) == "-h" ) )
 		{
 			printf( "\nLinux MultiMedia Studio %s\n"
-	"Copyright (c) 2004-2008 LMMS developers.\n\n"
+	"Copyright (c) 2004-2012 LMMS developers.\n\n"
 	"usage: lmms [ -r <project file> ] [ options ]\n"
 	"			[ -u <in> <out> ]\n"
 	"			[ -d <in> ]\n"
@@ -176,19 +178,30 @@ int main( int argc, char * * argv )
 	"-x, --oversampling <value>	specify oversampling\n"
 	"				possible values: 1, 2, 4, 8\n"
 	"				default: 2\n"
-	"-u, --upgrade <in> <out>	upgrade file <in> and save as <out>\n"
+	"-u, --upgrade <in> [out]	upgrade file <in> and save as <out>\n"
+	"       standard out is used if no output file is specifed\n"
 	"-d, --dump <in>			dump XML of compressed file <in>\n"
 	"-v, --version			show version information and exit.\n"
 	"-h, --help			show this usage information and exit.\n\n",
 							LMMS_VERSION );
 			return( EXIT_SUCCESS );
 		}
-		else if( argc > i+1 && ( QString( argv[i] ) == "--upgrade" ||
+		else if( argc > i && ( QString( argv[i] ) == "--upgrade" ||
 						QString( argv[i] ) == "-u" ) )
 		{
-			file_to_load = argv[i + 1];
-			file_to_save = argv[i + 2];
-			i += 2;
+			multimediaProject mmp( QString( argv[i + 1] ) );
+			if (argc > i+2)
+			{
+				mmp.writeFile( argv[i + 2] );
+			}
+			else
+			{
+				
+				QTextStream ts( stdout );
+				mmp.write( ts );
+				fflush(stdout);
+			}
+			return( 0 );
 		}
 		else if( argc > i && ( QString( argv[i] ) == "--dump" ||
 						QString( argv[i] ) == "-d" ) )
@@ -399,7 +412,7 @@ int main( int argc, char * * argv )
 
 	configManager::inst()->loadConfigFile();
 
-	if( render_out.isEmpty() && file_to_save.isEmpty() )
+	if( render_out.isEmpty() )
 	{
 		// init style and palette
 		// TODO, select based on theme.xml!
@@ -532,29 +545,21 @@ int main( int argc, char * * argv )
 		engine::getSong()->loadProject( file_to_load );
 		printf( "done\n" );
 
-		if( !render_out.isEmpty() )
-		{
-			// create renderer
-			ProjectRenderer * r = new ProjectRenderer( qs, es, eff,
-				render_out + QString( ProjectRenderer::EFF_ext[eff] ) );
-			QCoreApplication::instance()->connect( r,
-					SIGNAL( finished() ), SLOT( quit() ) );
+		// create renderer
+		ProjectRenderer * r = new ProjectRenderer( qs, es, eff,
+			render_out + QString( ProjectRenderer::EFF_ext[eff] ) );
+		QCoreApplication::instance()->connect( r,
+				SIGNAL( finished() ), SLOT( quit() ) );
 
-			// timer for progress-updates
-			QTimer * t = new QTimer( r );
-			r->setConsoleUpdateTimer(t);
-			r->connect( t, SIGNAL( timeout() ),
-					SLOT( updateConsoleProgress() ) );
-			t->start( 200 );
+		// timer for progress-updates
+		QTimer * t = new QTimer( r );
+		r->setConsoleUpdateTimer(t);
+		r->connect( t, SIGNAL( timeout() ),
+				SLOT( updateConsoleProgress() ) );
+		t->start( 200 );
 
-			// start now!
-			r->startProcessing();
-		}
-		else
-		{
-			engine::getSong()->saveProjectFile( file_to_save );
-			return( 0 );
-		}
+		// start now!
+		r->startProcessing();
 	}
 
 	return app->exec();

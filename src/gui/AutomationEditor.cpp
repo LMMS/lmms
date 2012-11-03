@@ -3,6 +3,7 @@
  *                        actual setting of dynamic values
  *
  * Copyright (c) 2008-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2009 Paul Giblock <pgib/at/users.sourceforge.net>
  * Copyright (c) 2006-2008 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
@@ -87,6 +88,8 @@ AutomationEditor::AutomationEditor() :
 	m_action( ActionNone ),
 	m_moveStartLevel( 0 ),
 	m_moveStartTick( 0 ),
+	m_drawLastLevel( 0.0f ),
+	m_drawLastTick( 0 ),
 	m_ppt( DefaultPixelsPerTact ),
 	m_y_delta( DefaultYDelta ),
 	m_y_auto( true ),
