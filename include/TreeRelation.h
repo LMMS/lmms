@@ -63,9 +63,10 @@ public:
 
 	~TreeRelation()
 	{
-		foreachTreeRelation( children() )
+		TreeRelationList kids = children();
+		while( ! kids.isEmpty() )
 		{
-			delete *it;
+			delete kids.takeFirst();
 		}
 		if( item() )
 		{
