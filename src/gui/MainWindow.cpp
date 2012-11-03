@@ -262,7 +262,7 @@ void MainWindow::finalize( void )
 					tr( "E&xport tracks..." ),
 					engine::getSong(),
 					SLOT( exportProjectTracks() ),
-					Qt::CTRL + Qt::Key_E );
+					Qt::CTRL + Qt::SHIFT + Qt::Key_E );
 
 	project_menu->addSeparator();
 	project_menu->addAction( embed::getIconPixmap( "exit" ), tr( "&Quit" ),
