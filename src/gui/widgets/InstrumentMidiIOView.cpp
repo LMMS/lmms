@@ -47,8 +47,8 @@ InstrumentMidiIOView::InstrumentMidiIOView( QWidget * _parent ) :
 	m_midiInputGroupBox = new groupBox( tr( "ENABLE MIDI INPUT" ), this );
 	m_midiInputGroupBox->setGeometry( 4, 5, 242, 80 );
 
-	m_inputChannelSpinBox = new lcdSpinBox( 3, m_midiInputGroupBox );
-	m_inputChannelSpinBox->addTextForValue( 0, "---" );
+	m_inputChannelSpinBox = new lcdSpinBox( 2, m_midiInputGroupBox );
+	m_inputChannelSpinBox->addTextForValue( 0, "--" );
 	m_inputChannelSpinBox->setLabel( tr( "CHANNEL" ) );
 	m_inputChannelSpinBox->move( 16, 32 );
 	m_inputChannelSpinBox->setEnabled( false );
@@ -69,7 +69,7 @@ InstrumentMidiIOView::InstrumentMidiIOView( QWidget * _parent ) :
 	m_midiOutputGroupBox = new groupBox( tr( "ENABLE MIDI OUTPUT" ), this );
 	m_midiOutputGroupBox->setGeometry( 4, 90, 242, 80 );
 
-	m_outputChannelSpinBox = new lcdSpinBox( 3, m_midiOutputGroupBox );
+	m_outputChannelSpinBox = new lcdSpinBox( 2, m_midiOutputGroupBox );
 	m_outputChannelSpinBox->setLabel( tr( "CHANNEL" ) );
 	m_outputChannelSpinBox->move( 16, 32 );
 	m_outputChannelSpinBox->setEnabled( false );
