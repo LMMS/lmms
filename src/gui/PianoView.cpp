@@ -57,11 +57,6 @@
 #include "templates.h"
 #include "update_event.h"
 
-#ifdef Q_WS_X11
-
-#include <X11/Xlib.h>
-
-#endif
 
 /*! The black / white order of keys as they appear on the keyboard.
  */
