@@ -52,6 +52,8 @@ MidiPort::MidiPort( const QString & _name, MidiClient * _mc,
 						tr( "Fixed input velocity" )  ),
 	m_fixedOutputVelocityModel( -1, -1, MidiMaxVelocity, this,
 						tr( "Fixed output velocity" ) ),
+	m_fixedOutputNoteModel( -1, -1, MidiMaxNote, this,
+						tr( "Fixed output note" ) ),
 	m_outputProgramModel( 1, 1, MidiProgramCount, this,
 						tr( "Output MIDI program" )  ),
 	m_readableModel( false, this, tr( "Receive MIDI-events" ) ),
@@ -156,9 +158,16 @@ void MidiPort::processOutEvent( const midiEvent & _me, const midiTime & _time )
 		midiEvent ev = _me;
 		// we use/display MIDI channels 1...16 but we need 0...15 for
 		// the outside world
-		if( ev.m_channel > 0 )
+		// We are already in "real" MIDI channel space here
+		/* if( ev.m_channel > 0 )
 		{
 			--ev.m_channel;
+		} */
+		if( ( _me.m_type == MidiNoteOn || _me.m_type == MidiNoteOff ) &&
+		    fixedOutputNote() >=0 ) {
+		  // Convert MIDI note number (from spinbox) -> LMMS note number
+		  // that will be converted back when outputted.
+		  ev.key() = fixedOutputNote() - KeysPerOctave;
 		}
 		if( fixedOutputVelocity() >= 0 && _me.velocity() > 0 &&
 			( _me.m_type == MidiNoteOn ||
@@ -183,6 +192,8 @@ void MidiPort::saveSettings( QDomDocument & _doc, QDomElement & _this )
 							"fixedinputvelocity" );
 	m_fixedOutputVelocityModel.saveSettings( _doc, _this,
 							"fixedoutputvelocity" );
+	m_fixedOutputNoteModel.saveSettings( _doc, _this,
+							"fixedoutputnote" );
 	m_outputProgramModel.saveSettings( _doc, _this, "outputprogram" );
 	m_readableModel.saveSettings( _doc, _this, "readable" );
 	m_writableModel.saveSettings( _doc, _this, "writable" );

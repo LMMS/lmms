@@ -85,26 +85,34 @@ InstrumentMidiIOView::InstrumentMidiIOView( QWidget * _parent ) :
 	m_outputProgramSpinBox->move( 112, 32 );
 	m_outputProgramSpinBox->setEnabled( false );
 
+	m_fixedOutputNoteSpinBox = new lcdSpinBox( 3, m_midiOutputGroupBox );
+	m_fixedOutputNoteSpinBox->addTextForValue( -1, "---" );
+	m_fixedOutputNoteSpinBox->setLabel( tr( "NOTE" ) );
+	m_fixedOutputNoteSpinBox->move( 160, 32 );
+	m_fixedOutputNoteSpinBox->setEnabled( false );
+
+
 	connect( m_midiOutputGroupBox->ledButton(), SIGNAL( toggled( bool ) ),
 			m_outputChannelSpinBox, SLOT( setEnabled( bool ) ) );
 	connect( m_midiOutputGroupBox->ledButton(), SIGNAL( toggled( bool ) ),
 		m_fixedOutputVelocitySpinBox, SLOT( setEnabled( bool ) ) );
 	connect( m_midiOutputGroupBox->ledButton(), SIGNAL( toggled( bool ) ),
 			m_outputProgramSpinBox, SLOT( setEnabled( bool ) ) );
-
+	connect( m_midiOutputGroupBox->ledButton(), SIGNAL( toggled( bool ) ),
+		m_fixedOutputNoteSpinBox, SLOT( setEnabled( bool ) ) );
 
 	if( !engine::mixer()->midiClient()->isRaw() )
 	{
 		m_rpBtn = new QToolButton( m_midiInputGroupBox );
 		m_rpBtn->setText( tr( "MIDI devices to receive MIDI events from" ) );
 		m_rpBtn->setIcon( embed::getIconPixmap( "piano" ) );
-		m_rpBtn->setGeometry( 186, 24, 32, 32 );
+		m_rpBtn->setGeometry( 208, 24, 32, 32 );
 		m_rpBtn->setPopupMode( QToolButton::InstantPopup );
 
 		m_wpBtn = new QToolButton( m_midiOutputGroupBox );
 		m_wpBtn->setText( tr( "MIDI devices to send MIDI events to" ) );
 		m_wpBtn->setIcon( embed::getIconPixmap( "piano" ) );
-		m_wpBtn->setGeometry( 186, 24, 32, 32 );
+		m_wpBtn->setGeometry( 208, 24, 32, 32 );
 		m_wpBtn->setPopupMode( QToolButton::InstantPopup );
 	}
 }
@@ -131,6 +139,8 @@ void InstrumentMidiIOView::modelChanged()
 	m_outputChannelSpinBox->setModel( &mp->m_outputChannelModel );
 	m_fixedOutputVelocitySpinBox->setModel(
 					&mp->m_fixedOutputVelocityModel );
+	m_fixedOutputNoteSpinBox->setModel(
+					&mp->m_fixedOutputNoteModel );
 	m_outputProgramSpinBox->setModel( &mp->m_outputProgramModel );
 
 	if( m_rpBtn )
