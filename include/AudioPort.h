@@ -36,7 +36,7 @@ class AudioPort : public ThreadableJob
 {
 public:
 	AudioPort( const QString & _name, bool _has_effect_chain = true );
-	~AudioPort();
+	virtual ~AudioPort();
 
 	inline sampleFrameA * firstBuffer()
 	{
