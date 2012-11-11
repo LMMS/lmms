@@ -1,7 +1,7 @@
 /*
  * midi.h - constants, structs etc. concerning MIDI
  *
- * Copyright (c) 2005-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2012 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -167,6 +167,16 @@ struct midiEvent
 	inline Sint16 & key()
 	{
 		return m_data.m_param[0];
+	}
+
+	inline uint8_t controllerNumber() const
+	{
+		return m_data.m_param[0];
+	}
+
+	inline uint8_t controllerValue() const
+	{
+		return m_data.m_param[1];
 	}
 
 	inline Sint16 velocity() const
