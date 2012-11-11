@@ -81,10 +81,30 @@ enum MidiMetaEvents
 } ;
 
 
+enum MidiStandardControllers
+{
+	MidiControllerBankSelect = 0,
+	MidiControllerModulationWheel = 1,
+	MidiControllerBreathController = 2,
+	MidiControllerFootController = 4,
+	MidiControllerPortamentoTime = 5,
+	MidiControllerMainVolume = 7,
+	MidiControllerBalance = 8,
+	MidiControllerPan = 10,
+	MidiControllerEffectControl1 = 12,
+	MidiControllerEffectControl2 = 13,
+	MidiControllerSustain = 64,
+	MidiControllerPortamento = 65,
+	MidiControllerSostenuto = 66,
+	MidiControllerSoftPedal = 67,
+	MidiControllerLegatoFootswitch = 68,
+};
+
 const int MidiChannelCount = 16;
 const int MidiControllerCount = 128;
 const int MidiProgramCount = 128;
 const int MidiMaxVelocity = 127;
+const int MidiMaxControllerValue = 127;
 const int MidiMaxNote = 127;
 
 const int MidiMaxPanning = 127;
