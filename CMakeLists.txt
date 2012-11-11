@@ -30,7 +30,6 @@ OPTION(WANT_ALSA	"Include ALSA (Advanced Linux Sound Architecture) support" ON)
 OPTION(WANT_CALF	"Include CALF LADSPA plugins" ON)
 OPTION(WANT_CAPS	"Include C* Audio Plugin Suite (LADSPA plugins)" ON)
 OPTION(WANT_CMT		"Include Computer Music Toolkit LADSPA plugins" ON)
-OPTION(WANT_FFTW3F	"Include SpectrumAnalyzer and ZynAddSubFX plugin" ON)
 OPTION(WANT_JACK	"Include JACK (Jack Audio Connection Kit) support" ON)
 OPTION(WANT_OGGVORBIS	"Include OGG/Vorbis support" ON)
 OPTION(WANT_PULSEAUDIO	"Include PulseAudio support" ON)
@@ -261,16 +260,7 @@ ENDIF(WANT_JACK)
 
 
 # check for FFTW3F-library
-IF(WANT_FFTW3F)
-	PKG_CHECK_MODULES(FFTW3F fftw3f>=3.0.0)
-	IF(FFTW3F_FOUND)
-		SET(LMMS_HAVE_FFTW3F TRUE)
-		SET(STATUS_FFTW3F "OK")
-	ELSE(FFTW3F_FOUND)
-		SET(STATUS_FFTW3F "not found, libfftw3-dev (or similiar) "
-			"is highly recommended")
-	ENDIF(FFTW3F_FOUND)
-ENDIF(WANT_FFTW3F)
+PKG_CHECK_MODULES(FFTW3F REQUIRED fftw3f>=3.0.0)
 
 
 # check for Fluidsynth
@@ -615,13 +605,11 @@ MESSAGE(
 "* Stk Mallets                 : ${STATUS_STK}\n"
 "* VST-instrument hoster       : ${STATUS_VST}\n"
 "* VST-effect hoster           : ${STATUS_VST}\n"
-"* SpectrumAnalyzer            : ${STATUS_FFTW3F}\n"
 "* CALF LADSPA plugins         : ${STATUS_CALF}\n"
 "* CAPS LADSPA plugins         : ${STATUS_CAPS}\n"
 "* CMT LADSPA plugins          : ${STATUS_CMT}\n"
 "* TAP LADSPA plugins          : ${STATUS_TAP}\n"
 "* SWH LADSPA plugins          : ${STATUS_SWH}\n"
-"* ZynAddSubFX                 : ${STATUS_FFTW3F}\n"
 )
 
 MESSAGE(
