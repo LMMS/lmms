@@ -98,6 +98,7 @@ InstrumentTrack::InstrumentTrack( trackContainer * _tc ) :
 	m_midiPort( tr( "unnamed_track" ), engine::getMixer()->midiClient(),
 								this, this ),
 	m_notes(),
+	m_sustainPedalPressed( false ),
 	m_baseNoteModel( 0, 0, KeysPerOctave * NumOctaves - 1, this,
 							tr( "Base note" ) ),
         m_volumeModel( DefaultVolume, MinVolume, MaxVolume, 0.1f, this,
@@ -303,6 +304,18 @@ void InstrumentTrack::processInEvent( const midiEvent & _me,
 			break;
 
 		case MidiControlChange:
+			if( _me.controllerNumber() == MidiControllerSustain )
+			{
+				if( _me.controllerValue() > MidiMaxControllerValue/2 )
+				{
+					m_sustainPedalPressed = true;
+				}
+				else
+				{
+					m_sustainPedalPressed = false;
+				}
+			}
+
 		case MidiProgramChange:
 			m_instrument->handleMidiEvent( _me, _time );
 			break;
