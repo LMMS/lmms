@@ -2,7 +2,7 @@
  * InstrumentTrack.h - declaration of class InstrumentTrack, a track + window
  *                     which holds an instrument-plugin
  *
- * Copyright (c) 2004-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2012 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -79,6 +79,11 @@ public:
 						const midiTime & _time );
 	// silence all running notes played by this track
 	void silenceAllNotes();
+
+	bool isSustainPedalPressed() const
+	{
+		return m_sustainPedalPressed;
+	}
 
 	f_cnt_t beatLen( notePlayHandle * _n ) const;
 
@@ -211,6 +216,7 @@ private:
 
 	notePlayHandle * m_notes[NumKeys];
 	int m_runningMidiNotes[NumKeys];
+	bool m_sustainPedalPressed;
 
 	NotePlayHandleList m_processHandles;
 

@@ -98,9 +98,10 @@ InstrumentTrack::InstrumentTrack( trackContainer * _tc ) :
 	m_midiPort( tr( "unnamed_track" ), engine::getMixer()->midiClient(),
 								this, this ),
 	m_notes(),
-        m_volumeModel( DefaultVolume, MinVolume, MaxVolume, 0.1f, this,
+	m_sustainPedalPressed( false ),
+	m_volumeModel( DefaultVolume, MinVolume, MaxVolume, 0.1f, this,
 							tr( "Volume" ) ),
-        m_panningModel( DefaultPanning, PanningLeft, PanningRight, 0.1f,
+	m_panningModel( DefaultPanning, PanningLeft, PanningRight, 0.1f,
 							this, tr( "Panning" ) ),
 	m_pitchModel( 0, -100, 100, 1, this, tr( "Pitch" ) ),
 	m_pitchRangeModel( 1, 1, 24, this, tr( "Pitch range" ) ),
@@ -306,6 +307,18 @@ void InstrumentTrack::processInEvent( const midiEvent & _me,
 			break;
 
 		case MidiControlChange:
+			if( _me.controllerNumber() == MidiControllerSustain )
+			{
+				if( _me.controllerValue() > MidiMaxControllerValue/2 )
+				{
+					m_sustainPedalPressed = true;
+				}
+				else
+				{
+					m_sustainPedalPressed = false;
+				}
+			}
+
 		case MidiProgramChange:
 			m_instrument->handleMidiEvent( _me, _time );
 			break;

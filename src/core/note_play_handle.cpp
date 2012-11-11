@@ -190,6 +190,7 @@ void notePlayHandle::play( sampleFrame * _working_buffer )
 	}
 
 	if( m_released == false &&
+		instrumentTrack()->isSustainPedalPressed() == false &&
 		m_totalFramesPlayed + engine::getMixer()->framesPerPeriod()
 								>= m_frames )
 	{
@@ -293,7 +294,11 @@ void notePlayHandle::play( sampleFrame * _working_buffer )
 
 f_cnt_t notePlayHandle::framesLeft() const
 {
-	if( m_released && actualReleaseFramesToDo() == 0 )
+	if( instrumentTrack()->isSustainPedalPressed() )
+	{
+		return 4*engine::getMixer()->framesPerPeriod();
+	}
+	else if( m_released && actualReleaseFramesToDo() == 0 )
 	{
 		return m_framesBeforeRelease;
 	}
