@@ -883,7 +883,7 @@ void RemoteVstPlugin::rotateProgram( int _len )
 		currProgram = _len - 1;
 	}
 
-	char presName[30];
+	char presName[64];
 	sprintf( presName, " %d/%d: %s", currProgram, m_plugin->numPrograms, presetName() );
 
 	sendMessage( message( IdVstPluginPresetString ).addString( presName ) );
@@ -1106,7 +1106,7 @@ void RemoteVstPlugin::loadChunkFromPresetFile( const std::string & _file )
 			fclose( stream );
 		}
 	}
-	char presName[30];
+	char presName[64];
 	int currProgram = m_plugin->dispatcher(m_plugin, effGetProgram, 0, 0, 0, 0) + 1;
 	sprintf( presName, " %d/%d: %s", currProgram, m_plugin->numPrograms, presetName() );
 
