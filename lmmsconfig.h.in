@@ -7,7 +7,6 @@
 #cmakedefine LMMS_HOST_X86_64
 
 #cmakedefine LMMS_HAVE_ALSA
-#cmakedefine LMMS_HAVE_FFTW3F
 #cmakedefine LMMS_HAVE_FLUIDSYNTH
 #cmakedefine LMMS_HAVE_JACK
 #cmakedefine LMMS_HAVE_LV2

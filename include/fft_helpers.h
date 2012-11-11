@@ -1,7 +1,7 @@
 /*
  * fft_helpers.h - some functions around FFT analysis
  *
- * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2012 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -28,8 +28,6 @@
 
 #include "lmmsconfig.h"
 #include "export.h"
-
-#ifdef LMMS_HAVE_FFTW3F
 
 #include <fftw3.h>
 
@@ -83,7 +81,5 @@ int EXPORT calc13octaveband31( float * _absspec_buffer, float * _subbands,
  *    returns power on success, else -1
  */
 float EXPORT signalpower(float *timesignal, int num_values);
-
-#endif
 
 #endif
