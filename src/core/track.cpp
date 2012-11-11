@@ -1770,7 +1770,8 @@ void track::loadSettings( const QDomElement & _this )
 		node = node.nextSibling();
 	}
 
-	if( _this.attribute( "height" ).toInt() >= MINIMAL_TRACK_HEIGHT )
+	if( _this.attribute( "height" ).toInt() >= MINIMAL_TRACK_HEIGHT &&
+		_this.attribute( "height" ).toInt() <= DEFAULT_TRACK_HEIGHT )	// workaround for #3585927, tobydox/2012-11-11
 	{
 		m_height = _this.attribute( "height" ).toInt();
 	}
