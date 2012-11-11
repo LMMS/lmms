@@ -2,7 +2,7 @@
  * track.cpp - implementation of classes concerning tracks -> necessary for
  *             all track-like objects (beat/bassline, sample-track...)
  *
- * Copyright (c) 2004-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2012 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -31,7 +31,7 @@
  * \mainpage Track classes
  *
  * \section introduction Introduction
- * 
+ *
  * \todo fill this out
  */
 
@@ -637,7 +637,7 @@ void trackContentObjectView::mousePressEvent( QMouseEvent * _me )
  *  * If in move mode, move ourselves in the track,
  *  * or if in move-selection mode, move the entire selection,
  *  * or if in resize mode, resize ourselves,
- *  * otherwise ??? 
+ *  * otherwise ???
  *
  * \param _me The QMouseEvent to handle.
  * \todo what does the final else case do here?
@@ -1192,7 +1192,7 @@ void trackContentWidget::paintEvent( QPaintEvent * _pe )
 	// Don't draw background on BB-Editor
 	if( m_trackView->getTrackContainerView() != engine::getBBEditor() )
 	{
-		p.drawTiledPixmap( rect(), m_background, QPoint( 
+		p.drawTiledPixmap( rect(), m_background, QPoint(
 				tcv->currentPosition().getTact() * ppt, 0 ) );
 	}
 }
@@ -1673,9 +1673,9 @@ void track::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	_this.setAttribute( "type", type() );
 	_this.setAttribute( "name", name() );
 	_this.setAttribute( "muted", isMuted() );
-	if( m_height >= MINIMAL_TRACK_HEIGHT ) 
+	if( m_height >= MINIMAL_TRACK_HEIGHT )
 	{
-	  _this.setAttribute( "height", m_height );
+		_this.setAttribute( "height", m_height );
 	}
 
 	QDomElement ts_de = _doc.createElement( nodeName() );
@@ -1768,11 +1768,11 @@ void track::loadSettings( const QDomElement & _this )
 			}
 		}
 		node = node.nextSibling();
-        }
-	
+	}
+
 	if( _this.attribute( "height" ).toInt() >= MINIMAL_TRACK_HEIGHT )
 	{
-	  m_height = _this.attribute( "height" ).toInt();
+		m_height = _this.attribute( "height" ).toInt();
 	}
 }
 
@@ -2332,13 +2332,13 @@ void trackView::dropEvent( QDropEvent * _de )
  */
 void trackView::mousePressEvent( QMouseEvent * _me )
 {
-        // If previously dragged too small, restore on shift-leftclick
-        if( height() < DEFAULT_TRACK_HEIGHT && 
-	    _me->modifiers() & Qt::ShiftModifier && 
-	    _me->button() == Qt::LeftButton )
+	// If previously dragged too small, restore on shift-leftclick
+	if( height() < DEFAULT_TRACK_HEIGHT &&
+		_me->modifiers() & Qt::ShiftModifier &&
+		_me->button() == Qt::LeftButton )
 	{
-	  setFixedHeight( DEFAULT_TRACK_HEIGHT );
-	  m_track->setHeight( DEFAULT_TRACK_HEIGHT );
+		setFixedHeight( DEFAULT_TRACK_HEIGHT );
+		m_track->setHeight( DEFAULT_TRACK_HEIGHT );
 	}
 
 
@@ -2429,8 +2429,10 @@ void trackView::mouseMoveEvent( QMouseEvent * _me )
 		m_trackContainerView->realignTracks();
 		m_track->setHeight( height() );
 	}
-	if( height() < DEFAULT_TRACK_HEIGHT ) {
-                toolTip::add( this, m_track->m_name );
+
+	if( height() < DEFAULT_TRACK_HEIGHT )
+	{
+		toolTip::add( this, m_track->m_name );
 	}
 }
 
