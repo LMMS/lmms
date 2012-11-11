@@ -113,7 +113,7 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 	m_manualChPiano( configManager::inst()->value( "ui",
 					"manualchannelpiano" ).toInt() ),
 	m_smoothScroll( configManager::inst()->value( "ui", "smoothscroll" ).toInt() ),
-	m_disableAutoSave( configManager::inst()->value( "ui", "disableautosave" ).toInt() ),
+	m_enableAutoSave( configManager::inst()->value( "ui", "enableautosave" ).toInt() ),
 	m_oneInstrumentTrackWindow( configManager::inst()->value( "ui",
 					"oneinstrumenttrackwindow" ).toInt() ),
 	m_compactTrackButtons( configManager::inst()->value( "ui",
@@ -493,9 +493,9 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 
 
 	ledCheckBox * autoSave = new ledCheckBox(
-			tr( "Disable auto save feature" ), ui_fx_tw );
+			tr( "Enable auto save feature" ), ui_fx_tw );
 	autoSave->move( 10, 80 );
-	autoSave->setChecked( m_disableAutoSave );
+	autoSave->setChecked( m_enableAutoSave );
 	connect( autoSave, SIGNAL( toggled( bool ) ),
 				this, SLOT( toggleAutoSave( bool ) ) );
 
@@ -768,8 +768,8 @@ void setupDialog::accept()
 					QString::number( m_manualChPiano ) );
 	configManager::inst()->setValue( "ui", "smoothscroll",
 					QString::number( m_smoothScroll ) );
-	configManager::inst()->setValue( "ui", "disableautosave",
-					QString::number( m_disableAutoSave ) );
+	configManager::inst()->setValue( "ui", "enableautosave",
+					QString::number( m_enableAutoSave ) );
 	configManager::inst()->setValue( "ui", "oneinstrumenttrackwindow",
 					QString::number( m_oneInstrumentTrackWindow ) );
 	configManager::inst()->setValue( "ui", "compacttrackbuttons",
@@ -939,7 +939,7 @@ void setupDialog::toggleSmoothScroll( bool _enabled )
 
 void setupDialog::toggleAutoSave( bool _enabled )
 {
-	m_disableAutoSave = _enabled;
+	m_enableAutoSave = _enabled;
 }
 
 

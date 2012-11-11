@@ -153,7 +153,7 @@ private:
 	bool m_disableChActInd;
 	bool m_manualChPiano;
 	bool m_smoothScroll;
-	bool m_disableAutoSave;
+	bool m_enableAutoSave;
 	bool m_oneInstrumentTrackWindow;
 	bool m_compactTrackButtons;
 
