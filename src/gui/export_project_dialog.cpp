@@ -1,7 +1,7 @@
 /*
  * export_project_dialog.cpp - implementation of dialog for exporting project
  *
- * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2012 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -87,7 +87,7 @@ exportProjectDialog::exportProjectDialog( const QString & _file_name,
 exportProjectDialog::~exportProjectDialog()
 {
 
-	for( RenderVector::const_iterator it = m_renderers.begin();
+	for( RenderVector::ConstIterator it = m_renderers.begin();
 							it != m_renderers.end(); ++it )
 	{
 		delete (*it);
@@ -99,27 +99,29 @@ exportProjectDialog::~exportProjectDialog()
 
 void exportProjectDialog::reject()
 {
-	for( RenderVector::const_iterator it = m_renderers.begin();
-							it != m_renderers.end(); ++it )
+	for( RenderVector::ConstIterator it = m_renderers.begin(); it != m_renderers.end(); ++it )
 	{
 		(*it)->abortProcessing();
 	}
 }
+
+
+
 void exportProjectDialog::accept()
 {
 	// If more to render, kick off next render job
-	if (m_renderers.size() > 0)
+	if( m_renderers.isEmpty() == false )
 	{
-		pop_render( );
+		popRender();
 	}
 	else
 	{
 		// If done, then reset mute states
-		while(!m_unmuted.empty())
+		while( m_unmuted.isEmpty() == false )
 		{
-			track* restore_track = m_unmuted.back();
+			track* restoreTrack = m_unmuted.back();
 			m_unmuted.pop_back();
-			restore_track->setMuted(false);
+			restoreTrack->setMuted( false );
 		}
 
 		QDialog::accept();
@@ -132,8 +134,7 @@ void exportProjectDialog::accept()
 
 void exportProjectDialog::closeEvent( QCloseEvent * _ce )
 {
-	for( RenderVector::const_iterator it = m_renderers.begin();
-							it != m_renderers.end(); ++it )
+	for( RenderVector::ConstIterator it = m_renderers.begin(); it != m_renderers.end(); ++it )
 	{
 		if( (*it)->isRunning() )
 		{
@@ -143,20 +144,23 @@ void exportProjectDialog::closeEvent( QCloseEvent * _ce )
 	QDialog::closeEvent( _ce );
 }
 
-void exportProjectDialog::pop_render() {
+
+
+void exportProjectDialog::popRender() {
 
 	track* render_track = m_tracksToRender.back();
 	m_tracksToRender.pop_back();
 
 	// Set must states for song tracks
-	for (TrackVector::const_iterator it = m_unmuted.begin();
-			it != m_unmuted.end(); ++it) {
-		if ((*it) == render_track)
+	for( TrackVector::ConstIterator it = m_unmuted.begin(); it != m_unmuted.end(); ++it )
+	{
+		if( (*it) == render_track )
 		{
-			(*it)->setMuted(false);
-		} else
+			(*it)->setMuted( false );
+		}
+		else
 		{
-			(*it)->setMuted(true);
+			(*it)->setMuted( true );
 		}
 	}
 
@@ -164,10 +168,10 @@ void exportProjectDialog::pop_render() {
 	// Pop next render job and start
 	ProjectRenderer* r = m_renderers.back();
 	m_renderers.pop_back();
-	render(r);
+	render( r );
 }
 
-void exportProjectDialog::multi_render()
+void exportProjectDialog::multiRender()
 {
 	m_dirName = m_fileName;
 	QString path = QDir(m_fileName).filePath("text.txt");
@@ -176,24 +180,24 @@ void exportProjectDialog::multi_render()
 
 	const trackContainer::trackList & tl = engine::getSong()->tracks();
 
-	// Check for all unmuted tracks.  Remember list.
-	for( trackContainer::trackList::const_iterator it = tl.begin();
+	// Check for all unmuted tracks. Remember list.
+	for( trackContainer::trackList::ConstIterator it = tl.begin();
 							it != tl.end(); ++it )
 	{
 		track* tk = (*it);
 		track::TrackTypes type = tk->type();
 		// Don't mute automation tracks
-		if (! tk->isMuted() && (
-				type == track::InstrumentTrack ||
-				type == track::SampleTrack ))
+		if ( tk->isMuted() == false &&
+				( type == track::InstrumentTrack || type == track::SampleTrack ) )
 		{
 			m_unmuted.push_back(tk);
 			QString nextName = tk->name();
 			nextName = nextName.remove(QRegExp("[^a-zA-Z]"));
 			QString name = QString("%1_%2.wav").arg(x++).arg(nextName);
 			m_fileName = QDir(m_dirName).filePath(name);
-			prep_render();
-		} else if (! tk->isMuted() && type == track::BBTrack)
+			prepRender();
+		}
+		else if (! tk->isMuted() && type == track::BBTrack )
 		{
 			m_unmutedBB.push_back(tk);
 		}
@@ -202,61 +206,71 @@ void exportProjectDialog::multi_render()
 	}
 
 	const trackContainer::trackList t2 = engine::getBBTrackContainer()->tracks();
-	for( trackContainer::trackList::const_iterator it = t2.begin();
-							it != t2.end(); ++it )
+	for( trackContainer::trackList::ConstIterator it = t2.begin(); it != t2.end(); ++it )
 	{
 		track* tk = (*it);
-		if (! tk->isMuted())
+		if ( tk->isMuted() == false )
 		{
 			m_unmuted.push_back(tk);
 			QString nextName = tk->name();
 			nextName = nextName.remove(QRegExp("[^a-zA-Z]"));
 			QString name = QString("%1_%2.wav").arg(x++).arg(nextName);
 			m_fileName = QDir(m_dirName).filePath(name);
-			prep_render();
+			prepRender();
 		}
 	}
 
 
 	m_tracksToRender = m_unmuted;
 
-	pop_render( );
+	popRender();
 }
 
-ProjectRenderer* exportProjectDialog::prep_render(
-		) {
+
+
+ProjectRenderer* exportProjectDialog::prepRender()
+{
 	mixer::qualitySettings qs =
 			mixer::qualitySettings(
 					static_cast<mixer::qualitySettings::Interpolation>(interpolationCB->currentIndex()),
 					static_cast<mixer::qualitySettings::Oversampling>(oversamplingCB->currentIndex()),
 					sampleExactControllersCB->isChecked(),
-					aliasFreeOscillatorsCB->isChecked());
+					aliasFreeOscillatorsCB->isChecked() );
+
 	ProjectRenderer::OutputSettings os = ProjectRenderer::OutputSettings(
-			samplerateCB->currentText().section(" ", 0, 0).toUInt(), false,
+			samplerateCB->currentText().section(" ", 0, 0).toUInt(),
+			false,
 			bitrateCB->currentText().section(" ", 0, 0).toUInt(),
-			static_cast<ProjectRenderer::Depths>(depthCB->currentIndex()));
-	ProjectRenderer* renderer = new ProjectRenderer(qs, os, m_ft, m_fileName);
+			static_cast<ProjectRenderer::Depths>( depthCB->currentIndex() ) );
+
+	ProjectRenderer* renderer = new ProjectRenderer( qs, os, m_ft, m_fileName );
+
 	m_renderers.push_back(renderer);
+
 	return renderer;
 }
 
-void exportProjectDialog::render(ProjectRenderer* renderer)
+
+
+void exportProjectDialog::render( ProjectRenderer* renderer )
 {
 
-	if (renderer->isReady()) {
-		connect(renderer, SIGNAL( progressChanged( int ) ), progressBar,
-				SLOT( setValue( int ) ));
-		connect(renderer, SIGNAL( progressChanged( int ) ), this,
-				SLOT( updateTitleBar( int ) ));
-		connect(renderer, SIGNAL( finished() ), this, SLOT( accept() ));
-		connect(renderer, SIGNAL( finished() ), engine::mainWindow(),
-				SLOT( resetWindowTitle() ));
+	if( renderer->isReady() )
+	{
+		connect( renderer, SIGNAL( progressChanged( int ) ), progressBar, SLOT( setValue( int ) ) );
+		connect( renderer, SIGNAL( progressChanged( int ) ), this, SLOT( updateTitleBar( int ) )) ;
+		connect( renderer, SIGNAL( finished() ), this, SLOT( accept() ) );
+		connect( renderer, SIGNAL( finished() ), engine::mainWindow(), SLOT( resetWindowTitle() ) );
 
 		renderer->startProcessing();
-	} else {
+	}
+	else
+	{
 		accept();
 	}
 }
+
+
 
 void exportProjectDialog::startBtnClicked()
 {
@@ -290,11 +304,11 @@ void exportProjectDialog::startBtnClicked()
 
 	if (m_multiExport==true)
 	{
-		multi_render();
+		multiRender();
 	}
 	else
 	{
-		render(prep_render());
+		render(prepRender());
 	}
 }
 

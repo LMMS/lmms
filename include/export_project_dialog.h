@@ -2,7 +2,7 @@
  * export_project_dialog.h - declaration of class exportProjectDialog which is
  *                           responsible for exporting project
  *
- * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2012 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -51,10 +51,10 @@ private slots:
 	void startBtnClicked( void );
 	void updateTitleBar( int );
 	void render(ProjectRenderer* renderer);
-	void multi_render();
-	ProjectRenderer* prep_render();
-	void pop_render();
-    void accept();
+	void multiRender();
+	ProjectRenderer* prepRender();
+	void popRender();
+	void accept();
 
 private:
 	QString m_fileName;
