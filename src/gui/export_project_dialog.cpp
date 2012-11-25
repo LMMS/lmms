@@ -308,7 +308,8 @@ void exportProjectDialog::startBtnClicked()
 	}
 	else
 	{
-		render(prepRender());
+		prepRender();
+		popRender();
 	}
 }
 
