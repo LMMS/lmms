@@ -1,7 +1,7 @@
 /*
  * VstPlugin.cpp - implementation of VstPlugin class
  *
- * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2012 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -88,8 +88,8 @@ VstPlugin::VstPlugin( const QString & _plugin ) :
 	m_version( 0 ),
 	m_vendorString(),
 	m_productString(),
-	m_presetString(),
-	m_presetsString(),
+	m_currentProgramName(),
+	m_allProgramNames(),
 	p_name()
 {
 	setSplittedChannels( true );
@@ -406,12 +406,12 @@ bool VstPlugin::processMessage( const message & _m )
 			m_productString = _m.getQString();
 			break;
 
-		case IdVstPluginPresetString:
-			m_presetString = _m.getQString();
+		case IdVstCurrentProgramName:
+			m_currentProgramName = _m.getQString();
 			break;
 
-		case IdVstPluginPresetsString:
-			m_presetsString = _m.getQString();
+		case IdVstProgramNames:
+			m_allProgramNames = _m.getQString();
 			break;
 
 		case IdVstPluginUniqueID:
@@ -457,12 +457,12 @@ void VstPlugin::openPreset( )
 					!ofd.selectedFiles().isEmpty() )
 	{
 		lock();
-		sendMessage( message( IdLoadChunkFromPresetFile ).
+		sendMessage( message( IdLoadPresetFile ).
 			addString(
 				QSTR_TO_STDSTR(
 					QDir::toNativeSeparators( ofd.selectedFiles()[0] ) ) )
 			);
-		waitForMessage( IdLoadChunkFromPresetFile );
+		waitForMessage( IdLoadPresetFile );
 		unlock();
 	}
 }
@@ -470,24 +470,33 @@ void VstPlugin::openPreset( )
 
 
 
-void VstPlugin::rollPreset( int step )
+void VstPlugin::setProgram( int index )
 {
 	lock();
-	sendMessage( message( IdRotateProgram ).
-		addInt( step ) );
-	waitForMessage( IdRotateProgram );
+	sendMessage( message( IdVstSetProgram ).addInt( index ) );
+	waitForMessage( IdVstSetProgram );
 	unlock();
 }
 
 
 
 
-void VstPlugin::loadPrograms( int step )
+void VstPlugin::rotateProgram( int offset )
 {
 	lock();
-	sendMessage( message( IdLoadPrograms ).
-		addInt( step ) );
-	waitForMessage( IdLoadPrograms );
+	sendMessage( message( IdVstRotateProgram ).addInt( offset ) );
+	waitForMessage( IdVstRotateProgram );
+	unlock();
+}
+
+
+
+
+void VstPlugin::loadProgramNames()
+{
+	lock();
+	sendMessage( message( IdVstProgramNames ) );
+	waitForMessage( IdVstProgramNames );
 	unlock();
 }
 
@@ -496,7 +505,7 @@ void VstPlugin::loadPrograms( int step )
 
 void VstPlugin::savePreset( )
 {
-	QString presName = this->presetString() == "" ? tr(": default"): this->presetString();
+	QString presName = currentProgramName().isEmpty() ? tr(": default") : currentProgramName();
 	presName.replace(tr("\""), tr("'")); // QFileDialog unable to handle double quotes properly
 
 	QFileDialog sfd( NULL, tr( "Save Preset" ), presName.section(": ", 1, 1) + tr(".fxp"),
@@ -519,12 +528,12 @@ void VstPlugin::savePreset( )
 			fns = fns + tr(".fxb");
 		else fns = fns.left(fns.length() - 4) + (fns.right( 4 )).toLower();
 		lock();
-		sendMessage( message( IdSavePreset ).
+		sendMessage( message( IdSavePresetFile ).
 			addString(
 				QSTR_TO_STDSTR(
 					QDir::toNativeSeparators( fns ) ) )
 			);
-		waitForMessage( IdSavePreset );
+		waitForMessage( IdSavePresetFile );
 		unlock();
 	}
 }
@@ -535,8 +544,8 @@ void VstPlugin::savePreset( )
 void VstPlugin::setParam( int i, float f )
 {
 	lock();
-	sendMessage( message( IdSetParameter ).addInt( i ).addFloat( f ) );
-	waitForMessage( IdSetParameter );
+	sendMessage( message( IdVstSetParameter ).addInt( i ).addFloat( f ) );
+	waitForMessage( IdVstSetParameter );
 	unlock();
 }
 

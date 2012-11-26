@@ -1,7 +1,7 @@
 /*
  * RemotePlugin.h - base class providing RPC like mechanisms
  *
- * Copyright (c) 2008-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2012 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -509,12 +509,8 @@ enum RemoteMessageIDs
 	IdSaveSettingsToFile,
 	IdLoadSettingsFromString,
 	IdLoadSettingsFromFile,
-	IdLoadChunkFromPresetFile,
-	IdRotateProgram,
-	IdLoadPrograms,
-	IdSavePreset,
-	IdSetParameter,
-	IdLoadPresetFromFile,
+	IdSavePresetFile,
+	IdLoadPresetFile,
 	IdDebugMessage,
 	IdUserBase = 64
 } ;

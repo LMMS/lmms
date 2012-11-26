@@ -170,7 +170,7 @@ void VstEffectControls::savePreset( void )
 	if ( m_effect->m_plugin != NULL ) {
 		m_effect->m_plugin->savePreset( );
 /*    		bool converted;
-    		QString str = m_vi->m_plugin->presetString().section("/", 0, 0);
+    		QString str = m_vi->m_plugin->currentProgramName().section("/", 0, 0);
      		if (str != "")
    			lastPosInMenu = str.toInt(&converted, 10) - 1;
 		QWidget::update();*/
@@ -185,11 +185,12 @@ void VstEffectControls::updateMenu( void )
 {
 
 	// get all presets -
-	if ( m_effect->m_plugin != NULL ) {
-		m_effect->m_plugin->loadPrograms( 1 );
+	if ( m_effect->m_plugin != NULL )
+	{
+		m_effect->m_plugin->loadProgramNames();
 		///QWidget::update();
 
-     		QString str = m_effect->m_plugin->presetsString();
+     		QString str = m_effect->m_plugin->allProgramNames();
 
     		QStringList list1 = str.split("|");
 
@@ -223,7 +224,7 @@ void VstEffectControls::openPreset( void )
 	if ( m_effect->m_plugin != NULL ) {
 		m_effect->m_plugin->openPreset( );
     		bool converted;
-    		QString str = m_effect->m_plugin->presetString().section("/", 0, 0);
+    		QString str = m_effect->m_plugin->currentProgramName().section("/", 0, 0);
      		if (str != "")
    			lastPosInMenu = str.toInt(&converted, 10) - 1;
 		//QWidget::update();
@@ -238,9 +239,9 @@ void VstEffectControls::rollPreset( void )
 {
 
 	if ( m_effect->m_plugin != NULL ) {
-		m_effect->m_plugin->rollPreset( 1 );
+		m_effect->m_plugin->rotateProgram( 1 );
     		bool converted;
-    		QString str = m_effect->m_plugin->presetString().section("/", 0, 0);
+    		QString str = m_effect->m_plugin->currentProgramName().section("/", 0, 0);
      		if (str != "")
    			lastPosInMenu = str.toInt(&converted, 10) - 1;
 		//QWidget::update();
@@ -254,9 +255,9 @@ void VstEffectControls::rolrPreset( void )
 {
 
 	if ( m_effect->m_plugin != NULL ) {
-		m_effect->m_plugin->rollPreset( -1 );
+		m_effect->m_plugin->rotateProgram( -1 );
     		bool converted;
-    		QString str = m_effect->m_plugin->presetString().section("/", 0, 0);
+    		QString str = m_effect->m_plugin->currentProgramName().section("/", 0, 0);
      		if (str != "")
    			lastPosInMenu = str.toInt(&converted, 10) - 1;
 		//QWidget::update();
@@ -273,7 +274,7 @@ void VstEffectControls::selPreset( void )
      if (action)
          if ( m_effect->m_plugin != NULL ) {
 		lastPosInMenu = action->data().toInt();
-		m_effect->m_plugin->rollPreset( lastPosInMenu + 2 );
+		m_effect->m_plugin->setProgram( lastPosInMenu );
 		//QWidget::update();
 	 }
 }

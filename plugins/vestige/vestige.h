@@ -1,7 +1,7 @@
 /*
  * vestige.h - instrument VeSTige for hosting VST-plugins
  *
- * Copyright (c) 2005-2011 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2012 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -145,8 +145,8 @@ protected slots:
 	void managePlugin( void );
 	void openPreset( void );
 	void savePreset( void );
-	void rollPreset( void );
-	void rolrPreset( void );
+	void nextProgram();
+	void previousProgram();
 	void selPreset( void );
 	void toggleGUI( void );
 	void noteOffAll( void );

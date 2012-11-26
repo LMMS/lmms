@@ -163,8 +163,11 @@ public:
 	// determine product-string of plugin
 	const char * pluginProductString();
 
-	// determine name of plugipn preset
+	// determine name of plugin preset
 	const char * presetName();
+
+	// send name of current program back to host
+	void sendCurrentProgramName();
 
 	// do a complete parameter-dump and post it
 	void getParameterDump();
@@ -182,13 +185,16 @@ public:
 	void loadChunkFromFile( const std::string & _file, int _len );
 
 	// restore settings chunk of plugin from file
-	void loadChunkFromPresetFile( const std::string & _file );
+	void loadPresetFile( const std::string & _file );
 
-	// restore settings chunk of plugin from file
-	void rotateProgram( int _len );
+	// sets given program index
+	void setProgram( int index );
 
-	// Load names VST of presets/programs
-	void loadPrograms( int _len );
+	// rotate current program by given offset
+	void rotateProgram( int offset );
+
+	// Load names of presets/programs
+	void getProgramNames();
 
 	// Save presets/programs
 	void savePreset( const std::string & _file );
@@ -401,29 +407,33 @@ bool RemoteVstPlugin::processMessage( const message & _m )
 			sendMessage( IdLoadSettingsFromFile );
 			break;
 
-		case IdLoadChunkFromPresetFile:
-			loadChunkFromPresetFile( _m.getString( 0 ) );
-			sendMessage( IdLoadChunkFromPresetFile );
+		case IdLoadPresetFile:
+			loadPresetFile( _m.getString( 0 ) );
+			sendMessage( IdLoadPresetFile );
 			break;
 
-		case IdRotateProgram:
+		case IdVstSetProgram:
+			setProgram( _m.getInt( 0 ) );
+			sendMessage( IdVstSetProgram );
+			break;
+
+		case IdVstRotateProgram:
 			rotateProgram( _m.getInt( 0 ) );
-			sendMessage( IdRotateProgram );
+			sendMessage( IdVstRotateProgram );
 			break;
 
-		case IdLoadPrograms:
-			loadPrograms( _m.getInt( 0 ) );
-			sendMessage( IdLoadPrograms );
+		case IdVstProgramNames:
+			getProgramNames();
 			break;
 
-		case IdSavePreset:
+		case IdSavePresetFile:
 			savePreset( _m.getString( 0 ) );
-			sendMessage( IdSavePreset );
+			sendMessage( IdSavePresetFile );
 			break;
 
-		case IdSetParameter:
+		case IdVstSetParameter:
 			m_plugin->setParameter( m_plugin, _m.getInt( 0 ), _m.getFloat( 1 ) );
-			sendMessage( IdSetParameter );
+			sendMessage( IdVstSetParameter );
 			break;
 
 
@@ -691,7 +701,6 @@ void RemoteVstPlugin::process( const sampleFrame * _in, sampleFrame * _out )
 #endif
 
 	m_currentSamplePos += bufferSize();
-
 }
 
 
@@ -771,12 +780,23 @@ const char * RemoteVstPlugin::pluginProductString()
 const char * RemoteVstPlugin::presetName()
 {
 	static char buf[32];
-	buf[0] = 0;
 
-	m_plugin->dispatcher(m_plugin, effGetProgramName, 0, 0, buf, 0);
+	memset( buf, 0, sizeof( buf ) );
+
+	pluginDispatch( effGetProgramName, 0, 0, buf );
 
 	buf[31] = 0;
 	return buf;
+}
+
+
+
+void RemoteVstPlugin::sendCurrentProgramName()
+{
+	char presName[64];
+	sprintf( presName, " %d/%d: %s", pluginDispatch( effGetProgram ) + 1, m_plugin->numPrograms, presetName() );
+
+	sendMessage( message( IdVstCurrentProgramName ).addString( presName ) );
 }
 
 
@@ -869,30 +889,55 @@ void RemoteVstPlugin::saveChunkToFile( const std::string & _file )
 
 
 
-void RemoteVstPlugin::rotateProgram( int _len )
+void RemoteVstPlugin::setProgram( int program )
 {
-	int currProgram;
-	if (isInitialized() == false) return;
-	if (_len <= 1) {
-		currProgram = m_plugin->dispatcher(m_plugin, effGetProgram, 0, 0, 0, 0) + _len;
-		if (currProgram >= m_plugin->numPrograms) currProgram = m_plugin->numPrograms - 1;
-		if (currProgram < 0) currProgram = 0;
-		m_plugin->dispatcher(m_plugin, effSetProgram, 0, currProgram++, 0, 0);
-	} else {
-		m_plugin->dispatcher(m_plugin, effSetProgram, 0, _len - 2, 0, 0);
-		currProgram = _len - 1;
+	if( isInitialized() == false )
+	{
+		return;
 	}
 
-	char presName[64];
-	sprintf( presName, " %d/%d: %s", currProgram, m_plugin->numPrograms, presetName() );
+	if( program < 0 )
+	{
+		program = 0;
+	}
+	else if( program >= m_plugin->numPrograms )
+	{
+		program = m_plugin->numPrograms - 1;
+	}
+	pluginDispatch( effSetProgram, 0, program );
 
-	sendMessage( message( IdVstPluginPresetString ).addString( presName ) );
+	sendCurrentProgramName();
 }
 
 
 
 
-void RemoteVstPlugin::loadPrograms( int _len )
+void RemoteVstPlugin::rotateProgram( int offset )
+{
+	if( isInitialized() == false )
+	{
+		return;
+	}
+
+	int newProgram = pluginDispatch( effGetProgram ) + offset;
+
+	if( newProgram < 0 )
+	{
+		newProgram = 0;
+	}
+	else if( newProgram >= m_plugin->numPrograms )
+	{
+		newProgram = m_plugin->numPrograms - 1;
+	}
+	pluginDispatch( effSetProgram, 0, newProgram );
+
+	sendCurrentProgramName();
+}
+
+
+
+
+void RemoteVstPlugin::getProgramNames()
 {
 	char presName[1024+256*30];
 	char curProgName[30];
@@ -917,7 +962,7 @@ void RemoteVstPlugin::loadPrograms( int _len )
 		}
 	} else sprintf( presName, "%s", presetName() );
 
-	sendMessage( message( IdVstPluginPresetsString ).addString( presName ) );
+	sendMessage( message( IdVstProgramNames ).addString( presName ) );
 }
 
 
@@ -1034,7 +1079,7 @@ void RemoteVstPlugin::savePreset( const std::string & _file )
 
 
 
-void RemoteVstPlugin::loadChunkFromPresetFile( const std::string & _file )
+void RemoteVstPlugin::loadPresetFile( const std::string & _file )
 {
 	void * chunk = NULL;
 	unsigned int * pLen = new unsigned int[ 1 ];
@@ -1048,7 +1093,7 @@ void RemoteVstPlugin::loadChunkFromPresetFile( const std::string & _file )
 	float * pFloat;
 
 	if (m_plugin->uniqueID != pBank->fxID) {
-		sendMessage( message( IdVstPluginPresetString ).
+		sendMessage( message( IdVstCurrentProgramName ).
 					addString( "Error: Plugin UniqID not match" ) );
 		fclose( stream );
 		delete[] (unsigned int*)pLen;
@@ -1106,11 +1151,8 @@ void RemoteVstPlugin::loadChunkFromPresetFile( const std::string & _file )
 			fclose( stream );
 		}
 	}
-	char presName[64];
-	int currProgram = m_plugin->dispatcher(m_plugin, effGetProgram, 0, 0, 0, 0) + 1;
-	sprintf( presName, " %d/%d: %s", currProgram, m_plugin->numPrograms, presetName() );
 
-	sendMessage( message( IdVstPluginPresetString ).addString( presName ) );
+	sendCurrentProgramName();
 
 	delete[] (unsigned int*)pLen;
 	delete[] (sBank*)pBank;

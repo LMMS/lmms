@@ -1,7 +1,7 @@
 /*
  * VstPlugin.h - declaration of VstPlugin class
  *
- * Copyright (c) 2005-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2012 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -75,15 +75,17 @@ public:
 		return m_productString;
 	}
 
-	inline const QString & presetString() const
+	inline const QString& currentProgramName() const
 	{
-		return m_presetString;
+		return m_currentProgramName;
 	}
 
-	inline const QString & presetsString() const
+	inline const QString& allProgramNames() const
 	{
-		return m_presetsString;
+		return m_allProgramNames;
 	}
+
+	int currentProgram();
 
 	const QMap<QString, QString> & parameterDump();
 	void setParameterDump( const QMap<QString, QString> & _pdump );
@@ -114,8 +116,9 @@ public slots:
 	void setTempo( bpm_t _bpm );
 	void updateSampleRate();
 	void openPreset( void );
-	void rollPreset( int step );
-	void loadPrograms( int step );
+	void setProgram( int index );
+	void rotateProgram( int offset );
+	void loadProgramNames();
 	void savePreset( void );
 	void setParam( int i, float f );
 
@@ -135,8 +138,8 @@ private:
 	Sint32 m_version;
 	QString m_vendorString;
 	QString m_productString;
-	QString m_presetString;
-	QString m_presetsString;
+	QString m_currentProgramName;
+	QString m_allProgramNames;
 
 	QString p_name;
 

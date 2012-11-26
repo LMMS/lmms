@@ -1,7 +1,7 @@
 /*
  * RemoteZynAddSubFx.cpp - ZynAddSubFx-embedding plugin
  *
- * Copyright (c) 2008-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2012 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -98,7 +98,7 @@ public:
 			case IdShowUI:
 			case IdHideUI:
 			case IdLoadSettingsFromFile:
-			case IdLoadPresetFromFile:
+			case IdLoadPresetFile:
 				pthread_mutex_lock( &m_guiMutex );
 				m_guiMessages.push( _m );
 				pthread_mutex_unlock( &m_guiMutex );
@@ -221,7 +221,7 @@ void RemoteZynAddSubFx::guiThread()
 					break;
 				}
 
-				case IdLoadPresetFromFile:
+				case IdLoadPresetFile:
 				{
 					LocalZynAddSubFx::loadPreset( m.getString(), ui ?
 											ui->npartcounter->value()-1 : 0 );
@@ -232,7 +232,7 @@ void RemoteZynAddSubFx::guiThread()
 						ui->refresh_master_ui();
 					}
 					pthread_mutex_lock( &m_master->mutex );
-					sendMessage( IdLoadPresetFromFile );
+					sendMessage( IdLoadPresetFile );
 					pthread_mutex_unlock( &m_master->mutex );
 					break;
 				}

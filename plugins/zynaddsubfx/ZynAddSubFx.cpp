@@ -290,8 +290,8 @@ void ZynAddSubFxInstrument::loadFile( const QString & _file )
 	{
 		m_remotePlugin->lock();
 		m_remotePlugin->sendMessage(
-			RemotePlugin::message( IdLoadPresetFromFile ).addString( fn ) );
-		m_remotePlugin->waitForMessage( IdLoadPresetFromFile );
+			RemotePlugin::message( IdLoadPresetFile ).addString( fn ) );
+		m_remotePlugin->waitForMessage( IdLoadPresetFile );
 		m_remotePlugin->unlock();
 	}
 	else

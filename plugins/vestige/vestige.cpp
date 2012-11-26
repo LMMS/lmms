@@ -1,7 +1,7 @@
 /*
  * vestige.cpp - instrument-plugin for hosting VST-instruments
  *
- * Copyright (c) 2005-2011 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2012 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -398,7 +398,7 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 	m_rolLPresetButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"stepper-left" ) );
 	connect( m_rolLPresetButton, SIGNAL( clicked() ), this,
-						SLOT( rolrPreset() ) );
+						SLOT( previousProgram() ) );
 	toolTip::add( m_rolLPresetButton, tr( "Previous (-)" ) );
 
 	m_rolLPresetButton->setShortcut( Qt::Key_Minus );
@@ -432,7 +432,7 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 	m_rolRPresetButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"stepper-right" ) );
 	connect( m_rolRPresetButton, SIGNAL( clicked() ), this,
-						SLOT( rollPreset() ) );
+						SLOT( nextProgram() ) );
 	toolTip::add( m_rolRPresetButton, tr( "Next (+)" ) );
 
 	m_rolRPresetButton->setShortcut( Qt::Key_Plus );
@@ -501,11 +501,12 @@ void VestigeInstrumentView::updateMenu( void )
 {
 
 	// get all presets -
-	if ( m_vi->m_plugin != NULL ) {
-		m_vi->m_plugin->loadPrograms( 1 );
+	if ( m_vi->m_plugin != NULL )
+	{
+		m_vi->m_plugin->loadProgramNames();
 		QWidget::update();
 
-     		QString str = m_vi->m_plugin->presetsString();
+     		QString str = m_vi->m_plugin->allProgramNames();
 
     		QStringList list1 = str.split("|");
 
@@ -600,13 +601,13 @@ void VestigeInstrumentView::openPlugin()
 
 
 
-void VestigeInstrumentView::openPreset( void )
+void VestigeInstrumentView::openPreset()
 {
 
 	if ( m_vi->m_plugin != NULL ) {
 		m_vi->m_plugin->openPreset( );
     		bool converted;
-    		QString str = m_vi->m_plugin->presetString().section("/", 0, 0);
+    		QString str = m_vi->m_plugin->currentProgramName().section("/", 0, 0);
      		if (str != "")
    			lastPosInMenu = str.toInt(&converted, 10) - 1;
 		QWidget::update();
@@ -617,10 +618,11 @@ void VestigeInstrumentView::openPreset( void )
 
 
 
-void VestigeInstrumentView::savePreset( void )
+void VestigeInstrumentView::savePreset()
 {
 
-	if ( m_vi->m_plugin != NULL ) {
+	if ( m_vi->m_plugin != NULL )
+	{
 		m_vi->m_plugin->savePreset( );
 /*    		bool converted;
     		QString str = m_vi->m_plugin->presetString().section("/", 0, 0);
@@ -634,13 +636,13 @@ void VestigeInstrumentView::savePreset( void )
 
 
 
-void VestigeInstrumentView::rollPreset( void )
+void VestigeInstrumentView::nextProgram()
 {
 
 	if ( m_vi->m_plugin != NULL ) {
-		m_vi->m_plugin->rollPreset( 1 );
+		m_vi->m_plugin->rotateProgram( 1 );
     		bool converted;
-    		QString str = m_vi->m_plugin->presetString().section("/", 0, 0);
+    		QString str = m_vi->m_plugin->currentProgramName().section("/", 0, 0);
      		if (str != "")
    			lastPosInMenu = str.toInt(&converted, 10) - 1;
 		QWidget::update();
@@ -650,13 +652,13 @@ void VestigeInstrumentView::rollPreset( void )
 
 
 
-void VestigeInstrumentView::rolrPreset( void )
+void VestigeInstrumentView::previousProgram()
 {
 
 	if ( m_vi->m_plugin != NULL ) {
-		m_vi->m_plugin->rollPreset( -1 );
+		m_vi->m_plugin->rotateProgram( -1 );
     		bool converted;
-    		QString str = m_vi->m_plugin->presetString().section("/", 0, 0);
+    		QString str = m_vi->m_plugin->currentProgramName().section("/", 0, 0);
      		if (str != "")
    			lastPosInMenu = str.toInt(&converted, 10) - 1;
 		QWidget::update();
@@ -673,7 +675,7 @@ void VestigeInstrumentView::selPreset( void )
      if (action)
          if ( m_vi->m_plugin != NULL ) {
 		lastPosInMenu = action->data().toInt();
-		m_vi->m_plugin->rollPreset( action->data().toInt() + 2 );
+		m_vi->m_plugin->setProgram( action->data().toInt() );
 		QWidget::update();
 	 }
 }
@@ -790,7 +792,7 @@ void VestigeInstrumentView::paintEvent( QPaintEvent * )
 		p.setFont( pointSize<8>( f ) );
 		p.drawText( 10, 114, tr( "by" ) + " " +
 					m_vi->m_plugin->vendorString() );
-		p.drawText( 10, 225, m_vi->m_plugin->presetString() );
+		p.drawText( 10, 225, m_vi->m_plugin->currentProgramName() );
 	}
 //	m_pluginMutex.unlock();
 }
