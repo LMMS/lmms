@@ -291,6 +291,7 @@ private:
 
 	bpm_t m_bpm;
 	double m_currentSamplePos;
+	int m_currentProgram;
 
 } ;
 
@@ -312,7 +313,8 @@ RemoteVstPlugin::RemoteVstPlugin( key_t _shm_in, key_t _shm_out ) :
 	m_outputs( NULL ),
 	m_midiEvents(),
 	m_bpm( 0 ),
-	m_currentSamplePos( 0 )
+	m_currentSamplePos( 0 ),
+	m_currentProgram( -1 )
 {
 	pthread_mutex_init( &m_pluginLock, NULL );
 
@@ -701,6 +703,13 @@ void RemoteVstPlugin::process( const sampleFrame * _in, sampleFrame * _out )
 #endif
 
 	m_currentSamplePos += bufferSize();
+
+	int newCurrentProgram = pluginDispatch( effGetProgram );
+	if( newCurrentProgram != m_currentProgram )
+	{
+		m_currentProgram = newCurrentProgram;
+		sendCurrentProgramName();
+	}
 }
 
 
