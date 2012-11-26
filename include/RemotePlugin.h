@@ -284,7 +284,7 @@ public:
 	// recursive lock
 	inline void lock()
 	{
-		if( !isInvalid() && ++m_lockDepth == 1 )
+		if( !isInvalid() && __sync_add_and_fetch( &m_lockDepth, 1 ) == 1 )
 		{
 #ifdef USE_QT_SEMAPHORES
 			m_dataSem.acquire();
@@ -297,16 +297,13 @@ public:
 	// recursive unlock
 	inline void unlock()
 	{
-		if( m_lockDepth > 0 )
+		if( __sync_sub_and_fetch( &m_lockDepth, 1) <= 0 )
 		{
-			if( --m_lockDepth == 0 )
-			{
 #ifdef USE_QT_SEMAPHORES
-				m_dataSem.release();
+			m_dataSem.release();
 #else
-				sem_post( m_dataSem );
+			sem_post( m_dataSem );
 #endif
-			}
 		}
 	}
 
@@ -484,7 +481,7 @@ private:
 	sem_t * m_dataSem;
 	sem_t * m_messageSem;
 #endif
-	int m_lockDepth;
+	volatile int m_lockDepth;
 
 } ;
 
