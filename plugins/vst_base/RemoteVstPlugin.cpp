@@ -419,6 +419,10 @@ bool RemoteVstPlugin::processMessage( const message & _m )
 			sendMessage( IdVstSetProgram );
 			break;
 
+		case IdVstCurrentProgram:
+			sendMessage( message( IdVstCurrentProgram ).addInt( m_currentProgram ) );
+			break;
+
 		case IdVstRotateProgram:
 			rotateProgram( _m.getInt( 0 ) );
 			sendMessage( IdVstRotateProgram );

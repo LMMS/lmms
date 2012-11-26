@@ -145,6 +145,8 @@ private:
 
 	QMap<QString, QString> m_parameterDump;
 
+	int m_currentProgram;
+
 } ;
 
 

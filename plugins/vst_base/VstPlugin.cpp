@@ -90,7 +90,8 @@ VstPlugin::VstPlugin( const QString & _plugin ) :
 	m_productString(),
 	m_currentProgramName(),
 	m_allProgramNames(),
-	p_name()
+	p_name(),
+	m_currentProgram()
 {
 	setSplittedChannels( true );
 
@@ -279,6 +280,10 @@ void VstPlugin::loadSettings( const QDomElement & _this )
 		setParameterDump( dump );
 	}
 
+	if( _this.hasAttribute( "program" ) )
+	{
+		setProgram( _this.attribute( "program" ).toInt() );
+	}
 }
 
 
@@ -309,6 +314,8 @@ void VstPlugin::saveSettings( QDomDocument & _doc, QDomElement & _this )
 			_this.setAttribute( it.key(), it.value() );
 		}
 	}
+
+	_this.setAttribute( "program", currentProgram() );
 }
 
 
@@ -332,6 +339,18 @@ void VstPlugin::updateSampleRate()
 	unlock();
 }
 
+
+
+
+int VstPlugin::currentProgram()
+{
+	lock();
+	sendMessage( message( IdVstCurrentProgram ) );
+	waitForMessage( IdVstCurrentProgram );
+	unlock();
+
+	return m_currentProgram;
+}
 
 
 
@@ -404,6 +423,10 @@ bool VstPlugin::processMessage( const message & _m )
 
 		case IdVstPluginProductString:
 			m_productString = _m.getQString();
+			break;
+
+		case IdVstCurrentProgram:
+			m_currentProgram = _m.getInt();
 			break;
 
 		case IdVstCurrentProgramName:

@@ -65,6 +65,7 @@ enum VstRemoteMessageIDs
 	IdVstSetParameterDump,
 	IdVstGetParameterProperties,
 	IdVstProgramNames,
+	IdVstCurrentProgram,
 	IdVstCurrentProgramName,
 	IdVstSetProgram,
 	IdVstRotateProgram,
