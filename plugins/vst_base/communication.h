@@ -69,6 +69,7 @@ enum VstRemoteMessageIDs
 	IdVstCurrentProgramName,
 	IdVstSetProgram,
 	IdVstRotateProgram,
+	IdVstIdleUpdate,
 
 	// remoteVstPlugin -> vstPlugin
 	IdVstFailedLoadingPlugin,

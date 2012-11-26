@@ -28,6 +28,7 @@
 #include <QtCore/QMutex>
 #include <QtCore/QPointer>
 #include <QtCore/QString>
+#include <QtCore/QTimer>
 #include <QtGui/QWidget>
 
 #include "mixer.h"
@@ -121,6 +122,7 @@ public slots:
 	void loadProgramNames();
 	void savePreset( void );
 	void setParam( int i, float f );
+	void idleUpdate();
 
 
 private:
@@ -146,6 +148,8 @@ private:
 	QMap<QString, QString> m_parameterDump;
 
 	int m_currentProgram;
+
+	QTimer m_idleTimer;
 
 } ;
 

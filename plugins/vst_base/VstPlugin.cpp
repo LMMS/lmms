@@ -91,7 +91,8 @@ VstPlugin::VstPlugin( const QString & _plugin ) :
 	m_currentProgramName(),
 	m_allProgramNames(),
 	p_name(),
-	m_currentProgram()
+	m_currentProgram(),
+	m_idleTimer()
 {
 	setSplittedChannels( true );
 
@@ -110,6 +111,11 @@ VstPlugin::VstPlugin( const QString & _plugin ) :
 			this, SLOT( setTempo( bpm_t ) ) );
 	connect( engine::getMixer(), SIGNAL( sampleRateChanged() ),
 				this, SLOT( updateSampleRate() ) );
+
+	// update once per second
+	m_idleTimer.start( 1000 );
+	connect( &m_idleTimer, SIGNAL( timeout() ),
+				this, SLOT( idleUpdate() ) );
 }
 
 
@@ -572,6 +578,14 @@ void VstPlugin::setParam( int i, float f )
 	unlock();
 }
 
+
+
+void VstPlugin::idleUpdate()
+{
+	lock();
+	sendMessage( message( IdVstIdleUpdate ) );
+	unlock();
+}
 
 
 

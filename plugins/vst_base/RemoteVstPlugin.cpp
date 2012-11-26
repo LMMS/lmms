@@ -438,11 +438,24 @@ bool RemoteVstPlugin::processMessage( const message & _m )
 			break;
 
 		case IdVstSetParameter:
+			lock();
 			m_plugin->setParameter( m_plugin, _m.getInt( 0 ), _m.getFloat( 1 ) );
+			unlock();
 			sendMessage( IdVstSetParameter );
 			break;
 
 
+		case IdVstIdleUpdate:
+		{
+			int newCurrentProgram = pluginDispatch( effGetProgram );
+			if( newCurrentProgram != m_currentProgram )
+			{
+				m_currentProgram = newCurrentProgram;
+				sendCurrentProgramName();
+			}
+
+			break;
+		}
 
 		default:
 			return RemotePluginClient::processMessage( _m );
@@ -691,6 +704,8 @@ void RemoteVstPlugin::process( const sampleFrame * _in, sampleFrame * _out )
 		memset( m_outputs[i], 0, bufferSize() * sizeof( float ) );
 	}
 
+	lock();
+
 #ifdef OLD_VST_SDK
 	if( m_plugin->flags & effFlagsCanReplacing )
 	{
@@ -706,14 +721,9 @@ void RemoteVstPlugin::process( const sampleFrame * _in, sampleFrame * _out )
 	}
 #endif
 
-	m_currentSamplePos += bufferSize();
+	unlock();
 
-	int newCurrentProgram = pluginDispatch( effGetProgram );
-	if( newCurrentProgram != m_currentProgram )
-	{
-		m_currentProgram = newCurrentProgram;
-		sendCurrentProgramName();
-	}
+	m_currentSamplePos += bufferSize();
 }
 
 
@@ -807,7 +817,7 @@ const char * RemoteVstPlugin::presetName()
 void RemoteVstPlugin::sendCurrentProgramName()
 {
 	char presName[64];
-	sprintf( presName, " %d/%d: %s", pluginDispatch( effGetProgram ) + 1, m_plugin->numPrograms, presetName() );
+	sprintf( presName, "%d/%d: %s", pluginDispatch( effGetProgram ) + 1, m_plugin->numPrograms, presetName() );
 
 	sendMessage( message( IdVstCurrentProgramName ).addString( presName ) );
 }
