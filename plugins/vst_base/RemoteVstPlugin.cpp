@@ -163,8 +163,8 @@ public:
 	// determine product-string of plugin
 	const char * pluginProductString();
 
-	// determine name of plugin preset
-	const char * presetName();
+	// determine name of current program
+	const char * programName();
 
 	// send name of current program back to host
 	void sendCurrentProgramName();
@@ -800,7 +800,7 @@ const char * RemoteVstPlugin::pluginProductString()
 
 
 
-const char * RemoteVstPlugin::presetName()
+const char * RemoteVstPlugin::programName()
 {
 	static char buf[32];
 
@@ -817,7 +817,7 @@ const char * RemoteVstPlugin::presetName()
 void RemoteVstPlugin::sendCurrentProgramName()
 {
 	char presName[64];
-	sprintf( presName, "%d/%d: %s", pluginDispatch( effGetProgram ) + 1, m_plugin->numPrograms, presetName() );
+	sprintf( presName, "%d/%d: %s", pluginDispatch( effGetProgram ) + 1, m_plugin->numPrograms, programName() );
 
 	sendMessage( message( IdVstCurrentProgramName ).addString( presName ) );
 }
@@ -982,12 +982,12 @@ void RemoteVstPlugin::getProgramNames()
 			for (int i = 0; i< (m_plugin->numPrograms >= 256?256:m_plugin->numPrograms); i++)
 			{
 				pluginDispatch( effSetProgram, 0, i );
-				if (i == 0) 	sprintf( presName, "%s", presetName() );
-				else		sprintf( presName + strlen(presName), "|%s", presetName() );
+				if (i == 0) 	sprintf( presName, "%s", programName() );
+				else		sprintf( presName + strlen(presName), "|%s", programName() );
 			}
 			pluginDispatch( effSetProgram, 0, currProgram );
 		}
-	} else sprintf( presName, "%s", presetName() );
+	} else sprintf( presName, "%s", programName() );
 
 	presName[sizeof(presName)-1] = 0;
 
