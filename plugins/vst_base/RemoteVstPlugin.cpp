@@ -802,13 +802,14 @@ const char * RemoteVstPlugin::pluginProductString()
 
 const char * RemoteVstPlugin::programName()
 {
-	static char buf[32];
+	static char buf[24];
 
 	memset( buf, 0, sizeof( buf ) );
 
 	pluginDispatch( effGetProgramName, 0, 0, buf );
 
-	buf[31] = 0;
+	buf[24] = 0;
+
 	return buf;
 }
 
@@ -826,17 +827,19 @@ void RemoteVstPlugin::sendCurrentProgramName()
 
 void RemoteVstPlugin::getParameterDump()
 {
-	char curPresName[30];
 	//VstParameterProperties vst_props;
  	message m( IdVstParameterDump );
  	m.addInt( m_plugin->numParams );
  	for( int i = 0; i < m_plugin->numParams; ++i )
  	{
-		//pluginDispatch( effGetParameterProperties, i, 0, &vst_props );
-		pluginDispatch( effGetParamName, i, 0, curPresName );
+		char paramName[32];
+		pluginDispatch( effGetParamName, i, 0, paramName );
+		paramName[31] = 0;
  		m.addInt( i );
-		m.addString( /*vst_props.shortLabel*/curPresName );
+		m.addString( paramName );
+		lock();
  		m.addFloat( m_plugin->getParameter( m_plugin, i ) );
+		unlock();
  	}
  	sendMessage( m );
 }
@@ -846,6 +849,7 @@ void RemoteVstPlugin::getParameterDump()
 
 void RemoteVstPlugin::setParameterDump( const message & _m )
 {
+	lock();
 	const int n = _m.getInt( 0 );
 	const int params = ( n > m_plugin->numParams ) ?
 					m_plugin->numParams : n;
@@ -858,6 +862,7 @@ void RemoteVstPlugin::setParameterDump( const message & _m )
 		item.value = _m.getFloat( ++p );
 		m_plugin->setParameter( m_plugin, item.index, item.value );
 	}
+	unlock();
 }
 
 
@@ -1037,12 +1042,14 @@ void RemoteVstPlugin::savePreset( const std::string & _file )
 			chunk_size = m_plugin->numParams * sizeof( float );
 			data = new char[ chunk_size ];
 			unsigned int* toUIntArray = reinterpret_cast<unsigned int*>( data );
+			lock();
 			for ( int i = 0; i < m_plugin->numParams; i++ )
 			{
 				float value = m_plugin->getParameter( m_plugin, i );
 				unsigned int * pValue = ( unsigned int * ) &value;
 				toUIntArray[ i ] = endian_swap( *pValue );
 			}
+			unlock();
 		} else chunk_size = (((m_plugin->numParams * sizeof( float )) + 56)*m_plugin->numPrograms);
 	}
 
@@ -1088,12 +1095,14 @@ void RemoteVstPlugin::savePreset( const std::string & _file )
 			pluginDispatch( effSetProgram, 0, j );
 			pluginDispatch( effGetProgramName, 0, 0, pBank->prgName );
 			fwrite ( pBank, 1, 56, stream );
+			lock();
 			for ( int i = 0; i < m_plugin->numParams; i++ )
 			{
 				value = m_plugin->getParameter( m_plugin, i );
 				pValue = ( unsigned int * ) &value;
 				toUIntArray[ i ] = endian_swap( *pValue );
 			}
+			unlock();
 			fwrite ( data, 1, chunk_size, stream );
 		}
 		pluginDispatch( effSetProgram, 0, currProgram );
@@ -1148,13 +1157,17 @@ void RemoteVstPlugin::loadPresetFile( const std::string & _file )
 		pluginDispatch( 4, 0, 0, pBank->prgName );
 		if(pBank->fxMagic != 0x6B437846)
 			pluginDispatch( 24, 1, len, chunk );
-		else {
+		else
+		{
+			lock();
 			unsigned int* toUIntArray = reinterpret_cast<unsigned int*>( chunk );
-			for (int i = 0; i < pBank->numPrograms; i++ ) {
+			for (int i = 0; i < pBank->numPrograms; i++ )
+			{
 				toUInt = endian_swap( toUIntArray[ i ] );
 				pFloat = ( float* ) &toUInt;
 				m_plugin->setParameter( m_plugin, i, *pFloat );
 			}
+			unlock();
 		}
 	} else {
 		if(pBank->fxMagic != 0x6B427846) {
@@ -1165,6 +1178,7 @@ void RemoteVstPlugin::loadPresetFile( const std::string & _file )
 			int currProgram = pluginDispatch( effGetProgram );
 			chunk = new char[ len = sizeof(float)*m_plugin->numParams ];
 			toUIntArray = reinterpret_cast<unsigned int *>( chunk );
+			lock();
 			for (int i =0; i < numPrograms; i++) {
 				fread (pBank, 1, 56, stream);
 				fread (chunk, len, 1, stream);
@@ -1177,6 +1191,7 @@ void RemoteVstPlugin::loadPresetFile( const std::string & _file )
 					m_plugin->setParameter( m_plugin, j, *pFloat );
 				}
 			}
+			unlock();
 			pluginDispatch( effSetProgram, 0, currProgram );
 			fclose( stream );
 		}
