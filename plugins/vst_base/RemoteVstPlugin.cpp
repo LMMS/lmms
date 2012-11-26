@@ -823,7 +823,7 @@ void RemoteVstPlugin::getParameterDump()
  	for( int i = 0; i < m_plugin->numParams; ++i )
  	{
 		//pluginDispatch( effGetParameterProperties, i, 0, &vst_props );
-		m_plugin->dispatcher(m_plugin, effGetParamName, i, 0, curPresName, 0);
+		pluginDispatch( effGetParamName, i, 0, curPresName );
  		m.addInt( i );
 		m.addString( /*vst_props.shortLabel*/curPresName );
  		m.addFloat( m_plugin->getParameter( m_plugin, i ) );
@@ -955,25 +955,31 @@ void RemoteVstPlugin::getProgramNames()
 	char presName[1024+256*30];
 	char curProgName[30];
 	if (isInitialized() == false) return;
-	bool progNameIndexed = (m_plugin->dispatcher(m_plugin, 29, 0, -1, curProgName, 0) == 1);
+	bool progNameIndexed = ( pluginDispatch( 29, 0, -1, curProgName ) == 1 );
 
 	if (m_plugin->numPrograms > 1) {
 		if (progNameIndexed) {
-			for (int i = 0; i< (m_plugin->numPrograms >= 256?256:m_plugin->numPrograms); i++) {
-				m_plugin->dispatcher(m_plugin, 29, i, -1, curProgName, 0);
+			for (int i = 0; i< (m_plugin->numPrograms >= 256?256:m_plugin->numPrograms); i++)
+			{
+				pluginDispatch( 29, i, -1, curProgName );
 				if (i == 0) 	sprintf( presName, "%s", curProgName );
 				else		sprintf( presName + strlen(presName), "|%s", curProgName );
 			}
-		} else {
-			int currProgram = m_plugin->dispatcher(m_plugin, effGetProgram, 0, 0, 0, 0);
-			for (int i = 0; i< (m_plugin->numPrograms >= 256?256:m_plugin->numPrograms); i++) {
-				m_plugin->dispatcher(m_plugin, effSetProgram, 0, i, 0, 0);
+		}
+		else
+		{
+			int currProgram = pluginDispatch( effGetProgram );
+			for (int i = 0; i< (m_plugin->numPrograms >= 256?256:m_plugin->numPrograms); i++)
+			{
+				pluginDispatch( effSetProgram, 0, i );
 				if (i == 0) 	sprintf( presName, "%s", presetName() );
 				else		sprintf( presName + strlen(presName), "|%s", presetName() );
 			}
-			m_plugin->dispatcher(m_plugin, effSetProgram, 0, currProgram, 0, 0);
+			pluginDispatch( effSetProgram, 0, currProgram );
 		}
 	} else sprintf( presName, "%s", presetName() );
+
+	presName[sizeof(presName)-1] = 0;
 
 	sendMessage( message( IdVstProgramNames ).addString( presName ) );
 }
@@ -1008,13 +1014,14 @@ void RemoteVstPlugin::savePreset( const std::string & _file )
 	bool isPreset = _file.substr( _file.find_last_of( "." ) + 1 )  == "fxp";
 	int presNameLen = _file.find_last_of( "/" ) + _file.find_last_of( "\\" ) + 2;
 
-	if (isPreset) {
+	if (isPreset)
+	{
 		for (int i = 0; i < _file.length() - 4 - presNameLen; i++) 
 			progName[i] = i < 23 ? _file[presNameLen + i] : 0;
-		m_plugin->dispatcher(m_plugin, 4, 0, 0, progName, 0);
-	} //	m_plugin->dispatcher( m_plugin, effGetProgramName, 0, 0, progName, 0.0f );
+		pluginDispatch( 4, 0, 0, progName );
+	}
 	if ( chunky )
-		chunk_size = m_plugin->dispatcher( m_plugin, 23, isPreset, 0, &data, false );
+		chunk_size = pluginDispatch( 23, isPreset, 0, &data );
 	else {
 		if (isPreset) {
 			chunk_size = m_plugin->numParams * sizeof( float );
@@ -1057,7 +1064,7 @@ void RemoteVstPlugin::savePreset( const std::string & _file )
 		fwrite ( data, 1, chunk_size, stream );
 	else {
 		int numPrograms = m_plugin->numPrograms;
-		int currProgram = m_plugin->dispatcher(m_plugin, effGetProgram, 0, 0, 0, 0);
+		int currProgram = pluginDispatch( effGetProgram );
 		chunk_size = (m_plugin->numParams * sizeof( float ));
 		pBank->byteSize = chunk_size + 48;
 		pBank->byteSize = endian_swap( pBank->byteSize );
@@ -1068,8 +1075,8 @@ void RemoteVstPlugin::savePreset( const std::string & _file )
 		unsigned int* pValue,* toUIntArray = reinterpret_cast<unsigned int*>( data );
 		float value;
 		for (int j = 0; j < numPrograms; j++) {
-			m_plugin->dispatcher(m_plugin, effSetProgram, 0, j, 0, 0);
-			m_plugin->dispatcher(m_plugin, effGetProgramName, 0, 0, pBank->prgName, 0);
+			pluginDispatch( effSetProgram, 0, j );
+			pluginDispatch( effGetProgramName, 0, 0, pBank->prgName );
 			fwrite ( pBank, 1, 56, stream );
 			for ( int i = 0; i < m_plugin->numParams; i++ )
 			{
@@ -1079,7 +1086,7 @@ void RemoteVstPlugin::savePreset( const std::string & _file )
 			}
 			fwrite ( data, 1, chunk_size, stream );
 		}
-		m_plugin->dispatcher(m_plugin, effSetProgram, 0, currProgram, 0, 0);
+		pluginDispatch( effSetProgram, 0, currProgram );
 	}
 	fclose( stream );
 
@@ -1128,9 +1135,9 @@ void RemoteVstPlugin::loadPresetFile( const std::string & _file )
 
 	if(_file.substr(_file.find_last_of(".") + 1) == "fxp") {
 		pBank->prgName[23] = 0;
-		m_plugin->dispatcher(m_plugin, 4, 0, 0, pBank->prgName, 0);
+		pluginDispatch( 4, 0, 0, pBank->prgName );
 		if(pBank->fxMagic != 0x6B437846)
-			m_plugin->dispatcher(m_plugin, 24, 1, len, chunk, 0);
+			pluginDispatch( 24, 1, len, chunk );
 		else {
 			unsigned int* toUIntArray = reinterpret_cast<unsigned int*>( chunk );
 			for (int i = 0; i < pBank->numPrograms; i++ ) {
@@ -1141,26 +1148,26 @@ void RemoteVstPlugin::loadPresetFile( const std::string & _file )
 		}
 	} else {
 		if(pBank->fxMagic != 0x6B427846) {
-			m_plugin->dispatcher(m_plugin, 24, 0, len, chunk, 0);
+			pluginDispatch( 24, 0, len, chunk );
 		} else {
 			int numPrograms = pBank->numPrograms;
 			unsigned int * toUIntArray;
-			int currProgram = m_plugin->dispatcher(m_plugin, effGetProgram, 0, 0, 0, 0);
+			int currProgram = pluginDispatch( effGetProgram );
 			chunk = new char[ len = sizeof(float)*m_plugin->numParams ];
 			toUIntArray = reinterpret_cast<unsigned int *>( chunk );
 			for (int i =0; i < numPrograms; i++) {
 				fread (pBank, 1, 56, stream);
 				fread (chunk, len, 1, stream);
-				m_plugin->dispatcher(m_plugin, effSetProgram, 0, i, 0, 0);
+				pluginDispatch( effSetProgram, 0, i );
 				pBank->prgName[23] = 0;
-				m_plugin->dispatcher(m_plugin, 4, 0, 0, pBank->prgName, 0);
+				pluginDispatch( 4, 0, 0, pBank->prgName );
 				for (int j = 0; j < m_plugin->numParams; j++ ) {
 					toUInt = endian_swap( toUIntArray[ j ] );
 					pFloat = ( float* ) &toUInt;
 					m_plugin->setParameter( m_plugin, j, *pFloat );
 				}
 			}
-			m_plugin->dispatcher(m_plugin, effSetProgram, 0, currProgram, 0, 0);
+			pluginDispatch( effSetProgram, 0, currProgram );
 			fclose( stream );
 		}
 	}
