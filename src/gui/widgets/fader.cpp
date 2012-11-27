@@ -1,8 +1,8 @@
 /*
  * fader.cpp - fader-widget used in mixer - partly taken from Hydrogen
  *
- * Copyright (c) 2008-2011 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ * Copyright (c) 2008-2012 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -153,11 +153,11 @@ void fader::wheelEvent ( QWheelEvent *ev )
 
 	if ( ev->delta() > 0 )
 	{
-		m_model->incValue( 5 );
+		m_model->incValue( 1 );
 	}
 	else
 	{
-		m_model->incValue( -5 );
+		m_model->incValue( -1 );
 	}
 	updateTextFloat();
 	s_textFloat->setVisibilityTimeOut( 1000 );
