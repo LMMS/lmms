@@ -45,6 +45,7 @@
  */
 
 
+#include <QtGui/QInputDialog>
 #include <QtGui/QMouseEvent>
 #include <QtGui/QPaintEvent>
 #include <QtGui/QPainter>
@@ -149,6 +150,27 @@ void fader::mousePressEvent( QMouseEvent* mouseEvent )
 	else
 	{
 		AutomatableModelView::mousePressEvent( mouseEvent );
+	}
+}
+
+
+
+void fader::mouseDoubleClickEvent( QMouseEvent* mouseEvent )
+{
+	bool ok;
+
+	// TODO: dbV handling
+	int newValue = QInputDialog::getInteger( this, windowTitle(),
+				tr( "Please enter a new value between %1 and %2:" ).
+						arg( model()->minValue()*100 ).
+						arg( model()->maxValue()*100 ),
+					model()->value()*100,
+					model()->minValue()*100,
+					model()->maxValue()*100, 1, &ok );
+
+	if( ok )
+	{
+		model()->setValue( newValue / 100.0f );
 	}
 }
 

@@ -74,6 +74,7 @@ public:
 private:
 	virtual void contextMenuEvent( QContextMenuEvent * _me );
 	virtual void mousePressEvent( QMouseEvent *ev );
+	virtual void mouseDoubleClickEvent( QMouseEvent* mouseEvent );
 	virtual void mouseMoveEvent( QMouseEvent *ev );
 	virtual void mouseReleaseEvent( QMouseEvent * _me );
 	virtual void wheelEvent( QWheelEvent *ev );
