@@ -1,7 +1,7 @@
 /*
  * fader.h - fader-widget used in FX-mixer - partly taken from Hydrogen
  *
- * Copyright (c) 2008-2011 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2012 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -91,6 +91,7 @@ private:
 
 	void setPeak( float fPeak, float &targetPeak, float &persistentPeak, QTime &lastPeakTime );
 	int calculateDisplayPeak( float fPeak );
+
 	float m_fPeakValue_L;
 	float m_fPeakValue_R;
 	float m_persistentPeak_L;
@@ -104,6 +105,9 @@ private:
 	QPixmap m_back;
 	QPixmap m_leds;
 	QPixmap m_knob;
+
+	int m_moveStartPoint;
+	float m_startValue;
 
 	static textFloat * s_textFloat;
 	void updateTextFloat();

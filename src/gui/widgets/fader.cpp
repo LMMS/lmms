@@ -73,7 +73,9 @@ fader::fader( FloatModel * _model, const QString & _name, QWidget * _parent ) :
 	m_fMaxPeak( 1.1 ),
 	m_back( embed::getIconPixmap( "fader_background" ) ),
 	m_leds( embed::getIconPixmap( "fader_leds" ) ),
-	m_knob( embed::getIconPixmap( "fader_knob" ) )
+	m_knob( embed::getIconPixmap( "fader_knob" ) ),
+	m_moveStartPoint( -1 ),
+	m_startValue( 0 )
 {
 	if( s_textFloat == NULL )
 	{
@@ -107,35 +109,46 @@ void fader::contextMenuEvent( QContextMenuEvent * _ev )
 
 
 
-void fader::mouseMoveEvent( QMouseEvent *ev )
+void fader::mouseMoveEvent( QMouseEvent *mouseEvent )
 {
-	float fVal = (float)( height() - ev->y() ) / (float)height();
-	fVal = fVal * ( m_model->maxValue() - m_model->minValue() );
+	if( m_moveStartPoint >= 0 )
+	{
+		int dy = m_moveStartPoint - mouseEvent->globalY();
 
-	fVal = fVal + m_model->minValue();
+		float delta = dy * ( m_model->maxValue() - m_model->minValue() ) / (float) ( height() - m_knob.height() );
 
-	m_model->setValue( fVal );
+		model()->setValue( m_startValue + delta );
 
-	updateTextFloat();
+		updateTextFloat();
+	}
 }
 
 
 
 
-void fader::mousePressEvent( QMouseEvent * _me )
+void fader::mousePressEvent( QMouseEvent* mouseEvent )
 {
-	if( _me->button() == Qt::LeftButton &&
-			! ( _me->modifiers() & Qt::ControlModifier ) )
+	if( mouseEvent->button() == Qt::LeftButton &&
+			! ( mouseEvent->modifiers() & Qt::ControlModifier ) )
 	{
-		updateTextFloat();
-		s_textFloat->show();
+		if( mouseEvent->y() >= knobPosY() - m_knob.height() && mouseEvent->y() < knobPosY() )
+		{
+			updateTextFloat();
+			s_textFloat->show();
 
-		mouseMoveEvent( _me );
-		_me->accept();
+			m_moveStartPoint = mouseEvent->globalY();
+			m_startValue = model()->value();
+
+			mouseEvent->accept();
+		}
+		else
+		{
+			m_moveStartPoint = -1;
+		}
 	}
 	else
 	{
-		AutomatableModelView::mousePressEvent( _me );
+		AutomatableModelView::mousePressEvent( mouseEvent );
 	}
 }
 
