@@ -225,7 +225,7 @@ void fader::updateTextFloat()
 	{
 		s_textFloat->setText( QString("Volume: %1 %").arg( m_model->value() * 100 ) );
 	}
-	s_textFloat->moveGlobal( this, QPoint( width() - m_knob.width() - 5, knob_y() - 46 ) );
+	s_textFloat->moveGlobal( this, QPoint( width() - m_knob.width() - 5, knobPosY() - 46 ) );
 }
 
 
@@ -268,18 +268,7 @@ void fader::paintEvent( QPaintEvent * ev)
 	}
 
 	// knob
-	static const uint knob_height = 29;
-	static const uint knob_width = 15;
-
-	float fRange = m_model->maxValue() - m_model->minValue();
-
-	float realVal = m_model->value() - m_model->minValue();
-
-//		uint knob_y = (uint)( 116.0 - ( 86.0 * ( m_model->value() / fRange ) ) );
-	uint knob_y = (uint)( 116.0 - ( 86.0 * ( realVal / fRange ) ) );
-
-
-	painter.drawPixmap( QRect( 4, knob_y - knob_height, knob_width, knob_height), m_knob, QRect( 0, 0, knob_width, knob_height ) );
+	painter.drawPixmap( 4, knobPosY() - m_knob.height(), m_knob );
 }
 
 

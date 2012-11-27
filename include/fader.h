@@ -79,12 +79,12 @@ private:
 	virtual void wheelEvent( QWheelEvent *ev );
 	virtual void paintEvent( QPaintEvent *ev );
 
-	inline uint knob_y() const
+	int knobPosY() const
 	{
 		float fRange = m_model->maxValue() - m_model->minValue();
 		float realVal = m_model->value() - m_model->minValue();
-//		uint knob_y = (uint)( 116.0 - ( 86.0 * ( m_model->value() / fRange ) ) );
-		return (uint)( 116.0 - ( 86.0 * ( realVal / fRange ) ) );
+
+		return height() - ( ( height() - m_knob.height() ) * ( realVal / fRange ) );
 	}
 
 	FloatModel * m_model;
