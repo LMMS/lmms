@@ -146,21 +146,24 @@ void exportProjectDialog::closeEvent( QCloseEvent * _ce )
 
 
 
-void exportProjectDialog::popRender() {
-
-	track* render_track = m_tracksToRender.back();
-	m_tracksToRender.pop_back();
-
-	// Set must states for song tracks
-	for( TrackVector::ConstIterator it = m_unmuted.begin(); it != m_unmuted.end(); ++it )
+void exportProjectDialog::popRender()
+{
+	if( m_multiExport && m_tracksToRender.isEmpty() == false )
 	{
-		if( (*it) == render_track )
+		track* renderTrack = m_tracksToRender.back();
+		m_tracksToRender.pop_back();
+
+		// Set must states for song tracks
+		for( TrackVector::ConstIterator it = m_unmuted.begin(); it != m_unmuted.end(); ++it )
 		{
-			(*it)->setMuted( false );
-		}
-		else
-		{
-			(*it)->setMuted( true );
+			if( (*it) == renderTrack )
+			{
+				(*it)->setMuted( false );
+			}
+			else
+			{
+				(*it)->setMuted( true );
+			}
 		}
 	}
 
@@ -170,6 +173,8 @@ void exportProjectDialog::popRender() {
 	m_renderers.pop_back();
 	render( r );
 }
+
+
 
 void exportProjectDialog::multiRender()
 {
