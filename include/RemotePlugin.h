@@ -607,7 +607,7 @@ public:
 		m_out = out;
 	}
 
-	void sendMessage( const message & _m );
+	int sendMessage( const message & _m );
 	message receiveMessage();
 
 	inline bool isInvalid() const
@@ -926,19 +926,21 @@ RemotePluginBase::~RemotePluginBase()
 
 
 
-void RemotePluginBase::sendMessage( const message & _m )
+int RemotePluginBase::sendMessage( const message & _m )
 {
 	m_out->lock();
 	m_out->writeInt( _m.id );
 	m_out->writeInt( _m.data.size() );
-	int j = 0;
+	int j = 8;
 	for( unsigned int i = 0; i < _m.data.size(); ++i )
 	{
 		m_out->writeString( _m.data[i] );
-		j += _m.data[i].size();
+		j += 4 + _m.data[i].size();
 	}
 	m_out->unlock();
 	m_out->messageSent();
+
+	return j;
 }
 
 
