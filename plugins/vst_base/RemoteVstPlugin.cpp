@@ -1,7 +1,7 @@
 /*
  * RemoteVstPlugin.cpp - LMMS VST Support Layer (RemotePlugin client)
  *
- * Copyright (c) 2005-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2012 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -808,7 +808,7 @@ const char * RemoteVstPlugin::programName()
 
 	pluginDispatch( effGetProgramName, 0, 0, buf );
 
-	buf[24] = 0;
+	buf[23] = 0;
 
 	return buf;
 }
