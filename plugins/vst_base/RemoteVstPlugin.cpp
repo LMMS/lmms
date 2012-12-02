@@ -834,21 +834,26 @@ void RemoteVstPlugin::sendCurrentProgramName()
 
 void RemoteVstPlugin::getParameterDump()
 {
-	//VstParameterProperties vst_props;
- 	message m( IdVstParameterDump );
- 	m.addInt( m_plugin->numParams );
- 	for( int i = 0; i < m_plugin->numParams; ++i )
- 	{
+	lock();
+
+	message m( IdVstParameterDump );
+	m.addInt( m_plugin->numParams );
+
+	for( int i = 0; i < m_plugin->numParams; ++i )
+	{
 		char paramName[32];
-		pluginDispatch( effGetParamName, i, 0, paramName );
-		paramName[31] = 0;
- 		m.addInt( i );
+		memset( paramName, 0, sizeof( paramName ) );
+		pluginDispatchNoLocking( effGetParamName, i, 0, paramName );
+		paramName[sizeof(paramName)-1] = 0;
+
+		m.addInt( i );
 		m.addString( paramName );
-		lock();
- 		m.addFloat( m_plugin->getParameter( m_plugin, i ) );
-		unlock();
- 	}
- 	sendMessage( m );
+		m.addFloat( m_plugin->getParameter( m_plugin, i ) );
+	}
+
+	unlock();
+
+	sendMessage( m );
 }
 
 
