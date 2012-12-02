@@ -1031,7 +1031,7 @@ void RemoteVstPlugin::savePreset( const std::string & _file )
 
 	if (isPreset)
 	{
-		for (int i = 0; i < _file.length() - 4 - presNameLen; i++) 
+		for (size_t i = 0; i < _file.length() - 4 - presNameLen; i++)
 			progName[i] = i < 23 ? _file[presNameLen + i] : 0;
 		pluginDispatch( 4, 0, 0, progName );
 	}
