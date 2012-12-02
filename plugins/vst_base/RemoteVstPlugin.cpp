@@ -267,6 +267,17 @@ private:
 		return ret;
 	}
 
+	// thread-safe dispatching of plugin
+	int pluginDispatchNoLocking( int cmd, int param1 = 0, int param2 = 0, void * p = NULL, float f = 0 )
+	{
+		if( m_plugin )
+		{
+			return m_plugin->dispatcher( m_plugin, cmd, param1, param2, p, f );
+		}
+		return 0;
+	}
+
+
 	std::string m_shortName;
 
 	HINSTANCE m_libInst;
