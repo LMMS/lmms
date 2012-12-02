@@ -261,8 +261,7 @@ private:
 		lock();
 		if( m_plugin )
 		{
-			ret = m_plugin->dispatcher( m_plugin, cmd, param1,
-							param2, p, f );
+			ret = m_plugin->dispatcher( m_plugin, cmd, param1, param2, p, f );
 		}
 		unlock();
 		return ret;
@@ -322,7 +321,7 @@ RemoteVstPlugin::RemoteVstPlugin( key_t _shm_in, key_t _shm_out ) :
 
 	// process until we have loaded the plugin
 	while( 1 )
-        {
+	{
 		message m = receiveMessage();
 		processMessage( m );
 		if( m.id == IdVstLoadPlugin || m.id == IdQuit )
