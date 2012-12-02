@@ -314,7 +314,7 @@ void RemotePlugin::resizeSharedProcessingMemory()
 #endif
 	}
 
-	int shm_key = 0;
+	static int shm_key = 0;
 #ifdef USE_QT_SHMEM
 	do
 	{

@@ -1101,13 +1101,15 @@ void RemotePluginClient::setShmKey( key_t _key, int _size )
 {
 #ifdef USE_QT_SHMEM
 	m_shmObj.setKey( QString::number( _key ) );
-	if( m_shmObj.attach() )
+	if( m_shmObj.attach() || m_shmObj.error() == QSharedMemory::NoError )
 	{
 		m_shm = (float *) m_shmObj.data();
 	}
 	else
 	{
-		debugMessage( "failed getting shared memory\n" );
+		char buf[64];
+		sprintf( buf, "failed getting shared memory: %d\n", m_shmObj.error() );
+		debugMessage( buf );
 	}
 #else
 	if( m_shm != NULL )
