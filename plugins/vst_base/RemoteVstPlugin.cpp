@@ -637,10 +637,7 @@ bool RemoteVstPlugin::load( const std::string & _plugin_file )
 
 	if( m_plugin->magic != kEffectMagic )
 	{
-		char buf[256];
-		sprintf( buf, "%s is not a VST plugin\n",
-							_plugin_file.c_str() );
-		debugMessage( buf );
+		debugMessage( "File is not a VST plugin\n" );
 		return false;
 	}
 
