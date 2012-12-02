@@ -53,7 +53,7 @@
 #include <stdlib.h>
 #endif
 
-#include "malloc.h"
+#include "ur_malloc.h"
 #include "defs.h"
 #include "error.h"
 #include "attr.h"

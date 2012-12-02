@@ -55,7 +55,7 @@
 
 #include "error.h"
 #include "main.h"
-#include "malloc.h"
+#include "ur_malloc.h"
 
 
 typedef struct _hi {

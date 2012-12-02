@@ -90,7 +90,7 @@
 #include "defs.h"
 #include "parse.h"
 #include "util.h"
-#include "malloc.h"
+#include "ur_malloc.h"
 #include "main.h"
 #include "error.h"
 #include "word.h"

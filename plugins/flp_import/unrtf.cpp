@@ -62,7 +62,7 @@ OutputPersonality * op = NULL;
 #include "error.c"
 #include "hash.c"
 #include "html.c"
-#include "malloc.c"
+#include "ur_malloc.c"
 #include "output.c"
 #include "parse.c"
 #include "util.c"

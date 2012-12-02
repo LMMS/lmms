@@ -55,7 +55,7 @@
 #endif
 
 #include "error.h"
-#include "malloc.h"
+#include "ur_malloc.h"
 
 static unsigned long count=0;
 
