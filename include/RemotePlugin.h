@@ -546,8 +546,7 @@ public:
 
 		message & addInt( int _i )
 		{
-			char buf[128];
-			buf[0] = 0;
+			char buf[32];
 			sprintf( buf, "%d", _i );
 			data.push_back( std::string( buf ) );
 			return *this;
@@ -555,8 +554,7 @@ public:
 
 		message & addFloat( float _f )
 		{
-			char buf[128];
-			buf[0] = 0;
+			char buf[32];
 			sprintf( buf, "%f", _f );
 			data.push_back( std::string( buf ) );
 			return *this;
