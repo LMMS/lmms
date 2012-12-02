@@ -415,7 +415,8 @@ private:
 			return;
 		}
 		lock();
-		while( _len > m_data->endPtr - m_data->startPtr )
+		while( isInvalid() == false &&
+				_len > m_data->endPtr - m_data->startPtr )
 		{
 			unlock();
 #ifndef LMMS_BUILD_WIN32
@@ -436,7 +437,7 @@ private:
 
 	void write( const void * _buf, int _len )
 	{
-		if( isInvalid() )
+		if( isInvalid() || _len > SHM_FIFO_SIZE )
 		{
 			return;
 		}
