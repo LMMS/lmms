@@ -238,7 +238,7 @@ FxMixerView::FxMixerView() :
 	flags |= Qt::MSWindowsFixedSizeDialogHint;
 	flags &= ~Qt::WindowMaximizeButtonHint;
 	subWin->setWindowFlags( flags );
-	subWin->layout()->setSizeConstraint(QLayout::SetFixedSize);
+	//subWin->layout()->setSizeConstraint(QLayout::SetFixedSize);
 
 	parentWidget()->setAttribute( Qt::WA_DeleteOnClose, false );
 	parentWidget()->move( 5, 310 );
