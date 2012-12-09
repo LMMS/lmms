@@ -115,7 +115,7 @@ typedef int32_t key_t;
 
 // sometimes we need to exchange bigger messages (e.g. for VST parameter dumps)
 // so set a usable value here
-const int SHM_FIFO_SIZE = 64000;
+const int SHM_FIFO_SIZE = 512*1024;
 
 
 // implements a FIFO inside a shared memory segment
