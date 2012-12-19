@@ -1,7 +1,7 @@
 #!/bin/sh
 #
 # "$Id: fltk-config.in 6614 2009-01-01 16:11:32Z matt $"
-# 
+#
 # FLTK configuration utility.
 #
 # Copyright 2000-2009 by Bill Spitzak and others.
@@ -31,31 +31,31 @@
 MAJOR_VERSION=1
 MINOR_VERSION=3
 PATCH_VERSION=0
-VERSION="$MAJOR_VERSION.$MINOR_VERSION.$PATCH_VERSION"
-APIVERSION="$MAJOR_VERSION.$MINOR_VERSION"
+VERSION=1.3.0
+APIVERSION=1.3
 
 ### BEGIN fltk-config
 selfdir=`dirname "$0"`
 
-prefix=/usr
-exec_prefix=${prefix}
+prefix=/usr/local
+exec_prefix=
 exec_prefix_set=no
-bindir=${exec_prefix}/bin
-includedir=${prefix}/include
-libdir=${exec_prefix}/lib
+bindir=/usr/local/bin
+includedir=
+libdir=/usr/local/lib
 srcdir=.
 
 # compiler names
 CC="gcc"
-CXX="g++"
+CXX="c++"
 
 # flags for C++ compiler:
 ARCHFLAGS=""
-CFLAGS="  -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 -D_THREAD_SAFE -D_REENTRANT"
-CXXFLAGS="-I/usr/include/freetype2   -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 -D_THREAD_SAFE -D_REENTRANT"
-LDFLAGS=" "
-LDLIBS="-lXext -lXft -lfontconfig -lXinerama -lpthread -ldl -lm  -lX11 "
-OPTIM=" -Os -Wall -Wunused -Wno-format-y2k  -fno-exceptions -fno-strict-aliasing"
+CFLAGS="-DUSE_X11 -D_THREAD_SAFE -D_REENTRANT -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE"
+CXXFLAGS="-DUSE_X11 -D_THREAD_SAFE -D_REENTRANT -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE"
+LDFLAGS=""
+LDLIBS="-lX11 -lpthread -lXinerama -lXft -lXext"
+OPTIM=""
 CAIROFLAGS=""
 
 # Check for local invocation, and update paths accordingly...
@@ -91,11 +91,11 @@ if test -f "$libdir/libfltk_cairo.a"; then
 fi
 
 # libraries to link with:
-LIBNAME="../lib/libfltk.a"
+LIBNAME=""
 DSONAME=""
 DSOLINK=""
-IMAGELIBS="-lpng -lz -ljpeg "
-STATICIMAGELIBS="-lpng -lz -ljpeg "
+IMAGELIBS=""
+STATICIMAGELIBS=""
 CAIROLIBS=""
 SHAREDSUFFIX=""
 
@@ -143,10 +143,10 @@ post=
 debug=
 
 # Parse command line options
-while test $# -gt 0 
+while test $# -gt 0
 do
     case "$1" in
-	-*=*) 
+	-*=*)
 	    optarg=`echo "$1" | sed 's/[-_a-zA-Z0-9]*=//'`
 	    ;;
 	*)
@@ -239,8 +239,8 @@ if test x$use_forms = xyes; then
     LDSTATIC="$libdir/libfltk_forms.a $LDSTATIC"
 fi
 if test x$use_gl = xyes; then
-    LDLIBS="-lfltk_gl$SHAREDSUFFIX -lGLU -lGL $LDLIBS"
-    LDSTATIC="$libdir/libfltk_gl.a -lGLU -lGL $LDSTATIC"
+    LDLIBS="-lfltk_gl$SHAREDSUFFIX  $LDLIBS"
+    LDSTATIC="$libdir/libfltk_gl.a  $LDSTATIC"
 fi
 if test x$use_images = xyes; then
     LDLIBS="-lfltk_images$SHAREDSUFFIX $IMAGELIBS $LDLIBS"
