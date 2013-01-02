@@ -542,7 +542,15 @@ AudioFileProcessorWaveView::AudioFileProcessorWaveView( QWidget * _parent, int _
 
 void AudioFileProcessorWaveView::isPlaying( f_cnt_t _frames_played )
 {
-	m_framesPlayed = _frames_played % ( m_sampleBuffer.endFrame() - m_sampleBuffer.startFrame() );
+	const f_cnt_t nb_frames = m_sampleBuffer.endFrame() - m_sampleBuffer.startFrame();
+	if( nb_frames < 1 )
+	{
+		m_framesPlayed = 0;
+	}
+	else
+	{
+		m_framesPlayed = _frames_played % nb_frames;
+	}
 	update();
 }
 
