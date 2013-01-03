@@ -117,13 +117,14 @@ void vestigeInstrument::loadSettings( const QDomElement & _this )
 		m_plugin->loadSettings( _this );
 
 		const QMap<QString, QString> & dump = m_plugin->parameterDump();
-		int paramCount = (dump).size();
+		paramCount = dump.size();
 		char paramStr[35];
-		vstKnobs = new knob *[paramCount];
-		knobFModel = new FloatModel *[paramCount];
+		vstKnobs = new knob *[ paramCount ];
+		knobFModel = new FloatModel *[ paramCount ];
 		QStringList list1;
 		QWidget * widget = new QWidget();
-		for (int i = 0; i < paramCount; i++) {
+		for( int i = 0; i < paramCount; i++ )
+		{
 			sprintf( paramStr, "param%d", i);
 			list1 = dump[paramStr].split(":");
 
@@ -167,9 +168,10 @@ void vestigeInstrument::saveSettings( QDomDocument & _doc, QDomElement & _this )
 		m_plugin->saveSettings( _doc, _this );
 		if (knobFModel != NULL) {
 			const QMap<QString, QString> & dump = m_plugin->parameterDump();
-			int paramCount = (dump).size();
+			paramCount = dump.size();
 			char paramStr[35];
-			for (int i = 0; i < paramCount; i++) {
+			for( int i = 0; i < paramCount; i++ )
+			{
 				if (knobFModel[i]->isAutomated() || knobFModel[i]->getControllerConnection()) {
 					sprintf( paramStr, "param%d", i);
 					knobFModel[i]->saveSettings( _doc, _this, paramStr );
@@ -223,7 +225,10 @@ void vestigeInstrument::loadFile( const QString & _file )
 				InstrumentTrack::tr( "Default preset" );
 	m_pluginMutex.unlock();
 
-	closePlugin();
+	if ( m_plugin != NULL )
+	{
+		closePlugin();
+	}
 
 	m_pluginDLL = _file;
 	textFloat * tf = textFloat::displayMessage(
@@ -308,6 +313,51 @@ bool vestigeInstrument::handleMidiEvent( const midiEvent & _me,
 
 void vestigeInstrument::closePlugin( void )
 {
+	// disconnect all signals
+	if( knobFModel != NULL )
+	{
+		for( int i = 0; i < paramCount; i++ )
+		{
+			delete knobFModel[ i ];
+			delete vstKnobs[ i ];
+		}
+	}
+	
+	if( vstKnobs != NULL )
+	{
+		delete [] vstKnobs;
+		vstKnobs = NULL;
+	}
+
+	if( knobFModel != NULL )
+	{
+		delete [] knobFModel;
+		knobFModel = NULL;
+	}
+ 
+	if( m_scrollArea != NULL )
+	{
+//		delete m_scrollArea;
+		m_scrollArea = NULL;
+	}
+ 
+	if( m_subWindow != NULL )
+	{
+		m_subWindow->setAttribute( Qt::WA_DeleteOnClose );
+		m_subWindow->close();
+ 
+		if( m_subWindow != NULL )
+		{
+			delete m_subWindow;
+		}
+		m_subWindow = NULL;
+	}
+
+	if( p_subWindow != NULL )
+	{
+		p_subWindow = NULL;
+	}
+
 	m_pluginMutex.lock();
 	if( m_plugin )
 	{
@@ -832,23 +882,24 @@ manageVestigeInstrumentView::manageVestigeInstrumentView( Instrument * _instrume
 	l->addWidget( m_syncButton, 0, 0, 1, 2, Qt::AlignLeft );
 
 	const QMap<QString, QString> & dump = m_vi->m_plugin->parameterDump();
-	int paramCount = (dump).size();
+	m_vi->paramCount = dump.size();
 
 	bool isVstKnobs = true;
 
 	if (m_vi->vstKnobs == NULL) {
-		m_vi->vstKnobs = new knob *[paramCount];
+		m_vi->vstKnobs = new knob *[ m_vi->paramCount ];
 		isVstKnobs = false;
 	}
 	if (m_vi->knobFModel == NULL) {
-		m_vi->knobFModel = new FloatModel *[paramCount];
+		m_vi->knobFModel = new FloatModel *[ m_vi->paramCount ];
 	}
 
 	char paramStr[35];
 	QStringList list1;
 
 	if (isVstKnobs == false) {
-		for (int i = 0; i < paramCount; i++) {
+		for( int i = 0; i < m_vi->paramCount; i++ )
+		{
 			sprintf( paramStr, "param%d", i);
     			list1 = dump[paramStr].split(":");
 
@@ -865,15 +916,19 @@ manageVestigeInstrumentView::manageVestigeInstrumentView( Instrument * _instrume
 	}
 
 	int i = 0;
-	for (int lrow = 0+1; lrow < (int(paramCount / 10) + 1)+1; lrow++) {
-		for (int lcolumn = 0; lcolumn < 10; lcolumn++) {
-			if (i < paramCount)
+	for( int lrow = 1; lrow < ( int( m_vi->paramCount / 10 ) + 1 ) + 1; lrow++ )
+	{
+		for( int lcolumn = 0; lcolumn < 10; lcolumn++ )
+		{
+			if( i < m_vi->paramCount )
+			{
 				l->addWidget( m_vi->vstKnobs[i], lrow, lcolumn, Qt::AlignCenter );
+			}
 			i++;
 		}
 	}
 
-	l->setRowStretch( (int(paramCount / 10) + 1), 1 );
+	l->setRowStretch( ( int( m_vi->paramCount / 10) + 1), 1 );
 	l->setColumnStretch( 10, 1 );
 
 	widget->setLayout(l);
@@ -911,9 +966,24 @@ void manageVestigeInstrumentView::syncPlugin( void )
 
 manageVestigeInstrumentView::~manageVestigeInstrumentView()
 {
+	if( m_vi->knobFModel != NULL )
+	{
+		for( int i = 0; i < m_vi->paramCount; i++ )
+		{
+			delete m_vi->knobFModel[ i ];
+			delete m_vi->vstKnobs[ i ];
+		}
+	}
+
 	if (m_vi->vstKnobs != NULL) {
 		delete []m_vi->vstKnobs;
 		m_vi->vstKnobs = NULL;
+	}
+
+	if( m_vi->knobFModel != NULL )
+	{
+		delete [] m_vi->knobFModel;
+		m_vi->knobFModel = NULL;
 	}
  
 	if (m_vi->m_scrollArea != NULL) {
@@ -929,6 +999,8 @@ manageVestigeInstrumentView::~manageVestigeInstrumentView()
 			delete m_vi->m_subWindow;
 		m_vi->m_subWindow = NULL;
 	}
+
+	m_vi->p_subWindow = NULL;
 }
 
 

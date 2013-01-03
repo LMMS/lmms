@@ -88,6 +88,7 @@ private:
 	QScrollArea * m_scrollArea;
 	FloatModel ** knobFModel;
 	knob ** vstKnobs;
+	int paramCount;
 
 	QObject * ctrHandle;
 

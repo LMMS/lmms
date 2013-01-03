@@ -92,6 +92,7 @@ private:
 	knob ** vstKnobs;
 	FloatModel ** knobFModel;
 	QObject * p_subWindow;
+	int paramCount;
 
 
 	friend class VestigeInstrumentView;
