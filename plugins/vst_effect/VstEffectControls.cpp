@@ -73,19 +73,27 @@ void VstEffectControls::loadSettings( const QDomElement & _this )
 		char paramStr[35];
 		vstKnobs = new knob *[ paramCount ];
 		knobFModel = new FloatModel *[ paramCount ];
-		QStringList list1;
+		QStringList s_dumpValues;
 		QWidget * widget = new QWidget();
 		for( int i = 0; i < paramCount; i++ )
 		{
-			sprintf( paramStr, "param%d", i);
-			list1 = dump[paramStr].split(":");
+			sprintf( paramStr, "param%d", i );
+			s_dumpValues = dump[ paramStr ].split( ":" );
 
 			vstKnobs[i] = new knob( knobBright_26, widget );
-			vstKnobs[i]->setHintText( list1.at(1) + ":", "");
-			vstKnobs[i]->setLabel( list1.at(1).left(15) );
+			vstKnobs[i]->setHintText( s_dumpValues.at( 1 ) + ":", "" );
+			vstKnobs[i]->setLabel( s_dumpValues.at( 1 ).left( 15 ) );
 
-			knobFModel[i] = new FloatModel( (list1.at(2)).toFloat(), 0.0f, 1.0f, 0.01f, this, QString::number(i) );
+			knobFModel[i] = new FloatModel( 0.0f, 0.0f, 1.0f, 0.01f, this, QString::number(i) );
 			knobFModel[i]->loadSettings( _this, paramStr );
+
+			if( !( knobFModel[ i ]->isAutomated() ||
+						knobFModel[ i ]->getControllerConnection() ) )
+			{
+				knobFModel[ i ]->setValue( (s_dumpValues.at( 2 ) ).toFloat() );
+				knobFModel[ i ]->setInitValue( (s_dumpValues.at( 2 ) ).toFloat() );
+			}
+
 			connect( knobFModel[i], SIGNAL( dataChanged() ), this, SLOT( setParameter() ) );
 
 			vstKnobs[i]->setModel( knobFModel[i] );
