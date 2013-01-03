@@ -128,7 +128,7 @@ void vestigeInstrument::loadSettings( const QDomElement & _this )
 			sprintf( paramStr, "param%d", i );
 			s_dumpValues = dump[ paramStr ].split( ":" );
 
-			vstKnobs[i] = new knob( knobBright_26, widget );
+			vstKnobs[i] = new knob( knobBright_26, widget, s_dumpValues.at( 1 ) );
 			vstKnobs[i]->setHintText( s_dumpValues.at( 1 ) + ":", "" );
 			vstKnobs[i]->setLabel( s_dumpValues.at( 1 ).left( 15 ) );
 
@@ -916,21 +916,21 @@ manageVestigeInstrumentView::manageVestigeInstrumentView( Instrument * _instrume
 	}
 
 	char paramStr[35];
-	QStringList list1;
+	QStringList s_dumpValues;
 
 	if (isVstKnobs == false) {
 		for( int i = 0; i < m_vi->paramCount; i++ )
 		{
 			sprintf( paramStr, "param%d", i);
-    			list1 = dump[paramStr].split(":");
+    			s_dumpValues = dump[ paramStr ].split( ":" );
 
-			m_vi->vstKnobs[i] = new knob( knobBright_26, this );
-			m_vi->vstKnobs[i]->setHintText( list1.at(1) + ":", "");
-			m_vi->vstKnobs[i]->setLabel( list1.at(1).left(15) );
+			m_vi->vstKnobs[ i ] = new knob( knobBright_26, this, s_dumpValues.at( 1 ) );
+			m_vi->vstKnobs[ i ]->setHintText( s_dumpValues.at( 1 ) + ":", "" );
+			m_vi->vstKnobs[ i ]->setLabel( s_dumpValues.at( 1 ).left( 15 ) );
 
 			sprintf( paramStr, "%d", i);
-			m_vi->knobFModel[i] = new FloatModel( (list1.at(2)).toFloat(), 0.0f, 1.0f, 0.01f, 
-					castModel<vestigeInstrument>(), tr( paramStr ) );
+			m_vi->knobFModel[ i ] = new FloatModel( (s_dumpValues.at( 2 )).toFloat(), 
+				0.0f, 1.0f, 0.01f, castModel<vestigeInstrument>(), tr( paramStr ) );
 			connect( m_vi->knobFModel[i], SIGNAL( dataChanged() ), this, SLOT( setParameter() ) );
 			m_vi->vstKnobs[i] ->setModel( m_vi->knobFModel[i] );
 		}
