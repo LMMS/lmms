@@ -574,7 +574,7 @@ void VstPlugin::setParam( int i, float f )
 {
 	lock();
 	sendMessage( message( IdVstSetParameter ).addInt( i ).addFloat( f ) );
-	waitForMessage( IdVstSetParameter );
+	//waitForMessage( IdVstSetParameter );
 	unlock();
 }
 

@@ -230,14 +230,13 @@ bool RemotePlugin::process( const sampleFrame * _in_buf,
 
 	lock();
 	sendMessage( IdStartProcessing );
-	unlock();
 
 	if( m_failed || _out_buf == NULL || m_outputCount == 0 )
 	{
+		unlock();
 		return false;
 	}
 
-	lock();
 	waitForMessage( IdProcessingDone );
 	unlock();
 

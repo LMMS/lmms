@@ -451,7 +451,7 @@ bool RemoteVstPlugin::processMessage( const message & _m )
 			lock();
 			m_plugin->setParameter( m_plugin, _m.getInt( 0 ), _m.getFloat( 1 ) );
 			unlock();
-			sendMessage( IdVstSetParameter );
+			//sendMessage( IdVstSetParameter );
 			break;
 
 
