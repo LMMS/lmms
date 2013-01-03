@@ -852,6 +852,11 @@ void VestigeInstrumentView::paintEvent( QPaintEvent * )
 					m_vi->m_plugin->vendorString() );
 		p.drawText( 10, 225, m_vi->m_plugin->currentProgramName() );
 	}
+
+	if( m_vi->m_subWindow != NULL )
+	{
+		m_vi->m_subWindow->setWindowTitle( m_vi->instrumentTrack()->name() );
+	}
 //	m_pluginMutex.unlock();
 }
 
@@ -872,7 +877,7 @@ manageVestigeInstrumentView::manageVestigeInstrumentView( Instrument * _instrume
 	m_vi->m_subWindow->setSizePolicy( QSizePolicy::Fixed, QSizePolicy::Fixed );
 	m_vi->m_subWindow->setFixedSize( 960, 300);
 	m_vi->m_subWindow->setWidget(m_vi->m_scrollArea);
-	m_vi->m_subWindow->setWindowTitle(m_vi->m_plugin->name());
+	m_vi->m_subWindow->setWindowTitle( m_vi->instrumentTrack()->name() );
 	m_vi->m_subWindow->setWindowIcon( PLUGIN_NAME::getIconPixmap( "logo" ) );
 	//m_vi->m_subWindow->setAttribute(Qt::WA_DeleteOnClose);
 
@@ -1114,6 +1119,7 @@ void manageVestigeInstrumentView::dropEvent( QDropEvent * _de )
  
 void manageVestigeInstrumentView::paintEvent( QPaintEvent * )
 {
+	m_vi->m_subWindow->setWindowTitle(m_vi->instrumentTrack()->name());
 }
 
 
