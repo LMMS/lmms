@@ -889,6 +889,19 @@ manageVestigeInstrumentView::manageVestigeInstrumentView( Instrument * _instrume
 
 	l->addWidget( m_syncButton, 0, 0, 1, 2, Qt::AlignLeft );
 
+	m_displayAutomatedOnly = new QPushButton( tr( "Automated" ), this );
+	connect( m_displayAutomatedOnly, SIGNAL( clicked() ), this,
+							SLOT( displayAutomatedOnly() ) );
+	m_displayAutomatedOnly->setWhatsThis(
+		tr( "Click here if you want to display automated parameters only." ) );
+
+	l->addWidget( m_displayAutomatedOnly, 0, 1, 1, 2, Qt::AlignLeft );
+
+	for( int i = 0; i < 10; i++ )
+	{
+		l->addItem( new QSpacerItem( 68, 45, QSizePolicy::Fixed, QSizePolicy::Fixed ), 0, i );
+	}
+
 	const QMap<QString, QString> & dump = m_vi->m_plugin->parameterDump();
 	m_vi->paramCount = dump.size();
 
@@ -974,6 +987,31 @@ void manageVestigeInstrumentView::syncPlugin( void )
 			f_value = ( s_dumpValues.at( 2 ) ).toFloat();
 			m_vi->knobFModel[ i ]->setAutomatedValue( f_value );
 			m_vi->knobFModel[ i ]->setInitValue( f_value );
+		}
+	}
+}
+
+
+
+
+void manageVestigeInstrumentView::displayAutomatedOnly( void )
+{
+	bool isAuto = QString::compare( m_displayAutomatedOnly->text(), tr( "Automated" ) ) == 0;
+
+	for( int i = 0; i< m_vi->paramCount; i++ )
+	{
+
+		if( !( m_vi->knobFModel[ i ]->isAutomated() ||
+					m_vi->knobFModel[ i ]->getControllerConnection() ) )
+		{
+			if( m_vi->vstKnobs[ i ]->isVisible() == true  && isAuto )
+			{
+				m_vi->vstKnobs[ i ]->hide();
+				m_displayAutomatedOnly->setText( "All" );
+			} else {	
+				m_vi->vstKnobs[ i ]->show();
+				m_displayAutomatedOnly->setText( "Automated" );
+			}
 		}
 	}
 }

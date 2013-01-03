@@ -331,6 +331,19 @@ manageVSTEffectView::manageVSTEffectView( VstEffect * _eff, VstEffectControls * 
 
 	l->addWidget( m_syncButton, 0, 0, 1, 2, Qt::AlignLeft );
 
+	m_displayAutomatedOnly = new QPushButton( tr( "Automated" ), widget );
+	connect( m_displayAutomatedOnly, SIGNAL( clicked() ), this,
+							SLOT( displayAutomatedOnly() ) );
+	m_displayAutomatedOnly->setWhatsThis(
+		tr( "Click here if you want to display automated parameters only." ) );
+
+	l->addWidget( m_displayAutomatedOnly, 0, 1, 1, 2, Qt::AlignLeft );
+
+	for( int i = 0; i < 10; i++ )
+	{
+		l->addItem( new QSpacerItem( 68, 45, QSizePolicy::Fixed, QSizePolicy::Fixed ), 0, i );
+	}
+
 	const QMap<QString, QString> & dump = m_effect->m_plugin->parameterDump();
 	m_vi->paramCount = dump.size();
 
@@ -420,6 +433,30 @@ void manageVSTEffectView::syncPlugin( void )
 			m_vi2->knobFModel[ i ]->setInitValue( f_value );
 		}
 	}
+}
+
+
+
+void manageVSTEffectView::displayAutomatedOnly( void )
+{
+	bool isAuto = QString::compare( m_displayAutomatedOnly->text(), tr( "Automated" ) ) == 0;
+
+	for( int i = 0; i< m_vi2->paramCount; i++ )
+	{
+
+		if( !( m_vi2->knobFModel[ i ]->isAutomated() ||
+					m_vi2->knobFModel[ i ]->getControllerConnection() ) )
+		{
+			if( m_vi2->vstKnobs[ i ]->isVisible() == true  && isAuto )
+			{
+				m_vi2->vstKnobs[ i ]->hide();
+				m_displayAutomatedOnly->setText( "All" );
+			} else {	
+				m_vi2->vstKnobs[ i ]->show();
+				m_displayAutomatedOnly->setText( "Automated" );
+			}
+		}
+ 	}
 }
 
 
