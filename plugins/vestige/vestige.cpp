@@ -950,16 +950,23 @@ manageVestigeInstrumentView::manageVestigeInstrumentView( Instrument * _instrume
 void manageVestigeInstrumentView::syncPlugin( void )
 {
 	char paramStr[35];
-	QStringList list1;
+	QStringList s_dumpValues;
 	const QMap<QString, QString> & dump = m_vi->m_plugin->parameterDump();
-	float f;
+	float f_value;
 
-	for (int i = 0; i<(dump).size(); i++) {
-		sprintf( paramStr, "param%d", i);
-    		list1 = dump[paramStr].split(":");
-		f = (list1.at(2)).toFloat();
-		m_vi->knobFModel[i]->setValue(f);
-		m_vi->knobFModel[i]->setInitValue(f);
+	for( int i = 0; i < m_vi->paramCount; i++ )
+	{
+		// only not automated knobs are synced from VST
+		// those auto-setted values are not jurnaled, tracked for undo / redo
+		if( !( m_vi->knobFModel[ i ]->isAutomated() || 
+					m_vi->knobFModel[ i ]->getControllerConnection() ) )
+		{
+			sprintf( paramStr, "param%d", i );
+    			s_dumpValues = dump[ paramStr ].split( ":" );
+			f_value = ( s_dumpValues.at( 2 ) ).toFloat();
+			m_vi->knobFModel[ i ]->setAutomatedValue( f_value );
+			m_vi->knobFModel[ i ]->setInitValue( f_value );
+		}
 	}
 }
 
