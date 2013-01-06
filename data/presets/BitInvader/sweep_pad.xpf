@@ -3,7 +3,7 @@
 <multimediaproject creator="Linux MultiMedia Studio (LMMS)" creatorversion="0.1.2-cvs20060123" type="channelsettings" version="1.0" >
   <head/>
   <channelsettings>
-    <channeltrack surpos="134219776" fxch="0" baseoct="5" vol="100" name="Default" basetone="9" tab="1" >
+    <channeltrack surpos="134219776" fxch="0" baseoct="5" vol="100" name="sweep_pad" basetone="9" tab="1" >
       <bitinvader sampleLength="8" interpolation="0" version="0.1" normalize="0" sampleShape="+MrwPiRn7r4WUV6/xEkNv429tL6ofBA+P7uAPtTiwD4=" />
       <eldata fres="0.43" ftype="0" fcut="1280" fwet="1" >
         <elvol lfosyncmode="0" lpdel="0" amt="1" rel="0.351" ctlenvamt="0" latt="0" sus="0.499" lspd="0.1" att="0.164" pdel="0" lamt="0" dec="0.499" userwavefile="" x100="0" lshp="0" hold="0.499" />
