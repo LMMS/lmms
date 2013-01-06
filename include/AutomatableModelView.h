@@ -1,7 +1,7 @@
 /*
  * AutomatableModelView.h - class AutomatableModelView
  *
- * Copyright (c) 2008-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2013 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -101,6 +101,7 @@ public slots:
 	void execConnectionDialog();
 	void removeConnection();
 	void editSongGlobalAutomation();
+	void removeSongGlobalAutomation();
 
 
 protected:
