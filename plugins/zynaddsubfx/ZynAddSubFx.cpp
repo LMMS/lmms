@@ -301,6 +301,9 @@ void ZynAddSubFxInstrument::loadFile( const QString & _file )
 		m_pluginMutex.unlock();
 	}
 
+	instrumentTrack()->setName( QFileInfo( _file ).baseName().
+									replace( QRegExp( "^[0-9]{4}-" ), QString() ) );
+
 	m_modifiedControllers.clear();
 
 	emit settingsChanged();
