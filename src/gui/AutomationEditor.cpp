@@ -2,7 +2,7 @@
  * AutomationEditor.cpp - implementation of AutomationEditor which is used for
  *                        actual setting of dynamic values
  *
- * Copyright (c) 2008-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2013 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2006-2008 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
@@ -1424,7 +1424,8 @@ void AutomationEditor::paintEvent( QPaintEvent * _pe )
 		timeMap & time_map = m_pattern->getTimeMap();
 		timeMap::iterator it = time_map.begin();
 		p.setPen( QColor( 0xFF, 0xDF, 0x20 ) );
-		do
+
+		while( it != time_map.end() )
 		{
 			Sint32 len_ticks = 4;
 
@@ -1516,7 +1517,7 @@ void AutomationEditor::paintEvent( QPaintEvent * _pe )
 			}
 			else printf("not in range\n");
 			++it;
-		} while( it != time_map.end() );
+		}
 	}
 	else
 	{
