@@ -98,6 +98,16 @@ enum MidiStandardControllers
 	MidiControllerSostenuto = 66,
 	MidiControllerSoftPedal = 67,
 	MidiControllerLegatoFootswitch = 68,
+	// Channel Mode Messages are controllers too...
+	MidiControllerAllSoundOff = 120,
+	MidiControllerResetAllControllers = 121,
+	MidiControllerLocalControl = 122,
+	MidiControllerAllNotesOff = 123,
+	MidiControllerOmniOn = 124,
+	MidiControllerOmniOff = 125,
+	MidiControllerMonoOn = 126,
+	MidiControllerPolyOn = 127,
+
 };
 
 const int MidiChannelCount = 16;

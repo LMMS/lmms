@@ -315,6 +315,17 @@ void InstrumentTrack::processInEvent( const midiEvent & _me,
 					m_sustainPedalPressed = false;
 				}
 			}
+			if( _me.controllerNumber() == MidiControllerAllSoundOff ||
+			    _me.controllerNumber() == MidiControllerAllNotesOff ||
+			    _me.controllerNumber() == MidiControllerOmniOn ||
+			    _me.controllerNumber() == MidiControllerOmniOff ||
+			    _me.controllerNumber() == MidiControllerMonoOn ||
+			    _me.controllerNumber() == MidiControllerPolyOn )
+			{
+				silenceAllNotes();
+			}
+			m_instrument->handleMidiEvent( _me, _time );
+			break;
 
 		case MidiProgramChange:
 			m_instrument->handleMidiEvent( _me, _time );
