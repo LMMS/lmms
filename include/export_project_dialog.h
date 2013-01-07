@@ -59,6 +59,7 @@ private slots:
 private:
 	QString m_fileName;
 	QString m_dirName;
+	QString m_fileExtension;
 	typedef QVector<ProjectRenderer*> RenderVector;
 	RenderVector m_renderers;
 	bool m_multiExport;
