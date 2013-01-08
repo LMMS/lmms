@@ -226,7 +226,7 @@ void VstEffectControlDialog::paintEvent( QPaintEvent * )
 
 VstEffectControlDialog::~VstEffectControlDialog()
 {
-	delete m_pluginWidget;
+	//delete m_pluginWidget;
 }
 
 

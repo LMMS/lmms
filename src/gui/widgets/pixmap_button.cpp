@@ -57,7 +57,7 @@ void pixmapButton::paintEvent( QPaintEvent * )
 {
 	QPainter p( this );
 
-	if( model()->value() || m_pressed )
+	if( model() != NULL && model()->value() || m_pressed )
 	{
 		if( !m_activePixmap.isNull() )
 		{

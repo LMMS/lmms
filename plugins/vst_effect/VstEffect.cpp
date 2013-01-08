@@ -162,6 +162,10 @@ void VstEffect::openPlugin( const QString & _plugin )
 void VstEffect::closePlugin()
 {
 	m_pluginMutex.lock();
+	if( m_plugin->pluginWidget() != NULL )
+	{
+		delete m_plugin->pluginWidget();
+	}
 	delete m_plugin;
 	m_plugin = NULL;
 	m_pluginMutex.unlock();
