@@ -130,6 +130,7 @@ ChordCreator::ChordTable::Init ChordCreator::ChordTable::s_initTable[] =
 	{ QT_TRANSLATE_NOOP( "ChordCreator", "Mixolydian" ), { 0, 2, 4, 5, 7, 9, 10, -1 } },
 	{ QT_TRANSLATE_NOOP( "ChordCreator", "Aeolian" ), { 0, 2, 3, 5, 7, 8, 10, -1 } },
 	{ QT_TRANSLATE_NOOP( "ChordCreator", "Locrian" ), { 0, 1, 3, 5, 6, 8, 10, -1 } },
+	{ QT_TRANSLATE_NOOP( "ChordCreator", "Minor" ), { 0, 2, 3, 5, 7, 8, 10, -1 } },
 } ;
 
 
