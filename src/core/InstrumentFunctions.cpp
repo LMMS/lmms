@@ -1,7 +1,7 @@
 /*
  * InstrumentFunctions.cpp - models for instrument-function-tab
  *
- * Copyright (c) 2004-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2013 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -48,7 +48,7 @@ ChordCreator::ChordTable::Init ChordCreator::ChordTable::s_initTable[] =
 	
 	{ QT_TRANSLATE_NOOP( "ChordCreator", "6" ), { 0, 4, 7, 9, -1 } },
 	{ QT_TRANSLATE_NOOP( "ChordCreator", "6sus4" ), { 0, 5, 7, 9, -1 } },
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "6add9" ), { 0, 4, 7, 12, -1 } },
+	{ QT_TRANSLATE_NOOP( "ChordCreator", "6add9" ), { 0, 4, 7, 9, 14, -1 } },
 	{ QT_TRANSLATE_NOOP( "ChordCreator", "m6" ), { 0, 3, 7, 9, -1 } },
 	{ QT_TRANSLATE_NOOP( "ChordCreator", "m6add9" ), { 0, 3, 7, 9, 14, -1 } },
 
