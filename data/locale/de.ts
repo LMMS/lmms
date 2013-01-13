@@ -539,7 +539,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>6add9</source>
-        <translation>madd9</translation>
+        <translation>6add9</translation>
     </message>
     <message>
         <source>m6</source>
