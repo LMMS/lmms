@@ -1,7 +1,7 @@
 /*
  * ZynAddSubFx.cpp - ZynAddSubxFX-embedding plugin
  *
- * Copyright (c) 2008-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2013 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -450,7 +450,7 @@ void ZynAddSubFxInstrument::initPlugin()
 
 void ZynAddSubFxInstrument::sendControlChange( MidiControllers midiCtl, float value )
 {
-	handleMidiEvent( midiEvent( MidiControlChange, 0, midiCtl, (int) value, this ),
+	handleMidiEvent( midiEvent( MidiControlChange, instrumentTrack()->midiPort()->realOutputChannel(), midiCtl, (int) value, this ),
 						midiTime() );
 }
 

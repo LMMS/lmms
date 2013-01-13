@@ -1,7 +1,7 @@
 /*
  * LocalZynAddSubFx.cpp - local implementation of ZynAddSubFx plugin
  *
- * Copyright (c) 2009-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2009-2013 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -206,10 +206,10 @@ void LocalZynAddSubFx::processMidiEvent( const midiEvent & _e )
 				}
 				if( m_runningNotes[_e.key()] > 0 )
 				{
-					m_master->NoteOff( 0, _e.key() );
+					m_master->NoteOff( _e.channel(), _e.key() );
 				}
 				++m_runningNotes[_e.key()];
-				m_master->NoteOn( 0, _e.key(), _e.velocity() );
+				m_master->NoteOn( _e.channel(), _e.key(), _e.velocity() );
 				break;
 			}
 		case MidiNoteOff:
@@ -219,16 +219,16 @@ void LocalZynAddSubFx::processMidiEvent( const midiEvent & _e )
 			}
 			if( --m_runningNotes[_e.key()] <= 0 )
 			{
-				m_master->NoteOff( 0, _e.key() );
+				m_master->NoteOff( _e.channel(), _e.key() );
 			}
 			break;
 		case MidiPitchBend:
-			m_master->SetController( 0, C_pitchwheel,
+			m_master->SetController( _e.channel(), C_pitchwheel,
 						_e.m_data.m_param[0] +
 							_e.m_data.m_param[1]*128-8192 );
 			break;
 		case MidiControlChange:
-			m_master->SetController( 0,
+			m_master->SetController( _e.channel(),
 						midiIn.getcontroller( _e.m_data.m_param[0] ),
 						_e.m_data.m_param[1] );
 			break;
