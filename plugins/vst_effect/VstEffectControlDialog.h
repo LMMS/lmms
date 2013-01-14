@@ -26,6 +26,7 @@
 #define _VST_EFFECT_CONTROL_DIALOG_H
 
 #include "EffectControlDialog.h"
+#include "VstPlugin.h"
 
 #include <QObject>
 #include <QPainter>
@@ -57,6 +58,7 @@ private:
 	pixmapButton * m_managePluginButton;
 	pixmapButton * m_savePresetButton;
 
+	VstPlugin * m_plugin;
 } ;
 
 #endif

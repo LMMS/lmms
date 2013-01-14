@@ -314,7 +314,7 @@ manageVSTEffectView::manageVSTEffectView( VstEffect * _eff, VstEffectControls * 
 	m_vi->m_subWindow->setSizePolicy( QSizePolicy::Fixed, QSizePolicy::Fixed );
 	m_vi->m_subWindow->setFixedSize( 960, 300);
 	m_vi->m_subWindow->setWidget(m_vi->m_scrollArea);
-	m_vi->m_subWindow->setWindowTitle(_eff->m_plugin->name());
+	m_vi->m_subWindow->setWindowTitle( _eff->m_plugin->name() + tr( " - VST parameter control" ) );
 	m_vi->m_subWindow->setWindowIcon( PLUGIN_NAME::getIconPixmap( "logo" ) );
 	//m_vi->m_subWindow->setAttribute(Qt::WA_DeleteOnClose);
 
@@ -338,6 +338,16 @@ manageVSTEffectView::manageVSTEffectView( VstEffect * _eff, VstEffectControls * 
 		tr( "Click here if you want to display automated parameters only." ) );
 
 	l->addWidget( m_displayAutomatedOnly, 0, 1, 1, 2, Qt::AlignLeft );
+
+
+	m_closeButton = new QPushButton( tr( "    Close    " ), widget );
+	connect( m_closeButton, SIGNAL( clicked() ), this,
+							SLOT( closeWindow() ) );
+	m_closeButton->setWhatsThis(
+		tr( "Close VST effect knob-controller window." ) );
+
+	l->addWidget( m_closeButton, 0, 2, 1, 7, Qt::AlignLeft );
+
 
 	for( int i = 0; i < 10; i++ )
 	{
@@ -408,6 +418,14 @@ manageVSTEffectView::manageVSTEffectView( VstEffect * _eff, VstEffectControls * 
 	m_vi->m_scrollArea->setWidget( widget );
 
 	m_vi->m_subWindow->show();
+}
+
+
+
+
+void manageVSTEffectView::closeWindow()
+{
+	m_vi2->m_subWindow->hide();
 }
 
 

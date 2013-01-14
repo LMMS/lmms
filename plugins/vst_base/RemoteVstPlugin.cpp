@@ -558,10 +558,12 @@ void RemoteVstPlugin::initEditor()
 	}
 
 #ifdef LMMS_BUILD_LINUX
-	m_window = CreateWindowEx( 0, "LVSL", m_shortName.c_str(),
-			       ( WS_OVERLAPPEDWINDOW | WS_THICKFRAME ) & ~WS_MAXIMIZEBOX,
-			       0, 0, 10, 10, NULL, NULL, hInst, NULL );
+	//m_window = CreateWindowEx( 0, "LVSL", m_shortName.c_str(),
+	//		       ( WS_OVERLAPPEDWINDOW | WS_THICKFRAME ) & ~WS_MAXIMIZEBOX,
+	//		       0, 0, 10, 10, NULL, NULL, hInst, NULL );
 
+	m_window = CreateWindowEx( 0 , "LVSL", m_shortName.c_str(),
+	   WS_POPUP | WS_SYSMENU | WS_BORDER , 0, 0, 10, 10, NULL, NULL, hInst, NULL);
 #else
 	m_windowID = 1;	// arbitrary value on win32 to signal
 			// vstPlugin-class that we have an editor

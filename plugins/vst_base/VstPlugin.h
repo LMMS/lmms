@@ -53,7 +53,7 @@ public:
 		return m_pluginWindowID != 0;
 	}
 
-	void showEditor( QWidget * _parent = NULL );
+	void showEditor( QWidget * _parent = NULL, bool isEffect = false );
 	void hideEditor();
 
 	inline const QString & name() const

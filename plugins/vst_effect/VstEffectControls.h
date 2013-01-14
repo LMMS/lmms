@@ -115,6 +115,7 @@ protected slots:
 	void syncPlugin( void );
 	void displayAutomatedOnly( void );
 	void setParameter( void );
+	void closeWindow();
 
 private:
 
@@ -131,6 +132,7 @@ private:
 
 	QPushButton * m_syncButton;
 	QPushButton * m_displayAutomatedOnly;
+	QPushButton * m_closeButton;
 
 } ;
 

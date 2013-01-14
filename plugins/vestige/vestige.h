@@ -113,6 +113,7 @@ protected slots:
 	void syncPlugin( void );
 	void displayAutomatedOnly( void );
 	void setParameter( void );
+	void closeWindow();
 
 
 protected:
@@ -130,6 +131,7 @@ private:
 	QGridLayout * l;
 	QPushButton * m_syncButton;
 	QPushButton * m_displayAutomatedOnly;
+	QPushButton * m_closeButton;
 
 } ;
 

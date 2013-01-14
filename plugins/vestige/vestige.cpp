@@ -263,7 +263,7 @@ void vestigeInstrument::loadFile( const QString & _file )
 		return;
 	}
 
-	m_plugin->showEditor();
+	m_plugin->showEditor( NULL, false );
 
 	if( set_ch_name )
 	{
@@ -743,8 +743,7 @@ void VestigeInstrumentView::selPreset( void )
 
 void VestigeInstrumentView::toggleGUI( void )
 {
-	QMutexLocker ml( &m_vi->m_pluginMutex );
-	if( m_vi->m_plugin == NULL )
+	if( m_vi == NULL || m_vi->m_plugin == NULL )
 	{
 		return;
 	}
@@ -848,14 +847,15 @@ void VestigeInstrumentView::paintEvent( QPaintEvent * )
 		p.setPen( QColor( 251, 41, 8 ) );
 		f.setBold( false );
 		p.setFont( pointSize<8>( f ) );
-		p.drawText( 10, 114, tr( "by" ) + " " +
+		p.drawText( 10, 114, tr( "by " ) +
 					m_vi->m_plugin->vendorString() );
 		p.drawText( 10, 225, m_vi->m_plugin->currentProgramName() );
 	}
 
 	if( m_vi->m_subWindow != NULL )
 	{
-		m_vi->m_subWindow->setWindowTitle( m_vi->instrumentTrack()->name() );
+		m_vi->m_subWindow->setWindowTitle( m_vi->instrumentTrack()->name() 
+								+ tr( " - VST plugin control" ) );
 	}
 //	m_pluginMutex.unlock();
 }
@@ -877,7 +877,8 @@ manageVestigeInstrumentView::manageVestigeInstrumentView( Instrument * _instrume
 	m_vi->m_subWindow->setSizePolicy( QSizePolicy::Fixed, QSizePolicy::Fixed );
 	m_vi->m_subWindow->setFixedSize( 960, 300);
 	m_vi->m_subWindow->setWidget(m_vi->m_scrollArea);
-	m_vi->m_subWindow->setWindowTitle( m_vi->instrumentTrack()->name() );
+	m_vi->m_subWindow->setWindowTitle( m_vi->instrumentTrack()->name() 
+								+ tr( " - VST plugin control" ) );
 	m_vi->m_subWindow->setWindowIcon( PLUGIN_NAME::getIconPixmap( "logo" ) );
 	//m_vi->m_subWindow->setAttribute(Qt::WA_DeleteOnClose);
 
@@ -901,6 +902,16 @@ manageVestigeInstrumentView::manageVestigeInstrumentView( Instrument * _instrume
 		tr( "Click here if you want to display automated parameters only." ) );
 
 	l->addWidget( m_displayAutomatedOnly, 0, 1, 1, 2, Qt::AlignLeft );
+
+
+	m_closeButton = new QPushButton( tr( "    Close    " ), widget );
+	connect( m_closeButton, SIGNAL( clicked() ), this,
+							SLOT( closeWindow() ) );
+	m_closeButton->setWhatsThis(
+		tr( "Close VST plugin knob-controller window." ) );
+
+	l->addWidget( m_closeButton, 0, 2, 1, 7, Qt::AlignLeft );
+
 
 	for( int i = 0; i < 10; i++ )
 	{
@@ -968,6 +979,14 @@ manageVestigeInstrumentView::manageVestigeInstrumentView( Instrument * _instrume
 	m_vi->m_scrollArea->setWidget( widget );
 
 	m_vi->m_subWindow->show();
+}
+
+
+
+
+void manageVestigeInstrumentView::closeWindow()
+{
+	m_vi->m_subWindow->hide();
 }
 
 
@@ -1119,7 +1138,8 @@ void manageVestigeInstrumentView::dropEvent( QDropEvent * _de )
  
 void manageVestigeInstrumentView::paintEvent( QPaintEvent * )
 {
-	m_vi->m_subWindow->setWindowTitle(m_vi->instrumentTrack()->name());
+	m_vi->m_subWindow->setWindowTitle( m_vi->instrumentTrack()->name()
+					+ tr( " - VST plugin control" ) );
 }
 
 

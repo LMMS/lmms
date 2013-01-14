@@ -85,6 +85,8 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 "while deciding when to stop processing signals." ) );
 
 
+	setModel( _model );
+
 	if( effect()->controls()->controlCount() > 0 )
 	{
 		QPushButton * ctls_btn = new QPushButton( tr( "Controls" ),
@@ -94,6 +96,7 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 		ctls_btn->setGeometry( 140, 14, 50, 20 );
 		connect( ctls_btn, SIGNAL( clicked() ), 
 					this, SLOT( editControls() ) );
+
 		m_controlView = effect()->controls()->createView();
 		if( m_controlView )
 		{
@@ -141,7 +144,8 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 "Right clicking will bring up a context menu where you can change the order "
 "in which the effects are processed or delete an effect altogether." ) );
 
-	setModel( _model );
+	//move above vst effect view creation
+	//setModel( _model );
 }
 
 
@@ -149,7 +153,15 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 
 EffectView::~EffectView()
 {
+
+#ifdef LMMS_BUILD_LINUX
+
 	delete m_subWindow;
+#else
+	// otherwise on win32 build VST GUI can get lost
+	m_subWindow->hide();
+#endif
+
 }
 
 
@@ -159,7 +171,7 @@ void EffectView::editControls()
 {
 	if( m_subWindow )
 	{
-		if( !effect()->controls()->isViewVisible() )
+		if( !m_subWindow->isVisible() )
 		{
 			m_subWindow->show();
 			m_subWindow->raise();
