@@ -335,7 +335,12 @@ RemoteVstPlugin::RemoteVstPlugin( key_t _shm_in, key_t _shm_out ) :
 	{
 		message m = receiveMessage();
 		processMessage( m );
-		if( m.id == IdVstLoadPlugin || m.id == IdQuit )
+		//if( m.id == IdVstLoadPlugin || m.id == IdQuit )
+
+		// IdBufferSizeInformation is sent right after plugin load
+		// otherwise causes deadlocks to FxMixer/EffectChain
+
+		if( m.id == IdBufferSizeInformation || m.id == IdQuit )
 		{
 			break;
 		}
