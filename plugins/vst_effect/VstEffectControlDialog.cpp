@@ -37,12 +37,15 @@
 #include <QObject>
 #include <QtGui/QPainter>
 #include "gui_templates.h"
+#include <QtGui/QToolBar>
+#include <QtGui/QLabel>
 
 
 VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 	EffectControlDialog( _ctl ),
 	m_pluginWidget( NULL ),
-	m_plugin( NULL )
+	m_plugin( NULL ),
+	tbLabel( NULL )
 {
 	QGridLayout * l = new QGridLayout( this );
 	l->setContentsMargins( 10, 10, 10, 10 );
@@ -68,15 +71,16 @@ VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 	if( m_pluginWidget )
 	{
 		setWindowTitle( m_pluginWidget->windowTitle() );
-		QPushButton * btn = new QPushButton( tr( "Show/hide VST FX GUI" ) );
+		setMinimumWidth( 250 );
+
+		QPushButton * btn = new QPushButton( tr( "Show/hide" ) );
 		btn->setCheckable( true );
-		l->addWidget( btn, 0, 0, 1, 80, Qt::AlignLeft );
 		connect( btn, SIGNAL( toggled( bool ) ),
 					m_pluginWidget, SLOT( setVisible( bool ) ) );
 		emit btn->click();
 
-		btn->setMinimumWidth( 200 );
-		btn->setMaximumWidth( 200 );
+		btn->setMinimumWidth( 78 );
+		btn->setMaximumWidth( 78 );
 		btn->setMinimumHeight( 24 );
 		btn->setMaximumHeight( 24 );
 
@@ -202,22 +206,40 @@ VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 		m_savePresetButton->setMinimumHeight( 21 );
 		m_savePresetButton->setMaximumHeight( 21 );
 
-		for( int i = 0; i < 13; i++ )
-		{
-			l->addItem( new QSpacerItem( 15, 30, QSizePolicy::Fixed, 
-						QSizePolicy::Fixed ), 1, i );
-		}
-		l->addWidget( m_openPresetButton, 1, 6, 1, 1, Qt::AlignLeft );
-		l->addWidget( m_rolLPresetButton, 1, 3, 1, 1, Qt::AlignLeft );
-		l->addWidget( m_rolRPresetButton, 1, 4, 1, 1, Qt::AlignLeft );
-	    	l->addWidget( _ctl->m_selPresetButton, 1, 5, 1, 1, Qt::AlignLeft );
+		int newSize = m_pluginWidget->width() + 20;
+		newSize = (newSize < 250) ? 250 : newSize;
+		QWidget* resize = new QWidget(this);
+		resize->resize( newSize, 10 );
+		QWidget* space0 = new QWidget(this);
+		space0->resize(8, 10);
+		QWidget* space1 = new QWidget(this);
+		space1->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+		QFont f( "Arial", 10 );
 
-		l->addWidget( m_savePresetButton, 1, 7, 2, 2, Qt::AlignLeft );
-	      	l->addWidget( m_managePluginButton, 1, 8, 2, 2, Qt::AlignCenter );
-		l->addWidget( m_pluginWidget, 3, 0, 1, 80, Qt::AlignCenter );
-
+		l->addItem( new QSpacerItem( newSize - 20, 30, QSizePolicy::Fixed, 
+						QSizePolicy::Fixed ), 1, 0 );
+		l->addWidget( resize, 2, 0, 1, 1, Qt::AlignCenter );
+		l->addWidget( m_pluginWidget, 3, 0, 1, 1, Qt::AlignCenter );
 		l->setRowStretch( 5, 1 );
-		l->setColumnStretch( 80, 1 );
+		l->setColumnStretch( 1, 1 );
+
+		QToolBar * tb = new QToolBar( this );
+		tb->resize( newSize , 32 );
+		tb->addWidget(space0);
+		tb->addWidget( m_rolLPresetButton );
+		tb->addWidget( m_rolRPresetButton );
+		tb->addWidget( _ctl->m_selPresetButton );
+		tb->addWidget( m_openPresetButton );
+		tb->addWidget( m_savePresetButton );
+		tb->addWidget( m_managePluginButton );
+		tb->addWidget( btn );
+		tb->addWidget(space1);
+
+		tbLabel = new QLabel( tr( "Effect by: " ), this );
+		tbLabel->setFont( pointSize<7>( f ) );
+		tbLabel->setTextFormat(Qt::RichText);
+		tbLabel->setAlignment( Qt::AlignTop | Qt::AlignLeft );
+		tb->addWidget( tbLabel );
 	}
 }
 
@@ -226,22 +248,11 @@ VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 
 void VstEffectControlDialog::paintEvent( QPaintEvent * )
 {
-	if( m_plugin != NULL )
+	if( m_plugin != NULL && tbLabel != NULL )
 	{
-		QString plugin_name = m_plugin->name();
-		QPainter p( this );
-		QFont f = p.font();
-
-		f.setBold( true );
-		p.setFont( pointSize<10>( f ) );
-		p.setPen( QColor( 32, 160, 54 ) );
-		p.drawText( 225, 20, plugin_name );
-		p.setPen( QColor( 251, 41, 8 ) );
-		f.setBold( false );
-		p.setFont( pointSize<8>( f ) );
-		p.drawText( 225, 34, tr( "Effect by: " ) + m_plugin->vendorString() );
-		p.drawText( 225, 47, m_plugin->currentProgramName() );
-
+		tbLabel->setText( tr( "Effect by: " ) + m_plugin->vendorString() + 
+			tr( "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br />" ) + 
+			m_plugin->currentProgramName() );
 	}
 }
 

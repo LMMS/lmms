@@ -30,6 +30,7 @@
 
 #include <QObject>
 #include <QPainter>
+#include <QtGui/QLabel>
 
 
 class VstEffectControls;
@@ -59,6 +60,8 @@ private:
 	pixmapButton * m_savePresetButton;
 
 	VstPlugin * m_plugin;
+
+	QLabel * tbLabel;
 } ;
 
 #endif
