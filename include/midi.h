@@ -1,7 +1,7 @@
 /*
  * midi.h - constants, structs etc. concerning MIDI
  *
- * Copyright (c) 2005-2012 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2013 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -132,7 +132,8 @@ struct midiEvent
 		m_metaEvent( MidiMetaInvalid ),
 		m_channel( _channel ),
 		m_sysExData( NULL ),
-		m_sourcePort( _sourcePort )
+		m_sourcePort( _sourcePort ),
+		m_fromMidiPort( false )
 	{
 		m_data.m_param[0] = _param1;
 		m_data.m_param[1] = _param2;
@@ -144,7 +145,8 @@ struct midiEvent
 		m_metaEvent( MidiMetaInvalid ),
 		m_channel( 0 ),
 		m_sysExData( _sysex_data ),
-		m_sourcePort( NULL )
+		m_sourcePort( NULL ),
+		m_fromMidiPort( false )
 	{
 		m_data.m_sysExDataLen = _data_len;
 	}
@@ -155,7 +157,8 @@ struct midiEvent
 		m_channel( _copy.m_channel ),
 		m_data( _copy.m_data ),
 		m_sysExData( _copy.m_sysExData ),
-		m_sourcePort( _copy.m_sourcePort )
+		m_sourcePort( _copy.m_sourcePort ),
+		m_fromMidiPort( _copy.m_fromMidiPort )
 	{
 	}
 
@@ -222,6 +225,15 @@ struct midiEvent
 			( (float)( PanningRight - PanningLeft ) ) );
 	}
 
+	void setFromMidiPort( bool enabled )
+	{
+		m_fromMidiPort = enabled;
+	}
+
+	bool isFromMidiPort() const
+	{
+		return m_fromMidiPort;
+	}
 
 	MidiEventTypes m_type;		// MIDI event type
 	MidiMetaEvents m_metaEvent;	// Meta event (mostly unused)
@@ -235,6 +247,10 @@ struct midiEvent
 
 	const char * m_sysExData;
 	const void * m_sourcePort;
+
+
+private:
+	bool m_fromMidiPort;
 
 } ;
 
