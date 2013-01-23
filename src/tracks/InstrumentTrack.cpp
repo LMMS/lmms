@@ -221,6 +221,18 @@ void InstrumentTrack::processInEvent( const midiEvent & _me,
 							const midiTime & _time )
 {
 	engine::getMixer()->lock();
+
+	// in the special case this event comes from a MIDI port, the instrument
+	// is MIDI based (VST plugin, Sf2Player etc.) and the user did not set
+	// a dedicated MIDI output channel, directly pass the MIDI event to the
+	// instrument plugin
+	if( _me.isFromMidiPort() && m_instrument->isMidiBased() &&
+			midiPort()->realOutputChannel() < 0 )
+	{
+		m_instrument->handleMidiEvent( _me, _time );
+		return;
+	}
+
 	switch( _me.m_type )
 	{
 		// we don't send MidiNoteOn, MidiNoteOff and MidiKeyPressure
