@@ -2,7 +2,7 @@
  * MidiPort.cpp - abstraction of MIDI-ports which are part of LMMS's MIDI-
  *                sequencing system
  *
- * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2013 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -129,20 +129,24 @@ void MidiPort::processInEvent( const midiEvent & _me, const midiTime & _time )
 	if( inputEnabled() &&
 		( inputChannel()-1 == _me.m_channel || inputChannel() == 0 ) )
 	{
+		midiEvent ev = _me;
 		if( _me.m_type == MidiNoteOn ||
 			_me.m_type == MidiNoteOff ||
 			_me.m_type == MidiKeyPressure )
 		{
-			if( _me.key() < 0 || _me.key() >= NumKeys )
+			ev.key() = ev.key() + KeysPerOctave;
+			if( ev.key() < 0 || ev.key() >= NumKeys )
 			{
 				return;
 			}
 		}
-		midiEvent ev = _me;
+
 		if( fixedInputVelocity() >= 0 && _me.velocity() > 0 )
 		{
 			ev.velocity() = fixedInputVelocity();
 		}
+
+		ev.setFromMidiPort( true );
 		m_midiEventProcessor->processInEvent( ev, _time );
 	}
 }
