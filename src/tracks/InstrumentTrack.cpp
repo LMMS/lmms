@@ -226,8 +226,8 @@ void InstrumentTrack::processInEvent( const midiEvent & _me,
 	// is MIDI based (VST plugin, Sf2Player etc.) and the user did not set
 	// a dedicated MIDI output channel, directly pass the MIDI event to the
 	// instrument plugin
-	if( _me.isFromMidiPort() && m_instrument->isMidiBased() &&
-			midiPort()->realOutputChannel() < 0 )
+	if( _me.isFromMidiPort() && m_instrument->isMidiBased()/* &&
+			midiPort()->realOutputChannel() < 0 */ )
 	{
 		m_instrument->handleMidiEvent( _me, _time );
 		return;
