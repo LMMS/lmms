@@ -108,6 +108,7 @@ private slots:
 	void toggleAutoSave( bool _enabled );
 	void toggleOneInstrumentTrackWindow( bool _enabled );
 	void toggleCompactTrackButtons( bool _enabled );
+	void toggleSyncVSTPlugins( bool _enabled );
 
 
 private:
@@ -156,6 +157,7 @@ private:
 	bool m_enableAutoSave;
 	bool m_oneInstrumentTrackWindow;
 	bool m_compactTrackButtons;
+	bool m_syncVSTPlugins;
 
 	typedef QMap<QString, AudioDevice::setupWidget *> AswMap;
 	typedef QMap<QString, MidiClient::setupWidget *> MswMap;

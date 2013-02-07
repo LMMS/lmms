@@ -27,6 +27,7 @@
 
 #include "export.h"
 #include "midi.h"
+#include "VST_sync_shm.h"
 
 #include <vector>
 #include <cstdio>
@@ -811,7 +812,9 @@ class RemotePluginClient : public RemotePluginBase
 public:
 	RemotePluginClient( key_t _shm_in, key_t _shm_out );
 	virtual ~RemotePluginClient();
-
+#ifdef USE_QT_SHMEM
+	sncVST * getQtVSTshm();
+#endif
 	virtual bool processMessage( const message & _m );
 
 	virtual void process( const sampleFrame * _in_buf,
@@ -879,7 +882,9 @@ private:
 
 #ifdef USE_QT_SHMEM
 	QSharedMemory m_shmObj;
+	QSharedMemory m_shmQtID;
 #endif
+	sncVST * m_SncVSTplug;
 	float * m_shm;
 
 	int m_inputCount;
@@ -1007,13 +1012,60 @@ RemotePluginClient::RemotePluginClient( key_t _shm_in, key_t _shm_out ) :
 	RemotePluginBase( new shmFifo( _shm_in ), new shmFifo( _shm_out ) ),
 #ifdef USE_QT_SHMEM
 	m_shmObj(),
+	m_shmQtID( "/usr/bin/lmms" ),
 #endif
+	m_SncVSTplug( NULL ),
 	m_shm( NULL ),
 	m_inputCount( 0 ),
 	m_outputCount( 0 ),
 	m_sampleRate( 44100 ),
 	m_bufferSize( 0 )
 {
+#ifdef USE_QT_SHMEM
+	if( m_shmQtID.attach( QSharedMemory::ReadOnly ) )
+	{
+		m_SncVSTplug = (sncVST *) m_shmQtID.data();
+		m_bufferSize = m_SncVSTplug->m_bufferSize;
+		m_sampleRate = m_SncVSTplug->m_sampleRate;
+		return;
+	}
+#else
+	key_t key;
+	int m_shmID;
+
+	if( ( key = ftok( VST_SNC_SHM_KEY_FILE, 'R' ) ) == -1 )
+	{
+		perror( "RemotePluginClient::ftok" );
+	}
+	else
+	{	// connect to shared memory segment
+		if( ( m_shmID = shmget( key, 0, 0 ) ) == -1 )
+		{
+			perror( "RemotePluginClient::shmget" );
+		}
+		else
+		{	// attach segment
+			m_SncVSTplug = (sncVST *)shmat(m_shmID, 0, 0);
+			if( m_SncVSTplug == (sncVST *)( -1 ) )
+			{
+				perror( "RemotePluginClient::shmat" );
+			}
+			else
+			{
+				m_bufferSize = m_SncVSTplug->m_bufferSize;
+				m_sampleRate = m_SncVSTplug->m_sampleRate;
+
+				// detach segment
+				if( shmdt(m_SncVSTplug) == -1 )
+				{
+					perror("RemotePluginClient::shmdt");
+				}
+				return;
+			}
+		}
+	}
+#endif
+	// if attaching shared memory fails
 	sendMessage( IdSampleRateInformation );
 	sendMessage( IdBufferSizeInformation );
 }
@@ -1023,6 +1075,9 @@ RemotePluginClient::RemotePluginClient( key_t _shm_in, key_t _shm_out ) :
 
 RemotePluginClient::~RemotePluginClient()
 {
+#ifdef USE_QT_SHMEM
+	m_shmQtID.detach();
+#endif
 	sendMessage( IdQuit );
 
 #ifndef USE_QT_SHMEM
@@ -1030,6 +1085,14 @@ RemotePluginClient::~RemotePluginClient()
 #endif
 }
 
+
+
+#ifdef USE_QT_SHMEM
+sncVST * RemotePluginClient::getQtVSTshm()
+{
+	return m_SncVSTplug;
+}
+#endif
 
 
 
