@@ -1,7 +1,7 @@
 /*
  * song.cpp - root of the model tree
  *
- * Copyright (c) 2004-2012 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2013 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -1096,8 +1096,9 @@ void song::importProject()
 			tr("MIDI sequences") +
 			" (*.mid *.midi *.rmi);;" +
 			tr("FL Studio projects") +
-			" (*.flp"
-			 	");;" +
+			" (*.flp);;" +
+			tr("Hydrogen projects") +
+			" (*.h2song);;" +
 			tr("All file types") +
 			" (*.*)");
 
