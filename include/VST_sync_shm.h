@@ -39,19 +39,19 @@
 struct sncVST
 {
 	bool isPlayin;
-	double ppqPos;
+	float ppqPos;
 	int timeSigNumer;
 	int timeSigDenom;
 	bool isCycle;
 	bool hasSHM;
-	double cycleStart;
-	double cycleEnd;
+	float cycleStart;
+	float cycleEnd;
 	int m_bufferSize;
 	int m_sampleRate;
 	int m_bpm;
 
 #ifdef VST_SNC_LATENCY
-	double m_latency;
+	float m_latency;
 #endif
 } ;
 

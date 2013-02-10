@@ -319,8 +319,8 @@ private:
 	// host to plugin synchronisation data structure
 	struct in
 	{
-		double lastppqPos;
-		double m_Timestamp;
+		float lastppqPos;
+		float m_Timestamp;
 	} ;
 
 	in * m_in;
@@ -1482,7 +1482,7 @@ intptr_t RemoteVstPlugin::hostCallback( AEffect * _effect, int32_t _opcode,
 				__plugin->m_in->lastppqPos += (
 							__plugin->m_SncVSTplug->hasSHM ?
 							__plugin->m_SncVSTplug->m_bpm :
-							__plugin->m_bpm ) / (double)10340;
+							__plugin->m_bpm ) / (float)10340;
 				_timeInfo.ppqPos = __plugin->m_in->lastppqPos;
 			}
 //			_timeInfo.ppqPos = __plugin->m_SncVSTplug->ppqPos;

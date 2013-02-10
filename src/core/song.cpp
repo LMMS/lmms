@@ -243,7 +243,7 @@ void song::setTempo()
 
 #ifdef VST_SNC_LATENCY
 	m_SncVSTplug->m_latency = m_SncVSTplug->m_bufferSize * tempo / 
-				( (double) m_SncVSTplug->m_sampleRate * 60 );
+				( (float) m_SncVSTplug->m_sampleRate * 60 );
 #endif
 
 	emit tempoChanged( tempo );
@@ -471,7 +471,7 @@ void song::processNextBuffer()
 #ifdef VST_SNC_LATENCY
 		m_SncVSTplug->m_latency = m_SncVSTplug->m_bufferSize * 
 				m_SncVSTplug->m_bpm / 
-				( (double) m_SncVSTplug->m_sampleRate * 60 );
+				( (float) m_SncVSTplug->m_sampleRate * 60 );
 #endif
 
 		float current_frame = m_playPos[m_playMode].currentFrame();
@@ -482,10 +482,10 @@ void song::processNextBuffer()
 				+ (int)( current_frame / frames_per_tick );
 
 #ifdef VST_SNC_LATENCY
-			m_SncVSTplug->ppqPos = ( ( ticks + 0 ) / (double)48 ) -
+			m_SncVSTplug->ppqPos = ( ( ticks + 0 ) / (float)48 ) -
 							m_SncVSTplug->m_latency;
 #else
-			m_SncVSTplug->ppqPos = ( ( ticks + 0 ) / (double)48 );
+			m_SncVSTplug->ppqPos = ( ( ticks + 0 ) / (float)48 );
 #endif
 
 			// did we play a whole tact?
@@ -523,11 +523,11 @@ void song::processNextBuffer()
 						midiTime::ticksPerTact() );
 #ifdef VST_SNC_LATENCY
 					m_SncVSTplug->ppqPos = ( ( ticks + 0 )
-						/ (double)48 )
+						/ (float)48 )
 						- m_SncVSTplug->m_latency;
 #else
 					m_SncVSTplug->ppqPos = ( ( ticks + 0 )
-								/ (double)48 );
+								/ (float)48 );
 #endif
 				}
 			}
@@ -538,10 +538,10 @@ void song::processNextBuffer()
 				m_SncVSTplug->isCycle = true;
 				m_SncVSTplug->cycleStart = 
 					( tl->loopBegin().getTicks() )
-								/ (double)48;
+								/ (float)48;
 				m_SncVSTplug->cycleEnd =
 					( tl->loopEnd().getTicks() )
-								/ (double)48;
+								/ (float)48;
 				if( m_playPos[m_playMode] >= tl->loopEnd() )
 				{
 					m_playPos[m_playMode].setTicks(
@@ -1362,7 +1362,7 @@ void song::updateSampleRateSHM()
 
 #ifdef VST_SNC_LATENCY
 	m_SncVSTplug->m_latency = m_SncVSTplug->m_bufferSize * m_SncVSTplug->m_bpm /
-				( (double) m_SncVSTplug->m_sampleRate * 60 );
+				( (float) m_SncVSTplug->m_sampleRate * 60 );
 #endif
 }
 
