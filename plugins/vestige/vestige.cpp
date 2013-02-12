@@ -169,6 +169,16 @@ void vestigeInstrument::setParameter( void )
 
 void vestigeInstrument::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
+	if( QFileInfo( m_pluginDLL ).isAbsolute() )
+	{
+		QString relativePath;
+		if( !( relativePath = m_pluginDLL.section( configManager::
+					inst()->vstDir(), 1, 1 ) ).isEmpty() )
+		{
+			m_pluginDLL = relativePath;
+		}
+	}
+
 	_this.setAttribute( "plugin", m_pluginDLL );
 	m_pluginMutex.lock();
 	if( m_plugin != NULL )
