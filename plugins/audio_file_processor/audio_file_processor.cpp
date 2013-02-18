@@ -927,6 +927,10 @@ void AudioFileProcessorWaveView::slideSamplePointByFrames( knobType _point, f_cn
 
 void AudioFileProcessorWaveView::slideSampleByFrames( f_cnt_t _frames )
 {
+	if( m_sampleBuffer.frames() <= 1 )
+	{
+		return;
+	}
 	const double v = double( _frames ) / m_sampleBuffer.frames();
 	m_startKnob->slideBy( v, false );
 	m_endKnob->slideBy( v, false );
