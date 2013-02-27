@@ -117,7 +117,9 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 	m_oneInstrumentTrackWindow( configManager::inst()->value( "ui",
 					"oneinstrumenttrackwindow" ).toInt() ),
 	m_compactTrackButtons( configManager::inst()->value( "ui",
-					"compacttrackbuttons" ).toInt() )
+					"compacttrackbuttons" ).toInt() ),
+	m_syncVSTPlugins( configManager::inst()->value( "ui",
+					"syncvstplugins" ).toInt() )
 {
 	setWindowIcon( embed::getIconPixmap( "setup_general" ) );
 	setWindowTitle( tr( "Setup LMMS" ) );
@@ -186,7 +188,7 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 
 
 	tabWidget * misc_tw = new tabWidget( tr( "MISC" ), general );
-	misc_tw->setFixedHeight( 156 );
+	misc_tw->setFixedHeight( 174 );
 
 	ledCheckBox * enable_tooltips = new ledCheckBox(
 							tr( "Enable tooltips" ),
@@ -245,6 +247,15 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 	compacttracks->setChecked( m_compactTrackButtons );
 	connect( compacttracks, SIGNAL( toggled( bool ) ),
 				this, SLOT( toggleCompactTrackButtons( bool ) ) );
+
+
+	ledCheckBox * syncVST = new ledCheckBox(
+				tr( "Sync VST plugins to host playback" ),
+								misc_tw );
+	syncVST->move( 10, 144 );
+	syncVST->setChecked( m_syncVSTPlugins );
+	connect( syncVST, SIGNAL( toggled( bool ) ),
+				this, SLOT( toggleSyncVSTPlugins( bool ) ) );
 
 
 
@@ -774,6 +785,8 @@ void setupDialog::accept()
 					QString::number( m_oneInstrumentTrackWindow ) );
 	configManager::inst()->setValue( "ui", "compacttrackbuttons",
 					QString::number( m_compactTrackButtons ) );
+	configManager::inst()->setValue( "ui", "syncvstplugins",
+					QString::number( m_syncVSTPlugins ) );
 
 	configManager::inst()->setWorkingDir( m_workingDir );
 	configManager::inst()->setVSTDir( m_vstDir );
@@ -950,6 +963,15 @@ void setupDialog::toggleAutoSave( bool _enabled )
 void setupDialog::toggleCompactTrackButtons( bool _enabled )
 {
 	m_compactTrackButtons = _enabled;
+}
+
+
+
+
+
+void setupDialog::toggleSyncVSTPlugins( bool _enabled )
+{
+	m_syncVSTPlugins = _enabled;
 }
 
 

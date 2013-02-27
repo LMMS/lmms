@@ -2,7 +2,7 @@
  * sf2_player.cpp - a soundfont2 player using fluidSynth
  *
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail/dot/com>
- * Copyright (c) 2009-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2009-2013 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -389,6 +389,8 @@ void sf2Instrument::openFile( const QString & _sf2File )
 	}
 
 	delete[] sf2Ascii;
+
+	instrumentTrack()->setName( QFileInfo( _sf2File ).baseName() );
 }
 
 

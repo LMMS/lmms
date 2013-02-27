@@ -221,6 +221,18 @@ void InstrumentTrack::processInEvent( const midiEvent & _me,
 							const midiTime & _time )
 {
 	engine::getMixer()->lock();
+
+	// in the special case this event comes from a MIDI port, the instrument
+	// is MIDI based (VST plugin, Sf2Player etc.) and the user did not set
+	// a dedicated MIDI output channel, directly pass the MIDI event to the
+	// instrument plugin
+	if( _me.isFromMidiPort() && m_instrument->isMidiBased()/* &&
+			midiPort()->realOutputChannel() < 0 */ )
+	{
+		m_instrument->handleMidiEvent( _me, _time );
+		return;
+	}
+
 	switch( _me.m_type )
 	{
 		// we don't send MidiNoteOn, MidiNoteOff and MidiKeyPressure
@@ -315,6 +327,17 @@ void InstrumentTrack::processInEvent( const midiEvent & _me,
 					m_sustainPedalPressed = false;
 				}
 			}
+			if( _me.controllerNumber() == MidiControllerAllSoundOff ||
+			    _me.controllerNumber() == MidiControllerAllNotesOff ||
+			    _me.controllerNumber() == MidiControllerOmniOn ||
+			    _me.controllerNumber() == MidiControllerOmniOff ||
+			    _me.controllerNumber() == MidiControllerMonoOn ||
+			    _me.controllerNumber() == MidiControllerPolyOn )
+			{
+				silenceAllNotes();
+			}
+			m_instrument->handleMidiEvent( _me, _time );
+			break;
 
 		case MidiProgramChange:
 			m_instrument->handleMidiEvent( _me, _time );
@@ -1036,9 +1059,9 @@ void InstrumentTrackView::freeInstrumentTrackWindow()
 			model()->setHook( NULL );
 			m_window->setInstrumentTrackView( NULL );
 			m_window->parentWidget()->hide();
-			m_window->setModel(
-				engine::dummyTrackContainer()->
-						dummyInstrumentTrack() );
+			//m_window->setModel(
+			//	engine::dummyTrackContainer()->
+			//			dummyInstrumentTrack() );
 			m_window->updateInstrumentView();
 			s_windowCache << m_window;
 		}

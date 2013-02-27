@@ -2,7 +2,7 @@
  * MidiPort.cpp - abstraction of MIDI-ports which are part of LMMS's MIDI-
  *                sequencing system
  *
- * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2013 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -45,17 +45,17 @@ MidiPort::MidiPort( const QString & _name, MidiClient * _mc,
 	m_outputChannelModel( 1, 1, MidiChannelCount, this,
 						tr( "Output channel" ) ),
 	m_inputControllerModel( 0, 0, MidiControllerCount, this,
-						tr( "Input controller" )  ),
+						tr( "Input controller" ) ),
 	m_outputControllerModel( 0, 0, MidiControllerCount, this,
-						tr( "Output controller" )  ),
+						tr( "Output controller" ) ),
 	m_fixedInputVelocityModel( -1, -1, MidiMaxVelocity, this,
-						tr( "Fixed input velocity" )  ),
+						tr( "Fixed input velocity" ) ),
 	m_fixedOutputVelocityModel( -1, -1, MidiMaxVelocity, this,
 						tr( "Fixed output velocity" ) ),
 	m_fixedOutputNoteModel( -1, -1, MidiMaxNote, this,
 						tr( "Fixed output note" ) ),
 	m_outputProgramModel( 1, 1, MidiProgramCount, this,
-						tr( "Output MIDI program" )  ),
+						tr( "Output MIDI program" ) ),
 	m_readableModel( false, this, tr( "Receive MIDI-events" ) ),
 	m_writableModel( false, this, tr( "Send MIDI-events" ) )
 {
@@ -129,20 +129,24 @@ void MidiPort::processInEvent( const midiEvent & _me, const midiTime & _time )
 	if( inputEnabled() &&
 		( inputChannel()-1 == _me.m_channel || inputChannel() == 0 ) )
 	{
+		midiEvent ev = _me;
 		if( _me.m_type == MidiNoteOn ||
 			_me.m_type == MidiNoteOff ||
 			_me.m_type == MidiKeyPressure )
 		{
-			if( _me.key() < 0 || _me.key() >= NumKeys )
+			ev.key() = ev.key() + KeysPerOctave;
+			if( ev.key() < 0 || ev.key() >= NumKeys )
 			{
 				return;
 			}
 		}
-		midiEvent ev = _me;
+
 		if( fixedInputVelocity() >= 0 && _me.velocity() > 0 )
 		{
 			ev.velocity() = fixedInputVelocity();
 		}
+
+		ev.setFromMidiPort( true );
 		m_midiEventProcessor->processInEvent( ev, _time );
 	}
 }
@@ -164,10 +168,11 @@ void MidiPort::processOutEvent( const midiEvent & _me, const midiTime & _time )
 			--ev.m_channel;
 		} */
 		if( ( _me.m_type == MidiNoteOn || _me.m_type == MidiNoteOff ) &&
-		    fixedOutputNote() >=0 ) {
-		  // Convert MIDI note number (from spinbox) -> LMMS note number
-		  // that will be converted back when outputted.
-		  ev.key() = fixedOutputNote() - KeysPerOctave;
+			fixedOutputNote() >= 0 )
+		{
+			// Convert MIDI note number (from spinbox) -> LMMS note number
+			// that will be converted back when outputted.
+			ev.key() = fixedOutputNote() - KeysPerOctave;
 		}
 		if( fixedOutputVelocity() >= 0 && _me.velocity() > 0 &&
 			( _me.m_type == MidiNoteOn ||

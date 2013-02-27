@@ -92,7 +92,20 @@ struct ERect
 #include "midi.h"
 #include "communication.h"
 
+#include "VST_sync_shm.h"
 
+#ifdef LMMS_BUILD_WIN32
+#define USE_QT_SHMEM
+#endif
+
+#ifndef USE_QT_SHMEM
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/types.h>
+#include <sys/ipc.h>
+#include <sys/shm.h>
+#endif
 
 static VstHostLanguages hlang = LanguageEnglish;
 
@@ -303,6 +316,18 @@ private:
 	double m_currentSamplePos;
 	int m_currentProgram;
 
+	// host to plugin synchronisation data structure
+	struct in
+	{
+		float lastppqPos;
+		float m_Timestamp;
+	} ;
+
+	in * m_in;
+
+	int m_shmID;
+	sncVST * m_SncVSTplug;
+
 } ;
 
 
@@ -324,11 +349,58 @@ RemoteVstPlugin::RemoteVstPlugin( key_t _shm_in, key_t _shm_out ) :
 	m_midiEvents(),
 	m_bpm( 0 ),
 	m_currentSamplePos( 0 ),
-	m_currentProgram( -1 )
+	m_currentProgram( -1 ),
+	m_in( NULL ),
+	m_shmID( -1 ),
+	m_SncVSTplug( NULL )
+
 {
 	pthread_mutex_init( &m_pluginLock, NULL );
 
 	__plugin = this;
+
+#ifndef USE_QT_SHMEM
+	key_t key;
+	if( ( key = ftok( VST_SNC_SHM_KEY_FILE, 'R' ) ) == -1 )
+	{
+		perror( "RemoteVstPlugin.cpp::ftok" );
+	}
+	else
+	{	// connect to shared memory segment
+		if( ( m_shmID = shmget( key, 0, 0 ) ) == -1 )
+		{
+			perror( "RemoteVstPlugin.cpp::shmget" );
+		}
+		else
+		{	// attach segment
+			m_SncVSTplug = (sncVST *)shmat(m_shmID, 0, 0);
+			if( m_SncVSTplug == (sncVST *)( -1 ) )
+			{
+				perror( "RemoteVstPlugin.cpp::shmat" );
+			}
+		}
+	}
+#else
+	m_SncVSTplug = RemotePluginClient::getQtVSTshm();
+#endif
+	if( m_SncVSTplug == NULL )
+	{
+		fprintf(stderr, "RemoteVstPlugin.cpp: "
+			"Failed to initialize shared memory for VST synchronization.\n"
+			" (VST-host synchronization will be disabled)\n");
+		m_SncVSTplug = (sncVST*) malloc( sizeof( sncVST ) );
+		m_SncVSTplug->isPlayin = true;
+		m_SncVSTplug->timeSigNumer = 4;
+		m_SncVSTplug->timeSigDenom = 4;
+		m_SncVSTplug->ppqPos = 0;
+		m_SncVSTplug->isCycle = false;
+		m_SncVSTplug->hasSHM = false;
+		m_SncVSTplug->m_sampleRate = sampleRate();
+	}
+
+	m_in = ( in* ) new char[ sizeof( in ) ];
+	m_in->lastppqPos = 0;
+	m_in->m_Timestamp = -1;
 
 	// process until we have loaded the plugin
 	while( 1 )
@@ -347,6 +419,21 @@ RemoteVstPlugin::RemoteVstPlugin( key_t _shm_in, key_t _shm_out ) :
 
 RemoteVstPlugin::~RemoteVstPlugin()
 {
+#ifndef USE_QT_SHMEM
+	// detach shared memory segment
+	if( shmdt( m_SncVSTplug ) == -1)
+	{
+		if( __plugin->m_SncVSTplug->hasSHM )
+		{
+			perror( "~RemoteVstPlugin::shmdt" );
+		}
+		if( m_SncVSTplug != NULL )
+		{
+			delete m_SncVSTplug;
+			m_SncVSTplug = NULL;
+		}
+	}
+#endif
 	if( m_window != NULL )
 	{
 		pluginDispatch( effEditClose );
@@ -451,7 +538,7 @@ bool RemoteVstPlugin::processMessage( const message & _m )
 			lock();
 			m_plugin->setParameter( m_plugin, _m.getInt( 0 ), _m.getFloat( 1 ) );
 			unlock();
-			sendMessage( IdVstSetParameter );
+			//sendMessage( IdVstSetParameter );
 			break;
 
 
@@ -485,6 +572,12 @@ void RemoteVstPlugin::init( const std::string & _plugin_file )
 	}
 
 	updateInOutCount();
+
+	// some plugins have to set samplerate during init
+	if( m_SncVSTplug->hasSHM )
+	{
+		updateSampleRate();
+	}
 
 	/* set program to zero */
 	/* i comment this out because it breaks dfx Geometer
@@ -558,10 +651,12 @@ void RemoteVstPlugin::initEditor()
 	}
 
 #ifdef LMMS_BUILD_LINUX
-	m_window = CreateWindowEx( 0, "LVSL", m_shortName.c_str(),
-			       ( WS_OVERLAPPEDWINDOW | WS_THICKFRAME ) & ~WS_MAXIMIZEBOX,
-			       0, 0, 10, 10, NULL, NULL, hInst, NULL );
+	//m_window = CreateWindowEx( 0, "LVSL", m_shortName.c_str(),
+	//		       ( WS_OVERLAPPEDWINDOW | WS_THICKFRAME ) & ~WS_MAXIMIZEBOX,
+	//		       0, 0, 10, 10, NULL, NULL, hInst, NULL );
 
+	m_window = CreateWindowEx( 0 , "LVSL", m_shortName.c_str(),
+	   WS_POPUP | WS_SYSMENU | WS_BORDER , 0, 0, 10, 10, NULL, NULL, hInst, NULL);
 #else
 	m_windowID = 1;	// arbitrary value on win32 to signal
 			// vstPlugin-class that we have an editor
@@ -1349,16 +1444,62 @@ intptr_t RemoteVstPlugin::hostCallback( AEffect * _effect, int32_t _opcode,
 			// fields are required (see valid masks above), as some
 			// items may require extensive conversions
 
-			memset( &_timeInfo, 0, sizeof( _timeInfo ) );
+			// Shared memory was initialised? - see song.cpp
+			//assert( __plugin->m_SncVSTplug != NULL );
 
+			memset( &_timeInfo, 0, sizeof( _timeInfo ) );
 			_timeInfo.samplePos = __plugin->m_currentSamplePos;
-			_timeInfo.sampleRate = __plugin->sampleRate();
+			_timeInfo.sampleRate = __plugin->m_SncVSTplug->hasSHM ?
+							__plugin->m_SncVSTplug->m_sampleRate :
+							__plugin->sampleRate();
 			_timeInfo.flags = 0;
-			_timeInfo.tempo = __plugin->m_bpm;
-			_timeInfo.timeSigNumerator = 4;
-			_timeInfo.timeSigDenominator = 4;
-			_timeInfo.flags |= (/* kVstBarsValid|*/kVstTempoValid );
-			_timeInfo.flags |= kVstTransportPlaying;
+			_timeInfo.tempo = __plugin->m_SncVSTplug->hasSHM ?
+							__plugin->m_SncVSTplug->m_bpm :
+							__plugin->m_bpm;
+			_timeInfo.timeSigNumerator = __plugin->m_SncVSTplug->timeSigNumer;
+			_timeInfo.timeSigDenominator = __plugin->m_SncVSTplug->timeSigDenom;
+			_timeInfo.flags |= kVstTempoValid;
+			_timeInfo.flags |= kVstTimeSigValid;
+
+			if( __plugin->m_SncVSTplug->isCycle )
+			{
+				_timeInfo.cycleStartPos = __plugin->m_SncVSTplug->cycleStart;
+				_timeInfo.cycleEndPos = __plugin->m_SncVSTplug->cycleEnd;
+				_timeInfo.flags |= kVstCyclePosValid;
+				_timeInfo.flags |= kVstTransportCycleActive;
+			}
+
+			if( __plugin->m_SncVSTplug->ppqPos != 
+							__plugin->m_in->m_Timestamp )
+			{
+				_timeInfo.ppqPos = __plugin->m_SncVSTplug->ppqPos;
+				_timeInfo.flags |= kVstTransportChanged;
+				__plugin->m_in->lastppqPos = __plugin->m_SncVSTplug->ppqPos;
+				__plugin->m_in->m_Timestamp = __plugin->m_SncVSTplug->ppqPos;
+			}
+			else if( __plugin->m_SncVSTplug->isPlayin )
+			{
+				__plugin->m_in->lastppqPos += (
+							__plugin->m_SncVSTplug->hasSHM ?
+							__plugin->m_SncVSTplug->m_bpm :
+							__plugin->m_bpm ) / (float)10340;
+				_timeInfo.ppqPos = __plugin->m_in->lastppqPos;
+			}
+//			_timeInfo.ppqPos = __plugin->m_SncVSTplug->ppqPos;
+			_timeInfo.flags |= kVstPpqPosValid;
+
+			if( __plugin->m_SncVSTplug->isPlayin )
+			{
+				_timeInfo.flags |= kVstTransportPlaying;
+			}
+			_timeInfo.barStartPos = ( (int) ( _timeInfo.ppqPos / 
+				( 4 *__plugin->m_SncVSTplug->timeSigNumer
+				/ (float) __plugin->m_SncVSTplug->timeSigDenom ) ) ) *
+				( 4 * __plugin->m_SncVSTplug->timeSigNumer
+				/ (float) __plugin->m_SncVSTplug->timeSigDenom );
+
+			_timeInfo.flags |= kVstBarsValid;
+
 #ifdef LMMS_BUILD_WIN64
 			return (long long) &_timeInfo;
 #else

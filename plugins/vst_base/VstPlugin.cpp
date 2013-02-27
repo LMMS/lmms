@@ -49,6 +49,7 @@
 #include "MainWindow.h"
 #include "song.h"
 #include "templates.h"
+#include <QtGui/QLayout>
 
 
 class vstSubWin : public QMdiSubWindow
@@ -200,11 +201,24 @@ void VstPlugin::tryLoad( const QString &remoteVstPluginExecutable )
 
 
 
-void VstPlugin::showEditor( QWidget * _parent )
+void VstPlugin::showEditor( QWidget * _parent, bool isEffect )
 {
 	QWidget * w = pluginWidget();
 	if( w )
 	{
+#ifdef LMMS_BUILD_WIN32
+		// hide sw, plugin window wrapper on win32
+		// this is obtained from pluginWidget()
+		if( isEffect )
+		{
+			w->setWindowFlags( Qt::FramelessWindowHint );
+			w->setAttribute( Qt::WA_TranslucentBackground );
+		}
+		else
+		{
+			w->setWindowFlags( Qt::WindowCloseButtonHint );
+		}
+#endif
 		w->show();
 		return;
 	}
@@ -222,13 +236,30 @@ void VstPlugin::showEditor( QWidget * _parent )
 	{
 		vstSubWin * sw = new vstSubWin(
 					engine::mainWindow()->workspace() );
-		sw->setWidget( m_pluginWidget );
+		if( isEffect )
+		{
+			sw->setAttribute( Qt::WA_TranslucentBackground );
+			sw->setWindowFlags( Qt::FramelessWindowHint );
+			sw->setWidget( m_pluginWidget );
+
+			QX11EmbedContainer * xe = new QX11EmbedContainer( sw );
+			xe->embedClient( m_pluginWindowID );
+			xe->setFixedSize( m_pluginGeometry );
+			xe->show();
+		} 
+		else
+		{
+			sw->setWindowFlags( Qt::WindowCloseButtonHint );
+			sw->setWidget( m_pluginWidget );
+
+			QX11EmbedContainer * xe = new QX11EmbedContainer( sw );
+			xe->embedClient( m_pluginWindowID );
+			xe->setFixedSize( m_pluginGeometry );
+			xe->move( 4, 24 );
+			xe->show();
+		}
 	}
 
-	QX11EmbedContainer * xe = new QX11EmbedContainer( m_pluginWidget );
-	xe->embedClient( m_pluginWindowID );
-	xe->setFixedSize( m_pluginGeometry );
-	xe->show();
 #endif
 
 	if( m_pluginWidget )
@@ -258,7 +289,7 @@ void VstPlugin::loadSettings( const QDomElement & _this )
 	{
 		if( _this.attribute( "guivisible" ).toInt() )
 		{
-			showEditor();
+			showEditor( NULL, false );
 		}
 		else
 		{
@@ -574,7 +605,7 @@ void VstPlugin::setParam( int i, float f )
 {
 	lock();
 	sendMessage( message( IdVstSetParameter ).addInt( i ).addFloat( f ) );
-	waitForMessage( IdVstSetParameter );
+	//waitForMessage( IdVstSetParameter );
 	unlock();
 }
 

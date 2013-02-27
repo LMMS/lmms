@@ -1,7 +1,7 @@
 /*
  * export_project_dialog.cpp - implementation of dialog for exporting project
  *
- * Copyright (c) 2004-2012 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2013 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -39,6 +39,7 @@ exportProjectDialog::exportProjectDialog( const QString & _file_name,
 	QDialog( _parent ),
 	Ui::ExportProjectDialog(),
 	m_fileName( _file_name ),
+	m_fileExtension(),
 	m_multiExport(multi_export)
 {
 	setupUi( this );
@@ -103,6 +104,8 @@ void exportProjectDialog::reject()
 	{
 		(*it)->abortProcessing();
 	}
+
+	QDialog::reject();
 }
 
 
@@ -198,7 +201,7 @@ void exportProjectDialog::multiRender()
 			m_unmuted.push_back(tk);
 			QString nextName = tk->name();
 			nextName = nextName.remove(QRegExp("[^a-zA-Z]"));
-			QString name = QString("%1_%2.wav").arg(x++).arg(nextName);
+			QString name = QString( "%1_%2%3" ).arg( x++ ).arg( nextName ).arg( m_fileExtension );
 			m_fileName = QDir(m_dirName).filePath(name);
 			prepRender();
 		}
@@ -219,7 +222,7 @@ void exportProjectDialog::multiRender()
 			m_unmuted.push_back(tk);
 			QString nextName = tk->name();
 			nextName = nextName.remove(QRegExp("[^a-zA-Z]"));
-			QString name = QString("%1_%2.wav").arg(x++).arg(nextName);
+			QString name = QString( "%1_%2%3" ).arg( x++ ).arg( nextName ).arg( m_fileExtension );
 			m_fileName = QDir(m_dirName).filePath(name);
 			prepRender();
 		}
@@ -290,6 +293,7 @@ void exportProjectDialog::startBtnClicked()
 				__fileEncodeDevices[i].m_description ) )
 		{
 			m_ft = __fileEncodeDevices[i].m_fileFormat;
+			m_fileExtension = QString( QLatin1String( __fileEncodeDevices[i].m_extension ) );
 			break;
 		}
 	}

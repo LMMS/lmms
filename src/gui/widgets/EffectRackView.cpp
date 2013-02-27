@@ -175,29 +175,36 @@ void EffectRackView::update()
 							Qt::QueuedConnection );
 			view->show();
 			m_effectViews.append( view );
-			view_map[i] = true;
+			if( i < view_map.size() )
+			{
+				view_map[i] = true;
+			}
+			else
+			{
+				view_map.append( true );
+			}
 
 		}
 	}
 
-	int i = m_lastY = 0;
+	int i = m_lastY = 0, nView = 0;
 	for( QVector<EffectView *>::Iterator it = m_effectViews.begin(); 
-					it != m_effectViews.end(); )
+					it != m_effectViews.end(); i++ )
 	{
-		if( i < view_map.size() && i < m_effectViews.size() &&
-							view_map[i] == false )
+		if( i < view_map.size() && view_map[i] == false )
 		{
-			delete m_effectViews[i];
+			delete m_effectViews[nView];
 			it = m_effectViews.erase( it );
 		}
 		else
 		{
 			( *it )->move( 0, m_lastY );
 			m_lastY += ( *it )->height();
+			++nView;
 			++it;
-			++i;
 		}
 	}
+
 	w->setFixedSize( 210, m_lastY );
 
 	QWidget::update();
@@ -242,7 +249,7 @@ void EffectRackView::addEffect()
 
 void EffectRackView::modelChanged()
 {
-	clearViews();
+	//clearViews();
 	m_effectsGroupBox->setModel( &fxChain()->m_enabledModel );
 	connect( fxChain(), SIGNAL( aboutToClear() ),
 			this, SLOT( clearViews() ) );

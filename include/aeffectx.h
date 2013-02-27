@@ -114,8 +114,14 @@ const int kEffectMagic = CCONST( 'V', 's', 't', 'P' );
 const int kVstLangEnglish = 1;
 const int kVstMidiType = 1;
 const int kVstParameterUsesFloatStep = 1 << 2;
+const int kVstPpqPosValid = 1 << 9;
 const int kVstTempoValid = 1 << 10;
+const int kVstBarsValid = 1 << 11;
+const int kVstCyclePosValid = 1 << 12;
+const int kVstTimeSigValid = 1 << 13;
 const int kVstTransportPlaying = 1 << 1;
+const int kVstTransportCycleActive = 1 << 2;
+const int kVstTransportChanged = 1;
 
 
 class RemoteVstPlugin;
@@ -267,12 +273,18 @@ public:
 	double samplePos;
 	// 08
 	double sampleRate;
-	// unconfirmed 10 18
-	char empty1[8 + 8];
+	// unconfirmed 10
+	char empty1[8];
+	// 18
+	double ppqPos;
 	// 20?
 	double tempo;
-	// unconfirmed 28 30 38
-	char empty2[8 + 8 + 8];
+	// 28
+	double barStartPos;
+	// 30?
+	double cycleStartPos;
+	// 38?
+	double cycleEndPos;
 	// 40?
 	int timeSigNumerator;
 	// 44?

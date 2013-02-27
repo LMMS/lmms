@@ -1,9 +1,7 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * main_window.cpp - implementation of LMMS-main-window
  *
- * Copyright (c) 2004-2011 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2013 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -810,16 +808,17 @@ void MainWindow::help( void )
 
 
 
-void MainWindow::toggleWindow( QWidget * _w )
+void MainWindow::toggleWindow( QWidget *window, bool forceShow )
 {
-	QWidget * parent = _w->parentWidget();
+	QWidget *parent = window->parentWidget();
 
-	if( m_workspace->activeSubWindow() != parent
-				|| parent->isHidden() )
+	if( forceShow ||
+		m_workspace->activeSubWindow() != parent ||
+		parent->isHidden() )
 	{
 		parent->show();
-		_w->show();
-		_w->setFocus();
+		window->show();
+		window->setFocus();
 	}
 	else
 	{
@@ -836,9 +835,9 @@ void MainWindow::toggleWindow( QWidget * _w )
 
 
 
-void MainWindow::toggleBBEditorWin( void )
+void MainWindow::toggleBBEditorWin( bool forceShow )
 {
-	toggleWindow( engine::getBBEditor() );
+	toggleWindow( engine::getBBEditor(), forceShow );
 }
 
 
@@ -1072,5 +1071,3 @@ void MainWindow::autoSave()
 
 #include "moc_MainWindow.cxx"
 
-
-#endif

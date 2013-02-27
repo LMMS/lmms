@@ -92,6 +92,7 @@ private:
 	knob ** vstKnobs;
 	FloatModel ** knobFModel;
 	QObject * p_subWindow;
+	int paramCount;
 
 
 	friend class VestigeInstrumentView;
@@ -110,7 +111,9 @@ public:
 
 protected slots:
 	void syncPlugin( void );
+	void displayAutomatedOnly( void );
 	void setParameter( void );
+	void closeWindow();
 
 
 protected:
@@ -127,6 +130,8 @@ private:
 	QWidget *widget;
 	QGridLayout * l;
 	QPushButton * m_syncButton;
+	QPushButton * m_displayAutomatedOnly;
+	QPushButton * m_closeButton;
 
 } ;
 

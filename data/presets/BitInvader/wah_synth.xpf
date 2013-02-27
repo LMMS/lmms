@@ -3,7 +3,7 @@
 <multimediaproject creator="Linux MultiMedia Studio (LMMS)" creatorversion="0.1.2-cvs20060123" type="channelsettings" version="1.0" >
   <head/>
   <channelsettings>
-    <channeltrack surpos="134219776" fxch="0" baseoct="6" vol="100" name="Default" basetone="9" tab="0" >
+    <channeltrack surpos="134219776" fxch="0" baseoct="6" vol="100" name="wah_synth" basetone="9" tab="0" >
       <bitinvader sampleLength="56" interpolation="1" version="0.1" normalize="1" sampleShape="AAAAAKJN5T2H3GM+VxqpPgMm3j5BMwg/CJ0fP/MENT89Ctc+XI/CPlyPwj57FK4+CtejPpqZmT4pXI8+rkdhPq5HYT7NzEw+zcxMPo/CdT4pXI8+CtejPgrXoz57FK4+7FG4PlyPwj6H3GM+nE3lPS69u7OzTeW9k9xjvlYaqb4DJt6+rkfhvq5H4b49Cte+zczMvs3MzL5cj8K+exSuvnsUrr57FK6+CtejvpqZmb4pXI++KVyPvilcj74pXI++KVyPvilcj74pXI++CtejvuxRuL5cj8K+gtxjvpBN5b0=" />
       <eldata fres="0.21" ftype="6" fcut="2720" fwet="1" >
         <elvol lfosyncmode="0" lpdel="0" amt="1" rel="0.528" ctlenvamt="0" latt="0" sus="0" lspd="0.7311" att="0" pdel="0" lamt="0" dec="0.897" userwavefile="" x100="1" lshp="0" hold="0.234" />

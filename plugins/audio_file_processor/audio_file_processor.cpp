@@ -542,7 +542,15 @@ AudioFileProcessorWaveView::AudioFileProcessorWaveView( QWidget * _parent, int _
 
 void AudioFileProcessorWaveView::isPlaying( f_cnt_t _frames_played )
 {
-	m_framesPlayed = _frames_played % ( m_sampleBuffer.endFrame() - m_sampleBuffer.startFrame() );
+	const f_cnt_t nb_frames = m_sampleBuffer.endFrame() - m_sampleBuffer.startFrame();
+	if( nb_frames < 1 )
+	{
+		m_framesPlayed = 0;
+	}
+	else
+	{
+		m_framesPlayed = _frames_played % nb_frames;
+	}
 	update();
 }
 
@@ -919,6 +927,10 @@ void AudioFileProcessorWaveView::slideSamplePointByFrames( knobType _point, f_cn
 
 void AudioFileProcessorWaveView::slideSampleByFrames( f_cnt_t _frames )
 {
+	if( m_sampleBuffer.frames() <= 1 )
+	{
+		return;
+	}
 	const double v = double( _frames ) / m_sampleBuffer.frames();
 	m_startKnob->slideBy( v, false );
 	m_endKnob->slideBy( v, false );

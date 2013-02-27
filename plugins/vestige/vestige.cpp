@@ -117,22 +117,31 @@ void vestigeInstrument::loadSettings( const QDomElement & _this )
 		m_plugin->loadSettings( _this );
 
 		const QMap<QString, QString> & dump = m_plugin->parameterDump();
-		int paramCount = (dump).size();
+		paramCount = dump.size();
 		char paramStr[35];
-		vstKnobs = new knob *[paramCount];
-		knobFModel = new FloatModel *[paramCount];
-		QStringList list1;
+		vstKnobs = new knob *[ paramCount ];
+		knobFModel = new FloatModel *[ paramCount ];
+		QStringList s_dumpValues;
 		QWidget * widget = new QWidget();
-		for (int i = 0; i < paramCount; i++) {
-			sprintf( paramStr, "param%d", i);
-			list1 = dump[paramStr].split(":");
+		for( int i = 0; i < paramCount; i++ )
+		{
+			sprintf( paramStr, "param%d", i );
+			s_dumpValues = dump[ paramStr ].split( ":" );
 
-			vstKnobs[i] = new knob( knobBright_26, widget );
-			vstKnobs[i]->setHintText( list1.at(1) + ":", "");
-			vstKnobs[i]->setLabel( list1.at(1).left(15) );
+			vstKnobs[i] = new knob( knobBright_26, widget, s_dumpValues.at( 1 ) );
+			vstKnobs[i]->setHintText( s_dumpValues.at( 1 ) + ":", "" );
+			vstKnobs[i]->setLabel( s_dumpValues.at( 1 ).left( 15 ) );
 
-			knobFModel[i] = new FloatModel( (list1.at(2)).toFloat(), 0.0f, 1.0f, 0.01f, this, QString::number(i) );
+			knobFModel[i] = new FloatModel( 0.0f, 0.0f, 1.0f, 0.01f, this, QString::number(i) );
 			knobFModel[i]->loadSettings( _this, paramStr );
+
+			if( !( knobFModel[ i ]->isAutomated() ||
+						knobFModel[ i ]->getControllerConnection() ) )
+			{
+				knobFModel[ i ]->setValue( ( s_dumpValues.at( 2 )).toFloat() );
+				knobFModel[ i ]->setInitValue( ( s_dumpValues.at( 2 )).toFloat() );
+			}
+
 			connect( knobFModel[i], SIGNAL( dataChanged() ), this, SLOT( setParameter() ) );
 
 			vstKnobs[i]->setModel( knobFModel[i] );
@@ -167,9 +176,10 @@ void vestigeInstrument::saveSettings( QDomDocument & _doc, QDomElement & _this )
 		m_plugin->saveSettings( _doc, _this );
 		if (knobFModel != NULL) {
 			const QMap<QString, QString> & dump = m_plugin->parameterDump();
-			int paramCount = (dump).size();
+			paramCount = dump.size();
 			char paramStr[35];
-			for (int i = 0; i < paramCount; i++) {
+			for( int i = 0; i < paramCount; i++ )
+			{
 				if (knobFModel[i]->isAutomated() || knobFModel[i]->getControllerConnection()) {
 					sprintf( paramStr, "param%d", i);
 					knobFModel[i]->saveSettings( _doc, _this, paramStr );
@@ -223,7 +233,10 @@ void vestigeInstrument::loadFile( const QString & _file )
 				InstrumentTrack::tr( "Default preset" );
 	m_pluginMutex.unlock();
 
-	closePlugin();
+	if ( m_plugin != NULL )
+	{
+		closePlugin();
+	}
 
 	m_pluginDLL = _file;
 	textFloat * tf = textFloat::displayMessage(
@@ -250,7 +263,7 @@ void vestigeInstrument::loadFile( const QString & _file )
 		return;
 	}
 
-	m_plugin->showEditor();
+	m_plugin->showEditor( NULL, false );
 
 	if( set_ch_name )
 	{
@@ -308,6 +321,51 @@ bool vestigeInstrument::handleMidiEvent( const midiEvent & _me,
 
 void vestigeInstrument::closePlugin( void )
 {
+	// disconnect all signals
+	if( knobFModel != NULL )
+	{
+		for( int i = 0; i < paramCount; i++ )
+		{
+			delete knobFModel[ i ];
+			delete vstKnobs[ i ];
+		}
+	}
+	
+	if( vstKnobs != NULL )
+	{
+		delete [] vstKnobs;
+		vstKnobs = NULL;
+	}
+
+	if( knobFModel != NULL )
+	{
+		delete [] knobFModel;
+		knobFModel = NULL;
+	}
+ 
+	if( m_scrollArea != NULL )
+	{
+//		delete m_scrollArea;
+		m_scrollArea = NULL;
+	}
+ 
+	if( m_subWindow != NULL )
+	{
+		m_subWindow->setAttribute( Qt::WA_DeleteOnClose );
+		m_subWindow->close();
+ 
+		if( m_subWindow != NULL )
+		{
+			delete m_subWindow;
+		}
+		m_subWindow = NULL;
+	}
+
+	if( p_subWindow != NULL )
+	{
+		p_subWindow = NULL;
+	}
+
 	m_pluginMutex.lock();
 	if( m_plugin )
 	{
@@ -685,8 +743,7 @@ void VestigeInstrumentView::selPreset( void )
 
 void VestigeInstrumentView::toggleGUI( void )
 {
-	QMutexLocker ml( &m_vi->m_pluginMutex );
-	if( m_vi->m_plugin == NULL )
+	if( m_vi == NULL || m_vi->m_plugin == NULL )
 	{
 		return;
 	}
@@ -790,9 +847,15 @@ void VestigeInstrumentView::paintEvent( QPaintEvent * )
 		p.setPen( QColor( 251, 41, 8 ) );
 		f.setBold( false );
 		p.setFont( pointSize<8>( f ) );
-		p.drawText( 10, 114, tr( "by" ) + " " +
+		p.drawText( 10, 114, tr( "by " ) +
 					m_vi->m_plugin->vendorString() );
 		p.drawText( 10, 225, m_vi->m_plugin->currentProgramName() );
+	}
+
+	if( m_vi->m_subWindow != NULL )
+	{
+		m_vi->m_subWindow->setWindowTitle( m_vi->instrumentTrack()->name() 
+								+ tr( " - VST plugin control" ) );
 	}
 //	m_pluginMutex.unlock();
 }
@@ -814,7 +877,8 @@ manageVestigeInstrumentView::manageVestigeInstrumentView( Instrument * _instrume
 	m_vi->m_subWindow->setSizePolicy( QSizePolicy::Fixed, QSizePolicy::Fixed );
 	m_vi->m_subWindow->setFixedSize( 960, 300);
 	m_vi->m_subWindow->setWidget(m_vi->m_scrollArea);
-	m_vi->m_subWindow->setWindowTitle(m_vi->m_plugin->name());
+	m_vi->m_subWindow->setWindowTitle( m_vi->instrumentTrack()->name() 
+								+ tr( " - VST plugin control" ) );
 	m_vi->m_subWindow->setWindowIcon( PLUGIN_NAME::getIconPixmap( "logo" ) );
 	//m_vi->m_subWindow->setAttribute(Qt::WA_DeleteOnClose);
 
@@ -831,49 +895,77 @@ manageVestigeInstrumentView::manageVestigeInstrumentView( Instrument * _instrume
 
 	l->addWidget( m_syncButton, 0, 0, 1, 2, Qt::AlignLeft );
 
+	m_displayAutomatedOnly = new QPushButton( tr( "Automated" ), this );
+	connect( m_displayAutomatedOnly, SIGNAL( clicked() ), this,
+							SLOT( displayAutomatedOnly() ) );
+	m_displayAutomatedOnly->setWhatsThis(
+		tr( "Click here if you want to display automated parameters only." ) );
+
+	l->addWidget( m_displayAutomatedOnly, 0, 1, 1, 2, Qt::AlignLeft );
+
+
+	m_closeButton = new QPushButton( tr( "    Close    " ), widget );
+	connect( m_closeButton, SIGNAL( clicked() ), this,
+							SLOT( closeWindow() ) );
+	m_closeButton->setWhatsThis(
+		tr( "Close VST plugin knob-controller window." ) );
+
+	l->addWidget( m_closeButton, 0, 2, 1, 7, Qt::AlignLeft );
+
+
+	for( int i = 0; i < 10; i++ )
+	{
+		l->addItem( new QSpacerItem( 68, 45, QSizePolicy::Fixed, QSizePolicy::Fixed ), 0, i );
+	}
+
 	const QMap<QString, QString> & dump = m_vi->m_plugin->parameterDump();
-	int paramCount = (dump).size();
+	m_vi->paramCount = dump.size();
 
 	bool isVstKnobs = true;
 
 	if (m_vi->vstKnobs == NULL) {
-		m_vi->vstKnobs = new knob *[paramCount];
+		m_vi->vstKnobs = new knob *[ m_vi->paramCount ];
 		isVstKnobs = false;
 	}
 	if (m_vi->knobFModel == NULL) {
-		m_vi->knobFModel = new FloatModel *[paramCount];
+		m_vi->knobFModel = new FloatModel *[ m_vi->paramCount ];
 	}
 
 	char paramStr[35];
-	QStringList list1;
+	QStringList s_dumpValues;
 
 	if (isVstKnobs == false) {
-		for (int i = 0; i < paramCount; i++) {
+		for( int i = 0; i < m_vi->paramCount; i++ )
+		{
 			sprintf( paramStr, "param%d", i);
-    			list1 = dump[paramStr].split(":");
+    			s_dumpValues = dump[ paramStr ].split( ":" );
 
-			m_vi->vstKnobs[i] = new knob( knobBright_26, this );
-			m_vi->vstKnobs[i]->setHintText( list1.at(1) + ":", "");
-			m_vi->vstKnobs[i]->setLabel( list1.at(1).left(15) );
+			m_vi->vstKnobs[ i ] = new knob( knobBright_26, this, s_dumpValues.at( 1 ) );
+			m_vi->vstKnobs[ i ]->setHintText( s_dumpValues.at( 1 ) + ":", "" );
+			m_vi->vstKnobs[ i ]->setLabel( s_dumpValues.at( 1 ).left( 15 ) );
 
 			sprintf( paramStr, "%d", i);
-			m_vi->knobFModel[i] = new FloatModel( (list1.at(2)).toFloat(), 0.0f, 1.0f, 0.01f, 
-					castModel<vestigeInstrument>(), tr( paramStr ) );
+			m_vi->knobFModel[ i ] = new FloatModel( (s_dumpValues.at( 2 )).toFloat(), 
+				0.0f, 1.0f, 0.01f, castModel<vestigeInstrument>(), tr( paramStr ) );
 			connect( m_vi->knobFModel[i], SIGNAL( dataChanged() ), this, SLOT( setParameter() ) );
 			m_vi->vstKnobs[i] ->setModel( m_vi->knobFModel[i] );
 		}
 	}
 
 	int i = 0;
-	for (int lrow = 0+1; lrow < (int(paramCount / 10) + 1)+1; lrow++) {
-		for (int lcolumn = 0; lcolumn < 10; lcolumn++) {
-			if (i < paramCount)
+	for( int lrow = 1; lrow < ( int( m_vi->paramCount / 10 ) + 1 ) + 1; lrow++ )
+	{
+		for( int lcolumn = 0; lcolumn < 10; lcolumn++ )
+		{
+			if( i < m_vi->paramCount )
+			{
 				l->addWidget( m_vi->vstKnobs[i], lrow, lcolumn, Qt::AlignCenter );
+			}
 			i++;
 		}
 	}
 
-	l->setRowStretch( (int(paramCount / 10) + 1), 1 );
+	l->setRowStretch( ( int( m_vi->paramCount / 10) + 1), 1 );
 	l->setColumnStretch( 10, 1 );
 
 	widget->setLayout(l);
@@ -892,28 +984,83 @@ manageVestigeInstrumentView::manageVestigeInstrumentView( Instrument * _instrume
 
 
 
+void manageVestigeInstrumentView::closeWindow()
+{
+	m_vi->m_subWindow->hide();
+}
+
+
+
+
 void manageVestigeInstrumentView::syncPlugin( void )
 {
 	char paramStr[35];
-	QStringList list1;
+	QStringList s_dumpValues;
 	const QMap<QString, QString> & dump = m_vi->m_plugin->parameterDump();
-	float f;
+	float f_value;
 
-	for (int i = 0; i<(dump).size(); i++) {
-		sprintf( paramStr, "param%d", i);
-    		list1 = dump[paramStr].split(":");
-		f = (list1.at(2)).toFloat();
-		m_vi->knobFModel[i]->setValue(f);
-		m_vi->knobFModel[i]->setInitValue(f);
+	for( int i = 0; i < m_vi->paramCount; i++ )
+	{
+		// only not automated knobs are synced from VST
+		// those auto-setted values are not jurnaled, tracked for undo / redo
+		if( !( m_vi->knobFModel[ i ]->isAutomated() || 
+					m_vi->knobFModel[ i ]->getControllerConnection() ) )
+		{
+			sprintf( paramStr, "param%d", i );
+    			s_dumpValues = dump[ paramStr ].split( ":" );
+			f_value = ( s_dumpValues.at( 2 ) ).toFloat();
+			m_vi->knobFModel[ i ]->setAutomatedValue( f_value );
+			m_vi->knobFModel[ i ]->setInitValue( f_value );
+		}
+	}
+}
+
+
+
+
+void manageVestigeInstrumentView::displayAutomatedOnly( void )
+{
+	bool isAuto = QString::compare( m_displayAutomatedOnly->text(), tr( "Automated" ) ) == 0;
+
+	for( int i = 0; i< m_vi->paramCount; i++ )
+	{
+
+		if( !( m_vi->knobFModel[ i ]->isAutomated() ||
+					m_vi->knobFModel[ i ]->getControllerConnection() ) )
+		{
+			if( m_vi->vstKnobs[ i ]->isVisible() == true  && isAuto )
+			{
+				m_vi->vstKnobs[ i ]->hide();
+				m_displayAutomatedOnly->setText( "All" );
+			} else {	
+				m_vi->vstKnobs[ i ]->show();
+				m_displayAutomatedOnly->setText( "Automated" );
+			}
+		}
 	}
 }
 
 
 manageVestigeInstrumentView::~manageVestigeInstrumentView()
 {
+	if( m_vi->knobFModel != NULL )
+	{
+		for( int i = 0; i < m_vi->paramCount; i++ )
+		{
+			delete m_vi->knobFModel[ i ];
+			delete m_vi->vstKnobs[ i ];
+		}
+	}
+
 	if (m_vi->vstKnobs != NULL) {
 		delete []m_vi->vstKnobs;
 		m_vi->vstKnobs = NULL;
+	}
+
+	if( m_vi->knobFModel != NULL )
+	{
+		delete [] m_vi->knobFModel;
+		m_vi->knobFModel = NULL;
 	}
  
 	if (m_vi->m_scrollArea != NULL) {
@@ -929,6 +1076,8 @@ manageVestigeInstrumentView::~manageVestigeInstrumentView()
 			delete m_vi->m_subWindow;
 		m_vi->m_subWindow = NULL;
 	}
+
+	m_vi->p_subWindow = NULL;
 }
 
 
@@ -989,6 +1138,8 @@ void manageVestigeInstrumentView::dropEvent( QDropEvent * _de )
  
 void manageVestigeInstrumentView::paintEvent( QPaintEvent * )
 {
+	m_vi->m_subWindow->setWindowTitle( m_vi->instrumentTrack()->name()
+					+ tr( " - VST plugin control" ) );
 }
 
 

@@ -1,7 +1,7 @@
 /*
  * song.cpp - root of the model tree
  *
- * Copyright (c) 2004-2012 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2013 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -61,6 +61,21 @@
 #include "text_float.h"
 #include "timeline.h"
 
+#ifdef LMMS_BUILD_WIN32
+#ifndef USE_QT_SHMEM
+#define USE_QT_SHMEM
+#endif
+#endif
+
+#ifndef USE_QT_SHMEM
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/types.h>
+#include <sys/ipc.h>
+#include <sys/shm.h>
+#endif
+
 tick_t midiTime::s_ticksPerTact = DefaultTicksPerTact;
 
 
@@ -88,7 +103,10 @@ song::song() :
 	m_length( 0 ),
 	m_trackToPlay( NULL ),
 	m_patternToPlay( NULL ),
-	m_loopPattern( false )
+	m_loopPattern( false ),
+	m_shmID( -1 ),
+	m_SncVSTplug( NULL ),
+	m_shmQtID( "/usr/bin/lmms" )
 {
 	connect( &m_tempoModel, SIGNAL( dataChanged() ),
 						this, SLOT( setTempo() ) );
@@ -101,6 +119,59 @@ song::song() :
 	connect( engine::getMixer(), SIGNAL( sampleRateChanged() ), this,
 						SLOT( updateFramesPerTick() ) );
 
+	// handle VST plugins sync
+	if( configManager::inst()->value( "ui", "syncvstplugins" ).toInt() )
+	{
+		connect( engine::getMixer(), SIGNAL( sampleRateChanged() ), this,
+						SLOT( updateSampleRateSHM() ) );
+#ifdef USE_QT_SHMEM
+		if ( !m_shmQtID.create( sizeof( sncVST ) ) ) 
+		{
+			fprintf(stderr, "song.cpp::m_shmQtID create SHM error: %s\n",
+				m_shmQtID.errorString().toStdString().c_str() );
+		}
+		m_SncVSTplug = (sncVST *) m_shmQtID.data();
+#else
+		key_t key; // make the key:
+		if( ( key = ftok( VST_SNC_SHM_KEY_FILE, 'R' ) ) == -1 )
+		{
+			perror( "song.cpp::ftok" );
+		}
+		else
+		{	// connect to shared memory segment
+			if( ( m_shmID = shmget( key, sizeof( sncVST ), 
+							0644 | IPC_CREAT ) ) == -1 )
+			{
+				perror( "song.cpp::shmget" );
+			}
+			else
+			{	// attach segment
+				m_SncVSTplug = (sncVST *)shmat(m_shmID, 0, 0);
+				if( m_SncVSTplug == (sncVST *)( -1 ) )
+				{
+					perror( "song.cpp::shmat" );
+				}
+			}
+		}
+#endif
+		// if we are connected into shared memory
+		if( m_SncVSTplug != NULL )
+		{
+			m_SncVSTplug->isPlayin = m_playing | m_exporting;
+			m_SncVSTplug->hasSHM = true;
+			m_SncVSTplug->m_sampleRate =
+				engine::getMixer()->processingSampleRate();
+			m_SncVSTplug->m_bufferSize =
+				engine::getMixer()->framesPerPeriod();
+			m_SncVSTplug->timeSigNumer = 4;
+			m_SncVSTplug->timeSigDenom = 4;
+		}
+	} // end of VST plugin sync section
+
+	if( m_SncVSTplug == NULL )
+	{
+		m_SncVSTplug = (sncVST*) malloc( sizeof( sncVST ) );
+	}
 
 	connect( &m_masterVolumeModel, SIGNAL( dataChanged() ),
 			this, SLOT( masterVolumeChanged() ) );
@@ -116,6 +187,24 @@ song::song() :
 
 song::~song()
 {
+	// detach shared memory, delete it:
+#ifdef USE_QT_SHMEM
+	m_shmQtID.detach();
+#else
+	if( shmdt( m_SncVSTplug ) == -1)
+	{
+		if( m_SncVSTplug->hasSHM )
+		{
+			perror("~song::shmdt");
+		}
+		if( m_SncVSTplug != NULL )
+		{
+			delete m_SncVSTplug;
+			m_SncVSTplug = NULL;
+		}
+	}
+	shmctl(m_shmID, IPC_RMID, NULL);
+#endif
 	m_playing = false;
 	delete m_globalAutomationTrack;
 }
@@ -150,6 +239,13 @@ void song::setTempo()
 
 	engine::updateFramesPerTick();
 
+	m_SncVSTplug->m_bpm = tempo;
+
+#ifdef VST_SNC_LATENCY
+	m_SncVSTplug->m_latency = m_SncVSTplug->m_bufferSize * tempo / 
+				( (float) m_SncVSTplug->m_sampleRate * 60 );
+#endif
+
 	emit tempoChanged( tempo );
 }
 
@@ -162,6 +258,8 @@ void song::setTimeSignature()
 	emit timeSignatureChanged( m_oldTicksPerTact, ticksPerTact() );
 	emit dataChanged();
 	m_oldTicksPerTact = ticksPerTact();
+	m_SncVSTplug->timeSigNumer = getTimeSigModel().getNumerator();
+	m_SncVSTplug->timeSigDenom = getTimeSigModel().getDenominator();
 }
 
 
@@ -178,6 +276,7 @@ void song::doActions()
 				timeLine * tl =
 					m_playPos[m_playMode].m_timeLine;
 				m_playing = false;
+				m_SncVSTplug->isPlayin = m_exporting;
 				m_recording = true;
 				if( tl != NULL )
 				{
@@ -219,31 +318,37 @@ void song::doActions()
 			case ActionPlaySong:
 				m_playMode = Mode_PlaySong;
 				m_playing = true;
+				m_SncVSTplug->isPlayin = true;
 				Controller::resetFrameCounter();
 				break;
 
 			case ActionPlayTrack:
 				m_playMode = Mode_PlayTrack;
 				m_playing = true;
+				m_SncVSTplug->isPlayin = true;
 				break;
 
 			case ActionPlayBB:
 				m_playMode = Mode_PlayBB;
 				m_playing = true;
+				m_SncVSTplug->isPlayin = true;
 				break;
 
 			case ActionPlayPattern:
 				m_playMode = Mode_PlayPattern;
 				m_playing = true;
+				m_SncVSTplug->isPlayin = true;
 				break;
 
 			case ActionPause:
 				m_playing = false;// just set the play-flag
+				m_SncVSTplug->isPlayin = m_exporting;
 				m_paused = true;
 				break;
 
 			case ActionResumeFromPause:
 				m_playing = true;// just set the play-flag
+				m_SncVSTplug->isPlayin = true;
 				m_paused = false;
 				break;
 		}
@@ -360,8 +465,14 @@ void song::processNextBuffer()
 	while( total_frames_played
 				< engine::getMixer()->framesPerPeriod() )
 	{
-		f_cnt_t played_frames = engine::getMixer()
-				->framesPerPeriod() - total_frames_played;
+		f_cnt_t played_frames = ( m_SncVSTplug->m_bufferSize = engine::getMixer()
+				->framesPerPeriod() ) - total_frames_played;
+
+#ifdef VST_SNC_LATENCY
+		m_SncVSTplug->m_latency = m_SncVSTplug->m_bufferSize * 
+				m_SncVSTplug->m_bpm / 
+				( (float) m_SncVSTplug->m_sampleRate * 60 );
+#endif
 
 		float current_frame = m_playPos[m_playMode].currentFrame();
 		// did we play a tick?
@@ -369,6 +480,14 @@ void song::processNextBuffer()
 		{
 			int ticks = m_playPos[m_playMode].getTicks()
 				+ (int)( current_frame / frames_per_tick );
+
+#ifdef VST_SNC_LATENCY
+			m_SncVSTplug->ppqPos = ( ( ticks + 0 ) / (float)48 ) -
+							m_SncVSTplug->m_latency;
+#else
+			m_SncVSTplug->ppqPos = ( ( ticks + 0 ) / (float)48 );
+#endif
+
 			// did we play a whole tact?
 			if( ticks >= midiTime::ticksPerTact() )
 			{
@@ -402,17 +521,36 @@ void song::processNextBuffer()
 					// offset
 					ticks = ticks % ( max_tact *
 						midiTime::ticksPerTact() );
+#ifdef VST_SNC_LATENCY
+					m_SncVSTplug->ppqPos = ( ( ticks + 0 )
+						/ (float)48 )
+						- m_SncVSTplug->m_latency;
+#else
+					m_SncVSTplug->ppqPos = ( ( ticks + 0 )
+								/ (float)48 );
+#endif
 				}
 			}
 			m_playPos[m_playMode].setTicks( ticks );
 
 			if( check_loop )
 			{
+				m_SncVSTplug->isCycle = true;
+				m_SncVSTplug->cycleStart = 
+					( tl->loopBegin().getTicks() )
+								/ (float)48;
+				m_SncVSTplug->cycleEnd =
+					( tl->loopEnd().getTicks() )
+								/ (float)48;
 				if( m_playPos[m_playMode] >= tl->loopEnd() )
 				{
 					m_playPos[m_playMode].setTicks(
 						tl->loopBegin().getTicks() );
 				}
+			}
+			else
+			{
+				m_SncVSTplug->isCycle = false;
 			}
 
 			current_frame = fmodf( current_frame, frames_per_tick );
@@ -637,6 +775,7 @@ void song::startExport()
 	doActions();
 
 	m_exporting = true;
+	m_SncVSTplug->isPlayin = true;
 }
 
 
@@ -647,6 +786,7 @@ void song::stopExport()
 	stop();
 	m_exporting = false;
 	m_exportLoop = false;
+	m_SncVSTplug->isPlayin = m_playing;
 }
 
 
@@ -1096,8 +1236,9 @@ void song::importProject()
 			tr("MIDI sequences") +
 			" (*.mid *.midi *.rmi);;" +
 			tr("FL Studio projects") +
-			" (*.flp"
-			 	");;" +
+			" (*.flp);;" +
+			tr("Hydrogen projects") +
+			" (*.h2song);;" +
 			tr("All file types") +
 			" (*.*)");
 
@@ -1210,6 +1351,19 @@ void song::exportProject(bool multiExport)
 void song::updateFramesPerTick()
 {
 	engine::updateFramesPerTick();
+}
+
+
+
+
+void song::updateSampleRateSHM()
+{
+	m_SncVSTplug->m_sampleRate = engine::getMixer()->processingSampleRate();
+
+#ifdef VST_SNC_LATENCY
+	m_SncVSTplug->m_latency = m_SncVSTplug->m_bufferSize * m_SncVSTplug->m_bpm /
+				( (float) m_SncVSTplug->m_sampleRate * 60 );
+#endif
 }
 
 

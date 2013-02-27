@@ -1,7 +1,7 @@
 /*
  * AutomatableModelView.cpp - implementation of AutomatableModelView
  *
- * Copyright (c) 2011 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2011-2013 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -88,6 +88,12 @@ void AutomatableModelView::addDefaultActions( QMenu * _menu )
 			AutomatableModel::tr( "Edit song-global automation" ),
 					amvSlots,
 					SLOT( editSongGlobalAutomation() ) );
+
+	_menu->addAction( QPixmap(),
+			AutomatableModel::tr( "Remove song-global automation" ),
+					amvSlots,
+					SLOT( removeSongGlobalAutomation() ) );
+
 	_menu->addSeparator();
 
 	QString controllerTxt;
@@ -237,6 +243,13 @@ void AutomatableModelViewSlots::editSongGlobalAutomation()
 {
 	AutomationPattern::globalAutomationPattern( amv->modelUntyped() )->
 						openInAutomationEditor();
+}
+
+
+
+void AutomatableModelViewSlots::removeSongGlobalAutomation()
+{
+	delete AutomationPattern::globalAutomationPattern( amv->modelUntyped() );
 }
 
 

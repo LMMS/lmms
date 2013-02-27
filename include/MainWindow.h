@@ -1,7 +1,7 @@
 /*
  * main_window.h - declaration of class MainWindow, the main window of LMMS
  *
- * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2013 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -106,7 +106,7 @@ public slots:
 	void aboutLMMS( void );
 	void help( void );
 	void toggleAutomationEditorWin( void );
-	void toggleBBEditorWin( void );
+	void toggleBBEditorWin( bool forceShow = false );
 	void toggleSongEditorWin( void );
 	void toggleProjectNotesWin( void );
 	void toggleFxMixerWin( void );
@@ -132,7 +132,7 @@ private:
 
 	void finalize( void );
 
-	void toggleWindow( QWidget * _w );
+	void toggleWindow( QWidget *window, bool forceShow = false );
 
 
 	QMdiArea * m_workspace;

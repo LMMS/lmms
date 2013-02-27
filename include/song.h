@@ -25,13 +25,14 @@
 #ifndef _SONG_H
 #define _SONG_H
 
+#include <QtCore/QSharedMemory>
 #include <QtCore/QVector>
 
 #include "track_container.h"
 #include "AutomatableModel.h"
 #include "Controller.h"
 #include "MeterModel.h"
-
+#include "VST_sync_shm.h"
 
 class AutomationTrack;
 class pattern;
@@ -249,6 +250,8 @@ private slots:
 
 	void updateFramesPerTick();
 
+	void updateSampleRateSHM();
+
 
 
 private:
@@ -323,6 +326,9 @@ private:
 	} ;
 	QVector<Actions> m_actions;
 
+	int m_shmID;
+	sncVST * m_SncVSTplug;
+	QSharedMemory m_shmQtID;
 
 	friend class engine;
 	friend class songEditor;
