@@ -2,6 +2,7 @@
  * mmp.cpp - implementation of class multimediaProject
  *
  * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2012-2013 Paul Giblock    <p/at/pgiblock.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -66,6 +67,7 @@ multimediaProject::multimediaProject( ProjectTypes _project_type ) :
 	m_head(),
 	m_type( _project_type )
 {
+	appendChild( createProcessingInstruction("xml", "version=\"1.0\""));
 	QDomElement root = createElement( "multimedia-project" );
 	root.setAttribute( "version", MMP_VERSION_STRING );
 	root.setAttribute( "type", typeName( _project_type ) );
@@ -163,7 +165,7 @@ QString multimediaProject::nameWithExtension( const QString & _fn ) const
 
 
 
-bool multimediaProject::writeFile( const QString & _fn )
+void multimediaProject::write( QTextStream & _strm )
 {
 	if( type() == SongProject || type() == SongProjectTemplate
 					|| type() == InstrumentTrackSettings )
@@ -171,7 +173,14 @@ bool multimediaProject::writeFile( const QString & _fn )
 		cleanMetaNodes( documentElement() );
 	}
 
+	save(_strm, 2);
+}
 
+
+
+
+bool multimediaProject::writeFile( const QString & _fn )
+{
 	QString fn = nameWithExtension( _fn );
 	QFile outfile( fn );
 	if( !outfile.open( QIODevice::WriteOnly | QIODevice::Truncate ) )
@@ -189,14 +198,18 @@ bool multimediaProject::writeFile( const QString & _fn )
 						).arg( fn ) );
 		return false;
 	}
-	QString xml = "<?xml version=\"1.0\"?>\n" + toString( 2 );
+
 	if( fn.section( '.', -1 ) == "mmpz" )
 	{
+		QString xml;
+		QTextStream ts( &xml );
+		write( ts );
 		outfile.write( qCompress( xml.toUtf8() ) );
 	}
 	else
 	{
-		QTextStream( &outfile ) << xml;
+		QTextStream ts( &outfile );
+		write( ts );
 	}
 	outfile.close();
 
