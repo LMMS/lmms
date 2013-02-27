@@ -1,8 +1,8 @@
 /*
  * main.cpp - just main.cpp which is starting up app...
  *
- * Copyright (c) 2004-2011 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ * Copyright (c) 2004-2013 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -130,7 +130,7 @@ int main( int argc, char * * argv )
 						QString( argv[i] ) == "-v" )
 		{
 			printf( "\nLinux MultiMedia Studio %s\n\n"
-	"Copyright (c) 2004-2008 LMMS developers.\n\n"
+	"Copyright (c) 2004-2013 LMMS developers.\n\n"
 	"This program is free software; you can redistribute it and/or\n"
 	"modify it under the terms of the GNU General Public\n"
 	"License as published by the Free Software Foundation; either\n"
@@ -143,7 +143,7 @@ int main( int argc, char * * argv )
 						QString( argv[i] ) == "-h" ) )
 		{
 			printf( "\nLinux MultiMedia Studio %s\n"
-	"Copyright (c) 2004-2008 LMMS developers.\n\n"
+	"Copyright (c) 2004-2013 LMMS developers.\n\n"
 	"usage: lmms [ -r <project file> ] [ options ]\n"
 	"            [ -u <in> <out> ]\n"
 	"            [ -d <in> ]\n"
