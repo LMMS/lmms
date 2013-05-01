@@ -2,7 +2,7 @@
  * InstrumentTrack.cpp - implementation of instrument-track-class
  *                        (window + data-structures)
  *
- * Copyright (c) 2004-2012 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2013 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -230,6 +230,7 @@ void InstrumentTrack::processInEvent( const midiEvent & _me,
 			midiPort()->realOutputChannel() < 0 */ )
 	{
 		m_instrument->handleMidiEvent( _me, _time );
+		engine::getMixer()->unlock();
 		return;
 	}
 
