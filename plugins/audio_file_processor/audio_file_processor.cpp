@@ -522,7 +522,8 @@ AudioFileProcessorWaveView::AudioFileProcessorWaveView( QWidget * _parent, int _
 	m_endKnob( 0 ),
 	m_isDragging( false ),
 	m_reversed( false ),
-	m_framesPlayed( 0 )
+	m_framesPlayed( 0 ),
+	m_animation(configManager::inst()->value("ui", "animateafp").toInt())
 {
 	setFixedSize( _w, _h );
 	setMouseTracking( true );
@@ -701,7 +702,7 @@ void AudioFileProcessorWaveView::paintEvent( QPaintEvent * _pe )
 			QColor( 255, 255, 0, 70 )
 		);
 
-		if( m_framesPlayed )
+		if( m_framesPlayed && m_animation)
 		{
 			const int played_width_px = m_framesPlayed
 				/ double( m_sampleBuffer.endFrame() - m_sampleBuffer.startFrame() )

@@ -91,7 +91,6 @@ private:
 	BoolModel m_reverseModel;
 	BoolModel m_loopModel;
 
-
 	friend class AudioFileProcessorView;
 
 } ;
@@ -235,7 +234,7 @@ private:
 	draggingType m_draggingType;
 	bool m_reversed;
 	f_cnt_t m_framesPlayed;
-
+	bool m_animation;
 
 public:
 	AudioFileProcessorWaveView( QWidget * _parent, int _w, int _h, sampleBuffer & _buf );

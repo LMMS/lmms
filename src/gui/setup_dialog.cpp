@@ -1,7 +1,7 @@
 /*
  * setup_dialog.cpp - dialog for setting up LMMS
  *
- * Copyright (c) 2005-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2013 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -119,7 +119,9 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 	m_compactTrackButtons( configManager::inst()->value( "ui",
 					"compacttrackbuttons" ).toInt() ),
 	m_syncVSTPlugins( configManager::inst()->value( "ui",
-					"syncvstplugins" ).toInt() )
+							"syncvstplugins" ).toInt() ),
+	m_animateAFP(configManager::inst()->value( "ui",
+						   "animateafp").toInt() )
 {
 	setWindowIcon( embed::getIconPixmap( "setup_general" ) );
 	setWindowTitle( tr( "Setup LMMS" ) );
@@ -476,7 +478,7 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 	tabWidget * ui_fx_tw = new tabWidget( tr( "UI effects vs. "
 						"performance" ).toUpper(),
 								performance );
-	ui_fx_tw->setFixedHeight( 100 );
+	ui_fx_tw->setFixedHeight( 120 );
 
 	ledCheckBox * disable_ch_act_ind = new ledCheckBox(
 				tr( "Disable channel activity indicators" ),
@@ -509,6 +511,15 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 	autoSave->setChecked( m_enableAutoSave );
 	connect( autoSave, SIGNAL( toggled( bool ) ),
 				this, SLOT( toggleAutoSave( bool ) ) );
+
+
+	ledCheckBox * animAFP = new ledCheckBox(
+				tr( "Show playback cursor in AudioFileProcessor" ),
+								ui_fx_tw );
+	animAFP->move( 10, 100 );
+	animAFP->setChecked( m_animateAFP );
+	connect( animAFP, SIGNAL( toggled( bool ) ),
+				this, SLOT( toggleAnimateAFP( bool ) ) );
 
 
 
@@ -787,6 +798,9 @@ void setupDialog::accept()
 					QString::number( m_compactTrackButtons ) );
 	configManager::inst()->setValue( "ui", "syncvstplugins",
 					QString::number( m_syncVSTPlugins ) );
+	configManager::inst()->setValue( "ui", "animateafp",
+					QString::number( m_animateAFP ) );
+
 
 	configManager::inst()->setWorkingDir( m_workingDir );
 	configManager::inst()->setVSTDir( m_vstDir );
@@ -972,6 +986,11 @@ void setupDialog::toggleCompactTrackButtons( bool _enabled )
 void setupDialog::toggleSyncVSTPlugins( bool _enabled )
 {
 	m_syncVSTPlugins = _enabled;
+}
+
+void setupDialog::toggleAnimateAFP( bool _enabled )
+{
+	m_animateAFP = _enabled;
 }
 
 
