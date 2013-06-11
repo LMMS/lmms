@@ -228,7 +228,7 @@ void sf2Instrument::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 void sf2Instrument::loadSettings( const QDomElement & _this )
 {
-	openFile( _this.attribute( "src" ) );
+	openFile( _this.attribute( "src" ), false );
 	m_patchNum.loadSettings( _this, "patch" );
 	m_bankNum.loadSettings( _this, "bank" );
 
@@ -329,7 +329,7 @@ void sf2Instrument::freeFont()
 
 
 
-void sf2Instrument::openFile( const QString & _sf2File )
+void sf2Instrument::openFile( const QString & _sf2File, bool updateTrackName )
 {
 	emit fileLoading();
 
@@ -390,7 +390,10 @@ void sf2Instrument::openFile( const QString & _sf2File )
 
 	delete[] sf2Ascii;
 
-	instrumentTrack()->setName( QFileInfo( _sf2File ).baseName() );
+	if( updateTrackName )
+	{
+		instrumentTrack()->setName( QFileInfo( _sf2File ).baseName() );
+	}
 }
 
 

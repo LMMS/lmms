@@ -2,7 +2,7 @@
  * sf2_player.h - a soundfont2 player using fluidSynth
  *
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail/dot/com>
- * Copyright (c) 2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2009-2013 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -91,7 +91,7 @@ public:
 
 
 public slots:
-	void openFile( const QString & _sf2File );
+	void openFile( const QString & _sf2File, bool updateTrackName = true );
 	void updatePatch();
 	void updateSampleRate();
 	
