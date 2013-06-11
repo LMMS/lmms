@@ -69,7 +69,13 @@ bool AudioFileWave::startEncoding()
 		case 16:
 		default: m_si.format = SF_FORMAT_WAV | SF_FORMAT_PCM_16; break;
 	}
-	m_sf = sf_open( outputFile().toUtf8().constData(), SFM_WRITE, &m_si );
+	m_sf = sf_open(
+#ifdef LMMS_BUILD_WIN32
+					outputFile().toLocal8Bit().constData(),
+#else
+					outputFile().toUtf8().constData(),
+#endif
+					SFM_WRITE, &m_si );
 	sf_set_string ( m_sf, SF_STR_SOFTWARE, "LMMS" );
 	return true;
 }
