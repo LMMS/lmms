@@ -113,7 +113,7 @@ ChordCreator::ChordTable::Init ChordCreator::ChordTable::s_initTable[] =
 	{ QT_TRANSLATE_NOOP( "ChordCreator", "Melodic minor" ), { 0, 2, 3, 5, 7, 9, 11, -1 } },
 	{ QT_TRANSLATE_NOOP( "ChordCreator", "Whole tone" ), { 0, 2, 4, 6, 8, 10, -1 } },
 	{ QT_TRANSLATE_NOOP( "ChordCreator", "Diminished" ), { 0, 2, 3, 5, 6, 8, 9, 11, -1 } },
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "Major pentatonic" ), { 0, 2, 4, 7, 10, -1 } },
+	{ QT_TRANSLATE_NOOP( "ChordCreator", "Major pentatonic" ), { 0, 2, 4, 7, 9, -1 } },
 	{ QT_TRANSLATE_NOOP( "ChordCreator", "Minor pentatonic" ), { 0, 3, 5, 7, 10, -1 } },
 	{ QT_TRANSLATE_NOOP( "ChordCreator", "Jap in sen" ), { 0, 1, 5, 7, 10, -1 } },
 	{ QT_TRANSLATE_NOOP( "ChordCreator", "Major bebop" ), { 0, 2, 4, 5, 7, 8, 9, 11, -1 } },
