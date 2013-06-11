@@ -5,7 +5,7 @@
  * This file is based on encode.c from vorbis-tools-source, for more information
  * see below.
  *
- * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2013 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -49,7 +49,7 @@ AudioFileOgg::AudioFileOgg( const sample_rate_t _sample_rate,
 				_nom_bitrate, _min_bitrate, _max_bitrate,
 								_depth, _mixer )
 {
-	m_ok = _success_ful = startEncoding();
+	m_ok = _success_ful = outputFileOpened() && startEncoding();
 }
 
 
