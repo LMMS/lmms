@@ -41,8 +41,7 @@
 AutomationPattern::AutomationPattern( AutomationTrack * _auto_track ) :
 	trackContentObject( _auto_track ),
 	m_autoTrack( _auto_track ),
-	m_objects(),
-	m_hasAutomation( false )
+	m_objects()
 {
 	changeLength( midiTime( 1, 0 ) );
 }
@@ -53,8 +52,7 @@ AutomationPattern::AutomationPattern( AutomationTrack * _auto_track ) :
 AutomationPattern::AutomationPattern( const AutomationPattern & _pat_to_copy ) :
 	trackContentObject( _pat_to_copy.m_autoTrack ),
 	m_autoTrack( _pat_to_copy.m_autoTrack ),
-	m_objects( _pat_to_copy.m_objects ),
-	m_hasAutomation( _pat_to_copy.m_hasAutomation )
+	m_objects( _pat_to_copy.m_objects )
 {
 	for( timeMap::const_iterator it = _pat_to_copy.m_timeMap.begin();
 				it != _pat_to_copy.m_timeMap.end(); ++it )
@@ -154,8 +152,6 @@ midiTime AutomationPattern::putValue( const midiTime & _time,
 
 	m_timeMap[newTime] = _value;
 
-	m_hasAutomation = true;
-
 	// we need to maximize our length in case we're part of a hidden
 	// automation track as the user can't resize this pattern
 	if( getTrack() && getTrack()->type() == track::HiddenAutomationTrack )
@@ -181,11 +177,6 @@ void AutomationPattern::removeValue( const midiTime & _time )
 		getTrack()->type() == track::HiddenAutomationTrack )
 	{
 		changeLength( length() );
-	}
-
-	if( m_timeMap.isEmpty() )
-	{
-		m_hasAutomation = false;
 	}
 
 	emit dataChanged();
@@ -277,8 +268,6 @@ void AutomationPattern::loadSettings( const QDomElement & _this )
 		}
 	}
 
-	m_hasAutomation = m_timeMap.size() > 0;
-
 	int len = _this.attribute( "len" ).toInt();
 	if( len <= 0 )
 	{
@@ -353,7 +342,7 @@ bool AutomationPattern::isAutomated( const AutomatableModel * _m )
 			{
 				const AutomationPattern * a =
 								dynamic_cast<const AutomationPattern *>( *j );
-				if( a && a->m_hasAutomation )
+				if( a && a->hasAutomation() )
 				{
 	for( objectVector::const_iterator k = a->m_objects.begin();
 					k != a->m_objects.end(); ++k )

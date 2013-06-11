@@ -71,7 +71,7 @@ public:
 
 	inline bool hasAutomation() const
 	{
-		return m_hasAutomation;
+		return m_timeMap.isEmpty() == false;
 	}
 
 	float valueAt( const midiTime & _time ) const;
