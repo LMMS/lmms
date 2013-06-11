@@ -97,7 +97,15 @@ void AutomationPattern::addObject( AutomatableModel * _obj, bool _search_dup )
 
 	if( addIt )
 	{
+		// been empty before?
+		if( m_objects.isEmpty() && hasAutomation() == false )
+		{
+			// then initialize default value
+			putValue( 0, _obj->value<float>(), false );
+		}
+
 		m_objects += _obj;
+
 		connect( _obj, SIGNAL( destroyed( jo_id_t ) ),
 				this, SLOT( objectDestroyed( jo_id_t ) ),
 							Qt::DirectConnection );
