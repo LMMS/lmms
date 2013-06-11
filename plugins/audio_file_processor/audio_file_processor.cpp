@@ -932,8 +932,12 @@ void AudioFileProcessorWaveView::slideSampleByFrames( f_cnt_t _frames )
 		return;
 	}
 	const double v = double( _frames ) / m_sampleBuffer.frames();
-	m_startKnob->slideBy( v, false );
-	m_endKnob->slideBy( v, false );
+	if(m_startKnob) {
+		m_startKnob->slideBy( v, false );
+	}
+	if(m_endKnob) {
+		m_endKnob->slideBy( v, false );
+	}
 }
 
 
