@@ -41,6 +41,7 @@
 #include "string_pair_drag.h"
 #include "RemoteZynAddSubFx.h"
 #include "LocalZynAddSubFx.h"
+#include "ControllerConnection.h"
 
 #include "embed.cpp"
 #include "moc_ZynAddSubFx.cxx"
@@ -624,6 +625,8 @@ void ZynAddSubFxView::toggleUI()
 			connect( model->m_remotePlugin, SIGNAL( clickedCloseButton() ),
 						m_toggleUIButton, SLOT( toggle() ) );
 		}
+
+		ControllerConnection::finalizeConnections();
 	}
 }
 
