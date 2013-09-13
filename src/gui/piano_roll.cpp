@@ -667,7 +667,7 @@ void pianoRoll::markSemiTone( int i )
 
 			const int first = chord->isScale() ? 0 : key;
 			const int last = chord->isScale() ? NumKeys : key + chord->last();
-			const int cap = chord->isScale() ? KeysPerOctave : chord->last();
+			const int cap = ( chord->isScale() || chord->last() == 0 ) ? KeysPerOctave : chord->last();
 
 			for( int i = first; i <= last; i++ )
 			{
