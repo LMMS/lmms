@@ -1,7 +1,7 @@
 /*
  * VstPlugin.cpp - implementation of VstPlugin class
  *
- * Copyright (c) 2005-2012 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2013 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -512,6 +512,9 @@ void VstPlugin::openPreset( )
 
 	QFileDialog ofd( NULL, tr( "Open Preset" ), "",
 		tr( "Vst Plugin Preset (*.fxp *.fxb)" ) );
+#if QT_VERSION >= 0x040806
+	ofd.setOption( QFileDialog::DontUseCustomDirectoryIcons );
+#endif
 	ofd.setFileMode( QFileDialog::ExistingFiles );
 	if( ofd.exec () == QDialog::Accepted &&
 					!ofd.selectedFiles().isEmpty() )
@@ -571,6 +574,9 @@ void VstPlugin::savePreset( )
 	QFileDialog sfd( NULL, tr( "Save Preset" ), presName.section(": ", 1, 1) + tr(".fxp"),
 		tr( "Vst Plugin Preset (*.fxp *.fxb)" ) );
 
+#if QT_VERSION >= 0x040806
+	sfd.setOption( QFileDialog::DontUseCustomDirectoryIcons );
+#endif
 	if( p_name != "" ) // remember last directory
 	{
 		sfd.setDirectory( QFileInfo( p_name ).absolutePath() );

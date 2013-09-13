@@ -688,6 +688,9 @@ void MainWindow::openProject( void )
 	{
 		QFileDialog ofd( this, tr( "Open project" ), "",
 			tr( "MultiMedia Project (*.mmp *.mmpz *.xml)" ) );
+#if QT_VERSION >= 0x040806
+		ofd.setOption( QFileDialog::DontUseCustomDirectoryIcons );
+#endif
 		ofd.setDirectory( configManager::inst()->userProjectsDir() );
 		ofd.setFileMode( QFileDialog::ExistingFiles );
 		if( ofd.exec () == QDialog::Accepted &&
@@ -751,6 +754,9 @@ bool MainWindow::saveProjectAs( void )
 	QFileDialog sfd( this, tr( "Save project" ), "",
 			tr( "MultiMedia Project (*.mmp *.mmpz);;"
 				"MultiMedia Project Template (*.mpt)" ) );
+#if QT_VERSION >= 0x040806
+	sfd.setOption( QFileDialog::DontUseCustomDirectoryIcons );
+#endif
 	sfd.setAcceptMode( QFileDialog::AcceptSave );
 	sfd.setFileMode( QFileDialog::AnyFile );
 	QString f = engine::getSong()->projectFileName();

@@ -1,7 +1,7 @@
 /*
  * sample_buffer.cpp - container-class sampleBuffer
  *
- * Copyright (c) 2005-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2013 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -742,6 +742,9 @@ void sampleBuffer::visualize( QPainter & _p, const QRect & _dr,
 QString sampleBuffer::openAudioFile() const
 {
 	QFileDialog ofd( NULL, tr( "Open audio file" ) );
+#if QT_VERSION >= 0x040806
+	ofd.setOption( QFileDialog::DontUseCustomDirectoryIcons );
+#endif
 
 	QString dir;
 	if( !m_audioFile.isEmpty() )

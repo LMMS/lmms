@@ -1241,6 +1241,9 @@ void song::importProject()
 			" (*.h2song);;" +
 			tr("All file types") +
 			" (*.*)");
+#if QT_VERSION >= 0x040806
+	ofd.setOption( QFileDialog::DontUseCustomDirectoryIcons );
+#endif
 
 	ofd.setFileMode( QFileDialog::ExistingFiles );
 	if( ofd.exec () == QDialog::Accepted && !ofd.selectedFiles().isEmpty() )
@@ -1296,6 +1299,9 @@ void song::exportProject(bool multiExport)
 	}
 
 	QFileDialog efd( engine::mainWindow() );
+#if QT_VERSION >= 0x040806
+	efd.setOption( QFileDialog::DontUseCustomDirectoryIcons );
+#endif
 	if (multiExport)
 	{
 		efd.setFileMode( QFileDialog::Directory);

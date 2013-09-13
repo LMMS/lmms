@@ -1,7 +1,7 @@
 /*
  * vestige.cpp - instrument-plugin for hosting VST-instruments
  *
- * Copyright (c) 2005-2012 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2013 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -607,6 +607,9 @@ void VestigeInstrumentView::modelChanged()
 void VestigeInstrumentView::openPlugin()
 {
 	QFileDialog ofd( NULL, tr( "Open VST-plugin" ) );
+#if QT_VERSION >= 0x040806
+	ofd.setOption( QFileDialog::DontUseCustomDirectoryIcons );
+#endif
 
 	QString dir;
 	if( m_vi->m_pluginDLL != "" )

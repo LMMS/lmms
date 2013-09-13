@@ -1010,7 +1010,11 @@ void setupDialog::openWorkingDir()
 {
 	QString new_dir = QFileDialog::getExistingDirectory( this,
 					tr( "Choose LMMS working directory" ),
-							m_workingDir );
+							m_workingDir
+#if QT_VERSION >= 0x040806
+							, QFileDialog::DontUseCustomDirectoryIcons
+#endif
+					 );
 	if( new_dir != QString::null )
 	{
 		m_wdLineEdit->setText( new_dir );

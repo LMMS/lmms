@@ -2,7 +2,7 @@
  * patman.cpp - a GUS-compatible patch instrument plugin
  *
  * Copyright (c) 2007-2008 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
- * Copyright (c) 2009-2011 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2009-2013 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -511,6 +511,9 @@ PatmanView::~PatmanView()
 void PatmanView::openFile( void )
 {
 	QFileDialog ofd( NULL, tr( "Open patch file" ) );
+#if QT_VERSION >= 0x040806
+	ofd.setOption( QFileDialog::DontUseCustomDirectoryIcons );
+#endif
 	ofd.setFileMode( QFileDialog::ExistingFiles );
 
 	QStringList types;

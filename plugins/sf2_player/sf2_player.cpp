@@ -1046,6 +1046,9 @@ void sf2InstrumentView::showFileDialog()
 	sf2Instrument * k = castModel<sf2Instrument>();
 
 	QFileDialog ofd( NULL, tr( "Open SoundFont file" ) );
+#if QT_VERSION >= 0x040806
+	ofd.setOption( QFileDialog::DontUseCustomDirectoryIcons );
+#endif
 	ofd.setFileMode( QFileDialog::ExistingFiles );
 
 	QStringList types;
