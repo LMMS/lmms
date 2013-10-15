@@ -2629,7 +2629,66 @@ void pianoRoll::dragNotes( int x, int y, bool alt, bool shift )
 	engine::getSong()->setModified();
 }
 
+static QString calculateNoteLabel(QString note, int octave)
+{
+	if(note.isEmpty())
+		return "";
+	return note + QString::number(octave);
+}
 
+static void printNoteHeights(QPainter& p, int bottom, int width, int startKey)
+{
+	assert(Key_C == 0);
+	assert(Key_H == 11);
+
+	struct KeyLabel
+	{
+		QString key, minor, major;
+	};
+	const KeyLabel labels[12] = {
+		{QObject::tr("C", "Note name")},
+		{"", QObject::tr("Db", "Note name"), QObject::tr("C#", "Note name")},
+		{QObject::tr("D", "Note name")},
+		{"", QObject::tr("Eb", "Note name"), QObject::tr("D#", "Note name")},
+		{QObject::tr("E", "Note name"), QObject::tr("Fb", "Note name")},
+		{"F"},
+		{"", QObject::tr("Gb", "Note name"), QObject::tr("F#", "Note name")},
+		{QObject::tr("G", "Note name")},
+		{"", QObject::tr("Ab", "Note name"),QObject::tr( "G#", "Note name")},
+		{QObject::tr("A", "Note name")},
+		{"", QObject::tr("Bb", "Note name"),QObject::tr( "A#", "Note name")},
+		{QObject::tr("B", "Note name")}
+	};
+
+	p.setFont( pointSize<KEY_LINE_HEIGHT-4>( p.font() ) );
+	p.setPen( QColor( 255, 255, 0 ) );
+	for( int y = bottom, key = startKey; y > PR_TOP_MARGIN;
+			y -= KEY_LINE_HEIGHT, key++)
+	{
+		const unsigned note = key % KeysPerOctave;
+		assert( note < ( sizeof( labels ) / sizeof( *labels) ));
+		const KeyLabel& noteLabel( labels[note] );
+		const int octave = key / KeysPerOctave;
+		const KeyLabel notes = {
+			calculateNoteLabel(noteLabel.key, octave),
+			calculateNoteLabel(noteLabel.minor, octave),
+			calculateNoteLabel(noteLabel.major, octave),
+		};
+
+
+		const int drawWidth( width - WHITE_KEY_WIDTH );
+		const int hspace = 300;
+		const int columnCount = drawWidth/hspace + 1;
+		for(int col = 0; col < columnCount; col++)
+		{
+			const int subOffset = 42;
+			const int x = subOffset + hspace/2 + hspace * col;
+			p.drawText( WHITE_KEY_WIDTH + x, y, notes.key);
+			p.drawText( WHITE_KEY_WIDTH + x - subOffset, y, notes.minor);
+			p.drawText( WHITE_KEY_WIDTH + x + subOffset, y, notes.major);
+		}
+	}
+}
 
 void pianoRoll::paintEvent( QPaintEvent * _pe )
 {
@@ -3103,6 +3162,8 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 		p.drawPixmap( mapFromGlobal( QCursor::pos() ) + QPoint( 8, 8 ),
 								*cursor );
 	}
+
+	printNoteHeights(p, keyAreaBottom(), width(), m_startKey);
 }
 
 
