@@ -190,12 +190,17 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 
 
 	tabWidget * misc_tw = new tabWidget( tr( "MISC" ), general );
-	misc_tw->setFixedHeight( 174 );
+	const int XDelta = 10;
+	const int YDelta = 18;
+	const int HeaderSize = 30;
+	int labelNumber = 0;
+
 
 	ledCheckBox * enable_tooltips = new ledCheckBox(
 							tr( "Enable tooltips" ),
 								misc_tw );
-	enable_tooltips->move( 10, 18 );
+	labelNumber++;
+	enable_tooltips->move( XDelta, YDelta*labelNumber );
 	enable_tooltips->setChecked( m_toolTips );
 	connect( enable_tooltips, SIGNAL( toggled( bool ) ),
 					this, SLOT( toggleToolTips( bool ) ) );
@@ -204,7 +209,8 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 	ledCheckBox * restart_msg = new ledCheckBox(
 			tr( "Show restart warning after changing settings" ),
 								misc_tw );
-	restart_msg->move( 10, 36 );
+	labelNumber++;
+	restart_msg->move( XDelta, YDelta*labelNumber );
 	restart_msg->setChecked( m_warnAfterSetup );
 	connect( restart_msg, SIGNAL( toggled( bool ) ),
 				this, SLOT( toggleWarnAfterSetup( bool ) ) );
@@ -212,7 +218,8 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 
 	ledCheckBox * dbv = new ledCheckBox( tr( "Display volume as dBV " ),
 								misc_tw );
-	dbv->move( 10, 54 );
+	labelNumber++;
+	dbv->move( XDelta, YDelta*labelNumber );
 	dbv->setChecked( m_displaydBV );
 	connect( dbv, SIGNAL( toggled( bool ) ),
 				this, SLOT( toggleDisplaydBV( bool ) ) );
@@ -221,7 +228,8 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 	ledCheckBox * mmpz = new ledCheckBox(
 				tr( "Compress project files per default" ),
 								misc_tw );
-	mmpz->move( 10, 72 );
+	labelNumber++;
+	mmpz->move( XDelta, YDelta*labelNumber );
 	mmpz->setChecked( m_MMPZ );
 	connect( mmpz, SIGNAL( toggled( bool ) ),
 					this, SLOT( toggleMMPZ( bool ) ) );
@@ -229,7 +237,8 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 	ledCheckBox * oneitw = new ledCheckBox(
 				tr( "One instrument track window mode" ),
 								misc_tw );
-	oneitw->move( 10, 90 );
+	labelNumber++;
+	oneitw->move( XDelta, YDelta*labelNumber );
 	oneitw->setChecked( m_oneInstrumentTrackWindow );
 	connect( oneitw, SIGNAL( toggled( bool ) ),
 				this, SLOT( toggleOneInstrumentTrackWindow( bool ) ) );
@@ -237,7 +246,8 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 	ledCheckBox * hqaudio = new ledCheckBox(
 				tr( "HQ-mode for output audio-device" ),
 								misc_tw );
-	hqaudio->move( 10, 108 );
+	labelNumber++;
+	hqaudio->move( XDelta, YDelta*labelNumber );
 	hqaudio->setChecked( m_hqAudioDev );
 	connect( hqaudio, SIGNAL( toggled( bool ) ),
 				this, SLOT( toggleHQAudioDev( bool ) ) );
@@ -245,7 +255,8 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 	ledCheckBox * compacttracks = new ledCheckBox(
 				tr( "Compact track buttons" ),
 								misc_tw );
-	compacttracks->move( 10, 126 );
+	labelNumber++;
+	compacttracks->move( XDelta, YDelta*labelNumber );
 	compacttracks->setChecked( m_compactTrackButtons );
 	connect( compacttracks, SIGNAL( toggled( bool ) ),
 				this, SLOT( toggleCompactTrackButtons( bool ) ) );
@@ -254,11 +265,13 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 	ledCheckBox * syncVST = new ledCheckBox(
 				tr( "Sync VST plugins to host playback" ),
 								misc_tw );
-	syncVST->move( 10, 144 );
+	labelNumber++;
+	syncVST->move( XDelta, YDelta*labelNumber );
 	syncVST->setChecked( m_syncVSTPlugins );
 	connect( syncVST, SIGNAL( toggled( bool ) ),
 				this, SLOT( toggleSyncVSTPlugins( bool ) ) );
 
+	misc_tw->setFixedHeight( YDelta*labelNumber + HeaderSize );
 
 
 	gen_layout->addWidget( bufsize_tw );
