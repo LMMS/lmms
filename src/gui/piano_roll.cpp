@@ -45,6 +45,7 @@
 #include <math.h>
 #include <algorithm>
 
+#include "config_mgr.h"
 #include "piano_roll.h"
 #include "bb_track_container.h"
 #include "Clipboard.h"
@@ -3163,7 +3164,10 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 								*cursor );
 	}
 
-	printNoteHeights(p, keyAreaBottom(), width(), m_startKey);
+	if( configManager::inst()->value( "ui", "printnotelabels").toInt() )
+	{
+		printNoteHeights(p, keyAreaBottom(), width(), m_startKey);
+	}
 }
 
 

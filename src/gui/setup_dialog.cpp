@@ -121,7 +121,9 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 	m_syncVSTPlugins( configManager::inst()->value( "ui",
 							"syncvstplugins" ).toInt() ),
 	m_animateAFP(configManager::inst()->value( "ui",
-						   "animateafp").toInt() )
+						   "animateafp").toInt() ),
+	m_printNoteLabels(configManager::inst()->value( "ui",
+						   "printnotelabels").toInt() )
 {
 	setWindowIcon( embed::getIconPixmap( "setup_general" ) );
 	setWindowTitle( tr( "Setup LMMS" ) );
@@ -270,6 +272,15 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 	syncVST->setChecked( m_syncVSTPlugins );
 	connect( syncVST, SIGNAL( toggled( bool ) ),
 				this, SLOT( toggleSyncVSTPlugins( bool ) ) );
+
+	ledCheckBox * noteLabels = new ledCheckBox(
+				tr( "Enable note labels in piano roll" ),
+								misc_tw );
+	labelNumber++;
+	noteLabels->move( XDelta, YDelta*labelNumber );
+	noteLabels->setChecked( m_printNoteLabels );
+	connect( noteLabels, SIGNAL( toggled( bool ) ),
+				this, SLOT( toggleNoteLabels( bool ) ) );
 
 	misc_tw->setFixedHeight( YDelta*labelNumber + HeaderSize );
 
@@ -813,6 +824,8 @@ void setupDialog::accept()
 					QString::number( m_syncVSTPlugins ) );
 	configManager::inst()->setValue( "ui", "animateafp",
 					QString::number( m_animateAFP ) );
+	configManager::inst()->setValue( "ui", "printnotelabels",
+					QString::number( m_printNoteLabels ) );
 
 
 	configManager::inst()->setWorkingDir( m_workingDir );
@@ -1007,7 +1020,10 @@ void setupDialog::toggleAnimateAFP( bool _enabled )
 }
 
 
-
+void setupDialog::toggleNoteLabels( bool en )
+{
+	m_printNoteLabels = en;
+}
 
 
 void setupDialog::toggleOneInstrumentTrackWindow( bool _enabled )
