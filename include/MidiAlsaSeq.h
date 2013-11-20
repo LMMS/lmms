@@ -1,7 +1,7 @@
 /*
  * MidiAlsaSeq.h - ALSA-sequencer-client
  *
- * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2013 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -31,6 +31,7 @@
 #include <alsa/asoundlib.h>
 #endif
 
+#include <QtCore/QMutex>
 #include <QtCore/QThread>
 #include <QtCore/QTimer>
 
@@ -130,6 +131,7 @@ private:
 	virtual void run();
 
 #ifdef LMMS_HAVE_ALSA
+	QMutex m_seqMutex;
 	snd_seq_t * m_seqHandle;
 	struct Ports
 	{

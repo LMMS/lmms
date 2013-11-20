@@ -1,7 +1,7 @@
 /*
  * MidiAlsaSeq.cpp - ALSA sequencer client
  *
- * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2013 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -73,6 +73,7 @@ static QString __portName( snd_seq_t * _seq, const snd_seq_addr_t * _addr )
 
 MidiAlsaSeq::MidiAlsaSeq() :
 	MidiClient(),
+	m_seqMutex(),
 	m_seqHandle( NULL ),
 	m_queueID( -1 ),
 	m_quit( false ),
@@ -131,9 +132,11 @@ MidiAlsaSeq::~MidiAlsaSeq()
 		m_quit = true;
 		wait( EventPollTimeOut*2 );
 
+		m_seqMutex.lock();
 		snd_seq_stop_queue( m_seqHandle, m_queueID, NULL );
 		snd_seq_free_queue( m_seqHandle, m_queueID );
 		snd_seq_close( m_seqHandle );
+		m_seqMutex.unlock();
 	}
 }
 
@@ -228,8 +231,10 @@ void MidiAlsaSeq::processOutEvent( const midiEvent & _me,
 			return;
 	}
 
+	m_seqMutex.lock();
 	snd_seq_event_output( m_seqHandle, &ev );
 	snd_seq_drain_output( m_seqHandle );
+	m_seqMutex.unlock();
 
 }
 
@@ -238,6 +243,8 @@ void MidiAlsaSeq::processOutEvent( const midiEvent & _me,
 
 void MidiAlsaSeq::applyPortMode( MidiPort * _port )
 {
+	m_seqMutex.lock();
+
 	// determine port-capabilities
 	unsigned int caps[2] = { 0, 0 };
 
@@ -297,6 +304,7 @@ void MidiAlsaSeq::applyPortMode( MidiPort * _port )
 		}
 	}
 
+	m_seqMutex.unlock();
 }
 
 
@@ -304,6 +312,8 @@ void MidiAlsaSeq::applyPortMode( MidiPort * _port )
 
 void MidiAlsaSeq::applyPortName( MidiPort * _port )
 {
+	m_seqMutex.lock();
+
 	for( int i = 0; i < 2; ++i )
 	{
 		if( m_portIDs[_port][i] == -1 )
@@ -320,6 +330,8 @@ void MidiAlsaSeq::applyPortName( MidiPort * _port )
 							port_info );
 		snd_seq_port_info_free( port_info );
 	}
+
+	m_seqMutex.unlock();
 }
 
 
@@ -329,8 +341,11 @@ void MidiAlsaSeq::removePort( MidiPort * _port )
 {
 	if( m_portIDs.contains( _port ) )
 	{
+		m_seqMutex.lock();
 		snd_seq_delete_simple_port( m_seqHandle, m_portIDs[_port][0] );
 		snd_seq_delete_simple_port( m_seqHandle, m_portIDs[_port][1] );
+		m_seqMutex.unlock();
+
 		m_portIDs.remove( _port );
 	}
 	MidiClient::removePort( _port );
@@ -361,11 +376,16 @@ void MidiAlsaSeq::subscribeReadablePort( MidiPort * _port,
 	{
 		return;
 	}
+
+	m_seqMutex.lock();
+
 	snd_seq_addr_t sender;
 	if( snd_seq_parse_address( m_seqHandle, &sender,
 			_dest.section( ' ', 0, 0 ).toAscii().constData() ) )
 	{
 		fprintf( stderr, "error parsing sender-address!\n" );
+
+		m_seqMutex.unlock();
 		return;
 	}
 	snd_seq_port_info_t * port_info;
@@ -386,6 +406,8 @@ void MidiAlsaSeq::subscribeReadablePort( MidiPort * _port,
 	}
 	snd_seq_port_subscribe_free( subs );
 	snd_seq_port_info_free( port_info );
+
+	m_seqMutex.unlock();
 }
 
 
@@ -406,11 +428,14 @@ void MidiAlsaSeq::subscribeWritablePort( MidiPort * _port,
 		return;
 	}
 
+	m_seqMutex.lock();
+
 	snd_seq_addr_t dest;
 	if( snd_seq_parse_address( m_seqHandle, &dest,
 			_dest.section( ' ', 0, 0 ).toAscii().constData() ) )
 	{
 		fprintf( stderr, "error parsing dest-address!\n" );
+		m_seqMutex.unlock();
 		return;
 	}
 	snd_seq_port_info_t * port_info;
@@ -431,6 +456,7 @@ void MidiAlsaSeq::subscribeWritablePort( MidiPort * _port,
 	}
 	snd_seq_port_subscribe_free( subs );
 	snd_seq_port_info_free( port_info );
+	m_seqMutex.unlock();
 }
 
 
@@ -471,15 +497,20 @@ void MidiAlsaSeq::run()
 			break;
 		}
 
+		m_seqMutex.lock();
+
 		// while event queue is not empty
 		while( snd_seq_event_input_pending( m_seqHandle, true ) > 0 )
 		{
 		snd_seq_event_t * ev;
 		if( snd_seq_event_input( m_seqHandle, &ev ) < 0 )
 		{
+			m_seqMutex.unlock();
+
 			qCritical( "error while fetching MIDI event from sequencer" );
 			break;
 		}
+		m_seqMutex.unlock();
 
 		snd_seq_addr_t * source = NULL;
 		MidiPort * dest = NULL;
@@ -582,7 +613,11 @@ void MidiAlsaSeq::run()
 				break;
 		}	// end switch
 
+		m_seqMutex.lock();
+
 		}	// end while
+
+		m_seqMutex.unlock();
 
 	}
 
@@ -594,9 +629,13 @@ void MidiAlsaSeq::run()
 
 void MidiAlsaSeq::changeQueueTempo( bpm_t _bpm )
 {
+	m_seqMutex.lock();
+
 	snd_seq_change_queue_tempo( m_seqHandle, m_queueID,
 					60000000 / (int) _bpm, NULL );
 	snd_seq_drain_output( m_seqHandle );
+
+	m_seqMutex.unlock();
 }
 
 
@@ -615,6 +654,9 @@ void MidiAlsaSeq::updatePortList()
 	snd_seq_port_info_malloc( &pinfo );
 
 	snd_seq_client_info_set_client( cinfo, -1 );
+
+	m_seqMutex.lock();
+
 	while( snd_seq_query_next_client( m_seqHandle, cinfo ) >= 0 )
 	{
 		int client = snd_seq_client_info_get_client( cinfo );
@@ -642,6 +684,9 @@ void MidiAlsaSeq::updatePortList()
 			}
 		}
 	}
+
+	m_seqMutex.unlock();
+
 
 	snd_seq_client_info_free( cinfo );
 	snd_seq_port_info_free( pinfo );
