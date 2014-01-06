@@ -1,7 +1,7 @@
 /*
  * AutomatableModelView.h - class AutomatableModelView
  *
- * Copyright (c) 2008-2013 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -55,15 +55,6 @@ public:
 	{
 		return( modelUntyped() ? modelUntyped()->value<T>() : 0 );
 	}
-
-	inline void setValue( const float _value )
-	{
-		if( modelUntyped() )
-		{
-			modelUntyped()->setValue( _value );
-		}
-	}
-
 
 	inline void setDescription( const QString & _desc )
 	{
