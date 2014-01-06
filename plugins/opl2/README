@@ -1,0 +1,62 @@
+Snatched from AdPlug 2.2.1:
+adlibemu.c
+adlibemu.h
+fmopl.c
+fmopl.h
+kemuopl.h
+opl.h
+temuopl.cpp
+temuopl.h
+mididata.h
+
+1.2.2 Sound generation section
+------------------------------
+
+The Sound generation section is responsible for generating the OPL's
+sound, according to the input of the Playback section. This sound is
+either routed back to the application for it to do something with it or
+routed directly to a specific audio hardware.
+
+   The following headers provide the interface to the sound generation
+section: `emuopl.h', `temuopl.h', `kemuopl.h', `realopl.h',
+`silentopl.h', `analopl.h' and `diskopl.h'. All classes inside these
+headers are derived from the abstract base class `Copl', declared
+inside the file `opl.h', which provides the common interface for the
+Backend layer of the Playback section. This interface is not meant for
+the Frontend layer (i.e. your application). Your application, however,
+has to call special methods of these classes in order to route the data
+back, if there is any.
+
+   `emuopl.h' provides the class `CEmuopl', which implements a virtual
+OPL emulator, which automatically selects the best available OPL chip
+emulation and type for each replayer.
+
+   `temuopl.h' provides the class `CTEmuopl', which is a wrapper class
+around Tatsuyuki Satoh's fmopl OPL2 emulator, which generates wave
+audio data to be routed back to the application.
+
+   `kemuopl.h' provides the class `CKemuopl', which is a wrapper class
+around Ken Silverman's adlibemu OPL2 emulator, which generates wave
+audio data to be routed back to the application.
+
+   `realopl.h' provides the class `CRealopl', which outputs to a real
+hardware OPL2 or OPL3 chip. No data is routed back to the application.
+This class is currently only working on x86 hardware.
+
+   `silentopl.h' provides the class `CSilentopl', which is a dummy
+OPL2/3, which generates nothing. All data sent to it is forgotten
+immediately. No data is routed back to the application.
+
+   `analopl.h' provides the class `CAnalopl', which is the same as `CRealopl',
+but also provides a 9-channel loudness pseudo-analyzer interface for
+the application. The loudness data is the only data routed back to the
+application.
+
+   `diskopl.h' provides the class `CDiskopl', which is an OPL3 emulator
+that does not output any sound to the soundcard, but instead writes all
+received OPL commands to a file in the RdosPlay RAW format.
+
+
+Patches can be found at: 
+http://cd.textfiles.com/soundsensations/SYNTH/
+(list at http://cd.textfiles.com/soundsensations/NEWMENU/SYNTH.BBS )
