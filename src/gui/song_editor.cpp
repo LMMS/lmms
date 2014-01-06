@@ -1,7 +1,7 @@
 /*
  * song_editor.cpp - basic window for song-editing
  *
- * Copyright (c) 2004-2011 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -50,6 +50,7 @@
 #include "tool_button.h"
 #include "tooltip.h"
 #include "visualization_widget.h"
+#include "TimeDisplayWidget.h"
 #include "AudioDevice.h"
 #include "piano_roll.h"
 #include "config_mgr.h"
@@ -130,7 +131,7 @@ songEditor::songEditor( song * _song, songEditor * & _engine_ptr ) :
 			"should be played within a minute (or how many measures "
 			"should be played within four minutes)." ) );
 
-	engine::mainWindow()->addWidgetToToolBar( m_tempoSpinBox, 0 );
+	int tempoSpinBoxCol = engine::mainWindow()->addWidgetToToolBar( m_tempoSpinBox, 0 );
 
 #if 0
 	toolButton * hq_btn = new toolButton( embed::getIconPixmap( "hq_mode" ),
@@ -145,6 +146,9 @@ songEditor::songEditor( song * _song, songEditor * & _engine_ptr ) :
 
 	engine::mainWindow()->addSpacingToToolBar( 10 );
 
+	engine::mainWindow()->addWidgetToToolBar( new TimeDisplayWidget, 1, tempoSpinBoxCol );
+
+	engine::mainWindow()->addSpacingToToolBar( 10 );
 
 	m_timeSigDisplay = new MeterDialog( this, TRUE );
 	m_timeSigDisplay->setModel( &m_s->m_timeSigModel );
