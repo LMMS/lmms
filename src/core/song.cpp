@@ -1,7 +1,7 @@
 /*
  * song.cpp - root of the model tree
  *
- * Copyright (c) 2004-2013 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -104,6 +104,9 @@ song::song() :
 	m_trackToPlay( NULL ),
 	m_patternToPlay( NULL ),
 	m_loopPattern( false ),
+	m_elapsedMilliSeconds( 0 ),
+	m_elapsedTicks( 0 ),
+	m_elapsedTacts( 0 ),
 	m_shmID( -1 ),
 	m_SncVSTplug( NULL ),
 	m_shmQtID( "/usr/bin/lmms" )
@@ -179,7 +182,6 @@ song::song() :
 			this, SLOT( masterPitchChanged() ) );*/
 
 	qRegisterMetaType<note>( "note" );
-
 }
 
 
@@ -285,6 +287,7 @@ void song::doActions()
 		{
 			case timeLine::BackToZero:
 				m_playPos[m_playMode].setTicks( 0 );
+				m_elapsedMilliSeconds = 0;
 				break;
 
 			case timeLine::BackToStart:
@@ -292,6 +295,7 @@ void song::doActions()
 				{
 					m_playPos[m_playMode].setTicks(
 						tl->savedPos().getTicks() );
+					m_elapsedMilliSeconds = (((tl->savedPos().getTicks())*60*1000/48)/getTempo());
 					tl->savePos( -1 );
 				}
 				break;
@@ -305,6 +309,7 @@ void song::doActions()
 				else
 				{
 					m_playPos[m_playMode].setTicks( 0 );
+					m_elapsedMilliSeconds = 0;
 				}
 
 				m_playPos[m_playMode].setCurrentFrame( 0 );
@@ -454,6 +459,7 @@ void song::processNextBuffer()
 		if( m_playPos[m_playMode] < tl->loopBegin() ||
 					m_playPos[m_playMode] >= tl->loopEnd() )
 		{
+			m_elapsedMilliSeconds = (tl->loopBegin().getTicks()*60*1000/48)/getTempo();
 			m_playPos[m_playMode].setTicks(
 						tl->loopBegin().getTicks() );
 		}
@@ -546,6 +552,7 @@ void song::processNextBuffer()
 				{
 					m_playPos[m_playMode].setTicks(
 						tl->loopBegin().getTicks() );
+					m_elapsedMilliSeconds = ((tl->loopBegin().getTicks())*60*1000/48)/getTempo();
 				}
 			}
 			else
@@ -599,6 +606,9 @@ void song::processNextBuffer()
 		total_frames_played += played_frames;
 		m_playPos[m_playMode].setCurrentFrame( played_frames +
 								current_frame );
+		m_elapsedMilliSeconds += (((played_frames/frames_per_tick)*60*1000/48)/getTempo());
+		m_elapsedTacts = m_playPos[Mode_PlaySong].getTact();
+		m_elapsedTicks = (m_playPos[Mode_PlaySong].getTicks()%ticksPerTact())/48;
 	}
 }
 
@@ -733,6 +743,8 @@ void song::updateLength()
 
 void song::setPlayPos( tick_t _ticks, PlayModes _play_mode )
 {
+	m_elapsedTicks += m_playPos[_play_mode].getTicks() - _ticks;
+	m_elapsedMilliSeconds += (((( _ticks - m_playPos[_play_mode].getTicks()))*60*1000/48)/getTempo());
 	m_playPos[_play_mode].setTicks( _ticks );
 	m_playPos[_play_mode].setCurrentFrame( 0.0f );
 }

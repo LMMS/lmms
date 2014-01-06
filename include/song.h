@@ -1,7 +1,7 @@
 /*
  * song.h - class song - the root of the model-tree
  *
- * Copyright (c) 2004-2012 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -94,7 +94,46 @@ public:
 
 	void processNextBuffer();
 
+	inline int getMilliseconds() const
+	{
+		return m_elapsedMilliSeconds;
+	}
+	inline void setMilliSeconds( float _ellapsedMilliSeconds )
+	{
+		m_elapsedMilliSeconds = (_ellapsedMilliSeconds);
+	}
+	inline int getTacts() const
+	{
+		return currentTact();
+	}
 
+	inline int ticksPerTact() const
+	{
+		return DefaultTicksPerTact *
+				m_timeSigModel.getNumerator() /
+					 m_timeSigModel.getDenominator();
+	}
+
+	// Returns the beat position inside the bar, 0-based
+	inline int getBeat() const
+	{
+		return (currentTick() - currentTact()*ticksPerTact()) /
+			(ticksPerTact() / m_timeSigModel.getNumerator() );
+	}
+	// the remainder after bar and beat are removed
+	inline int getBeatTicks() const
+	{
+		return 	(currentTick() - currentTact()*ticksPerTact()) %
+			(ticksPerTact() / m_timeSigModel.getNumerator() );
+	}
+	inline int getTicks() const
+	{
+		return currentTick();
+	}
+	inline bool isTempoAutomated()
+	{
+		return m_tempoModel.isAutomated();
+	}
 	inline bool isPaused() const
 	{
 		return m_paused;
@@ -260,13 +299,6 @@ private:
 	virtual ~song();
 
 
-	inline int ticksPerTact() const
-	{
-		return DefaultTicksPerTact *
-				m_timeSigModel.getNumerator() /
-					 m_timeSigModel.getDenominator();
-	}
-
 	inline tact_t currentTact() const
 	{
 		return m_playPos[m_playMode].getTact();
@@ -313,6 +345,9 @@ private:
 	pattern * m_patternToPlay;
 	bool m_loopPattern;
 
+	double m_elapsedMilliSeconds;
+	tick_t m_elapsedTicks;
+	tact_t m_elapsedTacts;
 
 	enum Actions
 	{
