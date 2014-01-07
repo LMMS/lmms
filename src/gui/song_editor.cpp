@@ -144,8 +144,6 @@ songEditor::songEditor( song * _song, songEditor * & _engine_ptr ) :
 	engine::mainWindow()->addWidgetToToolBar( hq_btn, 1, col );
 #endif
 
-	engine::mainWindow()->addSpacingToToolBar( 10 );
-
 	engine::mainWindow()->addWidgetToToolBar( new TimeDisplayWidget, 1, tempoSpinBoxCol );
 
 	engine::mainWindow()->addSpacingToToolBar( 10 );
