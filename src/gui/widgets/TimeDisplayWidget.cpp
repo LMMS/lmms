@@ -36,8 +36,8 @@ TimeDisplayWidget::TimeDisplayWidget() :
 	QWidget(),
 	m_displayMode( MinutesSeconds ),
 	m_spinBoxesLayout( this ),
-	m_majorLCD( 2, this ),
-	m_minorLCD( 2, this ),
+	m_majorLCD( 3, this ),
+	m_minorLCD( 3, this ),
 	m_milliSecondsLCD( 3, this )
 {
 	m_spinBoxesLayout.setSpacing( 0 );
