@@ -223,7 +223,7 @@ void opl2instrument::reloadEmulator() {
 	for(int i=1; i<9; ++i) {
 		voiceNote[i] = OPL2_VOICE_FREE;
 	}
-	// updatePatch();
+	updatePatch();
 }
 
 bool opl2instrument::handleMidiEvent( const midiEvent & _me,
