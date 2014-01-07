@@ -56,7 +56,7 @@
 #include <string.h>
 #endif
 
-#include "malloc.h"
+#include "ur_malloc.h"
 #include "defs.h"
 #include "error.h"
 #include "output.h"

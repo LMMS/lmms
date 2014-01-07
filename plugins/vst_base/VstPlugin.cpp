@@ -1,7 +1,7 @@
 /*
  * VstPlugin.cpp - implementation of VstPlugin class
  *
- * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2013 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -49,6 +49,7 @@
 #include "MainWindow.h"
 #include "song.h"
 #include "templates.h"
+#include <QtGui/QLayout>
 
 
 class vstSubWin : public QMdiSubWindow
@@ -88,9 +89,11 @@ VstPlugin::VstPlugin( const QString & _plugin ) :
 	m_version( 0 ),
 	m_vendorString(),
 	m_productString(),
-	m_presetString(),
-	m_presetsString(),
-	p_name()
+	m_currentProgramName(),
+	m_allProgramNames(),
+	p_name(),
+	m_currentProgram(),
+	m_idleTimer()
 {
 	setSplittedChannels( true );
 
@@ -109,6 +112,11 @@ VstPlugin::VstPlugin( const QString & _plugin ) :
 			this, SLOT( setTempo( bpm_t ) ) );
 	connect( engine::getMixer(), SIGNAL( sampleRateChanged() ),
 				this, SLOT( updateSampleRate() ) );
+
+	// update once per second
+	m_idleTimer.start( 1000 );
+	connect( &m_idleTimer, SIGNAL( timeout() ),
+				this, SLOT( idleUpdate() ) );
 }
 
 
@@ -193,11 +201,24 @@ void VstPlugin::tryLoad( const QString &remoteVstPluginExecutable )
 
 
 
-void VstPlugin::showEditor( QWidget * _parent )
+void VstPlugin::showEditor( QWidget * _parent, bool isEffect )
 {
 	QWidget * w = pluginWidget();
 	if( w )
 	{
+#ifdef LMMS_BUILD_WIN32
+		// hide sw, plugin window wrapper on win32
+		// this is obtained from pluginWidget()
+		if( isEffect )
+		{
+			w->setWindowFlags( Qt::FramelessWindowHint );
+			w->setAttribute( Qt::WA_TranslucentBackground );
+		}
+		else
+		{
+			w->setWindowFlags( Qt::WindowCloseButtonHint );
+		}
+#endif
 		w->show();
 		return;
 	}
@@ -215,13 +236,30 @@ void VstPlugin::showEditor( QWidget * _parent )
 	{
 		vstSubWin * sw = new vstSubWin(
 					engine::mainWindow()->workspace() );
-		sw->setWidget( m_pluginWidget );
+		if( isEffect )
+		{
+			sw->setAttribute( Qt::WA_TranslucentBackground );
+			sw->setWindowFlags( Qt::FramelessWindowHint );
+			sw->setWidget( m_pluginWidget );
+
+			QX11EmbedContainer * xe = new QX11EmbedContainer( sw );
+			xe->embedClient( m_pluginWindowID );
+			xe->setFixedSize( m_pluginGeometry );
+			xe->show();
+		} 
+		else
+		{
+			sw->setWindowFlags( Qt::WindowCloseButtonHint );
+			sw->setWidget( m_pluginWidget );
+
+			QX11EmbedContainer * xe = new QX11EmbedContainer( sw );
+			xe->embedClient( m_pluginWindowID );
+			xe->setFixedSize( m_pluginGeometry );
+			xe->move( 4, 24 );
+			xe->show();
+		}
 	}
 
-	QX11EmbedContainer * xe = new QX11EmbedContainer( m_pluginWidget );
-	xe->embedClient( m_pluginWindowID );
-	xe->setFixedSize( m_pluginGeometry );
-	xe->show();
 #endif
 
 	if( m_pluginWidget )
@@ -251,7 +289,7 @@ void VstPlugin::loadSettings( const QDomElement & _this )
 	{
 		if( _this.attribute( "guivisible" ).toInt() )
 		{
-			showEditor();
+			showEditor( NULL, false );
 		}
 		else
 		{
@@ -279,6 +317,10 @@ void VstPlugin::loadSettings( const QDomElement & _this )
 		setParameterDump( dump );
 	}
 
+	if( _this.hasAttribute( "program" ) )
+	{
+		setProgram( _this.attribute( "program" ).toInt() );
+	}
 }
 
 
@@ -309,6 +351,8 @@ void VstPlugin::saveSettings( QDomDocument & _doc, QDomElement & _this )
 			_this.setAttribute( it.key(), it.value() );
 		}
 	}
+
+	_this.setAttribute( "program", currentProgram() );
 }
 
 
@@ -332,6 +376,18 @@ void VstPlugin::updateSampleRate()
 	unlock();
 }
 
+
+
+
+int VstPlugin::currentProgram()
+{
+	lock();
+	sendMessage( message( IdVstCurrentProgram ) );
+	waitForMessage( IdVstCurrentProgram );
+	unlock();
+
+	return m_currentProgram;
+}
 
 
 
@@ -406,12 +462,16 @@ bool VstPlugin::processMessage( const message & _m )
 			m_productString = _m.getQString();
 			break;
 
-		case IdVstPluginPresetString:
-			m_presetString = _m.getQString();
+		case IdVstCurrentProgram:
+			m_currentProgram = _m.getInt();
 			break;
 
-		case IdVstPluginPresetsString:
-			m_presetsString = _m.getQString();
+		case IdVstCurrentProgramName:
+			m_currentProgramName = _m.getQString();
+			break;
+
+		case IdVstProgramNames:
+			m_allProgramNames = _m.getQString();
 			break;
 
 		case IdVstPluginUniqueID:
@@ -452,17 +512,20 @@ void VstPlugin::openPreset( )
 
 	QFileDialog ofd( NULL, tr( "Open Preset" ), "",
 		tr( "Vst Plugin Preset (*.fxp *.fxb)" ) );
+#if QT_VERSION >= 0x040806
+	ofd.setOption( QFileDialog::DontUseCustomDirectoryIcons );
+#endif
 	ofd.setFileMode( QFileDialog::ExistingFiles );
 	if( ofd.exec () == QDialog::Accepted &&
 					!ofd.selectedFiles().isEmpty() )
 	{
 		lock();
-		sendMessage( message( IdLoadChunkFromPresetFile ).
+		sendMessage( message( IdLoadPresetFile ).
 			addString(
 				QSTR_TO_STDSTR(
 					QDir::toNativeSeparators( ofd.selectedFiles()[0] ) ) )
 			);
-		waitForMessage( IdLoadChunkFromPresetFile );
+		waitForMessage( IdLoadPresetFile );
 		unlock();
 	}
 }
@@ -470,24 +533,33 @@ void VstPlugin::openPreset( )
 
 
 
-void VstPlugin::rollPreset( int step )
+void VstPlugin::setProgram( int index )
 {
 	lock();
-	sendMessage( message( IdRotateProgram ).
-		addInt( step ) );
-	waitForMessage( IdRotateProgram );
+	sendMessage( message( IdVstSetProgram ).addInt( index ) );
+	waitForMessage( IdVstSetProgram );
 	unlock();
 }
 
 
 
 
-void VstPlugin::loadPrograms( int step )
+void VstPlugin::rotateProgram( int offset )
 {
 	lock();
-	sendMessage( message( IdLoadPrograms ).
-		addInt( step ) );
-	waitForMessage( IdLoadPrograms );
+	sendMessage( message( IdVstRotateProgram ).addInt( offset ) );
+	waitForMessage( IdVstRotateProgram );
+	unlock();
+}
+
+
+
+
+void VstPlugin::loadProgramNames()
+{
+	lock();
+	sendMessage( message( IdVstProgramNames ) );
+	waitForMessage( IdVstProgramNames );
 	unlock();
 }
 
@@ -496,12 +568,15 @@ void VstPlugin::loadPrograms( int step )
 
 void VstPlugin::savePreset( )
 {
-	QString presName = this->presetString() == "" ? tr(": default"): this->presetString();
+	QString presName = currentProgramName().isEmpty() ? tr(": default") : currentProgramName();
 	presName.replace(tr("\""), tr("'")); // QFileDialog unable to handle double quotes properly
 
 	QFileDialog sfd( NULL, tr( "Save Preset" ), presName.section(": ", 1, 1) + tr(".fxp"),
 		tr( "Vst Plugin Preset (*.fxp *.fxb)" ) );
 
+#if QT_VERSION >= 0x040806
+	sfd.setOption( QFileDialog::DontUseCustomDirectoryIcons );
+#endif
 	if( p_name != "" ) // remember last directory
 	{
 		sfd.setDirectory( QFileInfo( p_name ).absolutePath() );
@@ -519,12 +594,12 @@ void VstPlugin::savePreset( )
 			fns = fns + tr(".fxb");
 		else fns = fns.left(fns.length() - 4) + (fns.right( 4 )).toLower();
 		lock();
-		sendMessage( message( IdSavePreset ).
+		sendMessage( message( IdSavePresetFile ).
 			addString(
 				QSTR_TO_STDSTR(
 					QDir::toNativeSeparators( fns ) ) )
 			);
-		waitForMessage( IdSavePreset );
+		waitForMessage( IdSavePresetFile );
 		unlock();
 	}
 }
@@ -535,11 +610,19 @@ void VstPlugin::savePreset( )
 void VstPlugin::setParam( int i, float f )
 {
 	lock();
-	sendMessage( message( IdSetParameter ).addInt( i ).addFloat( f ) );
-	waitForMessage( IdSetParameter );
+	sendMessage( message( IdVstSetParameter ).addInt( i ).addFloat( f ) );
+	//waitForMessage( IdVstSetParameter );
 	unlock();
 }
 
+
+
+void VstPlugin::idleUpdate()
+{
+	lock();
+	sendMessage( message( IdVstIdleUpdate ) );
+	unlock();
+}
 
 
 

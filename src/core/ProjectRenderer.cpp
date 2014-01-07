@@ -35,7 +35,7 @@
 #ifdef LMMS_HAVE_SCHED_H
 #include <sched.h>
 #endif
-
+#include <QMutexLocker>
 
 FileEncodeDevice __fileEncodeDevices[] =
 {
@@ -126,6 +126,7 @@ ProjectRenderer::ExportFileFormats ProjectRenderer::getFileFormatFromExtension(
 
 void ProjectRenderer::startProcessing()
 {
+
 	if( isReady() )
 	{
 		// have to do mixer stuff with GUI-thread-affinity in order to
@@ -139,9 +140,9 @@ void ProjectRenderer::startProcessing()
 			QThread::HighPriority
 #endif
 						);
+
 	}
 }
-
 
 
 void ProjectRenderer::run()
@@ -156,6 +157,7 @@ void ProjectRenderer::run()
 #endif
 #endif
 #endif
+
 
 	engine::getSong()->startExport();
 

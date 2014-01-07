@@ -2,7 +2,7 @@
  * sf2_player.cpp - a soundfont2 player using fluidSynth
  *
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail/dot/com>
- * Copyright (c) 2009-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2009-2013 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -228,7 +228,7 @@ void sf2Instrument::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 void sf2Instrument::loadSettings( const QDomElement & _this )
 {
-	openFile( _this.attribute( "src" ) );
+	openFile( _this.attribute( "src" ), false );
 	m_patchNum.loadSettings( _this, "patch" );
 	m_bankNum.loadSettings( _this, "bank" );
 
@@ -329,7 +329,7 @@ void sf2Instrument::freeFont()
 
 
 
-void sf2Instrument::openFile( const QString & _sf2File )
+void sf2Instrument::openFile( const QString & _sf2File, bool updateTrackName )
 {
 	emit fileLoading();
 
@@ -389,6 +389,11 @@ void sf2Instrument::openFile( const QString & _sf2File )
 	}
 
 	delete[] sf2Ascii;
+
+	if( updateTrackName )
+	{
+		instrumentTrack()->setName( QFileInfo( _sf2File ).baseName() );
+	}
 }
 
 
@@ -1041,6 +1046,9 @@ void sf2InstrumentView::showFileDialog()
 	sf2Instrument * k = castModel<sf2Instrument>();
 
 	QFileDialog ofd( NULL, tr( "Open SoundFont file" ) );
+#if QT_VERSION >= 0x040806
+	ofd.setOption( QFileDialog::DontUseCustomDirectoryIcons );
+#endif
 	ofd.setFileMode( QFileDialog::ExistingFiles );
 
 	QStringList types;

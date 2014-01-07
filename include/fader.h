@@ -1,7 +1,7 @@
 /*
  * fader.h - fader-widget used in FX-mixer - partly taken from Hydrogen
  *
- * Copyright (c) 2008-2011 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2012 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -74,23 +74,25 @@ public:
 private:
 	virtual void contextMenuEvent( QContextMenuEvent * _me );
 	virtual void mousePressEvent( QMouseEvent *ev );
+	virtual void mouseDoubleClickEvent( QMouseEvent* mouseEvent );
 	virtual void mouseMoveEvent( QMouseEvent *ev );
 	virtual void mouseReleaseEvent( QMouseEvent * _me );
 	virtual void wheelEvent( QWheelEvent *ev );
 	virtual void paintEvent( QPaintEvent *ev );
 
-	inline uint knob_y() const
+	int knobPosY() const
 	{
 		float fRange = m_model->maxValue() - m_model->minValue();
 		float realVal = m_model->value() - m_model->minValue();
-//		uint knob_y = (uint)( 116.0 - ( 86.0 * ( m_model->value() / fRange ) ) );
-		return (uint)( 116.0 - ( 86.0 * ( realVal / fRange ) ) );
+
+		return height() - ( ( height() - m_knob.height() ) * ( realVal / fRange ) );
 	}
 
 	FloatModel * m_model;
 
 	void setPeak( float fPeak, float &targetPeak, float &persistentPeak, QTime &lastPeakTime );
 	int calculateDisplayPeak( float fPeak );
+
 	float m_fPeakValue_L;
 	float m_fPeakValue_R;
 	float m_persistentPeak_L;
@@ -104,6 +106,9 @@ private:
 	QPixmap m_back;
 	QPixmap m_leds;
 	QPixmap m_knob;
+
+	int m_moveStartPoint;
+	float m_startValue;
 
 	static textFloat * s_textFloat;
 	void updateTextFloat();

@@ -2,7 +2,7 @@
  * AutomationPattern.h - declaration of class AutomationPattern, which contains
  *                       all information about an automation pattern
  *
- * Copyright (c) 2008-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2013 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2006-2008 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
@@ -71,7 +71,7 @@ public:
 
 	inline bool hasAutomation() const
 	{
-		return m_hasAutomation;
+		return m_timeMap.isEmpty() == false;
 	}
 
 	float valueAt( const midiTime & _time ) const;
@@ -109,6 +109,8 @@ public slots:
 
 
 private:
+	void cleanObjects();
+
 	AutomationTrack * m_autoTrack;
 	QVector<jo_id_t> m_idsToResolve;
 	objectVector m_objects;

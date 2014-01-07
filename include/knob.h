@@ -112,6 +112,8 @@ protected:
 	virtual void paintEvent( QPaintEvent * _me );
 	virtual void wheelEvent( QWheelEvent * _me );
 
+	virtual float getValue( const QPoint & _p );
+
 private slots:
 	virtual void enterValue();
 	void displayHelp();
@@ -128,7 +130,6 @@ private:
 
 	void drawKnob( QPainter * _p );
 	void setPosition( const QPoint & _p );
-	float getValue( const QPoint & _p );
 	bool updateAngle();
 
 	inline float pageSize() const

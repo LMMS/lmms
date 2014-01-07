@@ -77,10 +77,10 @@ public:
 				const float _freq,
 				const bool _looped = false );
 
-	void visualize( QPainter & _p, const QRect & _dr, const QRect & _clip );
-	inline void visualize( QPainter & _p, const QRect & _dr )
+	void visualize( QPainter & _p, const QRect & _dr, const QRect & _clip, f_cnt_t _from_frame = 0, f_cnt_t _to_frame = 0 );
+	inline void visualize( QPainter & _p, const QRect & _dr, f_cnt_t _from_frame = 0, f_cnt_t _to_frame = 0 )
 	{
-		visualize( _p, _dr, _dr );
+		visualize( _p, _dr, _dr, _from_frame, _to_frame );
 	}
 
 	inline const QString & audioFile() const
@@ -130,6 +130,16 @@ public:
 	inline float frequency() const
 	{
 		return m_frequency;
+	}
+
+	sample_rate_t sampleRate() const
+	{
+		return m_sampleRate;
+	}
+
+	int sampleLength() const
+	{
+		return double( m_endFrame - m_startFrame ) / m_sampleRate * 1000;
 	}
 
 	inline void setFrequency( float _freq )

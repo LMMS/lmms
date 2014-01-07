@@ -1,7 +1,7 @@
 /*
  * vestige.h - instrument VeSTige for hosting VST-plugins
  *
- * Copyright (c) 2005-2011 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2012 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -92,6 +92,7 @@ private:
 	knob ** vstKnobs;
 	FloatModel ** knobFModel;
 	QObject * p_subWindow;
+	int paramCount;
 
 
 	friend class VestigeInstrumentView;
@@ -110,7 +111,9 @@ public:
 
 protected slots:
 	void syncPlugin( void );
+	void displayAutomatedOnly( void );
 	void setParameter( void );
+	void closeWindow();
 
 
 protected:
@@ -127,6 +130,8 @@ private:
 	QWidget *widget;
 	QGridLayout * l;
 	QPushButton * m_syncButton;
+	QPushButton * m_displayAutomatedOnly;
+	QPushButton * m_closeButton;
 
 } ;
 
@@ -145,8 +150,8 @@ protected slots:
 	void managePlugin( void );
 	void openPreset( void );
 	void savePreset( void );
-	void rollPreset( void );
-	void rolrPreset( void );
+	void nextProgram();
+	void previousProgram();
 	void selPreset( void );
 	void toggleGUI( void );
 	void noteOffAll( void );

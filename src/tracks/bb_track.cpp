@@ -1,7 +1,7 @@
 /*
  * bb_track.cpp - implementation of class bbTrack and bbTCO
  *
- * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2013 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -33,6 +33,7 @@
 #include "embed.h"
 #include "engine.h"
 #include "gui_templates.h"
+#include "MainWindow.h"
 #include "mixer.h"
 #include "rename_dialog.h"
 #include "song.h"
@@ -223,10 +224,9 @@ void bbTCOView::paintEvent( QPaintEvent * )
 
 void bbTCOView::openInBBEditor()
 {
-	engine::getBBTrackContainer()->setCurrentBB( bbTrack::numOfBBTrack(
-							m_bbTCO->getTrack() ) );
-	engine::getBBEditor()->show();
-	engine::getBBEditor()->setFocus();
+	engine::getBBTrackContainer()->setCurrentBB( bbTrack::numOfBBTrack( m_bbTCO->getTrack() ) );
+
+	engine::mainWindow()->toggleBBEditorWin( true );
 }
 
 

@@ -1,7 +1,7 @@
 /*
  * sample_buffer.cpp - container-class sampleBuffer
  *
- * Copyright (c) 2005-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2013 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -699,8 +699,10 @@ f_cnt_t sampleBuffer::getLoopedIndex( f_cnt_t _index ) const
 
 
 void sampleBuffer::visualize( QPainter & _p, const QRect & _dr,
-							const QRect & _clip )
+							const QRect & _clip, f_cnt_t _from_frame, f_cnt_t _to_frame )
 {
+	const bool focus_on_range = _to_frame <= m_frames
+					&& 0 <= _from_frame && _from_frame < _to_frame;
 //	_p.setClipRect( _clip );
 //	_p.setPen( QColor( 0x22, 0xFF, 0x44 ) );
 	//_p.setPen( QColor( 64, 224, 160 ) );
@@ -709,25 +711,28 @@ void sampleBuffer::visualize( QPainter & _p, const QRect & _dr,
 
 	const int yb = h / 2 + _dr.y();
 	const float y_space = h*0.25f;
+	const int nb_frames = focus_on_range ? _to_frame - _from_frame : m_frames;
 
-	if( m_frames < 60000 )
+	if( nb_frames < 60000 )
 	{
 		_p.setRenderHint( QPainter::Antialiasing );
 		QColor c = _p.pen().color();
 		_p.setPen( QPen( c, 0.7 ) );
 	}
-	const int fpp = tLimit<int>( m_frames / w, 1, 20 );
-	QPoint * l = new QPoint[m_frames / fpp + 1];
+	const int fpp = tLimit<int>( nb_frames / w, 1, 20 );
+	QPoint * l = new QPoint[nb_frames / fpp + 1];
 	int n = 0;
 	const int xb = _dr.x();
-	for( int frame = 0; frame < m_frames; frame += fpp )
+	const int first = focus_on_range ? _from_frame : 0;
+	const int last = focus_on_range ? _to_frame : m_frames;
+	for( int frame = first; frame < last; frame += fpp )
 	{
-		l[n] = QPoint( xb + ( frame * w / m_frames ),
+		l[n] = QPoint( xb + ( (frame - first) * double( w ) / nb_frames ),
 			(int)( yb - ( ( m_data[frame][0]+m_data[frame][1] ) *
 								y_space ) ) );
 		++n;
 	}
-	_p.drawPolyline( l, m_frames / fpp );
+	_p.drawPolyline( l, nb_frames / fpp );
 	delete[] l;
 }
 
@@ -737,6 +742,9 @@ void sampleBuffer::visualize( QPainter & _p, const QRect & _dr,
 QString sampleBuffer::openAudioFile() const
 {
 	QFileDialog ofd( NULL, tr( "Open audio file" ) );
+#if QT_VERSION >= 0x040806
+	ofd.setOption( QFileDialog::DontUseCustomDirectoryIcons );
+#endif
 
 	QString dir;
 	if( !m_audioFile.isEmpty() )

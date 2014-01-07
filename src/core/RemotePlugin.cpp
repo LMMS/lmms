@@ -230,14 +230,13 @@ bool RemotePlugin::process( const sampleFrame * _in_buf,
 
 	lock();
 	sendMessage( IdStartProcessing );
-	unlock();
 
 	if( m_failed || _out_buf == NULL || m_outputCount == 0 )
 	{
+		unlock();
 		return false;
 	}
 
-	lock();
 	waitForMessage( IdProcessingDone );
 	unlock();
 
@@ -314,7 +313,7 @@ void RemotePlugin::resizeSharedProcessingMemory()
 #endif
 	}
 
-	int shm_key = 0;
+	static int shm_key = 0;
 #ifdef USE_QT_SHMEM
 	do
 	{

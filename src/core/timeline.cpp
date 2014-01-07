@@ -1,7 +1,7 @@
 /*
  * timeline.cpp - class timeLine, representing a time-line with position marker
  *
- * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -324,6 +324,7 @@ void timeLine::mouseMoveEvent( QMouseEvent * _me )
 	{
 		case MovePositionMarker:
 			m_pos.setTicks( t.getTicks() );
+			engine::getSong()->setMilliSeconds(((((t.getTicks()))*60*1000/48)/engine::getSong()->getTempo()));
 			m_pos.setCurrentFrame( 0 );
 			updatePosition();
 			break;

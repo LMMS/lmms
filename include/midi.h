@@ -1,7 +1,7 @@
 /*
  * midi.h - constants, structs etc. concerning MIDI
  *
- * Copyright (c) 2005-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2013 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -81,10 +81,41 @@ enum MidiMetaEvents
 } ;
 
 
+enum MidiStandardControllers
+{
+	MidiControllerBankSelect = 0,
+	MidiControllerModulationWheel = 1,
+	MidiControllerBreathController = 2,
+	MidiControllerFootController = 4,
+	MidiControllerPortamentoTime = 5,
+	MidiControllerMainVolume = 7,
+	MidiControllerBalance = 8,
+	MidiControllerPan = 10,
+	MidiControllerEffectControl1 = 12,
+	MidiControllerEffectControl2 = 13,
+	MidiControllerSustain = 64,
+	MidiControllerPortamento = 65,
+	MidiControllerSostenuto = 66,
+	MidiControllerSoftPedal = 67,
+	MidiControllerLegatoFootswitch = 68,
+	// Channel Mode Messages are controllers too...
+	MidiControllerAllSoundOff = 120,
+	MidiControllerResetAllControllers = 121,
+	MidiControllerLocalControl = 122,
+	MidiControllerAllNotesOff = 123,
+	MidiControllerOmniOn = 124,
+	MidiControllerOmniOff = 125,
+	MidiControllerMonoOn = 126,
+	MidiControllerPolyOn = 127,
+
+};
+
 const int MidiChannelCount = 16;
 const int MidiControllerCount = 128;
 const int MidiProgramCount = 128;
 const int MidiMaxVelocity = 127;
+const int MidiMaxControllerValue = 127;
+const int MidiMaxNote = 127;
 
 const int MidiMaxPanning = 127;
 const int MidiMinPanning = -128;
@@ -101,7 +132,8 @@ struct midiEvent
 		m_metaEvent( MidiMetaInvalid ),
 		m_channel( _channel ),
 		m_sysExData( NULL ),
-		m_sourcePort( _sourcePort )
+		m_sourcePort( _sourcePort ),
+		m_fromMidiPort( false )
 	{
 		m_data.m_param[0] = _param1;
 		m_data.m_param[1] = _param2;
@@ -113,7 +145,8 @@ struct midiEvent
 		m_metaEvent( MidiMetaInvalid ),
 		m_channel( 0 ),
 		m_sysExData( _sysex_data ),
-		m_sourcePort( NULL )
+		m_sourcePort( NULL ),
+		m_fromMidiPort( false )
 	{
 		m_data.m_sysExDataLen = _data_len;
 	}
@@ -124,7 +157,8 @@ struct midiEvent
 		m_channel( _copy.m_channel ),
 		m_data( _copy.m_data ),
 		m_sysExData( _copy.m_sysExData ),
-		m_sourcePort( _copy.m_sourcePort )
+		m_sourcePort( _copy.m_sourcePort ),
+		m_fromMidiPort( _copy.m_fromMidiPort )
 	{
 	}
 
@@ -146,6 +180,16 @@ struct midiEvent
 	inline Sint16 & key()
 	{
 		return m_data.m_param[0];
+	}
+
+	inline uint8_t controllerNumber() const
+	{
+		return m_data.m_param[0];
+	}
+
+	inline uint8_t controllerValue() const
+	{
+		return m_data.m_param[1];
 	}
 
 	inline Sint16 velocity() const
@@ -181,6 +225,15 @@ struct midiEvent
 			( (float)( PanningRight - PanningLeft ) ) );
 	}
 
+	void setFromMidiPort( bool enabled )
+	{
+		m_fromMidiPort = enabled;
+	}
+
+	bool isFromMidiPort() const
+	{
+		return m_fromMidiPort;
+	}
 
 	MidiEventTypes m_type;		// MIDI event type
 	MidiMetaEvents m_metaEvent;	// Meta event (mostly unused)
@@ -194,6 +247,10 @@ struct midiEvent
 
 	const char * m_sysExData;
 	const void * m_sourcePort;
+
+
+private:
+	bool m_fromMidiPort;
 
 } ;
 

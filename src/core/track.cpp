@@ -2,7 +2,7 @@
  * track.cpp - implementation of classes concerning tracks -> necessary for
  *             all track-like objects (beat/bassline, sample-track...)
  *
- * Copyright (c) 2004-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2012 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -31,7 +31,7 @@
  * \mainpage Track classes
  *
  * \section introduction Introduction
- * 
+ *
  * \todo fill this out
  */
 
@@ -79,13 +79,6 @@ const Sint16 RESIZE_GRIP_WIDTH = 4;
  */
 const Uint16 TRACK_OP_BTN_WIDTH = 20;
 const Uint16 TRACK_OP_BTN_HEIGHT = 14;
-
-/*! The minimum track height in pixels
- *
- * Tracks can be resized by shift-dragging anywhere inside the track
- * display.  This sets the minimum size in pixels for a track.
- */
-const Uint16 MINIMAL_TRACK_HEIGHT = 32;
 
 
 /*! A pointer for that text bubble used when moving segments, etc.
@@ -644,7 +637,7 @@ void trackContentObjectView::mousePressEvent( QMouseEvent * _me )
  *  * If in move mode, move ourselves in the track,
  *  * or if in move-selection mode, move the entire selection,
  *  * or if in resize mode, resize ourselves,
- *  * otherwise ??? 
+ *  * otherwise ???
  *
  * \param _me The QMouseEvent to handle.
  * \todo what does the final else case do here?
@@ -1199,7 +1192,7 @@ void trackContentWidget::paintEvent( QPaintEvent * _pe )
 	// Don't draw background on BB-Editor
 	if( m_trackView->getTrackContainerView() != engine::getBBEditor() )
 	{
-		p.drawTiledPixmap( rect(), m_background, QPoint( 
+		p.drawTiledPixmap( rect(), m_background, QPoint(
 				tcv->currentPosition().getTact() * ppt, 0 ) );
 	}
 }
@@ -1563,6 +1556,7 @@ track::track( TrackTypes _type, trackContainer * _tc ) :
 	m_trackContentObjects()         /*!< The track content objects (segments) */
 {
 	m_trackContainer->addTrack( this );
+	m_height = -1;
 }
 
 
@@ -1679,8 +1673,10 @@ void track::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	_this.setAttribute( "type", type() );
 	_this.setAttribute( "name", name() );
 	_this.setAttribute( "muted", isMuted() );
-// ### TODO
-//	_this.setAttribute( "height", m_trackView->height() );
+	if( m_height >= MINIMAL_TRACK_HEIGHT )
+	{
+		_this.setAttribute( "height", m_height );
+	}
 
 	QDomElement ts_de = _doc.createElement( nodeName() );
 	// let actual track (InstrumentTrack, bbTrack, sampleTrack etc.) save
@@ -1772,13 +1768,13 @@ void track::loadSettings( const QDomElement & _this )
 			}
 		}
 		node = node.nextSibling();
-        }
-/*
-	if( _this.attribute( "height" ).toInt() >= MINIMAL_TRACK_HEIGHT )
+	}
+
+	if( _this.attribute( "height" ).toInt() >= MINIMAL_TRACK_HEIGHT &&
+		_this.attribute( "height" ).toInt() <= DEFAULT_TRACK_HEIGHT )	// workaround for #3585927, tobydox/2012-11-11
 	{
-		m_trackView->setFixedHeight(
-					_this.attribute( "height" ).toInt() );
-	}*/
+		m_height = _this.attribute( "height" ).toInt();
+	}
 }
 
 
@@ -2122,6 +2118,7 @@ trackView::trackView( track * _track, trackContainerView * _tcv ) :
 	layout->addWidget( &m_trackOperationsWidget );
 	layout->addWidget( &m_trackSettingsWidget );
 	layout->addWidget( &m_trackContentWidget, 1 );
+	setFixedHeight( m_track->getHeight() );
 
 	resizeEvent( NULL );
 
@@ -2225,7 +2222,8 @@ void trackView::modelChanged()
 	connect( m_track, SIGNAL( destroyedTrack() ), this, SLOT( close() ) );
 	m_trackOperationsWidget.m_muteBtn->setModel( &m_track->m_mutedModel );
 	m_trackOperationsWidget.m_soloBtn->setModel( &m_track->m_soloModel );
-	ModelView::modelChanged();
+	ModelView::modelChanged();	
+	setFixedHeight( m_track->getHeight() );
 }
 
 
@@ -2256,6 +2254,10 @@ void trackView::undoStep( JournalEntry & _je )
 						MINIMAL_TRACK_HEIGHT ) );
 			m_trackContainerView->realignTracks();
 			break;
+			/*case RestoreTrack:
+			setFixedHeight( DEFAULT_TRACK_HEIGHT );
+			m_trackContainerView->realignTracks();
+			break; */
 	}
 	restoreJournallingState();
 }
@@ -2331,6 +2333,16 @@ void trackView::dropEvent( QDropEvent * _de )
  */
 void trackView::mousePressEvent( QMouseEvent * _me )
 {
+	// If previously dragged too small, restore on shift-leftclick
+	if( height() < DEFAULT_TRACK_HEIGHT &&
+		_me->modifiers() & Qt::ShiftModifier &&
+		_me->button() == Qt::LeftButton )
+	{
+		setFixedHeight( DEFAULT_TRACK_HEIGHT );
+		m_track->setHeight( DEFAULT_TRACK_HEIGHT );
+	}
+
+
 	if( m_trackContainerView->allowRubberband() == true )
 	{
 		QWidget::mousePressEvent( _me );
@@ -2385,6 +2397,7 @@ void trackView::mousePressEvent( QMouseEvent * _me )
  */
 void trackView::mouseMoveEvent( QMouseEvent * _me )
 {
+
 	if( m_trackContainerView->allowRubberband() == true )
 	{
 		QWidget::mouseMoveEvent( _me );
@@ -2415,9 +2428,14 @@ void trackView::mouseMoveEvent( QMouseEvent * _me )
 	{
 		setFixedHeight( qMax<int>( _me->y(), MINIMAL_TRACK_HEIGHT ) );
 		m_trackContainerView->realignTracks();
+		m_track->setHeight( height() );
+	}
+
+	if( height() < DEFAULT_TRACK_HEIGHT )
+	{
+		toolTip::add( this, m_track->m_name );
 	}
 }
-
 
 
 

@@ -667,11 +667,12 @@ void pianoRoll::markSemiTone( int i )
 
 			const int first = chord->isScale() ? 0 : key;
 			const int last = chord->isScale() ? NumKeys : key + chord->last();
-			const int cap = chord->isScale() ? KeysPerOctave : chord->last();
+			const int cap = ( chord->isScale() || chord->last() == 0 ) ? KeysPerOctave : chord->last();
 
 			for( int i = first; i <= last; i++ )
 			{
-				if( chord->hasSemiTone( std::abs( key - i ) % cap ) )
+			  //if( chord->hasSemiTone( std::abs( key - i ) % cap ) )
+			  if( chord->hasSemiTone( ( i + cap - ( key % cap ) ) % cap ) )
 				{
 					m_markedSemiTones.push_back( i );
 				}
@@ -2689,6 +2690,24 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 
 	int key = m_startKey;
 
+	// display note marks before drawing other lines
+	for( int i = 0; i < m_markedSemiTones.size(); i++ )
+	{
+		const int key_num = m_markedSemiTones.at( i );
+		const int y = keyAreaBottom() + 5
+			- KEY_LINE_HEIGHT * ( key_num - m_startKey + 1 );
+
+		if( y > keyAreaBottom() )
+		{
+			break;
+		}
+
+		p.fillRect( WHITE_KEY_WIDTH+1, y-KEY_LINE_HEIGHT/2,
+			    width() - 10, KEY_LINE_HEIGHT,
+							QColor( 0, 80 - ( key_num % KeysPerOctave ) * 3, 64 + key_num / 2) );
+	}
+
+
 	// draw all white keys...
 	for( int y = key_line_y + 1 + y_offset; y > PR_TOP_MARGIN;
 			key_line_y -= KEY_LINE_HEIGHT, ++keys_processed )
@@ -2817,22 +2836,6 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 		++key;
 	}
 
-	// display note marks
-	for( int i = 0; i < m_markedSemiTones.size(); i++ )
-	{
-		const int key_num = m_markedSemiTones.at( i );
-		const int y = keyAreaBottom() + 5
-			- KEY_LINE_HEIGHT * ( key_num - m_startKey + 1 );
-
-		if( y > keyAreaBottom() )
-		{
-			break;
-		}
-
-		p.fillRect( WHITE_KEY_WIDTH, y,
-				width() - 10, 1,
-							QColor( 64, 64 + ( key_num % KeysPerOctave ) * 7, 96 + key_num ) );
-	}
 
 	// erase the area below the piano, because there might be keys that 
 	// should be only half-visible

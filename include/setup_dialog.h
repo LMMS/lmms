@@ -105,8 +105,11 @@ private slots:
 	void toggleDisableChActInd( bool _disabled );
 	void toggleManualChPiano( bool _enabled );
 	void toggleSmoothScroll( bool _enabled );
+	void toggleAutoSave( bool _enabled );
 	void toggleOneInstrumentTrackWindow( bool _enabled );
 	void toggleCompactTrackButtons( bool _enabled );
+	void toggleSyncVSTPlugins( bool _enabled );
+	void toggleAnimateAFP( bool _enabled );
 
 
 private:
@@ -152,8 +155,11 @@ private:
 	bool m_disableChActInd;
 	bool m_manualChPiano;
 	bool m_smoothScroll;
+	bool m_enableAutoSave;
 	bool m_oneInstrumentTrackWindow;
 	bool m_compactTrackButtons;
+	bool m_syncVSTPlugins;
+	bool m_animateAFP;
 
 	typedef QMap<QString, AudioDevice::setupWidget *> AswMap;
 	typedef QMap<QString, MidiClient::setupWidget *> MswMap;

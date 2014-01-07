@@ -2,7 +2,7 @@
  * InstrumentTrack.cpp - implementation of instrument-track-class
  *                        (window + data-structures)
  *
- * Copyright (c) 2004-2012 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2013 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -98,6 +98,7 @@ InstrumentTrack::InstrumentTrack( trackContainer * _tc ) :
 	m_midiPort( tr( "unnamed_track" ), engine::getMixer()->midiClient(),
 								this, this ),
 	m_notes(),
+	m_sustainPedalPressed( false ),
 	m_baseNoteModel( 0, 0, KeysPerOctave * NumOctaves - 1, this,
 							tr( "Base note" ) ),
         m_volumeModel( DefaultVolume, MinVolume, MaxVolume, 0.1f, this,
@@ -220,6 +221,19 @@ void InstrumentTrack::processInEvent( const midiEvent & _me,
 							const midiTime & _time )
 {
 	engine::getMixer()->lock();
+
+	// in the special case this event comes from a MIDI port, the instrument
+	// is MIDI based (VST plugin, Sf2Player etc.) and the user did not set
+	// a dedicated MIDI output channel, directly pass the MIDI event to the
+	// instrument plugin
+	if( _me.isFromMidiPort() && m_instrument->isMidiBased()/* &&
+			midiPort()->realOutputChannel() < 0 */ )
+	{
+		m_instrument->handleMidiEvent( _me, _time );
+		engine::getMixer()->unlock();
+		return;
+	}
+
 	switch( _me.m_type )
 	{
 		// we don't send MidiNoteOn, MidiNoteOff and MidiKeyPressure
@@ -303,6 +317,29 @@ void InstrumentTrack::processInEvent( const midiEvent & _me,
 			break;
 
 		case MidiControlChange:
+			if( _me.controllerNumber() == MidiControllerSustain )
+			{
+				if( _me.controllerValue() > MidiMaxControllerValue/2 )
+				{
+					m_sustainPedalPressed = true;
+				}
+				else
+				{
+					m_sustainPedalPressed = false;
+				}
+			}
+			if( _me.controllerNumber() == MidiControllerAllSoundOff ||
+			    _me.controllerNumber() == MidiControllerAllNotesOff ||
+			    _me.controllerNumber() == MidiControllerOmniOn ||
+			    _me.controllerNumber() == MidiControllerOmniOff ||
+			    _me.controllerNumber() == MidiControllerMonoOn ||
+			    _me.controllerNumber() == MidiControllerPolyOn )
+			{
+				silenceAllNotes();
+			}
+			m_instrument->handleMidiEvent( _me, _time );
+			break;
+
 		case MidiProgramChange:
 			m_instrument->handleMidiEvent( _me, _time );
 			break;
@@ -1023,9 +1060,9 @@ void InstrumentTrackView::freeInstrumentTrackWindow()
 			model()->setHook( NULL );
 			m_window->setInstrumentTrackView( NULL );
 			m_window->parentWidget()->hide();
-			m_window->setModel(
-				engine::dummyTrackContainer()->
-						dummyInstrumentTrack() );
+			//m_window->setModel(
+			//	engine::dummyTrackContainer()->
+			//			dummyInstrumentTrack() );
 			m_window->updateInstrumentView();
 			s_windowCache << m_window;
 		}
@@ -1193,6 +1230,9 @@ class fxLineLcdSpinBox : public lcdSpinBox
 		virtual void mouseDoubleClickEvent ( QMouseEvent * _me )
 		{
 			engine::fxMixerView()->setCurrentFxLine( model()->value() );
+
+			engine::fxMixerView()->show();// show fxMixer window
+			engine::fxMixerView()->setFocus();// set focus to fxMixer window
 			//engine::getFxMixerView()->raise();
 		}
 };

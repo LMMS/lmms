@@ -2,7 +2,7 @@
  * export_project_dialog.h - declaration of class exportProjectDialog which is
  *                           responsible for exporting project
  *
- * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2012 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -28,17 +28,17 @@
 #define _EXPORT_PROJECT_DIALOG_H
 
 #include <QtGui/QDialog>
-
+#include <vector>
 #include "ui_export_project.h"
 
-class ProjectRenderer;
+#include "ProjectRenderer.h"
 
 
 class exportProjectDialog : public QDialog, public Ui::ExportProjectDialog
 {
 	Q_OBJECT
 public:
-	exportProjectDialog( const QString & _file_name, QWidget * _parent );
+	exportProjectDialog( const QString & _file_name, QWidget * _parent, bool multi_export );
 	virtual ~exportProjectDialog();
 
 
@@ -50,12 +50,25 @@ protected:
 private slots:
 	void startBtnClicked( void );
 	void updateTitleBar( int );
-
+	void render(ProjectRenderer* renderer);
+	void multiRender();
+	ProjectRenderer* prepRender();
+	void popRender();
+	void accept();
 
 private:
 	QString m_fileName;
-	ProjectRenderer * m_renderer;
+	QString m_dirName;
+	QString m_fileExtension;
+	typedef QVector<ProjectRenderer*> RenderVector;
+	RenderVector m_renderers;
+	bool m_multiExport;
 
+	typedef QVector<track*> TrackVector;
+	TrackVector m_unmuted;
+	TrackVector m_unmutedBB;
+	ProjectRenderer::ExportFileFormats m_ft;
+	TrackVector m_tracksToRender;
 } ;
 
 #endif

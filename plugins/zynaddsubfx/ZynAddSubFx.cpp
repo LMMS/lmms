@@ -1,7 +1,7 @@
 /*
  * ZynAddSubFx.cpp - ZynAddSubxFX-embedding plugin
  *
- * Copyright (c) 2008-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2013 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -41,6 +41,7 @@
 #include "string_pair_drag.h"
 #include "RemoteZynAddSubFx.h"
 #include "LocalZynAddSubFx.h"
+#include "ControllerConnection.h"
 
 #include "embed.cpp"
 #include "moc_ZynAddSubFx.cxx"
@@ -290,8 +291,8 @@ void ZynAddSubFxInstrument::loadFile( const QString & _file )
 	{
 		m_remotePlugin->lock();
 		m_remotePlugin->sendMessage(
-			RemotePlugin::message( IdLoadPresetFromFile ).addString( fn ) );
-		m_remotePlugin->waitForMessage( IdLoadPresetFromFile );
+			RemotePlugin::message( IdLoadPresetFile ).addString( fn ) );
+		m_remotePlugin->waitForMessage( IdLoadPresetFile );
 		m_remotePlugin->unlock();
 	}
 	else
@@ -300,6 +301,9 @@ void ZynAddSubFxInstrument::loadFile( const QString & _file )
 		m_plugin->loadPreset( fn );
 		m_pluginMutex.unlock();
 	}
+
+	instrumentTrack()->setName( QFileInfo( _file ).baseName().
+									replace( QRegExp( "^[0-9]{4}-" ), QString() ) );
 
 	m_modifiedControllers.clear();
 
@@ -447,7 +451,7 @@ void ZynAddSubFxInstrument::initPlugin()
 
 void ZynAddSubFxInstrument::sendControlChange( MidiControllers midiCtl, float value )
 {
-	handleMidiEvent( midiEvent( MidiControlChange, 0, midiCtl, (int) value, this ),
+	handleMidiEvent( midiEvent( MidiControlChange, instrumentTrack()->midiPort()->realOutputChannel(), midiCtl, (int) value, this ),
 						midiTime() );
 }
 
@@ -621,6 +625,8 @@ void ZynAddSubFxView::toggleUI()
 			connect( model->m_remotePlugin, SIGNAL( clickedCloseButton() ),
 						m_toggleUIButton, SLOT( toggle() ) );
 		}
+
+		ControllerConnection::finalizeConnections();
 	}
 }
 

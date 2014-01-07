@@ -1,7 +1,7 @@
 /*
  * AutomatableModel.cpp - some implementations of AutomatableModel-class
  *
- * Copyright (c) 2008-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2012 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -44,6 +44,8 @@ AutomatableModel::AutomatableModel( DataType _type,
 						bool _default_constructed ) :
 	Model( _parent, _display_name, _default_constructed ),
 	m_dataType( _type ),
+	m_value( _val ),
+	m_initValue( _val ),
 	m_minValue( _min ),
 	m_maxValue( _max ),
 	m_step( _step ),

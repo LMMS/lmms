@@ -2,7 +2,7 @@
  * AudioFileWave.cpp - audio-device which encodes wave-stream and writes it
  *                     into a WAVE-file. This is used for song-export.
  *
- * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2013 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -38,9 +38,10 @@ AudioFileWave::AudioFileWave( const sample_rate_t _sample_rate,
 				mixer * _mixer ) :
 	AudioFileDevice( _sample_rate, _channels, _file, _use_vbr,
 			_nom_bitrate, _min_bitrate, _max_bitrate,
-								_depth, _mixer )
+								_depth, _mixer ),
+	m_sf( NULL )
 {
-	_success_ful = startEncoding();
+	_success_ful = outputFileOpened() && startEncoding();
 }
 
 
@@ -68,7 +69,13 @@ bool AudioFileWave::startEncoding()
 		case 16:
 		default: m_si.format = SF_FORMAT_WAV | SF_FORMAT_PCM_16; break;
 	}
-	m_sf = sf_open( outputFile().toUtf8().constData(), SFM_WRITE, &m_si );
+	m_sf = sf_open(
+#ifdef LMMS_BUILD_WIN32
+					outputFile().toLocal8Bit().constData(),
+#else
+					outputFile().toUtf8().constData(),
+#endif
+					SFM_WRITE, &m_si );
 	sf_set_string ( m_sf, SF_STR_SOFTWARE, "LMMS" );
 	return true;
 }
@@ -110,6 +117,9 @@ void AudioFileWave::writeBuffer( const surroundSampleFrame * _ab,
 
 void AudioFileWave::finishEncoding()
 {
-	sf_close( m_sf );
+	if( m_sf )
+	{
+		sf_close( m_sf );
+	}
 }
 

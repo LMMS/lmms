@@ -2,7 +2,7 @@
  * pixmap_button.cpp - implementation of pixmap-button (often used as "themed"
  *                     checkboxes/radiobuttons etc)
  *
- * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2013 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -57,7 +57,7 @@ void pixmapButton::paintEvent( QPaintEvent * )
 {
 	QPainter p( this );
 
-	if( model()->value() || m_pressed )
+	if( ( model() != NULL && model()->value() ) || m_pressed )
 	{
 		if( !m_activePixmap.isNull() )
 		{

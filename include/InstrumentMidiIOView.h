@@ -55,6 +55,7 @@ private:
 	lcdSpinBox * m_outputChannelSpinBox;
 	lcdSpinBox * m_fixedOutputVelocitySpinBox;
 	lcdSpinBox * m_outputProgramSpinBox;
+	lcdSpinBox * m_fixedOutputNoteSpinBox;
 	QToolButton * m_wpBtn;
 
 } ;

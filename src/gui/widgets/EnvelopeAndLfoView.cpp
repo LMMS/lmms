@@ -2,7 +2,7 @@
  * EnvelopeAndLfoView.cpp - widget which is m_used by envelope/lfo/filter-
  *                          tab of instrument track window
  *
- * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -341,25 +341,25 @@ void EnvelopeAndLfoView::mousePressEvent( QMouseEvent * _me )
 	if( QRect( ENV_GRAPH_X, ENV_GRAPH_Y, s_envGraph->width(),
 			s_envGraph->height() ).contains( _me->pos() ) == true )
 	{
-		if( m_amountKnob->value<float>() < 1.0f )
+		if( m_params->m_amountModel.value() < 1.0f )
 		{
-			m_amountKnob->setValue( 1.0f );
+			m_params->m_amountModel.setValue( 1.0f );
 		}
 		else
 		{
-			m_amountKnob->setValue( 0.0f );
+			m_params->m_amountModel.setValue( 0.0f );
 		}
 	}
 	else if( QRect( LFO_GRAPH_X, LFO_GRAPH_Y, s_lfoGraph->width(),
 			s_lfoGraph->height() ).contains( _me->pos() ) == true )
 	{
-		if( m_lfoAmountKnob->value<float>() < 1.0f )
+		if( m_params->m_lfoAmountModel.value() < 1.0f )
 		{
-			m_lfoAmountKnob->setValue( 1.0f );
+			m_params->m_lfoAmountModel.setValue( 1.0f );
 		}
 		else
 		{
-			m_lfoAmountKnob->setValue( 0.0f );
+			m_params->m_lfoAmountModel.setValue( 0.0f );
 		}
 	}
 }

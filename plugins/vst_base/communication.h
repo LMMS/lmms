@@ -64,6 +64,12 @@ enum VstRemoteMessageIDs
 	IdVstGetParameterDump,
 	IdVstSetParameterDump,
 	IdVstGetParameterProperties,
+	IdVstProgramNames,
+	IdVstCurrentProgram,
+	IdVstCurrentProgramName,
+	IdVstSetProgram,
+	IdVstRotateProgram,
+	IdVstIdleUpdate,
 
 	// remoteVstPlugin -> vstPlugin
 	IdVstFailedLoadingPlugin,
@@ -74,9 +80,9 @@ enum VstRemoteMessageIDs
 	IdVstPluginVersion,
 	IdVstPluginVendorString,
 	IdVstPluginProductString,
-	IdVstPluginPresetString,
 	IdVstPluginPresetsString,
 	IdVstPluginUniqueID,
+	IdVstSetParameter,
 	IdVstParameterCount,
 	IdVstParameterDump,
 	IdVstParameterProperties

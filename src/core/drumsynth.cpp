@@ -270,7 +270,7 @@ int DrumSynth::GetDSFileSamples(const char *dsfile, int16_t *&wave, int channels
   int   MainFilter, HighPass;
   
   long  NON, NT, TON, DiON, TDroop=0, DStep;
-  float a, b=0.f, c=0.f, d=0.f, g, TT=0.f, TL, NL, F1, F2, Fsync;
+  float a, b=0.f, c=0.f, d=0.f, g, TT=0.f, TL, NL, F1, F2;
   float TphiStart=0.f, Tphi, TDroopRate, ddF, DAtten, DGain;
   
   long  BON, BON2, BFStep, BFStep2, botmp;
@@ -354,7 +354,6 @@ int DrumSynth::GetDSFileSamples(const char *dsfile, int16_t *&wave, int channels
   F1 = MasterTune * TwoPi * GetPrivateProfileFloat(sec,"F1",200.0,dsfile) / Fs;
   if(fabs(F1)<0.001f) F1=0.001f; //to prevent overtone ratio div0
   F2 = MasterTune * TwoPi * GetPrivateProfileFloat(sec,"F2",120.0,dsfile) / Fs;
-  Fsync = F2;
   TDroopRate = GetPrivateProfileFloat(sec,"Droop",0.f,dsfile);
   if(TDroopRate>0.f)
   {

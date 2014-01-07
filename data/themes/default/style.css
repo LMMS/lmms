@@ -224,6 +224,13 @@ sf2InstrumentView knob {
 	qproperty-lineWidth: 2;
 }
 
+opl2instrumentView knob {
+    color: rgb(128,128,128);
+    qproperty-outerColor: rgb(255,255,255);
+    qproperty-innerRadius: 2;
+    qproperty-outerRadius: 9;
+    qproperty-lineWidth: 2;
+}   
 /* Notes: 
  
 lcd-spinbox colors: (12, 250, 150), (37, 57, 42)

@@ -1,0 +1,465 @@
+<!DOCTYPE ZynAddSubFX-data>
+<ZynAddSubFX-data version-revision="1" version-minor="4" version-major="2" ZynAddSubFX-author="Nasca Octavian Paul">
+ <INFORMATION/>
+ <BASE_PARAMETERS>
+  <par value="16" name="max_midi_parts"/>
+  <par value="16" name="max_kit_items_per_instrument"/>
+  <par value="4" name="max_system_effects"/>
+  <par value="8" name="max_insertion_effects"/>
+  <par value="3" name="max_instrument_effects"/>
+  <par value="8" name="max_addsynth_voices"/>
+ </BASE_PARAMETERS>
+ <INSTRUMENT>
+  <INFO>
+   <string name="name">Analog Piano 3</string>
+   <string name="author"></string>
+   <string name="comments"></string>
+   <par value="0" name="type"/>
+  </INFO>
+  <INSTRUMENT_KIT>
+   <par value="0" name="kit_mode"/>
+   <par_bool value="no" name="drum_mode"/>
+   <INSTRUMENT_KIT_ITEM id="0">
+    <par_bool value="yes" name="enabled"/>
+    <string name="name">Analog Piano 3</string>
+    <par_bool value="no" name="muted"/>
+    <par value="0" name="min_key"/>
+    <par value="127" name="max_key"/>
+    <par value="0" name="send_to_instrument_effect"/>
+    <par_bool value="yes" name="add_enabled"/>
+    <ADD_SYNTH_PARAMETERS>
+     <par_bool value="yes" name="stereo"/>
+     <AMPLITUDE_PARAMETERS>
+      <par value="90" name="volume"/>
+      <par value="64" name="panning"/>
+      <par value="64" name="velocity_sensing"/>
+      <par value="0" name="punch_strength"/>
+      <par value="60" name="punch_time"/>
+      <par value="64" name="punch_stretch"/>
+      <par value="72" name="punch_velocity_sensing"/>
+      <par value="0" name="harmonic_randomness_grouping"/>
+      <AMPLITUDE_ENVELOPE>
+       <par_bool value="no" name="free_mode"/>
+       <par value="4" name="env_points"/>
+       <par value="2" name="env_sustain"/>
+       <par value="0" name="env_stretch"/>
+       <par_bool value="yes" name="forced_release"/>
+       <par_bool value="no" name="linear_envelope"/>
+       <par value="0" name="A_dt"/>
+       <par value="88" name="D_dt"/>
+       <par value="63" name="R_dt"/>
+       <par value="64" name="A_val"/>
+       <par value="64" name="D_val"/>
+       <par value="0" name="S_val"/>
+       <par value="64" name="R_val"/>
+      </AMPLITUDE_ENVELOPE>
+      <AMPLITUDE_LFO>
+       <par_real value="0.629921" name="freq"/>
+       <par value="0" name="intensity"/>
+       <par value="64" name="start_phase"/>
+       <par value="0" name="lfo_type"/>
+       <par value="0" name="randomness_amplitude"/>
+       <par value="0" name="randomness_frequency"/>
+       <par value="0" name="delay"/>
+       <par value="64" name="stretch"/>
+       <par_bool value="no" name="continous"/>
+      </AMPLITUDE_LFO>
+     </AMPLITUDE_PARAMETERS>
+     <FREQUENCY_PARAMETERS>
+      <par value="8192" name="detune"/>
+      <par value="0" name="coarse_detune"/>
+      <par value="1" name="detune_type"/>
+      <par value="64" name="bandwidth"/>
+      <FREQUENCY_ENVELOPE>
+       <par_bool value="no" name="free_mode"/>
+       <par value="3" name="env_points"/>
+       <par value="1" name="env_sustain"/>
+       <par value="0" name="env_stretch"/>
+       <par_bool value="no" name="forced_release"/>
+       <par_bool value="no" name="linear_envelope"/>
+       <par value="50" name="A_dt"/>
+       <par value="10" name="D_dt"/>
+       <par value="60" name="R_dt"/>
+       <par value="64" name="A_val"/>
+       <par value="64" name="D_val"/>
+       <par value="64" name="S_val"/>
+       <par value="64" name="R_val"/>
+      </FREQUENCY_ENVELOPE>
+      <FREQUENCY_LFO>
+       <par_real value="0.614173" name="freq"/>
+       <par value="26" name="intensity"/>
+       <par value="64" name="start_phase"/>
+       <par value="0" name="lfo_type"/>
+       <par value="0" name="randomness_amplitude"/>
+       <par value="0" name="randomness_frequency"/>
+       <par value="0" name="delay"/>
+       <par value="64" name="stretch"/>
+       <par_bool value="no" name="continous"/>
+      </FREQUENCY_LFO>
+     </FREQUENCY_PARAMETERS>
+     <FILTER_PARAMETERS>
+      <par value="26" name="velocity_sensing_amplitude"/>
+      <par value="64" name="velocity_sensing"/>
+      <FILTER>
+       <par value="0" name="category"/>
+       <par value="2" name="type"/>
+       <par value="53" name="freq"/>
+       <par value="42" name="q"/>
+       <par value="0" name="stages"/>
+       <par value="64" name="freq_track"/>
+       <par value="64" name="gain"/>
+      </FILTER>
+      <FILTER_ENVELOPE>
+       <par_bool value="no" name="free_mode"/>
+       <par value="4" name="env_points"/>
+       <par value="2" name="env_sustain"/>
+       <par value="0" name="env_stretch"/>
+       <par_bool value="yes" name="forced_release"/>
+       <par_bool value="no" name="linear_envelope"/>
+       <par value="0" name="A_dt"/>
+       <par value="44" name="D_dt"/>
+       <par value="60" name="R_dt"/>
+       <par value="46" name="A_val"/>
+       <par value="127" name="D_val"/>
+       <par value="64" name="S_val"/>
+       <par value="64" name="R_val"/>
+      </FILTER_ENVELOPE>
+      <FILTER_LFO>
+       <par_real value="0.629921" name="freq"/>
+       <par value="0" name="intensity"/>
+       <par value="64" name="start_phase"/>
+       <par value="0" name="lfo_type"/>
+       <par value="0" name="randomness_amplitude"/>
+       <par value="0" name="randomness_frequency"/>
+       <par value="0" name="delay"/>
+       <par value="64" name="stretch"/>
+       <par_bool value="no" name="continous"/>
+      </FILTER_LFO>
+     </FILTER_PARAMETERS>
+     <RESONANCE>
+      <par_bool value="no" name="enabled"/>
+     </RESONANCE>
+     <VOICE id="0">
+      <par_bool value="yes" name="enabled"/>
+      <par value="0" name="type"/>
+      <par value="1" name="unison_size"/>
+      <par value="60" name="unison_frequency_spread"/>
+      <par value="64" name="unison_stereo_spread"/>
+      <par value="64" name="unison_vibratto"/>
+      <par value="64" name="unison_vibratto_speed"/>
+      <par value="0" name="unison_invert_phase"/>
+      <par value="0" name="delay"/>
+      <par_bool value="yes" name="resonance"/>
+      <par value="-1" name="ext_oscil"/>
+      <par value="-1" name="ext_fm_oscil"/>
+      <par value="64" name="oscil_phase"/>
+      <par value="64" name="oscil_fm_phase"/>
+      <par_bool value="no" name="filter_enabled"/>
+      <par_bool value="no" name="filter_bypass"/>
+      <par value="0" name="fm_enabled"/>
+      <OSCIL>
+       <par value="0" name="harmonic_mag_type"/>
+       <par value="4" name="base_function"/>
+       <par value="51" name="base_function_par"/>
+       <par value="0" name="base_function_modulation"/>
+       <par value="64" name="base_function_modulation_par1"/>
+       <par value="64" name="base_function_modulation_par2"/>
+       <par value="32" name="base_function_modulation_par3"/>
+       <par value="0" name="modulation"/>
+       <par value="64" name="modulation_par1"/>
+       <par value="64" name="modulation_par2"/>
+       <par value="32" name="modulation_par3"/>
+       <par value="64" name="wave_shaping"/>
+       <par value="0" name="wave_shaping_function"/>
+       <par value="0" name="filter_type"/>
+       <par value="64" name="filter_par1"/>
+       <par value="64" name="filter_par2"/>
+       <par value="0" name="filter_before_wave_shaping"/>
+       <par value="0" name="spectrum_adjust_type"/>
+       <par value="64" name="spectrum_adjust_par"/>
+       <par value="0" name="rand"/>
+       <par value="0" name="amp_rand_type"/>
+       <par value="64" name="amp_rand_power"/>
+       <par value="0" name="harmonic_shift"/>
+       <par_bool value="no" name="harmonic_shift_first"/>
+       <par value="0" name="adaptive_harmonics"/>
+       <par value="128" name="adaptive_harmonics_base_frequency"/>
+       <par value="100" name="adaptive_harmonics_power"/>
+       <HARMONICS>
+        <HARMONIC id="1">
+         <par value="127" name="mag"/>
+         <par value="64" name="phase"/>
+        </HARMONIC>
+       </HARMONICS>
+      </OSCIL>
+      <AMPLITUDE_PARAMETERS>
+       <par value="32" name="panning"/>
+       <par value="100" name="volume"/>
+       <par_bool value="no" name="volume_minus"/>
+       <par value="127" name="velocity_sensing"/>
+       <par_bool value="no" name="amp_envelope_enabled"/>
+       <par_bool value="no" name="amp_lfo_enabled"/>
+      </AMPLITUDE_PARAMETERS>
+      <FREQUENCY_PARAMETERS>
+       <par_bool value="no" name="fixed_freq"/>
+       <par value="0" name="fixed_freq_et"/>
+       <par value="7095" name="detune"/>
+       <par value="0" name="coarse_detune"/>
+       <par value="0" name="detune_type"/>
+       <par_bool value="no" name="freq_envelope_enabled"/>
+       <par_bool value="no" name="freq_lfo_enabled"/>
+      </FREQUENCY_PARAMETERS>
+     </VOICE>
+     <VOICE id="1">
+      <par_bool value="yes" name="enabled"/>
+      <par value="0" name="type"/>
+      <par value="1" name="unison_size"/>
+      <par value="60" name="unison_frequency_spread"/>
+      <par value="64" name="unison_stereo_spread"/>
+      <par value="64" name="unison_vibratto"/>
+      <par value="64" name="unison_vibratto_speed"/>
+      <par value="0" name="unison_invert_phase"/>
+      <par value="0" name="delay"/>
+      <par_bool value="yes" name="resonance"/>
+      <par value="0" name="ext_oscil"/>
+      <par value="-1" name="ext_fm_oscil"/>
+      <par value="64" name="oscil_phase"/>
+      <par value="64" name="oscil_fm_phase"/>
+      <par_bool value="no" name="filter_enabled"/>
+      <par_bool value="no" name="filter_bypass"/>
+      <par value="0" name="fm_enabled"/>
+      <OSCIL>
+       <par value="0" name="harmonic_mag_type"/>
+       <par value="0" name="base_function"/>
+       <par value="64" name="base_function_par"/>
+       <par value="0" name="base_function_modulation"/>
+       <par value="64" name="base_function_modulation_par1"/>
+       <par value="64" name="base_function_modulation_par2"/>
+       <par value="32" name="base_function_modulation_par3"/>
+       <par value="0" name="modulation"/>
+       <par value="64" name="modulation_par1"/>
+       <par value="64" name="modulation_par2"/>
+       <par value="32" name="modulation_par3"/>
+       <par value="64" name="wave_shaping"/>
+       <par value="0" name="wave_shaping_function"/>
+       <par value="0" name="filter_type"/>
+       <par value="64" name="filter_par1"/>
+       <par value="64" name="filter_par2"/>
+       <par value="0" name="filter_before_wave_shaping"/>
+       <par value="0" name="spectrum_adjust_type"/>
+       <par value="64" name="spectrum_adjust_par"/>
+       <par value="64" name="rand"/>
+       <par value="0" name="amp_rand_type"/>
+       <par value="64" name="amp_rand_power"/>
+       <par value="0" name="harmonic_shift"/>
+       <par_bool value="no" name="harmonic_shift_first"/>
+       <par value="0" name="adaptive_harmonics"/>
+       <par value="128" name="adaptive_harmonics_base_frequency"/>
+       <par value="100" name="adaptive_harmonics_power"/>
+       <HARMONICS>
+        <HARMONIC id="1">
+         <par value="127" name="mag"/>
+         <par value="64" name="phase"/>
+        </HARMONIC>
+       </HARMONICS>
+      </OSCIL>
+      <AMPLITUDE_PARAMETERS>
+       <par value="96" name="panning"/>
+       <par value="100" name="volume"/>
+       <par_bool value="no" name="volume_minus"/>
+       <par value="127" name="velocity_sensing"/>
+       <par_bool value="no" name="amp_envelope_enabled"/>
+       <par_bool value="no" name="amp_lfo_enabled"/>
+      </AMPLITUDE_PARAMETERS>
+      <FREQUENCY_PARAMETERS>
+       <par_bool value="no" name="fixed_freq"/>
+       <par value="0" name="fixed_freq_et"/>
+       <par value="8514" name="detune"/>
+       <par value="0" name="coarse_detune"/>
+       <par value="0" name="detune_type"/>
+       <par_bool value="no" name="freq_envelope_enabled"/>
+       <par_bool value="no" name="freq_lfo_enabled"/>
+      </FREQUENCY_PARAMETERS>
+     </VOICE>
+     <VOICE id="2">
+      <par_bool value="yes" name="enabled"/>
+      <par value="0" name="type"/>
+      <par value="1" name="unison_size"/>
+      <par value="60" name="unison_frequency_spread"/>
+      <par value="64" name="unison_stereo_spread"/>
+      <par value="64" name="unison_vibratto"/>
+      <par value="64" name="unison_vibratto_speed"/>
+      <par value="0" name="unison_invert_phase"/>
+      <par value="0" name="delay"/>
+      <par_bool value="yes" name="resonance"/>
+      <par value="0" name="ext_oscil"/>
+      <par value="-1" name="ext_fm_oscil"/>
+      <par value="64" name="oscil_phase"/>
+      <par value="64" name="oscil_fm_phase"/>
+      <par_bool value="no" name="filter_enabled"/>
+      <par_bool value="no" name="filter_bypass"/>
+      <par value="0" name="fm_enabled"/>
+      <OSCIL>
+       <par value="0" name="harmonic_mag_type"/>
+       <par value="0" name="base_function"/>
+       <par value="64" name="base_function_par"/>
+       <par value="0" name="base_function_modulation"/>
+       <par value="64" name="base_function_modulation_par1"/>
+       <par value="64" name="base_function_modulation_par2"/>
+       <par value="32" name="base_function_modulation_par3"/>
+       <par value="0" name="modulation"/>
+       <par value="64" name="modulation_par1"/>
+       <par value="64" name="modulation_par2"/>
+       <par value="32" name="modulation_par3"/>
+       <par value="64" name="wave_shaping"/>
+       <par value="0" name="wave_shaping_function"/>
+       <par value="0" name="filter_type"/>
+       <par value="64" name="filter_par1"/>
+       <par value="64" name="filter_par2"/>
+       <par value="0" name="filter_before_wave_shaping"/>
+       <par value="0" name="spectrum_adjust_type"/>
+       <par value="64" name="spectrum_adjust_par"/>
+       <par value="64" name="rand"/>
+       <par value="0" name="amp_rand_type"/>
+       <par value="64" name="amp_rand_power"/>
+       <par value="0" name="harmonic_shift"/>
+       <par_bool value="no" name="harmonic_shift_first"/>
+       <par value="0" name="adaptive_harmonics"/>
+       <par value="128" name="adaptive_harmonics_base_frequency"/>
+       <par value="100" name="adaptive_harmonics_power"/>
+       <HARMONICS>
+        <HARMONIC id="1">
+         <par value="127" name="mag"/>
+         <par value="64" name="phase"/>
+        </HARMONIC>
+       </HARMONICS>
+      </OSCIL>
+      <AMPLITUDE_PARAMETERS>
+       <par value="0" name="panning"/>
+       <par value="100" name="volume"/>
+       <par_bool value="no" name="volume_minus"/>
+       <par value="127" name="velocity_sensing"/>
+       <par_bool value="no" name="amp_envelope_enabled"/>
+       <par_bool value="no" name="amp_lfo_enabled"/>
+      </AMPLITUDE_PARAMETERS>
+      <FREQUENCY_PARAMETERS>
+       <par_bool value="no" name="fixed_freq"/>
+       <par value="0" name="fixed_freq_et"/>
+       <par value="9890" name="detune"/>
+       <par value="0" name="coarse_detune"/>
+       <par value="0" name="detune_type"/>
+       <par_bool value="no" name="freq_envelope_enabled"/>
+       <par_bool value="no" name="freq_lfo_enabled"/>
+      </FREQUENCY_PARAMETERS>
+     </VOICE>
+     <VOICE id="3">
+      <par_bool value="no" name="enabled"/>
+     </VOICE>
+     <VOICE id="4">
+      <par_bool value="no" name="enabled"/>
+     </VOICE>
+     <VOICE id="5">
+      <par_bool value="no" name="enabled"/>
+     </VOICE>
+     <VOICE id="6">
+      <par_bool value="no" name="enabled"/>
+     </VOICE>
+     <VOICE id="7">
+      <par_bool value="no" name="enabled"/>
+     </VOICE>
+    </ADD_SYNTH_PARAMETERS>
+    <par_bool value="no" name="sub_enabled"/>
+    <par_bool value="no" name="pad_enabled"/>
+   </INSTRUMENT_KIT_ITEM>
+   <INSTRUMENT_KIT_ITEM id="1">
+    <par_bool value="no" name="enabled"/>
+   </INSTRUMENT_KIT_ITEM>
+   <INSTRUMENT_KIT_ITEM id="2">
+    <par_bool value="no" name="enabled"/>
+   </INSTRUMENT_KIT_ITEM>
+   <INSTRUMENT_KIT_ITEM id="3">
+    <par_bool value="no" name="enabled"/>
+   </INSTRUMENT_KIT_ITEM>
+   <INSTRUMENT_KIT_ITEM id="4">
+    <par_bool value="no" name="enabled"/>
+   </INSTRUMENT_KIT_ITEM>
+   <INSTRUMENT_KIT_ITEM id="5">
+    <par_bool value="no" name="enabled"/>
+   </INSTRUMENT_KIT_ITEM>
+   <INSTRUMENT_KIT_ITEM id="6">
+    <par_bool value="no" name="enabled"/>
+   </INSTRUMENT_KIT_ITEM>
+   <INSTRUMENT_KIT_ITEM id="7">
+    <par_bool value="no" name="enabled"/>
+   </INSTRUMENT_KIT_ITEM>
+   <INSTRUMENT_KIT_ITEM id="8">
+    <par_bool value="no" name="enabled"/>
+   </INSTRUMENT_KIT_ITEM>
+   <INSTRUMENT_KIT_ITEM id="9">
+    <par_bool value="no" name="enabled"/>
+   </INSTRUMENT_KIT_ITEM>
+   <INSTRUMENT_KIT_ITEM id="10">
+    <par_bool value="no" name="enabled"/>
+   </INSTRUMENT_KIT_ITEM>
+   <INSTRUMENT_KIT_ITEM id="11">
+    <par_bool value="no" name="enabled"/>
+   </INSTRUMENT_KIT_ITEM>
+   <INSTRUMENT_KIT_ITEM id="12">
+    <par_bool value="no" name="enabled"/>
+   </INSTRUMENT_KIT_ITEM>
+   <INSTRUMENT_KIT_ITEM id="13">
+    <par_bool value="no" name="enabled"/>
+   </INSTRUMENT_KIT_ITEM>
+   <INSTRUMENT_KIT_ITEM id="14">
+    <par_bool value="no" name="enabled"/>
+   </INSTRUMENT_KIT_ITEM>
+   <INSTRUMENT_KIT_ITEM id="15">
+    <par_bool value="no" name="enabled"/>
+   </INSTRUMENT_KIT_ITEM>
+  </INSTRUMENT_KIT>
+  <INSTRUMENT_EFFECTS>
+   <INSTRUMENT_EFFECT id="0">
+    <EFFECT>
+     <par value="2" name="type"/>
+     <par value="0" name="preset"/>
+     <EFFECT_PARAMETERS>
+      <par_no id="0">
+       <par value="34" name="par"/>
+      </par_no>
+      <par_no id="1">
+       <par value="64" name="par"/>
+      </par_no>
+      <par_no id="2">
+       <par value="20" name="par"/>
+      </par_no>
+      <par_no id="3">
+       <par value="64" name="par"/>
+      </par_no>
+      <par_no id="4">
+       <par value="30" name="par"/>
+      </par_no>
+      <par_no id="5">
+       <par value="59" name="par"/>
+      </par_no>
+     </EFFECT_PARAMETERS>
+    </EFFECT>
+    <par value="0" name="route"/>
+    <par_bool value="no" name="bypass"/>
+   </INSTRUMENT_EFFECT>
+   <INSTRUMENT_EFFECT id="1">
+    <EFFECT>
+     <par value="0" name="type"/>
+    </EFFECT>
+    <par value="0" name="route"/>
+    <par_bool value="no" name="bypass"/>
+   </INSTRUMENT_EFFECT>
+   <INSTRUMENT_EFFECT id="2">
+    <EFFECT>
+     <par value="0" name="type"/>
+    </EFFECT>
+    <par value="0" name="route"/>
+    <par_bool value="no" name="bypass"/>
+   </INSTRUMENT_EFFECT>
+  </INSTRUMENT_EFFECTS>
+ </INSTRUMENT>
+</ZynAddSubFX-data>

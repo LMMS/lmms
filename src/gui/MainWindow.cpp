@@ -1,9 +1,7 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
 /*
  * main_window.cpp - implementation of LMMS-main-window
  *
- * Copyright (c) 2004-2011 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2013 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -184,9 +182,12 @@ MainWindow::MainWindow( void ) :
 
 	m_updateTimer.start( 1000 / 20, this );	// 20 fps
 
-	// connect auto save
-	connect(&m_autoSaveTimer, SIGNAL(timeout()), this, SLOT(autoSave()));
-	m_autoSaveTimer.start(1000 * 60); // 1 minute
+	if( configManager::inst()->value( "ui", "enableautosave" ).toInt() )
+	{
+		// connect auto save
+		connect(&m_autoSaveTimer, SIGNAL(timeout()), this, SLOT(autoSave()));
+		m_autoSaveTimer.start(1000 * 60); // 1 minute
+	}
 }
 
 
@@ -255,6 +256,12 @@ void MainWindow::finalize( void )
 					engine::getSong(),
 					SLOT( exportProject() ),
 					Qt::CTRL + Qt::Key_E );
+	project_menu->addAction( embed::getIconPixmap( "project_export" ),
+					tr( "E&xport tracks..." ),
+					engine::getSong(),
+					SLOT( exportProjectTracks() ),
+					Qt::CTRL + Qt::SHIFT + Qt::Key_E );
+
 	project_menu->addSeparator();
 	project_menu->addAction( embed::getIconPixmap( "exit" ), tr( "&Quit" ),
 					qApp, SLOT( closeAllWindows() ),
@@ -681,6 +688,9 @@ void MainWindow::openProject( void )
 	{
 		QFileDialog ofd( this, tr( "Open project" ), "",
 			tr( "MultiMedia Project (*.mmp *.mmpz *.xml)" ) );
+#if QT_VERSION >= 0x040806
+		ofd.setOption( QFileDialog::DontUseCustomDirectoryIcons );
+#endif
 		ofd.setDirectory( configManager::inst()->userProjectsDir() );
 		ofd.setFileMode( QFileDialog::ExistingFiles );
 		if( ofd.exec () == QDialog::Accepted &&
@@ -744,6 +754,9 @@ bool MainWindow::saveProjectAs( void )
 	QFileDialog sfd( this, tr( "Save project" ), "",
 			tr( "MultiMedia Project (*.mmp *.mmpz);;"
 				"MultiMedia Project Template (*.mpt)" ) );
+#if QT_VERSION >= 0x040806
+	sfd.setOption( QFileDialog::DontUseCustomDirectoryIcons );
+#endif
 	sfd.setAcceptMode( QFileDialog::AcceptSave );
 	sfd.setFileMode( QFileDialog::AnyFile );
 	QString f = engine::getSong()->projectFileName();
@@ -801,16 +814,17 @@ void MainWindow::help( void )
 
 
 
-void MainWindow::toggleWindow( QWidget * _w )
+void MainWindow::toggleWindow( QWidget *window, bool forceShow )
 {
-	QWidget * parent = _w->parentWidget();
+	QWidget *parent = window->parentWidget();
 
-	if( m_workspace->activeSubWindow() != parent
-				|| parent->isHidden() )
+	if( forceShow ||
+		m_workspace->activeSubWindow() != parent ||
+		parent->isHidden() )
 	{
 		parent->show();
-		_w->show();
-		_w->setFocus();
+		window->show();
+		window->setFocus();
 	}
 	else
 	{
@@ -827,9 +841,9 @@ void MainWindow::toggleWindow( QWidget * _w )
 
 
 
-void MainWindow::toggleBBEditorWin( void )
+void MainWindow::toggleBBEditorWin( bool forceShow )
 {
-	toggleWindow( engine::getBBEditor() );
+	toggleWindow( engine::getBBEditor(), forceShow );
 }
 
 
@@ -1063,5 +1077,3 @@ void MainWindow::autoSave()
 
 #include "moc_MainWindow.cxx"
 
-
-#endif

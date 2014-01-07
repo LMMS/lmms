@@ -88,6 +88,7 @@ private:
 	QScrollArea * m_scrollArea;
 	FloatModel ** knobFModel;
 	knob ** vstKnobs;
+	int paramCount;
 
 	QObject * ctrHandle;
 
@@ -112,7 +113,9 @@ public:
 
 protected slots:
 	void syncPlugin( void );
+	void displayAutomatedOnly( void );
 	void setParameter( void );
+	void closeWindow();
 
 private:
 
@@ -128,6 +131,8 @@ private:
 	QGridLayout * l;
 
 	QPushButton * m_syncButton;
+	QPushButton * m_displayAutomatedOnly;
+	QPushButton * m_closeButton;
 
 } ;
 

@@ -1,7 +1,7 @@
 /*
  * RemotePlugin.h - base class providing RPC like mechanisms
  *
- * Copyright (c) 2008-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2012 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -27,6 +27,7 @@
 
 #include "export.h"
 #include "midi.h"
+#include "VST_sync_shm.h"
 
 #include <vector>
 #include <cstdio>
@@ -115,7 +116,7 @@ typedef int32_t key_t;
 
 // sometimes we need to exchange bigger messages (e.g. for VST parameter dumps)
 // so set a usable value here
-const int SHM_FIFO_SIZE = 64000;
+const int SHM_FIFO_SIZE = 512*1024;
 
 
 // implements a FIFO inside a shared memory segment
@@ -284,7 +285,7 @@ public:
 	// recursive lock
 	inline void lock()
 	{
-		if( !isInvalid() && ++m_lockDepth == 1 )
+		if( !isInvalid() && __sync_add_and_fetch( &m_lockDepth, 1 ) == 1 )
 		{
 #ifdef USE_QT_SEMAPHORES
 			m_dataSem.acquire();
@@ -297,16 +298,13 @@ public:
 	// recursive unlock
 	inline void unlock()
 	{
-		if( m_lockDepth > 0 )
+		if( __sync_sub_and_fetch( &m_lockDepth, 1) <= 0 )
 		{
-			if( --m_lockDepth == 0 )
-			{
 #ifdef USE_QT_SEMAPHORES
-				m_dataSem.release();
+			m_dataSem.release();
 #else
-				sem_post( m_dataSem );
+			sem_post( m_dataSem );
 #endif
-			}
 		}
 	}
 
@@ -418,7 +416,8 @@ private:
 			return;
 		}
 		lock();
-		while( _len > m_data->endPtr - m_data->startPtr )
+		while( isInvalid() == false &&
+				_len > m_data->endPtr - m_data->startPtr )
 		{
 			unlock();
 #ifndef LMMS_BUILD_WIN32
@@ -439,7 +438,7 @@ private:
 
 	void write( const void * _buf, int _len )
 	{
-		if( isInvalid() )
+		if( isInvalid() || _len > SHM_FIFO_SIZE )
 		{
 			return;
 		}
@@ -484,7 +483,7 @@ private:
 	sem_t * m_dataSem;
 	sem_t * m_messageSem;
 #endif
-	int m_lockDepth;
+	volatile int m_lockDepth;
 
 } ;
 
@@ -509,12 +508,8 @@ enum RemoteMessageIDs
 	IdSaveSettingsToFile,
 	IdLoadSettingsFromString,
 	IdLoadSettingsFromFile,
-	IdLoadChunkFromPresetFile,
-	IdRotateProgram,
-	IdLoadPrograms,
-	IdSavePreset,
-	IdSetParameter,
-	IdLoadPresetFromFile,
+	IdSavePresetFile,
+	IdLoadPresetFile,
 	IdDebugMessage,
 	IdUserBase = 64
 } ;
@@ -552,8 +547,7 @@ public:
 
 		message & addInt( int _i )
 		{
-			char buf[128];
-			buf[0] = 0;
+			char buf[32];
 			sprintf( buf, "%d", _i );
 			data.push_back( std::string( buf ) );
 			return *this;
@@ -561,8 +555,7 @@ public:
 
 		message & addFloat( float _f )
 		{
-			char buf[128];
-			buf[0] = 0;
+			char buf[32];
 			sprintf( buf, "%f", _f );
 			data.push_back( std::string( buf ) );
 			return *this;
@@ -615,7 +608,7 @@ public:
 		m_out = out;
 	}
 
-	void sendMessage( const message & _m );
+	int sendMessage( const message & _m );
 	message receiveMessage();
 
 	inline bool isInvalid() const
@@ -819,7 +812,9 @@ class RemotePluginClient : public RemotePluginBase
 public:
 	RemotePluginClient( key_t _shm_in, key_t _shm_out );
 	virtual ~RemotePluginClient();
-
+#ifdef USE_QT_SHMEM
+	sncVST * getQtVSTshm();
+#endif
 	virtual bool processMessage( const message & _m );
 
 	virtual void process( const sampleFrame * _in_buf,
@@ -887,7 +882,9 @@ private:
 
 #ifdef USE_QT_SHMEM
 	QSharedMemory m_shmObj;
+	QSharedMemory m_shmQtID;
 #endif
+	sncVST * m_SncVSTplug;
 	float * m_shm;
 
 	int m_inputCount;
@@ -934,19 +931,21 @@ RemotePluginBase::~RemotePluginBase()
 
 
 
-void RemotePluginBase::sendMessage( const message & _m )
+int RemotePluginBase::sendMessage( const message & _m )
 {
 	m_out->lock();
 	m_out->writeInt( _m.id );
 	m_out->writeInt( _m.data.size() );
-	int j = 0;
+	int j = 8;
 	for( unsigned int i = 0; i < _m.data.size(); ++i )
 	{
 		m_out->writeString( _m.data[i] );
-		j += _m.data[i].size();
+		j += 4 + _m.data[i].size();
 	}
 	m_out->unlock();
 	m_out->messageSent();
+
+	return j;
 }
 
 
@@ -1013,13 +1012,60 @@ RemotePluginClient::RemotePluginClient( key_t _shm_in, key_t _shm_out ) :
 	RemotePluginBase( new shmFifo( _shm_in ), new shmFifo( _shm_out ) ),
 #ifdef USE_QT_SHMEM
 	m_shmObj(),
+	m_shmQtID( "/usr/bin/lmms" ),
 #endif
+	m_SncVSTplug( NULL ),
 	m_shm( NULL ),
 	m_inputCount( 0 ),
 	m_outputCount( 0 ),
 	m_sampleRate( 44100 ),
 	m_bufferSize( 0 )
 {
+#ifdef USE_QT_SHMEM
+	if( m_shmQtID.attach( QSharedMemory::ReadOnly ) )
+	{
+		m_SncVSTplug = (sncVST *) m_shmQtID.data();
+		m_bufferSize = m_SncVSTplug->m_bufferSize;
+		m_sampleRate = m_SncVSTplug->m_sampleRate;
+		return;
+	}
+#else
+	key_t key;
+	int m_shmID;
+
+	if( ( key = ftok( VST_SNC_SHM_KEY_FILE, 'R' ) ) == -1 )
+	{
+		perror( "RemotePluginClient::ftok" );
+	}
+	else
+	{	// connect to shared memory segment
+		if( ( m_shmID = shmget( key, 0, 0 ) ) == -1 )
+		{
+			perror( "RemotePluginClient::shmget" );
+		}
+		else
+		{	// attach segment
+			m_SncVSTplug = (sncVST *)shmat(m_shmID, 0, 0);
+			if( m_SncVSTplug == (sncVST *)( -1 ) )
+			{
+				perror( "RemotePluginClient::shmat" );
+			}
+			else
+			{
+				m_bufferSize = m_SncVSTplug->m_bufferSize;
+				m_sampleRate = m_SncVSTplug->m_sampleRate;
+
+				// detach segment
+				if( shmdt(m_SncVSTplug) == -1 )
+				{
+					perror("RemotePluginClient::shmdt");
+				}
+				return;
+			}
+		}
+	}
+#endif
+	// if attaching shared memory fails
 	sendMessage( IdSampleRateInformation );
 	sendMessage( IdBufferSizeInformation );
 }
@@ -1029,6 +1075,9 @@ RemotePluginClient::RemotePluginClient( key_t _shm_in, key_t _shm_out ) :
 
 RemotePluginClient::~RemotePluginClient()
 {
+#ifdef USE_QT_SHMEM
+	m_shmQtID.detach();
+#endif
 	sendMessage( IdQuit );
 
 #ifndef USE_QT_SHMEM
@@ -1036,6 +1085,14 @@ RemotePluginClient::~RemotePluginClient()
 #endif
 }
 
+
+
+#ifdef USE_QT_SHMEM
+sncVST * RemotePluginClient::getQtVSTshm()
+{
+	return m_SncVSTplug;
+}
+#endif
 
 
 
@@ -1107,13 +1164,15 @@ void RemotePluginClient::setShmKey( key_t _key, int _size )
 {
 #ifdef USE_QT_SHMEM
 	m_shmObj.setKey( QString::number( _key ) );
-	if( m_shmObj.attach() )
+	if( m_shmObj.attach() || m_shmObj.error() == QSharedMemory::NoError )
 	{
 		m_shm = (float *) m_shmObj.data();
 	}
 	else
 	{
-		debugMessage( "failed getting shared memory\n" );
+		char buf[64];
+		sprintf( buf, "failed getting shared memory: %d\n", m_shmObj.error() );
+		debugMessage( buf );
 	}
 #else
 	if( m_shm != NULL )

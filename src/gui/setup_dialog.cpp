@@ -1,7 +1,7 @@
 /*
  * setup_dialog.cpp - dialog for setting up LMMS
  *
- * Copyright (c) 2005-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2013 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -113,10 +113,15 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 	m_manualChPiano( configManager::inst()->value( "ui",
 					"manualchannelpiano" ).toInt() ),
 	m_smoothScroll( configManager::inst()->value( "ui", "smoothscroll" ).toInt() ),
+	m_enableAutoSave( configManager::inst()->value( "ui", "enableautosave" ).toInt() ),
 	m_oneInstrumentTrackWindow( configManager::inst()->value( "ui",
 					"oneinstrumenttrackwindow" ).toInt() ),
 	m_compactTrackButtons( configManager::inst()->value( "ui",
-					"compacttrackbuttons" ).toInt() )
+					"compacttrackbuttons" ).toInt() ),
+	m_syncVSTPlugins( configManager::inst()->value( "ui",
+							"syncvstplugins" ).toInt() ),
+	m_animateAFP(configManager::inst()->value( "ui",
+						   "animateafp").toInt() )
 {
 	setWindowIcon( embed::getIconPixmap( "setup_general" ) );
 	setWindowTitle( tr( "Setup LMMS" ) );
@@ -185,7 +190,7 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 
 
 	tabWidget * misc_tw = new tabWidget( tr( "MISC" ), general );
-	misc_tw->setFixedHeight( 156 );
+	misc_tw->setFixedHeight( 174 );
 
 	ledCheckBox * enable_tooltips = new ledCheckBox(
 							tr( "Enable tooltips" ),
@@ -244,6 +249,15 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 	compacttracks->setChecked( m_compactTrackButtons );
 	connect( compacttracks, SIGNAL( toggled( bool ) ),
 				this, SLOT( toggleCompactTrackButtons( bool ) ) );
+
+
+	ledCheckBox * syncVST = new ledCheckBox(
+				tr( "Sync VST plugins to host playback" ),
+								misc_tw );
+	syncVST->move( 10, 144 );
+	syncVST->setChecked( m_syncVSTPlugins );
+	connect( syncVST, SIGNAL( toggled( bool ) ),
+				this, SLOT( toggleSyncVSTPlugins( bool ) ) );
 
 
 
@@ -464,7 +478,7 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 	tabWidget * ui_fx_tw = new tabWidget( tr( "UI effects vs. "
 						"performance" ).toUpper(),
 								performance );
-	ui_fx_tw->setFixedHeight( 90 );
+	ui_fx_tw->setFixedHeight( 120 );
 
 	ledCheckBox * disable_ch_act_ind = new ledCheckBox(
 				tr( "Disable channel activity indicators" ),
@@ -489,6 +503,23 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 	smoothScroll->setChecked( m_smoothScroll );
 	connect( smoothScroll, SIGNAL( toggled( bool ) ),
 				this, SLOT( toggleSmoothScroll( bool ) ) );
+
+
+	ledCheckBox * autoSave = new ledCheckBox(
+			tr( "Enable auto save feature" ), ui_fx_tw );
+	autoSave->move( 10, 80 );
+	autoSave->setChecked( m_enableAutoSave );
+	connect( autoSave, SIGNAL( toggled( bool ) ),
+				this, SLOT( toggleAutoSave( bool ) ) );
+
+
+	ledCheckBox * animAFP = new ledCheckBox(
+				tr( "Show playback cursor in AudioFileProcessor" ),
+								ui_fx_tw );
+	animAFP->move( 10, 100 );
+	animAFP->setChecked( m_animateAFP );
+	connect( animAFP, SIGNAL( toggled( bool ) ),
+				this, SLOT( toggleAnimateAFP( bool ) ) );
 
 
 
@@ -759,10 +790,17 @@ void setupDialog::accept()
 					QString::number( m_manualChPiano ) );
 	configManager::inst()->setValue( "ui", "smoothscroll",
 					QString::number( m_smoothScroll ) );
+	configManager::inst()->setValue( "ui", "enableautosave",
+					QString::number( m_enableAutoSave ) );
 	configManager::inst()->setValue( "ui", "oneinstrumenttrackwindow",
 					QString::number( m_oneInstrumentTrackWindow ) );
 	configManager::inst()->setValue( "ui", "compacttrackbuttons",
 					QString::number( m_compactTrackButtons ) );
+	configManager::inst()->setValue( "ui", "syncvstplugins",
+					QString::number( m_syncVSTPlugins ) );
+	configManager::inst()->setValue( "ui", "animateafp",
+					QString::number( m_animateAFP ) );
+
 
 	configManager::inst()->setWorkingDir( m_workingDir );
 	configManager::inst()->setVSTDir( m_vstDir );
@@ -926,11 +964,33 @@ void setupDialog::toggleSmoothScroll( bool _enabled )
 
 
 
+void setupDialog::toggleAutoSave( bool _enabled )
+{
+	m_enableAutoSave = _enabled;
+}
+
+
+
+
 
 
 void setupDialog::toggleCompactTrackButtons( bool _enabled )
 {
 	m_compactTrackButtons = _enabled;
+}
+
+
+
+
+
+void setupDialog::toggleSyncVSTPlugins( bool _enabled )
+{
+	m_syncVSTPlugins = _enabled;
+}
+
+void setupDialog::toggleAnimateAFP( bool _enabled )
+{
+	m_animateAFP = _enabled;
 }
 
 
@@ -950,7 +1010,11 @@ void setupDialog::openWorkingDir()
 {
 	QString new_dir = QFileDialog::getExistingDirectory( this,
 					tr( "Choose LMMS working directory" ),
-							m_workingDir );
+							m_workingDir
+#if QT_VERSION >= 0x040806
+							, QFileDialog::DontUseCustomDirectoryIcons
+#endif
+					 );
 	if( new_dir != QString::null )
 	{
 		m_wdLineEdit->setText( new_dir );

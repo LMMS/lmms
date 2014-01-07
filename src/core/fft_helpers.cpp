@@ -1,7 +1,7 @@
 /*
  * fft_helpers.cpp - some functions around FFT analysis
  *
- * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2012 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -24,8 +24,6 @@
 
 
 #include "fft_helpers.h"
-
-#ifdef LMMS_HAVE_FFTW3F
 
 #include <math.h>
 
@@ -242,6 +240,4 @@ float signalpower(float *timesignal, int num_values)
 	
 	return power;	
 }
-
-#endif
 

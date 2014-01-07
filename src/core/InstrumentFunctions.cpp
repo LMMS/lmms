@@ -1,7 +1,7 @@
 /*
  * InstrumentFunctions.cpp - models for instrument-function-tab
  *
- * Copyright (c) 2004-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2013 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -48,7 +48,7 @@ ChordCreator::ChordTable::Init ChordCreator::ChordTable::s_initTable[] =
 	
 	{ QT_TRANSLATE_NOOP( "ChordCreator", "6" ), { 0, 4, 7, 9, -1 } },
 	{ QT_TRANSLATE_NOOP( "ChordCreator", "6sus4" ), { 0, 5, 7, 9, -1 } },
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "6add9" ), { 0, 4, 7, 12, -1 } },
+	{ QT_TRANSLATE_NOOP( "ChordCreator", "6add9" ), { 0, 4, 7, 9, 14, -1 } },
 	{ QT_TRANSLATE_NOOP( "ChordCreator", "m6" ), { 0, 3, 7, 9, -1 } },
 	{ QT_TRANSLATE_NOOP( "ChordCreator", "m6add9" ), { 0, 3, 7, 9, 14, -1 } },
 
@@ -56,11 +56,11 @@ ChordCreator::ChordTable::Init ChordCreator::ChordTable::s_initTable[] =
 	{ QT_TRANSLATE_NOOP( "ChordCreator", "7sus4" ), { 0, 5, 7, 10, -1 } },
 	{ QT_TRANSLATE_NOOP( "ChordCreator", "7#5" ), { 0, 4, 8, 10, -1 } },
 	{ QT_TRANSLATE_NOOP( "ChordCreator", "7b5" ), { 0, 4, 6, 10, -1 } },
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "7#9" ), { 0, 4, 7, 10, 13, 18, -1 } },
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "7b9" ), { 0, 4, 7, 10, 13, 16, -1 } },
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "7#5#9" ), { 0, 4, 8, 12, 14, 19, -1 } },
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "7#5b9" ), { 0, 4, 8, 12, 14, 17, -1 } },
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "7b5b9" ), { 0, 4, 6, 10, 12, 15, -1 } },
+	{ QT_TRANSLATE_NOOP( "ChordCreator", "7#9" ), { 0, 4, 7, 10, 15, -1 } },
+	{ QT_TRANSLATE_NOOP( "ChordCreator", "7b9" ), { 0, 4, 7, 10, 13, -1 } },
+	{ QT_TRANSLATE_NOOP( "ChordCreator", "7#5#9" ), { 0, 4, 8, 10, 15, -1 } },
+	{ QT_TRANSLATE_NOOP( "ChordCreator", "7#5b9" ), { 0, 4, 8, 10, 13, -1 } },
+	{ QT_TRANSLATE_NOOP( "ChordCreator", "7b5b9" ), { 0, 4, 6, 10, 13, -1 } },
 	{ QT_TRANSLATE_NOOP( "ChordCreator", "7add11" ), { 0, 4, 7, 10, 17, -1 } },
 	{ QT_TRANSLATE_NOOP( "ChordCreator", "7add13" ), { 0, 4, 7, 10, 21, -1 } },
 	{ QT_TRANSLATE_NOOP( "ChordCreator", "7#11" ), { 0, 4, 7, 10, 18, -1 } },
@@ -113,7 +113,7 @@ ChordCreator::ChordTable::Init ChordCreator::ChordTable::s_initTable[] =
 	{ QT_TRANSLATE_NOOP( "ChordCreator", "Melodic minor" ), { 0, 2, 3, 5, 7, 9, 11, -1 } },
 	{ QT_TRANSLATE_NOOP( "ChordCreator", "Whole tone" ), { 0, 2, 4, 6, 8, 10, -1 } },
 	{ QT_TRANSLATE_NOOP( "ChordCreator", "Diminished" ), { 0, 2, 3, 5, 6, 8, 9, 11, -1 } },
-	{ QT_TRANSLATE_NOOP( "ChordCreator", "Major pentatonic" ), { 0, 2, 4, 7, 10, -1 } },
+	{ QT_TRANSLATE_NOOP( "ChordCreator", "Major pentatonic" ), { 0, 2, 4, 7, 9, -1 } },
 	{ QT_TRANSLATE_NOOP( "ChordCreator", "Minor pentatonic" ), { 0, 3, 5, 7, 10, -1 } },
 	{ QT_TRANSLATE_NOOP( "ChordCreator", "Jap in sen" ), { 0, 1, 5, 7, 10, -1 } },
 	{ QT_TRANSLATE_NOOP( "ChordCreator", "Major bebop" ), { 0, 2, 4, 5, 7, 8, 9, 11, -1 } },
@@ -130,6 +130,7 @@ ChordCreator::ChordTable::Init ChordCreator::ChordTable::s_initTable[] =
 	{ QT_TRANSLATE_NOOP( "ChordCreator", "Mixolydian" ), { 0, 2, 4, 5, 7, 9, 10, -1 } },
 	{ QT_TRANSLATE_NOOP( "ChordCreator", "Aeolian" ), { 0, 2, 3, 5, 7, 8, 10, -1 } },
 	{ QT_TRANSLATE_NOOP( "ChordCreator", "Locrian" ), { 0, 1, 3, 5, 6, 8, 10, -1 } },
+	{ QT_TRANSLATE_NOOP( "ChordCreator", "Minor" ), { 0, 2, 3, 5, 7, 8, 10, -1 } },
 } ;
 
 

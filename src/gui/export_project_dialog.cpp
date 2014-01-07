@@ -1,7 +1,7 @@
 /*
  * export_project_dialog.cpp - implementation of dialog for exporting project
  *
- * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2013 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -23,20 +23,24 @@
  */
 
 #include <QtCore/QFileInfo>
+#include <QtCore/QDir>
 #include <QtGui/QMessageBox>
 
 #include "export_project_dialog.h"
+#include "song.h"
 #include "engine.h"
 #include "MainWindow.h"
-#include "ProjectRenderer.h"
+#include "bb_track_container.h"
+#include "bb_track.h"
 
 
 exportProjectDialog::exportProjectDialog( const QString & _file_name,
-							QWidget * _parent ) :
+							QWidget * _parent, bool multi_export=false ) :
 	QDialog( _parent ),
 	Ui::ExportProjectDialog(),
 	m_fileName( _file_name ),
-	m_renderer( NULL )
+	m_fileExtension(),
+	m_multiExport(multi_export)
 {
 	setupUi( this );
 	setWindowTitle( tr( "Export project to %1" ).arg( 
@@ -83,7 +87,12 @@ exportProjectDialog::exportProjectDialog( const QString & _file_name,
 
 exportProjectDialog::~exportProjectDialog()
 {
-	delete m_renderer;
+
+	for( RenderVector::ConstIterator it = m_renderers.begin();
+							it != m_renderers.end(); ++it )
+	{
+		delete (*it);
+	}
 }
 
 
@@ -91,13 +100,35 @@ exportProjectDialog::~exportProjectDialog()
 
 void exportProjectDialog::reject()
 {
-	if( m_renderer == NULL )
+	for( RenderVector::ConstIterator it = m_renderers.begin(); it != m_renderers.end(); ++it )
 	{
-		accept();
+		(*it)->abortProcessing();
+	}
+
+	QDialog::reject();
+}
+
+
+
+void exportProjectDialog::accept()
+{
+	// If more to render, kick off next render job
+	if( m_renderers.isEmpty() == false )
+	{
+		popRender();
 	}
 	else
 	{
-		m_renderer->abortProcessing();
+		// If done, then reset mute states
+		while( m_unmuted.isEmpty() == false )
+		{
+			track* restoreTrack = m_unmuted.back();
+			m_unmuted.pop_back();
+			restoreTrack->setMuted( false );
+		}
+
+		QDialog::accept();
+
 	}
 }
 
@@ -106,19 +137,154 @@ void exportProjectDialog::reject()
 
 void exportProjectDialog::closeEvent( QCloseEvent * _ce )
 {
-	if( m_renderer != NULL && m_renderer->isRunning() )
+	for( RenderVector::ConstIterator it = m_renderers.begin(); it != m_renderers.end(); ++it )
 	{
-		m_renderer->abortProcessing();
+		if( (*it)->isRunning() )
+		{
+			(*it)->abortProcessing();
+		}
 	}
 	QDialog::closeEvent( _ce );
 }
 
 
 
+void exportProjectDialog::popRender()
+{
+	if( m_multiExport && m_tracksToRender.isEmpty() == false )
+	{
+		track* renderTrack = m_tracksToRender.back();
+		m_tracksToRender.pop_back();
+
+		// Set must states for song tracks
+		for( TrackVector::ConstIterator it = m_unmuted.begin(); it != m_unmuted.end(); ++it )
+		{
+			if( (*it) == renderTrack )
+			{
+				(*it)->setMuted( false );
+			}
+			else
+			{
+				(*it)->setMuted( true );
+			}
+		}
+	}
+
+
+	// Pop next render job and start
+	ProjectRenderer* r = m_renderers.back();
+	m_renderers.pop_back();
+	render( r );
+}
+
+
+
+void exportProjectDialog::multiRender()
+{
+	m_dirName = m_fileName;
+	QString path = QDir(m_fileName).filePath("text.txt");
+
+	int x = 1;
+
+	const trackContainer::trackList & tl = engine::getSong()->tracks();
+
+	// Check for all unmuted tracks. Remember list.
+	for( trackContainer::trackList::ConstIterator it = tl.begin();
+							it != tl.end(); ++it )
+	{
+		track* tk = (*it);
+		track::TrackTypes type = tk->type();
+		// Don't mute automation tracks
+		if ( tk->isMuted() == false &&
+				( type == track::InstrumentTrack || type == track::SampleTrack ) )
+		{
+			m_unmuted.push_back(tk);
+			QString nextName = tk->name();
+			nextName = nextName.remove(QRegExp("[^a-zA-Z]"));
+			QString name = QString( "%1_%2%3" ).arg( x++ ).arg( nextName ).arg( m_fileExtension );
+			m_fileName = QDir(m_dirName).filePath(name);
+			prepRender();
+		}
+		else if (! tk->isMuted() && type == track::BBTrack )
+		{
+			m_unmutedBB.push_back(tk);
+		}
+
+
+	}
+
+	const trackContainer::trackList t2 = engine::getBBTrackContainer()->tracks();
+	for( trackContainer::trackList::ConstIterator it = t2.begin(); it != t2.end(); ++it )
+	{
+		track* tk = (*it);
+		if ( tk->isMuted() == false )
+		{
+			m_unmuted.push_back(tk);
+			QString nextName = tk->name();
+			nextName = nextName.remove(QRegExp("[^a-zA-Z]"));
+			QString name = QString( "%1_%2%3" ).arg( x++ ).arg( nextName ).arg( m_fileExtension );
+			m_fileName = QDir(m_dirName).filePath(name);
+			prepRender();
+		}
+	}
+
+
+	m_tracksToRender = m_unmuted;
+
+	popRender();
+}
+
+
+
+ProjectRenderer* exportProjectDialog::prepRender()
+{
+	mixer::qualitySettings qs =
+			mixer::qualitySettings(
+					static_cast<mixer::qualitySettings::Interpolation>(interpolationCB->currentIndex()),
+					static_cast<mixer::qualitySettings::Oversampling>(oversamplingCB->currentIndex()),
+					sampleExactControllersCB->isChecked(),
+					aliasFreeOscillatorsCB->isChecked() );
+
+	ProjectRenderer::OutputSettings os = ProjectRenderer::OutputSettings(
+			samplerateCB->currentText().section(" ", 0, 0).toUInt(),
+			false,
+			bitrateCB->currentText().section(" ", 0, 0).toUInt(),
+			static_cast<ProjectRenderer::Depths>( depthCB->currentIndex() ) );
+
+	engine::getSong()->setExportLoop( exportLoopCB->isChecked() );
+
+	ProjectRenderer* renderer = new ProjectRenderer( qs, os, m_ft, m_fileName );
+
+	m_renderers.push_back(renderer);
+
+	return renderer;
+}
+
+
+
+void exportProjectDialog::render( ProjectRenderer* renderer )
+{
+
+	if( renderer->isReady() )
+	{
+		connect( renderer, SIGNAL( progressChanged( int ) ), progressBar, SLOT( setValue( int ) ) );
+		connect( renderer, SIGNAL( progressChanged( int ) ), this, SLOT( updateTitleBar( int ) )) ;
+		connect( renderer, SIGNAL( finished() ), this, SLOT( accept() ) );
+		connect( renderer, SIGNAL( finished() ), engine::mainWindow(), SLOT( resetWindowTitle() ) );
+
+		renderer->startProcessing();
+	}
+	else
+	{
+		accept();
+	}
+}
+
+
 
 void exportProjectDialog::startBtnClicked()
 {
-	ProjectRenderer::ExportFileFormats ft = ProjectRenderer::NumFileFormats;
+	m_ft = ProjectRenderer::NumFileFormats;
 
 	for( int i = 0; i < ProjectRenderer::NumFileFormats; ++i )
 	{
@@ -126,12 +292,13 @@ void exportProjectDialog::startBtnClicked()
 			ProjectRenderer::tr(
 				__fileEncodeDevices[i].m_description ) )
 		{
-			ft = __fileEncodeDevices[i].m_fileFormat;
+			m_ft = __fileEncodeDevices[i].m_fileFormat;
+			m_fileExtension = QString( QLatin1String( __fileEncodeDevices[i].m_extension ) );
 			break;
 		}
 	}
 
-	if( ft == ProjectRenderer::NumFileFormats )
+	if( m_ft == ProjectRenderer::NumFileFormats )
 	{
 		QMessageBox::information( this, tr( "Error" ),
 			tr( "Error while determining file-encoder device. "
@@ -146,38 +313,14 @@ void exportProjectDialog::startBtnClicked()
 
 	updateTitleBar( 0 );
 
-	mixer::qualitySettings qs = mixer::qualitySettings(
-		static_cast<mixer::qualitySettings::Interpolation>(
-					interpolationCB->currentIndex() ),
-		static_cast<mixer::qualitySettings::Oversampling>(
-					oversamplingCB->currentIndex() ),
-					sampleExactControllersCB->isChecked(),
-					aliasFreeOscillatorsCB->isChecked() );
-
-	ProjectRenderer::OutputSettings os = ProjectRenderer::OutputSettings(
-		samplerateCB->currentText().section( " ", 0, 0 ).toUInt(),
-		false,
-		bitrateCB->currentText().section( " ", 0, 0 ).toUInt(),
-		static_cast<ProjectRenderer::Depths>(
-						depthCB->currentIndex() ) );
-
-	m_renderer = new ProjectRenderer( qs, os, ft, m_fileName );
-	if( m_renderer->isReady() )
+	if (m_multiExport==true)
 	{
-		connect( m_renderer, SIGNAL( progressChanged( int ) ),
-				progressBar, SLOT( setValue( int ) ) );
-		connect( m_renderer, SIGNAL( progressChanged( int ) ),
-				this, SLOT( updateTitleBar( int ) ) );
-		connect( m_renderer, SIGNAL( finished() ),
-				this, SLOT( accept() ) );
-		connect( m_renderer, SIGNAL( finished() ),
-			engine::mainWindow(), SLOT( resetWindowTitle() ) );
-
-		m_renderer->startProcessing();
+		multiRender();
 	}
 	else
 	{
-		accept();
+		prepRender();
+		popRender();
 	}
 }
 

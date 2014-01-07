@@ -1,8 +1,8 @@
 /*
  * fader.cpp - fader-widget used in mixer - partly taken from Hydrogen
  *
- * Copyright (c) 2008-2011 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ * Copyright (c) 2008-2012 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -45,6 +45,7 @@
  */
 
 
+#include <QtGui/QInputDialog>
 #include <QtGui/QMouseEvent>
 #include <QtGui/QPaintEvent>
 #include <QtGui/QPainter>
@@ -73,7 +74,9 @@ fader::fader( FloatModel * _model, const QString & _name, QWidget * _parent ) :
 	m_fMaxPeak( 1.1 ),
 	m_back( embed::getIconPixmap( "fader_background" ) ),
 	m_leds( embed::getIconPixmap( "fader_leds" ) ),
-	m_knob( embed::getIconPixmap( "fader_knob" ) )
+	m_knob( embed::getIconPixmap( "fader_knob" ) ),
+	m_moveStartPoint( -1 ),
+	m_startValue( 0 )
 {
 	if( s_textFloat == NULL )
 	{
@@ -107,35 +110,67 @@ void fader::contextMenuEvent( QContextMenuEvent * _ev )
 
 
 
-void fader::mouseMoveEvent( QMouseEvent *ev )
+void fader::mouseMoveEvent( QMouseEvent *mouseEvent )
 {
-	float fVal = (float)( height() - ev->y() ) / (float)height();
-	fVal = fVal * ( m_model->maxValue() - m_model->minValue() );
+	if( m_moveStartPoint >= 0 )
+	{
+		int dy = m_moveStartPoint - mouseEvent->globalY();
 
-	fVal = fVal + m_model->minValue();
+		float delta = dy * ( m_model->maxValue() - m_model->minValue() ) / (float) ( height() - m_knob.height() );
 
-	m_model->setValue( fVal );
+		model()->setValue( m_startValue + delta );
 
-	updateTextFloat();
+		updateTextFloat();
+	}
 }
 
 
 
 
-void fader::mousePressEvent( QMouseEvent * _me )
+void fader::mousePressEvent( QMouseEvent* mouseEvent )
 {
-	if( _me->button() == Qt::LeftButton &&
-			! ( _me->modifiers() & Qt::ControlModifier ) )
+	if( mouseEvent->button() == Qt::LeftButton &&
+			! ( mouseEvent->modifiers() & Qt::ControlModifier ) )
 	{
-		updateTextFloat();
-		s_textFloat->show();
+		if( mouseEvent->y() >= knobPosY() - m_knob.height() && mouseEvent->y() < knobPosY() )
+		{
+			updateTextFloat();
+			s_textFloat->show();
 
-		mouseMoveEvent( _me );
-		_me->accept();
+			m_moveStartPoint = mouseEvent->globalY();
+			m_startValue = model()->value();
+
+			mouseEvent->accept();
+		}
+		else
+		{
+			m_moveStartPoint = -1;
+		}
 	}
 	else
 	{
-		AutomatableModelView::mousePressEvent( _me );
+		AutomatableModelView::mousePressEvent( mouseEvent );
+	}
+}
+
+
+
+void fader::mouseDoubleClickEvent( QMouseEvent* mouseEvent )
+{
+	bool ok;
+
+	// TODO: dbV handling
+	int newValue = QInputDialog::getInteger( this, windowTitle(),
+				tr( "Please enter a new value between %1 and %2:" ).
+						arg( model()->minValue()*100 ).
+						arg( model()->maxValue()*100 ),
+					model()->value()*100,
+					model()->minValue()*100,
+					model()->maxValue()*100, 1, &ok );
+
+	if( ok )
+	{
+		model()->setValue( newValue / 100.0f );
 	}
 }
 
@@ -153,11 +188,11 @@ void fader::wheelEvent ( QWheelEvent *ev )
 
 	if ( ev->delta() > 0 )
 	{
-		m_model->incValue( 5 );
+		m_model->incValue( 1 );
 	}
 	else
 	{
-		m_model->incValue( -5 );
+		m_model->incValue( -1 );
 	}
 	updateTextFloat();
 	s_textFloat->setVisibilityTimeOut( 1000 );
@@ -225,7 +260,7 @@ void fader::updateTextFloat()
 	{
 		s_textFloat->setText( QString("Volume: %1 %").arg( m_model->value() * 100 ) );
 	}
-	s_textFloat->moveGlobal( this, QPoint( width() - m_knob.width() - 5, knob_y() - 46 ) );
+	s_textFloat->moveGlobal( this, QPoint( width() - m_knob.width() - 5, knobPosY() - 46 ) );
 }
 
 
@@ -268,18 +303,7 @@ void fader::paintEvent( QPaintEvent * ev)
 	}
 
 	// knob
-	static const uint knob_height = 29;
-	static const uint knob_width = 15;
-
-	float fRange = m_model->maxValue() - m_model->minValue();
-
-	float realVal = m_model->value() - m_model->minValue();
-
-//		uint knob_y = (uint)( 116.0 - ( 86.0 * ( m_model->value() / fRange ) ) );
-	uint knob_y = (uint)( 116.0 - ( 86.0 * ( realVal / fRange ) ) );
-
-
-	painter.drawPixmap( QRect( 4, knob_y - knob_height, knob_width, knob_height), m_knob, QRect( 0, 0, knob_width, knob_height ) );
+	painter.drawPixmap( 4, knobPosY() - m_knob.height(), m_knob );
 }
 
 

@@ -1,7 +1,7 @@
 /*
  * song.h - class song - the root of the model-tree
  *
- * Copyright (c) 2004-2011 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -25,13 +25,14 @@
 #ifndef _SONG_H
 #define _SONG_H
 
+#include <QtCore/QSharedMemory>
 #include <QtCore/QVector>
 
 #include "track_container.h"
 #include "AutomatableModel.h"
 #include "Controller.h"
 #include "MeterModel.h"
-
+#include "VST_sync_shm.h"
 
 class AutomationTrack;
 class pattern;
@@ -94,7 +95,46 @@ public:
 
 	void processNextBuffer();
 
+	inline int getMilliseconds() const
+	{
+		return m_elapsedMilliSeconds;
+	}
+	inline void setMilliSeconds( float _ellapsedMilliSeconds )
+	{
+		m_elapsedMilliSeconds = (_ellapsedMilliSeconds);
+	}
+	inline int getTacts() const
+	{
+		return currentTact();
+	}
 
+	inline int ticksPerTact() const
+	{
+		return DefaultTicksPerTact *
+				m_timeSigModel.getNumerator() /
+					 m_timeSigModel.getDenominator();
+	}
+
+	// Returns the beat position inside the bar, 0-based
+	inline int getBeat() const
+	{
+		return (currentTick() - currentTact()*ticksPerTact()) /
+			(ticksPerTact() / m_timeSigModel.getNumerator() );
+	}
+	// the remainder after bar and beat are removed
+	inline int getBeatTicks() const
+	{
+		return 	(currentTick() - currentTact()*ticksPerTact()) %
+			(ticksPerTact() / m_timeSigModel.getNumerator() );
+	}
+	inline int getTicks() const
+	{
+		return currentTick();
+	}
+	inline bool isTempoAutomated()
+	{
+		return m_tempoModel.isAutomated();
+	}
 	inline bool isPaused() const
 	{
 		return m_paused;
@@ -117,6 +157,11 @@ public:
 		return m_exporting;
 	}
 
+	inline void setExportLoop( bool exportLoop )
+	{
+		m_exportLoop = exportLoop;
+	}
+
 	inline bool isRecording() const
 	{
 		return m_recording;
@@ -126,8 +171,16 @@ public:
 
 	inline bool isExportDone() const
 	{
-		return m_exporting == true &&
-			m_playPos[Mode_PlaySong].getTact() >= length() + 1;
+		if ( m_exportLoop )
+		{
+			return m_exporting == true &&
+				m_playPos[Mode_PlaySong].getTact() >= length();
+		}
+		else
+		{
+			return m_exporting == true &&
+				m_playPos[Mode_PlaySong].getTact() >= length() + 1;
+		}
 	}
 
 	inline PlayModes playMode() const
@@ -212,7 +265,8 @@ public slots:
 	void stop();
 
 	void importProject();
-	void exportProject();
+	void exportProject(bool multiExport=false);
+	void exportProjectTracks();
 
 	void startExport();
 	void stopExport();
@@ -240,6 +294,8 @@ private slots:
 
 	void updateFramesPerTick();
 
+	void updateSampleRateSHM();
+
 
 
 private:
@@ -247,13 +303,6 @@ private:
 	song( const song & );
 	virtual ~song();
 
-
-	inline int ticksPerTact() const
-	{
-		return DefaultTicksPerTact *
-				m_timeSigModel.getNumerator() /
-					 m_timeSigModel.getDenominator();
-	}
 
 	inline tact_t currentTact() const
 	{
@@ -287,6 +336,7 @@ private:
 
 	volatile bool m_recording;
 	volatile bool m_exporting;
+	volatile bool m_exportLoop;
 	volatile bool m_playing;
 	volatile bool m_paused;
 
@@ -300,6 +350,25 @@ private:
 	pattern * m_patternToPlay;
 	bool m_loopPattern;
 
+	double m_elapsedMilliSeconds;
+	tick_t m_elapsedTicks;
+	tact_t m_elapsedTacts;
+
+	enum Actions
+	{
+		ActionStop,
+		ActionPlaySong,
+		ActionPlayTrack,
+		ActionPlayBB,
+		ActionPlayPattern,
+		ActionPause,
+		ActionResumeFromPause
+	} ;
+	QVector<Actions> m_actions;
+
+	int m_shmID;
+	sncVST * m_SncVSTplug;
+	QSharedMemory m_shmQtID;
 
 	friend class engine;
 	friend class songEditor;
