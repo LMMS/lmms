@@ -41,6 +41,13 @@ class EXPORT AutomationPattern : public trackContentObject
 {
 	Q_OBJECT
 public:
+	enum ProgressionTypes
+	{
+		DiscreteProgression,
+		LinearProgression,
+		CubicHermiteProgression
+	} ;
+
 	typedef QMap<int, float> timeMap;
 	typedef QVector<QPointer<AutomatableModel> > objectVector;
 
@@ -51,6 +58,19 @@ public:
 	void addObject( AutomatableModel * _obj, bool _search_dup = true );
 
 	const AutomatableModel * firstObject() const;
+
+	// progression-type stuff
+	inline ProgressionTypes progressionType() const
+	{
+		return m_progressionType;
+	}
+	void setProgressionType( ProgressionTypes _new_progression_type );
+
+	inline QString getTension() const
+	{
+		return m_tension;
+	}
+	void setTension( QString _new_tension );
 
 	virtual midiTime length() const;
 
@@ -69,12 +89,23 @@ public:
 		return m_timeMap;
 	}
 
+	inline const timeMap & getTangents() const
+	{
+		return m_tangents;
+	}
+
+	inline timeMap & getTangents()
+	{
+		return m_tangents;
+	}
+
 	inline bool hasAutomation() const
 	{
 		return m_timeMap.isEmpty() == false;
 	}
 
 	float valueAt( const midiTime & _time ) const;
+	float *valuesAfter( const midiTime & _time ) const;
 
 	const QString name() const;
 
@@ -110,12 +141,18 @@ public slots:
 
 private:
 	void cleanObjects();
+	void generateTangents();
+	void generateTangents( timeMap::const_iterator it, int numToGenerate );
+	float valueAt( timeMap::const_iterator v, int offset ) const;
 
 	AutomationTrack * m_autoTrack;
 	QVector<jo_id_t> m_idsToResolve;
 	objectVector m_objects;
 	timeMap m_timeMap;	// actual values
+	timeMap m_tangents;	// slope at each point for calculating spline
+	QString m_tension;
 	bool m_hasAutomation;
+	ProgressionTypes m_progressionType;
 
 
 	friend class AutomationPatternView;

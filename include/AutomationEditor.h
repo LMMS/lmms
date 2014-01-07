@@ -94,14 +94,16 @@ protected:
 	virtual void wheelEvent( QWheelEvent * _we );
 
 	float getLevel( int _y );
-	static inline void drawValueRect( QPainter & _p, int _x, int _y,
-						int _width, int _height,
-						const bool _is_selected );
+	int xCoordOfTick( int _tick );
+	int yCoordOfLevel( float _level );
+	inline void drawLevelTick( QPainter & _p, int _tick,
+					float _value, bool _is_selected );
 	void removeSelection();
 	void selectAll();
 	void getSelectedValues( timeMap & _selected_values );
 
 	void drawLine( int x0, float y0, int x1, float y1 );
+	void disableTensionComboBox();
 
 protected slots:
 	void play();
@@ -114,6 +116,11 @@ protected slots:
 	void eraseButtonToggled();
 	void selectButtonToggled();
 	void moveButtonToggled();
+
+	void discreteButtonToggled();
+	void linearButtonToggled();
+	void cubicHermiteButtonToggled();
+	void tensionChanged();
 
 	void copySelectedValues();
 	void cutSelectedValues();
@@ -177,6 +184,13 @@ private:
 	toolButton * m_eraseButton;
 	toolButton * m_selectButton;
 	toolButton * m_moveButton;
+
+	toolButton * m_discreteButton;
+	toolButton * m_linearButton;
+	toolButton * m_cubicHermiteButton;
+	comboBox * m_tensionComboBox;
+	ComboBoxModel m_tensionModel;
+	ComboBoxModel m_tensionDisabledModel;
 
 	toolButton * m_cutButton;
 	toolButton * m_copyButton;
@@ -250,4 +264,3 @@ signals:
 
 
 #endif
-

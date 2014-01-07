@@ -237,28 +237,39 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 	QLinearGradient lin2grad( 0, min, 0, max );
 	const QColor cl = QColor( 255, 224, 0 );
 	const QColor cd = QColor( 229, 158, 0 );
-	
+
 	lin2grad.setColorAt( 1, cl );
 	lin2grad.setColorAt( 0, cd );
 
+	// TODO: skip this part for patterns or parts of the pattern that will
+	// not be on the screen
 	for( AutomationPattern::timeMap::const_iterator it =
 						m_pat->getTimeMap().begin();
 					it != m_pat->getTimeMap().end(); ++it )
 	{
-		const float x1 = x_base + it.key() * ppt /
+		if( it+1 == m_pat->getTimeMap().end() )
+		{
+			const float x1 = x_base + it.key() * ppt /
 						midiTime::ticksPerTact();
-		float x2;
-		if( it+1 != m_pat->getTimeMap().end() )
-		{
-		 	x2 = x_base + (it+1).key() * ppt /
-						midiTime::ticksPerTact() + 1;
+			const float x2 = (float)( width() - TCO_BORDER_WIDTH );
+			p.fillRect( QRectF( x1, 0.0f, x2-x1, it.value() ),
+								lin2grad );
+			break;
 		}
-		else
+
+		float *values = m_pat->valuesAfter( it.key() );
+		for( int i = it.key(); i < (it+1).key(); i++ )
 		{
-			x2 = (float)( width() - TCO_BORDER_WIDTH );
+			float value = values[i - it.key()];
+			const float x1 = x_base + i * ppt /
+						midiTime::ticksPerTact();
+			const float x2 = x_base + (i+1) * ppt /
+						midiTime::ticksPerTact();
+
+			p.fillRect( QRectF( x1, 0.0f, x2-x1, value ),
+								lin2grad );
 		}
-		p.fillRect( QRectF( x1, 0.0f, x2-x1, it.value() ),
-							lin2grad );
+		delete [] values;
 	}
 
 	p.resetMatrix();

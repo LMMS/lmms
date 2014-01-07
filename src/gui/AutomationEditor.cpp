@@ -169,8 +169,6 @@ AutomationEditor::AutomationEditor() :
 		tr( "Click here if you want to stop playing of the "
 			"current pattern." ) );
 
-
-
 	removeSelection();
 
 	// init scrollbars
@@ -240,6 +238,70 @@ AutomationEditor::AutomationEditor() :
 			"mode you can move the values you selected in select-"
 			"mode. You can also press 'Shift+M' on your keyboard "
 			"to activate this mode." ) );
+
+	m_discreteButton = new toolButton( embed::getIconPixmap(
+						"progression_discrete" ),
+					tr( "Discrete progression" ),
+					this, SLOT( discreteButtonToggled() ),
+					m_toolBar );
+	m_discreteButton->setCheckable( true );
+	m_discreteButton->setChecked( true );
+
+	m_linearButton = new toolButton( embed::getIconPixmap(
+							"progression_linear" ),
+					tr( "Linear progression" ),
+					this, SLOT( linearButtonToggled() ),
+					m_toolBar );
+	m_linearButton->setCheckable( true );
+
+	m_cubicHermiteButton = new toolButton( embed::getIconPixmap(
+						"progression_cubic_hermite" ),
+					tr( "Cubic Hermite progression" ),
+					this, SLOT(
+						cubicHermiteButtonToggled() ),
+					m_toolBar );
+	m_cubicHermiteButton->setCheckable( true );
+
+	// setup tension-stuff
+	m_tensionComboBox = new comboBox( m_toolBar );
+	m_tensionComboBox->setFixedSize( 60, 22 );
+
+	for( int i = 0; i < 4; ++i )
+	{
+		m_tensionModel.addItem( "0." + QString::number( 25 * i ) );
+	}
+	m_tensionModel.addItem( "1.0" );
+	m_tensionModel.setValue( m_tensionModel.findText( "1.0" ) );
+
+	m_tensionDisabledModel.addItem( "-----" );
+	disableTensionComboBox();
+
+	connect( &m_tensionModel, SIGNAL( dataChanged() ),
+			this, SLOT( tensionChanged() ) );
+	
+	tool_button_group = new QButtonGroup( this );
+	tool_button_group->addButton( m_discreteButton );
+	tool_button_group->addButton( m_linearButton );
+	tool_button_group->addButton( m_cubicHermiteButton );
+	tool_button_group->setExclusive( true );
+
+	m_discreteButton->setWhatsThis(
+		tr( "Click here to choose discrete progressions for this "
+			"automation pattern.  The value of the connected "
+			"object will remain constant between control points "
+			"and be set immediately to the new value when each "
+			"control point is reached." ) );
+	m_linearButton->setWhatsThis(
+		tr( "Click here to choose linear progressions for this "
+			"automation pattern.  The value of the connected "
+			"object will change at a steady rate over time "
+			"between control points to reach the correct value at "
+			"each control point without a sudden change." ) );
+	m_cubicHermiteButton->setWhatsThis(
+		tr( "Click here to choose cubic hermite progressions for this "
+			"automation pattern.  The value of the connected "
+			"object will change in a smooth curve and ease in to "
+			"the peaks and valleys." ) );
 
 	m_cutButton = new toolButton( embed::getIconPixmap( "edit_cut" ),
 					tr( "Cut selected values (Ctrl+X)" ),
@@ -335,6 +397,12 @@ AutomationEditor::AutomationEditor() :
 	tb_layout->addWidget( m_selectButton );
 	tb_layout->addWidget( m_moveButton );
 	tb_layout->addSpacing( 10 );
+	tb_layout->addWidget( m_discreteButton );
+	tb_layout->addWidget( m_linearButton );
+	tb_layout->addWidget( m_cubicHermiteButton );
+	tb_layout->addSpacing( 5 );
+	tb_layout->addWidget( m_tensionComboBox );
+	tb_layout->addSpacing( 10 );
 	tb_layout->addWidget( m_cutButton );
 	tb_layout->addWidget( m_copyButton );
 	tb_layout->addWidget( m_pasteButton );
@@ -385,6 +453,7 @@ AutomationEditor::~AutomationEditor()
 {
 	m_zoomingXModel.disconnect();
 	m_zoomingYModel.disconnect();
+	m_tensionModel.disconnect();
 }
 
 
@@ -455,6 +524,29 @@ void AutomationEditor::updateAfterPatternChange()
 		return;
 	}
 
+	if( m_pattern->progressionType() ==
+				AutomationPattern::DiscreteProgression && 
+				!m_discreteButton->isChecked() )
+	{
+		m_discreteButton->setChecked( true );
+	}
+
+	if( m_pattern->progressionType() ==
+				AutomationPattern::LinearProgression &&
+				!m_linearButton->isChecked() )
+	{
+		m_linearButton->setChecked( true );
+	}
+
+	if( m_pattern->progressionType() ==
+				AutomationPattern::CubicHermiteProgression &&
+				!m_cubicHermiteButton->isChecked() )
+	{
+		m_cubicHermiteButton->setChecked( true );
+	}
+
+	m_tensionModel.setValue( m_tensionModel.findText(
+						m_pattern->getTension() ) );
 	m_minLevel = m_pattern->firstObject()->minValue<float>();
 	m_maxLevel = m_pattern->firstObject()->maxValue<float>();
 	m_step = m_pattern->firstObject()->step<float>();
@@ -482,28 +574,6 @@ void AutomationEditor::update()
 	{
 		engine::getPianoRoll()->update();
 	}
-}
-
-
-
-
-inline void AutomationEditor::drawValueRect( QPainter & _p,
-						int _x, int _y,
-						int _width, int _height,
-						const bool _is_selected )
-{
-	QColor current_color( 0xFF, 0xB0, 0x00 );
-	if( _is_selected == TRUE )
-	{
-		current_color.setRgb( 0x00, 0x40, 0xC0 );
-	}
-	_p.fillRect( _x, _y, _width, _height, current_color );
-
-	_p.drawLine( _x - 1, _y, _x + 1, _y );
-	_p.drawLine( _x, _y - 1, _x, _y + 1 );
-//	_p.setPen( QColor( 0xFF, 0x9F, 0x00 ) );
-
-//	_p.setPen( QColor( 0xFF, 0xFF, 0x40 ) );
 }
 
 
@@ -722,6 +792,19 @@ void AutomationEditor::drawLine( int _x0, float _y0, int _x1, float _y1 )
 		m_pattern->removeValue( midiTime( x ) );
 		m_pattern->putValue( midiTime( x ), y );
 	}
+}
+
+
+
+
+void AutomationEditor::disableTensionComboBox()
+{
+	m_tensionComboBox->setEnabled( false );
+	m_tensionComboBox->setModel( &m_tensionDisabledModel );
+	m_tensionComboBox->setToolTip(
+			tr( "Choose Cubic Hermite progression to enable" ) );
+	m_tensionComboBox->setWhatsThis(
+		tr( "Choose Cubic Hermite progression to enable" ) );
 }
 
 
@@ -1446,102 +1529,73 @@ void AutomationEditor::paintEvent( QPaintEvent * _pe )
 
 	if( validPattern() )
 	{
+		Sint32 len_ticks = 4;
 		timeMap & time_map = m_pattern->getTimeMap();
 		timeMap::iterator it = time_map.begin();
 		p.setPen( QColor( 0xFF, 0xDF, 0x20 ) );
 
-		while( it != time_map.end() )
+		while( it+1 != time_map.end() )
 		{
-			Sint32 len_ticks = 4;
+			// skip this section if it occurs completely before the
+			// visible area
+			int next_x = xCoordOfTick( (it+1).key() );
+			if( next_x < 0 )
+			{
+				++it;
+				continue;
+			}
 
-			const float level = it.value();
-
-			Sint32 pos_ticks = it.key();
-
-			const int x = ( pos_ticks - m_currentPosition ) *
-						m_ppt / DefaultTicksPerTact;
-			if( x > width() - VALUES_WIDTH )
+			int x = xCoordOfTick( it.key() );
+			if( x > width() )
 			{
 				break;
 			}
 
-			int rect_width;
-			if( it+1 != time_map.end() )
+			bool is_selected = FALSE;
+			// if we're in move-mode, we may only draw
+			// values in selected area, that have originally
+			// been selected and not values that are now in
+			// selection because the user moved it...
+			if( m_editMode == MOVE )
 			{
-				timeMap::iterator it_prev = it+1;
-				Sint32 next_pos_ticks = it_prev.key();
-				int next_x = ( next_pos_ticks
-					- m_currentPosition ) * m_ppt /
-							DefaultTicksPerTact;
-				// skip this value if not in visible area at all
-/*				if( next_x > width() )
-				{
-					break;
-				}*/
-				rect_width = next_x - x;
-			}
-			else
-			{
-				rect_width = width() - x;
-			}
-
-			// is the value in visible area?
-			if( ( level >= m_bottomLevel && level <= m_topLevel )
-				|| ( level > m_topLevel && m_topLevel >= 0 )
-				|| ( level < m_bottomLevel
-						&& m_bottomLevel <= 0 ) )
-			{
-				bool is_selected = FALSE;
-				// if we're in move-mode, we may only draw
-				// values in selected area, that have originally
-				// been selected and not values that are now in
-				// selection because the user moved it...
-				if( m_editMode == MOVE )
-				{
-					if( m_selValuesForMove.contains(
-								it.key() ) )
-					{
-						is_selected = TRUE;
-					}
-				}
-				else if( level >= selLevel_start &&
-					level <= selLevel_end &&
-					pos_ticks >= sel_pos_start &&
-					pos_ticks + len_ticks <=
-								sel_pos_end )
+				if( m_selValuesForMove.contains( it.key() ) )
 				{
 					is_selected = TRUE;
 				}
-
-				// we've done and checked all, lets draw the
-				// value
-				int y_start;
-				int rect_height;
-				if( m_y_auto )
-				{
-					y_start = (int)( grid_bottom
-						- ( grid_bottom - TOP_MARGIN )
-						* ( level - m_minLevel )
-						/ ( m_maxLevel - m_minLevel ) );
-					int y_end = (int)( grid_bottom
-						+ ( grid_bottom - TOP_MARGIN )
-						* m_minLevel
-						/ ( m_maxLevel - m_minLevel ) );
-					rect_height = y_end - y_start;
-				}
-				else
-				{
-					y_start = (int)( grid_bottom - ( level
-							- m_bottomLevel )
-							* m_y_delta );
-					rect_height = (int)( level * m_y_delta );
-				}
-				drawValueRect( p, x + VALUES_WIDTH, y_start,
-							rect_width, rect_height,
-							is_selected );
 			}
-			else printf("not in range\n");
+			else if( it.value() >= selLevel_start &&
+				it.value() <= selLevel_end &&
+				it.key() >= sel_pos_start &&
+				it.key() + len_ticks <= sel_pos_end )
+			{
+				is_selected = TRUE;
+			}
+
+			float *values = m_pattern->valuesAfter( it.key() );
+			for( int i = 0; i < (it+1).key() - it.key(); i++ )
+			{
+				drawLevelTick( p, it.key() + i, values[i],
+								is_selected );
+			}
+			delete [] values;
+			
+			// Draw cross
+			int y = yCoordOfLevel( it.value() );
+			p.drawLine( x - 1, y, x + 1, y );
+			p.drawLine( x, y - 1, x, y + 1 );
+		//	_p.setPen( QColor( 0xFF, 0x9F, 0x00 ) );
+		//	_p.setPen( QColor( 0xFF, 0xFF, 0x40 ) );
+
 			++it;
+		}
+
+		for( int i = it.key(), x = xCoordOfTick( i ); x <= width();
+						i++, x = xCoordOfTick( i ) )
+		{
+			// TODO: Find out if the section after the last control
+			// point is able to be selected and if so set this
+			// boolean correctly
+			drawLevelTick( p, i, it.value(), false );
 		}
 	}
 	else
@@ -1606,6 +1660,79 @@ void AutomationEditor::paintEvent( QPaintEvent * _pe )
 	}
 	p.drawPixmap( mapFromGlobal( QCursor::pos() ) + QPoint( 8, 8 ),
 								*cursor );
+}
+
+
+
+
+int AutomationEditor::xCoordOfTick( int _tick )
+{
+	return VALUES_WIDTH + ( ( _tick - m_currentPosition )
+						* m_ppt / DefaultTicksPerTact );
+}
+
+
+
+
+int AutomationEditor::yCoordOfLevel( float _level )
+{
+	int grid_bottom = height() - SCROLLBAR_SIZE - 1;
+	if( m_y_auto )
+	{
+		return (int)( grid_bottom - ( grid_bottom - TOP_MARGIN )
+						* ( _level - m_minLevel )
+						/ ( m_maxLevel - m_minLevel ) );
+	}
+	else
+	{
+		return (int)( grid_bottom - ( _level - m_bottomLevel )
+								* m_y_delta );
+	}
+}
+
+
+
+
+void AutomationEditor::drawLevelTick( QPainter & _p, int _tick, float _level,
+							bool _is_selected )
+{
+	int grid_bottom = height() - SCROLLBAR_SIZE - 1;
+	const int x = xCoordOfTick( _tick );
+	int rect_width = xCoordOfTick( _tick+1 ) - x;
+
+	// is the level in visible area?
+	if( ( _level >= m_bottomLevel && _level <= m_topLevel )
+			|| ( _level > m_topLevel && m_topLevel >= 0 )
+			|| ( _level < m_bottomLevel && m_bottomLevel <= 0 ) )
+	{
+		int y_start = yCoordOfLevel( _level );
+		int rect_height;
+
+		if( m_y_auto )
+		{
+			int y_end = (int)( grid_bottom
+						+ ( grid_bottom - TOP_MARGIN )
+						* m_minLevel
+						/ ( m_maxLevel - m_minLevel ) );
+
+			rect_height = y_end - y_start;
+		}
+		else
+		{
+			rect_height = (int)( _level * m_y_delta );
+		}
+
+		QColor current_color( 0xFF, 0xB0, 0x00 );
+		if( _is_selected == TRUE )
+		{
+			current_color.setRgb( 0x00, 0x40, 0xC0 );
+		}
+		_p.fillRect( x, y_start, rect_width, rect_height, current_color );
+	}
+	else
+	{
+		printf("not in range\n");
+	}
 }
 
 
@@ -1852,6 +1979,71 @@ void AutomationEditor::moveButtonToggled()
 	m_editMode = MOVE;
 	m_selValuesForMove.clear();
 	getSelectedValues( m_selValuesForMove );
+	update();
+}
+
+
+
+
+void AutomationEditor::discreteButtonToggled()
+{
+	if ( validPattern() )
+	{
+		QMutexLocker m( &m_patternMutex );
+		disableTensionComboBox();
+		m_pattern->setProgressionType(
+				AutomationPattern::DiscreteProgression );
+		engine::getSong()->setModified();
+		update();
+	}
+}
+
+
+
+
+void AutomationEditor::linearButtonToggled()
+{
+	if ( validPattern() )
+	{
+		QMutexLocker m( &m_patternMutex );
+		disableTensionComboBox();
+		m_pattern->setProgressionType(
+					AutomationPattern::LinearProgression );
+		engine::getSong()->setModified();
+		update();
+	}
+}
+
+
+
+
+void AutomationEditor::cubicHermiteButtonToggled()
+{
+	if ( validPattern() )
+	{
+		QMutexLocker m( &m_patternMutex );
+		m_tensionComboBox->setEnabled( true );
+		m_tensionComboBox->setModel( &m_tensionModel );
+		m_tensionComboBox->setToolTip(
+					tr( "Tension value for spline" ) );
+		m_tensionComboBox->setWhatsThis(
+			tr( "A higher tension value may make a smoother curve "
+				"but overshoot some values.  A low tension "
+				"value will cause the slope of the curve to "
+				"level off at each control point." ) );
+		m_pattern->setProgressionType(
+				AutomationPattern::CubicHermiteProgression );
+		engine::getSong()->setModified();
+		update();
+	}
+}
+
+
+
+
+void AutomationEditor::tensionChanged()
+{
+	m_pattern->setTension( m_tensionModel.currentText() );
 	update();
 }
 
