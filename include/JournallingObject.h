@@ -27,45 +27,11 @@
 
 #include "lmms_basics.h"
 #include "export.h"
-#include "mmp.h"
 #include "SerializingObject.h"
 
 #include <QtCore/QVariant>
 #include <QtCore/QVector>
 #include <QtCore/QStack>
-
-
-class JournalCheckPoint
-{
-public:
-	JournalCheckPoint( const multimediaProject &data =
-						multimediaProject( multimediaProject::JournalData ) ) :
-		m_data( data )
-	{
-	}
-
-	~JournalCheckPoint()
-	{
-	}
-
-	const multimediaProject &data() const
-	{
-		return m_data;
-	}
-
-	multimediaProject &data()
-	{
-		return m_data;
-	}
-
-
-private:
-	multimediaProject m_data;
-
-} ;
-
-
-typedef QVector<JournalCheckPoint> JournalCheckPointVector;
 
 
 class EXPORT JournallingObject : public SerializingObject
@@ -79,27 +45,10 @@ public:
 		return m_id;
 	}
 
-	void undo();
-	void redo();
-
-	void clear()
-	{
-		m_journalCheckPoints.clear();
-		m_currentJournalCheckPoint = m_journalCheckPoints.end();
-	}
-
-	void clearRedoSteps()
-	{
-		m_journalCheckPoints.erase( m_currentJournalCheckPoint,
-						m_journalCheckPoints.end() );
-		m_currentJournalCheckPoint = m_journalCheckPoints.end();
-		
-	}
-
-	void saveJournallingState( const bool _new_state )
+	void saveJournallingState( const bool newState )
 	{
 		m_journallingStateStack.push( m_journalling );
-		m_journalling = _new_state;
+		m_journalling = newState;
 	}
 
 	void restoreJournallingState()
@@ -110,10 +59,9 @@ public:
 	void addJournalCheckPoint();
 
 	virtual QDomElement saveState( QDomDocument & _doc,
-							QDomElement & _parent );
+									QDomElement & _parent );
 
 	virtual void restoreState( const QDomElement & _this );
-
 
 	inline bool isJournalling() const
 	{
@@ -125,10 +73,10 @@ public:
 		m_journalling = _sr;
 	}
 
-	inline bool testAndSetJournalling( const bool _sr )
+	inline bool testAndSetJournalling( const bool newState )
 	{
 		const bool oldJournalling = m_journalling;
-		m_journalling = _sr;
+		m_journalling = newState;
 		return oldJournalling;
 	}
 
@@ -138,14 +86,7 @@ protected:
 
 
 private:
-	void saveJournal( QDomDocument & _doc, QDomElement & _parent );
-	void loadJournal( const QDomElement & _this );
-
-
 	jo_id_t m_id;
-
-	JournalCheckPointVector m_journalCheckPoints;
-	JournalCheckPointVector::Iterator m_currentJournalCheckPoint;
 
 	bool m_journalling;
 

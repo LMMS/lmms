@@ -1,7 +1,7 @@
 /*
  * ProjectJournal.h - declaration of class ProjectJournal
  *
- * Copyright (c) 2006-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -26,10 +26,10 @@
 #define _PROJECT_JOURNAL_H
 
 #include <QtCore/QHash>
-#include <QtCore/QVariant>
-#include <QtCore/QVector>
+#include <QtCore/QStack>
 
 #include "lmms_basics.h"
+#include "mmp.h"
 
 class JournallingObject;
 
@@ -43,8 +43,7 @@ public:
 	void undo();
 	void redo();
 
-	// tell history that a new journal entry was added to object with ID _id
-	void journalEntryAdded( const jo_id_t _id );
+	void addJournalCheckPoint( JournallingObject *jo );
 
 	bool isJournalling() const
 	{
@@ -72,10 +71,6 @@ public:
 		reallocID( _id, NULL );
 	}
 
-	// completely remove everything linked with ID _id - all global
-	// journalling information about the ID get's lost
-	void forgetAboutID( const jo_id_t _id );
-
 	void clearJournal();
 
 	JournallingObject * journallingObject( const jo_id_t _id )
@@ -90,12 +85,25 @@ public:
 
 private:
 	typedef QHash<jo_id_t, JournallingObject *> JoIdMap;
-	typedef QVector<jo_id_t> JournalEntryVector;
+
+	struct CheckPoint
+	{
+		CheckPoint( jo_id_t initID = 0,
+					const multimediaProject &initData =
+						multimediaProject( multimediaProject::JournalData ) ) :
+			joID( initID ),
+			data( initData )
+		{
+		}
+		jo_id_t joID;
+		multimediaProject data;
+	} ;
+	typedef QStack<CheckPoint> CheckPointStack;
 
 	JoIdMap m_joIDs;
 
-	JournalEntryVector m_journalEntries;
-	JournalEntryVector::Iterator m_currentJournalEntry;
+	CheckPointStack m_undoCheckPoints;
+	CheckPointStack m_redoCheckPoints;
 
 	bool m_journalling;
 

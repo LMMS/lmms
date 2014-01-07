@@ -32,8 +32,8 @@
 
 ProjectJournal::ProjectJournal() :
 	m_joIDs(),
-	m_journalEntries(),
-	m_currentJournalEntry( m_journalEntries.end() ),
+	m_undoCheckPoints(),
+	m_redoCheckPoints(),
 	m_journalling( false )
 {
 }
@@ -50,57 +50,66 @@ ProjectJournal::~ProjectJournal()
 
 void ProjectJournal::undo()
 {
-	if( m_journalEntries.empty() == true )
+	while( !m_undoCheckPoints.isEmpty() )
 	{
-		return;
-	}
+		CheckPoint c = m_undoCheckPoints.pop();
+		JournallingObject *jo = m_joIDs[c.joID];
 
-	JournallingObject * jo;
+		if( jo )
+		{
+			multimediaProject curState( multimediaProject::JournalData );
+			jo->saveState( curState, curState.content() );
+			m_redoCheckPoints.push( CheckPoint( c.joID, curState ) );
 
-	if( m_currentJournalEntry - 1 >= m_journalEntries.begin() &&
-		( jo = m_joIDs[*--m_currentJournalEntry] ) != NULL )
-	{
-		bool prev = isJournalling();
-		setJournalling( false );
-		jo->undo();
-		setJournalling( prev );
-		engine::getSong()->setModified();
+			bool prev = isJournalling();
+			setJournalling( false );
+			jo->restoreState( c.data.content().firstChildElement() );
+			setJournalling( prev );
+			engine::getSong()->setModified();
+			break;
+		}
 	}
 }
-
 
 
 
 void ProjectJournal::redo()
 {
-	if( m_journalEntries.empty() == true )
+	while( !m_redoCheckPoints.isEmpty() )
 	{
-		return;
-	}
+		CheckPoint c = m_redoCheckPoints.pop();
+		JournallingObject *jo = m_joIDs[c.joID];
 
-	JournallingObject * jo;
+		if( jo )
+		{
+			multimediaProject curState( multimediaProject::JournalData );
+			jo->saveState( curState, curState.content() );
+			m_undoCheckPoints.push( CheckPoint( c.joID, curState ) );
 
-	//printf("%d\n", m_joIDs[*(m_currentJournalEntry+1)] );
-	if( m_currentJournalEntry < m_journalEntries.end() &&
-		( jo = m_joIDs[*m_currentJournalEntry++] ) != NULL )
-	{
-		bool prev = isJournalling();
-		setJournalling( false );
-		jo->redo();
-		setJournalling( prev );
-		engine::getSong()->setModified();
+			bool prev = isJournalling();
+			setJournalling( false );
+			jo->restoreState( c.data.content().firstChildElement() );
+			setJournalling( prev );
+			engine::getSong()->setModified();
+			break;
+		}
 	}
 }
 
 
 
 
-void ProjectJournal::journalEntryAdded( const jo_id_t _id )
+void ProjectJournal::addJournalCheckPoint( JournallingObject *jo )
 {
-	m_journalEntries.erase( m_currentJournalEntry, m_journalEntries.end() );
-	m_journalEntries.push_back( _id );
-	m_currentJournalEntry = m_journalEntries.end();
-	engine::getSong()->setModified();
+	if( isJournalling() )
+	{
+		m_redoCheckPoints.clear();
+
+		multimediaProject mmp( multimediaProject::JournalData );
+		jo->saveState( mmp, mmp.content() );
+
+		m_undoCheckPoints.push( CheckPoint( jo->id(), mmp ) );
+	}
 }
 
 
@@ -136,29 +145,11 @@ void ProjectJournal::reallocID( const jo_id_t _id, JournallingObject * _obj )
 
 
 
-void ProjectJournal::forgetAboutID( const jo_id_t _id )
-{
-	//printf("forget about %d\n", _id );
-	JournalEntryVector::Iterator it;
-	while( ( it = qFind( m_journalEntries.begin(), m_journalEntries.end(),
-					_id ) ) != m_journalEntries.end() )
-	{
-		if( m_currentJournalEntry >= it )
-		{
-			--m_currentJournalEntry;
-		}
-		m_journalEntries.erase( it );
-	}
-	m_joIDs.remove( _id );
-}
-
-
-
-
 void ProjectJournal::clearJournal()
 {
-	m_journalEntries.clear();
-	m_currentJournalEntry = m_journalEntries.end();
+	m_undoCheckPoints.clear();
+	m_redoCheckPoints.clear();
+
 	for( JoIdMap::Iterator it = m_joIDs.begin(); it != m_joIDs.end(); )
 	{
 		if( it.value() == NULL )
