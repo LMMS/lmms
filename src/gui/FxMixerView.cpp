@@ -1,7 +1,7 @@
 /*
  * FxMixerView.cpp - effect-mixer-view for LMMS
  *
- * Copyright (c) 2008-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -38,7 +38,7 @@
 #include "engine.h"
 #include "embed.h"
 #include "MainWindow.h"
-#include "lcd_spinbox.h"
+#include "LcdWidget.h"
 #include "gui_templates.h"
 #include "tooltip.h"
 #include "pixmap_button.h"
@@ -165,10 +165,9 @@ FxMixerView::FxMixerView() :
 						m->m_fxChannels[i]->m_name );
 			banks[bank]->addWidget( cv->m_fxLine );
 		}
-		lcdSpinBox * l = new lcdSpinBox( 2, cv->m_fxLine );
-		l->model()->setRange( i, i );
-		l->model()->setValue( i );
-		l->move( 2, 4 );
+		LcdWidget* l = new LcdWidget( 2, cv->m_fxLine );
+		l->setValue( i );
+		l->move( 3, 4 );
 		l->setMarginWidth( 1 );
 
 
