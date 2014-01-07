@@ -2,7 +2,7 @@
  * MidiPort.h - abstraction of MIDI ports which are part of LMMS's MIDI-
  *              sequencing system
  *
- * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -28,7 +28,7 @@
 
 #include <QtCore/QString>
 #include <QtCore/QList>
-#include <QtCore/QPair>
+#include <QtCore/QMap>
 
 #include "midi.h"
 #include "AutomatableModel.h"

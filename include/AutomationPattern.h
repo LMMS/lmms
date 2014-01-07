@@ -27,6 +27,7 @@
 #ifndef _AUTOMATION_PATTERN_H
 #define _AUTOMATION_PATTERN_H
 
+#include <QtCore/QMap>
 #include <QtCore/QPointer>
 
 #include "track.h"

@@ -25,13 +25,10 @@
 #ifndef _JOURNALLING_OBJECT_H
 #define _JOURNALLING_OBJECT_H
 
-#include "lmms_basics.h"
-#include "export.h"
-#include "SerializingObject.h"
-
-#include <QtCore/QVariant>
-#include <QtCore/QVector>
 #include <QtCore/QStack>
+
+#include "lmms_basics.h"
+#include "SerializingObject.h"
 
 
 class EXPORT JournallingObject : public SerializingObject
