@@ -2,7 +2,7 @@
  * track_container.cpp - implementation of base-class for all track-containers
  *                       like Song-Editor, BB-Editor...
  *
- * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -73,10 +73,16 @@ void trackContainer::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 void trackContainer::loadSettings( const QDomElement & _this )
 {
+	bool journalRestore = _this.parentNode().nodeName() == "journaldata";
+	if( journalRestore )
+	{
+		clearAllTracks();
+	}
+
 	static QProgressDialog * pd = NULL;
 	bool was_null = ( pd == NULL );
 	int start_val = 0;
-	if( engine::hasGUI() )
+	if( !journalRestore && engine::hasGUI() )
 	{
 		if( pd == NULL )
 		{
@@ -154,6 +160,8 @@ void trackContainer::addTrack( track * _track )
 {
 	if( _track->type() != track::HiddenAutomationTrack )
 	{
+		addJournalCheckPoint();
+
 		m_tracksMutex.lockForWrite();
 		m_tracks.push_back( _track );
 		m_tracksMutex.unlock();

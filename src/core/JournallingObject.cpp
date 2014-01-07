@@ -1,7 +1,7 @@
 /*
  * JournallingObject.cpp - implementation of journalling-object related stuff
  *
- * Copyright (c) 2006-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -37,8 +37,8 @@
 JournallingObject::JournallingObject() :
 	SerializingObject(),
 	m_id( engine::projectJournal()->allocID( this ) ),
-	m_journalEntries(),
-	m_currentJournalEntry( m_journalEntries.end() ),
+	m_journalCheckPoints(),
+	m_currentJournalCheckPoint( m_journalCheckPoints.end() ),
 	m_journalling( true ),
 	m_journallingStateStack()
 {
@@ -60,14 +60,15 @@ JournallingObject::~JournallingObject()
 
 void JournallingObject::undo()
 {
-	if( m_journalEntries.empty() == true )
+	if( m_journalCheckPoints.empty() == true )
 	{
 		return;
 	}
 
-	if( m_currentJournalEntry - 1 >= m_journalEntries.begin() )
+	if( m_currentJournalCheckPoint - 1 >= m_journalCheckPoints.begin() )
 	{
-		undoStep( *--m_currentJournalEntry );
+		--m_currentJournalCheckPoint;
+		restoreState( m_currentJournalCheckPoint->data().content().firstChildElement() );
 	}
 }
 
@@ -76,14 +77,15 @@ void JournallingObject::undo()
 
 void JournallingObject::redo()
 {
-	if( m_journalEntries.empty() == true )
+	if( m_journalCheckPoints.empty() == true )
 	{
 		return;
 	}
 
-	if( m_currentJournalEntry < m_journalEntries.end() )
+	if( m_currentJournalCheckPoint < m_journalCheckPoints.end() )
 	{
-		redoStep( *m_currentJournalEntry++ );
+		restoreState( m_currentJournalCheckPoint->data().content().firstChildElement() );
+		++m_currentJournalCheckPoint;
 	}
 }
 
@@ -124,14 +126,19 @@ void JournallingObject::restoreState( const QDomElement & _this )
 
 
 
-void JournallingObject::addJournalEntry( const JournalEntry & _je )
+void JournallingObject::addJournalCheckPoint()
 {
 	if( engine::projectJournal()->isJournalling() && isJournalling() )
 	{
-		m_journalEntries.erase( m_currentJournalEntry,
-						m_journalEntries.end() );
-		m_journalEntries.push_back( _je );
-		m_currentJournalEntry = m_journalEntries.end();
+		m_journalCheckPoints.erase( m_currentJournalCheckPoint,
+						m_journalCheckPoints.end() );
+
+		multimediaProject mmp( multimediaProject::JournalData );
+		saveState( mmp, mmp.content() );
+
+		m_journalCheckPoints.push_back( JournalCheckPoint( mmp ) );
+
+		m_currentJournalCheckPoint = m_journalCheckPoints.end();
 		engine::projectJournal()->journalEntryAdded( id() );
 	}
 }
@@ -172,25 +179,25 @@ void JournallingObject::saveJournal( QDomDocument & _doc,
 							QDomElement & _parent )
 {
 /*	// avoid creating empty journal-nodes
-	if( m_journalEntries.size() == 0 )
+	if( m_journalCheckPoints.size() == 0 )
 	{
 		return;
 	}*/
 	QDomElement journal_de = _doc.createElement( "journal" );
 	journal_de.setAttribute( "id", id() );
-	journal_de.setAttribute( "entries", m_journalEntries.size() );
-	journal_de.setAttribute( "curentry", (int)( m_currentJournalEntry -
-						m_journalEntries.begin() ) );
+	journal_de.setAttribute( "entries", m_journalCheckPoints.size() );
+	journal_de.setAttribute( "curentry", (int)( m_currentJournalCheckPoint -
+						m_journalCheckPoints.begin() ) );
 	journal_de.setAttribute( "metadata", true );
 
-	for( JournalEntryVector::const_iterator it = m_journalEntries.begin();
-					it != m_journalEntries.end(); ++it )
+	for( JournalCheckPointVector::const_iterator it = m_journalCheckPoints.begin();
+					it != m_journalCheckPoints.end(); ++it )
 	{
 		QDomElement je_de = _doc.createElement( "entry" );
 		je_de.setAttribute( "pos", (int)( it -
-						m_journalEntries.begin() ) );
-		je_de.setAttribute( "actionid", it->actionID() );
-		je_de.setAttribute( "data", base64::encode( it->data() ) );
+						m_journalCheckPoints.begin() ) );
+		//je_de.setAttribute( "data", base64::encode( it->data().toString() ) );
+		je_de.setAttribute( "data", it->data().toString() );
 		journal_de.appendChild( je_de );
 	}
 
@@ -213,7 +220,7 @@ void JournallingObject::loadJournal( const QDomElement & _this )
 
 	changeID( new_id );
 
-	m_journalEntries.resize( _this.attribute( "entries" ).toInt() );
+	m_journalCheckPoints.resize( _this.attribute( "entries" ).toInt() );
 
 	QDomNode node = _this.firstChild();
 	while( !node.isNull() )
@@ -221,15 +228,14 @@ void JournallingObject::loadJournal( const QDomElement & _this )
 		if( node.isElement() )
 		{
 			const QDomElement & je = node.toElement();
-			m_journalEntries[je.attribute( "pos" ).toInt()] =
-				JournalEntry(
-					je.attribute( "actionid" ).toInt(),
-				base64::decode( je.attribute( "data" ) ) );
+			m_journalCheckPoints[je.attribute( "pos" ).toInt()] =
+				JournalCheckPoint(
+					multimediaProject( je.attribute( "data" ).toUtf8() ) );
 		}
 		node = node.nextSibling();
-        }
+	}
 
-	m_currentJournalEntry = m_journalEntries.begin() +
+	m_currentJournalCheckPoint = m_journalCheckPoints.begin() +
 					_this.attribute( "curentry" ).toInt();
 }
 

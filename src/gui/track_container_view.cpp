@@ -121,10 +121,6 @@ void trackContainerView::loadSettings( const QDomElement & _this )
 
 trackView * trackContainerView::addTrackView( trackView * _tv )
 {
-/*	QMap<QString, QVariant> map;
-	map["id"] = _tv->getTrack()->id();
-	addJournalEntry( JournalEntry( AddTrack, map ) );*/
-
 	m_trackViews.push_back( _tv );
 	m_scrollLayout->addWidget( _tv );
 	connect( this, SIGNAL( positionChanged( const midiTime & ) ),
@@ -142,13 +138,6 @@ void trackContainerView::removeTrackView( trackView * _tv )
 	int index = m_trackViews.indexOf( _tv );
 	if( index != -1 )
 	{
-/*		QMap<QString, QVariant> map;
-		multimediaProject mmp( multimediaProject::JournalData );
-		_tv->getTrack()->saveState( mmp, mmp.content() );
-		map["id"] = _tv->getTrack()->id();
-		map["state"] = mmp.toString();
-		addJournalEntry( JournalEntry( RemoveTrack, map ) );*/
-
 		m_trackViews.removeAt( index );
 
 		disconnect( _tv );
@@ -238,6 +227,8 @@ void trackContainerView::createTrackView( track * _t )
 
 void trackContainerView::deleteTrackView( trackView * _tv )
 {
+	m_tc->addJournalCheckPoint();
+
 	track * t = _tv->getTrack();
 	removeTrackView( _tv );
 	delete _tv;
@@ -302,64 +293,6 @@ void trackContainerView::clearAllTracks()
 		delete tv;
 		delete t;
 	}
-}
-
-
-
-
-void trackContainerView::undoStep( JournalEntry & _je )
-{
-#if 0
-	saveJournallingState( false );
-	switch( _je.actionID() )
-	{
-		case AddTrack:
-		{
-			QMap<QString, QVariant> map = _je.data().toMap();
-			track * t =
-				dynamic_cast<track *>(
-			engine::projectJournal()->getJournallingObject(
-							map["id"].toInt() ) );
-			assert( t != NULL );
-			multimediaProject mmp( multimediaProject::JournalData );
-			t->saveState( mmp, mmp.content() );
-			map["state"] = mmp.toString();
-			_je.data() = map;
-			t->deleteLater();
-			break;
-		}
-
-		case RemoveTrack:
-		{
-			multimediaProject mmp(
-				_je.data().toMap()["state"].toString().utf8() );
-			track::create( mmp.content().firstChild().toElement(),
-									m_tc );
-			break;
-		}
-	}
-	restoreJournallingState();
-#endif
-}
-
-
-
-
-void trackContainerView::redoStep( JournalEntry & _je )
-{
-#if 0
-	switch( _je.actionID() )
-	{
-		case AddTrack:
-		case RemoveTrack:
-			_je.actionID() = ( _je.actionID() == AddTrack ) ?
-						RemoveTrack : AddTrack;
-			undoStep( _je );
-			_je.actionID() = ( _je.actionID() == AddTrack ) ?
-						RemoveTrack : AddTrack;
-			break;
-	}
-#endif
 }
 
 

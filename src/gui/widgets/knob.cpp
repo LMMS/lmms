@@ -1,7 +1,7 @@
 /*
  * knob.cpp - powerful knob-widget
  *
- * Copyright (c) 2004-2011 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -438,7 +438,12 @@ void knob::mousePressEvent( QMouseEvent * _me )
 			! ( _me->modifiers() & Qt::ControlModifier ) &&
 			! ( _me->modifiers() & Qt::ShiftModifier ) )
 	{
-		model()->prepareJournalEntryFromOldVal();
+		AutomatableModel *thisModel = model();
+		if( thisModel )
+		{
+			thisModel->addJournalCheckPoint();
+			thisModel->saveJournallingState( false );
+		}
 
 		const QPoint & p = _me->pos();
 		m_origMousePos = p;
@@ -485,7 +490,7 @@ void knob::mouseMoveEvent( QMouseEvent * _me )
 
 void knob::mouseReleaseEvent( QMouseEvent * /* _me*/ )
 {
-	model()->addJournalEntryFromOldToCurVal();
+	model()->restoreJournallingState();
 
 	m_buttonPressed = false;
 

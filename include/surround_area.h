@@ -3,7 +3,7 @@
  *                   position of a channel + calculation of volume for each
  *                   speaker
  *
- * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -56,18 +56,6 @@ public:
 					const QString & _name = "surpos" );
 	void loadSettings( const QDomElement & _this,
 					const QString & _name = "surpos" );
-
-	inline void prepareJournalEntryFromOldVal()
-	{
-		m_posX.prepareJournalEntryFromOldVal();
-		m_posY.prepareJournalEntryFromOldVal();
-	}
-
-	inline void addJournalEntryFromOldToCurVal()
-	{
-		m_posX.addJournalEntryFromOldToCurVal();
-		m_posY.addJournalEntryFromOldToCurVal();
-	}
 
 //	AutomationPattern * automationPatternX();
 //	AutomationPattern * automationPatternY();

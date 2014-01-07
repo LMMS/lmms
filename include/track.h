@@ -2,7 +2,7 @@
  * track.h - declaration of classes concerning tracks -> necessary for all
  *           track-like objects (beat/bassline, sample-track...)
  *
- * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -126,11 +126,6 @@ public slots:
 	void copy();
 	void paste();
 	void toggleMute();
-
-
-protected:
-	virtual void undoStep( JournalEntry & _je );
-	virtual void redoStep( JournalEntry & _je );
 
 
 signals:
@@ -275,17 +270,8 @@ protected:
 		return "trackcontentwidget";
 	}
 
-	virtual void undoStep( JournalEntry & _je );
-	virtual void redoStep( JournalEntry & _je );
-
 
 private:
-	enum Actions
-	{
-		AddTrackContentObject,
-		RemoveTrackContentObject
-	} ;
-
 	track * getTrack();
 	midiTime getPosition( int _mouse_x );
 
@@ -539,8 +525,6 @@ public slots:
 
 protected:
 	virtual void modelChanged();
-	virtual void undoStep( JournalEntry & _je );
-	virtual void redoStep( JournalEntry & _je );
 
 	virtual QString nodeName() const
 	{

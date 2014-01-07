@@ -1,7 +1,7 @@
 /*
  * JournallingObject.h - declaration of class JournallingObject
  *
- * Copyright (c) 2006-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -27,6 +27,7 @@
 
 #include "lmms_basics.h"
 #include "export.h"
+#include "mmp.h"
 #include "SerializingObject.h"
 
 #include <QtCore/QVariant>
@@ -34,57 +35,37 @@
 #include <QtCore/QStack>
 
 
-typedef uint32_t t_action_id;
-
-
-class JournalEntry
+class JournalCheckPoint
 {
 public:
-	JournalEntry( const t_action_id _action_id, const QVariant & _data ) :
-		m_actionID( _action_id ),
-		m_data( _data )
+	JournalCheckPoint( const multimediaProject &data =
+						multimediaProject( multimediaProject::JournalData ) ) :
+		m_data( data )
 	{
 	}
 
-	JournalEntry() :
-		m_actionID( 0 ),
-		m_data( 0 )
+	~JournalCheckPoint()
 	{
 	}
 
-	~JournalEntry()
-	{
-	}
-
-	t_action_id actionID() const
-	{
-		return m_actionID;
-	}
-	
-	t_action_id & actionID()
-	{
-		return m_actionID;
-	}
-	
-	const QVariant & data() const
+	const multimediaProject &data() const
 	{
 		return m_data;
 	}
 
-	QVariant & data()
+	multimediaProject &data()
 	{
 		return m_data;
 	}
 
 
 private:
-	t_action_id m_actionID;
-	QVariant m_data;
+	multimediaProject m_data;
 
 } ;
 
 
-typedef QVector<JournalEntry> JournalEntryVector;
+typedef QVector<JournalCheckPoint> JournalCheckPointVector;
 
 
 class EXPORT JournallingObject : public SerializingObject
@@ -103,15 +84,15 @@ public:
 
 	void clear()
 	{
-		m_journalEntries.clear();
-		m_currentJournalEntry = m_journalEntries.end();
+		m_journalCheckPoints.clear();
+		m_currentJournalCheckPoint = m_journalCheckPoints.end();
 	}
 
 	void clearRedoSteps()
 	{
-		m_journalEntries.erase( m_currentJournalEntry,
-						m_journalEntries.end() );
-		m_currentJournalEntry = m_journalEntries.end();
+		m_journalCheckPoints.erase( m_currentJournalCheckPoint,
+						m_journalCheckPoints.end() );
+		m_currentJournalCheckPoint = m_journalCheckPoints.end();
 		
 	}
 
@@ -125,6 +106,8 @@ public:
 	{
 		m_journalling = m_journallingStateStack.pop();
 	}
+
+	void addJournalCheckPoint();
 
 	virtual QDomElement saveState( QDomDocument & _doc,
 							QDomElement & _parent );
@@ -153,16 +136,6 @@ public:
 protected:
 	void changeID( jo_id_t _id );
 
-	void addJournalEntry( const JournalEntry & _je );
-
-	// to be implemented by sub-objects
-	virtual void undoStep( JournalEntry & )
-	{
-	}
-	virtual void redoStep( JournalEntry & )
-	{
-	}
-
 
 private:
 	void saveJournal( QDomDocument & _doc, QDomElement & _parent );
@@ -171,8 +144,8 @@ private:
 
 	jo_id_t m_id;
 
-	JournalEntryVector m_journalEntries;
-	JournalEntryVector::Iterator m_currentJournalEntry;
+	JournalCheckPointVector m_journalCheckPoints;
+	JournalCheckPointVector::Iterator m_currentJournalCheckPoint;
 
 	bool m_journalling;
 

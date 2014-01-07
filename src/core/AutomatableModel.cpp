@@ -1,7 +1,7 @@
 /*
  * AutomatableModel.cpp - some implementations of AutomatableModel-class
  *
- * Copyright (c) 2008-2012 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -50,7 +50,6 @@ AutomatableModel::AutomatableModel( DataType _type,
 	m_maxValue( _max ),
 	m_step( _step ),
 	m_range( _max - _min ),
-	m_journalEntryReady( false ),
 	m_setValueDepth( 0 ),
 	m_hasLinkedModels( false ),
 	m_controllerConnection( NULL )
@@ -83,6 +82,22 @@ AutomatableModel::~AutomatableModel()
 bool AutomatableModel::isAutomated() const
 {
 	return AutomationPattern::isAutomated( this );
+}
+
+
+
+
+void AutomatableModel::saveSettings( QDomDocument &doc, QDomElement &_this )
+{
+	saveSettings( doc, _this, "value" );
+}
+
+
+
+
+void AutomatableModel::loadSettings( const QDomElement &_this )
+{
+	loadSettings( _this, "value" );
 }
 
 
@@ -184,7 +199,7 @@ void AutomatableModel::setValue( const float _value )
 	if( old_val != m_value )
 	{
 		// add changes to history so user can undo it
-		addJournalEntry( JournalEntry( 0, m_value - old_val ) );
+		addJournalCheckPoint();
 
 		// notify linked models
 		for( AutoModelVector::Iterator it =
@@ -315,52 +330,6 @@ float AutomatableModel::fittedValue( float _value ) const
 	return _value;
 }
 
-
-
-
-
-void AutomatableModel::redoStep( JournalEntry & _je )
-{
-	bool journalling = testAndSetJournalling( false );
-	setValue( value<float>() + (float) _je.data().toDouble() );
-	setJournalling( journalling );
-}
-
-
-
-
-void AutomatableModel::undoStep( JournalEntry & _je )
-{
-	JournalEntry je( _je.actionID(), -_je.data().toDouble() );
-	redoStep( je );
-}
-
-
-
-
-void AutomatableModel::prepareJournalEntryFromOldVal()
-{
-	m_oldValue = value<float>();
-	saveJournallingState( false );
-	m_journalEntryReady = true;
-}
-
-
-
-
-void AutomatableModel::addJournalEntryFromOldToCurVal()
-{
-	if( m_journalEntryReady )
-	{
-		restoreJournallingState();
-		if( value<float>() != m_oldValue )
-		{
-			addJournalEntry( JournalEntry( 0, value<float>() -
-								m_oldValue ) );
-		}
-		m_journalEntryReady = false;
-	}
-}
 
 
 

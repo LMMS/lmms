@@ -1,7 +1,7 @@
 /*
  * ProjectJournal.cpp - implementation of ProjectJournal
  *
- * Copyright (c) 2006-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -60,7 +60,10 @@ void ProjectJournal::undo()
 	if( m_currentJournalEntry - 1 >= m_journalEntries.begin() &&
 		( jo = m_joIDs[*--m_currentJournalEntry] ) != NULL )
 	{
+		bool prev = isJournalling();
+		setJournalling( false );
 		jo->undo();
+		setJournalling( prev );
 		engine::getSong()->setModified();
 	}
 }
@@ -81,7 +84,10 @@ void ProjectJournal::redo()
 	if( m_currentJournalEntry < m_journalEntries.end() &&
 		( jo = m_joIDs[*m_currentJournalEntry++] ) != NULL )
 	{
+		bool prev = isJournalling();
+		setJournalling( false );
 		jo->redo();
+		setJournalling( prev );
 		engine::getSong()->setModified();
 	}
 }

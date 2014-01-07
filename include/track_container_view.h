@@ -1,7 +1,7 @@
 /*
  * track_container_view.h - view-component for trackContainer
  *
- * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -138,9 +138,6 @@ protected:
 	virtual void mouseMoveEvent( QMouseEvent * _me );
 	virtual void mouseReleaseEvent( QMouseEvent * _me );
 	virtual void resizeEvent( QResizeEvent * );
-
-	virtual void undoStep( JournalEntry & _je );
-	virtual void redoStep( JournalEntry & _je );
 
 	midiTime m_currentPosition;
 
