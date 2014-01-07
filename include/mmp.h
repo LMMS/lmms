@@ -2,6 +2,7 @@
  * mmp.h - class for reading and writing multimedia-project-files
  *
  * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2012-2013 Paul Giblock <p/at/pgiblock.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -27,6 +28,7 @@
 #define _MMP_H
 
 #include <QtXml/QDomDocument>
+#include <QTextStream>
 
 #include "export.h"
 #include "lmms_basics.h"
@@ -59,6 +61,7 @@ public:
 
 	QString nameWithExtension( const QString & _fn ) const;
 
+	void write( QTextStream & _strm );
 	bool writeFile( const QString & _fn );
 
 	inline QDomElement & content()

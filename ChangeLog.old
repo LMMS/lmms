@@ -158,6 +158,11 @@
 	* plugins/flp_import/unrtf/convert.c:
 	Avoid compile warnings
 
+2009-01-03	Paul Giblock <drfaygo/at/gmail/dot/com>
+
+	* src/gui/widgets/automatable_button.cpp:
+	fix drag support for button groups
+
 2008-12-22	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
 	* CMakeLists.txt:
@@ -246,6 +251,12 @@
 	* src/core/piano.cpp:
 	* src/tracks/pattern.cpp:
 	backport: added support for panning editing of notes
+
+2008-12-15	Paul Giblock <drfaygo/at/gmail/dot/com>
+	
+	* src/core/track.cpp:
+	* include/track.h:
+	Cache background per-object instead of per-class.
 
 2008-12-14	Tobias Doerffel	<tobydox/at/users/dot/sourceforge/dot/net>
 
