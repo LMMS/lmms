@@ -46,7 +46,7 @@ class AudioJack : public QObject, public AudioDevice
 {
 	Q_OBJECT
 public:
-	AudioJack( bool & _success_ful, mixer * _mixer );
+	AudioJack( bool & _success_ful, Mixer* mixer );
 	virtual ~AudioJack();
 
 	inline static QString name()

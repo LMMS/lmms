@@ -70,7 +70,7 @@
 //
 
 
-//#define engine::getMixer()->processingSampleRate() 44100.0f
+//#define engine::mixer()->processingSampleRate() 44100.0f
 
 
 extern "C"
@@ -108,8 +108,8 @@ void lb303Filter::recalc()
 {
 	vcf_e1 = exp(6.109 + 1.5876*(fs->envmod) + 2.1553*(fs->cutoff) - 1.2*(1.0-(fs->reso)));
 	vcf_e0 = exp(5.613 - 0.8*(fs->envmod) + 2.1553*(fs->cutoff) - 0.7696*(1.0-(fs->reso)));
-	vcf_e0*=M_PI/engine::getMixer()->processingSampleRate();
-	vcf_e1*=M_PI/engine::getMixer()->processingSampleRate();
+	vcf_e0*=M_PI/engine::mixer()->processingSampleRate();
+	vcf_e1*=M_PI/engine::mixer()->processingSampleRate();
 	vcf_e1 -= vcf_e0;
 
 	vcf_rescoeff = exp(-1.20 + 3.455*(fs->reso));
@@ -225,14 +225,14 @@ void lb303Filter3Pole::envRecalc()
 	w = vcf_e0 + vcf_c0;
 	k = (fs->cutoff > 0.975)?0.975:fs->cutoff;
 	kfco = 50.f + (k)*((2300.f-1600.f*(fs->envmod))+(w) *
-	                   (700.f+1500.f*(k)+(1500.f+(k)*(engine::getMixer()->processingSampleRate()/2.f-6000.f)) * 
+	                   (700.f+1500.f*(k)+(1500.f+(k)*(engine::mixer()->processingSampleRate()/2.f-6000.f)) * 
 	                   (fs->envmod)) );
 	//+iacc*(.3+.7*kfco*kenvmod)*kaccent*kaccurve*2000
 
 
 #ifdef LB_24_IGNORE_ENVELOPE
 	// kfcn = fs->cutoff;
-	kfcn = 2.0 * kfco / engine::getMixer()->processingSampleRate();
+	kfcn = 2.0 * kfco / engine::mixer()->processingSampleRate();
 #else
 	kfcn = w;
 #endif
@@ -283,7 +283,7 @@ lb303Synth::lb303Synth( InstrumentTrack * _InstrumentTrack ) :
 
 {
 
-	connect( engine::getMixer(), SIGNAL( sampleRateChanged( ) ),
+	connect( engine::mixer(), SIGNAL( sampleRateChanged( ) ),
 	         this, SLOT ( filterChanged( ) ) );
 
 	connect( &vcf_cut_knob, SIGNAL( dataChanged( ) ),
@@ -353,7 +353,7 @@ lb303Synth::lb303Synth( InstrumentTrack * _InstrumentTrack ) :
 	delete_freq = -1;
 
 	instrumentPlayHandle * iph = new instrumentPlayHandle( this );
-	engine::getMixer()->addPlayHandle( iph );
+	engine::mixer()->addPlayHandle( iph );
 
 	filterChanged();
 }
@@ -412,7 +412,7 @@ void lb303Synth::filterChanged()
 
 	float d = 0.2 + (2.3*vcf_dec_knob.value());
 
-	d *= engine::getMixer()->processingSampleRate();                                // d *= smpl rate
+	d *= engine::mixer()->processingSampleRate();                                // d *= smpl rate
 	fs.envdecay = pow(0.1, 1.0/d * ENVINC);    // decay is 0.1 to the 1/d * ENVINC
 	                                           // vcf_envdecay is now adjusted for both
 	                                           // sampling rate and ENVINC
@@ -452,7 +452,7 @@ inline int MIN(int a, int b) {
 }
 
 inline float GET_INC(float freq) {
-	return freq/engine::getMixer()->processingSampleRate();  // TODO: Use actual sampling rate.
+	return freq/engine::mixer()->processingSampleRate();  // TODO: Use actual sampling rate.
 }
 
 int lb303Synth::process(sampleFrame *outbuf, const Uint32 size)
@@ -590,7 +590,7 @@ int lb303Synth::process(sampleFrame *outbuf, const Uint32 size)
 		// Handle Envelope
 		if(vca_mode==0) {
 			vca_a+=(vca_a0-vca_a)*vca_attack;
-			if(sample_cnt>=0.5*engine::getMixer()->processingSampleRate()) 
+			if(sample_cnt>=0.5*engine::mixer()->processingSampleRate()) 
 				vca_mode = 2;
 		}
 		else if(vca_mode == 1) {
@@ -710,7 +710,7 @@ void lb303Synth::playNote( notePlayHandle * _n,
 void lb303Synth::play( sampleFrame * _working_buffer )
 {
 	//printf(".");
-	const fpp_t frames = engine::getMixer()->framesPerPeriod();
+	const fpp_t frames = engine::mixer()->framesPerPeriod();
 
 	process( _working_buffer, frames); 
 	instrumentTrack()->processAudioBuffer( _working_buffer, frames,

@@ -52,7 +52,7 @@
 #include "plugin_browser.h"
 #include "SideBar.h"
 #include "config_mgr.h"
-#include "mixer.h"
+#include "Mixer.h"
 #include "PluginView.h"
 #include "project_notes.h"
 #include "setup_dialog.h"
@@ -500,7 +500,7 @@ void MainWindow::finalize( void )
 		sd.exec();
 	}
 	// look whether mixer could use a audio-interface beside AudioDummy
-	else if( engine::getMixer()->audioDevName() == AudioDummy::name() )
+	else if( engine::mixer()->audioDevName() == AudioDummy::name() )
 	{
 		// no, so we offer setup-dialog with audio-settings...
 		setupDialog sd( setupDialog::AudioSettings );

@@ -41,7 +41,7 @@ public:
 				const bitrate_t _min_bitrate,
 				const bitrate_t _max_bitrate,
 				const int _depth,
-				mixer * _mixer );
+				Mixer* mixer );
 	virtual ~AudioFileDevice();
 
 	QString outputFile() const
@@ -108,7 +108,7 @@ typedef AudioFileDevice * ( * AudioFileDeviceInstantiaton )
 						const bitrate_t _min_bitrate,
 						const bitrate_t _max_bitrate,
 						const int _depth,
-						mixer * _mixer );
+						Mixer* mixer );
 
 
 #endif

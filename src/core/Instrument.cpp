@@ -107,7 +107,7 @@ bool Instrument::isMuted() const
 void Instrument::applyRelease( sampleFrame * buf, const notePlayHandle * _n )
 {
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();
-	const fpp_t fpp = engine::getMixer()->framesPerPeriod();
+	const fpp_t fpp = engine::mixer()->framesPerPeriod();
 	const f_cnt_t fl = _n->framesLeft();
 	if( fl <= desiredReleaseFrames()+fpp )
 	{

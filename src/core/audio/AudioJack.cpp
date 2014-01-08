@@ -44,7 +44,7 @@
 
 
 
-AudioJack::AudioJack( bool & _success_ful, mixer * _mixer ) :
+AudioJack::AudioJack( bool & _success_ful, Mixer*  _mixer ) :
 	AudioDevice( tLimit<int>( configManager::inst()->value(
 					"audiojack", "channels" ).toInt(),
 					DEFAULT_CHANNELS, SURROUND_CHANNELS ),
@@ -53,7 +53,7 @@ AudioJack::AudioJack( bool & _success_ful, mixer * _mixer ) :
 	m_active( false ),
 	m_stopSemaphore( 1 ),
 	m_tempOutBufs( new jack_default_audio_sample_t *[channels()] ),
-	m_outBuf( new surroundSampleFrame[getMixer()->framesPerPeriod()] ),
+	m_outBuf( new surroundSampleFrame[mixer()->framesPerPeriod()] ),
 	m_framesDoneInCurBuf( 0 ),
 	m_framesToDoInCurBuf( 0 )
 {
@@ -214,7 +214,7 @@ void AudioJack::startProcessing()
 
 
 	// try to sync JACK's and LMMS's buffer-size
-//	jack_set_buffer_size( m_client, getMixer()->framesPerPeriod() );
+//	jack_set_buffer_size( m_client, mixer()->framesPerPeriod() );
 
 
 
@@ -259,7 +259,7 @@ void AudioJack::applyQualitySettings()
 {
 	if( hqAudio() )
 	{
-		setSampleRate( engine::getMixer()->processingSampleRate() );
+		setSampleRate( engine::mixer()->processingSampleRate() );
 
 		if( jack_get_sample_rate( m_client ) != sampleRate() )
 		{
@@ -345,7 +345,7 @@ int AudioJack::processCallback( jack_nframes_t _nframes, void * _udata )
 
 #ifdef AUDIO_PORT_SUPPORT
 	const Uint32 frames = qMin<Uint32>( _nframes,
-						getMixer()->framesPerPeriod() );
+						mixer()->framesPerPeriod() );
 	for( jackPortMap::iterator it = m_portMap.begin();
 						it != m_portMap.end(); ++it )
 	{
@@ -374,7 +374,7 @@ int AudioJack::processCallback( jack_nframes_t _nframes, void * _udata )
 						_nframes,
 						m_framesToDoInCurBuf -
 							m_framesDoneInCurBuf );
-		const float gain = getMixer()->masterGain();
+		const float gain = mixer()->masterGain();
 		for( int c = 0; c < channels(); ++c )
 		{
 			jack_default_audio_sample_t * o = m_tempOutBufs[c];

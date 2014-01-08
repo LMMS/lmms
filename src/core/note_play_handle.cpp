@@ -191,7 +191,7 @@ void notePlayHandle::play( sampleFrame * _working_buffer )
 
 	if( m_released == false &&
 		instrumentTrack()->isSustainPedalPressed() == false &&
-		m_totalFramesPlayed + engine::getMixer()->framesPerPeriod()
+		m_totalFramesPlayed + engine::mixer()->framesPerPeriod()
 								>= m_frames )
 	{
 		noteOff( m_frames - m_totalFramesPlayed );
@@ -208,7 +208,7 @@ void notePlayHandle::play( sampleFrame * _working_buffer )
 
 	if( m_released )
 	{
-		f_cnt_t todo = engine::getMixer()->framesPerPeriod();
+		f_cnt_t todo = engine::mixer()->framesPerPeriod();
 		// if this note is base-note for arpeggio, always set
 		// m_releaseFramesToDo to bigger value than m_releaseFramesDone
 		// because we do not allow notePlayHandle::done() to be true
@@ -217,7 +217,7 @@ void notePlayHandle::play( sampleFrame * _working_buffer )
 		if( isArpeggioBaseNote() )
 		{
 			m_releaseFramesToDo = m_releaseFramesDone + 2 *
-				engine::getMixer()->framesPerPeriod();
+				engine::mixer()->framesPerPeriod();
 		}
 		// look whether we have frames left to be done before release
 		if( m_framesBeforeRelease )
@@ -225,7 +225,7 @@ void notePlayHandle::play( sampleFrame * _working_buffer )
 			// yes, then look whether these samples can be played
 			// within one audio-buffer
 			if( m_framesBeforeRelease <=
-				engine::getMixer()->framesPerPeriod() )
+				engine::mixer()->framesPerPeriod() )
 			{
 				// yes, then we did less releaseFramesDone
 				todo -= m_framesBeforeRelease;
@@ -238,7 +238,7 @@ void notePlayHandle::play( sampleFrame * _working_buffer )
 				// release-phase yet)
 				todo = 0;
 				m_framesBeforeRelease -=
-				engine::getMixer()->framesPerPeriod();
+				engine::mixer()->framesPerPeriod();
 			}
 		}
 		// look whether we're in release-phase
@@ -286,7 +286,7 @@ void notePlayHandle::play( sampleFrame * _working_buffer )
 	}
 
 	// update internal data
-	m_totalFramesPlayed += engine::getMixer()->framesPerPeriod();
+	m_totalFramesPlayed += engine::mixer()->framesPerPeriod();
 }
 
 
@@ -296,7 +296,7 @@ f_cnt_t notePlayHandle::framesLeft() const
 {
 	if( instrumentTrack()->isSustainPedalPressed() )
 	{
-		return 4*engine::getMixer()->framesPerPeriod();
+		return 4*engine::mixer()->framesPerPeriod();
 	}
 	else if( m_released && actualReleaseFramesToDo() == 0 )
 	{
@@ -412,7 +412,7 @@ void notePlayHandle::mute()
 int notePlayHandle::index() const
 {
 	const PlayHandleList & playHandles =
-					engine::getMixer()->playHandles();
+					engine::mixer()->playHandles();
 	int idx = 0;
 	for( PlayHandleList::ConstIterator it = playHandles.begin();
 						it != playHandles.end(); ++it )
@@ -440,7 +440,7 @@ int notePlayHandle::index() const
 ConstNotePlayHandleList notePlayHandle::nphsOfInstrumentTrack(
 				const InstrumentTrack * _it, bool _all_ph )
 {
-	const PlayHandleList & playHandles = engine::getMixer()->playHandles();
+	const PlayHandleList & playHandles = engine::mixer()->playHandles();
 	ConstNotePlayHandleList cnphv;
 
 	for( PlayHandleList::ConstIterator it = playHandles.begin();

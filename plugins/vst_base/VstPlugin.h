@@ -31,7 +31,7 @@
 #include <QtCore/QTimer>
 #include <QtGui/QWidget>
 
-#include "mixer.h"
+#include "Mixer.h"
 #include "JournallingObject.h"
 #include "communication.h"
 

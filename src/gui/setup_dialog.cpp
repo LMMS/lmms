@@ -37,7 +37,7 @@
 #include "tab_button.h"
 #include "tab_widget.h"
 #include "gui_templates.h"
-#include "mixer.h"
+#include "Mixer.h"
 #include "ProjectJournal.h"
 #include "config_mgr.h"
 #include "embed.h"
@@ -606,8 +606,8 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 		m_audioInterfaces->addItem( it.key() );
 	}
 	m_audioInterfaces->setCurrentIndex( m_audioInterfaces->findText(
-			tr( engine::getMixer()->audioDevName().toAscii() ) ) );
-	m_audioIfaceSetupWidgets[engine::getMixer()->audioDevName()]->show();
+			tr( engine::mixer()->audioDevName().toAscii() ) ) );
+	m_audioIfaceSetupWidgets[engine::mixer()->audioDevName()]->show();
 
 	connect( m_audioInterfaces, SIGNAL( activated( const QString & ) ),
 		this, SLOT( audioInterfaceChanged( const QString & ) ) );
@@ -687,8 +687,8 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 	}
 
 	m_midiInterfaces->setCurrentIndex( m_midiInterfaces->findText(
-		tr( engine::getMixer()->midiClientName().toAscii() ) ) );
-	m_midiIfaceSetupWidgets[engine::getMixer()->midiClientName()]->show();
+		tr( engine::mixer()->midiClientName().toAscii() ) ) );
+	m_midiIfaceSetupWidgets[engine::mixer()->midiClientName()]->show();
 
 	connect( m_midiInterfaces, SIGNAL( activated( const QString & ) ),
 		this, SLOT( midiInterfaceChanged( const QString & ) ) );
@@ -870,7 +870,7 @@ void setupDialog::setBufferSize( int _value )
 	m_bufSizeLbl->setText( tr( "Frames: %1\nLatency: %2 ms" ).arg(
 					m_bufferSize ).arg(
 						1000.0f * m_bufferSize /
-				engine::getMixer()->processingSampleRate(),
+				engine::mixer()->processingSampleRate(),
 						0, 'f', 1 ) );
 }
 

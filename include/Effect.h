@@ -28,7 +28,7 @@
 
 #include "Plugin.h"
 #include "engine.h"
-#include "mixer.h"
+#include "Mixer.h"
 #include "AutomatableModel.h"
 #include "TempoSyncKnobModel.h"
 
@@ -102,10 +102,10 @@ public:
 	inline f_cnt_t timeout() const
 	{
 		const float samples =
-				engine::getMixer()->processingSampleRate() *
+				engine::mixer()->processingSampleRate() *
 					m_autoQuitModel.value() / 1000.0f;
 		return 1 + ( static_cast<Uint32>( samples ) / 
-				engine::getMixer()->framesPerPeriod() );
+				engine::mixer()->framesPerPeriod() );
 	}
 
 	inline float wetLevel() const
@@ -122,7 +122,7 @@ public:
 	{
 		const float level = m_gateModel.value();
 		return level*level * m_processors *
-				engine::getMixer()->framesPerPeriod();
+				engine::mixer()->framesPerPeriod();
 	}
 
 	inline f_cnt_t bufferCount() const
@@ -174,9 +174,9 @@ protected:
 							sample_rate_t _dst_sr )
 	{
 		resample( 0, _src_buf,
-				engine::getMixer()->processingSampleRate(),
+				engine::mixer()->processingSampleRate(),
 					_dst_buf, _dst_sr,
-					engine::getMixer()->framesPerPeriod() );
+					engine::mixer()->framesPerPeriod() );
 	}
 
 	inline void sampleBack( const sampleFrame * _src_buf,
@@ -184,9 +184,9 @@ protected:
 							sample_rate_t _src_sr )
 	{
 		resample( 1, _src_buf, _src_sr, _dst_buf,
-				engine::getMixer()->processingSampleRate(),
-			engine::getMixer()->framesPerPeriod() * _src_sr /
-				engine::getMixer()->processingSampleRate() );
+				engine::mixer()->processingSampleRate(),
+			engine::mixer()->framesPerPeriod() * _src_sr /
+				engine::mixer()->processingSampleRate() );
 	}
 	void reinitSRC();
 

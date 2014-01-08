@@ -50,20 +50,20 @@ void AudioPortAudioSetupUtil::updateChannels()
 #include "lcd_spinbox.h"
 
 
-AudioPortAudio::AudioPortAudio( bool & _success_ful, mixer * _mixer ) :
+AudioPortAudio::AudioPortAudio( bool & _success_ful, Mixer * _mixer ) :
 	AudioDevice( tLimit<ch_cnt_t>(
 		configManager::inst()->value( "audioportaudio", "channels" ).toInt(),
 					DEFAULT_CHANNELS, SURROUND_CHANNELS ),
 								_mixer ),
 	m_paStream( NULL ),
 	m_wasPAInitError( false ),
-	m_outBuf( new surroundSampleFrame[getMixer()->framesPerPeriod()] ),
+	m_outBuf( new surroundSampleFrame[mixer()->framesPerPeriod()] ),
 	m_outBufPos( 0 ),
 	m_stopSemaphore( 1 )
 {
 	_success_ful = false;
 
-	m_outBufSize = getMixer()->framesPerPeriod();
+	m_outBufSize = mixer()->framesPerPeriod();
 
 	PaError err = Pa_Initialize();
 	
@@ -110,12 +110,12 @@ AudioPortAudio::AudioPortAudio( bool & _success_ful, mixer * _mixer ) :
 		return;
 	}
 
-	double inLatency = 0;//(double)getMixer()->framesPerPeriod() / (double)sampleRate();
-	double outLatency = 0;//(double)getMixer()->framesPerPeriod() / (double)sampleRate();
+	double inLatency = 0;//(double)mixer()->framesPerPeriod() / (double)sampleRate();
+	double outLatency = 0;//(double)mixer()->framesPerPeriod() / (double)sampleRate();
 
 	//inLatency = Pa_GetDeviceInfo( inDevIdx )->defaultLowInputLatency;
 	//outLatency = Pa_GetDeviceInfo( outDevIdx )->defaultLowOutputLatency;
-	const int samples = getMixer()->framesPerPeriod();
+	const int samples = mixer()->framesPerPeriod();
 	
 	// Configure output parameters.
 	m_outputParameters.device = outDevIdx;
@@ -232,8 +232,8 @@ void AudioPortAudio::applyQualitySettings()
 	if( hqAudio() )
 	{
 
-		setSampleRate( engine::getMixer()->processingSampleRate() );
-		int samples = getMixer()->framesPerPeriod();
+		setSampleRate( engine::mixer()->processingSampleRate() );
+		int samples = mixer()->framesPerPeriod();
 
 		PaError err = Pa_OpenStream(
 			&m_paStream,
@@ -264,7 +264,7 @@ int AudioPortAudio::process_callback(
 {
 	if( supportsCapture() )
 	{
-		getMixer()->pushInputFrames( (sampleFrame*)_inputBuffer,
+		mixer()->pushInputFrames( (sampleFrame*)_inputBuffer,
 												_framesPerBuffer );
 	}
 
@@ -294,14 +294,14 @@ int AudioPortAudio::process_callback(
 		const int min_len = qMin( (int)_framesPerBuffer,
 			m_outBufSize - m_outBufPos );
 
-		float master_gain = getMixer()->masterGain();
+		float master_gain = mixer()->masterGain();
 
 		for( fpp_t frame = 0; frame < min_len; ++frame )
 		{
 			for( ch_cnt_t chnl = 0; chnl < channels(); ++chnl )
 			{
 				( _outputBuffer + frame * channels() )[chnl] =
-						mixer::clip( m_outBuf[frame][chnl] *
+						Mixer::clip( m_outBuf[frame][chnl] *
 						master_gain );
 			}
 		}

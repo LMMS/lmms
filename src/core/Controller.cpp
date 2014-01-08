@@ -30,7 +30,7 @@
 
 #include "song.h"
 #include "engine.h"
-#include "mixer.h"
+#include "Mixer.h"
 #include "Controller.h"
 #include "ControllerConnection.h"
 #include "ControllerDialog.h"
@@ -109,7 +109,7 @@ unsigned int Controller::runningFrames()
 // Get position in seconds
 float Controller::runningTime()
 {
-	return s_frames / engine::getMixer()->processingSampleRate();
+	return s_frames / engine::mixer()->processingSampleRate();
 }
 
 
@@ -125,7 +125,7 @@ void Controller::triggerFrameCounter()
 		emit s_controllers.at(i)->valueChanged();
 	}
 
-	s_frames += engine::getMixer()->framesPerPeriod();
+	s_frames += engine::mixer()->framesPerPeriod();
 	//emit s_signaler.triggerValueChanged();
 }
 

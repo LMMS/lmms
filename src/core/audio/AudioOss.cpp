@@ -71,7 +71,7 @@
 
 
 
-AudioOss::AudioOss( bool & _success_ful, mixer * _mixer ) :
+AudioOss::AudioOss( bool & _success_ful, Mixer*  _mixer ) :
 	AudioDevice( tLimit<ch_cnt_t>(
 		configManager::inst()->value( "audiooss", "channels" ).toInt(),
 					DEFAULT_CHANNELS, SURROUND_CHANNELS ),
@@ -103,7 +103,7 @@ AudioOss::AudioOss( bool & _success_ful, mixer * _mixer ) :
 
 	int frag_spec;
 	for( frag_spec = 0; static_cast<int>( 0x01 << frag_spec ) <
-		getMixer()->framesPerPeriod() * channels() *
+		mixer()->framesPerPeriod() * channels() *
 							BYTES_PER_INT_SAMPLE;
 		++frag_spec )
 	{
@@ -175,7 +175,7 @@ AudioOss::AudioOss( bool & _success_ful, mixer * _mixer ) :
 	}
 	if( value != sampleRate() )
 	{
-		value = getMixer()->baseSampleRate();
+		value = mixer()->baseSampleRate();
 		if ( ioctl( m_audioFD, SNDCTL_DSP_SPEED, &value ) < 0 )
 		{
 			perror( "SNDCTL_DSP_SPEED" );
@@ -268,7 +268,7 @@ void AudioOss::applyQualitySettings()
 {
 	if( hqAudio() )
 	{
-		setSampleRate( engine::getMixer()->processingSampleRate() );
+		setSampleRate( engine::mixer()->processingSampleRate() );
 
 		unsigned int value = sampleRate();
 		if ( ioctl( m_audioFD, SNDCTL_DSP_SPEED, &value ) < 0 )
@@ -279,7 +279,7 @@ void AudioOss::applyQualitySettings()
 		}
 		if( value != sampleRate() )
 		{
-			value = getMixer()->baseSampleRate();
+			value = mixer()->baseSampleRate();
 			if ( ioctl( m_audioFD, SNDCTL_DSP_SPEED, &value ) < 0 )
 			{
 				perror( "SNDCTL_DSP_SPEED" );
@@ -299,9 +299,9 @@ void AudioOss::applyQualitySettings()
 void AudioOss::run()
 {
 	surroundSampleFrame * temp =
-		new surroundSampleFrame[getMixer()->framesPerPeriod()];
+		new surroundSampleFrame[mixer()->framesPerPeriod()];
 	int_sample_t * outbuf =
-			new int_sample_t[getMixer()->framesPerPeriod() *
+			new int_sample_t[mixer()->framesPerPeriod() *
 								channels()];
 
 	while( true )
@@ -313,7 +313,7 @@ void AudioOss::run()
 		}
 
 		int bytes = convertToS16( temp, frames,
-				getMixer()->masterGain(), outbuf,
+				mixer()->masterGain(), outbuf,
 							m_convertEndian );
 		if( write( m_audioFD, outbuf, bytes ) != bytes )
 		{

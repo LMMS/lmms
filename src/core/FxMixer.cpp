@@ -38,14 +38,14 @@ FxChannel::FxChannel( Model * _parent ) :
 	m_stillRunning( false ),
 	m_peakLeft( 0.0f ),
 	m_peakRight( 0.0f ),
-	m_buffer( new sampleFrame[engine::getMixer()->framesPerPeriod()] ),
+	m_buffer( new sampleFrame[engine::mixer()->framesPerPeriod()] ),
 	m_muteModel( false, _parent ),
 	m_volumeModel( 1.0, 0.0, 2.0, 0.01, _parent ),
 	m_name(),
 	m_lock()
 {
-	engine::getMixer()->clearAudioBuffer( m_buffer,
-					engine::getMixer()->framesPerPeriod() );
+	engine::mixer()->clearAudioBuffer( m_buffer,
+					engine::mixer()->framesPerPeriod() );
 }
 
 
@@ -93,7 +93,7 @@ void FxMixer::mixToChannel( const sampleFrame * _buf, fx_ch_t _ch )
 	{
 		m_fxChannels[_ch]->m_lock.lock();
 		sampleFrame * buf = m_fxChannels[_ch]->m_buffer;
-		for( f_cnt_t f = 0; f < engine::getMixer()->framesPerPeriod();
+		for( f_cnt_t f = 0; f < engine::mixer()->framesPerPeriod();
 									++f )
 		{
 			buf[f][0] += _buf[f][0];
@@ -118,14 +118,14 @@ void FxMixer::processChannel( fx_ch_t _ch, sampleFrame * _buf )
 		{
 			_buf = m_fxChannels[_ch]->m_buffer;
 		}
-		const fpp_t f = engine::getMixer()->framesPerPeriod();
+		const fpp_t f = engine::mixer()->framesPerPeriod();
 		if( !engine::getSong()->isFreezingPattern() )
 		{
 			m_fxChannels[_ch]->m_fxChain.startRunning();
 			m_fxChannels[_ch]->m_stillRunning = m_fxChannels[_ch]->m_fxChain.processAudioBuffer( _buf, f );
-			m_fxChannels[_ch]->m_peakLeft = engine::getMixer()->peakValueLeft( _buf, f ) *
+			m_fxChannels[_ch]->m_peakLeft = engine::mixer()->peakValueLeft( _buf, f ) *
 												m_fxChannels[_ch]->m_volumeModel.value();
-			m_fxChannels[_ch]->m_peakRight = engine::getMixer()->peakValueRight( _buf, f ) *
+			m_fxChannels[_ch]->m_peakRight = engine::mixer()->peakValueRight( _buf, f ) *
 												m_fxChannels[_ch]->m_volumeModel.value();
 		}
 		m_fxChannels[_ch]->m_used = true;
@@ -142,8 +142,8 @@ void FxMixer::processChannel( fx_ch_t _ch, sampleFrame * _buf )
 
 void FxMixer::prepareMasterMix()
 {
-	engine::getMixer()->clearAudioBuffer( m_fxChannels[0]->m_buffer,
-					engine::getMixer()->framesPerPeriod() );
+	engine::mixer()->clearAudioBuffer( m_fxChannels[0]->m_buffer,
+					engine::mixer()->framesPerPeriod() );
 }
 
 
@@ -151,7 +151,7 @@ void FxMixer::prepareMasterMix()
 
 void FxMixer::masterMix( sampleFrame * _buf )
 {
-	const int fpp = engine::getMixer()->framesPerPeriod();
+	const int fpp = engine::mixer()->framesPerPeriod();
 	memcpy( _buf, m_fxChannels[0]->m_buffer, sizeof( sampleFrame ) * fpp );
 
 	for( int i = 1; i < NumFxChannels+1; ++i )
@@ -165,8 +165,8 @@ void FxMixer::masterMix( sampleFrame * _buf )
 				_buf[f][0] += ch_buf[f][0] * v;
 				_buf[f][1] += ch_buf[f][1] * v;
 			}
-			engine::getMixer()->clearAudioBuffer( ch_buf,
-					engine::getMixer()->framesPerPeriod() );
+			engine::mixer()->clearAudioBuffer( ch_buf,
+					engine::mixer()->framesPerPeriod() );
 			m_fxChannels[i]->m_used = false;
 		}
 	}
@@ -175,20 +175,20 @@ void FxMixer::masterMix( sampleFrame * _buf )
 
 	if( m_fxChannels[0]->m_muteModel.value() )
 	{
-		engine::getMixer()->clearAudioBuffer( _buf,
-					engine::getMixer()->framesPerPeriod() );
+		engine::mixer()->clearAudioBuffer( _buf,
+					engine::mixer()->framesPerPeriod() );
 		return;
 	}
 
 	const float v = m_fxChannels[0]->m_volumeModel.value();
-	for( f_cnt_t f = 0; f < engine::getMixer()->framesPerPeriod(); ++f )
+	for( f_cnt_t f = 0; f < engine::mixer()->framesPerPeriod(); ++f )
 	{
 		_buf[f][0] *= v;
 		_buf[f][1] *= v;
 	}
 
-	m_fxChannels[0]->m_peakLeft *= engine::getMixer()->masterGain();
-	m_fxChannels[0]->m_peakRight *= engine::getMixer()->masterGain();
+	m_fxChannels[0]->m_peakLeft *= engine::mixer()->masterGain();
+	m_fxChannels[0]->m_peakRight *= engine::mixer()->masterGain();
 }
 
 

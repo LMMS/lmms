@@ -29,7 +29,7 @@
 #endif
 
 #include "RemotePlugin.h"
-#include "mixer.h"
+#include "Mixer.h"
 #include "engine.h"
 #include "config_mgr.h"
 
@@ -162,13 +162,13 @@ bool RemotePlugin::init( const QString &pluginExecutable,
 bool RemotePlugin::process( const sampleFrame * _in_buf,
 						sampleFrame * _out_buf )
 {
-	const fpp_t frames = engine::getMixer()->framesPerPeriod();
+	const fpp_t frames = engine::mixer()->framesPerPeriod();
 
 	if( m_failed || !isRunning() )
 	{
 		if( _out_buf != NULL )
 		{
-			engine::getMixer()->clearAudioBuffer( _out_buf,
+			engine::mixer()->clearAudioBuffer( _out_buf,
 								frames );
 		}
 		return false;
@@ -188,7 +188,7 @@ bool RemotePlugin::process( const sampleFrame * _in_buf,
 		}
 		if( _out_buf != NULL )
 		{
-			engine::getMixer()->clearAudioBuffer( _out_buf,
+			engine::mixer()->clearAudioBuffer( _out_buf,
 								frames );
 		}
 		return false;
@@ -263,7 +263,7 @@ bool RemotePlugin::process( const sampleFrame * _in_buf,
 		sampleFrame * o = (sampleFrame *) ( m_shm +
 							m_inputCount*frames );
 		// clear buffer, if plugin didn't fill up both channels
-		engine::getMixer()->clearAudioBuffer( _out_buf, frames );
+		engine::mixer()->clearAudioBuffer( _out_buf, frames );
 
 		for( ch_cnt_t ch = 0; ch <
 				qMin<int>( DEFAULT_CHANNELS, outputs ); ++ch )
@@ -301,7 +301,7 @@ void RemotePlugin::processMidiEvent( const midiEvent & _e,
 void RemotePlugin::resizeSharedProcessingMemory()
 {
 	const size_t s = ( m_inputCount+m_outputCount ) *
-				engine::getMixer()->framesPerPeriod() *
+				engine::mixer()->framesPerPeriod() *
 							sizeof( float );
 	if( m_shm != NULL )
 	{
@@ -354,12 +354,12 @@ bool RemotePlugin::processMessage( const message & _m )
 
 		case IdSampleRateInformation:
 			reply = true;
-			reply_message.addInt( engine::getMixer()->processingSampleRate() );
+			reply_message.addInt( engine::mixer()->processingSampleRate() );
 			break;
 
 		case IdBufferSizeInformation:
 			reply = true;
-			reply_message.addInt( engine::getMixer()->framesPerPeriod() );
+			reply_message.addInt( engine::mixer()->framesPerPeriod() );
 			break;
 
 		case IdChangeInputCount:

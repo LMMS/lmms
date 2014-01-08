@@ -26,7 +26,7 @@
 #define _FX_MIXER_H
 
 #include "Model.h"
-#include "mixer.h"
+#include "Mixer.h"
 #include "EffectChain.h"
 #include "JournallingObject.h"
 
@@ -91,7 +91,7 @@ private:
 	FxChannel * m_fxChannels[NumFxChannels+1];	// +1 = master
 
 
-	friend class mixerWorkerThread;
+	friend class MixerWorkerThread;
 	friend class FxMixerView;
 
 } ;

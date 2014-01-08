@@ -45,7 +45,7 @@ static void stream_write_callback(pa_stream *s, size_t length, void *userdata)
 
 
 
-AudioPulseAudio::AudioPulseAudio( bool & _success_ful, mixer * _mixer ) :
+AudioPulseAudio::AudioPulseAudio( bool & _success_ful, Mixer*  _mixer ) :
 	AudioDevice( tLimit<ch_cnt_t>(
 		configManager::inst()->value( "audiopa", "channels" ).toInt(),
 					DEFAULT_CHANNELS, SURROUND_CHANNELS ),
@@ -118,7 +118,7 @@ void AudioPulseAudio::applyQualitySettings()
 {
 	if( hqAudio() )
 	{
-//		setSampleRate( engine::getMixer()->processingSampleRate() );
+//		setSampleRate( engine::mixer()->processingSampleRate() );
 
 	}
 
@@ -179,7 +179,7 @@ static void context_state_callback(pa_context *c, void *userdata)
 			buffer_attr.minreq = (uint32_t)(-1);
 			buffer_attr.fragsize = (uint32_t)(-1);
 
-			double latency = (double)( engine::getMixer()->framesPerPeriod() ) /
+			double latency = (double)( engine::mixer()->framesPerPeriod() ) /
 													(double)_this->sampleRate();
 
 			// ask PulseAudio for the desired latency (which might not be approved)
@@ -247,7 +247,7 @@ void AudioPulseAudio::run()
 
 void AudioPulseAudio::streamWriteCallback( pa_stream *s, size_t length )
 {
-	const fpp_t fpp = getMixer()->framesPerPeriod();
+	const fpp_t fpp = mixer()->framesPerPeriod();
 	surroundSampleFrame * temp = new surroundSampleFrame[fpp];
 	Sint16 * pcmbuf = (Sint16*)pa_xmalloc( fpp * channels() * sizeof(Sint16) );
 
@@ -261,7 +261,7 @@ void AudioPulseAudio::streamWriteCallback( pa_stream *s, size_t length )
 			break;
 		}
 		int bytes = convertToS16( temp, frames,
-						getMixer()->masterGain(),
+						mixer()->masterGain(),
 						pcmbuf,
 						m_convertEndian );
 		if( bytes > 0 )

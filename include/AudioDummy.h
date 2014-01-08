@@ -32,8 +32,8 @@
 class AudioDummy : public AudioDevice, public QThread
 {
 public:
-	AudioDummy( bool & _success_ful, mixer * _mixer ) :
-		AudioDevice( DEFAULT_CHANNELS, _mixer )
+	AudioDummy( bool & _success_ful, Mixer* mixer ) :
+		AudioDevice( DEFAULT_CHANNELS, mixer )
 	{
 		_success_ful = true;
 	}
@@ -96,7 +96,7 @@ private:
 		{
 			timer.reset();
 			const surroundSampleFrame * b =
-						getMixer()->nextBuffer();
+						mixer()->nextBuffer();
 			if( !b )
 			{
 				break;
@@ -104,9 +104,9 @@ private:
 			delete[] b;
 
 			const Sint32 microseconds = static_cast<Sint32>(
-					getMixer()->framesPerPeriod() *
+					mixer()->framesPerPeriod() *
 					1000000.0f /
-				getMixer()->processingSampleRate() -
+				mixer()->processingSampleRate() -
 							timer.elapsed() );
 			if( microseconds > 0 )
 			{

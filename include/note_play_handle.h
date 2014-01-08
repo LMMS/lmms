@@ -28,7 +28,7 @@
 #define _NOTE_PLAY_HANDLE_H
 
 #include "lmmsconfig.h"
-#include "mixer.h"
+#include "Mixer.h"
 #include "note.h"
 #include "engine.h"
 #include "track.h"
@@ -85,7 +85,7 @@ public:
 	inline fpp_t framesLeftForCurrentPeriod() const
 	{
 		return (fpp_t) qMin<f_cnt_t>( framesLeft(),
-										engine::getMixer()->framesPerPeriod() );
+										engine::mixer()->framesPerPeriod() );
 	}
 
 

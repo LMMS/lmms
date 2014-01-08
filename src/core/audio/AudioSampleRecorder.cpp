@@ -32,7 +32,7 @@
 
 AudioSampleRecorder::AudioSampleRecorder( const ch_cnt_t _channels,
 							bool & _success_ful,
-							mixer * _mixer ) :
+							Mixer * _mixer ) :
 	AudioDevice( _channels, _mixer ),
 	m_buffers()
 {

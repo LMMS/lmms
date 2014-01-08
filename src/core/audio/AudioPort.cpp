@@ -30,19 +30,19 @@
 
 AudioPort::AudioPort( const QString & _name, bool _has_effect_chain ) :
 	m_bufferUsage( NoUsage ),
-	m_firstBuffer( new sampleFrame[engine::getMixer()->framesPerPeriod()] ),
+	m_firstBuffer( new sampleFrame[engine::mixer()->framesPerPeriod()] ),
 	m_secondBuffer( new sampleFrame[
-				engine::getMixer()->framesPerPeriod()] ),
+				engine::mixer()->framesPerPeriod()] ),
 	m_extOutputEnabled( false ),
 	m_nextFxChannel( 0 ),
 	m_name( "unnamed port" ),
 	m_effects( _has_effect_chain ? new EffectChain( NULL ) : NULL )
 {
-	engine::getMixer()->clearAudioBuffer( m_firstBuffer,
-				engine::getMixer()->framesPerPeriod() );
-	engine::getMixer()->clearAudioBuffer( m_secondBuffer,
-				engine::getMixer()->framesPerPeriod() );
-	engine::getMixer()->addAudioPort( this );
+	engine::mixer()->clearAudioBuffer( m_firstBuffer,
+				engine::mixer()->framesPerPeriod() );
+	engine::mixer()->clearAudioBuffer( m_secondBuffer,
+				engine::mixer()->framesPerPeriod() );
+	engine::mixer()->addAudioPort( this );
 	setExtOutputEnabled( true );
 }
 
@@ -52,7 +52,7 @@ AudioPort::AudioPort( const QString & _name, bool _has_effect_chain ) :
 AudioPort::~AudioPort()
 {
 	setExtOutputEnabled( false );
-	engine::getMixer()->removeAudioPort( this );
+	engine::mixer()->removeAudioPort( this );
 	delete[] m_firstBuffer;
 	delete[] m_secondBuffer;
 	delete m_effects;
@@ -64,8 +64,8 @@ AudioPort::~AudioPort()
 void AudioPort::nextPeriod()
 {
 	m_firstBufferLock.lock();
-	engine::getMixer()->clearAudioBuffer( m_firstBuffer,
-				engine::getMixer()->framesPerPeriod() );
+	engine::mixer()->clearAudioBuffer( m_firstBuffer,
+				engine::mixer()->framesPerPeriod() );
 	qSwap( m_firstBuffer, m_secondBuffer );
 
 	// this is how we decrease state of buffer-usage ;-)
@@ -86,11 +86,11 @@ void AudioPort::setExtOutputEnabled( bool _enabled )
 		m_extOutputEnabled = _enabled;
 		if( m_extOutputEnabled )
 		{
-			engine::getMixer()->audioDev()->registerPort( this );
+			engine::mixer()->audioDev()->registerPort( this );
 		}
 		else
 		{
-			engine::getMixer()->audioDev()->unregisterPort( this );
+			engine::mixer()->audioDev()->unregisterPort( this );
 		}
 	}
 }
@@ -101,7 +101,7 @@ void AudioPort::setExtOutputEnabled( bool _enabled )
 void AudioPort::setName( const QString & _name )
 {
 	m_name = _name;
-	engine::getMixer()->audioDev()->renamePort( this );
+	engine::mixer()->audioDev()->renamePort( this );
 }
 
 
@@ -113,7 +113,7 @@ bool AudioPort::processEffects()
 	{
 		lockFirstBuffer();
 		bool more = m_effects->processAudioBuffer( m_firstBuffer,
-					engine::getMixer()->framesPerPeriod() );
+					engine::mixer()->framesPerPeriod() );
 		unlockFirstBuffer();
 		return more;
 	}

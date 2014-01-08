@@ -44,7 +44,7 @@ public:
 			const bitrate_t _min_bitrate,
 			const bitrate_t _max_bitrate,
 			const int _depth,
-			mixer * _mixer );
+			Mixer* mixer );
 	virtual ~AudioFileWave();
 
 	static AudioFileDevice * getInst( const sample_rate_t _sample_rate,
@@ -56,13 +56,13 @@ public:
 						const bitrate_t _min_bitrate,
 						const bitrate_t _max_bitrate,
 						const int _depth,
-						mixer * _mixer )
+						Mixer* mixer )
 	{
 		return new AudioFileWave( _sample_rate, _channels,
 						_success_ful, _file, _use_vbr,
 						_nom_bitrate, _min_bitrate,
 							_max_bitrate, _depth,
-							_mixer );
+							mixer );
 	}
 
 

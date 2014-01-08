@@ -238,10 +238,10 @@ void exportProjectDialog::multiRender()
 
 ProjectRenderer* exportProjectDialog::prepRender()
 {
-	mixer::qualitySettings qs =
-			mixer::qualitySettings(
-					static_cast<mixer::qualitySettings::Interpolation>(interpolationCB->currentIndex()),
-					static_cast<mixer::qualitySettings::Oversampling>(oversamplingCB->currentIndex()),
+	Mixer::qualitySettings qs =
+			Mixer::qualitySettings(
+					static_cast<Mixer::qualitySettings::Interpolation>(interpolationCB->currentIndex()),
+					static_cast<Mixer::qualitySettings::Oversampling>(oversamplingCB->currentIndex()),
 					sampleExactControllersCB->isChecked(),
 					aliasFreeOscillatorsCB->isChecked() );
 

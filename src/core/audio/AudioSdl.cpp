@@ -38,16 +38,16 @@
 
 
 
-AudioSdl::AudioSdl( bool & _success_ful, mixer * _mixer ) :
+AudioSdl::AudioSdl( bool & _success_ful, Mixer*  _mixer ) :
 	AudioDevice( DEFAULT_CHANNELS, _mixer ),
-	m_outBuf( new surroundSampleFrame[getMixer()->framesPerPeriod()] ),
+	m_outBuf( new surroundSampleFrame[mixer()->framesPerPeriod()] ),
 	m_convertedBufPos( 0 ),
 	m_convertEndian( false ),
 	m_stopSemaphore( 1 )
 {
 	_success_ful = false;
 
-	m_convertedBufSize = getMixer()->framesPerPeriod() * channels()
+	m_convertedBufSize = mixer()->framesPerPeriod() * channels()
 						* sizeof( int_sample_t );
 	m_convertedBuf = new Uint8[m_convertedBufSize];
 
@@ -63,7 +63,7 @@ AudioSdl::AudioSdl( bool & _success_ful, mixer * _mixer ) :
 						// of system, so we don't have
 						// to convert the buffers
 	m_audioHandle.channels = channels();
-	m_audioHandle.samples = qMax( 1024, getMixer()->framesPerPeriod()*2 );
+	m_audioHandle.samples = qMax( 1024, mixer()->framesPerPeriod()*2 );
 
 	m_audioHandle.callback = sdlAudioCallback;
 	m_audioHandle.userdata = this;
@@ -131,7 +131,7 @@ void AudioSdl::applyQualitySettings()
 	{
 		SDL_CloseAudio();
 
-		setSampleRate( engine::getMixer()->processingSampleRate() );
+		setSampleRate( engine::mixer()->processingSampleRate() );
 
 		m_audioHandle.freq = sampleRate();
 
@@ -185,7 +185,7 @@ void AudioSdl::sdlAudioCallback( Uint8 * _buf, int _len )
 						* sizeof( int_sample_t );
 
 			convertToS16( m_outBuf, frames,
-						getMixer()->masterGain(),
+						mixer()->masterGain(),
 						(int_sample_t *)m_convertedBuf,
 						m_convertEndian );
 		}

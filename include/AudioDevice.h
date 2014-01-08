@@ -29,7 +29,7 @@
 #include <QtCore/QMutex>
 #include <QtCore/QThread>
 
-#include "mixer.h"
+#include "Mixer.h"
 #include "tab_widget.h"
 
 
@@ -39,7 +39,7 @@ class AudioPort;
 class AudioDevice
 {
 public:
-	AudioDevice( const ch_cnt_t _channels, mixer * _mixer );
+	AudioDevice( const ch_cnt_t _channels, Mixer* mixer );
 	virtual ~AudioDevice();
 
 	inline void lock()
@@ -152,7 +152,7 @@ protected:
 		m_sampleRate = _new_sr;
 	}
 
-	mixer * getMixer()
+	Mixer* mixer()
 	{
 		return m_mixer;
 	}
@@ -167,7 +167,7 @@ protected:
 private:
 	sample_rate_t m_sampleRate;
 	ch_cnt_t m_channels;
-	mixer * m_mixer;
+	Mixer* m_mixer;
 	bool m_inProcess;
 
 	QMutex m_devMutex;

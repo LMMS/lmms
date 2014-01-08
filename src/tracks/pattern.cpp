@@ -188,7 +188,7 @@ note * pattern::addNote( const note & _new_note, const bool _quant_pos )
 		new_note->quantizePos( engine::getPianoRoll()->quantization() );
 	}
 
-	engine::getMixer()->lock();
+	engine::mixer()->lock();
 	if( m_notes.size() == 0 || m_notes.back()->pos() <= new_note->pos() )
 	{
 		m_notes.push_back( new_note );
@@ -211,7 +211,7 @@ note * pattern::addNote( const note & _new_note, const bool _quant_pos )
 
 		m_notes.insert( it, new_note );
 	}
-	engine::getMixer()->unlock();
+	engine::mixer()->unlock();
 
 	checkType();
 	changeLength( length() );
@@ -228,7 +228,7 @@ note * pattern::addNote( const note & _new_note, const bool _quant_pos )
 
 void pattern::removeNote( const note * _note_to_del )
 {
-	engine::getMixer()->lock();
+	engine::mixer()->lock();
 	NoteVector::Iterator it = m_notes.begin();
 	while( it != m_notes.end() )
 	{
@@ -240,7 +240,7 @@ void pattern::removeNote( const note * _note_to_del )
 		}
 		++it;
 	}
-	engine::getMixer()->unlock();
+	engine::mixer()->unlock();
 
 	checkType();
 	changeLength( length() );
@@ -276,14 +276,14 @@ void pattern::rearrangeAllNotes()
 
 void pattern::clearNotes()
 {
-	engine::getMixer()->lock();
+	engine::mixer()->lock();
 	for( NoteVector::Iterator it = m_notes.begin(); it != m_notes.end();
 									++it )
 	{
 		delete *it;
 	}
 	m_notes.clear();
-	engine::getMixer()->unlock();
+	engine::mixer()->unlock();
 
 	checkType();
 	emit dataChanged();
@@ -739,12 +739,12 @@ void patternFreezeThread::run()
 	// create and install audio-sample-recorder
 	bool b;
 	// we cannot create local copy, because at a later stage
-	// mixer::restoreAudioDevice(...) deletes old audio-dev and thus
+	// Mixer::restoreAudioDevice(...) deletes old audio-dev and thus
 	// AudioSampleRecorder would be destroyed two times...
 	AudioSampleRecorder * freeze_recorder = new AudioSampleRecorder(
 							DEFAULT_CHANNELS, b,
-							engine::getMixer() );
-	engine::getMixer()->setAudioDevice( freeze_recorder );
+							engine::mixer() );
+	engine::mixer()->setAudioDevice( freeze_recorder );
 
 	// prepare stuff for playing correct things later
 	engine::getSong()->playPattern( m_pattern, false );
@@ -769,7 +769,7 @@ void patternFreezeThread::run()
 
 	// render tails
 	int count = 0;
-	while( engine::getMixer()->hasNotePlayHandles() &&
+	while( engine::mixer()->hasNotePlayHandles() &&
 					m_pattern->m_freezeAborted == false &&
 					++count < 2000 )
 	{
@@ -791,7 +791,7 @@ void patternFreezeThread::run()
 	}
 
 	// restore original audio-device
-	engine::getMixer()->restoreAudioDevice();
+	engine::mixer()->restoreAudioDevice();
 
 	m_statusDlg->setProgress( -1 );	// we're finished
 

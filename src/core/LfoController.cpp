@@ -31,7 +31,7 @@
 
 #include "song.h"
 #include "engine.h"
-#include "mixer.h"
+#include "Mixer.h"
 #include "LfoController.h"
 #include "ControllerDialog.h"
 
@@ -89,7 +89,7 @@ float LfoController::value( int _offset )
 		// The new duration in frames 
 		// (Samples/Second) / (periods/second) = (Samples/cycle)
 		float newDurationF =
-				engine::getMixer()->processingSampleRate() *
+				engine::mixer()->processingSampleRate() *
 				m_speedModel.value();
 
 		switch(m_multiplierModel.value() )
@@ -146,7 +146,7 @@ float LfoController::value( int _offset )
 
 	//  frames / (20seconds of frames)
 	float sampleFrame = float( frame+m_phaseOffset ) / 
-		(engine::getMixer()->processingSampleRate() *  m_speedModel.value() );
+		(engine::mixer()->processingSampleRate() *  m_speedModel.value() );
 
 	switch(m_multiplierModel.value() )
 	{

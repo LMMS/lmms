@@ -1,7 +1,7 @@
 /*
- * mixer.cpp - audio-device-independent mixer for LMMS
+ * Mixer.cpp - audio-device-independent mixer for LMMS
  *
- * Copyright (c) 2004-2012 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -24,7 +24,7 @@
 
 #include <math.h>
 
-#include "mixer.h"
+#include "Mixer.h"
 #include "FxMixer.h"
 #include "MixHelpers.h"
 #include "play_handle.h"
@@ -143,14 +143,14 @@ public:
 
 	static JobQueue s_jobQueue;
 
-	MixerWorkerThread( int _worker_num, mixer * _mixer ) :
-		QThread( _mixer ),
+	MixerWorkerThread( int _worker_num, Mixer* mixer ) :
+		QThread( mixer ),
 		m_workingBuf( (sampleFrame *) aligned_malloc(
-					_mixer->framesPerPeriod() *
+					mixer->framesPerPeriod() *
 						sizeof( sampleFrame ) ) ),
 		m_workerNum( _worker_num ),
 		m_quit( false ),
-		m_mixer( _mixer ),
+		m_mixer( mixer ),
 		m_queueReadyWaitCond( &m_mixer->m_queueReadyWaitCond )
 	{
 	}
@@ -194,7 +194,7 @@ private:
 	sampleFrame * m_workingBuf;
 	int m_workerNum;
 	volatile bool m_quit;
-	mixer * m_mixer;
+	Mixer* m_mixer;
 	QWaitCondition * m_queueReadyWaitCond;
 
 } ;
@@ -296,7 +296,7 @@ void MixerWorkerThread::processJobQueue()
 
 
 
-mixer::mixer() :
+Mixer::Mixer() :
 	m_framesPerPeriod( DEFAULT_BUFFER_SIZE ),
 	m_workingBuf( NULL ),
 	m_inputBufferRead( 0 ),
@@ -388,7 +388,7 @@ mixer::mixer() :
 
 
 
-mixer::~mixer()
+Mixer::~Mixer()
 {
 	// distribute an empty job-queue so that worker-threads
 	// get out of their processing-loop
@@ -428,7 +428,7 @@ mixer::~mixer()
 
 
 
-void mixer::initDevices()
+void Mixer::initDevices()
 {
 	m_audioDev = tryAudioDevices();
 	m_midiClient = tryMidiClients();
@@ -437,7 +437,7 @@ void mixer::initDevices()
 
 
 
-void mixer::startProcessing( bool _needs_fifo )
+void Mixer::startProcessing( bool _needs_fifo )
 {
 	if( _needs_fifo )
 	{
@@ -455,7 +455,7 @@ void mixer::startProcessing( bool _needs_fifo )
 
 
 
-void mixer::stopProcessing()
+void Mixer::stopProcessing()
 {
 	if( m_fifoWriter != NULL )
 	{
@@ -475,7 +475,7 @@ void mixer::stopProcessing()
 
 
 
-sample_rate_t mixer::baseSampleRate() const
+sample_rate_t Mixer::baseSampleRate() const
 {
 	sample_rate_t sr =
 		configManager::inst()->value( "mixer", "samplerate" ).toInt();
@@ -489,7 +489,7 @@ sample_rate_t mixer::baseSampleRate() const
 
 
 
-sample_rate_t mixer::outputSampleRate() const
+sample_rate_t Mixer::outputSampleRate() const
 {
 	return m_audioDev != NULL ? m_audioDev->sampleRate() :
 							baseSampleRate();
@@ -498,7 +498,7 @@ sample_rate_t mixer::outputSampleRate() const
 
 
 
-sample_rate_t mixer::inputSampleRate() const
+sample_rate_t Mixer::inputSampleRate() const
 {
 	return m_audioDev != NULL ? m_audioDev->sampleRate() :
 							baseSampleRate();
@@ -507,7 +507,7 @@ sample_rate_t mixer::inputSampleRate() const
 
 
 
-sample_rate_t mixer::processingSampleRate() const
+sample_rate_t Mixer::processingSampleRate() const
 {
 	return outputSampleRate() * m_qualitySettings.sampleRateMultiplier();
 }
@@ -515,7 +515,7 @@ sample_rate_t mixer::processingSampleRate() const
 
 
 
-bool mixer::criticalXRuns() const
+bool Mixer::criticalXRuns() const
 {
 	return m_cpuLoad >= 99 && engine::getSong()->realTimeTask() == true;
 }
@@ -523,7 +523,7 @@ bool mixer::criticalXRuns() const
 
 
 
-void mixer::pushInputFrames( sampleFrame * _ab, const f_cnt_t _frames )
+void Mixer::pushInputFrames( sampleFrame * _ab, const f_cnt_t _frames )
 {
 	lockInputFrames();
 
@@ -553,7 +553,7 @@ void mixer::pushInputFrames( sampleFrame * _ab, const f_cnt_t _frames )
 
 
 
-const surroundSampleFrame * mixer::renderNextBuffer()
+const surroundSampleFrame * Mixer::renderNextBuffer()
 {
 	MicroTimer timer;
 	static song::playPos last_metro_pos = -1;
@@ -685,7 +685,7 @@ const surroundSampleFrame * mixer::renderNextBuffer()
 
 // removes all play-handles. this is necessary, when the song is stopped ->
 // all remaining notes etc. would be played until their end
-void mixer::clear()
+void Mixer::clear()
 {
 	// TODO: m_midiClient->noteOffAll();
 	lock();
@@ -705,7 +705,7 @@ void mixer::clear()
 
 
 
-void mixer::bufferToPort( const sampleFrame * _buf,
+void Mixer::bufferToPort( const sampleFrame * _buf,
 					const fpp_t _frames,
 					const f_cnt_t _offset,
 					stereoVolumeVector _vv,
@@ -748,7 +748,7 @@ void mixer::bufferToPort( const sampleFrame * _buf,
 
 
 
-void mixer::clearAudioBuffer( sampleFrame * _ab, const f_cnt_t _frames,
+void Mixer::clearAudioBuffer( sampleFrame * _ab, const f_cnt_t _frames,
 							const f_cnt_t _offset )
 {
 	memset( _ab+_offset, 0, sizeof( *_ab ) * _frames );
@@ -757,7 +757,7 @@ void mixer::clearAudioBuffer( sampleFrame * _ab, const f_cnt_t _frames,
 
 
 #ifndef LMMS_DISABLE_SURROUND
-void mixer::clearAudioBuffer( surroundSampleFrame * _ab, const f_cnt_t _frames,
+void Mixer::clearAudioBuffer( surroundSampleFrame * _ab, const f_cnt_t _frames,
 							const f_cnt_t _offset )
 {
 	memset( _ab+_offset, 0, sizeof( *_ab ) * _frames );
@@ -767,7 +767,7 @@ void mixer::clearAudioBuffer( surroundSampleFrame * _ab, const f_cnt_t _frames,
 
 
 
-float mixer::peakValueLeft( sampleFrame * _ab, const f_cnt_t _frames )
+float Mixer::peakValueLeft( sampleFrame * _ab, const f_cnt_t _frames )
 {
 	float p = 0.0f;
 	for( f_cnt_t f = 0; f < _frames; ++f )
@@ -787,7 +787,7 @@ float mixer::peakValueLeft( sampleFrame * _ab, const f_cnt_t _frames )
 
 
 
-float mixer::peakValueRight( sampleFrame * _ab, const f_cnt_t _frames )
+float Mixer::peakValueRight( sampleFrame * _ab, const f_cnt_t _frames )
 {
 	float p = 0.0f;
 	for( f_cnt_t f = 0; f < _frames; ++f )
@@ -807,7 +807,7 @@ float mixer::peakValueRight( sampleFrame * _ab, const f_cnt_t _frames )
 
 
 
-void mixer::changeQuality( const struct qualitySettings & _qs )
+void Mixer::changeQuality( const struct qualitySettings & _qs )
 {
 	// don't delete the audio-device
 	stopProcessing();
@@ -824,7 +824,7 @@ void mixer::changeQuality( const struct qualitySettings & _qs )
 
 
 
-void mixer::setAudioDevice( AudioDevice * _dev )
+void Mixer::setAudioDevice( AudioDevice * _dev )
 {
 	stopProcessing();
 
@@ -832,7 +832,7 @@ void mixer::setAudioDevice( AudioDevice * _dev )
 
 	if( _dev == NULL )
 	{
-		printf( "param _dev == NULL in mixer::setAudioDevice(...). "
+		printf( "param _dev == NULL in Mixer::setAudioDevice(...). "
 					"Trying any working audio-device\n" );
 		m_audioDev = tryAudioDevices();
 	}
@@ -849,7 +849,7 @@ void mixer::setAudioDevice( AudioDevice * _dev )
 
 
 
-void mixer::setAudioDevice( AudioDevice * _dev,
+void Mixer::setAudioDevice( AudioDevice * _dev,
 				const struct qualitySettings & _qs,
 				bool _needs_fifo )
 {
@@ -861,7 +861,7 @@ void mixer::setAudioDevice( AudioDevice * _dev,
 
 	if( _dev == NULL )
 	{
-		printf( "param _dev == NULL in mixer::setAudioDevice(...). "
+		printf( "param _dev == NULL in Mixer::setAudioDevice(...). "
 					"Trying any working audio-device\n" );
 		m_audioDev = tryAudioDevices();
 	}
@@ -879,7 +879,7 @@ void mixer::setAudioDevice( AudioDevice * _dev,
 
 
 
-void mixer::restoreAudioDevice()
+void Mixer::restoreAudioDevice()
 {
 	if( m_oldAudioDev != NULL )
 	{
@@ -897,7 +897,7 @@ void mixer::restoreAudioDevice()
 
 
 
-void mixer::removeAudioPort( AudioPort * _port )
+void Mixer::removeAudioPort( AudioPort * _port )
 {
 	QVector<AudioPort *>::Iterator it = qFind( m_audioPorts.begin(),
 							m_audioPorts.end(),
@@ -913,7 +913,7 @@ void mixer::removeAudioPort( AudioPort * _port )
 
 
 
-void mixer::removePlayHandle( playHandle * _ph )
+void Mixer::removePlayHandle( playHandle * _ph )
 {
 	lock();
 	// check thread affinity as we must not delete play-handles
@@ -940,7 +940,7 @@ void mixer::removePlayHandle( playHandle * _ph )
 
 
 
-void mixer::removePlayHandles( track * _track )
+void Mixer::removePlayHandles( track * _track )
 {
 	lock();
 	PlayHandleList::Iterator it = m_playHandles.begin();
@@ -962,7 +962,7 @@ void mixer::removePlayHandles( track * _track )
 
 
 
-bool mixer::hasNotePlayHandles()
+bool Mixer::hasNotePlayHandles()
 {
 	lock();
 
@@ -983,7 +983,7 @@ bool mixer::hasNotePlayHandles()
 
 
 
-AudioDevice * mixer::tryAudioDevices()
+AudioDevice * Mixer::tryAudioDevices()
 {
 	bool success_ful = false;
 	AudioDevice * dev = NULL;
@@ -1097,7 +1097,7 @@ AudioDevice * mixer::tryAudioDevices()
 
 
 
-MidiClient * mixer::tryMidiClients()
+MidiClient * Mixer::tryMidiClients()
 {
 	QString client_name = configManager::inst()->value( "mixer",
 								"mididev" );
@@ -1168,8 +1168,8 @@ MidiClient * mixer::tryMidiClients()
 
 
 
-mixer::fifoWriter::fifoWriter( mixer * _mixer, fifo * _fifo ) :
-	m_mixer( _mixer ),
+Mixer::fifoWriter::fifoWriter( Mixer* mixer, fifo * _fifo ) :
+	m_mixer( mixer ),
 	m_fifo( _fifo ),
 	m_writing( true )
 {
@@ -1178,7 +1178,7 @@ mixer::fifoWriter::fifoWriter( mixer * _mixer, fifo * _fifo ) :
 
 
 
-void mixer::fifoWriter::finish()
+void Mixer::fifoWriter::finish()
 {
 	m_writing = false;
 }
@@ -1186,7 +1186,7 @@ void mixer::fifoWriter::finish()
 
 
 
-void mixer::fifoWriter::run()
+void Mixer::fifoWriter::run()
 {
 #if 0
 #ifdef LMMS_BUILD_LINUX
@@ -1214,5 +1214,5 @@ void mixer::fifoWriter::run()
 
 
 
-#include "moc_mixer.cxx"
+#include "moc_Mixer.cxx"
 

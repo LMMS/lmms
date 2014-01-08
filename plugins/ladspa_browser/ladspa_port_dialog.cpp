@@ -31,7 +31,7 @@
 #include "embed.h"
 #include "engine.h"
 #include "ladspa_2_lmms.h"
-#include "mixer.h"
+#include "Mixer.h"
 
 
 ladspaPortDialog::ladspaPortDialog( const ladspa_key_t & _key )
@@ -95,11 +95,11 @@ ladspaPortDialog::ladspaPortDialog( const ladspa_key_t & _key )
 		{
 			if( min != NOHINT )
 			{
-				min *= engine::getMixer()->processingSampleRate();
+				min *= engine::mixer()->processingSampleRate();
 			}
 			if( max != NOHINT )
 			{
-				max *= engine::getMixer()->processingSampleRate();
+				max *= engine::mixer()->processingSampleRate();
 			}
 		}
 

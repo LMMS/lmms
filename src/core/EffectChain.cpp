@@ -116,9 +116,9 @@ void EffectChain::loadSettings( const QDomElement & _this )
 
 void EffectChain::appendEffect( Effect * _effect )
 {
-	engine::getMixer()->lock();
+	engine::mixer()->lock();
 	m_effects.append( _effect );
-	engine::getMixer()->unlock();
+	engine::mixer()->unlock();
 
 	emit dataChanged();
 }
@@ -128,9 +128,9 @@ void EffectChain::appendEffect( Effect * _effect )
 
 void EffectChain::removeEffect( Effect * _effect )
 {
-	engine::getMixer()->lock();
+	engine::mixer()->lock();
 	m_effects.erase( qFind( m_effects.begin(), m_effects.end(), _effect ) );
-	engine::getMixer()->unlock();
+	engine::mixer()->unlock();
 }
 
 

@@ -195,8 +195,8 @@ QString audioFileProcessor::nodeName( void ) const
 Uint32 audioFileProcessor::getBeatLen( notePlayHandle * _n ) const
 {
 	const float freq_factor = BaseFreq / _n->frequency() *
-			engine::getMixer()->processingSampleRate() /
-					engine::getMixer()->baseSampleRate();
+			engine::mixer()->processingSampleRate() /
+					engine::mixer()->baseSampleRate();
 
 	return( static_cast<Uint32>( floorf( ( m_sampleBuffer.endFrame() -
 						m_sampleBuffer.startFrame() ) *

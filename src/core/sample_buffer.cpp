@@ -24,7 +24,7 @@
 
 
 #include "sample_buffer.h"
-#include "mixer.h"
+#include "Mixer.h"
 
 
 #include <QtCore/QBuffer>
@@ -76,7 +76,7 @@ sampleBuffer::sampleBuffer( const QString & _audio_file,
 	m_amplification( 1.0f ),
 	m_reversed( false ),
 	m_frequency( BaseFreq ),
-	m_sampleRate( engine::getMixer()->baseSampleRate() )
+	m_sampleRate( engine::mixer()->baseSampleRate() )
 {
 	if( _is_base64_data == true )
 	{
@@ -101,7 +101,7 @@ sampleBuffer::sampleBuffer( const sampleFrame * _data, const f_cnt_t _frames ) :
 	m_amplification( 1.0f ),
 	m_reversed( false ),
 	m_frequency( BaseFreq ),
-	m_sampleRate( engine::getMixer()->baseSampleRate() )
+	m_sampleRate( engine::mixer()->baseSampleRate() )
 {
 	if( _frames > 0 )
 	{
@@ -128,7 +128,7 @@ sampleBuffer::sampleBuffer( const f_cnt_t _frames ) :
 	m_amplification( 1.0f ),
 	m_reversed( false ),
 	m_frequency( BaseFreq ),
-	m_sampleRate( engine::getMixer()->baseSampleRate() )
+	m_sampleRate( engine::mixer()->baseSampleRate() )
 {
 	if( _frames > 0 )
 	{
@@ -158,7 +158,7 @@ void sampleBuffer::update( bool _keep_settings )
 	const bool lock = ( m_data != NULL );
 	if( lock )
 	{
-		engine::getMixer()->lock();
+		engine::mixer()->lock();
 		delete[] m_data;
 	}
 
@@ -185,7 +185,7 @@ void sampleBuffer::update( bool _keep_settings )
 #endif
 		int_sample_t * buf = NULL;
 		ch_cnt_t channels = DEFAULT_CHANNELS;
-		sample_rate_t samplerate = engine::getMixer()->baseSampleRate();
+		sample_rate_t samplerate = engine::mixer()->baseSampleRate();
 		m_frames = 0;
 
 		const QFileInfo fileInfo( file );
@@ -289,7 +289,7 @@ void sampleBuffer::update( bool _keep_settings )
 
 	if( lock )
 	{
-		engine::getMixer()->unlock();
+		engine::mixer()->unlock();
 	}
 
 	emit sampleUpdated();
@@ -302,10 +302,10 @@ void sampleBuffer::normalizeSampleRate( const sample_rate_t _src_sr,
 							bool _keep_settings )
 {
 	// do samplerate-conversion to our default-samplerate
-	if( _src_sr != engine::getMixer()->baseSampleRate() )
+	if( _src_sr != engine::mixer()->baseSampleRate() )
 	{
 		sampleBuffer * resampled = resample( this, _src_sr,
-					engine::getMixer()->baseSampleRate() );
+					engine::mixer()->baseSampleRate() );
 		delete[] m_data;
 		m_frames = resampled->frames();
 		m_data = new sampleFrame[m_frames];
@@ -524,7 +524,7 @@ bool sampleBuffer::play( sampleFrame * _ab, handleState * _state,
 {
 	QMutexLocker ml( &m_varLock );
 
-	engine::getMixer()->clearAudioBuffer( _ab, _frames );
+	engine::mixer()->clearAudioBuffer( _ab, _frames );
 
 	if( m_endFrame == 0 || _frames == 0 )
 	{
@@ -532,7 +532,7 @@ bool sampleBuffer::play( sampleFrame * _ab, handleState * _state,
 	}
 
 	const double freq_factor = (double) _freq / (double) m_frequency *
-		m_sampleRate / engine::getMixer()->processingSampleRate();
+		m_sampleRate / engine::mixer()->processingSampleRate();
 
 	// calculate how many frames we have in requested pitch
 	const f_cnt_t total_frames_for_current_pitch = static_cast<f_cnt_t>( (
@@ -855,7 +855,7 @@ QString & sampleBuffer::toBase64( QString & _dst ) const
 /*	FLAC__stream_encoder_set_do_exhaustive_model_search( flac_enc, true );
 	FLAC__stream_encoder_set_do_mid_side_stereo( flac_enc, true );*/
 	FLAC__stream_encoder_set_sample_rate( flac_enc,
-					engine::getMixer()->sampleRate() );
+					engine::mixer()->sampleRate() );
 	QBuffer ba_writer;
 	ba_writer.open( QBuffer::WriteOnly );
 
@@ -879,7 +879,7 @@ QString & sampleBuffer::toBase64( QString & _dst ) const
 			for( ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch )
 			{
 				buf[f*DEFAULT_CHANNELS+ch] = (FLAC__int32)(
-					mixer::clip( m_data[f+frame_cnt][ch] ) *
+					Mixer::clip( m_data[f+frame_cnt][ch] ) *
 						OUTPUT_SAMPLE_MULTIPLIER );
 			}
 		}
@@ -1206,7 +1206,7 @@ sampleBuffer::handleState::handleState( bool _varying_pitch ) :
 {
 	int error;
 	if( ( m_resamplingData = src_new(/*
-		( engine::getMixer()->highQuality() == true ) ?
+		( engine::mixer()->highQuality() == true ) ?
 					SRC_SINC_FASTEST :*/
 					SRC_LINEAR,
 					DEFAULT_CHANNELS, &error ) ) == NULL )

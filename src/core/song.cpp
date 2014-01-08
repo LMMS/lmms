@@ -119,13 +119,13 @@ song::song() :
 					this, SLOT( setTimeSignature() ) );
 
 
-	connect( engine::getMixer(), SIGNAL( sampleRateChanged() ), this,
+	connect( engine::mixer(), SIGNAL( sampleRateChanged() ), this,
 						SLOT( updateFramesPerTick() ) );
 
 	// handle VST plugins sync
 	if( configManager::inst()->value( "ui", "syncvstplugins" ).toInt() )
 	{
-		connect( engine::getMixer(), SIGNAL( sampleRateChanged() ), this,
+		connect( engine::mixer(), SIGNAL( sampleRateChanged() ), this,
 						SLOT( updateSampleRateSHM() ) );
 #ifdef USE_QT_SHMEM
 		if ( !m_shmQtID.create( sizeof( sncVST ) ) ) 
@@ -163,9 +163,9 @@ song::song() :
 			m_SncVSTplug->isPlayin = m_playing | m_exporting;
 			m_SncVSTplug->hasSHM = true;
 			m_SncVSTplug->m_sampleRate =
-				engine::getMixer()->processingSampleRate();
+				engine::mixer()->processingSampleRate();
 			m_SncVSTplug->m_bufferSize =
-				engine::getMixer()->framesPerPeriod();
+				engine::mixer()->framesPerPeriod();
 			m_SncVSTplug->timeSigNumer = 4;
 			m_SncVSTplug->timeSigDenom = 4;
 		}
@@ -216,7 +216,7 @@ song::~song()
 
 void song::masterVolumeChanged()
 {
-	engine::getMixer()->setMasterGain( m_masterVolumeModel.value() /
+	engine::mixer()->setMasterGain( m_masterVolumeModel.value() /
 								100.0f );
 }
 
@@ -226,8 +226,8 @@ void song::masterVolumeChanged()
 void song::setTempo()
 {
 	const bpm_t tempo = (bpm_t) m_tempoModel.value();
-	engine::getMixer()->lock();
-	PlayHandleList & playHandles = engine::getMixer()->playHandles();
+	engine::mixer()->lock();
+	PlayHandleList & playHandles = engine::mixer()->playHandles();
 	for( PlayHandleList::Iterator it = playHandles.begin();
 						it != playHandles.end(); ++it )
 	{
@@ -237,7 +237,7 @@ void song::setTempo()
 			nph->resize( tempo );
 		}
 	}
-	engine::getMixer()->unlock();
+	engine::mixer()->unlock();
 
 	engine::updateFramesPerTick();
 
@@ -315,7 +315,7 @@ void song::savePos()
 				m_playPos[m_playMode].setCurrentFrame( 0 );
 
 				// remove all note-play-handles that are active
-				engine::getMixer()->clear();
+				engine::mixer()->clear();
 
 				break;
 			}
@@ -468,9 +468,9 @@ void song::processNextBuffer()
 	const float frames_per_tick = engine::framesPerTick();
 
 	while( total_frames_played
-				< engine::getMixer()->framesPerPeriod() )
+				< engine::mixer()->framesPerPeriod() )
 	{
-		f_cnt_t played_frames = ( m_SncVSTplug->m_bufferSize = engine::getMixer()
+		f_cnt_t played_frames = ( m_SncVSTplug->m_bufferSize = engine::mixer()
 				->framesPerPeriod() ) - total_frames_played;
 
 #ifdef VST_SNC_LATENCY
@@ -830,7 +830,7 @@ void song::stop()
 	m_playPos[m_playMode].setCurrentFrame( 0 );
 
 	// remove all note-play-handles that are active
-	engine::getMixer()->clear();
+	engine::mixer()->clear();
 
 	m_playMode = Mode_None;
 
@@ -894,11 +894,11 @@ void song::removeBar()
 
 void song::addBBTrack()
 {
-	engine::getMixer()->lock();
+	engine::mixer()->lock();
 	track * t = track::create( track::BBTrack, this );
 	engine::getBBTrackContainer()->setCurrentBB(
 						bbTrack::numOfBBTrack( t ) );
-	engine::getMixer()->unlock();
+	engine::mixer()->unlock();
 }
 
 
@@ -906,9 +906,9 @@ void song::addBBTrack()
 
 void song::addSampleTrack()
 {
-	engine::getMixer()->lock();
+	engine::mixer()->lock();
 	(void) track::create( track::SampleTrack, this );
-	engine::getMixer()->unlock();
+	engine::mixer()->unlock();
 }
 
 
@@ -916,9 +916,9 @@ void song::addSampleTrack()
 
 void song::addAutomationTrack()
 {
-	engine::getMixer()->lock();
+	engine::mixer()->lock();
 	(void) track::create( track::AutomationTrack, this );
-	engine::getMixer()->unlock();
+	engine::mixer()->unlock();
 }
 
 
@@ -955,7 +955,7 @@ void song::clearProject()
 	}
 
 
-	engine::getMixer()->lock();
+	engine::mixer()->lock();
 	if( engine::getBBEditor() )
 	{
 		engine::getBBEditor()->clearAllTracks();
@@ -990,7 +990,7 @@ void song::clearProject()
 	AutomationPattern::globalAutomationPattern( &m_masterPitchModel )->
 									clear();
 
-	engine::getMixer()->unlock();
+	engine::mixer()->unlock();
 
 	if( engine::getProjectNotes() )
 	{
@@ -1118,7 +1118,7 @@ void song::loadProject( const QString & _file_name )
 		return;
 	}
 
-	engine::getMixer()->lock();
+	engine::mixer()->lock();
 
 	// get the header information from the DOM
 	m_tempoModel.loadSettings( mmp.head(), "bpm" );
@@ -1208,7 +1208,7 @@ void song::loadProject( const QString & _file_name )
 	AutomationPattern::resolveAllIDs();
 
 
-	engine::getMixer()->unlock();
+	engine::mixer()->unlock();
 
 	configManager::inst()->addRecentlyOpenedProject( _file_name );
 
@@ -1443,7 +1443,7 @@ void song::updateFramesPerTick()
 
 void song::updateSampleRateSHM()
 {
-	m_SncVSTplug->m_sampleRate = engine::getMixer()->processingSampleRate();
+	m_SncVSTplug->m_sampleRate = engine::mixer()->processingSampleRate();
 
 #ifdef VST_SNC_LATENCY
 	m_SncVSTplug->m_latency = m_SncVSTplug->m_bufferSize * m_SncVSTplug->m_bpm /

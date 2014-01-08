@@ -32,7 +32,7 @@
 
 #include "song.h"
 #include "engine.h"
-#include "mixer.h"
+#include "Mixer.h"
 #include "PeakController.h"
 #include "ControllerDialog.h"
 #include "plugins/peak_controller_effect/peak_controller_effect.h"

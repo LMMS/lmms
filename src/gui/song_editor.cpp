@@ -269,7 +269,7 @@ songEditor::songEditor( song * _song, songEditor * & _engine_ptr ) :
 	m_recordButton->setDisabled( true );
 	
 	// disable record buttons if capturing is not supported
-	if( !engine::getMixer()->audioDev()->supportsCapture() )
+	if( !engine::mixer()->audioDev()->supportsCapture() )
 	{
 		m_recordButton->setDisabled( true );
 		m_recordAccompanyButton->setDisabled( true );
@@ -408,9 +408,9 @@ songEditor::~songEditor()
 
 void songEditor::setHighQuality( bool _hq )
 {
-	engine::getMixer()->changeQuality( mixer::qualitySettings(
-			_hq ? mixer::qualitySettings::Mode_HighQuality :
-				mixer::qualitySettings::Mode_Draft ) );
+	engine::mixer()->changeQuality( Mixer::qualitySettings(
+			_hq ? Mixer::qualitySettings::Mode_HighQuality :
+				Mixer::qualitySettings::Mode_Draft ) );
 }
 
 
@@ -593,7 +593,7 @@ void songEditor::masterVolumeChanged( int _new_val )
 			QPoint( m_masterVolumeSlider->width() + 2, -2 ) );
 		m_mvsStatus->setVisibilityTimeOut( 1000 );
 	}
-	engine::getMixer()->setMasterGain( _new_val / 100.0f );
+	engine::mixer()->setMasterGain( _new_val / 100.0f );
 }
 
 

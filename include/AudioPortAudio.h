@@ -63,7 +63,7 @@ class lcdSpinBox;
 class AudioPortAudio : public AudioDevice
 {
 public:
-	AudioPortAudio( bool & _success_ful, mixer * _mixer );
+	AudioPortAudio( bool & _success_ful, Mixer* mixer );
 	virtual ~AudioPortAudio();
 
 	inline static QString name()

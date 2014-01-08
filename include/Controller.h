@@ -28,7 +28,7 @@
 #define _CONTROLLER_H
 
 #include "engine.h"
-#include "mixer.h"
+#include "Mixer.h"
 #include "Model.h"
 #include "JournallingObject.h"
 
@@ -65,7 +65,7 @@ public:
 	inline bool isSampleExact() const
 	{
 		return m_sampleExact ||
-			engine::getMixer()->currentQualitySettings().
+			engine::mixer()->currentQualitySettings().
 							sampleExactControllers;
 	}
 

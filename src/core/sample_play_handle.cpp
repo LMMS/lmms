@@ -121,7 +121,7 @@ void samplePlayHandle::play( sampleFrame * _working_buffer )
 		return;
 	}
 
-	const fpp_t frames = engine::getMixer()->framesPerPeriod();
+	const fpp_t frames = engine::mixer()->framesPerPeriod();
 	if( !( m_track && m_track->isMuted() )
 				&& !( m_bbTrack && m_bbTrack->isMuted() ) )
 	{
@@ -130,7 +130,7 @@ void samplePlayHandle::play( sampleFrame * _working_buffer )
 				m_volumeModel->value() / DefaultVolume } };
 		m_sampleBuffer->play( _working_buffer, &m_state, frames,
 								BaseFreq );
-		engine::getMixer()->bufferToPort( _working_buffer, frames,
+		engine::mixer()->bufferToPort( _working_buffer, frames,
 						offset(), v, m_audioPort );
 	}
 
@@ -159,8 +159,8 @@ bool samplePlayHandle::isFromTrack( const track * _track ) const
 f_cnt_t samplePlayHandle::totalFrames() const
 {
 	return( ( m_sampleBuffer->endFrame() - m_sampleBuffer->startFrame() ) *
-			( engine::getMixer()->processingSampleRate() /
-				engine::getMixer()->baseSampleRate() ) );
+			( engine::mixer()->processingSampleRate() /
+				engine::mixer()->baseSampleRate() ) );
 }
 
 

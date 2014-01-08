@@ -213,7 +213,7 @@ QString papuInstrument::nodeName() const
 
 /*f_cnt_t papuInstrument::desiredReleaseFrames() const
 {
-	const float samplerate = engine::getMixer()->processingSampleRate();
+	const float samplerate = engine::mixer()->processingSampleRate();
 	int maxrel = 0;
 	for( int i = 0 ; i < 3 ; ++i )
 	{
@@ -235,7 +235,7 @@ void papuInstrument::playNote( notePlayHandle * _n,
 						sampleFrame * _working_buffer )
 {
 	const f_cnt_t tfp = _n->totalFramesPlayed();
-	const int samplerate = engine::getMixer()->processingSampleRate();
+	const int samplerate = engine::mixer()->processingSampleRate();
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();
 
 	int data = 0;

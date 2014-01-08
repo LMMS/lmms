@@ -34,7 +34,7 @@
 #include "engine.h"
 #include "gui_templates.h"
 #include "MainWindow.h"
-#include "mixer.h"
+#include "Mixer.h"
 #include "rename_dialog.h"
 #include "song.h"
 #include "song_editor.h"
@@ -317,7 +317,7 @@ bbTrack::bbTrack( trackContainer * _tc ) :
 
 bbTrack::~bbTrack()
 {
-	engine::getMixer()->removePlayHandles( this );
+	engine::mixer()->removePlayHandles( this );
 
 	const int bb = s_infoMap[this];
 	engine::getBBTrackContainer()->removeBB( bb );

@@ -44,7 +44,7 @@ AudioFileOgg::AudioFileOgg( const sample_rate_t _sample_rate,
 				const bitrate_t _min_bitrate,
 				const bitrate_t _max_bitrate,
 				const int _depth,
-				mixer * _mixer ) :
+				Mixer*  _mixer ) :
 	AudioFileDevice( _sample_rate, _channels, _file, _use_vbr,
 				_nom_bitrate, _min_bitrate, _max_bitrate,
 								_depth, _mixer )

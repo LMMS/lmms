@@ -29,7 +29,7 @@
 #include "cpuload_widget.h"
 #include "embed.h"
 #include "engine.h"
-#include "mixer.h"
+#include "Mixer.h"
 
 
 cpuloadWidget::cpuloadWidget( QWidget * _parent ) :
@@ -90,7 +90,7 @@ void cpuloadWidget::paintEvent( QPaintEvent *  )
 void cpuloadWidget::updateCpuLoad()
 {
 	// smooth load-values a bit
-	Uint8 new_load = ( m_currentLoad + engine::getMixer()->cpuLoad() ) / 2;
+	Uint8 new_load = ( m_currentLoad + engine::mixer()->cpuLoad() ) / 2;
 	if( new_load != m_currentLoad )
 	{
 		m_currentLoad = new_load;

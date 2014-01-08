@@ -380,7 +380,7 @@ void Arpeggiator::processNote( notePlayHandle * _n )
 
 	// number of frames that every note should be played
 	const f_cnt_t arp_frames = (f_cnt_t)( m_arpTimeModel.value() / 1000.0f *
-				engine::getMixer()->processingSampleRate() );
+				engine::mixer()->processingSampleRate() );
 	const f_cnt_t gated_frames = (f_cnt_t)( m_arpGateModel.value() *
 							arp_frames / 100.0f );
 
@@ -393,13 +393,13 @@ void Arpeggiator::processNote( notePlayHandle * _n )
 	// used for loop
 	f_cnt_t frames_processed = 0;
 
-	while( frames_processed < engine::getMixer()->framesPerPeriod() )
+	while( frames_processed < engine::mixer()->framesPerPeriod() )
 	{
 		const f_cnt_t remaining_frames_for_cur_arp = arp_frames -
 						( cur_frame % arp_frames );
 		// does current arp-note fill whole audio-buffer?
 		if( remaining_frames_for_cur_arp >
-				engine::getMixer()->framesPerPeriod() )
+				engine::mixer()->framesPerPeriod() )
 		{
 			// then we don't have to do something!
 			break;
@@ -465,7 +465,7 @@ void Arpeggiator::processNote( notePlayHandle * _n )
 		// range-checking
 		if( sub_note_key >= NumKeys ||
 			sub_note_key < 0 ||
-					engine::getMixer()->criticalXRuns() )
+					engine::mixer()->criticalXRuns() )
 		{
 			continue;
 		}

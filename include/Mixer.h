@@ -1,7 +1,7 @@
 /*
- * mixer.h - audio-device-independent mixer for LMMS
+ * Mixer.h - audio-device-independent mixer for LMMS
  *
- * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -75,7 +75,7 @@ const Octaves BaseOctave = DefaultOctave;
 class MixerWorkerThread;
 
 
-class EXPORT mixer : public QObject
+class EXPORT Mixer : public QObject
 {
 	Q_OBJECT
 public:
@@ -377,13 +377,13 @@ private:
 	class fifoWriter : public QThread
 	{
 	public:
-		fifoWriter( mixer * _mixer, fifo * _fifo );
+		fifoWriter( Mixer * _mixer, fifo * _fifo );
 
 		void finish();
 
 
 	private:
-		mixer * m_mixer;
+		Mixer * m_mixer;
 		fifo * m_fifo;
 		volatile bool m_writing;
 
@@ -392,8 +392,8 @@ private:
 	} ;
 
 
-	mixer();
-	virtual ~mixer();
+	Mixer();
+	virtual ~Mixer();
 
 	void startProcessing( bool _needs_fifo = true );
 	void stopProcessing();

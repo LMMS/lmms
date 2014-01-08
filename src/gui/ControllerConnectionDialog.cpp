@@ -73,7 +73,7 @@ public:
 			m_detectedMidiChannel = _me.m_channel + 1;
 			m_detectedMidiController = ( _me.m_data.m_bytes[0] & 0x7F ) + 1;
 			m_detectedMidiPort =
-				engine::getMixer()->midiClient()->sourcePortName( _me );
+				engine::mixer()->midiClient()->sourcePortName( _me );
 
 			emit valueChanged();
 		}
@@ -168,7 +168,7 @@ ControllerConnectionDialog::ControllerConnectionDialog( QWidget * _parent,
 
 	// when using with non-raw-clients we can provide buttons showing
 	// our port-menus when being clicked
-	if( !engine::getMixer()->midiClient()->isRaw() )
+	if( !engine::mixer()->midiClient()->isRaw() )
 	{
 		m_readablePorts = new MidiPortMenu( MidiPort::Input );
 		connect( m_readablePorts, SIGNAL( triggered( QAction * ) ),

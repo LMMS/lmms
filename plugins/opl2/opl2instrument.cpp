@@ -141,13 +141,13 @@ opl2instrument::opl2instrument( InstrumentTrack * _instrument_track ) :
 
 	// Connect the plugin to the mixer...
 	InstrumentPlayHandle * iph = new InstrumentPlayHandle( this );
-	engine::getMixer()->addPlayHandle( iph );
+	engine::mixer()->addPlayHandle( iph );
 
 	// Create an emulator - samplerate, 16 bit, mono
 	// CTemuopl is the better one, CKemuopl kinda sucks (some sounds silent, pitch goes flat after a while)
 	emulatorMutex.lock();
-	// theEmulator = new CKemuopl(engine::getMixer()->processingSampleRate(), true, false);
-	theEmulator = new CTemuopl(engine::getMixer()->processingSampleRate(), true, false);
+	// theEmulator = new CKemuopl(engine::mixer()->processingSampleRate(), true, false);
+	theEmulator = new CTemuopl(engine::mixer()->processingSampleRate(), true, false);
 	theEmulator->init();
 	// Enable waveform selection
 	theEmulator->write(0x01,0x20);
@@ -158,7 +158,7 @@ opl2instrument::opl2instrument( InstrumentTrack * _instrument_track ) :
 	updatePatch();
 
 	// Can the buffer size change suddenly? I bet that would break lots of stuff
-	frameCount = engine::getMixer()->framesPerPeriod();
+	frameCount = engine::mixer()->framesPerPeriod();
 	renderbuffer = new short[frameCount];
 
 	// Some kind of sane default
@@ -167,7 +167,7 @@ opl2instrument::opl2instrument( InstrumentTrack * _instrument_track ) :
 	for(int i=1; i<9; ++i) {
 		voiceNote[i] = OPL2_VOICE_FREE;
 	}
-	connect( engine::getMixer(), SIGNAL( sampleRateChanged() ),
+	connect( engine::mixer(), SIGNAL( sampleRateChanged() ),
 		 this, SLOT( reloadEmulator() ) );
 	// Connect knobs
 	// This one's for testing...
@@ -216,7 +216,7 @@ opl2instrument::opl2instrument( InstrumentTrack * _instrument_track ) :
 // Samplerate changes when choosing oversampling, so this is more or less mandatory
 void opl2instrument::reloadEmulator() {
 	emulatorMutex.lock();
-	theEmulator = new CTemuopl(engine::getMixer()->processingSampleRate(), true, false);
+	theEmulator = new CTemuopl(engine::mixer()->processingSampleRate(), true, false);
 	theEmulator->init();
 	theEmulator->write(0x01,0x20);
 	emulatorMutex.unlock();

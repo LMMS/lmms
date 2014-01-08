@@ -399,7 +399,7 @@ sampleTrack::sampleTrack( trackContainer * _tc ) :
 
 sampleTrack::~sampleTrack()
 {
-	engine::getMixer()->removePlayHandles( this );
+	engine::mixer()->removePlayHandles( this );
 }
 
 
@@ -442,7 +442,7 @@ bool sampleTrack::play( const midiTime & _start, const fpp_t _frames,
 //			handle->setBBTrack( _tco_num );
 			handle->setOffset( _offset );
 			// send it to the mixer
-			engine::getMixer()->addPlayHandle( handle );
+			engine::mixer()->addPlayHandle( handle );
 			played_a_note = true;
 		}
 	}

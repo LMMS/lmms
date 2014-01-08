@@ -110,7 +110,7 @@ VstPlugin::VstPlugin( const QString & _plugin ) :
 
 	connect( engine::getSong(), SIGNAL( tempoChanged( bpm_t ) ),
 			this, SLOT( setTempo( bpm_t ) ) );
-	connect( engine::getMixer(), SIGNAL( sampleRateChanged() ),
+	connect( engine::mixer(), SIGNAL( sampleRateChanged() ),
 				this, SLOT( updateSampleRate() ) );
 
 	// update once per second
@@ -372,7 +372,7 @@ void VstPlugin::updateSampleRate()
 {
 	lock();
 	sendMessage( message( IdSampleRateInformation ).
-			addInt( engine::getMixer()->processingSampleRate() ) );
+			addInt( engine::mixer()->processingSampleRate() ) );
 	unlock();
 }
 

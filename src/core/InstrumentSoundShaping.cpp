@@ -114,7 +114,7 @@ float InstrumentSoundShaping::volumeLevel( notePlayHandle * _n,
 
 	if( _n->released() == false )
 	{
-		release_begin += engine::getMixer()->framesPerPeriod();
+		release_begin += engine::mixer()->framesPerPeriod();
 	}
 
 	float volume_level;
@@ -137,7 +137,7 @@ void InstrumentSoundShaping::processAudioBuffer( sampleFrame * _ab,
 
 	if( _n->released() == false )
 	{
-		release_begin += engine::getMixer()->framesPerPeriod();
+		release_begin += engine::mixer()->framesPerPeriod();
 	}
 
 	// because of optimizations, there's special code for several cases:
@@ -156,7 +156,7 @@ void InstrumentSoundShaping::processAudioBuffer( sampleFrame * _ab,
 		if( _n->m_filter == NULL )
 		{
 			_n->m_filter = new basicFilters<>(
-				engine::getMixer()->processingSampleRate() );
+				engine::mixer()->processingSampleRate() );
 		}
 		_n->m_filter->setFilterType( m_filterModel.value() );
 

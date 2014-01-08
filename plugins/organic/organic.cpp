@@ -116,7 +116,7 @@ organicInstrument::organicInstrument( InstrumentTrack * _instrument_track ) :
 	}
 	
 
-	connect( engine::getMixer(), SIGNAL( sampleRateChanged() ),
+	connect( engine::mixer(), SIGNAL( sampleRateChanged() ),
 					this, SLOT( updateAllDetuning() ) );
 
 }
@@ -551,10 +551,10 @@ void OscillatorObject::updateDetuning()
 {
 	m_detuningLeft = powf( 2.0f, m_harmonic
 				+ (float)m_detuneModel.value() / 100.0f ) /
-				engine::getMixer()->processingSampleRate();
+				engine::mixer()->processingSampleRate();
 	m_detuningRight = powf( 2.0f, m_harmonic
 				- (float)m_detuneModel.value() / 100.0f ) /
-				engine::getMixer()->processingSampleRate();
+				engine::mixer()->processingSampleRate();
 }
 
 

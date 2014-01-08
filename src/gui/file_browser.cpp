@@ -412,7 +412,7 @@ void fileBrowserTreeWidget::mousePressEvent( QMouseEvent * _me )
 		m_pphMutex.lock();
 		if( m_previewPlayHandle != NULL )
 		{
-			engine::getMixer()->removePlayHandle(
+			engine::mixer()->removePlayHandle(
 							m_previewPlayHandle );
 			m_previewPlayHandle = NULL;
 		}
@@ -446,7 +446,7 @@ void fileBrowserTreeWidget::mousePressEvent( QMouseEvent * _me )
 		}
 		if( m_previewPlayHandle != NULL )
 		{
-			if( !engine::getMixer()->addPlayHandle(
+			if( !engine::mixer()->addPlayHandle(
 							m_previewPlayHandle ) )
 			{
 				m_previewPlayHandle = NULL;
@@ -523,7 +523,7 @@ void fileBrowserTreeWidget::mouseReleaseEvent( QMouseEvent * _me )
 			samplePlayHandle * s = dynamic_cast<samplePlayHandle *>(
 							m_previewPlayHandle );
 			if( s && s->totalFrames() - s->framesDone() <=
-				static_cast<f_cnt_t>( engine::getMixer()->
+				static_cast<f_cnt_t>( engine::mixer()->
 						processingSampleRate() * 3 ) )
 			{
 				s->setDoneMayReturnTrue( true );
@@ -532,7 +532,7 @@ void fileBrowserTreeWidget::mouseReleaseEvent( QMouseEvent * _me )
 				return;
 			}
 		}
-		engine::getMixer()->removePlayHandle( m_previewPlayHandle );
+		engine::mixer()->removePlayHandle( m_previewPlayHandle );
 		m_previewPlayHandle = NULL;
 	}
 	m_pphMutex.unlock();
@@ -544,7 +544,7 @@ void fileBrowserTreeWidget::mouseReleaseEvent( QMouseEvent * _me )
 
 void fileBrowserTreeWidget::handleFile( fileItem * f, InstrumentTrack * _it )
 {
-	engine::getMixer()->lock();
+	engine::mixer()->lock();
 	switch( f->handling() )
 	{
 		case fileItem::LoadAsProject:
@@ -592,7 +592,7 @@ void fileBrowserTreeWidget::handleFile( fileItem * f, InstrumentTrack * _it )
 			break;
 
 	}
-	engine::getMixer()->unlock();
+	engine::mixer()->unlock();
 }
 
 
@@ -614,12 +614,12 @@ void fileBrowserTreeWidget::activateListItem( QTreeWidgetItem * _item,
 	}
 	else if( f->handling() != fileItem::NotSupported )
 	{
-		engine::getMixer()->lock();
+		engine::mixer()->lock();
 		InstrumentTrack * it = dynamic_cast<InstrumentTrack *>(
 				track::create( track::InstrumentTrack,
 					engine::getBBTrackContainer() ) );
 		handleFile( f, it );
-		engine::getMixer()->unlock();
+		engine::mixer()->unlock();
 	}
 }
 
@@ -631,11 +631,11 @@ void fileBrowserTreeWidget::openInNewInstrumentTrack( trackContainer * _tc )
 	if( m_contextMenuItem->handling() == fileItem::LoadAsPreset ||
 		m_contextMenuItem->handling() == fileItem::LoadByPlugin )
 	{
-		engine::getMixer()->lock();
+		engine::mixer()->lock();
 		InstrumentTrack * it = dynamic_cast<InstrumentTrack *>(
 				track::create( track::InstrumentTrack, _tc ) );
 		handleFile( m_contextMenuItem, it );
-		engine::getMixer()->unlock();
+		engine::mixer()->unlock();
 	}
 }
 

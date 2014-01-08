@@ -233,7 +233,7 @@ void malletsInstrument::playNote( notePlayHandle * _n,
 						m_vibratoFreqModel.value(),
 						p,
 						(Uint8) m_spreadModel.value(),
-				engine::getMixer()->processingSampleRate() );
+				engine::mixer()->processingSampleRate() );
 		}
 		else if( p == 9 )
 		{
@@ -246,7 +246,7 @@ void malletsInstrument::playNote( notePlayHandle * _n,
 						m_lfoSpeedModel.value(),
 						m_adsrModel.value(),
 						(Uint8) m_spreadModel.value(),
-				engine::getMixer()->processingSampleRate() );
+				engine::mixer()->processingSampleRate() );
 		}
 		else
 		{
@@ -259,7 +259,7 @@ void malletsInstrument::playNote( notePlayHandle * _n,
 						m_strikeModel.value() * 128.0,
 						m_velocityModel.value(),
 						(Uint8) m_spreadModel.value(),
-				engine::getMixer()->processingSampleRate() );
+				engine::mixer()->processingSampleRate() );
 		}
 		m.unlock();
 	}

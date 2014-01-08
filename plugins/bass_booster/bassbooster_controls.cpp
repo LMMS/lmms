@@ -46,7 +46,7 @@ bassBoosterControls::bassBoosterControls( bassBoosterEffect * _eff ) :
 	connect( &m_ratioModel, SIGNAL( dataChanged() ),
 			this, SLOT( changeRatio() ) );
 
-	connect( engine::getMixer(), SIGNAL( sampleRateChanged() ),
+	connect( engine::mixer(), SIGNAL( sampleRateChanged() ),
 			this, SLOT( changeFrequency() ) );
 	changeFrequency();
 	changeGain();
@@ -58,7 +58,7 @@ bassBoosterControls::bassBoosterControls( bassBoosterEffect * _eff ) :
 
 void bassBoosterControls::changeFrequency()
 {
-	const sample_t fac = engine::getMixer()->processingSampleRate() /
+	const sample_t fac = engine::mixer()->processingSampleRate() /
 								44100.0f;
 	m_effect->m_bbFX.leftFX().setFrequency( m_freqModel.value() * fac );
 	m_effect->m_bbFX.rightFX().setFrequency( m_freqModel.value() * fac );

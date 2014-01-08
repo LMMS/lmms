@@ -68,8 +68,8 @@ sampleRecordHandle::~sampleRecordHandle()
 
 void sampleRecordHandle::play( sampleFrame * /*_working_buffer*/ )
 {
-	const sampleFrame * recbuf = engine::getMixer()->inputBuffer();
-	const f_cnt_t frames = engine::getMixer()->inputBufferFrames();
+	const sampleFrame * recbuf = engine::mixer()->inputBuffer();
+	const f_cnt_t frames = engine::mixer()->inputBufferFrames();
 	writeBuffer( recbuf, frames );
 	m_framesRecorded += frames;
 
@@ -129,7 +129,7 @@ void sampleRecordHandle::createSampleBuffer( sampleBuffer * * _sample_buf )
 	}
 	// create according sample-buffer out of big buffer
 	*_sample_buf = new sampleBuffer( data, frames );
-	( *_sample_buf )->setSampleRate( engine::getMixer()->inputSampleRate() );
+	( *_sample_buf )->setSampleRate( engine::mixer()->inputSampleRate() );
 	delete[] data;
 }
 

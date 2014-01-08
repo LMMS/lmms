@@ -95,7 +95,7 @@ InstrumentTrack::InstrumentTrack( trackContainer * _tc ) :
 	track( track::InstrumentTrack, _tc ),
 	MidiEventProcessor(),
 	m_audioPort( tr( "unnamed_track" ) ),
-	m_midiPort( tr( "unnamed_track" ), engine::getMixer()->midiClient(),
+	m_midiPort( tr( "unnamed_track" ), engine::mixer()->midiClient(),
 								this, this ),
 	m_notes(),
 	m_sustainPedalPressed( false ),
@@ -187,7 +187,7 @@ void InstrumentTrack::processAudioBuffer( sampleFrame * _buf,
 		panning += _n->getPanning();
 		panning = tLimit<int>( panning, PanningLeft, PanningRight );
 	}
-	engine::getMixer()->bufferToPort( _buf, ( _n != NULL ) ?
+	engine::mixer()->bufferToPort( _buf, ( _n != NULL ) ?
 		qMin<f_cnt_t>(_n->framesLeftForCurrentPeriod(), _frames ) :
 								_frames,
 			( _n != NULL ) ? _n->offset() : 0,
@@ -220,7 +220,7 @@ midiEvent InstrumentTrack::applyMasterKey( const midiEvent & _me )
 void InstrumentTrack::processInEvent( const midiEvent & _me,
 							const midiTime & _time )
 {
-	engine::getMixer()->lock();
+	engine::mixer()->lock();
 
 	// in the special case this event comes from a MIDI port, the instrument
 	// is MIDI based (VST plugin, Sf2Player etc.) and the user did not set
@@ -230,7 +230,7 @@ void InstrumentTrack::processInEvent( const midiEvent & _me,
 			midiPort()->realOutputChannel() < 0 */ )
 	{
 		m_instrument->handleMidiEvent( _me, _time );
-		engine::getMixer()->unlock();
+		engine::mixer()->unlock();
 		return;
 	}
 
@@ -262,7 +262,7 @@ void InstrumentTrack::processInEvent( const midiEvent & _me,
 						engine::framesPerTick() ),
 						typeInfo<f_cnt_t>::max() / 2,
 									n );
-					if( engine::getMixer()->addPlayHandle(
+					if( engine::mixer()->addPlayHandle(
 									nph ) )
 					{
 						m_notes[_me.key()] = nph;
@@ -370,7 +370,7 @@ void InstrumentTrack::processInEvent( const midiEvent & _me,
 			}
 			break;
 	}
-	engine::getMixer()->unlock();
+	engine::mixer()->unlock();
 }
 
 
@@ -449,7 +449,7 @@ void InstrumentTrack::processOutEvent( const midiEvent & _me,
 
 void InstrumentTrack::silenceAllNotes()
 {
-	engine::getMixer()->lock();
+	engine::mixer()->lock();
 	for( int i = 0; i < NumKeys; ++i )
 	{
 		m_notes[i] = NULL;
@@ -458,8 +458,8 @@ void InstrumentTrack::silenceAllNotes()
 
 	// invalidate all NotePlayHandles linked to this track
 	m_processHandles.clear();
-	engine::getMixer()->removePlayHandles( this );
-	engine::getMixer()->unlock();
+	engine::mixer()->removePlayHandles( this );
+	engine::mixer()->unlock();
 }
 
 
@@ -562,13 +562,13 @@ void InstrumentTrack::setName( const QString & _new_name )
 
 void InstrumentTrack::updateBaseNote()
 {
-	engine::getMixer()->lock();
+	engine::mixer()->lock();
 	for( NotePlayHandleList::Iterator it = m_processHandles.begin();
 					it != m_processHandles.end(); ++it )
 	{
 		( *it )->updateFrequency();
 	}
-	engine::getMixer()->unlock();
+	engine::mixer()->unlock();
 }
 
 
@@ -662,7 +662,7 @@ bool InstrumentTrack::play( const midiTime & _start,
 			handle->setBBTrack( bb_track );
 			handle->setOffset( _offset );
 			// send it to the mixer
-			engine::getMixer()->addPlayHandle( handle );
+			engine::mixer()->addPlayHandle( handle );
 			played_a_note = true;
 			continue;
 		}
@@ -720,7 +720,7 @@ bool InstrumentTrack::play( const midiTime & _start,
 #if LMMS_SINGERBOT_SUPPORT
 				note_play_handle->setPatternIndex( note_idx );
 #endif
-				engine::getMixer()->addPlayHandle(
+				engine::mixer()->addPlayHandle(
 							note_play_handle );
 				played_a_note = true;
 #if LMMS_SINGERBOT_SUPPORT
@@ -783,7 +783,7 @@ void InstrumentTrack::loadTrackSpecificSettings( const QDomElement & _this )
 {
 	silenceAllNotes();
 
-	engine::getMixer()->lock();
+	engine::mixer()->lock();
 
 	m_volumeModel.loadSettings( _this, "vol" );
 
@@ -878,7 +878,7 @@ void InstrumentTrack::loadTrackSpecificSettings( const QDomElement & _this )
 		}
 		node = node.nextSibling();
         }
-	engine::getMixer()->unlock();
+	engine::mixer()->unlock();
 }
 
 
@@ -888,10 +888,10 @@ Instrument * InstrumentTrack::loadInstrument( const QString & _plugin_name )
 {
 	silenceAllNotes();
 
-	engine::getMixer()->lock();
+	engine::mixer()->lock();
 	delete m_instrument;
 	m_instrument = Instrument::instantiate( _plugin_name, this );
-	engine::getMixer()->unlock();
+	engine::mixer()->unlock();
 
 	emit instrumentChanged();
 
@@ -963,7 +963,7 @@ InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it,
 	m_midiMenu = new QMenu( tr( "MIDI" ), this );
 
 	// sequenced MIDI?
-	if( !engine::getMixer()->midiClient()->isRaw() )
+	if( !engine::mixer()->midiClient()->isRaw() )
 	{
 		_it->m_midiPort.m_readablePortsMenu = new MidiPortMenu(
 							MidiPort::Input );

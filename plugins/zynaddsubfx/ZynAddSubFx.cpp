@@ -129,9 +129,9 @@ ZynAddSubFxInstrument::ZynAddSubFxInstrument(
 
 	// now we need a play-handle which cares for calling play()
 	InstrumentPlayHandle * iph = new InstrumentPlayHandle( this );
-	engine::getMixer()->addPlayHandle( iph );
+	engine::mixer()->addPlayHandle( iph );
 
-	connect( engine::getMixer(), SIGNAL( sampleRateChanged() ),
+	connect( engine::mixer(), SIGNAL( sampleRateChanged() ),
 			this, SLOT( reloadPlugin() ) );
 }
 
@@ -140,7 +140,7 @@ ZynAddSubFxInstrument::ZynAddSubFxInstrument(
 
 ZynAddSubFxInstrument::~ZynAddSubFxInstrument()
 {
-	engine::getMixer()->removePlayHandles( instrumentTrack() );
+	engine::mixer()->removePlayHandles( instrumentTrack() );
 
 	m_pluginMutex.lock();
 	delete m_remotePlugin;
@@ -334,7 +334,7 @@ void ZynAddSubFxInstrument::play( sampleFrame * _buf )
 	}
 	m_pluginMutex.unlock();
 	instrumentTrack()->processAudioBuffer( _buf,
-				engine::getMixer()->framesPerPeriod(), NULL );
+				engine::mixer()->framesPerPeriod(), NULL );
 }
 
 
@@ -440,8 +440,8 @@ void ZynAddSubFxInstrument::initPlugin()
 	else
 	{
 		m_plugin = new LocalZynAddSubFx;
-		m_plugin->setSampleRate( engine::getMixer()->processingSampleRate() );
-		m_plugin->setBufferSize( engine::getMixer()->framesPerPeriod() );
+		m_plugin->setSampleRate( engine::mixer()->processingSampleRate() );
+		m_plugin->setBufferSize( engine::mixer()->framesPerPeriod() );
 	}
 	m_pluginMutex.unlock();
 }

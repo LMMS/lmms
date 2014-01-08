@@ -242,9 +242,9 @@ void trackContainerView::deleteTrackView( trackView * _tv )
 	removeTrackView( _tv );
 	delete _tv;
 
-	engine::getMixer()->lock();
+	engine::mixer()->lock();
 	delete t;
-	engine::getMixer()->unlock();
+	engine::mixer()->unlock();
 }
 
 
@@ -381,7 +381,7 @@ void trackContainerView::dropEvent( QDropEvent * _de )
 {
 	QString type = stringPairDrag::decodeKey( _de );
 	QString value = stringPairDrag::decodeValue( _de );
-	engine::getMixer()->lock();
+	engine::mixer()->lock();
 	if( type == "instrument" )
 	{
 		InstrumentTrack * it = dynamic_cast<InstrumentTrack *>(
@@ -425,7 +425,7 @@ void trackContainerView::dropEvent( QDropEvent * _de )
 		track::create( mmp.content().firstChild().toElement(), m_tc );
 		_de->accept();
 	}
-	engine::getMixer()->unlock();
+	engine::mixer()->unlock();
 }
 
 

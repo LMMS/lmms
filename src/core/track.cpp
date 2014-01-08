@@ -1484,9 +1484,9 @@ void trackOperationsWidget::paintEvent( QPaintEvent * _pe )
  */
 void trackOperationsWidget::cloneTrack()
 {
-	engine::getMixer()->lock();
+	engine::mixer()->lock();
 	m_trackView->getTrack()->clone();
-	engine::getMixer()->unlock();
+	engine::mixer()->unlock();
 }
 
 
@@ -2310,9 +2310,9 @@ void trackView::dropEvent( QDropEvent * _de )
 		// value contains our XML-data so simply create a
 		// multimediaProject which does the rest for us...
 		multimediaProject mmp( value.toUtf8() );
-		engine::getMixer()->lock();
+		engine::mixer()->lock();
 		m_track->restoreState( mmp.content().firstChild().toElement() );
-		engine::getMixer()->unlock();
+		engine::mixer()->unlock();
 		_de->accept();
 	}
 }

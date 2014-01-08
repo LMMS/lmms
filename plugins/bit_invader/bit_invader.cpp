@@ -278,7 +278,7 @@ void bitInvader::playNote( notePlayHandle * _n,
 					m_graph.length(),
 					_n,
 					m_interpolation.value(), factor,
-				engine::getMixer()->processingSampleRate() );
+				engine::mixer()->processingSampleRate() );
 	}
 
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();

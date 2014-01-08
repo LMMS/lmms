@@ -1,7 +1,7 @@
 /*
  * engine.h - engine-system of LMMS
  *
- * Copyright (c) 2006-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -40,7 +40,7 @@ class FxMixer;
 class FxMixerView;
 class ProjectJournal;
 class MainWindow;
-class mixer;
+class Mixer;
 class pianoRoll;
 class projectNotes;
 class song;
@@ -71,7 +71,7 @@ public:
 	}
 
 	// core
-	static mixer * getMixer()
+	static Mixer *mixer()
 	{
 		return s_mixer;
 	}
@@ -177,7 +177,7 @@ private:
 	static float s_framesPerTick;
 
 	// core
-	static mixer * s_mixer;
+	static Mixer *s_mixer;
 	static FxMixer * s_fxMixer;
 	static song * s_song;
 	static bbTrackContainer * s_bbTrackContainer;

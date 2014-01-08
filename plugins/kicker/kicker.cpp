@@ -117,7 +117,7 @@ void kickerInstrument::playNote( notePlayHandle * _n,
 						sampleFrame * _working_buffer )
 {
 	const float decfr = m_decayModel.value() *
-			engine::getMixer()->processingSampleRate() / 1000.0f;
+			engine::mixer()->processingSampleRate() / 1000.0f;
 	const f_cnt_t tfp = _n->totalFramesPlayed();
 
 	if ( tfp == 0 )
@@ -136,9 +136,9 @@ void kickerInstrument::playNote( notePlayHandle * _n,
 /*	const fpp_t frames = _n->released() ?
 		tMax( tMin<f_cnt_t>( desiredReleaseFrames() -
 							_n->releaseFramesDone(),
-			engine::getMixer()->framesPerAudioBuffer() ), 0 )
+			engine::mixer()->framesPerAudioBuffer() ), 0 )
 		:
-		engine::getMixer()->framesPerAudioBuffer();*/
+		engine::mixer()->framesPerAudioBuffer();*/
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();
 	const float f1 = m_startFreqModel.value() + tfp * fdiff / decfr;
 	const float f2 = m_startFreqModel.value() + (frames+tfp-1)*fdiff/decfr;
@@ -146,7 +146,7 @@ void kickerInstrument::playNote( notePlayHandle * _n,
 
 	SweepOsc * so = static_cast<SweepOsc *>( _n->m_pluginData );
 	so->update( _working_buffer, frames, f1, f2,
-				engine::getMixer()->processingSampleRate() );
+				engine::mixer()->processingSampleRate() );
 
 	if( _n->released() )
 	{

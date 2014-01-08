@@ -33,7 +33,7 @@
 #include "AudioDevice.h"
 #include "engine.h"
 #include "ladspa_2_lmms.h"
-#include "mixer.h"
+#include "Mixer.h"
 
 
 
@@ -74,7 +74,7 @@ ladspaDescription::ladspaDescription( QWidget * _parent,
 	{
 		if( _type != VALID || 
 			manager->getDescription( ( *it ).second )->inputChannels
-				<= engine::getMixer()->audioDev()->channels() )
+				<= engine::mixer()->audioDev()->channels() )
 		{ 
 			pluginNames.push_back( ( *it ).first );
 			m_pluginKeys.push_back( ( *it ).second );

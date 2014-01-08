@@ -36,7 +36,7 @@
 #include "InstrumentTrack.h"
 #include "ladspa_2_lmms.h"
 #include "MainWindow.h"
-#include "mixer.h"
+#include "Mixer.h"
 #include "pattern.h"
 #include "piano_roll.h"
 #include "preset_preview_play_handle.h"
@@ -50,7 +50,7 @@
 bool engine::s_hasGUI = true;
 bool engine::s_suppressMessages = false;
 float engine::s_framesPerTick;
-mixer * engine::s_mixer = NULL;
+Mixer* engine::s_mixer = NULL;
 FxMixer * engine::s_fxMixer = NULL;
 FxMixerView * engine::s_fxMixerView = NULL;
 MainWindow * engine::s_mainWindow = NULL;
@@ -77,7 +77,7 @@ void engine::init( const bool _has_gui )
 	initPluginFileHandling();
 
 	s_projectJournal = new ProjectJournal;
-	s_mixer = new mixer;
+	s_mixer = new Mixer;
 	s_song = new song;
 	s_fxMixer = new FxMixer;
 	s_bbTrackContainer = new bbTrackContainer;

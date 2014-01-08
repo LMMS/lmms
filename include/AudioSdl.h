@@ -40,7 +40,7 @@ class QLineEdit;
 class AudioSdl : public AudioDevice
 {
 public:
-	AudioSdl( bool & _success_ful, mixer * _mixer );
+	AudioSdl( bool & _success_ful, Mixer* mixer );
 	virtual ~AudioSdl();
 
 	inline static QString name()

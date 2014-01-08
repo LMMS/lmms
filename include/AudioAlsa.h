@@ -44,7 +44,7 @@ class QLineEdit;
 class AudioAlsa : public AudioDevice, public QThread
 {
 public:
-	AudioAlsa( bool & _success_ful, mixer * _mixer );
+	AudioAlsa( bool & _success_ful, Mixer* mixer );
 	virtual ~AudioAlsa();
 
 	inline static QString name()

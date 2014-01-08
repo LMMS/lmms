@@ -24,7 +24,7 @@
 
 #include "Oscillator.h"
 #include "engine.h"
-#include "mixer.h"
+#include "Mixer.h"
 #include "AutomatableModel.h"
 
 
@@ -55,9 +55,9 @@ Oscillator::Oscillator( const IntModel * _wave_shape_model,
 void Oscillator::update( sampleFrame * _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl )
 {
-	if( m_freq >= engine::getMixer()->processingSampleRate() / 2 )
+	if( m_freq >= engine::mixer()->processingSampleRate() / 2 )
 	{
-		mixer::clearAudioBuffer( _ab, _frames );
+		Mixer::clearAudioBuffer( _ab, _frames );
 		return;
 	}
 	if( m_subOsc != NULL )
@@ -456,7 +456,7 @@ void Oscillator::updateFM( sampleFrame * _ab, const fpp_t _frames,
 	recalcPhase();
 	const float osc_coeff = m_freq * m_detuning;
 	const float sampleRateCorrection = 44100.0f /
-				engine::getMixer()->processingSampleRate();
+				engine::mixer()->processingSampleRate();
 
 	for( fpp_t frame = 0; frame < _frames; ++frame )
 	{

@@ -62,14 +62,14 @@ FileEncodeDevice __fileEncodeDevices[] =
 
 
 
-ProjectRenderer::ProjectRenderer( const mixer::qualitySettings & _qs,
+ProjectRenderer::ProjectRenderer( const Mixer::qualitySettings & _qs,
 					const OutputSettings & _os,
 					ExportFileFormats _file_format,
 					const QString & _out_file ) :
-	QThread( engine::getMixer() ),
+	QThread( engine::mixer() ),
 	m_fileDev( NULL ),
 	m_qualitySettings( _qs ),
-	m_oldQualitySettings( engine::getMixer()->currentQualitySettings() ),
+	m_oldQualitySettings( engine::mixer()->currentQualitySettings() ),
 	m_progress( 0 ),
 	m_abort( false )
 {
@@ -84,7 +84,7 @@ ProjectRenderer::ProjectRenderer( const mixer::qualitySettings & _qs,
 				_out_file, _os.vbr,
 				_os.bitrate, _os.bitrate - 64, _os.bitrate + 64,
 				_os.depth == Depth_32Bit ? 32 : 16,
-							engine::getMixer() );
+							engine::mixer() );
 	if( success_ful == false )
 	{
 		delete m_fileDev;
@@ -132,7 +132,7 @@ void ProjectRenderer::startProcessing()
 		// have to do mixer stuff with GUI-thread-affinity in order to
 		// make slots connected to sampleRateChanged()-signals being
 		// called immediately
-		engine::getMixer()->setAudioDevice( m_fileDev,
+		engine::mixer()->setAudioDevice( m_fileDev,
 						m_qualitySettings, false );
 
 		start(
@@ -183,8 +183,8 @@ void ProjectRenderer::run()
 
 	const QString f = m_fileDev->outputFile();
 
-	engine::getMixer()->restoreAudioDevice();  // also deletes audio-dev
-	engine::getMixer()->changeQuality( m_oldQualitySettings );
+	engine::mixer()->restoreAudioDevice();  // also deletes audio-dev
+	engine::mixer()->changeQuality( m_oldQualitySettings );
 
 	// if the user aborted export-process, the file has to be deleted
 	if( m_abort )

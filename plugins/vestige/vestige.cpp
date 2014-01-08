@@ -83,7 +83,7 @@ vestigeInstrument::vestigeInstrument( InstrumentTrack * _instrument_track ) :
 {
 	// now we need a play-handle which cares for calling play()
 	InstrumentPlayHandle * iph = new InstrumentPlayHandle( this );
-	engine::getMixer()->addPlayHandle( iph );
+	engine::mixer()->addPlayHandle( iph );
 }
 
 
@@ -101,7 +101,7 @@ vestigeInstrument::~vestigeInstrument()
 		knobFModel = NULL;
 	}
 
-	engine::getMixer()->removePlayHandles( instrumentTrack() );
+	engine::mixer()->removePlayHandles( instrumentTrack() );
 	closePlugin();
 }
 
@@ -301,7 +301,7 @@ void vestigeInstrument::play( sampleFrame * _buf )
 
 	m_plugin->process( NULL, _buf );
 
-	const fpp_t frames = engine::getMixer()->framesPerPeriod();
+	const fpp_t frames = engine::mixer()->framesPerPeriod();
 
 	instrumentTrack()->processAudioBuffer( _buf, frames, NULL );
 
@@ -652,7 +652,7 @@ void VestigeInstrumentView::openPlugin()
 		{
 			return;
 		}
-		engine::getMixer()->lock();
+		engine::mixer()->lock();
 		
 		if (m_vi->p_subWindow != NULL) {
 			delete m_vi->p_subWindow;
@@ -660,7 +660,7 @@ void VestigeInstrumentView::openPlugin()
 		}
 
 		m_vi->loadFile( ofd.selectedFiles()[0] );
-		engine::getMixer()->unlock();
+		engine::mixer()->unlock();
 		if( m_vi->m_plugin && m_vi->m_plugin->pluginWidget() )
 		{
 			m_vi->m_plugin->pluginWidget()->setWindowIcon(

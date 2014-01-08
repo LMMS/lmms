@@ -31,7 +31,7 @@
 #include <QtGui/QWidget>
 
 #include "AutomatableModel.h"
-#include "mixer.h"
+#include "Mixer.h"
 
 
 class QPixmap;
