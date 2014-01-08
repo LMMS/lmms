@@ -26,6 +26,7 @@
 
 #include "mixer.h"
 #include "FxMixer.h"
+#include "MixHelpers.h"
 #include "play_handle.h"
 #include "song.h"
 #include "templates.h"
@@ -715,12 +716,10 @@ void mixer::bufferToPort( const sampleFrame * _buf,
 	const int loop1_frame = qMin<int>( end_frame, m_framesPerPeriod );
 
 	_port->lockFirstBuffer();
-	sampleFrame * obuf = _port->firstBuffer()+start_frame;
-	for( int frame = 0; frame < loop1_frame-start_frame; ++frame )
-	{
-		obuf[frame][0] += _buf[frame][0] * _vv.vol[0];
-		obuf[frame][1] += _buf[frame][1] * _vv.vol[1];
-	}
+	MixHelpers::addMultipliedStereo( _port->firstBuffer()+start_frame,	// dst
+										_buf,							// src
+										_vv.vol[0], _vv.vol[1],			// coeff left/right
+										loop1_frame - start_frame );	// frame count
 	_port->unlockFirstBuffer();
 
 	_port->lockSecondBuffer();
@@ -729,14 +728,12 @@ void mixer::bufferToPort( const sampleFrame * _buf,
 		const int frames_done = m_framesPerPeriod - start_frame;
 		end_frame -= m_framesPerPeriod;
 		end_frame = qMin<int>( end_frame, m_framesPerPeriod );
-		sampleFrame * obuf = _port->secondBuffer();
-		for( fpp_t frame = 0; frame < end_frame; ++frame )
-		{
-			obuf[frame][0] += _buf[frames_done + frame][0] *
-								_vv.vol[0];
-			obuf[frame][1] += _buf[frames_done + frame][1] *
-								_vv.vol[1];
-		}
+
+		MixHelpers::addMultipliedStereo( _port->secondBuffer(),			// dst
+											_buf+frames_done,			// src
+											_vv.vol[0], _vv.vol[1],		// coeff left/right
+											end_frame );				// frame count
+
 		// we used both buffers so set flags
 		_port->m_bufferUsage = AudioPort::BothBuffers;
 	}
