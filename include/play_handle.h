@@ -1,7 +1,7 @@
 /*
  * play_handle.h - base-class playHandle - core of rendering engine
  *
- * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -28,12 +28,13 @@
 #include <QtCore/QThread>
 #include <QtCore/QVector>
 
+#include "ThreadableJob.h"
 #include "lmms_basics.h"
 
 class track;
 
 
-class playHandle
+class playHandle : public ThreadableJob
 {
 public:
 	enum types
@@ -69,6 +70,18 @@ public:
 	{
 		return m_type;
 	}
+
+	// required for ThreadableJob
+	virtual void doProcessing( sampleFrame * _working_buffer )
+	{
+		play( _working_buffer );
+	}
+
+	virtual bool requiresProcessing() const
+	{
+		return !done();
+	}
+
 
 	virtual void play( sampleFrame * _working_buffer ) = 0;
 	virtual bool done( void ) const = 0;

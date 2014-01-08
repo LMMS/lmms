@@ -2,7 +2,7 @@
  * InstrumentTrack.cpp - implementation of instrument-track-class
  *                        (window + data-structures)
  *
- * Copyright (c) 2004-2013 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -106,13 +106,14 @@ InstrumentTrack::InstrumentTrack( trackContainer * _tc ) :
         m_panningModel( DefaultPanning, PanningLeft, PanningRight, 0.1f,
 							this, tr( "Panning" ) ),
 	m_pitchModel( 0, -100, 100, 1, this, tr( "Pitch" ) ),
-	m_effectChannelModel( 0, 0, NumFxChannels, this, tr( "FX channel" ) ),
+	m_effectChannelModel( 0, 0, 0, this, tr( "FX channel" ) ),
 	m_instrument( NULL ),
 	m_soundShaping( this ),
 	m_arpeggiator( this ),
 	m_chordCreator( this ),
 	m_piano( this )
 {
+    m_effectChannelModel.setRange( 0, engine::fxMixer()->numChannels()-1, 1);
 	m_baseNoteModel.setInitValue( DefaultKey );
 	connect( &m_baseNoteModel, SIGNAL( dataChanged() ),
 			this, SLOT( updateBaseNote() ) );
