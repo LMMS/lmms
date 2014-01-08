@@ -803,6 +803,7 @@ void song::stop()
 		{
 			case timeLine::BackToZero:
 				m_playPos[m_playMode].setTicks( 0 );
+				m_elapsedMilliSeconds = 0;
 				break;
 
 			case timeLine::BackToStart:
@@ -810,6 +811,7 @@ void song::stop()
 				{
 					m_playPos[m_playMode].setTicks(
 						tl->savedPos().getTicks() );
+					m_elapsedMilliSeconds = (((tl->savedPos().getTicks())*60*1000/48)/getTempo());
 					tl->savePos( -1 );
 				}
 				break;
@@ -822,6 +824,7 @@ void song::stop()
 	else
 	{
 		m_playPos[m_playMode].setTicks( 0 );
+		m_elapsedMilliSeconds = 0;
 	}
 
 	m_playPos[m_playMode].setCurrentFrame( 0 );
