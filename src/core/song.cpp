@@ -1049,7 +1049,7 @@ void song::createNewProject()
 	t = track::create( track::InstrumentTrack,
 						engine::getBBTrackContainer() );
 	dynamic_cast<InstrumentTrack * >( t )->loadInstrument(
-						"tripleoscillator" );
+						"kicker" );
 	track::create( track::SampleTrack, this );
 	track::create( track::BBTrack, this );
 	track::create( track::AutomationTrack, this );
