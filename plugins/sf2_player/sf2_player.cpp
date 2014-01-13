@@ -863,7 +863,7 @@ sf2InstrumentView::sf2InstrumentView( Instrument * _instrument,
 	
 	m_reverbButton = new pixmapButton( this );
 	m_reverbButton->setCheckable( true );
-	m_reverbButton->move( 24, 176 );
+	m_reverbButton->move( 14, 180 );
 	m_reverbButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"reverb_on" ) );
 	m_reverbButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
@@ -905,7 +905,7 @@ sf2InstrumentView::sf2InstrumentView( Instrument * _instrument,
 
 	m_chorusButton = new pixmapButton( this );
 	m_chorusButton->setCheckable( true );
-	m_chorusButton->move( 24, 222 );
+	m_chorusButton->move( 14, 226 );
 	m_chorusButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"chorus_on" ) );
 	m_chorusButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
