@@ -1,5 +1,5 @@
 /*
- * sample_record_handle.h - play-handle for recording a sample
+ * SampleRecordHandle.h - play-handle for recording a sample
  *
  * Copyright (c) 2008 Csaba Hruska <csaba.hruska/at/gmail.com>
  * 
@@ -31,19 +31,19 @@
 #include <qobject.h>
 
 #include "Mixer.h"
-#include "sample_buffer.h"
+#include "SampleBuffer.h"
 
 class bbTrack;
 class pattern;
-class sampleTCO;
+class SampleTCO;
 class track;
 
 
-class sampleRecordHandle : public playHandle
+class SampleRecordHandle : public playHandle
 {
 public:
-	sampleRecordHandle( sampleTCO * _tco );
-	virtual ~sampleRecordHandle();
+	SampleRecordHandle( SampleTCO* tco );
+	virtual ~SampleRecordHandle();
 
 	virtual void play( sampleFrame * _working_buffer );
 	virtual bool done() const;
@@ -51,7 +51,7 @@ public:
 	virtual bool isFromTrack( const track * _track ) const;
 
 	f_cnt_t framesRecorded() const;
-	void createSampleBuffer( sampleBuffer * * _sample_buf );
+	void createSampleBuffer( SampleBuffer * * _sample_buf );
 
 
 private:
@@ -65,7 +65,7 @@ private:
 
 	track * m_track;
 	bbTrack * m_bbTrack;
-	sampleTCO * m_tco;
+	SampleTCO * m_tco;
 
 } ;
 

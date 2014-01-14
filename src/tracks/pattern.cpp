@@ -42,7 +42,7 @@
 #include "piano_roll.h"
 #include "TrackContainer.h"
 #include "rename_dialog.h"
-#include "sample_buffer.h"
+#include "SampleBuffer.h"
 #include "AudioSampleRecorder.h"
 #include "song.h"
 #include "tooltip.h"

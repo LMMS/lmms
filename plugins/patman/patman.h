@@ -28,7 +28,7 @@
 
 #include "Instrument.h"
 #include "InstrumentView.h"
-#include "sample_buffer.h"
+#include "SampleBuffer.h"
 #include "AutomatableModel.h"
 
 
@@ -79,13 +79,13 @@ public slots:
 private:
 	typedef struct
 	{
-		sampleBuffer::handleState * state;
+		SampleBuffer::handleState* state;
 		bool tuned;
-		sampleBuffer * sample;
+		SampleBuffer* sample;
 	} handle_data;
 
 	QString m_patchFile;
-	QVector<sampleBuffer *> m_patchSamples;
+	QVector<SampleBuffer *> m_patchSamples;
 	BoolModel m_loopedModel;
 	BoolModel m_tunedModel;
 

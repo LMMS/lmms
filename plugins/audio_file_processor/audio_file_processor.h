@@ -2,7 +2,7 @@
  * audio_file_processor.h - declaration of class audioFileProcessor
  *                          (instrument-plugin for using audio-files)
  *
- * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -31,7 +31,7 @@
 
 #include "Instrument.h"
 #include "InstrumentView.h"
-#include "sample_buffer.h"
+#include "SampleBuffer.h"
 #include "knob.h"
 #include "pixmap_button.h"
 
@@ -81,9 +81,9 @@ signals:
 
 
 private:
-	typedef sampleBuffer::handleState handleState;
+	typedef SampleBuffer::handleState handleState;
 
-	sampleBuffer m_sampleBuffer;
+	SampleBuffer m_sampleBuffer;
 	
 	FloatModel m_ampModel;
 	FloatModel m_startPointModel;
@@ -219,7 +219,7 @@ private:
 		sample_end,
 	} ;
 
-	sampleBuffer & m_sampleBuffer;
+	SampleBuffer& m_sampleBuffer;
 	QPixmap m_graph;
 	f_cnt_t m_from;
 	f_cnt_t m_to;
@@ -237,7 +237,7 @@ private:
 	bool m_animation;
 
 public:
-	AudioFileProcessorWaveView( QWidget * _parent, int _w, int _h, sampleBuffer & _buf );
+	AudioFileProcessorWaveView( QWidget * _parent, int _w, int _h, SampleBuffer& buf );
 	void setKnobs( knob * _start, knob * _end );
 
 

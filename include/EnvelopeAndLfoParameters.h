@@ -1,7 +1,7 @@
 /*
  * EnvelopeAndLfoParameters.h - class EnvelopeAndLfoParameters
  *
- * Copyright (c) 2004-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -29,7 +29,7 @@
 
 #include "JournallingObject.h"
 #include "AutomatableModel.h"
-#include "sample_buffer.h"
+#include "SampleBuffer.h"
 #include "TempoSyncKnobModel.h"
 #include "lmms_basics.h"
 
@@ -158,7 +158,7 @@ private:
 	bool m_lfoAmountIsZero;
 	sample_t * m_lfoShapeData;
 	bool m_bad_lfoShapeData;
-	sampleBuffer m_userWave;
+	SampleBuffer m_userWave;
 
 	enum LfoShapes
 	{

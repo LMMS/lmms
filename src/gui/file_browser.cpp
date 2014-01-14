@@ -2,7 +2,7 @@
  * file_browser.cpp - implementation of the project-, preset- and
  *                    sample-file-browser
  *
- * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -45,7 +45,7 @@
 #include "MainWindow.h"
 #include "mmp.h"
 #include "preset_preview_play_handle.h"
-#include "sample_play_handle.h"
+#include "SamplePlayHandle.h"
 #include "song.h"
 #include "string_pair_drag.h"
 #include "text_float.h"
@@ -418,7 +418,7 @@ void fileBrowserTreeWidget::mousePressEvent( QMouseEvent * _me )
 		}
 
 		// in special case of sample-files we do not care about
-		// handling() rather than directly creating a samplePlayHandle
+		// handling() rather than directly creating a SamplePlayHandle
 		if( f->type() == fileItem::SampleFile )
 		{
 			textFloat * tf = textFloat::displayMessage(
@@ -429,7 +429,7 @@ void fileBrowserTreeWidget::mousePressEvent( QMouseEvent * _me )
 								24, 24 ), 0 );
 			qApp->processEvents(
 					QEventLoop::ExcludeUserInputEvents );
-			samplePlayHandle * s = new samplePlayHandle(
+			SamplePlayHandle * s = new SamplePlayHandle(
 								f->fullName() );
 			s->setDoneMayReturnTrue( false );
 			m_previewPlayHandle = s;
@@ -520,7 +520,7 @@ void fileBrowserTreeWidget::mouseReleaseEvent( QMouseEvent * _me )
 		if( m_previewPlayHandle->type() ==
 						playHandle::SamplePlayHandle )
 		{
-			samplePlayHandle * s = dynamic_cast<samplePlayHandle *>(
+			SamplePlayHandle * s = dynamic_cast<SamplePlayHandle *>(
 							m_previewPlayHandle );
 			if( s && s->totalFrames() - s->framesDone() <=
 				static_cast<f_cnt_t>( engine::mixer()->

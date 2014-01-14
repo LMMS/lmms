@@ -192,9 +192,8 @@ void patmanInstrument::setFile( const QString & _patch_file, bool _rename )
 	// else we don't touch the instrument-track-name, because the user
 	// named it self
 
-	m_patchFile = sampleBuffer::tryToMakeRelative( _patch_file );
-	LoadErrors error = loadPatch( sampleBuffer::tryToMakeAbsolute(
-								_patch_file ) );
+	m_patchFile = SampleBuffer::tryToMakeRelative( _patch_file );
+	LoadErrors error = loadPatch( SampleBuffer::tryToMakeAbsolute( _patch_file ) );
 	if( error )
 	{
 		printf("Load error\n");
@@ -351,7 +350,7 @@ patmanInstrument::LoadErrors patmanInstrument::loadPatch(
 			}
 		}
 
-		sampleBuffer * psample = new sampleBuffer( data, frames );
+		SampleBuffer* psample = new SampleBuffer( data, frames );
 		psample->setFrequency( root_freq / 1000.0f );
 		psample->setSampleRate( sample_rate );
 
@@ -390,10 +389,9 @@ void patmanInstrument::selectSample( notePlayHandle * _n )
 	const float freq = _n->frequency();
 
 	float min_dist = HUGE_VALF;
-	sampleBuffer * sample = NULL;
+	SampleBuffer* sample = NULL;
 
-	for( QVector<sampleBuffer *>::iterator it = m_patchSamples.begin();
-					it != m_patchSamples.end(); ++it )
+	for( QVector<SampleBuffer *>::iterator it = m_patchSamples.begin(); it != m_patchSamples.end(); ++it )
 	{
 		float patch_freq = ( *it )->frequency();
 		float dist = freq >= patch_freq ? freq / patch_freq :
@@ -414,9 +412,9 @@ void patmanInstrument::selectSample( notePlayHandle * _n )
 	}
 	else
 	{
-		hdata->sample = new sampleBuffer( NULL, 0 );
+		hdata->sample = new SampleBuffer( NULL, 0 );
 	}
-	hdata->state = new sampleBuffer::handleState( _n->hasDetuningInfo() );
+	hdata->state = new SampleBuffer::handleState( _n->hasDetuningInfo() );
 
 	_n->m_pluginData = hdata;
 }

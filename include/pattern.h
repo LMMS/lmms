@@ -2,7 +2,7 @@
  * pattern.h - declaration of class pattern, which contains all informations
  *             about a pattern
  *
- * Copyright (c) 2004-2011 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -43,7 +43,7 @@ class QPushButton;
 
 class InstrumentTrack;
 class patternFreezeThread;
-class sampleBuffer;
+class SampleBuffer;
 
 
 
@@ -104,7 +104,7 @@ public:
 		return m_frozenPattern != NULL;
 	}
 
-	sampleBuffer *frozenPattern()
+	SampleBuffer *frozenPattern()
 	{
 		return m_frozenPattern;
 	}
@@ -157,7 +157,7 @@ private:
 	int m_steps;
 
 	// pattern freezing
-	sampleBuffer * m_frozenPattern;
+	SampleBuffer* m_frozenPattern;
 	bool m_freezing;
 	volatile bool m_freezeAborted;
 

@@ -1,6 +1,6 @@
 /*
- * sample_track.cpp - implementation of class sampleTrack, a track which
- *                    provides arrangement of samples
+ * SampleTrack.cpp - implementation of class SampleTrack, a track which
+ *                   provides arrangement of samples
  *
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -33,14 +33,14 @@
 #include <QtGui/QPushButton>
 
 #include "gui_templates.h"
-#include "sample_track.h"
+#include "SampleTrack.h"
 #include "song.h"
 #include "embed.h"
 #include "engine.h"
 #include "tooltip.h"
 #include "AudioPort.h"
-#include "sample_play_handle.h"
-#include "sample_record_handle.h"
+#include "SamplePlayHandle.h"
+#include "SampleRecordHandle.h"
 #include "string_pair_drag.h"
 #include "knob.h"
 #include "MainWindow.h"
@@ -49,9 +49,9 @@
 #include "config_mgr.h"
 
 
-sampleTCO::sampleTCO( track * _track ) :
+SampleTCO::SampleTCO( track * _track ) :
 	trackContentObject( _track ),
-	m_sampleBuffer( new sampleBuffer )
+	m_sampleBuffer( new SampleBuffer )
 {
 	saveJournallingState( false );
 	setSampleFile( "" );
@@ -66,7 +66,7 @@ sampleTCO::sampleTCO( track * _track ) :
 
 
 
-sampleTCO::~sampleTCO()
+SampleTCO::~SampleTCO()
 {
 	sharedObject::unref( m_sampleBuffer );
 }
@@ -74,7 +74,7 @@ sampleTCO::~sampleTCO()
 
 
 
-void sampleTCO::changeLength( const midiTime & _length )
+void SampleTCO::changeLength( const midiTime & _length )
 {
 	trackContentObject::changeLength( qMax( static_cast<Sint32>( _length ),
 							DefaultTicksPerTact ) );
@@ -83,17 +83,17 @@ void sampleTCO::changeLength( const midiTime & _length )
 
 
 
-const QString & sampleTCO::sampleFile() const
+const QString & SampleTCO::sampleFile() const
 {
 	return m_sampleBuffer->audioFile();
 }
 
 
 
-void sampleTCO::setSampleBuffer( sampleBuffer * _sb )
+void SampleTCO::setSampleBuffer( SampleBuffer* sb )
 {
 	sharedObject::unref( m_sampleBuffer );
-	m_sampleBuffer = _sb;
+	m_sampleBuffer = sb;
 	updateLength();
 
 	emit sampleChanged();
@@ -101,7 +101,7 @@ void sampleTCO::setSampleBuffer( sampleBuffer * _sb )
 
 
 
-void sampleTCO::setSampleFile( const QString & _sf )
+void SampleTCO::setSampleFile( const QString & _sf )
 {
 	m_sampleBuffer->setAudioFile( _sf );
 	updateLength();
@@ -112,7 +112,7 @@ void sampleTCO::setSampleFile( const QString & _sf )
 
 
 
-void sampleTCO::toggleRecord()
+void SampleTCO::toggleRecord()
 {
 	m_recordModel.setValue( !m_recordModel.value() );
 	emit dataChanged();
@@ -121,7 +121,7 @@ void sampleTCO::toggleRecord()
 
 
 
-void sampleTCO::updateLength( bpm_t )
+void SampleTCO::updateLength( bpm_t )
 {
 	changeLength( sampleLength() );
 }
@@ -129,7 +129,7 @@ void sampleTCO::updateLength( bpm_t )
 
 
 
-midiTime sampleTCO::sampleLength() const
+midiTime SampleTCO::sampleLength() const
 {
 	return (int)( m_sampleBuffer->frames() / engine::framesPerTick() );
 }
@@ -137,7 +137,7 @@ midiTime sampleTCO::sampleLength() const
 
 
 
-void sampleTCO::saveSettings( QDomDocument & _doc, QDomElement & _this )
+void SampleTCO::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
 	if( _this.parentNode().nodeName() == "clipboard" )
 	{
@@ -161,7 +161,7 @@ void sampleTCO::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 
 
-void sampleTCO::loadSettings( const QDomElement & _this )
+void SampleTCO::loadSettings( const QDomElement & _this )
 {
 	if( _this.attribute( "pos" ).toInt() >= 0 )
 	{
@@ -179,9 +179,9 @@ void sampleTCO::loadSettings( const QDomElement & _this )
 
 
 
-trackContentObjectView * sampleTCO::createView( trackView * _tv )
+trackContentObjectView * SampleTCO::createView( trackView * _tv )
 {
-	return new sampleTCOView( this, _tv );
+	return new SampleTCOView( this, _tv );
 }
 
 
@@ -193,14 +193,14 @@ trackContentObjectView * sampleTCO::createView( trackView * _tv )
 
 
 
-sampleTCOView::sampleTCOView( sampleTCO * _tco, trackView * _tv ) :
+SampleTCOView::SampleTCOView( SampleTCO * _tco, trackView * _tv ) :
 	trackContentObjectView( _tco, _tv ),
 	m_tco( _tco )
 {
 	// update UI and tooltip
 	updateSample();
 
-	// track future changes of sampleTCO
+	// track future changes of SampleTCO
 	connect( m_tco, SIGNAL( sampleChanged() ),
 			this, SLOT( updateSample() ) );
 }
@@ -208,14 +208,14 @@ sampleTCOView::sampleTCOView( sampleTCO * _tco, trackView * _tv ) :
 
 
 
-sampleTCOView::~sampleTCOView()
+SampleTCOView::~SampleTCOView()
 {
 }
 
 
 
 
-void sampleTCOView::updateSample()
+void SampleTCOView::updateSample()
 {
 	update();
 	// set tooltip to filename so that user can see what sample this
@@ -228,7 +228,7 @@ void sampleTCOView::updateSample()
 
 
 
-void sampleTCOView::contextMenuEvent( QContextMenuEvent * _cme )
+void SampleTCOView::contextMenuEvent( QContextMenuEvent * _cme )
 {
 	QMenu contextMenu( this );
 	if( fixedTCOs() == false )
@@ -259,7 +259,7 @@ void sampleTCOView::contextMenuEvent( QContextMenuEvent * _cme )
 
 
 
-void sampleTCOView::dragEnterEvent( QDragEnterEvent * _dee )
+void SampleTCOView::dragEnterEvent( QDragEnterEvent * _dee )
 {
 	if( stringPairDrag::processDragEnterEvent( _dee,
 					"samplefile,sampledata" ) == false )
@@ -271,7 +271,7 @@ void sampleTCOView::dragEnterEvent( QDragEnterEvent * _dee )
 
 
 
-void sampleTCOView::dropEvent( QDropEvent * _de )
+void SampleTCOView::dropEvent( QDropEvent * _de )
 {
 	if( stringPairDrag::decodeKey( _de ) == "samplefile" )
 	{
@@ -296,7 +296,7 @@ void sampleTCOView::dropEvent( QDropEvent * _de )
 
 
 
-void sampleTCOView::mousePressEvent( QMouseEvent * _me )
+void SampleTCOView::mousePressEvent( QMouseEvent * _me )
 {
 	if( _me->button() == Qt::LeftButton &&
 		_me->modifiers() & Qt::ControlModifier &&
@@ -313,7 +313,7 @@ void sampleTCOView::mousePressEvent( QMouseEvent * _me )
 
 
 
-void sampleTCOView::mouseDoubleClickEvent( QMouseEvent * )
+void SampleTCOView::mouseDoubleClickEvent( QMouseEvent * )
 {
 	QString af = m_tco->m_sampleBuffer->openAudioFile();
 	if( af != "" && af != m_tco->m_sampleBuffer->audioFile() )
@@ -326,7 +326,7 @@ void sampleTCOView::mouseDoubleClickEvent( QMouseEvent * )
 
 
 
-void sampleTCOView::paintEvent( QPaintEvent * _pe )
+void SampleTCOView::paintEvent( QPaintEvent * _pe )
 {
 	QPainter p( this );
 
@@ -385,8 +385,8 @@ void sampleTCOView::paintEvent( QPaintEvent * _pe )
 
 
 
-sampleTrack::sampleTrack( TrackContainer* tc ) :
-	track( SampleTrack, tc ),
+SampleTrack::SampleTrack( TrackContainer* tc ) :
+	track( track::SampleTrack, tc ),
 	m_audioPort( tr( "Sample track" ) ),
 	m_volumeModel( DefaultVolume, MinVolume, MaxVolume, 1.0, this,
 							tr( "Volume" ) )
@@ -397,7 +397,7 @@ sampleTrack::sampleTrack( TrackContainer* tc ) :
 
 
 
-sampleTrack::~sampleTrack()
+SampleTrack::~SampleTrack()
 {
 	engine::mixer()->removePlayHandles( this );
 }
@@ -405,7 +405,7 @@ sampleTrack::~sampleTrack()
 
 
 
-bool sampleTrack::play( const midiTime & _start, const fpp_t _frames,
+bool SampleTrack::play( const midiTime & _start, const fpp_t _frames,
 						const f_cnt_t _offset,
 							Sint16 /*_tco_num*/ )
 {
@@ -419,7 +419,7 @@ bool sampleTrack::play( const midiTime & _start, const fpp_t _frames,
 		{
 			continue;
 		}
-		sampleTCO * st = dynamic_cast<sampleTCO *>( tco );
+		SampleTCO * st = dynamic_cast<SampleTCO *>( tco );
 		if( !st->isMuted() )
 		{
 			playHandle * handle;
@@ -429,12 +429,12 @@ bool sampleTrack::play( const midiTime & _start, const fpp_t _frames,
 				{
 					return played_a_note;
 				}
-				sampleRecordHandle * smpHandle = new sampleRecordHandle( st );
+				SampleRecordHandle* smpHandle = new SampleRecordHandle( st );
 				handle = smpHandle;
 			}
 			else
 			{
-				samplePlayHandle * smpHandle = new samplePlayHandle( st );
+				SamplePlayHandle* smpHandle = new SamplePlayHandle( st );
 				smpHandle->setVolumeModel( &m_volumeModel );
 				handle = smpHandle;
 			}
@@ -453,23 +453,23 @@ bool sampleTrack::play( const midiTime & _start, const fpp_t _frames,
 
 
 
-trackView * sampleTrack::createView( TrackContainerView* tcv )
+trackView * SampleTrack::createView( TrackContainerView* tcv )
 {
-	return new sampleTrackView( this, tcv );
+	return new SampleTrackView( this, tcv );
 }
 
 
 
 
-trackContentObject * sampleTrack::createTCO( const midiTime & )
+trackContentObject * SampleTrack::createTCO( const midiTime & )
 {
-	return new sampleTCO( this );
+	return new SampleTCO( this );
 }
 
 
 
 
-void sampleTrack::saveTrackSpecificSettings( QDomDocument & _doc,
+void SampleTrack::saveTrackSpecificSettings( QDomDocument & _doc,
 							QDomElement & _this )
 {
 	m_audioPort.effects()->saveState( _doc, _this );
@@ -482,7 +482,7 @@ void sampleTrack::saveTrackSpecificSettings( QDomDocument & _doc,
 
 
 
-void sampleTrack::loadTrackSpecificSettings( const QDomElement & _this )
+void SampleTrack::loadTrackSpecificSettings( const QDomElement & _this )
 {
 	QDomNode node = _this.firstChild();
 	m_audioPort.effects()->clear();
@@ -505,7 +505,7 @@ void sampleTrack::loadTrackSpecificSettings( const QDomElement & _this )
 
 
 
-sampleTrackView::sampleTrackView( sampleTrack * _t, TrackContainerView* tcv ) :
+SampleTrackView::SampleTrackView( SampleTrack * _t, TrackContainerView* tcv ) :
 	trackView( _t, tcv )
 {
 	setFixedHeight( 32 );
@@ -550,7 +550,7 @@ sampleTrackView::sampleTrackView( sampleTrack * _t, TrackContainerView* tcv ) :
 
 
 
-sampleTrackView::~sampleTrackView()
+SampleTrackView::~SampleTrackView()
 {
 	m_effWindow->deleteLater();
 }
@@ -558,7 +558,7 @@ sampleTrackView::~sampleTrackView()
 
 
 
-void sampleTrackView::showEffects()
+void SampleTrackView::showEffects()
 {
 	if( m_effWindow->isHidden() )
 	{
@@ -574,9 +574,9 @@ void sampleTrackView::showEffects()
 
 
 
-void sampleTrackView::modelChanged()
+void SampleTrackView::modelChanged()
 {
-	sampleTrack * st = castModel<sampleTrack>();
+	SampleTrack * st = castModel<SampleTrack>();
 	m_volumeKnob->setModel( &st->m_volumeModel );
 
 	trackView::modelChanged();
@@ -584,5 +584,5 @@ void sampleTrackView::modelChanged()
 
 
 
-#include "moc_sample_track.cxx"
+#include "moc_SampleTrack.cxx"
 

@@ -1,7 +1,7 @@
 /*
  * Oscillator.h - declaration of class Oscillator
  *
- * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -33,11 +33,11 @@
 #include <stdlib.h>
 #endif
 
-#include "sample_buffer.h"
+#include "SampleBuffer.h"
 #include "lmms_constants.h"
 
 
-class sampleBuffer;
+class SampleBuffer;
 class IntModel;
 
 
@@ -81,7 +81,7 @@ public:
 	}
 
 
-	inline void setUserWave( const sampleBuffer * _wave )
+	inline void setUserWave( const SampleBuffer * _wave )
 	{
 		m_userWave = _wave;
 	}
@@ -165,7 +165,7 @@ private:
 	Oscillator * m_subOsc;
 	float m_phaseOffset;
 	float m_phase;
-	const sampleBuffer * m_userWave;
+	const SampleBuffer * m_userWave;
 
 
 	void updateNoSub( sampleFrame * _ab, const fpp_t _frames,

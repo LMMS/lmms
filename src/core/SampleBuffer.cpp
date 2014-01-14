@@ -1,7 +1,7 @@
 /*
- * sample_buffer.cpp - container-class sampleBuffer
+ * SampleBuffer.cpp - container-class SampleBuffer
  *
- * Copyright (c) 2005-2013 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -23,7 +23,7 @@
  */
 
 
-#include "sample_buffer.h"
+#include "SampleBuffer.h"
 #include "Mixer.h"
 
 
@@ -62,7 +62,7 @@
 #include "templates.h"
 
 
-sampleBuffer::sampleBuffer( const QString & _audio_file,
+SampleBuffer::SampleBuffer( const QString & _audio_file,
 							bool _is_base64_data ) :
 	m_audioFile( ( _is_base64_data == true ) ? "" : _audio_file ),
 	m_origData( NULL ),
@@ -88,7 +88,7 @@ sampleBuffer::sampleBuffer( const QString & _audio_file,
 
 
 
-sampleBuffer::sampleBuffer( const sampleFrame * _data, const f_cnt_t _frames ) :
+SampleBuffer::SampleBuffer( const sampleFrame * _data, const f_cnt_t _frames ) :
 	m_audioFile( "" ),
 	m_origData( NULL ),
 	m_origFrames( 0 ),
@@ -115,7 +115,7 @@ sampleBuffer::sampleBuffer( const sampleFrame * _data, const f_cnt_t _frames ) :
 
 
 
-sampleBuffer::sampleBuffer( const f_cnt_t _frames ) :
+SampleBuffer::SampleBuffer( const f_cnt_t _frames ) :
 	m_audioFile( "" ),
 	m_origData( NULL ),
 	m_origFrames( 0 ),
@@ -142,7 +142,7 @@ sampleBuffer::sampleBuffer( const f_cnt_t _frames ) :
 
 
 
-sampleBuffer::~sampleBuffer()
+SampleBuffer::~SampleBuffer()
 {
 	delete[] m_origData;
 	delete[] m_data;
@@ -153,7 +153,7 @@ sampleBuffer::~sampleBuffer()
 
 
 
-void sampleBuffer::update( bool _keep_settings )
+void SampleBuffer::update( bool _keep_settings )
 {
 	const bool lock = ( m_data != NULL );
 	if( lock )
@@ -266,7 +266,7 @@ void sampleBuffer::update( bool _keep_settings )
 }
 
 
-void sampleBuffer::convertIntToFloat ( int_sample_t * & _ibuf, f_cnt_t _frames, int _channels)
+void SampleBuffer::convertIntToFloat ( int_sample_t * & _ibuf, f_cnt_t _frames, int _channels)
 {
 			// following code transforms int-samples into
 			// float-samples and does amplifying & reversing
@@ -308,7 +308,7 @@ void sampleBuffer::convertIntToFloat ( int_sample_t * & _ibuf, f_cnt_t _frames, 
 
 }
 
-void sampleBuffer::directFloatWrite ( sample_t * & _fbuf, f_cnt_t _frames, int _channels)
+void SampleBuffer::directFloatWrite ( sample_t * & _fbuf, f_cnt_t _frames, int _channels)
 
 {
 
@@ -347,13 +347,13 @@ void sampleBuffer::directFloatWrite ( sample_t * & _fbuf, f_cnt_t _frames, int _
 }
 
 
-void sampleBuffer::normalizeSampleRate( const sample_rate_t _src_sr,
+void SampleBuffer::normalizeSampleRate( const sample_rate_t _src_sr,
 							bool _keep_settings )
 {
 	// do samplerate-conversion to our default-samplerate
 	if( _src_sr != engine::mixer()->baseSampleRate() )
 	{
-		sampleBuffer * resampled = resample( this, _src_sr,
+		SampleBuffer * resampled = resample( this, _src_sr,
 					engine::mixer()->baseSampleRate() );
 		delete[] m_data;
 		m_frames = resampled->frames();
@@ -374,7 +374,7 @@ void sampleBuffer::normalizeSampleRate( const sample_rate_t _src_sr,
 
 
 
-f_cnt_t sampleBuffer::decodeSampleSF( const char * _f,
+f_cnt_t SampleBuffer::decodeSampleSF( const char * _f,
 					int_sample_t * & _buf,
 					ch_cnt_t & _channels,
 					sample_rate_t & _samplerate )
@@ -404,7 +404,7 @@ f_cnt_t sampleBuffer::decodeSampleSF( const char * _f,
 		if( sf_rr < sf_info.channels * frames )
 		{
 #ifdef DEBUG_LMMS
-			printf( "sampleBuffer::decodeSampleSF(): could not read"
+			printf( "SampleBuffer::decodeSampleSF(): could not read"
 				" sample %s: %s\n", _f, sf_strerror( NULL ) );
 #endif
 		}
@@ -416,7 +416,7 @@ f_cnt_t sampleBuffer::decodeSampleSF( const char * _f,
 	else
 	{
 #ifdef DEBUG_LMMS
-		printf( "sampleBuffer::decodeSampleSF(): could not load "
+		printf( "SampleBuffer::decodeSampleSF(): could not load "
 				"sample %s: %s\n", _f, sf_strerror( NULL ) );
 #endif
 	}
@@ -489,7 +489,7 @@ long qfileTellCallback( void * _udata )
 
 
 
-f_cnt_t sampleBuffer::decodeSampleOGGVorbis( const char * _f,
+f_cnt_t SampleBuffer::decodeSampleOGGVorbis( const char * _f,
 						int_sample_t * & _buf,
 						ch_cnt_t & _channels,
 						sample_rate_t & _samplerate )
@@ -520,23 +520,23 @@ f_cnt_t sampleBuffer::decodeSampleOGGVorbis( const char * _f,
 		switch( err )
 		{
 			case OV_EREAD:
-				printf( "sampleBuffer::decodeSampleOGGVorbis():"
+				printf( "SampleBuffer::decodeSampleOGGVorbis():"
 						" media read error\n" );
 				break;
 			case OV_ENOTVORBIS:
-/*				printf( "sampleBuffer::decodeSampleOGGVorbis():"
+/*				printf( "SampleBuffer::decodeSampleOGGVorbis():"
 					" not an Ogg Vorbis file\n" );*/
 				break;
 			case OV_EVERSION:
-				printf( "sampleBuffer::decodeSampleOGGVorbis():"
+				printf( "SampleBuffer::decodeSampleOGGVorbis():"
 						" vorbis version mismatch\n" );
 				break;
 			case OV_EBADHEADER:
-				printf( "sampleBuffer::decodeSampleOGGVorbis():"
+				printf( "SampleBuffer::decodeSampleOGGVorbis():"
 					" invalid Vorbis bitstream header\n" );
 				break;
 			case OV_EFAULT:
-				printf( "sampleBuffer::decodeSampleOgg(): "
+				printf( "SampleBuffer::decodeSampleOgg(): "
 					"internal logic fault\n" );
 				break;
 		}
@@ -585,7 +585,7 @@ f_cnt_t sampleBuffer::decodeSampleOGGVorbis( const char * _f,
 
 
 
-f_cnt_t sampleBuffer::decodeSampleDS( const char * _f,
+f_cnt_t SampleBuffer::decodeSampleDS( const char * _f,
 						int_sample_t * & _buf,
 						ch_cnt_t & _channels,
 						sample_rate_t & _samplerate )
@@ -605,7 +605,7 @@ f_cnt_t sampleBuffer::decodeSampleDS( const char * _f,
 
 
 
-bool sampleBuffer::play( sampleFrame * _ab, handleState * _state,
+bool SampleBuffer::play( sampleFrame * _ab, handleState * _state,
 					const fpp_t _frames,
 					const float _freq,
 					const bool _looped )
@@ -683,12 +683,12 @@ bool sampleBuffer::play( sampleFrame * _ab, handleState * _state,
 								&src_data );
 		if( error )
 		{
-			printf( "sampleBuffer: error while resampling: %s\n",
+			printf( "SampleBuffer: error while resampling: %s\n",
 							src_strerror( error ) );
 		}
 		if( src_data.output_frames_gen > _frames )
 		{
-			printf( "sampleBuffer: not enough frames: %ld / %d\n",
+			printf( "SampleBuffer: not enough frames: %ld / %d\n",
 					src_data.output_frames_gen, _frames );
 		}
 		// Advance
@@ -726,7 +726,7 @@ bool sampleBuffer::play( sampleFrame * _ab, handleState * _state,
 
 
 
-sampleFrame * sampleBuffer::getSampleFragment( f_cnt_t _start,
+sampleFrame * SampleBuffer::getSampleFragment( f_cnt_t _start,
 		f_cnt_t _frames, bool _looped, sampleFrame * * _tmp ) const
 {
 	if( _looped )
@@ -773,7 +773,7 @@ sampleFrame * sampleBuffer::getSampleFragment( f_cnt_t _start,
 
 
 
-f_cnt_t sampleBuffer::getLoopedIndex( f_cnt_t _index ) const
+f_cnt_t SampleBuffer::getLoopedIndex( f_cnt_t _index ) const
 {
 	if( _index < m_loopEndFrame )
 	{
@@ -786,7 +786,7 @@ f_cnt_t sampleBuffer::getLoopedIndex( f_cnt_t _index ) const
 
 
 
-void sampleBuffer::visualize( QPainter & _p, const QRect & _dr,
+void SampleBuffer::visualize( QPainter & _p, const QRect & _dr,
 							const QRect & _clip, f_cnt_t _from_frame, f_cnt_t _to_frame )
 {
 	const bool focus_on_range = _to_frame <= m_frames
@@ -827,7 +827,7 @@ void sampleBuffer::visualize( QPainter & _p, const QRect & _dr,
 
 
 
-QString sampleBuffer::openAudioFile() const
+QString SampleBuffer::openAudioFile() const
 {
 	QFileDialog ofd( NULL, tr( "Open audio file" ) );
 #if QT_VERSION >= 0x040806
@@ -932,7 +932,7 @@ void flacStreamEncoderMetadataCallback( const FLAC__StreamEncoder *,
 
 
 
-QString & sampleBuffer::toBase64( QString & _dst ) const
+QString & SampleBuffer::toBase64( QString & _dst ) const
 {
 #ifdef LMMS_HAVE_FLAC_STREAM_ENCODER_H
 	const f_cnt_t FRAMES_PER_BUF = 1152;
@@ -997,14 +997,14 @@ QString & sampleBuffer::toBase64( QString & _dst ) const
 
 
 
-sampleBuffer * sampleBuffer::resample( sampleFrame * _data,
+SampleBuffer * SampleBuffer::resample( sampleFrame * _data,
 						const f_cnt_t _frames,
 						const sample_rate_t _src_sr,
 						const sample_rate_t _dst_sr )
 {
 	const f_cnt_t dst_frames = static_cast<f_cnt_t>( _frames /
 					(float) _src_sr * (float) _dst_sr );
-	sampleBuffer * dst_sb = new sampleBuffer( dst_frames );
+	SampleBuffer * dst_sb = new SampleBuffer( dst_frames );
 	sampleFrame * dst_buf = dst_sb->m_origData;
 
 	// yeah, libsamplerate, let's rock with sinc-interpolation!
@@ -1022,7 +1022,7 @@ sampleBuffer * sampleBuffer::resample( sampleFrame * _data,
 		src_data.src_ratio = (double) _dst_sr / _src_sr;
 		if( ( error = src_process( state, &src_data ) ) )
 		{
-			printf( "sampleBuffer: error while resampling: %s\n",
+			printf( "SampleBuffer: error while resampling: %s\n",
 							src_strerror( error ) );
 		}
 		src_delete( state );
@@ -1038,7 +1038,7 @@ sampleBuffer * sampleBuffer::resample( sampleFrame * _data,
 
 
 
-void sampleBuffer::setAudioFile( const QString & _audio_file )
+void SampleBuffer::setAudioFile( const QString & _audio_file )
 {
 	m_audioFile = tryToMakeRelative( _audio_file );
 	update();
@@ -1139,7 +1139,7 @@ void flacStreamDecoderErrorCallback( const FLAC__StreamDecoder *,
 #endif
 
 
-void sampleBuffer::loadFromBase64( const QString & _data )
+void SampleBuffer::loadFromBase64( const QString & _data )
 {
 	char * dst = NULL;
 	int dsize = 0;
@@ -1203,7 +1203,7 @@ void sampleBuffer::loadFromBase64( const QString & _data )
 
 
 
-void sampleBuffer::setStartFrame( const f_cnt_t _s )
+void SampleBuffer::setStartFrame( const f_cnt_t _s )
 {
 	m_varLock.lock();
 	m_loopStartFrame = m_startFrame = _s;
@@ -1213,7 +1213,7 @@ void sampleBuffer::setStartFrame( const f_cnt_t _s )
 
 
 
-void sampleBuffer::setEndFrame( const f_cnt_t _e )
+void SampleBuffer::setEndFrame( const f_cnt_t _e )
 {
 	m_varLock.lock();
 	m_loopEndFrame = m_endFrame = _e;
@@ -1223,7 +1223,7 @@ void sampleBuffer::setEndFrame( const f_cnt_t _e )
 
 
 
-void sampleBuffer::setAmplification( float _a )
+void SampleBuffer::setAmplification( float _a )
 {
 	m_amplification = _a;
 	update( true );
@@ -1232,7 +1232,7 @@ void sampleBuffer::setAmplification( float _a )
 
 
 
-void sampleBuffer::setReversed( bool _on )
+void SampleBuffer::setReversed( bool _on )
 {
 	m_reversed = _on;
 	update( true );
@@ -1241,7 +1241,7 @@ void sampleBuffer::setReversed( bool _on )
 
 
 
-QString sampleBuffer::tryToMakeRelative( const QString & _file )
+QString SampleBuffer::tryToMakeRelative( const QString & _file )
 {
 	if( QFileInfo( _file ).isRelative() == false )
 	{
@@ -1265,7 +1265,7 @@ QString sampleBuffer::tryToMakeRelative( const QString & _file )
 
 
 
-QString sampleBuffer::tryToMakeAbsolute( const QString & _file )
+QString SampleBuffer::tryToMakeAbsolute( const QString & _file )
 {
 	if( QFileInfo( _file ).isAbsolute() )
 	{
@@ -1288,7 +1288,7 @@ QString sampleBuffer::tryToMakeAbsolute( const QString & _file )
 
 
 
-sampleBuffer::handleState::handleState( bool _varying_pitch ) :
+SampleBuffer::handleState::handleState( bool _varying_pitch ) :
 	m_frameIndex( 0 ),
 	m_varyingPitch( _varying_pitch )
 {
@@ -1306,7 +1306,7 @@ sampleBuffer::handleState::handleState( bool _varying_pitch ) :
 
 
 
-sampleBuffer::handleState::~handleState()
+SampleBuffer::handleState::~handleState()
 {
 	src_delete( m_resamplingData );
 }
@@ -1314,7 +1314,7 @@ sampleBuffer::handleState::~handleState()
 
 
 
-#include "moc_sample_buffer.cxx"
+#include "moc_SampleBuffer.cxx"
 
 
 /* vim: set tw=0 noexpandtab: */

@@ -62,7 +62,7 @@
 #include "mmp.h"
 #include "pixmap_button.h"
 #include "ProjectJournal.h"
-#include "sample_track.h"
+#include "SampleTrack.h"
 #include "song.h"
 #include "string_pair_drag.h"
 #include "templates.h"
@@ -1602,7 +1602,7 @@ track * track::create( TrackTypes _tt, TrackContainer * _tc )
 	{
 		case InstrumentTrack: t = new ::InstrumentTrack( _tc ); break;
 		case BBTrack: t = new bbTrack( _tc ); break;
-		case SampleTrack: t = new sampleTrack( _tc ); break;
+		case SampleTrack: t = new ::SampleTrack( _tc ); break;
 //		case EVENT_TRACK:
 //		case VIDEO_TRACK:
 		case AutomationTrack: t = new ::AutomationTrack( _tc ); break;

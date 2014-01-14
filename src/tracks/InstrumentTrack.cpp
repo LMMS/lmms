@@ -69,7 +69,7 @@
 #include "note_play_handle.h"
 #include "pattern.h"
 #include "PluginView.h"
-#include "sample_play_handle.h"
+#include "SamplePlayHandle.h"
 #include "song.h"
 #include "string_pair_drag.h"
 #include "surround_area.h"
@@ -658,7 +658,7 @@ bool InstrumentTrack::play( const midiTime & _start,
 				continue;
 			}
 
-			samplePlayHandle * handle = new samplePlayHandle( p );
+			SamplePlayHandle* handle = new SamplePlayHandle( p );
 			handle->setBBTrack( bb_track );
 			handle->setOffset( _offset );
 			// send it to the mixer

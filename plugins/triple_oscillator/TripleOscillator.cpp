@@ -1,7 +1,7 @@
 /*
  * TripleOscillator.cpp - powerful instrument with three oscillators
  *
- * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -35,7 +35,7 @@
 #include "knob.h"
 #include "note_play_handle.h"
 #include "pixmap_button.h"
-#include "sample_buffer.h"
+#include "SampleBuffer.h"
 #include "song_editor.h"
 #include "tooltip.h"
 
@@ -88,7 +88,7 @@ OscillatorObject::OscillatorObject( Model * _parent, int _idx ) :
 				Oscillator::NumModulationAlgos-1, this,
 				tr( "Modulation type %1" ).arg( _idx+1 ) ),
 
-	m_sampleBuffer( new sampleBuffer ),
+	m_sampleBuffer( new SampleBuffer ),
 	m_volumeLeft( 0.0f ),
 	m_volumeRight( 0.0f ),
 	m_detuningLeft( 0.0f ),

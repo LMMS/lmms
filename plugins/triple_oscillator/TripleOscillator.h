@@ -2,7 +2,7 @@
  * TripleOscillator.h - declaration of class TripleOscillator a powerful
  *                      instrument-plugin with 3 oscillators
  *
- * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -36,7 +36,7 @@ class automatableButtonGroup;
 class knob;
 class notePlayHandle;
 class pixmapButton;
-class sampleBuffer;
+class SampleBuffer;
 
 const int NUM_OF_OSCILLATORS = 3;
 
@@ -59,7 +59,7 @@ private:
 	FloatModel m_stereoPhaseDetuningModel;
 	IntModel m_waveShapeModel;
 	IntModel m_modulationAlgoModel;
-	sampleBuffer * m_sampleBuffer;
+	SampleBuffer* m_sampleBuffer;
 
 	float m_volumeLeft;
 	float m_volumeRight;
