@@ -171,31 +171,26 @@ void FxMixer::deleteChannel(int index)
 	m_fxChannels[index]->m_lock.lock();
 
 	// go through every instrument and adjust for the channel index change
-	QVector<track *> songTrackList = engine::getSong()->tracks();
-	QVector<track *> bbTrackList = engine::getBBTrackContainer()->tracks();
+	TrackContainer::TrackList tracks;
+	tracks += engine::getSong()->tracks();
+	tracks += engine::getBBTrackContainer()->tracks();
 
-	QVector<track *> trackLists[] = {songTrackList, bbTrackList};
-	for(int tl=0; tl<2; ++tl)
+	foreach( track* t, tracks )
 	{
-		QVector<track *> trackList = trackLists[tl];
-		for(int i=0; i<trackList.size(); ++i)
+		if( t->type() == track::InstrumentTrack )
 		{
-			if( trackList[i]->type() == track::InstrumentTrack )
+			InstrumentTrack* inst = dynamic_cast<InstrumentTrack *>( t );
+			int val = inst->effectChannelModel()->value(0);
+			if( val == index )
 			{
-				InstrumentTrack * inst = (InstrumentTrack *) trackList[i];
-				int val = inst->effectChannelModel()->value(0);
-				if( val == index )
-				{
-					// we are deleting this track's fx send
-					// send to master
-					inst->effectChannelModel()->setValue(0);
-				}
-				else if( val > index )
-				{
-					// subtract 1 to make up for the missing channel
-					inst->effectChannelModel()->setValue(val-1);
-				}
-
+				// we are deleting this track's fx send
+				// send to master
+				inst->effectChannelModel()->setValue(0);
+			}
+			else if( val > index )
+			{
+				// subtract 1 to make up for the missing channel
+				inst->effectChannelModel()->setValue(val-1);
 			}
 		}
 	}
