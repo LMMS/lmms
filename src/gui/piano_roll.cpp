@@ -2787,7 +2787,7 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 			// draw a big one while checking if it is pressed or not
 			if(m_pattern->instrumentTrack()->pianoModel()->isKeyPressed( key ) )
 			{
-				p.drawPixmap( PIANO_X, y - WHITE_KEY_SMALL_HEIGHT, *s_whiteKeyBigPressedPm );
+				p.drawPixmap( PIANO_X, y - WHITE_KEY_BIG_HEIGHT, *s_whiteKeyBigPressedPm );
 			}
 			else
 			{
