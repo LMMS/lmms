@@ -2,7 +2,7 @@
  * piano_roll.h - declaration of class pianoRoll which is a window where you
  *                can set and edit notes in an easy way
  *
- * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2008 Andrew Kelley <superjoe30/at/gmail/dot/com>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
@@ -50,7 +50,6 @@ class pattern;
 class timeLine;
 class toolButton;
 
-class Piano;
 class pianoRoll : public QWidget, public SerializingObject
 {
 	Q_OBJECT
@@ -154,7 +153,6 @@ signals:
 
 
 private:
-	Piano * m_piano;
 	enum editModes
 	{
 		ModeDraw,

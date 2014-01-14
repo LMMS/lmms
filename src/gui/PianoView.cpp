@@ -2,7 +2,7 @@
  * Piano.cpp - implementation of piano-widget used in instrument-track-window
  *             for testing + according model class
  *
- * Copyright (c) 2004-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -306,8 +306,8 @@ void PianoView::modelChanged()
 	m_piano = castModel<Piano>();
 	if( m_piano != NULL )
 	{
-		connect( m_piano->m_instrumentTrack->baseNoteModel(),
-			SIGNAL( dataChanged() ), this, SLOT( update() ) );
+		connect( m_piano->instrumentTrack()->baseNoteModel(), SIGNAL( dataChanged() ),
+					this, SLOT( update() ) );
 	}
 
 }
@@ -413,8 +413,7 @@ void PianoView::contextMenuEvent( QContextMenuEvent * _me )
 	}
 
 	captionMenu contextMenu( tr( "Base note" ) );
-	AutomatableModelView amv( m_piano->m_instrumentTrack->baseNoteModel(),
-								&contextMenu );
+	AutomatableModelView amv( m_piano->instrumentTrack()->baseNoteModel(), &contextMenu );
 	amv.addDefaultActions( &contextMenu );
 	contextMenu.exec( QCursor::pos() );
 }
@@ -466,11 +465,8 @@ void PianoView::mousePressEvent( QMouseEvent * _me )
 				velocity = MidiMaxVelocity;
 			}
 			// set note on
-			m_piano->m_instrumentTrack->processInEvent(
-					midiEvent( MidiNoteOn, 0, key_num,
-							velocity ),
-								midiTime() );
-			m_piano->m_pressedKeys[key_num] = true;
+			m_piano->midiEventProcessor()->processInEvent( midiEvent( MidiNoteOn, 0, key_num, velocity ), midiTime() );
+			m_piano->setKeyState( key_num, true );
 			m_lastKey = key_num;
 
 			emit keyPressed( key_num );
@@ -480,17 +476,13 @@ void PianoView::mousePressEvent( QMouseEvent * _me )
 			if( _me->modifiers() & Qt::ControlModifier )
 			{
 				new stringPairDrag( "automatable_model",
-					QString::number( m_piano->
-						m_instrumentTrack->
-							baseNoteModel()->id() ),
+					QString::number( m_piano->instrumentTrack()->baseNoteModel()->id() ),
 					QPixmap(), this );
 				_me->accept();
 			}
 			else
 			{
-				m_piano->m_instrumentTrack->
-					baseNoteModel()->
-						setInitValue( (float) key_num );
+				m_piano->instrumentTrack()->baseNoteModel()->setInitValue( (float) key_num );
 
 				emit baseNoteChanged();
 			}
@@ -518,10 +510,8 @@ void PianoView::mouseReleaseEvent( QMouseEvent * )
 	{
 		if( m_piano != NULL )
 		{
-			m_piano->m_midiEvProc->processInEvent(
-				midiEvent( MidiNoteOff, 0, m_lastKey, 0 ),
-								midiTime() );
-			m_piano->m_pressedKeys[m_lastKey] = false;
+			m_piano->midiEventProcessor()->processInEvent( midiEvent( MidiNoteOff, 0, m_lastKey, 0 ), midiTime() );
+			m_piano->setKeyState( m_lastKey, false );
 		}
 
 		// and let the user see that he released a key... :)
@@ -581,39 +571,29 @@ void PianoView::mouseMoveEvent( QMouseEvent * _me )
 	{
 		if( m_lastKey != -1 )
 		{
-			m_piano->m_midiEvProc->processInEvent(
-				midiEvent( MidiNoteOff, 0, m_lastKey, 0 ),
-								midiTime() );
-			m_piano->m_pressedKeys[m_lastKey] = false;
+			m_piano->midiEventProcessor()->processInEvent( midiEvent( MidiNoteOff, 0, m_lastKey, 0 ), midiTime() );
+			m_piano->setKeyState( m_lastKey, false );
 			m_lastKey = -1;
 		}
 		if( _me->buttons() & Qt::LeftButton )
 		{
 			if( _me->pos().y() > PIANO_BASE )
 			{
-				m_piano->m_midiEvProc->processInEvent(
-					midiEvent( MidiNoteOn, 0, key_num,
-							velocity ),
-								midiTime() );
-				m_piano->m_pressedKeys[key_num] = true;
+				m_piano->midiEventProcessor()->processInEvent( midiEvent( MidiNoteOn, 0, key_num, velocity ), midiTime() );
+				m_piano->setKeyState( key_num, true );
 				m_lastKey = key_num;
 			}
 			else
 			{
-				m_piano->m_instrumentTrack->
-					baseNoteModel()->
-						setInitValue( (float) key_num );
+				m_piano->instrumentTrack()->baseNoteModel()->setInitValue( (float) key_num );
 			}
 		}
 		// and let the user see that he pressed a key... :)
 		update();
 	}
-	else if( m_piano->m_pressedKeys[key_num] == true )
+	else if( m_piano->isKeyPressed( key_num ) )
 	{
-		m_piano->m_midiEvProc->processInEvent(
-				midiEvent( MidiKeyPressure, 0, key_num,
-							velocity ),
-								midiTime() );
+		m_piano->midiEventProcessor()->processInEvent( midiEvent( MidiKeyPressure, 0, key_num, velocity ), midiTime() );
 	}
 
 }
@@ -710,10 +690,8 @@ void PianoView::focusOutEvent( QFocusEvent * )
 	// hang otherwise
 	for( int i = 0; i < NumKeys; ++i )
 	{
-		m_piano->m_midiEvProc->processInEvent(
-					midiEvent( MidiNoteOff, 0, i, 0 ),
-								midiTime() );
-		m_piano->m_pressedKeys[i] = false;
+		m_piano->midiEventProcessor()->processInEvent( midiEvent( MidiNoteOff, 0, i, 0 ), midiTime() );
+		m_piano->setKeyState( i, false );
 	}
 	update();
 }
@@ -826,7 +804,7 @@ void PianoView::paintEvent( QPaintEvent * )
 	p.setPen( Qt::white );
 
 	const int base_key = ( m_piano != NULL ) ?
-		m_piano->m_instrumentTrack->baseNoteModel()->value() : 0;
+		m_piano->instrumentTrack()->baseNoteModel()->value() : 0;
 	g.setColorAt( 0, QColor( 0, 96, 0 ) );
 	g.setColorAt( 0.1, QColor( 64, 255, 64 ) );
 	g.setColorAt( 1, QColor( 0, 96, 0 ) );
@@ -854,7 +832,7 @@ void PianoView::paintEvent( QPaintEvent * )
 
 		// draw pressed or not pressed key, depending on state of
 		// current key
-		if( m_piano && m_piano->m_pressedKeys[cur_key] == true )
+		if( m_piano && m_piano->isKeyPressed( cur_key ) )
 		{
 			p.drawPixmap( x, PIANO_BASE, *s_whiteKeyPressedPm );
 		}
@@ -881,19 +859,17 @@ void PianoView::paintEvent( QPaintEvent * )
 	cur_key = m_startKey;
 	int white_cnt = 0;
 
-	int s_key = m_startKey;
-	if( s_key > 0 &&
-		KEY_ORDER[(Keys)(--s_key) % KeysPerOctave] == Piano::BlackKey )
+	int startKey = m_startKey;
+	if( startKey > 0 &&
+		KEY_ORDER[(Keys)(--startKey) % KeysPerOctave] == Piano::BlackKey )
 	{
-		if( m_piano && m_piano->m_pressedKeys[s_key] == true )
+		if( m_piano && m_piano->isKeyPressed( startKey ) )
 		{
-			p.drawPixmap( 0 - PW_WHITE_KEY_WIDTH / 2, PIANO_BASE,
-							*s_blackKeyPressedPm );
+			p.drawPixmap( 0 - PW_WHITE_KEY_WIDTH / 2, PIANO_BASE, *s_blackKeyPressedPm );
 		}
 		else
 		{
-			p.drawPixmap( 0 - PW_WHITE_KEY_WIDTH / 2, PIANO_BASE,
-								*s_blackKeyPm );
+			p.drawPixmap( 0 - PW_WHITE_KEY_WIDTH / 2, PIANO_BASE, *s_blackKeyPm );
 		}
 	}
 
@@ -904,16 +880,13 @@ void PianoView::paintEvent( QPaintEvent * )
 		{
 			// draw pressed or not pressed key, depending on
 			// state of current key
-			if( m_piano && m_piano->m_pressedKeys[cur_key] == true )
+			if( m_piano && m_piano->isKeyPressed( cur_key ) )
 			{
-				p.drawPixmap( x + PW_WHITE_KEY_WIDTH / 2,
-								PIANO_BASE,
-							*s_blackKeyPressedPm );
+				p.drawPixmap( x + PW_WHITE_KEY_WIDTH / 2, PIANO_BASE, *s_blackKeyPressedPm );
 			}
 			else
 			{
-				p.drawPixmap( x + PW_WHITE_KEY_WIDTH / 2,
-						PIANO_BASE, *s_blackKeyPm );
+				p.drawPixmap( x + PW_WHITE_KEY_WIDTH / 2, PIANO_BASE, *s_blackKeyPm );
 			}
 			x += PW_WHITE_KEY_WIDTH;
 			white_cnt = 0;

@@ -2,7 +2,7 @@
  * piano_roll.cpp - implementation of piano-roll which is used for actual
  *                  writing of melodies
  *
- * Copyright (c) 2004-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2008 Andrew Kelley <superjoe30/at/gmail/dot/com>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
@@ -139,7 +139,6 @@ const int DEFAULT_PR_PPT = KEY_LINE_HEIGHT * DefaultStepsPerTact;
 
 
 pianoRoll::pianoRoll() :
-    m_piano(NULL),
 	m_nemStr( QVector<QString>() ),
 	m_noteEditMenu( NULL ),
 	m_semiToneMarkerMenu( NULL ),
@@ -2814,15 +2813,13 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 		if( prKeyOrder[key % KeysPerOctave] == PR_WHITE_KEY_SMALL )
 		{
 			// draw a small one while checking if it is pressed or not
-			if(m_pattern->instrumentTrack()->pianoModel()->m_pressedKeys[key] == true)
+			if( m_pattern->instrumentTrack()->pianoModel()->isKeyPressed( key ) )
 			{
-				p.drawPixmap( PIANO_X, y - WHITE_KEY_SMALL_HEIGHT,
-							*s_whiteKeySmallPressedPm );
+				p.drawPixmap( PIANO_X, y - WHITE_KEY_SMALL_HEIGHT, *s_whiteKeySmallPressedPm );
 			}
 			else
 			{
-				p.drawPixmap( PIANO_X, y - WHITE_KEY_SMALL_HEIGHT,
-								*s_whiteKeySmallPm );
+				p.drawPixmap( PIANO_X, y - WHITE_KEY_SMALL_HEIGHT, *s_whiteKeySmallPm );
 			}
 			// update y-pos
 			y -= WHITE_KEY_SMALL_HEIGHT;
@@ -2832,15 +2829,13 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 							PR_WHITE_KEY_BIG )
 		{
 			// draw a big one while checking if it is pressed or not
-			if(m_pattern->instrumentTrack()->pianoModel()->m_pressedKeys[key] == true)
+			if(m_pattern->instrumentTrack()->pianoModel()->isKeyPressed( key ) )
 			{
-				p.drawPixmap( PIANO_X, y - WHITE_KEY_SMALL_HEIGHT,
-							*s_whiteKeyBigPressedPm );
+				p.drawPixmap( PIANO_X, y - WHITE_KEY_SMALL_HEIGHT, *s_whiteKeyBigPressedPm );
 			}
 			else
 			{
-				p.drawPixmap( PIANO_X, y-WHITE_KEY_BIG_HEIGHT,
-							*s_whiteKeyBigPm );
+				p.drawPixmap( PIANO_X, y-WHITE_KEY_BIG_HEIGHT, *s_whiteKeyBigPm );
 			}
 			// if a big white key has been the first key,
 			// black keys needs to be lifted up
@@ -2909,7 +2904,7 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 			// then draw it (calculation of y very complicated,
 			// but that's the only working solution, sorry...)
 			// check if the key is pressed or not
-			if(m_pattern->instrumentTrack()->pianoModel()->m_pressedKeys[key] == true)
+			if( m_pattern->instrumentTrack()->pianoModel()->isKeyPressed( key ) )
 			{
 				p.drawPixmap( PIANO_X, y - ( first_white_key_height -
 						WHITE_KEY_SMALL_HEIGHT ) -
