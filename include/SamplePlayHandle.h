@@ -1,7 +1,7 @@
 /*
- * sample_play_handle.h - play-handle for playing a sample
+ * SamplePlayHandle.h - play-handle for playing a sample
  *
- * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -22,29 +22,28 @@
  *
  */
 
-
 #ifndef _SAMPLE_PLAY_HANDLE_H
 #define _SAMPLE_PLAY_HANDLE_H
 
 #include "Mixer.h"
-#include "sample_buffer.h"
+#include "SampleBuffer.h"
 #include "AutomatableModel.h"
 
 class bbTrack;
 class pattern;
-class sampleTCO;
+class SampleTCO;
 class track;
 class AudioPort;
 
 
-class samplePlayHandle : public playHandle
+class SamplePlayHandle : public playHandle
 {
 public:
-	samplePlayHandle( const QString & _sample_file );
-	samplePlayHandle( sampleBuffer * _sample_buffer );
-	samplePlayHandle( sampleTCO * _tco );
-	samplePlayHandle( pattern * _pattern );
-	virtual ~samplePlayHandle();
+	SamplePlayHandle( const QString& sampleFile );
+	SamplePlayHandle( SampleBuffer* sampleBuffer );
+	SamplePlayHandle( SampleTCO* tco );
+	SamplePlayHandle( pattern * _pattern );
+	virtual ~SamplePlayHandle();
 
 	virtual inline bool affinityMatters() const
 	{
@@ -79,11 +78,11 @@ public:
 
 
 private:
-	sampleBuffer * m_sampleBuffer;
+	SampleBuffer * m_sampleBuffer;
 	bool m_doneMayReturnTrue;
 
 	f_cnt_t m_frame;
-	sampleBuffer::handleState m_state;
+	SampleBuffer::handleState m_state;
 
 	AudioPort * m_audioPort;
 	const bool m_ownAudioPort;

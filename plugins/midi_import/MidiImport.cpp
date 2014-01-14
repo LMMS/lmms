@@ -1,7 +1,7 @@
 /*
  * MidiImport.cpp - support for importing MIDI files
  *
- * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  * 
@@ -30,7 +30,7 @@
 #include <QtGui/QProgressDialog>
 
 #include "MidiImport.h"
-#include "track_container.h"
+#include "TrackContainer.h"
 #include "InstrumentTrack.h"
 #include "AutomationTrack.h"
 #include "AutomationPattern.h"
@@ -87,7 +87,7 @@ MidiImport::~MidiImport()
 
 
 
-bool MidiImport::tryImport( trackContainer * _tc )
+bool MidiImport::tryImport( TrackContainer* tc )
 {
 	if( openFile() == false )
 	{
@@ -124,11 +124,11 @@ bool MidiImport::tryImport( trackContainer * _tc )
 	{
 		case makeID( 'M', 'T', 'h', 'd' ):
 			printf( "MidiImport::tryImport(): found MThd\n");
-			return readSMF( _tc );
+			return readSMF( tc );
 
 		case makeID( 'R', 'I', 'F', 'F' ):
 			printf( "MidiImport::tryImport(): found RIFF\n");
-			return readRIFF( _tc );
+			return readRIFF( tc );
 
 		default:
 			printf( "MidiImport::tryImport(): not a Standard MIDI "
@@ -154,12 +154,11 @@ public:
 	AutomationPattern * ap;
 	midiTime lastPos;
 	
-	smfMidiCC & create( trackContainer * _tc )
+	smfMidiCC & create( TrackContainer* tc )
 	{
 		if( !at )
 		{
-			at = dynamic_cast<AutomationTrack *>(
-					track::create( track::AutomationTrack, _tc ) );
+			at = dynamic_cast<AutomationTrack *>( track::create( track::AutomationTrack, tc ) );
 		}
 		return *this;
 	}
@@ -215,11 +214,10 @@ public:
 	bool hasNotes;
 	midiTime lastEnd;
 	
-	smfMidiChannel * create( trackContainer * _tc )
+	smfMidiChannel * create( TrackContainer* tc )
 	{
 		if( !it ) {
-			it = dynamic_cast<InstrumentTrack *>(
-			track::create( track::InstrumentTrack, _tc ) );
+			it = dynamic_cast<InstrumentTrack *>( track::create( track::InstrumentTrack, tc ) );
 
 #ifdef LMMS_HAVE_FLUIDSYNTH
 			it_inst = it->loadInstrument( "sf2player" );
@@ -262,15 +260,15 @@ public:
 };
 
 
-bool MidiImport::readSMF( trackContainer * _tc )
+bool MidiImport::readSMF( TrackContainer* tc )
 {
 	QString filename = file().fileName();
 	closeFile();
 
 	const int preTrackSteps = 2;
-	QProgressDialog pd( trackContainer::tr( "Importing MIDI-file..." ),
-	trackContainer::tr( "Cancel" ), 0, preTrackSteps, engine::mainWindow() );
-	pd.setWindowTitle( trackContainer::tr( "Please wait..." ) );
+	QProgressDialog pd( TrackContainer::tr( "Importing MIDI-file..." ),
+	TrackContainer::tr( "Cancel" ), 0, preTrackSteps, engine::mainWindow() );
+	pd.setWindowTitle( TrackContainer::tr( "Please wait..." ) );
 	pd.setWindowModality(Qt::WindowModal);
 	pd.setMinimumDuration( 0 );
 
@@ -318,7 +316,7 @@ bool MidiImport::readSMF( trackContainer * _tc )
 	pd.setValue( 2 );
 
 	// Tempo stuff
-	AutomationPattern * tap = _tc->tempoAutomationPattern();
+	AutomationPattern * tap = tc->tempoAutomationPattern();
 	if( tap )
 	{
 		tap->clear();
@@ -376,7 +374,7 @@ bool MidiImport::readSMF( trackContainer * _tc )
 			}
 			else if( evt->is_note() && evt->chan < 256 )
 			{
-				smfMidiChannel * ch = chs[evt->chan].create( _tc );
+				smfMidiChannel * ch = chs[evt->chan].create( tc );
 				Alg_note_ptr noteEvt = dynamic_cast<Alg_note_ptr>( evt );
 
 				note n( noteEvt->get_duration() * ticksPerBeat,
@@ -389,7 +387,7 @@ bool MidiImport::readSMF( trackContainer * _tc )
 			
 			else if( evt->is_update() )
 			{
-				smfMidiChannel * ch = chs[evt->chan].create( _tc );
+				smfMidiChannel * ch = chs[evt->chan].create( tc );
 
 				double time = evt->time*ticksPerBeat;
 				QString update( evt->get_attribute() );
@@ -469,7 +467,7 @@ bool MidiImport::readSMF( trackContainer * _tc )
 							}
 							else
 							{
-								ccs[ccid].create( _tc );
+								ccs[ccid].create( tc );
 								ccs[ccid].putValue( time, objModel, cc );
 							}
 						}
@@ -492,7 +490,7 @@ bool MidiImport::readSMF( trackContainer * _tc )
 		{
 			printf(" Should remove empty track\n");
 			// must delete trackView first - but where is it?
-			//_tc->removeTrack( chs[c].it );
+			//tc->removeTrack( chs[c].it );
 			//it->deleteLater();
 		}
 	}
@@ -503,7 +501,7 @@ bool MidiImport::readSMF( trackContainer * _tc )
 
 
 
-bool MidiImport::readRIFF( trackContainer * _tc )
+bool MidiImport::readRIFF( TrackContainer* tc )
 {
 	// skip file length
 	skip( 4 );
@@ -543,7 +541,7 @@ data_not_found:
 	{
 		goto invalid_format;
 	}
-	return readSMF( _tc );
+	return readSMF( tc );
 }
 
 

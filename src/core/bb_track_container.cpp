@@ -1,7 +1,7 @@
 /*
  * bb_track_container.cpp - model-component of BB-Editor
  *
- * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -33,7 +33,7 @@
 
 
 bbTrackContainer::bbTrackContainer() :
-	trackContainer(),
+	TrackContainer(),
 	m_bbComboBoxModel( this )
 {
 	connect( &m_bbComboBoxModel, SIGNAL( dataChanged() ),
@@ -66,8 +66,8 @@ bool bbTrackContainer::play( midiTime _start, fpp_t _frames,
 
 	_start = _start % ( lengthOfBB( _tco_num ) * midiTime::ticksPerTact() );
 
-	trackList tl = tracks();
-	for( trackList::iterator it = tl.begin(); it != tl.end(); ++it )
+	TrackList tl = tracks();
+	for( TrackList::iterator it = tl.begin(); it != tl.end(); ++it )
 	{
 		if( ( *it )->play( _start, _frames, _offset, _tco_num ) )
 		{
@@ -102,8 +102,8 @@ tact_t bbTrackContainer::lengthOfBB( int _bb )
 {
 	midiTime max_length = midiTime::ticksPerTact();
 
-	const trackList & tl = tracks();
-	for( trackList::const_iterator it = tl.begin(); it != tl.end(); ++it )
+	const TrackList & tl = tracks();
+	for( TrackList::const_iterator it = tl.begin(); it != tl.end(); ++it )
 	{
 		max_length = qMax( max_length,
 					( *it )->getTCO( _bb )->length() );
@@ -125,8 +125,8 @@ int bbTrackContainer::numOfBBs() const
 
 void bbTrackContainer::removeBB( int _bb )
 {
-	trackList tl = tracks();
-	for( trackList::iterator it = tl.begin(); it != tl.end(); ++it )
+	TrackList tl = tracks();
+	for( TrackList::iterator it = tl.begin(); it != tl.end(); ++it )
 	{
 		delete ( *it )->getTCO( _bb );
 		( *it )->removeTact( _bb * DefaultTicksPerTact );
@@ -142,8 +142,8 @@ void bbTrackContainer::removeBB( int _bb )
 
 void bbTrackContainer::swapBB( int _bb1, int _bb2 )
 {
-	trackList tl = tracks();
-	for( trackList::iterator it = tl.begin(); it != tl.end(); ++it )
+	TrackList tl = tracks();
+	for( TrackList::iterator it = tl.begin(); it != tl.end(); ++it )
 	{
 		( *it )->swapPositionOfTCOs( _bb1, _bb2 );
 	}
@@ -168,8 +168,8 @@ void bbTrackContainer::updateBBTrack( trackContentObject * _tco )
 
 void bbTrackContainer::fixIncorrectPositions()
 {
-	trackList tl = tracks();
-	for( trackList::iterator it = tl.begin(); it != tl.end(); ++it )
+	TrackList tl = tracks();
+	for( TrackList::iterator it = tl.begin(); it != tl.end(); ++it )
 	{
 		for( int i = 0; i < numOfBBs(); ++i )
 		{
@@ -228,8 +228,8 @@ void bbTrackContainer::currentBBChanged()
 
 	// now update all track-labels (the current one has to become white,
 	// the others gray)
-	trackList tl = engine::getSong()->tracks();
-	for( trackList::iterator it = tl.begin(); it != tl.end(); ++it )
+	TrackList tl = engine::getSong()->tracks();
+	for( TrackList::iterator it = tl.begin(); it != tl.end(); ++it )
 	{
 		if( ( *it )->type() == track::BBTrack )
 		{
@@ -248,7 +248,7 @@ void bbTrackContainer::createTCOsForBB( int _bb )
 		return;
 	}
 
-	trackList tl = tracks();
+	TrackList tl = tracks();
 	for( int i = 0; i < tl.size(); ++i )
 	{
 		while( tl[i]->numOfTCOs() < _bb + 1 )

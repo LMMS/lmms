@@ -2,7 +2,7 @@
  * AudioSampleRecorder.h - device-class that implements recording
  *                         audio-buffers into RAM
  *
- * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -31,7 +31,7 @@
 
 #include "AudioDevice.h"
 
-class sampleBuffer;
+class SampleBuffer;
 
 
 class AudioSampleRecorder : public AudioDevice
@@ -42,7 +42,7 @@ public:
 	virtual ~AudioSampleRecorder();
 
 	f_cnt_t framesRecorded() const;
-	void createSampleBuffer( sampleBuffer * * _sample_buf );
+	void createSampleBuffer( SampleBuffer** sampleBuffer );
 
 
 private:

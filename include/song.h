@@ -28,7 +28,7 @@
 #include <QtCore/QSharedMemory>
 #include <QtCore/QVector>
 
-#include "track_container.h"
+#include "TrackContainer.h"
 #include "AutomatableModel.h"
 #include "Controller.h"
 #include "MeterModel.h"
@@ -45,7 +45,7 @@ const bpm_t MaxTempo = 999;
 const tick_t MaxSongLength = 9999 * DefaultTicksPerTact;
 
 
-class EXPORT song : public trackContainer
+class EXPORT song : public TrackContainer
 {
 	Q_OBJECT
 	mapPropertyFromModel(int,getTempo,setTempo,m_tempoModel);

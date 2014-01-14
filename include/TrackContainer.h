@@ -1,6 +1,6 @@
 /*
- * track_container.h - base-class for all track-containers like Song-Editor,
- *                     BB-Editor...
+ * TrackContainer.h - base-class for all track-containers like Song-Editor,
+ *                    BB-Editor...
  *
  * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -34,17 +34,17 @@
 
 class AutomationPattern;
 class InstrumentTrack;
-class trackContainerView;
+class TrackContainerView;
 
 
-class EXPORT trackContainer : public Model, public JournallingObject
+class EXPORT TrackContainer : public Model, public JournallingObject
 {
 	Q_OBJECT
 public:
-	typedef QVector<track *> trackList;
+	typedef QVector<track *> TrackList;
 
-	trackContainer();
-	virtual ~trackContainer();
+	TrackContainer();
+	virtual ~TrackContainer();
 
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
 
@@ -66,7 +66,7 @@ public:
 
 	void clearAllTracks();
 
-	const trackList & tracks() const
+	const TrackList & tracks() const
 	{
 		return m_tracks;
 	}
@@ -86,16 +86,16 @@ protected:
 	mutable QReadWriteLock m_tracksMutex;
 
 private:
-	trackList m_tracks;
+	TrackList m_tracks;
 
 
-	friend class trackContainerView;
+	friend class TrackContainerView;
 	friend class track;
 
 } ;
 
 
-class DummyTrackContainer : public trackContainer
+class DummyTrackContainer : public TrackContainer
 {
 public:
 	DummyTrackContainer();

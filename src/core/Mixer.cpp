@@ -37,7 +37,7 @@
 #include "debug.h"
 #include "engine.h"
 #include "config_mgr.h"
-#include "sample_play_handle.h"
+#include "SamplePlayHandle.h"
 #include "piano_roll.h"
 #include "MicroTimer.h"
 #include "atomic_int.h"
@@ -354,7 +354,7 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 		p != last_metro_pos && p.getTicks() %
 					(DefaultTicksPerTact / 4 ) == 0 )
 	{
-		addPlayHandle( new samplePlayHandle( "misc/metronome01.ogg" ) );
+		addPlayHandle( new SamplePlayHandle( "misc/metronome01.ogg" ) );
 		last_metro_pos = p;
 	}
 

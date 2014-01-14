@@ -35,12 +35,12 @@
 #include "mmp.h"
 #include "note_play_handle.h"
 #include "ProjectJournal.h"
-#include "track_container.h"
+#include "TrackContainer.h"
 
 
 
 // invisible track-container which is needed as parent for preview-channels
-class previewTrackContainer : public trackContainer
+class previewTrackContainer : public TrackContainer
 {
 public:
 	previewTrackContainer() :

@@ -1,7 +1,7 @@
 /*
  * bb_track_container.h - model-component of BB-Editor
  *
- * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -26,11 +26,11 @@
 #ifndef _BB_TRACK_CONTAINER_H
 #define _BB_TRACK_CONTAINER_H
 
-#include "track_container.h"
+#include "TrackContainer.h"
 #include "combobox.h"
 
 
-class EXPORT bbTrackContainer : public trackContainer
+class EXPORT bbTrackContainer : public TrackContainer
 {
 	Q_OBJECT
 	mapPropertyFromModel(int,currentBB,setCurrentBB,m_bbComboBoxModel);

@@ -2,7 +2,7 @@
  * AutomationEditor.cpp - implementation of AutomationEditor which is used for
  *                        actual setting of dynamic values
  *
- * Copyright (c) 2008-2013 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2008-2013 Paul Giblock <pgib/at/users.sourceforge.net>
  * Copyright (c) 2006-2008 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
  * 
@@ -1848,8 +1848,7 @@ inline bool AutomationEditor::inBBEditor()
 {
 	QMutexLocker m( &m_patternMutex );
 	return( validPattern() &&
-				m_pattern->getTrack()->getTrackContainer()
-					== engine::getBBTrackContainer() );
+				m_pattern->getTrack()->trackContainer() == engine::getBBTrackContainer() );
 }
 
 

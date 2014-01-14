@@ -1,7 +1,7 @@
 /*
  * file_browser.h - include file for fileBrowser
  *
- * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -40,7 +40,7 @@ class fileItem;
 class InstrumentTrack;
 class fileBrowserTreeWidget;
 class playHandle;
-class trackContainer;
+class TrackContainer;
 
 
 
@@ -96,7 +96,7 @@ protected:
 
 private:
 	void handleFile( fileItem * _fi, InstrumentTrack * _it );
-	void openInNewInstrumentTrack( trackContainer * _tc );
+	void openInNewInstrumentTrack( TrackContainer* tc );
 
 
 	bool m_mousePressed;

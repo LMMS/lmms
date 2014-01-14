@@ -1,7 +1,7 @@
 /*
  * bb_editor.h - view-component of BB-Editor
  *
- * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -26,7 +26,7 @@
 #ifndef _BB_EDITOR_H
 #define _BB_EDITOR_H
 
-#include "track_container_view.h"
+#include "TrackContainerView.h"
 
 
 class bbTrackContainer;
@@ -34,7 +34,7 @@ class comboBox;
 class toolButton;
 
 
-class bbEditor : public trackContainerView
+class bbEditor : public TrackContainerView
 {
 	Q_OBJECT
 public:

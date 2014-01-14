@@ -29,7 +29,7 @@
 
 #include "graph.h"
 #include "string_pair_drag.h"
-#include "sample_buffer.h"
+#include "SampleBuffer.h"
 #include "Oscillator.h"
 #include "engine.h"
 

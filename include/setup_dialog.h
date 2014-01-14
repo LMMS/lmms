@@ -110,6 +110,7 @@ private slots:
 	void toggleCompactTrackButtons( bool _enabled );
 	void toggleSyncVSTPlugins( bool _enabled );
 	void toggleAnimateAFP( bool _enabled );
+	void toggleNoteLabels( bool en );
 
 
 private:
@@ -160,6 +161,7 @@ private:
 	bool m_compactTrackButtons;
 	bool m_syncVSTPlugins;
 	bool m_animateAFP;
+	bool m_printNoteLabels;
 
 	typedef QMap<QString, AudioDevice::setupWidget *> AswMap;
 	typedef QMap<QString, MidiClient::setupWidget *> MswMap;

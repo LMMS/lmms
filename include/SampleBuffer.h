@@ -1,7 +1,7 @@
 /*
- * sample_buffer.h - container-class sampleBuffer
+ * SampleBuffer.h - container-class SampleBuffer
  *
- * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -42,7 +42,7 @@
 class QPainter;
 
 
-class EXPORT sampleBuffer : public QObject, public sharedObject
+class EXPORT SampleBuffer : public QObject, public sharedObject
 {
 	Q_OBJECT
 public:
@@ -58,19 +58,19 @@ public:
 		const bool m_varyingPitch;
 		SRC_STATE * m_resamplingData;
 
-		friend class sampleBuffer;
+		friend class SampleBuffer;
 
 	} ;
 
 
 	// constructor which either loads sample _audio_file or decodes
 	// base64-data out of string
-	sampleBuffer( const QString & _audio_file = QString(),
+	SampleBuffer( const QString & _audio_file = QString(),
 						bool _is_base64_data = false );
-	sampleBuffer( const sampleFrame * _data, const f_cnt_t _frames );
-	sampleBuffer( const f_cnt_t _frames );
+	SampleBuffer( const sampleFrame * _data, const f_cnt_t _frames );
+	SampleBuffer( const f_cnt_t _frames );
 
-	virtual ~sampleBuffer();
+	virtual ~SampleBuffer();
 
 	bool play( sampleFrame * _ab, handleState * _state,
 				const fpp_t _frames,
@@ -166,12 +166,12 @@ public:
 	QString & toBase64( QString & _dst ) const;
 
 
-	static sampleBuffer * resample( sampleFrame * _data,
+	static SampleBuffer * resample( sampleFrame * _data,
 						const f_cnt_t _frames,
 						const sample_rate_t _src_sr,
 						const sample_rate_t _dst_sr );
 
-	static inline sampleBuffer * resample( sampleBuffer * _buf,
+	static inline SampleBuffer * resample( SampleBuffer * _buf,
 						const sample_rate_t _src_sr,
 						const sample_rate_t _dst_sr )
 	{
@@ -219,6 +219,8 @@ public slots:
 private:
 	void update( bool _keep_settings = false );
 
+    void convertIntToFloat ( int_sample_t * & _ibuf, f_cnt_t _frames, int _channels);
+    void directFloatWrite ( sample_t * & _fbuf, f_cnt_t _frames, int _channels);
 
 	f_cnt_t decodeSampleSF( const char * _f, int_sample_t * & _buf,
 						ch_cnt_t & _channels,

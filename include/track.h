@@ -45,8 +45,8 @@ class pixmapButton;
 class textFloat;
 class track;
 class trackContentObjectView;
-class trackContainer;
-class trackContainerView;
+class TrackContainer;
+class TrackContainerView;
 class trackContentWidget;
 class trackView;
 
@@ -364,12 +364,12 @@ public:
 		NumTrackTypes
 	} ;
 
-	track( TrackTypes _type, trackContainer * _tc );
+	track( TrackTypes _type, TrackContainer * _tc );
 	virtual ~track();
 
-	static track * create( TrackTypes _tt, trackContainer * _tc );
+	static track * create( TrackTypes _tt, TrackContainer * _tc );
 	static track * create( const QDomElement & _this,
-							trackContainer * _tc );
+							TrackContainer * _tc );
 	void clone();
 
 
@@ -384,7 +384,7 @@ public:
 						Sint16 _tco_num = -1 ) = 0;
 
 
-	virtual trackView * createView( trackContainerView * _view ) = 0;
+	virtual trackView * createView( TrackContainerView * _view ) = 0;
 	virtual trackContentObject * createTCO( const midiTime & _pos ) = 0;
 
 	virtual void saveTrackSpecificSettings( QDomDocument & _doc,
@@ -424,9 +424,9 @@ public:
 	tact_t length() const;
 
 
-	inline trackContainer * getTrackContainer() const
+	inline TrackContainer* trackContainer() const
 	{
-		return( m_trackContainer );
+		return m_trackContainer;
 	}
 
 	// name-stuff
@@ -461,7 +461,7 @@ public slots:
 
 
 private:
-	trackContainer * m_trackContainer;
+	TrackContainer* m_trackContainer;
 	TrackTypes m_type;
 	QString m_name;
 	int m_height;
@@ -492,7 +492,7 @@ class trackView : public QWidget, public ModelView, public JournallingObject
 {
 	Q_OBJECT
 public:
-	trackView( track * _track, trackContainerView * _tcv );
+	trackView( track * _track, TrackContainerView* tcv );
 	virtual ~trackView();
 
 	inline const track * getTrack() const
@@ -505,9 +505,9 @@ public:
 		return( m_track );
 	}
 
-	inline trackContainerView * getTrackContainerView()
+	inline TrackContainerView* trackContainerView()
 	{
-		return( m_trackContainerView );
+		return m_trackContainerView;
 	}
 
 	inline trackOperationsWidget * getTrackOperationsWidget()
@@ -566,7 +566,7 @@ private:
 	} ;
 
 	track * m_track;
-	trackContainerView * m_trackContainerView;
+	TrackContainerView * m_trackContainerView;
 
 	trackOperationsWidget m_trackOperationsWidget;
 	trackSettingsWidget m_trackSettingsWidget;

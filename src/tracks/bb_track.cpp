@@ -298,8 +298,8 @@ void bbTCOView::setColor( QColor _new_color )
 
 
 
-bbTrack::bbTrack( trackContainer * _tc ) :
-	track( BBTrack, _tc )
+bbTrack::bbTrack( TrackContainer* tc ) :
+	track( BBTrack, tc )
 {
 	int bbNum = s_infoMap.size();
 	s_infoMap[this] = bbNum;
@@ -333,7 +333,7 @@ bbTrack::~bbTrack()
 
 	// remove us from TC so bbTrackContainer::numOfBBs() returns a smaller
 	// value and thus combobox-updating in bbTrackContainer works well
-	getTrackContainer()->removeTrack( this );
+	trackContainer()->removeTrack( this );
 	engine::getBBTrackContainer()->updateComboBox();
 }
 
@@ -391,9 +391,9 @@ bool bbTrack::play( const midiTime & _start, const fpp_t _frames,
 
 
 
-trackView * bbTrack::createView( trackContainerView * _tcv )
+trackView * bbTrack::createView( TrackContainerView* tcv )
 {
-	return( new bbTrackView( this, _tcv ) );
+	return new bbTrackView( this, tcv );
 }
 
 
@@ -454,11 +454,11 @@ void bbTrack::loadTrackSpecificSettings( const QDomElement & _this )
 		const int src = _this.attribute( "clonebbt" ).toInt();
 		const int dst = s_infoMap[this];
 		engine::getBBTrackContainer()->createTCOsForBB( dst );
-		trackContainer::trackList tl =
+		TrackContainer::TrackList tl =
 					engine::getBBTrackContainer()->tracks();
 		// copy TCOs of all tracks from source BB (at bar "src") to destination
 		// TCOs (which are created if they do not exist yet)
-		for( trackContainer::trackList::iterator it = tl.begin();
+		for( TrackContainer::TrackList::iterator it = tl.begin();
 							it != tl.end(); ++it )
 		{
 			( *it )->getTCO( src )->copy();
@@ -470,7 +470,7 @@ void bbTrack::loadTrackSpecificSettings( const QDomElement & _this )
 	else
 	{
 		QDomNode node = _this.namedItem(
-					trackContainer::classNodeName() );
+					TrackContainer::classNodeName() );
 		if( node.isElement() )
 		{
 			( (JournallingObject *)engine::getBBTrackContainer() )->
@@ -539,8 +539,8 @@ void bbTrack::swapBBTracks( track * _track1, track * _track2 )
 
 
 
-bbTrackView::bbTrackView( bbTrack * _bbt, trackContainerView * _tcv ) :
-	trackView( _bbt, _tcv ),
+bbTrackView::bbTrackView( bbTrack * _bbt, TrackContainerView* tcv ) :
+	trackView( _bbt, tcv ),
 	m_bbTrack( _bbt )
 {
 	setFixedHeight( 32 );
@@ -583,7 +583,7 @@ void bbTrackView::clickedTrackLabel()
 					bbTrack::numOfBBTrack( m_bbTrack ) );
 	engine::getBBEditor()->show();
 /*	foreach( bbTrackView * tv,
-			getTrackContainerView()->findChildren<bbTrackView *>() )
+			trackContainerView()->findChildren<bbTrackView *>() )
 	{
 		tv->m_trackLabel->update();
 	}*/

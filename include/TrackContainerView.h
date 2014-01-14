@@ -1,7 +1,7 @@
 /*
- * track_container_view.h - view-component for trackContainer
+ * TrackContainerView.h - view-component for TrackContainer
  *
- * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -36,17 +36,17 @@
 
 
 class QVBoxLayout;
-class trackContainer;
+class TrackContainer;
 
 
-class trackContainerView : public QWidget, public ModelView,
+class TrackContainerView : public QWidget, public ModelView,
 						public JournallingObject,
 						public SerializingObjectHook
 {
 	Q_OBJECT
 public:
-	trackContainerView( trackContainer * _tc );
-	virtual ~trackContainerView();
+	TrackContainerView( TrackContainer* tc );
+	virtual ~TrackContainerView();
 
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _this );
 	virtual void loadSettings( const QDomElement & _this );
@@ -92,14 +92,14 @@ public:
 	}
 
 
-	trackContainer * model()
+	TrackContainer* model()
 	{
-		return( m_tc );
+		return m_tc;
 	}
 
-	const trackContainer * model() const
+	const TrackContainer* model() const
 	{
-		return( m_tc );
+		return m_tc;
 	}
 
 	void moveTrackViewUp( trackView * _tv );
@@ -155,18 +155,18 @@ private:
 	class scrollArea : public QScrollArea
 	{
 	public:
-		scrollArea( trackContainerView * _parent );
+		scrollArea( TrackContainerView* parent );
 		virtual ~scrollArea();
 
 	protected:
 		virtual void wheelEvent( QWheelEvent * _we );
 
 	private:
-		trackContainerView * m_trackContainerView;
+		TrackContainerView* m_trackContainerView;
 
 	} ;
 
-	trackContainer * m_tc;
+	TrackContainer* m_tc;
 	typedef QList<trackView *> trackViewList;
 	trackViewList m_trackViews;
 

@@ -1,8 +1,7 @@
 /*
- * sample_track.h - class sampleTrack, a track which provides arrangement of
- *                  samples
+ * SampleTrack.h - class SampleTrack, a track which provides arrangement of samples
  *
- * Copyright (c) 2005-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -33,16 +32,16 @@
 
 class EffectRackView;
 class knob;
-class sampleBuffer;
+class SampleBuffer;
 
 
-class sampleTCO : public trackContentObject
+class SampleTCO : public trackContentObject
 {
 	Q_OBJECT
 	mapPropertyFromModel(bool,isRecord,setRecord,m_recordModel);
 public:
-	sampleTCO( track * _track );
-	virtual ~sampleTCO();
+	SampleTCO( track * _track );
+	virtual ~SampleTCO();
 
 	virtual void changeLength( const midiTime & _length );
 	const QString & sampleFile() const;
@@ -54,7 +53,7 @@ public:
 		return "sampletco";
 	}
 
-	sampleBuffer * getSampleBuffer()
+	SampleBuffer* sampleBuffer()
 	{
 		return m_sampleBuffer;
 	}
@@ -65,18 +64,18 @@ public:
 
 
 public slots:
-	void setSampleBuffer( sampleBuffer * _sb );
+	void setSampleBuffer( SampleBuffer* sb );
 	void setSampleFile( const QString & _sf );
 	void updateLength( bpm_t = 0 );
 	void toggleRecord();
 
 
 private:
-	sampleBuffer * m_sampleBuffer;
+	SampleBuffer* m_sampleBuffer;
 	BoolModel m_recordModel;
 
 
-	friend class sampleTCOView;
+	friend class SampleTCOView;
 
 
 signals:
@@ -86,12 +85,12 @@ signals:
 
 
 
-class sampleTCOView : public trackContentObjectView
+class SampleTCOView : public trackContentObjectView
 {
 	Q_OBJECT
 public:
-	sampleTCOView( sampleTCO * _tco, trackView * _tv );
-	virtual ~sampleTCOView();
+	SampleTCOView( SampleTCO * _tco, trackView * _tv );
+	virtual ~SampleTCOView();
 
 
 public slots:
@@ -108,24 +107,24 @@ protected:
 
 
 private:
-	sampleTCO * m_tco;
+	SampleTCO * m_tco;
 
 } ;
 
 
 
 
-class sampleTrack : public track
+class SampleTrack : public track
 {
 	Q_OBJECT
 public:
-	sampleTrack( trackContainer * _tc );
-	virtual ~sampleTrack();
+	SampleTrack( TrackContainer* tc );
+	virtual ~SampleTrack();
 
 	virtual bool play( const midiTime & _start, const fpp_t _frames,
 						const f_cnt_t _frame_base,
 							Sint16 _tco_num = -1 );
-	virtual trackView * createView( trackContainerView * _tcv );
+	virtual trackView * createView( TrackContainerView* tcv );
 	virtual trackContentObject * createTCO( const midiTime & _pos );
 
 
@@ -149,18 +148,18 @@ private:
 	FloatModel m_volumeModel;
 
 
-	friend class sampleTrackView;
+	friend class SampleTrackView;
 
 } ;
 
 
 
-class sampleTrackView : public trackView
+class SampleTrackView : public trackView
 {
 	Q_OBJECT
 public:
-	sampleTrackView( sampleTrack * _track, trackContainerView * _tcv );
-	virtual ~sampleTrackView();
+	SampleTrackView( SampleTrack* track, TrackContainerView* tcv );
+	virtual ~SampleTrackView();
 
 
 public slots:

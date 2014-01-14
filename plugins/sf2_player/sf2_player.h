@@ -36,7 +36,7 @@
 #include "lcd_spinbox.h"
 #include "led_checkbox.h"
 #include "fluidsynth.h"
-#include "sample_buffer.h"
+#include "SampleBuffer.h"
 
 class sf2InstrumentView;
 class sf2Font;

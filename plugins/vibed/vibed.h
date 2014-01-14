@@ -26,7 +26,6 @@
 
 #include "Instrument.h"
 #include "InstrumentView.h"
-#include "sample_buffer.h"
 #include "graph.h"
 #include "knob.h"
 #include "pixmap_button.h"

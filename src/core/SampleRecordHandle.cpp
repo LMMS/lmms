@@ -1,5 +1,5 @@
 /*
- * sample_record_handle.cpp - implementation of class sampleRecordHandle
+ * SampleRecordHandle.cpp - implementation of class SampleRecordHandle
  *
  * Copyright (c) 2008 Csaba Hruska <csaba.hruska/at/gmail.com>
  * 
@@ -23,34 +23,34 @@
  */
 
 
-#include "sample_record_handle.h"
+#include "SampleRecordHandle.h"
 #include "bb_track.h"
 #include "engine.h"
 #include "InstrumentTrack.h"
 #include "pattern.h"
-#include "sample_buffer.h"
-#include "sample_track.h"
+#include "SampleBuffer.h"
+#include "SampleTrack.h"
 
 
 
-sampleRecordHandle::sampleRecordHandle( sampleTCO * _tco ) :
+SampleRecordHandle::SampleRecordHandle( SampleTCO* tco ) :
 	playHandle( SamplePlayHandle ),
 	m_framesRecorded( 0 ),
-	m_minLength( _tco->length() ),
-	m_track( _tco->getTrack() ),
+	m_minLength( tco->length() ),
+	m_track( tco->getTrack() ),
 	m_bbTrack( NULL ),
-	m_tco( _tco )
+	m_tco( tco )
 {
 }
 
 
 
 
-sampleRecordHandle::~sampleRecordHandle()
+SampleRecordHandle::~SampleRecordHandle()
 {
 	if( !m_buffers.empty() )
 	{
-		sampleBuffer * sb;
+		SampleBuffer* sb;
 		createSampleBuffer( &sb );
 		m_tco->setSampleBuffer( sb );
 	}
@@ -66,7 +66,7 @@ sampleRecordHandle::~sampleRecordHandle()
 
 
 
-void sampleRecordHandle::play( sampleFrame * /*_working_buffer*/ )
+void SampleRecordHandle::play( sampleFrame * /*_working_buffer*/ )
 {
 	const sampleFrame * recbuf = engine::mixer()->inputBuffer();
 	const f_cnt_t frames = engine::mixer()->inputBufferFrames();
@@ -84,7 +84,7 @@ void sampleRecordHandle::play( sampleFrame * /*_working_buffer*/ )
 
 
 
-bool sampleRecordHandle::done() const
+bool SampleRecordHandle::done() const
 {
 	return false;
 }
@@ -92,7 +92,7 @@ bool sampleRecordHandle::done() const
 
 
 
-bool sampleRecordHandle::isFromTrack( const track * _track ) const
+bool SampleRecordHandle::isFromTrack( const track * _track ) const
 {
 	return( m_track == _track || m_bbTrack == _track );
 }
@@ -100,7 +100,7 @@ bool sampleRecordHandle::isFromTrack( const track * _track ) const
 
 
 
-f_cnt_t sampleRecordHandle::framesRecorded() const
+f_cnt_t SampleRecordHandle::framesRecorded() const
 {
 	return( m_framesRecorded );
 }
@@ -108,7 +108,7 @@ f_cnt_t sampleRecordHandle::framesRecorded() const
 
 
 
-void sampleRecordHandle::createSampleBuffer( sampleBuffer * * _sample_buf )
+void SampleRecordHandle::createSampleBuffer( SampleBuffer** sampleBuf )
 {
 	const f_cnt_t frames = framesRecorded();
 	// create buffer to store all recorded buffers in
@@ -128,15 +128,15 @@ void sampleRecordHandle::createSampleBuffer( sampleBuffer * * _sample_buf )
 		data_ptr += ( *it ).second;
 	}
 	// create according sample-buffer out of big buffer
-	*_sample_buf = new sampleBuffer( data, frames );
-	( *_sample_buf )->setSampleRate( engine::mixer()->inputSampleRate() );
+	*sampleBuf = new SampleBuffer( data, frames );
+	( *sampleBuf)->setSampleRate( engine::mixer()->inputSampleRate() );
 	delete[] data;
 }
 
 
 
 
-void sampleRecordHandle::writeBuffer( const sampleFrame * _ab,
+void SampleRecordHandle::writeBuffer( const sampleFrame * _ab,
 					const f_cnt_t _frames )
 {
 	sampleFrame * buf = new sampleFrame[_frames];

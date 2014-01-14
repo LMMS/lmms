@@ -1,7 +1,7 @@
 /*
- * sample_play_handle.cpp - implementation of class samplePlayHandle
+ * SamplePlayHandle.cpp - implementation of class SamplePlayHandle
  *
- * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -22,23 +22,23 @@
  *
  */
 
-#include "sample_play_handle.h"
+#include "SamplePlayHandle.h"
 #include "AudioPort.h"
 #include "bb_track.h"
 #include "engine.h"
 #include "InstrumentTrack.h"
 #include "pattern.h"
-#include "sample_buffer.h"
-#include "sample_track.h"
+#include "SampleBuffer.h"
+#include "SampleTrack.h"
 
 
 
-samplePlayHandle::samplePlayHandle( const QString & _sample_file ) :
-	playHandle( SamplePlayHandle ),
-	m_sampleBuffer( new sampleBuffer( _sample_file ) ),
+SamplePlayHandle::SamplePlayHandle( const QString& sampleFile ) :
+	playHandle( playHandle::SamplePlayHandle ),
+	m_sampleBuffer( new SampleBuffer( sampleFile ) ),
 	m_doneMayReturnTrue( true ),
 	m_frame( 0 ),
-	m_audioPort( new AudioPort( "samplePlayHandle", false ) ),
+	m_audioPort( new AudioPort( "SamplePlayHandle", false ) ),
 	m_ownAudioPort( true ),
 	m_defaultVolumeModel( DefaultVolume, MinVolume, MaxVolume, 1 ),
 	m_volumeModel( &m_defaultVolumeModel ),
@@ -50,12 +50,12 @@ samplePlayHandle::samplePlayHandle( const QString & _sample_file ) :
 
 
 
-samplePlayHandle::samplePlayHandle( sampleBuffer * _sample_buffer ) :
-	playHandle( SamplePlayHandle ),
-	m_sampleBuffer( sharedObject::ref( _sample_buffer ) ),
+SamplePlayHandle::SamplePlayHandle( SampleBuffer* sampleBuffer ) :
+	playHandle( playHandle::SamplePlayHandle ),
+	m_sampleBuffer( sharedObject::ref( sampleBuffer ) ),
 	m_doneMayReturnTrue( true ),
 	m_frame( 0 ),
-	m_audioPort( new AudioPort( "samplePlayHandle", false ) ),
+	m_audioPort( new AudioPort( "SamplePlayHandle", false ) ),
 	m_ownAudioPort( true ),
 	m_defaultVolumeModel( DefaultVolume, MinVolume, MaxVolume, 1 ),
 	m_volumeModel( &m_defaultVolumeModel ),
@@ -67,16 +67,16 @@ samplePlayHandle::samplePlayHandle( sampleBuffer * _sample_buffer ) :
 
 
 
-samplePlayHandle::samplePlayHandle( sampleTCO * _tco ) :
-	playHandle( SamplePlayHandle ),
-	m_sampleBuffer( sharedObject::ref( _tco->getSampleBuffer() ) ),
+SamplePlayHandle::SamplePlayHandle( SampleTCO* tco ) :
+	playHandle( playHandle::SamplePlayHandle ),
+	m_sampleBuffer( sharedObject::ref( tco->sampleBuffer() ) ),
 	m_doneMayReturnTrue( true ),
 	m_frame( 0 ),
-	m_audioPort( ( (sampleTrack *)_tco->getTrack() )->audioPort() ),
+	m_audioPort( ( (SampleTrack *)tco->getTrack() )->audioPort() ),
 	m_ownAudioPort( false ),
 	m_defaultVolumeModel( DefaultVolume, MinVolume, MaxVolume, 1 ),
 	m_volumeModel( &m_defaultVolumeModel ),
-	m_track( _tco->getTrack() ),
+	m_track( tco->getTrack() ),
 	m_bbTrack( NULL )
 {
 }
@@ -84,8 +84,8 @@ samplePlayHandle::samplePlayHandle( sampleTCO * _tco ) :
 
 
 
-samplePlayHandle::samplePlayHandle( pattern * _pattern ) :
-	playHandle( SamplePlayHandle ),
+SamplePlayHandle::SamplePlayHandle( pattern * _pattern ) :
+	playHandle( playHandle::SamplePlayHandle ),
 	m_sampleBuffer( sharedObject::ref( _pattern->frozenPattern() ) ),
 	m_doneMayReturnTrue( true ),
 	m_frame( 0 ),
@@ -101,7 +101,7 @@ samplePlayHandle::samplePlayHandle( pattern * _pattern ) :
 
 
 
-samplePlayHandle::~samplePlayHandle()
+SamplePlayHandle::~SamplePlayHandle()
 {
 	sharedObject::unref( m_sampleBuffer );
 	if( m_ownAudioPort )
@@ -113,7 +113,7 @@ samplePlayHandle::~samplePlayHandle()
 
 
 
-void samplePlayHandle::play( sampleFrame * _working_buffer )
+void SamplePlayHandle::play( sampleFrame * _working_buffer )
 {
 	//play( 0, _try_parallelizing );
 	if( framesDone() >= totalFrames() )
@@ -140,7 +140,7 @@ void samplePlayHandle::play( sampleFrame * _working_buffer )
 
 
 
-bool samplePlayHandle::done() const
+bool SamplePlayHandle::done() const
 {
 	return( framesDone() >= totalFrames() && m_doneMayReturnTrue == true );
 }
@@ -148,7 +148,7 @@ bool samplePlayHandle::done() const
 
 
 
-bool samplePlayHandle::isFromTrack( const track * _track ) const
+bool SamplePlayHandle::isFromTrack( const track * _track ) const
 {
 	return( m_track == _track || m_bbTrack == _track );
 }
@@ -156,7 +156,7 @@ bool samplePlayHandle::isFromTrack( const track * _track ) const
 
 
 
-f_cnt_t samplePlayHandle::totalFrames() const
+f_cnt_t SamplePlayHandle::totalFrames() const
 {
 	return( ( m_sampleBuffer->endFrame() - m_sampleBuffer->startFrame() ) *
 			( engine::mixer()->processingSampleRate() /

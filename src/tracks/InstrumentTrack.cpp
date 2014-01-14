@@ -69,7 +69,7 @@
 #include "note_play_handle.h"
 #include "pattern.h"
 #include "PluginView.h"
-#include "sample_play_handle.h"
+#include "SamplePlayHandle.h"
 #include "song.h"
 #include "string_pair_drag.h"
 #include "surround_area.h"
@@ -91,8 +91,8 @@ const int INSTRUMENT_WINDOW_CACHE_SIZE = 8;
 
 
 // #### IT:
-InstrumentTrack::InstrumentTrack( trackContainer * _tc ) :
-	track( track::InstrumentTrack, _tc ),
+InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
+	track( track::InstrumentTrack, tc ),
 	MidiEventProcessor(),
 	m_audioPort( tr( "unnamed_track" ) ),
 	m_midiPort( tr( "unnamed_track" ), engine::mixer()->midiClient(),
@@ -659,7 +659,7 @@ bool InstrumentTrack::play( const midiTime & _start,
 				continue;
 			}
 
-			samplePlayHandle * handle = new samplePlayHandle( p );
+			SamplePlayHandle* handle = new SamplePlayHandle( p );
 			handle->setBBTrack( bb_track );
 			handle->setOffset( _offset );
 			// send it to the mixer
@@ -745,9 +745,9 @@ trackContentObject * InstrumentTrack::createTCO( const midiTime & )
 
 
 
-trackView * InstrumentTrack::createView( trackContainerView * _tcv )
+trackView * InstrumentTrack::createView( TrackContainerView* tcv )
 {
-	return new InstrumentTrackView( this, _tcv );
+	return new InstrumentTrackView( this, tcv );
 }
 
 
@@ -910,9 +910,8 @@ QQueue<InstrumentTrackWindow *> InstrumentTrackView::s_windowCache;
 
 
 
-InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it,
-						trackContainerView * _tcv ) :
-	trackView( _it, _tcv ),
+InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerView* tcv ) :
+	trackView( _it, tcv ),
 	m_window( NULL ),
 	m_lastPos( -1, -1 )
 {

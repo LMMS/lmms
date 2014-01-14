@@ -2,7 +2,7 @@
  * AudioSampleRecorder.cpp - device-class that implements recording
  *                           audio-buffers into RAM
  *
- * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -25,7 +25,7 @@
 
 
 #include "AudioSampleRecorder.h"
-#include "sample_buffer.h"
+#include "SampleBuffer.h"
 #include "debug.h"
 
 
@@ -68,7 +68,7 @@ f_cnt_t AudioSampleRecorder::framesRecorded() const
 
 
 
-void AudioSampleRecorder::createSampleBuffer( sampleBuffer * * _sample_buf )
+void AudioSampleRecorder::createSampleBuffer( SampleBuffer** sampleBuf )
 {
 	const f_cnt_t frames = framesRecorded();
 	// create buffer to store all recorded buffers in
@@ -88,8 +88,8 @@ void AudioSampleRecorder::createSampleBuffer( sampleBuffer * * _sample_buf )
 		data_ptr += ( *it ).second;
 	}
 	// create according sample-buffer out of big buffer
-	*_sample_buf = new sampleBuffer( data, frames );
-	( *_sample_buf )->setSampleRate( sampleRate() );
+	*sampleBuf = new SampleBuffer( data, frames );
+	( *sampleBuf )->setSampleRate( sampleRate() );
 	delete[] data;
 }
 

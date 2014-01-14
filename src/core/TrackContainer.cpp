@@ -1,8 +1,8 @@
 /*
- * track_container.cpp - implementation of base-class for all track-containers
- *                       like Song-Editor, BB-Editor...
+ * TrackContainer.cpp - implementation of base class for all trackcontainers
+ *                      like Song-Editor, BB-Editor...
  *
- * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -28,14 +28,14 @@
 #include <QtGui/QProgressDialog>
 #include <QtXml/QDomElement>
 
-#include "track_container.h"
+#include "TrackContainer.h"
 #include "InstrumentTrack.h"
 #include "engine.h"
 #include "MainWindow.h"
 #include "song.h"
 
 
-trackContainer::trackContainer() :
+TrackContainer::TrackContainer() :
 	Model( NULL ),
 	JournallingObject(),
 	m_tracksMutex(),
@@ -46,7 +46,7 @@ trackContainer::trackContainer() :
 
 
 
-trackContainer::~trackContainer()
+TrackContainer::~TrackContainer()
 {
 	clearAllTracks();
 }
@@ -54,7 +54,7 @@ trackContainer::~trackContainer()
 
 
 
-void trackContainer::saveSettings( QDomDocument & _doc, QDomElement & _this )
+void TrackContainer::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
 	_this.setTagName( classNodeName() );
 	_this.setAttribute( "type", nodeName() );
@@ -71,7 +71,7 @@ void trackContainer::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 
 
-void trackContainer::loadSettings( const QDomElement & _this )
+void TrackContainer::loadSettings( const QDomElement & _this )
 {
 	static QProgressDialog * pd = NULL;
 	bool was_null = ( pd == NULL );
@@ -132,7 +132,7 @@ void trackContainer::loadSettings( const QDomElement & _this )
 
 
 
-int trackContainer::countTracks( track::TrackTypes _tt ) const
+int TrackContainer::countTracks( track::TrackTypes _tt ) const
 {
 	int cnt = 0;
 	m_tracksMutex.lockForRead();
@@ -150,7 +150,7 @@ int trackContainer::countTracks( track::TrackTypes _tt ) const
 
 
 
-void trackContainer::addTrack( track * _track )
+void TrackContainer::addTrack( track * _track )
 {
 	if( _track->type() != track::HiddenAutomationTrack )
 	{
@@ -164,7 +164,7 @@ void trackContainer::addTrack( track * _track )
 
 
 
-void trackContainer::removeTrack( track * _track )
+void TrackContainer::removeTrack( track * _track )
 {
 	int index = m_tracks.indexOf( _track );
 	if( index != -1 )
@@ -183,14 +183,14 @@ void trackContainer::removeTrack( track * _track )
 
 
 
-void trackContainer::updateAfterTrackAdd()
+void TrackContainer::updateAfterTrackAdd()
 {
 }
 
 
 
 
-void trackContainer::clearAllTracks()
+void TrackContainer::clearAllTracks()
 {
 	//m_tracksMutex.lockForWrite();
 	while( !m_tracks.isEmpty() )
@@ -203,9 +203,9 @@ void trackContainer::clearAllTracks()
 
 
 
-bool trackContainer::isEmpty() const
+bool TrackContainer::isEmpty() const
 {
-	for( trackList::const_iterator it = m_tracks.begin();
+	for( TrackList::const_iterator it = m_tracks.begin();
 						it != m_tracks.end(); ++it )
 	{
 		if( !( *it )->getTCOs().isEmpty() )
@@ -222,7 +222,7 @@ bool trackContainer::isEmpty() const
 
 
 DummyTrackContainer::DummyTrackContainer() :
-	trackContainer(),
+	TrackContainer(),
 	m_dummyInstrumentTrack( NULL )
 {
 	setJournalling( false );
@@ -235,5 +235,5 @@ DummyTrackContainer::DummyTrackContainer() :
 
 
 
-#include "moc_track_container.cxx"
+#include "moc_TrackContainer.cxx"
 

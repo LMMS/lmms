@@ -38,9 +38,9 @@
 
 
 
-bbEditor::bbEditor( bbTrackContainer * _tc ) :
-	trackContainerView( _tc ),
-	m_bbtc( _tc )
+bbEditor::bbEditor( bbTrackContainer* tc ) :
+	TrackContainerView( tc ),
+	m_bbtc( tc )
 {
 	// create toolbar
 	m_toolBar = new QWidget;
@@ -108,7 +108,7 @@ bbEditor::bbEditor( bbTrackContainer * _tc ) :
 
 	m_bbComboBox = new comboBox( m_toolBar );
 	m_bbComboBox->setFixedSize( 200, 22 );
-	m_bbComboBox->setModel( &_tc->m_bbComboBoxModel );
+	m_bbComboBox->setModel( &tc->m_bbComboBoxModel );
 
 	tb_layout->addSpacing( 5 );
 	tb_layout->addWidget( m_playButton );
@@ -130,8 +130,8 @@ bbEditor::bbEditor( bbTrackContainer * _tc ) :
 	parentWidget()->show();
 
 
-	setModel( _tc );
-	connect( &_tc->m_bbComboBoxModel, SIGNAL( dataChanged() ),
+	setModel( tc );
+	connect( &tc->m_bbComboBoxModel, SIGNAL( dataChanged() ),
 			this, SLOT( updatePosition() ) );
 }
 
