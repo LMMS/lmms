@@ -771,6 +771,9 @@ void pianoRoll::setCurrentPattern( pattern * _new_pattern )
 	connect( m_pattern->instrumentTrack(),
 			SIGNAL( noteOff( const note & ) ),
 			this, SLOT( finishRecordNote( const note & ) ) );
+	connect( m_pattern->instrumentTrack()->pianoModel(),
+			SIGNAL( dataChanged() ),
+			this, SLOT( update() ) );
 
 	setWindowTitle( tr( "Piano-Roll - %1" ).arg( m_pattern->name() ) );
 
@@ -1275,7 +1278,7 @@ void pianoRoll::keyPressEvent( QKeyEvent* event )
 		case Qt::Key_S:
 			if( event->modifiers() & Qt::ShiftModifier )
 			{
-				_ke->accept();
+				event->accept();
 				m_selectButton->setChecked( true );
 			}
 			break;
@@ -1791,10 +1794,8 @@ void pianoRoll::mousePressEvent( QMouseEvent * _me )
 				m_lastKey = key_num;
 				if( ! m_recording && ! engine::getSong()->isPlaying() )
 				{
-					int v = ( (float) x ) / ( (float) WHITE_KEY_WIDTH ) * 127;
-					m_pattern->instrumentTrack()->processInEvent(
-								midiEvent( MidiNoteOn, 0, key_num, v ),
-								midiTime() );
+					int v = ( (float) x ) / ( (float) WHITE_KEY_WIDTH ) * MidiMaxVelocity;
+					m_pattern->instrumentTrack()->pianoModel()->handleKeyPress( key_num, v );
 				}
 			}
 		}
@@ -1848,12 +1849,9 @@ void pianoRoll::testPlayNote( note * n )
 					! engine::getSong()->isPlaying() )
 	{
 		n->setIsPlaying( true );
-		m_pattern->instrumentTrack()->processInEvent(
-			midiEvent( MidiNoteOn, 0, n->key(), 
-				  n->getVolume() * 127 / 100 ), midiTime() );
+		m_pattern->instrumentTrack()->pianoModel()->handleKeyPress( n->key(), volumeToMidi( n->getVolume() ) );
 
-		midiEvent evt( MidiMetaEvent, 0, n->key(), 
-				panningToMidi( n->getPanning() ) );
+		midiEvent evt( MidiMetaEvent, 0, n->key(), panningToMidi( n->getPanning() ) );
 		
 		evt.m_metaEvent = MidiNotePanning;
 		m_pattern->instrumentTrack()->processInEvent( evt, midiTime() );
@@ -1874,11 +1872,7 @@ void pianoRoll::pauseTestNotes( bool _pause )
 			if( _pause )
 			{
 				// stop note
-				m_pattern->instrumentTrack()->
-					processInEvent(
-						midiEvent( MidiNoteOff, 0, 
-							  ( *it )->key(), 0 ),
-								midiTime() );
+				m_pattern->instrumentTrack()->pianoModel()->handleKeyRelease( ( *it )->key() );
 			}
 			else
 			{
@@ -1895,23 +1889,19 @@ void pianoRoll::pauseTestNotes( bool _pause )
 
 
 
-void pianoRoll::testPlayKey( int _key, int _vol, int _pan )
+void pianoRoll::testPlayKey( int key, int velocity, int pan )
 {
 	// turn off old key
-	m_pattern->instrumentTrack()->processInEvent(
-				midiEvent( MidiNoteOff, 0, m_lastKey, 0 ),
-								midiTime() );
+	m_pattern->instrumentTrack()->pianoModel()->handleKeyRelease( m_lastKey );
 
 	// remember which one we're playing
-	m_lastKey = _key;
+	m_lastKey = key;
 	
 	// play new key
-	m_pattern->instrumentTrack()->processInEvent(
-				midiEvent( MidiNoteOn, 0, _key, _vol ),
-								midiTime() );
-	
+	m_pattern->instrumentTrack()->pianoModel()->handleKeyPress( key, velocity );
+
 	// set panning of newly played key
-	midiEvent evt( MidiMetaEvent, 0, _key, _pan );
+	midiEvent evt( MidiMetaEvent, 0, key, pan );
 	evt.m_metaEvent = MidiNotePanning;
 }
 
@@ -2056,11 +2046,7 @@ void pianoRoll::mouseReleaseEvent( QMouseEvent * _me )
 		{
 			if( ( *it )->isPlaying() )
 			{
-				m_pattern->instrumentTrack()->
-					processInEvent(
-						midiEvent( MidiNoteOff, 0,
-							( *it )->key(), 0 ), 
-								midiTime() );
+				m_pattern->instrumentTrack()->pianoModel()->handleKeyRelease( ( *it )->key() );
 				( *it )->setIsPlaying( false );
 			}
 			
@@ -2068,10 +2054,7 @@ void pianoRoll::mouseReleaseEvent( QMouseEvent * _me )
 		}
 		
 		// stop playing keys that we let go of
-		m_pattern->instrumentTrack()->processInEvent(
-				midiEvent( MidiNoteOff, 0, m_lastKey, 0 ),
-								midiTime() );
-				
+		m_pattern->instrumentTrack()->pianoModel()->handleKeyRelease( m_lastKey );
 	}
 
 	m_currentNote = NULL;
@@ -2136,9 +2119,7 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 		    && _me->buttons() & Qt::LeftButton )
 		{
 			// clicked on a key, play the note
-			testPlayKey( key_num, 
-						( (float) x ) / ( (float) WHITE_KEY_WIDTH ) * 127,
-						0 );
+			testPlayKey( key_num, ( (float) x ) / ( (float) WHITE_KEY_WIDTH ) * MidiMaxVelocity, 0 );
 			update();
 			return;
 		}
@@ -2233,21 +2214,14 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 					{
 						n->setVolume( vol );
 						m_pattern->instrumentTrack()->processInEvent(
-							midiEvent( 
-							  MidiKeyPressure, 
-							  0, 
-							  n->key(), 
-							  vol * 127 / 100),
-									midiTime() );
+							midiEvent( MidiKeyPressure, 0, n->key(), volumeToMidi( vol ) ), midiTime() );
 					}
 					else if( m_noteEditMode == NoteEditPanning )
 					{
 						n->setPanning( pan );
-						midiEvent evt( MidiMetaEvent, 0, 
-										  n->key(), panningToMidi( pan ) );
+						midiEvent evt( MidiMetaEvent, 0, n->key(), panningToMidi( pan ) );
 						evt.m_metaEvent = MidiNotePanning;
-						m_pattern->instrumentTrack()->processInEvent(
-									evt, midiTime() );
+						m_pattern->instrumentTrack()->processInEvent( evt, midiTime() );
 					}
 				}
 				else
@@ -2255,10 +2229,8 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 					if( n->isPlaying() )
 					{
 						// mouse not over this note, stop playing it.
-						m_pattern->instrumentTrack()->processInEvent(
-							midiEvent( MidiNoteOff, 0,
-										n->key(), 0 ), midiTime() );
-						
+						m_pattern->instrumentTrack()->pianoModel()->handleKeyRelease( n->key() );
+
 						n->setIsPlaying( false );
 					}
 				}
