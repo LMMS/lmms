@@ -1154,6 +1154,11 @@ void song::loadProject( const QString & _file_name )
 			else if( node.nodeName() == engine::fxMixer()->nodeName() )
 			{
 				engine::fxMixer()->restoreState( node.toElement() );
+				if( engine::hasGUI() )
+				{
+					// refresh FxMixerView
+					engine::fxMixerView()->refreshDisplay();
+				}
 			}
 			else if( engine::hasGUI() )
 			{
