@@ -225,56 +225,26 @@ void sampleBuffer::update( bool _keep_settings )
 		}
 
 		delete[] f;
-		}
 
-		if( m_frames > 0 && buf != NULL )
-		{
-			// following code transforms int-samples into
-			// float-samples and does amplifying & reversing
-			const float fac = m_amplification /
-						OUTPUT_SAMPLE_MULTIPLIER;
-			m_data = new sampleFrame[m_frames];
-			const int ch = ( channels > 1 ) ? 1 : 0;
-
-			// if reversing is on, we also reverse when
-			// scaling
-			if( m_reversed )
+			if ( m_frames == 0 )  // if still no frames, bail
 			{
-				int idx = ( m_frames - 1 ) * channels;
-				for( f_cnt_t frame = 0; frame < m_frames;
-								++frame )
-				{
-					m_data[frame][0] = buf[idx+0] * fac;
-					m_data[frame][1] = buf[idx+ch] * fac;
-					idx -= channels;
-				}
+				// sample couldn't be decoded, create buffer containing
+				// one sample-frame
+				m_data = new sampleFrame[1];
+				memset( m_data, 0, sizeof( *m_data ) );
+				m_frames = 1;
+				m_loopStartFrame = m_startFrame = 0;
+				m_loopEndFrame = m_endFrame = 1;
 			}
-			else
+			else // otherwise normalize sample rate
 			{
-				int idx = 0;
-				for( f_cnt_t frame = 0; frame < m_frames;
-								++frame )
-				{
-					m_data[frame][0] = buf[idx+0] * fac;
-					m_data[frame][1] = buf[idx+ch] * fac;
-					idx += channels;
-				}
+				normalizeSampleRate( samplerate, _keep_settings );
 			}
 
-			delete[] buf;
+		}
 
-			normalizeSampleRate( samplerate, _keep_settings );
-		}
-		else
-		{
-			// sample couldn't be decoded, create buffer containing
-			// one sample-frame
-			m_data = new sampleFrame[1];
-			memset( m_data, 0, sizeof( *m_data ) );
-			m_frames = 1;
-			m_loopStartFrame = m_startFrame = 0;
-			m_loopEndFrame = m_endFrame = 1;
-		}
+
+
 	}
 	else
 	{
@@ -296,6 +266,85 @@ void sampleBuffer::update( bool _keep_settings )
 }
 
 
+void sampleBuffer::convertIntToFloat ( int_sample_t * & _ibuf, f_cnt_t _frames, int _channels)
+{
+			// following code transforms int-samples into
+			// float-samples and does amplifying & reversing
+			const float fac = m_amplification /
+						OUTPUT_SAMPLE_MULTIPLIER;
+			m_data = new sampleFrame[_frames];
+			const int ch = ( _channels > 1 ) ? 1 : 0;
+
+			// if reversing is on, we also reverse when
+			// scaling
+			if( m_reversed )
+			{
+				int idx = ( _frames - 1 ) * _channels;
+				for( f_cnt_t frame = 0; frame < _frames;
+								++frame )
+				{
+					m_data[frame][0] = _ibuf[idx+0] * fac;
+					m_data[frame][1] = _ibuf[idx+ch] * fac;
+					idx -= _channels;
+				}
+			}
+			else
+			{
+				int idx = 0;
+				for( f_cnt_t frame = 0; frame < _frames;
+								++frame )
+				{
+					m_data[frame][0] = _ibuf[idx+0] * fac;
+					m_data[frame][1] = _ibuf[idx+ch] * fac;
+					idx += _channels;
+				}
+			}
+
+			delete[] _ibuf;
+
+
+
+
+
+}
+
+void sampleBuffer::directFloatWrite ( sample_t * & _fbuf, f_cnt_t _frames, int _channels)
+
+{
+
+		m_data = new sampleFrame[_frames];
+		const int ch = ( _channels > 1 ) ? 1 : 0;
+
+			// if reversing is on, we also reverse when
+			// scaling
+			if( m_reversed )
+			{
+				int idx = ( _frames - 1 ) * _channels;
+				for( f_cnt_t frame = 0; frame < _frames;
+								++frame )
+				{
+					m_data[frame][0] = _fbuf[idx+0];
+					m_data[frame][1] = _fbuf[idx+ch];
+					idx -= _channels;
+				}
+			}
+			else
+			{
+				int idx = 0;
+				for( f_cnt_t frame = 0; frame < _frames;
+								++frame )
+				{
+					m_data[frame][0] = _fbuf[idx+0];
+					m_data[frame][1] = _fbuf[idx+ch];
+					idx += _channels;
+				}
+			}
+
+			delete[] _fbuf;
+
+
+
+}
 
 
 void sampleBuffer::normalizeSampleRate( const sample_rate_t _src_sr,
@@ -333,12 +382,26 @@ f_cnt_t sampleBuffer::decodeSampleSF( const char * _f,
 	SNDFILE * snd_file;
 	SF_INFO sf_info;
 	f_cnt_t frames = 0;
+	bool sf_rr = false;
+	sample_t * fbuf = 0;
+
 	if( ( snd_file = sf_open( _f, SFM_READ, &sf_info ) ) != NULL )
 	{
 		frames = sf_info.frames;
-		_buf = new int_sample_t[sf_info.channels * frames];
-		if( sf_read_short( snd_file, _buf, sf_info.channels * frames )
-						< sf_info.channels * frames )
+
+		// check if float
+		if ( (sf_info.format & SF_FORMAT_SUBMASK) == SF_FORMAT_FLOAT ) // if yes, use float format for buffer
+		{
+			fbuf = new sample_t[sf_info.channels * frames];
+			sf_rr = sf_read_float( snd_file, fbuf, sf_info.channels * frames );
+		}
+		else // otherwise, use int
+		{
+			_buf = new int_sample_t[sf_info.channels * frames];
+			sf_rr = sf_read_short( snd_file, _buf, sf_info.channels * frames );
+		}
+
+		if( sf_rr < sf_info.channels * frames )
 		{
 #ifdef DEBUG_LMMS
 			printf( "sampleBuffer::decodeSampleSF(): could not read"
@@ -357,6 +420,17 @@ f_cnt_t sampleBuffer::decodeSampleSF( const char * _f,
 				"sample %s: %s\n", _f, sf_strerror( NULL ) );
 #endif
 	}
+    //write down either directly or convert i->f depending on file type
+
+    if ( frames > 0 && fbuf != NULL )
+    {
+        directFloatWrite ( fbuf, frames, _channels);
+    }
+    else if ( frames > 0 && _buf != NULL )
+    {
+        convertIntToFloat ( _buf, frames, _channels);
+    }
+
 	return frames;
 }
 
@@ -497,6 +571,12 @@ f_cnt_t sampleBuffer::decodeSampleOGGVorbis( const char * _f,
 	while( bytes_read != 0 && bitstream == 0 );
 
 	ov_clear( &vf );
+	// if buffer isn't empty, convert it to float and write it down
+
+	if ( frames > 0 && _buf != NULL )
+	{
+		convertIntToFloat ( _buf, frames, _channels);
+	}
 
 	return frames;
 }
@@ -511,7 +591,15 @@ f_cnt_t sampleBuffer::decodeSampleDS( const char * _f,
 						sample_rate_t & _samplerate )
 {
 	DrumSynth ds;
-	return ds.GetDSFileSamples( _f, _buf, _channels );
+	f_cnt_t frames = ds.GetDSFileSamples( _f, _buf, _channels );
+
+	if ( frames > 0 && _buf != NULL )
+	{
+		convertIntToFloat ( _buf, frames, _channels);
+	}
+
+	return frames;
+
 }
 
 

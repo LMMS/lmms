@@ -219,6 +219,8 @@ public slots:
 private:
 	void update( bool _keep_settings = false );
 
+    void convertIntToFloat ( int_sample_t * & _ibuf, f_cnt_t _frames, int _channels);
+    void directFloatWrite ( sample_t * & _fbuf, f_cnt_t _frames, int _channels);
 
 	f_cnt_t decodeSampleSF( const char * _f, int_sample_t * & _buf,
 						ch_cnt_t & _channels,
