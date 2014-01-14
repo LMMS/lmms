@@ -1,0 +1,67 @@
+jack_interposer
+
+jack_interposer is a small library that can be used for troubleshooting
+misbehaving JACK applications. No recompile of the application under test is 
+neccessary, though you get more useful backtraces when the application is
+compiled with debugging symbols in.
+
+== Building ==
+
+$ make
+
+== Usage ==
+
+You can simply add this library to your LD_PRELOAD environment:
+
+$ export LD_PRELOAD=/home/arnouten/dev/jack_interposer/jack_interposer.so
+
+Then run the program you wish to analyze: it will abort as soon as a 
+non-rt-safe operation is performed from the jack process callback thread:
+
+$ lmms
+cannot connect output ports. you'll have to do connections at your own!
+malloc(24) is called while in rt section
+Aborted
+$ 
+
+To get a more useful backtrace, run the application in gdb:
+
+$ gdb lmms
+*snip*
+(gdb) run
+*snip*
+malloc(24) is called while in rt section
+
+Program received signal SIGABRT, Aborted.
+[Switching to Thread 0xb35bdb70 (LWP 18358)]
+0xb7fe1424 in __kernel_vsyscall ()
+(gdb) 
+
+Finally, use 'bt' to produce the actual backtrace:
+
+(gdb) bt
+#0  0xb7fe1424 in __kernel_vsyscall ()
+#1  0xb6b138c0 in raise () from /lib/i686/cmov/libc.so.6
+#2  0xb6b16df5 in abort () from /lib/i686/cmov/libc.so.6
+#3  0xb7fddbf9 in malloc () from /home/arnouten/dev/jack_interposer/jack_interposer.so
+#4  0xb72bee1d in qMalloc(unsigned int) () from /usr/lib/libQtCore.so.4
+#5  0x080da586 in audioJACK::processCallback(unsigned int, void*) ()
+#6  0x080dae08 in audioJACK::staticProcessCallback(unsigned int, void*) ()
+#7  0xb7fddc4d in interposed_process_callback () from /home/arnouten/dev/jack_interposer/jack_interposer.so
+#8  0xb708659e in ?? () from /usr/lib/libjack.so.0
+#9  0xb708a34f in ?? () from /usr/lib/libjack.so.0
+#10 0xb725b585 in start_thread () from /lib/i686/cmov/libpthread.so.0
+#11 0xb6bb818e in clone () from /lib/i686/cmov/libc.so.6
+(gdb) 
+
+Looks like LMMS is using some QT helper classes that are performing malloc()'s!
+
+== Limitations ==
+
+Unless compiled with GCC 3.3 or later, jack_interposer only works for 
+single-CPU machines, or machines configured to run the application under test 
+on a single CPU.
+
+== Related applications ==
+
+http://trac.jackaudio.org/wiki/WalkThrough/Dev/Tools

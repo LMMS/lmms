@@ -1,0 +1,11 @@
+int|select|int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, struct timeval *timeout|nfds, readfds, writefds, exceptfds, timeout
+unsigned int|sleep|unsigned int seconds|seconds
+void *|malloc|size_t size|size
+void *|realloc|void *ptr, size_t size|ptr, size
+void|free|void* ptr|ptr
+int|pthread_mutex_lock|pthread_mutex_t *mutex|mutex
+int|pthread_join|pthread_t thread, void **value_ptr|thread, value_ptr
+pid_t|wait|int* status|status
+int|poll|struct pollfd *fds, nfds_t nfds, int timeout|fds, nfds, timeout
+int|vprintf|const char *format, va_list ap|format, ap
+int|vfprintf|FILE *stream, const char *format, va_list ap|stream, format, ap
