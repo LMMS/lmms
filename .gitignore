@@ -1,3 +1,4 @@
 /build
 .*.sw?
 *~
+/rttests/jack_interposer/jack_interposer.so
