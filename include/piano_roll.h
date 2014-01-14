@@ -50,7 +50,7 @@ class pattern;
 class timeLine;
 class toolButton;
 
-
+class Piano;
 class pianoRoll : public QWidget, public SerializingObject
 {
 	Q_OBJECT
@@ -154,7 +154,7 @@ signals:
 
 
 private:
-
+	Piano * m_piano;
 	enum editModes
 	{
 		ModeDraw,
@@ -230,8 +230,11 @@ private:
 	static const int cm_scrollAmtVert = 1;
 			
 	static QPixmap * s_whiteKeyBigPm;
+	static QPixmap * s_whiteKeyBigPressedPm;
 	static QPixmap * s_whiteKeySmallPm;
+	static QPixmap * s_whiteKeySmallPressedPm;
 	static QPixmap * s_blackKeyPm;
+	static QPixmap * s_blackKeyPressedPm;
 	static QPixmap * s_toolDraw;
 	static QPixmap * s_toolErase;
 	static QPixmap * s_toolSelect;
