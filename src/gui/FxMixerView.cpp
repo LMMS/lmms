@@ -437,6 +437,9 @@ void FxMixerView::setCurrentFxLine( int _line )
 void FxMixerView::clear()
 {
 	m_rackView->clearViews();
+
+	engine::fxMixer()->clear();
+
 	refreshDisplay();
 }
 
