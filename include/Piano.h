@@ -50,7 +50,7 @@ public:
 		return m_pressedKeys[key];
 	}
 
-	void handleKeyPress( int key );
+	void handleKeyPress( int key, int midiVelocity = MidiMaxVelocity );
 	void handleKeyRelease( int key );
 
 	InstrumentTrack* instrumentTrack() const

@@ -92,11 +92,11 @@ void Piano::setKeyState( int key, bool state )
  *
  *  \param key the key being pressed
  */
-void Piano::handleKeyPress( int key )
+void Piano::handleKeyPress( int key, int midiVelocity )
 {
 	if( isValidKey( key ) )
 	{
-		m_midiEvProc->processInEvent( midiEvent( MidiNoteOn, 0, key, MidiMaxVelocity ), midiTime() );
+		m_midiEvProc->processInEvent( midiEvent( MidiNoteOn, 0, key, midiVelocity ), midiTime() );
 		m_pressedKeys[key] = true;
 	}
 }
