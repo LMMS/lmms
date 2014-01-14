@@ -77,7 +77,7 @@ void positionLine::paintEvent( QPaintEvent * _pe )
 
 
 songEditor::songEditor( song * _song, songEditor * & _engine_ptr ) :
-	trackContainerView( _song ),
+	TrackContainerView( _song ),
 	m_s( _song ),
 	m_scrollBack( false ),
 	m_smoothScroll( configManager::inst()->value( "ui", "smoothscroll" ).toInt() )

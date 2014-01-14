@@ -2,7 +2,7 @@
  * AutomationPattern.cpp - implementation of class AutomationPattern which
  *                         holds dynamic values
  *
- * Copyright (c) 2008-2013 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2006-2008 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
@@ -449,10 +449,10 @@ trackContentObjectView * AutomationPattern::createView( trackView * _tv )
 
 bool AutomationPattern::isAutomated( const AutomatableModel * _m )
 {
-	trackContainer::trackList l = engine::getSong()->tracks() +
+	TrackContainer::TrackList l = engine::getSong()->tracks() +
 				engine::getBBTrackContainer()->tracks();
 	l += engine::getSong()->globalAutomationTrack();
-	for( trackContainer::trackList::const_iterator it = l.begin();
+	for( TrackContainer::TrackList::const_iterator it = l.begin();
 							it != l.end(); ++it )
 	{
 		if( ( *it )->type() == track::AutomationTrack ||
@@ -516,10 +516,10 @@ AutomationPattern * AutomationPattern::globalAutomationPattern(
 
 void AutomationPattern::resolveAllIDs()
 {
-	trackContainer::trackList l = engine::getSong()->tracks() +
+	TrackContainer::TrackList l = engine::getSong()->tracks() +
 				engine::getBBTrackContainer()->tracks();
 	l += engine::getSong()->globalAutomationTrack();
-	for( trackContainer::trackList::iterator it = l.begin();
+	for( TrackContainer::TrackList::iterator it = l.begin();
 							it != l.end(); ++it )
 	{
 		if( ( *it )->type() == track::AutomationTrack ||

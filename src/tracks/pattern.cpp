@@ -1,7 +1,7 @@
 /*
  * pattern.cpp - implementation of class pattern which holds notes
  *
- * Copyright (c) 2004-2012 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2005-2007 Danny McRae <khjklujn/at/yahoo.com>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
@@ -40,7 +40,7 @@
 #include "embed.h"
 #include "engine.h"
 #include "piano_roll.h"
-#include "track_container.h"
+#include "TrackContainer.h"
 #include "rename_dialog.h"
 #include "sample_buffer.h"
 #include "AudioSampleRecorder.h"
@@ -563,7 +563,7 @@ void pattern::ensureBeatNotes()
 
 void pattern::updateBBTrack()
 {
-	if( getTrack()->getTrackContainer() == engine::getBBTrackContainer() )
+	if( getTrack()->trackContainer() == engine::getBBTrackContainer() )
 	{
 		engine::getBBTrackContainer()->updateBBTrack( this );
 	}

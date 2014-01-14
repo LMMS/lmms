@@ -1,7 +1,7 @@
 /*
  * flp_import.cpp - support for importing FLP-files
  *
- * Copyright (c) 2006-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -51,7 +51,7 @@
 #include "ProjectJournal.h"
 #include "project_notes.h"
 #include "song.h"
-#include "track_container.h"
+#include "TrackContainer.h"
 #include "embed.h"
 #include "lmmsconfig.h"
 
@@ -586,7 +586,7 @@ FlpImport::~FlpImport()
 
 
 
-bool FlpImport::tryImport( trackContainer * _tc )
+bool FlpImport::tryImport( TrackContainer* tc )
 {
 	const int mappedFilter[] =
 	{
@@ -711,9 +711,9 @@ bool FlpImport::tryImport( trackContainer * _tc )
 	}
 
 	QProgressDialog progressDialog(
-			trackContainer::tr( "Importing FLP-file..." ),
-			trackContainer::tr( "Cancel" ), 0, p.numChannels );
-	progressDialog.setWindowTitle( trackContainer::tr( "Please wait..." ) );
+			TrackContainer::tr( "Importing FLP-file..." ),
+			TrackContainer::tr( "Cancel" ), 0, p.numChannels );
+	progressDialog.setWindowTitle( TrackContainer::tr( "Please wait..." ) );
 	progressDialog.show();
 
 	bool valid = false;

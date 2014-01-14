@@ -2,7 +2,7 @@
  * AutomationTrack.cpp - AutomationTrack handles automation of objects without
  *                       a track
  *
- * Copyright (c) 2008-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2006-2008 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
@@ -30,12 +30,12 @@
 #include "embed.h"
 #include "ProjectJournal.h"
 #include "string_pair_drag.h"
-#include "track_container_view.h"
+#include "TrackContainerView.h"
 #include "track_label_button.h"
 
 
-AutomationTrack::AutomationTrack( trackContainer * _tc, bool _hidden ) :
-	track( _hidden ? HiddenAutomationTrack : track::AutomationTrack, _tc )
+AutomationTrack::AutomationTrack( TrackContainer* tc, bool _hidden ) :
+	track( _hidden ? HiddenAutomationTrack : track::AutomationTrack, tc )
 {
 	setName( tr( "Automation track" ) );
 }
@@ -90,9 +90,9 @@ bool AutomationTrack::play( const midiTime & _start, const fpp_t _frames,
 
 
 
-trackView * AutomationTrack::createView( trackContainerView * _tcv )
+trackView * AutomationTrack::createView( TrackContainerView* tcv )
 {
-	return new AutomationTrackView( this, _tcv );
+	return new AutomationTrackView( this, tcv );
 }
 
 
@@ -127,9 +127,8 @@ void AutomationTrack::loadTrackSpecificSettings( const QDomElement & _this )
 
 
 
-AutomationTrackView::AutomationTrackView( AutomationTrack * _at,
-						trackContainerView * _tcv ) :
-	trackView( _at, _tcv )
+AutomationTrackView::AutomationTrackView( AutomationTrack * _at, TrackContainerView* tcv ) :
+	trackView( _at, tcv )
 {
         setFixedHeight( 32 );
 	trackLabelButton * tlb = new trackLabelButton( this,
@@ -169,12 +168,12 @@ void AutomationTrackView::dropEvent( QDropEvent * _de )
 					journallingObject( val.toInt() ) );
 		if( mod != NULL )
 		{
-			midiTime pos = midiTime( getTrackContainerView()->
+			midiTime pos = midiTime( trackContainerView()->
 							currentPosition() +
 				( _de->pos().x() -
 					getTrackContentWidget()->x() ) *
 						midiTime::ticksPerTact() /
-		static_cast<int>( getTrackContainerView()->pixelsPerTact() ) )
+		static_cast<int>( trackContainerView()->pixelsPerTact() ) )
 				.toNearestTact();
 
 			if( pos.getTicks() < 0 )

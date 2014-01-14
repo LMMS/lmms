@@ -81,7 +81,7 @@ tick_t midiTime::s_ticksPerTact = DefaultTicksPerTact;
 
 
 song::song() :
-	trackContainer(),
+	TrackContainer(),
 	m_globalAutomationTrack( dynamic_cast<AutomationTrack *>(
 				track::create( track::HiddenAutomationTrack,
 								this ) ) ),
@@ -399,7 +399,7 @@ void song::processNextBuffer()
 		return;
 	}
 
-	trackList track_list;
+	TrackList track_list;
 	int tco_num = -1;
 
 	switch( m_playMode )
@@ -742,7 +742,7 @@ void song::updateLength()
 {
 	m_length = 0;
 	m_tracksMutex.lockForRead();
-	for( trackList::const_iterator it = tracks().begin();
+	for( TrackList::const_iterator it = tracks().begin();
 						it != tracks().end(); ++it )
 	{
 		const tact_t cur = ( *it )->length();
@@ -867,7 +867,7 @@ void song::stopExport()
 void song::insertBar()
 {
 	m_tracksMutex.lockForRead();
-	for( trackList::const_iterator it = tracks().begin();
+	for( TrackList::const_iterator it = tracks().begin();
 					it != tracks().end(); ++it )
 	{
 		( *it )->insertTact( m_playPos[Mode_PlaySong] );
@@ -881,7 +881,7 @@ void song::insertBar()
 void song::removeBar()
 {
 	m_tracksMutex.lockForRead();
-	for( trackList::const_iterator it = tracks().begin();
+	for( TrackList::const_iterator it = tracks().begin();
 					it != tracks().end(); ++it )
 	{
 		( *it )->removeTact( m_playPos[Mode_PlaySong] );

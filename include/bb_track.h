@@ -2,7 +2,7 @@
  * bb_track.h - class bbTrack, a wrapper for using bbEditor
  *              (which is a singleton-class) as track
  *
- * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -33,7 +33,7 @@
 #include "track.h"
 
 class trackLabelButton;
-class trackContainer;
+class TrackContainer;
 
 
 class bbTCO : public trackContentObject
@@ -106,14 +106,14 @@ class EXPORT bbTrack : public track
 {
 	Q_OBJECT
 public:
-	bbTrack( trackContainer * _tc );
+	bbTrack( TrackContainer* tc );
 	virtual ~bbTrack();
 
 	virtual bool play( const midiTime & _start,
 					const fpp_t _frames,
 					const f_cnt_t _frame_base,
 							Sint16 _tco_num = -1 );
-	virtual trackView * createView( trackContainerView * _tcv );
+	virtual trackView * createView( TrackContainerView* tcv );
 	virtual trackContentObject * createTCO( const midiTime & _pos );
 
 	virtual void saveTrackSpecificSettings( QDomDocument & _doc,
@@ -162,7 +162,7 @@ class bbTrackView : public trackView
 {
 	Q_OBJECT
 public:
-	bbTrackView( bbTrack * _bbt, trackContainerView * _tcv );
+	bbTrackView( bbTrack* bbt, TrackContainerView* tcv );
 	virtual ~bbTrackView();
 
 	virtual bool close();

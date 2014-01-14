@@ -2,7 +2,7 @@
  * ImportFilter.h - declaration of class ImportFilter, the base-class for all
  *                  file import filters
  *
- * Copyright (c) 2006-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -31,7 +31,7 @@
 #include "Plugin.h"
 
 
-class trackContainer;
+class TrackContainer;
 
 
 class EXPORT ImportFilter : public Plugin
@@ -45,11 +45,11 @@ public:
 	// tries to import given file to given track-container by having all
 	// available import-filters to try to import the file
 	static void import( const QString & _file_to_import,
-						trackContainer * _tc );
+						TrackContainer* tc );
 
 
 protected:
-	virtual bool tryImport( trackContainer * _tc ) = 0;
+	virtual bool tryImport( TrackContainer* tc ) = 0;
 
 	const QFile & file() const
 	{

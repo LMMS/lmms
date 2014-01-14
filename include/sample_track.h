@@ -2,7 +2,7 @@
  * sample_track.h - class sampleTrack, a track which provides arrangement of
  *                  samples
  *
- * Copyright (c) 2005-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -119,13 +119,13 @@ class sampleTrack : public track
 {
 	Q_OBJECT
 public:
-	sampleTrack( trackContainer * _tc );
+	sampleTrack( TrackContainer* tc );
 	virtual ~sampleTrack();
 
 	virtual bool play( const midiTime & _start, const fpp_t _frames,
 						const f_cnt_t _frame_base,
 							Sint16 _tco_num = -1 );
-	virtual trackView * createView( trackContainerView * _tcv );
+	virtual trackView * createView( TrackContainerView* tcv );
 	virtual trackContentObject * createTCO( const midiTime & _pos );
 
 
@@ -159,7 +159,7 @@ class sampleTrackView : public trackView
 {
 	Q_OBJECT
 public:
-	sampleTrackView( sampleTrack * _track, trackContainerView * _tcv );
+	sampleTrackView( sampleTrack * _track, TrackContainerView* tcv );
 	virtual ~sampleTrackView();
 
 

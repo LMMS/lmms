@@ -626,14 +626,14 @@ void fileBrowserTreeWidget::activateListItem( QTreeWidgetItem * _item,
 
 
 
-void fileBrowserTreeWidget::openInNewInstrumentTrack( trackContainer * _tc )
+void fileBrowserTreeWidget::openInNewInstrumentTrack( TrackContainer* tc )
 {
 	if( m_contextMenuItem->handling() == fileItem::LoadAsPreset ||
 		m_contextMenuItem->handling() == fileItem::LoadByPlugin )
 	{
 		engine::mixer()->lock();
 		InstrumentTrack * it = dynamic_cast<InstrumentTrack *>(
-				track::create( track::InstrumentTrack, _tc ) );
+				track::create( track::InstrumentTrack, tc ) );
 		handleFile( m_contextMenuItem, it );
 		engine::mixer()->unlock();
 	}

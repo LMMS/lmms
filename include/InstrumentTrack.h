@@ -2,7 +2,7 @@
  * InstrumentTrack.h - declaration of class InstrumentTrack, a track + window
  *                     which holds an instrument-plugin
  *
- * Copyright (c) 2004-2012 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -64,7 +64,7 @@ class EXPORT InstrumentTrack : public track, public MidiEventProcessor
 	Q_OBJECT
 	mapPropertyFromModel(int,getVolume,setVolume,m_volumeModel);
 public:
-	InstrumentTrack( trackContainer * _tc );
+	InstrumentTrack( TrackContainer* tc );
 	virtual ~InstrumentTrack();
 
 	// used by instrument
@@ -123,7 +123,7 @@ public:
 					const f_cnt_t _frame_base,
 							Sint16 _tco_num = -1 );
 	// create new view for me
-	virtual trackView * createView( trackContainerView * _tcv );
+	virtual trackView * createView( TrackContainerView* tcv );
 
 	// create new track-content-object = pattern
 	virtual trackContentObject * createTCO( const midiTime & _pos );
@@ -254,7 +254,7 @@ class InstrumentTrackView : public trackView
 {
 	Q_OBJECT
 public:
-	InstrumentTrackView( InstrumentTrack * _it, trackContainerView * _tc );
+	InstrumentTrackView( InstrumentTrack * _it, TrackContainerView* tc );
 	virtual ~InstrumentTrackView();
 
 	InstrumentTrackWindow * getInstrumentTrackWindow();

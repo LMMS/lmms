@@ -2,7 +2,7 @@
  * song_editor.h - declaration of class songEditor, a window where you can
  *                 setup your songs
  *
- * Copyright (c) 2004-2011 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -27,7 +27,7 @@
 #ifndef _SONG_EDITOR_H
 #define _SONG_EDITOR_H
 
-#include "track_container_view.h"
+#include "TrackContainerView.h"
 
 class QLabel;
 class QScrollBar;
@@ -52,7 +52,7 @@ private:
 } ;
 
 
-class songEditor : public trackContainerView
+class songEditor : public TrackContainerView
 {
 	Q_OBJECT
 public:

@@ -1,7 +1,7 @@
 /*
- * track_container_view.cpp - view-component for trackContainer
+ * TrackContainerView.cpp - view-component for TrackContainer
  *
- * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -31,8 +31,8 @@
 #include <QtGui/QWheelEvent>
 
 
-#include "track_container_view.h"
-#include "track_container.h"
+#include "TrackContainerView.h"
+#include "TrackContainer.h"
 #include "bb_track.h"
 #include "MainWindow.h"
 #include "debug.h"
@@ -47,7 +47,7 @@
 #include "track.h"
 
 
-trackContainerView::trackContainerView( trackContainer * _tc ) :
+TrackContainerView::TrackContainerView( TrackContainer * _tc ) :
 	QWidget(),
 	ModelView( NULL, this ),
 	JournallingObject(),
@@ -90,7 +90,7 @@ trackContainerView::trackContainerView( trackContainer * _tc ) :
 
 
 
-trackContainerView::~trackContainerView()
+TrackContainerView::~TrackContainerView()
 {
 	while( !m_trackViews.empty() )
 	{
@@ -102,7 +102,7 @@ trackContainerView::~trackContainerView()
 
 
 
-void trackContainerView::saveSettings( QDomDocument & _doc,
+void TrackContainerView::saveSettings( QDomDocument & _doc,
 							QDomElement & _this )
 {
 	MainWindow::saveWidgetState( this, _this );
@@ -111,7 +111,7 @@ void trackContainerView::saveSettings( QDomDocument & _doc,
 
 
 
-void trackContainerView::loadSettings( const QDomElement & _this )
+void TrackContainerView::loadSettings( const QDomElement & _this )
 {
 	MainWindow::restoreWidgetState( this, _this );
 }
@@ -119,7 +119,7 @@ void trackContainerView::loadSettings( const QDomElement & _this )
 
 
 
-trackView * trackContainerView::addTrackView( trackView * _tv )
+trackView * TrackContainerView::addTrackView( trackView * _tv )
 {
 /*	QMap<QString, QVariant> map;
 	map["id"] = _tv->getTrack()->id();
@@ -137,7 +137,7 @@ trackView * trackContainerView::addTrackView( trackView * _tv )
 
 
 
-void trackContainerView::removeTrackView( trackView * _tv )
+void TrackContainerView::removeTrackView( trackView * _tv )
 {
 	int index = m_trackViews.indexOf( _tv );
 	if( index != -1 )
@@ -165,7 +165,7 @@ void trackContainerView::removeTrackView( trackView * _tv )
 
 
 
-void trackContainerView::moveTrackViewUp( trackView * _tv )
+void TrackContainerView::moveTrackViewUp( trackView * _tv )
 {
 	for( int i = 1; i < m_trackViews.size(); ++i )
 	{
@@ -187,7 +187,7 @@ void trackContainerView::moveTrackViewUp( trackView * _tv )
 
 
 
-void trackContainerView::moveTrackViewDown( trackView * _tv )
+void TrackContainerView::moveTrackViewDown( trackView * _tv )
 {
 	for( int i = 0; i < m_trackViews.size()-1; ++i )
 	{
@@ -210,7 +210,7 @@ void trackContainerView::moveTrackViewDown( trackView * _tv )
 
 
 
-void trackContainerView::realignTracks()
+void TrackContainerView::realignTracks()
 {
 	QWidget * content = m_scrollArea->widget();
 	content->setFixedWidth( width()
@@ -228,7 +228,7 @@ void trackContainerView::realignTracks()
 
 
 
-void trackContainerView::createTrackView( track * _t )
+void TrackContainerView::createTrackView( track * _t )
 {
 	_t->createView( this );
 }
@@ -236,7 +236,7 @@ void trackContainerView::createTrackView( track * _t )
 
 
 
-void trackContainerView::deleteTrackView( trackView * _tv )
+void TrackContainerView::deleteTrackView( trackView * _tv )
 {
 	track * t = _tv->getTrack();
 	removeTrackView( _tv );
@@ -250,7 +250,7 @@ void trackContainerView::deleteTrackView( trackView * _tv )
 
 
 
-const trackView * trackContainerView::trackViewAt( const int _y ) const
+const trackView * TrackContainerView::trackViewAt( const int _y ) const
 {
 	const int abs_y = _y + m_scrollArea->viewport()->y();
 	int y_cnt = 0;
@@ -270,7 +270,7 @@ const trackView * trackContainerView::trackViewAt( const int _y ) const
 
 
 
-bool trackContainerView::allowRubberband() const
+bool TrackContainerView::allowRubberband() const
 {
 	return( false );
 }
@@ -278,7 +278,7 @@ bool trackContainerView::allowRubberband() const
 
 
 
-void trackContainerView::setPixelsPerTact( int _ppt )
+void TrackContainerView::setPixelsPerTact( int _ppt )
 {
 	m_ppt = _ppt;
 
@@ -293,7 +293,7 @@ void trackContainerView::setPixelsPerTact( int _ppt )
 
 
 
-void trackContainerView::clearAllTracks()
+void TrackContainerView::clearAllTracks()
 {
 	while( !m_trackViews.empty() )
 	{
@@ -307,7 +307,7 @@ void trackContainerView::clearAllTracks()
 
 
 
-void trackContainerView::undoStep( JournalEntry & _je )
+void TrackContainerView::undoStep( JournalEntry & _je )
 {
 #if 0
 	saveJournallingState( false );
@@ -345,7 +345,7 @@ void trackContainerView::undoStep( JournalEntry & _je )
 
 
 
-void trackContainerView::redoStep( JournalEntry & _je )
+void TrackContainerView::redoStep( JournalEntry & _je )
 {
 #if 0
 	switch( _je.actionID() )
@@ -365,7 +365,7 @@ void trackContainerView::redoStep( JournalEntry & _je )
 
 
 
-void trackContainerView::dragEnterEvent( QDragEnterEvent * _dee )
+void TrackContainerView::dragEnterEvent( QDragEnterEvent * _dee )
 {
 	stringPairDrag::processDragEnterEvent( _dee,
 		QString( "presetfile,pluginpresetfile,samplefile,instrument,"
@@ -377,7 +377,7 @@ void trackContainerView::dragEnterEvent( QDragEnterEvent * _dee )
 
 
 
-void trackContainerView::dropEvent( QDropEvent * _de )
+void TrackContainerView::dropEvent( QDropEvent * _de )
 {
 	QString type = stringPairDrag::decodeKey( _de );
 	QString value = stringPairDrag::decodeValue( _de );
@@ -431,7 +431,7 @@ void trackContainerView::dropEvent( QDropEvent * _de )
 
 
 
-void trackContainerView::mousePressEvent( QMouseEvent * _me )
+void TrackContainerView::mousePressEvent( QMouseEvent * _me )
 {
 	if( allowRubberband() == true )
 	{
@@ -445,7 +445,7 @@ void trackContainerView::mousePressEvent( QMouseEvent * _me )
 
 
 
-void trackContainerView::mouseMoveEvent( QMouseEvent * _me )
+void TrackContainerView::mouseMoveEvent( QMouseEvent * _me )
 {
 	if( rubberBandActive() == true )
 	{
@@ -459,7 +459,7 @@ void trackContainerView::mouseMoveEvent( QMouseEvent * _me )
 
 
 
-void trackContainerView::mouseReleaseEvent( QMouseEvent * _me )
+void TrackContainerView::mouseReleaseEvent( QMouseEvent * _me )
 {
 	m_rubberBand->hide();
 	QWidget::mouseReleaseEvent( _me );
@@ -469,7 +469,7 @@ void trackContainerView::mouseReleaseEvent( QMouseEvent * _me )
 
 
 
-void trackContainerView::resizeEvent( QResizeEvent * _re )
+void TrackContainerView::resizeEvent( QResizeEvent * _re )
 {
 	realignTracks();
 	QWidget::resizeEvent( _re );
@@ -478,7 +478,7 @@ void trackContainerView::resizeEvent( QResizeEvent * _re )
 
 
 
-trackContainerView::scrollArea::scrollArea( trackContainerView * _parent ) :
+TrackContainerView::scrollArea::scrollArea( TrackContainerView * _parent ) :
 	QScrollArea( _parent ),
 	m_trackContainerView( _parent )
 {
@@ -490,14 +490,14 @@ trackContainerView::scrollArea::scrollArea( trackContainerView * _parent ) :
 
 
 
-trackContainerView::scrollArea::~scrollArea()
+TrackContainerView::scrollArea::~scrollArea()
 {
 }
 
 
 
 
-void trackContainerView::scrollArea::wheelEvent( QWheelEvent * _we )
+void TrackContainerView::scrollArea::wheelEvent( QWheelEvent * _we )
 {
 	// always pass wheel-event to parent-widget (song-editor
 	// bb-editor etc.) because they might want to use it for zooming
@@ -514,5 +514,5 @@ void trackContainerView::scrollArea::wheelEvent( QWheelEvent * _we )
 
 
 
-#include "moc_track_container_view.cxx"
+#include "moc_TrackContainerView.cxx"
 

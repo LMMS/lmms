@@ -2,7 +2,7 @@
  * sample_track.cpp - implementation of class sampleTrack, a track which
  *                    provides arrangement of samples
  *
- * Copyright (c) 2005-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -385,8 +385,8 @@ void sampleTCOView::paintEvent( QPaintEvent * _pe )
 
 
 
-sampleTrack::sampleTrack( trackContainer * _tc ) :
-	track( SampleTrack, _tc ),
+sampleTrack::sampleTrack( TrackContainer* tc ) :
+	track( SampleTrack, tc ),
 	m_audioPort( tr( "Sample track" ) ),
 	m_volumeModel( DefaultVolume, MinVolume, MaxVolume, 1.0, this,
 							tr( "Volume" ) )
@@ -453,9 +453,9 @@ bool sampleTrack::play( const midiTime & _start, const fpp_t _frames,
 
 
 
-trackView * sampleTrack::createView( trackContainerView * _tcv )
+trackView * sampleTrack::createView( TrackContainerView* tcv )
 {
-	return new sampleTrackView( this, _tcv );
+	return new sampleTrackView( this, tcv );
 }
 
 
@@ -505,8 +505,8 @@ void sampleTrack::loadTrackSpecificSettings( const QDomElement & _this )
 
 
 
-sampleTrackView::sampleTrackView( sampleTrack * _t, trackContainerView * _tcv ) :
-	trackView( _t, _tcv )
+sampleTrackView::sampleTrackView( sampleTrack * _t, TrackContainerView* tcv ) :
+	trackView( _t, tcv )
 {
 	setFixedHeight( 32 );
 

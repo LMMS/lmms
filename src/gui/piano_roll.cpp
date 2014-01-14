@@ -3294,7 +3294,7 @@ int pianoRoll::getKey( int _y ) const
 
 song::PlayModes pianoRoll::desiredPlayModeForAccompany() const
 {
-	if( m_pattern->getTrack()->getTrackContainer() ==
+	if( m_pattern->getTrack()->trackContainer() ==
 					engine::getBBTrackContainer() )
 	{
 		return song::Mode_PlayBB;
@@ -3357,7 +3357,7 @@ void pianoRoll::recordAccompany()
 
 	m_recording = true;
 
-	if( m_pattern->getTrack()->getTrackContainer() == engine::getSong() )
+	if( m_pattern->getTrack()->trackContainer() == engine::getSong() )
 	{
 		engine::getSong()->playSong();
 	}

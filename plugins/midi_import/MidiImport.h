@@ -1,7 +1,7 @@
 /*
  * MidiImport.h - support for importing MIDI-files
  *
- * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -46,10 +46,10 @@ public:
 
 
 private:
-	virtual bool tryImport( trackContainer * _tc );
+	virtual bool tryImport( TrackContainer* tc );
 
-	bool readSMF( trackContainer * _tc );
-	bool readRIFF( trackContainer * _tc );
+	bool readSMF( TrackContainer* tc );
+	bool readRIFF( TrackContainer* tc );
 	bool readTrack( int _track_end, QString & _track_name );
 
 	void error( void );

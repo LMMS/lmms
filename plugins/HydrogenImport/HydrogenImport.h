@@ -21,7 +21,7 @@ public:
 		return( NULL );
 	}
 private:
-	virtual bool tryImport( trackContainer * _tc );
+	virtual bool tryImport( TrackContainer* tc );
 };
 #endif
 

@@ -2,7 +2,7 @@
  * InstrumentTrack.cpp - implementation of instrument-track-class
  *                        (window + data-structures)
  *
- * Copyright (c) 2004-2013 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -91,8 +91,8 @@ const int INSTRUMENT_WINDOW_CACHE_SIZE = 8;
 
 
 // #### IT:
-InstrumentTrack::InstrumentTrack( trackContainer * _tc ) :
-	track( track::InstrumentTrack, _tc ),
+InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
+	track( track::InstrumentTrack, tc ),
 	MidiEventProcessor(),
 	m_audioPort( tr( "unnamed_track" ) ),
 	m_midiPort( tr( "unnamed_track" ), engine::mixer()->midiClient(),
@@ -744,9 +744,9 @@ trackContentObject * InstrumentTrack::createTCO( const midiTime & )
 
 
 
-trackView * InstrumentTrack::createView( trackContainerView * _tcv )
+trackView * InstrumentTrack::createView( TrackContainerView* tcv )
 {
-	return new InstrumentTrackView( this, _tcv );
+	return new InstrumentTrackView( this, tcv );
 }
 
 
@@ -909,9 +909,8 @@ QQueue<InstrumentTrackWindow *> InstrumentTrackView::s_windowCache;
 
 
 
-InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it,
-						trackContainerView * _tcv ) :
-	trackView( _it, _tcv ),
+InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerView* tcv ) :
+	trackView( _it, tcv ),
 	m_window( NULL ),
 	m_lastPos( -1, -1 )
 {
