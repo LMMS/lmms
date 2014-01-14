@@ -115,8 +115,11 @@ const int NUM_TRIPLET_LENGTHS = 5;
 
 
 QPixmap * pianoRoll::s_whiteKeySmallPm = NULL;
+QPixmap * pianoRoll::s_whiteKeySmallPressedPm = NULL;
 QPixmap * pianoRoll::s_whiteKeyBigPm = NULL;
+QPixmap * pianoRoll::s_whiteKeyBigPressedPm = NULL;
 QPixmap * pianoRoll::s_blackKeyPm = NULL;
+QPixmap * pianoRoll::s_blackKeyPressedPm = NULL;
 QPixmap * pianoRoll::s_toolDraw = NULL;
 QPixmap * pianoRoll::s_toolErase = NULL;
 QPixmap * pianoRoll::s_toolSelect = NULL;
@@ -136,6 +139,7 @@ const int DEFAULT_PR_PPT = KEY_LINE_HEIGHT * DefaultStepsPerTact;
 
 
 pianoRoll::pianoRoll() :
+    m_piano(NULL),
 	m_nemStr( QVector<QString>() ),
 	m_noteEditMenu( NULL ),
 	m_semiToneMarkerMenu( NULL ),
@@ -222,15 +226,30 @@ pianoRoll::pianoRoll() :
 		s_whiteKeySmallPm = new QPixmap( embed::getIconPixmap(
 						"pr_white_key_small" ) );
 	}
+	if( s_whiteKeySmallPressedPm == NULL )
+	{
+		s_whiteKeySmallPressedPm = new QPixmap( embed::getIconPixmap(
+						"pr_white_key_small_pressed" ) );
+	}
 	if( s_whiteKeyBigPm == NULL )
 	{
 		s_whiteKeyBigPm = new QPixmap( embed::getIconPixmap(
 							"pr_white_key_big" ) );
 	}
+	if( s_whiteKeyBigPressedPm == NULL )
+	{
+		s_whiteKeyBigPressedPm = new QPixmap( embed::getIconPixmap(
+							"pr_white_key_big_pressed" ) );
+	}
 	if( s_blackKeyPm == NULL )
 	{
 		s_blackKeyPm = new QPixmap( embed::getIconPixmap(
 							"pr_black_key" ) );
+	}
+	if( s_blackKeyPressedPm == NULL )
+	{
+		s_blackKeyPressedPm = new QPixmap( embed::getIconPixmap(
+							"pr_black_key_pressed" ) );
 	}
 	if( s_toolDraw == NULL )
 	{
@@ -1343,6 +1362,7 @@ void pianoRoll::keyPressEvent( QKeyEvent * _ke )
 		default:
 			break;
 	}
+	update();
 }
 
 
@@ -1371,6 +1391,7 @@ void pianoRoll::keyReleaseEvent( QKeyEvent * _ke )
 			update();
 			break;
 	}
+	update();
 }
 
 
@@ -1847,7 +1868,7 @@ void pianoRoll::testPlayNote( note * n )
 		m_pattern->instrumentTrack()->processInEvent(
 			midiEvent( MidiNoteOn, 0, n->key(), 
 				  n->getVolume() * 127 / 100 ), midiTime() );
-		
+
 		midiEvent evt( MidiMetaEvent, 0, n->key(), 
 				panningToMidi( n->getPanning() ) );
 		
@@ -1897,7 +1918,7 @@ void pianoRoll::testPlayKey( int _key, int _vol, int _pan )
 	m_pattern->instrumentTrack()->processInEvent(
 				midiEvent( MidiNoteOff, 0, m_lastKey, 0 ),
 								midiTime() );
-	
+
 	// remember which one we're playing
 	m_lastKey = _key;
 	
@@ -2224,7 +2245,7 @@ void pianoRoll::mouseMoveEvent( QMouseEvent * _me )
 					// play the note so that the user can tell how loud it is
 					// and where it is panned
 					testPlayNote( n );
-					
+
 					if( m_noteEditMode == NoteEditVolume )
 					{
 						n->setVolume( vol );
@@ -2739,7 +2760,6 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 			}
 			break;
 	}
-
 	// start drawing at the bottom
 	int key_line_y = keyAreaBottom() - 1;
 	// used for aligning black-keys later
@@ -2793,9 +2813,17 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 		// check whether to draw a big or a small white key
 		if( prKeyOrder[key % KeysPerOctave] == PR_WHITE_KEY_SMALL )
 		{
-			// draw a small one...
-			p.drawPixmap( PIANO_X, y - WHITE_KEY_SMALL_HEIGHT,
-							*s_whiteKeySmallPm );
+			// draw a small one while checking if it is pressed or not
+			if(m_pattern->instrumentTrack()->pianoModel()->m_pressedKeys[key] == true)
+			{
+				p.drawPixmap( PIANO_X, y - WHITE_KEY_SMALL_HEIGHT,
+							*s_whiteKeySmallPressedPm );
+			}
+			else
+			{
+				p.drawPixmap( PIANO_X, y - WHITE_KEY_SMALL_HEIGHT,
+								*s_whiteKeySmallPm );
+			}
 			// update y-pos
 			y -= WHITE_KEY_SMALL_HEIGHT;
 
@@ -2803,9 +2831,17 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 		else if( prKeyOrder[key % KeysPerOctave] ==
 							PR_WHITE_KEY_BIG )
 		{
-			// draw a big one...
-			p.drawPixmap( PIANO_X, y-WHITE_KEY_BIG_HEIGHT,
+			// draw a big one while checking if it is pressed or not
+			if(m_pattern->instrumentTrack()->pianoModel()->m_pressedKeys[key] == true)
+			{
+				p.drawPixmap( PIANO_X, y - WHITE_KEY_SMALL_HEIGHT,
+							*s_whiteKeyBigPressedPm );
+			}
+			else
+			{
+				p.drawPixmap( PIANO_X, y-WHITE_KEY_BIG_HEIGHT,
 							*s_whiteKeyBigPm );
+			}
 			// if a big white key has been the first key,
 			// black keys needs to be lifted up
 			if( keys_processed == 0 )
@@ -2868,15 +2904,25 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 			}
 		}
 		// current key black?
-		if( prKeyOrder[key % KeysPerOctave] == PR_BLACK_KEY )
+		if( prKeyOrder[key % KeysPerOctave] == PR_BLACK_KEY)
 		{
 			// then draw it (calculation of y very complicated,
 			// but that's the only working solution, sorry...)
-			p.drawPixmap( PIANO_X, y - ( first_white_key_height -
-					WHITE_KEY_SMALL_HEIGHT ) -
-					WHITE_KEY_SMALL_HEIGHT/2 - 1 -
-					BLACK_KEY_HEIGHT, *s_blackKeyPm );
-
+			// check if the key is pressed or not
+			if(m_pattern->instrumentTrack()->pianoModel()->m_pressedKeys[key] == true)
+			{
+				p.drawPixmap( PIANO_X, y - ( first_white_key_height -
+						WHITE_KEY_SMALL_HEIGHT ) -
+						WHITE_KEY_SMALL_HEIGHT/2 - 1 -
+						BLACK_KEY_HEIGHT, *s_blackKeyPressedPm );
+			}
+		    else
+			{
+				p.drawPixmap( PIANO_X, y - ( first_white_key_height -
+						WHITE_KEY_SMALL_HEIGHT ) -
+						WHITE_KEY_SMALL_HEIGHT/2 - 1 -
+						BLACK_KEY_HEIGHT, *s_blackKeyPm );
+			}
 			// update y-pos
 			y -= WHITE_KEY_BIG_HEIGHT;
 			// reset white-counter

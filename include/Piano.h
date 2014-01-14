@@ -56,6 +56,7 @@ private:
 
 
 	friend class PianoView;
+	friend class pianoRoll;
 
 } ;
 
