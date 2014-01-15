@@ -34,43 +34,43 @@ class QMenu;
 class EXPORT AutomatableModelView : public ModelView
 {
 public:
-	AutomatableModelView( Model * _model, QWidget * _this );
+	AutomatableModelView( Model* model, QWidget* _this );
 	virtual ~AutomatableModelView();
 
 	// some basic functions for convenience
-	AutomatableModel * modelUntyped()
+	AutomatableModel* modelUntyped()
 	{
-		return( castModel<AutomatableModel>() );
+		return castModel<AutomatableModel>();
 	}
 
-	const AutomatableModel * modelUntyped() const
+	const AutomatableModel* modelUntyped() const
 	{
-		return( castModel<AutomatableModel>() );
+		return castModel<AutomatableModel>();
 	}
 
-	virtual void setModel( Model * _model, bool _old_model_valid = true );
+	virtual void setModel( Model* model, bool isOldModelValid = true );
 
 	template<typename T>
 	inline T value() const
 	{
-		return( modelUntyped() ? modelUntyped()->value<T>() : 0 );
+		return modelUntyped() ? modelUntyped()->value<T>() : 0;
 	}
 
-	inline void setDescription( const QString & _desc )
+	inline void setDescription( const QString& desc )
 	{
-		m_description = _desc;
+		m_description = desc;
 	}
 
-	inline void setUnit( const QString & _unit )
+	inline void setUnit( const QString& unit )
 	{
-		m_unit = _unit;
+		m_unit = unit;
 	}
 
-	void addDefaultActions( QMenu * _menu );
+	void addDefaultActions( QMenu* menu );
 
 
 protected:
-	virtual void mousePressEvent( QMouseEvent * _ev );
+	virtual void mousePressEvent( QMouseEvent* event );
 
 	QString m_description;
 	QString m_unit;
@@ -84,9 +84,7 @@ class AutomatableModelViewSlots : public QObject
 {
 	Q_OBJECT
 public:
-	AutomatableModelViewSlots( 
-			AutomatableModelView * _amv,
-			QObject * _parent );
+	AutomatableModelViewSlots( AutomatableModelView* amv, QObject* parent );
 
 public slots:
 	void execConnectionDialog();
@@ -97,7 +95,7 @@ public slots:
 
 
 protected:
-	AutomatableModelView * amv;
+	AutomatableModelView* m_amv;
 
 } ;
 
@@ -108,19 +106,19 @@ protected:
 class EXPORT type##ModelView : public AutomatableModelView		\
 {																\
 public:															\
-	type##ModelView( Model * _model, QWidget * _this ) :		\
-		AutomatableModelView( _model, _this )					\
+	type##ModelView( Model* model, QWidget* _this ) :			\
+		AutomatableModelView( model, _this )					\
 	{															\
 	}															\
 																\
-	type##Model * model()										\
+	type##Model* model()										\
 	{															\
-		return( castModel<type##Model>() );						\
+		return castModel<type##Model>();						\
 	}															\
 																\
-	const type##Model * model() const							\
+	const type##Model* model() const							\
 	{															\
-		return( castModel<type##Model>() );						\
+		return castModel<type##Model>();						\
 	}															\
 }
 
