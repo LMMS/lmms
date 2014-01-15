@@ -124,7 +124,7 @@ void lmmsStyle::drawPrimitive( PrimitiveElement element,
 
 		QColor black = QColor( 0, 0, 0 );
 		QColor shadow = option->palette.shadow().color();
-		QColor highlight = option->palette.highligt().color();
+		QColor highlight = option->palette.highlight().color();
 
 		int a100 = 165;
 		int a75 = static_cast<int>( a100 * .75 );
