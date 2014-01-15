@@ -86,12 +86,25 @@ static void drawFxLine( QPainter* p, const QWidget *fxLine, const QString& name,
 	int width = fxLine->rect().width();
 	int height = fxLine->rect().height();
 
-	p->fillRect( fxLine->rect(), QColor( 72, 76, 88 ) );
-	p->setPen( QColor( 40, 42, 48 ) );
+	QColor bg_color = QApplication::palette().color( QPalette::Active,
+							QPalette::Background );
+	QColor sh_color = QApplication::palette().color( QPalette::Active,
+							QPalette::Shadow );
+	QColor te_color = QApplication::palette().color( QPalette::Active,
+							QPalette::Text );
+	QColor bt_color = QApplication::palette().color( QPalette::Active,
+							QPalette::BrightText );
+
+
+	p->fillRect( fxLine->rect(), isActive ? bg_color.lighter(130) : bg_color );
+
+	p->setPen( bg_color.darker(130) );
 	p->drawRect( 0, 0, width-2, height-2 );
-	p->setPen( QColor( 108, 114, 132 ) );
+
+	p->setPen( bg_color.lighter(150) );
 	p->drawRect( 1, 1, width-2, height-2 );
-	p->setPen( QColor( 20, 24, 32 ) );
+
+	p->setPen( isActive ? sh_color : bg_color.darker(130) );
 	p->drawRect( 0, 0, width-1, height-1 );
 
 	// draw the mixer send background
@@ -103,8 +116,13 @@ static void drawFxLine( QPainter* p, const QWidget *fxLine, const QString& name,
 
 	// draw the channel name
 	p->rotate( -90 );
-	p->setPen( isActive ? QColor( 0, 255, 0 ) : Qt::white );
-	p->setFont( pointSizeF( fxLine->font(), 7.5f ) );
+
+	p->setFont( pointSizeF( fxLine->font(), 7.5f ) );	
+	p->setPen( sh_color );
+	p->drawText( -146, 21, name ); 
+	
+	p->setPen( isActive ? bt_color : te_color );
+
 	p->drawText( -145, 20, name );
 
 }
