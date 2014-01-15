@@ -42,6 +42,7 @@
 #include "gui_templates.h"
 #include "tooltip.h"
 #include "pixmap_button.h"
+#include "lmms_style.h"
 
 
 
@@ -61,19 +62,36 @@ public:
 	virtual void paintEvent( QPaintEvent * )
 	{
 		QPainter p( this );
-		p.fillRect( rect(), QColor( 72, 76, 88 ) );
-		p.setPen( QColor( 40, 42, 48 ) );
+		QColor bg_color = QApplication::palette().color( QPalette::Active,
+							QPalette::Background );
+		QColor sh_color = QApplication::palette().color( QPalette::Active,
+							QPalette::Shadow );
+		QColor te_color = QApplication::palette().color( QPalette::Active,
+							QPalette::Text );
+		QColor bt_color = QApplication::palette().color( QPalette::Active,
+							QPalette::BrightText );
+
+		p.fillRect( rect(), 
+			m_mv->currentFxLine() == this ? bg_color.lighter(130) : bg_color );
+
+		p.setPen( bg_color.darker(130) );
 		p.drawRect( 0, 0, width()-2, height()-2 );
-		p.setPen( QColor( 108, 114, 132 ) );
+
+		p.setPen( bg_color.lighter(150) );
 		p.drawRect( 1, 1, width()-2, height()-2 );
-		p.setPen( QColor( 20, 24, 32 ) );
+
+		p.setPen( m_mv->currentFxLine() == this ? sh_color : bg_color.darker(130) );
 		p.drawRect( 0, 0, width()-1, height()-1 );
-		
+
 		p.rotate( -90 );
-		p.setPen( m_mv->currentFxLine() == this ?
-					QColor( 0, 255, 0 ) : Qt::white );
 		p.setFont( pointSizeF( font(), 7.5f ) );
+
+		p.setPen( sh_color );
+		p.drawText( -91, 21, m_name );
+		
+		p.setPen( m_mv->currentFxLine() == this ? bt_color : te_color );
 		p.drawText( -90, 20, m_name );
+		
 	}
 
 	virtual void mousePressEvent( QMouseEvent * )
@@ -114,9 +132,11 @@ FxMixerView::FxMixerView() :
 	FxMixer * m = engine::fxMixer();
 	m->setHook( this );
 
-	QPalette pal = palette();
+/*	QPalette pal = palette();
 	pal.setColor( QPalette::Background, QColor( 72, 76, 88 ) );
-	setPalette( pal );
+	setPalette( pal );*/
+
+
 	setAutoFillBackground( true );
 	setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Minimum );
 
@@ -231,7 +251,7 @@ FxMixerView::FxMixerView() :
 
 
 	// add ourself to workspace
-	QMdiSubWindow * subWin = 
+	QMdiSubWindow * subWin =
 		engine::mainWindow()->workspace()->addSubWindow( this );
 	Qt::WindowFlags flags = subWin->windowFlags();
 	flags |= Qt::MSWindowsFixedSizeDialogHint;
@@ -292,7 +312,7 @@ void FxMixerView::setCurrentFxLine( int _line )
 	if ( _line >= 0 && _line < NumFxChannels+1 )
 	{
 		setCurrentFxLine( m_fxChannelViews[_line].m_fxLine );
-		
+
 		m_bankButtons->button( (_line-1) / 16 )->click();
 	}
 }

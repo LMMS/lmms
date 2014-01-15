@@ -78,11 +78,11 @@ pianoRoll {
 	background-color: rgb(0, 0, 0);
 }
 
-trackContainerView QWidget{ 
+/*TrackContainerView QWidget{
 	background-color: #5b6571;
-}
+}*/
 
-trackContainerView QFrame{
+TrackContainerView QFrame{
 	background-color: #49515b;
 }
 
@@ -142,43 +142,44 @@ nameLabel, effectLabel, sf2InstrumentView > QLabel {
 
 
 QWidget#mainToolbar {
-	background-image: url(resources:main_toolbar_bg.png);
+	background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #98a2a7, stop:1 #5b646f);
 }
 
 QToolBar {
-	background: url(resources:toolbar_bg.png);
+	background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #98a2a7, stop:1 #5b646f);
 }
 
 QToolButton, toolButton {
 	padding: 2px 1px 1px 2px;
 	border-radius: 2px;
 	border: 1px solid rgba(0,0,0,64);
-	background: #c9c9c9;
+	background: qradialgradient(cx:0.3, cy:0.3, radius:0.8, fx:0.3, fy:0.3, stop:0 #c9c9c9, stop:0.5 #c0c0c0, stop:1 #747474 );
 	font-size:10px;
 	color: black;
 }
 
-QToolButton:hover {
-	background: qlineargradient(spread:reflect, x1:0.5, y1:0.5, x2:0.5, y2:0, stop:0 rgba(224, 224, 224, 255), stop:1 rgba(201, 201, 201, 255));
+QToolButton:hover, toolButton:hover {
+	background: qradialgradient(cx:0.3, cy:0.3, radius:0.8, fx:0.3, fy:0.3, stop:0 #e0e0e0, stop:0.5 #c9c9c9, stop:1 #747474 );
 	border: 1px solid rgba(0,0,0,255);
-	color: black;
+	color: white;
 }
 
-QToolButton:pressed {
-	background: qlineargradient(spread:reflect, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 #747474, stop:0.5 #c9c9c9, stop:1 #c0c0c0 );
+QToolButton:pressed, ToolButton:pressed {
+	background: qradialgradient(cx:0.3, cy:0.3, radius:0.8, fx:0.3, fy:0.3, stop:0 #c9c9c9, stop:0.5 #c0c0c0, stop:1 #747474 );
 	padding: 3px 1px 0px 2px;
 	border: 1px solid rgba(0,0,0,255);
 	color: white;
 }
 
-QToolButton:checked {
-	background: qlineargradient(spread:reflect, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 #747474, stop:0.5 #c9c9c9, stop:1 #c0c0c0 );
+QToolButton:checked, ToolButton:checked  {
+	background: qradialgradient(cx:0.3, cy:0.3, radius:0.8, fx:0.3, fy:0.3, stop:0 #e0e0e0, stop:0.8 #c9c9c9, stop:1 #c0c0c0 );
+	border-radius: 3px;
 	padding: 3px 1px 0px 2px;
-	border: 1px solid rgba(0,0,0,64);
+	border: 1px solid rgba(0,0,0,255);
 	color: black;
 }
 
-trackContainerView QToolButton {
+trackLabelButton {
     background-color: #5b6571;
     color: #c9c9c9;
     font-size: 10px;
@@ -187,34 +188,34 @@ trackContainerView QToolButton {
     border: 1px solid rgba(0,0,0,64);
 }
 
-trackContainerView QToolButton:hover {
+trackLabelButton:hover {
     background-color: #7b838d;
     color: white;
     border: 1px solid black;
 }
 
-trackContainerView QToolButton:pressed {
+trackLabelButton:pressed {
 	background: qlineargradient(spread:reflect, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 #49515b, stop:0.5 #5b6571, stop:1 #6b7581 );
 	color: white;
 	border: 1px solid black;
 	font-weight: bold;
 }
 
-trackContainerView QToolButton:checked {
+trackLabelButton:checked {
 	background: qlineargradient(spread:reflect, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 #49515b, stop:0.5 #5b6571, stop:1 #6b7581 );
 	color: #c9c9c9;
 	border: 1px solid rgba(0,0,0,64);
 	font-weight: bold;
 }
 
-trackContainerView QToolButton:checked:hover {
+trackLabelButton:checked:hover {
 	background-color: #7b838d;
 	color: white;
 	border: 1px solid black;
 	font-weight: bold;
 }
 
-trackContainerView QToolButton:checked:pressed {
+trackLabelButton:checked:pressed {
 	background: qlineargradient(spread:reflect, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 #49515b, stop:0.5 #5b6571, stop:1 #6b7581 );
 	color: white;
 	border: 1px solid black;
@@ -316,6 +317,21 @@ opl2instrumentView knob {
     qproperty-outerRadius: 9;
     qproperty-lineWidth: 2;
 }
+
+/* palette information - each colour definition must be on a single line, and the line must begin with "palette:", with no leading whitespace
+ * colour codes MUST be of the form #RRGGBB */
+
+palette:background {color: #5b6571}
+palette:windowtext {color: #f0f0f0}
+palette:base {color: #808080}
+palette:text {color: #e0e0e0}
+palette:button {color: #c9c9c9}
+palette:shadow {color: #000000}
+palette:buttontext {color: #000000}
+palette:brighttext {color: #4afd85}
+palette:highlight {color: #303030}
+palette:highlightedtext {color: #ffffff}
+
 /* Notes:
 
 lcd-spinbox colors: (12, 250, 150), (37, 57, 42)

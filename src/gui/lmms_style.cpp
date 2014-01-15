@@ -3,7 +3,7 @@
  *                  interface
  *
  * Copyright (c) 2007-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -33,9 +33,8 @@
 #include "lmms_style.h"
 
 
-
-lmmsStyle::lmmsStyle() : 
-	QPlastiqueStyle()	
+lmmsStyle::lmmsStyle() :
+	QPlastiqueStyle()
 {
 	QFile file( "resources:style.css" );
 	file.open( QIODevice::ReadOnly );
@@ -50,7 +49,7 @@ lmmsStyle::lmmsStyle() :
 QPalette lmmsStyle::standardPalette( void ) const
 {
 	QPalette pal = QPlastiqueStyle::standardPalette();
-	pal.setColor( QPalette::Background, QColor( 91, 101, 113 ) );
+/*	pal.setColor( QPalette::Background, QColor( 91, 101, 113 ) );
 	pal.setColor( QPalette::WindowText, QColor( 240, 240, 240 ) );
 	pal.setColor( QPalette::Base, QColor( 128, 128, 128 ) );
 	pal.setColor( QPalette::Text, QColor( 224, 224, 224 ) );
@@ -59,7 +58,23 @@ QPalette lmmsStyle::standardPalette( void ) const
 	pal.setColor( QPalette::ButtonText, QColor( 0, 0, 0 ) );
 	pal.setColor( QPalette::BrightText, QColor( 74, 253, 133 ) );
 	pal.setColor( QPalette::Highlight, QColor( 100, 100, 100 ) );
-	pal.setColor( QPalette::HighlightedText, QColor( 255, 255, 255 ) );
+	pal.setColor( QPalette::HighlightedText, QColor( 255, 255, 255 ) );*/
+
+	QStringList paletteData = qApp->styleSheet().split( '\n' ).filter( QRegExp( "^palette:*" ) );
+	foreach( QString s, paletteData )
+	{
+		if (s.contains("background"))	 			{ pal.setColor( QPalette::Background, 		QColor( s.mid( s.indexOf("#"), 7 ) ) ); }
+		else if (s.contains("windowtext"))	 		{ pal.setColor( QPalette::WindowText, 		QColor( s.mid( s.indexOf("#"), 7 ) ) ); }
+		else if (s.contains("base")) 				{ pal.setColor( QPalette::Base, 			QColor( s.mid( s.indexOf("#"), 7 ) ) ); }
+		else if (s.contains("buttontext")) 		{ pal.setColor( QPalette::ButtonText, 		QColor( s.mid( s.indexOf("#"), 7 ) ) ); }		
+		else if (s.contains("brighttext")) 		{ pal.setColor( QPalette::BrightText, 		QColor( s.mid( s.indexOf("#"), 7 ) ) ); }		
+		else if (s.contains("text")) 				{ pal.setColor( QPalette::Text, 			QColor( s.mid( s.indexOf("#"), 7 ) ) ); }
+		else if (s.contains("button")) 			{ pal.setColor( QPalette::Button, 			QColor( s.mid( s.indexOf("#"), 7 ) ) ); }
+		else if (s.contains("shadow")) 			{ pal.setColor( QPalette::Shadow, 			QColor( s.mid( s.indexOf("#"), 7 ) ) ); }
+		else if (s.contains("highlightedtext")) 	{ pal.setColor( QPalette::HighlightedText, 	QColor( s.mid( s.indexOf("#"), 7 ) ) ); }
+		else if (s.contains("highlight")) 			{ pal.setColor( QPalette::Highlight, 		QColor( s.mid( s.indexOf("#"), 7 ) ) ); };
+	}
+
 	return( pal );
 }
 
@@ -97,8 +112,8 @@ void lmmsStyle::drawComplexControl( ComplexControl control,
 
 
 
-void lmmsStyle::drawPrimitive( PrimitiveElement element, 
-		const QStyleOption *option, QPainter *painter, 
+void lmmsStyle::drawPrimitive( PrimitiveElement element,
+		const QStyleOption *option, QPainter *painter,
 		const QWidget *widget) const
 {
 	if( element == QStyle::PE_Frame ||
@@ -109,7 +124,7 @@ void lmmsStyle::drawPrimitive( PrimitiveElement element,
 
 		QColor black = QColor( 0, 0, 0 );
 		QColor shadow = option->palette.shadow().color();
-		QColor highlight = option->palette.highlight().color();
+		QColor highlight = option->palette.highligt().color();
 
 		int a100 = 165;
 		int a75 = static_cast<int>( a100 * .75 );
@@ -152,7 +167,7 @@ void lmmsStyle::drawPrimitive( PrimitiveElement element,
 		lines[1] = QLine(rect.left(), rect.top() + 2,
 						rect.left(), rect.bottom() - 2);
 		painter->drawLines(lines, 2);
-		
+
 		// outside corner dots - shadow
 		// 75%
 		shadow.setAlpha(a50);
@@ -160,7 +175,7 @@ void lmmsStyle::drawPrimitive( PrimitiveElement element,
 		points[0] = QPoint(rect.left() + 1, rect.top() + 1);
 		points[1] = QPoint(rect.right() - 1, rect.top() + 1);
 		painter->drawPoints(points, 2);
-		
+
 		// outside end dots - shadow
 		// 50%
 		shadow.setAlpha(a25);
@@ -170,7 +185,7 @@ void lmmsStyle::drawPrimitive( PrimitiveElement element,
 		points[2] = QPoint(rect.right() - 1, rect.top());
 		points[3] = QPoint(rect.left(), rect.bottom() - 1);
 		painter->drawPoints(points, 4);
-		
+
 
 		// outside lines - highlight
 		// 100%
@@ -181,7 +196,7 @@ void lmmsStyle::drawPrimitive( PrimitiveElement element,
 		lines[1] = QLine(rect.right(), rect.top() + 2,
 					rect.right(), rect.bottom() - 2);
 		painter->drawLines(lines, 2);
-		
+
 		// outside corner dots - highlight
 		// 75%
 		highlight.setAlpha(a50);
@@ -189,7 +204,7 @@ void lmmsStyle::drawPrimitive( PrimitiveElement element,
 		points[0] = QPoint(rect.left() + 1, rect.bottom() - 1);
 		points[1] = QPoint(rect.right() - 1, rect.bottom() - 1);
 		painter->drawPoints(points, 2);
-		
+
 		// outside end dots - highlight
 		// 50%
 		highlight.setAlpha(a25);
@@ -200,7 +215,7 @@ void lmmsStyle::drawPrimitive( PrimitiveElement element,
 		points[3] = QPoint(rect.right(), rect.top() + 1);
 		painter->drawPoints(points, 4);
 	}
-	else 
+	else
 	{
 		QPlastiqueStyle::drawPrimitive( element, option, painter,
 								widget );

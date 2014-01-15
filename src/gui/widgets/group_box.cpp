@@ -127,7 +127,7 @@ void groupBox::updatePixmap()
 
 
 	//p.setPen( QColor( 255, 255, 255 ) );
-	p.setPen( palette().color( QPalette::Active, QPalette::ButtonText ) );
+	p.setPen( palette().color( QPalette::Active, QPalette::Text ) );
 	p.setFont( pointSize<7>( font() ) );
 	p.drawText( 22, 10, m_caption );
 
