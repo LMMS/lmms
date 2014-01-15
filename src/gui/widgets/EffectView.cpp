@@ -70,7 +70,7 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 	m_autoQuit->setLabel( tr( "DECAY" ) );
 	m_autoQuit->move( 60, 5 );
 	m_autoQuit->setHintText( tr( "Time:" ) + " ", "ms" );
-	m_autoQuit->setWhatsThis( tr( 
+	m_autoQuit->setWhatsThis( tr(
 "The Decay knob controls how many buffers of silence must pass before the "
 "plugin stops processing.  Smaller values will reduce the CPU overhead but "
 "run the risk of clipping the tail on delay and reverb effects." ) );
@@ -80,7 +80,7 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 	m_gate->setLabel( tr( "GATE" ) );
 	m_gate->move( 93, 5 );
 	m_gate->setHintText( tr( "Gate:" ) + " ", "" );
-	m_gate->setWhatsThis( tr( 
+	m_gate->setWhatsThis( tr(
 "The Gate knob controls the signal level that is considered to be 'silence' "
 "while deciding when to stop processing signals." ) );
 
@@ -94,7 +94,7 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 		QFont f = ctls_btn->font();
 		ctls_btn->setFont( pointSize<7>( f ) );
 		ctls_btn->setGeometry( 140, 14, 50, 20 );
-		connect( ctls_btn, SIGNAL( clicked() ), 
+		connect( ctls_btn, SIGNAL( clicked() ),
 					this, SLOT( editControls() ) );
 
 		m_controlView = effect()->controls()->createView();
@@ -115,7 +115,7 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 	}
 
 
-	setWhatsThis( tr( 
+	setWhatsThis( tr(
 "Effect plugins function as a chained series of effects where the signal will "
 "be processed from top to bottom.\n\n"
 
@@ -264,7 +264,7 @@ void EffectView::paintEvent( QPaintEvent * )
 	f.setBold( true );
 	p.setFont( f );
 
-	p.setPen( QColor( 64, 64, 64 ) );
+	p.setPen( palette().shadow().color() );
 	p.drawText( 6, 55, model()->displayName() );
 	p.setPen( palette().text().color() );
 	p.drawText( 5, 54, model()->displayName() );
