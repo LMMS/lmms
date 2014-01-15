@@ -92,6 +92,7 @@ public slots:
 	void execConnectionDialog();
 	void removeConnection();
 	void editSongGlobalAutomation();
+	void unlinkAllModels();
 	void removeSongGlobalAutomation();
 
 

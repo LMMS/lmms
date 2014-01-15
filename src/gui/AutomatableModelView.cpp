@@ -68,6 +68,7 @@ void AutomatableModelView::addDefaultActions( QMenu * _menu )
 						_model->initValue<float>() ) ).
 				arg( m_unit ),
 					_model, SLOT( reset() ) );
+
 	_menu->addSeparator();
 	_menu->addAction( embed::getIconPixmap( "edit_copy" ),
 			AutomatableModel::tr( "&Copy value (%1%2)" ).
@@ -95,6 +96,14 @@ void AutomatableModelView::addDefaultActions( QMenu * _menu )
 					SLOT( removeSongGlobalAutomation() ) );
 
 	_menu->addSeparator();
+
+	if( _model->hasLinkedModels() )
+	{
+		_menu->addAction( embed::getIconPixmap( "edit-delete" ),
+							AutomatableModel::tr( "Remove all linked controls" ),
+							amvSlots, SLOT( unlinkAllModels() ) );
+		_menu->addSeparator();
+	}
 
 	QString controllerTxt;
 	if( _model->getControllerConnection() )
@@ -252,6 +261,11 @@ void AutomatableModelViewSlots::removeSongGlobalAutomation()
 	delete AutomationPattern::globalAutomationPattern( amv->modelUntyped() );
 }
 
+
+void AutomatableModelViewSlots::unlinkAllModels()
+{
+	amv->modelUntyped()->unlinkAllModels();
+}
 
 
 #include "moc_AutomatableModelView.cxx"

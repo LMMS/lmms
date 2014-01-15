@@ -418,6 +418,19 @@ void AutomatableModel::unlinkModels( AutomatableModel * _model1,
 
 
 
+void AutomatableModel::unlinkAllModels()
+{
+	foreach( AutomatableModel* model, m_linkedModels )
+	{
+		unlinkModels( this, model );
+	}
+
+	m_hasLinkedModels = false;
+}
+
+
+
+
 void AutomatableModel::setControllerConnection( ControllerConnection * _c )
 {
 	m_controllerConnection = _c;
