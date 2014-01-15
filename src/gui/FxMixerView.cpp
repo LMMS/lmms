@@ -48,6 +48,7 @@
 #include "song.h"
 #include "bb_track_container.h"
 
+
 FxMixerView::FxMixerView() :
 	QWidget(),
 	ModelView( NULL, this ),
@@ -59,6 +60,7 @@ FxMixerView::FxMixerView() :
 	//QPalette pal = palette();
 	//pal.setColor( QPalette::Background, QColor( 72, 76, 88 ) );
 	//setPalette( pal );
+
 	setAutoFillBackground( true );
 
 	setWindowTitle( tr( "FX-Mixer" ) );
@@ -137,7 +139,7 @@ FxMixerView::FxMixerView() :
 
 
 	// add ourself to workspace
-	QMdiSubWindow * subWin = 
+	QMdiSubWindow * subWin =
 		engine::mainWindow()->workspace()->addSubWindow( this );
 	Qt::WindowFlags flags = subWin->windowFlags();
 	flags &= ~Qt::WindowMaximizeButtonHint;

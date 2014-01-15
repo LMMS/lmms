@@ -1,7 +1,7 @@
 /*
  * Piano.h - declaration of class Piano
  *
- * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -40,22 +40,39 @@ public:
 		BlackKey
 	} ;
 
-	Piano( InstrumentTrack * _it );
+	Piano( InstrumentTrack* track );
 	virtual ~Piano();
 
-	void setKeyState( int _key, bool _on = false );
+	void setKeyState( int key, bool state );
 
-	void handleKeyPress( int _key );
-	void handleKeyRelease( int _key );
+	bool isKeyPressed( int key ) const
+	{
+		return m_pressedKeys[key];
+	}
+
+	void handleKeyPress( int key, int midiVelocity = MidiMaxVelocity );
+	void handleKeyRelease( int key );
+
+	InstrumentTrack* instrumentTrack() const
+	{
+		return m_instrumentTrack;
+	}
+
+	MidiEventProcessor* midiEventProcessor() const
+	{
+		return m_midiEvProc;
+	}
 
 
 private:
-    InstrumentTrack * m_instrumentTrack;
-	MidiEventProcessor * m_midiEvProc;
+	static bool isValidKey( int key )
+	{
+		return key >= 0 && key < NumKeys;
+	}
+
+	InstrumentTrack* m_instrumentTrack;
+	MidiEventProcessor* m_midiEvProc;
 	bool m_pressedKeys[NumKeys];
-
-
-	friend class PianoView;
 
 } ;
 

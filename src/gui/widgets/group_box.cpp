@@ -46,7 +46,7 @@ groupBox::groupBox( const QString & _caption, QWidget * _parent ) :
 
 	m_led = new pixmapButton( this, _caption );
 	m_led->setCheckable( true );
-	m_led->move( 3, 3 );
+	m_led->move( 3, 0 );
 	m_led->setActiveGraphic( embed::getIconPixmap( "led_green" ) );
 	m_led->setInactiveGraphic( embed::getIconPixmap( "led_off" ) );
 
@@ -127,7 +127,7 @@ void groupBox::updatePixmap()
 
 
 	//p.setPen( QColor( 255, 255, 255 ) );
-	p.setPen( palette().color( QPalette::Active, QPalette::ButtonText ) );
+	p.setPen( palette().color( QPalette::Active, QPalette::Text ) );
 	p.setFont( pointSize<7>( font() ) );
 	p.drawText( 22, 10, m_caption );
 

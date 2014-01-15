@@ -2,7 +2,7 @@
  * Piano.cpp - implementation of piano-widget used in instrument-track-window
  *             for testing + according model class
  *
- * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -45,10 +45,10 @@
  *
  *  \param _it the InstrumentTrack window to attach to
  */
-Piano::Piano( InstrumentTrack * _it ) :
+Piano::Piano( InstrumentTrack* track ) :
 	Model( NULL ),              /*!< base class ctor */
-	m_instrumentTrack( _it ),
-	m_midiEvProc( _it )        /*!< the InstrumentTrack Model */
+	m_instrumentTrack( track ),
+	m_midiEvProc( track )        /*!< the InstrumentTrack Model */
 {
 	for( int i = 0; i < NumKeys; ++i )
 	{
@@ -72,13 +72,17 @@ Piano::~Piano()
 
 /*! \brief Turn a key on or off
  *
- *  \param _key the key number to change
- *  \param _on the state to set the key to
+ *  \param key the key number to change
+ *  \param state the state to set the key to
  */
-void Piano::setKeyState( int _key, bool _on )
+void Piano::setKeyState( int key, bool state )
 {
-	m_pressedKeys[tLimit( _key, 0, NumKeys-1 )] = _on;
-	emit dataChanged();
+	if( isValidKey( key ) )
+	{
+		m_pressedKeys[key] = state;
+
+		emit dataChanged();
+	}
 }
 
 
@@ -86,13 +90,15 @@ void Piano::setKeyState( int _key, bool _on )
 
 /*! \brief Handle a note being pressed on our keyboard display
  *
- *  \param _key the key being pressed
+ *  \param key the key being pressed
  */
-void Piano::handleKeyPress( int _key )
+void Piano::handleKeyPress( int key, int midiVelocity )
 {
-	m_midiEvProc->processInEvent( midiEvent( MidiNoteOn, 0, _key,
-						MidiMaxVelocity ), midiTime() );
-	m_pressedKeys[_key] = true;
+	if( isValidKey( key ) )
+	{
+		m_midiEvProc->processInEvent( midiEvent( MidiNoteOn, 0, key, midiVelocity ), midiTime() );
+		m_pressedKeys[key] = true;
+	}
 }
 
 
@@ -101,13 +107,15 @@ void Piano::handleKeyPress( int _key )
 
 /*! \brief Handle a note being released on our keyboard display
  *
- *  \param _key the key being releassed
+ *  \param key the key being releassed
  */
-void Piano::handleKeyRelease( int _key )
+void Piano::handleKeyRelease( int key )
 {
-	m_midiEvProc->processInEvent( midiEvent( MidiNoteOff, 0, _key, 0 ),
-								midiTime() );
-	m_pressedKeys[_key] = false;
+	if( isValidKey( key ) )
+	{
+		m_midiEvProc->processInEvent( midiEvent( MidiNoteOff, 0, key, 0 ), midiTime() );
+		m_pressedKeys[key] = false;
+	}
 }
 
 

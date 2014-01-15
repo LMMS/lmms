@@ -29,6 +29,7 @@
 #include "lmmsconfig.h"
 
 #include "lmms_basics.h"
+#include "midi.h"
 
 const volume_t MinVolume = 0;
 const volume_t MaxVolume = 200;
@@ -49,5 +50,10 @@ typedef struct
 #endif
 } surroundVolumeVector;
 
+
+inline int volumeToMidi( volume_t vol )
+{
+	return vol * MidiMaxVelocity / DefaultVolume;
+}
 
 #endif
