@@ -69,6 +69,7 @@ private:
 	TrackVector m_unmutedBB;
 	ProjectRenderer::ExportFileFormats m_ft;
 	TrackVector m_tracksToRender;
+	ProjectRenderer* m_activeRenderer;
 } ;
 
 #endif

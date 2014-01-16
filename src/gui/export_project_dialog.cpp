@@ -105,6 +105,10 @@ void exportProjectDialog::reject()
 		(*it)->abortProcessing();
 	}
 
+	if( m_activeRenderer ) {
+		m_activeRenderer->abortProcessing();
+	}
+
 	QDialog::reject();
 }
 
@@ -144,6 +148,11 @@ void exportProjectDialog::closeEvent( QCloseEvent * _ce )
 			(*it)->abortProcessing();
 		}
 	}
+
+	if( m_activeRenderer && m_activeRenderer->isRunning() ) {
+		m_activeRenderer->abortProcessing();
+	}
+
 	QDialog::closeEvent( _ce );
 }
 
@@ -172,9 +181,9 @@ void exportProjectDialog::popRender()
 
 
 	// Pop next render job and start
-	ProjectRenderer* r = m_renderers.back();
+	m_activeRenderer = m_renderers.back();
 	m_renderers.pop_back();
-	render( r );
+	render( m_activeRenderer );
 }
 
 
