@@ -2769,7 +2769,7 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 		if( prKeyOrder[key % KeysPerOctave] == PR_WHITE_KEY_SMALL )
 		{
 			// draw a small one while checking if it is pressed or not
-			if( m_pattern->instrumentTrack()->pianoModel()->isKeyPressed( key ) )
+			if( validPattern() && m_pattern->instrumentTrack()->pianoModel()->isKeyPressed( key ) )
 			{
 				p.drawPixmap( PIANO_X, y - WHITE_KEY_SMALL_HEIGHT, *s_whiteKeySmallPressedPm );
 			}
@@ -2785,7 +2785,7 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 							PR_WHITE_KEY_BIG )
 		{
 			// draw a big one while checking if it is pressed or not
-			if(m_pattern->instrumentTrack()->pianoModel()->isKeyPressed( key ) )
+			if( validPattern() && m_pattern->instrumentTrack()->pianoModel()->isKeyPressed( key ) )
 			{
 				p.drawPixmap( PIANO_X, y - WHITE_KEY_BIG_HEIGHT, *s_whiteKeyBigPressedPm );
 			}
@@ -2860,7 +2860,7 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 			// then draw it (calculation of y very complicated,
 			// but that's the only working solution, sorry...)
 			// check if the key is pressed or not
-			if( m_pattern->instrumentTrack()->pianoModel()->isKeyPressed( key ) )
+			if( validPattern() && m_pattern->instrumentTrack()->pianoModel()->isKeyPressed( key ) )
 			{
 				p.drawPixmap( PIANO_X, y - ( first_white_key_height -
 						WHITE_KEY_SMALL_HEIGHT ) -
