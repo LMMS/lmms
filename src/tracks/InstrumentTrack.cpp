@@ -894,6 +894,7 @@ Instrument * InstrumentTrack::loadInstrument( const QString & _plugin_name )
 	m_instrument = Instrument::instantiate( _plugin_name, this );
 	engine::mixer()->unlock();
 
+	setName( m_instrument->displayName() );
 	emit instrumentChanged();
 
 	return m_instrument;
