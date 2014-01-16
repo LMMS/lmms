@@ -1,8 +1,8 @@
 /*
- * lmms_style.cpp - the graphical style used by LMMS to create a consistent
+ * LmmsStyle.cpp - the graphical style used by LMMS to create a consistent
  *				  interface
  *
- * Copyright (c) 2007-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2007-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -31,7 +31,7 @@
 #include <QtGui/QPixmapCache>
 #include <QtGui/QStyleOption>
 
-#include "lmms_style.h"
+#include "LmmsStyle.h"
 
 
 const int BUTTON_LENGTH = 24;
@@ -214,7 +214,7 @@ static QString getCacheKey( const QString & _key,
 }
 
 
-lmmsStyle::lmmsStyle() :
+LmmsStyle::LmmsStyle() :
 	QPlastiqueStyle()
 {
 	QFile file( "resources:style.css" );
@@ -227,7 +227,7 @@ lmmsStyle::lmmsStyle() :
 
 
 
-QPalette lmmsStyle::standardPalette( void ) const
+QPalette LmmsStyle::standardPalette( void ) const
 {
 	QPalette pal = QPlastiqueStyle::standardPalette();
 /*	pal.setColor( QPalette::Background, QColor( 91, 101, 113 ) );
@@ -262,7 +262,7 @@ QPalette lmmsStyle::standardPalette( void ) const
 
 
 
-void lmmsStyle::drawControl( ControlElement element, const QStyleOption* option, QPainter* painter, const QWidget* widget ) const
+void LmmsStyle::drawControl( ControlElement element, const QStyleOption* option, QPainter* painter, const QWidget* widget ) const
 {
 
 	switch( element )
@@ -450,7 +450,7 @@ void lmmsStyle::drawControl( ControlElement element, const QStyleOption* option,
 
 
 
-void lmmsStyle::drawComplexControl( ComplexControl control,
+void LmmsStyle::drawComplexControl( ComplexControl control,
 					const QStyleOptionComplex * option,
 					QPainter *painter,
 						const QWidget *widget ) const
@@ -487,7 +487,7 @@ void lmmsStyle::drawComplexControl( ComplexControl control,
 
 
 
-void lmmsStyle::drawPrimitive( PrimitiveElement element,
+void LmmsStyle::drawPrimitive( PrimitiveElement element,
 		const QStyleOption *option, QPainter *painter,
 		const QWidget *widget) const
 {
@@ -599,7 +599,7 @@ void lmmsStyle::drawPrimitive( PrimitiveElement element,
 }
 
 
-int lmmsStyle::pixelMetric( PixelMetric _metric, const QStyleOption * _option,
+int LmmsStyle::pixelMetric( PixelMetric _metric, const QStyleOption * _option,
 						const QWidget * _widget ) const
 {
 	switch( _metric )
@@ -627,7 +627,7 @@ int lmmsStyle::pixelMetric( PixelMetric _metric, const QStyleOption * _option,
 
 // QStyle::SH_TitleBar_NoBorder
 
-QSize lmmsStyle::sizeFromContents( ContentsType type, const QStyleOption* option, const QSize& size, const QWidget* widget ) const
+QSize LmmsStyle::sizeFromContents( ContentsType type, const QStyleOption* option, const QSize& size, const QWidget* widget ) const
 {
 	if( type == CT_ScrollBar )
 	{
@@ -650,7 +650,7 @@ QSize lmmsStyle::sizeFromContents( ContentsType type, const QStyleOption* option
 }
 
 
-QRect lmmsStyle::subControlRect( ComplexControl control, const QStyleOptionComplex* option, SubControl subControl, const QWidget* widget ) const
+QRect LmmsStyle::subControlRect( ComplexControl control, const QStyleOptionComplex* option, SubControl subControl, const QWidget* widget ) const
 {
 	QRect rect = QPlastiqueStyle::subControlRect( control, option, subControl, widget );
 
@@ -794,7 +794,7 @@ QRect lmmsStyle::subControlRect( ComplexControl control, const QStyleOptionCompl
 
 
 
-QImage lmmsStyle::colorizeXpm( const char * const * xpm, const QBrush& fill ) const
+QImage LmmsStyle::colorizeXpm( const char * const * xpm, const QBrush& fill ) const
 {
 	QImage arrowXpm( xpm );
 	QImage arrow( arrowXpm.size(), QImage::Format_ARGB32 );
@@ -807,7 +807,7 @@ QImage lmmsStyle::colorizeXpm( const char * const * xpm, const QBrush& fill ) co
 }
 
 
-void lmmsStyle::hoverColors( bool sunken, bool hover, bool active, QColor& color, QColor& blend ) const
+void LmmsStyle::hoverColors( bool sunken, bool hover, bool active, QColor& color, QColor& blend ) const
 {
 	if( active )
 	{

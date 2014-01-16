@@ -1,8 +1,8 @@
 /*
- * lmms_style.h - the graphical style used by LMMS to create a consistent
+ * LmmsStyle.h - the graphical style used by LMMS to create a consistent
  *                interface
  *
- * Copyright (c) 2007-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2007-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -30,7 +30,7 @@
 #include <QtGui/QPlastiqueStyle>
 
 
-class lmmsStyle : public QPlastiqueStyle
+class LmmsStyle : public QPlastiqueStyle
 {
 public:
 	enum ColorRole
@@ -61,8 +61,8 @@ public:
 		NumColorRoles
 	};
 
-	lmmsStyle();
-	virtual ~lmmsStyle() 
+	LmmsStyle();
+	virtual ~LmmsStyle()
 	{
 	}
 
@@ -90,7 +90,7 @@ public:
 private:
 	QImage colorizeXpm( const char * const * xpm, const QBrush& fill ) const;
 	void hoverColors( bool sunken, bool hover, bool active, QColor& color, QColor& blend ) const;
-	QColor m_colors[ lmmsStyle::NumColorRoles ];
+	QColor m_colors[ LmmsStyle::NumColorRoles ];
 
 } ;
 

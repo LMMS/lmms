@@ -42,7 +42,6 @@
 #include "gui_templates.h"
 #include "tooltip.h"
 #include "pixmap_button.h"
-#include "lmms_style.h"
 
 
 
