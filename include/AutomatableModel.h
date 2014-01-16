@@ -180,6 +180,8 @@ public:
 	static void unlinkModels( AutomatableModel * _m1,
 						AutomatableModel * _m2 );
 
+	void unlinkAllModels();
+
 	virtual void saveSettings( QDomDocument & _doc,
 					QDomElement & _this,
 				const QString & _name = QString( "value" ) );
@@ -206,6 +208,11 @@ public:
 			case Bool: return QString::number( castValue<bool>( _val ) );
 		}
 		return "0";
+	}
+
+	bool hasLinkedModels() const
+	{
+		return m_hasLinkedModels;
 	}
 
 
