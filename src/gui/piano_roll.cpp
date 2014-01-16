@@ -2922,7 +2922,7 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 	bool triplets = ( quantization() % 3 != 0 ); 
 
 	int spt = midiTime::stepsPerTact(); 
-	float pp16th = m_ppt / spt;
+	float pp16th = (float)m_ppt / spt;
 	int bpt = DefaultBeatsPerTact;
 	if ( triplets ) {
 		spt = static_cast<int>(1.5 * spt);
@@ -3855,7 +3855,7 @@ midiTime pianoRoll::newNoteLen() const
 	{
 		return m_lenOfNewNotes;
 	}
-	return midiTime::ticksPerTact() / m_noteLenModel.currentText().right(
+	return DefaultTicksPerTact / m_noteLenModel.currentText().right(
 				m_noteLenModel.currentText().length() -
 								2 ).toInt();
 }
