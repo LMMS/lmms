@@ -123,7 +123,9 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 	m_animateAFP(configManager::inst()->value( "ui",
 						   "animateafp").toInt() ),
 	m_printNoteLabels(configManager::inst()->value( "ui",
-						   "printnotelabels").toInt() )
+						   "printnotelabels").toInt() ),
+	m_displayWaveform(configManager::inst()->value( "ui",
+						   "displaywaveform").toInt() )
 {
 	setWindowIcon( embed::getIconPixmap( "setup_general" ) );
 	setWindowTitle( tr( "Setup LMMS" ) );
@@ -281,6 +283,15 @@ setupDialog::setupDialog( ConfigTabs _tab_to_open ) :
 	noteLabels->setChecked( m_printNoteLabels );
 	connect( noteLabels, SIGNAL( toggled( bool ) ),
 				this, SLOT( toggleNoteLabels( bool ) ) );
+
+	ledCheckBox * displayWaveform = new ledCheckBox(
+				tr( "Enable waveform display by default" ),
+								misc_tw );
+	labelNumber++;
+	displayWaveform->move( XDelta, YDelta*labelNumber );
+	displayWaveform->setChecked( m_displayWaveform );
+	connect( displayWaveform, SIGNAL( toggled( bool ) ),
+				this, SLOT( toggleDisplayWaveform( bool ) ) );
 
 	misc_tw->setFixedHeight( YDelta*labelNumber + HeaderSize );
 
@@ -826,6 +837,8 @@ void setupDialog::accept()
 					QString::number( m_animateAFP ) );
 	configManager::inst()->setValue( "ui", "printnotelabels",
 					QString::number( m_printNoteLabels ) );
+	configManager::inst()->setValue( "ui", "displaywaveform",
+					QString::number( m_displayWaveform ) );
 
 
 	configManager::inst()->setWorkingDir( m_workingDir );
@@ -1023,6 +1036,12 @@ void setupDialog::toggleAnimateAFP( bool _enabled )
 void setupDialog::toggleNoteLabels( bool en )
 {
 	m_printNoteLabels = en;
+}
+
+
+void setupDialog::toggleDisplayWaveform( bool en )
+{
+	m_displayWaveform = en;
 }
 
 
