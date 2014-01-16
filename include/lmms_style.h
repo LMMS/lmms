@@ -33,12 +33,42 @@
 class lmmsStyle : public QPlastiqueStyle
 {
 public:
+	enum ColorRole
+	{
+		AutomationBarFill,
+		AutomationBarValue,
+		AutomationSelectedBarFill,
+		AutomationCrosshair,
+		PianoRollStepNote,
+		PianoRollSelectedNote,
+		PianoRollDefaultNote,
+		PianoRollFrozenNote,
+		PianoRollMutedNote,
+		PianoRollEditHandle,
+		PianoRollVolumeLevel,
+		PianoRollPanningLevel,
+		PianoRollSelectedLevel,
+		TimelineForecolor,
+		StandardGraphLine,
+		StandardGraphHandle,
+		StandardGraphHandleBorder,
+		StandardGraphCrosshair,
+		TextFloatForecolor,
+		TextFloatFill,
+		VisualizationLevelLow,
+		VisualizationLevelMid,
+		VisualizationLevelPeak,
+		NumColorRoles
+	};
+
 	lmmsStyle();
 	virtual ~lmmsStyle() 
 	{
 	}
 
 	virtual QPalette standardPalette( void ) const;
+
+	virtual void drawControl( ControlElement element, const QStyleOption* option, QPainter* painter, const QWidget* widget ) const;
 
 	virtual void drawComplexControl(
 				ComplexControl control,
@@ -53,6 +83,14 @@ public:
 	virtual int pixelMetric( PixelMetric metric,
 					const QStyleOption * option = 0, 
 					const QWidget * widget = 0 ) const;
+
+	QSize sizeFromContents( ContentsType type, const QStyleOption* option, const QSize& size, const QWidget* widget ) const;
+	QRect subControlRect( ComplexControl control, const QStyleOptionComplex *option, SubControl subControl, const QWidget *widget ) const;
+
+private:
+	QImage colorizeXpm( const char * const * xpm, const QBrush& fill ) const;
+	void hoverColors( bool sunken, bool hover, bool active, QColor& color, QColor& blend ) const;
+	QColor m_colors[ lmmsStyle::NumColorRoles ];
 
 } ;
 
