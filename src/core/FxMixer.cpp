@@ -121,8 +121,8 @@ void FxChannel::doProcessing( sampleFrame * _buf )
 	{
 		m_fxChain.startRunning();
 		m_stillRunning = m_fxChain.processAudioBuffer( _buf, fpp );
-		m_peakLeft = engine::mixer()->peakValueLeft( _buf, fpp ) * v;
-		m_peakRight = engine::mixer()->peakValueRight( _buf, fpp ) * v;
+		m_peakLeft = qMax( m_peakLeft, engine::mixer()->peakValueLeft( _buf, fpp ) * v );
+		m_peakRight = qMax( m_peakRight, engine::mixer()->peakValueRight( _buf, fpp ) * v );
 	}
 }
 

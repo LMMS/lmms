@@ -1,7 +1,7 @@
 /*
  * main.cpp - just main.cpp which is starting up app...
  *
- * Copyright (c) 2004-2013 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2012-2013 Paul Giblock    <p/at/pgiblock.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
@@ -58,7 +58,7 @@
 #include "config_mgr.h"
 #include "embed.h"
 #include "engine.h"
-#include "lmms_style.h"
+#include "LmmsStyle.h"
 #include "ImportFilter.h"
 #include "MainWindow.h"
 #include "ProjectRenderer.h"
@@ -386,7 +386,7 @@ int main( int argc, char * * argv )
 	if( render_out.isEmpty() )
 	{
 		// init style and palette
-		QApplication::setStyle( new lmmsStyle() );
+		QApplication::setStyle( new LmmsStyle() );
 
 		// init splash screen - this is a bit difficult as we have a
 		// semi-transparent splash-image therefore we first need to grab
