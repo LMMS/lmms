@@ -443,7 +443,7 @@ void FxMixer::addChannelLeaf( int _ch, sampleFrame * _buf )
 	FxChannel * thisCh = m_fxChannels[_ch];
 
 	// if we're muted or this channel is seen already, discount it
-	if( thisCh->m_muteModel.value() || thisCh->m_queued )
+	if( thisCh->m_queued )
 	{
 		return;
 	}
