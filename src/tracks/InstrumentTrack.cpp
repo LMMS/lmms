@@ -803,6 +803,7 @@ void InstrumentTrack::loadTrackSpecificSettings( const QDomElement & _this )
 	}
 
 	m_pitchModel.loadSettings( _this, "pitch" );
+	m_effectChannelModel.setRange( 0, INT_MAX );
 	m_effectChannelModel.loadSettings( _this, "fxch" );
 
 	if( _this.hasAttribute( "baseoct" ) )
