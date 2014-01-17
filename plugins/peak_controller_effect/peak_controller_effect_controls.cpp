@@ -39,7 +39,10 @@ PeakControllerEffectControls( PeakControllerEffect * _eff ) :
 	m_amountModel( 1.0, -1.0, 1.0, 0.005, this, tr( "Modulation amount" ) ),
 	m_attackModel( 0, 0, 0.999, 0.001, this, tr( "Attack" ) ),
 	m_decayModel( 0, 0, 0.999, 0.001, this, tr( "Release" ) ),
-	m_muteModel( false, this, tr( "Mute output" ) )
+	m_muteModel( false, this, tr( "Mute output" ) ),
+	m_absModel( true, this, tr("Abs Value") ),
+	m_amountMultModel( 1.0, 0, 32, 0.2, this, tr("Amount Multiplicator") ),
+	m_muteOutputModel( false, this, tr("Mute Output") )
 {
 }
 
@@ -53,6 +56,10 @@ void PeakControllerEffectControls::loadSettings( const QDomElement & _this )
 
 	m_attackModel.loadSettings( _this, "attack" );
 	m_decayModel.loadSettings( _this, "decay" );
+
+	m_absModel.loadSettings( _this, "abs" );
+	m_amountMultModel.loadSettings( _this, "amountmult" );
+	m_muteOutputModel.loadSettings( _this, "muteout" );
 
 	int effectId = _this.attribute( "effectId" ).toInt();
 	if( effectId > PeakController::s_lastEffectId )
@@ -82,6 +89,10 @@ void PeakControllerEffectControls::saveSettings( QDomDocument & _doc,
 
 	m_attackModel.saveSettings( _doc, _this, "attack" );
 	m_decayModel.saveSettings( _doc, _this, "decay" );
+
+	m_absModel.saveSettings( _doc,  _this, "abs" );
+	m_amountMultModel.saveSettings( _doc, _this, "amountmult" );
+	m_muteOutputModel.saveSettings(  _doc, _this, "muteout" );
 }
 
 
