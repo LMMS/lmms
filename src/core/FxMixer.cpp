@@ -123,10 +123,17 @@ void FxMixer::processChannel( fx_ch_t _ch, sampleFrame * _buf )
 		{
 			m_fxChannels[_ch]->m_fxChain.startRunning();
 			m_fxChannels[_ch]->m_stillRunning = m_fxChannels[_ch]->m_fxChain.processAudioBuffer( _buf, f );
-			m_fxChannels[_ch]->m_peakLeft = engine::mixer()->peakValueLeft( _buf, f ) *
-												m_fxChannels[_ch]->m_volumeModel.value();
-			m_fxChannels[_ch]->m_peakRight = engine::mixer()->peakValueRight( _buf, f ) *
-												m_fxChannels[_ch]->m_volumeModel.value();
+			float peakLeft = engine::mixer()->peakValueLeft( _buf, f ) * m_fxChannels[_ch]->m_volumeModel.value();
+			float peakRight = engine::mixer()->peakValueRight( _buf, f ) * m_fxChannels[_ch]->m_volumeModel.value();
+
+			if( peakLeft > m_fxChannels[_ch]->m_peakLeft )
+			{
+				m_fxChannels[_ch]->m_peakLeft = peakLeft;
+			}
+			if( peakRight > m_fxChannels[_ch]->m_peakRight )
+			{
+				m_fxChannels[_ch]->m_peakRight = peakRight;
+			}
 		}
 		m_fxChannels[_ch]->m_used = true;
 	}

@@ -340,17 +340,18 @@ void FxMixerView::updateFaders()
 		const float fall_off = 1.2;
 		if( m->m_fxChannels[i]->m_peakLeft > opl )
 		{
-			m_fxChannelViews[i].m_fader->setPeak_L(
-					m->m_fxChannels[i]->m_peakLeft );
+			m_fxChannelViews[i].m_fader->setPeak_L( m->m_fxChannels[i]->m_peakLeft );
+			m->m_fxChannels[i]->m_peakLeft = 0;
 		}
 		else
 		{
 			m_fxChannelViews[i].m_fader->setPeak_L( opl/fall_off );
 		}
+
 		if( m->m_fxChannels[i]->m_peakRight > opr )
 		{
-			m_fxChannelViews[i].m_fader->setPeak_R(
-					m->m_fxChannels[i]->m_peakRight );
+			m_fxChannelViews[i].m_fader->setPeak_R( m->m_fxChannels[i]->m_peakRight );
+			m->m_fxChannels[i]->m_peakRight = 0;
 		}
 		else
 		{
