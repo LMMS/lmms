@@ -917,6 +917,9 @@ inline void pianoRoll::drawDetuningInfo( QPainter & _p, note * _n, int _x,
 	int middle_y = _y + KEY_LINE_HEIGHT / 2;
 	_p.setPen( QColor( 0xFF, 0xDF, 0x20 ) );
 
+	int old_x = 0;
+	int old_y = 0;
+
 	timeMap & map = _n->detuning()->automationPattern()->getTimeMap();
 	for( timeMap::ConstIterator it = map.begin(); it != map.end(); ++it )
 	{
@@ -931,8 +934,26 @@ inline void pianoRoll::drawDetuningInfo( QPainter & _p, note * _n, int _x,
 
 		int pos_y = (int)( middle_y - level * KEY_LINE_HEIGHT );
 
+		if( old_x != 0 && old_y != 0 )
+		{
+			switch( _n->detuning()->automationPattern()->progressionType() )
+			{
+			case AutomationPattern::DiscreteProgression:
+				_p.drawLine( old_x, old_y, pos_x, old_y );
+				_p.drawLine( pos_x, old_y, pos_x, pos_y );
+				break;
+			case AutomationPattern::CubicHermiteProgression: /* TODO */
+			case AutomationPattern::LinearProgression:
+				_p.drawLine( old_x, old_y, pos_x, pos_y );
+				break;
+			}
+		}
+
 		_p.drawLine( pos_x - 1, pos_y, pos_x + 1, pos_y );
 		_p.drawLine( pos_x, pos_y - 1, pos_x, pos_y + 1 );
+
+		old_x = pos_x;
+		old_y = pos_y;
 	}
 }
 
