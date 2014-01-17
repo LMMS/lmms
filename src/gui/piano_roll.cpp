@@ -618,7 +618,7 @@ pianoRoll::pianoRoll() :
 	if( engine::mainWindow()->workspace() )
 	{
 		engine::mainWindow()->workspace()->addSubWindow( this );
-		parentWidget()->setMinimumWidth( tb_layout->minimumSize().width()+10 );
+		parentWidget()->setMinimumSize( tb_layout->minimumSize().width()+10, 200 );
 		parentWidget()->resize( tb_layout->minimumSize().width()+10,
 						INITIAL_PIANOROLL_HEIGHT );
 		parentWidget()->hide();
