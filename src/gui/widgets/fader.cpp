@@ -290,7 +290,7 @@ void fader::paintEvent( QPaintEvent * ev)
 
 	if( m_persistentPeak_L > 0.05 )
 	{
-		painter.fillRect( QRect( 2, persistentPeak_L, 4, 1 ), (m_persistentPeak_L < 1.0 )? QColor( 0, 200, 0) : QColor( 200, 0, 0));
+		painter.fillRect( QRect( 2, persistentPeak_L, 4, 1 ), (m_persistentPeak_L < 1.0 )? QColor( 74, 253, 133) : QColor( 255, 100, 100));
 	}
 
 	int peak_R = calculateDisplayPeak( m_fPeakValue_R - m_fMinPeak );

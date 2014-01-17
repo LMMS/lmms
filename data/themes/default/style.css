@@ -13,6 +13,18 @@ AutomationEditor {
 }
 
 
+QLineEdit {
+	border-radius: 4px;
+	border: 2px inset rgba(91,101,113,128);
+	background: #49515b;
+	color: #e0e0e0;
+}
+
+QLineEdit:focus {
+/*	background: qlineargradient (spread:reflect, x1:0, y1:0, x2:0, y2:0.5, stop:0 #49515b, stop:0.9 #5b6571, stop:1 #5b6571);*/
+	border: 1px solid rgba(0,0,0, 128);
+}
+
 
 QToolTip {
 	border-radius: 4px;
@@ -196,14 +208,14 @@ trackLabelButton:hover {
 	background-color: qlineargradient(spread:reflect, x1:0, y1:0, x2:0, y2:0.5, stop:0 #5b6571, stop:0.75 #7b838d, stop:1 #7b838d );
 	color: white;
 	border: 1px solid rgba(0,0,0,64);
-	padding: 1px 0px;	
+	padding: 1px 0px;
 }
 
 trackLabelButton:pressed {
 	background: qlineargradient(spread:reflect, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 #49515b, stop:0.3 #5b6571, stop:1 #6b7581 );
 	color: white;
 	border: 1px solid rgba(0,0,0,64);
-	padding: 2px 0px 0px;		
+	padding: 2px 0px 0px;
 	font-weight: bold;
 }
 
@@ -211,7 +223,7 @@ trackLabelButton:checked {
 	background: qlineargradient(spread:reflect, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 #49515b, stop:0.3 #5b6571, stop:1 #6b7581 );
 	color: white;
 	border: 1px solid rgba(0,0,0,128);
-	padding: 2px 0px 0px;		
+	padding: 2px 0px 0px;
 	font-weight: bold;
 }
 
@@ -329,7 +341,7 @@ palette:button {color: #c9c9c9}
 palette:shadow {color: #000000}
 palette:buttontext {color: #000000}
 palette:brighttext {color: #4afd85}
-palette:highlight {color: #303030}
+palette:highlight {color: #202020}
 palette:highlightedtext {color: #ffffff}
 
 /* Notes:
