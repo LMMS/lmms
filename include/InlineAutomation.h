@@ -52,9 +52,7 @@ public:
 	inline bool hasAutomation() const
 	{
 		return m_autoPattern != NULL &&
-			!typeInfo<float>::isEqual(
-					m_autoPattern->getTimeMap()[0],
-							defaultValue() );
+			m_autoPattern->getTimeMap().isEmpty() == false;
 	}
 
 	AutomationPattern * automationPattern()
