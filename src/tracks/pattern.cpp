@@ -485,9 +485,9 @@ void pattern::abortFreeze()
 
 
 
-void pattern::addSteps( int _n )
+void pattern::addSteps()
 {
-	m_steps += _n;
+	m_steps += midiTime::stepsPerTact();
 	ensureBeatNotes();
 	emit dataChanged();
 }
@@ -495,8 +495,9 @@ void pattern::addSteps( int _n )
 
 
 
-void pattern::removeSteps( int _n )
+void pattern::removeSteps()
 {
+	int _n = midiTime::stepsPerTact();
 	if( _n < m_steps )
 	{
 		for( int i = m_steps - _n; i < m_steps; ++i )
@@ -908,23 +909,6 @@ void patternView::changeName()
 
 
 
-
-void patternView::addSteps( QAction * _item )
-{
-	m_pat->addSteps( _item->text().section( ' ', 0, 0 ).toInt() );
-}
-
-
-
-
-void patternView::removeSteps( QAction * _item )
-{
-	m_pat->removeSteps( _item->text().section( ' ', 0, 0 ).toInt() );
-}
-
-
-
-
 void patternView::constructContextMenu( QMenu * _cm )
 {
 	QAction * a = new QAction( embed::getIconPixmap( "piano" ),
@@ -967,24 +951,10 @@ void patternView::constructContextMenu( QMenu * _cm )
 		_cm->addSeparator();
 	}
 
-	QMenu * add_step_menu = _cm->addMenu(
-					embed::getIconPixmap( "step_btn_add" ),
-							tr( "Add steps" ) );
-	QMenu * remove_step_menu = _cm->addMenu(
-				embed::getIconPixmap( "step_btn_remove" ),
-							tr( "Remove steps" ) );
-	connect( add_step_menu, SIGNAL( triggered( QAction * ) ),
-			this, SLOT( addSteps( QAction * ) ) );
-	connect( remove_step_menu, SIGNAL( triggered( QAction * ) ),
-			this, SLOT( removeSteps( QAction * ) ) );
-	for( int i = 1; i <= 16; i *= 2 )
-	{
-		const QString label = ( i == 1 ) ?
-					tr( "1 step" ) :
-					tr( "%1 steps" ).arg( i );
-		add_step_menu->addAction( label );
-		remove_step_menu->addAction( label );
-	}
+	_cm->addAction( embed::getIconPixmap( "step_btn_add" ),
+		tr( "Add steps" ), m_pat, SLOT( addSteps() ) );
+	_cm->addAction( embed::getIconPixmap( "step_btn_remove" ),
+		tr( "Remove steps" ), m_pat, SLOT( removeSteps() ) );
 }
 
 
