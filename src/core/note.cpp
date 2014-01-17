@@ -272,6 +272,8 @@ void note::createDetuning()
 	m_detuning = new DetuningHelper;
 	(void) m_detuning->automationPattern();
 	m_detuning->setRange( -MaxDetuning, MaxDetuning, 0.1f );
+	m_detuning->automationPattern()->setProgressionType(
+		AutomationPattern::LinearProgression );
 }
 
 
