@@ -1,7 +1,7 @@
 /*
  * OPL2 FM synth
  *
- * Copyright (c) 2013 Raine M. Ekman <raine/at/iki/fi>
+ * Copyright (c) 2014 Raine M. Ekman <raine/at/iki/fi>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -27,6 +27,8 @@
 // - Velocity (and aftertouch) sensitivity
 //   - in FM mode: OP2 level, add mode: OP1 and OP2 levels
 // - .sbi (or similar) file loading into models
+// - RT safety = get rid of mutex = make emulator code thread-safe
+
 // - Extras:
 //   - double release: first release is in effect until noteoff (heard if percussive sound),
 //     second is switched in just before key bit cleared (is this useful???)
@@ -213,8 +215,15 @@ opl2instrument::opl2instrument( InstrumentTrack * _instrument_track ) :
 	MOD_CON( trem_depth_mdl );
 }
 
+opl2instrument::~opl2instrument() {
+	delete theEmulator;
+	engine::mixer()->removePlayHandles( instrumentTrack() );
+	delete [] renderbuffer;
+}
+
 // Samplerate changes when choosing oversampling, so this is more or less mandatory
 void opl2instrument::reloadEmulator() {
+	delete theEmulator;
 	emulatorMutex.lock();
 	theEmulator = new CTemuopl(engine::mixer()->processingSampleRate(), true, false);
 	theEmulator->init();
@@ -236,36 +245,45 @@ bool opl2instrument::handleMidiEvent( const midiEvent & _me,
 	//   - what to do when voices run out and so on...
 	// - mono mode 
 	// 
-	int key;
+	int key, vel;
 	static int lastvoice=0;
-	if( _me.m_type == MidiNoteOn && !isMuted() ) {
-		// to get us in line with MIDI
-		key = _me.key() +12;
-		for(int i=lastvoice+1; i!=lastvoice; ++i,i%=9) {
-			if( voiceNote[i] == OPL2_VOICE_FREE ) {
-				theEmulator->write(0xA0+i, fnums[key] & 0xff);
-				theEmulator->write(0xB0+i, 32 + ((fnums[key] & 0x1f00) >> 8) );
-				// printf("%d: %d %d\n", key, (fnums[key] & 0x1c00) >> 10, fnums[key] & 0x3ff);
-				voiceNote[i] = key;
-				// printf("Voice %d on\n",i);
-				lastvoice=i;
-				break;
-			}
-		}
-	} else 	if( _me.m_type == MidiNoteOff ) {
-		key = _me.key() +12;
-		for(int i=0; i<9; ++i) {
-			if( voiceNote[i] == key ) {
-				theEmulator->write(0xA0+i, fnums[key] & 0xff);
-				theEmulator->write(0xB0+i, (fnums[key] & 0x1f00) >> 8 );
-				voiceNote[i] = OPL2_VOICE_FREE;
-			}
-		}
-	} else {
-		printf("Midi event type %d\n",_me.m_type);
-		// 224 - pitch wheel
-		// 160 - aftertouch?
-	}
+	switch(_me.m_type) {
+        case MidiNoteOn:
+                if( !isMuted() ) {
+                        // to get us in line with MIDI
+                        key = _me.key() +12;
+                        vel = _me.velocity();
+                        for(int i=lastvoice+1; i!=lastvoice; ++i,i%=9) {
+                                if( voiceNote[i] == OPL2_VOICE_FREE ) {
+                                        theEmulator->write(0xA0+i, fnums[key] & 0xff);
+                                        theEmulator->write(0xB0+i, 32 + ((fnums[key] & 0x1f00) >> 8) );
+                                        voiceNote[i] = key;
+                                        lastvoice=i;
+                                        break;
+                                }
+                        }
+                }
+                break;
+        case MidiNoteOff:
+                key = _me.key() +12; 
+                for(int i=0; i<9; ++i) {
+                        if( voiceNote[i] == key ) {
+                                theEmulator->write(0xA0+i, fnums[key] & 0xff);
+                                theEmulator->write(0xB0+i, (fnums[key] & 0x1f00) >> 8 );
+                                voiceNote[i] = OPL2_VOICE_FREE;
+                        }
+                }
+                break;
+        case MidiKeyPressure:
+                key = _me.key() +12;
+                vel = _me.velocity();
+                break;
+        case MidiPitchBend:
+                printf("TODO: Pitch bend\n");
+                break;
+        default:
+                printf("Midi event type %d\n",_me.m_type);
+        }
 	emulatorMutex.unlock();
 	return true;
 }
@@ -338,7 +356,6 @@ void opl2instrument::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 void opl2instrument::loadSettings( const QDomElement & _this )
 {
-	printf("loadSettings!\n");
 	op1_a_mdl.loadSettings( _this, "op1_a" );
 	op1_d_mdl.loadSettings( _this, "op1_d" );
 	op1_s_mdl.loadSettings( _this, "op1_s" );
@@ -375,9 +392,6 @@ void opl2instrument::loadSettings( const QDomElement & _this )
 // Load a preset in binary form
 void opl2instrument::loadPatch(unsigned char inst[14]) {
 	const unsigned int adlib_opadd[] = {0x00, 0x01, 0x02, 0x08, 0x09, 0x0A, 0x10, 0x11, 0x12};
-	// Set all voices
-	printf("%02x %02x %02x %02x %02x ",inst[0],inst[1],inst[2],inst[3],inst[4]);
-	printf("%02x %02x %02x %02x %02x %02x\n",inst[5],inst[6],inst[7],inst[8],inst[9],inst[10]);
 
 	emulatorMutex.lock();
 	for(int v=0; v<9; ++v) {
@@ -400,7 +414,6 @@ void opl2instrument::tuneEqual(int center, float Hz) {
 	for(int n=0; n<128; ++n) {
 		float tmp = Hz*pow(2, (n-center)/12.0);
 		fnums[n] = Hz2fnum( tmp );
-		//printf("%d: %d %d %f\n", n, (fnums[n] & 0x1c00) >> 10, fnums[n] & 0x3ff,tmp);
 	}
 }
 
@@ -418,7 +431,6 @@ int opl2instrument::Hz2fnum(float Hz) {
 // Load one of the default patches
 void opl2instrument::loadGMPatch() {
 	unsigned char *inst = midi_fm_instruments[m_patchModel.value()];
-	// printf("loadGMPatch: %d ", m_patchModel.value());
 	loadPatch(inst);
 }
 
@@ -429,7 +441,6 @@ void opl2instrument::loadGMPatch() {
 
 // Update patch from the models to the chip emulation
 void opl2instrument::updatePatch() {
-	printf("updatePatch()\n");
 	unsigned char *inst = midi_fm_instruments[0];
 	inst[0] = ( op1_trem_mdl.value() ?  128 : 0  ) +
 		( op1_vib_mdl.value() ?  64 : 0 ) +
@@ -558,9 +569,9 @@ opl2instrumentView::opl2instrumentView( Instrument * _instrument,
         pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap(
                                                                 "artwork" ) );
         setPalette( pal );
-
-
-
+}
+opl2instrumentView::~opl2instrumentView() {
+	// Nobody else seems to delete their knobs and buttons?
 }
 
 void opl2instrumentView::modelChanged()
@@ -609,5 +620,6 @@ void opl2instrumentView::modelChanged()
 	trem_depth_btn->setModel( &m->trem_depth_mdl );
 
 }
+
 
 #include "moc_opl2instrument.cxx"

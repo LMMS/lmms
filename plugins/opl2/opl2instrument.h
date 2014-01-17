@@ -40,6 +40,8 @@ class opl2instrument : public Instrument
 	Q_OBJECT
 public:
 	opl2instrument( InstrumentTrack * _instrument_track );
+	virtual ~opl2instrument();
+
 	virtual QString nodeName() const;
 	virtual PluginView * instantiateView( QWidget * _parent );
 
@@ -121,6 +123,7 @@ class opl2instrumentView : public InstrumentView
 	Q_OBJECT
 public:
         opl2instrumentView( Instrument * _instrument, QWidget * _parent );
+	virtual ~opl2instrumentView();
 	lcdSpinBox *m_patch;
 	void modelChanged();
 
