@@ -74,6 +74,7 @@ class trackContentObject : public Model, public JournallingObject
 {
 	Q_OBJECT
 	mapPropertyFromModel(bool,isMuted,setMuted,m_mutedModel);
+	mapPropertyFromModel(bool,isSolo,setSolo,m_soloModel);
 public:
 	trackContentObject( track * _track );
 	virtual ~trackContentObject();
@@ -154,6 +155,7 @@ private:
 	midiTime m_length;
 
 	BoolModel m_mutedModel;
+	BoolModel m_soloModel;
 
 
 	friend class trackContentObjectView;
@@ -349,6 +351,7 @@ class EXPORT track : public Model, public JournallingObject
 {
 	Q_OBJECT
 	mapPropertyFromModel(bool,isMuted,setMuted,m_mutedModel);
+	mapPropertyFromModel(bool,isSolo,setSolo,m_soloModel);
 public:
 	typedef QVector<trackContentObject *> tcoVector;
 
