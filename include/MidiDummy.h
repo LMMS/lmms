@@ -71,7 +71,7 @@ public:
 
 
 protected:
-	virtual void sendByte( const Uint8 )
+	virtual void sendByte( const unsigned char )
 	{
 	}
 

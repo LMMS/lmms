@@ -360,7 +360,7 @@ Mixer::Mixer() :
 
 	m_workingBuf = (sampleFrame*) aligned_malloc( m_framesPerPeriod *
 							sizeof( sampleFrame ) );
-	for( Uint8 i = 0; i < 3; i++ )
+	for( int i = 0; i < 3; i++ )
 	{
 		m_readBuf = (surroundSampleFrame*)
 			aligned_malloc( m_framesPerPeriod *
@@ -412,7 +412,7 @@ Mixer::~Mixer()
 	delete m_audioDev;
 	delete m_midiClient;
 
-	for( Uint8 i = 0; i < 3; i++ )
+	for( int i = 0; i < 3; i++ )
 	{
 		aligned_free( m_bufferPool[i] );
 	}
