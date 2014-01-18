@@ -241,9 +241,12 @@ void bbEditor::addSteps()
 	for( TrackContainer::TrackList::iterator it = tl.begin();
 		it != tl.end(); ++it )
 	{
-		pattern * p = static_cast<pattern *>(
-			( *it )->getTCO( m_bbtc->currentBB() ) );
-		p->addSteps();
+		if( ( *it )->type() == track::InstrumentTrack )
+		{
+			pattern * p = static_cast<pattern *>(
+				( *it )->getTCO( m_bbtc->currentBB() ) );
+			p->addSteps();
+		}
 	}
 }
 
@@ -257,9 +260,12 @@ void bbEditor::removeSteps()
 	for( TrackContainer::TrackList::iterator it = tl.begin();
 		it != tl.end(); ++it )
 	{
-		pattern * p = static_cast<pattern *>(
-			( *it )->getTCO( m_bbtc->currentBB() ) );
-		p->removeSteps();
+		if( ( *it )->type() == track::InstrumentTrack )
+		{
+			pattern * p = static_cast<pattern *>(
+				( *it )->getTCO( m_bbtc->currentBB() ) );
+			p->removeSteps();
+		}
 	}
 }
 
