@@ -1529,7 +1529,7 @@ void AutomationEditor::paintEvent( QPaintEvent * _pe )
 
 	if( validPattern() )
 	{
-		Sint32 len_ticks = 4;
+		int len_ticks = 4;
 		timeMap & time_map = m_pattern->getTimeMap();
 		timeMap::iterator it = time_map.begin();
 		p.setPen( QColor( 0xFF, 0xDF, 0x20 ) );

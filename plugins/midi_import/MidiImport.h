@@ -69,15 +69,15 @@ private:
 		} while( --_bytes );
 		return( value );
 	}
-	inline Sint32 read32LE( void )
+	inline int read32LE()
 	{
 		int value = readByte();
 		value |= readByte() << 8;
 		value |= readByte() << 16;
 		value |= readByte() << 24;
-		return( value );
+		return value;
 	}
-	inline int readVar( void )
+	inline int readVar()
 	{
 		int c = readByte();
 		int value = c & 0x7f;
@@ -103,9 +103,9 @@ private:
         	return( !file().atEnd() ? value : -1 );
 	}
 
-	inline Sint32 readID( void )
+	inline int readID()
 	{
-		return( read32LE() );
+		return read32LE();
 	}
 	inline void skip( int _bytes )
 	{

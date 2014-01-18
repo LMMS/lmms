@@ -1,7 +1,7 @@
 /*
  * LadspaControls.cpp - model for LADSPA plugin controls
  *
- * Copyright (c) 2008-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -46,26 +46,20 @@ LadspaControls::LadspaControls( LadspaEffect * _eff ) :
 		control_list_t p;
 
 		const bool linked_control = ( m_processors > 1 && proc == 0 );
-		buffer_data_t last_port = NONE;
 
-		for( multi_proc_t::Iterator it = controls.begin(); 
-						it != controls.end(); it++ )
+		for( multi_proc_t::Iterator it = controls.begin(); it != controls.end(); it++ )
 		{
 			if( (*it)->proc == proc )
 			{
 				(*it)->control = new LadspaControl( this, *it,
 							linked_control );
 
-				last_port = (*it)->data_type;
-
 				p.append( (*it)->control );
 
 				if( linked_control )
 				{
-					connect( (*it)->control, 
-					SIGNAL( linkChanged( Uint16, bool ) ),
-						this,
-					SLOT( linkPort( Uint16, bool ) ) );
+					connect( (*it)->control, SIGNAL( linkChanged( int, bool ) ),
+								this, SLOT( linkPort( int, bool ) ) );
 				}
 			}
 		}
@@ -143,7 +137,7 @@ void LadspaControls::loadSettings( const QDomElement & _this )
 
 
 
-void LadspaControls::linkPort( Uint16 _port, bool _state )
+void LadspaControls::linkPort( int _port, bool _state )
 {
 	LadspaControl * first = m_controls[0][_port];
 	if( _state )
@@ -170,18 +164,14 @@ void LadspaControls::updateLinkStatesFromGlobal()
 {
 	if( m_stereoLinkModel.value() )
 	{
-		for( Uint16 port = 0; 
-			port < m_controlCount / m_processors;
-			port++ )
+		for( int port = 0; port < m_controlCount / m_processors; port++ )
 		{
 			m_controls[0][port]->setLink( true );
 		}
 	}
 	else if( !m_noLink )
 	{
-		for( Uint16 port = 0; 
-			port < m_controlCount / m_processors;
-			port++ )
+		for( int port = 0; port < m_controlCount / m_processors; port++ )
 		{
 			m_controls[0][port]->setLink( false );
 		}

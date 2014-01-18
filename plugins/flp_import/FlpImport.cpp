@@ -721,7 +721,7 @@ bool FlpImport::tryImport( TrackContainer* tc )
 	// search for FLdt chunk
 	while( 1 )
 	{
-		Sint32 id = readID();
+		int32_t id = readID();
 		const int len = read32LE();
 		if( file().atEnd() )
 		{
@@ -769,7 +769,7 @@ bool FlpImport::tryImport( TrackContainer* tc )
 	while( file().atEnd() == false )
 	{
 		FLP_Events ev = static_cast<FLP_Events>( readByte() );
-		Uint32 data = readByte();
+		uint32_t data = readByte();
 
 		if( ev >= FLP_Word && ev < FLP_Text )
 		{
@@ -786,7 +786,7 @@ bool FlpImport::tryImport( TrackContainer* tc )
 		if( ev >= FLP_Text )
 		{
 			text_len = data & 0x7F;
-			Uint8 shift = 0;
+			uint8_t shift = 0;
 			while( data & 0x80 )
 			{
 				data = readByte();
@@ -1814,7 +1814,7 @@ void FlpImport::processPluginParams( FL_Channel * _ch )
 			int ws = Oscillator::UserDefinedWave;
 			for( int i = 0; i < 3; ++i )
 			{
-				const Sint32 * d = (const Sint32 *)
+				const int32_t * d = (const int32_t *)
 					( _ch->pluginSettings + i * 28 );
 				QString is = QString::number( i );
 				de.setAttribute( "vol" + is,

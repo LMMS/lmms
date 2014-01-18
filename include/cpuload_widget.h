@@ -2,7 +2,7 @@
  * cpuload_widget.h - widget for displaying CPU-load (partly based on
  *                    Hydrogen's CPU-load-widget)
  *
- * Copyright (c) 2005-2007 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -51,7 +51,7 @@ protected slots:
 
 
 private:
-	Uint8 m_currentLoad;
+	int m_currentLoad;
 
 	QPixmap m_temp;
 	QPixmap m_background;

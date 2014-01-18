@@ -2,7 +2,7 @@
  * effect_rack_view.h - view for effectChain-model
  *
  * Copyright (c) 2006-2007 Danny McRae <khjklujn@netscape.net>
- * Copyright (c) 2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -79,7 +79,7 @@ private:
 	groupBox * m_effectsGroupBox;
 	QScrollArea * m_scrollArea;
 
-	Uint32 m_lastY;
+	int m_lastY;
 
 } ;
 

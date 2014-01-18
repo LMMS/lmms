@@ -34,35 +34,26 @@
 #include <stdint.h>
 #endif
 
-typedef unsigned char	Uint8;
-typedef signed char	Sint8;
-typedef unsigned short	Uint16;
-typedef signed short	Sint16;
-typedef unsigned int	Uint32;
-typedef signed int	Sint32;
 
-
-typedef Uint32 minute_t;
-typedef Sint8 second_t;
-typedef Sint32 tact_t;
-typedef Sint32 tick_t;
-typedef Uint8 volume_t;
-typedef Sint8 panning_t;
+typedef int32_t tact_t;
+typedef int32_t tick_t;
+typedef uint8_t volume_t;
+typedef int8_t panning_t;
 
 
 typedef float sample_t;			// standard sample-type
-typedef Sint16 int_sample_t;		// 16-bit-int-sample
+typedef int16_t int_sample_t;		// 16-bit-int-sample
 
 
-typedef Uint32 sample_rate_t;		// sample-rate
-typedef Sint16 fpp_t;			// frames per period (0-16384)
-typedef Sint32 f_cnt_t;			// standard frame-count
-typedef Uint8 ch_cnt_t;			// channel-count (0-SURROUND_CHANNELS)
-typedef Uint16 bpm_t;			// tempo (MIN_BPM to MAX_BPM)
-typedef Uint16 bitrate_t;		// bitrate in kbps
-typedef Sint8 fx_ch_t;			// FX-channel (0 to MAX_EFFECT_CHANNEL)
+typedef uint32_t sample_rate_t;		// sample-rate
+typedef int16_t fpp_t;			// frames per period (0-16384)
+typedef int32_t f_cnt_t;			// standard frame-count
+typedef uint8_t ch_cnt_t;			// channel-count (0-SURROUND_CHANNELS)
+typedef uint16_t bpm_t;			// tempo (MIN_BPM to MAX_BPM)
+typedef uint16_t bitrate_t;		// bitrate in kbps
+typedef uint16_t fx_ch_t;			// FX-channel (0 to MAX_EFFECT_CHANNEL)
 
-typedef Uint32 jo_id_t;			// (unique) ID of a journalling object
+typedef uint32_t jo_id_t;			// (unique) ID of a journalling object
 
 // use for improved branch prediction
 #define likely(x)	__builtin_expect((x),1)

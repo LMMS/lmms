@@ -5,7 +5,7 @@
  * This file is based on encode.c from vorbis-tools-source, for more information
  * see below.
  *
- * Copyright (c) 2004-2013 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -63,9 +63,9 @@ AudioFileOgg::~AudioFileOgg()
 
 
 
-inline Sint32 AudioFileOgg::writePage()
+inline int AudioFileOgg::writePage()
 {
-	Sint32 written = writeData( m_og.header, m_og.header_len );
+	int written = writeData( m_og.header, m_og.header_len );
 	written += writeData( m_og.body, m_og.body_len );
 	return written;
 }
@@ -78,7 +78,7 @@ bool AudioFileOgg::startEncoding()
 	vorbis_comment vc;
 	const char * comments = "Cool=This song has been made using Linux "
 							"MultiMedia Studio";
-	Sint32 comment_length = strlen( comments );
+	int comment_length = strlen( comments );
 	char * user_comments = new char[comment_length + 1];
 	strcpy( user_comments, comments );
 
@@ -166,7 +166,7 @@ bool AudioFileOgg::startEncoding()
 		{
 			break;
 		}
-		Sint32 ret = writePage();
+		int ret = writePage();
 		if( ret != m_og.header_len + m_og.body_len )
 		{
 			// clean up

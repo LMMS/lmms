@@ -37,9 +37,9 @@ public:
 				float _pick, 
 				float _pickup,
 				float * impluse,
-				Uint32 _len,
+				int _len,
 				sample_rate_t _sample_rate,
-				Uint8 _oversample,
+				int _oversample,
 				float _randomize,
 				float _string_loss,
 				float _detune,
@@ -57,7 +57,7 @@ public:
 	{	
 		sample_t ym0;
 		sample_t ypM;
-		for( Uint8 i = 0; i < m_oversample; i++)
+		for( int i = 0; i < m_oversample; i++)
 		{
 			// Output at pickup position
 			m_outsamp[i] = fromBridgeAccess( m_fromBridge, 
@@ -94,7 +94,7 @@ private:
 	delayLine * m_fromBridge;
 	delayLine * m_toBridge;
 	int m_pickupLoc;
-	Uint8 m_oversample;
+	int m_oversample;
 	float m_randomize;
 	float m_stringLoss;
 	

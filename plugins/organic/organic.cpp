@@ -190,7 +190,7 @@ void organicInstrument::playNote( notePlayHandle * _n,
 		Oscillator * oscs_l[m_numOscillators];
 		Oscillator * oscs_r[m_numOscillators];
 
-		for( Sint8 i = m_numOscillators - 1; i >= 0; --i )
+		for( int i = m_numOscillators - 1; i >= 0; --i )
 		{
 			
 			m_osc[i]->m_phaseOffsetLeft = rand()

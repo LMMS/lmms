@@ -304,7 +304,7 @@ void TripleOscillator::playNote( notePlayHandle * _n,
 		Oscillator * oscs_l[NUM_OF_OSCILLATORS];
 		Oscillator * oscs_r[NUM_OF_OSCILLATORS];
 
-		for( Sint8 i = NUM_OF_OSCILLATORS - 1; i >= 0; --i )
+		for( int i = NUM_OF_OSCILLATORS - 1; i >= 0; --i )
 		{
 
 			// the last oscs needs no sub-oscs...

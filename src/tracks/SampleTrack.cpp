@@ -76,8 +76,7 @@ SampleTCO::~SampleTCO()
 
 void SampleTCO::changeLength( const midiTime & _length )
 {
-	trackContentObject::changeLength( qMax( static_cast<Sint32>( _length ),
-							DefaultTicksPerTact ) );
+	trackContentObject::changeLength( qMax( static_cast<int>( _length ), DefaultTicksPerTact ) );
 }
 
 
@@ -406,8 +405,7 @@ SampleTrack::~SampleTrack()
 
 
 bool SampleTrack::play( const midiTime & _start, const fpp_t _frames,
-						const f_cnt_t _offset,
-							Sint16 /*_tco_num*/ )
+						const f_cnt_t _offset, int /*_tco_num*/ )
 {
 	m_audioPort.effects()->startRunning();
 	bool played_a_note = false;	// will be return variable

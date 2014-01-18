@@ -73,12 +73,12 @@
 
 /*! The width of the resize grip in pixels
  */
-const Sint16 RESIZE_GRIP_WIDTH = 4;
+const int RESIZE_GRIP_WIDTH = 4;
 
 /*! The size of the track buttons in pixels
  */
-const Uint16 TRACK_OP_BTN_WIDTH = 20;
-const Uint16 TRACK_OP_BTN_HEIGHT = 14;
+const int TRACK_OP_BTN_WIDTH = 20;
+const int TRACK_OP_BTN_HEIGHT = 14;
 
 
 /*! A pointer for that text bubble used when moving segments, etc.

@@ -1,7 +1,7 @@
 /*
  * mmp.h - class for reading and writing multimedia-project-files
  *
- * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2012-2013 Paul Giblock <p/at/pgiblock.net>
  * 
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
@@ -104,10 +104,9 @@ private:
 } ;
 
 
-const Uint8 MMP_MAJOR_VERSION = 1;
-const Uint8 MMP_MINOR_VERSION = 0;
-const QString MMP_VERSION_STRING = QString::number( MMP_MAJOR_VERSION ) + "." +
-					QString::number( MMP_MINOR_VERSION );
+const int MMP_MAJOR_VERSION = 1;
+const int MMP_MINOR_VERSION = 0;
+const QString MMP_VERSION_STRING = QString::number( MMP_MAJOR_VERSION ) + "." + QString::number( MMP_MINOR_VERSION );
 
 
 #endif

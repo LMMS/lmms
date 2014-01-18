@@ -1,7 +1,7 @@
 /*
- * MidiAlsaRaw.cpp - midi-client for RawMIDI via ALSA
+ * MidiAlsaRaw.cpp - MIDI client for RawMIDI via ALSA
  *
- * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -95,9 +95,9 @@ QString MidiAlsaRaw::probeDevice()
 
 
 
-void MidiAlsaRaw::sendByte( Uint8 _c )
+void MidiAlsaRaw::sendByte( unsigned char c )
 {
-	snd_rawmidi_write( m_output, &_c, sizeof( _c ) );
+	snd_rawmidi_write( m_output, &c, sizeof( c ) );
 }
 
 
@@ -105,7 +105,7 @@ void MidiAlsaRaw::sendByte( Uint8 _c )
 
 void MidiAlsaRaw::run()
 {
-	Uint8 buf[128];
+	unsigned char buf[128];
 	//int cnt = 0;
 	while( m_quit == false )
 	{

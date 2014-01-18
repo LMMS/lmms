@@ -124,9 +124,9 @@ const int MidiMinPanning = -128;
 struct midiEvent
 {
 	midiEvent( MidiEventTypes _type = MidiActiveSensing,
-			Sint8 _channel = 0,
-			Sint16 _param1 = 0,
-			Sint16 _param2 = 0,
+			int8_t _channel = 0,
+			int16_t _param1 = 0,
+			int16_t _param2 = 0,
 			const void * _sourcePort = NULL ) :
 		m_type( _type ),
 		m_metaEvent( MidiMetaInvalid ),
@@ -172,12 +172,12 @@ struct midiEvent
 		return m_channel;
 	}
 
-	inline Sint16 key() const
+	inline int16_t key() const
 	{
 		return m_data.m_param[0];
 	}
 
-	inline Sint16 & key()
+	inline int16_t & key()
 	{
 		return m_data.m_param[0];
 	}
@@ -192,17 +192,17 @@ struct midiEvent
 		return m_data.m_param[1];
 	}
 
-	inline Sint16 velocity() const
+	inline int16_t velocity() const
 	{
 		return m_data.m_param[1];
 	}
 
-	inline Sint16 & velocity()
+	inline int16_t & velocity()
 	{
 		return m_data.m_param[1];
 	}
 
-	inline Sint16 midiPanning() const
+	inline int16_t midiPanning() const
 	{
 		return m_data.m_param[1];
 	}
@@ -237,12 +237,12 @@ struct midiEvent
 
 	MidiEventTypes m_type;		// MIDI event type
 	MidiMetaEvents m_metaEvent;	// Meta event (mostly unused)
-	Sint8 m_channel;		// MIDI channel
+	int8_t m_channel;		// MIDI channel
 	union
 	{
-		Sint16 m_param[2];	// first/second parameter (key/velocity)
-		Uint8  m_bytes[4];		// raw bytes
-		Sint32 m_sysExDataLen;	// len of m_sysExData
+		int16_t m_param[2];	// first/second parameter (key/velocity)
+		uint8_t m_bytes[4];		// raw bytes
+		int32_t m_sysExDataLen;	// len of m_sysExData
 	} m_data;
 
 	const char * m_sysExData;

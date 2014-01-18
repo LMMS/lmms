@@ -90,7 +90,7 @@ public:
 	virtual ~vibedView() {};
 
 public slots:
-	void showString( Uint8 _string );
+	void showString( int _string );
 	void contextMenuEvent( QContextMenuEvent * );
 	void displayHelp();
 

@@ -1,7 +1,7 @@
 /*
  * MidiClient.h - base-class for MIDI clients like ALSA-sequencer-client
  *
- * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -140,7 +140,7 @@ protected:
 
 
 
-const Uint8 RAW_MIDI_PARSE_BUF_SIZE = 16;
+const int RAW_MIDI_PARSE_BUF_SIZE = 16;
 
 
 class MidiClientRaw : public MidiClient
@@ -158,37 +158,35 @@ public:
 
 protected:
 	// generic raw-MIDI-parser which generates appropriate MIDI-events
-	void parseData( const Uint8 _c );
+	void parseData( const unsigned char c );
 
 	// to be implemented by actual client-implementation
-	virtual void sendByte( const Uint8 _c ) = 0;
+	virtual void sendByte( const unsigned char c ) = 0;
 
 
 private:
 	// this does MIDI-event-process
 	void processParsedEvent();
-	virtual void processOutEvent( const midiEvent & _me,
-						const midiTime & _time,
-						const MidiPort * _port );
+	virtual void processOutEvent( const midiEvent& event, const midiTime& time, const MidiPort* port );
 
 	// small helper function returning length of a certain event - this
 	// is necessary for parsing raw-MIDI-data
-	static Uint8 eventLength( const Uint8 _event );
+	static int eventLength( const unsigned char event );
 
 
 	// data being used for parsing
 	struct midiParserData
 	{
-		Uint8 m_status;		// identifies the type of event, that
+		uint8_t m_status;		// identifies the type of event, that
 					// is currently received ('Noteon',
 					// 'Pitch Bend' etc).
-		Uint8 m_channel;	// The channel of the event that is
+		uint8_t m_channel;	// The channel of the event that is
 					// received (in case of a channel event)
-		Uint32 m_bytes;		// How many bytes have been read for
+		uint32_t m_bytes;		// How many bytes have been read for
 					// the current event?
-		Uint32 m_bytesTotal;	// How many bytes does the current
+		uint32_t m_bytesTotal;	// How many bytes does the current
 					// event type include?
-		Uint32 m_buffer[RAW_MIDI_PARSE_BUF_SIZE];
+		uint32_t m_buffer[RAW_MIDI_PARSE_BUF_SIZE];
 					// buffer for incoming data
 		midiEvent m_midiEvent;	// midi-event 
 	} m_midiParseData;

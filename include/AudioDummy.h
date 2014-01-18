@@ -1,7 +1,7 @@
 /*
  * AudioDummy.h - dummy audio-device
  *
- * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -95,19 +95,14 @@ private:
 		while( true )
 		{
 			timer.reset();
-			const surroundSampleFrame * b =
-						mixer()->nextBuffer();
+			const surroundSampleFrame* b = mixer()->nextBuffer();
 			if( !b )
 			{
 				break;
 			}
 			delete[] b;
 
-			const Sint32 microseconds = static_cast<Sint32>(
-					mixer()->framesPerPeriod() *
-					1000000.0f /
-				mixer()->processingSampleRate() -
-							timer.elapsed() );
+			const int microseconds = static_cast<int>( mixer()->framesPerPeriod() * 1000000.0f / mixer()->processingSampleRate() - timer.elapsed() );
 			if( microseconds > 0 )
 			{
 				usleep( microseconds );

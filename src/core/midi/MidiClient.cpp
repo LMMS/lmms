@@ -1,7 +1,7 @@
 /*
  * MidiClient.cpp - base-class for MIDI-clients like ALSA-sequencer-client
  *
- * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * This file partly contains code from Fluidsynth, Peter Hanappe
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
@@ -110,7 +110,7 @@ MidiClientRaw::~MidiClientRaw()
 
 
 
-void MidiClientRaw::parseData( const Uint8 _c )
+void MidiClientRaw::parseData( const unsigned char c )
 {
 	/*********************************************************************/
 	/* 'Process' system real-time messages                               */
@@ -120,9 +120,9 @@ void MidiClientRaw::parseData( const Uint8 _c )
 	 * Real-time range: 0xF8 .. 0xFF
 	 * Note: Real-time does not affect (running) status.
 	 */  
-	if( _c >= 0xF8 )
+	if( c >= 0xF8 )
 	{
-		if( _c == MidiSystemReset )
+		if( c == MidiSystemReset )
 		{
 			m_midiParseData.m_midiEvent.m_type = MidiSystemReset;
 			m_midiParseData.m_status = 0;
@@ -137,7 +137,7 @@ void MidiClientRaw::parseData( const Uint8 _c )
 	/* There are no system common messages that are of interest here.
 	 * System common range: 0xF0 .. 0xF7 
 	 */
-	if( _c > 0xF0 )
+	if( c > 0xF0 )
 	{
 	/* MIDI spec say: To ignore a non-real-time message, just discard all
 	 * data up to the next status byte.  And our parser will ignore data
@@ -157,14 +157,13 @@ void MidiClientRaw::parseData( const Uint8 _c )
 	 * as soon as a byte >= 0x80 comes in, we are dealing with a status byte
 	 * and start a new event.
 	 */
-	if( _c & 0x80 )
+	if( c & 0x80 )
 	{
-		m_midiParseData.m_channel = _c & 0x0F;
-		m_midiParseData.m_status = _c & 0xF0;
+		m_midiParseData.m_channel = c & 0x0F;
+		m_midiParseData.m_status = c & 0xF0;
 		/* The event consumes x bytes of data...
 					(subtract 1 for the status byte) */
-		m_midiParseData.m_bytesTotal = eventLength(
-						m_midiParseData.m_status ) - 1;
+		m_midiParseData.m_bytesTotal = eventLength( m_midiParseData.m_status ) - 1;
 		/* of which we have read 0 at this time. */
 		m_midiParseData.m_bytes = 0;
 		return;
@@ -185,7 +184,7 @@ void MidiClientRaw::parseData( const Uint8 _c )
 	/* Store the first couple of bytes */
 	if( m_midiParseData.m_bytes < RAW_MIDI_PARSE_BUF_SIZE )
 	{
-		m_midiParseData.m_buffer[m_midiParseData.m_bytes] = _c;
+		m_midiParseData.m_buffer[m_midiParseData.m_bytes] = c;
 	}
 	++m_midiParseData.m_bytes;
 
@@ -207,8 +206,7 @@ void MidiClientRaw::parseData( const Uint8 _c )
 	 * We simply keep the status as it is, just reset the parameter counter.
 	 * If another status byte comes in, it will overwrite the status. 
 	 */
-	m_midiParseData.m_midiEvent.m_type = static_cast<MidiEventTypes>(
-						m_midiParseData.m_status );
+	m_midiParseData.m_midiEvent.m_type = static_cast<MidiEventTypes>( m_midiParseData.m_status );
 	m_midiParseData.m_midiEvent.m_channel = m_midiParseData.m_channel;
 	m_midiParseData.m_bytes = 0; /* Related to running status! */
 	switch( m_midiParseData.m_midiEvent.m_type )
@@ -290,7 +288,7 @@ void MidiClientRaw::processOutEvent( const midiEvent & _me,
 
 
 // Taken from Nagano Daisuke's USB-MIDI driver
-static const Uint8 REMAINS_F0F6[] =
+static const unsigned char REMAINS_F0F6[] =
 {
 	0,	/* 0xF0 */
 	2,	/* 0XF1 */
@@ -301,7 +299,7 @@ static const Uint8 REMAINS_F0F6[] =
 	1	/* 0XF6 */
 } ;
 
-static const Uint8 REMAINS_80E0[] =
+static const unsigned char REMAINS_80E0[] =
 {
 	3,	/* 0x8X Note Off */
 	3,	/* 0x9X Note On */
@@ -316,15 +314,15 @@ static const Uint8 REMAINS_80E0[] =
 
 // Returns the length of the MIDI message starting with _event.
 // Taken from Nagano Daisuke's USB-MIDI driver
-Uint8 MidiClientRaw::eventLength( const Uint8 _event )
+int MidiClientRaw::eventLength( const unsigned char event )
 {
-	if ( _event < 0xF0 )
+	if ( event < 0xF0 )
 	{
-		return REMAINS_80E0[( ( _event - 0x80 ) >> 4 ) & 0x0F];
+		return REMAINS_80E0[( ( event - 0x80 ) >> 4 ) & 0x0F];
 	}
-	else if ( _event < 0xF7 )
+	else if ( event < 0xF7 )
 	{
-		return REMAINS_F0F6[_event - 0xF0];
+		return REMAINS_F0F6[event - 0xF0];
 	}
 	return 1;
 }

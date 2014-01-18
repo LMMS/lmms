@@ -89,9 +89,9 @@ QString MidiOss::probeDevice()
 
 
 
-void MidiOss::sendByte( const Uint8 _c )
+void MidiOss::sendByte( const unsigned char c )
 {
-	m_midiDev.putChar( _c );
+	m_midiDev.putChar( c );
 }
 
 

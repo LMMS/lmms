@@ -1,7 +1,7 @@
 /*
  * AudioDevice.h - base-class for audio-devices, used by LMMS-mixer
  *
- * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -130,11 +130,11 @@ protected:
 
 	// convert a given audio-buffer to a buffer in signed 16-bit samples
 	// returns num of bytes in outbuf
-	Uint32 convertToS16( const surroundSampleFrame * _ab,
-					const fpp_t _frames,
-					const float _master_gain,
-					int_sample_t * _output_buffer,
-					const bool _convert_endian = FALSE );
+	int convertToS16( const surroundSampleFrame * _ab,
+						const fpp_t _frames,
+						const float _master_gain,
+						int_sample_t * _output_buffer,
+						const bool _convert_endian = false );
 
 	// clear given signed-int-16-buffer
 	void clearS16Buffer( int_sample_t * _outbuf,

@@ -55,7 +55,7 @@ public:
 			const StkFloat _control8,
 			const StkFloat _control11,
 			const int _control16,
-			const Uint8 _delay,
+			const uint8_t _delay,
 			const sample_rate_t _sample_rate );
 
 	// TubeBell
@@ -67,7 +67,7 @@ public:
 			const StkFloat _control4,
 			const StkFloat _control11,
 			const StkFloat _control128,
-			const Uint8 _delay,
+			const uint8_t _delay,
 			const sample_rate_t _sample_rate );
 
 	// BandedWG
@@ -79,7 +79,7 @@ public:
 			const int _control16,
 			const StkFloat _control64,
 			const StkFloat _control128,
-			const Uint8 _delay,
+			const uint8_t _delay,
 			const sample_rate_t _sample_rate );
 
 	inline ~malletsSynth()
@@ -124,8 +124,8 @@ protected:
 	Instrmnt * m_voice;
 
 	StkFloat * m_delay;
-	Uint8 m_delayRead;
-	Uint8 m_delayWrite;
+	uint8_t m_delayRead;
+	uint8_t m_delayWrite;
 };
 
 

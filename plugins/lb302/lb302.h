@@ -231,7 +231,7 @@ private:
 
 	void recalcFilter();
 
-	int process(sampleFrame *outbuf, const Uint32 size);
+	int process(sampleFrame *outbuf, const int size);
 
 	friend class lb302SynthView;
 

@@ -1,8 +1,8 @@
 /*
  * endian_handling.h - handle endianess
  *
- * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
  * This program is free software; you can redistribute it and/or
@@ -22,7 +22,6 @@
  *
  */
 
-
 #ifndef _ENDIAN_HANDLING_H
 #define _ENDIAN_HANDLING_H
 
@@ -37,18 +36,18 @@ inline bool isLittleEndian()
 }
 
 
-inline Sint16 swap16IfBE( Sint16 _i )
+inline int16_t swap16IfBE( int16_t i )
 {
-	return( isLittleEndian() ? _i : ( ( _i & 0xFF ) << 8) | ( ( _i >> 8 ) & 0xFF ) );
+	return( isLittleEndian() ? i : ( ( i & 0xFF ) << 8) | ( ( i >> 8 ) & 0xFF ) );
 }
 
 
-inline Sint32 swap32IfBE( Sint32 _i )
+inline int32_t swap32IfBE( int32_t i )
 {
-	return( isLittleEndian() ? _i : ( ( _i & 0xff000000 ) >> 24 ) |
-					( ( _i & 0x00ff0000 ) >> 8 )  |
-					( ( _i & 0x0000ff00 ) << 8 )  |
-					( ( _i & 0x000000ff ) << 24 ) );
+	return( isLittleEndian() ? i : ( ( i & 0xff000000 ) >> 24 ) |
+					( ( i & 0x00ff0000 ) >> 8 )  |
+					( ( i & 0x0000ff00 ) << 8 )  |
+					( ( i & 0x000000ff ) << 24 ) );
 }
 
 #endif

@@ -1,7 +1,7 @@
 /*
  * InstrumentFunctions.h - models for instrument-functions-tab
  *
- * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -45,7 +45,7 @@ public:
 	static const int MAX_CHORD_POLYPHONY = 10;
 
 private:
-	typedef Sint8 ChordSemiTones [MAX_CHORD_POLYPHONY];
+	typedef int8_t ChordSemiTones [MAX_CHORD_POLYPHONY];
 
 public:
 	ChordCreator( Model * _parent );
@@ -90,9 +90,9 @@ public:
 			return size() == 0;
 		}
 
-		bool hasSemiTone( Sint8 semi_tone ) const;
+		bool hasSemiTone( int8_t semiTone ) const;
 
-		Sint8 last() const
+		int8_t last() const
 		{
 			return m_semiTones[size() - 1];
 		}
@@ -102,7 +102,7 @@ public:
 			return m_name;
 		}
 
-		Sint8 operator [] ( int n ) const
+		int8_t operator [] ( int n ) const
 		{
 			return m_semiTones[n];
 		}

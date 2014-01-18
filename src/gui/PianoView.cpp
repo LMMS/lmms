@@ -444,7 +444,7 @@ void PianoView::mousePressEvent( QMouseEvent * _me )
 	if( _me->button() == Qt::LeftButton && m_piano != NULL )
 	{
 		// get pressed key
-		Uint32 key_num = getKeyFromMouse( _me->pos() );
+		int key_num = getKeyFromMouse( _me->pos() );
 		if( _me->pos().y() > PIANO_BASE )
 		{
 			int y_diff = _me->pos().y() - PIANO_BASE;

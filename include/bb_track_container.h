@@ -39,8 +39,7 @@ public:
 	virtual ~bbTrackContainer();
 
 	virtual bool play( midiTime _start, const fpp_t _frames,
-						const f_cnt_t _frame_base,
-							Sint16 _tco_num = -1 );
+						const f_cnt_t _frame_base, int _tco_num = -1 );
 
 	virtual void updateAfterTrackAdd();
 

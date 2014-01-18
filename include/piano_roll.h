@@ -284,7 +284,7 @@ private:
 	actions m_action;
 	noteEditMode m_noteEditMode;
 
-	Uint32 m_selectStartTick;
+	int m_selectStartTick;
 	int m_selectedTick;
 	int m_selectStartKey;
 	int m_selectedKeys;

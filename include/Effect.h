@@ -2,7 +2,7 @@
  * Effect.h - base class for effects
  *
  * Copyright (c) 2006-2007 Danny McRae <khjklujn/at/users.sourceforge.net>
- * Copyright (c) 2006-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -101,11 +101,8 @@ public:
 
 	inline f_cnt_t timeout() const
 	{
-		const float samples =
-				engine::mixer()->processingSampleRate() *
-					m_autoQuitModel.value() / 1000.0f;
-		return 1 + ( static_cast<Uint32>( samples ) / 
-				engine::mixer()->framesPerPeriod() );
+		const float samples = engine::mixer()->processingSampleRate() * m_autoQuitModel.value() / 1000.0f;
+		return 1 + ( static_cast<int>( samples ) / engine::mixer()->framesPerPeriod() );
 	}
 
 	inline float wetLevel() const

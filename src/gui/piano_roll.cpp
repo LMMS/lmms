@@ -923,7 +923,7 @@ inline void pianoRoll::drawDetuningInfo( QPainter & _p, note * _n, int _x,
 	timeMap & map = _n->detuning()->automationPattern()->getTimeMap();
 	for( timeMap::ConstIterator it = map.begin(); it != map.end(); ++it )
 	{
-		Sint32 pos_ticks = it.key();
+		int pos_ticks = it.key();
 		if( pos_ticks > _n->length() )
 		{
 			break;
@@ -1969,7 +1969,7 @@ void pianoRoll::computeSelectedNotes(bool shift)
 				( *it )->setSelected( false );
 			}
 			
-			Sint32 len_ticks = ( *it )->length();
+			int len_ticks = ( *it )->length();
 
 			if( len_ticks == 0 )
 			{
@@ -1982,7 +1982,7 @@ void pianoRoll::computeSelectedNotes(bool shift)
 
 			const int key = ( *it )->key() - m_startKey + 1;
 
-			Sint32 pos_ticks = ( *it )->pos();
+			int pos_ticks = ( *it )->pos();
 
 			// if the selection even barely overlaps the note
 			if( key > sel_key_start &&
@@ -3032,7 +3032,7 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 		for( NoteVector::ConstIterator it = notes.begin();
 						it != notes.end(); ++it )
 		{
-			Sint32 len_ticks = ( *it )->length();
+			int len_ticks = ( *it )->length();
 
 			if( len_ticks == 0 )
 			{
@@ -3045,7 +3045,7 @@ void pianoRoll::paintEvent( QPaintEvent * _pe )
 
 			const int key = ( *it )->key() - m_startKey + 1;
 
-			Sint32 pos_ticks = ( *it )->pos();
+			int pos_ticks = ( *it )->pos();
 
 			int note_width = len_ticks * m_ppt /
 						midiTime::ticksPerTact();
@@ -3523,16 +3523,15 @@ void pianoRoll::selectAll()
 	// if first_time = true, we HAVE to set the vars for select
 	bool first_time = true;
 
-	for( NoteVector::ConstIterator it = notes.begin(); it != notes.end();
-									++it )
+	for( NoteVector::ConstIterator it = notes.begin(); it != notes.end(); ++it )
 	{
-		Uint32 len_ticks = ( *it )->length();
+		int len_ticks = ( *it )->length();
 
 		if( len_ticks > 0 )
 		{
 			const int key = ( *it )->key();
 
-			Uint32 pos_ticks = ( *it )->pos();
+			int pos_ticks = ( *it )->pos();
 			if( key <= m_selectStartKey || first_time )
 			{
 				// if we move start-key down, we have to add 

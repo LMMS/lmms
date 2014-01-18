@@ -1,7 +1,7 @@
 /*
  * InstrumentFunctions.cpp - models for instrument-function-tab
  *
- * Copyright (c) 2004-2013 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -153,12 +153,14 @@ ChordCreator::Chord::Chord( const char * n, const ChordSemiTones & semi_tones ) 
 
 
 
-bool ChordCreator::Chord::hasSemiTone( Sint8 semi_tone ) const
+bool ChordCreator::Chord::hasSemiTone( int8_t semi_tone ) const
 {
 	for( int i = 0; i < size(); ++i )
 	{
 		if( semi_tone == m_semiTones[i] )
+		{
 			return true;
+		}
 	}
 	return false;
 }

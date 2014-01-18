@@ -603,10 +603,8 @@ void InstrumentTrack::removeMidiPortNode( multimediaProject & _mmp )
 
 
 
-bool InstrumentTrack::play( const midiTime & _start,
-					const fpp_t _frames,
-					const f_cnt_t _offset,
-							Sint16 _tco_num )
+bool InstrumentTrack::play( const midiTime & _start, const fpp_t _frames,
+							const f_cnt_t _offset, int _tco_num )
 {
 	const float frames_per_tick = engine::framesPerTick();
 

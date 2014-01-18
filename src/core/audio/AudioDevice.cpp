@@ -1,7 +1,7 @@
 /*
  * AudioDevice.cpp - base-class for audio-devices used by LMMS-mixer
  *
- * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -193,23 +193,20 @@ void AudioDevice::resample( const surroundSampleFrame * _src,
 
 
 
-Uint32 AudioDevice::convertToS16( const surroundSampleFrame * _ab,
-						const fpp_t _frames,
-						const float _master_gain,
-						int_sample_t * _output_buffer,
-						const bool _convert_endian )
+int AudioDevice::convertToS16( const surroundSampleFrame * _ab,
+								const fpp_t _frames,
+								const float _master_gain,
+								int_sample_t * _output_buffer,
+								const bool _convert_endian )
 {
 	if( _convert_endian )
 	{
-		Uint16 temp;
+		int_sample_t temp;
 		for( fpp_t frame = 0; frame < _frames; ++frame )
 		{
 			for( ch_cnt_t chnl = 0; chnl < channels(); ++chnl )
 			{
-				temp = static_cast<int_sample_t>(
-						Mixer::clip( _ab[frame][chnl] *
-						_master_gain ) *
-						OUTPUT_SAMPLE_MULTIPLIER );
+				temp = static_cast<int_sample_t>( Mixer::clip( _ab[frame][chnl] * _master_gain ) * OUTPUT_SAMPLE_MULTIPLIER );
 				
 				( _output_buffer + frame * channels() )[chnl] =
 						( temp & 0x00ff ) << 8 |

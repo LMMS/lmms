@@ -238,9 +238,7 @@ void timeLine::paintEvent( QPaintEvent * )
 
 	tact_t tact_num = m_begin.getTact();
 	int x = m_xOffset + s_posMarkerPixmap->width() / 2 -
-			( ( static_cast<Sint32>( m_begin * m_ppt ) /
-						midiTime::ticksPerTact() ) %
-						static_cast<int>( m_ppt ) );
+			( ( static_cast<int>( m_begin * m_ppt ) / midiTime::ticksPerTact() ) % static_cast<int>( m_ppt ) );
 
 	p.setPen( QColor( 192, 192, 192 ) );
 	for( int i = 0; x + i * m_ppt < width(); ++i )
@@ -287,9 +285,7 @@ void timeLine::mousePressEvent( QMouseEvent * _me )
 	}
 	else
 	{
-		const midiTime t = m_begin +
-				static_cast<Sint32>( _me->x() *
-					midiTime::ticksPerTact() / m_ppt );
+		const midiTime t = m_begin + static_cast<int>( _me->x() * midiTime::ticksPerTact() / m_ppt );
 		m_action = MoveLoopBegin;
 		if( m_loopPos[0] > m_loopPos[1]  )
 		{
@@ -317,9 +313,8 @@ void timeLine::mousePressEvent( QMouseEvent * _me )
 
 void timeLine::mouseMoveEvent( QMouseEvent * _me )
 {
-	const midiTime t = m_begin + static_cast<Sint32>( qMax( _me->x() -
-				    m_xOffset - m_moveXOff, 0 ) *
-					midiTime::ticksPerTact() / m_ppt );
+	const midiTime t = m_begin + static_cast<int>( qMax( _me->x() - m_xOffset - m_moveXOff, 0 ) * midiTime::ticksPerTact() / m_ppt );
+
 	switch( m_action )
 	{
 		case MovePositionMarker:
@@ -332,7 +327,7 @@ void timeLine::mouseMoveEvent( QMouseEvent * _me )
 		case MoveLoopBegin:
 		case MoveLoopEnd:
 		{
-			const Uint8 i = m_action - MoveLoopBegin;
+			const int i = m_action - MoveLoopBegin;
 			if( _me->modifiers() & Qt::ControlModifier )
 			{
 				// no ctrl-press-hint when having ctrl pressed

@@ -466,9 +466,8 @@ inline float GET_INC(float freq) {
 	return freq/engine::mixer()->processingSampleRate();  // TODO: Use actual sampling rate.
 }
 
-int lb302Synth::process(sampleFrame *outbuf, const Uint32 size)
+int lb302Synth::process(sampleFrame *outbuf, const int size)
 {
-	unsigned int i;
 	float w;
 	float samp;
 
@@ -500,7 +499,7 @@ int lb302Synth::process(sampleFrame *outbuf, const Uint32 size)
 	// TODO: NORMAL RELEASE
 	// vca_mode = 1;
 
-	for(i=0;i<size;i++) {
+	for(int i=0;i<size;i++) {
 
 		// update vcf
 		if(vcf_envpos >= ENVINC) {
