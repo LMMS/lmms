@@ -1,7 +1,7 @@
 /*
  * VstPlugin.h - declaration of VstPlugin class
  *
- * Copyright (c) 2005-2012 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
  *
@@ -61,7 +61,7 @@ public:
 		return m_name;
 	}
 
-	inline Sint32 version() const
+	inline int version() const
 	{
 		return m_version;
 	}
@@ -137,7 +137,7 @@ private:
 	bool m_badDllFormat;
 
 	QString m_name;
-	Sint32 m_version;
+	int m_version;
 	QString m_vendorString;
 	QString m_productString;
 	QString m_currentProgramName;
