@@ -303,7 +303,7 @@ void fader::paintEvent( QPaintEvent * ev)
 	}
 
 	// knob
-	painter.drawPixmap( 4, knobPosY() - m_knob.height(), m_knob );
+	painter.drawPixmap( 0, knobPosY() - m_knob.height(), m_knob );
 }
 
 

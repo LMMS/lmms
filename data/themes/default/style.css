@@ -21,7 +21,6 @@ QLineEdit {
 }
 
 QLineEdit:focus {
-/*	background: qlineargradient (spread:reflect, x1:0, y1:0, x2:0, y2:0.5, stop:0 #49515b, stop:0.9 #5b6571, stop:1 #5b6571);*/
 	border: 1px solid rgba(0,0,0, 128);
 }
 
@@ -164,7 +163,7 @@ QToolBar {
 	background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #98a2a7, stop:1 #5b646f);
 }
 
-QToolButton, toolButton {
+QToolButton, ToolButton {
 	padding: 1px 1px 1px 1px;
 	border-radius: 2px;
 	border: 1px solid rgba(0,0,0,32);
@@ -173,7 +172,7 @@ QToolButton, toolButton {
 	color: black;
 }
 
-QToolButton:hover, toolButton:hover {
+QToolButton:hover, ToolButton:hover {
 	background: qradialgradient(cx:0.3, cy:0.3, radius:0.8, fx:0.3, fy:0.3, stop:0 #e0e0e0, stop:0.5 #c9c9c9, stop:1 #969696 );
 	border: 1px solid rgba(0,0,0,128);
 	color: white;
