@@ -1657,7 +1657,7 @@ void track::clone()
 
 /*! \brief Save this track's settings to file
  *
- *  We save the track type and its muted state, then append the track-
+ *  We save the track type and its muted state and solo state, then append the track-
  *  specific settings.  Then we iterate through the trackContentObjects
  *  and save all their states in turn.
  *
@@ -1675,6 +1675,7 @@ void track::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	_this.setAttribute( "type", type() );
 	_this.setAttribute( "name", name() );
 	_this.setAttribute( "muted", isMuted() );
+	_this.setAttribute( "solo", isSolo() );
 	if( m_height >= MINIMAL_TRACK_HEIGHT )
 	{
 		_this.setAttribute( "height", m_height );
@@ -1705,7 +1706,7 @@ void track::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 /*! \brief Load the settings from a file
  *
- *  We load the track's type and muted state, then clear out our
+ *  We load the track's type and muted state and solo state, then clear out our
  *  current trackContentObject.
  *
  *  Then we step through the QDomElement's children and load the
@@ -1727,6 +1728,7 @@ void track::loadSettings( const QDomElement & _this )
 			_this.firstChild().toElement().attribute( "name" ) );
 
 	setMuted( _this.attribute( "muted" ).toInt() );
+	setSolo( _this.attribute( "solo" ).toInt() );
 
 	if( m_simpleSerializingMode )
 	{
