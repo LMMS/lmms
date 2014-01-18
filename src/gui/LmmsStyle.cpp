@@ -214,6 +214,7 @@ static QString getCacheKey( const QString & _key,
 }
 
 
+
 LmmsStyle::LmmsStyle() :
 	QPlastiqueStyle()
 {
@@ -229,10 +230,11 @@ LmmsStyle::LmmsStyle() :
 
 QPalette LmmsStyle::standardPalette( void ) const
 {
-	
-	/* set sane defaults in case loading from stylesheet fails */
-	
+
 	QPalette pal = QPlastiqueStyle::standardPalette();
+	
+/*	sane defaults in case fetching from stylesheet fails*/
+
 	pal.setColor( QPalette::Background, QColor( 91, 101, 113 ) );
 	pal.setColor( QPalette::WindowText, QColor( 240, 240, 240 ) );
 	pal.setColor( QPalette::Base, QColor( 128, 128, 128 ) );
@@ -243,14 +245,14 @@ QPalette LmmsStyle::standardPalette( void ) const
 	pal.setColor( QPalette::BrightText, QColor( 74, 253, 133 ) );
 	pal.setColor( QPalette::Highlight, QColor( 100, 100, 100 ) );
 	pal.setColor( QPalette::HighlightedText, QColor( 255, 255, 255 ) );
-
-	/* load from stylesheet */
+	
+/* fetch from stylesheet using regexp */
 
 	QStringList paletteData = qApp->styleSheet().split( '\n' ).filter( QRegExp( "^palette:*" ) );
 	foreach( QString s, paletteData )
 	{
-		if (s.contains(":background"))	 			{ pal.setColor( QPalette::Background, 		QColor( s.mid( s.indexOf("#"), 7 ) ) ); }
-		else if (s.contains(":windowtext"))	 		{ pal.setColor( QPalette::WindowText, 		QColor( s.mid( s.indexOf("#"), 7 ) ) ); }
+		if (s.contains(":background"))	 			{ pal.setColor( QPalette::Background, 		QColor( s.mid( s.indexOf("#"), 7 ) ) ); }		
+		else if (s.contains(":windowtext"))		{ pal.setColor( QPalette::WindowText, 		QColor( s.mid( s.indexOf("#"), 7 ) ) ); }
 		else if (s.contains(":base")) 				{ pal.setColor( QPalette::Base, 			QColor( s.mid( s.indexOf("#"), 7 ) ) ); }
 		else if (s.contains(":buttontext")) 		{ pal.setColor( QPalette::ButtonText, 		QColor( s.mid( s.indexOf("#"), 7 ) ) ); }		
 		else if (s.contains(":brighttext")) 		{ pal.setColor( QPalette::BrightText, 		QColor( s.mid( s.indexOf("#"), 7 ) ) ); }		
@@ -258,7 +260,7 @@ QPalette LmmsStyle::standardPalette( void ) const
 		else if (s.contains(":button")) 			{ pal.setColor( QPalette::Button, 			QColor( s.mid( s.indexOf("#"), 7 ) ) ); }
 		else if (s.contains(":shadow")) 			{ pal.setColor( QPalette::Shadow, 			QColor( s.mid( s.indexOf("#"), 7 ) ) ); }
 		else if (s.contains(":highlightedtext")) 	{ pal.setColor( QPalette::HighlightedText, 	QColor( s.mid( s.indexOf("#"), 7 ) ) ); }
-		else if (s.contains(":highlight")) 			{ pal.setColor( QPalette::Highlight, 		QColor( s.mid( s.indexOf("#"), 7 ) ) ); };
+		else if (s.contains(":highlight")) 		{ pal.setColor( QPalette::Highlight, 		QColor( s.mid( s.indexOf("#"), 7 ) ) ); };
 	}
 
 	return( pal );
