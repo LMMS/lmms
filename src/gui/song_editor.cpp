@@ -252,7 +252,7 @@ songEditor::songEditor( song * _song, songEditor * & _engine_ptr ) :
 
 
 	// fill own tool-bar
-	m_playButton = new toolButton( embed::getIconPixmap( "play", 24, 24 ),
+	m_playButton = new toolButton( embed::getIconPixmap( "play" ),
 					tr( "Play song (Space)" ),
 					this, SLOT( play() ), m_toolBar );
 
@@ -275,7 +275,7 @@ songEditor::songEditor( song * _song, songEditor * & _engine_ptr ) :
 		m_recordAccompanyButton->setDisabled( true );
 	}
 
-	m_stopButton = new toolButton( embed::getIconPixmap( "stop", 24, 24 ),
+	m_stopButton = new toolButton( embed::getIconPixmap( "stop" ),
 					tr( "Stop song (Space)" ),
 					this, SLOT( stop() ), m_toolBar );
 

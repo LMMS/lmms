@@ -299,7 +299,7 @@ void fader::paintEvent( QPaintEvent * ev)
 
 	if( m_persistentPeak_R > 0.05 )
 	{
-		painter.fillRect( QRect( 16, persistentPeak_R, 4, 1 ), (m_persistentPeak_R < 1.0 )? QColor( 0, 200, 0) : QColor( 200, 0, 0));
+		painter.fillRect( QRect( 16, persistentPeak_R, 4, 1 ), (m_persistentPeak_R < 1.0 )? QColor( 74, 253, 133) : QColor( 255, 100, 100));
 	}
 
 	// knob
