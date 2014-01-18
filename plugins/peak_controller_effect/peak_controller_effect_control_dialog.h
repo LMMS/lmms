@@ -50,10 +50,6 @@ protected:
 	knob * m_decayKnob;
 	ledCheckBox * m_muteLed;
 
-	ledCheckBox * m_absLed;
-	knob * m_amountMultKnob;
-	ledCheckBox * m_muteOutputLed;
-
 } ;
 
 

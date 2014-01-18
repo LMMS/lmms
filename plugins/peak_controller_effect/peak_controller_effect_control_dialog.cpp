@@ -44,11 +44,10 @@ PeakControllerEffectControlDialog::PeakControllerEffectControlDialog(
 	pal.setBrush( backgroundRole(),
 				PLUGIN_NAME::getIconPixmap( "artwork" ) );
 	setPalette( pal );
-	setFixedSize( 288, 110 );
+	setFixedSize( 144, 110 );
 
 	QVBoxLayout * tl = new QVBoxLayout( this );
 	tl->addSpacing( 25 );
-	tl->addStretch();
 
 	QHBoxLayout * l = new QHBoxLayout;
 
@@ -62,13 +61,8 @@ PeakControllerEffectControlDialog::PeakControllerEffectControlDialog(
 	m_amountKnob->setModel( &_controls->m_amountModel );
 	m_amountKnob->setHintText( tr( "Modulation amount:" ) + " ", "" );
 
-	m_amountMultKnob = new knob( knobBright_26, this );
-	m_amountMultKnob->setLabel( tr( "MULT" ) );
-	m_amountMultKnob->setModel( &_controls->m_amountMultModel );
-	m_amountMultKnob->setHintText( tr( "Amount Multiplicator:" ) + " ", "" );
-
 	m_attackKnob = new knob( knobBright_26, this );
-	m_attackKnob->setLabel( tr( "ATTCK" ) );
+	m_attackKnob->setLabel( tr( "ATTACK" ) );
 	m_attackKnob->setModel( &_controls->m_attackModel );
 	m_attackKnob->setHintText( tr( "Attack:" ) + " ", "" );
 
@@ -79,30 +73,15 @@ PeakControllerEffectControlDialog::PeakControllerEffectControlDialog(
 
 	l->addWidget( m_baseKnob );
 	l->addWidget( m_amountKnob );
-	l->addWidget( m_amountMultKnob );
 	l->addWidget( m_attackKnob );
 	l->addWidget( m_decayKnob );
-	l->addStretch(); // expand, so other widgets have minimum width
 	tl->addLayout( l );
 
-	l = new QHBoxLayout; // = 2nd hbox
-
-	m_muteLed = new ledCheckBox( "Mute Effect", this );
+	m_muteLed = new ledCheckBox( "Mute", this );
 	m_muteLed->setModel( &_controls->m_muteModel );
 
-	m_absLed = new ledCheckBox( "Abs Value", this );
-	m_absLed->setModel( &_controls->m_absModel );
-
-	m_muteOutputLed = new ledCheckBox( "Mute Output", this );
-	m_muteOutputLed->setModel( &_controls->m_muteOutputModel );
-
 	tl->addSpacing( 5 );
-
-	l->addWidget( m_muteLed );
-	l->addWidget( m_absLed );
-	l->addWidget( m_muteOutputLed );
-	l->addStretch(); // expand, so other widgets have minimum width
-	tl->addLayout( l );
+	tl->addWidget( m_muteLed );
 
 	setLayout( tl );
 }

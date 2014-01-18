@@ -64,7 +64,6 @@ PeakControllerEffect::PeakControllerEffect(
 	m_peakControls( this ),
 	m_lastSample( 0 ),
 	m_lastRMS( -1 ),
-	m_lastRMSavail(false),
 	m_autoController( NULL )
 {
 	m_autoController = new PeakController( engine::getSong(), this );
@@ -84,19 +83,13 @@ PeakControllerEffect::~PeakControllerEffect()
 	}
 }
 
-//! returns 1.0f if val > 0.0f, -1.0 else
-inline float my_sign(float val) { return -1.0f + 2.0f * (val > 0.0f); }
 
-//! if val >= 0.0f, returns sqrtf(val), else: -sqrtf(-val)
-inline float sqrt_neg(float val) {
-	return sqrtf(fabs(val)) * my_sign(val);
-}
 
 bool PeakControllerEffect::processAudioBuffer( sampleFrame * _buf,
 							const fpp_t _frames )
 {
 	PeakControllerEffectControls & c = m_peakControls;
-
+	
 	// This appears to be used for determining whether or not to continue processing
 	// audio with this effect	
 	if( !isEnabled() || !isRunning() )
@@ -108,12 +101,7 @@ bool PeakControllerEffect::processAudioBuffer( sampleFrame * _buf,
 	double sum = 0;
 	for( int i = 0; i < _frames; ++i )
 	{
-		float sign_0 = (c.m_absModel.value())
-			? 1.0f : my_sign(_buf[i][0]);
-		float sign_1 = (c.m_absModel.value())
-			? 1.0f : my_sign(_buf[i][1]);
-		sum +=	_buf[i][0]*_buf[i][0]*sign_0
-			+ _buf[i][1]*_buf[i][1]*sign_1;
+		sum += _buf[i][0]*_buf[i][0] + _buf[i][1]*_buf[i][1];
 	}
 
 	if( c.m_muteModel.value() )
@@ -124,22 +112,19 @@ bool PeakControllerEffect::processAudioBuffer( sampleFrame * _buf,
 		}
 	}
 
-	float curRMS = sqrt_neg( sum / _frames );
+	float curRMS = sqrtf( sum / _frames );
 	const float origRMS = curRMS;
-
-	if( !m_lastRMSavail )
+	if( m_lastRMS < 0 )
 	{
-		m_lastRMSavail = true;
 		m_lastRMS = curRMS;
 	}
 	const float v = ( curRMS >= m_lastRMS ) ?
 				c.m_attackModel.value() :
 					c.m_decayModel.value();
-	const float a = sqrt_neg( sqrt_neg( v ) );
+	const float a = sqrtf( sqrtf( v ) );
 	curRMS = (1-a)*curRMS + a*m_lastRMS;
 
-	const float amount = c.m_amountModel.value() * c.m_amountMultModel.value();
-	m_lastSample = c.m_baseModel.value() + amount*curRMS;
+	m_lastSample = c.m_baseModel.value() + c.m_amountModel.value()*curRMS;
 	m_lastRMS = curRMS;
 
 	// on greater buffer sizes our LP is updated less frequently, therfore
@@ -152,16 +137,6 @@ bool PeakControllerEffect::processAudioBuffer( sampleFrame * _buf,
 	}
 
 	//checkGate( out_sum / _frames );
-
-	// finally, mute the output if wanted
-	// TODO: avoid clips?
-	if( c.m_muteOutputModel.value() )
-	{
-		for( int i = 0; i < _frames; ++i )
-		{
-			_buf[i][0] = _buf[i][1] = 0.0f;
-		}
-	}
 
 	return isRunning();
 }
