@@ -163,6 +163,7 @@ private:
 
 	friend class patternView;
 	friend class patternFreezeThread;
+	friend class bbEditor;
 
 } ;
 

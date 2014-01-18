@@ -36,6 +36,9 @@
 #include "tool_button.h"
 #include "config_mgr.h"
 
+#include "TrackContainer.h"
+#include "pattern.h"
+
 
 
 bbEditor::bbEditor( bbTrackContainer* tc ) :
@@ -93,6 +96,16 @@ bbEditor::bbEditor( bbTrackContainer* tc ) :
 						tr( "Add automation-track" ),
 				this, SLOT( addAutomationTrack() ), m_toolBar );
 
+	toolButton * remove_bar = new toolButton(
+				embed::getIconPixmap( "step_btn_remove" ),
+						tr( "Remove steps" ),
+				this, SLOT( removeSteps() ), m_toolBar );
+
+	toolButton * add_bar = new toolButton(
+				embed::getIconPixmap( "step_btn_add" ),
+						tr( "Add steps" ),
+				this, SLOT( addSteps() ), m_toolBar );
+
 
 
 	m_playButton->setWhatsThis(
@@ -119,6 +132,8 @@ bbEditor::bbEditor( bbTrackContainer* tc ) :
 	tb_layout->addWidget( add_bb_track );
 	tb_layout->addWidget( add_automation_track );
 	tb_layout->addStretch();
+	tb_layout->addWidget( remove_bar );
+	tb_layout->addWidget( add_bar );
 	tb_layout->addWidget( l );
 	tb_layout->addSpacing( 15 );
 
@@ -214,6 +229,38 @@ void bbEditor::updatePosition()
 void bbEditor::addAutomationTrack()
 {
 	(void) track::create( track::AutomationTrack, model() );
+}
+
+
+
+
+void bbEditor::addSteps()
+{
+	TrackContainer::TrackList tl = model()->tracks();
+
+	for( TrackContainer::TrackList::iterator it = tl.begin();
+		it != tl.end(); ++it )
+	{
+		pattern * p = static_cast<pattern *>(
+			( *it )->getTCO( m_bbtc->currentBB() ) );
+		p->addSteps();
+	}
+}
+
+
+
+
+void bbEditor::removeSteps()
+{
+	TrackContainer::TrackList tl = model()->tracks();
+
+	for( TrackContainer::TrackList::iterator it = tl.begin();
+		it != tl.end(); ++it )
+	{
+		pattern * p = static_cast<pattern *>(
+			( *it )->getTCO( m_bbtc->currentBB() ) );
+		p->removeSteps();
+	}
 }
 
 
