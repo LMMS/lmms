@@ -24,7 +24,14 @@ IF(LMMS_BUILD_LINUX AND NOT WANT_VST_NOWINE)
 
 IF(LMMS_HOST_X86_64)
 	SET(EXTRA_FLAGS -m32)
+
+	# workaround for broken wineg++ in WINE 1.4 (shipped e.g. with Ubuntu Precise)
+	EXEC_PROGRAM( wineg++ ARGS "-v -m32 /dev/zero" OUTPUT_VARIABLE WINEBUILD_OUTPUT)
+	if("${WINEBUILD_OUTPUT}" MATCHES ".*x86_64-linux-gnu/wine/libwinecrt0.a.*")
+		SET(EXTRA_FLAGS ${EXTRA_FLAGS} -nodefaultlibs /usr/lib/i386-linux-gnu/wine/libwinecrt0.a -luser32 -lkernel32 -lgdi32)
+	ENDIF()
 ENDIF(LMMS_HOST_X86_64)
+
 ADD_CUSTOM_COMMAND(
 		SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/RemoteVstPlugin.cpp
 		COMMAND wineg++
