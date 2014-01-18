@@ -106,6 +106,7 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
         m_panningModel( DefaultPanning, PanningLeft, PanningRight, 0.1f,
 							this, tr( "Panning" ) ),
 	m_pitchModel( 0, -100, 100, 1, this, tr( "Pitch" ) ),
+	m_pitchRangeModel( 1, 1, 24, this, tr( "Pitch range" ) ),
 	m_effectChannelModel( 0, 0, NumFxChannels, this, tr( "FX channel" ) ),
 	m_instrument( NULL ),
 	m_soundShaping( this ),
@@ -119,6 +120,8 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 	connect( &m_pitchModel, SIGNAL( dataChanged() ),
 			this, SLOT( updatePitch() ) );
 
+	connect( &m_pitchRangeModel, SIGNAL( dataChanged() ),
+				this, SLOT( updatePitchRange() ) );
 
 	for( int i = 0; i < NumKeys; ++i )
 	{
@@ -585,6 +588,15 @@ void InstrumentTrack::updatePitch()
 
 
 
+void InstrumentTrack::updatePitchRange()
+{
+	const int r = m_pitchRangeModel.value();
+	m_pitchModel.setRange( -100 * r, 100 * r );
+}
+
+
+
+
 int InstrumentTrack::masterKey( int _midi_key ) const
 {
 	int key = m_baseNoteModel.value() - engine::getSong()->masterPitch();
@@ -756,6 +768,7 @@ void InstrumentTrack::saveTrackSpecificSettings( QDomDocument & _doc,
 	m_volumeModel.saveSettings( _doc, _this, "vol" );
 	m_panningModel.saveSettings( _doc, _this, "pan" );
 	m_pitchModel.saveSettings( _doc, _this, "pitch" );
+	m_pitchRangeModel.saveSettings( _doc, _this, "pitchrange" );
 
 	m_effectChannelModel.saveSettings( _doc, _this, "fxch" );
 	m_baseNoteModel.saveSettings( _doc, _this, "basenote" );
@@ -800,6 +813,7 @@ void InstrumentTrack::loadTrackSpecificSettings( const QDomElement & _this )
 	}
 
 	m_pitchModel.loadSettings( _this, "pitch" );
+	m_pitchRangeModel.loadSettings( _this, "pitchrange" );
 	m_effectChannelModel.loadSettings( _this, "fxch" );
 
 	if( _this.hasAttribute( "baseoct" ) )
@@ -1296,6 +1310,13 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 
 	basicControlsLayout->addWidget( m_pitchKnob );
 
+	// set up pitch range knob
+	m_pitchRangeSpinBox= new lcdSpinBox( 2, NULL, tr( "Pitch range (semitones)" ) );
+	m_pitchRangeSpinBox->setLabel( tr( "RANGE" ) );
+
+	basicControlsLayout->addWidget( m_pitchRangeSpinBox );
+	basicControlsLayout->addStretch();
+
 	// setup spinbox for selecting FX-channel
 	m_effectChannelNumber = new fxLineLcdSpinBox( 2, NULL, tr( "FX channel" ) );
 	m_effectChannelNumber->setLabel( tr( "FX CHNL" ) );
@@ -1416,6 +1437,7 @@ void InstrumentTrackWindow::modelChanged()
 	if( m_track->instrument() && m_track->instrument()->isBendable() )
 	{
 		m_pitchKnob->setModel( &m_track->m_pitchModel );
+		m_pitchRangeSpinBox->setModel( &m_track->m_pitchRangeModel );
 		m_pitchKnob->show();
 	}
 	else

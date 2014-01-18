@@ -185,6 +185,11 @@ public:
 		return &m_panningModel;
 	}
 
+	IntModel* pitchRangeModel()
+	{
+		return &m_pitchRangeModel;
+	}
+
 	IntModel * effectChannelModel()
 	{
 		return &m_effectChannelModel;
@@ -209,6 +214,7 @@ protected:
 protected slots:
 	void updateBaseNote();
 	void updatePitch();
+	void updatePitchRange();
 
 
 private:
@@ -226,6 +232,7 @@ private:
 	FloatModel m_volumeModel;
 	FloatModel m_panningModel;
 	FloatModel m_pitchModel;
+	IntModel m_pitchRangeModel;
 	IntModel m_effectChannelModel;
 
 
@@ -387,6 +394,7 @@ private:
 	knob * m_volumeKnob;
 	knob * m_panningKnob;
 	knob * m_pitchKnob;
+	lcdSpinBox* m_pitchRangeSpinBox;
 	lcdSpinBox * m_effectChannelNumber;
 
 
